@@ -182,6 +182,11 @@ function measure(LIBRARY) {
         // E29 (critic D10): the teacher pages' text, and each key cell's letter and answer marks
         if (teacher) { const b0 = pg.querySelector(':scope > .ws-body') || pg; const th = [...b0.querySelectorAll('.dl-thumb')]; th.forEach((t) => { t.dataset.hide = t.style.display; t.style.display = 'none'; });
             P.text = b0.innerText.replace(/\s+/g, ' '); th.forEach((t) => { t.style.display = t.dataset.hide || ''; }); }
+        // E30 (critic r3 S1): a pupil page's / key's own words and digits, the I Can title, tab and
+        // footer left out (the title may name the band, "numbers to 1,000")
+        if (!teacher) { const b0 = pg.querySelector(':scope > .ws-body') || pg; const tw = document.createTreeWalker(b0, NodeFilter.SHOW_TEXT); const parts = []; let tn;
+            while ((tn = tw.nextNode())) { if (tn.parentElement.closest('.ws-title, .ws-tabbox, .ws-foot, .ws-copy, .dl-thumb, style, script')) continue; const v = tn.textContent.trim(); if (v) parts.push(v); }
+            P.bodyText = parts.join(' | '); }
         if (key) P.keyCells = [...pg.querySelectorAll('.ws-cell')].filter((c) => !c.closest('.dl-copy, .dl-thumb')).map((c) => ({
             letter: ((c.querySelector('[data-ws-label], .ws-letter') || {}).textContent || '').trim().replace(/\.$/, ''),
             ans: [...c.querySelectorAll('[data-ws-key-ans]')].map((e) => e.textContent.trim()).join(' '),
@@ -240,12 +245,17 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
     row('E6', 'Pupil text ≥ 11 pt (quiet letters, tab, footer excepted)', `smallest ${pMin} pt (${pMinAt})`, pMin >= 11 - 0.01);
     row('E7', 'Teacher text ≥ 10 pt', `smallest ${tMin} pt (${teach.filter((p) => p.minPt === tMin).map((p) => `${p.id} "${p.minWhere}"`).slice(0, 2).join(', ')})`, tMin >= 10 - 0.01);
     row('E8', 'Working digits 28 pt outside the anchor chart', 'the kit sets --ws-digit 28pt at size L on every pupil page (one size L pack); measured by ws-print-lint --source kit', true);
-    // V22 3131: a teacher page is filled to >= 92 % and only what does not fit continues on a 12 mm-header
-    // page; that continuation holds whole bands and may be short (it is exempt from 50 % when the page
-    // before it is >= 88 % used). Every other page: 50-100 %.
-    const contOk = (p) => { const m = /^(T\w+)-(\d+)$/.exec(p.id); if (!m || !p.teacher) return false; const prev = pages.find((x) => x.id === (m[2] === '2' ? m[1] : `${m[1]}-${+m[2] - 1}`)); return !!prev && prev.usedPct >= 88; };
-    const used = pages.filter((p) => (p.usedPct < 50 && !contOk(p)) || p.overflow > 0);
+    // V22 §8.12.4 / RUBRIC H5: EVERY page 50-100 % used - a teacher continuation page too (critic r3: the
+    // E9 continuation exemption was reverted; the gold packs have none). E9c holds teacher pages to V22 3131.
+    const used = pages.filter((p) => p.usedPct < 50 || p.overflow > 0);
     row('E9', 'Every page ≥ 50 % used, nothing past the body', `min ${Math.min(...pages.map((p) => p.usedPct))} %; overflow ${pages.filter((p) => p.overflow).map((p) => `${p.id} +${p.overflow} mm`).join(', ') || 'none'}; under 50 %: ${pages.filter((p) => p.usedPct < 50).map((p) => `${p.id} ${p.usedPct}`).join(', ') || 'none'}`, !used.length);
+    // E9c (V22 3131 "fill each teacher page to >= 92 %"): a teacher page that is not the last of its
+    // group (T2 → T2-2) must be >= 92 % used - only what does not fit continues; the last page of a
+    // group (or a page alone) >= 50 % (E9). T1 / T6 are single pages by V22 and also >= 50 %.
+    const grpOf = (id) => id.replace(/-\d+$/, '');
+    const notLast = teach.filter((p) => teach.some((q) => q !== p && grpOf(q.id) === grpOf(p.id) && teach.indexOf(q) > teach.indexOf(p)));
+    const under = notLast.filter((p) => p.usedPct < 92);
+    row('E9c', 'Teacher pages: one continued is ≥ 92 % used (V22 3131); every teacher page listed', `${teach.map((p) => `${p.id} ${p.usedPct}`).join(', ')}; continued under 92 %: ${under.map((p) => `${p.id} ${p.usedPct}`).join(', ') || 'none'}`, !under.length);
     const bb = pages.filter((p) => p.bottomBlank > 8);
     row('E9b', 'Body ≤ 8 % blank below its last band (site lint)', `max ${Math.max(...pages.map((p) => p.bottomBlank))} %; over 8 %: ${bb.map((p) => `${p.id} ${p.bottomBlank}`).join(', ') || 'none'}`, !bb.length);
     const cells = [...pupil, ...keys].flatMap((p) => p.cells.filter((c) => !c.empty).map((c) => ({ ...c, page: p.id })));
@@ -313,9 +323,33 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
         // (and by ANSWER on every pupil page but the charts: 10 more than 19 and 30 less 1 are twins too - critic r2)
         // (a Mixed page's skills are told apart by their own form: there the twins are counted per skill)
         for (const pgid of [...new Set(pl.filter((x) => !/^P2/.test(x.page)).map((x) => x.page))]) { const mixed = /^P4m/.test(pgid); const v = pl.filter((x) => x.page === pgid && x.ans !== undefined && x.ans !== '').map((x) => (mixed ? `${x.rep}:` : '') + String(x.ans)); const dup = v.filter((x, i) => v.indexOf(x) !== i); if (dup.length) probs.push(`twin answers ${[...new Set(dup)].join(', ')} on ${pgid}`); }
-        e24b = { ok: !probs.length && prPages.length > 0, msg: probs.length ? probs.join('; ') : `${prPages.length} Practice pages: last rows all edge cases (a 0 place, a teen ending, 1000); no twin answers on any page` };
+        // (LR-6 near twins, V22 2983 / critic r3 N1: two one-number items of one skill on a page within 2 of
+        // each other - 405 and 406 - on every pupil page but the charts)
+        for (const pgid of [...new Set(pl.filter((x) => !/^P2/.test(x.page)).map((x) => x.page))]) {
+            const xs = pl.filter((x) => x.page === pgid && /^\d+$/.test(String(x.item)));
+            for (let i = 0; i < xs.length; i++) for (let j = i + 1; j < xs.length; j++)
+                if (xs[i].rep === xs[j].rep && Math.abs(Number(xs[i].item) - Number(xs[j].item)) <= 2) probs.push(`near twins ${xs[i].item} / ${xs[j].item} on ${pgid}`);
+        }
+        e24b = { ok: !probs.length && prPages.length > 0, msg: probs.length ? probs.join('; ') : `${prPages.length} Practice pages: last rows all edge cases (${[...edge].length} edge numbers dealt); no twin answers and no near twins on any page` };
     }
-    row('E24b', 'Practice last row only edge cases (★★★); LR-6 no twin answers on a page', e24b.msg, e24b.ok);
+    row('E24b', 'Practice last row only edge cases (★★★); LR-6 no twin answers and no near twins (one skill, numbers within 2) on a page', e24b.msg, e24b.ok);
+    // E30 (critic r3 S1): a number the lesson declares `boardOnly` (shown on the board only) is never a
+    // pupil item's number or answer, and never printed on a pupil page or key (digits, with or without
+    // a comma, or its name). The pool JSON carries the list; an empty list passes trivially.
+    {
+        const bo = (R.pool && Array.isArray(R.pool.boardOnly)) ? R.pool.boardOnly : null, probs = [];
+        if (!bo) probs.push('no boardOnly list in the pool JSON');
+        for (const b of bo || []) {
+            const n = String(b.n), withComma = n.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            const re = new RegExp(`(?<![\\d,])(${n}|${withComma})(?![\\d]|,\\d)`);
+            for (const x of (R.pool.places || [])) if (String(x.item) === n || String(x.ans).replace(/,(?=\d{3})/g, '').split(/[^0-9]+/).includes(n)) probs.push(`${n} dealt on ${x.page}`);
+            for (const p of [...pupil, ...keys]) {
+                if (re.test(p.bodyText || '')) probs.push(`${n} printed on ${p.id}`);
+                if (b.words && new RegExp(`\\b${b.words.replace(/[-\s]+/g, '[-\\s]+')}\\b`, 'i').test(p.bodyText || '')) probs.push(`"${b.words}" printed on ${p.id}`);
+            }
+        }
+        row('E30', 'No boardOnly number on a pupil page or key (item, answer, digits or name)', probs.length ? [...new Set(probs)].slice(0, 6).join('; ') : `${(bo || []).map((b) => b.n).join(', ') || 'none declared'}: on no pupil page or key (${pupil.length + keys.length} pages)`, !!bo && !probs.length);
+    }
     // E29 (critic D10): every item letter a teacher page quotes exists on the pupil page it names,
     // and every "x. answer" it quotes is that cell's key answer (digits compared). Section 1 and the
     // routing table name P0; Section 10 names P6.

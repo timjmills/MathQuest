@@ -34,6 +34,10 @@ export function sources(skills, { earlier }) {
     return list.slice(0, 4).map((sk, i) => ({ id: `q${i}`, skills: [sk] }));
 }
 export const measureCols = () => [1, 2, 4];
+// The detailed lesson's check grows its rows to fill the body (critic r3 R7: no bordered empty strip
+// under the last row). Its items are centred in their cells (mq-lvcenter), so a cell keeps no empty
+// band of 30 % (H13) up to about 2.5 x its content; 2 x the measured minimum stays well inside that.
+const GROW_MAX = 2;
 // `input.perQuestion` (the detailed lesson's Prerequisite Check, V22 §9.1: 3-4 questions, up to 8
 // items): items per prerequisite when a caller asks; PER_QUAD otherwise.
 // (An array gives each question its own count, in order.)
@@ -97,7 +101,7 @@ export function plan(input = {}) {
             const own = quads.map((q0) => { const c = [4, 2, 1].find((cc) => fitsAt(q0, cc, ctx)) || 1; return { h: hMinAt(q0, c, ctx), rows: Math.ceil(q0.length / c) }; });
             const need = own.reduce((a, o) => a + m.strip + o.rows * o.h, 0);
             const rowsH = own.reduce((a, o) => a + o.rows * o.h, 0);
-            if (need < m.budget && rowsH > 0) grow = Math.min(1.45, 1 + (m.budget - need - 1) / rowsH);
+            if (need < m.budget && rowsH > 0) grow = Math.min(GROW_MAX, 1 + (m.budget - need - 1) / rowsH);
             // (every item the description asks for prints when the whole check fits one page - critic D15)
             whole = need <= m.budget;
         }
@@ -118,7 +122,7 @@ export function plan(input = {}) {
         // trailing area inside the frame, V22 §8.12.4), so the body is not blank at its foot.
         // (only when the rows could not grow to the body: an empty bordered strip under the last row reads
         // as a missing item - critic r2 R7)
-        if (input.perQuestion && grow >= 1.45) for (const pg of pages) { const last = pg.sections[pg.sections.length - 1]; if (last) last.grow = true; }
+        if (input.perQuestion && grow >= GROW_MAX) for (const pg of pages) { const last = pg.sections[pg.sections.length - 1]; if (last) last.grow = true; }
     }
     const n = kept || all.length;
     const finalFrame = n === all.length ? frame : frameOf({ skills: skillsOn.length ? skillsOn : input.skills || [], input: Object.assign({}, input, { form }),

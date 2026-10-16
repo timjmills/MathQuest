@@ -83,7 +83,7 @@ export function teacherBands(d, V, pages) {
         const m = /^P([23])([a-z])$/.exec(String(s.page || ''));
         if (m) return `${m[1] === '2' ? 'Anchor chart' : 'Lesson sheet'} ${chunkNo(m[2]) || m[2]}`;
         const chunked = (d.chunks || []).length > 1;
-        return { P0: 'Prerequisite Check', P1: 'Number sense', P2: chunked ? 'Anchor chart 1' : 'Anchor chart', P3: chunked ? 'Lesson sheet 1' : 'Lesson sheet', P4: 'Practice 1–2', P5: 'Word problem', P6: 'Exit slip' }[s.page] || 'Mini whiteboards';
+        return { P0: 'Prerequisite Check', P1: 'Number sense', P2: chunked ? 'Anchor chart 1' : 'Anchor chart', P3: chunked ? 'Lesson sheet 1' : 'Lesson sheet', P4: d.mixed ? 'Practice 1–2, Mixed 1' : 'Practice 1–2', P5: 'Word problem', P6: 'Exit slip' }[s.page] || 'Mini whiteboards';
     };
     const flowRows = d.sections.map((s) => [String(s.n), cellText(s.name), cellText(pageOf(s)), `<span class="num">${s.min}</span>`]);
     if (d.transitionsMin) flowRows.push(['', 'Transitions', 'between pages', `<span class="num">${d.transitionsMin}</span>`]);
@@ -107,7 +107,7 @@ export function teacherBands(d, V, pages) {
     const atoms = d.atoms.slice().sort((a, b) => (b.prereq ? 1 : 0) - (a.prereq ? 1 : 0));
     const atomRows = atoms.map((a, i) => ({
         cls: a.critical ? 'dl-crit' : '',
-        cells: [String(i + 1), keyNamed(a.skill), `${esc(a.type)}${a.prereq ? ' · Pre-requisite' : ''}`, `${a.critical ? `${keyIcon()} <b>Critical Atom.</b> ` : ''}${esc(f(a.notes))}`],
+        cells: [String(i + 1), keyNamed(a.skill), `<span style="white-space:nowrap">${esc(a.type)}${a.prereq ? ' · Pre-requisite' : ''}</span>`, `${a.critical ? `${keyIcon()} <b>Critical Atom.</b> ` : ''}${esc(f(a.notes))}`],
     }));
     const routineRows = d.routine.map((r, i) => ({
         cls: r.critical ? 'dl-crit' : '',
@@ -115,17 +115,20 @@ export function teacherBands(d, V, pages) {
     }));
     // (where each mistake is caught is the table's own column - V22 10.9, critic D7)
     const caughtOf = (m) => (m.option ? `Check Question ${m.option}` : m.caught ? f(m.caught) : '');
-    const mistakeRows = d.mistakes.map((m) => [`<b>${esc(m.name)}</b>`, `Step ${m.step}`, esc(m.looks), esc(m.fix), esc(caughtOf(m))]);
+    // (`looks` / `fix` are filled from the dealt items - critic r3 S3: an error form such as
+    // {exit.0.wrong.MV9} is the provider's own wrong answer for that item, never typed)
+    const mistakeRows = d.mistakes.map((m) => [`<b>${esc(m.name)}</b>`, String(m.step), esc(f(m.looks)), esc(f(m.fix)), esc(caughtOf(m))]);
     // Every mistake names where it is caught: its Check Question option, else `caught` (V22 10.9, critic D7).
     const links = d.mistakes.map((m) => (m.option ? `Check Question option ${m.option} catches <b>${esc(m.name)}</b>.` : m.caught ? `<b>${esc(m.name)}</b> is caught by ${esc(f(m.caught))}.` : '')).filter(Boolean).join(' ');
     out.T2 = [
-        { label: 'What students need to know:', blocks: [tTable(['#', 'Skill or Concept', 'Atom Type', 'Teacher Notes'], atomRows, { widths: ['7mm', '', '36mm', ''] })] },
+        { label: 'What students need to know:', blocks: [tTable(['#', 'Skill or Concept', 'Atom Type', 'Teacher Notes'], atomRows, { widths: ['7mm', '', '50mm', ''] })] },
         // (the flow note is the table's foot: one block, never a band continued for one line - critic D5)
-        { label: 'What students do:', blocks: [tTable(['Step', 'Task / Routine atom', 'Tag', 'Check it with'], routineRows, { widths: ['16mm', '', '26mm', '48mm'] })
+        { label: 'What students do:', blocks: [tTable(['Step', 'Task / Routine atom', 'Tag', 'Check it with'], routineRows, { widths: ['13mm', '', '16mm', '52mm'] })
             + tLine(`Rows tagged New: ${newCount} → Flow: ${flow}.${d.flowNote ? ` ${esc(d.flowNote)}` : ''}`)] },
         // (the Board line only when the description says what goes on the board - critic D8)
-        { label: 'How to teach:', blocks: [`<ol class="dl-list">${d.howToTeach.map((t) => `<li>${esc(t)}</li>`).join('')}</ol>` + (d.board ? boardLine(`Board: ${f(d.board)}`) : '')] },
-        { label: 'Common mistakes:', blocks: [tTable(['Mistake', 'Broken step', 'Looks like', 'Fix', 'Caught by'], mistakeRows, { widths: ['28mm', '18mm', '', '', '34mm'] })] },
+        // (a string is ONE paragraph, as the gold T2 - critic r3 S2; a list prints numbered)
+        { label: 'How to teach:', blocks: [(typeof d.howToTeach === 'string' ? tLine(esc(f(d.howToTeach))) : `<ol class="dl-list">${d.howToTeach.map((t) => `<li>${esc(t)}</li>`).join('')}</ol>`) + (d.board ? boardLine(`Board: ${f(d.board)}`) : '')] },
+        { label: 'Common mistakes:', blocks: [tTable(['Mistake', 'Step', 'Looks like', 'Fix', 'Caught by'], mistakeRows, { widths: ['36mm', '13mm', '', '', '33mm'] })] },
     ];
 
     // ---------------------------------------------------------------------------- T2b
@@ -184,7 +187,7 @@ export function teacherBands(d, V, pages) {
         { label: 'Accepted answers:', blocks: [`<ul class="dl-list">${(d.accepted || []).map((t) => `<li>${esc(t)}</li>`).join('')}</ul>`] },
         // (in runs of 4 rows, so a long table continues on the next page instead of moving whole)
         { label: 'Answers at a glance:', blocks: chunk(pages.glance, 4).map((part, i) => tTable(i ? null : ['Page', 'Answers', 'Fade'], part.map((g) => [cellText(g.page), `<span class="dl-ka" data-ka>${esc(g.answers)}</span>`, esc(g.fade)]), { widths: ['44mm', '', '14mm'] })) },
-        { label: 'Wrong answers to look for when marking:', blocks: [tTable(['Pupil wrote', 'Likely mistake', 'Next step'], d.wrongAnswers.map((w) => [cellText(w.wrote), `<b>${esc(w.mistake)}</b>`, cellText(w.next)]))] },
+        { label: 'Wrong answers to look for when marking:', blocks: [tTable(['Pupil wrote', 'Likely mistake', 'Next step'], d.wrongAnswers.map((w) => [cellText(f(w.wrote)), `<b>${esc(w.mistake)}</b>`, cellText(f(w.next))]))] },
     ];
     return { bands: out, flow };
 }
@@ -235,22 +238,26 @@ export function paginateTeacher(bands, heights, { body = TEACHER_BODY_MM, greedy
         return pages;
     };
     let pages = pack(Infinity);
-    // PG-23 / V22 §8.12.4: a page under half full is rebalanced with its neighbour - of every packing
-    // with the same page count, the one whose emptiest page is fullest.
-    // (`greedy`: the first page filled first - V22 3131 "fill to 92 %, continue only what does not fit")
-    if (pages.length > 1 && !greedy) {
+    // V22 3131 first: "fill each teacher page to >= 92 %, continue only what does not fit" - the
+    // greedy packing, when every page but the last is >= 92 % and the last is >= 50 % (V22 §8.12.4).
+    // Else PG-23 / §8.12.4: of every packing with the same page count, the one whose emptiest page is
+    // fullest; and when no packing gets every page to half full, the greedy one (E9 then names it).
+    // (critic r3: no continuation page may be a stub; the self-check E9 / E9c hold both floors)
+    if (pages.length > 1) {
         const n = pages.length;
-        const fill = (ps) => Math.min(...ps.map((pg, i) => cost(pg) / budgetOf(i)));
-        let best = pages, bestFill = fill(pages);
-        for (let cap = budgetOf(1); cap > 40; cap -= 2) {
-            const p2 = pack(cap);
-            if (p2.length !== n) break;
-            const f = fill(p2);
-            if (f > bestFill) { best = p2; bestFill = f; }
+        const fillAt = (pg, i) => cost(pg) / budgetOf(i);
+        const fill = (ps) => Math.min(...ps.map(fillAt));
+        const v22 = pages.every((pg, i) => fillAt(pg, i) >= (i < n - 1 ? 0.92 : 0.5));
+        if (!v22 && !greedy) {
+            let best = pages, bestFill = fill(pages);
+            for (let cap = budgetOf(1); cap > 40; cap -= 2) {
+                const p2 = pack(cap);
+                if (p2.length !== n) break;
+                const f = fill(p2);
+                if (f > bestFill) { best = p2; bestFill = f; }
+            }
+            if (bestFill >= 0.5) pages = best;
         }
-        // (no balance reaches half a page on every page: fill the first page and let the rest continue,
-        // V22 3131 - the continuation is short by rule)
-        if (bestFill >= 0.5) pages = best;
     }
     return pages.map((list, i) => {
         const out = [];
@@ -387,6 +394,7 @@ export function numberSensePlan({ bands, cellH }, frame) {
 
 /** The extra pupil-page CSS of P5 and P6 (additive; `dl-*` only). */
 export const DETAILED_PUPIL_CSS = `
+.ws-page[data-dl-page] .ws-band.grow>.ws-grid.fixed:last-child{flex:1 1 auto;height:auto!important;min-height:0}
 .ws-page .dl-wptoprow{flex:none}
 .ws-page .dl-wptoprow .ws-grid{height:100%}
 .ws-page .dl-wpstory .ws-cell,.ws-page .dl-wppanel .ws-cell{justify-content:stretch;align-items:stretch;padding:3mm}

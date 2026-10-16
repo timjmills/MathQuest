@@ -176,8 +176,23 @@ export function plan(input = {}) {
     // The spare height is shared into the shelves only as far as a cell keeps its drawing filling
     // it (H13: never an empty band of 30% of a cell): a tenth of a shelf's own height at most.
     const growOf = (sh) => (shelves.length ? ((input.fill || input.growLast) ? Math.min(sh.h * 0.35, spare / shelves.length) : Math.min(12, sh.h * 0.1, spare / shelves.length)) : 0);
+    // `growLast` (the detailed lesson maker): the spare is water-filled - a shelf that reaches its
+    // 35 % cap passes the rest to the others - so no bordered empty strip is left under the
+    // last row (critic r3 nit, P4m-1). Absent on every other Mixed page (equal shares, as before).
+    const fillShares = (() => {
+        if (!input.growLast || !shelves.length) return null;
+        const g = shelves.map(() => 0);
+        let left = spare, open = shelves.map((_, i) => i);
+        for (let it = 0; it < 8 && left > 0.05 && open.length; it++) {
+            const each = left / open.length;
+            const next = [];
+            for (const i of open) { const room = shelves[i].h * 0.35 - g[i]; const add = Math.min(room, each); g[i] += add; left -= add; if (room - add > 0.05) next.push(i); }
+            open = next;
+        }
+        return g;
+    })();
     for (const [i, sh] of shelves.entries()) {
-        const grow = growOf(sh);
+        const grow = fillShares ? fillShares[i] : growOf(sh);
         const firstOfSkill = i === 0 || shelves[i - 1].id !== sh.id;
         const budget = pages.length > 1 ? p.mCont.budget : m.budget;   // the page `cur` is on
         let bandH = m.strip + sh.h + grow + (sh.anchor ? sh.bandMm : 0);

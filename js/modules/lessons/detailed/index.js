@@ -24,6 +24,9 @@
 //                 It is passed to the standard lesson role as `lessonData`; prereqs.js is untouched.
 //   pool, edgeTest {kind: 'range', lo, hi} | {kind: 'list', items}; a roles/lesson.js CASE_TESTS name
 //                 (the ★★★ last row and the pool's `edge` list). Absent pool: the pack's own places.
+//   boardOnly     [1000]                               numbers shown on the board only (a script may say
+//                 them): a HARD bound on every ref of the pack (print-sheet.js refHardOk) - never a pupil
+//                 item's number or answer, never on a key; the pool must not hold them; self-check E30
 //   practiceSheets [{skill?, shape?: [count, cols], chunk?, edgeLast?: {per, cols, wants: [case]}}]
 //                 each Practice page its own sheet ({} = the lesson skill); `chunk` puts that chunk's Steps
 //                 on it; `edgeLast.wants` names the case of each ★★★ place (a wanted case is kept for it)
@@ -121,6 +124,11 @@ export function validateDescription(d) {
     if ((d.prerequisites || []).length < 3 || d.prerequisites.length > 4) errs.push('P0 needs 3-4 questions');
     if ((d.exit || []).length !== 4) errs.push('the exit slip has 4 items');
     if ((d.vocabulary || []).length > 3 || (d.t1Boxes || []).length > 3) errs.push('at most 3 vocabulary cards and 3 T1 boxes');
+    if (d.boardOnly !== undefined) {
+        if (!Array.isArray(d.boardOnly) || d.boardOnly.some((v) => !Number.isFinite(Number(v)))) errs.push('boardOnly is a list of numbers');
+        else if (d.pool && d.pool.kind === 'range' && d.boardOnly.some((v) => v >= d.pool.lo && v <= d.pool.hi)) errs.push('a boardOnly number is inside the pool range');
+        else if (d.pool && d.pool.kind === 'list' && d.boardOnly.some((v) => d.pool.items.map(Number).includes(Number(v)))) errs.push('a boardOnly number is in the pool list');
+    }
     const total = (d.sections || []).reduce((a, s) => a + (s.min || 0), 0) + (d.transitionsMin || 0);
     if (total !== 60) errs.push(`the sections add up to ${total} minutes, not 60`);
     for (const s of d.sections || []) for (const r of s.rows || []) for (const k of ['say', 'ask']) {

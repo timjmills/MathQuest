@@ -235,6 +235,8 @@ function refAccepts(sk, cand, key, seen, kept) {
     if (sk.distinctAnswer && seen.has(`ans:${key}:${refAnswer(cand)}`)) return false;
     // (`avoidKeys` refs - the detailed lesson maker: no two answers alike on the page across its skills, LR-6)
     if (sk.avoidKeys && seen.has(`ansAll:${dlAns(cand).replace(/[^0-9a-z<>=]/gi, '')}`)) return false;
+    // (LR-6 near twins, critic r3 N1: no two one-number items of a skill on a page within 2 - 405 and 406)
+    if (sk.avoidKeys && nearKeyOf(cand) !== null) { const v = nearKeyOf(cand); for (let dv = -2; dv <= 2; dv++) if (dv && seen.has(`near:${key}:${v + dv}`)) return false; }
     if (sk.noTurnaround && ops.length >= 2 && seen.has(`pair:${key}:${ops.slice().sort((x, y) => x - y).join(',')}`)) return false;
     if (sk.maxSmall !== undefined && ops.length >= 2 && ops[1] < 10 && (kept.get(`small:${key}`) || 0) >= Number(sk.maxSmall)) return false;
     if (Array.isArray(sk.avoidTexts) && sk.avoidTexts.includes(refText(cand))) return false;
@@ -242,15 +244,34 @@ function refAccepts(sk, cand, key, seen, kept) {
     // page of the pack dealt; `minNum` / `maxNum` - the item's number (or answer) in range; `edge`
     // with `edgeTest` - only the lesson's edge cases (roles/lesson.js CASE_TESTS). Absent on every
     // other request.
-    if (sk.avoidKeys || sk.minNum !== undefined || sk.maxNum !== undefined || sk.edge) {
-        const v = itemNumberOf(cand);
+    if (sk.avoidKeys || sk.minNum !== undefined || sk.maxNum !== undefined || sk.edge || sk.boardOnly) {
         const k = factKeyOf(cand);
         if (k === null) return false;
         if (sk.avoidKeys && sk.avoidKeys.includes(k)) return false;
-        if (sk.minNum !== undefined && !(v >= Number(sk.minNum))) return false;
-        if (sk.maxNum !== undefined && !(v <= Number(sk.maxNum))) return false;
+        if (!refHardOk(sk, cand)) return false;
         if (sk.edge) { const t = LESSON_CASE_TESTS[sk.edgeTest || 'pvEdge']; if (t && !t({ q: cand })) return false; }
         if (seen.has(`key:${k}`)) return false;
+    }
+    return true;
+}
+
+/**
+ * A lesson ref's HARD bounds (the detailed lesson maker): `minNum` / `maxNum` on the item's number
+ * and `boardOnly` (numbers shown on the board only: never an item's number or its answer). Unlike
+ * the soft floors these are never relaxed, not even on a ref's last try (critic r3 S1: the last try
+ * "took what it got" and printed 1,000 on a pupil page past `maxNum: 999`).
+ */
+export const refHasHard = (sk) => !!sk && (sk.minNum !== undefined || sk.maxNum !== undefined || (Array.isArray(sk.boardOnly) && sk.boardOnly.length > 0));
+export function refHardOk(sk, cand) {
+    if (!refHasHard(sk)) return true;
+    const v = itemNumberOf(cand);
+    if (sk.minNum !== undefined && !(v !== null && v >= Number(sk.minNum))) return false;
+    if (sk.maxNum !== undefined && !(v !== null && v <= Number(sk.maxNum))) return false;
+    if (Array.isArray(sk.boardOnly) && sk.boardOnly.length) {
+        const bo = sk.boardOnly.map(Number);
+        const a = String(dlAns(cand)).replace(/,(?=\d{3})/g, '');
+        if (v !== null && bo.includes(v)) return false;
+        if ((a.match(/\d+/g) || []).some((x) => bo.includes(Number(x)))) return false;
     }
     return true;
 }
@@ -285,8 +306,12 @@ export function factKeyOf(q) {
     return v === null ? null : String(v);
 }
 
-/** An edge case of a numbers-to-1000 lesson: a 0 in the tens or ones, a teen ending, or 1000. */
-export const isEdgeNumber = (v) => v === 1000 || (v >= 100 && (Math.floor(v / 10) % 10 === 0 || v % 10 === 0 || Math.floor(v / 10) % 10 === 1));
+/** An edge case of a numbers-to-1000 lesson: a 0 in the tens or ones, a teen ending, or 1000 (not
+ *  when the lesson declares it `boardOnly`: then it is never dealt, so never an edge case). */
+export const isEdgeNumber = (v, boardOnly = []) => !boardOnly.map(Number).includes(v) && (v === 1000 || (v >= 100 && (Math.floor(v / 10) % 10 === 0 || v % 10 === 0 || Math.floor(v / 10) % 10 === 1)));
+
+/** A one-number item's number for LR-6's near-twin rule (an operation item: null). */
+const nearKeyOf = (q) => (composeOpOf(q) ? null : itemNumberOf(q));
 
 /** Records what `refAccepts` checks the next items against. */
 function refRecord(sk, q, key, seen, kept) {
@@ -294,9 +319,10 @@ function refRecord(sk, q, key, seen, kept) {
     if (sk.distinctFirst) seen.add(`first:${key}:${ops[0]}`);
     if (sk.distinctAnswer) seen.add(`ans:${key}:${refAnswer(q)}`);
     if (sk.avoidKeys) seen.add(`ansAll:${dlAns(q).replace(/[^0-9a-z<>=]/gi, '')}`);
+    if (sk.avoidKeys && nearKeyOf(q) !== null) seen.add(`near:${key}:${nearKeyOf(q)}`);
     if (sk.noTurnaround && ops.length >= 2) seen.add(`pair:${key}:${ops.slice().sort((x, y) => x - y).join(',')}`);
     if (sk.maxSmall !== undefined && ops.length >= 2 && ops[1] < 10) kept.set(`small:${key}`, (kept.get(`small:${key}`) || 0) + 1);
-    if (sk.avoidKeys || sk.minNum !== undefined || sk.maxNum !== undefined || sk.edge) { const k = factKeyOf(q); if (k !== null) seen.add(`key:${k}`); }
+    if (sk.avoidKeys || sk.minNum !== undefined || sk.maxNum !== undefined || sk.edge || sk.boardOnly) { const k = factKeyOf(q); if (k !== null) seen.add(`key:${k}`); }
 }
 
 const refAnswer = (q) => String(q && q.ans !== undefined ? (typeof q.ans === 'object' ? JSON.stringify(q.ans) : q.ans) : '');
@@ -325,20 +351,33 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // such a place tries the item rotations in turn (a generator deals its cases off itemIndex).
         const edgeAt = sk.edgeLast ? (i % sk.edgeLast.per) - (sk.edgeLast.per - sk.edgeLast.cols) : -1;
         const edgeWant = edgeAt >= 0 && Array.isArray(sk.edgeLast.wants) ? sk.edgeLast.wants[edgeAt] : '';
-        for (let k = 0; k <= tries; k++) {
-            const seed = (baseSeed + i + 7919 * k) >>> 0;
-            let cand = null;
-            try { cand = generateQuestionFor(Object.assign({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex: edgeWant ? itemIndex + k : itemIndex, itemCount: perSkill ? perSkill.get(key) : undefined }, sk.range ? { range: sk.range } : {})); } catch (e) { cand = null; }
-            if (!cand) continue;
-            // A lesson's skill ref (lessons r2-r3): floors on what the packet deals. Not skill
-            // options - the packet's; the last try takes what it gets.
-            const skR = edgeAt >= 0 ? Object.assign({}, sk, { edge: true }, edgeWant ? { edgeTest: edgeWant } : {}) : sk;
-            if (k < tries && !refAccepts(skR, cand, key, seen, kept)) continue;
-            // (a case the last row WANTS is kept for it: no other place of the page deals it)
-            if (k < tries && edgeAt < 0 && sk.edgeLast && Array.isArray(sk.edgeLast.wants) && sk.edgeLast.wants.some((w) => w && LESSON_CASE_TESTS[w] && LESSON_CASE_TESTS[w]({ q: cand }))) continue;
-            q = cand;
-            if (!seen.has(signature(cand))) break;
-        }
+        // A ref with HARD bounds (refHasHard: the detailed lesson maker) never relaxes them: its last
+        // try is strict too; failing that, a second pass rotates the generator's case (itemIndex - a
+        // case-dealing generator gives every seed the same case at one index, so seeds alone cannot
+        // escape it), and only then are the SOFT floors relaxed, the hard bounds still held. A ref
+        // without them deals exactly as before (the standard lesson maker is unchanged).
+        const hard = refHasHard(sk);
+        const pass = (rotate, relaxLast, soft) => {
+            let got = null;
+            for (let k = 0; k <= tries; k++) {
+                const seed = (baseSeed + i + 7919 * k) >>> 0;
+                let cand = null;
+                try { cand = generateQuestionFor(Object.assign({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex: edgeWant || rotate ? itemIndex + k : itemIndex, itemCount: perSkill ? perSkill.get(key) : undefined }, sk.range ? { range: sk.range } : {})); } catch (e) { cand = null; }
+                if (!cand) continue;
+                // A lesson's skill ref (lessons r2-r3): floors on what the packet deals. Not skill
+                // options - the packet's; the last try takes what it gets (a hard bound excepted).
+                const skR = edgeAt >= 0 ? Object.assign({}, sk, { edge: true }, edgeWant ? { edgeTest: edgeWant } : {}) : sk;
+                const strict = soft && !(relaxLast && k === tries);
+                if (hard && !refHardOk(sk, cand)) continue;
+                if (strict && !refAccepts(skR, cand, key, seen, kept)) continue;
+                // (a case the last row WANTS is kept for it: no other place of the page deals it)
+                if (strict && edgeAt < 0 && sk.edgeLast && Array.isArray(sk.edgeLast.wants) && sk.edgeLast.wants.some((w) => w && LESSON_CASE_TESTS[w] && LESSON_CASE_TESTS[w]({ q: cand }))) continue;
+                got = cand;
+                if (!seen.has(signature(cand))) break;
+            }
+            return got;
+        };
+        q = hard ? (pass(false, false, true) || pass(true, false, true) || pass(true, false, false)) : pass(false, true, true);
         if (!q) return;
         // A lesson's practice page (lessons r1): `check` on the skill ref puts the Check line
         // ("Check: add back") under every subtraction stack. Not a skill option - the page's.
@@ -2631,7 +2670,7 @@ const dlAns = (q) => (q && typeof q.ans === 'object' ? (Array.isArray(q.ans) ? q
 const dlWant = (want) => (want && LESSON_CASE_TESTS[want]) || null;
 
 /** One question of `ref` that passes `want`, never a fact key in `used`; seeded, so reproducible. */
-function dealOne(ref, seed, used, want, avoidAns = null) {
+function dealOne(ref, seed, used, want, avoidAns = null, near = null) {
     const ok = dlWant(want);
     for (let k = 0; k < 600; k++) {
         let q = null;
@@ -2642,8 +2681,11 @@ function dealOne(ref, seed, used, want, avoidAns = null) {
         const key = factKeyOf(q), v = itemNumberOf(q);
         if (key === null || used.has(key) || (ok && !ok({ q }))) continue;
         if (avoidAns && avoidAns.has(dlAns(q))) continue;
-        if (ref.minNum !== undefined && !(v >= ref.minNum)) continue;
-        if (ref.maxNum !== undefined && !(v <= ref.maxNum)) continue;
+        if (!refHardOk(ref, q)) continue;
+        // (`near`: the page's one-number items by skill - LR-6 no near twins, critic r3 N1)
+        const nv = near ? nearKeyOf(q) : null;
+        if (nv !== null && [-2, -1, 1, 2].some((dv) => near.has(`${ref.skillId}:${nv + dv}`))) continue;
+        if (nv !== null) near.add(`${ref.skillId}:${nv}`);
         used.add(key);
         return { q, v, key };
     }
@@ -2665,9 +2707,28 @@ function dlItemVars(q, d) {
         say: composeOralFrameOf({ q }, { fill: true }) || '', words: n !== null && n >= 0 && n <= 1000 ? numberWords(n) : '',
         Words: n !== null && n >= 0 && n <= 1000 ? numberWords(n).replace(/^./, (c) => c.toUpperCase()) : '',
     };
+    // `wrong`: the item's own wrong answers, from its provider, by misconception id without dashes
+    // ({x.wrong.MV9} = 83039 for 839): a script or mistake row quotes an error form of a DEALT item,
+    // never a typed one (critic r3 S3: "300407 for three hundred seven" was typed and wrong).
+    base.wrong = dlWrongs(q);
     let extra = {};
     try { extra = typeof d.vars === 'function' ? d.vars(q, base) || {} : {}; } catch (e) { extra = {}; }
     return Object.assign(base, extra);
+}
+
+/** {misconceptionId (dashes removed): display} of one item, from its provider (wrongAnswers, else wrongAnswer rotated). */
+function dlWrongs(q) {
+    const out = {};
+    let p = null;
+    try { p = getProvider(q.categoryId || '', q.skillId || ''); } catch (e) { p = null; }
+    if (!p) return out;
+    const right = dlAns(q);
+    const put = (w) => { if (!w || w.display === undefined || !w.misconception || w.correct) return; const k = String(w.misconception).replace(/[^A-Za-z0-9]/g, ''); if (!(k in out) && String(w.display) !== right) out[k] = String(w.display); };
+    let all = null;
+    try { all = typeof p.wrongAnswers === 'function' ? p.wrongAnswers(q) : null; } catch (e) { all = null; }
+    if (Array.isArray(all)) all.forEach(put);
+    for (let s = 0; typeof p.wrongAnswer === 'function' && s < 24; s++) { let w = null; try { w = p.wrongAnswer(Object.assign({}, q, { seed: s })); } catch (e) { w = null; } put(w); }
+    return out;
 }
 
 /**
@@ -2775,7 +2836,11 @@ async function buildDetailedLesson(req = {}) {
     const tab = (id) => [`Level ${d.level}`, d.strand, id];
     const header = (id, extra = {}) => Object.assign({ title: d.title, footerLeft: tagLine, tab: tab(id), year }, extra);
     const used = new Set();
-    const withAvoid = (r) => Object.assign({}, r, { avoidKeys: [...used], tries: 300 });
+    // `boardOnly` (critic r3 S1): numbers the lesson shows on the board only - every ref of the pack
+    // carries them as a HARD bound (refHardOk), so no pupil page or key ever deals one.
+    const boardOnly = Array.isArray(d.boardOnly) ? d.boardOnly.map(Number).filter(Number.isFinite) : [];
+    const bo = (r) => (r && boardOnly.length ? Object.assign({}, r, { boardOnly }) : r);
+    const withAvoid = (r) => Object.assign({}, bo(r), { avoidKeys: [...used], tries: 300 });
     const recordPlan = (plan) => { for (const c of planCells(plan)) { const k = factKeyOf(c.q); if (k !== null) used.add(k); } };
     const partPlan = (part) => ((lesson && lesson.partPlans) || []).filter((x) => x.part === part).flatMap((x) => x.plans);
     const record = (res) => { for (const pp of res.partPlans || []) for (const pl of pp.plans) recordPlan(pl); if (res.plan) recordPlan(res.plan); };
@@ -2802,8 +2867,8 @@ async function buildDetailedLesson(req = {}) {
     // The standard lesson packet, fed the description's chart data (prereqs.js untouched).
     const lesson = await buildSheet({
         role: 'lesson', sections: [{ skills: [withAvoid(Object.assign({ edgeTest: d.edgeTest }, d.skill))] }], lessonData: d.lessonData, size: 'L', paper, seed, key: true,
-        practicePages: d.practicePages || 1, practiceSheets: d.practiceSheets ? d.practiceSheets.map((ps) => (ps.chunk ? Object.assign({}, ps, { strip: chunkStrip(ps.chunk) }) : ps)) : null,
-        mixed: !!d.mixed, mixedSkills: d.mixed ? d.mixed.skills : null, mixedLattice: d.mixed && d.mixed.lattice, mixedStrip: d.mixed && d.mixed.strip === false ? false : undefined,
+        practicePages: d.practicePages || 1, practiceSheets: d.practiceSheets ? d.practiceSheets.map((ps) => Object.assign({}, ps, ps.skill ? { skill: bo(ps.skill) } : {}, ps.chunk ? { strip: chunkStrip(ps.chunk) } : {})) : null,
+        mixed: !!d.mixed, mixedSkills: d.mixed ? d.mixed.skills.map(bo) : null, mixedLattice: d.mixed && d.mixed.lattice, mixedStrip: d.mixed && d.mixed.strip === false ? false : undefined,
         ...(chunks ? { lesson: `1${chunks[0].id}` } : {}),
         header: { title: d.title, year }, tagLine, packTab: [`Level ${d.level}`, d.strand], edgeLast: req.edgeLast || { per: shape[0], cols: shape[1] },
     });
@@ -2821,14 +2886,14 @@ async function buildDetailedLesson(req = {}) {
         header: { name: true, date: true, score, tab: tab(id), title: d.title },
         footer: { left: tagLine, right: `Form A · seed ${seed}`, year }, seed, form: 'A',
     });
-    const nsAns = new Set();
+    const nsAns = new Set(), nsNear = new Set();
     const nsBands = ['A', 'B'].map((k, bi) => {
         const ns = d.numberSense[k];
         // `items` (V22 §9.2, critic D11): five bank TYPES, one a row, the same order in A and B, each
         // row its item's own library instruction; else one ref five times (`ref`, `wants`).
         const refs = Array.isArray(ns.items) ? ns.items : Array.from({ length: 5 }, () => ns.ref);
         // (LR-6: no two answers alike on the page - critic r2, 29 and 29)
-        const dealt = refs.map((r, i) => { const x = dealOne(r, (seed + 211 + 1009 * bi + 131 * i) >>> 0, used, r.want || (ns.wants || [])[i] || ns.want || '', nsAns); nsAns.add(dlAns(x.q)); return x; });
+        const dealt = refs.map((r, i) => { const x = dealOne(bo(r), (seed + 211 + 1009 * bi + 131 * i) >>> 0, used, r.want || (ns.wants || [])[i] || ns.want || '', nsAns, nsNear); nsAns.add(dlAns(x.q)); return x; });
         const its = dealt.map((x, i) => hostItem({ q: x.q, skill: Object.assign({}, refs[i]) }, 0, 'L'));
         for (const it of its) if (Array.isArray(ns.items)) it.nsInstr = composeInstrText(composeInstrKeyOf([it], refs), [it]);
         return { label: `Number sense: ${k}`, instr: ns.instruction, its };
@@ -2845,12 +2910,12 @@ async function buildDetailedLesson(req = {}) {
     const p1 = { pupilPages: p1r.pupilPages, keyPages: p1r.keyPages, plan: p1Plan };
 
     // ---------------------------------------------------------------- dealt items for P5, P6, scripts
-    const wpD = dealOne(d.wordProblem.ref, (seed + 307) >>> 0, used, d.wordProblem.want);
-    const exitD = d.exit.map((e, i) => dealOne(e.ref, (seed + 401 + 97 * i) >>> 0, used, e.want));
-    const retD = (d.retrieval || []).map((r, i) => dealOne(r.ref, (seed + 503 + 89 * i) >>> 0, used));
-    const cqD = dealOne(d.skill, (seed + 601) >>> 0, used, (d.checkQuestion || {}).want || '');
+    const wpD = dealOne(bo(d.wordProblem.ref), (seed + 307) >>> 0, used, d.wordProblem.want);
+    const exitD = d.exit.map((e, i) => dealOne(bo(e.ref), (seed + 401 + 97 * i) >>> 0, used, e.want));
+    const retD = (d.retrieval || []).map((r, i) => dealOne(bo(r.ref), (seed + 503 + 89 * i) >>> 0, used));
+    const cqD = dealOne(bo(d.skill), (seed + 601) >>> 0, used, (d.checkQuestion || {}).want || '');
     // The exit slip's Say line reads a FRESH item of the slip's kind, never one of its four (V22 §9.7).
-    const sayD = d.exitSay ? dealOne(d.exit[0].ref, (seed + 701) >>> 0, used, '') : null;
+    const sayD = d.exitSay ? dealOne(bo(d.exit[0].ref), (seed + 701) >>> 0, used, '') : null;
 
     // ---------------------------------------------------------------- P5 Word problem
     const wpV = dlItemVars(wpD.q, d);
@@ -2964,6 +3029,8 @@ async function buildDetailedLesson(req = {}) {
     const V = {
         chart: dlItemVars(chartQ[0], d), chart2: dlItemVars(chartQ[1] || chartQ[0], d), chart3: dlItemVars(chartQ[2] || chartQ[1] || chartQ[0], d),
         we: teachCells.slice(0, nGuided).map((c) => dlItemVars(c.q, d)),
+        // (the lesson sheet's Independent cells, as a chunk's {b.indep} / {b.indepList} - T4 §6a's walk)
+        indep: teachCells.slice(nGuided).map((c) => dlItemVars(c.q, d)),
         // Each question's items by the LETTERS P0 prints (critic D10): {pre.i.letters} 'a–d',
         // {pre.i.list} 'a. 61 · b. 80 ...'; {p0.list} every item. Read from the P0 plan, never typed.
         pre: d.prerequisites.map((p, i) => {
@@ -3006,6 +3073,7 @@ async function buildDetailedLesson(req = {}) {
     }
     V.ret.forEach((r, i) => { r.ask = fillPlaceholders((d.retrieval[i] || {}).ask || '', { ret: V.ret }); });
     while (V.we.length < 2) V.we.push(V.chart);
+    V.indepList = V.indep.map((x) => x.ans).join(' · ');
 
     // ---------------------------------------------------------------- T6 data
     const glance = [
@@ -3115,6 +3183,8 @@ async function buildDetailedLesson(req = {}) {
     const edgeTest = LESSON_CASE_TESTS[d.edgeTest || ''];
     const pool = {
         op: 'list', decl: { kind: 'list', items: poolKeys }, pool: poolKeys, forbidden: [],
+        // (board-only numbers and their names: the self-check's E30 finds none on a pupil page or key)
+        boardOnly: boardOnly.map((v) => ({ n: v, words: v >= 0 && v <= 1000 ? numberWords(v) : '' })),
         edge: [...new Set(places.filter((x) => edgeTest && edgeTest({ q: x.q })).map((x) => x.item))],
         // (each place's answer too: LR-6 'no two answers alike on a page' is checked on every pupil page)
         places: places.map(({ q, ...x }) => Object.assign(x, { ans: dlAns(q) })),
