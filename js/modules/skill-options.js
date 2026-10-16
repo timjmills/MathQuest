@@ -1318,7 +1318,8 @@ const _chartTask = () => ({
     values: [{ v: 'fill', l: 'Fill in the missing products' },
         { v: 'headers', l: 'Fill in the missing row and column numbers' },
         { v: 'shade', l: 'Shade every multiple of a number' },
-        { v: 'pattern', l: 'Find the pattern in one row (write the rule)' }],
+        { v: 'pattern', l: 'Find the pattern in one row (write the rule)' },
+        { v: 'even', l: 'Shade every even product' }],
     help: 'One task per page. Shade and pattern print every product; the pupil looks for the pattern.',
 });
 const _hopLine = (div) => [
@@ -1480,6 +1481,22 @@ const CB_CHART_LINE_OPTIONS = {
             help: 'How many of the products (or, for Task: row and column numbers, the factors) are left blank. 100% is a blank chart to fill in.' }),
         _cbTables(1, 'Tables with blanks', 'Times tables', 'Only the rows and columns of the ticked tables have blanks (tick 7 and 8 to practise those two).'),
         _chartTask(),
+        // Lesson 4 (B3): the window's size and its smallest factor. A window only; the whole chart ignores them.
+        {
+            id: 'winRows', label: 'Window rows', type: 'enum', default: 4, group: 'layout',
+            values: [2, 3, 4].map(v => ({ v, l: `${v} rows` })),
+            help: 'How many rows the window of the chart holds. A smaller window is a quicker item (an exit slip).',
+        },
+        {
+            id: 'winCols', label: 'Window columns', type: 'enum', default: 5, group: 'layout',
+            values: [3, 4, 5].map(v => ({ v, l: `${v} columns` })),
+            help: 'How many columns the window of the chart holds.',
+        },
+        {
+            id: 'minFactor', label: 'Smallest row and column', type: 'enum', default: 1, group: 'difficulty',
+            values: [{ v: 1, l: 'From 1 (the 1 row and column may show)' }, { v: 2, l: 'From 2 (no 1 row, no 1 column)' }],
+            help: 'From 2 keeps the 1 row and the 1 column out of the window, where every product is just the other number.',
+        },
     ],
     'multiplication:mult_chart_easy': [
         levelSubset([2, 1, 0], 2, 'The same chart every time: level 2 leaves 8 cells to fill, level 1 leaves 16, '
@@ -1910,6 +1927,12 @@ const _ftOptions = (easy) => [
         ]),
         helpShort: 'Three rows are enough to find a rule. Out of order stops the pupil just reading down the Out column.',
         help: 'Three rows are enough to find a rule. Out of order stops the pupil just following the Out column down. A tall table fits four to a page instead of six.',
+    },
+    {
+        // Lesson 5 (RESEARCH proposal 1): row 1 fits a + rule AND a × (or ÷) rule (2 → 4: + 2 or × 2), so only
+        // the later rows decide. Off by default.
+        id: 'ftTrap', label: 'First row fits two rules', type: 'bool', default: false, group: 'difficulty',
+        help: 'On: the first row fits a + rule and a × rule (2 → 4 is + 2 and × 2; 3 → 6 is + 3 and × 2), so the pupil must test the other rows. The rule is still the only one that fits every row.',
     },
     {
         id: 'support', label: 'Support', type: 'enum', default: 'frame', group: 'support',

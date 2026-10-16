@@ -158,7 +158,10 @@ export const MULTI_KEYS = Object.freeze({
     chart: '2D',         // mult_chart: a window / the whole chart
     ticks: '2E',         // nl_mult, nl_div: labels every step / every number
     shape: '2F',         // count_by_tables, number_patterns_rule, number_seq_fill: box / circle / hexagon
-    // NEXT FREE IN BLOCK 2: 2G.
+    winRows: '2G',       // mult_chart (lesson 4, 2026-10-16): rows in the window (2 / 3 / 4)
+    winCols: '2H',       // mult_chart: columns in the window (3 / 4 / 5)
+    minFactor: '2I',     // mult_chart: the window's smallest row / column number (1 or 2)
+    // NEXT FREE IN BLOCK 2: 2J.
     // Lane C sub-range 2U-2Z (wave 1): skip-count lines and the number grid.
     fill: '2U',          // count_by_tables: how many numbers are printed at the start (two / one / half)
     jumps: '2V',         // count_by_tables: the row runs to 12 or to 15 jumps
@@ -174,7 +177,8 @@ export const MULTI_KEYS = Object.freeze({
     // tokens only (task, response, order: inorder, support); `ops` is its own key because the
     // deployed decoder would read an unknown `op` token as an EMPTY set (every operation).
     ops: '3A',           // function_table_easy / _hard: the operations a rule may use (+ − × ÷)
-    // NEXT FREE IN BLOCK 3: 3B.
+    ftTrap: '3B',        // function tables (lesson 5, 2026-10-16): row 1 fits a + and a × rule
+    // NEXT FREE IN BLOCK 3: 3C.
 
     // Block 4 — SUPPORTS (S2: `cover` and `mix` are live; `touch` is unused - touch dots are
     // values of the unified `support` set; `anchors` is the sheet-level S6 request field)
@@ -269,6 +273,8 @@ export const VALUE_TOKENS = Object.freeze({
         length: 'L', height: 'H', thickness: 'T', all: 'A',
         // block 2 (2026-09-25): the multiplication chart
         fill: 'Q', headers: 'Z', shade: 'X', pattern: 'J',
+        // lesson 4 (2026-10-16): shade every even product
+        even: 'S',
         // block 3 (2026-09-25): function tables (O U I W F D left to P10 and count-by)
         outputs: 'G', rule: 'Y', inputs: 'V', mixed: 'M', make: 'K',
         // block 1 P10 time + money (`all` reuses A)
@@ -417,6 +423,8 @@ export const SCALAR_ONLY = Object.freeze({
     wpCues: 'bool', wpBank: 'bool', wpBar: 'bool',
     // Wave 1 lane A
     calculator: 'bool', skipAfter: 'decimal',
+    // lessons 4 and 5 (2026-10-16)
+    winRows: 'decimal', winCols: 'decimal', minFactor: 'decimal', ftTrap: 'bool',
 });
 
 /**

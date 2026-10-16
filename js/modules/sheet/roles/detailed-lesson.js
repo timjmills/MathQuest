@@ -145,7 +145,7 @@ export function teacherBands(d, V, pages) {
     const iconRow = (id, label, accent) => [accent ? stepIcon(id, 'L', { mm: 5 }) : teacherIcon(id, 5), esc(label)];
     out.T2b = [{ label: 'Reference key:', blocks: [twoCols(
         [subHead('Pages and order'), tTable(['Page', 'Tab', 'Score'], [
-            ['P0', 'Prerequisite', 'one per question'], ['P1', 'Number sense', '/10'], ['P2', 'Anchor chart', 'none (a poster)'], ['P3', 'Lesson 1', 'Independent cells'],
+            ['P0', 'Prerequisite', 'one per question'], ['P1', 'Number sense', '/10'], ['P2', 'Anchor chart', 'none (a poster)'], ['P3', 'Lesson 1', d.p3Score || 'Independent cells'],
             ['P4', 'Practice n / Mixed n', 'every cell'], ['P5', 'Word problem', '/1'], ['P6', 'Exit slip', '/4 a half'], ['T1–T5', 'Teacher n', '—'], ['T6', 'Answer Key', '—'],
         ].map((r) => r.map(cellText))),
         subHead('Fade levels'), tTable(['Label', 'Means'], [['★', 'Guided: hints on, step 1 traced'], ['★★', 'Independent: hints off'], ['★★★', 'Last row: the edge cases']].map((r) => r.map(cellText))),

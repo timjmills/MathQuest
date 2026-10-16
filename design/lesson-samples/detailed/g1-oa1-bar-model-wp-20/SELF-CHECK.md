@@ -13,8 +13,8 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | E6 | Pupil text ≥ 11 pt (quiet letters, tab, footer excepted) | smallest 11.99 pt (P3 "13", P3-key "13") | PASS |
 | E7 | Teacher text ≥ 10 pt | smallest 10 pt (T1 "#", T2 "#") | PASS |
 | E8 | Working digits 28 pt outside the anchor chart | the kit sets --ws-digit 28pt at size L on every pupil page (one size L pack); measured by ws-print-lint --source kit | PASS |
-| E9 | Every page ≥ 50 % used, nothing past the body | min 91 %; overflow none; under 50 %: none | PASS |
-| E9c | Teacher pages: one continued is ≥ 92 % used (V22 3131); every teacher page listed | T1 96, T2 96, T2b 93, T3 93, T4 92, T5 98, T6 91; continued under 92 %: none | PASS |
+| E9 | Every page ≥ 50 % used, nothing past the body | min 92 %; overflow none; under 50 %: none | PASS |
+| E9c | Teacher pages: one continued is ≥ 92 % used (V22 3131); every teacher page listed | T1 96, T2 96, T2b 93, T3 93, T4 92, T5 98, T6 92; continued under 92 %: none | PASS |
 | E9b | Body ≤ 8 % blank below its last band (site lint) | max 3 %; over 8 %: none | PASS |
 | E10 | Every item cell ≥ 40 % free (reading cells exempt) | 108 cells; min free 50 %; below 40 %: none | PASS |
 | E11 | No empty band ≥ 30 % in a cell (the site sheetCheck H13, from the border box) | worst 26 %; failing: none | PASS |
@@ -70,7 +70,7 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | P4m-1-key | key | 95 | 0 | 12 | 14 | 51 | #000000 #5b2a86 #c2410c #ffffff |
 | P5-key | key | 100 | 0 | 12 | 3 | 57 | #000000 #5b2a86 #c2410c #ffffff |
 | P6-key | key | 97 | 0 | 12 | 6 | 45 | #000000 #c2410c #ffffff |
-| T6 | teacher | 91 | 0 | 10 | 0 | — | #000000 #c2410c |
+| T6 | teacher | 92 | 0 | 10 | 0 | — | #000000 #c2410c |
 
 ## Notes from the build
 

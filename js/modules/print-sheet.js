@@ -3115,7 +3115,8 @@ async function buildDetailedLesson(req = {}) {
         { page: 'P0 Prerequisite', answers: p0Cells.map((c) => dlAns(c.q)).join(' · '), fade: DL_FADE.P0 },
         { page: 'P1 Number sense', answers: cellsOf([p1.plan]).map((c) => dlAns(c.q)).join(' · '), fade: DL_FADE.P1 },
         { page: 'P3 Guided', answers: teachCells.slice(0, nGuided).map((c) => dlAns(c.q)).join(' · '), fade: '★' },
-        { page: 'P3 Independent', answers: teachCells.slice(nGuided).map((c) => dlAns(c.q)).join(' · '), fade: '★★' },
+        // (no row for a part the sheet does not print - lesson 2's P3 has no Independent cells, critic r1 D4)
+        ...(teachCells.length > nGuided ? [{ page: 'P3 Independent', answers: teachCells.slice(nGuided).map((c) => dlAns(c.q)).join(' · '), fade: '★★' }] : []),
     ];
     for (const { ch } of chunkRes) {
         glance.push({ page: `P3${ch.id} Guided`, answers: V[ch.id].we.map((x) => x.ans).join(' · '), fade: '★' });

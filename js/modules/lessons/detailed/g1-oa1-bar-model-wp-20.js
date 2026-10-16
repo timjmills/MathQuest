@@ -257,6 +257,8 @@ export default {
             ] },
     ],
     transitionsMin: 4,
+    // (P3 holds Guided cells only: the Independent work is Practice 1)
+    p3Score: 'Guided: not scored',
     // T2b: this lesson's own slots and routing ids
     slotRows: [{ shape: 'box', use: 'a bar box: a part (lower row) or the whole (top)' }, { shape: 'line', use: 'P5: the answer on the story line' }],
     routeNote: 'K CC 5 Count to 20 · Y1 B2 S2 Part-whole model · G1 OA 6 Add within 20: the lessons P0 routes back to (T6).',
@@ -267,12 +269,14 @@ export default {
         'The equation in either order (6 + 7 or 7 + 6).',
         'The label word is printed: never marked. On P5, any two-part bar, the whole on top.',
         'The answer box and the top box hold the same number. A blank part box with the right whole: ask for the parts.',
-        'P5 equation: the two parts in either order, then the whole after =.',
+        'P5 equation: the two parts in either order, + in the circle, then the whole after =.',
+        'Equal parts (★★★): the two part boxes hold the same number.',
         'Exit slip: sort by the boxes ticked; “one more day” pupils join the cube group next lesson.',
     ],
     wrongAnswers: [
         { wrote: '{exit.1.wrong.barwholeinpart} (b)', mistake: 'Whole in a part box', next: 'The chant; touch the top box.' },
         { wrote: '{exit.0.wrong.barpartontop} (a)', mistake: 'Story number as answer', next: '“Is it in the story? Then it is a part.”' },
+        { wrote: '{exit.0.slip} (a)', mistake: 'Count slip past 10', next: 'Start at the big part; count on the small part.' },
         { wrote: '{exit.2.slip} (c)', mistake: 'Count slip past 10', next: 'Count on from the big part with fingers.' },
         { wrote: '{exit.2.wrong.barwholeinpart} (c)', mistake: 'Whole in a part box', next: 'Point: the whole goes on top.' },
         { wrote: '{exit.1.wrong.wrongoperation} (b)', mistake: 'Wrong sign', next: '“In all”: point at the top box.' },

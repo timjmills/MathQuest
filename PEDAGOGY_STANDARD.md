@@ -1308,6 +1308,7 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `chart-fill-all` | Fill in the whole multiplication chart. | the blank chart (100%) |
 | `chart-headers` | Fill in the missing row and column numbers. | multiplication chart: the factors on its edges |
 | `shade-multiples` | Shade every multiple of {n}. | multiplication chart: find the multiples |
+| `shade-even` | Shade every even product. | multiplication chart: shade the even products (screen: Tap every even product.) |
 | `chart-row-rule` | Fill in the row. Write the rule. | multiplication chart: a row's pattern |
 | `hop-draw` | Draw the hops on the line. Write the product. | multiplication on a number line |
 | `hop-draw-div` | Draw hops of the number you divide by. Write how many hops. | division on a number line |

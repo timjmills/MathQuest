@@ -170,8 +170,23 @@ export function generateFunctionTable(q, skillId) {
     // The In numbers: distinct, then in order or out of order.
     let xs = [];
     let check = null;
+    // ftTrap (lesson 5): row 1 fits a + rule and a × / ÷ rule, so only the later rows decide.
+    // + d: In d (d → 2d is also × 2); − d: In 2d (2d → d is also ÷ 2); × k / ÷ k: every row also fits
+    // a + / − rule, so row 1 is the smallest In (2 → 4 for × 2).
+    let trapX = null;
+    if (o.ftTrap === true && rule.length === 1 && task !== 'make') {
+        const r0 = rule[0];
+        const want = r0.op === '+' ? r0.n : r0.op === '-' ? 2 * r0.n : r0.op === 'x' ? (pool.includes(r0.n) ? r0.n : pool[0]) : pool[0];
+        if (pool.includes(want) && pool.length >= need) trapX = want;
+    }
     for (let tries = 0; tries < 40; tries++) {
-        const pickd = shuffle(pool.slice()).slice(0, need);
+        let pickd = shuffle(pool.slice()).slice(0, need);
+        if (trapX !== null) {
+            // the trap leads; the rest are bigger when the table runs in order (so it stays row 1)
+            const rest = pool.filter((v) => v !== trapX && (scrambled || v > trapX));
+            const from = rest.length >= need - 1 ? rest : pool.filter((v) => v !== trapX);
+            pickd = [trapX, ...shuffle(from.slice()).slice(0, need - 1)];
+        }
         xs = pickd.slice(0, rowsN);
         const cx = wantCheck ? pickd[rowsN] : null;
         if (scrambled) {
@@ -180,8 +195,10 @@ export function generateFunctionTable(q, skillId) {
                 const asc = xs.every((v, i) => i === 0 || v > xs[i - 1]);
                 const desc = xs.every((v, i) => i === 0 || v < xs[i - 1]);
                 if (!asc && !desc) break;
-                xs = shuffle(xs);
+                xs = trapX !== null ? [trapX, ...shuffle(xs.slice(1))] : shuffle(xs);
             }
+        } else if (trapX !== null) {
+            xs = [trapX, ...xs.slice(1).sort((a, b) => a - b)];
         } else {
             xs.sort((a, b) => a - b);
         }
@@ -211,6 +228,7 @@ export function generateFunctionTable(q, skillId) {
 
     const payload = {
         task, rule, rows, check,
+        ...(trapX !== null ? { trap: true } : {}),
         support: /^line/.test(String(o.support)) ? 'line' : 'frame',
         machine: !/-bare$/.test(String(o.support)) && o.pictures !== false,
     };

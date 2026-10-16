@@ -186,6 +186,7 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'chart-fill-all': 'Fill in the whole multiplication chart.',
     'chart-headers': 'Fill in the missing row and column numbers.',
     'shade-multiples': 'Shade every multiple of {n}.',
+    'shade-even': 'Shade every even product.',
     'chart-row-rule': 'Fill in the row. Write the rule.',
     'hop-draw': 'Draw the hops on the line. Write the product.',
     'hop-draw-div': 'Draw hops of the number you divide by. Write how many hops.',
