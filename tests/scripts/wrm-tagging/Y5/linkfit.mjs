@@ -11,7 +11,9 @@
 //   WHY: a cited title ("4-digit", "Count in 10s", "to 100,000") and a named table / unit / fraction family must be true of
 //        the generated items; a pre must cite a step its skill is tagged to and that the school teaches by this week.
 // usage: node linkfit.mjs <Y5.json> [--all]           report every misfit (exit 1 when any)
-//        node linkfit.mjs <Y5.json> --fit <out.json>   for each link, the first option set that fits (or null = drop)
+//        node linkfit.mjs <Y5.json> --fit <out.json>   REPORT only (critic r7 N): each link that misfits at its spec opts, with the
+//                                                      first option set that passes every check and claim, for the spec by hand
+//        node linkfit.mjs <Y5.json> --try "<unit> ~ <role> ~ <key> ~ <opts>[@max] ~ <why>"   checks, claims and items of one link
 // Generation: print path (generateQuestionFor, seeded, itemIndex set), 5 seed sets × 20 items = 100 items a link.
 const _m = new Map(); globalThis.localStorage = { getItem: k => _m.get(k) ?? null, setItem: (k, v) => _m.set(k, String(v)), removeItem: k => _m.delete(k) };
 globalThis.window = globalThis; globalThis.document = undefined;
@@ -49,7 +51,7 @@ function probe(key, opts, range) {
     if (!q) continue;
     const text = strip(q.text), a = typeof q.ans === 'object' ? JSON.stringify(q.ans) : String(q.ans), pay = q.cell ? JSON.stringify(q.cell.payload) : '';
     const x = strip([...(q.options || []), ...(q.tiles || []), ...(q.bins || []), ...(q.items || [])].map(lab).join(' ; '));
-    items.push({ text, a: strip(a), x, pay, vis: strip(q.visual), tpl: q.cell ? q.cell.template : '' });
+    items.push({ text, a: strip(a), x, pay, vis: strip(q.visual), raw: String(q.visual || '').toLowerCase().slice(0, 6000), tpl: q.cell ? q.cell.template : '' });
     let t = text + ' ' + x;
     if (/"[xy]":/.test(a)) t += ' ' + [...a.matchAll(/"[xy]":(\d+)/g)].map(m => m[1]).join(' ');
     else t += ' ' + strip(a).split(/[,;]/).join(' ');
@@ -243,7 +245,7 @@ function whyCheck(e, r) {
   }
   // critic r6 H', K, L and the round-5 sweep: every RULE claim of the why (units, metric / customary, times as many, equal parts,
   // fractions, decimals, 3 dp, negatives, percent, Roman numerals) must be true of the items; the cited step's FULL title counts
-  for (const h of CL.claimHits(CL.claimText(w0, titles), r.items, { rulesOnly: true })) if (!h.ok) out.push(`why claims "${h.word}" (${h.claim}) but only ${h.hit} of ${h.n} items show it`);
+  for (const h of CL.claimHits(CL.claimText(w0, titles), r.items, { gateOnly: true })) if (!h.ok) out.push(`why claims "${h.word}" (${h.claim}) but only ${h.hit} of ${h.n} items show it`);
   for (const h of CL.halfHits(w0, r.items)) if (!h.ok) out.push(`why is marked "${h.claim}" but ${h.hit} of ${h.n} items deal the other half`);
   const UNIT = { metres: 'm|metres?|meters?', kilometres: 'km|kilometres?', centimetres: 'cm|centimetres?', millimetres: 'mm|millimetres?', grams: 'g|grams?', kilograms: 'kg|kilograms?', litres: 'l|litres?|liters?', millilitres: 'ml|millilitres?', hours: 'h|hr|hours?', minutes: 'min|minutes?', seconds: 's|sec|seconds?' };
   // critic r5: every unit the why names must be in at least a fifth of the items ("kilograms and grams" on fl oz / lb items)
@@ -263,6 +265,7 @@ function citeCheck(e, role) {
   return (taughtAt[e.key] && taughtAt[e.key].has(m[1])) ? [] : [`cites ${m[1]}, which ${e.key} is not tagged to`];
 }
 const STOP = new Set('the and one page only form forms kind each item items dealt both mixed with from into for its all any are not off on a an of to in or by as at is it this that what which who how many write find click drag sort pick choose'.split(' '));
+const STOP_NOUNS = new Set([...STOP].filter(w => !['click', 'drag', 'sort', 'pick', 'choose', 'write', 'find'].includes(w)));
 const stem = w => w.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/(?:ing|es|ed|s)$/, '');
 const KEYS = Object.keys(JSON.parse(fs.readFileSync(DATA + '/keys.json', 'utf8')).keys);
 function missedOptions(s) {
@@ -273,12 +276,28 @@ function missedOptions(s) {
   const parts = [s.missing, ...s.partial.map(e => e.missing)].flatMap(t => CL.negatedParts(t)).map(p => p.split(/[\s-]+/).map(stem).filter(Boolean));
   if (!parts.length) return out;
   const named = `${s.note || ''} ${s.missing || ''} ${s.partial.map(e => e.missing).join(' ')}`;
+  // critic r7 M'(1): a skill is excused only when the unit's text names its full key (category:skill), its id in backticks, or
+  // an id that cannot be an ordinary word (it has an underscore: frac_10_100_nv), never because the id is an ordinary word
+  // ("capacity", "compare", "value", "volume" are words of the lesson's own title)
+  const esc = x => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const isNamed = (c, sk) => named.includes(`${c}:${sk}`) || named.includes('`' + sk + '`') || (sk.includes('_') && new RegExp(`(?<![A-Za-z0-9_:])${esc(sk)}(?![A-Za-z0-9_])`).test(named));
   const near = (p, ws) => { for (let j = 0; j + 1 < p.length; j++) for (let q = j + 1; q <= j + 3 && q < p.length; q++) if (p[j] === ws[0] && p[q] === ws[1]) return true; return false; };
   for (const k of pool) { const [c, sk] = k.split(':');
-    if (named.includes(sk)) continue;
-    for (const def of so.optionsFor(c, sk) || []) { if (!['forms', 'units', 'task', 'kind', 'model'].includes(def.id) || !def.values) continue;
-      for (const v of def.values) { const words = [...new Set(String(v.l).replace(/[()]/g, ' ').split(/[\s-]+/).map(stem).filter(w => w.length > 2 && !STOP.has(w) && !/^\d+$/.test(w)))];
-        if (words.length < 2 || !parts.some(p => words.every(w => p.includes(w)) && (words.length > 2 || near(p, words)))) continue;
+    if (isNamed(c, sk)) continue;
+    // critic r7 M'(2): EVERY option with labelled values is read (not only forms / units / task / kind / model): unit_form's
+    // rename "Yes (476 = 47 tens 6 ones)" is read as its control label + example, "More than 9 of one place (47 tens 6 ones)";
+    // a "No" / "Off" / "None" value is the plain default and is not a feature a clause can deny; the support group is a scaffold
+    for (const def of so.optionsFor(c, sk) || []) { if (!def.values || def.group === 'support' || ['band', 'range', 'support', 'cover', 'mix'].includes(def.id)) continue;
+      for (const v of def.values) { const L = String(v.l ?? '');
+        if (/^(no|off|none)\b/i.test(L)) continue;
+        // a Yes / On value is read as its control's label ("More than 9 of one place") and, separately, as its example
+        const texts = /^(yes|on)\b/i.test(L) ? [def.label || '', L.replace(/^(yes|on)\b[:,]?/i, '')] : [L];
+        // the action verbs (click, drag, sort …) are stop words, but a label that is ONLY an action and its object ("Click or sort
+        // containers") keeps them, so a clause "never clicks or sorts containers" is read against it (critic r7 M')
+        const wordsOf = (t, stop) => [...new Set(t.replace(/[()]/g, ' ').split(/[\s-]+/).map(stem).filter(w => w.length > 2 && !stop.has(w) && !/^\d+$/.test(w)))];
+        const hits = texts.some(t => { let words = wordsOf(t, STOP); if (words.length < 2) words = wordsOf(t, STOP_NOUNS);
+          return words.length >= 2 && parts.some(p => words.every(w => p.includes(w)) && (words.length > 2 || near(p, words))); });
+        if (!hits) continue;
         const used = mine.some(e => e.key === k && [].concat((e.opts || {})[def.id] ?? []).includes(v.v));
         if (!used) out.push(`a clause says "never / no …" what ${k} option ${def.id}=${JSON.stringify(v.v)} "${v.l}" deals; use the option (key + value) or say why not`); } } }
   return [...new Set(out)];
@@ -319,20 +338,43 @@ function candidates(e) {
   const seen = new Set();
   return out.filter(x => { const s = JSON.stringify(x); if (seen.has(s)) return false; seen.add(s); return true; }).slice(0, 48);
 }
-if (FIT) {
-  const res = {};
+const TRY = process.argv.indexOf('--try');
+if (TRY > 0) {
+  // hand re-read helper: node linkfit.mjs <Y5.json> --try '<uid> ~ <role> ~ <key> ~ <opts json>[@maxNumber] ~ <why>'  (several allowed):
+  // every check of the build, every claim of the why (gated or swept) and 12 items, for a link the builder is about to write
+  for (const arg of process.argv.slice(TRY + 1)) {
+    const [uid, role, key, oo, ...wr] = arg.split(' ~ '); const why = wr.join(' ~ ');
+    const [ojs, mn] = oo.split('@'); const e = { key, opts: JSON.parse(ojs || '{}'), why }; if (mn) e.maxNumber = +mn;
+    const f = check(uid, role, e), r = probe(key, e.opts, e.maxNumber || 10000);
+    console.log(`TRY ${uid} ${role} ${key} ${oo}\n   why: ${why}\n   checks: ${f.length ? f.join(' | ') : 'ok'}\n   claims: ${CL.claimHits(CL.claimText(why, titles), r.items).map(h => `${h.claim} ${h.hit}/${h.n}${h.ok ? '' : ' FALSE'}`).join('; ') || '(none)'}`);
+    for (const i of r.items.filter((_, j) => j % 8 === 0).slice(0, 12)) console.log(`      · ${i.text.slice(0, 150)}${i.x ? ' {' + i.x.slice(0, 90) + '}' : ''} → ${String(i.a).slice(0, 50)}${i.tpl ? ' [' + i.tpl + ']' : ''}`);
+  }
+} else if (FIT) {
+  // critic r7 N (structural): --fit is a REPORT, never an edit. A link that fits at its spec opts is "ok". For a link that does
+  // not, the report gives its failures and the first candidate option set that passes every check AND every claim of the why
+  // (claims.mjs, the swept operation / story claims too), with 8 of that candidate's items to re-read. build.py applies nothing:
+  // the builder writes the chosen opts and a re-read why into the spec by hand, and the build fails while any link misfits.
+  const res = {}; let nbad = 0, nsug = 0;
   for (const [sid, s] of Object.entries(UNITS)) for (const role of ['pre', 'related']) for (const e of s[role]) {
-    let pick = null, why0 = null;
-    for (const cnd of candidates(e)) {
+    const k = `${sid}|${role}|${e.key}|${JSON.stringify(e.opts || {})}${e.maxNumber ? '@' + e.maxNumber : ''}`;
+    const f0 = check(sid, role, e);
+    if (!f0.length) { res[k] = { ok: true }; continue; }
+    nbad++;
+    let pick = null;
+    for (const cnd of candidates(e).slice(1)) {
       const ee = { ...e, opts: cnd.opts }; if (cnd.maxNumber) ee.maxNumber = cnd.maxNumber; else delete ee.maxNumber;
-      const f = check(sid, role, ee); if (why0 === null) why0 = f;
-      if (!f.length) { pick = cnd; break; }
+      if (check(sid, role, ee).length) continue;
+      const r = probe(ee.key, ee.opts || {}, ee.maxNumber || 10000);
+      if (CL.claimHits(CL.claimText(e.why, titles), r.items).some(h => !h.ok)) continue;
+      pick = { opts: cnd.opts, maxNumber: cnd.maxNumber || null, items: r.items.slice(0, 8).map(i => `${i.text.slice(0, 140)}${i.x ? ' {' + i.x.slice(0, 80) + '}' : ''} → ${String(i.a).slice(0, 40)}${i.tpl ? ' [' + i.tpl + ']' : ''}`) };
+      break;
     }
-    res[`${sid}|${role}|${e.key}|${JSON.stringify(e.opts || {})}`] = pick ? { opts: pick.opts, maxNumber: pick.maxNumber || null } : { drop: why0 };
+    if (pick) nsug++;
+    res[k] = { ok: false, fails: f0, suggest: pick, why: e.why };
   }
   fs.writeFileSync(FIT, JSON.stringify(res, null, 1));
-  const n = Object.values(res), drop = n.filter(x => x.drop).length;
-  console.log(`linkfit --fit: ${n.length} links; ${drop} with no fitting option set (dropped)`);
+  for (const [k, v] of Object.entries(res)) if (!v.ok) console.log(`FIT ${k}\n   fails: ${v.fails.join(' | ')}\n   why: ${v.why}\n   suggest: ${v.suggest ? JSON.stringify(v.suggest.opts) + (v.suggest.maxNumber ? '@' + v.suggest.maxNumber : '') + ' — re-read the why on these items, then write the opts and the why into the spec:\n      ' + v.suggest.items.join('\n      ') : 'none fits: drop the link or change its why in the spec'}`);
+  console.log(`linkfit --fit (report only): ${Object.keys(res).length} links; ${nbad} do not fit at their spec opts; ${nsug} with a suggested option set`);
 } else {
   let bad = 0, checked = 0;
   for (const [sid, s] of Object.entries(UNITS)) {

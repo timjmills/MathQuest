@@ -11,6 +11,13 @@ export const MET = /\d\s*(?:cm|mm|km|kg|m|g|l|ml)\b|\b(?:cm|mm|km|kg|ml|mL)\b|\d
 // the cell template and its payload (class names and payload keys name a representation: "nlp-line", "rows", "places")
 export const itemStr = i => `${i.text || ''} ¦ ${i.a || ''} ¦ ${i.x || ''} ¦ ${i.vis || ''} ¦ ${i.raw || ''} ¦ ${i.tpl || ''} ¦ ${i.pay || ''}`;
 export const itemWords = i => `${i.text || ''} ¦ ${i.a || ''} ¦ ${i.x || ''} ¦ ${i.vis || ''}`;
+// critic r7 N': a REPRESENTATION claim ("read on a scale", "number line", "bar model") is judged on the picture, its raw markup,
+// the cell template and its payload ONLY: option and tile text is not a picture ("Milk jug" in a unit sort is not a scale)
+// The question's own stem may name what is drawn or built ("Read the graduated cylinder", "Build a bar graph": an interactive
+// builder has no picture markup); the options, tiles and answer never count.
+export const repStr = i => `${i.text || ''} ¦ ${i.vis || ''} ¦ ${i.raw || ''} ¦ ${i.tpl || ''} ¦ ${i.pay || ''}`;
+// a FORM claim (what the pupil does: sort, click, drag, convert, rename) is judged on the question, the template and the payload
+export const formStr = i => `${i.text || ''} ¦ ${i.tpl || ''} ¦ ${i.pay || ''}`;
 const FR = /(?<![\d/])\d+\s*\/\s*\d+(?![\d/])|class="den"/;
 // [name, claim regex (on the why / clause), item regex, share of items that must show it, judged on 'words' | 'all']
 // RULE = true: run on every build by linkfit (precise enough to gate); the others are swept and reviewed by hand.
@@ -51,10 +58,10 @@ export const CLAIMS = [
   { n: 'percent', c: /%|\bpercent/i, i: /%|percent/i, s: 0.2, rule: true },
   { n: 'Roman numerals', c: /\bRoman\b/, i: /\b[IVXLCDM]{2,}\b|Roman/, s: 0.2, rule: true },
   // representations (raw picture markup and template names count)
-  { n: 'number line', c: /number[- ]lines?/i, i: /number[- ]?line|nlp|numline|"ticks"|tick|\bline\b.*\b0\b/i, s: 0.2, all: true },
+  { n: 'number line', c: /number[- ]lines?/i, i: /number[- ]?line|nlp|numline|"ticks"|line-mark|"support":"line"|"kind":"line|class="nl|frac-line|nl-/i, s: 0.2, all: true },
   { n: 'bar model', c: /bar models?|tape diagrams?|\bbar of\b|bars? cut/i, i: /tape|bar[- ]model|"bars"|bar-diagram|class="bar|\bbar\b/i, s: 0.2, all: true },
   { n: 'hundred square', c: /hundred squares?|100 square|10 ?× ?10 grid/i, i: /hundred|10x10|10 × 10|grid|"cells":100|hundredths/i, s: 0.2, all: true },
-  { n: 'array', c: /\barrays?\b/i, i: /array|"rows"|rows? of|dot/i, s: 0.2, all: true },
+  { n: 'array', c: /\barrays?\b/i, i: /array|"rows"|rows? of|\brows?\b[^¦]{0,20}\bcolumns?\b|dot|(?:<circle[^>]*>\s*){4,}/i, s: 0.2, all: true },
   { n: 'place-value chart / counters', c: /place[- ]value (?:chart|grid|mat|counters?)|counters on|\bdisks?\b/i, i: /place[- ]?value|pv-|"places"|counter|disk|chart|\bth\b.*\bh\b.*\bt\b/i, s: 0.2, all: true },
   { n: 'base 10', c: /base[- ]?10|dienes|\bflats?\b|\brods?\b/i, i: /base[- ]?10|b10|flat|rod|cube|block/i, s: 0.2, all: true },
   { n: 'protractor', c: /protractor/i, i: /protractor/i, s: 0.2, all: true },
@@ -64,9 +71,16 @@ export const CLAIMS = [
   { n: 'column method', c: /\bcolumns?\b(?! of)|column method|written method|vertical/i, i: /"stack"|stack|column|vertical|align/i, s: 0.2, all: true },
   { n: 'graph / chart / table', c: /\b(bar graphs?|bar charts?|pictograms?|pictographs?|line graphs?|line plots?|tally|(?<!times-)tables?)\b/i, i: /graph|chart|pictogra|plot|tally|table|<table|svg/i, s: 0.2, all: true },
   { n: 'coordinates', c: /\bcoordinates?\b/i, i: /coordinat|\(\s*-?\d+\s*,\s*-?\d+\s*\)|"x":|grid|plot/i, s: 0.2, all: true },
+  // critic r7 N: FORM claims, what the pupil does with the item (a re-option from a sort to a convert form made "sort containers"
+  // false on Y5.B14.S4; "45 hundreds = 4,500" on standard unit-form items made lesson 2's why false)
+  { n: 'sorts', c: /\bsort(?:s|ing|ed)?\b/i, i: /\bsort|"bins"|drag-bin|\bbins?\b/i, s: 0.2, form: true },
+  { n: 'clicks', c: /\bclick(?:s|ing)?\b|click-all/i, i: /\bclick|\btap\b|\bselect\b|"hotspot|hotspot/i, s: 0.2, form: true },
+  { n: 'drags', c: /\bdrag(?:s|ging)?\b/i, i: /\bdrag|drag-bin|"tiles"/i, s: 0.2, form: true },
+  { n: 'converts', c: /\bconver(?:t|ts|ting|sions?)\b/i, i: /convert|how many \w+(?: \w+)? (?:are )?(?:in|make)|how many \w+ is that|\bwrite\b[^¦]{0,40}\bas an? (?:mixed number|improper fraction|fraction|decimal)|\d\s*[a-zA-Z]+\.?\s*=\s*(?:_+|\?|\d)|=\s*(?:_+|\?)\s*[a-zA-Z]|_+\s*[a-zA-Z]+\s*=|conversion/i, s: 0.2, form: true },
+  { n: 'renamed unit form', c: /\b(?:[1-9]\d+)\s+(?:ones|tens|hundreds|thousands)\b|\brenam\w*\b[^;,.]{0,30}\b(?:ones|tens|hundreds|thousands)\b/i, i: /\b[1-9]\d+\s+(?:ones|tens|hundreds|thousands)\b/i, s: 0.2, form: true },
   // contexts
   { n: 'story', c: /\bstor(?:y|ies)\b|word problems?/i, i: null, s: 0.3 },
-  { n: 'circle model', c: /\bcircles?\b(?! the)|\bpie\b/i, i: /"kind":"circle"|circle|<circle|pie/i, s: 0.2, all: true },
+  { n: 'circle model', c: /\bcircle models?\b|\bfraction circles?\b|\bcircles? (?:cut|divided|split|shaded)\b|\bpie\b/i, i: /"kind":"circle"|circle|<circle|<ellipse|pie/i, s: 0.2, all: true },
 ];
 // remove negated parts and the parts that describe another step or the pupil, not the items
 export function positive(t) {
@@ -78,16 +92,20 @@ export function negatedParts(t) {
   return [...String(t || '').matchAll(/\b(?:never|no|without)\b([^;,.:()]*)/gi)].map(m => m[1].trim()).filter(Boolean);
 }
 const story = i => (i.text || '').split(/\s+/).length >= 9 && /\?/.test(i.text || '') && /[a-z]\.\s+[A-Z]|\b(?:has|had|have|buys|bought|needs|makes|ran|runs|puts|shares|gets|weighs|holds|uses|costs|biked|walked|is|was)\b/.test(i.text || '') && !/^(?:Find|Convert|What is|Write|Click|Round|Compare|Order|Drag|Estimate|Sort)\b/.test(i.text || '');
-export function claimHits(text, items, { rulesOnly = false, ruleSet = null } = {}) {
+// GATE (critic r7 N): the claims linkfit enforces on every build: the rules, every representation claim (picture only) and every
+// form claim. Operations and "story" are fuzzy (a purpose word, "to check by adding") and stay in the swept, hand-read set.
+export const isGate = cl => !!(cl.rule || cl.all || cl.form);
+export function claimHits(text, items, { rulesOnly = false, gateOnly = false, ruleSet = null } = {}) {
   const pos = positive(text), out = [], N = items.length || 1;
   // a text that lists several units ("kg↔g, km↔m, m↔cm and L↔mL") claims a mix: each listed unit is judged at its share of the list
   const nUnits = CLAIMS.filter(cl => cl.unit && cl.c.test(pos)).length;
   for (const cl of CLAIMS) {
     if (rulesOnly && !cl.rule) continue;
+    if (gateOnly && !isGate(cl)) continue;
     if (ruleSet && !ruleSet.has(cl.n)) continue;
     if (!cl.c.test(pos)) continue;
     if (cl.n === 'litres' && /\b[IVXCDM]\b.*\b[IVXCDM]\b/.test(pos)) continue;   // "D, C, L and X" are Roman numerals
-    const hit = cl.n === 'story' ? items.filter(story).length : items.filter(i => cl.i.test(cl.all ? itemStr(i) : itemWords(i))).length;
+    const hit = cl.n === 'story' ? items.filter(story).length : items.filter(i => cl.i.test(cl.all ? repStr(i) : cl.form ? formStr(i) : itemWords(i))).length;
     const share = cl.unit && nUnits > 2 ? Math.max(0.05, cl.s / (nUnits - 1)) : cl.s;
     out.push({ claim: cl.n, word: (pos.match(cl.c) || [''])[0], hit, n: N, ok: hit >= share * N });
   }

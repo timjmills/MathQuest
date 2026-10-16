@@ -6,9 +6,12 @@ Inputs (all in the repo):
   wrm-steps.json, the Grade 4 sheet of the school xlsx (prior.mjs), live SKILL_WRM / proposals (keys.mjs)
 Passes (ported from the Y4 lane, critic r13):
   1. hand fixes;  2. own build never in preBuild;  3. a pre cites a step its skill is tagged to and that the school
-  teaches by this week (re-cited, or named "nearest live practice");  4. linkfit.mjs --fit: every pre / related link gets
-  the nearest option set whose 100 generated items fit the step (size, Grade-4 school-week content, later-grade content,
-  why claims); a link with no fitting option set is dropped;  5. tagFixes DERIVED by diffing against live SKILL_WRM;
+  teaches by this week (re-cited, or named "nearest live practice");  4. linkfit.mjs --fit, a REPORT only (critic r7 class
+  N, the structural fix): every link's opts come from the spec and nothing in the build changes them. A link that does not fit
+  at its spec opts fails the build; the report prints the nearest option set that passes every check and every claim of the
+  why, with items, and the builder writes the chosen opts and a re-read why into a spec file by hand. The build also fails when
+  any built link's key / opts / Max Number differ from the spec's (spec-links.json, checked by specopts.py);
+  5. tagFixes DERIVED by diffing against live SKILL_WRM;
   6. every partial / gap step gets its envisioned skill (name, kind, teaches, closes, representation);  7. mergecheck.mjs
   (live wrm.js) must report 0 problems, else the build fails.
 usage: python3 tests/scripts/wrm-tagging/Y5/build.py      (exit 1 on any problem; output is byte-identical run to run)
@@ -126,6 +129,11 @@ for lid in LESSONS:
 for lid in lids:
     if lid not in LESSONS: errs.append('site lesson not tagged: ' + lid)
 UNITS = {**ST, **LESSONS}   # steps and site lessons: passes 1-4 and the checks run on both
+# critic r7 N: the spec's links, exactly as the spec files leave them. Every link in the output must be one of these with the
+# same key, opts and Max Number (a pass may drop nothing silently and may change no opts; whys are re-cited by pass 3 only)
+def _lsig(e): return {'key': e['key'], 'opts': e.get('opts') or {}, 'maxNumber': e.get('maxNumber') or None}
+SPEC_LINKS = {sid: {role: [_lsig(e) for e in st[role]] for role in ('pre', 'related')} for sid, st in UNITS.items()}
+json.dump(SPEC_LINKS, open(os.path.join(DATA, 'spec-links.json'), 'w'), indent=1, ensure_ascii=False, sort_keys=True)
 # proposal ids folded into another (owner rulings / cross-year reuse)
 for sid, st in UNITS.items():
     for f in ('build', 'preBuild'):
@@ -141,29 +149,20 @@ for st in UNITS.values():
     for e in st['pre'] + st['related']:
         e['why'] = re.sub(r'\s*[-:]\s*(?:option [a-z]+ \S+\s*-\s*)?easier: \{.*?\}\s*$', '', e['why'])
 # ---------- critic r5 class F: a pre / related link may not repeat the unit's own direct or partial ----------
-# Same key and opts (and Max Number) as an own direct / partial: a pre with a numeric band steps one band down (the same skill
-# one place smaller, with a why that says so, no step cite); otherwise, and for a related link, it is dropped. Run again after
-# the linkfit pass (which can re-option a link onto the unit's own opts), and linkfit fails a link that deals the same items.
+# Same key and opts (and Max Number) as an own direct / partial is an error (critic r7 N: the build used to step such a pre one
+# band down or drop it silently; now the spec must say which band, with a why that says so). linkfit also fails a link that
+# deals the same items as the unit's own.
 BANDS = K.get('bands', {})
 def _sig(e): return e['key'] + json.dumps(e.get('opts', {}), sort_keys=True) + str(e.get('maxNumber') or '')
-def own_repeats(stage):
-    n_sub, n_drop = 0, 0
+def own_repeats():
+    n = 0
     for sid, st in UNITS.items():
         mine = {_sig(e) for e in st['direct'] + st['partial']}
         for role in ('pre', 'related'):
-            keep = []
             for e in st[role]:
-                if _sig(e) not in mine: keep.append(e); continue
-                b = (e.get('opts') or {}).get('band'); lower = [v for v in BANDS.get(e['key'], []) if b and v < b]
-                if stage == 'before fit' and role == 'pre' and lower:
-                    e = dict(e); e['opts'] = dict(e['opts'], band=lower[-1])
-                    if _sig(e) not in mine and _sig(e) not in {_sig(x) for x in keep}:
-                        e['why'] = f"{keys.get(e['key'], e['key'])} with numbers to {lower[-1]:,}: the same skill one band below this unit's own (lower band)"
-                        keep.append(e); n_sub += 1; continue
-                n_drop += 1
-            st[role] = keep
-    return n_sub, n_drop
-OWNREP = {'before fit': own_repeats('before fit')}
+                if _sig(e) in mine: n += 1; errs.append(f"{sid} {role} {e['key']}{json.dumps(e.get('opts', {}))}: repeats the unit's own direct / partial (critic r5 F); set a lower band or drop it in the spec")
+    return n
+OWNREP = own_repeats()
 # ---------- pass 3: pre cites a tagged step met by this week ----------
 taught_at = {}
 for k_, v_ in K['tags'].items():
@@ -207,45 +206,33 @@ for sid_, st_ in UNITS.items():
                     e_['why'] = (e_['why'][:-1] + f'; the {h_} half)') if e_['why'].endswith(')') else e_['why'] + f' (the {h_} half)'
                     halved += 1; break
 
-# ---------- pass 4: linkfit --fit ----------
+# ---------- pass 4: linkfit --fit, a REPORT (critic r7 N) ----------
+# Nothing here edits a link. A link that does not fit at its spec opts is a build error; the report gives the nearest option set
+# that passes every check and every claim of its why, with items to re-read, for the builder to write into a spec by hand.
 cand = os.path.join(DATA, 'Y5.candidate.json')
 json.dump({'year': 'Y5', 'steps': ST, 'lessons': LESSONS, 'tagFixes': []}, open(cand, 'w'), indent=1, ensure_ascii=False)
 fitf = os.path.join(DATA, 'fit.json')
 p = node(os.path.join(H, 'linkfit.mjs'), cand, '--fit', fitf)
 fit = json.load(open(fitf))
-dropped, changed = [], 0
-for sid, st in UNITS.items():
-    for role in ('pre', 'related'):
-        keep = []
-        for e in st[role]:
-            r = fit[f"{sid}|{role}|{e['key']}|{json.dumps(e.get('opts', {}), separators=(',', ':'), ensure_ascii=False)}"]
-            if 'drop' in r:
-                dropped.append((sid, role, e['key'], r['drop'][:2])); continue
-            if r['opts'] != e.get('opts', {}) or (r.get('maxNumber') or None) != e.get('maxNumber'): changed += 1
-            if r['opts']: e['opts'] = r['opts']
-            else: e.pop('opts', None)
-            if r.get('maxNumber'): e['maxNumber'] = r['maxNumber']
-            else: e.pop('maxNumber', None)
-            keep.append(e)
-        st[role] = keep
-json.dump(dropped, open(os.path.join(DATA, 'dropped.json'), 'w'), indent=1, ensure_ascii=False)
-OWNREP['after fit'] = own_repeats('after fit')
-# critic r4 class E: one link per key + opts in a role (the first, best-ranked, is kept); linkfit also fails two links
-# of one role that deal the same items
+misfit = [k for k, r in fit.items() if not r['ok']]
+open(os.path.join(DATA, 'fit-report.txt'), 'w').write(p.stdout)
+for k in misfit:
+    r = fit[k]; sg = r.get('suggest')
+    errs.append(f"link does not fit at its spec opts: {k}: {' | '.join(r['fails'])[:400]}; " + (f"report suggests {json.dumps(sg['opts'])}{'@' + str(sg['maxNumber']) if sg.get('maxNumber') else ''} (re-read the why on its items in fit-report.txt, then write opts and why into a spec file)" if sg else 'no option set fits: drop it or rewrite its why in a spec file'))
+# critic r4 class E: one link per key + opts in a role; a duplicate is a spec error now (it was silently removed)
 deduped = 0
 for sid, st in UNITS.items():
     for role in ('pre', 'related'):
-        seen, keep = set(), []
+        seen = set()
         for e in st[role]:
-            sg = e['key'] + json.dumps(e.get('opts', {}), sort_keys=True) + str(e.get('maxNumber') or '')
-            if sg in seen: deduped += 1; continue
-            seen.add(sg); keep.append(e)
-        st[role] = keep
+            sg = _sig(e)
+            if sg in seen: deduped += 1; errs.append(f"{sid} {role}: duplicate link {e['key']}{json.dumps(e.get('opts', {}))} (drop one in the spec)")
+            seen.add(sg)
 
 # ---------- step checks ----------
 for sid, st in UNITS.items():
-    if len(st['pre']) > 8: st['pre'] = st['pre'][:8]
-    if len(st['related']) > 8: st['related'] = st['related'][:8]
+    for role in ('pre', 'related'):
+        if len(st[role]) > 8: errs.append(f'{sid}: {len(st[role])} {role} links, more than 8 (drop in the spec)')
     v = st['verdict']
     if len(st['pre']) < 3 and 'Pre-skills are few' not in st['note']:
         errs.append(f'{sid}: rule 15, {len(st["pre"])} pre and no "Pre-skills are few" note')
@@ -424,8 +411,11 @@ print('steps', len(out_steps), dict(c))
 print('lessons', len(out_lessons), dict(Counter(s['verdict'] for s in out_lessons.values())), 'site-lessons Y5', len(LES))
 print('proposals new', sum(1 for p_ in proposals.values() if not p_['reused']), 'reused', sum(1 for p_ in proposals.values() if p_['reused']),
       'tagFixes', len(tagfixes), {a: sum(1 for t in tagfixes if t['action'] == a) for a in ('add', 'full', 'partial', 'opts', 'remove')})
-print(f'pre re-cited: {recited}; "A and B" cites marked with the half dealt: {halved}; links re-optioned by linkfit: {changed}; links dropped by linkfit: {len(dropped)}; duplicates removed: {deduped}')
-print('own direct/partial repeated as a link (critic r5 F): ' + '; '.join(f'{k}: {a} stepped a band down, {b} dropped' for k, (a, b) in OWNREP.items()))
+print(f'pre re-cited: {recited}; "A and B" cites marked with the half dealt: {halved}; links that do not fit at their spec opts (linkfit --fit report, nothing applied): {len(misfit)}; duplicate links: {deduped}; own direct/partial repeated as a link (critic r5 F): {OWNREP}')
+# critic r7 N: every built link carries exactly its spec's key, opts and Max Number
+so = subprocess.run(['python3', os.path.join(H, 'specopts.py'), OUT, os.path.join(DATA, 'spec-links.json')], capture_output=True, text=True)
+print(so.stdout.strip().splitlines()[-1] if so.stdout.strip() else 'specopts: no output')
+if so.returncode != 0: errs.append('specopts FAILED (a built link differs from its spec):\n' + so.stdout.strip()[-3000:])
 mc = node(os.path.join(H, 'mergecheck.mjs'), OUT, *[R + f'data/curriculum/links/{y}.json' for y in OTHER_YEARS])
 print(mc.stdout.strip().splitlines()[-1] if mc.stdout.strip() else 'mergecheck: no output')
 if mc.returncode != 0: errs.append('mergecheck.mjs FAILED:\n' + mc.stdout.strip()[-3000:])

@@ -1,4 +1,257 @@
-# Wave 2 tagging: Year 5 (US Grade 4) — round 5: critic r6 rows + root-cause sweep (2026-10-16)
+# Wave 2 tagging: Year 5 (US Grade 4) — round 6: critic r7 rows, the fit loop made a report (2026-10-16)
+
+Critic r7 (FAIL narrowly: steps 8.00 and lessons 8.00, but Y5.B15.S2 = 7 and lesson 2 = 7, both class N). Builder still at
+Opus medium (the ceiling; `design/STATUS.md`). Every row is fixed at the source (`build.py`, `linkfit.mjs`, `claims.mjs`, the new
+`specopts.py` and `spec_zz_r7.py`). No hand JSON.
+
+## Class N, the structural fix: no build pass changes a link's opts
+Three rounds in a row a false why came from the same place: `linkfit --fit` re-optioned a failing link (or dropped it) inside
+the build, and only the rule claims were re-checked. From this round:
+
+| Piece | What it does |
+|---|---|
+| `linkfit.mjs --fit` | a **report only**. For each link that fails at its spec opts it prints the failures and the first candidate option set that passes every check **and every claim of the why** (gated and swept: claims.mjs `claimHits` on all claims), with 8 of its items to re-read. It writes nothing into the build |
+| `build.py` pass 4 | applies nothing. A link that does not fit at its spec opts is a build error naming the report's suggestion (or "none fits"); the report is `fit-report.txt` in the build folder. The F pass (a link repeating the unit's own direct / partial: was stepped a band down or dropped silently), the duplicate pass (was removed silently) and the 8-link cap (was truncated silently) are errors too |
+| `specopts.py` (new gate) | `build.py` writes `spec-links.json` right after the spec files run; every built pre / related link must match a spec link of the same unit and role with the same key, opts and Max Number, one to one. A pass that re-options or drops a link fails the build |
+| `spec_zz_r7.py` | writes **by hand** what the old fit loop did silently: 143 RELINK rows (spec opts → chosen opts, each with the why re-read on generated items and rewritten where it was not true) and 96 DROP rows (94 the old loop dropped, 2 duplicates), plus the critic's per-entry rows |
+| `linkfit.mjs --try '<unit> ~ <role> ~ <key> ~ <opts>[@max] ~ <why>'` | the hand re-read helper: every build check, every claim (gated or swept) and 12 items for one link before it is written into a spec |
+
+### Gate changes (N, N′, M′)
+| Class | Change |
+|---|---|
+| N form claims | `claims.mjs`: **sorts, clicks, drags, converts, renamed unit form** ("45 hundreds", "30 hundreds", "renaming … tens") are claims, judged on the question, template and payload. linkfit now gates every rule, representation and form claim (`gateOnly`); operations and "story" stay in the swept, hand-read set |
+| N′ representations | every representation claim (number line, bar model, array, scale / cylinder / ruler, graph, clock …) is judged on the **question stem, the picture, its raw markup, the template and the payload only**: option, tile and answer text never count ("Milk jug" in a unit sort no longer satisfies "scale"). Number line no longer matches any "tick" (a bar graph's axis is not a number line); the circle-model claim needs "circle model / fraction circle / pie", not a shape name |
+| M′(1) | a skill is excused from M only when the unit's text names its full key, its id in backticks, or an underscore id (`frac_10_100_nv`), never an ordinary word ("capacity", "compare", "value", "volume") |
+| M′(2) | M reads **every** option with labelled values (not only forms / units / task / kind / model), except the support group and size bands; a Yes / On value is read as its control label ("More than 9 of one place", unit_form `rename`) and its example separately; a No / Off / None value is skipped; a label that is only an action and its object ("Click or sort containers") keeps its action verbs |
+
+### Each new gate proven on a mutated scratch copy
+`mut8.py` (scratch) re-applies the critic's five `mut7.json` mutations to the new Y5.json and adds six, all in one copy
+(`mut8.json`), then runs the new linkfit and the r7 (HEAD 2031ff4f) linkfit on it:
+
+| Mutation | New linkfit | r7 linkfit |
+|---|---|---|
+| critic: money claim on `add_decimal {decimals:2}` | fires | fires |
+| critic: K customary `length_customary` on B14.S1 | fires | fires |
+| critic / M′(2): lesson 1 clause "never more than 9 of one place (47 tens 6 ones)" | **fires** (unit_form rename="more") | missed |
+| critic: L tape_diagram "times-as-many" on lesson 6 | fires | fires |
+| critic / M′(1): lesson 14 "never clicks or sorts containers" | **fires** (capacity forms=1) | missed |
+| N′: B15.S2 the r7 unit sort under "read on a scale" | **fires** (scale 0 / 100) | missed |
+| N: B14.S4 convert items under "sort containers" | **fires** (sorts 0 / 100) | missed |
+| N: lesson 2 standard unit form under "45 hundreds" | **fires** (renamed unit form 0 / 100) | missed |
+| N: B10.S9 click-all under "sort" | **fires** | missed |
+| N: B14.S5 facts under "conversion" | **fires** | missed |
+| N′: B11.S1 bar graph under "number line" | **fires** | missed |
+
+Build-level mutations on a scratch tree copy: (A) a spec file restoring B15.S2 `mass_volume_liquid {forms:[0]}` and B14.S4
+`capacity {units:[0], forms:[1]}` with their r7 whys, a pre equal to B1.S2's own direct, a duplicate pre on B3.S1 and 9 related
+on B1.S1: the build **exits 1** with "does not fit at its spec opts" for both links ("no option set fits": the unit sort the old
+loop chose for B15.S2 is no longer suggested, its "scale" claim is false), the F, duplicate and more-than-8 errors, and the
+written file still carries the spec opts (nothing re-optioned). (B) `build.py` with a pass that silently sets B15.S2's volume
+link to `band:12`: the build **exits 1** at specopts ("not in the spec (spec has band 30)").
+
+## The 18 links whose spec set explicit opts that the old fit changed (re-read by hand, fresh seeds)
+| # | Unit | Link | Spec opts (old) | Now in the spec | Why, verified on the items |
+|---|---|---|---|---|---|
+| 1 | Y5.B3.S1 | pre `patterns:seq_5` | band 1000 | band 50 | "Count in 2s, 5s and 10s" (Y2.B1.S15): 34, 39, ___, 49; reverse-order drags to 28. True |
+| 2 | Y5.B3.S1 | pre `patterns:seq_10` | band 1000 | band 50 | same cite: 19, 29, ___, 49. True |
+| 3 | Y5.B3.S2 | pre `multiplication:mult_facts` | constant [3,6,9] | constant [9], band 100 | pass 3 re-cites it to "Y4.B4.S5 9 times-table … (the multiplication half)"; [3,6,9] dealt 9s in 41 / 100. Now 9 × 4, 9 × 3, 9 × 9. True |
+| 4 | Y5.B5.S1 | pre `mult_facts` | [3,6,9] | [9] | same cite: 9 × 5, 9 × 11. True |
+| 5 | Y5.B5.S6 | pre `mult_facts` | [6,7,9] | [7] | "Y4.B4.S8 7 times-table …": 7 × 5, 7 × 4. True |
+| 6 | Y5.B12.S9 | pre `patterns:count_by_step_up` | range 1000 | range 50 | "count up in steps (4.OA.C.5)": count up by 5s, 3s, 2s to 50 (range 1000 reached 1,255). True |
+| 7 | Y5.B12.S12 | pre `mult_facts` | [3,6,9] | [9] | as 3. True |
+| 8 | Y5.B14.S3 | pre `measurement:mass_volume_liquid` | forms [0] | forms [2] | the cylinder (to 1,000 mL) is too big here; **why rewritten**: "this form chooses the unit for an object, g or kg, mL or L, by sorting and clicking: the sense of size behind a change of metric unit" (it had said "choose the unit … before converting": the old why's "converting" is now a false form claim) |
+| 9 | Y5.B14.S4 | related `measurement:capacity` | units [0], forms [1] | units [0], forms [0] | **critic row: why rewritten** "customary capacity conversions one a cell (4 pints = 2 quarts, 6 cups = 3 pints)" (was "sort containers"): 12 quarts = ___ gallons, 6 cups = ___ pints |
+| 10 | Y5.B15.S2 | related `mass_volume_liquid` | forms [0] | **replaced**: `area_perimeter:volume {forms:[0], band:30}` | **critic row**: "working out each cuboid's volume in cubic units (length × width × height), then comparing two volumes": l = 3, w = 2, h = 2 → 12 cubic units |
+| 11 | lesson 2 | pre `placevalue:place_value_10x` | op x, power [10,100], band 10000 | band 1000 | "Y4.B5.S4 Multiply by 100": 7 × 10, 10 × 100, 82 × 10 on the shift chart. True |
+| 12 | lesson 2 | related `placevalue:unit_form` | band 9999 | band 999, **rename 'more'** | **critic row**: "renaming in unit form (454 = 45 tens 4 ones; 3 hundreds 14 tens = 440): the step inside 9 tens times 5 tens = 45 hundreds = 4,500": 975 = ___ tens 5 ones, 1 hundred 15 tens = ___ |
+| 13 | lesson 3 | pre `count_by_step_up` | step [1] | step [1], range 100 | **why gets** "this option counts on in 3s and in 4s" (critic carried minor; the skill's step [1] is "3s and 4s", no 3s-only value) |
+| 14 | lesson 4 | pre `skip_count_line` | step [0] | step [0], band 50 | **why gets** "skip counts in 2s, 5s and 10s" (step [0] is that set; 2s in about a third) |
+| 15 | lesson 5 | pre `skip_count_line` | step [0] | step [0], band 50 | as 14 |
+| 16 | lesson 5 | pre `count_by_step_up` | step [1] | step [1], range 1000 | as 13 |
+| 17 | lesson 14 | pre `measurement:capacity` | units [1], forms [0] | units [1], forms [1] | **critic minor: re-cited honestly**: convert (3 L = 3,000 mL) is past the lesson's size and capacity has no band (Max Number does not change it, tried), so the why says "this form clicks the metric containers larger than 1 litre, a bucket of 8 L against a can of 355 mL: the sense of a litre before cups, pints, quarts and gallons" |
+| 18 | lesson 15 | pre `measurement:length_metric` | forms [1] | forms [3] | **why rewritten**: "converting km to m, 2 km = 2,000 m: a larger unit changed into a smaller one" (forms 1 failed "kilometres") |
+
+## Per-entry rows (critic r7 fix table)
+| Entry | Change |
+|---|---|
+| Y5.B15.S2 | related `volume {forms:[0], band:30}` (row 10 above); the r7 pre `volume {}` stays dropped (inches / feet in its mix) |
+| Lesson 2 | related `unit_form {band:999, rename:'more'}` (row 12) |
+| Lesson 1 | related `unit_form {band:9999, rename:'more'}`, why "renaming a number in a smaller unit (7,576 = 757 tens 6 ones; 4 thousands 16 hundreds = 5,600)" |
+| Y5.B14.S4 | why rewritten (row 9); no "metric" in it |
+| Lesson 14 | capacity pre re-cited honestly (row 17) |
+| B6.S2 / S3 / S5 / S7 | `frac_mult_word {denoms:[5]}`: measured 52 / 100 serving stories (fraction × whole) and 48 / 100 "how many 1/5 m pieces in 3 m" (Grade 5, 5.NF.B.7c). The skill's only option is the denominator family, so the why names both: "fraction × whole number in stories (each serving uses 2/5 L: 3 servings = 1 1/5 L), some asking which numbers are needed; about half are 'how many 1/5 m pieces in 3 m' stories (Grade 5, 5.NF.B.7c), worked here by counting 5 fifths in each metre". Generator note: a × / ÷ story filter on `frac_mult_word` would make it a clean × link |
+| B5.S5 | pre `make_ten` dropped (unfiltered week-list entry) |
+| B4.S4 (and B4.S14 / S16) | `whole_as_fraction` deals 54 / 100 "1 = n/n" and 46 / 100 "9 = 9/1": the whys say both |
+| Lesson 3 | count_by_step_up why names 3s and 4s (row 13); skip_count_line names 2s, 5s and 10s |
+| B10.S9 | `hotspot_quads` why "click every quadrilateral among other shapes …" (was "sort") |
+| B10.S10 (M′ found) | the M gate, now reading `net_identify`'s `shapes` option ("Pyramids and triangular prisms"), flagged the `name_3d_shapes` clause; the clause now names `shapes_classify:net_identify` ("has them, as nets to fold, not as solids to name"), which is true: net_identify {} already deals the square pyramid and triangular prism nets |
+| Gate-found whys | the new form / representation claims and the re-read found these whys false at their opts; rewritten: B14.S5 mult_facts ("conversion"), B6.S1 fraction_of_set ("1/n" on 6/8 of 16), B8.S1 multiply ("× 2 facts and doubling" on mixed facts), B10.S4 / S8 additive_angles ("measure two parts and add", "a whole turn or a straight line" on parts of 90°), B11.S5 partition_shapes ("halves" on halves and quarters), B12.S1 add_fractions_like ("3/10 + 4/10" on click-the-sums-to-1), B7.S1 / S3 write_fraction (fifths and tenths named), B14.S1 / S3 related capacity moved to the convert form `{units:[1], forms:[0]}` (the "1,000 rule" the why names) |
+
+## Counts and gates
+- 136 steps (37 full / 74 partial / 25 gap), 21 lessons (4 / 16 / 1), 101 proposals, 175 tagFixes, **874 links** (875 − make_ten).
+- `build.py`: 0 links that do not fit at their spec opts, 0 duplicates, 0 own repeats; **specopts 874 links, 0 differences**;
+  linkfit 0 misfits; optcheck 0; mergecheck (Y5 + R, Y1, Y4, Y6) OK.
+- `sweep.mjs` (fresh seeds): 874 links, 148 clauses, 806 claims: **a 0, a-neg 0, b 0**, c 32 (the same 32 the critic accepted).
+- critic's `merge7.mjs`: order-independent, 0 key|step written by 2 lanes, own-step mismatches 0 / 0 for every lane, Y5 opts
+  that do not land 0.
+- Self-check: every touched entry re-dumped on fresh seeds (80923 + 61 i, 41077 + 71 i, the critic's dump script): B15.S2,
+  B14.S1 / S3 / S4 / S5, lessons 1 / 2 / 3 / 4 / 5 / 14 / 15, B3.S1, B4.S4 / S14 / S16, B5.S5, B6.S1 / S2 / S7, B7.S1, B8.S1,
+  B10.S4 / S8 / S9 / S10, B11.S5, B12.S1: each why read true on its items; I grade every one 8 (B15.S2 and lesson 2 now 8:
+  their related deal exactly what the why says).
+
+## Every link the old fit loop changed, now written in the spec (`spec_zz_r7.py` RELINK)
+Generated from the fit report's suggestion, re-read on its items, the why rewritten where it was not true (the rows above).
+
+| # | Unit | Role | Skill | Spec opts (old) | Opts now in the spec | Why (re-read on the items) |
+|---|---|---|---|---|---|---|
+| 1 | Y5.B1.S1 | related | `placevalue:number_word_names` | `{}` | `{"band": 999}` | another way of writing the same number (words) |
+| 2 | Y5.B1.S2 | related | `placevalue:value` | `{}` | `{"band": 9999}` | value of a digit in a 4-digit number |
+| 3 | Y5.B1.S2 | related | `placevalue:number_word_names` | `{}` | `{"band": 9999}` | the number in words |
+| 4 | Y5.B1.S3 | related | `placevalue:number_word_names` | `{}` | `{"band": 99999}` | 5-digit numbers in words |
+| 5 | Y5.B1.S7 | pre | `placevalue:value` | `{}` | `{"band": 999999}` | Y5.B1.S4 Numbers to 1,000,000 (earlier Y5 step) |
+| 6 | Y5.B1.S10 | pre | `placevalue:identify` | `{}` | `{"band": 99999}` | Y5.B1.S3 Numbers to 100,000 (earlier Y5 step) |
+| 7 | Y5.B1.S10 | related | `placevalue:number_word_names` | `{}` | `{"band": 99999}` | the same 5-digit numbers named in words, read before they are compared |
+| 8 | Y5.B1.S11 | pre | `placevalue:identify` | `{}` | `{"band": 999999}` | Y5.B1.S4 Numbers to 1,000,000 (earlier Y5 step) |
+| 9 | Y5.B2.S3 | pre | `subtraction:sub_across_zeros` | `{}` | `{"band": 10000}` | Y4.B2.S7 Subtract two 4-digit numbers - more than one exchange (prior learning wk W09): exchanging across zeros, ≤ 4 digits |
+| 10 | Y5.B2.S7 | pre | `placevalue:compare` | `{}` | `{"band": 999999}` | Y5.B1.S11 Compare and order numbers to 1,000,000 (earlier Y5 step) |
+| 11 | Y5.B3.S1 | pre | `patterns:seq_5` | `{"band": 1000}` | `{"band": 50}` | Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W01) |
+| 12 | Y5.B3.S1 | pre | `patterns:seq_10` | `{"band": 1000}` | `{"band": 50}` | Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W01) |
+| 13 | Y5.B3.S2 | pre | `multiplication:count_by_tables` | `{}` | `{"constant": [3]}` | Y4.B4.S1 Multiples of 3 (prior learning wk W01) |
+| 14 | Y5.B3.S2 | pre | `multiplication:mult_facts` | `{"constant": [3, 6, 9]}` | `{"constant": [9], "band": 100}` | Y4.B4.S5 9 times-table and division facts (lower grade, same idea; the multiplication half) |
+| 15 | Y5.B3.S2 | related | `number_theory:divisibility_sort` | `{}` | `{"band": 50}` | sort by divisor |
+| 16 | Y5.B3.S5 | pre | `multiplication:mult_facts` | `{}` | `{"constant": [2, 4, 8]}` | Y3.B3.S15 The 2, 4 and 8 times-tables (prior learning wk W02) |
+| 17 | Y5.B3.S5 | related | `number_theory:divisibility_sort` | `{}` | `{"band": 50}` | divisibility rules rule numbers out |
+| 18 | Y5.B3.S5 | related | `number_theory:mixed_number_theory` | `{}` | `{}` @100 | mixed review |
+| 19 | Y5.B3.S7 | pre | `multiplication:mult_facts` | `{}` | `{"constant": [2, 4, 8]}` | Y3.B3.S15 The 2, 4 and 8 times-tables (lower grade, same cluster CCSS 3.OA.C.7) |
+| 20 | Y5.B3.S8 | pre | `multiplication:count_by_tables` | `{}` | `{"constant": [10]}` | Y2.B5.S13 The 10 times-table (prior learning wk W10) |
+| 21 | Y5.B3.S8 | pre | `patterns:seq_10` | `{}` | `{"band": 1000}` | Y1.B9.S2 Count in 10s (prior learning wk W10) |
+| 22 | Y5.B3.S9 | pre | `division:div_facts` | `{}` | `{"constant": [10]}` | Y2.B5.S14 Divide by 10 (prior learning wk W10) |
+| 23 | Y5.B3.S9 | related | `division:divide` | `{}` | `{"range": 100}` | division facts and beyond |
+| 24 | Y5.B4.S1 | pre | `fractions:equiv_frac_nv` | `{}` | `{"denoms": [2]}` | Y4.B7.S10 Equivalent fraction families (prior learning wk W15) |
+| 25 | Y5.B4.S1 | pre | `fractions:identify` | `{}` | `{"forms": [1]}` | Y2.B8.S10 Unit fractions (prior learning wk W15) |
+| 26 | Y5.B4.S1 | related | `fractions:select_equiv_frac` | `{}` | `{"denoms": [3]}` | recognise equivalents (next step Y5.B4.S3) |
+| 27 | Y5.B4.S1 | related | `fractions:simplify` | `{}` | `{"forms": [1]}` | the inverse: simplify to the unit fraction |
+| 28 | Y5.B4.S2 | related | `fractions:select_equiv_frac` | `{}` | `{"denoms": [3]}` | recognise equivalents (next step) |
+| 29 | Y5.B4.S2 | related | `fractions:simplify` | `{}` | `{"forms": [1]}` | inverse: simplify |
+| 30 | Y5.B4.S3 | related | `fractions:simplify` | `{}` | `{"forms": [1]}` | simplest form |
+| 31 | Y5.B4.S11 | related | `fraction_operations:sub_frac_unlike` | `{}` | `{"denoms": [2]}` | inverse |
+| 32 | Y5.B5.S1 | pre | `multiplication:mult_facts` | `{"constant": [3, 6, 9]}` | `{"constant": [9]}` | Y4.B4.S5 9 times-table and division facts (lower grade, same idea; the multiplication half) |
+| 33 | Y5.B5.S1 | related | `division:divide` | `{}` | `{"range": 100}` | the inverse: division facts and 2-digit ÷ 1-digit, before 4-digit ÷ 1-digit (Y5.B5.S8) |
+| 34 | Y5.B5.S6 | pre | `multiplication:mult_facts` | `{"constant": [6, 7, 9]}` | `{"constant": [7]}` | Y4.B4.S8 7 times-table and division facts (lower grade, same idea; the multiplication half) |
+| 35 | Y5.B5.S6 | related | `division:div_word_problems_plain` | `{}` | `{"range": 100}` | the inverse: one-step division stories |
+| 36 | Y5.B5.S7 | pre | `division:missing_mult_div` | `{}` | `{"range": 100}` | Y3.B4.S6 Link multiplication and division (prior learning wk W12) |
+| 37 | Y5.B5.S7 | pre | `division:div_facts` | `{}` | `{"constant": [10]}` | Y2.B5.S14 Divide by 10 (lower grade, same cluster CCSS 3.OA.C.7) |
+| 38 | Y5.B5.S8 | pre | `division:missing_mult_div` | `{}` | `{"range": 100}` | Y3.B4.S6 Link multiplication and division (prior learning wk W12) |
+| 39 | Y5.B5.S8 | related | `division:div_word_problems_plain` | `{}` | `{"range": 100}` | division stories |
+| 40 | Y5.B5.S9 | related | `division:remainder_interpret` | `{}` | `{"range": 100}` | what the remainder means in a story |
+| 41 | Y5.B5.S10 | pre | `division:missing_mult_div` | `{}` | `{"range": 100}` | Y3.B4.S6 Link multiplication and division (prior learning wk W12) |
+| 42 | Y5.B5.S10 | related | `division:div_check_by_multiplying` | `{}` | `{"range": 100}` | check the result |
+| 43 | Y5.B5.S11 | related | `division:div_word_problems_plain` | `{}` | `{"range": 100}` | one-step division stories |
+| 44 | Y5.B6.S1 | related | `fractions:fraction_of_set_nv` | `{}` | `{"denoms": [2]}` | a fraction of an amount (1/2 of 12, 6/8 of 16): halves, quarters and eighths, unit and non-unit |
+| 45 | Y5.B6.S2 | related | `fraction_operations:frac_mult_word` | `{}` | `{"denoms": [5]}` | fraction × whole number in stories (each serving uses 2/5 L: 3 servings = 1 1/5 L), some asking which numbers are needed; about half are 'how many 1/5 m pieces in 3 m' stories (Grade 5, 5.NF.B.7c), worked here by counting 5 fifths in each metre |
+| 46 | Y5.B6.S3 | related | `fraction_operations:frac_mult_word` | `{}` | `{"denoms": [5]}` | fraction × whole number in stories (each serving uses 2/5 L: 3 servings = 1 1/5 L), some asking which numbers are needed; about half are 'how many 1/5 m pieces in 3 m' stories (Grade 5, 5.NF.B.7c), worked here by counting 5 fifths in each metre |
+| 47 | Y5.B6.S3 | related | `fractions:fraction_of_set_nv` | `{}` | `{"denoms": [2]}` | next step: a fraction of a quantity |
+| 48 | Y5.B6.S4 | pre | `division:div_word_problems` | `{}` | `{"range": 100}` | divide by the denominator (prior learning wk W20) |
+| 49 | Y5.B6.S4 | pre | `patterns:halve` | `{}` | `{"band": 50}` | halving (prior learning wk W20) |
+| 50 | Y5.B6.S4 | related | `fractions:fraction_of_set_hard_nv` | `{}` | `{"denoms": [2]}` | Y5.B6.S5 Fraction of an amount (next step) |
+| 51 | Y5.B6.S5 | pre | `fractions:fraction_of_set_nv` | `{}` | `{"denoms": [2]}` | Y5.B6.S4 (previous step) |
+| 52 | Y5.B6.S5 | pre | `division:div_word_problems` | `{}` | `{"range": 100}` | divide by the denominator (prior learning wk W20) |
+| 53 | Y5.B6.S5 | pre | `multiplication:mult_facts` | `{}` | `{"constant": [12]}` | Y4.B4.S10 12 times-table and division facts (lower grade, same idea; multiply the unit part back up; the multiplication half) |
+| 54 | Y5.B6.S5 | related | `fraction_operations:frac_mult_word` | `{}` | `{"denoms": [5]}` | fraction × whole number in stories (each serving uses 2/5 L: 3 servings = 1 1/5 L), some asking which numbers are needed; about half are 'how many 1/5 m pieces in 3 m' stories (Grade 5, 5.NF.B.7c), worked here by counting 5 fifths in each metre |
+| 55 | Y5.B6.S6 | pre | `fractions:fraction_of_set_nv` | `{}` | `{"denoms": [2]}` | Y5.B6.S4 (earlier step) |
+| 56 | Y5.B6.S6 | pre | `division:missing_mult_div` | `{}` | `{"range": 100}` | inverse operations (CCSS 3.OA.A.4) |
+| 57 | Y5.B6.S6 | pre | `multiplication:mult_facts` | `{}` | `{"constant": [12]}` | Y4.B4.S10 12 times-table and division facts (lower grade, same idea; multiply the unit part back up; the multiplication half) |
+| 58 | Y5.B6.S7 | pre | `division:div_word_problems` | `{}` | `{"range": 100}` | ÷ by the denominator (prior learning wk W20) |
+| 59 | Y5.B7.S1 | pre | `conversions:f_to_d` | `{}` | `{"denoms": [5]}` | Y4.B8.S2 Tenths as decimals (prior learning wk W21) |
+| 60 | Y5.B7.S1 | pre | `fractions:write_fraction` | `{}` | `{"denoms": [5]}` | Y4.B8.S1 Tenths as fractions (prior learning wk W21; shaded fifths and tenths, as 3/5 and 2/10) |
+| 61 | Y5.B7.S1 | pre | `placevalue:value` | `{}` | `{"band": 99}` | whole-number place value (CCSS 4.NBT.A.2) |
+| 62 | Y5.B7.S3 | pre | `fractions:write_fraction` | `{}` | `{"denoms": [5]}` | Y4.B8.S1 Tenths as fractions (lower grade, same idea; shaded fifths and tenths, as 3/5 and 2/10) |
+| 63 | Y5.B7.S4 | pre | `fractions:simplify` | `{}` | `{"forms": [1]}` | simplest form (CCSS 4.NF.A.1) |
+| 64 | Y5.B7.S6 | pre | `placevalue:value` | `{}` | `{"band": 99}` | value of a digit (CCSS 4.NBT.A.2) |
+| 65 | Y5.B7.S7 | pre | `placevalue:value` | `{}` | `{"band": 99}` | value of a digit (CCSS 4.NBT.A.2) |
+| 66 | Y5.B7.S8 | pre | `conversions:d_to_f` | `{}` | `{"forms": [1]}` | Y4.B8.S8 Hundredths as decimals (lower grade, same idea) |
+| 67 | Y5.B7.S9 | pre | `placevalue:compare` | `{}` | `{"band": 99}` | compare whole numbers (prior learning wk W22) |
+| 68 | Y5.B7.S13 | pre | `fractions:simplify` | `{}` | `{"forms": [1]}` | simplest form (CCSS 4.NF.A.1) |
+| 69 | Y5.B8.S1 | pre | `multiplication:multiply` | `{}` | `{"range": 100}` | multiplication facts within 100 (8 × 5, 11 × 2): a perimeter uses the × 2 fact, a rectangle has two of each side (CCSS 3.OA.C.7) |
+| 70 | Y5.B8.S1 | related | `area_perimeter:area` | `{}` | `{"forms": [1]}` | Y5.B8.S4 Area of rectangles (next idea, same shape) |
+| 71 | Y5.B8.S1 | related | `area_perimeter:area_perimeter` | `{}` | `{"band": 50}` | both measures of one rectangle |
+| 72 | Y5.B8.S2 | related | `area_perimeter:area_polygon_decompose` | `{}` | `{"band": 50}` | same L/T/U shapes, area instead of perimeter |
+| 73 | Y5.B8.S3 | pre | `area_perimeter:composite_shapes` | `{}` | `{"band": 40}` | Y5.B8.S2 Perimeter of rectilinear shapes (previous step) |
+| 74 | Y5.B8.S4 | related | `area_perimeter:area_perimeter` | `{}` | `{"band": 50}` | area and perimeter of one rectangle |
+| 75 | Y5.B8.S4 | related | `area_perimeter:area_distributive_visual` | `{}` | `{"band": 50}` | split a rectangle to multiply |
+| 76 | Y5.B8.S4 | related | `area_perimeter:area_polygon_decompose` | `{}` | `{"band": 50}` | Y5.B8.S5 compound shapes (next step) |
+| 77 | Y5.B8.S5 | pre | `area_perimeter:area` | `{}` | `{"forms": [1]}` | Y5.B8.S4 Area of rectangles (previous step) |
+| 78 | Y5.B8.S5 | pre | `area_perimeter:area_distributive_visual` | `{}` | `{"band": 50}` | split a rectangle into two parts (lower grade, CCSS 3.MD.C.7c) |
+| 79 | Y5.B8.S6 | pre | `area_perimeter:area` | `{}` | `{"forms": [1], "band": 25}` | Y5.B8.S4 Area of rectangles |
+| 80 | Y5.B8.S6 | related | `area_perimeter:area_perimeter` | `{}` | `{"band": 50}` | the exact area of a rectangle, to check an estimate against |
+| 81 | Y5.B9.S1 | pre | `graphs:bar_graph` | `{}` | `{"forms": [0]}` | Y3/Gr.2 Interpret bar charts (prior learning wk W36) |
+| 82 | Y5.B9.S2 | pre | `graphs:bar_graph` | `{}` | `{"forms": [0]}` | Y3/Gr.2 Interpret bar charts (prior learning wk W36) |
+| 83 | Y5.B9.S3 | pre | `graphs:bar_graph` | `{}` | `{"forms": [0]}` | Y3/Gr.2 Interpret bar charts (prior learning wk W04) |
+| 84 | Y5.B9.S4 | pre | `graphs:bar_graph` | `{}` | `{"forms": [0]}` | Y3/Gr.2 Interpret bar charts (prior learning wk W04) |
+| 85 | Y5.B9.S4 | related | `graphs:pictograph` | `{}` | `{"forms": [0]}` | the same counts as a picture graph |
+| 86 | Y5.B10.S3 | related | `angles_lines:additive_angles` | `{}` | `{"forms": [0]}` | benchmark 90° plus a part |
+| 87 | Y5.B10.S4 | pre | `measurement:temperature` | `{}` | `{"forms": [1]}` | Y2.B7.S9 Temperature (lower grade, same idea) |
+| 88 | Y5.B10.S4 | related | `angles_lines:additive_angles` | `{}` | `{"forms": [0]}` | two parts that make a right angle: find the missing part (80° and ? make 90°) |
+| 89 | Y5.B10.S6 | pre | `subtraction:sub_1k_regroup` | `{}` | `{"band": 100}` | Y3.B2.S15 Subtract two numbers (across a 10) (lower grade, same idea; subtraction with an exchange, the step behind 360 − 145) |
+| 90 | Y5.B10.S7 | pre | `subtraction:sub_1k_regroup` | `{}` | `{"band": 100}` | Y3.B2.S15 Subtract two numbers (across a 10) (lower grade, same idea; subtraction with an exchange, the step behind 180 − 45) |
+| 91 | Y5.B10.S8 | related | `area_perimeter:composite_shapes` | `{}` | `{"band": 40}` | missing lengths in rectilinear shapes |
+| 92 | Y5.B10.S8 | related | `angles_lines:additive_angles` | `{}` | `{"forms": [0]}` | angles that add up: the missing part of a right angle (46° and ? make 90°), the idea a missing angle in a shape is found with (Y5.B10.S6) |
+| 93 | Y5.B11.S1 | pre | `graphs:bar_graph` | `{}` | `{"forms": [0]}` | reading values off an axis |
+| 94 | Y5.B11.S3 | related | `coordinates:geo_rotate` | `{}` | `{"forms": [1]}` | another transformation |
+| 95 | Y5.B11.S5 | pre | `shapes_early:partition_shapes` | `{}` | `{"forms": [1]}` | equal parts of shapes, halves and quarters (lower grade, same cluster CCSS 2.G.A.3) |
+| 96 | Y5.B11.S6 | related | `coordinates:geo_rotate` | `{}` | `{"forms": [1]}` | another transformation |
+| 97 | Y5.B12.S1 | related | `decimals:add_decimal` | `{}` | `{"range": 100}` | decimal addition written in a line (23.2 + 64.4): the written sums known facts make quick |
+| 98 | Y5.B12.S1 | related | `fraction_operations:add_fractions_like` | `{}` | `{"denoms": [5]}` | the same facts with fractions: 4/10 + 6/10 = 1, as 0.4 + 0.6 = 1 (fifths and tenths, click the sums that make 1) |
+| 99 | Y5.B12.S2 | related | `decimals:add_decimal` | `{}` | `{"range": 100}` | Y5.B12.S3 Add and subtract decimals across 1 (next step; the adding half) |
+| 100 | Y5.B12.S3 | pre | `addition:add_1k_regroup` | `{}` | `{"band": 100}` | Y3 Add two numbers (across a 10) (prior learning wk W13) |
+| 101 | Y5.B12.S3 | pre | `conversions:d_to_f` | `{}` | `{"forms": [0]}` | Y4.B8.S8 (prior learning wk W13) |
+| 102 | Y5.B12.S4 | pre | `addition:add_1k_regroup` | `{}` | `{"band": 100}` | Y3 Add two numbers (across a 10) (prior learning wk W13) |
+| 103 | Y5.B12.S5 | pre | `subtraction:sub_10k_regroup` | `{}` | `{"band": 100}` | column subtraction with exchange (prior learning wk W14) |
+| 104 | Y5.B12.S6 | pre | `addition:add_10k_regroup` | `{}` | `{"band": 100}` | column addition with exchange (prior learning wk W14) |
+| 105 | Y5.B12.S9 | pre | `patterns:count_by_step_up` | `{"range": 1000}` | `{"range": 50}` | count up in steps (lower grade, same cluster CCSS 4.OA.C.5) |
+| 106 | Y5.B12.S9 | pre | `patterns:count_by_step_down` | `{}` | `{"range": 50}` | count back in steps (CCSS 4.OA.C.5) |
+| 107 | Y5.B12.S9 | pre | `patterns:number_pattern` | `{}` | `{"band": 50}` | find the rule (CCSS 4.OA.C.5) |
+| 108 | Y5.B12.S10 | pre | `conversions:d_to_f` | `{}` | `{"forms": [0]}` | tenths written as a decimal and as a fraction (0.7 = 7/10), lower grade (Y4.B8 tenths) |
+| 109 | Y5.B12.S11 | pre | `division:div_facts` | `{}` | `{"constant": [10]}` | Y2.B5.S14 Divide by 10 (prior learning wk W10) |
+| 110 | Y5.B12.S11 | related | `conversions:d_to_f` | `{}` | `{"forms": [0]}` | decimal to fraction |
+| 111 | Y5.B12.S12 | pre | `multiplication:mult_zeros` | `{}` | `{"forms": [0]}` | × multiples of 10 (CCSS 4.NBT.B.5) |
+| 112 | Y5.B12.S12 | pre | `multiplication:mult_facts` | `{"constant": [3, 6, 9]}` | `{"constant": [9]}` | Y4.B4.S5 9 times-table and division facts (lower grade, same idea; the multiplication half) |
+| 113 | Y5.B13.S1 | pre | `placevalue:compare` | `{}` | `{"band": 99}` | Y2/Gr.1 compare numbers (prior learning) |
+| 114 | Y5.B13.S1 | pre | `counting:number_seq_fill` | `{}` | `{"range": 100}` | fill a counting sequence (prior learning) |
+| 115 | Y5.B13.S2 | pre | `counting:number_seq_fill` | `{}` | `{"range": 100}` | fill a counting sequence (prior learning) |
+| 116 | Y5.B13.S2 | pre | `patterns:seq_10` | `{}` | `{"band": 50}` | counting sequences (prior learning) |
+| 117 | Y5.B13.S3 | pre | `patterns:seq_2` | `{}` | `{"band": 50}` | count in 2s (prior learning) |
+| 118 | Y5.B13.S3 | pre | `patterns:seq_5` | `{}` | `{"band": 50}` | count in 5s (prior learning) |
+| 119 | Y5.B13.S3 | pre | `patterns:seq_10` | `{}` | `{"band": 50}` | count in 10s (prior learning) |
+| 120 | Y5.B13.S4 | pre | `placevalue:compare` | `{}` | `{"band": 99}` | Y2/Gr.1 compare numbers (prior learning) |
+| 121 | Y5.B13.S4 | pre | `placevalue:order_least_to_greatest` | `{}` | `{"band": 99}` | order numbers (prior learning) |
+| 122 | Y5.B14.S1 | related | `measurement:capacity` | `{}` | `{"units": [1], "forms": [0]}` | the same 1,000 rule for litres: 2 L = 2,000 mL, 250 mL = 0.25 L |
+| 123 | Y5.B14.S3 | pre | `measurement:mass_volume_liquid` | `{"forms": [0]}` | `{"forms": [2]}` | Y3.B7.S8 Measure capacity and volume in litres and millilitres (lower grade, same idea; this form chooses the unit for an object, g or kg, mL or L, by sorting and clicking: the sense of size behind a change of metric unit) |
+| 124 | Y5.B14.S4 | pre | `measurement:length_customary` | `{}` | `{"forms": [0]}` | customary lengths (lower grade, same CCSS 4.MD.A.1) |
+| 125 | lesson multiplyanddividemultiplesof10usingbasicf | pre | `placevalue:place_value_10x` | `{"op": "x", "power": [10, 100], "band": 10000}` | `{"op": "x", "power": [10, 100], "band": 1000}` | Y4.B5.S4 Multiply by 100 (lower grade, same idea) |
+| 126 | lesson extendgrowingshapepatterns | pre | `patterns:count_by_step_up` | `{"step": [1]}` | `{"step": [1], "range": 100}` | Y2.B1.S16 Count in 3s (lower grade, same idea; this option counts on in 3s and in 4s) |
+| 127 | lesson findemergentfeaturesegunitsdigitcycle | pre | `patterns:skip_count_line` | `{"step": [0]}` | `{"step": [0], "band": 50}` | Y1.B9.S1 Count in 2s (lower grade, same idea; this option skip counts in 2s, 5s and 10s) |
+| 128 | lesson followagivenruletoextendanumberpattern | pre | `patterns:skip_count_line` | `{"step": [0]}` | `{"step": [0], "band": 50}` | Y1.B9.S1 Count in 2s (lower grade, same idea; this option skip counts in 2s, 5s and 10s) |
+| 129 | lesson followagivenruletoextendanumberpattern | pre | `patterns:count_by_step_up` | `{"step": [1]}` | `{"step": [1], "range": 1000}` | Y2.B1.S16 Count in 3s (lower grade, same idea; this option counts on in 3s and in 4s) |
+| 130 | lesson followagivenruletoextendanumberpattern | related | `patterns:number_pattern` | `{}` | `{"band": 1000}` | find the rule yourself and fill the gaps: the inverse task |
+| 131 | lesson multiplicativecomparisontimesasmany | pre | `multiplication:multiply` | `{}` | `{"range": 100}` | Y4.B5.S9 Multiply a 2-digit number by a 1-digit number (lower grade, same idea) |
+| 132 | lesson multiplicativecomparisontimesasmany | related | `number_ops_mixed:word_problems_mixed` | `{}` | `{}` @100 | times-as-many stories among other multiplication and division stories (Y5.B5.S11) |
+| 133 | lesson multiplicativecomparisonwordproblemshowma | pre | `division:div_word_problems` | `{}` | `{"range": 100}` | Y3.B3.S5 Sharing and grouping (lower grade, same idea) |
+| 134 | lesson multistepwordproblemsdivideandinterpretth | pre | `division:div_word_problems` | `{}` | `{"range": 100}` | Y3.B3.S5 Sharing and grouping (lower grade, same idea) |
+| 135 | lesson multistepwordproblemsdivideandinterpretth | pre | `number_ops_mixed:word_problems_mixed` | `{}` | `{}` @100 | Y5.B5.S11 Solve problems with multiplication and division (taught earlier this year, wk W03) |
+| 136 | lesson pointslineslinesegmentsandrays | related | `angles_lines:identify_angles` | `{}` | `{"forms": [1]}` | two rays from one point make an angle: the next idea (Y5.B10.S2) |
+| 137 | lesson customarycapacitycupspintsquartsandgallon | pre | `division:div_facts` | `{}` | `{"constant": [4]}` | Y3.B3.S10 Divide by 4 (lower grade, same idea) |
+| 138 | lesson customarycapacitycupspintsquartsandgallon | pre | `measurement:capacity` | `{"units": [1], "forms": [0]}` | `{"units": [1], "forms": [1]}` | Y3.B7.S9 Equivalent capacities and volumes (litres and millilitres) (lower grade, same idea; this form clicks the metric containers larger than 1 litre, a bucket of 8 L against a can of 355 mL: the sense of a litre before cups, pints, quarts and gallons) |
+| 139 | lesson customarylengthandweightinchesfeetyardsou | pre | `measurement:length_metric` | `{"forms": [1]}` | `{"forms": [3]}` | Y4.B6.S1 Measure in kilometres and metres (lower grade, same idea; converting km to m, 2 km = 2,000 m: a larger unit changed into a smaller one, as the lesson does with its own units) |
+| 140 | lesson comparefractions | pre | `fractions:identify` | `{}` | `{"forms": [1]}` | Y3.B6.S1 Understand the denominators of unit fractions (lower grade, same idea) |
+| 141 | lesson dividea1digitnumberby100 | pre | `division:div_facts` | `{}` | `{"constant": [10]}` | Y2.B5.S14 Divide by 10 (lower grade, same idea) |
+| 142 | lesson hundredths | related | `decimals:compare_decimal` | `{}` | `{"forms": [1]}` | comparing hundredths once they are on the chart |
+| 143 | lesson orderfractions | pre | `fractions:identify` | `{}` | `{"forms": [1]}` | Y3.B6.S1 Understand the denominators of unit fractions (lower grade, same idea) |
+
+DROP rows (no option set fits; the r7 build dropped the same 94 links silently): Y5.B1.S4 pre `place_value_10x`; Y5.B1.S6 related `exponents_simple`; Y5.B1.S7 related `place_value_10x`; Y5.B1.S10 related `order_negatives`; Y5.B1.S12 related `nearest_10000`; Y5.B1.S13 related `nearest_100000`; Y5.B1.S14 related `nearest_million`; Y5.B2.S8 pre `tape_diagram`; Y5.B3.S3 related `prime_composite`; Y5.B3.S3 related `mult_div_fact_family`; Y5.B3.S10 pre `place_value_10x`; Y5.B4.S1 pre `write_fraction`; Y5.B4.S1 related `frac_10_100`; Y5.B4.S2 related `frac_10_100`; Y5.B4.S3 related `frac_10_100`; Y5.B4.S4 pre `mult_facts`; Y5.B4.S4 related `round_fractions`; Y5.B4.S5 pre `mult_facts`; Y5.B4.S5 related `mult_frac_whole`; Y5.B4.S5 related `round_fractions`; Y5.B4.S8 related `round_fractions`; Y5.B4.S10 related `estimate_frac_ops`; Y5.B4.S17 related `frac_word_mixed`; Y5.B4.S17 related `mixed_fraction_ops`; Y5.B5.S3 pre `area_model_mult_hard`; Y5.B5.S4 related `long_div_2digit`; Y5.B5.S5 pre `mult_placeholder_zero`; Y5.B5.S5 related `mult_decimal`; Y5.B5.S5 related `long_div_2digit`; Y5.B5.S9 related `remainder_contexts`; Y5.B5.S11 related `remainder_contexts`; Y5.B6.S2 related `mult_frac_frac`; Y5.B6.S7 related `percent_of_number`; Y5.B7.S1 related `percent_visual`; Y5.B7.S2 related `percent_visual`; Y5.B7.S2 related `f_to_p`; Y5.B7.S2 related `frac_10_100_nv`; Y5.B7.S3 related `percent_visual`; Y5.B7.S3 related `p_to_d`; Y5.B7.S4 related `order_fdp`; Y5.B7.S4 related `f_to_p`; Y5.B7.S4 related `frac_10_100_nv`; Y5.B7.S5 related `round_thousandths`; Y5.B7.S5 related `place_value_10x`; Y5.B7.S6 pre `d_to_f`; Y5.B7.S6 pre `f_to_d`; Y5.B7.S6 pre `pv_digit_drag`; Y5.B7.S7 pre `d_to_f`; Y5.B7.S7 pre `pv_digit_drag`; Y5.B7.S7 related `place_value_10x`; Y5.B7.S7 related `round_thousandths`; Y5.B7.S10 pre `rounding_table`; Y5.B7.S12 related `d_to_p`; Y5.B7.S13 related `d_to_p`; Y5.B7.S13 related `p_to_d`; Y5.B7.S15 related `mixed_conversions`; Y5.B7.S15 related `frac_10_100`; Y5.B8.S3 pre `multiply`; Y5.B8.S4 related `area_model_mult`; Y5.B8.S5 related `volume_composite`; Y5.B8.S5 related `mixed_area_perimeter`; Y5.B8.S5 related `area_model_mult`; Y5.B8.S6 related `estimate_length`; Y5.B8.S6 related `area_triangle`; Y5.B9.S3 related `mixed_graphs`; Y5.B10.S3 pre `estimate_length`; Y5.B10.S4 pre `reading_ruler`; Y5.B10.S5 pre `reading_ruler`; Y5.B10.S5 pre `length_metric`; Y5.B11.S1 related `coordinate_graph`; Y5.B11.S3 related `geo_reflect`; Y5.B11.S4 related `geo_reflect`; Y5.B11.S5 related `geo_reflect`; Y5.B12.S1 pre `d_to_f`; Y5.B12.S3 related `place_value_10x`; Y5.B12.S3 related `number_bonds`; Y5.B12.S4 pre `d_to_f`; Y5.B12.S7 pre `sub_across_zeros`; Y5.B12.S8 related `estimate_sums_diffs`; Y5.B12.S10 pre `count_by_powers_of_10`; Y5.B12.S10 related `mult_decimal`; Y5.B12.S10 related `compare_thousandths`; Y5.B12.S11 related `div_decimal`; Y5.B12.S11 related `count_by_powers_of_10`; Y5.B12.S12 related `mult_decimal`; Y5.B12.S12 related `div_decimal`; Y5.B13.S4 related `ordering_rationals`; Y5.B14.S2 pre `unit_conversions`; Y5.B14.S2 related `unit_conversion_word`; Y5.B14.S3 pre `reading_ruler`; Y5.B14.S3 related `length_customary`; Y5.B14.S4 related `unit_conversion_word`; Y5.B15.S2 pre `volume`; lesson dividea1digitnumberby100 related `frac_10_100`
+
+
+# (round 5) Wave 2 tagging: Year 5 (US Grade 4) — round 5: critic r6 rows + root-cause sweep (2026-10-16)
 
 Critic r6 (FAIL narrowly: steps 7.94 with B15.S4 / B15.S1 / B15.S3 = 7; lessons 7.95 with lesson 7 and lesson 10 = 7). Builder
 **escalated to Opus medium** (false whys / unit-mismatched links survived rounds 2-4; recorded in `design/STATUS.md`). Every row

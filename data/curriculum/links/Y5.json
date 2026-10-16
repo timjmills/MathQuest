@@ -1684,7 +1684,7 @@
        8
       ]
      },
-     "why": "Y3.B3.S15 The 2, 4 and 8 times-tables (lower grade, same cluster CCSS 3.OA.C.7)"
+     "why": "Y3.B3.S15 The 2, 4 and 8 times-tables (lower grade, same idea)"
     }
    ],
    "preBuild": [],
@@ -2637,7 +2637,7 @@
     },
     {
      "key": "composing:whole_as_fraction",
-     "why": "Y4.B7.S1 Understand the whole: 1 = 4/4 (prior learning wk W16)"
+     "why": "Y4.B7.S1 Understand the whole (prior learning wk W16; 1 = 3/3 and 9 = 9/1: a whole number written as a fraction)"
     },
     {
      "key": "composing:compose_whole",
@@ -3257,7 +3257,7 @@
     },
     {
      "key": "composing:whole_as_fraction",
-     "why": "1 = 4/4: the whole renamed as a fraction, the first move when a fraction is taken from a whole (CCSS 3.NF.A.3c)"
+     "why": "a whole number written as a fraction (1 = 3/3, 9 = 9/1): the whole renamed, the first move when a fraction is taken from a whole (CCSS 3.NF.A.3c)"
     }
    ],
    "preBuild": [],
@@ -3371,7 +3371,7 @@
     },
     {
      "key": "composing:whole_as_fraction",
-     "why": "1 = n/n (CCSS 3.NF.A.3c)"
+     "why": "a whole number written as a fraction: 1 = n/n and 9 = 9/1 (CCSS 3.NF.A.3c)"
     },
     {
      "key": "fraction_operations:sub_fractions_like",
@@ -3797,10 +3797,6 @@
     {
      "key": "number_sense:rounding_table",
      "why": "Y4.B1.S17 Round to the nearest 10, 100 or 1,000 (prior learning wk W35)"
-    },
-    {
-     "key": "composing:make_ten",
-     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W35)"
     }
    ],
    "preBuild": [],
@@ -4349,7 +4345,7 @@
        2
       ]
      },
-     "why": "1/n of an amount"
+     "why": "a fraction of an amount (1/2 of 12, 6/8 of 16): halves, quarters and eighths, unit and non-unit"
     }
    ],
    "note": "",
@@ -4409,7 +4405,7 @@
        5
       ]
      },
-     "why": "in stories"
+     "why": "fraction × whole number in stories (each serving uses 2/5 L: 3 servings = 1 1/5 L), some asking which numbers are needed; about half are 'how many 1/5 m pieces in 3 m' stories (Grade 5, 5.NF.B.7c), worked here by counting 5 fifths in each metre"
     }
    ],
    "note": ""
@@ -4454,7 +4450,7 @@
        5
       ]
      },
-     "why": "fraction × whole in stories"
+     "why": "fraction × whole number in stories (each serving uses 2/5 L: 3 servings = 1 1/5 L), some asking which numbers are needed; about half are 'how many 1/5 m pieces in 3 m' stories (Grade 5, 5.NF.B.7c), worked here by counting 5 fifths in each metre"
     },
     {
      "key": "fraction_operations:add_mixed_like_nv",
@@ -4618,7 +4614,7 @@
        5
       ]
      },
-     "why": "in stories"
+     "why": "fraction × whole number in stories (each serving uses 2/5 L: 3 servings = 1 1/5 L), some asking which numbers are needed; about half are 'how many 1/5 m pieces in 3 m' stories (Grade 5, 5.NF.B.7c), worked here by counting 5 fifths in each metre"
     },
     {
      "key": "fraction_operations:mult_frac_whole_nv",
@@ -4742,7 +4738,7 @@
        5
       ]
      },
-     "why": "the operator applied to a quantity in a story (4/5 of a litre, 4 times)"
+     "why": "fraction × whole number in stories (each serving uses 2/5 L: 3 servings = 1 1/5 L), some asking which numbers are needed; about half are 'how many 1/5 m pieces in 3 m' stories (Grade 5, 5.NF.B.7c), worked here by counting 5 fifths in each metre"
     }
    ],
    "note": "",
@@ -4801,7 +4797,7 @@
        5
       ]
      },
-     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W21)"
+     "why": "Y4.B8.S1 Tenths as fractions (prior learning wk W21; shaded fifths and tenths, as 3/5 and 2/10)"
     },
     {
      "key": "placevalue:value",
@@ -4954,7 +4950,7 @@
        5
       ]
      },
-     "why": "Y4.B8.S1 Tenths as fractions (lower grade, same idea)"
+     "why": "Y4.B8.S1 Tenths as fractions (lower grade, same idea; shaded fifths and tenths, as 3/5 and 2/10)"
     }
    ],
    "preBuild": [
@@ -5656,7 +5652,7 @@
      "opts": {
       "range": 100
      },
-     "why": "× 2 facts and doubling: a rectangle has two of each side (CCSS 3.OA.C.7)"
+     "why": "multiplication facts within 100 (8 × 5, 11 × 2): a perimeter uses the × 2 fact, a rectangle has two of each side (CCSS 3.OA.C.7)"
     }
    ],
    "preBuild": [],
@@ -6474,7 +6470,7 @@
        0
       ]
      },
-     "why": "measure two parts and add"
+     "why": "two parts that make a right angle: find the missing part (80° and ? make 90°)"
     },
     {
      "key": "angles_lines:identify_lines",
@@ -6678,7 +6674,7 @@
        0
       ]
      },
-     "why": "angles that add up to a whole turn or a straight line: finding a missing angle, the step after this one (Y5.B10.S6)"
+     "why": "angles that add up: the missing part of a right angle (46° and ? make 90°), the idea a missing angle in a shape is found with (Y5.B10.S6)"
     }
    ],
    "note": "",
@@ -6725,7 +6721,7 @@
    "related": [
     {
      "key": "shapes_classify:hotspot_quads",
-     "why": "sort shapes by a property"
+     "why": "click every quadrilateral among other shapes: the family named before regular and irregular are told apart"
     },
     {
      "key": "shapes_early:shape_attributes",
@@ -6758,7 +6754,7 @@
     },
     {
      "key": "shapes_early:name_3d_shapes",
-     "missing": "names basic solids; no triangular/pentagonal prisms or square-based vs triangular-based pyramids"
+     "missing": "names basic solids; no triangular/pentagonal prisms or square-based vs triangular-based pyramids (shapes_classify:net_identify has them, as nets to fold, not as solids to name)"
     },
     {
      "key": "shapes_classify:net_identify",
@@ -7017,7 +7013,7 @@
        1
       ]
      },
-     "why": "equal halves of shapes (lower grade, same cluster CCSS 2.G.A.3)"
+     "why": "equal parts of shapes, halves and quarters (lower grade, same cluster CCSS 2.G.A.3)"
     },
     {
      "key": "shapes_early:name_2d_shapes",
@@ -7135,7 +7131,7 @@
        5
       ]
      },
-     "why": "the same fact with tenths as fractions: 3/10 + 4/10 = 7/10, as 0.3 + 0.4 = 0.7"
+     "why": "the same facts with fractions: 4/10 + 6/10 = 1, as 0.4 + 0.6 = 1 (fifths and tenths, click the sums that make 1)"
     }
    ],
    "note": "",
@@ -8170,9 +8166,12 @@
      "opts": {
       "units": [
        1
+      ],
+      "forms": [
+       0
       ]
      },
-     "why": "the same 1,000 rule for litres"
+     "why": "the same 1,000 rule for litres: 2 L = 2,000 mL, 250 mL = 0.25 L"
     }
    ],
    "note": "Defect seen in sampling: length_metric at RANGE=1000 asked \"How many m are in 10 km?\" with answer 1000 (should be 10,000). Report to the measurement lane.",
@@ -8334,7 +8333,7 @@
        2
       ]
      },
-     "why": "Y3.B7.S8 Measure capacity and volume in litres and millilitres (lower grade, same idea; choose the unit (mL or L, g or kg) before converting between them)"
+     "why": "Y3.B7.S8 Measure capacity and volume in litres and millilitres (lower grade, same idea; this form chooses the unit for an object, g or kg, mL or L, by sorting and clicking: the sense of size behind a change of metric unit)"
     }
    ],
    "preBuild": [],
@@ -8344,9 +8343,12 @@
      "opts": {
       "units": [
        1
+      ],
+      "forms": [
+       0
       ]
      },
-     "why": "the same 1,000-to-1 conversion for litres and millilitres"
+     "why": "the same 1,000-to-1 conversion for litres and millilitres (2,000 mL = 2 L, 250 mL = 0.25 L)"
     }
    ],
    "note": "",
@@ -8414,7 +8416,7 @@
        0
       ]
      },
-     "why": "customary capacity: sort containers by size in pints, quarts and gallons"
+     "why": "customary capacity conversions one a cell (4 pints = 2 quarts, 6 cups = 3 pints)"
     }
    ],
    "note": "Supplements (customary units) are school lessons, not steps.",
@@ -8469,7 +8471,7 @@
        7
       ]
      },
-     "why": "× 6 and × 7 facts: 6 × 10 = 60 and 7 days make a week, the facts behind each conversion"
+     "why": "× 6 and × 7 facts (6 × 10 = 60, 7 × 3 = 21): the multiplying inside a time change, where the bigger unit holds 60 or 7 of the smaller one"
     }
    ],
    "preBuild": [],
@@ -8629,13 +8631,14 @@
    "preBuild": [],
    "related": [
     {
-     "key": "measurement:mass_volume_liquid",
+     "key": "area_perimeter:volume",
      "opts": {
       "forms": [
-       2
-      ]
+       0
+      ],
+      "band": 30
      },
-     "why": "capacity read on a scale in mL: the other \"how much space\" measure"
+     "why": "working out each cuboid's volume in cubic units (length × width × height), then comparing two volumes"
     }
    ],
    "note": "",
@@ -8869,9 +8872,10 @@
     {
      "key": "placevalue:unit_form",
      "opts": {
-      "band": 9999
+      "band": 9999,
+      "rename": "more"
      },
-     "why": "3 thousands = 30 hundreds: the ten-times link between places in unit form"
+     "why": "renaming a number in a smaller unit (7,576 = 757 tens 6 ones; 4 thousands 16 hundreds = 5,600): each place is ten of the place to its right"
     }
    ],
    "note": "Domain-test build lesson (site: \"New CCSS BUILD lesson so the domain test only asks what has been taught\"), W05 in the place-value unit. 5.NBT.A.1 is the decimal half of the same idea (Grade 5).",
@@ -8953,9 +8957,10 @@
     {
      "key": "placevalue:unit_form",
      "opts": {
-      "band": 999
+      "band": 999,
+      "rename": "more"
      },
-     "why": "45 hundreds = 4,500: the unit-form step inside 9 tens times 5 tens"
+     "why": "renaming in unit form (454 = 45 tens 4 ones; 3 hundreds 14 tens = 440): the step inside 9 tens times 5 tens = 45 hundreds = 4,500"
     }
    ],
    "note": "Domain-test build lesson (W06). The pupil needs the fact and the place-value shift together; mult_zeros already does the shift for one factor.",
@@ -9020,7 +9025,7 @@
       ],
       "range": 100
      },
-     "why": "Y2.B1.S16 Count in 3s (lower grade, same idea)"
+     "why": "Y2.B1.S16 Count in 3s (lower grade, same idea; this option counts on in 3s and in 4s)"
     },
     {
      "key": "patterns:skip_count_line",
@@ -9030,7 +9035,7 @@
       ],
       "band": 50
      },
-     "why": "Y1.B9.S1 Count in 2s (lower grade, same idea)"
+     "why": "Y1.B9.S1 Count in 2s (lower grade, same idea; this option skip counts in 2s, 5s and 10s)"
     },
     {
      "key": "composing:odd_even",
@@ -9117,7 +9122,7 @@
       ],
       "band": 50
      },
-     "why": "Y1.B9.S1 Count in 2s (lower grade, same idea)"
+     "why": "Y1.B9.S1 Count in 2s (lower grade, same idea; this option skip counts in 2s, 5s and 10s)"
     }
    ],
    "preBuild": [],
@@ -9185,7 +9190,7 @@
       ],
       "band": 50
      },
-     "why": "Y1.B9.S1 Count in 2s (lower grade, same idea)"
+     "why": "Y1.B9.S1 Count in 2s (lower grade, same idea; this option skip counts in 2s, 5s and 10s)"
     },
     {
      "key": "patterns:count_by_step_up",
@@ -9195,7 +9200,7 @@
       ],
       "range": 1000
      },
-     "why": "Y2.B1.S16 Count in 3s (lower grade, same idea)"
+     "why": "Y2.B1.S16 Count in 3s (lower grade, same idea; this option counts on in 3s and in 4s)"
     },
     {
      "key": "number_theory:multiples",
@@ -9816,7 +9821,7 @@
        1
       ]
      },
-     "why": "Y3.B7.S9 Equivalent capacities and volumes (litres and millilitres) (lower grade, same idea)"
+     "why": "Y3.B7.S9 Equivalent capacities and volumes (litres and millilitres) (lower grade, same idea; this form clicks the metric containers larger than 1 litre, a bucket of 8 L against a can of 355 mL: the sense of a litre before cups, pints, quarts and gallons)"
     }
    ],
    "preBuild": [],
@@ -9890,7 +9895,7 @@
        3
       ]
      },
-     "why": "Y4.B6.S1 Measure in kilometres and metres (lower grade, same idea)"
+     "why": "Y4.B6.S1 Measure in kilometres and metres (lower grade, same idea; converting km to m, 2 km = 2,000 m: a larger unit changed into a smaller one, as the lesson does with its own units)"
     },
     {
      "key": "measurement:reading_ruler",
@@ -14133,7 +14138,7 @@
    "key": "shapes_early:name_3d_shapes",
    "step": "Y5.B10.S10",
    "action": "add",
-   "partial": "names basic solids; no triangular/pentagonal prisms or square-based vs triangular-based pyramids",
+   "partial": "names basic solids; no triangular/pentagonal prisms or square-based vs triangular-based pyramids (shapes_classify:net_identify has them, as nets to fold, not as solids to name)",
    "why": "not tagged yet; generated items teach this step in part"
   },
   {
