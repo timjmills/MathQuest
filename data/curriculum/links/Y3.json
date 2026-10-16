@@ -5420,14 +5420,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "algebra:tape_diagram",
-     "why": "a bar model: 3 times as long",
-     "opts": {}
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "no related skill: the later-taught steps of the block are Y3.B4.S11 How many ways (W34) has no skill yet"
   },
   "Y3.B4.S11": {
    "title": "How many ways",
@@ -10909,7 +10903,7 @@
     {
      "key": "measurement:reading_ruler",
      "opts": {},
-     "why": "Y3.B5.S2 Measure in millimetres (taught earlier, W14): reading a length in whole inches on a ruler (nearest live practice: Y3.B5.S2 has it as a partial skill, and these items never millimetres)"
+     "why": "Y3.B5.S2 Measure in millimetres (taught earlier, W14): reading a length in whole inches on a ruler (nearest live practice: Y3.B5.S2 has it as a partial skill, and these items never use millimetres)"
     },
     {
      "key": "shapes_early:measure_nonstandard",
@@ -11123,7 +11117,7 @@
     {
      "key": "measurement:reading_ruler",
      "opts": {},
-     "why": "Y3.B5.S2 Measure in millimetres (taught earlier, W14): one length read in whole inches (nearest live practice: Y3.B5.S2 has it as a partial skill, and these items never millimetres)"
+     "why": "Y3.B5.S2 Measure in millimetres (taught earlier, W14): one length read in whole inches (nearest live practice: Y3.B5.S2 has it as a partial skill, and these items never use millimetres)"
     },
     {
      "key": "graphs:pictograph",
@@ -11281,7 +11275,7 @@
     {
      "key": "measurement:reading_ruler",
      "opts": {},
-     "why": "Y3.B5.S2 Measure in millimetres (taught earlier, W14): reading one length in whole inches (nearest live practice: Y3.B5.S2 has it as a partial skill, and these items never millimetres)"
+     "why": "Y3.B5.S2 Measure in millimetres (taught earlier, W14): reading one length in whole inches (nearest live practice: Y3.B5.S2 has it as a partial skill, and these items never use millimetres)"
     }
    ],
    "preBuild": [],
@@ -11351,7 +11345,7 @@
     {
      "key": "measurement:reading_ruler",
      "opts": {},
-     "why": "Y3.B5.S2 Measure in millimetres (taught earlier, W14): reading one length in whole inches (nearest live practice: Y3.B5.S2 has it as a partial skill, and these items never millimetres)"
+     "why": "Y3.B5.S2 Measure in millimetres (taught earlier, W14): reading one length in whole inches (nearest live practice: Y3.B5.S2 has it as a partial skill, and these items never use millimetres)"
     }
    ],
    "preBuild": [],

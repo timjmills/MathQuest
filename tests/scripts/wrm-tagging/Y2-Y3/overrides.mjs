@@ -1356,3 +1356,16 @@ export const relWhyFix = { 'Y2.B8.S10': { 'measurement:time_half_hour': HALFPAST
 // sweep (r12): the inherited clause "a centimetre ruler (the skill reads inches only)" read as a claim; the same gap, said as
 // what is dealt first (items: "The arrow points to [ ] inches.")
 r3['Y2.B6.S1'] = { ...(r3['Y2.B6.S1'] || {}), partials: [P('measurement:reading_ruler', 'reads an inch ruler (whole inches) only; measuring in centimetres on a centimetre ruler is not dealt')] };
+// r12 self-check (leads read step by step after the N11 fix): four leads that were a sibling or a later calculation, not the
+// nearest building block. Each core below is generated and read (items in the r12 report).
+CORE('Y2.B4.S8', C('measurement:equiv_coin_sets', 'Y2.B4.S5 Make the same amount (taught earlier, W32): do these coins make the amount? The same check with totals to 50 cents', { currency: 'usd' }),
+  C('measurement:money_count', 'Y1.B13.S4 Count in coins (K): counting 1-cent, 5-cent and 10-cent coins to 50 cents', { currency: 'usd', kind: 'like', band: 50, values: [1, 5, 10] }));
+CORE('Y2.B2.S5', C('placevalue:more_less_10', 'Y1.B6.S8 1 more, 1 less (K): one more and one less than a number to 50, the same move by one', { step: 1, band: 50 }));
+CORE('Y2.B5.S1', C('multiplication:arrays_groups', 'Y1.B9.S5 Add equal groups (K): equal groups of counters counted and added, to 10', { forms: [1], range: 10 }));
+CORE('Y2.B11.S1', C('shapes_early:shape_positions', 'Y1.B11.S4 Describe position - above and below (K): the first position words', { forms: [0] }));
+// Y2.B11.S1 has a hand pre list (preOnly), which outranks core: the K position rung leads it
+r3['Y2.B11.S1'] = { ...r3['Y2.B11.S1'], pre: [R('shapes_early:shape_positions', 'Y1.B11.S4 Describe position - above and below (K): the first position words', { forms: [0] }), ...r3['Y2.B11.S1'].pre] };
+// self-check: the bar-model related of Y3.B4.S10 Scaling deals additive stories only (join, missing part): "3 times as long" was
+// false (the sweep's multiplicative claim now reads "times as long / tall / heavy" too). Dropped; the mult_word_problems related
+// stays filtered out by the markers as before.
+relR3['Y3.B4.S10'] = (relR3['Y3.B4.S10'] || []).filter(r => r.key !== 'algebra:tape_diagram');

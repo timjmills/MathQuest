@@ -1833,9 +1833,10 @@
    "pre": [
     {
      "key": "placevalue:more_less_10",
-     "why": "how much more or less: 10: a neighbouring rung of this step's skill, not the step itself — Y2.B2.S13 10 more, 10 less (taught earlier, W7)",
+     "why": "Y1.B6.S8 1 more, 1 less (K): one more and one less than a number to 50, the same move by one",
      "opts": {
-      "step": 10
+      "step": 1,
+      "band": 50
      }
     },
     {
@@ -4817,6 +4818,27 @@
    ],
    "pre": [
     {
+     "key": "measurement:equiv_coin_sets",
+     "why": "Y2.B4.S5 Make the same amount (taught earlier, W32): do these coins make the amount? The same check with totals to 50 cents",
+     "opts": {
+      "currency": "usd"
+     }
+    },
+    {
+     "key": "measurement:money_count",
+     "why": "Y1.B13.S4 Count in coins (K): counting 1-cent, 5-cent and 10-cent coins to 50 cents",
+     "opts": {
+      "currency": "usd",
+      "kind": "like",
+      "band": 50,
+      "values": [
+       1,
+       5,
+       10
+      ]
+     }
+    },
+    {
      "key": "measurement:money_change",
      "why": "Y2.B4.S9 Find change (W12): subtracting a price from the bill paid",
      "opts": {
@@ -4827,31 +4849,10 @@
      }
     },
     {
-     "key": "measurement:equiv_coin_sets",
-     "why": "this step's skill as it was met then (totals to: 50) — Y2.B4.S5 Make the same amount (taught earlier, W32)",
-     "opts": {
-      "currency": "usd"
-     }
-    },
-    {
      "key": "measurement:money",
      "why": "Y2.B4.S7 Calculate with money (taught before this step in the block)",
      "opts": {
       "currency": "usd"
-     }
-    },
-    {
-     "key": "measurement:money_count",
-     "why": "Y1.B13.S4 Count in coins (prior learning wk W34)",
-     "opts": {
-      "currency": "usd",
-      "kind": "like",
-      "band": 50,
-      "values": [
-       1,
-       5,
-       10
-      ]
      }
     },
     {
@@ -5034,6 +5035,16 @@
    "build": [],
    "pre": [
     {
+     "key": "multiplication:arrays_groups",
+     "why": "Y1.B9.S5 Add equal groups (K): equal groups of counters counted and added, to 10",
+     "opts": {
+      "forms": [
+       1
+      ],
+      "range": 10
+     }
+    },
+    {
      "key": "multiplication:mult_facts",
      "why": "Y2.B5.S17 The 5 and 10 times-tables (taught before this step in the block)",
      "opts": {
@@ -5058,16 +5069,6 @@
      "why": "Y1.B9.S7 Make doubles (prior learning wk W27)",
      "opts": {
       "band": 20
-     }
-    },
-    {
-     "key": "multiplication:arrays_groups",
-     "why": "Y1.B9.S6 Make arrays (prior learning wk W27)",
-     "opts": {
-      "forms": [
-       0
-      ],
-      "range": 10
      }
     },
     {
@@ -9257,6 +9258,15 @@
    "build": [],
    "pre": [
     {
+     "key": "shapes_early:shape_positions",
+     "why": "Y1.B11.S4 Describe position - above and below (K): the first position words",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    },
+    {
      "key": "shapes_early:name_2d_shapes",
      "why": "Y1.B3.S3 naming the shapes whose positions are described",
      "opts": {
@@ -9284,15 +9294,6 @@
      "key": "comparing:compare_objects",
      "why": "Y1.B7.S1 comparing words (taller, nearer): the same describing language",
      "opts": {}
-    },
-    {
-     "key": "shapes_early:shape_positions",
-     "why": "this step's skill as it was met then (which position words: above and below) — Y1.B11.S4 Describe position - above and below (Grade K)",
-     "opts": {
-      "forms": [
-       0
-      ]
-     }
     }
    ],
    "preBuild": [],
@@ -10103,7 +10104,7 @@
       ],
       "range": 10
      },
-     "why": "R.B11.S13 Explore even and odd (Reception, the source grade): making pairs, the step's partial skill names odd or even numbers to 10"
+     "why": "R.B11.S13 Explore even and odd (Reception, the source grade): naming odd and even numbers to 10 (the Reception step makes pairs): an even number splits into a double"
     }
    ],
    "preBuild": [],
@@ -10241,11 +10242,6 @@
    "build": [],
    "pre": [
     {
-     "key": "comparing:compare_objects",
-     "opts": {},
-     "why": "R.B2.S1 Compare size (Reception, the source grade): comparing two pictured objects by size, length and thickness"
-    },
-    {
      "key": "comparing:compare_groups",
      "opts": {
       "band": 5,
@@ -10269,7 +10265,7 @@
      "why": "measuring a length with cubes or paper clips (Y1.B7.S2, the next idea in Kindergarten)"
     }
    ],
-   "note": "Support lesson (enrich-native, source Reception \"Growing 6, 7, 8\"); nearest WRM steps R.B10.S1-S4 Explore and compare length and height. compare_objects {task:length} and {task:height} ask which of two is longer, shorter, taller or shorter; order_objects_length {tiles:3} orders three objects shortest to longest: the compare and the order the title names."
+   "note": "Support lesson (enrich-native, source Reception \"Growing 6, 7, 8\"); nearest WRM steps R.B10.S1-S4 Explore and compare length and height. compare_objects {task:length} and {task:height} ask which of two is longer, shorter, taller or shorter; order_objects_length {tiles:3} orders three objects shortest to longest: the compare and the order the title names. Pre-skills are few: Reception's length and height steps are this lesson itself, and compare_objects {} (R.B2.S1 Compare size) deals length and height too, so it is not a pre; only comparing amounts and comparing mass come before it."
   },
   "G1|-|selectmoneyusdollarscents": {
    "title": "Select money (US: dollars & cents)",

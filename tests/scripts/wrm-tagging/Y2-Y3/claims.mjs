@@ -49,7 +49,7 @@ export const CLAIMS = [
   { n: 'degrees', c: /°|\bdegrees?\b/i, i: /°|degree|protractor|angle/i, s: 0.2, rule: true },
   { n: 'money', c: /\b(money|dollars?|cents?|coins?|notes?|bills?)\b|\$|¢|£/i, i: /\$|¢|£|dollar|cent|coin|money|price|cost|\bpay|spend|change|\bnotes?\b|\bbills?\b/i, s: 0.2, rule: true },
   // critic r6 L: a multiplicative idea must be multiplicative in the items (tape_diagram is additive in every form)
-  { n: 'times as many / equal groups', c: /times[- ]as[- ]many|how many times|multiplicative|equal (?:groups|shares)|scal(?:e|ing) (?:up|by)/i,
+  { n: 'times as many / equal groups', c: /times[- ]as[- ](?:many|long|tall|heavy|much|far)|how many times|multiplicative|equal (?:groups|shares)|scal(?:e|ing) (?:up|by)/i,
     i: /\btimes\b|×|÷|(?<![a-z])x(?=\s*\d)|equal(?:ly)?\b|in each\b|each (?:friend|group|row|box|bag|plate|basket|jar|pack)|groups? of\b|\bshare|missing factor|\?\s*×|×\s*\?|_+\s*[×÷]|[×÷]\s*_+/i, s: 0.34, rule: true },
   { n: 'equal parts', c: /equal parts/i, i: /equal|\d+\s*\/\s*\d+|class="den"|parts?\b|fraction|share|÷/i, s: 0.34, rule: true },
   // operations

@@ -110,18 +110,17 @@ lesson(G1 + 'doublingupto55', {
   build: ['doubles_pictured'],
   pre: [['addition:add_5_pictures', {}, 'R.B9.S9', 'putting two pictured groups together and counting them all'],
         ['composing:number_bonds', { band: 10 }, 'R.B11.S7', 'the parts of numbers to 10, 5 and 5 among them (used for doubles)'],
-        ['composing:odd_even', { forms: [2], range: 10 }, 'R.B11.S13', 'making pairs, the step\'s partial skill names odd or even numbers to 10']],
+        ['composing:odd_even', { forms: [2], range: 10 }, 'R.B11.S13', 'naming odd and even numbers to 10 (the Reception step makes pairs): an even number splits into a double']],
   related: [['patterns:double', { band: 20 }, 'Double 7 = 14: the double written as a number fact (R.B11.S12 Doubles to 10, make a double)']],
   note: 'Support lesson (enrich-native, source Reception); nearest WRM steps R.B11.S11 / S12 Doubles to 10 (find, make a double), both partial for the same reason. doubles_pictured is the Reception lane\'s option for them.',
 });
 lesson(G1 + 'lengthandheightcompareorder', {
   direct: [['comparing:compare_objects', { task: 'length' }], ['comparing:compare_objects', { task: 'height' }], ['shapes_early:order_objects_length', { tiles: 3 }]],
   verdict: 'full',
-  pre: [['comparing:compare_objects', {}, 'R.B2.S1', 'comparing two pictured objects by size, length and thickness'],
-        ['comparing:compare_groups', { band: 5, level: [1] }, 'R.B1.S7', 'the compare words more, fewer, the same'],
+  pre: [['comparing:compare_groups', { band: 5, level: [1] }, 'R.B1.S7', 'the compare words more, fewer, the same'],
         ['measurement:heavier_lighter_visual', {}, 'R.B2.S2', 'comparing two objects by mass: the same compare idea for another measure']],
   related: [['shapes_early:measure_nonstandard', {}, 'measuring a length with cubes or paper clips (Y1.B7.S2, the next idea in Kindergarten)']],
-  note: 'Support lesson (enrich-native, source Reception "Growing 6, 7, 8"); nearest WRM steps R.B10.S1-S4 Explore and compare length and height. compare_objects {task:length} and {task:height} ask which of two is longer, shorter, taller or shorter; order_objects_length {tiles:3} orders three objects shortest to longest: the compare and the order the title names.',
+  note: 'Support lesson (enrich-native, source Reception "Growing 6, 7, 8"); nearest WRM steps R.B10.S1-S4 Explore and compare length and height. compare_objects {task:length} and {task:height} ask which of two is longer, shorter, taller or shorter; order_objects_length {tiles:3} orders three objects shortest to longest: the compare and the order the title names. Pre-skills are few: Reception\'s length and height steps are this lesson itself, and compare_objects {} (R.B2.S1 Compare size) deals length and height too, so it is not a pre; only comparing amounts and comparing mass come before it.',
 });
 // above-grade core titles in the Grade 1 money block (site flag above, no week: judged at W38, after the money block W32-W34)
 lesson(G1 + 'countmoneynotesandcoinsusdollarscents', {
