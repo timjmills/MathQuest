@@ -30,14 +30,15 @@ Run by `selfcheck.mjs` (Appendix E reference implementation, Chromium print medi
 | E21 | T2: ≥ 5 atoms, every type one of Category / Comparative / Fact / Conceptual; no ★ in the atom tables | 7 atoms: Fact, Conceptual, Fact, Category, Comparative, Conceptual, Fact; ★ in tables: false | PASS |
 | E22 | Every delivery page (T3–T5) shows at least one pupil-page thumbnail | T3: 1, T4: 2, T5: 1 | PASS |
 | E23 | Every row of T6 "Answers at a glance" carries a fade label ★ / ★★ / ★★★ | 11 / 11 rows | PASS |
-| E24 | Item pool, read from the pack: every item in the pool and not forbidden; no exact repeat except on the exit slip and only as many as the pool is short (places − usable pool); no turn-around pair on one page; FAILS when the pool JSON or the items are missing | 25 items read from the pages; pool 2025 (usable 2025); repeats allowed 0; exit-slip repeats 0; other repeats 0; same-page turn-arounds 0; outside the pool / forbidden 0 | PASS |
-| E24b | Practice last row holds only edge cases (★★★ is true); no two items on a page share an answer | 2 Practice pages: last rows all edge cases; no twin answers (per page, or per row when the pool has fewer answers than the page has items) | PASS |
+| E24 | Item pool, read from the pack (LR-5): pool recomputed from its declared rule; places ≤ usable pool; every item in the pool and not forbidden; ZERO exact repeats anywhere (exit slip included); no turn-around pair on one page; FAILS when the pool JSON or the items are missing | 25 places, usable pool 2025 (pool 2025 recomputed from its rule: matches); exact repeats 0; same-page turn-arounds 0; outside the pool / forbidden 0 | PASS |
+| E24b | Practice last row holds only edge cases (★★★ is true); LR-6: no two answers alike on a page; − : no number taken away twice on a page and no near twins (both numbers within 2 of another item); + : no first addend twice in a row of the grid or three times running | 2 Practice pages: last rows all edge cases; LR-6 holds on every pupil page; no twin answers (per page, or per row when the pool has fewer answers than the page has items) | PASS |
 | E17b | The anchor chart and its key carry no answer marks (no .ka / data-ka) | P2: 0, P2-key: 0 | PASS |
 | E26 | Every anchor-chart step panel adds at least one grey (newest) mark | 5 / 5 panels | PASS |
 | E21b | T1 flow word = the rule: Chunked when the T2 routine table has ≥ 4 rows tagged New, else Standard | T2 New routine steps 3 → Standard; T1 says "Standard" | PASS |
+| E27 | Counters are drawn in rows of at most 5 (RP-21, §19.3) | no counters | PASS |
 | E25 | One key per pupil page (anchor chart included) | 8 pupil pages, 8 keys | PASS |
 
-**32 / 32 pass.**
+**33 / 33 pass.**
 
 ## Per page
 
@@ -73,7 +74,7 @@ page-01 T1 · page-02 T2 · page-03 T2b · page-04 T3 · page-05 T4 · page-06 T
 page-09 P2 anchor chart · page-10 P3 lesson sheet · page-11 P4 Practice 1 · page-12 P4 Practice 2 · page-13 P5 ·
 page-14 P6 exit slip (A4 landscape, 2-up) · page-15 to page-22 keys of P0, P1, P2, P3, P4 ×2, P5, P6 · page-23 T6.
 
-## Checks by eye (looked at every PNG, round 3)
+## Checks by eye (looked at every PNG, round 4)
 
 | Check | Result |
 |---|---|

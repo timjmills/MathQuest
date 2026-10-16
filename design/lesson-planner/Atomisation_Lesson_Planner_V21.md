@@ -6815,15 +6815,15 @@ a + b ≤ 10, no + 0: 39 ordered facts, 2 forbidden (7 + 2 and 2 + 8 turned roun
 | T2b | Page ids, packet order, Score rule, fade levels, data loop, abbreviations, slot shapes, icons, band labels | — |
 | T3 | Sections 1–4 with the P0 thumbnail | ★ 8, 7, 9, 2 · band A / B · 10, 6 dots, 3 |
 | T4 | Sections 5–6 with the chart and lesson-sheet thumbnails | 9, 8 · ★ 8, 8, 4 |
-| T5 | Sections 7–10 with the Practice 1 thumbnail; exit items listed with the mistake each catches | C · 3 + 2 = 5 · 8, 7, 2, 10 |
+| T5 | Sections 7–10 with the Practice 1 thumbnail; exit items listed with the mistake each catches | C · 3 + 2 = 5 · 9, 8, 4, 10 |
 | P0 | a 8 triangles in rows of 5 and 3 + square; b number track 3 4 5 6 [ ] 8 9; c 4 and 9; d bond 7 = 5 + [ ]. Score /4 | 8 · 7 · 9 circled · 2 |
 | P1 | A: [ ] 5 [ ]; 3, 4, [ ], 6; 7 ○ 4; 6 + [ ] = 10; 9, 8, [ ], 6. B: [ ] 14 [ ]; 16, 17, [ ], 19; 12 ○ 21; 3 + [ ] = 10; 15, 14, [ ], 12. Score /10 | 4, 6 · 5 · > · 4 · 7 · 13, 15 · 18 · < · 7 · 13 |
 | P2 | Panels 7 + 2 (step 1 grey ring on 7; step 2 grey tile and hops; step 3 grey 9); `Another example:` 2 + 8 = 10 and 3 + 3 = 6, all in black; Say; Rule | key = same chart, tab Answer Key (no answer marks) |
 | P3 | Vocabulary + / = / hops → equals · count on · plus; Remember; Guided 4 + 1 (ring grey), 3 + 7 beside Steps; Independent a–f 6 + 1, 1 + 8, 2 + 1 / 5 + 2, 7 + 1, 2 + 4. Score /6 | lines · 5, 10 · 7, 9, 3, 7, 8, 6 |
-| P4 Practice 1 | 3 × 4 by rows: 4+3, 1+2, 5+1 / 9+1, 1+7, 4+2 / 2+2, 3+5, 8+1 / 2+6, 1+3, 3+6 (last row ★★★) | 7, 3, 6 / 10, 8, 6 / 4, 8, 9 / 8, 4, 9 |
-| P4 Practice 2 | 3 × 3 (sized to the pool) by rows: 6+3, 3+1, 1+6 / 6+2, 2+3, 1+5 / 7+3, 2+5, 1+4 (last row ★★★: sum of 10, big second) | 9, 4, 7 / 8, 5, 6 / 10, 7, 5 |
+| P4 Practice 1 | 3 × 4 by rows: 1+5, 3+4, 5+3 / 3+1, 4+2, 1+4 / 3+6, 1+6, 6+2 / 2+5, 7+3, 1+7 (last row ★★★) | 6, 7, 8 / 4, 6, 5 / 9, 7, 8 / 7, 10, 8 (no twin in a row) |
+| P4 Practice 2 | 3 × 3 (sized to the pool) by rows: 1+1, 2+3, 5+1 / 1+2, 4+3, 8+1 / 1+3, 3+5, 9+1 (last row ★★★); then `Remember:` and the `Say:` / `Rule:` band take the fourth row's height | 2, 5, 6 / 3, 7, 9 / 4, 8, 10 (every answer once) |
 | P5 | Omar has 3 cars. He gets 2 more cars. How many …? Answer line in the story; 6-row panel; Workspace; frame | 3 + 2 = 5; 5 cars |
-| P6 | Each half: 5 + 3, 3 + 4, 1 + 1, 1 + 9 (2 × 2, on no other page); Say “a. 5 plus 3 equals __.”; two check boxes; Score /4 | 8, 7, 2, 10 |
+| P6 | Each half: 6 + 3, 2 + 6, 2 + 2, 1 + 9 (2 × 2, on no other page); Say “a. 6 plus 3 equals __.”; two check boxes; Score /4 | 9, 8, 4, 10 |
 | T6 | Routing (atoms 1–4 → K-3, K-4, K-6, K-9); accepted answers; answers at a glance with Fade; wrong answers to look for | — |
 
 ### F.2 Subtract within 100 with regrouping, Level 2
@@ -6890,10 +6890,10 @@ const { it, LET, k, lt, sec, tbox, sc, ans, blank, loop, table, chk, withThumb, 
 const CHART = [[7, 2], [2, 8], [3, 3]];
 const GUIDED = [[4, 1], [3, 7]];                               // the Model's case first (big first), then big second (sum of 10)
 const INDEP = [[6, 1], [1, 8], [2, 1], [5, 2], [7, 1], [2, 4]];   // rows of 3: no twin answers, no first addend twice in a row
-const P1 = [[4, 3], [1, 2], [5, 1], [9, 1], [1, 7], [4, 2], [2, 2], [3, 5], [8, 1], [2, 6], [1, 3], [3, 6]];
-const P2 = [[6, 3], [3, 1], [1, 6], [6, 2], [2, 3], [1, 5], [7, 3], [2, 5], [1, 4]];   // 3 x 3: places must not exceed the usable pool
+const P1 = [[1, 5], [3, 4], [5, 3], [3, 1], [4, 2], [1, 4], [3, 6], [1, 6], [6, 2], [2, 5], [7, 3], [1, 7]];
+const P2 = [[1, 1], [2, 3], [5, 1], [1, 2], [4, 3], [8, 1], [1, 3], [3, 5], [9, 1]];   // 3 x 3 (places may not exceed the usable pool); answers 2..10 once each
 const STORY = [3, 2];
-const EXIT = [[5, 3], [3, 4], [1, 1], [1, 9]];                  // big first count 3 · big second count 3 · same · sum of 10 (all fresh)
+const EXIT = [[6, 3], [2, 6], [2, 2], [1, 9]];                  // big first · big second · same · sum of 10 (on no other page)
 // The item pool, written into the pack for the self-check (E24, E24b): every a + b with min(a, b) in 1..3 and
 // a + b <= 10; forbidden = the chart examples turned round (LR-5); edge = the cases of the last Practice row.
 const POOLLIST = []; for (let a = 1; a <= 9; a++) for (let b = 1; b <= 9; b++) if (Math.min(a, b) <= 3 && a + b <= 10) POOLLIST.push([a, b]);
@@ -6975,7 +6975,10 @@ function sheet(key) {
 }
 
 const practice = (items, key, cols = 3) => stepsStrip() + `<div class="instr" data-instr>Add.</div><div class="grid" data-section="practice" style="grid-template-columns:repeat(${cols},1fr);grid-template-rows:repeat(${items.length / cols},1fr)">` +
-  items.map(([a, b], i) => cellF(a, b, i, key, cols)).join('') + `</div>`;
+  items.map(([a, b], i) => cellF(a, b, i, key, cols)).join('') + `</div>` +
+  // a page sized down to the pool (3 rows) gives the spare height to the oral frame, never to empty cell space (E11)
+  (items.length / cols < 4 ? `<div class="band"><div class="strip"><b>Remember:</b><span>Start at the bigger number and count on.</span></div></div>` +
+    `<div class="band sayb"><div class="sayline"><b>Say:</b><span>“a. 1 plus 1 equals ${blank()}.”</span></div><div class="sayline"><b>Rule:</b><span>Big number first. Count on. Write it.</span></div></div>` : '');
 
 // ---- P5 Word problem: story 58 %, routine panel 42 %, one action per check box, 13 pt (Steps-box size) ----
 function wordProblem(key) {
@@ -6996,7 +6999,7 @@ function wordProblem(key) {
 // ---- P6 Exit slip half: 4 facts (2 x 2), one per case; the Say frame for item a ----
 const exitHalf = (key, copy) => `<div style="flex:1;display:flex;flex-direction:column;min-width:0">${exitHead(key)}` +
   `<div class="instr" data-instr>Add.</div><div class="grid" data-section="exit" style="grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr">${EXIT.map(([a, b], i) => cellF(a, b, i, key, 2, copy)).join('')}</div>` +
-  `<div class="band sayb" style="margin-top:-1.5pt"><div class="sayline"><b>Say:</b><span>“a. 4 plus 3 equals ${blank()}.”</span></div></div>${exitFoot()}</div>`;
+  `<div class="band sayb" style="margin-top:-1.5pt"><div class="sayline"><b>Say:</b><span>“a. 6 plus 3 equals ${blank()}.”</span></div></div>${exitFoot()}</div>`;
 
 // ---- pupil packet ----
 const P = [
@@ -7093,7 +7096,7 @@ const T5 = sec('Section 7 · Check Question (3 min, board + mini whiteboards)', 
       tbox('feedback', 'Feedback:', 'Name the step.', '“You started with the big number. That is step 1.” Fix: “Point to step 2. Count the dots.”'), pg('P4a'))) +
   sec('Section 9 · Word problem (in You Do, ★★)', sc(1, [['Do:', 'Read the story aloud twice. Pupils check one box per action.'], ['Note:', `Accept ${ans('3 + 2 = 5')} or ${ans('2 + 3 = 5')}; answer ${ans('5 cars')}.`]])) +
   sec('Section 10 · Plenary (7 min)', sc(1, [['Do:', 'Exit slip: four facts. Pupils say the frame for a, then check one box.'],
-      ['Note:', `★★ a ${ans('8')} (big first) · b ${ans('7')} (big second: catches Starting small and Counting the start → 6) · c ${ans('2')} (same) · d ${ans('10')} (sum of 10). None of the four appears on any other page.`]]) +
+      ['Note:', `★★ a ${ans('9')} (big first) · b ${ans('8')} (big second: catches Starting small and Counting the start → 7) · c ${ans('4')} (same) · d ${ans('10')} (sum of 10). None of the four appears on any other page.`]]) +
     sc(2, [['Say:', '“Big number first. Count on. Write it.” (chant, twice)'], ['Ask:', 'Thumbs: “Can you add 1, 2 or 3?” (oral)']]), true);
 
 const sum = (items) => items.map(([a, b], i) => `${LET[i]} ${a + b}`).join(' · ');
@@ -7109,7 +7112,7 @@ const routing = sec('Prerequisite routing:', table(['Question', 'Prerequisite (T
     ['Practice 2, a–f', ans(sum(P2.slice(0, 6))), '★★'], ['Practice 2, g–i', ans(sum(P2).split(' · ').slice(6).join(' · ')), '★★★'],
     ['Word problem', ans('5 cars'), '★★'], ['Exit slip', ans(sum(EXIT)), '★★']]) +
     `<h3 style="margin-top:2mm">Wrong answers to look for when marking</h3>` + table(['Pupil wrote', 'Likely mistake', 'Next step'], [
-      ['one less than the key (exit b → 8)', 'Counting the start', 'Feedback: “Say the start, count the dots.”'],
+      ['one less than the key (exit b → 7)', 'Counting the start', 'Feedback: “Say the start, count the dots.”'],
       ['right answer, counted from the small number', 'Starting small', 'Ask “Which is bigger?” before each item'],
       ['one or two more than the key', 'Losing the count', 'One finger per dot; dot tile back on'],
       ['the small number (7 + 3 → 3)', 'Last count only', 'Say the whole frame aloud'],
