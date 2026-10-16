@@ -21,7 +21,7 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | E12 | Equal cells within each grid (±0.5 mm) and across the Practice pages | all grids equal; Practice cells 6, spread 0.0 × 0.0 mm | PASS |
 | E13 | No underscore characters on pupil pages (slot widths: ws-print-lint --source kit) | underscores 0 | PASS |
 | E14 | No dashed line except the cut line and the missing-digit box | 0 outside a cut line | PASS |
-| E15 | Instructions ≤ 12 words, print verb first, string in the controlled library (V22 Appendix C.1: 130 strings; the kit's PED 10.1 library: 164) | 22 instructions; failing: none; in the kit library but missing from V22 C.1: "Write how many of each place.", "Read the story. Fill in the bar. Solve." | PASS |
+| E15 | Instructions ≤ 12 words, print verb first, string in the controlled library (V22 Appendix C.1: 130 strings; the kit's PED 10.1 library: 165) | 22 instructions; failing: none; in the kit library but missing from V22 C.1: "Write how many of each place.", "Read the story. Fill in the bar. Solve." | PASS |
 | E16 | Every Say frame ≤ 2 blanks | 9 frames; blanks 0, 1 | PASS |
 | E16b | RCDWS panel: one action per box, each row one line (≤ 9 mm) | 12 rows; tallest 9 mm | PASS |
 | E17b | The anchor chart and its key carry no answer marks | P2: 0, P2-key: 0 | PASS |
@@ -33,8 +33,8 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | E21 | T2: ≥ 5 atoms of the four types; no ★ in the atom tables | 8 atoms: Fact, Conceptual, Fact, Category, Category, Conceptual, Category, Comparative; ★ false | PASS |
 | E22 | Every delivery page (T3–T5) shows a pupil-page thumbnail | T3: 1, T4: 2, T5: 1 | PASS |
 | E23 | Every row of T6 "Answers at a glance" carries ★ / ★★ / ★★★ | 4/4 | PASS |
-| E24 | Item pool read from the pack (LR-5): pool recomputed from its rule; 0 repeats of (number, representation); a number never twice on a page; chart examples never return | 46 places (46 numbers), usable pool 46 (pool 46 recomputed from its list rule: matches); repeats 0; chart examples returning 0; outside the pool 0; items without a rep 0 | PASS |
-| E24b | Practice last row only edge cases (★★★); LR-6 no twin answers and no near twins (one skill, numbers within 2) on a page | 1 Practice pages: last rows all edge cases (3 edge numbers dealt); no twin answers and no near twins on any page | PASS |
+| E24 | Item pool read from the pack (LR-5): pool recomputed from its rule; 0 repeats of (number, representation); a number never twice on a page; chart examples never return | 47 places (47 numbers), usable pool 47 (pool 47 recomputed from its list rule: matches); repeats 0; chart examples returning 0; outside the pool 0; items without a rep 0 | PASS |
+| E24b | Practice last row only edge cases (★★★); LR-6 no twin answers and no near twins (one skill, numbers within 2) on a page | 1 Practice pages: last rows all edge cases (4 edge numbers dealt); no twin answers and no near twins on any page | PASS |
 | E30 | No boardOnly number on a pupil page or key (item, answer, digits or name) | none declared: on no pupil page or key (16 pages) | PASS |
 | E29 | Every item letter and answer a teacher page quotes is on the pupil page it names (T3 §1, T5 §10, T6 routing) | 14 quotes, all on their pages | PASS |
 | E28 | No Say:, Rule: or Remember: band on a Practice page | 4 Practice / Mixed pages; extra bands 0 | PASS |

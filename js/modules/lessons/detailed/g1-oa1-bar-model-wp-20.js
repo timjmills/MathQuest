@@ -9,7 +9,7 @@
 // Every number a script speaks is a {placeholder} filled from the DEALT items, never typed here.
 
 const NS = (categoryId, skillId, opts, extra) => Object.assign({ categoryId, skillId, opts }, extra || {});
-const WP = (extra, payload) => Object.assign({ categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'bar', wpCues: false, wpBank: false }, partMin: 2, noPart: [10], cellPayload: Object.assign({ layout: 'bar' }, payload || {}), instructionKey: 'story-bar' }, extra || {});
+const WP = (extra, payload) => Object.assign({ categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'bar', wpCues: false, wpBank: false }, partMin: 3, noPart: [10], crossTen: true, crossTenExcept: [20], cellPayload: Object.assign({ layout: 'bar' }, payload || {}), instructionKey: 'story-bar' }, extra || {});
 // (The exit slip: full-size bar items, the story beside the bar, one across a 132.5 mm half.)
 const EXIT_BAR = { beside: true, barW: 44 };
 // (`cellPayload.layout: 'bar'`: the word-work cell's compact form - story, bar, answer box with the
@@ -30,7 +30,7 @@ export default {
     // A join story within 20 (the sum <= 20), the kit part-part-whole bar under it, all labels blank.
     skill: WP({ minNum: 11, maxNum: 20 }),
     // The last row of every Practice page (★★★): the edge cases - equal parts and a whole of 20
-    // (RESEARCH.md; no part of 1 or 10 anywhere: partMin / noPart on every story ref).
+    // (RESEARCH.md §5; every other story crosses ten with parts of 3 to 9: partMin / noPart / crossTen on every story ref).
     edgeTest: 'wpEdge',
     practiceSheets: [{ edgeLast: { per: 6, cols: 2, wants: ['wpEqual', 'wpWhole20'] } }],
     // The lesson's own placeholder names: the story's unit word and its parts.
@@ -41,7 +41,7 @@ export default {
         // (`slip`: the count slip past 10 - one less than the whole)
         return { unit: p.unit || '', parts: st.a !== undefined ? `${st.a} + ${st.b}` : '', whole, slip: Number.isFinite(Number(whole)) ? Number(whole) - 1 : '' };
     },
-    checkQuestion: { want: 'wpNineFour', correct: 'D' },
+    checkQuestion: { want: 'wpBridgeBigFirst', correct: 'D' },
     practicePages: 1,
     // Mixed: EARLIER skills only (V22 §9.5): number bonds and facts within 20.
     mixed: { skills: [
@@ -112,7 +112,7 @@ export default {
     // ------------------------------------------------------------------ P5 Word problem
     // The same skill with the bar OFF: the pupil draws the bar (the fade).
     wordProblem: {
-        ref: { categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'none', wpCues: false, wpBank: false }, minNum: 11, maxNum: 19, partMin: 2, noPart: [10] },
+        ref: { categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'none', wpCues: false, wpBank: false }, minNum: 11, maxNum: 19, partMin: 3, noPart: [10], crossTen: true },
         want: 'wpBridgeSmallFirst',
         // The dealt story itself (its own words and numbers); the bar is OFF - the pupil draws it in the Workspace.
         answerLine: 'The answer: __ {wp.unit}.',
@@ -221,7 +221,7 @@ export default {
                 { say: 'Wrong. {chart.whole} is the whole. The whole goes on top.', note: 'First model it wrong: write {chart.whole} in a lower box. Then move it.' },
                 { ask: 'How many {chart.unit} in all?', note: 'Step 4. Expected: [[{chart.whole}]] {chart.unit}.' },
                 { do: 'Now an add-to story. Write on the board: {chart2.text}' },
-                { say: '“Gets more” is a part. “Now” asks for the whole.', note: 'Parts [[{chart2.parts}]]; whole [[{chart2.whole}]].' },
+                { say: 'Gets more: a part. Now: the whole.', note: 'Parts [[{chart2.parts}]]; whole [[{chart2.whole}]].' },
                 { ask: 'Swap the cube trains. Same whole?', note: 'Expected: yes, the bar is the same length.' },
             ] },
         { n: 6, name: 'We Do: Guided Practice', min: 8, page: 'P3', boxes: [{ kind: 'feedback', title: 'Fix it at once', text: 'Fix: touch the top box and ask “Is that a part?”' }],
@@ -266,7 +266,7 @@ export default {
     // ------------------------------------------------------------------ T6
     accepted: [
         'The two parts in either order in the lower boxes.',
-        'The equation in either order (6 + 7 or 7 + 6).',
+        'The equation with the two parts in either order.',
         'The label word is printed: never marked. On P5, any two-part bar, the whole on top.',
         'The answer box and the top box hold the same number. A blank part box with the right whole: ask for the parts.',
         'P5 equation: the two parts in either order, + in the circle, then the whole after =.',

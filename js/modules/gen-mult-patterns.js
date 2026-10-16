@@ -523,6 +523,7 @@ export function genMultChart(q, skill) {
         if (task === 'even') {
             q.text = 'Tap every even product.';
             q.printText = 'Shade every even product.';
+            q.instructionKey = 'shade-even';   // the page instruction (print-sheet instructionKeyFor reads the item's own key)
         }
         q.hint = task === 'even' ? 'An even row number or an even column number makes the product even. Both numbers odd: the product is odd.' : `A multiple of ${n} is in the ${n} times table: ${n}, ${2 * n}, ${3 * n} … Look for the pattern the shaded boxes make.`;
     } else {

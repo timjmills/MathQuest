@@ -207,7 +207,7 @@ export const CASE_TESTS = Object.freeze({
     wpEdge: (it) => CASE_TESTS.wpEqual(it) || CASE_TESTS.wpWhole20(it),
     wpSixSeven: (it) => { const o = wpParts(it); return !!o && o[0] === 6 && o[1] === 7; },
     wpNineFour: (it) => { const o = wpParts(it); return !!o && o[0] === 9 && o[1] === 4; },
-    wpAddTo: (it) => { const o = wpParts(it); return !!o && /\bmore\b/i.test(String((it && it.q && it.q.text) || '')) && o[0] > o[1] && o[0] >= 10 && o[1] >= 2 && o[1] <= 9 && o[0] !== 10; },
+    wpAddTo: (it) => { const o = wpParts(it); return !!o && /\bmore\b/i.test(String((it && it.q && it.q.text) || '')) && o[0] > o[1]; },
     pvEdge: (it) => { const n = pvNumberOf(it); return n !== null && (n === 1000 || (n >= 100 && (Math.floor(n / 10) % 10 === 0 || n % 10 === 0 || Math.floor(n / 10) % 10 === 1))); },
 });
 

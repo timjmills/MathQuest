@@ -296,8 +296,9 @@ registerSkill('multiplication:mult_chart_easy', chartProvider());
 
 function chartProvider() {
     return {
-        strings: stringsBy((q) => {
-            const task = chartTask(q);
+        strings: stringsBy((q, ref) => {
+            // A section's strings are asked with the skill's options and no item (roles/practice.js): read its task there.
+            const task = q ? chartTask(q) : (ref && ref.opts && ref.opts.task) || 'fill';
             const complete = q && /whole multiplication chart/i.test(String(q.text || ''));
             return {
                 iCan: task === 'even' ? 'I Can find even products'
@@ -331,8 +332,7 @@ function chartProvider() {
                 const out = [];
                 out.push(step(er.length ? `The even row numbers: ${er.join(', ')}. Shade every box in ${er.length > 1 ? 'those rows' : 'that row'}.` : 'No row number is even.'));
                 out.push(step(ec.length ? `The even column numbers: ${ec.join(', ')}. Shade those boxes too.` : 'No column number is even.'));
-                out.push(step('Both numbers odd? Leave the box white.'));
-                out.push(step(`The even products: ${want.slice(0, 6).join(', ')}${want.length > 6 ? ' …' : ''}.`, [{ slot: 'answer', value: want.join(', ') }]));
+                out.push(step(`Both numbers odd? Leave the box white. The even products: ${want.slice(0, 6).join(', ')}${want.length > 6 ? ' …' : '.'}`, [{ slot: 'answer', value: want.join(', ') }]));
                 return clampSteps(out);
             }
             if (task === 'shade') {

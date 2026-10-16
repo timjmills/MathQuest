@@ -91,7 +91,7 @@ function workedSteps(q) {
         } else if (rule.length === 1) {
             // Lesson 5 order for + / − (the sign picks the variant): bigger or smaller first, then the change.
             const bigger = rule[0].op === '+';
-            out.push(step(`Out is ${bigger ? 'bigger' : 'smaller'}: try ${bigger ? '+' : '−'}. ${a.x} to ${a.y} is ${ruleText(rule)}.`));
+            out.push(step(`Out is ${bigger ? 'bigger' : 'smaller'}: try ${bigger ? '+' : '−'}. ${a.x} to ${a.y} is ${bigger ? '+' : '−'}\u00a0${rule[0].n}.`));
             out.push(step(`Test ${ruleText(rule)} on every row: ${p.rows.slice(1).map((r) => `${ruleOn(rule, r.x)} = ${r.y}`).join(', ')}. It works.`));
         } else {
             out.push(step(`One + or one × does not fit every row: try two steps.`));

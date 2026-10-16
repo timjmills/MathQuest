@@ -261,18 +261,21 @@ function refAccepts(sk, cand, key, seen, kept) {
  * the soft floors these are never relaxed, not even on a ref's last try (critic r3 S1: the last try
  * "took what it got" and printed 1,000 on a pupil page past `maxNum: 999`).
  */
-export const refHasHard = (sk) => !!sk && (sk.minNum !== undefined || sk.maxNum !== undefined || (Array.isArray(sk.boardOnly) && sk.boardOnly.length > 0) || sk.partMin !== undefined || Array.isArray(sk.noPart));
+export const refHasHard = (sk) => !!sk && (sk.minNum !== undefined || sk.maxNum !== undefined || (Array.isArray(sk.boardOnly) && sk.boardOnly.length > 0) || sk.partMin !== undefined || Array.isArray(sk.noPart) || !!sk.crossTen);
 export function refHardOk(sk, cand) {
     if (!refHasHard(sk)) return true;
     const v = itemNumberOf(cand);
     if (sk.minNum !== undefined && !(v !== null && v >= Number(sk.minNum))) return false;
     if (sk.maxNum !== undefined && !(v !== null && v <= Number(sk.maxNum))) return false;
     // (`partMin` / `noPart`: a two-operand item's parts - the detailed lesson maker, lesson 2: no part of 1 or 10)
-    if (sk.partMin !== undefined || Array.isArray(sk.noPart)) {
+    if (sk.partMin !== undefined || Array.isArray(sk.noPart) || sk.crossTen) {
         const o = composeOperandsOf(cand).map(Number);
         if (o.length < 2 || !o.every(Number.isFinite)) return false;
         if (sk.partMin !== undefined && o.some((x) => x < Number(sk.partMin))) return false;
         if (Array.isArray(sk.noPart) && o.some((x) => sk.noPart.map(Number).includes(x))) return false;
+        // (`crossTen`: both parts 9 or less and the whole past 10 - counting on across ten -, unless the
+        // whole is one of `crossTenExcept` (lesson 2: a whole of exactly 20, its edge case))
+        if (sk.crossTen && !(o[0] <= 9 && o[1] <= 9 && o[0] + o[1] >= 11) && !(Array.isArray(sk.crossTenExcept) && sk.crossTenExcept.map(Number).includes(o[0] + o[1]))) return false;
     }
     if (Array.isArray(sk.boardOnly) && sk.boardOnly.length) {
         const bo = sk.boardOnly.map(Number);

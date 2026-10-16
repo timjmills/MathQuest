@@ -239,6 +239,9 @@ export function generateFunctionTable(q, skillId) {
     try {
         q.visual = renderCell({ cell: q.cell }, { mode: 'screen', static: true, size: 'L', look: 'ican', state: 'blank' });
     } catch (e) { q.visual = ''; }
+    // The page instruction is the item's own task (print-sheet instructionKeyFor reads q.instructionKey first):
+    // a section's strings are otherwise asked without an item and fall back to the skill's default task.
+    q.instructionKey = { outputs: 'table', rule: 'table-rule', inputs: 'table-in', mixed: 'table', make: 'table-make' }[task];
     q.text = INSTRUCTION[task];
     q.printText = INSTRUCTION[task];
     q.ans = parts.join(', ');
