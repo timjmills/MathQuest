@@ -33,12 +33,15 @@ import { getSetOptions } from './skill-option-store.js';
 import { normalizeOptions } from './skill-options.js';
 import { getProvider } from './sheet/index.js';
 import { stretchWhy, hasOwnOpen, NO_STRETCH_REASON } from './sheet/roles/stretch.js';
+// The detailed lesson maker (V22, 2026-10-16): its lessons, picked by name (no skill choice).
+import { detailedLessonList, detailedLessonFor } from './lessons/detailed/index.js';
 
 // The page types buildSheet composes (print-sheet.js SHEET_ROLES). Anything else is listed,
 // disabled, as "coming soon".
 const WORKING = new Set([
     'lesson', 'opener', 'scripted-model', 'guided', 'independent', 'more-practice', 'error-analysis', 'review', 'test', 'test-b',
     'pre-skill-check', 'word-problems', 'fact-rows', 'fact-probe', 'mixed-practice', 'true-false', 'reason-it', 'stretch',
+    'detailed-lesson',
 ]);
 // PAUSED (owner ruling 2026-09-26: "let's forgo the find the error type for future worksheets ...
 // we might bring these back later once everything is built"): a working role that is NOT offered
@@ -55,7 +58,8 @@ const PAGE_GROUPS = [
         ['word-problems', 'Word problems', 'Stories with room to work.'],
     ]],
     ['Teach', [
-        ['lesson', 'Lesson', 'Anchor chart, warm-up, we do, then practice.'],
+        ['lesson', 'Lesson: standard', 'Anchor chart, warm-up, we do, then practice.'],
+        ['detailed-lesson', 'Lesson: detailed', 'Teacher pages, the pupil packet and every key.'],
         ['opener', 'Lesson opener', 'A warm-up to start the lesson.'],
         ['scripted-model', 'Scripted model', 'Worked examples and what to say.'],
         ['guided', 'Guided', 'Help that fades item by item.'],
@@ -78,7 +82,7 @@ const PAGE_GROUPS = [
     ]],
 ].map(([g, list]) => [g, list.filter(([v]) => WORKING.has(v) && !PAUSED.has(v))]).filter(([, list]) => list.length);
 const PAGE_TYPES = [
-    ['Lesson', [['lesson', 'Lesson'], ['lesson-packet', 'Lesson packet'], ['opener', 'Lesson opener'], ['scripted-model', 'Scripted model'], ['guided', 'Guided'], ['independent', 'Independent'], ['more-practice', 'More Practice'], ['error-analysis', 'Error analysis (Check it)'], ['review', 'Review'], ['test', 'Test A'], ['test-b', 'Test B'], ['pre-skill-check', 'Pre-skill check']]],
+    ['Lesson', [['lesson', 'Lesson'], ['detailed-lesson', 'Lesson: detailed'], ['lesson-packet', 'Lesson packet'], ['opener', 'Lesson opener'], ['scripted-model', 'Scripted model'], ['guided', 'Guided'], ['independent', 'Independent'], ['more-practice', 'More Practice'], ['error-analysis', 'Error analysis (Check it)'], ['review', 'Review'], ['test', 'Test A'], ['test-b', 'Test B'], ['pre-skill-check', 'Pre-skill check']]],
     ['Practice', [['computation', 'Computation grid'], ['word-problems', 'Word problems'], ['visual-grid', 'Visual grid']]],
     ['Facts', [['fact-rows', 'Fact rows'], ['fact-probe', 'Fact probe']]],
     ['Mixed review', [['mixed-practice', 'Mixed practice'], ['daily4', 'Daily 4'], ['spiral', 'Daily spiral'], ['todays-number', "Today's Number"]]],
@@ -266,6 +270,7 @@ function onClick(e) {
             const s = sec(d.sec);
             const changed = s.role !== d.v;
             s.role = d.v;
+            if (d.v === 'detailed-lesson') dlSkills(s, false);
             s.types = false;
             renderWhat();
             root.querySelector(`[data-act="types"][data-sec="${d.sec}"]`)?.focus();
@@ -337,6 +342,7 @@ function onChange(e) {
     if (d.role !== undefined) { sec(d.role).role = t.value; renderWhat(); scheduleBuild(); }
     else if (d.cols !== undefined) { sec(d.cols).columns = t.value === 'auto' ? 'auto' : Number(t.value); scheduleBuild(); }
     else if (d.pages !== undefined) { sec(d.pages).pages = Number(t.value); scheduleBuild(); }
+    else if (d.dlesson !== undefined) { const s = sec(d.dlesson); s.lessonId = t.value; dlSkills(s, true); renderWhat(); scheduleBuild(); }
     else if (d.mixed !== undefined) { sec(d.mixed).mixed = !!t.checked; scheduleBuild(); }
     else if (d.classic !== undefined) { pr.classic[d.classic] = Number(t.value); }
 }
@@ -404,6 +410,11 @@ function sectionHTML(s, i) {
   <div>
     <label class="tv-label" for="tvMixed${i}"><input type="checkbox" id="tvMixed${i}" data-mixed="${i}"${s.mixed ? ' checked' : ''}> Mixed practice page</label>
     <p class="tv-cap" style="margin-top:6px;">The anchor chart, warm-up and we do come first; practice pages follow.</p>
+  </div>` : s.role === 'detailed-lesson' ? `
+  <div>
+    <label class="tv-label" for="tvDLesson${i}">Lesson</label>
+    <select id="tvDLesson${i}" class="tv-select" data-dlesson="${i}">${detailedLessonList().map((l) => `<option value="${esc(l.id)}"${s.lessonId === l.id ? ' selected' : ''}>${esc(`Grade ${l.grade} · ${l.title}`)}</option>`).join('')}</select>
+    <p class="tv-cap" style="margin-top:6px;">The whole pack: teacher pages, the pupil packet, every key and the routing page. A4, Large.</p>
   </div>` : s.role !== 'independent' ? '' : `
   <div>
     <label class="tv-label" for="tvPages${i}">Pages</label>
@@ -785,7 +796,20 @@ function classicHTML() {
 
 /* ================================================================= build + preview */
 
+/** A detailed lesson section: its lesson (the first one by default) and, shown as its skill, the lesson's practice skill. */
+function dlSkills(s, force) {
+    const list = detailedLessonList();
+    if (!s.lessonId || !detailedLessonFor(s.lessonId)) s.lessonId = list.length ? list[0].id : '';
+    const d = detailedLessonFor(s.lessonId);
+    if (d && (force || !s.skills.length)) s.skills = [{ categoryId: d.skill.categoryId, skillId: d.skill.skillId, opts: Object.assign({}, d.skill.opts || {}) }];
+}
+
 function requestFor(s, i) {
+    if (s.role === 'detailed-lesson') {
+        dlSkills(s, false);
+        // (`sections` names the lesson's skill for the screen's own checks; the pack ignores it.)
+        return { role: 'detailed-lesson', lessonId: s.lessonId, paper: pr.paper, seed: (pr.seed + i * 7919) >>> 0, key: { on: true }, sections: [{ skills: s.skills.slice(0, 1) }] };
+    }
     const skills = s.skills.map((k) => {
         // Always an explicit object: a row reset to its defaults here (k.opts undefined) must
         // print the defaults, not fall back to the set's options (generateQuestionFor looks the

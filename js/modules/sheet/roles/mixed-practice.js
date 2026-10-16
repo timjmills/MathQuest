@@ -214,6 +214,10 @@ export function plan(input = {}) {
         start += pupil.length;
         cur.used += bandH;
     }
+    // `growLast` (the detailed lesson maker's Mixed page): the last band of each page takes the spare
+    // height - one unruled trailing area inside the frame (V22 §8.12.4) - so the body never ends
+    // blank. Absent on every other Mixed page.
+    if (input.growLast) for (const pg of pages) { const bands = pg.sections.filter((x) => x.kind === 'band'); if (bands.length) bands[bands.length - 1].grow = true; }
     const achieved = {};
     for (const sh of shelves) achieved[sh.id] = (achieved[sh.id] || 0) + sh.items.filter((it) => !it.anchor).length;
     return assemble(ROLE_ID, input, frame, pages.map((pg) => ({ sections: pg.sections })), {

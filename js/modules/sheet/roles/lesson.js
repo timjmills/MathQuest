@@ -183,7 +183,19 @@ export const CASE_TESTS = Object.freeze({
         const n = c && c.payload ? Number(c.payload.n) : NaN;
         return roundRest(it) !== null && (Number(c.payload.place) || 10) === 10 && n >= 95 && n <= 99;
     },
+    // The detailed lesson maker (numbers to 1,000, 2026-10-16): a 3-digit place-value item with no
+    // 0 place, a 0 in the tens, a 0 in the ones (lessons/detailed/g2-nbt3-read-write-1000.js).
+    pvNoZero: (it) => { const n = pvNumberOf(it); return n !== null && n >= 100 && n <= 999 && !String(n).includes('0'); },
+    pvZeroTens: (it) => { const n = pvNumberOf(it); return n !== null && n >= 100 && n <= 999 && Math.floor(n / 10) % 10 === 0 && n % 10 !== 0; },
+    pvZeroOnes: (it) => { const n = pvNumberOf(it); return n !== null && n >= 100 && n <= 999 && n % 10 === 0 && Math.floor(n / 10) % 10 !== 0; },
 });
+
+/** A place-value item's number (its `q.pv.n` or cell payload `n`), or null. */
+function pvNumberOf(it) {
+    const q = (it && it.q) || {};
+    const v = q.pv && q.pv.n !== undefined ? q.pv.n : q.cell && q.cell.payload ? q.cell.payload.n : undefined;
+    return Number.isFinite(Number(v)) && v !== undefined && v !== null ? Number(v) : null;
+}
 
 /** A rounding item's ones digit on the tenths scale of its place (0-9), or null. */
 function roundRest(it) {
@@ -532,10 +544,36 @@ const isRound = (it) => {
 };
 
 /** The drawing of state k of the example (no slots: the Model is never scored, AK-1). */
+/** A place-value expanded-form item (pv `expand`): the detailed lesson's chart (2026-10-16). */
+const isExpand = (it) => { const cl = it && it.q && it.q.cell; return !!(cl && cl.template === 'pv' && cl.payload && cl.payload.kind === 'expand'); };
+
+/**
+ * The state of an expanded-form problem after step k (P-LC-9): a box is empty until the step that
+ * first writes it, grey at that step (the newest mark), black after; a box a later step names
+ * again ("So 539 = 500 + 30 + 9") is grey again on that step's panel. The cell is the pv template's
+ * own drawing, answered, with the boxes of later steps emptied.
+ */
+function expandState(it, groups, k, c) {
+    const first = new Map();
+    groups.forEach((g, gi) => (g.marks || []).forEach((m) => { if (m && m.slot && !first.has(m.slot)) first.set(m.slot, gi); }));
+    const newest = new Set(((groups[k] && groups[k].marks) || []).map((m) => m && m.slot).filter(Boolean));
+    const ctx = resolveCtx(Object.assign({}, c, { state: 'answered', scaffoldLevel: 1, metrics: undefined }));
+    let html = it.render(ctx, { cols: 1 });
+    html = html.replace(/<span class="ws-box([^"]*)"([^>]*?) data-ws-slot="(part\d+)"([^>]*)>([^<]*)<\/span>/g, (m, cls, pre, slot, post, val) => {
+        const g = first.has(slot) ? first.get(slot) : 0;
+        const attrs = `${pre} data-ws-slot="${slot}"${post.replace(/ data-ws-ink="[a-z]+"/, '')}`;
+        if (g > k) return `<span class="ws-box${cls}"${attrs}></span>`;
+        if (newest.has(slot)) return `<span class="ws-box${cls} ws-trace"${attrs} data-ws-ink="trace">${val}</span>`;
+        return `<span class="ws-box${cls}"${attrs} data-ws-ink="solid">${val}</span>`;
+    });
+    return html;
+}
+
 function stateDrawing(it, steps, groups, k, c) {
     const merged = groups.map((g) => ({ marks: g.marks }));
     const ctx = resolveCtx(Object.assign({}, c, { state: 'blank', scaffoldLevel: 3, metrics: undefined }));
     if (isRound(it)) return unslot(roundState(it, k, ctx, Number(c.chartLineMm) > 0 ? Number(c.chartLineMm) : ({ S: 44, M: 52, L: 58 }[c.size] || 58)));
+    if (isExpand(it)) return unslot(expandState(it, merged, k, c));
     const t = stepTemplateOf(it);
     if (t) {
         const payload = Object.assign({}, it.q.cell.payload || {});
@@ -597,7 +635,10 @@ export function namedSteps(steps, data, { general = false } = {}) {
 export const stepMarker = (n) => `<em class="mq-lnum" data-mq-accent>${n}</em>`;
 
 /** The chart layout by state count: 4 -> 2 x 2 panels; 2 or 3 -> full-width rows. */
-export const chartLayout = (n) => (n >= 4 ? { cols: 2, rows: Math.ceil(n / 2), variant: 'col' } : { cols: 1, rows: n, variant: 'row' });
+export const chartLayout = (n, data = null) => (data && data.chartWide ? { cols: 1, rows: n, variant: 'col' }
+    : n >= 4 ? { cols: 2, rows: Math.ceil(n / 2), variant: 'col' } : { cols: 1, rows: n, variant: 'row' });
+// `chartWide` (lesson data; the detailed lesson maker, 2026-10-16): a drawing too wide for half the
+// page (expanded form, 3 boxes) - every panel is a full-width row, the step head above its drawing.
 
 /**
  * The ANCHOR CHART's state items (owner ruling 2026-09-25: "the I Do example should be like an
@@ -607,11 +648,14 @@ export const chartLayout = (n) => (n >= 4 ? { cols: 2, rows: Math.ceil(n / 2), v
  * Host-shaped so the host measures them; `drawOnly` measures the drawing alone (for its zoom).
  */
 export function stateItems(example, data) {
-    const steps = workedStepsOf(example);
+    const ws = workedStepsOf(example);
+    // `tailLast` (lesson data; the detailed lesson maker): the closing step ("Read it with plus")
+    // writes nothing new - it is the line under the panels, not a panel of its own.
+    const steps = data && data.tailLast ? ws.map((st, i) => (i === ws.length - 1 ? Object.assign({}, st, { marks: [] }) : st)) : ws;
     if (!steps.length) return [];
     const groups = stateGroups(steps);
     const named = namedSteps(steps, data);
-    const { variant } = chartLayout(groups.length);
+    const { variant } = chartLayout(groups.length, data);
     const drawing = (k, c) => stateDrawing(example, steps, groups, k, c);
     // Lessons r1: a closing step that draws nothing ("Check: add back") is not squeezed into the
     // last panel: it gets a line of its own under the panels, its words beside its name.
@@ -1001,7 +1045,7 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
     const header = Object.assign({}, f.header, { name: false, date: false, score: false });
     const m = bandMetrics(ctx, layoutHeader(header));
     const n = states.length;
-    const lay = chartLayout(n);
+    const lay = chartLayout(n, data);
     const chant = data && data.chant ? data.chant : '';
     const chantH = chant ? { S: 13, M: 15, L: 17 }[ctx.size] + 1.5 : 0;
     const cols = lay.cols === 2 ? 2 : 1;
@@ -1039,14 +1083,16 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
     let z = 0;
     let hF = 0;
     // 1. row: the second example's states under the panels, the panels at zoom 1 or more.
-    if (k2 && lay.rows * H(1) + band2 <= avail) { mode = 'row'; z = solve((q) => lay.rows * H(q), avail - band2, 1, zMax); }
+    const wide = !!(data && data.chartWide);
+    if (k2 && !wide && lay.rows * H(1) + band2 <= avail) { mode = 'row'; z = solve((q) => lay.rows * H(q), avail - band2, 1, zMax); }
     // 2. final: the other examples whole, side by side - three across where a third case fits
     //    (lessons r3: rounding's 90s -> 100), else two; the panels a little smaller.
     let finShown = fin;
     let finCols = 2;
-    for (const [list, c] of [[finals.slice(0, 3), 3], [fin, 2]]) {
-        if (mode !== 'one' || lay.cols !== 2 || list.length !== c || (c === 3 && !list.every(fits3))) continue;
-        const hF1 = Math.max(...list.map((x) => hOf(x, c)));
+    // `chartWide` (one drawing a row): the other examples whole, one under the other.
+    for (const [list, c] of wide ? [[fin, 1], [fin.slice(0, 1), 1]] : [[finals.slice(0, 3), 3], [fin, 2]]) {
+        if (mode !== 'one' || (!wide && (lay.cols !== 2 || list.length !== c || (c === 3 && !list.every(fits3)))) || !list.length) continue;
+        const hF1 = wide ? list.reduce((a, x) => a + hOf(x, 1), 0) : Math.max(...list.map((x) => hOf(x, c)));
         const HF = (q) => hF1 - (1 - q) * dLast;
         const zb = solve((q) => lay.rows * H(q) + HF(q), avail, 0.85, 1);
         if (zb) { mode = 'final'; z = zb; hF = HF(zb); finShown = list; finCols = c; }
@@ -1098,7 +1144,10 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
                 content: gridPart(second.map((x) => Object.assign(planItem(x, { cols: Math.min(4, k2), nolabel: true }), { cls: x.cellCls })), { cols: k2, rows: 1, cellH: h2 + Math.min(spare, h2 * 0.3), labels: 'none' }),
             });
         }
-        if (mode === 'final') sections.push(gridPart(finShown.map((x) => withZoom(x, finCols)), { cols: finCols, rows: 1, cellH: hF + Math.min(spare, hF * 0.3), labels: 'none', cls: 'mq-cfinalgrid' }));
+        if (mode === 'final') {
+            const fr = Math.max(1, Math.ceil(finShown.length / finCols));
+            sections.push(gridPart(finShown.map((x) => withZoom(x, finCols)), { cols: finCols, rows: fr, cellH: (hF + Math.min(spare, hF * 0.3)) / fr, labels: 'none', cls: 'mq-cfinalgrid' }));
+        }
     }
     sections.push({ kind: 'say', frame: oralFrameOf(example || {}, { fill: true }), digits: 2 });
     if (chant) sections.push({ kind: 'html', html: `<div class="ws-band mq-cchantband" style="height:${chantH - 1.5}mm"><div class="mq-cchant"><b>Rule:</b><span>${esc(chant)}</span></div></div>` });
@@ -1253,7 +1302,13 @@ export function plan(input = {}) {
     const stripX = extrasList.find((x) => x.lessonStrip);
     const wantN = data && Array.isArray(data.guided) ? Math.min(3, data.guided.length) : 0;
     let top = null;
-    if (stepsZone && stripX && weDo.length && !stackRows && (gH < 0.72 * zH || wantN > weDo.length)) {
+    // `chartWide` (the detailed lesson maker): a Guided problem too wide to stand beside the Steps
+    // takes the strip over the cells and two full-width rows (cell 1 the Model's case).
+    const wideG = !!(data && data.chartWide);
+    if (wideG && stepsZone && stripX && example) {
+        const set = pickWeDo(weDoPool, example, data, 2).slice(0, 2);
+        if (set.length) top = { set, cols: 1, rows: set.length, h: Math.max(20, hAt(set, 1)) };
+    } else if (stepsZone && stripX && weDo.length && !stackRows && (gH < 0.72 * zH || wantN > weDo.length)) {
         const w3 = example ? pickWeDo(weDoPool, example, data, 3) : rest.slice(0, 3);
         const k = w3.length >= 3 && fitsWidth(w3.slice(0, 3), 3) ? 3 : Math.min(2, w3.length);
         const set = w3.slice(0, k);
@@ -1277,7 +1332,7 @@ export function plan(input = {}) {
     // (or to the Steps beside them); the Independent rows under them take the rest.
     if (top) {
         const items = weDo.map((it, i) => planItem(Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }), { cols: top.cols, level: 2, render: weDoRender(it, i), nolabel: true }));
-        const grid = gridPart(items, { cols: weDo.length, rows: 1, cellH: top.h, labels: 'none' });
+        const grid = top.rows ? gridPart(items, { cols: 1, rows: top.rows, cellH: top.h, labels: 'none' }) : gridPart(items, { cols: weDo.length, rows: 1, cellH: top.h, labels: 'none' });
         const stripH = hOf(stripX, 1);
         // The chant: on the Remember line when the sheet has one (it becomes the Rule line - the
         // rule is what the pupil needs beside the Guided cells), else under the strip.
@@ -1286,7 +1341,7 @@ export function plan(input = {}) {
         const chantH = data && data.chant && !rem ? m.instr : 0;
         const chantHtml = chantH ? `<div class="mq-lstripchant" style="height:${chantH.toFixed(2)}mm"><b>Rule:</b><span>${esc(data.chant)}</span></div>` : '';
         const content = { kind: 'col', cls: 'mq-lwedotop', parts: [{ kind: 'html', html: stripHtml(data, exSteps, ctx.size) + chantHtml }, grid] };
-        groups.push(band(m.strip + stripH + chantH + top.h, { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content }, { h: top.h, grid: [grid], cap: 0.1, capIfEmpty: 0.35 }));
+        groups.push(band(m.strip + stripH + chantH + top.h * (top.rows || 1), { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content }, { h: top.h * (top.rows || 1), grid: [grid], cap: 0.1, capIfEmpty: 0.35 }));
     } else if (weDo.length) groups.push(band(m.strip + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: 0.1, capIfEmpty: 0.35 }));
 
     /* ---- the Remember strip gives way when it alone pushes the Guided band overleaf */
@@ -1461,6 +1516,15 @@ function weDoRender(it, i) {
             // The stack keeps its own answer slot (AK-4: the key has the pupil page's slots).
             // ('answered': the key's working is black, never the Guided grey.)
             if (t && steps.length) return t.stepState(Object.assign({}, it.q.cell.payload || {}), steps.concat([{ marks: [] }]), steps.length, Object.assign({}, c, { state: 'answered', scaffoldLevel: 2 }));
+        }
+        // An expanded-form Guided cell 1 (the detailed lesson maker): step 1 done in grey - the
+        // hundreds box traced, the other boxes empty; every box keeps its slot.
+        if (!answered && i === 0 && isExpand(it)) {
+            const html = it.render(resolveCtx(Object.assign({}, c, { state: 'answered', metrics: undefined })), o);
+            return html.replace(/<span class="ws-box([^"]*)"([^>]*?) data-ws-slot="(part\d+)"([^>]*)>([^<]*)<\/span>/g, (m, cls, pre, slot, post, val) => {
+                const attrs = `${pre} data-ws-slot="${slot}"${post.replace(/ data-ws-ink="[a-z]+"/, '')}`;
+                return slot === 'part0' ? `<span class="ws-box${cls} ws-trace"${attrs} data-ws-ink="trace">${val}</span>` : `<span class="ws-box${cls}"${attrs}></span>`;
+            });
         }
         if (!answered && i === 0) {
             const t = stepTemplateOf(it);

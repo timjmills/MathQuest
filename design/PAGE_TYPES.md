@@ -106,6 +106,8 @@ Header, first page (every field is a teacher check box, PT-FRM-3):
 | Test | `Test A`, `Test B` | Mixed Skill Practice | `Mixed n` |
 | Pre-skill check | `Check A`, `Check B` | Today's Number | range and version, `to 120 - B` |
 | Blank template | `Template` | Answer key | `Answer Key` replaces the id |
+| Detailed lesson: Prerequisite Check, Number sense, Anchor chart | `Prerequisite`, `Number sense`, `Anchor chart` | Detailed lesson: Lesson sheet, Practice, Mixed | `Lesson n`, `Practice n`, `Mixed n` |
+| Detailed lesson: Word problem, Exit slip | `Word problem`, `Exit slip` | Detailed lesson teacher pages (V22, Q9) | `Teacher 1` ... `Teacher 5`, `Reference` (T2b), `Answer Key` (T6) |
 
 - **PT-FRM-10.** When header fields are switched off, the freed height is added to the body and rows are recomputed with the same formulas. Content never grows in size because of it; only row counts or answer space change.
 

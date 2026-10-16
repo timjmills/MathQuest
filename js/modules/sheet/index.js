@@ -161,6 +161,13 @@ export const TM_TEMPLATE_IDS = ['clock', 'timeline', 'coins', 'money-columns'];
 export { thermometerSVG, rulerSVG, barGraphSVG, perimeterSVG, splitMixed as figureSplitMixed, FIGURE_TEMPLATE_IDS } from './cells/figures.js';
 import { FIGURE_TEMPLATE_IDS } from './cells/figures.js';
 
+// The detailed lesson maker (V22, 2026-10-16): the word-problem routine panel template, the
+// teacher-page parts and icons.
+export { RCDWS_ROWS, RCDWS_CSS } from './cells/rcdws.js';
+export * as teacherParts from './teacher-parts.js';
+export { TEACHER_CSS } from './teacher-parts.js';
+export { teacherIcon, routineIcon, TEACHER_ICON_IDS } from './teacher-icons.js';
+
 /** Which cell templates this build carries. `legacy` is registered by `adapters.js`. */
 export const TEMPLATE_IDS = ['legacy', 'stack', 'fact', 'equation', 'pv',
     'counters', 'tenframe', 'base10', 'bond', 'chartwindow', 'seqstrip', 'compare', 'wordpic', 'word-work',
