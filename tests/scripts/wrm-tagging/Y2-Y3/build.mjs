@@ -678,7 +678,7 @@ fs.mkdirSync(root+'data/curriculum/links',{recursive:true});
 {const wr=JSON.parse(fs.readFileSync(root+`data/curriculum/links/${YEAR}.json`,'utf8'));let n=0,bad=0;
   for(const[id,sn]of Object.entries(specSnap)){const w=wr.steps?.[id]||wr.lessons?.[id];if(!w){console.error('SPECOPTS',id,'missing from the written file');bad++;continue;}
     for(const role of ['direct','partial','pre','related']){const a=sn[role],b=(w[role]||[]).map(sig);n+=a.length;
-      if(a.length!==b.length||a.some((x,i)=>x!==b[i])){bad++;console.error('SPECOPTS',id,role,'spec',JSON.stringify(a.filter(x=>!b.includes(x))),'written',JSON.stringify(b.filter(x=>!a.includes(x))),a.length!==b.length?`(${a.length} vs ${b.length} links)`:'(order)');}}}
+      if(a.length!==b.length||a.some((x,i)=>x!==b[i])){bad++;console.error('SPECOPTS',id,role,'spec',JSON.stringify(a.filter(x=>!b.includes(x))),'written',JSON.stringify(b.filter(x=>!a.includes(x))),a.length!==b.length?`(${a.length} vs ${b.length} links)`:a.some(x=>!b.includes(x))?'(re-optioned or swapped)':'(order)');}}}
   for(const id of [...Object.keys(wr.steps||{}),...Object.keys(wr.lessons||{})])if(!specSnap[id]){console.error('SPECOPTS',id,'written but has no spec snapshot');bad++;}
   if(bad)process.exitCode=1;console.error(`specopts ${YEAR}: ${n} links of ${Object.keys(specSnap).length} entries checked against the spec snapshot; ${bad} differences`);}
 // r13 DENOMCHECK (critic r12 N12): every denoms link, clause and why against its items, fractions read from the payload too

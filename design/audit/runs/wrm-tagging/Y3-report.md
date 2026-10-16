@@ -1,4 +1,4 @@
-# Wave 2 tagging: Year 3 (US Grade 2) — round 12
+# Wave 2 tagging: Year 3 (US Grade 2) — round 13
 
 Output: `data/curriculum/links/Y3.json` (134 steps, 12 blocks, block order, none skipped). Items: `Y2-Y3-items.md`.
 
@@ -13,6 +13,122 @@ Site lessons (round 12): 25 (8 full / 12 partial / 5 gap). New proposals for les
 New proposals: `more_less_1_3digit`, `hundreds_any`, `exchange_count` (owner ruling: none / one in the ones / one in
 the tens / two or more, on every + − × ÷ regroup band), `two_and_three_digit`, `compare_kind`, `metric_mass_capacity`,
 `compare_measures`, `within_whole`, `fos_kind`, plus `money_difference` shared with Y2 and `sub_from_ten` (Y2's option, a prerequisite here). Round 3 extends `more_less_1_3digit` (ones on a 3-digit number), `within_whole` (subtraction) and `compare_measures` (lengths, one unit first).
+
+## Round 13 (after critic Y2–Y3 r12, Y2 7.96 / Y3 8.00, lessons 8.00; builder still at Opus medium, `design/STATUS.md`)
+
+### Row 1: the denominator check reads the cell payload (N12)
+- **New `tests/scripts/wrm-tagging/Y2-Y3/denoms.mjs`** (a lane gate, `node denoms.mjs Y2 Y3 [--n 80] [--seed S] [--step K] [--all]`).
+  It reads an item's denominators the way the generator does (`itemDenominators`: text, picture markup, options, tiles,
+  answer) **plus the kit cell payload**: every numeric `d` / `den` / `denom` / `denominator` and every "a/b" string in it. For
+  every link with `opts.denoms` (steps and site lessons; direct, partial, pre, related) it counts the items with a fraction
+  outside the ticked families (`utils.js denomAllowed`), then reads the link's text (the clause, or the why with the full
+  title of every step it cites). A text that names a denominator claims a family: **FAMILY** fails when the items deal a
+  family (thirds, fifths, sevenths) the text does not name; **NAMED** fails when a denominator word in a positive part is
+  dealt by no item (judged on 400 more items, so a rare real denominator is not a false finding).
+- **The build runs it twice:** `denomNotePass` appends the hand note `denomNote[key|opts]` (overrides.mjs) to any pre / related
+  why whose text claims a family its items go beyond (a missing note exits 1, DENOMNOTE), and **DENOMCHECK** re-checks the
+  whole written section (120 items, seeds 52807 + 113 i) and exits 1 on any finding. The `rungDeals` text for a `denoms`
+  rung now names the option ("denominators option: the halves family"), not what is dealt ("halves, quarters, eighths").
+- **Before the fix**, on fresh seeds (40961 + 131 i, 80 items): Y2 4 findings (FAMILY 3: Y2.B8.S10 identify, Y2.B8.S12
+  equiv_frac_visual, Y2.B8.S13 identify; NAMED 1: Y2.B8.S8 "twelfths"), Y3 13 (FAMILY 11: every `equiv_frac_visual {denoms:[2]}`
+  pre citing Y2.B8.S12 and the two `identify {denoms:[2]}` pres citing "Recognise three-quarters"; NAMED 2: "ninths, twelfths" in
+  the `write_fraction {denoms:[2,3]}` rung whys of Y3.B6.S1 / S3, from the option label).
+- **The counts the clauses were rewritten from** (600 items, seeds 40961 / 12345 / 77001 + 97 i):
+
+| Link | Off-family items | What they are |
+|---|---|---|
+| `equiv_frac_visual {denoms:[2]}` | **294 / 600** | = / ≠ checks 329, of which 254 off-family: /3 60, /5 71, /6 136, /7 9, /9 20, /10 26, /12 77, /15 23, /18 20, /20 9, /24 18 (2/3 = 6/9, 1/6 = 3/18, 3/5 = 6/10, 2/5 = 8/20, 3/5 ≠ 5/7, improper 3/5 ≠ 9/5); missing-number pictures 271, of which 40 off (1/2 = 3/6, 3/4 = 9/12) |
+| `identify {denoms:[2]}` | 184 / 600 | every "which model shows" item: the target is in the family, the other three pictures include /3, /5 or /6 (2/3, 1/6, 2/5) |
+| `identify {denoms:[2,3]}` | 95 / 600 | "which model shows" items with fifths among the pictures (4/5) |
+| `shade_fraction {denoms:[3]}` | 0 | deals /3 and /6 only: no twelfths |
+| `shade_fraction` / `write_fraction` `{denoms:[2]}`, `{[2,3]}`; `graph_fractions`, `equiv_frac_nv`, `fraction_of_set(_hard)`, the add / subtract like-fraction skills | 0 | |
+
+- **After:** `denoms.mjs` on three fresh seed sets (40961 + 131 i × 80, 90001 + 211 i × 80, 31337 + 173 i × 160): Y2 9 denoms
+  links (7 key + opts), 3 deal an off-family fraction, 9 texts name a denominator; Y3 78 links (14 key + opts), 21 deal an
+  off-family fraction, 20 texts name a denominator; **0 findings in every run**. The build's DENOMCHECK: 0 / 0.
+- The round-12 claim "every `denoms` link regenerated: 0 off-family" is **withdrawn**: that check read the generator's fields only.
+
+### Row 2: the generator blind spot (recorded, not fixed: generator files are outside this lane)
+- **`js/modules/generate-question.js` `itemDenominators(q)` (≈ l.304), used by `p12Acceptor` (≈ l.381–391) for the `denoms`
+  option, ignores `q.cell.payload`.** An item whose fractions live only in its kit cell passes the filter with any denominator:
+  the = / ≠ items of `equiv_frac_visual` (`payload.terms[].d`, about half the page) and its missing-number items whose answer
+  is the bare denominator (`1/2 = 3/?`, `payload.answer.d`). **Fix:** add the payload's denominators to `itemDenominators`
+  (every numeric `d` under `terms`, `show`, `answer`, and "a/b" strings in the payload; `denoms.mjs payloadDens` is a reference
+  walk). Check the redraw rate after: 254 of 329 = / ≠ items are off-family under `{denoms:[2]}`, so the sign task may need to
+  draw its pair from `denomAllowed` directly rather than rely on the 80-try redraw. **When it is fixed, the Y2.B8.S12 / S10 /
+  S13 clauses and the `denomNote` texts revert** (DENOMCHECK will then report NAMED on the families no longer dealt).
+- Added to the owner bug list below.
+
+### Row 3: Y2.B8.S12 and the other Y2 fraction clauses
+| Step | Clause now (partial) |
+|---|---|
+| **Y2.B8.S12** `equiv_frac_visual {denoms:[2]}` | "the missing-number pictures are the halves family (1/2 = 2/4, 3/4 = 12/16) with a few sixths and twelfths (1/2 = 3/6), but about half the items are = / ≠ checks that compare fractions outside it: thirds, sixths, ninths, twelfths and eighteenths (2/3 = 6/9, 1/6 = 3/18), fifths, tenths, fifteenths and twentieths (3/5 = 6/10, 2/5 = 8/20), sevenths (3/5 ≠ 5/7) and improper fractions (3/5 ≠ 9/5); a page of 1/2 = 2/4 only is not available" |
+| Y2.B8.S13 `identify {denoms:[2]}` | "… it deals eighths (1/8, 7/8), and every "which model shows" item (about a third of the page) has thirds, sixths or fifths among its four pictures (2/3, 1/6, 2/5); not 3/4 alone" |
+| Y2.B8.S10 `identify {denoms:[2,3]}` | "… and some "which model shows" items have fifths among the pictures (4/5)" added |
+| Y2.B8.S8 `shade_fraction {denoms:[3]}` | "the thirds family also deals sixths: …" ("and twelfths" removed: 0 of 600) |
+
+Every example in these clauses was read on generated items. Verdicts and builds are unchanged (partial, `single_fraction`).
+The merge carries the new clauses as `partial` tagFixes; mergecheck 0.
+
+### Row 4: the Y3 pre whys (Y3.B6.S9, Y3.B6.S8, Y3.B8.S2 and the rest of the class)
+- Every `equiv_frac_visual {denoms:[2]}` pre (Y3.B6.S8, S9, S10, Y3.B8.S1–S6) now says what it deals after the cited title:
+  "— equivalence pictures (1/2 = 2/4), but about half the items are = / ≠ checks in other families too: thirds, sixths, ninths and
+  twelfths (2/3 = 6/9), fifths, tenths and twentieths (2/5 = 8/20), and sevenths (3/5 ≠ 5/7)". The Y3.B6.S9 / S10 rung no longer
+  says "(denominators: halves, quarters, eighths)" but "(denominators option: the halves family)".
+- The `identify {denoms:[2]}` pres of Y3.B6.S1 / S4 (citing "Recognise three-quarters") add "every "which model shows" item has
+  thirds, sixths or fifths among its four pictures". The `write_fraction {denoms:[2,3]}` rungs of Y3.B6.S1 / S3 no longer
+  name ninths and twelfths.
+- The two related `equiv_frac_visual` links of Y3.B6.S2 / S5 cite a later step under "nearest live practice" and name no
+  family, so they stay as they were.
+
+### Row 5: optional rows, all done
+- **SPECOPTS** (critic r12 M1, the Y5 lane's `specopts`): the build snapshots every entry's skills — direct / partial from the
+  spec, pre / related at the moment OPTGATE passes them, lessons from `lessons.mjs` — and after the write reads the file back
+  from disk and compares it one to one (order included). Y2 1,072 links of 135 entries, Y3 1,244 of 159: 0 differences.
+  **Mutation-proved** in fresh `git archive` trees: (m1) the critic's m3, `base10_build` / `add_100_regroup` → `band:50` on
+  Y2.B2.S15 / Y3.B2.S13 placed after the gate: exit 1, "SPECOPTS Y2.B2.S15 pre spec [base10_build|{band:99}] written [{band:50}]"
+  and the same for Y3.B2.S13; (m2) every lesson's first related re-optioned after the lesson checks: exit 1, 6 Y2 and 6 Y3
+  lessons named. (m3) the r12 Y2.B8.S12 clause restored: DENOMCHECK exit 1 (FAMILY: fifths). (m4) the `equiv_frac_visual`
+  note deleted: DENOMNOTE exit 1 on all 9 Y3 pres.
+- **Y2.B1.S11 lead pre**: `place_on_number_line {span:10, band:100}` was the step's own partial (same key and opts, through
+  `selfPre`); dropped, and `selfPre` cleared. No K or Grade 1 skill deals a shorter line (the skill has no band below 100).
+  The lead is now `tens_foundation_visual {band:90}` (Y1.B12.S2 Tens to 100), then the count to 100 and compare.
+- **M3** Y2.B11.S5 related `number_pattern {band:50}`: "finding the rule of a number pattern and continuing it (fill the missing
+  numbers, or put numbers in counting order): the same what-comes-next reasoning, without turns" (items: "Find the pattern.
+  Fill in the missing numbers. 18, 20, 24", "Drag the numbers in reverse counting order").
+- **M4** Y2.B11.S2 / S4 related `place_on_number_line {span:10, band:20}`: dropped (a tap on one number; band 20 changes
+  nothing). Y2.B11.S2 now has no related and carries its round-11 note; Y2.B11.S4 keeps half past (a half turn).
+- **M5** Y3.B7.S10 related `money_compare` now `{response:'sign'}` ("Write <, > or = in the circle" between two coin sets),
+  why "two amounts of coins compared with <, > or =: the same signs, between amounts in cents".
+- **Sweep, critic r12 M2:** `claims.mjs negatedHits` now reads a story's operation from the kit cell payload (`steps[].op`,
+  "op":"-") and its take-away / join words when the words carry no sign, and judges a **negated unit** ("never grams", "no mL",
+  "not litres or millilitres": a part that is only unit words) one unit at a time against the items (fails above 5%). The
+  money claim also reads the payload (a coin picture has no words). Mutations (`sweep()` on edited copies, the critic's
+  `mutsw.mjs` extended): "never subtracts" on the `sub_wp_20` story clause → a-neg 30/30; "never adds" on `add_wp_20` → 30/30;
+  "reads kilogram dials only; never grams" → 12/30; "never mL" on the cylinder step → 30/30; the controls ("never subtracts"
+  and "never mL" on a g/kg dial, "never feet" on the inch ruler) do not fire. The other eight r12 mutations are still caught.
+  (The r12 script edited a stale `lessons` reference after its first restore, so its M3 never reached the sweep; fixed in the copy.)
+
+### Counts and gates (round 13)
+- Counts unchanged: Y2 124 steps (63 / 36 / 25), 11 lessons (6 / 5 / 0), 66 tagFixes; Y3 134 steps (49 / 55 / 30), 25 lessons
+  (8 / 12 / 5), 71 tagFixes. OPTGATE: Y2 880 links (3 fewer: the Y2.B1.S11 lead and the two M4 relateds), 839 at spec opts;
+  Y3 971, 952.
+- **Reproducible:** three clean `git archive HEAD` trees (A, B: Y2 then Y3; C: Y2.json / Y3.json deleted first, Y3 built
+  first): exit 0 ×6, sha256 Y2 `84d6481a…bdaad3`, Y3 `15b3a6b6…b585b6` for A, B, C and the committed files; the logs are
+  identical (bar node's path in its module warning). Each log: specopts 0, denomcheck 0, mergecheck 0, optgate 0, titleclaim
+  0, lessons 0, bbcheck 0.
+- `linkscan.mjs Y2 Y3`: OK. `sweep.mjs Y2 Y3`: OK (Y2 925 links, 53 clauses, 455 claims; Y3 1,077 links, 87 clauses, 827
+  claims; a 0, a-neg 0, b 0; c 55 / 63 as read in round 12). `denoms.mjs Y2 Y3` on three fresh seed sets: OK.
+- Merge: `mergeall.mjs` R → Y6 and Y6 → R: 1,040 tags, 0 problems both orders (the agreeing Y2 / Y4 duplicate on Y2.B1.S15 is
+  a NOTE); `mergecheck23.mjs` 0 / 0; the critic's `merge12.mjs`: order-independent, 1 key|step written by two lanes with the
+  same outcome (0 real conflicts), own-step mismatches 0 for all seven lanes.
+- `ws-wrm-extract --site …/scratchpad/site/index.html --check`: exit 0 (both files up to date). `ws-boot-smoke`: OK.
+
+### Self-check (fresh seeds)
+Every entry this round touched was re-read on items from the seeds above: Y2.B8.S8 / S10 / S12 / S13 (clauses), Y2.B1.S11
+(pre list), Y2.B11.S2 / S4 / S5 (related); Y3.B6.S1 / S3 / S4 / S8 / S9 / S10, Y3.B8.S1–S6 (fraction pre whys), Y3.B7.S10
+(related). Each clause and why is true of its items, and I grade each of them 8. Y2.B8.S12's pres (halving, the half-and-quarter
+shapes, grouping, "equal or not") are unchanged; they are thin but true.
 
 ## Round 12 (after critic Y2–Y3 r11, 7.96 / 7.96; builder escalated to Opus medium, `design/STATUS.md`)
 
@@ -54,7 +170,7 @@ Y2.B11.S2's quarter-of-a-shape pre says "the quarter turn"; a pre whose items eq
 - The 8 `{forms:[1]}` pre links: the r12-WIP broken-link mechanism is emptied. The four mass steps' whys say "reading a mass
   on a dial in g or kg (every mark labelled)"; the capacity steps keep the g/kg dial rung ("the same scale reading in another
   measure"), which is sound again.
-- Fraction denominators: every `denoms` link (15 key + opts) regenerated, 60 items each: 0 off-family on the families
+- Fraction denominators: every `denoms` link (15 key + opts) regenerated, 60 items each: 0 off-family on the families **(withdrawn in round 13: that check read the generator's fields only; the = / ≠ items of `equiv_frac_visual` carry their fractions in the cell payload, see Round 13 row 1)**
   (`{denoms:[2]}` is halves, quarters and eighths, as before). `fraction_of_set` still ignores `denoms` in its
   missing-numerator items (`?/5 of 15` under `{denoms:[2,3]}`), so that clause and owner bug stay.
 - The generator bug lists below drop the kg-dial bug.
@@ -485,7 +601,9 @@ Step rows:
   B5.S12 `perimeter {forms:[0,1]}` (form 2 is feet-and-inch stories).
 - **Owner bug list** (generator, not tagging; round 12: the kg-dial bug is fixed by PR #8 and removed here): `missing_mult_div` ignores `range` (deals "__ × 12 = 144"); `pictograph` `range` does not bound totals (105 at
   range 50); `fraction_of_set` ignores `denoms` in missing-numerator items; `denoms` on the fraction skills picks a
-  family (denoms [2] deals eighths).
+  family (denoms [2] deals eighths). **Round 13:** `generate-question.js` `itemDenominators` / `p12Acceptor` ignore `q.cell.payload`, so `denoms` does not filter
+  the payload-only fractions of `equiv_frac_visual` (its = / ≠ items, and missing-number answers `1/2 = 3/?`): add the payload's `d`
+  values and "a/b" strings to `itemDenominators` (Round 13 row 2).
 
 ## Round 3 (after critic Y2–Y3 r2, 7.53 / 7.45) — fixed in the generator, file-wide
 

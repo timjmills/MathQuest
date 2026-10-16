@@ -229,6 +229,7 @@ Gate failures and load numbers measured before this fix (~12:30 UTC) are not tru
 - 2026-10-09 Wave 1 lane "Answer-key options" (4.4) fix round 4: builder escalated to Opus medium (the ceiling) - the key-ink tagging failed critic rounds 1, 2 and 3 (r3: design 6 - given lines and boxes orange on 215 skills, two keys all black, stroked disk numerals).
 - 2026-10-09 Wave 1 lane "Search terms for every skill" (`a21ec3ef403026c80`) fix round 6: builder escalated to Opus medium (the ceiling) - the "Showing results for" correction notice failed critic rounds 1 to 5 (r5: no regression 7, the Navigator notice truncated at Chromebook size and the student notice lost on "+" / refocus).
 - 2026-10-16 Wave 2 WRM tagging Y2-Y3 round 12: builder escalated to Opus medium (the ceiling) - the pre-skill lead / ordering defect (rule 14: lead pre not the nearest building block) survived critic rounds 10 and 11 (r11 N11, Y2.B2.S15 = 7).
+- 2026-10-16 Wave 2 WRM tagging Y2-Y3 round 13: builder still at Opus medium (the ceiling) - critic r12 failed narrowly (Y2 steps 7.96: N12, `equiv_frac_visual {denoms:[2]}` deals off-family = / ≠ items the lane's denominator check could not see, because their fractions live only in the cell payload).
 
 ### Answer-key options (4.4): open after critic r4 (recorded 2026-10-10, fix round 5 fixed R4-1 only)
 
