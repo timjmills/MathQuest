@@ -150,6 +150,7 @@ export default {
         { case: 'a square fact', ref: FACTS(), want: 'arrSquare', instr: 'Write the missing number.', detects: 'Thinks a square cannot turn.' },
     ],
     exitInstruction: 'Write how many rows. Write how many in each row.',
+    exitSayItem: 1,
     exitSay: '{say.rows} times {say.cols} equals {say.cols} times {say.rows}.',
 
     // ------------------------------------------------------------------ retrieval (MWB)
