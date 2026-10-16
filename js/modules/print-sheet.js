@@ -148,6 +148,10 @@ function normaliseRequest(req = {}) {
         latticeN: [4, 6, 8, 10].includes(Number(req.latticeN)) ? Number(req.latticeN) : 0,
         // A lesson's Mixed page (lessons r3): its first skill holds at least half the placed items.
         leadHalf: !!req.leadHalf,
+        // The detailed lesson maker (lessons/detailed/*): a lesson's chart / sheet data in the
+        // prereqs.js LESSONS shape, used INSTEAD of lessonFor() when given (null otherwise, so
+        // every standard lesson renders exactly as before).
+        lessonData: req.lessonData && typeof req.lessonData === 'object' ? req.lessonData : null,
     };
 }
 
@@ -216,8 +220,40 @@ function refAccepts(sk, cand, key, seen, kept) {
     if (sk.noTurnaround && ops.length >= 2 && seen.has(`pair:${key}:${ops.slice().sort((x, y) => x - y).join(',')}`)) return false;
     if (sk.maxSmall !== undefined && ops.length >= 2 && ops[1] < 10 && (kept.get(`small:${key}`) || 0) >= Number(sk.maxSmall)) return false;
     if (Array.isArray(sk.avoidTexts) && sk.avoidTexts.includes(refText(cand))) return false;
+    // The detailed lesson maker (LR-5, V22 §9.5): `avoidNums` - never a number another page of the
+    // pack dealt; `minNum` / `maxNum` - the item's number in range; `edge` - only an edge case
+    // (a 0 in the tens or ones, a teen ending, 1000). Absent on every other request.
+    if (sk.avoidNums || sk.minNum !== undefined || sk.maxNum !== undefined || sk.edge) {
+        const v = itemNumberOf(cand);
+        if (v === null) return false;
+        if (sk.avoidNums && sk.avoidNums.includes(v)) return false;
+        if (sk.minNum !== undefined && v < Number(sk.minNum)) return false;
+        if (sk.maxNum !== undefined && v > Number(sk.maxNum)) return false;
+        if (sk.edge && !isEdgeNumber(v)) return false;
+        if (seen.has(`num:${v}`)) return false;
+    }
     return true;
 }
+
+/**
+ * The one whole number a place-value / number-name item is about (305 for "three hundred five",
+ * "Write 305 in expanded form.", "300 + 5 = ?"), or null. Used by the detailed lesson maker's
+ * pool (LR-5) and by its self-check.
+ */
+export function itemNumberOf(q) {
+    if (!q) return null;
+    const p = (q.cell && q.cell.payload) || {};
+    if (q.pv && Number.isFinite(Number(q.pv.n))) return Number(q.pv.n);
+    if (Number.isFinite(Number(p.n))) return Number(p.n);
+    const a = typeof q.ans === 'object' ? null : String(q.ans).replace(/,/g, '').trim();
+    if (a !== null && /^\d+$/.test(a)) return Number(a);
+    const t = refText(q).replace(/,(?=\d{3})/g, '');
+    const m = t.match(/\b\d{2,4}\b/);
+    return m ? Number(m[0]) : null;
+}
+
+/** An edge case of a numbers-to-1000 lesson: a 0 in the tens or ones, a teen ending, or 1000. */
+export const isEdgeNumber = (v) => v === 1000 || (v >= 100 && (Math.floor(v / 10) % 10 === 0 || v % 10 === 0 || Math.floor(v / 10) % 10 === 1));
 
 /** Records what `refAccepts` checks the next items against. */
 function refRecord(sk, q, key, seen, kept) {
@@ -226,6 +262,7 @@ function refRecord(sk, q, key, seen, kept) {
     if (sk.distinctAnswer) seen.add(`ans:${key}:${refAnswer(q)}`);
     if (sk.noTurnaround && ops.length >= 2) seen.add(`pair:${key}:${ops.slice().sort((x, y) => x - y).join(',')}`);
     if (sk.maxSmall !== undefined && ops.length >= 2 && ops[1] < 10) kept.set(`small:${key}`, (kept.get(`small:${key}`) || 0) + 1);
+    if (sk.avoidNums || sk.minNum !== undefined || sk.maxNum !== undefined || sk.edge) { const v = itemNumberOf(q); if (v !== null) seen.add(`num:${v}`); }
 }
 
 const refAnswer = (q) => String(q && q.ans !== undefined ? (typeof q.ans === 'object' ? JSON.stringify(q.ans) : q.ans) : '');
@@ -251,7 +288,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         for (let k = 0; k <= tries; k++) {
             const seed = (baseSeed + i + 7919 * k) >>> 0;
             let cand = null;
-            try { cand = generateQuestionFor({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex, itemCount: perSkill ? perSkill.get(key) : undefined }); } catch (e) { cand = null; }
+            try { cand = generateQuestionFor(Object.assign({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex, itemCount: perSkill ? perSkill.get(key) : undefined }, sk.range ? { range: sk.range } : {})); } catch (e) { cand = null; }
             if (!cand) continue;
             // A lesson's skill ref (lessons r2-r3): floors on what the packet deals. Not skill
             // options - the packet's; the last try takes what it gets.
@@ -2260,7 +2297,7 @@ export const LESSON_SIZE_NOTE = 'A lesson prints at Medium or Large: Small is pr
 
 async function buildLesson(n, metaOf) {
     const sk0 = n.sections[0].skills[0];
-    const data0 = lessonFor(sk0.categoryId, sk0.skillId);
+    const data0 = n.lessonData || lessonFor(sk0.categoryId, sk0.skillId);
     // The lesson's floor on its own operands (lessons r2: "add 1-3" never deals + 0), on every part.
     const flags = {};
     if (data0 && data0.minOperand !== undefined && sk0.minOperand === undefined) flags.minOperand = data0.minOperand;
@@ -2275,7 +2312,7 @@ async function buildLesson(n, metaOf) {
     const sk = Object.keys(flags).length ? Object.assign({}, sk0, flags) : sk0;
     if (sk !== sk0) n = Object.assign({}, n, { sections: [Object.assign({}, n.sections[0], { skills: [sk] }), ...n.sections.slice(1)] });
     const meta = metaOf(sk);
-    const data = lessonFor(sk.categoryId, sk.skillId);
+    const data = n.lessonData || lessonFor(sk.categoryId, sk.skillId);
     const warmSkills = data ? data.skills.map(skillRef) : earlierSkills(sk, 2);
     let st = { ccss: [], ee: [], approx: false };
     try { if (standardsMod) st = standardsMod.standardsFor(sk.categoryId, sk.skillId); } catch (e) { /* no tags */ }
