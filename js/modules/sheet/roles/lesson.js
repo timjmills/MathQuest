@@ -1369,7 +1369,9 @@ export function plan(input = {}) {
     const shortH = Math.max(20, hAt(rest.slice(0, 3), 2) + lineExtra(rest.slice(0, 3)));
     // (one stacked row is not a stack: it left a single Guided cell beside the Steps - critic R1,
     // div_facts long-division lesson - so a stack is at least two rows)
-    const stackRows = zH > 0 && rest.length >= 3 && fitsWidth(rest.slice(0, 3), 2) && shortH * 1.8 <= zH && Math.floor(zH / shortH) >= 2 ? Math.min(3, Math.floor(zH / shortH)) : 0;
+    // (`guidedStack` k on lesson data - the detailed lesson maker, lesson 2: k cells too wide to stand side by side stack beside the Steps)
+    const forceStack = data && Number(data.guidedStack) >= 2 && rest.length >= Number(data.guidedStack) ? Math.min(3, Number(data.guidedStack)) : 0;
+    const stackRows = forceStack || (zH > 0 && rest.length >= 3 && fitsWidth(rest.slice(0, 3), 2) && shortH * 1.8 <= zH && Math.floor(zH / shortH) >= 2 ? Math.min(3, Math.floor(zH / shortH)) : 0);
     if (stackRows) gk = stackRows;
     const weDoPool = main.filter((it) => it !== example2 && it !== example3 && it !== example4);
     let weDo = example ? pickWeDo(weDoPool, example, data, gk) : rest.slice(0, gk);

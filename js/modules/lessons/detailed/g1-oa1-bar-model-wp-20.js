@@ -66,6 +66,7 @@ export default {
         // The chart's four panels fill the bar one step at a time (roles/lesson.js barState).
         chartSteps: ['{a} and {b} are the parts.', 'Write {a} and {b} in the part boxes.', 'The whole is missing: {a} + {b} = {ans}.', 'Write {ans} {unit}.'],
         guidedRows: 2,
+        guidedStack: 2,
         practiceShape: [6, 2],
         format: {
             kind: 'numbered steps with icons + a chant',
