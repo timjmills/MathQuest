@@ -68,3 +68,21 @@ Run by `selfcheck.mjs` (Appendix E reference implementation, Chromium print medi
 | P5-key | 99 | 12 | 2 | 11 | #000000 #5b2a86 #c2410c #ffffff |
 | P6-key | 100 | 12 | 8 | 83 | #000000 #c2410c #ffffff |
 | T6 | 98 | 10 | 0 | — | #000000 #c2410c |
+
+## Page files (23 pages)
+
+page-01 T1 · page-02 T2 · page-03 T2b · page-04 T3 · page-05 T4 · page-06 T5 · page-07 P0 · page-08 P1 ·
+page-09 P2 anchor chart · page-10 P3 lesson sheet · page-11 P4 Practice 1 · page-12 P4 Practice 2 · page-13 P5 ·
+page-14 P6 exit slip (A4 landscape, 2-up) · page-15 to page-22 keys of P0, P1, P2, P3, P4 ×2, P5, P6 · page-23 T6.
+
+## Checks by eye (looked at every PNG, round 7)
+
+| Check | Result |
+|---|---|
+| Chart: every case the practice deals is drawn; the other examples are finished in black (answers printed) | PASS |
+| Chart: each step panel adds a grey mark (also E26); the chart and its key carry no answer marks (E17b) | PASS |
+| Guided cell 1 has step 1 in grey; Guided cells varied | PASS |
+| Key answers sit in the pupil's slots; no clipped content | PASS |
+
+The item pool travels inside `pack.html` (`<script id="v21-pool">`); E24 / E24b read it and the `data-item`
+marks, and fail when either is missing. Built from code extracted from V21 itself; iterated in a scratch folder.

@@ -99,19 +99,19 @@
    "id": "P6",
    "items": [
     {
-     "item": "1+9",
+     "item": "9+1",
      "rep": "tenframe",
      "row": 0
     },
     {
-     "item": "2+8",
+     "item": "8+2",
      "rep": "tenframe",
      "row": 0
     },
     {
-     "item": "0+10",
+     "item": "10+0",
      "rep": "tenframe",
-     "row": 0
+     "row": 1
     },
     {
      "item": "1+9",
