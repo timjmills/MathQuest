@@ -2927,7 +2927,10 @@ async function buildDetailedLesson(req = {}) {
     const retD = (d.retrieval || []).map((r, i) => dealOne(bo(r.ref), (seed + 503 + 89 * i) >>> 0, used));
     const cqD = dealOne(bo(d.skill), (seed + 601) >>> 0, used, (d.checkQuestion || {}).want || '');
     // The exit slip's Say line reads a FRESH item of the slip's kind, never one of its four (V22 §9.7).
-    const sayD = d.exitSay ? dealOne(bo(d.exit[0].ref), (seed + 701) >>> 0, used, '') : null;
+    // (`exitSayItem` k - the detailed lesson maker, lesson 2: a story slip's Say reads ITS OWN item k, whose
+    // story the pupil can see; a fresh item would be one the pupil never sees)
+    const sayK = Number.isInteger(d.exitSayItem) && d.exitSayItem >= 0 && d.exitSayItem < exitD.length ? d.exitSayItem : null;
+    const sayD = d.exitSay ? (sayK !== null ? exitD[sayK] : dealOne(bo(d.exit[0].ref), (seed + 701) >>> 0, used, '')) : null;
 
     // ---------------------------------------------------------------- P5 Word problem
     const wpV = dlItemVars(wpD.q, d);
@@ -3036,7 +3039,10 @@ async function buildDetailedLesson(req = {}) {
     const uniqQ = (cs) => { const seen = new Set(); return cs.filter((c) => { const k = `${c.page}|${factKeyOf(c.q)}|${c.q && c.q.skillId}`; if (seen.has(k)) return false; seen.add(k); return true; }); };
     const chartQ = ((lesson.lesson && lesson.lesson.chart && lesson.lesson.chart.exampleQs) || []).filter(Boolean);
     const teachCells = uniqQ(cellsOf(partPlan('teach')));
-    const nGuided = Math.max(2, Math.min(4, Number(d.lessonData && d.lessonData.guidedRows) || 2));
+    // (the Guided cells the lesson sheet PRINTS: its first dealt grid - lesson 2's sheet fits one, not guidedRows)
+    const g0 = teachCells[0];
+    const nPrinted = g0 ? teachCells.filter((c) => c.page === g0.page && c.grid === g0.grid).length : 0;
+    const nGuided = nPrinted > 0 && nPrinted < 2 ? nPrinted : Math.max(2, Math.min(4, Number(d.lessonData && d.lessonData.guidedRows) || 2));
     const p0Cells = cellsOf([p0.plan]);
     const V = {
         chart: dlItemVars(chartQ[0], d), chart2: dlItemVars(chartQ[1] || chartQ[0], d), chart3: dlItemVars(chartQ[2] || chartQ[1] || chartQ[0], d),

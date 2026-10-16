@@ -1,0 +1,74 @@
+# V22 self-check: g1-oa1-bar-model-wp-20
+
+Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to the kit's markup; Chromium print media) on `pack.html`, seed 4242, 2026-10-16. **37 / 37 PASS**.
+
+| # | Check | Measured | Result |
+|---|---|---|---|
+| E1 | Paper is A4 (595 × 842 pt; the 2-up exit slip A4 landscape) | 21 portrait + 2 landscape of 23; 23 pages in the DOM | PASS |
+| E1b | Exit-slip halves 132.5 ± 0.5 mm wide | P6: 132.5 / 132.5; P6-key: 132.5 / 132.5 | PASS |
+| E2 | Andika 400 + 700 loaded and on every text node | 700/28px true, 400/15px true; other faces 0 | PASS |
+| E3 | Only #000, #FFF, #949494; accent #5B2A86 only on step marks; key #C2410C only on answer marks | paints #000000, #5b2a86, #949494, #c2410c, #ffffff; out of place 0 | PASS |
+| E4 | No colour on pupil pages except the accent on step marks | pupil-page paints: #000000, #5b2a86, #949494, #ffffff | PASS |
+| E5 | No emoji (© and the teacher-page ★ excepted) | 0 found | PASS |
+| E6 | Pupil text ≥ 11 pt (quiet letters, tab, footer excepted) | smallest 11.99 pt (P3 "13", P3-key "13") | PASS |
+| E7 | Teacher text ≥ 10 pt | smallest 10 pt (T1 "#", T2 "#") | PASS |
+| E8 | Working digits 28 pt outside the anchor chart | the kit sets --ws-digit 28pt at size L on every pupil page (one size L pack); measured by ws-print-lint --source kit | PASS |
+| E9 | Every page ≥ 50 % used, nothing past the body | min 75 %; overflow none; under 50 %: none | PASS |
+| E9c | Teacher pages: one continued is ≥ 92 % used (V22 3131); every teacher page listed | T1 96, T2 96, T2b 81, T3 88, T4 83, T5 98, T6 75; continued under 92 %: none | PASS |
+| E9b | Body ≤ 8 % blank below its last band (site lint) | max 5 %; over 8 %: none | PASS |
+| E10 | Every item cell ≥ 40 % free (reading cells exempt) | 112 cells; min free 44 %; below 40 %: none | PASS |
+| E11 | No empty band ≥ 30 % in a cell (the site sheetCheck H13, from the border box) | worst 27 %; failing: none | PASS |
+| E12 | Equal cells within each grid (±0.5 mm) and across the Practice pages | all grids equal; Practice cells 6, spread 0.0 × 0.0 mm | PASS |
+| E13 | No underscore characters on pupil pages (slot widths: ws-print-lint --source kit) | underscores 0 | PASS |
+| E14 | No dashed line except the cut line and the missing-digit box | 0 outside a cut line | PASS |
+| E15 | Instructions ≤ 12 words, print verb first, string in the controlled library (V22 Appendix C.1: 130 strings; the kit's PED 10.1 library: 162) | 23 instructions; failing: none; in the kit library but missing from V22 C.1: "Write how many of each place.", "Read the story. Fill in the bar. Solve." | PASS |
+| E16 | Every Say frame ≤ 2 blanks | 9 frames; blanks 0, 1 | PASS |
+| E16b | RCDWS panel: one action per box, each row one line (≤ 9 mm) | 12 rows; tallest 9 mm | PASS |
+| E17b | The anchor chart and its key carry no answer marks | P2: 0, P2-key: 0 | PASS |
+| E17 | Each key has the same slots as its page | P0 8/8, P1 12/12, P2 0/0, P3 9/9, P4-1 24/24, P4m-1 20/20, P5 10/10, P6 32/32 | PASS |
+| E18 | © line and strand tab on every page | © 23/23; tab 23/23 | PASS |
+| E19 | One identical I Can title on every page | I Can solve stories with a bar | PASS |
+| E20 | No lone item (word problem v1 and the anchor chart excepted) | none | PASS |
+| E21b | T1 Flow word: Chunked when T2 has ≥ 4 routine rows tagged New | T2 New rows 2 → Standard; T1 "Standard" | PASS |
+| E21 | T2: ≥ 5 atoms of the four types; no ★ in the atom tables | 8 atoms: Fact, Conceptual, Fact, Category, Category, Conceptual, Category, Comparative; ★ false | PASS |
+| E22 | Every delivery page (T3–T5) shows a pupil-page thumbnail | T3: 1, T4: 2, T5: 1 | PASS |
+| E23 | Every row of T6 "Answers at a glance" carries ★ / ★★ / ★★★ | 4/4 | PASS |
+| E24 | Item pool read from the pack (LR-5): pool recomputed from its rule; 0 repeats of (number, representation); a number never twice on a page; chart examples never return | 48 places (48 numbers), usable pool 48 (pool 48 recomputed from its list rule: matches); repeats 0; chart examples returning 0; outside the pool 0; items without a rep 0 | PASS |
+| E24b | Practice last row only edge cases (★★★); LR-6 no twin answers and no near twins (one skill, numbers within 2) on a page | 1 Practice pages: last rows all edge cases (21 edge numbers dealt); no twin answers and no near twins on any page | PASS |
+| E30 | No boardOnly number on a pupil page or key (item, answer, digits or name) | none declared: on no pupil page or key (16 pages) | PASS |
+| E29 | Every item letter and answer a teacher page quotes is on the pupil page it names (T3 §1, T5 §10, T6 routing) | 15 quotes, all on their pages | PASS |
+| E28 | No Say:, Rule: or Remember: band on a Practice page | 4 Practice / Mixed pages; extra bands 0 | PASS |
+| E27 | Counters in rows of at most 5 | no counters | PASS |
+| E26 | Every anchor-chart step panel adds a grey (newest) mark | P2 4 / 4 panels | PASS |
+| E25 | One key per pupil page (anchor chart included) | 8 pupil pages, 8 keys | PASS |
+
+**37 / 37 pass.**
+
+## Per page
+
+| Page | Kind | Used % | Bottom blank % | Min text pt | Cells | Min free % | Paints |
+|---|---|---|---|---|---|---|---|
+| T1 | teacher | 96 | 0 | 10 | 0 | — | #000000 #ffffff |
+| T2 | teacher | 96 | 0 | 10 | 0 | — | #000000 #5b2a86 |
+| T2b | teacher | 81 | 0 | 10 | 0 | — | #000000 #5b2a86 #ffffff |
+| T3 | teacher | 88 | 0 | 11 | 0 | — | #000000 #5b2a86 #c2410c |
+| T4 | teacher | 83 | 0 | 11 | 0 | — | #000000 #5b2a86 |
+| T5 | teacher | 98 | 0 | 11 | 0 | — | #000000 #5b2a86 #c2410c #ffffff |
+| P0 | pupil | 93 | 2 | 12 | 8 | 50 | #000000 #ffffff |
+| P1 | pupil | 95 | 3 | 12 | 10 | 50 | #000000 #ffffff |
+| P2 | pupil | 98 | 0 | 14 | 4 | 60 | #000000 #5b2a86 #949494 #ffffff |
+| P3 | pupil | 92 | 5 | 11.99 | 3 | 48 | #000000 #5b2a86 #949494 #ffffff |
+| P4-1 | pupil | 96 | 0 | 12 | 6 | 53 | #000000 #5b2a86 #ffffff |
+| P4m-1 | pupil | 95 | 0 | 12 | 14 | 50 | #000000 #5b2a86 #ffffff |
+| P5 | pupil | 100 | 0 | 12 | 3 | 57 | #000000 #5b2a86 #ffffff |
+| P6 | pupil | 98 | 0 | 12 | 8 | 34 | #000000 #ffffff |
+| P0-key | key | 94 | 2 | 12 | 8 | 50 | #000000 #c2410c #ffffff |
+| P1-key | key | 95 | 3 | 12 | 10 | 50 | #000000 #c2410c #ffffff |
+| P2-key | key | 98 | 0 | 14 | 4 | 60 | #000000 #5b2a86 #949494 #ffffff |
+| P3-key | key | 92 | 5 | 11.99 | 3 | 44 | #000000 #5b2a86 #c2410c #ffffff |
+| P4-1-key | key | 96 | 0 | 12 | 6 | 53 | #000000 #5b2a86 #c2410c #ffffff |
+| P4m-1-key | key | 95 | 0 | 12 | 14 | 50 | #000000 #5b2a86 #c2410c #ffffff |
+| P5-key | key | 100 | 0 | 12 | 3 | 57 | #000000 #5b2a86 #c2410c #ffffff |
+| P6-key | key | 97 | 0 | 12 | 8 | 34 | #000000 #c2410c #ffffff |
+| T6 | teacher | 75 | 0 | 10 | 0 | — | #000000 #c2410c |
+

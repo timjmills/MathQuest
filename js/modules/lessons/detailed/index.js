@@ -44,6 +44,7 @@
 //   numberSense   {A: ref, B: ref}                     P1 bands (5 items each)
 //   wordProblem   {ref, want, lines: [...], unit, say} P5: story lines with {wp.*} placeholders
 //   exit          [{case, ref, want, detects}] x 4     P6 items, one per case; `exitSay` its Say frame
+//                 `exitSayItem` k: the Say reads slip item k (its {say.*} vars and key) instead of a fresh item
 //   retrieval     [{ref, ask}]                         T3 spaced retrieval (mini whiteboards)
 //   t1Boxes       [{kind, title, text}] <= 3           T1 Lesson guidance (tip | language | why | watch ...)
 //   materials     [text]                               T1 check-box list

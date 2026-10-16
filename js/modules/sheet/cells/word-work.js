@@ -957,7 +957,8 @@ function barLayout(p, ctx) {
     const cols = Math.max(1, Number(ctx.columns || 1));
     // The answer stands BESIDE the bar (box over its printed label word), so a story is story + one
     // bar row high and four fit a page half (the exit slip).
-    const W = Math.max(40, Math.min(120, 186 / cols - 16 - 30));
+    // (`barW` on the payload: a host whose grid is narrower than its column count says - the exit slip's half page)
+    const W = Number(p.barW) > 0 ? Number(p.barW) : Math.max(40, Math.min(120, 186 / cols - 16 - 30));
     const put = filled(ctx);
     const ink = put ? inkOf(ctx) : null;
     const bx = boxMm(ctx);

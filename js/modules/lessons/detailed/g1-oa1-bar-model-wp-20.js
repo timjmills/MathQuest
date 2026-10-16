@@ -9,7 +9,9 @@
 // Every number a script speaks is a {placeholder} filled from the DEALT items, never typed here.
 
 const NS = (categoryId, skillId, opts, extra) => Object.assign({ categoryId, skillId, opts }, extra || {});
-const WP = (extra) => Object.assign({ categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'bar', wpCues: false, wpBank: false }, cellPayload: { layout: 'bar' }, instructionKey: 'story-bar' }, extra || {});
+const WP = (extra, payload) => Object.assign({ categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'bar', wpCues: false, wpBank: false }, cellPayload: Object.assign({ layout: 'bar' }, payload || {}), instructionKey: 'story-bar' }, extra || {});
+// (The exit slip's half page holds two cells a row in ~65 mm: its bars are drawn 34 mm wide.)
+const EXIT_BAR = { barW: 34 };
 // (`cellPayload.layout: 'bar'`: the word-work cell's compact form - story, bar, answer box with the
 // label printed; no sign row, column boxes or unit bank: the bar is the working.)
 
@@ -111,13 +113,15 @@ export default {
 
     // ------------------------------------------------------------------ P6 Exit slip
     exit: [
-        { case: 'put together, big part first', ref: WP({ maxNum: 20 }), want: 'bigFirst', detects: 'Copies a story number as the answer.' },
-        { case: 'small part first (Critical Atom)', ref: WP({ maxNum: 20 }), want: 'bigSecond', detects: 'The whole written in a part box.' },
-        { case: 'add to: gets more', ref: WP({ maxNum: 20 }), want: 'bigFirst', detects: 'Subtracts: the wrong sign.' },
-        { case: 'a whole past 10', ref: WP({ minNum: 11, maxNum: 20 }), want: 'bigSecond', detects: 'Count slip past 10: one less.' },
+        { case: 'add to, big part first', ref: WP({ maxNum: 20 }, EXIT_BAR), want: 'bigFirst', detects: 'Copies a story number as the answer.' },
+        { case: 'small part first (Critical Atom)', ref: WP({ maxNum: 20 }, EXIT_BAR), want: 'bigSecond', detects: 'The whole written in a part box.' },
+        { case: 'put together, big part first', ref: WP({ maxNum: 20 }, EXIT_BAR), want: 'bigFirst', detects: 'Subtracts: the wrong sign.' },
+        { case: 'a whole past 10', ref: WP({ minNum: 11, maxNum: 20 }, EXIT_BAR), want: 'bigSecond', detects: 'Count slip past 10: one less.' },
     ],
     exitInstruction: 'Read the story. Fill in the bar. Solve.',
-    exitSay: 'The answer is __ __.',
+    // The Say reads slip item b (the Critical Atom's case): its own unit word, one blank.
+    exitSay: 'b. The answer is __ {say.unit}.',
+    exitSayItem: 1,
 
     // ------------------------------------------------------------------ retrieval (MWB)
     retrieval: [
@@ -147,7 +151,7 @@ export default {
         { type: 'Category', skill: 'Story numbers are parts', notes: 'Point at each number.' },
         { type: 'Conceptual', critical: true, skill: 'Bar: whole on top, parts below', notes: 'Cubes on the mat first.' },
         { type: 'Category', skill: '“In all” and “now” ask for the whole', notes: 'Point at the top box.' },
-        { type: 'Comparative', skill: 'Same parts, same whole', notes: 'The other examples (EE .b).' },
+        { type: 'Comparative', skill: 'Same parts, same whole', notes: 'Swap the cube trains (EE .b).' },
     ],
     routine: [
         { step: 'Find the two parts.', tag: 'New', check: 'Guided cell 1' },
@@ -203,7 +207,7 @@ export default {
                 { ask: 'Is the whole missing?', note: 'Expected: yes. Step 3.' },
                 { say: 'The whole is missing. Add.', note: 'Push the cubes together under the top box. Count on.' },
                 { say: 'The whole goes on top.', note: 'Step 4: write the whole and the label word.' },
-                { do: 'Point to the other examples: the big part first, then the small part first.' },
+                { do: 'Swap the two cube trains on the mat: the other part first.' },
                 { ask: 'Same parts, other order. Same whole?', note: 'Expected: yes, the bar is the same length.' },
             ] },
         { n: 6, name: 'We Do: Guided Practice', min: 8, page: 'P3', boxes: [{ kind: 'feedback', title: 'Fix it at once', text: 'Fix: touch the top box and ask “Is that a part?”' }],
@@ -229,7 +233,7 @@ export default {
             ] },
         { n: 9, name: 'Word problem', min: 5, page: 'P5',
             rows: [
-                { do: 'Read the story aloud two times.' },
+                { do: 'Read the story aloud two times. Pupils tick each box.' },
                 { say: 'No bar this time. Draw the bar.', note: 'Right: two parts in either order, the whole on top.' },
             ] },
         { n: 10, name: 'Plenary and exit slip', min: 5, page: 'P6',
@@ -251,6 +255,6 @@ export default {
         { wrote: 'The sum in a lower box', mistake: 'Whole in a part box', next: 'The chant; touch the top box.' },
         { wrote: 'A story number as the answer', mistake: 'Story number as answer', next: '“Is it in the story? Then it is a part.”' },
         { wrote: 'The difference of the parts', mistake: 'Wrong sign', next: '“Is the whole missing? Add.”' },
-        { wrote: 'One less than the key', mistake: 'Count slip past 10', next: 'Count on from the big part with fingers.' },
+        { wrote: 'One less than the whole', mistake: 'Count slip past 10', next: 'Count on from the big part with fingers.' },
     ],
 };
