@@ -23,7 +23,13 @@ export default {
     ccss: ['2.NBT.A.3'],
     ee: ['M.EE.2.NBT.3'],
     cra: 'Pictorial → Abstract',
-    flowNote: 'Chunk 1 (5a, 6a): steps 1–4, numeral to expanded form. Chunk 2 (5b, 6b): step 5, the number name to the numeral in H T O boxes.',
+    flowNote: 'Chunk 1 (5a, 6a): steps 1–4, numeral to expanded form. Chunk 2 (5b, 6b): step 5, the number name to the numeral in H T O boxes. Writing number names is a follow-on lesson: today names are read and said, never written.',
+    // Owner ruling (critic r2 R1, 2026-10-16): writing a number IN WORDS is not a pupil task in this
+    // lesson (Grade 2 SPED, one new thing per step). It is said (Say frames, read-aloud) only. The
+    // follow-on lesson, for the build list: "Write numbers to 1,000 in words" (composing:
+    // number_word_form, wordform to_words, a word bank hundred / tens / ones words) - 2.NBT.A.3.
+    // 1,000 (critic r2 R2): shown and said on the board in §5b, never written by the pupil today.
+    followOn: [{ title: 'Write numbers to 1,000 in words', skill: 'composing:number_word_form', opts: { wordform: ['to_words'] }, ccss: '2.NBT.A.3' }],
     // V22 Chunked Flow: two I Do / We Do cycles. Chunk a is this file's own skill and chart data;
     // chunk b has its own anchor chart (P2b) and lesson sheet (P3b), and its Steps head Practice 2.
     chunks: [
@@ -43,7 +49,10 @@ export default {
                 chant: 'Three boxes, three digits.',
                 guidedRows: 2,
                 format: { kind: 'numbered steps with icons + a chant', why: 'Three boxes make the missing tens word visible: the T box cannot stay empty.' },
-                example: { test: 'pvNoZero' },
+                example: { test: 'pvPlain' },
+                // Guided: a plain name, then the Critical Atom's case (no tens word) - critic r2 R3.
+                guided: ['pvPlain', 'pvZeroTens'],
+                independent: ['pvZeroTens', 'pvZeroOnes'],
                 second: { test: 'pvZeroTens', label: 'No tens word? Write 0 tens.' },
                 third: { test: 'pvZeroOnes', label: 'No ones word? Write 0 ones.' },
                 mixWith: [],
@@ -62,14 +71,16 @@ export default {
     // Each Practice page its own sheet (V22 §9.5): 1 = numeral to expanded form (the chart's steps on
     // top), 2 = number name to numeral (the words form).
     // (its ★★★ last row: 1,000 and one more edge case - critic D2)
-    practiceSheets: [{}, { skill: WORDS('to_number'), shape: [8, 2], chunk: 'b', edgeLast: { per: 8, cols: 2, wants: ['pvThousand', ''] } }],
-    // Mixed: the lesson skill with its other forms - expanded form back to the numeral, and a number
-    // written in words (the writing direction, harder: on the Mixed page only).
-    // (no Steps band on the mixed page, and the words band named for what it asks - critic D17, D18)
-    mixed: { skills: [PV('combine'), WORDS('to_words', { sectionLabel: 'Words' }), PV('unit_form')], strip: false },
+    practiceSheets: [{}, { skill: WORDS('to_number', { maxNum: 999 }), shape: [8, 2], chunk: 'b', edgeLast: { per: 8, cols: 2, wants: ['pvZeroTens', ''] } }],
+    // Mixed: the lesson skill with its other forms - expanded form back to the numeral and the
+    // number name to the numeral (H T O boxes). No number is WRITTEN in words (owner ruling, R1).
+    // (no Steps band on the mixed page - critic D18)
+    mixed: { skills: [PV('combine'), WORDS('to_number', { sectionLabel: 'Number names', maxNum: 999 }), PV('unit_form'), PV('value')], strip: false },
 
     // The lesson's own placeholder names (index.js): a 3-digit number's parts.
     vars: (q, b) => {
+        const pc = (q && q.cell && q.cell.payload) || {};
+        if (pc.kind === 'compare') return { a: pc.a, b: pc.b, big: Math.max(Number(pc.a), Number(pc.b)) };
         const n = Number(b.n);
         if (!Number.isFinite(n) || b.n === '') return {};
         const h = Math.floor(n / 100) * 100, t = Math.floor((n % 100) / 10) * 10, o = n % 10;
@@ -106,7 +117,7 @@ export default {
             kind: 'numbered steps with icons + a chant',
             why: 'The one step pupils skip is the 0 place; a five-word chant said at step 2 cues it.',
         },
-        example: { match: 'hundreds place', test: 'pvNoZero' },
+        example: { match: 'hundreds place', test: 'pvPlain' },
         second: { test: 'pvZeroTens', label: 'No tens? The tens part is 0.' },
         third: { test: 'pvZeroOnes', label: 'No ones? The ones part is 0.' },
         mixWith: [],
@@ -140,20 +151,18 @@ export default {
         lines: ['Sam has {wp.h} bags of 100 beads.', 'Sam has {wp.o} more beads.', 'How many beads does Sam have?'],
         answerLine: 'Sam has __ beads.',
         // (the number in words too - critic D19)
-        wordsLine: 'Write the number in words: __',
         say: 'Sam has __ beads.',
     },
 
     // ------------------------------------------------------------------ P6 Exit slip (Q8)
-    // Four items, both chunks (critic D14): a-b the number's NAME to the numeral (chunk 2), c-d
-    // expanded form back to the numeral (chunk 1: step 4 reads it with plus; an expanded-form row is
-    // too wide for a 132.5 mm half at L). The Critical Atom's case (a missing tens word) is b, a 0
-    // part d.
+    // Four items, both chunks (critic D14, r2 R4): a-b the number's NAME to the numeral (chunk 2), c
+    // expanded form back to the numeral (chunk 1's read-back, step 4), d numeral to expanded form with
+    // a 0 place (chunk 1, the Critical Atom). The tens-word case is b.
     exit: [
-        { case: 'name, no 0 place', ref: WORDS('to_number'), want: 'pvNoZero', instr: 'Write the number.', detects: 'Parts side by side (300407).' },
-        { case: 'name, no tens word (Critical Atom)', ref: WORDS('to_number'), want: 'pvZeroTens', instr: 'Write the number.', detects: 'Drops the 0: six hundred five = 65.' },
+        { case: 'name, no 0 place', ref: WORDS('to_number', { maxNum: 999 }), want: 'pvNoZero', instr: 'Write the number.', detects: 'Parts side by side (300407).' },
+        { case: 'name, no tens word (Critical Atom)', ref: WORDS('to_number', { maxNum: 999 }), want: 'pvZeroTens', instr: 'Write the number.', detects: 'Drops the 0: six hundred five = 65.' },
         { case: 'expanded form to the numeral, no 0 place', ref: PV('combine'), want: 'pvNoZero', instr: 'Write the number.', detects: 'Parts side by side: 500 + 30 + 9 = 500309.' },
-        { case: 'expanded form to the numeral, a 0 part', ref: PV('combine'), want: 'pvZeroTens', instr: 'Write the number.', detects: 'Drops the 0 part: 700 + 0 + 5 = 75.' },
+        { case: 'numeral to expanded form, a 0 place', ref: PV('expand'), want: 'pvZeroTens', instr: 'Write the number in expanded form.', detects: 'Writes 10 for the empty tens: 400 + 10 + 7.' },
     ],
     exitInstruction: 'Write the number.',
     // The Say line reads a FRESH number (dealt apart from the four items).
@@ -161,32 +170,34 @@ export default {
 
     // ------------------------------------------------------------------ retrieval (MWB, T3 §3)
     retrieval: [
-        { ref: { categoryId: 'composing', skillId: 'number_word_form', opts: { wordform: ['to_number'], band: 100 }, minNum: 21, maxNum: 99 }, ask: 'Write the number for {ret.0.words}.' },
+        // (three, none a P0 task again - critic N3)
+        { ref: { categoryId: 'placevalue', skillId: 'more_less_10', opts: { step: 10, dir: 'more', band: 100 }, minNum: 21, maxNum: 89 }, ask: '{ret.0.text}' },
         { ref: { categoryId: 'placevalue', skillId: 'unit_form', opts: { band: 99 }, minNum: 21, maxNum: 99 }, ask: 'How many tens in {ret.1.n}?' },
+        { ref: { categoryId: 'placevalue', skillId: 'compare', opts: { band: 99, closeness: 'close' } }, ask: 'Which is bigger: {ret.2.a} or {ret.2.b}?' },
     ],
 
     // ------------------------------------------------------------------ T1
     t1Boxes: [
-        { kind: 'tip', title: 'Keep the chart up', text: 'Keep the H T O place chart on the board all lesson.' },
+        { kind: 'tip', title: 'Read, say, write numerals', text: 'Pupils read names and say them. Writing number names is a follow-on lesson.' },
         { kind: 'language', title: 'No "and" in writing', text: 'Pupils who say “three hundred and five” are right to say it. We write “three hundred five”.' },
         { kind: 'watch', title: 'The 0 place', text: 'The mistake to stop today is 35 for 305: a 0 place still gets its part.' },
     ],
     // Pupil-page answers whose case a teacher should see first (T5 Watch, critic D13): the case
     // tests of roles/lesson.js, named.
     // T2b's extra answer-slot shapes this pack prints (critic D9).
-    slotRows: [{ shape: 'hto', use: 'a number from its name, a digit a box' }, { shape: 'longline', use: 'a number in words' }],
-    caseNames: { pvThousand: 'one thousand', pvZeroTens: '0 tens', pvZeroOnes: '0 ones', pvTeen: 'a teen' },
+    slotRows: [{ shape: 'hto', use: 'a number from its name, a digit a box' }],
+    caseNames: { pvZeroTens: '0 tens', pvZeroOnes: '0 ones', pvTeen: 'a teen' },
     routeNote: 'No site lesson exists yet for these prerequisites: T6 names a CCSS code and a short title (V22 Appendix H).',
     materials: ['Base-ten blocks (flats, rods, cubes)', 'Mini whiteboards and pens', 'H T O place chart on the board', 'Number word cards: hundred, tens, teens', 'Pupil packet, one per pupil', 'Exit slips, cut in half'],
     vocabulary: [
-        { word: 'digit', gloss: 'one of 0 to 9', diagram: { kind: 'digit', text: '7' } },
+        { word: 'number name', gloss: 'the number in words', diagram: { kind: 'text', text: 'three hundred' } },
         { word: 'place', gloss: 'hundreds, tens or ones', diagram: { kind: 'pv', digits: '347' } },
         { word: 'expanded form', gloss: 'the number split by place', diagram: { kind: 'text', text: '300 + 40 + 7' } },
     ],
 
     // ------------------------------------------------------------------ T2 Atomisation template
     atoms: [
-        { type: 'Fact', prereq: true, skill: 'Number words: twenty to ninety-nine, and the teens', notes: 'Read eleven to nineteen and the tens words; forty has no u. Prerequisite Check {pre.0.letters}.' },
+        { type: 'Fact', prereq: true, skill: 'Number words: twenty to ninety-nine', notes: 'The tens words and the ones words. Prerequisite Check {pre.0.list}.' },
         { type: 'Conceptual', prereq: true, skill: 'Hundreds, tens and ones: 3 digits are 3 places', notes: 'From 2.NBT.A.1. Prerequisite Check {pre.1.letters}.' },
         { type: 'Conceptual', prereq: true, skill: 'Value of a digit: the 4 in 347 is worth 40', notes: 'From 2.NBT.A.1. Prerequisite Check {pre.2.letters}.' },
         { type: 'Category', skill: 'Word parts: the word before “hundred” is the hundreds digit', notes: 'The rest is a 2-digit number: “three hundred | forty-seven”.' },
@@ -204,10 +215,9 @@ export default {
         { step: 'Name to numeral: the hundreds word in H, the rest in T and O.', tag: 'New', check: '3 boxes, 3 digits' },
     ],
     howToTeach: [
-        'Draw the H T O chart first, every time: three boxes, so three digits.',
-        'Cover part of a number word with your hand and read it in two parts.',
-        'Chunk 1 first, numeral to expanded form: it has the lowest writing load. Chunk 2: the name to the numeral.',
-        'Point to each digit and ask what it is worth before writing its part.',
+        'Draw the H T O chart first, every time: three boxes, three digits.',
+        'Chunk 1 (numeral to expanded form) first: the lowest writing load.',
+        'Chunk 2: cover the end of the name; read the hundreds word first.',
     ],
     board: 'H T O boxes for {b.chart2.words}: {b.chart2.hto}.',
     // `misconception`: the provider's name for the wrong answer (sheet/providers/pv.js); `option`: the
@@ -217,7 +227,8 @@ export default {
         { name: 'Writes 10 for an empty tens', step: 3, looks: '305 = 300 + 10 + 5', fix: 'No tens: the tens part is 0, not 10.', option: 'B', misconception: 'M-V5' },
         { name: 'One place too big', step: 1, looks: '305 = 3000 + 0 + 50', fix: 'Count the zeros: a hundreds part has two.', option: 'C', misconception: 'M-V14' },
         { name: 'Drops the 0', step: 5, looks: '35 for three hundred five', fix: 'Fill the H T O boxes: 3 boxes, 3 digits.', option: '', caught: 'exit slip b and the Practice 2 boxes' },
-        { name: 'Teen or ty swap', step: 5, looks: '230 for two hundred thirteen', fix: 'Say the end of the word: teen is ones.', option: '', caught: 'Practice 2 and the Guided cells of the lesson sheet 2' },
+        { name: 'Parts side by side', step: 5, looks: '300407 for three hundred seven', fix: 'Three boxes, three digits: the rest goes in T and O.', option: '', caught: 'exit slip a and the Practice 2 boxes' },
+        { name: 'Teen or ty swap', step: 5, looks: '230 for two hundred thirteen', fix: 'Say the end of the word: teen is ones.', option: '', caught: 'Practice 2 and lesson sheet 2' },
     ],
     checkQuestion: { want: 'pvZeroTens', correct: 'D' },
 
@@ -239,8 +250,9 @@ export default {
         { n: 3, name: 'Spaced retrieval', min: 4, page: '',
             rows: [
                 { do: 'Pupils hold mini whiteboards. Write each question on the board.' },
-                { ask: '{ret.0.ask}', note: 'Expected: [[{ret.0.n}]].' },
+                { ask: '{ret.0.ask}', note: 'Expected: [[{ret.0.ans}]].' },
                 { ask: '{ret.1.ask}', note: 'Expected: [[{ret.1.tens}]].' },
+                { ask: '{ret.2.ask}', note: 'Expected: [[{ret.2.big}]].' },
             ] },
         { n: 4, name: 'Chaining bridge', min: 2, page: '',
             rows: [
@@ -272,12 +284,15 @@ export default {
                 { ask: 'Read the rest. How many tens? How many ones?', note: 'Expected: [[{b.chart.t}]] tens, [[{b.chart.o}]] ones (step 2).' },
                 { say: 'Three boxes, three digits: {b.chart.n}.', note: 'Step 3: read it back.' },
                 { say: '{b.chart2.Words}: no tens word. Write 0 tens.', note: 'Expected: [[{b.chart2.n}]].' },
+                { do: 'Write 1000 on the board under Th H T O.', note: 'Shown, not practised: one thousand is ten hundreds.' },
+                { say: 'Ten hundreds is one thousand.', note: 'A new place, Th. Pupils say it; nobody writes it today.' },
             ] },
         { n: '6b', name: 'We Do 2: Guided Practice', min: 4, page: 'P3b', boxes: [{ kind: 'feedback', title: 'An empty box', text: 'Point to it: “Is there a tens word? Then write 0.”' }],
             rows: [
                 { say: 'Read {b.we.0.words}. Step 1 is done in grey.' },
                 { ask: 'H box? T box? O box?', note: 'Expected ★: [[{b.we.0.hto}]].' },
-                { do: 'Pupils do {b.we.1.words} on their own.', note: 'Expected ★: [[{b.we.1.n}]].' },
+                { do: 'Pupils do {b.we.1.words} on their own.', note: 'Expected ★: [[{b.we.1.n}]]: no tens word, so 0 tens.' },
+                { do: 'Pupils do the Independent Practice. Walk and check.', note: 'Expected ★★: [[{b.indepList}]].' },
                 { say: 'Three boxes, three digits.', note: 'The chant. Say it twice together.' },
             ] },
         { n: 7, name: 'Check Question', min: 3, page: '',
@@ -297,7 +312,7 @@ export default {
             rows: [
                 { do: 'Read the story aloud two times. Pupils tick each box.' },
                 { ask: 'How many hundreds? How many ones?', note: 'Expected: [[{wp.h}]] hundreds, [[{wp.o}]] ones.' },
-                { ask: 'How many beads? Say it in words.', note: 'Expected: [[{wp.eq}]]; [[{wp.words}]].' },
+                { ask: 'How many beads? Say it in words.', note: 'Expected: [[{wp.eq}]]; said: {wp.words}.' },
             ] },
         { n: 10, name: 'Plenary and exit slip', min: 4, page: 'P6',
             rows: [

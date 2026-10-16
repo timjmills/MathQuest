@@ -113,7 +113,9 @@ export function teacherBands(d, V, pages) {
         cls: r.critical ? 'dl-crit' : '',
         cells: [stepMark(i + 1), `${r.critical ? `${keyIcon()} ` : ''}${esc(r.step)}`, esc(r.tag), esc(r.check)],
     }));
-    const mistakeRows = d.mistakes.map((m) => [`<b>${esc(m.name)}</b>`, `Step ${m.step}`, esc(m.looks), esc(m.fix)]);
+    // (where each mistake is caught is the table's own column - V22 10.9, critic D7)
+    const caughtOf = (m) => (m.option ? `Check Question ${m.option}` : m.caught ? f(m.caught) : '');
+    const mistakeRows = d.mistakes.map((m) => [`<b>${esc(m.name)}</b>`, `Step ${m.step}`, esc(m.looks), esc(m.fix), esc(caughtOf(m))]);
     // Every mistake names where it is caught: its Check Question option, else `caught` (V22 10.9, critic D7).
     const links = d.mistakes.map((m) => (m.option ? `Check Question option ${m.option} catches <b>${esc(m.name)}</b>.` : m.caught ? `<b>${esc(m.name)}</b> is caught by ${esc(f(m.caught))}.` : '')).filter(Boolean).join(' ');
     out.T2 = [
@@ -122,8 +124,8 @@ export function teacherBands(d, V, pages) {
         { label: 'What students do:', blocks: [tTable(['Step', 'Task / Routine atom', 'Tag', 'Check it with'], routineRows, { widths: ['16mm', '', '26mm', '48mm'] })
             + tLine(`Rows tagged New: ${newCount} → Flow: ${flow}.${d.flowNote ? ` ${esc(d.flowNote)}` : ''}`)] },
         // (the Board line only when the description says what goes on the board - critic D8)
-        { label: 'How to teach:', blocks: [`<ol class="dl-list">${d.howToTeach.map((t) => `<li>${esc(t)}</li>`).join('')}</ol>`, d.board ? boardLine(`Board: ${f(d.board)}`) : ''] },
-        { label: 'Common mistakes:', blocks: [tTable(['Mistake', 'Broken step', 'Looks like', 'Fix'], mistakeRows, { widths: ['30mm', '20mm', '', ''] }), links ? tLine(links) : ''] },
+        { label: 'How to teach:', blocks: [`<ol class="dl-list">${d.howToTeach.map((t) => `<li>${esc(t)}</li>`).join('')}</ol>` + (d.board ? boardLine(`Board: ${f(d.board)}`) : '')] },
+        { label: 'Common mistakes:', blocks: [tTable(['Mistake', 'Broken step', 'Looks like', 'Fix', 'Caught by'], mistakeRows, { widths: ['28mm', '18mm', '', '', '34mm'] })] },
     ];
 
     // ---------------------------------------------------------------------------- T2b
@@ -149,7 +151,7 @@ export function teacherBands(d, V, pages) {
             .concat((d.slotRows || []).map((r) => [slotDraw[r.shape] || esc(r.shape), esc(r.use)]))),
         subHead('Icons'), tTable(['Icon', 'Means'], [iconRow('tip', 'Tip'), iconRow('feedback', 'Feedback'), iconRow('watch', 'Watch'), iconRow('research', 'Research'),
             iconRow('key', 'Critical Atom'), iconRow('language', 'Language tip'), iconRow('why', 'Why it works'), iconRow('board', 'Board'),
-            [d.lessonData.steps.map((s, i) => stepMark(i + 1, s.icon)).join(' '), 'The pupil Steps (accent)']]),
+            [`<span style="white-space:nowrap">${d.lessonData.steps.map((s, i) => stepMark(i + 1, s.icon)).join('')}</span>`, 'The pupil Steps (accent)']]),
         subHead('Band labels'), tLine('Pupil: Vocabulary · Remember · Guided Practice · Steps · Independent Practice · Mixed Review · Number sense: A / B · Workspace · Another example · Say · Rule.'),
         tLine('Teacher: Lesson guidance · Lesson flow · Materials · What students need to know · What students do · How to teach · Common mistakes · Section n · Prerequisite routing · Accepted answers · Answers at a glance.'),
         ].join(''))] }];
@@ -197,7 +199,7 @@ const bandH = (label, hs, over) => (label ? (over || STRIP_MM + LINE_MM + BAND_P
  * A band runs over: its remaining blocks continue on the next page (12 mm header), strip repeated.
  * @returns {{head: 'lifted'|'cont', bands: {label, blocks: string[]}[]}[]}
  */
-export function paginateTeacher(bands, heights, { body = TEACHER_BODY_MM } = {}) {
+export function paginateTeacher(bands, heights, { body = TEACHER_BODY_MM, greedy = false } = {}) {
     // Flatten to blocks in order; a page holds consecutive blocks, a band's strip repeats on every
     // page its blocks reach (PG-21: a band is never separated from its first block).
     const flat = [];
@@ -210,7 +212,8 @@ export function paginateTeacher(bands, heights, { body = TEACHER_BODY_MM } = {})
         close();
         return t;
     };
-    const budgetOf = (i) => (i === 0 ? body.lifted : body.cont) - 1;
+    // (a greedy page is filled to the brim, so it keeps a measuring margin: the frame's rules add up)
+    const budgetOf = (i) => (i === 0 ? body.lifted : body.cont) - (greedy ? 2 : 1);
     const pack = (cap) => {
         const pages = [];
         let cur = [];
@@ -234,7 +237,8 @@ export function paginateTeacher(bands, heights, { body = TEACHER_BODY_MM } = {})
     let pages = pack(Infinity);
     // PG-23 / V22 §8.12.4: a page under half full is rebalanced with its neighbour - of every packing
     // with the same page count, the one whose emptiest page is fullest.
-    if (pages.length > 1) {
+    // (`greedy`: the first page filled first - V22 3131 "fill to 92 %, continue only what does not fit")
+    if (pages.length > 1 && !greedy) {
         const n = pages.length;
         const fill = (ps) => Math.min(...ps.map((pg, i) => cost(pg) / budgetOf(i)));
         let best = pages, bestFill = fill(pages);
@@ -386,6 +390,7 @@ export const DETAILED_PUPIL_CSS = `
 .ws-page .dl-wpstory .ws-cell,.ws-page .dl-wppanel .ws-cell{justify-content:stretch;align-items:stretch;padding:3mm}
 .ws-page .dl-wpstory .ws-story{height:100%;display:flex;flex-direction:column;justify-content:space-evenly;font-size:15pt;line-height:1.45;padding:3mm 4mm}
 .ws-page .dl-ansline{display:flex;align-items:flex-end;gap:2mm}
+.ws-page.ws-key .ws-band--say .ws-line[data-ws-key-ans]{display:inline-flex;justify-content:center;align-items:flex-end;width:var(--w)}
 .ws-page .dl-wordsline{flex-direction:column;align-items:flex-start;gap:1mm}
 .ws-page .dl-work{flex:1 1 auto;min-height:60mm}
 .ws-page .dl-wpeq .ws-cell{justify-content:center;align-items:center}
@@ -394,6 +399,9 @@ export const DETAILED_PUPIL_CSS = `
 .ws-page.dl-land .ws-body>.mq-row{flex:1 1 auto}
 .ws-page .dl-half>.ws-instrline{flex:none}
 .ws-page .dl-half>.ws-grid{flex:none}
+/* the exit slip's expanded-form row fits its 132.5 mm half: the signs keep their size, their slots close up (critic r2 R4) */
+.ws-page .dl-exitgrid .pv-expand{gap:1.5mm}
+.ws-page .dl-exitgrid .pv-expand .o{width:auto;padding:0 0.5mm}
 .ws-page .dl-nsgrid .ws-cell{justify-content:stretch;align-items:center}
 .ws-page .dl-nsrow{display:grid;grid-template-columns:58mm 1fr;align-items:center;width:100%;gap:3mm;padding-left:5mm;box-sizing:border-box}
 .ws-page .dl-nsrow>.dl-nsinstr{height:auto;padding:0;font-size:15pt;line-height:1.2;white-space:normal}

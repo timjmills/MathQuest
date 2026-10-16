@@ -2719,7 +2719,8 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                         if (wfBand === 100) num = Math.max(30, Math.floor(num / 10) * 10);
                         // (1,000 is the band's own zero-place case: 0 hundreds, 0 tens, 0 ones - one zero item in four)
                         else if (rng(0, 3) === 0) num = 1000;
-                        else num = Math.floor(num / 100) * 100 + (rng(0, 1) ? rng(1, 9) : rng(1, 9) * 10);
+                        // (the 0 alternates: a 0 in the tens, then a 0 in the ones - both cases on every page)
+                        else num = Math.floor(num / 100) * 100 + (Math.floor(k / 3) % 2 === 0 ? rng(1, 9) : rng(1, 9) * 10);
                     }
                 } else {
                     const maxNum = Math.max(10, Math.min(range, 9999));

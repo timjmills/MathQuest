@@ -2627,7 +2627,7 @@ const dlAns = (q) => (q && typeof q.ans === 'object' ? (Array.isArray(q.ans) ? q
 const dlWant = (want) => (want && LESSON_CASE_TESTS[want]) || null;
 
 /** One question of `ref` that passes `want`, never a fact key in `used`; seeded, so reproducible. */
-function dealOne(ref, seed, used, want) {
+function dealOne(ref, seed, used, want, avoidAns = null) {
     const ok = dlWant(want);
     for (let k = 0; k < 600; k++) {
         let q = null;
@@ -2636,6 +2636,7 @@ function dealOne(ref, seed, used, want) {
         if (ref.cellPayload && q.cell && q.cell.payload) q = Object.assign({}, q, { cell: Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, ref.cellPayload) }) });
         const key = factKeyOf(q), v = itemNumberOf(q);
         if (key === null || used.has(key) || (ok && !ok({ q }))) continue;
+        if (avoidAns && avoidAns.has(dlAns(q))) continue;
         if (ref.minNum !== undefined && !(v >= ref.minNum)) continue;
         if (ref.maxNum !== undefined && !(v <= ref.maxNum)) continue;
         used.add(key);
@@ -2731,7 +2732,12 @@ async function measureTeacherBlocks(bandsList) {
         return bandsList.map((bands) => bands.map((b) => b.blocks.map((html) => {
             if (!html) return 0;
             body.innerHTML = measureShell(html);
-            return mm(body.firstElementChild.firstElementChild.firstElementChild || body.firstElementChild);
+            // (every element of the block, first top to last bottom: a block may be a table AND its foot line)
+            const bi = body.firstElementChild.firstElementChild;
+            const kids = bi ? [...bi.children] : [];
+            if (!kids.length) return mm(body.firstElementChild);
+            const top = Math.min(...kids.map((k) => k.getBoundingClientRect().top)), bot = Math.max(...kids.map((k) => k.getBoundingClientRect().bottom));
+            return (bot - top) / PX_PER_MM;
         })).map((hs) => Object.assign(hs, { over })));
     } finally { frame.remove(); }
 }
@@ -2810,12 +2816,14 @@ async function buildDetailedLesson(req = {}) {
         header: { name: true, date: true, score, tab: tab(id), title: d.title },
         footer: { left: tagLine, right: `Form A · seed ${seed}`, year }, seed, form: 'A',
     });
+    const nsAns = new Set();
     const nsBands = ['A', 'B'].map((k, bi) => {
         const ns = d.numberSense[k];
         // `items` (V22 §9.2, critic D11): five bank TYPES, one a row, the same order in A and B, each
         // row its item's own library instruction; else one ref five times (`ref`, `wants`).
         const refs = Array.isArray(ns.items) ? ns.items : Array.from({ length: 5 }, () => ns.ref);
-        const dealt = refs.map((r, i) => dealOne(r, (seed + 211 + 1009 * bi + 131 * i) >>> 0, used, r.want || (ns.wants || [])[i] || ns.want || ''));
+        // (LR-6: no two answers alike on the page - critic r2, 29 and 29)
+        const dealt = refs.map((r, i) => { const x = dealOne(r, (seed + 211 + 1009 * bi + 131 * i) >>> 0, used, r.want || (ns.wants || [])[i] || ns.want || '', nsAns); nsAns.add(dlAns(x.q)); return x; });
         const its = dealt.map((x, i) => hostItem({ q: x.q, skill: Object.assign({}, refs[i]) }, 0, 'L'));
         for (const it of its) if (Array.isArray(ns.items)) it.nsInstr = composeInstrText(composeInstrKeyOf([it], refs), [it]);
         return { label: `Number sense: ${k}`, instr: ns.instruction, its };
@@ -2909,6 +2917,10 @@ async function buildDetailedLesson(req = {}) {
     // other key does (key-short.js tagKeyAnswers: what differs from the pupil page takes the key ink);
     // the exit slip key's second half reads "Answer Key" too (critic D21).
     for (const r of [p1, p5, p6]) r.keyPages = (r.keyPages || []).map((k, i) => tagKeyAnswers(r.pupilPages[i] || '', k));
+    // The Say blank of a key reads its answer (the item the frame names), in the key ink (critic r2 R10).
+    const sayFill = (html, v) => String(html).replace(/(<span class="ws-line"[^>]*data-ws-slot="say-1"[^>]*)><\/span>/g, `$1 data-ws-key-ans>${String(v).replace(/</g, '&lt;')}</span>`);
+    p5.keyPages = p5.keyPages.map((k) => sayFill(k, wpV.ans));
+    if (sayD) p6.keyPages = p6.keyPages.map((k) => sayFill(k, dlAns(sayD.q)));
     p6.keyPages = p6.keyPages.map((k) => String(k).split('<div class="ws-field name">Name<i></i></div>').join(`<div class="ws-field name"><span data-ws-key="name">Answer Key</span><i></i></div>`));
 
     // ---------------------------------------------------------------- the pupil packet and its keys
@@ -2985,6 +2997,7 @@ async function buildDetailedLesson(req = {}) {
         const ng = Math.max(2, Math.min(4, Number(ch.lessonData && ch.lessonData.guidedRows) || 2));
         V[ch.id] = { chart: dlItemVars(qs[0], d), chart2: dlItemVars(qs[1] || qs[0], d), chart3: dlItemVars(qs[2] || qs[1] || qs[0], d), we: tc.slice(0, ng).map((c) => dlItemVars(c.q, d)), indep: tc.slice(ng).map((c) => dlItemVars(c.q, d)) };
         while (V[ch.id].we.length < 2) V[ch.id].we.push(V[ch.id].chart);
+        V[ch.id].indepList = V[ch.id].indep.map((x) => x.ans).join(' · ');
     }
     V.ret.forEach((r, i) => { r.ask = fillPlaceholders((d.retrieval[i] || {}).ask || '', { ret: V.ret }); });
     while (V.we.length < 2) V.we.push(V.chart);
@@ -3033,7 +3046,7 @@ async function buildDetailedLesson(req = {}) {
     const body = lifted ? TEACHER_BODY_MM : { lifted: TEACHER_BODY_MM.full, cont: TEACHER_BODY_MM.cont };
     const measured = await measureTeacherBlocks(groups.map((g) => bands[g]));
     const groupPages = {};
-    groups.forEach((g, i) => { groupPages[g] = paginateTeacher(bands[g], measured[i], { body, fillFirst: g === 'T1' }); });
+    groups.forEach((g, i) => { groupPages[g] = paginateTeacher(bands[g], measured[i], { body, fillFirst: g === 'T1', greedy: g === 'T2' }); });
     const teacherTotal = groups.reduce((a, g) => a + groupPages[g].length, 0);
     let tNo = 0;
     const tabIdOf = { T1: 'Teacher 1', T2: 'Teacher 2', T2b: 'Reference', T3: 'Teacher 3', T4: 'Teacher 4', T5: 'Teacher 5', T6: 'Answer Key' };
@@ -3098,7 +3111,8 @@ async function buildDetailedLesson(req = {}) {
     const pool = {
         op: 'list', decl: { kind: 'list', items: poolKeys }, pool: poolKeys, forbidden: [],
         edge: [...new Set(places.filter((x) => edgeTest && edgeTest({ q: x.q })).map((x) => x.item))],
-        places: places.map(({ q, ...x }) => x),
+        // (each place's answer too: LR-6 'no two answers alike on a page' is checked on every pupil page)
+        places: places.map(({ q, ...x }) => Object.assign(x, { ans: dlAns(q) })),
         note: 'Places are written here by the bridge (the kit equivalent of V22 data-item / data-rep / data-row).',
     };
     const css = `<style data-dl-css>${TEACHER_CSS}${RCDWS_CSS}${DETAILED_PUPIL_CSS}</style>`;

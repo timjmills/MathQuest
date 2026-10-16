@@ -87,7 +87,7 @@ register('words', {
                 + `<span style="font-size:${pt(digitPt)};font-weight:700;line-height:1.1;">${esc(Number(p.n).toLocaleString('en-US'))}</span>`
                 + `<span style="font-size:${pt(textPt + 4)};line-height:1.2;">${line}</span></div>`;
         }
-        if (p.slot === 'hto') return htoCell(p, ctx, (i) => (key === null ? '' : htoDigits(p)[i]), () => null, null);
+        if (p.slot === 'hto') return htoCell(p, ctx, (i) => (key === null ? '' : htoDigits(p)[i]), () => null, p.under === 0 || p.under === 1 ? p.under : null);
         const slot = blank({ id: 'answer', kind: 'number', shape: 'line', digits: 4, graded: true }, ctx, key);
         return `<div class="ws-words" data-ws-words="to_number" style="display:flex;flex-direction:column;align-items:center;gap:4mm;">`
             + `<span style="font-size:${pt(textPt + 2)};font-weight:700;line-height:1.2;text-align:center;max-width:100%;text-wrap:balance;">${esc(p.words || numberWords(p.n))}</span>`

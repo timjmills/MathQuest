@@ -115,7 +115,9 @@ export function plan(input = {}) {
         if (cur.sections.length) pages.push(cur);
         // The detailed lesson's check: the last band takes the page's spare height (one unruled
         // trailing area inside the frame, V22 §8.12.4), so the body is not blank at its foot.
-        if (input.perQuestion) for (const pg of pages) { const last = pg.sections[pg.sections.length - 1]; if (last) last.grow = true; }
+        // (only when the rows could not grow to the body: an empty bordered strip under the last row reads
+        // as a missing item - critic r2 R7)
+        if (input.perQuestion && grow >= 1.45) for (const pg of pages) { const last = pg.sections[pg.sections.length - 1]; if (last) last.grow = true; }
     }
     const n = kept || all.length;
     const finalFrame = n === all.length ? frame : frameOf({ skills: skillsOn.length ? skillsOn : input.skills || [], input: Object.assign({}, input, { form }),

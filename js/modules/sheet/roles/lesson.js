@@ -190,6 +190,8 @@ export const CASE_TESTS = Object.freeze({
     // (no 0 place and no teen ending: the plain case - critic D14)
     pvNoZero: (it) => { const n = pvNumberOf(it); return n !== null && n >= 100 && n <= 999 && !String(n).includes('0') && Math.floor(n / 10) % 10 !== 1; },
     pvThousand: (it) => pvNumberOf(it) === 1000,
+    // (a chart model: no 0, no teen, three different digits - critic r2: which 5 made which word?)
+    pvPlain: (it) => { const n = pvNumberOf(it); return n !== null && n >= 100 && n <= 999 && !String(n).includes('0') && Math.floor(n / 10) % 10 !== 1 && new Set(String(n)).size === 3; },
     pvZeroTens: (it) => { const n = pvNumberOf(it); return n !== null && n >= 100 && n <= 999 && Math.floor(n / 10) % 10 === 0 && n % 10 !== 0; },
     pvZeroOnes: (it) => { const n = pvNumberOf(it); return n !== null && n >= 100 && n <= 999 && n % 10 === 0 && Math.floor(n / 10) % 10 !== 0; },
     pvTeen: (it) => { const n = pvNumberOf(it); return n !== null && n >= 100 && n <= 999 && Math.floor(n / 10) % 10 === 1 && n % 10 !== 0; },
@@ -848,6 +850,17 @@ function finalDrawing(it, c) {
     const groups = stateGroups(steps);
     const ctx = resolveCtx(Object.assign({}, c, { state: 'blank', scaffoldLevel: 3, metrics: undefined }));
     if (isRound(it)) return unslot(roundState(it, 4, ctx, Number(c.chartLineMm) > 0 ? Number(c.chartLineMm) : 58));
+    // An expanded-form example with a 0 place (the detailed lesson, critic r2): the newest (grey)
+    // mark is its 0 part - the part the panel teaches - every other part black.
+    if (isExpand(it)) {
+        const parts = (it.q.cell.payload.parts || []).map(Number);
+        const zeros = parts.map((v, i) => (v === 0 ? `part${i}` : null)).filter(Boolean);
+        if (zeros.length) {
+            const all = parts.map((v, i) => ({ slot: `part${i}`, value: String(v) }));
+            const merged = [{ marks: all.filter((m) => !zeros.includes(m.slot)) }, { marks: all.filter((m) => zeros.includes(m.slot)) }];
+            return unslot(expandState(it, merged, 1, c));
+        }
+    }
     const t = stepTemplateOf(it);
     if (t && it.q.cell.template !== 'fact') {
         const merged = groups.map((g) => ({ marks: g.marks })).concat([{ marks: [] }]);
@@ -1429,7 +1442,16 @@ export function plan(input = {}) {
 
     /* ---- Independent Practice: whole rows filling the last page (PT-OPN-7, H5) */
     const used = new Set([example, example2, example3, example4, ...weDo]);
-    const indepPool = main.filter((it) => !used.has(it));
+    const indepPool0 = main.filter((it) => !used.has(it));
+    // `independent` (lesson data; the detailed lesson maker, critic r2 R3): the cases the Independent
+    // cells must hold, one cell each, first (the Critical Atom's case on every sheet that states it).
+    const indepFirst = [];
+    for (const name of (data && Array.isArray(data.independent) ? data.independent : [])) {
+        const t = CASE_TESTS[name];
+        const hit = t ? indepPool0.find((it) => !indepFirst.includes(it) && t(it)) : null;
+        if (hit) indepFirst.push(hit);
+    }
+    const indepPool = indepFirst.concat(indepPool0.filter((it) => !indepFirst.includes(it)));
     const icWanted = AUTO_COLS[ctx.size];
     // One across look on the page (critic R3 N-2): the Guided cells keep a division fact's line
     // beside the sentence, so the Independent band takes only columns where it stays beside.
@@ -1603,10 +1625,11 @@ function weDoRender(it, i) {
         }
         // A name-to-numeral Guided cell 1 in H T O boxes (the detailed lesson maker): step 1 done in
         // grey - the hundreds digit traced in the H box, the hundreds words underlined.
-        if (!answered && i === 0 && it.q && it.q.cell && it.q.cell.template === 'words' && it.q.cell.payload && it.q.cell.payload.slot === 'hto') {
+        if (i === 0 && it.q && it.q.cell && it.q.cell.template === 'words' && it.q.cell.payload && it.q.cell.payload.slot === 'hto') {
             const t = stepTemplateOf(it);
             const steps = workedStepsOf(it);
-            if (t && steps.length > 1) return t.stepState(Object.assign({}, it.q.cell.payload), steps.map((s) => ({ marks: s.marks || [] })), 0, c);
+            // (the key: every box answered, the prompt drawn exactly as on the pupil page - INK-31, critic r2 R9)
+            if (t && steps.length > 1) return answered ? t.render(Object.assign({}, it.q.cell.payload, { under: 0 }), c) : t.stepState(Object.assign({}, it.q.cell.payload), steps.map((s) => ({ marks: s.marks || [] })), 0, c);
         }
         if (!answered && i === 0) {
             const t = stepTemplateOf(it);

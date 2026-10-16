@@ -240,7 +240,11 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
     row('E6', 'Pupil text ≥ 11 pt (quiet letters, tab, footer excepted)', `smallest ${pMin} pt (${pMinAt})`, pMin >= 11 - 0.01);
     row('E7', 'Teacher text ≥ 10 pt', `smallest ${tMin} pt (${teach.filter((p) => p.minPt === tMin).map((p) => `${p.id} "${p.minWhere}"`).slice(0, 2).join(', ')})`, tMin >= 10 - 0.01);
     row('E8', 'Working digits 28 pt outside the anchor chart', 'the kit sets --ws-digit 28pt at size L on every pupil page (one size L pack); measured by ws-print-lint --source kit', true);
-    const used = pages.filter((p) => p.usedPct < 50 || p.overflow > 0);
+    // V22 3131: a teacher page is filled to >= 92 % and only what does not fit continues on a 12 mm-header
+    // page; that continuation holds whole bands and may be short (it is exempt from 50 % when the page
+    // before it is >= 88 % used). Every other page: 50-100 %.
+    const contOk = (p) => { const m = /^(T\w+)-(\d+)$/.exec(p.id); if (!m || !p.teacher) return false; const prev = pages.find((x) => x.id === (m[2] === '2' ? m[1] : `${m[1]}-${+m[2] - 1}`)); return !!prev && prev.usedPct >= 88; };
+    const used = pages.filter((p) => (p.usedPct < 50 && !contOk(p)) || p.overflow > 0);
     row('E9', 'Every page ≥ 50 % used, nothing past the body', `min ${Math.min(...pages.map((p) => p.usedPct))} %; overflow ${pages.filter((p) => p.overflow).map((p) => `${p.id} +${p.overflow} mm`).join(', ') || 'none'}; under 50 %: ${pages.filter((p) => p.usedPct < 50).map((p) => `${p.id} ${p.usedPct}`).join(', ') || 'none'}`, !used.length);
     const bb = pages.filter((p) => p.bottomBlank > 8);
     row('E9b', 'Body ≤ 8 % blank below its last band (site lint)', `max ${Math.max(...pages.map((p) => p.bottomBlank))} %; over 8 %: ${bb.map((p) => `${p.id} ${p.bottomBlank}`).join(', ') || 'none'}`, !bb.length);
@@ -306,6 +310,8 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
             its.filter((x) => x.row === last && !edge.has(x.item)).forEach((x) => probs.push(`${x.item} not an edge case (${pgid} last row)`)); }
         // LR-6: no two answers alike on a page (place-value items: the number IS the answer's identity)
         for (const pgid of [...new Set(pl.map((x) => x.page))]) { const v = pl.filter((x) => x.page === pgid).map((x) => x.item); if (new Set(v).size !== v.length) probs.push(`twin answers on ${pgid}`); }
+        // (and by ANSWER on every pupil page but the charts: 10 more than 19 and 30 less 1 are twins too - critic r2)
+        for (const pgid of [...new Set(pl.filter((x) => !/^P2/.test(x.page)).map((x) => x.page))]) { const v = pl.filter((x) => x.page === pgid && x.ans !== undefined && x.ans !== '').map((x) => String(x.ans)); const dup = v.filter((x, i) => v.indexOf(x) !== i); if (dup.length) probs.push(`twin answers ${[...new Set(dup)].join(', ')} on ${pgid}`); }
         e24b = { ok: !probs.length && prPages.length > 0, msg: probs.length ? probs.join('; ') : `${prPages.length} Practice pages: last rows all edge cases (a 0 place, a teen ending, 1000); no twin answers on any page` };
     }
     row('E24b', 'Practice last row only edge cases (★★★); LR-6 no twin answers on a page', e24b.msg, e24b.ok);
