@@ -73,7 +73,10 @@ export function cell(inner, opts = {}) {
     if (opts.scope) a += ` data-ws-scope="${attr(opts.scope)}"`;
     if (opts.legacy) a += ' data-ws-legacy="1"';
     const body = opts.template ? `<div class="ws-cell-body">${inner}</div>` : inner;
-    return `<div class="ws-cell ${cls}"${a} style="${style}">${lab}${body}</div>`;
+    // `keyAttr` (key pages only): a data-ws-key-* hook after the style, so the page decorator's
+    // `data-ws-cell style="` match is untouched
+    const extra = /^data-ws-key-[a-z-]+$/.test(opts.keyAttr || '') ? ` ${opts.keyAttr}` : '';
+    return `<div class="ws-cell ${cls}"${a} style="${style}"${extra}>${lab}${body}</div>`;
 }
 
 /** LS-3: a dashed line across the page means CUT, and only that. Tagged for the lint (LS-4). */

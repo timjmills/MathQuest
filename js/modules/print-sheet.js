@@ -30,6 +30,7 @@ import { kitCellSpec } from './print-generate.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
+import { normKeyOptions, shortKeyRows, renderShortKey, tagKeyAnswers, answerText } from './sheet/roles/key-short.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH } from './sheet/roles/practice.js';
 import { onePageRows, setOnePagePaper, ONE_PAGE_ITEMS } from './count-rows.js';
 import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS } from './sheet/layout.js';
@@ -1454,7 +1455,7 @@ function touchFitLine(line, html, size) {
     return line.replace(/Digits (\d+) pt\./, (m, pt) => `Digits ${pt} pt; ${what}.`);
 }
 
-export async function buildSheet(req = {}) {
+async function buildSheetCore(req = {}) {
     setOnePagePaper(req.paper);      // before the request is read: it counts the one-page rows the paper holds
     const n = normaliseRequest(req);
     if (!n.sections.length) throw new Error('buildSheet: no section has a skill');
@@ -1813,6 +1814,7 @@ export async function buildSheet(req = {}) {
     return {
         pupilHtml: out.pupilHtml,
         keyHtml: n.key ? out.keyHtml : '',
+        pupilPages: out.pupilPages, keyPages: n.key ? out.keyPages : [],
         pageCount,
         keyPageCount: n.key ? out.keyPages.length : 0,
         fits,
@@ -1829,6 +1831,133 @@ export async function buildSheet(req = {}) {
         notes,
         plan,
     };
+}
+
+/**
+ * Wave 4.4 (owner 2026-10-03): the answer key options. `req.key` is `true` / `false` (today's
+ * facsimile key at the end, unchanged) or `{on, placement: 'end'|'after-page', style: 'copy'|'short'}`.
+ * The sheet is built exactly as before; the key pages are then restyled (short) and ordered.
+ * Adds `docHtml` (pupil and key pages in print order) and `keyOptions` to the result.
+ */
+export async function buildSheet(req = {}) {
+    const ko = normKeyOptions(req.key);
+    const res = await buildSheetCore(Object.assign({}, req, { key: ko.on }));
+    return arrangeKey(res, ko, req);
+}
+
+/**
+ * The blank back of a sheet ("Start each key on a new sheet", owner 2026-10-09): no header, tab or
+ * border, and one very small line in the kit's own footer band, centre cell (regular, black, no
+ * copyright line), so a pupil never takes it for a worksheet.
+ */
+export function blankBack(paperAttr = 'a4') {
+    const letter = paperAttr === 'letter' ? ' mq-paper-letter' : '';
+    return `<section class="ws-page ws-blank-back${letter}" data-ws-paper="${paperAttr}" data-ws-mode="blank" aria-label="Blank back of the sheet"><main class="ws-body"></main>`
+        + '<footer class="ws-foot ws-blank-foot"><span></span><span class="ws-blank-note">This page is intentionally blank</span><span></span></footer></section>';
+}
+
+/** Restyle and order the key pages of a built sheet (exported for the lane test). */
+export function arrangeKey(res, ko, req = {}) {
+    res.keyOptions = ko;
+    const pupil = res.pupilPages || [res.pupilHtml];
+    if (!ko.on) { res.docHtml = res.pupilHtml; return res; }
+    const plan0 = (res.keyPlans && res.keyPlans[0]) || res.plan || {};
+    const paper = (plan0.ctx && plan0.ctx.paper) || req.paper || 'A4';
+    const paperAttr = /letter/i.test(paper) ? 'letter' : 'a4';
+    const decorateKey = (html, i, role) => html
+        .replace(/<section ([^>]*?)class="ws-page ([^"]*)"/, (m, pre, c) => `<section ${pre}class="ws-page ${c}" data-ws-page="${i}" data-ws-paper="${paperAttr}" data-ws-role="${role}" data-ws-mode="key"`)
+        .replace('<footer class="ws-foot">', '<footer class="ws-foot" data-ws-teacher>');
+    let keyPages = res.keyPages || (res.keyHtml ? [res.keyHtml] : []);
+    // INK-31 (critic r1, B1): only the answers take the key ink; a given claim, the made-up
+    // pupil's work and every printed number keep their ink. Each key page is matched to its twin.
+    keyPages = keyPages.map((k, i) => tagKeyAnswers(pupil.length === keyPages.length ? pupil[i] : '', k));
+    let groupsByPage = null;
+    if (ko.style === 'short') {
+        const plans = res.keyPlans || (res.plan ? [res.plan] : []);
+        const rows = shortKeyRows(plans);
+        const head = plan0.header || {};
+        const opts = {
+            size: (plan0.ctx && plan0.ctx.size) || req.size || 'L', look: (plan0.ctx && plan0.ctx.look) || 'ican', paper,
+            header: { tab: head.tab }, footer: { left: (plan0.footer && plan0.footer.left) || '', right: ['Key', res.seed !== undefined ? `seed ${res.seed}` : ''].filter(Boolean).join(' · ') },
+        };
+        const role = `${res.role || 'sheet'}`;
+        // B3 / B4 (critic r1): a group is headed with the name its pupil page prints - the tab's
+        // own label ("Practice A") and its page number when the sheet runs to several - and, in a
+        // printout of several sections, the section ("Section 2 · Add within 20").
+        const nameOf = (h) => {
+            const tabBox = /<div class="ws-tabbox">([\s\S]*?)<\/div>/.exec(h || '');
+            const spans = tabBox ? [...tabBox[1].matchAll(/<span>([^<]*)<\/span>/g)].map((m) => m[1].trim()).filter(Boolean) : [];
+            const foot = /<footer class="ws-foot"[^>]*>[\s\S]*?<b>([^<]*)<\/b>/.exec(h || '');
+            const nn = foot && /^(\d+)\/(\d+)$/.exec(foot[1].trim());
+            const name = spans.length ? spans[spans.length - 1] : '';
+            return { name, n: nn ? +nn[1] : 0, of: nn ? +nn[2] : 0 };
+        };
+        const title0 = /<div class="ws-title">([\s\S]*?)<\/div>/.exec(pupil[0] || '');
+        const titleText = title0 ? title0[1].replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim() : '';
+        const section = req.keySection ? [String(req.keySection), titleText].filter(Boolean).join(': ') : '';
+        let labels = rows.length === pupil.length ? pupil.map((h, i) => {
+            const { name, n, of } = nameOf(h);
+            const pageBit = of > 1 ? `page ${n} of ${of}` : '';
+            return [name, pageBit].filter(Boolean).join(', ') || `Page ${i + 1}`;
+        }) : null;
+        // two pages that print the same name (a lesson's two "Lesson 1" pages) are told apart
+        if (labels) {
+            const seen = {};
+            const total = labels.reduce((m, l) => Object.assign(m, { [l]: (m[l] || 0) + 1 }), {});
+            labels = labels.map((l) => (total[l] > 1 ? `${l}, page ${(seen[l] = (seen[l] || 0) + 1)} of ${total[l]}` : l));
+            if (section) labels = labels.map((l) => `${section} · ${l}`);
+        }
+        opts.pageLabel = (p) => (labels && labels[p - 1]) || (section ? `${section} · Page ${p}` : `Page ${p}`);
+        if (section) opts.footer.left = [String(req.keySection), opts.footer.left].filter(Boolean).join(' · ');
+        if (rows.length === pupil.length) groupsByPage = rows.map((r) => renderShortKey([r], opts).map((h, j) => decorateKey(h, j + 1, role)));
+        keyPages = renderShortKey(rows, opts).map((h, j) => decorateKey(h, j + 1, role));
+        res.shortRows = rows.map((r) => ({
+            page: r.page, heading: opts.pageLabel(r.page),
+            items: r.items.map((it) => ({ label: it.label, cell: it.cell, skill: it.skill, text: answerText(it), slots: (it.key && typeof it.key === 'object' && it.key.slots) || null })),
+        }));
+    }
+    let doc;
+    if (ko.placement === 'after-page') {
+        const perPage = groupsByPage || (keyPages.length === pupil.length ? keyPages.map((k) => [k]) : null);
+        if (perPage) {
+            // "Key n/N" on the page that follows pupil page n/N, so the dialog's run stays readable.
+            const N = pupil.length;
+            const keyed = perPage.map((list, i) => list.map((h, j) => h.replace(/(<footer class="ws-foot"[^>]*><span>[\s\S]*?<\/span><b>)([^<]*)(<\/b>)/,
+                (m, a, c, b) => `${a}${ko.style === 'short' ? `Key ${i + 1}/${N}${list.length > 1 ? ` (${j + 1})` : ''}` : `Key ${c}`}${b}`)));
+            if (ko.newSheet) {
+                // "Start each key on a new sheet" (owner 2026-10-09, double-sided printing): a blank
+                // back pads the run so every key starts on the front of a sheet, and the key keeps its
+                // sheet whole, so the next pupil page starts on a fresh sheet too.
+                const blank = blankBack(paperAttr);
+                const out = [];
+                const pad = () => { if (out.length % 2) out.push(blank); };
+                pupil.forEach((p, i) => { pad(); out.push(p); pad(); out.push(...keyed[i]); });
+                pad();
+                doc = out.join('\n');
+                res.blankBacks = out.filter((h) => h === blank).length;
+            } else doc = pupil.map((p, i) => [p, ...keyed[i]].join('\n')).join('\n');
+            keyPages = keyed.flat();
+        } else {
+            res.notes = (res.notes || []).concat('The key prints at the end: its pages do not match the pupil pages one to one.');
+            if (ko.newSheet) {
+                // critic r3 (N-3): a part that falls back to the end still keeps the sheets whole, so
+                // its key starts on a front and the next section never starts on a back
+                const blank = blankBack(paperAttr);
+                const nPages = (list) => list.reduce((n, h) => n + (String(h).match(/<section\b[^>]*\bclass="ws-page[ "]/g) || []).length, 0);
+                const out = [...pupil];
+                if (nPages(out) % 2) out.push(blank);
+                out.push(...keyPages);
+                if (nPages(out) % 2) out.push(blank);
+                doc = out.join('\n');
+                res.blankBacks = out.filter((h) => h === blank).length;
+            }
+        }
+    }
+    res.keyPages = keyPages;
+    res.keyHtml = keyPages.join('\n');
+    res.keyPageCount = keyPages.length;
+    res.docHtml = doc || [res.pupilHtml, res.keyHtml].filter(Boolean).join('\n');
+    return res;
 }
 
 /* ====================================================== the P7.2b roles (roles/index.js) */
@@ -2094,6 +2223,7 @@ async function buildRoleSheet(n, metaOf) {
     return {
         pupilHtml: out.pupilHtml,
         keyHtml: n.key ? out.keyHtml : '',
+        pupilPages: out.pupilPages, keyPages: n.key ? out.keyPages : [],
         pageCount: out.pupilPages.length,
         keyPageCount: n.key ? out.keyPages.length : 0,
         fits: { cols: f0.cols, rows: f0.rows, perPage: f0.perPage, pages: out.pupilPages.length, note: [line, ...notes.filter((t) => !line.includes(t))].filter(Boolean).join(' '), sections: fitsList },
@@ -2274,8 +2404,12 @@ async function buildLesson(n, metaOf) {
     const notes = [...new Set(sizeNote.concat(parts.flatMap((p) => p.res.notes || [])))];
     const PART_NAME = { chart: 'Anchor chart', teach: 'Lesson', practice: 'Practice', mixed: 'Mixed' };
     const line = parts.map((p) => `${PART_NAME[p.part]}: ${p.res.pageCount} page${p.res.pageCount === 1 ? '' : 's'}`).join(' · ');
+    const tagPages = (list, p) => { const ids = sheetIds(p); return (list || []).map((h, i) => tagSheets(h, i === 0 ? ids[0] : ids[1], ids[1])); };
     return {
         pupilHtml, keyHtml, pageCount, keyPageCount,
+        pupilPages: parts.flatMap((p) => tagPages(p.res.pupilPages, p)),
+        keyPages: n.key ? parts.flatMap((p) => tagPages(p.res.keyPages, p)) : [],
+        keyPlans: parts.flatMap((p) => p.res.keyPlans || [p.res.plan]),
         fits: { cols: teach.fits.cols, rows: teach.fits.rows, pages: pageCount, note: [`${line}.`, teach.fits.note].filter(Boolean).join(' '), sections: teach.fits.sections },
         items: parts.flatMap((p) => (p.res.items || []).map((it) => Object.assign({ part: p.part }, it))),
         // The problems the pupil does (lessons r3: the print panel counted every dealt pool item,

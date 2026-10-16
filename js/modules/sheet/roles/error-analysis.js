@@ -560,6 +560,15 @@ export function prepare(it, info = {}) {
     if (kind === 'line') (partsOfList(correct) || []).forEach((v, i) => { slots[`ea-ans-${i}`] = isWrong ? v : ''; });
     if (kind === 'choice') choice.labels.forEach((lab, i) => { slots[`ea-pick-${i}`] = isWrong && i === choice.correct ? '✓' : ''; });
     const key = slotKey(slots, correct);
+    // the short key's line (critic r1, B2): the judgement, and on a wrong item the fix
+    {
+        const fixOf = () => {
+            if (kind === 'choice') return String(choice.labels[choice.correct]);
+            if (kind === 'value' || kind === 'text') return String(fixText);
+            return String((it.key && it.key.display) || correct);
+        };
+        key.short = isWrong ? `${JUDGE_LABELS.fixIt}: ${fixOf()}` : JUDGE_LABELS.correct;
+    }
     const digitMm = (size) => ({ S: 6, M: 7, L: 8 }[size] || 8);
     // L3 (critic EA r5): a fix box as wide as the RIGHT answer gives it away ("10,000" is wider
     // than "9,000": round_nl 55 vs 47 mm). Its room comes from the numbers the question prints,
