@@ -160,13 +160,53 @@ neighbours keep the no-merge gap (gate). The overlay takes no space and changes 
   number (on a multi-digit number, one target per NUMBER, not per digit, because at 40 px two 44 px
   targets would overlap). A tap counts the **nearest mark that still has a touch left**
   (`touchDotNearest`), so a tap never misses and a pupil who touches a dot gets that dot.
+  **Column stacks are the exception: one target per DIGIT**, because column work counts each column
+  separately (the label reads "1: 1 touch dot. Tap to count."). **A 0 is no target** (it has no
+  marks to count).
+- A pointer tap counts **without taking the focus** (`preventDefault` on `pointerdown` /
+  `mousedown`), so the caret stays in the answer box and a digit typed next lands there. The active
+  box never pulls the focus off a touch numeral a keyboard user is counting on.
 - **Touched marks turn the one grey**: black = still to touch, grey = counted. A double takes two
-  taps: the first greys its centre dot, the second its ring. Nothing grows or moves.
-- The running count is shown quietly under the cell ("Touched 5 · 30" for count-by-6), outside the
-  B&W cell. **"Start again"** clears. **No timer.**
+  taps: the first greys its centre dot, the second its ring. **Nothing grows or moves**: the count
+  line's space is reserved from the start in every cell that has touch numerals, or whose ladder can
+  draw them (`data-mq-touch-floor`); on the online worksheet every such card draws at 40 px from the
+  start.
+- **The count line** (quietly under the cell, outside the B&W cell; **"Start again"** clears the live
+  cell; **no timer**). Owner rulings 2026-10-09:
+  - **×**: count-by language as the pupil touches. Before the first touch it asks "How much is
+    4 threes?"; then "3, 6, 9 (counting by threes)". The owner wants this even though the last count
+    equals the product.
+  - **+ / − count all** (every number dotted): the greys and Start again only. "Touched N" appears
+    **only after the pupil has answered** (a check or a ladder rung on that item), never before,
+    because the last count is the sum.
+  - **count on / count back** (one number dotted): "Touched N".
+  - **Column stacks count per column** (critic r4, lead ruling = owner question 1 option a): the line
+    shows only the column being touched ("Touched 4") and starts again when the pupil touches another
+    column; the greys stay. The ladder's touch rung on a stack speaks in column words ("Start with the
+    ones. Say the biggest number. Touch the dots and count on."), never the whole sum's numbers.
+  - × wording: "How much is 1 six?" (a singular list, not a stripped s); past twelve "How much is
+    7 groups of 70?". A long count-by run shows its last three counts ("… 700, 800, 900 (counting
+    by 100s)") so the line keeps to its reserved two lines.
+  - **Where the line sits.** Under the cell (below its lowest answer box, so a stack's answer row
+    never covers it). On the practice card and the quiz, numerals a LADDER rung brings put the line
+    on the ladder message's own row (message, count, Start again), so a wrong answer adds only that
+    row; the teacher's numerals keep the line under the cell from the start. Start again never wraps.
+  - The quiz counts as answered once its feedback line shows (count all then says "Touched N").
+  - The count follows the cell: a ladder redraw that resets the marks resets the line.
 - Keyboard: Tab to a number; Space / Enter counts the next mark in counting order
   (`touchDotOrder`). The number's button has an `aria-label` ("7: 7 touch dots. Tap to count."),
   and the count is in an `aria-live` region.
+- **Ladder over a teacher touch option** (owner 2026-10-09): when the item already shows the
+  teacher's touch marks, a wrong answer **keeps them** and adds the next support; the ladder never
+  swaps count-all for count-on. This holds on **every** skill (ruling (b), critic r4): the redraw
+  reads the teacher's touch ids from the first drawing (`data-mq-teacher`) and unions them into what
+  it draws, and the message says the "too" form: "Not yet. Now use the arrow too." 
+- **Built in** `js/modules/touch-tap.js` (installed from `globals.js`) for every touch numeral on the
+  practice card, the online worksheet and the quiz; CSS at the end of `css/screen-cell.css`
+  (`.mq-tn-hit`, `.mq-tn-count`); gate `node tests/scripts/ws-touch-tap.cjs` (a synthetic cell plus
+  the real card, worksheet and quiz at 1366 × 650 with touch).
+- **Follow-up (owner 2026-10-09, not built yet):** the ÷ tally dots become tappable later (44 px
+  targets, greys only). Today the ÷ tally row is not tappable.
 
 ### S1.9 API (`js/modules/sheet/touchdots.js`, pure, SCC-01)
 
@@ -175,20 +215,35 @@ neighbours keep the no-merge gap (gate). The overlay takes no space and changes 
 | `TOUCH_DOTS`, `TOUCH_DOTS_BOLD` | `{0..9: [{x, y, double}]}` in counting order |
 | `touchDots(d, weight)` | the table for a weight |
 | `touchDotCount(d)`, `touchDotOrder(d)` | counts (doubles 2) and the per-touch order `{mark, say, second}` |
-| `TOUCH_DOT_BASELINE_EM`, `TOUCH_DOT_TOP_EM` | 0.41 / −0.31 em from the line-box centre |
-| `TOUCH_DOT_SIZES`, `TOUCH_DOT_DEFAULT` | S / M / L, default M |
+| `TOUCH_DOT_BASELINE_EM`, `TOUCH_DOT_TOP_EM` | 0.415 / −0.31 em from the line-box centre |
+| `TOUCH_NUMERAL_SIZES` | the sizes touch numerals draw at (never below 24 pt / 40 px): paper 24 pt (fact floor) and 28 pt (L), screen 40 px (phone card, and the worksheet grid once raised), 48 px (card), 56 px (desktop) |
+| `TOUCH_DOT_SIZES`, `TOUCH_DOT_FLOOR_MM`, `TOUCH_DOT_FLOOR_PX` | rulings 9-11: single 0.16 em + keyline; double = 0.08 em dot on a white keyline (ck) in an open 0.23 em ring, line 0.03 em; floors paper {gap 0.3, rw 0.25, halo 0.15, ck 0.26} mm, screen {gap 2, rw 1.5, halo 1, ck 1.5} px |
 | `TOUCH_DOT_MIN`, `touchDotsFits(size, unit)` | 24 pt / 40 px |
-| `touchDotGeometry(opts)` | radii in em after the photocopy floors |
-| `touchDotsSVG(d, {em, unit, weight, ink, photocopy, size, halo, ring = 'open', counted, tappable})` | the overlay: absolute SVG, 1 × 1.15 em in CSS em, centred on the host span, no layout |
-| `touchDotsMarks(d, opts)` | the marks alone (em coordinates) for an SVG host (clock, coin) |
-| `touchDotsDigitHTML(ch, opts)` | a span's inner HTML: digit + overlay |
+| `touchDotGeometry(opts)` | radii in em after the floors |
+| `touchNumeralSVG(d, {em, unit, weight, ink: 'solid'\|'trace', photocopy, counted, tappable})` | **the touch numeral**: the Andika glyph path (`touch-glyphs.js`) plus its marks, absolute SVG centred on the host, sized in CSS em |
+| `touchNumeralHTML(ch, opts)` | the digit as a touch numeral: a span holding the real digit as transparent text (its exact width, baseline and text) and the numeral SVG over it. `touchDotsSVG` / `touchDotsDigitHTML` are aliases kept for old callers |
+| `touchDotsMarks(d, opts)` | the marks alone (1/1000 em, centre origin) |
 | `touchDotNearest(d, x, y, counted)` | the mark a tap counts |
 | `touchTallySVG(n, opts)` | the ÷ tally row |
 
-Host: the digit span takes `class="ws-td"` (`position: relative`, additive rule in
-`css/sheet-kit.css`) and the overlay as its last child. Paper `fact()` / `stack()` spans and the
-screen `factHTML()` / `stackHTML()` spans are one span per digit, so no template change is needed
-to host it (S3 wires it).
+**One unit (owner report 2026-10-03).** The earlier overlay drifted off the digit on screen (three
+dots clumped left of a 5). A touched digit is now one touch numeral: the real digit text with its
+marks centred on it: the touch points are generated once from the app's own Andika
+(`python3 tests/scripts/ws-touch-glyphs.py css/fonts/Andika-Regular.woff2 css/fonts/Andika-Bold.woff2
+js/modules/sheet/touch-glyphs.js`, open 4), normalised to the em box, with every touch point snapped to
+the stroke centre; the SVG scales per size. `support-draw.js` `touchDigit` / `touchNumberHTML`
+emit it for the fact, stack and equation templates on paper (pupil and key) and on every screen host.
+Only a single-digit number is ever a touch numeral in a fact or sentence (`touchNumbers`); a stack
+dots its digits column by column. The support ladder's touch rung swaps the numerals in on the
+card live, says how to use them from the item ("Say 7. Touch the dots on 6 and count on.";
+count back; count by for ×; one dot per count for ÷), and is dropped (with its message) when the
+cell could not draw them. The teacher's touch option applies in the quiz as in practice.
+Photocopy-safe sheets pass `photocopySafe` into the marks (solid black, wider gap).
+
+**Owner exception (2026-10-03, R2-4) to ruling 10:** on SCREEN the white outline round a SINGLE dot
+is a 0.5 px hairline (so the 4 and 5 strokes stay whole at standard resolution). Paper keeps the
+ruling-10 outline (>= 0.15 mm). The 6-9 centre-dot outline keeps its screen floor (1.5 px).
+Specimen: `node tests/scripts/ws-touchdots-specimen.cjs` → `design/audit/runs/touchdots/specimen.png`.
 
 ### S1.10 Tools and gate
 

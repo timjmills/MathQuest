@@ -164,6 +164,7 @@ function selectIfLoose(active) {
     }
     if (ae && ae !== document.body && ae !== document.documentElement && ae.matches) {
         if (ae.matches(TYPING) || ae.matches('button, a[href], select')) return;          // the pupil chose that
+        if (ae.matches('.ws-tn[data-mq-tn]')) return;   // a touch numeral the pupil is counting on with the keyboard (R3-1)
         // a focusable WRAPPER (a card, a cell) is a blank part of the problem: it does not hold the focus
         const inProblem = ae.closest(HOSTS + ', ' + POPUP) || ae.matches(HOSTS + ', ' + POPUP);
         if (ae.matches('[tabindex]:not([tabindex="-1"]), [role="button"]') && !inProblem) return;

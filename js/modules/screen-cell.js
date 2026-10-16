@@ -2647,16 +2647,23 @@ export function ringCellHTML(p) {
             // The long-division bracket, as the printed cell draws it (ops-counters.js): the
             // quotient box over the dividend, "R [ ]" beside it, the divisor against the arc and
             // the vinculum over the dividend. The two slots keep their order (quotient, remainder).
+            // Bracket hug (critic ldiv-hug R1 D-1): no column gap, so the arc's top stroke runs
+            // straight into the dividend's vinculum (the arc drops half its 2 px stroke to meet it),
+            // and the quotient box sits centred over the dividend without sizing its column
+            // (`contain: inline-size`), so the arc and the bar hug the digits. The boxes are sized
+            // from the dividend and the divisor, never the answer (SL-2).
+            const qw = Math.max(String(p.a).length, 2), rw = Math.max(String(p.b).length, 2);
             const arc = '<svg viewBox="0 0 10 40" preserveAspectRatio="none" aria-hidden="true" style="display:block;width:100%;height:100%;overflow:visible">'
                 + '<path d="M1.5 0 H10 M1.5 0 Q9 20 1.5 40" fill="none" stroke="#000" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>';
             const at = (c, r, inner, extra = '') => `<span style="grid-column:${c};grid-row:${r};display:flex;align-items:flex-end;justify-content:center;${extra}">${inner}</span>`;
             return (p.a <= 60 ? ringGroupsHTML(p.a, p.b) : '')
-                + `<div style="text-align:center"><div class="ws-eq mq-eq mq-remeq" data-mq-join=" R " role="group" aria-label="${attr(`${p.a} divided by ${p.b}`)}" `
-                + 'style="display:inline-grid;grid-template-columns:auto 0.55em auto auto auto;grid-template-rows:auto 1.3em;column-gap:0.15em;row-gap:0.12em;">'
-                + at(3, 1, cellSlot(w, 'quotient')) + at(4, 1, '<span class="mq-rlabel">R</span>') + at(5, 1, cellSlot(w, 'remainder'))
+                + `<div style="text-align:center"><div class="ws-eq mq-eq mq-remeq mq-rembrk" data-mq-join=" R " role="group" aria-label="${attr(`${p.a} divided by ${p.b}`)}" `
+                + 'style="display:inline-grid;grid-template-columns:auto 0.55em auto auto auto;grid-template-rows:auto 1.3em;column-gap:0;row-gap:0.12em;">'
+                + at(3, 1, cellSlot(qw, 'quotient'), 'contain:inline-size;')
+                + at(4, 1, '<span class="mq-rlabel">R</span>', 'padding:0 0.15em 0 0.6em;') + at(5, 1, cellSlot(rw, 'remainder'))
                 + at(1, 2, String(p.b), 'align-items:center;padding-right:0.1em;')
-                + `<span style="grid-column:2;grid-row:2;align-self:stretch;display:block">${arc}</span>`
-                + at(3, 2, String(p.a), 'align-items:center;border-top:2px solid #000;padding:0 0.15em;')
+                + `<span style="grid-column:2;grid-row:2;align-self:stretch;display:block;position:relative;top:1px">${arc}</span>`
+                + at(3, 2, String(p.a), 'align-self:stretch;align-items:center;border-top:2px solid #000;padding:0 0.12em;')
                 + '</div></div>';
         }
         return (p.a <= 60 ? ringGroupsHTML(p.a, p.b) : '')
