@@ -16,6 +16,16 @@ the owner's — keep. Follow-up for the first two goes with the skip_count grid/
 
 **Owner answers 2026-10-10:** (1) Lane D More Practice DN-2 lint compares item counts within one letter only (each letter is its own sheet); (2) number_families_mult gains a "6 × 6" band choice, default unchanged (share codes stable); (3) touch column stacks keep the greys of earlier columns; (4) "Touched N" stays on × stacks; (5) a search with no hits says "No skill teaches this yet".
 
+**Owner request 2026-10-10 (regroup boxes, build NEXT SESSION with Lane B):** on screen the needed regroup / carry boxes are required and marked; a right subtraction regroup number crosses out the old top digit live (78 − 29: 7 → 6, 8 → 18); addition carries a 1, no crossing; paper unchanged; per-skill option marked (default) / unmarked / optional. Spec: `design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md`.
+
+**Owner request 2026-10-10 (placevalue:identify, NEXT SESSION):** pupils also WRITE the value of the underlined digit on a line at the bottom of the cell (132 → 30); new appended option `writeValue`, default on; key shows ring + value in orange; screen adds a value box. Spec: `design/audit/runs/next-session/PV-IDENTIFY-WRITE-VALUE-SPEC.md`.
+
+**Owner ruling 2026-10-10 (WRM coverage):** keep ALL White Rose skills/steps even when they go beyond CCSS (24-hour clock, Roman numerals, above-grade steps, 11/12 times-tables …): every step is covered or gets a build proposal; beyond-CCSS ones may be lower priority but are never dropped. Also owner: Y4 tagger questions answered by this ruling (build 24-hour clock + roman_100; keep 11/12 tables). Owner also: YES to a one-direction option on `improper_mixed` (mixed → improper only / improper → mixed only; default both), and the one-exchange / two-or-more-exchanges option on every regroup band. Owner also: keep ALL times-tables and extend them up to 15 (13, 14, 15 × and ÷ tables on every times-table / division-fact skill and the tables picker; add as a build item `tables_to_15`, option on the existing skills; share codes stable — append only). Owner also: KEEP the 24-hour clock (build it); Roman numerals go all the way to large numbers (a `roman_numerals` skill with bands to 12 / 100 / 1,000 / 3,999, both directions — not only to 100).
+
+**Owner answers 2026-10-10 (recommended answers accepted):** White Rose / MAP pages — the MAP page opens on "Practise by task" (old start links open the test tab); "Skills to be made" has no sidebar entry (linked from White Rose, MAP and Home); "Other (drawing / repair)" items stay on the list behind a filter; Grade 6+ and "Grade not set" items show at the end; the MAP audit checks the REP_PAIRS map. Tagging — money stays US dollars and cents; above-grade WRM steps tagged as WRM with pages defaulting to the smallest bands; build `equal_sign_repair` before `compare_sentences`; "Convert pounds and pence" becomes dollars and cents; adding fractions offered at Grade 2 (same denominator, sum ≤ 1); `share_group` steps that are doubles / 3-part bonds / change-unknown move to the new proposals; oral steps stay partial, closed by `oral_count`; Reception "Make connections" is the mixed-review page and keeps a build; Kindergarten money defaults to US bills; build `time_talk` (days, then months); the two KG CCSS shape lessons stay on the CCSS build list; small-number windows use one `focus` option; multiples-from-0 is an option on the `seq_*` skills; `add_wp_10` gets a Kindergarten `k_story` layout; count_edges_faces_vertices should follow WRM (2 flat faces + 1 curved surface on a cylinder); the answer-key Print button may wrap at 1366.
+
+**PAUSED 2026-10-10 (owner wind-down):** small-fixes lane — branch `claude/sweet-newton-c8wrv1-wip-small-fixes` @ 135365f9 (critic r5 FAIL on N13 only; c957695d fixes N13/N14 but is unreviewed; a round-6 builder was mid "large-number boxes" when stopped — that unsaved edit is lost); next: critic r6, then merge. Lane D @ b6256e9d (r10 density patch applied UNVERIFIED; owner answers built). Fraction key @ 7a6c3d58 (critic r4 not run). Skip-count @ 6953c02e (critic r1 FAIL: Chromebook row wrap D1–D3, "skiping" title D4, Model steps D5; D6 lesson packet → lessons wave). Lane B held. Number line @ 23ef2ac9 (critic r7 FAIL C1 7: R6-D1 dots fixed; NEW R7-D1 — timed sessions at 1280x600 scroll the band under the sticky header because question-render.js focuses the answer box without preventScroll (~line 5547); add a timed 1280 gate case measuring the band against the header bottom; then critic r8, merge). Answer keys: critic r5 running at pause time.
+
 **Owner plan 2026-10-09 (night):** finish every Wave 1 lane EXCEPT Lane B answer boxes (held — next push), deploy each as it
 passes, finish the print backlog (Lane D), then STOP. Lane B stays on its wip branch (af686f163db04a00a), last critic r5 FAIL.
 
@@ -215,9 +225,22 @@ Gate failures and load numbers measured before this fix (~12:30 UTC) are not tru
 
 - 2026-10-02 Wave 1 Lane C fix round 5: builder escalated to Opus low (builder ladder step 2 per the brief) - the ten-column chart's desktop digit size failed critic rounds 3 and 4 and the Sonnet-medium builder reported pre-fit-pass numbers (33.4 px vs 15.36 px rendered).
 - 2026-10-03 Wave 1 Lane C2 fix round 8: builder escalated to Opus medium (the ceiling) - the phone count-row first view / first focus failed critic rounds 5, 6 and 7 (C1 = 7) with Opus-low builders.
+- 2026-10-09 Wave 1 lane "Touch numerals" round 5: builder escalated to Opus medium (the ceiling) - the screen hosts failed critic rounds 1 to 4 (teacher dots dropped on a wrong answer, stack Start again covered, column wording, quiz count-all line).
+- 2026-10-09 Wave 1 lane "Answer-key options" (4.4) fix round 4: builder escalated to Opus medium (the ceiling) - the key-ink tagging failed critic rounds 1, 2 and 3 (r3: design 6 - given lines and boxes orange on 215 skills, two keys all black, stroked disk numerals).
 - 2026-10-09 Wave 1 lane "Search terms for every skill" (`a21ec3ef403026c80`) fix round 6: builder escalated to Opus medium (the ceiling) - the "Showing results for" correction notice failed critic rounds 1 to 5 (r5: no regression 7, the Navigator notice truncated at Chromebook size and the student notice lost on "+" / refocus).
 
 - 2026-10-10 small fixes lane, item 7 (Opener count-row fit) fix round 6: builder escalated to Opus medium (the ceiling) - critic rounds 1-5 each failed the Opener's fit (D5, N3/N4, N8/N9, N12, N13) with Opus-low builders.
+
+### Answer-key options (4.4): open after critic r4 (recorded 2026-10-10, fix round 5 fixed R4-1 only)
+
+- **N-6 (open, pre-existing)**: the Scripted Model key page is a plain copy of the pupil page: "Name" in the header,
+  no "Answer Key" marker, no "Key" in the footer. Nothing to colour, but it can be handed out by mistake. Give it the
+  key header and footer like every other key.
+- **N-7 (open, legacy)**: on legacy word problems the copy key stamps the answer as small "Answer: 4" text under the
+  line instead of on it; on the Opener `area` Model the traced "20" is replaced by the stamp. Colours are right; size
+  and placement belong to the legacy-migration work.
+- **N-5 (for the lessons wave, Wave 8/9)**: the `nl_add` Lesson anchor chart number line runs past the cell and its
+  labels overlap ("110121132143154"); the Say frame reads "10 plus 10 equals 10." while the steps say "You land on 20".
 
 ## 10. Wave 8 (lessons) — word-problem lesson pages, found 2026-10-03 and left as on main
 
@@ -241,3 +264,7 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
   half cell; the key's answer digits need about 4 mm more row height than the pupil page.
 - 2026-10-09 div_facts forms fix round 3: builder escalated to Opus medium (the ceiling) - Mix at size L wasted space (critic R1 D14, R2 D-A) survived two Opus-low rounds.
 
+- 2026-10-10: answer-key options deployed (e58f15fa via 498d8710): critic r5 PASS, full gates green (c2phone passed on rerun, print-lint at its 463/33 baseline), stamp OK, live serves the new modules.
+- 2026-10-10 White Rose page (recommended answers kept, per owner): the 13 lessons that map to another year's WRM step stay mapped and are listed in MAPPING_REPORT; Kindergarten's two duplicate titles (1 more, 1 less; Partition into tens and ones) resolve to the nearest block.
+- 2026-10-10: WRM tagging Y4 PASSED critic r13 (every graded step 9, no defects; independent merge simulation 0 problems; build reproducible). Lane frozen after three optional tidy-ups; waits for the lead merge.
+- 2026-10-10: WRM tagging R + Y1 PASSED critic r12 (both 8.00, every graded step 8; independent merge simulation 0 problems). Lane frozen after four text tidy-ups; waits for the lead merge.

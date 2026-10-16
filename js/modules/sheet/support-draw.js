@@ -19,7 +19,7 @@
 //
 // Pure module (SCC-01).
 
-import { touchDotsSVG, touchTallySVG, touchDotsFits } from './touchdots.js';
+import { touchNumeralHTML, touchTallySVG, touchDotsFits } from './touchdots.js';
 import { PANES, placePane, attachPane, PANE_GAP_MM } from './cells/panes/index.js';
 import { TOUCH_IDS, CUE_IDS, alternativesOf } from './supports.js';
 import { installSupportDrawer } from './registry.js';
@@ -57,6 +57,15 @@ const digitsOf = (n) => String(n).replace(/[^0-9]/g, '');
  * Returns {a: bool, b: bool}.
  */
 export function touchNumbers(p, mode = touchMode(p)) {
+    // Scope (owner report 2026-10-03): a touch numeral stands for its own value, so only a
+    // SINGLE-DIGIT number is ever drawn as one in a sentence or a fact (a 12 is not 1 + 2 counts).
+    // Column stacks dot their digits column by column instead (touchColumns).
+    const r = touchNumbersRaw(p, mode);
+    const one = (v) => /^[0-9]$/.test(String(v).trim());
+    return { a: r.a && one(p.a), b: r.b && one(p.b) };
+}
+
+function touchNumbersRaw(p, mode) {
     const none = { a: false, b: false };
     if (!mode) return none;
     const op = opKey(p.op), a = Number(p.a), b = Number(p.b);
@@ -101,19 +110,22 @@ export function touchColumns(rows, T, op, mode) {
 }
 
 /** The overlay options for a digit printed at `pt` points (or px on screen). */
-export const touchOpts = (em, unit = 'pt', ink = 'solid') => ({ em, unit, ink, label: false });
+export const touchOpts = (em, unit = 'pt', ink = 'solid', photocopy = false) => ({ em, unit, ink, label: false, photocopy: !!photocopy });
 
-/** One digit span with its touch dots: the digit, then the overlay; the span is `position:relative`. */
+/**
+ * One digit track's span with the digit AS a touch numeral (touchdots.js): the touch numeral
+ * replaces the plain digit in place, same width and baseline, so the cell never moves.
+ */
 export function touchDigit(ch, on, o) {
     if (!on || !/^[0-9]$/.test(String(ch))) return null;
-    return `<span class="ws-td" data-ws-touch="1">${ch}${touchDotsSVG(ch, o)}</span>`;
+    return `<span>${touchNumeralHTML(ch, o)}</span>`;
 }
 
 /** A whole number, one span per digit, with touch dots when `on` (equation sentences, screen). */
 export function touchNumberHTML(n, on, o) {
     const s = String(n);
     if (!on) return s;
-    return [...s].map((ch) => (/[0-9]/.test(ch) ? `<span class="ws-td" data-ws-touch="1">${ch}${touchDotsSVG(ch, o)}</span>` : ch)).join('');
+    return [...s].map((ch) => touchNumeralHTML(ch, o)).join('');
 }
 
 /** Can this digit size carry dots? (24 pt paper, 40 px screen, SUPPORTS.md §S1.6.) */

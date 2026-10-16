@@ -318,3 +318,67 @@
 /* Wave 1 lane C (owner 2026-10-02, all twelve tables on one page): the compact count-by cell trims its
    vertical padding (row chrome), never its digits. Additive. */
 :is(.ws-page, .ws-sheet) .ws-cell.ws-cell-compact { padding-top: 1.5mm; padding-bottom: 1.5mm; }
+
+/* ---------- INK-31: the answer-key ink (Wave 4.4, owner 2026-10-03) ----------
+   Key answers only: reddish orange #C2410C (5.2:1 on white; luma ~98/255, so a mono copy prints
+   it as a dark grey, darker than the trace grey #949494). Pupil pages, the key's copy of the
+   question and traced (grey) model answers are unchanged. */
+.ws-page.ws-key { --ws-key-ink: #c2410c; }
+/* Critic r1 (B1): the ink goes ONLY on marks tagged `data-ws-key-ans` (print-sheet.js arrangeKey ->
+   key-short.js tagKeyAnswers): what the pupil writes, ticks or fills. A given claim, the made-up
+   pupil's work, a worked example and every printed number keep their ink. A slot that WRAPS
+   printed content (a choice of pictures, a drawing zone, a row of clock faces) colours only its
+   own mark, never the printed content inside it. */
+.ws-page.ws-key [data-ws-key-ans]:not([data-ws-shape="choice"], [data-ws-shape="draw"], [data-ws-shape="check"]:has(*), [data-ws-key-mark]),
+.ws-page.ws-key [data-ws-key-ans]:not([data-ws-shape="choice"], [data-ws-shape="draw"], [data-ws-shape="check"]:has(*), [data-ws-key-mark]) :not(svg):not(svg *):not(.mq-pupil):not(.mq-pupil *) { color: var(--ws-key-ink) !important; }
+.ws-page.ws-key svg [data-ws-key-ans]:not([stroke="none"]):not([data-ws-key-fill]),
+.ws-page.ws-key svg[data-ws-key-ans] :is(line, path, polyline, circle):not([stroke="none"]):not([stroke="#fff"]) { stroke: var(--ws-key-ink) !important; }
+.ws-page.ws-key svg :is(text, tspan)[data-ws-key-ans],
+.ws-page.ws-key svg[data-ws-key-ans] :is(text, tspan) { fill: var(--ws-key-ink) !important; }
+.ws-page.ws-key .ws-choice[data-ws-key-ans] { outline-color: var(--ws-key-ink) !important; }
+/* A drawn answer (shade the model, build the blocks): the shading the pupil would add is the key
+   ink; the printed stimulus inside the zone (the fraction to shade) stays black. */
+.ws-page.ws-key [data-ws-shape="draw"][data-ws-key-ans] svg [fill="#949494"] { fill: var(--ws-key-ink) !important; }
+
+/* ---------- the short answer key (Wave 4.4) ---------- */
+.ws-skey { display: flex; flex-direction: column; gap: 2mm; font-family: 'Andika', sans-serif; line-height: 1.25; }
+.ws-skey-h { font-weight: 700; font-size: 1.05em; border-bottom: var(--ws-hair) solid var(--ws-ink); padding-bottom: .5mm; margin-bottom: 1mm; }
+.ws-skey-grid { display: grid; gap: 1mm 3mm; align-items: center; }
+.ws-skey-it { display: flex; align-items: baseline; gap: 1.5mm; min-width: 0; break-inside: avoid; }
+.ws-skey-lab { flex: none; font-weight: 400; color: var(--ws-ink); }
+.ws-skey-ans { font-weight: 700; overflow-wrap: anywhere; }
+.ws-skey-frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1; font-size: .85em; margin: 0 .3mm; }
+.ws-skey-frac > span:first-child { border-bottom: var(--ws-hair) solid currentColor; padding: 0 .6mm .2mm; }
+.ws-skey-frac > span:last-child { padding-top: .2mm; }
+.ws-skey-none { margin: 0; }
+
+/* Critic r2 (R2-1, owner ruling 2026-10-09: a drawn answer is fully orange): a mark the key ADDS that
+   its pupil twin lacks (`data-ws-key-add`: a counter, a block, a disk, a tick, a ring, a jump and its
+   label, a placed dot) is the answer: its strokes, its solid fills and its text take the key ink, the
+   whole mark. Given content is never tagged and stays black. Additive. */
+.ws-page.ws-key [data-ws-key-add],
+.ws-page.ws-key [data-ws-key-add] :not(.mq-pupil):not(.mq-pupil *) { color: var(--ws-key-ink) !important; outline-color: var(--ws-key-ink) !important; border-color: var(--ws-key-ink) !important; }
+.ws-page.ws-key svg [data-ws-key-add]:not([stroke="none"]):not(text):not(tspan),
+.ws-page.ws-key svg[data-ws-key-add] :not([stroke="none"]):not(text):not(tspan),
+.ws-page.ws-key svg [data-ws-key-add] :not([stroke="none"]):not(text):not(tspan) { stroke: var(--ws-key-ink) !important; }
+.ws-page.ws-key svg [data-ws-key-add]:not([fill="none"]):not([fill="#fff"]):not([fill="#ffffff"]):not([fill="white"]):not(g),
+.ws-page.ws-key svg[data-ws-key-add] :not([fill="none"]):not([fill="#fff"]):not([fill="#ffffff"]):not([fill="white"]):not(g),
+.ws-page.ws-key svg [data-ws-key-add] :not([fill="none"]):not([fill="#fff"]):not([fill="#ffffff"]):not([fill="white"]):not(g) { fill: var(--ws-key-ink) !important; }
+/* the answer dot / ring of a number line (R2-6): the whole dot, centre too */
+.ws-page.ws-key svg [data-ws-key-ans]:is(circle, ellipse):not([fill="none"]):not([fill="#fff"]):not([fill="white"]) { fill: var(--ws-key-ink) !important; }
+/* critic r2 (R2-2): the short key's Guided Practice / Practice sub-headings. Additive. */
+.ws-skey-sub { font-style: italic; margin: .5mm 0 .5mm; }
+/* the same given restyled on the key: only the new paint is the answer - a shaded part's fill, a
+   ringed choice's border - its content stays black (critic r2, R2-1). Additive. */
+.ws-page.ws-key svg [data-ws-key-fill] { fill: var(--ws-key-ink) !important; }
+.ws-page.ws-key [data-ws-key-mark] { border-color: var(--ws-key-ink) !important; outline-color: var(--ws-key-ink) !important; }
+/* critic r3 (R3-3): SVG stroke is inherited, so the key ink's stroke on an added or answered group
+   reached its text ("100", "10", "1" on the disks printed as blobs). Text never takes a stroke it
+   did not draw itself: only its fill is the key ink. Additive. */
+.ws-page.ws-key.ws-key.ws-key svg :is([data-ws-key-add], [data-ws-key-ans]) :is(text, tspan):not([stroke]),
+.ws-page.ws-key.ws-key.ws-key svg[data-ws-key-add] :is(text, tspan):not([stroke]),
+.ws-page.ws-key.ws-key.ws-key svg[data-ws-key-ans] :is(text, tspan):not([stroke]),
+.ws-page.ws-key.ws-key.ws-key svg :is(text, tspan):is([data-ws-key-add], [data-ws-key-ans]):not([stroke]) { stroke: none !important; }
+/* owner 2026-10-09: the blank back of a key-on-a-new-sheet run carries one very small line in the
+   footer band's centre cell (6 mm band, 7 pt, regular, black), level with the facing pages' footers. Additive. */
+.ws-page.ws-blank-back .ws-blank-foot > .ws-blank-note { font-weight: 400; color: var(--ws-ink); text-align: center; white-space: nowrap; }

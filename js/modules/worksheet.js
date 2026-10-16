@@ -1,4 +1,4 @@
-import { worksheetLadderWrong, markTried } from './support-ladder.js';
+import { worksheetLadderWrong, markTried, rungsFor } from './support-ladder.js';
 import { state } from './state.js';
 import { skipAfterFor } from './skip-rule.js';
 import { isOrderFreeFamily, familyBoxVerdict } from './number-family-check.js';
@@ -1509,6 +1509,14 @@ function _wsRenderCard(grid, q, i) {
     // The cell: screen-only captions go, the question line reads first and is said once,
     // and everything inside is held to ink, paper and grey (INK-1), widgets included.
     const cellEl = card.querySelector('.ws-cell');
+    // SF-34 (touch round 2): when this item's ladder can draw touch numerals, the grid takes the
+    // 40 px touch digit from the start, so no cell grows mid-ladder.
+    try {
+        if (kind && rungsFor(q, { categoryId: state.category, skillId: state.skill }).some((r) => r.id === 'touch' || r.id === 'touchall')) {
+            const sc = card.querySelector('.ws-card-visual.mq-scell');   // R3-3: THIS card's own cell
+            if (sc) sc.setAttribute('data-mq-touch-floor', '1');
+        }
+    } catch (e) { /* optional */ }
     if (cellEl) {
         if (!kind) _wsTidyLegacyCell(cellEl);
         if (!kind) wireTickBoxes(cellEl, q, document.getElementById(`ws_input_${i}`));
