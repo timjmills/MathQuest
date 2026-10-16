@@ -1,0 +1,7 @@
+ok   multiplication:mixed_multiplication M
+ok   subtraction:mixed_subtraction M
+ok   counting_mixed:counting_all M
+ok   composing:mixed_composing M
+ok   addition:add_sub_10s M
+ok   division:missing_mult_div M
+ws-sheet-determinism: OK
