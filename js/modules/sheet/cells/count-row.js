@@ -317,6 +317,9 @@ const IN_MM = 7.5;          // the lane a line starts with when the step tab sta
  */
 const LINE_GAP_MIN = { paper: 2 * 1.0 + 3, compact: 2 * 1.0 + 3 };   // a 3 mm arrow (head 2.4 mm), 1 mm clear each side
 const LINE_GAP_MAX = 10;
+/** Screen wrap (critic r8): the widest number's width in em (digits 0.56 em, separators 0.3 em), and the gap of a wrapping row. */
+const wrapEm = (p) => Math.max(1, ...(p.values || []).map((v) => { const t = fmt(v); const d = t.replace(/\D/g, '').length; return d * 0.56 + (t.length - d) * 0.3; }));
+const WRAP_GAP = 4.6;
 function linesGeom(p, ctx, c) {
     const { size, n, tabBody, tab, live, lblPt: lblPt0, lblChars, hasLbl } = c;
     const chars = maxDigits(p);
@@ -330,6 +333,14 @@ function linesGeom(p, ctx, c) {
     // lines narrow (digits down to FLOOR_PT) before the row splits. At M and L, and on the one-page sheet, a row never shrinks
     // its digits or tab below the size's working size - it takes two lines of six. On SCREEN Lines wraps 6 + 6 like Boxes.
     const mayNarrow = !twin && !p.compact && size === 'S';
+    // critic r8 D3 (SL-3a): above a phone (`twinWrap`) a Lines row is ONE wrapping line at today's digits, each line as wide as
+    // the widest answer, and the screen scales it to the host's digit size (as the Boxes row does): it wraps, never swipes
+    if (twin && p.twinWrap && !(Number(p.twinGapPx) > 0) && narrowCols(p, ctx) === 1 && !p.compact) {
+        const wW = Math.max(7, wrapEm(p) * basePt * PT_MM + 2.4), gW = WRAP_GAP;
+        const h0 = S(ctx).writeMm + 1;
+        const lblPtW = hasLbl ? Math.max(8, Math.min(lblPt0, (wW + gW - 0.8) / (Math.max(1, lblChars) * 0.6 * PT_MM))) : lblPt0;
+        return { size, n, look: 'arcs', shape: 'box', w: wW, h: h0, pitch: wW + gW, gap: gW, tab, tabBody, perRow: n, rows: 1, arcH: 0, pt: basePt, tabPt: basePt, hasLbl, lblH: hasLbl ? lblPtW * PT_MM * 1.2 + 0.9 : 0, lblPt: lblPtW, compact: false, lines: true, wrap: true };
+    }
     if (twin) perRow = n >= 13 ? 5 : Math.ceil(n / 2);
     else if (gapFor(n, w, false) < minGap && n <= 12 && mayNarrow) {
         const w1 = (live - tab - (n - 1) * minGap) / n, pt1 = (w1 - 2.4) / (chars * 0.56 * PT_MM);
@@ -390,12 +401,16 @@ function arcsGeom(p, ctx, c) {
         const avail0 = live - tab - (rows > 1 ? EXIT_MM : 0);
         const kS0 = shape === 'hex' || shape === 'mixed' ? 1.12 : 1;
         const need0 = Math.max(MIN_BOX[size], chars * 0.56 * basePt * PT_MM + 2.4);
-        if ((avail0 + MIN_GAP) / perRow - MIN_GAP < need0 * kS0) {
-            const w = Math.max(MIN_BOX[size], chars * 0.56 * basePt * PT_MM + 3);
+        // critic r8 D2: EVERY desktop row is drawn this way (a row that fits as well), so every count row on a host is at that
+        // host's digit size and the cards of one skill match; the line wraps only where the cell is too narrow, never swipes
+        if (p.twinWrapAll || (avail0 + MIN_GAP) / perRow - MIN_GAP < need0 * kS0) {
+            // the box holds the widest number as written (digits 0.56 em, separators 0.3 em) plus a margin; the gap keeps a
+            // short jump arrow with 1 mm clear each side, so three or more numbers stand on a line of the host's cell
+            const w = Math.max(1.9 * basePt * PT_MM, wrapEm(p) * basePt * PT_MM + 2.4);   // a short number keeps a box of 1.9 em
             const sz = shape === 'box' ? { w, h: baseH } : tileSize(shape === 'mixed' ? 'hex' : shape, w, baseH);
-            const lblPt = hasLbl ? Math.max(8, Math.min(lblPt0, (sz.w + MIN_GAP - 0.8) / (Math.max(1, lblChars) * 0.6 * PT_MM))) : lblPt0;
+            const lblPt = hasLbl ? Math.max(8, Math.min(lblPt0, (sz.w + WRAP_GAP - 0.8) / (Math.max(1, lblChars) * 0.6 * PT_MM))) : lblPt0;
             const lblHh = hasLbl ? lblPt * PT_MM * 1.2 + 0.9 : lblH;
-            return { size, n, look: 'arcs', shape, w: sz.w, h: sz.h, pitch: sz.w + MIN_GAP, gap: MIN_GAP, tab, tabBody, perRow: n, rows: 1, arcH: 0, pt: basePt, hasLbl, lblH: lblHh, lblPt, compact: false, wrap: true };
+            return { size, n, look: 'arcs', shape, w: sz.w, h: sz.h, pitch: sz.w + WRAP_GAP, gap: WRAP_GAP, tab, tabBody, perRow: n, rows: 1, arcH: 0, pt: basePt, hasLbl, lblH: lblHh, lblPt, compact: false, wrap: true };
         }
     }
     const avail = live - tab - (rows > 1 ? EXIT_MM : 0);        // the width the numbers of one line may fill

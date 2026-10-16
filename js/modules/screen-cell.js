@@ -1665,12 +1665,30 @@ function wireSwipeRows(cellEl) {
                 cues.querySelectorAll('.k2-swipe-cue, .k2-swipe-back').forEach((x) => { x.style.fontSize = nf; });
             }
         };
+        // critic r8 D1: the wrapping line takes as many numbers as the cell holds, in even lines (12 -> 6 + 6, 4 + 4 + 4,
+        // 3 + 3 + 3 + 3), so no line is left with one or two numbers
+        const balanceWrap = () => {
+            const ln = w.querySelector('.k2-countrow-line [data-mq-wrapped]');
+            const its = items();
+            if (!ln || its.length < 2) return;
+            ln.style.maxWidth = '';
+            const a = its[0].getBoundingClientRect(), b = its[1].getBoundingClientRect();
+            const pitch = b.left - a.left, gap = pitch - a.width;
+            if (!(pitch > 0)) return;
+            const cellEl2 = frame.closest('.mq-scell');
+            const lr = ln.getBoundingClientRect(), pad = parseFloat(getComputedStyle(ln).paddingLeft) || 0;
+            let right = w.getBoundingClientRect().right;
+            if (cellEl2) { const cr = cellEl2.getBoundingClientRect(), cs = getComputedStyle(cellEl2); right = Math.min(right, cr.right - parseFloat(cs.paddingRight || 0) - parseFloat(cs.borderRightWidth || 0)); }
+            const k = Math.max(1, Math.floor((right - lr.left - pad + gap + 0.5) / pitch));
+            const per = Math.ceil(its.length / Math.ceil(its.length / k));
+            ln.style.maxWidth = `${Math.ceil(pad + per * pitch - gap + 1)}px`;
+        };
         const mode = () => {
             if (!frame || !body) return;
             frame.removeAttribute('data-mq-swipes'); w.style.width = ''; frame.style.minWidth = ''; w.style.maxWidth = ''; w.style.overflowX = 'auto'; body.style.paddingRight = '0px';
             // critic r7 O9: a wide row drawn as one wrapping line (desktop / tablet, count-row.js) never swipes: its step tab
             // stands above it and the line wraps to the cell's width
-            if (body.dataset.mqWrap === '1') { frame.setAttribute('data-mq-swipes', ''); w.style.overflowX = 'visible'; w.style.width = '100%'; level(); return; }
+            if (body.dataset.mqWrap === '1') { frame.setAttribute('data-mq-swipes', ''); w.style.overflowX = 'visible'; w.style.width = '100%'; balanceWrap(); level(); return; }
             const its = items();
             const fw = frame.parentElement ? frame.parentElement.getBoundingClientRect().width : frame.getBoundingClientRect().width;
             if (body.getBoundingClientRect().width + col.getBoundingClientRect().width <= fw + 1 || its.length < 2) { level(); return; }
@@ -1701,6 +1719,19 @@ function wireSwipeRows(cellEl) {
         };
         mode();
         window.addEventListener('resize', mode);
+        // a wrapping row re-balances when its cell settles (fonts, the card's own layout passes)
+        if (body && body.dataset.mqWrap === '1' && typeof ResizeObserver !== 'undefined') {
+            let lastW = -1;
+            const ro = new ResizeObserver(() => {
+                if (!w.isConnected) { ro.disconnect(); return; }
+                const c = frame.closest('.mq-scell') || w;
+                const it0 = items()[0];
+                const cw = `${Math.round(c.getBoundingClientRect().width)}:${it0 ? Math.round(it0.getBoundingClientRect().width) : 0}`;
+                if (cw !== lastW) { lastW = cw; balanceWrap(); level(); }
+            });
+            ro.observe(frame.closest('.mq-scell') || w);
+            if (items()[0]) ro.observe(items()[0]);
+        }
         const upd = () => { level(); lastSL = w.scrollLeft; w.toggleAttribute('data-mq-scrolled', w.scrollLeft > 1); w.toggleAttribute('data-mq-end', !moreRight()); };
         w.addEventListener('scroll', upd, { passive: true });
         window.addEventListener('resize', upd);
@@ -3051,7 +3082,7 @@ export function countRowTwin(q, { phoneGap = true } = {}) {
         || !/class="k2-twin"/.test(String(q.visual || ''))) return q;
     const phone = window.innerWidth <= 480;
     if (phone && !phoneGap) return q;
-    try { return Object.assign({}, q, { visual: k2Twin('count-row', Object.assign({}, q.cell.payload, phone ? { twinGapPx: 24 } : { twinWrap: true })) }); } catch (e) { return q; /* keep the stored twin */ }
+    try { return Object.assign({}, q, { visual: k2Twin('count-row', Object.assign({}, q.cell.payload, phone ? { twinGapPx: 24 } : { twinWrap: true, twinWrapAll: true })) }); } catch (e) { return q; /* keep the stored twin */ }
 }
 
 export function screenTwin(q, { categoryId = '', typedOrder = false } = {}) {

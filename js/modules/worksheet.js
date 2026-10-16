@@ -1567,6 +1567,9 @@ function _wsRenderCard(grid, q, i) {
         // a ten-column number chart keeps rows of ten at the host's digit size: its card takes the whole row
         const _chartRow = cellEl.querySelector('.k2-chart tr');
         if (_chartRow && _chartRow.children.length === 10) { card.classList.add('mq-span-row'); card.dataset.mqSpan = '1'; }
+        // critic r8 D1/D2: a count row drawn as one wrapping line (desktop / tablet) takes the worksheet's wide card, so it wraps
+        // several numbers to a line at the host's 29 px, and every count-row card of the skill is the same width
+        if (cellEl.querySelector('.k2-countrow-body[data-mq-wrap="1"]')) { card.classList.add('mq-span-row'); card.dataset.mqSpan = '1'; }
         if (twin) {
             const inp = document.getElementById(`ws_input_${i}`);
             wireRingGroups(cellEl);
