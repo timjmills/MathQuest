@@ -130,6 +130,9 @@ const FIRST = [
 const OWN = { 'Y5.B14.S4': ['customary units'],
   // Y5.B12.S11 Divide by 10, 100 and 1,000 (W10): its own title makes thousandths (439 ÷ 1,000 = 0.439)
   'Y5.B12.S11': ['thousandths'],
+  // Y5.B4.S17 Subtract two mixed numbers (W16) is taught before the school's W17 unlike-denominator addition: it is itself the
+  // first related-denominator lesson (round 5, after the PR #8 denoms fix made sub_mixed_unlike {denoms:[2]} its full direct)
+  'Y5.B4.S17': ['unlike denominators ±'],
   // the site's three customary lessons (W30-W31) ARE the school's first customary-unit lessons
   'G4|-|customarycapacitycupspintsquartsandgallons': ['customary units'],
   'G4|-|customarylengthandweightinchesfeetyardsouncesandpounds': ['customary units'],

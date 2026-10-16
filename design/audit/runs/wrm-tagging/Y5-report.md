@@ -1,3 +1,129 @@
+# Wave 2 tagging: Year 5 (US Grade 4) — round 5: critic r6 rows + root-cause sweep (2026-10-16)
+
+Critic r6 (FAIL narrowly: steps 7.94 with B15.S4 / B15.S1 / B15.S3 = 7; lessons 7.95 with lesson 7 and lesson 10 = 7). Builder
+**escalated to Opus medium** (false whys / unit-mismatched links survived rounds 2-4; recorded in `design/STATUS.md`). Every row
+is fixed at the source: `linkfit.mjs`, the new `claims.mjs` (claim rules) and `sweep.mjs` (the sweep), `build.py` pass 3b, and
+`spec_zz_r6.py` (applied after `spec_zz_r5.py`). The branch also merges `origin/claude/sweet-newton-c8wrv1` (PR #8 generator
+fixes, f18041bd) and re-judges the fraction clauses against regenerated items. No hand JSON.
+
+## Root cause
+The whys were checked only for a few words (a cited "Count in 3s", a table, a unit spelled out in the cited title cut at "(").
+`linkfit --fit` re-options a failing link to the first option set that passes size and week checks, and **nothing checked that
+the new option set still dealt what the why said**. That is how B15.S4's r2 link `unit_conversions {units:[0]}` (metric, why
+"L ↔ mL") became `{units:[1]}` (customary): 5,000 mL passed nothing, quarts passed everything. The fix makes every why a set of
+claims that the items must bear out, inside the fit loop, so a re-option can no longer make a why false.
+
+## Build-level classes
+| Class | Fix (at the source) |
+|---|---|
+| K customary on metric | `linkfit.mjs` `content()`: on EVERY metric or time unit (Y5.B8, B10, B14 except S4, B15, and any unit whose title names a metric measure) a pre or related link with a customary unit fails; and (the lead's "vice versa") a metric-only link on a customary unit fails unless it is a pre whose why names the metric measure it brings (Grade 3 litres before customary capacity). The Support-only H check is folded in |
+| K why units, L multiplicative, H′ title | `claims.mjs` CLAIMS with `rule: true`, run by `linkfit.mjs whyCheck` on the why's **claim text**: the cited step's FULL title from `wrm-steps.json` (parentheses included: "Equivalent masses (kilograms and grams)") plus the builder's own words, negated parts removed ("no pictures", "never …"). Rules: metric, customary, each metric unit, cups/pints/quarts/gallons, ounces/pounds, inches/feet/yards/miles, minutes/hours, degrees, money, **times as many / equal groups** (must be multiplicative in a third of the items), equal parts, fractions, decimals, 3 dp, negatives, percent, Roman numerals. A list of several units is judged as a mix |
+| H′ unlikeCompare | reads the answer, the payload and the tiles, and "greatest / least / biggest / order" (order_fractions {forms:[1]} and the drag form now fail on a Year 3 Support lesson) |
+| M existing option missed | `linkfit.mjs missedOptions()`: every "never X" / "no X" / "without X" part of a unit's clauses is read against the forms / units / task / kind / model value labels of every skill the unit lists and every skill of its direct / partial categories; a label whose content words are all in the part (two words: next to each other) fails unless the unit uses that key + value, or its note or a clause names the skill (says why not) |
+| "A and B" titles | `build.py` pass 3b: a link citing "Add and subtract …" / "… times-table and division facts" whose skill deals one half gets "; the adding half)" etc. (23 links); skills that deal both (add_sub_100s, missing_mult_div, sub_check_by_adding, families) are not marked, and `linkfit` fails a marker whose items deal the other half |
+| Later-taught pre | `linkfit.mjs`: a pre whose skill this year first teaches after the unit's week, and that no lower year is tagged with, fails (B10.S8 W26 had additive_angles, W31) |
+
+### Each gate proven on a mutated scratch copy (`mut.py`, scratch folder; the old r6 linkfit missed K, L and H′ unlike)
+| Mutation | Fired |
+|---|---|
+| B15.S4 related back to `unit_conversions {units:[1]}` with the r6 why | yes: K customary (quarts) + why claims metric / mL / L |
+| B15.S1 related back to `volume {band:30}` | yes: K customary (inches) |
+| metric-only `unit_conversions {units:[0],forms:[0]}` related on the customary capacity lesson | yes: K metric-only |
+| lesson 7 related `tape_diagram {}` with the times-as-many why | yes: why claims "times-as-many", 0 of 100 |
+| lesson 10 back to `frac_10_100` "never adds a tenths and a hundredths fraction" | yes: M, frac_10_100_nv forms value 2 "Add tenths and hundredths" |
+| Compare fractions (G2 source) pre `order_fractions {forms:[1]}` ("greatest to least"), and `{forms:[2]}` (drag) | yes, both: H unlike compare |
+| customary lesson pre `length_customary` with why "Y3.B7.S4 Equivalent masses (kilograms and grams)" | yes: why claims "kilograms" |
+| "the adding half" on `add_sub_100s`; "the subtracting half" on `sub_check_by_adding` | yes, both |
+| B10.S8 pre `additive_angles` | yes: first taught W31, after W26 |
+| B15.S1 pre why "1 mL of water fills 1 cm³" on cylinder items | yes: why claims "cm" |
+
+## Rows
+| Entry | Change |
+|---|---|
+| K Y5.B15.S4 | related `unit_conversions {units:[0], forms:[0]}` (metric, one conversion a cell: no "1 mile" click-all distractor), why names only "metric"; pre `area_unit_squares` out, `capacity {units:[1], forms:[0]}` in (Y3.B7.S9, 1 L = 1,000 mL); the step's missing clause names its range (a bucket ≈ 5 l = 5,000 ml) |
+| K Y5.B15.S1 / S3 | related `volume {forms:[0], band:30}` ("length = 3, width = 3, height = 2", cubic units, no ft / in); B15.S1 pre `mass_volume_liquid {forms:[0]}` (millilitres on a cylinder, not the sort that mixes in grams) |
+| L lesson 7 | related `tape_diagram` out; `div_word_problems_plain {forms:[1], range:100}` (grouping: 42 is how many 6s) and `missing_mult_div @100` (___ × 7 = 42). B5.S11 related `tape_diagram` out |
+| M lesson 10 | partial **`frac_10_100_nv {forms:[2]}`** "adds a tenths and a hundredths fraction in numbers (3/10 + 5/100), but the forms value does not keep the page to them … and there is no hundred-square picture"; `frac_10_100` clause "has no add form"; `add_tenths_hundredths` rescoped to the true remainder: the pictured add form on `frac_10_100` and making `_nv` forms value 2 filter on the print path |
+| Report | the Y4 "Measure in grams" note replaced (below) |
+| B2.S6 | related `tape_diagram_plain` and `algebra_word_mixed` out (2 related left) |
+| B3.S3 | pre `mult_properties {forms:[0,2]}` (order and × 1), cited "Y4.B4.S12 … (the multiplication half: …)"; B3.S5 `{forms:[2]}`, B3.S7 `{forms:[0]}` likewise |
+| Lessons 10 / 14 (carried) | `add_decimal {decimals:2}` why now what it deals (76.28 + 18.2); lesson 14 pre `mass_volume_liquid {forms:[0]}` (the millilitre cylinder), not the sort with grams |
+| B10.S3 | preBuild + `turns_angles` (quarter / half / whole turns); note says so |
+
+## The root-cause sweep (`sweep.mjs`)
+Every pre / related why (875 links) and every partial clause (148) of Y5.json, steps and lessons, against **30 items on fresh
+seeds** (73013 + 59 i; linkfit uses five other seed sets) with the link's opts: (a) every claim word of `claims.mjs` (all claims,
+not only the rule ones: operations, representations, contexts too), and every "never / no" operation in a clause against the
+signs in the items; (b) customary on metric and metric-only on customary; (c) a pre past 1.5 × its entry's ceiling, or taught
+later in the year and in no lower year.
+
+| Pass | Claims checked | Findings |
+|---|---|---|
+| first rule set, r6 file | 929 | 227 raw (most were rule noise: "times-tables" read as a table, "L-shapes" as litres, nouns after "no") |
+| refined rules, r6 file | 778 | 112: a 76, a-neg 0, b 3, c 33 |
+| after the fixes (this commit) | 753 | **32: a 0, a-neg 0, b 0, c 32** |
+
+**Fixed from the sweep** (46 per-entry rows in `spec_zz_r6.py` section S, plus 23 half markers): clauses that named what the items
+do not deal (B1.S6 "decimal results"; B12.S3 "column items"; B7.S2 / B7.S3 f_to_d after PR #8); whys naming a representation the
+items lack ("column method" on line sums B12.S1 / S2; "area model" B5.S2 / S4; "protractor" B10.S4; "bar models" on the circle
+model of `equiv_frac_visual` → `{model:['bar']}` on Compare fractions); a cited title in parentheses the opts did not deal
+(B14.S4 `length_metric` cm→mm under "metres and centimetres" → `{forms:[1]}`; measurement word problems `{forms:[1]}` under
+"kilometres and metres" → `{forms:[3]}`; B7.S4 / B7.S13 `equivalent` "to /10" → `{denoms:[5]}`; B7.S8 `d_to_f` cited
+"Thousandths as fractions" → re-cited Y4.B8.S8); false operations / contexts (B3.S9 "round then divide" on a compatible-numbers
+skill; B5.S9 "+ remainder" on a no-remainder check; B5.S10 "remainders"; B4.S4 "fraction left"; B11.S4 "coordinate" on plain sums;
+stories, "table" for times-tables); unit words in whys used as examples (B8.S3 "7 cm", customary lesson "1 ft = 12 in", B15.S1
+"cm³"); (c) B10.S8 additive_angles moved to related, B8.S4 perimeter `{band:20}`, line plots bar_graph `{most:10}`.
+
+**Rule (a) and (b) are now linkfit rules** (the `rule: true` claims, the half markers, K both ways, M, later-taught pre). Operation,
+representation and context claims stay in the sweep: they need a reader (e.g. "the place-value reading rounding needs" is a
+purpose, not a claim about the items), and the sweep's list was read entry by entry.
+
+**The 32 remaining (c) findings, reviewed, none harder:** a pre with larger numbers but an easier task (6-digit place value before
+"100,000 more or less"; 98,000 = 98 × 1,000 before ÷ 1,000; reading 800 mL on a cylinder before customary cups; bar-graph scales;
+area_model 2-digit × 3-digit before 4-digit × 2-digit, whose products are larger), thousandths distractors in `frac_10_100`
+click-all items on steps after W12 (no forms option to leave them out), decimal sums (94.48 + 93.5 = 188), and number artefacts
+(count-by sequences "888,891" read as one number, coordinate payloads).
+
+## PR #8 generator fixes (merged): re-judged
+Regenerated, 60 items each with `{denoms:[2]}`: `add_frac_unlike`, `add_frac_unlike_nv`, `add_mixed_unlike`, `sub_frac_unlike`,
+`sub_frac_unlike_nv`, `sub_mixed_unlike` deal **0** items outside halves / quarters / eighths on every form (calculate,
+click-all, sort).
+- B4.S10, B4.S11, B4.S12, B4.S14, B4.S15: the "click-all and sort items ignore {denoms:[2]}" caveat is gone (B4.S11's "45 of 60"
+  unrelated pairs with it); the remaining clauses are the real gaps (total within 1 / greater than 1, mixed + proper form, whole
+  or improper minuend). `linkfit`'s "unrelated denominators" check now finds none on these partials without the clause naming it.
+- **`denoms_all_forms` retired** (built by PR #8): off every build list; not emitted.
+- **B4.S17 → FULL**: `sub_mixed_unlike {denoms:[2]}` (0 of 100 off-family). The school teaches it in W16, a week before its first
+  unlike addition; the step is itself the first related-denominator lesson (linkfit OWN, as B14.S4 is for customary units).
+- **B4.S13 stays partial** on a new, narrower clause: the sort form writes an addend with a zero whole ("2 1/2 + 0 3/4", 13 of
+  100 items, also at default opts), which is not a mixed number. New option proposal `mixed_sort_whole`.
+- `conversions:f_to_d {denoms:[5]}` no longer deals the halves-and-quarters percent bin (0 of 30): B7.S2 / B7.S3 clauses rewritten.
+  B7.S4 (`f_to_d {}`) still has it, so `f_to_d_forms` stays.
+- `select_equiv_frac`, `equivalent`, `compare_frac_lcd`, `order_fractions` entries (28: 21 links, 7 direct / partial) re-checked by linkfit and the sweep on the
+  new generator: 0 misfits, 0 claim findings. Remaining exception (PR #8 note): a form naming an off-family benchmark is redrawn
+  as another form, so a few pages have no click-all / sort item; no Y5 clause depends on those forms.
+
+## Generator defects (record only, round 5)
+1. `fraction_operations:frac_10_100_nv {forms:[2]}` does not filter on the print path: a page still deals renaming and click-all
+   items (about 6 of 20 are additions). Lesson 10's partial clause and `add_tenths_hundredths` name it.
+2. `division:div_word_problems(_plain) {forms:[2]}` ("A remainder to interpret") deals sharing stories with no remainder (12 of
+   12); the multi-step remainder lesson's note says why it is not listed.
+3. `fraction_operations:add_mixed_unlike` sort form writes "0 3/4" as an addend (13 of 100) — proposal `mixed_sort_whole`.
+The round-2 list below is updated: its items 1 (denoms on click-all / sort) and 4 (kg dial answering 0) are **fixed by PR #8**.
+
+## For the lead (replaces the round-4 note on Y4)
+No Y4 / Y1 / Y6 links file has a `lessons` section yet (only Y5). When a lane adds one it takes **its own `wrmYear` entries of
+`data/curriculum/site-lessons.json`** (Y4: 23, Y1: 39, Y6: 24) and nothing else; "Measure in grams" (G2 source) is a step record
+on `Y2.B7.S2`, tagged by the Y2 lane, not a lesson. **12 lesson-only proposals have empty `steps`** (`lessons` + `closes[<lesson
+id>]`): a WRM_PROPOSALS merge that reads only `steps` would drop them.
+
+## Counts and gates
+136 steps (37 full / 74 partial / 25 gap), 21 lessons (4 / 16 / 1), 175 tagFixes, 101 proposals (29 new, 72 reused), 875 links.
+linkfit 0 misfits, optcheck 0, sweep a / b 0 (c 32 reviewed), mergecheck Y5 + R + Y1 + Y4 + Y6 0 problems, critic `merge6.mjs`
+0 real conflicts / 0 own-step mismatches / 0 Y5 lesson tagFixes, `ws-wrm-extract --check` exit 0, `ws-boot-smoke` OK, two clean
+`git archive` builds byte-identical to the committed Y5.json.
+
+---
+
 # Wave 2 tagging: Year 5 (US Grade 4) — round 4: critic r5 rows (2026-10-16)
 
 Critic r5 (FAIL: B12.S11 = 6; B1.S2 / B1.S9 / B10.S3 = 7; lessons mean 7.82, customary length and weight 6, Compare fractions /
@@ -46,10 +172,7 @@ Counts: disagreements 12 -> 14 (2 "review matches no step" replaced by 2 retitle
 site-lessons 141 -> 143 (+4 core titles, -2 Support titles now on steps); Support titles matched to steps 1,202 -> 1,204,
 unmatched 73 -> 71. `--check` reproduces both files (exit 0).
 
-**For the lead:** the Y4 lane's links file still has a lesson for G3 "Measure in grams" (now a step record, Y2.B7.S2); its
-lane should drop it on its next build. **12 lesson-only proposals have empty `steps`** (they list only `lessons` and
-`closes[<lesson id>]`): a WRM_PROPOSALS merge that reads only `steps` would drop them; read `lessons` too, or put them in
-`STANDARD_PROPOSALS` (all are CCSS-tagged).
+(Round-4 note on Y4 "Measure in grams" withdrawn: it was inaccurate; see round 5 "For the lead".)
 
 ## Counts and gates
 136 steps (36 full / 75 partial / 25 gap), 21 lessons (4 full / 16 partial / 1 gap), 175 tagFixes, 101 proposals (29 new,
@@ -224,14 +347,14 @@ none fits. One fix came out of it (B15.S3 estimate link, above). I would grade e
   the script does not read; the claim is true.
 
 ## Generator defects found (record only; app code not edited)
-1. **`denoms` ignored by click-all and sort forms.** `generate-question.js` `itemDenominators` / `itemPlainText` read only
+1. ~~**`denoms` ignored by click-all and sort forms.**~~ **Fixed by PR #8 (round 5):** `generate-question.js` `itemDenominators` / `itemPlainText` read only
    `q.text` / `q.printText`, not `q.options` / `q.tiles` labels, so the "Click ALL sums greater than 1" and drag-sort forms
    of `add/sub_frac_unlike(_nv)` and `add/sub_mixed_unlike` (`gen-fractions.js` ~932, 996, 1070, 1107, 1182, 1416, 1499;
    their dPool is `[2,3,4,5,6,8]`) pass the family filter with unrelated pairs (3/5 + 3/8). Fix: filter the option labels too,
    or draw dPool from the ticked family. Proposal `denoms_all_forms`.
 2. `measurement:unit_conversions {units:[0]}` (metric): the "equivalent to 1 kilometer" click-all offers "1 mile".
 3. `measurement:unit_conversion_word {units:[1]}` (metric): the Length Key beside every story lists 1 ft = 12 in, 1 yd = 3 ft.
-4. `measurement:mass_volume_liquid` form 1 ("Read the scale. What is the mass in kg?") answers 0 for sub-kilogram masses.
+4. ~~`measurement:mass_volume_liquid` form 1 answers 0 for sub-kilogram masses.~~ **Fixed by PR #8 (round 5)**: kg dials step in whole kilograms.
 5. `division:remainder_interpret`, `remainder_contexts` and `number_ops_mixed:word_problems_mixed` deal division stories with
    2-digit divisors (13–19) at default range; `{range:100}` removes them from `remainder_interpret` only.
 6. `conversions:f_to_d` has no `forms` option (its twin `d_to_f` has one), so its percent drag-bin cannot be left out

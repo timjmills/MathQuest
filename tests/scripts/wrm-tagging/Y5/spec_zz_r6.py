@@ -166,3 +166,48 @@ sw(U7, 'related', 'division:missing_mult_div', why='the unknown-factor equation 
 # sweep (c): a pre with larger numbers than its entry deals
 sw('Y5.B8.S4', 'pre', 'area_perimeter:perimeter', opts={'forms': [0], 'band': 20})
 sw(L + 'lineplotswithfractions', 'pre', 'graphs:bar_graph', opts={'most': 10})
+
+# ── generator fixes from PR #8 (design/audit/runs/wrm-tagging/GENERATOR-FIXES-2026-10-16.md, merged into this branch) ──
+# fraction_operations: {denoms} is now honoured by the click-all and sort forms too. Regenerated (60 items each, {denoms:[2]}):
+# add_frac_unlike, add_frac_unlike_nv, add_mixed_unlike, sub_frac_unlike, sub_frac_unlike_nv, sub_mixed_unlike have 0 items
+# outside halves / quarters / eighths. The class-A caveat comes off every clause and denoms_all_forms is retired (built).
+_DEN = re.compile(r'[;,]?\s*related denominators on the calculate items only: the click-all and sort items ignore \{denoms:\[2\]\} and pair unrelated denominators(?: in the sort items)?(?: \([^)]*\))?')
+for sid in ('Y5.B4.S10', 'Y5.B4.S11', 'Y5.B4.S12', 'Y5.B4.S13', 'Y5.B4.S14', 'Y5.B4.S15', 'Y5.B4.S17'):
+    st = ST[sid]
+    for e in st['partial']: e['missing'] = _DEN.sub('', e['missing']).strip().lstrip(';').strip()
+    st['build'] = [p for p in st['build'] if p != 'denoms_all_forms']
+    CLOSES.get(sid, {}).pop('denoms_all_forms', None)
+for sid in ('Y5.B4.S10', 'Y5.B4.S11'):
+    ST[sid]['note'] = 'Both partials carry {denoms:[2]}: every form (calculate, click-all, sort) stays in halves, quarters and eighths.'
+ST['Y5.B4.S14']['note'] = ('WRM includes subtracting from a whole or an improper fraction; sub_fractions_like covers the same denominator. {denoms:[2]} keeps '
+                           'every form in one family.')
+# B4.S13 Add two mixed numbers: the family now holds on every form; what is left is the sort form, which writes an addend as
+# "0 3/4" (13 of 100 items: "2 1/2 + 0 3/4"), so those items are not two mixed numbers
+ST['Y5.B4.S13']['partial'][0]['missing'] = ('one form in eight is a sort whose addends are sometimes written with a zero whole ("2 1/2 + 0 3/4", 13 of 100 '
+                                           'items), so those items do not add two mixed numbers')
+ST['Y5.B4.S13']['missing'] = 'every item adding two true mixed numbers: the sort form writes some addends as "0 3/4"'
+ST['Y5.B4.S13']['build'] = ['mixed_sort_whole']
+CLOSES.setdefault('Y5.B4.S13', {})['mixed_sort_whole'] = 'every item adding two true mixed numbers: the sort form writes some addends as "0 3/4"'
+NEW['mixed_sort_whole'] = {
+    'kind': 'option', 'skill': 'fraction_operations:add_mixed_unlike', 'also': ['fraction_operations:add_mixed_like'],
+    'option': 'the sort form draws both addends as mixed numbers (whole part 1 or more); a proper-fraction addend is written "3/4", never "0 3/4"',
+    'name': 'Two True Mixed Numbers in the Sort Form (option)',
+    'teaches': 'sorting sums of two mixed numbers (2 1/2 + 1 3/4) into "less than 3 / 3 to 4 / more than 4" bins, every addend a mixed number',
+    'representation': 'the existing sort cell: five sum tiles and three bins, unchanged except the addends',
+    'family': 'fraction_operations', 'ccss': ['4.NF.B.3c'],
+    'why': 'regenerated add_mixed_unlike {denoms:[2]} (after PR #8) keeps every form in one family, but 13 of 100 items are sort items with an addend '
+           'written "0 3/4" or "0 1/2", which is not a mixed number and is confusing to read'}
+# B4.S17 Subtract two mixed numbers: sub_mixed_unlike {denoms:[2]} now deals related-denominator mixed − mixed on every form
+# (0 of 100 off-family, no zero wholes): FULL. The school teaches it in W16, before its W17 unlike-denominator addition: the
+# step is itself the school's first related-denominator lesson (linkfit OWN, as Y5.B14.S4 is for customary units)
+for e in list(ST['Y5.B4.S17']['partial']):
+    if e['key'] == 'fraction_operations:sub_mixed_unlike':
+        ST['Y5.B4.S17']['partial'].remove(e); ST['Y5.B4.S17']['direct'].append({'key': e['key'], 'opts': e.get('opts', {})})
+ST['Y5.B4.S17'].update(verdict='full', missing='', build=[])
+ST['Y5.B4.S17']['note'] = ('sub_mixed_unlike {denoms:[2]} subtracts two mixed numbers with related denominators (4 1/4 − 3 5/8) on every form since the '
+    'PR #8 generator fix. The school teaches this step in W16, a week before its first unlike-denominator addition: the step is itself the '
+    'first lesson of that content. sub_mixed_like / _nv stay as like-denominator partials beside it.')
+# conversions:f_to_d {denoms:[5]}: after PR #8 the halves-and-quarters drag-bin sort (with its percent tiles) is no longer dealt
+# under the fifths family (0 of 30 regenerated items); every item converts a fifth, tenth or hundredth to a decimal
+sw('Y5.B7.S2', 'partial', 'conversions:f_to_d', why='with {denoms:[5]} it converts fifths, tenths and hundredths to decimals (4/5 = 0.8, 7/100 = 0.07) mixed on one page; no tenths-only page or tenths strip')
+sw('Y5.B7.S3', 'partial', 'conversions:f_to_d', why='with {denoms:[5]} it converts fraction → decimal only, and hundredths are about a third of the page (7/100 = 0.07) beside fifths and tenths; never a decimal written as hundredths')
