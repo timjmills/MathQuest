@@ -672,8 +672,9 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     const maxKg = pick([1, 2, 5, 10]);
                     const unitLabel = maxKg <= 2 ? "g" : "kg";
                     const maxVal = maxKg <= 2 ? maxKg * 1000 : maxKg;
-                    const increment = maxKg <= 1 ? 100 : maxKg <= 2 ? 200 : maxKg <= 5 ? 500 : 1000;
-                    const gIncrement = unitLabel === "g" ? increment : increment;
+                    // g dials step in grams; kg dials step in whole kg (a kg dial
+                    // divided by gram steps had under one mark, so read 0).
+                    const increment = maxKg <= 1 ? 100 : maxKg <= 2 ? 200 : 1;
                     const numMarks = maxVal / increment;
                     const reading = rng(1, numMarks - 1) * increment;
 
