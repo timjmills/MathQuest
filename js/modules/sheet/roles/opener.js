@@ -17,7 +17,7 @@
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, bestCols, planItem, gridPart,
     instructionKeyOf, instructionText, generalSteps, stepsHtml, stringsOf, oralFrameOf, assemble,
-    poolItems, answerOf, labelStyleOf,
+    poolItems, answerOf, labelStyleOf, stripExtraMm,
 } from './compose.js';
 
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
@@ -69,11 +69,18 @@ function geometry(items, input, cap = {}) {
     const practice = first && first.template === 'count-row' && items.length > nModel ? items.slice(nModel) : items;
     const gc = bestCols(practice, [gcWanted, 3, 2, 1].filter((c, i, a) => a.indexOf(c) === i && c <= gcWanted), ctx);
     const gH = hMinAt(practice, gc, ctx);
-    let used = (whatsNew ? m.strip + 2 : 0) + modelBand + m.say + m.strip + gH;
+    // critic r6 N15: the Say band of a count-row page is one line of four short blanks, drawn Hw + 2.6 mm tall (measured 8.4 / 10.5 /
+    // 12.6 mm at S / M / L), not the generic estimate (Hw + 4.5): with the taller practice rows its 2 mm decide whether a row fits
+    const sayMm = first && first.template === 'count-row' ? m.writeMm + 2.6 : m.say;
+    let used = (whatsNew ? m.strip + 2 : 0) + modelBand + sayMm + m.strip + gH;
     let iRows = 0;
     // Item 7: a count row's band labels wrap to two lines at L ("Independent / Practice:"), which the strip height does not
     // count; a page of count rows keeps that much in hand before it adds an Independent row (it ran 4.8 mm over at L)
-    const hand = first && first.template === 'count-row' && ctx.size === 'L' ? m.strip : 0;   // the labels wrap at L only
+    // critic r6 N15: at M the Independent band's instruction wraps under its label too (measured 11.9 mm against a 7.5 mm strip); with
+    // the Say band now counted at its drawn height that wrap is no longer hidden, so it is reserved from the same width estimate the
+    // other roles use (stripExtraMm)
+    const crow = !!first && first.template === 'count-row';
+    const hand = crow && ctx.size === 'L' ? m.strip : crow ? stripExtraMm(ctx, 'Independent Practice:', instructionText(instructionKeyOf(practice, input.skills), practice)) : 0;
     const iMax = Math.min(2, cap.iMax === undefined ? 2 : cap.iMax);
     while (iRows < iMax && used + (iRows ? 0 : m.strip) + gH + hand <= m.budget) { used += (iRows ? 0 : m.strip) + gH; iRows++; }
     // the L label-wrap reserve is for the Independent band's label: with no Independent band drawn it is not held (critic r5 N13a)

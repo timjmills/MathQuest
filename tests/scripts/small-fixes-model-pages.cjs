@@ -6,6 +6,10 @@
 // Critic r3 N8/N9: every Opener pupil page (this tree only) is also rendered in Chromium and every cell measured - no cell may be
 // EMPTY (a bordered box with no ink), and no cell's largest empty band (top or bottom, from the cell's inner edge to the nearest
 // ink: text, a drawing, a box or a line) may reach 30 % of the cell's height (RUBRIC H13).
+// Critic r6 N15: in every Opener KEY, each Guided / Independent count-row cell's narrowest answer slot holds its longest answer at
+// the size's writing height (slot >= characters x 0.55 x Hw, Hw 6 / 8 / 10 mm; a one-page sheet prints at S), the given numbers
+// print at >= 11 pt, and per option set and paper they never get smaller as the size grows (S <= M <= L). N16: the missing-row
+// checks read the plan's natural row height (rowMm) and fail when the plan stops reporting it.
 //   git archive 72e05d7 | tar -x -C /tmp/base-72e05d7
 //   MQ_BASE_ROOT=/tmp/base-72e05d7 node tests/scripts/small-fixes-model-pages.cjs
 // (it re-runs itself with MQ_ROOT=<base> and `--digest` to read the base's numbers)
@@ -37,6 +41,7 @@ const ONLY = process.env.SF_ONLY ? process.env.SF_ONLY.split(process.env.SF_ONLY
 const COMBOS = ONLY ? COMBOS_ALL.filter((c) => ONLY.includes(c.name)) : COMBOS_ALL;
 const ROLES = (process.env.SF_ROLES || 'opener,scripted-model').split(',');   // SF_ROLES / SF_ONLY narrow a quick run
 const SIZES = ['S', 'M', 'L'];
+const WRITE_MM = { S: 6, M: 8, L: 10 };   // Hw, the writing height (sheet/tokens.js)
 const PAPERS = ['A4', 'Letter'];
 const sha = (s) => crypto.createHash('sha1').update(String(s)).digest('hex').slice(0, 12);
 
@@ -93,17 +98,51 @@ async function digest() {
       };
       fr.srcdoc = doc.replace(/<head>/i, `<head><base href="${location.href}">`);
     }) : null;
+    // critic r6 N15: in the KEY (the same plan, every answer written in its slot), every Guided / Independent count-row cell: the
+    // narrowest answer slot (mm), the longest answer it holds (characters, "1,300,000" is 9), and the smallest given number (pt)
+    const measureWrite = withCells ? (doc) => new Promise((resolve) => {
+      const fr = document.createElement('iframe');
+      fr.style.cssText = 'position:fixed;left:-3000px;top:0;width:900px;height:1400px;border:0;';
+      document.body.appendChild(fr);
+      fr.onload = async () => {
+        const d = fr.contentDocument;
+        try { await d.fonts.ready; } catch (e) { /* measure anyway */ }
+        await new Promise((r) => setTimeout(r, 50));
+        const pxmm = 96 / 25.4;
+        let cells = 0, minW = Infinity, maxLen = 0, minPt = Infinity, worstRatio = Infinity, worst = '';
+        for (const band of d.querySelectorAll('.ws-band')) {
+          const lbl = band.querySelector('.ws-strip b');
+          if (!lbl || !/Practice/.test(lbl.textContent)) continue;
+          for (const cell of band.querySelectorAll('.ws-cell')) {
+            const slots = [...cell.querySelectorAll('[data-ws-slot^="b"]')];
+            if (!slots.length) continue;
+            cells++;
+            let w = Infinity, len = 0;
+            for (const s of slots) { w = Math.min(w, s.getBoundingClientRect().width / pxmm); len = Math.max(len, s.textContent.trim().length); }
+            minW = Math.min(minW, w); maxLen = Math.max(maxLen, len);
+            if (len && w / len < worstRatio) { worstRatio = w / len; worst = `${w.toFixed(1)} mm for "${[...slots].map((s) => s.textContent.trim()).sort((a, b) => b.length - a.length)[0]}"`; }
+            for (const g of cell.querySelectorAll('.k2-given')) minPt = Math.min(minPt, parseFloat(d.defaultView.getComputedStyle(g).fontSize) * 0.75);
+          }
+        }
+        fr.remove();
+        resolve({ cells, minW: Math.round(minW * 10) / 10, maxLen, mmPerChar: Math.round(worstRatio * 100) / 100, worst, minPt: Math.round(minPt * 10) / 10 });
+      };
+      fr.srcdoc = doc.replace(/<head>/i, `<head><base href="${location.href}">`);
+    }) : null;
     for (const c of COMBOS) for (const role of ROLES) for (const size of SIZES) for (const paper of PAPERS) {
       const k = `${c.name} | ${role} | ${size} | ${paper}`;
       try {
         const r = await window.buildSheet({ role, sections: [{ skills: [{ categoryId: 'multiplication', skillId: 'count_by_tables', opts: c.opts }] }], size, paper, seed: 4242, key: true });
         const note = String((r.fits && r.fits.note) || '');
         const ind = /(\d+) independent/.exec(note), gd = /(\d+) guided/.exec(note);
-        res[k] = { pages: r.pageCount, keyPages: r.keyPageCount, html: r.pupilHtml + r.keyHtml, indep: ind ? Number(ind[1]) : null,
+        res[k] = { onePage: !!c.opts.onePage, pages: r.pageCount, keyPages: r.keyPageCount, html: r.pupilHtml + r.keyHtml, indep: ind ? Number(ind[1]) : null,
           guided: gd ? Number(gd[1]) : null, cols: r.fits && r.fits.cols };
         const sec = (r.fits && r.fits.sections && r.fits.sections[0]) || {};
         if (sec.rowMm !== undefined) Object.assign(res[k], { rowMm: sec.rowMm, growMm: sec.growMm || 0 });
-        if (role === 'opener' && measureCells) { res[k].cells = await measureCells(window.sheetDocument(r.pupilHtml, 'probe', { paper })); res[k].cells.strip = size === 'L' ? 9.5 : 7.5; }
+        if (role === 'opener' && measureCells) {
+          res[k].cells = await measureCells(window.sheetDocument(r.pupilHtml, 'probe', { paper })); res[k].cells.strip = size === 'L' ? 9.5 : 7.5;
+          res[k].write = await measureWrite(window.sheetDocument(r.keyHtml, 'probe-key', { paper }));
+        }
       } catch (e) { res[k] = { error: String(e && e.message || e).slice(0, 80) }; }
     }
     return res;
@@ -139,7 +178,10 @@ async function digest() {
       // the gap between the body and the footer, which no row may use - so the r5 form of this check (foot >= strip + row) passed
       // sheets the budget forbids and could not see a missing second row of a band (no strip).
       const rows = a.cols ? Math.round(((a.guided || 0) + (a.indep || 0)) / a.cols) : 0;
-      const natural = a.rowMm !== undefined ? a.rowMm : a.cells.lastRowMm;
+      // critic r6 N16: the plan's natural row height (no grow); a plan that stops reporting it fails rather than passing on the
+      // drawn height, which includes up to 8 mm of grow and hides a dropped row
+      if (a.rowMm === undefined) errs.push('no rowMm in the plan fits (the missing-row checks cannot run)');
+      const natural = a.rowMm !== undefined ? a.rowMm : a.cells.lastRowMm - 8;
       // less 1 mm: the same sheet measures up to ~1.5 mm apart in two Chromium hosts (fonts, rounding), so a row the plan's own
       // drawn heights put 2.5 mm over the budget (100,000 + Lines, S Letter) must not read as fitting by 0.1 mm here
       const free = Math.round((a.cells.roomMm + (a.growMm || 0) * rows - 4 - 1) * 10) / 10;
@@ -149,11 +191,28 @@ async function digest() {
       if (a.cols === 1 && a.guided === 1 && free >= natural) errs.push(`1 Guided row with ${free} mm free in the budget (a row is ${natural.toFixed(1)} mm)`);
       if (a.cells.overMm > 0.5) errs.push(`the last row runs ${a.cells.overMm} mm into the footer`);
       if (a.cells.empty) errs.push(`${a.cells.empty} empty cell(s)`);
+      // critic r6 N15 (RUBRIC H9, TY-11): every answer slot holds its longest answer handwritten at the size's writing height
+      // (0.55 x Hw a character, Hw 6 / 8 / 10 mm), and the given numbers print at >= 11 pt
+      const w = a.write;
+      if (w && w.cells) {
+        // "All rows on one page" prints the whole sheet at Size S (owner 2026-10-02, print-sheet.js), so its rows write at S's height
+        const hw = WRITE_MM[a.onePage ? 'S' : k.split(' | ')[2]];
+        if (w.minW + 0.05 < w.maxLen * 0.55 * hw) errs.push(`answer slot ${w.minW} mm < ${w.maxLen} characters x 0.55 x ${hw} mm = ${(w.maxLen * 0.55 * hw).toFixed(1)} mm (${w.worst})`);
+        if (w.minPt < 11 - 0.05) errs.push(`given numbers at ${w.minPt} pt (< 11 pt)`);
+      }
       if (a.cells.maxBand >= 0.3) errs.push(`empty band ${Math.round(a.cells.maxBand * 100)} % (>= 30 %) in "${a.cells.worst}"`);
     }
     if (errs.length) bad++;
-    const ind = k.includes('| opener |') ? `  guided ${b.guided === undefined ? '?' : b.guided} -> ${a.guided}, independent rows ${b.indep} -> ${a.indep}${a.cells ? `  cells ${a.cells.n}, band ${Math.round(a.cells.maxBand * 100)} %, foot ${a.cells.footMm} mm, room ${a.cells.roomMm} mm` : ''}` : '';
+    const ind = k.includes('| opener |') ? `  guided ${b.guided === undefined ? '?' : b.guided} -> ${a.guided}, independent rows ${b.indep} -> ${a.indep}${a.cells ? `  cells ${a.cells.n}, band ${Math.round(a.cells.maxBand * 100)} %, foot ${a.cells.footMm} mm, room ${a.cells.roomMm} mm` : ''}${a.write && a.write.cells ? `  slot ${a.write.minW} mm / ${a.write.maxLen} ch, given ${a.write.minPt} pt` : ''}` : '';
     console.log(`${errs.length ? 'FAIL' : 'ok  '} ${k.padEnd(52)} pages ${b.pages}/${b.keyPages} -> ${a.pages}/${a.keyPages}${ind}${errs.length ? '  ' + errs.join('; ') : ''}`);
+  }
+  // critic r6 N15 (lessons-learned L1): the givens never get smaller as the size grows (L >= M >= S), per combo and paper
+  for (const c of COMBOS) for (const paper of PAPERS) {
+    const pts = SIZES.map((sz) => ((now[`${c.name} | opener | ${sz} | ${paper}`] || {}).write || {}).minPt);
+    if (pts.some((v) => !(v > 0) || !Number.isFinite(v))) continue;
+    const ok = pts[0] <= pts[1] + 0.05 && pts[1] <= pts[2] + 0.05;
+    if (!ok) bad++;
+    console.log(`${ok ? 'ok  ' : 'FAIL'} ${`${c.name} | opener | S/M/L | ${paper}`.padEnd(52)} given numbers ${pts.join(' / ')} pt${ok ? '' : '  (a larger size prints them smaller)'}`);
   }
   console.log(`small-fixes-model-pages: ${bad ? 'FAIL' : 'OK'} (${Object.keys(now).length} sheets${bad ? `, ${bad} failing` : ''})`);
   process.exit(bad ? 1 : 0);
