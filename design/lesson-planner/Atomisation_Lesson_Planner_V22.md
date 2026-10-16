@@ -5942,6 +5942,12 @@ here. The V22 addition is marked.
 | `story-rcdws` (V22) | Read the story. Draw it. Solve. | word problem v1 with the RCDWS panel (P5) |
 | `partition` (V22) | Draw a line to make 2 equal parts. | partition a shape into halves (Appendix H) |
 | `equal-parts` (V22) | Are the parts equal? Check one box. | judge equal parts; labels `Equal parts` / `Not equal parts` |
+| `standard-form` (V22, 2026-10-16) | Write the number. | expanded form or a number name to a numeral |
+| `unit-form` (V22, 2026-10-16) | Write how many of each place. | unit form (hundreds, tens, ones) |
+| `number-words` (V22, 2026-10-16) | Write the number in words. | numeral to number name |
+
+Change note 2026-10-16 (lead ruling): the last three keys were already in the site's kit library
+(`js/modules/sheet/contract.js`) and are added here so the C.1 library and the kit agree.
 
 Rules: at most 12 words and three sentences, each starting with a print verb (a question may open a
 decide instruction); the same task always gets the same string; "Do _not_ solve." always last, with
