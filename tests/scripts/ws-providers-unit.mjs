@@ -32,6 +32,7 @@ import { rng, int, pick, shuffle, deriveSeed } from '../../js/modules/sheet/rng.
 import { sameAnswer, chooseWrong } from '../../js/modules/sheet/providers/util.js';
 import { applyRule, ftSlots } from '../../js/modules/sheet/index.js';
 import { hintOf, hintGivesAnswer } from '../../js/modules/sheet/roles/guided.js';
+import { topicOf } from '../../js/modules/sheet/roles/compose.js';
 
 /** Skills whose items yield no Guided hint (reported; a stack or a fact draws its own cue). */
 const NO_HINT = [];
@@ -755,6 +756,24 @@ for (const band of ['10', '20', '50', '100', '1k', '10k', '100k', '1m']) {
     const dq = { categoryId: 'addition', skillId: 'add_three', ans: 10, text: '3 + 4 + 3 = ?', distractorTags: { 10: 'same', 7: 'Added two of the three.' } };
     const dw = getProvider('addition', 'add_three').wrongAnswer(dq);
     ok(dw && !sameAnswer(dw.value, dq.ans), `L3: the default adapter never tags the right answer as wrong (${dw && dw.value})`);
+}
+
+// critic skip-count r1 D4: a review / test title is the I Can line as a topic; no title is ever misspelt "skiping"
+{
+    ok(topicOf('I Can skip count on a number line') === 'skip counting on a number line', `D4: "${topicOf('I Can skip count on a number line')}"`);
+    ok(topicOf('I Can skip count by 2s, 5s and 10s') === 'skip counting by 2s, 5s and 10s', `D4: "${topicOf('I Can skip count by 2s, 5s and 10s')}"`);
+    ok(topicOf('I Can add within 10') === 'adding within 10', 'D4: other verbs still take -ing');
+    let n = 0;
+    for (const key of listProviders()) {
+        const [cat, skill] = String(key).split(':');
+        let iCan = '';
+        try { const st = getProvider(cat, skill).strings({ categoryId: cat, skillId: skill }); iCan = st && st.iCan; } catch (e) { continue; }
+        if (!iCan) continue;
+        n++;
+        const t = topicOf(iCan);
+        ok(!/\b\w+iping\b/i.test(t) && !/\b\w+iping\b/i.test(`Review: ${t}`), `D4: ${key} title "${t}" is misspelt`);
+    }
+    ok(n > 50, `D4: titles checked for ${n} providers`);
 }
 
 if (failures.length) {

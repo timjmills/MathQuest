@@ -57,11 +57,14 @@ const GERUND_SKIP = new Set(['i', 'can']);
 export function topicOf(iCan) {
     let t = String(iCan || '').replace(/^I Can\s+/i, '').trim();
     t = t.replace(/^work on\s+/i, '');
+    // "skip count ..." names its activity as the noun phrase "skip counting ..." (critic skip-count r1 D4: never "skiping count")
+    const sc = /^skip[\s-]count(?:ing)?\b(.*)$/i.exec(t);
+    if (sc) return `skip counting${sc[1]}`;
     const m = /^([a-z]+)\b(.*)$/i.exec(t);
     if (!m) return t;
     const v = m[1].toLowerCase();
     const verbs = new Set(['add', 'subtract', 'multiply', 'divide', 'count', 'compare', 'order', 'round', 'estimate',
-        'read', 'write', 'tell', 'measure', 'find', 'make', 'build', 'show', 'solve', 'name', 'use', 'draw', 'skip', 'identify', 'sort']);
+        'read', 'write', 'tell', 'measure', 'find', 'make', 'build', 'show', 'solve', 'name', 'use', 'draw', 'identify', 'sort']);
     if (!verbs.has(v) || GERUND_SKIP.has(v)) return t;
     const ing = /e$/.test(v) && !/ee$/.test(v) ? `${v.slice(0, -1)}ing` : /^(?:[^aeiou]*[aeiou])[^aeiouwxy]$/.test(v) && v.length <= 3 ? `${v}${v.slice(-1)}ing` : `${v}ing`;
     return `${ing}${m[2]}`;
