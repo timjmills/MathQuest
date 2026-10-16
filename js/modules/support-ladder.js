@@ -42,7 +42,7 @@ import {
 } from './sheet/index.js';
 import { declaredSupports } from './sheet/providers/util.js';
 import { renderPane, PANES } from './sheet/cells/panes/index.js';
-import { cellKindFor, kindHTML, binaryParts, regroupFor } from './screen-cell.js';
+import { cellKindFor, kindHTML, binaryParts, regroupFor, screenSupportsFor } from './screen-cell.js';
 
 /* ------------------------------------------------------------------ the teacher's setting */
 
@@ -168,6 +168,8 @@ export function candidatesFor(q, ctx = {}) {
         const k = kind && SCREEN_TEMPLATE[kind.kind] ? kind : bp;
         const p = { a: k.a, b: k.b, op: k.op, operands: k.operands };
         const pay = { op: opKey(k.op), a: Number(k.a), b: Number(k.b) };
+        const tb = tableOf(q, k);
+        if (tb != null) pay.table = tb;
         return declared
             .filter((id) => !(bp && TOUCH_IDS.includes(id) && opKey(bp.op) !== '/'))
             .filter((id) => { try { return canDraw(id, p, tpl); } catch (e) { return false; } })
@@ -218,6 +220,20 @@ export function candidatesFor(q, ctx = {}) {
     return [];
 }
 
+/** The touch ids the teacher's own support option draws on this item ([] when none). */
+function teacherTouchIds(q, ctx = {}) {
+    try {
+        const kind = ctx.kind !== undefined ? ctx.kind : cellKindFor(Object.assign({}, q, { options: [] }));
+        if (!kind) return [];
+        const { cat, skill } = whereFrom(q, ctx);
+        const s = screenSupportsFor(q, kind, { index: ctx.index || 0, total: ctx.total || 1, categoryId: cat, skillId: skill, options: ctx.options || null });
+        return s ? s.on.filter((id) => TOUCH_IDS.includes(id)) : [];
+    } catch (e) { return []; }
+}
+
+/** Does the teacher's support option already draw touch marks on this item? */
+function teacherTouches(q, ctx = {}) { return teacherTouchIds(q, ctx).length > 0; }
+
 const clashes = (x, y) => {
     if (x === y) return true;
     if (!SUPPORT_IDS.includes(x) || !SUPPORT_IDS.includes(y)) return false;
@@ -232,7 +248,11 @@ export function rungsFor(q, ctx = {}) {
     const mode = modeFor(q, ctx);
     if (mode === 'none') return [];
     if (mode === 'worked') return [{ id: 'worked', how: 'worked' }];
-    const c = candidatesFor(q, ctx);
+    let c = candidatesFor(q, ctx);
+    // Owner 2026-10-09 (R3-6): when the teacher's own touch marks are already on this item, the
+    // touch rung is spent: the ladder KEEPS those marks and moves on to the next support, never
+    // swapping count-all for count-on.
+    if (teacherTouches(q, ctx)) c = c.filter((r) => !TOUCH_IDS.includes(r.id));
     const out = [];
     if (c.length) {
         const r1 = c[0];
@@ -291,7 +311,7 @@ export function ladderWrong(q, value, ctx = {}) {
     if (!e) {
         const rungs = rungsFor(q, ctx);
         if (!rungs.length) return null;
-        e = { n: 0, last: null, rungs };
+        e = { n: 0, last: null, rungs, q, kind: ctx.kind, teacher: teacherTouchIds(q, ctx) };
         _entries.set(q, e);
     }
     const v = String(value == null ? '' : value).trim();
@@ -321,12 +341,60 @@ export function ladderMessage(q) {
     return e && e.n ? messageFor(e) : '';
 }
 
+/**
+ * The touch-dot rung says HOW to use the dots, built from the item (critic round 1): the number
+ * to say, the number whose dots to touch, and the direction. Never the answer.
+ */
+/** × : the table number (the paper rule, screenSupportsFor): the one factor in the set's constant. */
+function tableOf(q, k) {
+    const cs = q && q.skillOptions && Array.isArray(q.skillOptions.constant) ? q.skillOptions.constant.map(Number) : null;
+    if (!cs || !k || opKey(k.op) !== '*') return null;
+    const a = Number(k.a), b = Number(k.b);
+    return cs.includes(a) !== cs.includes(b) ? (cs.includes(a) ? a : b) : null;
+}
+
+function touchHow(e, id) {
+    let k = null;
+    try {
+        const q = Object.assign({}, e.q, { options: [] });
+        const kd = e.kind || cellKindFor(q);
+        k = kd && kd.a != null ? kd : binaryParts(q);
+    } catch (err) { k = null; }
+    if (!k || k.a == null || k.b == null) return '';
+    // A column stack is worked column by column (S1.8): the words name the column, never the whole sum.
+    if (k.kind === 'stack') {
+        const opS = opKey(k.op);
+        if (opS === '-') return 'Start with the ones. Say the top number. Touch the dots and count back.';
+        if (id === 'touchall') return 'Start with the ones. Touch and count all the dots.';
+        return 'Start with the ones. Say the biggest number. Touch the dots and count on.';
+    }
+    const op = opKey(k.op), a = Number(k.a), b = Number(k.b);
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return '';
+    const one = (v) => v >= 0 && v <= 9;
+    if (op === '/') return `Count by ${b}s. Touch one dot for each count.`;
+    if (op === '*') {
+        // the paper rule (support-draw.js touchNumbers): count by the table number, dot the other
+        const t = tableOf(e.q, k);
+        const dotA = t != null ? t === b : a < b;
+        return `Count by ${dotA ? b : a}s. Touch a dot on ${dotA ? a : b} for each count.`;
+    }
+    if (op === '-') return id === 'touchall' && one(a) ? `Touch the dots on ${a}. Take away ${b}.` : `Say ${a}. Touch the dots on ${b} and count back.`;
+    if (id === 'touchall' && one(a) && one(b)) return 'Touch and count all the dots.';
+    const big = a >= b ? a : b, small = a >= b ? b : a;
+    return `Say ${big}. Touch the dots on ${small} and count on.`;
+}
+
 function messageFor(e) {
     if (e.n > e.rungs.length) return '';
     const r = e.rungs[e.n - 1];
     if (r.id === 'worked') return 'Here is how. Finish it, then try again.';
     const name = NAMES[r.id] || 'the help';
-    if (e.n === 1) return `Not yet. Use ${name}, then try again.`;
+    const how = TOUCH_IDS.includes(r.id) ? touchHow(e, r.id) : '';
+    if (how) return `Not yet. ${how}`;
+    // Owner ruling (b), 2026-10-09: the teacher's touch dots always stay (a picture is drawn beside
+    // them, a mark in the kit with them), so this support is ADDED to them: the "too" form.
+    const kept = (e.teacher || []).length > 0;
+    if (e.n === 1) return kept ? `Not yet. Now use ${name} too.` : `Not yet. Use ${name}, then try again.`;
     return clashes(e.rungs[0].id, r.id) ? `Not yet. Now try ${name}.` : `Not yet. Now use ${name} too.`;
 }
 
@@ -367,9 +435,22 @@ function redrawKit(root, q, ids, ctx) {
     if (!old) return false;
     const mine = String(old.getAttribute('data-mq-ladder') || '').split(/\s+/).filter(Boolean);
     const had = old.classList.contains('ws-supported') ? String(old.getAttribute('data-ws-supports') || '').split(/\s+/).filter((x) => x && !mine.includes(x)) : [];
-    const on = [...new Set([...had.filter((x) => !ids.some((y) => y !== x && clashes(x, y))), ...ids])];
+    // R4-1 / owner ruling (b): touch numerals are drawn inside the digits, so a cell whose teacher
+    // turned them on carries no .ws-supported wrapper for them. Read them once, from the first
+    // drawing (numerals there and none of them the ladder's), and keep them on every redraw.
+    let teach = old.getAttribute('data-mq-teacher');
+    if (teach == null) {
+        const drawnTn = !old.hasAttribute('data-mq-ladder') && !!old.querySelector('.ws-tn');
+        const t = drawnTn ? teacherTouchIds(q, ctx) : [];
+        teach = (drawnTn ? (t.length ? t : ['touch']) : []).join(' ');
+    }
+    const teacher = teach.split(/\s+/).filter(Boolean);
+    const base = [...new Set([...teacher, ...had])];
+    const on = [...new Set([...base.filter((x) => !ids.some((y) => y !== x && clashes(x, y))), ...ids])];
     const supports = { on };
     if (opKey(kind.op) === '/') supports.tally = 10;
+    const tbl = tableOf(q, kind);
+    if (tbl != null) supports.table = tbl;
     const oldInputs = Array.from(old.querySelectorAll('input, select, textarea'));
     const html = kind.kind === 'stack'
         ? kindHTML(kind, { regroup: regroupFor(q.skillId || ctx.skillId || state.skill), supports })
@@ -388,6 +469,7 @@ function redrawKit(root, q, ids, ctx) {
         if (host) { if (oldInputs[0]) host.replaceWith(oldInputs[0]); else host.remove(); }
     }
     fresh.setAttribute('data-mq-ladder', ids.join(' '));
+    fresh.setAttribute('data-mq-teacher', teach);
     const focused = typeof document !== 'undefined' ? document.activeElement : null;
     old.replaceWith(fresh);
     // the pupil may be typing in the moved input: moving an element drops its focus
@@ -575,7 +657,7 @@ function paneHTML(r) {
 
 function eqHTML(rs) {
     const p = rs[0].payload;
-    const html = withSupports('<span class="mq-sup-anchor"></span>', { a: p.a, b: p.b, op: p.op, supports: { on: rs.map((r) => r.id), reserve: [], ...(opKey(p.op) === '/' ? { tally: 10 } : {}) } },
+    const html = withSupports('<span class="mq-sup-anchor"></span>', { a: p.a, b: p.b, op: p.op, supports: { on: rs.map((r) => r.id), reserve: [], ...(opKey(p.op) === '/' ? { tally: 10 } : {}), ...(p.table != null ? { table: p.table } : {}) } },
         'equation', SCREEN_CTX, { problemWMm: 0, problemHMm: 0 });
     return html && !/^<span class="mq-sup-anchor"><\/span>$/.test(html)
         ? `<div class="ws-sheet mq-kit mq-ladder-pane" data-mq-ladder-on="${esc(rs.map((r) => r.id).join(' '))}">${html}</div>` : '';
@@ -613,6 +695,21 @@ export function drawLadder(root, q, ctx = {}) {
     if (ww.length) wwSupports(root, q, ww);
     sup.filter((r) => r.how === 'pane').forEach((r) => parts.push(paneHTML(r)));
     if (s.worked) parts.push(workedHTML(q, ctx));
+    // The touch-dot rung (owner report 2026-10-03): its message may only stand when the touch
+    // numerals really are on the card. A cell that could not draw them drops that rung, and the
+    // next rung (and its message) takes its place at once.
+    // Touch numerals need a 40 px digit (SF-34): once they appear, the cell keeps that size for
+    // the rest of the ladder, so the problem never changes size again.
+    if (root.querySelector('.ws-tn')) {
+        const sc = (root.querySelector && root.querySelector('.ws-card-visual.mq-scell')) || (root.closest ? root.closest('.mq-scell') : null) || (root.querySelector && root.querySelector('.mq-scell'));
+        if (sc) sc.setAttribute('data-mq-touch-floor', '1');
+    }
+    const e = _entries.get(q);
+    const cur = e && e.n >= 1 && e.n <= e.rungs.length ? e.rungs[e.n - 1] : null;
+    if (cur && TOUCH_IDS.includes(cur.id) && !root.querySelector('[data-ws-touch], [data-ws-tally]')) {
+        e.rungs.splice(e.n - 1, 1);
+        return drawLadder(root, q, ctx.message ? Object.assign({}, ctx, { message: messageFor(e) }) : ctx);
+    }
     const body = parts.filter(Boolean).join('');
     if (!body) return;
     const box = document.createElement('div');
@@ -826,7 +923,8 @@ export function practiceLadderWrong(q, userAns) {
     if (fb) {
         fb.style.display = 'block';
         fb.className = 'feedback-area mq-ladder-feedback';
-        fb.textContent = r.message;
+        // the message of the rung actually drawn (a touch rung the cell could not draw was dropped)
+        fb.textContent = ladderMessage(q) || r.message;
     }
     return r;
 }

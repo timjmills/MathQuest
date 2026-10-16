@@ -254,6 +254,43 @@ async function startHost(page, host, c, k, seed) {
             console.log(`${(s + ' ' + size.w + 'x' + size.h).padEnd(44)} ${line.join(' | ')}`);
         }
     }
+    // Touch (critic r5 Q5-1): instant feedback, a typed one-box answer, then ONE real touch tap on Next
+    // moves on (the feedback must not be drawn under the tap and move Next away from it).
+    if (HOSTS.includes('quiz')) {
+        for (const size of SIZES) {
+            const t = await open({ seed: 17, viewport: { width: size.w, height: size.h, deviceScaleFactor: 1, hasTouch: true } });
+            try {
+                await t.page.waitForFunction(() => typeof window.generateQuestionFor === 'function' && !!window.SKILLS, { timeout: 30000 });
+                for (const [c, k] of [['addition', 'add_facts'], ['subtraction', 'subtract'], ['multiplication', 'mult_facts']]) for (const ans of ['wrong', 'right']) {
+                    await t.page.evaluate((c, k) => {
+                        const questions = [];
+                        for (let i = 0; i < 3; i++) {
+                            const q = window.generateQuestionFor({ category: c, skill: k, seed: 990 + i, itemIndex: i });
+                            questions.push({ id: i, skillId: k, points: 1, questionData: window.quizQuestionData(q) });
+                        }
+                        const test = { id: null, name: 'Fit', sections: [{ id: 0, label: 'A', layout: { columns: 2, spacing: 'normal' }, instructions: '', questions }],
+                            settings: { timeLimit: null, randomOrder: false, showFeedback: 'instant', allowRetry: true, passingScore: 70, sectionMode: 'sequential', shuffleWithinSections: false, printVersions: 1 } };
+                        window.handleQuizURL(window.compressTestForURL(test));
+                        const name = document.getElementById('qtStudentName'); name.value = 'A'; name.dispatchEvent(new Event('input'));
+                        window.startQuizTest(); window.scrollTo(0, 0);
+                    }, c, k);
+                    await sleep(1200);
+                    const tag = `${c}:${k} ${size.w}x${size.h} quiz touch ${ans}`;
+                    if (!(await t.page.$('#qtAnswerInput'))) { fails.push(`${tag}: no one-box answer`); continue; }
+                    const v = await t.page.evaluate((ans) => { const s = window.state; const a = Number(String(s.quizAllQuestions[s.quizOrder[s.quizQuestionIndex]].question.questionData.ans).replace(/,/g, '')); return String(ans === 'right' ? a : a + 1); }, ans);
+                    await t.page.focus('#qtAnswerInput'); await t.page.keyboard.type(v);
+                    const nx = await t.page.evaluate(() => { const n = document.querySelector('#quizTakeView .qt-nav-btn.next'); const r = n.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+                    await t.page.touchscreen.tap(nx.x, nx.y); await sleep(1100);
+                    const idx = await t.page.evaluate(() => window.state.quizQuestionIndex);
+                    console.log(`${tag.padEnd(44)} touch Next ${idx === 1 ? 'ok' : 'FAIL'}`);
+                    if (idx !== 1) fails.push(`${tag}: one touch tap on Next after typing did not move to the next question`);
+                }
+            } finally {
+                if (t.problems.length) fails.push(...t.problems.slice(0, 4).map(p => `[${p.type}] ${p.text}`));
+                await t.close();
+            }
+        }
+    }
     if (arg('json', null)) fs.writeFileSync(arg('json'), JSON.stringify(rows, null, 1));
     if (tall.length) console.log(`\nGenuinely tall items (may scroll; active-box brings the box into view):\n  ${tall.join('\n  ')}`);
     if (app.problems.length) fails.push(...app.problems.slice(0, 8).map(p => `[${p.type}] ${p.text}`));
