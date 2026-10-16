@@ -1,0 +1,1914 @@
+{
+ "tool": "ws-print-lint",
+ "source": "kit",
+ "lints": [
+  "L-INK",
+  "L-EMOJI",
+  "L-FONT",
+  "L-SIZE",
+  "L-OVERFLOW",
+  "L-SPLIT",
+  "L-DENSITY",
+  "L-KEY",
+  "L-VERBS",
+  "L-ANSAREA",
+  "L-INPUT",
+  "L-CCSS",
+  "L-ANCHOR",
+  "L-SUPPORT"
+ ],
+ "documents": [
+  {
+   "id": "composing:odd_even#more-practice",
+   "label": "Odd or Even? (Visual) (more-practice)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "composing:whole_as_fraction#more-practice",
+   "label": "Whole Numbers as Fractions (Visual) (more-practice)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "division:div_zero_in_quotient#more-practice",
+   "label": "Zero in the Quotient (more-practice)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "composing:ten_frame_build#more-practice",
+   "label": "Build a Number on a Ten Frame (more-practice)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "multiplication:dot_array_mult#more-practice",
+   "label": "Dot Array Multiplication (B&W) (more-practice)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "addition:add_sub_10s#more-practice",
+   "label": "Add & Subtract by 10s (more-practice)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "division:missing_mult_div#more-practice",
+   "label": "Missing Factors (×/÷) (more-practice)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "multiplication:mixed_multiplication#more-practice",
+   "label": "Mixed Multiplication (more-practice)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "multiplication:mixed_multiplication#more-practice@2697700287",
+   "label": "Mixed Multiplication (more-practice) (seed 2697700287)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "multiplication:mixed_multiplication#more-practice@2714477906",
+   "label": "Mixed Multiplication (more-practice) (seed 2714477906)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "multiplication:mixed_multiplication#more-practice@2731255525",
+   "label": "Mixed Multiplication (more-practice) (seed 2731255525)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "multiplication:mixed_multiplication#more-practice@2613812192",
+   "label": "Mixed Multiplication (more-practice) (seed 2613812192)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "multiplication:mixed_multiplication#more-practice@2630589811",
+   "label": "Mixed Multiplication (more-practice) (seed 2630589811)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "multiplication:mixed_multiplication#more-practice@2647367430",
+   "label": "Mixed Multiplication (more-practice) (seed 2647367430)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "multiplication:mixed_multiplication#more-practice@2664145049",
+   "label": "Mixed Multiplication (more-practice) (seed 2664145049)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "multiplication:mixed_multiplication#more-practice@2815143620",
+   "label": "Mixed Multiplication (more-practice) (seed 2815143620)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "multiplication:mixed_multiplication#more-practice@2831921239",
+   "label": "Mixed Multiplication (more-practice) (seed 2831921239)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "composing:mixed_composing#more-practice",
+   "label": "Mixed Number Sense (more-practice)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "composing:mixed_composing#more-practice@57332673",
+   "label": "Mixed Number Sense (more-practice) (seed 57332673)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "composing:mixed_composing#more-practice@6999816",
+   "label": "Mixed Number Sense (more-practice) (seed 6999816)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "composing:mixed_composing#more-practice@23777435",
+   "label": "Mixed Number Sense (more-practice) (seed 23777435)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "composing:mixed_composing#more-practice@107665530",
+   "label": "Mixed Number Sense (more-practice) (seed 107665530)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "composing:mixed_composing#more-practice@124443149",
+   "label": "Mixed Number Sense (more-practice) (seed 124443149)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "composing:mixed_composing#more-practice@74110292",
+   "label": "Mixed Number Sense (more-practice) (seed 74110292)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "composing:mixed_composing#more-practice@90887911",
+   "label": "Mixed Number Sense (more-practice) (seed 90887911)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "composing:mixed_composing#more-practice@4201301398",
+   "label": "Mixed Number Sense (more-practice) (seed 4201301398)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "composing:mixed_composing#more-practice@4218079017",
+   "label": "Mixed Number Sense (more-practice) (seed 4218079017)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "counting_mixed:counting_all#more-practice",
+   "label": "All Counting & Cardinality (more-practice)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "counting_mixed:counting_all#more-practice@174999603",
+   "label": "All Counting & Cardinality (more-practice) (seed 174999603)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "counting_mixed:counting_all#more-practice@191777222",
+   "label": "All Counting & Cardinality (more-practice) (seed 191777222)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "counting_mixed:counting_all#more-practice@208554841",
+   "label": "All Counting & Cardinality (more-practice) (seed 208554841)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "counting_mixed:counting_all#more-practice@225332460",
+   "label": "All Counting & Cardinality (more-practice) (seed 225332460)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "counting_mixed:counting_all#more-practice@242110079",
+   "label": "All Counting & Cardinality (more-practice) (seed 242110079)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "counting_mixed:counting_all#more-practice@258887698",
+   "label": "All Counting & Cardinality (more-practice) (seed 258887698)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "counting_mixed:counting_all#more-practice@275665317",
+   "label": "All Counting & Cardinality (more-practice) (seed 275665317)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "counting_mixed:counting_all#more-practice@292442936",
+   "label": "All Counting & Cardinality (more-practice) (seed 292442936)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "counting_mixed:counting_all#more-practice@309220555",
+   "label": "All Counting & Cardinality (more-practice) (seed 309220555)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "division:long_div_2digit#more-practice",
+   "label": "Divide by 2-Digit Numbers (Visual) (more-practice)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "multiplication:mult_comparison#more-practice",
+   "label": "Times as Many Word Problems (Visual) (more-practice)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "division:remainder_interpret#more-practice",
+   "label": "Interpret the Remainder (Word Problems) (more-practice)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "addition:number_families_add#more-practice",
+   "label": "Number Families (Add & Subtract) (more-practice)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "multiplication:number_families_mult#more-practice",
+   "label": "Number Families (Multiply & Divide) (more-practice)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "subtraction:missing_add_sub#more-practice",
+   "label": "Missing Numbers (+/−) (more-practice)",
+   "mode": "kit",
+   "pages": 4,
+   "keyPages": 2,
+   "printedPages": 4,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      3,
+      4
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0
+   },
+   "findings": [],
+   "notes": []
+  }
+ ]
+}
