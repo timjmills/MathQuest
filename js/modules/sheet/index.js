@@ -79,11 +79,12 @@ export {
 export { stack, stackTabStep, stackAnswerSlot } from './cells/stack.js';
 export { fact, factPadTop, factWidthMm, factFillOfColumn, factWriteMm, FACT_GEOMETRY, factCue } from './cells/fact.js';
 export { equation, equationParts, equationColumns, frac, mixed } from './cells/equation.js';
-// S1 touch dots: the engine only (design/SUPPORTS.md §S1). No skill or option uses it yet.
+// S1 touch numerals: the digit drawn with its touch dots on the strokes (design/SUPPORTS.md §S1).
 export {
     TOUCH_DOTS, TOUCH_DOTS_BOLD, TOUCH_DOT_BASELINE_EM, TOUCH_DOT_SIZES, TOUCH_DOT_DEFAULT, TOUCH_DOT_MIN,
     touchDots, touchDotCount, touchDotOrder, touchDotsFits, touchDotGeometry, touchDotsMarks, touchDotsSVG,
-    touchDotsDigitHTML, touchDotNearest, touchTallySVG,
+    touchDotsDigitHTML, touchDotNearest, touchTallySVG, touchNumeralSVG, touchNumeralHTML, TOUCH_NUMERAL_SIZES,
+    TOUCH_DOT_FLOOR_MM, TOUCH_DOT_FLOOR_PX,
 } from './touchdots.js';
 // S2 the supports model: the allocator and the drawing (design/SUPPORTS.md §S2).
 export {

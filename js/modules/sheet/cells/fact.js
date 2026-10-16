@@ -293,7 +293,7 @@ register('fact', {
         // VA-71 / the notation option: vertical rows first, then a horizontal block. An across
         // fact on a page of more than 4 columns (a fact-rows page) is drawn vertical (VA-65).
         const tn = touchNumbers(p);
-        const to = touchOpts(pt, ctx.mode === 'screen' ? 'px' : 'pt');
+        const to = touchOpts(pt, ctx.mode === 'screen' ? 'px' : 'pt', 'solid', ctx.photocopySafe);
         if (drawsAcross(p, ctx)) {
             const nd = Math.max(2, Number(p.digits) || 3);
             const A0 = touchNumberHTML(p.a, tn.a, to), B0 = touchNumberHTML(p.b, tn.b, to);
