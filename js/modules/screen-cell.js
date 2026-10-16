@@ -1822,7 +1822,13 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
     // denominator, the whole or the fraction left out when its boxes are empty.
     const mixed = join === 'mixed';
     const splitMixed = (v) => { const m = /^\s*(?:(\d+)\s+)?(\d*)\s*\/?\s*(\d*)\s*$/.exec(String(v || '')); return m ? [m[1] || '', m[2] || '', m[3] || ''] : []; };
-    const saved = mixed ? splitMixed(input.value) : String(input.value || '').split(join.trim() || ',').map((t) => t.trim());
+    let saved = mixed ? splitMixed(input.value) : String(input.value || '').split(join.trim() || ',').map((t) => t.trim());
+    // A row that joins with NO separator (a word problem's answer digits, data-mq-join=""): "816" is one digit per box, the
+    // digits in the rightmost boxes (the row's spare boxes stand on the left) - small fixes item 4, "[816|_|_|_]" on going back.
+    if (!mixed && join === '' && slots.length > 1) {
+        const ch = [...String(input.value || '').replace(/\s/g, '')];
+        saved = ch.length <= slots.length ? [...Array(slots.length - ch.length).fill(''), ...ch] : saved;
+    }
     const boxes = slots.map((slot, k) => {
         const el = document.createElement('input');
         el.type = 'text';
@@ -1836,6 +1842,8 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
         const fixedW = slot.getAttribute('data-mq-fixed') === '1' && Number(slot.getAttribute('data-mq-w'));
         el.setAttribute('maxlength', String(fixedW || Math.max(2, Number(slot.getAttribute('data-mq-w')) || 4)));
         if (fixedW) el.dataset.mqFixed = '1';
+        // a count-by box: as many digits as the row's widest number; one more goes on to the next box (active-box.js)
+        if (Number(slot.getAttribute('data-mq-max')) > 0) { el.dataset.mqMax = slot.getAttribute('data-mq-max'); el.setAttribute('maxlength', el.dataset.mqMax); }
         el.setAttribute('aria-label', slot.getAttribute('data-mq-label') || `answer ${k + 1} of ${slots.length}`);
         if (saved[k]) el.value = saved[k];
         slot.textContent = '';
@@ -1850,12 +1858,33 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
     };
     boxes.forEach((b, k) => {
         b.addEventListener('input', () => {
+            delete b.dataset.mqHandedAt;
             b.value = _slotChars(b.value, b.dataset.mqKind);
             input.value = compose();
             input.dispatchEvent(new Event('input', { bubbles: true }));
         });
         b.addEventListener('change', () => { if (onChange) onChange(compose()); });
         b.addEventListener('keydown', (e) => {
+            // a LIST of numbers (a count-by row): Space or a comma after a number moves on to the next box, as a pupil writes
+            // a gap (a box keeps digits only, so a comma is never part of a number here)
+            const list = join.trim() === ',' && !b.dataset.mqKind;
+            // critic r3 N7: the caret was just HANDED to this empty box (a right number turned green, or a digit ran over):
+            // the pupil's Space / comma / Enter / Tab is the move-on for the number they finished - it is already done here
+            const handed = list && !(b.value || '').trim() && Date.now() - Number(b.dataset.mqHandedAt || 0) < 2500;
+            if (handed && (e.key === ' ' || e.key === ',' || e.key === 'Enter' || (e.key === 'Tab' && !e.shiftKey))) {
+                e.preventDefault();
+                delete b.dataset.mqHandedAt;
+                return;
+            }
+            // Space or a comma moves on to the NEXT EMPTY box (one already right or filled is passed over, critic r3 N11)
+            const nextEmpty = boxes.slice(k + 1).find((x) => !(x.value || '').trim());
+            if ((e.key === ' ' || e.key === ',') && list && (b.value || '').trim() && nextEmpty) {
+                e.preventDefault();
+                const nx = nextEmpty;
+                nx.focus({ preventScroll: true });
+                try { nx.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (err) { /* ignore */ }   // a box 1 px under the fold too
+                return;
+            }
             if (e.key === 'Enter') {
                 e.preventDefault();
                 const next = boxes[k + 1];
@@ -1988,11 +2017,17 @@ export function wireNumberLines(root) {
  * The pupil's working in a cell (number-line jumps, long-division working digits), so a host that
  * redraws the cell (the quiz re-renders on every answer) can put it back. Working is never graded.
  */
+// A word problem's working and answer (small fixes item 4, critic r1 D4): the copy boxes and sign box (input.mq-wwork), each
+// answer box (input.mq-cellslot: a row joined with no separator cannot be split back from "816"), and the tapped sign or unit word.
+const WORK_BOXES = 'input.mq-wwork, input.mq-cellslot:not(.mq-cellslot-host)';
+const WORK_PICKS = 'button.mq-wwop, button.mq-wwword';
 export function saveWorking(root) {
     if (!root) return null;
     return {
         nl: Array.from(root.querySelectorAll('[data-mq-nl]')).map((w) => w.dataset.mqJumps || ''),
         work: Array.from(root.querySelectorAll('input.mq-work')).map((i) => i.value || ''),
+        boxes: Array.from(root.querySelectorAll(WORK_BOXES)).map((i) => i.value || ''),
+        picks: Array.from(root.querySelectorAll(WORK_PICKS)).map((b) => b.getAttribute('aria-pressed') === 'true'),
     };
 }
 export function restoreWorking(root, saved) {
@@ -2004,6 +2039,19 @@ export function restoreWorking(root, saved) {
     Array.from(root.querySelectorAll('input.mq-work')).forEach((i, k) => {
         if (saved.work && saved.work[k]) i.value = saved.work[k];
     });
+    // every box back as the pupil left it, holes and all (only when the drawing is the same one: same number of boxes)
+    const boxes = Array.from(root.querySelectorAll(WORK_BOXES));
+    if (Array.isArray(saved.boxes) && saved.boxes.length === boxes.length) {
+        boxes.forEach((i, k) => {
+            if ((i.value || '') === saved.boxes[k]) return;
+            i.value = saved.boxes[k];
+            i.dispatchEvent(new Event('input', { bubbles: true }));   // the host recomposes its answer from its boxes
+        });
+    }
+    const picks = Array.from(root.querySelectorAll(WORK_PICKS));
+    if (Array.isArray(saved.picks) && saved.picks.length === picks.length) {
+        picks.forEach((b, k) => { if (saved.picks[k] && b.getAttribute('aria-pressed') !== 'true') b.click(); });
+    }
 }
 
 /**

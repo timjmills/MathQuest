@@ -512,21 +512,21 @@ export function playSelectedSkills(mode = 'practice') {
         state.bossHealth = 100;
         state.bossMaxHealth = 100;
         state.playerHealth = 100;
-        showNotification(`👹 Starting Boss Battle with ${window.skillQueue.length} skill${window.skillQueue.length > 1 ? 's' : ''}!`, 'success');
+        // (no start banner: it lingered over the first question - owner rule, no pop-ups during play)
     } else if (mode === 'race') {
         // Car Race mode
         state.gameMode = 'race';
         state.racePosition = 0;
         state.raceOpponentPosition = 0;
-        showNotification(`🏎️ Starting Car Race with ${window.skillQueue.length} skill${window.skillQueue.length > 1 ? 's' : ''}!`, 'success');
+        // (no start banner: it lingered over the first question - owner rule, no pop-ups during play)
     } else if (mode === 'worksheet') {
         // Worksheet mode - on-screen worksheet style
         state.gameMode = 'worksheet';
-        showNotification(`📝 Starting Worksheet with ${window.skillQueue.length} skill${window.skillQueue.length > 1 ? 's' : ''}!`, 'success');
+        // (no start banner: it lingered over the first question - owner rule, no pop-ups during play)
     } else {
         // Standard practice mode
         state.gameMode = 'practice';
-        showNotification(`▶️ Starting Practice with ${window.skillQueue.length} skill${window.skillQueue.length > 1 ? 's' : ''}!`, 'success');
+        // (no start banner: it lingered over the first question - owner rule, no pop-ups during play)
     }
 
     // Start the game

@@ -159,6 +159,7 @@ function selectIfLoose(active) {
     const justRight = ae && ae !== active && ae.classList && ae.classList.contains('mq-live-correct')
         && ae === lastInput.el && Date.now() - lastInput.t < 1500;
     if (justRight) {
+        active.dataset.mqHandedAt = String(Date.now());   // the caret was handed here: a move-on key now is for the box left behind
         try { active.focus({ preventScroll: !onScreen(active) ? false : true }); } catch (e) { /* ignore */ }
         return;
     }
@@ -193,10 +194,11 @@ function selectIfLoose(active) {
 // to the next empty answer box of the same problem, in entry order (ones first in a column). This is
 // on every host and whether the digit is right or wrong: it reveals nothing, it only stops the next
 // digit joining a box that cannot take it. Only boxes with a fixed digit count (maxlength) move on;
-// a box whose answer may be longer never does. A count-by row keeps its own focus rule, and a widget
+// a box whose answer may be longer never does, except a count-by box, which carries its number's digit count. A widget
 // that has already moved the caret itself is left alone.
 function advanceIfFull(el) {
     if (!el || el !== document.activeElement || el.tagName !== 'INPUT' || !isAnswerBox(el)) return;
+    if (el.dataset.mqMax) return;           // a count-by box never moves the caret by itself (overflowKey)
     const max = el.maxLength;
     if (!(max > 0) || String(el.value || '').length < max) return;
     if (el.closest('[data-mq-swiperow]')) return;
@@ -205,11 +207,51 @@ function advanceIfFull(el) {
     const boxes = entryOrder([...host.querySelectorAll('input, textarea, [contenteditable="true"]')].filter(isAnswerBox).filter(visible));
     const i = boxes.indexOf(el);
     if (i < 0) return;
-    const ok = (b) => !valueOf(b) && !isOptional(b) && !b.classList.contains('mq-live-correct')
-        && !(b.matches('input.mq-wwork') && b.getAttribute('data-mq-expect') === '');
-    const next = boxes.slice(i + 1).find(ok) || boxes.slice(0, i).find(ok);
+    const next = nextEmptyBox(boxes, i);
     if (!next) return;
-    try { next.focus({ preventScroll: onScreen(next) }); } catch (e) { /* ignore */ }
+    moveTo(next);
+}
+
+const okNext = (b) => !valueOf(b) && !isOptional(b) && !b.classList.contains('mq-live-correct')
+    && !(b.matches('input.mq-wwork') && b.getAttribute('data-mq-expect') === '');
+function nextEmptyBox(boxes, i) { return boxes.slice(i + 1).find(okNext) || boxes.slice(0, i).find(okNext) || null; }
+function moveTo(next) {
+    // the browser scrolls the box into view unless ALL of it is on screen already (a box 1 px under the fold is scrolled to)
+    const r = next.getBoundingClientRect();
+    const whole = r.top >= 0 && r.left >= 0 && r.bottom <= innerHeight && r.right <= innerWidth;
+    try { next.focus({ preventScroll: whole && !underPinnedBar(next) }); } catch (e) { /* ignore */ }
+    if (!whole || underPinnedBar(next)) { try { next.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (e) { /* ignore */ } }
+}
+
+// A count-by box takes as many digits as the row's widest number (data-mq-max, count-row.js - the same for every box, so it
+// tells no box's answer). A digit typed into a box already holding that many goes on to the next empty box instead of being
+// lost (small fixes item 1, critic r2 N1/N2: in the quiz "21" then "28" joined as "2128"). Nothing moves on a pause or on the
+// box's own answer; the pupil moves on with Space, comma, Enter, Tab or a tap (screen-cell.js wireCellSlots).
+function overflowKey(e) {
+    const el = e.target;
+    if (!/^[0-9]$/.test(e.key || '') || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (!el || el.tagName !== 'INPUT' || !el.dataset || !el.dataset.mqMax || el !== document.activeElement || !isAnswerBox(el)) return;
+    const v = String(el.value || '');
+    if (v.replace(/\D/g, '').length < Number(el.dataset.mqMax)) return;
+    if (el.selectionStart !== v.length || el.selectionEnd !== v.length) return;       // a selection is typed over, in place
+    const host = el.closest(POPUP) || el.closest(HOSTS);
+    if (!host) return;
+    // a box scrolled out of its swipe row's window is still the row's next box (its rect may lie over a neighbouring card)
+    const shown = (b) => b.closest('[data-mq-swiperow]') || visible(b);
+    const boxes = entryOrder([...host.querySelectorAll('input, textarea, [contenteditable="true"]')].filter(isAnswerBox).filter(shown));
+    const i = boxes.indexOf(el);
+    const next = i < 0 ? null : boxes.slice(i + 1).find(okNext);
+    if (!next || next.tagName !== 'INPUT') {
+        // no box left to take it (the last box, or every later box filled): the digit stays here, never lost (critic r3 N10)
+        el.setAttribute('maxlength', String(v.length + 1));
+        return;
+    }
+    e.preventDefault();
+    next.dataset.mqHandedAt = String(Date.now());
+    moveTo(next);
+    next.value = e.key;
+    lastInput = { t: Date.now(), el: next };
+    next.dispatchEvent(new Event('input', { bubbles: true }));   // the host composes its answer from its boxes
 }
 
 export function refreshActiveBox() {
@@ -261,6 +303,7 @@ export function installActiveBox() {
         if (!box || box.closest('[data-mq-swiperow]') || !onScreen(box) || !uncovered(box)) return;
         try { box.focus({ preventScroll: true }); } catch (err) { /* ignore */ }
     }, true);
+    document.addEventListener('keydown', overflowKey, true);
     for (const ev of ['focusin', 'focusout', 'input', 'change', 'click']) document.addEventListener(ev, schedule, true);
     // Questions are re-rendered by many code paths; watch the DOM rather than hooking each one.
     const mo = new MutationObserver(schedule);
