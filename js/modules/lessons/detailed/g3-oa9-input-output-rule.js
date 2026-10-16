@@ -111,11 +111,11 @@ export default {
     prerequisites: [
         { atom: 1, items: 2, ref: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20 }, minNum: 11, maxNum: 20 },
             lesson: { id: '2.OA.B.2', title: 'Add within 20' } },
-        { atom: 1, items: 2, ref: { categoryId: 'subtraction', skillId: 'sub_facts', opts: { band: 20 } },
+        { atom: 2, items: 2, ref: { categoryId: 'subtraction', skillId: 'sub_facts', opts: { band: 20 } },
             lesson: { id: '2.OA.B.2', title: 'Subtract within 20' } },
-        { atom: 2, items: 3, ref: { categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: [2, 5, 10] } },
+        { atom: 3, items: 3, ref: { categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: [2, 5, 10] } },
             lesson: { id: '3.OA.C.7', title: 'Multiply by 2, 5 and 10' } },
-        { atom: 3, items: 1, ref: FT({ ftTask: 'outputs', ftRules: ['+'] }),
+        { atom: 4, items: 1, ref: FT({ ftTask: 'outputs', ftRules: ['+'] }),
             lesson: { id: '4.OA.C.5', title: 'Use a rule to fill a table' } },
     ],
 
@@ -186,7 +186,8 @@ export default {
 
     // ------------------------------------------------------------------ T2 Atomisation template
     atoms: [
-        { type: 'Fact', prereq: true, skill: 'Add and subtract facts to 20', notes: 'Find a change fast. Prerequisite Check {pre.0.letters} {pre.1.letters}.' },
+        { type: 'Fact', prereq: true, skill: 'Add facts to 20', notes: 'Find a change fast. Prerequisite Check {pre.0.letters}.' },
+        { type: 'Fact', prereq: true, skill: 'Subtract facts to 20', notes: 'Prerequisite Check {pre.1.letters}.' },
         { type: 'Fact', prereq: true, skill: '×2, ×5, ×10 facts', notes: 'Prerequisite Check {pre.2.letters}.' },
         { type: 'Conceptual', prereq: true, skill: 'Use a given rule', notes: 'Prerequisite Check {pre.3.letters} (4.OA.C.5).' },
         { type: 'Category', skill: 'In and Out: each row is a pair', notes: 'Read across, not down.' },

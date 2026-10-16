@@ -256,6 +256,7 @@ export default {
         'The label word is the story noun. On P5, any two-part bar with the right labels.',
         'The answer box and the top box hold the same number. A blank part box with the right whole: ask for the parts.',
         'P5 equation: the two parts in either order, then the whole after =.',
+        'Mixed page: a fact answer needs no label word; a story answer does.',
         'Exit slip: sort by the boxes ticked; “one more day” pupils join the cube group next lesson.',
     ],
     wrongAnswers: [
