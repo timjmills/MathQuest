@@ -310,6 +310,8 @@ missing_steps = [s for s in order if s not in ST]
 if missing_steps: errs.append(f'steps missing: {missing_steps}')
 doc = {'year': 'Y5', 'generatedBy': 'wave2-tagging', 'steps': out_steps, 'proposals': proposals, 'tagFixes': tagfixes}
 OUT = R + 'data/curriculum/links/Y5.json'
+# the other years' links files merged into main: mergecheck merges all their tagFixes with Y5's (0 real problems required)
+OTHER_YEARS = [y for y in ('R', 'Y1', 'Y2', 'Y3', 'Y4', 'Y6') if os.path.exists(R + f'data/curriculum/links/{y}.json')]
 with open(OUT, 'w') as f:
     json.dump(doc, f, indent=1, ensure_ascii=False); f.write('\n')
 from collections import Counter
@@ -318,7 +320,7 @@ print('steps', len(out_steps), dict(c))
 print('proposals new', sum(1 for p_ in proposals.values() if not p_['reused']), 'reused', sum(1 for p_ in proposals.values() if p_['reused']),
       'tagFixes', len(tagfixes), {a: sum(1 for t in tagfixes if t['action'] == a) for a in ('add', 'full', 'partial', 'opts', 'remove')})
 print(f'pre re-cited: {recited}; links re-optioned by linkfit: {changed}; links dropped by linkfit: {len(dropped)}; duplicates removed: {deduped}')
-mc = node(os.path.join(H, 'mergecheck.mjs'), OUT)
+mc = node(os.path.join(H, 'mergecheck.mjs'), OUT, *[R + f'data/curriculum/links/{y}.json' for y in OTHER_YEARS])
 print(mc.stdout.strip().splitlines()[-1] if mc.stdout.strip() else 'mergecheck: no output')
 if mc.returncode != 0: errs.append('mergecheck.mjs FAILED:\n' + mc.stdout.strip()[-3000:])
 lf = node(os.path.join(H, 'linkfit.mjs'), OUT)
