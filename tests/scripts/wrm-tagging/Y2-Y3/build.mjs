@@ -12,7 +12,7 @@ import fs from 'fs';
 import { execFileSync } from 'child_process';
 const _lsm=new Map();globalThis.localStorage={getItem:k=>_lsm.get(k)??null,setItem:(k,v)=>_lsm.set(k,String(v)),removeItem:k=>_lsm.delete(k)};globalThis.window=globalThis;globalThis.document={};
 const HERE=new URL('.',import.meta.url).pathname;
-const root=new URL('../../../',import.meta.url).pathname;
+const root=new URL('../../../../',import.meta.url).pathname;
 const [YEAR, MAXB] = [process.argv[2], +process.argv[3] || 99];
 const _log=console.log;console.log=()=>{};
 const {SKILLS}=await import(root+'js/modules/data.js');
@@ -27,9 +27,9 @@ const BL=await import(root+'js/modules/build-list.js');
 const OV=(await import(HERE+'overrides.mjs?'+Date.now()));
 const W=JSON.parse(fs.readFileSync(root+'data/curriculum/wrm-steps.json'));
 // r11 (critic r10 N9): the PASSED lanes' links files are read-only inputs (vendored copies under
-// design/audit/runs/wrm-tagging/inputs/, from the R/Y1 and Y4 lane branches). An R.* / Y1.* step's skills and their opts
+// tests/scripts/wrm-tagging/Y2-Y3/inputs/, from the R/Y1 and Y4 lane branches). An R.* / Y1.* step's skills and their opts
 // come from its lane's file, so a K rung of a Grade 1 skill keeps its opts ({usd, like, band 50}) instead of arriving as {}.
-const INP=root+'design/audit/runs/wrm-tagging/inputs/';
+const INP=HERE+'inputs/';
 const LANE={};for(const y of ['R','Y1'])LANE[y]=JSON.parse(fs.readFileSync(INP+y+'.json','utf8'));
 const laneStep=id=>{const y=id.split('.')[0];return LANE[y]?.steps?.[id]||null;};
 const SO=await import(root+'js/modules/skill-options.js');

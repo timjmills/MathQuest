@@ -1,5 +1,5 @@
 // Hand verdicts for Y2 / Y3, round 2. Every entry was judged from items generated WITH the opts below
-// (tests/scripts/wrm-tagging/items.mjs; log in design/audit/runs/wrm-tagging/Y2-Y3-items.md).
+// (tests/scripts/wrm-tagging/Y2-Y3/items.mjs; log in design/audit/runs/wrm-tagging/Y2-Y3-items.md).
 //   direct:[{key,opts}]  partials:[{key,missing,opts?}]  verdict  missing  build  pre  preBuild  related  note
 //   reviewed:true = the SKILL_WRM tags were re-generated and stand as they are.
 export const exclude = ['addition:equal_sign']; // deals plain column addition today (build-list equal_sign_repair)

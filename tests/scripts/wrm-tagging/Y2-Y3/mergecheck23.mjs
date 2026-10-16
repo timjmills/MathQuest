@@ -4,9 +4,9 @@
 // equal to its verdict, and no partial or gap step with a direct (full) skill.
 // Merge semantics (r11, one reading of all three lanes' shapes): remove -> drop; partial -> {step, partial: t.partial ?? why};
 // add -> partial when it has a `partial` field (or a "partial: X" why), else full; full -> full; opts -> no change.
-// usage: node tests/scripts/wrm-tagging/mergecheck23.mjs Y2 Y3     (build.mjs also calls mergeCheck on the file it writes)
+// usage: node tests/scripts/wrm-tagging/Y2-Y3/mergecheck23.mjs Y2 Y3     (build.mjs also calls mergeCheck on the file it writes)
 import fs from 'fs';
-const R = new URL('../../../', import.meta.url).pathname;
+const R = new URL('../../../../', import.meta.url).pathname;
 export async function mergeCheck(L) {
   if (!globalThis.localStorage) { const m = new Map(); globalThis.localStorage = { getItem: k => m.get(k) ?? null, setItem: (k, v) => m.set(k, String(v)), removeItem: k => m.delete(k) }; }
   globalThis.window ??= globalThis; globalThis.document ??= {};
@@ -18,9 +18,9 @@ export async function mergeCheck(L) {
   const M = {}; for (const [k, l] of Object.entries(SKILL_WRM)) M[k] = l.map(e => typeof e === 'string' ? { step: e } : { ...e });
   const P = [];
   // r11 (critic r10 A3b): the other lanes' tagFixes that touch THIS file's steps (the passed R, Y1 and Y4 files, vendored
-  // read-only under design/audit/runs/wrm-tagging/inputs/) are merged too, before and after this file's own fixes, so a
+  // read-only under tests/scripts/wrm-tagging/Y2-Y3/inputs/) are merged too, before and after this file's own fixes, so a
   // fix another lane carries on a Y2/Y3 step must agree with this file whichever lane the lead merges first.
-  const INP = R + 'design/audit/runs/wrm-tagging/inputs/';
+  const INP = new URL('inputs/', import.meta.url).pathname;
   const foreign = [];
   for (const y of ['R', 'Y1', 'Y4']) { let F; try { F = JSON.parse(fs.readFileSync(INP + y + '.json', 'utf8')); } catch (_) { P.push(`NO-INPUT ${y}.json`); continue; }
     for (const t of F.tagFixes || []) if (L.steps[t.step]) foreign.push({ ...t, lane: y }); }

@@ -17,7 +17,7 @@ import { execFileSync } from 'child_process';
 const _m=new Map();globalThis.localStorage={getItem:k=>_m.get(k)??null,setItem:(k,v)=>_m.set(k,String(v)),removeItem:k=>_m.delete(k)};
 globalThis.window=globalThis;globalThis.document=undefined;
 const HERE=new URL('.',import.meta.url).pathname;
-const root=new URL('../../../',import.meta.url).pathname;
+const root=new URL('../../../../',import.meta.url).pathname;
 const _l=console.log,_w=console.warn;console.log=()=>{};console.warn=()=>{};
 const {generateQuestionFor}=await import(root+'js/modules/generate-question.js');
 console.log=_l;console.warn=_w;

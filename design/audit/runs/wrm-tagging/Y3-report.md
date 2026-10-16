@@ -14,8 +14,8 @@ the tens / two or more, on every + − × ÷ regroup band), `two_and_three_digit
 
 ## Round 11 (after critic Y2–Y3 r10, 7.94 / 7.97): rung chooser, prior-lane opts, the five-year merge
 
-Generator (`tests/scripts/wrm-tagging/build.mjs`, `mergecheck23.mjs`, new `mergeall5.mjs`; inputs vendored read-only under
-`design/audit/runs/wrm-tagging/inputs/`: `R.json`, `Y1.json` from the R/Y1 lane, `Y4.json` from the Y4 lane):
+Generator (`tests/scripts/wrm-tagging/Y2-Y3/build.mjs`, `mergecheck23.mjs`, new `mergeall5.mjs`; inputs vendored read-only under
+`tests/scripts/wrm-tagging/Y2-Y3/inputs/`: `R.json`, `Y1.json` from the R/Y1 lane, `Y4.json` from the Y4 lane):
 
 - **A1 (N8, rung chooser).** For `count_by_tables` / `mult_facts` / `div_facts` the lower rung is a step whose every table
   divides one of the step's tables, with the rung at least 1/20 of it (10 for 100, 4 for 8, 2 for 4, 5 for 10; never 5 for
@@ -84,7 +84,7 @@ Step rows:
 - **A3 (N5b)**: every `share_into_groups` why that named sharing now reads "Y1.B9.S8 / Y2.B5.S7 making equal groups
   (grouping): ring the counters in groups of a size"; `whyText` added.
 - **A4 (N7, merge)**: a partial whose clause differs from `SKILL_WRM` now emits a `partial` tagFix (22 clause fixes).
-  New `tests/scripts/wrm-tagging/mergecheck23.mjs`, run by the build on every write (`MERGE` lines, exit 1): it applies
+  New `tests/scripts/wrm-tagging/Y2-Y3/mergecheck23.mjs`, run by the build on every write (`MERGE` lines, exit 1): it applies
   the tagFixes to the live `SKILL_WRM` and asserts every direct is full, every partial carries this file's clause,
   nothing else is tagged, every step's coverage equals its verdict, and no partial or gap step lists a direct skill.
   **mergecheck Y2 0 / Y3 0 problems**; the critic's `mergesim` 0 issues.
@@ -261,7 +261,7 @@ Step rows:
   step on the same topic taught before this one; earlier-in-block, xlsx and rule-14 promotions only take steps taught in
   an earlier week (or earlier in the same week); earlier grades always count. A pre whose `why` cites only same-year
   steps taught later is dropped; when it also cites earlier-grade learning, the later name is removed from the `why`.
-- **Content markers by week** (`tests/scripts/wrm-tagging/markers.mjs`, shared by `build.mjs` and `linkscan.mjs`):
+- **Content markers by week** (`tests/scripts/wrm-tagging/Y2-Y3/markers.mjs`, shared by `build.mjs` and `linkscan.mjs`):
   every link is generated (10 + 8 items, two seed families) and checked for content first met later than the step's
   week + 2 (Y2: thirds W31, quarter past W36, 5-minute times W37, ÷ W31, × W26, g/kg, ml/l, tally, pictogram; Y3: ÷3/4/8
   W31, ×8, fractions beyond quarters, equivalence W37, right angles W28, parallel/perpendicular W29, L ↔ mL W34, kg ↔ g,
@@ -354,7 +354,7 @@ Step rows:
   fix (`linkFix`). Links no option can narrow are dropped in that year (Y2 `mult_word_problems` deals 5 × 8;
   `fraction_of_set` ignores denoms; Y2 `capacity`, `length_metric`, `unit_conversion_word`; Y3 `count_by_tables` 100s
   past 1,000 on the to-100 steps) and replaced where a step was left without related.
-  `tests/scripts/wrm-tagging/linkscan.mjs` generates 8 items of every link with its opts and flags numbers past the
+  `tests/scripts/wrm-tagging/Y2-Y3/linkscan.mjs` generates 8 items of every link with its opts and flags numbers past the
   year's range (Y2 120 = 1.NBT.A.1, Y3 1,000; measures Y2 2,000 g/ml, Y3 5,000; money in cents; clock, angle and grid
   skills not range-checked): **243 flagged before, 0 after** (`linkscan: OK`). Links with explicit opts: Y2 390 of
   924, Y3 484 of 1,010 (the rest are skills whose defaults already sit inside the year).
@@ -383,8 +383,8 @@ Round 3 step fixes (S8):
 ## Method (round 2, after critic Y2–Y3 r1)
 
 - **Generated, not inherited.** Every direct and partial skill of every step was generated with `generateQuestionFor`
-  (6 items, the opts recorded in the links file) by `tests/scripts/wrm-tagging/items.mjs`; the first 3 of each are logged in
-  `Y2-Y3-items.md`. Hand verdicts live in `tests/scripts/wrm-tagging/overrides.mjs`; `build.mjs` writes the links file.
+  (6 items, the opts recorded in the links file) by `tests/scripts/wrm-tagging/Y2-Y3/items.mjs`; the first 3 of each are logged in
+  `Y2-Y3-items.md`. Hand verdicts live in `tests/scripts/wrm-tagging/Y2-Y3/overrides.mjs`; `build.mjs` writes the links file.
 - **Options are values.** No `opts.note` is left (the build refuses one). Old SKILL_WRM notes become opts only when they name
   a real value (`band 999`); every other step needing an option has hand opts read from `skill-options.js`
   (`constant`, `forms`, `band`, `kind`, `currency:'usd'`, `wordform`, `rows`, `stimulus`, `span` …).
