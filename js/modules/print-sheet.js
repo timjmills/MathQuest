@@ -692,7 +692,9 @@ function markOptions(html, q, ink) {
     return out.replace(/<span class="opt">([\s\S]*?)<\/span>(?=<span class="opt">|<\/div>)/g, (m, inner) => {
         const o = q.options[i++];
         if (!o || !o.correct) return m;
-        return `<span class="opt" data-ws-ink="${ink}" style="outline:0.6mm solid currentColor;outline-offset:0.8mm;border-radius:999px;${style}"><b style="${style}">${inner}</b></span>`;
+        // (r11, merged answer-key options INK-31) the ring is the answer and the printed option a
+        // given: no inner element the pupil page lacks, or the key would ink the option's text too
+        return `<span class="opt" data-ws-ink="${ink}" style="outline:0.6mm solid currentColor;outline-offset:0.8mm;border-radius:999px;${style}">${inner}</span>`;
     });
 }
 
@@ -3344,9 +3346,17 @@ function mergeLetterSheets(parts, seed) {
     });
     const pageCount = parts.reduce((a, p) => a + p.pageCount, 0);
     const notes = [...new Set(parts.flatMap((p) => p.notes || []))];
+    // The per-page lists travel too (r11, merge of the answer-key options): arrangeKey orders and
+    // restyles the key from pupilPages / keyPages / keyPlans, so letter B's pages must be in them
+    // (they held letter A's alone), numbered through the sheet as pupilHtml is.
+    const renumberList = (list) => { let i = 0; return list.map((h) => String(h).replace(/(<section class="ws-page [^"]*" )data-ws-page="\d+"/g, (m, a) => `${a}data-ws-page="${++i}"`)); };
+    const pagesOf = (p, k) => (Array.isArray(p[k + 'Pages']) ? p[k + 'Pages'] : (p[k + 'Html'] ? [p[k + 'Html']] : []));
     return Object.assign({}, first, {
         pupilHtml: renumber(parts.map((p) => p.pupilHtml).join('\n')),
         keyHtml: renumber(parts.map((p) => p.keyHtml || '').filter(Boolean).join('\n')),
+        pupilPages: renumberList(parts.flatMap((p) => pagesOf(p, 'pupil'))),
+        keyPages: renumberList(parts.flatMap((p) => pagesOf(p, 'key'))),
+        keyPlans: parts.flatMap((p) => p.keyPlans || (p.plan ? [p.plan] : [])),
         pageCount,
         keyPageCount: parts.reduce((a, p) => a + (p.keyPageCount || 0), 0),
         fits: Object.assign({}, first.fits, { pages: pageCount }),
