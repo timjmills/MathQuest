@@ -425,3 +425,16 @@
    Practice L: "55 ÷ ☐ = 11" under tab 10 began 0.4 mm inside it). The line keeps its size; a one-digit
    tab's cell is unchanged. Additive. */
 .ws-page .ws-grid > .ws-cell[data-ws-cell="equation"]:has(> .ws-tab.w2, > .ws-tab.w3) { padding-top: calc(var(--ws-ko) + 1.5mm); }
+/* CL-40 (Lane D r11, size M): a cell that steps RIGHT of the keep-out centres its drawing SAFELY, so a strip
+   a little wider than the room left of the keep-out starts at the room's left edge and runs into the right
+   padding, never back into the tab (number_seq_fill M: an 82 mm strip in 81.3 mm under tab 10). A parity
+   sort under a two- or three-digit tab steps right too ("100" rose into tab 10's square at M). Nothing
+   shrinks. Additive. */
+.ws-page .ws-grid > .ws-cell:is([data-ws-cell="seqstrip"], [data-ws-cell="counters"], [data-ws-cell="remainder"]):has(> .ws-tab, > .ws-letter) { align-items: safe center; }
+.ws-page .ws-grid > .ws-cell[data-ws-cell="parity"]:has(> .ws-tab.w2, > .ws-tab.w3) { padding-left: max(3mm, var(--ws-ko)); align-items: safe center; }
+/* A sequence strip fills its row's width, so at M and L it cannot step right of a two- or three-digit tab
+   (L: an 84.6 mm strip, 79.9 mm of room right of tab 10's keep-out). At M and L every labelled strip steps
+   DOWN instead, below the keep-out, and sits on the cell's bottom padding, so the strips of one page stay
+   level and aligned whatever their tab's width (the row holds the keep-out plus a strip at M and L; S keeps
+   the step to the right). */
+.ws-page:is(.ws-M, .ws-L) .ws-grid > .ws-cell[data-ws-cell="seqstrip"]:has(> .ws-tab, > .ws-letter) { padding-top: var(--ws-ko); padding-left: 3mm; justify-content: safe flex-end; }
