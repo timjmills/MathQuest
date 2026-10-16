@@ -8,7 +8,10 @@
 // pictures off, no key-word bolding. See the format in ./index.js. Pure data (no DOM, no state).
 // Every number a script speaks is a {placeholder} filled from the DEALT items, never typed here.
 
-const WP = (extra) => Object.assign({ categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'bar', wpCues: false, wpBank: false } }, extra || {});
+const NS = (categoryId, skillId, opts, extra) => Object.assign({ categoryId, skillId, opts }, extra || {});
+const WP = (extra) => Object.assign({ categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'bar', wpCues: false, wpBank: false }, cellPayload: { layout: 'bar' } }, extra || {});
+// (`cellPayload.layout: 'bar'`: the word-work cell's compact form - story, bar, answer box with the
+// label printed; no sign row, column boxes or unit bank: the bar is the working.)
 
 export default {
     id: 'g1-oa1-bar-model-wp-20',
@@ -36,8 +39,8 @@ export default {
     practicePages: 1,
     // Mixed: EARLIER skills only (V22 §9.5): number bonds and facts within 20.
     mixed: { skills: [
-        { categoryId: 'composing', skillId: 'number_bonds', opts: { band: 10, unknown: 'answer' } },
-        { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20 } },
+        { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20, notation: ['across'] } },
+        { categoryId: 'subtraction', skillId: 'sub_facts', opts: { band: 10, notation: ['across'] } },
     ] },
 
     lessonData: {
@@ -58,11 +61,10 @@ export default {
             { icon: 'check', text: 'Write the whole and the label.' },
         ],
         chant: 'Parts below. Whole on top. Add the parts.',
-        chartWide: true,
         // The chart's four panels fill the bar one step at a time (roles/lesson.js barState).
         chartSteps: ['{a} and {b} are the parts.', 'Write {a} and {b} in the part boxes.', 'The whole is missing: {a} + {b} = {ans}.', 'Write {ans} {unit}.'],
         guidedRows: 2,
-        practiceShape: [4, 2],
+        practiceShape: [6, 2],
         format: {
             kind: 'numbered steps with icons + a chant',
             why: 'The step pupils break is step 2 (the whole in a part box); the chant names where each number goes.',
@@ -83,14 +85,18 @@ export default {
             lesson: { id: 'K CC 5', title: 'Count to 20' } },
         { atom: 2, ref: { categoryId: 'composing', skillId: 'number_bonds', opts: { band: 10, unknown: 'answer' } },
             lesson: { id: 'Y1 B2 S2', title: 'Part-whole model' } },
-        { atom: 3, ref: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20 }, minNum: 11, maxNum: 20 },
+        { atom: 3, items: 4, ref: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20, notation: ['across'] }, minNum: 11, maxNum: 20 },
             lesson: { id: 'G1 OA 6', title: 'Add within 20' } },
     ],
 
     // ------------------------------------------------------------------ P1 Number sense
     numberSense: {
-        A: { ref: { categoryId: 'composing', skillId: 'number_bonds', opts: { band: 10, unknown: 'mixed' } }, instruction: 'Write the missing number.' },
-        B: { ref: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20 }, minNum: 11, maxNum: 20 }, instruction: 'Add.' },
+        // Five bank types (V22 §9.2), one a row, the same order in A and B; B the harder numbers.
+        // (A number bond is too tall for a P1 row - it is on P0.)
+        A: { items: [NS('placevalue', 'more_less_10', { step: 1, dir: 'more', band: 20 }), NS('placevalue', 'compare', { band: 99, closeness: 'far' }), NS('placevalue', 'unit_form', { band: 99 }, { maxNum: 50 }),
+            NS('placevalue', 'more_less_10', { step: 10, dir: 'more', band: 100 }, { maxNum: 60 }), NS('placevalue', 'more_less_10', { step: 1, dir: 'less', band: 20 })] },
+        B: { items: [NS('placevalue', 'more_less_10', { step: 1, dir: 'more', band: 100 }, { minNum: 30 }), NS('placevalue', 'compare', { band: 99, closeness: 'close' }), NS('placevalue', 'unit_form', { band: 99 }, { minNum: 50 }),
+            NS('placevalue', 'more_less_10', { step: 10, dir: 'more', band: 100 }, { minNum: 61 }), NS('placevalue', 'more_less_10', { step: 1, dir: 'less', band: 100 }, { minNum: 30 })] },
     },
 
     // ------------------------------------------------------------------ P5 Word problem
@@ -116,7 +122,7 @@ export default {
     // ------------------------------------------------------------------ retrieval (MWB)
     retrieval: [
         { ref: { categoryId: 'composing', skillId: 'number_bonds', opts: { band: 10, unknown: 'answer' } }, ask: 'Write the whole: the bond on the board.' },
-        { ref: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20 }, minNum: 11, maxNum: 19 }, ask: 'Solve the fact on the board.' },
+        { ref: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20, notation: ['across'] }, minNum: 11, maxNum: 19 }, ask: 'Solve the fact on the board.' },
     ],
 
     // ------------------------------------------------------------------ T1
@@ -134,12 +140,12 @@ export default {
 
     // ------------------------------------------------------------------ T2 Atomisation template
     atoms: [
-        { type: 'Fact', prereq: true, skill: 'Count a set: the last number said tells how many', notes: 'Prerequisite Check a.' },
-        { type: 'Conceptual', prereq: true, skill: 'Parts and whole: two parts make a whole', notes: 'Prerequisite Check b (number bond, the whole blank).' },
-        { type: 'Fact', prereq: true, skill: 'Add within 20: count on past 10', notes: 'Prerequisite Check c.' },
+        { type: 'Fact', prereq: true, skill: 'Count a set: the last number said tells how many', notes: 'Prerequisite Check {pre.0.letters}.' },
+        { type: 'Conceptual', prereq: true, skill: 'Parts and whole: two parts make a whole', notes: 'Prerequisite Check {pre.1.letters} (number bond, the whole blank).' },
+        { type: 'Fact', prereq: true, skill: 'Add within 20: count on past 10', notes: 'Prerequisite Check {pre.2.letters}.' },
         { type: 'Category', prereq: true, skill: 'Missing whole: when the whole is missing, add', notes: 'From number bonds. Checked again at step 3.' },
         { type: 'Category', skill: 'Story numbers are parts: “has … has …” gives two parts', notes: 'Show a story with one number too: no bar yet.' },
-        { type: 'Conceptual', critical: true, skill: 'Bar = part-whole: the top box is the whole, the lower boxes the parts', notes: 'The Critical Atom. Cubes on the mat first.' },
+        { type: 'Conceptual', critical: true, skill: 'Bar = part-whole: the top box is the whole, the lower boxes the parts', notes: 'Cubes on the mat first.' },
         { type: 'Category', skill: 'In all / now: the question asks for the whole', notes: '“In all” and “now” both point at the top box.' },
         { type: 'Comparative', skill: 'Same parts, same whole: 6 and 7 or 7 and 6', notes: 'The bar has the same length (EE .b). The other examples.' },
     ],
@@ -168,7 +174,7 @@ export default {
             rows: [
                 { do: 'Hand out the Prerequisite Check, face down.' },
                 { say: 'Do these on your own. Try every one.' },
-                { do: 'Read each question aloud. Wait 30 seconds.', note: 'Expected: a. [[{pre.0.ans}]], b. [[{pre.1.ans}]], c. [[{pre.2.ans}]]. Routing is on T6.' },
+                { do: 'Read each question aloud. Wait 30 seconds.', note: 'Expected: [[{p0.list}]]. Routing is on T6.' },
             ] },
         { n: 2, name: 'Number sense', min: 5, page: 'P1',
             rows: [

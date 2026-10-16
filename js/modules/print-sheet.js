@@ -339,6 +339,9 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         if (!q) return;
         // A lesson's practice page (lessons r1): `check` on the skill ref puts the Check line
         // ("Check: add back") under every subtraction stack. Not a skill option - the page's.
+        // `cellPayload` on a lesson's ref (the detailed lesson maker): fields merged into the item's
+        // kit payload (lesson 2: the word-work cell's compact `layout: 'bar'`). Absent elsewhere.
+        if (sk.cellPayload && q.cell && q.cell.payload) q = Object.assign({}, q, { cell: Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, sk.cellPayload) }) });
         if (sk.check && q.cell && q.cell.template === 'stack') q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, { check: true }) });
         // (`sectionLabel` on the ref: the Mixed page names the item's band by it - the detailed lesson maker)
         if (sk.sectionLabel) q = Object.assign({}, q, { sectionLabel: String(sk.sectionLabel) });
@@ -2630,6 +2633,7 @@ function dealOne(ref, seed, used, want) {
         let q = null;
         try { q = generateQuestionFor(Object.assign({ category: ref.categoryId, skill: ref.skillId, opts: ref.opts, seed: (seed + 7919 * k) >>> 0, itemIndex: k % 6 }, ref.range ? { range: ref.range } : {})); } catch (e) { q = null; }
         if (!q) continue;
+        if (ref.cellPayload && q.cell && q.cell.payload) q = Object.assign({}, q, { cell: Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, ref.cellPayload) }) });
         const key = factKeyOf(q), v = itemNumberOf(q);
         if (key === null || used.has(key) || (ok && !ok({ q }))) continue;
         if (ref.minNum !== undefined && !(v >= ref.minNum)) continue;
@@ -2819,7 +2823,10 @@ async function buildDetailedLesson(req = {}) {
     const nsAll = nsBands.flatMap((b) => b.its);
     measureItems(nsAll, { size: 'L', look: 'daily', colsList: [1] });
     const nsOwn = Math.max(14, ...nsAll.map((it) => (it.measured && it.measured[1] && Number.isFinite(it.measured[1].hMm) ? it.measured[1].hMm : 18)));
-    const nsCellH = Math.max(nsOwn, Math.min(nsOwn * 1.3, (236 - 2 * 11 - 4) / 10));
+    // Ten rows share the body (V22 §9.2: about 22 mm each): a cell measured taller (a fact cell's
+    // working room) still prints at the share - P1 rows are one-line items.
+    const nsShare = (236 - 2 * 11 - 4) / 10;
+    const nsCellH = Math.min(nsShare, Math.max(nsOwn, Math.min(nsOwn * 1.3, nsShare)));
     const p1Plan = numberSensePlan({ bands: nsBands.map((b) => ({ label: b.label, instr: b.instr, items: b.its.map((it) => Object.assign(composePlanItem(it, { cols: 1, level: 1 }), it.nsInstr ? { instr: it.nsInstr } : {})) })), cellH: nsCellH }, frameP('Number sense', 10));
     const p1r = renderPlan(p1Plan, { key: true });
     const p1 = { pupilPages: p1r.pupilPages, keyPages: p1r.keyPages, plan: p1Plan };

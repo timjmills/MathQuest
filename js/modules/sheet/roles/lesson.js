@@ -629,7 +629,7 @@ function barState(it, k, c, { keepSlots = false } = {}) {
 }
 
 function stateDrawing(it, steps, groups, k, c) {
-    if (isWordBar(it) && steps.length && /^bar-step-/.test(((steps[0] || {}).marks || [{}])[0].slot || '')) return unslot(barState(it, k, c));
+    if (isWordBar(it) && steps.length && /^bar-step-/.test((((steps[0] || {}).marks || [])[0] || {}).slot || '')) return unslot(barState(it, k, c));
     const merged = groups.map((g) => ({ marks: g.marks }));
     const ctx = resolveCtx(Object.assign({}, c, { state: 'blank', scaffoldLevel: 3, metrics: undefined }));
     if (isRound(it)) return unslot(roundState(it, k, ctx, Number(c.chartLineMm) > 0 ? Number(c.chartLineMm) : ({ S: 44, M: 52, L: 58 }[c.size] || 58)));

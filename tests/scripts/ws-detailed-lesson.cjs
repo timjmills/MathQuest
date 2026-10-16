@@ -180,10 +180,12 @@ function measure(LIBRARY) {
         const glance = tables.find((tb) => /Fade/.test(tb.querySelector('tr').textContent));
         P.fadeRows = glance ? [...glance.querySelectorAll('tbody tr')].map((tr) => /★/.test(tr.lastElementChild.textContent)) : null;
         // E29 (critic D10): the teacher pages' text, and each key cell's letter and answer marks
-        if (teacher) P.text = (pg.querySelector(':scope > .ws-body') || pg).innerText.replace(/\s+/g, ' ');
+        if (teacher) { const b0 = pg.querySelector(':scope > .ws-body') || pg; const th = [...b0.querySelectorAll('.dl-thumb')]; th.forEach((t) => { t.dataset.hide = t.style.display; t.style.display = 'none'; });
+            P.text = b0.innerText.replace(/\s+/g, ' '); th.forEach((t) => { t.style.display = t.dataset.hide || ''; }); }
         if (key) P.keyCells = [...pg.querySelectorAll('.ws-cell')].filter((c) => !c.closest('.dl-copy, .dl-thumb')).map((c) => ({
             letter: ((c.querySelector('[data-ws-label], .ws-letter') || {}).textContent || '').trim().replace(/\.$/, ''),
             ans: [...c.querySelectorAll('[data-ws-key-ans]')].map((e) => e.textContent.trim()).join(' '),
+            marks: [...c.querySelectorAll('[data-ws-key-ans]')].map((e) => e.textContent.trim()),
         })).filter((x) => x.letter);
         out.pages.push(P);
     }
@@ -322,7 +324,8 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
                 n++;
                 const c = cs.find((x) => x.letter === m[1]);
                 if (!c) probs.push(`${id} has no item ${m[1]}`);
-                else if (digits(c.ans) !== digits(m[2])) probs.push(`${id} ${m[1]}: teacher says ${m[2]}, key ${c.ans}`);
+                // (the quoted answer is the cell's whole key, or one of its marks - a bar story's answer box)
+                else if (digits(c.ans) !== digits(m[2]) && !(c.marks || []).some((k) => digits(k) === digits(m[2]))) probs.push(`${id} ${m[1]}: teacher says ${m[2]}, key ${c.ans}`);
             }
         };
         claims(sectionText(1), 'P0');

@@ -824,11 +824,11 @@ export function barMini({ whole, a, b, mark = '', wMm = 40, pt = 13 } = {}) {
 }
 
 /** A bar model with blank label boxes (the key writes the numbers and the answer). */
-function barModel(ctx, p) {
+function barModel(ctx, p, W = 150) {
     const st = p.steps[0];
     const put = filled(ctx);
     const ink = inkOf(ctx);
-    const W = 150, H = 8;
+    const H = 8;
     // A bar label is written on paper and typed on screen (scratch, never graded, SP-1 parity).
     const lab = (v, w) => (isTwin(ctx)
         ? `<input type="text" class="mq-wwork" data-mq-kind="number" data-mq-expect="${esc(String(v).replace(/,/g, ''))}" data-ws-graded="0" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="bar label" style="box-sizing:border-box;width:${L(ctx, Math.max(w, 16))};min-width:44px;height:max(44px, ${L(ctx, 7)});border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;color:${INK};font-family:'Andika','Open Sans',sans-serif;font-size:${P(ctx, zonePt(ctx) + 2)};font-weight:700;text-align:center;padding:0;">`
@@ -946,9 +946,28 @@ function shownSteps(p, ctx) {
     return { steps: out, picks: out.map((s) => s.op), ans: w.value !== undefined && w.value !== null ? String(w.value) : String(last.op === '/' ? last.q : last.ans) };
 }
 
+/**
+ * `layout: 'bar'` (a lesson's ref payload, the detailed lesson maker - lesson 2): the story, its
+ * part-whole bar as wide as the cell, and one answer box with the label word PRINTED beside it. No
+ * sign row, no column boxes, no unit bank: the bar IS the working (RCDWS "Draw it").
+ */
+function barLayout(p, ctx) {
+    const cols = Math.max(1, Number(ctx.columns || 1));
+    const W = Math.max(60, Math.min(150, 186 / cols - 16));
+    const put = filled(ctx);
+    const ink = put ? inkOf(ctx) : null;
+    const bx = boxMm(ctx);
+    const w = Math.max(blankWidth(2, sizeOf(ctx)), bx * 1.4);
+    const shown = put ? String(p.ans) : '';
+    const box = `<span data-ws-slot="answer" data-ws-shape="box"${ink ? ` data-ws-ink="${ink}"` : ''} style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${tw(ctx, w)};height:${tw(ctx, bx + 1)};border:${B(ctx, 1.5)} solid ${INK};border-radius:${L(ctx, 1.25)};background:#fff;font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;color:${ink === 'trace' ? GREY : INK};${KEY_FEATURES}">${esc(shown)}</span>`;
+    const ans = `<div class="mq-wwanswer" style="display:flex;align-items:center;gap:${L(ctx, 2)};font-size:${P(ctx, textPt(ctx) + 2)};margin-top:${L(ctx, 2)};"><span style="font-weight:700;">Answer:</span>${box}${p.unit ? `<span style="font-weight:700;">${esc(p.unit)}</span>` : ''}</div>`;
+    return `<div class="mq-ww mq-wwbarlayout" data-ww-ops="${p.steps[0].op}" style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${L(ctx, 2.5)};">${storyHTML(ctx, p, cols >= 2)}${barModel(ctx, p, W)}${ans}</div>`;
+}
+
 register(WW_TEMPLATE, {
     render(p, ctx) {
         if (!p || !Array.isArray(p.steps) || !p.steps.length) return '';
+        if (p.layout === 'bar' && p.bar && p.steps.length === 1 && !isTwin(ctx)) return barLayout(p, ctx);
         const twin = isTwin(ctx);
         // A cell in a 2- or 3-column grid (and the screen twin) stacks its zones: story, sign
         // row, columns, answer. A full-width cell puts the answer beside the columns, so a page
@@ -995,13 +1014,13 @@ register(WW_TEMPLATE, {
     answerKey(p) {
         const slots = { answer: { value: String(p.ans), graded: true, accept: [Number(p.ans).toLocaleString('en-US')] } };
         // the answer row's digit boxes (the one answer place when the answer is the row's result)
-        if (p.inRow !== false && Array.isArray(p.steps) && p.steps.length) {
+        if (p.inRow !== false && p.layout !== 'bar' && Array.isArray(p.steps) && p.steps.length) {
             const st = p.steps[p.steps.length - 1];
             const T = st.op === '/' ? digitsOf(st.top).length : columnRows(st, p.tracks).T;
             const d = String(p.ans).padStart(T, ' ');
             for (let i = 0; i < T; i++) slots[`ans-${i}`] = { value: d[i] === ' ' ? '' : d[i], graded: d[i] !== ' ' };
         }
-        if (p.unit) slots['answer-label'] = { value: p.unit, graded: false };
+        if (p.unit && p.layout !== 'bar') slots['answer-label'] = { value: p.unit, graded: false };
         (p.steps || []).forEach((s, i) => { slots[`op${i}`] = { value: GLYPH[s.op], graded: false }; });
         return { value: p.ans, display: p.unit ? `${Number(p.ans).toLocaleString('en-US')} ${p.unit}` : String(p.ans), slots };
     },
