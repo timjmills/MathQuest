@@ -1,10 +1,10 @@
 // Simulate the lead's merge of links-file tagFixes into the LIVE SKILL_WRM (js/modules/wrm.js) and check that every Y5 step comes
 // out as its links file says: each direct skill tagged FULL, each partial skill tagged PARTIAL with this file's clause, nothing else
 // tagged to a Y5 step. In wrm.js a string or {step, note} is FULL; {step, partial} is PARTIAL.
-// usage: node tests/scripts/wrm-tagging/mergecheck.mjs [Y5.json] [other years' links files ...]
+// usage: node tests/scripts/wrm-tagging/Y5/mergecheck.mjs [Y5.json] [other years' links files ...]
 // With several files, every file's tagFixes are merged in turn into one SKILL_WRM, then every file's steps are checked.
 globalThis.window = globalThis;
-const R = new URL('../../../', import.meta.url).pathname;
+const R = new URL('../../../../', import.meta.url).pathname;
 const { SKILL_WRM } = await import(R + 'js/modules/wrm.js');
 const fs = await import('fs');
 const files = process.argv.length > 2 ? process.argv.slice(2) : [R + 'data/curriculum/links/Y5.json'];

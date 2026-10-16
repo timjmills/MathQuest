@@ -1,7 +1,7 @@
 // Every opts value in Y5.json must be a real option of the skill and survive normalizeOptions unchanged.
 const _m = new Map(); globalThis.localStorage = { getItem: k => _m.get(k) ?? null, setItem: (k, v) => _m.set(k, String(v)), removeItem: k => _m.delete(k) };
 globalThis.window = globalThis; globalThis.document = undefined;
-const R = new URL('../../../', import.meta.url).pathname;
+const R = new URL('../../../../', import.meta.url).pathname;
 const _l = console.log; console.log = () => {}; await import(R + 'js/modules/generate-question.js'); console.log = _l;
 const so = await import(R + 'js/modules/skill-options.js');
 const fs = await import('fs');

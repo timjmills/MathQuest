@@ -11,11 +11,11 @@ Passes (ported from the Y4 lane, critic r13):
   why claims); a link with no fitting option set is dropped;  5. tagFixes DERIVED by diffing against live SKILL_WRM;
   6. every partial / gap step gets its envisioned skill (name, kind, teaches, closes, representation);  7. mergecheck.mjs
   (live wrm.js) must report 0 problems, else the build fails.
-usage: python3 tests/scripts/wrm-tagging/build.py      (exit 1 on any problem; output is byte-identical run to run)
+usage: python3 tests/scripts/wrm-tagging/Y5/build.py      (exit 1 on any problem; output is byte-identical run to run)
 """
 import json, re, sys, os, glob, subprocess, copy
 H = os.path.dirname(os.path.abspath(__file__))
-R = os.path.abspath(os.path.join(H, '..', '..', '..')) + '/'
+R = os.path.abspath(os.path.join(H, '..', '..', '..', '..')) + '/'
 DATA = os.environ.get('WRM_TAG_DATA') or os.path.join(os.environ.get('TMPDIR', '/tmp'), 'wrm-tag-Y5')
 os.makedirs(DATA, exist_ok=True)
 NENV = dict(os.environ, WRM_TAG_DATA=DATA)

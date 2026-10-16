@@ -1,5 +1,5 @@
 globalThis.localStorage={getItem(){return null},setItem(){}};globalThis.window=globalThis;globalThis.document={};
-const R=new URL('../../../js/modules/',import.meta.url).pathname;
+const R=new URL('../../../../js/modules/',import.meta.url).pathname;
 const fs=await import('fs');
 const d=await import(R+'data.js');const w=await import(R+'wrm.js');const b=await import(R+'build-list.js');
 const keys={};for(const[c,a] of Object.entries(d.SKILLS)) for(const s of a) if(s&&!s.retired) keys[c+':'+s.v]=s.l;

@@ -1,7 +1,7 @@
 // For each Y5 step (Grade 4 sheet): school week, PRIOR list for that week mapped to WRM step ids, and their tagged skills.
 import fs from 'fs';
 import { execFileSync } from 'child_process';
-const R=new URL('../../../',import.meta.url).pathname;
+const R=new URL('../../../../',import.meta.url).pathname;
 const w=await import(R+'js/modules/wrm.js');
 const d=JSON.parse(fs.readFileSync(R+'data/curriculum/wrm-steps.json','utf8'));
 const rows=JSON.parse(execFileSync('python3',['-I','-c',`

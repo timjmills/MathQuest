@@ -15,7 +15,7 @@
 // Generation: print path (generateQuestionFor, seeded, itemIndex set), 5 seed sets × 20 items = 100 items a link.
 const _m = new Map(); globalThis.localStorage = { getItem: k => _m.get(k) ?? null, setItem: (k, v) => _m.set(k, String(v)), removeItem: k => _m.delete(k) };
 globalThis.window = globalThis; globalThis.document = undefined;
-const R = new URL('../../../', import.meta.url).pathname;
+const R = new URL('../../../../', import.meta.url).pathname;
 const _log = console.log; console.log = () => {};
 const g = await import(R + 'js/modules/generate-question.js');
 const so = await import(R + 'js/modules/skill-options.js');
