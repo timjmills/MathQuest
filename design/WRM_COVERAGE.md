@@ -52,6 +52,8 @@ Where the Drive folders, the site pacing, the v3 crosswalk and our standards dat
 - EE 6.EE.B.6: our ee-math.json links [M.EE.6.EE.5-7], the site EEMAP links [none]
 - EE 6.EE.B.7: our ee-math.json links [M.EE.6.EE.5-7], the site EEMAP links [none]
 - Y6.B11.S6 "The mean": pacing CCSS [5.MD.B.2], v3 curriculum CCSS []
+- site G1 W28: review step "Count money - notes and coins (US: dollars & cents)" matches no WRM step
+- site G3 W22: review step "Pounds, tens, ones and pence (US: dollars & cents)" matches no WRM step
 - Drive vs site: the site RESOURCES tree is the Drive tree (same folder and file ids). Spot checks against live Drive listings matched: the Year 3 folder (1l9hjSYKWnwYnfwPj7Nui4Re5CDWJfWFi) block folders, the Teaching Guides of Year 3 Spring Block 3 (Fractions A), and the guides for Y3.B2.S21, Y4.B1.S16 and Y6.B1.S4. The Drive connector returns at most 5 files per page, so the 872 steps were not re-listed one by one.
 - Site pacing vs Drive: every Drive small step is in the site pacing under the same block and step number, with the same title except where the school teaches money in US dollars (the pacing adds "(US: dollars & cents)"; kept as usAdaptation). The pacing also schedules 36 Awsaj-authored "committee" lessons (kept as block supplements, not WRM steps).
 - v3 sheet vs site: the sheet says it is generated from the same data as the site, and its per-step CCSS codes are the site's. Its summary says "913 distinct White Rose small steps (PK4-Grade 5) plus 16 CCSS custom lessons still to be built". Drive has 872 small steps (Reception 119, Y1 116, Y2 124, Y3 134, Y4 129, Y5 136, Y6 114); the site's per-grade lesson lists hold 878 distinct titles (a title repeated inside Reception counts once; above-grade steps are listed in two grades) and 36 committee lessons; the sheet's lesson tabs have 849 rows. Neither 913 nor 16 could be reproduced from any source; the 872 Drive steps are the inventory used here.
@@ -2545,7 +2547,7 @@ whatever happens to the WRM gaps.
 - **Y4.B4.S13** Multiply three numbers — GAP. _3.OA.B.5_  
   Proposal: Multiply Three Numbers  
   Vocabulary: factor, product, commutative  
-- _Awsaj supplement (not a WRM step):_ Patterns on the multiplication table — 3.OA.D.9, 3.OA.C.7
+- _Awsaj supplement (not a WRM step):_ Patterns on the multiplication table — 3.OA.C.7, 3.OA.D.9
 - _Awsaj supplement (not a WRM step):_ Two-step word problems with the four operations — 3.OA.D.8
 
 #### Y4.B5 Spring Block 1: Multiplication and division B
@@ -2829,8 +2831,8 @@ whatever happens to the WRM gaps.
 - **Y4.B13.S4** Draw line graphs — GAP. _5.G.A.2, M.EE.5.G.2_  
   Proposal: Line Graphs  
   Vocabulary: scale, interval, plot  
-- _Awsaj supplement (not a WRM step):_ Build a line plot from inch measurements — 3.MD.B.4
 - _Awsaj supplement (not a WRM step):_ Measure to the half and quarter inch — 3.MD.B.4
+- _Awsaj supplement (not a WRM step):_ Build a line plot from inch measurements — 3.MD.B.4
 
 #### Y4.B14 Summer Block 6: Position and direction
 
@@ -2963,8 +2965,8 @@ whatever happens to the WRM gaps.
 - **Y5.B3.S10** Multiples of 10, 100 and 1,000 — GAP. _4.OA.B.4, M.EE.4.OA.4_  
   Proposal: Multiples of 10, 100 and 1,000 (option)  
   Vocabulary: factor pair, placeholder zero, times the size, greater  
-- _Awsaj supplement (not a WRM step):_ Find emergent features (e.g., units digit cycle) — 4.OA.C.5
 - _Awsaj supplement (not a WRM step):_ Follow a given rule to extend a number pattern — 4.OA.C.5
+- _Awsaj supplement (not a WRM step):_ Find emergent features (e.g., units digit cycle) — 4.OA.C.5
 - _Awsaj supplement (not a WRM step):_ Multiplicative comparison: times as many — 4.OA.A.1
 
 #### Y5.B4 Autumn Block 4: Fractions A
@@ -3572,8 +3574,8 @@ whatever happens to the WRM gaps.
 - **Y6.B7.S10** Solve problems with two unknowns — GAP. _3.OA.D.8, M.EE.3.OA.7_  
   Proposal: Pairs of Values and Two Unknowns  
   Vocabulary: sum, difference, unknown  
-- _Awsaj supplement (not a WRM step):_ Form ordered pairs from corresponding terms — 5.OA.B.3
 - _Awsaj supplement (not a WRM step):_ Generate two sequences using two different rules — 5.OA.B.3
+- _Awsaj supplement (not a WRM step):_ Form ordered pairs from corresponding terms — 5.OA.B.3
 
 #### Y6.B8 Spring Block 3: Decimals
 
