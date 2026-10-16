@@ -7,12 +7,13 @@
 import { readFileSync, readdirSync, existsSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 globalThis.localStorage = globalThis.localStorage || { getItem: () => null, setItem() {}, removeItem() {} };
-const { JARGON: JARGON_LIST, jargonHit } = createRequire(import.meta.url)('../lib/wrm-jargon.cjs');
+const { ready: jargonReady, jargonHit } = createRequire(import.meta.url)('../lib/wrm-jargon.cjs');
+await jargonReady();
 import { WRM_SEQUENCE } from '../../js/modules/wrm-sequence-db.js';
 import { WRM_STEPS, skillsForWrmStep } from '../../js/modules/wrm.js';
 import { linksFor, allLessons, lessonByKey, searchLessons, addCuratedYear, clearCurated, proposalName,
-    PREREQ_CAP, RELATED_CAP, WRM_LINK_OVERRIDES, REP_PAIRS, plainWhy, MAP_STRANDS, strandOfKey, repPairsOfText } from '../../js/modules/wrm-links.js';
-import { buildQueue, passes, toCSV, CSV_HEAD, gradesOfText, gradeOfCode, gradeOfRit, closesText, stepName } from '../../js/modules/build-queue.js';
+    PREREQ_CAP, RELATED_CAP, WRM_LINK_OVERRIDES, REP_PAIRS, composeWhy, composePartial, composeMissing, proposalLabel, stepsInNote, taskName, MAP_STRANDS, strandOfKey, repPairsOfText } from '../../js/modules/wrm-links.js';
+import { buildQueue, passes, toCSV, CSV_HEAD, KINDS, gradesOfText, gradeOfCode, gradeOfRit, closesText, stepName } from '../../js/modules/build-queue.js';
 
 let fails = 0;
 const ok = (c, msg) => { if (!c) { fails += 1; console.log('FAIL', msg); } };
@@ -97,7 +98,7 @@ addCuratedYear({ steps: { 'Y3.B1.S2': { title: 'x', direct: [], verdict: 'gap', 
 const co = linksFor('2:D1:2');
 ok(co.prereq[0].opts && co.prereq[0].opts.band === 99 && co.related[0].opts.span === 10, 'curated pre / related keep opts');
 ok(!/Y\d\.B\d|prior learning|wk W/.test(co.prereq[0].why + co.related[0].why), `why lines in plain words: "${co.prereq[0].why}" / "${co.related[0].why}"`);
-ok(plainWhy('builds 3-digit numbers; counting in 100s are not dealt').includes('not practised yet'), 'plainWhy: not dealt');
+ok(co.prereq[0].why === 'The step before: "Represent numbers to 100".', `composed: the step before -> "${co.prereq[0].why}"`);
 clearCurated();
 ok(linksFor('2:D1:1').source === 'rules', 'clearCurated');
 // the curated files on disk and data/curriculum/links/index.json agree
@@ -152,65 +153,79 @@ ok(both && both.sources.join() === 'WRM,MAP' && both.name === 'Fixture place val
 ok(Q1.items.filter((e) => passes(e, { sources: new Set(['MAP']) })).length === 2, 'filter by source');
 ok(Q1.items.filter((e) => passes(e, { q: 'fixture map option' })).length === 1, 'filter by search');
 ok(Q1.items.filter((e) => passes(e, { grades: new Set(['2']), domains: new Set(['G']), kinds: new Set(['option']) })).some((e) => e.id === 'fixture_map_one'), 'filter grade+domain+kind');
-ok(closesText({ 'Y3.B1.S1': 'part-whole' }).join() === 'Grade 2: Represent numbers to 100 — part-whole' && closesText(['a', 'b']).length === 2, 'closesText object / array');
+ok(closesText({ 'Y3.B1.S1': 'part-whole' }).join() === 'Y3.B1.S1: part-whole' && closesText(['a', 'b']).length === 2, 'closesText object / array (the CSV keeps the note as written)');
 const csv = toCSV(Q1.items.slice(0, 5)).split('\r\n');
 ok(csv.length === 6 && csv[0] === CSV_HEAD.join(','), 'CSV header + rows');
 
-// jargon gate (critic r2 M1, r3 M1, r4 M3/M4/m7): EVERY teacher-facing line reads plainly — the White Rose
-// why / missing / partial / prior lines, the MAP task notes and every Skills to be made field (screen and print
-// text), in both data modes (no link files; every file on disk and any --curated dir). Zero hits required.
-// The pattern is tests/lib/wrm-jargon.cjs (the browser gate uses the same one on the rendered screens).
+// PLAIN-ENGLISH gate (fix round 6: a whitelist, not a blacklist). EVERY teacher-facing line — the White Rose
+// why / missing / partial lines, the "To be built" names, the MAP task notes and every Skills to be made field
+// (screen and print text) — must pass js/modules/plain-words.js, the SAME check the screens use to decide
+// whether a note is shown. Both data modes (no link files; every file on disk and any --curated dir). Zero hits.
 const DATA = await import('../../js/modules/data.js');
 const TT = await import('../../js/modules/todo-text.js');
 const { setSkillLabeler } = await import('../../js/modules/wrm-links.js');
+const { teacherLabel } = await import('../../js/modules/teacher-label.js');
 const cleanLabel = (l) => String(l || '').replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}]/gu, '').replace(/^[\s½]+(?=\S)/, '').replace(/\s+/g, ' ').trim();
 setSkillLabeler((id) => {
     const [a, b] = String(id).includes(':') ? String(id).split(':') : [DATA.getCategoryForSkill(id), id];
     const sk = (DATA.SKILLS[a] || []).find((x) => x.v === b);
-    return sk ? cleanLabel(sk.l) : null;
+    return sk ? teacherLabel(cleanLabel(sk.l)) : null;
 });
-const samples = ['R.B2.S1 / R.B10 compare by size: the compare words', 'R.B1.S4 Sort objects to a type (school prior learning, week W23)',
-    'combining groups (add_5_pictures stops at 5; add_wp_10 is a word-work cell) [rule 3: nearest first]', 'Y2/Gr.1 Count in 10s, school week, W05',
-    'Y3.B1.S1 x {"band": 99}', 'same CCSS K.OA.A.1 in Y1.B2.S3 Parts', 'Y2.B1.S2 / Y2.B1.S3 Count (prior learning wk W01/W02)',
-    'part-whole model (see Y5.B13) [rule 18: opts {"notation":["across"]} for this pupil]', 'Y1/Gr.K Count to 10', 'Pre-K: / R.B10 compare by size',
-    // critic r4 M3 / N23
-    'R.B11.S5 / S6 1 more / 1 less', 'Y1.B6.S1 and Y1.B12.S1: counting to 50, and from 50 to 100', '(Y1.B6.S1 and Y1.B12.S1: counting to 50)',
-    'groups of 1-3 only (band 5 deals 4 and 5)', 'until band 3 exists', 'it deals the subtraction facts too, which are S13, and never',
-    'Y6.B8.S1-S2 place value of decimals', 'Count backwards within 100 (prior learning wk W33, "Y1 Count backwards")',
-    'R.B1.S1: matching an object; R.B1.S2: matching a picture', 'halves only (parts 0), with denoms [2]'];
-{ const r2 = plainWhy('part-whole model (see Y5.B13) [rule 18: opts {"notation":["across"]} for this pupil]');
-  ok(r2 === 'part-whole model (see Grade 4)', `r2 M1 line -> "${r2}"`); }
-{ const n14 = plainWhy('Y3.B1.S1 part-whole model'); ok(!/^Grade \d:/.test(n14), `N14 id + own words -> "${n14}"`); }
-{ const c = plainWhy('R.B1.S1: matching an object'); ok(/^Pre-K: matching/.test(c), `M4 "id:" keeps its grade -> "${c}"`); }
-{ const c = plainWhy('groups of 1-3 only (band 5 deals 4 and 5)'); ok(c.includes('"Numbers to 5" deals'), `M3 band -> "${c}"`); }
-{ const c = plainWhy('R.B11.S5 / S6'); ok(/^Pre-K: 1 more and 1 less$/.test(c), `M3 shorthand chain -> "${c}"`); }
-for (const t of samples) { const o = plainWhy(t, { step: 'Y1.B2.S4' }); const h = jargonHit(o); ok(!h, `jargon left in sample: "${t}" -> "${o}" (${h && h.name})`); }
-ok(JARGON_LIST.length >= 20 && !jargonHit('Grade 2/Grade 3 reading a scale') && jargonHit('Grade 2/Grade 2 x'), 'jargon pattern: named-group repeat, no false positive');
+// every skill label, as the teacher screens show it, is plain (a new label with a shorthand fails here)
+for (const [c, list] of Object.entries(DATA.SKILLS)) for (const sk of list || []) {
+    if (!sk || !sk.v) continue;
+    const h = jargonHit(teacherLabel(cleanLabel(sk.l)), { fragment: false });
+    ok(!h, `skill label not plain on the teacher screens: ${c}:${sk.v} "${sk.l}" (${h && h.name} ${h && h.at}) — write it out in js/modules/teacher-label.js or rename`);
+}
+// the r2–r5 critics' real lines: each must come out plain (shown whole, or replaced by a composed sentence)
+const LESSON = { step: 'Y4.B1.S3', ccss: ['3.NBT.A.2'] };
+const REAL = ['Y3.B1.S14 counts in 50s, which no live skill deals', '(Y4.B10.S2 Tenths as fractions, week W30)', 'ftRules only has x or / first',
+    'every band stops at 999,999', 'its partWhole variant writes a part-to-whole ratio', 'the forms option is lost on the print path',
+    'next steps S4-S5: the same area by b x h / 2', 'Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W18; tagged there as a partial cover by a hand tagFix)',
+    '(the smallest band is 5)', 'its lowest band (100) deals 51-100', 'generated with itemIndex (the print path)', 'R.B2.S1 / R.B10 compare by size: the compare words',
+    'part-whole model (see Y5.B13) [rule 18: opts {"notation":["across"]} for this pupil]', 'Y1.B6.S1 and Y1.B12.S1: counting to 50, and from 50 to 100',
+    'groups of 1-3 only (band 5 deals 4 and 5)', 'R.B11.S5 / S6 1 more / 1 less', 'Sum-and-difference brace; two levels) and the journey line', 'the the cat'];
+for (const t of REAL) {
+    for (const o of [composeWhy(t, { key: 'placevalue:compare', lesson: LESSON, group: 'prereq' }), composePartial(t, ['nl_20']), composeMissing(t, ['nl_20'])]) {
+        const h = jargonHit(o); ok(!h, `real line not plain: "${t}" -> "${o}" (${h && h.name})`);
+    }
+}
+{ const w = composeWhy('Y3.B1.S14 counts in 50s, which no live skill deals', { key: 'x:y', lesson: LESSON });
+  ok(/Grade 2/.test(w) && !/\( /.test(w), `M5 orphan bracket -> "${w}" names the grade and step`); }
+{ const w = composeWhy('Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W18)', { lesson: LESSON });
+  ok(w === 'Taught before, in Grade 1: "Count in 2s, 5s and 10s" (support block, week 18).', `composed prior learning -> "${w}"`); }
+ok(composeWhy('the same number written in unit form (4 hundreds 7 tens 6 ones)', { lesson: LESSON }) === 'The same number written in unit form (4 hundreds 7 tens 6 ones)', 'a plain note is shown whole');
+ok(stepsInNote('R.B11.S5 / S6').join() === 'R.B11.S5,R.B11.S6', 'stepsInNote: shorthand chain');
+ok(jargonHit('Grade 2/Grade 3 reading a scale') === null && jargonHit('the the cat') && jargonHit('Grade 2: Hundreds ( tens') && jargonHit('ftRules only') && jargonHit('Use band 5'), 'the plain check: plain line passes, the r5 forms fail');
 
 const dirs = [new URL('../../data/curriculum/links/', import.meta.url).pathname];
 process.argv.forEach((a, i) => { if (a === '--curated' && process.argv[i + 1]) dirs.push(...process.argv[i + 1].split(',')); });
 let jLines = 0, jBad = 0;
 const jByForm = {};
 const jByKind = {};
-const gate = (where, out) => {
-    const kind = /^todo/.test(where) ? 'Skills to be made fields' : /^MAP row/.test(where) ? 'MAP task notes' : /^lesson/.test(where) ? 'lesson screen lines' : /closes$/.test(where) ? 'proposal closes' : 'why / missing / partial lines';
+const gate = (where, out, opts) => {
+    const kind = /^todo/.test(where) ? 'Skills to be made fields' : /^MAP row/.test(where) ? 'MAP task notes' : 'White Rose lesson lines';
     for (const o of [].concat(out)) {
-        if (o == null) continue;
+        if (o == null || o === '') continue;
         jLines += 1;
         jByKind[kind] = (jByKind[kind] || 0) + 1;
-        const h = jargonHit(o);
-        if (h) { jBad += 1; jByForm[h.name] = (jByForm[h.name] || 0) + 1; if (jBad <= 12) console.log('JARGON', h.name, '|', where, '|', h.snippet); }
+        const h = jargonHit(o, opts);
+        if (h) { jBad += 1; jByForm[h.name] = (jByForm[h.name] || 0) + 1; if (jBad <= (process.env.SHOWALL ? 9999 : 15)) console.log('NOT PLAIN', h.name, '|', where, '|', h.snippet); }
     }
 };
 const todoGate = (tag, Q) => {
     TT.setTodoNames(Q.items);
     for (const e of Q.items) {
         const T = TT.todoTexts(e);
-        for (const [f, v] of Object.entries(T)) gate(`${tag} ${e.id} ${f}`, v);
+        for (const [f, v] of Object.entries(T)) gate(`${tag} ${e.id} ${f}`, f === 'kind' ? [(KINDS.find((x) => x[0] === e.kind) || [])[1], ...v].join(' · ') : v);
         gate(`${tag} ${e.id} steps`, e.wrmSteps.map(stepName));
-        gate(`${tag} ${e.id} map`, e.map.map((m) => [m.strand, m.ritBand, m.task || m.taskType].filter(Boolean).join(' · ')));
+        gate(`${tag} ${e.id} map`, e.map.map(TT.mapLine), { fragment: false });
     }
 };
+// the share of the tagging lanes' free-text notes the screens now hide (shown whole only when plain)
+const P = await import('../../js/modules/plain-words.js');
+const hidden = {};
+const count = (file, t) => { if (!t || typeof t !== 'string') return; const h = (hidden[file] = hidden[file] || [0, 0]); h[0] += 1; if (!P.plainNote(t)) h[1] += 1; };
 todoGate('todo (no files)', buildQueue());
 for (const dir of dirs) {
     const years = [];
@@ -220,34 +235,43 @@ for (const dir of dirs) {
         if (!existsSync(f)) continue;
         const d = JSON.parse(readFileSync(f, 'utf8'));
         years.push(d);
-        for (const [sid, st] of Object.entries(d.steps || {})) {
-            const key0 = ((st.partial || [])[0] || (st.direct || [])[0] || {}).key || '';
-            for (const g of ['pre', 'related']) for (const x of st[g] || []) gate(`${y} ${sid} ${g}`, plainWhy(x.why, { step: sid, key: x.key }));
-            for (const x of st.partial || []) gate(`${y} ${sid} partial`, plainWhy(x.missing, { step: sid, key: x.key }));
-            if (st.missing) gate(`${y} ${sid} missing`, plainWhy(st.missing, { step: sid, key: key0 }));
+        for (const st of Object.values(d.steps || {})) {
+            for (const g of ['pre', 'related']) for (const x of st[g] || []) count(`${y}.json`, x.why);
+            for (const x of st.partial || []) count(`${y}.json`, x.missing);
+            count(`${y}.json`, st.missing);
         }
-        for (const pr of Object.values(d.proposals || {})) gate(`${y} closes`, closesText(pr.closes));
     }
     const mf = `${dir.replace(/\/$/, '')}/MAP.json`;
-    if (existsSync(mf)) {
-        map = JSON.parse(readFileSync(mf, 'utf8'));
-        for (const r of map.rows || []) if (r.closes) gate(`MAP row ${r.task}`, TT.mapNote(r.closes, r.skills));
-    }
+    if (existsSync(mf)) { map = JSON.parse(readFileSync(mf, 'utf8')); for (const r of map.rows || []) count('MAP.json', r.closes); }
     if (years.length || map) {
         clearCurated();
         for (const d of years) addCuratedYear(d);
-        todoGate(`todo (${dir})`, buildQueue({ curated: years, map }));
+        const Qc = buildQueue({ curated: years, map });
+        todoGate(`todo (${dir})`, Qc);
+        if (map) {
+            TT.setTodoNames(Qc.items);
+            for (const r of map.rows || []) {
+                const note = TT.mapNote(r.closes, { proposal: r.proposal || '' });
+                gate(`MAP row ${r.task}`, note);
+                gate(`MAP row ${r.task} name`, taskName(r.task), { fragment: false });   // a name, not a sentence
+                if (r.proposal) ok(!/^(?:today|it|this)\b/i.test(note), `M7: MAP note starts with today/it/this: ${r.task} -> "${note}"`);
+                if (/equal sign/i.test(r.task || '') && r.proposal) ok(/equal sign/i.test(note) && note.length > 40, `M7: the equal-sign task names its repair: "${note}"`);
+            }
+        }
         // the lessons themselves, through linksFor (what the screen shows)
         for (const l of L) {
             if (!l.step || !years.some((d) => d.steps && d.steps[l.step])) continue;
             const r = linksFor(l);
-            gate(`lesson ${l.key}`, [r.missing, ...r.direct.map((x) => x.partial), ...r.prereq.map((x) => x.why), ...r.related.map((x) => x.why), ...r.build.map(proposalName), ...r.preBuild.map(proposalName)]);
+            gate(`lesson ${l.key}`, [r.missing, ...r.direct.map((x) => x.partial), ...r.prereq.map((x) => x.why), ...r.related.map((x) => x.why), ...r.build.map(proposalLabel), ...r.preBuild.map(proposalLabel), l.title]);
         }
         clearCurated();
     }
 }
-ok(!jBad, `jargon gate: ${jBad} of ${jLines} teacher-facing lines ${JSON.stringify(jByForm)}`);
-console.log(`jargon gate: ${jLines} teacher-facing lines checked, ${jBad} hits ${JSON.stringify(jByKind)}`);
+// rules mode: every lesson's lines with no link files
+for (const l of L) { const r = linksFor(l); gate(`lesson (rules) ${l.key}`, [r.missing, ...r.direct.map((x) => x.partial), ...r.prereq.map((x) => x.why), ...r.related.map((x) => x.why), l.title]); }
+ok(!jBad, `plain-English gate: ${jBad} of ${jLines} teacher-facing lines ${JSON.stringify(jByForm)}`);
+console.log(`plain-English gate: ${jLines} teacher-facing lines checked, ${jBad} not plain ${JSON.stringify(jByKind)}`);
+console.log(`free-text notes hidden (not plain as written; the composed sentence stands): ${Object.entries(hidden).map(([f, [n, h]]) => `${f} ${h}/${n} (${Math.round((100 * h) / n)}%)`).join(', ')}`);
 
 // search
 ok(searchLessons('Represent numbers to 100')[0].title === 'Represent numbers to 100', 'search exact title first');

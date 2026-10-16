@@ -256,6 +256,8 @@ function unitWeeks(u) {
     return `${label} (${ma[1]} ${(ma[2] || ma[4]).slice(0, 3)} – ${mb[1]} ${mb[2].slice(0, 3)})`;
 }
 
+/** The sequence's lesson note as a tag: "ADAPT: US money" → "Adapted: US money". */
+const noteTag = (n) => String(n || '').replace(/^ADAPT:\s*/, 'Adapted: ');
 /** 'G2' → 'Grade 2', 'GK' → 'Kindergarten', 'PK' → 'Pre-K' (N20). */
 const gradeWord = (g) => { const x = String(g || '').replace(/^G(?=[\dK])/, ''); return x === 'K' ? 'Kindergarten' : x === 'PK' ? 'Pre-K' : /^\d$/.test(x) ? `Grade ${x}` : String(g || ''); };
 
@@ -300,16 +302,16 @@ function detailHTML() {
           ${l.power ? '<span class="tvw-tag tvw-power">Power standard</span>' : ''}
           ${l.type === 'copied' ? `<span class="tvw-tag">Copied in from ${esc(gradeWord(l.from))} — teach it from that grade's files</span>` : ''}
           ${l.type === 'enrich' ? '<span class="tvw-tag">Enrichment (after MAP)</span>' : ''}
-          ${l.note ? `<span class="tvw-tag tvw-power">${esc(l.note)}</span>` : ''}
+          ${l.note ? `<span class="tvw-tag tvw-power">${esc(noteTag(l.note))}</span>` : ''}
           ${strands.length ? `<span class="tvw-tag tvw-strand">${esc(strands.join(' · '))}</span>` : ''}
           ${l.ccss.map((c) => `<span class="tvw-tag tvw-code">${esc(c)}</span>`).join('')}
           ${ee.slice(0, 3).map((c) => `<span class="tvw-tag tvw-code tvw-ee">${esc(c.replace(/^M\./, ''))}</span>`).join('')}
         </div>
         ${files.length ? `<div class="tvw-files">${fileBtn(files[0], l.type === 'copied' && l.from ? `Open lesson (${gradeWord(l.from)} files)` : 'Open lesson', 'external')}${fileBtn(files[1], 'Teaching guide', 'book')}${files[2] ? fileBtn('x', 'Video', 'play', files[2]) : ''}</div>` : ''}
-        <p class="tvw-verdict${links.verdict === 'gap' || l.type === 'build' ? ' is-gap' : ''}">${verdict}</p>${toBeBuiltHTML(links.build, L.proposalName)}
+        <p class="tvw-verdict${links.verdict === 'gap' || l.type === 'build' ? ' is-gap' : ''}">${verdict}</p>${toBeBuiltHTML(links.build, L.proposalLabel)}
         ${pick.quickHTML([['direct', 'All teaching skills'], ['prereq', 'Do-first skills'], ['related', 'Go-with skills'], ['all', 'Everything']])}
       </div>
-      ${GROUPS.map(([g, h, cap]) => pick.groupHTML(g, h, cap, emptyText(g, l), g === 'prereq' ? toBeBuiltHTML(links.preBuild, L.proposalName, 'Still to make') : '')).join('')}
+      ${GROUPS.map(([g, h, cap]) => pick.groupHTML(g, h, cap, emptyText(g, l), g === 'prereq' ? toBeBuiltHTML(links.preBuild, L.proposalLabel, 'Still to make') : '')).join('')}
       ${pick.barWrapHTML()}`;
 }
 

@@ -64,7 +64,7 @@ function buildTasks() {
     if (MAPD && Array.isArray(MAPD.rows)) {
         MAPD.rows.forEach((r, i) => {
             const [lo, hi] = rng(r.ritBand);
-            out.push({ id: `m${i}`, task: String(r.task || '').replace(/<->/g, '↔'), strand: r.strand, ritBand: r.ritBand, lo, hi, status: r.status || '',
+            out.push({ id: `m${i}`, task: W.taskName(r.task), strand: r.strand, ritBand: r.ritBand, lo, hi, status: r.status || '',
                 skills: (r.skills || []).filter(liveKey), proposal: r.proposal || '', note: r.closes || '' });
         });
     } else out.push(...engineTasks());
@@ -129,15 +129,17 @@ function load() {
 }
 
 const strands = () => W.MAP_STRANDS.map((s) => s[1]);
-const nameOf = (id) => {
+const entryOf = (id) => {
     const p = MAPD && MAPD.proposals && MAPD.proposals[id];
-    if (p && p.name) return p.name;
-    for (const r of W.REP_PAIRS) for (const s of Object.values(r.strands)) for (const [bid, n] of s.build) if (bid === id) return n;
-    return W.proposalName(id);
+    if (p && p.name) return { ...p, id, wrmSteps: p.steps || [] };
+    for (const r of W.REP_PAIRS) for (const s of Object.values(r.strands)) for (const [bid, n] of s.build) if (bid === id) return { id, name: n };
+    return { id, name: W.proposalName(id) };
 };
+/** An entry's name as a teacher reads it (todo-text: the name when plain, never an id). */
+const nameOf = (id) => TT.todoName(entryOf(id));
 
-/** A MAP row's note in plain words (the same rewrite, and the same jargon gate, as Skills to be made). */
-function plainNote(text, t = {}) { return TT.mapNote(text, t.skills); }
+/** A MAP row's note: the note when plain English as written, else composed from the entry that closes it. */
+function plainNote(text, t = {}) { return TT.mapNote(text, { proposal: t.proposal, entry: t.proposal ? entryOf(t.proposal) : null }); }
 
 /* ================================================================= links for a task */
 
@@ -149,7 +151,7 @@ export function taskLinks(t) {
     const pre = [];
     same.filter((x) => x.lo < t.lo).sort((a, b) => b.lo - a.lo).forEach((x) => x.skills.forEach((key) => push(pre, key, `Earlier MAP task: "${x.task}" (RIT ${x.ritBand})`)));
     const related = [];
-    same.filter((x) => x.lo >= t.lo && x.lo <= t.hi).forEach((x) => x.skills.forEach((key) => push(related, key, `Same band: "${x.task}"`)));
+    same.filter((x) => x.lo >= t.lo && x.lo <= t.hi).forEach((x) => x.skills.forEach((key) => push(related, key, `Same RIT band: "${x.task}"`)));
     for (const p of W.REP_PAIRS) {
         const s = p.strands[t.strand];
         if (s && s.skills.some((key) => t.skills.includes(key))) s.skills.forEach((key) => push(related, key, `Same picture-to-number change: ${p.label}`));
@@ -218,7 +220,7 @@ function tasksOf() { return TASKS.filter((t) => t.strand === k.strand && overlap
 
 function draw() {
     if (!host) return;
-    const src = MAPD ? 'The task types from our review of MAP Growth.' : 'The skills the app\'s MAP practice uses in each band, by topic.';
+    const src = MAPD ? 'The task types from our review of MAP Growth.' : 'The skills the app\'s MAP practice uses in each RIT band, by topic.';
     if (k.view === 'reps') {
         host.innerHTML = `<div class="tvmk-find">${strandChips()}<p class="tv-cap">MAP often asks pupils to match two forms of the same idea. Each box shows the skills that practise one change in this strand, and what still needs building.</p></div>
           <section class="tvmk-detail" id="tvmkDetail" aria-live="polite"></section>`;
@@ -235,7 +237,7 @@ function draw() {
       <div class="tvw-grid">
         <nav class="tv-card tv-flush tvw-lessons" aria-labelledby="tvmkListH" id="tvmkList">
           <h2 class="tv-h3 tvw-unit-title" id="tvmkListH">${esc(k.strand)}${k.band ? ` · RIT ${esc(k.band.replace('-', '–'))}` : ''}</h2>
-          ${list.length ? `<ol class="tvw-list">${list.map(taskRowHTML).join('')}</ol>` : '<p class="tv-cap tvw-pad">No MAP task in this band for this strand.</p>'}
+          ${list.length ? `<ol class="tvw-list">${list.map(taskRowHTML).join('')}</ol>` : '<p class="tv-cap tvw-pad">No MAP task in this RIT band for this strand.</p>'}
         </nav>
         <section class="tvw-detail" id="tvmkDetail" aria-live="polite"></section>
       </div>`;
@@ -280,7 +282,7 @@ function taskHTML() {
       ${pick.quickHTML([['direct', 'Task skills'], ['prereq', 'Do-first skills'], ['related', 'Go-with skills'], ['all', 'Everything']])}
       ${pick.groupHTML('direct', 'Skills for this task', 'Practise the task itself.', t.proposal ? 'No skill practises this task yet — it is on the list to be built.' : 'No skill practises this task yet.')}
       ${pick.groupHTML('prereq', 'Skills to do first', 'The same strand at a lower RIT band.', 'Nothing lower in this strand.')}
-      ${pick.groupHTML('related', 'Skills that go with it', 'The same strand and band, or the same picture-to-number change.', 'No other skills in this band.')}
+      ${pick.groupHTML('related', 'Skills that go with it', 'The same strand and RIT band, or the same picture-to-number change.', 'No other skills in this RIT band.')}
       ${pick.barWrapHTML()}`;
 }
 

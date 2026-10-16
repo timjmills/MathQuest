@@ -17,8 +17,9 @@
 
 import { buildList } from './build-list.js';
 import { WRM_PROPOSALS, wrmStep } from './wrm.js';
+import { WRM_STEPS } from './wrm-db.js';
 import { CCSS_AUDIT, EE_AUDIT } from './standards-audit.js';
-import { repPairsOfText, plainWhy, gradeOfYear, addProposalNames } from './wrm-links.js';
+import { repPairsOfText, gradeOfYear, addProposalNames, allLessons, stepTitle } from './wrm-links.js';
 
 export const SOURCES = ['CCSS', 'EE', 'WRM', 'MAP'];
 export const GRADES = ['PK', 'K', '1', '2', '3', '4', '5', '6'];
@@ -59,20 +60,42 @@ export function gradesOfText(t) {
     return GRADES.slice(a, (b < a ? a : b) + 1);
 }
 const kindOf = (k) => (['new', 'skill'].includes(k) ? 'new' : ['option', 'band'].includes(k) ? 'option' : 'other');
-const stepList = (ids) => `${ids.slice(0, 3).map((s) => `"${stepName(s)}"`).join(', ')}${ids.length > 3 ? ` and ${ids.length - 3} more steps` : ''}`;
-/** A step as a teacher reads it: 'Grade 2: Hundreds'. */
-export const stepName = (id) => { const r = wrmStep(id); return `${gradeOfYear(String(id).split('.')[0])}: ${r ? r.title : id}`; };
-/** `closes` may be a string, a list, or { stepId: clause } — always plain strings back. */
-export function closesText(v) {
-    return closesRaw(v).map((c) => c.replace(/\s*—\s*\(/g, ' (').replace(/\s*—\s*$/, ''));
+/**
+ * A step as a teacher reads it: 'Grade 2: Hundreds'. When two steps of a grade share a title (Pre-K has "1 more"
+ * in two blocks), the school unit that teaches it tells them apart: 'Pre-K CC4: 1 more' (critic r5 N26).
+ */
+let SHARED = null;
+function sharedTitles() {
+    if (SHARED) return SHARED;
+    const seen = new Map();
+    SHARED = new Set();
+    for (const s of WRM_STEPS) { const k = `${s.id.split('.')[0]}|${s.title}`; if (seen.has(k)) SHARED.add(k); else seen.set(k, s.id); }
+    return SHARED;
 }
-function closesRaw(v) {
+export const stepName = (id) => {
+    const r = wrmStep(id);
+    const year = String(id).split('.')[0];
+    if (!r) return gradeOfYear(year);
+    const title = stepTitle(id);
+    if (sharedTitles().has(`${year}|${r.title}`)) {
+        const l = allLessons().find((x) => x.step === id);
+        if (l) return `${l.gradeLabel} ${l.unit}: ${title}`;
+        if (r.block && r.block.title) return `${gradeOfYear(year)}: ${title} (${r.block.title})`;
+    }
+    return `${gradeOfYear(year)}: ${title}`;
+};
+/** `closes` may be a string, a list, or { stepId: clause } — the raw notes, each with its structured lead. */
+export function gapsOf(v) {
     if (v == null || v === '') return [];
-    if (typeof v === 'string') return [plainWhy(v)];
-    if (Array.isArray(v)) return v.flatMap(closesRaw);
-    if (typeof v === 'object') return Object.entries(v).map(([k, t]) => (/^(R|Y[1-6])\.B\d+\.S\d+$/.test(k) ? `${stepName(k)} — ${plainWhy(String(t), { step: k })}` : `${k}: ${plainWhy(String(t))}`));
-    return [String(v)];
+    if (typeof v === 'string') return [{ text: v }];
+    if (Array.isArray(v)) return v.flatMap(gapsOf);
+    if (typeof v === 'object') return Object.entries(v).map(([k, t]) => (/^(R|Y[1-6])\.B\d+\.S\d+$/.test(k) ? { step: k, text: String(t) } : { code: k, text: String(t) }));
+    return [{ text: String(v) }];
 }
+/** A gap as the build team wrote it (the CSV). */
+export const gapText = (g) => `${g.step ? `${g.step}: ` : g.code ? `${g.code}: ` : g.map ? `MAP task "${g.map}": ` : ''}${g.none ? `no skill teaches ${g.none.join(', ')}` : g.improves ? `only part of ${g.improves.join(', ')}` : g.text || ''}`;
+/** `closes` as plain strings, as written (kept for the CSV and older callers). */
+export function closesText(v) { return gapsOf(v).map(gapText); }
 const CLOSE_PAIR = /((?:R|Y[1-6])\.B\d+\.S\d+)\s*:\s*([\s\S]+?)\s*(?=;\s*(?:R|Y[1-6])\.B\d+\.S\d+\s*:|;?\s*$)/g;
 const uniq = (a) => [...new Set(a.filter(Boolean))];
 const sortGrades = (a) => uniq(a).filter((g) => GRADES.includes(g)).sort((x, y) => GRADES.indexOf(x) - GRADES.indexOf(y));
@@ -86,7 +109,7 @@ export function buildQueue({ curated = [], map = null } = {}) {
     const get = (id) => {
         if (!byId.has(id)) {
             byId.set(id, { id, name: '', kind: 'other', kindRaw: '', skill: '', option: '', sources: new Set(), grades: [], domain: '',
-                family: '', teaches: '', closes: [], representation: '', ccss: [], ee: [], wrmSteps: [], improves: [], map: [], spec: null, closedSteps: new Set() });
+                family: '', teaches: '', closes: [], gaps: [], representation: '', ccss: [], ee: [], wrmSteps: [], improves: [], map: [], spec: null, closedSteps: new Set() });
         }
         return byId.get(id);
     };
@@ -121,7 +144,7 @@ export function buildQueue({ curated = [], map = null } = {}) {
         e.wrmSteps.push(...b.wrmSteps);
         e.improves.push(...(b.wrmImproves || []));
         e.grades.push(...gradesOfText(b.grade));
-        if (b.source === 'visual' && !e.closes.length) e.closes.push('White Rose draws this picture and our pages do not yet.');
+        if (b.source === 'visual' && !e.gaps.length) e.gaps.push({ text: 'White Rose draws this picture and our pages do not yet.' });
         if ((b.problemTypes && b.problemTypes.length) || b.ladder || (b.misconceptions && b.misconceptions.length)) {
             e.spec = { problemTypes: b.problemTypes || [], ladder: b.ladder || '', answer: b.answer || '', misconceptions: b.misconceptions || [] };
         }
@@ -135,7 +158,7 @@ export function buildQueue({ curated = [], map = null } = {}) {
                 e.sources.add(src);
                 if (src === 'CCSS') e.ccss.push(code); else e.ee.push(code);
                 const miss = (a.missing || []).join('; ');
-                if (miss) e.closes.push(`${code}: ${miss}`);
+                if (miss) e.gaps.push({ code, text: miss });
             }
         }
     };
@@ -158,18 +181,18 @@ export function buildQueue({ curated = [], map = null } = {}) {
                     for (const [, sid, text] of pairs) {
                         if (e.closedSteps.has(sid)) continue;
                         e.closedSteps.add(sid);
-                        lines.push(`${stepName(sid)} — ${plainWhy(text.trim(), { step: sid })}`);
+                        lines.push({ step: sid, text: text.trim() });
                     }
-                    e.closes.unshift(...lines);
-                } else e.closes.unshift(...closesText(p.closes));
-            } else if (p.why && !/reused/i.test(p.why)) e.closes.push(p.why);
+                    e.gaps.unshift(...lines);
+                } else e.gaps.unshift(...gapsOf(p.closes));
+            } else if (p.why && !/reused/i.test(p.why)) e.gaps.push({ text: p.why });
         }
         for (const [sid, st] of Object.entries(y.steps || {})) {
             for (const id of [...(st.build || [])]) {
                 const e = byId.get(id);
                 if (!e) continue;
                 e.wrmSteps.push(sid);
-                if (st.missing && !e.closedSteps.has(sid)) e.closes.push(`${stepName(sid)} — ${plainWhy(st.missing, { step: sid })}`);   // N16: one line per step
+                if (st.missing && !e.closedSteps.has(sid)) e.gaps.push({ step: sid, text: st.missing });   // N16: one line per step
                 e.closedSteps.add(sid);
             }
         }
@@ -183,8 +206,8 @@ export function buildQueue({ curated = [], map = null } = {}) {
             e.ccss.push(...(p.ccss || []));
             const facets = Array.isArray(p.map) ? p.map : p.map ? [p.map] : [];
             e.map.push(...facets.map((f) => ({ strand: f.strand || '', ritBand: f.ritBand || '', taskType: f.taskType || '' })));
-            if (p.closes) e.closes.push(...closesText(p.closes));
-            else if (p.why) e.closes.push(p.why);
+            if (p.closes) e.gaps.push(...gapsOf(p.closes));
+            else if (p.why) e.gaps.push({ text: p.why });
             if (!e.spec && (p.problemTypes || p.levels || p.misconceptions)) {
                 e.spec = { problemTypes: p.problemTypes || [], ladder: (p.levels || []).join(' · '), answer: '', misconceptions: p.misconceptions || [] };
             }
@@ -195,7 +218,7 @@ export function buildQueue({ curated = [], map = null } = {}) {
             if (!e) continue;
             e.sources.add('MAP');
             if (!e.map.some((f) => f.task === r.task)) e.map.push({ strand: r.strand || '', ritBand: r.ritBand || '', taskType: '', task: r.task || '' });
-            if (r.closes) e.closes.push(...closesText(r.closes).map((c) => `MAP task “${r.task}”: ${c}`));
+            if (r.closes) e.gaps.push(...gapsOf(r.closes).map((g) => ({ ...g, map: r.task || '' })));
         }
     }
 
@@ -206,13 +229,13 @@ export function buildQueue({ curated = [], map = null } = {}) {
         if (W) fill(e, W);
         if (!e.name) e.name = e.id.replace(/_/g, ' ');
         e.ccss = uniq(e.ccss); e.ee = uniq(e.ee); e.wrmSteps = uniq(e.wrmSteps);
-        e.closes = uniq(e.closes.filter((c) => typeof c === 'string'));
-        if (!e.closes.length && e.wrmSteps.length) {
-            e.closes.push(`No skill teaches ${stepList(e.wrmSteps)}.`);
-        }
+        const seenGap = new Set();
+        e.gaps = e.gaps.filter((g) => { const k = JSON.stringify(g); return !seenGap.has(k) && seenGap.add(k); });
+        if (!e.gaps.length && e.wrmSteps.length) e.gaps.push({ none: e.wrmSteps.slice() });
         e.improves = uniq(e.improves).filter((s) => !e.wrmSteps.includes(s));
-        if (!e.closes.length && e.improves.length) e.closes.push(`Today's skills only cover part of ${stepList(e.improves)}.`);
-        if (!e.closes.length && e.ccss.length) e.closes.push(`Not yet fully taught: ${e.ccss.join(', ')}.`);
+        if (!e.gaps.length && e.improves.length) e.gaps.push({ improves: e.improves.slice() });
+        if (!e.gaps.length && e.ccss.length) e.gaps.push({ text: `Not yet fully taught: ${e.ccss.join(', ')}.` });
+        e.closes = uniq(e.gaps.map(gapText));   // the build team's words, for the CSV and the search
         const g = [...e.grades, ...e.ccss.map(gradeOfCode), ...e.ee.map(gradeOfCode), ...e.wrmSteps.map(gradeOfStep)];
         if (!g.filter(Boolean).length) g.push(...e.map.map((f) => gradeOfRit(f.ritBand)));
         e.grades = sortGrades(g);

@@ -34,6 +34,7 @@ const OUT = path.join(ROOT, 'design', 'audit', 'runs', 'wrm-page');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 (async () => {
+  await require('../lib/wrm-jargon.cjs').ready();
   const failures = [];
   const check = (ok, msg) => { if (!ok) failures.push(msg); };
   // Pick the test lessons from the data itself (node side), so the gate follows the data.
@@ -64,6 +65,36 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       req.respond({ status: 200, contentType: 'application/json', body });
     });
   }
+  // fix round 6: the plain-English check over the FULL rendered text of a screen (chrome lines may start lower
+  // case: "and 3 more") and over every teacher field on it as a sentence (no fragment) — the same check the
+  // screens use to decide whether a note is shown (js/modules/plain-words.js).
+  const FIELD_SEL = '.tvw-why, .tvw-verdict, .tvw-tbb-link, .tvt-dl dd:not(.tvt-codes), .tvt-name';   // titles and names are checked as screen lines
+  /** The distinct reasons in a list of sweep failures, most frequent first (so one run shows every form). */
+  const summ = (bad) => { const c = {}; for (const b of bad) { const k = (/\) ([^:]+: \[[^\]]*\])/.exec(b) || [, b.slice(0, 60)])[1]; c[k] = (c[k] || 0) + 1; } return Object.entries(c).sort((a, b) => b[1] - a[1]).slice(0, 40).map(([k, n]) => `${n}× ${k}`).join(' ; '); };
+  const plainSweep = async (sel, tag, bad) => {
+    const r = await page.evaluate((sel, fsel) => {
+      const el = document.querySelector(sel);
+      if (!el) return null;
+      // every visible text node as written (innerText would apply CSS upper-casing to the chrome labels)
+      const nodes = [];
+      const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      for (let n = w.nextNode(); n; n = w.nextNode()) {
+        const t = n.data.replace(/\s+/g, ' ').trim();
+        const p = n.parentElement;
+        if (!t || !p || p.closest('script, style, [hidden], [aria-hidden="true"]') || !p.getClientRects().length) continue;
+        nodes.push(t);
+      }
+      const fields = [...el.querySelectorAll(fsel)].filter((x) => !x.querySelector('ul')).map((x) => x.textContent.replace(/\s+/g, ' ').trim()).filter(Boolean);
+      const lis = [...el.querySelectorAll('.tvt-dl dd li')].map((x) => x.textContent.replace(/\s+/g, ' ').trim());
+      return { nodes, fields, lis };
+    }, sel, FIELD_SEL);
+    if (!r) { bad.push(`${tag}: ${sel} not found`); return 0; }
+    let n = 0;
+    for (const line of r.nodes) { n += 1; const h = jargonHit(line, { fragment: false }); if (h) bad.push(`${tag} (screen) ${h.name}: ${h.snippet}`); }
+    for (const f of r.fields) { n += 1; const h = jargonHit(f); if (h) bad.push(`${tag} (field) ${h.name}: ${h.snippet}`); }
+    for (const f of r.lis) { n += 1; const h = jargonHit(f, { fragment: false }); if (h) bad.push(`${tag} (list) ${h.name}: ${h.snippet}`); }
+    return n;
+  };
   // one case's error is reported and the run goes on (critic r4 B8)
   const step = async (name, fn) => { try { await fn(); } catch (e) { failures.push(`${name}: ${(e && e.message) || e}`); } };
   const shot = async (name) => { if (SHOTS) { fs.mkdirSync(OUT, { recursive: true }); await page.screenshot({ path: path.join(OUT, `${name}.png`) }); } };
@@ -392,7 +423,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await page.click(`[data-t-f="sources"][data-t-v="${srcPick}"]`);
     await page.click('[data-t-f="grades"][data-t-v="3"]');
     await sleep(150);
-    const f1 = await page.evaluate((src) => ({ n: document.querySelectorAll('.tvt-item').length, ok: [...document.querySelectorAll('.tvt-item')].every((li) => [...li.querySelectorAll('.tvt-src')].some((x) => x.textContent === src)) }), srcPick);
+    const f1 = await page.evaluate((src) => ({ n: document.querySelectorAll('.tvt-item').length, ok: [...document.querySelectorAll('.tvt-item')].every((li) => [...li.querySelectorAll('.tvt-src')].some((x) => x.dataset.src === src)) }), srcPick);
     check(f1.n > 0 && f1.ok, `todo: source+grade filter ${JSON.stringify(f1)}`);
     await page.click('[data-t-f="kinds"][data-t-v="option"]');
     await sleep(150);
@@ -602,7 +633,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       await waitFor(page, () => !!document.querySelector('[data-screen="map"].is-active [data-map-tab]'), 20000, 'm5 map 2');
       check(await page.$eval('[data-map-tab="tasks"]', (b) => b.getAttribute('aria-selected') === 'true'), 'm5: MAP did not reopen on Practise by task after the Start tab');
       // m6: every strand click leaves one band chip pressed and a list unless All is empty
+      await waitFor(page, () => document.querySelectorAll('[data-mk-strand]').length >= 7, 20000, 'm6 strands');
       const strands = await page.$$eval('[data-mk-strand]', (b) => b.map((x) => x.dataset.mkStrand).filter(Boolean));
+      check(strands.length === 7, `m6: ${strands.length} strand chips`);
       const bands = await page.$$eval('[data-mk-band]', (b) => b.map((x) => x.dataset.mkBand).filter(Boolean));
       if (bands.length) { await page.click(`[data-mk-band="${bands[bands.length - 1]}"]`); await sleep(150); }
       for (const st of strands) {
@@ -610,6 +643,39 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         const r = await page.evaluate(() => ({ pressed: document.querySelectorAll('[data-mk-band][aria-pressed="true"]').length, tasks: document.querySelectorAll('[data-mk-task]').length }));
         check(r.pressed === 1, `m6: strand ${st}: ${r.pressed} band chips pressed`);
         check(r.tasks > 0, `m6: strand ${st}: no task listed`);
+      }
+      // fix round 6: EVERY MAP task (all strands, band All), the whole MAP screen line by line
+      {
+        const mb = [];
+        let nTasks = 0, nL = 0;
+        for (const st of strands) {
+          await page.click(`[data-mk-strand="${st}"]`); await sleep(100);
+          await page.click('[data-mk-band=""]'); await sleep(100);
+          const ids = await page.$$eval('[data-mk-task]', (b) => b.map((x) => x.dataset.mkTask));
+          for (const id of ids) {
+            await page.evaluate((x) => document.querySelector(`[data-mk-task="${x}"]`).click(), id);
+            await waitFor(page, `!!document.querySelector('[data-mk-task="${id}"][aria-current="true"]') && !!document.querySelector('#tvmkDetail .tvw-title')`, 5000, `map task ${id}`);
+            nTasks += 1;
+            nL += await plainSweep('[data-screen="map"].is-active', `MAP ${st} ${id}`, mb);
+          }
+        }
+        check(nTasks > 20, `MAP task sweep reached only ${nTasks} tasks`);
+        check(!mb.length, `plain English: ${mb.length} MAP lines not plain: ${mb.slice(0, 5).join(' || ')} — forms: ${summ(mb)}`);
+        console.log(`MAP task sweep: ${nTasks} tasks, ${nL} lines, ${mb.length} not plain`);
+        if (CUR_MAP) {
+          const eq = await page.evaluate(async () => {
+            const b = [...document.querySelectorAll('[data-mk-strand]')].find((x) => /Operations/.test(x.textContent)); b.click();
+            await new Promise((r) => setTimeout(r, 120));
+            document.querySelector('[data-mk-band=""]').click();
+            await new Promise((r) => setTimeout(r, 120));
+            const t = [...document.querySelectorAll('[data-mk-task]')].find((x) => /Meaning of the equal sign/.test(x.textContent));
+            if (!t) return null;
+            t.click();
+            await new Promise((r) => setTimeout(r, 120));
+            return (document.querySelector('#tvmkDetail .tvw-verdict') || {}).textContent || '';
+          });
+          check(eq && /equal sign/i.test(eq) && !/^(today|it|this)\b/i.test(eq), `M7: "Meaning of the equal sign" note: ${eq}`);
+        }
       }
       // m7: Skills to be made shows no code, on screen (all entries open) or in the print
       await page.evaluate(() => window.tvGo('todo'));
@@ -620,15 +686,28 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         for (let i = 0; i < 400; i += 1) { const b = document.querySelector('[data-screen="todo"].is-active [data-t-open][aria-expanded="false"]'); if (!b) break; b.click(); }
         const scr = document.querySelector('[data-screen="todo"].is-active');
         const txt = [...scr.querySelectorAll('.tvt-item')].map((x) => x.innerText).join('\n');
-        const d = document.createElement('div'); d.innerHTML = m.todoPrintHTML().replace(/^[\s\S]*<body>/, '');
+        const d = { innerText: m.todoPrintHTML().replace(/^[\s\S]*<body>/, '').replace(/<[^>]+>/g, '\n').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>') };
         const chips = [...scr.querySelectorAll('[aria-labelledby="tvtGrH"] button')].map((b) => b.textContent.trim());
-        return { txt, print: d.innerText, chips, open: scr.querySelectorAll('.tvt-spec').length };
+        return { txt, print: d.innerText, chips, open: scr.querySelectorAll('.tvt-spec').length, items: scr.querySelectorAll('.tvt-item').length };
       });
-      // every line of every open entry and of the print, through the shared strict pattern (critic r4 M4 / m7)
-      const hit = (x) => { for (const line of String(x).split('\n')) { const h = jargonHit(line); if (h) return `${h.name}: ${h.snippet}`; } return ''; };
-      check(t7.open > 200, `m7: only ${t7.open} entries opened`);
-      check(!hit(t7.txt), `m7: code on the Skills to be made screen: "${hit(t7.txt)}"`);
-      check(!hit(t7.print), `m7: code in the Skills to be made print: "${hit(t7.print)}"`);
+      // fix round 6: every entry open, the whole screen and every field, then the print
+      const hit = (x) => { for (const line of String(x).split('\n')) { const h = jargonHit(line, { fragment: false }); if (h) return `${h.name}: ${h.snippet}`; } return ''; };
+      check(t7.open === t7.items, `m7: ${t7.open} of ${t7.items} entries opened`);
+      const tb = [];
+      const tn = await plainSweep('[data-screen="todo"].is-active', 'todo', tb);
+      check(!tb.length, `plain English: ${tb.length} Skills to be made lines not plain: ${tb.slice(0, 5).join(' || ')} — forms: ${summ(tb)}`);
+      check(!hit(t7.print), `m7: not plain in the Skills to be made print: "${hit(t7.print)}"`);
+      console.log(`Skills to be made sweep: ${t7.open} entries, ${tn} lines, ${tb.length} not plain`);
+      // m10: with the 6+ chip on, the heading's count is the count shown
+      await page.evaluate(() => document.querySelector('[data-t-f="grades"][data-t-v="6"]').click());
+      await sleep(150);
+      const m10 = await page.evaluate(() => ({ count: document.querySelector('#tvtCount').textContent, heads: [...document.querySelectorAll('.tvt-grade-h')].map((h) => h.textContent.trim()) }));
+      const shown6 = +((/Showing (\d+)/.exec(m10.count) || [])[1] || -1);
+      check(m10.heads.length === 1 && /^Reaching Grade 6 and above (\d+)$/.test(m10.heads[0]) && +m10.heads[0].replace(/\D+/g, ' ').trim().split(' ').pop() === shown6, `m10: 6+ heading ${JSON.stringify(m10)}`);
+      await page.evaluate(() => document.querySelector('[data-t-f="grades"][data-t-v="6"]').click());
+      await sleep(150);
+      // N25: "Reception" is never on a teacher screen
+      check(!/Reception/.test(t7.txt + t7.print), 'N25: "Reception" on Skills to be made');
       check(t7.chips.includes('6+') && t7.chips.includes('Not set'), `N13: Grade chips lack 6+ / Not set: ${t7.chips.join(',')}`);
     }
 
@@ -702,17 +781,17 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         const head = await page.$eval('[data-screen="wrm"].is-active .tvw-head', (e) => e.innerText);
         check(!/\bG\d\b/.test(head) && /Copied in from (Grade \d|Kindergarten|Pre-K)/.test(head), `N20: copied-in head "${head.slice(0, 160)}"`);
       }
-      // M3: every lesson the real files tag, its rendered text line by line through the strict pattern
+      // fix round 6: EVERY lesson of the sequence (curated and rules), the whole White Rose screen, line by line
       const bad = [];
-      for (const l of curLessons) {
+      let nLines = 0;
+      for (const l of all) {
         const h = `#wrm/${l.grade}/${l.unit}/${l.n}`;
         await page.evaluate((x) => { location.hash = x; }, h);
-        await waitFor(page, `location.hash === ${JSON.stringify(h)} && !!document.querySelector('[data-screen="wrm"].is-active #tvwDetail .tvw-title')`, 8000, l.key);
-        const txt = await page.$eval('[data-screen="wrm"].is-active #tvwDetail', (e) => e.innerText);
-        for (const line of txt.split('\n')) { const j = jargonHit(line); if (j) bad.push(`${l.key} ${j.name}: ${j.snippet}`); }
+        await waitFor(page, `location.hash === ${JSON.stringify(h)} && (document.querySelector('[data-screen="wrm"].is-active #tvwDetail .tvw-title') || {}).textContent?.includes(${JSON.stringify(l.title.slice(0, 12))})`, 8000, l.key);
+        nLines += await plainSweep('[data-screen="wrm"].is-active', l.key, bad);
       }
-      check(!bad.length, `M3: jargon in ${bad.length} rendered lesson lines: ${bad.slice(0, 4).join(' || ')}`);
-      if (curLessons.length) console.log(`rendered-text sweep: ${curLessons.length} curated lessons`);
+      check(!bad.length, `plain English: ${bad.length} White Rose lines not plain: ${bad.slice(0, 5).join(' || ')} — forms: ${summ(bad)}`);
+      console.log(`rendered-text sweep: ${all.length} lessons (${curLessons.length} curated), ${nLines} lines, ${bad.length} not plain`);
     });
 
     /* ==================================================== phone basic check (390x844): nothing scrolls sideways */
@@ -756,8 +835,18 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         await sleep(300);
         await rows390(`long why lines (${longWhyLesson.key})`);
         // N22: a clamped line opens on a tap
-        const opened = await page.evaluate(() => { const m = document.querySelector('[data-screen="wrm"].is-active [data-w-more]'); if (!m) return null; const h = m.getBoundingClientRect().height; m.click(); return [h, m.getBoundingClientRect().height, m.getAttribute('aria-expanded')]; });
-        check(!opened || (opened[2] === 'true' && opened[1] >= opened[0]), `N22: the "more" toggle ${JSON.stringify(opened)}`);
+        const opened = await page.evaluate(() => {
+          const b = document.querySelector('[data-screen="wrm"].is-active [data-w-more-btn]:not([hidden])');
+          if (!b) return null;
+          const m = b.closest('.tvw-row').querySelector('[data-w-more]');
+          const r = b.getBoundingClientRect();
+          const h = m.getBoundingClientRect().height;
+          const label0 = b.textContent.trim();
+          b.click();
+          return { h0: h, h1: m.getBoundingClientRect().height, open: m.getAttribute('aria-expanded'), label0, label1: b.textContent.trim(), w: r.width, hBtn: r.height };
+        });
+        check(!opened || (opened.open === 'true' && opened.h1 >= opened.h0), `N22: the "more" toggle ${JSON.stringify(opened)}`);
+        check(!opened || (opened.label0 === 'more' && opened.label1 === 'less' && opened.w >= 44 && opened.hBtn >= 44), `N24: the "more" button shows "more"/"less" with a 44 px target ${JSON.stringify(opened)}`);
       });
     }
     await page.goto(`${base}/index.html${mh}`, { waitUntil: 'networkidle2', timeout: 60000 });

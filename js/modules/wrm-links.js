@@ -20,10 +20,10 @@
 //                 2. The direct skills of the next 1–3 lessons in the same unit.
 
 import { WRM_SEQUENCE } from './wrm-sequence-db.js';
-import { skillsForWrmStep, wrmStep, WRM_PROPOSALS } from './wrm.js';
+import { skillsForWrmStep, wrmStep, wrmFor, WRM_PROPOSALS } from './wrm.js';
 import { skillsForStandard, SKILL_STANDARDS } from './standards.js';
 import { STANDARD_PROPOSALS, WRM_EXTENSIONS } from './build-list.js';
-import { optionsFor } from './skill-options.js';
+import { plainNote, isPlain } from './plain-words.js';
 
 // ---- curated links (data/curriculum/links/<YEAR>.json, written by the tagging lane) ------------
 // When a step has a curated record it wins over the computed rules: direct (with opts and partial),
@@ -85,7 +85,8 @@ function unpack() {
     for (const g of WRM_SEQUENCE) {
         for (const u of g.units) {
             u.lessons.forEach((t, i) => {
-                const [title, step, ccss, power, type, weeks, strands, from, note] = t;
+                const [rawTitle, step, ccss, power, type, weeks, strands, from, note] = t;
+                const title = String(rawTitle).replace(/\(\s+/g, '(').replace(/\s+\)/g, ')');   // "(How many left )"
                 const l = {
                     key: `${g.id}:${u.id}:${i + 1}`, grade: g.id, gradeLabel: g.label, unit: u.id, domain: u.domain,
                     unitName: u.name, n: i + 1, title, step, ccss, power: !!power, type, weeks, strands, from, note: note || '',
@@ -156,7 +157,7 @@ export function linksFor(lessonOrKey, opts = {}) {
     const cur = lesson.step ? CURATED.get(lesson.step) : null;
     if (cur) return curatedLinks(lesson, cur, ovr, live);
     const direct = applyOverride(directOf(lesson.step, live), ovr.direct, 'Added by the school', 0)
-        .map((x) => ({ key: x.key, partial: x.partial || '' }));
+        .map((x) => ({ key: x.key, partial: x.partial ? composePartial(x.partial) : '' }));
     const taken = new Set(direct.map((x) => x.key));
     const myClusters = new Set(lesson.ccss.map((c) => (clusterOf(c) || {}).id).filter(Boolean));
 
@@ -172,7 +173,7 @@ export function linksFor(lessonOrKey, opts = {}) {
     }).sort((a, b) => a.shares - b.shares || a.yr - b.yr || b.i - a.i);
     for (const r of ranked) {
         for (const d of directOf(r.sid, live)) {
-            push(pre, d.key, `Taught before: ${gradeOfYear(r.sid.split('.')[0])}, "${r.rec ? r.rec.title : r.sid}"`);
+            push(pre, d.key, `Taught before: ${gradeOfYear(r.sid.split('.')[0])}, "${r.rec ? tidyTitle(r.rec.title) : r.sid}"`);
         }
     }
     const sib = siblings(lesson);
@@ -208,156 +209,185 @@ export function linksFor(lessonOrKey, opts = {}) {
     const related = applyOverride(rel, ovr.related, 'Added by the school', RELATED_CAP);
     const verdict = !direct.length ? 'gap' : direct.some((x) => !x.partial) ? 'full' : 'partial';
     return { lesson, step: lesson.step ? wrmStep(lesson.step) : null, direct, prereq, related, verdict,
-        missing: verdict === 'partial' ? direct.map((x) => x.partial).filter(Boolean).join('; ') : '',
+        missing: verdict === 'partial' ? (directOf(lesson.step, live).map((x) => plainNote(x.partial)).find(Boolean) || '') : '',
         build: [], preBuild: [], source: 'rules' };
 }
 
 function curatedLinks(lesson, cur, ovr, live) {
-    const ctx = { step: lesson.step, key: ((cur.partial || [])[0] || (cur.direct || [])[0] || {}).key || '' };
     const seen = new Set();
     const keep = (x) => x && x.key && live(x.key) && !seen.has(x.key) && seen.add(x.key);
+    const build = (cur.build || []).slice();
     const direct = applyOverride([
         ...(cur.direct || []).map((x) => ({ key: x.key, opts: x.opts || null, partial: '' })),
-        ...(cur.partial || []).map((x) => ({ key: x.key, opts: x.opts || null, partial: plainWhy(x.missing || 'part of the step', { ...ctx, key: x.key }) })),
+        ...(cur.partial || []).map((x) => ({ key: x.key, opts: x.opts || null, partial: composePartial(x.missing, build) })),
     ], ovr.direct, 'Added by the school', 0).filter(keep).map((x) => ({ key: x.key, opts: x.opts || null, partial: x.partial || '' }));
     // opts travel with every link (a curated pre / related skill is often "within 100" etc.)
-    const withOpts = (x) => ({ key: x.key, why: plainWhy(x.why || '', { ...ctx, key: x.key }), opts: x.opts && Object.keys(x.opts).length ? x.opts : null });
-    const prereq = applyOverride((cur.pre || []).map(withOpts), ovr.prereq, 'Added by the school', 0).filter(keep);
-    const related = applyOverride((cur.related || []).map(withOpts), ovr.related, 'Added by the school', 0).filter(keep);
+    const withOpts = (group) => (x) => ({ key: x.key, why: composeWhy(x.why || '', { key: x.key, lesson, group }), opts: x.opts && Object.keys(x.opts).length ? x.opts : null });
+    const prereq = applyOverride((cur.pre || []).map(withOpts('prereq')), ovr.prereq, 'Added by the school', 0).filter(keep);
+    const related = applyOverride((cur.related || []).map(withOpts('related')), ovr.related, 'Added by the school', 0).filter(keep);
     const verdict = ['full', 'partial', 'gap'].includes(cur.verdict) ? cur.verdict
         : !direct.length ? 'gap' : direct.some((x) => !x.partial) ? 'full' : 'partial';
-    return { lesson, step: wrmStep(lesson.step), direct, prereq, related, verdict, missing: plainWhy(cur.missing || '', ctx),
-        build: (cur.build || []).slice(), preBuild: (cur.preBuild || []).slice(), note: cur.note || '', source: 'curated' };
+    return { lesson, step: wrmStep(lesson.step), direct, prereq, related, verdict, missing: composeMissing(cur.missing, build, cur.envision),
+        build, preBuild: (cur.preBuild || []).slice(), note: cur.note || '', source: 'curated' };
 }
 
 /**
- * Skill ids inside a note become the skill's label. Pure by default (the id in words); the page installs
- * the real labels with setSkillLabeler(fn(key|id) → label|null).
+ * The page installs real skill labels with setSkillLabeler(fn(key|id) → label|null); Node gates install theirs.
  */
 let skillLabeler = null;
 export function setSkillLabeler(fn) { skillLabeler = typeof fn === 'function' ? fn : null; }
 /** A live skill's label (through the installed labeler), or null. */
 export function liveSkillLabel(id) { return skillLabeler && id ? skillLabeler(id) || null : null; }
-const skillWords = (id) => {
-    const lab = skillLabeler ? skillLabeler(id) : null;
-    if (lab) return lab;
-    // an entry still to make ("compare_small", "vis_story_strip") reads as its name, in quotes (critic r4 M4)
-    if (!id.includes(':') && (CURATED_PROPOSALS[id] || EXTRA_NAMES[id] || WRM_PROPOSALS[id] || STANDARD_PROPOSALS[id] || WRM_EXTENSIONS[id])) return `"${proposalName(id)}"`;
-    return id.replace(/^[a-z_]+:/, '').replace(/_/g, ' ');
-};
-const YEAR_WORD = { R: 'Pre-K', Y1: 'Kindergarten', Y2: 'Grade 1', Y3: 'Grade 2', Y4: 'Grade 3', Y5: 'Grade 4', Y6: 'Grade 5' };
-// Option ids in a note ("band 5", "forms 0", "parts 2", "denoms [2]", "task 'fit'") → the option's label and value
-// labels from the dialog (skill-options.js), for the note's own skill when known (critic r4 M3, m7).
-const OPT_WORDS = { band: 'Numbers to', bands: 'Numbers to', forms: 'What the items ask', parts: 'Parts', denoms: 'Denominators', tiles: 'Numbers to sort',
-    span: 'Number line range', power: 'Powers of ten', decimals: 'Decimal places', mode: 'Mode', pool: 'Numbers used', objects: 'Objects', frame: 'Answer frame',
-    notation: 'How it is written', response: 'How the pupil answers', task: 'Task', form: 'Form', unknown: 'What is missing', support: 'Support',
-    level: 'Support level', ask: 'Question', direction: 'Direction', layout: 'Layout', arrangement: 'Arrangement', unit: 'Unit', regroup: 'Regrouping',
-    step: 'Step', steps: 'Steps', range: 'Max Number', counter: 'Counters', labels: 'Labels', model: 'Model', grid: 'Grid', facts: 'Facts', stories: 'Stories',
-    context: 'Context', focus: 'Focus', key: 'Key', words: 'Words', op: 'Operation', pictures: 'Pictures', reverse: 'Reverse', subtraction: 'Subtraction' };
-const NUM_OPTS = 'bands?|forms|parts|denoms|tiles|span|power|decimals';
-const OPT_VAL = '(?:"[^"]*"|\'[^\']*\'|\\d+(?:[.,]\\d+)*)';
-const OPT_NUM_RE = new RegExp(`\\b(${NUM_OPTS})\\s*[:=]?\\s*(${OPT_VAL}(?:\\s*(?:\\/|\\||\\bor\\b|,(?!\\d{3}))\\s*${OPT_VAL})*)`, 'g');
-const OPT_QUOTED_RE = new RegExp(`\\b(${Object.keys(OPT_WORDS).join('|')})\\s*:?\\s*(["'])([^"']{1,40})\\2`, 'g');
-export function optionPhrase(key, id, raw) {
-    let def = null;
-    if (key && String(key).includes(':')) {
-        try { const [c, sk] = String(key).split(':'); def = optionsFor(c, sk).find((d) => d.id === id) || null; } catch (e) { def = null; }
+
+/* ================================================================= teacher sentences (fix round 6)
+ * WHITELIST, not blacklist: every line a teacher reads about a link is COMPOSED from structured fields — the
+ * White Rose steps a note names (resolved to their grade and title), the relation of that step to this lesson
+ * (the step before, the next step, taught before in an earlier grade …), the week numbers, the skill's own
+ * White Rose steps and standards, and the names of the entries still to be built. The tagging lanes' free-text
+ * note is shown only when it passes plain-words.js WHOLE; it is never partly rewritten. The notes stay in the
+ * link files and the CSV for the build team.
+ */
+/** A title as written, with stray spaces inside brackets closed up ("(How many left )"). */
+export const tidyTitle = (t) => String(t || '').replace(/\(\s+/g, '(').replace(/\s+\)/g, ')').replace(/\s{2,}/g, ' ').trim();
+/** A White Rose step's title, tidied, or ''. */
+export function stepTitle(id) { const r = wrmStep(id); return r ? tidyTitle(r.title) : ''; }
+/**
+ * A MAP task's name as the screens show it: the MAP list's own name with its arrows drawn ("<->" → "↔"), "Gr 6"
+ * as "Grade 6", and any bracket that is not plain English left out.
+ */
+export function taskName(raw) {
+    const t = tidyTitle(raw).replace(/\s*<->\s*/g, ' ↔ ').replace(/\s*->\s*/g, ' → ').replace(/\bGr\.?\s?(\d)\b/g, 'Grade $1')
+        .replace(/\bB&W\b/g, 'black-and-white').replace(/\(Q1\)/g, '(first quadrant)').replace(/\(upper band\)/g, '(higher RIT scores)');
+    if (isPlain(t, { fragment: false })) return t;
+    return t.replace(/\s*\(([^()]*)\)/g, (m, x) => (isPlain(x, { fragment: false }) ? m : '')).trim();
+}
+const YEAR_ORDER = ['R', 'Y1', 'Y2', 'Y3', 'Y4', 'Y5', 'Y6'];
+const STEP_PART = /^((R|Y[1-6])\.B(\d+))\.S(\d+)$/;
+const ID_CHAIN = /\b(?:R|Y[1-6])\.B\d+(?:\.S\d+(?:\s*[-–]\s*S\d+)?)?\b(?:\s*(?:\/|,|&|\band\b|\bor\b)\s*(?:(?:R|Y[1-6])\.B\d+(?:\.S\d+(?:\s*[-–]\s*S\d+)?)?|S\d+(?:\s*[-–]\s*S\d+)?)\b)*/g;
+
+/** The White Rose steps a note names, in order: "Y3.B1.S8", "R.B11.S5 / S6", "Y6.B8.S1-S2". */
+export function stepsInNote(text) {
+    const out = [];
+    for (const m of String(text || '').match(ID_CHAIN) || []) {
+        let blk = '';
+        for (const p of m.split(/\s*(?:\/|,|&|\band\b|\bor\b)\s*/)) {
+            const f = /^(?:((?:R|Y[1-6])\.B\d+)(?:\.S(\d+))?|S(\d+))(?:\s*[-–]\s*S(\d+))?$/.exec(p);
+            if (!f) continue;
+            if (f[1]) blk = f[1];
+            const a = +(f[2] || f[3] || 0);
+            if (!a || !blk) continue;
+            for (let n = a; n <= Math.max(a, Math.min(+(f[4] || a), a + 9)); n += 1) {
+                const id = `${blk}.S${n}`;
+                if (wrmStep(id) && !out.includes(id)) out.push(id);
+            }
+        }
     }
-    const vals = String(raw).split(/\s*(?:\/|\||\bor\b|,(?!\d{3}))\s*/).map((v) => v.replace(/^["']|["']$/g, '').trim()).filter(Boolean);
-    const lab = (v) => {
-        const hit = def && (def.values || []).find((x) => String(x.v) === v || String(x.v) === v.replace(/,/g, ''));
-        return hit ? String(hit.l).replace(/\s*\(default\)$/i, '') : v.replace(/_/g, ' ');
-    };
-    if (/^bands?$/.test(id)) return `"Numbers to ${vals.map(lab).join(' or ')}"`;
-    if (!def && vals.every((v) => /^\d$/.test(v))) return `the "${OPT_WORDS[id] || id}" setting`;
-    return `"${(def && def.label) || OPT_WORDS[id] || id}: ${vals.map(lab).join(', ')}"`;
+    return out;
 }
-/** An option written as "id: value …" (a Skills to be made entry's option line) in the dialog's words. */
-export function optionText(key, text) {
-    const t = plainWhy(String(text || ''), { key }).replace(/\s*\|\s*/g, ' or ')
-        .replace(/(^|;\s*)(\w+)(\s*:\s*|\s+(?=\w))/g, (m, pre, id) => (OPT_WORDS[id] ? `${pre}${OPT_WORDS[id]}: ` : m));
-    return t.charAt(0).toUpperCase() + t.slice(1);
+/** The school weeks a note names ("wk W11", "week W05", "W30"), as numbers. */
+export function weeksInNote(text) {
+    const out = [];
+    for (const m of String(text || '').matchAll(/\b(?:wk|week),?\s*W?0?(\d{1,2})\b|\bW0?(\d{1,2})\b/gi)) {
+        const n = +(m[1] || m[2]);
+        if (n && !out.includes(n)) out.push(n);
+    }
+    return out;
 }
-const ID_CHAIN = /\b(?:R|Y[1-6])\.B\d+(?:\.S\d+(?:\s*[-–]\s*S\d+)?)?\b(?:\s*(?:\/|,|&|\band\b|\bor\b)\s*(?:(?:R|Y[1-6])\.B\d+(?:\.S\d+(?:\s*[-–]\s*S\d+)?)?|S\d+(?:\s*[-–]\s*S\d+)?|Y[1-6](?:\/Gr\.\s?[\dK])?)\b)*/g;
-const weekWords = (w) => w.split(/\s*\/\s*|,\s*/).map((x) => +String(x).replace(/\D/g, '')).filter(Boolean);
+
+/** How a step sits against this lesson's step. */
+export function relationOf(sid, lessonStep) {
+    const a = STEP_PART.exec(sid || ''), b = STEP_PART.exec(lessonStep || '');
+    if (!a) return 'other';
+    if (!b) return 'grade';
+    if (a[1] === b[1]) { const d = +a[4] - +b[4]; return d === -1 ? 'before' : d < 0 ? 'earlier' : d === 1 ? 'next' : d > 0 ? 'later' : 'same'; }
+    const ya = YEAR_ORDER.indexOf(a[2]), yb = YEAR_ORDER.indexOf(b[2]);
+    if (ya !== yb) return ya < yb ? 'earlierGrade' : 'laterGrade';
+    return +a[3] < +b[3] ? 'earlierBlock' : 'laterBlock';
+}
+const quoteJoin = (titles) => {
+    const q = [...new Set(titles)].slice(0, 3).map((t) => `"${t}"`);
+    return q.length < 2 ? q.join('') : `${q.slice(0, -1).join(', ')} and ${q[q.length - 1]}`;
+};
+const REL_LEAD = {
+    before: () => 'The step before', earlier: () => 'Earlier in the same White Rose block', next: () => 'The next step',
+    later: () => 'Later in the same White Rose block', same: () => 'This lesson\'s own White Rose step',
+    earlierGrade: (g) => `Taught before, in ${g}`, laterGrade: (g) => `Taught later, in ${g}`, earlierBlock: (g) => `Taught earlier in ${g}`,
+    laterBlock: (g) => `Taught later in ${g}`, grade: (g) => g,
+};
+const REL_ORDER = ['before', 'earlier', 'earlierBlock', 'earlierGrade', 'next', 'later', 'laterBlock', 'laterGrade', 'grade', 'same'];
+/** "Taught before, in Grade 2: "Hundreds, tens and ones" (support block, week 11)." for a list of steps. */
+export function stepsSentence(steps, lessonStep, { weeks = [], support = false } = {}) {
+    const groups = new Map();
+    for (const sid of steps) {
+        const rel = relationOf(sid, lessonStep);
+        if (rel === 'other') continue;
+        const g = gradeOfYear(sid.split('.')[0]);
+        const k = `${rel}|${g}`;
+        if (!groups.has(k)) groups.set(k, { rel, g, titles: [] });
+        groups.get(k).titles.push(stepTitle(sid));
+    }
+    const parts = [...groups.values()].sort((x, y) => REL_ORDER.indexOf(x.rel) - REL_ORDER.indexOf(y.rel)).slice(0, 2)
+        .map((x) => `${REL_LEAD[x.rel](x.g)}: ${quoteJoin(x.titles)}`);
+    if (!parts.length) return '';
+    const wk = weeks.length ? ` (${support ? 'support block, ' : ''}week${weeks.length > 1 ? 's' : ''} ${weeks.slice(0, 3).join(', ')})` : '';
+    return `${parts.join('. ')}${wk}.`;
+}
+const uniqBy = (a) => [...new Set(a)];
+/** A skill's own reason to sit beside a lesson when the note names no step: its White Rose steps, else its standards. */
+function skillReason(key, lesson, group) {
+    const [c, s] = String(key || '').split(':');
+    const mine = lesson.step || '';
+    const steps = c && s ? wrmFor(c, s).map((x) => x.id).filter((id) => id !== mine && relationOf(id, mine) !== 'other') : [];
+    const want = group === 'prereq' ? ['before', 'earlier', 'earlierBlock', 'earlierGrade'] : REL_ORDER;
+    const pick = steps.filter((id) => want.includes(relationOf(id, mine)));
+    // nearest first: the same block, then the nearest grade
+    pick.sort((a, b) => REL_ORDER.indexOf(relationOf(a, mine)) - REL_ORDER.indexOf(relationOf(b, mine))
+        || Math.abs(YEAR_ORDER.indexOf(a.split('.')[0]) - YEAR_ORDER.indexOf(mine.split('.')[0])) - Math.abs(YEAR_ORDER.indexOf(b.split('.')[0]) - YEAR_ORDER.indexOf(mine.split('.')[0])));
+    if (pick.length) return stepsSentence(pick.slice(0, 2), mine);
+    const codes = (SKILL_STANDARDS[key] || {}).ccss || [];
+    const shared = codes.filter((x) => (lesson.ccss || []).includes(x));
+    if (shared.length) return `Same standard as this lesson: ${uniqBy(shared).slice(0, 2).join(', ')}.`;
+    if (codes.length) return `${group === 'prereq' ? 'Earlier standard' : 'Linked standard'}: ${codes.slice(0, 2).join(', ')}.`;
+    return group === 'prereq' ? 'Earlier learning this lesson builds on.' : 'The same idea in another form.';
+}
 
 /**
- * A tagging note in a teacher's words (critic r1 M1, r2 M1): step ids become "Grade 1: <step title>",
- * block ids and year codes become grade names, the tagging lanes' shorthand ("prior learning wk W01",
- * "step before in the block", "not dealt", "[rule 3: …]", "{band: 99}", snake_case skill ids) becomes
- * the handbook's words ("support block, week 1", "the step before", "not practised yet", the skill's label).
+ * The line beside a linked skill: the note when it is plain English as written, else a sentence composed from
+ * the steps and weeks it names, else the skill's own steps or standards. Never a part of the note.
  */
-export function plainWhy(text, ctx = {}) {
-    let t = String(text || '');
-    if (!t) return t;
-    // JSON first (one level of nesting), then balanced rule brackets ("[rule 18: opts {…["across"]} …]"), then strays
-    t = t.replace(/\s*-?\s*easier:\s*\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/gi, ' (easier numbers)');
-    t = t.replace(/\s*\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/g, '');
-    t = t.replace(/\s*\[rule\b(?:[^\[\]]|\[[^\]]*\])*\]/gi, '');
-    t = t.replace(/[\[\]{}]/g, '');
-    // chains of ids, with shorthand steps and joiners: "R.B2.S1 / R.B10", "R.B11.S5 / S6", "Y1.B6.S1 and Y1.B12.S1:"
-    // (a bare "S6" belongs to the block of the id before it). Followed by ":" → "Grade: …" (the colon keeps its
-    // grade, M4); followed by punctuation or nothing → "Grade: Title"; followed by its own words → just the words (N14).
-    t = t.replace(ID_CHAIN, (m, off, s) => {
-        let blk = '';
-        let year = '';
-        const steps = [];
-        for (const p of m.split(/\s*(?:\/|,|&|\band\b|\bor\b)\s*/)) {
-            const full = /^(?:((?:R|Y[1-6])\.B\d+)(?:\.S(\d+))?|S(\d+))(?:\s*[-–]\s*S(\d+))?$/.exec(p);
-            if (/^Y[1-6]$|^Gr\./.test(p)) continue;   // "Y5/Gr.4" after a step: a year code, said by the step
-            if (!full) continue;
-            if (full[1]) { blk = full[1]; year = year || p.split('.')[0]; }
-            const a = +(full[2] || full[3] || 0);
-            if (!a || !blk) continue;
-            for (let n = a; n <= Math.max(a, Math.min(+(full[4] || a), a + 9)); n += 1) steps.push(`${blk}.S${n}`);
-        }
-        const g = YEAR_WORD[year] || '';
-        const after = s.slice(off + m.length);
-        if (/^\s*:/.test(after)) return `${g}\u0003`;
-        if (!steps.length) return g;
-        if (/^\s*(?:$|[(;,).\-—])/.test(after)) {
-            const titles = [...new Set(steps.map((id) => (wrmStep(id) || {}).title).filter(Boolean))];
-            return titles.length ? `${g}: ${titles.join(' and ')}` : g;
-        }
-        return '';
-    });
-    t = t.replace(/\u0003\s*:\s*/g, ': ').replace(/^\s+/, '');
-    // a bare step number left over ("which are S13"): the lesson's own block when it is known, else "another lesson"
-    t = t.replace(/(^|[^.\w])S(\d{1,2})\b/g, (m, pre, n) => {
-        const cur = /^((?:R|Y[1-6])\.B\d+)\.S(\d+)$/.exec(ctx.step || '');
-        const r = cur ? wrmStep(`${cur[1]}.S${n}`) : null;
-        const where = !cur ? 'another lesson' : +n > +cur[2] ? 'a later lesson' : 'an earlier lesson';
-        return `${pre}${r ? `"${r.title}" (${where})` : where}`;
-    });
-    // option ids → the option's teacher label ("band 5" → "Numbers to 5", the dialog's own wording)
-    t = t.replace(OPT_NUM_RE, (m, id, v) => optionPhrase(ctx.key, id, v)).replace(OPT_QUOTED_RE, (m, id, q, v) => optionPhrase(ctx.key, id, v));
-    // "(prior learning wk W33)", "(school prior learning, week W32; also …)", "(prior learning wk W33, "Y1 Count backwards")" (N23)
-    t = t.replace(/\s*\((?:school )?prior learning,?(?:\s*(?:wk|week)\s*((?:W?\d+\s*\/?\s*)+))?\s*(?:[;,]\s*([^()]*))?\)/gi, (m, w, rest) => {
-        const more = String(rest || '').trim().replace(/^"(.*)"$/, '$1');
-        return `${w ? ` — support block, week ${weekWords(w).join(', ')}` : ' — support block'}${more ? ` (${more})` : ''}`;
-    });
-    t = t.replace(/\s*\((?:the )?(?:step before in (?:the|this) block|previous step|earlier in (?:the|this) block|earlier step)\)/gi, ' — the step before');
-    t = t.replace(/\s*\(next step[^)]*\)/gi, ' — the next step');
-    t = t.replace(/\s*\(neighbouring step[^)]*\)/gi, ' — the step next to it');
-    t = t.replace(/\s*\(lower grade, same CCSS cluster\)/gi, ' — earlier grade, same standard group');
-    t = t.replace(/\s*\(same CCSS ([^,)]+), earlier\)/gi, ' — same standard $1, earlier');
-    t = t.replace(/\s*\(earlier (?:R|Y[1-6]) step\)/gi, ' — earlier');
-    t = t.replace(/^same block:\s*/i, 'Same unit: ').replace(/^next step:\s*/i, 'Next: ').replace(/^same CCSS ([^ ]+(?:, [^ ]+)*) in /i, 'Same standard $1: ');
-    t = t.replace(/\bCCSS cluster\b/gi, 'standard group');
-    // weeks: "school week, W23", "wk W05", "week W05", bare "W05"
-    t = t.replace(/\b(?:school )?(?:wk|week),?\s*W?0?(\d{1,2})\b/gi, 'week $1').replace(/\bW0?(\d{1,2})\b/g, 'week $1').replace(/\bweek week\b/gi, 'week');
-    // year codes: Y3 / Gr.2 / Rec / Y2/Gr.1
-    t = t.replace(/\bY[1-6]\/Gr\.\s?[\dK]\b/g, (m) => YEAR_WORD[m.split('/')[0]]).replace(/\bRec\/PK4\b/g, 'Pre-K').replace(/\bY1\/KG\b/g, 'Kindergarten');
-    t = t.replace(/\bGr\.\s?K\b/g, 'Kindergarten').replace(/\bGr\.\s?(\d)\b/g, 'Grade $1').replace(/\bY([1-6])\b/g, (m) => YEAR_WORD[m]);
-    // a grade word repeated across a slash or colon ("Pre-K: / Pre-K", "Kindergarten/Kindergarten") → once
-    t = t.replace(/\b(Pre-K|Kindergarten|Grade \d)\s*:?\s*\/\s*\1\b/g, '$1');
-    t = t.replace(/\b(?:the )?same week,?\s*week (\d+)\b/gi, 'same week (week $1)');
-    // skill ids → labels
-    t = t.replace(/\b[a-z_]+:[a-z0-9_]+\b/g, (m) => skillWords(m)).replace(/\b[a-z]+(?:_[a-z0-9]+)+\b/g, (m) => skillWords(m));
-    t = t.replace(/\bare not dealt\b/gi, 'are not practised yet').replace(/\bis not dealt\b/gi, 'is not practised yet').replace(/\bnot dealt\b/gi, 'not practised yet');
-    t = t.replace(/\((Pre-K|Kindergarten|Grade \d) (?=[A-Z])/g, '($1: ');
-    t = t.replace(/\(\s*\)/g, '').replace(/:\s*(—|$)/g, ' $1').replace(/—\s*—/g, '—').replace(/\s+([,;)])/g, '$1');
-    return t.replace(/\s{2,}/g, ' ').replace(/[\s—:-]+$/, '').replace(/^[\s\/;,:]+/, '').trim();
+export function composeWhy(note, { key = '', lesson = {}, group = 'prereq' } = {}) {
+    const whole = plainNote(note);
+    if (whole) return whole;
+    const steps = stepsInNote(note);
+    if (steps.length) {
+        const s = stepsSentence(steps, lesson.step || '', { weeks: weeksInNote(note), support: /prior learning/i.test(note) });
+        if (s) return s;
+    }
+    if (/added by the school/i.test(String(note || ''))) return 'Added by the school.';
+    return skillReason(key, lesson, group);
+}
+
+/** An entry still to build, by name, as a teacher reads it (the name when it is plain, else without its bracket). */
+export function proposalLabel(id) {
+    const n = String(proposalName(id) || '').replace(/\s*\(option\)\s*$/i, ' (new option on an existing skill)');
+    if (isPlain(n)) return n;
+    const bare = n.replace(/\s*\([^()]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim();
+    return isPlain(bare) ? bare : 'A new skill (see Skills to be made)';
+}
+const namesOf = (ids) => quoteJoin((ids || []).map(proposalLabel));
+
+/** "Covers part" beside one skill: the note when plain, else what will close the rest. */
+export function composePartial(note, build = []) {
+    const whole = plainNote(note);
+    if (whole) return `Not yet: ${/^[A-Z][a-z]/.test(whole) ? whole.charAt(0).toLowerCase() + whole.slice(1) : whole}`;
+    return build.length ? `The rest of the lesson comes with ${namesOf(build)}, still to be built.` : 'The rest of the lesson has no skill yet.';
+}
+/** "Not yet: …" for a lesson only partly taught: the note when plain, else what the entries to build will add. */
+export function composeMissing(note, build = [], envision = []) {
+    const whole = plainNote(note);
+    if (whole) return whole;
+    for (const e of envision || []) { const t = plainNote(e && e.teaches); if (t) return t; }
+    return build.length ? `What ${namesOf(build)} will add.` : '';
 }
 
 /**

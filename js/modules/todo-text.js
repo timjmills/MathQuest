@@ -1,93 +1,141 @@
-// todo-text.js — the teacher's words for one "Skills to be made" entry (critic r3 m7, r4 M4/m7).
-// The build queue (build-queue.js) keeps the build team's spec, which is full of file names, ids and
-// template options; the screen and its print show only what a teacher reads. The CSV keeps the spec.
+// todo-text.js — the teacher's words for one "Skills to be made" entry and for a MAP task note (fix round 6).
+// WHITELIST, not blacklist: every line is COMPOSED from structured fields (the entry's name, the live skill's
+// label, option labels and values from skill-options.js, White Rose step grades and titles, standard codes, MAP
+// task names). The build team's free text (teaches, representation, closes, option notes) is shown only when it
+// passes plain-words.js WHOLE; otherwise the composed sentence stands alone. The CSV keeps every note as written.
 //
-// Pure: no window, no DOM, no state. The page installs real skill labels through wrm-links'
-// setSkillLabeler (Node gates install theirs), and the queue's names through setTodoNames().
+// Pure: no window, no DOM, no state. The page installs real skill labels through wrm-links' setSkillLabeler
+// (Node gates install theirs), and the queue's entries through setTodoNames().
 
-import { plainWhy, optionText, liveSkillLabel } from './wrm-links.js';
+import { liveSkillLabel, proposalName, gradeOfYear, stepTitle, taskName } from './wrm-links.js';
+import { wrmStep } from './wrm.js';
+import { optionsFor } from './skill-options.js';
+import { plainNote, isPlain } from './plain-words.js';
+import { DOMAINS } from './build-queue.js';
 
-let NAMES = new Map();     // build-queue id -> entry name
-/** The queue's entries, so an entry id inside another entry's note reads as that entry's name. */
-export function setTodoNames(items) { NAMES = new Map((items || []).map((e) => [e.id, e.name])); }
+let NAMES = new Map();     // build-queue id -> entry
+/** The queue's entries, so a MAP row can name the entry that closes it. */
+export function setTodoNames(items) { NAMES = new Map((items || []).map((e) => [e.id, e])); }
 
-/** Anything still reading as code after the rewrite: a clause holding it is dropped. */
-export const DEV = /\.(?:js|md|json|cjs|mjs)\b|\b[A-Z]{3,}_[A-Z]|\bws-[a-z]|'[a-z-]+'\s*\||\bgains\b|\blanes?\b|\bproposals?-index\b|\bproviders?\/|\bopts\b|\bpanes?\b|\btemplates?\b|\bgenerators?\b|\bregistry\b|\bdispatcher\b|\bprintFormat\b|\bq\.cell\b|\bcell kit\b|\bkit cell\b|\bre-?grade\b|\bn=\d|\bnew:\s*[a-z]|\bwordpic\b|\bpicture-row\b/;
+const isMigrate = (e) => /^vis_migrate/.test(e.id || '') || /^Migrate Legacy/i.test(e.name || '');
+const isVisual = (e) => /^vis_/.test(e.id || '');
+const lowerFirst = (s) => (/^[A-Z][a-z]/.test(s) ? s.charAt(0).toLowerCase() + s.slice(1) : s);
 
-const teacherName = (n) => String(n || '').replace(/\s*\(option\)\s*$/i, ' (new option on an existing skill)');
-
-/** An entry's name in a teacher's words. */
+/** An entry's name in a teacher's words: the name when plain, else without its bracket, else what it is for. */
 export function todoName(e) {
     const n = String(e.name || '');
-    const mig = /^Migrate Legacy (.+?)(?: Visuals?)? to B&W Kit Cells$/i.exec(n);
-    if (mig) return `${mig[1]} pictures redrawn in the black-and-white worksheet style`;
-    return teacherName(n.replace(/\s*\(new skill [^)]*\)/i, '').replace(/\s*\(template option\)/i, ' (option)'));
+    const mig = /^Migrate Legacy (.+?)(?: Visuals?)? to (?:the )?B&W .+$/i.exec(n);
+    if (mig) return isPlain(`${mig[1]} pictures`) ? `${mig[1]} pictures redrawn in the black-and-white worksheet style` : 'Pictures redrawn in the black-and-white worksheet style';
+    const t = n.replace(/\s*\(new skill [^)]*\)/i, '').replace(/\s*\((?:template )?option\)\s*$/i, ' (new option on an existing skill)');
+    if (isPlain(t)) return t;
+    const bare = t.replace(/\s*\([^()]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim();
+    if (bare && isPlain(bare)) return bare;
+    const lab = e.skill ? liveSkillLabel(e.skill) : null;
+    if (lab && isPlain(lab)) return `${lab}: a new option`;
+    const st = (e.wrmSteps || []).map(stepTitle).find(Boolean);
+    if (st) return `A new ${isVisual(e) ? 'picture' : 'skill'} for "${st}"`;
+    const dom = (DOMAINS.find((d) => d[0] === e.domain) || [])[1];
+    return `A new ${isVisual(e) ? 'picture' : 'skill'}${dom ? ` in ${dom}` : ''}`;
 }
-const isMigrate = (e) => /^vis_migrate/.test(e.id) || /^Migrate Legacy/i.test(e.name);
-const isVisual = (e) => /^vis_/.test(e.id);
-const nameWords = (e) => todoName(e).replace(/\s*\((?:new )?option(?: on an existing skill)?\)$/i, '').toLowerCase();
+const nameWords = (e) => todoName(e).replace(/\s*\(new option on an existing skill\)$/i, '');
 
-/** The spec's note in plain words: entry ids become their names, files and source tables go, then plainWhy. */
-export function plainLine(x, e = {}) {
-    let t = String(x || '');
-    if (!t) return '';
-    t = t.replace(/`([^`]*)`/g, '$1').replace(/\b(?:pane|template):([a-z0-9-]+)/g, '$1 picture')
-        .replace(/\b([a-z]+(?:_[a-z0-9]+)*)_\*/g, (m, a) => `the ${a.replace(/_/g, ' ')} skills`);
-    // "(wrm.js)", "(STANDARD_PROPOSALS)", "(part A)", "(build-list.js)": where the build team keeps it
-    t = t.replace(/\s*\((?:[^()]*?(?:\.(?:js|md|json)\b|\b[A-Z]{3,}_[A-Z]+\b|proposals-index|\blane\b|\bgenerator\b|\bpart [A-Z]\b))[^()]*\)/g, '');
-    t = t.replace(/\b(?:WRM|STANDARD_PROPOSALS|VISUAL_BUILDS|WRM_EXTENSIONS|WRM_PROPOSALS)\s+(?=[a-z][a-z0-9]*_)/g, '');
-    t = t.replace(/\b(?:STANDARD_PROPOSALS|VISUAL_BUILDS|WRM_EXTENSIONS|WRM_PROPOSALS)\b\s*/g, '');
-    // another entry's id → its name, in quotes
-    t = t.replace(/\b[a-z][a-z0-9]*(?:_[a-z0-9]+)+\b/g, (id, off, s) => (NAMES.has(id) && s[off - 1] !== ':' ? `"${todoName({ id, name: NAMES.get(id) })}"` : id));
-    t = plainWhy(t, { key: e.skill || '', step: (e.wrmSteps || [])[0] || '' });
-    // what still reads as code goes, one clause at a time
-    const kept = t.split(/(?<=[;.])\s+(?=[A-Za-z"(])/).filter((c) => !DEV.test(c));
-    return kept.join(' ').replace(/[;,]\s*$/, '').trim();
-}
+/** A step as a teacher reads it: 'Grade 2, "Hundreds"'. */
+export const stepLabel = (id) => { const t = stepTitle(id); return t ? `${gradeOfYear(String(id).split('.')[0])}, "${t}"` : ''; };
+const stepsJoin = (ids) => {
+    const l = [...new Set(ids.map(stepLabel).filter(Boolean))];
+    return `${l.slice(0, 3).join('; ')}${l.length > 3 ? ` and ${l.length - 3} more` : ''}`;
+};
 
-/** A MAP.json row's note (its `closes`) in plain words, for the MAP task screen. */
-export function mapNote(text, skills = []) {
-    return plainLine(String(text || '').replace(/\s*\(part [A-Z]\)/g, ''), { skill: (skills || [])[0] || '' });
-}
-
-/** "What pupils will do". */
+/** "What pupils will do": the plain teaches sentence, else composed from the name and its first step. */
 export function todoTeaches(e) {
     if (isMigrate(e)) return 'The same questions as now, drawn in the black-and-white worksheet style, the same on paper and on screen.';
-    if (isVisual(e)) return `New pictures on worksheets and on screen: ${nameWords(e)}. The pupil answers from the picture.`;
-    return plainLine(e.teaches, e) || `Practise ${nameWords(e)}.`;
+    if (isVisual(e)) return `New pictures on worksheets and on screen: "${nameWords(e)}". The pupil answers from the picture.`;
+    const note = plainNote(e.teaches);
+    if (note) return note;
+    const st = (e.wrmSteps || []).find((s) => wrmStep(s));
+    return st ? `Practise "${nameWords(e)}", for ${stepLabel(st)}.` : `Practise "${nameWords(e)}".`;
 }
 
-/** "How it looks": the drawing, never the build spec (critic r4 M4 step 3). */
+/** "How it looks": the plain representation note, else a composed sentence (always composed for drawings). */
 export function todoLooks(e) {
-    if (isMigrate(e)) return 'Black-and-white boxed cells, drawn the same on paper and on screen.';
-    let t = String(e.representation || '');
-    // the design standard every page keeps: said once on the page, not on every entry
-    t = t.replace(/(^|[.;]\s*)print:\s*(?:one\s+)?(?:boxed\s+)?B&W\s+(?:boxed\s+)?(?:Andika\s+)?cell(?:\s*\([^)]*\))?(?:,\s*big digits)?(?:,\s*single grey for structure only)?\s*[;,]?\s*/gi, '$1On paper: ');
-    t = t.replace(/\bscreen:\s*/gi, 'On screen: ');
-    t = t.replace(/\s*\((?=[^()]*\b(?:production|MC|hot spot|select-all|selection|matching)\b)[^()]*\)/g, '').replace(/,?\s*(?:never|not)(?: single| text)? MC\b/g, '');
-    t = t.replace(/[^.;]*\bcomes from vis_[a-z_]+\.?/g, '');
-    // a bare list of drawing names ("counters, seqstrip") says nothing to a teacher
-    if (/^\s*[a-z0-9-]+(?:\s*[,+]\s*[a-z0-9-]+)*\s*$/i.test(t)) t = '';
-    let out = plainLine(t, e).replace(/^On paper:\s*(\S)/, (m, c) => `On paper: ${c}`);
-    if (isVisual(e) && (!out || out.length < 12)) out = '';
-    if (!out) out = isVisual(e) ? `A black-and-white line drawing of ${nameWords(e)}, the same on paper and on screen.` : 'A black-and-white boxed question, the same on paper and on screen.';
-    return out.charAt(0).toUpperCase() + out.slice(1);
+    if (isMigrate(e)) return 'Black-and-white boxed questions, drawn the same on paper and on screen.';
+    if (isVisual(e)) return `A black-and-white line drawing of "${nameWords(e)}", the same on paper and on screen.`;
+    return plainNote(e.representation) || 'A black-and-white boxed question, the same on paper and on screen.';
 }
 
-/** "Gap it fills": plain, one line per step, never twice. */
+/**
+ * "Gap it fills": one line per gap, composed from its structured lead (a White Rose step, a standard code, a MAP
+ * task) and the gap note when it is plain, never twice.
+ */
 export function todoCloses(e) {
-    return [...new Set((e.closes || []).map((c) => plainLine(c, e)).filter((c) => c && !/^\s*(?:none|n\/a|-)\s*\.?$/i.test(c) && !/\breused\b/i.test(c)))];
+    const out = [];
+    for (const g of e.gaps || []) {
+        const note = plainNote(g.text);
+        let line = '';
+        if (g.step) line = stepLabel(g.step) ? `${stepLabel(g.step)}: ${note || 'no skill teaches all of it yet.'}` : note;
+        else if (g.code) line = `${g.code}: ${note || 'not yet fully taught.'}`;
+        else if (g.map) { const tn = taskName(g.map); line = isPlain(`MAP task "${tn}"`) ? `MAP task "${tn}": ${note || 'no skill practises it yet.'}` : ''; }
+        else if (g.none) line = `No skill teaches ${stepsJoin(g.none)}.`;
+        else if (g.improves) line = `Today's skills cover only part of ${stepsJoin(g.improves)}.`;
+        else if (!/\breused\b/i.test(String(g.text || ''))) line = note;
+        if (line && !out.includes(line)) out.push(line);
+    }
+    if (!out.length && (e.wrmSteps || []).length) out.push(`No skill teaches ${stepsJoin(e.wrmSteps)}.`);
+    if (!out.length && (e.ccss || []).length) out.push(`Not yet fully taught: ${e.ccss.join(', ')}.`);
+    return out;
+}
+
+// An option written as "<id> <value>: <what it does>" in a build note: the id is read against the skill's own
+// option labels (skill-options.js) or this table of the setting names the build list uses.
+const OPTION_LABELS = { band: 'Numbers to', bands: 'Numbers to', forms: 'What the items ask', form: 'What the items ask', parts: 'Parts',
+    denoms: 'Denominators', denominators: 'Denominators', span: 'Number line range', places: 'Decimal places', decimals: 'Decimal places',
+    objects: 'Objects', pictures: 'Pictures', support: 'Support', response: 'How the pupil answers', task: 'Task', unknown: 'What is missing',
+    level: 'Support level', steps: 'Count in', step: 'Count in', words: 'Number words', layout: 'Layout', focus: 'Focus', items: 'Items' };
+const VAL = `(?:"[^"]*"|'[^']*'|\\d+(?:,\\d{3})*(?:\\s*[-–]\\s*\\d+(?:,\\d{3})*)?)`;
+const OPT_HEAD = new RegExp(`^([a-z]+)\\s*:?\\s*(${VAL}(?:\\s*(?:\\/|\\||\\bor\\b|\\band\\b|,)\\s*${VAL})*)\\s*([:;,(—-]?)\\s*([\\s\\S]*)$`, 'i');
+/** The option of an entry in the dialog's words: its label and values (always kept), then the note when plain. */
+export function optionLine(skill, raw) {
+    const text = String(raw || '').trim();
+    if (!text) return '';
+    const m = OPT_HEAD.exec(text);
+    if (m) {
+        const id = m[1].toLowerCase();
+        let def = null;
+        if (skill && skill.includes(':')) { try { const [c, s] = skill.split(':'); def = optionsFor(c, s).find((d) => d.id === id) || null; } catch (x) { def = null; } }
+        const label = def ? String(def.label || '') : OPTION_LABELS[id];
+        if (label) {
+            const vals = m[2].split(/\s*(?:\/|\||\bor\b|\band\b|,(?!\d{3}))\s*/).map((v) => v.replace(/^["']|["']$/g, '').trim()).filter(Boolean)
+                .map((v) => { const hit = def && (def.values || []).find((x) => String(x.v) === v.replace(/,/g, '')); return hit ? String(hit.l).replace(/\s*\(default\)$/i, '') : v; });
+            const head = /^bands?$/.test(id) && (!def || /^numbers to$/i.test(label)) ? `Numbers to ${vals.join(' or ')}` : `${label}: ${vals.join(', ')}`;
+            let rest = m[4].trim();
+            if (m[3] === '(' && rest.endsWith(')')) rest = rest.slice(0, -1);
+            // "and pictures" runs on from the values; a clause after ":" or "(" is its own sentence
+            const runOn = !m[3] && /^[a-z]/.test(rest);
+            const tail = !rest ? '' : runOn ? (isPlain(rest, { fragment: false }) ? ` ${rest.replace(/[.;,]$/, '')}` : '') : (plainNote(rest) ? `${/[.?!]$/.test(head) ? '' : '.'} ${plainNote(rest).replace(/\.$/, '')}` : '');
+            if (isPlain(head)) return `${head}${tail}`;
+        }
+    }
+    // "objects: show the group, add or take one": the setting's name, then its words when they are plain
+    const named = /^([a-z]+):\s+(.+)$/i.exec(text);
+    if (named) {
+        const id = named[1].toLowerCase();
+        let def = null;
+        if (skill && skill.includes(':')) { try { const [c, s] = skill.split(':'); def = optionsFor(c, s).find((d) => d.id === id) || null; } catch (x) { def = null; } }
+        const label = (def && def.label) || OPTION_LABELS[id] || id.charAt(0).toUpperCase() + id.slice(1);
+        const line = `${label}: ${named[2].replace(/[.;,]$/, '')}`;
+        if (isPlain(line)) return line;
+    }
+    return isPlain(text, { fragment: false }) && isPlain(`Option: ${text}`) ? text.replace(/[.;,]$/, '') : '';
 }
 
 /** The kind line's tail: the live skill it changes (by its label) and the option in the dialog's words. */
 export function todoKindTail(e) {
     const parts = [];
     const lab = e.skill ? liveSkillLabel(e.skill) : null;   // N19: a skill not made yet is the entry itself
-    if (lab) parts.push(lab);
+    if (lab && isPlain(lab, { fragment: false })) parts.push(lab);
     if (e.option) {
-        const o = optionText(e.skill, e.option);
-        const kept = o.split(/(?<=[;.])\s+/).filter((c) => !DEV.test(c)).join(' ').replace(/[;,]\s*$/, '');
-        if (kept) parts.push(`Option: ${kept}`);
+        const o = optionLine(e.skill, e.option);
+        parts.push(o ? `Option: ${o}` : 'A new setting on this skill');
     }
     return parts;
 }
@@ -95,4 +143,25 @@ export function todoKindTail(e) {
 /** Every field a teacher reads for one entry, for the screen, the print and the gates. */
 export function todoTexts(e) {
     return { name: todoName(e), teaches: todoTeaches(e), closes: todoCloses(e), looks: todoLooks(e), kind: todoKindTail(e) };
+}
+
+/**
+ * A MAP task's note (MAP · Practise by task): the row's note when it is plain, else a sentence composed from the
+ * entry that closes it ('"Meaning of the equal sign" will add: …'), else nothing. Never starts with an id.
+ */
+export function mapNote(text, row = {}) {
+    const whole = plainNote(text);
+    if (whole) return whole;
+    const id = row.proposal || '';
+    if (!id) return '';
+    const e = row.entry || NAMES.get(id) || { id, name: proposalName(id) };
+    const teaches = plainNote(e.teaches);
+    if (teaches) return `"${nameWords(e)}" will add: ${lowerFirst(teaches)}`;
+    return `"${nameWords(e)}" is still to be built.`;
+}
+
+/** One MAP line of an entry: strand · RIT band · the task (its MAP name) or the kind of item MAP asks. */
+export function mapLine(m) {
+    const what = m.task ? taskName(m.task) : taskName(m.taskType || '');
+    return [m.strand, m.ritBand ? `RIT ${m.ritBand}` : '', what && isPlain(what, { fragment: false }) ? what : ''].filter(Boolean).join(' · ');
 }

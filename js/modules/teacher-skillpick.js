@@ -11,13 +11,14 @@ import { state } from './state.js';
 import { icon, esc, toast, copyText, findSkill, levelText, loadSetIntoQueue, currentSet } from './teacher-ui.js';
 import { printSkills } from './teacher-print.js';
 import { getCategoryForSkill } from './data.js';
+import { teacherLabel } from './teacher-label.js';
 import { skillView, setSkillView, viewToggleHTML, lazyThumbs, tvpAttrs, infoButtonHTML } from './teacher-preview.js';
 
-/** A skill id or 'category:id' → its label (for plainWhy's notes), or null. */
+/** A skill id or 'category:id' → its teacher label, or null. */
 export function skillLabelOf(id) {
     const [a, b] = String(id).includes(':') ? String(id).split(':') : [getCategoryForSkill(id), id];
     const sk = a && b ? findSkill(a, b) : null;
-    return sk ? sk.label : null;
+    return sk ? teacherLabel(sk.label) : null;
 }
 
 export const k2p = (key) => key.replace(':', '|');
@@ -59,14 +60,29 @@ export function toBeBuiltHTML(ids, nameOf, lead = 'To be built') {
  * opts.redraw()  re-render the groups (after a tick or a view change)
  */
 // N22: a long why line shows two lines and opens on a tap (or Enter), so a list of rows stays scannable.
+// N24 (critic r5): the toggle is a visible "more" / "less" button with a 44 px target; a tap on the note works too.
 const longWhy = (x) => String(x.partial || x.why || '').length > 45;
-function toggleMore(el) { el.setAttribute('aria-expanded', String(el.getAttribute('aria-expanded') !== 'true')); }
+function toggleMore(el) {
+    const row = el.closest('.tvw-row');
+    if (!row) return;
+    const meta = row.querySelector('[data-w-more]');
+    const btn = row.querySelector('[data-w-more-btn]');
+    const open = !(meta && meta.getAttribute('aria-expanded') === 'true');
+    if (meta) meta.setAttribute('aria-expanded', String(open));
+    if (btn) { btn.setAttribute('aria-expanded', String(open)); btn.textContent = open ? 'less' : 'more'; }
+}
+/** N24: the "more" button only where the note is really cut off at this width. */
+function fitMore(container) {
+    if (!container) return;
+    for (const b of container.querySelectorAll('[data-w-more-btn]')) {
+        const m = b.closest('.tvw-row') && b.closest('.tvw-row').querySelector('[data-w-more]');
+        if (m && m.getAttribute('aria-expanded') !== 'true') b.hidden = m.scrollHeight <= m.clientHeight + 1;
+    }
+}
 if (typeof document !== 'undefined') {
-    document.addEventListener('click', (e) => { const m = e.target.closest && e.target.closest('[data-w-more]'); if (m) toggleMore(m); });
-    document.addEventListener('keydown', (e) => {
-        const m = e.target.closest && e.target.closest('[data-w-more]');
-        if (m && e.target === m && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggleMore(m); }
-    });
+    document.addEventListener('click', (e) => { const m = e.target.closest && e.target.closest('[data-w-more], [data-w-more-btn]'); if (m) toggleMore(m); });
+    let t = 0;
+    window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(() => fitMore(document.getElementById('teacherMain')), 150); });
 }
 
 export function createPicker(opts) {
@@ -91,7 +107,7 @@ export function createPicker(opts) {
 
     function cardHTML(x) {
         const b = bits(x);
-        const label = b.sk ? b.sk.label : x.key;
+        const label = b.sk ? teacherLabel(b.sk.label) : x.key;
         const o = b.opts ? ` data-tvp-opts="${esc(JSON.stringify(b.opts))}"` : '';
         return `<li class="tvw-card${b.on ? ' is-on' : ''}">
       <div class="tvw-card-top">${tickHTML(b, label)}<span class="tvw-card-name">${esc(label)}</span></div>
@@ -101,10 +117,10 @@ export function createPicker(opts) {
     }
     function rowHTML(x) {
         const b = bits(x);
-        const label = b.sk ? b.sk.label : x.key;
+        const label = b.sk ? teacherLabel(b.sk.label) : x.key;
         return `<li class="tvw-row${b.on ? ' is-on' : ''}"${tvpAttrs(b.c, b.s, b.opts)}>${tickHTML(b, label)}
-      <span class="tvw-row-main" data-tvp-anchor><span class="tvw-row-name">${esc(label)}</span><span class="tvw-row-meta"${longWhy(x) ? ' data-w-more role="button" tabindex="0" aria-expanded="false" title="Show the whole note"' : ''}>${esc(b.sk ? levelText(b.sk.level) : '')} ${why(x)}</span></span>
-      ${infoButtonHTML(label)}${quickHTML(b, label)}</li>`;
+      <span class="tvw-row-main" data-tvp-anchor><span class="tvw-row-name">${esc(label)}</span><span class="tvw-row-meta"${longWhy(x) ? ' data-w-more aria-expanded="false"' : ''}>${esc(b.sk ? levelText(b.sk.level) : '')} ${why(x)}</span></span>
+      ${longWhy(x) ? `<button type="button" class="tvw-more" data-w-more-btn aria-expanded="false" aria-label="Show the whole note for ${esc(label)}">more</button>` : ''}${infoButtonHTML(label)}${quickHTML(b, label)}</li>`;
     }
 
     /** One group: heading with a count and "Select all", the cards or rows, or the empty text. */
@@ -153,7 +169,7 @@ export function createPicker(opts) {
         document.documentElement.style.setProperty('--tv-bar-h', `${Math.max(bar.offsetHeight, above)}px`);
     };
     p.redrawBar = () => { const bar = root().querySelector(`#${idp}Bar`); if (bar) bar.innerHTML = p.barHTML(); p.measureBar(); };
-    p.after = (container) => { if (container && p.view === 'thumbs') lazyThumbs(container, null); p.measureBar(); };
+    p.after = (container) => { if (container && p.view === 'thumbs') lazyThumbs(container, null); fitMore(container); p.measureBar(); };
 
     function itemsFor(keys) {
         const all = p.all();

@@ -56,6 +56,8 @@ const todoLooks = (e) => TT.todoLooks(e);
 const todoCloses = (e) => TT.todoCloses(e);
 const kindLine = (e) => [kindName(e.kind), ...TT.todoKindTail(e)].join(' · ');
 
+/** A source as a teacher reads it: White Rose by name (the chips keep the short codes as their values). */
+const srcName = (s) => (s === 'WRM' ? 'White Rose' : s);
 const kindName = (k) => (Q.KINDS.find((x) => x[0] === k) || [k, k])[1];
 const domName = (d) => (Q.DOMAINS.find((x) => x[0] === d) || [d, d])[1];
 // "Not set" (N13) is the chip value 'none': an entry with no grade
@@ -69,6 +71,11 @@ function homeGrade(e) {
     const g = t.grades.size ? e.grades.find((x) => t.grades.has(x)) : e.grades[0];
     return g || '';
 }
+/**
+ * m10 (critic r5): unfiltered, an entry is listed under its lowest grade; with grade chips on, under the first
+ * ticked grade it reaches — so that heading says "Reaching …" and its count is the chip's count.
+ */
+const gradeHead = (g) => (t.grades.size && g ? `Reaching ${Q.GRADE_NAMES[g]}` : Q.GRADE_NAMES[g]);
 function groupsOf(items) {
     const out = [];
     const order = [...Q.GRADES, ''];
@@ -81,7 +88,7 @@ function groupsOf(items) {
     return out;
 }
 const gradeText = (e) => (e.grades.length ? (e.grades.length > 1 ? `${gradeShort(e.grades[0])}–${gradeShort(e.grades[e.grades.length - 1])}` : gradeShort(e.grades[0])) : '');
-const gradeShort = (g) => (g === 'PK' ? 'Pre-K' : g === 'K' ? 'K' : g === '6' ? '6+' : g === 'M' ? 'Several grades' : `Gr ${g}`);
+const gradeShort = (g) => (g === 'PK' ? 'Pre-K' : g === 'K' ? 'K' : g === '6' ? '6+' : g === 'M' ? 'Several grades' : `Grade ${g}`);
 
 /* ================================================================= render */
 
@@ -122,10 +129,10 @@ function draw() {
         <div class="tvt-total"><span class="tvt-big">${T.all}</span><span>to make</span></div>
         <div class="tvt-total"><span class="tvt-big">${T.new}</span><span>new skills</span></div>
         <div class="tvt-total"><span class="tvt-big">${T.option}</span><span>options on a skill</span></div>
-        <div class="tvt-total tvt-total-src">${Q.SOURCES.map((s) => `<span><b>${T.bySource[s]}</b> ${s}</span>`).join('')}<span class="tv-cap">(one entry can close several)</span></div>
+        <div class="tvt-total tvt-total-src">${Q.SOURCES.map((s) => `<span><b>${T.bySource[s]}</b> ${srcName(s)}</span>`).join('')}<span class="tv-cap">(one entry can close several)</span></div>
       </section>
       <section class="tv-card tvt-filters" aria-label="Filters">
-        <div class="tvw-pickrow"><span class="tvw-pick-h" id="tvtSrcH">Source</span><div class="tv-chips" role="group" aria-labelledby="tvtSrcH">${chips('sources', Q.SOURCES.map((s) => [s, s, { CCSS: 'Common Core standards', EE: 'Wisconsin Essential Elements', WRM: 'White Rose small steps', MAP: 'MAP Growth tasks' }[s]]), t.sources)}</div></div>
+        <div class="tvw-pickrow"><span class="tvw-pick-h" id="tvtSrcH">Source</span><div class="tv-chips" role="group" aria-labelledby="tvtSrcH">${chips('sources', Q.SOURCES.map((s) => [s, srcName(s), { CCSS: 'Common Core standards', EE: 'Wisconsin Essential Elements', WRM: 'White Rose small steps', MAP: 'MAP Growth tasks' }[s]]), t.sources)}</div></div>
         <div class="tvw-pickrow"><span class="tvw-pick-h" id="tvtGrH">Grade</span><div class="tv-chips" role="group" aria-labelledby="tvtGrH">${chips('grades', [...Q.GRADES.map((g) => [g, g === 'PK' ? 'Pre-K' : g === '6' ? '6+' : g]), ['none', 'Not set']], t.grades)}</div></div>
         <div class="tvw-pickrow"><span class="tvw-pick-h" id="tvtDomH">Domain</span><div class="tv-chips" role="group" aria-labelledby="tvtDomH">${chips('domains', Q.DOMAINS.map(([d, n]) => [d, d === 'X' ? 'Beyond K–5' : d, n]), t.domains)}</div></div>
         <div class="tvw-pickrow"><span class="tvw-pick-h" id="tvtKindH">Kind</span><div class="tv-chips" role="group" aria-labelledby="tvtKindH">${chips('kinds', Q.KINDS, t.kinds)}</div></div>
@@ -137,14 +144,20 @@ function draw() {
           <button type="button" class="tv-btn tv-btn-ghost" data-t-act="clear"${filtered ? '' : ' hidden'}>Clear filters</button>
         </div>
       </section>
-      <p class="tvt-count" aria-live="polite" id="tvtCount">${filtered ? `Showing ${items.length} of ${T.all}` : `All ${T.all}`} · grouped by grade, then domain</p>
+      <p class="tvt-count" aria-live="polite" id="tvtCount">${countText(items.length)}</p>
       <div id="tvtList">${listHTML(items)}</div>`;
+}
+
+function countText(n) {
+    const T = queue.totals;
+    const filtered = t.sources.size || t.grades.size || t.domains.size || t.kinds.size || t.pair || t.q;
+    return `${filtered ? `Showing ${n} of ${T.all}` : `All ${T.all}`} · ${t.grades.size ? 'each under the first ticked grade it reaches' : 'each under its lowest grade'}, then domain`;
 }
 
 function listHTML(items) {
     if (!items.length) return '<div class="tv-card tvw-empty"><div class="tv-h3">Nothing matches</div><p class="tv-cap">Try fewer filters or a shorter search.</p></div>';
     return groupsOf(items).map((g) => `<section class="tvt-grade" aria-labelledby="tvtG-${g.grade || 'none'}">
-        <h2 class="tv-h2 tvt-grade-h" id="tvtG-${g.grade || 'none'}">${esc(Q.GRADE_NAMES[g.grade])} <span class="tvw-n-sm">${g.n}</span></h2>
+        <h2 class="tv-h2 tvt-grade-h" id="tvtG-${g.grade || 'none'}">${esc(gradeHead(g.grade))} <span class="tvw-n-sm">${g.n}</span></h2>
         ${g.doms.map(([d, list]) => `<h3 class="tvt-dom-h">${esc(domName(d))} <span class="tvw-n-sm">${list.length}</span></h3>
           <ul class="tvt-list" role="list">${list.map(itemHTML).join('')}</ul>`).join('')}
       </section>`).join('');
@@ -156,7 +169,7 @@ function itemHTML(e) {
       <button type="button" class="tvt-row" aria-expanded="${open}" aria-controls="tvtS-${esc(e.id)}" data-t-open="${esc(e.id)}">
         <span class="tvt-chev" aria-hidden="true">${icon('arrow', 16)}</span>
         <span class="tvt-name">${esc(todoName(e))}</span>
-        <span class="tvt-badges"><span class="tvw-tag tvt-kind is-${e.kind}">${esc(kindName(e.kind))}</span>${e.sources.map((s) => `<span class="tvw-tag tvt-src">${s}</span>`).join('')}<span class="tvt-gr">${esc(gradeText(e))}</span></span>
+        <span class="tvt-badges"><span class="tvw-tag tvt-kind is-${e.kind}">${esc(kindName(e.kind))}</span>${e.sources.map((s) => `<span class="tvw-tag tvt-src" data-src="${s}">${srcName(s)}</span>`).join('')}<span class="tvt-gr">${esc(gradeText(e))}</span></span>
       </button>
       ${open ? specHTML(e) : ''}</li>`;
 }
@@ -165,7 +178,7 @@ function specHTML(e) {
     const steps = e.wrmSteps.map((s) => (lessonSteps.has(s)
         ? `<button type="button" class="tvt-step" data-t-step="${esc(s)}" title="Open this lesson on the White Rose screen (${esc(s)})">${esc(Q.stepName(s))}</button>`
         : `<span class="tvw-tag" title="${esc(s)}">${esc(Q.stepName(s))}</span>`)).join(' ');
-    const maps = e.map.map((m) => `<li>${esc([m.strand, m.ritBand ? `RIT ${m.ritBand}` : '', m.task || m.taskType].filter(Boolean).join(' · '))}</li>`).join('');
+    const maps = e.map.map((m) => `<li>${esc(TT.mapLine(m))}</li>`).join('');
     const pairs = e.pairs.map((p) => (W.REP_PAIRS.find((x) => x.id === p) || {}).label).filter(Boolean);
     return `<div class="tvt-spec" id="tvtS-${esc(e.id)}">
       <dl class="tvt-dl">
@@ -186,14 +199,14 @@ function specHTML(e) {
 /** The clean printable page of the filtered list (every entry's short spec). */
 export function todoPrintHTML() {
     const items = shown();
-    const filt = [t.sources.size ? `Source ${[...t.sources].join(', ')}` : '', t.grades.size ? `Grade ${[...t.grades].map((g) => (g === 'none' ? 'not set' : g === '6' ? '6+' : g)).join(', ')}` : '',
+    const filt = [t.sources.size ? `Source ${[...t.sources].map(srcName).join(', ')}` : '', t.grades.size ? `Grade ${[...t.grades].map((g) => (g === 'none' ? 'not set' : g === '6' ? '6+' : g)).join(', ')}` : '',
         t.domains.size ? `Domain ${[...t.domains].join(', ')}` : '', t.kinds.size ? `Kind ${[...t.kinds].map(kindName).join(', ')}` : '',
         t.pair ? (W.REP_PAIRS.find((p) => p.id === t.pair) || {}).label : '', t.q ? `"${t.q}"` : ''].filter(Boolean).join(' · ');
-    const row = (e) => `<div class="it"><h4>${esc(todoName(e))} <small>${esc(kindName(e.kind))} · ${esc(e.sources.join(', '))} · ${esc(gradeText(e))}</small></h4>
-      <p><b>What pupils will do:</b> ${esc(todoTeaches(e))}</p><p><b>Gap it fills:</b> ${esc(todoCloses(e).slice(0, 3).join(' | '))}</p>
+    const row = (e) => `<div class="it"><h4>${esc(todoName(e))} <small>${esc(kindName(e.kind))} · ${esc(e.sources.map(srcName).join(', '))} · ${esc(gradeText(e))}</small></h4>
+      <p><b>What pupils will do:</b> ${esc(todoTeaches(e))}</p><p><b>Gap it fills:</b> ${esc(todoCloses(e).slice(0, 3).join(' · '))}</p>
       <p><b>How it looks:</b> ${esc(todoLooks(e))}</p>
       ${e.ccss.length || e.ee.length || e.wrmSteps.length ? `<p class="c">${esc([...e.ccss, ...e.ee].join(', '))}${e.wrmSteps.length ? ` · White Rose: ${esc(e.wrmSteps.slice(0, 6).map(Q.stepName).join('; '))}${e.wrmSteps.length > 6 ? ' …' : ''}` : ''}</p>` : ''}</div>`;
-    const body = groupsOf(items).map((g) => `<h2>${esc(Q.GRADE_NAMES[g.grade])} (${g.n})</h2>${g.doms.map(([d, list]) => `<h3>${esc(domName(d))}</h3>${list.map(row).join('')}`).join('')}`).join('');
+    const body = groupsOf(items).map((g) => `<h2>${esc(gradeHead(g.grade))} (${g.n})</h2>${g.doms.map(([d, list]) => `<h3>${esc(domName(d))}</h3>${list.map(row).join('')}`).join('')}`).join('');
     return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Skills to be made</title><style>
       body{font:11pt/1.35 Arial,Helvetica,sans-serif;color:#000;margin:14mm}h1{font-size:18pt;margin:0 0 2mm}h2{font-size:14pt;margin:6mm 0 2mm;border-bottom:1px solid #000}
       h3{font-size:12pt;margin:4mm 0 1mm}h4{font-size:11pt;margin:0}h4 small{font-weight:normal;color:#444}.it{break-inside:avoid;padding:2mm 0;border-bottom:1px solid #ccc}
@@ -233,7 +246,7 @@ function redrawList() {
     root.querySelector('#tvtList').innerHTML = listHTML(items);
     const clr = root.querySelector('[data-t-act="clear"]');
     if (clr) clr.hidden = !filtered;
-    root.querySelector('#tvtCount').textContent = `${filtered ? `Showing ${items.length} of ${T.all}` : `All ${T.all}`} · grouped by grade, then domain`;
+    root.querySelector('#tvtCount').textContent = countText(items.length);
 }
 
 function wire(el) {
