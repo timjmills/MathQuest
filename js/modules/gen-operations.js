@@ -4147,60 +4147,62 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const propType = _mpForms ? _mpTypes[_mpForms[_dealRung(_mpForms.length)]] : pick(_mpTypes);
 
                 if (propType === 'commutative') {
-                    const a = rng(2, 9);
-                    const b = rng(2, 9);
+                    // Lesson 3a (P-A, RESEARCH g3-oa5-mult-properties): an array and the SAME array
+                    // turned, drawn by the kit's `arrays-turn` template in black and white. The old
+                    // item printed "If 5 x 4 = 20, what is 4 x 5?" (the answer in the prompt), a
+                    // coloured picture headed with the rule's name, and arrays to 9 x 9.
+                    //   task 0 'both'    both arrays, "r x c = [ ]" and "c x r = [ ]"
+                    //   task 1 'known'   the known fact printed with its product; the turned
+                    //                    array's fact in three boxes (its rows, row length, product)
+                    //   task 2 'missing' no pictures: "r x c = P" and "c x r = [ ]" / "c x [ ] = P"
+                    // Pictured arrays: at most 5 rows and 5 in a row (RP-21). `band` 81 lets the
+                    // abstract task use factors to 9; pictures off deals the abstract task only.
+                    const _tTypes = ['both', 'known', 'missing'];
+                    let _tSet = _opt('task');
+                    if (typeof _tSet === 'number') _tSet = [_tSet];
+                    _tSet = Array.isArray(_tSet) ? [0, 1, 2].filter(v => _tSet.includes(v)) : [];
+                    if (!_tSet.length) _tSet = [0, 1, 2];
+                    if (_opt('pictures') === false) _tSet = [2];
+                    const type = _tTypes[_tSet[_dealRung(_tSet.length, 'turn')]];
+                    const _band = Number(_opt('band')) === 81 ? 9 : 5;
+                    const hi = type === 'missing' ? _band : 5;
+                    let a = rng(2, hi), b = rng(2, hi);
+                    // A square turns into itself: one item in five at most, the ★★★ edge case.
+                    if (a === b && rng(1, 5) > 1) b = b === hi ? b - 1 : b + 1;
                     const product = a * b;
-                    q.text = `If ${a} x ${b} = ${product}, what is ${b} x ${a}?`;
-                    q.ans = product;
-                    q.a = b; q.b = a; q.op = '×';
-                    q.hint = `Commutative property: changing the order doesn't change the product. ${a} x ${b} = ${b} x ${a}`;
-                    q.answerType = "number";
-                    q.options = buildNumericOptions(product);
-
-                    // Two arrays side by side (original and rotated)
-                    const dotR = 18;
-                    const gap = 48;
-                    const pad = 34;
-                    const w1 = pad * 2 + (b - 1) * gap + dotR * 2;
-                    const h1 = pad * 2 + (a - 1) * gap + dotR * 2;
-                    const w2 = pad * 2 + (a - 1) * gap + dotR * 2;
-                    const h2 = pad * 2 + (b - 1) * gap + dotR * 2;
-
-                    let dots1 = '';
-                    for (let r = 0; r < a; r++) {
-                        for (let c = 0; c < b; c++) {
-                            dots1 += `<circle cx="${pad + dotR + c * gap}" cy="${pad + dotR + r * gap}" r="${dotR}" fill="var(--accent-green)" stroke="var(--text-bright)" stroke-width="1"/>`;
-                        }
+                    const ask = type === 'missing' ? (_dealRung(2, 'ask') ? 'factor' : 'product') : null;
+                    const payload = { kind: 'turn', rows: a, cols: b, product, type };
+                    if (ask) payload.ask = ask;
+                    q.a = a; q.b = b; q.op = '×';
+                    q.cell = { template: 'arrays-turn', v: 1, payload };
+                    if (type === 'both') {
+                        q.text = 'Look at the array. Write two facts.';
+                        q.ans = `${product}, ${product}`;
+                        q.keyParts = [String(product), String(product)];
+                        q.answerType = 'text';
+                        q.options = [];
+                        q.hint = `Count the dots in each array. ${a} rows of ${b}, then ${b} rows of ${a}.`;
+                        q.visual = _kitTwin('arrays-turn', payload, { join: ', ' });
+                    } else if (type === 'known') {
+                        q.text = 'Turn the array. Write the new fact.';
+                        q.ans = `${b}, ${a}, ${product}`;
+                        q.keyParts = [String(b), String(a), String(product)];
+                        q.answerType = 'text';
+                        q.options = [];
+                        q.hint = `The turned array has ${b} rows of ${a}. Turning it does not change the total.`;
+                        q.visual = _kitTwin('arrays-turn', payload, { join: ', ' });
+                    } else {
+                        q.text = ask === 'factor' ? `${a} x ${b} = ${product}. ${b} x ? = ${product}` : `${a} x ${b} = ${product}. ${b} x ${a} = ?`;
+                        q.ans = ask === 'factor' ? a : product;
+                        q.answerType = 'number';
+                        q.options = buildNumericOptions(q.ans);
+                        q.hint = `${b} x ${a} uses the same two numbers as ${a} x ${b}.`;
+                        q.visual = _kitTwin('arrays-turn', payload);
                     }
-                    let dots2 = '';
-                    for (let r = 0; r < b; r++) {
-                        for (let c = 0; c < a; c++) {
-                            dots2 += `<circle cx="${pad + dotR + c * gap}" cy="${pad + dotR + r * gap}" r="${dotR}" fill="var(--accent-orange)" stroke="var(--text-bright)" stroke-width="1"/>`;
-                        }
-                    }
-
-                    q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Commutative Property</div>
-                        <div style="display:flex;justify-content:center;align-items:center;gap:20px;flex-wrap:wrap;">
-                            <div>
-                                <div style="font-size:0.9rem;margin-bottom:5px;color:var(--accent-green);">${a} x ${b}</div>
-                                <svg width="${w1}" height="${h1}" viewBox="0 0 ${w1} ${h1}" style="max-width:100%;">
-                                    <rect x="0" y="0" width="${w1}" height="${h1}" rx="8" fill="var(--bg-card)" stroke="var(--accent-green)" stroke-width="2"/>
-                                    ${dots1}
-                                </svg>
-                            </div>
-                            <div style="font-size:1.5rem;font-weight:700;color:var(--text-dim);">=</div>
-                            <div>
-                                <div style="font-size:0.9rem;margin-bottom:5px;color:var(--accent-orange);">${b} x ${a}</div>
-                                <svg width="${w2}" height="${h2}" viewBox="0 0 ${w2} ${h2}" style="max-width:100%;">
-                                    <rect x="0" y="0" width="${w2}" height="${h2}" rx="8" fill="var(--bg-card)" stroke="var(--accent-orange)" stroke-width="2"/>
-                                    ${dots2}
-                                </svg>
-                            </div>
-                        </div>
-                        <div style="margin-top:8px;font-size:0.9rem;color:var(--text-dim);">Same product, different order!</div>
-                    </div>`;
-
+                    q.screenInstr = type === 'missing' ? 'Write the missing number.' : q.text;
+                    q.printFormat = 'mult-properties';
+                    q.skillLabel = 'Mult Properties';
+                    return;
                 } else if (propType === 'distributive') {
                     const a = rng(3, 8);
                     const splitPart = rng(1, a - 1);

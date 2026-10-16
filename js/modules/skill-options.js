@@ -2029,6 +2029,14 @@ const P12_OPTIONS = {
         formsOption([{ v: 0, l: 'Order (3 × 4 = 4 × 3)' }, { v: 1, l: 'Breaking apart (6 × 7 = 6 × 5 + 6 × 2)' },
             { v: 2, l: 'Times 1' }, { v: 3, l: 'Times 0' }], { label: 'Which property' }),
         _p12Pictures('Off prints the question alone: no arrays and no property name (the name tells the pupil which rule to use).'),
+        // Lesson 3a (2026-10-16): what an Order item asks (form 0 only), and how big its factors get.
+        { id: 'task', label: 'Order items ask', type: 'set', group: 'difficulty', default: [0, 1, 2],
+            values: [{ v: 0, l: 'An array and its turn: write both products' }, { v: 1, l: 'A known fact: write the turned fact' },
+                { v: 2, l: 'Facts only, no pictures: the missing number' }],
+            allLabel: 'All three, mixed',
+            help: 'Order (3 × 4 = 4 × 3) items only. The pictured arrays are at most 5 rows of 5.' },
+        _opsBand([25, 81], 25, { label: 'Order factors to', labels: { 25: '5 (5 × 5)', 81: '9 (9 × 9, facts only)' },
+            help: 'The largest factor of an Order item: the product is at most 25 or 81. The arrays stay at 5 × 5; 9 reaches the facts-only items.' }),
     ],
     'multiplication:area_model_mult': [_p12Enum('tiles', 'Digits × digit', [
         { v: null, l: 'Both sizes, dealt' }, { v: 21, l: '2-digit × 1-digit (4 × 36)' }, { v: 31, l: '3-digit × 1-digit (3 × 135)' }],
