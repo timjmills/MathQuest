@@ -191,6 +191,8 @@ const CBT_HOME='Y2.B1.S15';const CBT_ROWS={rows:[2,5,10].map(n=>({step:n,start:'
 const OPTDEF=k=>{const[c,sk]=k.split(':');try{return SO.optionsFor(c,sk)||[];}catch(_){return [];}};
 const effOpts=(k,op)=>{const o={};for(const x of OPTDEF(k))if(x.default!==undefined)o[x.id]=x.default;return {...o,...(op||{})};};
 const IGN=new Set(['level','support','currency']);
+// r12: two opts of one key that generate the same items (text, answer, payload, visual) on the marker seeds are the same link
+const sameItems=(k,a,b)=>{const x=markerHits.items(k,a||{}).slice(0,40),y=markerHits.items(k,b||{}).slice(0,40);return x.length>0&&x.length===y.length&&x.every((q,i)=>q.t===y[i].t&&q.a===y[i].a&&q.p===y[i].p&&q.v===y[i].v);};
 const effEq=(k,a,b)=>{const x=effOpts(k,a),y=effOpts(k,b);for(const f of ['level','support'])(delete x[f],delete y[f]);const n=o=>JSON.stringify(Object.entries(o).sort());return n(x)===n(y);};
 // the rung deals the same content as the step in a smaller band, or a subset of its forms / tables / values
 function rungSame(k,ro,dop){const a=effOpts(k,ro),b=effOpts(k,dop);for(const f of new Set([...Object.keys(a),...Object.keys(b)])){if(IGN.has(f))continue;const x=a[f],y=b[f];if(JSON.stringify(x)===JSON.stringify(y))continue;
@@ -208,8 +210,65 @@ const RUNGREL={'measurement:mass_volume_liquid':'the same scale reading in anoth
   'multiplication:arrays_groups':'the same multiplication in the other picture','placevalue:more_less_100':'the same jump on a number in another size',
   'measurement:money_count':'counting money of another kind first','measurement:money_change':'finding change with other amounts first',
   'measurement:money_notation':'reading money of another kind first','measurement:money':'adding money in other amounts first'};
+// r12 (critic r11 N11, rule 14): rank pre by BUILDING BLOCK before WRM distance, for every step.
+//  Hand pre (overrides) keep their order and lead; every other link gets a class from what its skill deals:
+//  addition / subtraction steps (block topic addsub):
+//   1 the same operation in the same layout one band lower, or with no exchange before exchange (and the step's own
+//     skill at another rung); 2 the place-value parts (add or subtract 10s / 100s, tens and ones) and the 1s facts / bonds
+//     (parts first on a 2- or 3-digit step, bonds first on a within-20 step); 3 the inverse operation in the same layout,
+//     fact families and missing numbers; 4 word problems and the other operation's lower facts.
+//  multiplication / division steps: 1 the same operation (tables, counts, arrays); 2 × facts for a ÷ step, other blocks;
+//   3 ÷ for a × step, fact families; 4 word problems.
+//  every other step: word problems last (unless the step is itself a problem step); the rest keep their tier order.
+//  Inside a class the earlier tier order (step before, xlsx week list, block) still breaks ties.
+function bbKey(k){const [cat,id]=k.split(':');
+  let m=/^(add|sub)_(10|20|50|100|1k|10k)_(no_regroup|regroup|mixed)$/.exec(id);
+  if(m){const lvl={10:1,20:1,50:2,100:3,'1k':4,'10k':5}[m[2]];return {op:m[1],kind:lvl===1?'fact':'calc',lvl,ex:m[3]!=='no_regroup'};}
+  const opOf={addition:'add',subtraction:'sub',multiplication:'mul',division:'div'}[cat]||null;
+  if(/^(add|sub)_wp_|word_problems|^comparison_word$|^multi_step_word$|^unknown_start_wp$|^two_step/.test(id))return {op:opOf,kind:'wp'};
+  const T={'addition:add_facts':['add','fact',1],'addition:add_5_pictures':['add','fact',1],'addition:add_three':['add','fact',1],'addition:number_line_add':['add','nl',1],'addition:nl_add':['add','nl',1],
+    'subtraction:sub_facts':['sub','fact',1],'subtraction:sub_5_pictures':['sub','fact',1],'subtraction:nl_sub':['sub','nl',1],'subtraction:number_line_sub':['sub','nl',1],
+    'addition:add_sub_10s':['both','pvop'],'addition:add_sub_100s':['both','pvop'],'placevalue:more_less_10':['both','pvop'],'placevalue:more_less_100':['both','pvop'],
+    'composing:make_ten':['both','bond'],'composing:number_bonds':['both','bond'],'number_sense:make_a_ten':['add','bond'],'composing:ten_frame_build':['both','bond'],'composing:ten_frame_build_teen':['both','bond'],'number_sense:doubles_near_doubles':['add','bond'],'number_sense:compensation':['both','bond'],
+    'addition:add_sub_fact_family':['both','fam'],'addition:number_families_add':['both','fam'],'addition:fact_family_sort':['both','fam'],'addition:cloze_addition':['both','fam'],'subtraction:missing_add_sub':['both','fam'],'subtraction:sub_check_by_adding':['both','fam'],
+    'multiplication:mult_div_fact_family':['both','fam'],'division:missing_mult_div':['both','fam'],'multiplication:count_by_tables':['mul','count'],'patterns:double':['mul','calc'],'patterns:halve':['div','calc']};
+  if(T[k])return {op:T[k][0],kind:T[k][1],lvl:T[k][2]??null,ex:null};
+  if(/^composing:(base10_build|tens_foundation_visual|teen_compose|hundreds_chart_fill)|^placevalue:(unit_form|identify|value|expand|combine|place_value_disks)$/.test(k))return {op:null,kind:'pvrep'};
+  if(cat==='multiplication'||cat==='division')return {op:opOf,kind:'calc'};
+  return null;}
+function bbStep(s,own){const t=s.title.toLowerCase();const fs=own.map(bbKey).filter(Boolean).map(f=>f.kind==='nl'?{...f,kind:'fact'}:f);const area={addsub:'as',muldiv:'md'}[topic(s)]||'other';
+  const wp=fs.some(f=>f.kind==='wp')||/problem|two-step|four operations|calculate|mixed addition|find change/.test(t);
+  let op=null,titleOp=false;if(area==='as'){const a=/\badd|\bsum|plus|bonds|complements/.test(t),b=/subtract|minus|difference/.test(t);op=a&&b?'both':a?'add':b?'sub':null;titleOp=!!op;
+    if(!op){const os=new Set(fs.filter(f=>['calc','fact','wp'].includes(f.kind)).map(f=>f.op));op=os.size===1?[...os][0]:'both';}}
+  if(area==='md'){const a=/multipl|times|equal groups|arrays|repeated|doubl|lots of|scaling|how many ways/.test(t),b=/divid|shar|halv|÷|link/.test(t);op=a&&b?'both':b?'div':a?'mul':'both';}
+  const cf=fs.filter(f=>['calc','fact'].includes(f.kind)&&f.lvl);
+  // a bonds / related-facts step works at the facts level; a step whose own skills are place-value moves is a place-value step
+  const lvl=cf.length?Math.max(...cf.map(f=>f.lvl)):fs.some(f=>['bond','fam'].includes(f.kind))?1:null;const pvStep=!cf.length&&fs.some(f=>['pvop','pvrep'].includes(f.kind));
+  const ex=cf.length?cf.some(f=>f.ex):(/not across|no exchange/.test(t)?false:/across|exchange/.test(t)?true:null);
+  // bonds lead on a bonds step, a step to the next 10 and a bridging step within 50 (8 + 5, 38 + 5); the place-value parts lead on a 2- or 3-digit step
+  const bondsFirst=/bond|complement|next 10|making 10|make 10/.test(t)||lvl===1||(lvl===2&&ex===true);
+  return {area,op,lvl,ex,wp,pvStep,bondsFirst,bondStep:/bond|complement|next 10/.test(t),famStep:!cf.length&&fs.some(f=>f.kind==='fam'),
+    // a step that names no operation and deals no calculation or facts of its own (spot the pattern, make connections,
+    // estimate, make decisions, compare number sentences): no operation ladder applies, only word problems go last
+    neutral:area==='as'&&!titleOp&&!cf.length&&!fs.some(f=>['fam','wp','pvop','pvrep'].includes(f.kind)),own:new Set(own)};}
+function bbRank(P,k){const f=bbKey(k);
+  if(P.area==='other'||P.neutral)return f&&f.kind==='wp'&&!P.wp?[4,0]:[2,0];
+  if(P.own.has(k))return [1,0];
+  if(f&&f.kind==='wp')return P.wp?[1,1]:[4,0];
+  if(P.area==='as'){if(!f)return [2,5];const big=P.lvl!=null&&P.lvl>=2;
+    if(P.bondStep&&f.kind==='bond')return [1,0];
+    if(P.famStep&&(f.kind==='fam'||f.kind==='bond'))return [1,f.kind==='fam'?0:1]; // related facts / missing numbers: the fact families and the part-whole bonds
+    if(P.pvStep){if(f.kind==='pvop'||f.kind==='pvrep'||f.kind==='count')return [1,f.kind==='pvop'?0:f.kind==='count'?2:1];if(f.kind==='bond'||f.kind==='fact'||f.kind==='nl'||f.kind==='calc'&&f.lvl<=2)return [2,f.kind==='bond'?0:1];if(f.kind==='fam')return [3,1];return [3,0];}
+    if(f.kind==='calc'||f.kind==='fact'||f.kind==='nl'){const same=P.op==='both'?['add','sub'].includes(f.op):f.op===P.op;
+      if(same){if(P.lvl==null)return [1,f.kind==='nl'?3:2];const d=P.lvl-f.lvl;if(f.kind==='nl')return d<=0?[1,3]:[2,big?2:1];if(d===1&&f.ex===P.ex)return [1,0];if(d===0)return [1,f.ex?2:1];if(d===1)return [1,2];if(d<0)return [3,5];return [2,big?2:1];}
+      if(P.lvl!=null&&f.kind==='calc'&&Math.abs(P.lvl-f.lvl)<=1)return [3,0];if(P.lvl===1&&f.kind!=='calc')return [3,0];return [4,1];}
+    const bf=P.bondsFirst,rep1=/^composing:base10_build|^placevalue:unit_form$/.test(k);
+    if(f.kind==='bond')return [2,bf?0:4];if(f.kind==='pvop')return [2,bf?3:0];if(f.kind==='pvrep')return [2,bf?4:rep1?1:3];if(f.kind==='fam')return P.lvl===1?[2,1]:[3,1];return [2,5];}
+  if(P.area==='md'){if(!f)return [2,1];if(f.kind==='count')return P.op==='div'?[2,0]:[1,0];if(P.op==='both'&&['mul','div'].includes(f.op)||f.op===P.op)return [1,0];if(f.op==='mul'&&P.op==='div')return [2,0];if(f.kind==='fam')return [3,1];if(f.op==='div'&&P.op==='mul')return [3,0];return [2,1];}
+  return [2,0];}
+const bbSort=(P,list)=>{const r=list.map((e,i)=>({e,i,c:e.hand?[-e.hand,0]:bbRank(P,e.key)}));r.sort((a,b)=>a.c[0]-b.c[0]||a.c[1]-b.c[1]||a.i-b.i);return r.map(x=>x.e);};
 const keyFirstWk={};for(const st of yr.blocks.flatMap(bb=>bb.steps))for(const k of allOf(st.id))keyFirstWk[k]=Math.min(keyFirstWk[k]??999,SWK[st.id]??999);
-const usedProps=new Set();const missingReview=[];
+const usedProps=new Set();const missingReview=[];const bbStats={n:0,bad:0,cls:{}};
 for(const b of yr.blocks){ if(b.number>MAXB)continue;
  b.steps.forEach((s,i)=>{
   const o={...(OV.steps[s.id]||{}),...(OV.prePatch?.[s.id]||{}),...(OV.r3?.[s.id]||{})};if(OV.gapMissing?.[s.id])o.missing=OV.gapMissing[s.id];
@@ -264,19 +323,22 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
   // o.selfPre: a PARTIAL skill whose dealt content is exactly an earlier step's (the number line to 100 on an estimating step)
   const isDirectPre=(k,op)=>{if(!allDirect.has(k))return false;if((o.selfPre||[]).includes(k)&&!direct.some(d=>d.key===k))return false;const js=JSON.stringify(op||{});if(js==='{}'||dOpts[k].includes(js))return true;if(!op)return false;
     if([...direct,...partial].some(d=>d.key===k&&effEq(k,d.opts,op)))return true; // r11: the same items as the step's own skill (key + EFFECTIVE opts) add no rung
+    if([...direct,...partial].some(d=>d.key===k&&sameItems(k,d.opts,op)))return true; // r12 (critic r11 residual): opts outside the schema ({range:20}) that change nothing: the generated items equal the step's own
     return [...direct,...partial].filter(d=>d.key===k).some(d=>ARR.some(a=>Array.isArray(d.opts?.[a])&&Array.isArray(op[a])&&d.opts[a].every(v=>op[a].includes(v)))||(RS(d.opts)&&RS(op)&&RS(d.opts).every(v=>RS(op).includes(v))));};
-  const pre=[],preBuild=[];
+  const pre=[],preBuild=[];const BB=bbStep(s,[...direct,...partial].map(d=>d.key));
   const cands=[];let ord=0;
   const dropPre=new Set((o.dropPre||[]).map(resolve));
   const oddOk=/odd|even/i.test(s.title);
   const okKey=(k,op)=>k&&!(OV.exclude||[]).includes(k)&&!isDirectPre(k,op)&&!dropPre.has(k)&&(oddOk||!ODDEVEN.includes(k));
   const cand=(k,why,tier,opts)=>{k=resolve(k);if(okKey(k,opts))cands.push({key:k,why,tier,ord:ord++,...(opts?{opts}:{})});};
   const addPB=pid=>{if(build.includes(pid)||preBuild.includes(pid)||preBuild.length>=3)return;preBuild.push(pid);usedProps.add(pid);};
-  const candK=(p,tier)=>{if(p.keep){const k=resolve(p.key);if(k&&!dropPre.has(k))cands.push({key:k,why:p.why,tier,ord:ord++,...(p.opts?{opts:p.opts}:{}),keep:true});}else cand(p.key,p.why,tier,p.opts);};
+  const candK=(p,tier)=>{if(p.keep){const k=resolve(p.key);if(k&&!dropPre.has(k))cands.push({key:k,why:p.why,tier,ord:ord++,...(p.opts?{opts:p.opts}:{}),keep:true,...(p.core?{core:true}:{})});}else{cand(p.key,p.why,tier,p.opts);if(p.core&&cands.length&&cands[cands.length-1].ord===ord-1&&cands[cands.length-1].key===resolve(p.key))cands[cands.length-1].core=true;}};
   for(const p of [...(o.pre||[]),...(OV.extraPre?.[s.id]||[])])candK(p,0);
   // r10 (critic r9 N6): automatic candidates carry the cited step's own opts, so a lower rung of a direct key (same key,
   // other opts) survives isDirectPre instead of being dropped as the step's own skill
-  for(const p of o.core||[])candK(p,1);
+  for(const p of o.core||[])candK({...p,core:true},1);
+  // r12: o.addPre = extra candidates that are ranked by building block like the automatic ones (not pinned first)
+  for(const p of o.addPre||[])candK(p,1);
   // r10 (critic r9 N6, rule 14): the lower rung of each of the step's own skills. The latest step taught before this one (this
   // year by school week, else the year before) that deals the same key with OTHER opts is a building block; isDirectPre still
   // drops a rung whose opts are the step's own or a superset of them.
@@ -326,7 +388,8 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
    // r8 (A1, rule 19): every block step TAUGHT EARLIER (school week), nearest week first, whatever its WRM position
    {let n=0;for(const st of b.steps.filter(x=>x.id!==s.id&&x.id!==prev?.id&&topic(x)===topic(s)&&taughtBefore(x.id,s.id)).sort((a,c)=>((SWK[c.id]??0)-(SWK[a.id]??0))||(order.indexOf(c.id)-order.indexOf(a.id)))){if(n>=3)break;const ks=allOf(st.id);if(ks.length)n++;for(const k of ks.slice(0,1))cand(k,`${st.id} ${st.title} (taught earlier, W${SWK[st.id]})`,4,stepOptsFor(st.id,k)||undefined);}}
   }
-  const take=()=>{pre.length=0;const seen=new Set();for(const c of [...cands].sort((a,b)=>a.tier-b.tier||a.ord-b.ord)){const sk=c.keep?c.key+'|'+JSON.stringify(c.opts||{}):c.key;if(seen.has(sk)||(!c.keep&&seen.has(c.key))||pre.length>=14)continue;seen.add(sk);seen.add(c.key);pre.push({key:c.key,why:c.why,...(c.opts?{opts:c.opts}:{}),...(c.keep?{keep:true}:{})});}};
+  const rk=c=>c.tier===0?[-2,0]:c.core?[-1,0]:bbRank(BB,c.key);
+  const take=()=>{pre.length=0;const seen=new Set();for(const c of [...cands].sort((a,b)=>{const x=rk(a),y=rk(b);return x[0]-y[0]||x[1]-y[1]||a.tier-b.tier||a.ord-b.ord;})){const sk=c.keep?c.key+'|'+JSON.stringify(c.opts||{}):c.key;if(seen.has(sk)||(!c.keep&&seen.has(c.key))||pre.length>=14)continue;seen.add(sk);seen.add(c.key);pre.push({key:c.key,why:c.why,...(c.opts?{opts:c.opts}:{}),...(c.keep?{keep:true}:{}),...(c.tier===0||c.core?{hand:c.tier===0?2:1}:{})});}};
   take();
   if(pre.length<3&&prevYear&&!o.preOnly){const py=W.years.find(y=>y.id===prevYear);const cand6=py.blocks.flatMap(bb=>bb.steps).filter(st=>topic(st)===topic(s)).reverse();
     let n=0;for(const st of cand6){if(n>=2)break;const ks=allOf(st.id);if(!ks.length)continue;const k0=resolve(ks[0]);if(!okKey(k0,stepOptsFor(st.id,k0))||cands.find(c=>c.key===k0))continue;cand(k0,`${st.id} ${st.title} (${prevYear}, same topic)`,6,stepOptsFor(st.id,k0)||undefined);n++;}
@@ -361,7 +424,7 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
   for(const list of [pre,related])for(let j=list.length-1;j>=0;j--){const e=list[j];const sw=SW[e.key];if(!sw||(sw.only&&!sw.only.test(s.id))||(sw.not&&sw.not.test(s.id)))continue;
     if(sw.preBuild&&list===pre&&!build.includes(sw.preBuild)&&!preBuild.includes(sw.preBuild)){preBuild.push(sw.preBuild);usedProps.add(sw.preBuild);}
     if(!sw.to){list.splice(j,1);continue;}
-    list[j]={key:sw.to,why:sw.to===e.key?e.why:descWhy(sw.to,sw.opts||{},s.id,''),opts:sw.opts||{},swapped:true};}
+    list[j]={key:sw.to,why:sw.to===e.key?e.why:descWhy(sw.to,sw.opts||{},s.id,''),opts:sw.opts||{},swapped:true,...(e.hand?{hand:e.hand}:{})};}
   for(const list of [pre,related]){const seen=new Set();const preKO=new Set(pre.map(x=>x.key+'|'+JSON.stringify(x.opts||{})));const preK=new Set(pre.map(x=>x.key));for(let j=0;j<list.length;j++){const k=list[j].key;const ko=k+'|'+JSON.stringify(list[j].opts||{});
     // r9: a related link repeats a pre only when its opts are the same (or it has none): mult_facts {2} next to pre mult_facts {5,10} is a new table
     const dupPre=list===related&&preK.has(k)&&!pre.filter(p=>p.key===k).every(p=>disjointOpts(p.opts,list[j].opts));if(list[j].keep?seen.has(ko):((list===pre?isDirectPre:isDirectRel)(k,list[j].opts)||seen.has(k)||dupPre)){list.splice(j,1);j--;}else{seen.add(k);seen.add(ko);}}}
@@ -379,7 +442,7 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
     return null;};
   const dropped=[];const coreKeys=new Set((o.core||[]).map(c=>resolve(c.key)));
   for(const list of [pre,related])for(let j=list.length-1;j>=0;j--){const e=list[j];if(list===pre&&citesLater(e)){dropped.push(e.key+' (taught later)');if(coreKeys.has(e.key)){console.error('COREDROP',s.id,e.key,'taught later');process.exitCode=1;}list.splice(j,1);continue;}
-    const ne=fixLink(e);if(!ne){if(list===pre&&coreKeys.has(e.key)){console.error('COREDROP',s.id,e.key,markerHits(e.key,e.opts,s.id).map(h=>h.m).join(','));process.exitCode=1;}dropped.push(e.key+' ('+markerHits(e.key,e.opts,s.id).map(h=>h.m).join(',')+')');list.splice(j,1);}else list[j]=ne;}
+    const ne=fixLink(e);if(ne&&ne!==e&&e.hand)ne.hand=e.hand;if(!ne){if(list===pre&&coreKeys.has(e.key)){console.error('COREDROP',s.id,e.key,markerHits(e.key,e.opts,s.id).map(h=>h.m).join(','));process.exitCode=1;}dropped.push(e.key+' ('+markerHits(e.key,e.opts,s.id).map(h=>h.m).join(',')+')');list.splice(j,1);}else list[j]=ne;}
   for(const list of [pre,related]){const seen=new Set();const preKO=new Set(pre.map(x=>x.key+'|'+JSON.stringify(x.opts||{})));const preK=new Set(pre.map(x=>x.key));for(let j=0;j<list.length;j++){const k=list[j].key;const ko=k+'|'+JSON.stringify(list[j].opts||{});
     // r9: a related link repeats a pre only when its opts are the same (or it has none): mult_facts {2} next to pre mult_facts {5,10} is a new table
     const dupPre=list===related&&preK.has(k)&&!pre.filter(p=>p.key===k).every(p=>disjointOpts(p.opts,list[j].opts));if(list[j].keep?seen.has(ko):((list===pre?isDirectPre:isDirectRel)(k,list[j].opts)||seen.has(k)||dupPre)){list.splice(j,1);j--;}else{seen.add(k);seen.add(ko);}}}
@@ -399,7 +462,7 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
       ex.why=`counting in ${ns.slice(0,-1).join(', ')}${ns.length>1?' and ':''}${ns[ns.length-1]}s from 0${ci.length?' ('+ci.join(', ')+')':''}`;}}list.splice(j,1);j--;continue;}
     {const own=order.find(id=>id.startsWith(YEAR+'.')&&id!==s.id&&taughtBefore(id,s.id)&&allOf(id).includes('multiplication:count_by_tables')&&(stepOptsFor(id,'multiplication:count_by_tables')?.rows||[]).some(r=>r.step===N&&r.start==='zero'));
      const ci=[...new Set([...[...String(e.why).matchAll(/(R|Y\d)\.B\d+\.S\d+/g)].map(x=>x[0]),...(own?[own]:[])])];const tail=String(e.why).replace(/\([^)]*\)/g,'').split(':').slice(1).join(':').trim().replace(/\b(the )?tens on the line\b/,'the tens marked on the line');
-     list[j]={key:'multiplication:count_by_tables',opts:{rows:[row]},why:`${ci.length?ci.join(' / ')+' ':''}counting in ${N}s from 0${tail?': '+tail:''}`};}}
+     list[j]={...(e.hand?{hand:e.hand}:{}),key:'multiplication:count_by_tables',opts:{rows:[row]},why:`${ci.length?ci.join(' / ')+' ':''}counting in ${N}s from 0${tail?': '+tail:''}`};}}
   {const pk=new Set(pre.map(x=>x.key));for(let j=related.length-1;j>=0;j--)if(related[j].key==='multiplication:count_by_tables'&&pk.has(related[j].key)&&!pre.filter(x=>x.key===related[j].key).every(x=>disjointOpts(x.opts,related[j].opts)))related.splice(j,1);}
   for(const e of [...pre,...related]){if(e.swapped&&e.why.includes('[rule'))e.why=descWhy(e.key,e.opts,s.id,e.why);delete e.swapped;
     e.why=String(e.why).replace(/\s*\[rule \d+[^\]]*\]/g,'');
@@ -411,7 +474,26 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
     if(e.key==='division:share_into_groups'&&/shar/i.test(e.why))e.why=(YEAR==='Y2'?'Y1.B9.S8':'Y2.B5.S7')+' making equal groups (grouping): ring the counters in groups of a size';
     if(COUNTKEY.test(e.key)&&COUNTCITE.test(e.why)&&!/from any number|counting on/i.test(e.why)){const ns=countNs(e.why);const fr=countMultFrac(e,ns);if(fr<0.9){console.error('COUNTCHECK',s.id,e.key,JSON.stringify(e.opts),'counts',ns.join('/'),'multiples',fr.toFixed(2),'|',e.why.slice(0,80));process.exitCode=1;}}
     if(whyContentBad(e).length)console.error('WHYBAD',s.id,e.key,JSON.stringify(e.opts),whyContentBad(e).join(','),'|',e.why.slice(0,80));}
-  pre.splice(8);related.splice(6);for(const e of [...pre,...related])delete e.keep;
+  // r12 (critic r11 N10): a link whose generated items are partly wrong (a generator bug) never stands as if sound. OV.brokenLinks
+  // [{key, opts, swap:{when, key, opts, why}, why:{stepId: text}, note}]: on a step `when` matches, the link is swapped for a
+  // sound skill (and that skill leaves related); on any other step its why says what is broken (`why` per step, else + note)
+  for(const bl of OV.brokenLinks||[])for(let j=0;j<pre.length;j++){const e=pre[j];if(e.key!==bl.key||JSON.stringify(e.opts||{})!==JSON.stringify(bl.opts))continue;
+    if(bl.swap&&bl.swap.when.test(s.id)){const sw=bl.swap;if(pre.some(x=>x.key===sw.key&&JSON.stringify(x.opts||{})===JSON.stringify(sw.opts))){pre.splice(j,1);j--;continue;}
+      pre[j]={key:sw.key,opts:sw.opts,why:sw.why,...(e.hand?{hand:e.hand}:{})};for(let r=related.length-1;r>=0;r--)if(related[r].key===sw.key)related.splice(r,1);continue;}
+    if(bl.why?.[s.id])e.why=bl.why[s.id];else if(!e.why.includes(bl.note))e.why+=bl.note;}
+  // r12: OV.whyFix[stepId][key] = the why of that pre link, written for this step (applied last, after every rewrite)
+  for(const e of pre){const w=OV.whyFix?.[s.id]?.[e.key];if(w)e.why=w;}
+  {const srt=bbSort(BB,pre);pre.splice(0,pre.length,...srt);}
+  // r12 BBCHECK (the building-block sweep, a build gate): the lead pre is a building block of the step (never a word problem
+  // on a non-problem step; on an addition / subtraction or multiplication / division step never the inverse, a fact family
+  // or the other operation's facts), and no word problem stands before a non-word-problem pre
+  {const rs=pre.slice(0,8).map(e=>bbRank(BB,e.key));const isWp=e=>bbKey(e.key)?.kind==='wp';const bad=[];
+    if(pre.length&&isWp(pre[0])&&!BB.wp)bad.push('lead is a word problem');
+    if(pre.length&&['as','md'].includes(BB.area)&&!BB.neutral&&rs[0][0]>=3)bad.push('lead class '+rs[0][0]+' (inverse / fact family / other operation)');
+    if(!BB.wp){const fw=pre.slice(0,8).findIndex(isWp);if(fw>=0&&pre.slice(fw+1,8).some(e=>!isWp(e)))bad.push('a word problem before a building block');}
+    bbStats.n++;bbStats.cls[pre.length?(pre[0].hand?'hand':rs[0][0]):'none']=(bbStats.cls[pre.length?(pre[0].hand?'hand':rs[0][0]):'none']||0)+1;
+    if(bad.length){console.error('BBCHECK',s.id,s.title,'|',bad.join('; '),'|',pre.slice(0,3).map(e=>e.key).join(', '));process.exitCode=1;bbStats.bad++;}}
+  pre.splice(8);related.splice(6);for(const e of [...pre,...related]){delete e.keep;delete e.hand;}
   // r6: never-in-grade content on the step's own skills must be named (critic r5: B4.S8 class)
   for(const d of [...direct,...partial])for(const h of markerHits(d.key,d.opts,s.id).filter(h=>MK.NEVERDIRECT[YEAR].includes(h.m)))
     if(!(o.neverNamed||[]).includes(d.key))console.error('NEVERDIRECT',s.id,verdict,d.key,JSON.stringify(d.opts||{}),h.m,h.ex);
@@ -470,6 +552,7 @@ fs.mkdirSync(root+'data/curriculum/links',{recursive:true});
 fs.writeFileSync(root+`data/curriculum/links/${YEAR}.json`,JSON.stringify(out,null,1)+'\n');
 // r10 (critic r9 N7): the merge assertion — tagFixes applied to SKILL_WRM must reproduce every tag, clause and step verdict
 {const MC=await import(HERE+'mergecheck23.mjs');const mr=await MC.mergeCheck(JSON.parse(JSON.stringify(out)));for(const p of mr.problems)console.error('MERGE',p);if(mr.problems.length)process.exitCode=1;console.error(`mergecheck ${YEAR}: ${mr.problems.length} problems`);}
+console.error(`bbcheck ${YEAR}: ${bbStats.n} steps swept, ${bbStats.bad} problems; lead pre by class ${JSON.stringify(bbStats.cls)}`);
 const c={full:0,partial:0,gap:0};for(const s of Object.values(out.steps))c[s.verdict]++;
 const pr=Object.values(out.proposals);
 console.log(YEAR,Object.keys(out.steps).length,'steps',JSON.stringify(c),'proposals new',pr.filter(p=>!p.reused).length,'reused',pr.filter(p=>p.reused).length,'tagFixes',out.tagFixes.length,'unreviewed',missingReview.length);

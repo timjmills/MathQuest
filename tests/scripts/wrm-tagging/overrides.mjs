@@ -1235,3 +1235,73 @@ r3['Y2.B2.S21'] = { ...(r3['Y2.B2.S21'] || {}), core: [...((r3['Y2.B2.S21'] || {
 // N8: the scale skill deals mL (form 0) or g/kg (form 1): the why names the form it deals
 whyText['measurement:mass_volume_liquid'] = 'reading a scale';
 r3['Y2.B1.S15'].mergeOnly = ['patterns:count_by_step_up'];
+
+// ======================= round 12 (critic Y2-Y3 r11: N11 building-block rank, N10 kg dials answer 0) =======================
+// N11: build.mjs ranks every pre by building block (bbRank). Y2.B2.S10 Subtract across 10 also takes the bridge through 10:
+// bonds to 10 and making 10 (the inverse strategy, Y2.B2.S9), ranked after subtracting within 20 without an exchange
+r3['Y2.B2.S10'] = { ...(r3['Y2.B2.S10'] || {}), addPre: [
+  R('composing:make_ten', 'Y2.B2.S1 bonds to 10: 13 − 5 is 13 − 3 − 2, back to 10 first'),
+  R('number_sense:make_a_ten', 'Y2.B2.S9 Add across a 10 (taught earlier, W7): the same bridge through 10, adding')] };
+// BBCHECK (the r12 sweep): the hand lead of Y3.B3.S12 Multiply by 8 was division facts (all tables): the 4s are the building
+// block (core: counting in 4s from 0; the rung mult_facts {4}); dividing is the inverse, ranked after them
+delete extraPre['Y3.B3.S12'];
+// N10: measurement:mass_volume_liquid form 1 (read the scale, g or kg): for maxKg 5 or 10 the generator draws a kg dial with
+// gram increments (js/modules/gen-measurement.js l.672-678: maxVal 5 or 10 kg, increment 500 or 1000), so numMarks is 0.01 and
+// every kg dial has answer 0. Fresh seeds: {forms:[1]} 44 of 80 items are kg dials with answer 0 (36 gram dials, all sound);
+// {forms:[0,1]} 25 of 80. The clauses say so (Y3.B7.S2 already did), and no pre cites form 1 as if it were sound.
+r3['Y2.B7.S2'] = { ...(r3['Y2.B7.S2'] || {}), partials: [P('measurement:mass_volume_liquid', 'reads one kind of g scale (marks in 100 g or 200 g); the kg items on the same form have answer 0 (generator bug, about half the items); reading scales in grams with different steps is not dealt', { forms: [1] })] };
+r3['Y3.B7.S2'] = { ...(r3['Y3.B7.S2'] || {}), partials: [P('measurement:mass_volume_liquid', 'grams on a scale, but the items that ask the mass in kg have answer 0 on the same scale (generator bug, about half the items)', { forms: [1] })] };
+r3['Y2.B7.S3'] = { ...(r3['Y2.B7.S3'] || {}), partials: [P('measurement:mass_volume_liquid', 'reads gram dials; every kg dial has answer 0 (generator bug), so reading a kilogram scale is not dealt', { forms: [1] })] };
+r3['Y3.B7.S1'] = { ...(r3['Y3.B7.S1'] || {}), partials: [P('measurement:mass_volume_liquid', 'reads one kind of scale each, and the kg dials have answer 0 (generator bug, 25 of 80 items); scales with different intervals are not dealt', { forms: [0, 1] })] };
+r3['Y3.B7.S3'] = { ...(r3['Y3.B7.S3'] || {}), partials: [P('measurement:mass_volume_liquid', 'g or kg alone, and every kg dial has answer 0 (generator bug); mixed kg and g readings are not dealt', { forms: [1] })] };
+// the 8 pre links of {forms:[1]}: the capacity steps take the thermometer (a sound scale reading, Y2.B7.S9 W22) instead;
+// the mass steps keep the gram scale (the only mass-scale skill) and say what is broken
+const KGNOTE = ' (its kg dials have answer 0 until the generator is fixed; the gram dials are sound)';
+export const brokenLinks = [{ key: 'measurement:mass_volume_liquid', opts: { forms: [1] }, note: KGNOTE,
+  swap: { when: /^Y2\.B7\.S[67]$|^Y3\.B7\.S[78]$/, key: 'measurement:temperature', opts: { forms: [1] },
+    why: 'reading a thermometer in °C: the same scale reading in another measure — Y2.B7.S9 Temperature (W22)' },
+  why: {
+    'Y2.B7.S4': 'Y2.B7.S2 reading a mass in grams on a scale' + KGNOTE,
+    'Y3.B7.S4': 'Y3.B7.S3 reading a mass on a scale in grams (taught before this step in the block)' + KGNOTE,
+    'Y3.B7.S5': 'Y2.B7.S2 reading a mass in grams on a scale (Grade 1)' + KGNOTE,
+    'Y3.B7.S6': 'Y2.B7.S2 reading a mass in grams on a scale (Grade 1, on the W35 list as Measure in kilograms)' + KGNOTE } }];
+// r12 whys written for the step (build.mjs applies them last)
+export const whyFix = {
+  // a quarter of a shape helps only through the quarter turn (critic r11 minor)
+  'Y2.B11.S2': { 'shapes_early:partition_shapes': 'Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W19): a quarter of a shape is the quarter turn' },
+  // Y2.B2.S15 (critic r11 row): the tens of the sum, the tens and ones of each number, then the ones
+  'Y2.B2.S15': {
+    'addition:add_sub_10s': 'Y2.B2.S4 adding and subtracting 10 on whole tens (60 + 10, W5): the tens of the two numbers are added as tens',
+    'composing:base10_build': 'Y1.B12.S3 / Y2.B1.S2 tens and ones: partitioning each number before adding',
+    'addition:add_20_no_regroup': 'Y1.B5.S2 Add ones using number bonds: the ones of the sum (4 + 5), no exchange' },
+  // Y3.B2.S13 / S14 (critic r11 rows): the same addition one band lower, then the same band with no exchange
+  'Y3.B2.S13': {
+    'addition:add_100_regroup': 'Y2.B2.S16 Add two 2-digit numbers across a 10 (Grade 1): the same exchange of 10 ones, one band lower',
+    'addition:add_1k_no_regroup': 'Y3.B2.S11 Add two numbers, no exchange (taught earlier, W6): the same 3-digit columns before the exchange' },
+  'Y3.B2.S14': {
+    'addition:add_100_regroup': 'Y2.B2.S16 Add two 2-digit numbers across a 10 (Grade 1): an exchange in the column addition, one band lower',
+    'addition:add_1k_no_regroup': 'Y3.B2.S11 Add two numbers, no exchange (taught earlier, W6): the same 3-digit columns before the exchange' },
+  // Y2.B2.S10 (critic r11 row): subtracting within 20 without an exchange first
+  'Y2.B2.S10': { 'subtraction:sub_20_no_regroup': 'Y1.B5.S6 Subtract ones using number bonds (prior learning wk W11): subtracting within 20 before crossing the 10' },
+};
+// the whole-file sweep (r12): steps outside + − × ÷ whose lead was the step taught before rather than a building block.
+// Each `core` below is the nearest building block, generated and read (items in the r12 report section).
+const CORE = (id, ...cs) => { r3[id] = { ...(r3[id] || {}), core: [...cs, ...((r3[id] || {}).core || []).filter(c => !cs.some(n => n.key === c.key))] }; };
+CORE('Y2.B1.S9', C('composing:tens_foundation_visual', 'Y1.B12.S2 Tens to 100 (K): the tens marked on the line', { band: 90 }),
+  C('composing:base10_build', 'Y2.B1.S2 / Y2.B1.S3 tens and ones (W1): a number as tens, counted along the line in 10s', { band: 99 }));
+CORE('Y2.B1.S10', C('composing:base10_build', 'Y2.B1.S3 tens and ones (W1): the tens jump along the line, then the ones', { band: 99 }),
+  C('composing:tens_foundation_visual', 'Y1.B12.S2 Tens to 100 (K): the tens marked on the line', { band: 90 }));
+CORE('Y2.B1.S12', C('placevalue:compare', 'Y1.B12.S7 Compare any two numbers (K): the words and signs more, fewer, the same, used on numbers', { band: 99 }));
+CORE('Y2.B1.S15', C('patterns:skip_count_line', 'skip counts of 2, 5 and 10 from 0 on a number line to 50 (Grade K, the Y1.B9 count steps): the same counts, met to 50', { step: [0], band: 50 }));
+CORE('Y2.B10.S1', C('counting:count_objects', 'Y1.B1.S2 Count objects (K): each object counted is one tally mark', { band: 10 }),
+  C('multiplication:count_by_tables', 'Y2.B1.S15 counting in 5s from 0 (W4): a full tally is a group of 5, counted 5, 10, 15', ZR(5)));
+CORE('Y3.B1.S5', C('composing:base10_build', 'Y3.B1.S1 / Y2.B1.S3 tens and ones in base-10 blocks: the same blocks, now with hundreds', { band: 99 }));
+CORE('Y3.B1.S9', C('placevalue:more_less_10', 'Y2.B2.S13 10 more, 10 less (Grade 1): the same move on a 2-digit number', { step: 10 }));
+CORE('Y3.B5.S8', C('addition:add_100_regroup', 'Y2.B2.S16 Add two 2-digit numbers across a 10 (Grade 1): the addition used with lengths in cm'),
+  C('measurement:length_metric', 'Y3.B5.S5 m ↔ cm (W14): 1 m 20 cm is 120 cm before adding', { forms: [1] }));
+CORE('Y3.B5.S9', C('subtraction:sub_100_regroup', 'Y2.B2.S18 Subtract two 2-digit numbers across a 10 (Grade 1): the subtraction used with lengths in cm'),
+  C('measurement:length_metric', 'Y3.B5.S5 m ↔ cm (W14): 1 m is 100 cm before subtracting', { forms: [1] }));
+CORE('Y3.B11.S1', C('measurement:time_quarter', 'Y2.B9.S2 quarter past and quarter to (Grade 1): the minute hand makes a quarter turn'),
+  C('shapes_early:shape_positions', 'Y2.B11.S1 position words (Grade 1: above, below, beside): the language a turn is described from'));
+CORE('Y3.B11.S2', C('measurement:time_quarter', 'Y2.B9.S2 quarter past and quarter to (Grade 1): a quarter turn of the minute hand, the turn a right angle measures'),
+  C('shapes_early:shape_corners_count', 'Y2.B3.S3 Count vertices on 2-D shapes (Grade 1): the corners where right angles are found'));

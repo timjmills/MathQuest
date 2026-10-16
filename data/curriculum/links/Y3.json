@@ -366,6 +366,13 @@
    "build": [],
    "pre": [
     {
+     "key": "composing:base10_build",
+     "why": "Y3.B1.S1 / Y2.B1.S3 tens and ones in base-10 blocks: the same blocks, now with hundreds",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
      "key": "placevalue:expand",
      "why": "the number written as hundreds + tens + ones (earlier step this builds on: Y3.B1.S2 Partition numbers to 100)",
      "opts": {
@@ -413,13 +420,6 @@
      "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W01)",
      "opts": {
       "band": 90
-     }
-    },
-    {
-     "key": "composing:base10_build",
-     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W01)",
-     "opts": {
-      "band": 99
      }
     }
    ],
@@ -772,6 +772,13 @@
    ],
    "pre": [
     {
+     "key": "placevalue:more_less_10",
+     "why": "Y2.B2.S13 10 more, 10 less (Grade 1): the same move on a 2-digit number",
+     "opts": {
+      "step": 10
+     }
+    },
+    {
      "key": "placevalue:identify",
      "why": "Y3.B1.S8 Hundreds, tens and ones (taught before this step in the block)",
      "opts": {
@@ -818,13 +825,6 @@
      "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W02)",
      "opts": {
       "band": 90
-     }
-    },
-    {
-     "key": "composing:base10_build",
-     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W02)",
-     "opts": {
-      "band": 99
      }
     }
    ],
@@ -1272,6 +1272,11 @@
    ],
    "pre": [
     {
+     "key": "addition:number_line_add",
+     "why": "Y2.B2.S5 Add and subtract 1s (prior learning wk W03)",
+     "opts": {}
+    },
+    {
      "key": "addition:add_sub_10s",
      "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W03)",
      "opts": {}
@@ -1282,11 +1287,6 @@
      "opts": {
       "step": 10
      }
-    },
-    {
-     "key": "addition:number_line_add",
-     "why": "Y2.B2.S5 Add and subtract 1s (prior learning wk W03)",
-     "opts": {}
     },
     {
      "key": "composing:make_ten",
@@ -1385,16 +1385,6 @@
      }
     },
     {
-     "key": "addition:number_line_add",
-     "why": "Y2.B2.S5 Add and subtract 1s (prior learning wk W03)",
-     "opts": {}
-    },
-    {
-     "key": "composing:make_ten",
-     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W03)",
-     "opts": {}
-    },
-    {
      "key": "multiplication:count_by_tables",
      "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W03)",
      "opts": {
@@ -1416,6 +1406,16 @@
        }
       ]
      }
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W03)",
+     "opts": {}
+    },
+    {
+     "key": "addition:number_line_add",
+     "why": "Y2.B2.S5 Add and subtract 1s (prior learning wk W03)",
+     "opts": {}
     },
     {
      "key": "placevalue:order_least_to_greatest",
@@ -1482,25 +1482,6 @@
      "opts": {}
     },
     {
-     "key": "addition:add_50_regroup",
-     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W04)",
-     "opts": {}
-    },
-    {
-     "key": "number_sense:make_a_ten",
-     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W04)",
-     "opts": {}
-    },
-    {
-     "key": "addition:add_10_regroup",
-     "why": "Y2.B2.S6 Add by making 10 (prior learning wk W04)",
-     "opts": {
-      "notation": [
-       "across"
-      ]
-     }
-    },
-    {
      "key": "placevalue:more_less_10",
      "why": "Y2.B2.S5 Add and subtract 1s (prior learning wk W04)",
      "opts": {
@@ -1508,13 +1489,32 @@
      }
     },
     {
-     "key": "addition:number_line_add",
-     "why": "Y2.B2.S5 Add and subtract 1s (prior learning wk W04)",
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W04)",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W04)",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W04)",
      "opts": {}
     },
     {
      "key": "composing:make_ten",
      "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W04)",
+     "opts": {}
+    },
+    {
+     "key": "addition:add_50_regroup",
+     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W04)",
      "opts": {}
     }
    ],
@@ -1627,29 +1627,12 @@
    ],
    "pre": [
     {
-     "key": "addition:add_sub_10s",
-     "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W04)",
-     "opts": {}
-    },
-    {
-     "key": "addition:add_50_regroup",
-     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W04)",
-     "opts": {}
-    },
-    {
      "key": "addition:add_10_regroup",
      "why": "Y2.B2.S6 Add by making 10 (prior learning wk W04)",
      "opts": {
       "notation": [
        "across"
       ]
-     }
-    },
-    {
-     "key": "placevalue:more_less_10",
-     "why": "Y2.B2.S5 Add and subtract 1s (prior learning wk W04)",
-     "opts": {
-      "step": 1
      }
     },
     {
@@ -1663,12 +1646,31 @@
      "opts": {}
     },
     {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W04)",
+     "opts": {}
+    },
+    {
+     "key": "placevalue:more_less_10",
+     "why": "Y2.B2.S5 Add and subtract 1s (prior learning wk W04)",
+     "opts": {
+      "step": 1
+     }
+    },
+    {
      "key": "addition:add_sub_100s",
      "why": "Y3.B2.S4 Add and subtract 100s (taught earlier, W4)",
      "opts": {}
     },
     {
      "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W04)",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
+     "key": "placevalue:value",
      "why": "Y2.B1.S4 Use a place value chart (prior learning wk W04)",
      "opts": {
       "band": 99
@@ -1701,8 +1703,8 @@
    ],
    "pre": [
     {
-     "key": "number_sense:make_a_ten",
-     "why": "Y3.B2.S6 Add 1s across a 10 (taught before this step in the block)",
+     "key": "addition:add_50_regroup",
+     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W05)",
      "opts": {}
     },
     {
@@ -1718,24 +1720,18 @@
      "opts": {}
     },
     {
-     "key": "subtraction:sub_50_regroup",
-     "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (prior learning wk W05)",
-     "opts": {
-      "band": 50
-     }
+     "key": "addition:add_sub_100s",
+     "why": "Y3.B2.S4 Add and subtract 100s (taught earlier, W4)",
+     "opts": {}
     },
     {
-     "key": "subtraction:sub_10_regroup",
-     "why": "Y2.B2.S10 Subtract across 10 (prior learning wk W05)",
-     "opts": {
-      "notation": [
-       "across"
-      ]
-     }
+     "key": "number_sense:make_a_ten",
+     "why": "Y3.B2.S6 Add 1s across a 10 (taught before this step in the block)",
+     "opts": {}
     },
     {
-     "key": "addition:add_50_regroup",
-     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W05)",
+     "key": "composing:make_ten",
+     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W05)",
      "opts": {}
     },
     {
@@ -1778,11 +1774,6 @@
    ],
    "pre": [
     {
-     "key": "addition:add_sub_10s",
-     "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W05)",
-     "opts": {}
-    },
-    {
      "key": "subtraction:sub_10_regroup",
      "why": "Y2.B2.S10 Subtract across 10 (prior learning wk W05)",
      "opts": {
@@ -1792,12 +1783,27 @@
      }
     },
     {
-     "key": "addition:add_50_regroup",
+     "key": "number_sense:make_a_ten",
      "why": "Y2.B2.S9 Add across a 10 (prior learning wk W05)",
      "opts": {}
     },
     {
-     "key": "number_sense:make_a_ten",
+     "key": "composing:make_ten",
+     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W05)",
+     "opts": {}
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W05)",
+     "opts": {}
+    },
+    {
+     "key": "addition:add_sub_100s",
+     "why": "Y3.B2.S4 Add and subtract 100s (taught earlier, W4)",
+     "opts": {}
+    },
+    {
+     "key": "addition:add_50_regroup",
      "why": "Y2.B2.S9 Add across a 10 (prior learning wk W05)",
      "opts": {}
     },
@@ -1809,16 +1815,6 @@
     {
      "key": "addition:fact_family_sort",
      "why": "Y2.B2.S3 Related facts (prior learning wk W05)",
-     "opts": {}
-    },
-    {
-     "key": "composing:make_ten",
-     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W05)",
-     "opts": {}
-    },
-    {
-     "key": "addition:add_sub_100s",
-     "why": "Y3.B2.S4 Add and subtract 100s (taught earlier, W4)",
      "opts": {}
     }
    ],
@@ -1850,11 +1846,6 @@
      "opts": {}
     },
     {
-     "key": "addition:add_sub_10s",
-     "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W05)",
-     "opts": {}
-    },
-    {
      "key": "subtraction:sub_10_regroup",
      "why": "Y2.B2.S10 Subtract across 10 (prior learning wk W05)",
      "opts": {
@@ -1864,13 +1855,23 @@
      }
     },
     {
-     "key": "addition:add_50_regroup",
-     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W05)",
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W05)",
+     "opts": {}
+    },
+    {
+     "key": "addition:add_sub_100s",
+     "why": "Y3.B2.S4 Add and subtract 100s (taught earlier, W4)",
      "opts": {}
     },
     {
      "key": "number_sense:make_a_ten",
      "why": "Y2.B2.S9 Add across a 10 (prior learning wk W05)",
+     "opts": {}
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W05)",
      "opts": {}
     },
     {
@@ -1881,11 +1882,6 @@
     {
      "key": "addition:fact_family_sort",
      "why": "Y2.B2.S3 Related facts (prior learning wk W05)",
-     "opts": {}
-    },
-    {
-     "key": "composing:make_ten",
-     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W05)",
      "opts": {}
     }
    ],
@@ -1998,13 +1994,8 @@
    "build": [],
    "pre": [
     {
-     "key": "number_sense:compensation",
-     "why": "Y3.B2.S10 Make connections (taught before this step in the block)",
-     "opts": {}
-    },
-    {
-     "key": "subtraction:sub_100_no_regroup",
-     "why": "Y2.B2.S17 Subtract two 2-digit numbers (not across a 10) (prior learning wk W06)",
+     "key": "addition:add_100_no_regroup",
+     "why": "Y2.B2.S15 Add two 2-digit numbers (not across a 10) (prior learning wk W06)",
      "opts": {}
     },
     {
@@ -2013,14 +2004,21 @@
      "opts": {}
     },
     {
-     "key": "addition:add_100_no_regroup",
-     "why": "Y2.B2.S15 Add two 2-digit numbers (not across a 10) (prior learning wk W06)",
-     "opts": {}
-    },
-    {
      "key": "addition:add_sub_10s",
      "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W06)",
      "opts": {}
+    },
+    {
+     "key": "addition:add_sub_100s",
+     "why": "Y3.B2.S4 Add and subtract 100s (taught earlier, W4)",
+     "opts": {}
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W06)",
+     "opts": {
+      "band": 99
+     }
     },
     {
      "key": "addition:add_50_regroup",
@@ -2028,14 +2026,18 @@
      "opts": {}
     },
     {
-     "key": "number_sense:make_a_ten",
-     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W06)",
-     "opts": {}
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W06)",
+     "opts": {
+      "band": 99
+     }
     },
     {
-     "key": "composing:make_ten",
-     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W06)",
-     "opts": {}
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W06)",
+     "opts": {
+      "band": 99
+     }
     }
    ],
    "preBuild": [],
@@ -2067,23 +2069,8 @@
    "build": [],
    "pre": [
     {
-     "key": "addition:add_1k_no_regroup",
-     "why": "Y3.B2.S11 Add two numbers (no exchange) (taught before this step in the block)",
-     "opts": {}
-    },
-    {
      "key": "subtraction:sub_100_no_regroup",
      "why": "Y2.B2.S17 Subtract two 2-digit numbers (not across a 10) (prior learning wk W06)",
-     "opts": {}
-    },
-    {
-     "key": "addition:add_100_regroup",
-     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W06)",
-     "opts": {}
-    },
-    {
-     "key": "addition:add_100_no_regroup",
-     "why": "Y2.B2.S15 Add two 2-digit numbers (not across a 10) (prior learning wk W06)",
      "opts": {}
     },
     {
@@ -2092,18 +2079,41 @@
      "opts": {}
     },
     {
-     "key": "addition:add_50_regroup",
-     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W06)",
+     "key": "composing:base10_build",
+     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W06)",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
+     "key": "subtraction:sub_50_regroup",
+     "why": "Y3.B2.S8 Subtract 1s across a 10 (taught earlier, W5)",
      "opts": {}
+    },
+    {
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W06)",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W06)",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
+     "key": "composing:tens_foundation_visual",
+     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W06)",
+     "opts": {
+      "band": 90
+     }
     },
     {
      "key": "number_sense:make_a_ten",
      "why": "Y2.B2.S9 Add across a 10 (prior learning wk W06)",
-     "opts": {}
-    },
-    {
-     "key": "composing:make_ten",
-     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W06)",
      "opts": {}
     }
    ],
@@ -2138,18 +2148,13 @@
    ],
    "pre": [
     {
-     "key": "subtraction:sub_1k_no_regroup",
-     "why": "Y3.B2.S12 Subtract two numbers (no exchange) (taught before this step in the block)",
-     "opts": {}
-    },
-    {
-     "key": "subtraction:sub_100_no_regroup",
-     "why": "Y2.B2.S17 Subtract two 2-digit numbers (not across a 10) (prior learning wk W06)",
-     "opts": {}
-    },
-    {
      "key": "addition:add_100_regroup",
-     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W06)",
+     "why": "Y2.B2.S16 Add two 2-digit numbers across a 10 (Grade 1): the same exchange of 10 ones, one band lower",
+     "opts": {}
+    },
+    {
+     "key": "addition:add_1k_no_regroup",
+     "why": "Y3.B2.S11 Add two numbers, no exchange (taught earlier, W6): the same 3-digit columns before the exchange",
      "opts": {}
     },
     {
@@ -2163,19 +2168,30 @@
      "opts": {}
     },
     {
+     "key": "composing:base10_build",
+     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W06)",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
      "key": "addition:add_50_regroup",
      "why": "Y2.B2.S9 Add across a 10 (prior learning wk W06)",
      "opts": {}
     },
     {
-     "key": "number_sense:make_a_ten",
-     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W06)",
-     "opts": {}
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W06)",
+     "opts": {
+      "band": 99
+     }
     },
     {
-     "key": "composing:make_ten",
-     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W06)",
-     "opts": {}
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W06)",
+     "opts": {
+      "band": 99
+     }
     }
    ],
    "preBuild": [],
@@ -2209,13 +2225,13 @@
    ],
    "pre": [
     {
-     "key": "subtraction:sub_100_no_regroup",
-     "why": "Y2.B2.S17 Subtract two 2-digit numbers (not across a 10) (prior learning wk W06)",
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers across a 10 (Grade 1): an exchange in the column addition, one band lower",
      "opts": {}
     },
     {
-     "key": "addition:add_100_regroup",
-     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W06)",
+     "key": "addition:add_1k_no_regroup",
+     "why": "Y3.B2.S11 Add two numbers, no exchange (taught earlier, W6): the same 3-digit columns before the exchange",
      "opts": {}
     },
     {
@@ -2229,24 +2245,30 @@
      "opts": {}
     },
     {
+     "key": "composing:base10_build",
+     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W06)",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
      "key": "addition:add_50_regroup",
      "why": "Y2.B2.S9 Add across a 10 (prior learning wk W06)",
      "opts": {}
     },
     {
-     "key": "number_sense:make_a_ten",
-     "why": "Y2.B2.S9 Add across a 10 (prior learning wk W06)",
-     "opts": {}
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W06)",
+     "opts": {
+      "band": 99
+     }
     },
     {
-     "key": "composing:make_ten",
-     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W06)",
-     "opts": {}
-    },
-    {
-     "key": "subtraction:sub_1k_no_regroup",
-     "why": "Y3.B2.S12 Subtract two numbers (no exchange) (taught earlier, W6)",
-     "opts": {}
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W06)",
+     "opts": {
+      "band": 99
+     }
     }
    ],
    "preBuild": [],
@@ -2280,18 +2302,13 @@
    ],
    "pre": [
     {
-     "key": "addition:add_1k_regroup",
-     "why": "Y3.B2.S14 Add two numbers (across a 100) (taught before this step in the block)",
-     "opts": {}
-    },
-    {
      "key": "subtraction:sub_100_regroup",
      "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (prior learning wk W07)",
      "opts": {}
     },
     {
-     "key": "addition:add_100_regroup",
-     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W07)",
+     "key": "subtraction:sub_1k_no_regroup",
+     "why": "Y3.B2.S12 Subtract two numbers (no exchange) (taught earlier, W6)",
      "opts": {}
     },
     {
@@ -2312,13 +2329,22 @@
      "opts": {}
     },
     {
-     "key": "subtraction:sub_1k_no_regroup",
-     "why": "Y3.B2.S12 Subtract two numbers (no exchange) (taught earlier, W6)",
-     "opts": {}
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W07)",
+     "opts": {
+      "band": 99
+     }
     },
     {
-     "key": "addition:add_1k_no_regroup",
-     "why": "Y3.B2.S11 Add two numbers (no exchange) (taught earlier, W6)",
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W07)",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
+     "key": "addition:add_1k_regroup",
+     "why": "Y3.B2.S14 Add two numbers (across a 100) (taught before this step in the block)",
      "opts": {}
     }
    ],
@@ -2358,8 +2384,8 @@
      "opts": {}
     },
     {
-     "key": "addition:add_100_regroup",
-     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W07)",
+     "key": "subtraction:sub_1k_no_regroup",
+     "why": "Y3.B2.S12 Subtract two numbers (no exchange) (taught earlier, W6)",
      "opts": {}
     },
     {
@@ -2380,21 +2406,23 @@
      "opts": {}
     },
     {
-     "key": "addition:add_1k_regroup",
-     "why": "Y3.B2.S14 Add two numbers (across a 100) (taught earlier, W6)",
-     "opts": {}
-    },
-    {
-     "key": "subtraction:sub_1k_no_regroup",
-     "why": "Y3.B2.S12 Subtract two numbers (no exchange) (taught earlier, W6)",
-     "opts": {}
-    },
-    {
      "key": "placevalue:identify",
      "why": "Y2.B1.S4 Use a place value chart (prior learning wk W07)",
      "opts": {
       "band": 99
      }
+    },
+    {
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W07)",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W07)",
+     "opts": {}
     }
    ],
    "preBuild": [],
@@ -2492,18 +2520,13 @@
    ],
    "pre": [
     {
-     "key": "addition:add_1k_mixed",
-     "why": "Y3.B2.S17 Add 2-digit and 3-digit numbers (taught before this step in the block)",
-     "opts": {}
-    },
-    {
      "key": "subtraction:sub_100_regroup",
      "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (prior learning wk W07)",
      "opts": {}
     },
     {
-     "key": "addition:add_100_regroup",
-     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W07)",
+     "key": "subtraction:sub_1k_regroup",
+     "why": "Y3.B2.S16 Subtract two numbers (across a 100) (taught earlier, W7)",
      "opts": {}
     },
     {
@@ -2524,13 +2547,22 @@
      "opts": {}
     },
     {
-     "key": "subtraction:sub_1k_regroup",
-     "why": "Y3.B2.S16 Subtract two numbers (across a 100) (taught earlier, W7)",
-     "opts": {}
+     "key": "placevalue:identify",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W07)",
+     "opts": {
+      "band": 99
+     }
     },
     {
-     "key": "addition:add_1k_regroup",
-     "why": "Y3.B2.S14 Add two numbers (across a 100) (taught earlier, W6)",
+     "key": "placevalue:value",
+     "why": "Y2.B1.S4 Use a place value chart (prior learning wk W07)",
+     "opts": {
+      "band": 99
+     }
+    },
+    {
+     "key": "addition:add_1k_mixed",
+     "why": "Y3.B2.S17 Add 2-digit and 3-digit numbers (taught before this step in the block)",
      "opts": {}
     }
    ],
@@ -2647,16 +2679,6 @@
      "opts": {}
     },
     {
-     "key": "addition:add_wp_100",
-     "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W08)",
-     "opts": {}
-    },
-    {
-     "key": "subtraction:sub_wp_100",
-     "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W08)",
-     "opts": {}
-    },
-    {
      "key": "subtraction:sub_100_regroup",
      "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (prior learning wk W08)",
      "opts": {}
@@ -2664,6 +2686,16 @@
     {
      "key": "addition:add_100_regroup",
      "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W08)",
+     "opts": {}
+    },
+    {
+     "key": "addition:add_three",
+     "why": "Y2.B2.S7 Add three 1-digit numbers (prior learning wk W08)",
+     "opts": {}
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S4 Bonds to 100 (tens) (prior learning wk W08)",
      "opts": {}
     }
    ],
@@ -2710,40 +2742,38 @@
      "opts": {}
     },
     {
+     "key": "addition:number_families_add",
+     "why": "Y2.B2.S2 Fact families - addition and subtraction bonds within 20 (prior learning wk W08)",
+     "opts": {}
+    },
+    {
+     "key": "addition:add_three",
+     "why": "Y2.B2.S7 Add three 1-digit numbers (prior learning wk W08)",
+     "opts": {}
+    },
+    {
+     "key": "composing:make_ten",
+     "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W08)",
+     "opts": {}
+    },
+    {
+     "key": "addition:add_sub_10s",
+     "why": "Y2.B2.S4 Bonds to 100 (tens) (prior learning wk W08)",
+     "opts": {}
+    },
+    {
      "key": "number_sense:estimate_sum",
      "why": "Y3.B2.S20 Estimate answers (taught before this step in the block)",
      "opts": {
       "place": 10
      }
-    },
-    {
-     "key": "number_sense:estimate_sums_diffs",
-     "why": "Y3.B2.S20 Estimate answers (taught before this step in the block)",
-     "opts": {
-      "place": 10
-     }
-    },
-    {
-     "key": "addition:add_wp_100",
-     "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W08)",
-     "opts": {}
-    },
-    {
-     "key": "subtraction:sub_wp_100",
-     "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W08)",
-     "opts": {}
-    },
-    {
-     "key": "subtraction:sub_100_regroup",
-     "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (prior learning wk W08)",
-     "opts": {}
     }
    ],
    "preBuild": [
     "add_next_10"
    ],
    "related": [],
-   "note": "no related skill: the later-taught steps of the block are Y3.B2.S22 Make decisions (W8) has no skill yet | Y3.B2.S1 (W9): add_sub_10s is already taught in Y3.B2.S3 (W3), before this step: earlier learning, not a next step; add_sub_100s is already taught in Y3.B2.S4 (W4), before this step: earlier learning, not a next step"
+   "note": "no related skill: the later-taught steps of the block are Y3.B2.S22 Make decisions (W8) has no skill yet | Y3.B2.S1 (W9): add_sub_10s is already linked here; add_sub_100s is already taught in Y3.B2.S4 (W4), before this step: earlier learning, not a next step"
   },
   "Y3.B2.S22": {
    "title": "Make decisions",
@@ -2783,18 +2813,18 @@
      "opts": {}
     },
     {
-     "key": "addition:add_wp_100",
-     "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W08)",
-     "opts": {}
-    },
-    {
-     "key": "subtraction:sub_wp_100",
-     "why": "Y2.B2.S19 Mixed addition and subtraction (prior learning wk W08)",
-     "opts": {}
-    },
-    {
      "key": "subtraction:sub_100_regroup",
      "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (prior learning wk W08)",
+     "opts": {}
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W08)",
+     "opts": {}
+    },
+    {
+     "key": "addition:add_three",
+     "why": "Y2.B2.S7 Add three 1-digit numbers (prior learning wk W08)",
      "opts": {}
     }
    ],
@@ -3220,6 +3250,15 @@
    ],
    "pre": [
     {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S10 Divide by 2 (prior learning wk W30)",
+     "opts": {
+      "constant": [
+       2
+      ]
+     }
+    },
+    {
      "key": "multiplication:arrays_groups",
      "why": "equal groups written as a multiplication: the inverse (earlier step this builds on: Y3.B3.S2 Use arrays)",
      "opts": {
@@ -3247,15 +3286,6 @@
         "start": "zero",
         "dir": "up"
        }
-      ]
-     }
-    },
-    {
-     "key": "division:div_facts",
-     "why": "Y2.B5.S10 Divide by 2 (prior learning wk W30)",
-     "opts": {
-      "constant": [
-       2
       ]
      }
     },
@@ -3334,13 +3364,6 @@
      }
     },
     {
-     "key": "patterns:halve",
-     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W11)",
-     "opts": {
-      "band": 20
-     }
-    },
-    {
      "key": "multiplication:mult_facts",
      "why": "Y2.B5.S9 The 2 times-table (prior learning wk W11)",
      "opts": {
@@ -3369,6 +3392,13 @@
      "key": "multiplication:repeated_add_to_mult",
      "why": "Y2.B5.S4 Introduce the multiplication symbol (prior learning wk W11)",
      "opts": {}
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W11)",
+     "opts": {
+      "band": 20
+     }
     }
    ],
    "preBuild": [],
@@ -3438,13 +3468,6 @@
      }
     },
     {
-     "key": "patterns:double",
-     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W31)",
-     "opts": {
-      "band": 20
-     }
-    },
-    {
      "key": "division:div_facts",
      "why": "Y2.B5.S10 Divide by 2 (prior learning wk W31)",
      "opts": {
@@ -3457,6 +3480,13 @@
      "key": "division:share_into_groups",
      "why": "Y2.B5.S7 making equal groups (grouping): ring the counters in groups of a size",
      "opts": {}
+    },
+    {
+     "key": "patterns:double",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W31)",
+     "opts": {
+      "band": 20
+     }
     },
     {
      "key": "multiplication:arrays_groups",
@@ -3568,13 +3598,6 @@
      }
     },
     {
-     "key": "patterns:halve",
-     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W11)",
-     "opts": {
-      "band": 20
-     }
-    },
-    {
      "key": "multiplication:arrays_groups",
      "why": "Y2.B5.S6 Use arrays (prior learning wk W11)",
      "opts": {
@@ -3594,6 +3617,13 @@
      "key": "multiplication:repeated_add_to_mult",
      "why": "Y2.B5.S4 Introduce the multiplication symbol (prior learning wk W11)",
      "opts": {}
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W11)",
+     "opts": {
+      "band": 20
+     }
     }
    ],
    "preBuild": [],
@@ -3670,13 +3700,6 @@
      }
     },
     {
-     "key": "patterns:halve",
-     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W11)",
-     "opts": {
-      "band": 20
-     }
-    },
-    {
      "key": "multiplication:arrays_groups",
      "why": "Y2.B5.S6 Use arrays (prior learning wk W11)",
      "opts": {
@@ -3696,6 +3719,13 @@
      "key": "multiplication:repeated_add_to_mult",
      "why": "Y2.B5.S4 Introduce the multiplication symbol (prior learning wk W11)",
      "opts": {}
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W11)",
+     "opts": {
+      "band": 20
+     }
     }
    ],
    "preBuild": [],
@@ -3749,6 +3779,18 @@
      }
     },
     {
+     "key": "patterns:halve",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W31)",
+     "opts": {
+      "band": 20
+     }
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y2.B5.S7 making equal groups (grouping): ring the counters in groups of a size",
+     "opts": {}
+    },
+    {
      "key": "multiplication:count_by_tables",
      "why": "counting in 4s from 0 finds the multiples used (earlier step this builds on: Y3.B3.S11 The 4 times-table)",
      "opts": {
@@ -3767,18 +3809,6 @@
      "opts": {
       "band": 20
      }
-    },
-    {
-     "key": "patterns:halve",
-     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W31)",
-     "opts": {
-      "band": 20
-     }
-    },
-    {
-     "key": "division:share_into_groups",
-     "why": "Y2.B5.S7 making equal groups (grouping): ring the counters in groups of a size",
-     "opts": {}
     },
     {
      "key": "multiplication:arrays_groups",
@@ -3871,13 +3901,6 @@
      }
     },
     {
-     "key": "patterns:halve",
-     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W11)",
-     "opts": {
-      "band": 20
-     }
-    },
-    {
      "key": "multiplication:arrays_groups",
      "why": "Y2.B5.S6 Use arrays (prior learning wk W11)",
      "opts": {
@@ -3897,6 +3920,13 @@
      "key": "multiplication:repeated_add_to_mult",
      "why": "Y2.B5.S4 Introduce the multiplication symbol (prior learning wk W11)",
      "opts": {}
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W11)",
+     "opts": {
+      "band": 20
+     }
     }
    ],
    "preBuild": [],
@@ -3944,21 +3974,6 @@
    "build": [],
    "pre": [
     {
-     "key": "division:div_facts",
-     "why": "sharing a number into equal groups using the tables (dividing by 2, 3, 4, 5, 8, 10) — Y3.B3.S10 Divide by 4 (the same week, W31)",
-     "opts": {
-      "constant": [
-       2,
-       3,
-       4,
-       5,
-       8,
-       10
-      ],
-      "band": 100
-     }
-    },
-    {
      "key": "multiplication:count_by_tables",
      "why": "Y3.B3.S11 counting in 4s from 0: double each multiple of 4 to count in 8s",
      "opts": {
@@ -3988,18 +4003,6 @@
      }
     },
     {
-     "key": "patterns:halve",
-     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W31)",
-     "opts": {
-      "band": 20
-     }
-    },
-    {
-     "key": "division:share_into_groups",
-     "why": "Y2.B5.S7 making equal groups (grouping): ring the counters in groups of a size",
-     "opts": {}
-    },
-    {
      "key": "multiplication:arrays_groups",
      "why": "Y2.B5.S6 Use arrays (prior learning wk W31)",
      "opts": {
@@ -4013,6 +4016,29 @@
      "why": "Y2.B5.S6 Use arrays (prior learning wk W31)",
      "opts": {
       "band": 25
+     }
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y2.B5.S3 Add equal groups (prior learning wk W31)",
+     "opts": {
+      "band": 25
+     }
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y3.B3.S10 Divide by 4 (taught before this step in the block)",
+     "opts": {
+      "constant": [
+       4
+      ]
+     }
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W31)",
+     "opts": {
+      "band": 20
      }
     }
    ],
@@ -4076,6 +4102,18 @@
      }
     },
     {
+     "key": "patterns:halve",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W31)",
+     "opts": {
+      "band": 20
+     }
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y2.B5.S7 making equal groups (grouping): ring the counters in groups of a size",
+     "opts": {}
+    },
+    {
      "key": "multiplication:mult_facts",
      "why": "Y3.B3.S12 Multiply by 8 (taught before this step in the block)",
      "opts": {
@@ -4090,18 +4128,6 @@
      "opts": {
       "band": 20
      }
-    },
-    {
-     "key": "patterns:halve",
-     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W31)",
-     "opts": {
-      "band": 20
-     }
-    },
-    {
-     "key": "division:share_into_groups",
-     "why": "Y2.B5.S7 making equal groups (grouping): ring the counters in groups of a size",
-     "opts": {}
     },
     {
      "key": "multiplication:arrays_groups",
@@ -4194,27 +4220,6 @@
      }
     },
     {
-     "key": "division:div_facts",
-     "why": "Y3.B3.S13 Divide by 8 (taught before this step in the block)",
-     "opts": {
-      "constant": [
-       8
-      ]
-     }
-    },
-    {
-     "key": "patterns:halve",
-     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W31)",
-     "opts": {
-      "band": 20
-     }
-    },
-    {
-     "key": "division:share_into_groups",
-     "why": "Y2.B5.S7 making equal groups (grouping): ring the counters in groups of a size",
-     "opts": {}
-    },
-    {
      "key": "multiplication:arrays_groups",
      "why": "Y2.B5.S6 Use arrays (prior learning wk W31)",
      "opts": {
@@ -4228,6 +4233,29 @@
      "why": "Y2.B5.S6 Use arrays (prior learning wk W31)",
      "opts": {
       "band": 25
+     }
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y2.B5.S3 Add equal groups (prior learning wk W31)",
+     "opts": {
+      "band": 25
+     }
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y3.B3.S13 Divide by 8 (taught before this step in the block)",
+     "opts": {
+      "constant": [
+       8
+      ]
+     }
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W31)",
+     "opts": {
+      "band": 20
      }
     }
    ],
@@ -4303,27 +4331,6 @@
      }
     },
     {
-     "key": "patterns:halve",
-     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W32)",
-     "opts": {
-      "band": 20
-     }
-    },
-    {
-     "key": "division:div_facts",
-     "why": "Y2.B5.S10 Divide by 2 (prior learning wk W32)",
-     "opts": {
-      "constant": [
-       2
-      ]
-     }
-    },
-    {
-     "key": "division:share_into_groups",
-     "why": "Y2.B5.S7 making equal groups (grouping): ring the counters in groups of a size",
-     "opts": {}
-    },
-    {
      "key": "multiplication:arrays_groups",
      "why": "Y2.B5.S6 Use arrays (prior learning wk W32)",
      "opts": {
@@ -4337,6 +4344,29 @@
      "why": "Y2.B5.S6 Use arrays (prior learning wk W32)",
      "opts": {
       "band": 25
+     }
+    },
+    {
+     "key": "multiplication:repeated_add_to_mult",
+     "why": "Y2.B5.S3 Add equal groups (prior learning wk W32)",
+     "opts": {
+      "band": 25
+     }
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W32)",
+     "opts": {
+      "band": 20
+     }
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S10 Divide by 2 (prior learning wk W32)",
+     "opts": {
+      "constant": [
+       2
+      ]
      }
     }
    ],
@@ -4702,11 +4732,6 @@
      }
     },
     {
-     "key": "division:share_into_groups",
-     "why": "Y2.B5.S7 making equal groups (grouping): ring the counters in groups of a size",
-     "opts": {}
-    },
-    {
      "key": "multiplication:arrays_groups",
      "why": "Y2.B5.S6 Use arrays (prior learning wk W33)",
      "opts": {
@@ -4720,6 +4745,13 @@
      "why": "Y2.B5.S6 Use arrays (prior learning wk W33)",
      "opts": {
       "band": 25
+     }
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y2.B1.S5 Partition numbers to 100 (prior learning wk W33)",
+     "opts": {
+      "band": 99
      }
     }
    ],
@@ -4816,11 +4848,6 @@
      }
     },
     {
-     "key": "division:share_into_groups",
-     "why": "Y2.B5.S7 making equal groups (grouping): ring the counters in groups of a size",
-     "opts": {}
-    },
-    {
      "key": "multiplication:arrays_groups",
      "why": "Y2.B5.S6 Use arrays (prior learning wk W33)",
      "opts": {
@@ -4834,6 +4861,13 @@
      "why": "Y2.B5.S6 Use arrays (prior learning wk W33)",
      "opts": {
       "band": 25
+     }
+    },
+    {
+     "key": "placevalue:unit_form",
+     "why": "Y2.B1.S5 Partition numbers to 100 (prior learning wk W33)",
+     "opts": {
+      "band": 99
      }
     }
    ],
@@ -5006,6 +5040,18 @@
      }
     },
     {
+     "key": "patterns:halve",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W32)",
+     "opts": {
+      "band": 20
+     }
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y2.B5.S7 making equal groups (grouping): ring the counters in groups of a size",
+     "opts": {}
+    },
+    {
      "key": "multiplication:mult_facts",
      "why": "Y3.B3.S15 The 2, 4 and 8 times-tables (taught before this step)",
      "opts": {
@@ -5024,13 +5070,6 @@
      }
     },
     {
-     "key": "patterns:halve",
-     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W32)",
-     "opts": {
-      "band": 20
-     }
-    },
-    {
      "key": "multiplication:count_by_tables",
      "why": "Y2.B5.S9 The 2 times-table (prior learning wk W32)",
      "opts": {
@@ -5042,11 +5081,6 @@
        }
       ]
      }
-    },
-    {
-     "key": "division:share_into_groups",
-     "why": "Y2.B5.S7 making equal groups (grouping): ring the counters in groups of a size",
-     "opts": {}
     },
     {
      "key": "multiplication:arrays_groups",
@@ -5144,14 +5178,19 @@
      }
     },
     {
-     "key": "patterns:double",
+     "key": "patterns:halve",
      "why": "Y2.B5.S11 Doubling and halving (prior learning wk W32)",
      "opts": {
       "band": 20
      }
     },
     {
-     "key": "patterns:halve",
+     "key": "division:share_into_groups",
+     "why": "Y2.B5.S7 making equal groups (grouping): ring the counters in groups of a size",
+     "opts": {}
+    },
+    {
+     "key": "patterns:double",
      "why": "Y2.B5.S11 Doubling and halving (prior learning wk W32)",
      "opts": {
       "band": 20
@@ -5178,11 +5217,6 @@
        }
       ]
      }
-    },
-    {
-     "key": "division:share_into_groups",
-     "why": "Y2.B5.S7 making equal groups (grouping): ring the counters in groups of a size",
-     "opts": {}
     },
     {
      "key": "multiplication:arrays_groups",
@@ -5260,14 +5294,33 @@
      }
     },
     {
-     "key": "patterns:double",
+     "key": "patterns:halve",
      "why": "Y2.B5.S11 Doubling and halving (prior learning wk W32)",
      "opts": {
       "band": 20
      }
     },
     {
-     "key": "patterns:halve",
+     "key": "division:share_into_groups",
+     "why": "Y2.B5.S7 making equal groups (grouping): ring the counters in groups of a size",
+     "opts": {}
+    },
+    {
+     "key": "division:box_division_easy",
+     "why": "Y3.B4.S7 Divide a 2-digit number by a 1-digit number - no exchange (taught earlier, W32)",
+     "opts": {
+      "regroup": "none",
+      "constant": [
+       2,
+       3,
+       4,
+       5,
+       8
+      ]
+     }
+    },
+    {
+     "key": "patterns:double",
      "why": "Y2.B5.S11 Doubling and halving (prior learning wk W32)",
      "opts": {
       "band": 20
@@ -5294,20 +5347,6 @@
        }
       ]
      }
-    },
-    {
-     "key": "division:share_into_groups",
-     "why": "Y2.B5.S7 making equal groups (grouping): ring the counters in groups of a size",
-     "opts": {}
-    },
-    {
-     "key": "multiplication:arrays_groups",
-     "why": "Y2.B5.S6 Use arrays (prior learning wk W32)",
-     "opts": {
-      "forms": [
-       0
-      ]
-     }
     }
    ],
    "preBuild": [
@@ -5332,36 +5371,6 @@
    ],
    "pre": [
     {
-     "key": "division:div_facts",
-     "why": "sharing a number into equal groups using the tables (dividing by 2, 3, 4, 5, 8, 10) — Y3.B3.S13 Divide by 8",
-     "opts": {
-      "constant": [
-       2,
-       3,
-       4,
-       5,
-       8,
-       10
-      ],
-      "band": 100
-     }
-    },
-    {
-     "key": "multiplication:mult_facts",
-     "why": "times-table facts (tables: 2, 3, 4, 5, 8, 10) — Y3.B3.S15 The 2, 4 and 8 times-tables",
-     "opts": {
-      "constant": [
-       2,
-       3,
-       4,
-       5,
-       8,
-       10
-      ],
-      "band": 100
-     }
-    },
-    {
      "key": "patterns:double",
      "why": "Y2.B5.S11 Doubling and halving (prior learning wk W33)",
      "opts": {
@@ -5369,10 +5378,12 @@
      }
     },
     {
-     "key": "patterns:halve",
-     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W33)",
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S9 The 2 times-table (prior learning wk W33)",
      "opts": {
-      "band": 20
+      "constant": [
+       2
+      ]
      }
     },
     {
@@ -5389,11 +5400,6 @@
      }
     },
     {
-     "key": "division:share_into_groups",
-     "why": "Y2.B5.S7 making equal groups (grouping): ring the counters in groups of a size",
-     "opts": {}
-    },
-    {
      "key": "multiplication:arrays_groups",
      "why": "Y2.B5.S6 Use arrays (prior learning wk W33)",
      "opts": {
@@ -5407,6 +5413,31 @@
      "why": "Y2.B5.S6 Use arrays (prior learning wk W33)",
      "opts": {
       "band": 25
+     }
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "why": "multiplying by 10 and by multiples of 10 — Y3.B4.S1 Multiples of 10",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    },
+    {
+     "key": "patterns:halve",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W33)",
+     "opts": {
+      "band": 20
+     }
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S10 Divide by 2 (prior learning wk W33)",
+     "opts": {
+      "constant": [
+       2
+      ]
      }
     }
    ],
@@ -5934,6 +5965,20 @@
    ],
    "pre": [
     {
+     "key": "addition:add_100_regroup",
+     "why": "Y2.B2.S16 Add two 2-digit numbers across a 10 (Grade 1): the addition used with lengths in cm",
+     "opts": {}
+    },
+    {
+     "key": "measurement:length_metric",
+     "why": "Y3.B5.S5 m ↔ cm (W14): 1 m 20 cm is 120 cm before adding",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    },
+    {
      "key": "shapes_early:order_objects_length",
      "why": "Y2.B6.S4 Order lengths and heights (prior learning wk W15)",
      "opts": {}
@@ -5944,22 +5989,8 @@
      "opts": {}
     },
     {
-     "key": "measurement:length_metric",
-     "why": "Y3.B5.S6 Equivalent lengths (centimetres and millimetres) (taught earlier, W14)",
-     "opts": {
-      "forms": [
-       0
-      ]
-     }
-    },
-    {
      "key": "subtraction:sub_100_regroup",
      "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (prior learning wk W15)",
-     "opts": {}
-    },
-    {
-     "key": "addition:add_100_regroup",
-     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (prior learning wk W15)",
      "opts": {}
     },
     {
@@ -6000,6 +6031,20 @@
    ],
    "pre": [
     {
+     "key": "subtraction:sub_100_regroup",
+     "why": "Y2.B2.S18 Subtract two 2-digit numbers across a 10 (Grade 1): the subtraction used with lengths in cm",
+     "opts": {}
+    },
+    {
+     "key": "measurement:length_metric",
+     "why": "Y3.B5.S5 m ↔ cm (W14): 1 m is 100 cm before subtracting",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    },
+    {
      "key": "shapes_early:order_objects_length",
      "why": "Y2.B6.S4 Order lengths and heights (prior learning wk W15)",
      "opts": {}
@@ -6007,20 +6052,6 @@
     {
      "key": "comparing:compare_objects",
      "why": "Y2.B6.S3 Compare lengths and heights (prior learning wk W15)",
-     "opts": {}
-    },
-    {
-     "key": "measurement:length_metric",
-     "why": "Y3.B5.S6 Equivalent lengths (centimetres and millimetres) (taught earlier, W14)",
-     "opts": {
-      "forms": [
-       0
-      ]
-     }
-    },
-    {
-     "key": "subtraction:sub_100_regroup",
-     "why": "Y2.B2.S18 Subtract two 2-digit numbers (across a 10) (prior learning wk W15)",
      "opts": {}
     },
     {
@@ -7009,7 +7040,7 @@
    "partial": [
     {
      "key": "measurement:mass_volume_liquid",
-     "missing": "reads one kind of scale each; scales with different intervals are not dealt",
+     "missing": "reads one kind of scale each, and the kg dials have answer 0 (generator bug, 25 of 80 items); scales with different intervals are not dealt",
      "opts": {
       "forms": [
        0,
@@ -7019,7 +7050,7 @@
     }
    ],
    "verdict": "partial",
-   "missing": "reads one kind of scale each; scales with different intervals are not dealt",
+   "missing": "reads one kind of scale each, and the kg dials have answer 0 (generator bug, 25 of 80 items); scales with different intervals are not dealt",
    "build": [
     "mass_scales"
    ],
@@ -7067,7 +7098,7 @@
    "partial": [
     {
      "key": "measurement:mass_volume_liquid",
-     "missing": "grams on a scale, but some items ask the mass in kg (answer 0) on the same scale",
+     "missing": "grams on a scale, but the items that ask the mass in kg have answer 0 on the same scale (generator bug, about half the items)",
      "opts": {
       "forms": [
        1
@@ -7076,7 +7107,7 @@
     }
    ],
    "verdict": "partial",
-   "missing": "grams on a scale, but some items ask the mass in kg (answer 0) on the same scale",
+   "missing": "grams on a scale, but the items that ask the mass in kg have answer 0 on the same scale (generator bug, about half the items)",
    "build": [
     "mass_scales"
    ],
@@ -7147,7 +7178,7 @@
    "partial": [
     {
      "key": "measurement:mass_volume_liquid",
-     "missing": "g or kg alone; mixed kg and g readings are not dealt",
+     "missing": "g or kg alone, and every kg dial has answer 0 (generator bug); mixed kg and g readings are not dealt",
      "opts": {
       "forms": [
        1
@@ -7156,7 +7187,7 @@
     }
    ],
    "verdict": "partial",
-   "missing": "g or kg alone; mixed kg and g readings are not dealt",
+   "missing": "g or kg alone, and every kg dial has answer 0 (generator bug); mixed kg and g readings are not dealt",
    "build": [
     "mass_scales"
    ],
@@ -7250,7 +7281,7 @@
     },
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "Y3.B7.S3 Measure mass in kilograms and grams (taught before this step in the block)",
+     "why": "Y3.B7.S3 reading a mass on a scale in grams (taught before this step in the block) (its kg dials have answer 0 until the generator is fixed; the gram dials are sound)",
      "opts": {
       "forms": [
        1
@@ -7301,7 +7332,7 @@
     },
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "Y2.B7.S3 Measure in kilograms (Y2, same topic)",
+     "why": "Y2.B7.S2 reading a mass in grams on a scale (Grade 1) (its kg dials have answer 0 until the generator is fixed; the gram dials are sound)",
      "opts": {
       "forms": [
        1
@@ -7341,7 +7372,7 @@
     },
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "Y2.B7.S3 Measure in kilograms (prior learning wk W35)",
+     "why": "Y2.B7.S2 reading a mass in grams on a scale (Grade 1, on the W35 list as Measure in kilograms) (its kg dials have answer 0 until the generator is fixed; the gram dials are sound)",
      "opts": {
       "forms": [
        1
@@ -7416,30 +7447,20 @@
      }
     },
     {
-     "key": "measurement:mass_volume_liquid",
-     "why": "what the items ask: read the scale (g or kg): the same scale reading in another measure — Y3.B7.S3 Measure mass in kilograms and grams (taught earlier, W35)",
+     "key": "measurement:temperature",
      "opts": {
       "forms": [
        1
       ]
-     }
+     },
+     "why": "reading a thermometer in °C: the same scale reading in another measure — Y2.B7.S9 Temperature (W22)"
     }
    ],
    "preBuild": [
     "nonstandard_capacity"
    ],
-   "related": [
-    {
-     "key": "measurement:temperature",
-     "why": "a thermometer: the same scale reading",
-     "opts": {
-      "forms": [
-       1
-      ]
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "no related skill: every later-taught step of the block uses skills already linked here"
   },
   "Y3.B7.S8": {
    "title": "Measure capacity and volume in litres and millilitres",
@@ -7467,13 +7488,13 @@
      "opts": {}
     },
     {
-     "key": "measurement:mass_volume_liquid",
-     "why": "what the items ask: read the scale (g or kg): the same scale reading in another measure — Y3.B7.S3 Measure mass in kilograms and grams (taught earlier, W35)",
+     "key": "measurement:temperature",
      "opts": {
       "forms": [
        1
       ]
-     }
+     },
+     "why": "reading a thermometer in °C: the same scale reading in another measure — Y2.B7.S9 Temperature (W22)"
     },
     {
      "key": "comparing:compare_objects",
@@ -9362,6 +9383,16 @@
    ],
    "pre": [
     {
+     "key": "measurement:time_quarter",
+     "why": "Y2.B9.S2 quarter past and quarter to (Grade 1): the minute hand makes a quarter turn",
+     "opts": {}
+    },
+    {
+     "key": "shapes_early:shape_positions",
+     "why": "Y2.B11.S1 position words (Grade 1: above, below, beside): the language a turn is described from",
+     "opts": {}
+    },
+    {
      "key": "shapes_early:name_2d_shapes",
      "why": "Y3.B11.S7 Recognise and describe 2-D shapes (taught before this step in the block)",
      "opts": {}
@@ -9422,6 +9453,16 @@
    ],
    "pre": [
     {
+     "key": "measurement:time_quarter",
+     "why": "Y2.B9.S2 quarter past and quarter to (Grade 1): a quarter turn of the minute hand, the turn a right angle measures",
+     "opts": {}
+    },
+    {
+     "key": "shapes_early:shape_corners_count",
+     "why": "Y2.B3.S3 Count vertices on 2-D shapes (Grade 1): the corners where right angles are found",
+     "opts": {}
+    },
+    {
      "key": "shapes_early:count_edges_faces_vertices",
      "why": "Y2.B3.S10 Count vertices on 3-D shapes (prior learning wk W28)",
      "opts": {
@@ -9429,11 +9470,6 @@
        2
       ]
      }
-    },
-    {
-     "key": "shapes_early:shape_corners_count",
-     "why": "Y2.B3.S3 Count vertices on 2-D shapes (prior learning wk W28)",
-     "opts": {}
     },
     {
      "key": "shapes_early:count_sides_vertices_2d",
@@ -11402,9 +11438,9 @@
    "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true,
    "closes": {
-    "Y3.B7.S1": "reads one kind of scale each; scales with different intervals are not dealt",
-    "Y3.B7.S2": "grams on a scale, but some items ask the mass in kg (answer 0) on the same scale",
-    "Y3.B7.S3": "g or kg alone; mixed kg and g readings are not dealt",
+    "Y3.B7.S1": "reads one kind of scale each, and the kg dials have answer 0 (generator bug, 25 of 80 items); scales with different intervals are not dealt",
+    "Y3.B7.S2": "grams on a scale, but the items that ask the mass in kg have answer 0 on the same scale (generator bug, about half the items)",
+    "Y3.B7.S3": "g or kg alone, and every kg dial has answer 0 (generator bug); mixed kg and g readings are not dealt",
     "Y3.B7.S8": "millilitres only; mixed l and ml readings are not dealt"
    },
    "kindText": "new skill",
@@ -12505,8 +12541,8 @@
      1
     ]
    },
-   "why": "reads one kind of scale each; scales with different intervals are not dealt",
-   "partial": "reads one kind of scale each; scales with different intervals are not dealt"
+   "why": "reads one kind of scale each, and the kg dials have answer 0 (generator bug, 25 of 80 items); scales with different intervals are not dealt",
+   "partial": "reads one kind of scale each, and the kg dials have answer 0 (generator bug, 25 of 80 items); scales with different intervals are not dealt"
   },
   {
    "key": "measurement:mass_volume_liquid",
@@ -12517,8 +12553,8 @@
      1
     ]
    },
-   "why": "grams on a scale, but some items ask the mass in kg (answer 0) on the same scale",
-   "partial": "grams on a scale, but some items ask the mass in kg (answer 0) on the same scale"
+   "why": "grams on a scale, but the items that ask the mass in kg have answer 0 on the same scale (generator bug, about half the items)",
+   "partial": "grams on a scale, but the items that ask the mass in kg have answer 0 on the same scale (generator bug, about half the items)"
   },
   {
    "key": "measurement:mass_volume_liquid",
@@ -12529,8 +12565,8 @@
      1
     ]
    },
-   "why": "g or kg alone; mixed kg and g readings are not dealt",
-   "partial": "g or kg alone; mixed kg and g readings are not dealt"
+   "why": "g or kg alone, and every kg dial has answer 0 (generator bug); mixed kg and g readings are not dealt",
+   "partial": "g or kg alone, and every kg dial has answer 0 (generator bug); mixed kg and g readings are not dealt"
   },
   {
    "key": "measurement:unit_conversions",
