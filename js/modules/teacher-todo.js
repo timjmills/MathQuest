@@ -46,9 +46,32 @@ export function openTodo(id) {
 
 /* ================================================================= helpers */
 
+// critic r3 m7: the screen and the print show teachers' words, never code (the CSV keeps the build team's spec).
+const todoName = (e) => {
+    const n = String(e.name || '');
+    const mig = /^Migrate Legacy (.+?)(?: Visuals?)? to B&W Kit Cells$/i.exec(n);
+    if (mig) return `${mig[1]} pictures redrawn in the black-and-white worksheet style`;
+    return teacherName(n.replace(/\s*\(new skill [^)]*\)/i, '').replace(/\s*\(template option\)/i, ' (option)'));
+};
+const skillText = (id) => (id ? (skillLabelOf(id) || W.plainWhy(id)) : '');
+const plainLine = (x) => W.plainWhy(String(x || '').replace(/`([^`]*)`/g, '$1').replace(/\b(?:pane|template):([a-z0-9-]+)/g, '$1 picture').replace(/\b([a-z]+(?:_[a-z0-9]+)*)_\*/g, (m, a) => `the ${a.replace(/_/g, ' ')} skills`));
+function todoTeaches(e) {
+    if (/^vis_migrate/.test(e.id) || /^Migrate Legacy/i.test(e.name)) return 'The same questions as now, drawn in the black-and-white worksheet style, the same on paper and on screen.';
+    if (/^vis_/.test(e.id)) return `New pictures on worksheets and on screen: ${todoName(e).replace(/\s*\(option\)$/i, '').replace(/\s*\(new option on an existing skill\)$/i, '').toLowerCase()}. The pupil answers from the picture.`;
+    return plainLine(e.teaches);
+}
+const isMigrate = (e) => /^vis_migrate/.test(e.id) || /^Migrate Legacy/i.test(e.name);
+const todoLooks = (e) => (isMigrate(e) ? 'Black-and-white boxed cells, drawn the same on paper and on screen.' : plainLine(e.representation));
+const todoCloses = (e) => [...new Set(e.closes.map(plainLine).filter(Boolean))];
+
 const kindName = (k) => (Q.KINDS.find((x) => x[0] === k) || [k, k])[1];
 const domName = (d) => (Q.DOMAINS.find((x) => x[0] === d) || [d, d])[1];
-function shown() { return queue.items.filter((e) => Q.passes(e, t)); }
+// "Not set" (N13) is the chip value 'none': an entry with no grade
+function shown() {
+    const none = t.grades.has('none');
+    const g = new Set([...t.grades].filter((x) => x !== 'none'));
+    return queue.items.filter((e) => Q.passes(e, { ...t, grades: new Set() }) && (!t.grades.size || e.grades.some((x) => g.has(x)) || (none && !e.grades.length)));
+}
 /** The grade an item is listed under: its first grade inside the grade filter (or its first grade). */
 function homeGrade(e) {
     const g = t.grades.size ? e.grades.find((x) => t.grades.has(x)) : e.grades[0];
@@ -111,7 +134,7 @@ function draw() {
       </section>
       <section class="tv-card tvt-filters" aria-label="Filters">
         <div class="tvw-pickrow"><span class="tvw-pick-h" id="tvtSrcH">Source</span><div class="tv-chips" role="group" aria-labelledby="tvtSrcH">${chips('sources', Q.SOURCES.map((s) => [s, s, { CCSS: 'Common Core standards', EE: 'Wisconsin Essential Elements', WRM: 'White Rose small steps', MAP: 'MAP Growth tasks' }[s]]), t.sources)}</div></div>
-        <div class="tvw-pickrow"><span class="tvw-pick-h" id="tvtGrH">Grade</span><div class="tv-chips" role="group" aria-labelledby="tvtGrH">${chips('grades', Q.GRADES.filter((g) => g !== '6').map((g) => [g, g === 'PK' ? 'Pre-K' : g]), t.grades)}</div></div>
+        <div class="tvw-pickrow"><span class="tvw-pick-h" id="tvtGrH">Grade</span><div class="tv-chips" role="group" aria-labelledby="tvtGrH">${chips('grades', [...Q.GRADES.map((g) => [g, g === 'PK' ? 'Pre-K' : g === '6' ? '6+' : g]), ['none', 'Not set']], t.grades)}</div></div>
         <div class="tvw-pickrow"><span class="tvw-pick-h" id="tvtDomH">Domain</span><div class="tv-chips" role="group" aria-labelledby="tvtDomH">${chips('domains', Q.DOMAINS.map(([d, n]) => [d, d === 'X' ? 'Beyond K–5' : d, n]), t.domains)}</div></div>
         <div class="tvw-pickrow"><span class="tvw-pick-h" id="tvtKindH">Kind</span><div class="tv-chips" role="group" aria-labelledby="tvtKindH">${chips('kinds', Q.KINDS, t.kinds)}</div></div>
         <div class="tvt-row2">
@@ -140,7 +163,7 @@ function itemHTML(e) {
     return `<li class="tvt-item${open ? ' is-open' : ''}" data-t-item="${esc(e.id)}">
       <button type="button" class="tvt-row" aria-expanded="${open}" aria-controls="tvtS-${esc(e.id)}" data-t-open="${esc(e.id)}">
         <span class="tvt-chev" aria-hidden="true">${icon('arrow', 16)}</span>
-        <span class="tvt-name">${esc(teacherName(e.name))}</span>
+        <span class="tvt-name">${esc(todoName(e))}</span>
         <span class="tvt-badges"><span class="tvw-tag tvt-kind is-${e.kind}">${esc(kindName(e.kind))}</span>${e.sources.map((s) => `<span class="tvw-tag tvt-src">${s}</span>`).join('')}<span class="tvt-gr">${esc(gradeText(e))}</span></span>
       </button>
       ${open ? specHTML(e) : ''}</li>`;
@@ -154,10 +177,10 @@ function specHTML(e) {
     const pairs = e.pairs.map((p) => (W.REP_PAIRS.find((x) => x.id === p) || {}).label).filter(Boolean);
     return `<div class="tvt-spec" id="tvtS-${esc(e.id)}">
       <dl class="tvt-dl">
-        <dt>Kind</dt><dd>${esc(kindName(e.kind))}${e.skill ? ` · <code class="tv-code">${esc(e.skill)}</code>` : ''}${e.option ? ` · option: ${esc(e.option)}` : ''}</dd>
-        <dt>What pupils will do</dt><dd>${esc(e.teaches)}</dd>
-        <dt>Gap it fills</dt><dd>${e.closes.length > 1 ? `<ul class="tvt-ul">${e.closes.slice(0, 6).map((c) => `<li>${esc(c)}</li>`).join('')}${e.closes.length > 6 ? `<li>and ${e.closes.length - 6} more</li>` : ''}</ul>` : esc(e.closes[0] || '')}</dd>
-        <dt>How it looks</dt><dd>${esc(e.representation)}${pairs.length ? ` <span class="tvw-tag">${esc(pairs.join(' · '))}</span>` : ''}</dd>
+        <dt>Kind</dt><dd>${esc(kindName(e.kind))}${e.skill ? ` · ${esc(skillText(e.skill))}` : ''}${e.option ? ` · option: ${esc(plainLine(e.option))}` : ''}</dd>
+        <dt>What pupils will do</dt><dd>${esc(todoTeaches(e))}</dd>
+        <dt>Gap it fills</dt><dd>${(() => { const c = todoCloses(e); return c.length > 1 ? `<ul class="tvt-ul">${c.slice(0, 6).map((x) => `<li>${esc(x)}</li>`).join('')}${c.length > 6 ? `<li>and ${c.length - 6} more</li>` : ''}</ul>` : esc(c[0] || ''); })()}</dd>
+        <dt>How it looks</dt><dd>${esc(todoLooks(e))}${pairs.length ? ` <span class="tvw-tag">${esc(pairs.join(' · '))}</span>` : ''}</dd>
         ${e.ccss.length || e.ee.length ? `<dt>Standards</dt><dd class="tvt-codes">${[...e.ccss, ...e.ee].map((c) => `<span class="tvw-tag tvw-code">${esc(c)}</span>`).join(' ')}</dd>` : ''}
         ${steps ? `<dt>White Rose steps</dt><dd class="tvt-codes">${steps}</dd>` : ''}
         ${maps ? `<dt>MAP tasks</dt><dd><ul class="tvt-ul">${maps}</ul></dd>` : ''}
@@ -171,12 +194,12 @@ function specHTML(e) {
 /** The clean printable page of the filtered list (every entry's short spec). */
 export function todoPrintHTML() {
     const items = shown();
-    const filt = [t.sources.size ? `Source ${[...t.sources].join(', ')}` : '', t.grades.size ? `Grade ${[...t.grades].join(', ')}` : '',
+    const filt = [t.sources.size ? `Source ${[...t.sources].join(', ')}` : '', t.grades.size ? `Grade ${[...t.grades].map((g) => (g === 'none' ? 'not set' : g === '6' ? '6+' : g)).join(', ')}` : '',
         t.domains.size ? `Domain ${[...t.domains].join(', ')}` : '', t.kinds.size ? `Kind ${[...t.kinds].map(kindName).join(', ')}` : '',
         t.pair ? (W.REP_PAIRS.find((p) => p.id === t.pair) || {}).label : '', t.q ? `"${t.q}"` : ''].filter(Boolean).join(' · ');
-    const row = (e) => `<div class="it"><h4>${esc(teacherName(e.name))} <small>${esc(kindName(e.kind))} · ${esc(e.sources.join(', '))} · ${esc(gradeText(e))}</small></h4>
-      <p><b>What pupils will do:</b> ${esc(e.teaches)}</p><p><b>Gap it fills:</b> ${esc(e.closes.slice(0, 3).join(' | '))}</p>
-      <p><b>How it looks:</b> ${esc(e.representation)}</p>
+    const row = (e) => `<div class="it"><h4>${esc(todoName(e))} <small>${esc(kindName(e.kind))} · ${esc(e.sources.join(', '))} · ${esc(gradeText(e))}</small></h4>
+      <p><b>What pupils will do:</b> ${esc(todoTeaches(e))}</p><p><b>Gap it fills:</b> ${esc(todoCloses(e).slice(0, 3).join(' | '))}</p>
+      <p><b>How it looks:</b> ${esc(todoLooks(e))}</p>
       ${e.ccss.length || e.ee.length || e.wrmSteps.length ? `<p class="c">${esc([...e.ccss, ...e.ee].join(', '))}${e.wrmSteps.length ? ` · White Rose: ${esc(e.wrmSteps.slice(0, 6).map(Q.stepName).join('; '))}${e.wrmSteps.length > 6 ? ' …' : ''}` : ''}</p>` : ''}</div>`;
     const body = groupsOf(items).map((g) => `<h2>${esc(Q.GRADE_NAMES[g.grade])} (${g.n})</h2>${g.doms.map(([d, list]) => `<h3>${esc(domName(d))}</h3>${list.map(row).join('')}`).join('')}`).join('');
     return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Skills to be made</title><style>

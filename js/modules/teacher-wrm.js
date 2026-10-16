@@ -243,6 +243,19 @@ function thisWeekHTML() {
     return t ? `<button type="button" class="tv-btn tv-btn-sm tvw-thisweek" data-w-thisweek="${esc(t.l.key)}">${icon('flag', 16)}<span>This week: Week ${esc(t.w.replace(/^W0?/, ''))}</span></button>` : '';
 }
 
+// "W01–W09" → "Weeks 1–9 (6 Sep – 5 Nov)" from the grade's week table (critic r3 m4)
+function unitWeeks(u) {
+    const ws = String(u.weeks || '').match(/W\d+/g) || [];
+    if (!ws.length) return String(u.weeks || '').replace(/\bW0?(\d+)/g, '$1');
+    const n = ws.map((w) => +w.slice(1));
+    const label = n.length > 1 && n[0] !== n[n.length - 1] ? `Weeks ${n[0]}–${n[n.length - 1]}` : `Week ${n[0]}`;
+    const pad = (x) => `W${String(x).padStart(2, '0')}`;
+    const a = (L.weekInfo(v.grade, pad(n[0])) || {}).weekOf || '', b = (L.weekInfo(v.grade, pad(n[n.length - 1])) || {}).weekOf || '';
+    const ma = /(\d+)\s*([A-Za-z]{3,})?\s*[–-]\s*(\d+)\s*([A-Za-z]{3,})/.exec(a), mb = /[–-]\s*(\d+)\s*([A-Za-z]{3,})/.exec(b);
+    if (!ma || !mb) return label;
+    return `${label} (${ma[1]} ${(ma[2] || ma[4]).slice(0, 3)} – ${mb[1]} ${mb[2].slice(0, 3)})`;
+}
+
 function lessonListHTML() {
     const u = unitRec();
     if (!u) return '<p class="tv-cap tvw-pad">This grade has no lessons yet.</p>';
@@ -252,7 +265,7 @@ function lessonListHTML() {
           ${units.map((x) => `<h3 class="tvw-sub-h">${esc(x.name.replace(/^[^:]*:\s*/, ''))}</h3><ol class="tvw-list">${lessonsOf(x).map(lessonRowHTML).join('')}</ol>`).join('')}`;
     }
     return `<h2 class="tv-h3 tvw-unit-title" id="tvwUnitTitle">${esc(u.id === 'E' ? 'Enrichment lessons (after MAP)' : `${u.id} ${u.name}`)}</h2>${thisWeekHTML()}
-      <p class="tv-cap tvw-pad">${esc(u.weeks || '')}${u.power && u.power.length ? ` · Power standards ${esc(u.power.join(', '))}` : ''}</p>
+      <p class="tv-cap tvw-pad">${esc(unitWeeks(u))}${u.power && u.power.length ? ` · Power standards ${esc(u.power.join(', '))}` : ''}</p>
       <ol class="tvw-list">${lessonsOf(u).map(lessonRowHTML).join('')}</ol>`;
 }
 

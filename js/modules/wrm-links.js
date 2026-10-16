@@ -246,17 +246,21 @@ const weekWords = (w) => w.split(/\s*\/\s*|,\s*/).map((x) => +String(x).replace(
 export function plainWhy(text) {
     let t = String(text || '');
     if (!t) return t;
-    t = t.replace(/\s*\[rule[^\]]*\]/gi, '');
-    t = t.replace(/\s*-?\s*easier:\s*\{[^}]*\}/gi, ' (easier numbers)').replace(/\s*\{[^}]*\}/g, '');
+    // JSON first (one level of nesting), then balanced rule brackets ("[rule 18: opts {…["across"]} …]"), then strays
+    t = t.replace(/\s*-?\s*easier:\s*\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/gi, ' (easier numbers)');
+    t = t.replace(/\s*\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/g, '');
+    t = t.replace(/\s*\[rule\b(?:[^\[\]]|\[[^\]]*\])*\]/gi, '');
+    t = t.replace(/[\[\]{}]/g, '');
     // chains of ids "R.B2.S1 / R.B10" → the last full step's grade + title, else the grade
     t = t.replace(/\b(?:R|Y[1-6])\.B\d+(?:\.S\d+)?\b(?:\s*\/\s*(?:R|Y[1-6])\.B\d+(?:\.S\d+)?\b)*/g, (m) => {
         const ids = m.split('/').map((x) => x.trim());
         const full = ids.find((x) => /\.S\d+$/.test(x));
         const y = ids[0].split('.')[0];
-        return full ? `${YEAR_WORD[y]}:\u0001${full}\u0001` : `${YEAR_WORD[y]}`;
+        return full ? `\u0002${YEAR_WORD[y]}\u0001${full}\u0001` : `${YEAR_WORD[y]}`;
     });
-    t = t.replace(/\u0001([^\u0001]+)\u0001(\s*)(?=$|[(;,)\-]|\s*$)/g, (m, id) => { const r = wrmStep(id); return r ? ` ${r.title}` : ''; });
-    t = t.replace(/\u0001[^\u0001]+\u0001/g, '');
+    t = t.replace(/\u0002([^\u0001]*)\u0001([^\u0001]+)\u0001(\s*)(?=$|[(;,)\-]|\s*$)/g, (m, g, id) => { const r = wrmStep(id); return r ? `${g}: ${r.title}` : g; });
+    // an id followed by its own words (not its title): drop the "Grade N:" prefix (N14)
+    t = t.replace(/\u0002[^\u0001]*\u0001[^\u0001]+\u0001\s*/g, '');
     t = t.replace(/\s*\((?:school )?prior learning(?:,)?(?:\s*(?:wk|week)\s*((?:W?\d+\s*\/?\s*)+))?\)/gi, (m, w) => (w ? ` — support block, week ${weekWords(w).join(', ')}` : ' — support block'));
     t = t.replace(/\s*\((?:the )?(?:step before in (?:the|this) block|previous step|earlier in (?:the|this) block|earlier step)\)/gi, ' — the step before');
     t = t.replace(/\s*\(next step[^)]*\)/gi, ' — the next step');
@@ -269,8 +273,11 @@ export function plainWhy(text) {
     // weeks: "school week, W23", "wk W05", "week W05", bare "W05"
     t = t.replace(/\b(?:school )?(?:wk|week),?\s*W?0?(\d{1,2})\b/gi, 'week $1').replace(/\bW0?(\d{1,2})\b/g, 'week $1').replace(/\bweek week\b/gi, 'week');
     // year codes: Y3 / Gr.2 / Rec / Y2/Gr.1
-    t = t.replace(/\bY[1-6]\/Gr\.\s?\d\b/g, (m) => YEAR_WORD[m.split('/')[0]]).replace(/\bRec\/PK4\b/g, 'Pre-K').replace(/\bY1\/KG\b/g, 'Kindergarten');
-    t = t.replace(/\bGr\.\s?(\d)\b/g, 'Grade $1').replace(/\bY([1-6])\b/g, (m) => YEAR_WORD[m]);
+    t = t.replace(/\bY[1-6]\/Gr\.\s?[\dK]\b/g, (m) => YEAR_WORD[m.split('/')[0]]).replace(/\bRec\/PK4\b/g, 'Pre-K').replace(/\bY1\/KG\b/g, 'Kindergarten');
+    t = t.replace(/\bGr\.\s?K\b/g, 'Kindergarten').replace(/\bGr\.\s?(\d)\b/g, 'Grade $1').replace(/\bY([1-6])\b/g, (m) => YEAR_WORD[m]);
+    // a grade word repeated across a slash or colon ("Pre-K: / Pre-K", "Kindergarten/Kindergarten") → once
+    t = t.replace(/\b(Pre-K|Kindergarten|Grade \d)\s*:?\s*\/\s*\1\b/g, '$1');
+    t = t.replace(/\b(?:the )?same week,?\s*week (\d+)\b/gi, 'same week (week $1)');
     // skill ids → labels
     t = t.replace(/\b[a-z_]+:[a-z0-9_]+\b/g, (m) => skillWords(m)).replace(/\b[a-z]+(?:_[a-z0-9]+)+\b/g, (m) => skillWords(m));
     t = t.replace(/\bare not dealt\b/gi, 'are not practised yet').replace(/\bis not dealt\b/gi, 'is not practised yet').replace(/\bnot dealt\b/gi, 'not practised yet');
@@ -317,7 +324,9 @@ export function weekForDate(gradeId, date = new Date()) {
     const g = WRM_SEQUENCE.find((x) => x.id === gradeId);
     if (!g || !g.weekInfo) return '';
     const MON = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 };
-    const day = (d, m) => new Date(m >= 7 ? 2026 : 2027, m, d);
+    // the school year runs Aug–Jul: derive it from the date itself (N12), so the table keeps working every year
+    const sy = date.getMonth() >= 7 ? date.getFullYear() : date.getFullYear() - 1;
+    const day = (d, m) => new Date(m >= 7 ? sy : sy + 1, m, d);
     const today = new Date(date.getFullYear(), date.getMonth(), date.getDate());
     let next = '';
     for (const [w, info] of Object.entries(g.weekInfo)) {

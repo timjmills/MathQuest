@@ -277,7 +277,7 @@ function wire(el) {
         const b = e.target.closest('button');
         if (!b || !el.contains(b) || !TASKS) return;
         const d = b.dataset;
-        if (d.mkStrand !== undefined && d.mkStrand) { k.strand = d.mkStrand; k.task = ''; pick.reset(); writeHash(false); draw(); host.querySelector(`[data-mk-strand="${CSS.escape(d.mkStrand)}"]`)?.focus(); return; }
+        if (d.mkStrand !== undefined && d.mkStrand) { k.strand = d.mkStrand; k.task = ''; if (k.band && !TASKS.some((t) => t.strand === k.strand && overlaps(t, k.band))) k.band = ''; pick.reset(); writeHash(false); draw(); host.querySelector(`[data-mk-strand="${CSS.escape(d.mkStrand)}"]`)?.focus(); return; }
         if (d.mkBand !== undefined) { k.band = d.mkBand; pick.reset(); writeHash(false); draw(); host.querySelector(`[data-mk-band="${CSS.escape(d.mkBand)}"]`)?.focus(); return; }
         if (d.mkTask) {
             k.task = d.mkTask; pick.reset();

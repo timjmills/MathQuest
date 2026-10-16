@@ -134,7 +134,12 @@ export function createPicker(opts) {
     // The toast sits above the bar: publish the bar's real height (it wraps to two rows on a phone).
     p.measureBar = () => {
         const bar = root() && root().querySelector(`#${idp}Bar`);
-        if (bar && bar.offsetHeight) document.documentElement.style.setProperty('--tv-bar-h', `${bar.offsetHeight}px`);
+        if (!bar || !bar.offsetHeight) return;
+        // critic r3 M2: on a short page the sticky bar is not at the window's bottom, so place the toast from the
+        // bar's REAL top at the moment it is measured (redrawBar runs right before every link / print toast).
+        const top = bar.getBoundingClientRect().top;
+        const above = top > 0 && top < window.innerHeight ? Math.ceil(window.innerHeight - top) : bar.offsetHeight;
+        document.documentElement.style.setProperty('--tv-bar-h', `${Math.max(bar.offsetHeight, above)}px`);
     };
     p.redrawBar = () => { const bar = root().querySelector(`#${idp}Bar`); if (bar) bar.innerHTML = p.barHTML(); p.measureBar(); };
     p.after = (container) => { if (container && p.view === 'thumbs') lazyThumbs(container, null); p.measureBar(); };

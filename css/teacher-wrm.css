@@ -223,3 +223,21 @@ body:has(#teacherMain .tv-screen.is-active .tvw-bar) .tv-toast { bottom: 112px; 
 body:has(#teacherMain .tv-screen.is-active .tvw-bar) .tv-toast { bottom: calc(var(--tv-bar-h, 88px) + 24px); }
 .tvw-thisweek { margin: 0 8px 8px; }
 @media (max-width: 600px) { .tvm-tabs { grid-auto-flow: row; width: 100%; max-width: 100%; } .tvm-tabs > button { white-space: normal; } }
+
+/* ---------------------------------------------------------------- critic r3: B7 phone rows, M2 toast above the bar's top */
+body:has(#teacherMain .tv-screen.is-active .tvw-bar) .tv-toast { bottom: calc(var(--tv-bar-h, 88px) + 12px); }
+@media (max-width: 600px) {
+    .tvw-row { flex-wrap: wrap; align-items: flex-start; }
+    .tvw-row-main { flex: 1 1 calc(100% - 104px); min-width: 200px; }
+    .tvw-row { row-gap: 4px; padding: 4px; }
+    .tvw-row .tvp-info { margin-left: 0; }
+    .tvw-row .tvw-q { flex: 0 1 auto; margin-left: auto; display: flex; justify-content: flex-end; gap: 8px; }
+    .tvw-row .tvw-q .tv-btn { padding: 0 8px; }
+    #teacherMain:has(.tv-screen.is-active .tvw-group) { padding-left: 16px; padding-right: 16px; }
+    .tvw-group { padding: 10px; }
+    .tvw-q .tv-btn { min-width: 44px; min-height: 44px; }
+    .tvw-q .tv-btn span { display: inline; }
+    .tv-actionbar.tvw-bar { flex-wrap: wrap; }
+    .tvw-bar-btns { display: flex; width: 100%; min-width: 0; flex-wrap: nowrap; }
+    .tvw-bar-btns .tv-btn { flex: 1 1 0; min-width: 0; }
+}

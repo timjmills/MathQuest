@@ -64,7 +64,7 @@ const m = {
     if (COUNTS.includes(Number(s.count))) m.count = Number(s.count);
     if (Array.isArray(s.bands)) m.bands = s.bands.filter((b) => bandsFor(m.tier).includes(b));
     if (Array.isArray(s.domains)) m.domains = s.domains.filter((d) => DOMAINS.some((x) => x[0] === d));
-    if (TABS.some((x) => x[0] === s.tab)) m.tab = s.tab;
+    // the tab is NOT restored (owner ruling, critic r3 m5): MAP opens on Practise by task unless a link names the view
 })();
 function persist() { writeStore(UI_KEY, { tab: m.tab, tier: m.tier, mode: m.mode, count: m.count, bands: m.bands, domains: m.domains }); }
 

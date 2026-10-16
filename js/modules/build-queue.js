@@ -152,7 +152,7 @@ export function buildQueue({ curated = [], map = null } = {}) {
                 const e = byId.get(id);
                 if (!e) continue;
                 e.wrmSteps.push(sid);
-                if (st.missing) e.closes.push(`${stepName(sid)} — ${plainWhy(st.missing)}`);
+                if (st.missing && !e.closes.some((c) => c.startsWith(`${stepName(sid)} —`))) e.closes.push(`${stepName(sid)} — ${plainWhy(st.missing)}`);   // N16: one line per step
             }
         }
     }

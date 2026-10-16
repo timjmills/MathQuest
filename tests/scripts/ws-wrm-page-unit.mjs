@@ -147,10 +147,14 @@ ok(csv.length === 6 && csv[0] === CSV_HEAD.join(','), 'CSV header + rows');
 // jargon gate (critic r2 M1): every curated why / missing / closes line reads plainly after plainWhy.
 // Runs over data/curriculum/links/*.json, any `--curated <dir>` given (the tagging lanes' newest files),
 // and the known-bad samples the critics found.
-const JARGON = /\b(R|Y\d)\.B\d|\bY[1-6]\b|\bW\d\d\b|\{|\[rule|[a-z]+_[a-z0-9_]+/;
+const JARGON = /\b(R|Y\d)\.B\d|\bY[1-6]\b|\bW\d\d\b|[{}\[\]]|Gr\.|\[rule|[a-z]+_[a-z0-9_]+|\b(Pre-K|Kindergarten|Grade \d)\s*:?\s*\/\s*\1\b/;
 const samples = ['R.B2.S1 / R.B10 compare by size: the compare words', 'R.B1.S4 Sort objects to a type (school prior learning, week W23)',
     'combining groups (add_5_pictures stops at 5; add_wp_10 is a word-work cell) [rule 3: nearest first]', 'Y2/Gr.1 Count in 10s, school week, W05',
-    'Y3.B1.S1 x {"band": 99}', 'same CCSS K.OA.A.1 in Y1.B2.S3 Parts', 'Y2.B1.S2 / Y2.B1.S3 Count (prior learning wk W01/W02)'];
+    'Y3.B1.S1 x {"band": 99}', 'same CCSS K.OA.A.1 in Y1.B2.S3 Parts', 'Y2.B1.S2 / Y2.B1.S3 Count (prior learning wk W01/W02)',
+    'part-whole model (see Y5.B13) [rule 18: opts {"notation":["across"]} for this pupil]', 'Y1/Gr.K Count to 10', 'Pre-K: / R.B10 compare by size'];
+{ const r2 = plainWhy('part-whole model (see Y5.B13) [rule 18: opts {"notation":["across"]} for this pupil]');
+  ok(r2 === 'part-whole model (see Grade 4)', `r2 M1 line -> "${r2}"`); }
+{ const n14 = plainWhy('Y3.B1.S1 part-whole model'); ok(!/^Grade \d:/.test(n14), `N14 id + own words -> "${n14}"`); }
 for (const t of samples) ok(!JARGON.test(plainWhy(t)), `jargon left: "${t}" -> "${plainWhy(t)}"`);
 const dirs = [new URL('../../data/curriculum/links/', import.meta.url).pathname];
 process.argv.forEach((a, i) => { if (a === '--curated' && process.argv[i + 1]) dirs.push(...process.argv[i + 1].split(',')); });

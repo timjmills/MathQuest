@@ -357,7 +357,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       check(want.some((x) => { return Object.keys(od[x.key] || {}).length; }), 'no curated option reached the link at all');
       check(want.length && !lost.length, `curated pre opts lost in the link: ${lost.join(', ')} (of ${want.length})`);
       const why = await page.$$eval('[data-w-group="prereq"] .tvw-why', (w) => w.map((x) => x.textContent).join(' | '));
-      check(!/\b(R|Y\d)\.B\d+\.S\d+|prior learning|wk W|not dealt/.test(why), `why lines show ids/jargon: ${why.slice(0, 200)}`);
+      check(!/\b(R|Y\d)\.B\d+\.S\d+|prior learning|wk W|not dealt|[{}\[\]]|Gr\./.test(why), `why lines show ids/jargon: ${why.slice(0, 200)}`);
     } else if (CUR_YEARS.length) failures.push('curated: no lesson whose do-first skills carry options');
 
     /* ==================================================== Skills to be made */
@@ -567,6 +567,75 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     check(!!(await page.$('[data-map-act="start"]')), 'map: Start a MAP test tab lost the start button');
 
 
+    /* ==================================================== critic r3 m4 / m5 / m6 / m7 */
+    {
+      await page.goto(`${base}/index.html#wrm/2/D1/1`, { waitUntil: 'networkidle2', timeout: 60000 });
+      await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active .tvw-head'), 20000, 'm4 wrm');
+      const wtxt = await page.$eval('[data-screen="wrm"].is-active', (e) => e.innerText);
+      const wcode = /\bW\d\d\b/.exec(wtxt);
+      check(!wcode, `m4: raw week code on the White Rose screen: ${wcode && wtxt.slice(Math.max(0, wcode.index - 40), wcode.index + 20)}`);
+      check(/Weeks? \d+(–\d+)? \(\d+ [A-Z][a-z]{2} – \d+ [A-Z][a-z]{2}\)/.test(wtxt), 'm4: unit caption lacks "Weeks 1–9 (6 Sep – 5 Nov)"');
+      // m5: the Start tab is not remembered
+      await page.goto(`${base}/index.html#map/start`, { waitUntil: 'networkidle2', timeout: 60000 });
+      await waitFor(page, () => !!document.querySelector('[data-screen="map"].is-active [data-map-tab]'), 20000, 'm5 map');
+      await page.click('[data-map-tab="start"]'); await sleep(200);
+      await page.goto(`${base}/index.html`, { waitUntil: 'networkidle2', timeout: 60000 });
+      await waitFor(page, () => typeof window.tvGo === 'function' && !!document.querySelector('#teacherMain'), 20000, 'm5 shell');
+      await sleep(300);
+      await page.evaluate(() => { window.setUserRole('teacher'); window.tvGo('map'); });
+      await waitFor(page, () => !!document.querySelector('[data-screen="map"].is-active [data-map-tab]'), 20000, 'm5 map 2');
+      check(await page.$eval('[data-map-tab="tasks"]', (b) => b.getAttribute('aria-selected') === 'true'), 'm5: MAP did not reopen on Practise by task after the Start tab');
+      // m6: every strand click leaves one band chip pressed and a list unless All is empty
+      const strands = await page.$$eval('[data-mk-strand]', (b) => b.map((x) => x.dataset.mkStrand).filter(Boolean));
+      const bands = await page.$$eval('[data-mk-band]', (b) => b.map((x) => x.dataset.mkBand).filter(Boolean));
+      if (bands.length) { await page.click(`[data-mk-band="${bands[bands.length - 1]}"]`); await sleep(150); }
+      for (const st of strands) {
+        await page.click(`[data-mk-strand="${st}"]`); await sleep(150);
+        const r = await page.evaluate(() => ({ pressed: document.querySelectorAll('[data-mk-band][aria-pressed="true"]').length, tasks: document.querySelectorAll('[data-mk-task]').length }));
+        check(r.pressed === 1, `m6: strand ${st}: ${r.pressed} band chips pressed`);
+        check(r.tasks > 0, `m6: strand ${st}: no task listed`);
+      }
+      // m7: Skills to be made shows no code, on screen (all entries open) or in the print
+      await page.evaluate(() => window.tvGo('todo'));
+      await waitFor(page, () => !!document.querySelector('[data-screen="todo"].is-active .tvt-item'), 20000, 'm7 todo');
+      const J7 = /\b(R|Y\d)\.B\d|\bY[1-6]\b|\bW\d\d\b|[{}\[\]`]|Gr\.|\b[a-z]+_[a-z0-9_]+|\b[a-z_]{3,}:[a-z_]{3,}/;
+      const t7 = await page.evaluate(async () => {
+        const m = await import('./js/modules/teacher-todo.js');
+        for (let i = 0; i < 400; i += 1) { const b = document.querySelector('[data-screen="todo"].is-active [data-t-open][aria-expanded="false"]'); if (!b) break; b.click(); }
+        const scr = document.querySelector('[data-screen="todo"].is-active');
+        const txt = [...scr.querySelectorAll('.tvt-item')].map((x) => x.innerText).join('\n');
+        const d = document.createElement('div'); d.innerHTML = m.todoPrintHTML().replace(/^[\s\S]*<body>/, '');
+        const chips = [...scr.querySelectorAll('[aria-labelledby="tvtGrH"] button')].map((b) => b.textContent.trim());
+        return { txt, print: d.innerText, chips, open: scr.querySelectorAll('.tvt-spec').length };
+      });
+      const hit = (x) => { const m = J7.exec(x); return m ? x.slice(Math.max(0, m.index - 50), m.index + 30).replace(/\s+/g, ' ') : ''; };
+      check(t7.open > 200, `m7: only ${t7.open} entries opened`);
+      check(!hit(t7.txt), `m7: code on the Skills to be made screen: "${hit(t7.txt)}"`);
+      check(!hit(t7.print), `m7: code in the Skills to be made print: "${hit(t7.print)}"`);
+      check(t7.chips.includes('6+') && t7.chips.includes('Not set'), `N13: Grade chips lack 6+ / Not set: ${t7.chips.join(',')}`);
+    }
+
+    /* ==================================================== critic r3 M2: the toast clears the bar's real top (820x1180, short page) */
+    await page.setViewport({ width: 820, height: 1180, deviceScaleFactor: 1 });
+    const toastCase = async (hash, sel, tag) => {
+      await page.goto(`${base}/index.html${hash}`, { waitUntil: 'networkidle2', timeout: 60000 });
+      await waitFor(page, `!!document.querySelector(${JSON.stringify(sel)})`, 20000, tag);
+      await page.evaluate(() => { navigator.clipboard.writeText = () => Promise.resolve(); });
+      const scope = sel.split(' ')[0];
+      for (const b of [`${scope} [data-w-quick="all"]`, `${scope} [data-w-act="link"]`]) {
+        await page.$eval(b, (e) => e.scrollIntoView({ block: 'center' })); await sleep(80); await page.click(b); await sleep(250);
+      }
+      const r = await page.evaluate(() => {
+        const t = [...document.querySelectorAll('.tv-toast')].find((x) => x.getBoundingClientRect().height);
+        const bar = document.querySelector('#teacherMain .tv-screen.is-active .tvw-bar');
+        return { tb: t ? t.getBoundingClientRect().bottom : null, bt: bar.getBoundingClientRect().top };
+      });
+      check(r.tb !== null, `toast ${tag}: no toast after Practice link`);
+      if (r.tb !== null) check(r.tb <= r.bt - 8, `toast ${tag}: toast bottom ${Math.round(r.tb)} not 8 px above the bar top ${Math.round(r.bt)}`);
+    };
+    await toastCase('#map/tasks/npv/all/e1', '#tvmkDetail .tvw-head', '820 MAP task');
+    await toastCase('#wrm/2/D1/1', '[data-screen="wrm"].is-active .tvw-head', '820 White Rose lesson');
+
     /* ==================================================== phone basic check (390x844): nothing scrolls sideways */
     await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
     const side = async (tag) => {
@@ -578,11 +647,34 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active .tvw-head'), 20000, '390 wrm');
     await sleep(300);
     await side('White Rose lesson');
+    // critic r3 B7: rows wrap, names >= 200 px, rows <= 140 px, buttons >= 44x44, bar buttons inside the bar
+    const rows390 = async (tag) => {
+      const r = await page.evaluate(() => {
+        const scr = document.querySelector('#teacherMain .tv-screen.is-active');
+        const out = { name: [], tall: [], small: [], outBar: [] };
+        for (const row of scr.querySelectorAll('.tvw-row')) {
+          if (!row.getClientRects().length) continue;
+          const n = row.querySelector('.tvw-row-name');
+          if (n && n.getBoundingClientRect().width < 200) out.name.push(`${n.textContent.slice(0, 30)}:${Math.round(n.getBoundingClientRect().width)}`);
+          if (row.getBoundingClientRect().height > 140) out.tall.push(`${(n || row).textContent.slice(0, 30)}:${Math.round(row.getBoundingClientRect().height)}`);
+          for (const b of row.querySelectorAll('button')) { const q = b.getBoundingClientRect(); if (q.width && (q.width < 44 || q.height < 44)) out.small.push(`${b.textContent.trim()}:${Math.round(q.width)}x${Math.round(q.height)}`); }
+        }
+        const bar = scr.querySelector('.tvw-bar');
+        if (bar) { const B = bar.getBoundingClientRect(); for (const b of bar.querySelectorAll('button')) { const q = b.getBoundingClientRect(); if (q.left < B.left - 0.5 || q.right > B.right + 0.5 || q.top < B.top - 0.5 || q.bottom > B.bottom + 0.5) out.outBar.push(b.textContent.trim()); if (q.width < 44 || q.height < 44) out.small.push(`bar ${b.textContent.trim()}`); } }
+        return out;
+      });
+      check(!r.name.length, `390 ${tag}: skill names under 200 px: ${r.name.slice(0, 3).join(', ')}`);
+      check(!r.tall.length, `390 ${tag}: rows taller than 140 px: ${r.tall.slice(0, 3).join(', ')}`);
+      check(!r.small.length, `390 ${tag}: buttons under 44x44: ${r.small.slice(0, 3).join(', ')}`);
+      check(!r.outBar.length, `390 ${tag}: bar buttons outside the bar: ${r.outBar.join(', ')}`);
+    };
+    await rows390('White Rose lesson');
     await shot('40-wrm-lesson-390');
     await page.goto(`${base}/index.html${mh}`, { waitUntil: 'networkidle2', timeout: 60000 });
     await waitFor(page, () => !!document.querySelector('[data-screen="map"].is-active #tvmkDetail .tvw-head'), 20000, '390 map');
     await sleep(300);
     await side('MAP task');
+    await rows390('MAP task');
     await page.evaluate(() => window.tvGo('todo'));
     await waitFor(page, () => !!document.querySelector('[data-screen="todo"].is-active .tvt-item'), 20000, '390 todo');
     await page.click('.tvt-item .tvt-row');
