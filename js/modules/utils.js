@@ -89,3 +89,21 @@ export function pickNoun(category) {
     const list = WORD_PROBLEM_NOUNS[cat];
     return list[Math.floor(Math.random() * list.length)];
 }
+
+/** Denominator families (the `denoms` option): 2 = halves / quarters / eighths, 3 = thirds /
+ *  sixths / ninths / twelfths, 5 = fifths / tenths / hundredths, 7 = sevenths, elevenths and the
+ *  other primes. A denominator is allowed when every odd prime in it has its family ticked (a
+ *  fifteenth needs 3 and 5); a power of two needs family 2. */
+export function denomAllowed(d, ticked) {
+    let n = Math.round(Number(d));
+    if (!(n > 1)) return true;
+    while (n % 2 === 0) n /= 2;
+    const fam = (p) => (p === 3 ? 3 : p === 5 ? 5 : 7);
+    const fams = new Set();
+    for (let p = 3; n > 1 && p * p <= n; p += 2) {
+        while (n % p === 0) { fams.add(fam(p)); n /= p; }
+    }
+    if (n > 1) fams.add(fam(n));
+    if (!fams.size) return ticked.includes(2);
+    return [...fams].every(f => ticked.includes(f));
+}

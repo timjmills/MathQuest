@@ -221,6 +221,11 @@ place where (a) and (c) are already the rule.
 - **OR-c** "A picture is the same size in every card of a page, up to 1.25× its minimum. When the pupil works ON the
   picture (shade, partition, mark, plot, draw), the picture is the answer zone and takes the spare height."
 
+- **OR-b revised (owner, 2026-10-16):** "The We Do and You Do can have as many problems as make sense and will be clear
+  according to our design specifications." The fixed 4–6 is replaced by the site's capacity rules (WDS 12.1 / 12.3
+  ceilings by page role at L, ≥ 40 % free per cell, no page < 50 % used, no lone item, no band ≥ 30 %, content never
+  shrinks); V21 §8.11 and §8.12.1 carry it.
+
 Builder notes. These do not change the rulings; they say how to apply them consistently with the site:
 - OR-a's "add a problem" comes after the work zones are filled. It stops at the role ceiling (WDS 12.1).
 - The anchor chart is a poster and keeps LR-15: its drawings fill the page, never below 0.8×. State this in V21 as the
