@@ -34,6 +34,13 @@ export function showToast(message, type = 'info') {
     toast.textContent = message;
     toast.style.pointerEvents = 'none';   // never catches a tap meant for the page
     document.body.appendChild(toast);
+    // a toast shown just before play starts must not stay over the first question
+    if (!/\bXP\b/i.test(String(message))) {
+        const watch = setInterval(() => {
+            if (!toast.isConnected) { clearInterval(watch); return; }
+            if (_inPupilPlay()) { clearInterval(watch); toast.remove(); }
+        }, 100);
+    }
 
     setTimeout(() => {
         toast.style.animation = 'toastSlideDown 0.3s ease forwards';
@@ -217,7 +224,23 @@ export function flashXpBurst(card, text) {
         const b = document.createElement('div');
         b.className = 'mq-xp-burst';
         b.textContent = text;
-        card.appendChild(b);
+        // Anchor beside the score in the play bar (or in the right gutter) so the
+        // burst never sits over the next question's digits.
+        const sc = document.getElementById('gameScore');
+        const sr = sc && sc.getClientRects().length ? sc.getBoundingClientRect() : null;
+        const cr = card.getBoundingClientRect();
+        let x = null, y = null;
+        if (sr && sr.top >= 0 && sr.bottom <= window.innerHeight && sr.bottom <= cr.top - 4) {
+            x = sr.right + 8; y = Math.max(0, sr.top + sr.height / 2 - 16);
+        } else if (window.innerWidth - cr.right >= 130) {
+            x = cr.right + 10; y = Math.max(8, Math.min(window.innerHeight - 50, cr.top + 8));
+        } else {
+            x = Math.max(8, window.innerWidth - 130); y = 8;
+        }
+        b.classList.add('mq-xp-burst--bar');
+        b.style.setProperty('--mq-xp-x', x + 'px');
+        b.style.setProperty('--mq-xp-y', y + 'px');
+        document.body.appendChild(b);
         setTimeout(() => { try { b.remove(); } catch (_) {} }, 1600);
     } catch (_) { /* fail-silent */ }
 }

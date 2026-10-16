@@ -8,7 +8,136 @@ import { applyVoice } from './voice-picker.js';
 //   - Click on the dark backdrop (anywhere outside the card)
 //   - Escape key
 // Auto-cleared when the next question loads (nextQuestion calls closeHintPopup).
+// ===== Word-problem hint: in flow, BELOW the story (owner ruling) =====
+// On the practice card a word problem's hint must never cover the story. When the
+// current question shows a story on the live card, the hint is placed in the page
+// flow directly under the story block instead of in a modal. It keeps the
+// #hintModal id and inner classes so speakHint(), closeHintPopup() and ESC work
+// unchanged, and the same Hint button toggles it open and closed.
+const _STORY_SEL = '.mq-wwstory, .k2-story, .mq-story, .word-problem-text';
+
+function _wordProblemStoryAnchor() {
+    const game = document.getElementById('gameView');
+    if (!game || !game.classList.contains('active')) return null;
+    const card = document.getElementById('questionCard');
+    if (!card || card.offsetParent === null) return null;
+    const q = state.currentQ || {};
+    // a word skill by its own id, its print format, or the word skill the pupil chose (a mixed
+    // pool such as mixed_subtraction deals its items under the pool's member ids)
+    const WORD = /word|story|_wp(_|$)/i;
+    const queued = (Array.isArray(window.skillQueue) ? window.skillQueue : []).map((s) => (s && s.skillId) || '').join(' ');
+    const isWord = WORD.test(String(q.skillId || '')) || WORD.test(String(state.skill || '')) || WORD.test(String(q.printFormat || ''))
+        || WORD.test(queued) || /\b(mixed_subtraction|operations_all)\b/.test(queued);   // pools that deal story items
+    const va = document.getElementById('visualAid');
+    const qt = document.getElementById('questionText');
+    const shown = (e) => !!e && e.getClientRects().length > 0 && e.getBoundingClientRect().height > 4 && e.getBoundingClientRect().width > 4;
+    let story = card.querySelector(_STORY_SEL);
+    if (story && !shown(story)) story = null;
+    if (!story && isWord) {
+        // The story text is the instruction line when it is drawn (not the hidden duplicate):
+        // the hint goes INSIDE that line's block, right under its text and never wider than it.
+        if (qt && shown(qt) && !qt.classList.contains('mq-dup') && qt.textContent.trim()) {
+            return { el: qt, inside: true };
+        }
+        // Otherwise find the story sentence inside the drawing: the deepest block that holds
+        // the start of the question's text (not the whole drawing or the working).
+        const key = String((qt && qt.textContent) || q.text || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 24);
+        if (va && key.length >= 8) {
+            let best = null;
+            va.querySelectorAll('div, p, span').forEach((e) => {
+                if (shown(e) && (e.textContent || '').replace(/\s+/g, ' ').includes(key)) best = e;   // later = deeper
+            });
+            if (best && best !== va) story = best;
+        }
+        if (!story && qt && shown(qt) && qt.textContent.trim()) return { el: qt, inside: true };
+        if (!story && va && shown(va) && va.textContent.trim()) story = va;
+    }
+    if (!story) return null;
+    // Climb out of side-by-side rows (story beside a picture or word bank) so the
+    // hint lands under the whole row, never beside the story; never out of the drawing.
+    let el = story;
+    while (el.parentElement && el !== card && el !== va && el.parentElement !== card && el.parentElement !== va) {
+        const cs = window.getComputedStyle(el.parentElement);
+        const rowish = (/flex/.test(cs.display) && !/column/.test(cs.flexDirection)) || /grid/.test(cs.display) || cs.display === 'contents';
+        if (!rowish) break;
+        el = el.parentElement;
+    }
+    return { el, inside: false };
+}
+
+// The screen band a hint may use: below the pinned top bar, above the pinned bottom bar
+// (Hint / Read / Check, sticky at the card's foot).
+function _visibleBand() {
+    let top = 0, bottom = window.innerHeight;
+    const bars = document.querySelectorAll('#gameView .game-header, #questionCard > .mq-qactions, #questionCard > .next-btn-container');
+    bars.forEach((b) => {
+        if (!b.getClientRects().length) return;
+        const cs = window.getComputedStyle(b);
+        const r = b.getBoundingClientRect();
+        if (cs.position === 'fixed' || cs.position === 'sticky') {
+            if (r.top < window.innerHeight / 2) top = Math.max(top, r.bottom);
+            else bottom = Math.min(bottom, window.innerHeight - r.height - 4);
+        }
+    });
+    // a sticky bottom bar only pins once the page scrolls; reserve its height either way
+    const qa = document.querySelector('#questionCard > .mq-qactions');
+    if (qa && qa.getClientRects().length && window.getComputedStyle(qa).position === 'sticky') {
+        bottom = Math.min(bottom, window.innerHeight - qa.getBoundingClientRect().height - 4);
+    }
+    if (top === 0) top = 72;   // the play bar
+    return { top: top + 6, bottom: bottom - 6 };
+}
+
+function _renderHintInline(where, titleHTML, bodyHTML) {
+    const anchor = where.el;
+    closeHintPopup();
+    const title = String(titleHTML).replace(/^[^A-Za-z<]+/, '');
+    const box = document.createElement('div');
+    box.id = 'hintModal';
+    box.className = 'mq-hint-inline';
+    box.setAttribute('role', 'region');
+    box.setAttribute('aria-label', 'Hint');
+    box.innerHTML =
+        '<div class="mq-hint-inline-head">' +
+            '<h3>' + title + '</h3>' +
+            '<button type="button" id="hintSpeakBtn" class="hint-speak-btn mq-hint-inline-btn mq-hint-inline-listen" aria-label="Read the hint aloud" title="Read the hint aloud" onclick="speakHint()">Listen</button>' +
+            '<button type="button" class="mq-hint-inline-btn" aria-label="Close hint" onclick="closeHintPopup()">×</button>' +
+        '</div>' +
+        '<div class="hint-modal-body">' + bodyHTML + '</div>' +
+        '<button type="button" class="mq-hint-inline-got" onclick="closeHintPopup()">Got it!</button>';
+    if (where.inside) anchor.appendChild(box);
+    else anchor.insertAdjacentElement('afterend', box);
+    const onKey = (ev) => { if (ev.key === 'Escape' || ev.key === 'Esc') closeHintPopup(); };
+    box._hintKeyHandler = onKey;
+    document.addEventListener('keydown', onKey);
+    // Show the story and its hint together: story top just under the play bar,
+    // unless the pair is taller than the screen, then the hint wins.
+    try {
+        const sr = anchor.getBoundingClientRect(), hr = box.getBoundingClientRect();
+        const band = _visibleBand();
+        let dy = 0;
+        if (hr.bottom - sr.top <= band.bottom - band.top) {
+            // story and hint together: the least scroll that shows both
+            if (sr.top < band.top) dy = sr.top - band.top;
+            else if (hr.bottom > band.bottom) dy = hr.bottom - band.bottom;
+        } else {
+            // too tall for both: the whole hint, its top just under the story's last line
+            dy = hr.bottom - band.bottom;
+            if (hr.top - dy < band.top) dy = hr.top - band.top;
+        }
+        if (dy) window.scrollBy(0, dy);
+    } catch (_) {}
+}
+
 function _renderHintModal(titleHTML, bodyHTML) {
+    const existing = document.getElementById('hintModal');
+    if (existing && existing.classList.contains('mq-hint-inline')) {
+        // Same Hint button closes the in-flow hint (toggle).
+        closeHintPopup();
+        return;
+    }
+    const anchor = _wordProblemStoryAnchor();
+    if (anchor) { _renderHintInline(anchor, titleHTML, bodyHTML); return; }
     // Replace any existing hint modal so a second click doesn't stack popups.
     closeHintPopup();
     const modal = document.createElement('div');
