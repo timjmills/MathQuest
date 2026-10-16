@@ -278,5 +278,7 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
   - session_01LFfjqtqDCXnWrkC28GPBrB — Lane D print backlog (verify r10) + fraction key (critic r4)
   - session_01Vvb92mUXgnNYjRvuhtnZNM — skip-count redo (D1-D5, critic r2) + White Rose page (critic r3)
   - session_01LVDoUbPMFjuTAdwUzzWVDL — WRM tagging Y2-Y3 (critic r10), Y5 and Y6 (fix local critic r1 vs rules 1-19)
+- 2026-10-16: WRM tagging Y6 merged (critic r5 PASS vs rules 1-19, mean 8.91, min 8); combined mergecheck Y6+R+Y1+Y4: 0 problems. Owner: tagging now ONE YEAR AT A TIME (Y5, then Y2-Y3), and every lesson on the live school site must be tagged, incl. CCSS-only "committee" (CCSS · BUILD), supplement, non-CCSS and support lessons (new `lessons` section per year; extractor to write data/curriculum/site-lessons.json); then the same for R, Y1, Y4, Y6.
+- Owner 2026-10-16: redesign the Atomisation Lesson Planner V20 (`design/lesson-planner/`) to the site's lesson/worksheet design profile for SPED pupils — audit running, then V21 + a rendered sample pack, critic >= 8.
 - Held for after these land: Lane B answer boxes + regroup boxes (spec `design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md`),
   placevalue:identify write-value (spec `design/audit/runs/next-session/PV-IDENTIFY-WRITE-VALUE-SPEC.md`).
