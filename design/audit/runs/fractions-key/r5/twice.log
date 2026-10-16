@@ -1,0 +1,16 @@
+fraction_of_set independent S distinct sheets over 4 identical builds: 1 
+fraction_of_set independent L distinct sheets over 4 identical builds: 1 
+fraction_of_set test S distinct sheets over 4 identical builds: 1 
+fraction_of_set test L distinct sheets over 4 identical builds: 1 
+fraction_of_set_hard independent S distinct sheets over 4 identical builds: 2 
+  1: There are 66 buttons. 3/6 of t=33 | Find the fraction of the set.=6 | Click 5/5 of the circles.=["opt0","opt1","opt2","opt3","opt4","opt5","opt6","opt7","opt8","opt9"] | Find the missing numerator.=2 | A jar holds 20 beads. Ben take=8 | Find the fraction of the set.=24
+  2: Find the fraction of the set.=33 | Click 2/3 of the circles.=["opt0","opt1","opt2","opt3"] | Find the fraction of the set.=10 | A jar holds 20 cookies. Ben ta=8 | Find the fraction of the set.=8 | Find the missing numerator.=4
+fraction_of_set_hard independent L distinct sheets over 4 identical builds: 2 
+  1: There are 66 buttons. 3/6 of t=33 | Find the fraction of the set.=6 | Click 5/5 of the circles.=["opt0","opt1","opt2","opt3","opt4","opt5","opt6","opt7","opt8","opt9"] | Find the missing numerator.=2
+  2: Find the fraction of the set.=33 | Click 2/3 of the circles.=["opt0","opt1","opt2","opt3"] | Find the fraction of the set.=10 | A jar holds 20 cookies. Ben ta=8
+fraction_of_set_hard test S distinct sheets over 4 identical builds: 1 
+fraction_of_set_hard test L distinct sheets over 4 identical builds: 1 
+add_fractions_like independent S distinct sheets over 4 identical builds: 1 
+add_fractions_like independent L distinct sheets over 4 identical builds: 1 
+add_fractions_like test S distinct sheets over 4 identical builds: 1 
+add_fractions_like test L distinct sheets over 4 identical builds: 1 
