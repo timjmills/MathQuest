@@ -1,5 +1,96 @@
 # Y6 (US Grade 5) — Wave 2 tagging report
 
+## Fix round r1 (after the lead's local critic r1, FAIL 7.02 against BRIEF rules 1-19) — 2026-10-16
+
+`data/curriculum/links/Y6.json` is now **GENERATED**: `python3 tests/scripts/wrm-tagging/build.py` builds it from
+`spec_base.json` (the helper's round-3 tagging, frozen) plus the fix rounds `spec_r0_helpers.py`, `spec_r1_*.py`, with the
+live `wrm.js`, `data.js`, `build-list.js`, the xlsx sheet "Grade 5" and the passed lane files R.json, Y1.json, Y4.json
+(`WRM_LINKS_OTHER`, default `/home/user/ref/...`). It derives the citations, the tagFixes, the proposals and the envisioned
+skills, checks rules 3, 10, 14, 15, 16, 19 (D, F, G, K), and runs `mergecheck.mjs` (Y6 alone, then Y6 + R + Y1 + Y4) and
+`optcheck.mjs`; any problem fails the build. Two builds are byte-identical. Tooling ported from the Y4 lane:
+`keys.mjs`, `prior.mjs` (Grade 5), `mergecheck.mjs` (now several files, structured `partial` required in the first),
+`optcheck.mjs`, `optchange.mjs`, `items.mjs`, and a Grade 5 `linkfit.mjs` (size per step, the critic's first-taught-week
+table, beyond-grade content, customary units on metric steps, whys checked against items); `probe.mjs` and `opts.mjs` print
+items and option schemas.
+
+**Gates (head of this round):** build OK twice, byte-identical; mergecheck Y6: 169 tags, 148 tagFixes, **0 problems**;
+mergecheck Y6 + R + Y1 + Y4: 559 tags, 470 tagFixes, **0 problems**; optcheck 133 opts entries, 0 problems; optchange 0 option
+values that change nothing; linkfit 809 links (60 print-path items each), **0 misfits**; items.mjs: every direct/partial
+generates with its opts, 0 errors.
+
+**Counts now:** 114 steps — 24 full, 70 partial, 20 gap (B1.S1 fell to partial: 1,000,000 itself is never dealt). 80
+proposals: 17 new, 63 reused (Y4's `factor_pair_strategy` reused as B2.S10's preBuild). 148 tagFixes: add 53, full 2,
+partial 77, opts 10, remove 6. 513 pre and 296 related links, 84 with opts. All 90 partial/gap steps carry an `envision`.
+
+### What changed, per critic defect
+- **M1** (direct on a partial step): B1.S6 `compare_int`, `order_negatives` and B9.S5 `d_to_p`, `p_to_d` are partial with
+  the step's clause; the build and mergecheck both reject a direct on a non-full step.
+- **M2 / M** (stale clauses, clause buried in `why`): tagFixes are derived against the live SKILL_WRM and every `partial` /
+  partial `add` carries the clause in a structured `partial` field; the 14 pairs now come out of the merge with the Y6.json
+  clause (mergecheck compares clause text).
+- **A** (links without opts): 84 links now carry opts (bands, metric units, forms), each generated first.
+- **B** (false whys): all 25 rewritten to what the items deal or given the band that makes them true (combine / pv_digit_drag /
+  compare band 999,999; place_value_disks band 9,999; place_on_number_line span 1,000 band 10,000; count_by_tables 3s;
+  multiply tiles 31 = 3-digit × 1-digit columns; mult_properties, missing_add_sub, div_remainders, div_zero_in_quotient,
+  mult_placeholder_zero, place_value_10x, volume, exponents whys rewritten); the two "parallelogram" related links on B10.S6
+  are gone; `double_num_line` is off every metric and percent step; `unit_conversions` is Metric with forms [0] (its "click
+  every equal" form offered "1 mile").
+- **C** (opts the clause relies on): B1.S2/S3/S6 bands 999,999; B1.S5 place_on_number_line span 1,000 band 10,000 with the
+  clause saying so; B4.S3/S4 `div_unit_frac_nv {forms:[2,3]}` (labels swapped, see bugs) with the click-item share in the
+  clause, `div_unit_fraction` moved to related; B2.S15 every direct at band 50 (200 items each, no negatives), so it stays full.
+- **D** (pre taught later): B7.S3, B7.S5, B7.S8, B7.S9, B11.S5, B2.S12 cites removed or replaced (B7.S8 pre now Grade 4
+  missing numbers + the W12 machine; the 1-step equation skills are related); B7.S5/B10.S1/B10.S2 `area {forms:[1,2]}`
+  (rectangles only, 0 triangles in 80); B5.S4 ratio table out; B4.S5 `div_unit_frac_nv` out; B3.S9 estimate `{task:[0]}`.
+  The build fails any pre whose cited Y6 step is taught after the step's week.
+- **E** (related far ahead / beyond grade): ordering_rationals, add_int, abs_value (×4), percent_of_number, double_num_line,
+  equiv_ratios, ratio_tables, unit_rate_intro, mixed_conversions, coordinate_graph/coordinate_all on B13.S1,
+  evaluate_expression_hard dropped; paren_simple / paren_multi band 50; exponents `{step:[0], band:50}`;
+  estimate_frac_ops `{task:[0]}`. linkfit fails a related more than 2 school weeks ahead.
+- **F**: the 8 earlier-learning related links moved to pre (B9.S3 ×2, B9.S4 ×3, B9.S5, B8.S1, B7.S9); the build rejects a
+  related whose why says prior learning or cites an earlier year.
+- **G**: own build removed from preBuild on all 11 steps (B11.S1 has no other line-graph proposal; its pre are live).
+- **H**: every pre citation is a step id; a cite the skill is not tagged to (SKILL_WRM + R/Y1/Y4 tagFixes + Y6) is re-cited
+  to the nearest step it is tagged to that the pupil has met by that week, or says "nearest live practice … is not tagged
+  to …" (6 left: add/sub_100k_mixed, factor_links_medium, fraction_nl_drag, mult_comparison_plain, count_by_step_down).
+- **I**: B8.S4 has 4 pre (money, compare_decimal moved in) with a note; B12.S1 has 3 pre (identify_lines) and a note.
+- **J**: B1.S2 (B1.S1 6-digit number_word_names, Y5 combine), B2.S7 (multiply 3-digit × 1-digit columns and 2-digit × 2-digit),
+  B5.S2 (decimal × and ÷ 10/100/1,000 from B8.S5/S6, W07), B7.S8 (missing_factor_or_addend), B8.S4 (above).
+- **K**: "half its coefficient items" → "some coefficient items"; the build rejects a per-seed proportion.
+- **L**: count_by_powers_of_10 off B1.S1, `{step:[0,1]}` on B1.S4; B1.S1 partial (1,000,000 never dealt), build big_numbers.
+- **Rule 13/16**: every partial/gap step has `envision` (name, kind, teaches, closes, representation); `closes` is the step's
+  own missing clause, and on the 13 two-build steps each proposal closes its own words of that clause.
+
+### Generator bugs (recorded, not fixed in this lane)
+- `fraction_operations:div_unit_frac_nv`: form labels swapped (forms [0,1] "Unit fraction ÷ whole" deal 8 ÷ 1/3; [2,3]
+  deal 1/3 ÷ 6); the "click all expressions equal to n ÷ 1/k" item ignores forms (17 of 60 with forms [2,3]).
+- `order_of_operations:two_ops_no_paren` / `three_ops_no_paren` / `paren_simple`: negative answers and operands at the
+  default band (band 20 or 50 removes them: 0 in 200).
+- `order_of_operations:exponents_simple`: "8² − 73 = −9" unless `step:[0]`.
+- `fraction_operations:estimate_frac_ops`: negative estimates ("1/10 − 1/8 ≈ −0.5") unless `task:[0]`.
+- `patterns:count_by_powers_of_10`: no band; reaches 23,000,000.
+- `fractions:simplify`: one "Simplify this fraction" item offers −1/10 as a distractor (1 in 60; linkfit lists it as known).
+- `measurement:unit_conversions` Metric: the "click every equal" form offers "1 mile" as a distractor.
+- Still open from the helper: `percent_of_number` 33% answers, the `mass_volume_liquid` kg dial, the `percent_visual` "shade" form.
+
+### Owner questions (recommended answer in italics; this round proceeds with it)
+1. **B1.S1: is a 6-digit band "Numbers to 1,000,000"?** The step's end number is never dealt. *Partial, closed by the
+   reused big_numbers band (which reaches 1,000,000 and beyond).*
+2. **Order of operations: tag with band 50, or wait for the generator fix?** *Tag full with band 50 (verified), and fix the
+   default-band negatives in the order-of-operations lane.*
+3. **Rulers marked in inches on metric lessons.** reading_ruler is off B5.S1; on B6.S5 and B12.S9 it stays with a why that
+   says so. *Build a cm ruler option on reading_ruler (small), then switch these links to it.*
+4. **Grade 5 teaches 2-step equations (W12) 23 weeks before 1-step (W35).** *Keep the school's order; 1-step equation skills
+   are related only for B7.S8, and the pre are Grade 4 missing numbers + the W12 function machine. Ask the school whether
+   W35 is intended.*
+5. **Pre citations with no tagged skill (6 "nearest live practice" links).** *Leave them for the Y5 and Y3 lanes to tag
+   (add_100k_mixed → Y5.B2.S2, sub_100k_mixed → Y5.B2.S3, …) rather than tag another year's steps from this file.*
+6. The round-3 questions below (big_numbers vs method at a smaller size, function_machine, mult_dec_dec, translate/reflect,
+   W32/W33 lists, Y5 re-check, generator bugs, tidy proposals) stand with the same recommendations.
+
+---
+
+## Round 3 report (helper lane, 2026-10-10; kept for the record)
+
 Output: `data/curriculum/links/Y6.json` (format per `BRIEF.md`). Critic: `Y6-critic.md` — round 3, **8.09/10 PASS**
 (min 7; 32 steps); earlier rounds `Y6-critic-r1.md` 7.47 FAIL, `Y6-critic-r2.md` 7.50 FAIL.
 
