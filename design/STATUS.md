@@ -266,3 +266,19 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - 2026-10-10 White Rose page (recommended answers kept, per owner): the 13 lessons that map to another year's WRM step stay mapped and are listed in MAPPING_REPORT; Kindergarten's two duplicate titles (1 more, 1 less; Partition into tens and ones) resolve to the nearest block.
 - 2026-10-10: WRM tagging Y4 PASSED critic r13 (every graded step 9, no defects; independent merge simulation 0 problems; build reproducible). Lane frozen after three optional tidy-ups; waits for the lead merge.
 - 2026-10-10: WRM tagging R + Y1 PASSED critic r12 (both 8.00, every graded step 8; independent merge simulation 0 problems). Lane frozen after four text tidy-ups; waits for the lead merge.
+
+## 11. Resumed 2026-10-16 (lead session_01HVwpAE3g6EZH8idgErP6LP; the previous lead chat was deleted by accident)
+
+- Merged into main: WRM tagging R/Y1 (critic r12 PASS), Y4 (critic r13 PASS; its tooling moved to
+  `tests/scripts/wrm-tagging/Y4/`, paths made repo-relative; `Y4/check.py` still reads a keys.json from the old
+  container's scratchpad — regenerate with `Y4/keys.mjs` before using it), MAP Growth audit (critic r5 PASS).
+  Gates: boot smoke, codes (608), standards, search terms OK; mergecheck R/Y1 and Y4 OK. Records only — no deploy needed.
+- Helper sessions (cloud, tag `mathquest-resume-2026-10-16`; each pushes only to its lane branch, the lead merges/deploys):
+  - session_01Qt98Wm6Wp75BgsTgX2oCVK — small fixes (critic r6) + custom number line (R7-D1, critic r8)
+  - session_01LFfjqtqDCXnWrkC28GPBrB — Lane D print backlog (verify r10) + fraction key (critic r4)
+  - session_01Vvb92mUXgnNYjRvuhtnZNM — skip-count redo (D1-D5, critic r2) + White Rose page (critic r3)
+  - session_01LVDoUbPMFjuTAdwUzzWVDL — WRM tagging Y2-Y3 (critic r10), Y5 and Y6 (fix local critic r1 vs rules 1-19)
+- 2026-10-16: WRM tagging Y6 merged (critic r5 PASS vs rules 1-19, mean 8.91, min 8); combined mergecheck Y6+R+Y1+Y4: 0 problems. Owner: tagging now ONE YEAR AT A TIME (Y5, then Y2-Y3), and every lesson on the live school site must be tagged, incl. CCSS-only "committee" (CCSS · BUILD), supplement, non-CCSS and support lessons (new `lessons` section per year; extractor to write data/curriculum/site-lessons.json); then the same for R, Y1, Y4, Y6.
+- Owner 2026-10-16: redesign the Atomisation Lesson Planner V20 (`design/lesson-planner/`) to the site's lesson/worksheet design profile for SPED pupils — audit running, then V21 + a rendered sample pack, critic >= 8.
+- Held for after these land: Lane B answer boxes + regroup boxes (spec `design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md`),
+  placevalue:identify write-value (spec `design/audit/runs/next-session/PV-IDENTIFY-WRITE-VALUE-SPEC.md`).
