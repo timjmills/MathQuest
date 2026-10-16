@@ -800,7 +800,7 @@ Knowledge is stored as schemas — organised structures retrieved as single unit
 
 This library is surfaced **contextually during lesson generation**. When the planner encounters
 a moment where a common myth would lead to worse teaching — or where a predictable student
-misconception will derail learning — it flags the issue as a **WATCH box** (red), **NOTE box**
+misconception will derail learning — it flags the issue as a **`Watch:` box** (1.5 pt border), **NOTE box**
 (plain text), or `Tip:` box (§10.5) in the delivery script.
 
 **Do NOT surface every myth in every lesson.** Only flag a myth when:
@@ -2294,7 +2294,9 @@ Rules:
 - **PG-2** Every row count is computed from the body height, never fixed.
 - **PG-3** The footer never grows. The header never exceeds 26 mm on page 1 and is 12 mm on continuations.
 - **PG-5** Landscape is used only for the 2-up Exit slip (two half-pages side by side, a dashed cut line
-  between them): A4 landscape, live area 271 × 184 mm (margins 12 / 13 / 14 mm).
+  between them): A4 landscape, margins 12 / 13 / 12 mm (top / sides / bottom), live area 271 × 186 mm. Each
+  half is laid out natively at **(271 − 6) / 2 = 132.5 mm** wide, with 3 mm clear on each side of the cut line;
+  the footer and © line are shared by the sheet. A half's title may wrap to two lines (HD-14).
 - `@page { size: A4; margin: 0 }` is set once and each page is a fixed 210 × 297 mm box with the margins as
   padding (Appendix A §3). Never add extra page padding on top of the margins (V20's double margin).
 
@@ -2315,6 +2317,12 @@ use, embed and redistribute under the OFL.
    so the open 4 (`cv04`) is lost.
 4. If you only have TTF, convert to WOFF2 (for example `python -m fontTools.ttLib.woff2 compress
    Andika-Regular.ttf`), or use the TTF directly with `format("truetype")`.
+
+**Which release.** Andika **6.200** (SIL, 2023). The two web fonts this pack was built and checked with:
+`Andika-Regular.woff2` (275,908 bytes, SHA-256 `bf3ee702ddfa18e3338ddb7b9943d534216b66f87fd884afb74f19e9da7dbada`)
+and `Andika-Bold.woff2` (274,976 bytes, SHA-256 `a043f07c66d5cf0891b52d69692bb1ca4de981566bfd669305d31e776f23fc1e`).
+A different build is acceptable if its GSUB table lists the feature `cv04` (test: in a browser,
+`"4"` drawn with `font-feature-settings:"cv04" 1` has an open top).
 
 **How to load it (self-hosted, no third-party request).** Either (a) put `Andika-Regular.woff2` and
 `Andika-Bold.woff2` in a folder next to the HTML and point `FONT_URL` in Appendix A §1 at it, or (b) for a
@@ -2454,7 +2462,7 @@ rule with a 1.5 pt top.
 
 Pupil band vocabulary (no other labels): `What's New:` `Vocabulary:` `Rule:` `Remember:` `Warm-up:`
 `Steps:` `Model:` `Say:` `Guided Practice:` `Independent Practice:` `More Practice:` `Mixed Review:`
-`Workspace:` and, new in V21 (**Owner default (2026-10-16, recommended; may change) — Q4**),
+`Workspace:`, `Another example:` (anchor chart: the other cases, drawn all in black) and, new in V21 (**Owner default (2026-10-16, recommended; may change) — Q4**),
 `Number sense: A` / `Number sense: B`. Never all capitals, never reversed out (white on black), never in a
 tab, never rotated.
 
@@ -2481,8 +2489,8 @@ Teacher band labels (teacher pages only): `Lesson guidance:` `Lesson flow:` `Mat
 - **CL-7** One idea per cell: one problem, one visual, one answer type. No skill name, level or code.
 - **CL-8** Padding 3 mm. Stacked-arithmetic cells: top pad 8 mm (room for the letter), sides 6 mm,
   bottom 4 mm.
-- **CL-9** In a wide single cell (exit slip) the stack is centred in the leftmost 62 mm; the rest is open
-  working space.
+- **CL-9** In a 1-column stacked layout the stack is centred in the leftmost 62 mm; the rest is open
+  working space. (No V21 page uses a 1-column stack: the exit slip is a 2 × 2 grid, §9.7.)
 - **CL-10** Quiet letter `a.` `b.` … at 10 pt, 1.5 mm from the top-left corners. Letters restart at `a.` on
   each page that is handed out alone (every pupil page in this pack). Model and Guided cells are
   unlabelled and not counted in the Score.
@@ -2490,8 +2498,13 @@ Teacher band labels (teacher pages only): `Lesson guidance:` `Lesson flow:` `Mat
   white 11 pt bold numeral (8.4 mm wide for 2 digits), numbering 1…N down the page.
 - **No split cell** (PG-21): `break-inside: avoid` on every cell; a band is never split from its first
   row; a word problem with its routine panel, and a Model with its Steps, are keep-together units.
-- **Empty bands** (RUBRIC H13): no cell may leave an empty band of 30 % or more of its height or width,
-  except the open answer / work zone under or to the right of the problem.
+- **Empty bands** (RUBRIC H13, measured the site's way): no cell may leave an empty band of 30 % or more of
+  its height or width. Slots, digit strips and answer rows count as content (they are ink). A written answer
+  (a slot or an answer row) may keep **one Hw (10 mm)** of open space under its lowest mark; anything beyond
+  that is an empty band. The only exemption is a cell the pupil DRAWS or WORKS on (a `Workspace:` band, a
+  picture to shade, partition, mark or plot, hops to draw, a work grid): there the open zone is the answer.
+  Spare height beyond the allowance means: add a row (OR-a), or move the height to another band — never
+  leave it in the cells.
 - **Trailing positions** (PG-15): item counts round to full rows; any remainder is one unruled blank
   area inside the frame, never empty lettered cells.
 
@@ -2525,8 +2538,12 @@ gives n = 2 because 10 is a possible answer. Never draw a blank with underscore 
   their minimum, the same size in every card of the section. Text and digit sizes are fixed by the lesson size and never
   change from page to page. If space is still left, add a problem (up to the page's ceiling) — never enlarge the
   content."
-- **OR-b** "We Do and You Do pages hold 4–6 problems: 6 by default (2 × 3), 4 for long procedures. Exceptions: word
-  problems 1–2 per page, full-width visuals (number lines, coin rows) 3–5."
+- **OR-b (revised 2026-10-16)** "The We Do and You Do can have as many problems as make sense and will be clear
+  according to our design specifications." *(This replaces the earlier ruling "We Do and You Do pages hold 4–6
+  problems: 6 by default (2 × 3), 4 for long procedures; word problems 1–2 per page; full-width visuals 3–5".)*
+  The count therefore comes from the capacity rules of §8.12.1: the ceiling for the page role at size L, every
+  item cell ≥ 40 % free, no page under 50 % used, no lone item, no empty band ≥ 30 %, content never shrinks.
+  Fill to the clearest count those rules allow, never past a ceiling.
 - **OR-c** "A picture is the same size in every card of a page, up to 1.25× its minimum. When the pupil works ON the
   picture (shade, partition, mark, plot, draw), the picture is the answer zone and takes the spare height."
 
@@ -2536,39 +2553,56 @@ How V21 applies them [AUD §3a builder notes]:
   enlarge to fill the page, never below 0.8× of the size they would have elsewhere (other examples ≥ 0.85×)
   [LR-15]. In practice: chart digits 34 pt, other examples 30 pt.
 - OR-b covers a We Do or You Do *page*. The lesson sheet's `Guided Practice:` band beside `Steps:` stays
-  2–3 cells [LR-4]; a separate Guided page holds 3–6.
-- **Owner default (2026-10-16, recommended; may change) — extra:** one-symbol answers (vertical facts,
-  "27 → __", fact rows) are a further exception: up to **15–16 per page** (site precedent: 3 × 4 = 12 for
-  vertical facts at L; 2 × 8 for one-line answers). Flip: cap them at 6 like other problems.
+  2–3 cells [LR-4], sized to their content; a separate Guided page holds 3–6.
+- One-symbol answers (vertical facts, "27 → __", fact rows) follow the same capacity rules: up to **16 per
+  page** at L (site precedent: 3 × 4 = 12 vertical facts; 2 × 5 / 2 × 8 grids for one-line answers). Under the
+  revised OR-b this is no longer a separate owner default.
 
 ### 8.12 Decision rules
 
 #### 8.12.1 Problems per page [OR-b, WDS 12.1, D18]
 
+Ceilings at size L (WDS 12.1, one section, A4 full header). A ceiling is never exceeded; the count is the
+largest one that passes the capacity test below.
+
+| Page role / item | Ceiling at L | Usual grid |
+|---|---|---|
+| Prerequisite Check | 3–4 questions (one per Pre-requisite atom), up to 8 items | one band per question |
+| Number sense | 5 + 5 | Daily-look rows |
+| Anchor chart | 1 worked example in 2–5 panels + 1–3 other examples | rows or 2 × 3 panels |
+| Lesson sheet Guided band | 2–3 (beside `Steps:`) | 1 row |
+| Lesson sheet Independent band | whole rows of 3 in the remaining height | 1–2 rows |
+| Guided page | 3–6 | 2 × 2 – 2 × 3 |
+| Independent / Practice, standard | 6 | 2 × 3 |
+| Independent / Practice, long procedure (3-digit regrouping, long × or ÷) | 4 | 2 × 2 |
+| Independent / Practice, one-symbol answers | 16 | 3 × 4 vertical facts; 2 × 5, 2 × 8 one-line |
+| Wide visuals (number lines, coin rows, base-10 over 100) | 3 | full-width rows |
+| Word problem v1 (scaffolded) / v2 (faded) | 1 / 2 | — |
+| Exit slip | 4 per half (one per case) | 2 × 2 |
+
 ```
-function itemsPerPage(role, item):
-  if role == 'prerequisite'      -> 3..4 (one per prerequisite lesson, most basic first)
-  if role == 'number-sense'      -> 5 + 5 (bands A and B)
-  if role == 'anchor-chart'      -> 1 worked example (2-5 step panels) + 1-3 other examples
-  if role == 'lesson-sheet'      -> Guided 2..3 beside Steps; Independent 3 (one row)
-  if role == 'guided-page'       -> 3..6
-  if item.kind == 'word-problem' -> 1 (scaffolded, with routine panel) | 2 (faded)
-  if item.kind == 'K-picture-word-problem' -> 1..2
-  if item.kind == 'wide-visual'  -> 3..5 full-width rows (number lines, coin rows, base-10 over 100)
-  if item.answer is one symbol   -> up to 16 (vertical facts at L: 3 columns x 4 rows = 12)   # owner default, extra
-  if item.procedure is long      -> 4 (2 x 2)   # regrouping, long multiplication, long division
-  else                           -> 6 (2 x 3)
-  role == 'exit-slip'            -> 1 per half page (2-up)
+function itemsPerPage(page):
+  minCellH = template minimum height (content + pads + one Hw under a written answer)   # 8.9
+  minCellW = max(item width, slot width) + pads
+  cols = floor(186 / minCellW)            clamp to the usual grid's columns
+  rows = floor(gridH / minCellH)
+  n = min(cols * rows, ceiling(page.role, item))
+  while n > 1:
+      lay out n items in equal cells (cells take the whole grid height)
+      if every cell >= 40 % free  and  no empty band >= 30 %  and  page >= 50 % used: return n
+      if the cells are too EMPTY (band >= 30 %): add a row of items if the ceiling allows, else
+         give the height to another band (Guided, Workspace, Vocabulary), else shrink the band to content
+      if the cells are too FULL (< 40 % free): n -= one row
+  never return 1 unless the role's ceiling is 1 (word problem v1)
 ```
-Never fewer than the page can hold at L; never more than the ceiling.
 
 #### 8.12.2 Page fill order [OR-a]
 
 ```
 1. Fix sizes: type, digits, Hw, B(n), picture minimums (size L). These never change.
 2. Choose the grid from 8.12.1 (columns x rows); cells are equal (1fr x 1fr) and fill the body exactly.
-3. Spare height in every cell goes to its answer / work zone (below the problem; for a stack in a wide
-   cell, the right-hand side as well).
+3. Spare height in every cell goes to its answer / work zone, up to one Hw (10 mm) under a written answer
+   (no cap for a draw / work cell). More spare than that: step 5.
 4. Pictures may grow to <= 1.25 x their minimum, the same size in every cell of the section (8.12.3).
 5. Still spare and the page below its ceiling? add a row of problems. Recompute from step 2.
 6. Banded pages (lesson sheet, word problem) give the spare height to the bands in this order:
@@ -2603,6 +2637,9 @@ a page under 50 % used is merged into the page before or filled with more items 
 ```
 
 #### 8.12.5 Scaffold fade [WDS 13.1, PED 4, D15]
+
+**★ has one meaning: the fade level** (★ Guided, ★★ Independent, ★★★ edge-case row). It never marks a
+prerequisite; a prerequisite atom is tagged with the word `Pre-requisite`.
 
 | Scaffold | Class | Anchor chart (Model) | Guided (★) | Independent (★★) | Practice last row (★★★) / Exit / Test |
 |---|---|---|---|---|---|
@@ -2640,7 +2677,8 @@ a production item on paper               -> stays production on screen and on th
   right reads `Answer Key · Form A · seed …`.
 - The Prerequisite Check key also prints, right-aligned in each section strip at 11 pt black,
   `If missed → Lesson <id> <title>`.
-- A fully worked page with no slots (the anchor chart) needs no separate key; say so on T6.
+- The anchor chart also gets a key page: the same chart with the tab `Answer Key` (it has no slots, so it is
+  otherwise identical). Every pupil page has exactly one key.
 - Keys print after the teacher pages, in pupil page order, then the T6 routing page.
 
 #### 8.12.8 Prerequisite routing [LR-17]
@@ -2681,7 +2719,7 @@ P-page from Part 9.
 | Q8 | Exit ticket as a 2-up slip with "I can do this." / "I need one more day." | Yes | §9.7 | Full-page exit ticket (no reflection) |
 | Q9 | SAY rule without italics (quotes + 13 pt + label); tab ids `Teacher n` | Yes | §10.3, §8.7 | Self-host Andika Italic for teacher pages |
 | Q10 | Keep "circle the mistake in a sequence" as count-row production items | Yes | Bank rule 4 | Delete them |
-| extra | One-symbol answers up to 15–16 per page | Yes | §8.11, §8.12.1 | Cap at 6 |
+| extra | One-symbol answers up to 15–16 per page | Settled by the owner's revised OR-b (2026-10-16): counts follow the capacity rules | §8.11, §8.12.1 | — |
 
 ### 8.14 Abbreviations — Preferred Usage Rule
 
@@ -2779,8 +2817,9 @@ widths are identical and the body is 18 mm shorter (fewer rows when needed, neve
 
 ### 9.1 P0 Prerequisite Check [LR-17, AUD C-10]
 
-Purpose: 3–4 questions, most basic first, each from ONE earlier lesson, so the teacher can route pupils
-before teaching (§8.12.8). Replaces the V20 warm-up (**Owner default Q3**).
+Purpose: 3–4 questions, most basic first, one for each **Pre-requisite atom on T2**, each from ONE earlier
+lesson, so the teacher can route pupils before teaching (§8.12.8). A question may hold two items of the same
+kind when one item alone would leave an empty band (Score then counts items). Replaces the V20 warm-up (**Owner default Q3**).
 
 ```
 | header 26 mm: Name / Date / Score /4 · tab Level n / strand / Prerequisite · title                    |
@@ -2833,7 +2872,7 @@ before teaching (§8.12.8). Replaces the V20 warm-up (**Owner default Q3**).
 |------------------------------------------------------------------------------------------------------|
 | [stack, step 3 state]        (3)[icon] Write how many.                                               |
 +======================================================================================================+
-| Model:                                                                                               |
+| Another example:                                                                                     |
 | Big number second? Start with it.        |  Same numbers? Start with either.                         |
 |   [final state, 30 pt]  [hops]           |    [final state, 30 pt]  [hops]                           |
 +------------------------------------------------------------------------------------------------------+
@@ -2845,18 +2884,22 @@ before teaching (§8.12.8). Replaces the V20 warm-up (**Owner default Q3**).
   right). Each panel is the same item in the state that step produces; the mark the step adds is GREY
   (the newest mark), earlier marks black. The step head is: accent numeral in a 10 mm circle, the step
   icon (8 mm), the step name in 18 pt bold (2–5 words, a print verb first). Under it one 15 pt line.
-- **Other examples** (`Model:` band, 1–3 cells): one final-state drawing for **every case the practice
-  will deal that the worked example does not show** (here: big number second; same numbers) [LR-1].
-  Each cell carries a one-line bold caption (≤ 8 words).
+- **Other examples** (`Another example:` band, or the last panel of a 2 × 3 panel grid, 1–3 cells): one
+  final-state drawing for **every case the practice will deal that the worked example does not show** (here:
+  big number second with a sum of 10; same numbers) [LR-1]. Each carries a one-line bold caption (≤ 8 words)
+  and is drawn **all in black** with every step done (grey would read "trace this" on a poster).
+- Panel layout: 3 steps → one full-width row per step (drawing left 42 %); 4–5 steps → a 2 × 3 grid of panels,
+  numeral + icon + step name on top, drawing, one 15 pt line under it, the 6th panel the other example.
 - `Say:` band with the filled oral frame; `Rule:` band with the chant (≤ 8 words, said twice in the
   plenary).
 - Poster sizing: drawings enlarge to fill the page (digits 34 pt in the panels, 30 pt in other examples);
-  never below 0.8× / 0.85× of the size they would be elsewhere. No Name, no Score, no slots, no key.
+  never below 0.8× / 0.85× of the size they would be elsewhere. No Name, no Score, no slots. Its key is the
+  same chart with the tab `Answer Key` (every pupil page has one key).
 
 ### 9.4 P3 Lesson sheet (Vocabulary · Remember · Guided Practice + Steps · Independent Practice) [LR-4, D17]
 
 ```
-| header 26 mm · Score /3 (Independent cells only) · tab Lesson 1                                      |
+| header 26 mm · Score /6 (Independent cells only) · tab Lesson 1                                      |
 +======================================================================================================+
 | Vocabulary:  Draw a line to match.                                                                   |
 |      [+]                    [=]                    [7 8 9 hops]      <- mini-diagrams, dot under each|
@@ -2873,15 +2916,19 @@ before teaching (§8.12.8). Replaces the V20 warm-up (**Owner default Q3**).
 +======================================================================================================+
 | Independent Practice:  Add.                                                                          |
 | a.                 | b.                 | c.                                                       |
+| d.                 | e.                 | f.                                                       |
 ```
 - Vocabulary: ≤ 3 terms, each a mini-diagram over a solid 2.5 mm dot, the shuffled words under dots;
   the dots face each other across a 12 mm channel (match with a line).
 - `Remember:` one line, ≤ 12 words (optionally a "Remember … NOT …" contrast line, Appendix C.4).
-- `Guided Practice:` 2–3 unlabelled cells carrying the chart's representation; **cell 1 has step 1 done
-  in grey**; the other hint scaffolds grey in every cell. `Steps:` panel 66 mm wide at the right (BD-4:
+- `Guided Practice:` 2–3 unlabelled cells carrying the chart's representation, **sized to their content**
+  (stack + answer row + pads: about 51 mm for a vertical fact, 62 mm for a regrouping stack). **Cell 1 has
+  step 1 done in grey and is the Model's case; the next cells are the other cases** (varied, never three of
+  one case); the other hint scaffolds grey in every cell. `Steps:` panel 66 mm wide at the right (BD-4:
   the Steps sit beside the cells), the numerals and icons in the accent.
-- `Independent Practice:` one row of 3 lettered cells, hint scaffolds off (structural ones stay).
-- The Guided and Independent bands share the spare height (equal flex).
+- `Independent Practice:` takes the remaining height in **whole rows of 3** lettered cells: add a row while
+  every cell stays at least its content height (one-symbol facts ≈ 45 mm, regrouping stacks ≈ 64 mm) and no
+  band ≥ 30 % is left (§8.9). Hint scaffolds off; structural ones stay. Score `/N` = the Independent count.
 
 ### 9.5 P4 Practice ×n (+ optional Mixed) [OR-b, D17, LR-8]
 
@@ -2897,15 +2944,19 @@ before teaching (§8.12.8). Replaces the V20 warm-up (**Owner default Q3**).
 |   (12 mm answer row, then the open work zone)                                                       |
 ```
 - Step strip (12 pt text, accent numerals and icons, a 0.75 pt rule under it), then the instruction,
-  then ONE framed grid. Count from §8.12.1: 6 (2 × 3) by default; 4 (2 × 2) for long procedures;
-  one-symbol answers up to 16 (vertical facts: 3 × 4 = 12, **Owner default — extra**).
+  then ONE framed grid. Count from §8.12.1 (revised OR-b): 6 (2 × 3) for a standard procedure (2-digit
+  regrouping with its Check line: 2 × 3, as on the site), 4 (2 × 2) for long procedures, one-symbol answers up
+  to 16 (vertical facts: 3 × 4 = 12).
 - The last row holds the edge cases (★★★): for example doubles, the big number second, a sum of 10.
 - A lesson prints 1–2 Practice pages (as many as the teacher asks). Each starts its letters at `a.`.
-- Optional Mixed page: earlier skills only, the lesson skill fills at least half the items, title
-  `Mixed practice`, tab line 2 omitted.
-- Item rules for every page of the packet [LR-2, LR-5…7]: only the cases the chart teaches; no item twice
-  in the packet (chart examples included, nor turned round); no turn-around pair on one page; no near
-  twins; at most one or two rare-case items per page.
+- Optional Mixed page: earlier skills only, the lesson skill fills at least half the items. It keeps the
+  pack's I Can title (R5); the band label `Mixed Review:` names it; tab line 3 `Mixed n`.
+- Item rules for every page of the packet [LR-2, LR-5…7]: only the cases the chart teaches; **no exact
+  repeat in the packet** (chart examples included); **no turn-around pair on one page**; a chart example is
+  never dealt turned round; no near twins; no two equal answers on one page where the pool allows; at most one
+  or two rare-case items per page. **Pool test:** count the distinct items the skill allows. When the pool is
+  smaller than the packet needs (add 1–3 within 10 has 39 ordered facts), turn-arounds may appear on later
+  pages, and the exit slip may repeat Practice items; nothing else may repeat (Appendix E24).
 
 ### 9.6 P5 Word problem (RCDWS panel) [AUD C-13, Owner default Q5]
 
@@ -2913,22 +2964,23 @@ before teaching (§8.12.8). Replaces the V20 warm-up (**Owner default Q3**).
 | header 26 mm · Score /1 · tab Word problem                                                           |
 | Read the story. Draw it. Solve.                                                                      |
 +-----------------------------------------------------------------+------------------------------------+
-| ( story box: 3 mm radius, 1.5 pt; one sentence per line,        | [ ] [read]   Read it two times.    |
-|   at most 4 lines, 15 pt, line height 1.45; fills the cell )    | [ ] [ring]   Circle the numbers.   |
-|                                                                 |              Underline the question.|
-|                                                                 | [ ] [draw]   Draw it.              |
-|                                                                 | [ ] [write]  Write the equation.   |
-|                                                                 | [ ] [check]  Solve. Check.         |
+| ( story box: 3 mm radius, 1.5 pt; one sentence per line,  | [ ] [read]      Read it two times.       |
+|   at most 4 lines, 15 pt, line height 1.45; fills the     | [ ] [ringnum]   Circle the numbers.      |
+|   cell; the last line is the answer line:                 | [ ] [underline] Underline the question.  |
+|   "Omar has ____ cars." )                                 | [ ] [draw]      Draw it.                 |
+|                                                           | [ ] [write]     Write the equation.      |
+|                                                           | [ ] [check]     Solve. Check.            |
 +-----------------------------------------------------------------+------------------------------------+
 | Workspace:                                         (the Draw-it zone, >= 60 mm tall; takes spare)  |
 |                                                                                                    |
 +====================================================================================================+
-|      ____   ( )   ____   =   ____                      ____  cars        <- equation frame + unit |
+|                      ____   ( )   ____   =   ____                    <- equation frame             |
 +----------------------------------------------------------------------------------------------------+
 | Say:  “The answer is ____ cars.”                                                                   |
 ```
-- Top row 86 mm: story ⅔, routine panel ⅓ (five check boxes 7 mm, each with an accent line-art icon and
-  the line at 15 pt). Word bank (≤ 4 words) only on a Guided (scaffolded) form; v1 = 1 problem per page,
+- Top row 72 mm: story 58 %, routine panel 42 % (78 mm): **six check boxes, one action each, one line each**
+  (7 mm box, accent line-art icon, the action at 13 pt — the Steps-box size — so each row fits on one line,
+  row height ≤ 9 mm). The answer-with-unit line sits inside the story box as its last line (SF-50). Word bank (≤ 4 words) only on a Guided (scaffolded) form; v1 = 1 problem per page,
   v2 (faded: no panel, "Solve. Write the number and the label.") = 2 per page.
 - Story rules: our own words (Q6), one sentence per line, ≤ 60 characters per line, the unit word in
   the story and pre-printed after the answer line, no idioms. The question is the last line.
@@ -2937,24 +2989,27 @@ before teaching (§8.12.8). Replaces the V20 warm-up (**Owner default Q3**).
 ### 9.7 P6 Exit slip (2-up half page) [AUD C-18, Owner default Q8]
 
 ```
-A4 landscape. Two identical halves (each about 126 mm wide), a dashed 0.75 pt cut line between them
-with the scissors glyph at its top. Each half:
-| Name ______________________               [tab: Level n / strand / Exit slip] |
-|                I Can add 1–3 (facts to 10)                                    |
-|===============================================================================|
-| Add.                                                                          |
-+-------------------------------------------------------------------------------+
-| a.  [one problem in the lesson's cell, stack in the left 62 mm]               |
-|     (the rest of the cell is open work space)                                 |
-+-------------------------------------------------------------------------------+
-| Say:  “5 plus 1 equals ____.”                                                 |
-+-------------------------------------------------------------------------------+
-  [ ] I can do this.
-  [ ] I need one more day.
+A4 landscape, margins 12 / 13 / 12 mm, live 271 x 186 mm. Two identical halves, each 132.5 mm wide, 6 mm
+apart, a dashed 0.75 pt cut line in the middle with the scissors glyph at its top. Each half:
+| Name ________________   Score ____ /4                  [tab: Level n / strand / Exit slip] |
+|                I Can add 1–3 (facts to 10)          (may wrap to 2 lines)                 |
+|============================================================================================|
+| Add.                                                                                       |
++---------------------------------------------+----------------------------------------------+
+| a.  big number first                        | b.  big number second, count 3 (Critical Atom)|
++---------------------------------------------+----------------------------------------------+
+| c.  same numbers                            | d.  sum of 10 (or: tens answer 0)             |
++---------------------------------------------+----------------------------------------------+
+| Say:  “a. 4 plus 3 equals ____.”                                                           |
++--------------------------------------------------------------------------------------------+
+  [ ] I can do this.      [ ] I need one more day.
 ```
-One footer for the sheet. No score record, no reflection writing. The two check boxes are the pupil's
-own signal to the teacher, not a tracker [SC-6]. Flip of Q8: one full-width exit problem per page with
-the same `Say:` band and no check boxes.
+- **4 items (2 × 2), one per case the chart teaches; cells equal; no lone item.** The items include the
+  Critical Atom's hardest case (here: big number second with a count of 3, which catches both "Starting
+  small" and "Counting the start"). Each item and the mistake it detects is listed on T5 Section 10.
+- Items are in the Practice cell format at 28 pt (stacks without T O heads), Score `/4`.
+- One footer for the sheet. No reflection writing. The two check boxes are the pupil's own signal to the
+  teacher, not a tracker [SC-6]. Flip of Q8: one full-width exit band of 4 items per page.
 
 ---
 ## Part 10 — Teacher pages: one family with the pupil pages (MANDATORY) [AUD §4]
@@ -2998,7 +3053,7 @@ Three rows; the words carry the meaning, black shapes repeat it:
 - solid circle — **`Most:`** → go on;
 - half-filled circle — **`About half:`** → a short reteach, then go on;
 - hollow circle — **`Fewer than half:`** → stop and reteach with a different, concrete example.
-Grid: 5 mm icon · 30 mm bold label · text.
+Grid: 5 mm icon · 36 mm bold label (so “Fewer than half:” stays on one line) · text.
 
 ### 10.7 T-ICON
 No emoji. Black line-art icons (Appendix B): Critical Atom `key`; language barrier `language`; why it
@@ -3015,10 +3070,10 @@ response (in scripts, tables and T6). Grey only where a teacher page reproduces 
 | Page | Layout (A4, body 245 mm) |
 |---|---|
 | **T1 Lesson at a glance** | One 11 pt line: `CCSS … · EE … · CRA: <stage> · Flow: Standard / Chunked`. Band `Lesson guidance:` with ≤ 3 boxes (Tips / one Watch). Band `Lesson flow:` a table (# · Section · Pupil page · Min) of the 9 sections + Transitions + Total = 60. Band `Materials:` a two-column check-box list (5 mm boxes). Band `Vocabulary:` ≤ 3 cards (3 mm rounded, 1.5 pt): mini-diagram, word 13 pt bold, gloss ≤ 8 words. Order fixed: title → standards → guidance → flow → materials → vocabulary. One page. |
-| **T2 Atomisation template** | Bands `What students need to know:` (Section 1 table) · `What students do:` (Section 2 table; Critical Atom row marked with the `key` icon and bold) · `How to teach:` · `Common mistakes:` (name · what it looks like · fix). Vocabulary cards (≤ 6, the pupil's 3 marked with a check box) when not already on T1. May continue (12 mm header). |
-| **T2b Reference key** | Band `Reference key:` with two columns (1fr 1fr, 4 mm gap) of 0.75 pt tables: page ids, fade levels, abbreviations, marks on teacher pages. Last line: "Print once per unit." Tab `Reference`. |
-| **T3–T5 Delivery** | One `Section n · Name (min)` band per section; a `Tip:` / `Watch:` box at its top where useful; then T-SCRIPT rows; a T-LOOP after any check. Where a pupil page is used, a **thumbnail of that pupil page** (the real page scaled to 26.2 %: 55 × 77.8 mm, 0.75 pt border, no answers) sits at the right of the first rows, so "Board = Paper" is visible. Inline expected answers in #C2410C. T3 = Sections 1–4, T4 = 5–6, T5 = 7–10. A section that does not fit continues on a page with the 12 mm header. |
-| **T6 Answer key** | The facsimile key of every pupil page in packet order (each its own page), then the routing page: band `Prerequisite routing:` (Question · Prerequisite · If missed → Lesson), `Accepted equations:` (word problem), `Answers at a glance:` (one row per pupil page), and the line "The anchor chart is fully worked and has no slots, so it has no separate key." |
+| **T2 Atomisation template** | Bands `What students need to know:` (Section 1 table: **# · Skill or Concept · Atom Type · Teacher Notes**; **at least 5 atoms**; types only Category / Comparative / Fact / Conceptual; Pre-requisite rows first, the Atom Type cell reading e.g. `Fact · Pre-requisite`; each Skill cell starts with a bold key name and a colon) · `What students do:` (Section 2 table: Step · Task / Routine atom · Tag · Check it with; tag words `Pre-requisite` / `New`, never ★; Critical Atom row marked with the `key` icon and bold) · `How to teach:` · `Common mistakes:` (Mistake · Broken step · Looks like · Fix) with one line linking each mistake to its Check Question option. Fill to ≥ 92 % of the body (site lint); continue on a 12 mm-header page if it does not fit. |
+| **T2b Reference key** | Band `Reference key:` with two columns (1fr 1fr, 4 mm gap) of 0.75 pt tables: page ids (+ packet order and the Score rule), fade levels, data loop shapes, abbreviations, slot shapes (with mini drawings), icons used, band labels. Footer right: `Teacher · Print once per unit`. Tab `Reference`. Filled to ≥ 92 % of the body. |
+| **T3–T5 Delivery** | One `Section n · Name (min)` band per section; a `Tip:` / `Watch:` / `Research:` box at its top where useful; then T-SCRIPT rows; a T-LOOP after any check. **Every delivery page shows at least one pupil-page thumbnail**: the real page scaled to 26.2 % (55 × 77.8 mm, 0.75 pt border, no answers) at the right of the first rows of the section that uses that page longest (T3: the Prerequisite Check; T4: the anchor chart and the lesson sheet; T5: Practice 1). More thumbnails only where they fit without a continuation page. Every item reference in a Note line carries its fade label (★ / ★★ / ★★★). T3 = Sections 1–4, T4 = 5–6, T5 = 7–10. A section that does not fit continues on a page with the 12 mm header. |
+| **T6 Answer key** | The facsimile key of every pupil page in packet order (each its own page, the anchor chart included), then the routing page: band `Prerequisite routing:` (Question · Prerequisite (T2 atom) · If missed → Lesson), `Accepted answers:` (every item with more than one right answer; one drawn on the key, the rest listed here), `Answers at a glance:` (Page · Answers · **Fade**, one row per page part, Practice split into its ★★ rows and its ★★★ last row), then `Wrong answers to look for when marking` (pupil wrote · likely mistake · next step). |
 
 ---
 
@@ -3344,7 +3399,7 @@ Answer key in T6. Circulate using the script above.
 ```
  See printed sheet — [Resource name], page [X]
 Work through problems [n–n] independently.
-SHOW WORK ON THE PRINTED SHEET.
+Show your work on the printed sheet.
 ```
 
 **Mini whiteboard format (for teacher page — We Do only):**
@@ -3678,13 +3733,10 @@ Example: **Tens Multiplication:** Multiplying a multiple of 10 by a multiple of 
 
 **Formatting rules for Atom Type column:**
 Render atom types in bold black (§10.4).
-`<td><span class="atom-type">FACT</span></td>`
-`<td><span class="atom-type">CATEGORY</span></td>`
-`<td><span class="atom-type">CONCEPTUAL</span></td>`
 
 | # | Skill or Concept | Atom Type | Teacher Notes |
 |---|-----------------|-----------|---------------|
-| 1 | **[Key Name]:** [one-sentence description] | `<span class="atom-type">Category / Comparative / Fact / Conceptual</span>` | Pre-requisite or New. What to watch for. |
+| 1 | **[Key Name]:** [one-sentence description] | Category / Comparative / Fact / Conceptual · Pre-requisite or New | Pre-requisite or New. What to watch for. |
 
 ---
 
@@ -3710,12 +3762,10 @@ routine succeeds or fails.
 
 **Formatting rules for Type column:**
 Render atom types in bold black (§10.4).
-`<td><span class="atom-type">TASK</span></td>`
-`<td><span class="atom-type">ROUTINE</span></td>`
 
 | Step | The action — what the student does | Teacher prompt | Type | Example |
 |------|-------------------------------------|---------------|------|---------|
-| 1 [Critical Atom] | **[Key verb]** [rest of action] | "[Exact prompt]" | `<span class="atom-type">Task / Routine</span>` | [What correct execution looks like] |
+| 1 [Critical Atom] | **[Key verb]** [rest of action] | "[Exact prompt]" | Task / Routine | [What correct execution looks like] |
 
 ---
 
@@ -3862,211 +3912,43 @@ specifications below keep their content; their V20 names are given in brackets.
 
 #### Section 1a — Number Sense Warm-Up (5 Minutes)
 
-> **V21 changes to this section.** Now **Section 2 · Number sense (5 min)**, pupil page P1 (§9.2, Owner default Q4). Both bands print as production slots; the P1 TRY THIS / CHALLENGE layout is replaced by bands A / B. Teacher answers in the key colour.
+> **V21 changes to this section.** Now **Section 2 · Number sense (5 min)**, pupil page P1 (§9.2, Owner default Q4). Both bands print as production slots in bands A / B; the V20 two-column layout is gone. Teacher answers in the key colour.
 
+**What it is.** Five number-sense items in two bands on pupil page P1 (§9.2): band A (numbers 2–4 grades
+below) and band B (the same five types, numbers 1–2 grades below). Drawn from the Number Sense Practice Bank,
+rotating categories across the week; Q1 is always a counting or skip-counting item.
 
-> **SECTION TIP PLACEMENT:** If a tip is generated for this section, render it as a
-> `.section-tip` box immediately above the delivery steps.
-> Draw from the library: **5.6 Do Now, 5.1 Daily Review, 6.1 Strong Start,
-> Habits and Routines, Pacing and Time Stamps, Do Now.**
-> Ask: which number sense category is being practised today? What is the most common
-> error for ELL/SPED students in this category at this grade level?
-> Only include if something genuinely lesson-specific can be said.
-> (e.g.  "Counting On, Not Back to Zero — that's the gap to catch here")
-
-**Purpose:** Mixed number sense and fluency practice drawn from 3–5 different
-categories each session. Both Easy and Hard versions are written on P1. Students
-work through their level; the teacher reads the Hard version aloud so all students
-hear it. No MWB-only questions — every answer is written on the student sheet.
-
-**Format:** 5 questions, mixed from across the 15 categories. Both Easy (TRY THIS)
-and Hard (CHALLENGE) versions printed side-by-side on P1 in two columns.
-
-- **Option A — Easy (2–4 grade levels below):** Left column on P1 labelled **TRY THIS**.
-  Students complete this first, writing all answers in the provided blanks/lines.
-- **Option B — Hard (1–2 grade levels below):** Right column on P1 labelled **CHALLENGE**.
-  Teacher reads these aloud as students work. Students who finish Easy move to Challenge.
-  All answers written directly on P1 — no MWBs needed for Section 1a.
-
-**Selecting problem types for this lesson:**
-Mix 3–5 types from different categories. At the top of the Number Sense section on T3
-list which categories are represented today and note any gap being targeted
-(e.g. "Q1: Counting sequence — practising count by 7s, not done this week. Q2: Fast
-facts — ×8 family. Q3: Place value — expanded form with zero placeholder, ties to today's
-lesson prerequisite.").
-
-**Sequence format (the most common type — always written):**
-Two formats rotate:
-- **Format A (mixed blanks):** Some numbers given, some blank.
-  `Start at 255, count by 5s: 255 → ___ → 265 → ___ → ___ → 280 → ___`
-  Half the terms are given as anchors; students fill the gaps.
-  Use when the skip value is tricky or students need visual anchors.
-- **Format B (write the next N):** Seed number given; all blanks follow.
-  `Start at 48, count by 7s. Write the next 6 numbers: 48 → ___ → ___ → ___ → ___ → ___ → ___`
-  Use when the skip value is simpler and fluency is the goal.
-
-For sequences: the teacher may lead a brief choral saying of the answers AFTER students
-have written them — not instead of writing. "Say the answers with me as I point." This
-adds an auditory reinforcement loop without replacing the written record.
-
-**Output format — teacher delivery page (T3):**
+**Teacher page format (T3, Section 2):**
 ```
-NUMBER SENSE WARM-UP — Mixed types: [list categories used, e.g. Cat.1 + Cat.3 + Cat.2 + Cat.7 + Cat.4]
-Rotation note: [which categories haven't appeared this week]
-
-★  TRY THIS (Easy — 2–4 grades below)    ★★  CHALLENGE (Hard — 1–2 grades below)
-
-Q1) [Type: Sequence — Format A or B]     Q1) [Same type, harder values]
-    [question text with blanks]               [question text with blanks]
-    Answer: [red — all terms]                 Answer: [red — all terms]
-
-Q2) [Type: Fast fact]                    Q2) [Same type, harder values]
-    [question text]                           [question text]
-    Answer: [red]                             Answer: [red]
-
-Q3) [Type: Place value]                  Q3) [Same type, harder values]
-    [question text]                           [question text]
-    Answer: [red]                             Answer: [red]
-
-Q4) [Type: Estimation / True-False]      Q4) [Same type, harder values]
-    [question text]                           [question text]
-    Answer: [red]                             Answer: [red]
-
-Q5) [Type: Number bond / Pattern]        Q5) [Same type, harder values]
-    [question text]                           [question text]
-    Answer: [red]                             Answer: [red]
+Section 2 · Number sense (5 min)
+ (1) Do:   Pupils do band A (1-5). Early finishers do band B (6-10).
+     Say:  “Point to the box. Say the number. Then write it.”
+ (2) Do:   Choral check: read each item and its answer together.
+     Note: A: <answers in the key colour> · B: <answers in the key colour>
 ```
+Rotation note (teacher page only): which categories have not appeared this week.
 
-**Delivery steps:**
-
-0.  DO: Point to the I CAN statement on the board and student sheet.
-    SAY: “Read this with me.”
-    DO: Read aloud together. 10 seconds. Brisk.
-
-1.  DO: Confirm worksheets open to page 1, Number Sense section.
-    SAY: *"Number sense time. Start with TRY THIS — write your answers in the blanks.
-    If you finish, move to CHALLENGE."*
-    DO: Give 3–4 minutes for students to work through both columns independently.
-    Circulate. Note which questions most students are leaving blank.
-
-    > Note: For sequences, whisper counting is deliberate and helpful — do not
-    > silence it. ELL students sub-vocalise to bridge the language-to-number gap.
-    > Listen for whether they count ON from the given number or reset to zero.
-    > Resetting to zero is the gap. That tells you more than checking the final answer.
-
-2.  DO: For any sequence question in the set, after students have written:
-    SAY: “Say the answers with me as I point.”
-    DO: Point to each term on the board (written as you go) — students read aloud together.
-    This adds an auditory loop after the written record, not instead of it.
-
-    > Note: Writing numbers while saying them simultaneously (the Choral Counting
-    > approach) makes place value patterns visible in real time. For ELL students,
-    > seeing the pattern while hearing it activates both verbal and visual channels
-    > (Dual Coding). The key: the teacher writes on the board AS students say it —
-    > not before. This makes the visual emerge from the oral, not replace it.
-
-3.  DO: After all 5 questions, read correct answers aloud. Students self-check.
-    SAY: “Check your answers. Circle anything to look at again.”
-    DO: Immediately move to Section 1b — no discussion, no hands.
-
-    > Note: No hands, no volunteers, no correction discussion. Self-check and move.
-    > Note which questions most students circled — these are candidates for next week's
-    > Number Sense category selection. Patterns in gaps are more useful than individual errors.
-
-Numbered circle: ①
-
----
+**Delivery steps:** 1. Hand out P1. 2. Read band A row 1 aloud; pupils write. 3. Pupils continue alone;
+circulate (ELL / SPED first). 4. Pupils who finish A start B. 5. Choral check of A, then B. Every answer is a
+production slot (box, line, circle); nothing is multiple choice.
 
 #### Section 1b — Spaced Retrieval (5 Minutes)
 
 > **V21 changes to this section.** Now **Section 3 · Spaced retrieval (3 min)**: mini whiteboards only, nothing printed (Owner default Q3). Domain labels print as plain 11 pt words in brackets on the teacher page (grey is never used for words). Option B is 1–2 grades below, as in the bank table.
 
+**What it is.** Three quick cross-domain questions on **mini whiteboards only — nothing is printed**
+(Owner default Q3). Earlier topics only, one per domain, 1–2 grades below the lesson (Option B of the bank
+table). Domain labels appear on the teacher page only, as plain 11 pt words in brackets.
 
-> **SECTION TIP PLACEMENT:** If a tip is generated for this section, render it as a
-> `.section-tip` box immediately above the delivery steps.
-> Draw from the library: **Retrieval Practice, Interleaving, Spaced Practice,
-> 1.4 Replace Self-Report, 6.2 Habits of Attention, 5.3 Spaced Practice.**
-> What cross-domain retrieval gap is most likely to surface today?
-> Only include if something lesson-specific can be said. Skip if not needed.
-> (e.g.  "Fractions in Q5 — that's where gaps will show")
-
-**Format:** 6 questions. Two versions printed/called out simultaneously.
-
-- **Option A — Easy (2–3 grade levels below):** PRINTED on student sheet (P1), below
-  the Number Sense section. Students complete in their booklets.
-- **Option B — Hard (0–1 grade levels below):** Called out verbally. Mini whiteboards
-  ONLY. Never printed on student sheets.
-
-Both versions cover exactly five math domains across Q1–Q5, one question per
-domain: (1) multiplication/operations, (2) geometry, (3) place value,
-(4) measurement, (5) fractions. Q6 in both versions = a word problem from a
-domain unrelated to today's lesson.
-
-**Internal planning (never appears in output):**
-- Q1–Q5: span different temporal distances (recent → distant)
-- Domains: one per question, five total, no clustering
-- Q6: cross-domain word problem (money, time, area — never today's topic)
-
-**Q6 word problem sentence rules (prevents bunching):**
-- Write as TWO separate sentences on separate lines, not one run-on sentence.
-- Line 1: the scenario (who, what, amount). Line 2: the question.
-- Do NOT run the dollar/unit symbol directly into the next word without a space.
-- Correct: "Sara has $20. She buys a toy for $12. How much is left?"
-- Incorrect (bunched): "Sara has$20.Shebuysatoyfor$12.Howmuchleft?"
-- Both Option A and Option B word problems follow this two-sentence structure.
-
-**Output format — teacher delivery page (T3):**
-
-Domain labels appear in small grey text in square brackets on the teacher page only.
-Both Easy and Hard versions show the domain label — teachers need to know which
-domain each question is testing regardless of which version they are reading aloud.
-Domain labels NEVER appear on student sheets.
-
+**Teacher page format (T3, Section 3):**
 ```
-OPTION A — EASY  (2–3 grade levels below)  [printed on pupil page P1]
-★  1)  [Question]     [multiplication]
-★  2)  [Question]     [geometry]
-★  3)  [Question]     [place value]
-★  4)  [Question]     [measurement]
-★  5)  [Question]     [fractions]
-★★ 6)  Word Problem: [Cross-domain — active voice, max 12 words/sentence]
-
-OPTION B — HARD  (0–1 grade levels below)  [mini whiteboards only — NOT printed]
-★  1)  [Question]     [multiplication]
-★  2)  [Question]     [geometry]
-★  3)  [Question]     [place value]
-★  4)  [Question]     [measurement]
-★  5)  [Question]     [fractions]
-★★ 6)  Word Problem: [Cross-domain — active voice, max 12 words/sentence]
+Section 3 · Spaced retrieval (3 min, mini whiteboards)
+ (1) Ask:  “<question 1>”  <answer in the key colour>   [domain]
+     Ask:  “<question 2>”  <answer>                      [domain]
+     Ask:  “<question 3>”  <answer>                      [domain]
 ```
-
-Note: Domain labels are in square brackets in grey text. Both versions show the same
-five domains in the same order — the questions are harder, the domain is identical.
-
-**Delivery steps:**
-
-1.  DO: Confirm worksheets are still open to page 1 (Spaced Retrieval section).
-    SAY: “Now spaced review. Same routine — I read, you write. 10 seconds each.”
-
-2.  DO: Read Option B questions aloud one at a time.
-    SAY: “[Question].”
-    DO: Count silently to 10.
-    SAY: “Show me in 3, 2, 1.”
-
-    > Note: Scan ALL boards before anyone flips or erases. Note which students got
-    > which questions wrong — these students get your first visit during You Do.
-
-3.  ASK: “What operation did you choose for Q6? Tell your partner. 10 seconds.”
-    DO: After 10 seconds, cold call one pair.
-    ASK: “[Name] — what did your partner say?”
-
-    > Note: Don't review every answer. Read correct answers aloud, pause for
-    > self-check, move on. Speed matters here — the value is in the retrieval act,
-    > not the discussion.
-
-Numbered circle: ①
-
----
+**Delivery:** read each question, count silently to 5, “3-2-1, show me”, scan every board, name the most
+common wrong answer without naming the pupil, then the next question.
 
 #### Section 2 — Prerequisite Check (3 Minutes)
 
@@ -4086,7 +3968,7 @@ at least one yes/no question.
 
 Each task must appear on the teacher delivery page with:
 - The exact question to ask
-- The correct answer (in red)
+- The correct answer (in the key colour #C2410C, bold)
 - What to look for on the boards
 - Which building block it checks (from T2 Section 1)
 
@@ -4100,7 +3982,7 @@ Each task must appear on the teacher delivery page with:
     DO: Count silently to 5.
     SAY: “Show me in 3, 2, 1.”
 
-    > Note: Correct answer for Task 1 is shown in red on this page.
+    > Note: Correct answer for Task 1 is shown in the key colour on this page.
     > If more than 3 students show a wrong answer → go to step 3a.
     > If most boards are correct → go to step 3b.
 
@@ -4326,12 +4208,12 @@ consistent, and removes any social negotiation mid-lesson.
     > Only use the think-aloud on Task 2 (not Task 1 or Task 3) to keep the We Do moving.
 
 2.  DO: Put the sentence frame on the board (as a `Say:` line on the teacher page).
-    Show the expected answer in **red text** (`.sf-answer` class) directly below the
+    Show the expected answer in the key colour (#C2410C, bold) directly below the
     blank(s) on the teacher delivery page — so the teacher sees the target response
     without students needing to see it on their copy.
     Format on teacher page:
     `"I will __________ because I am finding the __________."`
-    `Expected: "I will subtract because I am finding the difference."`  *(red)*
+    `Expected: "I will subtract because I am finding the difference."`  *(key colour)*
     SAY: “Talk to your partner: [specific question about this task]. Partner A starts. 30 seconds. Go.”
     DO: After 30 seconds:
     ASK: “Partner B — what did your partner say?”
@@ -4340,7 +4222,7 @@ consistent, and removes any social negotiation mid-lesson.
     > Note: Always give students three things before partner talk: WHAT to
     > discuss, WHO goes first, HOW LONG. Without all three, talk drifts.
     > The sentence frame lets English language learners start without worrying
-    > about vocabulary. The red expected answer on the teacher page means the
+    > about vocabulary. The key-colour expected answer on the teacher page means the
     > teacher knows what a complete, correct response sounds like before calling on anyone.
 
 3.  DO: Repeat steps 1–2 for Task 2 (★★).
@@ -4372,9 +4254,9 @@ Numbered circle: ④
 whether to move on, fix a specific mistake, or reteach. Every wrong answer
 corresponds to a specific mistake from T2. This is the teacher's decision point.
 
-**Format:** 3 answer choices. One correct (green on teacher page). Two wrong —
+**Format:** 3 answer choices. One correct (a check mark and the key colour on the teacher page). Two wrong —
 each matching a named mistake from the Common Mistakes table on T2 (shown in
-plain English in red on teacher page).
+plain English, bold black, on the teacher page).
 
 **Delivery steps:**
 
@@ -4435,24 +4317,17 @@ feedback without giving away answers.
 
 **Problem set — grade band determines the target count (see Grade Band spec):**
 - **PK–2:** Minimum 3 problems, target 5–6 (not counting the word problem).
-- **Grades 3–5:** Minimum 5 problems, target 8–10 (not counting the word problem).
+- **Grades 3–5:** Practice pages hold the count of §8.12.1 (6 a page; 4 for long procedures; up to 16 one-symbol answers), 1–2 pages, plus the lesson-sheet Independent rows (not counting the word problem).
 Aim closer to the target than the minimum. If the source PDF contains more problems
 than the target, use all of them — there is no upper limit from a source worksheet.
 All problems are paper-based — on the generated student worksheet or on a
 referenced printed sheet. Never delivered verbally or on mini whiteboards.
 
-**Faded Worked Example + Text Hint structure (mandatory for ★):**
-- ★ Q1–2: **Both scaffolds together** — the first one or two steps of the procedure are
-  already written on the student sheet (completion problem), AND a brief text hint is
-  printed below the pre-filled steps. Simple numbers.
-  Example for partitioning 2,345:
-  `2,345 = 2000 + ____ + ____ + ____`
-  `Hint: Say the number aloud — you are saying the parts.`
-- ★★ Q3–4: **Partially faded only** — the final step or critical atom step is blank.
-  No text hint. Slightly harder numbers.
-  Example: `4,052 = 4000 + 0 + ____ + ____`
-- ★★★ Q5+: **Fully blank** — no pre-filled steps, no hints. Multi-step or cross-topic.
-  Generate as many ★★★ problems as the content supports — do not cap at Q5.
+**Fade structure (§8.12.5):**
+- ★ (Guided, on the lesson sheet): cell 1 has step 1 in grey; hint scaffolds grey in every Guided cell.
+- ★★ (Independent rows and Practice rows): structure only — digit grid, regroup strip, frames, unit word.
+- ★★★ (the last Practice row): the lesson's edge cases in the SAME cell format. Cross-topic or reversed items
+  only if the lesson taught them.
 
 > Note: The two ★ scaffolds work differently and reinforce each other. The completion
 > problem removes the production demand for steps the student cannot yet carry out reliably,
@@ -4475,7 +4350,7 @@ referenced printed sheet. Never delivered verbally or on mini whiteboards.
 
 2.  DO: While circulating, look for the specific mistakes listed in the `Watch:`
     box on this page [mistake names in plain English and what they look like].
-    When you spot a mistake, point to the specific step — do not circle it in red.
+    When you spot a mistake, point to the specific step — do not mark it.
     ASK: “[Process question for most common mistake — e.g. 'Which step do you do first? Point to it.']”
     ASK: “[Process question for second mistake — lesson-specific]”
 
@@ -4555,14 +4430,9 @@ only. The sentence frame and word bank do the scaffolding.
 
 **Student page format (P5):**
 - Problem statement in the story box (§9.6), no italic
-- 2×2 grid:  READ IT /  CIRCLE IT /  DRAW IT /  WRITE IT
-  (one plain hint line under each emoji, then blank space)
--  SOLVE IT & CHECK (3 checkboxes + verification line)
-- Equation line (blank — student writes here)
-- Sentence fill-in (blank frame with underscored blanks — **no answers, no red text**)
-- Word bank chips (4–5 words, purple background) — the ONLY support provided
-  **Student pages NEVER show completed sentence frames, expected answers, or red text.
-  Blanks remain blank. Word bank is the sole scaffold. Answers are on the teacher page only.**
+- The pupil page is P5 (§9.6): story box with its answer line, the six-line RCDWS check-box panel, the
+  `Workspace:` band, the equation frame and the `Say:` band. No emoji, no word-bank chips on v1 beyond a
+  bank of ≤ 4 words on the Guided form, no sentence writing. Answers are on the key and the teacher page only.
 
 **Delivery steps:**
 
@@ -4864,7 +4734,7 @@ for ELL students; new domain lesson.
 | 5 — Students sort it | You Do | Sort or analogy using the target word |
 | 6 — Students use it in writing | Plenary | Exit reflection requires the target word |
 
-Student vocabulary box (`--purple-light` background):
+Pupil vocabulary box (3 mm rounded, 0.75 pt black outline, no fill; the word + a drawing zone, never "in my own words"):
 ```
  VOCABULARY
 Word: _______________
@@ -5070,7 +4940,7 @@ ASK: “Before I tell you — how do you know your answer makes sense?”
 ---
 
 **20. PROCESS FEEDBACK (when work is wrong)**
-DO: Point to the step where the error is. Do not circle it in red — just point.
+DO: Point to the step where the error is. Do not mark it — just point.
 ASK: “What were you trying to do at this step?”
 ASK: “What does the rule say about [the thing the student got wrong]?”
 
@@ -5342,24 +5212,22 @@ section for the full specification.
   (solid circle) Most correct → move on
 
 **You Do — Independent Practice:**
-- Minimum 5 problems, target 10, not counting the word problem. Aim closer to 10 than 5.
+- Practice pages hold the §8.12.1 count (revised OR-b), 1–2 pages, not counting the word problem.
   If the source PDF has more than 10 practice problems, use all of them — there is no
   upper limit when problems come from a source worksheet.
-- **Faded Worked Example + Text Hint (mandatory for ★):** ★ problems = completion
-  problems (first 1–2 steps pre-filled) PLUS a brief text hint below the pre-filled steps.
-  ★★ problems = final step only blank, no hint. ★★★ problems = fully blank, no hint.
+- **Fade (§8.12.5):** ★ = Guided cells (cell 1 has step 1 in grey; hint scaffolds grey); ★★ = Independent
+  (structure only); ★★★ = the last Practice row of edge cases in the same format.
 - **ALWAYS paper-based.** You Do problems must be on the generated student worksheet or
   on a referenced printed sheet (Method E). Never delivered verbally or on mini whiteboards.
 - Circulation Script: ELL and SPED students first within 60 seconds.
   Feedback at Process or Self-Regulation level only — never give the answer.
-- Responsive Scaffolding: 3 correct ★★ in a row → offer ★★★ without pre-filled steps.
+- Responsive Scaffolding: 3 correct ★★ in a row → move to the ★★★ row.
   Stuck on ★ after 2 tries → sit with student, reteach at ★ level.
 - Peer Tutoring trigger: when a student is secure at ★★ (3+ correct) AND another student
   is slow but not confused at ★, pair them briefly — one specific step, teacher-scripted,
   teacher-checked within 2 minutes. Never replace your own visit with a peer tutor.
-- Student Mastery Practice cards: 2-column grid. ★ cards have first 1–2 steps pre-printed.
-  "SHOW WORK BELOW:" top-aligned. ★★★ cards fully blank.
-- Extension Challenges: dashed-border boxes. "FINAL ANS" flush right.
+- Practice pages follow §9.5: one ruled grid, the step strip on top, the edge cases (★★★) in the last row,
+  in the same cell format. No cards, no dashed boxes, no capital labels.
 
 **Word Problem (mandatory every lesson):**
 - Single ★★ version only. Sentence frame and word bank are the primary
@@ -5385,9 +5253,8 @@ section for the full specification.
 - Use all six atom types in every lesson — do not drop any type. Atom type names are:
   Category / Comparative / Fact / Task / Routine / Conceptual. Never use "Transformation"
   as an atom type — it is an older term for "Task." All generated output must use "Task."
-- Write ★ You Do problems with BOTH scaffolds: first 1–2 steps pre-filled (completion
-  problem) AND a brief text hint below the pre-filled steps. Write ★★ problems with only
-  the final step blank and no text hint. Write ★★★ problems fully blank with no hints.
+- Apply the fade of §8.12.5 to You Do: ★ Guided (step 1 grey in cell 1, hints grey), ★★ Independent
+  (structure only), ★★★ last-row edge cases. Structural scaffolds stay at every level.
 - Include the Schema Connection Hook (Step 0) at the start of every I Do — name the prior
   learning this lesson extends and the next learning it unlocks. Two sentences maximum.
 - Follow the 6-step I Do structure (Steps 0–5) exactly as specified: Schema Hook →
@@ -5452,8 +5319,7 @@ section for the full specification.
 - Include Full Chain, Sub-Chain, or Variation Sequence tables as standalone output.
 - Cut off or squeeze content to hit a page target — add pages as needed.
 - Use percentage thresholds in data loop labels — use plain English only.
-- Write text hints as the *sole* scaffold for ★ problems — ★ problems must always pair
-  both: pre-filled steps AND a text hint.
+- Print a ★ cell without its grey step-1 trace and grey hint scaffolds, or print hints on ★★ cells.
 - Use "Transformation" as an atom type label anywhere in generated output.
 - Use atom type abbreviations (Cat, Com, F, Con, T, R) anywhere in generated output.
 - Use generic category labels as tip titles at either tier ("The hardest moment:", etc.).
@@ -5597,6 +5463,19 @@ than under-script. Pair every procedure with a visual.
 | Analog clock `clock` (hour, half hour, 5 min) | diameter 50 mm (38 mm in half-width panels) | 3 |
 | Analog clock (1 min; draw the hands) | 52 mm | 3 |
 | Hop track `hopTrack` | pitch 11 mm, numbers 15 pt bold | — |
+| Column subtraction with regroup strip `columnStackSub` | tracks 0.95 em at 28 pt (9.4 mm); regroup strip 8 mm; answer strip 12 mm; about 30 × 52 mm (+ 9 mm Check line) | 3 (2 with the Check line) |
+| 2D shape `shape` (judge, name, partition) | bounding box 42 mm | 3 |
+| Angle (arm length) | 35 mm | 3 |
+| Coordinate grid (cell) | 8 mm | 1–2 |
+| Generic coins | diameters 17.5 / 19.75 / 22.0 / 24.26 mm for 1 / 5 / 10 / 25 (scale 1.0) | 2 |
+| Ruler | true scale only (print at 100 %) | 1 |
+| Digital clock | 48 × 19 mm | 3 |
+| Clock with outer minute ring (Model) | 65 mm | 2 |
+| Tenths strip | 70 × 16 mm | 2 |
+| Area model (cell) | 25 × 14 mm | 1 |
+| Base-ten, 300 and over | unit 2.5 mm, flats 5 per row: 174.5 × 52 mm | 1 |
+| Graph (plot area) | 100 × 80 mm | 1 |
+| Tally box | 32 × 12 mm | — |
 
 ### 19.4 Worked example format [BD-4, LR-1, AUD §2]
 
@@ -5707,6 +5586,7 @@ html, body { margin: 0; padding: 0; background: #fff; }
   display: flex; flex-direction: column; justify-content: center; text-align: center; font-size: var(--tabtext); line-height: 1.12; font-weight: 700; }
 .tab span:last-child { font-weight: 400; }
 .title { height: 8mm; margin-top: 1mm; display: flex; align-items: center; justify-content: center; font-size: var(--title); font-weight: 700; white-space: nowrap; }
+.pg.land .title { white-space: normal; height: auto; min-height: 8mm; text-align: center; line-height: 1.15; }  /* a half-page title may wrap (HD-14) */
 .rowA > .title { position: absolute; left: 0; right: 0; bottom: 0; height: 14mm; margin: 0; pointer-events: none; } /* lifted title */
 .hrule { border-top: var(--rule) solid var(--ink); margin: 1.2mm 0 1mm; }
 .hd.cont .rowA { height: 8mm; }
@@ -6001,6 +5881,8 @@ here. The V21 addition is marked.
 | `default-order` | Write the numbers in order. | default adapter: ordering items with no stated direction |
 | `default-solve` | Solve. | default adapter: any other answer type |
 | `story-rcdws` (V21) | Read the story. Draw it. Solve. | word problem v1 with the RCDWS panel (P5) |
+| `partition` (V21) | Draw a line to make 2 equal parts. | partition a shape into halves (Appendix H) |
+| `equal-parts` (V21) | Are the parts equal? Check one box. | judge equal parts; labels `Equal parts` / `Not equal parts` |
 
 Rules: at most 12 words and three sentences, each starting with a print verb (a question may open a
 decide instruction); the same task always gets the same string; "Do _not_ solve." always last, with
@@ -6323,6 +6205,7 @@ export const ICONS = {
   // V21 additions for the word-problem routine (RCDWS) - same style:
   read: '<path d="M5 2.2 Q3 1 0.8 1.4 V8.4 Q3 8 5 9.2 Q7 8 9.2 8.4 V1.4 Q7 1 5 2.2 Z"/><path d="M5 2.2 V9.2"/>',
   ringnum: '<ellipse cx="5" cy="4.2" rx="4.1" ry="3.4"/><path d="M4.4 2.6 L5.4 2 V6.4"/><path d="M0.8 9.3 H9.2"/>',
+  underline: '<path d="M0.8 5 Q2.4 1.6 4 5 Q5.6 8.4 7.2 5 Q8.2 3 9.2 4"/><path d="M0.8 9 H9.2"/>',
   draw: '<rect x="0.8" y="0.8" width="8.4" height="8.4" rx="1"/><path d="M2.4 6.8 Q3.6 3 5 5.4 Q6.4 7.6 7.6 3.2"/>',
   // V21 teacher icons (T-ICON), drawn in BLACK on teacher pages:
   tip: '<path d="M3.2 7.2 Q1.2 5.6 1.6 3.6 Q2.2 0.8 5 0.8 Q7.8 0.8 8.4 3.6 Q8.8 5.6 6.8 7.2 Z"/><path d="M3.4 8.4 H6.6 M3.8 9.6 H6.2"/>',
@@ -6423,6 +6306,100 @@ export function shape({ kind = 'rect', w = 42, h = 30, task = 'judge', guides = 
 }
 ```
 
+### D.2 Pack kit (copy whole): the page frame, teacher parts and pack assembly
+
+`makeKit(L, R)` returns the frame builders (header with the lift rule, footer with the © line, strand tab,
+`pupilPage`, the 2-up `exitPage`), the teacher parts (`sec`, `tbox`, `sc`, `loop`, `table`, `withThumb`), and
+`document()`, which orders the pack: teacher pages, the pupil packet, one facsimile key per pupil page (the
+anchor chart included), then T6. `poolCheck()` reports exact repeats and same-page turn-arounds (E24).
+
+```js v21-packkit
+// ===== V21 pack kit (copy whole): the page frame, teacher-page parts and pack assembly. =====
+// Pure functions over a lesson description L and the drawing recipes R (Appendix D). Every page a lesson
+// builds goes through `page()` so the frame (header, strand tab, title, footer, © line) is identical everywhere.
+// L = { title, level, strand, foot, seed, steps: [[iconId, text], ...] }
+export function makeKit(L, R) {
+  const { icon } = R;
+  const LET = 'abcdefghijklmnopqrstuvwxyz';
+  const COPY = `© ${L.year || 2026} Cultivating the Digital. All rights reserved.`;
+  const tab = (l3, two = false) => `<div class="tab"><span>${L.level}</span>${two ? '' : `<span>${L.strand}</span>`}<span>${l3}</span></div>`;
+  // Full header (fields) or lifted header (no fields: anchor chart, teacher pages).
+  function header({ fields = true, score = null, l3, key = false }) {
+    // Lift the title into row A only when it is <= 118 mm wide (about 34 characters at 18 pt, HD reflow); else row A holds the tab alone.
+    if (!fields && L.title.length <= 34) return `<div class="hd"><div class="rowA"><div class="title">${L.title}</div>${tab(key ? 'Answer Key' : l3)}</div><div class="hrule"></div></div>`;
+    if (!fields) return `<div class="hd"><div class="rowA">${tab(key ? 'Answer Key' : l3)}</div><div class="title">${L.title}</div><div class="hrule"></div></div>`;
+    return `<div class="hd"><div class="rowA">` +
+      `<div class="fld name">Name <i>${key ? 'Answer Key' : ''}</i></div><div class="fld date">Date <i></i></div>` +
+      (score != null ? `<div class="fld score">Score <i></i><b>/${score}</b></div>` : '') + tab(key ? 'Answer Key' : l3) +
+      `</div><div class="title">${L.title}</div><div class="hrule"></div></div>`;
+  }
+  const footer = (centre, right) => `<div class="ft"><span>${L.foot}</span><span><b>${centre}</b></span><span>${right}</span><span class="copy">${COPY}</span></div>`;
+  const page = ({ id, cls = '', head, body, foot }) => `<section class="pg ${cls}" data-page="${id}">${head}<div class="body">${body}</div>${foot}</section>`;
+  const stepIcons = (i) => `<span class="num" data-accent>${i + 1}</span>${icon(L.steps[i][0])}`;
+  const stepsStrip = () => `<div class="sstrip"><b>Steps:</b><ol>${L.steps.map(([, t], i) => `<li>${stepIcons(i)}<span>${t}</span></li>`).join('')}</ol></div>`;
+  const stepsList = () => `<ol class="steps" style="flex:1;padding:2mm 3mm 3mm">${L.steps.map(([, t], i) => `<li>${stepIcons(i)}<span>${t}</span></li>`).join('')}</ol>`;
+  const k = (v) => `<b class="ka">${v}</b>`;                     // an answer: shown only on the key
+  const lt = (i) => `<span class="lt">${LET[i]}.</span>`;
+  // ---- teacher parts ----
+  const sec = (title, inner, grow = false) => `<div class="band${grow ? ' grow' : ''}"><div class="strip"><b>${title}</b></div><div class="tpad" style="border-top:1.5pt solid #000;${grow ? 'flex:1;' : ''}">${inner}</div></div>`;
+  const tbox = (kind, lab, title, text) => `<div class="tbox${kind === 'watch' ? ' watch' : ''}">${icon(kind, { color: 'ink' })}<div><b>${lab}</b> <b>${title}</b> ${text}</div></div>`;
+  const sc = (n, rows) => `<div class="sc"><span class="num" data-accent>${n}</span>${rows.map(([l, t]) => `<b>${l}</b><span${/^(Say|Ask)/.test(l) ? ' class="q"' : ''}>${t}</span>`).join('')}</div>`;
+  const ans = (t) => `<span class="ka">${t}</span>`;               // expected answer on a teacher page
+  const blank = (mm = 17) => `<span class="ln" style="--w:${mm}mm;height:5mm"></span>`;  // a said blank, never underscores
+  const LOOP = { most: '<circle cx="2.5" cy="2.5" r="2" fill="#000"/>', half: '<circle cx="2.5" cy="2.5" r="2" fill="none" stroke="#000" stroke-width=".27"/><path d="M2.5 .5 A2 2 0 0 0 2.5 4.5 Z" fill="#000"/>', few: '<circle cx="2.5" cy="2.5" r="2" fill="none" stroke="#000" stroke-width=".27"/>' };
+  const loop = (rows) => `<div class="loop">${rows.map(([kk, lab, t]) => `<svg viewBox="0 0 5 5" width="4mm" height="4mm">${LOOP[kk]}</svg><b>${lab}</b><span>${t}</span>`).join('')}</div>`;
+  const loopIcon = (kk) => `<svg viewBox="0 0 5 5" width="4mm" height="4mm" style="display:inline-block;vertical-align:-.6mm">${LOOP[kk]}</svg>`;
+  const num = (c) => /^(<b>)?\d+(<\/b>)?$/.test(String(c));
+  const table = (heads, rows) => `<table class="tt"><tr>${heads.map((h, i) => `<th${i === heads.length - 1 && /^(min|fade)$/i.test(h) ? ' class="r"' : ''}>${h}</th>`).join('')}</tr>` +
+    rows.map((r) => `<tr>${r.map((c, i) => `<td${i === r.length - 1 && (num(c) || /^★+$/.test(String(c))) ? ' class="r"' : ''}>${c}</td>`).join('')}</tr>`).join('') + `</table>`;
+  const chk = (t) => `<div><span class="chk" style="width:5mm;height:5mm;vertical-align:-1mm"></span>${t}</div>`;
+  const thumb = (pageHtml) => `<div class="thumb">${pageHtml}</div>`;
+  // A section with a pupil-page thumbnail at the right of its first rows (§10.9).
+  const withThumb = (left, pageHtml) => `<div style="display:flex;gap:4mm"><div style="flex:1;display:flex;flex-direction:column;gap:1.5mm;min-width:0">${left}</div>${thumb(pageHtml)}</div>`;
+  const tpage = (id, l3, body, n, N, right = 'Teacher · Form A · seed ' + L.seed, key = false) =>
+    page({ id, cls: key ? 'key teacher' : 'teacher', head: header({ fields: false, l3 }), body: `<div class="t" style="display:contents">${body}</div>`, foot: footer(`${n}/${N}`, right) });
+  // ---- pupil page wrappers ----
+  const pupilPage = ({ id, l3, score, body, key = false, fields = true }) => page({ id: id + (key ? '-key' : ''), cls: key ? 'key' : 'pupil',
+    head: header({ fields, score, l3, key }), body, foot: footer('1/1', `${key ? 'Answer Key · ' : ''}Form A · seed ${L.seed}`) });
+  // 2-up exit slip: A4 landscape, two identical 132.5 mm halves, 6 mm between them with the dashed cut line (§9.7).
+  const exitPage = ({ id = 'P6', half, key = false }) => `<section class="pg land ${key ? 'key' : 'pupil'}" data-page="${id}${key ? '-key' : ''}">` +
+    `<div class="body"><div style="flex:1;display:flex;gap:6mm;position:relative">${half(key)}<div class="cut" data-cut></div>` +
+    `<div style="position:absolute;left:50%;top:0;transform:translate(-50%,0);background:#fff;padding:1mm 0">${icon('scissors', { color: 'ink', mm: 5.8 })}</div>${half(key)}</div></div>` +
+    footer('1/1', `${key ? 'Answer Key · ' : ''}Form A · seed ${L.seed}`) + `</section>`;
+  const exitHead = (key) => `<div class="rowA" style="gap:3mm"><div class="fld name" style="min-width:40mm">Name <i>${key ? 'Answer Key' : ''}</i></div>` +
+    `<div class="fld score">Score <i></i><b>/4</b></div>${tab(key ? 'Answer Key' : 'Exit slip')}</div><div class="title">${L.title}</div><div class="hrule"></div>`;
+  const exitFoot = () => `<div style="flex:none;display:flex;gap:10mm;padding:3mm 3mm 0;font-size:15pt"><div><span class="chk" data-slot="check"></span>I can do this.</div><div><span class="chk" data-slot="check"></span>I need one more day.</div></div>`;
+  // ---- assembly: teacher pages, the pupil packet, then keys of every pupil page (the anchor chart too), then T6 ----
+  function document({ teacher, pupil, routing, titleTag }) {
+    const N = teacher.length + 1;
+    const pages = teacher.map((t, i) => tpage(t.id, t.l3, t.body, i + 1, N, t.right));
+    for (const p of pupil) pages.push(p.render(false));
+    for (const p of pupil) pages.push(p.render(true));
+    pages.push(tpage('T6', 'Answer Key', routing, N, N, undefined, true));
+    return { pages, html: (css) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">` +
+      `<title>${titleTag}</title><style>${css}</style></head><body>${pages.join('\n')}</body></html>` };
+  }
+  return { LET, tab, header, footer, page, stepsStrip, stepsList, stepIcons, k, lt, sec, tbox, sc, ans, blank, loop, loopIcon, table, chk, thumb, withThumb,
+    tpage, pupilPage, exitPage, exitHead, exitFoot, document };
+}
+
+// Item-pool check (Appendix E24): exact repeats in the packet and turn-around pairs on one page.
+// pages: [{ id, items: [[a, b], ...], mayRepeat: bool }]
+export function poolCheck(pages) {
+  const seen = new Map(); let repeats = [], turns = [];
+  for (const p of pages) {
+    const keyset = new Set(p.items.map(([a, b]) => `${a},${b}`));
+    for (const [a, b] of p.items) {
+      const kk = `${a},${b}`;
+      if (seen.has(kk) && !p.mayRepeat) repeats.push(`${a}+${b} (${seen.get(kk)} / ${p.id})`);
+      if (!seen.has(kk)) seen.set(kk, p.id);
+      if (a !== b && keyset.has(`${b},${a}`) && a > b) turns.push(`${a}+${b} / ${b}+${a} on ${p.id}`);
+    }
+  }
+  return { repeats, turns };
+}
+```
+
 ---
 
 ## Appendix E — Pre-output self-check (MANDATORY; every check must pass before the pack is issued)
@@ -6435,6 +6412,7 @@ measurements; the 3 mm cell padding is structure, not an empty band.
 | # | Check | How to measure | Pass |
 |---|---|---|---|
 | E1 | Paper | PDF page size | every page 595 × 842 pt (A4) or 842 × 595 pt (the 2-up slip); Letter only when asked |
+| E1b | Half-page geometry | width of each exit-slip half | 132.5 ± 0.5 mm |
 | E2 | Andika | `document.fonts.check('700 28px Andika')`, `('400 15px Andika')`; computed `font-family` of every text node | both true; 0 text nodes in another face |
 | E3 | Paints | computed `color` (text), `background-color`, border colours (width > 0), SVG `fill` / `stroke` of every element | only #000, #FFF, #949494, plus #5B2A86 inside a step mark and #C2410C inside an answer mark |
 | E4 | No colour on pupil pages | as E3, pupil pages | only #000, #FFF, #949494, #5B2A86 (step marks) |
@@ -6442,18 +6420,25 @@ measurements; the 3 mm cell padding is structure, not an empty band.
 | E6 | Pupil type floor | smallest computed size × SVG scale of pupil text, excluding quiet letters (10 pt), strand tab (10 pt), footer (7 / 6.5 pt) | ≥ 11 pt |
 | E7 | Teacher type floor | as E6 on teacher pages | ≥ 10 pt |
 | E8 | Working digits | computed size of every equation and stack outside the anchor chart | exactly 28 pt |
-| E9 | Page used | (lowest ink − body top) ÷ body height, per page | ≥ 50 % on every page |
-| E10 | Free per cell | 1 mm raster of ink in each item cell (reading cells exempt) | ≥ 40 % free |
-| E11 | Empty bands | gap between the cell's padding box and its ink, top / left (always) and right / bottom (unless it is the open answer / work zone) | each < 30 % of the cell's height or width |
+| E9 | Page used, nothing past the body | (lowest ink − body top) ÷ body height, per page | 50–100 % |
+| E9b | Bottom blank (site lint) | 100 % − E9 | ≤ 8 % on every page |
+| E10 | Free per cell | 1 mm raster of ink in each item cell (slots and answer rows are ink; reading cells exempt) | ≥ 40 % free |
+| E11 | Empty bands, the site's way | band between the cell's padding box and its ink on each side; slots, digit strips and answer rows are ink; a written answer keeps one Hw (10 mm) under its lowest mark; only draw / work cells are exempt | every band < 30 % of the cell's height or width |
 | E12 | Equal cells | width and height of the cells of each item section | equal within 0.5 mm |
 | E13 | Slots | widths of `.bx` / `.ln` answer slots per section; underscore characters in pupil text (footer excepted) | one width per section, ≥ 14 mm; 0 underscores |
 | E14 | Dashes | dashed CSS borders and SVG dash arrays not starting with 0 (dotted) | only on the cut line / missing-digit box |
-| E15 | Instructions | each pupil instruction: word count, first word of every sentence, membership of Appendix C.1 | ≤ 12 words; every sentence starts with a print verb; string in the library |
+| E15 | Instructions | each pupil instruction: word count, first word of every sentence, membership of Appendix C.1 (read from this file; `{n}` matches any number) | ≤ 12 words; every sentence starts with a print verb; string in C.1 |
 | E16 | Frames | blanks per `Say:` frame and per printed sentence frame | ≤ 2 |
-| E17 | Keys are facsimiles | number of slot elements on each pupil page vs its key | equal, for every page with a slot |
+| E16b | Routine panel | height of each RCDWS row | one action per box; each row one line (≤ 9 mm) |
+| E17 | Keys are facsimiles | number of slot elements on each pupil page vs its key (a key drawing inside a `Workspace:` band is not a slot) | equal for every page |
 | E18 | Frame on every page | © line text and a strand tab present | every page |
-| E19 | One title | distinct I Can title texts in the pack | 1 |
-| E20 | No lone item | pupil pages with fewer than 2 items, other than role-ceiling-1 pages (word problem v1, exit slip, anchor chart) | none |
+| E19 | One title | distinct I Can title texts in the pack (a Mixed page keeps it) | 1 |
+| E20 | No lone item | pupil pages with fewer than 2 items, other than the word problem v1 and the anchor chart | none |
+| E21 | T2 atoms | rows of T2 Section 1 and their Atom Type cells; ★ in the two atom tables | ≥ 5 atoms; types only Category / Comparative / Fact / Conceptual; no ★ |
+| E22 | Thumbnails | `.thumb` elements on T3, T4, T5 | ≥ 1 on each delivery page |
+| E23 | Fade labels | the Fade column of T6 "Answers at a glance" | every row carries ★ / ★★ / ★★★ |
+| E24 | Item pool | exact repeats in the packet; turn-around pairs on one page (from the builder's pool list) | 0 and 0 (exit slip repeats allowed only when the pool test says the pool is exhausted) |
+| E25 | One key per page | pupil pages vs key pages | equal, the anchor chart included |
 
 Also confirm by eye on a rendering of every page (the self-check cannot see whether a drawing teaches):
 the anchor chart draws every case the practice deals; the newest mark of each step is grey; Guided cell 1
@@ -6547,11 +6532,11 @@ const R = await p.evaluate((LIBRARY) => {
     P.instr = [...pg.querySelectorAll('[data-instr]')].filter((e) => !e.closest('.thumb')).map((e) => {
       const s = e.textContent.trim().replace(/\s+/g, ' '); const words = s.split(' ').length;
       const sentences = s.split(/(?<=[.?])\s+/); const verbs = sentences.every((x) => PRINT_VERBS.some((v) => x.startsWith(v + ' ') || x.startsWith(v + '.')));
-      return { s, words, verbs, lib: LIBRARY.includes(s) }; });
+      return { s, words, verbs, lib: LIBRARY.some((l) => new RegExp('^' + l.replace(/[.*+?^$()|[\]\\]/g, '\\$&').replace(/\{[a-z]+\}/g, '.+') + '$').test(s)) }; });
     // say frames
     P.sayBlanks = [...pg.querySelectorAll('.sayline')].map((e) => e.querySelectorAll('.ln').length);
     // slots
-    P.slots = pg.querySelectorAll('[data-slot]').length;
+    P.slots = [...pg.querySelectorAll('[data-slot]')].filter((e) => !e.closest('[data-work]')).length;
     // body use and cells
     const body = pg.querySelector('.body').getBoundingClientRect();
     let maxBottom = body.top;
@@ -6559,14 +6544,13 @@ const R = await p.evaluate((LIBRARY) => {
       const w2 = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); let n;
       while ((n = w2.nextNode())) { if (!n.textContent.trim()) continue; const pe = n.parentElement; const cs = getComputedStyle(pe);
         if (cs.display === 'none' || pe.closest('.ka') && !key || pe.closest('.lt')) continue; const r = document.createRange(); r.selectNodeContents(n); rs.push(...r.getClientRects()); }
-      root.querySelectorAll('svg, .bx, .ln, .sq, .circ, .chk, .dotm, .rule, .ring, .story, .ans, [data-slot], [data-slot="track"]').forEach((e) => { if (getComputedStyle(e).display !== 'none' && !(e.closest('[data-ka]') && !key)) rs.push(e.getBoundingClientRect()); });
+      root.querySelectorAll('svg, .bx, .ln, .sq, .circ, .chk, .dotm, .rule, .ring, .story, .ans, [data-slot]:not([data-slot="ans"]):not([data-slot=""])').forEach((e) => { if (getComputedStyle(e).display !== 'none' && !(e.closest('[data-ka]') && !key)) rs.push(e.getBoundingClientRect()); });
       return rs.filter((r) => r.width > 0 && r.height > 0); };
     for (const r of inkRects(pg.querySelector('.body'))) maxBottom = Math.max(maxBottom, r.bottom);
     // framed pages: the frame itself is structure; "used" = lowest ink (text, drawing, slot) over the body height
     P.usedPct = Math.round((maxBottom - body.top) / body.height * 100);
     // site lint: the body is no more than 8 % blank at the bottom (lowest ink of any kind, frame lines included)
-    let lowest = body.top; pg.querySelector('.body').querySelectorAll('*').forEach((e) => { if (e.closest('.thumb')) return; const r = e.getBoundingClientRect(); if (r.height > 0 && r.width > 0) lowest = Math.max(lowest, r.bottom); });
-    P.bottomBlank = Math.round(Math.max(0, body.bottom - lowest) / body.height * 100);
+    P.bottomBlank = Math.max(0, 100 - P.usedPct);
     P.thumbs = pg.querySelectorAll('.thumb').length;
     P.panelRows = [...pg.querySelectorAll('[data-panel-row]')].map((e) => Math.round(e.getBoundingClientRect().height / MM * 10) / 10);
     const t2 = pg.querySelector('table.tt');
@@ -6626,8 +6610,8 @@ row('E6', 'No pupil text below 11 pt (quiet letters 10 pt, strand tab 10 pt and 
 row('E7', 'Teacher text ≥ 10 pt (tables 10, body 11, spoken 13)', `smallest teacher text ${teachMin} pt`, teachMin >= 10);
 const dig = [...new Set(pages.filter((p) => !p.teacher).flatMap((p) => p.digitPt))];
 row('E8', 'Working digits are 28 pt on every pupil page (anchor chart may enlarge, never shrink)', `digit sizes found: ${dig.join(', ')} pt`, dig.every((d) => d === 28));
-const usedLow = pages.filter((p) => p.usedPct < 50);
-row('E9', 'Every page ≥ 50 % used (lowest ink over body height)', `min ${Math.min(...pages.map((p) => p.usedPct))} % (${pages.map((p) => p.id + ' ' + p.usedPct).join(', ')})`, usedLow.length === 0);
+const usedLow = pages.filter((p) => p.usedPct < 50 || p.usedPct > 100);
+row('E9', 'Every page ≥ 50 % used and nothing runs past the body (lowest ink over body height ≤ 100 %)', `min ${Math.min(...pages.map((p) => p.usedPct))} % (${pages.map((p) => p.id + ' ' + p.usedPct).join(', ')})`, usedLow.length === 0);
 const cells = pupil.flatMap((p) => p.cells.filter((c) => !c.empty).map((c) => ({ ...c, page: p.id })));
 const lowFree = cells.filter((c) => !c.read && c.free < 40);
 row('E10', 'Every item cell ≥ 40 % free (pupil pages; a key is its page; reading cells - story box, routine panel - exempt)', `${cells.length} cells; min free ${Math.min(...cells.filter((c) => !c.read).map((c) => c.free))} %; below 40 %: ${lowFree.map((c) => c.page).join(', ') || 'none'}`, lowFree.length === 0);
@@ -6654,7 +6638,7 @@ const lone = pupil.filter((p) => !['P5', 'P2'].includes(p.id) && p.slots < 2);
 row('E20', 'No lone item (one-item pages only where the role ceiling is 1: word problem v1; the anchor chart is a poster)', lone.length ? lone.map((p) => p.id).join(', ') : 'none', lone.length === 0);
 
 const bb = pages.filter((p) => p.bottomBlank > 8);
-row('E9b', 'Body no more than 8 % blank at the bottom (site lint)', `max ${Math.max(...pages.map((p) => p.bottomBlank))} %; over 8 %: ${bb.map((p) => p.id + ' ' + p.bottomBlank).join(', ') || 'none'}`, bb.length === 0);
+row('E9b', 'Body no more than 8 % blank below its lowest ink (site lint)', `max ${Math.max(...pages.map((p) => p.bottomBlank))} %; over 8 %: ${bb.map((p) => p.id + ' ' + p.bottomBlank).join(', ') || 'none'}`, bb.length === 0);
 const land = pages.filter((p) => p.halfW.length);
 row('E1b', 'Exit-slip halves 132.5 ± 0.5 mm wide (A4 landscape, live 271 × 186 mm, 6 mm cut gap)', land.map((p) => p.id + ': ' + p.halfW.join(' / ')).join('; '), land.every((p) => p.halfW.length === 2 && p.halfW.every((w) => Math.abs(w - 132.5) <= 0.5)));
 const panel = pages.flatMap((p) => p.panelRows);
@@ -6682,366 +6666,631 @@ if (process.argv.includes('--debug')) console.log(JSON.stringify(pages.map((p) =
 
 ---
 
-## Appendix F — Fully worked example pack: add 1–3 (facts to 10), Level 1
+## Appendix F — Two fully worked example packs
 
-The sample in `sample-v21/` was built from this specification and the appendices above, with no other
-source.
+Both samples were built from this file alone (the stylesheet of Appendix A, the recipes and pack kit of
+Appendix D and the builders of Appendix G), checked with Appendix E (all checks pass) and looked at page by
+page. Each pack: 23 pages — T1, T2, T2b, T3, T4, T5, P0–P6, the seven-plus-one keys (P0–P6, chart included),
+T6.
 
-**Lesson data.** Title `I Can add 1–3 (facts to 10)`. Level 1, strand Addition. Footer left
-`add_facts · Grade 1 · 1.OA.C.6 · EE M.EE.2.NBT.7, M.EE.3.OA.6`; right `Form A · seed 4242`. CRA:
-Pictures. Flow: Standard (3 new atoms). Steps (icon · words): 1 `start` Start with the big number. ·
-2 `count` Count on. · 3 `write` Write how many. Oral frame: “__ plus __ equals __.” Chant: Big number
-first. Count on. Write it. Cases the practice deals: big number first; big number second; same numbers
-(1+1, 2+2, 3+3); a sum of 10. Never + 0, never a small addend over 3, never a sum over 10. Item pool: a +
-b with min(a, b) ∈ {1, 2, 3}, a + b ≤ 10; no item twice in the packet (turned round included where
-possible); no turn-around pair on one page.
+### F.1 Add 1–3 (facts to 10), Level 1
 
-**Pages, in order** (22 pages):
+**Lesson data.** Title `I Can add 1–3 (facts to 10)` (27 characters: lifted on the chart and teacher pages).
+Level 1, Addition. Footer `add_facts · Grade 1 · 1.OA.C.6 · EE M.EE.2.NBT.7, M.EE.3.OA.6`, seed 4242. CRA:
+Pictures. Flow: Standard (3 new atoms). Steps: 1 `start` Start with the big number. · 2 `count` Count on. ·
+3 `write` Write how many. Frame “__ plus __ equals __.” Chant: Big number first. Count on. Write it.
+**Cases:** big number first; big number second; same numbers; a sum of 10. **Pool:** a + b, min(a, b) ∈ 1–3,
+a + b ≤ 10, no + 0: 39 ordered facts for 41 places, so the exit slip repeats Practice items (pool test).
 
-| # | Page | Tab line 3 | Content | Answers (key) |
-|---|---|---|---|---|
-| 1 | T1 Lesson at a glance | Teacher 1 | Standards line; 3 boxes: Tip "Big first, every time.", Tip (language) "Plus means put together.", Watch "Counting the start."; flow table (4, 5, 3, 1, 12, 8, 3, 15, 7, 2 = 60 min); 6 materials; vocabulary cards plus · equals · count on | — |
-| 2 | T2 Atomisation | Teacher 2 | 4 concept atoms; 3 routine steps, step 2 the Critical Atom ("Count on the small number from the big one, without counting the start"); How to teach; 4 mistakes: Counting the start (7 + 2 → 8), Starting small, Losing the count (7 + 3 → 11), Writing the last count only | — |
-| 3 | T2b Reference | Reference | Page ids, fade levels, abbreviations, marks; "Print once per unit." | — |
-| 4 | T3 Delivery | Teacher 3 | Sections 1–4 (Prerequisite Check 4 min with T-LOOP; Number sense 5; Spaced retrieval 3: 1 more than 9, 6 dots in a ten frame, which is less 3 or 8; Chaining Bridge 1) | 8, 7, 9, 2 · A 4,6 · 5 · > · 4 · 7 · B 13,15 · 18 · < · 7 · 13 · 10 · 6 dots · 3 |
-| 5 | T4 Delivery | Teacher 4 | Section 5 I Do (Watch box, Board line, 5 script steps, chart thumbnail); Section 6 We Do (Tip box, 2 steps, lesson-sheet thumbnail) | 9, 8, 5, 7, 9 |
-| 6 | T5 Delivery | Teacher 5 | Section 7 Check Question (6 + 3: A counts the start → 8; B starts small → 9; C the routine → 9) with T-LOOP; Section 8 You Do; Section 9 Word problem; Section 10 Plenary | C; 3 + 2 = 5 or 2 + 3 = 5; 6 |
-| 7 | P0 Prerequisite Check | Prerequisite | a. 8 triangles + answer square; b. number track 3 4 5 6 [ ] 8 9; c. 4 and 9 (circle the bigger); d. bond 7 = 5 + [ ]. Score /4 | 8 · 7 · 9 circled · 2 |
-| 8 | P1 Number sense | Number sense | A: [ ] 5 [ ]; 3, 4, [ ], 6; 7 ○ 4; 6 + [ ] = 10; 9, 8, [ ], 6. B: [ ] 14 [ ]; 16, 17, [ ], 19; 12 ○ 21; 3 + [ ] = 10; 15, 14, [ ], 12. Boxes 17 mm. Score /10 | 4, 6 · 5 · > · 4 · 7 · 13, 15 · 18 · < · 7 · 13 |
-| 9 | P2 Anchor chart | Anchor chart | Panels 7 + 2 (ring the 7; grey dot tile + grey hops 8, 9; answer 9 grey); Model: 2 + 8 (big number second and a sum of 10: ring the 8, answer 10), 3 + 3 (answer 6); Say “7 plus 2 equals 9.”; Rule chant | none (no slots) |
-| 10 | P3 Lesson sheet | Lesson 1 | Vocabulary + / = / hop track → equals · count on · plus (shuffled); Remember: Start at the bigger number and count on.; Guided 2 + 3 (ring round 3 grey, grey tile), 1 + 6, 1 + 8 beside Steps; Independent a 5 + 2, b 3 + 4, c 9 + 1. Score /3 | lines + → plus, = → equals, hops → count on · 5, 7, 9 · 7, 7, 10 |
-| 11 | P4 Practice 1 | Practice 1 | 3 × 4: 6+3, 2+5, 4+1, 1+7, 5+3, 2+6, 8+1, 1+2, 4+2, 2+2, 3+7, 6+1. Score /12 | 9, 7, 5, 8, 8, 8, 9, 3, 6, 4, 10, 7 |
-| 12 | P4 Practice 2 | Practice 2 | 3 × 4: 4+3, 1+5, 7+1, 2+4, 6+2, 1+3, 3+5, 2+1, 3+6, 1+4, 7+3, 1+1. Score /12 | 7, 6, 8, 6, 8, 4, 8, 3, 9, 5, 10, 2 |
-| 13 | P5 Word problem | Word problem | "Omar has 3 cars. / He gets 2 more cars. / How many cars does Omar have now?"; RCDWS panel; Workspace; frame `__ ○ __ = __`; `__ cars`; Say “The answer is __ cars.” Score /1 | 3 + 2 = 5; 5 cars; drawing 3 solid + 2 hollow |
-| 14 | P6 Exit slip (landscape) | Exit slip | Two halves: 5 + 1; Say “5 plus 1 equals __.”; I can do this. / I need one more day. | 6 |
-| 15–21 | Keys of P0, P1, P3, P4 ×2, P5, P6 | Answer Key | Facsimiles with the answers above in #C2410C | — |
-| 22 | T6 routing page | Answer Key | Prerequisite routing (K-3 Count to 10; K-4 Count on from a number; K-6 Compare numbers to 10; K-9 Number bonds to 10); accepted equations; answers at a glance; anchor-chart note | as above |
+| Page | Content | Answers (key) |
+|---|---|---|
+| T1 | Standards line; Tip “Big first, every time.”, Tip (language) “Plus means put together.”, Watch “Counting the start.”; flow 4 + 5 + 3 + 1 + 12 + 8 + 3 + 15 + 7 + 2 = 60; 6 materials; 3 vocabulary cards | — |
+| T2 | 8 atoms (4 Pre-requisite: Counting, Next number, Bigger number, Parts and whole; 4 New: Plus and equals, Count on, Turn-around, Start is said); 3 routine steps, step 2 the Critical Atom; 4 mistakes with broken step; Check Question link | — |
+| T2b | Page ids, packet order, Score rule, fade levels, data loop, abbreviations, slot shapes, icons, band labels | — |
+| T3 | Sections 1–4 with the P0 thumbnail | ★ 8, 7, 9, 2 · band A / B · 10, 6 dots, 3 |
+| T4 | Sections 5–6 with the chart and lesson-sheet thumbnails | 9, 8 · ★ 8, 8, 4 |
+| T5 | Sections 7–10 with the Practice 1 thumbnail; exit items listed with the mistake each catches | C · 3 + 2 = 5 · 7, 9, 2, 10 |
+| P0 | a 8 triangles + square; b number track 3 4 5 6 [ ] 8 9; c 4 and 9; d bond 7 = 5 + [ ]. Score /4 | 8 · 7 · 9 circled · 2 |
+| P1 | A: [ ] 5 [ ]; 3, 4, [ ], 6; 7 ○ 4; 6 + [ ] = 10; 9, 8, [ ], 6. B: [ ] 14 [ ]; 16, 17, [ ], 19; 12 ○ 21; 3 + [ ] = 10; 15, 14, [ ], 12. Score /10 | 4, 6 · 5 · > · 4 · 7 · 13, 15 · 18 · < · 7 · 13 |
+| P2 | Panels 7 + 2 (ring 7; grey tile and hops; grey 9); `Another example:` 2 + 8 and 3 + 3 in black; Say; Rule | key = same chart, tab Answer Key |
+| P3 | Vocabulary + / = / hops → equals · count on · plus; Remember; Guided 6 + 2 (ring grey), 1 + 7, 2 + 2 (51 mm cells) beside Steps; Independent a–f 5 + 2, 3 + 4, 9 + 1, 1 + 5, 6 + 3, 2 + 4. Score /6 | lines · 8, 8, 4 · 7, 7, 10, 6, 9, 6 |
+| P4 Practice 1 | 3 × 4: 5+3, 2+5, 4+1, 5+1, 8+1, 4+2, 2+1, 1+3, 4+3 / 1+1, 3+7, 1+6 (last row ★★★) | 8, 7, 5, 6, 9, 6, 3, 4, 7, 2, 10, 7 |
+| P4 Practice 2 | 3 × 4: 7+1, 6+1, 3+1, 2+6, 1+4, 3+5, 1+2, 2+3, 1+8 / 3+6, 1+9, 7+3 | 8, 7, 4, 8, 5, 8, 3, 5, 9, 9, 10, 10 |
+| P5 | Omar has 3 cars. He gets 2 more cars. How many …? Answer line in the story; 6-row panel; Workspace; frame | 3 + 2 = 5; 5 cars |
+| P6 | Each half: 4 + 3, 3 + 6, 1 + 1, 3 + 7 (2 × 2); Say “a. 4 plus 3 equals __.”; two check boxes; Score /4 | 7, 9, 2, 10 |
+| T6 | Routing (atoms 1–4 → K-3, K-4, K-6, K-9); accepted answers; answers at a glance with Fade; wrong answers to look for | — |
+
+### F.2 Subtract within 100 with regrouping, Level 2
+
+**Lesson data.** Title `I Can subtract within 100 (with regrouping)` (44 characters: never lifted; row A
+holds the tab alone, the title sits under it). Level 2, Subtraction. Footer
+`sub_100_regroup · Grade 2 · 2.NBT.B.5 · EE M.EE.2.NBT.5, M.EE.4.NBT.4`, seed 5150. CRA: Pictures → Abstract.
+Flow: Chunked (4 new atoms; two lessons were offered, the teacher kept one). Steps: 1 `look` Look at the ones.
+· 2 `regroup` Top smaller? Regroup a ten. · 3 `subOnes` Subtract the ones. · 4 `subTens` Subtract the tens. ·
+5 `check` Check: add back. Frame “__ minus __ equals __.” Chant: Top too small? Take a ten!
+**Cases:** regroup 2-digit − 2-digit; 0 in the ones (60 − 3); one-digit take-away; a tens answer of 0 (left
+empty). Every item regroups. No exact repeats, no turn-arounds (subtraction has none).
+
+| Page | Content | Answers (key) |
+|---|---|---|
+| T1 | Tip “Ones first, always.”, Watch “Smaller from bigger.”; chunked flow (5a, 6a, 5b, 6b) = 60; materials; vocabulary tens / ones / regroup (quick-draw) | — |
+| T2 | 7 atoms (4 Pre-requisite, 3 New); 5 routine steps, step 2 the Critical Atom; mistakes Smaller from bigger, Forgot the tens, Zero trouble, Regroup always; Check Question link | — |
+| T3–T5 | As F.1, with thumbnails of P0, the chart, the lesson sheet and Practice 1; Check Question 61 − 25 (A 44, B 46, C 36) | — |
+| P0 | a base-ten 46 → [ ] tens; b 5 tens 2 ones = 4 tens [ ] ones; c 14 − 6, 12 − 9; d 47 − 23, 68 − 35 (no regrouping). Score /6 | 4 · 12 · 8, 3 · 24, 33 |
+| P1 | A: [ ] 40 [ ]; count by 10 20, 30, [ ], [ ]; 46 ○ 64; 3 tens 5 ones = [ ]; 10 − [ ] = 6. B: 70; 35, 45, …; 81 ○ 18; 6 tens 12 ones; 100 − [ ] = 70 | 39, 41 · 40, 50 · < · 35 · 4 · 69, 71 · 55, 65 · > · 72 · 30 |
+| P2 | 2 × 3 panels on 52 − 39 (strip empty → 4 / 12 grey with grey cross-outs → 3 grey → 1 grey + 3 → check 13 + 39 = 52 grey); 6th panel `Another example:` 60 − 3 = 57 in black; Say; Rule | key = same chart |
+| P3 | Vocabulary rods / cubes / trade → ones · regroup · tens; Remember: 1 ten is 10 ones.; Guided 74 − 28 (regroup grey), 91 − 46, 50 − 7 (62 mm cells) beside 5 Steps; Independent a–c 83 − 36, 62 − 9, 46 − 38. Score /3 | 46, 45, 43 · 47, 53, 8 |
+| P4 Practice 1 | 2 × 3 with Check lines: 72 − 8, 45 − 27, 41 − 35, 63 − 47, 85 − 29, 70 − 44 | 64, 18, 6, 16, 56, 26 |
+| P4 Practice 2 | 92 − 56, 31 − 7, 64 − 38, 26 − 19, 80 − 52, 57 − 29 | 36, 24, 26, 7, 28, 28 |
+| P5 | Ana has 42 stickers. She gives away 17 stickers. How many …? | 42 − 17 = 25; 25 stickers |
+| P6 | Each half: 43 − 27, 40 − 13, 55 − 8, 42 − 36 (2 × 2, no heads); Say “a. 43 minus 27 equals __.” | 16, 27, 47, 6 |
+| T6 | Routing (1-12, 2-3, 1-20, 2-6); accepted answers; answers at a glance with Fade; wrong answers to look for | — |
 
 ---
 
-## Appendix G — Reference page builder for the worked example (optional)
+## Appendix G — Reference builders for the worked examples (optional)
 
-A Node script that builds `pack.html` for Appendix F from the CSS of Appendix A and the recipes of
-Appendix D (extract them from this file into `house.css` and `recipes.mjs` first: each block is fenced
-with ```` ```css v21-house ```` / ```` ```js v21-recipes ````). Render it to PDF with Chromium
-(`page.pdf({ preferCSSPageSize: true, printBackground: true })`) and rasterise with
-`pdftoppm -r 110 -png pack.pdf page`. It is an example of following V21, not a second rule source: where
-it and the text above differ, the text wins.
+Node scripts that build `pack.html` for F.1 and F.2. Extract the fenced blocks of this file first: Appendix A
+(```` ```css v21-house ````) → `house.css`, Appendix D (```` ```js v21-recipes ````) → `recipes.mjs`, D.2
+(```` ```js v21-packkit ````) → `packkit.mjs`, and the blocks below. Then:
+
+```
+node gen-add.mjs <folder with the three files> <output folder> [font folder URL]
+node gen-sub.mjs <folder with the three files> <output folder> [font folder URL]
+# print with Chromium: page.pdf({ path: 'pack.pdf', preferCSSPageSize: true, printBackground: true })
+pdftoppm -r 110 -png pack.pdf page
+node selfcheck.mjs <output folder> <this .md file> [chromium executable]     # Appendix E, writes SELF-CHECK.md
+```
+They are examples of following V21, not a second rule source: where they and the text differ, the text wins.
 
 ```js v21-example
-// Builds design/lesson-planner/sample-v21/pack.html from V21's own appendices (house.css + recipes.mjs
-// extracted from Atomisation_Lesson_Planner_V21.md by extract.mjs). No MathQuest kit code is used.
+// Worked example 1 (Appendix F.1): add 1-3 (facts to 10), Level 1.
+// usage: node gen-add.mjs <folder with house.css, recipes.mjs, packkit.mjs> <output folder> [font folder URL]
 import fs from 'node:fs';
 import path from 'node:path';
-const HERE = path.dirname(new URL(import.meta.url).pathname);
-const SRC = process.argv[2] || path.join(HERE, 'from-v21');
-const R = await import(path.join(SRC, 'recipes.mjs'));
+const [SRC, OUT, FONTS = '../../../css/fonts'] = process.argv.slice(2);
+const R = await import(path.resolve(SRC, 'recipes.mjs'));
+const { makeKit, poolCheck } = await import(path.resolve(SRC, 'packkit.mjs'));
 const { factStack, hopTrack, counters, numberBond, numberTrack, icon } = R;
-const OUT = '/home/user/MathQuest/design/lesson-planner/sample-v21';
-const css = fs.readFileSync(path.join(SRC, 'house.css'), 'utf8').replaceAll('FONT_URL', '../../../css/fonts');
+const css = fs.readFileSync(path.join(SRC, 'house.css'), 'utf8').replaceAll('FONT_URL', FONTS);
 
-// ---------- lesson data (Appendix F) ----------
-const L = {
-  title: 'I Can add 1–3 (facts to 10)', level: 'Level 1', strand: 'Addition',
+const L = { title: 'I Can add 1–3 (facts to 10)', level: 'Level 1', strand: 'Addition', seed: 4242,
   foot: 'add_facts · Grade 1 · 1.OA.C.6 · EE M.EE.2.NBT.7, M.EE.3.OA.6',
-  steps: [['start', 'Start with the big number.'], ['count', 'Count on.'], ['write', 'Write how many.']],
-};
-const P1 = [[6, 3], [2, 5], [4, 1], [1, 7], [5, 3], [2, 6], [8, 1], [1, 2], [4, 2], [2, 2], [3, 7], [6, 1]];
-const P2 = [[4, 3], [1, 5], [7, 1], [2, 4], [6, 2], [1, 3], [3, 5], [2, 1], [3, 6], [1, 4], [7, 3], [1, 1]];
-const GUIDED = [[2, 3], [1, 6], [1, 8]];
-const INDEP = [[5, 2], [3, 4], [9, 1]];
-const LET = 'abcdefghijklmnopqrstuvwxyz';
+  steps: [['start', 'Start with the big number.'], ['count', 'Count on.'], ['write', 'Write how many.']] };
+const K = makeKit(L, R);
+const { LET, k, lt, sec, tbox, sc, ans, blank, loop, table, chk, withThumb, stepsStrip, stepsList, pupilPage, exitPage, exitHead, exitFoot } = K;
 
-// ---------- frame ----------
-const tab = (l3) => `<div class="tab"><span>${L.level}</span><span>${L.strand}</span><span>${l3}</span></div>`;
-function header({ fields = true, score = null, l3, key = false, title = L.title }) {
-  if (!fields) return `<div class="hd"><div class="rowA"><div class="title">${title}</div>${tab(l3)}</div><div class="hrule"></div></div>`;
-  return `<div class="hd"><div class="rowA">` +
-    `<div class="fld name">Name <i>${key ? 'Answer Key' : ''}</i></div><div class="fld date">Date <i></i></div>` +
-    (score != null ? `<div class="fld score">Score <i></i><b>/${score}</b></div>` : '') + tab(key ? 'Answer Key' : l3) +
-    `</div><div class="title">${title}</div><div class="hrule"></div></div>`;
-}
-const footer = (centre, right) => `<div class="ft"><span>${L.foot}</span><span><b>${centre}</b></span><span>${right}</span>` +
-  `<span class="copy">© 2026 Cultivating the Digital. All rights reserved.</span></div>`;
-const page = ({ id, cls = '', head, body, foot }) =>
-  `<section class="pg ${cls}" data-page="${id}">${head}<div class="body">${body}</div>${foot}</section>`;
-const stepsStrip = () => `<div class="sstrip"><b>Steps:</b><ol>${L.steps.map(([ic, t], i) =>
-  `<li><span class="num" data-accent>${i + 1}</span>${icon(ic)}<span>${t}</span></li>`).join('')}</ol></div>`;
+// ---- items (Appendix F.1): pool a + b, min(a, b) in 1..3, a + b <= 10 ----
+const CHART = [[7, 2], [2, 8], [3, 3]];
+const GUIDED = [[6, 2], [1, 7], [2, 2]];                       // the Model's case first (big first), then big second, then same
+const INDEP = [[5, 2], [3, 4], [9, 1], [1, 5], [6, 3], [2, 4]];
+const P1 = [[5, 3], [2, 5], [4, 1], [5, 1], [8, 1], [4, 2], [2, 1], [1, 3], [4, 3], [1, 1], [3, 7], [1, 6]];
+const P2 = [[7, 1], [6, 1], [3, 1], [2, 6], [1, 4], [3, 5], [1, 2], [2, 3], [1, 8], [3, 6], [1, 9], [7, 3]];
+const STORY = [3, 2];
+const EXIT = [[4, 3], [3, 6], [1, 1], [3, 7]];                  // big first · big second count 3 · same · sum of 10
+export const POOL = poolCheck([{ id: 'P2', items: CHART }, { id: 'P3', items: [...GUIDED, ...INDEP] }, { id: 'P4a', items: P1 },
+  { id: 'P4b', items: P2 }, { id: 'P5', items: [STORY] }, { id: 'P6', items: EXIT, mayRepeat: true }]);
 
-// ---------- P0 Prerequisite Check ----------
+const fact = (a, b, key, o = {}) => factStack({ top: a, bottom: b, ans: key ? a + b : null, ...o });
+const cellF = (a, b, i, key) => `<div class="cell" style="padding-top:8mm">${lt(i)}${fact(a, b, key)}</div>`;
+
+// ---- P0 Prerequisite Check (one question per Pre-requisite atom on T2) ----
 function prereq(key) {
-  const sec = (instr, inner, tag, fl = 1) => `<div class="band" style="flex:${fl} 1 0;min-height:0;display:flex" data-section="pre"><div class="strip"><span data-instr>${instr}</span>` +
+  const s = (instr, inner, tag, fl) => `<div class="band" style="flex:${fl} 1 0;min-height:0;display:flex" data-section="pre"><div class="strip"><span data-instr>${instr}</span>` +
     (key ? `<span style="margin-left:auto;font-size:11pt">If missed → ${tag}</span>` : '') + `</div>` +
     `<div class="grid" style="grid-template-columns:1fr"><div class="cell mid" style="flex-direction:row;justify-content:space-evenly;align-items:center">${inner}</div></div></div>`;
-  const lt = (k) => `<span class="lt">${k}.</span>`;
-  return sec('Count. Write the number.', lt('a') + counters({ n: 8, kind: 'triangle', perRow: 5 }) + `<span class="sq" data-slot="sq"><b class="ka">8</b></span>`, 'Lesson K-3 Count to 10', 1.15) +
-    sec('Write the missing number.', lt('b') + numberTrack([3, 4, 5, 6, null, 8, 9], 7), 'Lesson K-4 Count on from a number', 0.85) +
-    sec('Circle the bigger number.', lt('c') + `<div class="eq" style="gap:60mm"><span>4</span><span style="position:relative" data-slot="choice">9<i class="ring ka" data-ka style="width:1.1em;height:1.3em;border-width:1.5pt;border-color:currentColor"></i></span></div>`, 'Lesson K-6 Compare numbers to 10', 0.8) +
-    sec('Write the missing number.', lt('d') + '<span data-slot="bond"></span>' + numberBond({ whole: 7, parts: [5, { v: 2, ka: true }], spread: 80, drop: 14 }), 'Lesson K-9 Number bonds to 10', 1.55);
+  return s('Count. Write the number.', lt(0) + counters({ n: 8, kind: 'triangle', perRow: 5 }) + `<span class="sq" data-slot="sq">${k(8)}</span>`, 'Lesson K-3 Count to 10', 1.15) +
+    s('Write the missing number.', lt(1) + numberTrack([3, 4, 5, 6, null, 8, 9], 7), 'Lesson K-4 Count on from a number', 0.85) +
+    s('Circle the bigger number.', lt(2) + `<div class="eq" style="gap:60mm"><span>4</span><span style="position:relative" data-slot="choice">9<i class="ring ka" data-ka style="width:1.1em;height:1.3em;border-width:1.5pt;border-color:currentColor"></i></span></div>`, 'Lesson K-6 Compare numbers to 10', 0.62) +
+    s('Write the missing number.', lt(3) + '<span data-slot="bond"></span>' + numberBond({ whole: 7, parts: [5, { v: 2, ka: true }], spread: 80, drop: 14 }), 'Lesson K-9 Number bonds to 10', 1.7);
 }
 
-// ---------- P1 Number sense (Daily look) ----------
-function numberSense(key) {
-  const k = (v) => `<b class="ka">${v}</b>`;
-  const B = (v, w = 17) => `<span class="bx" data-slot="box" style="--w:${w}mm">${k(v)}</span>`;
+// ---- P1 Number sense (Daily look) ----
+function numberSense() {
+  const B = (v) => `<span class="bx" data-slot="box" style="--w:17mm">${k(v)}</span>`;
   const ml = (n, lo, hi) => `<div class="eq" style="align-items:flex-start"><span style="display:flex;flex-direction:column;align-items:center">${B(lo)}<small style="font-size:12pt">1 less</small></span>` +
     `<span style="line-height:12mm">${n}</span><span style="display:flex;flex-direction:column;align-items:center">${B(hi)}<small style="font-size:12pt">1 more</small></span></div>`;
   const rows = (start, items) => items.map(([instr, inner], i) =>
     `<div class="cell" style="flex-direction:row;align-items:center;padding:2mm 3mm 2mm 10mm"><span class="ntab${start + i >= 10 ? ' w2' : ''}">${start + i}</span>` +
-    `<span data-instr style="width:58mm;flex:none;line-height:1.2">${instr}</span><div style="flex:1;display:flex;justify-content:center">${inner}</div></div>`).join('');
-  const A = [['Write 1 more and 1 less.', ml(5, 4, 6)], ['Write the missing number.', `<div class="eq">3, 4, ${B(5)}, 6</div>`],
+    `<span data-instr style="width:68mm;flex:none;line-height:1.2">${instr}</span><div style="flex:1;display:flex;justify-content:center">${inner}</div></div>`).join('');
+  const band = (lab, start, items) => `<div class="band grow" data-section="ns${lab}"><div class="strip"><b>Number sense: ${lab}</b></div><div class="grid daily" style="grid-template-rows:repeat(5,1fr)">${rows(start, items)}</div></div>`;
+  return band('A', 1, [['Write 1 more and 1 less.', ml(5, 4, 6)], ['Write the missing number.', `<div class="eq">3, 4, ${B(5)}, 6</div>`],
     ['Write &lt;, &gt; or = in the circle.', `<div class="eq">7 <span class="circ" data-slot="circle">${k('&gt;')}</span> 4</div>`],
-    ['Write the missing number.', `<div class="eq">6 <span class="o">+</span> ${B(4)} <span class="o">=</span> 10</div>`], ['Write the missing number.', `<div class="eq">9, 8, ${B(7)}, 6</div>`]];
-  const Bb = [['Write 1 more and 1 less.', ml(14, 13, 15)], ['Write the missing number.', `<div class="eq">16, 17, ${B(18)}, 19</div>`],
-    ['Write &lt;, &gt; or = in the circle.', `<div class="eq">12 <span class="circ" data-slot="circle">${k('&lt;')}</span> 21</div>`],
-    ['Write the missing number.', `<div class="eq">3 <span class="o">+</span> ${B(7)} <span class="o">=</span> 10</div>`], ['Write the missing number.', `<div class="eq">15, 14, ${B(13)}, 12</div>`]];
-  const band = (lab, start, items) => `<div class="band grow" data-section="ns${lab}"><div class="strip"><b>Number sense: ${lab}</b></div>` +
-    `<div class="grid daily" style="grid-template-rows:repeat(5,1fr)">${rows(start, items)}</div></div>`;
-  return band('A', 1, A) + band('B', 6, Bb);
+    ['Write the missing number.', `<div class="eq">6 <span class="o">+</span> ${B(4)} <span class="o">=</span> 10</div>`], ['Write the missing number.', `<div class="eq">9, 8, ${B(7)}, 6</div>`]]) +
+    band('B', 6, [['Write 1 more and 1 less.', ml(14, 13, 15)], ['Write the missing number.', `<div class="eq">16, 17, ${B(18)}, 19</div>`],
+      ['Write &lt;, &gt; or = in the circle.', `<div class="eq">12 <span class="circ" data-slot="circle">${k('&lt;')}</span> 21</div>`],
+      ['Write the missing number.', `<div class="eq">3 <span class="o">+</span> ${B(7)} <span class="o">=</span> 10</div>`], ['Write the missing number.', `<div class="eq">15, 14, ${B(13)}, 12</div>`]]);
 }
 
-// ---------- P2 Anchor chart ----------
+// ---- P2 Anchor chart ----
 function chart() {
   const panel = (i, stk, head, lines, pic) => `<div class="cell" style="flex-direction:row;align-items:center;padding:3mm 4mm">` +
-    `<div style="flex:0 0 42%;display:flex;justify-content:center;font-size:36pt" class="poster">${stk}</div>` +
+    `<div style="flex:0 0 42%;display:flex;justify-content:center" class="poster">${stk}</div>` +
     `<div style="flex:1;display:flex;flex-direction:column;gap:2.5mm"><div style="display:flex;align-items:center;gap:2.5mm;font-size:18pt;font-weight:700;line-height:1.2">` +
-    `<span class="num big" data-accent>${i}</span>${icon(L.steps[i - 1][0], { mm: 8 })}<span>${head}</span></div>` +
-    `<div style="font-size:15pt">${lines}</div>${pic || ''}</div></div>`;
-  const s = (o) => factStack({ top: 7, bottom: 2, ...o }).replace('class="stk"', 'class="stk" style="font-size:34pt"');
-  const p1 = panel(1, s({ ring: 'top' }), 'Start with the big number.', 'Start with 7.');
-  const p2 = panel(2, s({ ring: 'top', tile: { at: 'bottom', n: 2, grey: true } }), 'Count on.', 'Count on 2: 8, 9.', hopTrack({ nums: [7, 8, 9], numState: ['ink', 'grey', 'grey'], arcState: ['grey', 'grey'] }));
-  const p3 = panel(3, s({ ring: 'top', tile: { at: 'bottom', n: 2 }, ans: 9, state: 'traced' }), 'Write how many.', 'Write 9.', hopTrack({ nums: [7, 8, 9] }));
-  const ex = (cap, top, bot, ringAt, n, nums) => `<div class="cell" style="padding:3mm;gap:2mm"><b style="font-size:15pt;text-align:center">${cap}</b>` +
-    `<div style="display:flex;align-items:center;gap:6mm;flex:1"><div style="margin-right:10mm">${factStack({ top, bottom: bot, ring: ringAt, tile: { at: ringAt === 'top' ? 'bottom' : 'top', n }, ans: top + bot, state: 'traced' }).replace('class="stk"', 'class="stk" style="font-size:30pt"')}</div>` +
+    `<span class="num big" data-accent>${i}</span>${icon(L.steps[i - 1][0], { mm: 8 })}<span>${head}</span></div><div style="font-size:15pt">${lines}</div>${pic || ''}</div></div>`;
+  const big = (html, pt) => html.replace('class="stk"', `class="stk" style="font-size:${pt}pt"`);
+  const s = (o) => big(factStack({ top: 7, bottom: 2, ...o }), 34);
+  const ex = (cap, a, b, ringAt, n, nums) => `<div class="cell" style="padding:3mm;gap:2mm"><b style="font-size:15pt;text-align:center">${cap}</b>` +
+    `<div style="display:flex;align-items:center;gap:6mm;flex:1"><div style="margin-right:10mm">${big(factStack({ top: a, bottom: b, ring: ringAt, tile: { at: ringAt === 'top' ? 'bottom' : 'top', n }, ans: a + b, state: 'ink' }), 30)}</div>` +
     hopTrack({ nums }) + `</div></div>`;
-  return `<div class="band" style="flex:3 1 0;min-height:0" data-section="chart"><div class="grid" style="grid-template-rows:repeat(3,1fr);border-width:0">${p1}${p2}${p3}</div></div>` +
-    `<div class="band" style="flex:1.35 1 0;min-height:0" data-section="other"><div class="strip"><b>Model:</b></div><div class="grid" style="grid-template-columns:1fr 1fr">` +
+  return `<div class="band" style="flex:3 1 0;min-height:0" data-section="chart"><div class="grid" style="grid-template-rows:repeat(3,1fr);border-width:0">` +
+    panel(1, s({ ring: 'top' }), L.steps[0][1], 'Start with 7.') +
+    panel(2, s({ ring: 'top', tile: { at: 'bottom', n: 2, grey: true } }), L.steps[1][1], 'Count on 2: 8, 9.', hopTrack({ nums: [7, 8, 9], numState: ['ink', 'grey', 'grey'], arcState: ['grey', 'grey'] })) +
+    panel(3, s({ ring: 'top', tile: { at: 'bottom', n: 2 }, ans: 9, state: 'traced' }), L.steps[2][1], 'Write 9.', hopTrack({ nums: [7, 8, 9] })) + `</div></div>` +
+    `<div class="band" style="flex:1.35 1 0;min-height:0" data-section="other"><div class="strip"><b>Another example:</b></div><div class="grid" style="grid-template-columns:1fr 1fr">` +
     ex('Big number second? Start with it.', 2, 8, 'bottom', 2, [8, 9, 10]) + ex('Same numbers? Start with either.', 3, 3, 'top', 3, [3, 4, 5, 6]) + `</div></div>` +
     `<div class="band sayb"><div class="sayline"><b>Say:</b><span>“7 plus 2 equals 9.”</span></div></div>` +
     `<div class="band"><div class="strip" style="min-height:17mm"><b>Rule:</b><span class="chant">Big number first. Count on. Write it.</span></div></div>`;
 }
 
-// ---------- P3 Lesson sheet ----------
+// ---- P3 Lesson sheet: Guided cells sized to content (55 mm); Independent takes whole rows of 3 ----
 function sheet(key) {
   const W = 'flex:1;display:flex;flex-direction:column;align-items:center';
   const vpic = [`<span style="font-size:40pt;font-weight:700;line-height:1">+</span>`, `<span style="font-size:40pt;font-weight:700;line-height:1">=</span>`, hopTrack({ nums: [7, 8, 9] })];
-  const words = ['equals', 'count on', 'plus'];  // shuffled; key: + -> plus (2), = -> equals (0), hop -> count on (1)
   const vocab = `<div class="band" data-section="vocab"><div class="strip"><b>Vocabulary:</b><span data-instr>Draw a line to match.</span></div>` +
-    `<div class="grid" style="grid-template-columns:1fr;flex:none"><div class="cell" style="padding:3mm 6mm;position:relative">` +
-    `<div style="display:grid;grid-template-columns:repeat(3,1fr);width:100%;row-gap:12mm">` +
+    `<div class="grid" style="grid-template-columns:1fr;flex:none"><div class="cell" style="padding:3mm 6mm;position:relative"><div style="display:grid;grid-template-columns:repeat(3,1fr);width:100%;row-gap:9mm">` +
     vpic.map((p) => `<div style="${W};justify-content:space-between;height:20mm"><div style="height:16mm;display:flex;align-items:center">${p}</div><i class="dotm"></i></div>`).join('') +
-    words.map((w) => `<div style="${W};gap:1.5mm"><i class="dotm"></i><b style="font-size:15pt">${w}</b></div>`).join('') + `</div>` +
+    ['equals', 'count on', 'plus'].map((w) => `<div style="${W};gap:1.5mm"><i class="dotm"></i><b style="font-size:15pt">${w}</b></div>`).join('') + `</div>` +
     `<svg class="ka" data-ka viewBox="0 0 174 40" style="position:absolute;left:6mm;top:0;width:174mm;height:40mm;overflow:visible" fill="none">` +
-    `<path data-ka d="M29 21.75 L145 36.25 M87 21.75 L29 36.25 M145 21.75 L87 36.25" stroke-width="0.53"/></svg></div></div></div>`;
-  const remember = `<div class="band"><div class="strip"><b>Remember:</b><span>Start at the bigger number and count on.</span></div></div>`;
-  const gcell = ([a, b], i) => {
-    const big = a >= b ? 'top' : 'bottom';
-    return `<div class="cell" style="padding-top:6mm"><div style="margin-right:11mm">${factStack({ top: a, bottom: b, ring: i === 0 ? big : null, ringGrey: true,
-      tile: { at: big === 'top' ? 'bottom' : 'top', n: Math.min(a, b), grey: true }, ans: key ? a + b : null })}</div></div>`;
-  };
-  const guided = `<div class="band" style="flex:1 1 0" data-section="guided"><div class="row" style="flex:1;border-top:1.5pt solid #000">` +
+    `<path data-ka d="M29 21.75 L145 33.25 M87 21.75 L29 33.25 M145 21.75 L87 33.25" stroke-width="0.53"/></svg></div></div></div>`;
+  const gcell = ([a, b], i) => { const bigAt = a >= b ? 'top' : 'bottom';
+    return `<div class="cell" style="padding-top:5mm"><div style="margin-right:11mm">${fact(a, b, key, { ring: i === 0 ? bigAt : null, ringGrey: true,
+      tile: { at: bigAt === 'top' ? 'bottom' : 'top', n: Math.min(a, b), grey: true } })}</div></div>`; };
+  const guided = `<div class="band" style="flex:none" data-section="guided"><div class="row" style="border-top:1.5pt solid #000">` +
     `<div style="flex:1;display:flex;flex-direction:column;border-right:1.5pt solid #000"><div class="strip"><b>Guided Practice:</b><span data-instr>Add.</span></div>` +
-    `<div class="grid" style="grid-template-columns:repeat(3,1fr);border-width:1.5pt 0 0 0">${GUIDED.map(gcell).join('')}</div></div>` +
-    `<div style="flex:0 0 66mm;display:flex;flex-direction:column"><div class="strip"><b>Steps:</b></div><ol class="steps" style="flex:1;padding:2mm 3mm 3mm">` +
-    L.steps.map(([ic, t], i) => `<li><span class="num" data-accent>${i + 1}</span>${icon(ic)}<span>${t}</span></li>`).join('') + `</ol></div></div></div>`;
-  const indep = `<div class="band" style="flex:1 1 0" data-section="indep"><div class="strip"><b>Independent Practice:</b><span data-instr>Add.</span></div>` +
-    `<div class="grid" style="grid-template-columns:repeat(3,1fr)">${INDEP.map(([a, b], i) => `<div class="cell" style="padding-top:8mm"><span class="lt">${LET[i]}.</span>${factStack({ top: a, bottom: b, ans: key ? a + b : null })}</div>`).join('')}</div></div>`;
-  return vocab + remember + guided + indep;
+    `<div class="grid" style="flex:none;height:51mm;grid-template-columns:repeat(3,1fr);border-width:1.5pt 0 0 0">${GUIDED.map(gcell).join('')}</div></div>` +
+    `<div style="flex:0 0 66mm;display:flex;flex-direction:column"><div class="strip"><b>Steps:</b></div>${stepsList()}</div></div></div>`;
+  const indep = `<div class="band grow" data-section="indep"><div class="strip"><b>Independent Practice:</b><span data-instr>Add.</span></div>` +
+    `<div class="grid" style="grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr)">${INDEP.map(([a, b], i) => cellF(a, b, i, key)).join('')}</div></div>`;
+  return vocab + `<div class="band"><div class="strip"><b>Remember:</b><span>Start at the bigger number and count on.</span></div></div>` + guided + indep;
 }
 
-// ---------- P4 Practice ----------
-function practice(items, key) {
-  return stepsStrip() + `<div class="instr" data-instr>Add.</div><div class="grid" data-section="practice" style="grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr)">` +
-    items.map(([a, b], i) => `<div class="cell" style="padding-top:8mm"><span class="lt">${LET[i]}.</span>${factStack({ top: a, bottom: b, ans: key ? a + b : null })}</div>`).join('') + `</div>`;
-}
+const practice = (items, key) => stepsStrip() + `<div class="instr" data-instr>Add.</div><div class="grid" data-section="practice" style="grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr)">` +
+  items.map(([a, b], i) => cellF(a, b, i, key)).join('') + `</div>`;
 
-// ---------- P5 Word problem (RCDWS) ----------
+// ---- P5 Word problem: story 58 %, routine panel 42 %, one action per check box, 13 pt (Steps-box size) ----
 function wordProblem(key) {
-  const rc = [['read', 'Read it two times.'], ['ringnum', 'Circle the numbers. Underline the question.'], ['draw', 'Draw it.'], ['write', 'Write the equation.'], ['check', 'Solve. Check.']];
-  const k = (v) => `<b class="ka">${v}</b>`;
+  const rc = [['read', 'Read it two times.'], ['ringnum', 'Circle the numbers.'], ['underline', 'Underline the question.'], ['draw', 'Draw it.'], ['write', 'Write the equation.'], ['check', 'Solve. Check.']];
   return `<div class="instr" data-instr>Read the story. Draw it. Solve.</div>` +
-    `<div class="grid" data-section="wp" style="grid-template-columns:2fr 1fr;flex:none;height:86mm"><div class="cell" data-read style="justify-content:center;align-items:stretch">` +
-    `<div class="story" style="font-size:15pt;flex:1;display:flex;flex-direction:column;justify-content:space-evenly"><p>Omar has 3 cars.</p><p>He gets 2 more cars.</p><p>How many cars does Omar have now?</p></div></div>` +
+    `<div class="grid" data-section="wp" style="grid-template-columns:58fr 42fr;flex:none;height:72mm"><div class="cell" data-read style="justify-content:center;align-items:stretch">` +
+    `<div class="story" style="font-size:15pt;flex:1;display:flex;flex-direction:column;justify-content:space-evenly"><p>Omar has 3 cars.</p><p>He gets 2 more cars.</p><p>How many cars does Omar have now?</p>` +
+    `<p style="display:flex;align-items:flex-end;gap:2mm">Omar has <span class="ln" data-slot="line" style="--w:17mm">${k(5)}</span> cars.</p></div></div>` +
     `<div class="cell" data-read style="align-items:stretch;justify-content:space-evenly;padding:2mm 3mm">${rc.map(([ic, t]) =>
-      `<div style="display:flex;align-items:center;gap:1.5mm;font-size:15pt;line-height:1.15"><span class="chk" data-slot="check-routine"></span>${icon(ic)}<span>${t}</span></div>`).join('')}</div></div>` +
+      `<div data-panel-row style="display:flex;align-items:center;gap:1.5mm;font-size:13pt;line-height:1.15;white-space:nowrap"><span class="chk" data-slot="check-routine"></span>${icon(ic)}<span>${t}</span></div>`).join('')}</div></div>` +
     `<div class="band grow" style="margin-top:3mm;border-top-width:2.25pt"><div class="strip"><b>Workspace:</b></div><div style="flex:1;border-top:1.5pt solid #000;position:relative" data-work>` +
     (key ? `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:14mm" data-ka>${counters({ n: 3, kind: 'dot' })}${counters({ n: 2, kind: 'ring' })}</div>` : '') + `</div></div>` +
-    `<div class="band" style="flex:none"><div class="row" style="border-top:0;align-items:center;justify-content:space-around;height:24mm">` +
-    `<div class="eq"><span class="ln" data-slot="line" style="--w:17mm">${k(3)}</span><span class="circ" data-slot="circle">${k('+')}</span><span class="ln" data-slot="line" style="--w:17mm">${k(2)}</span><span class="o">=</span><span class="ln" data-slot="line" style="--w:17mm">${k(5)}</span></div>` +
-    `<div class="eq"><span class="ln" data-slot="line" style="--w:17mm">${k(5)}</span><span class="unit">cars</span></div></div></div>` +
-    `<div class="band sayb"><div class="sayline"><b>Say:</b><span>“The answer is <span class="ln" style="--w:17mm;height:6mm"></span> cars.”</span></div></div>`;
+    `<div class="band" style="flex:none"><div class="row" style="border-top:0;align-items:center;justify-content:center;height:24mm">` +
+    `<div class="eq"><span class="ln" data-slot="line" style="--w:17mm">${k(3)}</span><span class="circ" data-slot="circle">${k('+')}</span><span class="ln" data-slot="line" style="--w:17mm">${k(2)}</span><span class="o">=</span><span class="ln" data-slot="line" style="--w:17mm">${k(5)}</span></div></div></div>` +
+    `<div class="band sayb"><div class="sayline"><b>Say:</b><span>“The answer is ${blank()} cars.”</span></div></div>`;
 }
 
-// ---------- P6 Exit slip, 2-up landscape ----------
-function exitHalf(key) {
-  return `<div style="flex:1;display:flex;flex-direction:column;min-width:0">` +
-    `<div class="rowA" style="gap:3mm"><div class="fld name" style="min-width:40mm">Name <i>${key ? 'Answer Key' : ''}</i></div>${tab(key ? 'Answer Key' : 'Exit slip')}</div>` +
-    `<div class="title">${L.title}</div><div class="hrule"></div>` +
-    `<div class="instr" data-instr>Add.</div><div class="grid" data-section="exit" style="grid-template-columns:1fr"><div class="cell" data-work style="padding-top:8mm;align-items:flex-start"><span class="lt">a.</span><div style="width:62mm;display:flex;justify-content:center">${factStack({ top: 5, bottom: 1, ans: key ? 6 : null })}</div></div></div>` +
-    `<div class="band sayb" style="margin-top:-1.5pt"><div class="sayline"><b>Say:</b><span>“5 plus 1 equals <span class="ln" style="--w:17mm;height:6mm"></span>.”</span></div></div>` +
-    `<div style="flex:none;display:flex;flex-direction:column;gap:3mm;padding:4mm 3mm 0;font-size:15pt"><div><span class="chk" data-slot="check"></span>I can do this.</div><div><span class="chk" data-slot="check"></span>I need one more day.</div></div></div>`;
-}
-const exitBody = (key) => `<div style="flex:1;display:flex;gap:18mm;position:relative">${exitHalf(key)}<div class="cut" data-cut></div>` +
-  `<div style="position:absolute;left:50%;top:0;transform:translate(-50%,0);background:#fff;padding:1mm 0">${icon('scissors', { color: 'ink', mm: 5.8 })}</div>${exitHalf(key)}</div>`;
+// ---- P6 Exit slip half: 4 facts (2 x 2), one per case; the Say frame for item a ----
+const exitHalf = (key) => `<div style="flex:1;display:flex;flex-direction:column;min-width:0">${exitHead(key)}` +
+  `<div class="instr" data-instr>Add.</div><div class="grid" data-section="exit" style="grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr">${EXIT.map(([a, b], i) => cellF(a, b, i, key)).join('')}</div>` +
+  `<div class="band sayb" style="margin-top:-1.5pt"><div class="sayline"><b>Say:</b><span>“a. 4 plus 3 equals ${blank()}.”</span></div></div>${exitFoot()}</div>`;
 
-// ---------- teacher pages ----------
-const T = (n) => `Teacher ${n}`;
-const theader = (l3) => header({ fields: false, l3 });
-const tfoot = (n, N) => footer(`${n}/${N}`, 'Teacher · Form A · seed 4242');
-const sec = (title, inner, grow = false) => `<div class="band${grow ? ' grow' : ''}"><div class="strip"><b>${title}</b></div><div class="tpad" style="border-top:1.5pt solid #000;${grow ? 'flex:1;' : ''}">${inner}</div></div>`;
-const tbox = (kind, lab, title, text) => `<div class="tbox${kind === 'watch' ? ' watch' : ''}">${icon(kind, { color: 'ink' })}<div><b>${lab}</b> <b>${title}</b> ${text}</div></div>`;
-const sc = (n, rows) => `<div class="sc"><span class="num" data-accent>${n}</span>${rows.map(([l, t]) => `<b>${l}</b><span${/^(Say|Ask)/.test(l) ? ' class="q"' : ''}>${t}</span>`).join('')}</div>`;
-const ans = (t) => `<span class="ka" data-teacher-ans>${t}</span>`;
-const loopIcons = { most: '<circle cx="2.5" cy="2.5" r="2" fill="#000"/>', half: '<circle cx="2.5" cy="2.5" r="2" fill="none" stroke="#000" stroke-width=".27"/><path d="M2.5 .5 A2 2 0 0 0 2.5 4.5 Z" fill="#000"/>', few: '<circle cx="2.5" cy="2.5" r="2" fill="none" stroke="#000" stroke-width=".27"/>' };
-const loop = (rows) => `<div class="loop">${rows.map(([k, lab, t]) => `<svg viewBox="0 0 5 5" width="4mm" height="4mm">${loopIcons[k]}</svg><b>${lab}</b><span>${t}</span>`).join('')}</div>`;
-const table = (heads, rows) => `<table class="tt"><tr>${heads.map((h, i) => `<th${i === heads.length - 1 && /min/i.test(h) ? ' class="r"' : ''}>${h}</th>`).join('')}</tr>${rows.map((r) => `<tr>${r.map((c, i) => `<td${i === r.length - 1 && /^\d+$/.test(String(c)) ? ' class="r"' : ''}>${c}</td>`).join('')}</tr>`).join('')}</table>`;
-const chk = (t) => `<div><span class="chk" style="width:5mm;height:5mm;vertical-align:-1mm"></span>${t}</div>`;
+// ---- pupil packet ----
+const P = [
+  { id: 'P0', render: (key) => pupilPage({ id: 'P0', l3: 'Prerequisite', score: 4, body: prereq(key), key }) },
+  { id: 'P1', render: (key) => pupilPage({ id: 'P1', l3: 'Number sense', score: 10, body: numberSense(key), key }) },
+  { id: 'P2', render: (key) => pupilPage({ id: 'P2', l3: 'Anchor chart', fields: false, body: chart(), key }) },
+  { id: 'P3', render: (key) => pupilPage({ id: 'P3', l3: 'Lesson 1', score: 6, body: sheet(key), key }) },
+  { id: 'P4a', render: (key) => pupilPage({ id: 'P4a', l3: 'Practice 1', score: 12, body: practice(P1, key), key }) },
+  { id: 'P4b', render: (key) => pupilPage({ id: 'P4b', l3: 'Practice 2', score: 12, body: practice(P2, key), key }) },
+  { id: 'P5', render: (key) => pupilPage({ id: 'P5', l3: 'Word problem', score: 1, body: wordProblem(key), key }) },
+  { id: 'P6', render: (key) => exitPage({ half: exitHalf, key }) },
+];
+const pg = (id) => P.find((p) => p.id === id).render(false);
 
-function t1() {
-  return `<div class="t" style="display:contents">` +
-    `<div class="tline" style="padding:1.5mm 0 1mm">CCSS 1.OA.C.6 · EE M.EE.2.NBT.7, M.EE.3.OA.6 · CRA: Pictures · Flow: Standard</div>` +
-    sec('Lesson guidance:', tbox('tip', 'Tip:', 'Big first, every time.', 'Pupils who start with the first number count on 7 from 2: slow, and they lose count. Before every item ask “Which is bigger?” and have them touch it.') +
-      tbox('language', 'Tip:', 'Plus means put together.', 'ELL pupils may read + as “and” or not read it at all. Say “plus” and push two groups of counters together each time you say it.') +
-      tbox('watch', 'Watch:', 'Counting the start.', 'The most common mistake: 7 + 2 → “7, 8” → 8. The start number is said, not counted. Fix: tap the 7, say it, then put up one finger per count.')) +
-    sec('Lesson flow:', table(['', 'Section', 'Pupil page', 'Min'], [
-      [1, 'Prerequisite Check', 'Prerequisite Check', 4], [2, 'Number sense', 'Number sense', 5], [3, 'Spaced retrieval', 'mini whiteboards', 3],
-      [4, 'Chaining Bridge', '—', 1], [5, 'I Do', 'Anchor chart (board)', 12], [6, 'We Do', 'Lesson sheet: Guided Practice', 8],
-      [7, 'Check Question', 'board + mini whiteboards', 3], [8, 'You Do + word problem', 'Lesson sheet, Practice 1–2, Word problem', 15],
-      [9, 'Plenary', 'Exit slip', 7], ['', 'Transitions', '', 2], ['', '<b>Total</b>', '', '<b>60</b>']])) +
-    sec('Materials:', `<div style="display:grid;grid-template-columns:1fr 1fr;row-gap:1.5mm">` + [
-      'Pupil packet: 8 pages, one per pupil', 'Exit slips, cut in half', 'Counters and a 0–10 number track', 'Mini whiteboards and pens',
-      'Anchor chart on the board (A3 or projected)', 'Answer keys (Teacher 6)'].map(chk).join('') + `</div>`) +
-    sec('Vocabulary:', `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3mm">` + [
-      ['<span style="font-size:28pt;font-weight:700">+</span>', 'plus', 'put the two numbers together'],
-      ['<span style="font-size:28pt;font-weight:700">=</span>', 'equals', 'is the same as'],
-      [hopTrack({ nums: [7, 8, 9] }), 'count on', 'start at a number, then say the next ones']].map(([pic, w, g]) =>
-      `<div style="border:1.5pt solid #000;border-radius:3mm;padding:2mm;display:flex;flex-direction:column;align-items:center;gap:1mm;justify-content:center">${pic}<b style="font-size:13pt">${w}</b><span style="text-align:center">${g}</span></div>`).join('') + `</div>`, true) + `</div>`;
-}
+// ---- teacher pages ----
+const T1 = `<div class="tline" style="padding:1.5mm 0 1mm">CCSS 1.OA.C.6 · EE M.EE.2.NBT.7, M.EE.3.OA.6 · CRA: Pictures · Flow: Standard</div>` +
+  sec('Lesson guidance:', tbox('tip', 'Tip:', 'Big first, every time.', 'Pupils who start with the first number count on 7 from 2: slow, and they lose count. Before every item ask “Which is bigger?” and have them touch it.') +
+    tbox('language', 'Tip:', 'Plus means put together.', 'ELL pupils may read + as “and” or not read it at all. Say “plus” and push two groups of counters together each time you say it.') +
+    tbox('watch', 'Watch:', 'Counting the start.', 'The most common mistake: 7 + 2 → “7, 8” → 8. The start number is said, not counted. Fix: tap the 7, say it, then put up one finger per count.')) +
+  sec('Lesson flow:', table(['', 'Section', 'Pupil page', 'Min'], [[1, 'Prerequisite Check', 'Prerequisite Check', 4], [2, 'Number sense', 'Number sense', 5],
+    [3, 'Spaced retrieval', 'mini whiteboards', 3], [4, 'Chaining Bridge', '—', 1], [5, 'I Do', 'Anchor chart (board)', 12], [6, 'We Do', 'Lesson sheet: Guided Practice', 8],
+    [7, 'Check Question', 'board + mini whiteboards', 3], [8, 'You Do + word problem', 'Lesson sheet, Practice 1–2, Word problem', 15], [9, 'Plenary', 'Exit slip', 7],
+    ['', 'Transitions', '', 2], ['', '<b>Total</b>', '', '<b>60</b>']])) +
+  sec('Materials:', `<div style="display:grid;grid-template-columns:1fr 1fr;row-gap:1.5mm">` + ['Pupil packet: 8 pages, one per pupil', 'Exit slips, cut in half',
+    'Counters and a 0–10 number track', 'Mini whiteboards and pens', 'Anchor chart on the board (A3 or projected)', 'Answer keys (Teacher 6)'].map(chk).join('') + `</div>`) +
+  sec('Vocabulary:', `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3mm">` + [['<span style="font-size:28pt;font-weight:700">+</span>', 'plus', 'put the two numbers together'],
+    ['<span style="font-size:28pt;font-weight:700">=</span>', 'equals', 'is the same as'], [hopTrack({ nums: [7, 8, 9] }), 'count on', 'start at a number, then say the next ones']].map(([pic, w, g]) =>
+    `<div style="border:1.5pt solid #000;border-radius:3mm;padding:2mm;display:flex;flex-direction:column;align-items:center;gap:1mm;justify-content:center">${pic}<b style="font-size:13pt">${w}</b><span style="text-align:center">${g}</span></div>`).join('') + `</div>`, true);
 
-function t2() {
-  return `<div class="t" style="display:contents">` +
-    sec('What students need to know:', table(['Atom', 'Type', 'Pupil can say'], [
-      ['The bigger number is the one further along when we count.', 'Concept', '“9 is bigger than 4.”'],
-      ['Adding 1, 2 or 3 is the same as counting on 1, 2 or 3.', 'Concept', '“Plus 2 is count on 2.”'],
-      ['You can add in either order (we start with the big one).', 'Fact / property', '“7 plus 2 and 2 plus 7 are the same.”'],
-      ['The start number is said, not counted.', 'Procedure detail', '“Start with 7. Count on: 8, 9.”']])) +
-    sec('What students do:', table(['Step', 'Atom (routine)', 'New?', 'Check it with'], [
-      [1, 'Find the bigger number. Circle it.', '★ prerequisite (compare)', 'Prerequisite Check item c'],
-      [2, `${icon('key', { color: 'ink', mm: 4 })} <b>Count on the small number from the big one, without counting the start.</b>`, '<b>New: Critical Atom</b>', 'Guided cell 1, Check Question'],
-      [3, 'Write how many under the line.', 'New', 'Independent a–c']])) +
-    sec('How to teach:', `<p><b>CRA stage: Pictures.</b> Dot tiles beside the small number and hops on a number track. Counters on the tables for anyone who needs them.</p>` +
-      `<p><b>Order.</b> Model big-first (7 + 2) → big-second with a sum of 10 (2 + 8) → same numbers (3 + 3). Then guided with step 1 in grey, then independent.</p>` +
-      `<p><b>Language.</b> One phrase per step, the same every time: “Start with the big number.” “Count on.” “Write how many.”</p>`) +
-    sec('Common mistakes:', table(['Mistake', 'What it looks like', 'Fix'], [
-      ['<b>Counting the start</b>', '7 + 2 → 8', 'Tap and say the start; count only the dots on the tile.'],
-      ['<b>Starting small</b>', '2 + 7 counted from 2 (slow, loses count)', 'Ask “Which is bigger?” first; circle it.'],
-      ['<b>Losing the count</b>', '7 + 3 → 8, 9, 10, 11', 'One finger per dot on the tile; stop when the fingers match.'],
-      ['<b>Writing the last count only</b>', 'writes 3 for 7 + 3', 'Say the frame: “7 plus 3 equals 10.”']]), true) + `</div>`;
-}
+const T2 = sec('What students need to know:', table(['#', 'Skill or Concept', 'Atom Type', 'Teacher Notes'], [
+    [1, '<b>Counting:</b> the last number said tells how many.', 'Fact · Pre-requisite', 'Prerequisite Check a'],
+    [2, '<b>Next number:</b> each count is one more.', 'Fact · Pre-requisite', 'Prerequisite Check b'],
+    [3, '<b>Bigger number:</b> the one said later when we count.', 'Comparative · Pre-requisite', 'Prerequisite Check c'],
+    [4, '<b>Parts and whole:</b> two parts make the whole.', 'Conceptual · Pre-requisite', 'Prerequisite Check d'],
+    [5, '<b>Plus and equals:</b> + puts together; = means the same as.', 'Category · New', 'Vocabulary band'],
+    [6, '<b>Count on:</b> adding 1, 2 or 3 is counting on 1, 2 or 3.', 'Conceptual · New', 'Anchor chart step 2'],
+    [7, '<b>Turn-around:</b> 2 + 7 and 7 + 2 make the same total.', 'Fact · New', 'Another example, big second'],
+    [8, '<b>Start is said:</b> the start number is said, not counted.', 'Comparative · New', 'Critical Atom (step 2)']])) +
+  sec('What students do:', table(['Step', 'Task / Routine atom', 'Tag', 'Check it with'], [
+    [1, '<b>Find</b> the bigger number. Circle it.', 'Pre-requisite', 'Prerequisite Check c'],
+    [2, `${icon('key', { color: 'ink', mm: 4 })} <b>Count on</b> the small number from the big one, without counting the start.`, '<b>New · Critical Atom</b>', 'Guided cell 1, Check Question, exit b'],
+    [3, '<b>Write</b> how many under the line.', 'New', 'Independent a–f']])) +
+  sec('How to teach:', `<p><b>Show, then name</b> (steps 1–3). CRA: Pictures — dot tiles and hops. Model 7 + 2, then 2 + 8, then 3 + 3. Fade: Guided ★, Independent ★★, last practice row ★★★.</p>`) +
+  sec('Common mistakes:', table(['Mistake', 'Broken step', 'What it looks like', 'Fix'], [
+    ['<b>Counting the start</b>', 2, '7 + 2 → 8', 'Say the start; count only the dots.'],
+    ['<b>Starting small</b>', 1, '2 + 7 counted from 2', 'Ask “Which is bigger?”; circle it.'],
+    ['<b>Losing the count</b>', 2, '7 + 3 → 11', 'One finger per dot; stop when they match.'],
+    ['<b>Last count only</b>', 3, '7 + 3 → 3', 'Say “7 plus 3 equals 10.”']]) +
+    `<p style="margin-top:1.5mm"><b>Check Question link (6 + 3):</b> option A = Counting the start (8); option B = Starting small (9, slow route).</p>`, true);
 
-function t2b() {
-  const col = (h, rows) => `<div><h3>${h}</h3>${table(['Term', 'Means'], rows)}</div>`;
-  return `<div class="t" style="display:contents">` + sec('Reference key:', `<div class="cols2">` +
+const slotRow = (draw, name, means) => [draw, name, means];
+const T2b = sec('Reference key:', `<div class="cols2"><div style="display:flex;flex-direction:column;gap:3mm">` +
+    `<div><h3>Page ids</h3>${table(['Tab', 'Page'], [['Prerequisite', '3–4 routed questions'], ['Number sense', 'bands A and B'], ['Anchor chart', 'board copy; poster'], ['Lesson 1', 'lesson sheet'], ['Practice 1, 2', 'You Do pages'], ['Word problem', 'RCDWS page'], ['Exit slip', '2-up half page'], ['Answer Key', 'facsimile of each page']])}<p style="margin-top:1mm">Packet order: P0 Prerequisite · P1 Number sense · P2 Anchor chart · P3 Lesson 1 · P4 Practice · P5 Word problem · P6 Exit slip.</p><p>Score /N counts lettered items only: Guided cells, the chart, vocabulary and Say frames are not scored.</p></div>` +
+    `<div><h3>Fade levels (teacher labels only)</h3>${table(['Mark', 'Means'], [['★', 'Guided: step 1 grey, hints grey'], ['★★', 'Independent: structure only'], ['★★★', 'last row: edge cases, same format']])}</div>` +
+    `<div><h3>Data loop</h3>${table(['Shape', 'Read as'], [[K.loopIcon('most'), 'Most: go on'], [K.loopIcon('half'), 'About half: short reteach, go on'], [K.loopIcon('few'), 'Fewer than half: stop, reteach concretely']])}</div>` +
+    `<div><h3>Abbreviations</h3>${table(['Term', 'Means'], [['MWB', 'mini whiteboard'], ['CFU', 'check for understanding'], ['CRA', 'concrete, pictures, abstract'], ['RCDWS', 'Read, Circle, Draw, Write, Solve']])}</div></div>` +
     `<div style="display:flex;flex-direction:column;gap:3mm">` +
-    col('Page ids', [['Prerequisite Check', '3–4 routed questions'], ['Number sense', 'Daily-look bands A and B'], ['Anchor chart', 'the board copy; poster'], ['Lesson 1', 'lesson sheet'], ['Practice 1, 2', 'You Do pages'], ['Word problem', 'RCDWS page'], ['Exit slip', '2-up half page'], ['Answer Key', 'facsimile of each page']]) +
-    col('Fade levels (teacher labels)', [['★', 'Guided Practice: step 1 grey, hints grey'], ['★★', 'Independent Practice: hint on the first cell only'], ['★★★', 'last row: edge cases, same format']]) + `</div>` +
-    `<div style="display:flex;flex-direction:column;gap:3mm">` +
-    col('Abbreviations', [['MWB', 'mini whiteboard'], ['CFU', 'check for understanding'], ['CRA', 'concrete, pictures, abstract'], ['I Do / We Do / You Do', 'model / guided / independent'], ['RCDWS', 'Read, Circle, Draw, Write, Solve']]) +
-    col('Marks on teacher pages', [[`<span class="num" data-accent>3</span>`, 'step 3, same as the pupil Steps'], [ans('9'), 'expected answer (key colour)'], ['“…”', 'words you say aloud (13 pt)'], ['Tip: / Feedback: / Watch: / Research:', 'the four boxes'], [`${icon('key', { color: 'ink', mm: 4 })}`, 'Critical Atom']]) +
-    `</div></div><p style="margin-top:3mm">Print once per unit.</p>`, true) + `</div>`;
-}
+    `<div><h3>Slot shapes (what the pupil writes)</h3>${table(['Shape', 'Slot', 'Means'], [
+      slotRow('<span class="ln" style="--w:14mm;height:5mm"></span>', 'line', 'a number after ='), slotRow('<span class="bx" style="--w:12mm;height:7mm"></span>', 'box', 'a missing number inside'),
+      slotRow('<span class="circ" style="width:7mm;height:7mm"></span>', 'circle', 'a sign'), slotRow('<span class="chk" style="width:5mm;height:5mm"></span>', 'check box', 'a decision'),
+      slotRow('<span style="display:inline-block;width:14mm;border-top:1.5pt solid #000"></span>', 'answer row', 'under the sum rule')])}</div>` +
+    `<div><h3>Icons</h3>${table(['Icon', 'Means'], [[icon('start', { mm: 4.5 }), 'start with'], [icon('count', { mm: 4.5 }), 'count on'], [icon('write', { mm: 4.5 }), 'write'],
+      [icon('tip', { color: 'ink', mm: 4.5 }), 'Tip'], [icon('feedback', { color: 'ink', mm: 4.5 }), 'Feedback'], [icon('watch', { color: 'ink', mm: 4.5 }), 'Watch'],
+      [icon('research', { color: 'ink', mm: 4.5 }), 'Research'], [icon('key', { color: 'ink', mm: 4.5 }), 'Critical Atom'], [icon('board', { color: 'ink', mm: 4.5 }), 'board'], [icon('cubes', { color: 'ink', mm: 4.5 }), 'manipulative']])}</div>` +
+    `<div><h3>Band labels</h3>${table(['Label', 'Holds'], [['Vocabulary:', '≤ 3 words + pictures'], ['Remember:', 'one reminder'], ['Guided Practice:', 'worked together'], ['Independent Practice:', 'lettered, scored'], ['Another example:', 'chart: other cases'], ['Say:', 'the oral frame'], ['Rule:', 'the chant'], ['Workspace:', 'draw it']])}</div>` +
+    `</div></div>`, true);
 
-function t3() {
-  return `<div class="t" style="display:contents">` +
-    sec('Section 1 · Prerequisite Check (4 min)', tbox('tip', 'Tip:', 'Read each instruction aloud.', 'The check tests maths, not reading. Read the line, point to the slot, then wait.') +
-      sc(1, [['Do:', 'Hand out the Prerequisite Check. Pupils write their name.'], ['Say:', '“Four questions. Do them on your own. I will read each one.”']]) +
-      sc(2, [['Do:', 'Read a, wait 30 seconds; then b, c, d. Then “3-2-1, show me” each answer on fingers.'], ['Note:', `Answers: a ${ans('8')}, b ${ans('7')}, c ${ans('9 circled')}, d ${ans('2')}. Routing table: Teacher 6.`]]) +
-      loop([['most', 'Most:', 'right on all four → go on.'], ['half', 'About half:', 'reteach the missed item with counters for 2 minutes, then go on.'], ['few', 'Fewer than half:', 'stop; teach the earliest missed lesson first (routing table).']])) +
-    sec('Section 2 · Number sense (5 min)', sc(1, [['Do:', 'Pupils do band A (1–5). Early finishers do band B (6–10).'], ['Say:', '“Point to the box. Say the number. Then write it.”']]) +
-      sc(2, [['Do:', 'Choral check: read each item and its answer together.'], ['Note:', `A: ${ans('4, 6 · 5 · &gt; · 4 · 7')}. B: ${ans('13, 15 · 18 · &lt; · 7 · 13')}.`]])) +
-    sec('Section 3 · Spaced retrieval (3 min, mini whiteboards)', sc(1, [['Ask:', `“Write the number that is 1 more than 9.” ${ans('10')}`], ['Ask:', `“Draw 6 dots in a ten frame.” ${ans('6 dots, top row first')}`], ['Ask:', `“Which is less, 3 or 8?” ${ans('3')}`]]) +
-      `<p>Nothing printed. Earlier topics only, one per domain (counting, shapes, comparing).</p>`) +
-    sec('Section 4 · Chaining Bridge (1 min)', sc(1, [['Say:', '“Yesterday we counted on from any number. Today we use counting on to add.”'], ['Do:', 'Point to the I Can title on the board.'], ['Say:', '“I can add 1, 2 or 3. Say it with me.”']]), true) + `</div>`;
-}
+const T3 = sec('Section 1 · Prerequisite Check (4 min)', withThumb(tbox('tip', 'Tip:', 'Read each instruction aloud.', 'The check tests maths, not reading. Read the line, point to the slot, then wait.') +
+      sc(1, [['Do:', 'Hand out the Prerequisite Check. Pupils write their name.'], ['Say:', '“Four questions. Do them on your own.”']]) +
+      sc(2, [['Do:', 'Read a, wait 30 seconds; then b, c, d.'], ['Note:', `Answers ★: a ${ans('8')}, b ${ans('7')}, c ${ans('9 circled')}, d ${ans('2')}. Routing: Teacher 6.`]]), pg('P0')) +
+    loop([['most', 'Most:', 'right on all four → go on.'], ['half', 'About half:', 'reteach the missed item with counters for 2 minutes, then go on.'], ['few', 'Fewer than half:', 'stop; teach the earliest missed lesson first (routing table).']])) +
+  sec('Section 2 · Number sense (5 min)', sc(1, [['Do:', 'Pupils do band A (1–5). Early finishers do band B (6–10).'], ['Say:', '“Point to the box. Say the number. Then write it.”']]) +
+    sc(2, [['Do:', 'Choral check: read each item and its answer together.'], ['Note:', `★ A: ${ans('4, 6 · 5 · &gt; · 4 · 7')}. B: ${ans('13, 15 · 18 · &lt; · 7 · 13')}.`]])) +
+  sec('Section 3 · Spaced retrieval (3 min, mini whiteboards)', sc(1, [['Ask:', `“Write the number that is 1 more than 9.” ${ans('10')}`], ['Ask:', `“Draw 6 dots in a ten frame.” ${ans('6 dots, top row first')}`], ['Ask:', `“Which is less, 3 or 8?” ${ans('3')}`]])) +
+  sec('Section 4 · Chaining Bridge (1 min)', sc(1, [['Say:', '“Yesterday we counted on from any number. Today we use it to add.”'], ['Do:', 'Point to the I Can title on the board.'], ['Say:', '“I can add 1, 2 or 3. Say it with me.”']]), true);
 
-function thumb(inner) { return `<div class="thumb">${inner}</div>`; }
-function t4(chartPage, sheetPage) {
-  return `<div class="t" style="display:contents">` +
-    sec('Section 5 · I Do (12 min)', `<div style="display:flex;gap:4mm"><div style="flex:1;display:flex;flex-direction:column;gap:1.5mm">` +
-      tbox('watch', 'Watch:', 'Counting the start.', 'Model the wrong way once on the board: “7, 8” → 8. Write the word Wrong beside it. Never print it.') +
-      `<div class="bline">${icon('board', { color: 'ink' })}<span><b>Board:</b> the anchor chart. Board = Paper: pupils see the same drawing.</span></div>` +
+const T4 = sec('Section 5 · I Do (12 min)', withThumb(tbox('watch', 'Watch:', 'Counting the start.', 'Model the wrong way once on the board: “7, 8” → 8. Write the word Wrong beside it. Never print it.') +
+      `<div class="bline">${icon('board', { color: 'ink' })}<span><b>Board:</b> the anchor chart. Board = Paper.</span></div>` +
       sc(1, [['Do:', 'Point to 7 + 2. Silent: circle the 7.'], ['Say:', '“Start with the big number. 7.”']]) +
       sc(2, [['Do:', 'Touch each dot on the tile; draw the hops 8, 9.'], ['Say:', '“Count on 2. 8, 9.”']]) +
-      sc(3, [['Do:', 'Write 9 under the line.'], ['Say:', `“Write how many. 7 plus 2 equals 9.” ${ans('9')}`]]) + `</div>` + thumb(chartPage) + `</div>` +
-      sc(4, [['Do:', 'Repeat with 2 + 8 and 3 + 3 (chart, Model band).'], ['Ask:', `“Which number do we start with in 2 + 8?” ${ans('8')}`]]) +
-      sc(5, [['Do:', 'Pupils tell a partner why we start big (oral only).'], ['Say:', '“We start with the big number because ___ .”']])) +
-    sec('Section 6 · We Do (8 min)', `<div style="display:flex;gap:4mm"><div style="flex:1;display:flex;flex-direction:column;gap:1.5mm">` +
-      tbox('tip', 'Tip:', 'Grey is a helper.', 'In cell 1 the ring is grey: pupils trace it. Cells 2 and 3 have grey dot tiles only.') +
-      sc(1, [['Do:', 'Lesson sheet, Guided Practice. Work cell 1 together: trace the ring, count on, write.'], ['Say:', `“2 plus 3. Start with 3. Count on 2: 4, 5.” ${ans('5')}`]]) +
-      sc(2, [['Do:', 'Pairs do cells 2 and 3; A talks, B points.'], ['Ask:', `“Partner B, what did your partner start with?” ${ans('6, then 8')}`], ['Note:', `Answers: ${ans('7')}, ${ans('9')}. Manipulative: counters and the 0–10 track.`]]) + `</div>` + thumb(sheetPage) + `</div>`, true) + `</div>`;
-}
+      sc(3, [['Do:', 'Write 9 under the line.'], ['Say:', `“Write how many. 7 plus 2 equals 9.” ${ans('9')}`]]), pg('P2')) +
+    sc(4, [['Do:', 'Repeat with 2 + 8 and 3 + 3 (chart, Another example band).'], ['Ask:', `“Which number do we start with in 2 + 8?” ${ans('8')}`]]) +
+    sc(5, [['Do:', 'Pupils tell a partner why we start big (oral only).'], ['Say:', `“We start with the big number because ${blank()} .”`]])) +
+  sec('Section 6 · We Do (8 min)', withThumb(tbox('tip', 'Tip:', 'Grey is a helper.', 'In cell 1 the ring is grey: pupils trace it. Every Guided cell has a grey dot tile.') +
+      sc(1, [['Do:', 'Lesson sheet, Guided Practice. Work cell 1 together: trace the ring, count on, write.'], ['Say:', `“6 plus 2. Start with 6. Count on 2: 7, 8.” ${ans('8')} ★`]]) +
+      sc(2, [['Do:', 'Pairs do cells 2 and 3; A talks, B points.'], ['Ask:', `“Partner B, what did your partner start with?” ${ans('7, then 2')}`],
+        ['Note:', `Answers ★: ${ans('8')}, ${ans('4')}. Manipulative: counters and the 0–10 track.`]]), pg('P3')), true);
 
-function t5() {
-  return `<div class="t" style="display:contents">` +
-    sec('Section 7 · Check Question (3 min, board + mini whiteboards)', sc(1, [['Ask:', '“6 + 3. Which is right? A: 6, 7, 8 → 8. B: 3, then 4 … 9 → 9. C: start 6, count on 7, 8, 9 → 9.”'], ['Note:',
-      `${ans('C')} — the routine. <b>A</b>: Counting the start. <b>B</b>: Starting small (right answer, slow method).`]]) +
-      loop([['most', 'Most:', 'C → You Do.'], ['half', 'About half:', 'redo 6 + 3 on the chart with the class, then You Do.'], ['few', 'Fewer than half:', 'reteach with counters: 6 in a ten frame, add 3 hollow counters.']])) +
-    sec('Section 8 · You Do (15 min)', sc(1, [['Do:', 'Independent Practice a–c on the lesson sheet, then Practice 1, then Practice 2.'], ['Note:', 'Visit ELL and SPED pupils first, within 60 seconds.']]) +
-      sc(2, [['Ask:', '“Point to the big number.” “Show me the count on fingers.”'], ['Note:', 'A pupil stuck on step 1 gets counters, not a new explanation.']]) +
-      tbox('feedback', 'Feedback:', 'Name the step.', '“You started with the big number. That is step 1.” Fix: “Point to step 2. Count the dots.”')) +
-    sec('Section 9 · Word problem (in You Do)', sc(1, [['Do:', 'Read the story aloud twice. Pupils check box 1.'], ['Say:', '“Circle the numbers. Underline the question.”']]) +
-      sc(2, [['Do:', 'Pupils draw 3 dots and 2 rings in the Workspace, write the equation.'], ['Note:', `Accept ${ans('3 + 2 = 5')} or ${ans('2 + 3 = 5')}; answer ${ans('5 cars')}.`]])) +
-    sec('Section 10 · Plenary (7 min)', sc(1, [['Do:', 'Exit slip: 5 + 1. Pupils say the frame, then check one box.'], ['Note:', `Answer ${ans('6')}. “I need one more day” → small group tomorrow.`]]) +
-      sc(2, [['Say:', '“Big number first. Count on. Write it.” (chant, twice)'], ['Ask:', 'Thumbs: “Can you add 1, 2 or 3?” (oral)']]), true) + `</div>`;
-}
+const T5 = sec('Section 7 · Check Question (3 min, board + mini whiteboards)', sc(1, [['Ask:', '“6 + 3. Which is right? A: 6, 7, 8 → 8. B: 3, then 4 … 9 → 9. C: start 6, count on 7, 8, 9 → 9.”'],
+      ['Note:', `${ans('C')} — the routine. <b>A</b>: Counting the start. <b>B</b>: Starting small (right answer, slow method).`]]) +
+    loop([['most', 'Most:', 'C → You Do.'], ['half', 'About half:', 'redo 6 + 3 on the chart, then You Do.'], ['few', 'Fewer than half:', 'reteach with counters: 6 in a ten frame, add 3 hollow counters.']])) +
+  sec('Section 8 · You Do (15 min)', withThumb(sc(1, [['Do:', 'Lesson sheet a–f (★★), then Practice 1 and 2 (rows 1–3 ★★, last row ★★★).'], ['Note:', 'Visit ELL and SPED pupils first, within 60 seconds.']]) +
+      sc(2, [['Ask:', '“Point to the big number.” “Show me the count on fingers.”'], ['Note:', 'Stuck on step 1? Counters, not a new explanation.']]) +
+      tbox('feedback', 'Feedback:', 'Name the step.', '“You started with the big number. That is step 1.” Fix: “Point to step 2. Count the dots.”'), pg('P4a'))) +
+  sec('Section 9 · Word problem (in You Do, ★★)', sc(1, [['Do:', 'Read the story aloud twice. Pupils check one box per action.'], ['Note:', `Accept ${ans('3 + 2 = 5')} or ${ans('2 + 3 = 5')}; answer ${ans('5 cars')}.`]])) +
+  sec('Section 10 · Plenary (7 min)', sc(1, [['Do:', 'Exit slip: four facts. Pupils say the frame for a, then check one box.'],
+      ['Note:', `★★ a ${ans('7')} (big first) · b ${ans('9')} (big second: catches Starting small and Counting the start → 8) · c ${ans('2')} (same) · d ${ans('10')} (sum of 10).`]]) +
+    sc(2, [['Say:', '“Big number first. Count on. Write it.” (chant, twice)'], ['Ask:', 'Thumbs: “Can you add 1, 2 or 3?” (oral)']]), true);
 
-function routing() {
-  return `<div class="t" style="display:contents">` +
-    sec('Prerequisite routing:', table(['Question', 'Prerequisite', 'If missed → Lesson'], [
-      ['a. Count. Write the number.', 'Count objects to 10 (K.CC.B.5)', 'K-3 Count to 10'],
-      ['b. Write the missing number.', 'Next number when counting (K.CC.A.2)', 'K-4 Count on from a number'],
-      ['c. Circle the bigger number.', 'Compare two numbers to 10 (K.CC.C.7)', 'K-6 Compare numbers to 10'],
-      ['d. Write the missing number.', 'Number bonds to 10 (K.OA.A.3)', 'K-9 Number bonds to 10']]) +
-      `<p>One miss: that lesson first, then back. Two or more misses: start with the earliest.</p>`) +
-    sec('Accepted equations:', `<p>Word problem: ${ans('3 + 2 = 5')} or ${ans('2 + 3 = 5')}. Answer: ${ans('5')} cars. Drawing: any 5 marks in two groups (3 and 2).</p>`) +
-    sec('Answers at a glance:', table(['Page', 'Answers'], [
-      ['Prerequisite Check', ans('a 8 · b 7 · c 9 circled · d 2')],
-      ['Number sense A', ans('1: 4, 6 · 2: 5 · 3: &gt; · 4: 4 · 5: 7')], ['Number sense B', ans('6: 13, 15 · 7: 18 · 8: &lt; · 9: 7 · 10: 13')],
-      ['Lesson 1, Guided', ans('5 · 7 · 9')], ['Lesson 1, Independent', ans('a 7 · b 7 · c 10')],
-      ['Practice 1', ans(P1.map(([a, b], i) => `${LET[i]} ${a + b}`).join(' · '))], ['Practice 2', ans(P2.map(([a, b], i) => `${LET[i]} ${a + b}`).join(' · '))],
-      ['Word problem', ans('5 cars')], ['Exit slip', ans('6')]]) +
-      `<p>The anchor chart is fully worked and has no slots, so it has no separate key.</p>`, true) + `</div>`;
-}
+const sum = (items) => items.map(([a, b], i) => `${LET[i]} ${a + b}`).join(' · ');
+const routing = sec('Prerequisite routing:', table(['Question', 'Prerequisite (T2 atom)', 'If missed → Lesson'], [
+    ['a. Count. Write the number.', 'Counting (atom 1, K.CC.B.5)', 'K-3 Count to 10'], ['b. Write the missing number.', 'Next number (atom 2, K.CC.A.2)', 'K-4 Count on from a number'],
+    ['c. Circle the bigger number.', 'Bigger number (atom 3, K.CC.C.7)', 'K-6 Compare numbers to 10'], ['d. Write the missing number.', 'Parts and whole (atom 4, K.OA.A.3)', 'K-9 Number bonds to 10']]) +
+    `<p>One miss: that lesson first, then back. Two or more misses: start with the earliest.</p>`) +
+  sec('Accepted answers:', `<p>Word problem: ${ans('3 + 2 = 5')} or ${ans('2 + 3 = 5')}; ${ans('5')} cars; drawing: any 5 marks in two groups (3 and 2). Vocabulary: + → plus, = → equals, hops → count on. All other items have one answer.</p>`) +
+  sec('Answers at a glance:', table(['Page', 'Answers', 'Fade'], [
+    ['Prerequisite Check', ans('a 8 · b 7 · c 9 circled · d 2'), '★'], ['Number sense A', ans('1: 4, 6 · 2: 5 · 3: &gt; · 4: 4 · 5: 7'), '★'], ['Number sense B', ans('6: 13, 15 · 7: 18 · 8: &lt; · 9: 7 · 10: 13'), '★★'],
+    ['Lesson 1, Guided', ans(GUIDED.map(([a, b]) => a + b).join(' · ')), '★'], ['Lesson 1, Independent', ans(sum(INDEP)), '★★'],
+    ['Practice 1, a–i', ans(sum(P1.slice(0, 9))), '★★'], ['Practice 1, j–l', ans(sum(P1).split(' · ').slice(9).join(' · ')), '★★★'],
+    ['Practice 2, a–i', ans(sum(P2.slice(0, 9))), '★★'], ['Practice 2, j–l', ans(sum(P2).split(' · ').slice(9).join(' · ')), '★★★'],
+    ['Word problem', ans('5 cars'), '★★'], ['Exit slip', ans(sum(EXIT)), '★★']]) +
+    `<h3 style="margin-top:2mm">Wrong answers to look for when marking</h3>` + table(['Pupil wrote', 'Likely mistake', 'Next step'], [
+      ['one less than the key (exit b → 8)', 'Counting the start', 'Feedback: “Say the start, count the dots.”'],
+      ['right answer, counted from the small number', 'Starting small', 'Ask “Which is bigger?” before each item'],
+      ['one or two more than the key', 'Losing the count', 'One finger per dot; dot tile back on'],
+      ['the small number (7 + 3 → 3)', 'Last count only', 'Say the whole frame aloud'],
+      ['“I need one more day.” checked', '—', 'Small group tomorrow: Guided page with counters']]), true);
 
-// ---------- assemble ----------
-const pages = [];
-const pupil = (id, l3, score, body, cls = '') => ({ id, l3, score, body, cls });
-const P = [
-  pupil('P0', 'Prerequisite', 4, prereq),
-  pupil('P1', 'Number sense', 10, numberSense),
-  { id: 'P2', l3: 'Anchor chart', chart: true },
-  pupil('P3', 'Lesson 1', 3, sheet),
-  pupil('P4a', 'Practice 1', 12, (k) => practice(P1, k)),
-  pupil('P4b', 'Practice 2', 12, (k) => practice(P2, k)),
-  pupil('P5', 'Word problem', 1, wordProblem),
-  { id: 'P6', l3: 'Exit slip', exit: true },
-];
-const renderPupil = (p, key) => {
-  if (p.chart) return page({ id: p.id, cls: 'pupil', head: header({ fields: false, l3: p.l3 }), body: chart(), foot: footer('1/1', 'Form A · seed 4242') });
-  if (p.exit) return `<section class="pg land ${key ? 'key' : 'pupil'}" data-page="${p.id}${key ? '-key' : ''}"><div class="body">${exitBody(key)}</div>${footer('1/1', `${key ? 'Answer Key · ' : ''}Form A · seed 4242`)}</section>`;
-  return page({ id: p.id + (key ? '-key' : ''), cls: key ? 'key' : 'pupil', head: header({ score: p.score, l3: p.l3, key }), body: p.body(key),
-    foot: footer('1/1', `${key ? 'Answer Key · ' : ''}Form A · seed 4242`) });
-};
-const chartPage = renderPupil(P[2], false), sheetPage = renderPupil(P[3], false);
-const TP = [['T1', T(1), t1()], ['T2', T(2), t2()], ['T2b', 'Reference', t2b()], ['T3', T(3), t3()], ['T4', T(4), t4(chartPage, sheetPage)], ['T5', T(5), t5()]];
-const NT = TP.length + 1;
-TP.forEach(([id, l3, body], i) => pages.push(page({ id, cls: 'teacher', head: theader(l3), body, foot: tfoot(i + 1, NT) })));
-for (const p of P) pages.push(renderPupil(p, false));
-for (const p of P) if (!p.chart) pages.push(renderPupil(p, true));
-pages.push(page({ id: 'T6', cls: 'key teacher', head: theader('Answer Key'), body: routing(), foot: tfoot(NT, NT) }));
-
-const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">` +
-  `<title>Add 1–3 lesson pack (V21 sample)</title><style>${css}</style></head><body>${pages.join('\n')}</body></html>`;
-fs.writeFileSync(path.join(OUT, 'pack.html'), html);
-console.log('pages', pages.length);
+const doc = K.document({ titleTag: 'Add 1–3 lesson pack (V21 sample)', pupil: P, routing, teacher: [
+  { id: 'T1', l3: 'Teacher 1', body: T1 }, { id: 'T2', l3: 'Teacher 2', body: T2 }, { id: 'T2b', l3: 'Reference', body: T2b, right: 'Teacher · Print once per unit' },
+  { id: 'T3', l3: 'Teacher 3', body: T3 }, { id: 'T4', l3: 'Teacher 4', body: T4 }, { id: 'T5', l3: 'Teacher 5', body: T5 }] });
+fs.mkdirSync(OUT, { recursive: true });
+fs.writeFileSync(path.join(OUT, 'pack.html'), doc.html(css));
+fs.writeFileSync(path.join(OUT, 'pool.json'), JSON.stringify(POOL));
+console.log('pages', doc.pages.length, 'pool', JSON.stringify(POOL));
 ```
+
+```js v21-example-sub
+// Worked example 2 (Appendix F.2): subtract within 100 with regrouping, Level 2.
+// usage: node gen-sub.mjs <folder with house.css, recipes.mjs, packkit.mjs> <output folder> [font folder URL]
+import fs from 'node:fs';
+import path from 'node:path';
+const [SRC, OUT, FONTS = '../../../css/fonts'] = process.argv.slice(2);
+const R = await import(path.resolve(SRC, 'recipes.mjs'));
+const { makeKit, poolCheck } = await import(path.resolve(SRC, 'packkit.mjs'));
+const { columnStackSub, base10, quickDraw, numberTrack, icon } = R;
+const css = fs.readFileSync(path.join(SRC, 'house.css'), 'utf8').replaceAll('FONT_URL', FONTS);
+
+const L = { title: 'I Can subtract within 100 (with regrouping)', level: 'Level 2', strand: 'Subtraction', seed: 5150,
+  foot: 'sub_100_regroup · Grade 2 · 2.NBT.B.5 · EE M.EE.2.NBT.5, M.EE.4.NBT.4',
+  steps: [['look', 'Look at the ones.'], ['regroup', 'Top smaller? Regroup a ten.'], ['subOnes', 'Subtract the ones.'], ['subTens', 'Subtract the tens.'], ['check', 'Check: add back.']] };
+const K = makeKit(L, R);
+const { LET, k, lt, sec, tbox, sc, ans, blank, loop, table, chk, withThumb, stepsStrip, stepsList, pupilPage, exitPage, exitHead } = K;
+
+// ---- items (Appendix F.2): a - b, a two-digit, ones of a < ones of b (every item regroups), answer >= 1 ----
+// cases: regroup (2-digit - 2-digit) · zero in the ones (60 - 3) · one-digit take-away · a tens answer of 0 (41 - 35 = 6)
+const CHART = [[52, 39], [60, 3]];
+const GUIDED = [[74, 28], [91, 46], [50, 7]];
+const INDEP = [[83, 36], [62, 9], [46, 38]];
+const P1 = [[72, 8], [45, 27], [41, 35], [63, 47], [85, 29], [70, 44]];
+const P2 = [[92, 56], [31, 7], [64, 38], [26, 19], [80, 52], [57, 29]];
+const STORY = [42, 17];
+const EXIT = [[43, 27], [40, 13], [55, 8], [42, 36]];          // regroup · zero ones · one digit · tens answer 0
+export const POOL = poolCheck([{ id: 'P2', items: CHART }, { id: 'P3', items: [...GUIDED, ...INDEP] }, { id: 'P4a', items: P1 },
+  { id: 'P4b', items: P2 }, { id: 'P5', items: [STORY] }, { id: 'P6', items: EXIT }]);
+
+const keyStack = (a, b, key, o = {}) => columnStackSub({ top: a, bottom: b, regroup: key ? 'key' : 'slot', cross: key ? 'key' : 'none', ans: key ? 'key' : 'slot', ...o });
+const cellS = (a, b, i, key, o) => `<div class="cell" style="padding-top:7mm">${lt(i)}${keyStack(a, b, key, o)}</div>`;
+
+// ---- P0 Prerequisite Check ----
+function prereq(key) {
+  const s = (instr, inner, tag, fl) => `<div class="band" style="flex:${fl} 1 0;min-height:0;display:flex" data-section="pre"><div class="strip"><span data-instr>${instr}</span>` +
+    (key ? `<span style="margin-left:auto;font-size:11pt">If missed → ${tag}</span>` : '') + `</div>` +
+    `<div class="grid" style="grid-template-columns:1fr"><div class="cell mid" style="flex-direction:row;justify-content:space-evenly;align-items:center">${inner}</div></div></div>`;
+  const B = (v) => `<span class="bx" data-slot="box" style="--w:17mm">${k(v)}</span>`;
+  return s('Write how many tens.', lt(0) + base10({ tens: 4, ones: 6 }) +
+      `<div style="display:flex;font-size:15pt;align-items:center;gap:3mm">${B(4)}<span>tens</span></div>`, 'Lesson 1-12 Tens and ones', 1.1) +
+    s('Write the missing number.', lt(1) + `<div class="eq">5 tens 2 ones <span class="o">=</span> 4 tens ${B(12)} ones</div>`, 'Lesson 2-3 Regroup a ten', 0.62) +
+    s('Subtract.', lt(2) + `<div class="eq">14 <span class="o">−</span> 6 <span class="o">=</span> <span class="ln" data-slot="line" style="--w:17mm">${k(8)}</span></div>` +
+      `<div class="eq">12 <span class="o">−</span> 9 <span class="o">=</span> <span class="ln" data-slot="line" style="--w:17mm">${k(3)}</span></div>`, 'Lesson 1-20 Subtract within 20', 0.62) +
+    s('Subtract.', lt(3) + columnStackSub({ top: 47, bottom: 23, regroup: 'none', ans: key ? 'key' : 'slot' }) + columnStackSub({ top: 68, bottom: 35, regroup: 'none', ans: key ? 'key' : 'slot' }), 'Lesson 2-6 Subtract (no regrouping)', 1.25);
+}
+
+// ---- P1 Number sense ----
+function numberSense() {
+  const B = (v) => `<span class="bx" data-slot="box" style="--w:17mm">${k(v)}</span>`;
+  const ml = (n, lo, hi) => `<div class="eq" style="align-items:flex-start"><span style="display:flex;flex-direction:column;align-items:center">${B(lo)}<small style="font-size:12pt">1 less</small></span>` +
+    `<span style="line-height:12mm">${n}</span><span style="display:flex;flex-direction:column;align-items:center">${B(hi)}<small style="font-size:12pt">1 more</small></span></div>`;
+  const rows = (start, items) => items.map(([instr, inner], i) => `<div class="cell" style="flex-direction:row;align-items:center;padding:2mm 3mm 2mm 10mm"><span class="ntab${start + i >= 10 ? ' w2' : ''}">${start + i}</span>` +
+    `<span data-instr style="width:68mm;flex:none;line-height:1.2">${instr}</span><div style="flex:1;display:flex;justify-content:center">${inner}</div></div>`).join('');
+  const band = (lab, start, items) => `<div class="band grow" data-section="ns${lab}"><div class="strip"><b>Number sense: ${lab}</b></div><div class="grid daily" style="grid-template-rows:repeat(5,1fr)">${rows(start, items)}</div></div>`;
+  return band('A', 1, [['Write 1 more and 1 less.', ml(40, 39, 41)], ['Count by 10. Write the missing numbers.', `<div class="eq">20, 30, ${B(40)}, ${B(50)}</div>`],
+    ['Write &lt;, &gt; or = in the circle.', `<div class="eq">46 <span class="circ" data-slot="circle">${k('&lt;')}</span> 64</div>`],
+    ['Write the missing number.', `<div class="eq">3 tens 5 ones <span class="o">=</span> ${B(35)}</div>`], ['Write the missing number.', `<div class="eq">10 <span class="o">−</span> ${B(4)} <span class="o">=</span> 6</div>`]]) +
+    band('B', 6, [['Write 1 more and 1 less.', ml(70, 69, 71)], ['Count by 10. Write the missing numbers.', `<div class="eq">35, 45, ${B(55)}, ${B(65)}</div>`],
+      ['Write &lt;, &gt; or = in the circle.', `<div class="eq">81 <span class="circ" data-slot="circle">${k('&gt;')}</span> 18</div>`],
+      ['Write the missing number.', `<div class="eq">6 tens 12 ones <span class="o">=</span> ${B(72)}</div>`], ['Write the missing number.', `<div class="eq">100 <span class="o">−</span> ${B(30)} <span class="o">=</span> 70</div>`]]);
+}
+
+// ---- P2 Anchor chart: 2 x 3 step panels (site layout), the 6th is Another example ----
+function chart() {
+  const big = (h) => h.replace('font-size:28pt', 'font-size:30pt');
+  const panel = (i, stk, words, note = '') => `<div class="cell" style="padding:3mm;gap:2mm;justify-content:flex-start">` +
+    `<div style="display:flex;flex-direction:column;align-items:center;gap:1mm"><div style="display:flex;align-items:center;gap:2mm"><span class="num big" data-accent>${i}</span>${icon(L.steps[i - 1][0], { mm: 8 })}</div>` +
+    `<b style="font-size:15pt;text-align:center;line-height:1.2">${L.steps[i - 1][1]}</b></div>${big(stk)}<div style="font-size:15pt;text-align:center;line-height:1.25">${words}${note ? `<br><b>${note}</b>` : ''}</div></div>`;
+  const st = (o) => columnStackSub({ top: 52, bottom: 39, regroup: 'slot', ans: 'slot', ...o });
+  const p5 = `<div class="cell" style="padding:3mm;gap:2mm;justify-content:flex-start"><div style="display:flex;flex-direction:column;align-items:center;gap:1mm"><div style="display:flex;align-items:center;gap:2mm"><span class="num big" data-accent>5</span>${icon('check', { mm: 8 })}</div>` +
+    `<b style="font-size:15pt">${L.steps[4][1]}</b></div><div style="display:grid;grid-template-columns:repeat(3,.95em);font-size:30pt;line-height:1.15;margin-top:4mm"><span></span><span style="text-align:center">1</span><span style="text-align:center">3</span><b style="text-align:center">+</b><span style="text-align:center">3</span><span style="text-align:center">9</span><i style="grid-column:1/-1;border-top:1.5pt solid #000;margin:1mm 0"></i><span></span><span class="g" style="text-align:center">5</span><span class="g" style="text-align:center">2</span></div><div style="font-size:15pt;text-align:center">52 is the top number. Correct.</div></div>`;
+  const ex = `<div class="cell" style="padding:3mm;gap:2mm;justify-content:flex-start"><b style="font-size:15pt;text-align:center;line-height:1.2">Another example:<br><span style="font-weight:400">0 ones? Regroup a ten.</span></b>` +
+    big(columnStackSub({ top: 60, bottom: 3, regroup: 'ink', cross: 'ink', ans: 'ink' })) + `<div style="font-size:15pt;text-align:center">6 tens is 5 tens 10 ones.</div></div>`;
+  return `<div class="band" style="flex:1 1 0;min-height:0" data-section="chart"><div class="grid" style="grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;border-width:0">` +
+    panel(1, st({}), 'Ones: 2 is less than 9.') + panel(2, st({ regroup: 'grey', cross: 'grey' }), '5 tens 2 ones is 4 tens 12 ones.') +
+    panel(3, st({ regroup: 'ink', cross: 'ink', ans: 'grey', ansDigits: ['', 3] }), '12 − 9 = 3. Write 3.') +
+    panel(4, st({ regroup: 'ink', cross: 'ink', ans: 'ink', ansDigits: [1, 3] }).replace('>1<', ' class="g">1<'), '4 − 3 = 1. Write 1.', '0 tens? Leave it empty.') + p5 + ex + `</div></div>` +
+    `<div class="band sayb"><div class="sayline"><b>Say:</b><span>“52 minus 39 equals 13.”</span></div></div>` +
+    `<div class="band"><div class="strip" style="min-height:17mm"><b>Rule:</b><span class="chant">Top too small? Take a ten!</span></div></div>`;
+}
+
+// ---- P3 Lesson sheet ----
+function sheet(key) {
+  const W = 'flex:1;display:flex;flex-direction:column;align-items:center';
+  const vpic = [base10({ tens: 3 }), base10({ ones: 4 }), `<div style="display:flex;align-items:center;gap:2mm">${base10({ tens: 1 })}<span style="font-size:20pt">→</span>${base10({ ones: 10 })}</div>`];
+  const vocab = `<div class="band" data-section="vocab"><div class="strip"><b>Vocabulary:</b><span data-instr>Draw a line to match.</span></div>` +
+    `<div class="grid" style="grid-template-columns:1fr;flex:none"><div class="cell" style="padding:3mm 6mm;position:relative"><div style="display:grid;grid-template-columns:repeat(3,1fr);width:100%;row-gap:7mm">` +
+    vpic.map((p) => `<div style="${W};justify-content:space-between;height:40mm"><div style="height:36mm;display:flex;align-items:flex-end">${p}</div><i class="dotm"></i></div>`).join('') +
+    ['ones', 'regroup', 'tens'].map((w) => `<div style="${W};gap:1.5mm"><i class="dotm"></i><b style="font-size:15pt">${w}</b></div>`).join('') + `</div>` +
+    `<svg class="ka" data-ka viewBox="0 0 174 60" style="position:absolute;left:6mm;top:0;width:174mm;height:60mm;overflow:visible" fill="none">` +
+    `<path data-ka d="M29 41.75 L145 49.25 M87 41.75 L29 49.25 M145 41.75 L87 49.25" stroke-width="0.53"/></svg></div></div></div>`;
+  const gcell = ([a, b], i) => `<div class="cell" style="padding-top:3mm">${columnStackSub({ top: a, bottom: b, regroup: i === 0 ? 'grey' : (key ? 'key' : 'slot'), cross: i === 0 ? 'grey' : (key ? 'key' : 'none'), ans: key ? 'key' : 'slot' })}</div>`;
+  const guided = `<div class="band" style="flex:none" data-section="guided"><div class="row" style="border-top:1.5pt solid #000">` +
+    `<div style="flex:1;display:flex;flex-direction:column;border-right:1.5pt solid #000"><div class="strip"><b>Guided Practice:</b><span data-instr>Subtract.</span></div>` +
+    `<div class="grid" style="flex:none;height:62mm;grid-template-columns:repeat(3,1fr);border-width:1.5pt 0 0 0">${GUIDED.map(gcell).join('')}</div></div>` +
+    `<div style="flex:0 0 70mm;display:flex;flex-direction:column"><div class="strip"><b>Steps:</b></div>${stepsList()}</div></div></div>`;
+  const indep = `<div class="band grow" data-section="indep"><div class="strip"><b>Independent Practice:</b><span data-instr>Subtract.</span></div>` +
+    `<div class="grid" style="grid-template-columns:repeat(3,1fr)">${INDEP.map(([a, b], i) => cellS(a, b, i, key, { heads: false })).join('')}</div></div>`;
+  return vocab + `<div class="band"><div class="strip"><b>Remember:</b><span>1 ten is 10 ones.</span></div></div>` + guided + indep;
+}
+
+const practice = (items, key) => stepsStrip() + `<div class="instr" data-instr>Subtract.</div><div class="grid" data-section="practice" style="grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr)">` +
+  items.map(([a, b], i) => cellS(a, b, i, key, { heads: false, check: true, checkState: key ? 'key' : 'slot' })).join('') + `</div>`;
+
+// ---- P5 Word problem ----
+function wordProblem(key) {
+  const rc = [['read', 'Read it two times.'], ['ringnum', 'Circle the numbers.'], ['underline', 'Underline the question.'], ['draw', 'Draw it.'], ['write', 'Write the equation.'], ['check', 'Solve. Check.']];
+  return `<div class="instr" data-instr>Read the story. Draw it. Solve.</div>` +
+    `<div class="grid" data-section="wp" style="grid-template-columns:58fr 42fr;flex:none;height:72mm"><div class="cell" data-read style="justify-content:center;align-items:stretch">` +
+    `<div class="story" style="font-size:15pt;flex:1;display:flex;flex-direction:column;justify-content:space-evenly"><p>Ana has 42 stickers.</p><p>She gives away 17 stickers.</p><p>How many stickers does Ana have now?</p>` +
+    `<p style="display:flex;align-items:flex-end;gap:2mm">Ana has <span class="ln" data-slot="line" style="--w:17mm">${k(25)}</span> stickers.</p></div></div>` +
+    `<div class="cell" data-read style="align-items:stretch;justify-content:space-evenly;padding:2mm 3mm">${rc.map(([ic, t]) =>
+      `<div data-panel-row style="display:flex;align-items:center;gap:1.5mm;font-size:13pt;line-height:1.15;white-space:nowrap"><span class="chk" data-slot="check-routine"></span>${icon(ic)}<span>${t}</span></div>`).join('')}</div></div>` +
+    `<div class="band grow" style="margin-top:3mm;border-top-width:2.25pt"><div class="strip"><b>Workspace:</b></div><div style="flex:1;border-top:1.5pt solid #000;position:relative" data-work>` +
+    (key ? `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:14mm" data-ka>${columnStackSub({ top: 42, bottom: 17, regroup: 'key', cross: 'key', ans: 'key', heads: true })}${quickDraw({ tens: 2, ones: 5 })}</div>` : '') + `</div></div>` +
+    `<div class="band" style="flex:none"><div class="row" style="border-top:0;align-items:center;justify-content:center;height:24mm">` +
+    `<div class="eq"><span class="ln" data-slot="line" style="--w:17mm">${k(42)}</span><span class="circ" data-slot="circle">${k('−')}</span><span class="ln" data-slot="line" style="--w:17mm">${k(17)}</span><span class="o">=</span><span class="ln" data-slot="line" style="--w:17mm">${k(25)}</span></div></div></div>` +
+    `<div class="band sayb"><div class="sayline"><b>Say:</b><span>“The answer is ${blank()} stickers.”</span></div></div>`;
+}
+
+// ---- P6 Exit slip half: 4 items, one per case; the Say band and the two check boxes share one row ----
+const exitHalf = (key) => `<div style="flex:1;display:flex;flex-direction:column;min-width:0">${exitHead(key)}` +
+  `<div class="instr" data-instr>Subtract.</div><div class="grid" data-section="exit" style="grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr">${EXIT.map(([a, b], i) => cellS(a, b, i, key, { heads: false })).join('')}</div>` +
+  `<div class="band sayb" style="margin-top:-1.5pt"><div class="sayline" style="justify-content:space-between"><span><b>Say:</b> “a. 43 minus 27 equals ${blank()}.”</span></div></div>` +
+  `<div style="flex:none;display:flex;gap:10mm;padding:2mm 3mm 0;font-size:15pt"><div><span class="chk" data-slot="check"></span>I can do this.</div><div><span class="chk" data-slot="check"></span>I need one more day.</div></div></div>`;
+
+const P = [
+  { id: 'P0', render: (key) => pupilPage({ id: 'P0', l3: 'Prerequisite', score: 6, body: prereq(key), key }) },
+  { id: 'P1', render: (key) => pupilPage({ id: 'P1', l3: 'Number sense', score: 10, body: numberSense(key), key }) },
+  { id: 'P2', render: (key) => pupilPage({ id: 'P2', l3: 'Anchor chart', fields: false, body: chart(), key }) },
+  { id: 'P3', render: (key) => pupilPage({ id: 'P3', l3: 'Lesson 1', score: 3, body: sheet(key), key }) },
+  { id: 'P4a', render: (key) => pupilPage({ id: 'P4a', l3: 'Practice 1', score: 6, body: practice(P1, key), key }) },
+  { id: 'P4b', render: (key) => pupilPage({ id: 'P4b', l3: 'Practice 2', score: 6, body: practice(P2, key), key }) },
+  { id: 'P5', render: (key) => pupilPage({ id: 'P5', l3: 'Word problem', score: 1, body: wordProblem(key), key }) },
+  { id: 'P6', render: (key) => exitPage({ half: exitHalf, key }) },
+];
+const pg = (id) => P.find((p) => p.id === id).render(false);
+
+// ---- teacher pages ----
+const T1 = `<div class="tline" style="padding:1.5mm 0 1mm">CCSS 2.NBT.B.5 · EE M.EE.2.NBT.5, M.EE.4.NBT.4 · CRA: Pictures → Abstract · Flow: Chunked</div>` +
+  sec('Lesson guidance:', tbox('tip', 'Tip:', 'Ones first, always.', 'Every item starts at the ones. Pupils who start with the tens regroup too late. Point to the ones column before each item.') +
+    tbox('watch', 'Watch:', 'Smaller from bigger.', 'The most common mistake: 52 − 39 → 27 (9 − 2 in the ones). The top number is always first. Fix: “Is the top smaller? Then regroup.”')) +
+  sec('Lesson flow:', table(['', 'Section', 'Pupil page', 'Min'], [[1, 'Prerequisite Check', 'Prerequisite Check', 4], [2, 'Number sense', 'Number sense', 5],
+    [3, 'Spaced retrieval', 'mini whiteboards', 3], [4, 'Chaining Bridge', '—', 1], ['5a', 'I Do part 1 (steps 1–2)', 'Anchor chart panels 1–2', 6], ['6a', 'We Do part 1', 'Guided cell 1', 4],
+    ['5b', 'I Do part 2 (steps 3–5)', 'Anchor chart panels 3–6', 6], ['6b', 'We Do part 2', 'Guided cells 2–3', 4], [7, 'Check Question', 'board + mini whiteboards', 3],
+    [8, 'You Do + word problem', 'Lesson sheet, Practice 1–2, Word problem', 15], [9, 'Plenary', 'Exit slip', 7], ['', 'Transitions', '', 2], ['', '<b>Total</b>', '', '<b>60</b>']])) +
+  sec('Materials:', `<div style="display:grid;grid-template-columns:1fr 1fr;row-gap:1.5mm">` + ['Pupil packet: 8 pages, one per pupil', 'Exit slips, cut in half',
+    'Base-ten rods and cubes (5 rods, 20 cubes a pair)', 'Mini whiteboards and pens', 'Anchor chart on the board', 'Answer keys (Teacher 6)'].map(chk).join('') + `</div>`) +
+  sec('Vocabulary:', `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3mm">` + [[quickDraw({ tens: 2 }), 'tens', 'groups of ten'], [quickDraw({ ones: 4 }), 'ones', 'single cubes'],
+    [`<div style="display:flex;align-items:center;gap:1mm">${quickDraw({ tens: 1 })}<span>→</span>${quickDraw({ ones: 10 })}</div>`, 'regroup', 'trade 1 ten for 10 ones']].map(([pic, w, g]) =>
+    `<div style="border:1.5pt solid #000;border-radius:3mm;padding:2mm;display:flex;flex-direction:column;align-items:center;gap:1mm;justify-content:flex-end">${pic}<b style="font-size:13pt">${w}</b><span style="text-align:center">${g}</span></div>`).join('') + `</div>`, true);
+
+const T2 = sec('What students need to know:', table(['#', 'Skill or Concept', 'Atom Type', 'Teacher Notes'], [
+    [1, '<b>Tens and ones:</b> a 2-digit number is tens and ones.', 'Fact · Pre-requisite', 'Prerequisite Check a'],
+    [2, '<b>A ten is ten ones:</b> 1 ten can be traded for 10 ones.', 'Conceptual · Pre-requisite', 'Prerequisite Check b'],
+    [3, '<b>Facts within 20:</b> 12 − 9, 14 − 6.', 'Fact · Pre-requisite', 'Prerequisite Check c'],
+    [4, '<b>Column subtraction:</b> ones first, then tens.', 'Category · Pre-requisite', 'Prerequisite Check d'],
+    [5, '<b>Top smaller:</b> when the top ones are smaller, regroup.', 'Comparative · New', 'Critical Atom (step 2)'],
+    [6, '<b>Same value:</b> 5 tens 2 ones = 4 tens 12 ones.', 'Conceptual · New', 'Anchor chart panel 2'],
+    [7, '<b>Zero ones:</b> 60 is 5 tens 10 ones.', 'Fact · New', 'Another example panel']])) +
+  sec('What students do:', table(['Step', 'Task / Routine atom', 'Tag', 'Check it with'], [
+    [1, '<b>Look</b> at the ones.', 'New', 'Guided cell 1'],
+    [2, `${icon('key', { color: 'ink', mm: 4 })} <b>Regroup</b> a ten when the top ones are smaller: cross out, write new tens and ones.`, '<b>New · Critical Atom</b>', 'Check Question, exit a–d'],
+    [3, '<b>Subtract</b> the ones.', 'Pre-requisite', 'Prerequisite Check c'],
+    [4, '<b>Subtract</b> the tens (0 tens: leave empty).', 'Pre-requisite', 'exit d'],
+    [5, '<b>Check:</b> add back.', 'New', 'Practice Check lines']])) +
+  sec('How to teach:', `<p><b>Language.</b> Same phrase per step every time; “trade” before “regroup”.</p><p><b>Two chunks.</b> 4 new atoms, so the teacher was offered two lessons (decide-and-regroup first). Kept as one: I Do / We Do twice (steps 1–2, then 3–5). CRA: rods and cubes, then the stack.</p>`) +
+  sec('Common mistakes:', table(['Mistake', 'Broken step', 'Looks like', 'Fix'], [
+    ['<b>Smaller from bigger</b>', 2, '52 − 39 → 27', '“Is the top smaller? Regroup.”'], ['<b>Forgot the tens</b>', 2, '52 − 39 → 23', 'Cross out the 5; write 4.'],
+    ['<b>Zero trouble</b>', 2, '60 − 3 → 63', 'Show 6 tens as 5 tens 10 ones.'], ['<b>Regroup always</b>', 1, '47 − 23 regrouped', 'Look at the ones first.']]) +
+    `<p style="margin-top:1.5mm"><b>Check Question link (61 − 25):</b> A 44 = Smaller from bigger; B 46 = Forgot the tens; C 36 correct.</p>`, true);
+
+const T2b = sec('Reference key:', `<div class="cols2"><div style="display:flex;flex-direction:column;gap:3mm">` +
+    `<div><h3>Page ids</h3>${table(['Tab', 'Page'], [['Prerequisite', '4 routed questions'], ['Number sense', 'bands A and B'], ['Anchor chart', 'board copy; poster'], ['Lesson 1', 'lesson sheet'], ['Practice 1, 2', 'You Do pages'], ['Word problem', 'RCDWS page'], ['Exit slip', '2-up half page'], ['Answer Key', 'facsimile of each page']])}` +
+    `<p style="margin-top:1mm">Score /N counts lettered items only; Guided, the chart and Say frames are not scored. Packet order: P0 · P1 · P2 chart · P3 Lesson 1 · P4 Practice · P5 Word problem · P6 Exit slip.</p></div>` +
+    `<div><h3>Fade levels (teacher labels only)</h3>${table(['Mark', 'Means'], [['★', 'Guided: cell 1 regroup in grey'], ['★★', 'Independent: structure only'], ['★★★', 'zero ones, one-digit, tens 0']])}</div>` +
+    `<div><h3>Data loop</h3>${table(['Shape', 'Read as'], [[K.loopIcon('most'), 'Most: go on'], [K.loopIcon('half'), 'About half: short reteach'], [K.loopIcon('few'), 'Fewer than half: reteach with rods']])}</div>` +
+    `<div><h3>Abbreviations</h3>${table(['Term', 'Means'], [['MWB', 'mini whiteboard'], ['CRA', 'concrete, pictures, abstract'], ['T O', 'tens, ones'], ['RCDWS', 'Read, Circle, Draw, Write, Solve']])}</div></div>` +
+    `<div style="display:flex;flex-direction:column;gap:3mm">` +
+    `<div><h3>Slot shapes</h3>${table(['Shape', 'Slot', 'Means'], [['<span class="bx" style="--w:12mm;height:6mm"></span>', 'regroup strip', 'new tens, new ones'],
+      ['<span class="bx" style="--w:14mm;height:8mm"></span>', 'digit strip', 'the answer'], ['<span class="ln" style="--w:14mm;height:5mm"></span>', 'line', 'Check numbers'], ['<span class="chk" style="width:5mm;height:5mm"></span>', 'check box', 'a decision']])}</div>` +
+    `<div><h3>Icons</h3>${table(['Icon', 'Means'], L.steps.map(([ic, t]) => [icon(ic, { mm: 4.5 }), t]).concat([[icon('tip', { color: 'ink', mm: 4.5 }), 'Tip'], [icon('watch', { color: 'ink', mm: 4.5 }), 'Watch'],
+      [icon('key', { color: 'ink', mm: 4.5 }), 'Critical Atom'], [icon('cubes', { color: 'ink', mm: 4.5 }), 'manipulative']]))}</div>` +
+    `<div><h3>Band labels</h3>${table(['Label', 'Holds'], [['Vocabulary:', '≤ 3 words + pictures'], ['Remember:', 'one reminder'], ['Guided Practice:', 'worked together'], ['Independent Practice:', 'lettered, scored'], ['Another example:', 'chart: other cases'], ['Say:', 'the oral frame'], ['Rule:', 'the chant']])}</div>` +
+    `</div></div>`, true);
+
+const T3 = sec('Section 1 · Prerequisite Check (4 min)', withThumb(tbox('tip', 'Tip:', 'Read each line aloud.', 'Read the instruction, point to the slot, wait.') +
+      sc(1, [['Do:', 'Hand out the Prerequisite Check.'], ['Say:', '“Four parts. Work on your own.”']]) +
+      sc(2, [['Do:', 'Read a to d, 40 seconds each.'], ['Note:', `★ a ${ans('4 tens')}, b ${ans('12')}, c ${ans('8 · 3')}, d ${ans('24 · 33')}. Routing: Teacher 6.`]]), pg('P0')) +
+    loop([['most', 'Most:', 'all right → go on.'], ['half', 'About half:', 'reteach the missed part with rods, then go on.'], ['few', 'Fewer than half:', 'teach the earliest missed lesson first.']])) +
+  sec('Section 2 · Number sense (5 min)', sc(1, [['Do:', 'Band A, then band B for early finishers.'], ['Note:', `★ A ${ans('39, 41 · 40, 50 · &lt; · 35 · 4')}; B ${ans('69, 71 · 55, 65 · &gt; · 72 · 30')}.`]])) +
+  sec('Section 3 · Spaced retrieval (3 min, mini whiteboards)', tbox('research', 'Research:', 'Recall beats re-reading.', 'Pulling a fact from memory strengthens it more than seeing it again. Keep boards down until “3-2-1, show me”.') + sc(1, [['Ask:', `“Write 10 more than 47.” ${ans('57')}`], ['Ask:', `“Draw 3 tens 4 ones.” ${ans('3 sticks, 4 dots')}`], ['Ask:', `“15 − 8?” ${ans('7')}`]])) +
+  sec('Section 4 · Chaining Bridge (1 min)', sc(1, [['Say:', '“You can subtract without regrouping. Today the top ones are smaller.”'], ['Say:', '“I can subtract within 100. Say it with me.”']]), true);
+
+const T4 = sec('Section 5 · I Do, in two parts (6 + 6 min)', withThumb(tbox('watch', 'Watch:', 'Smaller from bigger.', 'Show 52 − 39 → 27 once on the board. Write the word Wrong beside it. Never print it.') +
+      sc(1, [['Do:', 'Silent: point to the ones, 2 and 9.'], ['Say:', '“Look at the ones. 2 is less than 9.”']]) +
+      sc(2, [['Do:', 'Trade a rod for 10 cubes. Cross out 5 and 2; write 4 and 12.'], ['Say:', '“Regroup a ten. 4 tens 12 ones.”']]) +
+      sc(3, [['Do:', 'Part 2: subtract the ones, then the tens.'], ['Say:', `“12 minus 9 is 3. 4 minus 3 is 1.” ${ans('13')}`]]), pg('P2')) +
+    sc(4, [['Do:', 'Check: add back. Then 60 − 3 (Another example).'], ['Ask:', `“What is 6 tens as tens and ones?” ${ans('5 tens 10 ones')}`]]) +
+    sc(5, [['Do:', 'Pupils tell a partner when to regroup (oral only).'], ['Say:', `“I regroup when the top ones are ${blank()} .”`]])) +
+  sec('Section 6 · We Do, in two parts (4 + 4 min)', withThumb(tbox('tip', 'Tip:', 'Grey is a helper.', 'Cell 1 shows the regroup in grey: pupils trace it.') +
+      sc(1, [['Do:', 'Part 1: cell 1, 74 − 28. Trace the regroup.'], ['Say:', `“6 tens 14 ones. 14 minus 8 is 6.” ${ans('46')} ★`]]) +
+      sc(2, [['Do:', 'Part 2: pairs do 91 − 46 and 50 − 7; A writes, B checks.'], ['Note:', `★ ${ans('45')}, ${ans('43')}. Rods for anyone who needs them.`]]), pg('P3')), true);
+
+const T5 = sec('Section 7 · Check Question (3 min, board + mini whiteboards)', sc(1, [['Ask:', '“61 − 25. Which is right? A 44. B 46. C 36.”'], ['Note:', `${ans('C')}. <b>A</b>: Smaller from bigger. <b>B</b>: Forgot the tens.`]]) +
+    loop([['most', 'Most:', 'C → You Do.'], ['half', 'About half:', 'redo 61 − 25 with rods.'], ['few', 'Fewer than half:', 'reteach step 2 with rods and cubes.']])) +
+  sec('Section 8 · You Do (15 min)', withThumb(sc(1, [['Do:', 'Lesson sheet a–c (★★), then Practice 1 and 2 (★★; zero ones, one-digit, tens 0 ★★★).'], ['Note:', 'Visit ELL and SPED pupils first, within 60 seconds.']]) +
+      sc(2, [['Ask:', '“Is the top smaller?” “Show me the trade.”'], ['Note:', 'Stuck? Rods and cubes, not a new explanation.']]) +
+      tbox('feedback', 'Feedback:', 'Name the step.', '“You looked at the ones first. That is step 1.” Fix: “Point to step 2. Is the top smaller?”'), pg('P4a')) +
+    tbox('feedback', 'Feedback:', 'I finished early.', '“Make your own: a top number with 0 ones. Subtract a one-digit number. Check it.” (mini whiteboard)')) +
+  sec('Section 9 · Word problem (in You Do, ★★)', sc(1, [['Do:', 'Read the story twice. One box per action.'], ['Note:', `Accept ${ans('42 − 17 = 25')}; ${ans('25 stickers')}.`]])) +
+  sec('Section 10 · Plenary (7 min)', sc(1, [['Do:', 'Exit slip: four items, one per case.'], ['Note:', `★★ a ${ans('16')} (regroup) · b ${ans('27')} (zero ones) · c ${ans('47')} (one digit) · d ${ans('6')} (tens 0). Each catches Smaller from bigger (a 24, b 33, c 53, d 14).`]]) +
+    sc(2, [['Say:', '“Top too small? Take a ten!” (chant, twice)']]), true);
+
+const diff = (items) => items.map(([a, b], i) => `${LET[i]} ${a - b}`).join(' · ');
+const routing = sec('Prerequisite routing:', table(['Question', 'Prerequisite (T2 atom)', 'If missed → Lesson'], [
+    ['a. tens', 'Tens and ones (atom 1, 1.NBT.B.2)', '1-12 Tens and ones'], ['b. missing number', 'A ten is ten ones (atom 2, 2.NBT.A.1)', '2-3 Regroup a ten'],
+    ['c. subtract', 'Facts within 20 (atom 3, 2.OA.B.2)', '1-20 Subtract within 20'], ['d. subtract', 'Column subtraction (atom 4, 2.NBT.B.5)', '2-6 Subtract (no regrouping)']]) +
+    `<p>One miss: that lesson first, then back. Two or more misses: start with the earliest.</p>`) +
+  sec('Accepted answers:', `<p>Word problem: ${ans('42 − 17 = 25')}; ${ans('25')} stickers; drawing: any picture of 42 with 17 taken away. Regroup strips: the new tens and ones as on the key; a pupil who regroups correctly in their head may leave the strip empty on Practice (not on Guided).</p>`) +
+  sec('Answers at a glance:', table(['Page', 'Answers', 'Fade'], [
+    ['Prerequisite Check', ans('a 4 tens · b 12 · c 8, 3 · d 24, 33'), '★'], ['Number sense A', ans('39, 41 · 40, 50 · &lt; · 35 · 4'), '★'], ['Number sense B', ans('69, 71 · 55, 65 · &gt; · 72 · 30'), '★★'],
+    ['Lesson 1, Guided', ans(GUIDED.map(([a, b]) => a - b).join(' · ')), '★'], ['Lesson 1, Independent', ans(diff(INDEP)), '★★'],
+    ['Practice 1, a–d', ans(diff(P1.slice(0, 4))), '★★'], ['Practice 1, e–f', ans(diff(P1).split(' · ').slice(4).join(' · ')), '★★★'],
+    ['Practice 2, a–d', ans(diff(P2.slice(0, 4))), '★★'], ['Practice 2, e–f', ans(diff(P2).split(' · ').slice(4).join(' · ')), '★★★'],
+    ['Word problem', ans('25 stickers'), '★★'], ['Exit slip', ans(diff(EXIT)), '★★']]) +
+    `<h3 style="margin-top:2mm">Wrong answers to look for when marking</h3>` + table(['Pupil wrote', 'Likely mistake', 'Next step'], [
+      ['ones digit = bigger − smaller (52 − 39 → 27)', 'Smaller from bigger', '“Is the top smaller?” before each item'], ['tens one too big (→ 23)', 'Forgot the tens', 'Cross out and rewrite the tens'],
+      ['60 − 3 → 63 or 3', 'Zero trouble', 'Rods: 6 tens is 5 tens 10 ones'], ['a 0 written in the tens (06)', 'Tens answer 0', 'Leave the tens box empty']]), true);
+
+const doc = K.document({ titleTag: 'Subtract with regrouping lesson pack (V21 sample 2)', pupil: P, routing, teacher: [
+  { id: 'T1', l3: 'Teacher 1', body: T1 }, { id: 'T2', l3: 'Teacher 2', body: T2 }, { id: 'T2b', l3: 'Reference', body: T2b, right: 'Teacher · Print once per unit' },
+  { id: 'T3', l3: 'Teacher 3', body: T3 }, { id: 'T4', l3: 'Teacher 4', body: T4 }, { id: 'T5', l3: 'Teacher 5', body: T5 }] });
+fs.mkdirSync(OUT, { recursive: true });
+fs.writeFileSync(path.join(OUT, 'pack.html'), doc.html(css));
+fs.writeFileSync(path.join(OUT, 'pool.json'), JSON.stringify(POOL));
+console.log('pages', doc.pages.length, 'pool', JSON.stringify(POOL));
+```
+
+---
+
+## Appendix H — Building a lesson V21 does not show (rules for the gaps)
+
+- **Prerequisite lesson ids (T6 routing, P0 key).** Use the teacher's own lesson list. If there is none, use
+  the MathQuest library id `<Level>-<n>` (for example `K-3`, `2-6`). If neither exists, write the CCSS code and
+  a short title (`K.CC.B.5 Count to 10`). Pick the 3–4 prerequisites from the Pre-requisite atoms of T2, one
+  question per atom, most basic first.
+- **Horizontal one-symbol items (`47 ○ 52`, `27 → __`).** Fit test: item width (characters × 0.6 em at 28 pt,
+  9.88 mm per em) + slot width B(n) + 2 × 3 mm pads + 3 mm ≤ cell width. Grids at L: 2 × 4, 2 × 5 or 2 × 8
+  (two columns of 93 mm), row pitch at least Hw + 8 = 18 mm. Up to 16 items a page.
+- **A new step icon.** 10 × 10 box, line art only, 1.5 pt stroke at the drawn size, round joins and caps, one
+  idea, at most 6 strokes, small solid marks (class `f`) only under 2 mm, no letters or numerals, tested at
+  5.8 mm for legibility; never reuse another step's icon in the same lesson.
+- **Score on every page role.** `Score /N` counts lettered items only. Unscored and never counted: Model and
+  Guided cells, the anchor chart, Vocabulary, `Remember:`, `Say:` frames, the routine-panel check boxes and
+  the exit-slip "I can do this." boxes. A page with no lettered item prints no Score field.
+- **Instruction strings for shape partitioning (added keys).** `partition`: "Draw a line to make 2 equal
+  parts." · `equal-parts`: "Are the parts equal? Check one box." with the check-box label pair `Equal parts`
+  / `Not equal parts`. Use the `shape()` recipe with `task:'partition'` and `guides:true`; the shape cell is a
+  draw cell (exempt from the bottom-band rule).
+- **Items with many right answers (any halving line, any drawing).** Draw one correct answer in the key colour
+  on the key; list "also accept …" on T6 under `Accepted answers:`.
+- **More slot shapes (WDS 6).** Number + label (faded word problem v2): a line B(n), then a 52 mm line for the
+  label. Mixed number: a tall whole box B(1) × 22 mm, a 2 mm gap, then the fraction slot. Money: whole units
+  B(n) × 12 mm, a printed point in a 3 mm gap, hundredths 17 × 12 mm. Missing digit in a stack: a dashed
+  (1.5 / 1 mm) box one track − 1 mm wide (min 4.4 mm) × 10 mm.
+
+---
+
+## Appendix I — Implementing V21 inside MathQuest (for the repository only)
+
+Outside AIs ignore this appendix: everything above stays self-contained. Inside the MathQuest repository, V21
+becomes a second "detailed lesson maker" beside the current lesson maker, and it is **built on the site's own
+code, rules and gates — never re-implementing what the kit already draws.** The HTML/CSS/recipes of Appendices
+A, D and G are then only the specification the kit is checked against, not code to copy.
+
+| V21 part | Existing MathQuest piece to use | Notes |
+|---|---|---|
+| Paper, tokens, type, ink, strokes (§8.1–8.6) | `js/modules/sheet/tokens.js` (`PAPER`, `SIZES.L`, `INK`, `LESSON_ACCENT`, `STROKE`, `SLOT`, `blankWidth`), `css/sheet-kit.css`, `css/fonts/andika.css` | Never hard-code a value in the new role |
+| Header, strand tab, title, footer, © line (§8.7) | `sheet/frame.js`: `headerFields`, `strandTab`, `pageTitle`, `pageFooter`, `copyrightLine`, `page`, `doc` | New tab ids `Teacher n`, `Reference` need a PT-FRM-9 entry |
+| Bands, `Say:`, Steps, story box (§8.8) | `sheet/frame.js`: `band`, `BAND_LABELS`, `sayBand`, `steps`, `story`; `sheet/lesson-css.js` (`mq-lstrip`, `mq-lsteps`, `mq-cchant`, `mq-lvocab`) | Add `Number sense: A/B` to `BAND_LABELS` only after the owner rules on Q4 |
+| Cells, grids, pagination, fill (§8.9, §8.12.1–8.12.4) | `sheet/cell.js`, `sheet/grid.js`, `sheet/layout.js`, `sheet/paginate.js` | The capacity rule of the revised OR-b is the kit's own `resolveSectionLayout` / row computation |
+| Slots and keys (§8.10, §8.12.7) | `cell.js` `blank()`; `sheet/roles/answer-key.js` (facsimile), `key-short.js` (`tagKeyAnswers`), the `.ws-key` / `data-ws-key-ans` key ink in `sheet-kit.css` | Every page, the anchor chart included, through `answer-key.js` |
+| Drawings (Appendix D) | `sheet/cells/*` templates (stack, fact, equation, pv, frac-model …), `svg-base10.js`, `svg-clock.js`, `svg-fractions.js`, `svg-geometry.js`; step icons `sheet/lesson-icons.js` | New drawings become kit templates (`registerCell`), never inline SVG in a role |
+| Every problem on every pupil page | `generateQuestionFor({category, skill, range, opts, seed})` | Seeded, skill options honoured; the item pool / avoid set of LR-5 |
+| Worked steps, wrong answers, footprint, strings | skill providers in `sheet/contract.js` / `sheet/providers/*` (`strings`, `workedSteps`, `wrongAnswer`, `footprint`) and the instruction library (PED 10.1, Appendix C.1) | `wrongAnswer` feeds the Check Question options and T6 "wrong answers to look for" |
+| P0 Prerequisite Check, P2 anchor chart, P3 lesson sheet, P4 Practice, Mixed | `sheet/roles/lesson.js` (chart, We Do, cases, `pickExample`, `otherExamples`), `pre-skill-check.js`, `practice.js`, `mixed-practice.js`; lesson data in `js/modules/lessons/` (`prereqs.js`, families) | **Owner default Q1:** where a lesson has passed, reuse its pupil pages as they are |
+| P1 Number sense | `sheet/roles/` Daily look (`compose.js` + the Daily-4 / Today's Number cells) | New role section; needs Q4 |
+| P5 Word problem (RCDWS panel) | word-problem cells (story, work cell) | The six-line panel is new kit work (Q5) |
+| P6 Exit slip 2-up | `paginate.js` 2-up halves (PG-5) + `practice.js` cells | New role layout |
+| The whole pack | `print-sheet.js` `buildSheet(req)` with a new role `detailed-lesson` beside `sheet/roles/lesson.js`; `sheetDocument()` | The teacher print screen (`teacher-print.js`) offers it beside the current lesson maker |
+| Gates (Appendix E) | `tests/scripts/ws-lesson-samples.cjs` (H13 `sheetCheck`, renders), the lesson gate `ws-lesson-check.cjs` (LR-1…18), `ws-print-lint.cjs --source kit`, `ws-grade-render.cjs`, then the RUBRIC critic (8 on every criterion, every page) | E21–E25 are new checks to add to the lesson gate |
+
+**Teacher pages with no kit equivalent yet (new role code needed):** T1 Lesson at a glance, T2 Atomisation
+template, T2b Reference key, T3–T5 delivery scripts (T-SCRIPT rows, T-BOX, T-LOOP, thumbnails), and the T6
+routing / answers-at-a-glance page. T6's facsimile keys already exist (`answer-key.js`). The teacher icons of
+Appendix B (`tip`, `feedback`, `watch`, `research`, `key`, `language`, `why`, `cubes`, `board`, `mwb`,
+`scissors`) and the word-problem icons (`read`, `ringnum`, `underline`, `draw`) are new entries for
+`lesson-icons.js` (or a `teacher-icons.js` beside it).
