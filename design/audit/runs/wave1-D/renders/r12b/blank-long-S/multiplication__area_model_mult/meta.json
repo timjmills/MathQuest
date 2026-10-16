@@ -20,14 +20,14 @@
             "perPage": 6,
             "pages": 1,
             "cellW": 93,
-            "cellH": 62.4,
+            "cellH": 60.6,
             "requested": "auto",
             "clamped": false,
             "note": "",
             "line": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 16 pt.",
             "cls": "standard",
             "digitPt": 16,
-            "hMin": 52,
+            "hMin": 50.5,
             "anchorMm": 0,
             "blocks": null
           },
@@ -44,7 +44,7 @@
             "line": "Fits: 1 column x 4 rows, 4 per page, 1 page. Digits 16 pt. 2 full-width problems at the bottom.",
             "cls": "standard",
             "digitPt": 16,
-            "hMin": 52,
+            "hMin": 50.5,
             "anchorMm": 0,
             "blocks": null
           }
@@ -71,27 +71,27 @@
           "ans": "1668",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 47.5
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 1.2
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -14.2
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -21.9
             },
             "5": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -26.6
             }
@@ -104,27 +104,27 @@
           "ans": "729",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 64.2
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 17.9
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 2.5
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -5.2
             },
             "5": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -9.9
             }
@@ -137,27 +137,27 @@
           "ans": "522",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 64.2
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 17.9
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 2.5
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -5.2
             },
             "5": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -9.9
             }
@@ -170,27 +170,27 @@
           "ans": "384",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 64.2
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 17.9
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 2.5
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -5.2
             },
             "5": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -9.9
             }
@@ -203,27 +203,27 @@
           "ans": "368",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 64.2
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 17.9
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 2.5
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -5.2
             },
             "5": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -9.9
             }
@@ -236,27 +236,27 @@
           "ans": "1356",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 47.5
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 1.2
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -14.2
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -21.9
             },
             "5": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -26.6
             }
@@ -318,14 +318,14 @@
             "perPage": 6,
             "pages": 1,
             "cellW": 93,
-            "cellH": 62.4,
+            "cellH": 60.6,
             "requested": "auto",
             "clamped": false,
             "note": "",
             "line": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 16 pt.",
             "cls": "standard",
             "digitPt": 16,
-            "hMin": 52,
+            "hMin": 50.5,
             "anchorMm": 0,
             "blocks": null
           },
@@ -342,7 +342,7 @@
             "line": "Fits: 1 column x 4 rows, 4 per page, 1 page. Digits 16 pt. 1 full-width problem at the bottom.",
             "cls": "standard",
             "digitPt": 16,
-            "hMin": 52,
+            "hMin": 50.5,
             "anchorMm": 0,
             "blocks": null
           }
@@ -370,27 +370,27 @@
           "letter": "A",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 66.7
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 20.4
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 4.9
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -2.8
             },
             "5": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -7.4
             }
@@ -404,27 +404,27 @@
           "letter": "A",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 64.2
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 17.9
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 2.5
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -5.2
             },
             "5": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -9.9
             }
@@ -438,27 +438,27 @@
           "letter": "A",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 52.8
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 6.5
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -9
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -16.7
             },
             "5": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -21.3
             }
@@ -472,27 +472,27 @@
           "letter": "A",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 66.7
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 20.4
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 4.9
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -2.8
             },
             "5": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -7.4
             }
@@ -506,27 +506,27 @@
           "letter": "A",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 64.2
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 17.9
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 2.5
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -5.2
             },
             "5": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -9.9
             }
@@ -540,27 +540,27 @@
           "letter": "A",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 47.5
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 1.2
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -14.2
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -21.9
             },
             "5": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -26.6
             }
@@ -574,27 +574,27 @@
           "letter": "A",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 52.8
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 6.5
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -9
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -16.7
             },
             "5": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -21.3
             }
@@ -662,7 +662,7 @@
             "cellW": 186,
             "innerW": 184.942,
             "cellH": 57,
-            "hMin": 52,
+            "hMin": 50.5,
             "gridH": 228,
             "gridHCont": 242,
             "fill": true,
@@ -701,22 +701,22 @@
           "ans": "462",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 64.2
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 17.9
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 2.5
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -5.2
             }
@@ -729,22 +729,22 @@
           "ans": "342",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 64.2
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 17.9
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 2.5
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -5.2
             }
@@ -757,22 +757,22 @@
           "ans": "1926",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 47.5
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 1.2
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -14.2
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -21.9
             }
@@ -785,22 +785,22 @@
           "ans": "245",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 64.2
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 17.9
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 2.5
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -5.2
             }
@@ -853,13 +853,13 @@
         "cols": 2,
         "rows": 4,
         "pages": 1,
-        "note": "Fits: 2 columns x 3 rows + 2 x 1 mixed, 8 per page.",
+        "note": "Fits: 2 columns x 3 rows + 3 x 1 mixed, 9 per page.",
         "sections": [
           {
             "cols": 2,
             "rows": 4,
-            "cellH": 55.7492795389049,
-            "line": "Fits: 2 columns x 3 rows + 2 x 1 mixed, 8 per page."
+            "cellH": 52.26367006487488,
+            "line": "Fits: 2 columns x 3 rows + 3 x 1 mixed, 9 per page."
           }
         ]
       },
@@ -882,22 +882,22 @@
           "ans": "126",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 64.2
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 17.9
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 2.5
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -5.2
             }
@@ -910,22 +910,22 @@
           "ans": "75",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 66.7
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 20.4
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 4.9
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -2.8
             }
@@ -938,22 +938,22 @@
           "ans": "205",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 64.2
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 17.9
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 2.5
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -5.2
             }
@@ -966,22 +966,22 @@
           "ans": "1140",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 52.8
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 6.5
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -9
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -16.7
             }
@@ -994,22 +994,22 @@
           "ans": "1290",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 47.5
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 1.2
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -14.2
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -21.9
             }
@@ -1022,22 +1022,22 @@
           "ans": "414",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 64.2
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 17.9
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 2.5
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -5.2
             }
@@ -1050,22 +1050,22 @@
           "ans": "356",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 64.2
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 17.9
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 2.5
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -5.2
             }
@@ -1078,22 +1078,22 @@
           "ans": "1392",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 47.5
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 1.2
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -14.2
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -21.9
             }
@@ -1106,22 +1106,22 @@
           "ans": "154",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 64.2
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 17.9
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 2.5
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -5.2
             }
@@ -1134,22 +1134,22 @@
           "ans": "1090",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 47.5
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 1.2
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -14.2
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -21.9
             }
@@ -1162,22 +1162,22 @@
           "ans": "184",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 64.2
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 17.9
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 2.5
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -5.2
             }
@@ -1190,22 +1190,22 @@
           "ans": "343",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 64.2
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 17.9
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 2.5
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -5.2
             }
@@ -1218,22 +1218,22 @@
           "ans": "423",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 64.2
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 17.9
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 2.5
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -5.2
             }
@@ -1246,22 +1246,22 @@
           "ans": "1295",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 47.5
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 1.2
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -14.2
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -21.9
             }
@@ -1274,22 +1274,22 @@
           "ans": "504",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 64.2
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 17.9
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 2.5
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -5.2
             }
@@ -1302,22 +1302,22 @@
           "ans": "744",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 52.8
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 6.5
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -9
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -16.7
             }
@@ -1330,22 +1330,22 @@
           "ans": "129",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 64.2
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 17.9
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": 2.5
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -5.2
             }
@@ -1358,22 +1358,22 @@
           "ans": "98",
           "measured": {
             "1": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 66.7
             },
             "2": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 20.4
             },
             "3": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": true,
               "slackMm": 4.9
             },
             "4": {
-              "hMm": 52,
+              "hMm": 50.5,
               "fits": false,
               "slackMm": -2.8
             }
@@ -1434,12 +1434,40 @@
               "slackMm": -5.3
             }
           }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Aya has 32 pencils. That is 4 times as many as Ravi has. How many pencils does R",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 39.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 48.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 60.3,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "4": {
+              "hMm": 60.3,
+              "fits": false,
+              "slackMm": -5.3
+            }
+          }
         }
       ],
       "pages": [
         {
           "file": "review-p1.png",
-          "words": 135,
+          "words": 161,
           "w_mm": 209.9,
           "h_mm": 297
         }
@@ -1447,7 +1475,7 @@
       "keyPages": [
         {
           "file": "review-key-p1.png",
-          "words": 199,
+          "words": 230,
           "w_mm": 209.9,
           "h_mm": 297
         }
@@ -1455,11 +1483,11 @@
       "check": {
         "pages": 1,
         "cells": [
-          8
+          9
         ],
         "problems": [],
         "fonts": {
-          "Andika": 73
+          "Andika": 83
         },
         "fontsReady": true,
         "andika": true
@@ -1467,11 +1495,11 @@
       "keyCheck": {
         "pages": 1,
         "cells": [
-          8
+          9
         ],
         "problems": [],
         "fonts": {
-          "Andika": 134
+          "Andika": 149
         },
         "fontsReady": true,
         "andika": true
@@ -1730,7 +1758,7 @@
             1
           ],
           [
-            "backgroundColor:rgb(255, 225, 77)",
+            "backgroundColor:rgb(255, 225, 79)",
             1
           ]
         ],

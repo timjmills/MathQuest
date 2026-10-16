@@ -158,7 +158,7 @@ function renderExt(p, ctx, wMm) {
         }).join('') + '</div>').join('');
     const A = R.reduce((s, n) => s + n, 0), B = C.reduce((s, n) => s + n, 0);
     const totalSlot = slot('total', 'area-model-total', total, boxMm(g, String(total).length + 1), 'total');
-    const model = `<div style="display:inline-flex;flex-direction:column;align-items:flex-start;white-space:nowrap${twin ? '' : `;padding-top:${g.em(1.5)}`}">`
+    const model = `<div style="display:inline-flex;flex-direction:column;align-items:flex-start;white-space:nowrap${twin ? '' : `;padding-top:${g.em(3)}`}">`
         + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;align-items:flex-end;margin-left:${g.em(sideMm)};margin-bottom:0.1em">${top}</div>`
         + rowHtml + workRow
         + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;align-items:center;gap:0.28em;margin-top:0.45em;white-space:nowrap">`
@@ -223,7 +223,7 @@ register('area-model', {
                 return `${i ? '<span style="font-weight:700;width:1em;text-align:center">+</span>' : ''}`
                     + `<span style="display:inline-flex;justify-content:center;align-items:flex-end;width:${g.em(bw)};height:${g.em(g.stripMm)};border-bottom:${HAIR} solid ${INK.ink};line-height:1.1">${fill}</span>`;
             }).join('') + '</div>';
-        const model = `<div style="display:inline-flex;flex-direction:column;align-items:flex-start;white-space:nowrap${twin ? '' : `;padding-top:${g.em(1.5)}`}">`
+        const model = `<div style="display:inline-flex;flex-direction:column;align-items:flex-start;white-space:nowrap${twin ? '' : `;padding-top:${g.em(3)}`}">`
             + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;margin-left:${g.em(mulMm)};margin-bottom:0.1em">${labels}</div>`
             + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;align-items:center">`
             + `<span style="flex:0 0 ${g.em(mulMm)};text-align:center;font-weight:700">${esc(p.multiplier)}</span>`
