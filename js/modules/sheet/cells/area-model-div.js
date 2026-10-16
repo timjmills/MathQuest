@@ -106,7 +106,7 @@ register('area-model-div', {
         } else {
             problem = `<span>${D}</span>${op('÷')}<span>${V}</span>${op('=')}${totalSlot}`;
         }
-        const model = `<div style="display:inline-flex;flex-direction:column;align-items:flex-start;white-space:nowrap${twin ? '' : `;padding-top:${g.em(2)}`}">`
+        const model = `<div style="display:inline-flex;flex-direction:column;align-items:flex-start;white-space:nowrap${twin ? '' : `;padding-top:${g.em(3)}`}">`
             + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;align-items:flex-end;margin-left:${g.em(G.sideMm)};margin-bottom:0.15em">${top}</div>`
             + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;align-items:center">`
             + `<span class="${NOWRAP}" style="flex:0 0 ${g.em(G.sideMm)};display:flex;justify-content:center;font-weight:700">${side}</span>`
