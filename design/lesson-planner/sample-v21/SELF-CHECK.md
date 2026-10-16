@@ -12,8 +12,8 @@ Run by `selfcheck.mjs` (Appendix E reference implementation, Chromium print medi
 | E6 | No pupil text below 11 pt (quiet letters 10 pt, strand tab 10 pt and footer 7 pt are the only exceptions) | smallest pupil text 11 pt; quiet letters 9.999975000000001 pt | PASS |
 | E7 | Teacher text ≥ 10 pt (tables 10, body 11, spoken 13) | smallest teacher text 10 pt | PASS |
 | E8 | Working digits are 28 pt on every pupil page (anchor chart may enlarge, never shrink) | digit sizes found: 28 pt | PASS |
-| E9 | Every page ≥ 50 % used (lowest ink over body height) | min 71 % (T1 98, T2 110, T2b 90, T3 96, T4 95, T5 95, P0 94, P1 99, P2 98, P3 99, P4a 96, P4b 96, P5 99, P6 100, P0-key 94, P1-key 99, P2-key 98, P3-key 100, P4a-key 97, P4b-key 97, P5-key 99, P6-key 100, T6 71) | PASS |
-| E10 | Every item cell ≥ 40 % free (pupil pages; a key is its page; reading cells - story box, routine panel - exempt) | 63 cells; min free 51 %; below 40 %: none | PASS |
+| E9 | Every page ≥ 50 % used and nothing runs past the body (lowest ink over body height ≤ 100 %) | min 71 % (T1 98, T2 90, T2b 90, T3 96, T4 95, T5 95, P0 94, P1 99, P2 98, P3 97, P4a 96, P4b 96, P5 99, P6 100, P0-key 94, P1-key 99, P2-key 98, P3-key 98, P4a-key 97, P4b-key 97, P5-key 99, P6-key 100, T6 71) | PASS |
+| E10 | Every item cell ≥ 40 % free (pupil pages; a key is its page; reading cells - story box, routine panel - exempt) | 63 cells; min free 49 %; below 40 %: none | PASS |
 | E11 | No empty band ≥ 30 % of a cell, measured the site way: slots and answer rows are content; a written answer keeps one Hw (10 mm) under it; only draw-on cells are exempt | worst top 19 %, left 29 %, right 29 %, bottom 2 %; failing: none | PASS |
 | E12 | Equal cells within each section (±0.5 mm) | all sections equal | PASS |
 | E13 | Slot widths = one B(n) per section, ≥ 14 mm; no underscore characters on pupil pages | P0/pre: 14 mm; P1/nsA: 17 mm; P1/nsB: 17 mm; P5/wp: 17 mm; P5/P5: 17 mm; P0-key/pre: 14 mm; P1-key/nsA: 17 mm; P1-key/nsB: 17 mm; P5-key/wp: 17 mm; P5-key/P5-key: 17 mm; underscores: 0 | PASS |
@@ -24,7 +24,7 @@ Run by `selfcheck.mjs` (Appendix E reference implementation, Chromium print medi
 | E18 | © line and strand tab on every page | © on 23/23; tab on 23/23 | PASS |
 | E19 | One identical I Can title on every page | I Can add 1–3 (facts to 10) | PASS |
 | E20 | No lone item (one-item pages only where the role ceiling is 1: word problem v1; the anchor chart is a poster) | none | PASS |
-| E9b | Body no more than 8 % blank at the bottom (site lint) | max 0 %; over 8 %: none | PASS |
+| E9b | Body no more than 8 % blank below its lowest ink (site lint) | max 29 %; over 8 %: T2 10, T2b 10, T6 29 | FAIL |
 | E1b | Exit-slip halves 132.5 ± 0.5 mm wide (A4 landscape, live 271 × 186 mm, 6 mm cut gap) | P6: 132.5 / 132.5; P6-key: 132.5 / 132.5 | PASS |
 | E16b | Routine panel: one action per check box, each row one line (≤ 9 mm) | 12 rows; tallest 7 mm | PASS |
 | E21 | T2: ≥ 5 atoms, every type one of Category / Comparative / Fact / Conceptual; no ★ in the atom tables | 8 atoms: Fact, Fact, Comparative, Conceptual, Category, Conceptual, Fact, Comparative; ★ in tables: false | PASS |
@@ -33,14 +33,14 @@ Run by `selfcheck.mjs` (Appendix E reference implementation, Chromium print medi
 | E24 | Item pool: no exact repeat in the packet (exit slip excepted when the pool is exhausted); no turn-around pair on one page | repeats: 0; same-page turn-arounds: 0 | PASS |
 | E25 | One key per pupil page (anchor chart included) | 8 pupil pages, 8 keys | PASS |
 
-**28 / 28 pass.**
+**27 / 28 pass.**
 
 ## Per page
 
 | Page | Used % | Min text pt | Cells | Min free % | Paints |
 |---|---|---|---|---|---|
 | T1 | 98 | 10 | 0 | — | #000000 |
-| T2 | 110 | 10 | 0 | — | #000000 |
+| T2 | 90 | 10 | 0 | — | #000000 |
 | T2b | 90 | 10 | 0 | — | #000000 #5b2a86 |
 | T3 | 96 | 11 | 0 | — | #000000 #5b2a86 #c2410c |
 | T4 | 95 | 11 | 0 | — | #000000 #5b2a86 #c2410c |
@@ -48,7 +48,7 @@ Run by `selfcheck.mjs` (Appendix E reference implementation, Chromium print medi
 | P0 | 94 | 12 | 4 | 64 | #000000 #ffffff |
 | P1 | 99 | 11 | 10 | 57 | #000000 #ffffff |
 | P2 | 98 | 14.99 | 5 | 51 | #000000 #5b2a86 #949494 #ffffff |
-| P3 | 99 | 12 | 10 | 53 | #000000 #5b2a86 #949494 #ffffff |
+| P3 | 97 | 12 | 10 | 49 | #000000 #5b2a86 #949494 #ffffff |
 | P4a | 96 | 12 | 12 | 71 | #000000 #5b2a86 #ffffff |
 | P4b | 96 | 12 | 12 | 71 | #000000 #5b2a86 #ffffff |
 | P5 | 99 | 12 | 2 | 11 | #000000 #5b2a86 #ffffff |
@@ -56,7 +56,7 @@ Run by `selfcheck.mjs` (Appendix E reference implementation, Chromium print medi
 | P0-key | 94 | 11 | 4 | 64 | #000000 #c2410c #ffffff |
 | P1-key | 99 | 11 | 10 | 56 | #000000 #c2410c #ffffff |
 | P2-key | 98 | 14.99 | 5 | 51 | #000000 #5b2a86 #949494 #c2410c #ffffff |
-| P3-key | 100 | 12 | 10 | 19 | #000000 #5b2a86 #949494 #c2410c #ffffff |
+| P3-key | 98 | 12 | 10 | 15 | #000000 #5b2a86 #949494 #c2410c #ffffff |
 | P4a-key | 97 | 12 | 12 | 70 | #000000 #5b2a86 #c2410c #ffffff |
 | P4b-key | 97 | 12 | 12 | 70 | #000000 #5b2a86 #c2410c #ffffff |
 | P5-key | 99 | 12 | 2 | 11 | #000000 #5b2a86 #c2410c #ffffff |
