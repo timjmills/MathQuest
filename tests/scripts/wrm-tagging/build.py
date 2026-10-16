@@ -5,18 +5,22 @@ Inputs (all in the repo except the generated scratch data):
   spec_*.py        the fix rounds, applied in file-name order; each mutates STEPS / NEW and may set ENVISION, CLOSES, ENVREP
   keys.json        live skill keys, every existing proposal, live SKILL_WRM (keys.mjs; regenerated on every build)
   prior.json       each Y6 step's school week and prior-learning list, xlsx sheet "Grade 5" (prior.mjs; regenerated)
-  OTHER lane files R.json, Y1.json, Y4.json (passed critics): their tags count as taught, their new proposals may be reused
+  OTHER lane files data/curriculum/links/{R,Y1,Y4}.json, pinned in the branch (passed critics; merged from
+               origin/claude/sweet-newton-c8wrv1): their tags count as taught, their new proposals may be reused
+  Scratch (keys.json, prior.json) goes to $WRM_TAG_DATA or a fresh temp dir; nothing is read from outside the repo.
 Derived here: pre citations as step ids, rule checks, tagFixes against the live SKILL_WRM (with a structured `partial`
 clause), proposals, the envisioned skill of every partial or gap step. The build runs mergecheck.mjs (Y6 alone, then with
-R, Y1, Y4) and optcheck.mjs, and fails on any problem.
+R, Y1, Y4), optcheck.mjs and linkfit.mjs, checks the notes against the data (class N), and fails on any problem.
 usage: python3 tests/scripts/wrm-tagging/build.py
 """
 import json, re, sys, os, glob, subprocess, copy
 H = os.path.dirname(os.path.abspath(__file__))
 R = os.path.abspath(os.path.join(H, '..', '..', '..')) + '/'
-DATA = os.environ.get('WRM_TAG_DATA', '/tmp/claude-0/-home-user-MathQuest/d4e794bd-d4af-593d-954b-51cf10298bc4/scratchpad/y6')
-OTHER = [p for p in os.environ.get('WRM_LINKS_OTHER', '/home/user/ref/r-y1/data/curriculum/links/R.json:'
-         '/home/user/ref/r-y1/data/curriculum/links/Y1.json:/home/user/ref/y4/data/curriculum/links/Y4.json').split(':') if p]
+import tempfile
+DATA = os.environ.get('WRM_TAG_DATA') or tempfile.mkdtemp(prefix='wrm-tag-y6-')   # scratch only (keys.json, prior.json)
+# The passed lanes' files are pinned inputs in the branch (merged from origin/claude/sweet-newton-c8wrv1); nothing outside the repo.
+OTHER = [p if os.path.isabs(p) else R + p for p in os.environ.get('WRM_LINKS_OTHER',
+         'data/curriculum/links/R.json:data/curriculum/links/Y1.json:data/curriculum/links/Y4.json').split(':') if p]
 for p in OTHER:
     if not os.path.exists(p): sys.exit(f'missing lane file {p} (set WRM_LINKS_OTHER)')
 os.makedirs(DATA, exist_ok=True)
@@ -111,6 +115,34 @@ for sid in order:
             errs.append(f'{sid}: F related {e["key"]} is earlier learning (why: {e["why"][:60]}) — it belongs in pre')
     if re.search(r'\bhalf (?:its|of its|of the|the) (?:\w+ )?items\b', sp['missing'] + ' ' + ' '.join(p['missing'] for p in sp['partial'])):
         errs.append(f'{sid}: K a per-seed proportion in a clause')
+
+# ---- 2b. class N (critic r4): a note may not contradict the data. "X is the build", "X is (also) the preBuild", "both are
+# preBuild", "no (separate) preBuild", "X and Y ... are direct / partial" are read and checked against the step's lists.
+def note_claims(sid, sp):
+    out = []
+    ids = set(NEW) | set(props)
+    for sent in re.split(r'(?<=[.;])\s+', sp['note']):
+        toks = [t for t in re.findall(r'\b[a-z][a-z0-9_]+\b', sent) if t in ids or ('_' in t and t in ids)]
+        sk = {e['key'].split(':')[1]: e['key'] for e in sp['direct'] + sp['partial'] + sp['pre'] + sp['related']}
+        if re.search(r'\bno (separate )?preBuild\b', sent) and sp['preBuild']: out.append(f'says no preBuild but preBuild is {sp["preBuild"]}')
+        for m in re.finditer(r'\b([a-z][a-z0-9_]+)\s+is\s+(also\s+)?(both\s+)?the\s+(preBuild|build)\b', sent):
+            t, kind = m.group(1), m.group(4)
+            if t in ids and t not in sp[kind]: out.append(f'says {t} is the {kind} but {kind} is {sp[kind]}')
+        m = re.search(r'\b(both|they) are (also )?preBuild\b', sent)
+        if m:
+            for t in toks:
+                if t not in sp['preBuild'] and t not in sp['build']: out.append(f'says {t} is preBuild but preBuild is {sp["preBuild"]}')
+            if any(t in sp['build'] for t in toks) and 'build' not in sent.replace('preBuild', ''): out.append(f'says {[t for t in toks if t in sp["build"]]} is preBuild but it is the build')
+        for m in re.finditer(r'\b(?:is|are) (direct|partial)\b', sent):
+            for t in re.findall(r'[a-z][a-z0-9_]+', sent[:m.start()]):
+                if t in sk:
+                    role = 'direct' if any(e['key'] == sk[t] for e in sp['direct']) else 'partial' if any(e['key'] == sk[t] for e in sp['partial']) else 'link'
+                    if role != m.group(1): out.append(f'says {t} is {m.group(1)} but it is {role}')
+        for m in re.finditer(r'\b([a-z][a-z0-9_]+) is (?:both )?the build and the pre-?(?:skill|Build)\b', sent):
+            if m.group(1) in ids and m.group(1) not in sp['preBuild']: out.append(f'says {m.group(1)} is also the pre-skill but preBuild is {sp["preBuild"]}')
+    return out
+for sid in order:
+    for c in note_claims(sid, STEPS[sid]): errs.append(f'{sid}: N stale note: {c}')
 
 # ---- 3. G18/H: a pre's cited step must be a step the skill is tagged to after the merge (live SKILL_WRM + the passed lane
 # files' tagFixes + this file). When it is not, re-cite the nearest step it IS tagged to that the pupil has met by this
@@ -265,5 +297,8 @@ for args in ([OUT], [OUT] + OTHER):
 oc = subprocess.run(['node', os.path.join(H, 'optcheck.mjs'), OUT], capture_output=True, text=True)
 print((oc.stdout.strip().splitlines() or ['optcheck: no output'])[-1])
 if oc.returncode: errs.append('optcheck.mjs FAILED:\n' + oc.stdout.strip()[-3000:])
+lf = subprocess.run(['node', os.path.join(H, 'linkfit.mjs'), OUT], capture_output=True, text=True, env={**os.environ, 'WRM_TAG_DATA': DATA})
+print((lf.stdout.strip().splitlines() or ['linkfit: no output'])[-1])
+if lf.returncode: errs.append('linkfit.mjs FAILED:\n' + lf.stdout.strip()[-3000:])
 print('\n'.join(errs) or 'OK')
 sys.exit(1 if errs else 0)

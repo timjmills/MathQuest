@@ -511,7 +511,7 @@
     },
     {
      "key": "placevalue:value",
-     "why": "Y2.B1.S4 Use a place value chart: compare from the greatest place"
+     "why": "Y2.B1.S4 Use a place value chart: the value of a digit (the 7 in 726 is 700), compared from the greatest place"
     }
    ],
    "preBuild": [],
@@ -605,7 +605,7 @@
     },
     {
      "key": "number_sense:rounding_table",
-     "why": "one number rounded to 10, 100, 1,000 and 10,000 in a table (numbers to 5 digits)"
+     "why": "a row of 3-digit numbers rounded to the nearest 10 or 100 in a table"
     },
     {
      "key": "number_sense:estimate_sums_diffs",
@@ -648,7 +648,7 @@
     },
     {
      "key": "patterns:count_by_step_down",
-     "why": "Y1.B5.S3 Count backwards within 100 (prior learning wk W33, \"Y1 Count backwards\"): counting back in steps of 2, 3 and 10 to 0, the move continued past 0 on a line (nearest live practice: count_by_step_down is not tagged to Y1.B5.S3)",
+     "why": "Y1.B5.S3 Count backwards within 100 (prior learning wk W33, \"Y1 Count backwards\"): counting back in 2s, 3s, 4s, 5s and 10s from numbers below 200: the move that continues past 0 on a line (nearest live practice: count_by_step_down is not tagged to Y1.B5.S3)",
      "opts": {
       "range": 100
      }
@@ -811,7 +811,7 @@
     },
     {
      "key": "number_theory:factor_tchart_easy",
-     "why": "Y4.B5 Factor pairs / Use factor pairs (prior learning wk W09)"
+     "why": "Y4.B5.S1 Factor pairs (prior learning wk W09, with Y4.B5.S2 Use factor pairs)"
     },
     {
      "key": "number_theory:factor_links_medium",
@@ -1024,15 +1024,15 @@
    "pre": [
     {
      "key": "multiplication:arrays_groups",
-     "why": "Y3.B3.S2 Use arrays (prior learning wk W33): a square number is a square array"
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W33): rows of equal groups (4 rows of 3): a square number is the array with equal rows and columns"
     },
     {
      "key": "multiplication:dot_array_mult",
-     "why": "Y3.B3.S2 Use arrays (prior learning wk W33): n rows of n dots"
+     "why": "Y3.B3.S2 Use arrays (prior learning wk W33): rows × columns of dots (8 × 3): a square number is the array with equal rows and columns"
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "n x n facts to 12 x 12"
+     "why": "times-table facts to 12 × 12; the square numbers are the n × n facts among them"
     },
     {
      "key": "number_theory:factor_tchart_medium",
@@ -1055,7 +1055,7 @@
      "why": "powers inside order of operations"
     }
    ],
-   "note": "W33 holds the negative-number lessons (for Y6.B1.S8) and Y3 Use arrays, Y4 Multiply three numbers, Y5 Square numbers and Cube numbers. Y5 Square/Cube numbers have no skill (square_cube) and Y4 Multiply three numbers has none (mult_three), so both are preBuild. exponents_simple is tagged with \"The power alone\" so the \"+ 96\" second step is off.",
+   "note": "W33 holds the negative-number lessons (for Y6.B1.S8) and Y3 Use arrays, Y4 Multiply three numbers, Y5 Square numbers and Cube numbers. Y4 Multiply three numbers has no skill (mult_three is the preBuild); Y5 Square and Cube numbers are this step's own build (square_cube). exponents_simple is tagged with \"The power alone\" so the \"+ 96\" second step is off.",
    "envision": [
     {
      "proposal": "square_cube",
@@ -1734,7 +1734,7 @@
    "pre": [
     {
      "key": "number_sense:estimate_sum",
-     "why": "Y3/Gr.2 and Y4/Gr.3 Estimate answers (prior learning wk W10)"
+     "why": "Y3.B2.S20 Estimate answers (prior learning wk W10, with Y4.B2.S9 Estimate answers)"
     },
     {
      "key": "number_sense:nearest_1000",
@@ -1746,7 +1746,7 @@
     },
     {
      "key": "multiplication:mult_zeros",
-     "why": "Y4/Gr.3 Related facts: x by a multiple of ten mentally (30 x 4 = 120), used in every estimate of a product"
+     "why": "Y4.B5.S7 Related facts – multiplication and division (lower grade): × by a multiple of ten mentally (30 × 4 = 120), used in every estimate of a product"
     }
    ],
    "preBuild": [
@@ -1798,7 +1798,7 @@
     },
     {
      "key": "placevalue:place_value_10x",
-     "why": "Y5.B3.S8 Multiply by 10, 100 and 1,000 (lower grade): × 10 and × 100 of a 3-digit number, the scaling inside 24 × 15 = 360 so 240 × 15 = 3,600",
+     "why": "Y5.B3.S8 Multiply by 10, 100 and 1,000 (lower grade): × 10 and × 100 (40 × 10 = 400), the scaling inside 24 × 15 = 360 so 240 × 15 = 3,600",
      "opts": {
       "op": "x",
       "power": [
@@ -1825,11 +1825,11 @@
     },
     {
      "key": "order_of_operations:compare_expressions",
-     "why": "compare without calculating"
+     "why": "compare two expressions (8 + 7 × 4 and 3 + 7 × 6), each worked out"
     },
     {
      "key": "multiplication:area_model_mult",
-     "why": "partial products: 24 × 16 is 24 × 15 plus one more 24"
+     "why": "partial products in an area model (4 × 78 = 4 × 70 + 4 × 8)"
     }
    ],
    "note": "mult_zeros and mult_properties only teach the Y3/Y4 roots of this; the Y6 reasoning (adjust by one group, scale by 10) is not dealt.",
@@ -1875,7 +1875,7 @@
     },
     {
      "key": "number_theory:gcf_easy",
-     "why": "Y5 Common factors / Y6.B2.S2 (prior learning wk W14)"
+     "why": "Y5.B3.S4 Common factors (prior learning wk W14, with Y6.B2.S2)"
     },
     {
      "key": "number_theory:factors_identify",
@@ -1886,7 +1886,7 @@
    "related": [
     {
      "key": "fractions:select_equiv_frac",
-     "why": "circle the equivalent fractions"
+     "why": "click the equivalent fractions (2/3 = 4/6)"
     },
     {
      "key": "fractions:graph_fractions",
@@ -1920,7 +1920,7 @@
    "pre": [
     {
      "key": "fractions:fraction_nl_drag",
-     "why": "Y3/Y4 Equivalent fractions on a number line (prior learning wk W14)"
+     "why": "Y3.B6.S9 Equivalent fractions on a number line (prior learning wk W14) (nearest live practice: fraction_nl_drag is not tagged to Y3.B6.S9)"
     },
     {
      "key": "fractions:equivalent",
@@ -1928,7 +1928,7 @@
     },
     {
      "key": "fractions:equiv_frac_visual",
-     "why": "equivalence with bars"
+     "why": "equivalence with circle models (1/2 = 2/4): the same amount shown two ways"
     },
     {
      "key": "fractions:mixed_nl_drag",
@@ -1939,7 +1939,7 @@
    "related": [
     {
      "key": "fractions:benchmark_fractions",
-     "why": "0, 1/2, 1 on a line"
+     "why": "the closest benchmark (0, ½ or 1) for a fraction; no number line in the items: the marks a line is read against"
     },
     {
      "key": "fractions:select_equiv_frac",
@@ -1993,7 +1993,7 @@
     },
     {
      "key": "fractions:equiv_frac_visual",
-     "why": "equivalence with bars"
+     "why": "equivalence with circle models (1/2 = 2/4): the same amount shown two ways"
     }
    ],
    "preBuild": [],
@@ -2401,11 +2401,11 @@
    "pre": [
     {
      "key": "fraction_operations:add_frac_like_nv",
-     "why": "Y4.B7.S11 Add two or more fractions (the skill's own step; this step builds on Y5.B4.S9 Add and subtract fractions with the same denominator): 3 x 2/5 = 2/5 + 2/5 + 2/5"
+     "why": "Y4.B7.S11 Add two or more fractions (the skill's own step; this step builds on Y5.B4.S9 Add and subtract fractions with the same denominator): adding fractions with the same denominator (3/8 + 2/8), repeated in 3 × 2/5 = 2/5 + 2/5 + 2/5"
     },
     {
      "key": "multiplication:repeated_add_to_mult",
-     "why": "Y3 equal groups as multiplication"
+     "why": "Y3.B3.S1 Multiplication - equal groups (lower grade): equal groups as multiplication"
     },
     {
      "key": "fractions:improper_mixed",
@@ -2532,7 +2532,7 @@
    "related": [
     {
      "key": "fraction_operations:frac_mult_word",
-     "why": "fraction / whole stories"
+     "why": "fraction stories: × (servings, area) and whole ÷ unit fraction (ribbon pieces); no fraction ÷ whole story yet"
     },
     {
      "key": "fractions:simplify",
@@ -2540,7 +2540,7 @@
     },
     {
      "key": "fraction_operations:div_unit_fraction",
-     "why": "the same unit fraction ÷ whole with bar, area or circle models (it also mixes in whole ÷ unit fraction, W19)"
+     "why": "the same unit fraction ÷ whole drawn with fraction bars (it also mixes in whole ÷ unit fraction, W19)"
     }
    ],
    "note": "Use div_unit_frac_nv with forms [2, 3]: GENERATOR BUG (record; not fixed here) — its form labels are swapped: forms [0, 1] \"Unit fraction ÷ whole\" deal 8 ÷ 1/3, and forms [2, 3] \"Whole ÷ unit fraction\" deal 1/3 ÷ 6. Its \"click all expressions equal to n ÷ 1/k\" item ignores forms (17 of 60 items with forms [2, 3]).",
@@ -2741,7 +2741,7 @@
    "partial": [
     {
      "key": "fractions:fraction_of_set_hard_nv",
-     "missing": "the bar model (forms \"Find the whole\" is numbers only)",
+     "missing": "the bar model; and about a third of the items are the forward 'click all expressions equal to 2/3 of 12' (that form ignores forms: generator bug, recorded)",
      "opts": {
       "forms": [
        1
@@ -2954,7 +2954,13 @@
    "related": [
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "reading a g/kg or ml scale"
+     "why": "choose g or kg; read a mL scale",
+     "opts": {
+      "forms": [
+       0,
+       2
+      ]
+     }
     },
     {
      "key": "measurement:estimate_length",
@@ -3042,7 +3048,7 @@
    "related": [
     {
      "key": "decimals:mult_decimal",
-     "why": "\"times as much\" items"
+     "why": "a decimal × a whole number (73.2 × 3), bare: the calculation a \"times as much\" measure needs"
     },
     {
      "key": "algebra:multi_step_word_plain",
@@ -3127,7 +3133,7 @@
    "related": [
     {
      "key": "patterns:double",
-     "why": "doubling: when 5 miles is about 8 of the other unit, 10 miles is about 16",
+     "why": "doubling a 3-digit number (370 → 740): when 5 miles is about 8 of the metric unit, 10 miles is about 16",
      "opts": {
       "band": 1000
      }
@@ -3184,7 +3190,7 @@
    "pre": [
     {
      "key": "measurement:unit_conversion_word",
-     "why": "Y5.B14.S3 Convert units of length (prior learning wk W22): metric and customary conversions in a story (yd, ft, lb, kg, g)",
+     "why": "Y5.B14.S3 Convert units of length (prior learning wk W22): metric and customary conversions in a story (cm → mm, gal → qt, lb → oz, ft → in)",
      "opts": {
       "units": [
        1,
@@ -3207,7 +3213,13 @@
    "related": [
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "metric mass and capacity"
+     "why": "metric mass and capacity: choose g, kg, mL or L; read a mL scale",
+     "opts": {
+      "forms": [
+       0,
+       2
+      ]
+     }
     }
    ],
    "note": "The US customary units our skills teach are the imperial units WRM names (except stone and the UK pint), so the within-system half is covered; the approximate cross-system half is not.",
@@ -3386,7 +3398,7 @@
     },
     {
      "key": "fractions:fraction_of_set",
-     "why": "ratio vs fraction of the whole (Y6.B6.S4)"
+     "why": "a fraction of a set (1/3 of 12 stickers are blue): the fraction of the whole a ratio is contrasted with"
     }
    ],
    "note": "Full with ratio_intro variant \"Write the ratio (apples to oranges)\": order matters, a : b, and simplest form. Its items have no picture; the WRM lesson starts from objects, so a teacher of ELL pupils pairs it with the ratio_language proposal page."
@@ -3465,10 +3477,6 @@
    ],
    "pre": [
     {
-     "key": "measurement:reading_ruler",
-     "why": "Y3.B11.S4 Measure and draw accurately (prior learning wk W34): read a length on a ruler (this ruler is marked in inches; a metric ruler is pending)"
-    },
-    {
      "key": "multiplication:mult_div_fact_family",
      "why": "Y3.B4.S6 Link multiplication and division (prior learning wk W34)"
     },
@@ -3496,11 +3504,11 @@
    "related": [
     {
      "key": "conversions:double_num_line",
-     "why": "drawing length | real length on two scales"
+     "why": "two quantities on paired scales (miles | hours, cups | pancakes): the paired-scale reading a scale key uses"
     },
     {
      "key": "conversions:equiv_ratios",
-     "why": "1 : 200 as an equivalent ratio"
+     "why": "equivalent ratios (2 : 4 = 10 : 20): the scaling a 1 : 200 key uses"
     },
     {
      "key": "fraction_operations:mult_scaling",
@@ -3531,7 +3539,7 @@
    "pre": [
     {
      "key": "multiplication:mult_comparison",
-     "why": "Y3.B4.S10 Scaling (prior learning wk W19): 3 times as long"
+     "why": "Y3.B4.S10 Scaling (prior learning wk W19): times as many (3 times as many crayons), the meaning of 3 times as long"
     },
     {
      "key": "multiplication:repeated_add_to_mult",
@@ -3539,11 +3547,11 @@
     },
     {
      "key": "fraction_operations:mult_frac_whole",
-     "why": "Y5.B6.S1 Multiply a unit fraction by an integer (prior learning wk W19): a scale factor of 1/2"
+     "why": "Y5.B6.S1 Multiply a unit fraction by an integer (prior learning wk W19): a fraction × a whole number (1/5 × 6), as a scale factor of 1/2 is applied"
     },
     {
      "key": "area_perimeter:perimeter",
-     "why": "side lengths of a rectangle on squared paper"
+     "why": "perimeter of a rectangle from its two side lengths (numbers, no grid)"
     },
     {
      "key": "multiplication:mult_facts",
@@ -3558,7 +3566,7 @@
     },
     {
      "key": "coordinates:coordinate_q1",
-     "why": "plotting enlarged vertices"
+     "why": "read and plot points in the first quadrant: where the vertices of an enlarged shape are drawn"
     }
    ],
    "note": "mult_scaling was a partial tag; it compares a product with a factor (\"is 7/5 x 6 greater than 6?\") and never enlarges a shape or finds a scale factor, so it is related only and the step is a gap. W19 list: equal groups, Scaling, multiply a unit fraction by an integer; the W20 list (fractions, decimals, percentages) has nothing for this step.",
@@ -3585,11 +3593,11 @@
    "pre": [
     {
      "key": "multiplication:mult_div_fact_family",
-     "why": "Y3.B4.S6 Link multiplication and division (prior learning wk W34): side x factor and its inverse"
+     "why": "Y3.B4.S6 Link multiplication and division (prior learning wk W34): × and ÷ fact families (9 × 4 = 36, 36 ÷ 4 = 9), a side × a factor and its inverse"
     },
     {
      "key": "fractions:equivalent",
-     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W34): sides in the same proportion"
+     "why": "Y4.B7.S10 Equivalent fraction families (prior learning wk W34): equivalent fractions (1/4 = 2/8), the same proportion similar shapes keep"
     },
     {
      "key": "multiplication:mult_comparison",
@@ -3601,25 +3609,21 @@
      "opts": {
       "band": 1000
      }
-    },
-    {
-     "key": "measurement:reading_ruler",
-     "why": "Y3.B11.S4 Measure and draw accurately (prior learning wk W34)"
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "conversions:equiv_ratios",
-     "why": "sides in the same ratio"
+     "why": "equivalent ratios (2 : 4 = 10 : 20): the sides of similar shapes are in the same ratio"
     },
     {
      "key": "conversions:ratio_tables",
-     "why": "short side : long side in a table"
+     "why": "a missing value in a ratio table: the scaling between the sides of similar shapes"
     },
     {
      "key": "fraction_operations:mult_scaling",
-     "why": "a scale factor above or below 1 makes the shape larger or smaller"
+     "why": "a factor above or below 1 makes the product larger or smaller (numbers, no shapes): the rule an enlargement follows"
     }
    ],
    "note": "The previous step (Y6.B6.S6 Use scale factors) has no skill; its build, scale, is this step's build too, so it is not repeated as a pre-build.",
@@ -3663,7 +3667,7 @@
     },
     {
      "key": "algebra:tape_diagram",
-     "why": "bar models for sharing"
+     "why": "bar models of + and − stories (a part and a whole): the bar a sharing problem is drawn on"
     },
     {
      "key": "multiplication:mult_div_fact_family",
@@ -3758,7 +3762,7 @@
     },
     {
      "key": "decimals:mult_decimal",
-     "why": "unit prices with decimals"
+     "why": "a decimal × a whole number (32.2 × 5), bare: the calculation a decimal unit price needs"
     }
    ],
    "note": "",
@@ -3798,7 +3802,7 @@
     },
     {
      "key": "patterns:double",
-     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W34/W35): double a recipe",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning wk W34/W35): doubling (370 → 740), the step that doubles a recipe",
      "opts": {
       "band": 1000
      }
@@ -3809,14 +3813,14 @@
     },
     {
      "key": "patterns:halve",
-     "why": "Y2.B5.S11 Doubling and halving (prior learning): halve a recipe",
+     "why": "Y2.B5.S11 Doubling and halving (prior learning): halving (740 → 370), the step that halves a recipe",
      "opts": {
       "band": 1000
      }
     },
     {
      "key": "fraction_operations:mult_frac_whole",
-     "why": "scaling by 1½"
+     "why": "a fraction × a whole number (2 × 5/6): the step before scaling by 1½"
     }
    ],
    "preBuild": [],
@@ -3827,11 +3831,11 @@
     },
     {
      "key": "decimals:mult_decimal",
-     "why": "amounts that become decimals"
+     "why": "a decimal × a whole number (67.8 × 9): scaled amounts that are decimals"
     },
     {
      "key": "fraction_operations:frac_mult_word",
-     "why": "scaling an amount by a fraction in a story (serves 4 → serves 6 is × 1½)"
+     "why": "fraction stories (2/3 cup × 4 batches): scaling an amount in a recipe"
     }
    ],
    "note": "",
@@ -4151,7 +4155,7 @@
    "partial": [
     {
      "key": "algebra:evaluate_expression_hard",
-     "missing": "substitutes into a bare expression; never a formula for a real quantity, in words or letters (P = 2(l + w), cost = 5n + 3)"
+     "missing": "substitutes into a bare expression; never a formula for a real quantity, in words or letters (P = 2(l + w), cost = 5n + 3); about 4 in 10 of its Evaluate items substitute a negative value or square a bracket ((a + 2)² at a = −1), beyond Grade 5; band 20/50 does not remove them"
     }
    ],
    "verdict": "partial",
@@ -4357,7 +4361,7 @@
     },
     {
      "key": "algebra:function_table_hard",
-     "why": "Y6.B7.S2 working a 2-step machine backwards"
+     "why": "Y6.B7.S2 2-step function machines: a 2-step rule (× 8 then + 2) found from a table, the two operations a 2-step equation undoes"
     },
     {
      "key": "subtraction:sub_check_by_adding",
@@ -4595,7 +4599,7 @@
    "partial": [
     {
      "key": "decimals:compare_thousandths",
-     "missing": "compares numbers with integer and decimal parts but never asks the value of a digit or partitions the number"
+     "missing": "compares decimals within 1 only (0.738 vs 0.589); never a number with an integer part, never the value of a digit or a partition"
     },
     {
      "key": "decimals:order_decimals",
@@ -4661,7 +4665,7 @@
    "partial": [
     {
      "key": "decimals:round_decimals",
-     "missing": "rounds to the nearest tenth or hundredth with a number line; no rounding to the nearest whole number"
+     "missing": "rounds to the nearest tenth or hundredth (no number line); no rounding to the nearest whole number"
     },
     {
      "key": "decimals:round_thousandths",
@@ -4707,7 +4711,7 @@
     },
     {
      "key": "decimals:add_decimal",
-     "why": "estimating sums by rounding"
+     "why": "adding decimals (73.2 + 22.1): the sums an estimate by rounding checks"
     }
    ],
    "note": "Y4.B9.S7 Round to the nearest whole number is in this week's prior learning and also has no skill; round_whole closes both.",
@@ -4751,7 +4755,10 @@
     },
     {
      "key": "measurement:money",
-     "why": "Y4.B10.S5 Calculate with money (the skill's own step; this step builds on Y4.B9.S1 Make a whole with tenths): dollars and cents are two-place decimals added and subtracted"
+     "why": "Y4.B10.S5 Calculate with money (the skill's own step; this step builds on Y4.B9.S1 Make a whole with tenths): prices with cents added in columns (6.47 + 9.30), two-place decimals",
+     "opts": {
+      "step": 1
+     }
     },
     {
      "key": "decimals:compare_decimal",
@@ -4899,7 +4906,7 @@
     },
     {
      "key": "conversions:d_to_f",
-     "why": "0.07 as 7/100"
+     "why": "a decimal as a fraction (0.75 = 3/4, 0.1 = 1/10): tenths and hundredths named as fractions"
     }
    ],
    "note": "Partial (round 3): genTimesTen (gen-pv.js:622) picks a whole number 11-999 for every ÷ item with Decimals on.",
@@ -4941,7 +4948,7 @@
     },
     {
      "key": "decimals:add_decimal",
-     "why": "repeated addition of a decimal"
+     "why": "adding decimals (73.2 + 22.1): repeated, it is a decimal × an integer"
     },
     {
      "key": "decimals:compare_thousandths",
@@ -4958,7 +4965,10 @@
     },
     {
      "key": "measurement:money",
-     "why": "money × integer"
+     "why": "prices with cents added in columns (6.47 + 9.30): money, the context a decimal × an integer is used in",
+     "opts": {
+      "step": 1
+     }
     },
     {
      "key": "fraction_operations:mult_frac_whole",
@@ -5027,7 +5037,7 @@
     },
     {
      "key": "measurement:money_change",
-     "why": "money shared out"
+     "why": "change from a payment (1.00 − 0.75): subtracting two-place money amounts"
     }
    ],
    "note": "Partial (round 3): the dec_by_whole branch (gen-fractions.js:7351) builds the quotient as whole + tenths/10, so the dividend is always 1 dp. Use \"Which division\" = \"A decimal ÷ a whole number\"; the default also mixes whole ÷ decimal and decimal ÷ decimal (Grade 6).",
@@ -5071,7 +5081,10 @@
     },
     {
      "key": "measurement:money",
-     "why": "money is the usual context for decimal x and /"
+     "why": "prices with cents added in columns (6.47 + 9.30): money, the usual context for decimal × and ÷",
+     "opts": {
+      "step": 1
+     }
     }
    ],
    "preBuild": [],
@@ -5145,7 +5158,7 @@
     },
     {
      "key": "decimals:decimal_nl_drag",
-     "why": "fractions and decimals on one line"
+     "why": "decimals placed on a number line (0.7): the line fractions and decimals share"
     },
     {
      "key": "conversions:order_fdp",
@@ -5193,11 +5206,16 @@
     },
     {
      "key": "division:box_division_hard",
-     "why": "short division, carried past the decimal point"
+     "why": "short division of a 3-digit number by a 1-digit number (597 ÷ 3): the method then carried past the decimal point"
     },
     {
      "key": "decimals:div_decimal",
-     "why": "decimal ÷ integer (Y6.B8.S8)"
+     "why": "a decimal ÷ an integer (27.6 ÷ 3) (Y6.B8.S8)",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
     },
     {
      "key": "fraction_operations:frac_10_100",
@@ -5216,11 +5234,11 @@
     },
     {
      "key": "fractions:improper_mixed",
-     "why": "7 ÷ 2 = 7/2 = 3½"
+     "why": "an improper fraction as a mixed number (25/6 = 4 1/6): the last move of 7 ÷ 2 = 7/2 = 3½"
     },
     {
      "key": "division:remainder_interpret",
-     "why": "a remainder as a fraction"
+     "why": "what a remainder means in a story (left over, or one more car): the remainder 7 ÷ 2 then writes as ½"
     }
    ],
    "note": "",
@@ -5257,7 +5275,7 @@
     },
     {
      "key": "placevalue:place_value_10x",
-     "why": "Y5.B3.S9 Divide by 10, 100 and 1,000 (prior learning wk W36/W37): ÷ 10 and ÷ 100, the steps to 10% and 1% of an amount",
+     "why": "Y5.B3.S9 Divide by 10, 100 and 1,000 (prior learning wk W36/W37): ÷ 10 and ÷ 100 (400 ÷ 10 = 40), no percents: the steps to 10% and 1% of an amount",
      "opts": {
       "op": "/",
       "power": [
@@ -5273,7 +5291,7 @@
     },
     {
      "key": "subtraction:missing_add_sub",
-     "why": "Y2.B2.S21 Missing number problems (the skill's own step; this step builds on Y3.B2.S19 Complements to 100): missing addends within 20 (6 + ___ = 19); the same move as 30% + ___% = 100%, at a smaller size"
+     "why": "Y2.B2.S21 Missing number problems (the skill's own step; this step builds on Y3.B2.S19 Complements to 100): missing addends within 20 (6 + ___ = 19), no percents: the same move as 30% + ___% = 100%, at a smaller size"
     },
     {
      "key": "conversions:f_to_p",
@@ -5345,7 +5363,7 @@
     },
     {
      "key": "placevalue:place_value_10x",
-     "why": "Y5.B3.S9 Divide by 10, 100 and 1,000 (prior learning wk W36/W37): ÷ 10 and ÷ 100, the steps to 10% and 1% of an amount",
+     "why": "Y5.B3.S9 Divide by 10, 100 and 1,000 (prior learning wk W36/W37): ÷ 10 and ÷ 100 (400 ÷ 10 = 40), no percents: the steps to 10% and 1% of an amount",
      "opts": {
       "op": "/",
       "power": [
@@ -5456,14 +5474,14 @@
    "related": [
     {
      "key": "decimals:decimal_nl_drag",
-     "why": "placing all three forms on a line"
+     "why": "decimals placed on a number line (0.3, 0.5, 0.6): the line the three forms are placed on"
     },
     {
      "key": "fraction_operations:frac_as_division",
      "why": "3/8 as a division"
     }
    ],
-   "note": "Partial (round 3): d_to_p and p_to_d deal tenths and hundredths both ways and are direct; the four converters that involve a fraction are held to the small denominator pools listed. (d_to_p and p_to_d also deal 150% = 1.5, beyond the step but harmless.)",
+   "note": "Partial (round 3): d_to_p and p_to_d are partial: decimal ↔ percent only (they also deal 150% = 1.5, beyond the step but harmless). The four converters that involve a fraction are held to the small denominator pools listed.",
    "envision": [
     {
      "proposal": "f_to_p_denoms",
@@ -5568,7 +5586,7 @@
     },
     {
      "key": "placevalue:place_value_10x",
-     "why": "Y5.B3.S9 Divide by 10, 100 and 1,000 (prior learning wk W36): ÷ 10 and ÷ 100, the steps to 10% and 1%",
+     "why": "Y5.B3.S9 Divide by 10, 100 and 1,000 (prior learning wk W36): ÷ 10 and ÷ 100 (400 ÷ 10 = 40), no percents: the steps to 10% and 1%",
      "opts": {
       "op": "/",
       "power": [
@@ -5580,7 +5598,7 @@
     },
     {
      "key": "patterns:halve",
-     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W36): 50% is a half",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W36): half of a number (740 → 370), no percents: 50% is a half",
      "opts": {
       "band": 1000
      }
@@ -5602,11 +5620,7 @@
    "related": [
     {
      "key": "fractions:fraction_of_set_nv",
-     "why": "a fraction of an amount without pictures: 1/4 of 80 is 25% of 80"
-    },
-    {
-     "key": "conversions:double_num_line",
-     "why": "an amount and its percent on a double number line"
+     "why": "a fraction of an amount (1/4 of 20), no percents: the move 25% of 80 = 1/4 of 80 uses"
     }
    ],
    "note": "Partial (round 3). The pool is 21 fixed combos (gen-fractions.js:6898-6906): 10, 15, 20, 25, 33, 40, 50, 60 and 75%, no 1%, and no option to restrict it. GENERATOR BUG: gen-fractions.js:6904 gives {pct: 33, base: 30, ans: 10}, {pct: 33, base: 60, ans: 20} and {pct: 33, base: 90, ans: 30}; 33% of 30 is 9.9, of 60 is 19.8, of 90 is 29.7 (33% is treated as 1/3), so 3 of the 21 items are marked wrong for a correct answer. Remove them or relabel them as 1/3 (lead to fix; not fixed here).",
@@ -5638,7 +5652,7 @@
    "pre": [
     {
      "key": "placevalue:place_value_10x",
-     "why": "Y5.B3.S9 Divide by 10, 100 and 1,000 (prior learning wk W36): ÷ 10 and ÷ 100, the steps to 10% and 1%",
+     "why": "Y5.B3.S9 Divide by 10, 100 and 1,000 (prior learning wk W36): ÷ 10 and ÷ 100 (400 ÷ 10 = 40), no percents: the steps to 10% and 1%",
      "opts": {
       "op": "/",
       "power": [
@@ -5650,7 +5664,7 @@
     },
     {
      "key": "patterns:halve",
-     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W36): 50% is a half",
+     "why": "Y1.B10.S4 Find a half of a quantity (prior learning wk W36): half of a number (740 → 370), no percents: 50% is a half",
      "opts": {
       "band": 1000
      }
@@ -5665,22 +5679,22 @@
     },
     {
      "key": "subtraction:missing_add_sub",
-     "why": "Y3 Complements to 100 / Y5 Find missing numbers: the part left after a discount (prior learning wk W36)"
+     "why": "Y5.B2.S8 Find missing numbers (prior learning wk W36, with Y3.B2.S19 Complements to 100): missing numbers within 20 (12 − ___ = 7), the move that finds the part left after a discount"
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "decimals:mult_decimal",
-     "why": "percent as a decimal multiplier"
+     "why": "a decimal × a whole number (73.2 × 3), no percents: the multiplication a decimal multiplier uses"
     },
     {
      "key": "measurement:money_change",
-     "why": "discount and change"
+     "why": "change from a payment (subtracting money), no percents: the subtraction a discount ends with"
     },
     {
      "key": "conversions:percent_visual",
-     "why": "the percent of a hundred square: 35% is 30 squares and 5 more, as 35% = 3 × 10% + 5%"
+     "why": "the percent shaded on a hundred square (20%, 65%): 35% is 30 squares and 5 more, as 35% = 3 × 10% + 5%"
     }
    ],
    "note": "",
@@ -5724,11 +5738,11 @@
     },
     {
      "key": "fractions:equivalent",
-     "why": "Y5.B4.S2 equivalent fractions (prior learning wk W37): 12/40 = 30/100"
+     "why": "Y5.B4.S2 equivalent fractions (prior learning wk W37): equivalent fractions (?/8 = 1/4), the move behind 12/40 = 30/100"
     },
     {
      "key": "placevalue:place_value_10x",
-     "why": "Y5.B3.S9 Divide by 10, 100 and 1,000 (prior learning wk W37): ÷ 10 and ÷ 100, the steps to 10% and 1%",
+     "why": "Y5.B3.S9 Divide by 10, 100 and 1,000 (prior learning wk W36): ÷ 10 and ÷ 100 (400 ÷ 10 = 40), no percents: the steps to 10% and 1%",
      "opts": {
       "op": "/",
       "power": [
@@ -5747,11 +5761,7 @@
    "related": [
     {
      "key": "conversions:ratio_tables",
-     "why": "percent as a ratio to 100"
-    },
-    {
-     "key": "fractions:fraction_of_set_hard",
-     "why": "find the whole from a fraction, with pictures"
+     "why": "a missing value in a scaling table (no percents): the scaling behind 12/40 = 30/100"
     }
    ],
    "note": "Round 3: both skills are partial; each finds a different missing value, neither finds the percentage. percent_multi adds the missing-percentage cell.",
@@ -5949,7 +5959,7 @@
     },
     {
      "key": "area_perimeter:composite_shapes",
-     "why": "area by splitting and counting"
+     "why": "area and perimeter of L and T shapes by splitting them into rectangles"
     }
    ],
    "note": "area_triangle does not count squares at all, so gap; area_estimate (Y5 whole/half squares) is the missing pre-skill.",
@@ -6140,7 +6150,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "single-digit facts, the products inside l x w x h (Y4.B4.S13 Multiply three numbers, prior learning wk W25, has no skill: mult_three)"
+     "why": "times-table facts to 12 × 12, the products inside l × w × h (Y4.B4.S13 Multiply three numbers, prior learning wk W25, has no skill: mult_three)"
     },
     {
      "key": "shapes_early:count_edges_faces_vertices",
@@ -6159,7 +6169,7 @@
      }
     }
    ],
-   "note": "Y5.B15 volume steps are also untaught, so pupils meet cube counting here for the first time; volume_cubes is both the build and the pre-skill.",
+   "note": "Y5.B15 volume steps are also untaught, so pupils meet cube counting here for the first time; volume_cubes is the build; mult_three is the preBuild.",
    "envision": [
     {
      "proposal": "volume_cubes",
@@ -6194,7 +6204,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "single-digit facts, the products inside l x w x h (Y4.B4.S13 Multiply three numbers, prior learning wk W25, has no skill: mult_three)"
+     "why": "times-table facts to 12 × 12, the products inside l × w × h (Y4.B4.S13 Multiply three numbers, prior learning wk W25, has no skill: mult_three)"
     },
     {
      "key": "multiplication:multiply",
@@ -6251,10 +6261,10 @@
     },
     {
      "key": "graphs:mixed_graphs",
-     "why": "choose the right graph"
+     "why": "mixed graph items (bar graph, pictograph, line plot, pie chart) read in turn"
     }
    ],
-   "note": "Corrected (round 3): the W30 prior list does name graphs: \"Y5 Read and interpret line graphs\" and \"Y5 Draw line graphs\" (Y5.B9.S1-S2), and both are gaps, so line_graph is also the preBuild. coordinate_graph was dropped from pre: it mixes in four-quadrant items.",
+   "note": "Corrected (round 3): the W30 prior list names \"Y5 Read and interpret line graphs\" and \"Y5 Draw line graphs\" (Y5.B9.S1-S2). line_graph is the build; the Y5 line-graph steps are also gaps, so there is no separate preBuild. coordinate_graph was dropped from pre: it mixes in four-quadrant items.",
    "envision": [
     {
      "proposal": "line_graph",
@@ -6305,7 +6315,7 @@
     },
     {
      "key": "graphs:mixed_graphs",
-     "why": "choose the right graph"
+     "why": "mixed graph items (bar graph, pictograph, line plot, pie chart) read in turn"
     }
    ],
    "note": "",
@@ -6423,7 +6433,7 @@
    "related": [
     {
      "key": "conversions:p_to_f",
-     "why": "percent as a fraction of the circle"
+     "why": "a percent written as a fraction (25% = 1/4): the share of the whole a sector shows"
     },
     {
      "key": "graphs:bar_graph",
@@ -6462,7 +6472,7 @@
     },
     {
      "key": "fractions:fraction_of_set",
-     "why": "fraction of 360"
+     "why": "a fraction of an amount (2/3 of 24), no angles: the step to a fraction of 360°"
     },
     {
      "key": "graphs:build_bar_graph",
@@ -6508,7 +6518,7 @@
    "pre": [
     {
      "key": "division:share_into_groups",
-     "why": "Y1.B9.S9 Make equal groups, sharing (prior learning wk W26): the mean shares the total equally"
+     "why": "Y1.B9.S9 Make equal groups, sharing (prior learning wk W26): counters put into equal groups (24 in 3s), the equal shares behind the mean"
     },
     {
      "key": "addition:add_column_multi",
@@ -6539,7 +6549,7 @@
     },
     {
      "key": "graphs:line_plot_fractions",
-     "why": "5.MD.B.2 fair share on a line plot"
+     "why": "a line plot of measurements (count them, the most common): the plot 5.MD.B.2 levels into a fair share"
     }
    ],
    "note": "Round 3: mean moved from direct to partial; it teaches one clause (find the mean), the step is partial.",
@@ -6588,11 +6598,11 @@
     },
     {
      "key": "composing:fraction_number_line",
-     "why": "Y3/Y4 reading a scale (prior learning wk W27)"
+     "why": "Y3.B6.S7 Fractions on a number line (prior learning wk W27, \"Y3/Y4 reading a scale\"): reading a marked scale between labelled marks"
     },
     {
      "key": "angles_lines:identify_lines",
-     "why": "Y3.B11.S6 Parallel and perpendicular (the skill's own step; this step builds on Y4.B12.S2 Identify angles): perpendicular lines meet at a right angle, the 90° mark angles are classified against"
+     "why": "Y3.B11.S6 Parallel and perpendicular (the skill's own step; this step builds on Y4.B12.S2 Identify angles): perpendicular lines meet at a right angle, the mark angles are classified against"
     }
    ],
    "preBuild": [],
@@ -6603,7 +6613,7 @@
     },
     {
      "key": "shapes_classify:classify_quads",
-     "why": "angle types inside quadrilaterals"
+     "why": "quadrilaterals sorted by their sides and angles"
     }
    ],
    "note": "Round 3: identify_angles moved to partial (no reflex: its Which angles set is right / acute / obtuse / straight only). Pre-skills are few: the Y5 lessons Classify angles and Measure angles up to 180° are this step's own partial skills (identify_angles, measure_angles), so they cannot be listed again as pre-skills.",
@@ -6651,7 +6661,7 @@
     },
     {
      "key": "subtraction:missing_add_sub",
-     "why": "the missing part of 90, 180 or 360"
+     "why": "a missing addend within 20 (___ + 10 = 17): the missing-part move that 180 − 164 uses"
     },
     {
      "key": "addition:add_three",
@@ -6662,7 +6672,7 @@
    "related": [
     {
      "key": "angles_lines:mixed_angles_lines",
-     "why": "the same two-part angle items mixed with naming angles and lines"
+     "why": "mixed angle and line items (measure, name, symmetry); about 1 in 9 is the two-part missing angle"
     },
     {
      "key": "algebra:solve_eq_addsub",
@@ -6758,15 +6768,15 @@
    "related": [
     {
      "key": "angles_lines:mixed_angles_lines",
-     "why": "missing angles in a right angle, on a line and around a point, mixed with naming angles (no triangles)"
+     "why": "mixed angle and line items (measure, name, symmetry); about 1 in 9 finds a missing part of 90°, 180° or 360° (no triangles)"
     },
     {
      "key": "algebra:solve_eq_addsub",
-     "why": "180 = a + b + ?, a missing addend"
+     "why": "a missing addend in an equation (x + 20 = 45), no angles: the form 180 = a + b + ? takes"
     },
     {
      "key": "shapes_classify:mixed_shapes",
-     "why": "naming triangles by their angles (acute, right, obtuse) among other shape items"
+     "why": "naming triangles (by angles or sides) among other shape items (nets, quadrilaterals, cross-sections)"
     }
    ],
    "note": "",
@@ -6802,7 +6812,7 @@
     },
     {
      "key": "angles_lines:identify_angles",
-     "why": "Y5.B10.S2 Classify angles (prior learning wk W30): a right angle is 90°"
+     "why": "Y5.B10.S2 Classify angles (prior learning wk W30): naming right, acute and obtuse angles, no angle sizes shown"
     },
     {
      "key": "angles_lines:additive_angles",
@@ -6852,7 +6862,7 @@
     },
     {
      "key": "subtraction:missing_add_sub",
-     "why": "180 − (a + b): the third angle as the missing part"
+     "why": "a missing addend within 20 (___ + 10 = 17): the missing-part move that 180 − 164 uses"
     },
     {
      "key": "shapes_classify:classify_triangles",
@@ -6928,7 +6938,7 @@
      "why": "find the quadrilaterals"
     }
    ],
-   "note": "Grounded on the W29 prior list (sheet row 139): Rec/PK4 shapes with 4 sides, Y3 Right angles, Y4 Triangles and Quadrilaterals, Y5 Measure angles up to 180°, Calculate angles around a point and on a straight line. The triangle sum (Y6.B12.S4) that the 360° argument uses has no skill, so angle_rules is also the preBuild.",
+   "note": "Grounded on the W29 prior list (sheet row 139): Rec/PK4 shapes with 4 sides, Y3 Right angles, Y4 Triangles and Quadrilaterals, Y5 Measure angles up to 180°, Calculate angles around a point and on a straight line. The triangle sum (Y6.B12.S4) that the 360° argument uses has no skill; angle_rules (this step's build) also makes the triangle sum.",
    "envision": [
     {
      "proposal": "angle_rules",
@@ -6956,7 +6966,7 @@
     },
     {
      "key": "shapes_early:count_sides_vertices_2d",
-     "why": "Y4.B12.S6 Polygons / Y5.B10.S9 Regular and irregular polygons (prior learning wk W27): count the sides; n sides split into n − 2 triangles"
+     "why": "Y4.B12.S6 Polygons / Y5.B10.S9 Regular and irregular polygons (prior learning wk W27): count the sides of a polygon (a heptagon has 7), the n in n − 2 triangles"
     },
     {
      "key": "angles_lines:identify_angles",
@@ -7015,27 +7025,23 @@
      }
     },
     {
-     "key": "measurement:reading_ruler",
-     "why": "Y2.B6.S1 Measure length (lower grade): read a length on a ruler, as a radius is measured (this ruler is marked in inches; a metric ruler is pending)"
-    },
-    {
      "key": "shapes_early:name_2d_shapes",
-     "why": "Rec/PK4 Identify and name circles; Y1 Recognise 2D shapes (prior learning wk W29)"
+     "why": "R.B4.S1 Identify and name circles and triangles (prior learning wk W29, with Y1.B3.S3 Recognise and name 2-D shapes): naming a circle among 2-D shapes"
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "angles_lines:symmetry",
-     "why": "a diameter is a line of symmetry"
+     "why": "lines of symmetry of polygons (no circles): the line a diameter is"
     },
     {
      "key": "shapes_early:shape_attributes",
-     "why": "a circle has no straight sides or corners"
+     "why": "sides and vertices of polygons (a hexagon has 6 vertices), no circles in the items: a circle has none"
     },
     {
      "key": "graphs:pie_chart",
-     "why": "a pie chart is a circle cut by radii (Y6.B11.S3)"
+     "why": "a pie chart cut into sectors from its centre (Y6.B11.S3)"
     }
    ],
    "note": "No CCSS (circle parts are 7.G.B.4 vocabulary). Grounded on the W29 prior list, which opens with Rec/PK4 Identify and name circles and triangles and Y1 Recognise and name 2D shapes.",
@@ -7065,10 +7071,6 @@
      "why": "Y5.B10.S4 Measure angles (prior learning wk W30)"
     },
     {
-     "key": "measurement:reading_ruler",
-     "why": "Y3.B11.S4 Measure and draw accurately (prior learning wk W30)"
-    },
-    {
      "key": "angles_lines:identify_lines",
      "why": "Y3.B11.S6 Parallel and perpendicular (prior learning wk W30)"
     },
@@ -7087,11 +7089,11 @@
    "related": [
     {
      "key": "coordinates:coord_polygon",
-     "why": "draw a shape from its vertices"
+     "why": "a polygon given by its vertices on a grid: its side lengths and perimeter"
     },
     {
      "key": "shapes_classify:mixed_shapes",
-     "why": "name the shape drawn"
+     "why": "mixed shape items: nets, quadrilateral and triangle names, cross-sections"
     }
    ],
    "note": "Print-first skill; on screen it can only check a measurement of the drawn shape.",
@@ -7206,7 +7208,7 @@
     },
     {
      "key": "graphs:line_plot",
-     "why": "values marked along one scaled axis: half of a coordinate grid"
+     "why": "values marked along one scaled axis: one axis of a coordinate plane"
     }
    ],
    "note": "Round 3: coordinate_graph removed from direct: it picks quadrant1 or all_quadrants at random (gen-geometry.js:3387) and no option restricts it to quadrant I. coordinate_q1 (read and plot, coordinates to 10) is the whole step. The W13 list lessons Y4 Describe position / Plot coordinates and Y5 Read and plot coordinates map to coordinate_q1 itself."
@@ -7356,13 +7358,13 @@
      "why": "the third transformation"
     }
    ],
-   "note": "One build for the four-quadrant clause: translate_grid, widened to four quadrants with the new coordinates written.",
+   "note": "One build for the four-quadrant clause: translate_grid, widened to four quadrants with the new coordinates written. The reused translate_grid proposal is written for the first quadrant (Y4/Y5); this step needs it with four quadrants and the new coordinates written (envision.teaches).",
    "envision": [
     {
      "proposal": "translate_grid",
      "name": "Translate on a Grid",
      "kind": "new skill coordinates:translate_on_grid",
-     "teaches": "translating a shape or point on a first-quadrant grid and describing a translation (3 right, 2 up)",
+     "teaches": "translating a shape on a four-quadrant grid, describing the translation (3 left, 2 down) and writing the image's coordinates",
      "closes": "drawing a translation in four quadrants, describing it (left/right, up/down) and writing new coordinates",
      "representation": "a coordinate grid with a shape and its image"
     }
@@ -7419,13 +7421,13 @@
      "why": "a reflected coordinate changes sign"
     }
    ],
-   "note": "One build for the four-quadrant clause: reflect_grid, widened to reflections in the x- and y-axes in four quadrants with the new coordinates written.",
+   "note": "One build for the four-quadrant clause: reflect_grid, widened to reflections in the x- and y-axes in four quadrants with the new coordinates written. The reused reflect_grid proposal is written for a square grid and the axes (Y5); this step needs four quadrants and the new coordinates written (envision.teaches).",
    "envision": [
     {
      "proposal": "reflect_grid",
      "name": "Reflect on a Grid",
      "kind": "new skill coordinates:reflect_on_grid",
-     "teaches": "reflecting a shape in a horizontal or vertical mirror line on a square grid and in the axes",
+     "teaches": "reflecting a shape in the x- or y-axis on a four-quadrant grid and writing the new coordinates",
      "closes": "drawing a reflection in the axes and writing the new coordinates",
      "representation": "a grid with a dashed mirror line and a shape"
     }
@@ -9493,7 +9495,7 @@
    "key": "fractions:fraction_of_set_hard_nv",
    "step": "Y6.B4.S7",
    "action": "partial",
-   "partial": "the bar model (forms \"Find the whole\" is numbers only)",
+   "partial": "the bar model; and about a third of the items are the forward 'click all expressions equal to 2/3 of 12' (that form ignores forms: generator bug, recorded)",
    "why": "tagged partial; the live clause is replaced by what the generated items leave out",
    "opts": {
     "forms": [
@@ -9771,7 +9773,7 @@
    "key": "algebra:evaluate_expression_hard",
    "step": "Y6.B7.S5",
    "action": "add",
-   "partial": "substitutes into a bare expression; never a formula for a real quantity, in words or letters (P = 2(l + w), cost = 5n + 3)",
+   "partial": "substitutes into a bare expression; never a formula for a real quantity, in words or letters (P = 2(l + w), cost = 5n + 3); about 4 in 10 of its Evaluate items substitute a negative value or square a bracket ((a + 2)² at a = −1), beyond Grade 5; band 20/50 does not remove them",
    "why": "not tagged yet; generated items with these opts teach this step in part"
   },
   {
@@ -9799,7 +9801,7 @@
    "key": "decimals:compare_thousandths",
    "step": "Y6.B8.S2",
    "action": "add",
-   "partial": "compares numbers with integer and decimal parts but never asks the value of a digit or partitions the number",
+   "partial": "compares decimals within 1 only (0.738 vs 0.589); never a number with an integer part, never the value of a digit or a partition",
    "why": "not tagged yet; generated items with these opts teach this step in part"
   },
   {
@@ -9813,7 +9815,7 @@
    "key": "decimals:round_decimals",
    "step": "Y6.B8.S3",
    "action": "partial",
-   "partial": "rounds to the nearest tenth or hundredth with a number line; no rounding to the nearest whole number",
+   "partial": "rounds to the nearest tenth or hundredth (no number line); no rounding to the nearest whole number",
    "why": "tagged full; generated items teach only part of the step"
   },
   {

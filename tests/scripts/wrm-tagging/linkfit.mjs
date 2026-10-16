@@ -12,7 +12,13 @@ globalThis.window = globalThis; globalThis.document = undefined;
 const R = new URL('../../../', import.meta.url).pathname;
 const g = await import(R + 'js/modules/generate-question.js');
 const fs = await import('fs');
-const DATA = process.env.WRM_TAG_DATA || '/tmp/claude-0/-home-user-MathQuest/d4e794bd-d4af-593d-954b-51cf10298bc4/scratchpad/y6';
+// prior.json (each step's school week) comes from WRM_TAG_DATA (build.py passes its scratch dir), else it is made in a temp dir
+let DATA = process.env.WRM_TAG_DATA;
+if (!DATA || !fs.existsSync(DATA + '/prior.json')) {
+  const os = await import('os'), path = await import('path'), cp = await import('child_process');
+  DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'wrm-linkfit-'));
+  cp.execFileSync('node', [new URL('prior.mjs', import.meta.url).pathname, DATA + '/prior.json']);
+}
 const prior = JSON.parse(fs.readFileSync(DATA + '/prior.json', 'utf8'));
 const args = process.argv.slice(2);
 const file = args.find(a => a.endsWith('.json')) || R + 'data/curriculum/links/Y6.json';
@@ -33,6 +39,10 @@ const cache = new Map();
 const FLOOR = 1000;
 // generator bugs recorded in the step notes and Y6-report.md; the link is kept (the bug is 1 item in 60 or less)
 const KNOWN = { 'fractions:simplify': /negative fractions or decimals/ };
+// generator bugs an option avoids (critic r4 #18): a link to the key must carry opts that pass `ok`, or it deals the bug
+const AVOIDABLE_BUGS = [
+  { key: 'measurement:mass_volume_liquid', ok: o => Array.isArray(o.forms) && !o.forms.includes(1), bug: 'the kg dial reads "mass in kg? → 0"; use forms [0, 2]' },
+];
 function probe(key, opts, range) {
   const id = key + JSON.stringify(opts) + range; if (cache.has(id)) return cache.get(id);
   const [c, k] = key.split(':'); let max = 0, ex = ''; const items = [];
@@ -41,7 +51,8 @@ function probe(key, opts, range) {
     if (!q) continue;
     const text = strip(q.text), a = strip(typeof q.ans === 'object' ? JSON.stringify(q.ans) : q.ans), pay = q.cell ? JSON.stringify(q.cell.payload) : '';
     const x = strip([...(q.options || []), ...(q.tiles || []), ...(q.bins || []), ...(q.items || [])].map(lab).join(' ; '));
-    items.push({ text, a, x, pay, vis: strip(q.visual), tpl: q.cell ? q.cell.template : '' });
+    const raw = String(q.visual ?? '');
+    items.push({ text, a, x, pay, vis: strip(q.visual), tpl: q.cell ? q.cell.template : '', draw: `${(raw.match(/<line\b/g) || []).length >= 8 || (raw.match(/<rect\b/g) || []).length >= 12 ? 'grid ' : ''}${/<circle\b|kind":"circle|d="[^"]*\bA\s*[\d.]/.test(raw + pay) ? 'circle ' : ''}${/area-model|bx-wrap/.test(raw + (q.cell ? q.cell.template : '')) ? 'grid ' : ''}` });
     const t = `${text} ${x} ${a.split(/[,;]/).join(' ')}`.replace(/\d+(\.\d+)?\s*°/g, ' ');   // angle measures are not number size
     for (const m of t.matchAll(NUM)) { const n = Number(m[1].replace(/,/g, '')); if (n > max) { max = n; ex = text.trim().slice(0, 70); } }
   }
@@ -135,6 +146,23 @@ function whyCheck(sid, e, r) {
   if (mm && texts.filter(t => new RegExp(`\\b${mm[1]}\\b`).test(t)).length < N / 3) out.push(`why says multiples of ${mm[1]} but few items use ${mm[1]}`);
   const um = w.match(/\b(kg|grams?|km|metres?|cm|mm|litres?|ml)\b/i);
   if (um && !texts.some(t => new RegExp(`\\b${um[1].replace(/s\?$/, '')}`, 'i').test(t))) out.push(`why names the unit ${um[1]} but no item has it`);
+  // r2 (critic r4 #18): representations, percents, wholes, totals and sizes a why names must be in the items
+  const said = r.items.map(i => `${i.text || ''} ${i.a || ''} ${i.x || ''}`);
+  const seen = r.items.map(i => `${i.text || ''} ${i.a || ''} ${i.x || ''} ${i.vis || ''} ${i.tpl || ''} ${i.draw || ''} ${(i.pay || '').slice(0, 600)}`);
+  const some = (arr, re) => arr.some(t => re.test(t)), share = (arr, re) => arr.filter(t => re.test(t)).length / (arr.length || 1);
+  const denied = x => new RegExp(`\\bno ${x}`, 'i').test(w);
+  if (/percent|%/i.test(w) && !denied('percent') && !some(said, /%|percent/i)) out.push('why names a percent but no item has one');
+  if (/squared paper|\bgrid\b/i.test(w) && !denied('grid') && !some(seen, /grid|squared|unit squares|"cells"|coord/i)) out.push('why names a grid but no item draws one');
+  if (/\bcircles?\b/i.test(w) && !denied('circle') && !some(seen, /circle/i)) out.push('why names a circle but no item shows one');
+  if (/find(ing)? the whole|the whole from/i.test(w) && !denied('find-the-whole') && !some(said, /of what number|of a number is|what is the (whole|number)\?/i)) out.push('why says "find the whole" but no item does');
+  if (/\bto 0\b/i.test(w) && /count/i.test(w) && share(said, /(^|[^\d.])0([^\d.]|$)/) < 0.2) out.push('why says counting to/past 0 but few items reach 0');
+  // an angle total the why says the items work with: "the missing part of 90, 180 or 360", "180 − (a + b)", "180 = a + b + ?", "is 90°"
+  for (const m of w.matchAll(/(?:\b(?:of|is|total|totals|make|sum to)\s+|=\s*)(90|180|360)\b|\b(90|180|360)\s*(?:=|[−-]\s*\()/g)) { const n = m[1] || m[2];
+    if (!/1 in \d|about 1|no angle|no triangle/i.test(w) && !some(said, new RegExp(`\\b${n}\\b`))) out.push(`why names the total ${n} but no item has it`); }
+  if (/\bn\s*[x×]\s*n\b/i.test(w) && !/among them/i.test(w) && share(said, /\b(\d+)\s*[×x]\s*\1\b/) < 0.5) out.push('why says n × n but most items are not squares');
+  if (/single-digit/i.test(w) && share(said, /\b\d{2,}\s*[×x]|[×x]\s*\d{2,}\b/) > 0.2) out.push('why says single-digit but items have 2-digit factors');
+  if (/integer part|integer and decimal parts/i.test(w) && !/never (a number with )?an? integer part/i.test(w) && !some(said, /\b[1-9]\d*\.\d/)) out.push('why names an integer part but every decimal is below 1');
+  if (/(two|2)-step/i.test(w) && /backwards|undo/i.test(w) && !some(said, /input|backwards|what (number|was) (went|put) in/i) && /machine/i.test(w)) out.push('why says a machine is worked backwards but no item does');
   return out;
 }
 let bad = 0, checked = 0;
@@ -148,11 +176,16 @@ for (const [sid, s] of Object.entries(d.steps)) {
     const limit = Math.max(1.5 * base, FLOOR);   // Grade 5 pupils have met 4-digit numbers (Grade 3-4)
     const tag = `${role} ${e.key}${e.opts ? JSON.stringify(e.opts) : ''}${e.maxNumber ? '@' + e.maxNumber : ''}`;
     if (!TIME.test(e.key) && r.max > limit) fails.push(`${tag}: size ${r.max} > ${limit} — ${r.ex}`);
+    for (const b of AVOIDABLE_BUGS) if (b.key === e.key && (!b.roles || b.roles.includes(role)) && !b.ok(e.opts || {})) fails.push(`${tag}: known generator bug: ${b.bug}`);
     for (const c of [...content(sid, e, r, role), ...whyCheck(sid, e, r)]) if (!(KNOWN[e.key] && KNOWN[e.key].test(c))) fails.push(`${tag}: ${c}`);
   }
   for (const e of [...s.direct, ...s.partial]) {   // direct/partial: beyond-grade content and generation errors only (their clause says the rest)
     const r = probe(e.key, e.opts || {}, e.maxNumber || 10000);
     const said = r.items.map(i => `${i.text || ''} → ${i.a || ''} ; ${i.x || ''}`).join(' | ');
+    for (const b of AVOIDABLE_BUGS) if (b.key === e.key && !b.roles && !b.ok(e.opts || {})) fails.push(`direct ${e.key}: known generator bug: ${b.bug}`);
+    // a partial clause says what is missing, but its positive claims must hold too (critic r4 #11: "integer and decimal parts")
+    if (e.missing && /integer part|integer and decimal parts/i.test(e.missing) && !/never (a number with )?an? integer part|no integer part/i.test(e.missing)
+      && !r.items.some(i => /\b[1-9]\d*\.\d/.test(`${i.text} ${i.a} ${i.x}`))) fails.push(`partial ${e.key} clause: names an integer part but every decimal is below 1`);
     for (const [n, f] of BEYOND) if (f(said) && !(KNOWN[e.key] && KNOWN[e.key].test(n)) && !(e.missing || '').match(/negative|beyond/i) && !/integers:|negative/.test(e.key) && !/B1\.S8|B13\.S[2-5]/.test(sid)) fails.push(`direct ${e.key}: beyond Grade 5: ${n}`);
     if (r.items.some(i => i.err) || !r.items.length) fails.push(`direct ${e.key}: generation error / no items`);
   }
