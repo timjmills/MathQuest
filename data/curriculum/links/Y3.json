@@ -1273,7 +1273,7 @@
    "pre": [
     {
      "key": "addition:number_line_add",
-     "why": "Y2.B2.S5 Add and subtract 1s (prior learning wk W03)",
+     "why": "Y2.B2.S5 Add and subtract 1s (prior learning wk W03; the adding half)",
      "opts": {}
     },
     {
@@ -1414,7 +1414,7 @@
     },
     {
      "key": "addition:number_line_add",
-     "why": "Y2.B2.S5 Add and subtract 1s (prior learning wk W03)",
+     "why": "Y2.B2.S5 Add and subtract 1s (prior learning wk W03; the adding half)",
      "opts": {}
     },
     {
@@ -1590,7 +1590,7 @@
     },
     {
      "key": "addition:number_line_add",
-     "why": "Y2.B2.S5 Add and subtract 1s (prior learning wk W04)",
+     "why": "Y2.B2.S5 Add and subtract 1s (prior learning wk W04; the adding half)",
      "opts": {}
     }
    ],
@@ -1637,7 +1637,7 @@
     },
     {
      "key": "addition:number_line_add",
-     "why": "Y2.B2.S5 Add and subtract 1s (prior learning wk W04)",
+     "why": "Y2.B2.S5 Add and subtract 1s (prior learning wk W04; the adding half)",
      "opts": {}
     },
     {
@@ -3187,7 +3187,7 @@
     },
     {
      "key": "division:div_facts",
-     "why": "sharing a number into equal groups using the tables (dividing by 2, 5, 10) — Y2.B5.S16 Divide by 5",
+     "why": "Y2.B5.S16 Divide by 5 (Grade 1): dividing by 2, 5 and 10 within 100 (40 ÷ 5, 70 ÷ 10); a multiple of 5 or 10 divides by it exactly",
      "opts": {
       "constant": [
        2,
@@ -3260,7 +3260,7 @@
     },
     {
      "key": "multiplication:arrays_groups",
-     "why": "equal groups written as a multiplication: the inverse (earlier step this builds on: Y3.B3.S2 Use arrays)",
+     "why": "arrays written as a multiplication (3 rows of 5 make 15): the inverse of sharing into rows (earlier step this builds on: Y3.B3.S2 Use arrays)",
      "opts": {
       "forms": [
        0
@@ -3629,18 +3629,6 @@
    "preBuild": [],
    "related": [
     {
-     "key": "division:div_facts",
-     "why": "sharing a number into equal groups using the tables (dividing by 2, 5, 10) — Y2.B5.S16 Divide by 5",
-     "opts": {
-      "constant": [
-       2,
-       5,
-       10
-      ],
-      "band": 100
-     }
-    },
-    {
      "key": "multiplication:nl_mult",
      "why": "the 3 times-table as jumps on a number line",
      "opts": {
@@ -3931,18 +3919,6 @@
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "division:div_facts",
-     "why": "sharing a number into equal groups using the tables (dividing by 2, 5, 10) — Y2.B5.S16 Divide by 5",
-     "opts": {
-      "constant": [
-       2,
-       5,
-       10
-      ],
-      "band": 100
-     }
-    },
     {
      "key": "multiplication:nl_mult",
      "why": "the 4 times-table as jumps on a number line",
@@ -4430,9 +4406,10 @@
     },
     {
      "key": "placevalue:unit_form",
-     "why": "Y3.B1.S8 ten tens = 1 hundred: 12 tens = 120",
+     "why": "Y3.B1.S8 renaming tens: 12 tens = 120 (5 hundreds 12 tens = 620)",
      "opts": {
-      "band": 999
+      "band": 999,
+      "rename": "more"
      }
     },
     {
@@ -4506,9 +4483,10 @@
     },
     {
      "key": "placevalue:unit_form",
-     "why": "Y3.B1.S8 hundreds, tens and ones: 12 tens = 120",
+     "why": "Y3.B1.S8 renaming tens: 12 tens = 120 (5 hundreds 12 tens = 620)",
      "opts": {
-      "band": 999
+      "band": 999,
+      "rename": "more"
      }
     },
     {
@@ -4686,7 +4664,7 @@
    "pre": [
     {
      "key": "multiplication:mult_zeros",
-     "why": "multiplying by 10 and by multiples of 10: 20 × 3 — Y3.B4.S1 Multiples of 10",
+     "why": "Y3.B4.S1 Multiples of 10 (taught earlier): multiplying by 10 (7 × 10 = 70), the tens part of 23 × 3",
      "opts": {
       "forms": [
        0
@@ -4695,7 +4673,7 @@
     },
     {
      "key": "placevalue:expand",
-     "why": "Y2.B1.S8 / Y3.B1.S2 partitioning into tens and ones: 23 × 3 = 20 × 3 + 3 × 3",
+     "why": "Y2.B1.S8 / Y3.B1.S2 partitioning into tens and ones, 23 = 20 + 3 (used to multiply each part: 20 × 3 and 3 × 3)",
      "opts": {
       "band": 99
      }
@@ -4802,7 +4780,7 @@
    "pre": [
     {
      "key": "placevalue:expand",
-     "why": "a number split into its parts (expanded form): 24 × 4 = 20 × 4 + 4 × 4 — Y3.B1.S6 Partition numbers to 1,000",
+     "why": "a number split into its parts (expanded form): 24 = 20 + 4 — Y3.B1.S6 Partition numbers to 1,000",
      "opts": {
       "band": 999
      }
@@ -4948,15 +4926,6 @@
      }
     },
     {
-     "key": "multiplication:mult_zeros",
-     "why": "multiplying by 10 and by multiples of 10 — Y3.B4.S1 Multiples of 10",
-     "opts": {
-      "forms": [
-       0
-      ]
-     }
-    },
-    {
      "key": "multiplication:count_by_tables",
      "why": "Y2.B5.S9 The 2 times-table (prior learning wk W33)",
      "opts": {
@@ -4988,6 +4957,19 @@
     {
      "key": "division:div_remainders",
      "why": "Y3.B4.S9 Divide a 2-digit number by a 1-digit number - with remainders (taught earlier, W32)",
+     "opts": {
+      "constant": [
+       2,
+       3,
+       4,
+       5,
+       8
+      ]
+     }
+    },
+    {
+     "key": "division:area_model_div_2by1",
+     "why": "Y3.B4.S8 Divide a 2-digit number by a 1-digit number - flexible partitioning (taught earlier, W32)",
      "opts": {
       "constant": [
        2,
@@ -5416,15 +5398,6 @@
      }
     },
     {
-     "key": "multiplication:mult_zeros",
-     "why": "multiplying by 10 and by multiples of 10 — Y3.B4.S1 Multiples of 10",
-     "opts": {
-      "forms": [
-       0
-      ]
-     }
-    },
-    {
      "key": "patterns:halve",
      "why": "Y2.B5.S11 Doubling and halving (prior learning wk W33)",
      "opts": {
@@ -5439,6 +5412,11 @@
        2
       ]
      }
+    },
+    {
+     "key": "division:share_into_groups",
+     "why": "Y2.B5.S7 making equal groups (grouping): ring the counters in groups of a size",
+     "opts": {}
     }
    ],
    "preBuild": [],
@@ -5447,13 +5425,6 @@
      "key": "algebra:tape_diagram",
      "why": "a bar model: 3 times as long",
      "opts": {}
-    },
-    {
-     "key": "multiplication:repeated_add_to_mult",
-     "why": "adding equal groups, written as a multiplication — Y2.B5.S3 Add equal groups",
-     "opts": {
-      "band": 25
-     }
     }
    ],
    "note": ""
@@ -5470,7 +5441,7 @@
    "pre": [
     {
      "key": "multiplication:mult_facts",
-     "why": "Y3.B3 the 2, 3, 4, 5, 8, 10 tables",
+     "why": "Y3.B3 the 2, 3, 4, 5, 8 and 10 times-tables",
      "opts": {
       "constant": [
        2,
@@ -5494,7 +5465,7 @@
     },
     {
      "key": "multiplication:repeated_add_to_mult",
-     "why": "adding equal groups, written as a multiplication — Y2.B5.S3 Add equal groups",
+     "why": "Y2.B5.S3 Add equal groups (Grade 1): equal groups added and written as a multiplication (5 + 5 + 5 = 3 × 5), how the ways are counted",
      "opts": {
       "band": 25
      }
@@ -5542,7 +5513,7 @@
    "pre": [
     {
      "key": "number_sense:place_on_number_line",
-     "why": "Y2.B1.S10 a ruler is a number line marked in equal steps",
+     "why": "Y2.B1.S10 a number line marked in equal steps (used for reading a ruler)",
      "opts": {
       "span": 10,
       "band": 100
@@ -5550,7 +5521,7 @@
     },
     {
      "key": "multiplication:count_by_tables",
-     "why": "Y3.B4.S1 counting in 10s: 100 cm make 1 m",
+     "why": "counting in equal steps from 0 (counting in 10s from 0) — Y3.B4.S1 Multiples of 10",
      "opts": {
       "rows": [
        {
@@ -5647,7 +5618,7 @@
    "pre": [
     {
      "key": "number_sense:place_on_number_line",
-     "why": "Y2.B1.S10 a ruler is a number line marked in equal steps",
+     "why": "Y2.B1.S10 a number line marked in equal steps (used for reading a ruler)",
      "opts": {
       "span": 10,
       "band": 100
@@ -5655,7 +5626,7 @@
     },
     {
      "key": "multiplication:count_by_tables",
-     "why": "Y3.B4.S1 counting in 10s: 10 mm make 1 cm",
+     "why": "Y3.B4.S1 counting in 10s from 0 (the count used for 10 mm in each cm)",
      "opts": {
       "rows": [
        {
@@ -5780,14 +5751,15 @@
    "pre": [
     {
      "key": "placevalue:unit_form",
-     "why": "Y3.B1.S8 hundreds, tens and ones: 1 m = 100 cm is the same exchange as 1 hundred = 100 ones",
+     "why": "Y3.B1.S8 renaming hundreds, tens and ones (5 hundreds 12 tens = 620; the same exchange used for 1 m = 100 cm)",
      "opts": {
-      "band": 999
+      "band": 999,
+      "rename": "more"
      }
     },
     {
      "key": "multiplication:count_by_tables",
-     "why": "Y3.B1.S4 counting in 100s from 0: 1 m, 2 m, 3 m in cm",
+     "why": "Y3.B1.S4 counting in 100s from 0 (the count used for 1 m, 2 m, 3 m in cm)",
      "opts": {
       "rows": [
        {
@@ -5966,7 +5938,7 @@
    "pre": [
     {
      "key": "addition:add_100_regroup",
-     "why": "Y2.B2.S16 Add two 2-digit numbers across a 10 (Grade 1): the addition used with lengths in cm",
+     "why": "Y2.B2.S16 Add two 2-digit numbers across a 10 (Grade 1; the addition used with lengths in cm)",
      "opts": {}
     },
     {
@@ -6032,7 +6004,7 @@
    "pre": [
     {
      "key": "subtraction:sub_100_regroup",
-     "why": "Y2.B2.S18 Subtract two 2-digit numbers across a 10 (Grade 1): the subtraction used with lengths in cm",
+     "why": "Y2.B2.S18 Subtract two 2-digit numbers across a 10 (Grade 1; the subtraction used with lengths in cm)",
      "opts": {}
     },
     {
@@ -6325,7 +6297,7 @@
    "related": [
     {
      "key": "composing:compose_whole",
-     "why": "how many unit fractions make one whole (Y3.B6.S4)",
+     "why": "making 1 whole from halves, quarters and eighths (or halves, thirds and sixths): how many parts make one whole (Y3.B6.S4)",
      "opts": {}
     }
    ],
@@ -6413,7 +6385,7 @@
    "related": [
     {
      "key": "fractions:equiv_frac_visual",
-     "why": "Y3.B6.S9 equivalent fractions (a later step, W37)",
+     "why": "Y3.B6.S9 equivalent fractions (a later step, W37; nearest live practice: Y3.B6.S9 has it as a partial skill, and these items never use a number line)",
      "opts": {
       "denoms": [
        2
@@ -6664,7 +6636,7 @@
    "related": [
     {
      "key": "fractions:equiv_frac_visual",
-     "why": "Y3.B6.S9 equivalent fractions (a later step, W37)",
+     "why": "Y3.B6.S9 equivalent fractions (a later step, W37; nearest live practice: Y3.B6.S9 has it as a partial skill, and these items never use a number line)",
      "opts": {
       "denoms": [
        2
@@ -7057,7 +7029,7 @@
    "pre": [
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "this step's skill as it was met then (what the items ask: read the cylinder (mL)) — Y2.B7.S7 Measure in litres (Grade 1)",
+     "why": "this step's skill as it was met then (what the items ask: read the cylinder (mL)) — Y2.B7.S6 Measure in millilitres (Grade 1)",
      "opts": {
       "forms": [
        0
@@ -7071,7 +7043,7 @@
     },
     {
      "key": "number_sense:place_on_number_line",
-     "why": "a scale is a number line with intervals (earlier step this builds on: Y3.B1.S11 Estimate on a number line to 1,000)",
+     "why": "a number line with intervals (used for reading a scale) (earlier step this builds on: Y3.B1.S11 Estimate on a number line to 1,000)",
      "opts": {
       "span": 100,
       "band": 1000
@@ -7137,7 +7109,7 @@
     },
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "what the items ask: read the cylinder (mL): the same scale reading in another measure — Y2.B7.S7 Measure in litres (Grade 1)",
+     "why": "what the items ask: read the cylinder (mL): the same scale reading in another measure — Y2.B7.S6 Measure in millilitres (Grade 1)",
      "opts": {
       "forms": [
        0
@@ -7146,7 +7118,7 @@
     },
     {
      "key": "number_sense:place_on_number_line",
-     "why": "a scale is a number line (earlier step this builds on: Y3.B1.S11 Estimate on a number line to 1,000)",
+     "why": "a number line (used for reading a scale) (earlier step this builds on: Y3.B1.S11 Estimate on a number line to 1,000)",
      "opts": {
       "span": 100,
       "band": 1000
@@ -7199,7 +7171,7 @@
     },
     {
      "key": "multiplication:count_by_tables",
-     "why": "counting in 100s to read a kg scale marked in 100 g",
+     "why": "counting in 100s from 0 (the count used to read a mass scale marked in 100 g)",
      "opts": {
       "rows": [
        {
@@ -7212,7 +7184,7 @@
     },
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "what the items ask: read the cylinder (mL): the same scale reading in another measure — Y2.B7.S7 Measure in litres (Grade 1)",
+     "why": "what the items ask: read the cylinder (mL): the same scale reading in another measure — Y2.B7.S6 Measure in millilitres (Grade 1)",
      "opts": {
       "forms": [
        0
@@ -7221,7 +7193,7 @@
     },
     {
      "key": "number_sense:place_on_number_line",
-     "why": "a scale is a number line (earlier step this builds on: Y3.B1.S11 Estimate on a number line to 1,000)",
+     "why": "a number line (used for reading a scale) (earlier step this builds on: Y3.B1.S11 Estimate on a number line to 1,000)",
      "opts": {
       "span": 100,
       "band": 1000
@@ -7229,7 +7201,7 @@
     },
     {
      "key": "measurement:length_metric",
-     "why": "m and cm: mixed units like kg and g (earlier step this builds on: Y3.B5.S5 Equivalent lengths (metres and centimetres))",
+     "why": "m and cm (1 m 20 cm = 120 cm): mixed units, the same idea used for kg and g (earlier step this builds on: Y3.B5.S5 Equivalent lengths (metres and centimetres))",
      "opts": {
       "forms": [
        1
@@ -7274,9 +7246,10 @@
     },
     {
      "key": "placevalue:unit_form",
-     "why": "Y3.B1.S8 1,000 = 10 hundreds: the 1,000 in 1 kg = 1,000 g",
+     "why": "Y3.B1.S8 renaming hundreds, tens and ones (5 hundreds 12 tens = 620; the same exchange used for 1 kg = 1,000 g)",
      "opts": {
-      "band": 999
+      "band": 999,
+      "rename": "more"
      }
     },
     {
@@ -7427,7 +7400,7 @@
    "pre": [
     {
      "key": "number_sense:place_on_number_line",
-     "why": "Y3.B1.S10 a jug scale is a vertical number line",
+     "why": "Y3.B1.S10 a number line to 1,000 (used for reading the marks on a jug)",
      "opts": {
       "span": 100,
       "band": 1000
@@ -7435,7 +7408,7 @@
     },
     {
      "key": "multiplication:count_by_tables",
-     "why": "Y3.B4.S1 counting in 10s to read the jug marks",
+     "why": "Y3.B4.S1 counting in 10s from 0 (the count used to read the marks on a jug)",
      "opts": {
       "rows": [
        {
@@ -7494,7 +7467,7 @@
    "pre": [
     {
      "key": "number_sense:place_on_number_line",
-     "why": "reading a scale",
+     "why": "reading a number line (used for reading a scale)",
      "opts": {}
     },
     {
@@ -7540,15 +7513,8 @@
    ],
    "pre": [
     {
-     "key": "placevalue:unit_form",
-     "why": "1 l = 1,000 ml, the same exchange as 1 thousand (earlier step this builds on: Y3.B1.S8 Hundreds, tens and ones)",
-     "opts": {
-      "band": 999
-     }
-    },
-    {
      "key": "measurement:mass_volume_liquid",
-     "why": "reading a scale (a cylinder in mL) — Y2.B7.S7 Measure in litres",
+     "why": "reading a scale (a cylinder in mL) — Y2.B7.S6 Measure in millilitres",
      "opts": {
       "forms": [
        0
@@ -7559,11 +7525,28 @@
      "key": "comparing:compare_objects",
      "why": "Y1.B7.S1 the compare language (more, less) (topic ladder)",
      "opts": {}
+    },
+    {
+     "key": "number_sense:place_on_number_line",
+     "why": "Y2.B1.S9 a number line (used for reading the marks on a jug) (topic ladder)",
+     "opts": {
+      "span": 10,
+      "band": 100
+     }
     }
    ],
    "preBuild": [],
-   "related": [],
-   "note": "no related skill: the same exchange with mass (kg ↔ g) has no skill yet (metric_mass_capacity), and 1,000 = 10 hundreds is pre"
+   "related": [
+    {
+     "key": "placevalue:unit_form",
+     "why": "renaming hundreds, tens and ones (5 hundreds 12 tens = 620; the same exchange used for 1 l = 1,000 ml)",
+     "opts": {
+      "band": 999,
+      "rename": "more"
+     }
+    }
+   ],
+   "note": ""
   },
   "Y3.B7.S10": {
    "title": "Compare capacity and volume",
@@ -7620,7 +7603,7 @@
    "pre": [
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "reading a scale (a cylinder in mL) — Y2.B7.S7 Measure in litres",
+     "why": "reading a scale (a cylinder in mL) — Y2.B7.S6 Measure in millilitres",
      "opts": {
       "forms": [
        0
@@ -7997,7 +7980,7 @@
    "pre": [
     {
      "key": "division:div_facts",
-     "why": "Y2.B5.S10-S16 / Y3.B3.S7-S10 dividing by the table: 1/3 of 12 is 12 ÷ 3",
+     "why": "Y2.B5.S10-S16 / Y3.B3.S7-S10 dividing by 2, 3, 4 and 5 (12 ÷ 3 = 4; used for 1/3 of 12)",
      "opts": {
       "constant": [
        2,
@@ -8313,7 +8296,7 @@
     },
     {
      "key": "placevalue:expand",
-     "why": "dollars and cents as two parts of one amount (earlier step this builds on: Y3.B1.S6 Partition numbers to 1,000)",
+     "why": "a number split into its parts, 345 = 300 + 40 + 5 (used for dollars and cents as two parts of one amount) (earlier step this builds on: Y3.B1.S6 Partition numbers to 1,000)",
      "opts": {
       "band": 999
      }
@@ -8403,13 +8386,6 @@
      }
     },
     {
-     "key": "placevalue:unit_form",
-     "why": "345 cents = 3 dollars 45 cents is the same exchange as 3 hundreds 45 ones (earlier step this builds on: Y3.B1.S8 Hundreds, tens and ones)",
-     "opts": {
-      "band": 999
-     }
-    },
-    {
      "key": "measurement:money_change",
      "why": "Y2.B4.S9 Find change (prior learning wk W19)",
      "opts": {
@@ -8445,6 +8421,14 @@
    "preBuild": [],
    "related": [
     {
+     "key": "placevalue:unit_form",
+     "why": "renaming hundreds, tens and ones (578 = 57 tens 8 ones; the same exchange used for 345 cents = 3 dollars 45 cents)",
+     "opts": {
+      "band": 999,
+      "rename": "more"
+     }
+    },
+    {
      "key": "measurement:money_compare",
      "why": "comparing two amounts once they are in the same form",
      "opts": {}
@@ -8477,7 +8461,7 @@
     },
     {
      "key": "measurement:money_notation",
-     "why": "Y3.B9.S2 Convert pounds and pence (taught before this step in the block)",
+     "why": "Y3.B9.S2 Convert pounds and pence (taught before this step in the block; nearest live practice: Y3.B9.S2 has it as a partial skill, and these items never convert)",
      "opts": {
       "currency": "usd",
       "task": "words"
@@ -8606,7 +8590,7 @@
     },
     {
      "key": "measurement:money_notation",
-     "why": "Y3.B9.S2 Convert pounds and pence (taught earlier, W19)",
+     "why": "Y3.B9.S2 Convert pounds and pence (taught earlier, W19; nearest live practice: Y3.B9.S2 has it as a partial skill, and these items never convert)",
      "opts": {
       "currency": "usd",
       "task": "words"
@@ -8617,7 +8601,7 @@
    "related": [
     {
      "key": "measurement:enough_money",
-     "why": "is there enough: the difference between what you have and a price",
+     "why": "is there enough money for a price? (the comparison used for finding a difference)",
      "opts": {
       "currency": "usd"
      }
@@ -8670,7 +8654,7 @@
     },
     {
      "key": "measurement:money_notation",
-     "why": "Y3.B9.S2 Convert pounds and pence (taught earlier, W19)",
+     "why": "Y3.B9.S2 Convert pounds and pence (taught earlier, W19; nearest live practice: Y3.B9.S2 has it as a partial skill, and these items never convert)",
      "opts": {
       "currency": "usd",
       "task": "words"
@@ -9592,7 +9576,7 @@
     },
     {
      "key": "number_sense:place_on_number_line",
-     "why": "Y2.B1.S10 a ruler is a number line marked in equal steps",
+     "why": "Y2.B1.S10 a number line marked in equal steps (used for reading a ruler)",
      "opts": {
       "span": 10,
       "band": 100
@@ -9748,7 +9732,7 @@
    "related": [
     {
      "key": "shapes_early:compose_from_attributes",
-     "why": "sorting shapes by parallel sides and right angles (the same week)",
+     "why": "clicking every shape with the named sides, parallel sides or right angles (the same week)",
      "opts": {}
     }
    ],

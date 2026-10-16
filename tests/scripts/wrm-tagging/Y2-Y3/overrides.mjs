@@ -71,7 +71,7 @@ export const steps = {
   'Y2.B4.S6': { reviewed: true, note: 'money_compare has no US option (plain or QAR): plain cents are dealt' },
   'Y2.B4.S7': { partials: [P('measurement:money', 'adds whole-dollar prices only; finding the difference between two amounts is not dealt', USD)],
     why: { 'measurement:enough_money': 'asks "is there enough?" (a compare), not a calculation: kept as related' }, build: ['money_difference'],
-    related: [R('measurement:enough_money', 'compare an amount with a price, the reasoning behind a difference'), R('measurement:money_change', 'the next step: change is a difference')] },
+    related: [R('measurement:enough_money', 'compare an amount with a price: is there enough money? (the reasoning used for finding a difference)'), R('measurement:money_change', 'the next step: change is a difference')] },
   'Y2.B4.S8': { partials: [P('measurement:equiv_coin_sets', 'checks whether coins make an amount up to $1; making exactly $1 (100 cents) in different ways is not asked', { currency: 'usd', band: 100 })], build: ['money_uk'] },
   'Y2.B4.S9': { direct: [D('measurement:money_change', { currency: 'usd', step: 100 })] },
   'Y2.B4.S10': { reviewed: true, preOnly: true, pre: [R('measurement:money', 'Y2.B4.S7 adding prices'), R('measurement:money_change', 'Y2.B4.S9 finding change'), R('addition:add_wp_100', 'one-step addition stories within 100'), R('subtraction:sub_wp_100', 'one-step subtraction stories within 100')] },
@@ -191,7 +191,7 @@ export const steps = {
     related: [R('division:area_model_div_2by1', 'the next step: dividing by flexible partitioning')] }, 'Y3.B4.S8': OK, 'Y3.B4.S9': OK, 'Y3.B4.S10': OK,
   'Y3.B4.S4': { partials: [P('multiplication:multiply', '2-digit × 1-digit with and without exchanges mixed (53 × 8); a no-exchange page is not available', { tiles: 21 }), P('multiplication:area_model_mult', 'the partition picture, exchanges mixed', { tiles: 21 })], build: ['exchange_count'] },
   'Y3.B4.S5': { partials: [P('multiplication:multiply', 'mostly with an exchange, but no-exchange items (30 × 2) are mixed in', { tiles: 21 }), P('multiplication:area_model_mult', 'the partition picture; exchanges are not controlled (3 × 13)', { tiles: 21 })], build: ['exchange_count'] },
-  'Y3.B4.S11': { reviewed: true, preOnly: true, pre: [R('multiplication:mult_facts', 'Y3.B3 the 2, 3, 4, 5, 8, 10 tables'), R('multiplication:arrays_groups', 'Y3.B3.S2 rows and columns: a table of combinations is an array'), R('multiplication:mult_word_problems', 'multiplication in stories')] },
+  'Y3.B4.S11': { reviewed: true, preOnly: true, pre: [R('multiplication:mult_facts', 'Y3.B3 the 2, 3, 4, 5, 8 and 10 times-tables'), R('multiplication:arrays_groups', 'Y3.B3.S2 rows and columns: a table of combinations is an array'), R('multiplication:mult_word_problems', 'multiplication in stories')] },
   // ================= Y3 B5 length and perimeter =================
   'Y3.B5.S1': { partials: [P('measurement:length_metric', 'converts whole metres to cm; measuring in m and cm with a mixed answer (1 m 25 cm) is not dealt', { forms: [1] })], build: ['mm_cm_m'] },
   'Y3.B5.S2': OK, 'Y3.B5.S3': OK, 'Y3.B5.S7': OK, 'Y3.B5.S8': OK, 'Y3.B5.S9': OK, 'Y3.B5.S10': OK, 'Y3.B5.S11': OK, 'Y3.B5.S12': OK,
@@ -317,22 +317,22 @@ export const proposals = {
     steps: ['Y2.B8.S6', 'Y2.B8.S8', 'Y2.B8.S10', 'Y2.B8.S11', 'Y2.B8.S12', 'Y2.B8.S13', 'Y2.B8.S14'], ccss: ['1.G.A.3', '2.G.A.3'], why: '`denoms` picks a family (halves → quarters, eighths); WRM Y2 needs one fraction per step' },
 };
 export const extraPre = {
-  'Y3.B7.S2': [R('measurement:mass_volume_liquid', 'Y2.B7.S2 reading a mass in grams on a simple scale (the same skill, Y2 opts forms [1])'), R('multiplication:count_by_tables', 'counting in 10s, 50s and 100s from 0 to read the scale marks')],
-  'Y3.B7.S3': [R('measurement:heavier_lighter_visual', 'Y2.B7.S1 heavier and lighter'), R('multiplication:count_by_tables', 'counting in 100s to read a kg scale marked in 100 g')],
+  'Y3.B7.S2': [R('measurement:mass_volume_liquid', 'Y2.B7.S2 reading a mass in grams on a simple scale (the same skill, Y2 opts forms [1])'), R('multiplication:count_by_tables', 'counting in 10s, 50s and 100s from 0 (the count used to read the scale marks)')],
+  'Y3.B7.S3': [R('measurement:heavier_lighter_visual', 'Y2.B7.S1 heavier and lighter'), R('multiplication:count_by_tables', 'counting in 100s from 0 (the count used to read a mass scale marked in 100 g)')],
   'Y3.B7.S7': [R('measurement:capacity', 'capacity language and units (Y2.B7.S5 compare capacity)')],
-  'Y3.B7.S8': [R('measurement:mass_volume_liquid', 'Y3.B7.S7 reading millilitres (partial skill of this step too)'), R('number_sense:place_on_number_line', 'reading a scale')],
+  'Y3.B7.S8': [R('measurement:mass_volume_liquid', 'Y3.B7.S7 reading millilitres (partial skill of this step too)'), R('number_sense:place_on_number_line', 'reading a number line (used for reading a scale)')],
   'Y3.B3.S12': [R('division:div_facts', 'the 4 times-table and dividing by 4 (Y3.B3.S9-S11): mult_facts {constant:[4]} doubled gives the 8s')],
   'Y3.B3.S14': [R('patterns:double', 'Y3.B3.S11 the 4 times-table doubled (practise mult_facts {constant:[4]} first)')],
-  'Y2.B7.S6': [R('number_sense:place_on_number_line', 'reading a scale is reading a number line in steps'), R('multiplication:count_by_tables', 'counting in 2s, 5s and 10s from 0 to read the scale marks')],
-  'Y2.B7.S7': [R('measurement:mass_volume_liquid', 'Y2.B7.S6 reading millilitres on a jug (a partial skill of this step too)'), R('number_sense:place_on_number_line', 'reading a scale is reading a number line')],
-  'Y2.B7.S9': [R('number_sense:place_on_number_line', 'a thermometer is a vertical number line'), R('multiplication:count_by_tables', 'counting in 2s, 5s and 10s from 0 to read the marks')],
+  'Y2.B7.S6': [R('number_sense:place_on_number_line', 'reading a number line in steps (used for reading a scale)'), R('multiplication:count_by_tables', 'counting in 2s, 5s and 10s from 0 (the count used to read the scale marks)')],
+  'Y2.B7.S7': [R('measurement:mass_volume_liquid', 'Y2.B7.S6 reading millilitres on a jug (a partial skill of this step too)'), R('number_sense:place_on_number_line', 'reading a number line (used for reading a scale)')],
+  'Y2.B7.S9': [R('number_sense:place_on_number_line', 'a number line (used for reading a thermometer)'), R('multiplication:count_by_tables', 'counting in 2s, 5s and 10s from 0 (the count used to read the marks)')],
   'Y2.B9.S1': [R('measurement:clock_parts', 'the parts of a clock face: hour hand and minute hand')],
 };
 export const extraRelated = {
   'Y3.B5.S3': [R('measurement:estimate_length', 'choosing mm or cm for an object')],
   'Y3.B5.S12': [R('addition:add_three', 'adding three or four side lengths is adding three numbers')],
   'Y3.B7.S10': [R('measurement:heavier_lighter_visual', 'comparing masses, the same compare idea'), R('placevalue:compare', 'comparing the numbers once the units match')],
-  'Y3.B7.S7': [R('number_sense:place_on_number_line', 'a measuring jug scale is a vertical number line')],
+  'Y3.B7.S7': [R('number_sense:place_on_number_line', 'a number line (used for reading the marks on a measuring jug)')],
   'Y3.B1.S1': [R('placevalue:place_value_disks', 'the same number shown with place-value counters'), R('placevalue:expand', 'the same number written as tens + ones')],
   'Y3.B1.S5': [R('placevalue:expand', 'the number written as hundreds + tens + ones'), R('number_sense:place_on_number_line', 'the same number placed on a line')],
   'Y3.B1.S6': [R('placevalue:combine', 'the inverse: recombine the parts'), R('placevalue:place_value_disks', 'the parts shown as counters')],
@@ -340,7 +340,7 @@ export const extraRelated = {
   'Y3.B2.S5': [R('placevalue:more_less_100', 'which digit changes when adding 10 or 100')],
   'Y3.B2.S7': [R('placevalue:more_less_100', '10 more across a hundred (298 + 10)'), R('addition:add_1k_regroup', 'the written method for crossing a hundred')],
   'Y3.B2.S21': [R('subtraction:missing_add_sub', 'finding a missing number with the inverse'), R('addition:add_sub_fact_family', 'fact families show the inverse')],
-  'Y3.B3.S5': [R('multiplication:arrays_groups', 'equal groups written as a multiplication: the inverse')],
+  'Y3.B3.S5': [R('multiplication:arrays_groups', 'arrays written as a multiplication (3 rows of 5 make 15): the inverse of sharing into rows')],
   'Y3.B3.S8': [R('division:div_facts', 'the inverse: dividing by 3')],
   'Y3.B3.S10': [R('multiplication:count_by_tables', 'counting in 4s from 0 finds the multiples used')],
   'Y3.B3.S11': [R('division:div_facts', 'the inverse: dividing by 4')],
@@ -356,16 +356,16 @@ export const extraRelated = {
   'Y3.B5.S7': [R('placevalue:compare', 'comparing the numbers once the units match')],
   'Y3.B6.S8': [R('composing:fraction_number_line', 'reading a fraction at a point on the line')],
   'Y3.B6.S10': [R('fractions:equiv_frac_nv', 'the same amount as two fractions without a picture (the next idea)')],
-  'Y3.B7.S1': [R('number_sense:place_on_number_line', 'a scale is a number line with intervals')],
-  'Y3.B7.S2': [R('number_sense:place_on_number_line', 'a scale is a number line')],
-  'Y3.B7.S3': [R('number_sense:place_on_number_line', 'a scale is a number line')],
+  'Y3.B7.S1': [R('number_sense:place_on_number_line', 'a number line with intervals (used for reading a scale)')],
+  'Y3.B7.S2': [R('number_sense:place_on_number_line', 'a number line (used for reading a scale)')],
+  'Y3.B7.S3': [R('number_sense:place_on_number_line', 'a number line (used for reading a scale)')],
   'Y3.B7.S4': [R('placevalue:unit_form', '1 kg = 1,000 g is the same exchange as 1 thousand = 10 hundreds')],
   'Y3.B7.S5': [R('placevalue:compare', 'comparing the numbers once the units match')],
   'Y3.B7.S6': [R('addition:add_1k_mixed', 'the column addition used with masses'), R('subtraction:sub_1k_mixed', 'the column subtraction used with masses')],
-  'Y3.B7.S9': [R('placevalue:unit_form', '1 l = 1,000 ml, the same exchange as 1 thousand')],
+  'Y3.B7.S9': [R('placevalue:unit_form', 'renaming hundreds, tens and ones (5 hundreds 12 tens = 620; the same exchange used for 1 l = 1,000 ml)', { band: 999, rename: 'more' })],
   'Y3.B8.S6': [R('fractions:fraction_of_set_nv', 'fractions of amounts without pictures')],
-  'Y3.B9.S1': [R('measurement:coin_value', 'the value of each coin'), R('placevalue:expand', 'dollars and cents as two parts of one amount')],
-  'Y3.B9.S2': [R('placevalue:unit_form', '345 cents = 3 dollars 45 cents is the same exchange as 3 hundreds 45 ones')],
+  'Y3.B9.S1': [R('measurement:coin_value', 'the value of each coin'), R('placevalue:expand', 'a number split into its parts, 345 = 300 + 40 + 5 (used for dollars and cents as two parts of one amount)')],
+  'Y3.B9.S2': [R('placevalue:unit_form', 'renaming hundreds, tens and ones (578 = 57 tens 8 ones; the same exchange used for 345 cents = 3 dollars 45 cents)', { band: 999, rename: 'more' })],
   'Y3.B9.S3': [R('addition:add_1k_mixed', 'the column addition behind adding amounts')],
   'Y3.B9.S4': [R('subtraction:sub_1k_mixed', 'the column subtraction behind a difference')],
   'Y3.B9.S5': [R('subtraction:sub_wp_100', 'take-away stories: change is a subtraction')],
@@ -380,7 +380,7 @@ export const extraRelated = {
   'Y3.B12.S6': [R('graphs:bar_graph', 'the same data as a chart')],
   'Y2.B1.S9': [R('multiplication:count_by_tables', 'counting in 10s from 0, the count the line is marked in')],
   'Y2.B1.S11': [R('measurement:estimate_length', 'estimating a length, the same judging-by-eye'), R('placevalue:compare', 'deciding which number is nearer, the same reasoning as an estimate')],
-  'Y2.B2.S1': [R('subtraction:sub_facts', 'the inverse: 10 − 3 = 7 from 3 + 7 = 10')],
+  'Y2.B2.S1': [R('subtraction:sub_facts', 'subtraction facts within 10 (10 − 3 = 7): the inverse of the bonds to 10')],
   'Y2.B3.S8': [R('shapes_early:shape_attributes', 'describing shapes by their properties'), R('shapes_early:shape_name_match_3d', 'matching 3-D shapes to names by their faces'), R('shapes_early:name_3d_shapes', 'naming the shape whose faces are counted')],
   'Y2.B3.S9': [R('shapes_early:shape_attributes', 'describing shapes by their properties'), R('shapes_early:shape_name_match_3d', 'matching 3-D shapes to names by their properties'), R('shapes_early:name_3d_shapes', 'naming the shape whose edges are counted')],
   'Y2.B4.S1': [R('measurement:money_compare', 'comparing two amounts of coins, the next use of a total')],
@@ -392,7 +392,7 @@ export const extraRelated = {
   'Y2.B5.S5': [R('multiplication:mult_word_problems', 'multiplication sentences in stories'), R('multiplication:dot_array_mult', 'the same sentence read from an array')],
   'Y2.B5.S6': [R('multiplication:mult_facts', 'the facts an array shows'), R('multiplication:repeated_add_to_mult', 'an array row by row is a repeated addition')],
   'Y2.B5.S15': [R('measurement:time_fives_ring', 'counting in 5s round a clock face'), R('division:div_facts', 'the inverse: dividing by 5 (Y2.B5.S16)')],
-  'Y2.B5.S17': [R('measurement:money_count', 'counting 5-cent and 10-cent coins'), R('division:div_facts', 'the inverse: dividing by 5 and 10')],
+  'Y2.B5.S17': [R('measurement:money_count', 'counting coins: 5-cent and 10-cent coins counted in 5s and 10s'), R('division:div_facts', 'the inverse: dividing by 5 and 10')],
   'Y2.B8.S15': [R('multiplication:count_by_tables', 'counting in equal steps from 0, the same count with whole numbers')],
   'Y2.B9.S3': [R('measurement:time_analog_digital', 'the same time written as digits')],
   'Y2.B9.S5': [R('measurement:time_analog_digital', 'matching a clock to its digital time')],
@@ -404,8 +404,8 @@ export const extraRelated = {
   'Y2.B1.S1': [R('placevalue:expand', 'a teen number written as 10 + 5, the same idea in symbols')],
   'Y2.B1.S5': [R('placevalue:combine', 'the inverse: put the parts back together (50 + 7 = 57)')],
   'Y2.B6.S4': [R('measurement:estimate_length', 'estimating lengths before ordering them')],
-  'Y2.B7.S2': [R('number_sense:place_on_number_line', 'a scale is a number line: find the value at the pointer')],
-  'Y2.B7.S3': [R('number_sense:place_on_number_line', 'a scale is a number line: find the value at the pointer')],
+  'Y2.B7.S2': [R('number_sense:place_on_number_line', 'a number line: find the value at the pointer (used for reading a scale)')],
+  'Y2.B7.S3': [R('number_sense:place_on_number_line', 'a number line: find the value at the pointer (used for reading a scale)')],
   'Y2.B7.S6': [R('measurement:capacity', 'capacity units and comparing containers')],
   'Y2.B7.S7': [R('measurement:capacity', 'capacity units: litres and smaller units')],
   'Y2.B7.S9': [R('comparing:compare_objects', 'warmer and colder as comparison language, like longer and shorter')],
@@ -422,8 +422,8 @@ export const extraRelated = {
 };
 // self-check r2b: hand pre lists where the filtered week list still gave weak ladders (preOnly = no automatic entries)
 export const prePatch = {
-  'Y2.B4.S1': { preOnly: true, pre: [R('multiplication:count_by_tables', 'Y2.B1.S15 counting in 2s, 5s and 10s from 0: counting 5-cent and 10-cent coins'), R('measurement:coin_value', 'Y1.B13.S2 recognising coins'), R('counting:count_objects', 'counting a set one by one, for 1-cent coins')] },
-  'Y2.B4.S5': { preOnly: true, pre: [R('measurement:make_change_least_coins', 'Y2.B4.S4 choosing coins'), R('measurement:money_count', 'Y2.B4.S1 counting coins'), R('measurement:coin_value', 'Y1.B13.S2 coin values'), R('addition:add_three', 'adding three small numbers (three coins)')] },
+  'Y2.B4.S1': { preOnly: true, pre: [R('multiplication:count_by_tables', 'Y2.B1.S15 counting in 2s, 5s and 10s from 0 (the count used for 5-cent and 10-cent coins)'), R('measurement:coin_value', 'Y1.B13.S2 recognising coins'), R('counting:count_objects', 'counting a set one by one (the count used for 1-cent coins)')] },
+  'Y2.B4.S5': { preOnly: true, pre: [R('measurement:make_change_least_coins', 'Y2.B4.S4 choosing coins'), R('measurement:money_count', 'Y2.B4.S1 counting coins'), R('measurement:coin_value', 'Y1.B13.S2 coin values'), R('addition:add_three', 'adding three small numbers (used to total three coins)')] },
   'Y3.B2.S17': { preOnly: true, pre: [R('addition:add_1k_regroup', 'Y3.B2.S13 adding two 3-digit numbers in columns'), R('addition:add_100_regroup', 'Y2.B2.S16 adding two 2-digit numbers across a 10'), R('placevalue:identify', 'Y2.B1.S4 the place of each digit (lining up the columns)'), R('placevalue:value', 'the value of each digit')] },
   'Y3.B2.S19': { preOnly: true, pre: [R('composing:make_ten', 'Y2.B2.S1 bonds to 10: 3 + 7 gives 30 + 70'), R('addition:add_sub_10s', 'Y2.B2.S14 adding and subtracting 10s'), R('placevalue:more_less_10', 'Y2.B2.S13 10 more, 10 less'), R('addition:cloze_addition', 'Y2.B2.S21 missing-number additions')] },
   'Y3.B11.S3': { preOnly: true, pre: [R('angles_lines:identify_angles', 'Y3.B11.S2 right angles: the angle every other is compared with'), R('shapes_early:shape_corners_count', 'Y2.B3.S3 corners (vertices) of 2-D shapes'), R('shapes_early:shape_positions', 'Y2.B11 position and turn language')], preBuild: ['turns'],
@@ -438,21 +438,21 @@ const C = (key, why, opts) => ({ key, why, ...(opts ? { opts } : {}) });
 const CBT = 'multiplication:count_by_tables';
 export const r3 = {
   // S6: the main building block first
-  'Y2.B2.S6': { core: [C('composing:make_ten', 'Y2.B2.S1 bonds to 10: making 10 is the first jump (8 + 5 = 8 + 2 + 3)'), C('composing:number_bonds', 'Y1 bonds within 10: splitting the second number')] },
+  'Y2.B2.S6': { core: [C('composing:make_ten', 'Y2.B2.S1 bonds to 10: making 10 is the first jump (8 + 5 = 8 + 2 + 3)'), C('composing:number_bonds', 'Y1 bonds within 10: splitting the number added (8 + 5 = 8 + 2 + 3)')] },
   'Y2.B5.S13': { core: [C('patterns:seq_10', 'Y2.B1.S15 counting in 10s: the 10 times-table is the count of 10s')] },
   'Y2.B3.S8': { core: [C('shapes_early:name_3d_shapes', 'Y1.B3.S1 / Y2.B3.S1 naming 3-D shapes (xlsx prior learning: recognise and name 3-D shapes)'), C('shapes_early:shape_name_match_3d', 'Y1.B3.S1 / Y2.B3.S1 matching a 3-D shape to its name')] },
   'Y2.B3.S9': { core: [C('shapes_early:name_3d_shapes', 'Y1.B3.S1 / Y2.B3.S1 naming 3-D shapes'), C('shapes_early:shape_name_match_3d', 'Y1.B3.S1 / Y2.B3.S1 matching a 3-D shape to its name')] },
   'Y2.B3.S10': { core: [C('shapes_early:name_3d_shapes', 'Y1.B3.S1 / Y2.B3.S1 naming 3-D shapes')] },
   'Y2.B10.S3': { partials: [P('measurement:bar_graph_intro', 'reads a 1-to-1 bar chart (how many, how many more); drawing a block diagram, and blocks stacked as squares (one square = one) rather than bars, are not dealt')],
     build: ['block_diagram'], core: [C('graphs:tally_chart', 'Y2.B10.S1 tally charts: the counts a block diagram shows'), C('measurement:pictograph_intro', 'Y2.B10.S5 one picture = one: the same 1-to-1 idea')] },
-  'Y3.B4.S4': { core: [C('placevalue:expand', 'Y2.B1.S8 / Y3.B1.S6 partitioning into tens and ones: 23 × 3 = 20 × 3 + 3 × 3'), C('multiplication:mult_zeros', 'Y3.B4.S1 multiples of 10: 20 × 3')] },
-  'Y3.B4.S5': { core: [C('placevalue:expand', 'Y2 "Partition numbers to 100" (xlsx prior learning): 24 × 4 = 20 × 4 + 4 × 4'), C('multiplication:mult_zeros', 'Y3.B4.S1 multiples of 10: 20 × 4')] },
+  'Y3.B4.S4': { core: [C('placevalue:expand', 'Y2.B1.S8 / Y3.B1.S6 partitioning into tens and ones, 23 = 20 + 3 (used to multiply each part: 20 × 3 and 3 × 3)'), C('multiplication:mult_zeros', 'Y3.B4.S1 multiples of 10: 20 × 3')] },
+  'Y3.B4.S5': { core: [C('placevalue:expand', 'Y2 "Partition numbers to 100" (xlsx prior learning): 24 = 20 + 4 (used to multiply each part: 20 × 4 and 4 × 4)'), C('multiplication:mult_zeros', 'Y3.B4.S1 multiples of 10: 20 × 4')] },
   'Y3.B4.S10': { dropPre: ['division:div_remainders'] },
   'Y3.B12.S5': { core: [C('graphs:tally_chart', 'Y2.B10.S1 tally charts: collecting the data')] },
   'Y3.B12.S6': { core: [C('graphs:tally_chart', 'Y2.B10.S1 tally charts and Y2.B10.S2 tables: a table of counts')] },
-  'Y2.B4.S2': { dropPre: ['composing:make_ten', 'addition:add_5_pictures'], core: [C(CBT, 'Y2.B1.S15 counting in 5s and 10s from 0: counting $5 and $10 bills'), C('measurement:money_count', 'Y2.B4.S1 counting coins (kind "like")')] },
-  'Y2.B4.S3': { dropPre: ['composing:make_ten', 'addition:add_5_pictures'], core: [C(CBT, 'Y2.B1.S15 counting in 5s and 10s from 0: counting bills and coins'), C('measurement:money_count', 'Y2.B4.S2 counting bills')] },
-  'Y2.B4.S4': { core: [C(CBT, 'Y2.B1.S15 counting in 5s and 10s: making an amount from $5 and $10 bills'), C('measurement:money_count', 'Y2.B4.S3 counting bills and coins')] },
+  'Y2.B4.S2': { dropPre: ['composing:make_ten', 'addition:add_5_pictures'], core: [C(CBT, 'Y2.B1.S15 counting in 5s and 10s from 0 (the count used for $5 and $10 bills)'), C('measurement:money_count', 'Y2.B4.S1 counting coins (kind "like")')] },
+  'Y2.B4.S3': { dropPre: ['composing:make_ten', 'addition:add_5_pictures'], core: [C(CBT, 'Y2.B1.S15 counting in 5s and 10s from 0 (the count used for bills and coins)'), C('measurement:money_count', 'Y2.B4.S2 counting bills')] },
+  'Y2.B4.S4': { core: [C(CBT, 'Y2.B1.S15 counting in 5s and 10s from 0 (the count used to make an amount from $5 and $10 bills)'), C('measurement:money_count', 'Y2.B4.S3 counting bills and coins')] },
   // S8: options that change what is dealt (generated: $5/$10/$20 paid, change $1-$8; Y3 $1/$5 paid, change in dollars and cents)
   'Y2.B4.S9': { direct: [D('measurement:money_change', { currency: 'usd', step: 100, paid: 'note', band: 2000 })],
     core: [C('subtraction:sub_wp_100', 'Y2.B2.S19 take-away stories: change is a subtraction'), C('measurement:money', 'Y2.B4.S7 adding prices')] },
@@ -481,8 +481,8 @@ export const r3 = {
   'Y3.B2.S19': { relOnly: true, related: [R('measurement:money_change', 'change from $1 (100 cents) is a complement to 100'), R('subtraction:missing_add_sub', '37 + ? = 100 is a missing-number addition')] },
   'Y3.B11.S8': { core: [C('measurement:reading_ruler', 'Y3.B11.S4 measuring and drawing lines accurately with a ruler'), C('shapes_early:name_2d_shapes', 'Y3.B11.S7 recognising and naming 2-D shapes')],
     relOnly: true, related: [R('coordinates:coord_polygon', 'drawing a polygon from its vertices on a grid (later years)')] },
-  'Y3.B4.S1': { core: [C('patterns:seq_10', 'Y2.B1.S15 counting in 10s: the multiples of 10 are the 10s count'), C('placevalue:unit_form', 'Y3.B1.S8 ten tens = 1 hundred: 12 tens = 120')] },
-  'Y2.B4.S1': { core: [C('patterns:seq_5', 'Y1.B9.S3 counting in 5s: counting 5-cent coins'), C('patterns:seq_10', 'Y1.B9.S2 counting in 10s: counting 10-cent coins')] },
+  'Y3.B4.S1': { core: [C('patterns:seq_10', 'Y2.B1.S15 counting in 10s: the multiples of 10 are the 10s count'), C('placevalue:unit_form', 'Y3.B1.S8 renaming tens: 12 tens = 120 (5 hundreds 12 tens = 620)', { band: 999, rename: 'more' })] },
+  'Y2.B4.S1': { core: [C('patterns:seq_5', 'Y1.B9.S3 counting in 5s (the count used for 5-cent coins)'), C('patterns:seq_10', 'Y1.B9.S2 counting in 10s (the count used for 10-cent coins)')] },
   'Y2.B11.S1': { preOnly: true, pre: [R('shapes_early:name_2d_shapes', 'Y1.B3.S3 naming the shapes whose positions are described'), R('shapes_early:name_3d_shapes', 'Y1.B3.S1 naming the objects (cube, ball) placed on, under, next to'), R('counting:count_objects', 'Y1.B1.S2 counting along a row: "the 3rd from the left"'), R('comparing:compare_objects', 'Y1.B7.S1 comparing words (taller, nearer): the same describing language')] },
   'Y2.B1.S16': { core: [C('patterns:seq_2', 'Y1.B9.S1 / Y2.B1.S15 counting in 2s: counting in equal steps'), C('patterns:seq_5', 'Y1.B9.S3 / Y2.B1.S15 counting in 5s'), C('patterns:seq_10', 'Y2.B1.S15 counting in 10s')], dropPre: ['comparing:compare_groups'] },
   'Y2.B2.S13': { core: [C('patterns:seq_10', 'counting on and back in 10s from any number (36, 46, 56): the 10 more, 10 less pattern'), C('composing:base10_build', 'Y2.B1.S3 tens and ones: one more tens rod is 10 more'), C('placevalue:identify', 'Y2.B1.S4 the tens digit is the digit that changes')] },
@@ -548,11 +548,11 @@ export const gapMissing = {
 };
 // rule 15: the topic ladder, used only while a step has fewer than 3 pre entries (every entry is earlier learning)
 export const ladders = {
-  length: [C('measurement:reading_ruler', 'Y2.B6.S1 measuring on a ruler'), C('shapes_early:measure_nonstandard', 'Y1.B7.S2 measuring with cubes and paper clips'), C('comparing:compare_objects', 'Y1.B7.S1 comparing lengths and heights'), C('number_sense:place_on_number_line', 'Y2.B1.S9 a ruler is a number line')],
-  mass: [C('measurement:heavier_lighter_visual', 'Y1.B8.S3 / Y2.B7.S1 heavier and lighter'), C('number_sense:place_on_number_line', 'Y2.B1.S9 a scale is a number line: find the value at the pointer'), C(CBT, 'Y2.B1.S15 counting in 2s, 5s and 10s from 0 to read the scale marks'), C('comparing:compare_objects', 'Y1.B7.S1 the compare language (more, less)')],
-  capacity: [C('comparing:compare_objects', 'Y1.B7.S1 the compare language (more, less)'), C('number_sense:place_on_number_line', 'Y2.B1.S9 a jug scale is a vertical number line'), C(CBT, 'Y2.B1.S15 counting in 2s, 5s and 10s from 0 to read the jug marks'), C('measurement:heavier_lighter_visual', 'Y2.B7.S1 comparing masses: the same compare idea')],
-  temp: [C('number_sense:place_on_number_line', 'Y2.B1.S9 a thermometer is a vertical number line'), C(CBT, 'Y2.B1.S15 counting in 2s, 5s and 10s to read the marks'), C('comparing:compare_objects', 'Y1.B7.S1 the compare language (warmer, colder)')],
-  time: [C('measurement:clock_parts', 'the parts of a clock face: hour hand and minute hand'), C('shapes_early:partition_shapes', 'Y1.B10.S1 a half of a shape: half past is half way round'), C(CBT, 'Y2.B1.S15 counting in 5s from 0: the minutes on the clock')],
+  length: [C('measurement:reading_ruler', 'Y2.B6.S1 measuring on a ruler'), C('shapes_early:measure_nonstandard', 'Y1.B7.S2 measuring with cubes and paper clips'), C('comparing:compare_objects', 'Y1.B7.S1 comparing lengths and heights'), C('number_sense:place_on_number_line', 'Y2.B1.S9 a number line (used for reading a ruler)')],
+  mass: [C('measurement:heavier_lighter_visual', 'Y1.B8.S3 / Y2.B7.S1 heavier and lighter'), C('number_sense:place_on_number_line', 'Y2.B1.S9 a number line: find the value at the pointer (used for reading a scale)'), C(CBT, 'Y2.B1.S15 counting in 2s, 5s and 10s from 0 (the count used to read the scale marks)'), C('comparing:compare_objects', 'Y1.B7.S1 the compare language (more, less)')],
+  capacity: [C('comparing:compare_objects', 'Y1.B7.S1 the compare language (more, less)'), C('number_sense:place_on_number_line', 'Y2.B1.S9 a number line (used for reading the marks on a jug)'), C(CBT, 'Y2.B1.S15 counting in 2s, 5s and 10s from 0 (the count used to read the marks on a jug)'), C('measurement:heavier_lighter_visual', 'Y2.B7.S1 comparing masses: the same compare idea')],
+  temp: [C('number_sense:place_on_number_line', 'Y2.B1.S9 a number line (used for reading a thermometer)'), C(CBT, 'Y2.B1.S15 counting in 2s, 5s and 10s (the count used to read the marks)'), C('comparing:compare_objects', 'Y1.B7.S1 the compare language (warmer, colder)')],
+  time: [C('measurement:clock_parts', 'the parts of a clock face: hour hand and minute hand'), C('shapes_early:partition_shapes', 'Y1.B10.S1 a half of a shape (used for half past: half way round the clock)'), C(CBT, 'Y2.B1.S15 counting in 5s from 0 (the count used for the minutes on the clock)')],
   stats: [C('graphs:tally_chart', 'Y2.B10.S1 tallying a count'), C('counting:count_objects', 'Y1.B1.S2 counting a set'), C('comparing:compare_groups', 'Y1.B1.S12 more, fewer, the same'), C('comparing:classify_count', 'Y1.B1.S1 sorting objects into groups')],
   position: [C('shapes_early:shape_positions', 'Y1.B11.S4 position words (left, right, above, below)'), C('shapes_early:partition_shapes', 'Y1.B10.S5 quarters: a quarter turn is a quarter of a whole turn'), C('shapes_early:name_2d_shapes', 'Y1.B3.S3 naming the shapes that are moved and turned'), C('counting:count_objects', 'Y1.B1.S2 counting the squares moved')],
   shape: [C('shapes_early:name_2d_shapes', 'Y1.B3.S3 naming 2-D shapes'), C('shapes_early:name_3d_shapes', 'Y1.B3.S1 naming 3-D shapes'), C('shapes_early:shape_corners_count', 'Y2.B3.S3 counting corners')],
@@ -595,7 +595,7 @@ export const relR3 = {
   'Y3.B6.S9': [R('fractions:select_equiv_frac', 'picking the fractions that name the same amount'), R('fractions:equiv_frac_nv', 'the same amount as two fractions without a picture, the next idea')],
   'Y3.B7.S1': [R('measurement:temperature', 'a thermometer: the same scale reading'), R('measurement:reading_ruler_hard', 'a ruler: another scale with intervals')],
   'Y3.B7.S2': [R('measurement:temperature', 'a thermometer: the same scale reading')],
-  'Y3.B7.S3': [R('measurement:temperature', 'a thermometer: the same scale reading'), R('measurement:length_metric', 'm and cm: mixed units like kg and g')],
+  'Y3.B7.S3': [R('measurement:temperature', 'a thermometer: the same scale reading'), R('measurement:length_metric', 'm and cm (1 m 20 cm = 120 cm): mixed units, the same idea used for kg and g')],
   'Y3.B7.S4': [R('measurement:length_metric', 'converting m and cm: the same exchange with 100'), R('measurement:unit_conversions', 'the same conversion with customary units (ounces and pounds)')],
   'Y3.B7.S5': [R('measurement:money_compare', 'comparing two amounts of money: the same <, > and = with units')],
   'Y3.B7.S6': [R('measurement:money', 'adding amounts of money (Y3.B9.S3): the same calculation with units'), R('algebra:tape_diagram', 'a bar model of two masses and their total')],
@@ -607,7 +607,7 @@ export const relR3 = {
   'Y3.B9.S1': [R('measurement:enough_money', 'checking an amount against a price: reading the amount first'), R('measurement:money_compare', 'comparing two amounts')],
   'Y3.B9.S2': [R('measurement:money_compare', 'comparing two amounts once they are in the same form'), R('measurement:unit_conversions', 'converting a bigger unit into smaller ones (feet to inches): the same idea as dollars to cents')],
   'Y3.B9.S3': [R('measurement:enough_money', 'is there enough: the total compared with what you have'), R('algebra:tape_diagram', 'a bar model of two prices and the total')],
-  'Y3.B9.S4': [R('measurement:enough_money', 'is there enough: the difference between what you have and a price'), R('addition:comparison_word', 'how many more: a difference')],
+  'Y3.B9.S4': [R('measurement:enough_money', 'is there enough money for a price? (the comparison used for finding a difference)'), R('addition:comparison_word', 'how many more: a difference')],
   'Y3.B10.S8': [R('measurement:elapsed_visual_easy', 'elapsed time on a time line'), R('measurement:elapsed_visual_medium', 'elapsed time on a time line, harder')],
   'Y3.B10.S9': [R('measurement:elapsed_visual_easy', 'a duration on a time line'), R('measurement:elapsed_visual_medium', 'a duration on a time line, harder')],
   'Y3.B10.S10': [R('measurement:unit_conversions', 'converting a bigger unit into smaller ones (pounds to ounces): the same idea as minutes to seconds')],
@@ -733,7 +733,7 @@ Object.assign(r3, {
   'Y2.B3.S12': { partials: [P('patterns:shape_pattern', '2-D shapes and stars only; patterns made of 3-D shapes (cube, sphere, cone) are not dealt')], verdict: 'partial', build: ['pattern_3d'] },
   'Y2.B10.S7': { direct: [D('graphs:pictograph', { range: 50, scale: [0, 1, 2] })] },
   'Y2.B2.S11': { ...r3['Y2.B2.S11'], core: [C('composing:make_ten', 'Y2.B2.S1 bonds to 10: 10 − 3 = 7, so 40 − 3 = 37'), C('composing:number_bonds', 'Y1 bonds within 10')] },
-  'Y2.B9.S5': { core: [C(CBT, 'Y2.B1.S15 counting in 5s from 0: the minutes round the clock', ZR(5))] },
+  'Y2.B9.S5': { core: [C(CBT, 'Y2.B1.S15 counting in 5s from 0 (the count used for the minutes round the clock)', ZR(5))] },
   'Y2.B10.S6': { core: [C(CBT, 'Y2.B1.S15 counting in 2s, 5s and 10s from 0: reading a key of 2, 5 or 10', ZR(2, 5, 10))] },
   'Y2.B10.S3': { ...r3['Y2.B10.S3'], core: [C('graphs:tally_chart', 'Y2.B10.S1 tally charts: the counts a block diagram shows'), C('comparing:compare_groups', 'Y1.B1.S12 more, fewer, the same')] },
   'Y2.B1.S14': { ...r3['Y2.B1.S14'], missing: 'orders numerals only; ordering objects or base-10 pictures of numbers is not dealt' },
@@ -743,7 +743,7 @@ Object.assign(r3, {
   'Y3.B3.S2': { direct: [D('multiplication:arrays_groups', { forms: [0] }), D('multiplication:dot_array_mult', { band: 25 })] },
   'Y3.B2.S16': { direct: [], partials: [P('subtraction:sub_1k_regroup', 'exchanges are mixed; one exchange from the hundreds only is not available')], verdict: 'partial', build: ['exchange_count'],
     related: [R('subtraction:sub_across_zeros', 'subtracting across zeros (302 − 264): the double exchange that comes next', { band: 500 })] },
-  'Y3.B7.S7': { core: [C('number_sense:place_on_number_line', 'Y3.B1.S10 a jug scale is a vertical number line', { span: 100, band: 1000 }), C(CBT, 'Y2.B1.S15 counting in 10s to read the jug marks', ZR(10)), C('measurement:mass_volume_liquid', 'Y2.B7.S6 reading millilitres on a jug', { forms: [0] })], preBuild: ['nonstandard_capacity'] },
+  'Y3.B7.S7': { core: [C('number_sense:place_on_number_line', 'Y3.B1.S10 a number line to 1,000 (used for reading the marks on a jug)', { span: 100, band: 1000 }), C(CBT, 'Y2.B1.S15 counting in 10s from 0 (the count used to read the marks on a jug)', ZR(10)), C('measurement:mass_volume_liquid', 'Y2.B7.S6 reading millilitres on a jug', { forms: [0] })], preBuild: ['nonstandard_capacity'] },
 });
 // related replacements where the S9 swaps emptied a step
 relR3['Y2.B2.S20'] = [R('addition:cloze_addition', 'a missing number in a sentence (Y2.B2.S21): the next idea'), R('subtraction:missing_add_sub', 'missing-number sentences (Y2.B2.S21)')];
@@ -767,7 +767,7 @@ proposals.compare_measures.steps.push('Y2.B7.S1');
 proposals.compare_measures.teaches += '; the balance-scale form shows two objects on a pan balance (heavier, lighter, or the same mass)';
 const TQ = R('measurement:time_quarter', 'quarter past / quarter to: a quarter of a turn of the clock (Y2.B9.S2)');
 const TH = R('measurement:time_half_hour', 'half past: half a turn of the minute hand (Y2.B9.S1)');
-const CS = R('shapes_early:compose_shapes', 'two or more equal parts put back together make the whole shape');
+const CS = R('shapes_early:compose_shapes', 'two shapes put together make a new shape (two triangles make a square): parts making a whole');
 Object.assign(relR3, {
   'Y2.B2.S8': [R('subtraction:sub_10_regroup', 'the inverse: subtracting back across 10', { notation: ['across'] }), R('number_sense:between_tens', 'which ten comes next after a number')],
   'Y2.B2.S10': [R('addition:add_10_regroup', 'the inverse: adding across 10', { notation: ['across'] }), R('number_sense:between_tens', 'the ten a number crosses back over')],
@@ -784,7 +784,7 @@ Object.assign(relR3, {
   'Y2.B11.S3': [TQ, TH], 'Y2.B11.S4': [TQ, R('number_sense:place_on_number_line', 'moving along a line by a number of steps', { span: 10, band: 20 })],
   'Y3.B1.S13': [R('measurement:order_clocks_digital_asc', 'putting times in order: the same ordering idea with another kind of number')],
   'Y3.B6.S1': [R('fractions:graph_fractions', 'placing a unit fraction on a number line (the next idea)', { denoms: [2, 3] })],
-  'Y3.B7.S9': [R('measurement:money_notation', '345 cents = $3.45: another exchange between a big and a small unit', { currency: 'usd', task: 'words' })],
+  'Y3.B7.S9': [R('measurement:money_notation', 'writing cents as dollars and cents with a point (75 cents = $0.75, 7 dollars 5 cents = $7.05): another exchange between a big and a small unit', { currency: 'usd', task: 'words' })],
   'Y3.B10.S10': [R('measurement:elapsed_visual_easy', 'a short duration on a time line')], 'Y3.B10.S11': [R('measurement:elapsed_visual_easy', 'comparing durations on a time line')],
   'Y3.B11.S8': [CS],
   'Y3.B12.S6': [R('multiplication:mult_chart_easy', 'a times-table chart is read by row and column, like a two-way table', { constant: [2, 3, 4, 5, 8, 10], band: 100 })],
@@ -810,7 +810,7 @@ Object.assign(linkFix, {
 });
 const BT = R('number_sense:between_tens', 'which two tens a number sits between');
 const SCL = R('patterns:skip_count_line', 'counting in 10s as jumps on a number line', { band: 50 });
-const HCF = R('composing:hundreds_chart_fill', 'one row down a hundred square is 10 more', { band: 100 });
+const HCF = R('composing:hundreds_chart_fill', 'filling gaps in part of a hundred square: one row down is 10 more', { band: 100 });
 Object.assign(relR3, {
   'Y2.B1.S9': [BT, HCF], 'Y2.B2.S11': [R('subtraction:nl_sub', 'counting back from a ten on a number line'), BT, R('addition:add_10_regroup', 'the inverse: adding across 10', { notation: ['across'] })],
   'Y2.B2.S12': [R('subtraction:nl_sub', 'counting back across a ten on a number line'), R('addition:add_10_regroup', 'the inverse: adding across 10', { notation: ['across'] }), BT],
@@ -935,11 +935,11 @@ Object.assign(proposals, {
 });
 // step fixes
 Object.assign(r3, {
-  'Y2.B9.S6': { ...r3['Y2.B9.S6'], core: [C(CBT, 'Y2.B1.S15 counting in 5s from 0: 12 fives make the 60 minutes (xlsx W23 prior learning)', ZR(5))] },
+  'Y2.B9.S6': { ...r3['Y2.B9.S6'], core: [C(CBT, 'Y2.B1.S15 counting in 5s from 0 to 60 (xlsx W23 prior learning; the count used for the 60 minutes of an hour)', ZR(5))] },
   'Y2.B8.S12': { ...(r3['Y2.B8.S12'] || {}), partials: [P('fractions:equiv_frac_visual', 'denoms [2] is the halves family: it deals 3/4 = 12/16, sixths, twelfths and eighths (and 5/3 choices); a page of 1/2 = 2/4 only is not available', { denoms: [2] })] },
   'Y2.B8.S13': { ...(r3['Y2.B8.S13'] || {}), partials: [P('shapes_early:partition_shapes', 'quarters shapes: shades 1/4, 2/4 and 3/4, not three-quarters alone', { parts: [2] }), P('fractions:identify', 'denoms [2] is the halves family: it deals eighths (1/8, 7/8) and fifths among the choices (2/5), not 3/4 alone', { denoms: [2] })] },
   'Y3.B4.S4': { ...r3['Y3.B4.S4'], neverNamed: ['multiplication:multiply', 'multiplication:area_model_mult'], dropPre: ['division:div_remainders'],
-    core: [C('multiplication:mult_zeros', 'Y3.B4.S1 / Y3.B4.S2 multiples of 10 and related calculations: 20 × 3', { forms: [0, 2] }), C('placevalue:expand', 'Y2.B1.S8 / Y3.B1.S6 partitioning into tens and ones: 23 × 3 = 20 × 3 + 3 × 3', { band: 99 })] },
+    core: [C('multiplication:mult_zeros', 'Y3.B4.S1 / Y3.B4.S2 multiples of 10 and related calculations: 20 × 3', { forms: [0, 2] }), C('placevalue:expand', 'Y2.B1.S8 / Y3.B1.S6 partitioning into tens and ones, 23 = 20 + 3 (used to multiply each part: 20 × 3 and 3 × 3)', { band: 99 })] },
   'Y3.B4.S7': { ...r3['Y3.B4.S7'], core: [C('division:div_facts', 'Y3.B3.S7 / S10 / S13 dividing by 3, 4 and 8', { constant: [3, 4, 8] })] },
   'Y3.B2.S21': { ...(r3['Y3.B2.S21'] || {}), core: [C('addition:add_sub_fact_family', 'Y2.B2.S2 fact families: the inverse as a fact family', { range: 100 }), C('subtraction:missing_add_sub', 'Y2.B2.S21 missing-number problems'), C('addition:cloze_addition', 'Y2.B2.S21 missing-number additions')] },
   'Y3.B6.S1': { ...(r3['Y3.B6.S1'] || {}), relNote: undefined, related: [R('fractions:write_fraction', 'the numerator of a non-unit fraction (Y3.B6.S3, the same week): the next idea', { denoms: [2, 3] })] },
@@ -948,9 +948,9 @@ Object.assign(r3, {
 });
 const DIVP = R('division:area_model_div_2by1', 'the inverse: dividing by partitioning (Y3.B4.S8)', { constant: [2, 3, 4, 5, 8] });
 Object.assign(relR3, {
-  'Y3.B6.S1': [R('composing:compose_whole', 'how many unit fractions make one whole (Y3.B6.S4)')],
-  'Y3.B4.S1': [R('multiplication:mult_chart_easy', 'the 10 row of a times-table chart', { constant: [10], band: 100 }), R('placevalue:unit_form', '12 tens = 120: the same multiple of 10 as place value', { band: 999 })],
-  'Y3.B4.S2': [R('placevalue:unit_form', '4 × 3 tens = 12 tens = 120: the same calculation as place value', { band: 999 }), DIVP],
+  'Y3.B6.S1': [R('composing:compose_whole', 'making 1 whole from halves, quarters and eighths (or halves, thirds and sixths): how many parts make one whole (Y3.B6.S4)')],
+  'Y3.B4.S1': [R('multiplication:mult_chart_easy', 'the 10 row of a times-table chart', { constant: [10], band: 100 }), R('placevalue:unit_form', 'renaming tens: 12 tens = 120 (5 hundreds 12 tens = 620), the same multiple of 10 as place value', { band: 999, rename: 'more' })],
+  'Y3.B4.S2': [R('placevalue:unit_form', 'renaming tens: 12 tens = 120 (the result of 4 × 3 tens), the same calculation as place value', { band: 999, rename: 'more' }), DIVP],
   'Y3.B4.S4': [DIVP], 'Y3.B4.S5': [DIVP],
 });
 r3['Y3.B1.S13'] = { ...r3['Y3.B1.S13'], related: [], relNote: 'no related skill: the number line to 1,000 (the other way to see the order) is earlier learning listed as pre; ordering other kinds of numbers is above Grade 2' };
@@ -974,7 +974,7 @@ linkSwap.Y3['patterns:skip_count_line'] = { to: null };
 // Y2 B8 (W16-W18): equal_or_unequal_groups answers "multiply / add" ten weeks before × (W26): compare groups instead
 linkSwap.Y2['multiplication:equal_or_unequal_groups'] = { to: 'comparing:compare_groups', opts: {}, only: /^Y2\.B8\./ };
 ladders.length = [C('shapes_early:measure_nonstandard', 'Y1.B7.S2 measuring with cubes and paper clips'), C('comparing:compare_objects', 'Y1.B7.S1 comparing lengths and heights'),
-  C('number_sense:place_on_number_line', 'Y2.B1.S9 a ruler is a number line marked in equal steps', { span: 10, band: 100 }), C('measurement:length_metric', 'Y3.B5.S5 m and cm: 1 m = 100 cm', { forms: [1] }), C('measurement:length_metric', 'Y3.B5.S6 cm and mm: 1 cm = 10 mm', { forms: [0] })];
+  C('number_sense:place_on_number_line', 'Y2.B1.S9 a number line marked in equal steps (used for reading a ruler)', { span: 10, band: 100 }), C('measurement:length_metric', 'Y3.B5.S5 m and cm: 1 m = 100 cm', { forms: [1] }), C('measurement:length_metric', 'Y3.B5.S6 cm and mm: 1 cm = 10 mm', { forms: [0] })];
 ladders.frac = ladders.frac.map((l) => l.key === 'multiplication:equal_or_unequal_groups' ? C('comparing:compare_groups', 'Y1.B1.S12 more, fewer, the same: comparing groups (K)') : l);
 Object.assign(linkFix, {
   'Y2.B5.S6': { 'patterns:skip_count_line': null }, 'Y2.B5.S7': { 'patterns:skip_count_line': null }, 'Y2.B5.S8': { 'patterns:skip_count_line': null },
@@ -984,11 +984,11 @@ Object.assign(linkFix, {
   'Y3.B5.S2': { 'measurement:reading_ruler_hard': null },
 });
 // the B6.S2-S5 / B5 measuring steps: refill pre from metric skills (ladder) after the inch ruler leaves
-for (const id of ['Y2.B6.S2', 'Y2.B6.S3', 'Y2.B6.S4', 'Y2.B6.S5']) r3[id] = { ...(r3[id] || {}), core: [C('shapes_early:measure_nonstandard', 'Y1.B7.S2 measuring with cubes and paper clips'), C('number_sense:place_on_number_line', 'Y2.B1.S9 a ruler is a number line marked in equal steps', { span: 10, band: 100 })] };
+for (const id of ['Y2.B6.S2', 'Y2.B6.S3', 'Y2.B6.S4', 'Y2.B6.S5']) r3[id] = { ...(r3[id] || {}), core: [C('shapes_early:measure_nonstandard', 'Y1.B7.S2 measuring with cubes and paper clips'), C('number_sense:place_on_number_line', 'Y2.B1.S9 a number line marked in equal steps (used for reading a ruler)', { span: 10, band: 100 })] };
 relR3['Y2.B2.S13'] = [R(CBT, 'counting in 10s from 0: the same jump of 10', ZR(10)), HCF, BT];
 relR3['Y2.B2.S14'] = [R(CBT, 'counting in 10s from 0: adding a 10 is the next count', ZR(10)), HCF, BT];
 relR3['Y2.B1.S15'] = [R('patterns:seq_10', 'counting on in 10s from any number, the next idea', { band: 100 }), R('patterns:skip_count_line', 'counting in 2s and 5s as jumps on a number line', { step: [0], band: 50 })];
-relR3['Y2.B5.S17'] = [R('patterns:skip_count_line', 'counting in 5s as jumps on a number line', { step: [0], band: 50 }), R('measurement:money_count', 'counting 5-cent and 10-cent coins', { currency: 'usd' })];
+relR3['Y2.B5.S17'] = [R('patterns:skip_count_line', 'counting in 5s as jumps on a number line', { step: [0], band: 50 }), R('measurement:money_count', 'counting coins: 5-cent and 10-cent coins counted in 5s and 10s', { currency: 'usd' })];
 // C. verdicts and clauses
 Object.assign(r3, {
   'Y3.B3.S5': { direct: [D('division:share_into_groups')], partials: [P('division:div_word_problems', 'sharing and grouping stories, but ÷6 and ÷7 facts beyond the Grade 2 tables appear (42 ÷ 6, 36 ÷ 6, 49 ÷ 7)')], verdict: 'partial', build: ['muldiv_tables'], neverNamed: ['division:div_word_problems'] },
@@ -1002,7 +1002,7 @@ Object.assign(r3, {
   'Y3.B4.S5': { ...r3['Y3.B4.S5'], core: [...(r3['Y3.B4.S5'].core || []), C('multiplication:mult_facts', 'Y3.B3.S8 / S11 / S12 the 3, 4 and 8 times-tables', { constant: [3, 4, 8] })], dropPre: ['division:div_facts', 'patterns:halve'] },
   'Y3.B4.S6': { ...r3['Y3.B4.S6'], core: [C('multiplication:mult_facts', 'Y3.B3.S15 the 2, 3, 4, 5, 8 and 10 times-tables', { constant: [2, 3, 4, 5, 8, 10], band: 100 }), C('division:div_facts', 'Y3.B3.S7 / S10 / S13 dividing by 2, 3, 4, 5, 8 and 10', { constant: [2, 3, 4, 5, 8, 10], band: 100 }), C('division:share_into_groups', 'Y3.B3.S5 sharing and grouping')], dropPre: ['patterns:double', 'patterns:halve'] },
   'Y3.B4.S8': { ...r3['Y3.B4.S8'], core: [C('division:box_division_easy', 'Y3.B4.S7 dividing a 2-digit number with no exchange', { regroup: 'none', constant: [2, 3, 4, 5, 8] }), C('division:div_facts', 'Y3.B3.S7 / S10 / S13 dividing by 3, 4 and 8', { constant: [3, 4, 8] })] },
-  'Y3.B4.S2': { ...r3['Y3.B4.S2'], core: [C('multiplication:mult_facts', 'Y3.B3.S15 the 2, 3, 4, 5, 8 and 10 times-tables: the known fact', { constant: [2, 3, 4, 5, 8, 10], band: 100 }), C('placevalue:unit_form', 'Y3.B1.S8 hundreds, tens and ones: 12 tens = 120', { band: 999 })] },
+  'Y3.B4.S2': { ...r3['Y3.B4.S2'], core: [C('multiplication:mult_facts', 'Y3.B3.S15 the 2, 3, 4, 5, 8 and 10 times-tables: the known fact', { constant: [2, 3, 4, 5, 8, 10], band: 100 }), C('placevalue:unit_form', 'Y3.B1.S8 renaming tens: 12 tens = 120 (5 hundreds 12 tens = 620)', { band: 999, rename: 'more' })] },
   'Y2.B3.S7': { ...r3['Y2.B3.S7'], core: [C('shapes_early:count_sides_vertices_2d', 'Y2.B3.S2 counting the sides of 2-D shapes', { forms: [0] }), C('shapes_early:shape_corners_count', 'Y2.B3.S3 counting corners'), C('shapes_early:name_2d_shapes', 'Y1.B3.S3 naming 2-D shapes')], dropPre: ['shapes_early:name_3d_shapes', 'shapes_early:shape_name_match_3d'] },
   'Y2.B1.S11': { ...(r3['Y2.B1.S11'] || {}), core: [C('patterns:seq_10', 'Y1.B12.S2 / Y2.B1.S15 counting in 10s: the tens on the line', { band: 100 }), C('counting:number_seq_fill', 'Y1.B12.S1 counting to 100 in order', { range: 100 })], dropPre: ['composing:number_word_form'] },
   // E. small fixes
@@ -1047,7 +1047,7 @@ Object.assign(whyText, {
   'measurement:money_count': 'counting coins and bills', 'number_sense:place_on_number_line': 'placing numbers on a number line',
 });
 r3['Y2.B4.S9'] = { ...r3['Y2.B4.S9'], core: [C('subtraction:sub_wp_100', 'Y2.B2.S19 take-away stories: change is a subtraction')] };
-r3['Y3.B4.S2'] = { ...r3['Y3.B4.S2'], core: [C('multiplication:mult_facts', 'Y3.B3.S8 / S11 and Y2.B5: the known fact (3 × 4 = 12)', { constant: [2, 3, 4, 5, 10] }), C('placevalue:unit_form', 'Y3.B1.S8 hundreds, tens and ones: 12 tens = 120', { band: 999 })], dropPre: ['division:share_into_groups'] };
+r3['Y3.B4.S2'] = { ...r3['Y3.B4.S2'], core: [C('multiplication:mult_facts', 'Y3.B3.S8 / S11 and Y2.B5: the known fact (3 × 4 = 12)', { constant: [2, 3, 4, 5, 10] }), C('placevalue:unit_form', 'Y3.B1.S8 renaming tens: 12 tens = 120 (5 hundreds 12 tens = 620)', { band: 999, rename: 'more' })], dropPre: ['division:share_into_groups'] };
 // ---- round 8 step fixes ----
 const ZR1 = (n) => ZR(n);
 Object.assign(r3, {
@@ -1060,19 +1060,19 @@ Object.assign(r3, {
   'Y3.B3.S15': { ...(r3['Y3.B3.S15'] || {}), core: [C('multiplication:mult_facts', 'Y3.B3.S11 the 4 times-table (W11): double each fact for the 8s', { constant: [4] }), C('patterns:double', 'twice a 2s fact is a 4s fact, twice a 4s fact an 8s fact', { band: 50 })] },
   'Y3.B3.S9': { ...(r3['Y3.B3.S9'] || {}), core: [C('multiplication:mult_facts', 'Y2.B5.S9 the 2 times-table: × 4 is double × 2', { constant: [2] }), C(CBT, 'Y2.B1.S15 counting in 2s from 0', ZR(2))] },
   'Y3.B3.S3': { ...(r3['Y3.B3.S3'] || {}), core: [C(CBT, 'Y2.B1.S15 counting in 2s from 0: the multiples of 2', ZR(2)), C('multiplication:mult_facts', 'Y2.B5.S9 the 2 times-table', { constant: [2] })], dropPre: ['addition:add_wp_100', 'subtraction:sub_wp_100', 'addition:cloze_addition', 'subtraction:missing_add_sub'] },
-  'Y3.B5.S1': { ...(r3['Y3.B5.S1'] || {}), core: [C('number_sense:place_on_number_line', 'Y2.B1.S10 a ruler is a number line marked in equal steps', { span: 10, band: 100 }), C(CBT, 'Y2.B1.S15 counting in 10s: 100 cm make 1 m', ZR(10))] },
-  'Y3.B5.S3': { ...(r3['Y3.B5.S3'] || {}), core: [C('number_sense:place_on_number_line', 'Y2.B1.S10 a ruler is a number line marked in equal steps', { span: 10, band: 100 }), C(CBT, 'Y2.B1.S15 counting in 10s: 10 mm make 1 cm', ZR(10))] },
-  'Y3.B5.S5': { ...(r3['Y3.B5.S5'] || {}), core: [C('placevalue:unit_form', 'Y3.B1.S8 hundreds, tens and ones: 1 m = 100 cm is the same exchange as 1 hundred = 100 ones', { band: 999 }), C(CBT, 'Y3.B1.S4 counting in 100s from 0: 1 m, 2 m, 3 m in cm', ZR(100))] },
+  'Y3.B5.S1': { ...(r3['Y3.B5.S1'] || {}), core: [C('number_sense:place_on_number_line', 'Y2.B1.S10 a number line marked in equal steps (used for reading a ruler)', { span: 10, band: 100 }), C(CBT, 'Y2.B1.S15 counting in 10s from 0 to 100 (the count used for 100 cm in 1 m)', ZR(10))] },
+  'Y3.B5.S3': { ...(r3['Y3.B5.S3'] || {}), core: [C('number_sense:place_on_number_line', 'Y2.B1.S10 a number line marked in equal steps (used for reading a ruler)', { span: 10, band: 100 }), C(CBT, 'Y2.B1.S15 counting in 10s from 0 (the count used for 10 mm in each cm)', ZR(10))] },
+  'Y3.B5.S5': { ...(r3['Y3.B5.S5'] || {}), core: [C('placevalue:unit_form', 'Y3.B1.S8 renaming hundreds, tens and ones (5 hundreds 12 tens = 620; the same exchange used for 1 m = 100 cm)', { band: 999, rename: 'more' }), C(CBT, 'Y3.B1.S4 counting in 100s from 0 (the count used for 1 m, 2 m, 3 m in cm)', ZR(100))] },
   'Y3.B5.S10': { ...(r3['Y3.B5.S10'] || {}), core: [C('shapes_early:count_sides_vertices_2d', 'Y2.B3.S2 counting the sides of a shape', { forms: [0] }), C('addition:add_three', 'Y2.B2.S7 adding three numbers: the sides added in turn'), C('measurement:length_metric', 'Y3.B5.S6 cm and mm', { forms: [0] })] },
-  'Y3.B11.S4': { ...(r3['Y3.B11.S4'] || {}), preOnly: true, pre: [R('measurement:length_metric', 'Y3.B5.S6 cm and mm: 1 cm = 10 mm', { forms: [0] }), R('number_sense:place_on_number_line', 'Y2.B1.S10 a ruler is a number line marked in equal steps', { span: 10, band: 100 }), R('shapes_early:measure_nonstandard', 'Y1.B7.S2 measuring with cubes and paper clips'), R(CBT, 'Y2.B1.S15 counting in 2s, 5s and 10s from 0', ZR(2, 5, 10))] },
-  'Y3.B11.S6': { ...(r3['Y3.B11.S6'] || {}), related: [R('shapes_early:compose_from_attributes', 'sorting shapes by parallel sides and right angles (the same week)')] },
+  'Y3.B11.S4': { ...(r3['Y3.B11.S4'] || {}), preOnly: true, pre: [R('measurement:length_metric', 'Y3.B5.S6 cm and mm: 1 cm = 10 mm', { forms: [0] }), R('number_sense:place_on_number_line', 'Y2.B1.S10 a number line marked in equal steps (used for reading a ruler)', { span: 10, band: 100 }), R('shapes_early:measure_nonstandard', 'Y1.B7.S2 measuring with cubes and paper clips'), R(CBT, 'Y2.B1.S15 counting in 2s, 5s and 10s from 0', ZR(2, 5, 10))] },
+  'Y3.B11.S6': { ...(r3['Y3.B11.S6'] || {}), related: [R('shapes_early:compose_from_attributes', 'clicking every shape with the named sides, parallel sides or right angles (the same week)')] },
   'Y3.B3.S4': { ...(r3['Y3.B3.S4'] || {}), related: [R('measurement:money_count', 'counting coins of one kind: pennies, and nickels, dimes and quarters, which are multiples of 5', { currency: 'usd', kind: 'like' })] },
   'Y3.B1.S14': { ...(r3['Y3.B1.S14'] || {}), preOnly: true, pre: [R('patterns:seq_10', 'Y2.B1.S15 counting in 10s'), R('multiplication:mult_facts', 'Y2.B5.S15 the 5 times-table: 50 is 5 tens', { constant: [5] }), R('placevalue:more_less_100', 'Y3.B1.S4 counting in 100s: 100 is two 50s', { step: 100 })] },
   'Y2.B5.S12': { ...(r3['Y2.B5.S12'] || {}) },
 });
 relR3['Y2.B5.S12'] = [R('counting:number_seq_fill', 'counting on in 2s from any number along a number track: the even and odd numbers in order', { step: 2, range: 20 })];
 linkFix['Y3.B7.S3'] = { ...linkFix['Y3.B7.S3'], 'multiplication:count_by_tables': ZR(100) };
-extraPre['Y3.B7.S3'] = [R('measurement:heavier_lighter_visual', 'Y2.B7.S1 heavier and lighter'), R('multiplication:count_by_tables', 'counting in 100s to read a kg scale marked in 100 g', ZR(100))];
+extraPre['Y3.B7.S3'] = [R('measurement:heavier_lighter_visual', 'Y2.B7.S1 heavier and lighter'), R('multiplication:count_by_tables', 'counting in 100s from 0 (the count used to read a mass scale marked in 100 g)', ZR(100))];
 const RN = (id, n) => { r3[id] = { ...(r3[id] || {}), relNote: n }; };
 const LATER = 'no related skill: by school week the skills that share this idea are taught earlier (they are pre), and no later step on the same topic adds a new skill';
 for (const id of ['Y2.B2.S4', 'Y2.B3.S1', 'Y2.B3.S6', 'Y2.B5.S2', 'Y2.B5.S3', 'Y2.B5.S4', 'Y2.B5.S5', 'Y2.B5.S14', 'Y2.B5.S16', 'Y2.B7.S2', 'Y2.B7.S3', 'Y2.B7.S6', 'Y2.B7.S7',
@@ -1103,8 +1103,8 @@ for (const id of ['Y2.B5.S2', 'Y2.B5.S3', 'Y2.B5.S4', 'Y2.B5.S5', 'Y2.B2.S4', 'Y
 const MF510 = C('multiplication:mult_facts', 'Y2.B5.S13/S15 the 10 and 5 times-tables (taught earlier, W26): the × sentences already met', { constant: [5, 10] });
 Object.assign(r3, {
   'Y2.B5.S4': { ...(r3['Y2.B5.S4'] || {}), core: [MF510] }, 'Y2.B5.S5': { ...(r3['Y2.B5.S5'] || {}), core: [MF510] },
-  'Y2.B5.S14': { ...(r3['Y2.B5.S14'] || {}), core: [C('multiplication:mult_facts', 'Y2.B5.S13 the 10 times-table (W26): 30 ÷ 10 = 3 because 3 × 10 = 30', { constant: [10] })] },
-  'Y2.B5.S16': { ...(r3['Y2.B5.S16'] || {}), core: [C('multiplication:mult_facts', 'Y2.B5.S15 the 5 times-table (W26): the facts dividing by 5 undoes', { constant: [5] })] },
+  'Y2.B5.S14': { ...(r3['Y2.B5.S14'] || {}), core: [C('multiplication:mult_facts', 'Y2.B5.S13 the 10 times-table (W26): 3 × 10 = 30 (the fact used to divide 30 by 10)', { constant: [10] })] },
+  'Y2.B5.S16': { ...(r3['Y2.B5.S16'] || {}), core: [C('multiplication:mult_facts', 'Y2.B5.S15 the 5 times-table (W26): 4 × 5 = 20 (the facts used when dividing by 5)', { constant: [5] })] },
   'Y3.B3.S7': { ...(r3['Y3.B3.S7'] || {}), core: [C('multiplication:mult_facts', 'Y3.B3.S8 the 3 times-table (W11)', { constant: [3] }), C(CBT, 'Y2.B1.S16 counting in 3s', ZR(3))], dropPre: ['multiplication:mult_zeros', 'patterns:halve'] },
   'Y3.B3.S10': { ...(r3['Y3.B3.S10'] || {}), core: [C('multiplication:mult_facts', 'Y3.B3.S11 the 4 times-table (W11)', { constant: [4] })] },
   'Y3.B3.S6': { ...(r3['Y3.B3.S6'] || {}), core: [C(CBT, 'Y2.B1.S16 counting in 3s: the 3s facts in order', ZR(3))] },
@@ -1158,7 +1158,7 @@ r3['Y2.B5.S12'] = { ...(r3['Y2.B5.S12'] || {}), relOnly: true, related: [...((r3
 // N7: share_into_groups deals grouping only (80/80 "Make groups of M. How many groups?"): partial here, as on Y2.B5.S8
 r3['Y3.B3.S5'] = { ...r3['Y3.B3.S5'], direct: [], partials: [P('division:share_into_groups', 'grouping only (make groups of M, how many groups); sharing into a given number of groups is not dealt', { band: 12 }), ...r3['Y3.B3.S5'].partials] };
 // the 5s and 10s coin counts are one count_by_tables link now: a third building block for counting coins
-r3['Y2.B4.S1'] = { ...(r3['Y2.B4.S1'] || {}), core: [...((r3['Y2.B4.S1'] || {}).core || []), C('addition:add_three', 'Y2.B2.S7 adding three 1-digit numbers (taught earlier, W10): the values of three coins together')] };
+r3['Y2.B4.S1'] = { ...(r3['Y2.B4.S1'] || {}), core: [...((r3['Y2.B4.S1'] || {}).core || []), C('addition:add_three', 'Y2.B2.S7 adding three 1-digit numbers (taught earlier, W10; used to total three coins)')] };
 // ---- r10 step rows (critic r9 §7 B) ----
 const NL100 = { span: 10, band: 100 }; const NL1000 = { span: 100, band: 1000 };
 const CROWS = (...ns) => ({ rows: ns.map(n => ({ step: n, start: 'zero', dir: 'up' })) });
@@ -1187,10 +1187,10 @@ r3['Y3.B4.S1'] = { ...r3['Y3.B4.S1'], core: [C('multiplication:mult_facts', 'Y2.
   ...r3['Y3.B4.S1'].core.filter(c => !/seq_10$/.test(c.key))] };
 r3['Y3.B3.S8'] = { ...(r3['Y3.B3.S8'] || {}), core: [C('multiplication:mult_facts', 'Y2.B5.S9/S13/S15 the 2, 5 and 10 times-tables (Grade 1; the 2 times-table is on the W11 list)', { constant: [2, 5, 10] })] };
 r3['Y3.B8.S4'] = { ...(r3['Y3.B8.S4'] || {}), dropPre: ['fractions:shade_fraction'],
-  core: [C('division:div_facts', 'Y2.B5.S10-S16 / Y3.B3.S7-S10 dividing by the table: 1/3 of 12 is 12 ÷ 3', { constant: [2, 3, 4, 5] })] };
+  core: [C('division:div_facts', 'Y2.B5.S10-S16 / Y3.B3.S7-S10 dividing by 2, 3, 4 and 5 (12 ÷ 3 = 4; used for 1/3 of 12)', { constant: [2, 3, 4, 5] })] };
 r3['Y3.B7.S4'] = { ...r3['Y3.B7.S4'], dropPre: ['number_sense:place_on_number_line'],
   core: [C('measurement:length_metric', 'Y3.B5.S5 m ↔ cm (W14): the same exchange in another unit', { forms: [1] }),
-    C('placevalue:unit_form', 'Y3.B1.S8 1,000 = 10 hundreds: the 1,000 in 1 kg = 1,000 g', { band: 999 })] };
+    C('placevalue:unit_form', 'Y3.B1.S8 renaming hundreds, tens and ones (5 hundreds 12 tens = 620; the same exchange used for 1 kg = 1,000 g)', { band: 999, rename: 'more' })] };
 for (const id of ['Y2.B7.S4', 'Y2.B7.S8']) r3[id] = { ...(r3[id] || {}), core: [...((r3[id] || {}).core || []),
   C('multiplication:mult_facts', 'Y2.B5 the 2, 5 and 10 times-tables (W26-29): multiplying a measure', { constant: [2, 5, 10] }),
   C('division:div_facts', 'Y2.B5.S10-S16 dividing by 2, 5 and 10 (W30-31): sharing a measure', { constant: [2, 5, 10] })] };
@@ -1289,16 +1289,70 @@ CORE('Y2.B1.S9', C('composing:tens_foundation_visual', 'Y1.B12.S2 Tens to 100 (K
 CORE('Y2.B1.S10', C('composing:base10_build', 'Y2.B1.S3 tens and ones (W1): the tens jump along the line, then the ones', { band: 99 }),
   C('composing:tens_foundation_visual', 'Y1.B12.S2 Tens to 100 (K): the tens marked on the line', { band: 90 }));
 CORE('Y2.B1.S12', C('placevalue:compare', 'Y1.B12.S7 Compare any two numbers (K): the words and signs more, fewer, the same, used on numbers', { band: 99 }));
-CORE('Y2.B1.S15', C('patterns:skip_count_line', 'skip counts of 2, 5 and 10 from 0 on a number line to 50 (Grade K, the Y1.B9 count steps): the same counts, met to 50', { step: [0], band: 50 }));
+CORE('Y2.B1.S15', C('patterns:skip_count_line', 'skip counts of 2, 5 and 10 from 0 to 50, filling the missing numbers (Grade K, the Y1.B9 count steps): the same counts, met to 50', { step: [0], band: 50 }));
 CORE('Y2.B10.S1', C('counting:count_objects', 'Y1.B1.S2 Count objects (K): each object counted is one tally mark', { band: 10 }),
   C('multiplication:count_by_tables', 'Y2.B1.S15 counting in 5s from 0 (W4): a full tally is a group of 5, counted 5, 10, 15', ZR(5)));
 CORE('Y3.B1.S5', C('composing:base10_build', 'Y3.B1.S1 / Y2.B1.S3 tens and ones in base-10 blocks: the same blocks, now with hundreds', { band: 99 }));
 CORE('Y3.B1.S9', C('placevalue:more_less_10', 'Y2.B2.S13 10 more, 10 less (Grade 1): the same move on a 2-digit number', { step: 10 }));
-CORE('Y3.B5.S8', C('addition:add_100_regroup', 'Y2.B2.S16 Add two 2-digit numbers across a 10 (Grade 1): the addition used with lengths in cm'),
+CORE('Y3.B5.S8', C('addition:add_100_regroup', 'Y2.B2.S16 Add two 2-digit numbers across a 10 (Grade 1; the addition used with lengths in cm)'),
   C('measurement:length_metric', 'Y3.B5.S5 m ↔ cm (W14): 1 m 20 cm is 120 cm before adding', { forms: [1] }));
-CORE('Y3.B5.S9', C('subtraction:sub_100_regroup', 'Y2.B2.S18 Subtract two 2-digit numbers across a 10 (Grade 1): the subtraction used with lengths in cm'),
+CORE('Y3.B5.S9', C('subtraction:sub_100_regroup', 'Y2.B2.S18 Subtract two 2-digit numbers across a 10 (Grade 1; the subtraction used with lengths in cm)'),
   C('measurement:length_metric', 'Y3.B5.S5 m ↔ cm (W14): 1 m is 100 cm before subtracting', { forms: [1] }));
 CORE('Y3.B11.S1', C('measurement:time_quarter', 'Y2.B9.S2 quarter past and quarter to (Grade 1): the minute hand makes a quarter turn'),
   C('shapes_early:shape_positions', 'Y2.B11.S1 position words (Grade 1: above, below, beside): the language a turn is described from'));
 CORE('Y3.B11.S2', C('measurement:time_quarter', 'Y2.B9.S2 quarter past and quarter to (Grade 1): a quarter turn of the minute hand, the turn a right angle measures'),
   C('shapes_early:shape_corners_count', 'Y2.B3.S3 Count vertices on 2-D shapes (Grade 1): the corners where right angles are found'));
+
+// ======================= round 12 part 3 (the root-cause guard: OPTGATE) =======================
+// build.mjs no longer lets a marker failure re-option a link silently (the class Y5 critic r7 named N): a markerFix change is
+// kept only when it is listed here for that step, and its why is written by hand below after re-reading the items
+// (items.mjs --key, fresh seeds). The 19 changes the old loop made are each judged: approved with a new why, re-specified
+// (linkFix / relR3), or dropped.
+relR3['Y2.B7.S5'] = []; // "half full" on a halves-family shading skill: the re-option to shape parts lost the reason; dropped
+Object.assign(linkFix, {
+  // "the inverse: dividing by 3 / 4": ÷3 and ÷4 are first met after these steps (the markers drop {constant:[3]} too); the old
+  // loop's ÷2/5/10 made the why false. Dropped: the next steps (Divide by 3 / by 4) are the inverse, linked as related there.
+  'Y3.B3.S8': { ...(linkFix['Y3.B3.S8'] || {}), 'division:div_facts': null },
+  'Y3.B3.S11': { ...(linkFix['Y3.B3.S11'] || {}), 'division:div_facts': null },
+  // the 2-digit × 1-digit column (taught later, W33) is not linked; ×10 is not a building block of these steps
+  'Y3.B4.S6': { ...(linkFix['Y3.B4.S6'] || {}), 'multiplication:multiply': null, 'multiplication:area_model_mult': null },
+  'Y3.B4.S10': { ...(linkFix['Y3.B4.S10'] || {}), 'multiplication:multiply': null },
+});
+relR3['Y3.B4.S10'] = (relR3['Y3.B4.S10'] || []).filter(r => r.key !== 'multiplication:mult_word_problems');
+export const markerFixOk = [
+  'Y2.B8.S1|fractions:shade_fraction|{"denoms":[2]}->shapes_early:partition_shapes|{"parts":[0,2]}',
+  'Y2.B8.S2|fractions:shade_fraction|{"denoms":[2]}->shapes_early:partition_shapes|{"parts":[0,2]}',
+  'Y2.B8.S9|fractions:shade_fraction|{"denoms":[2]}->shapes_early:partition_shapes|{"parts":[0,2]}',
+  'Y2.B8.S10|fractions:identify|{"denoms":[2]}->shapes_early:partition_shapes|{"parts":[0,2]}',
+  'Y2.B8.S12|fractions:shade_fraction|{"denoms":[2]}->shapes_early:partition_shapes|{"parts":[0,2]}',
+  'Y2.B11.S3|fractions:shade_fraction|{"denoms":[2]}->shapes_early:partition_shapes|{"parts":[0,2]}',
+  'Y2.B8.S10|measurement:time_quarter|{}->measurement:time_half_hour|{}',
+  'Y2.B8.S12|measurement:time_quarter|{}->measurement:time_half_hour|{}',
+  'Y2.B11.S3|measurement:time_quarter|{}->measurement:time_half_hour|{}',
+  'Y2.B11.S4|measurement:time_quarter|{}->measurement:time_half_hour|{}',
+  'Y3.B3.S4|division:div_facts|{"constant":[5]}->division:div_facts|{"constant":[2,5,10],"band":100}',
+  'Y3.B4.S4|multiplication:mult_zeros|{"forms":[0,2]}->multiplication:mult_zeros|{"forms":[0]}',
+  'Y3.B4.S11|multiplication:mult_word_problems|{"range":100}->multiplication:repeated_add_to_mult|{"band":25}',
+];
+// the whys of the approved changes, re-read on the items (partition_shapes {parts:[0,2]}: "What fraction of the shape is
+// shaded? 1/2", "How many equal parts is this shape divided into? 4"; time_half_hour: "Write the time. 12:30";
+// div_facts {2,5,10, band 100}: 40 ÷ 5, 20 ÷ 2, 70 ÷ 10; mult_zeros {forms:[0]}: 5 × 10, 7 × 10;
+// repeated_add_to_mult {band:25}: 5 + 5 + 5 = 3 × 5)
+const HQ = 'shapes cut into 2 or 4 equal parts: how many parts, and what fraction (1/2, 1/4) is shaded';
+Object.assign(whyFix, {
+  'Y2.B8.S1': { ...(whyFix['Y2.B8.S1'] || {}), 'shapes_early:partition_shapes': 'Y1.B10.S5 / Y1.B10.S6 Recognise and find a quarter of a shape (prior learning wk W16): ' + HQ },
+  'Y2.B8.S2': { ...(whyFix['Y2.B8.S2'] || {}), 'shapes_early:partition_shapes': 'Y1.B10.S5 / Y1.B10.S6 Recognise and find a quarter of a shape (prior learning wk W16): ' + HQ + ', the equal parts this step tells from unequal ones' },
+  'Y2.B8.S9': { ...(whyFix['Y2.B8.S9'] || {}), 'shapes_early:partition_shapes': 'Y2.B8.S6 Find a quarter (taught before this step in the block): ' + HQ + ', the parts that make the whole' },
+  'Y2.B8.S10': { ...(whyFix['Y2.B8.S10'] || {}), 'shapes_early:partition_shapes': 'Y2.B8.S3 / Y2.B8.S6 a half and a quarter of a shape (W17): ' + HQ + ', the unit fractions met first' },
+  'Y2.B8.S12': { ...(whyFix['Y2.B8.S12'] || {}), 'shapes_early:partition_shapes': 'Y1.B10.S6 Find a quarter of an object or a shape (prior learning wk W17): ' + HQ + ', so a half and two quarters can be seen on one shape' },
+  'Y2.B11.S3': { ...(whyFix['Y2.B11.S3'] || {}), 'shapes_early:partition_shapes': 'Y2.B8.S3 / Y2.B8.S6 a half and a quarter of a shape (Grade 1, W17): ' + HQ + ', the half and quarter a turn is named by' },
+  'Y3.B3.S4': { ...(whyFix['Y3.B3.S4'] || {}), 'division:div_facts': 'Y2.B5.S16 Divide by 5 (Grade 1): dividing by 2, 5 and 10 within 100 (40 ÷ 5, 70 ÷ 10); a multiple of 5 or 10 divides by it exactly' },
+  'Y3.B4.S4': { ...(whyFix['Y3.B4.S4'] || {}), 'multiplication:mult_zeros': 'Y3.B4.S1 Multiples of 10 (taught earlier): multiplying by 10 (7 × 10 = 70), the tens part of 23 × 3' },
+  'Y3.B4.S11': { ...(whyFix['Y3.B4.S11'] || {}), 'multiplication:repeated_add_to_mult': 'Y2.B5.S3 Add equal groups (Grade 1): equal groups added and written as a multiplication (5 + 5 + 5 = 3 × 5), how the ways are counted' },
+});
+const HALFPAST = 'Y1.B14.S6 Tell the time to the half hour (K): half past, the minute hand has turned half way round the clock';
+export const relWhyFix = { 'Y2.B8.S10': { 'measurement:time_half_hour': HALFPAST }, 'Y2.B8.S12': { 'measurement:time_half_hour': HALFPAST },
+  'Y2.B11.S3': { 'measurement:time_half_hour': HALFPAST + ' (a half turn)' }, 'Y2.B11.S4': { 'measurement:time_half_hour': HALFPAST + ' (a half turn)' } };
+// sweep (r12): the inherited clause "a centimetre ruler (the skill reads inches only)" read as a claim; the same gap, said as
+// what is dealt first (items: "The arrow points to [ ] inches.")
+r3['Y2.B6.S1'] = { ...(r3['Y2.B6.S1'] || {}), partials: [P('measurement:reading_ruler', 'reads an inch ruler (whole inches) only; measuring in centimetres on a centimetre ruler is not dealt')] };

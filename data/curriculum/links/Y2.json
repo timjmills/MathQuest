@@ -845,7 +845,7 @@
     },
     {
      "key": "composing:hundreds_chart_fill",
-     "why": "one row down a hundred square is 10 more",
+     "why": "filling gaps in part of a hundred square: one row down is 10 more",
      "opts": {
       "band": 100
      }
@@ -1297,7 +1297,7 @@
    "pre": [
     {
      "key": "patterns:skip_count_line",
-     "why": "skip counts of 2, 5 and 10 from 0 on a number line to 50 (Grade K, the Y1.B9 count steps): the same counts, met to 50",
+     "why": "skip counts of 2, 5 and 10 from 0 to 50, filling the missing numbers (Grade K, the Y1.B9 count steps): the same counts, met to 50",
      "opts": {
       "step": [
        0
@@ -1539,7 +1539,7 @@
    "related": [
     {
      "key": "subtraction:sub_facts",
-     "why": "the inverse: 10 − 3 = 7 from 3 + 7 = 10",
+     "why": "Subtraction Facts (within 20) (written across)",
      "opts": {
       "notation": [
        "across"
@@ -1698,7 +1698,7 @@
     },
     {
      "key": "addition:add_10_mixed",
-     "why": "Y1.B2.S17 Add or subtract 1 or 2 (prior learning wk W10)",
+     "why": "Y1.B2.S17 Add or subtract 1 or 2 (prior learning wk W10; the adding half)",
      "opts": {
       "notation": [
        "across"
@@ -1857,7 +1857,7 @@
     },
     {
      "key": "addition:add_10_mixed",
-     "why": "Y1.B2.S17 Add or subtract 1 or 2 (prior learning wk W10)",
+     "why": "Y1.B2.S17 Add or subtract 1 or 2 (prior learning wk W10; the adding half)",
      "opts": {
       "notation": [
        "across"
@@ -1937,7 +1937,7 @@
     },
     {
      "key": "composing:number_bonds",
-     "why": "Y1 bonds within 10: splitting the second number",
+     "why": "Y1 bonds within 10: splitting the number added (8 + 5 = 8 + 2 + 3)",
      "opts": {}
     },
     {
@@ -1952,7 +1952,7 @@
     },
     {
      "key": "addition:add_10_mixed",
-     "why": "Y1.B2.S17 Add or subtract 1 or 2 (prior learning wk W10)",
+     "why": "Y1.B2.S17 Add or subtract 1 or 2 (prior learning wk W10; the adding half)",
      "opts": {
       "notation": [
        "across"
@@ -1961,7 +1961,7 @@
     },
     {
      "key": "addition:number_line_add",
-     "why": "Y2.B2.S5 Add and subtract 1s (taught before this step in the block)",
+     "why": "Y2.B2.S5 Add and subtract 1s (taught before this step in the block; the adding half)",
      "opts": {}
     },
     {
@@ -2030,7 +2030,7 @@
     },
     {
      "key": "addition:add_10_mixed",
-     "why": "Y1.B2.S17 Add or subtract 1 or 2 (prior learning wk W10)",
+     "why": "Y1.B2.S17 Add or subtract 1 or 2 (prior learning wk W10; the adding half)",
      "opts": {
       "notation": [
        "across"
@@ -2255,7 +2255,7 @@
    "related": [
     {
      "key": "addition:add_wp_100",
-     "why": "Y2.B2.S19 Mixed addition and subtraction (a later step, W8: the same idea one step further)",
+     "why": "Y2.B2.S19 Mixed addition and subtraction (a later step, W8: the same idea one step further; the adding half)",
      "opts": {}
     },
     {
@@ -2594,7 +2594,7 @@
    "related": [
     {
      "key": "composing:hundreds_chart_fill",
-     "why": "one row down a hundred square is 10 more",
+     "why": "filling gaps in part of a hundred square: one row down is 10 more",
      "opts": {
       "band": 100
      }
@@ -2692,7 +2692,7 @@
    "related": [
     {
      "key": "composing:hundreds_chart_fill",
-     "why": "one row down a hundred square is 10 more",
+     "why": "filling gaps in part of a hundred square: one row down is 10 more",
      "opts": {
       "band": 100
      }
@@ -2864,7 +2864,7 @@
    "related": [
     {
      "key": "addition:add_wp_100",
-     "why": "Y2.B2.S19 Mixed addition and subtraction (next step, W8: the same idea one step further)",
+     "why": "Y2.B2.S19 Mixed addition and subtraction (next step, W8: the same idea one step further; the adding half)",
      "opts": {}
     },
     {
@@ -3301,7 +3301,7 @@
     },
     {
      "key": "shapes_early:shape_attributes",
-     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W15)",
+     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W15; nearest live practice: Y1.B3.S4 has it as a partial skill, and these items never sort)",
      "opts": {
       "forms": [
        0
@@ -3354,7 +3354,7 @@
    "pre": [
     {
      "key": "shapes_early:shape_attributes",
-     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W13)",
+     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W13; nearest live practice: Y1.B3.S4 has it as a partial skill, and these items never sort)",
      "opts": {
       "forms": [
        0
@@ -3431,7 +3431,7 @@
     },
     {
      "key": "shapes_early:shape_attributes",
-     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W13)",
+     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W13; nearest live practice: Y1.B3.S4 has it as a partial skill, and these items never sort)",
      "opts": {
       "forms": [
        0
@@ -3498,7 +3498,7 @@
     },
     {
      "key": "shapes_early:shape_attributes",
-     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W13)",
+     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W13; nearest live practice: Y1.B3.S4 has it as a partial skill, and these items never sort)",
      "opts": {
       "forms": [
        0
@@ -3560,7 +3560,7 @@
    "pre": [
     {
      "key": "shapes_early:shape_attributes",
-     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W13)",
+     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W13; nearest live practice: Y1.B3.S4 has it as a partial skill, and these items never sort)",
      "opts": {
       "forms": [
        0
@@ -3693,7 +3693,7 @@
     },
     {
      "key": "shapes_early:shape_attributes",
-     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W14)",
+     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W14; nearest live practice: Y1.B3.S4 has it as a partial skill, and these items never sort)",
      "opts": {
       "forms": [
        0
@@ -3755,7 +3755,7 @@
     },
     {
      "key": "shapes_early:shape_attributes",
-     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W14)",
+     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W14; nearest live practice: Y1.B3.S4 has it as a partial skill, and these items never sort)",
      "opts": {
       "forms": [
        0
@@ -3859,7 +3859,7 @@
     },
     {
      "key": "shapes_early:shape_attributes",
-     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W14)",
+     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W14; nearest live practice: Y1.B3.S4 has it as a partial skill, and these items never sort)",
      "opts": {
       "forms": [
        0
@@ -3949,7 +3949,7 @@
     },
     {
      "key": "shapes_early:shape_attributes",
-     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W14)",
+     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W14; nearest live practice: Y1.B3.S4 has it as a partial skill, and these items never sort)",
      "opts": {
       "forms": [
        0
@@ -4018,7 +4018,7 @@
     },
     {
      "key": "shapes_early:shape_attributes",
-     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W14)",
+     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W14; nearest live practice: Y1.B3.S4 has it as a partial skill, and these items never sort)",
      "opts": {
       "forms": [
        0
@@ -4081,7 +4081,7 @@
    "pre": [
     {
      "key": "shapes_early:shape_attributes",
-     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W14)",
+     "why": "Y1.B3.S4 Sort 2-D shapes (prior learning wk W14; nearest live practice: Y1.B3.S4 has it as a partial skill, and these items never sort)",
      "opts": {
       "forms": [
        0
@@ -4187,7 +4187,7 @@
     },
     {
      "key": "multiplication:count_by_tables",
-     "why": "Y2.B1.S15 counting in 2s, 5s and 10s from 0: counting 5-cent and 10-cent coins",
+     "why": "Y2.B1.S15 counting in 2s, 5s and 10s from 0 (the count used for 5-cent and 10-cent coins)",
      "opts": {
       "rows": [
        {
@@ -4210,12 +4210,12 @@
     },
     {
      "key": "counting:count_objects",
-     "why": "counting a set one by one, for 1-cent coins",
+     "why": "counting a set one by one (the count used for 1-cent coins)",
      "opts": {}
     },
     {
      "key": "addition:add_three",
-     "why": "Y2.B2.S7 adding three 1-digit numbers (taught earlier, W10): the values of three coins together",
+     "why": "Y2.B2.S7 adding three 1-digit numbers (taught earlier, W10; used to total three coins)",
      "opts": {}
     },
     {
@@ -4264,7 +4264,7 @@
    "pre": [
     {
      "key": "multiplication:count_by_tables",
-     "why": "counting in equal steps from 0 (counting in 2s, 5s, 10s from 0): counting $5 and $10 bills — Y2.B1.S15 Count in 2s, 5s and 10s",
+     "why": "counting in equal steps from 0 (counting in 2s, 5s, 10s from 0) — Y2.B1.S15 Count in 2s, 5s and 10s",
      "opts": {
       "rows": [
        {
@@ -4360,7 +4360,7 @@
    "pre": [
     {
      "key": "multiplication:count_by_tables",
-     "why": "counting in equal steps from 0 (counting in 2s, 5s, 10s from 0): counting bills and coins — Y2.B1.S15 Count in 2s, 5s and 10s",
+     "why": "counting in equal steps from 0 (counting in 2s, 5s, 10s from 0) — Y2.B1.S15 Count in 2s, 5s and 10s",
      "opts": {
       "rows": [
        {
@@ -4459,7 +4459,7 @@
    "pre": [
     {
      "key": "multiplication:count_by_tables",
-     "why": "counting in equal steps from 0 (counting in 2s, 5s, 10s from 0): making an amount from $5 and $10 bills — Y2.B1.S15 Count in 2s, 5s and 10s",
+     "why": "counting in equal steps from 0 (counting in 2s, 5s, 10s from 0) — Y2.B1.S15 Count in 2s, 5s and 10s",
      "opts": {
       "rows": [
        {
@@ -4577,7 +4577,7 @@
     },
     {
      "key": "addition:add_three",
-     "why": "adding three small numbers (three coins)",
+     "why": "adding three small numbers (used to total three coins)",
      "opts": {}
     },
     {
@@ -4789,7 +4789,7 @@
    "related": [
     {
      "key": "measurement:enough_money",
-     "why": "compare an amount with a price, the reasoning behind a difference",
+     "why": "compare an amount with a price: is there enough money? (the reasoning used for finding a difference)",
      "opts": {
       "currency": "usd"
      }
@@ -5658,7 +5658,7 @@
    "pre": [
     {
      "key": "division:share_into_groups",
-     "why": "Y1.B9.S8 making equal groups (grouping): ring the counters in groups of a size",
+     "why": "this step's skill as it was met then (counters to: 12) — Y1.B9.S8 Make equal groups - grouping (Grade K)",
      "opts": {
       "band": 12
      }
@@ -5754,7 +5754,7 @@
    "pre": [
     {
      "key": "division:share_into_groups",
-     "why": "Y1.B9.S8 making equal groups (grouping): ring the counters in groups of a size",
+     "why": "this step's skill as it was met then (counters to: 12) — Y1.B9.S8 Make equal groups - grouping (Grade K)",
      "opts": {
       "band": 12
      }
@@ -5914,7 +5914,7 @@
     },
     {
      "key": "division:share_into_groups",
-     "why": "Y1.B9.S8 making equal groups (grouping): ring the counters in groups of a size",
+     "why": "Y1.B9.S8 Make equal groups - grouping (taught before this step in the block)",
      "opts": {
       "band": 12
      }
@@ -5967,7 +5967,7 @@
     },
     {
      "key": "multiplication:count_by_tables",
-     "why": "counting in 2s, 5s and 10s from 0: the multiples this step divides (2s) — Y2.B1.S15 Count in 2s, 5s and 10s (W4)",
+     "why": "counting in 2s, 5s and 10s from 0: the multiples used when this step divides (2s) — Y2.B1.S15 Count in 2s, 5s and 10s (W4)",
      "opts": {
       "rows": [
        {
@@ -6345,7 +6345,7 @@
    "pre": [
     {
      "key": "multiplication:mult_facts",
-     "why": "Y2.B5.S13 the 10 times-table (W26): 30 ÷ 10 = 3 because 3 × 10 = 30",
+     "why": "Y2.B5.S13 the 10 times-table (W26): 3 × 10 = 30 (the fact used to divide 30 by 10)",
      "opts": {
       "constant": [
        10
@@ -6542,7 +6542,7 @@
    "pre": [
     {
      "key": "multiplication:mult_facts",
-     "why": "Y2.B5.S15 the 5 times-table (W26): the facts dividing by 5 undoes",
+     "why": "Y2.B5.S15 the 5 times-table (W26): 4 × 5 = 20 (the facts used when dividing by 5)",
      "opts": {
       "constant": [
        5
@@ -6567,7 +6567,7 @@
     },
     {
      "key": "multiplication:count_by_tables",
-     "why": "counting in 2s, 5s and 10s from 0: the multiples this step divides (5s) — Y2.B1.S15 Count in 2s, 5s and 10s (W4)",
+     "why": "counting in 2s, 5s and 10s from 0: the multiples used when this step divides (5s) — Y2.B1.S15 Count in 2s, 5s and 10s (W4)",
      "opts": {
       "rows": [
        {
@@ -6702,7 +6702,7 @@
    "related": [
     {
      "key": "measurement:money_count",
-     "why": "counting 5-cent and 10-cent coins",
+     "why": "counting coins: 5-cent and 10-cent coins counted in 5s and 10s",
      "opts": {
       "currency": "usd"
      }
@@ -6716,11 +6716,11 @@
    "partial": [
     {
      "key": "measurement:reading_ruler",
-     "missing": "a centimetre ruler (the skill reads inches only)"
+     "missing": "reads an inch ruler (whole inches) only; measuring in centimetres on a centimetre ruler is not dealt"
     }
    ],
    "verdict": "partial",
-   "missing": "a centimetre ruler (the skill reads inches only)",
+   "missing": "reads an inch ruler (whole inches) only; measuring in centimetres on a centimetre ruler is not dealt",
    "build": [
     "ruler_cm"
    ],
@@ -6737,7 +6737,7 @@
     },
     {
      "key": "number_sense:place_on_number_line",
-     "why": "Y2.B1.S9 a ruler is a number line marked in equal steps (topic ladder)",
+     "why": "Y2.B1.S9 a number line marked in equal steps (used for reading a ruler) (topic ladder)",
      "opts": {
       "span": 10,
       "band": 100
@@ -6775,7 +6775,7 @@
     },
     {
      "key": "number_sense:place_on_number_line",
-     "why": "Y2.B1.S9 a ruler is a number line marked in equal steps",
+     "why": "Y2.B1.S9 a number line marked in equal steps (used for reading a ruler)",
      "opts": {
       "span": 10,
       "band": 100
@@ -6834,7 +6834,7 @@
     },
     {
      "key": "number_sense:place_on_number_line",
-     "why": "Y2.B1.S9 a ruler is a number line marked in equal steps",
+     "why": "Y2.B1.S9 a number line marked in equal steps (used for reading a ruler)",
      "opts": {
       "span": 10,
       "band": 100
@@ -6898,7 +6898,7 @@
     },
     {
      "key": "number_sense:place_on_number_line",
-     "why": "Y2.B1.S9 a ruler is a number line marked in equal steps",
+     "why": "Y2.B1.S9 a number line marked in equal steps (used for reading a ruler)",
      "opts": {
       "span": 10,
       "band": 100
@@ -6979,7 +6979,7 @@
     },
     {
      "key": "number_sense:place_on_number_line",
-     "why": "Y2.B1.S9 a ruler is a number line marked in equal steps",
+     "why": "Y2.B1.S9 a number line marked in equal steps (used for reading a ruler)",
      "opts": {
       "span": 10,
       "band": 100
@@ -7031,7 +7031,7 @@
     },
     {
      "key": "number_sense:place_on_number_line",
-     "why": "Y2.B1.S9 a scale is a number line: find the value at the pointer (topic ladder)",
+     "why": "Y2.B1.S9 a number line: find the value at the pointer (used for reading a scale) (topic ladder)",
      "opts": {
       "span": 10,
       "band": 100
@@ -7069,7 +7069,7 @@
     },
     {
      "key": "number_sense:place_on_number_line",
-     "why": "a scale is a number line: find the value at the pointer (earlier step this builds on: Y2.B1.S11 Estimate numbers on a number line)",
+     "why": "a number line: find the value at the pointer (used for reading a scale) (earlier step this builds on: Y2.B1.S11 Estimate numbers on a number line)",
      "opts": {
       "span": 10,
       "band": 100
@@ -7077,7 +7077,7 @@
     },
     {
      "key": "multiplication:count_by_tables",
-     "why": "Y2.B1.S15 counting in 2s, 5s and 10s from 0 to read the scale marks (topic ladder)",
+     "why": "Y2.B1.S15 counting in 2s, 5s and 10s from 0 (the count used to read the scale marks) (topic ladder)",
      "opts": {
       "rows": [
        {
@@ -7137,7 +7137,7 @@
    "pre": [
     {
      "key": "number_sense:place_on_number_line",
-     "why": "a scale is a number line: find the value at the pointer (earlier step this builds on: Y2.B1.S11 Estimate numbers on a number line)",
+     "why": "a number line: find the value at the pointer (used for reading a scale) (earlier step this builds on: Y2.B1.S11 Estimate numbers on a number line)",
      "opts": {
       "span": 10,
       "band": 100
@@ -7150,7 +7150,7 @@
     },
     {
      "key": "multiplication:count_by_tables",
-     "why": "Y2.B1.S15 counting in 2s, 5s and 10s from 0 to read the scale marks (topic ladder)",
+     "why": "Y2.B1.S15 counting in 2s, 5s and 10s from 0 (the count used to read the scale marks) (topic ladder)",
      "opts": {
       "rows": [
        {
@@ -7286,7 +7286,7 @@
     },
     {
      "key": "number_sense:place_on_number_line",
-     "why": "Y2.B1.S9 a jug scale is a vertical number line (topic ladder)",
+     "why": "Y2.B1.S9 a number line (used for reading the marks on a jug) (topic ladder)",
      "opts": {
       "span": 10,
       "band": 100
@@ -7296,19 +7296,8 @@
    "preBuild": [
     "nonstandard_capacity"
    ],
-   "related": [
-    {
-     "key": "shapes_early:partition_shapes",
-     "why": "equal parts of a shape (halves and quarters of a shape) — Y2.B8.S13 Recognise three-quarters",
-     "opts": {
-      "parts": [
-       0,
-       2
-      ]
-     }
-    }
-   ],
-   "note": ""
+   "related": [],
+   "note": "no related skill: the later-taught steps of the block are Y2.B7.S2 (W34): mass_volume_liquid deals kg_g content first taught W34 (rule 19) | Y2.B7.S3 (W35): mass_volume_liquid deals kg_g content first taught W34 (rule 19) | Y2.B7.S4 Four operations with mass (W35) has no skill yet | Y2.B7.S7 (W35): mass_volume_liquid deals ml_l content first taught W35 (rule 19)"
   },
   "Y2.B7.S6": {
    "title": "Measure in millilitres",
@@ -7329,12 +7318,12 @@
    "pre": [
     {
      "key": "number_sense:place_on_number_line",
-     "why": "reading a scale is reading a number line in steps",
+     "why": "reading a number line in steps (used for reading a scale)",
      "opts": {}
     },
     {
      "key": "multiplication:count_by_tables",
-     "why": "counting in 2s, 5s and 10s from 0 to read the scale marks",
+     "why": "counting in 2s, 5s and 10s from 0 (the count used to read the scale marks)",
      "opts": {
       "rows": [
        {
@@ -7394,7 +7383,7 @@
    "pre": [
     {
      "key": "number_sense:place_on_number_line",
-     "why": "reading a scale is reading a number line",
+     "why": "reading a number line (used for reading a scale)",
      "opts": {}
     },
     {
@@ -7509,12 +7498,12 @@
    "pre": [
     {
      "key": "number_sense:place_on_number_line",
-     "why": "a thermometer is a vertical number line",
+     "why": "a number line (used for reading a thermometer)",
      "opts": {}
     },
     {
      "key": "multiplication:count_by_tables",
-     "why": "counting in 2s, 5s and 10s from 0 to read the marks",
+     "why": "counting in 2s, 5s and 10s from 0 (the count used to read the marks)",
      "opts": {
       "rows": [
        {
@@ -7563,7 +7552,7 @@
    "pre": [
     {
      "key": "shapes_early:partition_shapes",
-     "why": "equal parts of a shape (halves and quarters of a shape) — Y1.B10.S5 Recognise a quarter of an object or a shape",
+     "why": "Y1.B10.S5 / Y1.B10.S6 Recognise and find a quarter of a shape (prior learning wk W16): shapes cut into 2 or 4 equal parts: how many parts, and what fraction (1/2, 1/4) is shaded",
      "opts": {
       "parts": [
        0,
@@ -7588,7 +7577,7 @@
    "related": [
     {
      "key": "shapes_early:compose_shapes",
-     "why": "two or more equal parts put back together make the whole shape",
+     "why": "two shapes put together make a new shape (two triangles make a square): parts making a whole",
      "opts": {}
     },
     {
@@ -7611,7 +7600,7 @@
    "pre": [
     {
      "key": "shapes_early:partition_shapes",
-     "why": "equal parts of a shape (halves and quarters of a shape) — Y1.B10.S5 Recognise a quarter of an object or a shape",
+     "why": "Y1.B10.S5 / Y1.B10.S6 Recognise and find a quarter of a shape (prior learning wk W16): shapes cut into 2 or 4 equal parts: how many parts, and what fraction (1/2, 1/4) is shaded, the equal parts this step tells from unequal ones",
      "opts": {
       "parts": [
        0,
@@ -7636,7 +7625,7 @@
    "related": [
     {
      "key": "shapes_early:compose_shapes",
-     "why": "two or more equal parts put back together make the whole shape",
+     "why": "two shapes put together make a new shape (two triangles make a square): parts making a whole",
      "opts": {}
     }
    ],
@@ -7805,7 +7794,7 @@
    "related": [
     {
      "key": "shapes_early:compose_shapes",
-     "why": "two or more equal parts put back together make the whole shape",
+     "why": "two shapes put together make a new shape (two triangles make a square): parts making a whole",
      "opts": {}
     }
    ],
@@ -7859,7 +7848,7 @@
    "related": [
     {
      "key": "shapes_early:compose_shapes",
-     "why": "two or more equal parts put back together make the whole shape",
+     "why": "two shapes put together make a new shape (two triangles make a square): parts making a whole",
      "opts": {}
     }
    ],
@@ -7909,7 +7898,7 @@
    "related": [
     {
      "key": "shapes_early:compose_shapes",
-     "why": "two or more equal parts put back together make the whole shape",
+     "why": "two shapes put together make a new shape (two triangles make a square): parts making a whole",
      "opts": {}
     }
    ],
@@ -7937,7 +7926,7 @@
    "pre": [
     {
      "key": "shapes_early:partition_shapes",
-     "why": "equal parts of a shape (halves and thirds and quarters of a shape) — Y2.B8.S13 Recognise three-quarters",
+     "why": "equal parts of a shape (halves and thirds and quarters of a shape) — Y2.B8.S7 Recognise a third (the same week, W31)",
      "opts": {
       "parts": [
        0,
@@ -7963,7 +7952,7 @@
    "related": [
     {
      "key": "shapes_early:compose_shapes",
-     "why": "two or more equal parts put back together make the whole shape",
+     "why": "two shapes put together make a new shape (two triangles make a square): parts making a whole",
      "opts": {}
     }
    ],
@@ -7981,7 +7970,7 @@
    "pre": [
     {
      "key": "shapes_early:partition_shapes",
-     "why": "equal parts of a shape (halves and quarters of a shape) — Y2.B8.S13 Recognise three-quarters",
+     "why": "Y2.B8.S6 Find a quarter (taught before this step in the block): shapes cut into 2 or 4 equal parts: how many parts, and what fraction (1/2, 1/4) is shaded, the parts that make the whole",
      "opts": {
       "parts": [
        0,
@@ -8017,7 +8006,7 @@
     },
     {
      "key": "shapes_early:compose_shapes",
-     "why": "two or more equal parts put back together make the whole shape",
+     "why": "two shapes put together make a new shape (two triangles make a square): parts making a whole",
      "opts": {}
     }
    ],
@@ -8056,7 +8045,7 @@
    "pre": [
     {
      "key": "shapes_early:partition_shapes",
-     "why": "equal parts of a shape (halves and quarters of a shape) — Y2.B8.S13 Recognise three-quarters",
+     "why": "Y2.B8.S3 / Y2.B8.S6 a half and a quarter of a shape (W17): shapes cut into 2 or 4 equal parts: how many parts, and what fraction (1/2, 1/4) is shaded, the unit fractions met first",
      "opts": {
       "parts": [
        0,
@@ -8083,12 +8072,12 @@
    "related": [
     {
      "key": "shapes_early:compose_shapes",
-     "why": "two or more equal parts put back together make the whole shape",
+     "why": "two shapes put together make a new shape (two triangles make a square): parts making a whole",
      "opts": {}
     },
     {
      "key": "measurement:time_half_hour",
-     "why": "half past: the minute hand makes a half turn — Y1.B14.S6 Tell the time to the half hour",
+     "why": "Y1.B14.S6 Tell the time to the half hour (K): half past, the minute hand has turned half way round the clock",
      "opts": {}
     }
    ],
@@ -8127,7 +8116,7 @@
    "pre": [
     {
      "key": "shapes_early:partition_shapes",
-     "why": "equal parts of a shape (halves and thirds and quarters of a shape) — Y2.B8.S13 Recognise three-quarters",
+     "why": "equal parts of a shape (halves and thirds and quarters of a shape) — Y2.B8.S7 Recognise a third",
      "opts": {
       "parts": [
        0,
@@ -8155,7 +8144,7 @@
    "related": [
     {
      "key": "shapes_early:compose_shapes",
-     "why": "two or more equal parts put back together make the whole shape",
+     "why": "two shapes put together make a new shape (two triangles make a square): parts making a whole",
      "opts": {}
     },
     {
@@ -8195,7 +8184,7 @@
     },
     {
      "key": "shapes_early:partition_shapes",
-     "why": "equal parts of a shape (halves and quarters of a shape) — Y2.B8.S3 Recognise a half (the same week, W17)",
+     "why": "Y1.B10.S6 Find a quarter of an object or a shape (prior learning wk W17): shapes cut into 2 or 4 equal parts: how many parts, and what fraction (1/2, 1/4) is shaded, so a half and two quarters can be seen on one shape",
      "opts": {
       "parts": [
        0,
@@ -8220,7 +8209,7 @@
    "related": [
     {
      "key": "measurement:time_half_hour",
-     "why": "half past: the minute hand makes a half turn — Y1.B14.S6 Tell the time to the half hour",
+     "why": "Y1.B14.S6 Tell the time to the half hour (K): half past, the minute hand has turned half way round the clock",
      "opts": {}
     }
    ],
@@ -8310,7 +8299,7 @@
    "pre": [
     {
      "key": "shapes_early:partition_shapes",
-     "why": "equal parts of a shape (halves and thirds and quarters of a shape) — Y2.B8.S13 Recognise three-quarters",
+     "why": "equal parts of a shape (halves and thirds and quarters of a shape) — Y2.B8.S7 Recognise a third",
      "opts": {
       "parts": [
        0,
@@ -8356,7 +8345,7 @@
    "pre": [
     {
      "key": "shapes_early:partition_shapes",
-     "why": "equal parts of a shape (halves and thirds and quarters of a shape) — Y2.B8.S13 Recognise three-quarters",
+     "why": "equal parts of a shape (halves and thirds and quarters of a shape) — Y2.B8.S7 Recognise a third",
      "opts": {
       "parts": [
        0,
@@ -8432,7 +8421,7 @@
     },
     {
      "key": "shapes_early:partition_shapes",
-     "why": "Y1.B10.S1 a half of a shape: half past is half way round (topic ladder)",
+     "why": "Y1.B10.S1 a half of a shape (used for half past: half way round the clock) (topic ladder)",
      "opts": {
       "parts": [
        0
@@ -8441,7 +8430,7 @@
     },
     {
      "key": "multiplication:count_by_tables",
-     "why": "counting in equal steps from 0 (counting in 2s, 5s, 10s from 0): the minutes on the clock — Y2.B1.S15 Count in 2s, 5s and 10s",
+     "why": "counting in equal steps from 0 (counting in 2s, 5s, 10s from 0) — Y2.B1.S15 Count in 2s, 5s and 10s",
      "opts": {
       "rows": [
        {
@@ -8648,7 +8637,7 @@
    "pre": [
     {
      "key": "multiplication:count_by_tables",
-     "why": "Y2.B5.S15 counting in 5s from 0: the minutes round the clock",
+     "why": "Y2.B5.S15 counting in 5s from 0 (the count used for the minutes round the clock)",
      "opts": {
       "rows": [
        {
@@ -8707,7 +8696,7 @@
    "pre": [
     {
      "key": "multiplication:count_by_tables",
-     "why": "Y2.B1.S15 counting in 5s from 0: 12 fives make the 60 minutes (xlsx W23 prior learning)",
+     "why": "Y2.B1.S15 counting in 5s from 0 to 60 (xlsx W23 prior learning; the count used for the 60 minutes of an hour)",
      "opts": {
       "rows": [
        {
@@ -9387,7 +9376,7 @@
     },
     {
      "key": "shapes_early:partition_shapes",
-     "why": "equal parts of a shape (halves and quarters of a shape) — Y2.B8.S13 Recognise three-quarters",
+     "why": "Y2.B8.S3 / Y2.B8.S6 a half and a quarter of a shape (Grade 1, W17): shapes cut into 2 or 4 equal parts: how many parts, and what fraction (1/2, 1/4) is shaded, the half and quarter a turn is named by",
      "opts": {
       "parts": [
        0,
@@ -9405,7 +9394,7 @@
    "related": [
     {
      "key": "measurement:time_half_hour",
-     "why": "half past: the minute hand makes a half turn — Y1.B14.S6 Tell the time to the half hour",
+     "why": "Y1.B14.S6 Tell the time to the half hour (K): half past, the minute hand has turned half way round the clock (a half turn)",
      "opts": {}
     }
    ],
@@ -9460,7 +9449,7 @@
    "related": [
     {
      "key": "measurement:time_half_hour",
-     "why": "half past: the minute hand makes a half turn — Y1.B14.S6 Tell the time to the half hour",
+     "why": "Y1.B14.S6 Tell the time to the half hour (K): half past, the minute hand has turned half way round the clock (a half turn)",
      "opts": {}
     },
     {
@@ -10115,7 +10104,7 @@
    "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true,
    "closes": {
-    "Y2.B6.S1": "a centimetre ruler (the skill reads inches only)",
+    "Y2.B6.S1": "reads an inch ruler (whole inches) only; measuring in centimetres on a centimetre ruler is not dealt",
     "Y2.B6.S2": "(prerequisite of this step)",
     "Y2.B6.S3": "(prerequisite of this step)",
     "Y2.B6.S4": "(prerequisite of this step)",
@@ -11047,6 +11036,13 @@
    },
    "why": "checks whether coins make an amount up to $1; making exactly $1 (100 cents) in different ways is not asked",
    "partial": "checks whether coins make an amount up to $1; making exactly $1 (100 cents) in different ways is not asked"
+  },
+  {
+   "key": "measurement:reading_ruler",
+   "step": "Y2.B6.S1",
+   "action": "partial",
+   "why": "reads an inch ruler (whole inches) only; measuring in centimetres on a centimetre ruler is not dealt",
+   "partial": "reads an inch ruler (whole inches) only; measuring in centimetres on a centimetre ruler is not dealt"
   },
   {
    "key": "comparing:compare_objects",

@@ -20,6 +20,7 @@ const _warn=console.warn;console.warn=()=>{};
 const {generateQuestionFor}=await import(root+'js/modules/generate-question.js');
 console.log=_log;console.warn=_warn;
 const MK=await import(HERE+'markers.mjs');
+const CL=await import(HERE+'claims.mjs');
 const {SKILL_WRM,WRM_PROPOSALS}=await import(root+'js/modules/wrm.js');
 const {SKILL_STANDARDS}=await import(root+'js/modules/standards.js');
 const {SKILL_ALIASES}=await import(root+'js/modules/skill-aliases.js');
@@ -86,6 +87,9 @@ const directOf=id=>{const o={...(OV.steps[id]||{}),...(OV.r3?.[id]||{})};let d,p
 const allOf=id=>{const ls=laneStep(id);if(ls)return [...new Set([...ls.direct,...ls.partial].map(e=>resolve(e.key)).filter(Boolean))];const o={...(OV.steps[id]||{}),...(OV.r3?.[id]||{})};if(o.mergeOnly)return allOf0(id,o).filter(k=>!o.mergeOnly.includes(k));return allOf0(id,o);};
 // r11: o.mergeOnly = a partial tag carried for the cross-lane merge only (another lane's clause): never a link source
 const allOf0=(id,o)=>{let d,p;if(o?.direct||o?.partials){d=(o.direct||[]).map(x=>x.key);p=(o.partials||[]).map(x=>x.key);}else{d=(tags[id]||[]).filter(t=>!t.partial).map(t=>t.key);p=(tags[id]||[]).filter(t=>t.partial).map(t=>t.key);}return [...new Set([...d,...p].map(k=>resolve(k)).filter(Boolean))];};
+// r12: is key k a DIRECT (full) skill of step id? A citation prefers the step where the key is direct (its title is true of the items)
+function directAt(id,k){const ls=laneStep(id);if(ls)return ls.direct.some(x=>resolve(x.key)===k);const ow={...(OV.steps[id]||{}),...(OV.r3?.[id]||{})};
+  if(ow.direct||ow.partials)return (ow.direct||[]).some(x=>resolve(x.key)===k);return (tags[id]||[]).some(t=>!t.partial&&resolve(t.key)===k);}
 function earlierStep(k,sid,sameYear){const y=sid.split('.')[0];const at=order.indexOf(sid);for(let j=at-1;j>=0;j--){const id=order[j];if(sameYear&&!id.startsWith(y+'.'))continue;if(typeof taughtBefore==='function'&&!taughtBefore(id,sid))continue;if(allOf(id).includes(k))return id;}return null;}
 const SAMESTD_SKIP=/:mixed_|_plain$/;
 // r3 rule 18: a pre/related LINK carries opts. Hand opts on the entry win; else the opts the referenced step (the first
@@ -129,7 +133,7 @@ function optsText(k,o={}){const t=[];if(o.constant)t.push((/div/.test(k)?'dividi
 // opts whose rows / tables / parts contain the link's, then any use of the key; ties go to the latest step
 function bestOwner(k,sid,o){const want=JSON.stringify(o||{});const set=x=>(x?.rows||[]).map(r=>r.step).concat(x?.constant||[],x?.parts||[]);const ws=set(o);let best=null,bs=-1;
   for(const id of order){if(id===sid||!allOf(id).includes(k))continue;if(id.startsWith(YEAR+'.')?!taughtBefore(id,sid):order.indexOf(id)>order.indexOf(sid))continue;
-    const so=stepOptsFor(id,k);const ss=set(so);const sc=JSON.stringify(so||{})===want?3:(ws.length&&ws.every(v=>ss.includes(v)))?2:1;if(sc>=bs){bs=sc;best=id;}}return best;}
+    const so=stepOptsFor(id,k);const ss=set(so);const sc=(JSON.stringify(so||{})===want?3:(ws.length&&ws.every(v=>ss.includes(v)))?2:1)*2+(directAt(id,k)?1:0);if(sc>=bs){bs=sc;best=id;}}return best;}
 function taughtAt(k,sid,o){if(o&&Object.keys(o).length){const b=bestOwner(k,sid,o);if(b)return b;}if(o&&Object.keys(o).length){let b2=null;for(const id of order){if(id===sid||!allOf(id).includes(k))continue;if(id.startsWith(YEAR+'.')?!taughtBefore(id,sid):order.indexOf(id)>order.indexOf(sid))continue;if(JSON.stringify(stepOptsFor(id,k))===JSON.stringify(o))b2=id;}if(b2)return b2;}
   let best=null;for(const id of order){if(id===sid||!allOf(id).includes(k))continue;if(id.startsWith(YEAR+'.')?!taughtBefore(id,sid):order.indexOf(id)>order.indexOf(sid))continue;if(!best||taughtBefore(best,id))best=id;}return best;}
 // r8 (A2): the rebuilt why says what the skill does in words (whyText; else the catalogue label without its "(Visual)"
@@ -268,7 +272,19 @@ function bbRank(P,k){const f=bbKey(k);
   return [2,0];}
 const bbSort=(P,list)=>{const r=list.map((e,i)=>({e,i,c:e.hand?[-e.hand,0]:bbRank(P,e.key)}));r.sort((a,b)=>a.c[0]-b.c[0]||a.c[1]-b.c[1]||a.i-b.i);return r.map(x=>x.e);};
 const keyFirstWk={};for(const st of yr.blocks.flatMap(bb=>bb.steps))for(const k of allOf(st.id))keyFirstWk[k]=Math.min(keyFirstWk[k]??999,SWK[st.id]??999);
-const usedProps=new Set();const missingReview=[];const bbStats={n:0,bad:0,cls:{}};
+const titleStats={half:0,nlp:0,bad:0};
+const CLAIMVERB={sorts:'sort',clicks:'click',drags:'drag',converts:'convert','number line':'use a number line',litres:'use litres','ruler / scale':'read a scale',money:'use money','ounces / pounds':'use pounds',centimetres:'use centimetres',metres:'use metres',kilograms:'use kilograms',grams:'use grams',millilitres:'use millilitres','minutes / hours / seconds':'tell the time','equal parts':'name equal parts','graph / chart / table':'use a graph or table',fractions:'use fractions'};
+// the school teaches the UK money steps in US money: a cited title's pounds / pence / notes are dollars / cents / bills
+const usTitle=id=>{const t=stepById[id].title;return /pound|pence|\bnotes\b/i.test(t)?t.replace(/\bpounds\b/gi,'dollars').replace(/\bpound\b/gi,'dollar').replace(/\bpence\b/gi,'cents').replace(/\bnotes\b/gi,'bills').replace(/£/g,'$'):t;};
+// the items a title claim is judged on: 30 print-path items on the build's own seeds (not the sweep's), with the picture's raw
+// markup, the cell template and payload (a representation claim reads them, as the sweep does)
+const _ci=new Map();const _st=x=>String(x??'').replace(/<style[\s\S]*?<\/style>/g,'').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&#?\w+;/g,' ').replace(/\s+/g,' ');
+const _lb=x=>x==null?'':typeof x==='object'?(x.label??x.text??x.html??JSON.stringify(x)):String(x);
+const claimItems=(k,o)=>{const id=k+JSON.stringify(o||{});if(_ci.has(id))return _ci.get(id);const [c,sk]=k.split(':');const out=[];
+  for(let i=0;i<30;i++){let q;try{q=generateQuestionFor({category:c,skill:sk,opts:o||{},seed:61331+i*73,itemIndex:i%20,itemCount:20});}catch(_){continue;}if(!q)continue;
+    out.push({text:_st(q.text),a:_st(typeof q.ans==='object'?JSON.stringify(q.ans):q.ans),x:_st([...(q.options||[]),...(q.tiles||[]),...(q.bins||[]),...(q.items||[])].map(_lb).join(' ; ')),vis:_st(q.visual),raw:String(q.visual||'').toLowerCase().slice(0,6000),tpl:q.cell?q.cell.template:'',pay:q.cell?JSON.stringify(q.cell.payload):''});}
+  _ci.set(id,out);return out;};
+const usedProps=new Set();const missingReview=[];const bbStats={n:0,bad:0,cls:{}};const optStats={n:0,spec:0,bad:0,rule:{}};
 for(const b of yr.blocks){ if(b.number>MAXB)continue;
  b.steps.forEach((s,i)=>{
   const o={...(OV.steps[s.id]||{}),...(OV.prePatch?.[s.id]||{}),...(OV.r3?.[s.id]||{})};if(OV.gapMissing?.[s.id])o.missing=OV.gapMissing[s.id];
@@ -359,10 +375,10 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
       r=pick(divs.filter(x=>x.startsWith(YEAR+'.')))||pick(divs.filter(x=>!x.startsWith(YEAR+'.')));
       if(!r&&CBT_HOME!==s.id&&taughtBefore(CBT_HOME,s.id))fallback=true;
       if(fallback){const ns=tabsD;const tn=ns.map(n=>n+'s').join(' and ');
-        const w=`counting in 2s, 5s and 10s from 0: `+(d.key==='division:div_facts'?`the multiples this step divides${ns.every(n=>[2,5,10].includes(n))?' ('+tn+')':' are counted the same way, in '+tn}`:ns.every(n=>[2,5,10].includes(n))?`the count this step writes as a table (${tn})`:`the same count from 0 that this step makes in ${tn}`)+` — ${CBT_HOME} Count in 2s, 5s and 10s (${CBT_HOME.startsWith(YEAR+'.')?'W'+SWK[CBT_HOME]:'Grade '+({Y1:'K',Y2:'1',Y3:'2'}[prevYear]??prevYear)})`;
+        const w=`counting in 2s, 5s and 10s from 0: `+(d.key==='division:div_facts'?`the multiples used when this step divides${ns.every(n=>[2,5,10].includes(n))?' ('+tn+')':' are counted the same way, in '+tn}`:ns.every(n=>[2,5,10].includes(n))?`the count this step writes as a table (${tn})`:`the same count from 0 that this step makes in ${tn}`)+` — ${CBT_HOME} Count in 2s, 5s and 10s (${CBT_HOME.startsWith(YEAR+'.')?'W'+SWK[CBT_HOME]:'Grade '+({Y1:'K',Y2:'1',Y3:'2'}[prevYear]??prevYear)})`;
         if(!dropPre.has('multiplication:count_by_tables')&&!cands.some(c=>c.key==='multiplication:count_by_tables'))cands.push({key:'multiplication:count_by_tables',why:w,tier:1,ord:ord++,opts:CBT_ROWS,keep:true});
         continue;}}
-    else{rungs.sort(latest);r=rungs.pop()||null;}
+    else{rungs.sort(latest);r=rungs.pop()||null;if(r&&!directAt(r,d.key)){const same=[...rungs].reverse().find(x=>JSON.stringify(so(x))===JSON.stringify(so(r))&&directAt(x,d.key));if(same)r=same;}}
     if(!r)continue;const same=r.startsWith(YEAR+'.');const ro=so(r);const when=same?'taught earlier, W'+SWK[r]:'Grade '+({Y1:'K',Y2:'1',Y3:'2'}[prevYear]??prevYear);
     let rel;if(rungSame(d.key,ro,d.opts))rel="this step's skill as it was met then"+(rungDeals(d.key,ro,d.opts)?' ('+rungDeals(d.key,ro,d.opts)+')':'');
     else if(tabsD){const t=tabsOf(ro);const big=tabsD.filter(w=>t.every(v=>w%v===0));rel=`${rungDeals(d.key,ro,d.opts)}: every multiple of ${big.join(' and ')} is a multiple of ${t.join(' and ')}`;}
@@ -412,11 +428,16 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
    if(false)for(const c of s.ccss){for(const k of byStd[c]||[]){if(related.length>=2)break;if(SAMESTD_SKIP.test(k))continue;addRel(k,`also teaches ${c} (this step's standard): ${label[k]}`);}}
   }
   if(!related.length&&!o.relNote)console.error('NOREL',s.id,s.title);
-  for(const e of [...pre,...related])e.opts=linkOpts(e);
+  for(const e of [...pre,...related]){e.opts=linkOpts(e);e.o0=e.key+'|'+JSON.stringify(e.opts||{});e.why0=e.why;e.rules=[];}
+  // r12 OPTGATE (the root-cause guard, Y5 critic r7 class N): from here on a link's key / opts change ONLY through a named
+  // spec rule: linkFix (per step), linkSwap (year-wide), markerFix (only when OV.markerFixOk lists that exact change for the
+  // step, written by hand after the why was re-read on items), count0 (a count from 0 named by its why). Anything else is a
+  // build error at the end of the step.
+  const setRule=(e,r,from)=>{e.o0=from?.o0??e.o0;e.why0=from?.why0??e.why0;e.rules=[...(from?.rules||e.rules||[]),r];return e;};
   const yo=OV.linkOpts?.[YEAR]||{};
   for(const list of [pre,related])for(let j=list.length-1;j>=0;j--)if(yo[list[j].key]===null&&!Object.keys(list[j].opts||{}).length)list.splice(j,1);
   const lf=OV.linkFix?.[s.id]||{};
-  for(const list of [pre,related])for(let j=list.length-1;j>=0;j--){const f=lf[list[j].key];if(f===null)list.splice(j,1);else if(f)list[j].opts=f;}
+  for(const list of [pre,related])for(let j=list.length-1;j>=0;j--){const f=lf[list[j].key];if(f===null)list.splice(j,1);else if(f){list[j].opts=f;setRule(list[j],'linkFix');}}
   // r4 (critic r3 S9, rule 18 content): year-wide link swaps. {to:null} drops the link (and may name a preBuild that
   // stands in for it); {to:key, opts} replaces it. `only` limits a swap to matching step ids. Rule 12 (keep an earlier
   // partial as pre) yields to rule 18 when that partial deals content above the pupil.
@@ -424,11 +445,11 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
   for(const list of [pre,related])for(let j=list.length-1;j>=0;j--){const e=list[j];const sw=SW[e.key];if(!sw||(sw.only&&!sw.only.test(s.id))||(sw.not&&sw.not.test(s.id)))continue;
     if(sw.preBuild&&list===pre&&!build.includes(sw.preBuild)&&!preBuild.includes(sw.preBuild)){preBuild.push(sw.preBuild);usedProps.add(sw.preBuild);}
     if(!sw.to){list.splice(j,1);continue;}
-    list[j]={key:sw.to,why:sw.to===e.key?e.why:descWhy(sw.to,sw.opts||{},s.id,''),opts:sw.opts||{},swapped:true,...(e.hand?{hand:e.hand}:{})};}
+    list[j]=setRule({key:sw.to,why:sw.to===e.key?e.why:descWhy(sw.to,sw.opts||{},s.id,''),opts:sw.opts||{},swapped:true,...(e.hand?{hand:e.hand}:{})},'linkSwap',e);}
   for(const list of [pre,related]){const seen=new Set();const preKO=new Set(pre.map(x=>x.key+'|'+JSON.stringify(x.opts||{})));const preK=new Set(pre.map(x=>x.key));for(let j=0;j<list.length;j++){const k=list[j].key;const ko=k+'|'+JSON.stringify(list[j].opts||{});
     // r9: a related link repeats a pre only when its opts are the same (or it has none): mult_facts {2} next to pre mult_facts {5,10} is a new table
     const dupPre=list===related&&preK.has(k)&&!pre.filter(p=>p.key===k).every(p=>disjointOpts(p.opts,list[j].opts));if(list[j].keep?seen.has(ko):((list===pre?isDirectPre:isDirectRel)(k,list[j].opts)||seen.has(k)||dupPre)){list.splice(j,1);j--;}else{seen.add(k);seen.add(ko);}}}
-  if(pre.length<3)for(const l of (OV.ladders?.[topic(s)]||[])){const k=resolve(l.key);if(pre.length>=3)break;if(isDirectPre(k,l.opts)||pre.find(x=>x.key===k)||(SW[k]&&!SW[k].to&&(!SW[k].only||SW[k].only.test(s.id))))continue;const rr=related.findIndex(x=>x.key===k);if(rr>=0)related.splice(rr,1);pre.push({key:k,why:l.why+' (topic ladder)',opts:l.opts||OV.linkOpts?.[YEAR]?.[k]||{}});}
+  if(pre.length<3)for(const l of (OV.ladders?.[topic(s)]||[])){const k=resolve(l.key);if(pre.length>=3)break;if(isDirectPre(k,l.opts)||pre.find(x=>x.key===k)||(SW[k]&&!SW[k].to&&(!SW[k].only||SW[k].only.test(s.id))))continue;const rr=related.findIndex(x=>x.key===k);if(rr>=0)related.splice(rr,1);{const le={key:k,why:l.why+' (topic ladder)',opts:l.opts||OV.linkOpts?.[YEAR]?.[k]||{},rules:[]};le.o0=le.key+'|'+JSON.stringify(le.opts);pre.push(le);}}
   // r5 (rules 18-19): every link must be content met by this step's SCHOOL week. A pre that cites a step of this year
   // taught later is dropped; a link whose generated items carry a content marker first met later (scan TOL 2 weeks) tries
   // OV.markerFix alternatives (other opts / another skill) and is otherwise dropped. Then the topic ladder refills pre.
@@ -437,7 +458,7 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
     if(c.length)return c.some(x=>!taughtBefore(x,s.id))&&!c.some(x=>taughtBefore(x,s.id));
     return (keyFirstWk[e.key]??0)>(SWK[s.id]??999)+1&&!/Y\d\.|R\./.test(e.why);};
   const fixLink=(e)=>{if(!markerHits(e.key,e.opts,s.id).length)return e;
-    for(const alt of OV.markerFix?.[YEAR]?.[e.key]||[]){const ne={key:alt.key||e.key,why:descWhy(alt.key||e.key,alt.opts||{},s.id,(alt.key&&alt.key!==e.key)?'':e.why),opts:alt.opts||{}};
+    for(const alt of OV.markerFix?.[YEAR]?.[e.key]||[]){const ne=setRule({key:alt.key||e.key,why:descWhy(alt.key||e.key,alt.opts||{},s.id,(alt.key&&alt.key!==e.key)?'':e.why),opts:alt.opts||{}},'markerFix',e);
       if(!isDirect(ne.key,ne.opts)&&!markerHits(ne.key,ne.opts,s.id).length)return ne;}
     return null;};
   const dropped=[];const coreKeys=new Set((o.core||[]).map(c=>resolve(c.key)));
@@ -447,7 +468,7 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
     // r9: a related link repeats a pre only when its opts are the same (or it has none): mult_facts {2} next to pre mult_facts {5,10} is a new table
     const dupPre=list===related&&preK.has(k)&&!pre.filter(p=>p.key===k).every(p=>disjointOpts(p.opts,list[j].opts));if(list[j].keep?seen.has(ko):((list===pre?isDirectPre:isDirectRel)(k,list[j].opts)||seen.has(k)||dupPre)){list.splice(j,1);j--;}else{seen.add(k);seen.add(ko);}}}
   if(pre.length<3)for(const l of (OV.ladders?.[topic(s)]||[])){const k=resolve(l.key);if(pre.length>=3)break;if(isDirectPre(k,l.opts)||pre.find(x=>x.key===k))continue;
-    const e={key:k,why:l.why+' (topic ladder)',opts:l.opts||OV.linkOpts?.[YEAR]?.[k]||{}};if(citesLater(e))continue;const ne=fixLink(e);if(!ne)continue;const rr=related.findIndex(x=>x.key===ne.key);if(rr>=0)related.splice(rr,1);pre.push(ne);}
+    const e={key:k,why:l.why+' (topic ladder)',opts:l.opts||OV.linkOpts?.[YEAR]?.[k]||{},rules:[]};e.o0=e.key+'|'+JSON.stringify(e.opts);if(citesLater(e))continue;const ne=fixLink(e);if(!ne)continue;const rr=related.findIndex(x=>x.key===ne.key);if(rr>=0)related.splice(rr,1);pre.push(ne);}
   // a kept pre whose why also names a same-year step taught LATER (the content is earlier-grade learning): drop that name
   for(const e of pre){for(const x of [...String(e.why).matchAll(/Y\d\.B\d+\.S\d+/g)].map(m=>m[0]))if(x.startsWith(YEAR+'.')&&!taughtBefore(x,s.id)){const q=x.replace(/\./g,'\\.');e.why=e.why.replace(new RegExp('\\s*/\\s*'+q),'').replace(new RegExp(q+'\\s*/\\s*'),'');}}
   // r10 (critic r9 N5a): seq_2/5/10 count on from ANY number ("16, 26, 36"); a link that cites a count from 0 ("Count in 10s",
@@ -458,11 +479,11 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
     const N=m[1]?+m[1]:countNs(e.why)[0];if(!N)continue;const row={step:N,start:'zero',dir:'up'};if(list===pre&&isDirectPre('multiplication:count_by_tables',{rows:[row]})){list.splice(j,1);j--;continue;}
     // a row always holds 12 numbers (0 ... 110 in 10s): above 100 before Grade 1 counts past 100 (Y2.B1.S15, W4), so it is dropped there
     if(YEAR==='Y2'&&N*11>100&&(SWK[s.id]??999)<(SWK['Y2.B1.S15']??0)){list.splice(j,1);j--;continue;}const ex=list.find((x,i)=>i!==j&&x.key==='multiplication:count_by_tables');
-    if(ex){const rows=[...(ex.opts?.rows||[])];if(!rows.some(r=>r.step===row.step)){rows.push(row);rows.sort((x,y)=>x.step-y.step);if(!(list===pre&&isDirectPre(ex.key,{...(ex.opts||{}),rows}))){ex.opts={...(ex.opts||{}),rows};const ns=rows.map(r=>r.step);const ci=[...new Set([...String(ex.why).matchAll(/(R|Y\d)\.B\d+\.S\d+/g),...String(e.why).matchAll(/(R|Y\d)\.B\d+\.S\d+/g)].map(x=>x[0]))];
+    if(ex){const rows=[...(ex.opts?.rows||[])];if(!rows.some(r=>r.step===row.step)){rows.push(row);rows.sort((x,y)=>x.step-y.step);if(!(list===pre&&isDirectPre(ex.key,{...(ex.opts||{}),rows}))){ex.opts={...(ex.opts||{}),rows};setRule(ex,'count0');const ns=rows.map(r=>r.step);const ci=[...new Set([...String(ex.why).matchAll(/(R|Y\d)\.B\d+\.S\d+/g),...String(e.why).matchAll(/(R|Y\d)\.B\d+\.S\d+/g)].map(x=>x[0]))];
       ex.why=`counting in ${ns.slice(0,-1).join(', ')}${ns.length>1?' and ':''}${ns[ns.length-1]}s from 0${ci.length?' ('+ci.join(', ')+')':''}`;}}list.splice(j,1);j--;continue;}
     {const own=order.find(id=>id.startsWith(YEAR+'.')&&id!==s.id&&taughtBefore(id,s.id)&&allOf(id).includes('multiplication:count_by_tables')&&(stepOptsFor(id,'multiplication:count_by_tables')?.rows||[]).some(r=>r.step===N&&r.start==='zero'));
      const ci=[...new Set([...[...String(e.why).matchAll(/(R|Y\d)\.B\d+\.S\d+/g)].map(x=>x[0]),...(own?[own]:[])])];const tail=String(e.why).replace(/\([^)]*\)/g,'').split(':').slice(1).join(':').trim().replace(/\b(the )?tens on the line\b/,'the tens marked on the line');
-     list[j]={...(e.hand?{hand:e.hand}:{}),key:'multiplication:count_by_tables',opts:{rows:[row]},why:`${ci.length?ci.join(' / ')+' ':''}counting in ${N}s from 0${tail?': '+tail:''}`};}}
+     list[j]=setRule({...(e.hand?{hand:e.hand}:{}),key:'multiplication:count_by_tables',opts:{rows:[row]},why:`${ci.length?ci.join(' / ')+' ':''}counting in ${N}s from 0${tail?': '+tail:''}`},'count0',e);}}
   {const pk=new Set(pre.map(x=>x.key));for(let j=related.length-1;j>=0;j--)if(related[j].key==='multiplication:count_by_tables'&&pk.has(related[j].key)&&!pre.filter(x=>x.key===related[j].key).every(x=>disjointOpts(x.opts,related[j].opts)))related.splice(j,1);}
   for(const e of [...pre,...related]){if(e.swapped&&e.why.includes('[rule'))e.why=descWhy(e.key,e.opts,s.id,e.why);delete e.swapped;
     e.why=String(e.why).replace(/\s*\[rule \d+[^\]]*\]/g,'');
@@ -479,10 +500,27 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
   // sound skill (and that skill leaves related); on any other step its why says what is broken (`why` per step, else + note)
   for(const bl of OV.brokenLinks||[])for(let j=0;j<pre.length;j++){const e=pre[j];if(e.key!==bl.key||JSON.stringify(e.opts||{})!==JSON.stringify(bl.opts))continue;
     if(bl.swap&&bl.swap.when.test(s.id)){const sw=bl.swap;if(pre.some(x=>x.key===sw.key&&JSON.stringify(x.opts||{})===JSON.stringify(sw.opts))){pre.splice(j,1);j--;continue;}
-      pre[j]={key:sw.key,opts:sw.opts,why:sw.why,...(e.hand?{hand:e.hand}:{})};for(let r=related.length-1;r>=0;r--)if(related[r].key===sw.key)related.splice(r,1);continue;}
+      pre[j]=setRule({key:sw.key,opts:sw.opts,why:sw.why,...(e.hand?{hand:e.hand}:{})},'brokenLink',e);for(let r=related.length-1;r>=0;r--)if(related[r].key===sw.key)related.splice(r,1);continue;}
     if(bl.why?.[s.id])e.why=bl.why[s.id];else if(!e.why.includes(bl.note))e.why+=bl.note;}
   // r12: OV.whyFix[stepId][key] = the why of that pre link, written for this step (applied last, after every rewrite)
   for(const e of pre){const w=OV.whyFix?.[s.id]?.[e.key];if(w)e.why=w;}
+  for(const e of related){const w=OV.relWhyFix?.[s.id]?.[e.key];if(w)e.why=w;}
+  // r12 TITLECLAIM (the cited title is a claim, Y5 critic r6 H'): a why that cites a step claims that step's title. When the
+  // title names what the link's items never deal: an "add and subtract" title on a one-operation skill gets the half marker
+  // ("the adding half"); a skill that is only PARTIAL at the cited step gets "nearest live practice" (the title is the step's,
+  // the skill is its partial practice); a skill that is DIRECT there is a build error (the why or the opts must change by hand)
+  for(const [role,list] of [['pre',pre],['related',related]])for(const e of list){if(/nearest live practice/.test(e.why))continue;
+    const ids=[...new Set([...String(e.why).matchAll(/(?:R|Y\d)\.B\d+\.S\d+/g)].map(m=>m[0]))].filter(id=>stepById[id]);if(!ids.length)continue;
+    const its=claimItems(e.key,e.opts);if(!its.length)continue;
+    for(const id of ids){const t=usTitle(id);const bad=CL.claimHits(t,its).filter(h=>!h.ok);if(!bad.length)continue;
+      const ops=bad.map(h=>h.claim);const both=/\badd/i.test(t)&&/subtract/i.test(t)||/multipl/i.test(t)&&/divi/i.test(t);
+      if(both&&ops.every(c=>['adds','subtracts','multiplies','divides'].includes(c))){const half={subtracts:'adding',adds:'subtracting',divides:'multiplication',multiplies:'division'}[ops[0]];
+        if(!e.why.includes('the '+half+' half'))e.why=e.why.replace(/\)\s*$/,'')+(/\)\s*$/.test(e.why)?'; ':' (')+'the '+half+' half)';titleStats.half++;continue;}
+      const ls=laneStep(id);const ow={...(OV.steps[id]||{}),...(OV.r3?.[id]||{})};
+      const [dK,pK]=ls?[ls.direct.map(x=>resolve(x.key)),ls.partial.map(x=>resolve(x.key))]:(ow.direct||ow.partials)?[(ow.direct||[]).map(x=>resolve(x.key)),(ow.partials||[]).map(x=>resolve(x.key))]:[(tags[id]||[]).filter(t=>!t.partial).map(t=>resolve(t.key)),(tags[id]||[]).filter(t=>t.partial).map(t=>resolve(t.key))];const isPartial=pK.includes(e.key)&&!dK.includes(e.key);
+      const notThere=!allOf(id).includes(e.key);
+      if(isPartial||notThere){e.why=e.why.replace(/\)\s*$/,'')+(/\)\s*$/.test(e.why)?'; ':' (')+`nearest live practice: ${id} has ${isPartial?'it as a partial skill':'no skill that does this'}, and these items never ${ops.map(c=>CLAIMVERB[c]||c).join(' or ')})`;titleStats.nlp++;break;}
+      console.error('TITLECLAIM',s.id,role,e.key,JSON.stringify(e.opts||{}),'cites',id,t,'| false:',ops.join(','));process.exitCode=1;titleStats.bad++;}}
   {const srt=bbSort(BB,pre);pre.splice(0,pre.length,...srt);}
   // r12 BBCHECK (the building-block sweep, a build gate): the lead pre is a building block of the step (never a word problem
   // on a non-problem step; on an addition / subtraction or multiplication / division step never the inverse, a fact family
@@ -493,7 +531,15 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
     if(!BB.wp){const fw=pre.slice(0,8).findIndex(isWp);if(fw>=0&&pre.slice(fw+1,8).some(e=>!isWp(e)))bad.push('a word problem before a building block');}
     bbStats.n++;bbStats.cls[pre.length?(pre[0].hand?'hand':rs[0][0]):'none']=(bbStats.cls[pre.length?(pre[0].hand?'hand':rs[0][0]):'none']||0)+1;
     if(bad.length){console.error('BBCHECK',s.id,s.title,'|',bad.join('; '),'|',pre.slice(0,3).map(e=>e.key).join(', '));process.exitCode=1;bbStats.bad++;}}
-  pre.splice(8);related.splice(6);for(const e of [...pre,...related]){delete e.keep;delete e.hand;}
+  pre.splice(8);related.splice(6);
+  // r12 OPTGATE: every link's final key + opts is its spec value, or the change is a named spec rule (markerFix only when approved)
+  for(const [role,list] of [['pre',pre],['related',related]])for(const e of list){const now=e.key+'|'+JSON.stringify(e.opts||{});
+    if(!e.o0){console.error('OPTGATE',s.id,role,now,'link has no spec origin');process.exitCode=1;optStats.bad++;continue;}
+    optStats.n++;if(now===e.o0){optStats.spec++;continue;}
+    const rs=e.rules||[];if(!rs.length){console.error('OPTGATE',s.id,role,e.o0,'->',now,'changed by no named rule');process.exitCode=1;optStats.bad++;continue;}
+    if(rs.includes('markerFix')){const sig=`${s.id}|${e.o0}->${now}`;if(!(OV.markerFixOk||[]).includes(sig)){console.error('OPTGATE',s.id,role,'markerFix not approved:',sig,'\n     spec why:',e.why0,'\n     now why :',e.why);process.exitCode=1;optStats.bad++;continue;}}
+    for(const r of new Set(rs))optStats.rule[r]=(optStats.rule[r]||0)+1;}
+  for(const e of [...pre,...related]){delete e.keep;delete e.hand;delete e.o0;delete e.rules;delete e.why0;}
   // r6: never-in-grade content on the step's own skills must be named (critic r5: B4.S8 class)
   for(const d of [...direct,...partial])for(const h of markerHits(d.key,d.opts,s.id).filter(h=>MK.NEVERDIRECT[YEAR].includes(h.m)))
     if(!(o.neverNamed||[]).includes(d.key))console.error('NEVERDIRECT',s.id,verdict,d.key,JSON.stringify(d.opts||{}),h.m,h.ex);
@@ -552,6 +598,8 @@ fs.mkdirSync(root+'data/curriculum/links',{recursive:true});
 fs.writeFileSync(root+`data/curriculum/links/${YEAR}.json`,JSON.stringify(out,null,1)+'\n');
 // r10 (critic r9 N7): the merge assertion — tagFixes applied to SKILL_WRM must reproduce every tag, clause and step verdict
 {const MC=await import(HERE+'mergecheck23.mjs');const mr=await MC.mergeCheck(JSON.parse(JSON.stringify(out)));for(const p of mr.problems)console.error('MERGE',p);if(mr.problems.length)process.exitCode=1;console.error(`mergecheck ${YEAR}: ${mr.problems.length} problems`);}
+console.error(`optgate ${YEAR}: ${optStats.n} links, ${optStats.spec} at their spec opts, changed by a named rule ${JSON.stringify(optStats.rule)}, ${optStats.bad} problems`);
+console.error(`titleclaim ${YEAR}: half markers ${titleStats.half}, nearest-live-practice ${titleStats.nlp}, ${titleStats.bad} problems`);
 console.error(`bbcheck ${YEAR}: ${bbStats.n} steps swept, ${bbStats.bad} problems; lead pre by class ${JSON.stringify(bbStats.cls)}`);
 const c={full:0,partial:0,gap:0};for(const s of Object.values(out.steps))c[s.verdict]++;
 const pr=Object.values(out.proposals);
