@@ -3172,14 +3172,7 @@ export function cellDigitTarget(cellEl) {
  */
 export function screenTwin(q, { categoryId = '', typedOrder = false } = {}) {
     if (!q) return null;
-    // TY-10b (critic phone29): on a phone a count-by row is drawn again with its gap capped at 24 px absolute, so the
-    // geometry (box pitch, arcs) is laid out on the narrower pitch and three whole columns fit the worksheet / quiz window
-    // skip-count r2 (critic r1 D3): the cap is now applied at layout time by wireSwipeRows (phoneGap), so a row drawn at any
-    // width and then resized ends as a fresh load does; the second drawing is kept off here
-    if (false && q.cell && q.cell.template === 'count-row' && q.cell.payload && typeof window !== 'undefined' && window.innerWidth <= 480
-        && /class="k2-twin"/.test(String(q.visual || ''))) {
-        try { q = Object.assign({}, q, { visual: k2Twin('count-row', Object.assign({}, q.cell.payload, { twinGapPx: 24 })) }); } catch (e) { /* keep the stored twin */ }
-    }
+    // skip-count r2 (critic r1 D3): a count-by row's 24 px phone gap is applied at layout time by wireSwipeRows (phoneGap)
     const kt = kitCellTwin(q, { categoryId, typedOrder });
     if (kt) return kt;
     const t = q.answerType;
