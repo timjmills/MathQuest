@@ -82,7 +82,7 @@
 - Site lessons: data/curriculum/site-lessons.json (143 lessons, id = "<school grade>|-|<title slug>", the site's tracker key)
   and the per-year "lessons" section (shape in Y5-report.md "Site lessons"). Lessons emit NO tagFixes; 12 lesson-only
   proposals have empty `steps` — a WRM_PROPOSALS merge must read `lessons` too. Each other lane takes its wrmYear entries from
-  site-lessons.json (Y1 39, Y4 23, Y6 24, Y2 8, Y3 25; R none).
+  site-lessons.json (Y1 39, Y2 11, Y3 25, Y4 23, Y6 24; R none).
 - Optional minors from critic r8 (no grade change): claims.mjs array claim on picture only; M check strip bracketed examples;
   B7.S10 round_decimals {precision:[0]}; lesson 6/8/20 whys; B14.S4 typo.
 - Owner questions with recommendations: Y5-report.md (site lessons section + rounds 2-6).
