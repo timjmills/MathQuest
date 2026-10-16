@@ -361,7 +361,7 @@ attending to the later ones. The Chunked Flow splits the I Do and We Do into two
 of equal total time, teaching the first half of the routine and practising it before the second
 half is introduced.
 
-**In this planner:** A trigger rule detects routines with 4+ new atoms and switches the lesson
+**In this planner:** A trigger rule detects routines with 4 or more routine steps tagged New (§7) and switches the lesson
 to Chunked Flow. Total instructional time is unchanged.
 
 ---
@@ -2219,15 +2219,17 @@ whiteboards. Flip: restore V20 Sections 1a/1b/2 (5 + 5 + 3 min) and drop P0.
 
 ---
 
-### Chunked Flow — Use When the Routine Has 4+ New Atoms
+### Chunked Flow — Use When the Routine Table Has 4+ Steps Tagged New
+
+**Chunked-flow trigger (the one definition, used everywhere):** count the rows of the T2 Routine table (Section 2) whose Tag is `New`. **4 or more → Chunked; 3 or fewer → Standard.** T1 prints the result with the count, e.g. `Flow: Standard (3 new routine steps)` (self-check E21b).
 
 **First ask whether the routine should be two lessons.** One new thing per step [PED P-1]: a procedure
-with 4 or more new atoms is usually two lessons (for example a decide-only or notate-only lesson first,
+with 4 or more new routine steps is usually two lessons (for example a decide-only or notate-only lesson first,
 then the full routine) [PED P-9]. Propose the split to the teacher. Use Chunked Flow only when the
 teacher keeps one lesson [AUD C-20].
 
-When the Routine Atomisation table (T2 Section 2) contains four or more new steps
-(no ★ prerequisite tag) and the teacher keeps one lesson, a single 12-minute I Do creates too much to
+When the Routine Atomisation table (T2 Section 2) has four or more rows tagged `New`
+and the teacher keeps one lesson, a single 12-minute I Do creates too much to
 hold in working memory at once. Switch the lesson to Chunked Flow. Total time is identical — only the
 structure changes.
 
@@ -2247,9 +2249,9 @@ structure changes.
 | — | Transitions | 2 min |
 | **Total** | | **60 min** |
 
-**Trigger rule:** Count the new steps in the Routine Atomisation table. 3 or fewer → Standard
-Flow. 4 or more → propose two lessons; if the teacher keeps one, Chunked Flow. State which flow is used
-on T1 and at the top of T3.
+**Trigger rule:** as stated at the top of this section (rows tagged `New` in the Routine table: 4 or more →
+propose two lessons; if the teacher keeps one, Chunked Flow). State the flow and the count on T1 and at the
+top of T3.
 
 **Chunked Flow and optional enhancements:** If using Chunked Flow, limit to one optional
 enhancement maximum (not two), as the flow change itself costs structural flexibility.
@@ -2498,13 +2500,16 @@ Teacher band labels (teacher pages only): `Lesson guidance:` `Lesson flow:` `Mat
   white 11 pt bold numeral (8.4 mm wide for 2 digits), numbering 1…N down the page.
 - **No split cell** (PG-21): `break-inside: avoid` on every cell; a band is never split from its first
   row; a word problem with its routine panel, and a Model with its Steps, are keep-together units.
-- **Empty bands** (RUBRIC H13, measured the site's way): no cell may leave an empty band of 30 % or more of
-  its height or width. Slots, digit strips and answer rows count as content (they are ink). A written answer
-  (a slot or an answer row) may keep **one Hw (10 mm)** of open space under its lowest mark; anything beyond
-  that is an empty band. The only exemption is a cell the pupil DRAWS or WORKS on (a `Workspace:` band, a
-  picture to shade, partition, mark or plot, hops to draw, a work grid): there the open zone is the answer.
-  Spare height beyond the allowance means: add a row (OR-a), or move the height to another band — never
-  leave it in the cells.
+- **Empty bands** (RUBRIC H13, measured exactly as the site's `sheetCheck`): take the box around every
+  content element of the cell — every leaf element (no child elements, or an SVG, or a slot) and every element
+  with a border, the item letter excepted — and measure the gaps from that box to the cell's **border box**
+  (the 3 mm padding counts as empty). The largest top-or-bottom gap ÷ cell height and the largest left-or-right
+  gap ÷ cell width must each be **under 30 %** (cells under 40 px are skipped). A reserved answer row or slot
+  is content, so the pupil's writing place is never "empty"; open space under it is. Text sitting loose in a
+  container is not an element: wrap printed numbers and words in their own `<span>` so they count. The only
+  exemption is a cell the pupil DRAWS or WORKS on (a `Workspace:` band, a picture to shade, partition, mark or
+  plot, hops to draw, a work grid). Spare height means: add a row (OR-a), give the height to another band, or
+  fix a short band's height to its content (content + 2 × 7 mm) — never leave it in the cells.
 - **Trailing positions** (PG-15): item counts round to full rows; any remainder is one unruled blank
   area inside the frame, never empty lettered cells.
 
@@ -2601,8 +2606,8 @@ function itemsPerPage(page):
 ```
 1. Fix sizes: type, digits, Hw, B(n), picture minimums (size L). These never change.
 2. Choose the grid from 8.12.1 (columns x rows); cells are equal (1fr x 1fr) and fill the body exactly.
-3. Spare height in every cell goes to its answer / work zone, up to one Hw (10 mm) under a written answer
-   (no cap for a draw / work cell). More spare than that: step 5.
+3. Spare height in every cell goes to its answer / work zone only while every band stays under 30 % (§8.9,
+   measured from the border box; no cap for a draw / work cell). More spare than that: step 5.
 4. Pictures may grow to <= 1.25 x their minimum, the same size in every cell of the section (8.12.3).
 5. Still spare and the page below its ceiling? add a row of problems. Recompute from step 2.
 6. Banded pages (lesson sheet, word problem) give the spare height to the bands in this order:
@@ -2620,6 +2625,7 @@ function itemsPerPage(page):
 | It is the anchor chart | Step drawings enlarge to fill the poster, ≥ 0.8× (other examples ≥ 0.85×) |
 | The picture's size could hint at the answer (bar lengths, number of boxes) | Draw it schematic and constant across the section (bars equal length; same track counts) |
 | The picture will not fit at its minimum | Drop a column or a row; never shrink it |
+| One item holds two pictures side by side (for example two base-ten numbers to compare) | Width test: picture 1 + picture 2 + 6 mm gap + 2 × 3 mm pads (+ the slot if it sits beside them). If that is more than the column width (93 mm in 2 columns, 62 mm in 3), the item is a **wide visual**: full-width rows, 3 per page at L. Example: two base-ten pictures of 50.5 mm → 50.5 + 50.5 + 6 + 6 = 113 mm > 93 mm → full-width rows. |
 
 #### 8.12.4 Pagination and rebalancing [PG-20…24]
 
@@ -2887,7 +2893,12 @@ kind when one item alone would leave an empty band (Score then counts items). Re
 - **Other examples** (`Another example:` band, or the last panel of a 2 × 3 panel grid, 1–3 cells): one
   final-state drawing for **every case the practice will deal that the worked example does not show** (here:
   big number second with a sum of 10; same numbers) [LR-1]. Each carries a one-line bold caption (≤ 8 words)
-  and is drawn **all in black** with every step done (grey would read "trace this" on a poster).
+  and is drawn **all in black** with every step done, answer included (`factStack` state `'ink'`; grey would
+  read "trace this" on a poster). The chart carries **no answer marks** (`.ka` / `data-ka`), so its key is
+  identical to it apart from the tab (self-check E17b).
+- **Every step panel adds at least one grey mark** — the newest mark that step makes (step 1 of a column
+  subtraction: grey rings round the two ones digits; the check panel: the grey carry box and the grey answer
+  strip). Earlier marks are black (self-check E26).
 - Panel layout: 3 steps → one full-width row per step (drawing left 42 %); 4–5 steps → a 2 × 3 grid of panels,
   numeral + icon + step name on top, drawing, one 15 pt line under it, the 6th panel the other example.
 - `Say:` band with the filled oral frame; `Rule:` band with the chant (≤ 8 words, said twice in the
@@ -2953,10 +2964,17 @@ kind when one item alone would leave an empty band (Score then counts items). Re
   pack's I Can title (R5); the band label `Mixed Review:` names it; tab line 3 `Mixed n`.
 - Item rules for every page of the packet [LR-2, LR-5…7]: only the cases the chart teaches; **no exact
   repeat in the packet** (chart examples included); **no turn-around pair on one page**; a chart example is
-  never dealt turned round; no near twins; no two equal answers on one page where the pool allows; at most one
-  or two rare-case items per page. **Pool test:** count the distinct items the skill allows. When the pool is
-  smaller than the packet needs (add 1–3 within 10 has 39 ordered facts), turn-arounds may appear on later
-  pages, and the exit slip may repeat Practice items; nothing else may repeat (Appendix E24).
+  never dealt turned round; no near twins; **no two items on a page share an answer** (when the pool has
+  fewer distinct answers than the page has items — add 1–3 within 10 has 9 — none in one row); **the last row
+  holds only edge cases** (that is what ★★★ means); at most one or two rare-case items in the other rows. **Pool test:** count the distinct items the skill allows. When the pool is
+  smaller than the packet needs, turn-arounds may appear on later pages, and the exit slip may repeat Practice
+  items — **only as many as the pool is short**: allowed repeats = places dealt − (pool size − forbidden
+  items). Add 1–3 within 10: 41 places, 39 ordered facts, 2 forbidden (the chart examples 7 + 2 and 2 + 8
+  turned round, LR-5) → 4 repeats allowed, all on the exit slip (Appendix E24).
+- **The pool travels with the pack.** The builder writes the pool into `pack.html` as
+  `<script type="application/json" id="v21-pool">{"op":"+","pool":[[a,b],…],"forbidden":[[a,b],…],"edge":[[a,b],…]}</script>`
+  and marks every dealt item cell `data-item="a+b"` (or `a−b`) `data-row="r"` (the second exit-slip half is a
+  copy and carries no marks). The self-check reads only these.
 
 ### 9.6 P5 Word problem (RCDWS panel) [AUD C-13, Owner default Q5]
 
@@ -5057,7 +5075,7 @@ Before generating materials, ask:
     (begin at Representational / Pictures), or fluency (begin at Abstract)?
     Default: Representational.
 11. **Lesson flow** — After building the Routine Atomisation table (T2), count
-    the new steps. 3 or fewer new atoms → Standard Flow. 4 or more new atoms →
+    its rows tagged `New`. 3 or fewer → Standard Flow. 4 or more →
     propose two lessons; if the teacher keeps one, Chunked Flow.
     State which flow is in use on T1 and at the top of T3.
 12. **Grade Band** — Infer from the grade level provided in item 2. It changes counts and number
@@ -5191,7 +5209,7 @@ section for the full specification.
   Students write on MWBs or in margin — NEVER in a printed box on student sheet.
 - For spatial, geometric, or graphical topics: Example 2 MUST vary orientation or
   presentation, not just numbers. See Orientation Variation rule above.
-- If 4+ new student steps: use Chunked Flow. State which flow is used at the top of T3.
+- If the Routine table has 4 or more rows tagged New: propose two lessons, else Chunked Flow. State which flow is used at the top of T3.
 
 **We Do — Guided Practice:**
 - Partner talk: tell students WHAT to discuss, WHO speaks first, HOW LONG, then say go.
@@ -5627,7 +5645,7 @@ html, body { margin: 0; padding: 0; background: #fff; }
 .stk { font-size: var(--digit); line-height: 1; display: grid; grid-template-columns: .95em .72em .72em; justify-content: center; }  /* operator track 0.95 em, digit tracks 0.72 em */
 .stk > span { height: 1.15em; display: flex; align-items: center; justify-content: center; position: relative; }
 .stk .op { font-weight: 700; }
-.stk .rule { grid-column: 1 / -1; height: 0; border-top: var(--heavy) solid var(--ink); margin-top: 1mm; }
+.stk .rule { grid-column: 1 / -1; height: 0; border-top: var(--heavy) solid var(--ink); margin: 1mm -2.5mm 0; }  /* the sum rule overhangs the tracks by 2.5 mm each side */
 .stk .ans { grid-column: 1 / -1; height: var(--ans); display: grid; grid-template-columns: .95em .72em .72em; }
 .stk .ans > span { display: flex; align-items: center; justify-content: center; }
 .ring { position: absolute; left: 50%; top: 50%; width: .82em; height: 1.08em; transform: translate(-50%, -50%); border: var(--hair) solid var(--ink); border-radius: 50%; }
@@ -6074,14 +6092,18 @@ export function base10({ hundreds = 0, tens = 0, ones = 0, u = 3.5 } = {}) {
 }
 
 // RP-31. Quick-draw: open square = hundred (8 mm), stick = ten (10 mm), open dot = one (2.4 mm). All 1.5 pt.
-export function quickDraw({ hundreds = 0, tens = 0, ones = 0 } = {}) {
-  let s = '', x = 1; const sw = r2(S.heavy);
+// crossTens / crossOnes: how many of the drawn tens / ones are crossed out (a 0.75 pt diagonal: taken away).
+export function quickDraw({ hundreds = 0, tens = 0, ones = 0, crossTens = 0, crossOnes = 0 } = {}) {
+  let s = '', x = 1; const sw = r2(S.heavy), xw = r2(S.hair);
   for (let i = 0; i < hundreds; i++, x += 10) s += `<rect x="${x}" y="1" width="8" height="8" stroke-width="${sw}"/>`;
   if (hundreds) x += 2;
-  for (let i = 0; i < tens; i++, x += 3.5) s += `<path d="M${r2(x + 1)} 0.5 V10.5" stroke-width="${sw}"/>`;
+  for (let i = 0; i < tens; i++, x += 3.5) { s += `<path d="M${r2(x + 1)} 0.5 V10.5" stroke-width="${sw}"/>`;
+    if (i >= tens - crossTens) s += `<path d="M${r2(x - 0.4)} 7.5 L${r2(x + 2.4)} 3.5" stroke-width="${xw}"/>`; }
   if (tens) x += 2;
-  for (let i = 0; i < ones; i++) s += `<circle cx="${r2(x + 1.5 + (i % 5) * 3.6)}" cy="${i < 5 ? 3 : 8}" r="1.2" stroke-width="${sw}"/>`;
-  return svg(x + Math.min(ones, 5) * 3.6 + 2, 11, s, 'v-qd');
+  for (let i = 0; i < ones; i++) { const cx = x + 1.5 + (i % 5) * 3.6, cy = 3 + Math.floor(i / 5) * 5;
+    s += `<circle cx="${r2(cx)}" cy="${cy}" r="1.2" stroke-width="${sw}"/>`;
+    if (i >= ones - crossOnes) s += `<path d="M${r2(cx - 1.6)} ${cy + 1.6} L${r2(cx + 1.6)} ${cy - 1.6}" stroke-width="${xw}"/>`; }
+  return svg(x + Math.min(ones, 5) * 3.6 + 2, Math.max(11, 6 + 5 * Math.ceil(ones / 5)), s, 'v-qd');
 }
 
 // RP-40. Place-value chart: 1.5 pt outline, 0.75 pt interior; column 17 mm x row 12 mm at L; heads in words.
@@ -6229,14 +6251,15 @@ export function icon(id, { mm = 5.8, color = 'accent' } = {}) {
 
 // VA-70. Vertical fact (one-digit + one-digit): HTML. state: 'blank' | 'traced' (answer grey) | key (answer in key ink).
 // ring: 'top' | 'bottom' | null circles the big addend (black, or grey with ringGrey). tile: {at:'top'|'bottom', n, grey}.
-export function factStack({ top, bottom, op = '+', ans = null, state = 'blank', ring = null, ringGrey = false, tile = null } = {}) {
+export function factStack({ top, bottom, op = '+', ans = null, state = 'key', ring = null, ringGrey = false, tile = null } = {}) {
   const tileHTML = (at) => tile && tile.at === at ? `<span class="tile">${dotTile({ n: tile.n, grey: tile.grey })}</span>` : '';
   const ringHTML = (at) => ring === at ? `<i class="ring${ringGrey ? ' g' : ''}"></i>` : '';
   // digits sit right-aligned in tracks 2-3 (track 1 is the operator track); extras on the last digit only
   const row = (v, first, extra = '') => { const d = String(v).padStart(2, ' ').split('');
     return `${first}<span>${d[0].trim()}</span><span>${d[1]}${extra}</span>`; };
   const ad = ans == null ? ['', ''] : String(ans).padStart(2, ' ').split('');
-  const wrap = (x) => (!x.trim() ? '' : state === 'traced' ? `<span class="g">${x}</span>` : `<span class="ka">${x}</span>`);
+  // state: 'blank' (empty answer row) | 'traced' (answer grey: newest model mark) | 'ink' (answer black: a finished example) | 'key' (answer shown only on keys)
+  const wrap = (x) => (!x.trim() ? '' : state === 'traced' ? `<span class="g">${x}</span>` : state === 'ink' ? `<span>${x}</span>` : `<span class="ka">${x}</span>`);
   return `<div class="stk" data-slot="ans">` + row(top, '<span></span>', ringHTML('top') + tileHTML('top')) +
     row(bottom, `<span class="op">${op}</span>`, ringHTML('bottom') + tileHTML('bottom')) +
     `<i class="rule"></i><div class="ans"><span></span><span>${wrap(ad[0])}</span><span>${wrap(ad[1])}</span></div></div>`;
@@ -6244,10 +6267,12 @@ export function factStack({ top, bottom, op = '+', ans = null, state = 'blank', 
 
 // Column stack with a regroup strip (VA-10, SL-12) for 2-digit addition: tracks 0.95 em, heads T O, regroup strip 8 mm,
 // answer strip 12 mm tall, one segment per track. cells: answers on the key only.
-export function columnStack({ top = 47, bottom = 25, op = '+', carry = '1', ans = '72', heads = true, key = false } = {}) {
+// state: 'key' (marks only on the key) | 'grey' (model: carry and answer traced) | 'slot' (empty writing places)
+export function columnStack({ top = 47, bottom = 25, op = '+', carry = '1', ans = '72', heads = true, key = false, state = key ? 'key' : 'slot' } = {}) {
   const t = String(top).padStart(2, ' '), b = String(bottom).padStart(2, ' '), A = String(ans).padStart(2, ' ');
   const seg = (k, n, v) => `<i style="display:block;height:${n === 'r' ? 8 : 12}mm;border:.75pt solid #000;${n === 'r' ? 'border-radius:1.5mm;' : k === 0 ? 'border-right-width:0;border-radius:1.5mm 0 0 1.5mm;' : 'border-radius:0 1.5mm 1.5mm 0;'}` +
-    `font-style:normal;display:flex;align-items:center;justify-content:center;font-size:${n === 'r' ? 15 : 28}pt">${key && v.trim() ? `<b class="ka">${v}</b>` : ''}</i>`;
+    `font-style:normal;display:flex;align-items:center;justify-content:center;font-size:${n === 'r' ? 15 : 28}pt;${state === 'grey' ? 'border-color:#949494;border-width:1pt;' : ''}">` +
+    `${!v.trim() ? '' : state === 'key' ? `<b class="ka">${v}</b>` : state === 'grey' ? `<span class="g">${v}</span>` : ''}</i>`;
   return `<div style="display:grid;grid-template-columns:repeat(3,.95em);font-size:28pt;line-height:1;justify-content:center">` +
     (heads ? `<span></span><b style="font-size:12pt;text-align:center">T</b><b style="font-size:12pt;text-align:center">O</b>` : '') +
     `<span></span>${seg(0, 'r', carry)}<span style="border:0"></span>` +
@@ -6265,7 +6290,8 @@ export function columnStack({ top = 47, bottom = 25, op = '+', carry = '1', ans 
 // Every mark takes a state: 'none' (absent), 'slot' (empty writing place), 'grey' (trace / newest model mark),
 // 'ink' (black, done), 'key' (answer: shown only on the key, in the key colour).  A tens answer of 0 is left empty.
 export function columnStackSub({ top, bottom, op = '−', regroup = 'slot', cross = 'none', ans = 'slot', ansDigits = null,
-  check = false, checkState = 'slot', heads = true, size = 28, wide = false } = {}) {
+  check = false, checkState = 'slot', heads = true, size = 28, wide = false, ring = null } = {}) {
+  // ring: 'ones' draws a grey 1 pt ellipse round both ones digits (the 'Look at the ones' mark)
   const t = String(top).padStart(2, ' '), b = String(bottom).padStart(2, ' ');
   const diff = top - bottom, d = ansDigits || [Math.floor(diff / 10) || '', diff % 10];
   const regT = Math.floor(top / 10) - 1, regO = (top % 10) + 10;
@@ -6277,7 +6303,8 @@ export function columnStackSub({ top, bottom, op = '−', regroup = 'slot', cros
     `<path d="M7.6 1.2 L2.6 9.2" stroke="${st === 'grey' ? '#949494' : '#000'}" stroke-width="${st === 'grey' ? '1pt' : '.75pt'}" vector-effect="non-scaling-stroke"${st === 'key' ? ' data-ka' : ''}/></svg>`;
   const regroupRow = regroup === 'none' ? `<span style="grid-column:1/-1;height:8mm"></span>` :
     `<span></span>${seg('L', 8, `<span style="font-size:15pt">${mark(regT, regroup)}</span>`, regroup)}${seg('R', 8, `<span style="font-size:15pt">${mark(regO, regroup)}</span>`, regroup)}`;
-  const dig = (v, st) => `<span style="position:relative;display:flex;justify-content:center;height:1.15em;align-items:center">${v.trim()}${v.trim() ? xo(st) : ''}</span>`;
+  const rg = (on) => on ? `<i style="position:absolute;left:50%;top:50%;width:.8em;height:1.1em;transform:translate(-50%,-50%);border:1pt solid #949494;border-radius:50%"></i>` : '';
+  const dig = (v, st, r = false) => `<span style="position:relative;display:flex;justify-content:center;height:1.15em;align-items:center">${v.trim()}${v.trim() ? xo(st) : ''}${rg(r && v.trim())}</span>`;
   const ansRow = ans === 'none' ? `<span style="grid-column:1/-1;height:12mm"></span>` :
     `<span></span>${seg('L', 12, mark(d[0], d[0] === '' ? 'none' : ans), ans)}${seg('R', 12, mark(d[1], ans), ans)}`;
   const chk = check ? `<div class="ws-checkrow" style="display:flex;align-items:flex-end;justify-content:center;gap:1.6mm;margin-top:2mm;font-size:15pt;white-space:nowrap">` +
@@ -6285,24 +6312,34 @@ export function columnStackSub({ top, bottom, op = '−', regroup = 'slot', cros
     `<span class="ln" data-slot="line" style="--w:17mm;height:7mm;line-height:7mm">${mark(top, checkState)}</span></div>` : '';
   return `<div class="stk2" data-slot="ans" style="display:flex;flex-direction:column;align-items:center"><div style="display:grid;grid-template-columns:repeat(3,${wide ? 1.1 : 0.95}em);font-size:${size}pt;line-height:1">` +
     (heads ? `<span></span><b style="font-size:12pt;text-align:center;height:6mm">T</b><b style="font-size:12pt;text-align:center;height:6mm">O</b><i style="grid-column:2/-1;border-top:.75pt solid #000;height:1mm"></i>` : '') +
-    regroupRow + `<span></span>${dig(t[0], cross)}${dig(t[1], cross)}` +
-    `<b style="text-align:center;height:1.15em;display:flex;align-items:center;justify-content:center">${op}</b>${dig(b[0], 'none')}${dig(b[1], 'none')}` +
+    regroupRow + `<span></span>${dig(t[0], cross)}${dig(t[1], cross, ring === 'ones')}` +
+    `<b style="text-align:center;height:1.15em;display:flex;align-items:center;justify-content:center">${op}</b>${dig(b[0], 'none')}${dig(b[1], 'none', ring === 'ones')}` +
     `<i style="grid-column:1/-1;border-top:1.5pt solid #000;margin:1mm 0 1.5mm"></i>` + ansRow + `</div>${chk}</div>`;
 }
 
-// RP-120 / RP-93. A 2D shape to judge, name or partition (bounding box 42 mm at L). kind: rect | square | circle | triangle.
-// outline 1.5 pt for a shape to judge or name, 0.75 pt for a shape the pupil partitions or shades; no fill.
-// guides: true draws the partition guide dots (1 pt dotted semantics: solid 1.2 mm dots) where the pupil's line should
-// start and end, never the line itself.  line: {state:'grey'|'key'} draws one halving line (model / key).
-export function shape({ kind = 'rect', w = 42, h = 30, task = 'judge', guides = false, line = null } = {}) {
+// RP-120 / RP-93. A 2D shape to judge, name, partition or shade (bounding box 42 mm at L).
+//   kind: rect | square | circle | triangle.  Outline 1.5 pt for a shape to judge or name, 0.75 pt for one the pupil
+//   partitions or shades; no fill.
+//   lines: [{x1, y1, x2, y2, state}] partition lines in FRACTIONS of the box (0..1): state 'ink' (given, 0.75 pt),
+//          'grey' (model, 1 pt grey), 'key' (the answer: key only). An unequal partition is just an off-centre line.
+//   shade: [[x, y], ...] a polygon in fractions of the box, filled flat grey (#949494): the given shaded part.
+//   guides: [[x, y], ...] guide dots (1.2 mm, grey) where a line may start and end. A HINT scaffold: Guided cells only,
+//          and placed on every candidate point (all 4 side midpoints of a rectangle), never only on the answer's ends.
+let shapeIds = 0;
+export function shape({ kind = 'rect', w = 42, h = 30, task = 'judge', lines = [], shade = null, guides = [] } = {}) {
   const sw = r2(task === 'judge' ? S.heavy : S.hair), p = 1;
-  let s = '', ends = [[w / 2 + p, p], [w / 2 + p, h + p]];
-  if (kind === 'circle') { s = `<circle cx="${r2(w / 2 + p)}" cy="${r2(w / 2 + p)}" r="${r2(w / 2)}" stroke-width="${sw}"/>`; h = w; ends = [[w / 2 + p, p], [w / 2 + p, w + p]]; }
-  else if (kind === 'triangle') { s = `<path d="M${r2(w / 2 + p)} ${p} L${r2(w + p)} ${r2(h + p)} L${p} ${r2(h + p)} Z" stroke-width="${sw}"/>`; }
-  else { if (kind === 'square') h = w; s = `<rect x="${p}" y="${p}" width="${w}" height="${h}" stroke-width="${sw}"/>`; ends = [[w / 2 + p, p], [w / 2 + p, h + p]]; }
-  if (guides) for (const [x, y] of ends) s += `<circle cx="${r2(x)}" cy="${r2(y)}" r="0.6" fill="#000" stroke="none"/>`;
-  if (line) s += `<path d="M${r2(ends[0][0])} ${r2(ends[0][1])} L${r2(ends[1][0])} ${r2(ends[1][1])}" stroke="${line.state === 'grey' ? GREY : '#000'}" stroke-width="${r2(line.state === 'grey' ? S.dot : S.heavy)}"${line.state === 'key' ? ' data-ka' : ''}/>`;
-  return svg(w + 2 * p, h + 2 * p, s, 'v-shape');
+  if (kind === 'square' || kind === 'circle') h = w;
+  const X = (f) => r2(p + f * w), Y = (f) => r2(p + f * h);
+  let out = '', clip = '';
+  if (kind === 'circle') clip = `<circle cx="${X(0.5)}" cy="${Y(0.5)}" r="${r2(w / 2)}"/>`;
+  else if (kind === 'triangle') clip = `<path d="M${X(0.5)} ${Y(0)} L${X(1)} ${Y(1)} L${X(0)} ${Y(1)} Z"/>`;
+  else clip = `<rect x="${p}" y="${p}" width="${w}" height="${h}"/>`;
+  const id = 'sh' + (++shapeIds);
+  if (shade) out += `<clipPath id="${id}">${clip}</clipPath><path clip-path="url(#${id})" d="M${shade.map(([x, y]) => `${X(x)} ${Y(y)}`).join(' L')} Z" fill="${GREY}" stroke="none"/>`;
+  out += clip.replace('/>', ` stroke-width="${sw}"/>`);
+  for (const l of lines) out += `<path d="M${X(l.x1)} ${Y(l.y1)} L${X(l.x2)} ${Y(l.y2)}" stroke="${l.state === 'grey' ? GREY : '#000'}" stroke-width="${r2(l.state === 'grey' ? S.dot : S.hair)}"${l.state === 'key' ? ' data-ka' : ''}/>`;
+  for (const [x, y] of guides) out += `<circle cx="${X(x)}" cy="${Y(y)}" r="0.6" fill="${GREY}" stroke="none"/>`;
+  return svg(w + 2 * p, h + 2 * p, out, 'v-shape');
 }
 ```
 
@@ -6338,6 +6375,8 @@ export function makeKit(L, R) {
   const stepIcons = (i) => `<span class="num" data-accent>${i + 1}</span>${icon(L.steps[i][0])}`;
   const stepsStrip = () => `<div class="sstrip"><b>Steps:</b><ol>${L.steps.map(([, t], i) => `<li>${stepIcons(i)}<span>${t}</span></li>`).join('')}</ol></div>`;
   const stepsList = () => `<ol class="steps" style="flex:1;padding:2mm 3mm 3mm">${L.steps.map(([, t], i) => `<li>${stepIcons(i)}<span>${t}</span></li>`).join('')}</ol>`;
+  // every dealt item carries data-item="a+b" (or a−b) and its grid row, so the self-check reads items from the page
+  const it = (a, b, op, row = 0, copy = false) => copy ? '' : ` data-item="${a}${op}${b}" data-row="${row}"`;
   const k = (v) => `<b class="ka">${v}</b>`;                     // an answer: shown only on the key
   const lt = (i) => `<span class="lt">${LET[i]}.</span>`;
   // ---- teacher parts ----
@@ -6363,40 +6402,27 @@ export function makeKit(L, R) {
     head: header({ fields, score, l3, key }), body, foot: footer('1/1', `${key ? 'Answer Key · ' : ''}Form A · seed ${L.seed}`) });
   // 2-up exit slip: A4 landscape, two identical 132.5 mm halves, 6 mm between them with the dashed cut line (§9.7).
   const exitPage = ({ id = 'P6', half, key = false }) => `<section class="pg land ${key ? 'key' : 'pupil'}" data-page="${id}${key ? '-key' : ''}">` +
-    `<div class="body"><div style="flex:1;display:flex;gap:6mm;position:relative">${half(key)}<div class="cut" data-cut></div>` +
-    `<div style="position:absolute;left:50%;top:0;transform:translate(-50%,0);background:#fff;padding:1mm 0">${icon('scissors', { color: 'ink', mm: 5.8 })}</div>${half(key)}</div></div>` +
+    `<div class="body"><div style="flex:1;display:flex;gap:6mm;position:relative">${half(key, 0)}<div class="cut" data-cut></div>` +
+    `<div style="position:absolute;left:50%;top:0;transform:translate(-50%,0);background:#fff;padding:1mm 0">${icon('scissors', { color: 'ink', mm: 5.8 })}</div>${half(key, 1)}</div></div>` +
     footer('1/1', `${key ? 'Answer Key · ' : ''}Form A · seed ${L.seed}`) + `</section>`;
   const exitHead = (key) => `<div class="rowA" style="gap:3mm"><div class="fld name" style="min-width:40mm">Name <i>${key ? 'Answer Key' : ''}</i></div>` +
     `<div class="fld score">Score <i></i><b>/4</b></div>${tab(key ? 'Answer Key' : 'Exit slip')}</div><div class="title">${L.title}</div><div class="hrule"></div>`;
   const exitFoot = () => `<div style="flex:none;display:flex;gap:10mm;padding:3mm 3mm 0;font-size:15pt"><div><span class="chk" data-slot="check"></span>I can do this.</div><div><span class="chk" data-slot="check"></span>I need one more day.</div></div>`;
   // ---- assembly: teacher pages, the pupil packet, then keys of every pupil page (the anchor chart too), then T6 ----
-  function document({ teacher, pupil, routing, titleTag }) {
+  // pool: { op, pool: [[a, b], ...], forbidden: [[a, b], ...], edge: [[a, b], ...] } is written INTO the pack as JSON
+  // (<script type="application/json" id="v21-pool">) so the self-check (E24, E24b) needs nothing but pack.html.
+  function document({ teacher, pupil, routing, titleTag, pool }) {
     const N = teacher.length + 1;
     const pages = teacher.map((t, i) => tpage(t.id, t.l3, t.body, i + 1, N, t.right));
     for (const p of pupil) pages.push(p.render(false));
     for (const p of pupil) pages.push(p.render(true));
     pages.push(tpage('T6', 'Answer Key', routing, N, N, undefined, true));
     return { pages, html: (css) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">` +
-      `<title>${titleTag}</title><style>${css}</style></head><body>${pages.join('\n')}</body></html>` };
+      `<title>${titleTag}</title><style>${css}</style>` + (pool ? `<script type="application/json" id="v21-pool">${JSON.stringify(pool)}</script>` : '') +
+      `</head><body>${pages.join('\n')}</body></html>` };
   }
-  return { LET, tab, header, footer, page, stepsStrip, stepsList, stepIcons, k, lt, sec, tbox, sc, ans, blank, loop, loopIcon, table, chk, thumb, withThumb,
+  return { it, LET, tab, header, footer, page, stepsStrip, stepsList, stepIcons, k, lt, sec, tbox, sc, ans, blank, loop, loopIcon, table, chk, thumb, withThumb,
     tpage, pupilPage, exitPage, exitHead, exitFoot, document };
-}
-
-// Item-pool check (Appendix E24): exact repeats in the packet and turn-around pairs on one page.
-// pages: [{ id, items: [[a, b], ...], mayRepeat: bool }]
-export function poolCheck(pages) {
-  const seen = new Map(); let repeats = [], turns = [];
-  for (const p of pages) {
-    const keyset = new Set(p.items.map(([a, b]) => `${a},${b}`));
-    for (const [a, b] of p.items) {
-      const kk = `${a},${b}`;
-      if (seen.has(kk) && !p.mayRepeat) repeats.push(`${a}+${b} (${seen.get(kk)} / ${p.id})`);
-      if (!seen.has(kk)) seen.set(kk, p.id);
-      if (a !== b && keyset.has(`${b},${a}`) && a > b) turns.push(`${a}+${b} / ${b}+${a} on ${p.id}`);
-    }
-  }
-  return { repeats, turns };
 }
 ```
 
@@ -6423,21 +6449,25 @@ measurements; the 3 mm cell padding is structure, not an empty band.
 | E9 | Page used, nothing past the body | (lowest ink − body top) ÷ body height, per page | 50–100 % |
 | E9b | Bottom blank (site lint) | 100 % − E9 | ≤ 8 % on every page |
 | E10 | Free per cell | 1 mm raster of ink in each item cell (slots and answer rows are ink; reading cells exempt) | ≥ 40 % free |
-| E11 | Empty bands, the site's way | band between the cell's padding box and its ink on each side; slots, digit strips and answer rows are ink; a written answer keeps one Hw (10 mm) under its lowest mark; only draw / work cells are exempt | every band < 30 % of the cell's height or width |
+| E11 | Empty bands, exactly as the site's `sheetCheck` | box round every leaf element (no child elements, an SVG, or a slot) and every bordered element, the item letter excepted; gaps measured from the cell's **border box** (padding counts as empty); cells under 40 px skipped; draw / work cells exempt | largest top/bottom gap < 30 % of the height and largest left/right gap < 30 % of the width |
 | E12 | Equal cells | width and height of the cells of each item section | equal within 0.5 mm |
 | E13 | Slots | widths of `.bx` / `.ln` answer slots per section; underscore characters in pupil text (footer excepted) | one width per section, ≥ 14 mm; 0 underscores |
 | E14 | Dashes | dashed CSS borders and SVG dash arrays not starting with 0 (dotted) | only on the cut line / missing-digit box |
 | E15 | Instructions | each pupil instruction: word count, first word of every sentence, membership of Appendix C.1 (read from this file; `{n}` matches any number) | ≤ 12 words; every sentence starts with a print verb; string in C.1 |
 | E16 | Frames | blanks per `Say:` frame and per printed sentence frame | ≤ 2 |
 | E16b | Routine panel | height of each RCDWS row | one action per box; each row one line (≤ 9 mm) |
+| E17b | The anchor chart is not an exercise | `.ka` / `data-ka` elements on the chart and on its key | 0 on both |
 | E17 | Keys are facsimiles | number of slot elements on each pupil page vs its key (a key drawing inside a `Workspace:` band is not a slot) | equal for every page |
 | E18 | Frame on every page | © line text and a strand tab present | every page |
 | E19 | One title | distinct I Can title texts in the pack (a Mixed page keeps it) | 1 |
 | E20 | No lone item | pupil pages with fewer than 2 items, other than the word problem v1 and the anchor chart | none |
+| E21b | Flow word | T1's `Flow:` word vs the rows tagged `New` in the T2 Routine table | Chunked if ≥ 4, else Standard |
 | E21 | T2 atoms | rows of T2 Section 1 and their Atom Type cells; ★ in the two atom tables | ≥ 5 atoms; types only Category / Comparative / Fact / Conceptual; no ★ |
 | E22 | Thumbnails | `.thumb` elements on T3, T4, T5 | ≥ 1 on each delivery page |
 | E23 | Fade labels | the Fade column of T6 "Answers at a glance" | every row carries ★ / ★★ / ★★★ |
-| E24 | Item pool | exact repeats in the packet; turn-around pairs on one page (from the builder's pool list) | 0 and 0 (exit slip repeats allowed only when the pool test says the pool is exhausted) |
+| E24 | Item pool, from the pack itself | items from `data-item` on the pupil pages (exit slip: first half only); the pool from the pack's `v21-pool` JSON | every item in the pool and not forbidden; 0 repeats outside the exit slip; exit repeats ≤ places − (pool − forbidden); 0 turn-arounds on one page; **FAIL if the JSON or the items are missing** |
+| E24b | Last row and twin answers | `data-row` of each Practice item; answers per page (per row when the pool has fewer distinct answers than the page has items) | last Practice row all in the pool's `edge` list; no twin answers |
+| E26 | Chart panels | each `data-step-panel` cell contains a visible #949494 mark | every step panel |
 | E25 | One key per page | pupil pages vs key pages | equal, the anchor chart included |
 
 Also confirm by eye on a rendering of every page (the self-check cannot see whether a drawing teaches):
@@ -6448,7 +6478,8 @@ Reference implementation (Node + Playwright; adjust `OUT` and the browser path):
 
 ```js v21-selfcheck
 // Runs V21 Appendix E (pre-output self-check) on a rendered pack and writes SELF-CHECK.md next to it.
-// usage: node selfcheck.mjs <pack folder (pack.html, pack.pdf, pool.json)> <V21 .md file> [chromium executable]
+// usage: node selfcheck.mjs <pack folder (pack.html, pack.pdf)> <V21 .md file> [chromium executable]
+// Everything is read from the pack itself: items from data-item on the pupil pages, the pool from its v21-pool JSON.
 import { chromium } from 'playwright';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -6458,7 +6489,6 @@ const OUT = path.resolve(OUT0);
 // the instruction library = every string in Appendix C.1 of V21 (column 2 of its table)
 const md = fs.readFileSync(V21MD, 'utf8'); const c1 = md.slice(md.indexOf('### C.1'), md.indexOf('### C.2'));
 const LIB = [...c1.matchAll(/^\| `[^`]+`(?: \(V21\))? \| ([^|]+) \|/gm)].map((m) => m[1].trim().replace(/_/g, ''));
-const POOL = fs.existsSync(path.join(OUT, 'pool.json')) ? JSON.parse(fs.readFileSync(path.join(OUT, 'pool.json'), 'utf8')) : { repeats: [], turns: [] };
 const b = await chromium.launch(BROWSER ? { executablePath: BROWSER } : {});
 const p = await b.newPage();
 await p.emulateMedia({ media: 'print' });
@@ -6550,7 +6580,10 @@ const R = await p.evaluate((LIBRARY) => {
     // framed pages: the frame itself is structure; "used" = lowest ink (text, drawing, slot) over the body height
     P.usedPct = Math.round((maxBottom - body.top) / body.height * 100);
     // site lint: the body is no more than 8 % blank at the bottom (lowest ink of any kind, frame lines included)
-    P.bottomBlank = Math.max(0, 100 - P.usedPct);
+    // site lint: the body below its last band (the frame counts), as a share of the body
+    const kids = [...pg.querySelector('.body').querySelectorAll(':scope > *, :scope > .t > *')].filter((x) => x.getBoundingClientRect().height > 0);
+    const lastK = kids.length ? Math.max(...kids.map((x) => x.getBoundingClientRect().bottom)) : body.top;
+    P.bottomBlank = Math.max(0, Math.round((body.bottom - lastK) / body.height * 100));
     P.thumbs = pg.querySelectorAll('.thumb').length;
     P.panelRows = [...pg.querySelectorAll('[data-panel-row]')].map((e) => Math.round(e.getBoundingClientRect().height / MM * 10) / 10);
     const t2 = pg.querySelector('table.tt');
@@ -6570,13 +6603,27 @@ const R = await p.evaluate((LIBRARY) => {
       for (const r0 of rs) { const r = clip(r0); for (let y = Math.floor((r.t - cr.top) / MM); y < Math.ceil((r.b - cr.top) / MM); y++) for (let x = Math.floor((r.l - cr.left) / MM); x < Math.ceil((r.r - cr.left) / MM); x++) if (x >= 0 && y >= 0 && x < W && y < H) grid[y * W + x] = 1; }
       const ink = grid.reduce((a, v) => a + v, 0);
       const u = rs.map(clip).reduce((a, r) => ({ l: Math.min(a.l, r.l), t: Math.min(a.t, r.t), r: Math.max(a.r, r.r), b: Math.max(a.b, r.b) }), { l: 1e9, t: 1e9, r: -1e9, b: -1e9 });
-      const pad = 3 * MM;  // CL-8 pad is structure, not an empty band
-      const draw = c.hasAttribute('data-draw');   // the pupil draws or marks here: the open zone IS the answer
-      const hw = 10 * MM;                          // a written answer may keep one Hw of open space under it
-      return { w: cr.width / MM, h: cr.height / MM, free: Math.round((1 - ink / (W * H)) * 100), draw,
-        top: Math.round(Math.max(0, u.t - cr.top - pad) / cr.height * 100), left: Math.round(Math.max(0, u.l - cr.left - pad) / cr.width * 100),
-        right: Math.round(Math.max(0, cr.right - u.r - pad) / cr.width * 100), bottom: Math.round(Math.max(0, cr.bottom - u.b - pad - hw) / cr.height * 100),
-        read: c.hasAttribute('data-read'), work: !!c.querySelector('.stk, [data-work]') || !!c.closest('[data-section="exit"]'), sec: (c.closest('[data-section]') || {}).dataset?.section || '' }; });
+      const pad = 0;  // the site's sheetCheck measures from the cell's border box: the padding counts as empty
+      const draw = c.hasAttribute('data-draw');
+      // E11 = the site's sheetCheck (ws-lesson-samples.cjs), line for line: every leaf element (no children, an SVG,
+      // or a slot) and every bordered element counts as content, labels excepted; bands are measured from the
+      // cell's border box; cells under 40 px are skipped.
+      let bx = null;
+      for (const d of c.querySelectorAll('*')) {
+        if (d.closest('.lt')) continue;
+        const st = getComputedStyle(d); if (st.visibility === 'hidden' || st.display === 'none') continue;
+        const r = d.getBoundingClientRect(); if (!r.width || !r.height) continue;
+        const leaf = !d.children.length || d instanceof SVGElement || d.hasAttribute('data-slot');
+        const bordered = parseFloat(st.borderTopWidth) || parseFloat(st.borderBottomWidth);
+        if (!leaf && !bordered) continue;
+        bx = bx ? { t: Math.min(bx.t, r.top), b: Math.max(bx.b, r.bottom), l: Math.min(bx.l, r.left), r: Math.max(bx.r, r.right) } : { t: r.top, b: r.bottom, l: r.left, r: r.right };
+      }
+      const small = cr.height < 40 || cr.width < 40 || !bx;
+      const B0 = bx || { t: cr.top, b: cr.bottom, l: cr.left, r: cr.right };
+      return { w: cr.width / MM, h: cr.height / MM, free: Math.round((1 - ink / (W * H)) * 100), draw: draw || small,
+        top: Math.round(Math.max(0, B0.t - cr.top) / cr.height * 100), left: Math.round(Math.max(0, B0.l - cr.left) / cr.width * 100),
+        right: Math.round(Math.max(0, cr.right - B0.r) / cr.width * 100), bottom: Math.round(Math.max(0, cr.bottom - B0.b) / cr.height * 100), read: c.hasAttribute('data-read'),
+        work: !!c.querySelector('.stk, [data-work]') || !!c.closest('[data-section="exit"]'), sec: (c.closest('[data-section]') || {}).dataset?.section || '' }; });
     // equal cells per section
     const bySec = {}; for (const c of P.cells) (bySec[c.sec] = bySec[c.sec] || []).push(c);
     P.unequal = Object.entries(bySec).filter(([s, cs]) => s && !['pre', 'nsA', 'nsB', 'wp'].includes(s) && cs.length > 1 &&
@@ -6585,8 +6632,17 @@ const R = await p.evaluate((LIBRARY) => {
     const slotW = {}; pg.querySelectorAll('.bx[data-slot], .ln[data-slot]').forEach((e) => { const s = (e.closest('[data-section]') || pg).dataset.section || id;
       (slotW[s] = slotW[s] || new Set()).add(Math.round(e.getBoundingClientRect().width / MM * 2) / 2); });
     P.slotWidths = Object.fromEntries(Object.entries(slotW).map(([k, v]) => [k, [...v]]));
+    // items dealt on this page (pupil pages only), with their grid row
+    P.items = (teacher || key) ? [] : [...pg.querySelectorAll('[data-item]')].map((e) => ({ item: e.dataset.item, row: +e.dataset.row }));
+    P.kaCount = pg.querySelectorAll('.ka, [data-ka]').length;
+    P.panels = [...pg.querySelectorAll('[data-step-panel]')].map((c) => [...c.querySelectorAll('*')].some((e) => {
+      const cs = getComputedStyle(e); if (cs.display === 'none') return false;
+      return [cs.color, cs.borderTopColor, cs.fill, cs.stroke].some((v) => rgb(v) === '#949494') && (e.textContent.trim() || e instanceof SVGElement || parseFloat(cs.borderTopWidth) > 0); }));
+    if (id === 'T1') P.flow = (pg.querySelector('.tline') || {}).textContent || '';
+    if (id === 'T2') { const tb = pg.querySelectorAll('table.tt')[1]; P.newSteps = tb ? [...tb.querySelectorAll('tr')].slice(1).filter((tr) => /New/.test(tr.children[2].textContent)).length : -1; }
     out.pages.push(P);
   }
+  const pj = document.getElementById('v21-pool'); out.pool = pj ? JSON.parse(pj.textContent) : null;
   return out;
 }, LIB);
 await b.close();
@@ -6615,8 +6671,9 @@ row('E9', 'Every page ≥ 50 % used and nothing runs past the body (lowest ink o
 const cells = pupil.flatMap((p) => p.cells.filter((c) => !c.empty).map((c) => ({ ...c, page: p.id })));
 const lowFree = cells.filter((c) => !c.read && c.free < 40);
 row('E10', 'Every item cell ≥ 40 % free (pupil pages; a key is its page; reading cells - story box, routine panel - exempt)', `${cells.length} cells; min free ${Math.min(...cells.filter((c) => !c.read).map((c) => c.free))} %; below 40 %: ${lowFree.map((c) => c.page).join(', ') || 'none'}`, lowFree.length === 0);
-const band = cells.filter((c) => !c.read && !c.draw && (c.top >= 30 || c.left >= 30 || c.right >= 30 || c.bottom >= 30));
-row('E11', 'No empty band ≥ 30 % of a cell, measured the site way: slots and answer rows are content; a written answer keeps one Hw (10 mm) under it; only draw-on cells are exempt', (() => { const m = cells.filter((c) => !c.read && !c.draw); return `worst top ${Math.max(...m.map((c) => c.top))} %, left ${Math.max(...m.map((c) => c.left))} %, right ${Math.max(...m.map((c) => c.right))} %, bottom ${Math.max(...m.map((c) => c.bottom))} %; failing: ${band.map((c) => c.page + '/' + c.sec).join(', ') || 'none'}`; })(), band.length === 0);
+const band = cells.filter((c) => !c.draw && (c.top >= 30 || c.left >= 30 || c.right >= 30 || c.bottom >= 30));
+// E11 note: measured from the cell's border box (padding counts as empty), exactly as the site's sheetCheck.
+row('E11', 'No empty band ≥ 30 % of a cell, measured exactly as the site sheetCheck: from the cell border box (padding counts as empty); every leaf, slot or bordered element is content (labels excepted), so a reserved answer row counts', (() => { const m = cells.filter((c) => !c.draw); return `worst top ${Math.max(...m.map((c) => c.top))} %, left ${Math.max(...m.map((c) => c.left))} %, right ${Math.max(...m.map((c) => c.right))} %, bottom ${Math.max(...m.map((c) => c.bottom))} %; failing: ${band.map((c) => `${c.page}/${c.sec} (${Math.round(c.w)}x${Math.round(c.h)} t${c.top} b${c.bottom} l${c.left} r${c.right})`).join(', ') || 'none'}`; })(), band.length === 0);
 const uneq = pages.filter((p) => p.unequal.length);
 row('E12', 'Equal cells within each section (±0.5 mm)', uneq.length ? uneq.map((p) => p.id + ': ' + p.unequal.join('/')).join('; ') : 'all sections equal', uneq.length === 0);
 const sw = pages.filter((p) => !p.teacher).flatMap((p) => Object.entries(p.slotWidths).map(([s, w]) => ({ p: p.id, s, w })));
@@ -6638,7 +6695,7 @@ const lone = pupil.filter((p) => !['P5', 'P2'].includes(p.id) && p.slots < 2);
 row('E20', 'No lone item (one-item pages only where the role ceiling is 1: word problem v1; the anchor chart is a poster)', lone.length ? lone.map((p) => p.id).join(', ') : 'none', lone.length === 0);
 
 const bb = pages.filter((p) => p.bottomBlank > 8);
-row('E9b', 'Body no more than 8 % blank below its lowest ink (site lint)', `max ${Math.max(...pages.map((p) => p.bottomBlank))} %; over 8 %: ${bb.map((p) => p.id + ' ' + p.bottomBlank).join(', ') || 'none'}`, bb.length === 0);
+row('E9b', 'Body no more than 8 % blank below its last band (site lint, frame counts)', `max ${Math.max(...pages.map((p) => p.bottomBlank))} %; over 8 %: ${bb.map((p) => p.id + ' ' + p.bottomBlank).join(', ') || 'none'}`, bb.length === 0);
 const land = pages.filter((p) => p.halfW.length);
 row('E1b', 'Exit-slip halves 132.5 ± 0.5 mm wide (A4 landscape, live 271 × 186 mm, 6 mm cut gap)', land.map((p) => p.id + ': ' + p.halfW.join(' / ')).join('; '), land.every((p) => p.halfW.length === 2 && p.halfW.every((w) => Math.abs(w - 132.5) <= 0.5)));
 const panel = pages.flatMap((p) => p.panelRows);
@@ -6649,7 +6706,39 @@ const dl = pages.filter((p) => ['T3', 'T4', 'T5'].includes(p.id));
 row('E22', 'Every delivery page (T3–T5) shows at least one pupil-page thumbnail', dl.map((p) => p.id + ': ' + p.thumbs).join(', '), dl.length === 3 && dl.every((p) => p.thumbs >= 1));
 const t6 = pages.find((p) => p.id === 'T6');
 row('E23', 'Every row of T6 "Answers at a glance" carries a fade label ★ / ★★ / ★★★', t6 && t6.fadeRows ? `${t6.fadeRows.filter(Boolean).length} / ${t6.fadeRows.length} rows` : 'no table', !!(t6 && t6.fadeRows && t6.fadeRows.every(Boolean)));
-row('E24', 'Item pool: no exact repeat in the packet (exit slip excepted when the pool is exhausted); no turn-around pair on one page', `repeats: ${POOL.repeats.length ? POOL.repeats.join(', ') : 0}; same-page turn-arounds: ${POOL.turns.length ? POOL.turns.join(', ') : 0}`, !POOL.repeats.length && !POOL.turns.length);
+const POOL = R.pool, items = pupil.filter((p) => p.id !== 'P6').flatMap((p) => p.items.map((x) => ({ ...x, page: p.id })));
+const exitItems = (pupil.find((p) => p.id === 'P6') || { items: [] }).items.map((x) => ({ ...x, page: 'P6' }));
+const all = [...items, ...exitItems];
+let e24 = { ok: false, msg: 'no pool JSON or no items in the pack' };
+if (POOL && all.length) {
+  const op = POOL.op, kk = ([a, b]) => `${a}${op}${b}`, inPool = new Set(POOL.pool.map(kk)), forb = new Set(POOL.forbidden.map(kk));
+  const usable = POOL.pool.length - POOL.forbidden.length, allowed = Math.max(0, all.length - usable);
+  const seen = new Set(), rep = [], exitRep = [], bad = [];
+  for (const x of all) { if (!inPool.has(x.item) || forb.has(x.item)) bad.push(x.item + ' ' + x.page);
+    if (seen.has(x.item)) (x.page === 'P6' ? exitRep : rep).push(x.item); seen.add(x.item); }
+  const turns = []; if (op === '+') for (const p of pupil) { const s2 = new Set(p.items.map((x) => x.item));
+    for (const x of p.items) { const [a, b] = x.item.split('+'); if (a !== b && +a > +b && s2.has(`${b}+${a}`)) turns.push(`${x.item} on ${p.id}`); } }
+  e24 = { ok: !bad.length && !rep.length && exitRep.length <= allowed && !turns.length,
+    msg: `${all.length} items read from the pages; pool ${POOL.pool.length} (usable ${usable}); repeats allowed ${allowed}; exit-slip repeats ${exitRep.length}; other repeats ${rep.length}; same-page turn-arounds ${turns.length}; outside the pool / forbidden ${bad.length ? bad.join(', ') : 0}` };
+}
+row('E24', 'Item pool, read from the pack: every item in the pool and not forbidden; no exact repeat except on the exit slip and only as many as the pool is short (places − usable pool); no turn-around pair on one page; FAILS when the pool JSON or the items are missing', e24.msg, e24.ok);
+let e24b = { ok: false, msg: 'no pool' };
+if (POOL) { const op = POOL.op, kk = ([a, b]) => `${a}${op}${b}`, edge = new Set(POOL.edge.map(kk));
+  const val = (s3) => { const [a, b] = s3.split(op).map(Number); return op === '+' ? a + b : a - b; };
+  const answers = new Set(POOL.pool.map(([a, b]) => (op === '+' ? a + b : a - b))).size;
+  const pr = pupil.filter((p) => /^P4/.test(p.id)), probs = [];
+  for (const p of pr) { const last = Math.max(...p.items.map((x) => x.row)); p.items.filter((x) => x.row === last && !edge.has(x.item)).forEach((x) => probs.push(`${x.item} not an edge case (${p.id})`)); }
+  for (const p of pupil) { if (!p.items.length) continue; const whole = /^P[46]/.test(p.id) && answers >= p.items.length; const groups = whole ? [p.items] : [...new Set(p.items.map((x) => x.row))].map((r) => p.items.filter((x) => x.row === r));
+    for (const g of groups) { const v = g.map((x) => val(x.item)); if (new Set(v).size !== v.length) probs.push(`twin answers on ${p.id}${whole ? '' : ' (a row)'}`); } }
+  e24b = { ok: !probs.length && pr.length > 0, msg: probs.length ? probs.join('; ') : `${pr.length} Practice pages: last rows all edge cases; no twin answers (per page, or per row when the pool has fewer answers than the page has items)` }; }
+row('E24b', 'Practice last row holds only edge cases (★★★ is true); no two items on a page share an answer', e24b.msg, e24b.ok);
+const chartPages = pages.filter((p) => /^P2/.test(p.id));
+row('E17b', 'The anchor chart and its key carry no answer marks (no .ka / data-ka)', chartPages.map((p) => p.id + ': ' + p.kaCount).join(', '), chartPages.length === 2 && chartPages.every((p) => p.kaCount === 0));
+const ch = pages.find((p) => p.id === 'P2');
+row('E26', 'Every anchor-chart step panel adds at least one grey (newest) mark', ch ? `${ch.panels.filter(Boolean).length} / ${ch.panels.length} panels` : 'no chart', !!ch && ch.panels.length > 0 && ch.panels.every(Boolean));
+const t1 = pages.find((p) => p.id === 'T1'), t2n = pages.find((p) => p.id === 'T2');
+const want = t2n && t2n.newSteps >= 4 ? 'Chunked' : 'Standard';
+row('E21b', 'T1 flow word = the rule: Chunked when the T2 routine table has ≥ 4 rows tagged New, else Standard', `T2 New routine steps ${t2n ? t2n.newSteps : '?'} → ${want}; T1 says "${(t1 && t1.flow.match(/Flow: (\w+)/) || [])[1]}"`, !!t1 && new RegExp('Flow: ' + want).test(t1.flow));
 row('E25', 'One key per pupil page (anchor chart included)', `${pupil.length} pupil pages, ${keys.length} keys`, pupil.length === keys.length && pupil.every((p) => keys.some((k) => k.id === p.id + '-key')));
 
 const md2 = ['# V21 self-check: ' + path.basename(OUT), '',
@@ -6677,10 +6766,10 @@ T6.
 
 **Lesson data.** Title `I Can add 1–3 (facts to 10)` (27 characters: lifted on the chart and teacher pages).
 Level 1, Addition. Footer `add_facts · Grade 1 · 1.OA.C.6 · EE M.EE.2.NBT.7, M.EE.3.OA.6`, seed 4242. CRA:
-Pictures. Flow: Standard (3 new atoms). Steps: 1 `start` Start with the big number. · 2 `count` Count on. ·
+Pictures. Flow: Standard (2 routine steps tagged New). Steps: 1 `start` Start with the big number. · 2 `count` Count on. ·
 3 `write` Write how many. Frame “__ plus __ equals __.” Chant: Big number first. Count on. Write it.
 **Cases:** big number first; big number second; same numbers; a sum of 10. **Pool:** a + b, min(a, b) ∈ 1–3,
-a + b ≤ 10, no + 0: 39 ordered facts for 41 places, so the exit slip repeats Practice items (pool test).
+a + b ≤ 10, no + 0: 39 ordered facts, 2 forbidden (7 + 2 and 2 + 8 turned round), 41 places → 4 repeats allowed, all on the exit slip (pool test).
 
 | Page | Content | Answers (key) |
 |---|---|---|
@@ -6692,10 +6781,10 @@ a + b ≤ 10, no + 0: 39 ordered facts for 41 places, so the exit slip repeats P
 | T5 | Sections 7–10 with the Practice 1 thumbnail; exit items listed with the mistake each catches | C · 3 + 2 = 5 · 7, 9, 2, 10 |
 | P0 | a 8 triangles + square; b number track 3 4 5 6 [ ] 8 9; c 4 and 9; d bond 7 = 5 + [ ]. Score /4 | 8 · 7 · 9 circled · 2 |
 | P1 | A: [ ] 5 [ ]; 3, 4, [ ], 6; 7 ○ 4; 6 + [ ] = 10; 9, 8, [ ], 6. B: [ ] 14 [ ]; 16, 17, [ ], 19; 12 ○ 21; 3 + [ ] = 10; 15, 14, [ ], 12. Score /10 | 4, 6 · 5 · > · 4 · 7 · 13, 15 · 18 · < · 7 · 13 |
-| P2 | Panels 7 + 2 (ring 7; grey tile and hops; grey 9); `Another example:` 2 + 8 and 3 + 3 in black; Say; Rule | key = same chart, tab Answer Key |
-| P3 | Vocabulary + / = / hops → equals · count on · plus; Remember; Guided 6 + 2 (ring grey), 1 + 7, 2 + 2 (51 mm cells) beside Steps; Independent a–f 5 + 2, 3 + 4, 9 + 1, 1 + 5, 6 + 3, 2 + 4. Score /6 | lines · 8, 8, 4 · 7, 7, 10, 6, 9, 6 |
-| P4 Practice 1 | 3 × 4: 5+3, 2+5, 4+1, 5+1, 8+1, 4+2, 2+1, 1+3, 4+3 / 1+1, 3+7, 1+6 (last row ★★★) | 8, 7, 5, 6, 9, 6, 3, 4, 7, 2, 10, 7 |
-| P4 Practice 2 | 3 × 4: 7+1, 6+1, 3+1, 2+6, 1+4, 3+5, 1+2, 2+3, 1+8 / 3+6, 1+9, 7+3 | 8, 7, 4, 8, 5, 8, 3, 5, 9, 9, 10, 10 |
+| P2 | Panels 7 + 2 (step 1 grey ring on 7; step 2 grey tile and hops; step 3 grey 9); `Another example:` 2 + 8 = 10 and 3 + 3 = 6, all in black; Say; Rule | key = same chart, tab Answer Key (no answer marks) |
+| P3 | Vocabulary + / = / hops → equals · count on · plus; Remember; Guided 6 + 2 (ring grey), 1 + 6, 2 + 2 (51 mm cells) beside Steps; Independent a–f 5 + 2, 9 + 1, 1 + 5 / 3 + 4, 6 + 3, 2 + 4. Score /6 | lines · 8, 7, 4 · 7, 10, 6, 7, 9, 6 |
+| P4 Practice 1 | 3 × 4 by rows: 5+3, 5+1, 2+5 / 4+1, 4+2, 4+3 / 8+1, 2+1, 1+3 / 1+1, 3+7, 1+7 (last row ★★★: same, sum of 10, big second) | 8, 6, 7 / 5, 6, 7 / 9, 3, 4 / 2, 10, 8 (no twin in a row) |
+| P4 Practice 2 | 3 × 4 by rows: 7+1, 6+1, 3+1 / 1+4, 3+5, 1+2 / 2+3, 1+8, 7+3 / 3+6, 1+9, 2+6 (last row ★★★) | 8, 7, 4 / 5, 8, 3 / 5, 9, 10 / 9, 10, 8 |
 | P5 | Omar has 3 cars. He gets 2 more cars. How many …? Answer line in the story; 6-row panel; Workspace; frame | 3 + 2 = 5; 5 cars |
 | P6 | Each half: 4 + 3, 3 + 6, 1 + 1, 3 + 7 (2 × 2); Say “a. 4 plus 3 equals __.”; two check boxes; Score /4 | 7, 9, 2, 10 |
 | T6 | Routing (atoms 1–4 → K-3, K-4, K-6, K-9); accepted answers; answers at a glance with Fade; wrong answers to look for | — |
@@ -6705,7 +6794,7 @@ a + b ≤ 10, no + 0: 39 ordered facts for 41 places, so the exit slip repeats P
 **Lesson data.** Title `I Can subtract within 100 (with regrouping)` (44 characters: never lifted; row A
 holds the tab alone, the title sits under it). Level 2, Subtraction. Footer
 `sub_100_regroup · Grade 2 · 2.NBT.B.5 · EE M.EE.2.NBT.5, M.EE.4.NBT.4`, seed 5150. CRA: Pictures → Abstract.
-Flow: Chunked (4 new atoms; two lessons were offered, the teacher kept one). Steps: 1 `look` Look at the ones.
+Flow: Standard (3 routine steps tagged New: Look, Regroup, Check). Steps: 1 `look` Look at the ones.
 · 2 `regroup` Top smaller? Regroup a ten. · 3 `subOnes` Subtract the ones. · 4 `subTens` Subtract the tens. ·
 5 `check` Check: add back. Frame “__ minus __ equals __.” Chant: Top too small? Take a ten!
 **Cases:** regroup 2-digit − 2-digit; 0 in the ones (60 − 3); one-digit take-away; a tens answer of 0 (left
@@ -6713,16 +6802,16 @@ empty). Every item regroups. No exact repeats, no turn-arounds (subtraction has 
 
 | Page | Content | Answers (key) |
 |---|---|---|
-| T1 | Tip “Ones first, always.”, Watch “Smaller from bigger.”; chunked flow (5a, 6a, 5b, 6b) = 60; materials; vocabulary tens / ones / regroup (quick-draw) | — |
+| T1 | Tip “Ones first, always.”, Watch “Smaller from bigger.”; standard flow = 60; materials; vocabulary tens / ones / regroup (quick-draw) | — |
 | T2 | 7 atoms (4 Pre-requisite, 3 New); 5 routine steps, step 2 the Critical Atom; mistakes Smaller from bigger, Forgot the tens, Zero trouble, Regroup always; Check Question link | — |
 | T3–T5 | As F.1, with thumbnails of P0, the chart, the lesson sheet and Practice 1; Check Question 61 − 25 (A 44, B 46, C 36) | — |
-| P0 | a base-ten 46 → [ ] tens; b 5 tens 2 ones = 4 tens [ ] ones; c 14 − 6, 12 − 9; d 47 − 23, 68 − 35 (no regrouping). Score /6 | 4 · 12 · 8, 3 · 24, 33 |
+| P0 | a base-ten 63 → [ ] tens; b 5 tens 2 ones = 4 tens [ ] ones; c 14 − 6; d 12 − 9; e–g 47 − 23, 68 − 35, 59 − 14 (no regrouping). Short bands fixed at 34 mm. Score /7 | 6 · 12 · 8 · 3 · 24, 33, 45 |
 | P1 | A: [ ] 40 [ ]; count by 10 20, 30, [ ], [ ]; 46 ○ 64; 3 tens 5 ones = [ ]; 10 − [ ] = 6. B: 70; 35, 45, …; 81 ○ 18; 6 tens 12 ones; 100 − [ ] = 70 | 39, 41 · 40, 50 · < · 35 · 4 · 69, 71 · 55, 65 · > · 72 · 30 |
-| P2 | 2 × 3 panels on 52 − 39 (strip empty → 4 / 12 grey with grey cross-outs → 3 grey → 1 grey + 3 → check 13 + 39 = 52 grey); 6th panel `Another example:` 60 − 3 = 57 in black; Say; Rule | key = same chart |
+| P2 | 2 × 3 panels on 52 − 39 (1: grey rings round 2 and 9 → 2: 4 / 12 grey with grey cross-outs → 3: 3 grey → 4: 1 grey → 5: 13 + 39 with a grey carry 1 and grey 52 in the strip); 6th panel `Another example:` 60 − 3 = 57 in black; Say; Rule | key = same chart |
 | P3 | Vocabulary rods / cubes / trade → ones · regroup · tens; Remember: 1 ten is 10 ones.; Guided 74 − 28 (regroup grey), 91 − 46, 50 − 7 (62 mm cells) beside 5 Steps; Independent a–c 83 − 36, 62 − 9, 46 − 38. Score /3 | 46, 45, 43 · 47, 53, 8 |
-| P4 Practice 1 | 2 × 3 with Check lines: 72 − 8, 45 − 27, 41 − 35, 63 − 47, 85 − 29, 70 − 44 | 64, 18, 6, 16, 56, 26 |
-| P4 Practice 2 | 92 − 56, 31 − 7, 64 − 38, 26 − 19, 80 − 52, 57 − 29 | 36, 24, 26, 7, 28, 28 |
-| P5 | Ana has 42 stickers. She gives away 17 stickers. How many …? | 42 − 17 = 25; 25 stickers |
+| P4 Practice 1 | 2 × 3 with Check lines: 45 − 27, 63 − 47 / 85 − 29, 41 − 35 / 72 − 8, 70 − 44 (last row ★★★: one-digit, 0 ones) | 18, 16 / 56, 6 / 64, 26 |
+| P4 Practice 2 | 92 − 56, 64 − 38 / 57 − 38, 26 − 19 / 31 − 7, 80 − 52 (last row ★★★) | 36, 26 / 19, 7 / 24, 28 |
+| P5 | Ana has 42 stickers. She gives away 17 stickers. How many stickers does Ana have? | 42 − 17 = 25; 25 stickers; key drawing: 3 sticks and 12 dots (one ten traded), 1 stick and 7 dots crossed out |
 | P6 | Each half: 43 − 27, 40 − 13, 55 − 8, 42 − 36 (2 × 2, no heads); Say “a. 43 minus 27 equals __.” | 16, 27, 47, 6 |
 | T6 | Routing (1-12, 2-3, 1-20, 2-6); accepted answers; answers at a glance with Fade; wrong answers to look for | — |
 
@@ -6750,7 +6839,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 const [SRC, OUT, FONTS = '../../../css/fonts'] = process.argv.slice(2);
 const R = await import(path.resolve(SRC, 'recipes.mjs'));
-const { makeKit, poolCheck } = await import(path.resolve(SRC, 'packkit.mjs'));
+const { makeKit } = await import(path.resolve(SRC, 'packkit.mjs'));
 const { factStack, hopTrack, counters, numberBond, numberTrack, icon } = R;
 const css = fs.readFileSync(path.join(SRC, 'house.css'), 'utf8').replaceAll('FONT_URL', FONTS);
 
@@ -6758,31 +6847,33 @@ const L = { title: 'I Can add 1–3 (facts to 10)', level: 'Level 1', strand: 'A
   foot: 'add_facts · Grade 1 · 1.OA.C.6 · EE M.EE.2.NBT.7, M.EE.3.OA.6',
   steps: [['start', 'Start with the big number.'], ['count', 'Count on.'], ['write', 'Write how many.']] };
 const K = makeKit(L, R);
-const { LET, k, lt, sec, tbox, sc, ans, blank, loop, table, chk, withThumb, stepsStrip, stepsList, pupilPage, exitPage, exitHead, exitFoot } = K;
+const { it, LET, k, lt, sec, tbox, sc, ans, blank, loop, table, chk, withThumb, stepsStrip, stepsList, pupilPage, exitPage, exitHead, exitFoot } = K;
 
 // ---- items (Appendix F.1): pool a + b, min(a, b) in 1..3, a + b <= 10 ----
 const CHART = [[7, 2], [2, 8], [3, 3]];
-const GUIDED = [[6, 2], [1, 7], [2, 2]];                       // the Model's case first (big first), then big second, then same
-const INDEP = [[5, 2], [3, 4], [9, 1], [1, 5], [6, 3], [2, 4]];
-const P1 = [[5, 3], [2, 5], [4, 1], [5, 1], [8, 1], [4, 2], [2, 1], [1, 3], [4, 3], [1, 1], [3, 7], [1, 6]];
-const P2 = [[7, 1], [6, 1], [3, 1], [2, 6], [1, 4], [3, 5], [1, 2], [2, 3], [1, 8], [3, 6], [1, 9], [7, 3]];
+const GUIDED = [[6, 2], [1, 6], [2, 2]];                       // the Model's case first (big first), then big second, then same
+const INDEP = [[5, 2], [9, 1], [1, 5], [3, 4], [6, 3], [2, 4]];   // rows of 3: no two equal answers in a row
+const P1 = [[5, 3], [5, 1], [2, 5], [4, 1], [4, 2], [4, 3], [8, 1], [2, 1], [1, 3], [1, 1], [3, 7], [1, 7]];
+const P2 = [[7, 1], [6, 1], [3, 1], [1, 4], [3, 5], [1, 2], [2, 3], [1, 8], [7, 3], [3, 6], [1, 9], [2, 6]];
 const STORY = [3, 2];
 const EXIT = [[4, 3], [3, 6], [1, 1], [3, 7]];                  // big first · big second count 3 · same · sum of 10
-export const POOL = poolCheck([{ id: 'P2', items: CHART }, { id: 'P3', items: [...GUIDED, ...INDEP] }, { id: 'P4a', items: P1 },
-  { id: 'P4b', items: P2 }, { id: 'P5', items: [STORY] }, { id: 'P6', items: EXIT, mayRepeat: true }]);
+// The item pool, written into the pack for the self-check (E24, E24b): every a + b with min(a, b) in 1..3 and
+// a + b <= 10; forbidden = the chart examples turned round (LR-5); edge = the cases of the last Practice row.
+const POOLLIST = []; for (let a = 1; a <= 9; a++) for (let b = 1; b <= 9; b++) if (Math.min(a, b) <= 3 && a + b <= 10) POOLLIST.push([a, b]);
+const POOL = { op: '+', pool: POOLLIST, forbidden: [[2, 7], [8, 2]], edge: POOLLIST.filter(([a, b]) => a < b || a === b || a + b === 10) };
 
 const fact = (a, b, key, o = {}) => factStack({ top: a, bottom: b, ans: key ? a + b : null, ...o });
-const cellF = (a, b, i, key) => `<div class="cell" style="padding-top:8mm">${lt(i)}${fact(a, b, key)}</div>`;
+const cellF = (a, b, i, key, cols = 3, copy = false) => `<div class="cell" style="padding-top:8mm"${it(a, b, '+', Math.floor(i / cols), copy)}>${lt(i)}${fact(a, b, key)}</div>`;
 
 // ---- P0 Prerequisite Check (one question per Pre-requisite atom on T2) ----
 function prereq(key) {
-  const s = (instr, inner, tag, fl) => `<div class="band" style="flex:${fl} 1 0;min-height:0;display:flex" data-section="pre"><div class="strip"><span data-instr>${instr}</span>` +
+  const s = (instr, inner, tag, fl) => `<div class="band" style="${typeof fl === 'string' ? `flex:none;height:${fl}` : `flex:${fl} 1 0`};min-height:0;display:flex" data-section="pre"><div class="strip"><span data-instr>${instr}</span>` +
     (key ? `<span style="margin-left:auto;font-size:11pt">If missed → ${tag}</span>` : '') + `</div>` +
     `<div class="grid" style="grid-template-columns:1fr"><div class="cell mid" style="flex-direction:row;justify-content:space-evenly;align-items:center">${inner}</div></div></div>`;
-  return s('Count. Write the number.', lt(0) + counters({ n: 8, kind: 'triangle', perRow: 5 }) + `<span class="sq" data-slot="sq">${k(8)}</span>`, 'Lesson K-3 Count to 10', 1.15) +
-    s('Write the missing number.', lt(1) + numberTrack([3, 4, 5, 6, null, 8, 9], 7), 'Lesson K-4 Count on from a number', 0.85) +
-    s('Circle the bigger number.', lt(2) + `<div class="eq" style="gap:60mm"><span>4</span><span style="position:relative" data-slot="choice">9<i class="ring ka" data-ka style="width:1.1em;height:1.3em;border-width:1.5pt;border-color:currentColor"></i></span></div>`, 'Lesson K-6 Compare numbers to 10', 0.62) +
-    s('Write the missing number.', lt(3) + '<span data-slot="bond"></span>' + numberBond({ whole: 7, parts: [5, { v: 2, ka: true }], spread: 80, drop: 14 }), 'Lesson K-9 Number bonds to 10', 1.7);
+  return s('Count. Write the number.', lt(0) + counters({ n: 8, kind: 'triangle', perRow: 8 }) + `<span class="sq" data-slot="sq">${k(8)}</span>`, 'Lesson K-3 Count to 10', '42mm') +
+    s('Write the missing number.', lt(1) + numberTrack([3, 4, 5, 6, null, 8, 9], 7), 'Lesson K-4 Count on from a number', '36mm') +
+    s('Circle the bigger number.', lt(2) + `<div class="eq" style="gap:100mm"><span>4</span><span style="position:relative" data-slot="choice">9<i class="ring ka" data-ka style="width:1.1em;height:1.3em;border-width:1.5pt;border-color:currentColor"></i></span></div>`, 'Lesson K-6 Compare numbers to 10', '34mm') +
+    s('Write the missing number.', lt(3) + '<span data-slot="bond"></span>' + numberBond({ whole: 7, parts: [5, { v: 2, ka: true }], spread: 110, drop: 24 }), 'Lesson K-9 Number bonds to 10', 1.55);
 }
 
 // ---- P1 Number sense (Daily look) ----
@@ -6804,17 +6895,17 @@ function numberSense() {
 
 // ---- P2 Anchor chart ----
 function chart() {
-  const panel = (i, stk, head, lines, pic) => `<div class="cell" style="flex-direction:row;align-items:center;padding:3mm 4mm">` +
+  const panel = (i, stk, head, lines, pic) => `<div class="cell" data-step-panel="${i}"${i === 1 ? it(7, 2, '+') : ''} style="flex-direction:row;align-items:center;padding:3mm 4mm">` +
     `<div style="flex:0 0 42%;display:flex;justify-content:center" class="poster">${stk}</div>` +
     `<div style="flex:1;display:flex;flex-direction:column;gap:2.5mm"><div style="display:flex;align-items:center;gap:2.5mm;font-size:18pt;font-weight:700;line-height:1.2">` +
     `<span class="num big" data-accent>${i}</span>${icon(L.steps[i - 1][0], { mm: 8 })}<span>${head}</span></div><div style="font-size:15pt">${lines}</div>${pic || ''}</div></div>`;
   const big = (html, pt) => html.replace('class="stk"', `class="stk" style="font-size:${pt}pt"`);
   const s = (o) => big(factStack({ top: 7, bottom: 2, ...o }), 34);
-  const ex = (cap, a, b, ringAt, n, nums) => `<div class="cell" style="padding:3mm;gap:2mm"><b style="font-size:15pt;text-align:center">${cap}</b>` +
+  const ex = (cap, a, b, ringAt, n, nums) => `<div class="cell"${it(a, b, '+')} style="padding:3mm;gap:2mm"><b style="font-size:15pt;text-align:center">${cap}</b>` +
     `<div style="display:flex;align-items:center;gap:6mm;flex:1"><div style="margin-right:10mm">${big(factStack({ top: a, bottom: b, ring: ringAt, tile: { at: ringAt === 'top' ? 'bottom' : 'top', n }, ans: a + b, state: 'ink' }), 30)}</div>` +
     hopTrack({ nums }) + `</div></div>`;
   return `<div class="band" style="flex:3 1 0;min-height:0" data-section="chart"><div class="grid" style="grid-template-rows:repeat(3,1fr);border-width:0">` +
-    panel(1, s({ ring: 'top' }), L.steps[0][1], 'Start with 7.') +
+    panel(1, s({ ring: 'top', ringGrey: true }), L.steps[0][1], 'Start with 7.') +
     panel(2, s({ ring: 'top', tile: { at: 'bottom', n: 2, grey: true } }), L.steps[1][1], 'Count on 2: 8, 9.', hopTrack({ nums: [7, 8, 9], numState: ['ink', 'grey', 'grey'], arcState: ['grey', 'grey'] })) +
     panel(3, s({ ring: 'top', tile: { at: 'bottom', n: 2 }, ans: 9, state: 'traced' }), L.steps[2][1], 'Write 9.', hopTrack({ nums: [7, 8, 9] })) + `</div></div>` +
     `<div class="band" style="flex:1.35 1 0;min-height:0" data-section="other"><div class="strip"><b>Another example:</b></div><div class="grid" style="grid-template-columns:1fr 1fr">` +
@@ -6834,7 +6925,7 @@ function sheet(key) {
     `<svg class="ka" data-ka viewBox="0 0 174 40" style="position:absolute;left:6mm;top:0;width:174mm;height:40mm;overflow:visible" fill="none">` +
     `<path data-ka d="M29 21.75 L145 33.25 M87 21.75 L29 33.25 M145 21.75 L87 33.25" stroke-width="0.53"/></svg></div></div></div>`;
   const gcell = ([a, b], i) => { const bigAt = a >= b ? 'top' : 'bottom';
-    return `<div class="cell" style="padding-top:5mm"><div style="margin-right:11mm">${fact(a, b, key, { ring: i === 0 ? bigAt : null, ringGrey: true,
+    return `<div class="cell" style="padding-top:5mm"${it(a, b, '+', 10)}><div style="margin-right:11mm">${fact(a, b, key, { ring: i === 0 ? bigAt : null, ringGrey: true,
       tile: { at: bigAt === 'top' ? 'bottom' : 'top', n: Math.min(a, b), grey: true } })}</div></div>`; };
   const guided = `<div class="band" style="flex:none" data-section="guided"><div class="row" style="border-top:1.5pt solid #000">` +
     `<div style="flex:1;display:flex;flex-direction:column;border-right:1.5pt solid #000"><div class="strip"><b>Guided Practice:</b><span data-instr>Add.</span></div>` +
@@ -6852,7 +6943,7 @@ const practice = (items, key) => stepsStrip() + `<div class="instr" data-instr>A
 function wordProblem(key) {
   const rc = [['read', 'Read it two times.'], ['ringnum', 'Circle the numbers.'], ['underline', 'Underline the question.'], ['draw', 'Draw it.'], ['write', 'Write the equation.'], ['check', 'Solve. Check.']];
   return `<div class="instr" data-instr>Read the story. Draw it. Solve.</div>` +
-    `<div class="grid" data-section="wp" style="grid-template-columns:58fr 42fr;flex:none;height:72mm"><div class="cell" data-read style="justify-content:center;align-items:stretch">` +
+    `<div class="grid" data-section="wp"${it(3, 2, '+')} style="grid-template-columns:58fr 42fr;flex:none;height:72mm"><div class="cell" data-read style="justify-content:center;align-items:stretch">` +
     `<div class="story" style="font-size:15pt;flex:1;display:flex;flex-direction:column;justify-content:space-evenly"><p>Omar has 3 cars.</p><p>He gets 2 more cars.</p><p>How many cars does Omar have now?</p>` +
     `<p style="display:flex;align-items:flex-end;gap:2mm">Omar has <span class="ln" data-slot="line" style="--w:17mm">${k(5)}</span> cars.</p></div></div>` +
     `<div class="cell" data-read style="align-items:stretch;justify-content:space-evenly;padding:2mm 3mm">${rc.map(([ic, t]) =>
@@ -6865,8 +6956,8 @@ function wordProblem(key) {
 }
 
 // ---- P6 Exit slip half: 4 facts (2 x 2), one per case; the Say frame for item a ----
-const exitHalf = (key) => `<div style="flex:1;display:flex;flex-direction:column;min-width:0">${exitHead(key)}` +
-  `<div class="instr" data-instr>Add.</div><div class="grid" data-section="exit" style="grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr">${EXIT.map(([a, b], i) => cellF(a, b, i, key)).join('')}</div>` +
+const exitHalf = (key, copy) => `<div style="flex:1;display:flex;flex-direction:column;min-width:0">${exitHead(key)}` +
+  `<div class="instr" data-instr>Add.</div><div class="grid" data-section="exit" style="grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr">${EXIT.map(([a, b], i) => cellF(a, b, i, key, 2, copy)).join('')}</div>` +
   `<div class="band sayb" style="margin-top:-1.5pt"><div class="sayline"><b>Say:</b><span>“a. 4 plus 3 equals ${blank()}.”</span></div></div>${exitFoot()}</div>`;
 
 // ---- pupil packet ----
@@ -6883,7 +6974,7 @@ const P = [
 const pg = (id) => P.find((p) => p.id === id).render(false);
 
 // ---- teacher pages ----
-const T1 = `<div class="tline" style="padding:1.5mm 0 1mm">CCSS 1.OA.C.6 · EE M.EE.2.NBT.7, M.EE.3.OA.6 · CRA: Pictures · Flow: Standard</div>` +
+const T1 = `<div class="tline" style="padding:1.5mm 0 1mm">CCSS 1.OA.C.6 · EE M.EE.2.NBT.7, M.EE.3.OA.6 · CRA: Pictures · Flow: Standard (2 new routine steps)</div>` +
   sec('Lesson guidance:', tbox('tip', 'Tip:', 'Big first, every time.', 'Pupils who start with the first number count on 7 from 2: slow, and they lose count. Before every item ask “Which is bigger?” and have them touch it.') +
     tbox('language', 'Tip:', 'Plus means put together.', 'ELL pupils may read + as “and” or not read it at all. Say “plus” and push two groups of counters together each time you say it.') +
     tbox('watch', 'Watch:', 'Counting the start.', 'The most common mistake: 7 + 2 → “7, 8” → 8. The start number is said, not counted. Fix: tap the 7, say it, then put up one finger per count.')) +
@@ -6953,8 +7044,8 @@ const T4 = sec('Section 5 · I Do (12 min)', withThumb(tbox('watch', 'Watch:', '
     sc(5, [['Do:', 'Pupils tell a partner why we start big (oral only).'], ['Say:', `“We start with the big number because ${blank()} .”`]])) +
   sec('Section 6 · We Do (8 min)', withThumb(tbox('tip', 'Tip:', 'Grey is a helper.', 'In cell 1 the ring is grey: pupils trace it. Every Guided cell has a grey dot tile.') +
       sc(1, [['Do:', 'Lesson sheet, Guided Practice. Work cell 1 together: trace the ring, count on, write.'], ['Say:', `“6 plus 2. Start with 6. Count on 2: 7, 8.” ${ans('8')} ★`]]) +
-      sc(2, [['Do:', 'Pairs do cells 2 and 3; A talks, B points.'], ['Ask:', `“Partner B, what did your partner start with?” ${ans('7, then 2')}`],
-        ['Note:', `Answers ★: ${ans('8')}, ${ans('4')}. Manipulative: counters and the 0–10 track.`]]), pg('P3')), true);
+      sc(2, [['Do:', 'Pairs do cells 2 and 3; A talks, B points.'], ['Ask:', `“Partner B, what did your partner start with?” ${ans('6, then 2')}`],
+        ['Note:', `Answers ★: ${ans('7')}, ${ans('4')}. Manipulative: counters and the 0–10 track.`]]), pg('P3')), true);
 
 const T5 = sec('Section 7 · Check Question (3 min, board + mini whiteboards)', sc(1, [['Ask:', '“6 + 3. Which is right? A: 6, 7, 8 → 8. B: 3, then 4 … 9 → 9. C: start 6, count on 7, 8, 9 → 9.”'],
       ['Note:', `${ans('C')} — the routine. <b>A</b>: Counting the start. <b>B</b>: Starting small (right answer, slow method).`]]) +
@@ -6986,13 +7077,12 @@ const routing = sec('Prerequisite routing:', table(['Question', 'Prerequisite (T
       ['the small number (7 + 3 → 3)', 'Last count only', 'Say the whole frame aloud'],
       ['“I need one more day.” checked', '—', 'Small group tomorrow: Guided page with counters']]), true);
 
-const doc = K.document({ titleTag: 'Add 1–3 lesson pack (V21 sample)', pupil: P, routing, teacher: [
+const doc = K.document({ titleTag: 'Add 1–3 lesson pack (V21 sample)', pupil: P, routing, pool: POOL, teacher: [
   { id: 'T1', l3: 'Teacher 1', body: T1 }, { id: 'T2', l3: 'Teacher 2', body: T2 }, { id: 'T2b', l3: 'Reference', body: T2b, right: 'Teacher · Print once per unit' },
   { id: 'T3', l3: 'Teacher 3', body: T3 }, { id: 'T4', l3: 'Teacher 4', body: T4 }, { id: 'T5', l3: 'Teacher 5', body: T5 }] });
 fs.mkdirSync(OUT, { recursive: true });
 fs.writeFileSync(path.join(OUT, 'pack.html'), doc.html(css));
-fs.writeFileSync(path.join(OUT, 'pool.json'), JSON.stringify(POOL));
-console.log('pages', doc.pages.length, 'pool', JSON.stringify(POOL));
+console.log('pages', doc.pages.length);
 ```
 
 ```js v21-example-sub
@@ -7002,43 +7092,44 @@ import fs from 'node:fs';
 import path from 'node:path';
 const [SRC, OUT, FONTS = '../../../css/fonts'] = process.argv.slice(2);
 const R = await import(path.resolve(SRC, 'recipes.mjs'));
-const { makeKit, poolCheck } = await import(path.resolve(SRC, 'packkit.mjs'));
-const { columnStackSub, base10, quickDraw, numberTrack, icon } = R;
+const { makeKit } = await import(path.resolve(SRC, 'packkit.mjs'));
+const { columnStackSub, columnStack, base10, quickDraw, icon } = R;
 const css = fs.readFileSync(path.join(SRC, 'house.css'), 'utf8').replaceAll('FONT_URL', FONTS);
 
 const L = { title: 'I Can subtract within 100 (with regrouping)', level: 'Level 2', strand: 'Subtraction', seed: 5150,
   foot: 'sub_100_regroup · Grade 2 · 2.NBT.B.5 · EE M.EE.2.NBT.5, M.EE.4.NBT.4',
   steps: [['look', 'Look at the ones.'], ['regroup', 'Top smaller? Regroup a ten.'], ['subOnes', 'Subtract the ones.'], ['subTens', 'Subtract the tens.'], ['check', 'Check: add back.']] };
 const K = makeKit(L, R);
-const { LET, k, lt, sec, tbox, sc, ans, blank, loop, table, chk, withThumb, stepsStrip, stepsList, pupilPage, exitPage, exitHead } = K;
+const { it, LET, k, lt, sec, tbox, sc, ans, blank, loop, table, chk, withThumb, stepsStrip, stepsList, pupilPage, exitPage, exitHead } = K;
 
 // ---- items (Appendix F.2): a - b, a two-digit, ones of a < ones of b (every item regroups), answer >= 1 ----
 // cases: regroup (2-digit - 2-digit) · zero in the ones (60 - 3) · one-digit take-away · a tens answer of 0 (41 - 35 = 6)
 const CHART = [[52, 39], [60, 3]];
 const GUIDED = [[74, 28], [91, 46], [50, 7]];
 const INDEP = [[83, 36], [62, 9], [46, 38]];
-const P1 = [[72, 8], [45, 27], [41, 35], [63, 47], [85, 29], [70, 44]];
-const P2 = [[92, 56], [31, 7], [64, 38], [26, 19], [80, 52], [57, 29]];
+const P1 = [[45, 27], [63, 47], [85, 29], [41, 35], [72, 8], [70, 44]];   // last row: one-digit, 0 ones (edge cases)
+const P2 = [[92, 56], [64, 38], [57, 38], [26, 19], [31, 7], [80, 52]];
 const STORY = [42, 17];
 const EXIT = [[43, 27], [40, 13], [55, 8], [42, 36]];          // regroup · zero ones · one digit · tens answer 0
-export const POOL = poolCheck([{ id: 'P2', items: CHART }, { id: 'P3', items: [...GUIDED, ...INDEP] }, { id: 'P4a', items: P1 },
-  { id: 'P4b', items: P2 }, { id: 'P5', items: [STORY] }, { id: 'P6', items: EXIT }]);
+// The item pool, written into the pack (E24, E24b): a two-digit, a − b >= 1, ones(a) < ones(b) (every item regroups).
+// edge = one-digit take-away, 0 in the ones of the top number, or a tens answer of 0.
+const POOLLIST = []; for (let a = 10; a <= 99; a++) for (let b = 1; b < a; b++) if (a % 10 < b % 10) POOLLIST.push([a, b]);
+const POOL = { op: '−', pool: POOLLIST, forbidden: [], edge: POOLLIST.filter(([a, b]) => b < 10 || a % 10 === 0 || a - b < 10) };
 
 const keyStack = (a, b, key, o = {}) => columnStackSub({ top: a, bottom: b, regroup: key ? 'key' : 'slot', cross: key ? 'key' : 'none', ans: key ? 'key' : 'slot', ...o });
-const cellS = (a, b, i, key, o) => `<div class="cell" style="padding-top:7mm">${lt(i)}${keyStack(a, b, key, o)}</div>`;
+const cellS = (a, b, i, key, o, cols = 2, copy = false) => `<div class="cell" style="padding-top:7mm"${it(a, b, '−', Math.floor(i / cols), copy)}>${lt(i)}${keyStack(a, b, key, o)}</div>`;
 
-// ---- P0 Prerequisite Check ----
+// ---- P0 Prerequisite Check: one band per Pre-requisite atom; each item its own letter ----
 function prereq(key) {
-  const s = (instr, inner, tag, fl) => `<div class="band" style="flex:${fl} 1 0;min-height:0;display:flex" data-section="pre"><div class="strip"><span data-instr>${instr}</span>` +
+  const s = (instr, inner, tag, fl) => `<div class="band" style="${typeof fl === 'string' ? `flex:none;height:${fl}` : `flex:${fl} 1 0`};min-height:0;display:flex" data-section="pre"><div class="strip"><span data-instr>${instr}</span>` +
     (key ? `<span style="margin-left:auto;font-size:11pt">If missed → ${tag}</span>` : '') + `</div>` +
-    `<div class="grid" style="grid-template-columns:1fr"><div class="cell mid" style="flex-direction:row;justify-content:space-evenly;align-items:center">${inner}</div></div></div>`;
+    `<div class="grid" style="grid-template-columns:repeat(${inner.length}, 1fr)">${inner.map((x) => `<div class="cell mid" style="flex-direction:row;justify-content:space-evenly;align-items:center">${x}</div>`).join('')}</div></div>`;
   const B = (v) => `<span class="bx" data-slot="box" style="--w:17mm">${k(v)}</span>`;
-  return s('Write how many tens.', lt(0) + base10({ tens: 4, ones: 6 }) +
-      `<div style="display:flex;font-size:15pt;align-items:center;gap:3mm">${B(4)}<span>tens</span></div>`, 'Lesson 1-12 Tens and ones', 1.1) +
-    s('Write the missing number.', lt(1) + `<div class="eq">5 tens 2 ones <span class="o">=</span> 4 tens ${B(12)} ones</div>`, 'Lesson 2-3 Regroup a ten', 0.62) +
-    s('Subtract.', lt(2) + `<div class="eq">14 <span class="o">−</span> 6 <span class="o">=</span> <span class="ln" data-slot="line" style="--w:17mm">${k(8)}</span></div>` +
-      `<div class="eq">12 <span class="o">−</span> 9 <span class="o">=</span> <span class="ln" data-slot="line" style="--w:17mm">${k(3)}</span></div>`, 'Lesson 1-20 Subtract within 20', 0.62) +
-    s('Subtract.', lt(3) + columnStackSub({ top: 47, bottom: 23, regroup: 'none', ans: key ? 'key' : 'slot' }) + columnStackSub({ top: 68, bottom: 35, regroup: 'none', ans: key ? 'key' : 'slot' }), 'Lesson 2-6 Subtract (no regrouping)', 1.25);
+  const L_ = (v) => `<span class="ln" data-slot="line" style="--w:17mm">${k(v)}</span>`;
+  return s('Write how many tens.', [lt(0) + base10({ tens: 6, ones: 3 }) + `<div style="display:flex;font-size:15pt;align-items:center;gap:3mm">${B(6)}<span>tens</span></div>`], 'Lesson 1-12 Tens and ones', 1.05) +
+    s('Write the missing number.', [lt(1) + `<div class="eq"><span>5 tens 2 ones</span> <span class="o">=</span> <span>4 tens</span> ${B(12)} <span>ones</span></div>`], 'Lesson 2-3 Regroup a ten', '34mm') +
+    s('Subtract.', [lt(2) + `<div class="eq"><span>14</span> <span class="o">−</span> <span>6</span> <span class="o">=</span> ${L_(8)}</div>`, lt(3) + `<div class="eq"><span>12</span> <span class="o">−</span> <span>9</span> <span class="o">=</span> ${L_(3)}</div>`], 'Lesson 1-20 Subtract within 20', '34mm') +
+    s('Subtract.', [[47, 23], [68, 35], [59, 14]].map(([a, b], i) => lt(4 + i) + columnStackSub({ top: a, bottom: b, regroup: 'none', ans: key ? 'key' : 'slot' })), 'Lesson 2-6 Subtract (no regrouping)', 1.2);
 }
 
 // ---- P1 Number sense ----
@@ -7060,16 +7151,16 @@ function numberSense() {
 // ---- P2 Anchor chart: 2 x 3 step panels (site layout), the 6th is Another example ----
 function chart() {
   const big = (h) => h.replace('font-size:28pt', 'font-size:30pt');
-  const panel = (i, stk, words, note = '') => `<div class="cell" style="padding:3mm;gap:2mm;justify-content:flex-start">` +
+  const panel = (i, stk, words, note = '') => `<div class="cell" data-step-panel="${i}"${i === 1 ? it(52, 39, '−') : ''} style="padding:3mm;gap:2mm;justify-content:flex-start">` +
     `<div style="display:flex;flex-direction:column;align-items:center;gap:1mm"><div style="display:flex;align-items:center;gap:2mm"><span class="num big" data-accent>${i}</span>${icon(L.steps[i - 1][0], { mm: 8 })}</div>` +
     `<b style="font-size:15pt;text-align:center;line-height:1.2">${L.steps[i - 1][1]}</b></div>${big(stk)}<div style="font-size:15pt;text-align:center;line-height:1.25">${words}${note ? `<br><b>${note}</b>` : ''}</div></div>`;
   const st = (o) => columnStackSub({ top: 52, bottom: 39, regroup: 'slot', ans: 'slot', ...o });
-  const p5 = `<div class="cell" style="padding:3mm;gap:2mm;justify-content:flex-start"><div style="display:flex;flex-direction:column;align-items:center;gap:1mm"><div style="display:flex;align-items:center;gap:2mm"><span class="num big" data-accent>5</span>${icon('check', { mm: 8 })}</div>` +
-    `<b style="font-size:15pt">${L.steps[4][1]}</b></div><div style="display:grid;grid-template-columns:repeat(3,.95em);font-size:30pt;line-height:1.15;margin-top:4mm"><span></span><span style="text-align:center">1</span><span style="text-align:center">3</span><b style="text-align:center">+</b><span style="text-align:center">3</span><span style="text-align:center">9</span><i style="grid-column:1/-1;border-top:1.5pt solid #000;margin:1mm 0"></i><span></span><span class="g" style="text-align:center">5</span><span class="g" style="text-align:center">2</span></div><div style="font-size:15pt;text-align:center">52 is the top number. Correct.</div></div>`;
-  const ex = `<div class="cell" style="padding:3mm;gap:2mm;justify-content:flex-start"><b style="font-size:15pt;text-align:center;line-height:1.2">Another example:<br><span style="font-weight:400">0 ones? Regroup a ten.</span></b>` +
+  const p5 = `<div class="cell" data-step-panel="5" style="padding:3mm;gap:2mm;justify-content:flex-start"><div style="display:flex;flex-direction:column;align-items:center;gap:1mm"><div style="display:flex;align-items:center;gap:2mm"><span class="num big" data-accent>5</span>${icon('check', { mm: 8 })}</div>` +
+    `<b style="font-size:15pt">${L.steps[4][1]}</b></div>${big(columnStack({ top: 13, bottom: 39, op: '+', carry: '1', ans: '52', state: 'grey' }))}<div style="font-size:15pt;text-align:center">52 is the top number. Correct.</div></div>`;
+  const ex = `<div class="cell"${it(60, 3, '−')} style="padding:3mm;gap:2mm;justify-content:flex-start"><b style="font-size:15pt;text-align:center;line-height:1.2">Another example:<br><span style="font-weight:400">0 ones? Regroup a ten.</span></b>` +
     big(columnStackSub({ top: 60, bottom: 3, regroup: 'ink', cross: 'ink', ans: 'ink' })) + `<div style="font-size:15pt;text-align:center">6 tens is 5 tens 10 ones.</div></div>`;
   return `<div class="band" style="flex:1 1 0;min-height:0" data-section="chart"><div class="grid" style="grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;border-width:0">` +
-    panel(1, st({}), 'Ones: 2 is less than 9.') + panel(2, st({ regroup: 'grey', cross: 'grey' }), '5 tens 2 ones is 4 tens 12 ones.') +
+    panel(1, st({ ring: 'ones' }), 'Ones: 2 is less than 9.') + panel(2, st({ regroup: 'grey', cross: 'grey' }), '5 tens 2 ones is 4 tens 12 ones.') +
     panel(3, st({ regroup: 'ink', cross: 'ink', ans: 'grey', ansDigits: ['', 3] }), '12 − 9 = 3. Write 3.') +
     panel(4, st({ regroup: 'ink', cross: 'ink', ans: 'ink', ansDigits: [1, 3] }).replace('>1<', ' class="g">1<'), '4 − 3 = 1. Write 1.', '0 tens? Leave it empty.') + p5 + ex + `</div></div>` +
     `<div class="band sayb"><div class="sayline"><b>Say:</b><span>“52 minus 39 equals 13.”</span></div></div>` +
@@ -7086,13 +7177,13 @@ function sheet(key) {
     ['ones', 'regroup', 'tens'].map((w) => `<div style="${W};gap:1.5mm"><i class="dotm"></i><b style="font-size:15pt">${w}</b></div>`).join('') + `</div>` +
     `<svg class="ka" data-ka viewBox="0 0 174 60" style="position:absolute;left:6mm;top:0;width:174mm;height:60mm;overflow:visible" fill="none">` +
     `<path data-ka d="M29 41.75 L145 49.25 M87 41.75 L29 49.25 M145 41.75 L87 49.25" stroke-width="0.53"/></svg></div></div></div>`;
-  const gcell = ([a, b], i) => `<div class="cell" style="padding-top:3mm">${columnStackSub({ top: a, bottom: b, regroup: i === 0 ? 'grey' : (key ? 'key' : 'slot'), cross: i === 0 ? 'grey' : (key ? 'key' : 'none'), ans: key ? 'key' : 'slot' })}</div>`;
+  const gcell = ([a, b], i) => `<div class="cell" style="padding-top:3mm"${it(a, b, '−', 10)}>${columnStackSub({ top: a, bottom: b, regroup: i === 0 ? 'grey' : (key ? 'key' : 'slot'), cross: i === 0 ? 'grey' : (key ? 'key' : 'none'), ans: key ? 'key' : 'slot' })}</div>`;
   const guided = `<div class="band" style="flex:none" data-section="guided"><div class="row" style="border-top:1.5pt solid #000">` +
     `<div style="flex:1;display:flex;flex-direction:column;border-right:1.5pt solid #000"><div class="strip"><b>Guided Practice:</b><span data-instr>Subtract.</span></div>` +
     `<div class="grid" style="flex:none;height:62mm;grid-template-columns:repeat(3,1fr);border-width:1.5pt 0 0 0">${GUIDED.map(gcell).join('')}</div></div>` +
     `<div style="flex:0 0 70mm;display:flex;flex-direction:column"><div class="strip"><b>Steps:</b></div>${stepsList()}</div></div></div>`;
   const indep = `<div class="band grow" data-section="indep"><div class="strip"><b>Independent Practice:</b><span data-instr>Subtract.</span></div>` +
-    `<div class="grid" style="grid-template-columns:repeat(3,1fr)">${INDEP.map(([a, b], i) => cellS(a, b, i, key, { heads: false })).join('')}</div></div>`;
+    `<div class="grid" style="grid-template-columns:repeat(3,1fr)">${INDEP.map(([a, b], i) => cellS(a, b, i, key, { heads: false }, 3)).join('')}</div></div>`;
   return vocab + `<div class="band"><div class="strip"><b>Remember:</b><span>1 ten is 10 ones.</span></div></div>` + guided + indep;
 }
 
@@ -7103,26 +7194,26 @@ const practice = (items, key) => stepsStrip() + `<div class="instr" data-instr>S
 function wordProblem(key) {
   const rc = [['read', 'Read it two times.'], ['ringnum', 'Circle the numbers.'], ['underline', 'Underline the question.'], ['draw', 'Draw it.'], ['write', 'Write the equation.'], ['check', 'Solve. Check.']];
   return `<div class="instr" data-instr>Read the story. Draw it. Solve.</div>` +
-    `<div class="grid" data-section="wp" style="grid-template-columns:58fr 42fr;flex:none;height:72mm"><div class="cell" data-read style="justify-content:center;align-items:stretch">` +
-    `<div class="story" style="font-size:15pt;flex:1;display:flex;flex-direction:column;justify-content:space-evenly"><p>Ana has 42 stickers.</p><p>She gives away 17 stickers.</p><p>How many stickers does Ana have now?</p>` +
+    `<div class="grid" data-section="wp"${it(42, 17, '−')} style="grid-template-columns:58fr 42fr;flex:none;height:72mm"><div class="cell" data-read style="justify-content:center;align-items:stretch">` +
+    `<div class="story" style="font-size:15pt;flex:1;display:flex;flex-direction:column;justify-content:space-evenly"><p>Ana has 42 stickers.</p><p>She gives away 17 stickers.</p><p>How many stickers does Ana have?</p>` +
     `<p style="display:flex;align-items:flex-end;gap:2mm">Ana has <span class="ln" data-slot="line" style="--w:17mm">${k(25)}</span> stickers.</p></div></div>` +
     `<div class="cell" data-read style="align-items:stretch;justify-content:space-evenly;padding:2mm 3mm">${rc.map(([ic, t]) =>
       `<div data-panel-row style="display:flex;align-items:center;gap:1.5mm;font-size:13pt;line-height:1.15;white-space:nowrap"><span class="chk" data-slot="check-routine"></span>${icon(ic)}<span>${t}</span></div>`).join('')}</div></div>` +
     `<div class="band grow" style="margin-top:3mm;border-top-width:2.25pt"><div class="strip"><b>Workspace:</b></div><div style="flex:1;border-top:1.5pt solid #000;position:relative" data-work>` +
-    (key ? `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:14mm" data-ka>${columnStackSub({ top: 42, bottom: 17, regroup: 'key', cross: 'key', ans: 'key', heads: true })}${quickDraw({ tens: 2, ones: 5 })}</div>` : '') + `</div></div>` +
+    (key ? `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:14mm" data-ka>${columnStackSub({ top: 42, bottom: 17, regroup: 'key', cross: 'key', ans: 'key', heads: true })}${quickDraw({ tens: 3, ones: 12, crossTens: 1, crossOnes: 7 })}</div>` : '') + `</div></div>` +
     `<div class="band" style="flex:none"><div class="row" style="border-top:0;align-items:center;justify-content:center;height:24mm">` +
     `<div class="eq"><span class="ln" data-slot="line" style="--w:17mm">${k(42)}</span><span class="circ" data-slot="circle">${k('−')}</span><span class="ln" data-slot="line" style="--w:17mm">${k(17)}</span><span class="o">=</span><span class="ln" data-slot="line" style="--w:17mm">${k(25)}</span></div></div></div>` +
     `<div class="band sayb"><div class="sayline"><b>Say:</b><span>“The answer is ${blank()} stickers.”</span></div></div>`;
 }
 
 // ---- P6 Exit slip half: 4 items, one per case; the Say band and the two check boxes share one row ----
-const exitHalf = (key) => `<div style="flex:1;display:flex;flex-direction:column;min-width:0">${exitHead(key)}` +
-  `<div class="instr" data-instr>Subtract.</div><div class="grid" data-section="exit" style="grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr">${EXIT.map(([a, b], i) => cellS(a, b, i, key, { heads: false })).join('')}</div>` +
+const exitHalf = (key, copy) => `<div style="flex:1;display:flex;flex-direction:column;min-width:0">${exitHead(key)}` +
+  `<div class="instr" data-instr>Subtract.</div><div class="grid" data-section="exit" style="grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr">${EXIT.map(([a, b], i) => cellS(a, b, i, key, { heads: false }, 2, copy)).join('')}</div>` +
   `<div class="band sayb" style="margin-top:-1.5pt"><div class="sayline" style="justify-content:space-between"><span><b>Say:</b> “a. 43 minus 27 equals ${blank()}.”</span></div></div>` +
   `<div style="flex:none;display:flex;gap:10mm;padding:2mm 3mm 0;font-size:15pt"><div><span class="chk" data-slot="check"></span>I can do this.</div><div><span class="chk" data-slot="check"></span>I need one more day.</div></div></div>`;
 
 const P = [
-  { id: 'P0', render: (key) => pupilPage({ id: 'P0', l3: 'Prerequisite', score: 6, body: prereq(key), key }) },
+  { id: 'P0', render: (key) => pupilPage({ id: 'P0', l3: 'Prerequisite', score: 7, body: prereq(key), key }) },
   { id: 'P1', render: (key) => pupilPage({ id: 'P1', l3: 'Number sense', score: 10, body: numberSense(key), key }) },
   { id: 'P2', render: (key) => pupilPage({ id: 'P2', l3: 'Anchor chart', fields: false, body: chart(), key }) },
   { id: 'P3', render: (key) => pupilPage({ id: 'P3', l3: 'Lesson 1', score: 3, body: sheet(key), key }) },
@@ -7134,15 +7225,15 @@ const P = [
 const pg = (id) => P.find((p) => p.id === id).render(false);
 
 // ---- teacher pages ----
-const T1 = `<div class="tline" style="padding:1.5mm 0 1mm">CCSS 2.NBT.B.5 · EE M.EE.2.NBT.5, M.EE.4.NBT.4 · CRA: Pictures → Abstract · Flow: Chunked</div>` +
+const T1 = `<div class="tline" style="padding:1.5mm 0 1mm">CCSS 2.NBT.B.5 · EE M.EE.2.NBT.5, M.EE.4.NBT.4 · CRA: Pictures → Abstract · Flow: Standard (3 new routine steps)</div>` +
   sec('Lesson guidance:', tbox('tip', 'Tip:', 'Ones first, always.', 'Every item starts at the ones. Pupils who start with the tens regroup too late. Point to the ones column before each item.') +
     tbox('watch', 'Watch:', 'Smaller from bigger.', 'The most common mistake: 52 − 39 → 27 (9 − 2 in the ones). The top number is always first. Fix: “Is the top smaller? Then regroup.”')) +
   sec('Lesson flow:', table(['', 'Section', 'Pupil page', 'Min'], [[1, 'Prerequisite Check', 'Prerequisite Check', 4], [2, 'Number sense', 'Number sense', 5],
-    [3, 'Spaced retrieval', 'mini whiteboards', 3], [4, 'Chaining Bridge', '—', 1], ['5a', 'I Do part 1 (steps 1–2)', 'Anchor chart panels 1–2', 6], ['6a', 'We Do part 1', 'Guided cell 1', 4],
-    ['5b', 'I Do part 2 (steps 3–5)', 'Anchor chart panels 3–6', 6], ['6b', 'We Do part 2', 'Guided cells 2–3', 4], [7, 'Check Question', 'board + mini whiteboards', 3],
+    [3, 'Spaced retrieval', 'mini whiteboards', 3], [4, 'Chaining Bridge', '—', 1], [5, 'I Do', 'Anchor chart (board)', 12], [6, 'We Do', 'Lesson sheet: Guided Practice', 8],
+    [7, 'Check Question', 'board + mini whiteboards', 3],
     [8, 'You Do + word problem', 'Lesson sheet, Practice 1–2, Word problem', 15], [9, 'Plenary', 'Exit slip', 7], ['', 'Transitions', '', 2], ['', '<b>Total</b>', '', '<b>60</b>']])) +
   sec('Materials:', `<div style="display:grid;grid-template-columns:1fr 1fr;row-gap:1.5mm">` + ['Pupil packet: 8 pages, one per pupil', 'Exit slips, cut in half',
-    'Base-ten rods and cubes (5 rods, 20 cubes a pair)', 'Mini whiteboards and pens', 'Anchor chart on the board', 'Answer keys (Teacher 6)'].map(chk).join('') + `</div>`) +
+    'Base-ten rods and cubes', 'Mini whiteboards and pens', 'Anchor chart on the board', 'Answer keys (Teacher 6)'].map(chk).join('') + `</div>`) +
   sec('Vocabulary:', `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3mm">` + [[quickDraw({ tens: 2 }), 'tens', 'groups of ten'], [quickDraw({ ones: 4 }), 'ones', 'single cubes'],
     [`<div style="display:flex;align-items:center;gap:1mm">${quickDraw({ tens: 1 })}<span>→</span>${quickDraw({ ones: 10 })}</div>`, 'regroup', 'trade 1 ten for 10 ones']].map(([pic, w, g]) =>
     `<div style="border:1.5pt solid #000;border-radius:3mm;padding:2mm;display:flex;flex-direction:column;align-items:center;gap:1mm;justify-content:flex-end">${pic}<b style="font-size:13pt">${w}</b><span style="text-align:center">${g}</span></div>`).join('') + `</div>`, true);
@@ -7161,7 +7252,7 @@ const T2 = sec('What students need to know:', table(['#', 'Skill or Concept', 'A
     [3, '<b>Subtract</b> the ones.', 'Pre-requisite', 'Prerequisite Check c'],
     [4, '<b>Subtract</b> the tens (0 tens: leave empty).', 'Pre-requisite', 'exit d'],
     [5, '<b>Check:</b> add back.', 'New', 'Practice Check lines']])) +
-  sec('How to teach:', `<p><b>Language.</b> Same phrase per step every time; “trade” before “regroup”.</p><p><b>Two chunks.</b> 4 new atoms, so the teacher was offered two lessons (decide-and-regroup first). Kept as one: I Do / We Do twice (steps 1–2, then 3–5). CRA: rods and cubes, then the stack.</p>`) +
+  sec('How to teach:', `<p><b>Language.</b> Same phrase per step every time; “trade” before “regroup”.</p><p><b>Flow.</b> 3 routine steps are tagged New (Look, Regroup, Check), so the flow is Standard (Chunked needs 4 or more). CRA: rods and cubes, then the stack.</p>`) +
   sec('Common mistakes:', table(['Mistake', 'Broken step', 'Looks like', 'Fix'], [
     ['<b>Smaller from bigger</b>', 2, '52 − 39 → 27', '“Is the top smaller? Regroup.”'], ['<b>Forgot the tens</b>', 2, '52 − 39 → 23', 'Cross out the 5; write 4.'],
     ['<b>Zero trouble</b>', 2, '60 − 3 → 63', 'Show 6 tens as 5 tens 10 ones.'], ['<b>Regroup always</b>', 1, '47 − 23 regrouped', 'Look at the ones first.']]) +
@@ -7183,25 +7274,25 @@ const T2b = sec('Reference key:', `<div class="cols2"><div style="display:flex;f
 
 const T3 = sec('Section 1 · Prerequisite Check (4 min)', withThumb(tbox('tip', 'Tip:', 'Read each line aloud.', 'Read the instruction, point to the slot, wait.') +
       sc(1, [['Do:', 'Hand out the Prerequisite Check.'], ['Say:', '“Four parts. Work on your own.”']]) +
-      sc(2, [['Do:', 'Read a to d, 40 seconds each.'], ['Note:', `★ a ${ans('4 tens')}, b ${ans('12')}, c ${ans('8 · 3')}, d ${ans('24 · 33')}. Routing: Teacher 6.`]]), pg('P0')) +
+      sc(2, [['Do:', 'Read each band; 40 seconds a band.'], ['Note:', `★ a ${ans('6 tens')}, b ${ans('12')}, c ${ans('8')}, d ${ans('3')}, e ${ans('24')}, f ${ans('33')}, g ${ans('45')}. Routing: Teacher 6.`]]), pg('P0')) +
     loop([['most', 'Most:', 'all right → go on.'], ['half', 'About half:', 'reteach the missed part with rods, then go on.'], ['few', 'Fewer than half:', 'teach the earliest missed lesson first.']])) +
   sec('Section 2 · Number sense (5 min)', sc(1, [['Do:', 'Band A, then band B for early finishers.'], ['Note:', `★ A ${ans('39, 41 · 40, 50 · &lt; · 35 · 4')}; B ${ans('69, 71 · 55, 65 · &gt; · 72 · 30')}.`]])) +
   sec('Section 3 · Spaced retrieval (3 min, mini whiteboards)', tbox('research', 'Research:', 'Recall beats re-reading.', 'Pulling a fact from memory strengthens it more than seeing it again. Keep boards down until “3-2-1, show me”.') + sc(1, [['Ask:', `“Write 10 more than 47.” ${ans('57')}`], ['Ask:', `“Draw 3 tens 4 ones.” ${ans('3 sticks, 4 dots')}`], ['Ask:', `“15 − 8?” ${ans('7')}`]])) +
   sec('Section 4 · Chaining Bridge (1 min)', sc(1, [['Say:', '“You can subtract without regrouping. Today the top ones are smaller.”'], ['Say:', '“I can subtract within 100. Say it with me.”']]), true);
 
-const T4 = sec('Section 5 · I Do, in two parts (6 + 6 min)', withThumb(tbox('watch', 'Watch:', 'Smaller from bigger.', 'Show 52 − 39 → 27 once on the board. Write the word Wrong beside it. Never print it.') +
+const T4 = sec('Section 5 · I Do (12 min)', withThumb(tbox('watch', 'Watch:', 'Smaller from bigger.', 'Show 52 − 39 → 27 once on the board. Write the word Wrong beside it. Never print it.') +
       sc(1, [['Do:', 'Silent: point to the ones, 2 and 9.'], ['Say:', '“Look at the ones. 2 is less than 9.”']]) +
       sc(2, [['Do:', 'Trade a rod for 10 cubes. Cross out 5 and 2; write 4 and 12.'], ['Say:', '“Regroup a ten. 4 tens 12 ones.”']]) +
-      sc(3, [['Do:', 'Part 2: subtract the ones, then the tens.'], ['Say:', `“12 minus 9 is 3. 4 minus 3 is 1.” ${ans('13')}`]]), pg('P2')) +
+      sc(3, [['Do:', 'Subtract the ones, then the tens.'], ['Say:', `“12 minus 9 is 3. 4 minus 3 is 1.” ${ans('13')}`]]), pg('P2')) +
     sc(4, [['Do:', 'Check: add back. Then 60 − 3 (Another example).'], ['Ask:', `“What is 6 tens as tens and ones?” ${ans('5 tens 10 ones')}`]]) +
     sc(5, [['Do:', 'Pupils tell a partner when to regroup (oral only).'], ['Say:', `“I regroup when the top ones are ${blank()} .”`]])) +
-  sec('Section 6 · We Do, in two parts (4 + 4 min)', withThumb(tbox('tip', 'Tip:', 'Grey is a helper.', 'Cell 1 shows the regroup in grey: pupils trace it.') +
-      sc(1, [['Do:', 'Part 1: cell 1, 74 − 28. Trace the regroup.'], ['Say:', `“6 tens 14 ones. 14 minus 8 is 6.” ${ans('46')} ★`]]) +
-      sc(2, [['Do:', 'Part 2: pairs do 91 − 46 and 50 − 7; A writes, B checks.'], ['Note:', `★ ${ans('45')}, ${ans('43')}. Rods for anyone who needs them.`]]), pg('P3')), true);
+  sec('Section 6 · We Do (8 min)', withThumb(tbox('tip', 'Tip:', 'Grey is a helper.', 'Cell 1 shows the regroup in grey: pupils trace it.') +
+      sc(1, [['Do:', 'Cell 1, 74 − 28: trace the regroup together.'], ['Say:', `“6 tens 14 ones. 14 minus 8 is 6.” ${ans('46')} ★`]]) +
+      sc(2, [['Do:', 'Pairs do 91 − 46 and 50 − 7; A writes, B checks.'], ['Note:', `★ ${ans('45')}, ${ans('43')}. Rods for anyone who needs them.`]]), pg('P3')), true);
 
 const T5 = sec('Section 7 · Check Question (3 min, board + mini whiteboards)', sc(1, [['Ask:', '“61 − 25. Which is right? A 44. B 46. C 36.”'], ['Note:', `${ans('C')}. <b>A</b>: Smaller from bigger. <b>B</b>: Forgot the tens.`]]) +
     loop([['most', 'Most:', 'C → You Do.'], ['half', 'About half:', 'redo 61 − 25 with rods.'], ['few', 'Fewer than half:', 'reteach step 2 with rods and cubes.']])) +
-  sec('Section 8 · You Do (15 min)', withThumb(sc(1, [['Do:', 'Lesson sheet a–c (★★), then Practice 1 and 2 (★★; zero ones, one-digit, tens 0 ★★★).'], ['Note:', 'Visit ELL and SPED pupils first, within 60 seconds.']]) +
+  sec('Section 8 · You Do (15 min)', withThumb(sc(1, [['Do:', 'Lesson sheet a–c (★★), then Practice 1 and 2 (rows a–d ★★, last row ★★★: one-digit and 0 ones).'], ['Note:', 'Visit ELL and SPED pupils first, within 60 seconds.']]) +
       sc(2, [['Ask:', '“Is the top smaller?” “Show me the trade.”'], ['Note:', 'Stuck? Rods and cubes, not a new explanation.']]) +
       tbox('feedback', 'Feedback:', 'Name the step.', '“You looked at the ones first. That is step 1.” Fix: “Point to step 2. Is the top smaller?”'), pg('P4a')) +
     tbox('feedback', 'Feedback:', 'I finished early.', '“Make your own: a top number with 0 ones. Subtract a one-digit number. Check it.” (mini whiteboard)')) +
@@ -7212,26 +7303,25 @@ const T5 = sec('Section 7 · Check Question (3 min, board + mini whiteboards)', 
 const diff = (items) => items.map(([a, b], i) => `${LET[i]} ${a - b}`).join(' · ');
 const routing = sec('Prerequisite routing:', table(['Question', 'Prerequisite (T2 atom)', 'If missed → Lesson'], [
     ['a. tens', 'Tens and ones (atom 1, 1.NBT.B.2)', '1-12 Tens and ones'], ['b. missing number', 'A ten is ten ones (atom 2, 2.NBT.A.1)', '2-3 Regroup a ten'],
-    ['c. subtract', 'Facts within 20 (atom 3, 2.OA.B.2)', '1-20 Subtract within 20'], ['d. subtract', 'Column subtraction (atom 4, 2.NBT.B.5)', '2-6 Subtract (no regrouping)']]) +
+    ['c, d. subtract', 'Facts within 20 (atom 3, 2.OA.B.2)', '1-20 Subtract within 20'], ['e–g. subtract', 'Column subtraction (atom 4, 2.NBT.B.5)', '2-6 Subtract (no regrouping)']]) +
     `<p>One miss: that lesson first, then back. Two or more misses: start with the earliest.</p>`) +
   sec('Accepted answers:', `<p>Word problem: ${ans('42 − 17 = 25')}; ${ans('25')} stickers; drawing: any picture of 42 with 17 taken away. Regroup strips: the new tens and ones as on the key; a pupil who regroups correctly in their head may leave the strip empty on Practice (not on Guided).</p>`) +
   sec('Answers at a glance:', table(['Page', 'Answers', 'Fade'], [
-    ['Prerequisite Check', ans('a 4 tens · b 12 · c 8, 3 · d 24, 33'), '★'], ['Number sense A', ans('39, 41 · 40, 50 · &lt; · 35 · 4'), '★'], ['Number sense B', ans('69, 71 · 55, 65 · &gt; · 72 · 30'), '★★'],
+    ['Prerequisite Check', ans('a 6 tens · b 12 · c 8 · d 3 · e 24 · f 33 · g 45'), '★'], ['Number sense A', ans('39, 41 · 40, 50 · &lt; · 35 · 4'), '★'], ['Number sense B', ans('69, 71 · 55, 65 · &gt; · 72 · 30'), '★★'],
     ['Lesson 1, Guided', ans(GUIDED.map(([a, b]) => a - b).join(' · ')), '★'], ['Lesson 1, Independent', ans(diff(INDEP)), '★★'],
-    ['Practice 1, a–d', ans(diff(P1.slice(0, 4))), '★★'], ['Practice 1, e–f', ans(diff(P1).split(' · ').slice(4).join(' · ')), '★★★'],
-    ['Practice 2, a–d', ans(diff(P2.slice(0, 4))), '★★'], ['Practice 2, e–f', ans(diff(P2).split(' · ').slice(4).join(' · ')), '★★★'],
+    ['Practice 1, a–d', ans(diff(P1.slice(0, 4))), '★★'], ['Practice 1, e–f (one-digit, 0 ones)', ans(diff(P1).split(' · ').slice(4).join(' · ')), '★★★'],
+    ['Practice 2, a–d', ans(diff(P2.slice(0, 4))), '★★'], ['Practice 2, e–f (one-digit, 0 ones)', ans(diff(P2).split(' · ').slice(4).join(' · ')), '★★★'],
     ['Word problem', ans('25 stickers'), '★★'], ['Exit slip', ans(diff(EXIT)), '★★']]) +
     `<h3 style="margin-top:2mm">Wrong answers to look for when marking</h3>` + table(['Pupil wrote', 'Likely mistake', 'Next step'], [
       ['ones digit = bigger − smaller (52 − 39 → 27)', 'Smaller from bigger', '“Is the top smaller?” before each item'], ['tens one too big (→ 23)', 'Forgot the tens', 'Cross out and rewrite the tens'],
       ['60 − 3 → 63 or 3', 'Zero trouble', 'Rods: 6 tens is 5 tens 10 ones'], ['a 0 written in the tens (06)', 'Tens answer 0', 'Leave the tens box empty']]), true);
 
-const doc = K.document({ titleTag: 'Subtract with regrouping lesson pack (V21 sample 2)', pupil: P, routing, teacher: [
+const doc = K.document({ titleTag: 'Subtract with regrouping lesson pack (V21 sample 2)', pupil: P, routing, pool: POOL, teacher: [
   { id: 'T1', l3: 'Teacher 1', body: T1 }, { id: 'T2', l3: 'Teacher 2', body: T2 }, { id: 'T2b', l3: 'Reference', body: T2b, right: 'Teacher · Print once per unit' },
   { id: 'T3', l3: 'Teacher 3', body: T3 }, { id: 'T4', l3: 'Teacher 4', body: T4 }, { id: 'T5', l3: 'Teacher 5', body: T5 }] });
 fs.mkdirSync(OUT, { recursive: true });
 fs.writeFileSync(path.join(OUT, 'pack.html'), doc.html(css));
-fs.writeFileSync(path.join(OUT, 'pool.json'), JSON.stringify(POOL));
-console.log('pages', doc.pages.length, 'pool', JSON.stringify(POOL));
+console.log('pages', doc.pages.length);
 ```
 
 ---
@@ -7251,10 +7341,15 @@ console.log('pages', doc.pages.length, 'pool', JSON.stringify(POOL));
 - **Score on every page role.** `Score /N` counts lettered items only. Unscored and never counted: Model and
   Guided cells, the anchor chart, Vocabulary, `Remember:`, `Say:` frames, the routine-panel check boxes and
   the exit-slip "I can do this." boxes. A page with no lettered item prints no Score field.
-- **Instruction strings for shape partitioning (added keys).** `partition`: "Draw a line to make 2 equal
-  parts." · `equal-parts`: "Are the parts equal? Check one box." with the check-box label pair `Equal parts`
-  / `Not equal parts`. Use the `shape()` recipe with `task:'partition'` and `guides:true`; the shape cell is a
-  draw cell (exempt from the bottom-band rule).
+- **Shape partitioning (added instruction keys).** `partition`: "Draw a line to make 2 equal parts." ·
+  `equal-parts`: "Are the parts equal? Check one box." with the check-box labels `Equal parts` / `Not equal parts`.
+  Shapes at Levels K–2: rectangle, square and circle; a triangle only with its line of symmetry. Use `shape()`:
+  `task:'partition'` (0.75 pt outline); an unequal pair is an off-centre `lines` entry (for example
+  `{x1:0.3, y1:0, x2:0.3, y2:1}`); a shaded half is a `shade` polygon. `guides` are a **hint scaffold**: grey dots
+  on every candidate point (all four side midpoints of a rectangle, so they never show which line is right), on
+  Guided cells only — none on Independent, Practice or the exit slip (§8.12.5). The cell is a draw cell (E11
+  exempt). Vocabulary mini-diagram for "half": a square with one half shaded and a 0.75 pt middle line; for
+  "equal parts": a circle cut into 2 by a line through the centre.
 - **Items with many right answers (any halving line, any drawing).** Draw one correct answer in the key colour
   on the key; list "also accept …" on T6 under `Accepted answers:`.
 - **More slot shapes (WDS 6).** Number + label (faded word problem v2): a line B(n), then a 52 mm line for the
@@ -7286,7 +7381,7 @@ A, D and G are then only the specification the kit is checked against, not code 
 | P5 Word problem (RCDWS panel) | word-problem cells (story, work cell) | The six-line panel is new kit work (Q5) |
 | P6 Exit slip 2-up | `paginate.js` 2-up halves (PG-5) + `practice.js` cells | New role layout |
 | The whole pack | `print-sheet.js` `buildSheet(req)` with a new role `detailed-lesson` beside `sheet/roles/lesson.js`; `sheetDocument()` | The teacher print screen (`teacher-print.js`) offers it beside the current lesson maker |
-| Gates (Appendix E) | `tests/scripts/ws-lesson-samples.cjs` (H13 `sheetCheck`, renders), the lesson gate `ws-lesson-check.cjs` (LR-1…18), `ws-print-lint.cjs --source kit`, `ws-grade-render.cjs`, then the RUBRIC critic (8 on every criterion, every page) | E21–E25 are new checks to add to the lesson gate |
+| Gates (Appendix E) | On this branch: `tests/scripts/ws-lesson-samples.cjs` (H13 `sheetCheck`, renders), `tests/scripts/ws-print-lint.cjs --source kit`, `tests/scripts/ws-grade-render.cjs`, then the RUBRIC critic (8 on every criterion, every page). The lesson gate `ws-lesson-check.cjs` (LR-1…18) is **not on this branch**: it lives on `origin/claude/sweet-newton-c8wrv1-wip-lessons` and must be merged before use | E17b, E21–E26 are new checks to add to the lesson gate |
 
 **Teacher pages with no kit equivalent yet (new role code needed):** T1 Lesson at a glance, T2 Atomisation
 template, T2b Reference key, T3–T5 delivery scripts (T-SCRIPT rows, T-BOX, T-LOOP, thumbnails), and the T6
