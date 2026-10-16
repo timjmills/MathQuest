@@ -2644,6 +2644,9 @@ the instruction line repeats, word for word, at the top of every page on which i
 continuation pages use the 12 mm header;
 if the last page would hold fewer than 1/3 of a full page's rows, rebalance the rows evenly over the pages;
 a page under 50 % used is merged into the page before or filled with more items (up to the ceiling).
+a page shortened by pool sizing (§9.5) keeps the section's cell size on every page (CL-3, PG-11);
+   the freed rows are ONE unruled trailing area inside the frame (PG-15);
+   never add bands (Say:, Rule:, Remember:) or enlarge cells to fill it (E12, E28).
 ```
 
 #### 8.12.5 Scaffold fade [WDS 13.1, PED 4, D15]
@@ -2911,6 +2914,10 @@ kind when one item alone would leave an empty band (Score then counts items). Re
   never below 0.8× / 0.85× of the size they would be elsewhere. No Name, no Score, no slots. Its key is the
   same chart with the tab `Answer Key` (every pupil page has one key).
 
+- **Cases by skill (the chart draws every case the pages deal).** Time to the half hour: o'clock; half past;
+  the edge cases 12:30 (hour hand between 12 and 1, not past 12 → the pupil says 12, not 1) and 6:30 (hands
+  nearly in one line); 12:00 (hands together). Make 10: each split, 0 + 10 and 10 + 0 as the edge case.
+
 ### 9.4 P3 Lesson sheet (Vocabulary · Remember · Guided Practice + Steps · Independent Practice) [LR-4, D17]
 
 ```
@@ -2980,10 +2987,23 @@ kind when one item alone would leave an empty band (Score then counts items). Re
     you deal; when they are more, take whole rows off the last Practice page first, then off Practice 1. The
     exit slip never repeats an item: its four items appear on no other pupil page. Add 1–3 within 10: pool 39
     ordered facts, 2 forbidden (the chart examples 7 + 2 and 2 + 8 turned round) → usable 37; the pack deals
-    exactly 37 (Practice 2 is a 3 × 3 page for that reason). Write the pool as a rule (`rule`, `range`) as well
-    as a list: the self-check recomputes it from the rule (Appendix E24).
+    exactly 37 (Practice 2 is a 3 × 3 page for that reason). Write the pool as a declared rule (`decl`) as well
+    as a list: the self-check recomputes it from the rule (Appendix E24). The rule is DATA, not code, so a
+    self-check in any language can read it: `"decl":{"op":"+","small":[1,3],"maxSum":10,"noZero":true}` or
+    `{"op":"−","top":[10,99],"minDiff":1,"regroup":true}`. A code form may be kept as a note; never evaluate it.
+  - **A shortened Practice page** keeps the section's cell size; its freed rows are one unruled trailing area
+    inside the frame (§8.12.4, PG-15). Add 1–3: Practice 2 is 3 rows of Practice 1's cells and one blank row.
+  - **Small pool (usable pool < 12, one Practice page's worth).** Print **one** Practice page. Then, in this
+    order: (1) fewer Practice rows (a page under 50 % used is a half page, §8.12.4); (2) turn-arounds of items on
+    OTHER pages are allowed (soft, LR-5), never on the same page; (3) the same fact in a different representation
+    (ten frame, bond, equation) is a different item only on a different page. Never an exact repeat in one
+    representation. The exit slip takes items not on Practice, using a turn-around or another representation
+    when the pool is spent. Example, make 10: 11 ordered facts (0 + 10 … 10 + 0), 2 chart examples → usable 9:
+    Guided 2 + Independent 3 = 5 used; one Practice page of 2 rows of 3: the 4 facts left plus 2 turn-arounds of
+    Independent items (soft: another page); exit slip 4: Guided and Independent facts drawn as ten frames
+    (another representation, another page).
 - **The pool travels with the pack.** The builder writes the pool into `pack.html` as
-  `<script type="application/json" id="v21-pool">{"op":"+","rule":"(a, b) => …","range":[a0,a1,b0,b1],"pool":[[a,b],…],"forbidden":[[a,b],…],"edge":[[a,b],…]}</script>`
+  `<script type="application/json" id="v21-pool">{"op":"+","decl":{"op":"+","small":[1,3],"maxSum":10,"noZero":true},"pool":[[a,b],…],"forbidden":[[a,b],…],"edge":[[a,b],…]}</script>`
   and marks every dealt item cell `data-item="a+b"` (or `a−b`) `data-row="r"` (the second exit-slip half is a
   copy and carries no marks). The self-check reads only these.
 
@@ -5941,6 +5961,7 @@ the work ("Check the work."), never an option word.
 | Fractions | “__ out of __ equal parts are shaded.” |
 | Rounding | “__ is between __ and __. It is closer to __.” |
 | Time | “The time is __.” |
+| Number bonds / make 10 | “__ and __ make __.” (make 10: “__ and __ make 10.”) |
 | Measurement | “The line is __ {unit} long.” |
 | Word problem | “The answer is __ {unit}.” |
 | Error analysis (oral only) | “The mistake is in the __. The correct answer is __.” |
@@ -6197,6 +6218,14 @@ export function clock({ h = 3, m = 0, D = 50, hands = true, handsState = 'ink', 
   }
   s += `<circle cx="${c}" cy="${c}" r="1" fill="#000" stroke="none"/>`;
   return svg(D, D, s, 'v-clock');
+}
+
+// Time slot (Appendix H): hours box 20 x 12 mm, a printed colon in a 4 mm gap, minutes box 20 x 12 mm.
+// The pupil writes digits only ("3" and "30"); "half past" is said, never written. key: the answer in key colour.
+export function timeSlot({ h = null, m = null, key = false } = {}) {
+  const v = (x) => (key && x !== null ? `<b class="ka">${x}</b>` : '');
+  return `<span class="eq" style="gap:0;align-items:center"><span class="bx" data-slot="box" style="--w:20mm;height:12mm">${v(h)}</span>` +
+    `<span style="width:4mm;text-align:center">:</span><span class="bx" data-slot="box" style="--w:20mm;height:12mm">${v(m === null ? null : String(m).padStart(2, '0'))}</span></span>`;
 }
 
 // RP-90. Fraction bar 56 x 18 mm at L: outline 1.5 pt, dividers 0.75 pt, shading flat grey from the left.
@@ -6470,7 +6499,7 @@ measurements; the 3 mm cell padding is structure, not an empty band.
 | E9b | Bottom blank (site lint) | 100 % − E9 | ≤ 8 % on every page |
 | E10 | Free per cell | 1 mm raster of ink in each item cell (slots and answer rows are ink; reading cells exempt) | ≥ 40 % free |
 | E11 | Empty bands, exactly as the site's `sheetCheck` | box round every leaf element (no child elements, an SVG, or a slot) and every bordered element, the item letter excepted; gaps measured from the cell's **border box** (padding counts as empty); cells under 40 px skipped; draw / work cells exempt | largest top/bottom gap < 30 % of the height and largest left/right gap < 30 % of the width |
-| E12 | Equal cells | width and height of the cells of each item section | equal within 0.5 mm |
+| E12 | Equal cells | width and height of the cells of each item section, and of the Practice cells across all Practice pages and keys | equal within 0.5 mm (PG-11) |
 | E13 | Slots | widths of `.bx` / `.ln` answer slots per section; underscore characters in pupil text (footer excepted) | one width per section, ≥ 14 mm; 0 underscores |
 | E14 | Dashes | dashed CSS borders and SVG dash arrays not starting with 0 (dotted) | only on the cut line / missing-digit box |
 | E15 | Instructions | each pupil instruction: word count, first word of every sentence, membership of Appendix C.1 (read from this file; `{n}` matches any number) | ≤ 12 words; every sentence starts with a print verb; string in C.1 |
@@ -6485,8 +6514,9 @@ measurements; the 3 mm cell padding is structure, not an empty band.
 | E21 | T2 atoms | rows of T2 Section 1 and their Atom Type cells; ★ in the two atom tables | ≥ 5 atoms; types only Category / Comparative / Fact / Conceptual; no ★ |
 | E22 | Thumbnails | `.thumb` elements on T3, T4, T5 | ≥ 1 on each delivery page |
 | E23 | Fade labels | the Fade column of T6 "Answers at a glance" | every row carries ★ / ★★ / ★★★ |
-| E24 | Item pool, from the pack itself | items from `data-item` on the pupil pages (exit slip: first half only); the pool from the pack's `v21-pool` JSON | the pool recomputed from its `rule` over `range` equals the listed pool; places ≤ pool − forbidden; every item in the pool and not forbidden; **0 exact repeats anywhere** (exit slip included); 0 turn-arounds on one page; **FAIL if the JSON or the items are missing** |
+| E24 | Item pool, from the pack itself | items from `data-item` on the pupil pages (exit slip: first half only); the pool from the pack's `v21-pool` JSON | the pool recomputed from its `decl` (data, no eval) equals the listed pool; places ≤ pool − forbidden; every item in the pool and not forbidden; **0 exact repeats anywhere** (exit slip included); 0 turn-arounds on one page; **FAIL if the JSON or the items are missing** |
 | E24b | Last row and LR-6 | `data-row` of each Practice item; the items of every pupil page | last Practice row all in the pool's `edge` list; no twin answers (per page, per row when the pool has fewer distinct answers); − : distinct numbers taken away on a page, no near twins (both numbers within 2); + : no first addend twice in a grid row or three times running |
+| E28 | No extra bands on Practice | the bold band labels of every P4 page and key | no `Say:`, `Rule:` or `Remember:`; freed rows are one unruled trailing area (§8.12.4) |
 | E27 | Counters in fives | `svg[data-per-row]` written by `counters()` | every set of counters drawn in rows of at most 5 (§19.3) |
 | E26 | Chart panels | each `data-step-panel` cell contains a visible #949494 mark | every step panel |
 | E25 | One key per page | pupil pages vs key pages | equal, the anchor chart included |
@@ -6647,6 +6677,8 @@ const R = await p.evaluate((LIBRARY) => {
         work: !!c.querySelector('.stk, [data-work]') || !!c.closest('[data-section="exit"]'), sec: (c.closest('[data-section]') || {}).dataset?.section || '' }; });
     // equal cells per section
     const bySec = {}; for (const c of P.cells) (bySec[c.sec] = bySec[c.sec] || []).push(c);
+    P.secCells = Object.fromEntries(Object.entries(bySec).map(([s, cs]) => [s, cs.map((c) => [+c.w.toFixed(1), +c.h.toFixed(1)])]));
+    P.bandLabels = [...pg.querySelectorAll('.band b, .sayline b')].map((b) => b.textContent.trim());
     P.unequal = Object.entries(bySec).filter(([s, cs]) => s && !['pre', 'nsA', 'nsB', 'wp'].includes(s) && cs.length > 1 &&
       (Math.max(...cs.map((c) => c.w)) - Math.min(...cs.map((c) => c.w)) > 0.5 || Math.max(...cs.map((c) => c.h)) - Math.min(...cs.map((c) => c.h)) > 0.5)).map(([s]) => s);
     // slot widths per section (boxes and lines that are answer slots)
@@ -6697,7 +6729,11 @@ const band = cells.filter((c) => !c.draw && (c.top >= 30 || c.left >= 30 || c.ri
 // E11 note: measured from the cell's border box (padding counts as empty), exactly as the site's sheetCheck.
 row('E11', 'No empty band ≥ 30 % of a cell, measured exactly as the site sheetCheck: from the cell border box (padding counts as empty); every leaf, slot or bordered element is content (labels excepted), so a reserved answer row counts', (() => { const m = cells.filter((c) => !c.draw); return `worst top ${Math.max(...m.map((c) => c.top))} %, left ${Math.max(...m.map((c) => c.left))} %, right ${Math.max(...m.map((c) => c.right))} %, bottom ${Math.max(...m.map((c) => c.bottom))} %; failing: ${band.map((c) => `${c.page}/${c.sec} (${Math.round(c.w)}x${Math.round(c.h)} t${c.top} b${c.bottom} l${c.left} r${c.right})`).join(', ') || 'none'}`; })(), band.length === 0);
 const uneq = pages.filter((p) => p.unequal.length);
-row('E12', 'Equal cells within each section (±0.5 mm)', uneq.length ? uneq.map((p) => p.id + ': ' + p.unequal.join('/')).join('; ') : 'all sections equal', uneq.length === 0);
+const xs = {}; for (const p of pages.filter((q) => /^P4/.test(q.id))) for (const [s, cs] of Object.entries(p.secCells || {})) if (s === 'practice') (xs[s] = xs[s] || []).push(...cs.map((c) => [p.id, ...c]));
+const xw = Object.values(xs).flat(), spread = (i) => xw.length ? Math.max(...xw.map((c) => c[i])) - Math.min(...xw.map((c) => c[i])) : 0;
+row('E12', 'Equal cells within each section (±0.5 mm), and across all pages of a section (PG-11: Practice 1 and Practice 2, keys included)', (uneq.length ? uneq.map((p) => p.id + ': ' + p.unequal.join('/')).join('; ') : 'all sections equal') + `; Practice cells across pages: ${xw.length} cells, spread ${spread(1).toFixed(1)} × ${spread(2).toFixed(1)} mm`, uneq.length === 0 && xw.length > 0 && spread(1) <= 0.5 && spread(2) <= 0.5);
+const p4 = pages.filter((p) => /^P4/.test(p.id)), extra = p4.flatMap((p) => (p.bandLabels || []).filter((t) => /^(Say|Rule|Remember):/.test(t)).map((t) => p.id + ' ' + t));
+row('E28', 'No Say:, Rule: or Remember: band on a Practice page (keys included); freed rows are one unruled trailing area (§8.12.4)', `${p4.length} Practice pages; extra bands: ${extra.length ? extra.join(', ') : 0}`, p4.length > 0 && !extra.length);
 const sw = pages.filter((p) => !p.teacher).flatMap((p) => Object.entries(p.slotWidths).map(([s, w]) => ({ p: p.id, s, w })));
 const swBad = sw.filter((x) => x.w.length > 1 || x.w.some((v) => v < 14));
 row('E13', 'Slot widths = one B(n) per section, ≥ 14 mm; no underscore characters on pupil pages', `${sw.map((x) => `${x.p}/${x.s}: ${x.w.join('/')} mm`).join('; ')}; underscores: ${pages.reduce((a, p) => a + p.underscores, 0)}`, swBad.length === 0 && pages.every((p) => p.underscores === 0));
@@ -6736,9 +6772,13 @@ if (POOL && all.length) {
   const op = POOL.op, kk = ([a, b]) => `${a}${op}${b}`, inPool = new Set(POOL.pool.map(kk)), forb = new Set(POOL.forbidden.map(kk));
   const usable = POOL.pool.length - POOL.forbidden.length;
   // the pool is recomputed from its declared rule and must equal the listed pool
-  let ruleOk = false; try { const f = new Function('return ' + POOL.rule)(), [a0, a1, b0, b1] = POOL.range, re = [];
-    for (let a = a0; a <= a1; a++) for (let b = b0; b <= b1; b++) if (f(a, b)) re.push(kk([a, b]));
-    ruleOk = re.length === inPool.size && re.every((x) => inPool.has(x)); } catch (e) { ruleOk = false; }
+  // recomputed from the declared rule as DATA (no eval): + {small:[lo,hi], maxSum, noZero} · − {top:[lo,hi], minDiff, regroup}
+  let ruleOk = false; const d = POOL.decl, re = [];
+  if (d && d.op === '+') { for (let a = d.noZero ? 1 : 0; a <= d.maxSum; a++) for (let b = d.noZero ? 1 : 0; a + b <= d.maxSum; b++)
+      if (Math.min(a, b) >= d.small[0] && Math.min(a, b) <= d.small[1]) re.push(kk([a, b])); }
+  else if (d && d.op === '−') { for (let a = d.top[0]; a <= d.top[1]; a++) for (let b = 1; a - b >= d.minDiff; b++)
+      if (!d.regroup || a % 10 < b % 10) re.push(kk([a, b])); }
+  ruleOk = re.length > 0 && re.length === inPool.size && re.every((x) => inPool.has(x));
   const seen = new Set(), rep = [], bad = [];
   for (const x of all) { if (!inPool.has(x.item) || forb.has(x.item)) bad.push(x.item + ' ' + x.page);
     if (seen.has(x.item)) rep.push(x.item + ' ' + x.page); seen.add(x.item); }
@@ -6747,7 +6787,7 @@ if (POOL && all.length) {
   e24 = { ok: ruleOk && !bad.length && !rep.length && !turns.length && all.length <= usable,
     msg: `${all.length} places, usable pool ${usable} (pool ${POOL.pool.length} recomputed from its rule: ${ruleOk ? 'matches' : 'MISMATCH'}); exact repeats ${rep.length ? rep.join(', ') : 0}; same-page turn-arounds ${turns.length}; outside the pool / forbidden ${bad.length ? bad.join(', ') : 0}` };
 }
-row('E24', 'Item pool, read from the pack (LR-5): pool recomputed from its declared rule; places ≤ usable pool; every item in the pool and not forbidden; ZERO exact repeats anywhere (exit slip included); no turn-around pair on one page; FAILS when the pool JSON or the items are missing', e24.msg, e24.ok);
+row('E24', 'Item pool, read from the pack (LR-5): pool recomputed from its declared rule (data, no eval); places ≤ usable pool; every item in the pool and not forbidden; ZERO exact repeats anywhere (exit slip included); no turn-around pair on one page; FAILS when the pool JSON or the items are missing', e24.msg, e24.ok);
 let e24b = { ok: false, msg: 'no pool' };
 if (POOL) { const op = POOL.op, kk = ([a, b]) => `${a}${op}${b}`, edge = new Set(POOL.edge.map(kk));
   const val = (s3) => { const [a, b] = s3.split(op).map(Number); return op === '+' ? a + b : a - b; };
@@ -6779,7 +6819,7 @@ row('E27', 'Counters are drawn in rows of at most 5 (RP-21, §19.3)', cnt.length
 row('E25', 'One key per pupil page (anchor chart included)', `${pupil.length} pupil pages, ${keys.length} keys`, pupil.length === keys.length && pupil.every((p) => keys.some((k) => k.id === p.id + '-key')));
 
 const md2 = ['# V21 self-check: ' + path.basename(OUT), '',
-  `Run by \`selfcheck.mjs\` (Appendix E reference implementation, Chromium print media) on \`pack.html\`, ${new Date().toISOString().slice(0, 10)}. Checks are V21 Appendix E, E1–E25.`, '',
+  `Run by \`selfcheck.mjs\` (Appendix E reference implementation, Chromium print media) on \`pack.html\`, ${new Date().toISOString().slice(0, 10)}. Checks are V21 Appendix E (E1–E28 with lettered sub-checks): **${rows.filter((r) => r.pass).length} / ${rows.length} PASS**.`, '',
   '| # | Check | Measured | Result |', '|---|---|---|---|',
   ...rows.map((r) => `| ${r.id} | ${r.check} | ${String(r.measured).replace(/\|/g, '/')} | ${r.pass ? 'PASS' : 'FAIL'} |`), '',
   `**${rows.filter((r) => r.pass).length} / ${rows.length} pass.**`, '',
@@ -6821,7 +6861,7 @@ a + b ≤ 10, no + 0: 39 ordered facts, 2 forbidden (7 + 2 and 2 + 8 turned roun
 | P2 | Panels 7 + 2 (step 1 grey ring on 7; step 2 grey tile and hops; step 3 grey 9); `Another example:` 2 + 8 = 10 and 3 + 3 = 6, all in black; Say; Rule | key = same chart, tab Answer Key (no answer marks) |
 | P3 | Vocabulary + / = / hops → equals · count on · plus; Remember; Guided 4 + 1 (ring grey), 3 + 7 beside Steps; Independent a–f 6 + 1, 1 + 8, 2 + 1 / 5 + 2, 7 + 1, 2 + 4. Score /6 | lines · 5, 10 · 7, 9, 3, 7, 8, 6 |
 | P4 Practice 1 | 3 × 4 by rows: 1+5, 3+4, 5+3 / 3+1, 4+2, 1+4 / 3+6, 1+6, 6+2 / 2+5, 7+3, 1+7 (last row ★★★) | 6, 7, 8 / 4, 6, 5 / 9, 7, 8 / 7, 10, 8 (no twin in a row) |
-| P4 Practice 2 | 3 × 3 (sized to the pool) by rows: 1+1, 2+3, 5+1 / 1+2, 4+3, 8+1 / 1+3, 3+5, 9+1 (last row ★★★); then `Remember:` and the `Say:` / `Rule:` band take the fourth row's height | 2, 5, 6 / 3, 7, 9 / 4, 8, 10 (every answer once) |
+| P4 Practice 2 | 3 × 3 (sized to the pool) by rows: 1+1, 2+3, 5+1 / 1+2, 4+3, 8+1 / 1+3, 3+5, 9+1 (last row ★★★); at Practice 1's cell size; the fourth row is one unruled blank area (§8.12.4) | 2, 5, 6 / 3, 7, 9 / 4, 8, 10 (every answer once) |
 | P5 | Omar has 3 cars. He gets 2 more cars. How many …? Answer line in the story; 6-row panel; Workspace; frame | 3 + 2 = 5; 5 cars |
 | P6 | Each half: 6 + 3, 2 + 6, 2 + 2, 1 + 9 (2 × 2, on no other page); Say “a. 6 plus 3 equals __.”; two check boxes; Score /4 | 9, 8, 4, 10 |
 | T6 | Routing (atoms 1–4 → K-3, K-4, K-6, K-9); accepted answers; answers at a glance with Fade; wrong answers to look for | — |
@@ -6897,8 +6937,8 @@ const EXIT = [[6, 3], [2, 6], [2, 2], [1, 9]];                  // big first · 
 // The item pool, written into the pack for the self-check (E24, E24b): every a + b with min(a, b) in 1..3 and
 // a + b <= 10; forbidden = the chart examples turned round (LR-5); edge = the cases of the last Practice row.
 const POOLLIST = []; for (let a = 1; a <= 9; a++) for (let b = 1; b <= 9; b++) if (Math.min(a, b) <= 3 && a + b <= 10) POOLLIST.push([a, b]);
-const POOL = { op: '+', rule: '(a, b) => a >= 1 && b >= 1 && Math.min(a, b) <= 3 && a + b <= 10', range: [1, 9, 1, 9],
-  edgeRule: '(a, b) => a < b || a === b || a + b === 10', pool: POOLLIST, forbidden: [[2, 7], [8, 2]], edge: POOLLIST.filter(([a, b]) => a < b || a === b || a + b === 10) };
+const POOL = { op: '+', decl: { op: '+', small: [1, 3], maxSum: 10, noZero: true },
+  edgeRule: 'a < b, a = b, or a + b = 10', pool: POOLLIST, forbidden: [[2, 7], [8, 2]], edge: POOLLIST.filter(([a, b]) => a < b || a === b || a + b === 10) };
 
 const fact = (a, b, key, o = {}) => factStack({ top: a, bottom: b, ans: key ? a + b : null, ...o });
 const cellF = (a, b, i, key, cols = 3, copy = false) => `<div class="cell" style="padding-top:8mm"${it(a, b, '+', Math.floor(i / cols), copy)}>${lt(i)}${fact(a, b, key)}</div>`;
@@ -6974,11 +7014,11 @@ function sheet(key) {
   return vocab + `<div class="band"><div class="strip"><b>Remember:</b><span>Start at the bigger number and count on.</span></div></div>` + guided + indep;
 }
 
-const practice = (items, key, cols = 3) => stepsStrip() + `<div class="instr" data-instr>Add.</div><div class="grid" data-section="practice" style="grid-template-columns:repeat(${cols},1fr);grid-template-rows:repeat(${items.length / cols},1fr)">` +
-  items.map(([a, b], i) => cellF(a, b, i, key, cols)).join('') + `</div>` +
-  // a page sized down to the pool (3 rows) gives the spare height to the oral frame, never to empty cell space (E11)
-  (items.length / cols < 4 ? `<div class="band"><div class="strip"><b>Remember:</b><span>Start at the bigger number and count on.</span></div></div>` +
-    `<div class="band sayb"><div class="sayline"><b>Say:</b><span>“a. 1 plus 1 equals ${blank()}.”</span></div><div class="sayline"><b>Rule:</b><span>Big number first. Count on. Write it.</span></div></div>` : '');
+const practice = (items, key, cols = 3) => stepsStrip() + `<div class="instr" data-instr>Add.</div><div class="grid" data-section="practice" style="grid-template-columns:repeat(${cols},1fr);grid-template-rows:repeat(4,1fr)">` +
+  items.map(([a, b], i) => cellF(a, b, i, key, cols)).join('') +
+  // §8.12.4: a page shortened by pool sizing keeps the section's cell size (4 rows); the freed rows are ONE unruled
+  // trailing area inside the frame (PG-15) — never bands, never empty lettered cells
+  (items.length / cols < 4 ? `<div class="trail" data-trail style="grid-column:1/-1;grid-row:span ${4 - items.length / cols};background:#fff"></div>` : '') + `</div>`;
 
 // ---- P5 Word problem: story 58 %, routine panel 42 %, one action per check box, 13 pt (Steps-box size) ----
 function wordProblem(key) {
@@ -7155,8 +7195,8 @@ const EXIT = [[43, 27], [40, 13], [55, 8], [42, 36]];          // regroup · zer
 // The item pool, written into the pack (E24, E24b): a two-digit, a − b >= 1, ones(a) < ones(b) (every item regroups).
 // edge = one-digit take-away, 0 in the ones of the top number, or a tens answer of 0.
 const POOLLIST = []; for (let a = 10; a <= 99; a++) for (let b = 1; b < a; b++) if (a % 10 < b % 10) POOLLIST.push([a, b]);
-const POOL = { op: '−', rule: '(a, b) => a >= 10 && a <= 99 && b >= 1 && b < a && a % 10 < b % 10', range: [10, 99, 1, 98],
-  edgeRule: '(a, b) => b < 10 || a % 10 === 0 || a - b < 10', pool: POOLLIST, forbidden: [], edge: POOLLIST.filter(([a, b]) => b < 10 || a % 10 === 0 || a - b < 10) };
+const POOL = { op: '−', decl: { op: '−', top: [10, 99], minDiff: 1, regroup: true },
+  edgeRule: 'b < 10, a ends in 0, or a − b < 10', pool: POOLLIST, forbidden: [], edge: POOLLIST.filter(([a, b]) => b < 10 || a % 10 === 0 || a - b < 10) };
 
 const keyStack = (a, b, key, o = {}) => columnStackSub({ top: a, bottom: b, regroup: key ? 'key' : 'slot', cross: key ? 'key' : 'none', ans: key ? 'key' : 'slot', ...o });
 const cellS = (a, b, i, key, o, cols = 2, copy = false) => `<div class="cell" style="padding-top:7mm"${it(a, b, '−', Math.floor(i / cols), copy)}>${lt(i)}${keyStack(a, b, key, o)}</div>`;
@@ -7397,8 +7437,8 @@ console.log('pages', doc.pages.length);
 - **Clocks and the written time form.** `clock({h, m, hands, handsState, show})`: `handsState` `'ink'` (read
   the time), `'grey'` (the model's newest step) or `'key'` (draw-the-hands answers, key colour only); `show`
   `'both'`, `'hour'` or `'minute'` fades one hand at a time. Time answers are written in the digital slot
-  (`3:30`, `7:00`); "o'clock" and "half past" are said in the oral frame only (`Say: “It is half past 3.”`),
-  never written by the pupil.
+  (`3:30`, `7:00`) with `timeSlot({h, m, key})` (two 20 × 12 mm boxes, a printed colon); "o'clock" and "half past"
+  are said in the oral frame only (`Say: “It is half past 3.”`), never written by the pupil.
 - **Items with many right answers (any halving line, any drawing).** Draw one correct answer in the key colour
   on the key; list "also accept …" on T6 under `Accepted answers:`.
 - **More slot shapes (WDS 6).** Number + label (faded word problem v2): a line B(n), then a 52 mm line for the
