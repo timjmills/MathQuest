@@ -186,7 +186,7 @@ const REAL = ['Y3.B1.S14 counts in 50s, which no live skill deals', '(Y4.B10.S2 
     'part-whole model (see Y5.B13) [rule 18: opts {"notation":["across"]} for this pupil]', 'Y1.B6.S1 and Y1.B12.S1: counting to 50, and from 50 to 100',
     'groups of 1-3 only (band 5 deals 4 and 5)', 'R.B11.S5 / S6 1 more / 1 less', 'Sum-and-difference brace; two levels) and the journey line', 'the the cat'];
 for (const t of REAL) {
-    for (const o of [composeWhy(t, { key: 'placevalue:compare', lesson: LESSON, group: 'prereq' }), composePartial(t, ['nl_20']), composeMissing(t, ['nl_20'])]) {
+    for (const o of [composeWhy(t, { key: 'placevalue:compare', lesson: LESSON, group: 'prereq' }), composePartial(t, ['nl_20']), `Not yet: ${composeMissing(t, ['nl_20'])}`]) {
         const h = jargonHit(o); ok(!h, `real line not plain: "${t}" -> "${o}" (${h && h.name})`);
     }
 }
@@ -262,13 +262,13 @@ for (const dir of dirs) {
         for (const l of L) {
             if (!l.step || !years.some((d) => d.steps && d.steps[l.step])) continue;
             const r = linksFor(l);
-            gate(`lesson ${l.key}`, [r.missing, ...r.direct.map((x) => x.partial), ...r.prereq.map((x) => x.why), ...r.related.map((x) => x.why), ...r.build.map(proposalLabel), ...r.preBuild.map(proposalLabel), l.title]);
+            gate(`lesson ${l.key}`, [r.missing ? `These skills cover part of the lesson. Not yet: ${r.missing}` : '', ...r.direct.map((x) => x.partial), ...r.prereq.map((x) => x.why), ...r.related.map((x) => x.why), ...r.build.map(proposalLabel), ...r.preBuild.map(proposalLabel), l.title]);
         }
         clearCurated();
     }
 }
 // rules mode: every lesson's lines with no link files
-for (const l of L) { const r = linksFor(l); gate(`lesson (rules) ${l.key}`, [r.missing, ...r.direct.map((x) => x.partial), ...r.prereq.map((x) => x.why), ...r.related.map((x) => x.why), l.title]); }
+for (const l of L) { const r = linksFor(l); gate(`lesson (rules) ${l.key}`, [r.missing ? `These skills cover part of the lesson. Not yet: ${r.missing}` : '', ...r.direct.map((x) => x.partial), ...r.prereq.map((x) => x.why), ...r.related.map((x) => x.why), l.title]); }
 ok(!jBad, `plain-English gate: ${jBad} of ${jLines} teacher-facing lines ${JSON.stringify(jByForm)}`);
 console.log(`plain-English gate: ${jLines} teacher-facing lines checked, ${jBad} not plain ${JSON.stringify(jByKind)}`);
 console.log(`free-text notes hidden (not plain as written; the composed sentence stands): ${Object.entries(hidden).map(([f, [n, h]]) => `${f} ${h}/${n} (${Math.round((100 * h) / n)}%)`).join(', ')}`);

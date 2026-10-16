@@ -209,7 +209,7 @@ export function linksFor(lessonOrKey, opts = {}) {
     const related = applyOverride(rel, ovr.related, 'Added by the school', RELATED_CAP);
     const verdict = !direct.length ? 'gap' : direct.some((x) => !x.partial) ? 'full' : 'partial';
     return { lesson, step: lesson.step ? wrmStep(lesson.step) : null, direct, prereq, related, verdict,
-        missing: verdict === 'partial' ? (directOf(lesson.step, live).map((x) => plainNote(x.partial)).find(Boolean) || '') : '',
+        missing: verdict === 'partial' ? (directOf(lesson.step, live).map((x) => composeMissing(x.partial)).find(Boolean) || '') : '',
         build: [], preBuild: [], source: 'rules' };
 }
 
@@ -326,8 +326,13 @@ export function stepsSentence(steps, lessonStep, { weeks = [], support = false }
         if (!groups.has(k)) groups.set(k, { rel, g, titles: [] });
         groups.get(k).titles.push(stepTitle(sid));
     }
-    const parts = [...groups.values()].sort((x, y) => REL_ORDER.indexOf(x.rel) - REL_ORDER.indexOf(y.rel)).slice(0, 2)
-        .map((x) => `${REL_LEAD[x.rel](x.g)}: ${quoteJoin(x.titles)}`);
+    // the same titles in two grades ("Represent numbers to 1,000" in Grade 3 and Grade 2) are said once
+    const merged = [];
+    for (const x of [...groups.values()].sort((a, b) => REL_ORDER.indexOf(a.rel) - REL_ORDER.indexOf(b.rel))) {
+        const twin = merged.find((m) => m.rel === x.rel && quoteJoin(m.titles) === quoteJoin(x.titles));
+        if (twin) twin.g = `${twin.g} and ${x.g}`; else merged.push({ ...x });
+    }
+    const parts = merged.slice(0, 2).map((x) => `${REL_LEAD[x.rel](x.g)}: ${quoteJoin(x.titles)}`);
     if (!parts.length) return '';
     const wk = weeks.length ? ` (${support ? 'support block, ' : ''}week${weeks.length > 1 ? 's' : ''} ${weeks.slice(0, 3).join(', ')})` : '';
     return `${parts.join('. ')}${wk}.`;
@@ -382,12 +387,13 @@ export function composePartial(note, build = []) {
     if (whole) return `Not yet: ${/^[A-Z][a-z]/.test(whole) ? whole.charAt(0).toLowerCase() + whole.slice(1) : whole}`;
     return build.length ? `The rest of the lesson comes with ${namesOf(build)}, still to be built.` : 'The rest of the lesson has no skill yet.';
 }
-/** "Not yet: …" for a lesson only partly taught: the note when plain, else what the entries to build will add. */
+/** What follows "Not yet:" for a lesson only partly taught: the note when plain, else what the entries to build will add. */
 export function composeMissing(note, build = [], envision = []) {
+    const low = (t) => (/^[A-Z][a-z]/.test(t) ? t.charAt(0).toLowerCase() + t.slice(1) : t);
     const whole = plainNote(note);
-    if (whole) return whole;
-    for (const e of envision || []) { const t = plainNote(e && e.teaches); if (t) return t; }
-    return build.length ? `What ${namesOf(build)} will add.` : '';
+    if (whole) return low(whole);
+    for (const e of envision || []) { const t = plainNote(e && e.teaches); if (t) return low(t); }
+    return build.length ? `the part ${namesOf(build)} will add.` : '';
 }
 
 /**
