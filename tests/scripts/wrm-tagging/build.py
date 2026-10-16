@@ -2,7 +2,7 @@
 
 Inputs (all in the repo):
   y5_r0.json      the round-0 hand-authored steps and proposals (helper session, a181f8a4), the base
-  spec_*.py       hand fixes, applied in file-name order (spec_r1.py: critic local r1)
+  spec_*.py       hand fixes, applied in file-name order (spec_r1.py: critic local r1; spec_r2.py: critic r4)
   wrm-steps.json, the Grade 4 sheet of the school xlsx (prior.mjs), live SKILL_WRM / proposals (keys.mjs)
 Passes (ported from the Y4 lane, critic r13):
   1. hand fixes;  2. own build never in preBuild;  3. a pre cites a step its skill is tagged to and that the school
@@ -98,7 +98,7 @@ def move(sid, k, src, dst, why):
         if _match(e, k):
             ST[sid][src].remove(e); e['why'] = why; ST[sid][dst].insert(0 if dst == 'pre' else len(ST[sid][dst]), e); return
     errs.append(f'spec move: {sid} {src} has no {k}')
-ns = dict(ST=ST, NEW=NEW, E=E, cite=cite, drop=drop, add=add, add_partial=add_partial, setopts=setopts, to_partial=to_partial,
+ns = dict(ST=ST, NEW=NEW, E=E, cite=cite, _match=_match, drop=drop, add=add, add_partial=add_partial, setopts=setopts, to_partial=to_partial,
           move=move, steps=steps, wk=wk, errs=errs, CLOSES={}, KEEP_LINKS=set(), RENAME={}, PATCH={}, re=re, json=json)
 for f in sorted(glob.glob(os.path.join(H, 'spec_*.py'))): exec(open(f).read(), ns)
 CLOSES = ns['CLOSES']
@@ -162,6 +162,17 @@ for sid, st in ST.items():
             keep.append(e)
         st[role] = keep
 json.dump(dropped, open(os.path.join(DATA, 'dropped.json'), 'w'), indent=1, ensure_ascii=False)
+# critic r4 class E: one link per key + opts in a role (the first, best-ranked, is kept); linkfit also fails two links
+# of one role that deal the same items
+deduped = 0
+for sid, st in ST.items():
+    for role in ('pre', 'related'):
+        seen, keep = set(), []
+        for e in st[role]:
+            sg = e['key'] + json.dumps(e.get('opts', {}), sort_keys=True) + str(e.get('maxNumber') or '')
+            if sg in seen: deduped += 1; continue
+            seen.add(sg); keep.append(e)
+        st[role] = keep
 
 # ---------- step checks ----------
 for sid, st in ST.items():
@@ -306,7 +317,7 @@ c = Counter(s['verdict'] for s in out_steps.values())
 print('steps', len(out_steps), dict(c))
 print('proposals new', sum(1 for p_ in proposals.values() if not p_['reused']), 'reused', sum(1 for p_ in proposals.values() if p_['reused']),
       'tagFixes', len(tagfixes), {a: sum(1 for t in tagfixes if t['action'] == a) for a in ('add', 'full', 'partial', 'opts', 'remove')})
-print(f'pre re-cited: {recited}; links re-optioned by linkfit: {changed}; links dropped by linkfit: {len(dropped)}')
+print(f'pre re-cited: {recited}; links re-optioned by linkfit: {changed}; links dropped by linkfit: {len(dropped)}; duplicates removed: {deduped}')
 mc = node(os.path.join(H, 'mergecheck.mjs'), OUT)
 print(mc.stdout.strip().splitlines()[-1] if mc.stdout.strip() else 'mergecheck: no output')
 if mc.returncode != 0: errs.append('mergecheck.mjs FAILED:\n' + mc.stdout.strip()[-3000:])

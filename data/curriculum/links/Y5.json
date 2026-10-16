@@ -96,14 +96,14 @@
     {
      "key": "placevalue:place_value_disks",
      "opts": {
-      "band": 999
+      "band": 9999
      },
      "why": "Y4.B1.S5 Represent numbers to 10,000 (lower grade, same cluster CCSS 2.NBT.A.1)"
     },
     {
      "key": "placevalue:pv_digit_drag",
      "opts": {
-      "band": 999
+      "band": 9999
      },
      "why": "Y4.B1.S5 Represent numbers to 10,000 (lower grade, same cluster CCSS 2.NBT.A.1)"
     },
@@ -117,7 +117,7 @@
     {
      "key": "placevalue:expand",
      "opts": {
-      "band": 999
+      "band": 9999
      },
      "why": "Y4.B1.S6 Partition numbers to 10,000 (lower grade, same cluster CCSS 2.NBT.A.3)"
     }
@@ -126,6 +126,9 @@
    "related": [
     {
      "key": "placevalue:value",
+     "opts": {
+      "band": 9999
+     },
      "why": "value of a digit in a 4-digit number"
     },
     {
@@ -145,6 +148,9 @@
     },
     {
      "key": "placevalue:compare",
+     "opts": {
+      "band": 9999
+     },
      "why": "compare 4-digit numbers (Y5.B1.S10)"
     }
    ],
@@ -192,7 +198,7 @@
     {
      "key": "placevalue:place_value_disks",
      "opts": {
-      "band": 999
+      "band": 9999
      },
      "why": "Y5.B1.S2 Numbers to 10,000 (previous step)"
     },
@@ -205,6 +211,9 @@
     },
     {
      "key": "placevalue:expand",
+     "opts": {
+      "band": 9999
+     },
      "why": "Y4.B1.S6 Partition numbers to 10,000 (lower grade, same cluster CCSS 2.NBT.A.3)"
     }
    ],
@@ -219,7 +228,10 @@
     },
     {
      "key": "placevalue:compare",
-     "why": "compare to 100,000 (Y5.B1.S10)"
+     "opts": {
+      "band": 99999
+     },
+     "why": "compare two numbers to 100,000 (Y5.B1.S10)"
     },
     {
      "key": "number_sense:nearest_10000",
@@ -279,10 +291,16 @@
     },
     {
      "key": "placevalue:place_value_disks",
+     "opts": {
+      "band": 9999
+     },
      "why": "Y4.B1.S5 Represent numbers to 10,000 (prior learning wk W06)"
     },
     {
      "key": "placevalue:expand",
+     "opts": {
+      "band": 9999
+     },
      "why": "Y4.B1.S6 Partition numbers to 10,000 (prior learning wk W06)"
     },
     {
@@ -298,7 +316,10 @@
     },
     {
      "key": "placevalue:combine",
-     "why": "standard form to 1,000,000"
+     "opts": {
+      "band": 999999
+     },
+     "why": "standard form from parts, to 1,000,000"
     },
     {
      "key": "number_sense:round_nl_hundred_thousands",
@@ -361,6 +382,9 @@
     },
     {
      "key": "placevalue:expand",
+     "opts": {
+      "band": 9999
+     },
      "why": "Y4.B1.S6 Partition numbers to 10,000 (prior learning wk W06)"
     }
    ],
@@ -378,6 +402,9 @@
     },
     {
      "key": "placevalue:identify",
+     "opts": {
+      "band": 999999
+     },
      "why": "place names (thousands, hundred thousands)"
     }
    ],
@@ -399,7 +426,7 @@
    "partial": [
     {
      "key": "placevalue:place_value_10x",
-     "missing": "the powers of ten themselves: 10, 100 ... 1,000,000 and that each is 10 times the one before (10 hundreds = 1,000); it only multiplies/divides a number by 10, 100, 1,000"
+     "missing": "the powers of ten themselves: 10, 100 ... 1,000,000 and that each is 10 times the one before (10 hundreds = 1,000); it only multiplies/divides a number by 10, 100, 1,000, with ÷ 1,000 and decimal results that the school teaches from W10"
     }
    ],
    "verdict": "partial",
@@ -428,6 +455,9 @@
     },
     {
      "key": "placevalue:pv_digit_drag",
+     "opts": {
+      "band": 999999
+     },
      "why": "Y5.B1.S5 Read and write numbers to 1,000,000 (previous step)"
     },
     {
@@ -502,6 +532,9 @@
     },
     {
      "key": "placevalue:pv_digit_drag",
+     "opts": {
+      "band": 999999
+     },
      "why": "Y5.B1.S4 Numbers to 1,000,000 (earlier Y5 step)"
     },
     {
@@ -589,6 +622,9 @@
     },
     {
      "key": "placevalue:pv_digit_drag",
+     "opts": {
+      "band": 999999
+     },
      "why": "Y5.B1.S4 Numbers to 1,000,000 (earlier Y5 step)"
     }
    ],
@@ -641,8 +677,8 @@
     {
      "key": "number_sense:place_on_number_line",
      "opts": {
-      "span": 100,
-      "band": 1000
+      "span": 1000,
+      "band": 10000
      },
      "why": "Y4.B1.S9 Number line to 10,000 (prior learning wk W07)"
     },
@@ -652,6 +688,9 @@
     },
     {
      "key": "placevalue:pv_digit_drag",
+     "opts": {
+      "band": 999999
+     },
      "why": "Y5.B1.S4 Numbers to 1,000,000 (earlier Y5 step)"
     }
    ],
@@ -667,6 +706,9 @@
     },
     {
      "key": "placevalue:compare",
+     "opts": {
+      "band": 999999
+     },
      "why": "compare by position on the line"
     },
     {
@@ -756,7 +798,7 @@
      "opts": {
       "band": 99999
      },
-     "why": "compare numbers given in words"
+     "why": "the same 5-digit numbers named in words, read before they are compared"
     }
    ],
    "note": "Counters / number-line comparison pictures come with vis_pv_bands_millions and nl_20; the comparison itself is fully dealt."
@@ -832,7 +874,7 @@
     },
     {
      "key": "placevalue:number_word_names",
-     "why": "compare numbers given in words"
+     "why": "the same 6-digit numbers named in words, read before they are compared"
     }
    ],
    "note": "Counters / number-line comparison pictures come with vis_pv_bands_millions and nl_20; the comparison itself is fully dealt."
@@ -960,7 +1002,10 @@
    "related": [
     {
      "key": "placevalue:compare",
-     "why": "compare to 100,000"
+     "opts": {
+      "band": 99999
+     },
+     "why": "compare the numbers before and after rounding, to 100,000"
     },
     {
      "key": "number_sense:estimate_sums_diffs",
@@ -1013,6 +1058,9 @@
     },
     {
      "key": "placevalue:pv_digit_drag",
+     "opts": {
+      "band": 999999
+     },
      "why": "Y5.B1.S4 Numbers to 1,000,000 (earlier Y5 step)"
     }
    ],
@@ -1020,7 +1068,10 @@
    "related": [
     {
      "key": "placevalue:compare",
-     "why": "compare to 1,000,000"
+     "opts": {
+      "band": 999999
+     },
+     "why": "compare the numbers before and after rounding, to 1,000,000"
     },
     {
      "key": "number_sense:estimate_sums_diffs",
@@ -1058,7 +1109,10 @@
     },
     {
      "key": "placevalue:more_less_100",
-     "why": "Y5.B1.S7 10 100 1,000 10,000 100,000 more or less (earlier Y5 step)"
+     "opts": {
+      "step": 1000
+     },
+     "why": "Y5.B1.S7 1,000 more or 1,000 less (taught earlier this year): the jump a mental calculation counts on in"
     },
     {
      "key": "number_sense:nearest_1000",
@@ -1074,14 +1128,7 @@
      "why": "bridge through a ten, the small-number form"
     },
     {
-     "key": "addition:add_sub_10s",
-     "why": "count on and back in 10s"
-    },
-    {
      "key": "addition:add_1m_mixed",
-     "opts": {
-      "band": 1000
-     },
      "why": "the written method this replaces when numbers are easy"
     },
     {
@@ -1140,6 +1187,9 @@
     },
     {
      "key": "placevalue:pv_digit_drag",
+     "opts": {
+      "band": 999999
+     },
      "why": "Y5.B1.S4 Numbers to 1,000,000 (earlier Y5 step)"
     }
    ],
@@ -1353,9 +1403,6 @@
     },
     {
      "key": "addition:add_1m_mixed",
-     "opts": {
-      "band": 1000
-     },
      "why": "the calculation being checked"
     },
     {
@@ -1432,10 +1479,7 @@
     },
     {
      "key": "subtraction:sub_wp_1m_plain",
-     "opts": {
-      "band": 100
-     },
-     "why": "one-step subtraction stories to 1,000,000"
+     "why": "one-step subtraction stories: the single steps a multi-step problem is built from"
     },
     {
      "key": "number_sense:estimate_sums_diffs",
@@ -1476,14 +1520,14 @@
     }
    ],
    "verdict": "partial",
-   "missing": "comparing two +/− calculations by reasoning about how they differ (same start, one addend 1 less), with large numbers",
+   "missing": "comparing two +/− calculations by reasoning about how they differ (same start, one addend 1 less), with large numbers (4,580 + 2,000 vs 4,580 + 1,999)",
    "build": [
     "compare_calcs"
    ],
    "pre": [
     {
-     "key": "addition:equal_sign",
-     "why": "Y2.B2.S20 Compare number sentences (prior learning wk W09)"
+     "key": "algebra:balance_addsub",
+     "why": "keep both sides equal: the balance behind comparing two calculations (Y3/Y4 equal-sides number sentences)"
     },
     {
      "key": "addition:number_families_add",
@@ -1508,11 +1552,8 @@
    "preBuild": [],
    "related": [
     {
-     "key": "algebra:balance_addsub",
-     "opts": {
-      "band": 20
-     },
-     "why": "keep both sides equal"
+     "key": "number_sense:estimate_sums_diffs",
+     "why": "compare by estimating: judge two calculations without working them out exactly"
     }
    ],
    "note": "Weeks W09-W10.",
@@ -1522,7 +1563,7 @@
      "name": "Compare Calculations",
      "kind": "new skill algebra:compare_calculations",
      "teaches": "comparing two calculations without working them out (4,580 + 2,000 vs 4,580 + 1,999)",
-     "closes": "comparing two +/− calculations by reasoning about how they differ (same start, one addend 1 less), with large numbers",
+     "closes": "comparing two +/− calculations by reasoning about how they differ (same start, one addend 1 less), with large numbers (4,580 + 2,000 vs 4,580 + 1,999)",
      "representation": "two expressions with a circle between them"
     }
    ]
@@ -1575,16 +1616,10 @@
     },
     {
      "key": "addition:add_missing_digit",
-     "opts": {
-      "range": 100
-     },
      "why": "a missing digit in a column"
     },
     {
      "key": "subtraction:sub_missing_digit",
-     "opts": {
-      "range": 100
-     },
      "why": "a missing digit in a subtraction column"
     }
    ],
@@ -1633,13 +1668,17 @@
      "why": "Y4.B4.S1 Multiples of 3 (lower grade, same idea)"
     },
     {
-     "key": "multiplication:count_by_tables",
+     "key": "multiplication:mult_chart",
      "opts": {
+      "task": "headers",
+      "band": 100,
       "constant": [
-       3
+       3,
+       6,
+       9
       ]
      },
-     "why": "Y4.B4.S1 Multiples of 3 (prior learning wk W01)"
+     "why": "Y4.B4.S6 The 3, 6 and 9 times-tables (prior learning wk W01)"
     },
     {
      "key": "patterns:seq_5",
@@ -1654,6 +1693,17 @@
       "band": 50
      },
      "why": "Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W01)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "constant": [
+       2,
+       4,
+       8
+      ]
+     },
+     "why": "Y3.B3.S15 The 2, 4 and 8 times-tables (lower grade, same cluster CCSS 3.OA.C.7)"
     }
    ],
    "preBuild": [],
@@ -1719,6 +1769,19 @@
       ]
      },
      "why": "Y4.B4.S1 Multiples of 3 (prior learning wk W01)"
+    },
+    {
+     "key": "multiplication:mult_chart",
+     "opts": {
+      "task": "headers",
+      "band": 100,
+      "constant": [
+       3,
+       6,
+       9
+      ]
+     },
+     "why": "Y4.B4.S6 The 3, 6 and 9 times-tables (prior learning wk W01)"
     },
     {
      "key": "multiplication:mult_facts",
@@ -1904,6 +1967,17 @@
     {
      "key": "composing:odd_even",
      "why": "Y2.B5.S12 Odd and even numbers (prior learning wk W02)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "constant": [
+       2,
+       4,
+       8
+      ]
+     },
+     "why": "Y3.B3.S15 The 2, 4 and 8 times-tables (prior learning wk W02)"
     }
    ],
    "preBuild": [],
@@ -1963,6 +2037,19 @@
      "why": "Y1.B9.S6 Make arrays (prior learning wk W37)"
     },
     {
+     "key": "multiplication:mult_chart",
+     "opts": {
+      "task": "headers",
+      "band": 100,
+      "constant": [
+       3,
+       6,
+       9
+      ]
+     },
+     "why": "Y4.B4.S6 The 3, 6 and 9 times-tables (prior learning wk W37)"
+    },
+    {
      "key": "number_theory:factors_identify",
      "why": "Y5.B3.S3 Factors (earlier Y5 step)"
     },
@@ -1979,11 +2066,11 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "n × n facts"
+     "why": "times-table facts: a square number is the fact with two equal factors (6 × 6)"
     },
     {
      "key": "area_perimeter:area_perimeter",
-     "why": "area of a square"
+     "why": "area of a rectangle; a square number is the area of a square with whole-number sides"
     },
     {
      "key": "number_theory:factor_links_medium",
@@ -2042,6 +2129,30 @@
      "why": "Y3.B3.S2 Use arrays (prior learning wk W37)"
     },
     {
+     "key": "multiplication:mult_chart",
+     "opts": {
+      "task": "headers",
+      "band": 100,
+      "constant": [
+       3,
+       6,
+       9
+      ]
+     },
+     "why": "Y4.B4.S6 The 3, 6 and 9 times-tables (prior learning wk W37)"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "constant": [
+       2,
+       4,
+       8
+      ]
+     },
+     "why": "Y3.B3.S15 The 2, 4 and 8 times-tables (lower grade, same cluster CCSS 3.OA.C.7)"
+    },
+    {
      "key": "multiplication:mult_properties",
      "why": "Y4.B4.S12 Divide a number by 1 and itself (lower grade, same idea)"
     }
@@ -2052,7 +2163,7 @@
    "related": [
     {
      "key": "area_perimeter:volume",
-     "why": "volume of a cube"
+     "why": "volume of a box (length × width × height): a cube number is the volume of an n × n × n cube"
     }
    ],
    "note": "Above CCSS K-5 (6.EE.A.1). Prior-learning Y4.B4.S13 Multiply three numbers has no skill (mult_three).",
@@ -2253,23 +2364,25 @@
     },
     {
      "key": "number_theory:multiples",
-     "opts": {
-      "forms": [
-       0
-      ]
-     },
-     "why": "Y3.B3.S4 Multiples of 5 and 10 (prior learning wk W02)"
+     "why": "list the multiples of a number: a multiple of 100 is the same idea one place up (lower grade, Y3.B3 times-table multiples)"
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "number_theory:divisibility_sort",
-     "why": "divisible by 10 (mixed with 2 and 5)"
+     "why": "divisibility: is the number a multiple of the divisor? (2, 5, 9, 10 …)"
     },
     {
      "key": "placevalue:more_less_100",
-     "why": "count in 100s and 1,000s"
+     "opts": {
+      "step": 1000
+     },
+     "why": "1,000 more or 1,000 less: the next multiple of 1,000"
+    },
+    {
+     "key": "number_sense:nearest_1000",
+     "why": "the nearest multiple of 1,000"
     }
    ],
    "note": "The school teaches this in week W02 beside Y5.B3.S4. FLAG: reused mult_multiples was internally inconsistent (skill mult_zeros vs representation on number_theory:multiples); output re-states it on mult_zeros only.",
@@ -2824,26 +2937,8 @@
      "why": "in stories"
     },
     {
-     "key": "fraction_operations:add_frac_unlike",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     },
-     "why": "next steps: related denominators"
-    },
-    {
      "key": "fraction_operations:add_mixed_like",
      "why": "mixed numbers"
-    },
-    {
-     "key": "fraction_operations:add_frac_unlike_nv",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     },
-     "why": "Y5.B4.S10 Add fractions within 1 (next step)"
     }
    ],
    "note": ""
@@ -2859,7 +2954,7 @@
        2
       ]
      },
-     "missing": "no \"total within 1\" control: with one denominator family ({denoms:[2]} etc.) the denominators are related as WRM wants, but sums over 1 are mixed in"
+     "missing": "no \"total within 1\" control (sums over 1 are mixed in); related denominators on the calculate items only: the click-all and sort items ignore {denoms:[2]} and pair unrelated denominators (3/5 + 1/8)"
     },
     {
      "key": "fraction_operations:add_frac_unlike_nv",
@@ -2868,13 +2963,14 @@
        2
       ]
      },
-     "missing": "numbers only; no total-within-1 control, sums over 1 mixed in"
+     "missing": "numbers only; no total-within-1 control; related denominators on the calculate items only: the click-all and sort items ignore {denoms:[2]} and pair unrelated denominators in the sort items (2/3 + 1/4)"
     }
    ],
    "verdict": "partial",
    "missing": "a page of related-denominator additions whose total stays within 1 (1/4 + 3/8) with the bar model",
    "build": [
-    "frac_total_band"
+    "frac_total_band",
+    "denoms_all_forms"
    ],
    "pre": [
     {
@@ -2897,25 +2993,11 @@
    "preBuild": [],
    "related": [
     {
-     "key": "fraction_operations:sub_frac_unlike",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     },
-     "why": "inverse"
-    },
-    {
-     "key": "fraction_operations:estimate_frac_ops",
-     "opts": {
-      "task": [
-       0
-      ]
-     },
-     "why": "estimate first"
+     "key": "fraction_operations:sub_fractions_like",
+     "why": "the inverse: subtract, with one denominator"
     }
    ],
-   "note": "Use opts {\"denoms\":[2]} (or [3] / [5]) to keep denominators related.",
+   "note": "Both partials carry {denoms:[2]}: it keeps the calculate items in one family, but not the click-all and sort items (denoms_all_forms).",
    "envision": [
     {
      "proposal": "frac_total_band",
@@ -2924,6 +3006,14 @@
      "teaches": "adding fractions with related denominators where the total stays within 1 (1/4 + 3/8 = 5/8), then where it passes 1 and is renamed as a mixed number",
      "closes": "a page of related-denominator additions whose total stays within 1 (1/4 + 3/8) with the bar model",
      "representation": "boxed cell: the sum with a bar model in eighths (black outline, one grey for shaded parts)"
+    },
+    {
+     "proposal": "denoms_all_forms",
+     "name": "One Denominator Family on Every Item (option)",
+     "kind": "option on fraction_operations:add_frac_unlike",
+     "teaches": "adding and subtracting fractions and mixed numbers whose denominators are related (halves, quarters, eighths; thirds, sixths, twelfths), on every item of the page, the click-all and sort items included",
+     "closes": "the click-all and sort items of an add-within-1 page stay in one related family (today 3/5 + 1/8)",
+     "representation": "the existing calculate, click-all and sort cells, unchanged"
     }
    ]
   },
@@ -2938,7 +3028,7 @@
        2
       ]
      },
-     "missing": "no total-greater-than-1 control: about half the computed sums are 1 or less (3/4, 1, 7/8) and many items are \"click all sums greater than 1\" sorts"
+     "missing": "no total-greater-than-1 control: about half the computed sums are 1 or less (3/4, 1, 7/8); related denominators on the calculate items only: the click-all and sort items ignore {denoms:[2]} and pair unrelated denominators (3/5 + 3/8, 4/5 + 5/6 in 45 of 60 items)"
     },
     {
      "key": "fraction_operations:add_frac_unlike_nv",
@@ -2947,13 +3037,14 @@
        2
       ]
      },
-     "missing": "no total-greater-than-1 control: about half the computed sums are 1 or less (3/4, 1, 7/8) and many items are \"click all sums greater than 1\" sorts"
+     "missing": "no total-greater-than-1 control: about half the computed sums are 1 or less; related denominators on the calculate items only: the click-all and sort items ignore {denoms:[2]} and pair unrelated denominators in the sort items (2/3 + 1/4)"
     }
    ],
    "verdict": "partial",
    "missing": "a page of additions whose total is always greater than 1, renamed as a mixed number (3/4 + 5/8 = 11/8 = 1 3/8)",
    "build": [
-    "frac_total_band"
+    "frac_total_band",
+    "denoms_all_forms"
    ],
    "pre": [
     {
@@ -2976,24 +3067,11 @@
    "preBuild": [],
    "related": [
     {
-     "key": "fraction_operations:sub_frac_unlike",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     },
-     "why": "inverse"
-    },
-    {
-     "key": "fraction_operations:add_mixed_unlike",
-     "why": "next: mixed numbers"
-    },
-    {
      "key": "fraction_operations:add_mixed_like",
      "why": "Y5.B4.S12 Add to a mixed number (next step)"
     }
    ],
-   "note": "denoms takes one family per page ([2] halves/quarters/eighths, [3], [5]); any one family keeps denominators related.",
+   "note": "Both partials carry {denoms:[2]}: it keeps the calculate items in one family, but not the click-all and sort items (denoms_all_forms).",
    "envision": [
     {
      "proposal": "frac_total_band",
@@ -3002,6 +3080,14 @@
      "teaches": "adding fractions with related denominators where the total stays within 1 (1/4 + 3/8 = 5/8), then where it passes 1 and is renamed as a mixed number",
      "closes": "a page of additions whose total is always greater than 1, renamed as a mixed number (3/4 + 5/8 = 11/8 = 1 3/8)",
      "representation": "boxed cell: the sum with a bar model in eighths (black outline, one grey for shaded parts)"
+    },
+    {
+     "proposal": "denoms_all_forms",
+     "name": "One Denominator Family on Every Item (option)",
+     "kind": "option on fraction_operations:add_frac_unlike",
+     "teaches": "adding and subtracting fractions and mixed numbers whose denominators are related (halves, quarters, eighths; thirds, sixths, twelfths), on every item of the page, the click-all and sort items included",
+     "closes": "the \"click all sums greater than 1\" items stay in one related family (today 3/5 + 3/8, 4/5 + 5/6)",
+     "representation": "the existing calculate, click-all and sort cells, unchanged"
     }
    ]
   },
@@ -3020,24 +3106,16 @@
        2
       ]
      },
-     "missing": "deals mixed + mixed only (related denominators with {denoms:[2]}); no mixed + proper fraction form"
+     "missing": "deals mixed + mixed only, no mixed + proper fraction form; related denominators on the calculate items only: the click-all and sort items ignore {denoms:[2]} and pair unrelated denominators (1 1/2 + 3 1/3)"
     }
    ],
    "verdict": "partial",
    "missing": "adding a proper fraction to a mixed number (3 1/5 + 2/5; 2 1/4 + 5/8), including crossing the next whole",
    "build": [
-    "mixed_plus_frac"
+    "mixed_plus_frac",
+    "denoms_all_forms"
    ],
    "pre": [
-    {
-     "key": "fraction_operations:add_frac_unlike",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     },
-     "why": "Y5.B4.S11 Add fractions with total greater than 1 (previous step)"
-    },
     {
      "key": "fraction_operations:add_fractions_like",
      "why": "Y5.B4.S9 (earlier step)"
@@ -3071,42 +3149,48 @@
      "teaches": "adding a proper fraction to a mixed number (2 1/4 + 3/8) and subtracting a proper fraction from a mixed number (3 4/5 − 2/5), first without, then with crossing a whole",
      "closes": "adding a proper fraction to a mixed number (3 1/5 + 2/5; 2 1/4 + 5/8), including crossing the next whole",
      "representation": "boxed cell: wholes drawn as full bars and the fraction part as a partitioned bar"
+    },
+    {
+     "proposal": "denoms_all_forms",
+     "name": "One Denominator Family on Every Item (option)",
+     "kind": "option on fraction_operations:add_frac_unlike",
+     "teaches": "adding and subtracting fractions and mixed numbers whose denominators are related (halves, quarters, eighths; thirds, sixths, twelfths), on every item of the page, the click-all and sort items included",
+     "closes": "the click-all and sort items of an add-to-a-mixed-number page stay in one related family (today 1 1/2 + 3 1/3)",
+     "representation": "the existing calculate, click-all and sort cells, unchanged"
     }
    ]
   },
   "Y5.B4.S13": {
    "title": "Add two mixed numbers",
-   "direct": [
-    {
-     "key": "fraction_operations:add_mixed_like",
-     "opts": {}
-    },
+   "direct": [],
+   "partial": [
     {
      "key": "fraction_operations:add_mixed_unlike",
      "opts": {
       "denoms": [
        2
       ]
-     }
+     },
+     "missing": "related denominators on the calculate items only: the click-all and sort items ignore {denoms:[2]} and pair unrelated denominators (2 1/3 + 3 1/4 in 28 of 60 items)"
+    },
+    {
+     "key": "fraction_operations:add_mixed_like",
+     "missing": "like denominators only (2 1/5 + 1 3/5); never related denominators (2 1/4 + 1 3/8)"
     },
     {
      "key": "fraction_operations:add_mixed_like_nv",
-     "opts": {}
+     "missing": "like denominators only, numbers only; never related denominators"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "adding two mixed numbers with related denominators (2 1/4 + 1 3/8) on a page that stays inside one denominator family",
+   "build": [
+    "denoms_all_forms"
+   ],
    "pre": [
     {
-     "key": "fraction_operations:add_frac_unlike",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     },
-     "why": "Y5.B4.S11 (earlier step)"
+     "key": "fraction_operations:add_fractions_like",
+     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (taught earlier this year, wk W17; add the fraction parts)"
     },
     {
      "key": "fractions:improper_mixed",
@@ -3115,6 +3199,10 @@
     {
      "key": "fractions:mixed_improper_visual",
      "why": "Y5.B4.S5 (earlier step)"
+    },
+    {
+     "key": "fractions:mixed_nl_drag",
+     "why": "mixed numbers on a number line: the wholes and the parts (CCSS 4.NF.B.3)"
     }
    ],
    "preBuild": [
@@ -3124,18 +3212,19 @@
     {
      "key": "fraction_operations:sub_mixed_like",
      "why": "inverse"
-    },
-    {
-     "key": "fraction_operations:sub_frac_unlike",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     },
-     "why": "Y5.B4.S14 Subtract fractions (next step)"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "denoms_all_forms",
+     "name": "One Denominator Family on Every Item (option)",
+     "kind": "option on fraction_operations:add_frac_unlike",
+     "teaches": "adding and subtracting fractions and mixed numbers whose denominators are related (halves, quarters, eighths; thirds, sixths, twelfths), on every item of the page, the click-all and sort items included",
+     "closes": "every item of an add-two-mixed-numbers page inside one related family: today the click-all items pair 2 1/3 + 3 1/4",
+     "representation": "the existing calculate, click-all and sort cells, unchanged"
+    }
+   ]
   },
   "Y5.B4.S14": {
    "title": "Subtract fractions",
@@ -3152,7 +3241,7 @@
        2
       ]
      },
-     "missing": "related denominators with {denoms:[2]}, minuend within 1; no whole or improper minuend (2 − 3/4)"
+     "missing": "minuend within 1, no whole or improper minuend (2 − 3/4); related denominators on the calculate items only: the click-all and sort items ignore {denoms:[2]} and pair unrelated denominators (4/6 − 1/5)"
     },
     {
      "key": "fraction_operations:sub_frac_unlike_nv",
@@ -3161,13 +3250,14 @@
        2
       ]
      },
-     "missing": "numbers only; minuend within 1, no whole or improper minuend"
+     "missing": "numbers only; minuend within 1, no whole or improper minuend (2 − 3/4); related denominators on the calculate items only: the click-all and sort items ignore {denoms:[2]} and pair unrelated denominators (4/6 − 1/5)"
     }
    ],
    "verdict": "partial",
    "missing": "subtracting from a whole or an improper fraction with related denominators (2 − 3/4, 7/4 − 1/2): every dealt item stays within 1",
    "build": [
-    "frac_whole_minuend"
+    "frac_whole_minuend",
+    "denoms_all_forms"
    ],
    "pre": [
     {
@@ -3190,15 +3280,6 @@
    "preBuild": [],
    "related": [
     {
-     "key": "fraction_operations:add_frac_unlike",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     },
-     "why": "inverse"
-    },
-    {
      "key": "fraction_operations:frac_word_problems",
      "why": "in stories"
     },
@@ -3207,11 +3288,11 @@
      "why": "next: mixed numbers"
     },
     {
-     "key": "fraction_operations:sub_mixed_unlike",
-     "why": "Y5.B4.S15 Subtract from a mixed number (next step)"
+     "key": "fraction_operations:add_fractions_like",
+     "why": "the inverse: add the parts back, one denominator"
     }
    ],
-   "note": "WRM includes subtracting from a whole/improper fraction; sub_fractions_like covers same denominator, {denoms:[one family]} keeps the others related.",
+   "note": "WRM includes subtracting from a whole or an improper fraction; sub_fractions_like covers the same denominator. {denoms:[2]} keeps only the calculate items in one family (denoms_all_forms).",
    "envision": [
     {
      "proposal": "frac_whole_minuend",
@@ -3220,6 +3301,14 @@
      "teaches": "subtracting a fraction from a whole number (2 − 3/4 = 1 1/4) and from an improper fraction with related denominators (7/4 − 1/2 = 5/4)",
      "closes": "subtracting from a whole or an improper fraction with related denominators (2 − 3/4, 7/4 − 1/2): every dealt item stays within 1",
      "representation": "boxed cell: the whole(s) drawn as bars split into the denominator, the parts taken away crossed out"
+    },
+    {
+     "proposal": "denoms_all_forms",
+     "name": "One Denominator Family on Every Item (option)",
+     "kind": "option on fraction_operations:add_frac_unlike",
+     "teaches": "adding and subtracting fractions and mixed numbers whose denominators are related (halves, quarters, eighths; thirds, sixths, twelfths), on every item of the page, the click-all and sort items included",
+     "closes": "the click-all and sort items of a subtract-fractions page stay in one related family (today 4/6 − 1/5)",
+     "representation": "the existing calculate, click-all and sort cells, unchanged"
     }
    ]
   },
@@ -3238,24 +3327,16 @@
        2
       ]
      },
-     "missing": "deals mixed − mixed only (related denominators with {denoms:[2]}); no mixed − proper fraction form"
+     "missing": "deals mixed − mixed only, no mixed − proper fraction form; related denominators on the calculate items only: the click-all and sort items ignore {denoms:[2]} and pair unrelated denominators (3 1/2 − 2 2/3)"
     }
    ],
    "verdict": "partial",
    "missing": "subtracting a proper fraction from a mixed number (3 4/5 − 2/5; 4 3/4 − 3/8) with no exchange",
    "build": [
-    "mixed_plus_frac"
+    "mixed_plus_frac",
+    "denoms_all_forms"
    ],
    "pre": [
-    {
-     "key": "fraction_operations:sub_frac_unlike",
-     "opts": {
-      "denoms": [
-       2
-      ]
-     },
-     "why": "Y5.B4.S14 Subtract fractions (previous step)"
-    },
     {
      "key": "fraction_operations:sub_fractions_like",
      "why": "Y5.B4.S14 (previous step)"
@@ -3291,6 +3372,14 @@
      "teaches": "adding a proper fraction to a mixed number (2 1/4 + 3/8) and subtracting a proper fraction from a mixed number (3 4/5 − 2/5), first without, then with crossing a whole",
      "closes": "subtracting a proper fraction from a mixed number (3 4/5 − 2/5; 4 3/4 − 3/8) with no exchange",
      "representation": "boxed cell: wholes drawn as full bars and the fraction part as a partitioned bar"
+    },
+    {
+     "proposal": "denoms_all_forms",
+     "name": "One Denominator Family on Every Item (option)",
+     "kind": "option on fraction_operations:add_frac_unlike",
+     "teaches": "adding and subtracting fractions and mixed numbers whose denominators are related (halves, quarters, eighths; thirds, sixths, twelfths), on every item of the page, the click-all and sort items included",
+     "closes": "the click-all and sort items of a subtract-from-a-mixed-number page stay in one related family (today 3 1/2 − 2 2/3)",
+     "representation": "the existing calculate, click-all and sort cells, unchanged"
     }
    ]
   },
@@ -3310,10 +3399,6 @@
     "mixed_plus_frac"
    ],
    "pre": [
-    {
-     "key": "fraction_operations:sub_mixed_unlike",
-     "why": "Y5.B4.S17 Subtract two mixed numbers (taught earlier this year, wk W16)"
-    },
     {
      "key": "fractions:improper_mixed",
      "why": "Y5.B4.S5 1 whole = 5/5 (earlier step)"
@@ -3360,28 +3445,31 @@
   },
   "Y5.B4.S17": {
    "title": "Subtract two mixed numbers",
-   "direct": [
-    {
-     "key": "fraction_operations:sub_mixed_like",
-     "opts": {}
-    },
+   "direct": [],
+   "partial": [
     {
      "key": "fraction_operations:sub_mixed_unlike",
      "opts": {
       "denoms": [
        2
       ]
-     }
+     },
+     "missing": "related denominators on the calculate items only: the click-all and sort items ignore {denoms:[2]} and pair unrelated denominators (1 1/2 − 3/10 in 26 of 60 items); unlike denominators are first taught W17, a week after this step"
+    },
+    {
+     "key": "fraction_operations:sub_mixed_like",
+     "missing": "like denominators only (4 3/5 − 1 1/5); never related denominators"
     },
     {
      "key": "fraction_operations:sub_mixed_like_nv",
-     "opts": {}
+     "missing": "like denominators only, numbers only; never related denominators"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "subtracting two mixed numbers with related denominators (3 3/4 − 1 1/8) on a page that stays inside one denominator family",
+   "build": [
+    "denoms_all_forms"
+   ],
    "pre": [
     {
      "key": "fraction_operations:add_mixed_like",
@@ -3410,7 +3498,17 @@
      "why": "the inverse: add the mixed numbers back"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "denoms_all_forms",
+     "name": "One Denominator Family on Every Item (option)",
+     "kind": "option on fraction_operations:add_frac_unlike",
+     "teaches": "adding and subtracting fractions and mixed numbers whose denominators are related (halves, quarters, eighths; thirds, sixths, twelfths), on every item of the page, the click-all and sort items included",
+     "closes": "every item of a subtract-two-mixed-numbers page inside one related family: today the click-all items pair 1 1/2 − 3/10",
+     "representation": "the existing calculate, click-all and sort cells, unchanged"
+    }
+   ]
   },
   "Y5.B5.S1": {
    "title": "Multiply up to a 4-digit number by a 1-digit number",
@@ -3485,7 +3583,10 @@
     },
     {
      "key": "division:divide",
-     "why": "the inverse: 4-digit ÷ 1-digit (Y5.B5.S8)"
+     "opts": {
+      "range": 100
+     },
+     "why": "the inverse: division facts and 2-digit ÷ 1-digit, before 4-digit ÷ 1-digit (Y5.B5.S8)"
     }
    ],
    "note": "",
@@ -3526,6 +3627,11 @@
     {
      "key": "placevalue:place_value_10x",
      "opts": {
+      "op": "x",
+      "power": [
+       10,
+       100
+      ],
       "band": 10000
      },
      "why": "Y4.B5.S4 Multiply by 100 (prior learning wk W11)"
@@ -3543,11 +3649,12 @@
    "related": [
     {
      "key": "multiplication:mult_properties",
-     "why": "distributive property"
-    },
-    {
-     "key": "algebra:distributive_expr",
-     "why": "distribute over a sum"
+     "opts": {
+      "forms": [
+       1
+      ]
+     },
+     "why": "breaking a factor apart (6 × 17 = 6 × 10 + 6 × 7): the distributive idea the area model and the column use"
     },
     {
      "key": "number_sense:estimate_products",
@@ -3584,7 +3691,7 @@
      "opts": {
       "tiles": 21
      },
-     "why": "Y4.B5.S10 Multiply a 3-digit number by a 1-digit number (prior learning wk W11)"
+     "why": "Y4.B5.S9 Multiply a 2-digit number by a 1-digit number (lower grade, same idea)"
     },
     {
      "key": "multiplication:mult_zeros",
@@ -3593,6 +3700,11 @@
     {
      "key": "placevalue:place_value_10x",
      "opts": {
+      "op": "x",
+      "power": [
+       10,
+       100
+      ],
       "band": 10000
      },
      "why": "Y4.B5.S4 Multiply by 100 (prior learning wk W11)"
@@ -3650,7 +3762,7 @@
     {
      "key": "multiplication:multiply",
      "opts": {
-      "range": 100
+      "tiles": 22
      },
      "why": "Y5.B5.S3 Multiply a 2-digit number by a 2-digit number (previous step)"
     },
@@ -3663,11 +3775,6 @@
     },
     {
      "key": "multiplication:mult_zeros",
-     "opts": {
-      "forms": [
-       0
-      ]
-     },
      "why": "Y5.B3.S10 Multiples of 10, 100 and 1,000 (taught earlier this year, wk W02)"
     }
    ],
@@ -3683,7 +3790,12 @@
     },
     {
      "key": "multiplication:mult_properties",
-     "why": "distributive property"
+     "opts": {
+      "forms": [
+       1
+      ]
+     },
+     "why": "breaking a factor apart (6 × 17 = 6 × 10 + 6 × 7): the distributive idea the area model and the column use"
     }
    ],
    "note": "School week W34 is an assessment week; prior learning from Y5.B5 and Y5.B3.",
@@ -3766,7 +3878,7 @@
     },
     {
      "key": "number_ops_mixed:word_problems_mixed",
-     "missing": "multi-digit ×: one-step stories with table facts"
+     "missing": "one-step stories of all four operations with table-fact numbers; no multi-digit × and no two-step problems; a few division stories have a 2-digit divisor (13)"
     }
    ],
    "verdict": "partial",
@@ -3777,12 +3889,26 @@
    ],
    "pre": [
     {
+     "key": "multiplication:multiply",
+     "opts": {
+      "tiles": 21
+     },
+     "why": "Y4.B5.S9 Multiply a 2-digit number by a 1-digit number (lower grade, same idea; the multi-digit × building block)"
+    },
+    {
      "key": "multiplication:mult_comparison",
      "why": "Y3.B4.S10 Scaling (prior learning wk W03)"
     },
     {
      "key": "multiplication:mult_properties",
      "why": "Y3.B4.S3 Reasoning about multiplication (prior learning wk W03)"
+    },
+    {
+     "key": "multiplication:area_model_mult",
+     "opts": {
+      "tiles": 21
+     },
+     "why": "Y4.B5.S9 Multiply a 2-digit number by a 1-digit number (lower grade, same idea; the area model of the same multiplication)"
     },
     {
      "key": "multiplication:mult_facts",
@@ -3807,12 +3933,15 @@
      "why": "bar model of the story"
     },
     {
-     "key": "division:remainder_interpret",
-     "why": "the division twin (Y5.B5.S11)"
-    },
-    {
      "key": "algebra:multi_step_word",
      "why": "two-step + − stories (no × step)"
+    },
+    {
+     "key": "division:div_word_problems_plain",
+     "opts": {
+      "range": 100
+     },
+     "why": "the inverse: one-step division stories"
     }
    ],
    "note": "Prior-learning Y4.B5.S14 Correspondence problems has no skill (correspondence).",
@@ -3879,6 +4008,11 @@
     {
      "key": "placevalue:place_value_10x",
      "opts": {
+      "op": "/",
+      "power": [
+       10,
+       100
+      ],
       "band": 10000
      },
      "why": "Y4.B5.S5 Divide by 10 (prior learning wk W11)"
@@ -3987,10 +4121,13 @@
     },
     {
      "key": "multiplication:multiply",
-     "why": "the inverse: 4-digit × 1-digit"
+     "why": "the inverse: multiply the quotient by the divisor to get back to the dividend"
     },
     {
      "key": "division:div_word_problems_plain",
+     "opts": {
+      "range": 100
+     },
      "why": "division stories"
     }
    ],
@@ -4035,11 +4172,10 @@
    "related": [
     {
      "key": "division:remainder_interpret",
+     "opts": {
+      "range": 100
+     },
      "why": "what the remainder means in a story"
-    },
-    {
-     "key": "division:remainder_contexts",
-     "why": "remainder contexts"
     },
     {
      "key": "division:div_check_by_multiplying",
@@ -4074,7 +4210,7 @@
    "pre": [
     {
      "key": "division:divide",
-     "why": "Y5.B5.S9 Divide with remainders (previous step)"
+     "why": "division facts: the known facts an efficient method starts from (Y5.B5.S9 Divide with remainders, previous step)"
     },
     {
      "key": "number_theory:factor_links_easy",
@@ -4144,7 +4280,7 @@
    "partial": [
     {
      "key": "number_ops_mixed:word_problems_mixed",
-     "missing": "multi-digit × and ÷ numbers: table-fact stories only"
+     "missing": "multi-digit × and ÷ numbers: table-fact stories only; a few division stories have a 2-digit divisor (13)"
     },
     {
      "key": "multiplication:mult_comparison",
@@ -4152,16 +4288,23 @@
     },
     {
      "key": "division:remainder_interpret",
-     "missing": "÷ only, one step; no × and no two-step problems"
+     "missing": "÷ only, one step; no × and no two-step problems; some stories divide by 12-17 (2-digit divisor, 5.NBT.B.6)"
     }
    ],
    "verdict": "partial",
-   "missing": "× and ÷ problems with multi-digit calculations and two-step problems mixing × / ÷ with + / −",
+   "missing": "× and ÷ problems with multi-digit calculations (4-digit × 1-digit, 4-digit ÷ 1-digit) and two-step problems mixing × / ÷ with + / −",
    "build": [
     "mult_wp_multidigit",
     "multi_step_four_ops"
    ],
    "pre": [
+    {
+     "key": "multiplication:multiply",
+     "opts": {
+      "tiles": 21
+     },
+     "why": "Y4.B5.S9 Multiply a 2-digit number by a 1-digit number (lower grade, same idea; the multi-digit × building block)"
+    },
     {
      "key": "division:div_remainders",
      "why": "Y3.B4.S9 Divide a 2-digit number by a 1-digit number - with remainders (prior learning wk W04)"
@@ -4180,11 +4323,10 @@
    ],
    "related": [
     {
-     "key": "division:remainder_contexts",
-     "why": "remainder contexts"
-    },
-    {
      "key": "division:div_word_problems_plain",
+     "opts": {
+      "range": 100
+     },
      "why": "one-step division stories"
     },
     {
@@ -4199,7 +4341,7 @@
      "name": "Multiplication Problems With Larger Numbers (option)",
      "kind": "option on multiplication:mult_word_problems_plain",
      "teaches": "one- and two-step multiplication and division stories whose calculation is 4-digit × 1-digit, 2-digit × 2-digit or 4-digit ÷ 1-digit",
-     "closes": "× and ÷ problems with multi-digit calculations and two-step problems mixing × / ÷ with + / −",
+     "closes": "× and ÷ problems with multi-digit calculations (4-digit × 1-digit, 4-digit ÷ 1-digit) and two-step problems mixing × / ÷ with + / −",
      "representation": "B&W boxed cell: a two-line story, a bar model or equal-groups bar with the numbers in big Andika digits, a write-on calculation space and one answer box …"
     },
     {
@@ -4207,7 +4349,7 @@
      "name": "Two-Step Problems With All Four Operations (option)",
      "kind": "option on algebra:multi_step_word",
      "teaches": "two-step and multistep word problems with the four operations, represented by an equation with a letter, remainders interpreted, and checked by estimating",
-     "closes": "× and ÷ problems with multi-digit calculations and two-step problems mixing × / ÷ with + / −",
+     "closes": "× and ÷ problems with multi-digit calculations (4-digit × 1-digit, 4-digit ÷ 1-digit) and two-step problems mixing × / ÷ with + / −",
      "representation": "two steps with × and ÷ (3 packs of 6, 4 eaten), write the equation with a letter for the unknown, remainder steps, and a \"reasonable?\" estimate on the …"
     }
    ]
@@ -4262,10 +4404,6 @@
       ]
      },
      "why": "1/n of an amount"
-    },
-    {
-     "key": "fraction_operations:mult_scaling",
-     "why": "size of the product"
     }
    ],
    "note": "",
@@ -4501,6 +4639,9 @@
     },
     {
      "key": "division:div_word_problems",
+     "opts": {
+      "range": 100
+     },
      "why": "divide by the denominator (prior learning wk W20)"
     },
     {
@@ -4640,8 +4781,13 @@
    ],
    "related": [
     {
-     "key": "fraction_operations:mult_scaling",
-     "why": "multiplying as scaling"
+     "key": "fraction_operations:frac_mult_word",
+     "opts": {
+      "denoms": [
+       5
+      ]
+     },
+     "why": "the operator applied to a quantity in a story (4/5 of a litre, 4 times)"
     }
    ],
    "note": "",
@@ -4666,7 +4812,12 @@
     },
     {
      "key": "conversions:d_to_f",
-     "missing": "writes tenths and hundredths as fractions; no place-value chart or counters"
+     "opts": {
+      "forms": [
+       0
+      ]
+     },
+     "missing": "with {forms:[0]} it writes tenths, fifths and quarters as fractions (0.7 = 7/10, 0.75 = 3/4) and few hundredths; no place-value chart or counters"
     }
    ],
    "verdict": "partial",
@@ -4727,15 +4878,25 @@
    "partial": [
     {
      "key": "conversions:f_to_d",
-     "missing": "{denoms:[5]} still mixes hundredths in; no tenths-only page or tenths strip"
+     "opts": {
+      "denoms": [
+       5
+      ]
+     },
+     "missing": "with {denoms:[5]} it mixes fifths and hundredths with the tenths, and about 1 item in 3 is a drag-bin sort of halves and quarters with percent tiles (percent is W22); no tenths-only page or tenths strip"
     },
     {
      "key": "conversions:d_to_f",
-     "missing": "mixes tenths with hundredths and 0.75 = 3/4; no tenths-only page"
+     "opts": {
+      "forms": [
+       0
+      ]
+     },
+     "missing": "with {forms:[0]} it mixes tenths with fifths and quarters (0.75 = 3/4); no tenths-only page"
     }
    ],
    "verdict": "partial",
-   "missing": "a tenths-only page with a tenths strip / number line showing 3/10 = 0.3 (f_to_d {denoms:[5]} still mixes hundredths; d_to_f mixes 0.75 = 3/4)",
+   "missing": "a tenths-only page with a tenths strip / number line showing 3/10 = 0.3 (f_to_d with {denoms:[5]} still mixes hundredths and fifths; d_to_f mixes 0.75 = 3/4)",
    "build": [
     "fd_place_band"
    ],
@@ -4776,7 +4937,7 @@
      "name": "Fractions and Decimals by Place (option)",
      "kind": "option on conversions:d_to_f",
      "teaches": "writing tenths, then hundredths, as both a fraction and a decimal (3/10 = 0.3; 27/100 = 0.27), one place per page",
-     "closes": "a tenths-only page with a tenths strip / number line showing 3/10 = 0.3 (f_to_d {denoms:[5]} still mixes hundredths; d_to_f mixes 0.75 = 3/4)",
+     "closes": "a tenths-only page with a tenths strip / number line showing 3/10 = 0.3 (f_to_d with {denoms:[5]} still mixes hundredths and fifths; d_to_f mixes 0.75 = 3/4)",
      "representation": "boxed cell: a tenths strip or hundred square (black outline, grey shading) above"
     }
    ]
@@ -4859,20 +5020,27 @@
   },
   "Y5.B7.S4": {
    "title": "Equivalent fractions and decimals",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "conversions:f_to_d",
-     "opts": {}
+     "missing": "about 1 item in 5 is a drag-bin sort of halves and quarters with percent tiles (75%), a week before percent (W22); f_to_d has no option to leave it out"
     },
     {
      "key": "conversions:d_to_f",
-     "opts": {}
+     "opts": {
+      "forms": [
+       0
+      ]
+     },
+     "missing": "decimal → fraction only (0.75 = 3/4, 0.7 = 7/10), chosen from four fractions; the fraction → decimal direction is f_to_d"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "a fraction → decimal page (1/2, 1/4, 3/4, fifths, tenths, hundredths) without the drag-bin sort and its percent tiles",
+   "build": [
+    "f_to_d_forms"
+   ],
    "pre": [
     {
      "key": "fraction_operations:frac_10_100",
@@ -4902,7 +5070,17 @@
      "why": "compare the decimals once they are written"
     }
    ],
-   "note": ""
+   "note": "",
+   "envision": [
+    {
+     "proposal": "f_to_d_forms",
+     "name": "Fraction to Decimal: Convert Only (option)",
+     "kind": "option on conversions:f_to_d",
+     "teaches": "writing 1/2, 1/4, 3/4, fifths, tenths and hundredths as decimals, one fraction per cell, with no drag-bin sort",
+     "closes": "f_to_d with the drag-bin sort left out, so the fraction → decimal page has no percent tiles a week before W22",
+     "representation": "the existing f_to_d convert cell: the fraction, one decimal answer box"
+    }
+   ]
   },
   "Y5.B7.S5": {
    "title": "Thousandths as fractions",
@@ -4929,9 +5107,6 @@
     },
     {
      "key": "placevalue:value",
-     "opts": {
-      "band": 99
-     },
      "why": "place value of digits (CCSS 4.NBT.A.2)"
     }
    ],
@@ -5076,7 +5251,7 @@
    "verdict": "partial",
    "missing": "a page where every number has the same number of decimal places and the same whole part (0.47 vs 0.43; 3.6, 3.2, 3.9): order_decimals at 2 dp mixes 1 and 2 dp, compare_decimal pairs usually differ in the whole part",
    "build": [
-    "dec_compare_same"
+    "dec_same_whole"
    ],
    "pre": [
     {
@@ -5086,13 +5261,6 @@
     {
      "key": "decimals:decimal_nl_drag",
      "why": "Y4.B8.S4 Tenths on a number line (prior learning wk W22)"
-    },
-    {
-     "key": "placevalue:compare",
-     "opts": {
-      "band": 99
-     },
-     "why": "compare whole numbers (prior learning wk W22)"
     },
     {
      "key": "fraction_operations:frac_10_100",
@@ -5119,12 +5287,12 @@
    "note": "",
    "envision": [
     {
-     "proposal": "dec_compare_same",
-     "name": "Compare and Order Decimals: Same Decimal Places (option)",
+     "proposal": "dec_same_whole",
+     "name": "Decimals With the Same Whole Part (option)",
      "kind": "option on decimals:compare_decimal",
-     "teaches": "comparing and ordering decimals that all have the same number of decimal places and the same whole part, so the tenths then hundredths digit decides",
+     "teaches": "comparing and ordering decimals that share the whole-number part, with 1 and 2 places mixed (0.4 vs 0.38; 3.6, 3.65, 3.06), so the tenths digit decides",
      "closes": "a page where every number has the same number of decimal places and the same whole part (0.47 vs 0.43; 3.6, 3.2, 3.9): order_decimals at 2 dp mixes 1 and 2 dp, compare_decimal pairs usually differ in the whole part",
-     "representation": "two (or four) decimals in boxed cells over an aligned place-value header (O . t h)"
+     "representation": "the existing compare / order cell"
     }
    ]
   },
@@ -5193,10 +5361,6 @@
     {
      "key": "number_sense:rounding_visual",
      "why": "rounding on a number line (prior learning wk W35)"
-    },
-    {
-     "key": "number_sense:nearest_10",
-     "why": "round to the nearest 10 (prior learning wk W35)"
     }
    ],
    "preBuild": [],
@@ -5272,10 +5436,6 @@
     {
      "key": "decimals:compare_decimal",
      "why": "Y5.B7.S8 (earlier step)"
-    },
-    {
-     "key": "number_sense:nearest_10",
-     "why": "round to the nearest 10 (prior learning wk W35)"
     }
    ],
    "preBuild": [
@@ -5332,15 +5492,6 @@
     {
      "key": "conversions:f_to_p",
      "why": "fraction to percent"
-    },
-    {
-     "key": "conversions:percent_of_number",
-     "opts": {
-      "forms": [
-       0
-      ]
-     },
-     "why": "next grade: percent of"
     },
     {
      "key": "conversions:p_to_f",
@@ -5496,7 +5647,12 @@
    "direct": [
     {
      "key": "area_perimeter:perimeter",
-     "opts": {}
+     "opts": {
+      "forms": [
+       0,
+       1
+      ]
+     }
     },
     {
      "key": "area_perimeter:perimeter_grid",
@@ -5551,7 +5707,7 @@
      "why": "perimeter of a rectangle drawn on a coordinate grid"
     }
    ],
-   "note": "perimeter standard (find P), missing (find a side from P) and word variants cover the WRM lesson; perimeter_grid gives the counting-on-squares start."
+   "note": "perimeter {forms:[0,1]} (find the perimeter; find a missing side from the perimeter) covers the WRM lesson; the story form is left out because its fences are in feet (customary, W33). perimeter_grid gives the counting-on-squares start."
   },
   "Y5.B8.S2": {
    "title": "Perimeter of rectilinear shapes",
@@ -5638,6 +5794,13 @@
     "regular_polygon"
    ],
    "pre": [
+    {
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "band": 100
+     },
+     "why": "sides × side length: a regular polygon's perimeter is one times-table fact (5 sides × 7 cm = 35 cm)"
+    },
     {
      "key": "area_perimeter:perimeter",
      "opts": {
@@ -6178,11 +6341,6 @@
    "related": [
     {
      "key": "angles_lines:additive_angles",
-     "opts": {
-      "forms": [
-       0
-      ]
-     },
      "why": "angles that add to 90°/180°/360°"
     }
    ],
@@ -6419,8 +6577,11 @@
      "why": "Y5.B10.S4 Measure angles"
     },
     {
-     "key": "subtraction:subtract",
-     "why": "360 − known parts (lower grade, same cluster CCSS 3.NBT.A.2)"
+     "key": "subtraction:sub_1k_regroup",
+     "opts": {
+      "band": 100
+     },
+     "why": "Y3.B2.S15 Subtract two numbers (across a 10) (lower grade, same idea; subtraction with an exchange, the step behind 360 − 145)"
     },
     {
      "key": "angles_lines:identify_angles",
@@ -6428,13 +6589,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "graphs:pie_chart",
-     "why": "a full turn split into parts"
-    }
-   ],
-   "note": "Preview of 7.G.B.5; tag 4.MD.C.7.",
+   "related": [],
+   "note": "Preview of 7.G.B.5; tag 4.MD.C.7. No related link fits: the other angle skills are this step's pre-skills (naming, measuring) or its own partial; the pie-chart skill asks percents, not angles.",
    "envision": [
     {
      "proposal": "angles_point",
@@ -6470,18 +6626,16 @@
      "why": "Y5.B10.S4 measure angles"
     },
     {
-     "key": "subtraction:subtract",
-     "why": "180 − known parts (lower grade)"
+     "key": "subtraction:sub_1k_regroup",
+     "opts": {
+      "band": 100
+     },
+     "why": "Y3.B2.S15 Subtract two numbers (across a 10) (lower grade, same idea; subtraction with an exchange, the step behind 180 − 45)"
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "graphs:pie_chart",
-     "why": "parts of a whole turn add up (360°)"
-    }
-   ],
-   "note": "",
+   "related": [],
+   "note": "No related link fits: the other angle skills are this step's pre-skills (naming, measuring) or its own partial; the pie-chart skill asks percents, not angles.",
    "envision": [
     {
      "proposal": "angles_point",
@@ -6513,11 +6667,6 @@
     },
     {
      "key": "angles_lines:additive_angles",
-     "opts": {
-      "forms": [
-       0
-      ]
-     },
      "why": "Y5.B10.S1 Understand and use degrees (nearest live practice: additive_angles is not tagged to Y5.B10.S1)"
     },
     {
@@ -6726,7 +6875,7 @@
     }
    ],
    "verdict": "partial",
-   "missing": "finding a missing vertex of a rectangle/square and points on a line from coordinates",
+   "missing": "finding the missing vertex of a rectangle or square from the coordinates of the other three",
    "build": [
     "coord_polygon_draw"
    ],
@@ -6758,7 +6907,7 @@
      "name": "Draw Shapes on a Coordinate Grid (option)",
      "kind": "option on coordinates:coord_polygon",
      "teaches": "plotting given vertices and joining them to draw a 2-D shape, and finding the missing vertex of a square or rectangle",
-     "closes": "finding a missing vertex of a rectangle/square and points on a line from coordinates",
+     "closes": "finding the missing vertex of a rectangle or square from the coordinates of the other three",
      "representation": "first-quadrant grid in the boxed cell (black lines, axes labelled 0-10), plotted points as filled dots"
     }
    ]
@@ -6907,7 +7056,7 @@
    "partial": [
     {
      "key": "coordinates:geo_reflect",
-     "missing": "multiple choice over the x- or y-axis only; no drawing in a horizontal/vertical mirror line on squared paper"
+     "missing": "multiple choice over a reflection in the x- or y-axis only (a later-grade coordinate form); no drawing in a horizontal or vertical mirror line on squared paper"
     }
    ],
    "verdict": "partial",
@@ -6996,10 +7145,6 @@
     {
      "key": "decimals:sub_decimal",
      "why": "column method"
-    },
-    {
-     "key": "fraction_operations:add_fractions_like",
-     "why": "the whole-number fact"
     }
    ],
    "note": "",
@@ -7047,7 +7192,7 @@
    "related": [
     {
      "key": "decimals:sub_decimal",
-     "why": "subtract from 1"
+     "why": "column subtraction of decimals: 1.0 − 0.3 written in columns checks a complement"
     },
     {
      "key": "conversions:percent_visual",
@@ -7128,11 +7273,11 @@
    ],
    "related": [
     {
-     "key": "decimals:compare_decimal",
+     "key": "measurement:money_change",
      "opts": {
-      "decimals": 1
+      "currency": "usd"
      },
-     "why": "which decimal is nearer to 1: the same crossing of the whole"
+     "why": "change from a whole dollar: the same crossing of 1 ($1.00 − $0.25 = $0.75)"
     }
    ],
    "note": "",
@@ -7175,15 +7320,15 @@
    ],
    "pre": [
     {
-     "key": "decimals:decimal_nl_drag",
-     "why": "Y4.B8.S4 Tenths on a number line (lower grade, same idea)"
+     "key": "decimals:compare_decimal",
+     "opts": {
+      "decimals": 1
+     },
+     "why": "Y4.B9.S5 Compare decimals (lower grade, same idea; line up the tenths: the place-value reasoning column addition uses)"
     },
     {
-     "key": "addition:add_10k_regroup",
-     "opts": {
-      "band": 100
-     },
-     "why": "Y4 Add two 4-digit numbers with exchange (prior learning wk W13)"
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line (lower grade, same idea)"
     },
     {
      "key": "addition:add_1k_regroup",
@@ -7202,10 +7347,6 @@
     {
      "key": "decimals:sub_decimal",
      "why": "inverse"
-    },
-    {
-     "key": "decimals:compare_decimal",
-     "why": "compares decimals: same place-value reasoning that lines up the points"
     }
    ],
    "note": "",
@@ -7234,7 +7375,10 @@
    "partial": [
     {
      "key": "decimals:sub_decimal",
-     "missing": "same dp is guaranteed only at Decimal Places 1; at 2–3 dp items mix (43.53 − 41.4)"
+     "opts": {
+      "decimals": 1
+     },
+     "missing": "with Decimal Places 1 every item is tenths − tenths, so the places match; there is no same-number-of-places control at 2 or 3 places (43.53 − 41.4 when two places are asked)"
     }
    ],
    "verdict": "partial",
@@ -7257,14 +7401,14 @@
     },
     {
      "key": "decimals:compare_decimal",
-     "why": "decimal place value (Y5.B7.S8)"
+     "why": "Y4.B9.S5 Compare decimals (lower grade, same idea; compare decimals place by place before subtracting them)"
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "decimals:order_decimals",
-     "why": "size"
+     "why": "order decimals with different numbers of places (7.087, 13.9): line up the places, as the column does"
     }
    ],
    "note": "",
@@ -7293,7 +7437,10 @@
    "partial": [
     {
      "key": "decimals:add_decimal",
-     "missing": "different-dp pairs only some of the time at Decimal Places 2–3; no \"always different, place holder 0\" page"
+     "opts": {
+      "decimals": 2
+     },
+     "missing": "with Decimal Places 2 different-place pairs come only some of the time (4.53 + 4.4); no page that always adds different numbers of places with a place-holder 0"
     }
    ],
    "verdict": "partial",
@@ -7324,7 +7471,7 @@
    "related": [
     {
      "key": "decimals:order_decimals",
-     "why": "size"
+     "why": "order decimals with different numbers of places (7.087, 13.9): line up the places, as the column does"
     }
    ],
    "note": "",
@@ -7374,7 +7521,7 @@
    "related": [
     {
      "key": "decimals:order_decimals",
-     "why": "size"
+     "why": "order decimals with different numbers of places (7.087, 13.9): line up the places, as the column does"
     }
    ],
    "note": "",
@@ -7528,7 +7675,7 @@
        0
       ]
      },
-     "why": "decimal places (Y5.B7)"
+     "why": "tenths written as a decimal and as a fraction (0.7 = 7/10), lower grade (Y4.B8 tenths)"
     }
    ],
    "preBuild": [
@@ -7606,6 +7753,20 @@
    ],
    "pre": [
     {
+     "key": "division:missing_mult_div",
+     "opts": {
+      "range": 100
+     },
+     "why": "Y3.B4.S6 Link multiplication and division (lower grade, same idea; the same missing number in × and ÷, with whole numbers)"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "opts": {
+      "decimals": true
+     },
+     "why": "Y5.B12.S10–S11 Multiply/Divide by 10, 100 and 1,000 (previous step)"
+    },
+    {
      "key": "multiplication:mult_zeros",
      "opts": {
       "forms": [
@@ -7619,22 +7780,9 @@
      "opts": {
       "constant": [
        9
-      ],
-      "band": 100
+      ]
      },
      "why": "Y4.B4.S5 9 times-table and division facts (lower grade, same idea)"
-    },
-    {
-     "key": "division:div_facts",
-     "opts": {
-      "constant": [
-       3,
-       6,
-       9
-      ],
-      "band": 100
-     },
-     "why": "Y4.B4.S7 Multiply and divide by 7 (lower grade, same idea)"
     }
    ],
    "preBuild": [],
@@ -7754,10 +7902,6 @@
     {
      "key": "integers:integer_nl_drag",
      "why": "place the numbers you count"
-    },
-    {
-     "key": "integers:add_int",
-     "why": "a jump through zero"
     }
    ],
    "note": "",
@@ -7810,10 +7954,6 @@
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "integers:add_int",
-     "why": "repeated jumps"
-    },
     {
      "key": "integers:integer_nl_drag",
      "why": "place the numbers"
@@ -7880,10 +8020,6 @@
      "why": "distance from 0"
     },
     {
-     "key": "integers:ordering_rationals",
-     "why": "ordering on a number line"
-    },
-    {
      "key": "integers:opposite_numbers",
      "why": "opposites"
     }
@@ -7932,10 +8068,6 @@
      "why": "distance from 0"
     },
     {
-     "key": "integers:add_int",
-     "why": "the inverse jump"
-    },
-    {
      "key": "measurement:temperature",
      "why": "thermometer readings"
     }
@@ -7958,15 +8090,30 @@
    "partial": [
     {
      "key": "measurement:unit_conversions",
-     "missing": "with units [0] (metric) converts kg↔g, m↔cm, L↔mL both ways; no mixed units (2 kg 300 g) and km is absent"
+     "opts": {
+      "units": [
+       0
+      ]
+     },
+     "missing": "with units [0] (metric) it converts kg↔g, km↔m, m↔cm and L↔mL both ways, but mixes length, mass and capacity on one page, and a click-all distractor reads \"1 mile\" (customary); no mixed units (2 kg 300 g)"
     },
     {
      "key": "measurement:length_metric",
-     "missing": "km→m only, larger to smaller; no mixed units"
+     "opts": {
+      "forms": [
+       3
+      ]
+     },
+     "missing": "with {forms:[3]} km → m only, larger to smaller; no m → km and no mixed units (2 km 400 m)"
     },
     {
      "key": "measurement:unit_conversion_word",
-     "missing": "metric kg/km stories, larger to smaller only"
+     "opts": {
+      "units": [
+       1
+      ]
+     },
+     "missing": "with {units:[1]} (metric) the stories go larger to smaller only (8 kg = ? g; 4 km = ? m) and mix in L and cm, and the length key beside them also lists 1 ft = 12 in and 1 yd = 3 ft (customary); no smaller to larger, no mixed units"
     }
    ],
    "verdict": "partial",
@@ -7983,13 +8130,23 @@
     {
      "key": "placevalue:place_value_10x",
      "opts": {
+      "op": "/",
+      "power": [
+       10,
+       100
+      ],
       "band": 10000
      },
      "why": "Y4.B5.S5 Divide by 10 / 100 (prior learning)"
     },
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "Y3.B7.S3 Measure mass in kilograms and grams (lower grade)"
+     "opts": {
+      "forms": [
+       2
+      ]
+     },
+     "why": "Y3.B7.S3 Measure mass in kilograms and grams (lower grade, same idea; choose g or kg for an object before converting between them)"
     }
    ],
    "preBuild": [
@@ -7997,8 +8154,13 @@
    ],
    "related": [
     {
-     "key": "multiplication:multiply",
-     "why": "× 1,000"
+     "key": "measurement:capacity",
+     "opts": {
+      "units": [
+       1
+      ]
+     },
+     "why": "the same 1,000 rule for litres"
     }
    ],
    "note": "Defect seen in sampling: length_metric at RANGE=1000 asked \"How many m are in 10 km?\" with answer 1000 (should be 10,000). Report to the measurement lane.",
@@ -8027,11 +8189,22 @@
    "partial": [
     {
      "key": "measurement:capacity",
-     "missing": "with units [1] (metric) converts L↔mL both ways; no mixed units (1 l 250 ml)"
+     "opts": {
+      "units": [
+       1
+      ]
+     },
+     "missing": "with {units:[1]} (metric) it converts L↔mL both ways (1,500 mL = 1.5 L) and sorts containers against 1 litre; no mixed units (1 l 250 ml = 1,250 ml)"
     },
     {
      "key": "measurement:length_metric",
-     "missing": "cm→mm, m→mm one direction; no measuring in mm or mixed units"
+     "opts": {
+      "forms": [
+       0,
+       2
+      ]
+     },
+     "missing": "with {forms:[0,2]} cm → mm and m → mm, larger to smaller only; no measuring in mm and no mixed units (4 cm 3 mm)"
     }
    ],
    "verdict": "partial",
@@ -8048,12 +8221,22 @@
     {
      "key": "placevalue:place_value_10x",
      "opts": {
+      "op": "/",
+      "power": [
+       10,
+       100
+      ],
       "band": 10000
      },
      "why": "Y4.B5.S5 Divide by 10 / 100 (prior learning)"
     },
     {
      "key": "measurement:mass_volume_liquid",
+     "opts": {
+      "forms": [
+       0
+      ]
+     },
      "why": "Y3.B7.S7 Measure capacity in millilitres (lower grade)"
     }
    ],
@@ -8088,7 +8271,12 @@
    "partial": [
     {
      "key": "measurement:unit_conversions",
-     "missing": "units [0] (metric) gives m↔cm both ways but mixes mass and capacity items into a length page; no km, no mixed units"
+     "opts": {
+      "units": [
+       0
+      ]
+     },
+     "missing": "with units [0] (metric) it gives m↔cm and km↔m both ways but mixes mass and capacity items into a length page, and a click-all distractor reads \"1 mile\" (customary); no mixed units"
     },
     {
      "key": "measurement:length_metric",
@@ -8096,7 +8284,12 @@
     },
     {
      "key": "measurement:unit_conversion_word",
-     "missing": "larger→smaller only"
+     "opts": {
+      "units": [
+       1
+      ]
+     },
+     "missing": "with {units:[1]} (metric) larger to smaller only, mass and capacity stories are mixed in, and the length key also lists 1 ft = 12 in and 1 yd = 3 ft (customary)"
     }
    ],
    "verdict": "partial",
@@ -8113,13 +8306,23 @@
     {
      "key": "placevalue:place_value_10x",
      "opts": {
+      "op": "/",
+      "power": [
+       10,
+       100
+      ],
       "band": 10000
      },
      "why": "Y4.B5.S5 Divide by 10 / 100 (prior learning)"
     },
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "Y3.B7.S8 Measure capacity and volume in litres and millilitres (lower grade, same idea; reading two units at once (L and mL), as m and cm)"
+     "opts": {
+      "forms": [
+       2
+      ]
+     },
+     "why": "Y3.B7.S8 Measure capacity and volume in litres and millilitres (lower grade, same idea; choose the unit (mL or L, g or kg) before converting between them)"
     }
    ],
    "preBuild": [],
@@ -8129,9 +8332,6 @@
      "opts": {
       "units": [
        1
-      ],
-      "forms": [
-       0
       ]
      },
      "why": "the same ×1,000 conversion for litres and millilitres"
@@ -8171,7 +8371,7 @@
      "key": "measurement:length_customary",
      "opts": {
       "forms": [
-       1
+       0
       ]
      },
      "why": "customary lengths (lower grade, same CCSS 4.MD.A.1)"
@@ -8197,9 +8397,12 @@
      "opts": {
       "units": [
        0
+      ],
+      "forms": [
+       0
       ]
      },
-     "why": "customary capacity"
+     "why": "customary capacity: sort containers by size in pints, quarts and gallons"
     }
    ],
    "note": "Supplements (customary units) are school lessons, not steps.",
@@ -8247,8 +8450,14 @@
      "why": "time to the minute (lower grade)"
     },
     {
-     "key": "multiplication:multiply",
-     "why": "× 60, × 24, × 7"
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "constant": [
+       6,
+       7
+      ]
+     },
+     "why": "× 6 and × 7 facts: 6 × 10 = 60 and 7 days make a week, the facts behind each conversion"
     }
    ],
    "preBuild": [],
@@ -8411,7 +8620,7 @@
        2
       ]
      },
-     "why": "capacity read on a scale: the other \"how much space\" measure"
+     "why": "capacity read on a scale in mL: the other \"how much space\" measure"
     }
    ],
    "note": "",
@@ -8431,11 +8640,20 @@
    "direct": [],
    "partial": [],
    "verdict": "gap",
-   "missing": "estimating the volume of an object in cm³ (or cubes) from a benchmark",
+   "missing": "estimating the volume of an object in cm³ (or cubes) from a benchmark (a sugar cube is about 1 cm³; a cereal box about 3,000 cm³)",
    "build": [
     "volume_cubes"
    ],
    "pre": [
+    {
+     "key": "measurement:estimate_length",
+     "opts": {
+      "forms": [
+       0
+      ]
+     },
+     "why": "estimate a length from a known benchmark (\"about how long is a classroom?\"): the same estimate-from-a-known-size, before estimating volume"
+    },
     {
      "key": "area_perimeter:area_unit_squares",
      "why": "Y4/Gr.3 Count squares (prior learning)"
@@ -8443,23 +8661,10 @@
     {
      "key": "multiplication:dot_array_mult",
      "why": "arrays (prior learning)"
-    },
-    {
-     "key": "area_perimeter:area_unit_squares",
-     "why": "Y4.B3.S2 Count squares (lower grade, same idea; count unit squares before counting unit cubes)"
     }
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "measurement:estimate_length",
-     "opts": {
-      "forms": [
-       2
-      ]
-     },
-     "why": "estimate another measure"
-    },
     {
      "key": "area_perimeter:volume",
      "opts": {
@@ -8475,7 +8680,7 @@
      "name": "Volume by Counting Cubes",
      "kind": "new skill area_perimeter:volume_counting_cubes",
      "teaches": "volume as the number of unit cubes (cm³), comparing volumes and estimating volume and capacity",
-     "closes": "estimating the volume of an object in cm³ (or cubes) from a benchmark",
+     "closes": "estimating the volume of an object in cm³ (or cubes) from a benchmark (a sugar cube is about 1 cm³; a cereal box about 3,000 cm³)",
      "representation": "isometric drawings of cube solids"
     }
    ]
@@ -8486,7 +8691,15 @@
    "partial": [
     {
      "key": "measurement:capacity",
-     "missing": "sorting containers into capacity bins and \"larger than 1 litre\"; no estimate written in ml or l"
+     "opts": {
+      "units": [
+       1
+      ],
+      "forms": [
+       1
+      ]
+     },
+     "missing": "with {units:[1], forms:[1]} it sorts metric containers against 1 litre (a juice box 200 mL, a bucket 8 L); the pupil never writes an estimate in ml or l"
     }
    ],
    "verdict": "partial",
@@ -8497,10 +8710,20 @@
    "pre": [
     {
      "key": "measurement:estimate_length",
+     "opts": {
+      "forms": [
+       0
+      ]
+     },
      "why": "estimating with a benchmark in another measure"
     },
     {
      "key": "measurement:mass_volume_liquid",
+     "opts": {
+      "forms": [
+       0
+      ]
+     },
      "why": "Y3.B7.S7 Measure capacity in millilitres (lower grade, same cluster CCSS 3.MD.A.2)"
     },
     {
@@ -8519,7 +8742,7 @@
        1
       ]
      },
-     "why": "l↔ml"
+     "why": "metric conversions: L ↔ mL beside m and g, the units an estimate is written in"
     }
    ],
    "note": "volume_cubes also lists this step; capacity estimation is a separate option, so the lead may drop Y5.B15.S4 from volume_cubes.",
@@ -8953,7 +9176,7 @@
    "closes": {
     "Y5.B2.S6": "two-step +/− problems with 4- to 6-digit numbers drawn as bar models",
     "Y5.B5.S6": "multiplication problems with multi-digit numbers (4-digit × 1-digit, 2-digit × 2-digit) and two-step problems with a × step",
-    "Y5.B5.S11": "× and ÷ problems with multi-digit calculations and two-step problems mixing × / ÷ with + / −"
+    "Y5.B5.S11": "× and ÷ problems with multi-digit calculations (4-digit × 1-digit, 4-digit ÷ 1-digit) and two-step problems mixing × / ÷ with + / −"
    }
   },
   "vis_bar_family": {
@@ -9002,7 +9225,7 @@
    "reused": true,
    "source": "WRM_PROPOSALS",
    "closes": {
-    "Y5.B2.S7": "comparing two +/− calculations by reasoning about how they differ (same start, one addend 1 less), with large numbers"
+    "Y5.B2.S7": "comparing two +/− calculations by reasoning about how they differ (same start, one addend 1 less), with large numbers (4,580 + 2,000 vs 4,580 + 1,999)"
    }
   },
   "multiples_2digit": {
@@ -9185,6 +9408,47 @@
    "source": "WRM_PROPOSALS",
    "closes": {
     "Y5.B4.S8": "no skill compares or orders improper fractions and mixed numbers (all compare/order skills deal fractions below 1)"
+   }
+  },
+  "denoms_all_forms": {
+   "kind": "option",
+   "skill": "fraction_operations:add_frac_unlike",
+   "also": [
+    "fraction_operations:sub_frac_unlike",
+    "fraction_operations:add_mixed_unlike",
+    "fraction_operations:sub_mixed_unlike",
+    "fraction_operations:add_frac_unlike_nv",
+    "fraction_operations:sub_frac_unlike_nv"
+   ],
+   "option": "denoms honoured by every form: the click-all and sort items draw their pairs from the ticked family too",
+   "name": "One Denominator Family on Every Item (option)",
+   "teaches": "adding and subtracting fractions and mixed numbers whose denominators are related (halves, quarters, eighths; thirds, sixths, twelfths), on every item of the page, the click-all and sort items included",
+   "representation": "the existing calculate, click-all and sort cells, unchanged; only the pairs they draw change",
+   "family": "fraction_operations",
+   "ccss": [
+    "4.NF.B.3a",
+    "4.NF.B.3c",
+    "4.NF.C.5"
+   ],
+   "why": "generated with {denoms:[2]}, the calculate items keep one family but the click-all (\"click all sums greater than 1\") and sort items ignore it and pair unrelated denominators (3/5 + 3/8, 2 1/3 + 3 1/4): the ACCEPT filter reads only the item text, not its option labels",
+   "steps": [
+    "Y5.B4.S10",
+    "Y5.B4.S11",
+    "Y5.B4.S12",
+    "Y5.B4.S13",
+    "Y5.B4.S14",
+    "Y5.B4.S15",
+    "Y5.B4.S17"
+   ],
+   "reused": false,
+   "closes": {
+    "Y5.B4.S10": "the click-all and sort items of an add-within-1 page stay in one related family (today 3/5 + 1/8)",
+    "Y5.B4.S11": "the \"click all sums greater than 1\" items stay in one related family (today 3/5 + 3/8, 4/5 + 5/6)",
+    "Y5.B4.S12": "the click-all and sort items of an add-to-a-mixed-number page stay in one related family (today 1 1/2 + 3 1/3)",
+    "Y5.B4.S13": "every item of an add-two-mixed-numbers page inside one related family: today the click-all items pair 2 1/3 + 3 1/4",
+    "Y5.B4.S14": "the click-all and sort items of a subtract-fractions page stay in one related family (today 4/6 − 1/5)",
+    "Y5.B4.S15": "the click-all and sort items of a subtract-from-a-mixed-number page stay in one related family (today 3 1/2 − 2 2/3)",
+    "Y5.B4.S17": "every item of a subtract-two-mixed-numbers page inside one related family: today the click-all items pair 1 1/2 − 3/10"
    }
   },
   "frac_total_band": {
@@ -9393,7 +9657,7 @@
    "reused": false,
    "closes": {
     "Y5.B5.S6": "multiplication problems with multi-digit numbers (4-digit × 1-digit, 2-digit × 2-digit) and two-step problems with a × step",
-    "Y5.B5.S11": "× and ÷ problems with multi-digit calculations and two-step problems mixing × / ÷ with + / −"
+    "Y5.B5.S11": "× and ÷ problems with multi-digit calculations (4-digit × 1-digit, 4-digit ÷ 1-digit) and two-step problems mixing × / ÷ with + / −"
    }
   },
   "vis_division_layouts": {
@@ -9584,7 +9848,7 @@
    ],
    "reused": false,
    "closes": {
-    "Y5.B7.S2": "a tenths-only page with a tenths strip / number line showing 3/10 = 0.3 (f_to_d {denoms:[5]} still mixes hundredths; d_to_f mixes 0.75 = 3/4)"
+    "Y5.B7.S2": "a tenths-only page with a tenths strip / number line showing 3/10 = 0.3 (f_to_d with {denoms:[5]} still mixes hundredths and fifths; d_to_f mixes 0.75 = 3/4)"
    }
   },
   "frac_hundredths_dec": {
@@ -9608,6 +9872,26 @@
    "reused": false,
    "closes": {
     "Y5.B7.S3": "writing hundredths as decimals and decimals as hundredths (27/100 = 0.27, 0.08 = 8/100) as the whole page"
+   }
+  },
+  "f_to_d_forms": {
+   "kind": "option",
+   "skill": "conversions:f_to_d",
+   "option": "forms \"Convert one fraction\" | \"Sort values into bins\" (as d_to_f already has)",
+   "name": "Fraction to Decimal: Convert Only (option)",
+   "teaches": "writing 1/2, 1/4, 3/4, fifths, tenths and hundredths as decimals, one fraction per cell, with no drag-bin sort",
+   "representation": "the existing f_to_d convert cell: the fraction, one decimal answer box",
+   "family": "conversions",
+   "ccss": [
+    "4.NF.C.6"
+   ],
+   "why": "generated f_to_d {} deals a drag-bin sort with percent tiles (75%) in about 1 item in 5, and f_to_d has no forms option to turn it off; d_to_f does",
+   "steps": [
+    "Y5.B7.S4"
+   ],
+   "reused": false,
+   "closes": {
+    "Y5.B7.S4": "f_to_d with the drag-bin sort left out, so the fraction → decimal page has no percent tiles a week before W22"
    }
   },
   "thousandths_pv": {
@@ -9638,26 +9922,26 @@
     "Y5.B7.S7": "no skill shows thousandths on a place-value chart (counters / digits in Ones . Tenths Hundredths Thousandths)"
    }
   },
-  "dec_compare_same": {
+  "dec_same_whole": {
    "kind": "option",
    "skill": "decimals:compare_decimal",
-   "also": [
-    "decimals:order_decimals"
-   ],
-   "option": "set \"same decimal places, same whole part\" (0.47 vs 0.43; 3.6, 3.2, 3.9) vs \"any\"",
-   "name": "Compare and Order Decimals: Same Decimal Places (option)",
-   "teaches": "comparing and ordering decimals that all have the same number of decimal places and the same whole part, so the tenths then hundredths digit decides",
-   "representation": "two (or four) decimals in boxed cells over an aligned place-value header (O . t h); write < > = in the circle, or write the order in answer boxes; a grey column-highlight hint on the first differing place that fades",
+   "option": "items \"same whole part\" (also on decimals:order_decimals)",
+   "name": "Decimals With the Same Whole Part (option)",
+   "teaches": "comparing and ordering decimals that share the whole-number part, with 1 and 2 places mixed (0.4 vs 0.38; 3.6, 3.65, 3.06), so the tenths digit decides",
+   "representation": "the existing compare / order cell; a ones . tenths hundredths column header over the numbers (hint, fades)",
    "family": "decimals",
    "ccss": [
-    "4.NF.C.7",
-    "5.NBT.A.3"
+    "4.NF.C.7"
    ],
+   "why": "generated compare_decimal / order_decimals {decimals:2} at Max Number 10: whole parts differ on nearly every compare item (8.23 vs 9.92), and every number has exactly two places, so 0.4 vs 0.38 (the length misconception) never comes up",
+   "addValue": "Y5 asks one more value of the same option: \"same whole part, same number of places\" (0.47 vs 0.43; 3.6, 3.2, 3.9), for WRM Y5.B7.S8; Y4's value (places mixed) is unchanged",
+   "source": "Y4.json (wave-2 tagging, 7314ee1e); Y5 dec_compare_same folded in (critic r4)",
    "steps": [
+    "Y4.B9.S5",
+    "Y4.B9.S6",
     "Y5.B7.S8"
    ],
-   "why": "WRM B7.S8 is \"same number of decimal places\"; compare_decimal pairs usually differ in the whole part and order_decimals mixes 1 and 2 dp",
-   "reused": false,
+   "reused": true,
    "closes": {
     "Y5.B7.S8": "a page where every number has the same number of decimal places and the same whole part (0.47 vs 0.43; 3.6, 3.2, 3.9): order_decimals at 2 dp mixes 1 and 2 dp, compare_decimal pairs usually differ in the whole part"
    }
@@ -10061,7 +10345,7 @@
    ],
    "reused": true,
    "closes": {
-    "Y5.B11.S2": "finding a missing vertex of a rectangle/square and points on a line from coordinates"
+    "Y5.B11.S2": "finding the missing vertex of a rectangle or square from the coordinates of the other three"
    }
   },
   "translate_grid": {
@@ -10468,7 +10752,7 @@
    "closes": {
     "Y5.B15.S1": "volume as the number of 1 cm³ cubes in a solid (counting cubes in drawn solids)",
     "Y5.B15.S2": "comparing the volumes of two cube solids",
-    "Y5.B15.S3": "estimating the volume of an object in cm³ (or cubes) from a benchmark"
+    "Y5.B15.S3": "estimating the volume of an object in cm³ (or cubes) from a benchmark (a sugar cube is about 1 cm³; a cereal box about 3,000 cm³)"
    }
   },
   "capacity_estimate": {
@@ -10625,7 +10909,7 @@
    "key": "placevalue:place_value_10x",
    "step": "Y5.B1.S6",
    "action": "partial",
-   "partial": "the powers of ten themselves: 10, 100 ... 1,000,000 and that each is 10 times the one before (10 hundreds = 1,000); it only multiplies/divides a number by 10, 100, 1,000",
+   "partial": "the powers of ten themselves: 10, 100 ... 1,000,000 and that each is 10 times the one before (10 hundreds = 1,000); it only multiplies/divides a number by 10, 100, 1,000, with ÷ 1,000 and decimal results that the school teaches from W10",
    "why": "tagged full; generated items teach only part of the step"
   },
   {
@@ -11073,7 +11357,7 @@
    "key": "fraction_operations:add_frac_unlike",
    "step": "Y5.B4.S10",
    "action": "partial",
-   "partial": "no \"total within 1\" control: with one denominator family ({denoms:[2]} etc.) the denominators are related as WRM wants, but sums over 1 are mixed in",
+   "partial": "no \"total within 1\" control (sums over 1 are mixed in); related denominators on the calculate items only: the click-all and sort items ignore {denoms:[2]} and pair unrelated denominators (3/5 + 1/8)",
    "why": "tagged full (note 'related denominators, total within 1'); generated items teach only part of the step",
    "opts": {
     "denoms": [
@@ -11085,7 +11369,7 @@
    "key": "fraction_operations:add_frac_unlike_nv",
    "step": "Y5.B4.S10",
    "action": "add",
-   "partial": "numbers only; no total-within-1 control, sums over 1 mixed in",
+   "partial": "numbers only; no total-within-1 control; related denominators on the calculate items only: the click-all and sort items ignore {denoms:[2]} and pair unrelated denominators in the sort items (2/3 + 1/4)",
    "why": "not tagged yet; generated items teach this step in part",
    "opts": {
     "denoms": [
@@ -11097,7 +11381,7 @@
    "key": "fraction_operations:add_frac_unlike",
    "step": "Y5.B4.S11",
    "action": "partial",
-   "partial": "no total-greater-than-1 control: about half the computed sums are 1 or less (3/4, 1, 7/8) and many items are \"click all sums greater than 1\" sorts",
+   "partial": "no total-greater-than-1 control: about half the computed sums are 1 or less (3/4, 1, 7/8); related denominators on the calculate items only: the click-all and sort items ignore {denoms:[2]} and pair unrelated denominators (3/5 + 3/8, 4/5 + 5/6 in 45 of 60 items)",
    "why": "tagged full; generated items teach only part of the step",
    "opts": {
     "denoms": [
@@ -11109,7 +11393,7 @@
    "key": "fraction_operations:add_frac_unlike_nv",
    "step": "Y5.B4.S11",
    "action": "add",
-   "partial": "no total-greater-than-1 control: about half the computed sums are 1 or less (3/4, 1, 7/8) and many items are \"click all sums greater than 1\" sorts",
+   "partial": "no total-greater-than-1 control: about half the computed sums are 1 or less; related denominators on the calculate items only: the click-all and sort items ignore {denoms:[2]} and pair unrelated denominators in the sort items (2/3 + 1/4)",
    "why": "not tagged yet; generated items teach this step in part",
    "opts": {
     "denoms": [
@@ -11128,7 +11412,7 @@
    "key": "fraction_operations:add_mixed_unlike",
    "step": "Y5.B4.S12",
    "action": "partial",
-   "partial": "deals mixed + mixed only (related denominators with {denoms:[2]}); no mixed + proper fraction form",
+   "partial": "deals mixed + mixed only, no mixed + proper fraction form; related denominators on the calculate items only: the click-all and sort items ignore {denoms:[2]} and pair unrelated denominators (1 1/2 + 3 1/3)",
    "why": "tagged full; generated items teach only part of the step",
    "opts": {
     "denoms": [
@@ -11137,16 +11421,25 @@
    }
   },
   {
+   "key": "fraction_operations:add_mixed_like",
+   "step": "Y5.B4.S13",
+   "action": "partial",
+   "partial": "like denominators only (2 1/5 + 1 3/5); never related denominators (2 1/4 + 1 3/8)",
+   "why": "tagged full; generated items teach only part of the step"
+  },
+  {
    "key": "fraction_operations:add_mixed_like_nv",
    "step": "Y5.B4.S13",
    "action": "add",
-   "why": "not tagged yet; generated items teach this step"
+   "partial": "like denominators only, numbers only; never related denominators",
+   "why": "not tagged yet; generated items teach this step in part"
   },
   {
    "key": "fraction_operations:add_mixed_unlike",
    "step": "Y5.B4.S13",
-   "action": "opts",
-   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "action": "partial",
+   "partial": "related denominators on the calculate items only: the click-all and sort items ignore {denoms:[2]} and pair unrelated denominators (2 1/3 + 3 1/4 in 28 of 60 items)",
+   "why": "tagged full; generated items teach only part of the step",
    "opts": {
     "denoms": [
      2
@@ -11157,7 +11450,7 @@
    "key": "fraction_operations:sub_frac_unlike",
    "step": "Y5.B4.S14",
    "action": "partial",
-   "partial": "related denominators with {denoms:[2]}, minuend within 1; no whole or improper minuend (2 − 3/4)",
+   "partial": "minuend within 1, no whole or improper minuend (2 − 3/4); related denominators on the calculate items only: the click-all and sort items ignore {denoms:[2]} and pair unrelated denominators (4/6 − 1/5)",
    "why": "tagged full; generated items teach only part of the step",
    "opts": {
     "denoms": [
@@ -11169,7 +11462,7 @@
    "key": "fraction_operations:sub_frac_unlike_nv",
    "step": "Y5.B4.S14",
    "action": "add",
-   "partial": "numbers only; minuend within 1, no whole or improper minuend",
+   "partial": "numbers only; minuend within 1, no whole or improper minuend (2 − 3/4); related denominators on the calculate items only: the click-all and sort items ignore {denoms:[2]} and pair unrelated denominators (4/6 − 1/5)",
    "why": "not tagged yet; generated items teach this step in part",
    "opts": {
     "denoms": [
@@ -11195,7 +11488,7 @@
    "key": "fraction_operations:sub_mixed_unlike",
    "step": "Y5.B4.S15",
    "action": "partial",
-   "partial": "deals mixed − mixed only (related denominators with {denoms:[2]}); no mixed − proper fraction form",
+   "partial": "deals mixed − mixed only, no mixed − proper fraction form; related denominators on the calculate items only: the click-all and sort items ignore {denoms:[2]} and pair unrelated denominators (3 1/2 − 2 2/3)",
    "why": "tagged full; generated items teach only part of the step",
    "opts": {
     "denoms": [
@@ -11211,16 +11504,25 @@
    "why": "tagged partial; the clause is replaced by what the generated items leave out"
   },
   {
+   "key": "fraction_operations:sub_mixed_like",
+   "step": "Y5.B4.S17",
+   "action": "partial",
+   "partial": "like denominators only (4 3/5 − 1 1/5); never related denominators",
+   "why": "tagged full; generated items teach only part of the step"
+  },
+  {
    "key": "fraction_operations:sub_mixed_like_nv",
    "step": "Y5.B4.S17",
    "action": "add",
-   "why": "not tagged yet; generated items teach this step"
+   "partial": "like denominators only, numbers only; never related denominators",
+   "why": "not tagged yet; generated items teach this step in part"
   },
   {
    "key": "fraction_operations:sub_mixed_unlike",
    "step": "Y5.B4.S17",
-   "action": "opts",
-   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "action": "partial",
+   "partial": "related denominators on the calculate items only: the click-all and sort items ignore {denoms:[2]} and pair unrelated denominators (1 1/2 − 3/10 in 26 of 60 items); unlike denominators are first taught W17, a week after this step",
+   "why": "tagged full; generated items teach only part of the step",
    "opts": {
     "denoms": [
      2
@@ -11306,7 +11608,7 @@
    "key": "number_ops_mixed:word_problems_mixed",
    "step": "Y5.B5.S6",
    "action": "partial",
-   "partial": "multi-digit ×: one-step stories with table facts",
+   "partial": "one-step stories of all four operations with table-fact numbers; no multi-digit × and no two-step problems; a few division stories have a 2-digit divisor (13)",
    "why": "tagged full; generated items teach only part of the step"
   },
   {
@@ -11386,7 +11688,7 @@
    "key": "division:remainder_interpret",
    "step": "Y5.B5.S11",
    "action": "partial",
-   "partial": "÷ only, one step; no × and no two-step problems",
+   "partial": "÷ only, one step; no × and no two-step problems; some stories divide by 12-17 (2-digit divisor, 5.NBT.B.6)",
    "why": "tagged full; generated items teach only part of the step"
   },
   {
@@ -11400,7 +11702,7 @@
    "key": "number_ops_mixed:word_problems_mixed",
    "step": "Y5.B5.S11",
    "action": "partial",
-   "partial": "multi-digit × and ÷ numbers: table-fact stories only",
+   "partial": "multi-digit × and ÷ numbers: table-fact stories only; a few division stories have a 2-digit divisor (13)",
    "why": "tagged full; generated items teach only part of the step"
   },
   {
@@ -11464,8 +11766,13 @@
    "key": "conversions:d_to_f",
    "step": "Y5.B7.S1",
    "action": "partial",
-   "partial": "writes tenths and hundredths as fractions; no place-value chart or counters",
-   "why": "tagged full; generated items teach only part of the step"
+   "partial": "with {forms:[0]} it writes tenths, fifths and quarters as fractions (0.7 = 7/10, 0.75 = 3/4) and few hundredths; no place-value chart or counters",
+   "why": "tagged full; generated items teach only part of the step",
+   "opts": {
+    "forms": [
+     0
+    ]
+   }
   },
   {
    "key": "decimals:decimal_nl_drag",
@@ -11478,15 +11785,25 @@
    "key": "conversions:d_to_f",
    "step": "Y5.B7.S2",
    "action": "partial",
-   "partial": "mixes tenths with hundredths and 0.75 = 3/4; no tenths-only page",
-   "why": "tagged full; generated items teach only part of the step"
+   "partial": "with {forms:[0]} it mixes tenths with fifths and quarters (0.75 = 3/4); no tenths-only page",
+   "why": "tagged full; generated items teach only part of the step",
+   "opts": {
+    "forms": [
+     0
+    ]
+   }
   },
   {
    "key": "conversions:f_to_d",
    "step": "Y5.B7.S2",
    "action": "partial",
-   "partial": "{denoms:[5]} still mixes hundredths in; no tenths-only page or tenths strip",
-   "why": "tagged full (note 'tenths'); generated items teach only part of the step"
+   "partial": "with {denoms:[5]} it mixes fifths and hundredths with the tenths, and about 1 item in 3 is a drag-bin sort of halves and quarters with percent tiles (percent is W22); no tenths-only page or tenths strip",
+   "why": "tagged full (note 'tenths'); generated items teach only part of the step",
+   "opts": {
+    "denoms": [
+     5
+    ]
+   }
   },
   {
    "key": "conversions:d_to_f",
@@ -11517,6 +11834,25 @@
    "step": "Y5.B7.S3",
    "action": "partial",
    "partial": "mostly tenths ↔ hundredths as fractions (6/10 = 60/100); decimals appear only in \"click all equal to 0.07\"",
+   "why": "tagged full; generated items teach only part of the step"
+  },
+  {
+   "key": "conversions:d_to_f",
+   "step": "Y5.B7.S4",
+   "action": "partial",
+   "partial": "decimal → fraction only (0.75 = 3/4, 0.7 = 7/10), chosen from four fractions; the fraction → decimal direction is f_to_d",
+   "why": "tagged full; generated items teach only part of the step",
+   "opts": {
+    "forms": [
+     0
+    ]
+   }
+  },
+  {
+   "key": "conversions:f_to_d",
+   "step": "Y5.B7.S4",
+   "action": "partial",
+   "partial": "about 1 item in 5 is a drag-bin sort of halves and quarters with percent tiles (75%), a week before percent (W22); f_to_d has no option to leave it out",
    "why": "tagged full; generated items teach only part of the step"
   },
   {
@@ -11584,6 +11920,18 @@
    "step": "Y5.B7.S15",
    "action": "add",
    "why": "not tagged yet; generated items teach this step"
+  },
+  {
+   "key": "area_perimeter:perimeter",
+   "step": "Y5.B8.S1",
+   "action": "opts",
+   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "opts": {
+    "forms": [
+     0,
+     1
+    ]
+   }
   },
   {
    "key": "area_perimeter:perimeter_grid",
@@ -11751,7 +12099,7 @@
    "key": "coordinates:geo_reflect",
    "step": "Y5.B11.S6",
    "action": "partial",
-   "partial": "multiple choice over the x- or y-axis only; no drawing in a horizontal/vertical mirror line on squared paper",
+   "partial": "multiple choice over a reflection in the x- or y-axis only (a later-grade coordinate form); no drawing in a horizontal or vertical mirror line on squared paper",
    "why": "tagged partial; the clause is replaced by what the generated items leave out"
   },
   {
@@ -11782,15 +12130,21 @@
    "key": "decimals:sub_decimal",
    "step": "Y5.B12.S5",
    "action": "partial",
-   "partial": "same dp is guaranteed only at Decimal Places 1; at 2–3 dp items mix (43.53 − 41.4)",
-   "why": "tagged full; generated items teach only part of the step"
+   "partial": "with Decimal Places 1 every item is tenths − tenths, so the places match; there is no same-number-of-places control at 2 or 3 places (43.53 − 41.4 when two places are asked)",
+   "why": "tagged full; generated items teach only part of the step",
+   "opts": {
+    "decimals": 1
+   }
   },
   {
    "key": "decimals:add_decimal",
    "step": "Y5.B12.S6",
    "action": "partial",
-   "partial": "different-dp pairs only some of the time at Decimal Places 2–3; no \"always different, place holder 0\" page",
-   "why": "tagged full (note 'different decimal places'); generated items teach only part of the step"
+   "partial": "with Decimal Places 2 different-place pairs come only some of the time (4.53 + 4.4); no page that always adds different numbers of places with a place-holder 0",
+   "why": "tagged full (note 'different decimal places'); generated items teach only part of the step",
+   "opts": {
+    "decimals": 2
+   }
   },
   {
    "key": "decimals:sub_decimal",
@@ -11851,36 +12205,62 @@
    "key": "measurement:length_metric",
    "step": "Y5.B14.S1",
    "action": "partial",
-   "partial": "km→m only, larger to smaller; no mixed units",
-   "why": "tagged full (note 'km and m'); generated items teach only part of the step"
+   "partial": "with {forms:[3]} km → m only, larger to smaller; no m → km and no mixed units (2 km 400 m)",
+   "why": "tagged full (note 'km and m'); generated items teach only part of the step",
+   "opts": {
+    "forms": [
+     3
+    ]
+   }
   },
   {
    "key": "measurement:unit_conversion_word",
    "step": "Y5.B14.S1",
    "action": "add",
-   "partial": "metric kg/km stories, larger to smaller only",
-   "why": "not tagged yet; generated items teach this step in part"
+   "partial": "with {units:[1]} (metric) the stories go larger to smaller only (8 kg = ? g; 4 km = ? m) and mix in L and cm, and the length key beside them also lists 1 ft = 12 in and 1 yd = 3 ft (customary); no smaller to larger, no mixed units",
+   "why": "not tagged yet; generated items teach this step in part",
+   "opts": {
+    "units": [
+     1
+    ]
+   }
   },
   {
    "key": "measurement:unit_conversions",
    "step": "Y5.B14.S1",
    "action": "partial",
-   "partial": "with units [0] (metric) converts kg↔g, m↔cm, L↔mL both ways; no mixed units (2 kg 300 g) and km is absent",
-   "why": "tagged full; generated items teach only part of the step"
+   "partial": "with units [0] (metric) it converts kg↔g, km↔m, m↔cm and L↔mL both ways, but mixes length, mass and capacity on one page, and a click-all distractor reads \"1 mile\" (customary); no mixed units (2 kg 300 g)",
+   "why": "tagged full; generated items teach only part of the step",
+   "opts": {
+    "units": [
+     0
+    ]
+   }
   },
   {
    "key": "measurement:capacity",
    "step": "Y5.B14.S2",
    "action": "partial",
-   "partial": "with units [1] (metric) converts L↔mL both ways; no mixed units (1 l 250 ml)",
-   "why": "tagged full (note 'mL'); generated items teach only part of the step"
+   "partial": "with {units:[1]} (metric) it converts L↔mL both ways (1,500 mL = 1.5 L) and sorts containers against 1 litre; no mixed units (1 l 250 ml = 1,250 ml)",
+   "why": "tagged full (note 'mL'); generated items teach only part of the step",
+   "opts": {
+    "units": [
+     1
+    ]
+   }
   },
   {
    "key": "measurement:length_metric",
    "step": "Y5.B14.S2",
    "action": "partial",
-   "partial": "cm→mm, m→mm one direction; no measuring in mm or mixed units",
-   "why": "tagged full (note 'mm'); generated items teach only part of the step"
+   "partial": "with {forms:[0,2]} cm → mm and m → mm, larger to smaller only; no measuring in mm and no mixed units (4 cm 3 mm)",
+   "why": "tagged full (note 'mm'); generated items teach only part of the step",
+   "opts": {
+    "forms": [
+     0,
+     2
+    ]
+   }
   },
   {
    "key": "measurement:length_metric",
@@ -11893,15 +12273,25 @@
    "key": "measurement:unit_conversion_word",
    "step": "Y5.B14.S3",
    "action": "partial",
-   "partial": "larger→smaller only",
-   "why": "tagged full; generated items teach only part of the step"
+   "partial": "with {units:[1]} (metric) larger to smaller only, mass and capacity stories are mixed in, and the length key also lists 1 ft = 12 in and 1 yd = 3 ft (customary)",
+   "why": "tagged full; generated items teach only part of the step",
+   "opts": {
+    "units": [
+     1
+    ]
+   }
   },
   {
    "key": "measurement:unit_conversions",
    "step": "Y5.B14.S3",
    "action": "add",
-   "partial": "units [0] (metric) gives m↔cm both ways but mixes mass and capacity items into a length page; no km, no mixed units",
-   "why": "not tagged yet; generated items teach this step in part"
+   "partial": "with units [0] (metric) it gives m↔cm and km↔m both ways but mixes mass and capacity items into a length page, and a click-all distractor reads \"1 mile\" (customary); no mixed units",
+   "why": "not tagged yet; generated items teach this step in part",
+   "opts": {
+    "units": [
+     0
+    ]
+   }
   },
   {
    "key": "measurement:unit_conversion_word",
@@ -11919,8 +12309,16 @@
    "key": "measurement:capacity",
    "step": "Y5.B15.S4",
    "action": "partial",
-   "partial": "sorting containers into capacity bins and \"larger than 1 litre\"; no estimate written in ml or l",
-   "why": "tagged partial; the clause is replaced by what the generated items leave out"
+   "partial": "with {units:[1], forms:[1]} it sorts metric containers against 1 litre (a juice box 200 mL, a bucket 8 L); the pupil never writes an estimate in ml or l",
+   "why": "tagged partial; the clause is replaced by what the generated items leave out",
+   "opts": {
+    "units": [
+     1
+    ],
+    "forms": [
+     1
+    ]
+   }
   },
   {
    "key": "fractions:equiv_frac_nv",

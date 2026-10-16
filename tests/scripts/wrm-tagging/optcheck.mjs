@@ -17,5 +17,26 @@ for (const [sid, s] of Object.entries(d.steps)) for (const [role, list] of [['di
     if (def && !(legacy.has(id) && k === 'count_by_tables') && JSON.stringify(norm[id]) !== JSON.stringify(v)) { bad++; console.log(`${sid} ${role} ${e.key}: ${id}=${JSON.stringify(v)} normalises to ${JSON.stringify(norm[id])}`); }
   }
 }
-console.log(`optcheck: ${n} opts entries, ${bad} problems`);
+// critic r4 class B: an option value a clause, why or note NAMES ("{denoms:[5]}", "units [0]", "Decimal Places 2") must be the
+// value the entry really carries; a note is never a substitute for opts
+function tokens(t) {
+  const out = []; t = String(t || '');
+  for (const m of t.matchAll(/\{([^{}]*)\}/g)) { try { const o = JSON.parse('{' + m[1].replace(/'/g, '"').replace(/([A-Za-z_]\w*)\s*:/g, '"$1":') + '}'); for (const [k, v] of Object.entries(o)) out.push([k, v, m[0]]); } catch { /* prose braces */ } }
+  for (const m of t.matchAll(/\bunits \[(\d+(?:,\s*\d+)*)\]/g)) out.push(['units', m[1].split(',').map(Number), m[0]]);
+  for (const m of t.matchAll(/\bDecimal Places (\d)\b/g)) out.push(['decimals', +m[1], m[0]]);
+  return out;
+}
+const has = (e, k) => (so.optionsFor(...e.key.split(':')) || []).some(x => x.id === k);
+const same = (e, k, v) => JSON.stringify((e.opts || {})[k]) === JSON.stringify(v);
+let named = 0;
+for (const [sid, s] of Object.entries(d.steps)) {
+  for (const [role, list] of [['direct', s.direct], ['partial', s.partial], ['pre', s.pre], ['related', s.related]]) for (const e of list) {
+    for (const [k, v, raw] of tokens(role === 'partial' ? e.missing : e.why)) { if (!has(e, k)) continue; named++;
+      if (!same(e, k, v)) { bad++; console.log(`${sid} ${role} ${e.key}: the ${role === 'partial' ? 'clause' : 'why'} names ${raw} but opts are ${JSON.stringify(e.opts || {})}`); } } }
+  const own = [...s.direct, ...s.partial];
+  for (const [f, t] of [['missing', s.missing], ['note', s.note]]) for (const [k, v, raw] of tokens(t)) {
+    const cand = own.filter(e => has(e, k)); if (!cand.length) continue; named++;
+    if (!cand.some(e => same(e, k, v))) { bad++; console.log(`${sid} ${f} names ${raw} but no direct/partial skill carries it`); } }
+}
+console.log(`optcheck: ${n} opts entries, ${named} named option values checked, ${bad} problems`);
 process.exitCode = bad ? 1 : 0;

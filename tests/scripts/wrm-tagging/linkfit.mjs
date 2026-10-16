@@ -58,10 +58,15 @@ function probe(key, opts, range) {
 }
 const titleCeil = t => { const m = (t.match(/\d{1,3}(?:,\d{3})+|\d+(?!-digit|-D|s\b|dp|st|nd|rd|th)/g) || []).map(x => +x.replace(/,/g, ''));
   for (const k of t.matchAll(/(\d)-digit/g)) m.push(10 ** +k[1] - 1); return m.length ? Math.max(...m) : 0; };
+// critic r4 class C: a partial or gap step is sized from its INTENDED range: the title, or the example in its own
+// missing clause ("4-digit × 1-digit" = 9,999 × 9), never only from the deficient partial's items
+const clauseCeil = t => { t = String(t || ''); let c = titleCeil(t.replace(/\b\d+\/\d+\b|\d+ \d+\/\d+/g, ''));
+  for (const k of t.matchAll(/(\d)-digit\s*[×x]\s*(\d)-digit/g)) c = Math.max(c, (10 ** +k[1] - 1) * (10 ** +k[2] - 1));
+  return c; };
 const YEAR_RANGE = { R: 20, Y1: 100, Y2: 100, Y3: 1000, Y4: 10000 };
 const own = {};
 for (const [sid, s] of Object.entries(d.steps)) {
-  let c = titleCeil(s.title);
+  let c = Math.max(titleCeil(s.title), s.verdict === 'full' ? 0 : clauseCeil(s.missing));
   for (const e of [...s.direct, ...s.partial]) c = Math.max(c, probe(e.key, e.opts || {}, e.maxNumber || 10000).max);
   own[sid] = c;
 }
@@ -72,7 +77,8 @@ function citedCeil(sid, why) {
   if (yr === 'Y5') return (wkOf(ref) && wkOf(sid) && wkOf(ref) <= wkOf(sid)) ? own[ref] || 0 : 0;
   return titleCeil(titles[ref] || '') || YEAR_RANGE[yr] || 0;
 }
-const CUST = /\b(ounces?|oz|pounds?|lbs?|yards?|yd|inch(es)?|feet|foot|ft|miles?|gallons?|gal|quarts?|qt|pints?|pt|cups?|fahrenheit|tons?)\b|°\s*F\b/i;
+// a "Cup (240 mL)" in a metric container sort is a container, not the customary unit: cups count only after a number or as "cups"
+const CUST = /\b(ounces?|oz|pounds?|lbs?|yards?|yd|inch(es)?|feet|foot|ft|miles?|gallons?|gal|quarts?|qt|pints?|pt|fahrenheit|tons?)\b|\d\s*cups?\b|\bcups\b|°\s*F\b/i;
 const MONEY = /\$|¢|\bdollars?\b|\bmoney\b|\bprices?\b|\bcosts?\b|\bspend|\bchange\b/i;
 // Grade 4: the week the school first teaches each content type (critic r1 table, from the Grade 4 sheet)
 const FIRST = [
@@ -99,12 +105,17 @@ const FIRST = [
 ];
 // A step that is itself the first lesson of a content type may link to it (Y5.B14.S4 Imperial units is W32, the
 // school's CCSS customary lessons are W33)
-const OWN = { 'Y5.B14.S4': ['customary units'] };
+const OWN = { 'Y5.B14.S4': ['customary units'],
+  // Y5.B12.S11 Divide by 10, 100 and 1,000 (W10): its own title makes thousandths (439 ÷ 1,000 = 0.439)
+  'Y5.B12.S11': ['thousandths'] };
 function laterGrade(e, s, r) {
   const out = [];
   if (/\d+\.\d+\s*[×x÷]\s*\d+\.\d+/.test(s)) out.push('decimal × / ÷ decimal (5.NBT.B.7)');
-  if ([...s.matchAll(/(\d+\.\d+)\s*[×x÷]\s*(\d+)\b|\b(\d+)\s*[×x]\s*(\d+\.\d+)/g)].some(m => ![10, 100, 1000].includes(+(m[2] || m[3])))) out.push('decimal × / ÷ a whole number other than 10, 100, 1,000 (5.NBT.B.7)');
+  if ([...s.matchAll(/(\d+\.\d+)\s*[×x÷]\s*(\d{1,3}(?:,\d{3})+|\d+)\b|\b(\d{1,3}(?:,\d{3})+|\d+)\s*[×x]\s*(\d+\.\d+)/g)].some(m => ![10, 100, 1000].includes(+String(m[2] || m[3]).replace(/,/g, '')))) out.push('decimal × / ÷ a whole number other than 10, 100, 1,000 (5.NBT.B.7)');
   if (/\b\d+\/\d+\s*[×x]\s*\d+\/\d+|÷\s*\d+\/\d+|\b\d+\/\d+\s*÷/.test(s)) out.push('fraction × fraction or ÷ a fraction (5.NF)');
+  // critic r4 class A: a/b ± c/d where neither denominator divides the other is 5.NF.A.1 (Grade 4 adds related ones only)
+  { const m = [...s.matchAll(/(?:\d+ )?\d+\/(\d+)\s*[+\-−]\s*(?:\d+ )?\d+\/(\d+)\b/g)].find(m => { const a = +m[1], b = +m[2]; return a !== b && a % b && b % a; });
+    if (m) out.push(`unrelated denominators ± (5.NF.A.1): ${m[0]}`); }
   if (/triangle/i.test(s) && /\barea\b/i.test(s)) out.push('triangle area (6.G.A.1)');
   if (/probabilit|\blikely\b|\bunlikely\b/i.test(s)) out.push('probability (7.SP)');
   if (/\bratio\b/i.test(s)) out.push('ratio (6.RP)');
@@ -113,7 +124,11 @@ function laterGrade(e, s, r) {
   if (/\bmean\b|\baverage\b/i.test(s)) out.push('mean (6.SP)');
   for (const i of r.items) { const t = `${i.text || ''} ${i.x || ''} ${i.pay || ''}`;
     const dv = [...t.matchAll(/÷\s*(\d+)\b/g)].map(m => +m[1]).find(n => n >= 13 && ![100, 1000].includes(n));
-    if (dv) { out.push(`divisor ${dv} (Grade 4 divides by one digit, 10, 100, 1,000)`); break; } }
+    if (dv) { out.push(`divisor ${dv} (Grade 4 divides by one digit, 10, 100, 1,000)`); break; }
+    // critic r4: the divisor of a division STORY ("puts 16 shells in each basket", "each car holds 15") counts too
+    if (/left over|how many .{0,30}(?:need|fill|get)|equally/i.test(t)) {
+      const sd = [...t.matchAll(/(\d+) [a-z]+ (?:in|into) each|holds (\d+)|equally (?:among|between) (\d+)/gi)].map(m => +(m[1] || m[2] || m[3])).find(n => n >= 13 && ![100, 1000].includes(n));
+      if (sd) { out.push(`divisor ${sd} in a division story (Grade 4 divides by one digit)`); break; } } }
   return out;
 }
 function content(sid, e, r, role) {
@@ -126,7 +141,7 @@ function content(sid, e, r, role) {
   for (const [n, w, f] of FIRST) if (wk < w && !(OWN[sid] || []).includes(n) && f(e, n === 'customary units' || n === 'percent' ? all : said, r)) out.push(`rule 19: ${n} first taught ${w}, step is ${wk}`);
   out.push(...laterGrade(e, said, r));
   const dens = [...all.matchAll(/(?:\b\d+|\?|_+)\/(\d+)\b/g)].map(m => +m[1]).filter(x => x > 24 && x !== 100 && x !== 1000 && !(x === 50));
-  if (dens.length) out.push(`denominator ${Math.max(...dens)} (Grade 4: 2, 3, 4, 5, 6, 8, 10, 12, 100 and their doubles)`);
+  if (dens.length && (role === 'pre' || role === 'related')) out.push(`denominator ${Math.max(...dens)} (Grade 4: 2, 3, 4, 5, 6, 8, 10, 12, 100 and their doubles)`);
   if (role === 'pre') { const ref = (String(e.why).match(/^Y5\.B\d+\.S\d+/) || [])[0];
     if (ref && wkOf(ref) && wkOf(ref) > wk) out.push(`rule 19: cites ${ref}, taught ${wkOf(ref)}, after this step (${wk})`); }
   return out;
@@ -145,19 +160,27 @@ function whyCheck(e, r) {
         for (let j = 1; j < seq.length; j++) if (seq[j] != null && seq[j - 1] != null) k.push(Math.abs(seq[j] - seq[j - 1]));
         return k.some(x => want.has(x)); }).length;
       if (hit < N / 3) out.push(`cited "${cm[0]}" but only ${hit} of ${N} items count in those steps`); }
-    const dm = w.match(/(\d)-digit/);
-    if (dm) { const D = +dm[1]; const hit = texts.filter((t, k) => [...(t + ' ' + (r.items[k].pay || '')).matchAll(/\b\d{1,3}(?:,\d{3})+\b|\b\d+\b/g)].some(x => x[0].replace(/,/g, '').length === D)).length;
-      if (hit < N / 3) out.push(`cited "${D}-digit" but only ${hit} of ${N} items have ${D}-digit numbers`); }
     const tm = w.match(/\bto ([\d,]{5,})\b/);
     if (tm && !/Roman/i.test(w)) { const L = +tm[1].replace(/,/g, ''); if (r.max < L / 20) out.push(`cited "to ${tm[1]}" but the items reach ${r.max}`); }
   }
-  const tm = w.match(/\b(\d+)s? times-tables?|multiply and divide by (\d+)|\bdivide by (\d+)\b|\bmultiples of (\d+)\b/i);
+  // an "N-digit" claim anywhere in the why (cited title or own words) must be dealt (critic r4 class D)
+  { const dm = w0.split('(nearest')[0].match(/(\d)-digit(?! (?:number )?(?:÷|divis))/);
+    if (dm) { const D = +dm[1]; const hit = texts.filter((t, k) => [...(t + ' ' + (r.items[k].pay || '')).matchAll(/\b\d{1,3}(?:,\d{3})+\b|\b\d+\b/g)].some(x => x[0].replace(/,/g, '').length === D)).length;
+      if (hit < N / 3) out.push(`why names "${D}-digit" but only ${hit} of ${N} items have ${D}-digit numbers`); } }
+  const tm = w.match(/(?<!(?:\d,|\d| and| or) ?)\b(\d+)s? times-tables?|multiply and divide by (\d+)(?! (?:and|or|\/) \d)|\bdivide by (\d+)\b(?!,| (?:and|or|\/) \d)|\bmultiples of (\d+)\b(?!,| (?:and|or|\/) \d)/i);
   if (tm && !/,|and/.test(tm[0])) { const n = tm.slice(1).find(Boolean);
     const hit = texts.filter((t, k) => new RegExp(`(^|[^\\d])${n}\\s*[×x÷]|[×x÷]\\s*${n}(?!\\d)|by ${n}\\b|in ${n}s|of ${n}\\b`).test(t) || new RegExp(`"step":${n}\\b`).test(r.items[k].pay || '')).length;
     if (hit < N / 2) out.push(`why names ${n} but only ${hit} of ${N} items use it`); }
-  const tl = w.match(/\b(\d+), (\d+) and (\d+)(?: times-tables?|s\b)/);
-  if (tl) { const ns = tl.slice(1, 4); const hit = texts.filter(t => ns.some(n => new RegExp(`(^|[^\\d])${n}\\s*[×x÷]|[×x÷]\\s*${n}(?!\\d)|by ${n}\\b|in ${n}s|of ${n}\\b`).test(t))).length;
-    if (hit < N / 2) out.push(`why names ${ns.join(', ')} but only ${hit} of ${N} items use them`); }
+  const tl = w.match(/\b(\d+), (\d+) and (\d+)(?: times-tables?|s\b)/) || w.match(/(?:multiples of|divide by|times-tables? of) ((?:\d+, )*\d+(?: (?:and|or) \d+)?)\b/i) || w.match(/\b((?:\d+, )*\d+ (?:and|or) \d+)(?: times-tables?)/i);
+  if (tl) { const ns = (tl.length > 3 && tl[3] ? tl.slice(1, 4) : [...tl[1].matchAll(/\d+/g)].map(x => x[0])); if (ns.length > 1) { const hit = texts.filter(t => ns.some(n => new RegExp(`(^|[^\\d])${n}\\s*[×x÷]|[×x÷]\\s*${n}(?!\\d)|by ${n}\\b|in ${n}s|of ${n}\\b`).test(t))).length;
+    if (hit < N / 2) out.push(`why names ${ns.join(', ')} but only ${hit} of ${N} items use them`); } }
+  // critic r4 class D: a size the why claims ("to 100,000", "4-digit", "1,000 more") must be dealt: claim ≥ 10 × items' max is stale
+  { const ww = w0.split('(nearest')[0]; const c = [];
+    for (const m of ww.matchAll(/(?:to|within|past)\s+(\d{1,3}(?:,\d{3})+|\d{3,})\b/gi)) c.push(+m[1].replace(/,/g, ''));
+    for (const m of ww.matchAll(/(\d)-digit/g)) c.push(10 ** (+m[1] - 1));
+    for (const m of ww.matchAll(/\b(\d{1,3}(?:,\d{3})+)\s+(?:more|less)/g)) c.push(+m[1].replace(/,/g, ''));
+    const cl = c.length ? Math.max(...c) : 0;
+    if (cl >= 1000 && r.max < cl / 10) out.push(`why claims ${cl} but the items reach ${r.max}`); }
   const fams = Object.keys(FAM).filter(f => new RegExp(`\\b${f}\\b`, 'i').test(w));
   if (fams.length && !/\bto\s+(eighths|twelfths|tenths|hundredths|thousandths)/i.test(w)) {
     const ok = new Set(fams.flatMap(f => FAM[f]).concat([1]));
@@ -197,12 +220,13 @@ function candidates(e) {
   const sz = defs.find(x => x.id === 'band') || defs.find(x => x.id === 'range' && x.values);
   const bands = sz ? sz.values.map(x => x.v).filter(v => v != null && typeof v === 'number').sort((a, b) => b - a) : [];
   const withBand = (oo, mn) => { for (const b of bands) out.push({ opts: { ...oo, [sz.id]: b }, maxNumber: mn }); };
-  withBand(o, e.maxNumber);
-  // a why that names tables ("3, 6 and 9 times-tables", "Divide by 10") is made true with the skill's constant option
+  // a why that names tables ("3, 6 and 9 times-tables", "Divide by 10") is made true with the skill's constant option, and
+  // that is tried BEFORE any band (critic r4 class C: re-option to the named table before a band or a drop)
   const cdef = defs.find(x => x.id === 'constant');
   const named = [...String(e.why || '').matchAll(/\b(\d{1,2})(?=(?:, \d{1,2})*(?: and \d{1,2})?(?:s? times-tables?|s\b))|(?:by|of) (\d{1,2})\b/g)].map(m => +(m[1] || m[2]));
   if (cdef && named.length) { const nn = [...new Set(named)].filter(n => cdef.values.some(x => x.v === n));
     if (nn.length) { out.push({ opts: { ...o, constant: nn }, maxNumber: e.maxNumber }); withBand({ ...o, constant: nn }, e.maxNumber); } }
+  withBand(o, e.maxNumber);
   for (const id of ['forms', 'units', 'task', 'denoms', 'kind', 'decimals', 'shapes']) {
     const def = defs.find(x => x.id === id); if (!def || !def.values) continue;
     for (const v of def.values.map(x => x.v)) {
@@ -234,6 +258,22 @@ if (FIT) {
     const fails = [];
     for (const role of ['pre', 'related']) for (const e of s[role]) { checked++;
       for (const f of check(sid, role, e)) fails.push(`${role} ${e.key}${e.opts ? JSON.stringify(e.opts) : ''}${e.maxNumber ? '@' + e.maxNumber : ''}: ${f}`); }
+    // critic r4 class A(2): the content and week checks run on the step's OWN direct and partial items too. A direct may
+    // not deal later-grade or not-yet-taught content; a partial may, only when its clause names it.
+    for (const role of ['direct', 'partial']) for (const e of s[role]) {
+      const r = probe(e.key, e.opts || {}, e.maxNumber || 10000);
+      const said = r.items.map(i => `${i.text || ''} ${i.a || ''} ${i.x || ''}`).join(' | ');
+      for (const f of [...content(sid, e, r, role), ...laterGrade(e, said, r)].filter((x, i, a) => a.indexOf(x) === i)) {
+        const word = (f.replace(/^rule 19: /, '').match(/[A-Za-z]{4,}/) || [''])[0].toLowerCase();
+        if (role === 'partial' && word && String(e.missing).toLowerCase().includes(word)) continue;
+        fails.push(`${role} ${e.key}${JSON.stringify(e.opts || {})}: ${f}${role === 'partial' ? ' (the clause does not name it)' : ''}`);
+      } }
+    // critic r4 class E: no duplicate links (same key + opts, or the same generated items)
+    for (const role of ['pre', 'related']) { const seen = new Map();
+      for (const e of s[role]) { const r = probe(e.key, e.opts || {}, e.maxNumber || 10000);
+        const sig = r.items.map(i => i.text + '|' + i.a).join('\n');
+        if (seen.has(sig)) fails.push(`${role} ${e.key}${JSON.stringify(e.opts || {})}: duplicate of ${seen.get(sig)} (same items)`);
+        else seen.set(sig, e.key + JSON.stringify(e.opts || {})); } }
     bad += fails.length;
     if (fails.length || ALL) console.log(`${sid} [${wkOf(sid) || '—'}] own ceiling ${own[sid]}: ${fails.length ? fails.length + ' FAIL\n   ' + fails.join('\n   ') : 'ok'}`);
   }
