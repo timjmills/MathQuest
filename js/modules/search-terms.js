@@ -237,7 +237,7 @@ export const CONCEPT_RULES = [
     // ---- counting & early number
     [/^counting:|^counting_mixed:|count_objects|classify_count/, ['counting']],
     [/count_sequence|number_seq_fill|number_chart_fill|hundreds_chart_fill|more_less_10/, ['number_sequence']],
-    [/hundreds_chart|number_chart_fill|number_seq_fill|skip_count_grid|count_by_step|count_by_powers/, ['hundred_chart']],
+    [/hundreds_chart|number_chart_fill|number_seq_fill|count_by_step|count_by_powers/, ['hundred_chart']],   // skip_count_grid draws a count row, not a chart (critic skip-count r1 N3)
     [/^comparing:/, ['compare']],
     [/compare_objects|order_objects_length|heavier_lighter/, ['compare_attributes']],
     [/classify_count|divisibility_sort|compose_from_attributes|shape_attributes/, ['sorting']],
@@ -354,8 +354,10 @@ export const SKILL_TERMS = {
     'patterns:seq_5': ['skip counting', 'skip count by 5', 'count in fives', 'counting in 5s', 'fives', '5 times table'],
     'patterns:seq_10': ['skip counting', 'skip count by 10', 'count in tens', 'counting in 10s', 'tens', '10 times table'],
     'patterns:count_by_fill': ['skip counting', 'skip count fill in', 'count by', 'times tables', 'multiples'],
-    'patterns:skip_count_line': ['skip counting', 'skip count', 'jumps on a number line', 'hops on a number line', 'count by'],
-    'patterns:skip_count_grid': ['skip counting', 'skip count', 'hundred square', 'hundreds chart', 'number grid', 'count by'],
+    'patterns:skip_count_line': ['skip counting', 'skip count', 'jumps on a number line', 'hops on a number line', 'count by',
+        'count by 2', 'count by 5', 'count by 10', 'skip count by 2', 'skip count by 5', 'skip count by 10', 'count by 5 number line', 'count by 2 number line', 'count by 10 number line'],
+    'patterns:skip_count_grid': ['skip counting', 'skip count', 'count by', 'count by 2', 'count by 5', 'count by 10',
+        'skip count by 2', 'skip count by 5', 'skip count by 10', 'counting in 2s', 'counting in 5s', 'counting in 10s'],
     'addition:add_facts': ['plus', 'addition facts', 'add facts', 'adding', 'sum', 'basic addition facts', 'number facts', 'within 20', 'mental addition'],
     'addition:add': ['plus', 'adding', 'sum', 'simple addition', 'basic', 'easy addition'],
     'addition:add_5_pictures': ['plus', 'adding with pictures', 'count all', 'altogether', 'in all', 'beginning addition'],

@@ -611,8 +611,8 @@ export function genHopLine(q, skill) {
 
 /* ============================================== skip counting (Grade 2, 2.NBT.A.2), 2026-10-03 */
 // patterns:skip_count_grid and patterns:skip_count_line, drawn by the SAME kit `count-row` drawing as count_by_tables
-// (Lane C2): plain printed numbers, a full black answer box for each missing number, one hop arc with an arrowhead per
-// jump. The line adds the ruled number line (payload.axis) with each number under its tick, and its step label ("+5")
+// (Lane C2): plain printed numbers, a full black answer box for each missing number. The grid takes the short bold jump
+// arrows between its boxes (owner 2026-10-09); the line keeps one hop arc with an arrowhead per jump. The line adds the ruled number line (payload.axis) with each number under its tick, and its step label ("+5")
 // is a hint that fades (tabHint). Grade 2 content: the steps are 2s, 5s and 10s (2.NBT.A.2; counting in 2s is WRM Y1),
 // never 11s or 3s on a Grade 2 sheet.
 export const SKIP_STEPS = [2, 5, 10];

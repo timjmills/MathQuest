@@ -20,6 +20,13 @@ const MOD = (f) => pathToFileURL(path.join(__dirname, '../../js/modules', f)).hr
 
 // [query, [skills that MUST be in the top 5, as 'category:skill']]
 const QUERIES = [
+    // critic skip-count r1 N1: the bare 'count by N' and 'skip count by N' find both skip skills
+    ['count by 5 number line', ['patterns:skip_count_line']],
+    ['count by 2', ['patterns:skip_count_grid', 'patterns:skip_count_line']],
+    ['count by 5', ['patterns:skip_count_grid', 'patterns:skip_count_line']],
+    ['count by 10', ['patterns:skip_count_grid', 'patterns:skip_count_line']],
+    ['skip count by 5', ['patterns:skip_count_grid', 'patterns:skip_count_line']],
+    ['skip count by 2', ['patterns:skip_count_grid', 'patterns:skip_count_line']],
     // the owner's case
     ['skip counting', ['multiplication:count_by_tables']],
     ['skip count', ['multiplication:count_by_tables']],
