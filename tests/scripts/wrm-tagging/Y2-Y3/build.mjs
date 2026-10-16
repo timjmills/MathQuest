@@ -21,6 +21,7 @@ const {generateQuestionFor}=await import(root+'js/modules/generate-question.js')
 console.log=_log;console.warn=_warn;
 const MK=await import(HERE+'markers.mjs');
 const CL=await import(HERE+'claims.mjs');
+const DN=await import(HERE+'denoms.mjs'); // r13 (critic r12 N12): denominators read from the cell payload too
 const {SKILL_WRM,WRM_PROPOSALS}=await import(root+'js/modules/wrm.js');
 const {SKILL_STANDARDS}=await import(root+'js/modules/standards.js');
 const {SKILL_ALIASES}=await import(root+'js/modules/skill-aliases.js');
@@ -205,7 +206,10 @@ function rungSame(k,ro,dop){const a=effOpts(k,ro),b=effOpts(k,dop);for(const f o
 // what the rung deals, in the option labels of skill-options.js, for the options where it differs from the step
 function rungDeals(k,ro,dop){const a=effOpts(k,ro),b=effOpts(k,dop);const out=[];const tb=tabsOf(a);
   if(TABLEKEYS.has(k)&&tb)return (k==='multiplication:count_by_tables'?'counting in '+tb.map(n=>n+'s').join(', ')+' from 0':k==='division:div_facts'?'dividing by '+tb.join(', '):'the '+tb.join(', ')+' times-table'+(tb.length>1?'s':''));
-  for(const x of OPTDEF(k)){if(IGN.has(x.id))continue;const v=a[x.id],w=b[x.id];if(JSON.stringify(v)===JSON.stringify(w))continue;const lab=z=>(x.values||[]).find(q=>q.v===z)?.l??String(z);
+  for(const x of OPTDEF(k)){if(IGN.has(x.id))continue;const v=a[x.id],w=b[x.id];if(JSON.stringify(v)===JSON.stringify(w))continue;
+    // r13 (N12): the denoms option is a FILTER the = / ≠ items escape: name the ticked families as the option, not as what is dealt
+    if(x.id==='denoms'&&Array.isArray(v)){const f=v.map(d=>({2:'halves',3:'thirds',5:'fifths'})[d]||d+'s');out.push(`denominators option: the ${f.length>1?f.slice(0,-1).join(', ')+' and '+f[f.length-1]+' families':f[0]+' family'}`);continue;}
+    const lab=z=>(x.values||[]).find(q=>q.v===z)?.l??String(z);
     let t=Array.isArray(v)?v.map(lab).join(' and '):lab(v);if(t==null||t==='undefined')continue;t=t.replace(/\s*\([^)]*\)$/,m=>/mL|g or kg/.test(m)?m:'');
     if(a.currency==='usd')t=t.replace(/riyals or dollars/g,'dollars').replace(/riyal or dollar/g,'dollar');
     const lb=String(x.label||x.id).toLowerCase(),tl=t.charAt(0).toLowerCase()+t.slice(1);out.push(tl.startsWith(lb)?tl:lb+': '+tl);}
@@ -288,6 +292,14 @@ const claimItems=(k,o)=>{const id=k+JSON.stringify(o||{});if(_ci.has(id))return 
   // title names what the link's items never deal: an "add and subtract" title on a one-operation skill gets the half marker
   // ("the adding half"); a skill that is only PARTIAL at the cited step gets "nearest live practice" (the title is the step's,
   // the skill is its partial practice); a skill that is DIRECT there is a build error (the why or the opts must change by hand)
+// r13 (critic r12 N12): a denoms link whose why (or a title it cites) names a denominator family while its items deal other
+// families (read from the cell payload too: denoms.mjs) gets the hand note OV.denomNote[key|opts], which says what is dealt.
+// DENOMCHECK (end of the build) fails on any link, clause or why still untrue.
+const DNOPT={n:120,seed:52807,step:113};
+function denomNotePass(lists){for(const list of lists)for(const e of list){if(!Array.isArray(e.opts?.denoms))continue;
+  const f=DN.denomFinds({steps:{x:{direct:[],partial:[],pre:[e],related:[]}}},DNOPT).finds;if(!f.some(x=>x.kind==='FAMILY'))continue;
+  const note=OV.denomNote?.[e.key+'|'+JSON.stringify(e.opts)];if(!note){console.error('DENOMNOTE no note for',e.key,JSON.stringify(e.opts),'|',f.map(x=>x.msg).join('; '));process.exitCode=1;continue;}
+  if(!e.why.includes(note))e.why+=' — '+note;}}
 function titleClaimPass(sid,lists){for(const [role,list] of lists)for(const e of list){if(/nearest live practice/.test(e.why))continue;
     const ids=[...new Set([...String(e.why).matchAll(/(?:R|Y\d)\.B\d+\.S\d+/g)].map(m=>m[0]))].filter(id=>stepById[id]);if(!ids.length)continue;
     const its=claimItems(e.key,e.opts);if(!its.length)continue;
@@ -300,6 +312,9 @@ function titleClaimPass(sid,lists){for(const [role,list] of lists)for(const e of
       const notThere=!allOf(id).includes(e.key);
       if(isPartial||notThere){e.why=e.why.replace(/\)\s*$/,'')+(/\)\s*$/.test(e.why)?'; ':' (')+`nearest live practice: ${id} has ${isPartial?'it as a partial skill':'no skill that does this'}, and these items never ${ops.map(c=>CLAIMVERB[c]||c).join(' or ')})`;titleStats.nlp++;break;}
       console.error('TITLECLAIM',sid,role,e.key,JSON.stringify(e.opts||{}),'cites',id,t,'| false:',ops.join(','));process.exitCode=1;titleStats.bad++;}}}
+// r13 SPECOPTS (critic r12 M1, the Y5 lane's specopts): the spec snapshot of every entry's skills, compared one to one with the
+// WRITTEN file after the write, so a re-option anywhere after the gates (or after the step pass) fails the build
+const specSnap={};const sig=e=>e.key+'|'+JSON.stringify(e.opts||{});
 const usedProps=new Set();const missingReview=[];const bbStats={n:0,bad:0,cls:{}};const optStats={n:0,spec:0,bad:0,rule:{}};
 for(const b of yr.blocks){ if(b.number>MAXB)continue;
  b.steps.forEach((s,i)=>{
@@ -310,6 +325,7 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
   if(o.direct||o.partials){direct=(o.direct||[]).map(d=>({key:d.key,opts:d.opts||{}}));partial=(o.partials||[]).map(p=>({key:p.key,missing:p.missing,...(p.opts?{opts:p.opts}:{})}));}
   else{direct=T.filter(t=>!t.partial).map(t=>({key:t.key,opts:noteOpts(t.note)}));partial=T.filter(t=>t.partial).map(t=>({key:t.key,missing:t.partial}));}
   for(const d of [...direct,...partial]){const r=resolve(d.key);if(!r)throw new Error(s.id+' dead key '+d.key);d.key=r;}
+  specSnap[s.id]={direct:direct.map(sig),partial:partial.map(sig)};
   // tag fixes = diff against SKILL_WRM
   const why=o.why||{};
   for(const t of T){const k=resolve(t.key);const inD=direct.find(d=>d.key===k),inP=partial.find(p=>p.key===k);
@@ -521,6 +537,7 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
   // r12: OV.whyFix[stepId][key] = the why of that pre link, written for this step (applied last, after every rewrite)
   for(const e of pre){const w=OV.whyFix?.[s.id]?.[e.key];if(w)e.why=w;}
   for(const e of related){const w=OV.relWhyFix?.[s.id]?.[e.key];if(w)e.why=w;}
+  denomNotePass([pre,related]);
   titleClaimPass(s.id,[['pre',pre],['related',related]]);
   {const srt=bbSort(BB,pre);pre.splice(0,pre.length,...srt);}
   // r12 BBCHECK (the building-block sweep, a build gate): the lead pre is a building block of the step (never a word problem
@@ -540,6 +557,8 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
     const rs=e.rules||[];if(!rs.length){console.error('OPTGATE',s.id,role,e.o0,'->',now,'changed by no named rule');process.exitCode=1;optStats.bad++;continue;}
     if(rs.includes('markerFix')){const sig=`${s.id}|${e.o0}->${now}`;if(!(OV.markerFixOk||[]).includes(sig)){console.error('OPTGATE',s.id,role,'markerFix not approved:',sig,'\n     spec why:',e.why0,'\n     now why :',e.why);process.exitCode=1;optStats.bad++;continue;}}
     for(const r of new Set(rs))optStats.rule[r]=(optStats.rule[r]||0)+1;}
+  // r13 SPECOPTS snapshot (critic r12 M1): the key + opts each link has when OPTGATE passes it; the written file must equal it
+  specSnap[s.id].pre=pre.map(sig);specSnap[s.id].related=related.map(sig);
   for(const e of [...pre,...related]){delete e.keep;delete e.hand;delete e.o0;delete e.rules;delete e.why0;}
   // r6: never-in-grade content on the step's own skills must be named (critic r5: B4.S8 class)
   for(const d of [...direct,...partial])for(const h of markerHits(d.key,d.opts,s.id).filter(h=>MK.NEVERDIRECT[YEAR].includes(h.m)))
@@ -598,6 +617,8 @@ for(const l of myLessons){const sp=LS.lessons[l.id];lessonStats.n++;
   if(sp.verdict!==verdict)LERR(l.id,'verdict',sp.verdict,'but the skills say',verdict);
   if(verdict!=='full'&&!build.length)LERR(l.id,'not full and no build');if(verdict==='full'&&sp.missing)LERR(l.id,'full with a missing clause');
   const own=new Set([...direct,...partial].map(d=>d.key+'|'+JSON.stringify(d.opts||{})));
+  specSnap[l.id]={direct:(sp.direct||[]).map(([k,o])=>sig({key:resolve(k)||k,opts:o})),partial:(sp.partial||[]).map(([k,o])=>sig({key:resolve(k)||k,opts:o&&Object.keys(o).length?o:{}})),
+    pre:(sp.pre||[]).filter(([k0,,c])=>resolve(k0)&&stepById[c]).map(([k,o])=>sig({key:resolve(k),opts:o})),related:(sp.related||[]).map(([k,o])=>sig({key:resolve(k)||k,opts:o}))};
   const pre=[];for(const [k0,o,cite,reason] of sp.pre||[]){const k=resolve(k0);if(!k){LERR(l.id,'dead pre key',k0);continue;}
     const st=stepById[cite];if(!st){LERR(l.id,'pre cites an unknown step',cite);continue;}
     if(!allOf(cite).includes(k))LERR(l.id,'pre',k,'cites',cite,'which does not tag that skill');
@@ -613,6 +634,7 @@ for(const l of myLessons){const sp=LS.lessons[l.id];lessonStats.n++;
     // marker is the lesson's own content in the school's customary length unit (sp.customaryOk says why)
     const srcOwn=support&&role==='pre'&&e.cite&&JSON.stringify(stepOptsFor(e.cite,e.key)||{})===JSON.stringify(e.opts||{});
     const hits=srcOwn?[]:markerHits(e.key,e.opts,l.id).filter(h=>!(sp.customaryOk&&h.m==='customary'));if(hits.length)LERR(l.id,role,e.key,JSON.stringify(e.opts),'deals content first met later:',hits.map(h=>h.m+' (W'+h.mw+') '+h.ex).join(' | '));}}
+  denomNotePass([pre,related]);
   titleClaimPass(l.id,[['pre',pre],['related',related]]);
   for(const e of pre)delete e.cite;
   if(pre.length<3&&!/few/i.test(sp.note||''))LERR(l.id,'fewer than 3 pre and no note saying why');if(!related.length)LERR(l.id,'no related link');
@@ -652,6 +674,16 @@ for(const t of out.tagFixes)if(out.lessons[t.step])LERR(t.step,'a tagFix names a
 for(const s of Object.values(out.steps))for(const d of s.direct)if('note' in (d.opts||{}))throw new Error('note in opts '+d.key);
 fs.mkdirSync(root+'data/curriculum/links',{recursive:true});
 {const o2={};for(const k of ['year','generatedBy','method','steps','lessons','proposals','tagFixes','retireBuilt'])if(k in out)o2[k]=out[k];for(const k of Object.keys(out))if(!(k in o2))o2[k]=out[k];fs.writeFileSync(root+`data/curriculum/links/${YEAR}.json`,JSON.stringify(o2,null,1)+'\n');}
+// r13 SPECOPTS: the written file, read back from disk, against the spec snapshot
+{const wr=JSON.parse(fs.readFileSync(root+`data/curriculum/links/${YEAR}.json`,'utf8'));let n=0,bad=0;
+  for(const[id,sn]of Object.entries(specSnap)){const w=wr.steps?.[id]||wr.lessons?.[id];if(!w){console.error('SPECOPTS',id,'missing from the written file');bad++;continue;}
+    for(const role of ['direct','partial','pre','related']){const a=sn[role],b=(w[role]||[]).map(sig);n+=a.length;
+      if(a.length!==b.length||a.some((x,i)=>x!==b[i])){bad++;console.error('SPECOPTS',id,role,'spec',JSON.stringify(a.filter(x=>!b.includes(x))),'written',JSON.stringify(b.filter(x=>!a.includes(x))),a.length!==b.length?`(${a.length} vs ${b.length} links)`:'(order)');}}}
+  for(const id of [...Object.keys(wr.steps||{}),...Object.keys(wr.lessons||{})])if(!specSnap[id]){console.error('SPECOPTS',id,'written but has no spec snapshot');bad++;}
+  if(bad)process.exitCode=1;console.error(`specopts ${YEAR}: ${n} links of ${Object.keys(specSnap).length} entries checked against the spec snapshot; ${bad} differences`);}
+// r13 DENOMCHECK (critic r12 N12): every denoms link, clause and why against its items, fractions read from the payload too
+{const {rows,finds}=DN.denomFinds(out,DNOPT);for(const f of finds)console.error('DENOMCHECK',f.kind,f.sid,f.role,f.key,JSON.stringify(f.opts),'|',f.msg);if(finds.length)process.exitCode=1;
+  console.error(`denomcheck ${YEAR}: ${rows.length} denoms links, ${DNOPT.n} items each; ${rows.filter(r=>r.off).length} deal an off-family fraction; ${finds.length} problems`);}
 // r10 (critic r9 N7): the merge assertion — tagFixes applied to SKILL_WRM must reproduce every tag, clause and step verdict
 {const MC=await import(HERE+'mergecheck23.mjs');const mr=await MC.mergeCheck(JSON.parse(JSON.stringify(out)));for(const p of mr.problems)console.error('MERGE',p);if(mr.problems.length)process.exitCode=1;console.error(`mergecheck ${YEAR}: ${mr.problems.length} problems`);}
 console.error(`optgate ${YEAR}: ${optStats.n} links, ${optStats.spec} at their spec opts, changed by a named rule ${JSON.stringify(optStats.rule)}, ${optStats.bad} problems`);

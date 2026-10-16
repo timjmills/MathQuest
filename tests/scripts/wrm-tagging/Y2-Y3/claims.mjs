@@ -47,7 +47,8 @@ export const CLAIMS = [
   { n: 'inches / feet / yards / miles', c: /\b(inch(es)?|feet|foot|ft|yards?|yd|miles?)\b/i, i: /\binch|\bin\.|\bfeet\b|\bfoot\b|\bft\b|\byards?\b|\byd\b|\bmiles?\b/i, s: 0.2, rule: true },
   { n: 'minutes / hours / seconds', c: /\b(minutes?|hours?|seconds|mins?)\b|\b\d+\s*seconds?\b/i, i: /\bminutes?\b|\bhours?\b|\bseconds?\b|\bmin\b|\bhr\b|\bsec\b|o'clock|:\d\d|clock/i, s: 0.2, rule: true },
   { n: 'degrees', c: /°|\bdegrees?\b/i, i: /°|degree|protractor|angle/i, s: 0.2, rule: true },
-  { n: 'money', c: /\b(money|dollars?|cents?|coins?|notes?|bills?)\b|\$|¢|£/i, i: /\$|¢|£|dollar|cent|coin|money|price|cost|\bpay|spend|change|\bnotes?\b|\bbills?\b/i, s: 0.2, rule: true },
+  // r13: money is also judged on the kit cell payload (a coin picture drawn from payload.coins has no words: "Write <, > or = in the circle")
+  { n: 'money', c: /\b(money|dollars?|cents?|coins?|notes?|bills?)\b|\$|¢|£/i, i: /\$|¢|£|dollar|cent|coin|money|price|cost|\bpay|spend|change|\bnotes?\b|\bbills?\b/i, s: 0.2, rule: true, pay: true },
   // critic r6 L: a multiplicative idea must be multiplicative in the items (tape_diagram is additive in every form)
   { n: 'times as many / equal groups', c: /times[- ]as[- ](?:many|long|tall|heavy|much|far)|how many times|multiplicative|equal (?:groups|shares)|scal(?:e|ing) (?:up|by)/i,
     i: /\btimes\b|×|÷|(?<![a-z])x(?=\s*\d)|equal(?:ly)?\b|in each\b|each (?:friend|group|row|box|bag|plate|basket|jar|pack)|groups? of\b|\bshare|missing factor|\?\s*×|×\s*\?|_+\s*[×÷]|[×÷]\s*_+/i, s: 0.34, rule: true },
@@ -116,7 +117,7 @@ export function claimHits(text, items, { rulesOnly = false, gateOnly = false, ru
     if (ruleSet && !ruleSet.has(cl.n)) continue;
     if (!cl.c.test(pos)) continue;
     if (cl.n === 'litres' && /\b[IVXCDM]\b.*\b[IVXCDM]\b/.test(pos)) continue;   // "D, C, L and X" are Roman numerals
-    const hit = cl.n === 'story' ? items.filter(story).length : items.filter(i => cl.i.test(cl.all ? repStr(i) : cl.form ? formStr(i) : itemWords(i))).length;
+    const hit = cl.n === 'story' ? items.filter(story).length : items.filter(i => cl.i.test(cl.all ? repStr(i) : cl.form ? formStr(i) : cl.pay ? itemWords(i) + ' ¦ ' + (i.pay || '') : itemWords(i))).length;
     const share = cl.unit && nUnits > 2 ? Math.max(0.05, cl.s / (nUnits - 1)) : cl.s;
     out.push({ claim: cl.n, word: (pos.match(cl.c) || [''])[0], hit, n: N, ok: hit >= share * N });
   }
@@ -129,12 +130,35 @@ const OPS = [['adds', /^(?:a |an )?(?:add(?:s|ing|ition)?|sums?)\b|^\+(?!\s*\d)/
   ['subtracts', /^(?:a |an )?(?:subtract\w*)\b|^−/i, /\d\s*[−-]\s*\d/],
   ['multiplies', /^(?:a |an )?(?:multipl\w*)\b|^×/i, /\d\s*[×x]\s*\d/],
   ['divides', /^(?:a |an )?(?:divi\w*)\b|^÷(?!\s*\d)/i, /÷|⟌/]];
+// r13 (critic r12 M2): a story item carries no sign in its words ("Sam takes 5 books out"): its operation is read from the kit
+// cell payload (word-work steps[].op, "op":"-") and from the story's own take-away / join words. And a NEGATED UNIT ("never grams",
+// "no mL", "not litres or millilitres") must be false of the items: a part that is only unit words, judged like the unit claim
+const PAYOP = { adds: /"op":"\+"/, subtracts: /"op":"[-−]"/, multiplies: /"op":"[×x*]"/, divides: /"op":"[÷/]"/ };
+const STORYOP = { adds: /\b(?:in all|altogether|how many (?:\w+ )*(?:now|in total)|gets? \d+ more|more (?:come|join))\b/i,
+  subtracts: /\b(?:left|take[sn]? (?:away|out)|gives? (?:away )?\d|gave|ate|eats|fly away|flew away|how many fewer|how many more)\b/i };
+const UNITNEG = /^(?:any |the |a |an |in )?((?:(?:mL|ml|millilit(?:re|er)s?|lit(?:re|er)s?|L|kg|kilograms?|grams?|g|km|kilomet(?:re|er)s?|cm|centimet(?:re|er)s?|mm|millimet(?:re|er)s?|met(?:re|er)s?|m|inch(?:es)?|feet|foot|yards?|miles?|ounces?|oz|pounds?|lbs?|cups?|pints?|quarts?|gallons?)(?:\s*(?:,|or|and|nor)\s*)?)+)(?:\s+(?:at all|anywhere|items?|scales?|dials?|is dealt|are dealt|appear))?\s*$/i;
+// one unit at a time (the CLAIMS unit groups join inches / feet / yards: "never feet" on an inch ruler is true)
+const NEGU = [['millilitres', /\b(?:mL|ml|millilit\w*)\b/i, /\bml\b|millilit/i], ['litres', /(?:^|[^\w-])(?:L|lit(?:re|er)s?)\b/, /\d\s*L\b|\bL\b|\blit(?:re|er)s?\b/],
+  ['kilograms', /\b(?:kg|kilograms?)\b/i, /\bkg\b|kilogram/i], ['grams', /\b(?:g|grams?)\b/i, /\d\s*g\b|\bgrams?\b/i],
+  ['kilometres', /\b(?:km|kilomet\w*)\b/i, /\bkm\b|kilomet/i], ['centimetres', /\b(?:cm|centimet\w*)\b/i, /\bcm\b|centimet/i],
+  ['millimetres', /\b(?:mm|millimet\w*)\b/i, /\bmm\b|millimet/i], ['metres', /\b(?:m|met(?:re|er)s?)\b/i, /\d\s*m\b|\bmet(?:re|er)s?\b/i],
+  ['inches', /\binch(?:es)?\b/i, /\binch|\bin\./i], ['feet', /\b(?:feet|foot)\b/i, /\bfeet\b|\bfoot\b|\bft\b/i], ['yards', /\byards?\b/i, /\byards?\b|\byd\b/i],
+  ['miles', /\bmiles?\b/i, /\bmiles?\b/i], ['ounces', /\b(?:ounces?|oz)\b/i, /\bounces?\b|\boz\b/i], ['pounds', /\b(?:pounds?|lbs?)\b/i, /\bpounds?\b|\blbs?\b/i],
+  ['cups', /\bcups?\b/i, /\bcups?\b/i], ['pints', /\bpints?\b/i, /\bpints?\b/i], ['quarts', /\bquarts?\b/i, /\bquarts?\b/i], ['gallons', /\bgallons?\b/i, /\bgallons?\b/i]];
 export function negatedHits(text, items) {
   const out = [], N = items.length || 1;
-  for (const part of negatedParts(text)) for (const [n, c, re] of OPS) {
-    if (!c.test(part)) continue;
-    const hit = items.filter(i => re.test(`${i.text || ''} ${i.x || ''}`)).length;
-    out.push({ claim: n, part, hit, n: N, ok: hit <= N / 3 });
+  for (const part of negatedParts(text)) {
+    for (const [n, c, re] of OPS) {
+      if (!c.test(part)) continue;
+      const hit = items.filter(i => re.test(`${i.text || ''} ${i.x || ''}`) || PAYOP[n].test(i.pay || '') || (STORYOP[n] && !/\d\s*[+−×÷-]\s*\d/.test(i.text || '') && STORYOP[n].test(i.text || ''))).length;
+      out.push({ claim: n, part, hit, n: N, ok: hit <= N / 3 });
+    }
+    const u = UNITNEG.exec(part.trim());
+    if (u) for (const [name, w, re] of NEGU) {
+      if (!w.test(u[1])) continue;
+      const hit = items.filter(i => re.test(itemWords(i))).length;
+      out.push({ claim: 'no ' + name, part, hit, n: N, ok: hit <= N * 0.05 });
+    }
   }
   return out;
 }

@@ -6238,7 +6238,7 @@
    "pre": [
     {
      "key": "fractions:identify",
-     "why": "this step's skill as it was met then (denominators: halves, quarters, eighths) — Y2.B8.S13 Recognise three-quarters (Grade 1)",
+     "why": "this step's skill as it was met then (denominators option: the halves family) — Y2.B8.S13 Recognise three-quarters (Grade 1) — every \"which model shows\" item has thirds, sixths or fifths among its four pictures",
      "opts": {
       "denoms": [
        2
@@ -6247,7 +6247,7 @@
     },
     {
      "key": "fractions:write_fraction",
-     "why": "this step's skill as it was met then (denominators: halves, quarters, eighths and Thirds, sixths, ninths, twelfths) — Y2.B8.S11 Non-unit fractions (Grade 1)",
+     "why": "this step's skill as it was met then (denominators option: the halves and thirds families) — Y2.B8.S11 Non-unit fractions (Grade 1)",
      "opts": {
       "denoms": [
        2,
@@ -6423,7 +6423,7 @@
     },
     {
      "key": "fractions:write_fraction",
-     "why": "this step's skill as it was met then (denominators: halves, quarters, eighths and Thirds, sixths, ninths, twelfths) — Y2.B8.S11 Non-unit fractions (Grade 1)",
+     "why": "this step's skill as it was met then (denominators option: the halves and thirds families) — Y2.B8.S11 Non-unit fractions (Grade 1)",
      "opts": {
       "denoms": [
        2,
@@ -6433,7 +6433,7 @@
     },
     {
      "key": "fractions:shade_fraction",
-     "why": "this step's skill as it was met then (denominators: halves, quarters, eighths) — Y2.B8.S14 Find three-quarters (Grade 1)",
+     "why": "this step's skill as it was met then (denominators option: the halves family) — Y2.B8.S14 Find three-quarters (Grade 1)",
      "opts": {
       "denoms": [
        2
@@ -6533,7 +6533,7 @@
     },
     {
      "key": "fractions:identify",
-     "why": "Y2.B8.S13 Recognise three-quarters (prior learning wk W27)",
+     "why": "Y2.B8.S13 Recognise three-quarters (prior learning wk W27) — every \"which model shows\" item has thirds, sixths or fifths among its four pictures",
      "opts": {
       "denoms": [
        2
@@ -6770,7 +6770,7 @@
     },
     {
      "key": "fractions:equiv_frac_visual",
-     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W37)",
+     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W37) — equivalence pictures (1/2 = 2/4), but about half the items are = / ≠ checks in other families too: thirds, sixths, ninths and twelfths (2/3 = 6/9), fifths, tenths and twentieths (2/5 = 8/20), and sevenths (3/5 ≠ 5/7)",
      "opts": {
       "denoms": [
        2
@@ -6848,7 +6848,7 @@
    "pre": [
     {
      "key": "fractions:equiv_frac_visual",
-     "why": "this step's skill as it was met then (denominators: halves, quarters, eighths) — Y2.B8.S12 Recognise the equivalence of a half and two quarters (Grade 1)",
+     "why": "this step's skill as it was met then (denominators option: the halves family) — Y2.B8.S12 Recognise the equivalence of a half and two quarters (Grade 1) — equivalence pictures (1/2 = 2/4), but about half the items are = / ≠ checks in other families too: thirds, sixths, ninths and twelfths (2/3 = 6/9), fifths, tenths and twentieths (2/5 = 8/20), and sevenths (3/5 ≠ 5/7)",
      "opts": {
       "denoms": [
        2
@@ -6928,7 +6928,7 @@
    "pre": [
     {
      "key": "fractions:equiv_frac_visual",
-     "why": "this step's skill as it was met then (denominators: halves, quarters, eighths) — Y2.B8.S12 Recognise the equivalence of a half and two quarters (Grade 1)",
+     "why": "this step's skill as it was met then (denominators option: the halves family) — Y2.B8.S12 Recognise the equivalence of a half and two quarters (Grade 1) — equivalence pictures (1/2 = 2/4), but about half the items are = / ≠ checks in other families too: thirds, sixths, ninths and twelfths (2/3 = 6/9), fifths, tenths and twentieths (2/5 = 8/20), and sevenths (3/5 ≠ 5/7)",
      "opts": {
       "denoms": [
        2
@@ -7579,8 +7579,10 @@
    "related": [
     {
      "key": "measurement:money_compare",
-     "why": "comparing two amounts of money: the same <, > and = with units",
-     "opts": {}
+     "why": "two amounts of coins compared with <, > or =: the same signs, between amounts in cents",
+     "opts": {
+      "response": "sign"
+     }
     }
    ],
    "note": ""
@@ -7659,7 +7661,7 @@
    "pre": [
     {
      "key": "fractions:equiv_frac_visual",
-     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (taught before this step)",
+     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (taught before this step) — equivalence pictures (1/2 = 2/4), but about half the items are = / ≠ checks in other families too: thirds, sixths, ninths and twelfths (2/3 = 6/9), fifths, tenths and twentieths (2/5 = 8/20), and sevenths (3/5 ≠ 5/7)",
      "opts": {
       "denoms": [
        2
@@ -7793,7 +7795,7 @@
     },
     {
      "key": "fractions:equiv_frac_visual",
-     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W37)",
+     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W37) — equivalence pictures (1/2 = 2/4), but about half the items are = / ≠ checks in other families too: thirds, sixths, ninths and twelfths (2/3 = 6/9), fifths, tenths and twentieths (2/5 = 8/20), and sevenths (3/5 ≠ 5/7)",
      "opts": {
       "denoms": [
        2
@@ -7897,7 +7899,7 @@
     },
     {
      "key": "fractions:equiv_frac_visual",
-     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W38)",
+     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W38) — equivalence pictures (1/2 = 2/4), but about half the items are = / ≠ checks in other families too: thirds, sixths, ninths and twelfths (2/3 = 6/9), fifths, tenths and twentieths (2/5 = 8/20), and sevenths (3/5 ≠ 5/7)",
      "opts": {
       "denoms": [
        2
@@ -7986,7 +7988,7 @@
     },
     {
      "key": "fractions:equiv_frac_visual",
-     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W38)",
+     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W38) — equivalence pictures (1/2 = 2/4), but about half the items are = / ≠ checks in other families too: thirds, sixths, ninths and twelfths (2/3 = 6/9), fifths, tenths and twentieths (2/5 = 8/20), and sevenths (3/5 ≠ 5/7)",
      "opts": {
       "denoms": [
        2
@@ -8086,7 +8088,7 @@
     },
     {
      "key": "fractions:equiv_frac_visual",
-     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W38)",
+     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W38) — equivalence pictures (1/2 = 2/4), but about half the items are = / ≠ checks in other families too: thirds, sixths, ninths and twelfths (2/3 = 6/9), fifths, tenths and twentieths (2/5 = 8/20), and sevenths (3/5 ≠ 5/7)",
      "opts": {
       "denoms": [
        2
@@ -8194,7 +8196,7 @@
     },
     {
      "key": "fractions:equiv_frac_visual",
-     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W38)",
+     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (prior learning wk W38) — equivalence pictures (1/2 = 2/4), but about half the items are = / ≠ checks in other families too: thirds, sixths, ninths and twelfths (2/3 = 6/9), fifths, tenths and twentieths (2/5 = 8/20), and sevenths (3/5 ≠ 5/7)",
      "opts": {
       "denoms": [
        2

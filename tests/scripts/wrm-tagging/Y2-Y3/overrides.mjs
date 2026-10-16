@@ -1369,3 +1369,38 @@ r3['Y2.B11.S1'] = { ...r3['Y2.B11.S1'], pre: [R('shapes_early:shape_positions', 
 // false (the sweep's multiplicative claim now reads "times as long / tall / heavy" too). Dropped; the mult_word_problems related
 // stays filtered out by the markers as before.
 relR3['Y3.B4.S10'] = (relR3['Y3.B4.S10'] || []).filter(r => r.key !== 'algebra:tape_diagram');
+
+// ======================= round 13 (critic r12: N12 and minors M3-M5, structure row 3) =======================
+// N12: the = / ≠ items of equiv_frac_visual draw their fractions from the kit cell payload only, so the generator's `denoms`
+// filter (generate-question.js itemDenominators / p12Acceptor) never sees them. denoms.mjs reads the payload too; every clause
+// below was rewritten from its counts (600 items on three seed sets, `node denoms.mjs Y2 Y3 --all` and the r13 report):
+//  equiv_frac_visual {denoms:[2]}: 294 / 600 items outside the halves family. The = / ≠ checks (329) compare thirds, sixths,
+//    ninths, twelfths, eighteenths, fifths, tenths, fifteenths, twentieths, sevenths and improper fractions (254 off); the
+//    missing-number pictures (271) are the halves family except 40 with sixths or twelfths (1/2 = 3/6, 3/4 = 9/12)
+//  identify {denoms:[2]}: every "which model shows" item (184 / 600) has thirds, sixths or fifths among its four pictures
+//  identify {denoms:[2,3]}: 95 / 600 "which model shows" items have fifths among the pictures
+//  shade_fraction {denoms:[3]}: deals /3 and /6 only (no twelfths in 600)
+const EFV = 'the missing-number pictures are the halves family (1/2 = 2/4, 3/4 = 12/16) with a few sixths and twelfths (1/2 = 3/6), but about half the items are = / ≠ checks that compare fractions outside it: thirds, sixths, ninths, twelfths and eighteenths (2/3 = 6/9, 1/6 = 3/18), fifths, tenths, fifteenths and twentieths (3/5 = 6/10, 2/5 = 8/20), sevenths (3/5 ≠ 5/7) and improper fractions (3/5 ≠ 9/5)';
+Object.assign(r3, {
+  'Y2.B8.S12': { ...r3['Y2.B8.S12'], partials: [P('fractions:equiv_frac_visual', EFV + '; a page of 1/2 = 2/4 only is not available', { denoms: [2] })] },
+  'Y2.B8.S13': { ...r3['Y2.B8.S13'], partials: [r3['Y2.B8.S13'].partials[0], P('fractions:identify', 'denoms [2] is the halves family: it deals eighths (1/8, 7/8), and every "which model shows" item (about a third of the page) has thirds, sixths or fifths among its four pictures (2/3, 1/6, 2/5); not 3/4 alone', { denoms: [2] })] },
+  'Y2.B8.S10': { ...(r3['Y2.B8.S10'] || {}), partials: [P('fractions:identify', 'denoms [2,3] are families: items deal 2/6, 1/6 and 7/8, not only unit halves, quarters and thirds, and some "which model shows" items have fifths among the pictures (4/5)', { denoms: [2, 3] }), steps['Y2.B8.S10'].partials[1]] },
+  'Y2.B8.S8': { ...r3['Y2.B8.S8'], partials: [P('fractions:shade_fraction', 'the thirds family also deals sixths: a page of 1/3 of a shape only is not available, and a third of a quantity (1/3 of 12) is not dealt', { denoms: [3] })] },
+});
+// the note a denoms link's why carries when its text (or a title it cites) names a family the items go beyond (build.mjs
+// appends it only then; DENOMCHECK fails the build on any link still untrue)
+export const denomNote = {
+  'fractions:equiv_frac_visual|{"denoms":[2]}': 'equivalence pictures (1/2 = 2/4), but about half the items are = / ≠ checks in other families too: thirds, sixths, ninths and twelfths (2/3 = 6/9), fifths, tenths and twentieths (2/5 = 8/20), and sevenths (3/5 ≠ 5/7)',
+  'fractions:identify|{"denoms":[2]}': 'every "which model shows" item has thirds, sixths or fifths among its four pictures',
+  'fractions:identify|{"denoms":[2,3]}': 'some "which model shows" items have fifths among the pictures',
+};
+// row 3: the lead pre of Y2.B1.S11 was its own partial (same key and opts): it added no rung. Dropped (no K or Grade 1 skill
+// deals a shorter line: place_on_number_line has no band below 100)
+r3['Y2.B1.S11'] = { ...r3['Y2.B1.S11'], selfPre: [], core: r3['Y2.B1.S11'].core.filter(c => c.key !== 'number_sense:place_on_number_line') };
+// M3: number_pattern {band:50} deals growing number sequences (fill the missing numbers) and counting-order drags, not a repeating pattern
+relR3['Y2.B11.S5'] = relR3['Y2.B11.S5'].map(r => r.key === 'patterns:number_pattern' ? R(r.key, 'finding the rule of a number pattern and continuing it (fill the missing numbers, or put numbers in counting order): the same what-comes-next reasoning, without turns', r.opts) : r);
+// M4: place_on_number_line {span:10, band:20} taps one number on a 10-wide line (band 20 changes nothing): no movement by steps. Dropped
+relR3['Y2.B11.S2'] = relR3['Y2.B11.S2'].filter(r => r.key !== 'number_sense:place_on_number_line');
+relR3['Y2.B11.S4'] = relR3['Y2.B11.S4'].filter(r => r.key !== 'number_sense:place_on_number_line');
+// M5: money_compare rings the set with more money by default; response 'sign' writes <, > or = between the two amounts
+relR3['Y3.B7.S10'] = relR3['Y3.B7.S10'].map(r => r.key === 'measurement:money_compare' ? R(r.key, 'two amounts of coins compared with <, > or =: the same signs, between amounts in cents', { response: 'sign' }) : r);
