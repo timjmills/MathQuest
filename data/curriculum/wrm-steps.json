@@ -18,7 +18,9 @@
    "siteTitle": "the site pacing title where it differs from the WRM Drive file name",
    "drive": "Drive file ids: lesson PDF, owner Teaching Guide (Guide D) PDF(s), WRM teaching video",
    "vocab": "key vocabulary from the step's Teaching Guide: the \"Pre-teach\" words (data/curriculum/wrm-vocab.json, which also holds meanings, stems and the key model; empty = not extracted)",
-   "supplements": "Awsaj-authored lessons placed in the block to close CCSS standards WRM does not teach; not WRM small steps"
+   "supplements": "Awsaj-authored lessons placed in the block to close CCSS standards WRM does not teach; not WRM small steps. id = the lesson's id in data/curriculum/site-lessons.json (which also lists the committee lessons the pacing gives no block)",
+   "enrichment": "the pacing marks the step as an enrichment lesson (site badge \"ENRICHMENT · GRADE n STANDARD\")",
+   "site": "how the site uses the step beyond its own grade: taughtIn = [{grade, how: copied-in | review, firstWeek}] (pacing st.g / st.rv in a later grade); supportIn = later grades that list it as a Support (enrich-native) lesson"
   },
   "counts": {
    "years": 7,
@@ -35,7 +37,11 @@
    "EE 6.RP.A.1: our ee-math.json links [M.EE.6.RP.1], the site EEMAP links [none]",
    "EE 6.EE.B.6: our ee-math.json links [M.EE.6.EE.5-7], the site EEMAP links [none]",
    "EE 6.EE.B.7: our ee-math.json links [M.EE.6.EE.5-7], the site EEMAP links [none]",
-   "Y6.B11.S6 \"The mean\": pacing CCSS [5.MD.B.2], v3 curriculum CCSS []"
+   "Y6.B11.S6 \"The mean\": pacing CCSS [5.MD.B.2], v3 curriculum CCSS []",
+   "site G1 W28: review step \"Count money - notes and coins (US: dollars & cents)\" is Y2.B4.S2 \"Count money - pounds (notes and coins)\" by its block/step numbers (retitled on the site); recorded on Y2.B4.S2",
+   "site G3 W22: review step \"Pounds, tens, ones and pence (US: dollars & cents)\" is Y4.B10.S1 \"Write money using decimals\" by its block/step numbers (retitled on the site); recorded on Y4.B10.S1",
+   "site G3 Support \"Measure in grams\": the site gives source G2, but the title is exactly Y2.B7.S2 (G1); recorded on Y2.B7.S2",
+   "site G4 Support \"Measure in centimetres\": the site gives source K, but the title is exactly Y2.B6.S1 (G1); recorded on Y2.B6.S1"
   ],
   "reconciliation": [
    "Drive vs site: the site RESOURCES tree is the Drive tree (same folder and file ids). Spot checks against live Drive listings matched: the Year 3 folder (1l9hjSYKWnwYnfwPj7Nui4Re5CDWJfWFi) block folders, the Teaching Guides of Year 3 Spring Block 3 (Fractions A), and the guides for Y3.B2.S21, Y4.B1.S16 and Y6.B1.S4. The Drive connector returns at most 5 files per page, so the 872 steps were not re-listed one by one.",
@@ -71,6 +77,11 @@
        "notes": [
         "Beyond CCSS: Reception (PK4) step, Kindergarten readiness."
        ],
+       "site": {
+        "supportIn": [
+         "K"
+        ]
+       },
        "drive": {
         "lesson": "1W_Tqdn_aIWVCXmZ_dYCgUjDfPGB7uCYr",
         "guide": "1m9PqjtpXCzlBqfyWKlOHPQq5zbEJ-z5l"
@@ -91,6 +102,11 @@
        "notes": [
         "Beyond CCSS: Reception (PK4) step, Kindergarten readiness."
        ],
+       "site": {
+        "supportIn": [
+         "K"
+        ]
+       },
        "drive": {
         "lesson": "1RMKFrjeKCksoL4-KXVN_w0jSutq-utsy",
         "guide": "1s9VflEevLtbwzvXYvYPtD0gRgt-QfQSc"
@@ -111,6 +127,11 @@
        "notes": [
         "Beyond CCSS: Reception (PK4) step, Kindergarten readiness."
        ],
+       "site": {
+        "supportIn": [
+         "K"
+        ]
+       },
        "drive": {
         "lesson": "1xbYeWF9m7b2W90HuJX_-M2MUwwq10bmM",
         "guide": "1nB4FK4Uq3CzqA-5TsYKukYZWfawzstd-"
@@ -176,6 +197,14 @@
         "M.EE.K.MD.3"
        ],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1vbxlI1Ev93x22nFpVryqE0M6U43txh33",
         "guide": "1EqvP4_R9kVXq0QAm_Vz6HHocg6rzsm3y"
@@ -197,6 +226,15 @@
         "M.EE.K.CC.7"
        ],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "13AH_e9btrbhSNS0TYmXCEdruWXpgHtT3",
         "guide": "1nm99358e4gZsZgKUwonhIN9b3S_isBfU"
@@ -271,6 +309,11 @@
         "M.EE.K.MD.2"
        ],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "1xoIdqrPdHRbx5qEWAvrf0dq3UiCJRRsc",
         "guide": "1cfIz96F7z0u2PuVjaS2ZKMfj1e8py7hQ"
@@ -366,6 +409,11 @@
         "M.EE.K.CC.6"
        ],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "K"
+        ]
+       },
        "drive": {
         "lesson": "1TocPvMwwDUMnFyyLitruZ03mzGkaadjD",
         "guide": "19BNWfAM4L3M-Ia7E-t6weD70XX3uCAzj"
@@ -387,6 +435,11 @@
         "M.EE.K.CC.6"
        ],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "K"
+        ]
+       },
        "drive": {
         "lesson": "1-FcE5leKeP8XqyyH3HoxNkUdfpoqZ37e",
         "guide": "1_0CLjoNKA307qucVvuXIVZHQL9umQ9aK"
@@ -409,6 +462,11 @@
         "M.EE.K.CC.6"
        ],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "K"
+        ]
+       },
        "drive": {
         "lesson": "1SlYk4PynXD-Hp4RdNOezUyGovYKYykiq",
         "guide": "1fNEBT1YfwxUlaryzcm_FVJjUOwAmVQ9P"
@@ -431,6 +489,11 @@
         "M.EE.K.CC.4"
        ],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "K"
+        ]
+       },
        "drive": {
         "lesson": "1gA4D2Sd_dWpL4ZWaq1KMRTLOQIY65p3p",
         "guide": "1XuQuOCTTZYgv4VixiCcwaEXubIrc5AD4"
@@ -452,6 +515,16 @@
         "M.EE.K.CC.4"
        ],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "K",
+         "G1",
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1gMn-ifVNXK-pVT8shkpHhBu5tOvCb2rC",
         "guide": "1aRuUL2ZLI3wi1ST7AzSQ5rU8Cub8qBUW"
@@ -716,6 +789,13 @@
        ],
        "ee": [],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1p3G1bRnmXwJ2gzPHgKJ2Jexq-Fq8BTA9",
         "guide": "19iWy5wo6cyQxdqNLaQYPXtS_SXTtvkwK"
@@ -807,6 +887,12 @@
        "notes": [
         "Beyond CCSS: Reception (PK4) step, Kindergarten readiness."
        ],
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1WFaBojJCpdypLekAJ7W3QAAL_ZVfXSoB",
         "guide": "19NeTLY2MGCte5s8rb3tSIWCtqy3nt69-"
@@ -1224,6 +1310,15 @@
        "notes": [
         "Beyond CCSS: Reception (PK4) step, Kindergarten readiness."
        ],
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1KSwfsl7NCr14ZoyCScqqBfMszc0wlonL",
         "guide": "1arXjmGoY1mLS42z492GDllW-fiJw2cLG"
@@ -1290,6 +1385,15 @@
         "M.EE.K.OA.1"
        ],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1EggBjFnEFK2SYgBygn2jJQ5R2Vdt8tQZ",
         "guide": "1zqM6wcDdPjJVFwLDjpHm2vTHfr8sgmzk"
@@ -1364,6 +1468,11 @@
         "M.EE.K.MD.2"
        ],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "10FrXXnGii92NtsK2irys4-6JBys8Ag9-",
         "guide": "1sVnIGBKpcRucJjDhfDesNv_d9VYVb_PY"
@@ -1427,6 +1536,15 @@
        "notes": [
         "Beyond CCSS: Reception (PK4) step, Kindergarten readiness."
        ],
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1QxSEDzouYixCm77DfETYZzBbGTa1DoPi",
         "guide": "1DVPxaYVl5UXbPyaTKvHd0LOzJP96ja6Q"
@@ -1447,6 +1565,15 @@
        "notes": [
         "Beyond CCSS: Reception (PK4) step, Kindergarten readiness."
        ],
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1PVSxRdHZGSblYFu3IizH_5PjgmN3m80d",
         "guide": "1N2cgn7JA-m-3dIKo6sVe--3w5LZBzf7v"
@@ -1503,6 +1630,13 @@
         "M.EE.K.CC.7"
        ],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1QR3NITA4VHaE4XS2H9b7m_dghqlT3r1z",
         "guide": "1bhGiBk-CeWs87iQCJnQPb3h6_Isi6OG1"
@@ -1608,6 +1742,12 @@
        ],
        "ee": [],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "G1",
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1yV8fdHHM-nXcFtoz_XqF3l5Icma90IV-",
         "guide": "1QQ60l3i8yW7vcc449Qr6cWefthu-NuNy"
@@ -1628,6 +1768,15 @@
        ],
        "ee": [],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1D9RqetMauMzOcHThh2JCnad0Wo1MaWgj",
         "guide": "1GmDGKBTVIaxqAvnVvpi0dE6RvSc2IZxa"
@@ -1650,6 +1799,15 @@
         "M.EE.K.CC.6"
        ],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1_YXS1HSBgeTGFi2WDck4hIggWzsG8WId",
         "guide": "1ltWE84qRtDkllyP5T11HaqZ9c5OoM7vk"
@@ -1694,6 +1852,15 @@
         "M.EE.K.OA.1"
        ],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1hoWljFcyCCaB-_txSZS8AXk2P8ldp4IE",
         "guide": "1DZZZkASIg67xGp962DzfGmt0x6rJJ6i5"
@@ -1716,6 +1883,15 @@
         "M.EE.K.OA.1"
        ],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1TSpQrVU83UclT9j8qQuSUsXxPmnSJRNE",
         "guide": "11DCDiA4RJPEJdsRP5n-d-z_psbj4mpSh"
@@ -1737,6 +1913,15 @@
        "notes": [
         "Beyond CCSS: Reception (PK4) step, Kindergarten readiness."
        ],
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "13FIud1B1IU2WoNTX1S_ybyJ1jyP-NZ44",
         "guide": "1VU_Z57_M5keOtV0akwItpfkYAHS6J3CM"
@@ -1770,6 +1955,11 @@
         "M.EE.K.G.3"
        ],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "G1"
+        ]
+       },
        "drive": {
         "lesson": "1BcUuQkIhlWD5YPNEFMyGtXrGxhGSbtBK",
         "guide": "18U0RUtA1ARVPnUhbc8nTo8kzABWfTgHq"
@@ -1793,6 +1983,13 @@
         "M.EE.K.G.3"
        ],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "G2",
+         "G3",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "12rcETA1xo4IzaDiC36LtWU1DGbvL8rsD",
         "guide": "1TLHqWEK2tCYfMSBB8gf1HEfH4ISsp1Ls"
@@ -1833,6 +2030,14 @@
        ],
        "ee": [],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1FzQCCAuwcr2u9oMO46LXHv-ATFCYeLTx",
         "guide": "1kW5zNm8fPF7B-T7ykIEpxZ8Otf-rLa9-"
@@ -1874,6 +2079,13 @@
        "notes": [
         "Beyond CCSS: Reception (PK4) step, Kindergarten readiness."
        ],
+       "site": {
+        "supportIn": [
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1rrRDBt7EjiPVeAarAw630LQlWes7KYqC",
         "guide": "1lIjPAzdPSm-N6jgZHXkiVnZ6o8qC6MeE"
@@ -2013,6 +2225,15 @@
         "M.EE.K.CC.1"
        ],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1IISzNZ9Ib55Y526oOcNZXp4HwtOpCseO",
         "guide": "14KZBcwy7CKbx9oTZuOZwcSX-PpqShCt8"
@@ -2035,6 +2256,22 @@
         "M.EE.K.CC.1"
        ],
        "flag": "non-ccss",
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "K",
+          "how": "copied-in",
+          "firstWeek": "W01"
+         }
+        ],
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1G3JJUQntKKFmL42yN0pa_cvb3UJAXdNc",
         "guide": "1U7TYXeXq1zFSXCrX2fOQK_UJUMYtOkta"
@@ -2184,6 +2421,14 @@
         "M.EE.K.G.2"
        ],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1Pw3mn67XUZ53xWW3M2gCMNV1jc5gGwmV",
         "guide": "1Wz325YAwwIyye9E5KxN6VNSBJcEV4lDw"
@@ -2243,6 +2488,14 @@
        ],
        "ee": [],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1Bj5KoTPOlInk3Qia811KmVRSr8kFQyLT",
         "guide": "1N07HD0KBDU-JjPHMFoKd8KXkmYTKpcEC"
@@ -2263,6 +2516,15 @@
        ],
        "ee": [],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1FdYuWIvUjtFwJlUiMEZZb2rbydAjgvMt",
         "guide": "1L5TJlg3KnuA8Txfnd1aivSnwTT3HYkO5"
@@ -2396,6 +2658,11 @@
        "notes": [
         "Beyond CCSS: Reception (PK4) step, Kindergarten readiness."
        ],
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "1F7nZWQkOHlfOfoQLQK2ZCNpBjxIM7nOQ",
         "guide": "1QdadB3aDWNVp18DKguPe1qAGOdWIJC4y"
@@ -2437,6 +2704,15 @@
         "M.EE.K.OA.1"
        ],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "19YfhF6z3puwqRgWcN6YkK3_QFkDkhaI-",
         "guide": "1V7Gcgkb1aKWQtHeNBJeVNT2eTKjsGcpa"
@@ -2565,6 +2841,11 @@
        ],
        "ee": [],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "139fB1cv05YTuWZx4A_HE79bvTwmYsIm5",
         "guide": "1IB_NK4b9S7fWIRH4ABQa9br2PjF464we"
@@ -2584,6 +2865,11 @@
        ],
        "ee": [],
        "flag": "non-ccss",
+       "site": {
+        "supportIn": [
+         "G1"
+        ]
+       },
        "drive": {
         "lesson": "1LbgqNhr89HrOU6-jViVr4weTbtZuPZQn",
         "guide": "1JbFIf_shdkL9UIMJc5Qfl2degsn3CIvy"
@@ -2789,6 +3075,7 @@
        "ee": [
         "M.EE.K.CC.6"
        ],
+       "power": true,
        "flag": "native",
        "drive": {
         "lesson": "12nHka2BBsw1x1-GyYaaOVI_V6o2OJ6kU",
@@ -2811,6 +3098,7 @@
        "ee": [
         "M.EE.K.CC.6"
        ],
+       "power": true,
        "flag": "native",
        "drive": {
         "lesson": "1D1bhund3Gy3OtnGKuiCmS5ig5vz0Jxbb",
@@ -2991,6 +3279,12 @@
         "M.EE.K.CC.7"
        ],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G2",
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1xOF-gwv7DuAWaAsoZuLKNXAMwECkAskE",
         "guide": "1mmyUW0amxkEb4OylZWqPc40puo8FXr5B",
@@ -3015,6 +3309,14 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1-JqI4-cD5YpujrdfzLbCp0t4r8sICgkJ",
         "guide": "1ooYsPG0oJu66PggGuQ1UxVU7QzeOeJBD",
@@ -3036,6 +3338,15 @@
        "ee": [],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1kjnTYFJN2BSWiRar0jawexGbestFpUtd",
         "guide": "1tlDXhUhLmtozIVTgc3qr4CjmkBrYuwJo",
@@ -3060,6 +3371,14 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1IpS6N_AyNqbMMPFvN7DkpPLi_MN2IkXz",
         "guide": "1U4mfOkoULsYJ-JQuDp9wiJaw22sXZmaM",
@@ -3181,6 +3500,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G1"
+        ]
+       },
        "drive": {
         "lesson": "1ZCKCph7tZxW3g0IYtsAqmxjXIQJ9dEbm",
         "guide": "1Wro5YsWOs8dI68IZVkhvXooES1s8eGuZ",
@@ -3241,6 +3565,14 @@
        ],
        "ee": [],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1YoMTBrjrdA9eNJKNFYPBHDjcNfWL-Zxw",
         "guide": "1h9XIKmQslrVqxCARgSexEf0fL1mQP8bT",
@@ -3326,6 +3658,14 @@
        ],
        "ee": [],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1_YhT8pm2O30ZUc4cMLVGkzzXe748PGc4",
         "guide": "1nhLYymNf7EaXX6tvWoyqRElgMi3M5Twu",
@@ -3373,6 +3713,14 @@
         "M.EE.K.OA.1"
        ],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1RlV3o1JPdicvvVsE2MURWiBJznFy-ySk",
         "guide": "1-u8pm-Zg5dCOWDaqLE9sIYFgtLdOF8sD",
@@ -3395,6 +3743,12 @@
         "M.EE.K.OA.1"
        ],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1TsC-urn-4BlA1nxY09sumYNOeeaJVrLV",
         "guide": "1FiQqlRoAo6kfHYnUdMqmqdegJGf7EySb",
@@ -3415,6 +3769,13 @@
        ],
        "ee": [],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G2",
+         "G3",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1DLfWFJG-U4Gekbu_qRu9zntwLDSqo7Rs",
         "guide": "1VnEZabYXwo7pXjHqZlS0w2OZoDj_fuAs",
@@ -3437,6 +3798,14 @@
         "M.EE.K.OA.1"
        ],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1L4RiQZGqBOXqHYCPofKEWBAR6agG7suj",
         "guide": "1GJOohcIiYPcthOdGCjD2GbPOWFMbUHQD",
@@ -3497,6 +3866,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G1"
+        ]
+       },
        "drive": {
         "lesson": "1V8YdXVSymRn77ukIyAj8BtnybUNtlQ8S",
         "guide": "1xvKGlXpujy1NHwjkBp-r5l6--DVTmAKQ",
@@ -3521,6 +3895,13 @@
         "M.EE.K.G.2"
        ],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G2",
+         "G3",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1txraQmfVSToyZG9UOzswhMj2q2faXgfC",
         "guide": "1GmSFOFVgE-yTHDAOuwYV8-DIM3IafEwc",
@@ -3545,6 +3926,12 @@
         "M.EE.K.G.3"
        ],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1QacvREv0n4jouq9ZXQPjlxudXOVaATFz",
         "guide": "1QAwqEpPqCeH-7-Lz-IfhKIPw-96jGkP5",
@@ -3573,6 +3960,13 @@
         "M.EE.K.G.2"
        ],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G2",
+         "G3",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1y2iCg4RAqaxq4g455TIKQzLEsSj9PU3d",
         "guide": "1jG6etGB0u88a0YW9m1gPh1VsK_FR6OlU",
@@ -3595,6 +3989,14 @@
         "M.EE.K.G.2"
        ],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1KUHBzHam3g-03tAlV8Ks10GBQc4G9f4G",
         "guide": "1zhkjdS9vEg8grhR8E4qUk73K-5jPEzKT",
@@ -3609,6 +4011,7 @@
      ],
      "supplements": [
       {
+       "id": "K|-|buildanddrawshapes",
        "title": "Build and draw shapes",
        "ccss": [
         "K.G.B.5"
@@ -3617,6 +4020,7 @@
        "note": "Awsaj-authored lesson that closes a CCSS standard WRM does not teach (site flag \"committee\"). Not a WRM small step."
       },
       {
+       "id": "K|-|composeshapesfromsmallershapes",
        "title": "Compose shapes from smaller shapes",
        "ccss": [
         "K.G.B.6"
@@ -3644,10 +4048,17 @@
        "ee": [
         "M.EE.K.CC.6"
        ],
+       "power": true,
        "flag": "native",
        "notes": [
         "CCSS K.CC.A.3 is 0-20, and K.NBT.A.1 covers teen composition — fits K."
        ],
+       "site": {
+        "supportIn": [
+         "G2",
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "12YxPGefKt9XybOsYOj8FWSwZQnNc0R5G",
         "guide": "1VkM4Pf6INAPhAw8WB48zvVbQ03Faa4-X",
@@ -3926,6 +4337,18 @@
        "notes": [
         "Above grade. Grade 1 content (1.OA.C.6). Substitute: more K.OA.A.5 practice within 5."
        ],
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G1",
+          "how": "copied-in",
+          "firstWeek": "W02"
+         }
+        ],
+        "supportIn": [
+         "G1"
+        ]
+       },
        "drive": {
         "lesson": "16KI3CUQv9BHsGJN6gxibfEcFh19gV47B",
         "guide": "1sg6ll2w2CroCpErqbABbv9h8ZZubuHVC",
@@ -3948,10 +4371,16 @@
        "ee": [
         "M.EE.K.OA.1"
        ],
+       "enrichment": "Grade 1 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G1"
+        ]
+       },
        "drive": {
         "lesson": "1hdVfL6UiYZHtzjSX3LIvF6LlOkAhjXpG",
         "guide": "1xHqFjtKvjd0pOokDt9hbhn4UaJQYbJZ1",
@@ -3974,10 +4403,16 @@
        "ee": [
         "M.EE.K.OA.1"
        ],
+       "enrichment": "Grade 1 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G1"
+        ]
+       },
        "drive": {
         "lesson": "1o4cyqpfA87NWOdjnlgDBh3xIkGHoRdLe",
         "guide": "14rzXSl3jCAPhvzPnqfOSd6eOCJ0yZ5dO",
@@ -4004,6 +4439,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1kdeBF4KVL379QCwk_4tz-UNKz2gGdflx",
         "guide": "1ZXFe4pCbgf-L4fdVhEmXO0lAq1MnMINm",
@@ -4030,6 +4470,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "19l2r_TQEfyv_t3zsr0Fc874IwpwJvUh3",
         "guide": "1ulTAu7Td0UKwXKl6JamEcikpD_79YChX",
@@ -4052,10 +4497,16 @@
        "ee": [
         "M.EE.K.OA.1"
        ],
+       "enrichment": "Grade 1 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G1"
+        ]
+       },
        "drive": {
         "lesson": "169yI-0N9ME-giBcuOpg-rpytU7zGcICW",
         "guide": "1Lmbo8vDlluzO9aN9PxAmw1xs0SpS8Whh",
@@ -4084,6 +4535,18 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G1",
+          "how": "copied-in",
+          "firstWeek": "W02"
+         }
+        ],
+        "supportIn": [
+         "G1"
+        ]
+       },
        "drive": {
         "lesson": "14vSRiXqqPEi8rkWSQOmPhDKg2H4WW8yw",
         "guide": "1-J8_VIHhyT_2VaW3jSxako1n37ULFNQ-",
@@ -4111,6 +4574,15 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "19MA57KuYWBDqpsXClLcKrKOMH8vaMbkF",
         "guide": "1mJUA-WVZQtNae2HBwLm8cXeHVxrGQNUf",
@@ -4137,6 +4609,12 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G1",
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1sZN-ek4gOpvb49IrxbUr2ZKBIp_a2oWm",
         "guide": "1AjlEu557gt8kPh2-W7f2SDZ52KxtrcBf",
@@ -4163,6 +4641,15 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1QJIuv8d1oe15jLnaqpQeb-nnImWPC_VR",
         "guide": "1qFXjaiVhWC0cbpgsq7Dd2ykOpUerwtx0",
@@ -4201,6 +4688,11 @@
        "notes": [
         "Above grade. Grade 1 content (1.NBT.A.1). Substitute: K.NBT.A.1 teen numbers practice."
        ],
+       "site": {
+        "supportIn": [
+         "G1"
+        ]
+       },
        "drive": {
         "lesson": "1CbzLJI8_9Jh4SJuTxibBtkb63xJk_Qn_",
         "guide": "1V7yzkURAV8hY1NzO4pyVKWhDiawjE4kA",
@@ -4230,6 +4722,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G1"
+        ]
+       },
        "drive": {
         "lesson": "11iwkwrIiS593d5GspZJ1xyokpQ18t1sy",
         "guide": "1URyLnNQofaqipyNUjwu6Zl6--VZtGBGv",
@@ -4257,6 +4754,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G1"
+        ]
+       },
        "drive": {
         "lesson": "15fmMFMG55yW8bX34uZLUIE-9VS9TxlP2",
         "guide": "1fnbF_GNOiMnMMjDBEfikVzQu_46oAaAm",
@@ -4285,6 +4787,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G1"
+        ]
+       },
        "drive": {
         "lesson": "1uWFfTFuZ1MFUgWIGkBqTTYwsH1QUJR8H",
         "guide": "1w1J1mGVj94bGKK_yyuPdbTAGAX3acBju",
@@ -4313,6 +4820,12 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G1",
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1yqPFHFrjaRkwSig2fMWdDI2jFLGDrH_l",
         "guide": "1zMoCH2bBV6SDQMN_kqMXgyMuND8YGlds",
@@ -4339,6 +4852,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G1"
+        ]
+       },
        "drive": {
         "lesson": "1gaJsX01fI9HMsoK7dkfJcG8kkI496Cou",
         "guide": "1wxeU1dUJzNvR9qtUqlYNGkvEPFrzmJ01",
@@ -4365,6 +4883,15 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1SVWdKdP_8rf_56dLXLMgnIRdjDvJvnhX",
         "guide": "1ruLwE4nQFjU3JWZkKq5zmBSz1n9DyoS4",
@@ -4429,6 +4956,12 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "1qVxIZPi8l2tTEic8Ba0bNwfIK7uVyN_Q",
         "guide": "1OwjIt8gQNd_hH9n60HD4UIkDqP50pqvh",
@@ -4456,6 +4989,15 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G1",
+          "how": "copied-in",
+          "firstWeek": "W20"
+         }
+        ]
+       },
        "drive": {
         "lesson": "1o_K2YXl2ptzw8N7MGxtqay1JDwc0aowb",
         "guide": "1QshOLxQnoLPkEzz6rubasjknjHAqYBSa",
@@ -4546,6 +5088,12 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2",
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1I7n2Hji7BiFNbhqVNw46BlAjRoodI6V8",
         "guide": "14x9M0uRpiKAm2NrmS9MFAo1GgIlWS-F3",
@@ -4643,6 +5191,13 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1bVrocaUDilBx4PV8UnxUWymTagQup0ME",
         "guide": "1VTkqdLkMcQtHxw-pm_ClnepqrLIDgaJ8",
@@ -4665,6 +5220,14 @@
         "M.EE.K.MD.2"
        ],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "15XarQxBvGy9C-QEFEwpnXKU5SFgg6lFe",
         "guide": "1L50DgB0wclQrqqmkygan8J6vuWYG_8NG",
@@ -4696,10 +5259,16 @@
        "ee": [
         "M.EE.2.OA.3"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "above",
        "notes": [
         "Above grade. Grade 2 foundations (2.OA.C.4); also Grade 1 introduction."
        ],
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "1Cau1h4THt8q1T5cxI0-nWKMjw09qBvrE",
         "guide": "1sl2IZ08soJSB8sBAYcSZdZ-6j18dDUHV",
@@ -4728,6 +5297,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "1fS3HKUgprUvmiU_miTdoaIU7SEZSzkIm",
         "guide": "1Ma62qQccr5sZwUjOFDzx5bS0uIvIkWf_",
@@ -4749,10 +5323,16 @@
        "ee": [
         "M.EE.2.NBT.2"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "1pPFPEJFhcr9SQyyWibCy8238YMDoVG1y",
         "guide": "1J1aHu6R09CA6bCIHTYCTdiQmK-4YAI0B",
@@ -4776,10 +5356,16 @@
         "M.EE.K.OA.1",
         "M.EE.3.OA.1"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1wkQmVbD6W6gVsze1dwh56TDkwbCWrVJ6",
         "guide": "1yhau654DbqlsE4qQo_uFPTIsZZfIWhAh",
@@ -4802,10 +5388,16 @@
         "M.EE.K.OA.1",
         "M.EE.3.OA.1"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1FmR0NSON7673odq21HsL4wFSGYng2By3",
         "guide": "1amrTZjeQVuoMucCoKsPdu6fx8Wd47xhW",
@@ -4829,10 +5421,16 @@
         "M.EE.K.OA.1",
         "M.EE.2.OA.4"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "1NexV3kHQy9gaoQcDLjOX6Kz_JzL7tAdd",
         "guide": "1VT1PJXt_sK-xVtunWd7iiFJoiY7WxlU3",
@@ -4859,6 +5457,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1szDbeGqVkqt0vc1gvrK3GhJ5jafXO-oT",
         "guide": "19AFRaNHEAGlC-OApvX6i5kNCktSycb9i",
@@ -4879,10 +5482,18 @@
        "ee": [
         "M.EE.3.OA.2"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1jIcFzqcJN9aO0AoVUAgEh09yppxeHfho",
         "guide": "1KjEIIQtvWSP6XiNp2XEXCQvHIOo1B4Da",
@@ -4904,10 +5515,19 @@
        "ee": [
         "M.EE.3.OA.2"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1z4S9IUpH2rp36CbKNk_LRn58syV-rPGL",
         "guide": "1kkVrYawDsjuUtLemInd0pOzy22qTyDow",
@@ -4938,10 +5558,16 @@
        "ee": [
         "M.EE.1.G.3"
        ],
+       "enrichment": "Grade 1 standard",
        "flag": "above",
        "notes": [
         "Above grade. Grade 1 content (1.G.A.3). Substitute: more K.G.B.6 compose-shapes practice."
        ],
+       "site": {
+        "supportIn": [
+         "G1"
+        ]
+       },
        "drive": {
         "lesson": "1cDk4ZXlhodrviAb-ff9FMdZahbsi73zS",
         "guide": "1fQJJ-JAS_4klF-CJZz3r-30wqsA2fU0N",
@@ -4963,10 +5589,17 @@
        "ee": [
         "M.EE.1.G.3"
        ],
+       "enrichment": "Grade 1 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "1BoVBm89I7LGKYySJdtnv56uU2LE2-g0D",
         "guide": "1gbBnnFgO3IAenbDOXEfjpp6roLr91NMS",
@@ -4988,10 +5621,16 @@
        "ee": [
         "M.EE.1.G.3"
        ],
+       "enrichment": "Grade 1 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G1"
+        ]
+       },
        "drive": {
         "lesson": "1rAsAJGVlUiEweZJwQyw4FB3U3v8wnLI0",
         "guide": "1fxxK7G5ewyT4Aw0pwnRpO4QR92CXNSFP",
@@ -5013,10 +5652,16 @@
        "ee": [
         "M.EE.1.G.3"
        ],
+       "enrichment": "Grade 1 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G1"
+        ]
+       },
        "drive": {
         "lesson": "1vjNfr7I2IL2Wp51W-PSOQvWEwvSs7G3h",
         "guide": "1ZtrlvPLhEZQgPm52o0TNloCpJhSr31kW",
@@ -5038,10 +5683,20 @@
        "ee": [
         "M.EE.1.G.3"
        ],
+       "enrichment": "Grade 1 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "10gG20Ucow1KGMdSDo5GtX0MTf7g9-_GY",
         "guide": "1n2Sl-IyggVksHRF5CdwFyVI0zPQ7CV-k",
@@ -5063,10 +5718,17 @@
        "ee": [
         "M.EE.1.G.3"
        ],
+       "enrichment": "Grade 1 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "1PnnkEHzDcEgdTS8Ia7yuMVGZx0w_XeZH",
         "guide": "173KBjtHcGF9pyTbXKvfO1nMzSk6ngqif",
@@ -5088,10 +5750,17 @@
        "ee": [
         "M.EE.1.G.3"
        ],
+       "enrichment": "Grade 1 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2",
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1P3izFSbnFVCIUp0TuS9nJW4fwABQ_NDP",
         "guide": "10VKG4hmTW2CNgzBLRfSSEdnvdF4UlOy7",
@@ -5113,10 +5782,17 @@
        "ee": [
         "M.EE.1.G.3"
        ],
+       "enrichment": "Grade 1 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2",
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1rdvN1NXB42GCNuy7tfvJRW4Z7Ga-dNkl",
         "guide": "19FTWV8lKZ3QoT3GszHLwo0RJ-btPUhxO",
@@ -5268,6 +5944,11 @@
        "notes": [
         "Above grade. Grade 1 content (1.NBT.A.1). Substitute: more K.CC.A.1 count-to-100 practice."
        ],
+       "site": {
+        "supportIn": [
+         "G1"
+        ]
+       },
        "drive": {
         "lesson": "1XwAf6uhp5Ty83fRJRcjQzzxSktpD4XM6",
         "guide": "1aOTV71Hzz1LAsoUYHVXW1_NmkwwoSLmV",
@@ -5297,6 +5978,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G1"
+        ]
+       },
        "drive": {
         "lesson": "1UHZ9QSuR8HNizdMqbCb6lFlu9UBxyPCZ",
         "guide": "1VHjdcRfjDJqZXdzDJHscDnx3QGIVhmSD",
@@ -5350,6 +6036,12 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "1vmtlIEC1nQk-CZsYPkDSOy5HEu4HGpZd",
         "guide": "1TF_G0wNAXyUsQJBpXR4_d-wggpigGIcB",
@@ -5396,6 +6088,7 @@
         "M.EE.1.NBT.2",
         "M.EE.1.NBT.3"
        ],
+       "enrichment": "Grade 1 standard",
        "flag": "above",
        "notes": [
         "Above grade."
@@ -5422,10 +6115,16 @@
        "ee": [
         "M.EE.1.NBT.3"
        ],
+       "enrichment": "Grade 1 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1W__ADQFtcgKFEaoJ70Dsycvhoobah9-b",
         "guide": "1Mus7jW06qKgE46Z5KjEu-gh2eg0FpH5s",
@@ -5451,13 +6150,13 @@
        "id": "Y1.B13.S1",
        "number": 1,
        "title": "Unitising",
-       "usAdaptation": "Taught in US dollars and cents at the school (WRM uses pounds and pence).",
        "ccss": [
         "2.MD.C.8"
        ],
        "ee": [
         "M.EE.2.MD.8"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "native",
        "drive": {
         "lesson": "16NCHThflVAoJE5-Rcon4zf1s1cix8LD2",
@@ -5481,10 +6180,16 @@
        "ee": [
         "M.EE.2.MD.8"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "above",
        "notes": [
         "Above grade. Money not in K CCSS; Grade 2 content (2.MD.C.8). Supplemental note needed: UK money. ⚑ ADAPT: Adapt before teaching: swap £ and p for dollars and cents, and UK notes and coins for US bills and coins (1c, 5c, 10c, 25c, $1, $5, $10)."
        ],
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "1pLbtLJHztdOnyx8rY-xrTIQMpm3gWg_H",
         "guide": "1BTXBuKH1V_36TEn4w_NpiuPpzBgFbTXI",
@@ -5508,10 +6213,16 @@
        "ee": [
         "M.EE.2.MD.8"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "above",
        "notes": [
         "Above grade. ⚑ ADAPT: Adapt before teaching: swap £ and p for dollars and cents, and UK notes and coins for US bills and coins (1c, 5c, 10c, 25c, $1, $5, $10)."
        ],
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "143i9YPLaA_f13jbahntuptZ1bDwo3pAu",
         "guide": "1pNaTPujWRRT4PYkDT6Nkt6n26wSh0NkA",
@@ -5537,10 +6248,16 @@
         "M.EE.2.MD.8"
        ],
        "power": true,
+       "enrichment": "Grade 2 standard",
        "flag": "above",
        "notes": [
         "Above grade. ⚑ ADAPT: Adapt before teaching: swap £ and p for dollars and cents, and UK notes and coins for US bills and coins (1c, 5c, 10c, 25c, $1, $5, $10)."
        ],
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "1q7OGgM0QmoqOXDQTvaHu27xKdKbIaeht",
         "guide": "1Pqw6L1oa1z_UVUw6K2eOFJ62hSXiNF8t",
@@ -5572,10 +6289,16 @@
        "ee": [
         "M.EE.1.MD.3"
        ],
+       "enrichment": "Grade 1 standard",
        "flag": "above",
        "notes": [
         "Above grade. Grade 1 content (1.MD.B.3). Substitute: K.MD.A.1 attribute description."
        ],
+       "site": {
+        "supportIn": [
+         "G1"
+        ]
+       },
        "drive": {
         "lesson": "14ZvZ3klAlXmo0EojcbqkmUHR8dH-d8Cw",
         "guide": "1KRY0auXYiUFFc2dWIEJzZmZKWbRSUsJG",
@@ -5594,6 +6317,7 @@
        "title": "Days of the week",
        "ccss": [],
        "ee": [],
+       "enrichment": true,
        "flag": "non-ccss",
        "notes": [
         "Calendar literacy; not a CCSS K-5 math standard.",
@@ -5617,6 +6341,7 @@
        "title": "Months of the year",
        "ccss": [],
        "ee": [],
+       "enrichment": true,
        "flag": "non-ccss",
        "notes": [
         "Calendar literacy; not a CCSS K-5 math standard.",
@@ -5644,10 +6369,16 @@
        "ee": [
         "M.EE.1.MD.3"
        ],
+       "enrichment": "Grade 1 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G1"
+        ]
+       },
        "drive": {
         "lesson": "11srFCIAmqN4aAjQsAql9rgvRgfnJwnEk",
         "guide": "1292KXxzRzsZwdEfrXBfT4FHVDC5HmV0Q",
@@ -5669,10 +6400,20 @@
        "ee": [
         "M.EE.1.MD.3"
        ],
+       "enrichment": "Grade 1 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1XixqcbAyO4k7t3-WomFXxzD54MI16mtd",
         "guide": "1ZtsRQSj1P5Tn1RPctnKsRwvTHjQ8l7ks",
@@ -5694,10 +6435,20 @@
        "ee": [
         "M.EE.1.MD.3"
        ],
+       "enrichment": "Grade 1 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G1",
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1-NkBa4wG_vznkW3bi73mcrLDp17ALV4p",
         "guide": "13j13HL7kXHrQ0PJ6RGqbUCTgGWujb9cJ",
@@ -5809,6 +6560,13 @@
         "M.EE.1.NBT.2"
        ],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "14_QsXBbpMHRrnvIDIURRrW-OiUimO780",
         "guide": "1yxnClJ4Pz2I8Fv-2ruKVLSRbgGvLXlSo",
@@ -5831,6 +6589,12 @@
         "M.EE.1.NBT.2"
        ],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3",
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1JVWbMd02374WuWu0TedxtTjMuWeBgoXl",
         "guide": "1nun28JREJMfA-5YMxVS1YSUUstcJ9bhm",
@@ -5928,6 +6692,11 @@
         "M.EE.2.MD.6"
        ],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1JYqkrEN_8y_9twpXEZzFtbqb2OQD4BXY",
         "guide": "1qeA0VPhW2CtqLEJUiCRI0vi0aKp97kYu",
@@ -5953,6 +6722,11 @@
         "M.EE.2.MD.6"
        ],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1jz0n7Cz45jgjNliGhbHonob9GzYodL3r",
         "guide": "1Vtl5S_F_whp9zx7mHuQMDI3RmX9LOU4h",
@@ -5977,6 +6751,11 @@
         "M.EE.2.MD.6"
        ],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1Fr5JoSoM9VaacgD_vrde5hR-Pt1vi2NJ",
         "guide": "1YxAlJSSMGTIEDRyWBFaFbqpwLz0dK_Lz",
@@ -6023,6 +6802,12 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "179LV8--KK8aONEFKisyLA-qzVMOYcgsc",
         "guide": "1GmYoz3CYqqu60TwQVpCMLAnC4kgQ0J-b",
@@ -6073,6 +6858,21 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G2",
+          "how": "copied-in",
+          "firstWeek": "W03"
+         }
+        ],
+        "supportIn": [
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1UehvNLosMAEFkWw-KN8877mwB0wLOcMH",
         "guide": "1r-ww2QY2UJcXfFSn5sAdsBySO2QjLLIL",
@@ -6097,6 +6897,13 @@
         "M.EE.1.NBT.1"
        ],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1LeKIEkW8V0e0z8jPJTCT6aAuCU_k1JmN",
         "guide": "1AiJnchl3_ljwNXObyD-KviQguA8cvd2c",
@@ -6111,6 +6918,7 @@
      ],
      "supplements": [
       {
+       "id": "G1|-|countonto120",
        "title": "Count on to 120",
        "ccss": [
         "1.NBT.A.1"
@@ -6164,6 +6972,11 @@
        "ee": [],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "12qNJ-qcuKxYxDaAqOu3Q3rlVkunW7yu3",
         "guide": "1fPMxRQnoeh78v-JpTjDERvvvWXaZhStl",
@@ -6185,6 +6998,11 @@
        ],
        "ee": [],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1ufO2O8IsL_zbrqT9BhpV3_teUXt2pLzJ",
         "guide": "1bBAJrzmEptjUq9fT9smLlDxuIOsM1owk",
@@ -6235,6 +7053,11 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1OaAhjS1Wk8ZOtBWgQcjyd2pWyCDRQx7k",
         "guide": "15KY9TuSuBJAPGHtsxH2lkb9JMu9K-jV_",
@@ -6419,6 +7242,13 @@
        "ee": [],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1Bvl4sMRys3EMg4tpBeLIpzcAJmyforh-",
         "guide": "1KobKAvapaNrc3b-DI1Ncc8RNddTGY4tl",
@@ -6444,6 +7274,13 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1eawuhA1x23csKlQRUadHckiqDfscJU1H",
         "guide": "1CpmjNafNR79MO3hje0zZyge2OvMiHurb",
@@ -6490,6 +7327,13 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "17sqVMHXMPSCHwWZROql-_h-mXCTZgqAG",
         "guide": "18CIL_q0ykuia39xlY2VXmW2KxwN9tOLr",
@@ -6606,6 +7450,13 @@
        ],
        "ee": [],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1xi34CW2wbRD57ZLzcqct61avI1XzRjGQ",
         "guide": "15vzfHtRa7gL-DSHEDrhhiCganYbfvfL1",
@@ -6663,6 +7514,15 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "K",
+          "how": "copied-in",
+          "firstWeek": "W28"
+         }
+        ]
+       },
        "drive": {
         "lesson": "1bR4j2h1Tw_hl4nls6peIzU4O2aDxcZJX",
         "guide": "1_VCcCRUxkBypgD1vYi9fMbPjgQ9_xJBC",
@@ -6686,6 +7546,18 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "K",
+          "how": "copied-in",
+          "firstWeek": "W28"
+         }
+        ],
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "18JYQSZRyptHqrZP4YElM1qgDUQQDGvlZ",
         "guide": "1AKFyYkrt0kxC2hFvVxfEzwLa7hajau1e",
@@ -6712,6 +7584,11 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1yQITR3f-UITsXaAyBa9nZ8YHXZr3VJvW",
         "guide": "1U4rT-GkWJSSHO5qiZruTIvwx2OuNpZm_",
@@ -6740,6 +7617,12 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1lVcu57VfnNF3VzZs7vLP499PWWBiBAxq",
         "guide": "1PNkVsauJOQjcRLREKu7pwrdwbu0VxZ2z",
@@ -6768,6 +7651,12 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1l3r-ecy-8s1jOmSyhGBIh-snlVi-ttdD",
         "guide": "1f0U7BSc9eF8bXzmJGe-fFZVjyQCB0s23",
@@ -6817,6 +7706,12 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "15At5X8zaReL79RD1HM_bI-jmC6a8N0q8",
         "guide": "1kB52LXv0nrCkVY2o-f3n-TJeqN3SICIL",
@@ -6842,6 +7737,12 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "18T8MaPU6MIIeYHWlJc4yckmxSR2A8mF9",
         "guide": "1a0SMCT1L1cNrgOkqq0uF_ScdMldhtIta",
@@ -6867,6 +7768,12 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1IEgWB48xpSwJmlKh70Vq43f6CxGXsISy",
         "guide": "1--9p-U035OW3_mqTuTza7LnGg_0Y71J2",
@@ -6928,6 +7835,7 @@
      ],
      "supplements": [
       {
+       "id": "G1|-|composeandrecomposeshapes",
        "title": "Compose and recompose shapes",
        "ccss": [
         "1.G.A.2"
@@ -6958,10 +7866,24 @@
        "ee": [
         "M.EE.2.MD.8"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "above",
        "notes": [
         "Above grade. Money is CCSS Grade 2 (2.MD.C.8). Substitute: more 1.MD.A measurement practice. ⚑ ADAPT: Adapt before teaching: swap £ and p for dollars and cents, and UK notes and coins for US bills and coins (1c, 5c, 10c, 25c, $1, $5, $10)."
        ],
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G2",
+          "how": "copied-in",
+          "firstWeek": "W19"
+         }
+        ],
+        "supportIn": [
+         "G2",
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1K48vgFnN9I50vsSkj3zdSYwwE0q7sxJF",
         "guide": "1_Qwlh2dPY9lkRC8W7NL_5rzbwiUJRfBB",
@@ -6985,10 +7907,24 @@
        "ee": [
         "M.EE.2.MD.8"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "above",
        "notes": [
         "Above grade. ⚑ ADAPT: Adapt before teaching: swap £ and p for dollars and cents, and UK notes and coins for US bills and coins (1c, 5c, 10c, 25c, $1, $5, $10)."
        ],
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G1",
+          "how": "review",
+          "firstWeek": "W28"
+         }
+        ],
+        "supportIn": [
+         "G2",
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "163eLZG6LVZyAum5aa4VIwg9GpLfIk1ly",
         "guide": "1-EzOv34a_VZ8azZKojnBSsNgOwB2BIPs",
@@ -7004,13 +7940,13 @@
        "id": "Y2.B4.S3",
        "number": 3,
        "title": "Count money - pounds and pence",
-       "usAdaptation": "Taught in US dollars and cents at the school (WRM uses pounds and pence).",
        "ccss": [
         "2.MD.C.8"
        ],
        "ee": [
         "M.EE.2.MD.8"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "native",
        "drive": {
         "lesson": "17w8p-FXqaUhr84pE123mt49gh_7LFeCr",
@@ -7028,13 +7964,13 @@
        "id": "Y2.B4.S4",
        "number": 4,
        "title": "Choose notes and coins",
-       "usAdaptation": "Taught in US dollars and cents at the school (WRM uses pounds and pence).",
        "ccss": [
         "2.MD.C.8"
        ],
        "ee": [
         "M.EE.2.MD.8"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "native",
        "drive": {
         "lesson": "13Jdl7mUZzssVAEFCekEFSyQ36tXYnk6g",
@@ -7060,10 +7996,16 @@
        "ee": [
         "M.EE.2.MD.8"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "above",
        "notes": [
         "Above grade. ⚑ ADAPT: Adapt before teaching: swap £ and p for dollars and cents, and UK notes and coins for US bills and coins (1c, 5c, 10c, 25c, $1, $5, $10)."
        ],
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "1WEW0LXDE4RRcRJ5_LBKzkUQjGEx2tqHH",
         "guide": "1lFGWzvRyCHks1juv0pR7jBcCcthQvgh1",
@@ -7088,10 +8030,16 @@
         "M.EE.2.MD.8"
        ],
        "power": true,
+       "enrichment": "Grade 2 standard",
        "flag": "above",
        "notes": [
         "Above grade. ⚑ ADAPT: Adapt before teaching: swap £ and p for dollars and cents, and UK notes and coins for US bills and coins (1c, 5c, 10c, 25c, $1, $5, $10)."
        ],
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "1ZqqT3vilcgsUMXIrSdZvP-ZmGpL-XV0B",
         "guide": "1OPe27Mn2UbZkfG9BWn-sqVhNYN2bAlSe",
@@ -7107,13 +8055,13 @@
        "id": "Y2.B4.S7",
        "number": 7,
        "title": "Calculate with money",
-       "usAdaptation": "Taught in US dollars and cents at the school (WRM uses pounds and pence).",
        "ccss": [
         "2.MD.C.8"
        ],
        "ee": [
         "M.EE.2.MD.8"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "native",
        "drive": {
         "lesson": "1GdZ6iVzRVQumx8uvCoMoDDSNVgN7lYqA",
@@ -7130,14 +8078,19 @@
        "id": "Y2.B4.S8",
        "number": 8,
        "title": "Make a pound",
-       "usAdaptation": "Taught in US dollars and cents at the school (WRM uses pounds and pence).",
        "ccss": [
         "2.MD.C.8"
        ],
        "ee": [
         "M.EE.2.MD.8"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "19ZphfaqbdiKYF9MmUnwHEC0kY6waa4CV",
         "guide": "1ghhtARWYyol5DiNvWM8WC7USJlzj3qyf",
@@ -7163,10 +8116,16 @@
         "M.EE.2.MD.8"
        ],
        "power": true,
+       "enrichment": "Grade 2 standard",
        "flag": "above",
        "notes": [
         "Above grade. ⚑ ADAPT: Adapt before teaching: swap £ and p for dollars and cents, and UK notes and coins for US bills and coins (1c, 5c, 10c, 25c, $1, $5, $10)."
        ],
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "1eZAtOq3P_Qgaryb5fHGe6p0iGxqkYOcT",
         "guide": "1VpkE2hba2Iypbr5e-gQU43tnVlINs9Zd",
@@ -7190,10 +8149,16 @@
        "ee": [
         "M.EE.2.MD.8"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "above",
        "notes": [
         "Above grade. Auto-matched by keyword scan; verify. ⚑ ADAPT: Adapt before teaching: swap £ and p for dollars and cents, and UK notes and coins for US bills and coins (1c, 5c, 10c, 25c, $1, $5, $10)."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1kZxKqy4AI-FkmuLr4bosDdjSlwXrA9VT",
         "guide": "1EidIoxTp0YfPCUe52JuJfB3rJTAjRS4H",
@@ -7226,10 +8191,16 @@
        "ee": [
         "M.EE.3.OA.1"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade. Multiplication/division is Grade 2/3 CCSS. Substitute: 1.OA.C.6 fluency."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1DldVI3cQiombjablgIlJUk_06fSzbnda",
         "guide": "1S0j2hBNdcNiylsgMfwYtinCyLFyeATrL",
@@ -7251,10 +8222,16 @@
        "ee": [
         "M.EE.3.OA.1"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "16GM7GKW_3v2y5Xm_UkYKjKJcntyjSRYo",
         "guide": "1fjs1C_f3SC2aqmIoeyzclgI-OXBSmeme",
@@ -7278,10 +8255,16 @@
         "M.EE.2.OA.4",
         "M.EE.3.OA.1"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "17wPrinnxoHjVbN4IxFF23h1N82NAy_ef",
         "guide": "1Ni6i4CsSHdrcitGxEThGelV3lu6ir9zD",
@@ -7303,10 +8286,16 @@
        "ee": [
         "M.EE.3.OA.1"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "1M4omsZVKShFiUfyAIVeTL42eagYJwDtD",
         "guide": "1zEBLRy3Mr5dKgad01CKdoyEOISxdwsol",
@@ -7328,10 +8317,16 @@
        "ee": [
         "M.EE.3.OA.1"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "1zfSBkFrq2HRpY6Jtv17cssoE-WyC9eSC",
         "guide": "1AB8gvEK7-qUX-6IqqV43MSrQvET47BG1",
@@ -7356,10 +8351,16 @@
         "M.EE.2.OA.4",
         "M.EE.3.OA.1"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "15CvDDrvRK5B-vElR9uZ_IaommlZQD1Sj",
         "guide": "1406QsptGJmqbj4tDb_z5Ip3p6IKrUCRA",
@@ -7381,6 +8382,7 @@
        "ee": [
         "M.EE.3.OA.2"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "native",
        "drive": {
         "lesson": "1wc3uaQeEogj-X-BuH_TBrFd_LEzrtfRI",
@@ -7403,7 +8405,13 @@
        "ee": [
         "M.EE.3.OA.2"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1ov23QxIKdIlisQJsQctjPLvuTp3AcnqD",
         "guide": "1_o14aPlDHHUOzcUBNHJywfQ5IZI38mrI",
@@ -7427,10 +8435,16 @@
         "M.EE.2.OA.3",
         "M.EE.3.OA.6"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "1C7TAsc0ejKs9H15mMlTAxYVjw_oZ8kCj",
         "guide": "1NpQ0pHJkU4aVY9eZ9v_vXYoRNOR-ZQUq",
@@ -7455,10 +8469,16 @@
         "M.EE.3.OA.2",
         "M.EE.3.OA.6"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "10v6DXbAZO80W1BHYAqd4j1rF6OUzrRG2",
         "guide": "1h0KUicZAveF5lK1QiY-W7dggrN1eCH_5",
@@ -7484,7 +8504,21 @@
         "M.EE.3.OA.1",
         "M.EE.3.OA.2"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "native",
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G2",
+          "how": "copied-in",
+          "firstWeek": "W12"
+         }
+        ],
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "15Ad6KB8Ux3lQ-CQ1VuW2mAtTBce9y98_",
         "guide": "1HKzE47va5dWHzDhqmRlJIZN-eDhxWxvd",
@@ -7506,10 +8540,16 @@
        "ee": [
         "M.EE.2.OA.3"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "1vFsEy9gTphLVMjX8_WoCT014NJU13xMT",
         "guide": "1uON1ww1mraV8ddFVN5d2YcQarYarB73Q",
@@ -7533,10 +8573,19 @@
         "M.EE.2.NBT.2",
         "M.EE.3.OA.6"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1PBeIVGukQPTmENYLmXuUEAI0gy8ZLrpt",
         "guide": "1awOOhPgSxPkgn2Dz_K6e4xeL7ZwlMrFm",
@@ -7560,10 +8609,18 @@
         "M.EE.3.OA.2",
         "M.EE.3.OA.6"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1-ISL8fbDIGjGObDlJxcnxBUZoLVz24sZ",
         "guide": "1N8UpHiozCn7kIVvtdZFpH-p5c5XgxqVy",
@@ -7587,10 +8644,16 @@
         "M.EE.2.NBT.2",
         "M.EE.3.OA.6"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "1vqLB0ZOakvA0NIdOyIxhPBZfvhlnc_XZ",
         "guide": "15B8AJrGmSKUk9qXml-BRz2g7mj65vP1p",
@@ -7615,10 +8678,19 @@
         "M.EE.3.OA.2",
         "M.EE.3.OA.6"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2",
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1fjXTgK5HPyIgFQszxLGkYMuflNRgbi6K",
         "guide": "1YL77z0ORC8NPqEPXUSxFZ0t4Xse24Rfa",
@@ -7642,7 +8714,22 @@
         "M.EE.2.NBT.2",
         "M.EE.3.OA.6"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "native",
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G3",
+          "how": "copied-in",
+          "firstWeek": "W01"
+         }
+        ],
+        "supportIn": [
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1FCmPzqTWbIA6rRbXB-U3y0Tgnq1pj6A0",
         "guide": "1SkQDbVfwEUcjrO-BL8a97Vfq9KgqKr72",
@@ -7682,6 +8769,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1BsD_uGrruuuXd_hbA-nSEbMAkLbkNE0O",
         "guide": "18s8c-MEjOLiHekRUjp08pxMcp2-kxyV3",
@@ -7711,6 +8803,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1wJl-yAyG6qsUbX6zCIfa4sUnt6-Xoa_x",
         "guide": "1KwLDvHEJw89TdU5MMdAtCtzonxvINpYG",
@@ -7740,6 +8837,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "1Q41RtgvkBaHH8QggakfCRrzQNBw30E6-",
         "guide": "1Zj66oiG6psJ7RluYTCG3XlbHLtGUVMRs",
@@ -7769,6 +8871,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "15uezwK9U67Ui9wTq0NQTzqCm_WD4RV38",
         "guide": "1-jb38S7hYc78FwjOFxnMnZ-w_hbJ6BPt",
@@ -7790,6 +8897,7 @@
        "ee": [
         "M.EE.2.MD.5"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "native",
        "drive": {
         "lesson": "1w84RMiJLZGPUNSEzAHydK-zXNL43AIyy",
@@ -7851,10 +8959,16 @@
        "ee": [
         "M.EE.3.MD.2"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "14rqQU5yWtZZd4veH_wwOAbfBWHC5gC0F",
         "guide": "104lSYhH8nCZVqaF_fFPrw4Ytt1oPdMXc",
@@ -7877,10 +8991,16 @@
        "ee": [
         "M.EE.3.MD.2"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "12LsHP99FbjA2B_NOWgnW_FA96hOI7cFY",
         "guide": "17SLxNeUEKNwvt6eTaStcC1HKGpJRknmO",
@@ -7902,6 +9022,7 @@
        "ee": [
         "M.EE.3.MD.2"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "native",
        "drive": {
         "lesson": "1NIuqVWuuUutJHxUhDwpCTMv1uK0IaTZy",
@@ -7931,6 +9052,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1qJUyroJQpzc9BnDY6N51orZ0aB0ZR93S",
         "guide": "1IDLc0SvrcNTyTlZDJN-6egq39AB5bpTD",
@@ -7953,10 +9079,16 @@
        "ee": [
         "M.EE.3.MD.2"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "101Oj0ynKr03sGupsEuCMAjPxErDZbb_e",
         "guide": "1whQ1SJZMkCo18lZLC1_us1myaFEGai8m",
@@ -7978,10 +9110,16 @@
        "ee": [
         "M.EE.3.MD.2"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1Pz_n_ZkMU0tNwvniL3Vs_TYn3ILk-TXP",
         "guide": "1tsrI5Ozt4g53ZzWoq-YbdazlGO-Aio0G",
@@ -8003,7 +9141,13 @@
        "ee": [
         "M.EE.3.MD.2"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1TF18_vF6xlKLxGto1vCGZI7k58zOaepy",
         "guide": "1-1Du9ih_-_A-SLJhEHBp7srdpqXaGN1Y",
@@ -8021,6 +9165,7 @@
        "title": "Temperature",
        "ccss": [],
        "ee": [],
+       "enrichment": true,
        "flag": "non-ccss",
        "notes": [
         "(needs manual review). ⚑ ADAPT: Adapt before teaching: read thermometers in degrees Fahrenheit alongside Celsius.",
@@ -8083,6 +9228,15 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G2",
+          "how": "copied-in",
+          "firstWeek": "W26"
+         }
+        ]
+       },
        "drive": {
         "lesson": "14rujD51IZKc3F2BcKaD-qwhH9eG177rl",
         "guide": "1pkiPMM0oT-NX38zM_wx7irvV650h5otl",
@@ -8155,6 +9309,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "1gOg5Ah0OPKIebBnXhDmB_HWZcp5Y068Q",
         "guide": "1NvQehzfU1OFC6lHhDDm2PdQQwkv0o1rb",
@@ -8181,6 +9340,13 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "10dCcZ80O7VNDRVZrZ58JxZ_x4AzwrtSH",
         "guide": "1h-5B20XGEQeVZ9FgY0p-Oezd_Z74GLAf",
@@ -8200,6 +9366,7 @@
         "2.G.A.3"
        ],
        "ee": [],
+       "enrichment": "Grade 2 standard",
        "flag": "native",
        "drive": {
         "lesson": "12pU12zkmMKkrlRJBMKzEkWf3Ej0Sgc5H",
@@ -8220,6 +9387,7 @@
         "2.G.A.3"
        ],
        "ee": [],
+       "enrichment": "Grade 2 standard",
        "flag": "native",
        "drive": {
         "lesson": "107GU7Jhhv7RxWEvj0-dayszNnJBS75np",
@@ -8244,6 +9412,12 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1iqYfI3Gsjx9-End0D5xNEdRXxv46KGCc",
         "guide": "1nR-0GvnEkO6035VOa6jIyT0yVM4lpa8d",
@@ -8272,6 +9446,12 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1aZa8duQNc927uo177cf8iHiNK7ADp2Cd",
         "guide": "1coW1edHMdEfdHv8kXS5Hq9_OVKZMuRVO",
@@ -8293,10 +9473,16 @@
        "ee": [
         "M.EE.3.NF.1"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "13jrx8LumByVZSN8y7k5w5iObAizMYL_h",
         "guide": "1mfH8jsTQnorq7t0eg4yy_B-UHpw37gZI",
@@ -8345,6 +9531,11 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1RoTDKBbIVzArLpH-KREHh0YzN_Iws0L4",
         "guide": "1YEgaCifadLVul74dO_T8TDFiqgWyp7H-",
@@ -8366,6 +9557,7 @@
        "ee": [
         "M.EE.3.NF.1"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "native",
        "drive": {
         "lesson": "1XFdRjPjTf_4uGzBhNMAtOlaArYrjTj7G",
@@ -8390,7 +9582,15 @@
         "M.EE.3.NF.1",
         "M.EE.3.NF.3"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1DZ63GZZzByQym1uH5Du_6WNSJgLi3Axc",
         "guide": "1UXb4rCWZwUuoW8kVHD5_ut5zHPWtwA1N",
@@ -8445,10 +9645,16 @@
        "ee": [
         "M.EE.2.MD.7"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "1C7IVU9sJ63Kma0fhZQUzpJF_vVcYhdOi",
         "guide": "1ZgsJP1Xx6KEdlVzalX8-BxFD_maP1UKb",
@@ -8470,7 +9676,13 @@
        "ee": [
         "M.EE.2.MD.7"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1oG8O4kn1TS8Wh3ElDFrvFvl7aGQzzyif",
         "guide": "1g042dE4IgulLXXBNLhVfARtw_kJAIC7K",
@@ -8492,7 +9704,13 @@
        "ee": [
         "M.EE.2.MD.7"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1dDBUok7p_XDhFf2qCMlZZN8-A4k5bMYK",
         "guide": "1KW5V0nXD6mc6ZAqxU8FmfhlOn1zXjEoz",
@@ -8514,10 +9732,18 @@
        "ee": [
         "M.EE.2.MD.7"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2",
+         "G3",
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "18dIBc3rfb_2aV9qwW_J0-cB4N4UMFqJK",
         "guide": "1SWCGJlVKz0jaHm5UHeRvW06Togot6UH0",
@@ -8543,6 +9769,13 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1z2qQk2dBYF8lK0V5jarCChZeX4UcRpCG",
         "guide": "1ssJtG-lntVij4QfbLOR3XWZMDaSElvt4",
@@ -8566,6 +9799,11 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "18bygUcqAL0VUMXm_Idotz_ULbyPbqPxB",
         "guide": "1cjZSHUTLgSCMbQMhV__qAERK77Z8njG8",
@@ -8647,6 +9885,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1hbUEyb8_spNwpJU52angbovlDNnTxvPe",
         "guide": "1gWazVcr2ut4oWjEIM2AYLj8prc_Zm27V",
@@ -8674,6 +9917,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "1yn4SB2Gdw6pcV1hk-pKhoD0d2h4yro44",
         "guide": "1ZNnjpXTfajBk93LZBelam87ywKS0SQwz",
@@ -8701,6 +9949,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "18LydrBLdbIieXeQnioK9ARMssMpTNp1y",
         "guide": "1qvJALasAGpKEhw5uGvGEsGr_CrncCK4o",
@@ -8725,10 +9978,16 @@
         "M.EE.2.MD.10",
         "M.EE.3.MD.3"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2"
+        ]
+       },
        "drive": {
         "lesson": "1u9kuT1R5nkI9hm4D0Hq_smKM_8QZOsFc",
         "guide": "1gStluqwt3SKQJAbjWjq2BqiZJjOHwfOZ",
@@ -8753,10 +10012,18 @@
         "M.EE.2.MD.10",
         "M.EE.3.MD.3"
        ],
+       "enrichment": "Grade 2 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G2",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1ZJf3W3rOttYRynqE5GiITc-o8wz_hkO8",
         "guide": "1jdwlOhCK5mnVd40yIeQ3She8pkmJfruU",
@@ -8877,6 +10144,11 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "19JzuW2w01WcfCsGUyrTVllDm6SiXGHtp",
         "guide": "1btJ_E1Y8Y_w5k-55l7czaqImEhWOcMDp",
@@ -8945,6 +10217,11 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1GqW78uaKHuRwqTYGB9dfkc4utIwvahX5",
         "guide": "1hbi0u4QvELpiMTMpBcoWdwG_VyT3JZta",
@@ -8970,6 +10247,12 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1-nzFInI83EHWnkbEf89BY73yA49iSm_v",
         "guide": "1x2flj2MMypwUUigxeARcNBJ8NR0LZ2CZ",
@@ -9044,6 +10327,11 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1CLNWzQlM86pOmHBhh3xj2tF3ZWBfGeT-",
         "guide": "1UO7oSoO5zM6DcW66DDh9x6yo30emKNQV",
@@ -9090,6 +10378,11 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1EW6oq8fnSaDRz_bUumxYLAiRi43-YvTB",
         "guide": "1fzz0WO-ZdHz3WZ54autDR7EkD7KGv-fg",
@@ -9138,6 +10431,12 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1A5NoseuFSwdUe1y1ZUxqhHWSp4sR2PVD",
         "guide": "1PQG12_tKuZELQxkytFsyJsnlXwskdQ2y",
@@ -9163,6 +10462,12 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1lSkdgrLt0-jiS9uRbTqLZ_4USWjUXWZp",
         "guide": "1BgdOIiGTJE9uTseZXhaouZDlnrbjRn3K",
@@ -9186,6 +10491,12 @@
         "M.EE.2.NBT.4"
        ],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1l4PFgZ9sLT3cv8U2O35sfUdGMBF7a_0N",
         "guide": "16WYRIedAWhiE-x5JxDXydO9nOF5Ymr_X",
@@ -9208,6 +10519,12 @@
         "M.EE.2.NBT.4"
        ],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1jEVmfUzwBjc1Di1EzSpmi0cNlN_d6w-3",
         "guide": "19OKNVZC5rF8PRIBaRZgGWqgzj_g_yGq0",
@@ -9626,6 +10943,11 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1FsK-LuNnPzIt8MdCuL1YrtYXEKINlSvI",
         "guide": "1wdd7aoCJMe_fWDXEJMg_uVMV3WV0k9QS",
@@ -9649,6 +10971,12 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1g-jMciKuVOm4HJryrOwSHjmH0UFcedoq",
         "guide": "1FmPDrtVBe6XTAApR6rNBHSTshb4CIGQx",
@@ -9672,6 +11000,12 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1_ogicWxp-lb2ZzaOHleg8RLksOg5uCvc",
         "guide": "1m_VV9_WgeBEZbV1_yOPaXfi4mAUUin42",
@@ -9695,6 +11029,12 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1UxDSVkwpOl-jJdm1pDK2Lvbf96OmlXzd",
         "guide": "1v6YgZjr2ayQZaqhQsqSOqz1zqI2g01Zt",
@@ -9721,6 +11061,12 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1ckikAKE7HiI8AFx0ubncrbodA2RxzU_X",
         "guide": "1lVOCsJVcPV_OaxXP-FKb1m_2i7ztHT94",
@@ -9747,6 +11093,12 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1K580npaiv9Ue6HznNpwjGRE_C3rfqoFp",
         "guide": "1_bdxlarrXWPIYQ2KA-mOeo6HAnDhR8JI",
@@ -9787,6 +11139,7 @@
      ],
      "supplements": [
       {
+       "id": "G2|-|adduptofourtwodigitnumbers",
        "title": "Add up to four two-digit numbers",
        "ccss": [
         "2.NBT.B.6"
@@ -9797,6 +11150,7 @@
        "note": "Awsaj-authored lesson that closes a CCSS standard WRM does not teach (site flag \"committee\"). Not a WRM small step."
       },
       {
+       "id": "G2|-|solveonestepwordproblemsusingbarmodels",
        "title": "Solve one-step word problems using bar models",
        "ccss": [
         "2.OA.A.1"
@@ -9805,6 +11159,7 @@
        "note": "Awsaj-authored lesson that closes a CCSS standard WRM does not teach (site flag \"committee\"). Not a WRM small step."
       },
       {
+       "id": "G2|-|solvetwostepwordproblemsidentifyingbothoperations",
        "title": "Solve two-step word problems identifying both operations",
        "ccss": [
         "2.OA.A.1"
@@ -9838,6 +11193,18 @@
        "notes": [
         "Above grade. Multiplication as repeated addition is Grade 2 (2.OA.C.4); full mult/div is Grade 3."
        ],
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G3",
+          "how": "copied-in",
+          "firstWeek": "W01"
+         }
+        ],
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1hPlDB8c8NKAUDcfNZqmdHvLoCr9bzIMS",
         "guide": "15Z2bb9wZVqOppCuNmFlG3Xxm9tcXlx91",
@@ -9929,7 +11296,17 @@
        "ee": [
         "M.EE.3.OA.2"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "native",
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G3",
+          "how": "copied-in",
+          "firstWeek": "W01"
+         }
+        ]
+       },
        "drive": {
         "lesson": "1m5IXLl8l8AEm5Vym0RZfL_4szDP1B00-",
         "guide": "1vPZ1yGQ5xMZtFxCRM1a_prflKbkHYBgg",
@@ -9980,6 +11357,7 @@
         "M.EE.3.OA.2",
         "M.EE.3.OA.6"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "native",
        "drive": {
         "lesson": "1q_8OiJf__QAi9DhRR2iWVOHCrbVnfjAy",
@@ -10054,6 +11432,7 @@
         "M.EE.3.OA.2",
         "M.EE.3.OA.6"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "native",
        "drive": {
         "lesson": "1KEiMbJ4FWLx0gJvY6hqdgXqt8pR1BrDR",
@@ -10102,6 +11481,7 @@
         "M.EE.3.OA.1",
         "M.EE.3.OA.6"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "native",
        "drive": {
         "lesson": "1HeQaAPA_NXKH3H13nP2W4mDgIZDmm3AH",
@@ -10127,6 +11507,7 @@
         "M.EE.3.OA.2",
         "M.EE.3.OA.6"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "native",
        "drive": {
         "lesson": "1lBVDQrVP9NGWVDhVJLqmWsDx7CvGWeFR",
@@ -10149,7 +11530,17 @@
        "ee": [
         "M.EE.3.OA.6"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "native",
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G3",
+          "how": "copied-in",
+          "firstWeek": "W01"
+         }
+        ]
+       },
        "drive": {
         "lesson": "1-S1nKX0eTGSug7onGqsMg5QaPeYJuvC1",
         "guide": "1LjbB80i83ydY9vBCB4kOJzTpDxtKwF6k",
@@ -10172,7 +11563,17 @@
        "ee": [
         "M.EE.3.OA.6"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "native",
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G3",
+          "how": "copied-in",
+          "firstWeek": "W01"
+         }
+        ]
+       },
        "drive": {
         "lesson": "1C8VeUnPhiop8GYubDinC9Ce82U-zf_EF",
         "guide": "1vT-Qh4ujkJhdlcH_CalkUYdhCwtx94g9",
@@ -10187,6 +11588,7 @@
      ],
      "supplements": [
       {
+       "id": "G2|-|oddandevennumbers",
        "title": "Odd and even numbers",
        "ccss": [
         "2.OA.C.3"
@@ -10241,10 +11643,16 @@
        "ee": [
         "M.EE.3.NBT.3"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1MKyq0uVPFVLcXO8qA9Bc83klBuF_RShs",
         "guide": "1YDEb5doFsCSXGyWM4vHMwXB5KDQ063MW",
@@ -10288,10 +11696,16 @@
         "4.NBT.B.5"
        ],
        "ee": [],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "15L8hWEHlWmdKwXIa5pLorjKCtcPk627-",
         "guide": "19EyEalno4rbZIC5Xt_zzf7fJwf7hP541",
@@ -10312,10 +11726,16 @@
         "4.NBT.B.5"
        ],
        "ee": [],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "13LfG9I9zQpYYpaOteAO60_r-PEPK_oEJ",
         "guide": "1YsucYXiBWLFcvZomXOr8yOaXcoO7CB_w",
@@ -10338,10 +11758,17 @@
        "ee": [
         "M.EE.3.OA.6"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1QlFSCjMvzBjpAuqZ9KqqtP-B5BYqfuzt",
         "guide": "1a0oaIvQUwoZdwJlofPeOGhvLKnH3Zv6J",
@@ -10364,10 +11791,16 @@
        "ee": [
         "M.EE.3.OA.2"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1-6mDUduNZhRzNOdC55RQBYWP4Chq1OXh",
         "guide": "1Lhcz-Z3YvkX0H0t6xLXZpGFbV6yIL8E_",
@@ -10391,10 +11824,16 @@
        "ee": [
         "M.EE.3.OA.2"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1gO5zv0ZQlf6EmYX_6S5VITk4Ou1HeZTn",
         "guide": "1HYXlsk8qb5urBO4-CXbCr_oGdLQUkw1s",
@@ -10417,10 +11856,16 @@
        "ee": [
         "M.EE.3.OA.2"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1GsQbTDY_a4T4FOYyT64w6WmekAwHsUn8",
         "guide": "1ZhW1clajsO2efmAs8H1eUDcn3Cdb8gve",
@@ -10444,10 +11889,18 @@
         "M.EE.3.OA.1",
         "M.EE.4.OA.1"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1QmXk0pVlC4gF6FxYUcC_puDmM_MYPdxB",
         "guide": "13-thVu5zDuvSzW3-YLKxuJ7EQWrFofU6",
@@ -10467,10 +11920,18 @@
         "3.OA.A.3"
        ],
        "ee": [],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "14MpBF_GT_fAaMYn-n_WjqNOVOUJm2SKz",
         "guide": "1zFWMqfYad65Ox5iR1_PXm7P4oq8veoJS",
@@ -10510,6 +11971,11 @@
        "notes": [
         "Above grade. Perimeter is Grade 3 (3.MD.D.8). Length measurement fits Grade 2 (2.MD.A)."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1SJAVbqZNNp4ukuzgOPF9kia3qv65JqtP",
         "guide": "1QSPdzx44XTmJ9PK6lBMsO63wL30SuQwT",
@@ -10564,6 +12030,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1XQPzB4NSiVAVxghQWx_tqRwkfniFx6bV",
         "guide": "1OZVviIOocMvOlwtkNCRtmFquojgf1kHS",
@@ -10592,6 +12063,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1iPk-deK87Fwxs-XfadZiT1y3e7D8YgWE",
         "guide": "1Kkrd-lKrhfUDkPlNoGrDVuU4J42pgdwe",
@@ -10620,6 +12096,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1rzihH5QyiGupYi4JT0dSy75e0hTY7XH1",
         "guide": "1HbEpmUyxp9VPuz8IpUA4Vx8soM-oiaXC",
@@ -10648,6 +12129,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1RJpF05GQ1fDoI5J6me7ZYn3Vc9E8OgpS",
         "guide": "1dr7JIVT6XQUfcMq9qizndH--M8tucL3y",
@@ -10747,6 +12233,12 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3",
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1SIwaDhIvOBo_99EuFnz0YF02AAVxIIui",
         "guide": "1o9Lgh-Po6o53JBvLVDTcdQ-qUCFPB7O4",
@@ -10774,6 +12266,13 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1zaGceh5I7F_gNtL88mmC28UJMmXKKOh-",
         "guide": "1Xwo3lN7o8Wzx4VJY462BXb1hvMRAzwCd",
@@ -10801,6 +12300,13 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "10JKCjICpvuN5GlanwXczY0KcK0cmIpFW",
         "guide": "1SSmKeR17yc4dRzVpuQeuwJkrwc9iCpm3",
@@ -10815,6 +12321,7 @@
      ],
      "supplements": [
       {
+       "id": "G2|-|measureandestimateininchesandfeet",
        "title": "Measure and estimate in inches and feet",
        "ccss": [
         "2.MD.A.3"
@@ -10825,6 +12332,7 @@
        "note": "Awsaj-authored lesson that closes a CCSS standard WRM does not teach (site flag \"committee\"). Not a WRM small step."
       },
       {
+       "id": "G2|-|measurelengthsofasetofobjectstothenearestwholeunit",
        "title": "Measure lengths of a set of objects to the nearest whole unit",
        "ccss": [
         "2.MD.D.9"
@@ -10835,6 +12343,7 @@
        "note": "Awsaj-authored lesson that closes a CCSS standard WRM does not teach (site flag \"committee\"). Not a WRM small step."
       },
       {
+       "id": "G2|-|recordthemeasurementdatainatable",
        "title": "Record the measurement data in a table",
        "ccss": [
         "2.MD.D.9"
@@ -10845,6 +12354,7 @@
        "note": "Awsaj-authored lesson that closes a CCSS standard WRM does not teach (site flag \"committee\"). Not a WRM small step."
       },
       {
+       "id": "G2|-|showmeasurementdataonalineplot",
        "title": "Show measurement data on a line plot",
        "ccss": [
         "2.MD.D.9"
@@ -10855,6 +12365,7 @@
        "note": "Awsaj-authored lesson that closes a CCSS standard WRM does not teach (site flag \"committee\"). Not a WRM small step."
       },
       {
+       "id": "G2|-|solvelongerbyproblemsusingbarmodels",
        "title": "Solve 'longer by' problems using bar models",
        "ccss": [
         "2.MD.B.5"
@@ -10865,6 +12376,7 @@
        "note": "Awsaj-authored lesson that closes a CCSS standard WRM does not teach (site flag \"committee\"). Not a WRM small step."
       },
       {
+       "id": "G2|-|solveshorterbyproblemsusingbarmodels",
        "title": "Solve 'shorter by' problems using bar models",
        "ccss": [
         "2.MD.B.5"
@@ -10900,6 +12412,11 @@
        "notes": [
         "Above grade. Number-line fractions is Grade 3 (3.NF.A.2). Partitioning is Grade 2 (2.G.A.3)."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1-QP6k1G3EQdRcVIDgPsOx4GVlNaXe__m",
         "guide": "1vs5-DTk1ZepHrN_crOQyyC5rvPxRTdBs",
@@ -10923,10 +12440,17 @@
         "M.EE.3.NF.1",
         "M.EE.3.NF.3"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1faaJBV51d9f6ygvXt5HN9hLqpzLkjz1S",
         "guide": "1FccZxWuYLp2Jxo86P51YkHHxOox7KkkR",
@@ -10954,6 +12478,18 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G3",
+          "how": "copied-in",
+          "firstWeek": "W07"
+         }
+        ],
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1gPQKGRSzoJpuZmR5m7TKB4ZqaeageJdJ",
         "guide": "1botxyV4G63gFWpusTvpJStqteRiBy-Ce",
@@ -10981,6 +12517,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "10CwII88yHrG6y-xmd6yJbP0miPS4Ukck",
         "guide": "1ID7G249c8GiFSfo8gDQeG26YmXYbpAti",
@@ -11004,10 +12545,24 @@
         "M.EE.3.NF.1",
         "M.EE.3.NF.3"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G3",
+          "how": "copied-in",
+          "firstWeek": "W08"
+         }
+        ],
+        "supportIn": [
+         "G3",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "17IUTKwI_PEqxgCf82ys_muGDD_P4r1EF",
         "guide": "1WgqmSLH1l5V36be4TCmgGJce3KDFsDV4",
@@ -11053,10 +12608,24 @@
         "M.EE.3.NF.2"
        ],
        "power": true,
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G3",
+          "how": "copied-in",
+          "firstWeek": "W08"
+         }
+        ],
+        "supportIn": [
+         "G3",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1-CtQeC1yM6t8Ai_Wk3LG8zqX6hxD03c0",
         "guide": "17rKe6oOClBbEXJvHvwmr4wFXbo0fDbiL",
@@ -11078,10 +12647,16 @@
        "ee": [
         "M.EE.3.NF.2"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1QagxyMt4MzTDnsNBKWLcSXWV7HfftnIo",
         "guide": "1RxUGaqbJxWtRaTawdND_Hr9us04Crbhd",
@@ -11105,10 +12680,16 @@
         "M.EE.3.NF.2",
         "M.EE.3.NF.3"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade. Fraction equivalence/addition is Grade 3+ (3.NF.A.3, 4.NF.B.3)."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1Sebk_LaM5VNTxrIEIM_s4EK2rKNjmMFn",
         "guide": "1gMraaxta_GsQzWTWZ2o3iyseiQSz_28o",
@@ -11130,10 +12711,17 @@
        "ee": [
         "M.EE.3.NF.3"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1AWp0wyejMFmexdpWnstJMAzGE5b3gpFp",
         "guide": "1Rgd5Go_ebSKR_UWXyVmSwq-DriIdYx3E",
@@ -11165,10 +12753,16 @@
        "ee": [
         "M.EE.3.MD.2"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1-5im21dz-vlBu9kAdBei7eVgHALFFtuw",
         "guide": "1Lh1yzoCCTljZNVeCe5W26XwykhNCBr6P",
@@ -11190,6 +12784,7 @@
        "ee": [
         "M.EE.3.MD.2"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
@@ -11215,10 +12810,16 @@
        "ee": [
         "M.EE.3.MD.2"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "10xMe0T9l1Fu2E9_c87RNAJLxurnf6Hou",
         "guide": "1z_6qodyumvzQRzi2MeyXOAAmGkja5oZ1",
@@ -11242,10 +12843,17 @@
         "M.EE.3.MD.2",
         "M.EE.4.MD.1"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1r991HHhHAK9dEYtQ3Grkc8lLjJYDz9Dt",
         "guide": "1Ck5AK_L5d8jMlw1D-up04wqDx6boezfy",
@@ -11290,10 +12898,23 @@
        "ee": [
         "M.EE.3.MD.2"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G3",
+          "how": "copied-in",
+          "firstWeek": "W22"
+         }
+        ],
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1lmy65hSCirY58oHZjEuc9byq1xiWaX5n",
         "guide": "1EhrwXnqp2dKr9z8LL2E6i50qvZWsoAP0",
@@ -11315,10 +12936,18 @@
        "ee": [
         "M.EE.3.MD.2"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3",
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1qxFIbIvE85cm445CrS2N5zef4SrVAKmE",
         "guide": "1oliriOSS51IuKvyptTtRTAlGdbPNHq6c",
@@ -11340,10 +12969,16 @@
        "ee": [
         "M.EE.3.MD.2"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1tcGd2188XiENkXPmfSVqUyh9CIk2S2a7",
         "guide": "1vQ7IUscq3DFVmijBTyEawa6-HjwT-Z44",
@@ -11368,10 +13003,16 @@
         "M.EE.3.MD.2",
         "M.EE.4.MD.1"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1u3h5PpvrmSE6np6rL-AxIkzuPi8S96wg",
         "guide": "1GjhQ6DDGgnFAwF-SQEXI4JHaTrqMmy3G",
@@ -11415,10 +13056,16 @@
        "ee": [
         "M.EE.3.MD.2"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1xJrvxaw6TytrVldDMpkqGh6kJDiQhVrX",
         "guide": "1BBaClTEV7zEoteu6w7pSKbbZCKHDOKzZ",
@@ -11450,10 +13097,17 @@
        "ee": [
         "M.EE.4.NF.3"
        ],
+       "enrichment": "Grade 4 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3",
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1VCUWghRb3XF8YXjr8jkSDccz1ZHUsqee",
         "guide": "1xmaaeJLCAjJ5lbxdEoWHliFzgYwp1Mj-",
@@ -11475,10 +13129,16 @@
        "ee": [
         "M.EE.4.NF.3"
        ],
+       "enrichment": "Grade 4 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1F8apPp3xEz3fNuXCfEo7cLqE760ozsVX",
         "guide": "1TBFQ3Op6mpn4tUy1joJosFJv8eYAhS0m",
@@ -11501,10 +13161,16 @@
        "ee": [
         "M.EE.4.NF.3"
        ],
+       "enrichment": "Grade 4 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1T1_cx3oWWY92bq9sQ9sY__9eXw3ifEEA",
         "guide": "1o_TU-d2nBuvbKZFv2ipk3j2ZhDMFY4VO",
@@ -11528,6 +13194,7 @@
         "M.EE.3.NF.1",
         "M.EE.3.OA.2"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "native",
        "drive": {
         "lesson": "1OcEqrLXppFaIGLVVipuz05xeXy6in047",
@@ -11552,6 +13219,7 @@
         "M.EE.3.NF.1",
         "M.EE.3.OA.2"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "native",
        "drive": {
         "lesson": "1_aRglf9gpDUieDA7VFZxi9YnP2VlzE1V",
@@ -11575,6 +13243,7 @@
        "ee": [
         "M.EE.3.NF.1"
        ],
+       "enrichment": "Grade 3 standard",
        "flag": "native",
        "drive": {
         "lesson": "1RwblBsonDpU_2_9NPH5UARspoYyP-czJ",
@@ -11804,6 +13473,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3"
+        ]
+       },
        "drive": {
         "lesson": "1c37an7V69s_dMJlXzfU_lSF6_BNe3cbr",
         "guide": "1XX2FK6MGIGDFwoR5Ke7U7KU9jkv7-ZIa",
@@ -11922,6 +13596,18 @@
         "M.EE.3.MD.1"
        ],
        "flag": "native",
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G1",
+          "how": "copied-in",
+          "firstWeek": "W38"
+         }
+        ],
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1RL2ESCTQdOc0npD_8mGX2WoaQwcYhgLi",
         "guide": "16duJCzbo2ZQeyGD_IP3BQAq06lNW6Fue",
@@ -11949,6 +13635,12 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3",
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1VZTtg1oCU46FkUtbpmXSshTbvHBT3fiV",
         "guide": "1XkNwxnFqoh4Y2kDrxo9xXMImgNdDNDr-",
@@ -11971,6 +13663,12 @@
         "M.EE.2.MD.7"
        ],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1B6ZaUzkPNFZoz4ydoWXFQZCgr7QsL7R2",
         "guide": "1EToUjnkrDxOpnd-kvGQlSM4zMYFbU9uP",
@@ -11993,6 +13691,12 @@
         "M.EE.2.MD.7"
        ],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1rAIGBu1DhU6GJ07Y_ZW6Xa65FBJ6Magv",
         "guide": "1QeeXodblzoX4Cd0Yu9PKPtaHInFeX3eT",
@@ -12018,6 +13722,15 @@
         "M.EE.3.MD.1"
        ],
        "flag": "native",
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G3",
+          "how": "copied-in",
+          "firstWeek": "W26"
+         }
+        ]
+       },
        "drive": {
         "lesson": "1P-em0poXQD8XATOMsLMwxEaop_KxH74R",
         "guide": "1aRWCPDBiENHsrZSXkZCAkCFlu67XyGOo",
@@ -12080,6 +13793,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1j-XZieomZN9YmtG_89c1dQIsOoNUwqI9",
         "guide": "1tew2UsqG18krTbTf0xyc8RmmQz7SRL3i",
@@ -12130,6 +13848,12 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G3",
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1FtCPnGjeNO8tJJDqaQ9P_OFLTFpZwV5S",
         "guide": "1fF9EDcP_3hFRVVR-eSnzOYsmqdV4mRN1",
@@ -12181,6 +13905,18 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G4",
+          "how": "copied-in",
+          "firstWeek": "W22"
+         }
+        ],
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1Wvm0RmleJBsrXe-c49YospYkC_4m5KUf",
         "guide": "1wCW2hD4368VEuibfb-6qRasp8uIC0x6p",
@@ -12208,6 +13944,12 @@
        "notes": [
         "Angles and right angles is Grade 4 (4.MD.C.5) - beyond G2 expectation."
        ],
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1V209rTP6aBPiyckpD6Xh9kjC0NQ5JbEW",
         "guide": "1caFLKQ3SKxGOLQBLm_RyC05p1AbrqLNm",
@@ -12231,6 +13973,12 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1v9saJe-4i6OvUgY2BA8PAUmzHf8JRtzO",
         "guide": "1ZoKg1dr9nUIUJsRYrp-inRcV10xfYI88",
@@ -12256,6 +14004,11 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1e14poWv7i-7xcO0YmonxbnhBBdQWlcXX",
         "guide": "1lW1FLaHIDGGy_o-hIzebT-3Y1AUoEPTV",
@@ -12319,6 +14072,15 @@
        "notes": [
         "WR Y3 pictograms/bar charts align with 2.MD.D.10 (picture/bar graph) and extend toward 3.MD.B.3 (scaled picture/bar graphs); keep at Grade 2 with scaled work as a bridge."
        ],
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G3",
+          "how": "copied-in",
+          "firstWeek": "W26"
+         }
+        ]
+       },
        "drive": {
         "lesson": "1Kk4_xdMiczeyU3DFnB0sK7tTn99WIlNG",
         "guide": "1xe7RY0IoDrT1uEmsbEfFhRB_03TzpRBs",
@@ -12341,6 +14103,15 @@
         "M.EE.2.MD.10"
        ],
        "flag": "native",
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G3",
+          "how": "copied-in",
+          "firstWeek": "W26"
+         }
+        ]
+       },
        "drive": {
         "lesson": "1NPxPS3dgIMSG_LmZCdYIiWL6FjE0Xn61",
         "guide": "1peWPV6FpxYNnVLKwPgqui3lVIj8UjaPu",
@@ -12383,6 +14154,15 @@
         "M.EE.2.MD.10"
        ],
        "flag": "native",
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G3",
+          "how": "copied-in",
+          "firstWeek": "W26"
+         }
+        ]
+       },
        "drive": {
         "lesson": "1Z6xdZbtPZ1qCZy9wYE0KRYrJuLQarqUi",
         "guide": "16DAp2xslJ9X6mxCVQmFUxHxDGUCvqtW_",
@@ -12582,6 +14362,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1WNezh7deNdcAWeIK1If4RasipZbHLoXu",
         "guide": "1kUfetqz9WnS6g57UQ-uQgHcve4QMUdnf",
@@ -12604,10 +14389,16 @@
        "ee": [
         "M.EE.4.NBT.2"
        ],
+       "enrichment": "Grade 4 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1N4g-8D8laVtTIXyBuvQitKA10pKVsv-x",
         "guide": "1MgxlMGeFeYmyubKe6rL9rbyi3tcPkgHD",
@@ -12629,10 +14420,16 @@
        "ee": [
         "M.EE.4.NBT.2"
        ],
+       "enrichment": "Grade 4 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "199IL84GdlbhyucdCd46wdZaaKFppluYN",
         "guide": "1uDetzOsWSkI2sVfBO6WB8DOFzkUa6dW1",
@@ -12655,6 +14452,11 @@
        ],
        "ee": [],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1KA03i0u09w4GfyjYHN3Ci9M2M0-5gr_2",
         "guide": "1Y70JzUkAyUwsgBCbIdkFw8Qze0BnIU2N",
@@ -12701,6 +14503,11 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1okK_F4XBDh-hOo55i1smtKlm6TBvDQHS",
         "guide": "1prnPkz3nFVzk_Q84LwHTaedBE0MKaWBW",
@@ -12722,10 +14529,17 @@
        "ee": [
         "M.EE.4.NBT.2"
        ],
+       "enrichment": "Grade 4 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1V1UhQN5nrHGneLyG1vVPFwtignzpQ-_y",
         "guide": "1ZvoEUq3JAPtYGmHuoRtZ9pTUm87dtaCV",
@@ -12747,10 +14561,17 @@
        "ee": [
         "M.EE.4.NBT.2"
        ],
+       "enrichment": "Grade 4 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1xkoz-MDdVltOW1cjoN4ktjRYSo_xe-Kx",
         "guide": "1qI-XHkLJt8tPLiQoZ-tSgFFWUtSjgObD",
@@ -12796,6 +14617,11 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1oq234MoEO-YJgX6Xg4QSIjlN1EAnzFvT",
         "guide": "1dMC6LfRwvpfo60EUKj6poCgXKNNaGiQT",
@@ -12848,6 +14674,12 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "10EEAHTJjEaWSKFQ1B2ihej1S4BirqiXv",
         "guide": "12wgFieiBu6W1ag0zyx1fcJkcNsYTgrqj",
@@ -12877,6 +14709,12 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1-_L3dWrwuHt0PpSCQLQQusyZ3FrYgpoF",
         "guide": "1JwvR-ZwZ8NXm21JoP2KgfB6h0QzJjQGM",
@@ -12888,8 +14726,7 @@
         "round"
        ]
       }
-     ],
-     "siteName": "Place value (to 10,000)"
+     ]
     },
     {
      "id": "Y4.B2",
@@ -12937,6 +14774,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "10LXIXMGr31GEoidI12WsQgXnfLp3zyb-",
         "guide": "1PdTGFOH1HlIppjttFyxbEvEo1cnVjfA7",
@@ -12964,6 +14806,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1na0k9Ql1hwcD0En2mZPUJxRH08gkhHir",
         "guide": "1ivY4jT9EJmPkJWg3eWcPPCwjZpHSeaTo",
@@ -12991,6 +14838,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1mhlCwWbneUgiPFteptBEdN9neuc1a7rg",
         "guide": "1Cot0bFvZ8A0l9pJyFHf30icMbbvNG4fp",
@@ -13018,6 +14870,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1kgXt5c2QZlk1i3C6XJ5qa7TRM4ca-OwJ",
         "guide": "1S72AjpbPY8X-R1JguSuH9E9eS0akvISR",
@@ -13045,6 +14902,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1J5dp7uvLG_xRs3cZAUNYe8CF8gOHLXTR",
         "guide": "1wa2fBul93hrZNumCdklteuqN8HzeQMw9",
@@ -13072,6 +14934,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1je-CltWL_YxaOw4He88si44QyfQhKHbI",
         "guide": "1EeFSjFi9Lf6zGVFM1ULdsVgC1Ab2oFIM",
@@ -13141,6 +15008,11 @@
         "M.EE.3.NBT.2"
        ],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1Q6S5S6BiGQ3ZBDU2MzA4Pt69-8qnnN4W",
         "guide": "1TkdqirRamLaIf8k_KkrVpk-LFB61yCj1",
@@ -13194,6 +15066,15 @@
        ],
        "ee": [],
        "flag": "native",
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G2",
+          "how": "copied-in",
+          "firstWeek": "W26"
+         }
+        ]
+       },
        "drive": {
         "lesson": "1aTPmiODSfp-rMPSqWQfE3-jy9NeMsyLq",
         "guide": "1Wwrnd-gwJ0LcBaE8BgNZgKlIHzmBVtx5",
@@ -13250,6 +15131,7 @@
      ],
      "supplements": [
       {
+       "id": "G3|-|areaasmultiplication",
        "title": "Area as multiplication",
        "ccss": [
         "3.MD.C.7",
@@ -13260,6 +15142,7 @@
        "note": "Awsaj-authored lesson that closes a CCSS standard WRM does not teach (site flag \"committee\"). Not a WRM small step."
       },
       {
+       "id": "G3|-|distributiveandadditivearea",
        "title": "Distributive and additive area",
        "ccss": [
         "3.MD.C.7",
@@ -13589,18 +15472,20 @@
      ],
      "supplements": [
       {
+       "id": "G3|-|patternsonthemultiplicationtable",
        "title": "Patterns on the multiplication table",
        "ccss": [
-        "3.OA.D.9",
-        "3.OA.C.7"
+        "3.OA.C.7",
+        "3.OA.D.9"
        ],
        "ee": [
-        "M.EE.3.OA.8",
-        "M.EE.3.OA.6"
+        "M.EE.3.OA.6",
+        "M.EE.3.OA.8"
        ],
        "note": "Awsaj-authored lesson that closes a CCSS standard WRM does not teach (site flag \"committee\"). Not a WRM small step."
       },
       {
+       "id": "G3|-|twostepwordproblemswiththefouroperations",
        "title": "Two-step word problems with the four operations",
        "ccss": [
         "3.OA.D.8"
@@ -13678,6 +15563,11 @@
         "M.EE.3.NBT.3"
        ],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1qkeydZNo9fwljAzfAJ6V-XkBssKavOHX",
         "guide": "1xoRO_C_U8gvbtBGjf1aUaf5-2kjfdT3P",
@@ -13723,7 +15613,13 @@
        "ee": [
         "M.EE.5.NBT.2"
        ],
+       "enrichment": "Grade 4 standard",
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1IRaMkceZ5eUhY14KXGx6KmoP-BtBswOO",
         "guide": "1lmvJptI_LJasALb7a_B6b3KywS0jVaz0",
@@ -13746,6 +15642,7 @@
        "ee": [
         "M.EE.5.NBT.2"
        ],
+       "enrichment": "Grade 4 standard",
        "flag": "native",
        "drive": {
         "lesson": "1H5ftRd5ou9ofYPoC53Af9bRiURmHNQtV",
@@ -13794,6 +15691,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1Sf8_2be9UXXXJWWa6QZoh_2KK8lfEwm7",
         "guide": "1Ne0jV416ica40IH2hEvJRWDz4zC3jNDk",
@@ -13836,6 +15738,7 @@
         "4.NBT.B.5"
        ],
        "ee": [],
+       "enrichment": "Grade 4 standard",
        "flag": "native",
        "drive": {
         "lesson": "1C8EsHwWycfj06PWiwuwJhuN8v7bsR1tU",
@@ -13861,6 +15764,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1MVTsUKi5kiwXXCV8mvZZGp3kaGT8u5Of",
         "guide": "1otyjyk6ilGtW3yp4N46gioyGow59u-rO",
@@ -13885,6 +15793,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "19VRFVp1pS8xKHuQhSYa18_xJZpzAR-wi",
         "guide": "1gwgnVJBwVJBizao4-75o-PxSIf6iX47U",
@@ -13904,7 +15817,13 @@
         "4.NBT.B.6"
        ],
        "ee": [],
+       "enrichment": "Grade 4 standard",
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1gN4uPnWblWyVF6U__aeyAnK311RkpYb0",
         "guide": "15UYYMCwlRnTBh-NziDgahGxTN5Y5lLzx",
@@ -13929,6 +15848,11 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1WcZ_4G76bgltWRBVyLD2mf_sdz_jx8Iu",
         "guide": "1mJ6uO6zOsOrxt4cDlLFNJy4tkqybgBzD",
@@ -13949,6 +15873,11 @@
        ],
        "ee": [],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1dHSyxm08_-imNQGks5t_2l3EpxZHdV2H",
         "guide": "1Sq1Cpj6jpHnAMQOmekcyQSntaMCP-NAd",
@@ -13980,6 +15909,7 @@
        "ee": [
         "M.EE.4.MD.1"
        ],
+       "enrichment": "Grade 4 standard",
        "flag": "native",
        "drive": {
         "lesson": "12NS9DfE7IMTqP1h4PzRZdpno4PHdrvWJ",
@@ -14002,6 +15932,7 @@
        "ee": [
         "M.EE.4.MD.1"
        ],
+       "enrichment": "Grade 4 standard",
        "flag": "native",
        "drive": {
         "lesson": "1p08jlWKxe5V5TbOP42tbAT_afY06jvQ9",
@@ -14044,6 +15975,11 @@
        ],
        "ee": [],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1j72nzLD-PWfPZx4z--1_2Rig5Nyx4TYL",
         "guide": "1EqI3btIh9ZeYqoEXcW_LcrWuZ85QooU5",
@@ -14084,6 +16020,11 @@
        ],
        "ee": [],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1L4ba-7l3Wg6S-7QQBFG4JZ-qr-DlrJfs",
         "guide": "1EKc69diu-R49Yo8DLkuFJoqzcMPaLQVU",
@@ -14106,6 +16047,11 @@
        ],
        "ee": [],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1IteOF-EaDBnEhMcSGMbc5jXYoI9caDhc",
         "guide": "1Sr9UsmRT874it1LxwVyDqYK5ouoV0M8y",
@@ -14126,6 +16072,11 @@
        ],
        "ee": [],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1L8gX1pZSRyseLxIyLnM3h1c0yL8gbNul",
         "guide": "1Lny8g5RfUJhOD64jteAVqfbMWG_PeMsV",
@@ -14160,6 +16111,7 @@
      ],
      "supplements": [
       {
+       "id": "G3|-|measureandestimatemassandliquidvolumegkgmll",
        "title": "Measure and estimate mass and liquid volume (g, kg, ml, l)",
        "ccss": [
         "3.MD.A.2"
@@ -14245,6 +16197,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "18UGrPoK5upca9EGJZbvnBqDckOdU3fcM",
         "guide": "18ZFs5OR7dhrPXAUuvtxbyhU0sXF3P2Bw",
@@ -14293,6 +16250,11 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1_5iRBcn4FxPRNWe2s5LjVAzjuu5YGAkA",
         "guide": "1S393yYtiUF3nEUhWj4KHA5kn7mw72Zze",
@@ -14419,6 +16381,11 @@
         "M.EE.4.NF.1"
        ],
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1vSM-3lkL95P6yzHSU8H1SjANV2hbam6m",
         "guide": "143fZuKRVnENNfK2f38lreH6HEzFm5kMj",
@@ -14444,6 +16411,15 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G4",
+          "how": "copied-in",
+          "firstWeek": "W14"
+         }
+        ]
+       },
        "drive": {
         "lesson": "1cKVBrBNIkbVb1r1MvpbMY46rs80YiBu5",
         "guide": "1zUIzD5Uo0Xi1wyV5SBaPSoFsGEMX14li",
@@ -14472,6 +16448,12 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1AGyeMFmPxK2h6AZOxVdKMG0CLa2PJ5jN",
         "guide": "19pln5eqxK4t_64RPTIPhkbEtzzDyA2RL",
@@ -14497,6 +16479,11 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "176BBNax0s4Feua8YIwcuZQ1GkpbeenbP",
         "guide": "1vb-XX0XQUP5yHYqpVIcJFuba-bO-6MQR",
@@ -14521,6 +16508,11 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "17isTczwAm0AMcv-1OKL5AJCUMNbY7-NP",
         "guide": "1txmRh-sNSCWAAdUCr4eBw5gnmQA26Y0l",
@@ -14549,6 +16541,12 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1BS9RFbY2t2MYB5OPj0X0_O_KFgujXLcx",
         "guide": "1_leaOlmn8xCzyu8zxrq-rFnwm0IJIkvd",
@@ -14563,6 +16561,7 @@
      ],
      "supplements": [
       {
+       "id": "G3|-|partitionshapesintoequalareas",
        "title": "Partition shapes into equal areas",
        "ccss": [
         "3.G.A.2"
@@ -14593,10 +16592,16 @@
         "M.EE.3.NF.1"
        ],
        "power": true,
+       "enrichment": "Grade 4 standard",
        "flag": "above",
        "notes": [
         "Above grade. Decimals are Grade 4 CCSS (4.NF.C.5-C.7)."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1IneFAde4nWlx0zsRGlfFilB_4-3Hp22J",
         "guide": "1agAq4eR8AJNMu0lCXUic29EK4zMTf2Kf",
@@ -14620,10 +16625,16 @@
         "M.EE.3.NF.1"
        ],
        "power": true,
+       "enrichment": "Grade 4 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1hGQhqVD1XlBcQ5akhB2VJ9xqh0aI0msx",
         "guide": "1XkDGJyEWPOQBPgdjL2vzsXoJ3auyl3hk",
@@ -14647,10 +16658,16 @@
         "M.EE.3.NF.1"
        ],
        "power": true,
+       "enrichment": "Grade 4 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1eS6DS0jNfm8bkstSdOziJw_EIl4yvLL-",
         "guide": "1hoZjwwynz7iaq6wsQzEOzlC9lOaijaIN",
@@ -14674,10 +16691,23 @@
         "M.EE.3.NF.2"
        ],
        "power": true,
+       "enrichment": "Grade 4 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G4",
+          "how": "copied-in",
+          "firstWeek": "W18"
+         }
+        ],
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1XzqE_pxhmBfjyRGi_D6ehl60mHbTZBZ9",
         "guide": "1gr0rr0XuqRIbZyL7xKSYYN-fosihFdPo",
@@ -14700,10 +16730,16 @@
        "ee": [
         "M.EE.5.NBT.2"
        ],
+       "enrichment": "Grade 4 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1fcxm5qIgbl7o2ABMp0DHW-6vWHB4pqgA",
         "guide": "1AUeUDhZK7sZP72Rzb0arkdimTKSa4Y3v",
@@ -14726,10 +16762,16 @@
        "ee": [
         "M.EE.5.NBT.2"
        ],
+       "enrichment": "Grade 4 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1rmpAe_CVyb7d8Sz23wwNc-HD0cx3A-8q",
         "guide": "1GqlgBs7YJAr1GbnDwjoawsH3x1dkaF6d",
@@ -14753,6 +16795,7 @@
         "M.EE.3.NF.1"
        ],
        "power": true,
+       "enrichment": "Grade 4 standard",
        "flag": "native",
        "drive": {
         "lesson": "1Dl0sDo7Zgw0GNlw_D5Lo7pkKWFD7olE9",
@@ -14777,10 +16820,16 @@
         "M.EE.3.NF.1"
        ],
        "power": true,
+       "enrichment": "Grade 4 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "16woS1pXZQfCVCG3Uzx_Xnxo7b8xtsyDY",
         "guide": "18I0I6nTRCuBjj49wUNNTyJKrVnG0BcGZ",
@@ -14804,10 +16853,17 @@
         "M.EE.3.NF.1"
        ],
        "power": true,
+       "enrichment": "Grade 4 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1zpCSdmwjIuWo2s8AcCVEtNr2rfRYdWHp",
         "guide": "1DUN0fnnzzSoqJVETx9yPWVjrnrjYAzOv",
@@ -14830,7 +16886,13 @@
        "ee": [
         "M.EE.5.NBT.2"
        ],
+       "enrichment": "Grade 4 standard",
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1CBxHEyKRZIe7J-q3uC_gc-6JzSt8smpU",
         "guide": "1TrLfv-EhO4QbT66vwHQWm2Np5o7PLsmT",
@@ -14864,10 +16926,16 @@
         "M.EE.3.NF.1"
        ],
        "power": true,
+       "enrichment": "Grade 4 standard",
        "flag": "above",
        "notes": [
         "Above grade. Compare/order decimals to hundredths is Grade 4 (4.NF.C.7)."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1H-a8uTUh2kXWdEFydXvaiQp7o_uNRzTv",
         "guide": "127EaaS26xYmfWzj0wkb40AAA0loZI3Uj",
@@ -14891,6 +16959,7 @@
         "M.EE.3.NF.1"
        ],
        "power": true,
+       "enrichment": "Grade 4 standard",
        "flag": "native",
        "drive": {
         "lesson": "11VttRqfTuH_4GJRGwgkXvJaqIZM_TuMJ",
@@ -14914,6 +16983,7 @@
        "ee": [
         "M.EE.5.NBT.3"
        ],
+       "enrichment": "Grade 4 standard",
        "flag": "native",
        "drive": {
         "lesson": "1Xkhf2UStd2xR337xYVRR_m6F6a9EDPPd",
@@ -14937,6 +17007,7 @@
        "ee": [
         "M.EE.5.NBT.3"
        ],
+       "enrichment": "Grade 4 standard",
        "flag": "native",
        "drive": {
         "lesson": "1BsB94_hKFqT6XenKaINbX-fZy2awnM8N",
@@ -14957,10 +17028,16 @@
         "4.NF.C.7"
        ],
        "ee": [],
+       "enrichment": "Grade 4 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1YNtOsLrgfhJsguAI41E_GdLcWt9SIDbZ",
         "guide": "1TPiSAbxu1QvPJlXJwNGECdEUhvj2iA6Q",
@@ -14980,10 +17057,16 @@
         "4.NF.C.7"
        ],
        "ee": [],
+       "enrichment": "Grade 4 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1xFjXbhMfSOS8XKlyuCJiRnPGkXzVF_C3",
         "guide": "1GIKKF1DfsE9xnJSdqBBXAnEThRLlpHjr",
@@ -15007,10 +17090,16 @@
        "ee": [
         "M.EE.5.NBT.4"
        ],
+       "enrichment": "Grade 4 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1_K1DwRRx78pOEO2qX1AW3ygkZcdaAon-",
         "guide": "1V04k3AGGgqAdJKd_BcCs_AllhTK1QO2E",
@@ -15035,10 +17124,16 @@
         "M.EE.3.NF.1"
        ],
        "power": true,
+       "enrichment": "Grade 4 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1fNYcD_lg-NEPrFWh9YwMHA5JmI41jTDN",
         "guide": "1KyYyfOiopMdujiTSN_6-zglGlXxG2NPb",
@@ -15064,7 +17159,6 @@
        "id": "Y4.B10.S1",
        "number": 1,
        "title": "Write money using decimals",
-       "usAdaptation": "Taught in US dollars and cents at the school (WRM uses pounds and pence).",
        "ccss": [
         "4.MD.A.2",
         "4.NF.C.6"
@@ -15072,7 +17166,17 @@
        "ee": [
         "M.EE.4.MD.2"
        ],
+       "enrichment": "Grade 4 standard",
        "flag": "native",
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G3",
+          "how": "review",
+          "firstWeek": "W22"
+         }
+        ]
+       },
        "drive": {
         "lesson": "1cKrIDybPK-lAaC1QYQct_Me3997rsGsA",
         "guide": "1DziGQm44DLZcpMvcRtAZRypY3r80O7ch",
@@ -15088,7 +17192,6 @@
        "id": "Y4.B10.S2",
        "number": 2,
        "title": "Convert between pounds and pence",
-       "usAdaptation": "Taught in US dollars and cents at the school (WRM uses pounds and pence).",
        "ccss": [
         "2.MD.C.8",
         "4.MD.A.1"
@@ -15116,7 +17219,6 @@
        "id": "Y4.B10.S3",
        "number": 3,
        "title": "Compare amounts of money",
-       "usAdaptation": "Taught in US dollars and cents at the school (WRM uses pounds and pence).",
        "ccss": [
         "2.MD.C.8"
        ],
@@ -15157,6 +17259,11 @@
        "notes": [
         "Above grade. ⚑ ADAPT: Adapt before teaching: swap £ and p for dollars and cents, and UK notes and coins for US bills and coins (1c, 5c, 10c, 25c, $1, $5, $10)."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1BaBR7Hvdf-O3BZwRmABRMVWyJ3R8xNpf",
         "guide": "1Cd2KdOOcAa-Yx3nLhFpSMLX3sd0hw6aK",
@@ -15185,6 +17292,11 @@
        "notes": [
         "Above grade. ⚑ ADAPT: Adapt before teaching: swap £ and p for dollars and cents, and UK notes and coins for US bills and coins (1c, 5c, 10c, 25c, $1, $5, $10)."
        ],
+       "site": {
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1cUQnf_eP79vCQeyBqgVAOujQjLAzB1j7",
         "guide": "1jedA_zntolNwTcz61F2cCS2aJZd8JIYR",
@@ -15341,6 +17453,11 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1yB5qmcSFotSBnuepPMrW-AUEzLtsa16e",
         "guide": "1K5fO3Q7SPTRo9pRlzTb82jKsV3TuTpEx",
@@ -15376,6 +17493,18 @@
        "notes": [
         "Above grade. Angles, types of triangles, quadrilaterals, symmetry are Grade 4 (4.G.A, 4.MD.C.5/C.6)."
        ],
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G4",
+          "how": "copied-in",
+          "firstWeek": "W21"
+         }
+        ],
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1rzLIZf3NqlQFHM6v4yCwKK3G1XRpW7n0",
         "guide": "166DUmsOY2rh1pNEzdpJyX39-kxkdZIV6",
@@ -15407,6 +17536,18 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G4",
+          "how": "copied-in",
+          "firstWeek": "W21"
+         }
+        ],
+        "supportIn": [
+         "G4"
+        ]
+       },
        "drive": {
         "lesson": "1WjUYccK-xU7GPlNsJcHNQ0xr2tK4L_ww",
         "guide": "12vLGoMG5O_9xWaN2WHgsE6HGvOid0j4v",
@@ -15453,6 +17594,15 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G4",
+          "how": "copied-in",
+          "firstWeek": "W23"
+         }
+        ]
+       },
        "drive": {
         "lesson": "1qrOt0WZxCc95ZdLYqGqV5ygk0UbEYgVT",
         "guide": "1S-y1nIUUYkwhq0OhgHrAXHqCs4HR7vNV",
@@ -15503,6 +17653,11 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1s5ha5s7-BPhVg6ESqD_0vJXR4ARLSvMd",
         "guide": "1p9j1yJ4WmY4WgZvrYeFjDAxPWVpPQOqI",
@@ -15531,6 +17686,12 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G4",
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "14oSfJQt40Lp_gbu2K9FXYtZgm0IzHRA1",
         "guide": "1cR2NFL0VZeExJNZDbYxyW5QyZCHLx_Q_",
@@ -15556,6 +17717,11 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1nJbg9wPcsUk-y0Npj-h3Mv4ruo009e6F",
         "guide": "1qBqP86Dw8zuGpRZMv7Dzu4SkM09WdGeu",
@@ -15567,8 +17733,7 @@
         "reflect"
        ]
       }
-     ],
-     "siteName": "Shape (angles, 2-D, symmetry)"
+     ]
     },
     {
      "id": "Y4.B13",
@@ -15635,10 +17800,16 @@
        "ee": [
         "M.EE.5.G.2"
        ],
+       "enrichment": "Grade 5 standard",
        "flag": "native",
        "notes": [
         "Beyond K-5 CCSS (mainly 6.SP); useful preview."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1LJ7Xn3NCxvN2sf45aLpWvXObFuQiMrlu",
         "guide": "1iYqMCWO1B6Eun5jo6dL-9fswHIr6FAYq",
@@ -15662,7 +17833,13 @@
        "ee": [
         "M.EE.5.G.2"
        ],
+       "enrichment": "Grade 5 standard",
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1myjyzbJcmdgNDOv-scn3SBSK0g5E3E_F",
         "guide": "1UugogWiU2cZ2M50sN35b5_McHiMiDI5M",
@@ -15677,7 +17854,8 @@
      ],
      "supplements": [
       {
-       "title": "Build a line plot from inch measurements",
+       "id": "G3|-|measuretothehalfandquarterinch",
+       "title": "Measure to the half and quarter inch",
        "ccss": [
         "3.MD.B.4"
        ],
@@ -15687,7 +17865,8 @@
        "note": "Awsaj-authored lesson that closes a CCSS standard WRM does not teach (site flag \"committee\"). Not a WRM small step."
       },
       {
-       "title": "Measure to the half and quarter inch",
+       "id": "G3|-|buildalineplotfrominchmeasurements",
+       "title": "Build a line plot from inch measurements",
        "ccss": [
         "3.MD.B.4"
        ],
@@ -15716,10 +17895,16 @@
        "ee": [
         "M.EE.5.G.1"
        ],
+       "enrichment": "Grade 5 standard",
        "flag": "above",
        "notes": [
         "Above grade. Coordinates are Grade 5 CCSS (5.G.A.1/A.2)."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "14GhjaAZEphD-EePXr8opixX-ZG_XAbyS",
         "guide": "14DQAWQZyP-o7jcGj_M3INjiHeZkDAbhL",
@@ -15743,6 +17928,7 @@
         "M.EE.5.G.1",
         "M.EE.5.G.2"
        ],
+       "enrichment": "Grade 5 standard",
        "flag": "native",
        "drive": {
         "lesson": "1UBUZ6HyCm6u31cjFN8wFbM2H_3DF9vJx",
@@ -15769,10 +17955,16 @@
         "M.EE.5.G.1"
        ],
        "power": true,
+       "enrichment": "Grade 5 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1moPo468DLo6Jzz-EYdM01vCMqRAruego",
         "guide": "17mjxLKeiHa3_bd2k0tsjJpAkTStICNe-",
@@ -15795,10 +17987,16 @@
        "ee": [
         "M.EE.5.G.1"
        ],
+       "enrichment": "Grade 5 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1-N5DNYexLZxkXib1fzuc3VlJixD3kgRc",
         "guide": "1I_IkBqZZDAI6q4R4Ijw6m_Cbc-cd22UX",
@@ -15820,6 +18018,7 @@
        "ee": [
         "M.EE.5.G.1"
        ],
+       "enrichment": "Grade 5 standard",
        "flag": "native",
        "drive": {
         "lesson": "17V88a7n_7CWDoAmp2seU6I2kZYbhRuRj",
@@ -15864,6 +18063,7 @@
        "title": "Roman numerals to 1,000",
        "ccss": [],
        "ee": [],
+       "enrichment": true,
        "flag": "non-ccss",
        "notes": [
         "WR Y5 extends to 1,000,000 and beyond. CCSS G4 (4.NBT.A.1-A.3) covers up to 1,000,000; extension to 10,000,000+ relocates to Grade 5 (5.NBT.A.1). | Not in CCSS K-5; cultural/optional extra. ⚑ ADAPT: UK National Curriculum only, no US standard. Teach as enrichment, or use the day for extra place-value practice.",
@@ -15988,6 +18188,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1Oha-i1rMhH694YMS4Mj6pScOf4jeO1Hy",
         "guide": "1JbsGv0VUv0dDc6BDiXjk1EKdcIQS-Z-R",
@@ -16157,6 +18362,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1uUnneliWVW8U8CAjhXELb6uaelXPguOG",
         "guide": "1Q3V9mXZ9gRW2aVRm8MADpWP1w2GqrgmY",
@@ -16184,6 +18394,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1n04y4Z4Ea6Z0z9LcgzRdHsBz4YnHOAoR",
         "guide": "1Rfv-a_jRvpu3ZhNPXRsPKr-uH96Ku1CR",
@@ -16463,6 +18678,15 @@
         "M.EE.4.OA.4"
        ],
        "flag": "native",
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G5",
+          "how": "copied-in",
+          "firstWeek": "W09"
+         }
+        ]
+       },
        "drive": {
         "lesson": "1KqzwHlZn_vKe1FVTQPQmiGHNyZnFzODk",
         "guide": "146z0rzyKEFZGeVALlBasI3Xuf4RWIoqa",
@@ -16529,6 +18753,7 @@
        "ee": [
         "M.EE.6.EE.1-2"
        ],
+       "enrichment": "Grade 6 standard",
        "flag": "native",
        "notes": [
         "Beyond K-5 CCSS (appears in 6.EE.A.1); optional preview."
@@ -16554,6 +18779,7 @@
        "ee": [
         "M.EE.6.EE.1-2"
        ],
+       "enrichment": "Grade 6 standard",
        "flag": "native",
        "notes": [
         "Beyond K-5 CCSS (appears in 6.EE.A.1); optional preview."
@@ -16606,6 +18832,11 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1qGlJYLlFbeuMV2fejbWXQ_kOyKkNzH7d",
         "guide": "1jVxGvRzmNuT57cG_uUTASeMNuKRXpPqf",
@@ -16643,16 +18874,7 @@
      ],
      "supplements": [
       {
-       "title": "Find emergent features (e.g., units digit cycle)",
-       "ccss": [
-        "4.OA.C.5"
-       ],
-       "ee": [
-        "M.EE.4.OA.5"
-       ],
-       "note": "Awsaj-authored lesson that closes a CCSS standard WRM does not teach (site flag \"committee\"). Not a WRM small step."
-      },
-      {
+       "id": "G4|-|followagivenruletoextendanumberpattern",
        "title": "Follow a given rule to extend a number pattern",
        "ccss": [
         "4.OA.C.5"
@@ -16663,6 +18885,18 @@
        "note": "Awsaj-authored lesson that closes a CCSS standard WRM does not teach (site flag \"committee\"). Not a WRM small step."
       },
       {
+       "id": "G4|-|findemergentfeaturesegunitsdigitcycle",
+       "title": "Find emergent features (e.g., units digit cycle)",
+       "ccss": [
+        "4.OA.C.5"
+       ],
+       "ee": [
+        "M.EE.4.OA.5"
+       ],
+       "note": "Awsaj-authored lesson that closes a CCSS standard WRM does not teach (site flag \"committee\"). Not a WRM small step."
+      },
+      {
+       "id": "G4|-|multiplicativecomparisontimesasmany",
        "title": "Multiplicative comparison: times as many",
        "ccss": [
         "4.OA.A.1"
@@ -17093,6 +19327,15 @@
        "ee": [],
        "power": true,
        "flag": "native",
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G5",
+          "how": "copied-in",
+          "firstWeek": "W03"
+         }
+        ]
+       },
        "drive": {
         "lesson": "1Ig2O8MaUFozoiJpSfU_mXr2E80fE8JYC",
         "guide": "1uFZ25Gd7ao8Z2RqdEGnEYCd5tpuMeV4R",
@@ -17157,6 +19400,7 @@
        "ee": [
         "M.EE.5.NBT.5"
        ],
+       "enrichment": "Grade 5 standard",
        "flag": "native",
        "drive": {
         "lesson": "1e0m_qe007PHj08g8_Fduf5iO4BjXbbBn",
@@ -17178,6 +19422,7 @@
        "ee": [
         "M.EE.5.NBT.5"
        ],
+       "enrichment": "Grade 5 standard",
        "flag": "native",
        "drive": {
         "lesson": "19dg0QzoBLi2lH5WhTbmNxfYoWSOWVWww",
@@ -17604,6 +19849,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1spyyLFwOha6II9esvwvLo5ieM-t6dCyl",
         "guide": "13jBJUeG8F6WQr8fXkmlqUgquBQMbxGF3",
@@ -17631,6 +19881,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1RY3G1t_9lX7YIBPwx70xDarnX3MyfLAh",
         "guide": "1rLBrPfpz90XearvWFZ0mCPhxUT5kb6WT",
@@ -17657,6 +19912,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1EHpbaVSdHbaT0JWSkQZCBgc3cxF-D2i4",
         "guide": "1wa8aPySmW3md1QJZOTsPwmSejAni_3Q6",
@@ -17680,6 +19940,15 @@
         "M.EE.5.NBT.3"
        ],
        "flag": "native",
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G5",
+          "how": "copied-in",
+          "firstWeek": "W06"
+         }
+        ]
+       },
        "drive": {
         "lesson": "1V6-l-YDvrZY092QseYT4jBg5WsKR1oRS",
         "guide": "19xKZHoZiSJ4VXerkeshD0LdOL8gZe5J0",
@@ -17702,6 +19971,7 @@
        "ee": [
         "M.EE.5.NBT.4"
        ],
+       "enrichment": "Grade 5 standard",
        "flag": "native",
        "drive": {
         "lesson": "1xdPBDOA4SXzlYNXi2pjFk6RTS1s9MeRh",
@@ -17725,10 +19995,16 @@
        "ee": [
         "M.EE.5.NBT.4"
        ],
+       "enrichment": "Grade 5 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1yxW-mecN-PfDRccbHDCeTQia5fO3OfXk",
         "guide": "14POCEbUQCeGMNWblKWy-fBJ5SXHsIw0a",
@@ -17995,6 +20271,7 @@
        "ee": [
         "M.EE.5.G.2"
        ],
+       "enrichment": "Grade 5 standard",
        "flag": "native",
        "notes": [
         "Beyond K-5 CCSS (mainly 6.SP); useful preview."
@@ -18020,6 +20297,7 @@
        "ee": [
         "M.EE.5.G.2"
        ],
+       "enrichment": "Grade 5 standard",
        "flag": "native",
        "notes": [
         "Line graphs are Grade 5 (5.MD.B.2-adjacent); line plots are Grade 4 (4.MD.B.4). | Beyond K-5 CCSS (mainly 6.SP); useful preview."
@@ -18107,6 +20385,7 @@
      ],
      "supplements": [
       {
+       "id": "G4|-|lineplotswithfractions",
        "title": "Line plots with fractions",
        "ccss": [
         "4.MD.B.4"
@@ -18389,6 +20668,11 @@
        "notes": [
         "Above grade. Coordinate plane is Grade 5 (5.G.A.1/A.2)."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1cnENcnTP8GhHDq_dzbDM5aVx6Ycw6r0K",
         "guide": "1CcyNCH9AWAyHZx4iUtWYexFN_BnbSjO6",
@@ -18418,6 +20702,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1mHmUHjDOcSXqZBX7S2cZJ6ragyHoXHS3",
         "guide": "1YE3u1T-Dy7CbC-fHSu8d8dK6YZrRWELT",
@@ -18446,6 +20735,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1cZILjb4Kma0t6ogxcx89EwK8f0z9YVmh",
         "guide": "1I85NuWmmMwELCk-eUI3PVZRg_olHa94K",
@@ -18477,6 +20771,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "13HQWob8NKEAYWcR5bNTRaOpBa2aGNv1o",
         "guide": "1NxvIQRO-gsYNQwbfIBaE47HQzm7GVXnd",
@@ -18528,6 +20827,11 @@
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1ciPPvM93OqY7wdR225q3SuDudc-SLd-G",
         "guide": "1IwU-gSEpv_aSWPDrx-i0HYwu7A4apv11",
@@ -18564,10 +20868,16 @@
         "M.EE.5.NBT.7"
        ],
        "power": true,
+       "enrichment": "Grade 5 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1JagF_pgfU1bsdnaAq4Bc3ok5bgfv-oYt",
         "guide": "1OKzsjDN1MyikIObrnq72wlxhpOci1ued",
@@ -18589,6 +20899,7 @@
        "ee": [
         "M.EE.5.NBT.7"
        ],
+       "enrichment": "Grade 5 standard",
        "flag": "native",
        "drive": {
         "lesson": "1toqYCkUcYqBbxCHFanWT_i0XFxK3TdgL",
@@ -18614,10 +20925,16 @@
         "M.EE.5.NBT.7"
        ],
        "power": true,
+       "enrichment": "Grade 5 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1CnN5hkWdiKxlSAjORJtPt589fEofuRss",
         "guide": "1N2_ZdFK8AdBPjKBnIxw6upy5KfbkHUai",
@@ -18643,10 +20960,16 @@
         "M.EE.5.NBT.7"
        ],
        "power": true,
+       "enrichment": "Grade 5 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1kBkBIweEJdYT0WjocXzhGN25jBWNGYtj",
         "guide": "1cP8ECwh3ETWOuZkCLT8obniNZKD4eBz-",
@@ -18671,10 +20994,16 @@
         "M.EE.5.NBT.7"
        ],
        "power": true,
+       "enrichment": "Grade 5 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1OwTPVBj2yWqDTOiuYb1hRbOfR6ICqvT5",
         "guide": "1BzX60Prwzu2QUo7em5GCv5as1KYGfb0X",
@@ -18699,10 +21028,16 @@
         "M.EE.5.NBT.7"
        ],
        "power": true,
+       "enrichment": "Grade 5 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1ZyxUzcQ6j0qVPCZM9UVpqo4nPoqv54Jg",
         "guide": "18UXkIyHM6l24sgu3mOMwmMTTkU7zpRlX",
@@ -18727,10 +21062,16 @@
         "M.EE.5.NBT.7"
        ],
        "power": true,
+       "enrichment": "Grade 5 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "17CoeH8Ghjd7bWm9GbytVKzccwekPi1iD",
         "guide": "1CpGzyihmAZrEXANKHbprScpXZWf5t9zj",
@@ -18755,10 +21096,16 @@
         "M.EE.5.NBT.7"
        ],
        "power": true,
+       "enrichment": "Grade 5 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1ZHLxTtfKNvtgXFJpjbT6RcRGUiGQueax",
         "guide": "1uu483eg9KmSExVoJE0Rbj16Hmc4Qosjf",
@@ -18783,10 +21130,16 @@
         "M.EE.4.OA.5",
         "M.EE.5.NBT.7"
        ],
+       "enrichment": "Grade 5 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1H9psLDZLm1nxSJQqYhzuM-_0xbiCxfgv",
         "guide": "1p3wJ2cEuxrKP0tfvzR6RA_5MyyG3X-Ai",
@@ -18812,6 +21165,7 @@
         "M.EE.5.NBT.2"
        ],
        "power": true,
+       "enrichment": "Grade 5 standard",
        "flag": "native",
        "drive": {
         "lesson": "1BrDWPFAvndLq0xDoaAYRnPp159o3AMQ3",
@@ -18837,6 +21191,7 @@
         "M.EE.5.NBT.2"
        ],
        "power": true,
+       "enrichment": "Grade 5 standard",
        "flag": "native",
        "drive": {
         "lesson": "1CJnVOkKGywlemCLb-WzXJJpo6LKlnbxX",
@@ -18859,6 +21214,7 @@
        "ee": [
         "M.EE.5.NBT.2"
        ],
+       "enrichment": "Grade 5 standard",
        "flag": "native",
        "drive": {
         "lesson": "13_wbfY9DzDg8Opl3_ffrTU8-8GGzQEN4",
@@ -18891,6 +21247,7 @@
        "ee": [
         "M.EE.6.NS.6"
        ],
+       "enrichment": "Grade 6 standard",
        "flag": "native",
        "notes": [
         "Negative numbers are Grade 6 CCSS (6.NS.C). Flag as above grade; may be relocated to G6. | Beyond K-5 CCSS (covered in G6 6.NS.C.5); optional preview."
@@ -18917,6 +21274,7 @@
        "ee": [
         "M.EE.6.NS.6"
        ],
+       "enrichment": "Grade 6 standard",
        "flag": "native",
        "notes": [
         "Beyond K-5 CCSS (part of 6.NS.C.5 negatives); optional preview."
@@ -18942,6 +21300,7 @@
        "ee": [
         "M.EE.6.NS.6"
        ],
+       "enrichment": "Grade 6 standard",
        "flag": "native",
        "notes": [
         "Beyond K-5 CCSS (part of 6.NS.C.5 negatives); optional preview."
@@ -18967,6 +21326,7 @@
        "ee": [
         "M.EE.6.NS.7"
        ],
+       "enrichment": "Grade 6 standard",
        "flag": "native",
        "notes": [
         "Beyond K-5 CCSS (covered in G6 6.NS.C.5); optional preview."
@@ -18993,6 +21353,7 @@
        "ee": [
         "M.EE.6.NS.7"
        ],
+       "enrichment": "Grade 6 standard",
        "flag": "non-ccss",
        "notes": [
         "(needs manual review)."
@@ -19163,6 +21524,7 @@
      ],
      "supplements": [
       {
+       "id": "G4|-|customarycapacitycupspintsquartsandgallons",
        "title": "Customary capacity: cups, pints, quarts and gallons",
        "ccss": [
         "4.MD.A.1"
@@ -19173,6 +21535,7 @@
        "note": "Awsaj-authored lesson that closes a CCSS standard WRM does not teach (site flag \"committee\"). Not a WRM small step."
       },
       {
+       "id": "G4|-|customarylengthandweightinchesfeetyardsouncesandpounds",
        "title": "Customary length and weight - inches, feet, yards, ounces and pounds",
        "ccss": [
         "4.MD.A.1"
@@ -19183,6 +21546,7 @@
        "note": "Awsaj-authored lesson that closes a CCSS standard WRM does not teach (site flag \"committee\"). Not a WRM small step."
       },
       {
+       "id": "G4|-|measurementwordproblemsdistancetimemassmoneyandcapacity",
        "title": "Measurement word problems: distance, time, mass, money and capacity",
        "ccss": [
         "4.MD.A.2"
@@ -19214,7 +21578,17 @@
         "M.EE.5.MD.3",
         "M.EE.5.MD.4"
        ],
+       "enrichment": "Grade 5 standard",
        "flag": "native",
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G5",
+          "how": "copied-in",
+          "firstWeek": "W23"
+         }
+        ]
+       },
        "drive": {
         "lesson": "1wWn-fAECulrAvjw2goCWeiKezbhpEjox",
         "guide": "1YioZIbqisvP1dHJzRl50EGpVXpp4oWTh",
@@ -19235,10 +21609,16 @@
        "ee": [
         "M.EE.5.MD.4"
        ],
+       "enrichment": "Grade 5 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "1G4L0QP1cVUobk0pWX4y0wFAAMYAMqbKr",
         "guide": "1d3FRrKZso0fLnYE7BzaBhDBVZAPIO-Ig",
@@ -19259,10 +21639,16 @@
        "ee": [
         "M.EE.5.MD.4"
        ],
+       "enrichment": "Grade 5 standard",
        "flag": "above",
        "notes": [
         "Above grade."
        ],
+       "site": {
+        "supportIn": [
+         "G5"
+        ]
+       },
        "drive": {
         "lesson": "13Ws_YYv1fIjpg21f7WHDWlIcW1pbGeRT",
         "guide": "1-9HVe4CZmrvFruw9tCZVC6mwKlLSlvoI",
@@ -19506,10 +21892,25 @@
         "M.EE.6.NS.6",
         "M.EE.6.NS.7"
        ],
+       "enrichment": "Grade 6 standard",
        "flag": "native",
        "notes": [
         "Beyond K-5 CCSS (covered in G6 6.NS.C.5); optional preview."
        ],
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G3",
+          "how": "copied-in",
+          "firstWeek": "W30"
+         },
+         {
+          "grade": "G4",
+          "how": "copied-in",
+          "firstWeek": "W38"
+         }
+        ]
+       },
        "drive": {
         "lesson": "15ql-X5_EgPeqBjiCBXqENHhcGHqG0VK8",
         "guide": "1uUIizXGxxyK93gzrLVL8223tVwc62DsC",
@@ -19653,6 +22054,7 @@
        "ee": [
         "M.EE.6.EE.1-2"
        ],
+       "enrichment": "Grade 6 standard",
        "flag": "native",
        "notes": [
         "Beyond K-5 CCSS (appears in 6.EE.A.1); optional preview."
@@ -20140,6 +22542,7 @@
      ],
      "supplements": [
       {
+       "id": "G5|-|multiplicationasscaling",
        "title": "Multiplication as scaling",
        "ccss": [
         "5.NF.B.5",
@@ -20305,6 +22708,7 @@
      ],
      "supplements": [
       {
+       "id": "G5|-|divideawholenumberbyaunitfraction",
        "title": "Divide a whole number by a unit fraction",
        "ccss": [
         "5.NF.B.7",
@@ -20336,6 +22740,15 @@
        ],
        "power": true,
        "flag": "native",
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G4",
+          "how": "copied-in",
+          "firstWeek": "W31"
+         }
+        ]
+       },
        "drive": {
         "lesson": "1ahnrz_zQXZcZfMt5va0Xn1R8NxEunkp1",
         "guide": "1U3Ow_SqsXJvNaaj0QD0OPF76j4CJDeYE",
@@ -20495,6 +22908,7 @@
        "ee": [
         "M.EE.6.RP.1"
        ],
+       "enrichment": "Grade 6 standard",
        "flag": "non-ccss",
        "notes": [
         "(needs manual review)."
@@ -20520,6 +22934,7 @@
        "ee": [
         "M.EE.6.RP.1"
        ],
+       "enrichment": "Grade 6 standard",
        "flag": "non-ccss",
        "notes": [
         "(needs manual review)."
@@ -20545,6 +22960,7 @@
        "ee": [
         "M.EE.6.RP.1"
        ],
+       "enrichment": "Grade 6 standard",
        "flag": "non-ccss",
        "notes": [
         "(needs manual review)."
@@ -20568,6 +22984,7 @@
         "6.RP.A.3"
        ],
        "ee": [],
+       "enrichment": "Grade 6 standard",
        "flag": "non-ccss",
        "notes": [
         "(needs manual review)."
@@ -20615,6 +23032,7 @@
         "6.RP.A.3"
        ],
        "ee": [],
+       "enrichment": "Grade 6 standard",
        "flag": "non-ccss",
        "notes": [
         "(needs manual review)."
@@ -20638,6 +23056,7 @@
         "6.RP.A.3"
        ],
        "ee": [],
+       "enrichment": "Grade 6 standard",
        "flag": "non-ccss",
        "notes": [
         "(needs manual review)."
@@ -20661,6 +23080,7 @@
         "6.RP.A.3"
        ],
        "ee": [],
+       "enrichment": "Grade 6 standard",
        "flag": "non-ccss",
        "notes": [
         "(needs manual review)."
@@ -20685,6 +23105,7 @@
         "6.RP.A.3"
        ],
        "ee": [],
+       "enrichment": "Grade 6 standard",
        "flag": "non-ccss",
        "notes": [
         "(needs manual review)."
@@ -20784,6 +23205,7 @@
         "6.EE.A.2c"
        ],
        "ee": [],
+       "enrichment": "Grade 6 standard",
        "flag": "non-ccss",
        "notes": [
         "(needs manual review)."
@@ -20809,6 +23231,7 @@
        ],
        "ee": [],
        "power": true,
+       "enrichment": "Grade 6 standard",
        "flag": "non-ccss",
        "notes": [
         "(needs manual review)."
@@ -20835,6 +23258,7 @@
        "ee": [
         "M.EE.6.EE.5-7"
        ],
+       "enrichment": "Grade 6 standard",
        "flag": "non-ccss",
        "notes": [
         "(needs manual review)."
@@ -20860,6 +23284,7 @@
        "ee": [
         "M.EE.6.EE.5-7"
        ],
+       "enrichment": "Grade 6 standard",
        "flag": "native",
        "notes": [
         "Formal algebra with variables is Grade 6 CCSS (6.EE.A/B). Above grade for G5. | Auto-matched by keyword scan; verify."
@@ -20885,6 +23310,7 @@
        "ee": [
         "M.EE.3.OA.7"
        ],
+       "enrichment": true,
        "flag": "native",
        "notes": [
         "Auto-matched by keyword scan; verify."
@@ -20912,6 +23338,7 @@
         "M.EE.4.OA.4",
         "M.EE.6.EE.5-7"
        ],
+       "enrichment": "Grade 6 standard",
        "flag": "native",
        "notes": [
         "Auto-matched by keyword scan; verify."
@@ -20937,6 +23364,7 @@
        "ee": [
         "M.EE.3.OA.7"
        ],
+       "enrichment": true,
        "flag": "native",
        "notes": [
         "Auto-matched by keyword scan; verify."
@@ -20955,7 +23383,8 @@
      ],
      "supplements": [
       {
-       "title": "Form ordered pairs from corresponding terms",
+       "id": "G5|-|generatetwosequencesusingtwodifferentrules",
+       "title": "Generate two sequences using two different rules",
        "ccss": [
         "5.OA.B.3"
        ],
@@ -20965,7 +23394,8 @@
        "note": "Awsaj-authored lesson that closes a CCSS standard WRM does not teach (site flag \"committee\"). Not a WRM small step."
       },
       {
-       "title": "Generate two sequences using two different rules",
+       "id": "G5|-|formorderedpairsfromcorrespondingterms",
+       "title": "Form ordered pairs from corresponding terms",
        "ccss": [
         "5.OA.B.3"
        ],
@@ -21266,6 +23696,7 @@
         "6.RP.A.3"
        ],
        "ee": [],
+       "enrichment": "Grade 6 standard",
        "flag": "native",
        "notes": [
         "Beyond K-5 CCSS (covered in G6 6.RP); optional preview."
@@ -21289,6 +23720,7 @@
         "6.RP.A.3"
        ],
        "ee": [],
+       "enrichment": "Grade 6 standard",
        "flag": "native",
        "notes": [
         "Beyond K-5 CCSS (covered in G6 6.RP); optional preview."
@@ -21313,6 +23745,7 @@
         "6.RP.A.3"
        ],
        "ee": [],
+       "enrichment": "Grade 6 standard",
        "flag": "native",
        "notes": [
         "Beyond K-5 CCSS (covered in G6 6.RP); optional preview."
@@ -21339,6 +23772,7 @@
        "ee": [
         "M.EE.4.NF.2"
        ],
+       "enrichment": "Grade 6 standard",
        "flag": "native",
        "notes": [
         "Beyond K-5 CCSS (covered in G6 6.RP); optional preview."
@@ -21362,6 +23796,7 @@
         "6.RP.A.3"
        ],
        "ee": [],
+       "enrichment": "Grade 6 standard",
        "flag": "native",
        "notes": [
         "Beyond K-5 CCSS (covered in G6 6.RP); optional preview."
@@ -21385,6 +23820,7 @@
         "6.RP.A.3"
        ],
        "ee": [],
+       "enrichment": "Grade 6 standard",
        "flag": "native",
        "notes": [
         "Beyond K-5 CCSS (covered in G6 6.RP); optional preview."
@@ -21408,6 +23844,7 @@
         "6.RP.A.3"
        ],
        "ee": [],
+       "enrichment": "Grade 6 standard",
        "flag": "native",
        "notes": [
         "Beyond K-5 CCSS (covered in G6 6.RP); optional preview."
@@ -21604,6 +24041,7 @@
      ],
      "supplements": [
       {
+       "id": "G5|-|volumeofcompositesolids",
        "title": "Volume of composite solids",
        "ccss": [
         "5.MD.C.5",
@@ -21681,6 +24119,7 @@
         "6.RP.A.3"
        ],
        "ee": [],
+       "enrichment": "Grade 6 standard",
        "flag": "native",
        "drive": {
         "lesson": "1FKRiIq6HxwSRl0IxeD2x-GNy4jhZ5vLS",
@@ -21701,6 +24140,7 @@
         "6.RP.A.3"
        ],
        "ee": [],
+       "enrichment": "Grade 6 standard",
        "flag": "native",
        "notes": [
         "Beyond K-5 CCSS (covered in G6 6.RP); optional preview."
@@ -21727,6 +24167,7 @@
        "ee": [
         "M.EE.4.MD.6"
        ],
+       "enrichment": "Grade 6 standard",
        "flag": "native",
        "drive": {
         "lesson": "1BS-3RStffhs-SCw0GiSOU-bqSPS7Lb75",
@@ -21768,6 +24209,7 @@
      ],
      "supplements": [
       {
+       "id": "G5|-|fractionlineplots",
        "title": "Fraction line plots",
        "ccss": [
         "5.MD.B.2"
@@ -21961,6 +24403,7 @@
        "title": "Circles",
        "ccss": [],
        "ee": [],
+       "enrichment": true,
        "flag": "native",
        "notes": [
         "Beyond CCSS: no CCSS K-5 standard (UK National Curriculum content)."
@@ -22010,6 +24453,7 @@
         "6.G.A.4"
        ],
        "ee": [],
+       "enrichment": "Grade 6 standard",
        "flag": "native",
        "notes": [
         "Beyond K-5 CCSS (G6 6.G.A.4); optional preview."
@@ -22028,6 +24472,7 @@
      ],
      "supplements": [
       {
+       "id": "G5|-|classifytwodimensionalfiguresinahierarchy",
        "title": "Classify two-dimensional figures in a hierarchy",
        "ccss": [
         "5.G.B.3",
