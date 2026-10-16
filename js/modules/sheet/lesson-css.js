@@ -76,6 +76,7 @@ ${ICON_CSS}
 :is(.ws-page,.ws-sheet) .mq-lround-top{display:flex;align-items:flex-end;gap:1mm;white-space:nowrap}
 :is(.ws-page,.ws-sheet) .mq-lring{outline:var(--ws-hair) solid var(--ws-ink);outline-offset:.06em;border-radius:50%}
 :is(.ws-page,.ws-sheet) .mq-lring.mq-lring-t{outline:1pt solid #949494}
+:is(.ws-page,.ws-sheet) .mq-wwbarlayout .mq-lring{display:inline-block;margin:0 .2em;padding:0 .08em;line-height:1.05}
 :is(.ws-page,.ws-sheet) .mq-luline{border-bottom:1pt solid #949494;display:inline-block;line-height:1}
 :is(.ws-page,.ws-sheet) .ws-cell.mq-lvocabcell{justify-content:center;align-items:stretch;padding:2.5mm 3mm}
 :is(.ws-page,.ws-sheet) .mq-lvocab{width:100%;display:flex;flex-direction:column}

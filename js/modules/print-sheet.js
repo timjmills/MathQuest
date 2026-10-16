@@ -1403,6 +1403,8 @@ function skillMeta(sk, q) {
     const words = skillWords(Object.assign({ answerType: q && q.answerType, printFormat: q && q.printFormat }, meta, titleOpts, { skillId: nameId }));
     meta.iCan = sk.iCan || optionTitle(sk, words.iCan) || words.iCan;
     meta.instructionKey = q ? instructionKeyFor(q, words) : words.instructionKey;
+    // (a lesson ref's own library key - the detailed lesson maker, lesson 2 - wins on every band)
+    if (typeof sk.instructionKey === 'string' && INSTRUCTION_LIBRARY[sk.instructionKey]) meta.instructionKey = sk.instructionKey;
     return meta;
 }
 

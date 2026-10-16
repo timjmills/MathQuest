@@ -209,9 +209,9 @@ export default {
         { n: 6, name: 'We Do: Guided Practice', min: 8, page: 'P3', boxes: [{ kind: 'feedback', title: 'Fix it at once', text: 'Fix: touch the top box and ask “Is that a part?”' }],
             rows: [
                 { do: 'Pupils open the lesson sheet at Guided Practice.' },
-                { say: 'Cell 1: the grey is a helper. Trace it.' },
+                { say: 'The circles show the two parts.' },
                 { ask: 'Which box is the whole?', note: 'Pupils point at the top box.' },
-                { do: 'Pairs do cell 2: A talks, B points. Check every sheet.' },
+                { do: 'Pairs do Independent Practice a: A talks, B points. Check every sheet.' },
                 { say: 'Parts below. Whole on top. Add the parts.', note: 'The chant. Say it twice together.' },
             ] },
         { n: 7, name: 'Check Question', min: 3, page: '',

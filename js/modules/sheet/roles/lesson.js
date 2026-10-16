@@ -609,7 +609,9 @@ const inkSpan = (html, grey) => html.replace(/color:#000(000)?;?/g, '').replace(
 function barState(it, k, c, { keepSlots = false } = {}) {
     const v = barNums(it);
     const ctx = resolveCtx(Object.assign({}, c, { state: 'answered', scaffoldLevel: 1, metrics: undefined }));
-    let html = it.render(ctx, { cols: 1 });
+    // (a compact `layout: 'bar'` cell - the detailed lesson maker - sits in a half-width chart panel)
+    const half = ((it.q && it.q.cell && it.q.cell.payload) || {}).layout === 'bar';
+    let html = it.render(ctx, { cols: half ? 2 : 1 });
     // the bar labels in drawing order: whole, part a, part b
     let i = 0;
     html = html.replace(/<span data-ws-graded="0" data-ws-slot="bar"([^>]*)>([^<]*)<\/span>/g, (m, attrs, val) => {
