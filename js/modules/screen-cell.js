@@ -1668,6 +1668,9 @@ function wireSwipeRows(cellEl) {
         const mode = () => {
             if (!frame || !body) return;
             frame.removeAttribute('data-mq-swipes'); w.style.width = ''; frame.style.minWidth = ''; w.style.maxWidth = ''; w.style.overflowX = 'auto'; body.style.paddingRight = '0px';
+            // critic r7 O9: a wide row drawn as one wrapping line (desktop / tablet, count-row.js) never swipes: its step tab
+            // stands above it and the line wraps to the cell's width
+            if (body.dataset.mqWrap === '1') { frame.setAttribute('data-mq-swipes', ''); w.style.overflowX = 'visible'; w.style.width = '100%'; level(); return; }
             const its = items();
             const fw = frame.parentElement ? frame.parentElement.getBoundingClientRect().width : frame.getBoundingClientRect().width;
             if (body.getBoundingClientRect().width + col.getBoundingClientRect().width <= fw + 1 || its.length < 2) { level(); return; }
@@ -3037,14 +3040,23 @@ export function cellDigitTarget(cellEl) {
  *   build    the body holds a build mat (mountBuild writes the mat's value into the input)
  * null: the item keeps the host's legacy path.
  */
+/**
+ * A count-by row drawn again for the screen it is shown on. TY-10b (critic phone29): on a phone (`phoneGap`, the worksheet and
+ * the quiz) its gap is capped at 24 px absolute, so the geometry (box pitch, arcs) is laid out on the narrower pitch and three
+ * whole columns fit the window. Critic r7 O9: above a phone a row too wide for six boxes wraps onto more lines at the host's
+ * digit size (`twinWrap`, count-row.js) instead of shrinking under TY-10a. Any other item comes back as it is.
+ */
+export function countRowTwin(q, { phoneGap = true } = {}) {
+    if (!q || !q.cell || q.cell.template !== 'count-row' || !q.cell.payload || typeof window === 'undefined'
+        || !/class="k2-twin"/.test(String(q.visual || ''))) return q;
+    const phone = window.innerWidth <= 480;
+    if (phone && !phoneGap) return q;
+    try { return Object.assign({}, q, { visual: k2Twin('count-row', Object.assign({}, q.cell.payload, phone ? { twinGapPx: 24 } : { twinWrap: true })) }); } catch (e) { return q; /* keep the stored twin */ }
+}
+
 export function screenTwin(q, { categoryId = '', typedOrder = false } = {}) {
     if (!q) return null;
-    // TY-10b (critic phone29): on a phone a count-by row is drawn again with its gap capped at 24 px absolute, so the
-    // geometry (box pitch, arcs) is laid out on the narrower pitch and three whole columns fit the worksheet / quiz window
-    if (q.cell && q.cell.template === 'count-row' && q.cell.payload && typeof window !== 'undefined' && window.innerWidth <= 480
-        && /class="k2-twin"/.test(String(q.visual || ''))) {
-        try { q = Object.assign({}, q, { visual: k2Twin('count-row', Object.assign({}, q.cell.payload, { twinGapPx: 24 })) }); } catch (e) { /* keep the stored twin */ }
-    }
+    q = countRowTwin(q);
     const kt = kitCellTwin(q, { categoryId, typedOrder });
     if (kt) return kt;
     const t = q.answerType;

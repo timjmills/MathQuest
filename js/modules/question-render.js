@@ -17,7 +17,7 @@ import {
     answerDigits, wireStackEntry, hideScreenOnlyCaptions, visualRepeatsText, monoCell,
     regroupFor, screenTextLine, hideRepeatedPrompt, wireTickBoxes, adoptVisualBlank, releaseVisualBlank, wireCellSlots,
     clozeHTML, wireClozeBanks, ringParts, ringCellHTML, wireRingGroups, workRowsHTML, fitCellDigits, cellDigitTarget, isNumberLineItem, NUMBER_LINE_INSTRUCTION,
-    screenInstruction, canFitDigits, adoptSvgBlank, mountModel, kitCellTwin, wireSignCircle, printInstructionFor, skillDisplayLabel, fitTwinRows, wireLiveCorrect, unwireLiveCorrect, markLegacyBlanks, signsFor, screenCellVerbs,
+    screenInstruction, canFitDigits, adoptSvgBlank, mountModel, kitCellTwin, countRowTwin, wireSignCircle, printInstructionFor, skillDisplayLabel, fitTwinRows, wireLiveCorrect, unwireLiveCorrect, markLegacyBlanks, signsFor, screenCellVerbs,
 } from './screen-cell.js';
 
 // Escape HTML-significant characters so q.text strings (which may contain
@@ -2161,7 +2161,8 @@ function _renderQuestionImpl() {
 
     if (requiresVisual || q.visual) {
         visualAid.style.display = "block";
-        visualAid.innerHTML = q.visual;
+        // a count-by row too wide for six boxes wraps at the card's digit size above a phone (critic r7 O9)
+        visualAid.innerHTML = countRowTwin(q, { phoneGap: false }).visual;
         // Auto-advance focus on column-answer-input boxes (long division
         // quotient, column add/sub/mult result). When the student fills a
         // 1-character box, focus jumps to the next empty input. Enter

@@ -381,6 +381,23 @@ function arcsGeom(p, ctx, c) {
             rows = Math.ceil(n / perRow);
         }
     }
+    // critic r7 O9: on a DESKTOP / tablet screen (the host asks with `twinWrap`; the phone twin carries twinGapPx, TY-10b) a row whose numbers six
+    // boxes cannot hold at today's digits is not shrunk under TY-10a: it is drawn as ONE wrapping line at today's digits, each
+    // box wide enough for the widest answer, and the screen scales the whole row so its digits reach the host's digit size
+    // (min(--mq-digit, 40 px): 29 px on the online worksheet, 40 px on the card and the quiz). The browser wraps the line to
+    // the cell, so the row takes more lines instead of swiping. Paper is unchanged.
+    if (isTwin(ctx) && p.twinWrap && !(Number(p.twinGapPx) > 0) && narrowCols(p, ctx) === 1 && !p.compact) {
+        const avail0 = live - tab - (rows > 1 ? EXIT_MM : 0);
+        const kS0 = shape === 'hex' || shape === 'mixed' ? 1.12 : 1;
+        const need0 = Math.max(MIN_BOX[size], chars * 0.56 * basePt * PT_MM + 2.4);
+        if ((avail0 + MIN_GAP) / perRow - MIN_GAP < need0 * kS0) {
+            const w = Math.max(MIN_BOX[size], chars * 0.56 * basePt * PT_MM + 3);
+            const sz = shape === 'box' ? { w, h: baseH } : tileSize(shape === 'mixed' ? 'hex' : shape, w, baseH);
+            const lblPt = hasLbl ? Math.max(8, Math.min(lblPt0, (sz.w + MIN_GAP - 0.8) / (Math.max(1, lblChars) * 0.6 * PT_MM))) : lblPt0;
+            const lblHh = hasLbl ? lblPt * PT_MM * 1.2 + 0.9 : lblH;
+            return { size, n, look: 'arcs', shape, w: sz.w, h: sz.h, pitch: sz.w + MIN_GAP, gap: MIN_GAP, tab, tabBody, perRow: n, rows: 1, arcH: 0, pt: basePt, hasLbl, lblH: lblHh, lblPt, compact: false, wrap: true };
+        }
+    }
     const avail = live - tab - (rows > 1 ? EXIT_MM : 0);        // the width the numbers of one line may fill
     const pitch = (avail + MIN_GAP) / perRow;                   // box + gap, so six boxes and five gaps fill the line
     const shapeK = shape === 'hex' || shape === 'mixed' ? 1.12 : 1;
@@ -577,7 +594,7 @@ register('count-row', {
             const exitArrow = turns && r < g.rows - 1 ? `<span style="flex:none;width:${L(ctx, 6)};margin-left:${L(ctx, 1.5)};${lift}">${turnArrow(ctx, g, 'out', 6)}</span>` : '';
             rowsHtml.push(`<div class="k2-countrow-line"${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;align-items:flex-end;justify-content:${g.tab ? 'flex-start' : 'center'};${r ? `margin-top:${L(ctx, lg)};` : ''}">`
                 + `${swipeTabs ? '' : tabCol}<div style="display:flex;flex-direction:column;align-items:flex-start;">${arcs}`
-                + `<div${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;align-items:flex-start;gap:${L(ctx, g.gap)};">${lineCells.join('')}</div></div>${exitArrow}</div>`);
+                + `<div${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;align-items:flex-start;gap:${L(ctx, g.gap)};${g.wrap ? `flex-wrap:wrap;row-gap:${L(ctx, 3)};padding-left:${L(ctx, g.gap)};` : ''}">${lineCells.join('')}</div></div>${exitArrow}</div>`);
         }
         let caption = '';
         if (p.rule) {
@@ -603,7 +620,7 @@ register('count-row', {
         return root(ctx, `k2-countrow k2-countrow-${g.look}`,
             `${caption}${swipeTabs ? `<div class="k2-countrow-frame" style="display:flex;align-items:flex-start;max-width:100%;min-width:0;"><div class="k2-countrow-tabs" data-mq-tabcol="1" style="flex:none;">${tabsCol.join('')}</div>` : ''}`
             + `${isTwin(ctx) && g.look === 'arcs' ? `<div data-mq-swiperow="1" style="overflow-x:auto;max-width:100%;padding-bottom:1px;${swipeTabs ? 'flex:1 1 auto;min-width:0;width:auto;' : ''}">` : ''}`
-            + `<div class="k2-countrow-body" data-mq-join=", " style="display:inline-block;text-align:left;">${rowsHtml.join('')}</div>`
+            + `<div class="k2-countrow-body" data-mq-join=", " style="display:inline-block;text-align:left;${g.wrap ? `--mq-k2:calc(min(var(--mq-digit, 40px), 40px) / ${n2(g.pt * PT_MM)});` : ''}"${g.wrap ? ' data-mq-wrap="1"' : ''}>${rowsHtml.join('')}</div>`
             + `${isTwin(ctx) && g.look === 'arcs' ? '<div class="k2-swipe-cues" aria-hidden="true"><span class="k2-swipe-back"><i>&#10229;</i> <b>Back<span class="k2-cue-long"> to the start</span></b></span><span class="k2-swipe-cue"><b>Swipe</b> <i>&#10142;</i> <b>for more boxes</b></span></div></div>' : ''}${swipeTabs ? '</div>' : ''}${keys}${ruleFrame}`,
             { style: `text-align:${align};${vp ? `padding:${L(ctx, vp)} 0;` : ''}${inset ? `padding-left:${L(ctx, inset)};` : ''}` });
     },
