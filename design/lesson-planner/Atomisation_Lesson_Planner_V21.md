@@ -3001,13 +3001,15 @@ kind when one item alone would leave an empty band (Score then counts items). Re
   - **Small pool (usable pool < 12, one Practice page's worth).** Print **one** Practice page. Then, in this
     order: (1) fewer Practice rows (a page under 50 % used is a half page, §8.12.4); (2) turn-arounds of items on
     OTHER pages are allowed (soft, LR-5), never on the same page; (3) the same fact in a different representation
-    (ten frame, bond, equation) is a different item only on a different page. Never an exact repeat in one
+    (ten frame, bond, equation) is a different item only on a different page — **except a chart example: it never
+    returns, in any representation, on any page, and neither does its turn-around (LR-5)**. Never an exact repeat in one
     representation. The exit slip takes items not on Practice, using a turn-around or another representation
     when the pool is spent. Example, make 10: 11 ordered facts (0 + 10 … 10 + 0); the 2 chart examples (7 + 3, 4 + 6)
     are places and their turn-arounds (3 + 7, 6 + 4) are forbidden → **7 facts left for the pages**. Lesson sheet 4
     (1 + 9, 2 + 8, 5 + 5, 0 + 10) as equations; one Practice page: the 3 facts left (9 + 1, 8 + 2, 10 + 0) as
-    equations plus 5 + 5 as a bond (another representation, another page); exit slip: 1 + 9, 2 + 8, 0 + 10 and
-    7 + 3 as ten frames. Its E24 run is Appendix F.3.
+    equations plus 5 + 5 as a bond (another representation, another page); exit slip: 9 + 1, 8 + 2, 10 + 0 and
+    5 + 5 as ten frames (never 7 + 3 or 4 + 6, the chart examples). Usable pool 11 − 2 forbidden = 9: 2 chart
+    places + the 7 facts above. Its E24 run is Appendix F.3.
 - **The pool travels with the pack.** The builder writes the pool into `pack.html` as
   `<script type="application/json" id="v21-pool">{"op":"+","decl":{"op":"+","small":[1,3],"maxSum":10,"noZero":true},"pool":[[a,b],…],"forbidden":[[a,b],…],"edge":[[a,b],…]}</script>`
   and marks every dealt item cell `data-item="a+b"` (or `a−b`, or the list / time key such as `3:30`),
@@ -6838,7 +6840,11 @@ function poolCheck(POOL, pages) {
   const ruleOk = re.length > 0 && re.length === inPool.size && re.every((x) => inPool.has(x));
   const usable = inPool.size - forb.size, small = usable < 12;
   const seenRep = new Set(), seenPage = new Set(), firstPage = new Map(), rep = [], soft = [], bad = [], noRep = [];
+  // LR-5: a chart (P2) example never returns, in any representation, on any page, nor does its turn-around
+  const turn = (k) => { const [a, b] = k.split(op); return op === '+' && b !== undefined ? `${b}+${a}` : k; };
+  const chart = new Set(all.filter((x) => x.page === 'P2').flatMap((x) => [x.item, turn(x.item)])), chartBack = [];
   for (const x of all) {
+    if (x.page !== 'P2' && chart.has(x.item)) chartBack.push(`${x.item} (${x.rep}) ${x.page}`);
     if (!inPool.has(x.item) || forb.has(x.item)) bad.push(x.item + ' ' + x.page);
     if (!x.rep) noRep.push(x.item + ' ' + x.page);
     const kr = x.item + '|' + x.rep, kp = x.item + '|' + x.page;
@@ -6848,8 +6854,8 @@ function poolCheck(POOL, pages) {
   const turns = []; if (op === '+') for (const p of pages) { const s2 = new Set((p.items || []).map((x) => x.item));
     for (const x of p.items || []) { const [a, b] = x.item.split('+'); if (a !== b && +a > +b && s2.has(`${b}+${a}`)) turns.push(`${x.item} on ${p.id}`); } }
   const distinct = firstPage.size;
-  return { ok: ruleOk && !bad.length && !noRep.length && !rep.length && !turns.length && (small || all.length <= usable),
-    msg: `${all.length} places (${distinct} facts), usable pool ${usable}${small ? ' (small pool: another representation on another page allowed)' : ''} (pool ${inPool.size} recomputed from its rule: ${ruleOk ? 'matches' : 'MISMATCH'}); repeats ${rep.length ? rep.join(', ') : 0}; other-representation repeats on other pages ${soft.length}; same-page turn-arounds ${turns.length}; outside the pool / forbidden ${bad.length ? bad.join(', ') : 0}; items without data-rep ${noRep.length}` };
+  return { ok: ruleOk && !bad.length && !noRep.length && !rep.length && !chartBack.length && !turns.length && (small || all.length <= usable),
+    msg: `${all.length} places (${distinct} facts), usable pool ${usable}${small ? ' (small pool: another representation on another page allowed)' : ''} (pool ${inPool.size} recomputed from its rule: ${ruleOk ? 'matches' : 'MISMATCH'}); repeats ${rep.length ? rep.join(', ') : 0}; other-representation repeats on other pages ${soft.length}; chart examples returning ${chartBack.length ? chartBack.join(', ') : 0}; same-page turn-arounds ${turns.length}; outside the pool / forbidden ${bad.length ? bad.join(', ') : 0}; items without data-rep ${noRep.length}` };
 }
 ```
 
@@ -6924,8 +6930,9 @@ Committed beside the packs in `design/lesson-planner/fixtures/` and run with
 
 | Fixture | Declaration | Expected E24 |
 |---|---|---|
-| `make10.json` | `{"op":"+","sum":10,"zero":true}`, forbidden 3 + 7, 6 + 4; pages as in §9.5's example (5 + 5 also a bond on Practice; 4 exit items as ten frames) | **PASS**: 14 places, 9 facts, usable 9 (small pool); 5 other-representation repeats on other pages, 0 repeats |
+| `make10.json` | `{"op":"+","sum":10,"zero":true}`, forbidden 3 + 7, 6 + 4; pages as in §9.5's example (5 + 5 also a bond on Practice; exit 9 + 1, 8 + 2, 10 + 0, 5 + 5 as ten frames) | **PASS**: 14 places, 9 facts, usable 9 (small pool); 5 other-representation repeats on other pages, 0 repeats, 0 chart examples returning |
 | `make10-repeat.json` | the same, exit item d replaced by 1 + 9 as an equation (already on the lesson sheet as an equation) | **FAIL**: repeat 1+9 (stack) P6 |
+| `make10-chart.json` | the same, exit item d = 7 + 3 as a ten frame (a chart example returning) | **FAIL**: chart examples returning 7+3 (tenframe) P6 |
 | `time.json` | `{"kind":"time","h":[1,12],"m":[0,30]}`, 24 keys; chart 3:00, 3:30; 21 places, clocks; Practice last row 12:30, 6:30, 12:00 | **PASS**: 21 places, usable 24, 0 repeats |
 | `time-repeat.json` | the same, exit item d = 7:30 (on the lesson sheet) | **FAIL**: repeat 7:30 (clock) P6 |
 
