@@ -38,6 +38,10 @@ const DRAW = {
         + '<circle cx="0.8" cy="1.5" r="1" class="f"/><circle cx="9.2" cy="1.5" r="1" class="f"/>',
     // an up arrow and a down arrow: decide, round up or down
     decide: '<path d="M3 9.2 V1.2"/><path d="M1.4 2.9 L3 1 L4.6 2.9"/><path d="M7 0.8 V8.8"/><path d="M5.4 7.1 L7 9 L8.6 7.1"/>',
+    // a small array and a quarter-turn arrow: turn the array (detailed lesson 3a)
+    turn: '<circle cx="1.6" cy="1.6" r="0.8" class="f"/><circle cx="4" cy="1.6" r="0.8" class="f"/><circle cx="6.4" cy="1.6" r="0.8" class="f"/>'
+        + '<circle cx="1.6" cy="4" r="0.8" class="f"/><circle cx="4" cy="4" r="0.8" class="f"/><circle cx="6.4" cy="4" r="0.8" class="f"/>'
+        + '<path d="M8.6 3 Q9.6 8.6 3.6 8.8"/><path d="M5 7.6 L3.4 8.8 L5 9.9"/>',
     // a check mark in a box: check the work
     check: '<rect x="0.9" y="0.9" width="8.2" height="8.2" rx="1"/><path d="M2.6 5.2 L4.4 7 L7.6 2.9"/>',
     // a speech bubble: say it
@@ -62,6 +66,7 @@ export function iconForText(text) {
     if (/^regroup|trade/.test(t)) return 'regroup';
     if (/^(subtract|take)/.test(t) || /^\d+\s*[−-]\s*\d+/.test(t)) return 'subtract';
     if (/^(round|decide|5 or more|it is exactly)/.test(t) || /round (up|down)/.test(t)) return 'decide';
+    if (/^turn/.test(t)) return 'turn';
     if (/^check/.test(t)) return 'check';
     if (/^say/.test(t)) return 'say';
     return 'look';

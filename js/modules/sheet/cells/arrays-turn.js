@@ -55,7 +55,7 @@ function dotsSvg(g, rows, cols, ink, label) {
             body += `<circle cx="${(pitch / 2 + j * pitch).toFixed(2)}" cy="${(pitch / 2 + i * pitch).toFixed(2)}" r="${r.toFixed(2)}" fill="${fill}"/>`;
         }
     }
-    const svg = `<svg viewBox="0 0 ${W.toFixed(2)} ${H.toFixed(2)}" role="img" aria-label="${esc(label)}" `
+    const svg = `<svg viewBox="0 0 ${W.toFixed(2)} ${H.toFixed(2)}" data-per-row="${cols}" role="img" aria-label="${esc(label)}" `
         + `style="display:block;margin:0 auto;width:${g.em(W)};height:${g.screen ? 'auto' : g.em(H)};max-width:${g.screen ? '100%' : 'none'};overflow:visible">${body}</svg>`;
     return { svg, wMm: W, hMm: H };
 }

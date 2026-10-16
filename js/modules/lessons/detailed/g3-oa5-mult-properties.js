@@ -16,6 +16,11 @@
 
 // The array item: one picture, `___ rows of ___ make ___ in all.` (gen-operations.js arrays_groups).
 const ARR = (extra) => Object.assign({ categoryId: 'multiplication', skillId: 'arrays_groups', opts: { forms: [0] } }, extra || {});
+// The lesson's own skill (3.OA.B.5): an array and its turn. task 0 both products, 1 the known fact
+// gives the turned fact, 2 facts only (the missing number). Arrays stay at most 5 x 5 (band 25).
+const TURN = (task, extra) => Object.assign({ categoryId: 'multiplication', skillId: 'mult_properties', opts: { forms: [0], task: [task], band: 25 } }, extra || {});
+// The abstract ★★★ facts (task 2): factors to 9, so the pack's few 5 x 5 arrays are not all spent.
+const FACTS = (extra) => Object.assign(TURN(2), { opts: { forms: [0], task: [2], band: 81 } }, extra || {});
 // A one-line × fact (earlier content, Y3.B3): the tables of 2, 5 and 10.
 const FACT = (t, extra) => Object.assign({ categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: [t], notation: ['across'], band: 100 } }, extra || {});
 // One count-by row (Count by 1-12), the first two numbers printed.
@@ -45,12 +50,17 @@ export default {
     ],
 
     // ------------------------------------------------------------------ the practice skill
-    skill: ARR(),
+    skill: TURN(0),
     // (no pool: the pack's own places; there are only 10 rows-by-cols pairs, so ONE Practice page)
-    practicePages: 1,
+    practicePages: 2,
     // ★★★ last row: a square array (does it change when turned?) and a 5-row array.
     edgeTest: 'arrEdge',
-    practiceSheets: [{ edgeLast: { per: 6, cols: 2, wants: ['arrSquare', 'arrFive'] } }],
+    // ★★ Practice 1: the known fact gives the turned fact (pictures); ★★★ Practice 2: facts only, the
+    // missing number; each last row a square and a 5.
+    practiceSheets: [
+        { skill: TURN(1), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['arrSquare', 'arrFive'] } },
+        { skill: FACTS(), shape: [8, 2], edgeLast: { per: 8, cols: 2, wants: ['arrSquare', 'arrFive'] } },
+    ],
     // Mixed: EARLIER content only (V22 §9.5): × facts of 2, 5 and 10 and array totals.
     mixed: { skills: [FACT(2), FACT(5), FACT(10), { categoryId: 'multiplication', skillId: 'dot_array_mult', opts: { band: 25, support: 'none' } }], strip: false },
 
@@ -94,7 +104,7 @@ export default {
         format: { kind: 'numbered steps with icons', why: 'Step 5 is the Critical Atom: the pupil checks, never recounts.' },
         // A non-square array, no repeated digit, a product the pupils can count (3 rows of 4).
         example: { test: 'arrTurn' },
-        second: { test: 'arrTurn', label: 'Another size. Turn it: same product.' },
+        second: { test: 'arrNonSq', label: 'Another size. Turn it: same product.' },
         third: { test: 'arrFive', label: '5 rows? Turn it: 5 in each row.' },
         mixWith: [],
     },
@@ -122,8 +132,8 @@ export default {
     // ------------------------------------------------------------------ P5 Word problem
     // Our own words; the numbers come from a dealt array item (a non-square array).
     wordProblem: {
-        ref: ARR(),
-        want: 'arrTurn',
+        ref: TURN(0),
+        want: 'arrNonSq',
         instruction: 'Read the story. Draw it. Solve.',
         lines: ['A box has {wp.rows} rows of eggs.', 'There are {wp.cols} eggs in each row.', 'How many eggs are in the box?'],
         answerLine: 'There are __ eggs.',
@@ -134,10 +144,10 @@ export default {
     // Four items, exactly what was taught, fresh numbers: write the fact, write the turned fact, the
     // Critical Atom (same product), and the ★★★ square case.
     exit: [
-        { case: 'an array, the fact', ref: ARR(), want: 'arrTurn', instr: 'Write how many rows. Write how many in each row.', detects: 'Adds: rows + in each row.' },
-        { case: 'the turned array, the new fact', ref: ARR(), want: 'arrTurn', instr: 'Write how many rows. Write how many in each row.', detects: 'Copies the first fact: no swap.' },
-        { case: 'same product (Critical Atom)', ref: ARR(), want: 'arrFive', instr: 'Write how many rows. Write how many in each row.', detects: 'Recounts and writes a new total.' },
-        { case: 'a square array', ref: ARR(), want: 'arrSquare', instr: 'Write how many rows. Write how many in each row.', detects: 'Thinks a square cannot turn.' },
+        { case: 'an array: the known fact gives the turned fact', ref: TURN(1), want: 'arrNonSq', instr: 'Turn the array. Write the new fact.', detects: 'Copies the first fact: no swap.' },
+        { case: 'same product, no picture (Critical Atom)', ref: FACTS(), want: 'arrProduct', instr: 'Write the missing number.', detects: 'Multiplies again and slips: not the same product.' },
+        { case: 'the missing factor', ref: FACTS(), want: 'arrFactor', instr: 'Write the missing number.', detects: 'Writes the product, or the same factor, in the box.' },
+        { case: 'a square fact', ref: FACTS(), want: 'arrSquare', instr: 'Write the missing number.', detects: 'Thinks a square cannot turn.' },
     ],
     exitInstruction: 'Write how many rows. Write how many in each row.',
     exitSay: '{say.rows} times {say.cols} equals {say.cols} times {say.rows}.',
@@ -189,10 +199,10 @@ export default {
         { name: 'Recounts: a new product', step: 5, looks: '{cq.A}', fix: '“Did a dot move away?”', option: 'A', misconception: 'turn-recount' },
         { name: 'Copies the fact: no swap', step: 4, looks: '{cq.B}', fix: 'Count the turned rows aloud.', option: 'B', misconception: 'turn-no-swap' },
         { name: 'Product as a factor', step: 4, looks: '{cq.C}', fix: 'The product is always last.', option: 'C', misconception: 'turn-product-factor' },
-        { name: 'Adds rows and in each row', step: 2, looks: '{exit.0.wrong.added} for {exit.0.fact}', fix: 'Count by the row size.', option: '', caught: 'Exit a · Practice 1' },
-        { name: 'Story: bags = turned bags', step: 3, looks: 'The wrong picture on P5', fix: 'Same number, other story: draw both.', option: '', caught: 'Word problem' },
+        { name: 'Recounts the turned array', step: 5, looks: '{exit.1.wrong.turnrecount} for {exit.1.turned}', fix: 'Turn the tray: same dots.', option: '', caught: 'Exit b · Practice 2' },
+        { name: 'Story: counts eggs one by one', step: 2, looks: 'A tally, no fact, on P5', fix: 'Rows first: write the fact.', option: '', caught: 'Word problem' },
     ],
-    checkQuestion: { want: 'arrTurn', correct: 'D' },
+    checkQuestion: { want: 'arrNonSq', correct: 'D' },
 
     // ------------------------------------------------------------------ T3-T5 delivery scripts
     sections: [
@@ -273,9 +283,9 @@ export default {
         'On the egg story, 3 × 5 or 5 × 3 first; the label “eggs” may be left off.',
     ],
     wrongAnswers: [
-        { wrote: '{exit.0.wrong.added} for {exit.0.fact}', mistake: 'Adds rows and in each row', next: 'Count by the row size on the tray.' },
-        { wrote: 'A new total for the turned array', mistake: 'Recounts: a new product', next: 'Tray: turn it; “Did a dot move away?”' },
-        { wrote: 'The same fact written twice', mistake: 'Copies the fact: no swap', next: 'Count the turned rows aloud.' },
-        { wrote: 'The product in a factor box', mistake: 'Product as a factor', next: 'The box map: the product is last.' },
+        { wrote: '{exit.1.wrong.turnrecount} (b)', mistake: 'Recounts: a new product', next: 'Tray: turn it; “Did a dot move away?”' },
+        { wrote: '{exit.0.wrong.turnnoswap} (a)', mistake: 'Copies the fact: no swap', next: 'Count the turned rows aloud.' },
+        { wrote: '{exit.2.wrong.turnproductfactor} (c)', mistake: 'Product as a factor', next: 'The box map: the product is last.' },
+        { wrote: '{exit.0.wrong.turnproductfactor} (a)', mistake: 'Product as a factor', next: 'The product is always last.' },
     ],
 };

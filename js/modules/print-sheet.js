@@ -309,6 +309,10 @@ export function itemNumberOf(q) {
  */
 export function factKeyOf(q) {
     if (!q) return null;
+    // An array (arrays-turn, lesson 3a): keyed by its two factors, smaller first. 3 x 4 and 2 x 6 are two
+    // facts; 3 x 4 and 4 x 3 are ONE fact with two pictures - a turn cell draws both arrays, so dealing the
+    // pair twice would print a twin (V22 LR-6).
+    if (q.cell && q.cell.template === 'arrays-turn' && q.cell.payload) { const f = [Number(q.cell.payload.rows), Number(q.cell.payload.cols)].sort((x, y) => x - y); return `${f[0]}x${f[1]}`; }
     const op = composeOpOf(q);
     const ops = op ? composeOperandsOf(q) : [];
     if (op && ops.length >= 2) return ops.join(composeGlyphOf(op) || op);

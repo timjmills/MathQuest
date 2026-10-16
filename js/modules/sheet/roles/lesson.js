@@ -166,6 +166,9 @@ const sigOf = (it) => {
 };
 const digitsOfOps = (it) => operandsOf((it && it.q) || {}).map((v) => String(Math.abs(Math.trunc(v))).length).join(',');
 
+/** An arrays-turn payload's {rows, cols} (detailed lesson 3a), else null. */
+const arrTurnOf = (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'arrays-turn' && c.payload; return p ? { rows: Number(p.rows), cols: Number(p.cols) } : null; };
+
 /**
  * The named cases a lesson's examples are chosen by (lesson data `example.test`, `second.test`):
  * the chart models BOTH cases the practice pages deal (lessons r1).
@@ -197,6 +200,17 @@ export const CASE_TESTS = Object.freeze({
     pvTeen: (it) => { const n = pvNumberOf(it); return n !== null && n >= 100 && n <= 999 && Math.floor(n / 10) % 10 === 1 && n % 10 !== 0; },
     // an edge case of numbers to 1,000: a 0 place, a teen ending, or 1,000 itself
     // The detailed lesson maker, lesson 2 (put together / add to within 20, RESEARCH.md): two parts.
+    // The detailed lesson maker, lesson 3a (turn an array, 3.OA.B.5): an arrays-turn payload.
+    // arrTurn: non-square, no repeated digit across rows, cols and product (which 3 was which?).
+    arrTurn: (it) => { const p = arrTurnOf(it); return !!p && p.rows !== p.cols && p.rows >= 2 && p.cols >= 2 && new Set(`${p.rows}${p.cols}${p.rows * p.cols}`).size === `${p.rows}${p.cols}${p.rows * p.cols}`.length; },
+    // (any non-square array: the pack's other pictured items - only five arrays to 5 x 5 pass arrTurn)
+    arrNonSq: (it) => { const p = arrTurnOf(it); return !!p && p.rows !== p.cols && p.rows >= 2 && p.cols >= 2; },
+    arrSquare: (it) => { const p = arrTurnOf(it); return !!p && p.rows === p.cols && p.rows >= 2; },
+    arrFive: (it) => { const p = arrTurnOf(it); return !!p && p.rows !== p.cols && (p.rows === 5 || p.cols === 5); },
+    // (a facts-only turn that asks for the factor: 6 x [ ] = 24)
+    arrFactor: (it) => { const c = it && it.q && it.q.cell; return !!arrTurnOf(it) && CASE_TESTS.arrNonSq(it) && c.payload.type === 'missing' && c.payload.ask === 'factor'; },
+    arrProduct: (it) => { const c = it && it.q && it.q.cell; return !!arrTurnOf(it) && CASE_TESTS.arrNonSq(it) && c.payload.type === 'missing' && c.payload.ask !== 'factor'; },
+    arrEdge: (it) => CASE_TESTS.arrSquare(it) || CASE_TESTS.arrFive(it),
     wpBridge: (it) => { const o = wpParts(it); return !!o && o[0] >= 2 && o[1] >= 2 && o[0] <= 9 && o[1] <= 9 && o[0] + o[1] >= 11; },
     wpBridgeBigFirst: (it) => { const o = wpParts(it); return !!o && CASE_TESTS.wpBridge(it) && o[0] > o[1]; },
     wpBridgeSmallFirst: (it) => { const o = wpParts(it); return !!o && CASE_TESTS.wpBridge(it) && o[0] < o[1]; },
@@ -994,6 +1008,21 @@ function vocabPicture(pic, c) {
             b += `<text x="${X(pic.mark).toFixed(2)}" y="${(top - 1).toFixed(2)}" text-anchor="middle" font-size="${f}" font-weight="700">${pic.mark}</text>`;
             b += `<circle cx="${X(pic.mark).toFixed(2)}" cy="${axisY}" r="1.2" fill="#000"/>`;
             return `<svg viewBox="0 0 ${W} ${H.toFixed(2)}" width="${mm(W)}" height="${mm(H)}" aria-hidden="true" style="font-family:'Andika',sans-serif">${b}</svg>`;
+        }
+        // a small dot array (detailed lesson 3a): {rows, cols, mark: 'row' | 'turn'}
+        case 'array': {
+            const pitch = { S: 4, M: 4.4, L: 4.8 }[c.size] || 4.8, r = pitch * 0.32;
+            const R = Math.min(5, pic.rows || 1), C = Math.min(5, pic.cols || 1);
+            const one = (rows, cols, x0) => { let b = ''; for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) b += `<circle cx="${(x0 + pitch / 2 + j * pitch).toFixed(2)}" cy="${(pitch / 2 + i * pitch).toFixed(2)}" r="${r.toFixed(2)}" fill="#000"/>`; return b; };
+            let b = one(R, C, 0), W = C * pitch, H = R * pitch;
+            if (pic.mark === 'row') b += `<rect x="0.3" y="0.3" width="${(W - 0.6).toFixed(2)}" height="${(pitch - 0.6).toFixed(2)}" rx="${(pitch / 2).toFixed(2)}" fill="none" stroke="#000" stroke-width="${(0.75 * PT_MM).toFixed(3)}"/>`;
+            if (pic.mark === 'turn') {
+                const ax = W + 2, aw = 7, ay = H / 2;
+                b += `<path d="M${ax} ${ay} H${ax + aw - 1.6}" stroke="#000" stroke-width="${(1.5 * PT_MM).toFixed(3)}"/><path d="M${ax + aw - 2} ${ay - 1.3} L${ax + aw} ${ay} L${ax + aw - 2} ${ay + 1.3} Z" fill="#000"/>`;
+                b += one(C, R, ax + aw + 2);
+                W = ax + aw + 2 + R * pitch; H = Math.max(H, C * pitch);
+            }
+            return `<svg viewBox="0 0 ${W.toFixed(2)} ${H.toFixed(2)}" width="${mm(W)}" height="${mm(H)}" data-per-row="${Math.max(C, pic.mark === 'turn' ? R : 0)}" aria-hidden="true">${b}</svg>`;
         }
         default: return `<span class="mq-lvpic-text">${esc((pic && pic.text) || '')}</span>`;
     }
