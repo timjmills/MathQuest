@@ -249,6 +249,10 @@ Gate failures and load numbers measured before this fix (~12:30 UTC) are not tru
   rounds) and S2 (T2 continuation page under the fill floor; D5 r1 -> R5 r2 -> S2 r3). Reports:
   `design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r{1,2,3}.md`.
 
+- **2026-10-16, detailed lesson 2 (g1-oa1-bar-model-wp-20)**: builder escalated mq-opus-low -> mq-opus-medium for
+  critic r2 D1 (put-together never modelled; r1 D3 -> r2 D1) and D4 (exit slip; r1 D11 -> r2 D4). Reports:
+  `design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r{1,2}.md`.
+
 ## 10. Wave 8 (lessons) — word-problem lesson pages, found 2026-10-03 and left as on main
 
 These are deferred to Wave 8 (owner ruling 2026-10-03: lessons and anchor charts wait for the Lesson wave). A fix
