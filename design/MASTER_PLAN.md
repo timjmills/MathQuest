@@ -158,6 +158,13 @@ stay at the bottom of the student home.
 
 ## Wave 8 — Lessons
 
+**Owner plan 2026-10-16 (detailed lesson maker):** the Atomisation Lesson Planner V21 (`design/lesson-planner/`) is iterated
+until an independent critic scores >= 8 on every teacher and pupil page of its sample packs (the site is the gold standard).
+Then it is ADDED as a second, **detailed lesson maker** beside the current lesson maker (the current one stays). The owner
+will then name lessons to make with it; each made lesson is integrated into the site on the **White Rose page** (its WRM
+step / unit), tied to its associated skills (built ones, and build-list proposals until they are built), and tagged
+WRM / CCSS / EE like every lesson.
+
 The intervention lesson library uses the owner's **Atomised Lesson V20** format (he supplies it). It covers every WRM
 small step, CCSS standard / part and EE; each lesson is tagged and tied to a skill that practises it the same way.
 It includes the prerequisite check and per-part new numbers, and builds on the paused lessons-engine branch. The
