@@ -164,6 +164,12 @@ Then it is ADDED as a second, **detailed lesson maker** beside the current lesso
 will then name lessons to make with it; each made lesson is integrated into the site on the **White Rose page** (its WRM
 step / unit), tied to its associated skills (built ones, and build-list proposals until they are built), and tagged
 WRM / CCSS / EE like every lesson.
+Owner 2026-10-16: **inside MathQuest the detailed lesson maker is built on the site's own code, rules and gates** —
+the sheet kit (frame, cells, templates, keys, paginator, `lesson-css`, `lesson-icons`), `generateQuestionFor` with seeds and
+skill options, the skill providers and instruction library, `buildSheet` / a new lesson role beside `sheet/roles/lesson.js`,
+the existing passed lesson pages where they exist (Q1), and the gates (`ws-lesson-check`, `ws-print-lint --source kit`,
+`ws-grade-render`, the rubric critic). V21's hand-written HTML/CSS/SVG recipes are for AIs outside the repo only; in the
+repo nothing is re-implemented that the kit already draws.
 
 The intervention lesson library uses the owner's **Atomised Lesson V20** format (he supplies it). It covers every WRM
 small step, CCSS standard / part and EE; each lesson is tagged and tied to a skill that practises it the same way.
