@@ -248,6 +248,9 @@ export default {
             ] },
     ],
     transitionsMin: 4,
+    // T2b: this lesson's own slots and routing ids
+    slotRows: [{ shape: 'box', use: 'a bar box: a part (lower row) or the whole (top)' }, { shape: 'longline', use: 'P5: draw the bar in the Workspace' }],
+    routeNote: 'K CC 5 Count to 20 · Y1 B2 S2 Part-whole model · G1 OA 6 Add within 20: the lessons P0 routes back to (T6).',
 
     // ------------------------------------------------------------------ T6
     accepted: [
