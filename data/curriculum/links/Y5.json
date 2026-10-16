@@ -8758,6 +8758,1604 @@
    ]
   }
  },
+ "lessons": {
+  "G4|-|placevalue10timesandonetenthofadigitsvalue": {
+   "title": "Place value: 10 times and one tenth of a digit's value",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W05",
+    "ccss": [
+     "4.NBT.A.1",
+     "5.NBT.A.1"
+    ],
+    "ee": [
+     "M.EE.5.NBT.1"
+    ],
+    "domain": "NBT",
+    "unit": "Awsaj supplement lessons (domain tests)",
+    "block": null,
+    "power": true
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "placevalue:value",
+     "opts": {
+      "band": 9999
+     },
+     "missing": "the worth of one underlined digit only; never compares the same digit in two places (the 7 in 700 is 10 times the 7 in 70)"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "opts": {
+      "op": "x",
+      "power": [
+       10
+      ],
+      "band": 10000
+     },
+     "missing": "multiplies a number by 10 on a shift chart; never says a digit is worth one tenth of the same digit one place to its left"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "comparing the value of the same digit in neighbouring places: 10 times the place to its right and one tenth of the place to its left",
+   "build": [
+    "value_ten_times"
+   ],
+   "pre": [
+    {
+     "key": "placevalue:place_value_disks",
+     "opts": {
+      "band": 9999
+     },
+     "why": "Y5.B1.S2 Numbers to 10,000 (taught the same school week, W05)"
+    },
+    {
+     "key": "placevalue:identify",
+     "opts": {
+      "band": 999
+     },
+     "why": "Y3.B1.S8 Hundreds, tens and ones (lower grade, same idea)"
+    },
+    {
+     "key": "multiplication:mult_zeros",
+     "opts": {
+      "forms": [
+       0
+      ]
+     },
+     "why": "Y4.B5.S3 Multiply by 10 (lower grade, same idea)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:expand",
+     "opts": {
+      "band": 9999
+     },
+     "why": "writing a number as the sum of its place values: each place is worth ten of the place to its right"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "opts": {
+      "band": 9999
+     },
+     "why": "3 thousands = 30 hundreds: the ten-times link between places in unit form"
+    }
+   ],
+   "note": "Domain-test build lesson (site: \"New CCSS BUILD lesson so the domain test only asks what has been taught\"), W05 in the place-value unit. 5.NBT.A.1 is the decimal half of the same idea (Grade 5).",
+   "envision": [
+    {
+     "proposal": "value_ten_times",
+     "name": "Ten Times the Place to the Right (option)",
+     "kind": "option on placevalue:value",
+     "teaches": "a digit in one place is worth 10 times what it is worth in the place to its right and 1/10 of the place to its left",
+     "closes": "comparing the value of the same digit in neighbouring places: 10 times the place to its right and one tenth of the place to its left",
+     "representation": "form \"ten times / one tenth\": compare the value of the same digit in two places (the 7 in 700 is 10 times the 7 in 70"
+    }
+   ]
+  },
+  "G4|-|multiplyanddividemultiplesof10usingbasicfactseg90x5030030": {
+   "title": "Multiply and divide multiples of 10 using basic facts (e.g., 90 x 50, 300 ÷ 30)",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W06",
+    "ccss": [
+     "4.NBT.A.1",
+     "4.NBT.B.5",
+     "4.NBT.B.6"
+    ],
+    "ee": [],
+    "domain": "NBT",
+    "unit": "Awsaj supplement lessons (domain tests)",
+    "block": null,
+    "power": true
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "multiplication:mult_zeros",
+     "opts": {
+      "forms": [
+       2
+      ]
+     },
+     "missing": "one 1-digit number times a multiple of ten (6 × 40) only: never tens × tens (90 × 50) and never a division (300 ÷ 30)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "a multiple of ten times a multiple of ten (90 × 50) and dividing multiples of ten with a basic fact (300 ÷ 30, 2,400 ÷ 6)",
+   "build": [
+    "facts_times_tens"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:mult_zeros",
+     "opts": {
+      "forms": [
+       0,
+       1
+      ]
+     },
+     "why": "Y5.B3.S10 Multiples of 10, 100 and 1,000 (taught earlier this year, wk W02)"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y4.B4.S4 Multiply and divide by 9 (lower grade, same idea)"
+    },
+    {
+     "key": "placevalue:place_value_10x",
+     "opts": {
+      "op": "x",
+      "power": [
+       10,
+       100
+      ],
+      "band": 1000
+     },
+     "why": "Y4.B5.S4 Multiply by 100 (lower grade, same idea)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "placevalue:unit_form",
+     "opts": {
+      "band": 999
+     },
+     "why": "45 hundreds = 4,500: the unit-form step inside 90 × 50"
+    }
+   ],
+   "note": "Domain-test build lesson (W06). The pupil needs the fact and the place-value shift together; mult_zeros already does the shift for one factor.",
+   "envision": [
+    {
+     "proposal": "facts_times_tens",
+     "name": "Basic Facts With Tens: × and ÷ (option)",
+     "kind": "option on multiplication:mult_zeros",
+     "teaches": "using a basic fact and place value to multiply two multiples of ten (90 × 50 = 9 × 5 × 100) and to divide multiples of ten (300 ÷ 30 = 30 ÷ 3)",
+     "closes": "a multiple of ten times a multiple of ten (90 × 50) and dividing multiples of ten with a basic fact (300 ÷ 30, 2,400 ÷ 6)",
+     "representation": "the existing across fact cell"
+    }
+   ]
+  },
+  "G4|-|extendgrowingshapepatterns": {
+   "title": "Extend growing shape patterns",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W09",
+    "ccss": [
+     "4.OA.C.5"
+    ],
+    "ee": [
+     "M.EE.4.OA.5"
+    ],
+    "domain": "OA",
+    "unit": "Awsaj supplement lessons (domain tests)",
+    "block": null,
+    "power": false
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "patterns:number_patterns_rule",
+     "opts": {
+      "pattern": [
+       "add"
+      ],
+      "places": [
+       1
+      ]
+     },
+     "missing": "the number sequence of a growing pattern (find and continue the +3 rule); no pictured shapes that grow, and no drawing of the next term"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "a pictured growing pattern of dots or squares: draw the next term and count it",
+   "build": [
+    "growing_shape_patterns"
+   ],
+   "pre": [
+    {
+     "key": "patterns:shape_pattern",
+     "why": "Y2.B3.S12 Make patterns with 2-D and 3-D shapes (lower grade, same idea)"
+    },
+    {
+     "key": "patterns:count_by_step_up",
+     "opts": {
+      "step": [
+       1
+      ],
+      "range": 100
+     },
+     "why": "Y2.B1.S16 Count in 3s (lower grade, same idea)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "opts": {
+      "step": [
+       0
+      ],
+      "band": 50
+     },
+     "why": "Y1.B9.S1 Count in 2s (lower grade, same idea)"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "Y2.B5.S12 Odd and even numbers (lower grade, same idea)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "algebra:function_table_easy",
+     "opts": {
+      "ftTask": "outputs",
+      "ftRules": [
+       "+"
+      ]
+     },
+     "why": "term number in, number of squares out: the same growing rule as an In/Out table"
+    }
+   ],
+   "note": "Domain-test build lesson (W09, OA unit; intervention track W09, standard W10).",
+   "envision": [
+    {
+     "proposal": "growing_shape_patterns",
+     "name": "Growing Shape Patterns",
+     "kind": "new skill patterns:growing_shape_patterns",
+     "teaches": "drawing the next term of a growing pattern of dots or squares (1, 3, 5 …), counting each term and writing the number sequence and its rule",
+     "closes": "a pictured growing pattern of dots or squares: draw the next term and count it",
+     "representation": "one boxed cell: three pictured terms (dots or squares) in boxes, an empty box to draw term 4, a count row under the terms"
+    }
+   ]
+  },
+  "G4|-|findemergentfeaturesegunitsdigitcycle": {
+   "title": "Find emergent features (e.g., units digit cycle)",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W09",
+    "ccss": [
+     "4.OA.C.5"
+    ],
+    "ee": [
+     "M.EE.4.OA.5"
+    ],
+    "domain": "OA",
+    "unit": "Awsaj supplement lessons",
+    "block": "Y5.B3",
+    "power": false
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "patterns:number_patterns_rule",
+     "opts": {
+      "pattern": [
+       "add"
+      ],
+      "places": [
+       1,
+       10
+      ]
+     },
+     "missing": "finds and continues the rule; never asks what else the pattern shows (the terms alternate odd and even, the ones digit repeats 5, 0, 5, 0)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "naming a feature of the pattern that the rule does not state (odd / even alternation, a repeating ones digit) and explaining it",
+   "build": [
+    "patterns_notice"
+   ],
+   "pre": [
+    {
+     "key": "composing:odd_even",
+     "why": "Y2.B5.S12 Odd and even numbers (lower grade, same idea)"
+    },
+    {
+     "key": "number_theory:multiples",
+     "why": "Y5.B3.S1 Multiples (taught earlier this year, wk W01)"
+    },
+    {
+     "key": "patterns:skip_count_line",
+     "opts": {
+      "step": [
+       0
+      ],
+      "band": 50
+     },
+     "why": "Y1.B9.S1 Count in 2s (lower grade, same idea)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "patterns:pattern_relationship",
+     "why": "two patterns side by side and what links them: the next idea after one pattern's features"
+    }
+   ],
+   "note": "Awsaj supplement lesson in Y5.B3 (Multiplication and division A), W09.",
+   "envision": [
+    {
+     "proposal": "patterns_notice",
+     "name": "What Do You Notice?",
+     "kind": "new skill patterns:notice_patterns",
+     "teaches": "identifying arithmetic patterns in the addition and multiplication tables and in rule sequences, and explaining them with properties (4 × a number is always even; add 3 from 1 alternates odd, even)",
+     "closes": "naming a feature of the pattern that the rule does not state (odd / even alternation, a repeating ones digit) and explaining it",
+     "representation": "one boxed cell: a pattern row or a times-table strip, a \"what do you notice?\" sentence frame with a word bank (odd, even, ones digit, repeats) and a …"
+    }
+   ]
+  },
+  "G4|-|followagivenruletoextendanumberpattern": {
+   "title": "Follow a given rule to extend a number pattern",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W09",
+    "ccss": [
+     "4.OA.C.5"
+    ],
+    "ee": [
+     "M.EE.4.OA.5"
+    ],
+    "domain": "OA",
+    "unit": "Awsaj supplement lessons",
+    "block": "Y5.B3",
+    "power": false
+   },
+   "direct": [
+    {
+     "key": "patterns:number_patterns_rule",
+     "opts": {
+      "pattern": [
+       "add",
+       "sub"
+      ],
+      "places": [
+       10,
+       100
+      ],
+      "rule": false
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "patterns:skip_count_line",
+     "opts": {
+      "step": [
+       0
+      ],
+      "band": 50
+     },
+     "why": "Y1.B9.S1 Count in 2s (lower grade, same idea)"
+    },
+    {
+     "key": "patterns:count_by_step_up",
+     "opts": {
+      "step": [
+       1
+      ],
+      "range": 1000
+     },
+     "why": "Y2.B1.S16 Count in 3s (lower grade, same idea)"
+    },
+    {
+     "key": "number_theory:multiples",
+     "why": "Y5.B3.S1 Multiples (taught earlier this year, wk W01)"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "Y5.B2.S8 Find missing numbers (taught earlier this year, wk W01)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "algebra:function_table_easy",
+     "opts": {
+      "ftTask": "outputs",
+      "ftRules": [
+       "+",
+       "-"
+      ]
+     },
+     "why": "the same given rule applied to each In number of a table"
+    },
+    {
+     "key": "patterns:number_pattern",
+     "opts": {
+      "band": 1000
+     },
+     "why": "find the rule yourself and fill the gaps: the inverse task"
+    }
+   ],
+   "note": "Awsaj supplement lesson in Y5.B3, W09. With rule:false the rule is printed above the row (\"Rule: count on by 5\") and the pupil continues it, which is the lesson."
+  },
+  "G4|-|multiplicativecomparisontimesasmany": {
+   "title": "Multiplicative comparison: times as many",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W10",
+    "ccss": [
+     "4.OA.A.1"
+    ],
+    "ee": [
+     "M.EE.4.OA.1"
+    ],
+    "domain": "OA",
+    "unit": "Awsaj supplement lessons",
+    "block": "Y5.B3",
+    "power": true
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "multiplication:mult_comparison",
+     "missing": "times-as-many word problems only; never reads 35 = 5 × 7 as \"35 is 5 times as many as 7\" or writes the equation for a comparison statement"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "interpreting a multiplication equation as a comparison (35 = 5 × 7: 35 is 5 times as many as 7) and writing the equation for a verbal comparison",
+   "build": [
+    "comparison_statements"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S2 Use arrays (lower grade, same idea)"
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y4.B4.S4 Multiply and divide by 9 (lower grade, same idea)"
+    },
+    {
+     "key": "multiplication:multiply",
+     "opts": {
+      "range": 100
+     },
+     "why": "Y4.B5.S9 Multiply a 2-digit number by a 1-digit number (lower grade, same idea)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_ops_mixed:word_problems_mixed",
+     "maxNumber": 100,
+     "why": "times-as-many stories among other multiplication and division stories (Y5.B5.S11)"
+    }
+   ],
+   "note": "Awsaj supplement lesson in Y5.B3, W10 (power standard 4.OA.A.1).",
+   "envision": [
+    {
+     "proposal": "comparison_statements",
+     "name": "Times as Many: Statements and Equations (option)",
+     "kind": "option on multiplication:mult_comparison",
+     "teaches": "interpreting a multiplication equation as a multiplicative comparison and writing the equation for a verbal comparison",
+     "closes": "interpreting a multiplication equation as a comparison (35 = 5 × 7: 35 is 5 times as many as 7) and writing the equation for a verbal comparison",
+     "representation": "form \"statement ↔ equation\": 35 = 5 × 7 read as \"35 is 5 times as many as 7\" (and 7 times as many as 5), and the equation written for a comparison sentence …"
+    }
+   ]
+  },
+  "G4|-|multiplicativecomparisonwordproblemshowmanytimesasmanyunknownmultiplier": {
+   "title": "Multiplicative comparison word problems: how many times as many? (unknown multiplier)",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W10",
+    "ccss": [
+     "4.OA.A.2"
+    ],
+    "ee": [
+     "M.EE.4.OA.2"
+    ],
+    "domain": "OA",
+    "unit": "Awsaj supplement lessons (domain tests)",
+    "block": null,
+    "power": false
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "multiplication:mult_comparison",
+     "missing": "mixes the three unknowns at random: about half the items ask \"how many times as many?\" (4 of 8 generated); no option keeps a page on the unknown multiplier"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "a page of \"how many times as many?\" stories only (the unknown multiplier)",
+   "build": [
+    "comparison_unknown"
+   ],
+   "pre": [
+    {
+     "key": "division:div_facts",
+     "why": "Y4.B4.S4 Multiply and divide by 9 (lower grade, same idea)"
+    },
+    {
+     "key": "division:div_word_problems",
+     "opts": {
+      "range": 100
+     },
+     "why": "Y3.B3.S5 Sharing and grouping (lower grade, same idea)"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "why": "Y3.B3.S2 Use arrays (lower grade, same idea)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:mult_comparison_plain",
+     "why": "the same comparison stories with no pictures, for pupils past the bar model"
+    }
+   ],
+   "note": "Domain-test build lesson (W10, OA unit).",
+   "envision": [
+    {
+     "proposal": "comparison_unknown",
+     "name": "Times as Many: Choose the Unknown (option)",
+     "kind": "option on multiplication:mult_comparison",
+     "teaches": "one kind of comparison story per page, e.g. only \"how many times as many?\" (42 is how many times 7?), solved with a bar model or a division",
+     "closes": "a page of \"how many times as many?\" stories only (the unknown multiplier)",
+     "representation": "the existing story cell with its comparison bar (two bars, one cut into equal parts)"
+    }
+   ]
+  },
+  "G4|-|multistepwordproblemsdivideandinterprettheremainder": {
+   "title": "Multi-step word problems: divide and interpret the remainder",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W11",
+    "ccss": [
+     "4.OA.A.3",
+     "5.NBT.B.6"
+    ],
+    "ee": [
+     "M.EE.4.OA.3",
+     "M.EE.5.NBT.6"
+    ],
+    "domain": "OA",
+    "unit": "Awsaj supplement lessons (domain tests)",
+    "block": null,
+    "power": true
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "division:remainder_interpret",
+     "missing": "one-step stories only (how many full, how many left, how many needed); and it deals divisors past 9 (each car holds 19), which Grade 4 does not divide by"
+    },
+    {
+     "key": "algebra:multi_step_word",
+     "missing": "two-step stories with no division remainder to interpret"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "a two-step story whose division leaves a remainder the pupil must interpret (round up, drop it or report it), with a 1-digit divisor",
+   "build": [
+    "multi_step_four_ops"
+   ],
+   "pre": [
+    {
+     "key": "division:div_remainders",
+     "why": "Y4.B5.S12 Divide a 2-digit number by a 1-digit number (2) (lower grade, same idea)"
+    },
+    {
+     "key": "division:div_word_problems",
+     "opts": {
+      "range": 100
+     },
+     "why": "Y3.B3.S5 Sharing and grouping (lower grade, same idea)"
+    },
+    {
+     "key": "number_ops_mixed:word_problems_mixed",
+     "maxNumber": 100,
+     "why": "Y5.B5.S11 Solve problems with multiplication and division (taught earlier this year, wk W03)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "division:remainder_too_big",
+     "why": "checking that a remainder is smaller than the divisor before interpreting it"
+    }
+   ],
+   "note": "Domain-test build lesson (W11, OA unit). 5.NBT.B.6 on the site is the Grade 5 extension.",
+   "envision": [
+    {
+     "proposal": "multi_step_four_ops",
+     "name": "Two-Step Problems With All Four Operations (option)",
+     "kind": "option on algebra:multi_step_word",
+     "teaches": "two-step and multistep word problems with the four operations, represented by an equation with a letter, remainders interpreted, and checked by estimating",
+     "closes": "a two-step story whose division leaves a remainder the pupil must interpret (round up, drop it or report it), with a 1-digit divisor",
+     "representation": "two steps with × and ÷ (3 packs of 6, 4 eaten), write the equation with a letter for the unknown, remainder steps, and a \"reasonable?\" estimate on the …"
+    }
+   ]
+  },
+  "G4|-|decomposeafractionintoasumoffractionsequationsanddrawings": {
+   "title": "Decompose a fraction into a sum of fractions (equations and drawings)",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W13",
+    "ccss": [
+     "4.NF.B.3"
+    ],
+    "ee": [
+     "M.EE.4.NF.3"
+    ],
+    "domain": "NF",
+    "unit": "Awsaj supplement lessons (domain tests)",
+    "block": null,
+    "power": true
+   },
+   "direct": [
+    {
+     "key": "fraction_operations:decompose_fractions",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "Y4.B7.S11 Add two or more fractions (lower grade, same idea)"
+    },
+    {
+     "key": "composing:fraction_number_line",
+     "why": "Y4.B7.S4 Number lines with mixed numbers (lower grade, same idea)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y4.B7.S10 Equivalent fraction families (lower grade, same idea)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:decompose_frac_nv",
+     "opts": {
+      "forms": [
+       0,
+       1
+      ]
+     },
+     "why": "the same decompositions as equations only, no drawings"
+    },
+    {
+     "key": "fractions:compose_target_frac",
+     "why": "the inverse: build the fraction from unit-fraction tiles"
+    }
+   ],
+   "note": "Domain-test build lesson (W13, NF unit). decompose_fractions deals the sum of unit fractions with fraction-bar drawings on most items and a \"click all ways\" item (2/3 = 1/3 + 1/3, 2/8 = 1/8 + 1/8 …), which is 4.NF.B.3b for fractions; mixed numbers are Y5.B4."
+  },
+  "G4|-|addtenthsandhundredthsrenametenthsashundredths": {
+   "title": "Add tenths and hundredths (rename tenths as hundredths)",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W18",
+    "ccss": [
+     "4.NF.C.5"
+    ],
+    "ee": [],
+    "domain": "NF",
+    "unit": "Awsaj supplement lessons (domain tests)",
+    "block": null,
+    "power": false
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "fraction_operations:frac_10_100",
+     "missing": "renames tenths as hundredths (4/10 = 40/100) but never adds a tenths and a hundredths fraction"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "adding a tenths and a hundredths fraction by renaming the tenths (3/10 + 4/100 = 34/100)",
+   "build": [
+    "add_tenths_hundredths"
+   ],
+   "pre": [
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (taught earlier this year, wk W17)"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line (lower grade, same idea)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y5.B4.S2 Find fractions equivalent to a non-unit fraction (taught earlier this year, wk W15)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:frac_10_100_nv",
+     "why": "renaming tenths as hundredths with no hundred square"
+    },
+    {
+     "key": "decimals:add_decimal",
+     "opts": {
+      "decimals": 2
+     },
+     "why": "0.3 + 0.04 = 0.34: the same sum in decimals"
+    }
+   ],
+   "note": "Domain-test build lesson (W18, NF unit).",
+   "envision": [
+    {
+     "proposal": "add_tenths_hundredths",
+     "name": "Add Tenths and Hundredths (option)",
+     "kind": "option on fraction_operations:frac_10_100",
+     "teaches": "renaming the tenths fraction as hundredths and adding: 3/10 + 4/100 = 30/100 + 4/100 = 34/100, with a hundred square",
+     "closes": "adding a tenths and a hundredths fraction by renaming the tenths (3/10 + 4/100 = 34/100)",
+     "representation": "the existing frac_10_100 cell: a hundred square shading 3 columns and 4 squares, the two-step equation with answer boxes"
+    }
+   ]
+  },
+  "G4|-|pointslineslinesegmentsandrays": {
+   "title": "Points, lines, line segments and rays",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W21",
+    "ccss": [
+     "4.G.A.1"
+    ],
+    "ee": [
+     "M.EE.4.G.1"
+    ],
+    "domain": "G",
+    "unit": "Awsaj supplement lessons (domain tests)",
+    "block": null,
+    "power": true
+   },
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "naming and drawing points, lines, line segments and rays (no skill deals them)",
+   "build": [
+    "points_lines_rays"
+   ],
+   "pre": [
+    {
+     "key": "angles_lines:identify_lines",
+     "why": "Y3.B11.S6 Parallel and perpendicular (lower grade, same idea)"
+    },
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "Y3.B11.S7 Recognise and describe 2-D shapes (lower grade, same idea)"
+    },
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "why": "Y3.B11.S7 Recognise and describe 2-D shapes (lower grade, same idea)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "angles_lines:identify_angles",
+     "opts": {
+      "forms": [
+       1
+      ]
+     },
+     "why": "two rays from one point make an angle: the next idea (Y5.B10.S2)"
+    }
+   ],
+   "note": "Domain-test build lesson (W21, G unit).",
+   "envision": [
+    {
+     "proposal": "points_lines_rays",
+     "name": "Point, Line, Segment or Ray?",
+     "kind": "new skill angles_lines:points_lines_rays",
+     "teaches": "identifying and drawing points, lines, line segments, rays, right/acute/obtuse angles and perpendicular and parallel lines, and finding them in 2-D figures",
+     "closes": "naming and drawing points, lines, line segments and rays (no skill deals them)",
+     "representation": "one boxed cell: a drawn figure (dot, line with two arrows, segment with two end dots, ray with one) and a label bank to write from"
+    }
+   ]
+  },
+  "G4|-|anglesareadditivefindanunknownangleinadecomposedangle": {
+   "title": "Angles are additive: find an unknown angle in a decomposed angle",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W28",
+    "ccss": [
+     "4.MD.C.7"
+    ],
+    "ee": [],
+    "domain": "MD",
+    "unit": "Awsaj supplement lessons (domain tests)",
+    "block": null,
+    "power": false
+   },
+   "direct": [
+    {
+     "key": "angles_lines:additive_angles",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "angles_lines:measure_angles",
+     "why": "Y5.B10.S4 Measure angles up to 180° (taught earlier this year, wk W25)"
+    },
+    {
+     "key": "angles_lines:identify_angles",
+     "why": "Y5.B10.S2 Classify angles (taught earlier this year, wk W23)"
+    },
+    {
+     "key": "subtraction:missing_add_sub",
+     "why": "Y5.B2.S8 Find missing numbers (taught earlier this year, wk W01)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "angles_lines:mixed_angles_lines",
+     "why": "measuring, naming and adding angles mixed on one page"
+    }
+   ],
+   "note": "Domain-test build lesson (W28). additive_angles deals a drawn angle split in two with one part and the whole given (90°, 180° or 360°), the missing part to find, which is the lesson; Y5.B10.S6 / S7 hold the around-a-point and straight-line steps."
+  },
+  "G4|-|lineplotswithfractions": {
+   "title": "Line plots with fractions",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W28",
+    "ccss": [
+     "4.MD.B.4"
+    ],
+    "ee": [
+     "M.EE.4.MD.4"
+    ],
+    "domain": "MD",
+    "unit": "Awsaj supplement lessons",
+    "block": "Y5.B9",
+    "power": false
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "graphs:line_plot_fractions",
+     "missing": "reads a drawn line plot (how many at a mark, most common, how many in all); never makes the plot from a data list and never adds or subtracts the plotted fractions"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "making a line plot of measurements in halves, quarters and eighths from a data list, and solving addition and subtraction problems with the plotted fractions",
+   "build": [
+    "make_line_plot"
+   ],
+   "pre": [
+    {
+     "key": "graphs:bar_graph",
+     "why": "Y4.B13.S1 Interpret charts (lower grade, same idea)"
+    },
+    {
+     "key": "composing:fraction_number_line",
+     "why": "Y4.B7.S4 Number lines with mixed numbers (lower grade, same idea)"
+    },
+    {
+     "key": "fraction_operations:add_fractions_like",
+     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (taught earlier this year, wk W17)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "graphs:tally_chart",
+     "why": "recording a data list before plotting it"
+    }
+   ],
+   "note": "Awsaj supplement lesson in Y5.B9 (Statistics), W28.",
+   "envision": [
+    {
+     "proposal": "make_line_plot",
+     "name": "Make a Line Plot",
+     "kind": "new skill graphs:make_a_line_plot",
+     "teaches": "measuring objects (ruler pictures) or reading a data list, then making a line plot (dot plot) on a scale of whole numbers, halves, quarters or eighths, and solving problems from it",
+     "closes": "making a line plot of measurements in halves, quarters and eighths from a data list, and solving addition and subtraction problems with the plotted fractions",
+     "representation": "one boxed cell: the data list in a box, a number line marked 0 to 3 in eighths with an X column to fill per value, then one question box (how many longer …"
+    }
+   ]
+  },
+  "G4|-|customarycapacitycupspintsquartsandgallons": {
+   "title": "Customary capacity: cups, pints, quarts and gallons",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W30",
+    "ccss": [
+     "4.MD.A.1"
+    ],
+    "ee": [
+     "M.EE.4.MD.1"
+    ],
+    "domain": "MD",
+    "unit": "Awsaj supplement lessons",
+    "block": "Y5.B14",
+    "power": true
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:capacity",
+     "opts": {
+      "units": [
+       0
+      ],
+      "forms": [
+       0
+      ]
+     },
+     "missing": "converts between cups, pints, quarts and gallons one item at a time; never records the equivalents in a two-column table"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "recording customary capacity equivalents in a two-column conversion table (1 gal = 4 qt, 2 gal = 8 qt …)",
+   "build": [
+    "conversion_table"
+   ],
+   "pre": [
+    {
+     "key": "measurement:mass_volume_liquid",
+     "opts": {
+      "forms": [
+       2
+      ]
+     },
+     "why": "Y3.B7.S8 Measure capacity and volume in litres and millilitres (lower grade, same idea)"
+    },
+    {
+     "key": "division:div_facts",
+     "opts": {
+      "constant": [
+       4
+      ]
+     },
+     "why": "Y3.B3.S10 Divide by 4 (lower grade, same idea)"
+    },
+    {
+     "key": "measurement:capacity",
+     "opts": {
+      "units": [
+       1
+      ],
+      "forms": [
+       1
+      ]
+     },
+     "why": "Y3.B7.S9 Equivalent capacities and volumes (litres and millilitres) (lower grade, same idea)"
+    }
+   ],
+   "preBuild": [],
+   "related": [],
+   "note": "Awsaj supplement lesson in Y5.B14 (Converting units), W30; the school's first customary lesson. No related skill fits yet: the other customary skills (unit_conversions, unit_conversion_word, length_customary) deal lengths and weights past this lesson's numbers (120 in, 160 oz); the weight and length lesson a week later links them.",
+   "envision": [
+    {
+     "proposal": "conversion_table",
+     "name": "Conversion Tables (option)",
+     "kind": "option on measurement:unit_conversions",
+     "teaches": "knowing relative sizes of units in one system and recording equivalents in a two-column table (ft/in, m/cm, kg/g, lb/oz, l/ml, hr/min/sec)",
+     "closes": "recording customary capacity equivalents in a two-column conversion table (1 gal = 4 qt, 2 gal = 8 qt …)",
+     "representation": "form \"conversion table\": complete a two-column table (1 ft = 12 in, 2 ft, 3 ft …) and use it on the existing unit_conversions cell"
+    }
+   ]
+  },
+  "G4|-|customarylengthandweightinchesfeetyardsouncesandpounds": {
+   "title": "Customary length and weight - inches, feet, yards, ounces and pounds",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W31",
+    "ccss": [
+     "4.MD.A.1"
+    ],
+    "ee": [
+     "M.EE.4.MD.1"
+    ],
+    "domain": "MD",
+    "unit": "Awsaj supplement lessons",
+    "block": "Y5.B14",
+    "power": true
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:length_customary",
+     "opts": {
+      "forms": [
+       0,
+       1,
+       2
+      ]
+     },
+     "missing": "feet, inches and yards only: no ounces and pounds, no two-column table"
+    },
+    {
+     "key": "measurement:unit_conversions",
+     "opts": {
+      "units": [
+       1
+      ],
+      "forms": [
+       0
+      ]
+     },
+     "missing": "converts pounds and ounces, but mixes in capacity (quarts, cups, fluid ounces) on the same page; no table"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "a page of pounds and ounces on their own, and recording length and weight equivalents in a two-column table",
+   "build": [
+    "weight_customary",
+    "conversion_table"
+   ],
+   "pre": [
+    {
+     "key": "measurement:length_metric",
+     "opts": {
+      "forms": [
+       3
+      ]
+     },
+     "why": "Y4.B6.S1 Measure in kilometres and metres (lower grade, same idea)"
+    },
+    {
+     "key": "measurement:reading_ruler",
+     "why": "Y3.B11.S4 Measure and draw accurately (lower grade, same idea)"
+    },
+    {
+     "key": "measurement:unit_conversions",
+     "opts": {
+      "units": [
+       1
+      ],
+      "forms": [
+       0
+      ]
+     },
+     "why": "Y3.B7.S4 Equivalent masses (kilograms and grams) (lower grade, same idea)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:capacity",
+     "opts": {
+      "units": [
+       0
+      ],
+      "forms": [
+       0
+      ]
+     },
+     "why": "cups, pints, quarts and gallons: the customary capacity lesson taught beside it (W30-W31)"
+    }
+   ],
+   "note": "Awsaj supplement lesson in Y5.B14, W31.",
+   "envision": [
+    {
+     "proposal": "weight_customary",
+     "name": "Customary Weight (oz/lb)",
+     "kind": "new skill measurement:weight_customary",
+     "teaches": "knowing 1 lb = 16 oz and converting pounds to ounces (3 lb = 48 oz), and mixed pounds-and-ounces (2 lb 4 oz = 36 oz), as length_customary does for length",
+     "closes": "a page of pounds and ounces on their own, and recording length and weight equivalents in a two-column table",
+     "representation": "one boxed cell: the conversion fact \"1 lb = 16 oz\" as a hint that fades, the conversion, one answer box"
+    },
+    {
+     "proposal": "conversion_table",
+     "name": "Conversion Tables (option)",
+     "kind": "option on measurement:unit_conversions",
+     "teaches": "knowing relative sizes of units in one system and recording equivalents in a two-column table (ft/in, m/cm, kg/g, lb/oz, l/ml, hr/min/sec)",
+     "closes": "a page of pounds and ounces on their own, and recording length and weight equivalents in a two-column table",
+     "representation": "form \"conversion table\": complete a two-column table (1 ft = 12 in, 2 ft, 3 ft …) and use it on the existing unit_conversions cell"
+    }
+   ]
+  },
+  "G4|-|measurementwordproblemsdistancetimemassmoneyandcapacity": {
+   "title": "Measurement word problems: distance, time, mass, money and capacity",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W31",
+    "ccss": [
+     "4.MD.A.2"
+    ],
+    "ee": [
+     "M.EE.4.MD.2"
+    ],
+    "domain": "MD",
+    "unit": "Awsaj supplement lessons",
+    "block": "Y5.B14",
+    "power": true
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:unit_conversion_word",
+     "missing": "one-step conversion stories only (4 yd = ? ft): no adding, subtracting, multiplying or dividing measures, no money, no fractions or decimals of a unit"
+    },
+    {
+     "key": "measurement:money",
+     "missing": "money calculations only, none of the other measures"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "one- and two-step stories that add, subtract, multiply or divide distances, times, masses, capacities and money, with fractions or decimals of a unit and a number-line diagram",
+   "build": [
+    "measure_word_four_ops"
+   ],
+   "pre": [
+    {
+     "key": "measurement:elapsed_find_duration",
+     "why": "Y3.B10.S12 Solve problems with time (lower grade, same idea)"
+    },
+    {
+     "key": "measurement:length_metric",
+     "opts": {
+      "forms": [
+       1
+      ]
+     },
+     "why": "Y4.B6.S2 Equivalent lengths (kilometres and metres) (lower grade, same idea)"
+    },
+    {
+     "key": "algebra:multi_step_word",
+     "why": "Y5.B2.S6 Multi-step addition and subtraction problems (taught earlier this year, wk W09)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:capacity",
+     "opts": {
+      "units": [
+       0
+      ],
+      "forms": [
+       0
+      ]
+     },
+     "why": "the capacity conversions a story may need first"
+    }
+   ],
+   "note": "Awsaj supplement lesson in Y5.B14, W31 (standard track; priority and intervention W32).",
+   "envision": [
+    {
+     "proposal": "measure_word_four_ops",
+     "name": "Measurement Word Problems (Four Operations)",
+     "kind": "new skill measurement:measurement_word_problems",
+     "teaches": "one- and two-step stories about distance, time, mass, capacity and money that add, subtract, multiply or divide measures, some with a unit change (2 kg 300 g, 1 ½ hours) and a number-line diagram",
+     "closes": "one- and two-step stories that add, subtract, multiply or divide distances, times, masses, capacities and money, with fractions or decimals of a unit and a number-line diagram",
+     "representation": "one boxed story cell: the story, a measuring-scale or number-line diagram, a work box and an answer box with the unit printed"
+    }
+   ]
+  },
+  "G4|-|3dshapescubecuboidsphereconecylinder": {
+   "title": "3D shapes (cube, cuboid, sphere, cone, cylinder)",
+   "site": {
+    "flag": "enrich-native",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [],
+    "ee": [],
+    "domain": "MD",
+    "unit": null,
+    "block": null,
+    "power": false
+   },
+   "direct": [
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "why": "R.B4.S1 Identify and name circles and triangles (lower grade, same idea)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_early:count_edges_faces_vertices",
+     "why": "describing the same solids by faces, edges and vertices (Y5.B10.S10)"
+    }
+   ],
+   "note": "Support lesson (site flag enrich-native, Reception \"Building 9 and 10\"); nearest WRM step R.B12.S1 Recognise and name 3-D shapes. name_3d_shapes deals exactly the five solids named (cube, rectangular prism = cuboid, sphere, cone, cylinder). Pre-skills are few: it is a Reception lesson, so only 2-D shape naming and matching come before it."
+  },
+  "G4|-|comparefractions": {
+   "title": "Compare fractions",
+   "site": {
+    "flag": "enrich-native",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [
+     "3.NF.A.3d"
+    ],
+    "ee": [
+     "M.EE.3.NF.3"
+    ],
+    "domain": "NF",
+    "unit": null,
+    "block": null,
+    "power": false
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "fractions:compare",
+     "opts": {
+      "denoms": [
+       2,
+       3
+      ],
+      "forms": [
+       0,
+       1
+      ]
+     },
+     "missing": "mixes unlike pairs (1/4 vs 7/10, 3/5 vs 1/2) with same-denominator and same-numerator pairs; no option keeps the Grade 3 pairs only"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "comparing two fractions with the same denominator or the same numerator only, with bars, and saying why",
+   "build": [
+    "frac_compare_same_part"
+   ],
+   "pre": [
+    {
+     "key": "composing:fraction_number_line",
+     "why": "Y3.B6.S7 Fractions on a number line (lower grade, same idea)"
+    },
+    {
+     "key": "fractions:order_fractions",
+     "why": "Y3.B6.S2 Compare and order unit fractions (lower grade, same idea)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y4.B7.S10 Equivalent fraction families (lower grade, same idea)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fractions:compare_frac_lcd",
+     "why": "comparing unlike fractions by a common denominator: the Grade 4 step after it (Y5.B4.S6)"
+    }
+   ],
+   "note": "Support lesson (site flag enrich-native, Year 3 \"Fractions B\"); nearest WRM steps Y3.B6.S2 / S5 Compare and order unit / non-unit fractions.",
+   "envision": [
+    {
+     "proposal": "frac_compare_same_part",
+     "name": "Compare Fractions With the Same Numerator or Denominator (option)",
+     "kind": "option on fractions:compare",
+     "teaches": "comparing two fractions that share a denominator (3/8 < 5/8) or a numerator (3/4 > 3/8), with bars, and saying why",
+     "closes": "comparing two fractions with the same denominator or the same numerator only, with bars, and saying why",
+     "representation": "the existing compare cell with two bars of the same whole"
+    }
+   ]
+  },
+  "G4|-|dividea1digitnumberby100": {
+   "title": "Divide a 1-digit number by 100",
+   "site": {
+    "flag": "enrich-native",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [
+     "4.NF.C.6",
+     "5.NBT.A.2"
+    ],
+    "ee": [
+     "M.EE.5.NBT.2"
+    ],
+    "domain": "NF",
+    "unit": null,
+    "block": null,
+    "power": false
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "placevalue:place_value_10x",
+     "opts": {
+      "op": "/",
+      "power": [
+       100
+      ],
+      "decimals": true
+     },
+     "missing": "divides 3- and 4-digit numbers by 100; the lesson needs a 1-digit number ÷ 100 (7 ÷ 100 = 0.07)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "only 1-digit numbers divided by 100 (7 ÷ 100 = 0.07)",
+   "build": [
+    "div10_small_numbers"
+   ],
+   "pre": [
+    {
+     "key": "division:div_facts",
+     "opts": {
+      "constant": [
+       10
+      ]
+     },
+     "why": "Y2.B5.S14 Divide by 10 (lower grade, same idea)"
+    },
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line (lower grade, same idea)"
+    },
+    {
+     "key": "conversions:d_to_f",
+     "opts": {
+      "forms": [
+       1
+      ]
+     },
+     "why": "Y4.B8.S8 Hundredths as decimals (lower grade, same idea)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fraction_operations:frac_10_100",
+     "why": "7/100 = 0.07: the fraction the quotient names"
+    }
+   ],
+   "note": "Support lesson (site flag enrich-native, Year 4 \"Decimals A\"); nearest WRM step Y4.B8.S10 Divide a 1- or 2-digit number by 100. Reuses the Y4 lane's div10_small_numbers.",
+   "envision": [
+    {
+     "proposal": "div10_small_numbers",
+     "name": "Divide 1- and 2-Digit Numbers by 10 and 100 (option)",
+     "kind": "option on placevalue:place_value_10x",
+     "teaches": "7 ÷ 10 = 0.7, 34 ÷ 10 = 3.4, 7 ÷ 100 = 0.07, 34 ÷ 100 = 0.34 on a place-value chart with the digits sliding right",
+     "closes": "only 1-digit numbers divided by 100 (7 ÷ 100 = 0.07)",
+     "representation": "the shift-chart cell with tenths and hundredths columns added (O . t h"
+    }
+   ]
+  },
+  "G4|-|hundredths": {
+   "title": "Hundredths",
+   "site": {
+    "flag": "enrich-native",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [
+     "3.NF.A.1",
+     "4.NF.C.5"
+    ],
+    "ee": [
+     "M.EE.3.NF.1"
+    ],
+    "domain": "NF",
+    "unit": null,
+    "block": null,
+    "power": false
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "fraction_operations:frac_10_100",
+     "missing": "hundredths as fractions renamed from tenths; never builds a hundredth on a place-value chart or with base-10 (flat = 1)"
+    },
+    {
+     "key": "conversions:d_to_f",
+     "missing": "writes hundredths decimals as fractions; no place-value chart or base-10 model"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "hundredths as one whole cut into 100, shown with counters on a place-value chart and with base-10 (flat = 1)",
+   "build": [
+    "decimal_pv"
+   ],
+   "pre": [
+    {
+     "key": "decimals:decimal_nl_drag",
+     "why": "Y4.B8.S4 Tenths on a number line (lower grade, same idea)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y4.B7.S10 Equivalent fraction families (lower grade, same idea)"
+    },
+    {
+     "key": "composing:fraction_number_line",
+     "why": "Y3.B6.S7 Fractions on a number line (lower grade, same idea)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "decimals:compare_decimal",
+     "why": "comparing hundredths once they are on the chart"
+    }
+   ],
+   "note": "Support lesson (site flag enrich-native, Year 4 \"Decimals A\"); nearest WRM steps Y4.B8.S7-S9 Hundredths as fractions / as decimals / on a place value chart.",
+   "envision": [
+    {
+     "proposal": "decimal_pv",
+     "name": "Tenths and Hundredths in a Place-Value Chart",
+     "kind": "new skill decimals:decimal_place_value",
+     "teaches": "tenths and hundredths as decimals in a place-value chart, with counters and base-10 (flat = 1)",
+     "closes": "hundredths as one whole cut into 100, shown with counters on a place-value chart and with base-10 (flat = 1)",
+     "representation": "a place-value chart with counters"
+    }
+   ]
+  },
+  "G4|-|measureincentimetres": {
+   "title": "Measure in centimetres",
+   "site": {
+    "flag": "enrich-native",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [
+     "1.MD.A.2",
+     "2.MD.A.1"
+    ],
+    "ee": [
+     "M.EE.1.MD.2",
+     "M.EE.2.MD.1"
+    ],
+    "domain": "MD",
+    "unit": null,
+    "block": null,
+    "power": false
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:reading_ruler",
+     "missing": "reads a ruler in whole inches only; no centimetre ruler"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "measuring a length in whole centimetres on a centimetre ruler",
+   "build": [
+    "ruler_cm"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "why": "Y1.B7.S2 Measure length using objects (lower grade, same idea)"
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "why": "Y2.B6.S4 Order lengths and heights (lower grade, same idea)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:estimate_length",
+     "opts": {
+      "forms": [
+       2
+      ]
+     },
+     "why": "estimating a length before measuring it with the ruler"
+    }
+   ],
+   "note": "Support lesson (site flag enrich-native, Year 1 \"Length and Height\"); nearest WRM steps Y1.B7.S3 / Y2.B6.S1 Measure in centimetres. Pre-skills are few: only measuring with objects and comparing lengths come before it.",
+   "envision": [
+    {
+     "proposal": "ruler_cm",
+     "name": "Read a Centimetre Ruler (option)",
+     "kind": "option on measurement:reading_ruler",
+     "teaches": "measuring lengths in whole centimetres, then millimetres, on a metric ruler (the skill reads inches only)",
+     "closes": "measuring a length in whole centimetres on a centimetre ruler",
+     "representation": "a unit option (cm, mm) on reading_ruler with the same arrow-and-ruler picture"
+    }
+   ]
+  },
+  "G4|-|orderfractions": {
+   "title": "Order fractions",
+   "site": {
+    "flag": "enrich-native",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [],
+    "ee": [],
+    "domain": "NF",
+    "unit": null,
+    "block": null,
+    "power": false
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "fractions:order_fractions",
+     "missing": "orders sets of unlike fractions (3/4, 7/10, 2/3, 1/2, 3/8, 1/6); the Grade 3 lesson orders unit fractions or fractions with one denominator"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "ordering fractions with the same denominator or unit fractions only",
+   "build": [
+    "frac_compare_same_part"
+   ],
+   "pre": [
+    {
+     "key": "fractions:compare",
+     "why": "Y3.B6.S2 Compare and order unit fractions (lower grade, same idea)"
+    },
+    {
+     "key": "composing:fraction_number_line",
+     "why": "Y3.B6.S7 Fractions on a number line (lower grade, same idea)"
+    },
+    {
+     "key": "fractions:equivalent",
+     "why": "Y4.B7.S10 Equivalent fraction families (lower grade, same idea)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "fractions:order_frac_numline",
+     "why": "ordering the same fractions by placing them on a number line"
+    }
+   ],
+   "note": "Support lesson (site flag enrich-native, \"Prerequisite ladder\" from Year 3); nearest WRM steps Y3.B6.S2 / S5. The proposal frac_compare_same_part puts the same pairs option on order_fractions.",
+   "envision": [
+    {
+     "proposal": "frac_compare_same_part",
+     "name": "Compare Fractions With the Same Numerator or Denominator (option)",
+     "kind": "option on fractions:compare",
+     "teaches": "comparing two fractions that share a denominator (3/8 < 5/8) or a numerator (3/4 > 3/8), with bars, and saying why",
+     "closes": "ordering fractions with the same denominator or unit fractions only",
+     "representation": "the existing compare cell with two bars of the same whole"
+    }
+   ]
+  }
+ },
  "proposals": {
   "roman_numerals": {
    "kind": "new",
@@ -8924,8 +10522,12 @@
    "reused": true,
    "source": "STANDARD_PROPOSALS",
    "closes": {
-    "Y5.B1.S6": "naming 10, 100, 1,000 ... 1,000,000 as powers of ten and the \"10 of these make one of the next\" relationship (how many 1,000s in 100,000)"
-   }
+    "Y5.B1.S6": "naming 10, 100, 1,000 ... 1,000,000 as powers of ten and the \"10 of these make one of the next\" relationship (how many 1,000s in 100,000)",
+    "G4|-|placevalue10timesandonetenthofadigitsvalue": "comparing the value of the same digit in neighbouring places: 10 times the place to its right and one tenth of the place to its left"
+   },
+   "lessons": [
+    "G4|-|placevalue10timesandonetenthofadigitsvalue"
+   ]
   },
   "vis_gattegno": {
    "lane": "placevalue",
@@ -9176,8 +10778,12 @@
    "closes": {
     "Y5.B2.S6": "two-step +/− problems with 4- to 6-digit numbers drawn as bar models",
     "Y5.B5.S6": "multiplication problems with multi-digit numbers (4-digit × 1-digit, 2-digit × 2-digit) and two-step problems with a × step",
-    "Y5.B5.S11": "× and ÷ problems with multi-digit calculations (4-digit × 1-digit, 4-digit ÷ 1-digit) and two-step problems mixing × / ÷ with + / −"
-   }
+    "Y5.B5.S11": "× and ÷ problems with multi-digit calculations (4-digit × 1-digit, 4-digit ÷ 1-digit) and two-step problems mixing × / ÷ with + / −",
+    "G4|-|multistepwordproblemsdivideandinterprettheremainder": "a two-step story whose division leaves a remainder the pupil must interpret (round up, drop it or report it), with a 1-digit divisor"
+   },
+   "lessons": [
+    "G4|-|multistepwordproblemsdivideandinterprettheremainder"
+   ]
   },
   "vis_bar_family": {
    "lane": "operations",
@@ -9806,8 +11412,12 @@
    "reused": true,
    "source": "WRM_PROPOSALS",
    "closes": {
-    "Y5.B7.S1": "decimals to 2 dp on a place-value chart with counters, partitioned (0.36 = 0.3 + 0.06), and hundredths on a number line"
-   }
+    "Y5.B7.S1": "decimals to 2 dp on a place-value chart with counters, partitioned (0.36 = 0.3 + 0.06), and hundredths on a number line",
+    "G4|-|hundredths": "hundredths as one whole cut into 100, shown with counters on a place-value chart and with base-10 (flat = 1)"
+   },
+   "lessons": [
+    "G4|-|hundredths"
+   ]
   },
   "decimal_whole": {
    "kind": "new",
@@ -10255,7 +11865,13 @@
     "Y5.B14.S2"
    ],
    "reused": true,
-   "source": "WRM_PROPOSALS"
+   "source": "WRM_PROPOSALS",
+   "lessons": [
+    "G4|-|measureincentimetres"
+   ],
+   "closes": {
+    "G4|-|measureincentimetres": "measuring a length in whole centimetres on a centimetre ruler"
+   }
   },
   "angles_point": {
    "kind": "option",
@@ -10774,6 +12390,453 @@
    "reused": false,
    "closes": {
     "Y5.B15.S4": "estimating a container's capacity in ml and l against benchmarks (a cup ≈ 250 ml, a bottle 1 l)"
+   }
+  },
+  "facts_times_tens": {
+   "kind": "option",
+   "skill": "multiplication:mult_zeros",
+   "option": "forms \"a multiple of ten × a multiple of ten (90 × 50)\" and \"÷ by a multiple of ten or a 1-digit number with zeros (300 ÷ 30, 2,400 ÷ 6)\"",
+   "name": "Basic Facts With Tens: × and ÷ (option)",
+   "teaches": "using a basic fact and place value to multiply two multiples of ten (90 × 50 = 9 × 5 × 100) and to divide multiples of ten (300 ÷ 30 = 30 ÷ 3)",
+   "representation": "the existing across fact cell; a \"9 × 5 = 45, so 90 × 50 = ___\" fact line above as a hint that fades",
+   "family": "multiplication",
+   "ccss": [
+    "4.NBT.A.1",
+    "4.NBT.B.5",
+    "4.NBT.B.6"
+   ],
+   "why": "generated mult_zeros {forms:[2]} multiplies one 1-digit number by a multiple of ten (6 × 40) only: no tens × tens and no division form",
+   "steps": [],
+   "reused": false,
+   "lessons": [
+    "G4|-|multiplyanddividemultiplesof10usingbasicfactseg90x5030030"
+   ],
+   "closes": {
+    "G4|-|multiplyanddividemultiplesof10usingbasicfactseg90x5030030": "a multiple of ten times a multiple of ten (90 × 50) and dividing multiples of ten with a basic fact (300 ÷ 30, 2,400 ÷ 6)"
+   }
+  },
+  "growing_shape_patterns": {
+   "kind": "new",
+   "skill": "patterns:growing_shape_patterns",
+   "name": "Growing Shape Patterns",
+   "teaches": "drawing the next term of a growing pattern of dots or squares (1, 3, 5 …), counting each term and writing the number sequence and its rule",
+   "representation": "one boxed cell: three pictured terms (dots or squares) in boxes, an empty box to draw term 4, a count row under the terms",
+   "family": "patterns",
+   "ccss": [
+    "4.OA.C.5"
+   ],
+   "why": "patterns:shape_pattern deals repeating patterns only (AB, ABC); no skill pictures a pattern that grows",
+   "steps": [],
+   "reused": false,
+   "lessons": [
+    "G4|-|extendgrowingshapepatterns"
+   ],
+   "closes": {
+    "G4|-|extendgrowingshapepatterns": "a pictured growing pattern of dots or squares: draw the next term and count it"
+   }
+  },
+  "patterns_notice": {
+   "kind": "new",
+   "skill": "patterns:notice_patterns",
+   "name": "What Do You Notice?",
+   "grade": "3-4",
+   "family": "algebra",
+   "standards": [
+    "3.OA.D.9",
+    "4.OA.C.5"
+   ],
+   "ee": [
+    "M.EE.3.OA.8",
+    "M.EE.4.OA.5"
+   ],
+   "teaches": "identifying arithmetic patterns in the addition and multiplication tables and in rule sequences, and explaining them with properties (4 × a number is always even; add 3 from 1 alternates odd, even)",
+   "problemTypes": [
+    "shade the pattern in the table, tick what you notice",
+    "true or false: every product in the 5 row ends in 0 or 5",
+    "generate the terms, then say what alternates",
+    "why is 4 × n always even? (reason bank)",
+    "predict the 10th term"
+   ],
+   "templates": [
+    "mult-grid",
+    "count-row"
+   ],
+   "newTemplates": [],
+   "answer": "tick statements from a bank; write terms",
+   "ladder": "O2 addition table → multiplication table → rule sequences · O3 pattern shaded → none · O6 table / track",
+   "misconceptions": [
+    "a pattern seen in three terms always continues",
+    "odd × odd is even"
+   ],
+   "wrmSteps": [
+    "Y3.B3.S13",
+    "Y4.B4.S15"
+   ],
+   "after": [],
+   "steps": [],
+   "reused": true,
+   "source": "STANDARD_PROPOSALS",
+   "representation": "one boxed cell: a pattern row or a times-table strip, a \"what do you notice?\" sentence frame with a word bank (odd, even, ones digit, repeats) and a check-box choice",
+   "correctionWhy": "representation written in our boxed-cell terms (the build-list entry names templates only)",
+   "corrected": [
+    "representation"
+   ],
+   "lessons": [
+    "G4|-|findemergentfeaturesegunitsdigitcycle"
+   ],
+   "closes": {
+    "G4|-|findemergentfeaturesegunitsdigitcycle": "naming a feature of the pattern that the rule does not state (odd / even alternation, a repeating ones digit) and explaining it"
+   }
+  },
+  "comparison_statements": {
+   "kind": "option",
+   "skill": "multiplication:mult_comparison",
+   "also": [
+    "multiplication:mult_comparison_plain"
+   ],
+   "option": "form \"statement ↔ equation\": 35 = 5 × 7 read as \"35 is 5 times as many as 7\" (and 7 times as many as 5), and the equation written for a comparison sentence",
+   "name": "Times as Many: Statements and Equations (option)",
+   "grade": "4",
+   "family": "operations",
+   "standards": [
+    "4.OA.A.1"
+   ],
+   "ee": [
+    "M.EE.4.OA.1"
+   ],
+   "teaches": "interpreting a multiplication equation as a multiplicative comparison and writing the equation for a verbal comparison",
+   "problemTypes": [
+    "35 = 5 × 7 means … (tick both statements)",
+    "write the equation for \"24 is 3 times as many as 8\"",
+    "which statement matches the equation?",
+    "fill the blank: __ is 4 times as many as 6"
+   ],
+   "templates": [
+    "equation"
+   ],
+   "newTemplates": [
+    "bar-model"
+   ],
+   "answer": "write the equation; tick statements",
+   "ladder": "O2 facts to 5 × 5 → 10 × 10 · O3 comparison bar model → none · O6 bars / plain",
+   "misconceptions": [
+    "reads 5 × 7 as \"5 more than 7\"",
+    "only one of the two statements is true"
+   ],
+   "wrmSteps": [],
+   "after": [],
+   "steps": [],
+   "reused": true,
+   "source": "STANDARD_PROPOSALS",
+   "lessons": [
+    "G4|-|multiplicativecomparisontimesasmany"
+   ],
+   "closes": {
+    "G4|-|multiplicativecomparisontimesasmany": "interpreting a multiplication equation as a comparison (35 = 5 × 7: 35 is 5 times as many as 7) and writing the equation for a verbal comparison"
+   }
+  },
+  "comparison_unknown": {
+   "kind": "option",
+   "skill": "multiplication:mult_comparison",
+   "also": [
+    "multiplication:mult_comparison_plain"
+   ],
+   "option": "unknown \"the larger amount\" | \"how many times as many\" | \"the smaller amount\" (default all three)",
+   "name": "Times as Many: Choose the Unknown (option)",
+   "teaches": "one kind of comparison story per page, e.g. only \"how many times as many?\" (42 is how many times 7?), solved with a bar model or a division",
+   "representation": "the existing story cell with its comparison bar (two bars, one cut into equal parts); one answer box",
+   "family": "multiplication",
+   "ccss": [
+    "4.OA.A.2"
+   ],
+   "why": "generated mult_comparison deals the three unknowns at random: 4 of 8 generated items ask \"how many times as many?\"; no option keeps a page on one",
+   "steps": [],
+   "reused": false,
+   "lessons": [
+    "G4|-|multiplicativecomparisonwordproblemshowmanytimesasmanyunknownmultiplier"
+   ],
+   "closes": {
+    "G4|-|multiplicativecomparisonwordproblemshowmanytimesasmanyunknownmultiplier": "a page of \"how many times as many?\" stories only (the unknown multiplier)"
+   }
+  },
+  "add_tenths_hundredths": {
+   "kind": "option",
+   "skill": "fraction_operations:frac_10_100",
+   "also": [
+    "fraction_operations:frac_10_100_nv"
+   ],
+   "option": "form \"add a tenths and a hundredths fraction (3/10 + 4/100)\"",
+   "name": "Add Tenths and Hundredths (option)",
+   "teaches": "renaming the tenths fraction as hundredths and adding: 3/10 + 4/100 = 30/100 + 4/100 = 34/100, with a hundred square",
+   "representation": "the existing frac_10_100 cell: a hundred square shading 3 columns and 4 squares, the two-step equation with answer boxes",
+   "family": "fraction_operations",
+   "ccss": [
+    "4.NF.C.5"
+   ],
+   "why": "generated frac_10_100 renames 4/10 as 40/100 and finds equivalents of 0.05, but never adds a tenths and a hundredths fraction",
+   "steps": [],
+   "reused": false,
+   "lessons": [
+    "G4|-|addtenthsandhundredthsrenametenthsashundredths"
+   ],
+   "closes": {
+    "G4|-|addtenthsandhundredthsrenametenthsashundredths": "adding a tenths and a hundredths fraction by renaming the tenths (3/10 + 4/100 = 34/100)"
+   }
+  },
+  "points_lines_rays": {
+   "kind": "new",
+   "skill": "angles_lines:points_lines_rays",
+   "name": "Point, Line, Segment or Ray?",
+   "grade": "4",
+   "family": "geometry",
+   "standards": [
+    "4.G.A.1"
+   ],
+   "ee": [
+    "M.EE.4.G.1"
+   ],
+   "teaches": "identifying and drawing points, lines, line segments, rays, right/acute/obtuse angles and perpendicular and parallel lines, and finding them in 2-D figures",
+   "problemTypes": [
+    "name it: point, line, segment, ray",
+    "draw a ray from A through B on a dot grid",
+    "draw a line parallel / perpendicular to this one",
+    "find the perpendicular sides in the shape",
+    "draw an obtuse angle"
+   ],
+   "templates": [
+    "legacy"
+   ],
+   "newTemplates": [
+    "angle-kit",
+    "shape-grid"
+   ],
+   "answer": "write the word from a bank; draw on the grid (the key shows one drawing)",
+   "ladder": "O2 name → draw → find in figures · O3 arrowheads and end dots explained in a key → none · O6 dot / square grid",
+   "misconceptions": [
+    "a segment and a line are the same",
+    "lines must be horizontal to be parallel"
+   ],
+   "wrmSteps": [
+    "Y3.B11.S6",
+    "Y3.B11.S7"
+   ],
+   "after": [],
+   "steps": [],
+   "reused": true,
+   "source": "STANDARD_PROPOSALS",
+   "representation": "one boxed cell: a drawn figure (dot, line with two arrows, segment with two end dots, ray with one) and a label bank to write from; a draw-it item on dot paper",
+   "correctionWhy": "representation written in our boxed-cell terms (the build-list entry names templates only)",
+   "corrected": [
+    "representation"
+   ],
+   "lessons": [
+    "G4|-|pointslineslinesegmentsandrays"
+   ],
+   "closes": {
+    "G4|-|pointslineslinesegmentsandrays": "naming and drawing points, lines, line segments and rays (no skill deals them)"
+   }
+  },
+  "make_line_plot": {
+   "kind": "new",
+   "skill": "graphs:make_a_line_plot",
+   "name": "Make a Line Plot",
+   "grade": "2-6",
+   "family": "data",
+   "standards": [
+    "2.MD.D.9",
+    "3.MD.B.4",
+    "4.MD.B.4",
+    "5.MD.B.2"
+   ],
+   "ee": [
+    "M.EE.2.MD.9",
+    "M.EE.3.MD.4",
+    "M.EE.4.MD.4",
+    "M.EE.5.MD.2"
+   ],
+   "teaches": "measuring objects (ruler pictures) or reading a data list, then making a line plot (dot plot) on a scale of whole numbers, halves, quarters or eighths, and solving problems from it",
+   "problemTypes": [
+    "measure the objects, then plot",
+    "plot a list of measurements",
+    "difference between longest and shortest",
+    "total or share equally (Grade 5 redistribute)",
+    "how many measured more than …?"
+   ],
+   "templates": [
+    "legacy"
+   ],
+   "newTemplates": [
+    "graph-axes",
+    "measure-scale"
+   ],
+   "answer": "draw the × marks; write the answers",
+   "ladder": "O2 whole units → halves/quarters → eighths; plot → compute · O3 scale drawn with every tick labelled → ends only · O6 × / dots",
+   "misconceptions": [
+    "puts marks side by side instead of stacking",
+    "fraction ticks spaced unevenly",
+    "counts marks as the measurement"
+   ],
+   "wrmSteps": [
+    "Y3.B12.S5"
+   ],
+   "after": [],
+   "steps": [],
+   "reused": true,
+   "source": "STANDARD_PROPOSALS",
+   "representation": "one boxed cell: the data list in a box, a number line marked 0 to 3 in eighths with an X column to fill per value, then one question box (how many longer than 1 1/2 in?)",
+   "correctionWhy": "representation written in our boxed-cell terms (the build-list entry names templates only)",
+   "corrected": [
+    "representation"
+   ],
+   "lessons": [
+    "G4|-|lineplotswithfractions"
+   ],
+   "closes": {
+    "G4|-|lineplotswithfractions": "making a line plot of measurements in halves, quarters and eighths from a data list, and solving addition and subtraction problems with the plotted fractions"
+   }
+  },
+  "conversion_table": {
+   "kind": "option",
+   "skill": "measurement:unit_conversions",
+   "option": "form \"conversion table\": complete a two-column table (1 ft = 12 in, 2 ft, 3 ft …) and use it",
+   "name": "Conversion Tables (option)",
+   "grade": "4",
+   "family": "measurement",
+   "standards": [
+    "4.MD.A.1"
+   ],
+   "ee": [
+    "M.EE.4.MD.1"
+   ],
+   "teaches": "knowing relative sizes of units in one system and recording equivalents in a two-column table (ft/in, m/cm, kg/g, lb/oz, l/ml, hr/min/sec)",
+   "problemTypes": [
+    "complete the table",
+    "use the table to convert",
+    "1 ft is __ times as long as 1 in",
+    "find the error in a table"
+   ],
+   "templates": [
+    "legacy"
+   ],
+   "newTemplates": [
+    "data-table"
+   ],
+   "answer": "write the missing entries",
+   "ladder": "O2 ×10, ×12 → ×60, ×100 → ×1,000 · O3 first two rows filled → none · O6 table vertical / horizontal",
+   "misconceptions": [
+    "uses 100 for every conversion",
+    "divides when going to a smaller unit"
+   ],
+   "wrmSteps": [
+    "Y4.B6.S1",
+    "Y5.B14.S5"
+   ],
+   "after": [
+    "time_convert"
+   ],
+   "steps": [],
+   "reused": true,
+   "source": "STANDARD_PROPOSALS",
+   "lessons": [
+    "G4|-|customarycapacitycupspintsquartsandgallons",
+    "G4|-|customarylengthandweightinchesfeetyardsouncesandpounds"
+   ],
+   "closes": {
+    "G4|-|customarycapacitycupspintsquartsandgallons": "recording customary capacity equivalents in a two-column conversion table (1 gal = 4 qt, 2 gal = 8 qt …)",
+    "G4|-|customarylengthandweightinchesfeetyardsouncesandpounds": "a page of pounds and ounces on their own, and recording length and weight equivalents in a two-column table"
+   }
+  },
+  "weight_customary": {
+   "kind": "new",
+   "skill": "measurement:weight_customary",
+   "name": "Customary Weight (oz/lb)",
+   "teaches": "knowing 1 lb = 16 oz and converting pounds to ounces (3 lb = 48 oz), and mixed pounds-and-ounces (2 lb 4 oz = 36 oz), as length_customary does for length",
+   "representation": "one boxed cell: the conversion fact \"1 lb = 16 oz\" as a hint that fades, the conversion, one answer box; a two-column lb | oz table option",
+   "family": "measurement",
+   "ccss": [
+    "4.MD.A.1"
+   ],
+   "why": "length_customary deals inches, feet, yards and miles only; unit_conversions {units:[1]} mixes pounds with quarts, cups and fluid ounces",
+   "steps": [],
+   "reused": false,
+   "lessons": [
+    "G4|-|customarylengthandweightinchesfeetyardsouncesandpounds"
+   ],
+   "closes": {
+    "G4|-|customarylengthandweightinchesfeetyardsouncesandpounds": "a page of pounds and ounces on their own, and recording length and weight equivalents in a two-column table"
+   }
+  },
+  "measure_word_four_ops": {
+   "kind": "new",
+   "skill": "measurement:measurement_word_problems",
+   "name": "Measurement Word Problems (Four Operations)",
+   "teaches": "one- and two-step stories about distance, time, mass, capacity and money that add, subtract, multiply or divide measures, some with a unit change (2 kg 300 g, 1 ½ hours) and a number-line diagram",
+   "representation": "one boxed story cell: the story, a measuring-scale or number-line diagram, a work box and an answer box with the unit printed",
+   "family": "measurement",
+   "ccss": [
+    "4.MD.A.2"
+   ],
+   "why": "unit_conversion_word only converts one measure; no skill adds, subtracts, multiplies or divides measures with money and fractions of a unit (4.MD.A.2)",
+   "steps": [],
+   "reused": false,
+   "lessons": [
+    "G4|-|measurementwordproblemsdistancetimemassmoneyandcapacity"
+   ],
+   "closes": {
+    "G4|-|measurementwordproblemsdistancetimemassmoneyandcapacity": "one- and two-step stories that add, subtract, multiply or divide distances, times, masses, capacities and money, with fractions or decimals of a unit and a number-line diagram"
+   }
+  },
+  "frac_compare_same_part": {
+   "kind": "option",
+   "skill": "fractions:compare",
+   "also": [
+    "fractions:order_fractions"
+   ],
+   "option": "pairs \"same denominator\" | \"same numerator\" (3.NF.A.3d)",
+   "name": "Compare Fractions With the Same Numerator or Denominator (option)",
+   "teaches": "comparing two fractions that share a denominator (3/8 < 5/8) or a numerator (3/4 > 3/8), with bars, and saying why",
+   "representation": "the existing compare cell with two bars of the same whole; the < > = answer box",
+   "family": "fractions",
+   "ccss": [
+    "3.NF.A.3d"
+   ],
+   "why": "generated fractions:compare {denoms:[2,3]} mixes unlike pairs (1/4 vs 7/10, 3/5 vs 1/2) with same-part pairs; Grade 3 compares same numerator or same denominator only",
+   "steps": [],
+   "reused": false,
+   "lessons": [
+    "G4|-|comparefractions",
+    "G4|-|orderfractions"
+   ],
+   "closes": {
+    "G4|-|comparefractions": "comparing two fractions with the same denominator or the same numerator only, with bars, and saying why",
+    "G4|-|orderfractions": "ordering fractions with the same denominator or unit fractions only"
+   }
+  },
+  "div10_small_numbers": {
+   "kind": "option",
+   "skill": "placevalue:place_value_10x",
+   "option": "band \"1-digit\" and \"2-digit\" when decimals are on",
+   "name": "Divide 1- and 2-Digit Numbers by 10 and 100 (option)",
+   "teaches": "7 ÷ 10 = 0.7, 34 ÷ 10 = 3.4, 7 ÷ 100 = 0.07, 34 ÷ 100 = 0.34 on a place-value chart with the digits sliding right",
+   "representation": "the shift-chart cell with tenths and hundredths columns added (O . t h; today it shows H T O only on decimal items), arrows under the sliding digits, one decimal answer box with a fixed point",
+   "family": "placevalue",
+   "ccss": [
+    "4.NF.C.6",
+    "5.NBT.A.2"
+   ],
+   "why": "generated: place_value_10x {op:\"/\", power:[10], decimals:true} dealt 990 ÷ 10, 298 ÷ 10 = 29.8 (3-digit dividends, two whole answers) and drops to an H T O chart with no tenths column",
+   "source": "Y4.json (wave-2 tagging, critic r13 PASS)",
+   "steps": [
+    "Y4.B8.S5",
+    "Y4.B8.S6",
+    "Y4.B8.S10"
+   ],
+   "reused": true,
+   "lessons": [
+    "G4|-|dividea1digitnumberby100"
+   ],
+   "closes": {
+    "G4|-|dividea1digitnumberby100": "only 1-digit numbers divided by 100 (7 ÷ 100 = 0.07)"
    }
   }
  },

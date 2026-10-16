@@ -43,6 +43,17 @@ for (const [id, w] of want) {
   else if (w.status === 'partial' && got.clause !== w.clause) problems.push(`${id}: clause after the merge differs from the links file\n     merged: ${got.clause}\n     links file: ${w.clause}`);
 }
 for (const id of tag.keys()) { const sid = id.split('|')[1]; if (mine.has(sid) && !want.has(id)) problems.push(`${id}: still tagged after the merge, but not a direct or partial skill in its links file`); }
+// site lessons ("lessons" section) tag nothing into SKILL_WRM: no tagFix may name one, and the section must hold exactly
+// the year's lessons in data/curriculum/site-lessons.json
+const SL = JSON.parse(fs.readFileSync(R + 'data/curriculum/site-lessons.json', 'utf8'));
+for (const d of docs) {
+  if (!d.lessons) continue;
+  const site = new Set(SL.lessons.filter(l => l.wrmYear === d.year).map(l => l.id));
+  for (const id of Object.keys(d.lessons)) if (!site.has(id)) problems.push(`${d.year} lessons: ${id} is not a ${d.year} site lesson`);
+  for (const id of site) if (!d.lessons[id]) problems.push(`${d.year} lessons: site lesson ${id} is not tagged`);
+  for (const t of d.tagFixes) if (d.lessons[t.step] || site.has(t.step)) problems.push(`${d.year} tagFix names a site lesson (lessons tag nothing into SKILL_WRM): ${t.key}|${t.step}`);
+  for (const [id, l] of Object.entries(d.lessons)) for (const p of [...l.build, ...l.preBuild]) if (!d.proposals[p]) problems.push(`${id}: proposal ${p} is not in proposals`);
+}
 console.log(problems.join('\n'));
 console.log(`mergecheck: ${docs.map(d => d.year).join('+')}: ${want.size} direct/partial tags, ${docs.reduce((n, d) => n + d.tagFixes.length, 0)} tagFixes; ${problems.length} problems; ${formatOnly.length} format-only (partial clause in why, no partial field)`);
 console.log(problems.length ? 'mergecheck: FAIL' : 'mergecheck: OK');

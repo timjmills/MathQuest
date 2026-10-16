@@ -28,6 +28,8 @@ const wrm = JSON.parse(fs.readFileSync(R + 'data/curriculum/wrm-steps.json', 'ut
 const FILE = process.argv[2];
 const d = JSON.parse(fs.readFileSync(FILE, 'utf8'));
 const ALL = process.argv.includes('--all');
+// site lessons (the "lessons" section) are checked exactly as steps: their week is in prior.json (build.py adds it)
+const UNITS = { ...d.steps, ...(d.lessons || {}) };
 const fi = process.argv.indexOf('--fit'), FIT = fi > 0 ? process.argv[fi + 1] : null;
 const titles = {}; for (const y of wrm.years) for (const b of y.blocks) for (const s of b.steps) titles[s.id] = s.title;
 const strip = s => String(s ?? '').replace(/<style[\s\S]*?<\/style>/g, '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&#?\w+;/g, ' ').replace(/\s+/g, ' ');
@@ -65,7 +67,7 @@ const clauseCeil = t => { t = String(t || ''); let c = titleCeil(t.replace(/\b\d
   return c; };
 const YEAR_RANGE = { R: 20, Y1: 100, Y2: 100, Y3: 1000, Y4: 10000 };
 const own = {};
-for (const [sid, s] of Object.entries(d.steps)) {
+for (const [sid, s] of Object.entries(UNITS)) {
   let c = Math.max(titleCeil(s.title), s.verdict === 'full' ? 0 : clauseCeil(s.missing));
   for (const e of [...s.direct, ...s.partial]) c = Math.max(c, probe(e.key, e.opts || {}, e.maxNumber || 10000).max);
   own[sid] = c;
@@ -107,7 +109,11 @@ const FIRST = [
 // school's CCSS customary lessons are W33)
 const OWN = { 'Y5.B14.S4': ['customary units'],
   // Y5.B12.S11 Divide by 10, 100 and 1,000 (W10): its own title makes thousandths (439 ÷ 1,000 = 0.439)
-  'Y5.B12.S11': ['thousandths'] };
+  'Y5.B12.S11': ['thousandths'],
+  // the site's three customary lessons (W30-W31) ARE the school's first customary-unit lessons
+  'G4|-|customarycapacitycupspintsquartsandgallons': ['customary units'],
+  'G4|-|customarylengthandweightinchesfeetyardsouncesandpounds': ['customary units'],
+  'G4|-|measurementwordproblemsdistancetimemassmoneyandcapacity': ['customary units'] };
 function laterGrade(e, s, r) {
   const out = [];
   if (/\d+\.\d+\s*[×x÷]\s*\d+\.\d+/.test(s)) out.push('decimal × / ÷ decimal (5.NBT.B.7)');
@@ -240,7 +246,7 @@ function candidates(e) {
 }
 if (FIT) {
   const res = {};
-  for (const [sid, s] of Object.entries(d.steps)) for (const role of ['pre', 'related']) for (const e of s[role]) {
+  for (const [sid, s] of Object.entries(UNITS)) for (const role of ['pre', 'related']) for (const e of s[role]) {
     let pick = null, why0 = null;
     for (const cnd of candidates(e)) {
       const ee = { ...e, opts: cnd.opts }; if (cnd.maxNumber) ee.maxNumber = cnd.maxNumber; else delete ee.maxNumber;
@@ -254,7 +260,7 @@ if (FIT) {
   console.log(`linkfit --fit: ${n.length} links; ${drop} with no fitting option set (dropped)`);
 } else {
   let bad = 0, checked = 0;
-  for (const [sid, s] of Object.entries(d.steps)) {
+  for (const [sid, s] of Object.entries(UNITS)) {
     const fails = [];
     for (const role of ['pre', 'related']) for (const e of s[role]) { checked++;
       for (const f of check(sid, role, e)) fails.push(`${role} ${e.key}${e.opts ? JSON.stringify(e.opts) : ''}${e.maxNumber ? '@' + e.maxNumber : ''}: ${f}`); }
@@ -277,6 +283,6 @@ if (FIT) {
     bad += fails.length;
     if (fails.length || ALL) console.log(`${sid} [${wkOf(sid) || '—'}] own ceiling ${own[sid]}: ${fails.length ? fails.length + ' FAIL\n   ' + fails.join('\n   ') : 'ok'}`);
   }
-  console.log(`linkfit: ${checked} links in ${Object.keys(d.steps).length} steps; ${bad} misfits`);
+  console.log(`linkfit: ${checked} links in ${Object.keys(d.steps).length} steps and ${Object.keys(d.lessons || {}).length} site lessons; ${bad} misfits`);
   process.exitCode = bad ? 1 : 0;
 }

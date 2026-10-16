@@ -1,4 +1,75 @@
-# Wave 2 tagging: Year 5 (US Grade 4) — round 2 fixes (critic r4)
+# Wave 2 tagging: Year 5 (US Grade 4) — round 3: tooling, site re-extract, site lessons (2026-10-16)
+
+## Round 3 what changed
+1. **Tooling** lives in `tests/scripts/wrm-tagging/Y5/` (owner/lead rule: one folder per year); main merged (Y6, R/Y1/Y4/Y6
+   links). `mergecheck.mjs` now merges Y5 with every in-repo links file (`build.py` passes R, Y1, Y4, Y6): 0 problems; the 119
+   R/Y1 rows that keep a partial clause in `why` with no `partial` field are counted as **format-only** and accepted.
+   Two clean `git archive` builds are byte-identical, and the steps / tagFixes are byte-identical to round 2.
+2. **Site re-extract** (`tests/scripts/ws-wrm-extract.cjs`): the 872 steps, titles and CCSS of every Y5 step are unchanged.
+   Two extractor bugs fixed: a copied-in (`st.g`) or review (`st.rv`) pacing entry carries its OWN grade's block/step numbers
+   and used to overwrite this grade's step (wrong week, power flag, US-money flag); and the site now paces by CCSS domain, so a
+   domain unit no longer names a WRM block. Disagreements 10 -> 12 (the lead's raw trial had ~152, almost all from those
+   two bugs). Y5 steps gain only `enrichment` (29 steps: the pacing badge "ENRICHMENT · GRADE n STANDARD") and `site`
+   (27 steps: `supportIn` grades / `taughtIn` copied-in or review uses). New `data/curriculum/site-lessons.json`.
+   Y5's build passes against the refresh with no change to any step.
+3. **Site lessons**: a top-level `lessons` section in `data/curriculum/links/Y5.json` (below).
+
+## Site lessons (owner rule 2026-10-16: every site lesson tagged)
+Source: `data/curriculum/site-lessons.json`, the 22 entries with `wrmYear: "Y5"` (school Grade 4): 16 committee (CCSS custom,
+"build required"; all 16 scheduled as `SUP` in the pacing) and 6 Support (enrich-native) titles that match no
+WRM step. HELPERS.md's five Awsaj supplements are all present: pattern rules (follow a rule; emergent features; growing shape
+patterns), multiplicative comparison (times as many; unknown multiplier), fraction line plots, customary units (capacity;
+length and weight), measurement word problems. The other 8 committee lessons are the domain-test builds ("so the domain test only
+asks what has been taught").
+
+| Verdict | Lessons |
+|---|---|
+| full | 4: follow a given rule (number_patterns_rule {pattern:[add,sub], places:[10,100], rule:false}), decompose a fraction (decompose_fractions), angles are additive (additive_angles), 3-D shapes (name_3d_shapes) |
+| partial | 17 |
+| gap | 1: points, lines, line segments and rays |
+
+Proposals used by lessons: 17 (10 reused: value_ten_times, multi_step_four_ops, decimal_pv, ruler_cm, patterns_notice,
+comparison_statements, points_lines_rays, make_line_plot, conversion_table, and Y4's div10_small_numbers; 7 new:
+facts_times_tens, growing_shape_patterns, comparison_unknown, add_tenths_hundredths, weight_customary, measure_word_four_ops,
+frac_compare_same_part). Every verdict was judged from generated items with the listed opts (e.g. mult_comparison: 4 of 8
+items ask "how many times as many?"; remainder_interpret deals divisors to 19; capacity {units:[0],forms:[0]} converts cups,
+pints, quarts, gallons one item at a time). Every pre / related link passes `linkfit.mjs` exactly as a step's (the lesson's
+first school week; a Support lesson with no week is judged at W38); 880 links, 0 misfits.
+
+**Decision: lessons tag nothing into SKILL_WRM.** A site lesson is not a WRM small step, so it has no `tagFixes`, and a
+proposal it needs lists it under `lessons` (never `steps`, which the lead merges into WRM_PROPOSALS); `mergecheck.mjs`
+fails a tagFix that names a lesson and checks the section holds exactly the year's site lessons.
+
+### The `lessons` JSON shape (contract for the White Rose page lane)
+```
+"lessons": {
+  "<site lesson id>": {                 // id = data/curriculum/site-lessons.json id: "<school grade>|-|<title slug>"
+    "title": "...",                     // the site title
+    "site": { "flag": "committee" | "enrich-native" | "other", "supplement": bool, "firstWeek": "W28" | null,
+              "ccss": [...], "ee": [...], "domain": "MD", "unit": "Awsaj supplement lessons", "block": "Y5.B9" | null,
+              "power": bool },
+    "direct":  [{"key", "opts", "maxNumber"?}],             // as a step
+    "partial": [{"key", "opts"?, "maxNumber"?, "missing"}],
+    "verdict": "full" | "partial" | "gap", "missing": "...",
+    "build": ["proposalId"], "pre": [{"key", "opts"?, "why"}], "preBuild": [...], "related": [{"key", "opts"?, "why"}],
+    "note": "...", "envision": [{"proposal", "name", "kind", "teaches", "closes", "representation"}]   // partial / gap only
+  } }
+```
+Order: the site's (school week, then id). A proposal used by a lesson carries `"lessons": [ids]` and `closes[<lesson id>]`.
+
+### Owner questions (recommendation)
+1. **Support lessons that are really WRM steps under another title** (Hundredths = Y4.B8.S7-S9, Divide a 1-digit number by 100
+   = Y4.B8.S10, Compare / Order fractions = Y3.B6.S2 / S5, Measure in centimetres = Y1.B7.S3, 3D shapes = R.B12.S1): should the
+   site use the WRM titles so they resolve to the step? *Recommend yes; until then they are tagged here as lessons and the
+   note names the WRM step.*
+2. **Customary units come before the xlsx's first customary week** (site lessons W30-W31; the xlsx sheet's first customary
+   week is W33). *Recommend the site's weeks; linkfit lets these three lessons link customary content.*
+3. **Domain-test build lessons with no block** (8): place them in a WRM block (the site leaves `block` null)? *Recommend the
+   block the domain test closes, e.g. 4.NF.C.5 tenths + hundredths into Y5.B7 (Decimals).*
+4. **Two-column conversion tables** (conversion_table) are asked by both customary lessons: one option on unit_conversions,
+   or also on capacity / length_customary? *Recommend one shared form on all three.*
+
+# (Round 2) Wave 2 tagging: Year 5 (US Grade 4) — round 2 fixes (critic r4)
 
 Output: `data/curriculum/links/Y5.json`, generated by `tests/scripts/wrm-tagging/Y5/build.py`. Base: `y5_r0.json`. Hand fixes:
 `spec_a_crossyear.py`, `spec_r1.py` (local critic r1), **`spec_r2.py` (this round: every row of `Y5-critic-r4.md`)**.

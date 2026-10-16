@@ -1,4 +1,4 @@
-// Every opts value in Y5.json must be a real option of the skill and survive normalizeOptions unchanged.
+// Every opts value in Y5.json (steps and site lessons) must be a real option of the skill and survive normalizeOptions unchanged.
 const _m = new Map(); globalThis.localStorage = { getItem: k => _m.get(k) ?? null, setItem: (k, v) => _m.set(k, String(v)), removeItem: k => _m.delete(k) };
 globalThis.window = globalThis; globalThis.document = undefined;
 const R = new URL('../../../../', import.meta.url).pathname;
@@ -8,7 +8,7 @@ const fs = await import('fs');
 const d = JSON.parse(fs.readFileSync(process.argv[2] || R + 'data/curriculum/links/Y5.json', 'utf8'));
 let bad = 0, n = 0;
 const legacy = new Set(['constant']); // count_by_tables folds the hidden legacy `constant` into rows (critic r2: generates correctly)
-for (const [sid, s] of Object.entries(d.steps)) for (const [role, list] of [['direct', s.direct], ['partial', s.partial], ['pre', s.pre], ['related', s.related]]) for (const e of list) {
+for (const [sid, s] of Object.entries({ ...d.steps, ...(d.lessons || {}) })) for (const [role, list] of [['direct', s.direct], ['partial', s.partial], ['pre', s.pre], ['related', s.related]]) for (const e of list) {
   const o = e.opts || {}; if (!Object.keys(o).length) continue; n++;
   const [c, k] = e.key.split(':'); const defs = so.optionsFor(c, k) || []; const norm = so.normalizeOptions(c, k, o) || {};
   for (const [id, v] of Object.entries(o)) {
@@ -29,7 +29,7 @@ function tokens(t) {
 const has = (e, k) => (so.optionsFor(...e.key.split(':')) || []).some(x => x.id === k);
 const same = (e, k, v) => JSON.stringify((e.opts || {})[k]) === JSON.stringify(v);
 let named = 0;
-for (const [sid, s] of Object.entries(d.steps)) {
+for (const [sid, s] of Object.entries({ ...d.steps, ...(d.lessons || {}) })) {
   for (const [role, list] of [['direct', s.direct], ['partial', s.partial], ['pre', s.pre], ['related', s.related]]) for (const e of list) {
     for (const [k, v, raw] of tokens(role === 'partial' ? e.missing : e.why)) { if (!has(e, k)) continue; named++;
       if (!same(e, k, v)) { bad++; console.log(`${sid} ${role} ${e.key}: the ${role === 'partial' ? 'clause' : 'why'} names ${raw} but opts are ${JSON.stringify(e.opts || {})}`); } } }

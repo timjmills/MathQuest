@@ -28,6 +28,14 @@ node(os.path.join(H, 'prior.mjs'), os.path.join(DATA, 'prior.json'))
 K = json.load(open(os.path.join(DATA, 'keys.json')))
 keys, props = K['keys'], K['props']
 prior = json.load(open(os.path.join(DATA, 'prior.json')))
+# site lessons (data/curriculum/site-lessons.json, Year 5 = school Grade 4): every lesson the school site schedules that is
+# not a WRM small step. Tagged in spec_z_lessons.py into the "lessons" section; their week joins prior.json so the
+# pass-3 re-cite and linkfit judge their links against the school week too (a Support lesson with no week: W38, any time)
+SL = json.load(open(R + 'data/curriculum/site-lessons.json'))
+LES = [l for l in SL['lessons'] if l['wrmYear'] == 'Y5']
+for l in LES: prior[l['id']] = {'wk': l['firstWeek'] or 'W38', 'lesson': True}
+json.dump(prior, open(os.path.join(DATA, 'prior.json'), 'w'), indent=1, ensure_ascii=False)
+LESSONS = {}
 wrm = json.load(open(R + 'data/curriculum/wrm-steps.json'))
 steps, order, allorder = {}, [], []
 for y in wrm['years']:
@@ -98,12 +106,28 @@ def move(sid, k, src, dst, why):
         if _match(e, k):
             ST[sid][src].remove(e); e['why'] = why; ST[sid][dst].insert(0 if dst == 'pre' else len(ST[sid][dst]), e); return
     errs.append(f'spec move: {sid} {src} has no {k}')
-ns = dict(ST=ST, NEW=NEW, E=E, cite=cite, _match=_match, drop=drop, add=add, add_partial=add_partial, setopts=setopts, to_partial=to_partial,
+def lesson(lid, **f):
+    """One site lesson: direct / partial / pre / related as E() keys ('key{opts}' or (key, missing) / (key, why))."""
+    if lid in LESSONS: errs.append('lesson twice: ' + lid)
+    o = {'title': next((l['title'] for l in LES if l['id'] == lid), ''), 'direct': [], 'partial': [], 'pre': [], 'related': [], 'build': [], 'preBuild': [], 'missing': '', 'note': ''}
+    o.update({k: v for k, v in f.items() if k not in ('direct', 'partial', 'pre', 'related')})
+    for k in f.get('direct', []): e = E(k); e.setdefault('opts', {}); o['direct'].append(e)
+    for k, m in f.get('partial', []): e = E(k); e['missing'] = m; o['partial'].append(e)
+    for role in ('pre', 'related'):
+        for k, w in f.get(role, []): e = E(k); e['why'] = w; o[role].append(e)
+    LESSONS[lid] = o
+ns = dict(R_ROOT=R, ST=ST, NEW=NEW, LESSONS=LESSONS, lesson=lesson, LES=LES, E=E, cite=cite, _match=_match, drop=drop, add=add, add_partial=add_partial, setopts=setopts, to_partial=to_partial,
           move=move, steps=steps, wk=wk, errs=errs, CLOSES={}, KEEP_LINKS=set(), RENAME={}, PATCH={}, re=re, json=json)
 for f in sorted(glob.glob(os.path.join(H, 'spec_*.py'))): exec(open(f).read(), ns)
 CLOSES = ns['CLOSES']
+lids = [l['id'] for l in LES]
+for lid in LESSONS:
+    if lid not in lids: errs.append('lesson not on the site (site-lessons.json Y5): ' + lid)
+for lid in lids:
+    if lid not in LESSONS: errs.append('site lesson not tagged: ' + lid)
+UNITS = {**ST, **LESSONS}   # steps and site lessons: passes 1-4 and the checks run on both
 # proposal ids folded into another (owner rulings / cross-year reuse)
-for sid, st in ST.items():
+for sid, st in UNITS.items():
     for f in ('build', 'preBuild'):
         out = []
         for p in st[f]:
@@ -113,7 +137,7 @@ for sid, st in ST.items():
     st['preBuild'] = [p for p in st['preBuild'] if p not in st['build']]   # rule 3: never the step's own build
 
 # option values live in `opts` now: drop the round-0 "- easier: {...}" / ": option tiles 22" notes from the whys
-for st in ST.values():
+for st in UNITS.values():
     for e in st['pre'] + st['related']:
         e['why'] = re.sub(r'\s*[-:]\s*(?:option [a-z]+ \S+\s*-\s*)?easier: \{.*?\}\s*$', '', e['why'])
 # ---------- pass 3: pre cites a tagged step met by this week ----------
@@ -124,7 +148,7 @@ for sid_, st_ in ST.items():
     for e_ in st_['direct'] + st_['partial']: taught_at.setdefault(e_['key'], set()).add(sid_)
 YR = ['R', 'Y1', 'Y2', 'Y3', 'Y4', 'Y5', 'Y6']
 recited = 0
-for sid_, st_ in ST.items():
+for sid_, st_ in UNITS.items():
     for e_ in st_['pre']:
         m_ = re.match(r'^((?:R|Y\d)\.B\d+\.S\d+)', e_['why'])
         if not m_ or re.search(r"has no live skill|this step's build|nearest live practice", e_['why']): continue
@@ -142,12 +166,12 @@ for sid_, st_ in ST.items():
 
 # ---------- pass 4: linkfit --fit ----------
 cand = os.path.join(DATA, 'Y5.candidate.json')
-json.dump({'year': 'Y5', 'steps': ST, 'tagFixes': []}, open(cand, 'w'), indent=1, ensure_ascii=False)
+json.dump({'year': 'Y5', 'steps': ST, 'lessons': LESSONS, 'tagFixes': []}, open(cand, 'w'), indent=1, ensure_ascii=False)
 fitf = os.path.join(DATA, 'fit.json')
 p = node(os.path.join(H, 'linkfit.mjs'), cand, '--fit', fitf)
 fit = json.load(open(fitf))
 dropped, changed = [], 0
-for sid, st in ST.items():
+for sid, st in UNITS.items():
     for role in ('pre', 'related'):
         keep = []
         for e in st[role]:
@@ -165,7 +189,7 @@ json.dump(dropped, open(os.path.join(DATA, 'dropped.json'), 'w'), indent=1, ensu
 # critic r4 class E: one link per key + opts in a role (the first, best-ranked, is kept); linkfit also fails two links
 # of one role that deal the same items
 deduped = 0
-for sid, st in ST.items():
+for sid, st in UNITS.items():
     for role in ('pre', 'related'):
         seen, keep = set(), []
         for e in st[role]:
@@ -175,7 +199,7 @@ for sid, st in ST.items():
         st[role] = keep
 
 # ---------- step checks ----------
-for sid, st in ST.items():
+for sid, st in UNITS.items():
     if len(st['pre']) > 8: st['pre'] = st['pre'][:8]
     if len(st['related']) > 8: st['related'] = st['related'][:8]
     v = st['verdict']
@@ -219,13 +243,38 @@ for pid in sorted(used, key=lambda x: (order.index(used[x][0]), x)):
     for sid, c in cl.items():
         if c.strip() == (pr.get('teaches') or '').strip(): errs.append(f'{sid}: rule 16, closes copies the teaches of {pid}')
     proposals[pid] = pr
+# site lessons: a proposal a lesson builds lists the lesson under `lessons` (never under `steps`, which the lead merges into
+# WRM_PROPOSALS) and its clause under closes[<lesson id>]; a proposal only lessons use is emitted after the step ones
+used_l = {}
+for lid in lids:
+    if lid in LESSONS:
+        for pid in LESSONS[lid]['build'] + LESSONS[lid]['preBuild']: used_l.setdefault(pid, []).append(lid)
+for pid in sorted(used_l, key=lambda x: (lids.index(used_l[x][0]), x)):
+    if pid not in proposals:
+        if pid in props:
+            src = props[pid]; pr = {k: v for k, v in src.items() if k != '_src'}
+            pr['steps'] = sorted(set(src.get('steps') or []), key=okey); pr['reused'] = True; pr['source'] = src['_src']
+        elif pid in NEW:
+            pr = dict(NEW[pid]); pr['steps'] = sorted(set(pr.get('stepsOtherYears', [])), key=okey); pr.pop('stepsOtherYears', None)
+            pr['reused'] = bool(pr.get('source'))
+        else:
+            errs.append('unknown proposal ' + pid); continue
+        if pid in ns['PATCH']:
+            pr.update(ns['PATCH'][pid]); pr['corrected'] = sorted(k for k in ns['PATCH'][pid] if k != 'correctionWhy')
+        proposals[pid] = pr
+    pr = proposals[pid]
+    pr['lessons'] = used_l[pid]
+    for lid in used_l[pid]:
+        if pid in LESSONS[lid]['build']:
+            pr.setdefault('closes', {})[lid] = CLOSES.get(lid, {}).get(pid) or LESSONS[lid]['missing']
+            if pr['closes'][lid].strip() == (pr.get('teaches') or '').strip(): errs.append(f'{lid}: rule 16, closes copies the teaches of {pid}')
 for pid in NEW:
     if pid not in used and not NEW[pid].get('source'): pass   # unused new proposals are simply not emitted
 def short_rep(r):
     r = (r or '').split(';')[0].strip()
     return r if len(r) <= 160 else r[:157].rsplit(' ', 1)[0] + ' …'
-for sid in order:
-    st = ST[sid]
+for sid in order + [l for l in lids if l in LESSONS]:
+    st = UNITS[sid]
     if st['verdict'] == 'full': st.pop('envision', None); continue
     env = []
     for pid in st['build']:
@@ -234,7 +283,7 @@ for sid in order:
         if pr.get('skill'): ks = f"new skill {pr['skill']}" if kind == 'new' else f"option on {pr['skill']}"
         else: ks = ('new template' if kind == 'template' else 'visual option') + ' on ' + ', '.join(pr.get('hosts', [])[:3])
         env.append({'proposal': pid, 'name': pr.get('name', pid), 'kind': ks, 'teaches': pr.get('teaches') or short_rep(pr.get('build') or pr.get('adds') or ''),
-                    'closes': pr.get('closes', {}).get(sid, st['missing']), 'representation': short_rep(pr.get('representation') or pr.get('build') or ((pr.get('option') + ' on the existing ' + pr['skill'].split(':')[1] + ' cell') if pr.get('option') and pr.get('skill') else ''))})
+                    'closes': pr.get('closes', {}).get(sid, st['missing']), 'representation': short_rep(pr.get('representation') or pr.get('build') or ((pr.get('option') + ' on the existing ' + pr['skill'].split(':')[1] + ' cell') if pr.get('option') and pr.get('skill') else '') or (('the ' + ', '.join(pr['templates']) + ' template' + ('s' if len(pr['templates']) > 1 else '')) if pr.get('templates') else ''))})
     for e in env:
         for f in ('name', 'kind', 'teaches', 'closes', 'representation'):
             if not e.get(f): errs.append(f"{sid}: envisioned {e['proposal']} has no {f}")
@@ -306,9 +355,20 @@ for sid in order:
             if st.get('envision') is not None: o[f] = st['envision']
         else: o[f] = st.get(f, [] if f in ('build', 'preBuild') else '')
     out_steps[sid] = o
+out_lessons = {}
+for l in LES:
+    if l['id'] not in LESSONS: continue
+    st = LESSONS[l['id']]; o = {'title': l['title'],
+        'site': {k: l[k] for k in ('flag', 'supplement', 'firstWeek', 'ccss', 'ee', 'domain', 'unit', 'block', 'power')}}
+    for f in FIELDS[1:]:
+        if f in ('direct', 'partial', 'pre', 'related'): o[f] = [clean(e, f) for e in st[f]]
+        elif f == 'envision':
+            if st.get('envision') is not None: o[f] = st['envision']
+        else: o[f] = st.get(f, [] if f in ('build', 'preBuild') else '')
+    out_lessons[l['id']] = o
 missing_steps = [s for s in order if s not in ST]
 if missing_steps: errs.append(f'steps missing: {missing_steps}')
-doc = {'year': 'Y5', 'generatedBy': 'wave2-tagging', 'steps': out_steps, 'proposals': proposals, 'tagFixes': tagfixes}
+doc = {'year': 'Y5', 'generatedBy': 'wave2-tagging', 'steps': out_steps, 'lessons': out_lessons, 'proposals': proposals, 'tagFixes': tagfixes}
 OUT = R + 'data/curriculum/links/Y5.json'
 # the other years' links files merged into main: mergecheck merges all their tagFixes with Y5's (0 real problems required)
 OTHER_YEARS = [y for y in ('R', 'Y1', 'Y2', 'Y3', 'Y4', 'Y6') if os.path.exists(R + f'data/curriculum/links/{y}.json')]
@@ -317,6 +377,7 @@ with open(OUT, 'w') as f:
 from collections import Counter
 c = Counter(s['verdict'] for s in out_steps.values())
 print('steps', len(out_steps), dict(c))
+print('lessons', len(out_lessons), dict(Counter(s['verdict'] for s in out_lessons.values())), 'site-lessons Y5', len(LES))
 print('proposals new', sum(1 for p_ in proposals.values() if not p_['reused']), 'reused', sum(1 for p_ in proposals.values() if p_['reused']),
       'tagFixes', len(tagfixes), {a: sum(1 for t in tagfixes if t['action'] == a) for a in ('add', 'full', 'partial', 'opts', 'remove')})
 print(f'pre re-cited: {recited}; links re-optioned by linkfit: {changed}; links dropped by linkfit: {len(dropped)}; duplicates removed: {deduped}')
