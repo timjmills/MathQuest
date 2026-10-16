@@ -64,6 +64,11 @@ const MAX_ITEMS = 160;            // ten More Practice pages of 16 one-symbol it
  */
 const PAGE_CAP = Object.freeze({
     'multiplication:dot_array_mult': { S: 8, M: 6, L: 6 },
+    // (r11, critic r8 D8-3) number families: the owner's S 8-12 / M 8 / L 6, at the counts the page
+    // already deals (+/-: 12 / 9 / 6, x/÷: 8 / 9 / 6); the rows now share the grid, so the M page no
+    // longer ends over a 17 % strip (fill 0.83)
+    'addition:number_families_add': { S: 12, M: 9, L: 6 },
+    'multiplication:number_families_mult': { S: 8, M: 9, L: 6 },
 });
 /** The page ceiling of a section (Infinity when its skill has none). */
 function pageCapOf(sec, size) {
