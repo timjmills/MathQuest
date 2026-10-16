@@ -714,6 +714,16 @@ function sheetLayout(role, input, norm, sheetItems, tabId) {
  */
 /** The library lines a choose-all list's section prints for it (RM-08 and its paper tasks). */
 const PAPER_TASK_KEYS = new Set(['default-circle-all', 'sort-even-odd', 'circle-part-of-set']);
+/**
+ * Critic fractions-key r4 (R4-1): a paper-task line (circle all, circle part of a set, sort) is
+ * the task of a choose-all LIST only. A skill whose first dealt item was a list hands that line to
+ * every item it deals; any other item (a write-the-number production) says the write line, so no
+ * section ever prints "Circle all the correct answers." over an item with nothing to circle.
+ */
+export function keyForItem(it, key) {
+    if (!key || !PAPER_TASK_KEYS.has(key) || !it || !it.q) return key;
+    return it.q.printFormat === 'multi-select' ? key : 'default-write';
+}
 /** A fraction-of-a-set list ("Circle 2/3 of the stars."): its own paper task. */
 const PART_OF_SET_RE = /^\s*(?:Click|Circle|Tap)\s+\d+\/\d+\s+of\s+the\b/;
 
@@ -798,9 +808,9 @@ export function itemInstructionKey(it) {
         // Only a skill's own strings (the default adapter's key is a placeholder).
         const real = p && Array.isArray(p.real) && p.real.includes('strings');
         const raw = real && (typeof p.strings === 'function' ? p.strings({ categoryId: q.categoryId, skillId: q.skillId, label: q.skillLabel, q }) : p.strings);
-        if (raw && raw.instructionKey) return raw.instructionKey;
+        if (raw && raw.instructionKey) return keyForItem(it, raw.instructionKey);
     } catch (e) { /* the host's key */ }
-    return it.instructionKey || '';
+    return keyForItem(it, it.instructionKey || '');
 }
 
 /**
@@ -857,7 +867,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
         const hostKeys = pupil.map((it) => {
             const q = it.q || {};
             const s = skills.find((k) => k.skillId === q.skillId && (!q.categoryId || k.categoryId === q.categoryId));
-            return (it.instructionKey) || (s ? skillWords(s).instructionKey : '');
+            return keyForItem(it, (it.instructionKey) || (s ? skillWords(s).instructionKey : ''));
         });
         // Critic guided-r1: a mixed pool's items are stamped with the pool's one line ("Solve.
         // Write the answer.") over check-box and circle items. When the items' own kinds differ,

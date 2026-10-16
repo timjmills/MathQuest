@@ -5,7 +5,7 @@ import { fracHTML, fracCircleSVG, fracBarHTML } from './svg-fractions.js';
 import { getSkillGrade, maxDenominatorForGrade } from './data.js';
 import { COLORS, STROKE, FONTS, softFill, categoricalFill } from './design-tokens.js';
 import { optionsFor } from './skill-options.js';
-import { fracModelSVG, fracModelSizedHTML, fracStackHTML, fracTwin, tickLabelSet, nlPlacePayload, nlPlaceAnswer, nlPlaceTwin } from './sheet/index.js';
+import { fracModelSVG, fracModelSizedHTML, fracStackHTML, fracTwin, tickLabelSet, nlPlacePayload, nlPlaceAnswer, nlPlaceTwin, fosTwin } from './sheet/index.js';
 
 // ---- O6 APPEARANCE (lane AP3, 2026-09-25) --------------------------------------------------
 // `model` (skill-options.js, "Fraction model"): the teacher ticks the models a page draws. The
@@ -3926,11 +3926,22 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     const correctCount = Math.min(fosNum, fosDen) * fosMS_mult;
                     // Black-and-white shapes drawn as text, never colour emoji (critic fractions-key:
                     // H4 on paper); the noun names them, so the line reads as a sentence.
-                    const shapeSet = pick([['\u25CF', 'circles'], ['\u25A0', 'squares'], ['\u25B2', 'triangles'], ['\u2605', 'stars'], ['\u25C6', 'diamonds']]);
-                    const emoji = shapeSet[1];
+                    // Critic fractions-key r5: the shapes are drawn (an outline SVG), never a text glyph,
+                    // which no Andika face carries (L-FONT TY-1) and whose star is an emoji (INK-7).
+                    const _fosShapes = {
+                        circles: '<circle cx="12" cy="12" r="6.5"/>',
+                        squares: '<rect x="5.5" y="5.5" width="13" height="13"/>',
+                        triangles: '<path d="M12 4.5 L19.5 18.5 L4.5 18.5 Z"/>',
+                        stars: '<path d="M12 3.8 L14.2 9.3 L20 9.6 L15.5 13.3 L17 19 L12 15.8 L7 19 L8.5 13.3 L4 9.6 L9.8 9.3 Z"/>',
+                        diamonds: '<path d="M12 4 L19 12 L12 20 L5 12 Z"/>',
+                    };
+                    const emoji = pick(Object.keys(_fosShapes));
+                    // Drawn from the option's own type size (1.1em), so it scales with the printed numerals
+                    // at S, M and L on paper and on every screen host.
+                    const _fosSvg = `<svg class="fos-shape" viewBox="3.5 3.5 17 17" role="img" aria-label="${emoji.slice(0, -1)}" style="display:inline-block;width:1.1em;height:1.1em;vertical-align:middle;overflow:visible;"><g fill="#fff" stroke="#000" stroke-width="1.6" stroke-linejoin="round">${_fosShapes[emoji]}</g></svg>`;
                     const opts = [];
                     for (let i = 0; i < fosMS_total; i++) {
-                        opts.push({ id: 'opt' + i, label: shapeSet[0], correct: i < correctCount });
+                        opts.push({ id: 'opt' + i, label: _fosSvg, correct: i < correctCount });
                     }
                     const ans = opts.filter(o => o.correct).map(o => o.id);
                     q.text = `Click ${fosNum}/${fosDen} of the ${emoji}.`;
@@ -3959,9 +3970,16 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     q.hint = `Each group has ${fosTotal} ÷ ${fosDen} = ${fosMultiplier}. ${fosAnswer} ÷ ${fosMultiplier} = ${fosNum} groups.`;
                 } else if (_fosVariant === 3) {
                     // ---------- VARIANT 3: word problem -----------------
+                    // Critic fractions-key r4 (R4-3): no colour words on a black-and-white page; the
+                    // story names what happens to the part, and `{f}` is where the paper stacks the fraction.
                     const wpItems = pick(["marbles", "stickers", "crayons", "cookies", "buttons", "beads", "apples", "stars"]);
-                    const wpColor = pick(["blue", "red", "green", "yellow", "purple", "orange"]);
-                    q.text = `There are ${fosTotal} ${wpItems}. ${fosNum}/${fosDen} are ${wpColor}. How many ${wpColor} ${wpItems}?`;
+                    const wpStory = pick([
+                        `There are ${fosTotal} ${wpItems}. {f} of them are in a box. How many are in the box?`,
+                        `Ana has ${fosTotal} ${wpItems}. She gives away {f} of them. How many does she give away?`,
+                        `A jar holds ${fosTotal} ${wpItems}. Ben takes {f} of them. How many does Ben take?`,
+                    ]);
+                    q.text = wpStory.replace('{f}', `${fosNum}/${fosDen}`);
+                    q.fosStory = { story: wpStory, noun: wpItems };
                     q.ans = fosAnswer;
                     q.answerType = "number";
                     q.options = buildNumericOptions(fosAnswer);
@@ -4075,8 +4093,24 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     </div>
                 </div>`;
 
-                q.visual = _buildFosVisual(false);       // SCREEN: neutral
-                q.visualPrint = _buildFosVisual(true);   // PRINT: pre-colored
+                q.visual = _buildFosVisual(false);       // SCREEN (replaced by the kit twin below)
+                // PRINT (legacy path): pre-coloured, except a missing-numerator item, whose shading
+                // would be its answer (critic fractions-key r4, R4-3).
+                q.visualPrint = _buildFosVisual(!(_fosVariant === 2 && fosNum < fosDen));
+                // The kit's `fos` cell (sheet/cells/fos.js) draws every printed page and key: equal
+                // groups in rings, nothing shaded for the pupil, stacked fractions, sized to content.
+                const _fosTask = (_fosVariant === 2 && fosNum < fosDen) ? 'missing' : _fosVariant === 3 ? 'word' : 'of';
+                q.cell = { template: 'fos', v: 1, payload: Object.assign({
+                    task: _fosTask, num: fosNum, den: fosDen, mult: fosMultiplier, total: fosTotal, part: fosAnswer,
+                    ans: _fosTask === 'missing' ? fosNum : fosAnswer,
+                }, _fosTask === 'word' && q.fosStory ? { story: q.fosStory.story, noun: q.fosStory.noun } : {}) };
+                delete q.fosStory;
+                // The screen draws the same cell (L5: paper = screen): black and white, stacked
+                // fractions, nothing shaded, its box the answer input. The prompt line names the
+                // task; the cell holds the sentence (a story item keeps its story as the prompt).
+                q.visual = fosTwin(q.cell.payload);
+                if (_fosTask === 'of') q.text = 'Find the fraction of the set.';
+                else if (_fosTask === 'missing') q.text = 'Find the missing numerator.';
                 q.printFormat = 'fraction-of-set';
                 q.skillLabel = 'Frac of Set';
             } else if (fracSkill === "equiv_frac_visual") {

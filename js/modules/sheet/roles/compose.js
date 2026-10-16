@@ -29,7 +29,7 @@ import {
 import { paperOf, bodyHeightMm, instructionMm, resolveSectionLayout, fitsLine, LIVE_W_MM, itemCap } from '../layout.js';
 import {
     skillWords, levelLine, gradeWords, instructionHtml, estimateTitleLines, styleBlock, hookClasses,
-    STRAND_BY_CATEGORY, sectionInstructionKey, resolveInstruction, varsOfItems,
+    STRAND_BY_CATEGORY, sectionInstructionKey, resolveInstruction, varsOfItems, keyForItem,
 } from './practice.js';
 
 export { esc, blank, instructionHtml, styleBlock, deriveSeed, rng, shuffle, resolveSectionLayout, fitsLine, LIVE_W_MM };
@@ -241,10 +241,11 @@ export function instructionPart(key, vars = {}) {
 /** The instruction key of a set of items (BD-13), from the skills' own keys. */
 export function instructionKeyOf(items, skills) {
     const keys = items.map((it) => {
-        if (it.instructionKey) return it.instructionKey;
+        // R4-1: a list's paper task never reaches an item that is not a list.
+        if (it.instructionKey) return keyForItem(it, it.instructionKey);
         const q = it.q || {};
         const s = (skills || []).find((k) => k.skillId === q.skillId && (!q.categoryId || k.categoryId === q.categoryId));
-        return s ? (s.instructionKey || skillWords(s).instructionKey) : '';
+        return keyForItem(it, s ? (s.instructionKey || skillWords(s).instructionKey) : '');
     });
     return sectionInstructionKey(keys);
 }

@@ -116,8 +116,12 @@ export function pickNoun(category) {
 export function stackSlashFractions(text) {
     const s = String(text == null ? '' : text);
     if (/</.test(s)) return s;
-    return s.replace(/\b(\d+)\/(\d+)\b/g, '<span class="msc-frac" style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.05;font-size:0.8em;margin:0 0.08em;">'
-        + '<span>$1</span><span style="border-top:2px solid currentColor;align-self:stretch;text-align:center;">$2</span></span>');
+    const frac = (n, d) => '<span class="msc-frac" style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.05;font-size:0.8em;margin:0 0.08em;">'
+        + `<span>${n}</span><span style="border-top:2px solid currentColor;align-self:stretch;text-align:center;">${d}</span></span>`;
+    // Critic fractions-key r4 (R4-5): punctuation right after a fraction ("less than 1/2.") stays on
+    // the fraction's line - the pair is one unbreakable run, so the "." never wraps alone.
+    return s.replace(/\b(\d+)\/(\d+)\b([.,;:!?)]+)?/g, (m, n, d, p) => (p
+        ? `<span class="msc-frac-run" style="white-space:nowrap;">${frac(n, d)}${p}</span>` : frac(n, d)));
 }
 
 /**

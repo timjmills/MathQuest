@@ -33,6 +33,7 @@
 //   --mix section|problem     kit, with --supports: how clashing supports are shared (default section)
 //   --opts '{"notation":["across"]}'  kit: option values every skill in scope carries (O6 appearance)
 //   --no-combined             legacy: skip the combined multi-section sheet (see below)
+//   --seeds N                 kit: lint every document from N seeds (default 1, the skill's own seed)
 //   --key-place end|after-page  kit: where the key prints (Wave 4.4; default end = today)
 //   --key-style copy|short    kit: the facsimile key (default) or the short answers-only key
 //   --lints L-INK,L-KEY       only report these lints (the others still run)
@@ -1698,9 +1699,12 @@ async function runApp(source) {
         // --roles (kit only): every page role buildSheet composes, per skill. A role the skill
         // cannot take (a fact layout for a non-fact skill) is reported as n/a, not linted.
         const kitRoles = source === 'kit' ? (arg('roles', 'independent') || 'independent').split(',').map(r => r.trim()).filter(Boolean) : [null];
-        for (const s of skills) for (const role of kitRoles) {
-            const id = `${s.categoryId}:${s.skillId}${role && role !== 'independent' ? '#' + role : ''}`;
-            const seed = hash(`${s.categoryId}__${s.skillId}:print`);
+        // --seeds N (kit only): each document N times, from N seeds (the first is the usual one),
+        // so a lint is held on more than one deal of the skill. Default 1: unchanged.
+        const SEEDS = source === 'kit' ? Math.max(1, parseInt(arg('seeds', '1'), 10) || 1) : 1;
+        for (const s of skills) for (const role of kitRoles) for (let sk = 0; sk < SEEDS; sk++) {
+            const id = `${s.categoryId}:${s.skillId}${role && role !== 'independent' ? '#' + role : ''}${sk ? '@s' + sk : ''}`;
+            const seed = (hash(`${s.categoryId}__${s.skillId}:print`) + sk) >>> 0;
             let r;
             let kitHalves = null;
             try {

@@ -116,6 +116,8 @@ export const OPS_TEMPLATE_IDS = ['division', 'area-model', 'mult-chart', 'arrays
 // compare two groups, picture word problem. `k2Twin` draws a template's screen twin.
 export { k2Twin, SHAPES as K2_SHAPES } from './cells/k2kit.js';
 export { shareColumns } from './cells/counters.js';
+// Fraction of a set (critic fractions-key r4, R4-2 / R4-3): equal groups in rings, sized to content.
+export { fosTwin } from './cells/fos.js';
 export { base10Counts } from './cells/base10.js';
 import './cells/tenframe.js';
 import './cells/bond.js';
