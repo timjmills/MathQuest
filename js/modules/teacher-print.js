@@ -21,10 +21,10 @@
 // the chosen `opts` go straight into the buildSheet request (skills[].opts).
 
 import { rankByQuery, onSkillSearchReady } from './skill-finder.js';
-import { buildSheet, sheetDocument, LESSON_SIZE_NOTE } from './print-sheet.js';
+import { buildSheet, sheetDocument, LESSON_SIZE_NOTE, blankBack } from './print-sheet.js';
 import {
     icon, esc, toast, skillCatalogue, findSkill, levelText, currentSet, savedSets, printDefaults,
-    optionsSummary, optionsReadOnlyHTML, readStore, writeStore, PRINTS_KEY, fmtDay,
+    optionsSummary, optionsReadOnlyHTML, readStore, writeStore, PRINTS_KEY, PRINT_DEFAULTS_KEY, fmtDay,
 } from './teacher-ui.js';
 import { tvpAttrs, infoButtonHTML } from './teacher-preview.js';
 import { skillHasOfferedOptions } from './skill-options-ui.js';
@@ -107,6 +107,9 @@ function initState() {
         anchors: 'off',
         header: { name: true, date: true, score: true, tab: true, title: true },
         key: true,
+        // Wave 4.4: where the key prints and what it looks like (default = today's key; the
+        // teacher's last choice is remembered in the print defaults).
+        keyPlace: d.keyPlace, keyStyle: d.keyStyle, keyNewSheet: !!d.keyNewSheet,
         seed: freshSeed(),
         view: 0,          // page index, or 'key'
         versions: 1,
@@ -181,7 +184,7 @@ export async function reprint(id) {
     toast('Preparing the pages…');
     try {
         const built = await buildAll(rec.req);
-        await printHtml(built.pupilHtml + built.keyHtml, rec.title || 'Worksheet', rec.req.paper);
+        await printHtml(built.docHtml || (built.pupilHtml + built.keyHtml), rec.title || 'Worksheet', rec.req.paper);
         rec.at = Date.now();
         const list = (readStore(PRINTS_KEY, []) || []).filter((p) => p.id !== id);
         writeStore(PRINTS_KEY, [rec, ...list].slice(0, 10));
@@ -316,6 +319,9 @@ function onClick(e) {
         case 'paper': pr.paper = d.v; renderSetup(); scheduleBuild(); break;
         case 'anchors': if (b.getAttribute('aria-disabled') === 'true') break; pr.anchors = d.v; renderSetup(); scheduleBuild(); break;
         case 'header': pr.header[d.v] = !pr.header[d.v]; renderSetup(); scheduleBuild(); break;
+        case 'key-place': pr.keyPlace = d.v === 'after-page' ? 'after-page' : 'end'; rememberKeyDefaults(); renderSetup(); scheduleBuild(); break;
+        case 'key-style': pr.keyStyle = d.v === 'short' ? 'short' : 'copy'; rememberKeyDefaults(); renderSetup(); scheduleBuild(); break;
+        case 'key-newsheet': pr.keyNewSheet = !pr.keyNewSheet; rememberKeyDefaults(); renderSetup(); scheduleBuild(); break;
         case 'key': pr.key = !pr.key; if (pr.view === 'key' && !pr.key) pr.view = 0; renderSetup(); scheduleBuild(); break;
         case 'view': pr.view = d.v === 'key' ? 'key' : Number(d.v); showPreview(); break;
         case 'new-numbers': pr.seed = freshSeed(); scheduleBuild(0); break;
@@ -656,7 +662,11 @@ function check(key, label) {
 function renderSetup() {
     const box = root.querySelector('#tvSetup');
     const pages = last ? last.pages.length : 0;
-    const printLabel = pages ? `Print ${pages} pupil page${pages === 1 ? '' : 's'}${pr.key ? ' + key' : ''}` : `Print pupil pages${pr.key ? ' + key' : ''}`;
+    const sheets = last && pr.key && last.newSheet && last.docPages ? Math.ceil(last.docPages / 2) : 0;
+    // critic r4 (R4-1): the label stays short so it fits the one-line button at 1366; the sheet count is a caption under it.
+    // On the narrow 1366 column the label breaks only before "+ key", never inside "Print 2 pupil pages".
+    const printLabel = `<span class="tv-print-l">${pages ? `Print ${pages} pupil page${pages === 1 ? '' : 's'}` : 'Print pupil pages'}</span>${pr.key ? ' <span class="tv-print-l">+ key</span>' : ''}`;
+    const sheetCap = sheets ? `On ${sheets} sheet${sheets === 1 ? '' : 's'}, double-sided.` : '';
     box.innerHTML = `
   <div style="padding:24px;display:flex;flex-direction:column;gap:16px;">
     <h2 class="tv-h2" id="tvSetupH">Page setup</h2>
@@ -675,18 +685,40 @@ function renderSetup() {
       <div class="tv-fields-2" style="gap:4px 12px;">${check('name', 'Name')}${check('date', 'Date')}${check('score', 'Score')}${check('tab', 'Strand tab')}${check('title', 'Title')}</div>
     </div>
     <div class="tv-setting tv-divided">
-      <div><div class="tv-h3" id="tvKeyL">Answer key</div><p class="tv-cap" id="tvKeyD">The same page with the answers written in.</p></div>
+      <div><div class="tv-h3" id="tvKeyL">Answer key</div><p class="tv-cap" id="tvKeyD">${pr.keyStyle === 'short' ? 'A short list of every answer, page by page.' : 'The same page with the answers written in.'}</p></div>
       <button type="button" class="tv-switch" role="switch" aria-checked="${pr.key}" aria-labelledby="tvKeyL" aria-describedby="tvKeyD" data-act="key"></button>
-    </div>
+    </div>${pr.key ? keyOptionsHTML() : ''}
   </div>
   <div style="padding:16px 24px 24px;border-top:1px solid var(--tv-rule);display:flex;flex-direction:column;gap:8px;">
-    <button type="button" class="tv-btn tv-btn-primary tv-btn-block" data-act="print"${pages ? '' : ' aria-disabled="true"'}>${icon('print', 18)}<span>${printLabel}</span></button>
+    <button type="button" class="tv-btn tv-btn-primary tv-btn-block" data-act="print"${pages ? '' : ' aria-disabled="true"'}${sheetCap ? ' aria-describedby="tvPrintSheets"' : ''}>${icon('print', 18)}<span>${printLabel}</span></button>${sheetCap ? `
+    <p class="tv-cap tv-print-sheets" id="tvPrintSheets">${sheetCap}</p>` : ''}
     <button type="button" class="tv-btn tv-btn-block" data-act="open-tab"${pages ? '' : ' aria-disabled="true"'}>${icon('external', 18)}<span>Open in a new tab</span></button>
     <button type="button" class="tv-btn tv-btn-ghost" data-act="new-numbers" style="align-self:center;">${icon('reset', 16)}<span>New numbers</span></button>
   </div>
   ${classicHTML()}`;
     const det = box.querySelector('.tv-extras');
     if (det) det.addEventListener('toggle', () => { pr.classic.open = det.open; });
+}
+
+/** Wave 4.4 (critic r1, D7): the key placement and style are the teacher's print defaults. */
+function rememberKeyDefaults() {
+    try {
+        const d = readStore(PRINT_DEFAULTS_KEY, {}) || {};
+        writeStore(PRINT_DEFAULTS_KEY, Object.assign({}, d, { keyPlace: pr.keyPlace, keyStyle: pr.keyStyle, keyNewSheet: !!pr.keyNewSheet }));
+    } catch (e) { /* storage blocked: the choice still holds for this session */ }
+}
+
+/** Wave 4.4: the key's placement and style, shown only while the key is on. */
+function keyOptionsHTML() {
+    return `
+    <div class="tv-keyopts" style="display:flex;flex-direction:column;gap:10px;margin-top:-6px;">
+      <div><span class="tv-label">Key placement</span>${seg('key-place', pr.keyPlace || 'end', [['end', 'At the end'], ['after-page', 'After each page']], 'Key placement').replace('class="tv-seg"', 'class="tv-seg tv-seg-wrap"')}
+        <p class="tv-cap" style="margin-top:6px;">${pr.keyPlace === 'after-page' ? 'Each pupil page is followed by its own key.' : 'All key pages print after all pupil pages.'}</p>${pr.keyPlace === 'after-page' ? `
+        <button type="button" class="tv-check" role="checkbox" aria-checked="${!!pr.keyNewSheet}" data-act="key-newsheet" style="margin-top:6px;"><span class="tv-check-box" aria-hidden="true">${icon('check', 14)}</span><span>Start each key on a new sheet</span></button>
+        <p class="tv-cap" style="margin-top:4px;">For double-sided printing: a blank back is added so each key has its own sheet.</p>` : ''}</div>
+      <div><span class="tv-label">Key style</span>${seg('key-style', pr.keyStyle || 'copy', [['copy', 'Page copy'], ['short', 'Short']], 'Key style')}
+        <p class="tv-cap" style="margin-top:6px;">${pr.keyStyle === 'short' ? 'Short: labels and answers only, many pages on one sheet.' : 'Page copy: the pupil page with the answers filled in.'}</p></div>
+    </div>`;
 }
 
 /**
@@ -777,7 +809,7 @@ function requestFor(s, i) {
         photocopySafe: pr.photocopySafe,
         anchors: anchorsBlocked() ? 'off' : (pr.anchors || 'off'),
         header: { name: h.name, date: h.date, score: h.score, tab: h.tab ? undefined : false, title: h.title ? (pr.title.trim() || true) : false },
-        key: pr.key,
+        key: { on: !!pr.key, placement: pr.keyPlace || 'end', style: pr.keyStyle || 'copy', newSheet: !!pr.keyNewSheet },
         seed: (pr.seed + i * 7919) >>> 0,
     };
 }
@@ -788,18 +820,33 @@ function currentReq() {
 }
 
 async function buildAll(req) {
-    const out = { parts: [], pupilHtml: '', keyHtml: '', pages: [], keyPages: 0 };
+    const out = { parts: [], pupilHtml: '', keyHtml: '', docHtml: '', pages: [], keyPages: 0 };
+    let after = false;
     for (const [ri, r] of req.parts.entries()) {
         let res;
-        try { res = await buildSheet(r); } catch (e) { if (e && typeof e === 'object') e.sectionIndex = req.idx ? req.idx[ri] : ri; throw e; }
+        // B4 (critic r1): in a printout of several sections each short key names its section.
+        const rq = req.parts.length > 1 ? Object.assign({}, r, { keySection: `Section ${(req.idx ? req.idx[ri] : ri) + 1}` }) : r;
+        try { res = await buildSheet(rq); } catch (e) { if (e && typeof e === 'object') e.sectionIndex = req.idx ? req.idx[ri] : ri; throw e; }
         out.parts.push({ res, role: r.role, letters: r.letters });
         out.pupilHtml += res.pupilHtml;
         out.keyHtml += res.keyHtml || '';
+        let part = res.docHtml || res.pupilHtml;
+        // critic r3 (N-3): with "Start each key on a new sheet" every section keeps its sheets whole,
+        // so the next section never starts on the back of the last one
+        const ko = res.keyOptions || {};
+        if (ko.on && ko.newSheet && (part.match(/<section\b[^>]*\bclass="ws-page[ "]/g) || []).length % 2) part += '\n' + blankBack(/letter/i.test(r.paper || '') ? 'letter' : 'a4');
+        out.docHtml += part + '\n';
+        if (res.keyOptions && res.keyOptions.on && res.keyOptions.placement === 'after-page') after = true;
         out.keyPages += res.keyPageCount || 0;
         for (let p = 0; p < res.pageCount; p++) {
             out.pages.push(r.role === 'more-practice' && r.letters && r.letters[p] ? `Practice ${r.letters[p]}` : `Page ${out.pages.length + 1}`);
         }
     }
+    // "At the end": every section's pupil pages, then every key (today's order).
+    if (!after) out.docHtml = out.pupilHtml + out.keyHtml;
+    // critic r3 (N-2): the pages the printer will run, blank backs included
+    out.docPages = (out.docHtml.match(/<section\b[^>]*\bclass="ws-page[ "]/g) || []).length;
+    out.newSheet = after && req.parts.some((r) => r.key && r.key.newSheet);
     // Page labels must be unique when several sections repeat a letter.
     const seen = {};
     out.pages = out.pages.map((l) => { seen[l] = (seen[l] || 0) + 1; return seen[l] > 1 ? `${l} (${seen[l]})` : l; });
@@ -1016,7 +1063,7 @@ function titleOf() {
 
 async function doPrint() {
     if (!last || !last.pages.length) { toast('Add a skill first'); return; }
-    const html = last.pupilHtml + (pr.key ? last.keyHtml : '');
+    const html = pr.key ? last.docHtml : last.pupilHtml;
     const title = titleOf();
     rememberPrint(title);
     try { await printHtml(html, title, pr.paper); } catch (e) { console.warn('[teacher-print] print failed', e); toast('Could not open the print dialog'); }
@@ -1024,7 +1071,7 @@ async function doPrint() {
 
 function openTab() {
     if (!last || !last.pages.length) return;
-    const html = sheetDocument(last.pupilHtml + (pr.key ? last.keyHtml : ''), titleOf(), { paper: pr.paper });
+    const html = sheetDocument(pr.key ? last.docHtml : last.pupilHtml, titleOf(), { paper: pr.paper });
     const url = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
     const win = window.open(url, '_blank');
     if (!win) toast('Allow pop-ups to open the pages in a new tab');
@@ -1043,6 +1090,7 @@ function rememberPrint(title) {
         level: hit ? levelText(hit.level) : '',
         pages: last.pages.length,
         key: !!pr.key,
+        keyPlace: pr.keyPlace || 'end', keyStyle: pr.keyStyle || 'copy', keyNewSheet: !!pr.keyNewSheet,
         columns: (last.parts[0] && last.parts[0].res.fits && last.parts[0].res.fits.cols) || null,
         at: Date.now(),
         req,
