@@ -31,7 +31,7 @@ Run by `selfcheck.mjs` (Appendix E reference implementation, Chromium print medi
 | E21 | T2: ≥ 5 atoms, every type one of Category / Comparative / Fact / Conceptual; no ★ in the atom tables | 8 atoms: Fact, Fact, Comparative, Conceptual, Category, Conceptual, Fact, Comparative; ★ in tables: false | PASS |
 | E22 | Every delivery page (T3–T5) shows at least one pupil-page thumbnail | T3: 1, T4: 2, T5: 1 | PASS |
 | E23 | Every row of T6 "Answers at a glance" carries a fade label ★ / ★★ / ★★★ | 11 / 11 rows | PASS |
-| E24 | Item pool, read from the pack (LR-5, §9.5): pool recomputed from its declared rule (data, no eval); every item in the pool and not forbidden; ZERO repeats of (fact, representation) anywhere; a fact never twice on one page; the same fact in another representation on another page only while usable < 12; places ≤ usable pool when usable ≥ 12; no turn-around pair on one page; FAILS when the pool JSON or the items are missing | 37 places (37 facts), usable pool 37 (pool 39 recomputed from its rule: matches); repeats 0; other-representation repeats on other pages 0; same-page turn-arounds 0; outside the pool / forbidden 0; items without data-rep 0 | PASS |
+| E24 | Item pool, read from the pack (LR-5, §9.5): pool recomputed from its declared rule (data, no eval); every item in the pool and not forbidden; ZERO repeats of (fact, representation) anywhere; a fact never twice on one page; the same fact in another representation on another page only while usable < 12; places ≤ usable pool when usable ≥ 12; no turn-around pair on one page; FAILS when the pool JSON or the items are missing | 37 places (37 facts), usable pool 37 (pool 39 recomputed from its rule: matches); repeats 0; other-representation repeats on other pages 0; chart examples returning 0; same-page turn-arounds 0; outside the pool / forbidden 0; items without data-rep 0 | PASS |
 | E24b | Practice last row holds only edge cases (★★★ is true); LR-6: no two answers alike on a page; − : no number taken away twice on a page and no near twins (both numbers within 2 of another item); + : no first addend twice in a row of the grid or three times running | 2 Practice pages: last rows all edge cases; LR-6 holds on every pupil page; no twin answers (per page, or per row when the pool has fewer answers than the page has items) | PASS |
 | E17b | The anchor chart and its key carry no answer marks (no .ka / data-ka) | P2: 0, P2-key: 0 | PASS |
 | E26 | Every anchor-chart step panel adds at least one grey (newest) mark | 3 / 3 panels | PASS |
@@ -68,21 +68,3 @@ Run by `selfcheck.mjs` (Appendix E reference implementation, Chromium print medi
 | P5-key | 99 | 12 | 2 | 11 | #000000 #5b2a86 #c2410c #ffffff |
 | P6-key | 100 | 12 | 8 | 83 | #000000 #c2410c #ffffff |
 | T6 | 98 | 10 | 0 | — | #000000 #c2410c |
-
-## Page files (23 pages)
-
-page-01 T1 · page-02 T2 · page-03 T2b · page-04 T3 · page-05 T4 · page-06 T5 · page-07 P0 · page-08 P1 ·
-page-09 P2 anchor chart · page-10 P3 lesson sheet · page-11 P4 Practice 1 · page-12 P4 Practice 2 · page-13 P5 ·
-page-14 P6 exit slip (A4 landscape, 2-up) · page-15 to page-22 keys of P0, P1, P2, P3, P4 ×2, P5, P6 · page-23 T6.
-
-## Checks by eye (looked at every PNG, round 6)
-
-| Check | Result |
-|---|---|
-| Chart: every case the practice deals is drawn; the other examples are finished in black (answers printed) | PASS |
-| Chart: each step panel adds a grey mark (also E26); the chart and its key carry no answer marks (E17b) | PASS |
-| Guided cell 1 has step 1 in grey; Guided cells varied | PASS |
-| Key answers sit in the pupil's slots; no clipped content | PASS |
-
-The item pool travels inside `pack.html` (`<script id="v21-pool">`); E24 / E24b read it and the `data-item`
-marks, and fail when either is missing. Built from code extracted from V21 itself; iterated in a scratch folder.
