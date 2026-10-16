@@ -1,1 +1,6 @@
 ws-grade-render: 4 skills -> design/audit/runs/wave1-D/renders/r12b/defaults-M
+  [1/4] multiplication:area_model_mult  independent 1p+1k 2x3  more-practice 1p+1k 2x3  test 1p+1k 1x3  review 1p+1k 2x3  26s
+  [2/4] multiplication:area_model_mult_hard  independent 1p+1k 2x2  more-practice 1p+1k 2x2  test 1p+1k 1x2  review 1p+1k 2x2  51s
+  [3/4] division:area_model_div_2by1  independent 1p+1k 2x3  more-practice 1p+1k 2x3  test 1p+1k 2x4  review 1p+1k 2x4 OVERFLOW  77s
+  [4/4] division:area_model_div_3by1  independent 1p+1k 2x3  more-practice 1p+1k 2x3  test 1p+1k 2x4  review 1p+1k 2x4  102s
+ws-grade-render: done, 4 skills, 102s

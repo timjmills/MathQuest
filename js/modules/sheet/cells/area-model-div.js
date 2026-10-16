@@ -106,7 +106,7 @@ register('area-model-div', {
         } else {
             problem = `<span>${D}</span>${op('÷')}<span>${V}</span>${op('=')}${totalSlot}`;
         }
-        const model = `<div style="display:inline-flex;flex-direction:column;align-items:flex-start;white-space:nowrap${twin ? '' : `;padding-top:${g.em(3)}`}">`
+        const model = `<div style="display:inline-flex;flex-direction:column;align-items:flex-start;white-space:nowrap${twin ? '' : `;padding-top:${g.em(1)}`}">`
             + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;align-items:flex-end;margin-left:${g.em(G.sideMm)};margin-bottom:0.15em">${top}</div>`
             + `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;align-items:center">`
             + `<span class="${NOWRAP}" style="flex:0 0 ${g.em(G.sideMm)};display:flex;justify-content:center;font-weight:700">${side}</span>`
@@ -129,7 +129,7 @@ register('area-model-div', {
         const probH = formOf(p) === 'sign' ? g.stripMm : g.stripMm + g.E * 1.3;
         return {
             wMm: Math.ceil(Math.max(G.parts.length * G.colMm + G.sideMm, probW) + 12),
-            hMm: Math.ceil(g.stripMm + 2 + G.hMm + probH + 0.45 * g.E + (g.twin ? 0 : 3) + 8),
+            hMm: Math.ceil(g.stripMm + 2 + G.hMm + probH + 0.45 * g.E + (g.twin ? 0 : 3) + 14),
             measure: true, factLike: false, maxCols: 2,
         };
     },
