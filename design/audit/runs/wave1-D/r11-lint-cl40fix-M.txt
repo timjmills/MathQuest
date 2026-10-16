@@ -1,0 +1,14 @@
+ws-print-lint: source kit, 4 skill(s)
+  counting:number_seq_fill: 2+1 pages, 0 finding(s)
+  composing:select_even_odd: 2+1 pages, 0 finding(s)
+  composing:odd_even: 2+1 pages, 0 finding(s)
+  counting_mixed:counting_all: 2+1 pages, 0 finding(s)
+
+document                        pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT  result
+counting:number_seq_fill          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:select_even_odd         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:odd_even                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+TOTAL                                     .     .    .    .        .     .       .    .     .       .     .    .      .       .
+
+ws-print-lint: OK (4 document(s), source kit; 0 finding(s) in 0 document(s))
