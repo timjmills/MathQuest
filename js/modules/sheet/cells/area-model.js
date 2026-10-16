@@ -263,6 +263,8 @@ register('area-model', {
         const sv = slotInks(stepMarks(steps, k), (slot) => {
             const m = /^part(\d+)$/.exec(slot);
             if (m) return `part-${m[1]}`;
+            const rc = /^r(\d+)c(\d+)$/.exec(slot);
+            if (rc) return `part-${Number(rc[1]) * p.parts.length + Number(rc[2])}`;
             const e = /^(top|side)(\d+)$/.exec(slot);
             if (e && isExt(p)) return `${e[1]}-${e[2]}`;
             return WHOLE_SLOTS.has(slot) ? 'total' : null;

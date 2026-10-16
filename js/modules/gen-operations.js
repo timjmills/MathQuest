@@ -2328,8 +2328,6 @@ function _amForm(skill) {
     if (t.length === 1) return t[0];
     return t[_amDeal(`amForm:${skill}`, t.length)];
 }
-/** True when an area-model option asks for the kit drawing (anything but today's defaults). */
-function _amKit(edges, form) { return edges !== 'given' || form !== 'sign' || _opt('amEdges') === 'mixed'; }
 
 function _p12Narrowed(id) {
     const def = _optDef(id);
@@ -4893,10 +4891,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     }
                 }
                 
-                // r12: any edges choice but Given draws the kit's grid (black line art, every box keyed);
-                // Given keeps today's sheet byte for byte.
+                // r12b: the kit's grid (black line art, every box keyed) for every edges choice.
                 const _amhE = _amEdges('area_model_mult_hard');
-                if (_amKit(_amhE, 'sign')) {
+                {   // r12b: every item draws the kit grid (defaults too: black and white, the design contract)
                     const _amhPayload = { multiplier: num1, rows: rowParts.slice(), parts: colParts.slice(), product, uid: `amh${num1}x${num2}` };
                     if (_amhE === 'blank') _amhPayload.edges = 'blank';
                     q.cell = { template: 'area-model', v: 1, payload: _amhPayload };
@@ -5015,13 +5012,13 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.areaModelDivData = { divisor, dividend, quotient, parts };
                 q.areaModelData = q.areaModelDivData;   // r12: the card's area-model checker reads it
                 q.printFormat = "area-model-div";
-                // r12: the edges / form options draw the kit's division area model (black line art,
-                // the problem as ÷, the long-division bracket or a fraction); defaults keep today's sheet.
+                // r12b: the kit's division area model for every item (black line art, the problem as
+                // ÷, the long-division bracket or a fraction).
                 {
                     const _amdSk = String(dividend).length > 2 ? 'area_model_div_3by1' : 'area_model_div_2by1';
                     const _amdE = _amEdges(_amdSk);
                     const _amdF = _amForm(_amdSk);
-                    if (_amKit(_amdE, _amdF)) {
+                    {   // r12b: every item draws the kit model (defaults too)
                         // A part of 0 (60 ÷ 5 split 60 + 0) is no split at all: the kit model splits
                         // at the largest multiple of ten times the divisor below the dividend, else in half.
                         let _amdParts = parts.map(p => p.value);
@@ -5138,13 +5135,13 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.areaModelDivData = { divisor, dividend, quotient, parts };
                 q.areaModelData = q.areaModelDivData;   // r12: the card's area-model checker reads it
                 q.printFormat = "area-model-div";
-                // r12: the edges / form options draw the kit's division area model (black line art,
-                // the problem as ÷, the long-division bracket or a fraction); defaults keep today's sheet.
+                // r12b: the kit's division area model for every item (black line art, the problem as
+                // ÷, the long-division bracket or a fraction).
                 {
                     const _amdSk = String(dividend).length > 2 ? 'area_model_div_3by1' : 'area_model_div_2by1';
                     const _amdE = _amEdges(_amdSk);
                     const _amdF = _amForm(_amdSk);
-                    if (_amKit(_amdE, _amdF)) {
+                    {   // r12b: every item draws the kit model (defaults too)
                         // A part of 0 (60 ÷ 5 split 60 + 0) is no split at all: the kit model splits
                         // at the largest multiple of ten times the divisor below the dividend, else in half.
                         let _amdParts = parts.map(p => p.value);
