@@ -188,6 +188,25 @@ for sid_, st_ in UNITS.items():
             e_['why'] = re.sub(r'\)?$', '', e_['why'].split(' (')[0]) + f" (nearest live practice: {e_['key'].split(':')[1]} is not tagged to {ref_}" + (f", which the school teaches later, {wk(ref_)}" if later else '') + ')'
             recited += 1
 
+# ---------- pass 3b (critic r6 sweep): a link that cites an "A and B" step and deals one half says which half ----------
+# "Y4.B4.S5 9 times-table and division facts" on mult_facts, "Y5.B4.S9 Add and subtract fractions …" on add_fractions_like: the
+# why names the half the skill deals ("the multiplication half"), so the cited title does not claim the other operation
+# (claims.mjs reads the marker; sweep.mjs found these links in round 5)
+HALVES = [('adding', r'^addition:|:add_', r'\badd', r'\bsubtract'), ('subtracting', r'^subtraction:|:sub_', r'\bsubtract', r'\badd'),
+          ('multiplication', r'^multiplication:', r'multipl|times-table', r'divi'), ('division', r'^division:|:div_', r'divi', r'multipl|times-table')]
+halved = 0
+for sid_, st_ in UNITS.items():
+    for role_ in ('pre', 'related'):
+        for e_ in st_[role_]:
+            m_ = re.match(r'^((?:R|Y\d)\.B\d+\.S\d+)', e_['why'])
+            # a skill that deals both halves (add_sub_100s, missing_mult_div, sub_check_by_adding, fact families) is not marked
+            if not m_ or ' half' in e_['why'] or re.search(r'nearest live practice|has no live skill', e_['why']) or re.search(r'add_sub|mult_div|check|famil|inverse|missing', e_['key']): continue
+            t_ = steps.get(m_.group(1), {}).get('title', '')
+            for h_, kre, mine, other in HALVES:
+                if re.search(kre, e_['key']) and re.search(mine, t_, re.I) and re.search(other, t_, re.I):
+                    e_['why'] = (e_['why'][:-1] + f'; the {h_} half)') if e_['why'].endswith(')') else e_['why'] + f' (the {h_} half)'
+                    halved += 1; break
+
 # ---------- pass 4: linkfit --fit ----------
 cand = os.path.join(DATA, 'Y5.candidate.json')
 json.dump({'year': 'Y5', 'steps': ST, 'lessons': LESSONS, 'tagFixes': []}, open(cand, 'w'), indent=1, ensure_ascii=False)
@@ -405,7 +424,7 @@ print('steps', len(out_steps), dict(c))
 print('lessons', len(out_lessons), dict(Counter(s['verdict'] for s in out_lessons.values())), 'site-lessons Y5', len(LES))
 print('proposals new', sum(1 for p_ in proposals.values() if not p_['reused']), 'reused', sum(1 for p_ in proposals.values() if p_['reused']),
       'tagFixes', len(tagfixes), {a: sum(1 for t in tagfixes if t['action'] == a) for a in ('add', 'full', 'partial', 'opts', 'remove')})
-print(f'pre re-cited: {recited}; links re-optioned by linkfit: {changed}; links dropped by linkfit: {len(dropped)}; duplicates removed: {deduped}')
+print(f'pre re-cited: {recited}; "A and B" cites marked with the half dealt: {halved}; links re-optioned by linkfit: {changed}; links dropped by linkfit: {len(dropped)}; duplicates removed: {deduped}')
 print('own direct/partial repeated as a link (critic r5 F): ' + '; '.join(f'{k}: {a} stepped a band down, {b} dropped' for k, (a, b) in OWNREP.items()))
 mc = node(os.path.join(H, 'mergecheck.mjs'), OUT, *[R + f'data/curriculum/links/{y}.json' for y in OTHER_YEARS])
 print(mc.stdout.strip().splitlines()[-1] if mc.stdout.strip() else 'mergecheck: no output')

@@ -21,6 +21,7 @@ const g = await import(R + 'js/modules/generate-question.js');
 const so = await import(R + 'js/modules/skill-options.js');
 console.log = _log;
 const fs = await import('fs');
+const CL = await import('./claims.mjs');
 const DATA = process.env.WRM_TAG_DATA;
 const prior = JSON.parse(fs.readFileSync(DATA + '/prior.json', 'utf8'));
 const TAGS = JSON.parse(fs.readFileSync(DATA + '/keys.json', 'utf8')).tags;
@@ -86,8 +87,10 @@ for (const l of JSON.parse(fs.readFileSync(R + 'data/curriculum/site-lessons.jso
 }
 const isSupport = sid => SRC[sid] != null && SRC[sid] < 5;
 const FR = /(?<![\d/])(\d+)\/(\d+)(?![\d/])/g;
-const unlikeCompare = r => r.items.some(i => { const t = `${i.text || ''} ${i.x || ''}`;
-  if (!/compar|order|greater|less|largest|smallest|[<>]/i.test(t)) return false;
+// critic r6 H': the answer, the payload and the tiles are read too (order_fractions puts the fractions only in its answer), and
+// "greatest / least / biggest / order" count as comparing
+const unlikeCompare = r => r.items.some(i => { const t = `${i.text || ''} ${i.x || ''} ${i.a || ''} ${i.pay || ''}`;
+  if (!/compar|order|greater|greatest|less|least|largest|smallest|biggest|[<>]/i.test(t)) return false;
   const f = [...t.matchAll(FR)].map(m => [+m[1], +m[2]]);
   return f.some((a, j) => f.slice(j + 1).some(b => a[0] !== b[0] && a[1] !== b[1])); });
 function citedCeil(sid, why) {
@@ -154,6 +157,11 @@ function laterGrade(e, s, r) {
       if (sd) { out.push(`divisor ${sd} in a division story (Grade 4 divides by one digit)`); break; } } }
   return out;
 }
+const metricUnit = sid => { const t = UNITS[sid].title; if ((OWN[sid] || []).includes('customary units') || CL.custWords.test(t)) return false;
+  return (/^Y5\.B(8|10|14|15)\./.test(sid) && sid !== 'Y5.B14.S4') || CL.metricWords.test(t); };
+const custUnit = sid => { const t = UNITS[sid].title; return CL.custWords.test(t) && !CL.metricWords.test(t) && !/word problems/i.test(t); };
+const FIRST_Y5 = {};
+for (const [sid, s] of Object.entries(d.steps)) for (const e of [...s.direct, ...s.partial]) { const w = prior[sid]?.wk; if (w && (!FIRST_Y5[e.key] || w < FIRST_Y5[e.key].wk)) FIRST_Y5[e.key] = { wk: w, sid }; }
 function content(sid, e, r, role) {
   const link = role === 'pre' || role === 'related', out = [], wk = isSupport(sid) && link ? 'W00' : (wkOf(sid) || 'W99');
   const said = r.items.map(i => `${i.text || ''} ${i.a || ''} ${i.x || ''}`).join(' | ');
@@ -166,13 +174,21 @@ function content(sid, e, r, role) {
   if (isSupport(sid) && link) {
     const src = YR[SRC[sid]];
     if (role === 'pre' && unlikeCompare(r)) out.push(`H: compares or orders unlike fractions (4.NF.A.2), above this Support lesson's source year ${src}`);
-    if (/centimet|metre|gram|litre|millilit|kilo/i.test(UNITS[sid].title) && !CUST.test(UNITS[sid].title) && CUST.test(all))
-      out.push(`H: customary units on a metric Support lesson`);
     const ref = role === 'pre' && (String(e.why).match(/^(R|Y\d)\.B\d+\.S\d+/) || [])[1];
     if (ref && YR.indexOf(ref) > SRC[sid]) out.push(`H: cites a ${ref} step, above this Support lesson's source year ${src}`);
   }
+  // critic r6 K (rule 18): no customary unit on ANY metric or time unit (Y5.B8, B10, B14 but S4, B15, and any unit whose title
+  // names a metric measure), pre and related; and (the lead's "vice versa") no metric-only link on a customary unit, except a pre
+  // whose why names the metric measure it brings (the Grade 3 litres before customary capacity)
+  if (link && metricUnit(sid) && CUST.test(all)) out.push(`K: customary units (${(all.match(CUST) || [''])[0]}) on a metric / time unit`);
+  if (link && custUnit(sid) && CL.MET.test(all) && !CUST.test(all) && !(role === 'pre' && CL.metricWords.test(String(e.why || ''))))
+    out.push('K: metric-only link on a customary unit, and its why names no metric measure');
   const dens = [...all.matchAll(/(?:\b\d+|\?|_+)\/(\d+)\b/g)].map(m => +m[1]).filter(x => x > 24 && x !== 100 && x !== 1000 && !(x === 50));
   if (dens.length && (role === 'pre' || role === 'related')) out.push(`denominator ${Math.max(...dens)} (Grade 4: 2, 3, 4, 5, 6, 8, 10, 12, 100 and their doubles)`);
+  // round-5 sweep (c): a pre whose skill this year first teaches AFTER the unit's week, and that no lower year is tagged with, is
+  // content the pupil has not met (Y5.B10.S8 W26 had additive_angles, first taught at Y5.B10.S6 W31)
+  if (role === 'pre' && FIRST_Y5[e.key] && FIRST_Y5[e.key].wk > wk && !(TAGS[e.key] || []).some(t => /^(R|Y[1-4])\./.test(typeof t === 'string' ? t : t.step)))
+    out.push(`pre skill first taught at ${FIRST_Y5[e.key].sid} (${FIRST_Y5[e.key].wk}), after this unit (${wk}), and in no lower year`);
   if (role === 'pre') { const ref = (String(e.why).match(/^Y5\.B\d+\.S\d+/) || [])[0];
     if (ref && wkOf(ref) && wkOf(ref) > wk) out.push(`rule 19: cites ${ref}, taught ${wkOf(ref)}, after this step (${wk})`); }
   return out;
@@ -222,6 +238,10 @@ function whyCheck(e, r) {
     const hitF = per.filter(dd => [...dd].some(x => ok.has(x) && x !== 1)).length;
     if (hitF < N / 3) out.push(`${cited ? 'cited step' : 'why'} names ${fams.join('/')} but only ${hitF} of ${N} items deal it`);
   }
+  // critic r6 H', K, L and the round-5 sweep: every RULE claim of the why (units, metric / customary, times as many, equal parts,
+  // fractions, decimals, 3 dp, negatives, percent, Roman numerals) must be true of the items; the cited step's FULL title counts
+  for (const h of CL.claimHits(CL.claimText(w0, titles), r.items, { rulesOnly: true })) if (!h.ok) out.push(`why claims "${h.word}" (${h.claim}) but only ${h.hit} of ${h.n} items show it`);
+  for (const h of CL.halfHits(w0, r.items)) if (!h.ok) out.push(`why is marked "${h.claim}" but ${h.hit} of ${h.n} items deal the other half`);
   const UNIT = { metres: 'm|metres?|meters?', kilometres: 'km|kilometres?', centimetres: 'cm|centimetres?', millimetres: 'mm|millimetres?', grams: 'g|grams?', kilograms: 'kg|kilograms?', litres: 'l|litres?|liters?', millilitres: 'ml|millilitres?', hours: 'h|hr|hours?', minutes: 'min|minutes?', seconds: 's|sec|seconds?' };
   // critic r5: every unit the why names must be in at least a fifth of the items ("kilograms and grams" on fl oz / lb items)
   for (const um of w.matchAll(/\b(metres|kilometres|centimetres|millimetres|grams|kilograms|litres|millilitres|hours|minutes|seconds)\b/gi)) {
@@ -238,6 +258,27 @@ function citeCheck(e, role) {
   const m = String(e.why).match(/^((?:R|Y\d)\.B\d+\.S\d+)/); if (!m) return [];
   if (/has no live skill|this step's build|nearest live practice/i.test(e.why)) return [];
   return (taughtAt[e.key] && taughtAt[e.key].has(m[1])) ? [] : [`cites ${m[1]}, which ${e.key} is not tagged to`];
+}
+const STOP = new Set('the and one page only form forms kind each item items dealt both mixed with from into for its all any are not off on a an of to in or by as at is it this that what which who how many write find click drag sort pick choose'.split(' '));
+const stem = w => w.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/(?:ing|es|ed|s)$/, '');
+const KEYS = Object.keys(JSON.parse(fs.readFileSync(DATA + '/keys.json', 'utf8')).keys);
+function missedOptions(s) {
+  const out = [], mine = [...s.direct, ...s.partial], cats = new Set(mine.map(e => e.key.split(':')[0]));
+  const pool = new Set([...mine, ...s.pre, ...s.related].map(e => e.key).concat(KEYS.filter(k => cats.has(k.split(':')[0]))));
+  // the negated parts as stem lists; a label matches when all its content words are in one part (a two-word label: next to each
+  // other, "unit fraction"); a skill the unit's text names (its note or a clause says why it is not used) is not reported
+  const parts = [s.missing, ...s.partial.map(e => e.missing)].flatMap(t => CL.negatedParts(t)).map(p => p.split(/[\s-]+/).map(stem).filter(Boolean));
+  if (!parts.length) return out;
+  const named = `${s.note || ''} ${s.missing || ''} ${s.partial.map(e => e.missing).join(' ')}`;
+  const near = (p, ws) => { for (let j = 0; j + 1 < p.length; j++) for (let q = j + 1; q <= j + 3 && q < p.length; q++) if (p[j] === ws[0] && p[q] === ws[1]) return true; return false; };
+  for (const k of pool) { const [c, sk] = k.split(':');
+    if (named.includes(sk)) continue;
+    for (const def of so.optionsFor(c, sk) || []) { if (!['forms', 'units', 'task', 'kind', 'model'].includes(def.id) || !def.values) continue;
+      for (const v of def.values) { const words = [...new Set(String(v.l).replace(/[()]/g, ' ').split(/[\s-]+/).map(stem).filter(w => w.length > 2 && !STOP.has(w) && !/^\d+$/.test(w)))];
+        if (words.length < 2 || !parts.some(p => words.every(w => p.includes(w)) && (words.length > 2 || near(p, words)))) continue;
+        const used = mine.some(e => e.key === k && [].concat((e.opts || {})[def.id] ?? []).includes(v.v));
+        if (!used) out.push(`a clause says "never / no …" what ${k} option ${def.id}=${JSON.stringify(v.v)} "${v.l}" deals; use the option (key + value) or say why not`); } } }
+  return [...new Set(out)];
 }
 export function check(sid, role, e) {
   const r = probe(e.key, e.opts || {}, e.maxNumber || 10000);
@@ -315,6 +356,10 @@ if (FIT) {
       const names = /decimal/i.test(s.title) || (/decimal/i.test(blockOf[sid] || '') && !/percent/i.test(s.title)) || (cc.length && cc.every(c => /decimal/i.test(CCT[c] || CCT[c.replace(/[a-d]$/, '')] || '')));
       if (names) { const dec = [...s.direct].reduce((n, e) => n + probe(e.key, e.opts || {}, e.maxNumber || 10000).items.filter(i => /(?<![\d,])\d*\.\d/.test(i.text || '')).length, 0);
         if (!dec) fails.push(`full, and its ${/decimal/i.test(s.title) ? 'title' : /decimal/i.test(blockOf[sid] || '') ? 'block' : 'CCSS'} names decimals, but no direct item has a decimal in its question (critic r5 class G)`); } }
+    // critic r6 class M (rule 5): a clause that says "never X" / "no X" is read against the option values of the unit's own skills
+    // (every skill it lists, and every skill of its direct / partial categories): an option labelled X ("Add tenths and
+    // hundredths" on frac_10_100_nv) means X exists, so the unit must use that option (key + value in its direct / partial)
+    for (const f of missedOptions(s)) fails.push(`M: ${f}`);
     // critic r4 class E: no duplicate links (same key + opts, or the same generated items)
     // critic r5 class F: a pre or related link may not be the unit's own direct or partial (same key and opts, or the same items
     // drawn the same way; a _plain twin with the same text but no picture is the scaffold fade, not a repeat)

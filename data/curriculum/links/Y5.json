@@ -419,7 +419,7 @@
    "partial": [
     {
      "key": "placevalue:place_value_10x",
-     "missing": "the powers of ten themselves: 10, 100 ... 1,000,000 and that each is 10 times the one before (10 hundreds = 1,000); it only multiplies/divides a number by 10, 100, 1,000, with ÷ 1,000 and decimal results that the school teaches from W10"
+     "missing": "the powers of ten themselves: 10, 100 ... 1,000,000 and that each is 10 times the one before (10 hundreds = 1,000); it only multiplies and divides whole numbers by 10, 100 and 1,000 (43 × 1,000; 58,800 ÷ 100), with no decimal results, and × / ÷ 1,000 is content the school teaches from W10"
     }
    ],
    "verdict": "partial",
@@ -998,7 +998,7 @@
      "opts": {
       "band": 99999
      },
-     "why": "compare the numbers before and after rounding, to 100,000"
+     "why": "comparing numbers to 100,000 place by place: is 46,500 nearer 46,000 or 47,000?"
     },
     {
      "key": "number_sense:estimate_sums_diffs",
@@ -1064,7 +1064,7 @@
      "opts": {
       "band": 999999
      },
-     "why": "compare the numbers before and after rounding, to 1,000,000"
+     "why": "comparing numbers to 1,000,000 place by place: is 465,000 nearer 460,000 or 470,000?"
     },
     {
      "key": "number_sense:estimate_sums_diffs",
@@ -1463,20 +1463,12 @@
    "preBuild": [],
    "related": [
     {
-     "key": "algebra:tape_diagram_plain",
-     "why": "bar model, no pictures"
-    },
-    {
      "key": "subtraction:sub_wp_1m_plain",
      "why": "one-step subtraction stories: the single steps a multi-step problem is built from"
     },
     {
      "key": "number_sense:estimate_sums_diffs",
      "why": "check the answer is reasonable"
-    },
-    {
-     "key": "algebra:algebra_word_mixed",
-     "why": "stories with an unknown"
     }
    ],
    "note": "Build: multi_step_four_ops with its band ladder extended to 1,000,000 (do not add a second size option to multi_step_word).",
@@ -1780,7 +1772,7 @@
       ],
       "band": 100
      },
-     "why": "Y4.B4.S5 9 times-table and division facts (lower grade, same idea)"
+     "why": "Y4.B4.S5 9 times-table and division facts (lower grade, same idea; the multiplication half)"
     }
    ],
    "preBuild": [],
@@ -1840,7 +1832,13 @@
     },
     {
      "key": "multiplication:mult_properties",
-     "why": "× 1 and commutative facts (n × 1 = n, 3 × 4 = 4 × 3) underpin \"1 and itself\" and factor pairs (prior learning wk W02 Y4.B4.S12 Divide a number by 1 and itself, nearest live skill)"
+     "opts": {
+      "forms": [
+       0,
+       2
+      ]
+     },
+     "why": "Y4.B4.S12 Divide a number by 1 and itself (lower grade, same idea; the multiplication half: n × 1 = n and 3 × 4 = 4 × 3, the facts behind \"1 and itself\" and factor pairs)"
     },
     {
      "key": "number_theory:multiples",
@@ -1951,7 +1949,12 @@
     },
     {
      "key": "multiplication:mult_properties",
-     "why": "Y4.B4.S12 Divide a number by 1 and itself (prior learning wk W02)"
+     "opts": {
+      "forms": [
+       2
+      ]
+     },
+     "why": "Y4.B4.S12 Divide a number by 1 and itself (lower grade, same idea; the multiplication half: n × 1 = n, so every number has 1 and itself as factors)"
     },
     {
      "key": "composing:odd_even",
@@ -2143,7 +2146,12 @@
     },
     {
      "key": "multiplication:mult_properties",
-     "why": "Y4.B4.S12 Divide a number by 1 and itself (lower grade, same idea)"
+     "opts": {
+      "forms": [
+       0
+      ]
+     },
+     "why": "Y4.B4.S12 Divide a number by 1 and itself (lower grade, same idea; the multiplication half: the order facts (3 × 4 = 4 × 3) a product of three equal factors is regrouped by)"
     }
    ],
    "preBuild": [
@@ -2232,7 +2240,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "tables facts scaled by 10"
+     "why": "times-table facts (6 × 7 = 42): the fact behind 6 × 70 and 60 × 700"
     },
     {
      "key": "number_sense:estimate_products",
@@ -2306,7 +2314,7 @@
     },
     {
      "key": "number_sense:estimate_quotient",
-     "why": "round then divide"
+     "why": "a near number that divides easily, then divide (34 ÷ 5 ≈ 35 ÷ 5 = 7)"
     }
    ],
    "note": ""
@@ -2618,15 +2626,8 @@
      "why": "Y4.B7.S1 Understand the whole (prior learning wk W16)"
     },
     {
-     "key": "multiplication:mult_facts",
-     "opts": {
-      "band": 100
-     },
-     "why": "times tables: wholes × denominator"
-    },
-    {
      "key": "division:div_remainders",
-     "why": "division with remainders gives wholes and the fraction left"
+     "why": "division with remainders (17 ÷ 5 = 3 r 2): the wholes and the part left over, as in 17/5 = 3 2/5"
     }
    ],
    "preBuild": [
@@ -2680,13 +2681,6 @@
     {
      "key": "composing:whole_as_fraction",
      "why": "Y4.B7.S1 Understand the whole (prior learning wk W16)"
-    },
-    {
-     "key": "multiplication:mult_facts",
-     "opts": {
-      "band": 100
-     },
-     "why": "times tables: wholes × denominator"
     },
     {
      "key": "composing:compose_whole",
@@ -2849,19 +2843,19 @@
    "related": [
     {
      "key": "fraction_operations:add_fractions_like",
-     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (next step)"
+     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (next step; the adding half)"
     },
     {
      "key": "fraction_operations:sub_fractions_like",
-     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (next step)"
+     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (next step; the subtracting half)"
     },
     {
      "key": "fraction_operations:add_frac_like_nv",
-     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (next step)"
+     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (next step; the adding half)"
     },
     {
      "key": "fraction_operations:sub_frac_like_nv",
-     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (next step)"
+     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (next step; the subtracting half)"
     }
    ],
    "note": "",
@@ -2965,11 +2959,11 @@
    "pre": [
     {
      "key": "fraction_operations:add_fractions_like",
-     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (previous step)"
+     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (previous step; the adding half)"
     },
     {
      "key": "fraction_operations:add_frac_like_nv",
-     "why": "Y5.B4.S9 (previous step)"
+     "why": "Y5.B4.S9 (previous step; the adding half)"
     },
     {
      "key": "fractions:equivalent",
@@ -3047,7 +3041,7 @@
     },
     {
      "key": "fraction_operations:add_fractions_like",
-     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (taught earlier this year, wk W17)"
+     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (taught earlier this year, wk W17; the adding half)"
     },
     {
      "key": "fractions:mixed_improper_visual",
@@ -3108,7 +3102,7 @@
    "pre": [
     {
      "key": "fraction_operations:add_fractions_like",
-     "why": "Y5.B4.S9 (earlier step)"
+     "why": "Y5.B4.S9 (earlier step; the adding half)"
     },
     {
      "key": "fractions:improper_mixed",
@@ -3180,7 +3174,7 @@
    "pre": [
     {
      "key": "fraction_operations:add_fractions_like",
-     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (taught earlier this year, wk W17; add the fraction parts)"
+     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (taught earlier this year, wk W17; add the fraction parts; the adding half)"
     },
     {
      "key": "fractions:improper_mixed",
@@ -3256,7 +3250,7 @@
     },
     {
      "key": "fraction_operations:sub_frac_like_nv",
-     "why": "Y5.B4.S9 same-denominator subtraction (earlier step)"
+     "why": "Y5.B4.S9 same-denominator subtraction (earlier step; the subtracting half)"
     },
     {
      "key": "fractions:equivalent",
@@ -3264,7 +3258,7 @@
     },
     {
      "key": "composing:whole_as_fraction",
-     "why": "1 = 4/4 for subtracting from a whole (CCSS 3.NF.A.3c)"
+     "why": "1 = 4/4: the whole renamed as a fraction, the first move when a fraction is taken from a whole (CCSS 3.NF.A.3c)"
     }
    ],
    "preBuild": [],
@@ -3554,7 +3548,7 @@
        9
       ]
      },
-     "why": "Y4.B4.S5 9 times-table and division facts (lower grade, same idea)"
+     "why": "Y4.B4.S5 9 times-table and division facts (lower grade, same idea; the multiplication half)"
     }
    ],
    "preBuild": [],
@@ -3644,7 +3638,7 @@
        1
       ]
      },
-     "why": "breaking a factor apart (6 × 17 = 6 × 10 + 6 × 7): the distributive idea the area model and the column use"
+     "why": "breaking a factor apart (6 × 17 = 6 × 10 + 6 × 7): the distributive idea every written × method uses"
     },
     {
      "key": "number_sense:estimate_products",
@@ -3785,7 +3779,7 @@
        1
       ]
      },
-     "why": "breaking a factor apart (6 × 17 = 6 × 10 + 6 × 7): the distributive idea the area model and the column use"
+     "why": "breaking a factor apart (6 × 17 = 6 × 10 + 6 × 7): the distributive idea every written × method uses"
     }
    ],
    "note": "School week W34 is an assessment week; prior learning from Y5.B5 and Y5.B3.",
@@ -3907,7 +3901,7 @@
        7
       ]
      },
-     "why": "Y4.B4.S8 7 times-table and division facts (lower grade, same idea)"
+     "why": "Y4.B4.S8 7 times-table and division facts (lower grade, same idea; the multiplication half)"
     }
    ],
    "preBuild": [
@@ -4111,7 +4105,7 @@
     },
     {
      "key": "multiplication:multiply",
-     "why": "the inverse: multiply the quotient by the divisor to get back to the dividend"
+     "why": "the inverse operation: a multi-digit × 1-digit product undoes the sharing (749 × 9 = 6,741)"
     },
     {
      "key": "division:div_word_problems_plain",
@@ -4169,7 +4163,7 @@
     },
     {
      "key": "division:div_check_by_multiplying",
-     "why": "check: quotient × divisor + remainder"
+     "why": "checking a division by multiplying back (quotient × divisor = dividend), here without a remainder"
     },
     {
      "key": "division:div_equation_parts",
@@ -4200,7 +4194,7 @@
    "pre": [
     {
      "key": "division:divide",
-     "why": "division facts: the known facts an efficient method starts from (Y5.B5.S9 Divide with remainders, previous step)"
+     "why": "short division with 1-digit divisors and no remainder: the known facts an efficient method starts from"
     },
     {
      "key": "number_theory:factor_links_easy",
@@ -4208,7 +4202,7 @@
     },
     {
      "key": "multiplication:mult_zeros",
-     "why": "Y4.B5.S7 Related facts – multiplication and division (prior learning wk W12)"
+     "why": "Y4.B5.S7 Related facts – multiplication and division (prior learning wk W12; the multiplication half)"
     },
     {
      "key": "division:area_model_div_2by1",
@@ -4314,10 +4308,6 @@
       "range": 100
      },
      "why": "one-step division stories"
-    },
-    {
-     "key": "algebra:tape_diagram",
-     "why": "bar model of the story"
     }
    ],
    "note": "",
@@ -4361,7 +4351,7 @@
    "pre": [
     {
      "key": "fraction_operations:add_fractions_like",
-     "why": "Y5.B4.S9 same-denominator addition = repeated addition (prior learning wk W19)"
+     "why": "Y5.B4.S9 same-denominator addition = repeated addition (prior learning wk W19; the adding half)"
     },
     {
      "key": "multiplication:repeated_add_to_mult",
@@ -4423,7 +4413,7 @@
    "pre": [
     {
      "key": "fraction_operations:add_fractions_like",
-     "why": "Y5.B4.S9 repeated addition (prior learning wk W19)"
+     "why": "Y5.B4.S9 repeated addition (prior learning wk W19; the adding half)"
     },
     {
      "key": "fraction_operations:decompose_fractions",
@@ -4637,7 +4627,7 @@
        12
       ]
      },
-     "why": "Y4.B4.S10 12 times-table and division facts (lower grade, same idea; multiply the unit part back up)"
+     "why": "Y4.B4.S10 12 times-table and division facts (lower grade, same idea; multiply the unit part back up; the multiplication half)"
     }
    ],
    "preBuild": [],
@@ -4705,7 +4695,7 @@
        12
       ]
      },
-     "why": "Y4.B4.S10 12 times-table and division facts (lower grade, same idea; multiply the unit part back up)"
+     "why": "Y4.B4.S10 12 times-table and division facts (lower grade, same idea; multiply the unit part back up; the multiplication half)"
     }
    ],
    "preBuild": [],
@@ -5034,7 +5024,12 @@
     },
     {
      "key": "fractions:equivalent",
-     "why": "Y4.B7.S10 scale to /10 or /100 (prior learning wk W21)"
+     "opts": {
+      "denoms": [
+       5
+      ]
+     },
+     "why": "Y4.B7.S10 Equivalent fraction families (lower grade, same idea; fifths renamed as tenths, 1/5 = 2/10)"
     },
     {
      "key": "fractions:simplify",
@@ -5141,11 +5136,11 @@
     },
     {
      "key": "decimals:decimal_nl_drag",
-     "why": "Y4.B8.S4 Tenths on a number line (lower grade, same idea; tenths placed on a line, before thousandths)"
+     "why": "Y4.B8.S4 Tenths on a number line (lower grade, same idea; tenths placed on a line, the first of the decimal places)"
     },
     {
      "key": "fraction_operations:frac_10_100",
-     "why": "Y4.B8.S7 Hundredths as fractions (lower grade, same idea; tenths and hundredths as fractions, the pattern thousandths continue)"
+     "why": "Y4.B8.S7 Hundredths as fractions (lower grade, same idea; tenths and hundredths as fractions, the pattern the third place continues)"
     }
    ],
    "preBuild": [
@@ -5242,7 +5237,12 @@
    "pre": [
     {
      "key": "conversions:d_to_f",
-     "why": "Y5.B7.S5 (earlier step)"
+     "opts": {
+      "forms": [
+       1
+      ]
+     },
+     "why": "Y4.B8.S8 Hundredths as decimals (lower grade, same idea)"
     },
     {
      "key": "decimals:decimal_nl_drag",
@@ -5509,7 +5509,12 @@
     },
     {
      "key": "fractions:equivalent",
-     "why": "scale to /100 (CCSS 4.NF.A.1)"
+     "opts": {
+      "denoms": [
+       5
+      ]
+     },
+     "why": "renaming fifths as tenths and twentieths (1/5 = 2/10 = 4/20): the same scaling a fraction out of 100 needs (CCSS 4.NF.A.1)"
     },
     {
      "key": "fraction_operations:frac_10_100",
@@ -5663,7 +5668,7 @@
      "opts": {
       "range": 100
      },
-     "why": "2 × (l + w) needs ×2 (lower grade, same cluster CCSS 3.OA.C.7)"
+     "why": "× 2 facts and doubling: a rectangle has two of each side (CCSS 3.OA.C.7)"
     }
    ],
    "preBuild": [],
@@ -5785,7 +5790,7 @@
      "opts": {
       "band": 100
      },
-     "why": "sides × side length: a regular polygon's perimeter is one times-table fact (5 sides × 7 cm = 35 cm)"
+     "why": "sides × side length: a regular polygon's perimeter is one times-table fact (5 sides of 7 make 35)"
     },
     {
      "key": "area_perimeter:perimeter",
@@ -5872,7 +5877,8 @@
      "opts": {
       "forms": [
        0
-      ]
+      ],
+      "band": 20
      },
      "why": "Y5.B8.S1 Perimeter of rectangles (block start)"
     }
@@ -6055,7 +6061,7 @@
    "related": [
     {
      "key": "graphs:line_plot",
-     "why": "a line PLOT is not a line graph: name the difference"
+     "why": "a line PLOT is not a line graph: tell the two apart"
     }
    ],
    "note": "Line graphs are not in K-5 CCSS; tag 5.G.A.2 as the nearest. Owner: the school pairs 4.MD.B.4 line plots as a supplement (not a WRM step).",
@@ -6414,7 +6420,8 @@
     }
    ],
    "preBuild": [
-    "reflex_angles"
+    "reflex_angles",
+    "turns_angles"
    ],
    "related": [
     {
@@ -6427,7 +6434,7 @@
      "why": "benchmark 90° plus a part"
     }
    ],
-   "note": "Pre-skills are few: estimating an angle builds on naming it (acute, obtuse, right), which identify_angles deals; measure_angles is the step's own partial, so it is not repeated as a pre, and no other angle skill is taught by wk W31 without degrees past the step.",
+   "note": "Pre-skills are few: estimating an angle builds on naming it (acute, obtuse, right), which identify_angles deals, and on quarter, half and whole turns (90°, 180°, 360°), which no live skill deals: turns_angles is the preBuild. measure_angles is the step's own partial, so it is not repeated as a pre.",
    "envision": [
     {
      "proposal": "angle_estimate",
@@ -6483,7 +6490,7 @@
     },
     {
      "key": "angles_lines:identify_lines",
-     "why": "lines, rays and the vertex: what the protractor is laid on"
+     "why": "lines, rays and the vertex: the parts of every angle"
     }
    ],
    "note": "Pre-skills are few: the school meets degrees first in this unit (W23); reading a ruler is in inches only (customary, W33), so naming angles and reading a °C scale are the earlier skills.",
@@ -6648,10 +6655,6 @@
      "why": "Y4.B12.S4 Triangles (prior learning)"
     },
     {
-     "key": "angles_lines:additive_angles",
-     "why": "Y5.B10.S1 Understand and use degrees (nearest live practice: additive_angles is not tagged to Y5.B10.S1)"
-    },
-    {
      "key": "shapes_early:count_sides_vertices_2d",
      "why": "sides and vertices (prior learning)"
     },
@@ -6679,6 +6682,15 @@
       "band": 40
      },
      "why": "missing lengths in rectilinear shapes"
+    },
+    {
+     "key": "angles_lines:additive_angles",
+     "opts": {
+      "forms": [
+       0
+      ]
+     },
+     "why": "angles that add up to a whole turn or a straight line: finding a missing angle, the step after this one (Y5.B10.S6)"
     }
    ],
    "note": "",
@@ -6971,7 +6983,7 @@
     },
     {
      "key": "addition:add",
-     "why": "add/subtract the move to each coordinate"
+     "why": "adding the squares moved to a position number (3 + 4 = 7)"
     }
    ],
    "preBuild": [],
@@ -7122,11 +7134,11 @@
      "opts": {
       "range": 100
      },
-     "why": "column method"
+     "why": "decimal addition written in a line (23.2 + 64.4): the written sums known facts make quick"
     },
     {
      "key": "decimals:sub_decimal",
-     "why": "column method"
+     "why": "decimal subtraction written in a line (64.4 − 23.2): the written differences known facts make quick"
     }
    ],
    "note": "",
@@ -7174,7 +7186,7 @@
    "related": [
     {
      "key": "decimals:sub_decimal",
-     "why": "column subtraction of decimals: 1.0 − 0.3 written in columns checks a complement"
+     "why": "subtracting decimals with tenths and hundredths (68.6 − 64.4): the inverse of making a complement"
     },
     {
      "key": "conversions:percent_visual",
@@ -7189,7 +7201,7 @@
      "opts": {
       "range": 100
      },
-     "why": "Y5.B12.S3 Add and subtract decimals across 1 (next step)"
+     "why": "Y5.B12.S3 Add and subtract decimals across 1 (next step; the adding half)"
     }
    ],
    "note": "The W35 xlsx prior list (rounding review) is off-topic and was dropped.",
@@ -7210,11 +7222,11 @@
    "partial": [
     {
      "key": "decimals:add_decimal",
-     "missing": "column items cross 1 at random; no \"across 1\" control or number-line / place-value model"
+     "missing": "the sums (23.2 + 64.4 = ?) cross 1 at random; no \"across 1\" control or number-line / place-value model"
     },
     {
      "key": "decimals:sub_decimal",
-     "missing": "column items cross 1 at random; no across-1 control or model"
+     "missing": "the differences (64.4 − 23.2 = ?) cross 1 at random; no across-1 control or model"
     }
    ],
    "verdict": "partial",
@@ -7306,7 +7318,7 @@
      "opts": {
       "decimals": 1
      },
-     "why": "Y4.B9.S5 Compare decimals (lower grade, same idea; line up the tenths: the place-value reasoning column addition uses)"
+     "why": "Y4.B9.S5 Compare decimals (lower grade, same idea; line up the tenths: the same place-value reading of each digit)"
     },
     {
      "key": "decimals:decimal_nl_drag",
@@ -7785,7 +7797,7 @@
        9
       ]
      },
-     "why": "Y4.B4.S5 9 times-table and division facts (lower grade, same idea)"
+     "why": "Y4.B4.S5 9 times-table and division facts (lower grade, same idea; the multiplication half)"
     }
    ],
    "preBuild": [],
@@ -8337,7 +8349,7 @@
        1
       ]
      },
-     "why": "the same ×1,000 conversion for litres and millilitres"
+     "why": "the same 1,000-to-1 conversion for litres and millilitres"
     }
    ],
    "note": "",
@@ -8387,7 +8399,7 @@
      "key": "measurement:length_metric",
      "opts": {
       "forms": [
-       0
+       1
       ]
      },
      "why": "Y3.B5.S5 Equivalent lengths (metres and centimetres) (lower grade, same idea; the metric side of each conversion)"
@@ -8563,10 +8575,10 @@
      "key": "measurement:mass_volume_liquid",
      "opts": {
       "forms": [
-       2
+       0
       ]
      },
-     "why": "Y3/Gr.2 Measure capacity and volume in millilitres (prior learning)"
+     "why": "Y3.B7.S7 Measure capacity and volume in millilitres (lower grade, same idea; reading millilitres on a cylinder: one millilitre is the space of one small cube)"
     }
    ],
    "preBuild": [],
@@ -8574,9 +8586,12 @@
     {
      "key": "area_perimeter:volume",
      "opts": {
+      "forms": [
+       0
+      ],
       "band": 30
      },
-     "why": "l × w × h (Grade 5 next)"
+     "why": "length × width × height in cubic units (length = 3, width = 3, height = 2): counting the cubes by layers, the Grade 5 step after this one"
     }
    ],
    "note": "area_perimeter:volume uses l × w × h; WRM Y5 counts cubes first. Not tagged direct.",
@@ -8671,9 +8686,12 @@
     {
      "key": "area_perimeter:volume",
      "opts": {
+      "forms": [
+       0
+      ],
       "band": 30
      },
-     "why": "check by computing"
+     "why": "working out a cuboid's volume in cubic units (length × width × height) to check an estimate"
     }
    ],
    "note": "",
@@ -8706,7 +8724,7 @@
     }
    ],
    "verdict": "partial",
-   "missing": "estimating a container's capacity in ml and l against benchmarks (a cup ≈ 250 ml, a bottle 1 l)",
+   "missing": "estimating a container's capacity in ml and l against benchmarks (a cup ≈ 250 ml, a bottle 1 l) and writing a large one both ways (a bucket ≈ 5 l = 5,000 ml)",
    "build": [
     "capacity_estimate"
    ],
@@ -8721,6 +8739,18 @@
      "why": "estimating with a benchmark in another measure"
     },
     {
+     "key": "measurement:capacity",
+     "opts": {
+      "units": [
+       1
+      ],
+      "forms": [
+       0
+      ]
+     },
+     "why": "Y3.B7.S9 Equivalent capacities and volumes (litres and millilitres) (lower grade, same idea; 1 L = 1,000 mL: the benchmark a capacity estimate is compared to)"
+    },
+    {
      "key": "measurement:mass_volume_liquid",
      "opts": {
       "forms": [
@@ -8728,10 +8758,6 @@
       ]
      },
      "why": "Y3.B7.S7 Measure capacity in millilitres (lower grade, same cluster CCSS 3.MD.A.2)"
-    },
-    {
-     "key": "area_perimeter:area_unit_squares",
-     "why": "Y4.B3.S2 Count squares (lower grade, same idea; count unit squares before counting unit cubes)"
     }
    ],
    "preBuild": [
@@ -8742,10 +8768,13 @@
      "key": "measurement:unit_conversions",
      "opts": {
       "units": [
-       1
+       0
+      ],
+      "forms": [
+       0
       ]
      },
-     "why": "metric conversions: L ↔ mL beside m and g, the units an estimate is written in"
+     "why": "metric conversions, one a cell, capacity among length and mass: the metric measures an estimate is written in and checked by"
     }
    ],
    "note": "volume_cubes also lists this step; capacity estimation is a separate option, so the lead may drop Y5.B15.S4 from volume_cubes.",
@@ -8755,7 +8784,7 @@
      "name": "Estimate Capacity (option)",
      "kind": "option on measurement:capacity",
      "teaches": "estimating capacity with benchmarks (teaspoon 5 ml, cup 250 ml, bottle 1 l, bucket 10 l)",
-     "closes": "estimating a container's capacity in ml and l against benchmarks (a cup ≈ 250 ml, a bottle 1 l)",
+     "closes": "estimating a container's capacity in ml and l against benchmarks (a cup ≈ 250 ml, a bottle 1 l) and writing a large one both ways (a bucket ≈ 5 l = 5,000 ml)",
      "representation": "one black line drawing of a container per boxed cell beside a benchmark"
     }
    ]
@@ -8907,7 +8936,7 @@
     },
     {
      "key": "division:div_facts",
-     "why": "division facts to 12 × 12, every table (the Y4.B4 times-tables and division facts)"
+     "why": "division facts to 144 ÷ 12, every divisor from 2 to 12 (the Y4.B4 division facts)"
     },
     {
      "key": "placevalue:place_value_10x",
@@ -8929,7 +8958,7 @@
      "opts": {
       "band": 999
      },
-     "why": "45 hundreds = 4,500: the unit-form step inside 90 × 50"
+     "why": "45 hundreds = 4,500: the unit-form step inside 9 tens times 5 tens"
     }
    ],
    "note": "Domain-test build lesson (W06). The pupil needs the fact and the place-value shift together; mult_zeros already does the shift for one factor.",
@@ -9239,7 +9268,7 @@
     },
     {
      "key": "division:div_facts",
-     "why": "division facts to 12 × 12, every table (the Y4.B4 times-tables and division facts)"
+     "why": "division facts to 144 ÷ 12, every divisor from 2 to 12 (the Y4.B4 division facts)"
     },
     {
      "key": "multiplication:multiply",
@@ -9301,7 +9330,7 @@
    "pre": [
     {
      "key": "division:div_facts",
-     "why": "division facts to 12 × 12, every table (the Y4.B4 times-tables and division facts)"
+     "why": "division facts to 144 ÷ 12, every divisor from 2 to 12 (the Y4.B4 division facts)"
     },
     {
      "key": "division:div_word_problems",
@@ -9318,8 +9347,19 @@
    "preBuild": [],
    "related": [
     {
-     "key": "algebra:tape_diagram",
-     "why": "the bar model a times-as-many story is drawn with: one bar cut into equal parts beside the other"
+     "key": "division:div_word_problems_plain",
+     "opts": {
+      "forms": [
+       1
+      ],
+      "range": 100
+     },
+     "why": "grouping stories (42 shells, 6 in each basket: how many baskets?): the division that answers \"how many times as many?\" (42 is 7 times 6)"
+    },
+    {
+     "key": "division:missing_mult_div",
+     "maxNumber": 100,
+     "why": "the unknown-factor equation (___ × 7 = 42, 48 ÷ ___ = 8): the multiplier a comparison asks for is the missing factor"
     }
    ],
    "note": "Domain-test build lesson (W10, OA unit).",
@@ -9394,7 +9434,7 @@
      "why": "checking that a remainder is smaller than the divisor before interpreting it"
     }
    ],
-   "note": "Domain-test build lesson (W11, OA unit). 5.NBT.B.6 on the site is the Grade 5 extension.",
+   "note": "Domain-test build lesson (W11, OA unit). 5.NBT.B.6 on the site is the Grade 5 extension. div_word_problems / div_word_problems_plain with forms value 2 (\"A remainder to interpret\") are not listed: on the print path that value does not filter, and 12 of 12 generated items are sharing stories with no remainder (a generator defect, Y5-report.md).",
    "envision": [
     {
      "proposal": "multi_step_four_ops",
@@ -9484,19 +9524,28 @@
    "direct": [],
    "partial": [
     {
+     "key": "fraction_operations:frac_10_100_nv",
+     "opts": {
+      "forms": [
+       2
+      ]
+     },
+     "missing": "adds a tenths and a hundredths fraction in numbers (3/10 + 5/100 = ?/100), but the forms value does not keep the page to them (on the print path a page still mixes in renaming and click-all items), and there is no hundred-square picture"
+    },
+    {
      "key": "fraction_operations:frac_10_100",
-     "missing": "renames tenths as hundredths (4/10 = 40/100) but never adds a tenths and a hundredths fraction"
+     "missing": "renames tenths as hundredths (4/10 = 40/100) with its picture, but has no add form; the additions are on frac_10_100_nv"
     }
    ],
    "verdict": "partial",
-   "missing": "adding a tenths and a hundredths fraction by renaming the tenths (3/10 + 4/100 = 34/100)",
+   "missing": "a page of tenths-plus-hundredths additions only (3/10 + 4/100 = 34/100), and the same addition pictured on a hundred square (shade 3 columns and 4 squares)",
    "build": [
     "add_tenths_hundredths"
    ],
    "pre": [
     {
      "key": "fraction_operations:add_fractions_like",
-     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (taught earlier this year, wk W17)"
+     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (taught earlier this year, wk W17; the adding half)"
     },
     {
      "key": "decimals:decimal_nl_drag",
@@ -9510,25 +9559,21 @@
    "preBuild": [],
    "related": [
     {
-     "key": "fraction_operations:frac_10_100_nv",
-     "why": "renaming tenths as hundredths with no hundred square"
-    },
-    {
      "key": "decimals:add_decimal",
      "opts": {
       "decimals": 2
      },
-     "why": "0.3 + 0.04 = 0.34: the same sum in decimals"
+     "why": "adding decimals with hundredths, sometimes with different numbers of places (76.28 + 18.2): the same tenths-and-hundredths sum written as decimals (Y5.B12.S6, W14)"
     }
    ],
    "note": "Domain-test build lesson (W18, NF unit).",
    "envision": [
     {
      "proposal": "add_tenths_hundredths",
-     "name": "Add Tenths and Hundredths (option)",
+     "name": "Add Tenths and Hundredths, Pictured (option)",
      "kind": "option on fraction_operations:frac_10_100",
-     "teaches": "renaming the tenths fraction as hundredths and adding: 3/10 + 4/100 = 30/100 + 4/100 = 34/100, with a hundred square",
-     "closes": "adding a tenths and a hundredths fraction by renaming the tenths (3/10 + 4/100 = 34/100)",
+     "teaches": "renaming the tenths fraction as hundredths on a hundred square and adding: 3/10 + 4/100 = 30/100 + 4/100 = 34/100",
+     "closes": "a page of tenths-plus-hundredths additions only (frac_10_100_nv forms:[2] does not filter on the print path), and the addition pictured on a hundred square",
      "representation": "the existing frac_10_100 cell: a hundred square shading 3 columns and 4 squares, the two-step equation with answer boxes"
     }
    ]
@@ -9638,7 +9683,7 @@
    "related": [
     {
      "key": "angles_lines:mixed_angles_lines",
-     "why": "measuring, naming and adding angles mixed on one page"
+     "why": "measuring, naming and finding angles mixed on one page"
     }
    ],
    "note": "Domain-test build lesson (W28). additive_angles deals a drawn angle split in two with one part and the whole given (90°, 180° or 360°), the missing part to find, which is the lesson; Y5.B10.S6 / S7 hold the around-a-point and straight-line steps."
@@ -9675,6 +9720,9 @@
    "pre": [
     {
      "key": "graphs:bar_graph",
+     "opts": {
+      "most": 10
+     },
      "why": "Y4.B13.S1 Interpret charts (lower grade, same idea)"
     },
     {
@@ -9683,7 +9731,7 @@
     },
     {
      "key": "fraction_operations:add_fractions_like",
-     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (taught earlier this year, wk W17)"
+     "why": "Y5.B4.S9 Add and subtract fractions with the same denominator (taught earlier this year, wk W17; the adding half)"
     }
    ],
    "preBuild": [],
@@ -9747,10 +9795,10 @@
      "key": "measurement:mass_volume_liquid",
      "opts": {
       "forms": [
-       2
+       0
       ]
      },
-     "why": "Y3.B7.S8 Measure capacity and volume in litres and millilitres (lower grade, same idea)"
+     "why": "Y3.B7.S7 Measure capacity and volume in millilitres (lower grade, same idea; reading a capacity on a scale before converting it)"
     },
     {
      "key": "division:div_facts",
@@ -9858,7 +9906,7 @@
        12
       ]
      },
-     "why": "Y4.B4.S10 12 times-table and division facts (lower grade, same idea; 1 ft = 12 in: 3 ft = 3 × 12 in)"
+     "why": "Y4.B4.S10 12 times-table and division facts (lower grade, same idea; the × 12 fact behind changing 3 of the larger length unit into 36 of the smaller; the multiplication half)"
     }
    ],
    "preBuild": [],
@@ -9938,7 +9986,7 @@
      "key": "measurement:length_metric",
      "opts": {
       "forms": [
-       1
+       3
       ]
      },
      "why": "Y4.B6.S2 Equivalent lengths (kilometres and metres) (lower grade, same idea)"
@@ -9960,7 +10008,7 @@
        0
       ]
      },
-     "why": "the capacity conversions a story may need first"
+     "why": "the capacity conversions a measurement problem may need first"
     }
    ],
    "note": "Awsaj supplement lesson in Y5.B14, W31 (standard track; priority and intervention W32).",
@@ -10072,6 +10120,11 @@
     },
     {
      "key": "fractions:equiv_frac_visual",
+     "opts": {
+      "model": [
+       "bar"
+      ]
+     },
      "why": "Y3.B6.S10 Equivalent fractions as bar models (lower grade, same idea)"
     }
    ],
@@ -11689,7 +11742,8 @@
     "Y3.B11.S3",
     "Y4.B12.S1",
     "Y4.B12.S3",
-    "Y5.B10.S1"
+    "Y5.B10.S1",
+    "Y5.B10.S3"
    ],
    "reused": true,
    "source": "WRM_PROPOSALS",
@@ -12356,7 +12410,7 @@
    "why": "capacity sorts containers but never writes an estimate in ml/l",
    "reused": false,
    "closes": {
-    "Y5.B15.S4": "estimating a container's capacity in ml and l against benchmarks (a cup ≈ 250 ml, a bottle 1 l)"
+    "Y5.B15.S4": "estimating a container's capacity in ml and l against benchmarks (a cup ≈ 250 ml, a bottle 1 l) and writing a large one both ways (a bucket ≈ 5 l = 5,000 ml)"
    }
   },
   "facts_times_tens": {
@@ -12532,22 +12586,22 @@
    "also": [
     "fraction_operations:frac_10_100_nv"
    ],
-   "option": "form \"add a tenths and a hundredths fraction (3/10 + 4/100)\"",
-   "name": "Add Tenths and Hundredths (option)",
-   "teaches": "renaming the tenths fraction as hundredths and adding: 3/10 + 4/100 = 30/100 + 4/100 = 34/100, with a hundred square",
+   "option": "form \"add a tenths and a hundredths fraction (3/10 + 4/100)\" on frac_10_100 (pictured); and make the existing forms value 2 \"Add tenths and hundredths\" of frac_10_100_nv keep a printed page to the additions",
+   "name": "Add Tenths and Hundredths, Pictured (option)",
+   "teaches": "renaming the tenths fraction as hundredths on a hundred square and adding: 3/10 + 4/100 = 30/100 + 4/100 = 34/100",
    "representation": "the existing frac_10_100 cell: a hundred square shading 3 columns and 4 squares, the two-step equation with answer boxes",
    "family": "fraction_operations",
    "ccss": [
     "4.NF.C.5"
    ],
-   "why": "generated frac_10_100 renames 4/10 as 40/100 and finds equivalents of 0.05, but never adds a tenths and a hundredths fraction",
+   "why": "frac_10_100_nv already adds tenths and hundredths in numbers (its forms value 2), but on the print path forms:[2] still deals renaming and click-all items (6 of 20 are additions); frac_10_100, the pictured skill, has no add form",
    "steps": [],
    "reused": false,
    "lessons": [
     "G4|-|addtenthsandhundredthsrenametenthsashundredths"
    ],
    "closes": {
-    "G4|-|addtenthsandhundredthsrenametenthsashundredths": "adding a tenths and a hundredths fraction by renaming the tenths (3/10 + 4/100 = 34/100)"
+    "G4|-|addtenthsandhundredthsrenametenthsashundredths": "a page of tenths-plus-hundredths additions only (frac_10_100_nv forms:[2] does not filter on the print path), and the addition pictured on a hundred square"
    }
   },
   "points_lines_rays": {
@@ -12939,7 +12993,7 @@
    "key": "placevalue:place_value_10x",
    "step": "Y5.B1.S6",
    "action": "partial",
-   "partial": "the powers of ten themselves: 10, 100 ... 1,000,000 and that each is 10 times the one before (10 hundreds = 1,000); it only multiplies/divides a number by 10, 100, 1,000, with ÷ 1,000 and decimal results that the school teaches from W10",
+   "partial": "the powers of ten themselves: 10, 100 ... 1,000,000 and that each is 10 times the one before (10 hundreds = 1,000); it only multiplies and divides whole numbers by 10, 100 and 1,000 (43 × 1,000; 58,800 ÷ 100), with no decimal results, and × / ÷ 1,000 is content the school teaches from W10",
    "why": "tagged full; generated items teach only part of the step"
   },
   {
@@ -14136,14 +14190,14 @@
    "key": "decimals:add_decimal",
    "step": "Y5.B12.S3",
    "action": "partial",
-   "partial": "column items cross 1 at random; no \"across 1\" control or number-line / place-value model",
+   "partial": "the sums (23.2 + 64.4 = ?) cross 1 at random; no \"across 1\" control or number-line / place-value model",
    "why": "tagged full; generated items teach only part of the step"
   },
   {
    "key": "decimals:sub_decimal",
    "step": "Y5.B12.S3",
    "action": "partial",
-   "partial": "column items cross 1 at random; no across-1 control or model",
+   "partial": "the differences (64.4 − 23.2 = ?) cross 1 at random; no across-1 control or model",
    "why": "tagged full; generated items teach only part of the step"
   },
   {
