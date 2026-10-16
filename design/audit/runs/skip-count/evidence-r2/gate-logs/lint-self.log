@@ -1,0 +1,51 @@
+  ok   clean fixture: 0 findings
+  ok   coloured fill: L-INK INK-1 fired - background #3b82f6 is not ink #000, paper #fff or grey #949494 (INK-1)
+  ok   coloured text: L-INK INK-1 fired - text colour #7c3aed is not ink #000, paper #fff or grey #949494 (INK-1)
+  ok   key ink on a key page's question (a given): L-INK INK-1 fired - text colour #c2410c is not ink #000, paper #fff or grey #949494 (INK-1)
+  ok   key ink on a pupil page answer: L-INK INK-1 fired - text colour #c2410c is not ink #000, paper #fff or grey #949494 (INK-1)
+  ok   drop shadow on a heading: L-INK INK-2 fired - box-shadow rgb(0, 0, 0) 0px 3px 0px 0px: no shadows (INK-2)
+  ok   greyscale filter: L-INK INK-2 fired - filter grayscale(1): no filters (INK-2) - grey must be ink, not a greyscale filter
+  ok   black 20 mm disk with black text: L-INK INK-5 fired - <circle> filled black, 20 x 20 mm (a 18.7 mm disk fits inside the black): solid black only where the smaller s
+  ok   black 20 mm disk with black text: L-INK ILLEGIBLE fired - ILLEGIBLE: text "100" in #000000 on #000000 (contrast 1.00:1) - the pupil cannot read it (INK-5, AX-1)
+  ok   dashed box that is not a cut line: L-INK LS-4 fired - dashed border: a dashed line means "cut here" (data-ws-cut) or the missing-digit box (data-ws-shape="box-unkno
+  ok   emoji: L-EMOJI INK-7 fired - emoji / pictographic "⭐" U+2B50 in sheet text (INK-7, TY-6, RP-7)
+  ok   letter x as times sign: L-EMOJI TY-6 fired - "3 x 4 = ?": multiplication written with a letter x or asterisk; the operator is the true glyph U+00D7 (TY-6)
+  ok   serif font: L-FONT TY-1 fired - font-family ""Times New Roman", serif": every character of question content is Andika (TY-1)
+  ok   italic: L-FONT TY-2 fired - font-style italic: no italic anywhere (TY-2, AX-3)
+  ok   rejected digit variant cv01: L-FONT TY-4 fired - font-feature-settings "cv01", "cv04": only "cv04" is set; cv01 were rejected (TY-4)
+  ok   6 pt pupil text: L-SIZE TY-11 fired - 6.0 pt text: nothing a pupil reads is under 8 pt (TY-11)
+  ok   element sticking out of its cell: L-OVERFLOW PG-12 fired - sticks out of its cell by 28.8 mm (cell 92.3 x 75.1 mm) (PG-12, CL-1)
+  ok   clipped text: L-OVERFLOW TY-12 fired - text is clipped: content 145 x 9 mm in a 29.9 x 7.9 mm box (TY-12: long words wrap, never clip)
+  ok   split cell (page box taller than A4): L-SPLIT PG-21 fired - 2 sheet page(s) printed on 3 A4 page(s): a sheet page spills onto another sheet
+  ok   footer in mid-page: L-SPLIT HD-30 fired - teacher footer ends 116 mm above the foot of the live area: the footer sits at the page foot, never mid-page (
+  ok   two-item page in a two-page sheet: L-DENSITY DN-2 fired - page 1 holds 2 item(s) while page 2 of the same sheet follows and its fullest page holds 6: a page is never le
+  ok   empty band under a cell drawing (H13): L-DENSITY H13 fired - one empty band 179.7 mm tall in a 225.4 mm cell (80%): the row is sized for a taller item than it holds (RUBRI
+  ok   eight items on an Independent page: L-DENSITY DN-1 fired - page 1 holds 8 items; the Independent / More Practice ceiling at size L is 6 (section 12.1)
+  ok   list answer key: L-KEY AK-1 fired - key page 2 has 0 cells and no pupil page in the document has the same cells: a key is a facsimile, not a list 
+  ok   unanswered key slot: L-KEY AK-2 fired - key page 2: 1 of 6 answer slot(s) carry no answer (AK-2, AK-4)
+  ok   screen verb on paper: L-VERBS BD-12 fired - screen verb "Click" on paper: "Click the right answer." (BD-11, BD-12, BD-17)
+  ok   instruction over 12 words: L-VERBS BD-10 fired - instruction "Add the two numbers and then write the answer in the boxes b..." has 15 words; at most 12 (BD-10)
+  ok   "Part 01" section heading: L-VERBS BD-1 fired - section heading "Part 01": "Part NN" is not a band label; bands use the fixed vocabulary of BD-1 (and the Dail
+  ok   answer line under 14 mm: L-ANSAREA SL-1 fired - answer line 10 mm wide; no answer line or stand-alone box is under 14 mm (SL-1, AX-5)
+  ok   underscore blank: L-ANSAREA SL-6 fired - blank drawn with underscore characters "_____ blocks": blanks are ruled lines or boxes (SL-6)
+  ok   draw zone too small for the model: L-ANSAREA H12 fired - drawing zone "hundreds" is 40 x 18 mm, 100% empty: a zone to draw or build in needs >= 30 mm height and >= 60%
+  ok   narrow Lines write-on line at size M (SL-3a: S only): L-ANSAREA SL-1 fired - answer line 10 mm wide; no answer line or stand-alone box is under 14 mm (SL-1, AX-5)
+  ok   narrow Lines write-on line at size S (SL-3a exception): L-ANSAREA SL-1 not fired
+  ok   an input on paper: L-INPUT SP-10 fired - <input> on a printed sheet: print and key modes carry no inputs (L-INPUT)
+  ok   grade and CCSS code in a cell: L-CCSS SC-5 fired - "3.NBT.A.2" printed for the pupil: grade, CCSS codes and skill ids appear only in the teacher footer (SC-5, HD
+  ok   legacy: clean fixture: 0 findings (2 pupil + 2 key page(s))
+  ok   legacy: list answer key: L-KEY AK-1 fired - the answer key is a list (6 numbered answers in .answer-key-grid), not a facsimile: 0 cells against 6 on the p
+  ok   legacy: item taller than the space left on its page: L-SPLIT PG-21 fired - item 2 is split across printed pages 2 and 3 (300 mm tall, starting 0 mm down a 271 mm page) (PG-21)
+  ok   legacy: footer / date line in mid-page: L-SPLIT HD-30 fired - footer "MathQuestForm A" ends 138 mm above the foot of printed page 1: a footer or date line in mid-page reads
+  ok   legacy: ten items per printed page: L-DENSITY DN-1 fired - printed page 1 holds 10 items; the Independent / More Practice ceiling is 6 (section 12.1; the legacy dialog p
+  ok   support clean: 0 findings
+  ok   support showing the answer: L-SUPPORT RP-1 fired
+  ok   tally rows of two lengths: L-SUPPORT S1.7 fired
+  ok   answer zone moves: L-SUPPORT SCC-T10 fired
+  ok   key without the supports: L-SUPPORT AK-1 fired
+  ok   anchor clean: 0 findings
+  ok   anchor without its Model tab: L-ANCHOR PT-LBL-6 fired
+  ok   anchor with a letter label: L-ANCHOR PT-LBL-6 fired
+  ok   anchor with an answer slot: L-ANCHOR PT-LBL-6 fired
+  ok   anchor drawn differently on the key: L-ANCHOR AK-1 fired
+ws-print-lint: OK (self-test, 50 assertions, 38 planted defects, every lint covered)

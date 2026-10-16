@@ -1,0 +1,15 @@
+note multiplication/count_by_tables  "Skip counting: count by 1–12"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+
+Failures by class:
+     0  (none)
+
+Notes by class:
+     1  zero-facts
+
+By family:
+  operations    1 skills, 0 failing
+
+Coverage: 0 skills where NOTHING could be checked against the name; 0 more with at least one check that could not be applied.
+
+ws-content-audit: OK (1 count_by_tables skills, 240 items each, Max Number 100, 0 failing, 0 mixed pools held to their pool union, 1 notes)

@@ -1,0 +1,21 @@
+home screen 1366x650 (full header)           ok (nav flex, controls flex, menu button hidden)
+play at 1366x960 (tall screen, full header)  ok (nav flex, controls flex, menu button hidden)
+multiplication:count_by_tables 1366x650      card ok box 227/650 go 361 | boss ok box 227/650 go 361 | race ok box 227/650 go 361 | worksheet ok box 233/650 go 54 cards 2 | quiz ok box 200/650 go 354
+patterns:skip_count_grid 1366x650            card ok box 227/650 go 361 | boss ok box 227/650 go 361 | race ok box 227/650 go 361 | worksheet ok box 233/650 go 54 cards 2 | quiz ok box 200/650 go 354
+patterns:skip_count_line 1366x650            card ok box 258/650 go 330 | boss ok box 258/650 go 329 | race ok box 258/650 go 330 | worksheet ok box 272/650 go 54 cards 2 | quiz ok box 230/650 go 323
+multiplication:count_by_tables 1280x600      card ok box 227/600 go 361 | boss ok box 227/600 go 361 | race ok box 227/600 go 361 | worksheet ok box 233/600 go 54 cards 1 | quiz ok box 200/600 go 354
+patterns:skip_count_grid 1280x600            card ok box 227/600 go 361 | boss ok box 227/600 go 361 | race ok box 227/600 go 361 | worksheet ok box 233/600 go 54 cards 1 | quiz ok box 200/600 go 354
+patterns:skip_count_line 1280x600            card ok box 258/600 go 330 | boss ok box 258/600 go 329 | race ok box 258/600 go 330 | worksheet ok box 272/600 go 54 cards 2 | quiz ok box 230/600 go 323
+addition:add_facts 1366x650 quiz touch wrong touch Next ok
+addition:add_facts 1366x650 quiz touch right touch Next ok
+subtraction:subtract 1366x650 quiz touch wrong touch Next ok
+subtraction:subtract 1366x650 quiz touch right touch Next ok
+multiplication:mult_facts 1366x650 quiz touch wrong touch Next ok
+multiplication:mult_facts 1366x650 quiz touch right touch Next ok
+addition:add_facts 1280x600 quiz touch wrong touch Next ok
+addition:add_facts 1280x600 quiz touch right touch Next ok
+subtraction:subtract 1280x600 quiz touch wrong touch Next ok
+subtraction:subtract 1280x600 quiz touch right touch Next ok
+multiplication:mult_facts 1280x600 quiz touch wrong touch Next ok
+multiplication:mult_facts 1280x600 quiz touch right touch Next ok
+ws-chromebook-fit: OK
