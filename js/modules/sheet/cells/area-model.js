@@ -138,7 +138,7 @@ function renderExt(p, ctx, wMm) {
         const rects = C.map((_, c) => {
             const i = r * C.length + c;
             return `<span class="${NOWRAP}" style="flex:0 0 ${g.em(colMm)};height:${g.em(hMm)};box-sizing:border-box;display:flex;align-items:center;justify-content:center;`
-                + `${c ? `border-left:${HAIR} solid ${INK.ink};` : ''}${r ? `border-top:${HAIR} solid ${INK.ink};` : ''}">${slot(`part-${i}`, 'area-model-input', partials[i], bw, `area of part ${i + 1}`)}</span>`;
+                + `${c ? `border-left:${HAIR} solid ${INK.ink};` : ''}">${slot(`part-${i}`, 'area-model-input', partials[i], bw, `area of part ${i + 1}`)}</span>`;
         }).join('');
         return `<div class="${NOWRAP}" style="display:flex;flex-wrap:nowrap;align-items:center">`
             + `<span class="${NOWRAP}" style="flex:0 0 ${g.em(sideMm)};display:flex;justify-content:center;text-align:center;font-weight:700">${side}</span>`

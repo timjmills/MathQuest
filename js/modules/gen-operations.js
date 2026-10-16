@@ -5011,8 +5011,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.ans = quotient;
                 q.text = `Use the area model to find ${dividend} ÷ ${divisor}`;
                 q.hint = `Break ${dividend} into parts: ${parts[0].value} + ${parts[1].value}. Find what times ${divisor} equals each part, then add.`;
-                q.answerType = "area-model-div";
+                q.answerType = "area-model";   // r12: the area-model checker (the card typed into a single answer box before)
                 q.areaModelDivData = { divisor, dividend, quotient, parts };
+                q.areaModelData = q.areaModelDivData;   // r12: the card's area-model checker reads it
                 q.printFormat = "area-model-div";
                 // r12: the edges / form options draw the kit's division area model (black line art,
                 // the problem as ÷, the long-division bracket or a fraction); defaults keep today's sheet.
@@ -5133,8 +5134,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.ans = quotient;
                 q.text = `Use the area model to find ${dividend} ÷ ${divisor}`;
                 q.hint = `Break ${dividend} into parts: ${parts[0].value} + ${parts[1].value}. Find what times ${divisor} equals each part, then add.`;
-                q.answerType = "area-model-div";
+                q.answerType = "area-model";   // r12: the area-model checker (the card typed into a single answer box before)
                 q.areaModelDivData = { divisor, dividend, quotient, parts };
+                q.areaModelData = q.areaModelDivData;   // r12: the card's area-model checker reads it
                 q.printFormat = "area-model-div";
                 // r12: the edges / form options draw the kit's division area model (black line art,
                 // the problem as ÷, the long-division bracket or a fraction); defaults keep today's sheet.

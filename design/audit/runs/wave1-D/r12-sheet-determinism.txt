@@ -11,4 +11,3 @@ ok   composing:mixed_composing L
 ok   addition:add_sub_10s L
 ok   division:missing_mult_div L
 ws-sheet-determinism: OK
-exit 0
