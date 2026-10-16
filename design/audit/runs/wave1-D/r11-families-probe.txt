@@ -1,0 +1,120 @@
+number_families_add S IND seed 1: 12@3c fill 0.985
+number_families_add S IND seed 2: 12@3c fill 0.985
+number_families_add S IND seed 3: 12@3c fill 0.985
+number_families_add S IND seed 4: 12@3c fill 0.985
+number_families_add S IND seed 5: 12@3c fill 0.985
+number_families_add S IND seed 6: 12@3c fill 0.985
+number_families_add S IND seed 7: 12@3c fill 0.985
+number_families_add S IND seed 8: 12@3c fill 0.985
+number_families_add S IND seed 9: 12@3c fill 0.985
+number_families_add S IND seed 10: 12@3c fill 0.985
+number_families_add S MP  seed 1: 12@3c fill 0.985 | 12@3c fill 0.985
+number_families_add S MP  seed 2: 12@3c fill 0.985 | 12@3c fill 0.985
+number_families_add S MP  seed 3: 12@3c fill 0.985 | 12@3c fill 0.985
+number_families_add S MP  seed 4: 12@3c fill 0.985 | 12@3c fill 0.985
+number_families_add S MP  seed 5: 12@3c fill 0.985 | 12@3c fill 0.985
+number_families_add S MP  seed 6: 12@3c fill 0.985 | 12@3c fill 0.985
+number_families_add S MP  seed 7: 12@3c fill 0.985 | 12@3c fill 0.985
+number_families_add S MP  seed 8: 12@3c fill 0.985 | 12@3c fill 0.985
+number_families_add S MP  seed 9: 12@3c fill 0.985 | 12@3c fill 0.985
+number_families_add S MP  seed 10: 12@3c fill 0.985 | 12@3c fill 0.985
+number_families_add M IND seed 1: 9@3c fill 0.985
+number_families_add M IND seed 2: 9@3c fill 0.985
+number_families_add M IND seed 3: 9@3c fill 0.985
+number_families_add M IND seed 4: 9@3c fill 0.985
+number_families_add M IND seed 5: 9@3c fill 0.985
+number_families_add M IND seed 6: 9@3c fill 0.985
+number_families_add M IND seed 7: 9@3c fill 0.985
+number_families_add M IND seed 8: 9@3c fill 0.985
+number_families_add M IND seed 9: 9@3c fill 0.985
+number_families_add M IND seed 10: 9@3c fill 0.985
+number_families_add M MP  seed 1: 9@3c fill 0.985 | 9@3c fill 0.985
+number_families_add M MP  seed 2: 9@3c fill 0.985 | 9@3c fill 0.985
+number_families_add M MP  seed 3: 9@3c fill 0.985 | 9@3c fill 0.985
+number_families_add M MP  seed 4: 9@3c fill 0.985 | 9@3c fill 0.985
+number_families_add M MP  seed 5: 9@3c fill 0.985 | 9@3c fill 0.985
+number_families_add M MP  seed 6: 9@3c fill 0.985 | 9@3c fill 0.985
+number_families_add M MP  seed 7: 9@3c fill 0.985 | 9@3c fill 0.985
+number_families_add M MP  seed 8: 9@3c fill 0.985 | 9@3c fill 0.985
+number_families_add M MP  seed 9: 9@3c fill 0.985 | 9@3c fill 0.985
+number_families_add M MP  seed 10: 9@3c fill 0.985 | 9@3c fill 0.985
+number_families_add L IND seed 1: 6@2c fill 0.985
+number_families_add L IND seed 2: 6@2c fill 0.985
+number_families_add L IND seed 3: 6@2c fill 0.985
+number_families_add L IND seed 4: 6@2c fill 0.985
+number_families_add L IND seed 5: 6@2c fill 0.985
+number_families_add L IND seed 6: 6@2c fill 0.985
+number_families_add L IND seed 7: 6@2c fill 0.985
+number_families_add L IND seed 8: 6@2c fill 0.985
+number_families_add L IND seed 9: 6@2c fill 0.985
+number_families_add L IND seed 10: 6@2c fill 0.985
+number_families_add L MP  seed 1: 6@2c fill 0.985 | 6@2c fill 0.985
+number_families_add L MP  seed 2: 6@2c fill 0.985 | 6@2c fill 0.985
+number_families_add L MP  seed 3: 6@2c fill 0.985 | 6@2c fill 0.985
+number_families_add L MP  seed 4: 6@2c fill 0.985 | 6@2c fill 0.985
+number_families_add L MP  seed 5: 6@2c fill 0.985 | 6@2c fill 0.985
+number_families_add L MP  seed 6: 6@2c fill 0.985 | 6@2c fill 0.985
+number_families_add L MP  seed 7: 6@2c fill 0.985 | 6@2c fill 0.985
+number_families_add L MP  seed 8: 6@2c fill 0.985 | 6@2c fill 0.985
+number_families_add L MP  seed 9: 6@2c fill 0.985 | 6@2c fill 0.985
+number_families_add L MP  seed 10: 6@2c fill 0.985 | 6@2c fill 0.985
+number_families_mult S IND seed 1: 8@2c fill 0.985
+number_families_mult S IND seed 2: 8@2c fill 0.985
+number_families_mult S IND seed 3: 8@2c fill 0.985
+number_families_mult S IND seed 4: 8@2c fill 0.985
+number_families_mult S IND seed 5: 8@2c fill 0.985
+number_families_mult S IND seed 6: 8@2c fill 0.985
+number_families_mult S IND seed 7: 8@2c fill 0.985
+number_families_mult S IND seed 8: 8@2c fill 0.985
+number_families_mult S IND seed 9: 8@2c fill 0.985
+number_families_mult S IND seed 10: 8@2c fill 0.985
+number_families_mult S MP  seed 1: 8@2c fill 0.985 | 8@2c fill 0.985
+number_families_mult S MP  seed 2: 8@2c fill 0.985 | 8@2c fill 0.985
+number_families_mult S MP  seed 3: 8@2c fill 0.985 | 8@2c fill 0.985
+number_families_mult S MP  seed 4: 8@2c fill 0.985 | 8@2c fill 0.985
+number_families_mult S MP  seed 5: 8@2c fill 0.985 | 8@2c fill 0.985
+number_families_mult S MP  seed 6: 8@2c fill 0.985 | 8@2c fill 0.985
+number_families_mult S MP  seed 7: 8@2c fill 0.985 | 8@2c fill 0.985
+number_families_mult S MP  seed 8: 8@2c fill 0.985 | 8@2c fill 0.985
+number_families_mult S MP  seed 9: 8@2c fill 0.985 | 8@2c fill 0.985
+number_families_mult S MP  seed 10: 8@2c fill 0.985 | 8@2c fill 0.985
+number_families_mult M IND seed 1: 9@3c fill 0.985
+number_families_mult M IND seed 2: 9@3c fill 0.985
+number_families_mult M IND seed 3: 9@3c fill 0.985
+number_families_mult M IND seed 4: 9@3c fill 0.985
+number_families_mult M IND seed 5: 9@3c fill 0.985
+number_families_mult M IND seed 6: 9@3c fill 0.985
+number_families_mult M IND seed 7: 9@3c fill 0.985
+number_families_mult M IND seed 8: 9@3c fill 0.985
+number_families_mult M IND seed 9: 9@3c fill 0.985
+number_families_mult M IND seed 10: 9@3c fill 0.985
+number_families_mult M MP  seed 1: 9@3c fill 0.985 | 9@3c fill 0.985
+number_families_mult M MP  seed 2: 9@3c fill 0.985 | 9@3c fill 0.985
+number_families_mult M MP  seed 3: 9@3c fill 0.985 | 9@3c fill 0.985
+number_families_mult M MP  seed 4: 9@3c fill 0.985 | 9@3c fill 0.985
+number_families_mult M MP  seed 5: 9@3c fill 0.985 | 9@3c fill 0.985
+number_families_mult M MP  seed 6: 9@3c fill 0.985 | 9@3c fill 0.985
+number_families_mult M MP  seed 7: 9@3c fill 0.985 | 9@3c fill 0.985
+number_families_mult M MP  seed 8: 9@3c fill 0.985 | 9@3c fill 0.985
+number_families_mult M MP  seed 9: 9@3c fill 0.985 | 9@3c fill 0.985
+number_families_mult M MP  seed 10: 9@3c fill 0.985 | 9@3c fill 0.985
+number_families_mult L IND seed 1: 6@2c fill 0.985
+number_families_mult L IND seed 2: 6@2c fill 0.985
+number_families_mult L IND seed 3: 6@2c fill 0.985
+number_families_mult L IND seed 4: 6@2c fill 0.985
+number_families_mult L IND seed 5: 6@2c fill 0.985
+number_families_mult L IND seed 6: 6@2c fill 0.985
+number_families_mult L IND seed 7: 6@2c fill 0.985
+number_families_mult L IND seed 8: 6@2c fill 0.985
+number_families_mult L IND seed 9: 6@2c fill 0.985
+number_families_mult L IND seed 10: 6@2c fill 0.985
+number_families_mult L MP  seed 1: 6@2c fill 0.985 | 6@2c fill 0.985
+number_families_mult L MP  seed 2: 6@2c fill 0.985 | 6@2c fill 0.985
+number_families_mult L MP  seed 3: 6@2c fill 0.985 | 6@2c fill 0.985
+number_families_mult L MP  seed 4: 6@2c fill 0.985 | 6@2c fill 0.985
+number_families_mult L MP  seed 5: 6@2c fill 0.985 | 6@2c fill 0.985
+number_families_mult L MP  seed 6: 6@2c fill 0.985 | 6@2c fill 0.985
+number_families_mult L MP  seed 7: 6@2c fill 0.985 | 6@2c fill 0.985
+number_families_mult L MP  seed 8: 6@2c fill 0.985 | 6@2c fill 0.985
+number_families_mult L MP  seed 9: 6@2c fill 0.985 | 6@2c fill 0.985
+number_families_mult L MP  seed 10: 6@2c fill 0.985 | 6@2c fill 0.985

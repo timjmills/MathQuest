@@ -1,0 +1,240 @@
+mult_comparison S IND seed 1: 9@3c fill 0.891
+mult_comparison S IND seed 2: 9@3c fill 0.891
+mult_comparison S IND seed 3: 9@3c fill 0.891
+mult_comparison S IND seed 4: 9@3c fill 0.891
+mult_comparison S IND seed 5: 9@3c fill 0.891
+mult_comparison S IND seed 6: 9@3c fill 0.891
+mult_comparison S IND seed 7: 9@3c fill 0.891
+mult_comparison S IND seed 8: 9@3c fill 0.891
+mult_comparison S IND seed 9: 9@3c fill 0.891
+mult_comparison S IND seed 10: 9@3c fill 0.891
+mult_comparison S MP  seed 1: 9@3c fill 0.891 | 9@3c fill 0.891
+mult_comparison S MP  seed 2: 9@3c fill 0.891 | 9@3c fill 0.891
+mult_comparison S MP  seed 3: 9@3c fill 0.891 | 9@3c fill 0.891
+mult_comparison S MP  seed 4: 9@3c fill 0.891 | 9@3c fill 0.891
+mult_comparison S MP  seed 5: 9@3c fill 0.891 | 9@3c fill 0.891
+mult_comparison S MP  seed 6: 9@3c fill 0.891 | 9@3c fill 0.891
+mult_comparison S MP  seed 7: 9@3c fill 0.891 | 9@3c fill 0.891
+mult_comparison S MP  seed 8: 9@3c fill 0.891 | 9@3c fill 0.891
+mult_comparison S MP  seed 9: 9@3c fill 0.891 | 9@3c fill 0.891
+mult_comparison S MP  seed 10: 9@3c fill 0.891 | 9@3c fill 0.891
+mult_comparison M IND seed 1: 6@2c fill 0.925
+mult_comparison M IND seed 2: 6@2c fill 0.925
+mult_comparison M IND seed 3: 6@2c fill 0.925
+mult_comparison M IND seed 4: 6@2c fill 0.925
+mult_comparison M IND seed 5: 6@2c fill 0.925
+mult_comparison M IND seed 6: 6@2c fill 0.925
+mult_comparison M IND seed 7: 6@2c fill 0.925
+mult_comparison M IND seed 8: 6@2c fill 0.925
+mult_comparison M IND seed 9: 6@2c fill 0.925
+mult_comparison M IND seed 10: 6@2c fill 0.925
+mult_comparison M MP  seed 1: 6@2c fill 0.938 | 6@2c fill 0.938
+mult_comparison M MP  seed 2: 6@2c fill 0.925 | 6@2c fill 0.925
+mult_comparison M MP  seed 3: 6@2c fill 0.938 | 6@2c fill 0.938
+mult_comparison M MP  seed 4: 6@2c fill 0.925 | 6@2c fill 0.938
+mult_comparison M MP  seed 5: 6@2c fill 0.925 | 6@2c fill 0.925
+mult_comparison M MP  seed 6: 6@2c fill 0.925 | 6@2c fill 0.925
+mult_comparison M MP  seed 7: 6@2c fill 0.938 | 6@2c fill 0.925
+mult_comparison M MP  seed 8: 6@2c fill 0.938 | 6@2c fill 0.925
+mult_comparison M MP  seed 9: 6@2c fill 0.938 | 6@2c fill 0.925
+mult_comparison M MP  seed 10: 6@2c fill 0.925 | 6@2c fill 0.938
+mult_comparison L IND seed 1: 6@2c fill 0.927
+mult_comparison L IND seed 2: 6@2c fill 0.927
+mult_comparison L IND seed 3: 6@2c fill 0.932
+mult_comparison L IND seed 4: 6@2c fill 0.941
+mult_comparison L IND seed 5: 6@2c fill 0.938
+mult_comparison L IND seed 6: 6@2c fill 0.927
+mult_comparison L IND seed 7: 6@2c fill 0.927
+mult_comparison L IND seed 8: 6@2c fill 0.948
+mult_comparison L IND seed 9: 6@2c fill 0.932
+mult_comparison L IND seed 10: 6@2c fill 0.927
+mult_comparison L MP  seed 1: 6@2c fill 0.985 | 6@2c fill 0.985
+mult_comparison L MP  seed 2: 6@2c fill 0.927 | 6@2c fill 0.904
+mult_comparison L MP  seed 3: 6@2c fill 0.985 | 6@2c fill 0.985
+mult_comparison L MP  seed 4: 6@2c fill 0.904 | 6@2c fill 0.985
+mult_comparison L MP  seed 5: 6@2c fill 0.909 | 6@2c fill 0.927
+mult_comparison L MP  seed 6: 6@2c fill 0.951 | 6@2c fill 0.938
+mult_comparison L MP  seed 7: 6@2c fill 0.985 | 6@2c fill 0.927
+mult_comparison L MP  seed 8: 6@2c fill 0.985 | 6@2c fill 0.904
+mult_comparison L MP  seed 9: 6@2c fill 0.985 | 6@2c fill 0.98
+mult_comparison L MP  seed 10: 6@2c fill 0.951 | 6@2c fill 0.985
+remainder_interpret S IND seed 1: 6@2c fill 0.985
+remainder_interpret S IND seed 2: 6@2c fill 0.985
+remainder_interpret S IND seed 3: 6@2c fill 0.985
+remainder_interpret S IND seed 4: 6@2c fill 0.985
+remainder_interpret S IND seed 5: 6@2c fill 0.985
+remainder_interpret S IND seed 6: 6@2c fill 0.985
+remainder_interpret S IND seed 7: 6@2c fill 0.985
+remainder_interpret S IND seed 8: 6@2c fill 0.985
+remainder_interpret S IND seed 9: 6@2c fill 0.985
+remainder_interpret S IND seed 10: 6@2c fill 0.985
+remainder_interpret S MP  seed 1: 6@2c fill 0.985 | 6@2c fill 0.985
+remainder_interpret S MP  seed 2: 6@2c fill 0.985 | 6@2c fill 0.985
+remainder_interpret S MP  seed 3: 6@2c fill 0.985 | 6@2c fill 0.985
+remainder_interpret S MP  seed 4: 6@2c fill 0.985 | 6@2c fill 0.985
+remainder_interpret S MP  seed 5: 6@2c fill 0.985 | 6@2c fill 0.985
+remainder_interpret S MP  seed 6: 5@2c fill 0.878 | 6@2c fill 0.985
+remainder_interpret S MP  seed 7: 5@2c fill 0.878 | 5@2c fill 0.878
+remainder_interpret S MP  seed 8: 6@2c fill 0.985 | 6@2c fill 0.985
+remainder_interpret S MP  seed 9: 6@2c fill 0.985 | 5@2c fill 0.878
+remainder_interpret S MP  seed 10: 6@2c fill 0.985 | 6@2c fill 0.985
+remainder_interpret M IND seed 1: 5@2c fill 0.967
+remainder_interpret M IND seed 2: 5@2c fill 0.967
+remainder_interpret M IND seed 3: 5@2c fill 0.967
+remainder_interpret M IND seed 4: 5@2c fill 0.967
+remainder_interpret M IND seed 5: 5@2c fill 0.967
+remainder_interpret M IND seed 6: 5@2c fill 0.967
+remainder_interpret M IND seed 7: 5@2c fill 0.967
+remainder_interpret M IND seed 8: 6@2c fill 0.985
+remainder_interpret M IND seed 9: 6@2c fill 0.985
+remainder_interpret M IND seed 10: 6@2c fill 0.985
+remainder_interpret M MP  seed 1: 4@2c fill 0.972 | 4@2c fill 0.972
+remainder_interpret M MP  seed 2: 4@2c fill 0.967 | 4@2c fill 0.972
+remainder_interpret M MP  seed 3: 6@2c fill 0.985 | 5@2c fill 0.967
+remainder_interpret M MP  seed 4: 5@2c fill 0.967 | 5@2c fill 0.967
+remainder_interpret M MP  seed 5: 5@2c fill 0.967 | 6@2c fill 0.985
+remainder_interpret M MP  seed 6: 5@2c fill 0.967 | 5@2c fill 0.967
+remainder_interpret M MP  seed 7: 3@1c fill 0.985 | 5@2c fill 0.967
+remainder_interpret M MP  seed 8: 6@2c fill 0.985 | 5@2c fill 0.967
+remainder_interpret M MP  seed 9: 4@2c fill 0.972 | 5@2c fill 0.967
+remainder_interpret M MP  seed 10: 3@1c fill 0.985 | 4@2c fill 0.972
+remainder_interpret L IND seed 1: 2@1c fill 0.985
+remainder_interpret L IND seed 2: 2@1c fill 0.985
+remainder_interpret L IND seed 3: 2@1c fill 0.985
+remainder_interpret L IND seed 4: 2@1c fill 0.985
+remainder_interpret L IND seed 5: 2@1c fill 0.985
+remainder_interpret L IND seed 6: 2@1c fill 0.985
+remainder_interpret L IND seed 7: 2@1c fill 0.985
+remainder_interpret L IND seed 8: 2@1c fill 0.985
+remainder_interpret L IND seed 9: 2@1c fill 0.985
+remainder_interpret L IND seed 10: 2@1c fill 0.985
+remainder_interpret L MP  seed 1: 2@1c fill 0.985 | 2@1c fill 0.985
+remainder_interpret L MP  seed 2: 2@1c fill 0.985 | 2@1c fill 0.985
+remainder_interpret L MP  seed 3: 2@1c fill 0.985 | 2@1c fill 0.985
+remainder_interpret L MP  seed 4: 2@1c fill 0.985 | 2@1c fill 0.985
+remainder_interpret L MP  seed 5: 2@1c fill 0.985 | 2@1c fill 0.985
+remainder_interpret L MP  seed 6: 2@1c fill 0.985 | 2@1c fill 0.985
+remainder_interpret L MP  seed 7: 2@1c fill 0.985 | 2@1c fill 0.985
+remainder_interpret L MP  seed 8: 2@1c fill 0.985 | 2@1c fill 0.985
+remainder_interpret L MP  seed 9: 2@1c fill 0.985 | 2@1c fill 0.985
+remainder_interpret L MP  seed 10: 2@1c fill 0.985 | 2@1c fill 0.985
+mixed_multiplication S IND seed 1: 8@2c fill 0.985
+mixed_multiplication S IND seed 2: 6@2c fill 0.949
+mixed_multiplication S IND seed 3: 6@2c fill 0.883
+mixed_multiplication S IND seed 4: 6@2c fill 0.932
+mixed_multiplication S IND seed 5: 6@2c fill 0.887
+mixed_multiplication S IND seed 6: 6@2c fill 0.889
+mixed_multiplication S IND seed 7: 8@2c fill 0.98
+mixed_multiplication S IND seed 8: 8@2c fill 0.974
+mixed_multiplication S IND seed 9: 9@3c fill 0.813
+mixed_multiplication S IND seed 10: 8@2c fill 0.955
+mixed_multiplication S MP  seed 1: 9@2c fill 0.933 | 6@2c fill 0.904
+mixed_multiplication S MP  seed 2: 10@2c fill 0.928 | 5@2c fill 0.848
+mixed_multiplication S MP  seed 3: 6@2c fill 0.901 | 7@2c fill 0.877
+mixed_multiplication S MP  seed 4: 9@2c fill 0.878 | 5@2c fill 0.933
+mixed_multiplication S MP  seed 5: 10@2c fill 0.928 | 9@2c fill 0.86
+mixed_multiplication S MP  seed 6: 6@2c fill 0.896 | 6@2c fill 0.904
+mixed_multiplication S MP  seed 7: 7@2c fill 0.865 | 6@2c fill 0.954
+mixed_multiplication S MP  seed 8: 6@2c fill 0.855 | 5@2c fill 0.96
+mixed_multiplication S MP  seed 9: 6@2c fill 0.93 | 8@2c fill 0.985
+mixed_multiplication S MP  seed 10: 6@2c fill 0.958 | 6@2c fill 0.941
+mixed_multiplication M IND seed 1: 6@2c fill 0.947
+mixed_multiplication M IND seed 2: 6@2c fill 0.965
+mixed_multiplication M IND seed 3: 6@2c fill 0.921
+mixed_multiplication M IND seed 4: 6@2c fill 0.981
+mixed_multiplication M IND seed 5: 5@2c fill 0.933
+mixed_multiplication M IND seed 6: 8@2c fill 0.985
+mixed_multiplication M IND seed 7: 6@2c fill 0.927
+mixed_multiplication M IND seed 8: 6@2c fill 0.985
+mixed_multiplication M IND seed 9: 6@2c fill 0.95
+mixed_multiplication M IND seed 10: 6@2c fill 0.944
+mixed_multiplication M MP  seed 1: 8@2c fill 0.894 | 5@2c fill 0.933
+mixed_multiplication M MP  seed 2: 7@2c fill 0.924 | 5@2c fill 0.933
+mixed_multiplication M MP  seed 3: 6@2c fill 0.985 | 8@2c fill 0.933
+mixed_multiplication M MP  seed 4: 8@2c fill 0.877 | 8@2c fill 0.921
+mixed_multiplication M MP  seed 5: 4@2c fill 0.933 | 8@2c fill 0.933
+mixed_multiplication M MP  seed 6: 6@2c fill 0.985 | 4@2c fill 0.88
+mixed_multiplication M MP  seed 7: 6@2c fill 0.932 | 8@2c fill 0.985
+mixed_multiplication M MP  seed 8: 4@2c fill 0.933 | 8@2c fill 0.926
+mixed_multiplication M MP  seed 9: 7@2c fill 0.913 | 5@2c fill 0.915
+mixed_multiplication M MP  seed 10: 6@2c fill 0.976 | 6@2c fill 0.864
+mixed_multiplication L IND seed 1: 3@2c fill 0.918
+mixed_multiplication L IND seed 2: 4@2c fill 0.89
+mixed_multiplication L IND seed 3: 4@2c fill 0.871
+mixed_multiplication L IND seed 4: 5@2c fill 0.861
+mixed_multiplication L IND seed 5: 5@2c fill 0.849 KEEP 1
+mixed_multiplication L IND seed 6: 5@2c fill 0.832
+mixed_multiplication L IND seed 7: 7@2c fill 0.9
+mixed_multiplication L IND seed 8: 3@2c fill 0.928
+mixed_multiplication L IND seed 9: 5@2c fill 0.921
+mixed_multiplication L IND seed 10: 4@2c fill 0.918
+mixed_multiplication L MP  seed 1: 7@2c fill 0.924 | 6@2c fill 0.924
+mixed_multiplication L MP  seed 2: 6@2c fill 0.924 | 5@2c fill 0.928
+mixed_multiplication L MP  seed 3: 4@2c fill 0.965 | 5@2c fill 0.928
+mixed_multiplication L MP  seed 4: 6@2c fill 0.924 | 4@2c fill 0.917
+mixed_multiplication L MP  seed 5: 4@2c fill 0.911 | 5@2c fill 0.887
+mixed_multiplication L MP  seed 6: 4@2c fill 0.98 | 4@2c fill 0.953
+mixed_multiplication L MP  seed 7: 5@2c fill 0.928 | 6@2c fill 0.955
+mixed_multiplication L MP  seed 8: 4@2c fill 0.928 | 4@2c fill 0.943
+mixed_multiplication L MP  seed 9: 6@2c fill 0.924 | 3@2c fill 0.928
+mixed_multiplication L MP  seed 10: 6@2c fill 0.985 | 7@2c fill 0.914
+counting_all S IND seed 1: 8@2c fill 0.985
+counting_all S IND seed 2: 8@2c fill 0.985
+counting_all S IND seed 3: 8@2c fill 0.985
+counting_all S IND seed 4: 8@2c fill 0.979
+counting_all S IND seed 5: 8@2c fill 0.985
+counting_all S IND seed 6: 8@2c fill 0.985
+counting_all S IND seed 7: 8@2c fill 0.975
+counting_all S IND seed 8: 8@2c fill 0.985
+counting_all S IND seed 9: 8@2c fill 0.985
+counting_all S IND seed 10: 8@2c fill 0.977
+counting_all S MP  seed 1: 8@2c fill 0.981 | 10@2c fill 0.985
+counting_all S MP  seed 2: 8@2c fill 0.971 | 8@2c fill 0.98
+counting_all S MP  seed 3: 8@2c fill 0.985 | 8@2c fill 0.984
+counting_all S MP  seed 4: 6@2c fill 0.953 | 8@2c fill 0.985
+counting_all S MP  seed 5: 6@2c fill 0.985 | 8@2c fill 0.985
+counting_all S MP  seed 6: 8@2c fill 0.984 | 8@2c fill 0.984
+counting_all S MP  seed 7: 8@2c fill 0.978 | 8@2c fill 0.985
+counting_all S MP  seed 8: 8@2c fill 0.985 | 8@2c fill 0.982
+counting_all S MP  seed 9: 8@2c fill 0.982 | 6@2c fill 0.966
+counting_all S MP  seed 10: 8@2c fill 0.985 | 8@2c fill 0.97
+counting_all M IND seed 1: 6@2c fill 0.943
+counting_all M IND seed 2: 8@2c fill 0.984
+counting_all M IND seed 3: 8@2c fill 0.985
+counting_all M IND seed 4: 8@2c fill 0.978
+counting_all M IND seed 5: 8@2c fill 0.936
+counting_all M IND seed 6: 6@2c fill 0.95
+counting_all M IND seed 7: 8@2c fill 0.985
+counting_all M IND seed 8: 8@2c fill 0.981
+counting_all M IND seed 9: 8@2c fill 0.985
+counting_all M IND seed 10: 8@2c fill 0.943
+counting_all M MP  seed 1: 6@2c fill 0.946 | 6@2c fill 0.961
+counting_all M MP  seed 2: 6@2c fill 0.972 | 6@2c fill 0.985
+counting_all M MP  seed 3: 8@2c fill 0.94 | 8@2c fill 0.982
+counting_all M MP  seed 4: 6@2c fill 0.985 | 8@2c fill 0.985
+counting_all M MP  seed 5: 6@2c fill 0.985 | 6@2c fill 0.973
+counting_all M MP  seed 6: 8@2c fill 0.985 | 8@2c fill 0.985
+counting_all M MP  seed 7: 6@2c fill 0.959 | 6@2c fill 0.985
+counting_all M MP  seed 8: 6@2c fill 0.979 | 8@2c fill 0.981
+counting_all M MP  seed 9: 8@2c fill 0.967 | 6@2c fill 0.968
+counting_all M MP  seed 10: 8@2c fill 0.984 | 6@2c fill 0.973
+counting_all L IND seed 1: 6@2c fill 0.975
+counting_all L IND seed 2: 6@2c fill 0.985
+counting_all L IND seed 3: 6@2c fill 0.957
+counting_all L IND seed 4: 6@2c fill 0.955
+counting_all L IND seed 5: 6@2c fill 0.97
+counting_all L IND seed 6: 6@2c fill 0.962
+counting_all L IND seed 7: 6@2c fill 0.964
+counting_all L IND seed 8: 6@2c fill 0.952 KEEP 1
+counting_all L IND seed 9: 6@2c fill 0.948
+counting_all L IND seed 10: 6@2c fill 0.94
+counting_all L MP  seed 1: 6@2c fill 0.965 | 6@2c fill 0.985
+counting_all L MP  seed 2: 6@2c fill 0.985 | 6@2c fill 0.968
+counting_all L MP  seed 3: 6@2c fill 0.985 | 6@2c fill 0.976
+counting_all L MP  seed 4: 8@2c fill 0.983 KEEP 1 | 6@2c fill 0.985
+counting_all L MP  seed 5: 6@2c fill 0.937 | 6@2c fill 0.928
+counting_all L MP  seed 6: 6@2c fill 0.936 KEEP 1 | 6@2c fill 0.972
+counting_all L MP  seed 7: 6@2c fill 0.985 | 8@2c fill 0.985 KEEP 1
+counting_all L MP  seed 8: 6@2c fill 0.985 | 6@2c fill 0.952
+counting_all L MP  seed 9: 8@2c fill 0.982 | 6@2c fill 0.985
+counting_all L MP  seed 10: 6@2c fill 0.967 | 6@2c fill 0.957

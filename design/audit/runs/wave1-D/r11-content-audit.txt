@@ -1,0 +1,69 @@
+note composing/ten_frame_build  "Build a Number on a Ten Frame"
+       . [variety] 10 distinct items in 240; a page of 6 is likely to repeat one
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+note composing/odd_even  "Odd or Even? (Visual)"
+       . [variety] 20 distinct items in 240; a page of 6 is likely to repeat one
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+       . [unaudited] NOTHING in this skill could be checked against its name: no count band, no declared representation, no countable picture and no readable equation. It is listed as passing only because there is nothing here to fail it.
+       . [misfiled] sits in the composing category but its generator is the patterns one (skillCategoryOverride in generate-question.js). Report only - moving it would re-point every saved share code.
+note composing/whole_as_fraction  "Whole Numbers as Fractions (Visual)"
+       . [variety] 8 distinct items in 240; a page of 6 is likely to repeat one
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+       . [unaudited] NOTHING in this skill could be checked against its name: no count band, no declared representation, no countable picture and no readable equation. It is listed as passing only because there is nothing here to fail it.
+       . [misfiled] sits in the composing category but its generator is the fractions one (skillCategoryOverride in generate-question.js). Report only - moving it would re-point every saved share code.
+note composing/mixed_composing  "Mixed Number Sense"  [mixed pool]
+       . [mixed-pool] deliberately mixed: draws from 16 sibling skills in composing, whose names together declare +
+       . [cell-shape] mixed practice, so 9 different cell shapes on one page: base10 19%, picture:number 36%, chart 10%, tenframe 13%, select 6%, oddeven 7%, tiles 3%, rods 4%, picture:text 2% (base10-build, (none), hundreds-chart-fill, ten-frame-build, multi-select, odd-even, compose-fraction-tiles, tens-foundation)
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+note counting_mixed/counting_all  "All Counting & Cardinality"
+       . [cell-shape] mixed practice, so 8 different cell shapes on one page: picture:number 43%, picture:text 17%, chart 4%, base10 14%, tenframe 10%, select 6%, oddeven 3%, rods 3% ((none), hundreds-chart-fill, base10-build, ten-frame-build, multi-select, odd-even, tens-foundation)
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+note addition/add_sub_10s  "Add & Subtract by 10s"
+       . [variety] 20 distinct items in 240; a page of 6 is likely to repeat one
+note addition/number_families_add  "Number Families (Add & Subtract)"
+       . [variety] 96 distinct items in 240; a page of 6 is likely to repeat one
+ ok  subtraction/missing_add_sub  "Missing Numbers (+/−)"
+note multiplication/dot_array_mult  "Dot Array Multiplication (B&W)"
+       . [variety] 78 distinct items in 240; a page of 6 is likely to repeat one
+note multiplication/mult_comparison  "Times as Many Word Problems (Visual)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+note multiplication/number_families_mult  "Number Families (Multiply & Divide)"
+       . [variety] 16 distinct items in 240; a page of 6 is likely to repeat one
+note multiplication/mixed_multiplication  "Mixed Multiplication"  [mixed pool]
+       . [mixed-pool] deliberately mixed: draws from 26 sibling skills in multiplication, whose names together declare × ÷ +
+       . [cell-shape] mixed practice, so 3 different cell shapes on one page: across 5%, model 40%, family 12%, column 9% (mult-facts-horizontal, area-model-mult-hard, story-work, dot-array-visual, mult-placeholder-zero, mult-properties, number-family-mult-div, mult-grid, mult-facts-vertical, area-model-mult, repeated-add-mult, column-mult, count-row, hop-line, equal-groups-decide, fact-family-mult-div, arrays-groups)
+       . [notation-mix] writes the same item stacked AND across: column 9%, across 5%
+       . [unknown-format] print formats this audit has no cell shape for: story-work, mult-placeholder-zero, repeated-add-mult, column-mult, equal-groups-decide (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 130 items (fine unless this step teaches the zero case)
+note division/remainder_interpret  "Interpret the Remainder (Word Problems)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note division/long_div_2digit  "Divide by 2-Digit Numbers (Visual)"
+       . [unknown-format] print formats this audit has no cell shape for: long-div-kit (add them to SHAPE_OF)
+note division/missing_mult_div  "Missing Factors (×/÷)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note division/div_zero_in_quotient  "Zero in the Quotient"
+       . [unknown-format] print formats this audit has no cell shape for: short-div-kit (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+
+Failures by class:
+     0  (none)
+
+Notes by class:
+     7  variety
+     5  not-checked
+     5  unknown-format
+     4  zero-facts
+     3  cell-shape
+     2  unaudited
+     2  misfiled
+     2  mixed-pool
+     1  notation-mix
+
+By family:
+  operations   11 skills, 0 failing
+  k2            5 skills, 0 failing
+
+Coverage: 2 skills where NOTHING could be checked against the name (composing/odd_even, composing/whole_as_fraction); 5 more with at least one check that could not be applied.
+
+ws-content-audit: OK (16 odd_even,whole_as_fraction,div_zero_in_quotient,ten_frame_build,dot_array_mult,add_sub_10s,missing_mult_div,mixed_multiplication,mixed_composing,counting_all,long_div_2digit,mult_comparison,remainder_interpret,number_families_add,number_families_mult,missing_add_sub skills, 240 items each, Max Number 100, 0 failing, 2 mixed pools held to their pool union, 31 notes)

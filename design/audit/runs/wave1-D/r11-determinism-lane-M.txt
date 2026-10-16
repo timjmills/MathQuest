@@ -1,0 +1,17 @@
+ok   composing:odd_even M
+ok   composing:whole_as_fraction M
+ok   division:div_zero_in_quotient M
+ok   composing:ten_frame_build M
+ok   multiplication:dot_array_mult M
+ok   addition:add_sub_10s M
+ok   division:missing_mult_div M
+ok   multiplication:mixed_multiplication M
+ok   composing:mixed_composing M
+ok   counting_mixed:counting_all M
+ok   division:long_div_2digit M
+ok   multiplication:mult_comparison M
+ok   division:remainder_interpret M
+ok   addition:number_families_add M
+ok   multiplication:number_families_mult M
+ok   subtraction:missing_add_sub M
+ws-sheet-determinism: OK

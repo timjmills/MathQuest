@@ -103,4 +103,4 @@ ok   L IND add_sub_10s 2 pages key={"on":true,"placement":"after-page","style":"
 ok   L IND add_sub_10s 2 pages key={"on":true,"placement":"after-page","style":"short"} pages=2 order=PKPK ["Lesson 1, page 1 of 2:16","Lesson 1, page 2 of 2:16"]
 ok   L IND add_sub_10s 2 pages key={"on":true,"placement":"after-page","style":"copy","newSheet":true} pages=2 order=P_K_P_K_ 
 ok   L IND add_sub_10s 2 pages key={"on":false} pages=2 order=PP 
-key-probe: OK
+ws-key-letters: OK

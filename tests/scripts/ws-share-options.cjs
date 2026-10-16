@@ -291,6 +291,8 @@ async function e2e() {
         const res = await window.buildSheet({ role: 'more-practice', sections: [{ skills, columns: 'auto' }], letters: ['A', 'B'], size: 'standard', look: 'ican', paper: 'A4', key: true, seed: 4242 });
         const div = document.createElement('div');
         div.innerHTML = res.pupilHtml;
+        // CL-9a numbers every problem with a tab: its number is not part of the problem ("1" + "7 × 2")
+        div.querySelectorAll('[data-ws-label]').forEach((e) => e.remove());
         const txt = div.textContent.replace(/\s+/g, ' ');
         return { pages: res.pageCount, items: txt.match(/\d+\s*×\s*\d+/g) || [], optsSent: skills.map(s => s.skillId + ':' + JSON.stringify(s.opts)) };
     });
@@ -303,6 +305,7 @@ async function e2e() {
         const res = await window.buildSheet({ role: 'more-practice', sections: [{ skills: [{ categoryId: 'multiplication', skillId: 'mult_facts', opts: {} }], columns: 'auto' }], letters: ['A', 'B'], size: 'standard', look: 'ican', paper: 'A4', key: false, seed: 4243 });
         const div = document.createElement('div');
         div.innerHTML = res.pupilHtml;
+        div.querySelectorAll('[data-ws-label]').forEach((e) => e.remove());
         return div.textContent.replace(/\s+/g, ' ').match(/\d+\s*×\s*\d+/g) || [];
     });
     check(resetRow.some(t => MULT_OK(t) === false), `buildSheet with explicit default options still drilled only x7/x8: ${resetRow.join(', ')}`);
@@ -343,10 +346,15 @@ async function e2e() {
     // Print opens the Print worksheets screen, with the set's options on its skills ----
     await tp.evaluate(() => { window.printSections = []; window.printFromQueue(); });
     await waitFor(tp, () => !!document.querySelector('#teacherMain [data-screen="print"].is-active'), 10000, 'Print screen');
-    await waitFor(tp, () => { try { return document.getElementById('tvPreviewFrame').contentDocument.querySelectorAll('.ws-cell').length > 0; } catch (e) { return false; } }, 30000, 'Print screen preview');
+    // the preview is read once its LAST build has loaded (the screen rebuilds as it settles; a
+    // frame read between two builds has no body yet)
+    await waitFor(tp, () => { try { const st = document.getElementById('tvStage'); const d = document.getElementById('tvPreviewFrame').contentDocument; return st && st.dataset.state === 'ready' && d && d.body && d.querySelectorAll('.ws-cell').length > 0; } catch (e) { return false; } }, 60000, 'Print screen preview');
     const screenPrinted = await tp.evaluate(() => {
         const d = document.getElementById('tvPreviewFrame').contentDocument;
-        return (d.body.innerText.replace(/\s+/g, ' ').match(/\d+\s*×\s*\d+/g) || []);
+        const body = d.body.cloneNode(true);
+        body.querySelectorAll('[data-ws-label]').forEach((e) => e.remove());
+        d.documentElement.appendChild(body); const text = body.innerText; body.remove();
+        return (text.replace(/\s+/g, ' ').match(/\d+\s*×\s*\d+/g) || []);
     });
     const summaries = await tp.evaluate(() => [...document.querySelectorAll('#teacherMain [data-screen="print"] .tv-set-item')].map(e => e.textContent.replace(/\s+/g, ' ').trim()));
     check(summaries.some(t => /Multiplication Facts/.test(t) && /7/.test(t) && /8/.test(t)), `Print screen: the set's x7/x8 options are not on the skill: ${JSON.stringify(summaries)}`);

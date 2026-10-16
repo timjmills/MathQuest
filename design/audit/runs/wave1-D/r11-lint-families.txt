@@ -1,0 +1,6 @@
+S independent: ws-print-lint: OK (4 document(s), source kit; 0 finding(s) in 0 document(s))
+S more-practice: ws-print-lint: OK (4 document(s), source kit; 0 finding(s) in 0 document(s))
+M independent: ws-print-lint: OK (4 document(s), source kit; 0 finding(s) in 0 document(s))
+M more-practice: ws-print-lint: OK (4 document(s), source kit; 0 finding(s) in 0 document(s))
+L independent: ws-print-lint: OK (4 document(s), source kit; 0 finding(s) in 0 document(s))
+L more-practice: ws-print-lint: OK (4 document(s), source kit; 0 finding(s) in 0 document(s))
