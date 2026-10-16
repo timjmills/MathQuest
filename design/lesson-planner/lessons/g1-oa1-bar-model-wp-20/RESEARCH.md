@@ -135,7 +135,7 @@ Chant: **"Parts below. Whole on top. Add the parts."** This chant does help: it 
 
 T2 routine table: see §B (Check it with: step 1 → Guided cell 1. Step 2 → **Check Question**, exit slip b. Step 3 → Prereq d. Step 4 → Independent a–d).
 
-**How to teach:** cubes first. Make the two parts in two colours of cube... no: two *trains* of cubes (black and white only on paper; real cubes may be any colour) on the printed bar mat. Push them together under the top box. Then draw. Model the I Do story, then the Another-example stories (equal parts; small part first). Fade: Guided ★, Independent ★★, last practice row ★★★.
+**How to teach:** cubes first. Make the two parts as two trains of cubes on the printed bar mat (real cubes may be any colour; paper stays black and white). Push them together under the top box. Then draw. Model the I Do story, then the Another-example stories (equal parts; small part first). Fade: Guided ★, Independent ★★, last practice row ★★★.
 
 **Common mistakes**
 
