@@ -100,13 +100,14 @@
     "rows": "1W",
     "times": "1Z",
     "divForm": "5N",
-    "spaces": "1X"
+    "spaces": "1X",
+    "answerSlot": "0R"
   },
   "blocks": {
     "0": {
       "owner": "P9 place value (second wave)",
       "status": "assigned",
-      "keys": "0A-0Q"
+      "keys": "0A-0R"
     },
     "1": {
       "owner": "P10 time and money",
@@ -676,6 +677,10 @@
     "spaces": {
       "box": "B",
       "line": "L"
+    },
+    "answerSlot": {
+      "line": "L",
+      "hto": "H"
     }
   },
   "scalarOnly": {

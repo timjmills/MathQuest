@@ -153,6 +153,8 @@ function normaliseRequest(req = {}) {
         latticeN: [4, 6, 8, 10].includes(Number(req.latticeN)) ? Number(req.latticeN) : 0,
         // A lesson's Mixed page (lessons r3): its first skill holds at least half the placed items.
         leadHalf: !!req.leadHalf,
+        // The detailed lesson maker: no Steps strip on the lesson's Mixed page (critic D18).
+        mixedStrip: req.mixedStrip === false ? false : undefined,
         // The detailed lesson maker (lessons/detailed/*): a lesson's chart / sheet data in the
         // prereqs.js LESSONS shape, used INSTEAD of lessonFor() when given (null otherwise, so
         // every standard lesson renders exactly as before).
@@ -329,6 +331,8 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
             // options - the packet's; the last try takes what it gets.
             const skR = edgeAt >= 0 ? Object.assign({}, sk, { edge: true }, edgeWant ? { edgeTest: edgeWant } : {}) : sk;
             if (k < tries && !refAccepts(skR, cand, key, seen, kept)) continue;
+            // (a case the last row WANTS is kept for it: no other place of the page deals it)
+            if (k < tries && edgeAt < 0 && sk.edgeLast && Array.isArray(sk.edgeLast.wants) && sk.edgeLast.wants.some((w) => w && LESSON_CASE_TESTS[w] && LESSON_CASE_TESTS[w]({ q: cand }))) continue;
             q = cand;
             if (!seen.has(signature(cand))) break;
         }
@@ -336,6 +340,8 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // A lesson's practice page (lessons r1): `check` on the skill ref puts the Check line
         // ("Check: add back") under every subtraction stack. Not a skill option - the page's.
         if (sk.check && q.cell && q.cell.template === 'stack') q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, { check: true }) });
+        // (`sectionLabel` on the ref: the Mixed page names the item's band by it - the detailed lesson maker)
+        if (sk.sectionLabel) q = Object.assign({}, q, { sectionLabel: String(sk.sectionLabel) });
         seen.add(signature(q));
         refRecord(sk, q, key, seen, kept);
         kept.set(key, itemIndex + 1);
@@ -2647,6 +2653,7 @@ function dlItemVars(q, d) {
     const base = {
         n: n === null ? '' : n, ans: dlAns(q), text: refText(q), a: ops[0], b: ops[1], op: composeGlyphOf(composeOpOf(q)),
         say: composeOralFrameOf({ q }, { fill: true }) || '', words: n !== null && n >= 0 && n <= 1000 ? numberWords(n) : '',
+        Words: n !== null && n >= 0 && n <= 1000 ? numberWords(n).replace(/^./, (c) => c.toUpperCase()) : '',
     };
     let extra = {};
     try { extra = typeof d.vars === 'function' ? d.vars(q, base) || {} : {}; } catch (e) { extra = {}; }
@@ -2673,7 +2680,8 @@ function dlCheckQuestion(q, d) {
         if (r) right = String(r.display);
         for (const w of all) if (!w.correct && w.display !== undefined && !wrongs.some((x) => x.display === String(w.display))) wrongs.push({ display: String(w.display), misconception: w.misconception || '' });
     }
-    for (let s = 0; p && !wrongs.length && typeof p.wrongAnswer === 'function' && s < 40 && wrongs.length < 6; s++) {
+    const fromAll = wrongs.length > 0;
+    for (let s = 0; p && !fromAll && typeof p.wrongAnswer === 'function' && s < 40 && wrongs.length < 6; s++) {
         let w = null;
         try { w = p.wrongAnswer(Object.assign({}, q, { seed: s })); } catch (e) { w = null; }
         if (!w || w.display === undefined) continue;
@@ -2746,7 +2754,8 @@ async function buildDetailedLesson(req = {}) {
     for (const c of d.ccss) if (!ccssOf(c)) notes.push(`Tag check: ${c} is not a SKILL_STANDARDS tag of the lesson's skills: dropped.`);
     for (const c of d.ee) if (!tags.ee.includes(c)) notes.push(`Tag check: ${c} is not an EE of the lesson's skills: dropped.`);
     // V22 §8.7: the full code on every page (owner Q5, 2026-10-16).
-    const tagLine = lessonTagLine({ skillId: d.skill.skillId, grade: d.grade, ccss: tags.ccss, ee: tags.ee });
+    // (the pack is named by its lesson id, not one of its skills - critic N2)
+    const tagLine = lessonTagLine({ skillId: d.id, grade: d.grade, ccss: tags.ccss, ee: tags.ee });
     const year = req.year || new Date().getFullYear();
     const tab = (id) => [`Level ${d.level}`, d.strand, id];
     const header = (id, extra = {}) => Object.assign({ title: d.title, footerLeft: tagLine, tab: tab(id), year }, extra);
@@ -2843,26 +2852,57 @@ async function buildDetailedLesson(req = {}) {
     const exitGen = exitD.map((x, i) => ({ q: x.q, skill: Object.assign({}, d.exit[i].ref) }));
     const exitItems = exitGen.map((g) => hostItem(g, 0, 'L'));
     measureItems(exitItems, { size: 'L', look: 'ican', colsList: [1, 2] });
-    const fits2 = exitItems.every((it) => !it.measured || !it.measured[2] || it.measured[2].fits !== false);
-    const exCols = fits2 ? 2 : 1;
-    const hOf = (it) => (it.measured && it.measured[exCols] && Number.isFinite(it.measured[exCols].hMm) ? it.measured[exCols].hMm : 40);
-    const exRows = Math.ceil(exitItems.length / exCols);
-    // The half's body: 186 mm live - its header (26) - instruction (9) - Say (13) - self row (12) - footer (9).
-    // (one 9 mm instruction per run of items that share one: critic D14's both-chunk slip)
-    const exInstrs = d.exit.reduce((a, e, i) => a + (i === 0 || (e.instr || '') !== (d.exit[i - 1].instr || '') ? 1 : 0), 0);
-    const exAvail = (186 - 26 - 9 * exInstrs - (d.exitSay ? 13 : 0) - 12 - 9) / exRows;
-    const exOwn = Math.max(...exitItems.map(hOf));
-    // The cells take the half (V22 §8.12.2), up to where an empty band would reach 30 % (H13).
-    const exCellH = Math.max(exOwn, Math.min(exOwn * 1.65, exAvail));
-    if (!fits2) notes.push('Exit slip: the items do not fit two across a 132.5 mm half; printed one across.');
-    const exitPlanItems = exitItems.map((it, i) => Object.assign(composePlanItem(it, { cols: exCols, level: 0 }), d.exit[i].instr ? { instr: d.exit[i].instr } : {}));
+    // GROUPS (critic D14: one slip, both chunks): a run of items of one skill and one instruction.
+    // Each group takes two across when all its items fit a 66 mm column, else one; the groups share
+    // the half's body by their own heights (up to 1.65x, H13). A group repeats the instruction
+    // strip only when its instruction differs from the group above.
+    const exGroups = [];
+    exitItems.forEach((it, i) => {
+        const e = d.exit[i], last = exGroups[exGroups.length - 1];
+        const k = `${e.ref.categoryId}:${e.ref.skillId}|${e.instr || d.exitInstruction}`;
+        if (last && last.k === k) last.idx.push(i); else exGroups.push({ k, instr: e.instr || d.exitInstruction, idx: [i] });
+    });
+    for (const g of exGroups) {
+        const its = g.idx.map((i) => exitItems[i]);
+        g.cols = its.every((it) => !it.measured || !it.measured[2] || it.measured[2].fits !== false) ? 2 : 1;
+        g.rows = Math.ceil(its.length / g.cols);
+        g.own = Math.max(...its.map((it) => (it.measured && it.measured[g.cols] && Number.isFinite(it.measured[g.cols].hMm) ? it.measured[g.cols].hMm : 40)));
+        if (g.cols === 1 && its.length > 1) notes.push('Exit slip: a group of items does not fit two across a 132.5 mm half; printed one across.');
+    }
+    exGroups.forEach((g, j) => { g.strip = j === 0 || g.instr !== exGroups[j - 1].instr; });
+    // The half's body: 186 mm live - its header (26) - instructions (9 each) - Say (13) - self row (12) - footer (9).
+    const exAvailAll = 186 - 26 - 9 * exGroups.filter((g) => g.strip).length - (d.exitSay ? 13 : 0) - 12 - 9;
+    const exOwnAll = exGroups.reduce((a, g) => a + g.rows * g.own, 0);
+    // (a one-across group of short sums grows least: its wide cells read empty soonest, H13)
+    const capOf = (g) => (g.cols === 1 ? 1.12 : 1.65);
+    let spare = Math.max(0, exAvailAll - exOwnAll);
+    for (const g of exGroups) g.cellH = g.own;
+    for (let pass = 0; pass < 3 && spare > 0.5; pass++) {
+        const open = exGroups.filter((g) => g.cellH < g.own * capOf(g) - 0.01);
+        const w = open.reduce((a, g) => a + g.rows * g.own, 0);
+        if (!w) break;
+        let used = 0;
+        for (const g of open) { const add = Math.min(g.own * capOf(g) - g.cellH, spare * (g.rows * g.own / w) / g.rows); g.cellH += add; used += add * g.rows; }
+        spare -= used;
+    }
+    const exCols = Math.max(...exGroups.map((g) => g.cols));
+    const exitPlanItems = exitItems.map((it, i) => {
+        const g = exGroups.find((x) => x.idx.includes(i));
+        return composePlanItem(it, { cols: g.cols, level: 0 });
+    });
     const exVars = exitD.map((x) => dlItemVars(x.q, d));
     const sayV = sayD ? dlItemVars(sayD.q, d) : null;
     const p6Plan = exitSlipPlan({
         items: exitPlanItems, instr: d.exitInstruction,
-        say: d.exitSay ? fillPlaceholders(d.exitSay, { say: sayV, exit: exVars }) : '', tab: tab('Exit slip'), title: d.title, cellH: exCellH, cols: exCols,
+        groups: exGroups.map((g) => ({ instr: g.strip ? g.instr : '', items: g.idx.map((i) => exitPlanItems[i]), start: g.idx[0] + 1, cols: g.cols, cellH: g.cellH })),
+        say: d.exitSay ? fillPlaceholders(d.exitSay, { say: sayV, exit: exVars }) : '', tab: tab('Exit slip'), title: d.title, cellH: exGroups[0].cellH, cols: exCols,
     }, { header: { name: false, date: false, score: false, tab: false, title: '' }, footer: { left: tagLine, right: `Form A · seed ${seed}`, year }, seed, form: 'A' });
     const p6 = renderPlan(p6Plan, { key: true });
+    // INK-31 (critic D20): the keys the detailed role draws itself mark their answers the way every
+    // other key does (key-short.js tagKeyAnswers: what differs from the pupil page takes the key ink);
+    // the exit slip key's second half reads "Answer Key" too (critic D21).
+    for (const r of [p1, p5, p6]) r.keyPages = (r.keyPages || []).map((k, i) => tagKeyAnswers(r.pupilPages[i] || '', k));
+    p6.keyPages = p6.keyPages.map((k) => String(k).split('<div class="ws-field name">Name<i></i></div>').join(`<div class="ws-field name"><span data-ws-key="name">Answer Key</span><i></i></div>`));
 
     // ---------------------------------------------------------------- the pupil packet and its keys
     const sheetOf = (html) => (String(html).match(/data-ws-sheet="([^"]+)"/) || [])[1] || '';
@@ -2960,8 +3000,8 @@ async function buildDetailedLesson(req = {}) {
             pNo++;
             const its = cs.filter((c) => c.page === pg);
             const last = Math.max(...its.map((c) => c.row));
-            glance.push({ page: `P4 Practice ${pNo}, rows 1–${last}`, answers: its.filter((c) => c.row < last).map((c) => dlAns(c.q)).join(' · '), fade: '★★' });
-            glance.push({ page: `P4 Practice ${pNo}, last row`, answers: its.filter((c) => c.row === last).map((c) => dlAns(c.q)).join(' · '), fade: '★★★' });
+            glance.push({ page: `P4-${pNo} Practice, rows 1–${last}`, answers: its.filter((c) => c.row < last).map((c) => dlAns(c.q)).join(' · '), fade: '★★' });
+            glance.push({ page: `P4-${pNo} Practice, last row`, answers: its.filter((c) => c.row === last).map((c) => dlAns(c.q)).join(' · '), fade: '★★★' });
         }
     }
     if (mixedNo) glance.push({ page: 'P4 Mixed', answers: cellsOf(partPlan('mixed')).map((c) => dlAns(c.q)).join(' · '), fade: '★★' });
@@ -2972,7 +3012,7 @@ async function buildDetailedLesson(req = {}) {
         const a = prereqAtoms[Math.max(0, p.atom - 1)] || d.atoms[0];
         // (the item letters P0 prints, critic D10; the route the description names - a site lesson
         // or skill, or Appendix H's CCSS-code form - critic D22)
-        return { q: `${V.pre[i].letters}. ${(String(a.skill).split(':')[0])}`, atom: `${a.type} · Pre-requisite (atom ${p.atom})`, lesson: p.lesson.id ? `${p.lesson.id} ${p.lesson.title}` : p.lesson.title };
+        return { q: `${V.pre[i].letters}. ${(String(a.skill).split(':')[0])}`, atom: `${a.type}, atom ${p.atom}`, lesson: p.lesson.id ? `${p.lesson.id} ${p.lesson.title}` : p.lesson.title };
     });
 
     // ---------------------------------------------------------------- teacher pages

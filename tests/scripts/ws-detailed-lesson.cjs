@@ -169,7 +169,7 @@ function measure(LIBRARY) {
         P.halfW = pg.classList.contains('dl-land') ? [...pg.querySelectorAll('.dl-halves > .mq-rowcol')].filter((x) => x.querySelector('.dl-half')).map((x) => Math.round(x.getBoundingClientRect().width / MM * 10) / 10) : [];
         P.sizeMm = [Math.round(pg.getBoundingClientRect().width / MM), Math.round(pg.getBoundingClientRect().height / MM)];
         // E26: chart step panels (the lesson role's state cells) each show a grey mark
-        P.panels = id === 'P2' || id === 'P2-key' ? [...pg.querySelectorAll('.mq-cstatecell')].map((c) => [...c.querySelectorAll('*')].some((e) => {
+        P.panels = /^P2[a-z]?(-key)?$/.test(id) ? [...pg.querySelectorAll('.mq-cstatecell')].map((c) => [...c.querySelectorAll('*')].some((e) => {
             const cs = getComputedStyle(e); if (cs.display === 'none') return false;
             return [cs.color, cs.borderTopColor, cs.fill, cs.stroke, cs.outlineColor].some((v) => rgb(v) === '#949494') && (e.textContent.trim() || e instanceof SVGElement || parseFloat(cs.borderTopWidth) > 0 || parseFloat(cs.outlineWidth) > 0); })) : [];
         const tables = [...pg.querySelectorAll('table.tt')];
@@ -179,6 +179,12 @@ function measure(LIBRARY) {
         if (id === 'T1') P.flow = (pg.querySelector('.dl-flow') || {}).textContent || '';
         const glance = tables.find((tb) => /Fade/.test(tb.querySelector('tr').textContent));
         P.fadeRows = glance ? [...glance.querySelectorAll('tbody tr')].map((tr) => /★/.test(tr.lastElementChild.textContent)) : null;
+        // E29 (critic D10): the teacher pages' text, and each key cell's letter and answer marks
+        if (teacher) P.text = (pg.querySelector(':scope > .ws-body') || pg).innerText.replace(/\s+/g, ' ');
+        if (key) P.keyCells = [...pg.querySelectorAll('.ws-cell')].filter((c) => !c.closest('.dl-copy, .dl-thumb')).map((c) => ({
+            letter: ((c.querySelector('[data-ws-label], .ws-letter') || {}).textContent || '').trim().replace(/\.$/, ''),
+            ans: [...c.querySelectorAll('[data-ws-key-ans]')].map((e) => e.textContent.trim()).join(' '),
+        })).filter((x) => x.letter);
         out.pages.push(P);
     }
     const pj = document.getElementById('v21-pool'); out.pool = pj ? JSON.parse(pj.textContent) : null;
@@ -301,6 +307,36 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
         e24b = { ok: !probs.length && prPages.length > 0, msg: probs.length ? probs.join('; ') : `${prPages.length} Practice pages: last rows all edge cases (a 0 place, a teen ending, 1000); no twin answers on any page` };
     }
     row('E24b', 'Practice last row only edge cases (★★★); LR-6 no twin answers on a page', e24b.msg, e24b.ok);
+    // E29 (critic D10): every item letter a teacher page quotes exists on the pupil page it names,
+    // and every "x. answer" it quotes is that cell's key answer (digits compared). Section 1 and the
+    // routing table name P0; Section 10 names P6.
+    {
+        const probs = []; let n = 0;
+        const digits = (t) => String(t).replace(/[^0-9]/g, '');
+        const cellsOf = (id) => ((pages.find((p) => p.id === `${id}-key`) || {}).keyCells || []);
+        const sectionText = (num) => { const all = pages.filter((p) => p.teacher).map((p) => p.text || '').join(' ');
+            const m = all.match(new RegExp(`Section ${num} ·([\\s\\S]*?)(?=Section \\d|Prerequisite routing:|$)`)); return m ? m[1] : ''; };
+        const claims = (text, id) => {
+            const cs = cellsOf(id);
+            for (const m of text.matchAll(/(?:^|[\s:·;])([a-h])\. ([0-9][0-9 +|,a-z]*?)(?= ·|\.(?:\s|$)|;)/g)) {
+                n++;
+                const c = cs.find((x) => x.letter === m[1]);
+                if (!c) probs.push(`${id} has no item ${m[1]}`);
+                else if (digits(c.ans) !== digits(m[2])) probs.push(`${id} ${m[1]}: teacher says ${m[2]}, key ${c.ans}`);
+            }
+        };
+        claims(sectionText(1), 'P0');
+        claims(sectionText(10), 'P6');
+        const t6 = pages.filter((p) => /^T6/.test(p.id)).map((p) => p.text || '').join(' ');
+        const rt = (t6.match(/Prerequisite routing:([\s\S]*?)Accepted answers:/) || [])[1] || '';
+        const p0 = cellsOf('P0').map((x) => x.letter);
+        for (const m of rt.matchAll(/\b([a-h])(?:–([a-h]))?\. /g)) {
+            n++;
+            const lo = m[1].charCodeAt(0), hi = (m[2] || m[1]).charCodeAt(0);
+            for (let k = lo; k <= hi; k++) if (!p0.includes(String.fromCharCode(k))) probs.push(`routing names ${String.fromCharCode(k)}, P0 has no such item`);
+        }
+        row('E29', 'Every item letter and answer a teacher page quotes is on the pupil page it names (T3 §1, T5 §10, T6 routing)', probs.length ? probs.slice(0, 6).join('; ') : `${n} quotes, all on their pages`, n > 0 && !probs.length);
+    }
     const p4 = pages.filter((p) => /^P4/.test(p.id)), extra = p4.flatMap((p) => p.bandLabels.filter((t) => /^(Say|Rule|Remember):/.test(t)).map((t) => `${p.id} ${t}`));
     row('E28', 'No Say:, Rule: or Remember: band on a Practice page', `${p4.length} Practice / Mixed pages; extra bands ${extra.join(', ') || 0}`, p4.length > 0 && !extra.length);
     row('E27', 'Counters in rows of at most 5', pupil.flatMap((p) => p.perRow.map((n) => `${p.id}:${n}`)).join(', ') || 'no counters', pupil.every((p) => p.perRow.every((n) => n <= 5)));

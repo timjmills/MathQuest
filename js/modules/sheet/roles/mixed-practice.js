@@ -175,7 +175,7 @@ export function plan(input = {}) {
     const spare = p.pages > 1 ? 0 : Math.max(0, m.budget - used - (input.fill ? 1 : 0));
     // The spare height is shared into the shelves only as far as a cell keeps its drawing filling
     // it (H13: never an empty band of 30% of a cell): a tenth of a shelf's own height at most.
-    const growOf = (sh) => (shelves.length ? (input.fill ? Math.min(sh.h * 0.35, spare / shelves.length) : Math.min(12, sh.h * 0.1, spare / shelves.length)) : 0);
+    const growOf = (sh) => (shelves.length ? ((input.fill || input.growLast) ? Math.min(sh.h * 0.35, spare / shelves.length) : Math.min(12, sh.h * 0.1, spare / shelves.length)) : 0);
     for (const [i, sh] of shelves.entries()) {
         const grow = growOf(sh);
         const firstOfSkill = i === 0 || shelves[i - 1].id !== sh.id;
@@ -192,7 +192,7 @@ export function plan(input = {}) {
         const first = sh.items.find((it) => !it.anchor);
         const skill = (input.skills || []).find((s) => first && first.q && s.skillId === first.q.skillId) || {};
         // `sectionLabel` on the skill ref (the detailed lesson maker, critic D17): the band's own name.
-        const title = skill.sectionLabel || STRAND_BY_CATEGORY[skill.categoryId] || skillWords(skill).strand || 'Practice';
+        const title = (first && first.q && first.q.sectionLabel) || STRAND_BY_CATEGORY[skill.categoryId] || skillWords(skill).strand || 'Practice';
         const pupil = sh.items.filter((it) => !it.anchor);
         const grid = gridPart(sh.items.map((it) => (it.anchor ? anchorPlanItem(it, Math.min(sh.k, 6)) : planItem(it, { cols: Math.min(sh.k, 6) }))), { cols: sh.k, rows: 1, cellH: sh.h + grow, labels, start });
         if (joins) {

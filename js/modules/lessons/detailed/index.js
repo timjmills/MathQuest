@@ -24,7 +24,14 @@
 //                 It is passed to the standard lesson role as `lessonData`; prereqs.js is untouched.
 //   pool, edgeTest {kind: 'range', lo, hi} | {kind: 'list', items}; a roles/lesson.js CASE_TESTS name
 //                 (the ★★★ last row and the pool's `edge` list). Absent pool: the pack's own places.
-//   practiceSheets [{skill?, shape?: [count, cols]}]  each Practice page its own sheet ({} = the lesson skill)
+//   practiceSheets [{skill?, shape?: [count, cols], chunk?, edgeLast?: {per, cols, wants: [case]}}]
+//                 each Practice page its own sheet ({} = the lesson skill); `chunk` puts that chunk's Steps
+//                 on it; `edgeLast.wants` names the case of each ★★★ place (a wanted case is kept for it)
+//   chunks        [{id: 'a', name}, {id: 'b', name, skill, lessonData}]   V22 Chunked Flow: chunk a is the
+//                 lesson's own skill + lessonData; every further chunk prints its own anchor chart (P2b)
+//                 and lesson sheet (P3b); sections '5a' '6a' '5b' '6b' script them ({b.chart.*}, {b.we.i.*})
+//   caseNames     {caseTest: words}                    names the cases {p4.last} reads (T5 Watch)
+//   board, routeNote, slotRows                         T2 Board line, T2b routing note, T2b extra slot shapes
 //   vars(q, base) -> {...}                             the lesson's own placeholder names for one dealt item
 //                 (base = the kit's readers: n, ans, a, b, op, say, words, text); eqParts / eqOp set
 //                 the word problem's equation frame
@@ -54,6 +61,9 @@
 //   {ns.A.i.*} {ns.B.i.*}         Number sense bands     {ret.i.*} {ret.i.ask}  spaced retrieval
 //   {cq.n} {cq.A..D} {cq.right} {cq.why}   the Check Question (options from the provider's wrong answers)
 //   {wp.*} {wp.eq}  the word problem   {exit.i.*}  the exit slip   {say.*}  the exit slip's fresh Say item
+//   {pre.i.letters} {pre.i.list} {p0.list}   P0's item letters and answers, read from its plan
+//   {p4.last}       every Practice page's last row, each number with its case (caseNames)
+//   {<chunk>.chart.*} {<chunk>.we.i.*}   a chunk's own chart and Guided items; {x.Words} = capitalised name
 // `fillPlaceholders` throws on an unknown name, so a typo never prints.
 //
 // ADDING A LESSON: write <id>.js in this folder, add it to DETAILED_LESSONS below, run

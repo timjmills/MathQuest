@@ -119,7 +119,8 @@ export function tLoop({ most, half, fewer }) {
  */
 export function tTable(head, rows, { cls = '', widths = [] } = {}) {
     const col = widths.length ? `<colgroup>${widths.map((w) => `<col style="width:${w}">`).join('')}</colgroup>` : '';
-    return `<table class="tt dl-table ${cls}">${col}<thead><tr>${head.map((h) => `<th>${esc(h)}</th>`).join('')}</tr></thead>`
+    // (head null: a table continued from the block above, no header row)
+    return `<table class="tt dl-table ${cls}">${col}${head ? `<thead><tr>${head.map((h) => `<th>${esc(h)}</th>`).join('')}</tr></thead>` : ''}`
         + `<tbody>${rows.map((r) => `<tr${r.cls ? ` class="${r.cls}"` : ''}>${(r.cells || r).map((c) => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
 }
 export const cellText = (s) => esc(s);

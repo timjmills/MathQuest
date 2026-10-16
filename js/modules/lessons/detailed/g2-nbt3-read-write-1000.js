@@ -119,7 +119,7 @@ export default {
         // short title (V22 Appendix H); `routeNote` says so on T2b.
         { atom: 1, items: 4, ref: { categoryId: 'composing', skillId: 'number_word_form', opts: { wordform: ['to_number'], band: 100, zeroPlace: 'none' }, minNum: 21, maxNum: 99 },
             lesson: { id: '1.NBT.A.1', title: 'Read and write numbers to 120' } },
-        { atom: 2, items: 2, ref: PV('unit_form'), lesson: { id: '2.NBT.A.1', title: 'Hundreds, tens and ones' } },
+        { atom: 2, items: 3, ref: PV('unit_form'), lesson: { id: '2.NBT.A.1', title: 'Hundreds, tens and ones' } },
         { atom: 3, items: 2, ref: PV('value'), lesson: { id: '2.NBT.A.1', title: 'The value of a digit' } },
     ],
 
@@ -145,14 +145,15 @@ export default {
     },
 
     // ------------------------------------------------------------------ P6 Exit slip (Q8)
-    // Four items, both chunks (critic D14): a-b the number's NAME to the numeral (chunk 2), c-d the
-    // numeral to expanded form (chunk 1); the Critical Atom's case (a missing tens word) is b, a 0
-    // part is d. Each row prints its own instruction.
+    // Four items, both chunks (critic D14): a-b the number's NAME to the numeral (chunk 2), c-d
+    // expanded form back to the numeral (chunk 1: step 4 reads it with plus; an expanded-form row is
+    // too wide for a 132.5 mm half at L). The Critical Atom's case (a missing tens word) is b, a 0
+    // part d.
     exit: [
         { case: 'name, no 0 place', ref: WORDS('to_number'), want: 'pvNoZero', instr: 'Write the number.', detects: 'Parts side by side (300407).' },
         { case: 'name, no tens word (Critical Atom)', ref: WORDS('to_number'), want: 'pvZeroTens', instr: 'Write the number.', detects: 'Drops the 0: six hundred five = 65.' },
-        { case: 'expanded form, no 0 place', ref: PV('expand', { frame: 'line' }), want: 'pvNoZero', instr: 'Write the number in expanded form.', detects: 'Digits, not values: 3 + 4 + 7.' },
-        { case: 'expanded form, a 0 in the ones', ref: PV('expand', { frame: 'line' }), want: 'pvZeroOnes', instr: 'Write the number in expanded form.', detects: 'Writes 10 for an empty place.' },
+        { case: 'expanded form to the numeral, no 0 place', ref: PV('combine'), want: 'pvNoZero', instr: 'Write the number.', detects: 'Parts side by side: 500 + 30 + 9 = 500309.' },
+        { case: 'expanded form to the numeral, a 0 part', ref: PV('combine'), want: 'pvZeroTens', instr: 'Write the number.', detects: 'Drops the 0 part: 700 + 0 + 5 = 75.' },
     ],
     exitInstruction: 'Write the number.',
     // The Say line reads a FRESH number (dealt apart from the four items).
@@ -173,9 +174,9 @@ export default {
     // Pupil-page answers whose case a teacher should see first (T5 Watch, critic D13): the case
     // tests of roles/lesson.js, named.
     // T2b's extra answer-slot shapes this pack prints (critic D9).
-    slotRows: [{ shape: 'hto', use: 'a number from its name, one digit a box' }, { shape: 'longline', use: 'a number in words; “worth ___”' }],
-    caseNames: { pvThousand: '1,000', pvZeroTens: '0 tens', pvZeroOnes: '0 ones', pvTeen: 'a teen' },
-    routeNote: 'Routing: the site has no lesson for these prerequisites yet, so T6 names the CCSS code and a short title (V22 Appendix H).',
+    slotRows: [{ shape: 'hto', use: 'a number from its name, a digit a box' }, { shape: 'longline', use: 'a number in words' }],
+    caseNames: { pvThousand: 'one thousand', pvZeroTens: '0 tens', pvZeroOnes: '0 ones', pvTeen: 'a teen' },
+    routeNote: 'No site lesson exists yet for these prerequisites: T6 names a CCSS code and a short title (V22 Appendix H).',
     materials: ['Base-ten blocks (flats, rods, cubes)', 'Mini whiteboards and pens', 'H T O place chart on the board', 'Number word cards: hundred, tens, teens', 'Pupil packet, one per pupil', 'Exit slips, cut in half'],
     vocabulary: [
         { word: 'digit', gloss: 'one of 0 to 9', diagram: { kind: 'digit', text: '7' } },
@@ -270,7 +271,7 @@ export default {
                 { ask: 'How many hundreds?', note: 'Expected: [[{b.chart.h}]] in the H box (step 1).' },
                 { ask: 'Read the rest. How many tens? How many ones?', note: 'Expected: [[{b.chart.t}]] tens, [[{b.chart.o}]] ones (step 2).' },
                 { say: 'Three boxes, three digits: {b.chart.n}.', note: 'Step 3: read it back.' },
-                { say: '{b.chart2.words}: no tens word. Write 0 tens.', note: 'Expected: [[{b.chart2.n}]].' },
+                { say: '{b.chart2.Words}: no tens word. Write 0 tens.', note: 'Expected: [[{b.chart2.n}]].' },
             ] },
         { n: '6b', name: 'We Do 2: Guided Practice', min: 4, page: 'P3b', boxes: [{ kind: 'feedback', title: 'An empty box', text: 'Point to it: “Is there a tens word? Then write 0.”' }],
             rows: [

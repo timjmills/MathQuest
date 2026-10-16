@@ -88,20 +88,23 @@ export function plan(input = {}) {
         // pictures print one page of four one-row bands instead of four pages.
         let cur = { sections: [], used: 0, budget: m.budget };
         // `perQuestion` (the detailed lesson's Prerequisite Check, V22 §9.1): the bands fill the body
-        // (flex weights by content), each cell growing to at most 1.3 x its content so no empty band
+        // (flex weights by content), each cell growing to at most 1.45 x its content so no empty band
         // reaches 30 % (H13). Absent on every other check.
         let grow = 1;
+        let whole = false;
         if (input.perQuestion) {
             const own = quads.map((q0) => { const c = [4, 2, 1].find((cc) => fitsAt(q0, cc, ctx)) || 1; return { h: hMinAt(q0, c, ctx), rows: Math.ceil(q0.length / c) }; });
             const need = own.reduce((a, o) => a + m.strip + o.rows * o.h, 0);
             const rowsH = own.reduce((a, o) => a + o.rows * o.h, 0);
-            if (need < m.budget && rowsH > 0) grow = Math.min(1.3, 1 + (m.budget - need - 1) / rowsH);
+            if (need < m.budget && rowsH > 0) grow = Math.min(1.45, 1 + (m.budget - need - 1) / rowsH);
+            // (every item the description asks for prints when the whole check fits one page - critic D15)
+            whole = need <= m.budget;
         }
         for (const q0 of quads) {
             const cols = [4, 2, 1].find((c) => fitsAt(q0, c, ctx)) || 1;
             const h = hMinAt(q0, cols, ctx) * grow;
             const share = m.budget / quads.length - m.strip;
-            const q = q0.slice(0, Math.min(q0.length, cols * Math.max(1, Math.floor(share / Math.max(1, h)))));
+            const q = whole ? q0 : q0.slice(0, Math.min(q0.length, cols * Math.max(1, Math.floor(share / Math.max(1, h)))));
             kept += q.length;
             const rows = Math.ceil(q.length / cols);
             const bandH = m.strip + rows * h;

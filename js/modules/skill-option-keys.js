@@ -74,7 +74,7 @@ export const ONE_LETTER_KEYS = Object.freeze({
 // `status`: 'assigned' (ids below), 'reserved' (the wave owns `keys` and fills in its ids when it
 // merges — nobody else may take one), 'spare' (unallocated; claim a whole block here first).
 export const KEY_BLOCKS = Object.freeze({
-    0: Object.freeze({ owner: 'P9 place value (second wave)', status: 'assigned', keys: '0A-0Q' }),
+    0: Object.freeze({ owner: 'P9 place value (second wave)', status: 'assigned', keys: '0A-0R' }),
     1: Object.freeze({ owner: 'P10 time and money', status: 'assigned', keys: '1A-1O' }),
     2: Object.freeze({ owner: 'count-by, patterns, multiplication chart', status: 'assigned', keys: '2A-2F' }),
     3: Object.freeze({ owner: 'function tables', status: 'assigned', keys: '3A-3A' }),
@@ -127,6 +127,7 @@ export const MULTI_KEYS = Object.freeze({
     source: '0N',        // pv_digit_drag: word / expanded / numeral
     rename: '0P',        // unit_form: standard / more than 9 of one place
     span: '0Q',          // place_on_number_line: one ten / hundred / thousand to the next
+    answerSlot: '0R',    // number_word_form: the numeral on a line / in H T O boxes (detailed lesson 1, 2026-10-16)
     // NEXT FREE IN BLOCK 0: 0R.
 
     // Block 1 — P10 time and money (design/research/time-money.md §20). Its other options reuse
@@ -273,6 +274,7 @@ export const VALUE_TOKENS = Object.freeze({
         // block 1 P10 time + money (`all` reuses A)
         find: 'F', order: 'O', collection: 'D', words: 'W', missing: 'I', numerals: 'U', hands: 'B' }),
     zeroPlace: Object.freeze({ none: 'N', some: 'S', always: 'A' }),
+    answerSlot: Object.freeze({ line: 'L', hto: 'H' }),
     op: Object.freeze({ x: 'M', '/': 'D', both: 'B' }),
     order: Object.freeze({ largest: 'L', scrambled: 'S',
         // block 2 (2026-09-25): count by 1-12 rows

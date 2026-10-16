@@ -39,6 +39,27 @@ facsimile key from the same plan (`answer-key.js`). Additive hooks, each absent 
 `avoidNums` / `minNum` / `maxNum` / `edge` / `range` (print-sheet.js); lesson-data keys `chartWide`,
 `tailLast`, `practiceShape` and the case tests `pvNoZero` / `pvZeroTens` / `pvZeroOnes` (roles/lesson.js).
 
+## Chunked Flow and round 3 (lesson 1 critic r1, 2026-10-16)
+
+- **Chunks.** A description may declare `chunks` (V22 Chunked Flow, I Do / We Do / I Do / We Do). Chunk a is the
+  description's own skill and chart data; every further chunk is built as its own lesson packet with no practice
+  (`buildSheet({role: 'lesson', practicePages: 0})`), printed as P2b (its anchor chart) and P3b (its lesson sheet),
+  tabs `Lesson 1a` / `Lesson 1b`, the pack's strand on every tab. Sections `5a 6a 5b 6b` sit on T4 with their own
+  thumbnails; T1's flow table lists them and its Flow line prints the count (`Flow: Chunked (5 new routine steps)`).
+  A Practice sheet names the chunk whose Steps head it (`practiceSheets[k].chunk`).
+- **Words to numeral in H T O boxes.** `composing:number_word_form` option `answerSlot` (`line` | `hto`, codec key
+  `0R`): the kit `words` cell writes the numeral one digit a box under H T O (Th H T O for 1,000), with step states
+  for the chart panels and Guided cell 1's grey trace.
+- **Last row wants.** `edgeLast.wants` names the case of each ★★★ place (1,000 first); a wanted case is kept for that
+  place, and the place tries the generator's item rotations in turn.
+- **Teacher pages read the dealt items.** `{pre.i.letters}` / `{p0.list}` (P0's real letters and answers), `{p4.last}`
+  (each Practice page's last row and its case). Gate **E29** checks every letter and answer quoted on T3 §1, T5 §10
+  and the T6 routing against the key cell of that letter.
+- **P1** takes five bank `items` (one type a row, the same order in A and B), each row its own library instruction.
+- **Exit slip groups**: a run of items of one skill keeps its own columns and height (words two across, sums one).
+- **Keys** P1 / P5 / P6 mark their answers through `tagKeyAnswers` (the key ink); the exit key's second half reads
+  Answer Key. Teacher pagination never continues a band with its last block alone (widow control).
+
 ## Generic by design (round 2)
 
 `print-sheet.js` holds no per-family code. Script values come from each dealt item through the kit's own

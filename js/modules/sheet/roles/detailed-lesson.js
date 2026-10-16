@@ -46,6 +46,8 @@ const STRIP_MM = 8;          // band strip (V22 §8.8)
 const BAND_PAD_MM = 3.5;     // .dl-bandin padding top + bottom
 const LINE_MM = 1.5;         // the band's shared 1.5 pt edge
 
+const chunk = (list, n) => Array.from({ length: Math.ceil(list.length / n) }, (_, i) => list.slice(i * n, i * n + n));
+
 /* ================================================================= placeholders and vars */
 
 /** Fill {a.b} from vars; unknown names throw (a script never prints a typo or a typed number). */
@@ -130,7 +132,7 @@ export function teacherBands(d, V, pages) {
         box: '<span style="display:inline-block;width:10mm;height:8mm;border:1.5pt solid #000"></span>',
         check: '<span class="dl-cbox" style="display:inline-block"></span>',
         longline: '<span style="display:inline-block;width:30mm;border-bottom:0.75pt solid #000;height:5mm"></span>',
-        hto: '<span style="display:inline-flex;gap:1mm;align-items:flex-end">' + ['H', 'T', 'O'].map((l) => `<span style="display:inline-flex;flex-direction:column;align-items:center;font-size:8pt;font-weight:700">${l}<span style="display:inline-block;width:6mm;height:7mm;border:1.5pt solid #000"></span></span>`).join('') + '</span>',
+        hto: '<span style="display:inline-flex;gap:1mm;align-items:flex-end">' + ['H', 'T', 'O'].map((l) => `<span style="display:inline-flex;flex-direction:column;align-items:center;font-size:11pt;font-weight:700;line-height:1">${l}<span style="display:inline-block;width:6mm;height:6mm;border:1.5pt solid #000"></span></span>`).join('') + '</span>',
     };
     const iconRow = (id, label, accent) => [accent ? stepIcon(id, 'L', { mm: 5 }) : teacherIcon(id, 5), esc(label)];
     out.T2b = [{ label: 'Reference key:', blocks: [twoCols(
@@ -141,13 +143,13 @@ export function teacherBands(d, V, pages) {
         subHead('Fade levels'), tTable(['Label', 'Means'], [['★', 'Guided: hints on, step 1 traced'], ['★★', 'Independent: hints off'], ['★★★', 'Last row: the edge cases']].map((r) => r.map(cellText))),
         subHead('Data loop'), tLoop({ most: 'Go on.', half: 'Short reteach, then go on.', fewer: 'Stop. Reteach with a concrete example.' }),
         subHead('Abbreviations'), tTable(['Short', 'In full'], [['MWBs', 'mini whiteboards'], ['ELL', 'English language learners'], ['SPED', 'special education students'], ['RCDWS', 'Read, Circle, Draw, Write, Solve'], ['CRA', 'Concrete-Representational-Abstract']].map((r) => r.map(cellText))),
+        ...(d.routeNote ? [subHead('Routing ids'), tLine(esc(d.routeNote))] : []),
         ].join(''),
         [subHead('Answer slots'), tTable(['Shape', 'Used for'], [[slotDraw.line, 'a number after ='], [slotDraw.box, 'a part inside an expression'], [slotDraw.check, 'a tick (routine panel, exit slip)']]
             .concat((d.slotRows || []).map((r) => [slotDraw[r.shape] || esc(r.shape), esc(r.use)]))),
         subHead('Icons'), tTable(['Icon', 'Means'], [iconRow('tip', 'Tip'), iconRow('feedback', 'Feedback'), iconRow('watch', 'Watch'), iconRow('research', 'Research'),
             iconRow('key', 'Critical Atom'), iconRow('language', 'Language tip'), iconRow('why', 'Why it works'), iconRow('board', 'Board'),
             [d.lessonData.steps.map((s, i) => stepMark(i + 1, s.icon)).join(' '), 'The pupil Steps (accent)']]),
-        ...(d.routeNote ? [subHead('Routing ids'), tLine(esc(d.routeNote))] : []),
         subHead('Band labels'), tLine('Pupil: Vocabulary · Remember · Guided Practice · Steps · Independent Practice · Mixed Review · Number sense: A / B · Workspace · Another example · Say · Rule.'),
         tLine('Teacher: Lesson guidance · Lesson flow · Materials · What students need to know · What students do · How to teach · Common mistakes · Section n · Prerequisite routing · Accepted answers · Answers at a glance.'),
         ].join(''))] }];
@@ -176,9 +178,10 @@ export function teacherBands(d, V, pages) {
     // ---------------------------------------------------------------------------- T6
     out.T6 = [
         { label: 'Prerequisite routing:', blocks: [tTable(['Question', 'Prerequisite (T2 atom)', 'If missed → Lesson'], pages.routing.map((r) => [cellText(r.q), cellText(r.atom), cellText(r.lesson)])
-            .concat([['', '<b>Rule</b>', '0 missed: go on · 1: that lesson first · 2+: the earliest first']]))] },
+            .concat([['', '<b>Rule</b>', '0 missed: go on · 1: that lesson · 2+: the earliest']]))] },
         { label: 'Accepted answers:', blocks: [`<ul class="dl-list">${(d.accepted || []).map((t) => `<li>${esc(t)}</li>`).join('')}</ul>`] },
-        { label: 'Answers at a glance:', blocks: [tTable(['Page', 'Answers', 'Fade'], pages.glance.map((g) => [cellText(g.page), `<span class="dl-ka" data-ka>${esc(g.answers)}</span>`, esc(g.fade)]), { widths: ['32mm', '', '16mm'] })] },
+        // (in runs of 4 rows, so a long table continues on the next page instead of moving whole)
+        { label: 'Answers at a glance:', blocks: chunk(pages.glance, 4).map((part, i) => tTable(i ? null : ['Page', 'Answers', 'Fade'], part.map((g) => [cellText(g.page), `<span class="dl-ka" data-ka>${esc(g.answers)}</span>`, esc(g.fade)]), { widths: ['44mm', '', '14mm'] })) },
         { label: 'Wrong answers to look for when marking:', blocks: [tTable(['Pupil wrote', 'Likely mistake', 'Next step'], d.wrongAnswers.map((w) => [cellText(w.wrote), `<b>${esc(w.mistake)}</b>`, cellText(w.next)]))] },
     ];
     return { bands: out, flow };
@@ -214,14 +217,12 @@ export function paginateTeacher(bands, heights, { body = TEACHER_BODY_MM } = {})
         flat.forEach((x, idx) => {
             const lim = Math.min(budgetOf(pages.length), cap);
             if (cur.length && cost(cur.concat(x)) > lim) {
-                // Widow / orphan control (critic D12): a band never continues with its LAST block
-                // alone (the block before it goes along), and never leaves its FIRST block alone
-                // at a page foot (it goes along too).
+                // Widow control (critic D12): a band never continues with its LAST block alone
+                // (the block before it goes along).
                 let carry = [];
                 const lastOfBand = !flat[idx + 1] || flat[idx + 1].bi !== x.bi;
                 const mine = () => cur.filter((y) => y.bi === x.bi).length;
                 if (lastOfBand && mine() >= 3 && cur[cur.length - 1].bi === x.bi) carry = [cur.pop()];
-                if (mine() === 1 && cur.length > 1 && cur[cur.length - 1].bi === x.bi) carry = [cur.pop(), ...carry];
                 pages.push(cur);
                 cur = carry;
             }
@@ -335,7 +336,7 @@ function groupsOf(items, instr) {
     return out;
 }
 
-export function exitSlipPlan({ items, instr, say, tab, title, cellH, cols = 2 }, frame) {
+export function exitSlipPlan({ items, instr, say, tab, title, cellH, cols = 2, groups = null }, frame) {
     const head = `<div class="dl-halfhead"><div class="ws-rowA">${headerFields({ name: true, score: items.length })}${strandTab(tab)}</div>${pageTitle(title)}<div class="ws-headrule"></div></div>`;
     const self = '<div class="dl-selfrow"><span><span class="dl-cbox"></span>I can do this.</span><span><span class="dl-cbox"></span>I need one more day.</span></div>';
     const rows = Math.ceil(items.length / cols);
@@ -343,9 +344,11 @@ export function exitSlipPlan({ items, instr, say, tab, title, cellH, cols = 2 },
         { kind: 'html', html: head },
         // Items with their own `instr` (critic D14: both chunks on one slip) print one instruction
         // per run of items that share it, each run its own grid; the letters run on.
-        ...groupsOf(items, instr).flatMap((g) => [
-            { kind: 'instruction', text: g.instr },
-            { kind: 'grid', cols, rows: Math.ceil(g.items.length / cols), labels: 'letter', start: g.start, cls: `fixed dl-exitgrid${copy ? ' dl-copy' : ''}`, height: `${(Math.ceil(g.items.length / cols) * cellH).toFixed(2)}mm`, items: copy ? g.items.map((it) => Object.assign({}, it, { copy: true })) : g.items },
+        // (`groups` [{instr, items, start, cols, cellH}] from the host: each run its own columns and height;
+        // an empty instr = the strip above still applies)
+        ...(groups || groupsOf(items, instr).map((g) => Object.assign(g, { cols, cellH }))).flatMap((g) => [
+            ...(g.instr ? [{ kind: 'instruction', text: g.instr }] : []),
+            { kind: 'grid', cols: g.cols, rows: Math.ceil(g.items.length / g.cols), labels: 'letter', start: g.start, cls: `fixed dl-exitgrid${copy ? ' dl-copy' : ''}`, height: `${(Math.ceil(g.items.length / g.cols) * g.cellH).toFixed(2)}mm`, items: copy ? g.items.map((it) => Object.assign({}, it, { copy: true })) : g.items },
         ]),
         ...(say ? [{ kind: 'say', frame: say, digits: 3 }] : []),
         { kind: 'html', html: self },
@@ -383,6 +386,7 @@ export const DETAILED_PUPIL_CSS = `
 .ws-page .dl-wpstory .ws-cell,.ws-page .dl-wppanel .ws-cell{justify-content:stretch;align-items:stretch;padding:3mm}
 .ws-page .dl-wpstory .ws-story{height:100%;display:flex;flex-direction:column;justify-content:space-evenly;font-size:15pt;line-height:1.45;padding:3mm 4mm}
 .ws-page .dl-ansline{display:flex;align-items:flex-end;gap:2mm}
+.ws-page .dl-wordsline{flex-direction:column;align-items:flex-start;gap:1mm}
 .ws-page .dl-work{flex:1 1 auto;min-height:60mm}
 .ws-page .dl-wpeq .ws-cell{justify-content:center;align-items:center}
 .ws-page .dl-eq{display:flex;align-items:center;gap:3mm;font-size:28pt}
@@ -391,7 +395,7 @@ export const DETAILED_PUPIL_CSS = `
 .ws-page .dl-half>.ws-instrline{flex:none}
 .ws-page .dl-half>.ws-grid{flex:none}
 .ws-page .dl-nsgrid .ws-cell{justify-content:stretch;align-items:center}
-.ws-page .dl-nsrow{display:grid;grid-template-columns:58mm 1fr;align-items:center;width:100%;gap:3mm}
+.ws-page .dl-nsrow{display:grid;grid-template-columns:58mm 1fr;align-items:center;width:100%;gap:3mm;padding-left:5mm;box-sizing:border-box}
 .ws-page .dl-nsrow>.dl-nsinstr{height:auto;padding:0;font-size:15pt;line-height:1.2;white-space:normal}
 .ws-page .dl-nsitem{display:flex;justify-content:center;align-items:center;min-width:0}
 `;
