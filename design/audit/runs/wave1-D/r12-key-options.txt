@@ -227,3 +227,6 @@
   print button 1280x720 allp new-sheet on: "Print 3 pupil pages + key" | "On 6 sheets, double-sided." h 48
   print button 1024x768 A/Bp new-sheet off: "Print 2 pupil pages + key" | "" h 48
   print button 1024x768 A/Bp new-sheet on: "Print 2 pupil pages + key" | "On 4 sheets, double-sided." h 48
+  print button 1024x768 allp new-sheet off: "Print 3 pupil pages + key" | "" h 48
+  print button 1024x768 allp new-sheet on: "Print 3 pupil pages + key" | "On 6 sheets, double-sided." h 48
+key-options: OK
