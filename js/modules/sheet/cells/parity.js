@@ -102,8 +102,10 @@ register('parity', {
             const ink = sortInk(ctx);
             const one = (v) => {
                 const html = numeral(ctx, v);
-                if (!ink) return `<span style="flex:none;padding:${L(ctx, 1.5)} ${L(ctx, 1)};">${html}</span>`;
                 const even = Number(v) % 2 === 0;
+                // (r11, merged answer-key options INK-31) an odd number sits in the cross's own box on
+                // the pupil page too, so the key adds only the cross and its printed number stays a given
+                if (!ink) return `<span style="flex:none;padding:${L(ctx, 1.5)} ${L(ctx, 1)};">${even ? html : `<span style="position:relative;display:inline-block;">${html}</span>`}</span>`;
                 return `<span style="flex:none;padding:${L(ctx, 1.5)} ${L(ctx, 1)};">${even ? ringWrap(ctx, html, ink) : crossOver(ctx, html, ink)}</span>`;
             };
             // five or six numbers in two rows (3 + 2, 3 + 3): the cell stays a column of a 2- or
