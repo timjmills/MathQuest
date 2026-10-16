@@ -125,6 +125,33 @@ export function stackSlashFractions(text) {
 }
 
 /**
+ * Critic fractions-key r5 (R5-3, TY-7): a fraction inside a line of prose ("There are 55 buttons.
+ * 1/5 of them are in a box.") is stacked over its bar on screen, as on paper. Unlike
+ * stackSlashFractions it reads the context, so a date or a score is never stacked:
+ *   - `n/d/yyyy`, `n/d/` and `/n/d` (a date) never stack;
+ *   - after a month, weekday or "on", "date", "due", "born", "until", "since" (or a "score"), a
+ *     bare `n/d` is a date or a tally, unless it is followed by "of" ("on 3/4 of the days");
+ *   - `all: false` (a plain prompt): only a fraction followed by "of" ("1/5 of them") stacks;
+ *   - `all: true` (a prompt over a kit picture or cell): every other `n/d` stacks.
+ * The text must be tag-free (escaped) text; anything holding a tag comes back unchanged.
+ */
+const PROSE_DATE_BEFORE = /\b(?:on|dated?|due|born|until|till|since|scored?(?:\s+(?:was|is|of))?|jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?|sept?(?:ember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?|mon(?:day)?|tues?(?:day)?|wed(?:nesday)?|thu(?:rs)?(?:day)?|fri(?:day)?|sat(?:urday)?|sun(?:day)?)[\s,.]*$/i;
+export function stackProseFractions(text, { all = false } = {}) {
+    const s = String(text == null ? '' : text);
+    if (/</.test(s)) return s;
+    return s.replace(/(\d+)\/(\d+)(?![\d/])([.,;:!?)]+)?/g, (m, n, d, p, at) => {
+        const before = s.slice(0, at), after = s.slice(at + m.length - (p ? p.length : 0));
+        if (/[\d/]$/.test(before)) return m;                 // part of a longer token: 1/2/2026, 12/3
+        if (/^\/\d/.test(after)) return m;
+        if (!(Number(d) > 0)) return m;
+        const ofNext = !p && /^\s+of\b/i.test(after);
+        if (!ofNext && PROSE_DATE_BEFORE.test(before)) return m;
+        if (!all && !ofNext) return m;
+        return stackSlashFractions(m);
+    });
+}
+
+/**
  * What an answer SAYS: a choice item stores option ids ("opt3", or a list of them) in `ans` or in
  * a pupil's answer; this gives their labels, in option order, joined by "; " (a picture option
  * with no label is named by its letter). Anything else comes back as its own text.
@@ -135,6 +162,11 @@ export function answerLabelOf(q, value) {
     if (typeof ids === 'string' && ids.trim().startsWith('[')) { try { ids = JSON.parse(ids); } catch (e) { /* text */ } }
     if (typeof ids === 'string' && /^opt\d+(\s*,\s*opt\d+)*$/.test(ids.trim())) ids = ids.split(',').map((t) => t.trim());
     const list = Array.isArray(ids) ? ids.map(String) : [String(ids)];
+    // a count-graded list (critic fractions-key r5 R5-1): identical shapes, any n of them is right
+    const countN = Number(q && q.selectCount);
+    if (Number.isInteger(countN) && countN > 0 && opts.length && list.length && list.every((id) => opts.some((o) => String(o.id) === id))) {
+        return value === (q && q.ans) ? `any ${countN} of ${opts.length}` : `${list.length} of ${opts.length}`;
+    }
     if (opts.length && list.length && list.every((id) => opts.some((o) => String(o.id) === id))) {
         return opts.map((o, i) => ({ o, i })).filter(({ o }) => list.includes(String(o.id)))
             .map(({ o, i }) => String(o.label == null ? '' : o.label).replace(/<[^>]*>/g, '').trim() || String.fromCharCode(65 + i))

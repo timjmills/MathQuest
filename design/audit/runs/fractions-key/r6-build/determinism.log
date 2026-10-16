@@ -1,0 +1,35 @@
+fraction_of_set        independent   S  seeds 1:1 5:1 11:1 23:1 42:1  identical
+fraction_of_set        independent   L  seeds 1:1 5:1 11:1 23:1 42:1  identical
+fraction_of_set        more-practice S  seeds 1:1 5:1 11:1 23:1 42:1  identical
+fraction_of_set        more-practice L  seeds 1:1 5:1 11:1 23:1 42:1  identical
+fraction_of_set        test          S  seeds 1:1 5:1 11:1 23:1 42:1  identical
+fraction_of_set        test          L  seeds 1:1 5:1 11:1 23:1 42:1  identical
+fraction_of_set_hard   independent   S  seeds 1:1 5:1 11:1 23:1 42:1  identical
+fraction_of_set_hard   independent   L  seeds 1:1 5:1 11:1 23:1 42:1  identical
+fraction_of_set_hard   more-practice S  seeds 1:1 5:1 11:1 23:1 42:1  identical
+fraction_of_set_hard   more-practice L  seeds 1:1 5:1 11:1 23:1 42:1  identical
+fraction_of_set_hard   test          S  seeds 1:1 5:1 11:1 23:1 42:1  identical
+fraction_of_set_hard   test          L  seeds 1:1 5:1 11:1 23:1 42:1  identical
+add_fractions_like     independent   S  seeds 1:1 5:1 11:1 23:1 42:1  identical
+add_fractions_like     independent   L  seeds 1:1 5:1 11:1 23:1 42:1  identical
+add_fractions_like     more-practice S  seeds 1:1 5:1 11:1 23:1 42:1  identical
+add_fractions_like     more-practice L  seeds 1:1 5:1 11:1 23:1 42:1  identical
+add_fractions_like     test          S  seeds 1:1 5:1 11:1 23:1 42:1  identical
+add_fractions_like     test          L  seeds 1:1 5:1 11:1 23:1 42:1  identical
+sub_fractions_like     independent   S  seeds 1:1 5:1 11:1 23:1 42:1  identical
+sub_fractions_like     independent   L  seeds 1:1 5:1 11:1 23:1 42:1  identical
+sub_fractions_like     more-practice S  seeds 1:1 5:1 11:1 23:1 42:1  identical
+sub_fractions_like     more-practice L  seeds 1:1 5:1 11:1 23:1 42:1  identical
+sub_fractions_like     test          S  seeds 1:1 5:1 11:1 23:1 42:1  identical
+sub_fractions_like     test          L  seeds 1:1 5:1 11:1 23:1 42:1  identical
+add_frac_unlike        independent   S  seeds 1:1 5:1 11:1 23:1 42:1  identical
+add_frac_unlike        independent   L  seeds 1:1 5:1 11:1 23:1 42:1  identical
+add_frac_unlike        more-practice S  seeds 1:1 5:1 11:1 23:1 42:1  identical
+add_frac_unlike        more-practice L  seeds 1:1 5:1 11:1 23:1 42:1  identical
+add_frac_unlike        test          S  seeds 1:1 5:1 11:1 23:1 42:1  identical
+add_frac_unlike        test          L  seeds 1:1 5:1 11:1 23:1 42:1  identical
+fraction_of_set seed 3 kinds over 30: WWMLOOOLMOWWLWMWMOLOLWOOWMLWLL  cycle: none
+fraction_of_set seed 9 kinds over 30: MMOLOLWOLLMOOLWLMMOWOWOLWOLLMM  cycle: none
+fraction_of_set_hard seed 3 kinds over 30: WWMLOOOLMOWWLWMWMOLOLWOOWMLWLL  cycle: none
+fraction_of_set_hard seed 9 kinds over 30: MMOLOLWOLLMOOLWLMMOWOWOLWOLLMM  cycle: none
+determinism: 30/30 rows byte-identical

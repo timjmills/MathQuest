@@ -1,0 +1,2 @@
+fraction_of_set {"text":"Click 2/4 of the circles.","ans":["opt0","opt1","opt2","opt3","opt4","opt5"],"opts":["opt0","opt1","opt2","opt3","opt4","opt5","opt6","opt7","opt8","opt9","opt10","opt11"]} tapped last 6 of 12 {"green":0,"wrong":0,"missed":0,"score":1,"streak":0}
+fraction_of_set_hard {"text":"Click 3/5 of the circles.","ans":["opt0","opt1","opt2","opt3","opt4","opt5"],"opts":["opt0","opt1","opt2","opt3","opt4","opt5","opt6","opt7","opt8","opt9"]} tapped last 6 of 10 {"green":0,"wrong":0,"missed":0,"score":1,"streak":0}

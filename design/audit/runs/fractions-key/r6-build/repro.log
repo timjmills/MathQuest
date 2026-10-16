@@ -1,0 +1,24 @@
+fraction_of_set independent S reprint-same true mix20 {"word":35,"legacy":20,"of":38,"missing":27} 
+  A word:Ana has 40 beads. She gives away 1/4 of =10 | legacy:Click 3/5 of the circles.=["opt0","opt1","opt2","opt3","opt4","opt5"] | word:Ana has 24 stickers. She gives away 2/3 =16 | of:Find the fraction of the set.=12 | missing:Find the missing numerator.=1 | of:Find the fraction of the set.=10 
+  B word:Ana has 40 beads. She gives away 1/4 of =10 | legacy:Click 3/5 of the circles.=["opt0","opt1","opt2","opt3","opt4","opt5"] | word:Ana has 24 stickers. She gives away 2/3 =16 | of:Find the fraction of the set.=12 | missing:Find the missing numerator.=1 | of:Find the fraction of the set.=10
+fraction_of_set independent L reprint-same true mix20 {"word":30,"legacy":17,"of":27,"missing":16} 
+  A word:Ana has 40 beads. She gives away 1/4 of =10 | legacy:Click 3/5 of the circles.=["opt0","opt1","opt2","opt3","opt4","opt5"] | word:Ana has 24 stickers. She gives away 2/3 =16 | of:Find the fraction of the set.=12 
+  B word:Ana has 40 beads. She gives away 1/4 of =10 | legacy:Click 3/5 of the circles.=["opt0","opt1","opt2","opt3","opt4","opt5"] | word:Ana has 24 stickers. She gives away 2/3 =16 | of:Find the fraction of the set.=12
+fraction_of_set test S reprint-same true mix20 {"word":56,"missing":44,"of":60} 
+  A word:Ana has 40 beads. She gives away 1/4 of =10 | missing:Find the missing numerator.=5 | word:Ana has 24 stickers. She gives away 2/3 =16 | of:Find the fraction of the set.=12 | missing:Find the missing numerator.=1 | of:Find the fraction of the set.=10 | word:Ana has 28 apples. She gives away 2/4 of=14 | of:Find the fraction of the set.=18 
+  B word:Ana has 40 beads. She gives away 1/4 of =10 | missing:Find the missing numerator.=5 | word:Ana has 24 stickers. She gives away 2/3 =16 | of:Find the fraction of the set.=12 | missing:Find the missing numerator.=1 | of:Find the fraction of the set.=10 | word:Ana has 28 apples. She gives away 2/4 of=14 | of:Find the fraction of the set.=18
+fraction_of_set test L reprint-same true mix20 {"word":40,"missing":32,"of":42} 
+  A word:Ana has 40 beads. She gives away 1/4 of =10 | missing:Find the missing numerator.=5 | word:Ana has 24 stickers. She gives away 2/3 =16 | of:Find the fraction of the set.=12 
+  B word:Ana has 40 beads. She gives away 1/4 of =10 | missing:Find the missing numerator.=5 | word:Ana has 24 stickers. She gives away 2/3 =16 | of:Find the fraction of the set.=12
+fraction_of_set_hard independent S reprint-same true mix20 {"word":35,"legacy":20,"of":38,"missing":27} 
+  A word:There are 35 beads. 1/5 of them are in a=7 | legacy:Click 3/6 of the circles.=["opt0","opt1","opt2","opt3","opt4","opt5"] | word:Ana has 30 stickers. She gives away 4/5 =24 | of:Find the fraction of the set.=12 | missing:Find the missing numerator.=2 | of:Find the fraction of the set.=15 
+  B word:There are 35 beads. 1/5 of them are in a=7 | legacy:Click 3/6 of the circles.=["opt0","opt1","opt2","opt3","opt4","opt5"] | word:Ana has 30 stickers. She gives away 4/5 =24 | of:Find the fraction of the set.=12 | missing:Find the missing numerator.=2 | of:Find the fraction of the set.=15
+fraction_of_set_hard independent L reprint-same true mix20 {"word":27,"legacy":15,"of":24,"missing":14} 
+  A word:There are 35 beads. 1/5 of them are in a=7 | legacy:Click 3/6 of the circles.=["opt0","opt1","opt2","opt3","opt4","opt5"] | word:Ana has 30 stickers. She gives away 4/5 =24 | of:Find the fraction of the set.=12 
+  B word:There are 35 beads. 1/5 of them are in a=7 | legacy:Click 3/6 of the circles.=["opt0","opt1","opt2","opt3","opt4","opt5"] | word:Ana has 30 stickers. She gives away 4/5 =24 | of:Find the fraction of the set.=12
+fraction_of_set_hard test S reprint-same true mix20 {"word":56,"missing":44,"of":60} 
+  A word:There are 35 beads. 1/5 of them are in a=7 | missing:Find the missing numerator.=5 | word:Ana has 30 stickers. She gives away 4/5 =24 | of:Find the fraction of the set.=12 | missing:Find the missing numerator.=2 | of:Find the fraction of the set.=15 | word:Ana has 30 apples. She gives away 3/6 of=15 | of:Find the fraction of the set.=20 
+  B word:There are 35 beads. 1/5 of them are in a=7 | missing:Find the missing numerator.=5 | word:Ana has 30 stickers. She gives away 4/5 =24 | of:Find the fraction of the set.=12 | missing:Find the missing numerator.=2 | of:Find the fraction of the set.=15 | word:Ana has 30 apples. She gives away 3/6 of=15 | of:Find the fraction of the set.=20
+fraction_of_set_hard test L reprint-same true mix20 {"word":34,"missing":25,"of":35} 
+  A word:There are 35 beads. 1/5 of them are in a=7 | missing:Find the missing numerator.=5 | word:Ana has 30 stickers. She gives away 4/5 =24 | of:Find the fraction of the set.=12 
+  B word:There are 35 beads. 1/5 of them are in a=7 | missing:Find the missing numerator.=5 | word:Ana has 30 stickers. She gives away 4/5 =24 | of:Find the fraction of the set.=12

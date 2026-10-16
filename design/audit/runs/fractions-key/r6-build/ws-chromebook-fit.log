@@ -1,0 +1,19 @@
+home screen 1366x650 (full header)           ok (nav flex, controls flex, menu button hidden)
+play at 1366x960 (tall screen, full header)  ok (nav flex, controls flex, menu button hidden)
+fractions:fraction_of_set 1366x650           card ok box 273/650 go 532 | boss ok box 273/650 go 523 | race ok box 250/650 go 616 | worksheet ok box 259/650 go 54 cards 3 | quiz ok box 447/650 go 537
+fractions:fraction_of_set_hard 1366x650      card ok box 250/650 go 622 | boss ok box 273/650 go 532 | race ok box 542/650 go 609 | worksheet ok box 441/650 go 54 cards 3 | quiz ok box 342(paper)/650 go 419
+fractions:fraction_of_set 1280x600           card ok box 273/600 go 532 | boss ok box 273/600 go 523 | race ok box 250/544 go 595 | worksheet ok box 259/600 go 54 cards 3 | quiz ok box 447/600 go 537
+fractions:fraction_of_set_hard 1280x600      card ok box 250/544 go 595 | boss ok box 273/600 go 532 | race ok box 542/544 go 595 | worksheet ok box 441/600 go 54 cards 3 | quiz ok box 342(paper)/600 go 419
+addition:add_facts 1366x650 quiz touch wrong touch Next ok
+addition:add_facts 1366x650 quiz touch right touch Next ok
+subtraction:subtract 1366x650 quiz touch wrong touch Next ok
+subtraction:subtract 1366x650 quiz touch right touch Next ok
+multiplication:mult_facts 1366x650 quiz touch wrong touch Next ok
+multiplication:mult_facts 1366x650 quiz touch right touch Next ok
+addition:add_facts 1280x600 quiz touch wrong touch Next ok
+addition:add_facts 1280x600 quiz touch right touch Next ok
+subtraction:subtract 1280x600 quiz touch wrong touch Next ok
+subtraction:subtract 1280x600 quiz touch right touch Next ok
+multiplication:mult_facts 1280x600 quiz touch wrong touch Next ok
+multiplication:mult_facts 1280x600 quiz touch right touch Next ok
+ws-chromebook-fit: OK

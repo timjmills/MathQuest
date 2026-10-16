@@ -28,7 +28,7 @@
 // No window writes; no state import.
 
 import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, ftSlots, signOf, parseRule, applyRule, renderCell, resolveCtx, getProvider, roundingLineSVG, k2Twin } from './sheet/index.js';
-import { fracValueMatches, stackSlashFractions } from './utils.js';
+import { fracValueMatches, stackSlashFractions, stackProseFractions } from './utils.js';
 import { optionsFor } from './skill-options.js';
 import { isOrderFreeFamily, familyBoxVerdict, familyValuesFromInputs, familyWant, familyComposedRight } from './number-family-check.js';
 import {
@@ -276,7 +276,33 @@ export function screenTextLine(el) {
     }
     if (!el.children.length && /\b\d+\/\d+\s*[+\u2212\-\u00d7\u00f7]\s*\d+\/\d+\b/.test(el.textContent || '')) {
         el.innerHTML = stackSlashFractions(String(el.textContent).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]));
+        return;
     }
+    // Critic fractions-key r5 (R5-3): a story's fraction ("1/5 of them are in a box.") is stacked
+    // as on paper. Over a kit picture or cell every fraction of the line stacks; on any other line
+    // only an "n/d of" phrase does, and a date ("On 3/4", "3/4/2026") never (stackProseFractions).
+    // The line may hold a vocabulary link ("How many"): each text node is stacked on its own, and
+    // a node inside a control or a drawing is left alone.
+    if (/\d\/\d/.test(el.textContent || '') && !el.querySelector('input, select, textarea, svg, img')) {
+        const all = kitPromptHost(el);
+        const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+        const nodes = [];
+        while (tw.nextNode()) if (/\d\/\d/.test(tw.currentNode.nodeValue || '') && !tw.currentNode.parentElement.closest('.msc-frac, button')) nodes.push(tw.currentNode);
+        nodes.forEach((n) => {
+            const text = String(n.nodeValue).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]);
+            const html = stackProseFractions(text, { all });
+            if (html === text) return;
+            const tpl = document.createElement('template');
+            tpl.innerHTML = html;
+            n.parentNode.replaceChild(tpl.content, n);
+        });
+    }
+}
+
+/** Does this prompt line sit over a kit picture or cell (a `.k2-twin`, a kit template)? */
+export function kitPromptHost(el) {
+    const host = el && el.closest && el.closest('#questionPaper, .problem-card, .qt-cell, .mq-qtpaper, .ws-cell');
+    return !!(host && host.querySelector('.k2-twin, [data-mq-template], [data-ws-template]'));
 }
 
 /**

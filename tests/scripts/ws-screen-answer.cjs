@@ -266,6 +266,16 @@ function PLAN(rootSel, which) {
     // a tick list ("Click ALL ..."): tap every right option, then Submit (multi-select-check)
     const msc = all('.msc-opt');
     if (msc.length && Array.isArray(ans)) {
+        // A count-graded list (critic fractions-key r5 R5-1, "Tap 2/3 of the squares" over
+        // identical shapes): any n of them is right, so the gate taps the LAST n - a set the key
+        // does not name - and the host must still mark it right.
+        const cnt = Number(q.selectCount);
+        if (Number.isInteger(cnt) && cnt > 0 && cnt <= msc.length) {
+            msc.slice(msc.length - cnt).forEach(o => tag(o, { type: 'click' }));
+            const sub = root.querySelector('.msc-submit');
+            if (sub) tag(sub, { type: 'domclick' });
+            return { plan, q: `any ${cnt}: the last ${cnt} of ${msc.length}` };
+        }
         ans.forEach(id => { const o = msc.find(b => b.dataset.id === String(id)); if (o) tag(o, { type: 'click' }); });
         const sub = root.querySelector('.msc-submit');
         if (sub) tag(sub, { type: 'domclick' });
@@ -438,6 +448,44 @@ else (async () => {
                 const ok = after > before;
                 line.push(`card ${ok ? 'ok' : 'WRONG'}`);
                 if (!ok) fails.push(`${s} card: typed ${r.q}, not marked correct${btn ? '' : ' (no Check shown)'}`);
+            }
+        }
+        // A count-graded list on the card (critic fractions-key r5 R5-1): a skill that deals one
+        // is given one. One ring short is wrong, says the count, and tags no shape "missed" or
+        // "not this"; one more ring (any shape) makes it right.
+        if (HOSTS.includes('card')) {
+            const found = await page.evaluate((c, k, seed) => {
+                for (let t = 1; t <= 300; t++) {
+                    const q = window.generateQuestionFor({ category: c, skill: k, seed: seed + t, itemIndex: 0 });
+                    if (q && q.answerType === 'multi-select-check' && Number.isInteger(q.selectCount) && q.selectCount > 1 && q.selectCount < q.options.length) {
+                        const st = window.state; st.quizMode = false; st.category = c; st.skill = k; st.gameMode = 'practice'; st.isMixedMode = false; st.hasAnswered = false;
+                        window.showView('gameView'); st.currentQ = q; window.renderQuestion();
+                        return { n: q.selectCount, N: q.options.length };
+                    }
+                }
+                return null;
+            }, c, k, hash(s + ':count'));
+            if (found) {
+                await sleep(600);
+                const before = await page.evaluate(() => window.state.score || 0);
+                const opts = await page.$$('#questionPaper .msc-opt');
+                // the last n-1 shapes (never the keyed first ones), then Check
+                // a DOM click: a toast ("Starting Practice") can sit over the top row of shapes
+                for (let i = found.N - found.n + 1; i < found.N; i++) { await opts[i].evaluate(e => e.click()); await sleep(40); }
+                await page.evaluate(() => { const b = document.querySelector('#qcCheckBtn'); if (b) b.click(); });
+                await sleep(500);
+                const short = await page.evaluate(() => ({ score: window.state.score || 0, tags: document.querySelectorAll('#questionPaper .msc-opt.missed-correct, #questionPaper .msc-opt.wrong-persistent, #questionPaper .msc-opt.wrong-flash').length, fb: (document.getElementById('feedbackArea') || {}).textContent || '' }));
+                await opts[found.N - found.n].evaluate(e => e.click()); await sleep(60);
+                await page.evaluate(() => { const b = document.querySelector('#qcCheckBtn'); if (b) b.click(); });
+                await sleep(500);
+                // the retry is right: the card says so (the score only counts a first attempt)
+                const fin = await page.evaluate(() => { const f = document.getElementById('feedbackArea'); return { ok: !!f && ((/\bcorrect\b/.test(f.className) && !/\bincorrect\b/.test(f.className)) || /\bCorrect!/.test(f.textContent)), fb: f ? f.textContent.trim().slice(0, 60) : '', sel: document.querySelectorAll('#questionPaper .msc-opt.selected').length }; });
+                const after = fin.ok;
+                const okShort = short.score === before && short.tags === 0 && new RegExp(`Tap ${found.n}\\b`).test(short.fb);
+                const okFull = after === true;
+                line.push(`count-list ${okShort && okFull ? 'ok' : 'WRONG'} (${found.n} of ${found.N})`);
+                if (!okShort) fails.push(`${s} card count list: ${found.n - 1} of ${found.N} rung: score ${short.score - before}, ${short.tags} shapes tagged, feedback "${short.fb.trim()}"`);
+                if (!okFull) fails.push(`${s} card count list: the last ${found.n} of ${found.N} rung, not marked correct (${fin.sel} ringed, feedback "${fin.fb}")`);
             }
         }
         // a celebration pop-up of the card (badge, level) would sit over the next host

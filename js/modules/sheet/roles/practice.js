@@ -245,6 +245,7 @@ export const SHEET_ENGINE_CSS = `
 :is(.ws-page,.ws-sheet) [data-ws-tagged]{position:relative}
 :is(.ws-page,.ws-sheet) .mq-frac{display:inline-flex;flex-direction:column;align-items:center;font-size:.55em;line-height:1.05}
 :is(.ws-page,.ws-sheet) .mq-frac>span+span{border-top:1.5pt solid currentColor;padding-top:.3mm}
+:is(.ws-page,.ws-sheet) .ms-prompt .mq-frac{vertical-align:middle}
 :is(.ws-page,.ws-sheet) .mq-slottag,:is(.ws-page,.ws-sheet) .mq-pupil .mq-slottag{position:absolute;top:.4mm;left:.8mm;font-size:var(--ws-zone);font-style:normal;font-weight:700;line-height:1;color:#000!important}
 :is(.ws-page,.ws-sheet) .mq-fixsign .ws-circle{display:inline-flex;align-items:center;justify-content:center;font-size:var(--ws-digit);font-weight:700;line-height:1;vertical-align:middle}
 :is(.ws-page,.ws-sheet) .mq-eatask{font-size:var(--ws-text);line-height:1.2;margin:0 0 1mm;align-self:flex-start}

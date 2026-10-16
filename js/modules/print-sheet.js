@@ -463,7 +463,14 @@ export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {
         const on = Array.isArray(ids) ? q.options.map((o) => !!o && ids.map(String).includes(String(o.id))) : [];
         if (on.some(Boolean)) {
             let k = 0;
-            return html.replace(/<span class="opt">/g, () => (on[k++] ? `<span class="opt" data-ws-circled="1" data-ws-ink="${inkAttr}">` : '<span class="opt">'));
+            const ringed = html.replace(/<span class="opt">/g, () => (on[k++] ? `<span class="opt" data-ws-circled="1" data-ws-ink="${inkAttr}">` : '<span class="opt">'));
+            // A count-graded list (critic fractions-key r5 R5-1 / R5-4: "Circle 3/5 of the
+            // circles" over identical shapes): the rings show ONE right answer, and the note under
+            // them says that any that many is right, as the short key does.
+            const countN = Number(q.selectCount);
+            if (!(Number.isInteger(countN) && countN > 0)) return ringed;
+            const note = `<div class="mq-keynote" data-ws-key-add="1" data-ws-ink="${inkAttr}" style="text-align:center;font-weight:700;font-size:var(--ws-text);line-height:1.2;margin-top:1mm;${inkAttr === 'trace' ? 'color:#949494;' : ''}">(any ${countN})</div>`;
+            return ringed.replace(/<\/div>\s*$/, `${note}</div>`);
         }
     }
     if (!raw && !display) return null;
@@ -1821,8 +1828,31 @@ async function buildSheetCore(req = {}) {
                 perLetter = letters.map(() => L0.perPage);
             }
             let byLetter = letters.map((L, k) => finalRun(sec, si, letterBase(L), perLetter[k], probeOf(L)));
-            if (anchorMode === 'side' && anchorSets[si]) anchorSets[si].grow(byLetter.flat().length + 2);
             sec.floor = floorWith(si, [...probes.values()].flatMap((p) => p.items).concat(...byLetter));
+            // The count may also GROW, as on an Independent page (critic fractions-key D9): the
+            // first letter's probe can hold a taller problem than the letters dealt, and a page
+            // sized for it leaves rows empty (ws-print-lint L-DENSITY PAGEFILL, fraction_of_set
+            // r6). A page-sized letter takes what the measured page holds.
+            if (!(n.letters && n.letters.length) && !sec.count && shared[si] === null) {
+                // Only ever grows, and a grown run is kept only if the page still holds it (a mixed
+                // pool's extra problems can be taller) and holds no full-width problem: otherwise
+                // the letters stay as dealt.
+                for (let pass = 0; pass < 3; pass++) {
+                    const fit = Math.min(MAX_ITEMS, capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, byLetter.flat()), n, lctx)));
+                    if (!(fit > 0) || perLetter.every((c) => c >= fit)) break;
+                    // a split page (full-width problems under the columns) is counted from the
+                    // probe's share of wide problems: it is left as dealt
+                    if (byLetter.flat().some((it) => oneColumnOnly(it, n))) break;
+                    const prev = { perLetter, byLetter, floor: sec.floor };
+                    const grown = perLetter.map(() => fit);
+                    const next = letters.map((L, k) => finalRun(sec, si, letterBase(L), grown[k], probeOf(L)));
+                    sec.floor = floorWith(si, [...probes.values()].flatMap((p) => p.items).concat(...next));
+                    const holds = Math.min(MAX_ITEMS, capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, next.flat()), n, lctx)));
+                    if (holds < fit || next.flat().some((it) => oneColumnOnly(it, n))) { perLetter = prev.perLetter; byLetter = prev.byLetter; sec.floor = prev.floor; break; }
+                    perLetter = grown; byLetter = next;
+                }
+            }
+            if (anchorMode === 'side' && anchorSets[si]) anchorSets[si].grow(byLetter.flat().length + 2);
             const cap = shared[si] !== null ? shared[si] : capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, byLetter.flat()), n, lctx));
             if (perLetter.some((c) => c > cap)) {
                 byLetter = letters.map((L, k) => (perLetter[k] > cap ? finalRun(sec, si, letterBase(L), cap, probeOf(L)) : byLetter[k]));

@@ -1,4 +1,5 @@
 import { state } from './state.js';
+import { stackProseFractions } from './utils.js';
 import { calcAllowedFor } from './skip-rule.js';
 import { isOrderFreeFamily, familyBoxVerdict } from './number-family-check.js';
 import { getSkillGrade, gradeCircleHTML } from './data.js';
@@ -1218,7 +1219,7 @@ function _snapshotQ(isCorrect, userAnswer) {
 function _handleMultiPlaceSubmit(opts) {
     const { qq, allCorrect, wrongCount, totalScored,
         correctXP = 10, correctMessage = "🎉 Correct!",
-        onRetry, onLockOnAllCorrect, onLockOnMapTest } = opts;
+        onRetry, onLockOnAllCorrect, onLockOnMapTest, retryMessage = null } = opts;
 
     // ===== REVIEW MODE BRANCH =====
     // Student is re-answering a past question via the q-dot row. Patch the
@@ -1342,7 +1343,8 @@ function _handleMultiPlaceSubmit(opts) {
     if (feedback) {
         feedback.style.display = "block";
         feedback.className = "feedback-area incorrect";
-        feedback.innerHTML = buildRetryMessage(totalScored, wrongCount);
+        // a count-graded list says the count ("Tap 6. You tapped 4."), never "3 correct, 6 to fix"
+        feedback.innerHTML = retryMessage ? retryMessage : buildRetryMessage(totalScored, wrongCount);
     }
     if (card) {
         card.classList.add("incorrect-bg");
@@ -1641,7 +1643,8 @@ function _applyCardTwin(q, paper, visualAid, qt) {
     const setInstr = (text) => {
         if (!qt) return;
         qt.style.cssText = '';
-        qt.innerHTML = `<span class="mq-instr-text">${_escapeHtmlForQuestion(screenInstruction(text))}</span>`
+        // R5-3: the line sits over the kit's own cell, so its fractions stack (TY-7)
+        qt.innerHTML = `<span class="mq-instr-text">${stackProseFractions(_escapeHtmlForQuestion(screenInstruction(text)), { all: true })}</span>`
             + `<span class="mq-sr"> ${_escapeHtmlForQuestion(String(q.text || '').replace(/<[^>]*>/g, ''))}</span>`;
     };
     // The kit's own cell (round 3): an item whose paper cell is drawn by the kit alone (estimate,
@@ -3414,13 +3417,18 @@ function _renderQuestionImpl() {
             mod.renderMultiSelectCheck(q, host, { embedded });
             const onMsc = (qq, selectedIds) => {
                 const allCorrect = mod.checkMultiSelectCheck(qq, selectedIds);
-                const correctSet = new Set(qq.ans || []);
+                // A count-graded list (R5-1, "Tap 2/3 of the squares"): any n identical shapes are
+                // right, so the tags follow the pupil's own rings, and a wrong count tags none.
+                const countN = mod.mscSelectCount(qq);
+                const tagIds = mod.mscTagIds(qq, selectedIds);
+                const correctSet = new Set(tagIds || []);
                 const selectedSet = new Set(selectedIds);
                 const inMapTest = isMapTestMode();
 
                 // Count wrong placements (extras + misses) for the retry message.
                 let wrongCount = 0;
-                qq.options.forEach(o => {
+                if (countN) wrongCount = allCorrect ? 0 : Math.max(1, Math.abs(selectedSet.size - countN));
+                else qq.options.forEach(o => {
                     const sel = selectedSet.has(o.id);
                     const isAnswer = correctSet.has(o.id);
                     if (sel && !isAnswer) wrongCount++;
@@ -3431,6 +3439,7 @@ function _renderQuestionImpl() {
                     // MAP test mode: single-shot, paint full red/green and lock.
                     host.querySelectorAll('.msc-opt').forEach(el => {
                         el.classList.remove('correct-flash', 'wrong-flash');
+                        if (tagIds === null) return;
                         const id = el.dataset.id;
                         const sel = selectedSet.has(id);
                         const isAnswer = correctSet.has(id);
@@ -3452,7 +3461,7 @@ function _renderQuestionImpl() {
                     // clear wrong picks back to neutral, leave missed-correct
                     // neutral so the student can find them on a retry.
                     if (host._mscApplyPartialCorrect) {
-                        host._mscApplyPartialCorrect(qq.ans || []);
+                        host._mscApplyPartialCorrect(countN ? tagIds : (qq.ans || []));
                     }
                 }
 
@@ -3468,6 +3477,7 @@ function _renderQuestionImpl() {
                     totalScored: (qq.options && qq.options.length) || correctSet.size,
                     correctXP: 10,
                     correctMessage: "🎉 Correct!",
+                    retryMessage: countN && !allCorrect ? mod.mscCountMessage(qq, selectedIds) : null,
                     onRetry: () => {
                         // Painting + unlock already handled above via
                         // _mscApplyPartialCorrect; this hook is a safety

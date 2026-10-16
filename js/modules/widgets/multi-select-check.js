@@ -5,6 +5,7 @@
 //   q.options:    [{ id, label, correct, image?, svg? }]
 //   q.ans:        array of correct option IDs
 //   q.minCorrect: optional number (default 1)
+//   q.selectCount: optional number - grade by COUNT (any that many of identical options)
 //
 // Pure module — no globals attached, no DOM mutation outside `container`.
 
@@ -109,6 +110,17 @@ export function renderMultiSelectCheck(q, container, { embedded = false, onChang
     // interacts with that tile, so the feedback persists across re-submits
     // for unchanged tiles. Re-enables widget for another submit attempt.
     function applyPartialCorrectAndUnlock(correctIds) {
+        // a count-graded list with the wrong count (R5-1): no shape is "missed" or "not this";
+        // the ringed shapes stay ringed so the pupil adds or removes rings, and the host says
+        // "Tap 6. You tapped 4."
+        if (correctIds === null) {
+            grid.querySelectorAll('.msc-opt').forEach(el => {
+                el.classList.remove('correct-flash', 'wrong-flash', 'wrong-persistent', 'missed-correct');
+                el.disabled = false;
+            });
+            refresh();
+            return;
+        }
         const correctSet = new Set(Array.isArray(correctIds) ? correctIds : []);
         grid.querySelectorAll('.msc-opt').forEach(el => {
             // Always clear transient flash classes from any prior submit.
@@ -175,8 +187,45 @@ export function renderMultiSelectCheck(q, container, { embedded = false, onChang
     refresh();
 }
 
+/**
+ * A COUNT-graded list (critic fractions-key r5 R5-1): "Tap 2/3 of the squares" over nine
+ * identical squares is right for ANY six of them, so the item is graded by how many are ringed,
+ * never by which. The generator marks it `q.selectCount` (the number to ring); `q.ans` still names
+ * one right set (the first n) for the paper key and the gate that taps the keyed ids.
+ * @returns {number} the count to ring, or 0 when the list is graded by option id
+ */
+export function mscSelectCount(q) {
+    const n = Number(q && q.selectCount);
+    return Number.isInteger(n) && n > 0 ? n : 0;
+}
+
+/** The pupil-facing line for a wrong count: "Tap 6. You tapped 4." (the screen verb is Tap). */
+export function mscCountMessage(q, selectedIds) {
+    const want = mscSelectCount(q);
+    const got = Array.isArray(selectedIds) ? new Set(selectedIds.map(String)).size : 0;
+    return `Tap ${want}. You tapped ${got}.`;
+}
+
+/**
+ * The option ids a host may tag as right / missed / not this after a check. A count-graded list
+ * has no such ids (its shapes are interchangeable): when the count is right every ringed shape is
+ * right, and when it is wrong no single shape is "missed" or "not this", so nothing is tagged.
+ * @returns {string[]|null} the ids to treat as the answer, or null for "tag no shape"
+ */
+export function mscTagIds(q, selectedIds) {
+    if (!mscSelectCount(q)) return Array.isArray(q && q.ans) ? q.ans.map(String) : [];
+    return checkMultiSelectCheck(q, selectedIds) ? selectedIds.map(String) : null;
+}
+
 export function checkMultiSelectCheck(q, selectedIds) {
-    if (!Array.isArray(selectedIds) || !Array.isArray(q.ans)) return false;
+    if (!Array.isArray(selectedIds)) return false;
+    const want = mscSelectCount(q);
+    if (want) {
+        const ids = new Set((q.options || []).map(o => String(o.id)));
+        const got = new Set(selectedIds.map(String));
+        return got.size === selectedIds.length && got.size === want && [...got].every(id => ids.has(id));
+    }
+    if (!Array.isArray(q.ans)) return false;
     if (selectedIds.length !== q.ans.length) return false;
     const setA = new Set(selectedIds);
     for (const id of q.ans) if (!setA.has(id)) return false;

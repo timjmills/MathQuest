@@ -1,0 +1,4 @@
+fraction_of_set right seed 7919 card 4: tapped the last 3 of 6 (need 3) {"res":"Score: 1/6 (17%)","tagsWrong":0,"green":3,"fb":"","card":"problem-card mq-wscard card-msc mq-active-problem"}
+fraction_of_set short seed 7919 card 4: tapped the last 2 of 6 (need 3) {"res":"Score: 0/6 (0%)","tagsWrong":0,"green":0,"fb":"Tap 3. You tapped 2.","card":"problem-card mq-wscard card-msc mq-active-problem"}
+fraction_of_set_hard right seed 7919 card 4: tapped the last 6 of 8 (need 6) {"res":"Score: 1/6 (17%)","tagsWrong":0,"green":6,"fb":"","card":"problem-card mq-wscard card-msc mq-active-problem"}
+fraction_of_set_hard short seed 7919 card 4: tapped the last 5 of 8 (need 6) {"res":"Score: 0/6 (0%)","tagsWrong":0,"green":0,"fb":"Tap 6. You tapped 5.","card":"problem-card mq-wscard card-msc mq-active-problem"}

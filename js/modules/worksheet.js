@@ -4,7 +4,7 @@ import { skipAfterFor } from './skip-rule.js';
 import { isOrderFreeFamily, familyBoxVerdict } from './number-family-check.js';
 import { updateSkillProgress } from './progress.js';
 import { SKILLS } from './data.js';
-import { shuffle, normalizeText, stackSlashFractions, fracValueMatches } from './utils.js';
+import { shuffle, normalizeText, stackSlashFractions, stackProseFractions, fracValueMatches } from './utils.js';
 import { isTimeSkill, timeAnswersMatch } from './answer-check.js';
 import { openZoomModal, ZOOM_CLICK_IS_ANSWER_TYPES } from './question-render.js';
 import { generateQuestion, generateQuestionFor } from './generate-question.js';
@@ -383,10 +383,12 @@ function handleWorksheetMscSubmit(idx, qq, selectedIds, mod) {
     const correct = mod.checkMultiSelectCheck(qq, selectedIds);
     worksheetMscState.set(idx, { submitted: true, isCorrect: !!correct, selectedIds: Array.isArray(selectedIds) ? selectedIds.slice() : [] });
 
-    // Per-option visual feedback (green/red borders via flash classes).
-    const correctSet = new Set(qq.ans || []);
+    // Per-option visual feedback (green/red borders via flash classes). A count-graded list
+    // (R5-1) tags the pupil's own rings when the count is right, and no shape when it is wrong.
+    const tagIds = mod.mscTagIds(qq, selectedIds || []);
+    const correctSet = new Set(tagIds || []);
     const selectedSet = new Set(selectedIds || []);
-    host.querySelectorAll('.msc-opt').forEach(el => {
+    if (tagIds !== null) host.querySelectorAll('.msc-opt').forEach(el => {
         const id = el.dataset.id;
         const sel = selectedSet.has(id);
         const isAnswer = correctSet.has(id);
@@ -404,7 +406,7 @@ function handleWorksheetMscSubmit(idx, qq, selectedIds, mod) {
     }
     fb.style.cssText = 'margin-top:8px;font-weight:600;text-align:center;';
     fb.style.color = correct ? 'var(--correct)' : 'var(--incorrect)';
-    fb.textContent = correct ? 'Correct!' : 'Not quite — selected items are highlighted.';
+    fb.textContent = correct ? 'Correct!' : (mod.mscSelectCount(qq) ? mod.mscCountMessage(qq, selectedIds) : 'Not quite — selected items are highlighted.');
 
     // Card-level styling.
     if (correct) {
@@ -1443,7 +1445,8 @@ function _wsRenderCard(grid, q, i) {
             slotInCell = true;
         }
     }
-    const instrLine = kind ? instructionForKind(kind) : twin ? screenInstruction(twin.instr) : '';
+    // R5-3: a twin's line sits over the kit's own picture, so its fractions stack (TY-7)
+    const instrLine = kind ? instructionForKind(kind) : twin ? stackProseFractions(screenInstruction(twin.instr), { all: true }) : '';
     const answerRow = (!slotInCell && !answerInputStyle) ? `<div class="mq-answerrow">${inputHtml}</div>` : '';
     const parkedInput = (!slotInCell && answerInputStyle) ? inputHtml : '';
 
@@ -2859,14 +2862,25 @@ export function checkAllWorksheet() {
             if (host && host.dataset.mscEmbedded === '1' && !(stored && stored.submitted)) {
                 const sel = Array.from(host.querySelectorAll('.msc-opt.selected')).map(el => el.dataset.id);
                 if (sel.length) {
+                    // a count-graded list (R5-1): any n of the identical shapes; the tags follow
+                    // the pupil's rings when the count is right, and none when it is wrong
+                    const countN = Number.isInteger(Number(q.selectCount)) && Number(q.selectCount) > 0 ? Number(q.selectCount) : 0;
                     const want = new Set((q.ans || []).map(String));
-                    const ok = sel.length === want.size && sel.every(id => want.has(String(id)));
+                    const okCount = countN > 0 && new Set(sel).size === sel.length && sel.length === countN;
+                    const ok = countN ? okCount : (sel.length === want.size && sel.every(id => want.has(String(id))));
                     host.querySelectorAll('.msc-opt').forEach(el => {
-                        const on = sel.includes(el.dataset.id), right = want.has(String(el.dataset.id));
                         el.classList.remove('correct-flash', 'wrong-flash');
+                        if (countN) { if (ok && sel.includes(el.dataset.id)) el.classList.add('correct-flash'); return; }
+                        const on = sel.includes(el.dataset.id), right = want.has(String(el.dataset.id));
                         if (on && right) el.classList.add('correct-flash');
                         else if (on !== right) el.classList.add('wrong-flash');
                     });
+                    if (countN && !ok) {
+                        let fb = host.querySelector('.ws-msc-feedback');
+                        if (!fb) { fb = document.createElement('div'); fb.className = 'ws-msc-feedback'; host.appendChild(fb); }
+                        fb.style.cssText = 'margin-top:8px;font-weight:600;text-align:center;color:var(--incorrect);';
+                        fb.textContent = `Tap ${countN}. You tapped ${new Set(sel).size}.`;
+                    }
                     stored = { submitted: true, isCorrect: ok, selectedIds: sel };
                     worksheetMscState.set(idx, stored);
                 }
@@ -2876,7 +2890,9 @@ export function checkAllWorksheet() {
             } else {
                 isCorrect = false;
                 if (host) {
-                    const correctSet = new Set(q.ans || []);
+                    // a count-graded list reveals the count, not a particular set of shapes (R5-1)
+                    const countN = Number.isInteger(Number(q.selectCount)) && Number(q.selectCount) > 0 ? Number(q.selectCount) : 0;
+                    const correctSet = new Set(countN ? [] : (q.ans || []));
                     host.querySelectorAll('.msc-opt').forEach(el => {
                         const id = el.dataset.id;
                         if (correctSet.has(id)) el.classList.add('correct-flash');
@@ -2888,7 +2904,7 @@ export function checkAllWorksheet() {
                         const note = document.createElement('div');
                         note.className = 'ws-msc-ungraded-note';
                         note.style.cssText = 'margin-top:6px;font-size:0.85rem;color:var(--text-dim);font-style:italic;text-align:center;';
-                        note.textContent = 'No answer submitted.';
+                        note.textContent = countN ? `No answer submitted. Tap any ${countN}.` : 'No answer submitted.';
                         host.appendChild(note);
                     }
                 }

@@ -243,6 +243,11 @@ const LEGACY_TEMPLATE = register('legacy', {
         if (p && p.printAnswer && typeof p.printAnswer === 'string') {
             // the paper task's own answer ("Circle: 4, 8; Cross out: 3, 9"), never the screen target
             display = p.printAnswer;
+        } else if (picked && Number.isInteger(Number(p.selectCount)) && Number(p.selectCount) > 0) {
+            // A count-graded list (critic fractions-key r5 R5-1 / R5-4: "Circle 2/3 of the
+            // squares" over identical, unlettered shapes): any that many is right, so the key names
+            // the count, never letters the page does not print.
+            display = `any ${Number(p.selectCount)} circled`;
         } else if (picked) {
             // A choice item stores option ids ("opt3") in `ans`; the key prints what they SAY.
             display = picked.join('; ');

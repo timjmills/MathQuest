@@ -3883,9 +3883,9 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 // FRACTION OF A SET — variety + uncolored-until-hint visual
                 // ============================================================
                 // Variety:
-                //  - Problem TYPE rotates via per-skill counter so each
-                //    variant (numeric, multi-select, missing-numerator, word)
-                //    appears evenly instead of biasing toward one.
+                //  - Problem TYPE (numeric, multi-select, missing-numerator,
+                //    word) is dealt from the seeded rng and the page deck
+                //    (critic fractions-key r5 R5-2; see below).
                 //  - Numerator picks uniformly from [1..den-1] (and ~15% of
                 //    the time num == den for "whole" fractions like 4/4 of
                 //    12) so problems are not dominated by 1/N.
@@ -3896,11 +3896,19 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 //    when the student requests a hint. Print uses
                 //    q.visualPrint (pre-colored) since paper has no hint.
                 // ============================================================
-                if (!window.__skillVariantCounter) window.__skillVariantCounter = {};
-                const _fosCtrKey = `${fracSkill}_typev2`;
-                const _fosCtr = (window.__skillVariantCounter[_fosCtrKey] || 0);
-                window.__skillVariantCounter[_fosCtrKey] = _fosCtr + 1;
-                const _fosVariant = _fosCtr % 4; // 0..3
+                // Critic fractions-key r5 (R5-2, LESSONS L10): the kind is dealt from the SEEDED rng
+                // and the page deck, never from a session-global counter (which made the same
+                // request print a different sheet and cycled the kinds 0 1 2 3 down the page).
+                //  - the choose-all list is drawn from the item's own seed (about 1 in 4, as
+                //    before), so a page host that caps lists at one retries into another kind;
+                //  - the other three are dealt by page-deal.js (balanced, random order, repeats
+                //    allowed, reset at item 0 by generateQuestionFor).
+                const _fosKinds = ['of', 'missing', 'word'];
+                const _fosKind = Math.random() < 0.25 ? 'list'
+                    : ((typeof window !== 'undefined' && window.pickVariant)
+                        ? window.pickVariant(`${fracSkill}_kind`, _fosKinds)
+                        : pick(_fosKinds));
+                const _fosVariant = { of: 0, list: 1, missing: 2, word: 3 }[_fosKind];
 
                 // Pick denominator: hard biases toward larger denoms.
                 const fosDenomPool = fracSkill === "fraction_of_set_hard" ? [3, 4, 5, 6, 6, 8] : [2, 3, 4, 5, 6];
@@ -3949,6 +3957,9 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     q.options = opts;
                     q.ans = ans;
                     q.minCorrect = correctCount;
+                    // R5-1: the shapes are identical, so ANY correctCount of them is right; the
+                    // card, worksheet and quiz grade the count, and the key says "any n circled".
+                    q.selectCount = correctCount;
                     q.hint = `${fosNum}/${fosDen} of ${fosMS_total} = ${correctCount}. Tap ${correctCount} ${emoji}.`;
                     q.printFormat = 'multi-select';
                     q.skillLabel = 'Fraction of Set';
@@ -3956,7 +3967,10 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 }
 
                 // Numeric / missing-num / word variants share the same visual.
-                const fosMultMax = Math.max(3, Math.min(Math.floor(range / fosDen), 12));
+                // At most 48 counters in the picture (8 groups of 6, 6 of 8, 4 of 12): every counter is
+                // drawn and counted, and a 96-counter set made a cell twice as tall as its row-mates
+                // (ws-print-lint L-DENSITY H13 once the kinds were dealt from the seed, r6).
+                const fosMultMax = Math.max(3, Math.min(Math.floor(range / fosDen), 12, Math.floor(48 / fosDen)));
                 const fosMultiplier = rng(2, fosMultMax);
                 const fosTotal = fosDen * fosMultiplier;
                 const fosAnswer = fosNum * fosMultiplier;

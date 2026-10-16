@@ -5,7 +5,7 @@ import { state } from './state.js';
 import { quizLadderWrong, drawLadder, shownOf, ladderMessage } from './support-ladder.js';
 import { SKILLS } from './data.js';
 import { clearOfPinnedBar } from './touch-tap.js';
-import { shuffle, stackSlashFractions, answerLabelOf } from './utils.js';
+import { shuffle, stackSlashFractions, stackProseFractions, answerLabelOf } from './utils.js';
 import { saveResult, decompressTestFromURL, migrateTestToSections, getAllQuestionsFlat, getTotalQuestionCount } from './quiz-storage.js';
 import { broadcastQuizJoin, broadcastQuizAnswer, broadcastQuizSubmit } from './quiz-monitor.js';
 import {
@@ -220,6 +220,8 @@ const QUIZ_CELL_FIELDS = ['printFormat', 'gridFill', 'clozeOptions', 'inlineBlan
     'cell', 'skillId', 'categoryId', 'pv',
     // 2026-09-26: a fraction's two forms, graded from the cell's own boxes
     'dualFractionAnswers',
+    // critic fractions-key r5 R5-1: a list graded by count ("Tap 2/3 of the squares")
+    'selectCount',
     // 2026-10-04: a number family is graded in any order from its rows
     'numberFamilyData',
     // AP2 round 3: a twin that prints its own question (a graph's) says its instruction here,
@@ -395,7 +397,8 @@ function renderQuizQuestion(qItem, flatIdx) {
         // the paper cell's screen twin: the model the pupil works in, with the answer slot(s)
         cellBody = `<div class="qt-visual-aid mq-twin">${twin.html}</div>`
             + `<div class="qt-answer-area"${twin.mode === 'build' || twin.mode === 'model' ? ' style="display:none"' : ''}>${inputHtml}</div>`;
-        instrHtml = escHtml(screenInstruction(twin.instr));
+        // R5-3: the line sits over the kit's own picture, so its fractions stack (TY-7)
+        instrHtml = stackProseFractions(escHtml(screenInstruction(twin.instr)), { all: true });
     } else {
         cellBody = `<div class="qt-question-text">${qd.text || ''}</div>`
             + (qd.visual ? `<div class="qt-visual-aid">${qd.visual}</div>` : '')
@@ -681,7 +684,13 @@ function recordAnswer(flatIdx, studentAnswer) {
         // a choose-all list: the same set of options, in any order
         const got = String(studentAnswer).split(',').map(s => s.trim()).filter(Boolean);
         const want = new Set(qd.ans.map(String));
-        correct = got.length === want.size && got.every(id => want.has(id));
+        // a count-graded list (critic fractions-key r5 R5-1, "Tap 2/3 of the squares"): any n of
+        // the identical options is right, so the count is graded, never which ones
+        const countN = Number.isInteger(Number(qd.selectCount)) && Number(qd.selectCount) > 0 ? Number(qd.selectCount) : 0;
+        const ids = new Set((qd.options || []).map(o => String(o.id)));
+        correct = countN
+            ? new Set(got).size === got.length && got.length === countN && got.every(id => ids.has(id))
+            : got.length === want.size && got.every(id => want.has(id));
     } else if (qd.cell && qd.cell.template === 'frac-model' && /\//.test(String(studentAnswer)) && fracParse(String(studentAnswer)) && fracParse(String(qd.ans))) {
         // a fraction sentence (owner 2026-10-03, D4): 5/5 is as right as 1, 6/4 as 1 1/2
         const u = fracParse(String(studentAnswer)), a = fracParse(String(qd.ans));
