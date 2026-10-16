@@ -1245,28 +1245,25 @@ r3['Y2.B2.S10'] = { ...(r3['Y2.B2.S10'] || {}), addPre: [
 // BBCHECK (the r12 sweep): the hand lead of Y3.B3.S12 Multiply by 8 was division facts (all tables): the 4s are the building
 // block (core: counting in 4s from 0; the rung mult_facts {4}); dividing is the inverse, ranked after them
 delete extraPre['Y3.B3.S12'];
-// N10: measurement:mass_volume_liquid form 1 (read the scale, g or kg): for maxKg 5 or 10 the generator draws a kg dial with
-// gram increments (js/modules/gen-measurement.js l.672-678: maxVal 5 or 10 kg, increment 500 or 1000), so numMarks is 0.01 and
-// every kg dial has answer 0. Fresh seeds: {forms:[1]} 44 of 80 items are kg dials with answer 0 (36 gram dials, all sound);
-// {forms:[0,1]} 25 of 80. The clauses say so (Y3.B7.S2 already did), and no pre cites form 1 as if it were sound.
-r3['Y2.B7.S2'] = { ...(r3['Y2.B7.S2'] || {}), partials: [P('measurement:mass_volume_liquid', 'reads one kind of g scale (marks in 100 g or 200 g); the kg items on the same form have answer 0 (generator bug, about half the items); reading scales in grams with different steps is not dealt', { forms: [1] })] };
-r3['Y3.B7.S2'] = { ...(r3['Y3.B7.S2'] || {}), partials: [P('measurement:mass_volume_liquid', 'grams on a scale, but the items that ask the mass in kg have answer 0 on the same scale (generator bug, about half the items)', { forms: [1] })] };
-r3['Y2.B7.S3'] = { ...(r3['Y2.B7.S3'] || {}), partials: [P('measurement:mass_volume_liquid', 'reads gram dials; every kg dial has answer 0 (generator bug), so reading a kilogram scale is not dealt', { forms: [1] })] };
-r3['Y3.B7.S1'] = { ...(r3['Y3.B7.S1'] || {}), partials: [P('measurement:mass_volume_liquid', 'reads one kind of scale each, and the kg dials have answer 0 (generator bug, 25 of 80 items); scales with different intervals are not dealt', { forms: [0, 1] })] };
-r3['Y3.B7.S3'] = { ...(r3['Y3.B7.S3'] || {}), partials: [P('measurement:mass_volume_liquid', 'g or kg alone, and every kg dial has answer 0 (generator bug); mixed kg and g readings are not dealt', { forms: [1] })] };
-// the 8 pre links of {forms:[1]}: the capacity steps take the thermometer (a sound scale reading, Y2.B7.S9 W22) instead;
-// the mass steps keep the gram scale (the only mass-scale skill) and say what is broken
-const KGNOTE = ' (its kg dials have answer 0 until the generator is fixed; the gram dials are sound)';
-export const brokenLinks = [{ key: 'measurement:mass_volume_liquid', opts: { forms: [1] }, note: KGNOTE,
-  swap: { when: /^Y2\.B7\.S[67]$|^Y3\.B7\.S[78]$/, key: 'measurement:temperature', opts: { forms: [1] },
-    why: 'reading a thermometer in °C: the same scale reading in another measure — Y2.B7.S9 Temperature (W22)' },
-  why: {
-    'Y2.B7.S4': 'Y2.B7.S2 reading a mass in grams on a scale' + KGNOTE,
-    'Y3.B7.S4': 'Y3.B7.S3 reading a mass on a scale in grams (taught before this step in the block)' + KGNOTE,
-    'Y3.B7.S5': 'Y2.B7.S2 reading a mass in grams on a scale (Grade 1)' + KGNOTE,
-    'Y3.B7.S6': 'Y2.B7.S2 reading a mass in grams on a scale (Grade 1, on the W35 list as Measure in kilograms)' + KGNOTE } }];
+// N10 -> PR #8 (merged, design/audit/runs/wrm-tagging/GENERATOR-FIXES-2026-10-16.md): the kg dials of
+// measurement:mass_volume_liquid form 1 now step in whole kilograms (0-5 or 0-10 kg, every mark labelled) and no item has
+// answer 0. Re-judged on 100 fresh seeds (51233 + 97 i): {forms:[1]} 57 kg dials (1-9 kg) and 43 gram dials (100 g or
+// 200 g a mark, every mark labelled, to 2,000 g); {forms:[0,1]} 49 cylinders (mL, labels on every other mark), 25 g, 26 kg.
+// No option keeps the page to grams or to kilograms. The clauses say what is dealt; the r12 "broken link" notes are gone.
+r3['Y2.B7.S2'] = { ...(r3['Y2.B7.S2'] || {}), partials: [P('measurement:mass_volume_liquid', 'reads gram dials with every mark labelled (100 g or 200 g a mark), but about half the items are kilogram dials and no option keeps the page to grams; gram scales with unlabelled marks to count between (steps of 1, 2, 5 or 10 g) are not dealt', { forms: [1] })] };
+r3['Y2.B7.S3'] = { ...(r3['Y2.B7.S3'] || {}), partials: [P('measurement:mass_volume_liquid', 'reads kilogram dials (1 kg a mark, every mark labelled, 1-9 kg) in about half the items, but the rest are gram dials and no option keeps the page to kilograms; kilogram scales with unlabelled marks or steps of 2 or 5 kg are not dealt', { forms: [1] })] };
+r3['Y3.B7.S1'] = { ...(r3['Y3.B7.S1'] || {}), partials: [P('measurement:mass_volume_liquid', 'reads one scale at a time: a cylinder in mL (labels on every other mark) or a dial in g or kg (every mark labelled); working out what each interval is worth from labels several marks apart (0, 100, 200 with 4 marks between) is not dealt', { forms: [0, 1] })] };
+r3['Y3.B7.S2'] = { ...(r3['Y3.B7.S2'] || {}), partials: [P('measurement:mass_volume_liquid', 'reads gram dials with every mark labelled (100 g or 200 g a mark), but about half the items are kilogram dials and no option keeps the page to grams; gram scales with unlabelled marks are not dealt', { forms: [1] })] };
+r3['Y3.B7.S3'] = { ...(r3['Y3.B7.S3'] || {}), partials: [P('measurement:mass_volume_liquid', 'reads g or kg alone on a dial with every mark labelled; a reading in kilograms and grams together (1 kg 200 g) is not dealt', { forms: [1] })] };
+// the pre links of {forms:[1]}: sound again (no broken-link mechanism); their whys name both dials
+export const brokenLinks = [];
+const KGWHY = 'reading a mass on a dial in g or kg (every mark labelled)';
 // r12 whys written for the step (build.mjs applies them last)
 export const whyFix = {
+  'Y2.B7.S4': { 'measurement:mass_volume_liquid': 'Y2.B7.S2 / Y2.B7.S3 ' + KGWHY + ': the masses the operations use' },
+  'Y3.B7.S4': { 'measurement:mass_volume_liquid': 'Y3.B7.S3 ' + KGWHY + ' (taught before this step in the block): the two units converted here' },
+  'Y3.B7.S5': { 'measurement:mass_volume_liquid': 'Y2.B7.S2 / Y2.B7.S3 ' + KGWHY + ' (Grade 1): the masses compared here' },
+  'Y3.B7.S6': { 'measurement:mass_volume_liquid': 'Y2.B7.S2 / Y2.B7.S3 ' + KGWHY + ' (Grade 1, on the W35 list as Measure in kilograms): the masses added here' },
   // a quarter of a shape helps only through the quarter turn (critic r11 minor)
   'Y2.B11.S2': { 'shapes_early:partition_shapes': 'Y1.B10.S5 Recognise a quarter of an object or a shape (prior learning wk W19): a quarter of a shape is the quarter turn' },
   // Y2.B2.S15 (critic r11 row): the tens of the sum, the tens and ones of each number, then the ones

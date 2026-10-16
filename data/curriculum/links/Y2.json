@@ -7048,7 +7048,7 @@
    "partial": [
     {
      "key": "measurement:mass_volume_liquid",
-     "missing": "reads one kind of g scale (marks in 100 g or 200 g); the kg items on the same form have answer 0 (generator bug, about half the items); reading scales in grams with different steps is not dealt",
+     "missing": "reads gram dials with every mark labelled (100 g or 200 g a mark), but about half the items are kilogram dials and no option keeps the page to grams; gram scales with unlabelled marks to count between (steps of 1, 2, 5 or 10 g) are not dealt",
      "opts": {
       "forms": [
        1
@@ -7057,7 +7057,7 @@
     }
    ],
    "verdict": "partial",
-   "missing": "reads one kind of g scale (marks in 100 g or 200 g); the kg items on the same form have answer 0 (generator bug, about half the items); reading scales in grams with different steps is not dealt",
+   "missing": "reads gram dials with every mark labelled (100 g or 200 g a mark), but about half the items are kilogram dials and no option keeps the page to grams; gram scales with unlabelled marks to count between (steps of 1, 2, 5 or 10 g) are not dealt",
    "build": [
     "mass_scales"
    ],
@@ -7121,7 +7121,7 @@
    "partial": [
     {
      "key": "measurement:mass_volume_liquid",
-     "missing": "reads gram dials; every kg dial has answer 0 (generator bug), so reading a kilogram scale is not dealt",
+     "missing": "reads kilogram dials (1 kg a mark, every mark labelled, 1-9 kg) in about half the items, but the rest are gram dials and no option keeps the page to kilograms; kilogram scales with unlabelled marks or steps of 2 or 5 kg are not dealt",
      "opts": {
       "forms": [
        1
@@ -7130,7 +7130,7 @@
     }
    ],
    "verdict": "partial",
-   "missing": "reads gram dials; every kg dial has answer 0 (generator bug), so reading a kilogram scale is not dealt",
+   "missing": "reads kilogram dials (1 kg a mark, every mark labelled, 1-9 kg) in about half the items, but the rest are gram dials and no option keeps the page to kilograms; kilogram scales with unlabelled marks or steps of 2 or 5 kg are not dealt",
    "build": [
     "mass_scales"
    ],
@@ -7200,7 +7200,7 @@
    "pre": [
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "Y2.B7.S2 reading a mass in grams on a scale (its kg dials have answer 0 until the generator is fixed; the gram dials are sound)",
+     "why": "Y2.B7.S2 / Y2.B7.S3 reading a mass on a dial in g or kg (every mark labelled): the masses the operations use",
      "opts": {
       "forms": [
        1
@@ -7356,13 +7356,13 @@
      }
     },
     {
-     "key": "measurement:temperature",
+     "key": "measurement:mass_volume_liquid",
+     "why": "what the items ask: read the scale (g or kg): the same scale reading in another measure — Y2.B7.S3 Measure in kilograms (taught earlier, W35)",
      "opts": {
       "forms": [
        1
       ]
-     },
-     "why": "reading a thermometer in °C: the same scale reading in another measure — Y2.B7.S9 Temperature (W22)"
+     }
     }
    ],
    "preBuild": [
@@ -7398,13 +7398,13 @@
      "opts": {}
     },
     {
-     "key": "measurement:temperature",
+     "key": "measurement:mass_volume_liquid",
+     "why": "what the items ask: read the scale (g or kg): the same scale reading in another measure — Y2.B7.S3 Measure in kilograms (taught earlier, W35)",
      "opts": {
       "forms": [
        1
       ]
-     },
-     "why": "reading a thermometer in °C: the same scale reading in another measure — Y2.B7.S9 Temperature (W22)"
+     }
     },
     {
      "key": "comparing:compare_objects",
@@ -10242,8 +10242,8 @@
    "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true,
    "closes": {
-    "Y2.B7.S2": "reads one kind of g scale (marks in 100 g or 200 g); the kg items on the same form have answer 0 (generator bug, about half the items); reading scales in grams with different steps is not dealt",
-    "Y2.B7.S3": "reads gram dials; every kg dial has answer 0 (generator bug), so reading a kilogram scale is not dealt",
+    "Y2.B7.S2": "reads gram dials with every mark labelled (100 g or 200 g a mark), but about half the items are kilogram dials and no option keeps the page to grams; gram scales with unlabelled marks to count between (steps of 1, 2, 5 or 10 g) are not dealt",
+    "Y2.B7.S3": "reads kilogram dials (1 kg a mark, every mark labelled, 1-9 kg) in about half the items, but the rest are gram dials and no option keeps the page to kilograms; kilogram scales with unlabelled marks or steps of 2 or 5 kg are not dealt",
     "Y2.B7.S7": "reads millilitres only; reading a jug in litres is not dealt"
    },
    "kindText": "new skill"
@@ -11085,8 +11085,8 @@
      1
     ]
    },
-   "why": "reads one kind of g scale (marks in 100 g or 200 g); the kg items on the same form have answer 0 (generator bug, about half the items); reading scales in grams with different steps is not dealt",
-   "partial": "reads one kind of g scale (marks in 100 g or 200 g); the kg items on the same form have answer 0 (generator bug, about half the items); reading scales in grams with different steps is not dealt"
+   "why": "reads gram dials with every mark labelled (100 g or 200 g a mark), but about half the items are kilogram dials and no option keeps the page to grams; gram scales with unlabelled marks to count between (steps of 1, 2, 5 or 10 g) are not dealt",
+   "partial": "reads gram dials with every mark labelled (100 g or 200 g a mark), but about half the items are kilogram dials and no option keeps the page to grams; gram scales with unlabelled marks to count between (steps of 1, 2, 5 or 10 g) are not dealt"
   },
   {
    "key": "measurement:mass_volume_liquid",
@@ -11097,8 +11097,8 @@
      1
     ]
    },
-   "why": "reads gram dials; every kg dial has answer 0 (generator bug), so reading a kilogram scale is not dealt",
-   "partial": "reads gram dials; every kg dial has answer 0 (generator bug), so reading a kilogram scale is not dealt"
+   "why": "reads kilogram dials (1 kg a mark, every mark labelled, 1-9 kg) in about half the items, but the rest are gram dials and no option keeps the page to kilograms; kilogram scales with unlabelled marks or steps of 2 or 5 kg are not dealt",
+   "partial": "reads kilogram dials (1 kg a mark, every mark labelled, 1-9 kg) in about half the items, but the rest are gram dials and no option keeps the page to kilograms; kilogram scales with unlabelled marks or steps of 2 or 5 kg are not dealt"
   },
   {
    "key": "measurement:mass_volume_liquid",

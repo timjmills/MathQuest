@@ -7040,7 +7040,7 @@
    "partial": [
     {
      "key": "measurement:mass_volume_liquid",
-     "missing": "reads one kind of scale each, and the kg dials have answer 0 (generator bug, 25 of 80 items); scales with different intervals are not dealt",
+     "missing": "reads one scale at a time: a cylinder in mL (labels on every other mark) or a dial in g or kg (every mark labelled); working out what each interval is worth from labels several marks apart (0, 100, 200 with 4 marks between) is not dealt",
      "opts": {
       "forms": [
        0,
@@ -7050,7 +7050,7 @@
     }
    ],
    "verdict": "partial",
-   "missing": "reads one kind of scale each, and the kg dials have answer 0 (generator bug, 25 of 80 items); scales with different intervals are not dealt",
+   "missing": "reads one scale at a time: a cylinder in mL (labels on every other mark) or a dial in g or kg (every mark labelled); working out what each interval is worth from labels several marks apart (0, 100, 200 with 4 marks between) is not dealt",
    "build": [
     "mass_scales"
    ],
@@ -7098,7 +7098,7 @@
    "partial": [
     {
      "key": "measurement:mass_volume_liquid",
-     "missing": "grams on a scale, but the items that ask the mass in kg have answer 0 on the same scale (generator bug, about half the items)",
+     "missing": "reads gram dials with every mark labelled (100 g or 200 g a mark), but about half the items are kilogram dials and no option keeps the page to grams; gram scales with unlabelled marks are not dealt",
      "opts": {
       "forms": [
        1
@@ -7107,7 +7107,7 @@
     }
    ],
    "verdict": "partial",
-   "missing": "grams on a scale, but the items that ask the mass in kg have answer 0 on the same scale (generator bug, about half the items)",
+   "missing": "reads gram dials with every mark labelled (100 g or 200 g a mark), but about half the items are kilogram dials and no option keeps the page to grams; gram scales with unlabelled marks are not dealt",
    "build": [
     "mass_scales"
    ],
@@ -7178,7 +7178,7 @@
    "partial": [
     {
      "key": "measurement:mass_volume_liquid",
-     "missing": "g or kg alone, and every kg dial has answer 0 (generator bug); mixed kg and g readings are not dealt",
+     "missing": "reads g or kg alone on a dial with every mark labelled; a reading in kilograms and grams together (1 kg 200 g) is not dealt",
      "opts": {
       "forms": [
        1
@@ -7187,7 +7187,7 @@
     }
    ],
    "verdict": "partial",
-   "missing": "g or kg alone, and every kg dial has answer 0 (generator bug); mixed kg and g readings are not dealt",
+   "missing": "reads g or kg alone on a dial with every mark labelled; a reading in kilograms and grams together (1 kg 200 g) is not dealt",
    "build": [
     "mass_scales"
    ],
@@ -7281,7 +7281,7 @@
     },
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "Y3.B7.S3 reading a mass on a scale in grams (taught before this step in the block) (its kg dials have answer 0 until the generator is fixed; the gram dials are sound)",
+     "why": "Y3.B7.S3 reading a mass on a dial in g or kg (every mark labelled) (taught before this step in the block): the two units converted here",
      "opts": {
       "forms": [
        1
@@ -7332,7 +7332,7 @@
     },
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "Y2.B7.S2 reading a mass in grams on a scale (Grade 1) (its kg dials have answer 0 until the generator is fixed; the gram dials are sound)",
+     "why": "Y2.B7.S2 / Y2.B7.S3 reading a mass on a dial in g or kg (every mark labelled) (Grade 1): the masses compared here",
      "opts": {
       "forms": [
        1
@@ -7372,7 +7372,7 @@
     },
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "Y2.B7.S2 reading a mass in grams on a scale (Grade 1, on the W35 list as Measure in kilograms) (its kg dials have answer 0 until the generator is fixed; the gram dials are sound)",
+     "why": "Y2.B7.S2 / Y2.B7.S3 reading a mass on a dial in g or kg (every mark labelled) (Grade 1, on the W35 list as Measure in kilograms): the masses added here",
      "opts": {
       "forms": [
        1
@@ -7447,20 +7447,30 @@
      }
     },
     {
-     "key": "measurement:temperature",
+     "key": "measurement:mass_volume_liquid",
+     "why": "what the items ask: read the scale (g or kg): the same scale reading in another measure — Y3.B7.S3 Measure mass in kilograms and grams (taught earlier, W35)",
      "opts": {
       "forms": [
        1
       ]
-     },
-     "why": "reading a thermometer in °C: the same scale reading in another measure — Y2.B7.S9 Temperature (W22)"
+     }
     }
    ],
    "preBuild": [
     "nonstandard_capacity"
    ],
-   "related": [],
-   "note": "no related skill: every later-taught step of the block uses skills already linked here"
+   "related": [
+    {
+     "key": "measurement:temperature",
+     "why": "a thermometer: the same scale reading",
+     "opts": {
+      "forms": [
+       1
+      ]
+     }
+    }
+   ],
+   "note": ""
   },
   "Y3.B7.S8": {
    "title": "Measure capacity and volume in litres and millilitres",
@@ -7488,13 +7498,13 @@
      "opts": {}
     },
     {
-     "key": "measurement:temperature",
+     "key": "measurement:mass_volume_liquid",
+     "why": "what the items ask: read the scale (g or kg): the same scale reading in another measure — Y3.B7.S3 Measure mass in kilograms and grams (taught earlier, W35)",
      "opts": {
       "forms": [
        1
       ]
-     },
-     "why": "reading a thermometer in °C: the same scale reading in another measure — Y2.B7.S9 Temperature (W22)"
+     }
     },
     {
      "key": "comparing:compare_objects",
@@ -11438,9 +11448,9 @@
    "why": "existing WRM_PROPOSALS entry; reused",
    "reused": true,
    "closes": {
-    "Y3.B7.S1": "reads one kind of scale each, and the kg dials have answer 0 (generator bug, 25 of 80 items); scales with different intervals are not dealt",
-    "Y3.B7.S2": "grams on a scale, but the items that ask the mass in kg have answer 0 on the same scale (generator bug, about half the items)",
-    "Y3.B7.S3": "g or kg alone, and every kg dial has answer 0 (generator bug); mixed kg and g readings are not dealt",
+    "Y3.B7.S1": "reads one scale at a time: a cylinder in mL (labels on every other mark) or a dial in g or kg (every mark labelled); working out what each interval is worth from labels several marks apart (0, 100, 200 with 4 marks between) is not dealt",
+    "Y3.B7.S2": "reads gram dials with every mark labelled (100 g or 200 g a mark), but about half the items are kilogram dials and no option keeps the page to grams; gram scales with unlabelled marks are not dealt",
+    "Y3.B7.S3": "reads g or kg alone on a dial with every mark labelled; a reading in kilograms and grams together (1 kg 200 g) is not dealt",
     "Y3.B7.S8": "millilitres only; mixed l and ml readings are not dealt"
    },
    "kindText": "new skill",
@@ -12541,8 +12551,8 @@
      1
     ]
    },
-   "why": "reads one kind of scale each, and the kg dials have answer 0 (generator bug, 25 of 80 items); scales with different intervals are not dealt",
-   "partial": "reads one kind of scale each, and the kg dials have answer 0 (generator bug, 25 of 80 items); scales with different intervals are not dealt"
+   "why": "reads one scale at a time: a cylinder in mL (labels on every other mark) or a dial in g or kg (every mark labelled); working out what each interval is worth from labels several marks apart (0, 100, 200 with 4 marks between) is not dealt",
+   "partial": "reads one scale at a time: a cylinder in mL (labels on every other mark) or a dial in g or kg (every mark labelled); working out what each interval is worth from labels several marks apart (0, 100, 200 with 4 marks between) is not dealt"
   },
   {
    "key": "measurement:mass_volume_liquid",
@@ -12553,8 +12563,8 @@
      1
     ]
    },
-   "why": "grams on a scale, but the items that ask the mass in kg have answer 0 on the same scale (generator bug, about half the items)",
-   "partial": "grams on a scale, but the items that ask the mass in kg have answer 0 on the same scale (generator bug, about half the items)"
+   "why": "reads gram dials with every mark labelled (100 g or 200 g a mark), but about half the items are kilogram dials and no option keeps the page to grams; gram scales with unlabelled marks are not dealt",
+   "partial": "reads gram dials with every mark labelled (100 g or 200 g a mark), but about half the items are kilogram dials and no option keeps the page to grams; gram scales with unlabelled marks are not dealt"
   },
   {
    "key": "measurement:mass_volume_liquid",
@@ -12565,8 +12575,8 @@
      1
     ]
    },
-   "why": "g or kg alone, and every kg dial has answer 0 (generator bug); mixed kg and g readings are not dealt",
-   "partial": "g or kg alone, and every kg dial has answer 0 (generator bug); mixed kg and g readings are not dealt"
+   "why": "reads g or kg alone on a dial with every mark labelled; a reading in kilograms and grams together (1 kg 200 g) is not dealt",
+   "partial": "reads g or kg alone on a dial with every mark labelled; a reading in kilograms and grams together (1 kg 200 g) is not dealt"
   },
   {
    "key": "measurement:unit_conversions",
