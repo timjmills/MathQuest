@@ -1,4 +1,4 @@
-# Wave 2 tagging: Year 2 (US Grade 1) — round 11
+# Wave 2 tagging: Year 2 (US Grade 1) — round 12
 
 Output: `data/curriculum/links/Y2.json` (124 steps, 11 blocks, block order, none skipped). Items: `Y2-Y3-items.md`.
 
@@ -6,9 +6,155 @@ Output: `data/curriculum/links/Y2.json` (124 steps, 11 blocks, block order, none
 
 | Steps | full | partial | gap | proposals new | proposals reused | tag fixes | entries with real opts |
 |---|---|---|---|---|---|---|---|
-| 124 | 63 | 36 | 25 | 10 | 36 | 65 | 76 |
+| 124 | 63 | 36 | 25 | 10 | 41 | 66 | 76 |
+
+Site lessons (round 12): 11 (6 full / 5 partial / 0 gap). Proposals reused include 5 that only lessons use.
 
 New proposals: `one_digit_addend`, `make_amount_notes`, `money_difference`, `single_fraction`, `time_past_to`, and in round 3 `sub_from_ten`, `order_pictures`, `compare_measures` (extended to lengths in one unit; shared with Y3).
+
+## Round 12 (after critic Y2–Y3 r11, 7.96 / 7.96; builder escalated to Opus medium, `design/STATUS.md`)
+
+### Part 0: the WIP commit, reviewed
+`d747fdab` (the paused builder's round-12 edits) was rebuilt and kept: `bbRank` ranks every pre by building block before WRM
+distance (addition / subtraction: the same operation one band lower or before the exchange, then the place-value parts and
+the 1s facts, then the inverse and the fact families, word problems last; × / ÷ alike), and **BBCHECK** fails the build when
+a lead pre is a word problem on a non-problem step or the inverse / a fact family / the other operation on a + − × ÷ step.
+The r11 rows land: Y2.B2.S15 leads with `add_sub_10s` (Y2.B2.S4), then `base10_build {band:99}`, `unit_form`, the ones
+`add_20_no_regroup`; Y3.B2.S13 / S14 lead with `add_100_regroup` (Y2.B2.S16) then `add_1k_no_regroup` (Y3.B2.S11); Y2.B2.S10
+leads with `sub_20_no_regroup`, with `make_ten` and `make_a_ten` (the bridge through 10) after the counting-back pres;
+Y2.B11.S2's quarter-of-a-shape pre says "the quarter turn"; a pre whose items equal the step's own (opts outside the schema,
+`{range:20}`) is dropped (`sameItems`). bbcheck: Y2 124 steps / Y3 134, 0 problems.
+
+### Part 1: tidy and base
+- The lane's tooling now lives in `tests/scripts/wrm-tagging/Y2-Y3/` (`build.mjs`, `overrides.mjs`, `markers.mjs`,
+  `linkscan.mjs`, `items.mjs`, `mergecheck23.mjs`, `mergeall.mjs` (was `mergeall5.mjs`), `xlsx.py`, and the new
+  `claims.mjs`, `sweep.mjs`, `lessons.mjs`). The move left the output byte-identical.
+- Merged `origin/claude/sweet-newton-c8wrv1` (Y5 + site lessons, Y6, R/Y1/Y4/Y5/Y6 links in `data/curriculum/links/`, PR #8
+  generator fixes). The vendored `inputs/{R,Y1,Y4}.json` were byte-identical to the in-repo files and are gone: the build and
+  `mergecheck23` read `data/curriculum/links/`, and `mergecheck23` merges the R, Y1, Y4, Y5 and Y6 tagFixes on Y2/Y3 steps
+  before and after this file's own.
+- The Y5 lane's site extraction (`ws-wrm-extract.cjs`, `site-lessons.json`, `wrm-steps.json`, `wrm-db.js`,
+  `WRM_COVERAGE.md`) was already on the base, byte-identical to the Y5 branch. **Y2/Y3 step fields that changed:** no id,
+  title, CCSS or EE. Added: `site` on 146 steps (`supportIn` grades; `taughtIn` copied-in or review uses) and `enrichment`
+  on 83 ("Grade 2 standard" 27, "Grade 3 standard" 52, "Grade 4 standard" 3, one `true`). Removed: `usAdaptation` on
+  Y2.B4.S3 / S4 / S7 / S8 (the money steps; now `enrichment: "Grade 2 standard"`). The build reads none of these fields;
+  the US-money reading of the UK titles is now in the claim checker (below).
+
+### Part 2: PR #8 follow-up (`GENERATOR-FIXES-2026-10-16.md`)
+- `mass_volume_liquid` kg dials, re-judged on 100 fresh seeds (51233 + 97 i): `{forms:[1]}` deals 57 kg dials (1-9 kg, a mark
+  every kg, every mark labelled) and 43 gram dials (100 g or 200 g a mark, every mark labelled, to 2,000 g); `{forms:[0,1]}`
+  49 cylinders (mL, a label on every other mark), 25 g, 26 kg. No item has answer 0. No option keeps a page to grams or
+  to kilograms.
+- Clauses now say what is dealt: Y2.B7.S2 / Y3.B7.S2 (gram dials, but about half the items are kilogram dials; unlabelled
+  marks not dealt), **Y2.B7.S3 stays partial on a new clause** (kg dials in about half the items, the rest gram dials, no
+  unlabelled marks or 2 / 5 kg steps), Y3.B7.S1 (one scale at a time; working out an interval from labels several marks
+  apart not dealt), Y3.B7.S3 (g or kg alone; 1 kg 200 g not dealt). The answer-0 notes are gone from every clause.
+- The 8 `{forms:[1]}` pre links: the r12-WIP broken-link mechanism is emptied. The four mass steps' whys say "reading a mass
+  on a dial in g or kg (every mark labelled)"; the capacity steps keep the g/kg dial rung ("the same scale reading in another
+  measure"), which is sound again.
+- Fraction denominators: every `denoms` link (15 key + opts) regenerated, 60 items each: 0 off-family on the families
+  (`{denoms:[2]}` is halves, quarters and eighths, as before). `fraction_of_set` still ignores `denoms` in its
+  missing-numerator items (`?/5 of 15` under `{denoms:[2,3]}`), so that clause and owner bug stay.
+- The generator bug lists below drop the kg-dial bug.
+
+### Part 3: the root-cause guard (no silent re-optioning) and the claim sweep
+- **OPTGATE** (`build.mjs`): every link's key + opts is fixed when its spec opts are set (hand opts, the cited step's own
+  opts, the year default). After that a link may change only through a named spec rule: `linkFix` (per step), `linkSwap`
+  (year-wide), `count0` (a count from 0 its why names), or `markerFix` **only when `markerFixOk` lists that exact change for
+  that step**. Anything else exits 1. The old marker-fit loop had re-optioned **19 links silently**; each was re-read on its
+  items: 13 approved with a hand-written why (`whyFix` / `relWhyFix`: Y2 halves-and-quarters shape parts on B8.S1 / S2 / S9 /
+  S10 / S12 and B11.S3, half past on B8.S10 / S12, B11.S3 / S4; Y3 B3.S4 ÷2/5/10, B4.S4 ×10, B4.S11 equal groups), 6 dropped
+  (Y2.B7.S5 "half full" related; Y3.B3.S8 / S11 "the inverse: dividing by 3 / 4", which the old loop had turned into ÷2/5/10
+  and whose ÷3 / ÷4 is first met later; Y3.B4.S6 / S10 the 2-digit × 1-digit column, later; Y3.B4.S10 a story related).
+  Result: Y2 883 links, 842 at their spec opts, the rest by linkSwap 36, count0 6, linkFix 1, markerFix 10 (approved);
+  Y3 971 links, 952 at spec opts, linkFix 9, linkSwap 7, markerFix 3; 0 problems.
+- **TITLECLAIM** (`build.mjs`, Y5 critic r6 H′): a why that cites a step claims that step's full title. When the title names
+  what the items never deal, an "add and subtract" title on a one-operation skill gets the half marker ("the adding half",
+  Y2 9, Y3 7), a skill that is only partial at the cited step gets "nearest live practice: … these items never sort" (Y2 11,
+  Y3 9), and a skill that is direct there is a build error (0). UK money titles are read in dollars, cents and bills.
+- Rung citations prefer the step where the key is DIRECT: the millilitre cylinder now cites Y2.B7.S6 Measure in millilitres,
+  not Y2.B7.S7 Measure in litres.
+- **`sweep.mjs`** (ported from the Y5 lane, `claims.mjs` copied with the refinements its header lists): every pre / related
+  why and every partial clause of Y2.json and Y3.json, **steps and site lessons**, against 30 items on fresh seeds
+  (27449 + 89 i, no build or critic seed): (a) every unit, representation, form, operation, number kind and context the
+  text names, the cited titles included; (a-neg) a clause's "never / no" operation; (b) customary on a metric or time entry,
+  metric-only on a customary entry; (c) a pre past 1.5 × its entry's ceiling. A "used for …" part is the step's purpose,
+  not a claim. Exit 1 on any open (a), (a-neg) or (b).
+- The first sweep of the r11 file found 150 (a) findings (most rule noise: "which way round", "the second number", "vertical
+  number line", "the 2 times-tables", UK money titles); the real ones were fixed at the source: about 50 analogy whys rewritten
+  with a "used for" purpose ("a number line … (used for reading a ruler)", "counting in 5s from 0 (the count used for the
+  minutes)"), the `unit_form` links that claimed "12 tens = 120" (9 entries) moved to `{band:999, rename:'more'}` (5 hundreds 12 tens =
+  620), the "Sort 2-D shapes" / "Measure in litres" / "Convert pounds and pence" citations marked by TITLECLAIM, the Y2.B6.S1
+  clause said as "reads an inch ruler (whole inches) only; measuring in centimetres on a centimetre ruler is not dealt",
+  `arrays_groups {forms:[0]}` said as arrays, `compose_from_attributes` as clicking, `skip_count_line` without "number line".
+- **Final sweep: Y2 928 links, 53 clauses, 456 claims; Y3 1,077 links, 87 clauses, 826 claims: a 0, a-neg 0, b 0.** The
+  118 (c) findings (Y2 55, Y3 63) were read: 52 number skills met earlier with a 2- or 3-digit number in an easier task
+  (`add_1k_no_regroup` before adding four 2-digit numbers), 26 counts whose row passes 100, 11 graph totals, 10 money
+  amounts read in cents against a ceiling read in dollars, 10 scale or conversion readings, 7 number lines to 100, 2
+  symmetry payload coordinates. None is a harder task than its entry.
+- Lead pre: BBCHECK on every step (0); the self-check (below) re-read every lead and moved four that were a sibling or a
+  later calculation (Y2.B4.S8 Make a pound (a dollar) now leads with Make the same amount; Y2.B2.S5 with 1 more / 1 less; Y2.B5.S1 with
+  Add equal groups (K); Y2.B11.S1 with Describe position (K)).
+
+### Part 4: site lessons (owner rule 2026-10-16: every site lesson tagged)
+A top-level `lessons` section, generated by the build from `tests/scripts/wrm-tagging/Y2-Y3/lessons.mjs`, in exactly the Y5
+lane's shape (`Y5-report.md` "The `lessons` JSON shape"): `title`, `site {flag, supplement, firstWeek, ccss, ee, domain,
+unit, block, power}`, `direct`, `partial` (with opts and clause), `verdict`, `missing`, `build`, `pre`, `preBuild`,
+`related`, `note`, and `envision` on every lesson that is not full. Lessons tag nothing into SKILL_WRM (no tagFixes); a
+proposal a lesson uses lists it under `lessons` and `closes[<lesson id>]`, never under `steps`. Every verdict was judged
+from generated items with the listed opts. The build checks every lesson link as a step's: the cited step owns the key and
+is taught before the lesson's first week (same year) or in a lower grade; a Support lesson (site flag enrich-native) is
+judged against its SOURCE grade (its pres cite only steps of the source year or below; content markers at week 0); an
+above-grade core title with no week is judged at W38; no pre repeats the lesson's own skill; >= 3 pre or a note saying why
+few; title claims; and the sweep covers the section. `mergecheck23` asserts the section holds exactly the year's site
+lessons, no tagFix names a lesson, and every lesson build is listed by its proposal and closed.
+
+Y2 (school Grade 1): **11 lessons: 6 full, 5 partial, 0 gap**; 45 links.
+
+| Lesson (site) | Verdict | Skills (opts) | Build |
+|---|---|---|---|
+| Solve one-step word problems within 20 using bar models (committee, W03) | partial | `add_wp_20` / `sub_wp_20 {support:'bar'}`: result-unknown join and take-away on a bar | `map_change_unknown_story`, `map_compare_smaller_unknown` (MAP) |
+| Count on to 120 (committee, W08) | partial | `hundreds_chart_fill {band:100}`, `number_seq_fill {range:100}`: to 100 only | `chart_120` |
+| Compose and recompose shapes (committee, W15) | partial | `compose_shapes`, `compose_hexagon`: 2-D only | `map_compose_solids` (MAP) |
+| Bonds to 10 (Support, source Reception) | full | `make_ten {band:10}` | |
+| Compare mass (1), Compare mass (2) (Support, Reception) | full | `heavier_lighter_visual` (as R.B2.S2 / R.B8.S1) | |
+| Doubling (up to 5+5) (Support, Reception) | partial | `doubles_near_doubles {forms:[0]}`: abstract, to 10 + 10 | `doubles_pictured` (R) |
+| Length and height (compare, order) (Support, Reception) | full | `compare_objects {task:length}`, `{task:height}`, `order_objects_length {tiles:3}` | |
+| Count money - notes and coins (US) (above grade) | full | `money_count {usd, kind:both}` | |
+| Find the total (US) (above grade) | full | `money {usd, step:5, band:500}`: two prices in dollars and cents | |
+| Select money (US) (above grade) | partial | `make_change_least_coins {usd}`: fewest coins, no bills | `make_amount_notes` |
+
+### Counts and gates (round 12)
+- Y2: 124 steps (63 full / 36 partial / 25 gap), 11 lessons (6 / 5 / 0), 51 proposals (10 new, 41 reused), 66 tagFixes (+1: the Y2.B6.S1 clause).
+- Build: two builds from a clean `git archive HEAD` are byte-identical to each other and to the committed Y2.json / Y3.json;
+  mergecheck 0, OPTGATE 0, TITLECLAIM 0, lessons 0, BBCHECK 0 in each build log.
+- `linkscan.mjs Y2 Y3`: OK. `sweep.mjs Y2 Y3`: OK (a 0, a-neg 0, b 0).
+- Merge simulation, `mergeall.mjs` R + Y1 + Y2 + Y3 + Y4 + Y5 + Y6 (Y5 from the base, = `/home/user/wt-y5`): 1,040 tags, 0
+  problems in both orders (the agreeing Y4 / Y2 duplicate on Y2.B1.S15 is a NOTE). Other lanes' checkers on Y2 / Y3: R/Y1
+  `mergecheck_ry1.mjs` 0 / 0; Y4 `mergecheck.mjs` 0 / 0; Y5 `mergecheck.mjs` Y5 + Y2 + Y3 0, and all seven files 0 when
+  Y4 merges before Y2 (with Y2 first it prints "add on a tag that exists" for that same Y2.B1.S15 duplicate: Y4 adds the tag
+  Y2 already set, with the identical clause; the merged tag is the same, so 0 real conflicts, as critic r11 §4 ruled).
+- `ws-wrm-extract --site … --check`: exit 0 (both files up to date). `ws-boot-smoke`: OK.
+
+### Self-check (rule 6, fresh seeds 88211 + 137 i)
+Random 10 per year (`random.Random(121601)` Y2: B4.S8, B2.S15, B10.S3, B1.S5, B1.S13, B2.S17, B7.S5, B1.S1, B3.S5, B1.S15;
+`random.Random(121602)` Y3: B10.S2, B4.S10, B1.S7, B2.S6, B2.S4, B8.S3, B2.S2, B5.S9, B10.S7, B1.S12), the r11 sevens and
+rows (Y2.B2.S15, Y3.B7.S1, Y3.B2.S13 / S14, Y2.B2.S10, Y2.B11.S2), every lead pre of both files, and all 36 lessons were
+re-read on their items. Found and fixed: the Y2.B4.S8 lead (Find change → Make the same amount), Y2.B2.S5, Y2.B5.S1 and
+Y2.B11.S1 leads, the Y3.B4.S10 related "3 times as long" on additive bar models (dropped; the multiplicative claim now reads
+"times as long / tall / heavy"), and four lesson whys. I grade every re-read step and lesson 8.
+
+### Owner questions (round 12, with recommendations)
+1. **Support lessons that are WRM steps of an earlier grade under another title** (Bonds to 10 = R.B11.S8, Compare mass (1) /
+   (2) = R.B2.S2 / R.B8.S1, Count money - notes and coins = Y2.B4.S3, Group equally = Y2.B5.S7, Share equally = Y2.B5.S8 …).
+   *Recommend the site use the WRM titles so they resolve to the step (as the Y5 lane recommended); until then they are
+   tagged as lessons and the note names the step.*
+2. **"Find the total" is an auto-match the site asks to verify.** *Recommend reading it as adding two prices in dollars and
+   cents (as tagged); if it means counting a collection of coins, re-tag it to `money_count {kind:both}`.*
+3. **Customary length at Grade 2 (W17-W19)**: the xlsx Grade 2 sheet has no customary step, but the site schedules seven
+   inch-and-foot lessons. *Recommend the site's weeks; the lane allows inches in those seven lessons only.*
+4. **`mass_volume_liquid` form 1 mixes g and kg dials (about half each)**: *recommend a `unit` option (g / kg) on the scale form,
+   so Y2.B7.S2 / S3 and Y3.B7.S2 become full with it (`mass_scales` covers the unlabelled-mark part).*
 
 ## Round 11 (after critic Y2–Y3 r10, 7.94 / 7.97): rung chooser, prior-lane opts, the five-year merge
 
