@@ -5691,7 +5691,7 @@ html, body { margin: 0; padding: 0; background: #fff; }
   font-variant-numeric: lining-nums tabular-nums; font-size: var(--text); line-height: 1.3;
   -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 .pg.letter { page: letter; width: 215.9mm; height: 279.4mm; padding: 12mm 14.95mm 14mm; }
-.pg.land { page: land; width: 297mm; height: 210mm; padding: 12mm 13mm 14mm; }
+.pg.land { page: land; width: 297mm; height: 210mm; padding: 12mm 13mm 12mm; }  /* live 271 x 186 mm (PG-5) */
 .pg:last-child { break-after: auto; page-break-after: auto; }
 @media screen { body { background: #fff; } .pg { margin: 0 auto 8mm; outline: 1px solid var(--grey); } }
 
@@ -5723,6 +5723,7 @@ html, body { margin: 0; padding: 0; background: #fff; }
 /* 6. Bands (BD). Labels are bold, sentence case, end in a colon. */
 .band { flex: none; display: flex; flex-direction: column; border: var(--heavy) solid var(--ink); border-top: var(--rule) solid var(--ink); margin-top: -1.5pt; }
 .body > .band:first-child { margin-top: 1.5mm; border-top-width: var(--heavy); }
+.teacher .body > .t > .band:first-child, .teacher .body > .band:first-child { margin-top: 3mm; }  /* no double rule under the header */
 .band.grow { flex: 1 1 0; min-height: 0; }
 .strip { flex: none; min-height: var(--strip); display: flex; align-items: center; gap: 3mm; padding: 0 3mm; font-size: var(--text); }
 .strip b { font-weight: 700; }
@@ -5743,11 +5744,11 @@ html, body { margin: 0; padding: 0; background: #fff; }
 .ntab.w2 { min-width: 8.4mm; }
 
 /* 8. Vertical fact stack (VA-70): 3 tracks of 0.72 em; sum rule 1.5 pt; answer row 12 mm. */
-.stk { font-size: var(--digit); line-height: 1; display: grid; grid-template-columns: repeat(3, .72em); justify-content: center; }
+.stk { font-size: var(--digit); line-height: 1; display: grid; grid-template-columns: .95em .72em .72em; justify-content: center; }  /* operator track 0.95 em, digit tracks 0.72 em */
 .stk > span { height: 1.15em; display: flex; align-items: center; justify-content: center; position: relative; }
 .stk .op { font-weight: 700; }
 .stk .rule { grid-column: 1 / -1; height: 0; border-top: var(--heavy) solid var(--ink); margin-top: 1mm; }
-.stk .ans { grid-column: 1 / -1; height: var(--ans); display: grid; grid-template-columns: repeat(3, .72em); }
+.stk .ans { grid-column: 1 / -1; height: var(--ans); display: grid; grid-template-columns: .95em .72em .72em; }
 .stk .ans > span { display: flex; align-items: center; justify-content: center; }
 .ring { position: absolute; left: 50%; top: 50%; width: .82em; height: 1.08em; transform: translate(-50%, -50%); border: var(--hair) solid var(--ink); border-radius: 50%; }
 .ring.g { border: var(--dot) solid var(--grey); }
@@ -5816,7 +5817,7 @@ html, body { margin: 0; padding: 0; background: #fff; }
 .tbox { border: var(--hair) solid var(--ink); border-radius: 3mm; padding: 1.8mm 3mm; display: grid; grid-template-columns: 5.8mm 1fr; column-gap: 2.5mm; align-items: start; }
 .tbox.watch { border-width: var(--heavy); }
 .tbox svg { color: var(--ink); }
-.loop { display: grid; grid-template-columns: 5mm 30mm 1fr; column-gap: 2mm; row-gap: 1mm; align-items: baseline; }
+.loop { display: grid; grid-template-columns: 5mm 36mm 1fr; column-gap: 2mm; row-gap: 1mm; align-items: baseline; }
 .cols2 { display: grid; grid-template-columns: 1fr 1fr; column-gap: 4mm; }
 .thumb { width: 55mm; height: 77.8mm; flex: none; border: var(--hair) solid var(--ink); overflow: hidden; }
 .thumb > .pg { transform: scale(.262); transform-origin: 0 0; margin: 0; outline: 0; break-after: auto !important; page-break-after: auto !important; }
@@ -6372,6 +6373,54 @@ export function columnStack({ top = 47, bottom = 25, op = '+', carry = '1', ans 
     `<i style="grid-column:1/-1;border-top:1.5pt solid #000;margin:1mm 0"></i>` +
     `<span></span>${seg(0, 'a', A[0])}${seg(1, 'a', A[1])}</div>`;
 }
+
+// VA-10 / VA-20 / SL-12. Two-digit column subtraction with a regroup strip (HTML, 28 pt, tracks 0.95 em: TY-21).
+//   operator track | T | O.  Heads "T O" 12 pt bold over a 0.75 pt cap.  Regroup strip 8 mm over T and O
+//   (one rounded outline, a divider on the track boundary; new tens left, new ones right, 15 pt).
+//   Cross-out: a 0.75 pt diagonal through each regrouped digit.  Sum rule 1.5 pt.  Answer strip 12 mm, one
+//   segment per track.  Optional Check line: "Check: [line] + bottom = [line]".
+// Every mark takes a state: 'none' (absent), 'slot' (empty writing place), 'grey' (trace / newest model mark),
+// 'ink' (black, done), 'key' (answer: shown only on the key, in the key colour).  A tens answer of 0 is left empty.
+export function columnStackSub({ top, bottom, op = '−', regroup = 'slot', cross = 'none', ans = 'slot', ansDigits = null,
+  check = false, checkState = 'slot', heads = true, size = 28, wide = false } = {}) {
+  const t = String(top).padStart(2, ' '), b = String(bottom).padStart(2, ' ');
+  const diff = top - bottom, d = ansDigits || [Math.floor(diff / 10) || '', diff % 10];
+  const regT = Math.floor(top / 10) - 1, regO = (top % 10) + 10;
+  const mark = (v, st) => st === 'grey' ? `<span class="g">${v}</span>` : st === 'ink' ? `<span>${v}</span>` : st === 'key' ? `<b class="ka">${v}</b>` : '';
+  const grey = (st) => st === 'grey' ? 'border-color:#949494;border-width:1pt;' : '';
+  const seg = (pos, h, inner, st) => `<i data-slot="${st === 'none' ? '' : 'strip'}" style="display:flex;align-items:center;justify-content:center;font-style:normal;height:${h}mm;` +
+    `border:.75pt solid #000;${pos === 'L' ? 'border-right-width:0;border-radius:1.5mm 0 0 1.5mm;' : 'border-radius:0 1.5mm 1.5mm 0;'}${grey(st)}">${inner}</i>`;
+  const xo = (st) => st === 'none' ? '' : `<svg viewBox="0 0 10 10" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible"${st === 'key' ? ' class="ka" data-ka' : ''}>` +
+    `<path d="M7.6 1.2 L2.6 9.2" stroke="${st === 'grey' ? '#949494' : '#000'}" stroke-width="${st === 'grey' ? '1pt' : '.75pt'}" vector-effect="non-scaling-stroke"${st === 'key' ? ' data-ka' : ''}/></svg>`;
+  const regroupRow = regroup === 'none' ? `<span style="grid-column:1/-1;height:8mm"></span>` :
+    `<span></span>${seg('L', 8, `<span style="font-size:15pt">${mark(regT, regroup)}</span>`, regroup)}${seg('R', 8, `<span style="font-size:15pt">${mark(regO, regroup)}</span>`, regroup)}`;
+  const dig = (v, st) => `<span style="position:relative;display:flex;justify-content:center;height:1.15em;align-items:center">${v.trim()}${v.trim() ? xo(st) : ''}</span>`;
+  const ansRow = ans === 'none' ? `<span style="grid-column:1/-1;height:12mm"></span>` :
+    `<span></span>${seg('L', 12, mark(d[0], d[0] === '' ? 'none' : ans), ans)}${seg('R', 12, mark(d[1], ans), ans)}`;
+  const chk = check ? `<div class="ws-checkrow" style="display:flex;align-items:flex-end;justify-content:center;gap:1.6mm;margin-top:2mm;font-size:15pt;white-space:nowrap">` +
+    `<b>Check:</b><span class="ln" data-slot="line" style="--w:17mm;height:7mm;line-height:7mm">${mark(diff, checkState)}</span><span>+ ${bottom} =</span>` +
+    `<span class="ln" data-slot="line" style="--w:17mm;height:7mm;line-height:7mm">${mark(top, checkState)}</span></div>` : '';
+  return `<div class="stk2" data-slot="ans" style="display:flex;flex-direction:column;align-items:center"><div style="display:grid;grid-template-columns:repeat(3,${wide ? 1.1 : 0.95}em);font-size:${size}pt;line-height:1">` +
+    (heads ? `<span></span><b style="font-size:12pt;text-align:center;height:6mm">T</b><b style="font-size:12pt;text-align:center;height:6mm">O</b><i style="grid-column:2/-1;border-top:.75pt solid #000;height:1mm"></i>` : '') +
+    regroupRow + `<span></span>${dig(t[0], cross)}${dig(t[1], cross)}` +
+    `<b style="text-align:center;height:1.15em;display:flex;align-items:center;justify-content:center">${op}</b>${dig(b[0], 'none')}${dig(b[1], 'none')}` +
+    `<i style="grid-column:1/-1;border-top:1.5pt solid #000;margin:1mm 0 1.5mm"></i>` + ansRow + `</div>${chk}</div>`;
+}
+
+// RP-120 / RP-93. A 2D shape to judge, name or partition (bounding box 42 mm at L). kind: rect | square | circle | triangle.
+// outline 1.5 pt for a shape to judge or name, 0.75 pt for a shape the pupil partitions or shades; no fill.
+// guides: true draws the partition guide dots (1 pt dotted semantics: solid 1.2 mm dots) where the pupil's line should
+// start and end, never the line itself.  line: {state:'grey'|'key'} draws one halving line (model / key).
+export function shape({ kind = 'rect', w = 42, h = 30, task = 'judge', guides = false, line = null } = {}) {
+  const sw = r2(task === 'judge' ? S.heavy : S.hair), p = 1;
+  let s = '', ends = [[w / 2 + p, p], [w / 2 + p, h + p]];
+  if (kind === 'circle') { s = `<circle cx="${r2(w / 2 + p)}" cy="${r2(w / 2 + p)}" r="${r2(w / 2)}" stroke-width="${sw}"/>`; h = w; ends = [[w / 2 + p, p], [w / 2 + p, w + p]]; }
+  else if (kind === 'triangle') { s = `<path d="M${r2(w / 2 + p)} ${p} L${r2(w + p)} ${r2(h + p)} L${p} ${r2(h + p)} Z" stroke-width="${sw}"/>`; }
+  else { if (kind === 'square') h = w; s = `<rect x="${p}" y="${p}" width="${w}" height="${h}" stroke-width="${sw}"/>`; ends = [[w / 2 + p, p], [w / 2 + p, h + p]]; }
+  if (guides) for (const [x, y] of ends) s += `<circle cx="${r2(x)}" cy="${r2(y)}" r="0.6" fill="#000" stroke="none"/>`;
+  if (line) s += `<path d="M${r2(ends[0][0])} ${r2(ends[0][1])} L${r2(ends[1][0])} ${r2(ends[1][1])}" stroke="${line.state === 'grey' ? GREY : '#000'}" stroke-width="${r2(line.state === 'grey' ? S.dot : S.heavy)}"${line.state === 'key' ? ' data-ka' : ''}/>`;
+  return svg(w + 2 * p, h + 2 * p, s, 'v-shape');
+}
 ```
 
 ---
@@ -6413,18 +6462,25 @@ has step 1 in grey; no item repeats in the packet; the key's answers sit in the 
 Reference implementation (Node + Playwright; adjust `OUT` and the browser path):
 
 ```js v21-selfcheck
-// Runs V21 Appendix E (pre-output self-check) on the rendered sample pack and writes SELF-CHECK.md.
+// Runs V21 Appendix E (pre-output self-check) on a rendered pack and writes SELF-CHECK.md next to it.
+// usage: node selfcheck.mjs <pack folder (pack.html, pack.pdf, pool.json)> <V21 .md file> [chromium executable]
 import { chromium } from 'playwright';
 import fs from 'node:fs';
+import path from 'node:path';
 import { execSync } from 'node:child_process';
-const OUT = '/home/user/MathQuest/design/lesson-planner/sample-v21';
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+const [OUT0, V21MD, BROWSER] = process.argv.slice(2);
+const OUT = path.resolve(OUT0);
+// the instruction library = every string in Appendix C.1 of V21 (column 2 of its table)
+const md = fs.readFileSync(V21MD, 'utf8'); const c1 = md.slice(md.indexOf('### C.1'), md.indexOf('### C.2'));
+const LIB = [...c1.matchAll(/^\| `[^`]+`(?: \(V21\))? \| ([^|]+) \|/gm)].map((m) => m[1].trim().replace(/_/g, ''));
+const POOL = fs.existsSync(path.join(OUT, 'pool.json')) ? JSON.parse(fs.readFileSync(path.join(OUT, 'pool.json'), 'utf8')) : { repeats: [], turns: [] };
+const b = await chromium.launch(BROWSER ? { executablePath: BROWSER } : {});
 const p = await b.newPage();
 await p.emulateMedia({ media: 'print' });
 await p.goto('file://' + OUT + '/pack.html');
 await p.evaluate(() => document.fonts.ready);
 
-const R = await p.evaluate(() => {
+const R = await p.evaluate((LIBRARY) => {
   const MM = 96 / 25.4, PT = 96 / 72;
   const rgb = (c) => { const m = c && c.match(/rgba?\(([^)]+)\)/); if (!m) return null; const v = m[1].split(',').map((x) => parseFloat(x));
     if (v.length === 4 && v[3] === 0) return null; return '#' + v.slice(0, 3).map((n) => Math.round(n).toString(16).padStart(2, '0')).join(''); };
@@ -6434,7 +6490,6 @@ const R = await p.evaluate(() => {
   out.fonts.andika400_15 = document.fonts.check('400 15px Andika');
   out.fonts.loaded = [...document.fonts].map((f) => `${f.family} ${f.weight} ${f.status}`);
   const PRINT_VERBS = ['Look', 'Read', 'Say', 'Count', 'Circle', 'Underline', 'Box', 'Cross out', 'Trace', 'Write', 'Draw', 'Shade', 'Mark', 'Match', 'Measure', 'Use', 'Find', 'Fill in', 'Finish', 'Check', 'Fix', 'Think', 'Start', 'Put', 'Move', 'Add', 'Subtract', 'Multiply', 'Divide', 'Solve', 'Round', 'Compare', 'Estimate', 'Regroup', 'Bring down', 'Cut', 'Sort', 'Glue', 'Color'];
-  const LIBRARY = ['Add.', 'Count. Write the number.', 'Write the missing number.', 'Circle the bigger number.', 'Write 1 more and 1 less.', 'Write <, > or = in the circle.', 'Draw a line to match.', 'Read the story. Draw it. Solve.'];
   const emojiRe = /[\p{Extended_Pictographic}\u{1F000}-\u{1FAFF}]/u, allowedPicto = new Set(['©', '★', '®', '™']);
   for (const pg of pages) {
     const id = pg.dataset.page, teacher = pg.classList.contains('teacher'), key = pg.classList.contains('key');
@@ -6504,11 +6559,24 @@ const R = await p.evaluate(() => {
       const w2 = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); let n;
       while ((n = w2.nextNode())) { if (!n.textContent.trim()) continue; const pe = n.parentElement; const cs = getComputedStyle(pe);
         if (cs.display === 'none' || pe.closest('.ka') && !key || pe.closest('.lt')) continue; const r = document.createRange(); r.selectNodeContents(n); rs.push(...r.getClientRects()); }
-      root.querySelectorAll('svg, .bx, .ln, .sq, .circ, .chk, .dotm, .rule, .ring, .story, [data-slot="track"]').forEach((e) => { if (getComputedStyle(e).display !== 'none' && !(e.closest('[data-ka]') && !key)) rs.push(e.getBoundingClientRect()); });
+      root.querySelectorAll('svg, .bx, .ln, .sq, .circ, .chk, .dotm, .rule, .ring, .story, .ans, [data-slot], [data-slot="track"]').forEach((e) => { if (getComputedStyle(e).display !== 'none' && !(e.closest('[data-ka]') && !key)) rs.push(e.getBoundingClientRect()); });
       return rs.filter((r) => r.width > 0 && r.height > 0); };
     for (const r of inkRects(pg.querySelector('.body'))) maxBottom = Math.max(maxBottom, r.bottom);
     // framed pages: the frame itself is structure; "used" = lowest ink (text, drawing, slot) over the body height
     P.usedPct = Math.round((maxBottom - body.top) / body.height * 100);
+    // site lint: the body is no more than 8 % blank at the bottom (lowest ink of any kind, frame lines included)
+    let lowest = body.top; pg.querySelector('.body').querySelectorAll('*').forEach((e) => { if (e.closest('.thumb')) return; const r = e.getBoundingClientRect(); if (r.height > 0 && r.width > 0) lowest = Math.max(lowest, r.bottom); });
+    P.bottomBlank = Math.round(Math.max(0, body.bottom - lowest) / body.height * 100);
+    P.thumbs = pg.querySelectorAll('.thumb').length;
+    P.panelRows = [...pg.querySelectorAll('[data-panel-row]')].map((e) => Math.round(e.getBoundingClientRect().height / MM * 10) / 10);
+    const t2 = pg.querySelector('table.tt');
+    P.atoms = id === 'T2' && t2 ? [...t2.querySelectorAll('tr')].slice(1).map((tr) => tr.children[2].textContent.split('·')[0].trim()) : null;
+    P.t2stars = id === 'T2' ? [...pg.querySelectorAll('table.tt')].slice(0, 2).some((t) => /★/.test(t.textContent)) : false;
+    const tables = [...pg.querySelectorAll('table.tt')];
+    const glance = tables.find((t) => /Fade/.test(t.querySelector('tr').textContent));
+    P.fadeRows = glance ? [...glance.querySelectorAll('tr')].slice(1).map((tr) => /★/.test(tr.lastElementChild.textContent)) : null;
+    const halves = pg.classList.contains('land') ? [...pg.querySelectorAll('.body > div > div')].filter((d) => d.querySelector('.grid')) : [];
+    P.halfW = halves.map((d) => Math.round(d.getBoundingClientRect().width / MM * 10) / 10);
     const cells = [...pg.querySelectorAll('.cell')].filter((c) => !c.closest('.thumb'));
     P.cells = cells.map((c) => { const cr = c.getBoundingClientRect(); const rs = inkRects(c);
       if (!rs.length) return { w: cr.width / MM, h: cr.height / MM, free: 100, top: 0, left: 0, right: 0, bottom: 0, empty: true };
@@ -6519,9 +6587,11 @@ const R = await p.evaluate(() => {
       const ink = grid.reduce((a, v) => a + v, 0);
       const u = rs.map(clip).reduce((a, r) => ({ l: Math.min(a.l, r.l), t: Math.min(a.t, r.t), r: Math.max(a.r, r.r), b: Math.max(a.b, r.b) }), { l: 1e9, t: 1e9, r: -1e9, b: -1e9 });
       const pad = 3 * MM;  // CL-8 pad is structure, not an empty band
-      return { w: cr.width / MM, h: cr.height / MM, free: Math.round((1 - ink / (W * H)) * 100),
+      const draw = c.hasAttribute('data-draw');   // the pupil draws or marks here: the open zone IS the answer
+      const hw = 10 * MM;                          // a written answer may keep one Hw of open space under it
+      return { w: cr.width / MM, h: cr.height / MM, free: Math.round((1 - ink / (W * H)) * 100), draw,
         top: Math.round(Math.max(0, u.t - cr.top - pad) / cr.height * 100), left: Math.round(Math.max(0, u.l - cr.left - pad) / cr.width * 100),
-        right: Math.round(Math.max(0, cr.right - u.r - pad) / cr.width * 100), bottom: Math.round(Math.max(0, cr.bottom - u.b - pad) / cr.height * 100),
+        right: Math.round(Math.max(0, cr.right - u.r - pad) / cr.width * 100), bottom: Math.round(Math.max(0, cr.bottom - u.b - pad - hw) / cr.height * 100),
         read: c.hasAttribute('data-read'), work: !!c.querySelector('.stk, [data-work]') || !!c.closest('[data-section="exit"]'), sec: (c.closest('[data-section]') || {}).dataset?.section || '' }; });
     // equal cells per section
     const bySec = {}; for (const c of P.cells) (bySec[c.sec] = bySec[c.sec] || []).push(c);
@@ -6534,7 +6604,7 @@ const R = await p.evaluate(() => {
     out.pages.push(P);
   }
   return out;
-});
+}, LIB);
 await b.close();
 
 // ---------- evaluate ----------
@@ -6561,8 +6631,8 @@ row('E9', 'Every page ≥ 50 % used (lowest ink over body height)', `min ${Math.
 const cells = pupil.flatMap((p) => p.cells.filter((c) => !c.empty).map((c) => ({ ...c, page: p.id })));
 const lowFree = cells.filter((c) => !c.read && c.free < 40);
 row('E10', 'Every item cell ≥ 40 % free (pupil pages; a key is its page; reading cells - story box, routine panel - exempt)', `${cells.length} cells; min free ${Math.min(...cells.filter((c) => !c.read).map((c) => c.free))} %; below 40 %: ${lowFree.map((c) => c.page).join(', ') || 'none'}`, lowFree.length === 0);
-const band = cells.filter((c) => c.top >= 30 || c.left >= 30 || (!c.work && (c.right >= 30 || c.bottom >= 30)));
-row('E11', 'No empty band ≥ 30 % of a cell (top and left always; right and bottom unless that side is the open answer / work zone)', `worst top ${Math.max(...cells.map((c) => c.top))} %, left ${Math.max(...cells.map((c) => c.left))} %, right ${Math.max(...cells.map((c) => c.right))} %, non-work bottom ${Math.max(0, ...cells.filter((c) => !c.work).map((c) => c.bottom))} %, non-work right ${Math.max(0, ...cells.filter((c) => !c.work).map((c) => c.right))} %; failing: ${band.map((c) => c.page + '/' + c.sec).join(', ') || 'none'}`, band.length === 0);
+const band = cells.filter((c) => !c.read && !c.draw && (c.top >= 30 || c.left >= 30 || c.right >= 30 || c.bottom >= 30));
+row('E11', 'No empty band ≥ 30 % of a cell, measured the site way: slots and answer rows are content; a written answer keeps one Hw (10 mm) under it; only draw-on cells are exempt', (() => { const m = cells.filter((c) => !c.read && !c.draw); return `worst top ${Math.max(...m.map((c) => c.top))} %, left ${Math.max(...m.map((c) => c.left))} %, right ${Math.max(...m.map((c) => c.right))} %, bottom ${Math.max(...m.map((c) => c.bottom))} %; failing: ${band.map((c) => c.page + '/' + c.sec).join(', ') || 'none'}`; })(), band.length === 0);
 const uneq = pages.filter((p) => p.unequal.length);
 row('E12', 'Equal cells within each section (±0.5 mm)', uneq.length ? uneq.map((p) => p.id + ': ' + p.unequal.join('/')).join('; ') : 'all sections equal', uneq.length === 0);
 const sw = pages.filter((p) => !p.teacher).flatMap((p) => Object.entries(p.slotWidths).map(([s, w]) => ({ p: p.id, s, w })));
@@ -6572,25 +6642,40 @@ const dsh = pages.reduce((a, p) => a + p.dashedNotCut, 0);
 row('E14', 'No dashed line except the cut line (and the missing-digit box)', `${dsh} dashed strokes outside a cut line`, dsh === 0);
 const ins = pages.filter((p) => !p.teacher).flatMap((p) => p.instr);
 const insBad = ins.filter((i) => i.words > 12 || !i.verbs || !i.lib);
-row('E15', 'Instructions ≤ 12 words, every sentence starts with a print verb, string from the library', `${ins.length} instructions; max ${Math.max(...ins.map((i) => i.words))} words; failing: ${[...new Set(insBad.map((i) => i.s))].join(' | ') || 'none'}`, insBad.length === 0);
+row('E15', `Instructions ≤ 12 words, every sentence starts with a print verb, string in Appendix C.1 (${LIB.length} strings read from V21)`, `${ins.length} instructions; max ${Math.max(...ins.map((i) => i.words))} words; failing: ${[...new Set(insBad.map((i) => i.s))].join(' | ') || 'none'}`, insBad.length === 0);
 const say = pages.flatMap((p) => p.sayBlanks);
 row('E16', 'Every frame has ≤ 2 blanks', `Say frames: ${say.length}; blanks per frame ${[...new Set(say)].join(', ')}`, say.every((n) => n <= 2));
-const pairs = pupil.filter((p) => p.id !== 'P2').map((p) => [p, keys.find((k) => k.id === p.id + '-key')]);
+const pairs = pupil.map((p) => [p, keys.find((k) => k.id === p.id + '-key')]);
 row('E17', 'Each key has the same slots as its page (facsimile)', pairs.map(([p, k]) => `${p.id} ${p.slots}/${k ? k.slots : '—'}`).join(', '), pairs.every(([p, k]) => k && p.slots === k.slots));
 row('E18', '© line and strand tab on every page', `© on ${pages.filter((p) => p.copy).length}/${pages.length}; tab on ${pages.filter((p) => p.tabs > 0).length}/${pages.length}`, pages.every((p) => p.copy && p.tabs > 0));
 const titles = [...new Set(pages.flatMap((p) => p.titles))];
 row('E19', 'One identical I Can title on every page', titles.join(' | '), titles.length === 1);
-const lone = pupil.filter((p) => !['P5', 'P6', 'P2'].includes(p.id) && p.slots < 2);
-row('E20', 'No lone item (one-item pages only where the role ceiling is 1: word problem v1, exit slip)', lone.length ? lone.map((p) => p.id).join(', ') : 'none', lone.length === 0);
+const lone = pupil.filter((p) => !['P5', 'P2'].includes(p.id) && p.slots < 2);
+row('E20', 'No lone item (one-item pages only where the role ceiling is 1: word problem v1; the anchor chart is a poster)', lone.length ? lone.map((p) => p.id).join(', ') : 'none', lone.length === 0);
 
-const md = ['# V21 self-check: add 1–3 sample pack', '',
-  `Run by \`selfcheck.mjs\` (Chromium print media, A4) on \`pack.html\`, ${new Date().toISOString().slice(0, 10)}. Checks are V21 Appendix E, E1–E20.`, '',
+const bb = pages.filter((p) => p.bottomBlank > 8);
+row('E9b', 'Body no more than 8 % blank at the bottom (site lint)', `max ${Math.max(...pages.map((p) => p.bottomBlank))} %; over 8 %: ${bb.map((p) => p.id + ' ' + p.bottomBlank).join(', ') || 'none'}`, bb.length === 0);
+const land = pages.filter((p) => p.halfW.length);
+row('E1b', 'Exit-slip halves 132.5 ± 0.5 mm wide (A4 landscape, live 271 × 186 mm, 6 mm cut gap)', land.map((p) => p.id + ': ' + p.halfW.join(' / ')).join('; '), land.every((p) => p.halfW.length === 2 && p.halfW.every((w) => Math.abs(w - 132.5) <= 0.5)));
+const panel = pages.flatMap((p) => p.panelRows);
+row('E16b', 'Routine panel: one action per check box, each row one line (≤ 9 mm)', `${panel.length} rows; tallest ${Math.max(0, ...panel)} mm`, panel.every((h) => h <= 9));
+const t2 = pages.find((p) => p.id === 'T2'), TYPES = ['Category', 'Comparative', 'Fact', 'Conceptual'];
+row('E21', 'T2: ≥ 5 atoms, every type one of Category / Comparative / Fact / Conceptual; no ★ in the atom tables', t2 ? `${t2.atoms.length} atoms: ${t2.atoms.join(', ')}; ★ in tables: ${t2.t2stars}` : 'no T2', !!t2 && t2.atoms.length >= 5 && t2.atoms.every((a) => TYPES.includes(a)) && !t2.t2stars);
+const dl = pages.filter((p) => ['T3', 'T4', 'T5'].includes(p.id));
+row('E22', 'Every delivery page (T3–T5) shows at least one pupil-page thumbnail', dl.map((p) => p.id + ': ' + p.thumbs).join(', '), dl.length === 3 && dl.every((p) => p.thumbs >= 1));
+const t6 = pages.find((p) => p.id === 'T6');
+row('E23', 'Every row of T6 "Answers at a glance" carries a fade label ★ / ★★ / ★★★', t6 && t6.fadeRows ? `${t6.fadeRows.filter(Boolean).length} / ${t6.fadeRows.length} rows` : 'no table', !!(t6 && t6.fadeRows && t6.fadeRows.every(Boolean)));
+row('E24', 'Item pool: no exact repeat in the packet (exit slip excepted when the pool is exhausted); no turn-around pair on one page', `repeats: ${POOL.repeats.length ? POOL.repeats.join(', ') : 0}; same-page turn-arounds: ${POOL.turns.length ? POOL.turns.join(', ') : 0}`, !POOL.repeats.length && !POOL.turns.length);
+row('E25', 'One key per pupil page (anchor chart included)', `${pupil.length} pupil pages, ${keys.length} keys`, pupil.length === keys.length && pupil.every((p) => keys.some((k) => k.id === p.id + '-key')));
+
+const md2 = ['# V21 self-check: ' + path.basename(OUT), '',
+  `Run by \`selfcheck.mjs\` (Appendix E reference implementation, Chromium print media) on \`pack.html\`, ${new Date().toISOString().slice(0, 10)}. Checks are V21 Appendix E, E1–E25.`, '',
   '| # | Check | Measured | Result |', '|---|---|---|---|',
   ...rows.map((r) => `| ${r.id} | ${r.check} | ${String(r.measured).replace(/\|/g, '/')} | ${r.pass ? 'PASS' : 'FAIL'} |`), '',
   `**${rows.filter((r) => r.pass).length} / ${rows.length} pass.**`, '',
   '## Per page', '', '| Page | Used % | Min text pt | Cells | Min free % | Paints |', '|---|---|---|---|---|---|',
   ...pages.map((p) => `| ${p.id} | ${p.usedPct} | ${p.minTextPt} | ${p.cells.length} | ${p.cells.length ? Math.min(...p.cells.map((c) => c.free)) : '—'} | ${Object.keys(p.paints).sort().join(' ')} |`)].join('\n');
-fs.writeFileSync(OUT + '/SELF-CHECK.md', md + '\n');
+fs.writeFileSync(OUT + '/SELF-CHECK.md', md2 + '\n');
 console.log(rows.map((r) => `${r.id} ${r.pass ? 'PASS' : 'FAIL'} ${r.measured}`).join('\n'));
 if (process.argv.includes('--debug')) console.log(JSON.stringify(pages.map((p) => ({ id: p.id, bad: p.badPaints, cells: p.cells })), null, 1).slice(0, 6000));
 ```
