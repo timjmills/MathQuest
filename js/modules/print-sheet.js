@@ -233,6 +233,8 @@ function refAccepts(sk, cand, key, seen, kept) {
     if (sk.minN !== undefined && !(Number(cand.cell && cand.cell.payload && cand.cell.payload.n) >= Number(sk.minN))) return false;
     if (sk.distinctFirst && seen.has(`first:${key}:${ops[0]}`)) return false;
     if (sk.distinctAnswer && seen.has(`ans:${key}:${refAnswer(cand)}`)) return false;
+    // (`avoidKeys` refs - the detailed lesson maker: no two answers alike on the page across its skills, LR-6)
+    if (sk.avoidKeys && seen.has(`ansAll:${dlAns(cand).replace(/[^0-9a-z<>=]/gi, '')}`)) return false;
     if (sk.noTurnaround && ops.length >= 2 && seen.has(`pair:${key}:${ops.slice().sort((x, y) => x - y).join(',')}`)) return false;
     if (sk.maxSmall !== undefined && ops.length >= 2 && ops[1] < 10 && (kept.get(`small:${key}`) || 0) >= Number(sk.maxSmall)) return false;
     if (Array.isArray(sk.avoidTexts) && sk.avoidTexts.includes(refText(cand))) return false;
@@ -291,6 +293,7 @@ function refRecord(sk, q, key, seen, kept) {
     const ops = refOperands(q);
     if (sk.distinctFirst) seen.add(`first:${key}:${ops[0]}`);
     if (sk.distinctAnswer) seen.add(`ans:${key}:${refAnswer(q)}`);
+    if (sk.avoidKeys) seen.add(`ansAll:${dlAns(q).replace(/[^0-9a-z<>=]/gi, '')}`);
     if (sk.noTurnaround && ops.length >= 2) seen.add(`pair:${key}:${ops.slice().sort((x, y) => x - y).join(',')}`);
     if (sk.maxSmall !== undefined && ops.length >= 2 && ops[1] < 10) kept.set(`small:${key}`, (kept.get(`small:${key}`) || 0) + 1);
     if (sk.avoidKeys || sk.minNum !== undefined || sk.maxNum !== undefined || sk.edge) { const k = factKeyOf(q); if (k !== null) seen.add(`key:${k}`); }
@@ -342,6 +345,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // `cellPayload` on a lesson's ref (the detailed lesson maker): fields merged into the item's
         // kit payload (lesson 2: the word-work cell's compact `layout: 'bar'`). Absent elsewhere.
         if (sk.cellPayload && q.cell && q.cell.payload) q = Object.assign({}, q, { cell: Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, sk.cellPayload) }) });
+        if (sk.instructionKey && q) q = Object.assign({}, q, { instructionKey: sk.instructionKey });
         if (sk.check && q.cell && q.cell.template === 'stack') q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, { check: true }) });
         // (`sectionLabel` on the ref: the Mixed page names the item's band by it - the detailed lesson maker)
         if (sk.sectionLabel) q = Object.assign({}, q, { sectionLabel: String(sk.sectionLabel) });
@@ -2634,6 +2638,7 @@ function dealOne(ref, seed, used, want, avoidAns = null) {
         try { q = generateQuestionFor(Object.assign({ category: ref.categoryId, skill: ref.skillId, opts: ref.opts, seed: (seed + 7919 * k) >>> 0, itemIndex: k % 6 }, ref.range ? { range: ref.range } : {})); } catch (e) { q = null; }
         if (!q) continue;
         if (ref.cellPayload && q.cell && q.cell.payload) q = Object.assign({}, q, { cell: Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, ref.cellPayload) }) });
+        if (ref.instructionKey && q) q = Object.assign({}, q, { instructionKey: ref.instructionKey });
         const key = factKeyOf(q), v = itemNumberOf(q);
         if (key === null || used.has(key) || (ok && !ok({ q }))) continue;
         if (avoidAns && avoidAns.has(dlAns(q))) continue;

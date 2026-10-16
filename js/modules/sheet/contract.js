@@ -141,6 +141,8 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'story-work': 'Circle the sign. Write the numbers in the boxes. Solve.',
     // the detailed lesson's word problem page with the RCDWS panel (V22 §9.6, C.1 `story-rcdws`)
     'story-rcdws': 'Read the story. Draw it. Solve.',
+    // detailed lesson 2 (2026-10-16): the word-work cell's compact bar form (story, bar, answer)
+    'story-bar': 'Read the story. Fill in the bar. Solve.',
     'pick-parts': 'Write one number from each list to make the sum.',
     'fact-family': 'Use the three numbers. Fill in the fact family.',
     'chart-fill': 'Fill in the missing products.',

@@ -9,7 +9,7 @@
 // Every number a script speaks is a {placeholder} filled from the DEALT items, never typed here.
 
 const NS = (categoryId, skillId, opts, extra) => Object.assign({ categoryId, skillId, opts }, extra || {});
-const WP = (extra) => Object.assign({ categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'bar', wpCues: false, wpBank: false }, cellPayload: { layout: 'bar' } }, extra || {});
+const WP = (extra) => Object.assign({ categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'bar', wpCues: false, wpBank: false }, cellPayload: { layout: 'bar' }, instructionKey: 'story-bar' }, extra || {});
 // (`cellPayload.layout: 'bar'`: the word-work cell's compact form - story, bar, answer box with the
 // label printed; no sign row, column boxes or unit bank: the bar is the working.)
 
@@ -39,8 +39,8 @@ export default {
     practicePages: 1,
     // Mixed: EARLIER skills only (V22 §9.5): number bonds and facts within 20.
     mixed: { skills: [
-        { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20, notation: ['across'] } },
-        { categoryId: 'subtraction', skillId: 'sub_facts', opts: { band: 10, notation: ['across'] } },
+        { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20 } },
+        { categoryId: 'subtraction', skillId: 'sub_facts', opts: { band: 10 } },
     ] },
 
     lessonData: {
@@ -83,9 +83,9 @@ export default {
     prerequisites: [
         { atom: 1, ref: { categoryId: 'counting', skillId: 'count_objects', opts: { band: 20, objects: 'frame' }, minNum: 11, maxNum: 20 },
             lesson: { id: 'K CC 5', title: 'Count to 20' } },
-        { atom: 2, ref: { categoryId: 'composing', skillId: 'number_bonds', opts: { band: 10, unknown: 'answer' } },
+        { atom: 2, ref: { categoryId: 'composing', skillId: 'number_bonds', opts: { band: 10, unknown: 'answer', orientation: 'horizontal' } },
             lesson: { id: 'Y1 B2 S2', title: 'Part-whole model' } },
-        { atom: 3, items: 4, ref: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20, notation: ['across'] }, minNum: 11, maxNum: 20 },
+        { atom: 3, items: 4, ref: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20, notation: ['stacked'] }, minNum: 11, maxNum: 20 },
             lesson: { id: 'G1 OA 6', title: 'Add within 20' } },
     ],
 
@@ -116,7 +116,7 @@ export default {
         { case: 'add to: gets more', ref: WP({ maxNum: 20 }), want: 'bigFirst', detects: 'Subtracts: the wrong sign.' },
         { case: 'a whole past 10', ref: WP({ minNum: 11, maxNum: 20 }), want: 'bigSecond', detects: 'Count slip past 10: one less.' },
     ],
-    exitInstruction: 'Circle the sign. Write the numbers in the boxes. Solve.',
+    exitInstruction: 'Read the story. Fill in the bar. Solve.',
     exitSay: 'The answer is __ __.',
 
     // ------------------------------------------------------------------ retrieval (MWB)

@@ -1060,7 +1060,8 @@ export function extras(input = {}) {
     const data = lesson.data || null;
     const main = poolItems(input, 'main');
     const ex = pickExample(main, data);
-    const steps = ex ? workedStepsOf(ex) : [];
+    // (a bar story with the lesson's own chart steps: the Steps zone and strip name those steps)
+    const steps = ex ? (data && Array.isArray(data.chartSteps) && isWordBar(ex) ? chartStepsOf(ex, data) : workedStepsOf(ex)) : [];
     const out = [];
     if (ex) out.push(...stateItems(ex, data));
     const { ex2, ex3, ex4 } = otherExamples(input, ex, data);

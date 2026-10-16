@@ -240,6 +240,11 @@ Gate failures and load numbers measured before this fix (~12:30 UTC) are not tru
 - **N-5 (for the lessons wave, Wave 8/9)**: the `nl_add` Lesson anchor chart number line runs past the cell and its
   labels overlap ("110121132143154"); the Say frame reads "10 plus 10 equals 10." while the steps say "You land on 20".
 
+- **2026-10-16, detailed lesson maker, lesson 1 (g2-nbt3-read-write-1000)**: builder escalated mq-opus-low ->
+  mq-opus-medium for critic r3 S1 (1,000 still dealt on Practice 2 after the board-only ruling; R2 of r2, open two
+  rounds) and S2 (T2 continuation page under the fill floor; D5 r1 -> R5 r2 -> S2 r3). Reports:
+  `design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r{1,2,3}.md`.
+
 ## 10. Wave 8 (lessons) — word-problem lesson pages, found 2026-10-03 and left as on main
 
 These are deferred to Wave 8 (owner ruling 2026-10-03: lessons and anchor charts wait for the Lesson wave). A fix

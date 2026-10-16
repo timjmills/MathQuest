@@ -64,7 +64,8 @@ export function plan(input = {}) {
     const band = (its, cols, rows, cellH, pageCols) => {
         const b = {
             kind: 'band', label: '', instr: instructionText(instructionKeyOf(its, input.skills), its), extra: input.perQuestion ? '' : scoreTag(its.length),
-            content: gridPart(its.map((it) => planItem(it, { cols: pageCols, level: 0 })), { cols, rows, cellH, labels, start }),
+            // (the detailed lesson's check centres each item in its grown cell, H13)
+            content: gridPart(its.map((it) => planItem(input.perQuestion ? Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }) : it, { cols: pageCols, level: 0 })), { cols, rows, cellH, labels, start }),
         };
         start += its.length;
         return b;

@@ -248,7 +248,9 @@ export function paginateTeacher(bands, heights, { body = TEACHER_BODY_MM, greedy
             const f = fill(p2);
             if (f > bestFill) { best = p2; bestFill = f; }
         }
-        pages = best;
+        // (no balance reaches half a page on every page: fill the first page and let the rest continue,
+        // V22 3131 - the continuation is short by rule)
+        if (bestFill >= 0.5) pages = best;
     }
     return pages.map((list, i) => {
         const out = [];
@@ -394,7 +396,8 @@ export const DETAILED_PUPIL_CSS = `
 .ws-page .dl-wordsline{flex-direction:column;align-items:flex-start;gap:1mm}
 .ws-page .dl-work{flex:1 1 auto;min-height:60mm}
 .ws-page .dl-wpeq .ws-cell{justify-content:center;align-items:center}
-.ws-page .dl-eq{display:flex;align-items:center;gap:3mm;font-size:28pt}
+.ws-page .dl-eq{display:flex;align-items:center;gap:5mm;font-size:28pt}
+.ws-page .dl-eq .ws-box{min-width:24mm}
 .ws-page .dl-eq .ws-box{height:14mm;display:inline-flex;align-items:center;justify-content:center;font-size:28pt;font-weight:400}
 .ws-page.dl-land .ws-body>.mq-row{flex:1 1 auto}
 .ws-page .dl-half>.ws-instrline{flex:none}

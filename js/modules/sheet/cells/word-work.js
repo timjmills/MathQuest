@@ -855,8 +855,10 @@ function barModel(ctx, p, W = 150) {
         const whole = st.op === '+' ? st.ans : st.top;
         const pa = st.op === '+' ? st.top : st.bottom;
         const pb = st.op === '+' ? st.bottom : st.ans;
-        const wa = Math.max(30, Math.min(W - 30, W * pa / Math.max(1, whole)));
-        body = row(seg(W, lab(fmt(whole), 16), false)) + row(seg(wa, lab(fmt(pa), 16), false) + seg(W - wa, lab(fmt(pb), 16), false));
+        const mp = Math.min(30, W * 0.38);
+        const wa = Math.max(mp, Math.min(W - mp, W * pa / Math.max(1, whole)));
+        const lw = Math.min(16, mp - 3);
+        body = row(seg(W, lab(fmt(whole), lw), false)) + row(seg(wa, lab(fmt(pa), lw), false) + seg(W - wa, lab(fmt(pb), lw), false));
     }
     return `<div class="mq-wwbar" aria-label="bar model" style="display:flex;flex-direction:column;gap:${L(ctx, 1.2)};margin-top:${L(ctx, 1.5)};">${body}</div>`;
 }
@@ -953,15 +955,18 @@ function shownSteps(p, ctx) {
  */
 function barLayout(p, ctx) {
     const cols = Math.max(1, Number(ctx.columns || 1));
-    const W = Math.max(60, Math.min(150, 186 / cols - 16));
+    // The answer stands BESIDE the bar (box over its printed label word), so a story is story + one
+    // bar row high and four fit a page half (the exit slip).
+    const W = Math.max(40, Math.min(120, 186 / cols - 16 - 30));
     const put = filled(ctx);
     const ink = put ? inkOf(ctx) : null;
     const bx = boxMm(ctx);
     const w = Math.max(blankWidth(2, sizeOf(ctx)), bx * 1.4);
     const shown = put ? String(p.ans) : '';
     const box = `<span data-ws-slot="answer" data-ws-shape="box"${ink ? ` data-ws-ink="${ink}"` : ''} style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${tw(ctx, w)};height:${tw(ctx, bx + 1)};border:${B(ctx, 1.5)} solid ${INK};border-radius:${L(ctx, 1.25)};background:#fff;font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;color:${ink === 'trace' ? GREY : INK};${KEY_FEATURES}">${esc(shown)}</span>`;
-    const ans = `<div class="mq-wwanswer" style="display:flex;align-items:center;gap:${L(ctx, 2)};font-size:${P(ctx, textPt(ctx) + 2)};margin-top:${L(ctx, 2)};"><span style="font-weight:700;">Answer:</span>${box}${p.unit ? `<span style="font-weight:700;">${esc(p.unit)}</span>` : ''}</div>`;
-    return `<div class="mq-ww mq-wwbarlayout" data-ww-ops="${p.steps[0].op}" style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${L(ctx, 2.5)};">${storyHTML(ctx, p, cols >= 2)}${barModel(ctx, p, W)}${ans}</div>`;
+    const ans = `<div class="mq-wwanswer" style="flex:none;display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 1)};font-size:${P(ctx, textPt(ctx) + 1)};">${box}${p.unit ? `<span style="font-weight:700;line-height:1.1;">${esc(p.unit)}</span>` : ''}</div>`;
+    return `<div class="mq-ww mq-wwbarlayout" data-ww-ops="${p.steps[0].op}" data-read style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${L(ctx, 2.5)};">${storyHTML(ctx, p, cols >= 2)}`
+        + `<div style="display:flex;align-items:flex-end;gap:${L(ctx, 3)};">${barModel(ctx, p, W)}${ans}</div></div>`;
 }
 
 register(WW_TEMPLATE, {

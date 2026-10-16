@@ -311,7 +311,8 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
         // LR-6: no two answers alike on a page (place-value items: the number IS the answer's identity)
         for (const pgid of [...new Set(pl.map((x) => x.page))]) { const v = pl.filter((x) => x.page === pgid).map((x) => x.item); if (new Set(v).size !== v.length) probs.push(`twin answers on ${pgid}`); }
         // (and by ANSWER on every pupil page but the charts: 10 more than 19 and 30 less 1 are twins too - critic r2)
-        for (const pgid of [...new Set(pl.filter((x) => !/^P2/.test(x.page)).map((x) => x.page))]) { const v = pl.filter((x) => x.page === pgid && x.ans !== undefined && x.ans !== '').map((x) => String(x.ans)); const dup = v.filter((x, i) => v.indexOf(x) !== i); if (dup.length) probs.push(`twin answers ${[...new Set(dup)].join(', ')} on ${pgid}`); }
+        // (a Mixed page's skills are told apart by their own form: there the twins are counted per skill)
+        for (const pgid of [...new Set(pl.filter((x) => !/^P2/.test(x.page)).map((x) => x.page))]) { const mixed = /^P4m/.test(pgid); const v = pl.filter((x) => x.page === pgid && x.ans !== undefined && x.ans !== '').map((x) => (mixed ? `${x.rep}:` : '') + String(x.ans)); const dup = v.filter((x, i) => v.indexOf(x) !== i); if (dup.length) probs.push(`twin answers ${[...new Set(dup)].join(', ')} on ${pgid}`); }
         e24b = { ok: !probs.length && prPages.length > 0, msg: probs.length ? probs.join('; ') : `${prPages.length} Practice pages: last rows all edge cases (a 0 place, a teen ending, 1000); no twin answers on any page` };
     }
     row('E24b', 'Practice last row only edge cases (★★★); LR-6 no twin answers on a page', e24b.msg, e24b.ok);
