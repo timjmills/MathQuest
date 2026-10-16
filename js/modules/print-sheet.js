@@ -3005,6 +3005,15 @@ async function buildDetailedLesson(req = {}) {
     // The Say blank of a key reads its answer (the item the frame names), in the key ink (critic r2 R10).
     const sayFill = (html, v) => String(html).replace(/(<span class="ws-line"[^>]*data-ws-slot="say-1"[^>]*)><\/span>/g, `$1 data-ws-key-ans>${String(v).replace(/</g, '&lt;')}</span>`);
     p5.keyPages = p5.keyPages.map((k) => sayFill(k, wpV.ans));
+    // (`wordProblem.keyBar` - the detailed lesson maker, lesson 2: the pupil DRAWS the bar, so the key's Workspace
+    // shows the bar a pupil should draw, its numbers in the key ink; V22 E17: a key drawing in a Workspace is not a slot)
+    if (d.wordProblem.keyBar && eqParts.length === 2) {
+        const W = 110, A = Number(eqParts[0]), B = Number(eqParts[1]);
+        const wa = Math.max(W * 0.2, Math.min(W * 0.8, W * A / Math.max(1, A + B)));
+        const bx = (w, v, l) => `<span data-ws-key-ans style="display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:${w.toFixed(2)}mm;height:12mm;border:0.75pt solid #000;${l ? 'border-left:none;' : ''}font-size:22pt;font-weight:700;color:var(--ws-key-ink)">${escText(String(v))}</span>`;
+        const bar = `<div role="img" aria-label="bar model" style="display:flex;flex-direction:column;gap:1.5mm">${bx(W, wpV.ans)}<div style="display:flex">${bx(wa, A)}${bx(W - wa, B, true)}</div></div>`;
+        p5.keyPages = p5.keyPages.map((k) => String(k).replace('<div class="dl-work" data-work data-draw></div>', `<div class="dl-work" data-work data-draw style="display:flex;align-items:center;justify-content:center">${bar}</div>`));
+    }
     if (sayD) p6.keyPages = p6.keyPages.map((k) => sayFill(k, dlAns(sayD.q)));
     p6.keyPages = p6.keyPages.map((k) => String(k).split('<div class="ws-field name">Name<i></i></div>').join(`<div class="ws-field name"><span data-ws-key="name">Answer Key</span><i></i></div>`));
 

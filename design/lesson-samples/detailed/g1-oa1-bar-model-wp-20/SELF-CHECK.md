@@ -13,15 +13,15 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | E6 | Pupil text ≥ 11 pt (quiet letters, tab, footer excepted) | smallest 11.99 pt (P3 "13", P3-key "13") | PASS |
 | E7 | Teacher text ≥ 10 pt | smallest 10 pt (T1 "#", T2 "#") | PASS |
 | E8 | Working digits 28 pt outside the anchor chart | the kit sets --ws-digit 28pt at size L on every pupil page (one size L pack); measured by ws-print-lint --source kit | PASS |
-| E9 | Every page ≥ 50 % used, nothing past the body | min 75 %; overflow none; under 50 %: none | PASS |
-| E9c | Teacher pages: one continued is ≥ 92 % used (V22 3131); every teacher page listed | T1 96, T2 96, T2b 81, T3 88, T4 83, T5 98, T6 75; continued under 92 %: none | PASS |
-| E9b | Body ≤ 8 % blank below its last band (site lint) | max 5 %; over 8 %: none | PASS |
-| E10 | Every item cell ≥ 40 % free (reading cells exempt) | 112 cells; min free 44 %; below 40 %: none | PASS |
+| E9 | Every page ≥ 50 % used, nothing past the body | min 93 %; overflow none; under 50 %: none | PASS |
+| E9c | Teacher pages: one continued is ≥ 92 % used (V22 3131); every teacher page listed | T1 96, T2 96, T2b 93, T3 93, T4 95, T5 98, T6 93; continued under 92 %: none | PASS |
+| E9b | Body ≤ 8 % blank below its last band (site lint) | max 3 %; over 8 %: none | PASS |
+| E10 | Every item cell ≥ 40 % free (reading cells exempt) | 112 cells; min free 50 %; below 40 %: none | PASS |
 | E11 | No empty band ≥ 30 % in a cell (the site sheetCheck H13, from the border box) | worst 27 %; failing: none | PASS |
 | E12 | Equal cells within each grid (±0.5 mm) and across the Practice pages | all grids equal; Practice cells 6, spread 0.0 × 0.0 mm | PASS |
 | E13 | No underscore characters on pupil pages (slot widths: ws-print-lint --source kit) | underscores 0 | PASS |
 | E14 | No dashed line except the cut line and the missing-digit box | 0 outside a cut line | PASS |
-| E15 | Instructions ≤ 12 words, print verb first, string in the controlled library (V22 Appendix C.1: 130 strings; the kit's PED 10.1 library: 162) | 23 instructions; failing: none; in the kit library but missing from V22 C.1: "Write how many of each place.", "Read the story. Fill in the bar. Solve." | PASS |
+| E15 | Instructions ≤ 12 words, print verb first, string in the controlled library (V22 Appendix C.1: 130 strings; the kit's PED 10.1 library: 162) | 22 instructions; failing: none; in the kit library but missing from V22 C.1: "Write how many of each place.", "Read the story. Fill in the bar. Solve." | PASS |
 | E16 | Every Say frame ≤ 2 blanks | 9 frames; blanks 0, 1 | PASS |
 | E16b | RCDWS panel: one action per box, each row one line (≤ 9 mm) | 12 rows; tallest 9 mm | PASS |
 | E17b | The anchor chart and its key carry no answer marks | P2: 0, P2-key: 0 | PASS |
@@ -50,25 +50,25 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 |---|---|---|---|---|---|---|---|
 | T1 | teacher | 96 | 0 | 10 | 0 | — | #000000 #ffffff |
 | T2 | teacher | 96 | 0 | 10 | 0 | — | #000000 #5b2a86 |
-| T2b | teacher | 81 | 0 | 10 | 0 | — | #000000 #5b2a86 #ffffff |
-| T3 | teacher | 88 | 0 | 11 | 0 | — | #000000 #5b2a86 #c2410c |
-| T4 | teacher | 83 | 0 | 11 | 0 | — | #000000 #5b2a86 |
+| T2b | teacher | 93 | 0 | 10 | 0 | — | #000000 #5b2a86 #ffffff |
+| T3 | teacher | 93 | 0 | 11 | 0 | — | #000000 #5b2a86 #c2410c |
+| T4 | teacher | 95 | 0 | 11 | 0 | — | #000000 #5b2a86 #c2410c |
 | T5 | teacher | 98 | 0 | 11 | 0 | — | #000000 #5b2a86 #c2410c #ffffff |
 | P0 | pupil | 93 | 2 | 12 | 8 | 50 | #000000 #ffffff |
 | P1 | pupil | 95 | 3 | 12 | 10 | 50 | #000000 #ffffff |
-| P2 | pupil | 98 | 0 | 14 | 4 | 60 | #000000 #5b2a86 #949494 #ffffff |
-| P3 | pupil | 92 | 5 | 11.99 | 3 | 48 | #000000 #5b2a86 #949494 #ffffff |
-| P4-1 | pupil | 96 | 0 | 12 | 6 | 53 | #000000 #5b2a86 #ffffff |
-| P4m-1 | pupil | 95 | 0 | 12 | 14 | 50 | #000000 #5b2a86 #ffffff |
+| P2 | pupil | 98 | 0 | 14 | 4 | 61 | #000000 #5b2a86 #949494 #ffffff |
+| P3 | pupil | 94 | 3 | 11.99 | 3 | 60 | #000000 #5b2a86 #949494 #ffffff |
+| P4-1 | pupil | 96 | 0 | 12 | 6 | 55 | #000000 #5b2a86 #ffffff |
+| P4m-1 | pupil | 95 | 0 | 12 | 14 | 52 | #000000 #5b2a86 #ffffff |
 | P5 | pupil | 100 | 0 | 12 | 3 | 57 | #000000 #5b2a86 #ffffff |
-| P6 | pupil | 98 | 0 | 12 | 8 | 34 | #000000 #ffffff |
+| P6 | pupil | 98 | 0 | 12 | 8 | 35 | #000000 #ffffff |
 | P0-key | key | 94 | 2 | 12 | 8 | 50 | #000000 #c2410c #ffffff |
 | P1-key | key | 95 | 3 | 12 | 10 | 50 | #000000 #c2410c #ffffff |
-| P2-key | key | 98 | 0 | 14 | 4 | 60 | #000000 #5b2a86 #949494 #ffffff |
-| P3-key | key | 92 | 5 | 11.99 | 3 | 44 | #000000 #5b2a86 #c2410c #ffffff |
-| P4-1-key | key | 96 | 0 | 12 | 6 | 53 | #000000 #5b2a86 #c2410c #ffffff |
-| P4m-1-key | key | 95 | 0 | 12 | 14 | 50 | #000000 #5b2a86 #c2410c #ffffff |
+| P2-key | key | 98 | 0 | 14 | 4 | 61 | #000000 #5b2a86 #949494 #ffffff |
+| P3-key | key | 94 | 3 | 11.99 | 3 | 57 | #000000 #5b2a86 #949494 #c2410c #ffffff |
+| P4-1-key | key | 96 | 0 | 12 | 6 | 55 | #000000 #5b2a86 #c2410c #ffffff |
+| P4m-1-key | key | 95 | 0 | 12 | 14 | 52 | #000000 #5b2a86 #c2410c #ffffff |
 | P5-key | key | 100 | 0 | 12 | 3 | 57 | #000000 #5b2a86 #c2410c #ffffff |
-| P6-key | key | 97 | 0 | 12 | 8 | 34 | #000000 #c2410c #ffffff |
-| T6 | teacher | 75 | 0 | 10 | 0 | — | #000000 #c2410c |
+| P6-key | key | 97 | 0 | 12 | 8 | 35 | #000000 #c2410c #ffffff |
+| T6 | teacher | 93 | 0 | 10 | 0 | — | #000000 #c2410c |
 

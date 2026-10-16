@@ -110,6 +110,8 @@ export default {
         // The dealt story itself (its own words and numbers); the bar is OFF - the pupil draws it in the Workspace.
         answerLine: 'The answer: __ {wp.unit}.',
         say: 'The answer is __ {wp.unit}.',
+        // The key's Workspace shows the bar to draw (to scale, in the key ink).
+        keyBar: true,
     },
 
     // ------------------------------------------------------------------ P6 Exit slip
@@ -249,7 +251,7 @@ export default {
     ],
     transitionsMin: 4,
     // T2b: this lesson's own slots and routing ids
-    slotRows: [{ shape: 'box', use: 'a bar box: a part (lower row) or the whole (top)' }, { shape: 'longline', use: 'P5: draw the bar in the Workspace' }],
+    slotRows: [{ shape: 'box', use: 'a bar box: a part (lower row) or the whole (top)' }, { shape: 'line', use: 'P5: the answer, then its label word' }],
     routeNote: 'K CC 5 Count to 20 · Y1 B2 S2 Part-whole model · G1 OA 6 Add within 20: the lessons P0 routes back to (T6).',
 
     // ------------------------------------------------------------------ T6

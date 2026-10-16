@@ -1616,7 +1616,8 @@ function weDoRender(it, i) {
         // hundreds box traced, the other boxes empty; every box keeps its slot.
         // A bar story's Guided cell 1 (the detailed lesson maker): step 1 done in grey - the two
         // story numbers ringed; the bar and the answer stay the pupil's.
-        if (!answered && i === 0 && isWordBar(it)) {
+        // (the key rings them too: it is the page's facsimile, so the rings are not read as answers)
+        if (i === 0 && isWordBar(it)) {
             const v = barNums(it);
             let ringed = 0;
             return it.render(c, o).replace(/>([^<>]*)</g, (m, text) => (ringed >= 2 ? m : `>${text.replace(new RegExp(`\\b(${v.a}|${v.b})\\b`, 'g'), (n) => (ringed < 2 ? (ringed++, `<span class="mq-lring mq-lring-t">${n}</span>`) : n))}<`));
