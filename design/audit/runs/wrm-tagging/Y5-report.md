@@ -1,3 +1,68 @@
+# Wave 2 tagging: Year 5 (US Grade 4) — round 4: critic r5 rows (2026-10-16)
+
+Critic r5 (FAIL: B12.S11 = 6; B1.S2 / B1.S9 / B10.S3 = 7; lessons mean 7.82, customary length and weight 6, Compare fractions /
+Order fractions / Measure in centimetres 7). Every row is fixed at the source: `linkfit.mjs`, `build.py`, `keys.mjs`, the new
+`spec_zz_r5.py` (applied after `spec_z_lessons.py`) and the extractor. No hand JSON.
+
+## Build-level classes
+| Class | Fix |
+|---|---|
+| G overstated FULL | `linkfit.mjs` gate: a FULL unit whose title, WRM block (a percentage step of "Decimals and percentages" excepted) or EVERY CCSS code names decimals must have a decimal in a direct item's **question** (689 ÷ 10 = 68.9 is a whole-number dividend). Run over all 136 steps and the lessons: it finds only **B12.S11**. B3.S9 (same title, Autumn block, 4.NBT.A.1 + 5.NBT.A.2) is the whole-number half and passes by rule; its decimal half is B12.S11 |
+| F pre = own direct/partial | `build.py own_repeats()`, run before AND after the linkfit pass (the fit pass had re-optioned the customary lesson's metric pre onto its own partial): a pre / related with the unit's own direct or partial key + opts + Max Number steps one band down (a pre with a numeric band; `keys.mjs` now exports each skill's band values) or is dropped; the rule-15 count / "few" note is re-checked after it. `linkfit.mjs` fails a link that deals the same items, drawn the same way, as an own direct/partial (a `_plain` twin with no picture is the fade, not a repeat). It found 3 more: B2.S6 related `multi_step_word_plain`, B5.S11 pre `mult_comparison_plain`, lesson 7 related `mult_comparison_plain` (all dropped) |
+| H Support lessons at W38 | `linkfit.mjs` reads each Support (enrich-native) lesson's SOURCE grade from `site-lessons.json` ("Source: G2.") and judges its pre / related links against it: no Grade-4 first-taught content at all, no compare/order of unlike fractions in a pre below a Grade-4 source (4.NF.A.2), numbers within the source year's range, no customary units on a metric title, no pre citing a WRM year above the source year. The lesson's own direct/partial stays judged at W38. Why checks: a cited "unit fractions" step must be true of a third of the items; every unit a why names must be in a fifth of the items (the false "kilograms and grams" why) |
+
+## Rows
+| Entry | Change |
+|---|---|
+| Y5.B12.S11 | partial: `place_value_10x {op:'/', decimals:true}` "whole-number dividends only (689 ÷ 10 = 68.9); never a decimal divided by 10, 100 or 1,000 (3.4 ÷ 10 = 0.34)". New option proposal **`div10_decimal_dividend`** on `place_value_10x` (decimal dividends on ÷), closes "dividing a decimal by 10, 100 and 1,000". New first pre `place_value_10x {op:'x', decimals:true}` (B12.S10, the inverse, 6.5 × 10) |
+| Y5.B1.S2 | pre = `place_value_disks {band:999}` (Y4.B1.S1), `unit_form {band:999}`, `expand {band:999}` (Y4.B1.S2): numbers to 1,000, the step below |
+| Y5.B1.S3 | pre disks (own partial) dropped; + `unit_form {band:9999}` (Y5.B1.S2). 3 pre |
+| Y5.B1.S9 | own-partial number line dropped; + `place_on_number_line {span:100, band:1000}` (Y4.B1.S3). 3 pre |
+| Y5.B10.S3 | pre `measure_angles` (own partial) dropped; the "few" note says why one pre |
+| Y5.B5.S11 | `remainder_interpret` clause "12-19"; pre `mult_comparison_plain` dropped (same items as its partial); 3 pre |
+| Y5.B2.S6 | related `multi_step_word_plain` dropped (same items as its partial) |
+| Customary length and weight | the pre the fit had re-optioned onto the lesson's own partial (false "kilograms and grams" why) is dropped; + `mult_facts {constant:[12]}` (Y4.B4.S10, 1 ft = 12 in) |
+| Compare fractions (G2 source) | pre `order_fractions {}` and `equivalent` (Y4) out; pre `identify` (Y3.B6.S1), `shade_fraction` (Y3.B6.S3), `fraction_number_line` (Y3.B6.S7), `equiv_frac_visual` (Y3.B6.S10) |
+| Order fractions (G2 source) | pre `compare {}` and `equivalent` out; pre `identify`, `shade_fraction`, `fraction_number_line`; `compare` is related, its why names the frac_compare_same_part option |
+| Divide a 1-digit number by 100 (G3 source) | pre `d_to_f {forms:[0]}` re-cited "Y4.B8.S2 Tenths as decimals" (0.3 = 3/10); related `frac_10_100` dropped by the source-grade check (it deals thousandths), the note says why no related fits |
+| Lessons 2, 6, 7 | pre `div_facts {}` why: "division facts to 12 × 12, every table" |
+| Lesson 7 | related `mult_comparison_plain` (same items as its partial) -> `tape_diagram` |
+| Measure in centimetres | **no longer a site lesson** (X1.3 below): the extractor records it on Y2.B6.S1 (`site.supportIn` G4). The `lessons` section is now **21** (16 committee + 5 Support) |
+
+The other Support lessons were re-checked under the source-grade rules: 3D shapes (Reception source), Hundredths (G3) pass
+unchanged.
+
+## Extractor (X1, `tests/scripts/ws-wrm-extract.cjs`)
+1. **Curriculum core titles that match no WRM step** of any grade and are not scheduled as a step are now site lessons with the
+   site's flag (`above` / `native`): G1 "Select money (US)", "Find the total (US)", "Count money - notes and coins (US)",
+   G3 "Pounds, tens, ones and pence (US)". The note names the step where the pacing reviews it.
+2. **Review entries (`st.rv`) are resolved by this grade's (year, block, step) first**, then by title: G1 W28 -> Y2.B4.S2
+   `taughtIn` review, G3 W22 -> Y4.B10.S1 `taughtIn` review, each with a disagreement naming the retitle.
+3. **A Support title that matches no step of its stated source grade but exactly matches a step of another grade** is recorded
+   on that step's `site.supportIn` with a disagreement: G4 "Measure in centimetres" -> Y2.B6.S1 (site says K), G3 "Measure in
+   grams" -> Y2.B7.S2 (site says G2).
+
+Counts: disagreements 12 -> 14 (2 "review matches no step" replaced by 2 retitle notes, + 2 Support source mismatches);
+site-lessons 141 -> 143 (+4 core titles, -2 Support titles now on steps); Support titles matched to steps 1,202 -> 1,204,
+unmatched 73 -> 71. `--check` reproduces both files (exit 0).
+
+**For the lead:** the Y4 lane's links file still has a lesson for G3 "Measure in grams" (now a step record, Y2.B7.S2); its
+lane should drop it on its next build. **12 lesson-only proposals have empty `steps`** (they list only `lessons` and
+`closes[<lesson id>]`): a WRM_PROPOSALS merge that reads only `steps` would drop them; read `lessons` too, or put them in
+`STANDARD_PROPOSALS` (all are CCSS-tagged).
+
+## Counts and gates
+136 steps (36 full / 75 partial / 25 gap), 21 lessons (4 full / 16 partial / 1 gap), 175 tagFixes, 101 proposals (29 new,
+72 reused), 874 links. linkfit 0 misfits, optcheck 0, mergecheck (Y5 + R, Y1, Y4, Y6) 0 real, critic `merge5.mjs` 0 conflicts /
+0 Y5 status mismatches / 0 lesson tagFixes, `ws-wrm-extract --check` exit 0, `ws-boot-smoke` OK, two clean `git archive` builds
+byte-identical to the committed Y5.json.
+
+## Self-check (fresh seeds 71003 / 91219, the critic's dump script)
+B12.S11 8 (partial is honest: every ÷ item has a whole dividend; the new pre deals 6.5 × 10), B1.S2 8, B1.S3 8, B1.S9 8,
+B10.S3 8; random 10 (seed 61016: B7.S11, B4.S6, B9.S5, B7.S3, B14.S4, B2.S6, B14.S5, B10.S9, B6.S7, B11.S3) all 8, unchanged
+from r5 except B2.S6 (one fewer related). Lessons: customary length and weight 8, Compare fractions 8, Order fractions 8
+(related `compare` deals unlike pairs; it is a forward link with an honest why), Divide by 100 8; the other 17 unchanged at 8-9.
+
 # Wave 2 tagging: Year 5 (US Grade 4) — round 3: tooling, site re-extract, site lessons (2026-10-16)
 
 ## Round 3 what changed
