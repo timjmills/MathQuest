@@ -855,7 +855,8 @@ function barModel(ctx, p, W = 150) {
         const whole = st.op === '+' ? st.ans : st.top;
         const pa = st.op === '+' ? st.top : st.bottom;
         const pb = st.op === '+' ? st.bottom : st.ans;
-        const mp = Math.min(30, W * 0.38);
+        // (the compact `layout: 'bar'` cell draws its parts TO SCALE down to a label-wide part - lesson 2 critic brief)
+        const mp = p.layout === 'bar' ? Math.min(14, W * 0.3) : Math.min(30, W * 0.38);
         const wa = Math.max(mp, Math.min(W - mp, W * pa / Math.max(1, whole)));
         const lw = Math.min(16, mp - 3);
         body = row(seg(W, lab(fmt(whole), lw), false)) + row(seg(wa, lab(fmt(pa), lw), false) + seg(W - wa, lab(fmt(pb), lw), false));
