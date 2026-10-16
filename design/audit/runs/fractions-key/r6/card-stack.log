@@ -1,0 +1,31 @@
+time_5min s1 (no n/d in prompt) Write the time.
+elapsed_find_duration s1 (no n/d in prompt) Use the time line. Write how long it takes.
+elapsed_mixed s1 (no n/d in prompt) Use the time line. Write the end time.
+money_change s1 (no n/d in prompt) Subtract to find the change.
+money_notation s1 (no n/d in prompt) Write the amount. Use the point.
+ratio_intro s1 (no n/d in prompt) There are 8 pencils and 12 pens. What is the ratio of pencils to pens?
+equiv_ratios s1 (no n/d in prompt) Fill in the missing value: 8 : 8 = ? : 48
+ratio_tables s1 (no n/d in prompt) In the ratio table below, find the missing x value (the one with ?). T
+unit_rate_intro s1 (no n/d in prompt) An author wrote 9 pages in 3 days. How many pages per day?
+percent_of_number s1 (no n/d in prompt) What is 20% of 45?
+percent_of_number s2 {"src":"Click ALL expressions equal to 10% of 80.","stacked":["10100","8010"],"shown":"Tap ALL expressions equal to 10% of 80."}
+percent_of_number s3 {"src":"Click ALL expressions equal to 50% of 40.","stacked":["4050"],"shown":"Tap ALL expressions equal to 50% of 40."}
+line_plot_fractions s1 {"src":"How many measurements are at 1/2?","stacked":[],"shown":"How many measurements are at 1/2?"}
+line_plot_fractions s2 {"src":"How many measurements are at 3/8?","stacked":[],"shown":"How many measurements are at 3/8?"}
+line_plot_fractions s5 {"src":"How many measurements are at 1 3/4?","stacked":[],"shown":"How many measurements are at 1 3/4?"}
+probability_basic s1 (no n/d in prompt) Drag each event to the correct likelihood category.
+probability_basic s2 {"src":"Click ALL events with probability greater than 1/2.","stacked":["12"],"shown":"Tap ALL events with probability greater than 1 2 ."}
+probability_basic s3 {"src":"Click ALL events with probability greater than 1/2.","stacked":["12"],"shown":"Tap ALL events with probability greater than 1 2 ."}
+frac_word_problems s1 {"src":"Hana is 12 years old. Hana ate 2/5 of a cake for lunch in 44 minutes. Ethan ate 2/5. How much did they eat in ","stacked":["25","25","25"],"shown":"Hana is 12 years old. Hana ate 25 of a cake for lunch in 44 minutes. Ethan ate 2 5 . How much did they eat in "}
+frac_word_problems s2 {"src":"Amari ate 3/10 of a cake. Kai ate 2/10. How much did they eat in total?","stacked":["310"],"shown":"Amari ate 3 10 of a cake. Kai ate 2/10. How much did they eat in total?"}
+frac_word_problems s3 {"src":"Noah ate 2/5 of a cake. Ava ate 2/5. How much did they eat in total?","stacked":["25"],"shown":"Noah ate 2 5 of a cake. Ava ate 2/5. How much did they eat in total?"}
+frac_word_problems s4 {"src":"Emma had 3/4 of a cake after baking it for 30 minutes. Kai, who is 7 years old, ate 1/4 of it. How much is lef","stacked":["14","34"],"shown":"Emma had 34 of a cake after baking it for 30 minutes. Kai, who is 7 years old, ate 14 of it. How much is left?"}
+frac_word_problems s5 {"src":"Lucas had 5/6 of a pie. Aisha ate 1/6 of it. How much is left?","stacked":["56","16"],"shown":"Lucas had 5 6 of a pie. Aisha ate 1 6 of it. How much is left?"}
+frac_word_problems s6 {"src":"Owen had 3/5 of a chocolate bar. Sophia ate 2/5 of it. How much is left?","stacked":["35","25"],"shown":"Owen had 3 5 of a chocolate bar. Sophia ate 2 5 of it. How much is left?"}
+fraction_of_set_nv s1 {"src":"Click ALL expressions equal to 1/3 of 12.","stacked":["312","14","123"],"shown":"Tap ALL expressions equal to 13 of 12."}
+fraction_of_set_nv s2 {"src":"What is 1/5 of 15?","stacked":["15"],"shown":"What is 1 5 of 15?"}
+fraction_of_set_nv s3 {"src":"What is 4/7 of 21?","stacked":["47"],"shown":"What is 4 7 of 21?"}
+fraction_of_set_nv s4 {"src":"Click ALL expressions equal to 1/2 of 6.","stacked":["26","62","12"],"shown":"Tap ALL expressions equal to 12 of 6."}
+fraction_of_set_nv s5 {"src":"What is 1/8 of 16?","stacked":["18"],"shown":"What is 1 8 of 16?"}
+fraction_of_set_nv s6 {"src":"There are 6 buttons. 2/3 are green. How many are green?","stacked":[],"shown":"There are 6 buttons. 2/3 are green. How many are green?"}
+pageerrors 0 
