@@ -140,6 +140,30 @@ for sid, st in UNITS.items():
 for st in UNITS.values():
     for e in st['pre'] + st['related']:
         e['why'] = re.sub(r'\s*[-:]\s*(?:option [a-z]+ \S+\s*-\s*)?easier: \{.*?\}\s*$', '', e['why'])
+# ---------- critic r5 class F: a pre / related link may not repeat the unit's own direct or partial ----------
+# Same key and opts (and Max Number) as an own direct / partial: a pre with a numeric band steps one band down (the same skill
+# one place smaller, with a why that says so, no step cite); otherwise, and for a related link, it is dropped. Run again after
+# the linkfit pass (which can re-option a link onto the unit's own opts), and linkfit fails a link that deals the same items.
+BANDS = K.get('bands', {})
+def _sig(e): return e['key'] + json.dumps(e.get('opts', {}), sort_keys=True) + str(e.get('maxNumber') or '')
+def own_repeats(stage):
+    n_sub, n_drop = 0, 0
+    for sid, st in UNITS.items():
+        mine = {_sig(e) for e in st['direct'] + st['partial']}
+        for role in ('pre', 'related'):
+            keep = []
+            for e in st[role]:
+                if _sig(e) not in mine: keep.append(e); continue
+                b = (e.get('opts') or {}).get('band'); lower = [v for v in BANDS.get(e['key'], []) if b and v < b]
+                if stage == 'before fit' and role == 'pre' and lower:
+                    e = dict(e); e['opts'] = dict(e['opts'], band=lower[-1])
+                    if _sig(e) not in mine and _sig(e) not in {_sig(x) for x in keep}:
+                        e['why'] = f"{keys.get(e['key'], e['key'])} with numbers to {lower[-1]:,}: the same skill one band below this unit's own (lower band)"
+                        keep.append(e); n_sub += 1; continue
+                n_drop += 1
+            st[role] = keep
+    return n_sub, n_drop
+OWNREP = {'before fit': own_repeats('before fit')}
 # ---------- pass 3: pre cites a tagged step met by this week ----------
 taught_at = {}
 for k_, v_ in K['tags'].items():
@@ -186,6 +210,7 @@ for sid, st in UNITS.items():
             keep.append(e)
         st[role] = keep
 json.dump(dropped, open(os.path.join(DATA, 'dropped.json'), 'w'), indent=1, ensure_ascii=False)
+OWNREP['after fit'] = own_repeats('after fit')
 # critic r4 class E: one link per key + opts in a role (the first, best-ranked, is kept); linkfit also fails two links
 # of one role that deal the same items
 deduped = 0
@@ -381,6 +406,7 @@ print('lessons', len(out_lessons), dict(Counter(s['verdict'] for s in out_lesson
 print('proposals new', sum(1 for p_ in proposals.values() if not p_['reused']), 'reused', sum(1 for p_ in proposals.values() if p_['reused']),
       'tagFixes', len(tagfixes), {a: sum(1 for t in tagfixes if t['action'] == a) for a in ('add', 'full', 'partial', 'opts', 'remove')})
 print(f'pre re-cited: {recited}; links re-optioned by linkfit: {changed}; links dropped by linkfit: {len(dropped)}; duplicates removed: {deduped}')
+print('own direct/partial repeated as a link (critic r5 F): ' + '; '.join(f'{k}: {a} stepped a band down, {b} dropped' for k, (a, b) in OWNREP.items()))
 mc = node(os.path.join(H, 'mergecheck.mjs'), OUT, *[R + f'data/curriculum/links/{y}.json' for y in OTHER_YEARS])
 print(mc.stdout.strip().splitlines()[-1] if mc.stdout.strip() else 'mergecheck: no output')
 if mc.returncode != 0: errs.append('mergecheck.mjs FAILED:\n' + mc.stdout.strip()[-3000:])

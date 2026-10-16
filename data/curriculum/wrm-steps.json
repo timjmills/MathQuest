@@ -38,8 +38,10 @@
    "EE 6.EE.B.6: our ee-math.json links [M.EE.6.EE.5-7], the site EEMAP links [none]",
    "EE 6.EE.B.7: our ee-math.json links [M.EE.6.EE.5-7], the site EEMAP links [none]",
    "Y6.B11.S6 \"The mean\": pacing CCSS [5.MD.B.2], v3 curriculum CCSS []",
-   "site G1 W28: review step \"Count money - notes and coins (US: dollars & cents)\" matches no WRM step",
-   "site G3 W22: review step \"Pounds, tens, ones and pence (US: dollars & cents)\" matches no WRM step"
+   "site G1 W28: review step \"Count money - notes and coins (US: dollars & cents)\" is Y2.B4.S2 \"Count money - pounds (notes and coins)\" by its block/step numbers (retitled on the site); recorded on Y2.B4.S2",
+   "site G3 W22: review step \"Pounds, tens, ones and pence (US: dollars & cents)\" is Y4.B10.S1 \"Write money using decimals\" by its block/step numbers (retitled on the site); recorded on Y4.B10.S1",
+   "site G3 Support \"Measure in grams\": the site gives source G2, but the title is exactly Y2.B7.S2 (G1); recorded on Y2.B7.S2",
+   "site G4 Support \"Measure in centimetres\": the site gives source K, but the title is exactly Y2.B6.S1 (G1); recorded on Y2.B6.S1"
   ],
   "reconciliation": [
    "Drive vs site: the site RESOURCES tree is the Drive tree (same folder and file ids). Spot checks against live Drive listings matched: the Year 3 folder (1l9hjSYKWnwYnfwPj7Nui4Re5CDWJfWFi) block folders, the Teaching Guides of Year 3 Spring Block 3 (Fractions A), and the guides for Y3.B2.S21, Y4.B1.S16 and Y6.B1.S4. The Drive connector returns at most 5 files per page, so the 872 steps were not re-listed one by one.",
@@ -7911,6 +7913,13 @@
         "Above grade. ⚑ ADAPT: Adapt before teaching: swap £ and p for dollars and cents, and UK notes and coins for US bills and coins (1c, 5c, 10c, 25c, $1, $5, $10)."
        ],
        "site": {
+        "taughtIn": [
+         {
+          "grade": "G1",
+          "how": "review",
+          "firstWeek": "W28"
+         }
+        ],
         "supportIn": [
          "G2",
          "G3"
@@ -17159,6 +17168,15 @@
        ],
        "enrichment": "Grade 4 standard",
        "flag": "native",
+       "site": {
+        "taughtIn": [
+         {
+          "grade": "G3",
+          "how": "review",
+          "firstWeek": "W22"
+         }
+        ]
+       },
        "drive": {
         "lesson": "1cKrIDybPK-lAaC1QYQct_Me3997rsGsA",
         "guide": "1DziGQm44DLZcpMvcRtAZRypY3r80O7ch",

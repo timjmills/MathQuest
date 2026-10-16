@@ -96,16 +96,9 @@
     {
      "key": "placevalue:place_value_disks",
      "opts": {
-      "band": 9999
+      "band": 999
      },
-     "why": "Y4.B1.S5 Represent numbers to 10,000 (lower grade, same cluster CCSS 2.NBT.A.1)"
-    },
-    {
-     "key": "placevalue:pv_digit_drag",
-     "opts": {
-      "band": 9999
-     },
-     "why": "Y4.B1.S5 Represent numbers to 10,000 (lower grade, same cluster CCSS 2.NBT.A.1)"
+     "why": "Y4.B1.S1 Represent numbers to 1,000 (lower grade, same idea)"
     },
     {
      "key": "placevalue:unit_form",
@@ -117,9 +110,9 @@
     {
      "key": "placevalue:expand",
      "opts": {
-      "band": 9999
+      "band": 999
      },
-     "why": "Y4.B1.S6 Partition numbers to 10,000 (lower grade, same cluster CCSS 2.NBT.A.3)"
+     "why": "Y4.B1.S2 Partition numbers to 1,000 (lower grade, same idea)"
     }
    ],
    "preBuild": [],
@@ -196,13 +189,6 @@
    ],
    "pre": [
     {
-     "key": "placevalue:place_value_disks",
-     "opts": {
-      "band": 9999
-     },
-     "why": "Y5.B1.S2 Numbers to 10,000 (previous step)"
-    },
-    {
      "key": "placevalue:pv_digit_drag",
      "opts": {
       "band": 9999
@@ -215,6 +201,13 @@
       "band": 9999
      },
      "why": "Y4.B1.S6 Partition numbers to 10,000 (lower grade, same cluster CCSS 2.NBT.A.3)"
+    },
+    {
+     "key": "placevalue:unit_form",
+     "opts": {
+      "band": 9999
+     },
+     "why": "Y5.B1.S2 Numbers to 10,000 (taught the same school week, W05)"
     }
    ],
    "preBuild": [],
@@ -677,10 +670,10 @@
     {
      "key": "number_sense:place_on_number_line",
      "opts": {
-      "span": 1000,
-      "band": 10000
+      "span": 100,
+      "band": 1000
      },
-     "why": "Y4.B1.S9 Number line to 10,000 (prior learning wk W07)"
+     "why": "Y4.B1.S3 Number line to 1,000 (lower grade, same idea)"
     },
     {
      "key": "placevalue:more_less_100",
@@ -1469,10 +1462,6 @@
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "algebra:multi_step_word_plain",
-     "why": "the same stories without pictures"
-    },
     {
      "key": "algebra:tape_diagram_plain",
      "why": "bar model, no pictures"
@@ -2434,11 +2423,12 @@
      "why": "Y4.B7.S1 Understand the whole (prior learning wk W15)"
     },
     {
-     "key": "fractions:write_fraction",
-     "why": "Y3.B6.S1 Understand the denominators of unit fractions (prior learning wk W15)"
-    },
-    {
      "key": "fractions:identify",
+     "opts": {
+      "forms": [
+       1
+      ]
+     },
      "why": "Y2.B8.S10 Unit fractions (prior learning wk W15)"
     },
     {
@@ -4288,7 +4278,7 @@
     },
     {
      "key": "division:remainder_interpret",
-     "missing": "÷ only, one step; no × and no two-step problems; some stories divide by 12-17 (2-digit divisor, 5.NBT.B.6)"
+     "missing": "÷ only, one step; no × and no two-step problems; some stories divide by 12-19 (2-digit divisor, 5.NBT.B.6)"
     }
    ],
    "verdict": "partial",
@@ -4312,10 +4302,6 @@
     {
      "key": "division:box_division_hard",
      "why": "Y4.B5.S13 Divide a 3-digit number by a 1-digit number (prior learning wk W04)"
-    },
-    {
-     "key": "multiplication:mult_comparison_plain",
-     "why": "Y3.B4.S10 Scaling (nearest live practice: mult_comparison_plain is not tagged to Y3.B4.S10)"
     }
    ],
    "preBuild": [
@@ -6425,10 +6411,6 @@
     {
      "key": "angles_lines:identify_angles",
      "why": "Y5.B10.S2 Classify angles (previous step)"
-    },
-    {
-     "key": "angles_lines:measure_angles",
-     "why": "Y5.B10.S4 Measure angles up to 180° (taught earlier this year, wk W25)"
     }
    ],
    "preBuild": [
@@ -6445,7 +6427,7 @@
      "why": "benchmark 90° plus a part"
     }
    ],
-   "note": "Pre-skills are few: estimating an angle builds on naming it (acute, obtuse) and measuring it; no other angle skill is taught by wk W31 without degrees past the step.",
+   "note": "Pre-skills are few: estimating an angle builds on naming it (acute, obtuse, right), which identify_angles deals; measure_angles is the step's own partial, so it is not repeated as a pre, and no other angle skill is taught by wk W31 without degrees past the step.",
    "envision": [
     {
      "proposal": "angle_estimate",
@@ -7696,20 +7678,31 @@
   },
   "Y5.B12.S11": {
    "title": "Divide by 10, 100 and 1,000",
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "placevalue:place_value_10x",
      "opts": {
       "op": "/",
       "decimals": true
-     }
+     },
+     "missing": "whole-number dividends only (689 ÷ 10 = 68.9); never a decimal divided by 10, 100 or 1,000 (3.4 ÷ 10 = 0.34)"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "dividing a decimal by 10, 100 and 1,000 (3.4 ÷ 10 = 0.34, 45.6 ÷ 100 = 0.456)",
+   "build": [
+    "div10_decimal_dividend"
+   ],
    "pre": [
+    {
+     "key": "placevalue:place_value_10x",
+     "opts": {
+      "op": "x",
+      "decimals": true
+     },
+     "why": "Y5.B12.S10 Multiply by 10, 100 and 1,000 (taught the same school week, W10; the inverse: a decimal times 10, 100, 1,000)"
+    },
     {
      "key": "division:div_facts",
      "opts": {
@@ -7740,7 +7733,17 @@
      "why": "decimal to fraction"
     }
    ],
-   "note": "÷ 1,000 gives thousandths (439 ÷ 1,000 = 0.439)."
+   "note": "÷ 1,000 gives thousandths (439 ÷ 1,000 = 0.439). The step's decimal dividends wait for the div10_decimal_dividend option; Y5.B3.S9 is the whole-number half of the same title.",
+   "envision": [
+    {
+     "proposal": "div10_decimal_dividend",
+     "name": "Divide Decimals by 10, 100 and 1,000 (option)",
+     "kind": "option on placevalue:place_value_10x",
+     "teaches": "dividing a number that already has a decimal point by 10, 100 or 1,000: the digits move one, two or three places right past the point (3.4 ÷ 10 = 0.34)",
+     "closes": "dividing a decimal by 10, 100 and 1,000 (3.4 ÷ 10 = 0.34, 45.6 ÷ 100 = 0.456)",
+     "representation": "the existing shift-chart cell with tenths, hundredths and thousandths columns"
+    }
+   ]
   },
   "Y5.B12.S12": {
    "title": "Multiply and divide decimals - missing values",
@@ -8904,7 +8907,7 @@
     },
     {
      "key": "division:div_facts",
-     "why": "Y4.B4.S4 Multiply and divide by 9 (lower grade, same idea)"
+     "why": "division facts to 12 × 12, every table (the Y4.B4 times-tables and division facts)"
     },
     {
      "key": "placevalue:place_value_10x",
@@ -9236,7 +9239,7 @@
     },
     {
      "key": "division:div_facts",
-     "why": "Y4.B4.S4 Multiply and divide by 9 (lower grade, same idea)"
+     "why": "division facts to 12 × 12, every table (the Y4.B4 times-tables and division facts)"
     },
     {
      "key": "multiplication:multiply",
@@ -9298,7 +9301,7 @@
    "pre": [
     {
      "key": "division:div_facts",
-     "why": "Y4.B4.S4 Multiply and divide by 9 (lower grade, same idea)"
+     "why": "division facts to 12 × 12, every table (the Y4.B4 times-tables and division facts)"
     },
     {
      "key": "division:div_word_problems",
@@ -9315,8 +9318,8 @@
    "preBuild": [],
    "related": [
     {
-     "key": "multiplication:mult_comparison_plain",
-     "why": "the same comparison stories with no pictures, for pupils past the bar model"
+     "key": "algebra:tape_diagram",
+     "why": "the bar model a times-as-many story is drawn with: one bar cut into equal parts beside the other"
     }
    ],
    "note": "Domain-test build lesson (W10, OA unit).",
@@ -9849,16 +9852,13 @@
      "why": "Y3.B11.S4 Measure and draw accurately (lower grade, same idea)"
     },
     {
-     "key": "measurement:unit_conversions",
+     "key": "multiplication:mult_facts",
      "opts": {
-      "units": [
-       1
-      ],
-      "forms": [
-       0
+      "constant": [
+       12
       ]
      },
-     "why": "Y3.B7.S4 Equivalent masses (kilograms and grams) (lower grade, same idea)"
+     "why": "Y4.B4.S10 12 times-table and division facts (lower grade, same idea; 1 ft = 12 in: 3 ft = 3 × 12 in)"
     }
    ],
    "preBuild": [],
@@ -10054,16 +10054,25 @@
    ],
    "pre": [
     {
+     "key": "fractions:identify",
+     "opts": {
+      "forms": [
+       1
+      ]
+     },
+     "why": "Y3.B6.S1 Understand the denominators of unit fractions (lower grade, same idea)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (lower grade, same idea)"
+    },
+    {
      "key": "composing:fraction_number_line",
      "why": "Y3.B6.S7 Fractions on a number line (lower grade, same idea)"
     },
     {
-     "key": "fractions:order_fractions",
-     "why": "Y3.B6.S2 Compare and order unit fractions (lower grade, same idea)"
-    },
-    {
-     "key": "fractions:equivalent",
-     "why": "Y4.B7.S10 Equivalent fraction families (lower grade, same idea)"
+     "key": "fractions:equiv_frac_visual",
+     "why": "Y3.B6.S10 Equivalent fractions as bar models (lower grade, same idea)"
     }
    ],
    "preBuild": [],
@@ -10073,7 +10082,7 @@
      "why": "comparing unlike fractions by a common denominator: the Grade 4 step after it (Y5.B4.S6)"
     }
    ],
-   "note": "Support lesson (site flag enrich-native, Year 3 \"Fractions B\"); nearest WRM steps Y3.B6.S2 / S5 Compare and order unit / non-unit fractions.",
+   "note": "Support lesson (site flag enrich-native, Year 3 \"Fractions B\"); nearest WRM steps Y3.B6.S2 / S5 Compare and order unit / non-unit fractions. Judged against its source year (Year 3): no pre compares or orders unlike fractions.",
    "envision": [
     {
      "proposal": "frac_compare_same_part",
@@ -10140,20 +10149,15 @@
      "key": "conversions:d_to_f",
      "opts": {
       "forms": [
-       1
+       0
       ]
      },
-     "why": "Y4.B8.S8 Hundredths as decimals (lower grade, same idea)"
+     "why": "Y4.B8.S2 Tenths as decimals (lower grade, same idea)"
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "fraction_operations:frac_10_100",
-     "why": "7/100 = 0.07: the fraction the quotient names"
-    }
-   ],
-   "note": "Support lesson (site flag enrich-native, Year 4 \"Decimals A\"); nearest WRM step Y4.B8.S10 Divide a 1- or 2-digit number by 100. Reuses the Y4 lane's div10_small_numbers.",
+   "related": [],
+   "note": "Support lesson (site flag enrich-native, Year 4 \"Decimals A\"); nearest WRM step Y4.B8.S10 Divide a 1- or 2-digit number by 100. Reuses the Y4 lane's div10_small_numbers. No related skill fits: frac_10_100 (7/100 = 0.07) also deals thousandths, above the lesson's Year 4 source, and the other ÷ 100 skill is the lesson's own partial.",
    "envision": [
     {
      "proposal": "div10_small_numbers",
@@ -10217,6 +10221,11 @@
    "related": [
     {
      "key": "decimals:compare_decimal",
+     "opts": {
+      "forms": [
+       1
+      ]
+     },
      "why": "comparing hundredths once they are on the chart"
     }
    ],
@@ -10229,71 +10238,6 @@
      "teaches": "tenths and hundredths as decimals in a place-value chart, with counters and base-10 (flat = 1)",
      "closes": "hundredths as one whole cut into 100, shown with counters on a place-value chart and with base-10 (flat = 1)",
      "representation": "a place-value chart with counters"
-    }
-   ]
-  },
-  "G4|-|measureincentimetres": {
-   "title": "Measure in centimetres",
-   "site": {
-    "flag": "enrich-native",
-    "supplement": false,
-    "firstWeek": null,
-    "ccss": [
-     "1.MD.A.2",
-     "2.MD.A.1"
-    ],
-    "ee": [
-     "M.EE.1.MD.2",
-     "M.EE.2.MD.1"
-    ],
-    "domain": "MD",
-    "unit": null,
-    "block": null,
-    "power": false
-   },
-   "direct": [],
-   "partial": [
-    {
-     "key": "measurement:reading_ruler",
-     "missing": "reads a ruler in whole inches only; no centimetre ruler"
-    }
-   ],
-   "verdict": "partial",
-   "missing": "measuring a length in whole centimetres on a centimetre ruler",
-   "build": [
-    "ruler_cm"
-   ],
-   "pre": [
-    {
-     "key": "shapes_early:measure_nonstandard",
-     "why": "Y1.B7.S2 Measure length using objects (lower grade, same idea)"
-    },
-    {
-     "key": "shapes_early:order_objects_length",
-     "why": "Y2.B6.S4 Order lengths and heights (lower grade, same idea)"
-    }
-   ],
-   "preBuild": [],
-   "related": [
-    {
-     "key": "measurement:estimate_length",
-     "opts": {
-      "forms": [
-       2
-      ]
-     },
-     "why": "estimating a length before measuring it with the ruler"
-    }
-   ],
-   "note": "Support lesson (site flag enrich-native, Year 1 \"Length and Height\"); nearest WRM steps Y1.B7.S3 / Y2.B6.S1 Measure in centimetres. Pre-skills are few: only measuring with objects and comparing lengths come before it.",
-   "envision": [
-    {
-     "proposal": "ruler_cm",
-     "name": "Read a Centimetre Ruler (option)",
-     "kind": "option on measurement:reading_ruler",
-     "teaches": "measuring lengths in whole centimetres, then millimetres, on a metric ruler (the skill reads inches only)",
-     "closes": "measuring a length in whole centimetres on a centimetre ruler",
-     "representation": "a unit option (cm, mm) on reading_ruler with the same arrow-and-ruler picture"
     }
    ]
   },
@@ -10324,16 +10268,21 @@
    ],
    "pre": [
     {
-     "key": "fractions:compare",
-     "why": "Y3.B6.S2 Compare and order unit fractions (lower grade, same idea)"
+     "key": "fractions:identify",
+     "opts": {
+      "forms": [
+       1
+      ]
+     },
+     "why": "Y3.B6.S1 Understand the denominators of unit fractions (lower grade, same idea)"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (lower grade, same idea)"
     },
     {
      "key": "composing:fraction_number_line",
      "why": "Y3.B6.S7 Fractions on a number line (lower grade, same idea)"
-    },
-    {
-     "key": "fractions:equivalent",
-     "why": "Y4.B7.S10 Equivalent fraction families (lower grade, same idea)"
     }
    ],
    "preBuild": [],
@@ -10341,9 +10290,13 @@
     {
      "key": "fractions:order_frac_numline",
      "why": "ordering the same fractions by placing them on a number line"
+    },
+    {
+     "key": "fractions:compare",
+     "why": "comparing two fractions, the step inside ordering; with the frac_compare_same_part option it keeps to the Year 3 pairs"
     }
    ],
-   "note": "Support lesson (site flag enrich-native, \"Prerequisite ladder\" from Year 3); nearest WRM steps Y3.B6.S2 / S5. The proposal frac_compare_same_part puts the same pairs option on order_fractions.",
+   "note": "Support lesson (site flag enrich-native, \"Prerequisite ladder\" from Year 3); nearest WRM steps Y3.B6.S2 / S5. The proposal frac_compare_same_part puts the same pairs option on order_fractions. Judged against its source year (Year 3): no pre compares or orders unlike fractions.",
    "envision": [
     {
      "proposal": "frac_compare_same_part",
@@ -11865,13 +11818,7 @@
     "Y5.B14.S2"
    ],
    "reused": true,
-   "source": "WRM_PROPOSALS",
-   "lessons": [
-    "G4|-|measureincentimetres"
-   ],
-   "closes": {
-    "G4|-|measureincentimetres": "measuring a length in whole centimetres on a centimetre ruler"
-   }
+   "source": "WRM_PROPOSALS"
   },
   "angles_point": {
    "kind": "option",
@@ -12166,6 +12113,26 @@
    "source": "WRM_PROPOSALS",
    "closes": {
     "Y5.B12.S9": "no skill continues or finds the rule of decimal sequences (0.2, 0.4, 0.6; 1.5, 1.25, 1.0)"
+   }
+  },
+  "div10_decimal_dividend": {
+   "kind": "option",
+   "skill": "placevalue:place_value_10x",
+   "option": "with decimals on and op ÷: \"decimal dividends\" (3.4 ÷ 10, 45.6 ÷ 100, 7.2 ÷ 1,000), today the ÷ items keep whole-number dividends",
+   "name": "Divide Decimals by 10, 100 and 1,000 (option)",
+   "teaches": "dividing a number that already has a decimal point by 10, 100 or 1,000: the digits move one, two or three places right past the point (3.4 ÷ 10 = 0.34)",
+   "representation": "the existing shift-chart cell with tenths, hundredths and thousandths columns; arrows under the sliding digits; one decimal answer box with a fixed point",
+   "family": "placevalue",
+   "ccss": [
+    "5.NBT.A.2"
+   ],
+   "why": "generated place_value_10x {op:\"/\", decimals:true} deals only whole-number dividends (689 ÷ 10 = 68.9, 869 ÷ 1,000); the × form does deal decimals (68.9 × 10)",
+   "steps": [
+    "Y5.B12.S11"
+   ],
+   "reused": false,
+   "closes": {
+    "Y5.B12.S11": "dividing a decimal by 10, 100 and 1,000 (3.4 ÷ 10 = 0.34, 45.6 ÷ 100 = 0.456)"
    }
   },
   "dec_missing": {
@@ -13751,7 +13718,7 @@
    "key": "division:remainder_interpret",
    "step": "Y5.B5.S11",
    "action": "partial",
-   "partial": "÷ only, one step; no × and no two-step problems; some stories divide by 12-17 (2-digit divisor, 5.NBT.B.6)",
+   "partial": "÷ only, one step; no × and no two-step problems; some stories divide by 12-19 (2-digit divisor, 5.NBT.B.6)",
    "why": "tagged full; generated items teach only part of the step"
   },
   {
@@ -14229,8 +14196,9 @@
   {
    "key": "placevalue:place_value_10x",
    "step": "Y5.B12.S11",
-   "action": "opts",
-   "why": "tag unchanged; record the option values that make the generated items fit the step",
+   "action": "partial",
+   "partial": "whole-number dividends only (689 ÷ 10 = 68.9); never a decimal divided by 10, 100 or 1,000 (3.4 ÷ 10 = 0.34)",
+   "why": "tagged full (note '÷, decimals on'); generated items teach only part of the step",
    "opts": {
     "op": "/",
     "decimals": true

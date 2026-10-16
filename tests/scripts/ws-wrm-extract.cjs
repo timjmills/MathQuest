@@ -42,10 +42,11 @@ const SITE_LESSONS_DOC = {
     grades: 'school grade ids: PK, K, G1 ... G5; wrmYear = the WRM year taught in that grade (PK = R, K = Y1, G1 = Y2 ... G5 = Y6)',
     flags: {
         committee: 'site label "CCSS custom - build required": an Awsaj-authored lesson that closes a CCSS standard White Rose does not teach (pacing st.f "committee", st.s "SUP" = supplement). Not a WRM small step.',
-        'enrich-native': 'site label "Support": an earlier year\'s WRM step listed as support in a later grade. These ARE WRM steps: they are recorded on the step (wrm-steps.json steps[].site.supportIn), and only a Support title that matches no WRM step would be listed here.',
+        'enrich-native': 'site label "Support": an earlier year\'s WRM step listed as support in a later grade. These ARE WRM steps: they are recorded on the step (wrm-steps.json steps[].site.supportIn), also when the title matches a step of another grade than the site\'s stated source (a disagreement records that); only a Support title that matches no WRM step of any grade is listed here.',
+        native: 'a CURRICULUM core title (site flag native / above) that matches no WRM step title of any grade and is not scheduled as a step: listed so no site title is unaccounted for; the note names the step when the pacing reviews it under that title',
         'non-ccss': 'site label "Non-CCSS extra": a WRM step with no CCSS code (wrm-steps.json step.flag)',
         other: 'a pacing entry with no block, step or flag (G5 end-of-year: consolidation, investigation projects, problem solving, reasoning tasks)',
-        above: 'site label "Above grade": a WRM step whose CCSS is above the school grade (wrm-steps.json step.flag)',
+        above: 'site label "Above grade": a WRM step whose CCSS is above the school grade (wrm-steps.json step.flag); listed here only for a CURRICULUM core title that matches no WRM step (see native)',
     },
     fields: {
         id: 'stable id (idFormat)', grade: 'school grade id', usGrade: 'US grade', wrmYear: 'WRM year of that grade',
@@ -158,14 +159,6 @@ function main() {
         if (!assessments.has(id)) assessments.set(id, { id, grade: Y.g, wrmYear: Y.id, title: st.n, kind: st.f, domain: st.d || null, weeks: [] });
         const A = assessments.get(id); if (!A.weeks.includes(wk)) A.weeks.push(wk);
     }
-    // curriculum-only committee lessons (listed, not yet scheduled)
-    for (const Y of YEARS) for (const dom of site.CURRICULUM.grades[Y.g].domains) for (const u of dom.coreUnits) for (const s of u.steps) {
-        if (s.flag !== 'committee') continue;
-        const id = `${Y.g}|-|${slug(s.title)}`;
-        const scheduled = Object.values(site.PACING.grades[Y.g].weeks).some((w) => Object.values(w.t).some((t) => t.st.some((x) => norm(x.n) === norm(s.title))));
-        if (!scheduled && !lessons.has(id)) lessons.set(id, { id, grade: Y.g, usGrade: Y.usGrade, wrmYear: Y.id, title: s.title, flag: 'committee', supplement: false,
-            ccss: s.ccss.map(fixCode), ee: eeOf(s.ccss), power: false, domain: dom.code, unit: u.name, paceUnit: null, block: null, firstWeek: null, weeks: [], tracks: [], note: s.note || '' });
-    }
     // Support (enrich-native): an earlier grade's WRM step listed in a later grade -> recorded on the step
     const support = new Map();   // '<source grade>|<norm title>' -> [later grade ids]
     const supportRaw = [];
@@ -198,7 +191,9 @@ function main() {
                     }
                     // a step copied in from another grade (st.g) or a review step (st.rv) carries ITS OWN grade's block/step
                     // numbers: it is recorded on that step (site.taughtIn), never as this grade's (block, step)
-                    if (st.g || st.rv) { foreign.push({ to: Y.g, from: st.g || null, review: !!st.rv, title: st.n, wk: w.wk }); continue; }
+                    // (critic r5 X1.2) a review step (st.rv) carries THIS grade's block/step numbers (G1 W28 b4 s2 = Y2.B4.S2,
+                    // retitled): it is resolved by (year, b, s) first, then by title
+                    if (st.g || st.rv) { foreign.push({ to: Y.g, toYear: Y.id, from: st.g || null, review: !!st.rv, title: st.n, wk: w.wk, b: st.b, s: st.s }); continue; }
                     if (st.e != null) enriched.set(`${st.b}|${st.s}`, st.e);
                     const k = `${st.b}|${st.s}`;
                     if (!paced.has(k)) paced.set(k, { n: st.n, c: st.c, p: !!st.p, wk: w.wk });
@@ -307,8 +302,15 @@ function main() {
         for (const v of stepSite.values()) if ((!g || v.g === g) && (norm(v.step.title) === norm(title) || (v.siteTitle && norm(v.siteTitle) === norm(title)))) return v.step;
         return null;
     };
+    const stepAt = (id) => { const v = stepSite.get(id); return v ? v.step : null; };
+    const reviewAlias = new Map();   // '<grade>|<norm title>' -> step id: a review entry resolved by its numbering
     for (const f of foreign) {
-        const st = findStep(f.from, f.title) || (f.from ? null : null);
+        let byNum = f.review ? stepAt(`${f.toYear}.B${Number(f.b)}.S${Number(f.s)}`) : null;
+        if (byNum && norm(byNum.title) !== norm(f.title) && norm(byNum.siteTitle || '') !== norm(f.title)) {
+            dis(`site ${f.to} ${f.wk}: review step "${f.title}" is ${byNum.id} "${byNum.title}" by its block/step numbers (retitled on the site); recorded on ${byNum.id}`);
+            reviewAlias.set(`${f.to}|${norm(f.title)}`, byNum.id);
+        }
+        const st = byNum || findStep(f.from, f.title);
         const cand = st || (!f.from ? [...stepSite.values()].filter((v) => v.g !== f.to).map((v) => v.step).find((x) => norm(x.title) === norm(f.title) || norm(x.siteTitle || '') === norm(f.title)) : null);
         if (!cand) { dis(`site ${f.to} ${f.wk}: ${f.review ? 'review' : 'copied-in'} step "${f.title}"${f.from ? ` from ${f.from}` : ''} matches no WRM step`); continue; }
         cand.site = cand.site || {};
@@ -327,12 +329,38 @@ function main() {
             if (!st.site.supportIn.includes(r.to)) st.site.supportIn.push(r.to);
             continue;
         }
+        // (critic r5 X1.3) a Support title that matches no step of its stated source grade but exactly matches a WRM step of
+        // another grade is that step: it is recorded on the step and the source-grade mismatch is a disagreement
+        const other = findStep(null, r.title);
+        if (other) {
+            other.site = other.site || {};
+            other.site.supportIn = other.site.supportIn || [];
+            if (!other.site.supportIn.includes(r.to)) other.site.supportIn.push(r.to);
+            dis(`site ${r.to} Support "${r.title}": the site gives source ${r.from || 'none'}, but the title is exactly ${other.id} (${YEARS.find((y) => other.id.startsWith(y.id + '.')).g}); recorded on ${other.id}`);
+            continue;
+        }
         supportUnmatched += 1;
         const Y = YEARS.find((y) => y.g === r.to);
         const id = `${r.to}|-|${slug(r.title)}`;
         if (!lessons.has(id)) lessons.set(id, { id, grade: r.to, usGrade: Y.usGrade, wrmYear: Y.id, title: r.title, flag: 'enrich-native', supplement: false,
             ccss: r.ccss.map(fixCode), ee: eeOf(r.ccss), power: false, domain: r.domain, unit: null, paceUnit: null, block: null, firstWeek: null, weeks: [], tracks: [],
             note: `${r.note || ''} Support title that matches no WRM step of ${r.from || 'any grade'}.`.trim() });
+    }
+    // curriculum-only lessons (listed in the site CURRICULUM core units, never scheduled as a step of their own): every committee
+    // lesson, and (critic r5 X1.1) every core title that matches no WRM step of any grade (G1 "Select money (US)", G3 "Pounds,
+    // tens, ones and pence (US)"), so no site title is in neither file
+    for (const Y of YEARS) for (const dom of site.CURRICULUM.grades[Y.g].domains) for (const u of dom.coreUnits) for (const s of u.steps) {
+        const id = `${Y.g}|-|${slug(s.title)}`;
+        if (lessons.has(id)) continue;
+        const orphan = s.flag !== 'committee' && !findStep(null, s.title.replace(US_MONEY, ''));
+        if (s.flag !== 'committee' && !orphan) continue;
+        const scheduled = Object.values(site.PACING.grades[Y.g].weeks).some((w) => Object.values(w.t).some((t) => t.st.some((x) => norm(x.n) === norm(s.title) && !x.rv)));
+        if (scheduled) continue;
+        const alias = reviewAlias.get(`${Y.g}|${norm(s.title)}`);
+        const why = orphan ? ` Curriculum core title (site flag ${s.flag}) that matches no WRM step title of any grade${alias ? `; the pacing reviews it as ${alias} (same block/step numbers, retitled)` : ''}.` : '';
+        lessons.set(id, { id, grade: Y.g, usGrade: Y.usGrade, wrmYear: Y.id, title: s.title, flag: s.flag, supplement: false,
+            ccss: s.ccss.map(fixCode), ee: eeOf(s.ccss), power: false, domain: dom.code, unit: u.name, paceUnit: null, block: null, firstWeek: null, weeks: [], tracks: [],
+            note: `${s.note || ''}${why}`.trim() });
     }
     for (const v of stepSite.values()) if (v.step.site) {
         if (v.step.site.taughtIn) v.step.site.taughtIn.sort((a, z) => (a.grade + a.how).localeCompare(z.grade + z.how));

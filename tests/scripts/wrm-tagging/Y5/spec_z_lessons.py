@@ -288,14 +288,8 @@ lesson(L + 'hundredths',
     related=[('decimals:compare_decimal', 'comparing hundredths once they are on the chart')],
     note='Support lesson (site flag enrich-native, Year 4 "Decimals A"); nearest WRM steps Y4.B8.S7-S9 Hundredths as fractions / as decimals / on a place value chart.')
 
-lesson(L + 'measureincentimetres',
-    partial=[('measurement:reading_ruler', 'reads a ruler in whole inches only; no centimetre ruler')],
-    verdict='partial', missing='measuring a length in whole centimetres on a centimetre ruler',
-    build=['ruler_cm'],
-    pre=[('shapes_early:measure_nonstandard', cite(L + 'measureincentimetres', 'Y1.B7.S2')),
-         ('shapes_early:order_objects_length', cite(L + 'measureincentimetres', 'Y2.B6.S4'))],
-    related=[('measurement:estimate_length', 'estimating a length before measuring it with the ruler')],
-    note='Support lesson (site flag enrich-native, Year 1 "Length and Height"); nearest WRM steps Y1.B7.S3 / Y2.B6.S1 Measure in centimetres. Pre-skills are few: only measuring with objects and comparing lengths come before it.')
+# "Measure in centimetres" (Support, site source K) is no longer a site lesson: its title is exactly Y2.B6.S1, so the extractor
+# now records it on that step (site.supportIn G4) with a disagreement for the source grade (critic r5 X1.3)
 
 lesson(L + 'orderfractions',
     partial=[('fractions:order_fractions', 'orders sets of unlike fractions (3/4, 7/10, 2/3, 1/2, 3/8, 1/6); the Grade 3 lesson orders unit fractions or fractions with one denominator')],

@@ -7,10 +7,11 @@
   "grades": "school grade ids: PK, K, G1 ... G5; wrmYear = the WRM year taught in that grade (PK = R, K = Y1, G1 = Y2 ... G5 = Y6)",
   "flags": {
    "committee": "site label \"CCSS custom - build required\": an Awsaj-authored lesson that closes a CCSS standard White Rose does not teach (pacing st.f \"committee\", st.s \"SUP\" = supplement). Not a WRM small step.",
-   "enrich-native": "site label \"Support\": an earlier year's WRM step listed as support in a later grade. These ARE WRM steps: they are recorded on the step (wrm-steps.json steps[].site.supportIn), and only a Support title that matches no WRM step would be listed here.",
+   "enrich-native": "site label \"Support\": an earlier year's WRM step listed as support in a later grade. These ARE WRM steps: they are recorded on the step (wrm-steps.json steps[].site.supportIn), also when the title matches a step of another grade than the site's stated source (a disagreement records that); only a Support title that matches no WRM step of any grade is listed here.",
+   "native": "a CURRICULUM core title (site flag native / above) that matches no WRM step title of any grade and is not scheduled as a step: listed so no site title is unaccounted for; the note names the step when the pacing reviews it under that title",
    "non-ccss": "site label \"Non-CCSS extra\": a WRM step with no CCSS code (wrm-steps.json step.flag)",
    "other": "a pacing entry with no block, step or flag (G5 end-of-year: consolidation, investigation projects, problem solving, reasoning tasks)",
-   "above": "site label \"Above grade\": a WRM step whose CCSS is above the school grade (wrm-steps.json step.flag)"
+   "above": "site label \"Above grade\": a WRM step whose CCSS is above the school grade (wrm-steps.json step.flag); listed here only for a CURRICULUM core title that matches no WRM step (see native)"
   },
   "fields": {
    "id": "stable id (idFormat)",
@@ -34,25 +35,27 @@
   },
   "assessments": "domain exams and MAP windows from the pacing (st.f \"exam\" / \"map\"): not lessons, listed so nothing on the site is unaccounted for",
   "counts": {
-   "lessons": 141,
+   "lessons": 143,
    "byYearAndFlag": {
     "Y1 committee": 4,
     "Y1 enrich-native": 35,
     "Y2 committee": 3,
     "Y2 enrich-native": 5,
+    "Y2 above": 3,
     "Y3 committee": 14,
     "Y3 enrich-native": 11,
     "Y4 committee": 11,
-    "Y4 enrich-native": 12,
+    "Y4 enrich-native": 11,
+    "Y4 native": 1,
     "Y5 committee": 16,
-    "Y5 enrich-native": 6,
+    "Y5 enrich-native": 5,
     "Y6 committee": 16,
     "Y6 other": 4,
     "Y6 enrich-native": 4
    },
    "assessments": 34,
-   "supportTitlesMatchedToWrmSteps": 1202,
-   "supportTitlesUnmatched": 73
+   "supportTitlesMatchedToWrmSteps": 1204,
+   "supportTitlesUnmatched": 71
   }
  },
  "lessons": [
@@ -1166,6 +1169,30 @@
    "note": "Source: GPK.. From earlier work. (Prerequisite ladder.) Support title that matches no WRM step of PK."
   },
   {
+   "id": "G1|-|countmoneynotesandcoinsusdollarscents",
+   "grade": "G1",
+   "usGrade": "1",
+   "wrmYear": "Y2",
+   "title": "Count money - notes and coins (US: dollars & cents)",
+   "flag": "above",
+   "supplement": false,
+   "ccss": [
+    "2.MD.C.8"
+   ],
+   "ee": [
+    "M.EE.2.MD.8"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": "Money",
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Above grade. Curriculum core title (site flag above) that matches no WRM step title of any grade; the pacing reviews it as Y2.B4.S2 (same block/step numbers, retitled)."
+  },
+  {
    "id": "G1|-|doublingupto55",
    "grade": "G1",
    "usGrade": "1",
@@ -1184,6 +1211,32 @@
    "weeks": [],
    "tracks": [],
    "note": "Source: GPK.. From earlier work. (Prerequisite ladder.) Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "G1|-|findthetotalusdollarscents",
+   "grade": "G1",
+   "usGrade": "1",
+   "wrmYear": "Y2",
+   "title": "Find the total (US: dollars & cents)",
+   "flag": "above",
+   "supplement": false,
+   "ccss": [
+    "1.NBT.C.4",
+    "2.MD.C.8"
+   ],
+   "ee": [
+    "M.EE.1.NBT.4",
+    "M.EE.2.MD.8"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": "Money",
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Above grade. Auto-matched by keyword scan; verify. Curriculum core title (site flag above) that matches no WRM step title of any grade."
   },
   {
    "id": "G1|-|lengthandheightcompareorder",
@@ -1210,6 +1263,30 @@
    "weeks": [],
    "tracks": [],
    "note": "Source: GPK.. From Growing 6, 7, 8 (Phase 6). (Reception Spring.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "G1|-|selectmoneyusdollarscents",
+   "grade": "G1",
+   "usGrade": "1",
+   "wrmYear": "Y2",
+   "title": "Select money (US: dollars & cents)",
+   "flag": "above",
+   "supplement": false,
+   "ccss": [
+    "2.MD.C.8"
+   ],
+   "ee": [
+    "M.EE.2.MD.8"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": "Money",
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Above grade. Curriculum core title (site flag above) that matches no WRM step title of any grade."
   },
   {
    "id": "G2|-|readandwritenumbersto1000inwordsnumeralsandexpandedform",
@@ -2489,30 +2566,6 @@
    "note": "Source: GK.. From Mass and Volume. (Y1 Spring.). Support title that matches no WRM step of K."
   },
   {
-   "id": "G3|-|measureingrams",
-   "grade": "G3",
-   "usGrade": "3",
-   "wrmYear": "Y4",
-   "title": "Measure in grams",
-   "flag": "enrich-native",
-   "supplement": false,
-   "ccss": [
-    "3.MD.A.2"
-   ],
-   "ee": [
-    "M.EE.3.MD.2"
-   ],
-   "power": false,
-   "domain": "MD",
-   "unit": null,
-   "paceUnit": null,
-   "block": null,
-   "firstWeek": null,
-   "weeks": [],
-   "tracks": [],
-   "note": "Source: G2.. From Mass and Capacity. (Y3 Spring.). Support title that matches no WRM step of G2."
-  },
-  {
    "id": "G3|-|orderfractions",
    "grade": "G3",
    "usGrade": "3",
@@ -2535,6 +2588,30 @@
    "weeks": [],
    "tracks": [],
    "note": "Source: G2.. From Fractions B. (Y3 Summer.). Support title that matches no WRM step of G2."
+  },
+  {
+   "id": "G3|-|poundstensonesandpenceusdollarscents",
+   "grade": "G3",
+   "usGrade": "3",
+   "wrmYear": "Y4",
+   "title": "Pounds, tens, ones and pence (US: dollars & cents)",
+   "flag": "native",
+   "supplement": false,
+   "ccss": [
+    "2.MD.C.8"
+   ],
+   "ee": [
+    "M.EE.2.MD.8"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": "Money",
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Curriculum core title (site flag native) that matches no WRM step title of any grade; the pacing reviews it as Y4.B10.S1 (same block/step numbers, retitled)."
   },
   {
    "id": "G3|-|selectmoney",
@@ -3206,32 +3283,6 @@
    "weeks": [],
    "tracks": [],
    "note": "Source: G3.. From Decimals A. (Y4 Spring.). Support title that matches no WRM step of G3."
-  },
-  {
-   "id": "G4|-|measureincentimetres",
-   "grade": "G4",
-   "usGrade": "4",
-   "wrmYear": "Y5",
-   "title": "Measure in centimetres",
-   "flag": "enrich-native",
-   "supplement": false,
-   "ccss": [
-    "1.MD.A.2",
-    "2.MD.A.1"
-   ],
-   "ee": [
-    "M.EE.1.MD.2",
-    "M.EE.2.MD.1"
-   ],
-   "power": false,
-   "domain": "MD",
-   "unit": null,
-   "paceUnit": null,
-   "block": null,
-   "firstWeek": null,
-   "weeks": [],
-   "tracks": [],
-   "note": "Source: GK.. From Length and Height. (Y1 Spring.). Support title that matches no WRM step of K."
   },
   {
    "id": "G4|-|orderfractions",

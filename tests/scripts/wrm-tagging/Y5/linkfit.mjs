@@ -31,7 +31,8 @@ const ALL = process.argv.includes('--all');
 // site lessons (the "lessons" section) are checked exactly as steps: their week is in prior.json (build.py adds it)
 const UNITS = { ...d.steps, ...(d.lessons || {}) };
 const fi = process.argv.indexOf('--fit'), FIT = fi > 0 ? process.argv[fi + 1] : null;
-const titles = {}; for (const y of wrm.years) for (const b of y.blocks) for (const s of b.steps) titles[s.id] = s.title;
+const titles = {}, blockOf = {}, ccssOf = {}; for (const y of wrm.years) for (const b of y.blocks) for (const s of b.steps) { titles[s.id] = s.title; blockOf[s.id] = b.name; ccssOf[s.id] = s.ccss || []; }
+const CCT = Object.fromEntries(JSON.parse(fs.readFileSync(R + 'data/standards/ccss-math.json', 'utf8')).standards.map(x => [x.code, x.text || '']));
 const strip = s => String(s ?? '').replace(/<style[\s\S]*?<\/style>/g, '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&#?\w+;/g, ' ').replace(/\s+/g, ' ');
 const NUM = /(\d{1,3}(?:,\d{3})+(?!\d)|\d+)(\.\d+)?/g;
 const TIME = /^measurement:(time|elapsed|clock|order_clocks|mixed_time)/;   // clock payloads hold minutes
@@ -73,6 +74,22 @@ for (const [sid, s] of Object.entries(UNITS)) {
   own[sid] = c;
 }
 const wkOf = id => prior[id]?.wk || '';
+// critic r5 class H: a Support (enrich-native) lesson is an earlier grade's lesson re-taught in Grade 4. Its content ceiling is
+// its SOURCE grade (site note "Source: G2."), not W38: no Grade-4 first-taught content at all, no compare / order of unlike
+// fractions (4.NF.A.2) below a Grade-4 source, numbers within the source year's range, no customary units on a metric lesson,
+// and no pre that cites a WRM year above the source year
+const YR = ['R', 'Y1', 'Y2', 'Y3', 'Y4', 'Y5', 'Y6'];
+const SRC = {};
+for (const l of JSON.parse(fs.readFileSync(R + 'data/curriculum/site-lessons.json', 'utf8')).lessons) {
+  const m = l.flag === 'enrich-native' && String(l.note || '').match(/^Source: G?(PK|K|\d)\./);
+  if (m) SRC[l.id] = m[1] === 'PK' ? 0 : m[1] === 'K' ? 1 : +m[1] + 1;
+}
+const isSupport = sid => SRC[sid] != null && SRC[sid] < 5;
+const FR = /(?<![\d/])(\d+)\/(\d+)(?![\d/])/g;
+const unlikeCompare = r => r.items.some(i => { const t = `${i.text || ''} ${i.x || ''}`;
+  if (!/compar|order|greater|less|largest|smallest|[<>]/i.test(t)) return false;
+  const f = [...t.matchAll(FR)].map(m => [+m[1], +m[2]]);
+  return f.some((a, j) => f.slice(j + 1).some(b => a[0] !== b[0] && a[1] !== b[1])); });
 function citedCeil(sid, why) {
   const m = String(why).match(/^(R|Y\d)\.B\d+\.S\d+/); if (!m) return 0;
   const ref = m[0], yr = m[1];
@@ -138,7 +155,7 @@ function laterGrade(e, s, r) {
   return out;
 }
 function content(sid, e, r, role) {
-  const out = [], wk = wkOf(sid) || 'W99';
+  const link = role === 'pre' || role === 'related', out = [], wk = isSupport(sid) && link ? 'W00' : (wkOf(sid) || 'W99');
   const said = r.items.map(i => `${i.text || ''} ${i.a || ''} ${i.x || ''}`).join(' | ');
   const all = r.items.map(i => `${i.text || ''} ${i.a || ''} ${i.x || ''} ${i.vis || ''}`).join(' | ');
   if (r.items.some(i => i.err)) out.push('generation error');
@@ -146,6 +163,14 @@ function content(sid, e, r, role) {
   if (r.items.length >= 20 && r.distinct < 3) out.push(`degenerate: ${r.distinct} distinct items in ${r.items.length}`);
   for (const [n, w, f] of FIRST) if (wk < w && !(OWN[sid] || []).includes(n) && f(e, n === 'customary units' || n === 'percent' ? all : said, r)) out.push(`rule 19: ${n} first taught ${w}, step is ${wk}`);
   out.push(...laterGrade(e, said, r));
+  if (isSupport(sid) && link) {
+    const src = YR[SRC[sid]];
+    if (role === 'pre' && unlikeCompare(r)) out.push(`H: compares or orders unlike fractions (4.NF.A.2), above this Support lesson's source year ${src}`);
+    if (/centimet|metre|gram|litre|millilit|kilo/i.test(UNITS[sid].title) && !CUST.test(UNITS[sid].title) && CUST.test(all))
+      out.push(`H: customary units on a metric Support lesson`);
+    const ref = role === 'pre' && (String(e.why).match(/^(R|Y\d)\.B\d+\.S\d+/) || [])[1];
+    if (ref && YR.indexOf(ref) > SRC[sid]) out.push(`H: cites a ${ref} step, above this Support lesson's source year ${src}`);
+  }
   const dens = [...all.matchAll(/(?:\b\d+|\?|_+)\/(\d+)\b/g)].map(m => +m[1]).filter(x => x > 24 && x !== 100 && x !== 1000 && !(x === 50));
   if (dens.length && (role === 'pre' || role === 'related')) out.push(`denominator ${Math.max(...dens)} (Grade 4: 2, 3, 4, 5, 6, 8, 10, 12, 100 and their doubles)`);
   if (role === 'pre') { const ref = (String(e.why).match(/^Y5\.B\d+\.S\d+/) || [])[0];
@@ -166,6 +191,9 @@ function whyCheck(e, r) {
         for (let j = 1; j < seq.length; j++) if (seq[j] != null && seq[j - 1] != null) k.push(Math.abs(seq[j] - seq[j - 1]));
         return k.some(x => want.has(x)); }).length;
       if (hit < N / 3) out.push(`cited "${cm[0]}" but only ${hit} of ${N} items count in those steps`); }
+    // critic r5 class H: a cited "unit fractions" step must be true of the items (fractions:order_fractions {} is not)
+    if (/(?<!non-)\bunit fractions\b/i.test(w)) { const hit = r.items.filter(i => { const f = [...`${i.text || ''} ${i.x || ''}`.matchAll(FR)].map(m => +m[1]); return f.length && f.every(n => n === 1); }).length;
+      if (hit < N / 3) out.push(`cited "unit fractions" but only ${hit} of ${N} items are unit fractions`); }
     const tm = w.match(/\bto ([\d,]{5,})\b/);
     if (tm && !/Roman/i.test(w)) { const L = +tm[1].replace(/,/g, ''); if (r.max < L / 20) out.push(`cited "to ${tm[1]}" but the items reach ${r.max}`); }
   }
@@ -195,8 +223,10 @@ function whyCheck(e, r) {
     if (hitF < N / 3) out.push(`${cited ? 'cited step' : 'why'} names ${fams.join('/')} but only ${hitF} of ${N} items deal it`);
   }
   const UNIT = { metres: 'm|metres?|meters?', kilometres: 'km|kilometres?', centimetres: 'cm|centimetres?', millimetres: 'mm|millimetres?', grams: 'g|grams?', kilograms: 'kg|kilograms?', litres: 'l|litres?|liters?', millilitres: 'ml|millilitres?', hours: 'h|hr|hours?', minutes: 'min|minutes?', seconds: 's|sec|seconds?' };
-  const um = w.match(/\b(metres|kilometres|centimetres|millimetres|grams|kilograms|litres|millilitres|hours|minutes|seconds)\b/i);
-  if (um && !texts.some(t => new RegExp(`\\b(${UNIT[um[1].toLowerCase()]})\\b`, 'i').test(t))) out.push(`why names ${um[1]} but no item has that unit`);
+  // critic r5: every unit the why names must be in at least a fifth of the items ("kilograms and grams" on fl oz / lb items)
+  for (const um of w.matchAll(/\b(metres|kilometres|centimetres|millimetres|grams|kilograms|litres|millilitres|hours|minutes|seconds)\b/gi)) {
+    const hit = texts.filter(t => new RegExp(`\\b(${UNIT[um[1].toLowerCase()]})\\b`, 'i').test(t)).length;
+    if (hit < N / 5) { out.push(`why names ${um[1]} but only ${hit} of ${N} items have that unit`); break; } }
   return out;
 }
 const taughtAt = {};
@@ -212,7 +242,8 @@ function citeCheck(e, role) {
 export function check(sid, role, e) {
   const r = probe(e.key, e.opts || {}, e.maxNumber || 10000);
   const base = role === 'pre' ? Math.max(own[sid], citedCeil(sid, e.why)) : own[sid];
-  const limit = Math.max(1.5 * base, 100);
+  let limit = Math.max(1.5 * base, 100);
+  if (isSupport(sid)) limit = Math.min(limit, Math.max(1.5 * (YEAR_RANGE[YR[SRC[sid]]] || 10000), 100));
   const out = [];
   if (!TIME.test(e.key) && r.max > limit) out.push(`size ${r.max} > ${limit} — ${r.ex}`);
   out.push(...content(sid, e, r, role), ...whyCheck(e, r), ...citeCheck(e, role));
@@ -274,7 +305,25 @@ if (FIT) {
         if (role === 'partial' && word && String(e.missing).toLowerCase().includes(word)) continue;
         fails.push(`${role} ${e.key}${JSON.stringify(e.opts || {})}: ${f}${role === 'partial' ? ' (the clause does not name it)' : ''}`);
       } }
+    // critic r5 class G: a FULL unit that names decimals must deal a decimal OPERAND (in the question, not only the answer:
+    // 689 ÷ 10 = 68.9 is a whole-number dividend) in its direct items. "Names decimals" = its title, or its WRM block (a
+    // percentage step of "Decimals and percentages" excepted), or EVERY one of its CCSS codes (a step tagged with a whole-number standard beside a
+    // decimal one, Y5.B3.S9 4.NBT.A.1 + 5.NBT.A.2, may be the whole-number half; its decimal half is a separate step)
+    if (s.verdict === 'full') {
+      const site = d.lessons && d.lessons[sid] ? d.lessons[sid].site || {} : null;
+      const cc = site ? site.ccss || [] : ccssOf[sid] || [];
+      const names = /decimal/i.test(s.title) || (/decimal/i.test(blockOf[sid] || '') && !/percent/i.test(s.title)) || (cc.length && cc.every(c => /decimal/i.test(CCT[c] || CCT[c.replace(/[a-d]$/, '')] || '')));
+      if (names) { const dec = [...s.direct].reduce((n, e) => n + probe(e.key, e.opts || {}, e.maxNumber || 10000).items.filter(i => /(?<![\d,])\d*\.\d/.test(i.text || '')).length, 0);
+        if (!dec) fails.push(`full, and its ${/decimal/i.test(s.title) ? 'title' : /decimal/i.test(blockOf[sid] || '') ? 'block' : 'CCSS'} names decimals, but no direct item has a decimal in its question (critic r5 class G)`); } }
     // critic r4 class E: no duplicate links (same key + opts, or the same generated items)
+    // critic r5 class F: a pre or related link may not be the unit's own direct or partial (same key and opts, or the same items
+    // drawn the same way; a _plain twin with the same text but no picture is the scaffold fade, not a repeat)
+    { const ownSig = new Map();
+      for (const e of [...s.direct, ...s.partial]) { const r = probe(e.key, e.opts || {}, e.maxNumber || 10000);
+        ownSig.set(r.items.map(i => i.text + '|' + i.a + '|' + i.vis + '|' + i.tpl).join('\n'), e.key + JSON.stringify(e.opts || {})); ownSig.set('K' + e.key + JSON.stringify(e.opts || {}) + (e.maxNumber || ''), e.key + JSON.stringify(e.opts || {})); }
+      for (const role of ['pre', 'related']) for (const e of s[role]) { const r = probe(e.key, e.opts || {}, e.maxNumber || 10000);
+        const hit = ownSig.get('K' + e.key + JSON.stringify(e.opts || {}) + (e.maxNumber || '')) || ownSig.get(r.items.map(i => i.text + '|' + i.a + '|' + i.vis + '|' + i.tpl).join('\n'));
+        if (hit) fails.push(`${role} ${e.key}${JSON.stringify(e.opts || {})}: repeats the unit's own direct/partial ${hit} (critic r5 class F)`); } }
     for (const role of ['pre', 'related']) { const seen = new Map();
       for (const e of s[role]) { const r = probe(e.key, e.opts || {}, e.maxNumber || 10000);
         const sig = r.items.map(i => i.text + '|' + i.a).join('\n');
