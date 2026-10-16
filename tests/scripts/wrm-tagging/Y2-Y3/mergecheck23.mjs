@@ -66,6 +66,15 @@ export async function mergeCheck(L) {
   }
   for (let i = P0; i < P.length; i++) if (runName !== 'own') P[i] = `[${runName}] ` + P[i];
   }
+  // r12: the site lessons section holds exactly this year's site lessons and tags nothing (no tagFix names a lesson; a
+  // proposal a lesson uses lists it under `lessons` and closes it, never under `steps`)
+  if (L.lessons) { let site = []; try { site = JSON.parse(fs.readFileSync(R + 'data/curriculum/site-lessons.json', 'utf8')).lessons.filter(l => l.wrmYear === L.year).map(l => l.id); } catch (_) { P.push('NO site-lessons.json'); }
+    for (const id of site) if (!L.lessons[id]) P.push(`LESSON-MISSING ${id}`);
+    for (const id of Object.keys(L.lessons)) if (!site.includes(id)) P.push(`LESSON-EXTRA ${id}`);
+    for (const t of L.tagFixes) if (L.lessons[t.step]) P.push(`LESSON-TAGFIX ${t.step} ${t.key}`);
+    for (const [pid, p] of Object.entries(L.proposals)) { for (const s of p.steps || []) if (L.lessons[s]) P.push(`LESSON-IN-STEPS ${pid} ${s}`);
+      for (const lid of p.lessons || []) if (!L.lessons[lid]?.build.includes(pid) || !(p.closes || {})[lid]) P.push(`LESSON-CLOSES ${pid} ${lid}`); }
+    for (const [lid, l] of Object.entries(L.lessons)) for (const b of l.build) if (!(L.proposals[b]?.lessons || []).includes(lid)) P.push(`LESSON-BUILD ${lid} ${b} not listed by the proposal`); }
   return { problems: [...new Set(P)], tags, fixes: L.tagFixes.length, foreign: foreign.length };
 }
 if (process.argv[1] && process.argv[1].endsWith('mergecheck23.mjs')) {

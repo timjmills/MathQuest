@@ -5,7 +5,8 @@
 // "the second number"); "vertical" is no column method in "vertical number line"; "tables" is a data table only when it says
 // so (the 2, 5 and 10 times-tables are not); money items include notes and bills; a hundred-square window (rows + cols
 // payload) is a hundred square; fraction words (halves, quarters ...) are fractions; "an exchange of 10 ones" is no renamed
-// unit form; a clause's "no ÷6" names a table, not a division; clauses split at "but" and ";".
+// unit form; a clause's "no ÷6" names a table, not a division; clauses split at "but" and ";"; a cylinder is a scale only as a
+// graduated or measuring cylinder (3-D shape names are not); "or L-shape" is not litres.
 // Y5 claim checker (builder round 5, critic r6 classes K, L, M and the root-cause sweep).
 // A why (pre / related link) or a clause (partial `missing`) is a set of CLAIMS about the items the link deals: a unit
 // ("litres", "mL", "metric"), an operation ("adds", "÷"), a representation ("number line", "bar model"), a number kind
@@ -34,7 +35,7 @@ export const CLAIMS = [
   { n: 'metric', c: /\bmetric\b/i, i: MET, s: 0.4, rule: true },
   { n: 'customary', c: /\b(customary|imperial)\b/i, i: CUST, s: 0.4, rule: true },
   { n: 'millilitres', unit: true, c: /\b(mL|ml|millilit\w*|millilit(?:er|re)s?)\b/, i: /\bml\b|millilit/i, s: 0.2, rule: true },
-  { n: 'litres', unit: true, c: /\d\s*L\b|\bL\s*(?:↔|and|or|=)|(?:↔|and|or)\s*L\b|\blit(?:re|er)s?\b/, i: /\d\s*L\b|\bL\b|\blit(?:re|er)s?\b/, s: 0.2, rule: true },
+  { n: 'litres', unit: true, c: /\d\s*L\b|\bL\s*(?:↔|and|or|=)|(?:↔|and|or)\s*L\b(?!-)|\blit(?:re|er)s?\b/, i: /\d\s*L\b|\bL\b|\blit(?:re|er)s?\b/, s: 0.2, rule: true },
   { n: 'kilograms', unit: true, c: /\b(kg|kilograms?)\b/i, i: /\bkg\b|kilogram/i, s: 0.2, rule: true },
   { n: 'grams', unit: true, c: /\b(\d\s*g|grams?)\b/i, i: /\d\s*g\b|\bgrams?\b|\bg\b/i, s: 0.2, rule: true },
   { n: 'kilometres', unit: true, c: /\b(km|kilomet(?:re|er)s?)\b/i, i: /\bkm\b|kilomet/i, s: 0.2, rule: true },
@@ -74,7 +75,7 @@ export const CLAIMS = [
   { n: 'base 10', c: /base[- ]?10|dienes|\bflats?\b|\brods?\b/i, i: /base[- ]?10|b10|flat|rod|cube|block/i, s: 0.2, all: true },
   { n: 'protractor', c: /protractor/i, i: /protractor/i, s: 0.2, all: true },
   { n: 'clock', c: /\bclocks?\b|analogue|analog/i, i: /clock|o'clock|:\d\d|hand/i, s: 0.2, all: true },
-  { n: 'ruler / scale', c: /\bruler\b|\bscales?\b(?! factor)|thermometer|cylinder|\bjug\b/i, i: /ruler|scale|thermometer|cylinder|jug|tick|°/i, s: 0.2, all: true },
+  { n: 'ruler / scale', c: /\bruler\b|\bscales?\b(?! factor)|thermometer|(?:graduated|measuring) cylinder|cylinder (?:in|of) m|\bjug\b/i, i: /ruler|scale|thermometer|cylinder|jug|tick|°/i, s: 0.2, all: true },
   { n: 'area model / grid method', c: /area model|grid method/i, i: /area[- ]?model|grid|box method|partial products|"parts"/i, s: 0.2, all: true },
   { n: 'column method', c: /\bcolumns?\b(?! of)|column method|written method|\bvertical\b(?! (?:number )?line)/i, i: /"stack"|stack|column|vertical|align/i, s: 0.2, all: true },
   { n: 'graph / chart / table', c: /\b(bar graphs?|bar charts?|pictograms?|pictographs?|line graphs?|line plots?|tally|data tables?|tables? of (?:data|results)|(?:in|into) a table|frequency tables?)\b/i, i: /graph|chart|pictogra|plot|tally|table|<table|svg/i, s: 0.2, all: true },

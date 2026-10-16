@@ -9506,6 +9506,848 @@
    "note": ""
   }
  },
+ "lessons": {
+  "G1|-|solveonestepwordproblemswithin20usingbarmodels": {
+   "title": "Solve one-step word problems within 20 using bar models",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W03",
+    "ccss": [
+     "1.OA.A.1"
+    ],
+    "ee": [
+     "M.EE.1.OA.1"
+    ],
+    "domain": "OA",
+    "unit": "Awsaj supplement lessons (domain tests)",
+    "block": null,
+    "power": true
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "addition:add_wp_20",
+     "opts": {
+      "support": "bar"
+     },
+     "missing": "adding-to and putting-together stories with the total unknown, each on a bar (4 cards and 3 more cards); never the change or the start unknown"
+    },
+    {
+     "key": "subtraction:sub_wp_20",
+     "opts": {
+      "support": "bar"
+     },
+     "missing": "taking-from stories with the result unknown on a bar (7 cards, 4 taken out); never a compare story (how many more?)"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "stories with the change or the start unknown (had 8, got some, now 13) and compare stories with the smaller amount unknown, each drawn on a bar model",
+   "build": [
+    "map_change_unknown_story",
+    "map_compare_smaller_unknown"
+   ],
+   "pre": [
+    {
+     "key": "addition:add_wp_10",
+     "opts": {
+      "band": 10
+     },
+     "why": "Y1.B2.S10 Addition problems (Grade K): join stories within 10, the total unknown"
+    },
+    {
+     "key": "subtraction:sub_wp_10",
+     "opts": {},
+     "why": "Y1.B2.S15 Subtraction - take away (How many left ) (Grade K): take-away stories within 10"
+    },
+    {
+     "key": "composing:number_bonds",
+     "opts": {
+      "band": 10
+     },
+     "why": "R.B11.S7 Composition to 10 (Reception): the parts of a number to 10, a part or the whole unknown (used for the bar of a part-whole story)"
+    },
+    {
+     "key": "composing:teen_compose",
+     "opts": {},
+     "why": "Y2.B1.S1 Numbers to 20 (taught earlier, W1): the numbers 11 to 20 (used in the stories)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "algebra:tape_diagram",
+     "opts": {
+      "band": 20
+     },
+     "why": "bar models of joining, taking away and \"how many more does she need?\" within 20, with the bar drawn for the pupil"
+    },
+    {
+     "key": "addition:comparison_word",
+     "opts": {
+      "range": 10
+     },
+     "why": "how many more / fewer stories within 10: the compare stories this lesson adds"
+    }
+   ],
+   "note": "Domain-test build lesson (site: \"New CCSS BUILD lesson so the domain test only asks what has been taught\"), W03 and W04, OA unit. The school teaches it before the Grade 1 addition block (W5): its stories stay within 20 with the numbers met in Y2.B1.S1 (W1).",
+   "envision": [
+    {
+     "proposal": "map_change_unknown_story",
+     "name": "How Many Were Added? (change unknown)",
+     "kind": "option on addition:add_word_problems",
+     "teaches": "Join/separate stories where the change is unknown",
+     "closes": "stories with the change or the start unknown (had 8, got some, now 13) and compare stories with the smaller amount unknown, each drawn on a bar model",
+     "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over a First–Then–Now strip with the Then box empty; pupil writes the change. Screen: number entry in the Then box."
+    },
+    {
+     "proposal": "map_compare_smaller_unknown",
+     "name": "Compare Stories: Smaller Unknown",
+     "kind": "option on subtraction:sub_word_problems",
+     "teaches": "Solve compare stories where the smaller quantity is unknown",
+     "closes": "stories with the change or the start unknown (had 8, got some, now 13) and compare stories with the smaller amount unknown, each drawn on a bar model",
+     "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over a two-bar comparison diagram, one bar labelled ?; pupil writes the missing quantity. Screen: number entry in the ? bar. The two-bar drawing comes from vis_bar_family."
+    }
+   ]
+  },
+  "G1|-|countonto120": {
+   "title": "Count on to 120",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W08",
+    "ccss": [
+     "1.NBT.A.1"
+    ],
+    "ee": [
+     "M.EE.1.NBT.1"
+    ],
+    "domain": "NBT",
+    "unit": "Awsaj supplement lessons",
+    "block": "Y2.B1",
+    "power": false
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "composing:hundreds_chart_fill",
+     "opts": {
+      "band": 100
+     },
+     "missing": "fills gaps in a 1-100 chart; numbers past 100 (101 to 120) never appear"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "opts": {
+      "step": 1,
+      "range": 100
+     },
+     "missing": "counts on and back in a number track to 100 only"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "counting on past 100 to 120 from any number, and reading and writing the numerals 101 to 120",
+   "build": [
+    "chart_120"
+   ],
+   "pre": [
+    {
+     "key": "counting:number_seq_fill",
+     "opts": {
+      "step": 1,
+      "range": 50
+     },
+     "why": "Y1.B6.S1 Count from 20 to 50 (Grade K): counting on in a track to 50, the same count lower"
+    },
+    {
+     "key": "composing:base10_build",
+     "opts": {
+      "band": 99
+     },
+     "why": "Y2.B1.S2 Count objects to 100 by making 10s (taught earlier, W1): tens and ones to 100: the count past each ten"
+    },
+    {
+     "key": "placevalue:compare",
+     "opts": {
+      "band": 99
+     },
+     "why": "Y2.B1.S13 Compare numbers (taught earlier, W4): reading two numerals to 100 and saying which is more"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "opts": {
+      "rows": [
+       {
+        "step": 10,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     },
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (taught earlier, W4): counting in 10s from 0, to 110: the tens the count to 120 passes"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "composing:number_chart_fill",
+     "opts": {
+      "band": 200
+     },
+     "why": "filling gaps in a chart from 101 on (to 200): the same counting on, past 120"
+    }
+   ],
+   "note": "Awsaj supplement lesson in Y2.B1 (Place value within 100), W08 and W09; closes 1.NBT.A.1, which White Rose Year 2 does not teach past 100.",
+   "envision": [
+    {
+     "proposal": "chart_120",
+     "name": "Count to 120 on the Chart (option)",
+     "kind": "option on composing:hundreds_chart_fill",
+     "teaches": "counting, reading and writing numerals to 120 starting anywhere, across 100",
+     "closes": "counting on past 100 to 120 from any number, and reading and writing the numerals 101 to 120",
+     "representation": "chartwindow; write the missing numerals"
+    }
+   ]
+  },
+  "G1|-|composeandrecomposeshapes": {
+   "title": "Compose and recompose shapes",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W15",
+    "ccss": [
+     "1.G.A.2"
+    ],
+    "ee": [
+     "M.EE.1.G.2"
+    ],
+    "domain": "G",
+    "unit": "Awsaj supplement lessons",
+    "block": "Y2.B3",
+    "power": true
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "shapes_early:compose_shapes",
+     "missing": "two flat shapes put together make one new shape (two triangles make a square); never 3-D shapes"
+    },
+    {
+     "key": "shapes_early:compose_hexagon",
+     "missing": "fills a hexagon with pattern blocks three ways (triangles, rhombi, trapezoids): recomposing one 2-D shape"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "composing 3-D shapes (cubes, cuboids, cylinders, cones) into a composite solid and naming the solids a model is made of",
+   "build": [
+    "map_compose_solids"
+   ],
+   "pre": [
+    {
+     "key": "shapes_early:name_2d_shapes",
+     "opts": {
+      "shapes": [
+       0,
+       1,
+       2,
+       4
+      ]
+     },
+     "why": "Y1.B3.S3 Recognise and name 2-D shapes (Grade K): naming the circles, triangles, squares and rectangles put together"
+    },
+    {
+     "key": "shapes_early:count_sides_vertices_2d",
+     "opts": {
+      "forms": [
+       0
+      ]
+     },
+     "why": "Y2.B3.S2 Count sides on 2-D shapes (taught earlier, W13): counting the sides of the shapes joined"
+    },
+    {
+     "key": "shapes_early:count_edges_faces_vertices",
+     "opts": {
+      "forms": [
+       0
+      ]
+     },
+     "why": "Y2.B3.S8 Count faces on 3-D shapes (taught earlier, W14): the faces of cubes and cuboids, the 3-D shapes joined in the second half"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "opts": {},
+     "why": "naming cubes, cuboids, cylinders and cones: the solids the 3-D half puts together (Y2.B3.S1, the same week)"
+    }
+   ],
+   "note": "Awsaj supplement lesson in Y2.B3 (Shape), W15 and W16; closes 1.G.A.2, which White Rose Year 2 does not teach.",
+   "envision": [
+    {
+     "proposal": "map_compose_solids",
+     "name": "Combine 3-D Shapes (option)",
+     "kind": "option on shapes_early:compose_shapes",
+     "teaches": "composing 3-D shapes from cubes, prisms, cylinders and cones to make a composite shape, and seeing which solids a model is made from (1.G.A.2)",
+     "closes": "composing 3-D shapes (cubes, cuboids, cylinders, cones) into a composite solid and naming the solids a model is made of",
+     "representation": "print: B&W boxed Andika cell, isometric line drawings of the solids and the composite model, slots 'This model is made of __ cubes and __ cylinder' with a shape word bank; screen: drag solids onto the model outline (production), never MC"
+    }
+   ]
+  },
+  "G1|-|bondsto10explorecombinationsthatmake10": {
+   "title": "Bonds to 10 (explore combinations that make 10)",
+   "site": {
+    "flag": "enrich-native",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [],
+    "ee": [],
+    "domain": "OA",
+    "unit": null,
+    "block": null,
+    "power": false
+   },
+   "direct": [
+    {
+     "key": "composing:make_ten",
+     "opts": {
+      "band": 10
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "composing:number_bonds",
+     "opts": {
+      "band": 10
+     },
+     "why": "R.B11.S7 Composition to 10 (Reception, the source grade): the parts of every number to 10"
+    },
+    {
+     "key": "composing:ten_frame_build",
+     "opts": {
+      "band": 10
+     },
+     "why": "R.B11.S3 Represent 9 and 10 (Reception, the source grade): building 9 and 10 on a ten frame, the frame make_ten fills"
+    },
+    {
+     "key": "counting:count_objects",
+     "opts": {
+      "band": 10,
+      "objects": "frame"
+     },
+     "why": "R.B11.S1 Find 9 and 10 (Reception, the source grade): counting 9 and 10 in a frame"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:add_three",
+     "opts": {
+      "band": 10,
+      "notation": [
+       "across"
+      ]
+     },
+     "why": "three numbers that make 10 (R.B11.S10, the next Reception step)"
+    }
+   ],
+   "note": "Support lesson (site flag enrich-native, source Reception, \"From earlier work, prerequisite ladder\"); nearest WRM step R.B11.S8 Bonds to 10 (2 parts). make_ten {band:10} deals every bond to 10 on a ten frame (The frame shows 6. How many more make 10? 4), which is the lesson at its source grade."
+  },
+  "G1|-|comparemass1": {
+   "title": "Compare mass (1)",
+   "site": {
+    "flag": "enrich-native",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [],
+    "ee": [],
+    "domain": "MD",
+    "unit": null,
+    "block": null,
+    "power": false
+   },
+   "direct": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "comparing:compare_objects",
+     "opts": {},
+     "why": "R.B2.S1 Compare size (Reception, the source grade): comparing two pictured objects with the words taller, longer, thicker"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "opts": {
+      "band": 5,
+      "level": [
+       1
+      ]
+     },
+     "why": "R.B1.S7 Compare amounts (Reception, the source grade): the compare words more, fewer, the same on groups to 5"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "comparing:compare_objects",
+     "opts": {
+      "task": "length"
+     },
+     "why": "comparing two lengths: the same compare words for another measure (R.B10.S2)"
+    }
+   ],
+   "note": "Support lesson (enrich-native, source Reception); nearest WRM step R.B2.S2 Compare mass (Reception Autumn), the first measure lesson. heavier_lighter_visual asks which of two pictured objects is heavier or lighter, which is the Reception lesson. Pre-skills are few: only comparing size and comparing amounts come before it in Reception."
+  },
+  "G1|-|comparemass2": {
+   "title": "Compare mass (2)",
+   "site": {
+    "flag": "enrich-native",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [],
+    "ee": [],
+    "domain": "MD",
+    "unit": null,
+    "block": null,
+    "power": false
+   },
+   "direct": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "comparing:compare_objects",
+     "opts": {},
+     "why": "R.B2.S1 Compare size (Reception, the source grade): comparing two pictured objects with the words taller, longer, thicker"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "opts": {
+      "band": 5,
+      "level": [
+       1
+      ]
+     },
+     "why": "R.B1.S7 Compare amounts (Reception, the source grade): the compare words more, fewer, the same on groups to 5"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "comparing:compare_objects",
+     "opts": {
+      "task": "height"
+     },
+     "why": "comparing heights: the same compare words for another measure (R.B10.S4)"
+    }
+   ],
+   "note": "Support lesson (enrich-native, source Reception); nearest WRM step R.B8.S1 Compare mass (Reception Spring, the second time mass is compared; R.B2.S2 is the first). The site gives no other detail, so it is tagged as that step. Pre-skills are few for the reason given on Compare mass (1)."
+  },
+  "G1|-|countmoneynotesandcoinsusdollarscents": {
+   "title": "Count money - notes and coins (US: dollars & cents)",
+   "site": {
+    "flag": "above",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [
+     "2.MD.C.8"
+    ],
+    "ee": [
+     "M.EE.2.MD.8"
+    ],
+    "domain": "MD",
+    "unit": "Money",
+    "block": null,
+    "power": false
+   },
+   "direct": [
+    {
+     "key": "measurement:money_count",
+     "opts": {
+      "currency": "usd",
+      "kind": "both"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:money_count",
+     "opts": {
+      "currency": "usd",
+      "kind": "like"
+     },
+     "why": "Y2.B4.S1 Count money - pence (taught earlier, W32): counting coins of one kind"
+    },
+    {
+     "key": "measurement:money_count",
+     "opts": {
+      "currency": "usd",
+      "kind": "note"
+     },
+     "why": "Y2.B4.S2 Count money - pounds (notes and coins) (taught earlier, W32): counting bills"
+    },
+    {
+     "key": "measurement:coin_value",
+     "opts": {
+      "currency": "usd"
+     },
+     "why": "Y1.B13.S2 Recognise coins (Grade K): the value of each coin"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "opts": {
+      "rows": [
+       {
+        "step": 2,
+        "start": "zero",
+        "dir": "up"
+       },
+       {
+        "step": 5,
+        "start": "zero",
+        "dir": "up"
+       },
+       {
+        "step": 10,
+        "start": "zero",
+        "dir": "up"
+       }
+      ]
+     },
+     "why": "Y2.B1.S15 Count in 2s, 5s and 10s (taught earlier, W4): counting in 2s, 5s and 10s from 0 (the count used for 5-cent and 10-cent coins)"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:equiv_coin_sets",
+     "opts": {
+      "currency": "usd"
+     },
+     "why": "do these coins make the amount? The same total checked another way (Y2.B4.S5)"
+    }
+   ],
+   "note": "Above-grade core title (site flag above, 2.MD.C.8); the pacing reviews it as Y2.B4.S2 (the same block and step, retitled). money_count {kind:both} counts the bills and then the coins and writes both numbers ($50 and 36 cents), which is the lesson."
+  },
+  "G1|-|doublingupto55": {
+   "title": "Doubling (up to 5+5)",
+   "site": {
+    "flag": "enrich-native",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [],
+    "ee": [],
+    "domain": "OA",
+    "unit": null,
+    "block": null,
+    "power": false
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "opts": {
+      "forms": [
+       0
+      ]
+     },
+     "missing": "abstract doubles to 10 + 10 (Double it! 7 + 7); never a picture of two equal groups, and past 5 + 5"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "finding and making a double from a picture of two equal groups, totals to 10 (5 + 5)",
+   "build": [
+    "doubles_pictured"
+   ],
+   "pre": [
+    {
+     "key": "addition:add_5_pictures",
+     "opts": {},
+     "why": "R.B9.S9 Combine 2 groups (Reception, the source grade): putting two pictured groups together and counting them all"
+    },
+    {
+     "key": "composing:number_bonds",
+     "opts": {
+      "band": 10
+     },
+     "why": "R.B11.S7 Composition to 10 (Reception, the source grade): the parts of numbers to 10, 5 and 5 among them (used for doubles)"
+    },
+    {
+     "key": "composing:odd_even",
+     "opts": {
+      "forms": [
+       2
+      ],
+      "range": 10
+     },
+     "why": "R.B11.S13 Explore even and odd (Reception, the source grade): making pairs, the step's partial skill names odd or even numbers to 10"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "patterns:double",
+     "opts": {
+      "band": 20
+     },
+     "why": "Double 7 = 14: the double written as a number fact (R.B11.S12 Doubles to 10, make a double)"
+    }
+   ],
+   "note": "Support lesson (enrich-native, source Reception); nearest WRM steps R.B11.S11 / S12 Doubles to 10 (find, make a double), both partial for the same reason. doubles_pictured is the Reception lane's option for them.",
+   "envision": [
+    {
+     "proposal": "doubles_pictured",
+     "name": "Doubles with Pictures (option)",
+     "kind": "option on number_sense:doubles_near_doubles",
+     "teaches": "find the double in a picture of two equal groups, or draw the matching group to make a double; write the total (to 8, then to 10)",
+     "closes": "finding and making a double from a picture of two equal groups, totals to 10 (5 + 5)",
+     "representation": "two identical rows of counters in one boxed cell; write the total"
+    }
+   ]
+  },
+  "G1|-|findthetotalusdollarscents": {
+   "title": "Find the total (US: dollars & cents)",
+   "site": {
+    "flag": "above",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [
+     "1.NBT.C.4",
+     "2.MD.C.8"
+    ],
+    "ee": [
+     "M.EE.1.NBT.4",
+     "M.EE.2.MD.8"
+    ],
+    "domain": "MD",
+    "unit": "Money",
+    "block": null,
+    "power": false
+   },
+   "direct": [
+    {
+     "key": "measurement:money",
+     "opts": {
+      "currency": "usd",
+      "step": 5,
+      "band": 500
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:money_count",
+     "opts": {
+      "currency": "usd",
+      "kind": "both"
+     },
+     "why": "Y2.B4.S3 Count money - pounds and pence (taught earlier, W32): counting bills and coins: an amount in dollars and cents"
+    },
+    {
+     "key": "addition:add_100_no_regroup",
+     "opts": {},
+     "why": "Y2.B2.S15 Add two 2-digit numbers (not across a 10) (taught earlier, W6): adding two 2-digit numbers, not across a 10 (used for the cents column)"
+    },
+    {
+     "key": "addition:add_100_regroup",
+     "opts": {},
+     "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (taught earlier, W7): adding across a 10"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:money_change",
+     "opts": {
+      "currency": "usd",
+      "step": 100,
+      "paid": "note",
+      "band": 2000
+     },
+     "why": "finding the change from a bill: the next money calculation (Y2.B4.S9)"
+    }
+   ],
+   "note": "Above-grade core title (site flag above; the site says \"auto-matched by keyword scan; verify\"). Read as adding two prices to find the total cost: money {step:5, band:500} adds two prices in dollars and cents to $5 ($3.60 + $1.00 = $4.60) in a money column, which is 2.MD.C.8 within 1.NBT.C.4's sizes."
+  },
+  "G1|-|lengthandheightcompareorder": {
+   "title": "Length and height (compare, order)",
+   "site": {
+    "flag": "enrich-native",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [
+     "1.MD.A.1",
+     "2.MD.A.4"
+    ],
+    "ee": [
+     "M.EE.1.MD.1",
+     "M.EE.2.MD.4"
+    ],
+    "domain": "CC",
+    "unit": null,
+    "block": null,
+    "power": false
+   },
+   "direct": [
+    {
+     "key": "comparing:compare_objects",
+     "opts": {
+      "task": "length"
+     }
+    },
+    {
+     "key": "comparing:compare_objects",
+     "opts": {
+      "task": "height"
+     }
+    },
+    {
+     "key": "shapes_early:order_objects_length",
+     "opts": {
+      "tiles": 3
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "comparing:compare_objects",
+     "opts": {},
+     "why": "R.B2.S1 Compare size (Reception, the source grade): comparing two pictured objects by size, length and thickness"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "opts": {
+      "band": 5,
+      "level": [
+       1
+      ]
+     },
+     "why": "R.B1.S7 Compare amounts (Reception, the source grade): the compare words more, fewer, the same"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "opts": {},
+     "why": "R.B2.S2 Compare mass (Reception, the source grade): comparing two objects by mass: the same compare idea for another measure"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "shapes_early:measure_nonstandard",
+     "opts": {},
+     "why": "measuring a length with cubes or paper clips (Y1.B7.S2, the next idea in Kindergarten)"
+    }
+   ],
+   "note": "Support lesson (enrich-native, source Reception \"Growing 6, 7, 8\"); nearest WRM steps R.B10.S1-S4 Explore and compare length and height. compare_objects {task:length} and {task:height} ask which of two is longer, shorter, taller or shorter; order_objects_length {tiles:3} orders three objects shortest to longest: the compare and the order the title names."
+  },
+  "G1|-|selectmoneyusdollarscents": {
+   "title": "Select money (US: dollars & cents)",
+   "site": {
+    "flag": "above",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [
+     "2.MD.C.8"
+    ],
+    "ee": [
+     "M.EE.2.MD.8"
+    ],
+    "domain": "MD",
+    "unit": "Money",
+    "block": null,
+    "power": false
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:make_change_least_coins",
+     "opts": {
+      "currency": "usd"
+     },
+     "missing": "chooses the fewest coins for an amount to 50 cents and writes how many of each; never chooses bills, and never any set that makes the amount"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "choosing bills and coins to make an amount in dollars and cents, any way that works ($35 = $20 + $10 + $5)",
+   "build": [
+    "make_amount_notes"
+   ],
+   "pre": [
+    {
+     "key": "measurement:money_count",
+     "opts": {
+      "currency": "usd",
+      "kind": "both"
+     },
+     "why": "Y2.B4.S3 Count money - pounds and pence (taught earlier, W32): counting bills and coins"
+    },
+    {
+     "key": "measurement:coin_value",
+     "opts": {
+      "currency": "usd"
+     },
+     "why": "Y1.B13.S2 Recognise coins (Grade K): the value of each coin"
+    },
+    {
+     "key": "measurement:equiv_coin_sets",
+     "opts": {
+      "currency": "usd"
+     },
+     "why": "Y2.B4.S5 Make the same amount (taught earlier, W32): checking that a set of coins makes the amount"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:money_compare",
+     "opts": {},
+     "why": "which set has more money: the same amounts compared (Y2.B4.S6)"
+    }
+   ],
+   "note": "Above-grade core title (site flag above, 2.MD.C.8); nearest WRM step Y2.B4.S4 Choose notes and coins, partial for the same reason.",
+   "envision": [
+    {
+     "proposal": "make_amount_notes",
+     "name": "Make an Amount With Bills and Coins (option)",
+     "kind": "option on measurement:equiv_coin_sets",
+     "teaches": "choosing bills and coins to make an amount ($35 = $20 + $10 + $5) and finding more than one way",
+     "closes": "choosing bills and coins to make an amount in dollars and cents, any way that works ($35 = $20 + $10 + $5)",
+     "representation": "the amount in a box; a bank of drawn bills and coins to ring or tally; answer: tally boxes under each value"
+    }
+   ]
+  }
+ },
  "proposals": {
   "tens_ones_group": {
    "kind": "new",
@@ -9948,8 +10790,12 @@
    ],
    "why": "make_change_least_coins uses coins only and asks for the fewest coins; no skill deals bills to make an amount",
    "reused": false,
+   "lessons": [
+    "G1|-|selectmoneyusdollarscents"
+   ],
    "closes": {
-    "Y2.B4.S4": "coins only and always the FEWEST coins; choosing bills and coins to make an amount (any way) is not dealt"
+    "Y2.B4.S4": "coins only and always the FEWEST coins; choosing bills and coins to make an amount (any way) is not dealt",
+    "G1|-|selectmoneyusdollarscents": "choosing bills and coins to make an amount in dollars and cents, any way that works ($35 = $20 + $10 + $5)"
    },
    "kindText": "option on measurement:equiv_coin_sets"
   },
@@ -10703,6 +11549,207 @@
     "Y2.B11.S5": "continuing and completing a pattern in which a shape turns a quarter or a half turn each time"
    },
    "kindText": "new skill"
+  },
+  "map_change_unknown_story": {
+   "kind": "option",
+   "skill": "addition:add_word_problems",
+   "option": "unknown: change, 2-digit numbers (the within-10 picture strip is vis_story_strip) — past-tense join (had 8, got some, now 13); the same option is declared on subtraction:sub_word_problems for separate stories (had 15, some went, 9 left)",
+   "name": "How Many Were Added? (change unknown)",
+   "teaches": "Join/separate stories where the change is unknown",
+   "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over a First–Then–Now strip with the Then box empty; pupil writes the change. Screen: number entry in the Then box.",
+   "family": "addition",
+   "ccss": [
+    "1.OA.A.1",
+    "2.OA.A.1"
+   ],
+   "map": [
+    {
+     "strand": "Operations & algebra",
+     "ritBand": "171-190",
+     "taskType": "number entry"
+    }
+   ],
+   "why": "add_word_problems deals change-unknown only as \"wants N, needs how many more\"; past-tense join/separate change-unknown is the MAP K-2 181-190 item. Each skill gets the stories its name covers. (reused from the MAP lane's links file: the same id is the same spec)",
+   "problemTypes": [
+    "join, change unknown — had 5, got some, now 12 — write how many were added",
+    "separate, change unknown — had 15, some went, 9 left — write how many went",
+    "write the equation 5 + ☐ = 12 and solve — equation frame + number"
+   ],
+   "levels": [
+    "L1: join, within 10, counters drawn in First and Now (hint, fades); strip (structural, stays)",
+    "L2: counters fade, within 20",
+    "L3: separate stories added",
+    "L4: within 100, equation frame written by the pupil"
+   ],
+   "example": {
+    "item": "Leo had 8 cars. He got some more. Now he has 13. How many did he get?",
+    "answer": "5"
+   },
+   "misconceptions": [
+    "Adds the two numbers (8 + 13 = 21)",
+    "Writes the \"now\" number as the answer"
+   ],
+   "steps": [],
+   "reused": true,
+   "source": "MAP.json",
+   "lessons": [
+    "G1|-|solveonestepwordproblemswithin20usingbarmodels"
+   ],
+   "closes": {
+    "G1|-|solveonestepwordproblemswithin20usingbarmodels": "stories with the change or the start unknown (had 8, got some, now 13) and compare stories with the smaller amount unknown, each drawn on a bar model"
+   },
+   "kindText": "option on addition:add_word_problems"
+  },
+  "map_compare_smaller_unknown": {
+   "kind": "option",
+   "skill": "subtraction:sub_word_problems",
+   "option": "unknown: smaller quantity in a compare story (\"fewer than\" and \"more than\" with the bigger known)",
+   "name": "Compare Stories: Smaller Unknown",
+   "teaches": "Solve compare stories where the smaller quantity is unknown",
+   "representation": "Print: one B&W boxed Andika cell (WORKSHEET_DESIGN_STANDARD.md), big digits, single grey for structure only; story over a two-bar comparison diagram, one bar labelled ?; pupil writes the missing quantity. Screen: number entry in the ? bar. The two-bar drawing comes from vis_bar_family.",
+   "family": "subtraction",
+   "ccss": [
+    "1.OA.A.1",
+    "2.OA.A.1"
+   ],
+   "map": [
+    {
+     "strand": "Operations & algebra",
+     "ritBand": "181-200",
+     "taskType": "number entry"
+    }
+   ],
+   "why": "add_word_problems already deals bigger-unknown; the smaller unknown is solved by subtraction, so it belongs on sub_word_problems (reused from the MAP lane's links file: the same id is the same spec)",
+   "problemTypes": [
+    "fewer than — Maya 14, Tom 6 fewer — write Tom",
+    "more than, bigger known — Maya has 6 more than Tom, Maya 14 — write Tom"
+   ],
+   "levels": [
+    "L1: \"fewer than\", within 20, two-bar diagram with the difference shaded (hint, fades); two-bar frame (structural, stays)",
+    "L2: shading fades",
+    "L3: \"more than\" with the bigger known (the language trap)",
+    "L4: within 100"
+   ],
+   "example": {
+    "item": "Maya has 14 shells. Tom has 6 fewer shells than Maya. How many shells does Tom have?",
+    "answer": "8"
+   },
+   "misconceptions": [
+    "\"fewer\" means subtract always / \"more\" means add always (the language trap: \"Tom has 6 more than Maya\" with Tom known)",
+    "Writes the difference instead of the quantity"
+   ],
+   "steps": [],
+   "reused": true,
+   "source": "MAP.json",
+   "lessons": [
+    "G1|-|solveonestepwordproblemswithin20usingbarmodels"
+   ],
+   "closes": {
+    "G1|-|solveonestepwordproblemswithin20usingbarmodels": "stories with the change or the start unknown (had 8, got some, now 13) and compare stories with the smaller amount unknown, each drawn on a bar model"
+   },
+   "kindText": "option on subtraction:sub_word_problems"
+  },
+  "chart_120": {
+   "kind": "option",
+   "skill": "composing:hundreds_chart_fill",
+   "option": "band 120: chart windows from 100 to 120 (crossing 100)",
+   "name": "Count to 120 on the Chart (option)",
+   "teaches": "counting, reading and writing numerals to 120 starting anywhere, across 100",
+   "representation": "chartwindow; write the missing numerals",
+   "family": "counting",
+   "steps": [],
+   "ccss": [
+    "1.NBT.A.1"
+   ],
+   "why": "existing STANDARD_PROPOSALS entry; reused",
+   "reused": true,
+   "lessons": [
+    "G1|-|countonto120"
+   ],
+   "closes": {
+    "G1|-|countonto120": "counting on past 100 to 120 from any number, and reading and writing the numerals 101 to 120"
+   },
+   "kindText": "option on composing:hundreds_chart_fill",
+   "dropSteps": [
+    "Y2.B1.S5"
+   ]
+  },
+  "map_compose_solids": {
+   "kind": "option",
+   "skill": "shapes_early:compose_shapes",
+   "option": "form \"solids\": two or three 3-D shapes (cubes, cuboids, cylinders, cones, half-cylinders) put together; name what is made or pick the solids that make a drawn model",
+   "name": "Combine 3-D Shapes (option)",
+   "teaches": "composing 3-D shapes from cubes, prisms, cylinders and cones to make a composite shape, and seeing which solids a model is made from (1.G.A.2)",
+   "representation": "print: B&W boxed Andika cell, isometric line drawings of the solids and the composite model, slots 'This model is made of __ cubes and __ cylinder' with a shape word bank; screen: drag solids onto the model outline (production), never MC",
+   "family": "geometry",
+   "ccss": [
+    "1.G.A.2"
+   ],
+   "map": [
+    {
+     "strand": "Geometry",
+     "ritBand": "151-170",
+     "taskType": "compose 3-D shapes"
+    }
+   ],
+   "why": "compose_shapes and compose_hexagon put together flat shapes only (8/8 2-D); no proposal in proposals-index or build-list.js covers composing solids (reused from the MAP lane's links file: the same id is the same spec)",
+   "problemTypes": [
+    "what is it made of — a drawn model — write how many of each solid (bank) / drag solids",
+    "build it — 'Use 2 cubes and 1 cone to make a tower' — draw/drag",
+    "which model — pick the model made from the solids listed (tick) / click"
+   ],
+   "levels": [
+    "L1: two cubes stacked, solids named under the drawing (structural: word bank stays; hint: names under drawings fade)",
+    "L2: two different solids (cube + cone)",
+    "L3: three solids, names faded"
+   ],
+   "example": {
+    "item": "A tower is a cylinder with a cone on top. Which shapes is it made of?",
+    "answer": "1 cylinder and 1 cone"
+   },
+   "misconceptions": [
+    "names the flat face (circle) instead of the solid (cylinder)",
+    "counts a hidden cube twice or misses it"
+   ],
+   "steps": [],
+   "reused": true,
+   "source": "MAP.json",
+   "lessons": [
+    "G1|-|composeandrecomposeshapes"
+   ],
+   "closes": {
+    "G1|-|composeandrecomposeshapes": "composing 3-D shapes (cubes, cuboids, cylinders, cones) into a composite solid and naming the solids a model is made of"
+   },
+   "kindText": "option on shapes_early:compose_shapes"
+  },
+  "doubles_pictured": {
+   "kind": "option",
+   "skill": "number_sense:doubles_near_doubles",
+   "option": "pictures: two equal rows, totals to 8 / 10",
+   "name": "Doubles with Pictures (option)",
+   "teaches": "find the double in a picture of two equal groups, or draw the matching group to make a double; write the total (to 8, then to 10)",
+   "representation": "two identical rows of counters in one boxed cell; write the total",
+   "family": "algebra",
+   "ccss": [
+    "K.OA.A.1"
+   ],
+   "why": "doubles_near_doubles and double are abstract (9 + 9, \"Double 7\") (reused from the R lane's links file: the same id is the same spec)",
+   "steps": [
+    "R.B9.S7",
+    "R.B9.S8",
+    "R.B11.S11",
+    "R.B11.S12",
+    "R.B16.S6"
+   ],
+   "reused": true,
+   "source": "R.json",
+   "lessons": [
+    "G1|-|doublingupto55"
+   ],
+   "closes": {
+    "G1|-|doublingupto55": "finding and making a double from a picture of two equal groups, totals to 10 (5 + 5)"
+   },
+   "kindText": "option on number_sense:doubles_near_doubles"
   }
  },
  "tagFixes": [

@@ -284,6 +284,22 @@ const claimItems=(k,o)=>{const id=k+JSON.stringify(o||{});if(_ci.has(id))return 
   for(let i=0;i<30;i++){let q;try{q=generateQuestionFor({category:c,skill:sk,opts:o||{},seed:61331+i*73,itemIndex:i%20,itemCount:20});}catch(_){continue;}if(!q)continue;
     out.push({text:_st(q.text),a:_st(typeof q.ans==='object'?JSON.stringify(q.ans):q.ans),x:_st([...(q.options||[]),...(q.tiles||[]),...(q.bins||[]),...(q.items||[])].map(_lb).join(' ; ')),vis:_st(q.visual),raw:String(q.visual||'').toLowerCase().slice(0,6000),tpl:q.cell?q.cell.template:'',pay:q.cell?JSON.stringify(q.cell.payload):''});}
   _ci.set(id,out);return out;};
+  // r12 TITLECLAIM (the cited title is a claim, Y5 critic r6 H'): a why that cites a step claims that step's title. When the
+  // title names what the link's items never deal: an "add and subtract" title on a one-operation skill gets the half marker
+  // ("the adding half"); a skill that is only PARTIAL at the cited step gets "nearest live practice" (the title is the step's,
+  // the skill is its partial practice); a skill that is DIRECT there is a build error (the why or the opts must change by hand)
+function titleClaimPass(sid,lists){for(const [role,list] of lists)for(const e of list){if(/nearest live practice/.test(e.why))continue;
+    const ids=[...new Set([...String(e.why).matchAll(/(?:R|Y\d)\.B\d+\.S\d+/g)].map(m=>m[0]))].filter(id=>stepById[id]);if(!ids.length)continue;
+    const its=claimItems(e.key,e.opts);if(!its.length)continue;
+    for(const id of ids){const t=usTitle(id);const bad=CL.claimHits(t,its).filter(h=>!h.ok);if(!bad.length)continue;
+      const ops=bad.map(h=>h.claim);const both=/\badd/i.test(t)&&/subtract/i.test(t)||/multipl/i.test(t)&&/divi/i.test(t);
+      if(both&&ops.every(c=>['adds','subtracts','multiplies','divides'].includes(c))){const half={subtracts:'adding',adds:'subtracting',divides:'multiplication',multiplies:'division'}[ops[0]];
+        if(!e.why.includes('the '+half+' half'))e.why=e.why.replace(/\)\s*$/,'')+(/\)\s*$/.test(e.why)?'; ':' (')+'the '+half+' half)';titleStats.half++;continue;}
+      const ls=laneStep(id);const ow={...(OV.steps[id]||{}),...(OV.r3?.[id]||{})};
+      const [dK,pK]=ls?[ls.direct.map(x=>resolve(x.key)),ls.partial.map(x=>resolve(x.key))]:(ow.direct||ow.partials)?[(ow.direct||[]).map(x=>resolve(x.key)),(ow.partials||[]).map(x=>resolve(x.key))]:[(tags[id]||[]).filter(t=>!t.partial).map(t=>resolve(t.key)),(tags[id]||[]).filter(t=>t.partial).map(t=>resolve(t.key))];const isPartial=pK.includes(e.key)&&!dK.includes(e.key);
+      const notThere=!allOf(id).includes(e.key);
+      if(isPartial||notThere){e.why=e.why.replace(/\)\s*$/,'')+(/\)\s*$/.test(e.why)?'; ':' (')+`nearest live practice: ${id} has ${isPartial?'it as a partial skill':'no skill that does this'}, and these items never ${ops.map(c=>CLAIMVERB[c]||c).join(' or ')})`;titleStats.nlp++;break;}
+      console.error('TITLECLAIM',sid,role,e.key,JSON.stringify(e.opts||{}),'cites',id,t,'| false:',ops.join(','));process.exitCode=1;titleStats.bad++;}}}
 const usedProps=new Set();const missingReview=[];const bbStats={n:0,bad:0,cls:{}};const optStats={n:0,spec:0,bad:0,rule:{}};
 for(const b of yr.blocks){ if(b.number>MAXB)continue;
  b.steps.forEach((s,i)=>{
@@ -505,22 +521,7 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
   // r12: OV.whyFix[stepId][key] = the why of that pre link, written for this step (applied last, after every rewrite)
   for(const e of pre){const w=OV.whyFix?.[s.id]?.[e.key];if(w)e.why=w;}
   for(const e of related){const w=OV.relWhyFix?.[s.id]?.[e.key];if(w)e.why=w;}
-  // r12 TITLECLAIM (the cited title is a claim, Y5 critic r6 H'): a why that cites a step claims that step's title. When the
-  // title names what the link's items never deal: an "add and subtract" title on a one-operation skill gets the half marker
-  // ("the adding half"); a skill that is only PARTIAL at the cited step gets "nearest live practice" (the title is the step's,
-  // the skill is its partial practice); a skill that is DIRECT there is a build error (the why or the opts must change by hand)
-  for(const [role,list] of [['pre',pre],['related',related]])for(const e of list){if(/nearest live practice/.test(e.why))continue;
-    const ids=[...new Set([...String(e.why).matchAll(/(?:R|Y\d)\.B\d+\.S\d+/g)].map(m=>m[0]))].filter(id=>stepById[id]);if(!ids.length)continue;
-    const its=claimItems(e.key,e.opts);if(!its.length)continue;
-    for(const id of ids){const t=usTitle(id);const bad=CL.claimHits(t,its).filter(h=>!h.ok);if(!bad.length)continue;
-      const ops=bad.map(h=>h.claim);const both=/\badd/i.test(t)&&/subtract/i.test(t)||/multipl/i.test(t)&&/divi/i.test(t);
-      if(both&&ops.every(c=>['adds','subtracts','multiplies','divides'].includes(c))){const half={subtracts:'adding',adds:'subtracting',divides:'multiplication',multiplies:'division'}[ops[0]];
-        if(!e.why.includes('the '+half+' half'))e.why=e.why.replace(/\)\s*$/,'')+(/\)\s*$/.test(e.why)?'; ':' (')+'the '+half+' half)';titleStats.half++;continue;}
-      const ls=laneStep(id);const ow={...(OV.steps[id]||{}),...(OV.r3?.[id]||{})};
-      const [dK,pK]=ls?[ls.direct.map(x=>resolve(x.key)),ls.partial.map(x=>resolve(x.key))]:(ow.direct||ow.partials)?[(ow.direct||[]).map(x=>resolve(x.key)),(ow.partials||[]).map(x=>resolve(x.key))]:[(tags[id]||[]).filter(t=>!t.partial).map(t=>resolve(t.key)),(tags[id]||[]).filter(t=>t.partial).map(t=>resolve(t.key))];const isPartial=pK.includes(e.key)&&!dK.includes(e.key);
-      const notThere=!allOf(id).includes(e.key);
-      if(isPartial||notThere){e.why=e.why.replace(/\)\s*$/,'')+(/\)\s*$/.test(e.why)?'; ':' (')+`nearest live practice: ${id} has ${isPartial?'it as a partial skill':'no skill that does this'}, and these items never ${ops.map(c=>CLAIMVERB[c]||c).join(' or ')})`;titleStats.nlp++;break;}
-      console.error('TITLECLAIM',s.id,role,e.key,JSON.stringify(e.opts||{}),'cites',id,t,'| false:',ops.join(','));process.exitCode=1;titleStats.bad++;}}
+  titleClaimPass(s.id,[['pre',pre],['related',related]]);
   {const srt=bbSort(BB,pre);pre.splice(0,pre.length,...srt);}
   // r12 BBCHECK (the building-block sweep, a build gate): the lead pre is a building block of the step (never a word problem
   // on a non-problem step; on an addition / subtraction or multiplication / division step never the inverse, a fact family
@@ -572,10 +573,61 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
   out.steps[s.id]={title:s.title,direct,partial,verdict,missing,build,pre,preBuild,related,note:[o.note||(lessonWeek[s.id]?'':'not in the school sequence xlsx; pre-skills from the block and the previous year'),!related.length?(o.relNote||relNoteAuto):''].filter(Boolean).join('. ')};
  });
 }
+
+// ======================= r12: SITE LESSONS (owner rule 2026-10-16: every site lesson tagged; the Y5 lane's shape) =======================
+// lessons.mjs is the spec (hand verdicts judged from generated items); this pass writes the section and CHECKS every link as a
+// step's: the cited step owns the key and is taught before the lesson (same year: by school week; a Support lesson: only steps
+// of its SOURCE year or below), content markers at the lesson's week (a Support lesson at week 0 of this grade, an above-grade
+// core title with no week at W38), no pre repeating the lesson's own direct / partial, no duplicate, >= 3 pre or a note that
+// says why few, the cited-title claim (TITLECLAIM). Lessons tag nothing into SKILL_WRM: no tagFixes.
+const LS=await import(HERE+'lessons.mjs');
+const SITE=JSON.parse(fs.readFileSync(root+'data/curriculum/site-lessons.json','utf8'));
+const wkNum=w=>w?+String(w).replace(/\D/g,''):null;
+const myLessons=SITE.lessons.filter(l=>l.wrmYear===YEAR).sort((a,b)=>(wkNum(a.firstWeek)??99)-(wkNum(b.firstWeek)??99)||(a.id<b.id?-1:a.id>b.id?1:0));
+const YR={R:0,Y1:1,Y2:2,Y3:3,Y4:4,Y5:5,Y6:6};const SRC={GPK:'R',GK:'Y1',G1:'Y2',G2:'Y3',G3:'Y4',G4:'Y5',G5:'Y6'};
+const gradeName=y=>({R:'Reception',Y1:'Grade K',Y2:'Grade 1',Y3:'Grade 2',Y4:'Grade 3'})[y]||y;
+const lessonStats={n:0,full:0,partial:0,gap:0,links:0,bad:0};const LERR=(...a)=>{console.error('LESSON',...a);process.exitCode=1;lessonStats.bad++;};
+out.lessons={};
+for(const l of myLessons){const sp=LS.lessons[l.id];lessonStats.n++;
+  if(!sp){LERR(l.id,'no spec in lessons.mjs');continue;}
+  const src=(String(l.note||'').match(/^Source: (G\w+)\./)||[])[1];const srcY=src?SRC[src]:null;const support=l.flag==='enrich-native';
+  const week=l.firstWeek?wkNum(l.firstWeek):support?0:38;SWK[l.id]=week;
+  const direct=(sp.direct||[]).map(([k,o])=>({key:resolve(k)||(LERR(l.id,'dead key',k),k),opts:o||{}}));
+  const partial=(sp.partial||[]).map(([k,o,m])=>({key:resolve(k)||(LERR(l.id,'dead key',k),k),...(o&&Object.keys(o).length?{opts:o}:{}),missing:m}));
+  const build=[...(sp.build||[])];const verdict=direct.length&&!build.length?'full':(direct.length||partial.length)?'partial':'gap';
+  if(sp.verdict!==verdict)LERR(l.id,'verdict',sp.verdict,'but the skills say',verdict);
+  if(verdict!=='full'&&!build.length)LERR(l.id,'not full and no build');if(verdict==='full'&&sp.missing)LERR(l.id,'full with a missing clause');
+  const own=new Set([...direct,...partial].map(d=>d.key+'|'+JSON.stringify(d.opts||{})));
+  const pre=[];for(const [k0,o,cite,reason] of sp.pre||[]){const k=resolve(k0);if(!k){LERR(l.id,'dead pre key',k0);continue;}
+    const st=stepById[cite];if(!st){LERR(l.id,'pre cites an unknown step',cite);continue;}
+    if(!allOf(cite).includes(k))LERR(l.id,'pre',k,'cites',cite,'which does not tag that skill');
+    const cy=cite.split('.')[0];let rel;
+    if(cy===YEAR&&!support){if(!((SWK[cite]??999)<=week))LERR(l.id,'pre',k,'cites',cite,'taught W'+SWK[cite]+', after the lesson (W'+week+')');rel=SWK[cite]===week?`the same school week, W${week}`:`taught earlier, W${SWK[cite]}`;}
+    else{if(support&&srcY&&YR[cy]>YR[srcY])LERR(l.id,'Support lesson (source',src+') pre cites',cite,'above its source year');if(!support&&YR[cy]>YR[YEAR])LERR(l.id,'pre cites a later year',cite);rel=gradeName(cy)+(support&&cy===srcY?', the source grade':'');}
+    if(own.has(k+'|'+JSON.stringify(o||{})))LERR(l.id,'pre repeats the lesson\'s own skill',k);
+    pre.push({key:k,opts:o||{},why:`${cite} ${st.title} (${rel})${reason?': '+reason:''}`,cite});}
+  const related=(sp.related||[]).map(([k0,o,why])=>({key:resolve(k0)||k0,opts:o||{},why}));
+  for(const [role,list] of [['pre',pre],['related',related]]){const seen=new Set();for(const e of list){lessonStats.links++;const sig=e.key+'|'+JSON.stringify(e.opts);if(seen.has(sig))LERR(l.id,role,'duplicate',sig);seen.add(sig);
+    if(role==='related'&&own.has(sig))LERR(l.id,'related repeats the lesson\'s own skill',e.key);
+    // a Support lesson's pre that is its source-grade step's own skill and opts is that grade's lesson content; the customary
+    // marker is the lesson's own content in the school's customary length unit (sp.customaryOk says why)
+    const srcOwn=support&&role==='pre'&&e.cite&&JSON.stringify(stepOptsFor(e.cite,e.key)||{})===JSON.stringify(e.opts||{});
+    const hits=srcOwn?[]:markerHits(e.key,e.opts,l.id).filter(h=>!(sp.customaryOk&&h.m==='customary'));if(hits.length)LERR(l.id,role,e.key,JSON.stringify(e.opts),'deals content first met later:',hits.map(h=>h.m+' (W'+h.mw+') '+h.ex).join(' | '));}}
+  titleClaimPass(l.id,[['pre',pre],['related',related]]);
+  for(const e of pre)delete e.cite;
+  if(pre.length<3&&!/few/i.test(sp.note||''))LERR(l.id,'fewer than 3 pre and no note saying why');if(!related.length)LERR(l.id,'no related link');
+  for(const id of build)usedProps.add(id);lessonStats[verdict]++;
+  out.lessons[l.id]={title:l.title,site:{flag:l.flag,supplement:!!l.supplement,firstWeek:l.firstWeek||null,ccss:l.ccss||[],ee:l.ee||[],domain:l.domain||null,unit:l.unit||null,block:l.block||null,power:!!l.power},
+    direct,partial,verdict,missing:verdict==='full'?'':sp.missing,build,pre,preBuild:[],related,note:sp.note||''};}
+for(const id of Object.keys(LS.lessons))if(!myLessons.some(l=>l.id===id)&&id.startsWith(({Y2:'G1|',Y3:'G2|'})[YEAR]))LERR(id,'spec for a lesson the site does not list for',YEAR);
+const LANEF={};const laneProp=(y,id)=>{LANEF[y]??=JSON.parse(fs.readFileSync(root+'data/curriculum/links/'+y+'.json','utf8'));return LANEF[y].proposals?.[id]||null;};
 function propText(id){const p=OV.proposals?.[id]||WRM_PROPOSALS[id];if(p)return p.teaches;for(const n of ['STANDARD_PROPOSALS','WRM_EXTENSIONS','VISUAL_BUILDS']){const q=BL[n]?.[id];if(q)return q.teaches||q.name;}return id;}
 for(const id of usedProps){
   const own=OV.proposals?.[id];
   if(own){out.proposals[id]={...own,reused:false};continue;}
+  if(LS.lessonProposals?.[id]){out.proposals[id]={...LS.lessonProposals[id],steps:[],reused:false};continue;}
+  if(LS.laneProposals?.[id]){const y=LS.laneProposals[id];const q=laneProp(y,id);if(!q)throw new Error('lane proposal '+id+' not in '+y+'.json');
+    const {closes,lessons,reused,dropSteps,kindText,...rest}=q;out.proposals[id]={...rest,steps:[...(q.steps||[])],why:(q.why||'')+` (reused from the ${y} lane's links file: the same id is the same spec)`,reused:true,source:y+'.json'};continue;}
   const p=WRM_PROPOSALS[id];
   if(p){const ccss=[...new Set(p.steps.flatMap(s=>stepById[s]?.ccss||[]))];
     out.proposals[id]={kind:p.kind,skill:p.skill,...(p.option?{option:p.option}:{}),name:p.name,teaches:p.teaches,representation:p.representation,family:p.family,steps:[...p.steps],ccss:p.ccss||ccss,why:'existing WRM_PROPOSALS entry; reused',reused:true};
@@ -586,20 +638,25 @@ for(const id of usedProps){
 }
 // rule 13 (revised): every proposal says, per step of this year, the exact clause it closes
 for(const[id,p]of Object.entries(out.proposals)){const c={};for(const[sid,st]of Object.entries(out.steps))if(st.build.includes(id))c[sid]=st.missing;else if(st.preBuild.includes(id))c[sid]='(prerequisite of this step)';
+  const ls=Object.entries(out.lessons||{}).filter(([,L])=>L.build.includes(id));for(const [lid,L] of ls)c[lid]=L.missing;if(ls.length)p.lessons=ls.map(([lid])=>lid);
   p.closes=c;p.kindText=p.kind==='new'?'new skill':'option on '+(p.skills?p.skills.join(', '):p.skill);
   // r3: a step of THIS year that the proposal listed but no longer closes is moved to dropSteps (for the lead's merge)
   const drop=(p.steps||[]).filter(sid=>sid.startsWith(YEAR+'.')&&!c[sid]);if(drop.length){p.dropSteps=drop;p.steps=p.steps.filter(x=>!drop.includes(x));}
-  for(const sid of Object.keys(c))if(!(p.steps||[]).includes(sid))(p.steps??=[]).push(sid);}
+  for(const sid of Object.keys(c))if(stepById[sid]&&!(p.steps||[]).includes(sid))(p.steps??=[]).push(sid);}
+// r12: each lesson that is not full envisions the skill that closes it (the Y5 lessons shape)
+for(const L of Object.values(out.lessons))if(L.verdict!=='full')L.envision=L.build.map(id=>{const p=out.proposals[id];return {proposal:id,name:p.name,kind:p.kindText,teaches:p.teaches,closes:L.missing,representation:p.representation};});
 // rule 16 check: on a gap step `closes` is the step's own clause, never the proposal's `teaches` copied
-for(const[id,p]of Object.entries(out.proposals))for(const[sid,txt]of Object.entries(p.closes))if(out.steps[sid].verdict==='gap'&&txt===p.teaches)console.error('CLOSES=TEACHES',sid,id);
-for(const s of Object.values(out.steps))for(const x of [...s.direct,...s.partial,...s.pre,...s.related])if(!live(x.key))throw new Error('dead key '+x.key);
+for(const[id,p]of Object.entries(out.proposals))for(const[sid,txt]of Object.entries(p.closes))if((out.steps[sid]||out.lessons[sid]).verdict==='gap'&&txt===p.teaches)console.error('CLOSES=TEACHES',sid,id);
+for(const s of [...Object.values(out.steps),...Object.values(out.lessons)])for(const x of [...s.direct,...s.partial,...s.pre,...s.related])if(!live(x.key))throw new Error('dead key '+x.key);
+for(const t of out.tagFixes)if(out.lessons[t.step])LERR(t.step,'a tagFix names a lesson');
 for(const s of Object.values(out.steps))for(const d of s.direct)if('note' in (d.opts||{}))throw new Error('note in opts '+d.key);
 fs.mkdirSync(root+'data/curriculum/links',{recursive:true});
-fs.writeFileSync(root+`data/curriculum/links/${YEAR}.json`,JSON.stringify(out,null,1)+'\n');
+{const o2={};for(const k of ['year','generatedBy','method','steps','lessons','proposals','tagFixes','retireBuilt'])if(k in out)o2[k]=out[k];for(const k of Object.keys(out))if(!(k in o2))o2[k]=out[k];fs.writeFileSync(root+`data/curriculum/links/${YEAR}.json`,JSON.stringify(o2,null,1)+'\n');}
 // r10 (critic r9 N7): the merge assertion — tagFixes applied to SKILL_WRM must reproduce every tag, clause and step verdict
 {const MC=await import(HERE+'mergecheck23.mjs');const mr=await MC.mergeCheck(JSON.parse(JSON.stringify(out)));for(const p of mr.problems)console.error('MERGE',p);if(mr.problems.length)process.exitCode=1;console.error(`mergecheck ${YEAR}: ${mr.problems.length} problems`);}
 console.error(`optgate ${YEAR}: ${optStats.n} links, ${optStats.spec} at their spec opts, changed by a named rule ${JSON.stringify(optStats.rule)}, ${optStats.bad} problems`);
 console.error(`titleclaim ${YEAR}: half markers ${titleStats.half}, nearest-live-practice ${titleStats.nlp}, ${titleStats.bad} problems`);
+console.error(`lessons ${YEAR}: ${lessonStats.n} site lessons (${lessonStats.full} full / ${lessonStats.partial} partial / ${lessonStats.gap} gap), ${lessonStats.links} links checked, ${lessonStats.bad} problems`);
 console.error(`bbcheck ${YEAR}: ${bbStats.n} steps swept, ${bbStats.bad} problems; lead pre by class ${JSON.stringify(bbStats.cls)}`);
 const c={full:0,partial:0,gap:0};for(const s of Object.values(out.steps))c[s.verdict]++;
 const pr=Object.values(out.proposals);
