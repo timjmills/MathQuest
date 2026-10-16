@@ -24,6 +24,15 @@ export default {
     // ------------------------------------------------------------------ the practice skill
     // A join story within 20 (the sum <= 20), the kit part-part-whole bar under it, all labels blank.
     skill: WP({ maxNum: 20 }),
+    // The last row of every Practice page (★★★): the small part first (the Critical Atom's case).
+    edgeTest: 'bigSecond',
+    // The lesson's own placeholder names: the story's unit word and its parts.
+    vars: (q, b) => {
+        const p = (q && q.cell && q.cell.payload) || {};
+        const st = (p.steps || [])[0] || {};
+        return { unit: p.unit || '', parts: st.a !== undefined ? `${st.a} + ${st.b}` : '', whole: st.ans !== undefined ? st.ans : b.ans };
+    },
+    checkQuestion: { want: 'bigSecond', correct: 'D' },
     practicePages: 1,
     // Mixed: EARLIER skills only (V22 §9.5): number bonds and facts within 20.
     mixed: { skills: [
@@ -38,9 +47,9 @@ export default {
             { id: 'whole', text: 'The whole goes on top. Add the parts.' },
         ],
         vocab: [
-            { word: 'part', meaning: 'one piece of the whole', picture: { kind: 'text', text: '6 | 7' } },
-            { word: 'whole', meaning: 'all the parts together', picture: { kind: 'text', text: '13' } },
-            { word: 'bar', meaning: 'boxes that show the story', picture: { kind: 'text', text: '[ 13 ] / [ 6 | 7 ]' } },
+            { word: 'part', meaning: 'one piece of the whole', picture: { kind: 'bar', whole: 13, a: 6, b: 7, mark: 'parts' } },
+            { word: 'whole', meaning: 'all the parts together', picture: { kind: 'bar', whole: 13, a: 6, b: 7, mark: 'whole' } },
+            { word: 'bar', meaning: 'boxes that show the story', picture: { kind: 'bar', whole: 13, a: 6, b: 7 } },
         ],
         steps: [
             { icon: 'look', text: 'Find the two parts.' },
@@ -50,7 +59,9 @@ export default {
         ],
         chant: 'Parts below. Whole on top. Add the parts.',
         chartWide: true,
-        tailLast: true,
+        // The chart's four panels fill the bar one step at a time (roles/lesson.js barState).
+        chartSteps: ['{a} and {b} are the parts.', 'Write {a} and {b} in the part boxes.', 'The whole is missing: {a} + {b} = {ans}.', 'Write {ans} {unit}.'],
+        guidedRows: 2,
         practiceShape: [4, 2],
         format: {
             kind: 'numbered steps with icons + a chant',
@@ -86,10 +97,10 @@ export default {
     // The same skill with the bar OFF: the pupil draws the bar (the fade).
     wordProblem: {
         ref: { categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'none', wpCues: false, wpBank: false }, maxNum: 20 },
-        want: '',
-        lines: ['Leo has some red apples.', 'He has some green apples.', 'How many apples does he have in all?'],
-        answerLine: 'Leo has __ apples.',
-        say: 'The answer is __ apples.',
+        want: 'bigSecond',
+        // The dealt story itself (its own words and numbers); the bar is OFF - the pupil draws it in the Workspace.
+        answerLine: 'The answer: __ {wp.unit}.',
+        say: 'The answer is __ {wp.unit}.',
     },
 
     // ------------------------------------------------------------------ P6 Exit slip
@@ -116,9 +127,9 @@ export default {
     ],
     materials: ['Printed bar mat (boxes 20 mm high), one per pair', 'Linking cubes, 20 per pair', 'Mini whiteboards and pens', 'Anchor chart', 'Pupil packet, one per pupil', 'Exit slips, cut in half'],
     vocabulary: [
-        { word: 'part', gloss: 'one piece of the whole', diagram: { kind: 'text', text: '6 | 7' } },
-        { word: 'whole', gloss: 'all the parts together', diagram: { kind: 'text', text: '13' } },
-        { word: 'bar', gloss: 'boxes that show the story', diagram: { kind: 'text', text: '[ 13 ] over [ 6 | 7 ]' } },
+        { word: 'part', gloss: 'one piece of the whole', diagram: { kind: 'bar', whole: 13, a: 6, b: 7, mark: 'parts' } },
+        { word: 'whole', gloss: 'all the parts together', diagram: { kind: 'bar', whole: 13, a: 6, b: 7, mark: 'whole' } },
+        { word: 'bar', gloss: 'boxes that show the story', diagram: { kind: 'bar', whole: 13, a: 6, b: 7 } },
     ],
 
     // ------------------------------------------------------------------ T2 Atomisation template
@@ -145,9 +156,9 @@ export default {
         'Do not bold or hunt key words: point at the box the question asks for.',
     ],
     mistakes: [
-        { name: 'Whole in a part box', step: 2, looks: 'The sum written in a lower box', fix: 'Chant. Touch the top box: “whole”.', option: 'A' },
-        { name: 'Story number as answer', step: 4, looks: '“in all”: writes a part', fix: 'Point at the top box. Is it in the story?', option: 'B' },
-        { name: 'Wrong sign', step: 3, looks: 'The difference of the parts', fix: '“Is the whole missing? Add.”', option: 'C' },
+        { name: 'Whole in a part box', step: 2, looks: 'The sum written in a lower box', fix: 'Chant. Touch the top box: “whole”.', option: 'A', misconception: 'bar-whole-in-part' },
+        { name: 'Story number as answer', step: 4, looks: '“in all”: writes a part', fix: 'Point at the top box. Is it in the story?', option: 'B', misconception: 'bar-part-on-top' },
+        { name: 'Wrong sign', step: 3, looks: 'The difference of the parts', fix: '“Is the whole missing? Add.”', option: 'C', misconception: 'wrong-operation' },
         { name: 'Count slip past 10', step: 3, looks: 'One less than the whole', fix: 'Count on from the big part with fingers.', option: '' },
     ],
 
@@ -177,7 +188,7 @@ export default {
                 { say: 'Today the numbers live in a story.' },
                 { say: 'I can solve stories with a bar. Say it.' },
             ] },
-        { n: 5, name: 'I Do: the anchor chart', min: 12, page: 'P2', boxes: [{ kind: 'watch', title: 'Whole in a part box', text: 'Model it wrong once, say “Wrong”, fix it. Never print it.' }],
+        { n: 5, name: 'I Do: the anchor chart', min: 10, page: 'P2', boxes: [{ kind: 'watch', title: 'Whole in a part box', text: 'Model it wrong once, say “Wrong”, fix it. Never print it.' }],
             rows: [
                 { do: 'Put the anchor chart up. Read the story two times.' },
                 { say: 'Find the two parts.', note: 'Step 1. Point at each story number.' },
@@ -199,11 +210,12 @@ export default {
             ] },
         { n: 7, name: 'Check Question', min: 3, page: '',
             rows: [
-                { do: 'Draw three bars on the board for one story: A, B and C.', note: 'A: the whole in a part box. B: a story number on top. C: right.' },
-                { ask: 'Which bar is right? Show fingers.', note: 'Correct: [[C]]. A is mistake 1, B is mistake 2.' },
+                { do: 'Read the story: {cq.text}' },
+                { do: 'Draw four bars on the board. A: {cq.A}. B: {cq.B}. C: {cq.C}. D: {cq.D}.' },
+                { ask: 'Which bar is right? Show fingers.', note: 'Correct: [[{cq.right}]]. {cq.why}.' },
             ],
             loop: { most: 'Go on to You Do.', half: 'Redo one story on the bar mat with cubes, then two more.', fewer: 'Stop. Cubes again with two stories. Write each part under its train.' } },
-        { n: 8, name: 'You Do: Independent Practice', min: 12, page: 'P4', boxes: [{ kind: 'watch', title: 'The last row', text: 'The last row (★★★) has the small part first. Walk there first.' }],
+        { n: 8, name: 'You Do: Independent Practice', min: 10, page: 'P4', boxes: [{ kind: 'watch', title: 'The last row', text: 'The last row (★★★) has the small part first. Walk there first.' }],
             rows: [
                 { do: 'Pupils finish Independent Practice (★★), then Practice 1.' },
                 { say: 'Use the Steps at the top of the page.' },
@@ -223,7 +235,7 @@ export default {
                 { ask: 'Can you solve a story with a bar? Thumbs.' },
             ] },
     ],
-    transitionsMin: 0,
+    transitionsMin: 4,
 
     // ------------------------------------------------------------------ T6
     accepted: [

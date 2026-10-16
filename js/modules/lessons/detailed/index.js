@@ -62,9 +62,11 @@
 // Pure module (SCC-01): no DOM, no state, no Math.random.
 
 import lesson1 from './g2-nbt3-read-write-1000.js';
+import lesson2 from './g1-oa1-bar-model-wp-20.js';
 
 export const DETAILED_LESSONS = Object.freeze({
     [lesson1.id]: lesson1,
+    [lesson2.id]: lesson2,
 });
 
 /** The description of a detailed lesson, or null. */

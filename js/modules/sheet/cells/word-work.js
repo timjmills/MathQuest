@@ -808,6 +808,21 @@ function keywordBank(ctx) {
         + `<div style="font-weight:700;">Key words</div>${rows}</div>`;
 }
 
+/**
+ * A small part-whole bar for a vocabulary card or a chart caption (detailed lesson 2): the whole
+ * box on top, the two part boxes under it (widths in proportion), the labels written in; `mark`
+ * ('whole' | 'parts') draws that box (or boxes) at 1.5 pt, the rest at 0.75 pt. Line art, black.
+ */
+export function barMini({ whole, a, b, mark = '', wMm = 40, pt = 13 } = {}) {
+    const H = 7, W = wMm, PTMM = 25.4 / 72;
+    const wa = Math.max(W * 0.3, Math.min(W * 0.7, W * a / Math.max(1, a + b)));
+    const sw = (m) => ((m ? 1.5 : 0.75) * PTMM).toFixed(3);
+    const box = (x, y, w, label, m) => `<rect x="${x.toFixed(2)}" y="${y}" width="${w.toFixed(2)}" height="${H}" fill="#fff" stroke="#000" stroke-width="${sw(m)}"/>`
+        + `<text x="${(x + w / 2).toFixed(2)}" y="${(y + H / 2 + pt * PTMM * 0.35).toFixed(2)}" text-anchor="middle" font-family="Andika" font-weight="700" font-size="${(pt * PTMM).toFixed(2)}">${esc(String(label))}</text>`;
+    return `<svg class="mq-barmini" viewBox="-0.5 -0.5 ${W + 1} ${2 * H + 2.5}" width="${(W + 1).toFixed(1)}mm" height="${(2 * H + 2.5).toFixed(1)}mm" aria-label="bar model">`
+        + box(0, 0, W, whole, mark === 'whole') + box(0, H + 1.5, wa, a, mark === 'parts') + box(wa, H + 1.5, W - wa, b, mark === 'parts') + '</svg>';
+}
+
 /** A bar model with blank label boxes (the key writes the numbers and the answer). */
 function barModel(ctx, p) {
     const st = p.steps[0];

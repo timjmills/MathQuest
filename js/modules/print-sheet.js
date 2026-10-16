@@ -2650,11 +2650,20 @@ function dlItemVars(q, d) {
  * provider on copies of the item that differ only in their seed (its rotation start).
  */
 function dlCheckQuestion(q, d) {
-    const right = dlAns(q);
+    let right = dlAns(q);
     const wrongs = [];
     let p = null;
     try { p = getProvider(q.categoryId || '', q.skillId || ''); } catch (e) { p = null; }
-    for (let s = 0; p && typeof p.wrongAnswer === 'function' && s < 40 && wrongs.length < 6; s++) {
+    // A provider that lists EVERY misconception (`wrongAnswers`, with the right answer written the
+    // same way as `correct: true`) gives the options directly; else the one `wrongAnswer`, rotated.
+    let all = null;
+    try { all = p && typeof p.wrongAnswers === 'function' ? p.wrongAnswers(q) : null; } catch (e) { all = null; }
+    if (Array.isArray(all) && all.length) {
+        const r = all.find((w) => w.correct);
+        if (r) right = String(r.display);
+        for (const w of all) if (!w.correct && w.display !== undefined && !wrongs.some((x) => x.display === String(w.display))) wrongs.push({ display: String(w.display), misconception: w.misconception || '' });
+    }
+    for (let s = 0; p && !wrongs.length && typeof p.wrongAnswer === 'function' && s < 40 && wrongs.length < 6; s++) {
         let w = null;
         try { w = p.wrongAnswer(Object.assign({}, q, { seed: s })); } catch (e) { w = null; }
         if (!w || w.display === undefined) continue;
@@ -2793,8 +2802,8 @@ async function buildDetailedLesson(req = {}) {
     const eqOp = wpV.eqOp || wpV.op || '+';
     wpV.eq = `${eqParts.join(` ${eqOp} `)} = ${wpV.ans}`;
     const wpPlan = wordProblemPlan({
-        lines, answerLine: d.wordProblem.answerLine, say: d.wordProblem.say, n: wpV.ans, parts: eqParts, op: eqOp, item: String(wpD.key),
-        instruction: d.wordProblem.instruction || INSTRUCTION_LIBRARY.story,
+        lines, answerLine: fillPlaceholders(d.wordProblem.answerLine, { wp: wpV }), say: fillPlaceholders(d.wordProblem.say, { wp: wpV }), n: wpV.ans, parts: eqParts, op: eqOp, item: String(wpD.key),
+        instruction: d.wordProblem.instruction || INSTRUCTION_LIBRARY['story-rcdws'] || INSTRUCTION_LIBRARY.story,
     }, frameP('Word problem', 1));
     const p5 = renderPlan(wpPlan, { key: true });
 

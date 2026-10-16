@@ -53,6 +53,7 @@ import { workedStepsOf, stepTemplateOf, unslot, easeScore, stepLines } from '../
 import { dotTile, countCueOf, countCueRow } from './guided.js';
 import { stepIcon, iconForText } from '../lesson-icons.js';
 import { numberWords } from '../cells/words.js';
+import { barMini } from '../cells/word-work.js';
 
 export const ROLE_ID = 'lesson';
 /**
@@ -575,7 +576,58 @@ function expandState(it, groups, k, c) {
     return html;
 }
 
+/* ---------------------------------------------- a one-step story with its part-whole bar */
+
+/** A word-work story cell drawn with its part-whole bar (add_wp_* with support 'bar'). */
+const isWordBar = (it) => { const cl = it && it.q && it.q.cell; return !!(cl && cl.template === 'word-work' && cl.payload && cl.payload.bar && cl.payload.barKind === 'whole' && (cl.payload.steps || []).length === 1); };
+const barNums = (it) => { const st = it.q.cell.payload.steps[0]; return { a: st.a, b: st.b, ans: st.ans, unit: it.q.cell.payload.unit || '' }; };
+
+/**
+ * `chartSteps` (lesson data; the detailed lesson maker): the chart's steps of a bar story are the
+ * LESSON's steps (find the parts - write them in the bar - add for the whole - write the answer and
+ * label), each panel's words the lesson's line with the story's numbers ({a} {b} {ans} {unit}).
+ */
+function chartStepsOf(it, data) {
+    const v = barNums(it);
+    const fill = (t) => String(t).replace(/\{(a|b|ans|unit)\}/g, (m, k) => String(v[k]));
+    return data.chartSteps.map((t, i) => ({ text: fill(t), marks: [{ slot: `bar-step-${i}`, value: '1' }] }));
+}
+
+/** Grey (the newest mark) or black on a span that carries an inline colour. */
+const inkSpan = (html, grey) => html.replace(/color:#000(000)?;?/g, '').replace(/^<span /, `<span data-ws-ink="${grey ? 'trace' : 'solid'}" `).replace(/ style="/, ` style="color:${grey ? '#949494' : '#000'};`);
+
+/**
+ * The state of a bar story after step k (P-LC-9: the newest mark grey, earlier ones black):
+ *   0  the two story numbers ringed     1  the parts written in the part boxes
+ *   2  the whole written in the top box  3  the answer and its label written
+ * The cell is the word-work template's own drawing, answered, with later marks emptied.
+ */
+function barState(it, k, c, { keepSlots = false } = {}) {
+    const v = barNums(it);
+    const ctx = resolveCtx(Object.assign({}, c, { state: 'answered', scaffoldLevel: 1, metrics: undefined }));
+    let html = it.render(ctx, { cols: 1 });
+    // the bar labels in drawing order: whole, part a, part b
+    let i = 0;
+    html = html.replace(/<span data-ws-graded="0" data-ws-slot="bar"([^>]*)>([^<]*)<\/span>/g, (m, attrs, val) => {
+        const idx = i++;
+        const at = idx === 0 ? 2 : 1;
+        const shown = k >= at;
+        const span = `<span data-ws-graded="0" data-ws-slot="bar"${attrs.replace(/ data-ws-ink="[a-z]+"/, '')}>${shown ? val : ''}</span>`;
+        return shown ? inkSpan(span, k === at) : span;
+    });
+    // the answer box and its label word: written at step 3
+    html = html.replace(/(<span[^>]*data-ws-slot="(answer|answer-label)"[^>]*>)([^<]*)(<\/span>)/g, (m, open, id, val, close) => {
+        if (k < 3) return open.replace(/ data-ws-ink="[a-z]+"/, '') + close;
+        return k === 3 ? inkSpan(open + val + close, true) : open + val + close;
+    });
+    // step 0: the two story numbers ringed in grey (later: black) - text only, never inside a tag
+    let ringed = 0;
+    html = html.replace(/>([^<>]*)</g, (m, text) => (ringed >= 2 ? m : `>${text.replace(new RegExp(`\\b(${v.a}|${v.b})\\b`, 'g'), (n) => (ringed < 2 ? (ringed++, `<span class="mq-lring${k === 0 ? ' mq-lring-t' : ''}">${n}</span>`) : n))}<`));
+    return keepSlots ? html : html;
+}
+
 function stateDrawing(it, steps, groups, k, c) {
+    if (isWordBar(it) && steps.length && /^bar-step-/.test(((steps[0] || {}).marks || [{}])[0].slot || '')) return unslot(barState(it, k, c));
     const merged = groups.map((g) => ({ marks: g.marks }));
     const ctx = resolveCtx(Object.assign({}, c, { state: 'blank', scaffoldLevel: 3, metrics: undefined }));
     if (isRound(it)) return unslot(roundState(it, k, ctx, Number(c.chartLineMm) > 0 ? Number(c.chartLineMm) : ({ S: 44, M: 52, L: 58 }[c.size] || 58)));
@@ -654,7 +706,7 @@ export const chartLayout = (n, data = null) => (data && data.chartWide ? { cols:
  * Host-shaped so the host measures them; `drawOnly` measures the drawing alone (for its zoom).
  */
 export function stateItems(example, data) {
-    const ws = workedStepsOf(example);
+    const ws = data && Array.isArray(data.chartSteps) && isWordBar(example) ? chartStepsOf(example, data) : workedStepsOf(example);
     // `tailLast` (lesson data; the detailed lesson maker): the closing step ("Read it with plus")
     // writes nothing new - it is the line under the panels, not a panel of its own.
     const steps = data && data.tailLast ? ws.map((st, i) => (i === ws.length - 1 ? Object.assign({}, st, { marks: [] }) : st)) : ws;
@@ -847,6 +899,8 @@ function vocabPicture(pic, c) {
     const m = c.metrics;
     const mm = (v) => `${v.toFixed(2)}mm`;
     switch (pic && pic.kind) {
+        // a small part-whole bar (detailed lesson 2): {whole, a, b, mark: 'whole' | 'parts'}
+        case 'bar': return barMini({ whole: pic.whole, a: pic.a, b: pic.b, mark: pic.mark || '', wMm: 36, pt: 12 });
         case 'glyph': return `<span class="mq-lvpic-glyph" style="font-size:${Math.round(m.digitPt * 1.3)}pt">${esc(pic.text)}</span>`;
         // A longer text picture ("10, 20, 30") at four fifths, so it never crowds its neighbour.
         case 'text': return `<span class="mq-lvpic-text" style="font-size:${String(pic.text || '').length > 7 ? Math.round(m.digitPt * 0.8) : m.digitPt}pt">${esc(pic.text)}</span>`;
@@ -1531,6 +1585,13 @@ function weDoRender(it, i) {
         }
         // An expanded-form Guided cell 1 (the detailed lesson maker): step 1 done in grey - the
         // hundreds box traced, the other boxes empty; every box keeps its slot.
+        // A bar story's Guided cell 1 (the detailed lesson maker): step 1 done in grey - the two
+        // story numbers ringed; the bar and the answer stay the pupil's.
+        if (!answered && i === 0 && isWordBar(it)) {
+            const v = barNums(it);
+            let ringed = 0;
+            return it.render(c, o).replace(/>([^<>]*)</g, (m, text) => (ringed >= 2 ? m : `>${text.replace(new RegExp(`\\b(${v.a}|${v.b})\\b`, 'g'), (n) => (ringed < 2 ? (ringed++, `<span class="mq-lring mq-lring-t">${n}</span>`) : n))}<`));
+        }
         if (!answered && i === 0 && isExpand(it)) {
             const html = it.render(resolveCtx(Object.assign({}, c, { state: 'answered', metrics: undefined })), o);
             return html.replace(/<span class="ws-box([^"]*)"([^>]*?) data-ws-slot="(part\d+)"([^>]*)>([^<]*)<\/span>/g, (m, cls, pre, slot, post, val) => {

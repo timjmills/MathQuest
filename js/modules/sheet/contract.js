@@ -38,6 +38,9 @@ export const OPTIONAL_MEMBERS = Object.freeze([
     // `stories(q, {seed}) -> Story | null`: an original story carrying ONE item's numbers, with a
     // number + label answer, for the word-problem role (section 3.8; providers/stories.js).
     'stories',
+    // `wrongAnswers(q) -> WrongAnswer[]`: EVERY misconception's wrong answer for one item (the detailed
+    // lesson's Check Question options, 2026-10-16); `wrongAnswer` stays the one a page shows.
+    'wrongAnswers',
 ]);
 
 /* ================================================== the controlled instruction library */
@@ -136,6 +139,8 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'story-k2': 'Solve. Write the number.',
     // Every whole-number word problem (owner ruling 2026-09-25): the word-work cell.
     'story-work': 'Circle the sign. Write the numbers in the boxes. Solve.',
+    // the detailed lesson's word problem page with the RCDWS panel (V22 §9.6, C.1 `story-rcdws`)
+    'story-rcdws': 'Read the story. Draw it. Solve.',
     'pick-parts': 'Write one number from each list to make the sum.',
     'fact-family': 'Use the three numbers. Fill in the fact family.',
     'chart-fill': 'Fill in the missing products.',

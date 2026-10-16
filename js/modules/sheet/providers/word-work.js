@@ -78,6 +78,29 @@ export function wordWorkWrong(q) {
     }], { rotate: false });
 }
 
+/**
+ * EVERY misconception-based wrong answer of a one-step join story drawn with a part-whole bar, as
+ * the bar a pupil would fill (detailed lesson 2's Check Question, 2026-10-16): the whole written in
+ * a part box, a story number (a part) on top, and the wrong sign. `display` reads the bar
+ * ("top 7 · below 2 and 9"). Not used by `wrongAnswer`, so no existing page changes.
+ */
+export function wordWorkWrongs(q) {
+    const p = payloadOf(q);
+    if (!p || p.steps.length !== 1) return [];
+    const st = p.steps[0];
+    if (st.op !== '+') { const w = wordWorkWrong(q); return w ? [w] : []; }
+    const bar = (top, x, y) => `top ${fmt(top)} · below ${fmt(x)} and ${fmt(y)}`;
+    const hi = Math.max(st.a, st.b), lo = Math.min(st.a, st.b);
+    return [
+        { value: st.a, display: bar(st.a, st.ans, st.b), misconception: 'bar-whole-in-part', explain: 'Wrote the whole in a part box and a part on top.' },
+        { value: hi, display: bar(hi, lo, hi), misconception: 'bar-part-on-top', explain: 'Copied a story number as the whole.' },
+        { value: hi - lo, display: bar(hi - lo, st.a, st.b), misconception: 'wrong-operation', explain: 'Subtracted the parts.' },
+    ].filter((w) => w.value !== st.ans)
+        // the right answer written the same way, so a list of options reads alike
+        .concat([{ value: st.ans, display: bar(st.ans, st.a, st.b), correct: true }]);
+}
+export const barAnswerText = (q) => { const p = payloadOf(q); const st = p && p.steps[0]; return st ? `top ${fmt(st.ans)} · below ${fmt(st.a)} and ${fmt(st.b)}` : ''; };
+
 /** The provider members for one word-problem skill. */
 export function wordWorkProvider(iCan, extra = {}) {
     return Object.assign({
@@ -96,6 +119,7 @@ export function wordWorkProvider(iCan, extra = {}) {
         misconceptions: ['wrong-operation'],
         workedSteps: wordWorkSteps,
         wrongAnswer: wordWorkWrong,
+        wrongAnswers: wordWorkWrongs,
     }, extra);
 }
 

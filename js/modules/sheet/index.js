@@ -124,6 +124,7 @@ import './cells/seqstrip.js';
 import './cells/compare.js';
 import './cells/wordpic.js';
 // Every whole-number word problem (owner ruling 2026-09-25): story, sign row, column boxes, answer + unit bank.
+export { barMini } from './cells/word-work.js';
 export { wordWorkPayload, wordWorkTwin, solveStory, parseTwoStep, storyLines, unitOf, cueRanges, columnRows, KEYWORD_BANK, WW_TEMPLATE } from './cells/word-work.js';
 // Count-by rows, number patterns, the chart to complete, and × / ÷ on a number line (2026-09-25).
 import './cells/count-row.js';
