@@ -138,6 +138,8 @@ of coin unless the teacher changes it — keep the default?
 4. "Skills to be made" is reached from Home, White Rose and MAP — not the sidebar.
 5. The US-money lessons map to the nearest money step, tagged "ADAPT: US money": Grade 1 "Find the total" / "Find the difference" -> Y2.B4.S7, "Count money - notes and coins" -> Y2.B4.S2, "Select money" -> Y2.B4.S4; Grade 3 "Pounds, tens, ones and pence" -> Y4.B10.S1.
 
+**For the Y6 tagging lane (critic r4 N18, recorded 2026-10-16):** `data/curriculum/links/Y6.json` tags `mixed_*` pools (`number_theory:mixed_number_theory`, `graphs:mixed_graphs`, `angles_lines:mixed_angles_lines` …) on six Grade 5 lessons (D2/3, D2/4, D3/15, D4/16, D4/22, D4/23). The White Rose page drops them (they are not pupil skills), so those lessons list one row fewer than the file; retag them with the pools' member skills.
+
 ## 3. Work lanes at pause (not merged, not deployed)
 
 Each lane is a git worktree at `.claude/worktrees/agent-<id>` on branch `worktree-agent-<id>`; every tree was clean
@@ -235,6 +237,7 @@ Gate failures and load numbers measured before this fix (~12:30 UTC) are not tru
 - 2026-10-09 Wave 1 lane "Touch numerals" round 5: builder escalated to Opus medium (the ceiling) - the screen hosts failed critic rounds 1 to 4 (teacher dots dropped on a wrong answer, stack Start again covered, column wording, quiz count-all line).
 - 2026-10-09 Wave 1 lane "Answer-key options" (4.4) fix round 4: builder escalated to Opus medium (the ceiling) - the key-ink tagging failed critic rounds 1, 2 and 3 (r3: design 6 - given lines and boxes orange on 215 skills, two keys all black, stroked disk numerals).
 - 2026-10-09 Wave 1 lane "Search terms for every skill" (`a21ec3ef403026c80`) fix round 6: builder escalated to Opus medium (the ceiling) - the "Showing results for" correction notice failed critic rounds 1 to 5 (r5: no regression 7, the Navigator notice truncated at Chromebook size and the student notice lost on "+" / refocus).
+- 2026-10-16 White Rose page lane fix round 5: builder escalated to Opus medium (the ceiling) - teacher-facing jargon in why/gap lines failed critic rounds 2, 3 and 4 (new forms each round once the real tagging files loaded).
 
 ### Answer-key options (4.4): open after critic r4 (recorded 2026-10-10, fix round 5 fixed R4-1 only)
 

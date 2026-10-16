@@ -27,7 +27,7 @@ import { populateVoicePicker, setSelectedVoiceURI, testSelectedVoice, getSelecte
 import { isSfxEnabled } from './sfx.js';
 import {
     icon, esc, toast, copyText, fmtDay, savedSets, findSkill, levelText, levelsSummary, currentSet,
-    loadSetIntoQueue, skillCatalogue, optionsSummary, readStore, writeStore, PRINT_DEFAULTS_KEY, printDefaults, pupilCode,
+    loadSetIntoQueue, skillCatalogue, optionsSummary, readStore, writeStore, PRINT_DEFAULTS_KEY, printDefaults, pupilCode, hideToast,
 } from './teacher-ui.js';
 import { renderSetsScreen, openSavedSet, startNewSet, currentSetName } from './teacher-sets.js';
 import { renderPrintScreen, recentPrintouts, reprint, printoutMeta, openPrintWith } from './teacher-print.js';
@@ -90,6 +90,7 @@ function showScreen(key) {
     if (BOARD_WINDOW) return;
     document.body.classList.add('tv-on-screen');
     document.body.classList.remove('tv-play', 'tv-bigboard');
+    hideToast();
     // The White Rose screen keeps its place in the URL hash (#wrm/...); every other screen drops it.
     if (key !== 'wrm') clearWrmHash();
     if (key !== 'map') clearMapHash();
@@ -182,7 +183,7 @@ function onViewChangeInner() {
         return;
     }
     const id = activeViewId();
-    if (REPLACED_VIEWS[id] && !BOARD_WINDOW) { tvGo(REPLACED_VIEWS[id]); return; }
+    if (REPLACED_VIEWS[id] && !BOARD_WINDOW) { if (id === 'mapSelectorView') state.mapOpenTest = true; tvGo(REPLACED_VIEWS[id]); return; }
     if (id === 'homeView' || !id) {
         if (!document.body.classList.contains('tv-on-screen')) showScreen(current);
         document.body.classList.remove('tv-play', 'tv-bigboard');

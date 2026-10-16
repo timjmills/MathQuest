@@ -21,8 +21,15 @@ const ROOT = path.join(__dirname, '..', '..');
 const SHOTS = process.argv.includes('--shots');
 const CUR_AT = process.argv.indexOf('--curated');
 const CUR_DIR = CUR_AT > 0 ? path.resolve(process.argv[CUR_AT + 1]) : '';
-const CUR_YEARS = CUR_DIR ? ['R', 'Y1', 'Y2', 'Y3', 'Y4', 'Y5', 'Y6'].filter((y) => fs.existsSync(path.join(CUR_DIR, `${y}.json`))) : [];
-const CUR_MAP = CUR_DIR && fs.existsSync(path.join(CUR_DIR, 'MAP.json'));
+// --fallback: serve an empty index.json, so the computed fallbacks are tested (as shipped, the page reads the
+// real link files that data/curriculum/links/index.json lists)
+const FALLBACK = process.argv.includes('--fallback');
+const SHIP_DIR = path.join(ROOT, 'data', 'curriculum', 'links');
+const DATA_DIR = CUR_DIR || (FALLBACK ? '' : SHIP_DIR);
+const SHIP_IDX = DATA_DIR === SHIP_DIR && fs.existsSync(path.join(SHIP_DIR, 'index.json')) ? JSON.parse(fs.readFileSync(path.join(SHIP_DIR, 'index.json'), 'utf8')) : null;
+const CUR_YEARS = !DATA_DIR ? [] : SHIP_IDX ? (SHIP_IDX.years || []) : ['R', 'Y1', 'Y2', 'Y3', 'Y4', 'Y5', 'Y6'].filter((y) => fs.existsSync(path.join(DATA_DIR, `${y}.json`)));
+const CUR_MAP = !DATA_DIR ? false : SHIP_IDX ? !!SHIP_IDX.map : fs.existsSync(path.join(DATA_DIR, 'MAP.json'));
+const { jargonHit } = require('../lib/wrm-jargon.cjs');
 const OUT = path.join(ROOT, 'design', 'audit', 'runs', 'wrm-page');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -31,10 +38,16 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const check = (ok, msg) => { if (!ok) failures.push(msg); };
   // Pick the test lessons from the data itself (node side), so the gate follows the data.
   const links = await import(path.join(ROOT, 'js/modules/wrm-links.js'));
-  for (const y of CUR_YEARS) links.addCuratedYear(JSON.parse(fs.readFileSync(path.join(CUR_DIR, `${y}.json`), 'utf8')));
+  for (const y of CUR_YEARS) links.addCuratedYear(JSON.parse(fs.readFileSync(path.join(DATA_DIR, `${y}.json`), 'utf8')));
   const all = links.allLessons();
-  const builtLesson = CUR_YEARS.length ? all.find((l) => l.grade === '2' && links.linksFor(l).build.length) : null;
-  const optLesson = CUR_YEARS.length ? all.find((l) => l.grade === '2' && links.linksFor(l).prereq.some((x) => x.opts)) : null;
+  const pref = (f) => all.find((l) => l.grade === '2' && f(l)) || all.find((l) => l.type === 'wr' && f(l));
+  const builtLesson = CUR_YEARS.length ? pref((l) => links.linksFor(l).build.length) : null;
+  const optLesson = CUR_YEARS.length ? pref((l) => links.linksFor(l).prereq.some((x) => x.opts)) : null;
+  // every lesson the real files tag, for the rendered-text jargon sweep (critic r4 M3)
+  const curLessons = CUR_YEARS.length ? all.filter((l) => l.step && links.linksFor(l).source === 'curated') : [];
+  const partLesson = CUR_YEARS.length ? all.find((l) => l.key === 'PK:CC3:1' && links.linksFor(l).verdict === 'partial') || all.find((l) => links.linksFor(l).source === 'curated' && links.linksFor(l).verdict === 'partial') : null;
+  const longWhyLesson = CUR_YEARS.length ? all.find((l) => { const r = links.linksFor(l); return r.source === 'curated' && [...r.prereq, ...r.related].some((x) => String(x.why).length > 120); }) : null;
+  const copiedLesson = all.find((l) => l.type === 'copied');
   const gapLesson = all.find((l) => l.grade === '3' && l.type === 'wr' && l.step && !links.linksFor(l).direct.length)
     || all.find((l) => l.type === 'wr' && l.step && !links.linksFor(l).direct.length);
   const buildLesson = all.find((l) => l.grade === '3' && l.type === 'build');
@@ -42,15 +55,17 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
   const app = await open({ seed: 11, viewport: { width: 1366, height: 768, deviceScaleFactor: 1 } });
   const { page, browser, base } = app;
-  if (CUR_DIR) {
+  if (CUR_DIR || FALLBACK) {
     await page.setRequestInterception(true);
     page.on('request', (req) => {
       const m = /\/data\/curriculum\/links\/([A-Za-z0-9]+)\.json(\?|$)/.exec(req.url());
       if (!m) { req.continue(); return; }
-      const body = m[1] === 'index' ? JSON.stringify({ years: CUR_YEARS, map: !!CUR_MAP }) : fs.readFileSync(path.join(CUR_DIR, `${m[1]}.json`), 'utf8');
+      const body = m[1] === 'index' ? JSON.stringify(FALLBACK ? { years: [], map: false } : { years: CUR_YEARS, map: !!CUR_MAP }) : fs.readFileSync(path.join(CUR_DIR, `${m[1]}.json`), 'utf8');
       req.respond({ status: 200, contentType: 'application/json', body });
     });
   }
+  // one case's error is reported and the run goes on (critic r4 B8)
+  const step = async (name, fn) => { try { await fn(); } catch (e) { failures.push(`${name}: ${(e && e.message) || e}`); } };
   const shot = async (name) => { if (SHOTS) { fs.mkdirSync(OUT, { recursive: true }); await page.screenshot({ path: path.join(OUT, `${name}.png`) }); } };
   const hash = () => page.evaluate(() => location.hash);
   // Click as a teacher would: scroll the target to the middle first, so the sticky action bar
@@ -336,7 +351,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       await waitFor(page, () => !!document.querySelector(`[data-screen="todo"].is-active [data-t-item="${CSS.escape(window.__tbb)}"].is-open`), 15000, 'todo at entry');
       await sleep(200);
       await shot('15-todo-entry-from-lesson-1366');
-    } else if (CUR_YEARS.length) failures.push('curated: no Grade 2 lesson with a build proposal');
+    } else if (CUR_YEARS.length) failures.push('curated: no lesson with a build proposal');
 
     /* ==================================================== curated options travel into the link (B2) */
     if (optLesson) {
@@ -358,6 +373,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       check(want.length && !lost.length, `curated pre opts lost in the link: ${lost.join(', ')} (of ${want.length})`);
       const why = await page.$$eval('[data-w-group="prereq"] .tvw-why', (w) => w.map((x) => x.textContent).join(' | '));
       check(!/\b(R|Y\d)\.B\d+\.S\d+|prior learning|wk W|not dealt|[{}\[\]]|Gr\./.test(why), `why lines show ids/jargon: ${why.slice(0, 200)}`);
+      for (const w of why.split(' | ')) { const h = jargonHit(w); check(!h, `why line jargon (${h && h.name}): ${h && h.snippet}`); }
     } else if (CUR_YEARS.length) failures.push('curated: no lesson whose do-first skills carry options');
 
     /* ==================================================== Skills to be made */
@@ -598,7 +614,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       // m7: Skills to be made shows no code, on screen (all entries open) or in the print
       await page.evaluate(() => window.tvGo('todo'));
       await waitFor(page, () => !!document.querySelector('[data-screen="todo"].is-active .tvt-item'), 20000, 'm7 todo');
-      const J7 = /\b(R|Y\d)\.B\d|\bY[1-6]\b|\bW\d\d\b|[{}\[\]`]|Gr\.|\b[a-z]+_[a-z0-9_]+|\b[a-z_]{3,}:[a-z_]{3,}/;
+
       const t7 = await page.evaluate(async () => {
         const m = await import('./js/modules/teacher-todo.js');
         for (let i = 0; i < 400; i += 1) { const b = document.querySelector('[data-screen="todo"].is-active [data-t-open][aria-expanded="false"]'); if (!b) break; b.click(); }
@@ -608,7 +624,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         const chips = [...scr.querySelectorAll('[aria-labelledby="tvtGrH"] button')].map((b) => b.textContent.trim());
         return { txt, print: d.innerText, chips, open: scr.querySelectorAll('.tvt-spec').length };
       });
-      const hit = (x) => { const m = J7.exec(x); return m ? x.slice(Math.max(0, m.index - 50), m.index + 30).replace(/\s+/g, ' ') : ''; };
+      // every line of every open entry and of the print, through the shared strict pattern (critic r4 M4 / m7)
+      const hit = (x) => { for (const line of String(x).split('\n')) { const h = jargonHit(line); if (h) return `${h.name}: ${h.snippet}`; } return ''; };
       check(t7.open > 200, `m7: only ${t7.open} entries opened`);
       check(!hit(t7.txt), `m7: code on the Skills to be made screen: "${hit(t7.txt)}"`);
       check(!hit(t7.print), `m7: code in the Skills to be made print: "${hit(t7.print)}"`);
@@ -633,8 +650,70 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       check(r.tb !== null, `toast ${tag}: no toast after Practice link`);
       if (r.tb !== null) check(r.tb <= r.bt - 8, `toast ${tag}: toast bottom ${Math.round(r.tb)} not 8 px above the bar top ${Math.round(r.bt)}`);
     };
-    await toastCase('#map/tasks/npv/all/e1', '#tvmkDetail .tvw-head', '820 MAP task');
-    await toastCase('#wrm/2/D1/1', '[data-screen="wrm"].is-active .tvw-head', '820 White Rose lesson');
+    await step('toast 820 MAP task', async () => {
+      // the first real task of the strand, read from the page (MAP.json ids m…, fallback ids e…)
+      await page.goto(`${base}/index.html#map/tasks/npv/all`, { waitUntil: 'networkidle2', timeout: 60000 });
+      await waitFor(page, () => !!document.querySelector('[data-screen="map"].is-active [data-mk-task]:not(.is-gap)'), 20000, 'map task list');
+      const tid = await page.$eval('[data-screen="map"].is-active [data-mk-task]:not(.is-gap)', (b) => b.dataset.mkTask);
+      await toastCase(`#map/tasks/npv/all/${tid}`, '#tvmkDetail .tvw-head', '820 MAP task');
+    });
+    await step('toast 820 White Rose lesson', () => toastCase('#wrm/2/D1/1', '[data-screen="wrm"].is-active .tvw-head', '820 White Rose lesson'));
+
+    /* ==================================================== critic r4: B8 m8 m9 N17 N20 N22, and the rendered-text sweep */
+    await step('r4 checks', async () => {
+      await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
+      // B8: as shipped (no interception), the real files load: a lesson the files mark "Covers part" says so
+      if (partLesson) {
+        await page.goto(`${base}/index.html#wrm/${partLesson.grade}/${partLesson.unit}/${partLesson.n}`, { waitUntil: 'networkidle2', timeout: 60000 });
+        await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active [data-w-verdict-tag]'), 20000, 'B8 lesson');
+        const vt = await page.$eval('[data-screen="wrm"].is-active [data-w-verdict-tag]', (e) => e.dataset.wVerdictTag);
+        check(vt === 'partial', `B8: ${partLesson.key} shows verdict ${vt}, the file says partial`);
+      }
+      // m8: a toast never follows the teacher to the next screen
+      await page.goto(`${base}/index.html#wrm/2/D1/1`, { waitUntil: 'networkidle2', timeout: 60000 });
+      await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active .tvw-head'), 20000, 'm8 wrm');
+      await page.evaluate(() => { navigator.clipboard.writeText = () => Promise.resolve(); });
+      await tap('[data-screen="wrm"].is-active [data-w-quick="all"]');
+      await tap('[data-screen="wrm"].is-active [data-w-act="link"]');
+      await sleep(80);
+      const on1 = await page.evaluate(() => document.getElementById('tvToast')?.classList.contains('is-on'));
+      await page.evaluate(() => window.tvGo('todo'));
+      await sleep(100);
+      const on2 = await page.evaluate(() => document.getElementById('tvToast')?.classList.contains('is-on'));
+      check(on1 && !on2, `m8: toast on after the link ${on1}, still on after the screen change ${on2}`);
+      // N17: Start tab, Home, MAP → Practise by task (no reload)
+      await page.evaluate(() => window.tvGo('map'));
+      await waitFor(page, () => !!document.querySelector('[data-screen="map"].is-active [data-map-tab]'), 20000, 'N17 map');
+      await page.click('[data-map-tab="start"]'); await sleep(200);
+      await page.evaluate(() => window.tvGo('home')); await sleep(200);
+      await page.evaluate(() => window.tvGo('map')); await sleep(300);
+      check(await page.$eval('[data-map-tab="tasks"]', (b) => b.getAttribute('aria-selected') === 'true'), 'N17: MAP reopened on the test tab within the session');
+      // m9: an old fallback task link (e1) with MAP.json on opens a matching task or a plain note
+      if (CUR_MAP) {
+        await page.goto(`${base}/index.html#map/tasks/npv/all/e1`, { waitUntil: 'networkidle2', timeout: 60000 });
+        await waitFor(page, () => !!document.querySelector('[data-screen="map"].is-active #tvmkDetail .tvw-head, [data-screen="map"].is-active [data-mk-stale]'), 20000, 'm9');
+        const r9 = await page.evaluate(() => ({ task: !!document.querySelector('#tvmkDetail .tvw-head'), note: !!document.querySelector('[data-mk-stale]'), hash: location.hash }));
+        check(r9.task || r9.note, `m9: old link ${JSON.stringify(r9)}`);
+      }
+      // N20: a copied-in lesson names its grade in words
+      if (copiedLesson) {
+        await page.goto(`${base}/index.html#wrm/${copiedLesson.grade}/${copiedLesson.unit}/${copiedLesson.n}`, { waitUntil: 'networkidle2', timeout: 60000 });
+        await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active .tvw-head'), 20000, 'N20');
+        const head = await page.$eval('[data-screen="wrm"].is-active .tvw-head', (e) => e.innerText);
+        check(!/\bG\d\b/.test(head) && /Copied in from (Grade \d|Kindergarten|Pre-K)/.test(head), `N20: copied-in head "${head.slice(0, 160)}"`);
+      }
+      // M3: every lesson the real files tag, its rendered text line by line through the strict pattern
+      const bad = [];
+      for (const l of curLessons) {
+        const h = `#wrm/${l.grade}/${l.unit}/${l.n}`;
+        await page.evaluate((x) => { location.hash = x; }, h);
+        await waitFor(page, `location.hash === ${JSON.stringify(h)} && !!document.querySelector('[data-screen="wrm"].is-active #tvwDetail .tvw-title')`, 8000, l.key);
+        const txt = await page.$eval('[data-screen="wrm"].is-active #tvwDetail', (e) => e.innerText);
+        for (const line of txt.split('\n')) { const j = jargonHit(line); if (j) bad.push(`${l.key} ${j.name}: ${j.snippet}`); }
+      }
+      check(!bad.length, `M3: jargon in ${bad.length} rendered lesson lines: ${bad.slice(0, 4).join(' || ')}`);
+      if (curLessons.length) console.log(`rendered-text sweep: ${curLessons.length} curated lessons`);
+    });
 
     /* ==================================================== phone basic check (390x844): nothing scrolls sideways */
     await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
@@ -670,6 +749,17 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     };
     await rows390('White Rose lesson');
     await shot('40-wrm-lesson-390');
+    if (longWhyLesson) {
+      await step('390 long why lesson', async () => {
+        await page.goto(`${base}/index.html#wrm/${longWhyLesson.grade}/${longWhyLesson.unit}/${longWhyLesson.n}`, { waitUntil: 'networkidle2', timeout: 60000 });
+        await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active .tvw-head'), 20000, '390 long why');
+        await sleep(300);
+        await rows390(`long why lines (${longWhyLesson.key})`);
+        // N22: a clamped line opens on a tap
+        const opened = await page.evaluate(() => { const m = document.querySelector('[data-screen="wrm"].is-active [data-w-more]'); if (!m) return null; const h = m.getBoundingClientRect().height; m.click(); return [h, m.getBoundingClientRect().height, m.getAttribute('aria-expanded')]; });
+        check(!opened || (opened[2] === 'true' && opened[1] >= opened[0]), `N22: the "more" toggle ${JSON.stringify(opened)}`);
+      });
+    }
     await page.goto(`${base}/index.html${mh}`, { waitUntil: 'networkidle2', timeout: 60000 });
     await waitFor(page, () => !!document.querySelector('[data-screen="map"].is-active #tvmkDetail .tvw-head'), 20000, '390 map');
     await sleep(300);

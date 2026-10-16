@@ -18,7 +18,7 @@
 // it and Back works. The sequence and link data (~350 KB with standards) load the first time the
 // screen opens, never at boot.
 
-import { icon, esc } from './teacher-ui.js';
+import { icon, esc, hideToast } from './teacher-ui.js';
 import { skillView } from './teacher-preview.js';
 import { createPicker, liveKey, toBeBuiltHTML, skillLabelOf } from './teacher-skillpick.js';
 import { loadYear } from './links-data.js';
@@ -227,7 +227,7 @@ function lessonRowHTML(l) {
     return `<li><button type="button" class="tvw-lesson${gap ? ' is-gap' : ''}" data-w-lesson="${esc(l.key)}" data-w-verdict="${gap ? 'gap' : f.verdict}"${l.key === v.lesson ? ' aria-current="true"' : ''}>
       <span class="tvw-n">${l.n}</span>
       <span class="tvw-lt"><span class="tvw-lt-title">${esc(l.title)}</span>
-        <span class="tvw-lt-meta">${esc(meta)}${l.power ? ' <span class="tvw-tag tvw-power">Power</span>' : ''}${l.type === 'copied' ? ` <span class="tvw-tag">From ${esc(l.from)}</span>` : ''}${part}</span></span>
+        <span class="tvw-lt-meta">${esc(meta)}${l.power ? ' <span class="tvw-tag tvw-power">Power</span>' : ''}${l.type === 'copied' ? ` <span class="tvw-tag">From ${esc(gradeWord(l.from))}</span>` : ''}${part}</span></span>
       <span class="tvw-count${gap ? ' is-gap' : ''}">${gap ? esc(gap) : `${f.n} skill${f.n === 1 ? '' : 's'}`}</span></button></li>`;
 }
 
@@ -255,6 +255,9 @@ function unitWeeks(u) {
     if (!ma || !mb) return label;
     return `${label} (${ma[1]} ${(ma[2] || ma[4]).slice(0, 3)} – ${mb[1]} ${mb[2].slice(0, 3)})`;
 }
+
+/** 'G2' → 'Grade 2', 'GK' → 'Kindergarten', 'PK' → 'Pre-K' (N20). */
+const gradeWord = (g) => { const x = String(g || '').replace(/^G(?=[\dK])/, ''); return x === 'K' ? 'Kindergarten' : x === 'PK' ? 'Pre-K' : /^\d$/.test(x) ? `Grade ${x}` : String(g || ''); };
 
 function lessonListHTML() {
     const u = unitRec();
@@ -290,19 +293,19 @@ function detailHTML() {
             : links.verdict === 'partial' ? `These skills cover part of the lesson${links.missing ? `. Not yet: ${esc(links.missing)}` : '.'}` : 'No skill teaches this lesson yet.';
     const u = unitRec();
     return `<div class="tv-card tvw-head">
-        <p class="tvw-kicker">${esc(gradeRec().label)} · ${esc(u.id === 'E' ? 'Enrichment' : `${u.id} ${L.domainName(u.domain)}`)}${l.weeks.length ? ` · Week ${esc(l.weeks.map((w) => w.replace(/^W0?/, '')).join(', '))}` : ''}</p>
+        <p class="tvw-kicker">${esc(gradeRec().label)} · ${esc(u.id === 'E' ? 'Enrichment' : v.grade === 'PK' ? L.domainName(u.domain) : `${u.id} ${L.domainName(u.domain)}`)}${l.weeks.length ? ` · Week ${esc(l.weeks.map((w) => w.replace(/^W0?/, '')).join(', '))}` : ''}</p>
         <h2 class="tv-h2 tvw-title"><span class="tvw-title-n">Lesson ${l.n}</span> ${esc(l.title)}</h2>
         <div class="tvw-tags">
           ${vd ? `<span class="tvw-tag tvw-verdict-tag ${vd[1]}" data-w-verdict-tag="${links.verdict}">${vd[0]}</span>` : ''}
           ${l.power ? '<span class="tvw-tag tvw-power">Power standard</span>' : ''}
-          ${l.type === 'copied' ? `<span class="tvw-tag">Copied in from ${esc(l.from)} — teach it from that grade's files</span>` : ''}
+          ${l.type === 'copied' ? `<span class="tvw-tag">Copied in from ${esc(gradeWord(l.from))} — teach it from that grade's files</span>` : ''}
           ${l.type === 'enrich' ? '<span class="tvw-tag">Enrichment (after MAP)</span>' : ''}
           ${l.note ? `<span class="tvw-tag tvw-power">${esc(l.note)}</span>` : ''}
           ${strands.length ? `<span class="tvw-tag tvw-strand">${esc(strands.join(' · '))}</span>` : ''}
           ${l.ccss.map((c) => `<span class="tvw-tag tvw-code">${esc(c)}</span>`).join('')}
           ${ee.slice(0, 3).map((c) => `<span class="tvw-tag tvw-code tvw-ee">${esc(c.replace(/^M\./, ''))}</span>`).join('')}
         </div>
-        ${files.length ? `<div class="tvw-files">${fileBtn(files[0], l.type === 'copied' && l.from ? `Open lesson (${l.from.replace(/^G/, 'Grade ')} files)` : 'Open lesson', 'external')}${fileBtn(files[1], 'Teaching guide', 'book')}${files[2] ? fileBtn('x', 'Video', 'play', files[2]) : ''}</div>` : ''}
+        ${files.length ? `<div class="tvw-files">${fileBtn(files[0], l.type === 'copied' && l.from ? `Open lesson (${gradeWord(l.from)} files)` : 'Open lesson', 'external')}${fileBtn(files[1], 'Teaching guide', 'book')}${files[2] ? fileBtn('x', 'Video', 'play', files[2]) : ''}</div>` : ''}
         <p class="tvw-verdict${links.verdict === 'gap' || l.type === 'build' ? ' is-gap' : ''}">${verdict}</p>${toBeBuiltHTML(links.build, L.proposalName)}
         ${pick.quickHTML([['direct', 'All teaching skills'], ['prereq', 'Do-first skills'], ['related', 'Go-with skills'], ['all', 'Everything']])}
       </div>
@@ -324,6 +327,7 @@ function redrawDetail() {
 /* ================================================================= actions */
 
 function choose(patch, focusSel) {
+    hideToast();   // m8: a toast belongs to the lesson it was made on
     Object.assign(v, patch);
     v.finderOpen = !v.lesson;
     pick.reset();

@@ -1,4 +1,9 @@
 {
-  "years": [],
-  "map": false
+  "years": [
+    "R",
+    "Y1",
+    "Y4",
+    "Y6"
+  ],
+  "map": true
 }

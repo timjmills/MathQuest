@@ -99,6 +99,14 @@ export function toast(msg) {
     toastTimer = setTimeout(() => el.classList.remove('is-on'), 2200);
 }
 
+/** Take the toast down now (every screen change, critic r4 m8: it must not sit on the next screen's controls). */
+export function hideToast() {
+    clearTimeout(toastTimer);
+    toastTimer = null;
+    const el = document.getElementById('tvToast');
+    if (el) el.classList.remove('is-on');
+}
+
 export async function copyText(text) {
     try {
         await navigator.clipboard.writeText(text);

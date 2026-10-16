@@ -18,7 +18,7 @@
 import { buildList } from './build-list.js';
 import { WRM_PROPOSALS, wrmStep } from './wrm.js';
 import { CCSS_AUDIT, EE_AUDIT } from './standards-audit.js';
-import { repPairsOfText, plainWhy, gradeOfYear } from './wrm-links.js';
+import { repPairsOfText, plainWhy, gradeOfYear, addProposalNames } from './wrm-links.js';
 
 export const SOURCES = ['CCSS', 'EE', 'WRM', 'MAP'];
 export const GRADES = ['PK', 'K', '1', '2', '3', '4', '5', '6'];
@@ -70,9 +70,10 @@ function closesRaw(v) {
     if (v == null || v === '') return [];
     if (typeof v === 'string') return [plainWhy(v)];
     if (Array.isArray(v)) return v.flatMap(closesRaw);
-    if (typeof v === 'object') return Object.entries(v).map(([k, t]) => (/^(R|Y[1-6])\.B\d+\.S\d+$/.test(k) ? `${stepName(k)} — ${plainWhy(String(t))}` : `${k}: ${plainWhy(String(t))}`));
+    if (typeof v === 'object') return Object.entries(v).map(([k, t]) => (/^(R|Y[1-6])\.B\d+\.S\d+$/.test(k) ? `${stepName(k)} — ${plainWhy(String(t), { step: k })}` : `${k}: ${plainWhy(String(t))}`));
     return [String(v)];
 }
+const CLOSE_PAIR = /((?:R|Y[1-6])\.B\d+\.S\d+)\s*:\s*([\s\S]+?)\s*(?=;\s*(?:R|Y[1-6])\.B\d+\.S\d+\s*:|;?\s*$)/g;
 const uniq = (a) => [...new Set(a.filter(Boolean))];
 const sortGrades = (a) => uniq(a).filter((g) => GRADES.includes(g)).sort((x, y) => GRADES.indexOf(x) - GRADES.indexOf(y));
 
@@ -85,7 +86,7 @@ export function buildQueue({ curated = [], map = null } = {}) {
     const get = (id) => {
         if (!byId.has(id)) {
             byId.set(id, { id, name: '', kind: 'other', kindRaw: '', skill: '', option: '', sources: new Set(), grades: [], domain: '',
-                family: '', teaches: '', closes: [], representation: '', ccss: [], ee: [], wrmSteps: [], improves: [], map: [], spec: null });
+                family: '', teaches: '', closes: [], representation: '', ccss: [], ee: [], wrmSteps: [], improves: [], map: [], spec: null, closedSteps: new Set() });
         }
         return byId.get(id);
     };
@@ -99,8 +100,13 @@ export function buildQueue({ curated = [], map = null } = {}) {
         if (!e.representation && p.representation) e.representation = p.representation;
     };
 
+    // every entry's id reads as its name inside another entry's note
+    const BL = buildList();
+    addProposalNames(Object.fromEntries(BL.map((b) => [b.id, b])));
+    for (const y of curated) addProposalNames(y && y.proposals);
+    if (map) addProposalNames(map.proposals);
     // 1. the build list: WRM proposals, standards proposals, White Rose pictures
-    for (const b of buildList()) {
+    for (const b of BL) {
         const e = get(b.id);
         fill(e, b);
         if (b.source === 'standards') {
@@ -144,15 +150,27 @@ export function buildQueue({ curated = [], map = null } = {}) {
             fill(e, p);
             e.ccss.push(...(p.ccss || []));
             e.wrmSteps.push(...(p.steps || []));
-            if (p.closes) e.closes.unshift(...closesText(p.closes));
-            else if (p.why && !/reused/i.test(p.why)) e.closes.push(p.why);
+            if (p.closes) {
+                // "R.B1.S1: text; R.B1.S2: text" → one line per step, keyed by the step (critic r4 M4)
+                const pairs = typeof p.closes === 'string' ? [...p.closes.matchAll(CLOSE_PAIR)] : [];
+                if (pairs.length) {
+                    const lines = [];
+                    for (const [, sid, text] of pairs) {
+                        if (e.closedSteps.has(sid)) continue;
+                        e.closedSteps.add(sid);
+                        lines.push(`${stepName(sid)} — ${plainWhy(text.trim(), { step: sid })}`);
+                    }
+                    e.closes.unshift(...lines);
+                } else e.closes.unshift(...closesText(p.closes));
+            } else if (p.why && !/reused/i.test(p.why)) e.closes.push(p.why);
         }
         for (const [sid, st] of Object.entries(y.steps || {})) {
             for (const id of [...(st.build || [])]) {
                 const e = byId.get(id);
                 if (!e) continue;
                 e.wrmSteps.push(sid);
-                if (st.missing && !e.closes.some((c) => c.startsWith(`${stepName(sid)} —`))) e.closes.push(`${stepName(sid)} — ${plainWhy(st.missing)}`);   // N16: one line per step
+                if (st.missing && !e.closedSteps.has(sid)) e.closes.push(`${stepName(sid)} — ${plainWhy(st.missing, { step: sid })}`);   // N16: one line per step
+                e.closedSteps.add(sid);
             }
         }
     }
@@ -177,7 +195,7 @@ export function buildQueue({ curated = [], map = null } = {}) {
             if (!e) continue;
             e.sources.add('MAP');
             if (!e.map.some((f) => f.task === r.task)) e.map.push({ strand: r.strand || '', ritBand: r.ritBand || '', taskType: '', task: r.task || '' });
-            if (r.closes) e.closes.push(...closesText(r.closes).map((c) => `MAP task "${r.task}": ${c}`));
+            if (r.closes) e.closes.push(...closesText(r.closes).map((c) => `MAP task “${r.task}”: ${c}`));
         }
     }
 
@@ -203,6 +221,7 @@ export function buildQueue({ curated = [], map = null } = {}) {
         e.pairs = repPairsOfText([e.name, e.teaches, e.representation, e.option, ...e.map.map((f) => `${f.taskType} ${f.task || ''}`)].join(' '));
         e.sources = SOURCES.filter((s) => e.sources.has(s));
         if (!e.sources.length) continue;
+        delete e.closedSteps;
         items.push(e);
     }
     const gi = (e) => (e.grades.length ? GRADES.indexOf(e.grades[0]) : 99);

@@ -241,3 +241,8 @@ body:has(#teacherMain .tv-screen.is-active .tvw-bar) .tv-toast { bottom: calc(va
     .tvw-bar-btns { display: flex; width: 100%; min-width: 0; flex-wrap: nowrap; }
     .tvw-bar-btns .tv-btn { flex: 1 1 0; min-width: 0; }
 }
+
+/* N22 (critic r4): a long why line is two lines until tapped */
+.tvw-row-meta[data-w-more] { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; cursor: pointer; border-radius: 4px; }
+.tvw-row-meta[data-w-more][aria-expanded="true"] { display: block; -webkit-line-clamp: unset; line-clamp: none; overflow: visible; }
+.tvw-row-meta[data-w-more]:focus-visible { outline: 2px solid var(--tv-accent); outline-offset: 2px; }

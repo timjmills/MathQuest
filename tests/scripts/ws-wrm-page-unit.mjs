@@ -1,11 +1,18 @@
 // ws-wrm-page-unit.mjs — node unit test for the White Rose page data: the GENERATED sequence
 // (wrm-sequence-db.js) and the link rules (wrm-links.js). Run: node tests/scripts/ws-wrm-page-unit.mjs
-import { readFileSync, readdirSync, existsSync } from 'node:fs';
+//   --write-index        regenerate data/curriculum/links/index.json from the files on disk (after a merge)
+//   --curated <dir,...>  also run the jargon gate over the tagging lanes' newest files
+// The JARGON gate runs over EVERY teacher-facing line of the real link files (why / missing / partial /
+// prior lines, MAP task notes, every Skills to be made field) through the page's own text functions.
+import { readFileSync, readdirSync, existsSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+globalThis.localStorage = globalThis.localStorage || { getItem: () => null, setItem() {}, removeItem() {} };
+const { JARGON: JARGON_LIST, jargonHit } = createRequire(import.meta.url)('../lib/wrm-jargon.cjs');
 import { WRM_SEQUENCE } from '../../js/modules/wrm-sequence-db.js';
 import { WRM_STEPS, skillsForWrmStep } from '../../js/modules/wrm.js';
 import { linksFor, allLessons, lessonByKey, searchLessons, addCuratedYear, clearCurated, proposalName,
     PREREQ_CAP, RELATED_CAP, WRM_LINK_OVERRIDES, REP_PAIRS, plainWhy, MAP_STRANDS, strandOfKey, repPairsOfText } from '../../js/modules/wrm-links.js';
-import { buildQueue, passes, toCSV, CSV_HEAD, gradesOfText, gradeOfCode, gradeOfRit, closesText } from '../../js/modules/build-queue.js';
+import { buildQueue, passes, toCSV, CSV_HEAD, gradesOfText, gradeOfCode, gradeOfRit, closesText, stepName } from '../../js/modules/build-queue.js';
 
 let fails = 0;
 const ok = (c, msg) => { if (!c) { fails += 1; console.log('FAIL', msg); } };
@@ -97,9 +104,14 @@ ok(linksFor('2:D1:1').source === 'rules', 'clearCurated');
 const dir = new URL('../../data/curriculum/links/', import.meta.url);
 const files = existsSync(dir) ? readdirSync(dir) : [];
 const onDisk = files.filter((f) => /^(R|Y[1-6])\.json$/.test(f)).map((f) => f.replace('.json', '')).sort();
+const want = { years: ['R', 'Y1', 'Y2', 'Y3', 'Y4', 'Y5', 'Y6'].filter((y) => onDisk.includes(y)), map: files.includes('MAP.json') };
+if (process.argv.includes('--write-index')) {
+    writeFileSync(new URL('index.json', dir), `${JSON.stringify(want, null, 2)}\n`);
+    console.log(`wrote data/curriculum/links/index.json ${JSON.stringify(want)}`);
+}
 const idx = JSON.parse(readFileSync(new URL('index.json', dir)));
 ok(JSON.stringify(onDisk) === JSON.stringify([...idx.years].sort()), `index.json years ${JSON.stringify(idx.years)} = files on disk ${JSON.stringify(onDisk)}`);
-ok(!!idx.map === files.includes('MAP.json'), `index.json map ${idx.map} = MAP.json on disk ${files.includes('MAP.json')}`);
+ok(!!idx.map === files.includes('MAP.json'), `index.json map ${idx.map} = MAP.json on disk ${files.includes('MAP.json')} (fix: node tests/scripts/ws-wrm-page-unit.mjs --write-index)`);
 
 // representation pairs and strands
 ok(REP_PAIRS.length === 8, 'eight representation pairs');
@@ -144,38 +156,98 @@ ok(closesText({ 'Y3.B1.S1': 'part-whole' }).join() === 'Grade 2: Represent numbe
 const csv = toCSV(Q1.items.slice(0, 5)).split('\r\n');
 ok(csv.length === 6 && csv[0] === CSV_HEAD.join(','), 'CSV header + rows');
 
-// jargon gate (critic r2 M1): every curated why / missing / closes line reads plainly after plainWhy.
-// Runs over data/curriculum/links/*.json, any `--curated <dir>` given (the tagging lanes' newest files),
-// and the known-bad samples the critics found.
-const JARGON = /\b(R|Y\d)\.B\d|\bY[1-6]\b|\bW\d\d\b|[{}\[\]]|Gr\.|\[rule|[a-z]+_[a-z0-9_]+|\b(Pre-K|Kindergarten|Grade \d)\s*:?\s*\/\s*\1\b/;
+// jargon gate (critic r2 M1, r3 M1, r4 M3/M4/m7): EVERY teacher-facing line reads plainly — the White Rose
+// why / missing / partial / prior lines, the MAP task notes and every Skills to be made field (screen and print
+// text), in both data modes (no link files; every file on disk and any --curated dir). Zero hits required.
+// The pattern is tests/lib/wrm-jargon.cjs (the browser gate uses the same one on the rendered screens).
+const DATA = await import('../../js/modules/data.js');
+const TT = await import('../../js/modules/todo-text.js');
+const { setSkillLabeler } = await import('../../js/modules/wrm-links.js');
+const cleanLabel = (l) => String(l || '').replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}]/gu, '').replace(/^[\s½]+(?=\S)/, '').replace(/\s+/g, ' ').trim();
+setSkillLabeler((id) => {
+    const [a, b] = String(id).includes(':') ? String(id).split(':') : [DATA.getCategoryForSkill(id), id];
+    const sk = (DATA.SKILLS[a] || []).find((x) => x.v === b);
+    return sk ? cleanLabel(sk.l) : null;
+});
 const samples = ['R.B2.S1 / R.B10 compare by size: the compare words', 'R.B1.S4 Sort objects to a type (school prior learning, week W23)',
     'combining groups (add_5_pictures stops at 5; add_wp_10 is a word-work cell) [rule 3: nearest first]', 'Y2/Gr.1 Count in 10s, school week, W05',
     'Y3.B1.S1 x {"band": 99}', 'same CCSS K.OA.A.1 in Y1.B2.S3 Parts', 'Y2.B1.S2 / Y2.B1.S3 Count (prior learning wk W01/W02)',
-    'part-whole model (see Y5.B13) [rule 18: opts {"notation":["across"]} for this pupil]', 'Y1/Gr.K Count to 10', 'Pre-K: / R.B10 compare by size'];
+    'part-whole model (see Y5.B13) [rule 18: opts {"notation":["across"]} for this pupil]', 'Y1/Gr.K Count to 10', 'Pre-K: / R.B10 compare by size',
+    // critic r4 M3 / N23
+    'R.B11.S5 / S6 1 more / 1 less', 'Y1.B6.S1 and Y1.B12.S1: counting to 50, and from 50 to 100', '(Y1.B6.S1 and Y1.B12.S1: counting to 50)',
+    'groups of 1-3 only (band 5 deals 4 and 5)', 'until band 3 exists', 'it deals the subtraction facts too, which are S13, and never',
+    'Y6.B8.S1-S2 place value of decimals', 'Count backwards within 100 (prior learning wk W33, "Y1 Count backwards")',
+    'R.B1.S1: matching an object; R.B1.S2: matching a picture', 'halves only (parts 0), with denoms [2]'];
 { const r2 = plainWhy('part-whole model (see Y5.B13) [rule 18: opts {"notation":["across"]} for this pupil]');
   ok(r2 === 'part-whole model (see Grade 4)', `r2 M1 line -> "${r2}"`); }
 { const n14 = plainWhy('Y3.B1.S1 part-whole model'); ok(!/^Grade \d:/.test(n14), `N14 id + own words -> "${n14}"`); }
-for (const t of samples) ok(!JARGON.test(plainWhy(t)), `jargon left: "${t}" -> "${plainWhy(t)}"`);
+{ const c = plainWhy('R.B1.S1: matching an object'); ok(/^Pre-K: matching/.test(c), `M4 "id:" keeps its grade -> "${c}"`); }
+{ const c = plainWhy('groups of 1-3 only (band 5 deals 4 and 5)'); ok(c.includes('"Numbers to 5" deals'), `M3 band -> "${c}"`); }
+{ const c = plainWhy('R.B11.S5 / S6'); ok(/^Pre-K: 1 more and 1 less$/.test(c), `M3 shorthand chain -> "${c}"`); }
+for (const t of samples) { const o = plainWhy(t, { step: 'Y1.B2.S4' }); const h = jargonHit(o); ok(!h, `jargon left in sample: "${t}" -> "${o}" (${h && h.name})`); }
+ok(JARGON_LIST.length >= 20 && !jargonHit('Grade 2/Grade 3 reading a scale') && jargonHit('Grade 2/Grade 2 x'), 'jargon pattern: named-group repeat, no false positive');
+
 const dirs = [new URL('../../data/curriculum/links/', import.meta.url).pathname];
 process.argv.forEach((a, i) => { if (a === '--curated' && process.argv[i + 1]) dirs.push(...process.argv[i + 1].split(',')); });
 let jLines = 0, jBad = 0;
+const jByForm = {};
+const jByKind = {};
+const gate = (where, out) => {
+    const kind = /^todo/.test(where) ? 'Skills to be made fields' : /^MAP row/.test(where) ? 'MAP task notes' : /^lesson/.test(where) ? 'lesson screen lines' : /closes$/.test(where) ? 'proposal closes' : 'why / missing / partial lines';
+    for (const o of [].concat(out)) {
+        if (o == null) continue;
+        jLines += 1;
+        jByKind[kind] = (jByKind[kind] || 0) + 1;
+        const h = jargonHit(o);
+        if (h) { jBad += 1; jByForm[h.name] = (jByForm[h.name] || 0) + 1; if (jBad <= 12) console.log('JARGON', h.name, '|', where, '|', h.snippet); }
+    }
+};
+const todoGate = (tag, Q) => {
+    TT.setTodoNames(Q.items);
+    for (const e of Q.items) {
+        const T = TT.todoTexts(e);
+        for (const [f, v] of Object.entries(T)) gate(`${tag} ${e.id} ${f}`, v);
+        gate(`${tag} ${e.id} steps`, e.wrmSteps.map(stepName));
+        gate(`${tag} ${e.id} map`, e.map.map((m) => [m.strand, m.ritBand, m.task || m.taskType].filter(Boolean).join(' · ')));
+    }
+};
+todoGate('todo (no files)', buildQueue());
 for (const dir of dirs) {
+    const years = [];
+    let map = null;
     for (const y of ['R', 'Y1', 'Y2', 'Y3', 'Y4', 'Y5', 'Y6']) {
         const f = `${dir.replace(/\/$/, '')}/${y}.json`;
         if (!existsSync(f)) continue;
         const d = JSON.parse(readFileSync(f, 'utf8'));
-        const lines = [];
-        for (const st of Object.values(d.steps || {})) {
-            for (const g of ['pre', 'related']) for (const x of st[g] || []) lines.push(plainWhy(x.why));
-            for (const x of st.partial || []) lines.push(plainWhy(x.missing));
-            lines.push(plainWhy(st.missing));
+        years.push(d);
+        for (const [sid, st] of Object.entries(d.steps || {})) {
+            const key0 = ((st.partial || [])[0] || (st.direct || [])[0] || {}).key || '';
+            for (const g of ['pre', 'related']) for (const x of st[g] || []) gate(`${y} ${sid} ${g}`, plainWhy(x.why, { step: sid, key: x.key }));
+            for (const x of st.partial || []) gate(`${y} ${sid} partial`, plainWhy(x.missing, { step: sid, key: x.key }));
+            if (st.missing) gate(`${y} ${sid} missing`, plainWhy(st.missing, { step: sid, key: key0 }));
         }
-        for (const pr of Object.values(d.proposals || {})) lines.push(...closesText(pr.closes));
-        for (const o of lines) { jLines += 1; if (JARGON.test(o)) { jBad += 1; if (jBad <= 5) console.log('JARGON', f, '|', o); } }
+        for (const pr of Object.values(d.proposals || {})) gate(`${y} closes`, closesText(pr.closes));
+    }
+    const mf = `${dir.replace(/\/$/, '')}/MAP.json`;
+    if (existsSync(mf)) {
+        map = JSON.parse(readFileSync(mf, 'utf8'));
+        for (const r of map.rows || []) if (r.closes) gate(`MAP row ${r.task}`, TT.mapNote(r.closes, r.skills));
+    }
+    if (years.length || map) {
+        clearCurated();
+        for (const d of years) addCuratedYear(d);
+        todoGate(`todo (${dir})`, buildQueue({ curated: years, map }));
+        // the lessons themselves, through linksFor (what the screen shows)
+        for (const l of L) {
+            if (!l.step || !years.some((d) => d.steps && d.steps[l.step])) continue;
+            const r = linksFor(l);
+            gate(`lesson ${l.key}`, [r.missing, ...r.direct.map((x) => x.partial), ...r.prereq.map((x) => x.why), ...r.related.map((x) => x.why), ...r.build.map(proposalName), ...r.preBuild.map(proposalName)]);
+        }
+        clearCurated();
     }
 }
-ok(!jBad, `jargon gate: ${jBad} of ${jLines} curated lines`);
-if (jLines) console.log(`jargon gate: ${jLines} curated lines checked`);
+ok(!jBad, `jargon gate: ${jBad} of ${jLines} teacher-facing lines ${JSON.stringify(jByForm)}`);
+console.log(`jargon gate: ${jLines} teacher-facing lines checked, ${jBad} hits ${JSON.stringify(jByKind)}`);
 
 // search
 ok(searchLessons('Represent numbers to 100')[0].title === 'Represent numbers to 100', 'search exact title first');

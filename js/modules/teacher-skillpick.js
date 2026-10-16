@@ -50,7 +50,7 @@ export const teacherName = (n) => String(n || '').replace(/\s*\(option\)\s*$/i, 
 /** "To be built: <name>" — each name a button to the Skills to be made screen at that entry. */
 export function toBeBuiltHTML(ids, nameOf, lead = 'To be built') {
     if (!ids || !ids.length) return '';
-    return `<p class="tvw-tbb">${esc(lead)}: ${ids.map((id) => `<button type="button" class="tvw-tbb-link" data-todo-open="${esc(id)}">${esc(teacherName(nameOf(id)))}</button>`).join(', ')}</p>`;
+    return `<p class="tvw-tbb">${esc(lead)}: ${ids.map((id) => `<button type="button" class="tvw-tbb-link" data-todo-open="${esc(id)}">${esc(teacherName(nameOf(id)))}</button>`).join('')}</p>`;
 }
 
 /**
@@ -58,6 +58,17 @@ export function toBeBuiltHTML(ids, nameOf, lead = 'To be built') {
  * opts.root()    the screen element
  * opts.redraw()  re-render the groups (after a tick or a view change)
  */
+// N22: a long why line shows two lines and opens on a tap (or Enter), so a list of rows stays scannable.
+const longWhy = (x) => String(x.partial || x.why || '').length > 45;
+function toggleMore(el) { el.setAttribute('aria-expanded', String(el.getAttribute('aria-expanded') !== 'true')); }
+if (typeof document !== 'undefined') {
+    document.addEventListener('click', (e) => { const m = e.target.closest && e.target.closest('[data-w-more]'); if (m) toggleMore(m); });
+    document.addEventListener('keydown', (e) => {
+        const m = e.target.closest && e.target.closest('[data-w-more]');
+        if (m && e.target === m && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggleMore(m); }
+    });
+}
+
 export function createPicker(opts) {
     const p = { ticked: new Set(), link: '', linkNote: '', view: skillView(), groups: {} };
     const idp = opts.idp;
@@ -92,7 +103,7 @@ export function createPicker(opts) {
         const b = bits(x);
         const label = b.sk ? b.sk.label : x.key;
         return `<li class="tvw-row${b.on ? ' is-on' : ''}"${tvpAttrs(b.c, b.s, b.opts)}>${tickHTML(b, label)}
-      <span class="tvw-row-main" data-tvp-anchor><span class="tvw-row-name">${esc(label)}</span><span class="tvw-row-meta">${esc(b.sk ? levelText(b.sk.level) : '')} ${why(x)}</span></span>
+      <span class="tvw-row-main" data-tvp-anchor><span class="tvw-row-name">${esc(label)}</span><span class="tvw-row-meta"${longWhy(x) ? ' data-w-more role="button" tabindex="0" aria-expanded="false" title="Show the whole note"' : ''}>${esc(b.sk ? levelText(b.sk.level) : '')} ${why(x)}</span></span>
       ${infoButtonHTML(label)}${quickHTML(b, label)}</li>`;
     }
 

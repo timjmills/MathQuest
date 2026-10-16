@@ -76,13 +76,18 @@ let seenTier = null;   // the last state.mapTier this screen read or wrote
 export function renderMapScreen(el) {
     root = el;
     // openMapTest('k2' | '35' | 'mixed') from an old entry point names a tier: honour it once.
+    let named = false;
     if (state.mapTier && state.mapTier !== seenTier && TIERS.some((t) => t[0] === state.mapTier)) {
         if (state.mapTier !== m.tier) setTier(state.mapTier);
         m.tab = 'start';   // an old "open the MAP test" entry point lands on the test itself
+        named = true;
     }
+    if (state.mapOpenTest) { m.tab = 'start'; named = true; }   // the old MAP test view, opened from anywhere
+    state.mapOpenTest = false;
     seenTier = state.mapTier;
     const hv = mapHashView();
     if (hv) m.tab = hv;   // a #map/... bookmark or Back names the view
+    else if (!named) m.tab = 'tasks';   // N17: every visit opens on Practise by task unless a link names the tab
     if (!root.dataset.built) {
         root.dataset.built = '1';
         wire();

@@ -23,6 +23,7 @@ import { WRM_SEQUENCE } from './wrm-sequence-db.js';
 import { skillsForWrmStep, wrmStep, WRM_PROPOSALS } from './wrm.js';
 import { skillsForStandard, SKILL_STANDARDS } from './standards.js';
 import { STANDARD_PROPOSALS, WRM_EXTENSIONS } from './build-list.js';
+import { optionsFor } from './skill-options.js';
 
 // ---- curated links (data/curriculum/links/<YEAR>.json, written by the tagging lane) ------------
 // When a step has a curated record it wins over the computed rules: direct (with opts and partial),
@@ -44,8 +45,12 @@ export function clearCurated() { CURATED.clear(); for (const k of Object.keys(CU
 export function curatedFor(stepId) { return CURATED.get(stepId) || null; }
 
 /** A proposal's plain name: the year file's proposals first, then WRM_PROPOSALS, then the build list. */
+const EXTRA_NAMES = {};          // proposal id -> { name } from MAP.json and the build list (addProposalNames)
+export function addProposalNames(obj) {
+    for (const [id, p] of Object.entries(obj || {})) if (p && (p.name || p.label || p.title) && !EXTRA_NAMES[id]) EXTRA_NAMES[id] = { name: p.name || p.label || p.title };
+}
 export function proposalName(id) {
-    const p = CURATED_PROPOSALS[id] || WRM_PROPOSALS[id] || STANDARD_PROPOSALS[id] || WRM_EXTENSIONS[id];
+    const p = CURATED_PROPOSALS[id] || EXTRA_NAMES[id] || WRM_PROPOSALS[id] || STANDARD_PROPOSALS[id] || WRM_EXTENSIONS[id];
     return (p && (p.name || p.label || p.title)) || String(id).replace(/_/g, ' ');
 }
 
@@ -208,19 +213,20 @@ export function linksFor(lessonOrKey, opts = {}) {
 }
 
 function curatedLinks(lesson, cur, ovr, live) {
+    const ctx = { step: lesson.step, key: ((cur.partial || [])[0] || (cur.direct || [])[0] || {}).key || '' };
     const seen = new Set();
     const keep = (x) => x && x.key && live(x.key) && !seen.has(x.key) && seen.add(x.key);
     const direct = applyOverride([
         ...(cur.direct || []).map((x) => ({ key: x.key, opts: x.opts || null, partial: '' })),
-        ...(cur.partial || []).map((x) => ({ key: x.key, opts: x.opts || null, partial: plainWhy(x.missing || 'part of the step') })),
+        ...(cur.partial || []).map((x) => ({ key: x.key, opts: x.opts || null, partial: plainWhy(x.missing || 'part of the step', { ...ctx, key: x.key }) })),
     ], ovr.direct, 'Added by the school', 0).filter(keep).map((x) => ({ key: x.key, opts: x.opts || null, partial: x.partial || '' }));
     // opts travel with every link (a curated pre / related skill is often "within 100" etc.)
-    const withOpts = (x) => ({ key: x.key, why: plainWhy(x.why || ''), opts: x.opts && Object.keys(x.opts).length ? x.opts : null });
+    const withOpts = (x) => ({ key: x.key, why: plainWhy(x.why || '', { ...ctx, key: x.key }), opts: x.opts && Object.keys(x.opts).length ? x.opts : null });
     const prereq = applyOverride((cur.pre || []).map(withOpts), ovr.prereq, 'Added by the school', 0).filter(keep);
     const related = applyOverride((cur.related || []).map(withOpts), ovr.related, 'Added by the school', 0).filter(keep);
     const verdict = ['full', 'partial', 'gap'].includes(cur.verdict) ? cur.verdict
         : !direct.length ? 'gap' : direct.some((x) => !x.partial) ? 'full' : 'partial';
-    return { lesson, step: wrmStep(lesson.step), direct, prereq, related, verdict, missing: plainWhy(cur.missing || ''),
+    return { lesson, step: wrmStep(lesson.step), direct, prereq, related, verdict, missing: plainWhy(cur.missing || '', ctx),
         build: (cur.build || []).slice(), preBuild: (cur.preBuild || []).slice(), note: cur.note || '', source: 'curated' };
 }
 
@@ -230,11 +236,49 @@ function curatedLinks(lesson, cur, ovr, live) {
  */
 let skillLabeler = null;
 export function setSkillLabeler(fn) { skillLabeler = typeof fn === 'function' ? fn : null; }
+/** A live skill's label (through the installed labeler), or null. */
+export function liveSkillLabel(id) { return skillLabeler && id ? skillLabeler(id) || null : null; }
 const skillWords = (id) => {
     const lab = skillLabeler ? skillLabeler(id) : null;
-    return lab || id.replace(/^[a-z_]+:/, '').replace(/_/g, ' ');
+    if (lab) return lab;
+    // an entry still to make ("compare_small", "vis_story_strip") reads as its name, in quotes (critic r4 M4)
+    if (!id.includes(':') && (CURATED_PROPOSALS[id] || EXTRA_NAMES[id] || WRM_PROPOSALS[id] || STANDARD_PROPOSALS[id] || WRM_EXTENSIONS[id])) return `"${proposalName(id)}"`;
+    return id.replace(/^[a-z_]+:/, '').replace(/_/g, ' ');
 };
 const YEAR_WORD = { R: 'Pre-K', Y1: 'Kindergarten', Y2: 'Grade 1', Y3: 'Grade 2', Y4: 'Grade 3', Y5: 'Grade 4', Y6: 'Grade 5' };
+// Option ids in a note ("band 5", "forms 0", "parts 2", "denoms [2]", "task 'fit'") → the option's label and value
+// labels from the dialog (skill-options.js), for the note's own skill when known (critic r4 M3, m7).
+const OPT_WORDS = { band: 'Numbers to', bands: 'Numbers to', forms: 'What the items ask', parts: 'Parts', denoms: 'Denominators', tiles: 'Numbers to sort',
+    span: 'Number line range', power: 'Powers of ten', decimals: 'Decimal places', mode: 'Mode', pool: 'Numbers used', objects: 'Objects', frame: 'Answer frame',
+    notation: 'How it is written', response: 'How the pupil answers', task: 'Task', form: 'Form', unknown: 'What is missing', support: 'Support',
+    level: 'Support level', ask: 'Question', direction: 'Direction', layout: 'Layout', arrangement: 'Arrangement', unit: 'Unit', regroup: 'Regrouping',
+    step: 'Step', steps: 'Steps', range: 'Max Number', counter: 'Counters', labels: 'Labels', model: 'Model', grid: 'Grid', facts: 'Facts', stories: 'Stories',
+    context: 'Context', focus: 'Focus', key: 'Key', words: 'Words', op: 'Operation', pictures: 'Pictures', reverse: 'Reverse', subtraction: 'Subtraction' };
+const NUM_OPTS = 'bands?|forms|parts|denoms|tiles|span|power|decimals';
+const OPT_VAL = '(?:"[^"]*"|\'[^\']*\'|\\d+(?:[.,]\\d+)*)';
+const OPT_NUM_RE = new RegExp(`\\b(${NUM_OPTS})\\s*[:=]?\\s*(${OPT_VAL}(?:\\s*(?:\\/|\\||\\bor\\b|,(?!\\d{3}))\\s*${OPT_VAL})*)`, 'g');
+const OPT_QUOTED_RE = new RegExp(`\\b(${Object.keys(OPT_WORDS).join('|')})\\s*:?\\s*(["'])([^"']{1,40})\\2`, 'g');
+export function optionPhrase(key, id, raw) {
+    let def = null;
+    if (key && String(key).includes(':')) {
+        try { const [c, sk] = String(key).split(':'); def = optionsFor(c, sk).find((d) => d.id === id) || null; } catch (e) { def = null; }
+    }
+    const vals = String(raw).split(/\s*(?:\/|\||\bor\b|,(?!\d{3}))\s*/).map((v) => v.replace(/^["']|["']$/g, '').trim()).filter(Boolean);
+    const lab = (v) => {
+        const hit = def && (def.values || []).find((x) => String(x.v) === v || String(x.v) === v.replace(/,/g, ''));
+        return hit ? String(hit.l).replace(/\s*\(default\)$/i, '') : v.replace(/_/g, ' ');
+    };
+    if (/^bands?$/.test(id)) return `"Numbers to ${vals.map(lab).join(' or ')}"`;
+    if (!def && vals.every((v) => /^\d$/.test(v))) return `the "${OPT_WORDS[id] || id}" setting`;
+    return `"${(def && def.label) || OPT_WORDS[id] || id}: ${vals.map(lab).join(', ')}"`;
+}
+/** An option written as "id: value …" (a Skills to be made entry's option line) in the dialog's words. */
+export function optionText(key, text) {
+    const t = plainWhy(String(text || ''), { key }).replace(/\s*\|\s*/g, ' or ')
+        .replace(/(^|;\s*)(\w+)(\s*:\s*|\s+(?=\w))/g, (m, pre, id) => (OPT_WORDS[id] ? `${pre}${OPT_WORDS[id]}: ` : m));
+    return t.charAt(0).toUpperCase() + t.slice(1);
+}
+const ID_CHAIN = /\b(?:R|Y[1-6])\.B\d+(?:\.S\d+(?:\s*[-–]\s*S\d+)?)?\b(?:\s*(?:\/|,|&|\band\b|\bor\b)\s*(?:(?:R|Y[1-6])\.B\d+(?:\.S\d+(?:\s*[-–]\s*S\d+)?)?|S\d+(?:\s*[-–]\s*S\d+)?|Y[1-6](?:\/Gr\.\s?[\dK])?)\b)*/g;
 const weekWords = (w) => w.split(/\s*\/\s*|,\s*/).map((x) => +String(x).replace(/\D/g, '')).filter(Boolean);
 
 /**
@@ -243,7 +287,7 @@ const weekWords = (w) => w.split(/\s*\/\s*|,\s*/).map((x) => +String(x).replace(
  * "step before in the block", "not dealt", "[rule 3: …]", "{band: 99}", snake_case skill ids) becomes
  * the handbook's words ("support block, week 1", "the step before", "not practised yet", the skill's label).
  */
-export function plainWhy(text) {
+export function plainWhy(text, ctx = {}) {
     let t = String(text || '');
     if (!t) return t;
     // JSON first (one level of nesting), then balanced rule brackets ("[rule 18: opts {…["across"]} …]"), then strays
@@ -251,17 +295,47 @@ export function plainWhy(text) {
     t = t.replace(/\s*\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/g, '');
     t = t.replace(/\s*\[rule\b(?:[^\[\]]|\[[^\]]*\])*\]/gi, '');
     t = t.replace(/[\[\]{}]/g, '');
-    // chains of ids "R.B2.S1 / R.B10" → the last full step's grade + title, else the grade
-    t = t.replace(/\b(?:R|Y[1-6])\.B\d+(?:\.S\d+)?\b(?:\s*\/\s*(?:R|Y[1-6])\.B\d+(?:\.S\d+)?\b)*/g, (m) => {
-        const ids = m.split('/').map((x) => x.trim());
-        const full = ids.find((x) => /\.S\d+$/.test(x));
-        const y = ids[0].split('.')[0];
-        return full ? `\u0002${YEAR_WORD[y]}\u0001${full}\u0001` : `${YEAR_WORD[y]}`;
+    // chains of ids, with shorthand steps and joiners: "R.B2.S1 / R.B10", "R.B11.S5 / S6", "Y1.B6.S1 and Y1.B12.S1:"
+    // (a bare "S6" belongs to the block of the id before it). Followed by ":" → "Grade: …" (the colon keeps its
+    // grade, M4); followed by punctuation or nothing → "Grade: Title"; followed by its own words → just the words (N14).
+    t = t.replace(ID_CHAIN, (m, off, s) => {
+        let blk = '';
+        let year = '';
+        const steps = [];
+        for (const p of m.split(/\s*(?:\/|,|&|\band\b|\bor\b)\s*/)) {
+            const full = /^(?:((?:R|Y[1-6])\.B\d+)(?:\.S(\d+))?|S(\d+))(?:\s*[-–]\s*S(\d+))?$/.exec(p);
+            if (/^Y[1-6]$|^Gr\./.test(p)) continue;   // "Y5/Gr.4" after a step: a year code, said by the step
+            if (!full) continue;
+            if (full[1]) { blk = full[1]; year = year || p.split('.')[0]; }
+            const a = +(full[2] || full[3] || 0);
+            if (!a || !blk) continue;
+            for (let n = a; n <= Math.max(a, Math.min(+(full[4] || a), a + 9)); n += 1) steps.push(`${blk}.S${n}`);
+        }
+        const g = YEAR_WORD[year] || '';
+        const after = s.slice(off + m.length);
+        if (/^\s*:/.test(after)) return `${g}\u0003`;
+        if (!steps.length) return g;
+        if (/^\s*(?:$|[(;,).\-—])/.test(after)) {
+            const titles = [...new Set(steps.map((id) => (wrmStep(id) || {}).title).filter(Boolean))];
+            return titles.length ? `${g}: ${titles.join(' and ')}` : g;
+        }
+        return '';
     });
-    t = t.replace(/\u0002([^\u0001]*)\u0001([^\u0001]+)\u0001(\s*)(?=$|[(;,)\-]|\s*$)/g, (m, g, id) => { const r = wrmStep(id); return r ? `${g}: ${r.title}` : g; });
-    // an id followed by its own words (not its title): drop the "Grade N:" prefix (N14)
-    t = t.replace(/\u0002[^\u0001]*\u0001[^\u0001]+\u0001\s*/g, '');
-    t = t.replace(/\s*\((?:school )?prior learning(?:,)?(?:\s*(?:wk|week)\s*((?:W?\d+\s*\/?\s*)+))?\)/gi, (m, w) => (w ? ` — support block, week ${weekWords(w).join(', ')}` : ' — support block'));
+    t = t.replace(/\u0003\s*:\s*/g, ': ').replace(/^\s+/, '');
+    // a bare step number left over ("which are S13"): the lesson's own block when it is known, else "another lesson"
+    t = t.replace(/(^|[^.\w])S(\d{1,2})\b/g, (m, pre, n) => {
+        const cur = /^((?:R|Y[1-6])\.B\d+)\.S(\d+)$/.exec(ctx.step || '');
+        const r = cur ? wrmStep(`${cur[1]}.S${n}`) : null;
+        const where = !cur ? 'another lesson' : +n > +cur[2] ? 'a later lesson' : 'an earlier lesson';
+        return `${pre}${r ? `"${r.title}" (${where})` : where}`;
+    });
+    // option ids → the option's teacher label ("band 5" → "Numbers to 5", the dialog's own wording)
+    t = t.replace(OPT_NUM_RE, (m, id, v) => optionPhrase(ctx.key, id, v)).replace(OPT_QUOTED_RE, (m, id, q, v) => optionPhrase(ctx.key, id, v));
+    // "(prior learning wk W33)", "(school prior learning, week W32; also …)", "(prior learning wk W33, "Y1 Count backwards")" (N23)
+    t = t.replace(/\s*\((?:school )?prior learning,?(?:\s*(?:wk|week)\s*((?:W?\d+\s*\/?\s*)+))?\s*(?:[;,]\s*([^()]*))?\)/gi, (m, w, rest) => {
+        const more = String(rest || '').trim().replace(/^"(.*)"$/, '$1');
+        return `${w ? ` — support block, week ${weekWords(w).join(', ')}` : ' — support block'}${more ? ` (${more})` : ''}`;
+    });
     t = t.replace(/\s*\((?:the )?(?:step before in (?:the|this) block|previous step|earlier in (?:the|this) block|earlier step)\)/gi, ' — the step before');
     t = t.replace(/\s*\(next step[^)]*\)/gi, ' — the next step');
     t = t.replace(/\s*\(neighbouring step[^)]*\)/gi, ' — the step next to it');
@@ -281,8 +355,9 @@ export function plainWhy(text) {
     // skill ids → labels
     t = t.replace(/\b[a-z_]+:[a-z0-9_]+\b/g, (m) => skillWords(m)).replace(/\b[a-z]+(?:_[a-z0-9]+)+\b/g, (m) => skillWords(m));
     t = t.replace(/\bare not dealt\b/gi, 'are not practised yet').replace(/\bis not dealt\b/gi, 'is not practised yet').replace(/\bnot dealt\b/gi, 'not practised yet');
+    t = t.replace(/\((Pre-K|Kindergarten|Grade \d) (?=[A-Z])/g, '($1: ');
     t = t.replace(/\(\s*\)/g, '').replace(/:\s*(—|$)/g, ' $1').replace(/—\s*—/g, '—').replace(/\s+([,;)])/g, '$1');
-    return t.replace(/\s{2,}/g, ' ').replace(/[\s—:-]+$/, '').trim();
+    return t.replace(/\s{2,}/g, ' ').replace(/[\s—:-]+$/, '').replace(/^[\s\/;,:]+/, '').trim();
 }
 
 /**

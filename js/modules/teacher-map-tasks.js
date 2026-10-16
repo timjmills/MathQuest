@@ -20,7 +20,7 @@
 //   RELATED  skills of the same strand's other tasks that overlap this task's band, then the skills of the
 //            representation changes this task's skills take part in — cap 8, never direct or pre.
 
-import { esc, icon } from './teacher-ui.js';
+import { esc, icon, hideToast } from './teacher-ui.js';
 import { skillView } from './teacher-preview.js';
 import { getMapSkillsForBands, getCategoryForSkill, DOMAINS } from './data.js';
 import { createPicker, liveKey, toBeBuiltHTML, skillLabelOf } from './teacher-skillpick.js';
@@ -34,6 +34,8 @@ const STATUS = {
 const CAP = 8;
 
 let W = null;            // wrm-links.js (strands, representation pairs, proposal names)
+let TT = null;           // todo-text.js (a MAP row's note in plain words)
+let staleTask = '';      // an old bookmarked task id that no longer exists (m9)
 let MAPD = null;         // MAP.json or null
 let TASKS = null;        // [{ id, task, strand, ritBand, lo, hi, status, skills:[keys], proposal, note }]
 let loading = null;
@@ -65,8 +67,15 @@ function buildTasks() {
             out.push({ id: `m${i}`, task: String(r.task || '').replace(/<->/g, '↔'), strand: r.strand, ritBand: r.ritBand, lo, hi, status: r.status || '',
                 skills: (r.skills || []).filter(liveKey), proposal: r.proposal || '', note: r.closes || '' });
         });
-    } else {
-        // Fallback: the engine's own band lists, one task per skill category in each band.
+    } else out.push(...engineTasks());
+    out.sort((a, b) => a.lo - b.lo || a.hi - b.hi || a.task.localeCompare(b.task));
+    return out;
+}
+
+/** The engine's own band lists, one task per skill category in each band (the fallback when MAP.json is absent). */
+function engineTasks() {
+    const out = [];
+    {
         const names = catNames();
         for (const band of RIT_BANDS.slice(1)) {
             const by = new Map();
@@ -85,16 +94,34 @@ function buildTasks() {
             }
         }
     }
-    out.sort((a, b) => a.lo - b.lo || a.hi - b.hi || a.task.localeCompare(b.task));
     return out;
+}
+
+/**
+ * A task link bookmarked while the page ran without MAP.json (ids e0, e1 …) once MAP.json is on (critic r4 m9):
+ * the MAP.json task in the same strand whose band overlaps and that shares the most skills, else ''.
+ */
+function mapOldTask(id) {
+    if (!MAPD || !/^e\d+$/.test(id || '')) return '';
+    const old = engineTasks().find((t) => t.id === id);
+    if (!old) return '';
+    let best = null;
+    let score = 0;
+    for (const t of TASKS) {
+        if (t.strand !== old.strand || t.lo > old.hi || t.hi < old.lo) continue;
+        const n = t.skills.filter((key) => old.skills.includes(key)).length;
+        if (n > score) { score = n; best = t; }
+    }
+    return best ? best.id : '';
 }
 
 function load() {
     if (TASKS) return Promise.resolve();
     if (!loading) {
-        loading = Promise.all([import('./wrm-links.js'), loadMap()]).then(([w, map]) => {
-            W = w; MAPD = map;
+        loading = Promise.all([import('./wrm-links.js'), import('./todo-text.js'), loadMap()]).then(([w, tt, map]) => {
+            W = w; TT = tt; MAPD = map;
             W.setSkillLabeler(skillLabelOf);
+            if (MAPD) W.addProposalNames(MAPD.proposals);
             TASKS = buildTasks();
         }).catch((e) => { console.warn('[teacher-map-tasks] load', e); loading = null; });
     }
@@ -109,11 +136,8 @@ const nameOf = (id) => {
     return W.proposalName(id);
 };
 
-/** A note in plain words: a proposal id inside it becomes its name. */
-function plainNote(text) {
-    const named = String(text).replace(/\s*\(part [A-Z]\)/g, '').replace(/\b[a-z][a-z0-9]*(?:_[a-z0-9]+)+\b/g, (id) => (MAPD && MAPD.proposals && MAPD.proposals[id] ? `"${nameOf(id)}"` : id));
-    return W.plainWhy(named);
-}
+/** A MAP row's note in plain words (the same rewrite, and the same jargon gate, as Skills to be made). */
+function plainNote(text, t = {}) { return TT.mapNote(text, t.skills); }
 
 /* ================================================================= links for a task */
 
@@ -148,7 +172,14 @@ function readHash() {
     if (m[1] === 'tasks') {
         const b = decodeURIComponent(m[3] || 'all');
         k.band = b === 'all' ? '' : RIT_BANDS.includes(b) ? b : '';
-        k.task = m[4] && TASKS && TASKS.some((t) => t.id === m[4]) ? m[4] : '';
+        const want = m[4] ? decodeURIComponent(m[4]) : '';
+        k.task = want && TASKS && TASKS.some((t) => t.id === want) ? want : (want && TASKS ? mapOldTask(want) : '');
+        staleTask = want && !k.task ? want : '';
+        if (k.task && k.task !== want) {
+            const t = TASKS.find((x) => x.id === k.task);
+            if (t && t.strand !== k.strand) k.strand = t.strand;
+            if (k.band && t && !overlaps(t, k.band)) k.band = '';
+        }
     }
 }
 function writeHash(replace) {
@@ -234,7 +265,7 @@ function taskHTML() {
     if (!t) {
         pick.setGroups({});
         return `<div class="tv-card tvw-empty"><span class="tv-empty-icon" aria-hidden="true">${icon('flag', 22)}</span>
-          <div class="tv-h3">Choose a MAP task</div><p class="tv-cap">Pick a task on the left. You will see the skills that practise it, the skills to do first and the skills that go with it.</p></div>`;
+          <div class="tv-h3">Choose a MAP task</div>${staleTask ? '<p class="tvw-verdict" data-mk-stale>That task is no longer listed. Pick a task from the list.</p>' : ''}<p class="tv-cap">Pick a task on the left. You will see the skills that practise it, the skills to do first and the skills that go with it.</p></div>`;
     }
     const l = taskLinks(t);
     pick.setGroups({ direct: l.direct, prereq: l.pre, related: l.related });
@@ -243,7 +274,7 @@ function taskHTML() {
         <p class="tvw-kicker">${esc(t.strand)} · RIT ${esc(t.ritBand.replace('-', '–'))}</p>
         <h2 class="tv-h2 tvw-title">${esc(t.task)}</h2>
         ${st[0] ? `<div class="tvw-tags"><span class="tvw-tag tvw-verdict-tag ${st[1]}">${esc(st[0])}</span></div>` : ''}
-        ${t.note ? `<p class="tvw-verdict${t.status === 'missing' ? ' is-gap' : ''}">${esc(plainNote(t.note))}</p>` : ''}
+        ${t.note && plainNote(t.note, t) ? `<p class="tvw-verdict${t.status === 'missing' ? ' is-gap' : ''}">${esc(plainNote(t.note, t))}</p>` : ''}
         ${toBeBuiltHTML(t.proposal ? [t.proposal] : [], nameOf)}
       </div>
       ${pick.quickHTML([['direct', 'Task skills'], ['prereq', 'Do-first skills'], ['related', 'Go-with skills'], ['all', 'Everything']])}
@@ -277,10 +308,11 @@ function wire(el) {
         const b = e.target.closest('button');
         if (!b || !el.contains(b) || !TASKS) return;
         const d = b.dataset;
-        if (d.mkStrand !== undefined && d.mkStrand) { k.strand = d.mkStrand; k.task = ''; if (k.band && !TASKS.some((t) => t.strand === k.strand && overlaps(t, k.band))) k.band = ''; pick.reset(); writeHash(false); draw(); host.querySelector(`[data-mk-strand="${CSS.escape(d.mkStrand)}"]`)?.focus(); return; }
-        if (d.mkBand !== undefined) { k.band = d.mkBand; pick.reset(); writeHash(false); draw(); host.querySelector(`[data-mk-band="${CSS.escape(d.mkBand)}"]`)?.focus(); return; }
+        if (d.mkStrand !== undefined && d.mkStrand) { k.strand = d.mkStrand; k.task = ''; staleTask = ''; if (k.band && !TASKS.some((t) => t.strand === k.strand && overlaps(t, k.band))) k.band = ''; pick.reset(); writeHash(false); draw(); host.querySelector(`[data-mk-strand="${CSS.escape(d.mkStrand)}"]`)?.focus(); return; }
+        if (d.mkBand !== undefined) { k.band = d.mkBand; staleTask = ''; pick.reset(); writeHash(false); draw(); host.querySelector(`[data-mk-band="${CSS.escape(d.mkBand)}"]`)?.focus(); return; }
         if (d.mkTask) {
-            k.task = d.mkTask; pick.reset();
+            hideToast();
+            k.task = d.mkTask; staleTask = ''; pick.reset();
             writeHash(false);
             host.querySelectorAll('[data-mk-task]').forEach((x) => { if (x.dataset.mkTask === k.task) x.setAttribute('aria-current', 'true'); else x.removeAttribute('aria-current'); });
             drawDetail();

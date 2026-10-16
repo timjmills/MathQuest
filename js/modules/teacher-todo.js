@@ -9,10 +9,11 @@
 
 import { icon, esc, toast } from './teacher-ui.js';
 import { loadLinksData } from './links-data.js';
-import { skillLabelOf, teacherName } from './teacher-skillpick.js';
+import { skillLabelOf } from './teacher-skillpick.js';
 
 let Q = null;          // build-queue.js
 let W = null;          // wrm-links.js
+let TT = null;         // todo-text.js
 let queue = null;      // { items, totals }
 let lessonSteps = null;// Set of WRM step ids the White Rose screen can open
 let loading = null;
@@ -26,10 +27,11 @@ const t = {
 function load() {
     if (queue) return Promise.resolve();
     if (!loading) {
-        loading = Promise.all([import('./build-queue.js'), import('./wrm-links.js'), loadLinksData()]).then(([q, w, data]) => {
-            Q = q; W = w;
+        loading = Promise.all([import('./build-queue.js'), import('./wrm-links.js'), import('./todo-text.js'), loadLinksData()]).then(([q, w, tt, data]) => {
+            Q = q; W = w; TT = tt;
             W.setSkillLabeler(skillLabelOf);
             queue = Q.buildQueue({ curated: Object.values(data.years), map: data.map });
+            TT.setTodoNames(queue.items);
             lessonSteps = new Set(W.allLessons().map((l) => l.step).filter(Boolean));
         }).catch((e) => { console.warn('[teacher-todo] load', e); loading = null; });
     }
@@ -46,23 +48,13 @@ export function openTodo(id) {
 
 /* ================================================================= helpers */
 
-// critic r3 m7: the screen and the print show teachers' words, never code (the CSV keeps the build team's spec).
-const todoName = (e) => {
-    const n = String(e.name || '');
-    const mig = /^Migrate Legacy (.+?)(?: Visuals?)? to B&W Kit Cells$/i.exec(n);
-    if (mig) return `${mig[1]} pictures redrawn in the black-and-white worksheet style`;
-    return teacherName(n.replace(/\s*\(new skill [^)]*\)/i, '').replace(/\s*\(template option\)/i, ' (option)'));
-};
-const skillText = (id) => (id ? (skillLabelOf(id) || W.plainWhy(id)) : '');
-const plainLine = (x) => W.plainWhy(String(x || '').replace(/`([^`]*)`/g, '$1').replace(/\b(?:pane|template):([a-z0-9-]+)/g, '$1 picture').replace(/\b([a-z]+(?:_[a-z0-9]+)*)_\*/g, (m, a) => `the ${a.replace(/_/g, ' ')} skills`));
-function todoTeaches(e) {
-    if (/^vis_migrate/.test(e.id) || /^Migrate Legacy/i.test(e.name)) return 'The same questions as now, drawn in the black-and-white worksheet style, the same on paper and on screen.';
-    if (/^vis_/.test(e.id)) return `New pictures on worksheets and on screen: ${todoName(e).replace(/\s*\(option\)$/i, '').replace(/\s*\(new option on an existing skill\)$/i, '').toLowerCase()}. The pupil answers from the picture.`;
-    return plainLine(e.teaches);
-}
-const isMigrate = (e) => /^vis_migrate/.test(e.id) || /^Migrate Legacy/i.test(e.name);
-const todoLooks = (e) => (isMigrate(e) ? 'Black-and-white boxed cells, drawn the same on paper and on screen.' : plainLine(e.representation));
-const todoCloses = (e) => [...new Set(e.closes.map(plainLine).filter(Boolean))];
+// critic r3 m7, r4 M4/m7: the screen and the print show teachers' words, never code (the CSV keeps the build
+// team's spec). The words come from todo-text.js, which the jargon gate (ws-wrm-page-unit) runs over every entry.
+const todoName = (e) => TT.todoName(e);
+const todoTeaches = (e) => TT.todoTeaches(e);
+const todoLooks = (e) => TT.todoLooks(e);
+const todoCloses = (e) => TT.todoCloses(e);
+const kindLine = (e) => [kindName(e.kind), ...TT.todoKindTail(e)].join(' · ');
 
 const kindName = (k) => (Q.KINDS.find((x) => x[0] === k) || [k, k])[1];
 const domName = (d) => (Q.DOMAINS.find((x) => x[0] === d) || [d, d])[1];
@@ -89,7 +81,7 @@ function groupsOf(items) {
     return out;
 }
 const gradeText = (e) => (e.grades.length ? (e.grades.length > 1 ? `${gradeShort(e.grades[0])}–${gradeShort(e.grades[e.grades.length - 1])}` : gradeShort(e.grades[0])) : '');
-const gradeShort = (g) => (g === 'PK' ? 'Pre-K' : g === 'K' ? 'K' : g === '6' ? '6+' : `Gr ${g}`);
+const gradeShort = (g) => (g === 'PK' ? 'Pre-K' : g === 'K' ? 'K' : g === '6' ? '6+' : g === 'M' ? 'Several grades' : `Gr ${g}`);
 
 /* ================================================================= render */
 
@@ -177,7 +169,7 @@ function specHTML(e) {
     const pairs = e.pairs.map((p) => (W.REP_PAIRS.find((x) => x.id === p) || {}).label).filter(Boolean);
     return `<div class="tvt-spec" id="tvtS-${esc(e.id)}">
       <dl class="tvt-dl">
-        <dt>Kind</dt><dd>${esc(kindName(e.kind))}${e.skill ? ` · ${esc(skillText(e.skill))}` : ''}${e.option ? ` · option: ${esc(plainLine(e.option))}` : ''}</dd>
+        <dt>Kind</dt><dd>${esc(kindLine(e))}</dd>
         <dt>What pupils will do</dt><dd>${esc(todoTeaches(e))}</dd>
         <dt>Gap it fills</dt><dd>${(() => { const c = todoCloses(e); return c.length > 1 ? `<ul class="tvt-ul">${c.slice(0, 6).map((x) => `<li>${esc(x)}</li>`).join('')}${c.length > 6 ? `<li>and ${c.length - 6} more</li>` : ''}</ul>` : esc(c[0] || ''); })()}</dd>
         <dt>How it looks</dt><dd>${esc(todoLooks(e))}${pairs.length ? ` <span class="tvw-tag">${esc(pairs.join(' · '))}</span>` : ''}</dd>
