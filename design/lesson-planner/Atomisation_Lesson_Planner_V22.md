@@ -18,10 +18,10 @@ description: >-
   You Do, retrieval practice, math writing, word problem, scaffolded notes.
 metadata:
   author: loseyourlife
-  version: '21.0'
+  version: '22.0'
   last_updated: '2026-10-16'
   changes: >-
-    V21: the whole print layer is replaced by the MathQuest lesson design
+    V22: the whole print layer is replaced by the MathQuest lesson design
     profile (black, white and one grey #949494; Andika 400/700 self-hosted;
     one size L with 28 pt working digits; A4 default; ruled shared-border cell
     grids; answer slots sized by B(n); hint scaffolds that fade and structural
@@ -42,7 +42,7 @@ metadata:
     worked example pack are inside it.
 ---
 
-# Atomisation Lesson Planner — Version 21.0
+# Atomisation Lesson Planner — Version 22.0
 
 Generate evidence-based lesson materials grounded in Atomisation (Boulton;
 Barton), Rosenshine's Principles of Instruction, Cognitive Load Theory
@@ -65,7 +65,7 @@ MathQuest quality rubric; LV = Lessons Vision; LLP = Lesson Library Plan; AUD = 
 (2026-10-16); OR = owner ruling 2026-10-16.
 
 **Owner defaults.** Ten questions in the audit (Q1–Q10) and one extra are not yet answered by the owner.
-V21 is built with the recommended answer for each, marked **Owner default (2026-10-16, recommended; may
+V22 is built with the recommended answer for each, marked **Owner default (2026-10-16, recommended; may
 change)** wherever it applies, and listed together in §8.13 so each can be flipped in one place.
 
 ---
@@ -284,7 +284,7 @@ All circulation, Show Call, and feedback scripts must operate at **Process** or
 
 ### Faded Worked Examples / Completion Problems (Sweller; Renkl, 1997)
 
-> **V21 changes to this section.** On paper the fade is: Model = the anchor chart (worked, newest mark grey); Guided = first step in grey, hints in grey; Independent = hint on the first cell only; structural scaffolds (digit grid, regroup strip, frames, unit word) stay at every level (§8.12.5). Any "★ = pre-filled steps + text hint / ★★ final step blank / ★★★ blank" wording below is read this way.
+> **V22 changes to this section.** On paper the fade is: Model = the anchor chart (worked, newest mark grey); Guided = first step in grey, hints in grey; Independent = hint on the first cell only; structural scaffolds (digit grid, regroup strip, frames, unit word) stay at every level (§8.12.5). Any "★ = pre-filled steps + text hint / ★★ final step blank / ★★★ blank" wording below is read this way.
 
 A faded worked example is a partially-completed problem where the teacher has already filled in
 the first one or two steps, and the student completes the rest. Unlike a text hint ("remember to
@@ -353,7 +353,7 @@ presentation, not just the numbers, for any spatial, graphical, or geometric con
 
 ### Chunked Flow — I Do / We Do / I Do / We Do (CLT; Element Interactivity)
 
-> **V21 changes to this section.** First ask whether the routine should be two lessons (one new thing per step, PED P-1).
+> **V22 changes to this section.** First ask whether the routine should be two lessons (one new thing per step, PED P-1).
 
 When a routine has four or more new student steps, presenting all steps in a single 12-minute
 I Do risks cognitive overload: students cannot hold the earlier steps in working memory while
@@ -529,7 +529,7 @@ atoms fit together — the best possible condition for learning the routine.
 
 ### Mathematical Writing for ELL/SPED Students
 
-> **V21 changes to this section.** Written responses are numbers, signs, check boxes or words from a bank; sentences are said, not written (PED P-13). Every sentence-writing activity below is oral, printed on teacher pages only.
+> **V22 changes to this section.** Written responses are numbers, signs, check boxes or words from a bank; sentences are said, not written (PED P-13). Every sentence-writing activity below is oral, printed on teacher pages only.
 Every lesson must include at least one structured mathematical writing
 opportunity. Research: SRSD & PRISM✓ (Hughes et al., 2020–2025); Hamline ELL
 Writing (2020); RDW Process (Eureka Math); Sentence Frames (Colorín Colorado);
@@ -562,7 +562,7 @@ vocabulary of teaching from which all tips, corrections, scripts, and delivery l
 
 ### CATEGORY 1 — Checking for Understanding and Formative Assessment
 
-> **V21 changes to this section.** Diagnostic multiple-choice questions are fine on the board and on mini whiteboards; a printed pupil item stays a production item (PED P-29).
+> **V22 changes to this section.** Diagnostic multiple-choice questions are fine on the board and on mini whiteboards; a printed pupil item stays a production item (PED P-29).
 
 | # | Strategy | Description | Source | Rating |
 |---|----------|-------------|--------|--------|
@@ -893,7 +893,7 @@ above. This is not a checklist — it is a standard:
   "Say this after me: [correct answer]." Not: "Can you say that in a full sentence?"
 
 
-> **V21 changes to this section.** Every SAY / ASK sentence is 12 words or fewer, here and in the Always / Never rules (the V20 "15 words" line is corrected) [P-LG-12].
+> **V22 changes to this section.** Every SAY / ASK sentence is 12 words or fewer, here and in the Always / Never rules (the V20 "15 words" line is corrected) [P-LG-12].
 
 ### Educational Research Reminder Spec
 
@@ -907,7 +907,7 @@ and student group, and genuinely changes what the teacher does. Not every sectio
 Do not add a reminder just to add theory. Ask: *would a busy teacher instinctively do the
 wrong thing here without this reminder?* If yes, include it.
 
-**Format (V21):** the `Research:` box of §10.5 (T-BOX-4): a 3 mm rounded box, 0.75 pt black outline, no
+**Format (V22):** the `Research:` box of §10.5 (T-BOX-4): a 3 mm rounded box, 0.75 pt black outline, no
 fill; the black line-art `research` icon (a book, Appendix B) at 5.8 mm in the left column; then
 `Research:` in bold, a 2–5 word memorable title in bold, and 1–2 sentences at 11 pt: the finding + why it
 matters HERE, for THESE students, at THIS moment in the lesson. No colour, no emoji. HTML:
@@ -964,7 +964,7 @@ pupil page, apply these four rules first. They override anything in the format t
    box for a decision. One slot width per band, B(n) for the band's longest answer.
 2. **No composed writing.** Convert each free-writing prompt as follows; nothing else is allowed:
 
-   | V20 prompt | V21 printed form | Or |
+   | V20 prompt | V22 printed form | Or |
    |---|---|---|
    | "Explain", "Why?", "How do you know?", "Because: ___", "I notice: ___" | Check one box between two printed reasons | Oral `Say:` frame on the teacher page |
    | "Proof: ___" | The equation frame `__ ○ __ = __` (lines and a circle) | — |
@@ -2464,7 +2464,7 @@ rule with a 1.5 pt top.
 
 Pupil band vocabulary (no other labels): `What's New:` `Vocabulary:` `Rule:` `Remember:` `Warm-up:`
 `Steps:` `Model:` `Say:` `Guided Practice:` `Independent Practice:` `More Practice:` `Mixed Review:`
-`Workspace:`, `Another example:` (anchor chart: the other cases, drawn all in black) and, new in V21 (**Owner default (2026-10-16, recommended; may change) — Q4**),
+`Workspace:`, `Another example:` (anchor chart: the other cases, drawn all in black) and, new in V22 (**Owner default (2026-10-16, recommended; may change) — Q4**),
 `Number sense: A` / `Number sense: B`. Never all capitals, never reversed out (white on black), never in a
 tab, never rotated.
 
@@ -2496,7 +2496,7 @@ Teacher band labels (teacher pages only): `Lesson guidance:` `Lesson flow:` `Mat
   the ones track (about 26 mm at L), with no overhang. The stack is centred in its cell; the cell is sized so
   the empty-band test (below) passes honestly, never by stretching the rule.
 - **CL-9** In a 1-column stacked layout the stack is centred in the leftmost 62 mm; the rest is open
-  working space. (No V21 page uses a 1-column stack: the exit slip is a 2 × 2 grid, §9.7.)
+  working space. (No V22 page uses a 1-column stack: the exit slip is a 2 × 2 grid, §9.7.)
 - **CL-10** Quiet letter `a.` `b.` … at 10 pt, 1.5 mm from the top-left corners. Letters restart at `a.` on
   each page that is handed out alone (every pupil page in this pack). Model and Guided cells are
   unlabelled and not counted in the Score.
@@ -2556,7 +2556,7 @@ gives n = 2 because 10 is a possible answer. Never draw a blank with underscore 
 - **OR-c** "A picture is the same size in every card of a page, up to 1.25× its minimum. When the pupil works ON the
   picture (shade, partition, mark, plot, draw), the picture is the answer zone and takes the spare height."
 
-How V21 applies them [AUD §3a builder notes]:
+How V22 applies them [AUD §3a builder notes]:
 - OR-a's "add a problem" comes after the work zones are filled and stops at the role's ceiling (§8.12.1).
 - **The anchor chart is the one exception to "never enlarge":** it is a wall poster, so its step drawings
   enlarge to fill the page, never below 0.8× of the size they would have elsewhere (other examples ≥ 0.85×)
@@ -2720,7 +2720,7 @@ P-page from Part 9.
 
 ### 8.13 Owner defaults in force (2026-10-16, recommended; may change)
 
-| Q | Question | V21 builds with | Where it applies | To flip |
+| Q | Question | V22 builds with | Where it applies | To flip |
 |---|---|---|---|---|
 | Q1 | Use the site's pupil packet when one exists? | Yes | §8.12.9 | Always build P-pages |
 | Q2 | Paper | A4 default, Letter on request | §8.1 | Letter default |
@@ -3003,7 +3003,7 @@ kind when one item alone would leave an empty band (Score then counts items). Re
     OTHER pages are allowed (soft, LR-5), never on the same page; (3) the same fact in a different representation
     (ten frame, bond, equation) is a different item only on a different page — **except a chart example: it never
     returns, in any representation, on any page, and neither does its turn-around (LR-5)**. Never an exact repeat in one
-    representation. The exit slip takes items not on Practice, using a turn-around or another representation
+    representation. The exit slip takes items not on Practice in the same representation, using a turn-around or another representation
     when the pool is spent. Example, make 10: 11 ordered facts (0 + 10 … 10 + 0); the 2 chart examples (7 + 3, 4 + 6)
     are places and their turn-arounds (3 + 7, 6 + 4) are forbidden → **7 facts left for the pages**. Lesson sheet 4
     (1 + 9, 2 + 8, 5 + 5, 0 + 10) as equations; one Practice page: the 3 facts left (9 + 1, 8 + 2, 10 + 0) as
@@ -3247,7 +3247,7 @@ code. Rules:
 ---
 
 
-> **V21 changes to this section.** CCSS and EE codes appear only on teacher pages and in the pupil footer [SC-5, HD-30].
+> **V22 changes to this section.** CCSS and EE codes appear only on teacher pages and in the pupil footer [SC-5, HD-30].
 
 ### STEP 3 — Write the I Can Statement
 
@@ -3256,7 +3256,7 @@ constraint optional and in brackets, no full stop, at most 60 characters [HD-10]
 page of the pack, teacher pages included [HD-11]. Examples: "I Can add 1–3 (facts to 10)", "I Can subtract
 two-digit numbers (no regrouping)".
 
-> **V21 changes to this section.** Method A "EXTRACT verbatim" applies only to the teacher's own material. Third-party (publisher) problems are rewritten in our own words with the same numbers and structure, or used through Method E (the printed sheet), because every page carries the © Cultivating the Digital line [P-33]. **Owner default (2026-10-16, recommended; may change) — Q6.** Method B "KaTeX" becomes "Andika HTML: true glyphs, stacked fractions" (Part 19). Method C SVG follows Appendix D. Method E: the pupil-page reference is a 3 mm rounded box with a 0.75 pt outline and no fill.
+> **V22 changes to this section.** Method A "EXTRACT verbatim" applies only to the teacher's own material. Third-party (publisher) problems are rewritten in our own words with the same numbers and structure, or used through Method E (the printed sheet), because every page carries the © Cultivating the Digital line [P-33]. **Owner default (2026-10-16, recommended; may change) — Q6.** Method B "KaTeX" becomes "Andika HTML: true glyphs, stacked fractions" (Part 19). Method C SVG follows Appendix D. Method E: the pupil-page reference is a 3 mm rounded box with a 0.75 pt outline and no fill.
 
 ### STEP 4 — Classify and Extract Problems
 
@@ -3355,7 +3355,7 @@ Section ④  We Do   → Method F (mini whiteboards)
 Section ⑥  You Do  → Method E (printed sheet)
                      Students work through the source PDF worksheet
                      independently on paper. Teacher circulates using the
-                     V21 circulation script. The generated lesson references
+                     V22 circulation script. The generated lesson references
                      the printed sheet by page and problem number.
 ```
 
@@ -3402,11 +3402,11 @@ genuinely illegible or erroneous.
 
 ---
 
-> **V21 changes to this section.** The rows "Check Question = 3-option MC" and "Exit ticket + reflection frame" follow §9 and Part 4: the Check Question is board / mini-whiteboard only; the exit is the 2-up slip (P6) with no written reflection. "Common Student Responses T6b" is removed.
+> **V22 changes to this section.** The rows "Check Question = 3-option MC" and "Exit ticket + reflection frame" follow §9 and Part 4: the Check Question is board / mini-whiteboard only; the exit is the 2-up slip (P6) with no written reflection. "Common Student Responses T6b" is removed.
 
 ### STEP 5 — Assign Extracted Problems to Lesson Sections
 
-Map each usable problem from the PDF to the correct section of the V21 lesson
+Map each usable problem from the PDF to the correct section of the V22 lesson
 structure. Use this logic:
 
 | Problem type in PDF | Where it goes | Permitted methods |
@@ -3443,7 +3443,7 @@ is recommended:
 | ⑦ Plenary | Mini whiteboards | Generated exit ticket |
 
 This is not a workaround — it is a sound pedagogical structure. The generated
-V21 lesson provides the complete teaching sequence. The printed PDF provides
+V22 lesson provides the complete teaching sequence. The printed PDF provides
 the independent practice. Both work together; neither replaces the other.
 
 **Printed sheet reference format (for teacher page):**
@@ -3478,10 +3478,10 @@ If the PDF has fewer problems than the lesson needs → see Step 6.
 
 ### STEP 6 — Identify and Create Missing Elements
 
-A worksheet or textbook page almost never contains everything V21 requires.
+A worksheet or textbook page almost never contains everything V22 requires.
 After assigning extracted problems, check every required element against the
-V21 structure and create anything missing. This is mandatory — the PDF
-content drives what problems students practise, but V21 requirements still
+V22 structure and create anything missing. This is mandatory — the PDF
+content drives what problems students practise, but V22 requirements still
 govern what the lesson must contain.
 
 **Elements almost always missing from uploaded worksheets — create all of these:**
@@ -3507,8 +3507,8 @@ govern what the lesson must contain.
 > Note: A worksheet that only has practice problems gives you the You Do
 > section. Everything else — the entire teaching sequence, all delivery scripts,
 > all scaffolding, all ELL support, the assessment structures — must be created
-> from scratch. This is the main value of V21 applied to an uploaded resource:
-> the PDF provides the content, V21 provides the complete lesson.
+> from scratch. This is the main value of V22 applied to an uploaded resource:
+> the PDF provides the content, V22 provides the complete lesson.
 
 ---
 
@@ -3526,7 +3526,7 @@ Before generating the lesson, verify:
 ☐ Section ⑥ You Do contains only paper-based problems — on the generated student worksheet or on a referenced printed sheet.
 ☐ The CCSS standard matches the content of the PDF — not just the grade level.
 ☐ The I Can statement matches both the CCSS and the specific PDF content.
-☐ All V21 mandatory requirements are present (use the Mandatory Rules section as a checklist).
+☐ All V22 mandatory requirements are present (use the Mandatory Rules section as a checklist).
 ☐ Problems from the PDF are used verbatim or recreated faithfully — no accidental paraphrasing.
 ☐ Any skipped problems (Method D) are noted on the teacher page with a reason.
 ☐ T6 Answer Key includes answers for ALL problems — generated, recreated, referenced by page, or delivered on mini whiteboards.
@@ -3535,7 +3535,7 @@ Before generating the lesson, verify:
 ---
 
 
-**V21 print checks (add to the quality check):** run Appendix E. In short: A4; Andika on every node; three paints plus the accent on step marks and the key colour on answers; no emoji; B(n) slots; facsimile keys; © line and strand tab on every page; every page ≥ 50 % used; no cell band ≥ 30 % empty.
+**V22 print checks (add to the quality check):** run Appendix E. In short: A4; Andika on every node; three paints plus the accent on step marks and the key colour on answers; no emoji; B(n) slots; facsimile keys; © line and strand tab on every page; every page ≥ 50 % used; no cell band ≥ 30 % empty.
 
 ### PDF Problem Method — Quick Decision Guide
 
@@ -3643,7 +3643,7 @@ Layout and type: §10.9 (T1 row) and §8.3. **Content order — top to bottom, n
 6. `Vocabulary:`
 
 ---
-> **V21 changes to this section.** Tip titles keep their rules. Emoji prefixes are replaced by the black line-art icons `tip`, `language`, `why` (or no icon); the amber box is the `Tip:` box of §10.5. Label: `Tip:` (not "LESSON TIP").
+> **V22 changes to this section.** Tip titles keep their rules. Emoji prefixes are replaced by the black line-art icons `tip`, `language`, `why` (or no icon); the amber box is the `Tip:` box of §10.5. Label: `Tip:` (not "LESSON TIP").
 
 #### Top Tips for Teaching Success — Specification
 
@@ -3765,7 +3765,7 @@ the pupil page (P3 `Vocabulary:`) are marked with a 5 mm check box beside the wo
 ```
 
 ---
-> **V21 changes to this section.** Tables per §10.4: 0.75 pt rules, bold black head row under a 1.5 pt rule, no fills or zebra rows. Atom types, step names and mistake names are bold black sentence case (for example **Zero drop**), never blue, never ALL CAPS. The Critical Atom is marked with the `key` icon.
+> **V22 changes to this section.** Tables per §10.4: 0.75 pt rules, bold black head row under a 1.5 pt rule, no fills or zebra rows. Atom types, step names and mistake names are bold black sentence case (for example **Zero drop**), never blue, never ALL CAPS. The Critical Atom is marked with the `key` icon.
 
 #### Section 1 — Conceptual Atomisation
 
@@ -3863,7 +3863,7 @@ Example: `<td><span class="mistake-name">ADD INSTEAD</span></td>`
 
 ---
 
-> **V21 changes to this section.** Same table treatment as T2. The Check Question is shown on the board and mini whiteboards (never printed for pupils). Print once per unit; tab id `Reference`.
+> **V22 changes to this section.** Same table treatment as T2. The Check Question is shown on the board and mini whiteboards (never printed for pupils). Print once per unit; tab id `Reference`.
 
 ### PART 2: Reference Key (Teacher Page T2b)
 
@@ -3964,13 +3964,13 @@ Mistake names in bold black (§10.4).
    (Prerequisite Check, Number sense, Anchor chart, Lesson sheet, Practice ×n, Word problem, Exit slip);
    manipulatives; any lesson-specific materials.
 
-**V21 section numbering on T3–T5:** 1 Prerequisite Check · 2 Number sense · 3 Spaced retrieval · 4 Chaining
+**V22 section numbering on T3–T5:** 1 Prerequisite Check · 2 Number sense · 3 Spaced retrieval · 4 Chaining
 Bridge · 5 I Do · 6 We Do · 7 Check Question · 8 You Do · 9 Word problem · 10 Plenary. The V20 section
 specifications below keep their content; their V20 names are given in brackets.
 
 #### Section 1a — Number Sense Warm-Up (5 Minutes)
 
-> **V21 changes to this section.** Now **Section 2 · Number sense (5 min)**, pupil page P1 (§9.2, Owner default Q4). Both bands print as production slots in bands A / B; the V20 two-column layout is gone. Teacher answers in the key colour.
+> **V22 changes to this section.** Now **Section 2 · Number sense (5 min)**, pupil page P1 (§9.2, Owner default Q4). Both bands print as production slots in bands A / B; the V20 two-column layout is gone. Teacher answers in the key colour.
 
 **What it is.** Five number-sense items in two bands on pupil page P1 (§9.2): band A (numbers 2–4 grades
 below) and band B (the same five types, numbers 1–2 grades below). Drawn from the Number Sense Practice Bank,
@@ -3992,7 +3992,7 @@ production slot (box, line, circle); nothing is multiple choice.
 
 #### Section 1b — Spaced Retrieval (5 Minutes)
 
-> **V21 changes to this section.** Now **Section 3 · Spaced retrieval (3 min)**: mini whiteboards only, nothing printed (Owner default Q3). Domain labels print as plain 11 pt words in brackets on the teacher page (grey is never used for words). Option B is 1–2 grades below, as in the bank table.
+> **V22 changes to this section.** Now **Section 3 · Spaced retrieval (3 min)**: mini whiteboards only, nothing printed (Owner default Q3). Domain labels print as plain 11 pt words in brackets on the teacher page (grey is never used for words). Option B is 1–2 grades below, as in the bank table.
 
 **What it is.** Three quick cross-domain questions on **mini whiteboards only — nothing is printed**
 (Owner default Q3). Earlier topics only, one per domain, 1–2 grades below the lesson (Option B of the bank
@@ -4010,7 +4010,7 @@ common wrong answer without naming the pupil, then the next question.
 
 #### Section 2 — Prerequisite Check (3 Minutes)
 
-> **V21 changes to this section.** Now **Section 1 · Prerequisite Check (4 min)**, the printed page P0 (§9.1): 3–4 items, most basic first, each tagged on the key "If missed → Lesson …". Run it "3-2-1, show me" in the same order. The data loop uses T-LOOP shapes; the routing table is on T6 (§8.12.8).
+> **V22 changes to this section.** Now **Section 1 · Prerequisite Check (4 min)**, the printed page P0 (§9.1): 3–4 items, most basic first, each tagged on the key "If missed → Lesson …". Run it "3-2-1, show me" in the same order. The data loop uses T-LOOP shapes; the routing table is on T6 (§8.12.8).
 
 
 > **SECTION TIP PLACEMENT:** Render a `.section-tip` box at the top of this section.
@@ -4079,7 +4079,7 @@ Numbered circle: ②
 
 #### Section ②b — Chaining Bridge (1 Minute)
 
-> **V21 changes to this section.** Now **Section 4 · Chaining Bridge (1 min)**.
+> **V22 changes to this section.** Now **Section 4 · Chaining Bridge (1 min)**.
 
 
 **What this is:** A brief, named moment between the Prerequisite Check and the I Do where the
@@ -4106,7 +4106,7 @@ Numbered circle: ②b
 
 #### Section 3 — Instruction ("I Do") — Silent Teacher (12 Minutes)
 
-> **V21 changes to this section.** Now **Section 5 · I Do (12 min)**. Keep Steps 0–5 exactly. Step 1 "display the visual model alongside" = the **anchor chart** is the board copy (Board = Paper): each step is a panel in the skill's own drawing, newest marks grey. "CRA stage in a green callout" becomes a plain `CRA stage: Pictures` line. Labelling a wrong example on the board stays board work: write the word Wrong beside it; it is never printed on pupil pages (Find the mistake is paused).
+> **V22 changes to this section.** Now **Section 5 · I Do (12 min)**. Keep Steps 0–5 exactly. Step 1 "display the visual model alongside" = the **anchor chart** is the board copy (Board = Paper): each step is a panel in the skill's own drawing, newest marks grey. "CRA stage in a green callout" becomes a plain `CRA stage: Pictures` line. Labelling a wrong example on the board stays board work: write the word Wrong beside it; it is never printed on pupil pages (Find the mistake is paused).
 
 
 > **SECTION LESSON TIP PLACEMENT:** Render a `Tip:` box at the top of this section.
@@ -4216,7 +4216,7 @@ Numbered circle: ③
 
 #### Section 4 — Guided Practice ("We Do" — 8 Minutes)
 
-> **V21 changes to this section.** Now **Section 6 · We Do (8 min)**. The pairing, think-aloud and partner talk stay. The "purple box" sentence frame becomes `Say:` lines on the teacher page; the expected answer is in the key colour. Pupil page: the `Guided Practice:` band beside `Steps:` (2–3 cells, cell 1 with step 1 in grey).
+> **V22 changes to this section.** Now **Section 6 · We Do (8 min)**. The pairing, think-aloud and partner talk stay. The "purple box" sentence frame becomes `Say:` lines on the teacher page; the expected answer is in the key colour. Pupil page: the `Guided Practice:` band beside `Steps:` (2–3 cells, cell 1 with step 1 in grey).
 
 
 > **SECTION TIP PLACEMENT:** Render a `.section-tip` box at the top of this section.
@@ -4299,7 +4299,7 @@ Numbered circle: ④
 
 #### Section 5 — Check Question (3 Minutes)
 
-> **V21 changes to this section.** Now **Section 7 · Check Question (3 min)**, board and mini whiteboards only, never printed. Correct / wrong option colours become a check mark beside the right option (key colour) and the mistake name in bold beside each wrong one.
+> **V22 changes to this section.** Now **Section 7 · Check Question (3 min)**, board and mini whiteboards only, never printed. Correct / wrong option colours become a check mark beside the right option (key colour) and the mistake name in bold beside each wrong one.
 
 
 > **SECTION TIP PLACEMENT:** Render a `.section-tip` box at the top of this section.
@@ -4359,7 +4359,7 @@ Numbered circle: ⑤
 
 #### Section 6 — Independent Practice ("You Do" — 20 Minutes)
 
-> **V21 changes to this section.** Now **Section 8 · You Do (15 min)** (the V20 "20 Minutes" header is corrected to 15). "Grades 3–5 target 8–10" becomes the Practice counts of §8.12.1 (6 per page, 4 for long procedures, one-symbol answers up to 12–16). ★ / ★★ / ★★★ are the fade levels of Part 7. Circulation, peer-tutoring and early-finisher scripts stay; early-finisher Option C ("Write one sentence that explains WHY") becomes an oral frame.
+> **V22 changes to this section.** Now **Section 8 · You Do (15 min)** (the V20 "20 Minutes" header is corrected to 15). "Grades 3–5 target 8–10" becomes the Practice counts of §8.12.1 (6 per page, 4 for long procedures, one-symbol answers up to 12–16). ★ / ★★ / ★★★ are the fade levels of Part 7. Circulation, peer-tutoring and early-finisher scripts stay; early-finisher Option C ("Write one sentence that explains WHY") becomes an oral frame.
 
 
 > **SECTION TIP PLACEMENT:** Render a `.section-tip` box at the top of this section.
@@ -4479,7 +4479,7 @@ Numbered circle: ⑥
 
 #### Section 6b — Word Problem (7–8 minutes, within You Do time)
 
-> **V21 changes to this section.** Now **Section 9 · Word problem (in You Do)**, pupil page P5 (§9.6). The italic bordered box becomes the story box (no italic); the 2 × 2 emoji grid is removed. Delivery steps 1–5 stay.
+> **V22 changes to this section.** Now **Section 9 · Word problem (in You Do)**, pupil page P5 (§9.6). The italic bordered box becomes the story box (no italic); the 2 × 2 emoji grid is removed. Delivery steps 1–5 stay.
 
 
 **What this section is:** Every student works through one word problem using
@@ -4525,7 +4525,7 @@ Numbered circle: ⑥b
 
 #### Section 7 — Plenary — Exit Ticket + Consolidation (7 Minutes)
 
-> **V21 changes to this section.** Now **Section 10 · Plenary (7 min)**. The exit question on mini whiteboards stays; the written reflection page is replaced by the 2-up exit slip P6 (Owner default Q8). The thumbs check stays oral.
+> **V22 changes to this section.** Now **Section 10 · Plenary (7 min)**. The exit question on mini whiteboards stays; the written reflection page is replaced by the 2-up exit slip P6 (Owner default Q8). The thumbs check stays oral.
 
 
 > **SECTION TIP PLACEMENT:** Render a `.section-tip` box at the top of this section.
@@ -4605,7 +4605,7 @@ words of an oral frame. No underlining, no italics, no second colour.
 ---
 ### PART 5: Embedded Teaching and Feedback Boxes
 
-> **V21 changes to this section.** Keep the four box types and their decision rules. Render them as T-BOX-1…4 (§10.5): black only, line-art icons, no emoji; `Watch:` has the 1.5 pt border. `Note:` stays plain text.
+> **V22 changes to this section.** Keep the four box types and their decision rules. Render them as T-BOX-1…4 (§10.5): black only, line-art icons, no emoji; `Watch:` has the 1.5 pt border. `Note:` stays plain text.
 
 
 **What this is:** Boxes are embedded directly within the delivery script at the moment
@@ -4729,7 +4729,7 @@ No upper limit — generate as many as the lesson warrants.
 
 ## Optional Pedagogical Enhancement Decision Guide
 
-> **V21 changes to this section.** Enhancements 1, 3, 4 and 5 are teacher-side. Enhancement 2 (Variation set): the pupil-printed set is PAUSED (Reason It pages are paused); its oral use stays, and if un-paused it prints as two check boxes `Works` / `Does not work` with no "Why" line. Enhancement 3 (Marzano) pupil box: the word + a drawing zone (`Workspace:` band), never "in my own words". Enhancement 5 is oral.
+> **V22 changes to this section.** Enhancements 1, 3, 4 and 5 are teacher-side. Enhancement 2 (Variation set): the pupil-printed set is PAUSED (Reason It pages are paused); its oral use stays, and if un-paused it prints as two check boxes `Works` / `Does not work` with no "Why" line. Enhancement 3 (Marzano) pupil box: the word + a drawing zone (`Workspace:` band), never "in my own words". Enhancement 5 is oral.
 
 
 Choose **maximum 2 per lesson**. Combined time cost must not exceed 6 minutes.
@@ -5106,8 +5106,8 @@ Before generating materials, ask:
    request, best effort, with Andika embedded.
 8. **Uploaded resource** — PDF, image, or pupil worksheet uploaded?
    If yes → follow the **PDF/Image Source Workflow** in full (Part 18). Do NOT skip any step. The
-   uploaded material drives the lesson content; this V21 format drives the lesson structure and the
-   print design. All V21 requirements still apply in full — the PDF replaces invented content, not the
+   uploaded material drives the lesson content; this V22 format drives the lesson structure and the
+   print design. All V22 requirements still apply in full — the PDF replaces invented content, not the
    lesson framework.
 9. **Optional enhancements** — Which (if any)? Apply decision logic if
    unspecified. If using Chunked Flow, limit to one optional enhancement.
@@ -5156,7 +5156,7 @@ ask before generating pupil materials. Grades print as "Level N" on pupil pages 
 "Grade N" [SC-5].
 
 ---
-> **V21 changes to this section.** The bullets that encoded the V20 look (class names, pixel sizes, italics, colours, emoji cues, S1–S5 card layouts, the V20 footer and T1 type treatment, warm-up workspace boxes) are deleted; Part 8–10 and the print rules R1–R12 (Part 20) replace them. Every pedagogy bullet is kept, and the ones that mixed pedagogy with the old look are restated at the end of this part.
+> **V22 changes to this section.** The bullets that encoded the V20 look (class names, pixel sizes, italics, colours, emoji cues, S1–S5 card layouts, the V20 footer and T1 type treatment, warm-up workspace boxes) are deleted; Part 8–10 and the print rules R1–R12 (Part 20) replace them. Every pedagogy bullet is kept, and the ones that mixed pedagogy with the old look are restated at the end of this part.
 
 ## Mandatory Rules — Organised by Lesson Phase
 
@@ -5413,7 +5413,7 @@ section for the full specification.
 
 ---
 
-### Rules restated in V21 form (they replace the deleted V20 bullets that mixed pedagogy with the old look)
+### Rules restated in V22 form (they replace the deleted V20 bullets that mixed pedagogy with the old look)
 
 **ALWAYS:**
 - Put at most 3 boxes on T1 in the `Lesson guidance:` band (`Tip:` / `Watch:`): whole-lesson strategic level
@@ -5446,7 +5446,7 @@ section for the full specification.
 
 ### OPTIONAL ENHANCEMENTS (max 2 per lesson)
 
-> **V21 changes to this section.** Variation Theory: the pupil-printed set is paused; oral use only.
+> **V22 changes to this section.** Variation Theory: the pupil-printed set is paused; oral use only.
 
 
 | Enhancement | Use when | Skip when | Time cost |
@@ -5600,7 +5600,7 @@ A band: `<div class="band"><div class="strip"><b>Guided Practice:</b><span>Add.<
 Answers carry `class="ka"` (HTML) or `data-ka` (SVG): hidden on pupil pages, key colour on keys.
 
 ```css v21-house
-/* ===== V21 house stylesheet (copy whole; size L; A4 default) ===== */
+/* ===== V22 house stylesheet (copy whole; size L; A4 default) ===== */
 /* 1. Font. Andika 6.x (SIL OFL 1.1), self-hosted. FONT_URL = folder that holds the two woff2 files. */
 @font-face { font-family: "Andika"; font-style: normal; font-weight: 400; font-display: block;
   src: local("Andika"), local("Andika-Regular"), url("FONT_URL/Andika-Regular.woff2") format("woff2"); }
@@ -5765,7 +5765,7 @@ html, body { margin: 0; padding: 0; background: #fff; }
 
 ---
 
-## Appendix B — Icon library [lesson-icons.js + V21 teacher icons, AUD T-ICON]
+## Appendix B — Icon library [lesson-icons.js + V22 teacher icons, AUD T-ICON]
 
 All icons are line art in a 10 × 10 box, drawn at 5.8 mm (8 mm on the anchor chart), stroke 1.5 pt
 (converted to box units by the `icon()` function in Appendix D), round joins and caps, no fill except the
@@ -5808,7 +5808,7 @@ path data is the `ICONS` object in Appendix D.
 ### C.1 The controlled instruction library
 
 One string per task, reused word for word on every page. New strings may be added only by adding a key
-here. The V21 addition is marked.
+here. The V22 addition is marked.
 
 | Key | Instruction string | Used for |
 |---|---|---|
@@ -5939,9 +5939,9 @@ here. The V21 addition is marked.
 | `default-circle-all` | Circle all the correct answers. | default adapter: multi-select items |
 | `default-order` | Write the numbers in order. | default adapter: ordering items with no stated direction |
 | `default-solve` | Solve. | default adapter: any other answer type |
-| `story-rcdws` (V21) | Read the story. Draw it. Solve. | word problem v1 with the RCDWS panel (P5) |
-| `partition` (V21) | Draw a line to make 2 equal parts. | partition a shape into halves (Appendix H) |
-| `equal-parts` (V21) | Are the parts equal? Check one box. | judge equal parts; labels `Equal parts` / `Not equal parts` |
+| `story-rcdws` (V22) | Read the story. Draw it. Solve. | word problem v1 with the RCDWS panel (P5) |
+| `partition` (V22) | Draw a line to make 2 equal parts. | partition a shape into halves (Appendix H) |
+| `equal-parts` (V22) | Are the parts equal? Check one box. | judge equal parts; labels `Equal parts` / `Not equal parts` |
 
 Rules: at most 12 words and three sentences, each starting with a print verb (a question may open a
 decide instruction); the same task always gets the same string; "Do _not_ solve." always last, with
@@ -6002,7 +6002,7 @@ strokes from §8.5, grey only for shaded parts and hints, answers tagged `data-k
 show only on keys. Minimum sizes are in §19.3. Each function's comment states its drawing rules.
 
 ```js v21-recipes
-// ===== V21 drawing recipes (copy whole). Pure functions -> SVG / HTML strings. =====
+// ===== V22 drawing recipes (copy whole). Pure functions -> SVG / HTML strings. =====
 // Units: every viewBox is in millimetres and the <svg> width/height are the same numbers in mm,
 // so 1 viewBox unit = 1 mm on paper. Strokes are given in pt and converted (1 pt = 0.3528 mm).
 // Text is Andika. Ink: '#000'; the one grey '#949494'; nothing else on a pupil drawing.
@@ -6281,12 +6281,12 @@ export const ICONS = {
   decide: '<path d="M3 9.2 V1.2"/><path d="M1.4 2.9 L3 1 L4.6 2.9"/><path d="M7 0.8 V8.8"/><path d="M5.4 7.1 L7 9 L8.6 7.1"/>',
   check: '<rect x="0.9" y="0.9" width="8.2" height="8.2" rx="1"/><path d="M2.6 5.2 L4.4 7 L7.6 2.9"/>',
   say: '<path d="M1.5 1.4 H8.5 Q9.3 1.4 9.3 2.2 V6 Q9.3 6.8 8.5 6.8 H4.4 L2.2 9 L2.6 6.8 H1.5 Q0.7 6.8 0.7 6 V2.2 Q0.7 1.4 1.5 1.4 Z"/>',
-  // V21 additions for the word-problem routine (RCDWS) - same style:
+  // V22 additions for the word-problem routine (RCDWS) - same style:
   read: '<path d="M5 2.2 Q3 1 0.8 1.4 V8.4 Q3 8 5 9.2 Q7 8 9.2 8.4 V1.4 Q7 1 5 2.2 Z"/><path d="M5 2.2 V9.2"/>',
   ringnum: '<ellipse cx="5" cy="4.2" rx="4.1" ry="3.4"/><path d="M4.4 2.6 L5.4 2 V6.4"/><path d="M0.8 9.3 H9.2"/>',
   underline: '<path d="M0.8 5 Q2.4 1.6 4 5 Q5.6 8.4 7.2 5 Q8.2 3 9.2 4"/><path d="M0.8 9 H9.2"/>',
   draw: '<rect x="0.8" y="0.8" width="8.4" height="8.4" rx="1"/><path d="M2.4 6.8 Q3.6 3 5 5.4 Q6.4 7.6 7.6 3.2"/>',
-  // V21 teacher icons (T-ICON), drawn in BLACK on teacher pages:
+  // V22 teacher icons (T-ICON), drawn in BLACK on teacher pages:
   tip: '<path d="M3.2 7.2 Q1.2 5.6 1.6 3.6 Q2.2 0.8 5 0.8 Q7.8 0.8 8.4 3.6 Q8.8 5.6 6.8 7.2 Z"/><path d="M3.4 8.4 H6.6 M3.8 9.6 H6.2"/>',
   feedback: '<path d="M1.5 1.4 H8.5 Q9.3 1.4 9.3 2.2 V6 Q9.3 6.8 8.5 6.8 H4.4 L2.2 9 L2.6 6.8 H1.5 Q0.7 6.8 0.7 6 V2.2 Q0.7 1.4 1.5 1.4 Z"/><path d="M3 4.2 L4.4 5.4 L7 2.8"/>',
   watch: '<path d="M0.8 5.6 Q5 1.2 9.2 5.6 Q5 10 0.8 5.6 Z"/><circle cx="5" cy="5.6" r="1.5" class="f"/><path d="M5 0.4 V2"/>',
@@ -6409,7 +6409,7 @@ export function shape({ kind = 'rect', w = 42, h = 30, task = 'judge', lines = [
 anchor chart included), then T6. `poolCheck()` reports exact repeats and same-page turn-arounds (E24).
 
 ```js v21-packkit
-// ===== V21 pack kit (copy whole): the page frame, teacher-page parts and pack assembly. =====
+// ===== V22 pack kit (copy whole): the page frame, teacher-page parts and pack assembly. =====
 // Pure functions over a lesson description L and the drawing recipes R (Appendix D). Every page a lesson
 // builds goes through `page()` so the frame (header, strand tab, title, footer, © line) is identical everywhere.
 // L = { title, level, strand, foot, seed, steps: [[iconId, text], ...] }
@@ -6538,8 +6538,8 @@ has step 1 in grey; no item repeats in the packet; the key's answers sit in the 
 Reference implementation (Node + Playwright; adjust `OUT` and the browser path):
 
 ```js v21-selfcheck
-// Runs V21 Appendix E (pre-output self-check) on a rendered pack and writes SELF-CHECK.md next to it.
-// usage: node selfcheck.mjs <pack folder (pack.html, pack.pdf)> <V21 .md file> [chromium executable]
+// Runs V22 Appendix E (pre-output self-check) on a rendered pack and writes SELF-CHECK.md next to it.
+// usage: node selfcheck.mjs <pack folder (pack.html, pack.pdf)> <V22 .md file> [chromium executable]
 // Everything is read from the pack itself: items from data-item on the pupil pages, the pool from its v21-pool JSON.
 import { chromium } from 'playwright';
 import fs from 'node:fs';
@@ -6550,9 +6550,9 @@ const [OUT0, V21MD, BROWSER] = process.argv.slice(2);
 if (OUT0 === '--fixture') { const fx = JSON.parse(fs.readFileSync(V21MD, 'utf8')); const r = poolCheck(fx.pool, fx.pages);
   console.log(`E24 ${r.ok ? 'PASS' : 'FAIL'} ${r.msg}`); process.exit(r.ok ? 0 : 1); }
 const OUT = path.resolve(OUT0);
-// the instruction library = every string in Appendix C.1 of V21 (column 2 of its table)
+// the instruction library = every string in Appendix C.1 of V22 (column 2 of its table)
 const md = fs.readFileSync(V21MD, 'utf8'); const c1 = md.slice(md.indexOf('### C.1'), md.indexOf('### C.2'));
-const LIB = [...c1.matchAll(/^\| `[^`]+`(?: \(V21\))? \| ([^|]+) \|/gm)].map((m) => m[1].trim().replace(/_/g, ''));
+const LIB = [...c1.matchAll(/^\| `[^`]+`(?: \(V22\))? \| ([^|]+) \|/gm)].map((m) => m[1].trim().replace(/_/g, ''));
 const b = await chromium.launch(BROWSER ? { executablePath: BROWSER } : {});
 const p = await b.newPage();
 await p.emulateMedia({ media: 'print' });
@@ -6754,7 +6754,7 @@ const dsh = pages.reduce((a, p) => a + p.dashedNotCut, 0);
 row('E14', 'No dashed line except the cut line (and the missing-digit box)', `${dsh} dashed strokes outside a cut line`, dsh === 0);
 const ins = pages.filter((p) => !p.teacher).flatMap((p) => p.instr);
 const insBad = ins.filter((i) => i.words > 12 || !i.verbs || !i.lib);
-row('E15', `Instructions ≤ 12 words, every sentence starts with a print verb, string in Appendix C.1 (${LIB.length} strings read from V21)`, `${ins.length} instructions; max ${Math.max(...ins.map((i) => i.words))} words; failing: ${[...new Set(insBad.map((i) => i.s))].join(' | ') || 'none'}`, insBad.length === 0);
+row('E15', `Instructions ≤ 12 words, every sentence starts with a print verb, string in Appendix C.1 (${LIB.length} strings read from V22)`, `${ins.length} instructions; max ${Math.max(...ins.map((i) => i.words))} words; failing: ${[...new Set(insBad.map((i) => i.s))].join(' | ') || 'none'}`, insBad.length === 0);
 const say = pages.flatMap((p) => p.sayBlanks);
 row('E16', 'Every frame has ≤ 2 blanks', `Say frames: ${say.length}; blanks per frame ${[...new Set(say)].join(', ')}`, say.every((n) => n <= 2));
 const pairs = pupil.map((p) => [p, keys.find((k) => k.id === p.id + '-key')]);
@@ -6812,8 +6812,8 @@ const cnt = pupil.flatMap((p) => (p.perRow || []).map((n) => p.id + ':' + n));
 row('E27', 'Counters are drawn in rows of at most 5 (RP-21, §19.3)', cnt.length ? cnt.join(', ') : 'no counters', pupil.every((p) => (p.perRow || []).every((n) => n <= 5)));
 row('E25', 'One key per pupil page (anchor chart included)', `${pupil.length} pupil pages, ${keys.length} keys`, pupil.length === keys.length && pupil.every((p) => keys.some((k) => k.id === p.id + '-key')));
 
-const md2 = ['# V21 self-check: ' + path.basename(OUT), '',
-  `Run by \`selfcheck.mjs\` (Appendix E reference implementation, Chromium print media) on \`pack.html\`, ${new Date().toISOString().slice(0, 10)}. Checks are V21 Appendix E (E1–E28 with lettered sub-checks): **${rows.filter((r) => r.pass).length} / ${rows.length} PASS**.`, '',
+const md2 = ['# V22 self-check: ' + path.basename(OUT), '',
+  `Run by \`selfcheck.mjs\` (Appendix E reference implementation, Chromium print media) on \`pack.html\`, ${new Date().toISOString().slice(0, 10)}. Checks are V22 Appendix E (E1–E28 with lettered sub-checks): **${rows.filter((r) => r.pass).length} / ${rows.length} PASS**.`, '',
   '| # | Check | Measured | Result |', '|---|---|---|---|',
   ...rows.map((r) => `| ${r.id} | ${r.check} | ${String(r.measured).replace(/\|/g, '/')} | ${r.pass ? 'PASS' : 'FAIL'} |`), '',
   `**${rows.filter((r) => r.pass).length} / ${rows.length} pass.**`, '',
@@ -6949,7 +6949,7 @@ node gen-sub.mjs <folder with the three files> <output folder> [font folder URL]
 pdftoppm -r 110 -png pack.pdf page
 node selfcheck.mjs <output folder> <this .md file> [chromium executable]     # Appendix E, writes SELF-CHECK.md
 ```
-They are examples of following V21, not a second rule source: where they and the text differ, the text wins.
+They are examples of following V22, not a second rule source: where they and the text differ, the text wins.
 
 ```js v21-example
 // Worked example 1 (Appendix F.1): add 1-3 (facts to 10), Level 1.
@@ -7200,7 +7200,7 @@ const routing = sec('Prerequisite routing:', table(['Question', 'Prerequisite (T
       ['the small number (7 + 3 → 3)', 'Last count only', 'Say the whole frame aloud'],
       ['“I need one more day.” checked', '—', 'Small group tomorrow: Guided page with counters']]), true);
 
-const doc = K.document({ titleTag: 'Add 1–3 lesson pack (V21 sample)', pupil: P, routing, pool: POOL, teacher: [
+const doc = K.document({ titleTag: 'Add 1–3 lesson pack (V22 sample)', pupil: P, routing, pool: POOL, teacher: [
   { id: 'T1', l3: 'Teacher 1', body: T1 }, { id: 'T2', l3: 'Teacher 2', body: T2 }, { id: 'T2b', l3: 'Reference', body: T2b, right: 'Teacher · Print once per unit' },
   { id: 'T3', l3: 'Teacher 3', body: T3 }, { id: 'T4', l3: 'Teacher 4', body: T4 }, { id: 'T5', l3: 'Teacher 5', body: T5 }] });
 fs.mkdirSync(OUT, { recursive: true });
@@ -7440,7 +7440,7 @@ const routing = sec('Prerequisite routing:', table(['Question', 'Prerequisite (T
       ['ones digit = bigger − smaller (52 − 39 → 27)', 'Smaller from bigger', '“Is the top smaller?” before each item'], ['tens one too big (→ 23)', 'Forgot the tens', 'Cross out and rewrite the tens'],
       ['60 − 3 → 63 or 3', 'Zero trouble', 'Rods: 6 tens is 5 tens 10 ones'], ['a 0 written in the tens (06)', 'Tens answer 0', 'Leave the tens box empty']]), true);
 
-const doc = K.document({ titleTag: 'Subtract with regrouping lesson pack (V21 sample 2)', pupil: P, routing, pool: POOL, teacher: [
+const doc = K.document({ titleTag: 'Subtract with regrouping lesson pack (V22 sample 2)', pupil: P, routing, pool: POOL, teacher: [
   { id: 'T1', l3: 'Teacher 1', body: T1 }, { id: 'T2', l3: 'Teacher 2', body: T2 }, { id: 'T2b', l3: 'Reference', body: T2b, right: 'Teacher · Print once per unit' },
   { id: 'T3', l3: 'Teacher 3', body: T3 }, { id: 'T4', l3: 'Teacher 4', body: T4 }, { id: 'T5', l3: 'Teacher 5', body: T5 }] });
 fs.mkdirSync(OUT, { recursive: true });
@@ -7450,7 +7450,7 @@ console.log('pages', doc.pages.length);
 
 ---
 
-## Appendix H — Building a lesson V21 does not show (rules for the gaps)
+## Appendix H — Building a lesson V22 does not show (rules for the gaps)
 
 - **Prerequisite lesson ids (T6 routing, P0 key).** Use the teacher's own lesson list. If there is none, use
   the MathQuest library id `<Level>-<n>` (for example `K-3`, `2-6`). If neither exists, write the CCSS code and
@@ -7490,14 +7490,14 @@ console.log('pages', doc.pages.length);
 
 ---
 
-## Appendix I — Implementing V21 inside MathQuest (for the repository only)
+## Appendix I — Implementing V22 inside MathQuest (for the repository only)
 
-Outside AIs ignore this appendix: everything above stays self-contained. Inside the MathQuest repository, V21
+Outside AIs ignore this appendix: everything above stays self-contained. Inside the MathQuest repository, V22
 becomes a second "detailed lesson maker" beside the current lesson maker, and it is **built on the site's own
 code, rules and gates — never re-implementing what the kit already draws.** The HTML/CSS/recipes of Appendices
 A, D and G are then only the specification the kit is checked against, not code to copy.
 
-| V21 part | Existing MathQuest piece to use | Notes |
+| V22 part | Existing MathQuest piece to use | Notes |
 |---|---|---|
 | Paper, tokens, type, ink, strokes (§8.1–8.6) | `js/modules/sheet/tokens.js` (`PAPER`, `SIZES.L`, `INK`, `LESSON_ACCENT`, `STROKE`, `SLOT`, `blankWidth`), `css/sheet-kit.css`, `css/fonts/andika.css` | Never hard-code a value in the new role |
 | Header, strand tab, title, footer, © line (§8.7) | `sheet/frame.js`: `headerFields`, `strandTab`, `pageTitle`, `pageFooter`, `copyrightLine`, `page`, `doc` | New tab ids `Teacher n`, `Reference` need a PT-FRM-9 entry |

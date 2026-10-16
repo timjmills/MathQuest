@@ -1,6 +1,6 @@
-# V21 self-check: sample-v21
+# V22 self-check: sample-v22
 
-Run by `selfcheck.mjs` (Appendix E reference implementation, Chromium print media) on `pack.html`, 2026-10-16. Checks are V21 Appendix E (E1–E28 with lettered sub-checks): **34 / 34 PASS**.
+Run by `selfcheck.mjs` (Appendix E reference implementation, Chromium print media) on `pack.html`, 2026-10-16. Checks are V22 Appendix E (E1–E28 with lettered sub-checks): **34 / 34 PASS**.
 
 | # | Check | Measured | Result |
 |---|---|---|---|
@@ -19,7 +19,7 @@ Run by `selfcheck.mjs` (Appendix E reference implementation, Chromium print medi
 | E28 | No Say:, Rule: or Remember: band on a Practice page (keys included); freed rows are one unruled trailing area (§8.12.4) | 4 Practice pages; extra bands: 0 | PASS |
 | E13 | Slot widths = one B(n) per section, ≥ 14 mm; no underscore characters on pupil pages | P0/pre: 14 mm; P1/nsA: 17 mm; P1/nsB: 17 mm; P5/wp: 17 mm; P5/P5: 17 mm; P0-key/pre: 14 mm; P1-key/nsA: 17 mm; P1-key/nsB: 17 mm; P5-key/wp: 17 mm; P5-key/P5-key: 17 mm; underscores: 0 | PASS |
 | E14 | No dashed line except the cut line (and the missing-digit box) | 0 dashed strokes outside a cut line | PASS |
-| E15 | Instructions ≤ 12 words, every sentence starts with a print verb, string in Appendix C.1 (130 strings read from V21) | 44 instructions; max 8 words; failing: none | PASS |
+| E15 | Instructions ≤ 12 words, every sentence starts with a print verb, string in Appendix C.1 (130 strings read from V22) | 44 instructions; max 8 words; failing: none | PASS |
 | E16 | Every frame has ≤ 2 blanks | Say frames: 9; blanks per frame 0, 1 | PASS |
 | E17 | Each key has the same slots as its page (facsimile) | P0 5/5, P1 12/12, P2 5/5, P3 8/8, P4a 12/12, P4b 9/9, P5 11/11, P6 12/12 | PASS |
 | E18 | © line and strand tab on every page | © on 23/23; tab on 23/23 | PASS |
@@ -85,4 +85,4 @@ page-14 P6 exit slip (A4 landscape, 2-up) · page-15 to page-22 keys of P0, P1, 
 | Key answers sit in the pupil's slots; no clipped content | PASS |
 
 The item pool travels inside `pack.html` (`<script id="v21-pool">`); E24 / E24b read it and the `data-item`
-marks, and fail when either is missing. Built from code extracted from V21 itself; iterated in a scratch folder.
+marks, and fail when either is missing. Built from code extracted from V22 itself; iterated in a scratch folder.

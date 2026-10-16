@@ -158,7 +158,7 @@ stay at the bottom of the student home.
 
 ## Wave 8 — Lessons
 
-**Owner plan 2026-10-16 (detailed lesson maker):** the Atomisation Lesson Planner V21 (`design/lesson-planner/`) is iterated
+**Owner plan 2026-10-16 (detailed lesson maker):** the Atomisation Lesson Planner (V21 while in review; **V22** once passed — `design/lesson-planner/Atomisation_Lesson_Planner_V22.md`) is iterated
 until an independent critic scores >= 8 on every teacher and pupil page of its sample packs (the site is the gold standard).
 Then it is ADDED as a second, **detailed lesson maker** beside the current lesson maker (the current one stays). The owner
 will then name lessons to make with it; each made lesson is integrated into the site on the **White Rose page** (its WRM
@@ -168,14 +168,14 @@ Owner 2026-10-16: **inside MathQuest the detailed lesson maker is built on the s
 the sheet kit (frame, cells, templates, keys, paginator, `lesson-css`, `lesson-icons`), `generateQuestionFor` with seeds and
 skill options, the skill providers and instruction library, `buildSheet` / a new lesson role beside `sheet/roles/lesson.js`,
 the existing passed lesson pages where they exist (Q1), and the gates (`ws-lesson-check`, `ws-print-lint --source kit`,
-`ws-grade-render`, the rubric critic). V21's hand-written HTML/CSS/SVG recipes are for AIs outside the repo only; in the
+`ws-grade-render`, the rubric critic). V22's hand-written HTML/CSS/SVG recipes are for AIs outside the repo only; in the
 repo nothing is re-implemented that the kit already draws.
 **Owner list 2026-10-16: lessons to build with the detailed lesson maker** —
 `data/curriculum/source/Lessons_To_Build_K-5_2026-27.xlsx` (sheet "Build order (all grades)", ordered by the school
 calendar; each row: build-by date, teach week, quarter, grade, domain, lesson, why, CCSS, EE / EE note, domain exam, status).
 67 lessons (64 CCSS BUILD + 3 US versions of White Rose lessons): K 4, G1 5, G2 14, G3 12, G4 16, G5 16; Q1 12, Q2 19,
 Q3 26, Q4 10. On 2026-10-16, 10 are OVERDUE (teaching week started), 2 have a V20.1 sample in progress, 1 has a V20.1
-sample made. They are built in their OWN session once V21 passes (>= 8 on every page), in the sheet's build order (overdue
+sample made. They are built in their OWN session once V22 passes (>= 8 on every page; PASSED 2026-10-16, critic r7), in the sheet's build order (overdue
 first, then by build-by date), each tagged WRM / CCSS / EE, tied to its skills, and placed on the White Rose page.
 
 The intervention lesson library uses the owner's **Atomised Lesson V20** format (he supplies it). It covers every WRM
