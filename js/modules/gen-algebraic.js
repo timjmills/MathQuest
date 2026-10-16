@@ -2749,6 +2749,7 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                 // The kit cell (detailed lesson 1, 2026-10-16): the same item drawn by the `words`
                 // template on paper and screen; the legacy visual below stays for the old print path.
                 q.pv = { kind: 'words', n: num, words: wordForm, way: mode };
+                q.instructionKey = mode === 'to_words' ? 'number-words' : 'standard-form';
                 q.cell = { template: 'words', payload: { n: num, words: wordForm, way: mode, ans: mode === 'to_words' ? wordForm : String(num) } };
 
                 // Place value chart visual

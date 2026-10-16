@@ -52,6 +52,7 @@ import { resolveCtx, numeralTracksHTML } from '../index.js';
 import { workedStepsOf, stepTemplateOf, unslot, easeScore, stepLines } from '../anchors.js';
 import { dotTile, countCueOf, countCueRow } from './guided.js';
 import { stepIcon, iconForText } from '../lesson-icons.js';
+import { numberWords } from '../cells/words.js';
 
 export const ROLE_ID = 'lesson';
 /**
@@ -188,12 +189,17 @@ export const CASE_TESTS = Object.freeze({
     pvNoZero: (it) => { const n = pvNumberOf(it); return n !== null && n >= 100 && n <= 999 && !String(n).includes('0'); },
     pvZeroTens: (it) => { const n = pvNumberOf(it); return n !== null && n >= 100 && n <= 999 && Math.floor(n / 10) % 10 === 0 && n % 10 !== 0; },
     pvZeroOnes: (it) => { const n = pvNumberOf(it); return n !== null && n >= 100 && n <= 999 && n % 10 === 0 && Math.floor(n / 10) % 10 !== 0; },
+    pvTeen: (it) => { const n = pvNumberOf(it); return n !== null && n >= 100 && n <= 999 && Math.floor(n / 10) % 10 === 1 && n % 10 !== 0; },
+    // an edge case of numbers to 1,000: a 0 place, a teen ending, or 1,000 itself
+    pvEdge: (it) => { const n = pvNumberOf(it); return n !== null && (n === 1000 || (n >= 100 && (Math.floor(n / 10) % 10 === 0 || n % 10 === 0 || Math.floor(n / 10) % 10 === 1))); },
 });
 
 /** A place-value item's number (its `q.pv.n` or cell payload `n`), or null. */
 function pvNumberOf(it) {
     const q = (it && it.q) || {};
-    const v = q.pv && q.pv.n !== undefined ? q.pv.n : q.cell && q.cell.payload ? q.cell.payload.n : undefined;
+    let v = q.pv && q.pv.n !== undefined ? q.pv.n : q.cell && q.cell.payload ? q.cell.payload.n : undefined;
+    // (a numeral answer - "Write the number." from expanded form or words - is the item's number)
+    if ((v === undefined || v === null) && /^\d{1,4}$/.test(String(q.ans === undefined ? '' : q.ans).trim())) v = Number(q.ans);
     return Number.isFinite(Number(v)) && v !== undefined && v !== null ? Number(v) : null;
 }
 
@@ -1149,7 +1155,10 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
             sections.push(gridPart(finShown.map((x) => withZoom(x, finCols)), { cols: finCols, rows: fr, cellH: (hF + Math.min(spare, hF * 0.3)) / fr, labels: 'none', cls: 'mq-cfinalgrid' }));
         }
     }
-    sections.push({ kind: 'say', frame: oralFrameOf(example || {}, { fill: true }), digits: 2 });
+    // `sayWords` (lesson data; the detailed lesson maker): the Say line reads the example's number
+    // name, so the chart shows the number in all three forms (numeral, expanded, words).
+    const sayN = data && data.sayWords ? pvNumberOf(example) : null;
+    sections.push({ kind: 'say', frame: sayN !== null ? `${sayN} is ${numberWords(sayN)}.` : oralFrameOf(example || {}, { fill: true }), digits: 2 });
     if (chant) sections.push({ kind: 'html', html: `<div class="ws-band mq-cchantband" style="height:${chantH - 1.5}mm"><div class="mq-cchant"><b>Rule:</b><span>${esc(chant)}</span></div></div>` });
     const shown = mode === 'row' ? 1 : mode === 'final' ? finShown.length : mode === 'grid3' ? fin.length : 0;
     return {
@@ -1306,7 +1315,8 @@ export function plan(input = {}) {
     // takes the strip over the cells and two full-width rows (cell 1 the Model's case).
     const wideG = !!(data && data.chartWide);
     if (wideG && stepsZone && stripX && example) {
-        const set = pickWeDo(weDoPool, example, data, 2).slice(0, 2);
+        const gw = Math.max(2, Math.min(4, Number(data.guidedRows) || 2));
+        const set = pickWeDo(weDoPool, example, data, gw).slice(0, gw);
         if (set.length) top = { set, cols: 1, rows: set.length, h: Math.max(20, hAt(set, 1)) };
     } else if (stepsZone && stripX && weDo.length && !stackRows && (gH < 0.72 * zH || wantN > weDo.length)) {
         const w3 = example ? pickWeDo(weDoPool, example, data, 3) : rest.slice(0, 3);
@@ -1464,6 +1474,8 @@ export function plan(input = {}) {
             example2: secondShown && example2 ? String((example2.q && example2.q.text) || '') : '', part, chartSizing,
             example2Found: example2 ? String((example2.q && example2.q.text) || '') : '',
             example3: example3 ? String((example3.q && example3.q.text) || '') : '', example4: example4 ? String((example4.q && example4.q.text) || '') : '', bandSizes,
+            // the chart's items themselves (the detailed lesson maker reads its scripts' numbers from them)
+            exampleQs: [example, example2, example3, example4].filter(Boolean).map((x) => x.q),
             fits: [{ cols: 1, rows: out.length, line: `Fits: an anchor chart of ${states.length} steps, ${warmCount} warm-up, ${weDo.length} guided and ${indep.length} independent on ${out.length} page${out.length > 1 ? 's' : ''}.` }],
             notes: data ? [] : ['No lesson data for this skill yet: the warm-up uses the skills listed before it, with no vocabulary.'],
         },

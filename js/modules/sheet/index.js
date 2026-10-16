@@ -164,6 +164,8 @@ import { FIGURE_TEMPLATE_IDS } from './cells/figures.js';
 // The detailed lesson maker (V22, 2026-10-16): the word-problem routine panel template, the
 // teacher-page parts and icons.
 export { RCDWS_ROWS, RCDWS_CSS } from './cells/rcdws.js';
+// composing:number_word_form's kit cell (a number and its name).
+export { numberWords } from './cells/words.js';
 export * as teacherParts from './teacher-parts.js';
 export { TEACHER_CSS } from './teacher-parts.js';
 export { teacherIcon, routineIcon, TEACHER_ICON_IDS } from './teacher-icons.js';
@@ -171,7 +173,7 @@ export { teacherIcon, routineIcon, TEACHER_ICON_IDS } from './teacher-icons.js';
 /** Which cell templates this build carries. `legacy` is registered by `adapters.js`. */
 export const TEMPLATE_IDS = ['legacy', 'stack', 'fact', 'equation', 'pv',
     'counters', 'tenframe', 'base10', 'bond', 'chartwindow', 'seqstrip', 'compare', 'wordpic', 'word-work',
-    ...OPS_TEMPLATE_IDS, ...TM_TEMPLATE_IDS, 'function-table', ...FIGURE_TEMPLATE_IDS];
+    ...OPS_TEMPLATE_IDS, ...TM_TEMPLATE_IDS, 'function-table', ...FIGURE_TEMPLATE_IDS, 'words'];
 
 /* ------------------------------------------------- skill providers (register on load) */
 // The real per-skill providers (strings, workedSteps, wrongAnswer, stories). Importing the

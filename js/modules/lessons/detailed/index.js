@@ -22,7 +22,15 @@
 //   lessonData    the prereqs.js LESSONS shape          the anchor chart + lesson sheet data that
 //                 roles/lesson.js draws (steps, vocab, chant, example / second / third case tests).
 //                 It is passed to the standard lesson role as `lessonData`; prereqs.js is untouched.
-//   prerequisites [{atom, ref, lesson: {id, title}}]   P0 questions (3-4), most basic first; T6 routing
+//   pool, edgeTest {kind: 'range', lo, hi} | {kind: 'list', items}; a roles/lesson.js CASE_TESTS name
+//                 (the ★★★ last row and the pool's `edge` list). Absent pool: the pack's own places.
+//   practiceSheets [{skill?, shape?: [count, cols]}]  each Practice page its own sheet ({} = the lesson skill)
+//   vars(q, base) -> {...}                             the lesson's own placeholder names for one dealt item
+//                 (base = the kit's readers: n, ans, a, b, op, say, words, text); eqParts / eqOp set
+//                 the word problem's equation frame
+//   checkQuestion {want, correct}                     the Check Question item (a case test) and its right letter;
+//                 the options are the main skill provider's wrong answers, claimed by mistakes[].misconception
+//   prerequisites [{atom, items?, ref, lesson: {id, title}}]   P0: ONE question per Pre-requisite atom, most basic first
 //   numberSense   {A: ref, B: ref}                     P1 bands (5 items each)
 //   wordProblem   {ref, want, lines: [...], unit, say} P5: story lines with {wp.*} placeholders
 //   exit          [{case, ref, want, detects}] x 4     P6 items, one per case; `exitSay` its Say frame
@@ -39,13 +47,13 @@
 //   accepted      [text]                               T6 Accepted answers
 //   wrongAnswers  [{wrote, mistake, next}]             T6 Wrong answers to look for when marking
 //
-// PLACEHOLDERS. A script, story or frame never types a number: it names a dealt item.
-//   {chart.n} {chart.h} {chart.t} {chart.o} {chart.hv} {chart.tv} {chart.ov} {chart.parts} {chart.say}
-//   {chart2.*}                    the anchor chart's worked example and its first other example
-//   {we.0.*} {we.1.*}             the Guided cells       {pre.i.ans}  P0 question i's answer
-//   {ns.A.0.n} {ns.A.0.words}     Number sense band A    {ret.i.n} {ret.i.words} {ret.i.tens} {ret.i.ask}
+// PLACEHOLDERS. A script, story or frame never types a number: it names a dealt item. Every name
+// below is an item's vars (base readers + the description's `vars` hook):
+//   {chart.*} {chart2.*} {chart3.*}   the anchor chart's worked example and its other examples
+//   {we.i.*}                      the Guided cells       {pre.i.*}  P0 question i's first item
+//   {ns.A.i.*} {ns.B.i.*}         Number sense bands     {ret.i.*} {ret.i.ask}  spaced retrieval
 //   {cq.n} {cq.A..D} {cq.right} {cq.why}   the Check Question (options from the provider's wrong answers)
-//   {wp.n} {wp.h} {wp.t} {wp.o} {wp.parts}  the word problem   {exit.i.n} {exit.i.ans}  the exit slip
+//   {wp.*} {wp.eq}  the word problem   {exit.i.*}  the exit slip   {say.*}  the exit slip's fresh Say item
 // `fillPlaceholders` throws on an unknown name, so a typo never prints.
 //
 // ADDING A LESSON: write <id>.js in this folder, add it to DETAILED_LESSONS below, run

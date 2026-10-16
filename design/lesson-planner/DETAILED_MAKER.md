@@ -39,6 +39,17 @@ facsimile key from the same plan (`answer-key.js`). Additive hooks, each absent 
 `avoidNums` / `minNum` / `maxNum` / `edge` / `range` (print-sheet.js); lesson-data keys `chartWide`,
 `tailLast`, `practiceShape` and the case tests `pvNoZero` / `pvZeroTens` / `pvZeroOnes` (roles/lesson.js).
 
+## Generic by design (round 2)
+
+`print-sheet.js` holds no per-family code. Script values come from each dealt item through the kit's own
+readers (`itemNumberOf`, `answerOf`-style `dlAns`, compose.js `operandsOf` / `opOf` / `oralFrameOf`,
+`numberWords`), plus the description's optional `vars(q, base)` hook for lesson-specific names. The
+Check Question options are the main skill provider's `wrongAnswer`s (collected over seed rotations),
+named by the description's `mistakes[].misconception`. `want` names are roles/lesson.js `CASE_TESTS`.
+The pool keys are `factKeyOf(q)` (an operation item's operands and sign, else its number). P5's
+instruction is `wordProblem.instruction` (fallback: the kit's `story` string); its lines are the
+description's (placeholders) or the dealt item's own story.
+
 ## Adding a lesson
 
 1. Write `js/modules/lessons/detailed/<id>.js` in the format documented at the top of `index.js` (every

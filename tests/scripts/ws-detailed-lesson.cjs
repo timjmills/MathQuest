@@ -160,6 +160,7 @@ function measure(LIBRARY) {
                 skip: small, read: !!c.querySelector('[data-read], .ws-story') || !!c.closest('.dl-wppanel, .dl-wpstory'), draw: !!c.querySelector('[data-work], [data-draw]'),
                 grid: `${gridIds.get(gEl)}:${gEl.classList.contains('ws-grid') ? 'ws-grid' : ''}`, empty: !rects.length };
         });
+        P.bandHs = [...pg.querySelectorAll(':scope > .ws-body > .ws-band')].map((b) => [((b.querySelector(':scope > .ws-strip > b') || {}).textContent || '').slice(0, 14), Math.round(b.getBoundingClientRect().height / MM)]);
         P.bandLabels = [...pg.querySelectorAll('.ws-strip > b')].filter((b) => !b.closest('.dl-thumb')).map((b) => b.textContent.trim());
         P.thumbs = pg.querySelectorAll(':scope .dl-thumb').length;
         P.panelRows = [...pg.querySelectorAll('[data-panel-row]')].map((e) => Math.round(e.getBoundingClientRect().height / MM * 10) / 10);
@@ -244,8 +245,14 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
     const uneq = [];
     for (const p of pupil) { const by = {}; for (const c of p.cells) (by[c.grid] = by[c.grid] || []).push(c);
         for (const [g, cs] of Object.entries(by)) if (cs.length > 1 && /ws-grid/.test(g) && (Math.max(...cs.map((c) => c.w)) - Math.min(...cs.map((c) => c.w)) > 0.5 || Math.max(...cs.map((c) => c.h)) - Math.min(...cs.map((c) => c.h)) > 0.5)) uneq.push(`${p.id}`); }
-    const pc = pupil.filter((p) => /^P4-\d/.test(p.id)).flatMap((p) => p.cells.filter((c) => !c.empty && !c.skip));
-    const sp = (k) => (pc.length ? Math.max(...pc.map((c) => c[k])) - Math.min(...pc.map((c) => c[k])) : 0);
+    // PG-11: the cells of ONE section are equal on every page it reaches. A pack whose Practice
+    // pages practise different skills (Practice 1 expanded form, Practice 2 words) compares the
+    // pages of each skill (its representation, from the pool's places) among themselves.
+    const repOf = (id) => [...new Set(((R.pool && R.pool.places) || []).filter((x) => x.page === id).map((x) => x.rep))].sort().join('+');
+    const prGroups = {};
+    for (const p of pupil.filter((q) => /^P4-\d/.test(q.id))) (prGroups[repOf(p.id)] = prGroups[repOf(p.id)] || []).push(...p.cells.filter((c) => !c.empty && !c.skip));
+    const pc = Object.values(prGroups).flat();
+    const sp = (k) => Math.max(0, ...Object.values(prGroups).map((cs) => (cs.length ? Math.max(...cs.map((c) => c[k])) - Math.min(...cs.map((c) => c[k])) : 0)));
     row('E12', 'Equal cells within each grid (±0.5 mm) and across the Practice pages', `${uneq.length ? `unequal grids on ${[...new Set(uneq)].join(', ')}` : 'all grids equal'}; Practice cells ${pc.length}, spread ${sp('w').toFixed(1)} × ${sp('h').toFixed(1)} mm`, !uneq.length && pc.length > 0 && sp('w') <= 0.5 && sp('h') <= 0.5);
     row('E13', 'No underscore characters on pupil pages (slot widths: ws-print-lint --source kit)', `underscores ${pages.reduce((a, p) => a + p.underscores, 0)}`, pages.every((p) => p.underscores === 0));
     row('E14', 'No dashed line except the cut line and the missing-digit box', `${pages.reduce((a, p) => a + p.dashed, 0)} outside a cut line`, pages.every((p) => p.dashed === 0));

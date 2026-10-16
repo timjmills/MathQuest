@@ -36,11 +36,11 @@ const DRAW = {
     mwb: '<rect x="0.8" y="1.6" width="7" height="6.4" rx="0.6"/><path d="M2.2 4 H6.2 M2.2 5.8 H5"/><path d="M8.4 2.2 L9.6 3.4 L8.4 8.6 L7.9 8.1 Z"/>',
     // scissors: the cut line
     scissors: '<circle cx="2.2" cy="2.6" r="1.6"/><circle cx="2.2" cy="7.4" r="1.6"/><path d="M3.6 3.4 L9.4 7.6 M3.6 6.6 L9.4 2.4"/>',
-    // routine icons (accent): read two times, circle the numbers, underline, draw
-    read: '<path d="M5 2.2 Q3 1 0.8 1.4 V8.4 Q3 8 5 9.2 Q7 8 9.2 8.4 V1.4 Q7 1 5 2.2 Z"/><path d="M5 2.2 V9.2"/><path d="M2 3.6 H4 M2 5.2 H4 M6 3.6 H8 M6 5.2 H8"/>',
-    ringnum: '<ellipse cx="5" cy="5" rx="4.3" ry="3.4"/><path d="M4 3.6 L5.2 2.8 V7.2 M4.2 7.2 H6.2"/>',
-    underline: '<path d="M2.4 1.4 V5 Q2.4 7.2 5 7.2 Q7.6 7.2 7.6 5 V1.4"/><path d="M1 9.2 H9"/>',
-    draw: '<rect x="0.8" y="0.8" width="5.4" height="5.4"/><circle cx="3.5" cy="3.5" r="1.4"/><path d="M6.4 9.4 L5.6 9.6 L5.8 8.8 L9 5.6 L9.6 6.2 Z"/>',
+    // routine icons (accent; Appendix H: one idea each, open line art, no letters, no fills)
+    read: '<path d="M5 2.4 Q3.2 1.2 1 1.6 V8.4 Q3.2 8 5 9 Q6.8 8 9 8.4 V1.6 Q6.8 1.2 5 2.4 Z"/><path d="M5 2.4 V9"/>',
+    ringnum: '<ellipse cx="5" cy="5" rx="4.2" ry="3.2"/><path d="M4.4 3.4 L5.4 2.8 V7.2"/>',
+    underline: '<path d="M1.5 3.5 H8.5"/><path d="M1.5 5.5 H6.5"/><path d="M1 8.6 H9" stroke-width="2pt"/>',
+    draw: '<rect x="1" y="1" width="5.2" height="5.2" rx="0.4"/><path d="M5.8 9.2 L9.2 5.8 L8.2 4.8 L4.8 8.2 Z"/>',
 };
 
 export const TEACHER_ICON_IDS = Object.freeze(Object.keys(DRAW));

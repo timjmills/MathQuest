@@ -22,7 +22,12 @@ import { teacherIcon, TEACHER_ICON_CSS } from './teacher-icons.js';
 import { stepIcon } from './lesson-icons.js';
 
 /** V22 §8.1 / §10: body heights (A4) under each header kind. */
-export const TEACHER_BODY_MM = Object.freeze({ lifted: 245, cont: 250 });
+export const TEACHER_BODY_MM = Object.freeze({ lifted: 245, full: 236, cont: 250 });
+/**
+ * V22 §8.7: the title is lifted into row A only when it fits beside the tab on one line
+ * (<= 118 mm at 18 pt: about 34 characters); a longer title takes its own row (26 mm header).
+ */
+export const LIFT_MAX_CHARS = 34;
 /** V22 §10.9: a thumbnail is the real page scaled to 26.2 % (55 x 77.8 mm). */
 export const THUMB_SCALE = 0.262;
 export const THUMB_MM = Object.freeze({ w: 55, h: 77.8 });
@@ -40,7 +45,9 @@ export const KEY_INK = '#C2410C';
  */
 export function teacherPage({ tab, title, head = 'lifted', footer = {}, body, cls = '', id = '', kind = 'teacher' }) {
     const lines = (tab || []).filter(Boolean);
-    const header = head === 'cont'
+    const header = head === 'full'
+        ? `<header class="ws-head dl-full"><div class="ws-rowA">${headerFields({})}${strandTab(lines)}</div>${pageTitle(title)}<div class="ws-headrule"></div></header>`
+        : head === 'cont'
         ? `<header class="ws-head dl-cont"><div class="ws-rowA"><div class="ws-spacer"></div>`
             + `<div class="ws-tabbox dl-tabline"><span>${esc(lines.join(' · '))}</span></div></div><div class="ws-headrule"></div></header>`
         : `<header class="ws-head dl-lift"><div class="ws-rowA">${headerFields({})}${pageTitle(title)}${strandTab(lines)}</div><div class="ws-headrule"></div></header>`;
@@ -70,6 +77,8 @@ export const BOX_KINDS = Object.freeze(Object.keys(BOX));
 /** T-BOX-1..4 (V22 §10.5): icon column, bold label, bold 2-5 word title, 11 pt text. */
 export function tBox(kind, title, text) {
     const b = BOX[kind] || BOX.tip;
+    // V22 §10.5: the bold memorable title is a sentence of its own ("Big first, every time.").
+    title = /[.!?]$/.test(String(title).trim()) ? String(title).trim() : `${String(title).trim()}.`;
     return `<div class="dl-box dl-box-${kind === 'watch' ? 'watch' : 'plain'}">${teacherIcon(b.icon)}`
         + `<div class="dl-boxtext"><b>${esc(b.label)}</b> <b>${esc(title)}</b> ${text}</div></div>`;
 }
@@ -178,18 +187,18 @@ ${TEACHER_ICON_CSS}
 .ws-page .dl-tline{font-size:11pt;line-height:1.3;padding:1mm 0 2mm}
 .ws-page .dl-list{margin:0;padding-left:6mm;display:flex;flex-direction:column;gap:.6mm}
 .ws-page .dl-sub{font-size:13pt;font-weight:700;margin-top:1mm}
-.ws-page .dl-box{display:grid;grid-template-columns:5.8mm 1fr;gap:2.5mm;align-items:start;border:0.75pt solid ${INK.ink};border-radius:3mm;padding:1.4mm 3mm;font-size:11pt;line-height:1.25}
+.ws-page .dl-box{display:grid;grid-template-columns:5.8mm 1fr;gap:2.5mm;align-items:start;border:0.75pt solid ${INK.ink};border-radius:3mm;padding:1.1mm 3mm;font-size:11pt;line-height:1.22}
 .ws-page .dl-box.dl-box-watch{border-width:1.5pt}
 .ws-page .dl-boxtext b{font-weight:700}
 .ws-page .dl-spoken{font-size:13pt}
 .ws-page .dl-ka{color:${KEY_INK};font-weight:700}
 .ws-page .dl-script{display:flex;flex-direction:column}
-.ws-page .dl-srow{display:grid;grid-template-columns:8mm 1fr;gap:1.5mm;padding:.8mm 0;border-bottom:0.75pt solid #000}
+.ws-page .dl-srow{display:grid;grid-template-columns:8mm 1fr;gap:1.5mm;padding:.55mm 0;border-bottom:0.75pt solid #000}
 .ws-page .dl-srow:last-child{border-bottom:0}
 .ws-page .dl-srow>.mq-lnum{margin-top:.3mm}
-.ws-page .dl-slines{display:grid;grid-template-columns:14mm 1fr;row-gap:.3mm;align-items:baseline;font-size:11pt;line-height:1.3}
+.ws-page .dl-slines{display:grid;grid-template-columns:14mm 1fr;row-gap:.2mm;align-items:baseline;font-size:11pt;line-height:1.22}
 .ws-page .dl-slines>b{font-weight:700}
-.ws-page .dl-loop{display:flex;flex-direction:column;gap:1mm;padding:1mm 0}
+.ws-page .dl-loop{display:flex;flex-direction:column;gap:.4mm;padding:.3mm 0}
 .ws-page .dl-looprow{display:grid;grid-template-columns:5mm 36mm 1fr;gap:2mm;align-items:center;font-size:11pt}
 .ws-page .dl-loopdot{display:block}
 .ws-page table.dl-table{width:100%;border-collapse:collapse;font-size:10pt;line-height:1.25}
@@ -201,6 +210,10 @@ ${TEACHER_ICON_CSS}
 .ws-page .dl-checks li{display:flex;gap:2mm;align-items:center}
 .ws-page .dl-cbox{flex:none;width:5mm;height:5mm;border:1.5pt solid #000}
 .ws-page .dl-vcards{display:grid;grid-template-columns:repeat(3,1fr);gap:4mm}
+/* a growing last band's vocabulary cards take its height (V22 §8.12.2: fill with content, not blank) */
+.ws-page .ws-band.grow .dl-bandin>.dl-vcards{flex:1 1 auto}
+.ws-page .ws-band.grow .dl-vcard{justify-content:space-evenly}
+.ws-page .ws-band.grow .dl-vdiag{transform:scale(1.25)}
 .ws-page .dl-vcard{border:1.5pt solid #000;border-radius:3mm;padding:2.5mm;display:flex;flex-direction:column;align-items:center;gap:1.2mm;text-align:center}
 .ws-page .dl-vcard>b{font-size:13pt;font-weight:700}
 .ws-page .dl-vcard>span{font-size:11pt}
@@ -233,7 +246,7 @@ ${TEACHER_ICON_CSS}
 .ws-page .dl-halfhead .ws-headrule{margin-bottom:1.5mm}
 .ws-page .dl-cut{position:relative;height:100%;display:flex;justify-content:center}
 .ws-page .dl-cut>i{display:block;width:0;height:100%;border-left:0.75pt dashed #000}
-.ws-page .dl-cut>.mq-ticon{position:absolute;top:0;left:50%;transform:translateX(-50%);background:#fff}
+.ws-page .dl-cut>.mq-ticon{position:absolute;top:17mm;left:50%;transform:translateX(-50%) rotate(90deg);background:#fff}
 .ws-page .dl-selfrow{flex:none;display:flex;gap:10mm;align-items:center;padding:2mm 3mm 0;font-size:15pt}
 .ws-page .dl-selfrow>span{display:flex;gap:2.5mm;align-items:center}
 .ws-page .dl-selfrow .dl-cbox{width:7mm;height:7mm}

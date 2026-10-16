@@ -24,8 +24,9 @@
 
 import {
     teacherPage, tBand, tLine, tBox, tScript, tLoop, tTable, cellText, keyNamed, checkList, vocabCard, vocabCards,
-    boardLine, keyIcon, stepMark, thumb, besideThumb, twoCols, subHead, TEACHER_BODY_MM, KEY_INK,
+    boardLine, keyIcon, stepMark, thumb, besideThumb, twoCols, subHead, TEACHER_BODY_MM, KEY_INK, LIFT_MAX_CHARS,
 } from '../teacher-parts.js';
+export { TEACHER_BODY_MM, LIFT_MAX_CHARS };
 import { teacherIcon, routineIcon } from '../teacher-icons.js';
 import { stepIcon } from '../lesson-icons.js';
 import { esc, blank } from '../cell.js';
@@ -75,7 +76,7 @@ export function teacherBands(d, V, pages) {
     // ---------------------------------------------------------------------------- T1
     const pageOf = (s) => ({ P0: 'Prerequisite Check', P1: 'Number sense', P2: 'Anchor chart', P3: 'Lesson sheet', P4: 'Practice 1–2', P5: 'Word problem', P6: 'Exit slip' }[s.page] || 'Mini whiteboards');
     const flowRows = d.sections.map((s) => [String(s.n), cellText(s.name), cellText(pageOf(s)), `<span class="num">${s.min}</span>`]);
-    flowRows.push(['', 'Transitions', '', String(d.transitionsMin || 0)]);
+    if (d.transitionsMin) flowRows.push(['', 'Transitions', 'between pages', `<span class="num">${d.transitionsMin}</span>`]);
     flowRows.push(['', '<b>Total</b>', '', `<b>${d.sections.reduce((a, s) => a + s.min, 0) + (d.transitionsMin || 0)}</b>`]);
     const diagram = (g) => {
         if (!g) return '';
@@ -180,8 +181,9 @@ export function paginateTeacher(bands, heights, { body = TEACHER_BODY_MM } = {})
     const flat = [];
     bands.forEach((b, bi) => b.blocks.forEach((html, k) => { if (html) flat.push({ bi, label: b.label, html, h: (heights[bi] && heights[bi][k]) || 0, over: heights[bi] && heights[bi].over }); }));
     const cost = (list) => {
-        let t = 0, prev = -1, run = [];
-        const close = () => { if (run.length) t += bandH(run[0].label, run.map((x) => x.h), run[0].over); run = []; };
+        // (adjacent bands share their 1.5 pt edge: each band after the first is 0.53 mm shorter)
+        let t = 0, prev = -1, run = [], nb = 0;
+        const close = () => { if (run.length) { t += bandH(run[0].label, run.map((x) => x.h), run[0].over) - (nb++ ? 0.53 : 0); } run = []; };
         for (const x of list) { if (x.bi !== prev) { close(); prev = x.bi; } run.push(x); }
         close();
         return t;
@@ -266,12 +268,12 @@ export function wordProblemPlan(wp, frame) {
         render: (c) => {
             const k = c.state === 'answered' ? eqKey : null;
             const box = (id, dg) => blank({ id, kind: 'number', shape: 'box', digits: dg, graded: false }, c, k);
-            return `<div class="dl-eq">${parts.map((v, i) => box(`e${i}`, 3)).join('<span>+</span>')}<span>=</span>${box('eq', 3)}</div>`;
+            return `<div class="dl-eq">${parts.map((v, i) => box(`e${i}`, Math.max(2, String(v).length))).join(`<span>${esc(wp.op || '+')}</span>`)}<span>=</span>${box('eq', Math.max(2, String(wp.n).length))}</div>`;
         },
     };
     const panelItem = { nolabel: true, q: { cell: { template: 'rcdws', payload: {} }, text: '' }, drawsAnswer: true, key: { slots: {} } };
     const sections = [
-        { kind: 'instruction', text: 'Read the story. Draw it. Solve.' },
+        { kind: 'instruction', text: wp.instruction || 'Read the story. Draw it. Solve.' },
         { kind: 'row', cls: 'dl-wptoprow', widths: ['58fr', '42fr'], height: '72mm', parts: [
             { kind: 'grid', cols: 1, rows: 1, items: [storyItem], cls: 'fixed dl-wpstory', height: '72mm' },
             { kind: 'grid', cols: 1, rows: 1, items: [panelItem], cls: 'fixed dl-wppanel', height: '72mm' },
@@ -299,7 +301,7 @@ export function exitSlipPlan({ items, instr, say, tab, title, cellH, cols = 2 },
         { kind: 'html', html: head },
         { kind: 'instruction', text: instr },
         { kind: 'grid', cols, rows, labels: 'letter', start: 1, cls: `fixed dl-exitgrid${copy ? ' dl-copy' : ''}`, height: `${(rows * cellH).toFixed(2)}mm`, items: copy ? items.map((it) => Object.assign({}, it, { copy: true })) : items },
-        { kind: 'say', frame: say, digits: 3 },
+        ...(say ? [{ kind: 'say', frame: say, digits: 3 }] : []),
         { kind: 'html', html: self },
     ] });
     const cut = { kind: 'html', html: `<div class="dl-cut" data-cut><i data-cut></i>${teacherIcon('scissors', 6)}</div>` };

@@ -36,14 +36,18 @@ export function sources(skills, { earlier }) {
 export const measureCols = () => [1, 2, 4];
 // `input.perQuestion` (the detailed lesson's Prerequisite Check, V22 §9.1: 3-4 questions, up to 8
 // items): items per prerequisite when a caller asks; PER_QUAD otherwise.
-const perQuad = (input) => (input && Number(input.perQuestion) >= 1 && Number(input.perQuestion) <= PER_QUAD ? Number(input.perQuestion) : PER_QUAD);
-export const counts = (pools, input) => Object.fromEntries(Object.keys(pools).map((id) => [id, perQuad(input)]));
+// (An array gives each question its own count, in order.)
+const perQuad = (input, i = 0) => {
+    const v = input && Array.isArray(input.perQuestion) ? input.perQuestion[i] : input && input.perQuestion;
+    return Number(v) >= 1 && Number(v) <= PER_QUAD ? Number(v) : PER_QUAD;
+};
+export const counts = (pools, input) => Object.fromEntries(Object.keys(pools).map((id) => [id, perQuad(input, Number(String(id).replace(/\D/g, '')) || 0)]));
 
 export function plan(input = {}) {
     const ctx = ctxOf(input);
     const form = String(input.form || 'A').toUpperCase() === 'B' ? 'B' : 'A';
     const quads = [0, 1, 2, 3].map((i) => {
-        let its = poolItems(input, `q${i}`).slice(0, perQuad(input));
+        let its = poolItems(input, `q${i}`).slice(0, perQuad(input, i));
         if (form === 'B') its = shuffle(rng(deriveSeed(input.seed === undefined ? 0 : input.seed, ROLE_ID, 'B', i)), its);
         return its;
     }).filter((q) => q.length);

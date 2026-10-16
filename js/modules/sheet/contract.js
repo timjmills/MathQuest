@@ -188,6 +188,8 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'place-write': 'Write the place of the underlined digit.',
     'unit-form': 'Write how many of each place.',
     'standard-form': 'Write the number.',
+    // detailed lesson 1 (2026-10-16): composing:number_word_form, numeral to words
+    'number-words': 'Write the number in words.',
     'disk-read': 'Count the disks. Write the number.',
     'disk-count': 'Count the disks in the zone. Write how many.',
     'draw-disks': 'Draw disks to show the number.',
