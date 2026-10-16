@@ -80,7 +80,8 @@ export function page({ look = DEFAULT_LOOK, size = DEFAULT_SIZE, tab = 6, header
     const title = pageTitle(h.title, h.titleNote);
     return `${note ? `<div class="ws-note">${note}</div>` : ''}
 <section class="ws-page ws-${size} ws-${look} ws-tab${tab} ${cls}" data-ws-look="${look}" data-ws-size="${size}">
-  <header class="ws-head"><div class="ws-rowA${h.tab ? '' : ' notab'}">${fields}${tabBox}</div>${title}<div class="ws-headrule"></div></header>
+  <header class="ws-head"><div class="ws-rowA${h.tab ? '' : ' notab'}">${fields}${tabBox}</div>${title}<div class="ws-headrule"></div></header>${h.refBand ? `
+  ${h.refBand}` : ''}
   <main class="ws-body">${body}</main>
   ${pageFooter(footer)}
 </section>`;

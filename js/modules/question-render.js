@@ -1,5 +1,6 @@
 import { state } from './state.js';
 import { calcAllowedFor } from './skip-rule.js';
+import { syncPracticeRefLine, poolHost } from './refline-screen.js';
 import { isOrderFreeFamily, familyBoxVerdict } from './number-family-check.js';
 import { getSkillGrade, gradeCircleHTML } from './data.js';
 import { trackSkillAnswer, resetAttemptTracking } from './answer-check.js';
@@ -1375,11 +1376,86 @@ function _handleMultiPlaceSubmit(opts) {
 
 export function renderQuestion() {
     _restoreAnswerSlot();
+    // Wave 5.2 (critic nl-r8 D1): mount the line BEFORE the item renders, so the input's focus knows
+    // the band is there and does not scroll the page (the band would slide under the sticky bar).
+    _syncRefLine();
     _renderQuestionImpl();
     try { _applyScreenCell(); } catch (e) { console.error('screen cell:', e); }
+    _syncRefLine();
+    if (document.getElementById('mqRefLine')) _guardRefLine();
     // Widget hosts mount after a dynamic import; the chrome Check follows them.
     setTimeout(_syncChromeCheck, 0);
     setTimeout(_syncChromeCheck, 260);
+}
+
+// Wave 5.2: the skill's number line above the card (refline-screen.js), when its options tick it on.
+function _syncRefLine() {
+    try {
+        const q = state.currentQ;
+        // A category pool keeps its options under the pool's id (refline-screen.js poolHost).
+        // (A mixed-mode session's items come from the teacher's list, not from state.skill.)
+        const pool = !state.isMixedMode && poolHost(state.category, state.skill);
+        const key = pool ? state.category + ':' + state.skill
+            : q ? q.categoryId + ':' + (q.requestedSkillId || q.skillId) : '';
+        syncPracticeRefLine(q, { categoryId: state.category, skillId: state.skill, pool: !!pool,
+            opts: (state.skillOptionsBySkill || {})[key] || state.skillOptions || null });
+    } catch (e) { /* the line is a hint: never block the card */ }
+}
+
+// critic nl-r8 D1: a later programmatic scroll (a widget's focus, the active-box keeper, the page
+// settling) can still slide the band under the bar. For 1.5 s after a render, until the pupil scrolls
+// or taps, every scroll is answered in its own scroll event (no timer, so no visible late nudge).
+let _nlGuardUntil = 0;
+let _nlGuardWired = false;
+function _guardRefLine() {
+    _nlGuardUntil = Date.now() + 1500;
+    if (_nlGuardWired) return;
+    _nlGuardWired = true;
+    const stop = () => { _nlGuardUntil = 0; };
+    for (const ev of ['wheel', 'touchstart', 'pointerdown']) window.addEventListener(ev, stop, { passive: true, capture: true });
+    window.addEventListener('keydown', (e) => { if (/^(Page|Arrow(Up|Down)|Home|End| )/.test(e.key) && !(e.target && e.target.tagName === 'INPUT')) stop(); }, { capture: true });
+    window.addEventListener('scroll', () => { if (Date.now() < _nlGuardUntil) _clearRefLineOfHeader(); }, { passive: true });
+}
+
+// With the number line on: when the band sits under the sticky play bar, scroll back so its top
+// clears the bar's bottom, but only while the answer box and Check still fit in the window after
+// that scroll (a problem too tall to fit keeps the box in view, as before). No band: never runs.
+function _clearRefLineOfHeader() {
+    try {
+        const band = document.getElementById('mqRefLine');
+        if (!band || !window.scrollY) return;
+        let hdr = 0;
+        const bars = document.querySelectorAll('.nav-bar > .nav-logo, #gameView > *, #myStatsBar, .mq-play-menu-btn');
+        for (const el of bars) {
+            if (el === band || getComputedStyle(el).position !== 'sticky') continue;
+            const r = el.getBoundingClientRect();
+            if (r.height > 0 && r.top < 20 && r.bottom < innerHeight / 2) hdr = Math.max(hdr, r.bottom);
+        }
+        const top = band.getBoundingClientRect().top;
+        if (top >= hdr) return;
+        const d = Math.min(window.scrollY, Math.ceil(hdr + 4 - top));
+        // the active box: the focused input in the card (a stacked skill's digit cell), else #answerInput
+        const ae = document.activeElement;
+        const card = document.getElementById('questionCard');
+        const lit = card && card.querySelector('.mq-active-box');
+        const box = ae && ae.tagName === 'INPUT' && card && card.contains(ae) ? ae : (lit || document.getElementById('answerInput'));
+        // the box must stay clear of a bar pinned to the bottom edge too (Check / Next on a short
+        // screen), or the active-box keeper scrolls it back and the two fight
+        let low = innerHeight;
+        for (const bar of document.querySelectorAll('#questionCard > .mq-qactions, #questionCard > .next-btn-container')) {
+            const cs = getComputedStyle(bar);
+            if (cs.position !== 'sticky' && cs.position !== 'fixed') continue;
+            if (box && bar.contains(box)) continue;
+            const r = bar.getBoundingClientRect();
+            if (r.height > 0 && r.bottom >= innerHeight - 2 && r.top < innerHeight) low = Math.min(low, r.top);
+        }
+        for (const [el, lim] of [[box, low], [document.getElementById('qcCheckBtn'), innerHeight]]) {
+            if (!el) continue;
+            const r = el.getBoundingClientRect();
+            if (r.height > 0 && r.bottom + d > lim) return;
+        }
+        window.scrollBy(0, -d);
+    } catch (e) { /* the line is a hint */ }
 }
 
 // Put #answerInput back in #answerInputArea, where every branch of the renderer expects it.
@@ -5532,7 +5608,12 @@ function _renderQuestionImpl() {
         answerInput.disabled = false;
         answerInput.style.borderColor = "transparent";
         answerInput.style.background = "";
-        if (!hideInput) answerInput.focus();
+        // With the number line on, the focus does not scroll: the active-box keeper (active-box.js)
+        // brings the box into view by the least scroll, so the band stays below the sticky bar.
+        if (!hideInput) {
+            if (document.getElementById('mqRefLine')) { try { answerInput.focus({ preventScroll: true }); } catch (e) { answerInput.focus(); } }
+            else answerInput.focus();
+        }
     }
     document.getElementById("feedbackArea").style.display = "none";
     document.getElementById("feedbackArea").className = "feedback-area";

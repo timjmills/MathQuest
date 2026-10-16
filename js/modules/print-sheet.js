@@ -22,16 +22,19 @@
 // `installLegacyAdapters` at module load), which is what lets the `legacy` template reach the
 // app's print branches.
 
-import { generateQuestionFor } from './generate-question.js';
-import { factSetTitle, optionsFor, normalizeOptions } from './skill-options.js';
+import { generateQuestionFor as _generateQuestionFor, configuredItem } from './generate-question.js';
+// Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
+const generateQuestionFor = (req) => configuredItem(_generateQuestionFor(req), req && req.category);
+import { factSetTitle, optionsFor, normalizeOptions, numberLineFits } from './skill-options.js';
+import { mergedLine } from './refline-screen.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
 import { kitCellSpec } from './print-generate.js';
-import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor } from './sheet/index.js';
+import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor, nlResolveLine, nlLineNumbers, nlStepName as stepName, refLineHTML } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { normKeyOptions, shortKeyRows, renderShortKey, tagKeyAnswers, answerText } from './sheet/roles/key-short.js';
-import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH } from './sheet/roles/practice.js';
+import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH, splitPairH } from './sheet/roles/practice.js';
 import { onePageRows, setOnePagePaper, ONE_PAGE_ITEMS } from './count-rows.js';
 import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
@@ -133,6 +136,7 @@ function normaliseRequest(req = {}) {
         // own `cover` / `mix` option (the default: every problem, clashing supports by section).
         coverage: req.coverage ? normCoverage(req.coverage) : null,
         mix: req.mix ? normMix(req.mix) : null,
+        testHints: req.testHints === true,
         // The lesson packet (role 'lesson'): Independent pages after the teaching sheet, and the
         // optional Mixed practice page.
         practicePages: req.practicePages !== undefined && req.practicePages !== null ? clampInt(req.practicePages, 0, 10, 1) : 1,
@@ -1314,12 +1318,29 @@ function layoutOf(role, section, items, n, ctx) {
     const hN = splitCellH(Ln), hW = splitCellH(Lw);
     const isWide = items.map((it) => oneColumnOnly(it, n));
     const f = wide.length / items.length;
-    let best = 1;
-    for (let N = 2; N <= 40; N++) {
-        const nw = N <= items.length ? isWide.slice(0, N).filter(Boolean).length : Math.round(N * f);
-        const nn = N - nw;
-        if (Math.ceil(nn / Ln.cols) * hN + nw * hW > G - 0.99) break;
-        best = N;
+    const count = (Gm, a, b, Lna, Lwa, squeeze) => {
+        let n = 1;
+        for (let N = 2; N <= 40; N++) {
+            const nw = N <= items.length ? isWide.slice(0, N).filter(Boolean).length : Math.round(N * f);
+            const nn = N - nw;
+            const rowsN = Math.ceil(nn / Lna.cols);
+            if (rowsN * a + nw * b > Gm - 0.99 && !(squeeze && splitPairH(a, Lna.hMin, rowsN, b, Lwa.hMin, nw, Gm - 1.01))) break;
+            n = N;
+        }
+        return n;
+    };
+    let best = count(G, hN, hW, Ln, Lw, false);
+    // Wave 5.2 (critic nl-r4 D1 / D2): with the number-line band the two parts' rows give up their
+    // slack (practice.js splitPairH, as the role lays them out), up to the count the page holds
+    // without the band - never more, so the band never packs a page tighter than its absence.
+    if (Number(ctx.header && ctx.header.refBandMm) > 0) {
+        const opts0 = Object.assign({}, opts, { header: Object.assign({}, ctx.header, { refBandMm: 0 }) });
+        const Ln0 = resolveSectionLayout(Object.assign({}, base, { count: narrow.length, floor: floorOf(narrow) }), narrow, ctx.paper, LIVE_W_MM, opts0);
+        const Lw0 = resolveSectionLayout(Object.assign({}, base, { columns: 1, count: wide.length, floor: null }), wide, ctx.paper, LIVE_W_MM, opts0);
+        if (Ln0.cols === Ln.cols) {
+            const off = count(Ln0.gridH, splitCellH(Ln0), splitCellH(Lw0), Ln0, Lw0, false);
+            best = Math.max(best, Math.min(off, count(G, hN, hW, Ln, Lw, true)));
+        }
     }
     return Object.assign({}, Ln, { perPage: best, splitWide: true });
 }
@@ -1444,6 +1465,79 @@ function anchorSummary(mode, list, notes) {
  * @returns {Promise<{pupilHtml, keyHtml, pageCount, keyPageCount, fits, items, plan, seed, notes}>}
  */
 /**
+ * Wave 5.2: the number line a sheet asks for - the first skill on it that offers the line
+ * (skill-options.js numberLineFits) with it ticked on. null when none does. `sections` = the
+ * sections whose numbers the line must cover (every section of a skill that asked for it).
+ */
+// Wave 5.2: the check pages that carry no hint scaffold by default (P-SC-5: hints on tests are
+// the teacher's option, `req.testHints`).
+const NO_HINT_ROLES = new Set(['test', 'pre-skill-check', 'fact-probe']);
+/**
+ * Draw the line from the page's own items into the band reserved for it (`nline.hMm`) and put it
+ * on `header`. ONE line per page, shared by every section that asked for it (a mixed page draws
+ * one line covering all their numbers): one reference in one place, one reserved height, so the
+ * capacity of every section is decided once and a pupil never meets two different scales.
+ */
+function drawNumberLine(nline, items, size, header) {
+    // The skill's own line (one per skill and options, every role alike: critic nl-r1 D6), widened
+    // only by the page's items; several skills share one merged line (D8).
+    let spec = mergedLine(nline.reqs, items.map((it) => it.q));
+    let band = refLineHTML(spec, { size, widthMm: LIVE_W_MM, hMm: nline.hMm });
+    if (band.natural > nline.hMm + 0.05) {
+        spec = mergedLine(nline.reqs.map((r) => Object.assign({}, r, { opts: Object.assign({}, r.opts, { nlStep: stepName(nline.spec0.step) }) })), items.map((it) => it.q));
+        band = refLineHTML(spec, { size, widthMm: LIVE_W_MM, hMm: nline.hMm });
+    }
+    header.refBand = band.html;
+    return { from: spec.from, to: spec.to, step: stepName(spec.step), covers: spec.covers, missing: spec.missing, hMm: nline.hMm, notes: band.notes.concat(spec.notes || []), warn: spec.warn };
+}
+
+/**
+ * Wave 5.2 (critic nl-r4 D1, nl-r5 D2): the page-count rule's last resort. While the plan runs
+ * past the `wanted` pages, the section with the most items gives up its last one and the page is
+ * planned again (`replan(items)` -> plan). `items` is changed in place. Returns {plan, trimmed}.
+ */
+export function trimToPages(plan, items, wanted, replan) {
+    let trimmed = 0;
+    for (let guard = 0; plan.pages.length > wanted && guard < 24; guard++) {
+        const bySec = new Map();
+        items.forEach((it, i) => { const si = Number(it.section) || 0; if (!bySec.has(si)) bySec.set(si, []); bySec.get(si).push(i); });
+        const donor = [...bySec.entries()].filter(([, ix]) => ix.length > 1).sort((x, y) => y[1].length - x[1].length)[0];
+        if (!donor) break;
+        items.splice(donor[1][donor[1].length - 1], 1);
+        trimmed++;
+        plan = replan(items);
+    }
+    return { plan, trimmed };
+}
+
+/**
+ * Wave 5.2: the skills of a sheet that ask for the number line (skill-options.js numberLineFits,
+ * ticked on), the sections they hold, and the band reserved for their ONE merged line before any
+ * capacity is worked out. null when none asks.
+ */
+function numberLineRequest(n) {
+    const reqs = [];
+    const sections = new Set();
+    const keys = new Set();
+    n.sections.forEach((sec, si) => {
+        for (const sk of sec.skills) {
+            if (!numberLineFits(sk.categoryId, sk.skillId)) continue;
+            const o = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
+            if (!o.nlOn) continue;
+            sections.add(si);
+            const k = `${sk.categoryId}:${sk.skillId}`;
+            if (!keys.has(k)) reqs.push({ categoryId: sk.categoryId, skillId: sk.skillId, opts: sk.opts || {} });
+            keys.add(k);
+        }
+    });
+    if (!reqs.length) return null;
+    const spec0 = mergedLine(reqs, []);
+    if (!spec0) return null;
+    const band0 = refLineHTML(spec0, { size: n.size, widthMm: LIVE_W_MM });
+    return { reqs, sections, keys, spec0, hMm: band0.hMm, html: band0.html };
+}
+
+/**
  * SF-34: touch numerals never print under 24 pt, so on an S / M page the touch cells are raised
  * (stacks and sentences to L, 28 pt; facts to 24 pt or more). The fit line says so instead of
  * naming the page's own digit size alone.
@@ -1508,6 +1602,14 @@ async function buildSheetCore(req = {}) {
     const header = Object.assign({}, n.header, { titleLines: n.header.title === false ? 0 : measureTitleLines(title, n.size) });
     const layoutHeader = { tab: n.header.tab === false ? false : ['Level', 'Strand', 'Id'], title: n.header.title === false ? '' : title, titleLines: header.titleLines };
     const lctx = { paper, header: layoutHeader };
+    // Wave 5.2: the number line at the top of the page. Its band is reserved NOW, from a seeded
+    // sample of the skill, so the capacity below is decided with it (no split cell, rebalanced
+    // last page); the line itself is drawn from the page's real items once they exist.
+    const nline = numberLineRequest(n);
+    if (nline) {
+        header.refBandMm = layoutHeader.refBandMm = nline.hMm;
+        header.refBand = nline.html;
+    }
     // A lesson's step reminder strip sits above the grid on every page: the grid is that much
     // shorter (the strip's height comes off the body, never off a cell).
     if (n.stepStrip) {
@@ -1783,6 +1885,12 @@ async function buildSheetCore(req = {}) {
     allocateHostSupports(hostItems, n);
 
     settleMixedGrades(skills, hostItems);
+    // Wave 5.2: draw the line from the page's own numbers, in the band reserved above.
+    let numberLine = null;
+    if (nline) {
+        numberLine = drawNumberLine(nline, hostItems.filter((it) => nline.sections.has(Number(it.section) || 0)), n.size, header);
+        if (numberLine.warn) notes.push(numberLine.warn);
+    }
     const input = {
         items: hostItems,
         skills,
@@ -1796,8 +1904,20 @@ async function buildSheetCore(req = {}) {
         lesson: n.lesson,
         tabId: n.tabId || '',
         stepStrip: n.stepStrip ? n.stepStrip.html : '',
+        // Wave 5.2: only the pages holding a section that asked for the line print it (D8).
+        refSections: nline ? [...nline.sections] : null,
     };
-    const plan = n.role === 'more-practice' ? morePracticePlan(input) : independentPlan(input);
+    let plan = n.role === 'more-practice' ? morePracticePlan(input) : independentPlan(input);
+    // Wave 5.2 (critic nl-r4 D1): the number line never adds a page. A page-driven Independent
+    // sheet ("a page", no count) whose band pushes a part overleaf (a split section's full-width
+    // group under its grid) gives up its last problems, one at a time, until it is the pages it
+    // was asked for. The capacity above counts each section's grid; this counts the whole page.
+    let trimmed = 0;
+    if (nline && n.role === 'independent' && n.sections.every((sec) => !sec.count)) {
+        const wanted = n.sections.reduce((a, sec) => a + (sec.pages || 1), 0);
+        const t = trimToPages(plan, hostItems, wanted, (items) => { input.items = items; return independentPlan(input); });
+        plan = t.plan; trimmed = t.trimmed;
+    }
     const out = renderPlan(plan, { key: n.key });
     const fitsList = (plan.meta && plan.meta.fits) || [];
     const f0 = fitsList[0] || {};
@@ -1807,7 +1927,7 @@ async function buildSheetCore(req = {}) {
     // then any note the layout line does not already say.
     const line = touchFitLine(f0.line || '', out.pupilHtml, n.size);
     const fits = {
-        cols: f0.cols, rows: f0.rows, perPage: f0.perPage, pages: pageCount,
+        cols: f0.cols, rows: f0.rows, perPage: f0.perPage, pages: pageCount, trimmed,
         note: [line, ...notes.filter((t) => !line.includes(t))].filter(Boolean).join(' '),
         sections: fitsList,
     };
@@ -1823,6 +1943,7 @@ async function buildSheetCore(req = {}) {
             text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy,
         })),
         gaps: out.gaps,
+        numberLine,
         anchors: anchorSummary(anchorMode, anchorsIn ? anchorsIn.bySection.flat().concat(hostItems.map((it) => it.twin).filter(Boolean)) : [], anchorNotes),
         floors: n.sections.map((s) => s.floor || null),
         seed: n.seed,
@@ -2061,6 +2182,14 @@ async function buildRoleSheet(n, metaOf) {
     }
     const header = Object.assign({}, n.header);
     delete header.titleLines;
+    // Wave 5.2: the number line, reserved before any capacity is worked out (see buildSheet).
+    // A test / check page carries no hint scaffold unless the teacher allows hints on tests
+    // (PEDAGOGY P-SC-5: a teacher option, `req.testHints`); every other role carries it.
+    const nline = NO_HINT_ROLES.has(n.role) && !n.testHints ? null : numberLineRequest(n);
+    if (nline) {
+        header.refBandMm = nline.hMm;
+        header.refBand = nline.html;
+    }
     const ctx = { size: n.size, look: n.look, paper: n.paper, photocopySafe: n.photocopySafe };
     const colsList = (typeof mod.measureCols === 'function' ? mod.measureCols(ctx) : [1, 2]) || [1, 2];
     const needsShow = SHOWS_WORK.has(n.role);
@@ -2221,11 +2350,13 @@ async function buildRoleSheet(n, metaOf) {
         input.extras = ex;
     }
 
+    const numberLine = nline ? drawNumberLine(nline, items.some((it) => nline.keys.has(String(it.skill))) ? items.filter((it) => nline.keys.has(String(it.skill))) : items, n.size, header) : null;
     const plan = mod.plan(input);
     const out = renderPlan(plan, { key: n.key });
     const fitsList = (plan.meta && plan.meta.fits) || [];
     const f0 = fitsList[0] || {};
     const notes = [...new Set((plan.meta && plan.meta.notes) || []), ...anchorNotes];
+    if (numberLine && numberLine.warn) notes.push(numberLine.warn);
     // SF-34: touch numerals never print under 24 pt, so on an S / M page the stacked touch cells
     // are raised to L; the fit line says so instead of the page's own digit size alone.
     const line = touchFitLine(f0.line || '', out.pupilHtml, n.size);
@@ -2235,6 +2366,7 @@ async function buildRoleSheet(n, metaOf) {
         pupilPages: out.pupilPages, keyPages: n.key ? out.keyPages : [],
         pageCount: out.pupilPages.length,
         keyPageCount: n.key ? out.keyPages.length : 0,
+        numberLine,
         fits: { cols: f0.cols, rows: f0.rows, perPage: f0.perPage, pages: out.pupilPages.length, note: [line, ...notes.filter((t) => !line.includes(t))].filter(Boolean).join(' '), sections: fitsList },
         items: items.map((it) => ({
             skill: it.skill, section: 0, pool: it.pool, template: it.template,
