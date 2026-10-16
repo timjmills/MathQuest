@@ -20,9 +20,9 @@ export async function mergeCheck(L) {
   // r11 (critic r10 A3b): the other lanes' tagFixes that touch THIS file's steps (the passed R, Y1 and Y4 files, vendored
   // read-only under tests/scripts/wrm-tagging/Y2-Y3/inputs/) are merged too, before and after this file's own fixes, so a
   // fix another lane carries on a Y2/Y3 step must agree with this file whichever lane the lead merges first.
-  const INP = new URL('inputs/', import.meta.url).pathname;
+  const INP = R + 'data/curriculum/links/';
   const foreign = [];
-  for (const y of ['R', 'Y1', 'Y4']) { let F; try { F = JSON.parse(fs.readFileSync(INP + y + '.json', 'utf8')); } catch (_) { P.push(`NO-INPUT ${y}.json`); continue; }
+  for (const y of ['R', 'Y1', 'Y4', 'Y5', 'Y6']) { let F; try { F = JSON.parse(fs.readFileSync(INP + y + '.json', 'utf8')); } catch (_) { P.push(`NO-INPUT ${y}.json`); continue; }
     for (const t of F.tagFixes || []) if (L.steps[t.step]) foreign.push({ ...t, lane: y }); }
   const base = JSON.stringify(M);
   const apply = (M, fixes, tagP) => { const seen = new Map();

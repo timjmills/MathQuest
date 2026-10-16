@@ -29,7 +29,7 @@ const W=JSON.parse(fs.readFileSync(root+'data/curriculum/wrm-steps.json'));
 // r11 (critic r10 N9): the PASSED lanes' links files are read-only inputs (vendored copies under
 // tests/scripts/wrm-tagging/Y2-Y3/inputs/, from the R/Y1 and Y4 lane branches). An R.* / Y1.* step's skills and their opts
 // come from its lane's file, so a K rung of a Grade 1 skill keeps its opts ({usd, like, band 50}) instead of arriving as {}.
-const INP=HERE+'inputs/';
+const INP=root+'data/curriculum/links/';
 const LANE={};for(const y of ['R','Y1'])LANE[y]=JSON.parse(fs.readFileSync(INP+y+'.json','utf8'));
 const laneStep=id=>{const y=id.split('.')[0];return LANE[y]?.steps?.[id]||null;};
 const SO=await import(root+'js/modules/skill-options.js');

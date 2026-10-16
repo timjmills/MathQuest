@@ -1,3 +1,4 @@
+// r12: R, Y1, Y2, Y3, Y4, Y5, Y6 (every passed lane's links file in data/curriculum/links/). usage: node mergeall.mjs [order | reverse]
 // r11 (critic r10 §4): the lane's five-year merge, adapted from the critic's independent mergeall.mjs (r10 scratch).
 // Two changes, both on agreeing fixes only: a fix one lane carries on ANOTHER year's step, and the same tag fixed by two
 // lanes, are NOTES when the tag state they produce is the same (and that year's file then matches it, which the step check
@@ -8,13 +9,13 @@
 //  full -> full; opts -> no-op. Then every year's steps must equal its file (after ALL merges, not just its own).
 import fs from 'fs';
 const m=new Map();globalThis.localStorage={getItem:k=>m.get(k)??null,setItem:(k,v)=>m.set(k,String(v)),removeItem:k=>m.delete(k)};globalThis.window=globalThis;globalThis.document={};
-const ROOT=new URL('../../../../',import.meta.url).pathname;const INP=new URL('inputs/',import.meta.url).pathname;
+const ROOT=new URL('../../../../',import.meta.url).pathname;const INP=ROOT+'data/curriculum/links/';
 const _l=console.log;console.log=()=>{};
 const {SKILL_WRM}=await import(ROOT+'js/modules/wrm.js');const {SKILLS}=await import(ROOT+'js/modules/data.js');const {SKILL_ALIASES}=await import(ROOT+'js/modules/skill-aliases.js');
 console.log=_l;
 const live=k=>{const[c,s]=k.split(':');return (SKILLS[c]||[]).some(x=>x&&x.v===s);};
-const files={R:INP+'R.json',Y1:INP+'Y1.json',Y2:ROOT+'data/curriculum/links/Y2.json',Y3:ROOT+'data/curriculum/links/Y3.json',Y4:INP+'Y4.json'};
-const A=process.argv.slice(2);const order=A[0]==='reverse'?['Y4','Y3','Y2','Y1','R']:A.length?A:['R','Y1','Y2','Y3','Y4'];const N=[];const res=new Map();
+const ALL=['R','Y1','Y2','Y3','Y4','Y5','Y6'];const files=Object.fromEntries(ALL.map(y=>[y,INP+y+'.json']));
+const A=process.argv.slice(2);const order=A[0]==='reverse'?[...ALL].reverse():A.length?A:ALL;const N=[];const res=new Map();
 const D={};for(const y of order)D[y]=JSON.parse(fs.readFileSync(files[y]));
 const tag=new Map();for(const[k,v]of Object.entries(SKILL_WRM))for(const e of v){const s=typeof e==='string'?e:e.step;const id=k+'|'+s;if(tag.has(id))console.log('BASE-DUP',id);tag.set(id,typeof e==='object'&&'partial' in e?{st:'partial',c:e.partial}:{st:'full'});}
 const P=[];const touched=new Map();
