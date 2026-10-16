@@ -1,0 +1,16 @@
+== counting by 25
+  19.6  multiplication:count_by_tables  Skip counting: count by 1–12
+== count by 25s
+  19.6  multiplication:count_by_tables  Skip counting: count by 1–12
+== count by 5 number line
+  25.6  patterns:skip_count_line  Skip counting on a number line (2s, 5s, 10s)
+== skip count by 5
+  22.6  patterns:skip_count_line  Skip counting on a number line (2s, 5s, 10s)
+  22.6  patterns:skip_count_grid  Skip counting by 2s, 5s and 10s (rows)
+  22.2  patterns:seq_5  Count by 5s
+   8.0  multiplication:count_by_tables  Skip counting: count by 1–12
+== hundred chart
+  72.0  composing:hundreds_chart_fill  Hundreds Chart - Find the Missing Number (Visual)
+  11.6  composing:number_chart_fill  Number Chart - Find the Missing Number (to 1,000 and beyond)
+  10.0  counting:number_seq_fill  Number Sequence: Fill Missing (Grid)
+  10.0  patterns:count_by_step_up  Count Up by Step (Grid)

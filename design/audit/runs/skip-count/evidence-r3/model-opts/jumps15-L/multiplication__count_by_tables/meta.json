@@ -1,0 +1,116 @@
+{
+  "skill": "multiplication:count_by_tables",
+  "category": "multiplication",
+  "skillId": "count_by_tables",
+  "label": "Skip counting: count by 1–12",
+  "grade": "3",
+  "dir": "multiplication__count_by_tables",
+  "roles": {
+    "scripted-model": {
+      "fits": {
+        "cols": 2,
+        "rows": 4,
+        "pages": 2,
+        "note": "Fits: 4 states, 2 pages.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 4,
+            "line": "Fits: 4 states, 2 pages."
+          }
+        ]
+      },
+      "pageCount": 2,
+      "keyPageCount": 2,
+      "seed": 283712,
+      "title": "I Can count by 1 to 12 (15 jumps)",
+      "notes": [],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 2. Write the missing numbers.",
+          "ans": "8, 10, 16, 18, 22, 26, 28",
+          "measured": {
+            "1": {
+              "hMm": 50.1,
+              "fits": true,
+              "slackMm": 10
+            },
+            "2": {
+              "hMm": 50.1,
+              "fits": false,
+              "slackMm": -36.3
+            },
+            "3": {
+              "hMm": 50.1,
+              "fits": false,
+              "slackMm": -51.8
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "scripted-model-p1.png",
+          "words": 77,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "scripted-model-p2.png",
+          "words": 87,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "scripted-model-key-p1.png",
+          "words": 77,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "scripted-model-key-p2.png",
+          "words": 87,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 2,
+        "cells": [
+          2,
+          2
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 80
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 2,
+        "cells": [
+          2,
+          2
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 80
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

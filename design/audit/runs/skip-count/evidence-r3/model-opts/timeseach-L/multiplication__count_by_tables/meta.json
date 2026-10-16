@@ -1,0 +1,102 @@
+{
+  "skill": "multiplication:count_by_tables",
+  "category": "multiplication",
+  "skillId": "count_by_tables",
+  "label": "Skip counting: count by 1–12",
+  "grade": "3",
+  "dir": "multiplication__count_by_tables",
+  "roles": {
+    "scripted-model": {
+      "fits": {
+        "cols": 2,
+        "rows": 3,
+        "pages": 1,
+        "note": "Fits: 3 states, 1 page.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 3,
+            "line": "Fits: 3 states, 1 page."
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 283712,
+      "title": "I Can count by 1 to 12",
+      "notes": [],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 2. Write the missing numbers.",
+          "ans": "8, 10, 16, 18, 22",
+          "measured": {
+            "1": {
+              "hMm": 45.5,
+              "fits": true,
+              "slackMm": 7.4
+            },
+            "2": {
+              "hMm": 45.5,
+              "fits": false,
+              "slackMm": -38.9
+            },
+            "3": {
+              "hMm": 45.5,
+              "fits": false,
+              "slackMm": -54.4
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "scripted-model-p1.png",
+          "words": 220,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "scripted-model-key-p1.png",
+          "words": 220,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          3
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 90
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          3
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 90
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

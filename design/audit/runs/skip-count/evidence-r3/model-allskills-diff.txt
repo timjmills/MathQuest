@@ -1,0 +1,293 @@
+model pages, every skill x S/M/L, seed 7: entries 1707 changed vs parent 73cc8b8b: 68
+addition:add_10k_mixed:S: pages 2 -> 1; states 5 -> 4
+       Ones: 9 + 6 = 15. Write 5. Regroup 1 ten.
+       Tens: 6 + 3 + 1 regrouped = 10. Write 0. Regroup 1 hundred. Hundreds: 0 + 1 regrouped = 1. Write 1.
+       Thousands: 1 = 1. Write 1.
+       The sum is 1,105.
+addition:add_10k_no_regroup:S: pages 2 -> 1; states 5 -> 4
+       Ones: 0 + 5 = 5. Write 5.
+       Tens: 0 = 0. Write 0. Hundreds: 1 = 1. Write 1.
+       Thousands: 1 = 1. Write 1.
+       The sum is 1,105.
+addition:add_10k_regroup:S: pages 2 -> 1; states 5 -> 4
+       Ones: 1 + 9 = 10. Write 0. Regroup 1 ten.
+       Tens: 0 + 8 + 1 regrouped = 9. Write 9. Hundreds: 8 + 4 = 12. Write 2. Regroup 1 thousand.
+       Thousands: 3 + 3 + 1 regrouped = 7. Write 7.
+       The sum is 7,290.
+addition:add_1k_mixed:L: pages 2 -> 1; states 4 -> 3
+       Ones: 7 + 3 = 10. Write 0. Regroup 1 ten.
+       Tens: 0 + 1 regrouped = 1. Write 1. Hundreds: 1 = 1. Write 1.
+       The sum is 110.
+addition:add_1k_mixed:M: pages 2 -> 1; states 4 -> 3
+       Ones: 7 + 3 = 10. Write 0. Regroup 1 ten.
+       Tens: 0 + 1 regrouped = 1. Write 1. Hundreds: 1 = 1. Write 1.
+       The sum is 110.
+addition:add_1k_no_regroup:L: pages 2 -> 1; states 4 -> 3
+       Ones: 4 + 5 = 9. Write 9.
+       Tens: 3 + 3 = 6. Write 6. Hundreds: 1 + 4 = 5. Write 5.
+       The sum is 569.
+addition:add_1k_no_regroup:M: pages 2 -> 1; states 4 -> 3
+       Ones: 4 + 5 = 9. Write 9.
+       Tens: 3 + 3 = 6. Write 6. Hundreds: 1 + 4 = 5. Write 5.
+       The sum is 569.
+addition:add_1k_regroup:L: pages 2 -> 1; states 4 -> 3
+       Ones: 1 + 9 = 10. Write 0. Regroup 1 ten.
+       Tens: 8 + 4 + 1 regrouped = 13. Write 3. Regroup 1 hundred. Hundreds: 3 + 3 + 1 regrouped = 7. Write 7.
+       The sum is 730.
+addition:add_1k_regroup:M: pages 2 -> 1; states 4 -> 3
+       Ones: 1 + 9 = 10. Write 0. Regroup 1 ten.
+       Tens: 8 + 4 + 1 regrouped = 13. Write 3. Regroup 1 hundred. Hundreds: 3 + 3 + 1 regrouped = 7. Write 7.
+       The sum is 730.
+addition:add_50_mixed:L: pages 2 -> 1; states 4 -> 3
+       Add the ones.
+       10 or more? Write the ones. Regroup the ten into the box above the tens. Add the tens, and any regrouped number.
+       Check: the sum is bigger than each number.
+addition:add_50_mixed:M: pages 2 -> 1; states 4 -> 3
+       Add the ones.
+       10 or more? Write the ones. Regroup the ten into the box above the tens. Add the tens, and any regrouped number.
+       Check: the sum is bigger than each number.
+addition:nl_add:L: pages 2 -> 1; states 4 -> 3
+       Start at 2, the dot.
+       Jump 2 spaces to the right. Count the jumps: 1, 2.
+       You land on 4. Write 4.
+addition:number_line_add:L: pages 2 -> 1; states 4 -> 3
+       Start at 1, the dot.
+       Jump 1 space to the right. Count the jumps: 1.
+       You land on 2. Write 2.
+composing:hundreds_chart_fill:L: pages 2 -> 1; states 4 -> 3
+       The number before is 3.
+       One more is 4. The number below is 14. Ten less is 4.
+       Write 4.
+composing:hundreds_chart_fill:M: pages 2 -> 1; states 4 -> 3
+       The number before is 3.
+       One more is 4. The number below is 14. Ten less is 4.
+       Write 4.
+composing:hundreds_chart_fill:S: pages 2 -> 1; states 4 -> 3
+       The number before is 3.
+       One more is 4. The number below is 14. Ten less is 4.
+       Write 4.
+composing:number_bonds:L: pages 2 -> 1; states 4 -> 3
+       The whole is 10. One part is 3.
+       Take 3 from 10: 10 − 3 = 7. Check: 3 and 7 make 10.
+       Write 7 in the part.
+composing:number_bonds:M: pages 2 -> 1; states 4 -> 3
+       The whole is 10. One part is 3.
+       Take 3 from 10: 10 − 3 = 7. Check: 3 and 7 make 10.
+       Write 7 in the part.
+composing:number_chart_fill:L: pages 2 -> 1; states 4 -> 3
+       The number before is 102.
+       One more is 103. The number after is 104. One less is 103.
+       Write 103.
+composing:number_chart_fill:M: pages 2 -> 1; states 4 -> 3
+       The number before is 102.
+       One more is 103. The number after is 104. One less is 103.
+       Write 103.
+composing:number_chart_fill:S: pages 2 -> 1; states 4 -> 3
+       The number before is 102.
+       One more is 103. The number after is 104. One less is 103.
+       Write 103.
+composing:teen_compose:L: pages 2 -> 1; states 4 -> 3
+       The full frame is 10.
+       Count the ones: 1. 10 and 1 make 11.
+       Write 1.
+composing:teen_compose:M: pages 2 -> 1; states 4 -> 3
+       The full frame is 10.
+       Count the ones: 1. 10 and 1 make 11.
+       Write 1.
+composing:teen_compose:S: pages 2 -> 1; states 4 -> 3
+       The full frame is 10.
+       Count the ones: 1. 10 and 1 make 11.
+       Write 1.
+division:long_div_2digit:M: pages 2 -> 1; states 4 -> 3
+       Can 11 go into the first digits of 979? Start there.
+       97 ÷ 11 = 8. 8 × 11 = 88. 97 − 88 = 9. Bring down 9: 99. 99 ÷ 11 = 9. 9 × 11 = 99. 99 − 99 = 0.
+       The quotient is 89.
+division:nl_div:L: pages 2 -> 1; states 4 -> 3
+       Start at 0. Each hop is 9.
+       Hop: 9, 18, 27, 36. 4 hops of 9 land on 36.
+       36 ÷ 9 = 4.
+division:nl_div:M: pages 2 -> 1; states 4 -> 3
+       Start at 0. Each hop is 9.
+       Hop: 9, 18, 27, 36. 4 hops of 9 land on 36.
+       36 ÷ 9 = 4.
+division:share_into_groups:L: pages 2 -> 1; states 4 -> 3
+       Circle 3 counters. That is group 1.
+       Circle 3 more, and 3 more, until none are left. Count the circles: 1, 2, 3, 4, 5.
+       15 in groups of 3 makes 5 groups. Write 5.
+division:share_into_groups:M: pages 2 -> 1; states 4 -> 3
+       Circle 3 counters. That is group 1.
+       Circle 3 more, and 3 more, until none are left. Count the circles: 1, 2, 3, 4, 5.
+       15 in groups of 3 makes 5 groups. Write 5.
+division:share_into_groups:S: pages 2 -> 1; states 4 -> 3
+       Circle 3 counters. That is group 1.
+       Circle 3 more, and 3 more, until none are left. Count the circles: 1, 2, 3, 4, 5.
+       15 in groups of 3 makes 5 groups. Write 5.
+measurement:money:L: pages 2 -> 1; states 4 -> 3
+       Line up the ones.
+       Add the right column first. Regroup 10 if you need to. Add the next column.
+       Write 6.
+measurement:money_change:L: pages 2 -> 1; states 4 -> 3
+       Line up the points.
+       Subtract the right column first. Regroup if the top digit is smaller. Bring the point straight down.
+       Write 0.50.
+multiplication:area_model_mult:S: pages 2 -> 1; states 5 -> 4
+       Split 235 into 200 + 30 + 5.
+       4 × 200 = 800. Write it in part 1. 4 × 30 = 120. Write it in part 2.
+       4 × 5 = 20. Write it in part 3.
+       Add the parts: 800 + 120 + 20 = 940.
+multiplication:arrays_groups:L: pages 2 -> 1; states 4 -> 3
+       Count the groups: 3.
+       Count one group: 3 in each. Count by 3, 3 times: 3, 6, 9.
+       3 groups of 3 is 9. Write 9.
+multiplication:arrays_groups:M: pages 2 -> 1; states 4 -> 3
+       Count the groups: 3.
+       Count one group: 3 in each. Count by 3, 3 times: 3, 6, 9.
+       3 groups of 3 is 9. Write 9.
+multiplication:count_by_tables:L: pages 1 -> 1; states 4 -> 4
+       Count by 2: each jump adds 2.
+       6 + 2 = 8. Write 8.
+       8 + 2 = 10. Write 10.
+       Do the same at every gap. Check each jump.
+multiplication:count_by_tables:M: pages 1 -> 1; states 4 -> 4
+       Count by 2: each jump adds 2.
+       6 + 2 = 8. Write 8.
+       8 + 2 = 10. Write 10.
+       Do the same at every gap. Check each jump.
+multiplication:count_by_tables:S: pages 1 -> 1; states 4 -> 4
+       Count by 2: each jump adds 2.
+       6 + 2 = 8. Write 8.
+       8 + 2 = 10. Write 10.
+       Do the same at every gap. Check each jump.
+multiplication:nl_mult:L: pages 2 -> 1; states 4 -> 3
+       Start at 0. Each hop is 9.
+       Hop: 9, 18, 27, 36. 4 hops land on 36.
+       4 × 9 = 36.
+multiplication:nl_mult:M: pages 2 -> 1; states 4 -> 3
+       Start at 0. Each hop is 9.
+       Hop: 9, 18, 27, 36. 4 hops land on 36.
+       4 × 9 = 36.
+number_sense:place_on_number_line:M: pages 2 -> 1; states 4 -> 3
+       The line goes from 10 to 20.
+       Each small jump is 1. 11 is 1 jump from 10.
+       Mark 11.
+number_sense:place_on_number_line:S: pages 2 -> 1; states 4 -> 3
+       The line goes from 10 to 20.
+       Each small jump is 1. 11 is 1 jump from 10.
+       Mark 11.
+number_sense:round_nl_hundred_thousands:S: pages 2 -> 1; states 4 -> 3
+       Put a dot for 110,534 between 100,000 and 200,000.
+       Halfway between 100,000 and 200,000 is 150,000. 110,534 is before halfway, so it is nearer 100,000.
+       Write 100,000.
+number_sense:round_nl_ten_thousands:S: pages 2 -> 1; states 4 -> 3
+       Put a dot for 11,053 between 10,000 and 20,000.
+       Halfway between 10,000 and 20,000 is 15,000. 11,053 is before halfway, so it is nearer 10,000.
+       Write 10,000.
+number_sense:round_nl_thousands:S: pages 2 -> 1; states 4 -> 3
+       Put a dot for 1,105 between 1,000 and 2,000.
+       Halfway between 1,000 and 2,000 is 1,500. 1,105 is before halfway, so it is nearer 1,000.
+       Write 1,000.
+number_sense:rounding_visual:M: pages 2 -> 1; states 4 -> 3
+       11 is between 10 and 20.
+       The digit after the cut is 1: 4 or less, round down. 11 rounds to 10.
+       Write 10.
+number_sense:rounding_visual:S: pages 2 -> 1; states 4 -> 3
+       11 is between 10 and 20.
+       The digit after the cut is 1: 4 or less, round down. 11 rounds to 10.
+       Write 10.
+patterns:number_patterns_rule:L: pages 2 -> 2; states 5 -> 5
+       The rule: count on by 2.
+       1, 3, 5: the rule is count on by 2.
+       5 + 2 = 7. Write 7.
+       7 + 2 = 9. Write 9.
+       Do the same at every gap. Check each jump.
+patterns:number_patterns_rule:M: pages 2 -> 1; states 5 -> 4
+       The rule: count on by 2.
+       1, 3, 5: the rule is count on by 2. 5 + 2 = 7. Write 7.
+       7 + 2 = 9. Write 9.
+       Do the same at every gap. Check each jump.
+patterns:number_patterns_rule:S: pages 1 -> 1; states 5 -> 5
+       The rule: count on by 2.
+       1, 3, 5: the rule is count on by 2.
+       5 + 2 = 7. Write 7.
+       7 + 2 = 9. Write 9.
+       Do the same at every gap. Check each jump.
+patterns:skip_count_grid:L: pages 1 -> 1; states 4 -> 4
+       Skip count by 5: each jump adds 5.
+       15 + 5 = 20. Write 20.
+       20 + 5 = 25. Write 25.
+       Do the same at every gap. Check each jump.
+patterns:skip_count_grid:M: pages 1 -> 1; states 4 -> 4
+       Skip count by 5: each jump adds 5.
+       15 + 5 = 20. Write 20.
+       20 + 5 = 25. Write 25.
+       Do the same at every gap. Check each jump.
+patterns:skip_count_grid:S: pages 1 -> 1; states 4 -> 4
+       Skip count by 5: each jump adds 5.
+       15 + 5 = 20. Write 20.
+       20 + 5 = 25. Write 25.
+       Do the same at every gap. Check each jump.
+patterns:skip_count_line:L: pages 1 -> 1; states 4 -> 4
+       Skip count by 5: each jump adds 5.
+       40 + 5 = 45. Write 45.
+       45 + 5 = 50. Write 50.
+       Do the same at every gap. Check each jump.
+patterns:skip_count_line:M: pages 1 -> 1; states 4 -> 4
+       Skip count by 5: each jump adds 5.
+       40 + 5 = 45. Write 45.
+       45 + 5 = 50. Write 50.
+       Do the same at every gap. Check each jump.
+patterns:skip_count_line:S: pages 1 -> 1; states 4 -> 4
+       Skip count by 5: each jump adds 5.
+       40 + 5 = 45. Write 45.
+       45 + 5 = 50. Write 50.
+       Do the same at every gap. Check each jump.
+subtraction:nl_sub:L: pages 2 -> 1; states 4 -> 3
+       Start at 3, the dot.
+       Hop 1 space to the left. Count the hops: 1.
+       You land on 2. Write 2.
+subtraction:number_line_sub:L: pages 2 -> 1; states 4 -> 3
+       Start at 5, the dot.
+       Jump 1 space to the left. Count the jumps: 1.
+       You land on 4. Write 4.
+subtraction:sub_100_mixed:L: pages 2 -> 1; states 4 -> 3
+       Ones: 1 is not less than 1.
+       1 − 1 = 0. Write 0. 1 − 0 = 1. Write 1.
+       Check: 10 + 1 = 11.
+subtraction:sub_100_mixed:M: pages 2 -> 1; states 4 -> 3
+       Ones: 1 is not less than 1.
+       1 − 1 = 0. Write 0. 1 − 0 = 1. Write 1.
+       Check: 10 + 1 = 11.
+subtraction:sub_100_no_regroup:L: pages 2 -> 1; states 4 -> 3
+       Ones: 1 is not less than 0.
+       1 − 0 = 1. Write 1. 1 − 1 = 0. Leave the tens empty.
+       Check: 1 + 10 = 11.
+subtraction:sub_100_no_regroup:M: pages 2 -> 1; states 4 -> 3
+       Ones: 1 is not less than 0.
+       1 − 0 = 1. Write 1. 1 − 1 = 0. Leave the tens empty.
+       Check: 1 + 10 = 11.
+subtraction:sub_100_regroup:S: pages 2 -> 1; states 5 -> 4
+       Ones: 0 is less than 9.
+       7 tens 0 ones is 6 tens 10 ones. 10 − 9 = 1. Write 1.
+       6 − 3 = 3. Write 3.
+       Check: 31 + 39 = 70.
+subtraction:sub_50_mixed:L: pages 2 -> 1; states 4 -> 3
+       Ones: 0 is less than 1.
+       1 tens 0 ones is 0 tens 10 ones. 10 − 1 = 9. Write 9.
+       Check: 9 + 1 = 10.
+subtraction:sub_50_mixed:M: pages 2 -> 1; states 4 -> 3
+       Ones: 0 is less than 1.
+       1 tens 0 ones is 0 tens 10 ones. 10 − 1 = 9. Write 9.
+       Check: 9 + 1 = 10.
+subtraction:sub_50_no_regroup:L: pages 2 -> 1; states 4 -> 3
+       Ones: 8 is not less than 4.
+       8 − 4 = 4. Write 4. 3 − 1 = 2. Write 2.
+       Check: 24 + 14 = 38.
+subtraction:sub_50_no_regroup:M: pages 2 -> 1; states 4 -> 3
+       Ones: 8 is not less than 4.
+       8 − 4 = 4. Write 4. 3 − 1 = 2. Write 2.
+       Check: 24 + 14 = 38.
+subtraction:sub_50_regroup:S: pages 2 -> 1; states 5 -> 4
+       Ones: 0 is less than 9.
+       4 tens 0 ones is 3 tens 10 ones. 10 − 9 = 1. Write 1.
+       3 − 2 = 1. Write 1.
+       Check: 11 + 29 = 40.

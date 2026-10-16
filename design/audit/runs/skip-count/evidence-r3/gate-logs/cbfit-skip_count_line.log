@@ -1,0 +1,17 @@
+home screen 1366x650 (full header)           ok (nav flex, controls flex, menu button hidden)
+play at 1366x960 (tall screen, full header)  ok (nav flex, controls flex, menu button hidden)
+patterns:skip_count_line 1366x650            card ok box 325/650 go 395 | boss ok box 330/650 go 400 | race ok box 325/650 go 395 | worksheet ok box 272/650 go 54 cards 2 | quiz ok box 299/650 go 392
+patterns:skip_count_line 1280x600            card ok box 325/600 go 395 | boss ok box 330/600 go 400 | race ok box 325/600 go 395 | worksheet ok box 272/600 go 54 cards 2 | quiz ok box 299/600 go 392
+addition:add_facts 1366x650 quiz touch wrong touch Next ok
+addition:add_facts 1366x650 quiz touch right touch Next ok
+subtraction:subtract 1366x650 quiz touch wrong touch Next ok
+subtraction:subtract 1366x650 quiz touch right touch Next ok
+multiplication:mult_facts 1366x650 quiz touch wrong touch Next ok
+multiplication:mult_facts 1366x650 quiz touch right touch Next ok
+addition:add_facts 1280x600 quiz touch wrong touch Next ok
+addition:add_facts 1280x600 quiz touch right touch Next ok
+subtraction:subtract 1280x600 quiz touch wrong touch Next ok
+subtraction:subtract 1280x600 quiz touch right touch Next ok
+multiplication:mult_facts 1280x600 quiz touch wrong touch Next ok
+multiplication:mult_facts 1280x600 quiz touch right touch Next ok
+ws-chromebook-fit: OK
