@@ -1,0 +1,14 @@
+unit: 600 live skills, 600 offer at least one option, 2658 option round trips; offered by option: {"band":230,"objects":7,"orientation":2,"level":47,"support":70,"cover":24,"calculator":600,"skipAfter":600,"dir":12,"step":18,"shape":3,"range":58,"members":56,"poolSize":51,"poolSupport":19,"task":22,"tiles":32,"unknown":12,"grid":1,"gaps":2,"forms":206,"wordform":1,"denoms":59,"parts":4,"constant":14,"notation":31,"mix":17,"regroup":21,"response":23,"pictures":30,"wpCues":46,"wpBank":46,"wpBar":31,"ticks":13,"zeroPlace":12,"amEdges":4,"chart":1,"missing":4,"rows":1,"fill":1,"times":1,"onePage":1,"jumps":1,"order":7,"spaces":1,"divForm":1,"amForm":2,"shapes":13,"points":7,"decimals":11,"model":15,"precision":7,"digits":2,"units":4,"labels":12,"stimulus":5,"numerals":15,"review":4,"quarters":1,"words":1,"noon":7,"hours":4,"bars":2,"currency":9,"kind":1,"values":5,"gap":1,"paid":1,"most":3,"scale":1,"pattern":1,"places":3,"rule":1,"ftTask":2,"ftRules":2,"ftTable":2,"source":1,"op":1,"power":1,"repeatDigit":1,"form":2,"zeroDigit":1,"closeness":3,"lengths":3,"frame":1,"count":2,"rename":1,"place":9,"midpoint":18,"line":4,"midLabel":4,"responseScope":6,"bins":6,"blank":1,"span":1,"wordSet":47}
+unit: codes {"plain":"EA-AY","withOpts":"EA~C78-AY","mx":"MX-T00~C78.A00-40MSP1200","settings":"T00403M~C78"}
+teacher: skill codes {"enhanced":"EA~C78_NA-AY|T0-N20-Gp-D0","plain":"EA~C78_NA-AY"}
+buildSheet (teacher Print): 2 pages, 16 x items — 7×1, 8×2, 7×6, 8×7, 7×2, 8×6, 7×3, 8×3, 7×0, 8×8, 7×8, 8×1, 7×7, 8×6, 7×5, 8×9
+teacher: Quick Start link https://math.cultivatingthedigital.org/?qs=EA~C78_NA-AY
+teacher: Direct link      https://math.cultivatingthedigital.org/?c=EA~C78_NA-AY|T0-N20-Gp-D0
+teacher: MX- code MX-T00~C78_NA.A00-41M0P1200
+Print screen: 8 x items on the page — 7 × 7, 8 × 9, 7 × 4, 8 × 12, 7 × 6, 8 × 2, 7 × 10, 8 × 3
+print: 12 x items on paper — 8 × 9, 8 × 2, 7 × 6, 8 × 3, 7 × 2, 8 × 5, 7 × 0, 8 × 7, 7 × 11, 8 × 12, 7 × 3, 8 × 8
+pupil via Quick Start link: 12 answered — 6 x items (8 × 0, 7 × 7, 8 × 9, 7 × 12, 7 × 6, 7 × 10), 6 + items
+pupil via MX- code: 12 answered — 6 x items (7 × 10, 8 × 11, 7 × 11, 8 × 3, 8 × 4, 7 × 4), 6 + items
+pupil via Direct link: 12 answered — 6 x items (8 × 2, 8 × 1, 8 × 6, 7 × 5, 8 × 11, 8 × 9), 6 + items
+ws-share-options: OK
+exit 0

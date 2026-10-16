@@ -1,0 +1,107 @@
+ok   S MP dot_array_mult A,B key=true pages=2 order=PPKK 
+ok   S MP dot_array_mult A,B key={"on":true,"placement":"end","style":"copy"} pages=2 order=PPKK 
+ok   S MP dot_array_mult A,B key={"on":true,"placement":"end","style":"short"} pages=2 order=PPK ["Practice A:8","Practice B:8"]
+ok   S MP dot_array_mult A,B key={"on":true,"placement":"after-page","style":"copy"} pages=2 order=PKPK 
+ok   S MP dot_array_mult A,B key={"on":true,"placement":"after-page","style":"short"} pages=2 order=PKPK ["Practice A:8","Practice B:8"]
+ok   S MP dot_array_mult A,B key={"on":true,"placement":"after-page","style":"copy","newSheet":true} pages=2 order=P_K_P_K_ 
+ok   S MP dot_array_mult A,B key={"on":false} pages=2 order=PP 
+ok   S MP number_families_add A,B,C key=true pages=3 order=PPPKKK 
+ok   S MP number_families_add A,B,C key={"on":true,"placement":"end","style":"copy"} pages=3 order=PPPKKK 
+ok   S MP number_families_add A,B,C key={"on":true,"placement":"end","style":"short"} pages=3 order=PPPK ["Practice A:12","Practice B:12","Practice C:12"]
+ok   S MP number_families_add A,B,C key={"on":true,"placement":"after-page","style":"copy"} pages=3 order=PKPKPK 
+ok   S MP number_families_add A,B,C key={"on":true,"placement":"after-page","style":"short"} pages=3 order=PKPKPK ["Practice A:12","Practice B:12","Practice C:12"]
+ok   S MP number_families_add A,B,C key={"on":true,"placement":"after-page","style":"copy","newSheet":true} pages=3 order=P_K_P_K_P_K_ 
+ok   S MP number_families_add A,B,C key={"on":false} pages=3 order=PPP 
+ok   S MP mixed_multiplication A,B (pool) key=true pages=2 order=PPKK 
+ok   S MP mixed_multiplication A,B (pool) key={"on":true,"placement":"end","style":"copy"} pages=2 order=PPKK 
+ok   S MP mixed_multiplication A,B (pool) key={"on":true,"placement":"end","style":"short"} pages=2 order=PPK ["Practice A:7","Practice B:6"]
+ok   S MP mixed_multiplication A,B (pool) key={"on":true,"placement":"after-page","style":"copy"} pages=2 order=PKPK 
+ok   S MP mixed_multiplication A,B (pool) key={"on":true,"placement":"after-page","style":"short"} pages=2 order=PKPK ["Practice A:7","Practice B:6"]
+ok   S MP mixed_multiplication A,B (pool) key={"on":true,"placement":"after-page","style":"copy","newSheet":true} pages=2 order=P_K_P_K_ 
+ok   S MP mixed_multiplication A,B (pool) key={"on":false} pages=2 order=PP 
+ok   S IND mixed_composing (pool) key=true pages=1 order=PK 
+ok   S IND mixed_composing (pool) key={"on":true,"placement":"end","style":"copy"} pages=1 order=PK 
+ok   S IND mixed_composing (pool) key={"on":true,"placement":"end","style":"short"} pages=1 order=PK ["Lesson 1:8"]
+ok   S IND mixed_composing (pool) key={"on":true,"placement":"after-page","style":"copy"} pages=1 order=PK 
+ok   S IND mixed_composing (pool) key={"on":true,"placement":"after-page","style":"short"} pages=1 order=PK ["Lesson 1:8"]
+ok   S IND mixed_composing (pool) key={"on":true,"placement":"after-page","style":"copy","newSheet":true} pages=1 order=P_K_ 
+ok   S IND mixed_composing (pool) key={"on":false} pages=1 order=P 
+ok   S IND add_sub_10s 2 pages key=true pages=2 order=PPKK 
+ok   S IND add_sub_10s 2 pages key={"on":true,"placement":"end","style":"copy"} pages=2 order=PPKK 
+ok   S IND add_sub_10s 2 pages key={"on":true,"placement":"end","style":"short"} pages=2 order=PPK ["Lesson 1, page 1 of 2:30","Lesson 1, page 2 of 2:30"]
+ok   S IND add_sub_10s 2 pages key={"on":true,"placement":"after-page","style":"copy"} pages=2 order=PKPK 
+ok   S IND add_sub_10s 2 pages key={"on":true,"placement":"after-page","style":"short"} pages=2 order=PKPK ["Lesson 1, page 1 of 2:30","Lesson 1, page 2 of 2:30"]
+ok   S IND add_sub_10s 2 pages key={"on":true,"placement":"after-page","style":"copy","newSheet":true} pages=2 order=P_K_P_K_ 
+ok   S IND add_sub_10s 2 pages key={"on":false} pages=2 order=PP 
+ok   M MP dot_array_mult A,B key=true pages=2 order=PPKK 
+ok   M MP dot_array_mult A,B key={"on":true,"placement":"end","style":"copy"} pages=2 order=PPKK 
+ok   M MP dot_array_mult A,B key={"on":true,"placement":"end","style":"short"} pages=2 order=PPK ["Practice A:6","Practice B:6"]
+ok   M MP dot_array_mult A,B key={"on":true,"placement":"after-page","style":"copy"} pages=2 order=PKPK 
+ok   M MP dot_array_mult A,B key={"on":true,"placement":"after-page","style":"short"} pages=2 order=PKPK ["Practice A:6","Practice B:6"]
+ok   M MP dot_array_mult A,B key={"on":true,"placement":"after-page","style":"copy","newSheet":true} pages=2 order=P_K_P_K_ 
+ok   M MP dot_array_mult A,B key={"on":false} pages=2 order=PP 
+ok   M MP number_families_add A,B,C key=true pages=3 order=PPPKKK 
+ok   M MP number_families_add A,B,C key={"on":true,"placement":"end","style":"copy"} pages=3 order=PPPKKK 
+ok   M MP number_families_add A,B,C key={"on":true,"placement":"end","style":"short"} pages=3 order=PPPK ["Practice A:9","Practice B:9","Practice C:9"]
+ok   M MP number_families_add A,B,C key={"on":true,"placement":"after-page","style":"copy"} pages=3 order=PKPKPK 
+ok   M MP number_families_add A,B,C key={"on":true,"placement":"after-page","style":"short"} pages=3 order=PKPKPK ["Practice A:9","Practice B:9","Practice C:9"]
+ok   M MP number_families_add A,B,C key={"on":true,"placement":"after-page","style":"copy","newSheet":true} pages=3 order=P_K_P_K_P_K_ 
+ok   M MP number_families_add A,B,C key={"on":false} pages=3 order=PPP 
+ok   M MP mixed_multiplication A,B (pool) key=true pages=2 order=PPKK 
+ok   M MP mixed_multiplication A,B (pool) key={"on":true,"placement":"end","style":"copy"} pages=2 order=PPKK 
+ok   M MP mixed_multiplication A,B (pool) key={"on":true,"placement":"end","style":"short"} pages=2 order=PPK ["Practice A:6","Practice B:8"]
+ok   M MP mixed_multiplication A,B (pool) key={"on":true,"placement":"after-page","style":"copy"} pages=2 order=PKPK 
+ok   M MP mixed_multiplication A,B (pool) key={"on":true,"placement":"after-page","style":"short"} pages=2 order=PKPK ["Practice A:6","Practice B:8"]
+ok   M MP mixed_multiplication A,B (pool) key={"on":true,"placement":"after-page","style":"copy","newSheet":true} pages=2 order=P_K_P_K_ 
+ok   M MP mixed_multiplication A,B (pool) key={"on":false} pages=2 order=PP 
+ok   M IND mixed_composing (pool) key=true pages=1 order=PK 
+ok   M IND mixed_composing (pool) key={"on":true,"placement":"end","style":"copy"} pages=1 order=PK 
+ok   M IND mixed_composing (pool) key={"on":true,"placement":"end","style":"short"} pages=1 order=PK ["Lesson 1:8"]
+ok   M IND mixed_composing (pool) key={"on":true,"placement":"after-page","style":"copy"} pages=1 order=PK 
+ok   M IND mixed_composing (pool) key={"on":true,"placement":"after-page","style":"short"} pages=1 order=PK ["Lesson 1:8"]
+ok   M IND mixed_composing (pool) key={"on":true,"placement":"after-page","style":"copy","newSheet":true} pages=1 order=P_K_ 
+ok   M IND mixed_composing (pool) key={"on":false} pages=1 order=P 
+ok   M IND add_sub_10s 2 pages key=true pages=2 order=PPKK 
+ok   M IND add_sub_10s 2 pages key={"on":true,"placement":"end","style":"copy"} pages=2 order=PPKK 
+ok   M IND add_sub_10s 2 pages key={"on":true,"placement":"end","style":"short"} pages=2 order=PPK ["Lesson 1, page 1 of 2:16","Lesson 1, page 2 of 2:16"]
+ok   M IND add_sub_10s 2 pages key={"on":true,"placement":"after-page","style":"copy"} pages=2 order=PKPK 
+ok   M IND add_sub_10s 2 pages key={"on":true,"placement":"after-page","style":"short"} pages=2 order=PKPK ["Lesson 1, page 1 of 2:16","Lesson 1, page 2 of 2:16"]
+ok   M IND add_sub_10s 2 pages key={"on":true,"placement":"after-page","style":"copy","newSheet":true} pages=2 order=P_K_P_K_ 
+ok   M IND add_sub_10s 2 pages key={"on":false} pages=2 order=PP 
+ok   L MP dot_array_mult A,B key=true pages=2 order=PPKK 
+ok   L MP dot_array_mult A,B key={"on":true,"placement":"end","style":"copy"} pages=2 order=PPKK 
+ok   L MP dot_array_mult A,B key={"on":true,"placement":"end","style":"short"} pages=2 order=PPK ["Practice A:6","Practice B:6"]
+ok   L MP dot_array_mult A,B key={"on":true,"placement":"after-page","style":"copy"} pages=2 order=PKPK 
+ok   L MP dot_array_mult A,B key={"on":true,"placement":"after-page","style":"short"} pages=2 order=PKPK ["Practice A:6","Practice B:6"]
+ok   L MP dot_array_mult A,B key={"on":true,"placement":"after-page","style":"copy","newSheet":true} pages=2 order=P_K_P_K_ 
+ok   L MP dot_array_mult A,B key={"on":false} pages=2 order=PP 
+ok   L MP number_families_add A,B,C key=true pages=3 order=PPPKKK 
+ok   L MP number_families_add A,B,C key={"on":true,"placement":"end","style":"copy"} pages=3 order=PPPKKK 
+ok   L MP number_families_add A,B,C key={"on":true,"placement":"end","style":"short"} pages=3 order=PPPK ["Practice A:6","Practice B:6","Practice C:6"]
+ok   L MP number_families_add A,B,C key={"on":true,"placement":"after-page","style":"copy"} pages=3 order=PKPKPK 
+ok   L MP number_families_add A,B,C key={"on":true,"placement":"after-page","style":"short"} pages=3 order=PKPKPK ["Practice A:6","Practice B:6","Practice C:6"]
+ok   L MP number_families_add A,B,C key={"on":true,"placement":"after-page","style":"copy","newSheet":true} pages=3 order=P_K_P_K_P_K_ 
+ok   L MP number_families_add A,B,C key={"on":false} pages=3 order=PPP 
+ok   L MP mixed_multiplication A,B (pool) key=true pages=2 order=PPKK 
+ok   L MP mixed_multiplication A,B (pool) key={"on":true,"placement":"end","style":"copy"} pages=2 order=PPKK 
+ok   L MP mixed_multiplication A,B (pool) key={"on":true,"placement":"end","style":"short"} pages=2 order=PPK ["Practice A:5","Practice B:6"]
+ok   L MP mixed_multiplication A,B (pool) key={"on":true,"placement":"after-page","style":"copy"} pages=2 order=PKPK 
+ok   L MP mixed_multiplication A,B (pool) key={"on":true,"placement":"after-page","style":"short"} pages=2 order=PKPK ["Practice A:5","Practice B:6"]
+ok   L MP mixed_multiplication A,B (pool) key={"on":true,"placement":"after-page","style":"copy","newSheet":true} pages=2 order=P_K_P_K_ 
+ok   L MP mixed_multiplication A,B (pool) key={"on":false} pages=2 order=PP 
+ok   L IND mixed_composing (pool) key=true pages=1 order=PK 
+ok   L IND mixed_composing (pool) key={"on":true,"placement":"end","style":"copy"} pages=1 order=PK 
+ok   L IND mixed_composing (pool) key={"on":true,"placement":"end","style":"short"} pages=1 order=PK ["Lesson 1:6"]
+ok   L IND mixed_composing (pool) key={"on":true,"placement":"after-page","style":"copy"} pages=1 order=PK 
+ok   L IND mixed_composing (pool) key={"on":true,"placement":"after-page","style":"short"} pages=1 order=PK ["Lesson 1:6"]
+ok   L IND mixed_composing (pool) key={"on":true,"placement":"after-page","style":"copy","newSheet":true} pages=1 order=P_K_ 
+ok   L IND mixed_composing (pool) key={"on":false} pages=1 order=P 
+ok   L IND add_sub_10s 2 pages key=true pages=2 order=PPKK 
+ok   L IND add_sub_10s 2 pages key={"on":true,"placement":"end","style":"copy"} pages=2 order=PPKK 
+ok   L IND add_sub_10s 2 pages key={"on":true,"placement":"end","style":"short"} pages=2 order=PPK ["Lesson 1, page 1 of 2:16","Lesson 1, page 2 of 2:16"]
+ok   L IND add_sub_10s 2 pages key={"on":true,"placement":"after-page","style":"copy"} pages=2 order=PKPK 
+ok   L IND add_sub_10s 2 pages key={"on":true,"placement":"after-page","style":"short"} pages=2 order=PKPK ["Lesson 1, page 1 of 2:16","Lesson 1, page 2 of 2:16"]
+ok   L IND add_sub_10s 2 pages key={"on":true,"placement":"after-page","style":"copy","newSheet":true} pages=2 order=P_K_P_K_ 
+ok   L IND add_sub_10s 2 pages key={"on":false} pages=2 order=PP 
+ws-key-letters: OK
+exit 0

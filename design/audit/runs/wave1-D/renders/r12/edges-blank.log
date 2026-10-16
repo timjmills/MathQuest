@@ -1,0 +1,6 @@
+ws-grade-render: 4 skills -> design/audit/runs/wave1-D/renders/r12/edges-blank
+  [1/4] multiplication:area_model_mult  independent 1p+1k 2x3  9s
+  [2/4] multiplication:area_model_mult_hard  independent 1p+1k 2x2  18s
+  [3/4] division:area_model_div_2by1  independent 1p+1k 2x3  27s
+  [4/4] division:area_model_div_3by1  independent 1p+1k 2x3  36s
+ws-grade-render: done, 4 skills, 36s

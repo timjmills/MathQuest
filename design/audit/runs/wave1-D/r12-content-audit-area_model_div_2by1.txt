@@ -1,0 +1,16 @@
+note division/area_model_div_2by1  "Area Model Division (2÷1 digit)"
+       . [variety] 69 distinct items in 240; a page of 6 is likely to repeat one
+
+Failures by class:
+     0  (none)
+
+Notes by class:
+     1  variety
+
+By family:
+  operations    1 skills, 0 failing
+
+Coverage: 0 skills where NOTHING could be checked against the name; 0 more with at least one check that could not be applied.
+
+ws-content-audit: OK (1 area_model_div_2by1 skills, 240 items each, Max Number 100, 0 failing, 0 mixed pools held to their pool union, 1 notes)
+exit 0
