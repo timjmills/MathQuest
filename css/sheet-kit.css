@@ -419,3 +419,9 @@
 /* owner 2026-10-09: the blank back of a key-on-a-new-sheet run carries one very small line in the
    footer band's centre cell (6 mm band, 7 pt, regular, black), level with the facing pages' footers. Additive. */
 .ws-page.ws-blank-back .ws-blank-foot > .ws-blank-note { font-weight: 400; color: var(--ws-ink); text-align: center; white-space: nowrap; }
+/* CL-40 (Lane D r11): a one-line equation under a two- or three-digit tab (w2 / w3: the keep-out square
+   is the tab's width, wider than it is tall) starts below the keep-out. The digits' glyph box rises about
+   a quarter em above the line box, so the top inset is the keep-out plus 1.5 mm (missing_mult_div More
+   Practice L: "55 ÷ ☐ = 11" under tab 10 began 0.4 mm inside it). The line keeps its size; a one-digit
+   tab's cell is unchanged. Additive. */
+.ws-page .ws-grid > .ws-cell[data-ws-cell="equation"]:has(> .ws-tab.w2, > .ws-tab.w3) { padding-top: calc(var(--ws-ko) + 1.5mm); }
