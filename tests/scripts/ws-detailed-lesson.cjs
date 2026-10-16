@@ -268,14 +268,15 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
     row('E16', 'Every Say frame ≤ 2 blanks', `${say.length} frames; blanks ${[...new Set(say)].join(', ') || '—'}`, say.every((n) => n <= 2));
     const panel = pages.flatMap((p) => p.panelRows);
     row('E16b', 'RCDWS panel: one action per box, each row one line (≤ 9 mm)', `${panel.length} rows; tallest ${Math.max(0, ...panel)} mm`, panel.length >= 6 && panel.every((h) => h <= 9.05));
-    const chartP = pages.filter((p) => /^P2(-key)?$/.test(p.id));
-    row('E17b', 'The anchor chart and its key carry no answer marks', chartP.map((p) => `${p.id}: ${p.kaCount}`).join(', '), chartP.length === 2 && chartP.every((p) => p.kaCount === 0));
+    // (a chunked lesson has one chart per chunk: P2, P2b ...)
+    const chartP = pages.filter((p) => /^P2[a-z]?(-key)?$/.test(p.id));
+    row('E17b', 'The anchor chart and its key carry no answer marks', chartP.map((p) => `${p.id}: ${p.kaCount}`).join(', '), chartP.length >= 2 && chartP.length % 2 === 0 && chartP.every((p) => p.kaCount === 0));
     const pairs = pupil.map((p) => [p, keys.find((k) => k.id === `${p.id}-key`)]);
     row('E17', 'Each key has the same slots as its page', pairs.map(([p, k]) => `${p.id} ${p.slots}/${k ? k.slots : '—'}`).join(', '), pairs.every(([p, k]) => k && p.slots === k.slots));
     row('E18', '© line and strand tab on every page', `© ${pages.filter((p) => p.copy).length}/${pages.length}; tab ${pages.filter((p) => p.tabs > 0).length}/${pages.length}`, pages.every((p) => p.copy && p.tabs > 0));
     const titles = [...new Set(pages.flatMap((p) => p.titles))];
     row('E19', 'One identical I Can title on every page', titles.join(' | '), titles.length === 1);
-    const lone = pupil.filter((p) => !/^P[25]$/.test(p.id) && p.graded < 2);
+    const lone = pupil.filter((p) => !/^P(2[a-z]?|5)$/.test(p.id) && p.graded < 2);
     row('E20', 'No lone item (word problem v1 and the anchor chart excepted)', lone.map((p) => p.id).join(', ') || 'none', !lone.length);
     const t1 = pages.find((p) => p.id === 'T1'), t2 = pages.find((p) => p.id === 'T2');
     const want = t2 && t2.newSteps >= 4 ? 'Chunked' : 'Standard';
@@ -303,8 +304,8 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
     const p4 = pages.filter((p) => /^P4/.test(p.id)), extra = p4.flatMap((p) => p.bandLabels.filter((t) => /^(Say|Rule|Remember):/.test(t)).map((t) => `${p.id} ${t}`));
     row('E28', 'No Say:, Rule: or Remember: band on a Practice page', `${p4.length} Practice / Mixed pages; extra bands ${extra.join(', ') || 0}`, p4.length > 0 && !extra.length);
     row('E27', 'Counters in rows of at most 5', pupil.flatMap((p) => p.perRow.map((n) => `${p.id}:${n}`)).join(', ') || 'no counters', pupil.every((p) => p.perRow.every((n) => n <= 5)));
-    const ch = pages.find((p) => p.id === 'P2');
-    row('E26', 'Every anchor-chart step panel adds a grey (newest) mark', ch ? `${ch.panels.filter(Boolean).length} / ${ch.panels.length} panels` : 'no chart', !!ch && ch.panels.length > 0 && ch.panels.every(Boolean));
+    const chs = pages.filter((p) => /^P2[a-z]?$/.test(p.id));
+    row('E26', 'Every anchor-chart step panel adds a grey (newest) mark', chs.length ? chs.map((ch) => `${ch.id} ${ch.panels.filter(Boolean).length} / ${ch.panels.length} panels`).join('; ') : 'no chart', chs.length > 0 && chs.every((ch) => ch.panels.length > 0 && ch.panels.every(Boolean)));
     row('E25', 'One key per pupil page (anchor chart included)', `${pupil.length} pupil pages, ${keys.length} keys`, pupil.length === keys.length && pupil.every((p) => keys.some((k) => k.id === `${p.id}-key`)));
     return rows;
 }

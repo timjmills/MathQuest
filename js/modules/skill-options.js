@@ -1532,6 +1532,13 @@ SKILL_OPTIONS['composing:number_word_form'] = [{
     id: 'zeroPlace', label: 'A zero place (305, 340)', type: 'enum', default: 'none', group: 'difficulty',
     values: [{ v: 'none', l: 'Never' }, { v: 'some', l: 'Some numbers (every third)' }, { v: 'always', l: 'Every number' }],
     help: 'A missing tens or ones word means a 0 in that place: "three hundred five" is 305. Needs Numbers to 100 or 1,000.',
+}, {
+    // Detailed lesson 1 r3 (critic D16): words to numeral written in the place boxes, one digit a
+    // box under H T O - the scaffold that stops 35 for "three hundred five". The default keeps
+    // the answer line every saved page prints.
+    id: 'answerSlot', label: 'Write the number', type: 'enum', default: 'line', group: 'support',
+    values: [{ v: 'line', l: 'On a line' }, { v: 'hto', l: 'In H T O boxes (one digit a box)' }],
+    help: 'H T O boxes: three boxes, three digits - a missing tens word still gets its 0. Words to numeral only.',
 }];
 
 // ===========================================================================

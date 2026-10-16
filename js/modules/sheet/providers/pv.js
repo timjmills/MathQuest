@@ -1145,6 +1145,18 @@ registerSkill('composing:number_word_form', {
         if (p.way === 'to_words') {
             return clampSteps([step(`${f(n)}: the ${h || 'no'} is in the hundreds place.`), step(`The last two digits read ${r}.`), step(`So ${f(n)} is ${p.words}.`, [{ slot: 'answer', value: String(p.words) }])]);
         }
+        // H T O boxes (option answerSlot, the chart's words panels): each step writes its boxes.
+        if (q && q.cell && q.cell.payload && q.cell.payload.slot === 'hto') {
+            if (n === 1000) return clampSteps([step('"one thousand": 1 in the Th box.', [{ slot: 'pv-0', value: '1' }]),
+                step('No hundreds, tens or ones words: write 0, 0, 0.', [{ slot: 'pv-1', value: '0' }, { slot: 'pv-2', value: '0' }, { slot: 'pv-3', value: '0' }]), step('Read it: 1,000.')]);
+            const t = Math.floor(r / 10), o = r % 10;
+            const rest = String(p.words).split(' hundred')[1] ? String(p.words).split(' hundred')[1].trim() : '';
+            const two = !r ? 'No tens or ones words: write 0 tens, 0 ones.'
+                : r < 10 ? `"${rest}": no tens word, so 0 tens, ${o} ones.`
+                    : `"${rest}": ${t} ten${t === 1 ? '' : 's'}, ${o} ones.`;
+            return clampSteps([step(`"${String(p.words).split(' hundred')[0]} hundred": ${h} in the H box.`, [{ slot: 'pv-0', value: String(h) }]),
+                step(two, [{ slot: 'pv-1', value: String(t) }, { slot: 'pv-2', value: String(o) }]), step(`Read it: ${f(n)}.`)]);
+        }
         return clampSteps([step(`"${String(p.words).split(' hundred')[0]} hundred": ${h} in the hundreds.`), step(r ? `The rest is ${r}: ${Math.floor(r / 10)} tens ${r % 10} ones.` : 'No tens or ones words: 0 tens 0 ones.'),
             step(`Write ${f(n)}.`, [{ slot: 'answer', value: String(n) }])]);
     },

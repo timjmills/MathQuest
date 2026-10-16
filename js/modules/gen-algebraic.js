@@ -2717,6 +2717,8 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                     // A zero place: a 0 in the ones (or, at 1,000, the tens) - dealt, not hoped for.
                     if (wantZero && !(wfBand === 1000 && num === 1000)) {
                         if (wfBand === 100) num = Math.max(30, Math.floor(num / 10) * 10);
+                        // (1,000 is the band's own zero-place case: 0 hundreds, 0 tens, 0 ones - one zero item in four)
+                        else if (rng(0, 3) === 0) num = 1000;
                         else num = Math.floor(num / 100) * 100 + (rng(0, 1) ? rng(1, 9) : rng(1, 9) * 10);
                     }
                 } else {
@@ -2750,7 +2752,7 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                 // template on paper and screen; the legacy visual below stays for the old print path.
                 q.pv = { kind: 'words', n: num, words: wordForm, way: mode };
                 q.instructionKey = mode === 'to_words' ? 'number-words' : 'standard-form';
-                q.cell = { template: 'words', payload: { n: num, words: wordForm, way: mode, ans: mode === 'to_words' ? wordForm : String(num) } };
+                q.cell = { template: 'words', payload: Object.assign({ n: num, words: wordForm, way: mode, ans: mode === 'to_words' ? wordForm : String(num) }, mode !== 'to_words' && wfO.answerSlot === 'hto' && num <= 1000 ? { slot: 'hto' } : {}) };
 
                 // Place value chart visual
                 const digits = num.toString().split('');

@@ -36,7 +36,7 @@ import { barMini } from '../cells/word-work.js';
 export const ROLE_ID = 'detailed-lesson';
 
 /** PT-FRM-9 (V22 §8.7): every strand-tab id the detailed pack prints. */
-export const DETAILED_TAB_IDS = Object.freeze(['Prerequisite', 'Number sense', 'Anchor chart', 'Lesson 1', 'Practice 1', 'Practice 2',
+export const DETAILED_TAB_IDS = Object.freeze(['Prerequisite', 'Number sense', 'Anchor chart', 'Lesson 1', 'Lesson 1a', 'Lesson 1b', 'Practice 1', 'Practice 2',
     'Mixed 1', 'Word problem', 'Exit slip', 'Answer Key', 'Teacher 1', 'Teacher 2', 'Teacher 3', 'Teacher 4', 'Teacher 5', 'Reference']);
 
 /** V22 Part 11: which delivery page holds which sections, and the pupil page it shows. */
@@ -75,7 +75,14 @@ export function teacherBands(d, V, pages) {
     const out = {};
 
     // ---------------------------------------------------------------------------- T1
-    const pageOf = (s) => ({ P0: 'Prerequisite Check', P1: 'Number sense', P2: 'Anchor chart', P3: 'Lesson sheet', P4: 'Practice 1–2', P5: 'Word problem', P6: 'Exit slip' }[s.page] || 'Mini whiteboards');
+    // (a chunked lesson's own chart and sheet: P2b 'Anchor chart 2', P3b 'Lesson sheet 2')
+    const chunkNo = (c) => (d.chunks || []).findIndex((x) => x.id === c) + 1;
+    const pageOf = (s) => {
+        const m = /^P([23])([a-z])$/.exec(String(s.page || ''));
+        if (m) return `${m[1] === '2' ? 'Anchor chart' : 'Lesson sheet'} ${chunkNo(m[2]) || m[2]}`;
+        const chunked = (d.chunks || []).length > 1;
+        return { P0: 'Prerequisite Check', P1: 'Number sense', P2: chunked ? 'Anchor chart 1' : 'Anchor chart', P3: chunked ? 'Lesson sheet 1' : 'Lesson sheet', P4: 'Practice 1–2', P5: 'Word problem', P6: 'Exit slip' }[s.page] || 'Mini whiteboards';
+    };
     const flowRows = d.sections.map((s) => [String(s.n), cellText(s.name), cellText(pageOf(s)), `<span class="num">${s.min}</span>`]);
     if (d.transitionsMin) flowRows.push(['', 'Transitions', 'between pages', `<span class="num">${d.transitionsMin}</span>`]);
     flowRows.push(['', '<b>Total</b>', '', `<b>${d.sections.reduce((a, s) => a + s.min, 0) + (d.transitionsMin || 0)}</b>`]);
@@ -87,7 +94,7 @@ export function teacherBands(d, V, pages) {
         return esc(g.text || '');
     };
     out.T1 = [
-        { label: null, blocks: [tLine(`<b>CCSS</b> ${esc(pages.tags.ccss.join(', '))} · <b>EE</b> ${esc(pages.tags.ee.join(', '))} · <b>CRA:</b> ${esc(d.cra)} · <b>Flow:</b> ${flow}`, 'dl-flow tline')] },
+        { label: null, blocks: [tLine(`<b>CCSS</b> ${esc(pages.tags.ccss.join(', '))} · <b>EE</b> ${esc(pages.tags.ee.join(', '))} · <b>CRA:</b> ${esc(d.cra)} · <b>Flow:</b> ${flow} (${newCount} new routine steps)`, 'dl-flow tline')] },
         { label: 'Lesson guidance:', blocks: (d.t1Boxes || []).map((b) => tBox(b.kind, b.title, esc(f(b.text)))) },
         { label: 'Lesson flow:', blocks: [tTable(['#', 'Section', 'Pupil page', 'Min'], flowRows, { widths: ['8mm', '', '45mm', '14mm'] })] },
         { label: 'Materials:', blocks: [checkList(d.materials || [])] },
@@ -98,19 +105,22 @@ export function teacherBands(d, V, pages) {
     const atoms = d.atoms.slice().sort((a, b) => (b.prereq ? 1 : 0) - (a.prereq ? 1 : 0));
     const atomRows = atoms.map((a, i) => ({
         cls: a.critical ? 'dl-crit' : '',
-        cells: [String(i + 1), keyNamed(a.skill), `${esc(a.type)}${a.prereq ? ' · Pre-requisite' : ''}`, `${a.critical ? `${keyIcon()} <b>Critical Atom.</b> ` : ''}${esc(a.notes)}`],
+        cells: [String(i + 1), keyNamed(a.skill), `${esc(a.type)}${a.prereq ? ' · Pre-requisite' : ''}`, `${a.critical ? `${keyIcon()} <b>Critical Atom.</b> ` : ''}${esc(f(a.notes))}`],
     }));
     const routineRows = d.routine.map((r, i) => ({
         cls: r.critical ? 'dl-crit' : '',
         cells: [stepMark(i + 1), `${r.critical ? `${keyIcon()} ` : ''}${esc(r.step)}`, esc(r.tag), esc(r.check)],
     }));
     const mistakeRows = d.mistakes.map((m) => [`<b>${esc(m.name)}</b>`, `Step ${m.step}`, esc(m.looks), esc(m.fix)]);
-    const links = d.mistakes.filter((m) => m.option).map((m) => `Check Question option ${m.option} catches <b>${esc(m.name)}</b>.`).join(' ');
+    // Every mistake names where it is caught: its Check Question option, else `caught` (V22 10.9, critic D7).
+    const links = d.mistakes.map((m) => (m.option ? `Check Question option ${m.option} catches <b>${esc(m.name)}</b>.` : m.caught ? `<b>${esc(m.name)}</b> is caught by ${esc(f(m.caught))}.` : '')).filter(Boolean).join(' ');
     out.T2 = [
         { label: 'What students need to know:', blocks: [tTable(['#', 'Skill or Concept', 'Atom Type', 'Teacher Notes'], atomRows, { widths: ['7mm', '', '36mm', ''] })] },
-        { label: 'What students do:', blocks: [tTable(['Step', 'Task / Routine atom', 'Tag', 'Check it with'], routineRows, { widths: ['16mm', '', '26mm', '48mm'] }),
-            tLine(`Rows tagged New: ${newCount} → Flow: ${flow}.${d.flowNote ? ` ${esc(d.flowNote)}` : ''}`)] },
-        { label: 'How to teach:', blocks: [`<ol class="dl-list">${d.howToTeach.map((t) => `<li>${esc(t)}</li>`).join('')}</ol>`, boardLine()] },
+        // (the flow note is the table's foot: one block, never a band continued for one line - critic D5)
+        { label: 'What students do:', blocks: [tTable(['Step', 'Task / Routine atom', 'Tag', 'Check it with'], routineRows, { widths: ['16mm', '', '26mm', '48mm'] })
+            + tLine(`Rows tagged New: ${newCount} → Flow: ${flow}.${d.flowNote ? ` ${esc(d.flowNote)}` : ''}`)] },
+        // (the Board line only when the description says what goes on the board - critic D8)
+        { label: 'How to teach:', blocks: [`<ol class="dl-list">${d.howToTeach.map((t) => `<li>${esc(t)}</li>`).join('')}</ol>`, d.board ? boardLine(`Board: ${f(d.board)}`) : ''] },
         { label: 'Common mistakes:', blocks: [tTable(['Mistake', 'Broken step', 'Looks like', 'Fix'], mistakeRows, { widths: ['30mm', '20mm', '', ''] }), links ? tLine(links) : ''] },
     ];
 
@@ -119,6 +129,8 @@ export function teacherBands(d, V, pages) {
         line: '<span style="display:inline-block;width:14mm;border-bottom:0.75pt solid #000;height:5mm"></span>',
         box: '<span style="display:inline-block;width:10mm;height:8mm;border:1.5pt solid #000"></span>',
         check: '<span class="dl-cbox" style="display:inline-block"></span>',
+        longline: '<span style="display:inline-block;width:30mm;border-bottom:0.75pt solid #000;height:5mm"></span>',
+        hto: '<span style="display:inline-flex;gap:1mm;align-items:flex-end">' + ['H', 'T', 'O'].map((l) => `<span style="display:inline-flex;flex-direction:column;align-items:center;font-size:8pt;font-weight:700">${l}<span style="display:inline-block;width:6mm;height:7mm;border:1.5pt solid #000"></span></span>`).join('') + '</span>',
     };
     const iconRow = (id, label, accent) => [accent ? stepIcon(id, 'L', { mm: 5 }) : teacherIcon(id, 5), esc(label)];
     out.T2b = [{ label: 'Reference key:', blocks: [twoCols(
@@ -130,23 +142,28 @@ export function teacherBands(d, V, pages) {
         subHead('Data loop'), tLoop({ most: 'Go on.', half: 'Short reteach, then go on.', fewer: 'Stop. Reteach with a concrete example.' }),
         subHead('Abbreviations'), tTable(['Short', 'In full'], [['MWBs', 'mini whiteboards'], ['ELL', 'English language learners'], ['SPED', 'special education students'], ['RCDWS', 'Read, Circle, Draw, Write, Solve'], ['CRA', 'Concrete-Representational-Abstract']].map((r) => r.map(cellText))),
         ].join(''),
-        [subHead('Answer slots'), tTable(['Shape', 'Used for'], [[slotDraw.line, 'a number after ='], [slotDraw.box, 'a part inside an expression'], [slotDraw.check, 'a tick (routine panel, exit slip)']]),
+        [subHead('Answer slots'), tTable(['Shape', 'Used for'], [[slotDraw.line, 'a number after ='], [slotDraw.box, 'a part inside an expression'], [slotDraw.check, 'a tick (routine panel, exit slip)']]
+            .concat((d.slotRows || []).map((r) => [slotDraw[r.shape] || esc(r.shape), esc(r.use)]))),
         subHead('Icons'), tTable(['Icon', 'Means'], [iconRow('tip', 'Tip'), iconRow('feedback', 'Feedback'), iconRow('watch', 'Watch'), iconRow('research', 'Research'),
             iconRow('key', 'Critical Atom'), iconRow('language', 'Language tip'), iconRow('why', 'Why it works'), iconRow('board', 'Board'),
             [d.lessonData.steps.map((s, i) => stepMark(i + 1, s.icon)).join(' '), 'The pupil Steps (accent)']]),
+        ...(d.routeNote ? [subHead('Routing ids'), tLine(esc(d.routeNote))] : []),
         subHead('Band labels'), tLine('Pupil: Vocabulary · Remember · Guided Practice · Steps · Independent Practice · Mixed Review · Number sense: A / B · Workspace · Another example · Say · Rule.'),
         tLine('Teacher: Lesson guidance · Lesson flow · Materials · What students need to know · What students do · How to teach · Common mistakes · Section n · Prerequisite routing · Accepted answers · Answers at a glance.'),
         ].join(''))] }];
 
     // ---------------------------------------------------------------------------- T3-T5
     const THUMB_OF = { 1: 'P0', 5: 'P2', 6: 'P3', 8: 'P4' };
+    // A chunked lesson's sections 5a, 6a, 5b, 6b sit with 5 and 6 (V22 Chunked Flow), in description order.
     for (const [tid, nums] of Object.entries(DELIVERY)) {
-        out[tid] = nums.map((n) => d.sections.find((s) => s.n === n)).filter(Boolean).map((s) => {
+        out[tid] = d.sections.filter((s) => nums.includes(parseInt(String(s.n), 10))).map((s) => {
             const boxes = (s.boxes || []).map((b) => tBox(b.kind, b.title, esc(f(b.text))));
             const rows = s.rows.map((r, i) => ({ n: i + 1, do: r.do && f(r.do), say: r.say && f(r.say), ask: r.ask && f(r.ask), note: r.note && f(r.note) }));
-            const th = THUMB_OF[s.n] && pages.thumbs[THUMB_OF[s.n]];
+            const base = parseInt(String(s.n), 10);
+            const th = THUMB_OF[base] && (pages.thumbs[s.page] || pages.thumbs[THUMB_OF[base]]);
             // The thumbnail sits beside the first rows (the boxes and as many rows as its 77.8 mm hold).
-            const lead = Math.min(rows.length, th ? 4 : 0);
+            // (about 80 mm: a box takes ~13 mm, a row ~11 mm - critic D12: no gap under the rows)
+            const lead = Math.min(rows.length, th ? Math.max(3, Math.floor((80 - 13 * boxes.length) / 11)) : 0);
             const blocks = [];
             if (th) blocks.push(besideThumb(boxes.join('') + tScript(rows.slice(0, lead)), thumb(th)));
             else if (boxes.length) blocks.push(boxes.join(''));
@@ -194,11 +211,22 @@ export function paginateTeacher(bands, heights, { body = TEACHER_BODY_MM } = {})
     const pack = (cap) => {
         const pages = [];
         let cur = [];
-        for (const x of flat) {
+        flat.forEach((x, idx) => {
             const lim = Math.min(budgetOf(pages.length), cap);
-            if (cur.length && cost(cur.concat(x)) > lim) { pages.push(cur); cur = []; }
+            if (cur.length && cost(cur.concat(x)) > lim) {
+                // Widow / orphan control (critic D12): a band never continues with its LAST block
+                // alone (the block before it goes along), and never leaves its FIRST block alone
+                // at a page foot (it goes along too).
+                let carry = [];
+                const lastOfBand = !flat[idx + 1] || flat[idx + 1].bi !== x.bi;
+                const mine = () => cur.filter((y) => y.bi === x.bi).length;
+                if (lastOfBand && mine() >= 3 && cur[cur.length - 1].bi === x.bi) carry = [cur.pop()];
+                if (mine() === 1 && cur.length > 1 && cur[cur.length - 1].bi === x.bi) carry = [cur.pop(), ...carry];
+                pages.push(cur);
+                cur = carry;
+            }
             cur.push(x);
-        }
+        });
         if (cur.length) pages.push(cur);
         return pages;
     };
@@ -256,11 +284,13 @@ export const measureShell = (block) => `<div class="ws-band dl-band"><div class=
  */
 export function wordProblemPlan(wp, frame) {
     const digits = String(wp.n).length;
-    const ans = { slots: { answer: { value: String(wp.n) } }, display: String(wp.n) };
+    const ans = { slots: Object.assign({ answer: { value: String(wp.n) } }, wp.wordsLine ? { 'answer-words': { value: wp.words } } : {}), display: String(wp.n) };
     const storyItem = {
         nolabel: true, drawsAnswer: true, key: ans,
         render: (c) => story(wp.lines.map((l) => `<div>${esc(l)}</div>`).join('')
-            + `<div class="dl-ansline">${String(wp.answerLine).split('__').map(esc).join(blank({ id: 'answer', kind: 'number', shape: 'line', digits, graded: true }, c, c.state === 'answered' ? ans : null))}</div>`)
+            + `<div class="dl-ansline">${String(wp.answerLine).split('__').map(esc).join(blank({ id: 'answer', kind: 'number', shape: 'line', digits, graded: true }, c, c.state === 'answered' ? ans : null))}</div>`
+            // (`wordsLine`: the number in words too, on its own long line - critic D19)
+            + (wp.wordsLine ? `<div class="dl-ansline dl-wordsline">${String(wp.wordsLine).split('__').map(esc).join(blank({ id: 'answer-words', kind: 'text', shape: 'line', widthMm: 92, graded: true }, c, c.state === 'answered' ? { slots: { 'answer-words': { value: wp.words } } } : null))}</div>` : ''))
             .replace('<div class="ws-story">', '<div class="ws-story" data-item="' + esc(wp.item) + '" data-rep="story" data-row="0">'),
     };
     const parts = wp.parts.filter((v) => v !== null && v !== undefined);
@@ -295,14 +325,28 @@ export function wordProblemPlan(wp, frame) {
  * tab and the I Can title, the instruction, a 2 x 2 grid of the 4 items (`items`: plan items of the
  * kit's own cells), the Say band, and the two self-report boxes. The second half is a copy.
  */
+function groupsOf(items, instr) {
+    const out = [];
+    items.forEach((it, i) => {
+        const t = it.instr || instr;
+        const last = out[out.length - 1];
+        if (last && last.instr === t) last.items.push(it); else out.push({ instr: t, items: [it], start: i + 1 });
+    });
+    return out;
+}
+
 export function exitSlipPlan({ items, instr, say, tab, title, cellH, cols = 2 }, frame) {
     const head = `<div class="dl-halfhead"><div class="ws-rowA">${headerFields({ name: true, score: items.length })}${strandTab(tab)}</div>${pageTitle(title)}<div class="ws-headrule"></div></div>`;
     const self = '<div class="dl-selfrow"><span><span class="dl-cbox"></span>I can do this.</span><span><span class="dl-cbox"></span>I need one more day.</span></div>';
     const rows = Math.ceil(items.length / cols);
     const half = (copy) => ({ kind: 'col', cls: 'dl-half', parts: [
         { kind: 'html', html: head },
-        { kind: 'instruction', text: instr },
-        { kind: 'grid', cols, rows, labels: 'letter', start: 1, cls: `fixed dl-exitgrid${copy ? ' dl-copy' : ''}`, height: `${(rows * cellH).toFixed(2)}mm`, items: copy ? items.map((it) => Object.assign({}, it, { copy: true })) : items },
+        // Items with their own `instr` (critic D14: both chunks on one slip) print one instruction
+        // per run of items that share it, each run its own grid; the letters run on.
+        ...groupsOf(items, instr).flatMap((g) => [
+            { kind: 'instruction', text: g.instr },
+            { kind: 'grid', cols, rows: Math.ceil(g.items.length / cols), labels: 'letter', start: g.start, cls: `fixed dl-exitgrid${copy ? ' dl-copy' : ''}`, height: `${(Math.ceil(g.items.length / cols) * cellH).toFixed(2)}mm`, items: copy ? g.items.map((it) => Object.assign({}, it, { copy: true })) : g.items },
+        ]),
         ...(say ? [{ kind: 'say', frame: say, digits: 3 }] : []),
         { kind: 'html', html: self },
     ] });
@@ -323,7 +367,7 @@ export function numberSensePlan({ bands, cellH }, frame) {
     let start = 1;
     const sections = bands.map((b) => {
         const items = b.items.map((it) => Object.assign({}, it, {
-            render: (c) => `<div class="dl-nsrow"><span class="dl-nsinstr ws-instrline">${esc(b.instr)}</span><div class="dl-nsitem">${it.render ? it.render(c) : ''}</div></div>`,
+            render: (c) => `<div class="dl-nsrow"><span class="dl-nsinstr ws-instrline">${esc(it.instr || b.instr)}</span><div class="dl-nsitem">${it.render ? it.render(c) : ''}</div></div>`,
         }));
         const part = { kind: 'band', label: b.label, instr: '', content: { kind: 'grid', cols: 1, rows: items.length, labels: 'tab', start, cls: 'fixed dl-nsgrid', height: `${(items.length * cellH).toFixed(2)}mm`, items } };
         start += items.length;

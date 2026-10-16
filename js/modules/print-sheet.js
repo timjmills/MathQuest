@@ -42,7 +42,7 @@ import { detailedLessonFor, validateDescription, fillPlaceholders } from './less
 import { teacherBands, paginateTeacher, renderTeacherPage, measureShell, wordProblemPlan, exitSlipPlan, numberSensePlan, DETAILED_PUPIL_CSS, LIFT_MAX_CHARS, TEACHER_BODY_MM } from './sheet/roles/detailed-lesson.js';
 import { TEACHER_CSS, RCDWS_CSS, teacherParts, numberWords } from './sheet/index.js';
 const { tBand } = teacherParts;
-import { planItem as composePlanItem, operandsOf as composeOperandsOf, opOf as composeOpOf, opGlyphOf as composeGlyphOf, oralFrameOf as composeOralFrameOf, answerOf as composeAnswerOf } from './sheet/roles/compose.js';
+import { planItem as composePlanItem, operandsOf as composeOperandsOf, opOf as composeOpOf, opGlyphOf as composeGlyphOf, oralFrameOf as composeOralFrameOf, answerOf as composeAnswerOf, instructionKeyOf as composeInstrKeyOf, instructionText as composeInstrText } from './sheet/roles/compose.js';
 import {
     normaliseAnchors, ANCHOR_ROLES, anchorEligible, anchorItem, anchorHeightMm, easeScore, ineligibleNote,
     blockPlan, sideItems, pickDistinct,
@@ -314,16 +314,20 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // A lesson ref's floors can need many tries to meet (a 0 in the ones AND a one-place
         // bottom number): `tries` raises the budget for that ref only.
         const tries = Math.max(RETRIES, Math.min(600, Number(sk.tries) || 0));
+        // The detailed lesson (V22 §9.5, ★★★): `edgeLast` {per, cols} makes the last `cols` places
+        // of every `per` places edge cases only (the last row of each Practice page).
+        // `wants` [case per edge place] names the case test of each place of that row (1,000 first);
+        // such a place tries the item rotations in turn (a generator deals its cases off itemIndex).
+        const edgeAt = sk.edgeLast ? (i % sk.edgeLast.per) - (sk.edgeLast.per - sk.edgeLast.cols) : -1;
+        const edgeWant = edgeAt >= 0 && Array.isArray(sk.edgeLast.wants) ? sk.edgeLast.wants[edgeAt] : '';
         for (let k = 0; k <= tries; k++) {
             const seed = (baseSeed + i + 7919 * k) >>> 0;
             let cand = null;
-            try { cand = generateQuestionFor(Object.assign({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex, itemCount: perSkill ? perSkill.get(key) : undefined }, sk.range ? { range: sk.range } : {})); } catch (e) { cand = null; }
+            try { cand = generateQuestionFor(Object.assign({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex: edgeWant ? itemIndex + k : itemIndex, itemCount: perSkill ? perSkill.get(key) : undefined }, sk.range ? { range: sk.range } : {})); } catch (e) { cand = null; }
             if (!cand) continue;
             // A lesson's skill ref (lessons r2-r3): floors on what the packet deals. Not skill
             // options - the packet's; the last try takes what it gets.
-            // The detailed lesson (V22 §9.5, ★★★): `edgeLast` {per, cols} makes the last `cols` places
-            // of every `per` places edge cases only (the last row of each Practice page).
-            const skR = sk.edgeLast && (i % sk.edgeLast.per) >= sk.edgeLast.per - sk.edgeLast.cols ? Object.assign({}, sk, { edge: true }) : sk;
+            const skR = edgeAt >= 0 ? Object.assign({}, sk, { edge: true }, edgeWant ? { edgeTest: edgeWant } : {}) : sk;
             if (k < tries && !refAccepts(skR, cand, key, seen, kept)) continue;
             q = cand;
             if (!seen.has(signature(cand))) break;
@@ -2362,8 +2366,9 @@ async function buildLesson(n, metaOf) {
     // `tagLine` (the detailed lesson maker): the LESSON's tags, validated against standards.js by
     // the caller, printed on every sheet instead of the skill's own.
     const tagLine = n.tagLine || lessonTagLine({ skillId: sk.skillId, grade: meta.grade, ccss, ee });
-    const header = Object.assign({}, n.header, { footerLeft: tagLine });
-    const lessonNo = Math.max(1, Number(n.lesson) || 1);
+    const header = Object.assign({}, n.header, { footerLeft: tagLine }, Array.isArray(n.packTab) ? { tabStrand: n.packTab[1] } : {});
+    // (A chunked detailed lesson numbers its sheets '1a', '1b': V22 Chunked Flow.)
+    const lessonNo = /^\d+[a-z]$/.test(String(n.lesson || '')) ? String(n.lesson) : Math.max(1, Number(n.lesson) || 1);
 
     // Lessons r1: a lesson packet never prints below M (the regroup scaffold, the place-value
     // letters and the step words are unreadable at S), and its ANCHOR CHART is a wall chart: L type
@@ -2460,7 +2465,8 @@ async function buildLesson(n, metaOf) {
                 header: Object.assign({}, common.header, Array.isArray(n.packTab) ? { tab: [...n.packTab, `Practice ${k}`] } : {}),
                 sections: [{ skills: [sk1], count: shape[0], columns: shape[1], noCap: true }],
                 seed: (n.seed + 7919 * k) >>> 0,
-                stepStrip: withStrip ? { html: stripHtml, hMm: stripH } : undefined,
+                // (`strip`: another chunk's step strip - the words sheet carries the words steps.)
+                stepStrip: ps.strip && ps.strip.html ? ps.strip : withStrip ? { html: stripHtml, hMm: stripH } : undefined,
             }));
             parts.push({ part: 'practice', role: 'independent', res, strip: /data-mq-lesson-strip/.test(res.pupilHtml), sheet: k });
             for (const it of res.items || []) practiceTexts.push(refText(it));
@@ -2496,7 +2502,9 @@ async function buildLesson(n, metaOf) {
             // half the placed items (`leadHalf`, enforced after packing).
             sections: [{ skills: [Object.assign({}, practiceSk, { weight: Math.max(1, withSkills.length) + 0.5, avoidTexts: practiceTexts }, packNums ? { avoidKeys: packNums.slice(), edgeLast: undefined } : {}), ...withSkills] }], latticeN: n.mixedLattice || 6, leadHalf: true, growLast: !!packNums,
             seed: (n.seed + 15838) >>> 0,
-            stepStrip: stripHtml ? { html: stripHtml, hMm: stripH } : undefined,
+            // (`mixedStrip: false`, the detailed lesson maker - critic D18: one routine's Steps do not head a mixed page)
+            stepStrip: stripHtml && n.mixedStrip !== false ? { html: stripHtml, hMm: stripH } : undefined,
+            ...(Array.isArray(n.packTab) ? { header: Object.assign({}, common.header, { tab: [...n.packTab, 'Mixed 1'] }) } : {}),
         }));
         parts.push({ part: 'mixed', role: 'mixed-practice', res });
     }
@@ -2534,6 +2542,8 @@ async function buildLesson(n, metaOf) {
         gaps: parts.flatMap((p) => p.res.gaps || []),
         anchors: teach.anchors,
         floors: teach.floors,
+        // The practice step strip (a chunked detailed lesson hands chunk 2's to its words sheet).
+        strip: stripHtml ? { html: stripHtml, hMm: stripH } : null,
         seed: n.seed,
         role: 'lesson',
         title: teach.title,
@@ -2747,12 +2757,30 @@ async function buildDetailedLesson(req = {}) {
     const record = (res) => { for (const pp of res.partPlans || []) for (const pl of pp.plans) recordPlan(pl); if (res.plan) recordPlan(res.plan); };
     const shape = (d.lessonData && d.lessonData.practiceShape) || [6, 2];
 
+    // ---------------------------------------------------------------- Chunked Flow (V22): chunks 2..n
+    // A description with `chunks` teaches its routine in paired I Do / We Do cycles. Chunk 1 is the
+    // description's own skill and chart data (the packet below); every further chunk is its own
+    // anchor chart and lesson sheet (no practice of its own), built first so its step strip can head
+    // the Practice sheet that names it (`practiceSheets[k].chunk`).
+    const chunks = Array.isArray(d.chunks) && d.chunks.length > 1 ? d.chunks : null;
+    const chunkRes = [];
+    for (const [ci, ch] of (chunks ? chunks.slice(1) : []).entries()) {
+        const r = await buildSheet({
+            role: 'lesson', sections: [{ skills: [withAvoid(Object.assign({ edgeTest: d.edgeTest }, ch.skill))] }], lessonData: ch.lessonData, size: 'L', paper, seed: (seed + 53 * (ci + 1)) >>> 0, key: true,
+            practicePages: 0, mixed: false, header: { title: d.title, year }, tagLine, packTab: [`Level ${d.level}`, d.strand], lesson: `1${ch.id}`,
+        });
+        record(r);
+        chunkRes.push({ ch, r });
+    }
+    const chunkStrip = (id) => { const c = chunkRes.find((x) => x.ch.id === id); return c && c.r.strip ? c.r.strip : null; };
+
     // ---------------------------------------------------------------- P2 · P3 · P4 · Mixed
     // The standard lesson packet, fed the description's chart data (prereqs.js untouched).
     const lesson = await buildSheet({
         role: 'lesson', sections: [{ skills: [withAvoid(Object.assign({ edgeTest: d.edgeTest }, d.skill))] }], lessonData: d.lessonData, size: 'L', paper, seed, key: true,
-        practicePages: d.practicePages || 1, practiceSheets: d.practiceSheets || null,
-        mixed: !!d.mixed, mixedSkills: d.mixed ? d.mixed.skills : null, mixedLattice: d.mixed && d.mixed.lattice,
+        practicePages: d.practicePages || 1, practiceSheets: d.practiceSheets ? d.practiceSheets.map((ps) => (ps.chunk ? Object.assign({}, ps, { strip: chunkStrip(ps.chunk) }) : ps)) : null,
+        mixed: !!d.mixed, mixedSkills: d.mixed ? d.mixed.skills : null, mixedLattice: d.mixed && d.mixed.lattice, mixedStrip: d.mixed && d.mixed.strip === false ? false : undefined,
+        ...(chunks ? { lesson: `1${chunks[0].id}` } : {}),
         header: { title: d.title, year }, tagLine, packTab: [`Level ${d.level}`, d.strand], edgeLast: req.edgeLast || { per: shape[0], cols: shape[1] },
     });
     record(lesson);
@@ -2771,15 +2799,19 @@ async function buildDetailedLesson(req = {}) {
     });
     const nsBands = ['A', 'B'].map((k, bi) => {
         const ns = d.numberSense[k];
-        const dealt = [];
-        for (let i = 0; i < 5; i++) dealt.push(dealOne(ns.ref, (seed + 211 + 1009 * bi + 131 * i) >>> 0, used, (ns.wants || [])[i] || ns.want || ''));
-        return { label: `Number sense: ${k}`, instr: ns.instruction, its: dealt.map((x) => hostItem({ q: x.q, skill: Object.assign({}, ns.ref) }, 0, 'L')) };
+        // `items` (V22 §9.2, critic D11): five bank TYPES, one a row, the same order in A and B, each
+        // row its item's own library instruction; else one ref five times (`ref`, `wants`).
+        const refs = Array.isArray(ns.items) ? ns.items : Array.from({ length: 5 }, () => ns.ref);
+        const dealt = refs.map((r, i) => dealOne(r, (seed + 211 + 1009 * bi + 131 * i) >>> 0, used, r.want || (ns.wants || [])[i] || ns.want || ''));
+        const its = dealt.map((x, i) => hostItem({ q: x.q, skill: Object.assign({}, refs[i]) }, 0, 'L'));
+        for (const it of its) if (Array.isArray(ns.items)) it.nsInstr = composeInstrText(composeInstrKeyOf([it], refs), [it]);
+        return { label: `Number sense: ${k}`, instr: ns.instruction, its };
     });
     const nsAll = nsBands.flatMap((b) => b.its);
     measureItems(nsAll, { size: 'L', look: 'daily', colsList: [1] });
     const nsOwn = Math.max(14, ...nsAll.map((it) => (it.measured && it.measured[1] && Number.isFinite(it.measured[1].hMm) ? it.measured[1].hMm : 18)));
     const nsCellH = Math.max(nsOwn, Math.min(nsOwn * 1.3, (236 - 2 * 11 - 4) / 10));
-    const p1Plan = numberSensePlan({ bands: nsBands.map((b) => ({ label: b.label, instr: b.instr, items: b.its.map((it) => composePlanItem(it, { cols: 1, level: 1 })) })), cellH: nsCellH }, frameP('Number sense', 10));
+    const p1Plan = numberSensePlan({ bands: nsBands.map((b) => ({ label: b.label, instr: b.instr, items: b.its.map((it) => Object.assign(composePlanItem(it, { cols: 1, level: 1 }), it.nsInstr ? { instr: it.nsInstr } : {})) })), cellH: nsCellH }, frameP('Number sense', 10));
     const p1r = renderPlan(p1Plan, { key: true });
     const p1 = { pupilPages: p1r.pupilPages, keyPages: p1r.keyPages, plan: p1Plan };
 
@@ -2802,7 +2834,7 @@ async function buildDetailedLesson(req = {}) {
     const eqOp = wpV.eqOp || wpV.op || '+';
     wpV.eq = `${eqParts.join(` ${eqOp} `)} = ${wpV.ans}`;
     const wpPlan = wordProblemPlan({
-        lines, answerLine: fillPlaceholders(d.wordProblem.answerLine, { wp: wpV }), say: fillPlaceholders(d.wordProblem.say, { wp: wpV }), n: wpV.ans, parts: eqParts, op: eqOp, item: String(wpD.key),
+        lines, answerLine: fillPlaceholders(d.wordProblem.answerLine, { wp: wpV }), wordsLine: d.wordProblem.wordsLine ? fillPlaceholders(d.wordProblem.wordsLine, { wp: wpV }) : '', words: wpV.words, say: fillPlaceholders(d.wordProblem.say, { wp: wpV }), n: wpV.ans, parts: eqParts, op: eqOp, item: String(wpD.key),
         instruction: d.wordProblem.instruction || INSTRUCTION_LIBRARY['story-rcdws'] || INSTRUCTION_LIBRARY.story,
     }, frameP('Word problem', 1));
     const p5 = renderPlan(wpPlan, { key: true });
@@ -2816,12 +2848,14 @@ async function buildDetailedLesson(req = {}) {
     const hOf = (it) => (it.measured && it.measured[exCols] && Number.isFinite(it.measured[exCols].hMm) ? it.measured[exCols].hMm : 40);
     const exRows = Math.ceil(exitItems.length / exCols);
     // The half's body: 186 mm live - its header (26) - instruction (9) - Say (13) - self row (12) - footer (9).
-    const exAvail = (186 - 26 - 9 - (d.exitSay ? 13 : 0) - 12 - 9) / exRows;
+    // (one 9 mm instruction per run of items that share one: critic D14's both-chunk slip)
+    const exInstrs = d.exit.reduce((a, e, i) => a + (i === 0 || (e.instr || '') !== (d.exit[i - 1].instr || '') ? 1 : 0), 0);
+    const exAvail = (186 - 26 - 9 * exInstrs - (d.exitSay ? 13 : 0) - 12 - 9) / exRows;
     const exOwn = Math.max(...exitItems.map(hOf));
     // The cells take the half (V22 §8.12.2), up to where an empty band would reach 30 % (H13).
     const exCellH = Math.max(exOwn, Math.min(exOwn * 1.65, exAvail));
     if (!fits2) notes.push('Exit slip: the items do not fit two across a 132.5 mm half; printed one across.');
-    const exitPlanItems = exitItems.map((it) => composePlanItem(it, { cols: exCols, level: 0 }));
+    const exitPlanItems = exitItems.map((it, i) => Object.assign(composePlanItem(it, { cols: exCols, level: 0 }), d.exit[i].instr ? { instr: d.exit[i].instr } : {}));
     const exVars = exitD.map((x) => dlItemVars(x.q, d));
     const sayV = sayD ? dlItemVars(sayD.q, d) : null;
     const p6Plan = exitSlipPlan({
@@ -2843,6 +2877,16 @@ async function buildDetailedLesson(req = {}) {
         const id = s === 'lesson-chart' ? 'P2' : s === 'lesson-sheet' ? (sheetNo++ ? `P3-${sheetNo}` : 'P3') : s === 'lesson-practice' ? `P4-${++practiceNo}` : `P4m-${++mixedNo}`;
         push(id, h, lk[i]);
     });
+    // A chunk's chart follows the first chart, its lesson sheet the first sheet (P2b, P3b).
+    for (const { ch, r } of chunkRes) {
+        (r.pupilPages || []).forEach((h, i) => {
+            const s = sheetOf(h);
+            const id = s === 'lesson-chart' ? `P2${ch.id}` : `P3${ch.id}${i > 1 ? `-${i}` : ''}`;
+            const pre = s === 'lesson-chart' ? /^P2/ : /^P3/;
+            const at = P.reduce((a, x, j) => (pre.test(x.id) ? j : a), P.length - 1);
+            P.splice(at + 1, 0, { id, html: h, key: (r.keyPages || [])[i] });
+        });
+    }
     p5.pupilPages.forEach((h, i) => push(i ? `P5-${i + 1}` : 'P5', h, p5.keyPages[i]));
     push('P6', p6.pupilPages[0], p6.keyPages[0]);
 
@@ -2856,11 +2900,45 @@ async function buildDetailedLesson(req = {}) {
     const V = {
         chart: dlItemVars(chartQ[0], d), chart2: dlItemVars(chartQ[1] || chartQ[0], d), chart3: dlItemVars(chartQ[2] || chartQ[1] || chartQ[0], d),
         we: teachCells.slice(0, nGuided).map((c) => dlItemVars(c.q, d)),
-        pre: d.prerequisites.map((p, i) => { const c = p0Cells.find((x) => x.grid === i) || p0Cells[i]; return c ? dlItemVars(c.q, d) : { ans: '' }; }),
+        // Each question's items by the LETTERS P0 prints (critic D10): {pre.i.letters} 'a–d',
+        // {pre.i.list} 'a. 61 · b. 80 ...'; {p0.list} every item. Read from the P0 plan, never typed.
+        pre: d.prerequisites.map((p, i) => {
+            const mine = p0Cells.map((c, j) => Object.assign({ letter: 'abcdefghijklmnop'[j] }, c)).filter((c) => c.grid === i);
+            const c = mine[0] || p0Cells[i];
+            const v = c ? dlItemVars(c.q, d) : { ans: '' };
+            const L = mine.map((x) => x.letter);
+            return Object.assign(v, { letters: L.length > 1 ? `${L[0]}–${L[L.length - 1]}` : (L[0] || ''), list: mine.map((x) => `${x.letter}. ${dlAns(x.q)}`).join(' · ') });
+        }),
+        p0: { list: p0Cells.map((c, j) => `${'abcdefghijklmnop'[j]}. ${dlAns(c.q)}`).join(' · ') },
         ns: { A: nsBands[0].its.map((it) => dlItemVars(it.q, d)), B: nsBands[1].its.map((it) => dlItemVars(it.q, d)) },
         ret: retD.map((r) => dlItemVars(r.q, d)), cq: Object.assign(dlItemVars(cqD.q, d), dlCheckQuestion(cqD.q, d)),
         wp: wpV, exit: exVars, say: sayV,
     };
+    // {p4.last} (T5 Watch, critic D13): what each Practice page's LAST row holds, read from the plans,
+    // each number with its case (`caseNames`: a CASE_TESTS name -> words).
+    {
+        const named = (q) => { for (const [t, w] of Object.entries(d.caseNames || {})) { const f = LESSON_CASE_TESTS[t]; if (f && f({ q })) return w; } return ''; };
+        const parts = [];
+        let k = 0;
+        for (const pl of partPlan('practice')) {
+            const cs = planCells(pl);
+            for (const pg of [...new Set(cs.map((c) => c.page))]) {
+                k++;
+                const its = cs.filter((c) => c.page === pg);
+                const last = Math.max(...its.map((c) => c.row));
+                parts.push(`Practice ${k}: ${its.filter((c) => c.row === last).map((c) => { const w = named(c.q); return `${itemNumberOf(c.q) !== null ? itemNumberOf(c.q) : dlAns(c.q)}${w ? ` (${w})` : ''}`; }).join(', ')}`);
+            }
+        }
+        V.p4 = { last: parts.join('; ') };
+    }
+    // A chunk's own chart and Guided items: {b.chart.n}, {b.we.0.n} ...
+    for (const { ch, r } of chunkRes) {
+        const qs = ((r.lesson && r.lesson.chart && r.lesson.chart.exampleQs) || []).filter(Boolean);
+        const tc = uniqQ(cellsOf(((r.partPlans || []).filter((x) => x.part === 'teach')).flatMap((x) => x.plans)));
+        const ng = Math.max(2, Math.min(4, Number(ch.lessonData && ch.lessonData.guidedRows) || 2));
+        V[ch.id] = { chart: dlItemVars(qs[0], d), chart2: dlItemVars(qs[1] || qs[0], d), chart3: dlItemVars(qs[2] || qs[1] || qs[0], d), we: tc.slice(0, ng).map((c) => dlItemVars(c.q, d)), indep: tc.slice(ng).map((c) => dlItemVars(c.q, d)) };
+        while (V[ch.id].we.length < 2) V[ch.id].we.push(V[ch.id].chart);
+    }
     V.ret.forEach((r, i) => { r.ask = fillPlaceholders((d.retrieval[i] || {}).ask || '', { ret: V.ret }); });
     while (V.we.length < 2) V.we.push(V.chart);
 
@@ -2871,6 +2949,10 @@ async function buildDetailedLesson(req = {}) {
         { page: 'P3 Guided', answers: teachCells.slice(0, nGuided).map((c) => dlAns(c.q)).join(' · '), fade: '★' },
         { page: 'P3 Independent', answers: teachCells.slice(nGuided).map((c) => dlAns(c.q)).join(' · '), fade: '★★' },
     ];
+    for (const { ch } of chunkRes) {
+        glance.push({ page: `P3${ch.id} Guided`, answers: V[ch.id].we.map((x) => x.ans).join(' · '), fade: '★' });
+        glance.push({ page: `P3${ch.id} Independent`, answers: V[ch.id].indep.map((x) => x.ans).join(' · '), fade: '★★' });
+    }
     let pNo = 0;
     for (const pl of partPlan('practice')) {
         const cs = planCells(pl);
@@ -2888,12 +2970,15 @@ async function buildDetailedLesson(req = {}) {
     const prereqAtoms = d.atoms.filter((x) => x.prereq);
     const routing = d.prerequisites.map((p, i) => {
         const a = prereqAtoms[Math.max(0, p.atom - 1)] || d.atoms[0];
-        return { q: `${'abcd'[i]}. ${(String(a.skill).split(':')[0])}`, atom: `${a.type} · Pre-requisite (atom ${p.atom})`, lesson: `Lesson ${p.lesson.id} ${p.lesson.title}` };
+        // (the item letters P0 prints, critic D10; the route the description names - a site lesson
+        // or skill, or Appendix H's CCSS-code form - critic D22)
+        return { q: `${V.pre[i].letters}. ${(String(a.skill).split(':')[0])}`, atom: `${a.type} · Pre-requisite (atom ${p.atom})`, lesson: p.lesson.id ? `${p.lesson.id} ${p.lesson.title}` : p.lesson.title };
     });
 
     // ---------------------------------------------------------------- teacher pages
     const blankPupil = (id) => { const x = P.find((p) => p.id === id); return x ? x.html : ''; };
     const thumbs = { P0: blankPupil('P0'), P2: blankPupil('P2'), P3: blankPupil('P3'), P4: blankPupil('P4-1') };
+    for (const { ch } of chunkRes) { thumbs[`P2${ch.id}`] = blankPupil(`P2${ch.id}`); thumbs[`P3${ch.id}`] = blankPupil(`P3${ch.id}`); }
     const { bands, flow } = teacherBands(d, V, { thumbs, glance, routing, tags });
     const order = ['T1', 'T2', 'T2b', 'T3', 'T4', 'T5'];
     const groups = [...order, 'T6'];
@@ -2947,6 +3032,12 @@ async function buildDetailedLesson(req = {}) {
     fromPlans(partPlan('chart'), () => 'P2', { dedupe: true });
     for (const q of chartQ) { const k = factKeyOf(q); if (k !== null && !places.some((x) => x.page === 'P2' && x.item === k)) places.push({ page: 'P2', item: k, rep: dlRep(q), row: 0, q }); }
     fromPlans(partPlan('teach'), (i) => (i > 1 ? `P3-${i}` : 'P3'));
+    for (const { ch, r } of chunkRes) {
+        const pp = (part) => (r.partPlans || []).filter((x) => x.part === part).flatMap((x) => x.plans);
+        fromPlans(pp('chart'), () => `P2${ch.id}`, { dedupe: true });
+        for (const q of ((r.lesson && r.lesson.chart && r.lesson.chart.exampleQs) || []).filter(Boolean)) { const k = factKeyOf(q); if (k !== null && !places.some((x) => x.page === `P2${ch.id}` && x.item === k)) places.push({ page: `P2${ch.id}`, item: k, rep: dlRep(q), row: 0, q }); }
+        fromPlans(pp('teach'), (i) => (i > 1 ? `P3${ch.id}-${i}` : `P3${ch.id}`));
+    }
     fromPlans(partPlan('practice'), (i) => `P4-${i}`);
     fromPlans(partPlan('mixed'), (i) => `P4m-${i}`);
     places.push({ page: 'P5', item: String(wpD.key), rep: 'story', row: 0, q: wpD.q });

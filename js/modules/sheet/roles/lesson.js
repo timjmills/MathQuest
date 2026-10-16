@@ -187,7 +187,9 @@ export const CASE_TESTS = Object.freeze({
     },
     // The detailed lesson maker (numbers to 1,000, 2026-10-16): a 3-digit place-value item with no
     // 0 place, a 0 in the tens, a 0 in the ones (lessons/detailed/g2-nbt3-read-write-1000.js).
-    pvNoZero: (it) => { const n = pvNumberOf(it); return n !== null && n >= 100 && n <= 999 && !String(n).includes('0'); },
+    // (no 0 place and no teen ending: the plain case - critic D14)
+    pvNoZero: (it) => { const n = pvNumberOf(it); return n !== null && n >= 100 && n <= 999 && !String(n).includes('0') && Math.floor(n / 10) % 10 !== 1; },
+    pvThousand: (it) => pvNumberOf(it) === 1000,
     pvZeroTens: (it) => { const n = pvNumberOf(it); return n !== null && n >= 100 && n <= 999 && Math.floor(n / 10) % 10 === 0 && n % 10 !== 0; },
     pvZeroOnes: (it) => { const n = pvNumberOf(it); return n !== null && n >= 100 && n <= 999 && n % 10 === 0 && Math.floor(n / 10) % 10 !== 0; },
     pvTeen: (it) => { const n = pvNumberOf(it); return n !== null && n >= 100 && n <= 999 && Math.floor(n / 10) % 10 === 1 && n % 10 !== 0; },
@@ -1598,6 +1600,13 @@ function weDoRender(it, i) {
                 const attrs = `${pre} data-ws-slot="${slot}"${post.replace(/ data-ws-ink="[a-z]+"/, '')}`;
                 return slot === 'part0' ? `<span class="ws-box${cls} ws-trace"${attrs} data-ws-ink="trace">${val}</span>` : `<span class="ws-box${cls}"${attrs}></span>`;
             });
+        }
+        // A name-to-numeral Guided cell 1 in H T O boxes (the detailed lesson maker): step 1 done in
+        // grey - the hundreds digit traced in the H box, the hundreds words underlined.
+        if (!answered && i === 0 && it.q && it.q.cell && it.q.cell.template === 'words' && it.q.cell.payload && it.q.cell.payload.slot === 'hto') {
+            const t = stepTemplateOf(it);
+            const steps = workedStepsOf(it);
+            if (t && steps.length > 1) return t.stepState(Object.assign({}, it.q.cell.payload), steps.map((s) => ({ marks: s.marks || [] })), 0, c);
         }
         if (!answered && i === 0) {
             const t = stepTemplateOf(it);
