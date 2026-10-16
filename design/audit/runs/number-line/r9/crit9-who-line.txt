@@ -1,0 +1,112 @@
+run0 q1 mixed_addition stack stack:true frames-moved:7 | 11,198 + 29,232 = ?
+    360 scrollIntoView(answerInput) sy0 Element.scrollIntoView  < revealSettled (active-box.js:142:18) < selectIfLoose (active-box.js:150:46)
+    459 scrollIntoView(column-answer-input mq-active-box) sy0 Element.scrollIntoView  < selectIfLoose (active-box.js:187:61) < refreshActiveBox (active-box.js:228:26)
+    479 scrollIntoView(column-answer-input mq-active-box) sy0 Element.scrollIntoView  < revealSettled (active-box.js:142:18) < selectIfLoose (active-box.js:150:46)
+    491 FRAME sy 0>77 docH 772
+    509 FRAME sy 77>0 docH 772
+    510 scrollIntoView(column-answer-input mq-active-box) sy0 Element.scrollIntoView  < revealSettled (active-box.js:142:18) < selectIfLoose (active-box.js:150:46)
+    525 FRAME sy 0>77 docH 772
+    576 FRAME sy 77>0 docH 772
+    577 scrollIntoView(column-answer-input mq-active-box) sy0 Element.scrollIntoView  < revealSettled (active-box.js:142:18) < selectIfLoose (active-box.js:150:46)
+    589 FRAME sy 0>77 docH 772
+    1024 FRAME sy 77>0 docH 772
+    1025 scrollIntoView(column-answer-input mq-active-box) sy0 Element.scrollIntoView  < revealSettled (active-box.js:142:18) < selectIfLoose (active-box.js:150:46)
+    1039 FRAME sy 0>77 docH 772
+run0 q2 mixed_addition stack stack:true frames-moved:10 | 48 + 52 = ?
+    2866 FRAME sy 77>79 docH 772
+    2891 FRAME sy 79>0 docH 772
+    2892 scrollIntoView(column-answer-input mq-active-box) sy0 Element.scrollIntoView  < revealSettled (active-box.js:142:18) < selectIfLoose (active-box.js:150:46)
+    2914 FRAME sy 0>79 docH 772
+    2935 FRAME sy 79>0 docH 772
+    2936 scrollIntoView(column-answer-input mq-active-box) sy0 Element.scrollIntoView  < revealSettled (active-box.js:142:18) < selectIfLoose (active-box.js:150:46)
+    2957 FRAME sy 0>79 docH 772
+    2986 FRAME sy 79>0 docH 772
+    2990 scrollIntoView(column-answer-input mq-active-box) sy0 Element.scrollIntoView  < revealSettled (active-box.js:142:18) < selectIfLoose (active-box.js:150:46)
+    3013 FRAME sy 0>79 docH 772
+    3036 FRAME sy 79>0 docH 772
+    3037 scrollIntoView(column-answer-input mq-active-box) sy0 Element.scrollIntoView  < revealSettled (active-box.js:142:18) < selectIfLoose (active-box.js:150:46)
+    3060 FRAME sy 0>79 docH 772
+    3082 FRAME sy 79>0 docH 772
+    ---- next question rendered
+run0 q3 mixed_addition word-work stack:false frames-moved:2 | Leo has 8 stamps. Mia has 12 stamps. How many stam
+    8031 focus(column-answer-input mq-digit) sy0 HTMLElement.focus  < HTMLInputElement.<anonymous> (screen-cell.js:503:26)
+    8042 FRAME sy 0>4 docH 667
+    8069 focus(column-answer-input mq-digit) sy4 HTMLElement.focus  < HTMLInputElement.<anonymous> (screen-cell.js:503:26)
+    11032 scrollIntoView(mq-cellslot mq-active-box) sy4 Element.scrollIntoView  < revealSettled (active-box.js:142:18) < selectIfLoose (active-box.js:150:46)
+    11042 FRAME sy 4>188 docH 917
+    ---- next question rendered
+run0 q4 mixed_addition word-work stack:false frames-moved:2 | The farm has 618,506 dollars. The library has 122,
+    13060 FRAME sy 188>202 docH 917
+    15963 FRAME sy 202>233 docH 917
+    ---- next question rendered
+run1 q1 mixed_addition column-add stack:true frames-moved:0 | 5 + 15 = ?
+run1 q2 mixed_addition number-line stack:false frames-moved:0 | Use the number line: 17 + 1 = ?
+    2768 focus(column-answer-input mq-digit) sy0 HTMLElement.focus  < HTMLInputElement.<anonymous> (screen-cell.js:503:26)
+    ---- next question rendered
+run1 q3 mixed_addition column-add stack:true frames-moved:1 | 6 + 1 = ?
+    7842 FRAME sy 0>5 docH 660
+    ---- next question rendered
+run1 q4 mixed_addition undefined stack:false frames-moved:1 | 700 − 100 = ?
+    15648 FRAME sy 5>0 docH 600
+    ---- next question rendered
+run2 q1 mixed_addition stack stack:true frames-moved:1 | 25 + 36 + 64 + 84 = ?
+    316 scrollIntoView(column-answer-input mq-digit mq-active-box) sy0 Element.scrollIntoView  < revealSettled (active-box.js:142:18) < selectIfLoose (active-box.js:150:46)
+    368 FRAME sy 0>127 docH 802
+run2 q2 mixed_addition stack stack:true frames-moved:2 | 18 + 77 + 7 = ?
+    2821 focus(column-answer-input mq-digit) sy127 HTMLElement.focus  < HTMLInputElement.<anonymous> (screen-cell.js:503:26)
+    2831 FRAME sy 127>138 docH 802
+    2855 focus(column-answer-input mq-digit) sy138 HTMLElement.focus  < HTMLInputElement.<anonymous> (screen-cell.js:503:26)
+    5778 FRAME sy 138>135 docH 735
+    ---- next question rendered
+run2 q3 mixed_addition word-work stack:false frames-moved:1 | The club has 482,134 dollars. The club gets 66,360
+    7795 focus(column-answer-input mq-digit) sy135 HTMLElement.focus  < HTMLInputElement.<anonymous> (screen-cell.js:503:26)
+    7848 focus(column-answer-input mq-digit) sy135 HTMLElement.focus  < HTMLInputElement.<anonymous> (screen-cell.js:503:26)
+    10795 FRAME sy 135>166 docH 917
+    ---- next question rendered
+run2 q4 mixed_addition word-work stack:false frames-moved:2 | Leo has 383 marbles. Mia has 507 marbles. How many
+    12827 FRAME sy 166>202 docH 917
+    15829 FRAME sy 202>233 docH 917
+    ---- next question rendered
+run3 q1 mixed_addition stack stack:true frames-moved:0 | 388 + 78 = ?
+run3 q2 mixed_addition word-work stack:false frames-moved:2 | Yuki has 152 shells. Aya has 395 shells. How many 
+    2803 focus(column-answer-input mq-digit) sy0 HTMLElement.focus  < HTMLInputElement.<anonymous> (screen-cell.js:503:26)
+    2818 FRAME sy 0>4 docH 667
+    2841 focus(column-answer-input mq-digit) sy4 HTMLElement.focus  < HTMLInputElement.<anonymous> (screen-cell.js:503:26)
+    5798 scrollIntoView(mq-cellslot mq-active-box) sy4 Element.scrollIntoView  < revealSettled (active-box.js:142:18) < selectIfLoose (active-box.js:150:46)
+    5802 FRAME sy 4>188 docH 917
+    ---- next question rendered
+run3 q3 mixed_addition stack stack:true frames-moved:11 | 27,339 + 8,907 = ?
+    7820 FRAME sy 188>202 docH 917
+    10766 FRAME sy 202>0 docH 772
+    ---- next question rendered
+    10793 scrollIntoView(column-answer-input mq-active-box) sy0 Element.scrollIntoView  < selectIfLoose (active-box.js:187:61) < refreshActiveBox (active-box.js:228:26)
+    10812 scrollIntoView(column-answer-input mq-active-box) sy0 Element.scrollIntoView  < revealSettled (active-box.js:142:18) < selectIfLoose (active-box.js:150:46)
+    10816 FRAME sy 0>77 docH 772
+    10911 FRAME sy 77>0 docH 772
+    10912 scrollIntoView(column-answer-input mq-active-box) sy0 Element.scrollIntoView  < revealSettled (active-box.js:142:18) < selectIfLoose (active-box.js:150:46)
+    10918 FRAME sy 0>77 docH 772
+    10938 FRAME sy 77>0 docH 772
+    10939 scrollIntoView(column-answer-input mq-active-box) sy0 Element.scrollIntoView  < revealSettled (active-box.js:142:18) < selectIfLoose (active-box.js:150:46)
+    10951 FRAME sy 0>77 docH 772
+    10987 FRAME sy 77>0 docH 772
+    10988 scrollIntoView(column-answer-input mq-active-box) sy0 Element.scrollIntoView  < revealSettled (active-box.js:142:18) < selectIfLoose (active-box.js:150:46)
+    11001 FRAME sy 0>77 docH 772
+    11438 FRAME sy 77>0 docH 772
+    11439 scrollIntoView(column-answer-input mq-active-box) sy0 Element.scrollIntoView  < revealSettled (active-box.js:142:18) < selectIfLoose (active-box.js:150:46)
+    11451 FRAME sy 0>77 docH 772
+run3 q4 mixed_addition column-add stack:true frames-moved:10 | 5 + 6 = ?
+    12817 FRAME sy 77>79 docH 772
+    12840 FRAME sy 79>0 docH 772
+    12841 scrollIntoView(column-answer-input mq-active-box) sy0 Element.scrollIntoView  < revealSettled (active-box.js:142:18) < selectIfLoose (active-box.js:150:46)
+    12863 FRAME sy 0>79 docH 772
+    12885 FRAME sy 79>0 docH 772
+    12886 scrollIntoView(column-answer-input mq-active-box) sy0 Element.scrollIntoView  < revealSettled (active-box.js:142:18) < selectIfLoose (active-box.js:150:46)
+    12907 FRAME sy 0>79 docH 772
+    12930 FRAME sy 79>0 docH 772
+    12931 scrollIntoView(column-answer-input mq-active-box) sy0 Element.scrollIntoView  < revealSettled (active-box.js:142:18) < selectIfLoose (active-box.js:150:46)
+    12957 FRAME sy 0>79 docH 772
+    12979 FRAME sy 79>0 docH 772
+    12980 scrollIntoView(column-answer-input mq-active-box) sy0 Element.scrollIntoView  < revealSettled (active-box.js:142:18) < selectIfLoose (active-box.js:150:46)
+    13004 FRAME sy 0>79 docH 772
+    13027 FRAME sy 79>0 docH 772
+    ---- next question rendered

@@ -1,0 +1,38 @@
+== lane d6075045
+nl_mult line
+  start {"sy":452,"ae":"answerInput","aeY":772,"coveredBy":"","vals":"","hasAns":false,"ans":"33","notify":"756-824 1 ▶️ Starting Practice with 1 sk","overlays":""}
+  tap@796 {"sy":452,"ae":"answerInput","aeY":772,"coveredBy":"","vals":"","hasAns":false,"ans":"33","notify":"756-824 1 ▶️ Starting Practice with 1 sk","overlays":""}
+nl_mult OFF
+  start {"sy":387,"ae":"answerInput","aeY":774,"coveredBy":"","vals":"","hasAns":false,"ans":"33","notify":"756-824 1 ▶️ Starting Practice with 1 sk","overlays":""}
+  tap@798 {"sy":387,"ae":"answerInput","aeY":774,"coveredBy":"","vals":"","hasAns":false,"ans":"33","notify":"756-824 1 ▶️ Starting Practice with 1 sk","overlays":""}
+sub_100_regroup line
+  start {"sy":403,"ae":"column-answer-input mq-digit mq-active-b","aeY":772,"coveredBy":"mq-notify","vals":"|||","hasAns":false,"ans":"8","notify":"756-824 1 ▶️ Starting Practice with 1 sk","overlays":""}
+  tap@796 {"sy":403,"ae":"student-mode","aeY":-403,"coveredBy":"","vals":"|||","hasAns":false,"ans":"8","notify":"756-824 1 ▶️ Starting Practice with 1 sk","overlays":""}
+sub_100_regroup OFF
+  start {"sy":494,"ae":"column-answer-input mq-digit mq-active-b","aeY":618,"coveredBy":"","vals":"|||","hasAns":false,"ans":"18","notify":"756-824 1 ▶️ Starting Practice with 1 sk","overlays":""}
+  tap@642 {"sy":494,"ae":"column-answer-input mq-digit mq-active-b","aeY":618,"coveredBy":"","vals":"|||","hasAns":false,"ans":"18","notify":"756-824 1 ▶️ Starting Practice with 1 sk","overlays":""}
+add_facts line
+  start {"sy":351,"ae":"answerInput","aeY":772,"coveredBy":"mq-notify","vals":"","hasAns":false,"ans":"13","notify":"756-824 1 ▶️ Starting Practice with 1 sk","overlays":""}
+  tap@796 {"sy":351,"ae":"student-mode","aeY":-351,"coveredBy":"","vals":"","hasAns":false,"ans":"13","notify":"756-824 1 ▶️ Starting Practice with 1 sk","overlays":""}
+add_facts OFF
+  start {"sy":332,"ae":"answerInput","aeY":728,"coveredBy":"","vals":"","hasAns":false,"ans":"9","notify":"756-824 1 ▶️ Starting Practice with 1 sk","overlays":""}
+  tap@752 {"sy":332,"ae":"answerInput","aeY":728,"coveredBy":"","vals":"","hasAns":false,"ans":"9","notify":"756-824 1 ▶️ Starting Practice with 1 sk","overlays":""}
+== d6bd2639
+nl_mult line
+  start {"sy":452,"ae":"answerInput","aeY":772,"coveredBy":"","vals":"","hasAns":false,"ans":"24","notify":"756-824 1 ▶️ Starting Practice with 1 sk","overlays":""}
+  tap@796 {"sy":452,"ae":"answerInput","aeY":772,"coveredBy":"","vals":"","hasAns":false,"ans":"24","notify":"756-824 1 ▶️ Starting Practice with 1 sk","overlays":""}
+nl_mult OFF
+  start {"sy":383,"ae":"answerInput","aeY":778,"coveredBy":"mq-notify","vals":"","hasAns":false,"ans":"63","notify":"756-824 1 ▶️ Starting Practice with 1 sk","overlays":""}
+  tap@802 {"sy":383,"ae":"student-mode","aeY":-383,"coveredBy":"","vals":"","hasAns":false,"ans":"63","notify":"756-824 1 ▶️ Starting Practice with 1 sk","overlays":""}
+sub_100_regroup line
+  start {"sy":494,"ae":"column-answer-input mq-digit mq-active-b","aeY":681,"coveredBy":"","vals":"|||","hasAns":false,"ans":"33","notify":"756-824 1 ▶️ Starting Practice with 1 sk","overlays":""}
+  tap@705 {"sy":494,"ae":"column-answer-input mq-digit mq-active-b","aeY":681,"coveredBy":"","vals":"|||","hasAns":false,"ans":"33","notify":"756-824 1 ▶️ Starting Practice with 1 sk","overlays":""}
+sub_100_regroup OFF
+  start {"sy":494,"ae":"column-answer-input mq-digit mq-active-b","aeY":618,"coveredBy":"","vals":"|||","hasAns":false,"ans":"37","notify":"756-824 1 ▶️ Starting Practice with 1 sk","overlays":""}
+  tap@642 {"sy":494,"ae":"column-answer-input mq-digit mq-active-b","aeY":618,"coveredBy":"","vals":"|||","hasAns":false,"ans":"37","notify":"756-824 1 ▶️ Starting Practice with 1 sk","overlays":""}
+add_facts line
+  start {"sy":332,"ae":"answerInput","aeY":791,"coveredBy":"mq-notify","vals":"","hasAns":false,"ans":"15","notify":"756-824 1 ▶️ Starting Practice with 1 sk","overlays":""}
+  tap@815 {"sy":332,"ae":"student-mode","aeY":-332,"coveredBy":"","vals":"","hasAns":false,"ans":"15","notify":"756-824 1 ▶️ Starting Practice with 1 sk","overlays":""}
+add_facts OFF
+  start {"sy":332,"ae":"answerInput","aeY":728,"coveredBy":"","vals":"","hasAns":false,"ans":"13","notify":"756-824 1 ▶️ Starting Practice with 1 sk","overlays":""}
+  tap@752 {"sy":332,"ae":"answerInput","aeY":728,"coveredBy":"","vals":"","hasAns":false,"ans":"13","notify":"756-824 1 ▶️ Starting Practice with 1 sk","overlays":""}

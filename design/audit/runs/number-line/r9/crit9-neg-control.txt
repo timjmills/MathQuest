@@ -1,0 +1,28 @@
+== d6bd2639 (pre-fix app, new gate)
+  R8-D1 timed queue sub_100_regroup 1280x600: FAIL 604 frames, held scroll 67 > 7 > 22 > 7 > 22 > 7
+  R8-D1 timed link sub_100_regroup 1280x600: FAIL 602 frames, held scroll 67 > 7 > 22 > 7 > 22 > 7
+  R8-D1 untimed link sub_100_regroup 1280x600: FAIL 605 frames, held scroll 1 > 4 > 22 > 7 > 22 > 7
+  R8-D1 timed queue nl_mult 1280x600: FAIL 600 frames, held scroll 60 > 7
+  R8-D1 timed link nl_mult 1280x600: FAIL 593 frames, held scroll 60 > 7
+  R8-D1 untimed link nl_mult 1280x600: ok 602 frames, held scroll 1 > 5
+  R8-D1 timed queue sub_100_regroup 1366x650: FAIL 601 frames, held scroll 17 > 7
+  R8-D1 timed link sub_100_regroup 1366x650: FAIL 602 frames, held scroll 17 > 7
+  R8-D1 untimed link sub_100_regroup 1366x650: ok 604 frames, held scroll 0
+  R8-D1 timed queue nl_mult 1366x650: ok 600 frames, held scroll 10 > 8
+  R8-D1 timed link nl_mult 1366x650: ok 599 frames, held scroll 10 > 8
+  R8-D1 untimed link nl_mult 1366x650: ok 598 frames, held scroll 0
+FAIL 18
+== d6075045 (this tree)
+  R8-D1 timed queue sub_100_regroup 1280x600: ok 602 frames, held scroll 0 > 4
+  R8-D1 timed link sub_100_regroup 1280x600: ok 605 frames, held scroll 0 > 4
+  R8-D1 untimed link sub_100_regroup 1280x600: ok 604 frames, held scroll 0 > 4
+  R8-D1 timed queue nl_mult 1280x600: ok 598 frames, held scroll 0 > 5
+  R8-D1 timed link nl_mult 1280x600: ok 598 frames, held scroll 0 > 5
+  R8-D1 untimed link nl_mult 1280x600: ok 598 frames, held scroll 0 > 5
+  R8-D1 timed queue sub_100_regroup 1366x650: ok 602 frames, held scroll 0
+  R8-D1 timed link sub_100_regroup 1366x650: ok 601 frames, held scroll 0
+  R8-D1 untimed link sub_100_regroup 1366x650: ok 602 frames, held scroll 0
+  R8-D1 timed queue nl_mult 1366x650: ok 598 frames, held scroll 0
+  R8-D1 timed link nl_mult 1366x650: ok 600 frames, held scroll 0
+  R8-D1 untimed link nl_mult 1366x650: ok 602 frames, held scroll 0
+PASS

@@ -1,0 +1,224 @@
+run0 q1 mixed_addition undefined stack:false frames-moved:1 | Amari has 12 videos. Ava has 9 videos. How many FE
+    64 focus(answerInput) sy0 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    130 scroll-event sy81 docH 681 ae answerInput
+    130 FRAME sy 0>81 docH 681
+run0 q2 mixed_addition undefined stack:false frames-moved:1 | 600 − 100 = ?
+    5506 focus(answerInput) sy0 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    5525 scroll-event sy0 docH 600 ae answerInput
+    5526 FRAME sy 81>0 docH 600
+    ---- next question rendered
+run0 q3 mixed_addition column-add stack:true frames-moved:0 | 1 + 1 = ?
+    10447 focus(answerInput) sy0 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    ---- next question rendered
+run0 q4 mixed_addition stack stack:true frames-moved:0 | 43 + 38 = ?
+    15361 focus(answerInput) sy0 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    ---- next question rendered
+run1 q1 mixed_addition column-add stack:true frames-moved:2 | 8 + 4 = ?
+    24 focus(answerInput) sy0 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    71 scroll-event sy50 docH 650 ae column-answer-input mq-di
+    71 FRAME sy 0>50 docH 650
+    91 scroll-event sy0 docH 600 ae column-answer-input mq-di
+    94 FRAME sy 50>0 docH 600
+run1 q2 mixed_addition word-work stack:false frames-moved:1 | The school has 72,997 dollars. The club has 62,176
+    2567 focus(column-answer-input mq-digit) sy0 HTMLElement.focus  < HTMLInputElement.<anonymous> (screen-cell.js:503:26)
+    2575 select(column-answer-input mq-digit) sy0 HTMLInputElement.<computed> [as select]  < HTMLInputElement.<anonymous> (screen-cell.js:504:32)
+    5470 focus(answerInput) sy0 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    5496 scroll-event sy248 docH 848 ae mq-cellslot
+    5496 FRAME sy 0>248 docH 848
+    ---- next question rendered
+run1 q3 mixed_addition stack stack:true frames-moved:2 | 36 + 15 = ?
+    10465 focus(answerInput) sy165 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    10482 scroll-event sy55 docH 657 ae column-answer-input mq-di
+    10482 FRAME sy 248>55 docH 657
+    10489 scroll-event sy0 docH 600 ae column-answer-input mq-di
+    10490 FRAME sy 55>0 docH 600
+    ---- next question rendered
+run1 q4 mixed_addition column-add stack:true frames-moved:0 | 1 + 2 = ?
+    12539 focus(column-answer-input mq-digit) sy0 HTMLElement.focus  < HTMLInputElement.<anonymous> (screen-cell.js:503:26)
+    12550 select(column-answer-input mq-digit) sy0 HTMLInputElement.<computed> [as select]  < HTMLInputElement.<anonymous> (screen-cell.js:504:32)
+    15441 focus(answerInput) sy0 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    ---- next question rendered
+run2 q1 mixed_addition column-add stack:true frames-moved:2 | 7 + 8 = ?
+    33 focus(answerInput) sy0 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    73 scroll-event sy50 docH 650 ae column-answer-input mq-di
+    73 FRAME sy 0>50 docH 650
+    94 scroll-event sy0 docH 600 ae column-answer-input mq-di
+    97 FRAME sy 50>0 docH 600
+run2 q2 mixed_addition column-add stack:true frames-moved:0 | 17 + 1 = ?
+    2574 focus(column-answer-input mq-digit) sy0 HTMLElement.focus  < HTMLInputElement.<anonymous> (screen-cell.js:503:26)
+    2580 select(column-answer-input mq-digit) sy0 HTMLInputElement.<computed> [as select]  < HTMLInputElement.<anonymous> (screen-cell.js:504:32)
+    5462 focus(answerInput) sy0 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    ---- next question rendered
+run2 q3 mixed_addition stack stack:true frames-moved:2 | 11 + 19 = ?
+    7514 focus(column-answer-input mq-digit) sy0 HTMLElement.focus  < HTMLInputElement.<anonymous> (screen-cell.js:503:26)
+    7520 select(column-answer-input mq-digit) sy0 HTMLInputElement.<computed> [as select]  < HTMLInputElement.<anonymous> (screen-cell.js:504:32)
+    10396 focus(answerInput) sy0 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    10419 scroll-event sy7 docH 609 ae column-answer-input mq-di
+    10419 FRAME sy 0>7 docH 609
+    10429 scroll-event sy0 docH 600 ae column-answer-input mq-di
+    10430 FRAME sy 7>0 docH 600
+    ---- next question rendered
+run2 q4 mixed_addition word-work stack:false frames-moved:1 | 2 apples are in a bag. 2 apples are on a plate. Ho
+    12451 focus(column-answer-input mq-digit) sy0 HTMLElement.focus  < HTMLInputElement.<anonymous> (screen-cell.js:503:26)
+    12457 select(column-answer-input mq-digit) sy0 HTMLInputElement.<computed> [as select]  < HTMLInputElement.<anonymous> (screen-cell.js:504:32)
+    15340 focus(answerInput) sy0 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    15368 scroll-event sy248 docH 848 ae mq-cellslot
+    15368 FRAME sy 0>248 docH 848
+    ---- next question rendered
+run3 q1 mixed_addition stack stack:true frames-moved:2 | 21 + 1 = ?
+    34 focus(answerInput) sy0 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    68 scroll-event sy50 docH 650 ae column-answer-input mq-di
+    68 FRAME sy 0>50 docH 650
+    97 scroll-event sy0 docH 600 ae column-answer-input mq-di
+    99 FRAME sy 50>0 docH 600
+run3 q2 mixed_addition word-work stack:false frames-moved:1 | Aya has 640 books. Aya gets 300 more books. How ma
+    2576 focus(column-answer-input mq-digit) sy0 HTMLElement.focus  < HTMLInputElement.<anonymous> (screen-cell.js:503:26)
+    2583 select(column-answer-input mq-digit) sy0 HTMLInputElement.<computed> [as select]  < HTMLInputElement.<anonymous> (screen-cell.js:504:32)
+    5480 focus(answerInput) sy0 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    5511 scroll-event sy248 docH 848 ae mq-cellslot
+    5511 FRAME sy 0>248 docH 848
+    ---- next question rendered
+run3 q3 mixed_addition stack stack:true frames-moved:1 | 1,301 + 503 = ?
+    10412 focus(answerInput) sy165 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    10447 scroll-event sy0 docH 783 ae answerInput
+    10447 FRAME sy 248>0 docH 783
+    10451 scrollIntoView(answerInput) sy0 Element.scrollIntoView  < revealSettled (active-box.js:142:18) < selectIfLoose (active-box.js:150:46)
+    10473 scroll-event sy0 docH 703 ae answerInput
+    ---- next question rendered
+run3 q4 mixed_addition undefined stack:false frames-moved:8 | 100 − 100 = ?
+    12514 scroll-event sy10 docH 703 ae column-answer-input mq-ac
+    12514 FRAME sy 0>10 docH 703
+    12533 scroll-event sy0 docH 703 ae column-answer-input mq-ac
+    12533 FRAME sy 10>0 docH 703
+    12552 scroll-event sy10 docH 703 ae column-answer-input mq-ac
+    12553 FRAME sy 0>10 docH 703
+    12576 scroll-event sy0 docH 703 ae column-answer-input mq-ac
+    12577 FRAME sy 10>0 docH 703
+    12607 scroll-event sy10 docH 703 ae column-answer-input mq-ac
+    12607 FRAME sy 0>10 docH 703
+    12631 scroll-event sy0 docH 703 ae column-answer-input mq-ac
+    12631 FRAME sy 10>0 docH 703
+    12648 scroll-event sy10 docH 703 ae column-answer-input mq-ac
+    12648 FRAME sy 0>10 docH 703
+    12662 scroll-event sy0 docH 703 ae column-answer-input mq-li
+    12662 FRAME sy 10>0 docH 703
+    15504 focus(answerInput) sy0 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    ---- next question rendered
+run4 q1 mixed_addition stack stack:true frames-moved:2 | 24 + 6 = ?
+    23 focus(answerInput) sy0 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    59 scroll-event sy50 docH 650 ae column-answer-input mq-di
+    59 FRAME sy 0>50 docH 650
+    92 scroll-event sy0 docH 600 ae column-answer-input mq-di
+    99 FRAME sy 50>0 docH 600
+run4 q2 mixed_addition number-family-add-sub stack:false frames-moved:1 | Number Family: Complete all equations
+    2562 focus(column-answer-input mq-digit) sy0 HTMLElement.focus  < HTMLInputElement.<anonymous> (screen-cell.js:503:26)
+    2568 select(column-answer-input mq-digit) sy0 HTMLInputElement.<computed> [as select]  < HTMLInputElement.<anonymous> (screen-cell.js:504:32)
+    5467 scrollIntoView(number-family-input mq-active-box) sy0 Element.scrollIntoView  < selectIfLoose (active-box.js:187:61) < refreshActiveBox (active-box.js:228:26)
+    5486 scroll-event sy25 docH 1443 ae number-family-input mq-ac
+    5486 FRAME sy 0>25 docH 1443
+    ---- next question rendered
+run4 q3 mixed_addition number-family-add-sub stack:false frames-moved:1 | Number Family: Complete all equations
+    7503 focus(number-family-input) sy25 HTMLElement.focus  < HTMLInputElement.<anonymous> (question-render.js:2528:50)
+    7614 focus(number-family-input) sy25 HTMLElement.focus  < HTMLInputElement.<anonymous> (question-render.js:2528:50)
+    7735 focus(number-family-input) sy25 HTMLElement.focus  < HTMLInputElement.<anonymous> (question-render.js:2528:50)
+    7763 scroll-event sy383 docH 1443 ae number-family-input
+    7763 FRAME sy 25>383 docH 1443
+    ---- next question rendered
+run4 q4 mixed_addition number-family-add-sub stack:false frames-moved:0 | Number Family: Complete all equations
+    ---- next question rendered
+run5 q1 mixed_addition column-add stack:true frames-moved:2 | 3 + 2 = ?
+    39 focus(answerInput) sy0 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    85 scroll-event sy2 docH 602 ae column-answer-input mq-di
+    85 FRAME sy 0>2 docH 602
+    122 scroll-event sy0 docH 600 ae column-answer-input mq-di
+    124 FRAME sy 2>0 docH 600
+run5 q2 mixed_addition add-three stack:false frames-moved:1 | 7 + 1 + 10 = ?
+    5458 focus(answerInput) sy0 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    5480 scroll-event sy28 docH 630 ae answerInput
+    5480 FRAME sy 0>28 docH 630
+    ---- next question rendered
+run5 q3 mixed_addition number-line stack:false frames-moved:1 | 2 + 5 = ?
+    10353 focus(answerInput) sy28 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    10476 scroll-event sy0 docH 600 ae answerInput
+    10477 FRAME sy 28>0 docH 600
+    ---- next question rendered
+run5 q4 mixed_addition stack stack:true frames-moved:0 | 133,998 + 522,038 = ?
+    15347 focus(answerInput) sy0 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    15381 scrollIntoView(answerInput) sy0 Element.scrollIntoView  < revealSettled (active-box.js:142:18) < selectIfLoose (active-box.js:150:46)
+    15404 scroll-event sy0 docH 703 ae answerInput
+    ---- next question rendered
+run6 q1 mixed_addition column-add stack:true frames-moved:2 | 6 + 1 = ?
+    23 focus(answerInput) sy0 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    62 scroll-event sy2 docH 602 ae column-answer-input mq-di
+    62 FRAME sy 0>2 docH 602
+    90 scroll-event sy0 docH 600 ae column-answer-input mq-di
+    92 FRAME sy 2>0 docH 600
+run6 q2 mixed_addition cloze-bank stack:false frames-moved:0 | Pick one number from each bank to make 16.
+    5426 focus(answerInput) sy0 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    ---- next question rendered
+run6 q3 mixed_addition undefined stack:false frames-moved:1 | Mason has 16 grapes. Mia has 6 grapes. How many MO
+    10380 focus(answerInput) sy0 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    10392 scroll-event sy20 docH 681 ae answerInput
+    10392 FRAME sy 0>20 docH 681
+    ---- next question rendered
+run6 q4 mixed_addition stack stack:true frames-moved:2 | 220 + 400 = ?
+    12457 scroll-event sy37 docH 681 ae answerInput
+    12457 FRAME sy 20>37 docH 681
+    15298 focus(answerInput) sy37 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    15319 scroll-event sy0 docH 600 ae column-answer-input mq-di
+    15319 FRAME sy 37>0 docH 600
+    ---- next question rendered
+run7 q1 mixed_addition stack stack:true frames-moved:2 | 4,542 + 4,005 = ?
+    22 focus(answerInput) sy0 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    70 scroll-event sy183 docH 783 ae answerInput
+    70 FRAME sy 0>183 docH 783
+    114 scroll-event sy0 docH 703 ae answerInput
+    116 FRAME sy 183>0 docH 703
+run7 q2 mixed_addition stack stack:true frames-moved:8 | 85,836 + 10,262 = ?
+    2588 scroll-event sy10 docH 703 ae column-answer-input mq-ac
+    2589 FRAME sy 0>10 docH 703
+    2608 scroll-event sy0 docH 703 ae column-answer-input mq-ac
+    2608 FRAME sy 10>0 docH 703
+    2634 scroll-event sy10 docH 703 ae column-answer-input mq-ac
+    2635 FRAME sy 0>10 docH 703
+    2662 scroll-event sy0 docH 703 ae column-answer-input mq-ac
+    2663 FRAME sy 10>0 docH 703
+    2688 scroll-event sy10 docH 703 ae column-answer-input mq-ac
+    2689 FRAME sy 0>10 docH 703
+    2713 scroll-event sy0 docH 703 ae column-answer-input mq-ac
+    2714 FRAME sy 10>0 docH 703
+    2740 scroll-event sy10 docH 703 ae column-answer-input mq-ac
+    2741 FRAME sy 0>10 docH 703
+    2763 scroll-event sy0 docH 703 ae column-answer-input mq-li
+    2764 FRAME sy 10>0 docH 703
+    5604 focus(answerInput) sy0 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    5628 scrollIntoView(answerInput) sy0 Element.scrollIntoView  < revealSettled (active-box.js:142:18) < selectIfLoose (active-box.js:150:46)
+    5646 scroll-event sy0 docH 703 ae answerInput
+    ---- next question rendered
+run7 q3 mixed_addition fact-family-sort stack:false frames-moved:10 | Is 12, 4, 14 a fact family? Write yes or no.
+    7695 scroll-event sy10 docH 703 ae column-answer-input mq-ac
+    7695 FRAME sy 0>10 docH 703
+    7714 scroll-event sy0 docH 703 ae column-answer-input mq-ac
+    7714 FRAME sy 10>0 docH 703
+    7740 scroll-event sy10 docH 703 ae column-answer-input mq-ac
+    7741 FRAME sy 0>10 docH 703
+    7757 scroll-event sy0 docH 703 ae column-answer-input mq-ac
+    7758 FRAME sy 10>0 docH 703
+    7776 scroll-event sy10 docH 703 ae column-answer-input mq-ac
+    7777 FRAME sy 0>10 docH 703
+    7795 scroll-event sy0 docH 703 ae column-answer-input mq-ac
+    7796 FRAME sy 10>0 docH 703
+    7829 scroll-event sy10 docH 703 ae column-answer-input mq-ac
+    7829 FRAME sy 0>10 docH 703
+    7863 scroll-event sy0 docH 703 ae column-answer-input mq-ac
+    7864 FRAME sy 10>0 docH 703
+    7886 scroll-event sy10 docH 703 ae column-answer-input mq-ac
+    7886 FRAME sy 0>10 docH 703
+    7910 scroll-event sy0 docH 703 ae column-answer-input mq-li
+    7910 FRAME sy 10>0 docH 703
+    10740 focus(answerInput) sy0 HTMLElement.focus  < _renderQuestionImpl (question-render.js:5615:30) < renderQuestion (question-render.js:1382:5)
+    ---- next question rendered
+run7 q4 mixed_addition fact-family-sort stack:false frames-moved:0 | Is 12, 4, 14 a fact family? Write yes or no.
+    12871 focus(answerInput) sy0 HTMLElement.focus  < answer-check.js:1272:44
+    12871 select(answerInput) sy0 HTMLInputElement.<computed> [as select]  < answer-check.js:1272:85
+    ---- next question rendered
