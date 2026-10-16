@@ -1811,7 +1811,10 @@ function wireSwipeRows(cellEl) {
             level();
             return true;
         };
-        const mode = () => { layout(); alignAxis(); };
+        // the cue's state, from the row as it stands (skip-count r3 D7: set at the end of every layout and late fit, never stale)
+        const upd = () => { level(); lastSL = w.scrollLeft; w.toggleAttribute('data-mq-scrolled', w.scrollLeft > 1); w.toggleAttribute('data-mq-end', !moreRight()); };
+        let laidInner = 0;
+        const mode = () => { layout(); alignAxis(); upd(); };
         const layout = () => {
             clearAll();
             // the phone draws ~29 px digits (fitTwinRows' phone rule reads the fonts only), then caps the gap
@@ -1824,19 +1827,30 @@ function wireSwipeRows(cellEl) {
             const room = () => { w.style.width = '0px'; const r = cellInner(); w.style.width = ''; return r; };
             const inner = room();
             if (!inner) return;
+            laidInner = inner;
             const colW = () => (col ? col.getBoundingClientRect().width : 0);
-            const fits = () => body.getBoundingClientRect().width + colW() <= inner + 1;
+            // measured on the drawing as it will stand: a number line's axis and arcs are mapped onto the numbers first (r3 D7)
+            const tabTop = () => !!frame && (frame.hasAttribute('data-mq-tabtop') || frame.hasAttribute('data-mq-swipes'));
+            const fits = () => { alignAxis(); return body.getBoundingClientRect().width + (tabTop() ? 0 : colW()) <= inner + 1; };
             // (4) choose: the row fits beside its step tab
             if (fits()) { w.style.overflowX = 'visible'; level(); return; }
+            // a number line: the step tab goes above and the line is tried whole at its full size before anything shrinks (r1 order)
+            if (isAxis && frame) {
+                frame.setAttribute('data-mq-tabtop', ''); level();
+                if (fits()) { w.style.overflowX = 'visible'; level(); return; }
+            }
             // ... or it fits once the drawing shrinks, never below a 44 px box (SP-10): a wider-than-phone window only
             if (twin && window.innerWidth > 480) {
                 const cur = parseFloat(getComputedStyle(twin).getPropertyValue('--mq-k2')) || 3.4;
+                // the 44 px floor holds for the box the pupil types in (its input), not only its tile (r3 N1)
                 const slot = w.querySelector('.k2-tile-slot');
                 const r = slot ? slot.getBoundingClientRect() : null;
-                const small = r ? Math.min(r.width, r.height) : 0;
+                const inp = slot && slot.querySelector('input');
+                const ir0 = inp ? inp.getBoundingClientRect() : null;
+                const small = r ? Math.min(r.width, r.height, ir0 && ir0.width ? ir0.width : Infinity) : 0;
                 const floorK = small > 0 ? cur * 44 / small : cur * 0.75;
                 const bw = body.getBoundingClientRect().width;
-                const k = Math.max(Math.min(cur, floorK), cur * (inner - colW()) / bw * 0.995);
+                const k = Math.max(Math.min(cur, floorK), cur * (inner - (tabTop() ? 0 : colW())) / bw * 0.995);
                 if (k < cur - 0.01) {
                     twin.style.setProperty('--mq-k2', `${k.toFixed(2)}px`);
                     if (fits()) { w.style.overflowX = 'visible'; level(); return; }
@@ -1855,13 +1869,20 @@ function wireSwipeRows(cellEl) {
             if (!frame) return;
             frame.setAttribute('data-mq-swipes', '');
             level();
+            alignAxis();
             const a = its[0].getBoundingClientRect(), b = its[1].getBoundingClientRect();
             const pitch = b.left - a.left, gap = pitch - a.width;
-            const avail = inner;
-            const n = Math.max(1, Math.floor((avail + gap + 0.5) / pitch));
+            // the window may start right of the cell's inner edge (the drawing's own margin): that is room it does not get (r3 D9)
+            const scell = w.closest('.mq-scell');
+            const sr = scell.getBoundingClientRect(), scs = getComputedStyle(scell);
+            const rightEdge = sr.right - parseFloat(scs.paddingRight || 0) - parseFloat(scs.borderRightWidth || 0);
+            const avail = isAxis ? Math.min(inner, rightEdge - w.getBoundingClientRect().left) : inner;
+            // the line's lead-in before its first number (an axis starts left of it) is room the columns do not get (r3 D9)
+            const lead = Math.max(0, a.left - w.getBoundingClientRect().left);
+            const n = Math.max(1, Math.floor((avail - lead + gap + 0.5) / pitch));
             // critic C2 r7: when every column of a line fits (the tab above), the window takes the full width and does not scroll
             if (n >= its.length) { w.style.overflowX = 'visible'; level(); return; }
-            const win = Math.min(avail, n * pitch - gap + 3);
+            const win = Math.min(avail, lead + n * pitch - gap + 3);
             w.style.width = `${win}px`; w.style.maxWidth = `${Math.floor(avail)}px`;
             frame.style.minWidth = `${Math.ceil(win)}px`;     // the drawing around the window widens with it (it stays centred in the cell)
             padEnd();
@@ -1871,17 +1892,30 @@ function wireSwipeRows(cellEl) {
         // on a resize: now, and again once the host has laid its grid out for the new width (the worksheet re-lays its
         // columns 150 ms after the last resize), so the row is measured in the cell it will live in
         let modeT = 0;
-        window.addEventListener('resize', () => { w.scrollLeft = 0; mode(); clearTimeout(modeT); modeT = setTimeout(() => { if (w.isConnected) { mode(); upd(); setTimeout(() => { if (w.isConnected && !w.scrollLeft) { mode(); upd(); } }, 700); } }, 340); });
+        const onResize = () => { if (!w.isConnected) { window.removeEventListener('resize', onResize); return; } w.scrollLeft = 0; mode(); clearTimeout(modeT); modeT = setTimeout(() => { if (w.isConnected) { mode(); upd(); setTimeout(() => { if (w.isConnected && !w.scrollLeft) { mode(); upd(); } }, 700); } }, 340); };
+        window.addEventListener('resize', onResize);
         // the host's late fit (fonts, fitTwinRows) moves the numbers after the layout: the number line follows them
-        if (isAxis && typeof ResizeObserver !== 'undefined' && body) {
-            const ro = new ResizeObserver(() => { if (!w.isConnected) { ro.disconnect(); return; } alignAxis(); });
-            ro.observe(body);
+        // (every row: the cue is set again whenever the row's size changes late, r3 D7)
+        if (typeof ResizeObserver !== 'undefined' && body) {
+            const ro = new ResizeObserver(() => { if (!w.isConnected) { ro.disconnect(); return; } alignAxis(); upd(); });
+            ro.observe(body); ro.observe(w);
+            // the cell itself narrows late with no resize event (the page's scroll bar appears after the card is drawn, r3 D9):
+            // the row is laid out again in the cell it now has
+            const cellEl2 = w.closest('.mq-scell');
+            if (cellEl2) {
+                const roc = new ResizeObserver(() => {
+                    if (!w.isConnected) { roc.disconnect(); return; }
+                    const w0 = w.style.width; w.style.width = '0px'; const now = cellInner(); w.style.width = w0;
+                    if (laidInner && Math.abs(now - laidInner) > 0.5) mode();
+                });
+                roc.observe(cellEl2);
+            }
             const first = w.querySelector('.k2-countrow-line [data-mq-wrapped] > *');
             if (first) ro.observe(first);
         }
-        const upd = () => { level(); lastSL = w.scrollLeft; w.toggleAttribute('data-mq-scrolled', w.scrollLeft > 1); w.toggleAttribute('data-mq-end', !moreRight()); };
         w.addEventListener('scroll', upd, { passive: true });
-        window.addEventListener('resize', upd);
+        const onResizeUpd = () => { if (!w.isConnected) { window.removeEventListener('resize', onResizeUpd); return; } upd(); };
+        window.addEventListener('resize', onResizeUpd);
         // the pupil's own move into a box (critic C2 r7): a tap in this row, a Tab key, or a step from another box of the row
         let tapAt = 0;
         w.addEventListener('pointerdown', () => { tapAt = Date.now(); }, { capture: true, passive: true });

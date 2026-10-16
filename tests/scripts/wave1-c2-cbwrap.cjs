@@ -177,6 +177,50 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       check(!errs.length, `${tag}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)${errs.length ? ' - ' + errs.slice(0, 4).join('; ') : ''}`);
     }
   }
+  // critic skip-count r2 D7/D9: the card between half a Chromebook and a full one, and the phone window on 5 seeds.
+  //  - no visible cue unless a number/box lies past the window's right edge;
+  //  - no number/box straddles the window's or the cell's right edge;
+  //  - the digits at 820 are no smaller than at 683.
+  const EDGE = () => {
+    const rows = [...document.querySelectorAll('[data-mq-swiperow]')].filter((e) => e.offsetParent);
+    return rows.map((w) => {
+      const v = w.getBoundingClientRect(); const cell = w.closest('.mq-scell'); const cr = cell.getBoundingClientRect(); const cs = getComputedStyle(cell);
+      const ir = cr.right - parseFloat(cs.paddingRight) - parseFloat(cs.borderRightWidth);
+      const els = [...w.querySelectorAll('.k2-countrow-body .k2-given, .k2-countrow-body input')].filter((e) => e.getBoundingClientRect().width > 0);
+      const more = els.some((e) => e.getBoundingClientRect().right > v.right + 1);
+      const cue = w.querySelector('.k2-swipe-cue'); const cueOn = !!cue && !!cue.offsetParent && getComputedStyle(cue).display !== 'none';
+      const edge = Math.min(v.right, ir);
+      const straddle = els.filter((e) => { const r = e.getBoundingClientRect(); return r.left < edge - 1 && r.right > edge + 1; }).map((e) => e.textContent || e.value || 'box');
+      const giv = [...w.querySelectorAll('.k2-given')];
+      const fs = giv.length ? Math.min(...giv.map((e) => parseFloat(getComputedStyle(e).fontSize))) : 0;
+      return { cueOn, more, straddle, fs };
+    });
+  };
+  const fsAt = {};
+  for (const [vw, vh] of [[683, 650], [820, 1180], [1024, 768], [1100, 650]]) {
+    await page.setViewport({ width: vw, height: vh, deviceScaleFactor: 1, hasTouch: true });
+    for (const [cat, skill, opts] of CASES) {
+      await SHOW(page, 'card', cat, skill, opts);
+      await sleep(700);
+      const E = await page.evaluate(EDGE); const L = await page.evaluate(LAYOUT);
+      const tag = `card ${vw}x${vh} ${skill} ${JSON.stringify(opts)}`;
+      const errs = L.flatMap((r, i) => r.errs.map((e) => `row ${i}: ${e}`));
+      check(E.length > 0 && !errs.length, `${tag}: layout clean${errs.length ? ' - ' + errs.slice(0, 3).join('; ') : ''}`);
+      check(E.every((r) => !r.cueOn || r.more), `${tag}: no cue unless a number lies past the window (${E.map((r) => `${r.cueOn ? 'cue' : 'no cue'}/${r.more ? 'more' : 'all shown'}`).join(',')})`);
+      check(E.every((r) => !r.straddle.length), `${tag}: no number or box straddles the right edge${E.some((r) => r.straddle.length) ? ' - ' + E.flatMap((r) => r.straddle).join(',') : ''}`);
+      if (skill === 'skip_count_line') fsAt[vw] = Math.min(...E.map((r) => r.fs));
+    }
+  }
+  check(fsAt[820] >= fsAt[683] - 0.05, `card skip_count_line: digits at 820 (${fsAt[820]} px) >= digits at 683 (${fsAt[683]} px)`);
+  await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1, hasTouch: true });
+  for (const host of ['card', 'worksheet', 'quiz']) for (const seed of [9, 21, 33, 45, 57]) {
+    await page.evaluate((s) => window.__wsReseed && window.__wsReseed(s), seed);
+    await SHOW(page, host, 'patterns', 'skip_count_line', {});
+    await sleep(700);
+    const E = await page.evaluate(EDGE);
+    check(E.length > 0 && E.every((r) => !r.straddle.length), `${host} 390 skip_count_line seed ${seed}: no number or box straddles the window's right edge${E.some((r) => r.straddle.length) ? ' - ' + E.flatMap((r) => r.straddle).join(',') : ''}`);
+    check(E.every((r) => !r.cueOn || r.more), `${host} 390 skip_count_line seed ${seed}: cue only while a number lies past the window`);
+  }
   // D3: a resize cycle on ONE page with no reload ends exactly as a fresh load does, and is clean at every width
   for (const [cat, skill, opts] of CASES) {
     const tag = `resize ${skill} ${JSON.stringify(opts)}`;

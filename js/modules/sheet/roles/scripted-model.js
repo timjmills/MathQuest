@@ -67,7 +67,8 @@ export function plan(input = {}) {
     if (!it) return assemble(ROLE_ID, input, frame, [{ sections: [] }], { nothingToAnswer: true });
     const m = bandMetrics(ctx, layoutHeader(frame.header));
     const mCont = bandMetrics(ctx, layoutHeader(frame.header), { cont: true });
-    const steps = stepsFor(it);
+    let steps = stepsFor(it);
+    let marks = marksFor(it, steps);
     const cols = fitsAt([it], 2, ctx) ? 2 : 1;
     let textH = 2 * (m.pitch + 1.5) + 6;
     // A state too wide for the half-width state column (a word problem, a wide picture) takes the
@@ -80,11 +81,16 @@ export function plan(input = {}) {
         const H1 = hMinAt([it], 1, ctx) + (m.pitch + 1.5) + 6;
         if (Math.floor(room1 / H1) >= steps.length) { textH = (m.pitch + 1.5) + 6; H = H1; }
     }
+    // critic skip-count r2 D8: a taller drawing (a fact under each number, three lines of 5) may still leave the last state
+    // alone on a page; then the two parallel middle steps ("a + n = b. Write b.") become one state, so the model stays whole
+    if (Math.floor(room1 / H) < steps.length && Math.floor(room1 / H) >= steps.length - 1 && steps.length >= 4) {
+        steps = [steps[0], `${steps[1]} ${steps[2]}`, ...steps.slice(3)];
+        if (marks) marks = [marks[0], marks[2], ...marks.slice(3)];
+    }
     const perFirst = Math.max(1, Math.floor((m.budget - m.strip - m.say) / H));
     const perCont = Math.max(1, Math.floor((mCont.budget - m.strip - m.say) / H));
     const ans = answerOf(it);
     const stepText = (i) => `<div class="mq-steptext"><em>${i + 1}</em><span>${esc(steps[i])}</span></div>`;
-    const marks = marksFor(it, steps);
     const stateItem = (i) => planItem(it, {
         cols, level: 3, nolabel: true,
         render: (c, o) => (cols === 1 ? `<div class="mq-steptop">${stepText(i)}</div>` : '')
@@ -98,8 +104,12 @@ export function plan(input = {}) {
     });
     const pages = [];
     let i = 0;
+    // never a lone state on the last page (critic r2 D8): the page before gives it one of its states
+    const caps = [];
+    for (let left = steps.length; left > 0;) { const c = Math.min(left, caps.length ? perCont : perFirst); caps.push(c); left -= c; }
+    if (caps.length > 1 && caps[caps.length - 1] === 1 && caps[caps.length - 2] > 2) { caps[caps.length - 2]--; caps[caps.length - 1]++; }
     while (i < steps.length) {
-        const cap = pages.length ? perCont : perFirst;
+        const cap = caps[pages.length];
         const take = steps.slice(i, i + cap).map((_, k) => i + k);
         const cells = [];
         for (const k of take) { cells.push(stateItem(k)); if (cols === 2) cells.push(textItem(k)); }

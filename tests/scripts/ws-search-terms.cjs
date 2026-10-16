@@ -26,6 +26,7 @@ const QUERIES = [
     ['count by 5', ['patterns:skip_count_grid', 'patterns:skip_count_line']],
     ['count by 10', ['patterns:skip_count_grid', 'patterns:skip_count_line']],
     ['skip count by 5', ['patterns:skip_count_grid', 'patterns:skip_count_line']],
+    ['counting by 25', ['multiplication:count_by_tables']],
     ['skip count by 2', ['patterns:skip_count_grid', 'patterns:skip_count_line']],
     // the owner's case
     ['skip counting', ['multiplication:count_by_tables']],
