@@ -1,7 +1,7 @@
 // generate-question.js - Dispatcher: routes to domain-specific question generators
 import { state } from './state.js';
 import { DEFAULT_TABLES, SKILLS, DOMAINS, SKILL_GRADES, getSkillGrade, isMixedMetaSkill, getSkillsForCategory, getMixedPoolSkills, getSkillsForDomain, getSkillsForGrade, getCategoryForSkill, getMixedSkillScope } from './data.js';
-import { randInt, pick, buildNumericOptions } from './utils.js';
+import { randInt, pick, buildNumericOptions, denomAllowed } from './utils.js';
 
 // Domain-specific generators
 import { generateOperationsQuestion, generateIntegersQuestion } from './gen-operations.js';
@@ -311,6 +311,10 @@ export function itemDenominators(q) {
         return out.filter(d => d > 1);
     };
     const question = [...dens(q.text, true), ...dens(q.printText, true), ...dens(q.visual, true)];
+    // A click-all or sort item shows its fractions on its choices and tiles, not in its words.
+    for (const o of [...(Array.isArray(q.options) ? q.options : []), ...(Array.isArray(q.tiles) ? q.tiles : [])]) {
+        if (o && typeof o === 'object' && o.label != null) question.push(...dens(o.label, true));
+    }
     // The answer counts too: a page of halves, quarters and eighths must not have 6/12 in its key.
     const a = typeof q.ans === 'string' || typeof q.ans === 'number' ? dens(q.ans, false) : [];
     return [...question, ...a];
@@ -333,23 +337,8 @@ function p12Post(q) {
     q.printFormat = 'word-plain';
     return q;
 }
-/** Denominator families (the `denoms` option): 2 = halves / quarters / eighths, 3 = thirds /
- *  sixths / ninths / twelfths, 5 = fifths / tenths / hundredths, 7 = sevenths, elevenths and the
- *  other primes. A denominator is allowed when every odd prime in it has its family ticked (a
- *  fifteenth needs 3 and 5); a power of two needs family 2. */
-export function denomAllowed(d, ticked) {
-    let n = Math.round(Number(d));
-    if (!(n > 1)) return true;
-    while (n % 2 === 0) n /= 2;
-    const fam = (p) => (p === 3 ? 3 : p === 5 ? 5 : 7);
-    const fams = new Set();
-    for (let p = 3; n > 1 && p * p <= n; p += 2) {
-        while (n % p === 0) { fams.add(fam(p)); n /= p; }
-    }
-    if (n > 1) fams.add(fam(n));
-    if (!fams.size) return ticked.includes(2);
-    return [...fams].every(f => ticked.includes(f));
-}
+// denomAllowed (the `denoms` families) lives in utils.js so the generators can draw from it too.
+export { denomAllowed };
 /** The words and numbers of an item, as the pupil reads them (tags stripped, thousands commas out). */
 export function itemPlainText(q) {
     const strip = (s) => String(s == null ? '' : s).replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/−/g, '-');

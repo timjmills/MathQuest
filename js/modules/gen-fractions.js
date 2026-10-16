@@ -1,6 +1,6 @@
 // gen-fractions.js - Fractions, Decimals & Conversions question generation
 import { state } from './state.js';
-import { randInt, shuffle, pick, buildNumericOptions, simplifyFraction, fractionToPercent, pickName, pickTwoNames, pickNoun } from './utils.js';
+import { randInt, shuffle, pick, buildNumericOptions, simplifyFraction, fractionToPercent, pickName, pickTwoNames, pickNoun, denomAllowed } from './utils.js';
 import { fracHTML, fracCircleSVG, fracBarHTML } from './svg-fractions.js';
 import { getSkillGrade, maxDenominatorForGrade } from './data.js';
 import { COLORS, STROKE, FONTS, softFill, categoricalFill } from './design-tokens.js';
@@ -132,6 +132,25 @@ function _fChanged(id) {
     const t = legal.filter(v => o[id].includes(v));
     const d = legal.filter(v => (def.default || []).includes(v));
     return t.length && !(t.length === d.length && t.every(v => d.includes(v))) ? t : null;
+}
+
+// P12: a denominator pool narrowed to the ticked `denoms` families, so the click-all and sort
+// forms honour the option too (the accept layer can only redraw, and a five-choice item almost
+// never lands in one family by chance). Fewer than `min` left -> `wider` narrowed the same way.
+function _fDenPool(pool, min = 2, wider = [2, 3, 4, 5, 6, 8, 9, 10, 12]) {
+    const fams = _fChanged('denoms');
+    if (!fams) return pool;
+    const a = pool.filter(d => denomAllowed(d, fams));
+    if (a.length >= min) return a;
+    const b = wider.filter(d => denomAllowed(d, fams));
+    return b.length >= min ? b : pool;
+}
+// The same for a list of denominator pairs ({d1, d2} or [d1, d2]): both must be in a ticked family.
+function _fDenPairs(pairs) {
+    const fams = _fChanged('denoms');
+    if (!fams) return pairs;
+    const ok = pairs.filter(p => (Array.isArray(p) ? p : [p.d1, p.d2]).every(d => denomAllowed(d, fams)));
+    return ok.length ? ok : pairs;
 }
 
 export function generateFractionsQuestion(q, mappedSkill, helpers) {
@@ -268,7 +287,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             if (fracSkill === "add_fractions_like" && Math.random() < 0.25) {
                 // Phase 4.5 batch 12: multi-select-check variant — click ALL sums equal to 1
-                const den = pick([4, 5, 6, 8, 10]);
+                const den = pick(_fDenPool([4, 5, 6, 8, 10], 1));
                 const items = [];
                 const seen = new Set();
                 let safety = 0;
@@ -323,7 +342,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             } else if (fracSkill === "sub_fractions_like" && Math.random() < 0.25) {
                 // Phase 4.5 batch 12: multi-select-check variant — click ALL differences less than 1/2
-                const den = pick([4, 6, 8, 10, 12]);
+                const den = pick(_fDenPool([4, 6, 8, 10, 12], 1));
                 const items = [];
                 const seen = new Set();
                 let safety = 0;
@@ -382,7 +401,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             } else if (fracSkill === "add_mixed_like" && Math.random() < 0.25) {
                 // Phase 4.5 batch 12: multi-select-check variant — click ALL sums greater than 3
-                const den = pick([2, 3, 4, 5, 6, 8]);
+                const den = pick(_fDenPool([2, 3, 4, 5, 6, 8], 1));
                 const items = [];
                 const seen = new Set();
                 let safety = 0;
@@ -418,7 +437,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
             } else if (fracSkill === "add_mixed_like" && Math.random() < 0.20) {
                 // Phase 4.5 batch 12: dnd-categorize variant — sort 5 sums into bins by total size
-                const den = pick([2, 3, 4, 5, 6, 8]);
+                const den = pick(_fDenPool([2, 3, 4, 5, 6, 8], 1));
                 const items = [];
                 const seen = new Set();
                 let safety = 0;
@@ -461,7 +480,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
             } else if (fracSkill === "add_mixed_like") {
                 // Grade 4: Add mixed numbers with SAME denominator
-                const den = pick([2, 3, 4, 5, 6, 8]);
+                const den = pick(_fDenPool([2, 3, 4, 5, 6, 8], 1));
                 const w1 = rng(1, 4);
                 const f1 = rng(1, den - 1);
                 const w2 = rng(1, 3);
@@ -490,7 +509,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             } else if (fracSkill === "sub_mixed_like" && Math.random() < 0.25) {
                 // Phase 4.5 batch 12: multi-select-check variant — click ALL differences less than 2
-                const den = pick([2, 3, 4, 5, 6, 8]);
+                const den = pick(_fDenPool([2, 3, 4, 5, 6, 8], 1));
                 const items = [];
                 const seen = new Set();
                 let safety = 0;
@@ -529,7 +548,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
             } else if (fracSkill === "sub_mixed_like") {
                 // Grade 4: Subtract mixed numbers with SAME denominator
-                const den = pick([2, 3, 4, 5, 6, 8]);
+                const den = pick(_fDenPool([2, 3, 4, 5, 6, 8], 1));
                 let w1 = rng(2, 5);
                 let f1 = rng(1, den - 1);
                 let w2 = rng(1, w1 - 1);
@@ -614,7 +633,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
             } else if (fracSkill === "mult_frac_whole") {
                 // Grade 4: Multiply fraction x whole number
-                const den = pick([2, 3, 4, 5, 6, 8]);
+                const den = pick(_fDenPool([2, 3, 4, 5, 6, 8], 1));
                 const num = rng(1, den - 1);
                 const whole = rng(2, 6);
                 const prodNum = num * whole;
@@ -690,7 +709,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
             } else if (fracSkill === "decompose_fractions") {
                 // Grade 4: Decompose to unit fractions
-                const den = pick([2, 3, 4, 5, 6, 8]);
+                const den = pick(_fDenPool([2, 3, 4, 5, 6, 8], 1));
                 const num = rng(2, Math.min(den, 6));
                 const answer = Array.from({length: num}, () => `1/${den}`).join(' + ');
 
@@ -727,7 +746,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             } else if (fracSkill === "frac_word_problems" && Math.random() < 0.25) {
                 // Phase 4.5 batch 12: multi-select-check variant — click ALL the numbers needed to solve
-                const den = pick([4, 5, 6, 8, 10]);
+                const den = pick(_fDenPool([4, 5, 6, 8, 10], 1));
                 const itemsList = [
                     {item: "pizza", unit: "of a pizza"},
                     {item: "chocolate bar", unit: "of a chocolate bar"},
@@ -769,7 +788,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
             } else if (fracSkill === "frac_word_problems") {
                 // Grade 4: Fraction word problems (add/sub, like denominators)
-                const den = pick([4, 5, 6, 8, 10]);
+                const den = pick(_fDenPool([4, 5, 6, 8, 10], 1));
                 const items = [
                     {item: "pizza", unit: "of a pizza"},
                     {item: "chocolate bar", unit: "of a chocolate bar"},
@@ -931,7 +950,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             } else if (fracSkill === "add_frac_unlike" && Math.random() < 0.25) {
                 // Phase 4.5 batch 12: multi-select-check variant — click ALL sums greater than 1
-                const dPool = [2, 3, 4, 5, 6, 8];
+                const dPool = _fDenPool([2, 3, 4, 5, 6, 8]);
                 const items = [];
                 const seen = new Set();
                 let safety = 0;
@@ -967,7 +986,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
             } else if (fracSkill === "add_frac_unlike") {
                 // Grade 5: Add fractions with UNLIKE denominators
-                const denOptions = [2, 3, 4, 5, 6, 8, 10, 12];
+                const denOptions = _fDenPool([2, 3, 4, 5, 6, 8, 10, 12]);
                 let d1 = pick(denOptions);
                 let d2 = pick(denOptions);
                 while (d1 === d2) d2 = pick(denOptions);
@@ -995,7 +1014,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             } else if (fracSkill === "sub_frac_unlike" && Math.random() < 0.25) {
                 // Phase 4.5 batch 12: multi-select-check variant — click ALL differences greater than 1/4
-                const dPool = [2, 3, 4, 5, 6, 8];
+                const dPool = _fDenPool([2, 3, 4, 5, 6, 8]);
                 const items = [];
                 const seen = new Set();
                 let safety = 0;
@@ -1035,7 +1054,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
             } else if (fracSkill === "sub_frac_unlike") {
                 // Grade 5: Subtract fractions with UNLIKE denominators
-                const denOptions = [2, 3, 4, 5, 6, 8, 10, 12];
+                const denOptions = _fDenPool([2, 3, 4, 5, 6, 8, 10, 12]);
                 let d1 = pick(denOptions);
                 let d2 = pick(denOptions);
                 while (d1 === d2) d2 = pick(denOptions);
@@ -1069,7 +1088,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             } else if (fracSkill === "add_mixed_unlike" && Math.random() < 0.25) {
                 // Phase 4.5 batch 12: multi-select-check variant — click ALL sums greater than 4
-                const denPairs = [{d1:2,d2:3},{d1:2,d2:4},{d1:3,d2:4},{d1:2,d2:6},{d1:3,d2:6},{d1:4,d2:8},{d1:2,d2:5},{d1:5,d2:10}];
+                const denPairs = _fDenPairs([{d1:2,d2:3},{d1:2,d2:4},{d1:3,d2:4},{d1:2,d2:6},{d1:3,d2:6},{d1:4,d2:8},{d1:2,d2:5},{d1:5,d2:10}]);
                 const items = [];
                 const seen = new Set();
                 let safety = 0;
@@ -1106,7 +1125,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
             } else if (fracSkill === "add_mixed_unlike" && Math.random() < 0.20) {
                 // Phase 4.5 batch 12: dnd-categorize variant — sort 5 sums by total size
-                const denPairs = [{d1:2,d2:3},{d1:2,d2:4},{d1:3,d2:4},{d1:2,d2:6},{d1:3,d2:6},{d1:4,d2:8},{d1:2,d2:5},{d1:5,d2:10}];
+                const denPairs = _fDenPairs([{d1:2,d2:3},{d1:2,d2:4},{d1:3,d2:4},{d1:2,d2:6},{d1:3,d2:6},{d1:4,d2:8},{d1:2,d2:5},{d1:5,d2:10}]);
                 const items = [];
                 const seen = new Set();
                 let safety = 0;
@@ -1150,7 +1169,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
             } else if (fracSkill === "add_mixed_unlike") {
                 // Grade 5: Add mixed numbers with UNLIKE denominators
-                const denPairs = [{d1:2,d2:3},{d1:2,d2:4},{d1:3,d2:4},{d1:2,d2:6},{d1:3,d2:6},{d1:4,d2:8},{d1:2,d2:5},{d1:5,d2:10}];
+                const denPairs = _fDenPairs([{d1:2,d2:3},{d1:2,d2:4},{d1:3,d2:4},{d1:2,d2:6},{d1:3,d2:6},{d1:4,d2:8},{d1:2,d2:5},{d1:5,d2:10}]);
                 const dp = pick(denPairs);
                 const d1 = dp.d1, d2 = dp.d2;
                 const lcd = _lcm(d1, d2);
@@ -1181,7 +1200,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             } else if (fracSkill === "sub_mixed_unlike" && Math.random() < 0.25) {
                 // Phase 4.5 batch 12: multi-select-check variant — click ALL differences less than 2
-                const denPairs = [{d1:2,d2:3},{d1:2,d2:4},{d1:3,d2:4},{d1:2,d2:6},{d1:3,d2:6},{d1:4,d2:8},{d1:2,d2:5},{d1:5,d2:10}];
+                const denPairs = _fDenPairs([{d1:2,d2:3},{d1:2,d2:4},{d1:3,d2:4},{d1:2,d2:6},{d1:3,d2:6},{d1:4,d2:8},{d1:2,d2:5},{d1:5,d2:10}]);
                 const items = [];
                 const seen = new Set();
                 let safety = 0;
@@ -1220,7 +1239,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
             } else if (fracSkill === "sub_mixed_unlike") {
                 // Grade 5: Subtract mixed numbers with UNLIKE denominators
-                const denPairs = [{d1:2,d2:3},{d1:2,d2:4},{d1:3,d2:4},{d1:2,d2:6},{d1:3,d2:6},{d1:4,d2:8},{d1:2,d2:5},{d1:5,d2:10}];
+                const denPairs = _fDenPairs([{d1:2,d2:3},{d1:2,d2:4},{d1:3,d2:4},{d1:2,d2:6},{d1:3,d2:6},{d1:4,d2:8},{d1:2,d2:5},{d1:5,d2:10}]);
                 const dp = pick(denPairs);
                 const d1 = dp.d1, d2 = dp.d2;
                 const lcd = _lcm(d1, d2);
@@ -1260,7 +1279,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             } else if (fracSkill === "add_frac_like_nv" && Math.random() < 0.20) {
                 // Phase 4.5 batch 9: dnd-categorize variant - sort sums vs 1
-                const den = pick([4, 5, 6, 8]);
+                const den = pick(_fDenPool([4, 5, 6, 8], 1));
                 const items = [];
                 const seen = new Set();
                 let safety = 0;
@@ -1297,7 +1316,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
             } else if (fracSkill === "add_frac_like_nv") {
                 // Grade 4: Add proper fractions, like denominators (no visual)
-                const den = rng(2, 12);
+                const den = _fChanged('denoms') ? pick(_fDenPool([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], 1)) : rng(2, 12);
                 const maxNum = den - 1;
                 // LRU rotation across 3 sub-types (was Math.random() chain).
                 const roll = (typeof window !== 'undefined' && window.pickVariant)
@@ -1338,7 +1357,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             } else if (fracSkill === "sub_frac_like_nv" && Math.random() < 0.20) {
                 // Phase 4.5 batch 9: dnd-categorize variant - sort differences relative to 1/2
-                const den = pick([4, 6, 8, 10]);
+                const den = pick(_fDenPool([4, 6, 8, 10], 1));
                 const items = [];
                 const seen = new Set();
                 let safety = 0;
@@ -1375,7 +1394,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
             } else if (fracSkill === "sub_frac_like_nv") {
                 // Grade 4: Subtract proper fractions, like denominators (no visual)
-                const den = rng(2, 12);
+                const den = _fChanged('denoms') ? pick(_fDenPool([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], 1)) : rng(2, 12);
                 // LRU rotation across 3 sub-types (was Math.random() chain).
                 const roll = (typeof window !== 'undefined' && window.pickVariant)
                     ? window.pickVariant('sub_frac_like_nv', ["straight","missing_num","simplify"])
@@ -1415,7 +1434,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             } else if (fracSkill === "add_frac_unlike_nv" && Math.random() < 0.20) {
                 // Phase 4.5 batch 9: dnd-categorize variant - sort sums vs 1
-                const dPool = [2, 3, 4, 5, 6, 8];
+                const dPool = _fDenPool([2, 3, 4, 5, 6, 8]);
                 const items = [];
                 const seen = new Set();
                 let safety = 0;
@@ -1455,7 +1474,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
             } else if (fracSkill === "add_frac_unlike_nv") {
                 // Grade 5: Add proper fractions, unlike denominators (no visual)
-                const denPairs = [[2,3],[2,4],[3,4],[2,5],[3,5],[4,5],[2,6],[3,6],[4,6],[5,6],[2,8],[3,8],[4,8],[5,10],[2,10],[3,10],[4,10],[6,10],[2,12],[3,12],[4,12],[6,12]];
+                const denPairs = _fDenPairs([[2,3],[2,4],[3,4],[2,5],[3,5],[4,5],[2,6],[3,6],[4,6],[5,6],[2,8],[3,8],[4,8],[5,10],[2,10],[3,10],[4,10],[6,10],[2,12],[3,12],[4,12],[6,12]]);
                 const [d1, d2] = pick(denPairs);
                 const lcd = _lcm(d1, d2);
                 // LRU rotation across 3 sub-types (was Math.random() chain).
@@ -1498,7 +1517,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             } else if (fracSkill === "sub_frac_unlike_nv" && Math.random() < 0.20) {
                 // Phase 4.5 batch 9: dnd-categorize variant - sort differences vs 1/2
-                const dPool = [2, 3, 4, 5, 6, 8];
+                const dPool = _fDenPool([2, 3, 4, 5, 6, 8]);
                 const items = [];
                 const seen = new Set();
                 let safety = 0;
@@ -1545,7 +1564,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
             } else if (fracSkill === "sub_frac_unlike_nv") {
                 // Grade 5: Subtract proper fractions, unlike denominators (no visual)
-                const denPairs = [[2,3],[2,4],[3,4],[2,5],[3,5],[4,5],[2,6],[3,6],[4,6],[5,6],[2,8],[3,8],[4,8],[5,10],[2,10],[3,10],[4,10],[6,10],[2,12],[3,12],[4,12],[6,12]];
+                const denPairs = _fDenPairs([[2,3],[2,4],[3,4],[2,5],[3,5],[4,5],[2,6],[3,6],[4,6],[5,6],[2,8],[3,8],[4,8],[5,10],[2,10],[3,10],[4,10],[6,10],[2,12],[3,12],[4,12],[6,12]]);
                 const [d1, d2] = pick(denPairs);
                 const lcd = _lcm(d1, d2);
                 // LRU rotation across 3 sub-types (was Math.random() chain).
@@ -1588,7 +1607,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             } else if (fracSkill === "add_mixed_like_nv") {
                 // Grade 4: Add mixed numbers, like denominators (no visual)
-                const den = pick([2, 3, 4, 5, 6, 8]);
+                const den = pick(_fDenPool([2, 3, 4, 5, 6, 8], 1));
                 // LRU rotation across 3 sub-types (was Math.random() chain).
                 const roll = (typeof window !== 'undefined' && window.pickVariant)
                     ? window.pickVariant('add_mixed_like_nv', ["straight","missing","simplify"])
@@ -1639,7 +1658,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             } else if (fracSkill === "sub_mixed_like_nv") {
                 // Grade 4: Subtract mixed numbers, like denominators (no visual)
-                const den = pick([2, 3, 4, 5, 6, 8]);
+                const den = pick(_fDenPool([2, 3, 4, 5, 6, 8], 1));
                 // LRU rotation across 3 sub-types (was Math.random() chain).
                 const roll = (typeof window !== 'undefined' && window.pickVariant)
                     ? window.pickVariant('sub_mixed_like_nv', ["straight","missing","simplify"])
@@ -1702,7 +1721,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             } else if (fracSkill === "add_mixed_unlike_nv") {
                 // Grade 5: Add mixed numbers, unlike denominators (no visual)
-                const denPairs = [[2,3],[2,4],[3,4],[2,5],[3,5],[4,5],[2,6],[3,6],[4,6],[5,6],[2,8],[3,8],[4,8],[5,10],[2,10],[3,10],[4,10],[6,10],[2,12],[3,12],[4,12],[6,12]];
+                const denPairs = _fDenPairs([[2,3],[2,4],[3,4],[2,5],[3,5],[4,5],[2,6],[3,6],[4,6],[5,6],[2,8],[3,8],[4,8],[5,10],[2,10],[3,10],[4,10],[6,10],[2,12],[3,12],[4,12],[6,12]]);
                 const [d1, d2] = pick(denPairs);
                 const lcd = _lcm(d1, d2);
                 // LRU rotation across 3 sub-types (was Math.random() chain).
@@ -1761,7 +1780,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             } else if (fracSkill === "sub_mixed_unlike_nv") {
                 // Grade 5: Subtract mixed numbers, unlike denominators (no visual)
-                const denPairs = [[2,3],[2,4],[3,4],[2,5],[3,5],[4,5],[2,6],[3,6],[4,6],[5,6],[2,8],[3,8],[4,8],[5,10],[2,10],[3,10],[4,10],[6,10],[2,12],[3,12],[4,12],[6,12]];
+                const denPairs = _fDenPairs([[2,3],[2,4],[3,4],[2,5],[3,5],[4,5],[2,6],[3,6],[4,6],[5,6],[2,8],[3,8],[4,8],[5,10],[2,10],[3,10],[4,10],[6,10],[2,12],[3,12],[4,12],[6,12]]);
                 const [d1, d2] = pick(denPairs);
                 const lcd = _lcm(d1, d2);
                 // LRU rotation across 2 sub-types (was Math.random() chain).
@@ -2693,7 +2712,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
             } else if (fracSkill === "mult_scaling_nv" && Math.random() < 0.30) {
                 // Phase 4.5 batch 2: dnd-categorize variant — sort 4-6 expressions into Larger/Smaller/Equal bins
                 const whole = pick([6, 8, 10, 12]);
-                const dPool = [2, 3, 4, 5, 6, 8];
+                const dPool = _fDenPool([2, 3, 4, 5, 6, 8]);
                 const totalCount = randInt(5, 6);
                 const expressions = [];
                 const seen = new Set();
@@ -2759,7 +2778,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 const whole = pick([5, 6, 8, 10, 12]);
                 const correctCount = randInt(2, 3);
                 const totalCount = randInt(5, 6);
-                const dPool = [2, 3, 4, 5, 6, 8];
+                const dPool = _fDenPool([2, 3, 4, 5, 6, 8]);
                 const correctSet = [];
                 const wrongSet = [];
                 const seen = new Set();
@@ -2912,7 +2931,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
             } else if (fracSkill === "mult_frac_frac" && Math.random() < 0.20) {
                 // Phase 4.5 batch 9: dnd-categorize variant - sort products by size relative to 1/2
-                const dPool = [2, 3, 4, 5, 6, 8];
+                const dPool = _fDenPool([2, 3, 4, 5, 6, 8]);
                 const totalCount = randInt(5, 6);
                 const items = [];
                 const seen = new Set();
@@ -3162,7 +3181,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
             } else if (fracSkill === "mult_scaling" && Math.random() < 0.30) {
                 // Phase 4.5 batch 2: dnd-categorize variant — sort 4-6 expressions into Larger/Smaller/Equal bins
                 const whole = pick([6, 8, 10, 12]);
-                const dPool = [2, 3, 4, 5, 6, 8];
+                const dPool = _fDenPool([2, 3, 4, 5, 6, 8]);
                 const totalCount = randInt(5, 6);
                 const expressions = [];
                 const seen = new Set();
@@ -3226,7 +3245,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 const whole = pick([5, 6, 8, 10, 12]);
                 const correctCount = randInt(2, 3);
                 const totalCount = randInt(5, 6);
-                const dPool = [2, 3, 4, 5, 6, 8];
+                const dPool = _fDenPool([2, 3, 4, 5, 6, 8]);
                 const correctSet = [];
                 const wrongSet = [];
                 const seen = new Set();
@@ -3688,7 +3707,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 } else if (problemType === 'B') {
                     // Type B: Which number line shows the given fraction?
                     // Need at least 3 distinct positions → den >= 4
-                    const den = pick([4, 5, 6, 8]);
+                    const den = pick(_fDenPool([4, 5, 6, 8], 1));
                     const correctNum = rng(1, den - 1);
                     const correctPos = correctNum; // position in parts
                     const labels = ['A', 'B', 'C'];
@@ -3782,7 +3801,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
                 } else {
                     // Type E: Fractions greater than 1 (improper fractions / mixed numbers)
-                    const den = pick([2, 3, 4, 5, 6]);
+                    const den = pick(_fDenPool([2, 3, 4, 5, 6], 1));
                     const maxW = den <= 3 ? 3 : 2;
                     const totalParts = maxW * den;
                     // Pick a position > den (greater than 1) and not on a whole number
@@ -3858,7 +3877,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         <div style="display:flex;justify-content:center;gap:11px;flex-wrap:wrap;margin-bottom:8px;">${bars}</div>
                     </div>`;
                 } else {
-                    const den = pick([2, 3, 4, 5, 6, 8]);
+                    const den = pick(_fDenPool([2, 3, 4, 5, 6, 8], 1));
                     questionText = `Write 1 as a fraction with denominator ${den}.`;
                     answer = `${den}/${den}`;
                     hintText = `1 whole = ${den}/${den}. When numerator equals denominator, the fraction equals 1.`;
@@ -4915,7 +4934,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 // Grade 4: Round mixed numbers to nearest whole or nearest 1/2
                 const roundType = pick(["whole", "half"]);
                 const wholeNum = rng(1, 9);
-                const den = pick([3, 4, 5, 6, 8, 10]);
+                const den = pick(_fDenPool([3, 4, 5, 6, 8, 10], 1));
                 let num = rng(1, den - 1);
                 // Pedagogical guard: when rounding to nearest half, the fraction must NOT
                 // already be exactly 1/2 (e.g. 2/4, 3/6, 4/8, 5/10) — otherwise the answer
@@ -5129,7 +5148,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     return;
                 }
                 // Level 1: Identify fractions from visual
-                const den = pick([2, 3, 4, 5, 6, 8]);
+                const den = pick(_fDenPool([2, 3, 4, 5, 6, 8], 1));
                 const num = rng(1, den - 1);
                 const simple = simplifyFraction(num, den);
                 const wrongs = new Set();
@@ -5157,7 +5176,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 // Write the fraction shown: the pupil writes the numerator and the denominator in
                 // the two boxes of the fraction (paper and screen). Equivalent fractions are NOT
                 // accepted: the literal counted parts (2/4 shaded -> 2/4, not 1/2).
-                const den = pick([2, 3, 4, 5, 6, 8, 10]);
+                const den = pick(_fDenPool([2, 3, 4, 5, 6, 8, 10], 1));
                 const num = rng(1, den - 1);
                 const visualPick = Math.random();
                 const _wfModel = _fModelPick() || (visualPick < 0.34 ? 'circle' : visualPick < 0.67 ? 'bar' : 'area');
@@ -5179,7 +5198,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 // Shade the fraction: the pupil shades parts of an empty model (any parts: the
                 // COUNT is the answer). Paper: shade with a pencil; the key shades the model.
                 // Screen: tap the parts (the card's shade handler, or the grid hosts' model mount).
-                const den = pick([2, 3, 4, 5, 6, 8, 10]);
+                const den = pick(_fDenPool([2, 3, 4, 5, 6, 8, 10], 1));
                 const num = rng(1, den - 1);
                 const visualPick = Math.random();
                 const _sfModel = _fModelPick() || (visualPick < 0.34 ? 'circle' : visualPick < 0.67 ? 'bar' : 'area');
@@ -5831,7 +5850,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
             } else if (fracSkill === "improper_mixed") {
                 // Level 2: Convert between improper fractions and mixed numbers
-                const den = pick([2, 3, 4, 5, 6, 8]);
+                const den = pick(_fDenPool([2, 3, 4, 5, 6, 8], 1));
                 const wholes = rng(1, 4); // 1-4 whole parts
                 const extraNum = rng(1, den - 1); // Additional fraction part
                 const totalNum = wholes * den + extraNum; // Total numerator for improper fraction
