@@ -1521,6 +1521,17 @@ SKILL_OPTIONS['composing:number_word_form'] = [{
         { v: 'to_words', l: 'Numeral to words (write forty-one)' }],
     allLabel: 'Both ways, alternating',
     help: 'Writing the words is harder (it is spelling too). Tick both and the page alternates.',
+}, {
+    // Detailed lesson 1 (2026-10-16): "Numbers to" bounds the number itself (the answer). 0 = the
+    // Max Number setting, the old behaviour (10 up to Max Number), so every saved code deals as it
+    // did. 20 / 100 / 1,000 deal from just above the band below (11-20, 21-100, 101-1,000).
+    id: 'band', label: 'Numbers to', type: 'enum', default: 0, group: 'difficulty',
+    values: [{ v: 0, l: 'Max Number setting' }, { v: 20, l: '20' }, { v: 100, l: '100' }, { v: 1000, l: '1,000' }],
+    help: 'The numbers the page reads and writes. 1,000 deals 101 to 1,000.',
+}, {
+    id: 'zeroPlace', label: 'A zero place (305, 340)', type: 'enum', default: 'none', group: 'difficulty',
+    values: [{ v: 'none', l: 'Never' }, { v: 'some', l: 'Some numbers (every third)' }, { v: 'always', l: 'Every number' }],
+    help: 'A missing tens or ones word means a 0 in that place: "three hundred five" is 305. Needs Numbers to 100 or 1,000.',
 }];
 
 // ===========================================================================
