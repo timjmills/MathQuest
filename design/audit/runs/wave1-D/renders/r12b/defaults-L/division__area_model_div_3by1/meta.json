@@ -1,0 +1,1242 @@
+{
+  "skill": "division:area_model_div_3by1",
+  "category": "division",
+  "skillId": "area_model_div_3by1",
+  "label": "Area Model Division (3÷1 digit)",
+  "grade": "5",
+  "dir": "division__area_model_div_3by1",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 3,
+        "perPage": 6,
+        "pages": 1,
+        "note": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 28 pt.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 3,
+            "perPage": 6,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 75.667,
+            "requested": "auto",
+            "clamped": false,
+            "note": "",
+            "line": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 28 pt.",
+            "cls": "standard",
+            "digitPt": 28,
+            "hMin": 57.5,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 457771,
+      "title": "I Can divide with an area model",
+      "notes": [],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 152 ÷ 8",
+          "ans": "19",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 275 ÷ 5",
+          "ans": "55",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 231 ÷ 7",
+          "ans": "33",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 246 ÷ 2",
+          "ans": "123",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 49.7
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 3.4
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -12
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -19.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 168 ÷ 8",
+          "ans": "21",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 258 ÷ 2",
+          "ans": "129",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 49.7
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 3.4
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -12
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -19.7
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 85,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 106,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 62
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 80
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    },
+    "more-practice": {
+      "fits": {
+        "cols": 2,
+        "rows": 3,
+        "perPage": 6,
+        "pages": 1,
+        "note": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 28 pt.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 3,
+            "perPage": 6,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 75.667,
+            "requested": "auto",
+            "clamped": false,
+            "note": "",
+            "line": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 28 pt.",
+            "cls": "standard",
+            "digitPt": 28,
+            "hMin": 57.5,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 504100,
+      "title": "I Can divide with an area model",
+      "notes": [],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 153 ÷ 9",
+          "ans": "17",
+          "letter": "A",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 153 ÷ 3",
+          "ans": "51",
+          "letter": "A",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 275 ÷ 5",
+          "ans": "55",
+          "letter": "A",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 248 ÷ 4",
+          "ans": "62",
+          "letter": "A",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 264 ÷ 4",
+          "ans": "66",
+          "letter": "A",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 145 ÷ 5",
+          "ans": "29",
+          "letter": "A",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "more-practice-p1.png",
+          "words": 85,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "more-practice-key-p1.png",
+          "words": 106,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 62
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 80
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    },
+    "test": {
+      "fits": {
+        "cols": 2,
+        "rows": 3,
+        "perPage": 6,
+        "pages": 1,
+        "note": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 28 pt. Tall problems: 3 rows per page.",
+        "sections": [
+          {
+            "role": "test",
+            "cls": "standard",
+            "requested": "auto",
+            "cols": 2,
+            "rows": 3,
+            "perPage": 6,
+            "pages": 1,
+            "count": 6,
+            "cellW": 93,
+            "innerW": 92.339,
+            "cellH": 75.667,
+            "hMin": 57.5,
+            "gridH": 227,
+            "gridHCont": 241,
+            "fill": true,
+            "packed": false,
+            "filled": false,
+            "ceiling": 12,
+            "clamped": false,
+            "reason": "",
+            "note": "Tall problems: 3 rows per page.",
+            "notes": [
+              "Tall problems: 3 rows per page."
+            ],
+            "digitPt": 28,
+            "trackMm": null,
+            "size": "L",
+            "look": "ican",
+            "availableWidthMm": 186,
+            "line": "Fits: 2 columns x 3 rows, 6 per page, 1 page. Digits 28 pt. Tall problems: 3 rows per page."
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 611311,
+      "title": "Test A: dividing with an area model",
+      "notes": [
+        "Tall problems: 3 rows per page."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 295 ÷ 5",
+          "ans": "59",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 296 ÷ 8",
+          "ans": "37",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 155 ÷ 5",
+          "ans": "31",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 234 ÷ 6",
+          "ans": "39",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 261 ÷ 9",
+          "ans": "29",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 213 ÷ 3",
+          "ans": "71",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "test-p1.png",
+          "words": 85,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "test-key-p1.png",
+          "words": 106,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 62
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 80
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    },
+    "review": {
+      "fits": {
+        "cols": 2,
+        "rows": 3,
+        "pages": 1,
+        "note": "Fits: 2 columns x 2 rows + 2 x 1 mixed, 6 per page.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 3,
+            "cellH": 71.66666666666666,
+            "line": "Fits: 2 columns x 2 rows + 2 x 1 mixed, 6 per page."
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 418179,
+      "title": "Review: dividing with an area model",
+      "notes": [],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 145 ÷ 5",
+          "ans": "29",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 135 ÷ 5",
+          "ans": "27",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 144 ÷ 3",
+          "ans": "48",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 136 ÷ 4",
+          "ans": "34",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 136 ÷ 2",
+          "ans": "68",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 148 ÷ 4",
+          "ans": "37",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 126 ÷ 7",
+          "ans": "18",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 147 ÷ 7",
+          "ans": "21",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 126 ÷ 6",
+          "ans": "21",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 171 ÷ 3",
+          "ans": "57",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 261 ÷ 3",
+          "ans": "87",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 52.8
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 6.5
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -8.9
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -16.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 258 ÷ 2",
+          "ans": "129",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 49.7
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 3.4
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -12
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -19.7
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 84 ÷ 3",
+          "ans": "28",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 55.7
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 9.4
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -6
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -13.8
+            }
+          }
+        },
+        {
+          "template": "area-model-div",
+          "fclass": "standard",
+          "text": "Use the area model to find 56 ÷ 7",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 58.3
+            },
+            "2": {
+              "hMm": 57.5,
+              "fits": true,
+              "slackMm": 12
+            },
+            "3": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -3.4
+            },
+            "4": {
+              "hMm": 57.5,
+              "fits": false,
+              "slackMm": -11.1
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "review-p1.png",
+          "words": 87,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "review-key-p1.png",
+          "words": 108,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 64
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 82
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

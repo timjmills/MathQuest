@@ -1,0 +1,1400 @@
+{
+  "skill": "multiplication:area_model_mult_hard",
+  "category": "multiplication",
+  "skillId": "area_model_mult_hard",
+  "label": "Area Model (2×2 and 2×3)",
+  "grade": "5",
+  "dir": "multiplication__area_model_mult_hard",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 2,
+        "rows": 2,
+        "perPage": 4,
+        "pages": 1,
+        "note": "Fits: 2 columns x 2 rows, 4 per page, 1 page. Digits 16 pt. Tall problems: 2 rows per page.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 2,
+            "perPage": 4,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 111.25,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Tall problems: 2 rows per page.",
+            "line": "Fits: 2 columns x 2 rows, 4 per page, 1 page. Digits 16 pt. Tall problems: 2 rows per page.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 76.5,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 885019,
+      "title": "I Can multiply two numbers with an area model",
+      "notes": [
+        "Tall problems: 2 rows per page."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 65 × 183",
+          "ans": "11895",
+          "measured": {
+            "1": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 50.2
+            },
+            "2": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -11.5
+            },
+            "4": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -19.2
+            },
+            "5": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -23.9
+            }
+          }
+        },
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 19 × 37",
+          "ans": "703",
+          "measured": {
+            "1": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 65.7
+            },
+            "2": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 19.4
+            },
+            "3": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 4
+            },
+            "4": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -3.7
+            },
+            "5": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -8.4
+            }
+          }
+        },
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 43 × 43",
+          "ans": "1849",
+          "measured": {
+            "1": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 62.2
+            },
+            "2": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 15.9
+            },
+            "3": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": 0.5
+            },
+            "4": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -7.2
+            },
+            "5": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -11.9
+            }
+          }
+        },
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 14 × 67",
+          "ans": "938",
+          "measured": {
+            "1": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 65.7
+            },
+            "2": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 19.4
+            },
+            "3": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 4
+            },
+            "4": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -3.7
+            },
+            "5": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -8.4
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 90,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 133,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          4
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 65
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          4
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 105
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    },
+    "more-practice": {
+      "fits": {
+        "cols": 2,
+        "rows": 2,
+        "perPage": 4,
+        "pages": 1,
+        "note": "Fits: 2 columns x 2 rows, 4 per page, 1 page. Digits 16 pt. Tall problems: 2 rows per page.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 2,
+            "perPage": 4,
+            "pages": 1,
+            "cellW": 93,
+            "cellH": 111.25,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Tall problems: 2 rows per page.",
+            "line": "Fits: 2 columns x 2 rows, 4 per page, 1 page. Digits 16 pt. Tall problems: 2 rows per page.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 76.5,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 112532,
+      "title": "I Can multiply two numbers with an area model",
+      "notes": [
+        "Tall problems: 2 rows per page."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 79 × 23",
+          "ans": "1817",
+          "letter": "A",
+          "measured": {
+            "1": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 62.2
+            },
+            "2": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 15.9
+            },
+            "3": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": 0.5
+            },
+            "4": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -7.2
+            },
+            "5": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -11.9
+            }
+          }
+        },
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 36 × 379",
+          "ans": "13644",
+          "letter": "A",
+          "measured": {
+            "1": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 50.2
+            },
+            "2": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -11.5
+            },
+            "4": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -19.2
+            },
+            "5": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -23.9
+            }
+          }
+        },
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 21 × 75",
+          "ans": "1575",
+          "letter": "A",
+          "measured": {
+            "1": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 62.2
+            },
+            "2": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 15.9
+            },
+            "3": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": 0.5
+            },
+            "4": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -7.2
+            },
+            "5": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -11.9
+            }
+          }
+        },
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 67 × 34",
+          "ans": "2278",
+          "letter": "A",
+          "measured": {
+            "1": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 62.2
+            },
+            "2": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 15.9
+            },
+            "3": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": 0.5
+            },
+            "4": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -7.2
+            },
+            "5": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -11.9
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "more-practice-p1.png",
+          "words": 90,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "more-practice-key-p1.png",
+          "words": 133,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          4
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 65
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          4
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 105
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    },
+    "test": {
+      "fits": {
+        "cols": 1,
+        "rows": 2,
+        "perPage": 2,
+        "pages": 1,
+        "note": "Fits: 1 column x 2 rows, 2 per page, 1 page. Digits 16 pt. Tall problems: 2 rows per page. Very tall problems: fewer than 3 rows fit.",
+        "sections": [
+          {
+            "role": "test",
+            "cls": "standard",
+            "requested": "auto",
+            "cols": 1,
+            "rows": 2,
+            "perPage": 2,
+            "pages": 1,
+            "count": 2,
+            "cellW": 186,
+            "innerW": 184.942,
+            "cellH": 111.25,
+            "hMin": 76.5,
+            "gridH": 228,
+            "gridHCont": 242,
+            "fill": false,
+            "packed": false,
+            "filled": false,
+            "ceiling": 20,
+            "clamped": false,
+            "reason": "",
+            "note": "Tall problems: 2 rows per page. Very tall problems: fewer than 3 rows fit.",
+            "notes": [
+              "Tall problems: 2 rows per page.",
+              "Very tall problems: fewer than 3 rows fit."
+            ],
+            "digitPt": 16,
+            "trackMm": null,
+            "size": "S",
+            "look": "ican",
+            "availableWidthMm": 186,
+            "line": "Fits: 1 column x 2 rows, 2 per page, 1 page. Digits 16 pt. Tall problems: 2 rows per page. Very tall problems: fewer than 3 rows fit."
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 442335,
+      "title": "Test A: multiplying two numbers with an area model",
+      "notes": [
+        "Tall problems: 2 rows per page. Very tall problems: fewer than 3 rows fit."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 61 × 73",
+          "ans": "4453",
+          "measured": {
+            "1": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 62.2
+            },
+            "2": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 15.9
+            },
+            "3": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": 0.5
+            },
+            "4": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -7.2
+            }
+          }
+        },
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 91 × 281",
+          "ans": "25571",
+          "measured": {
+            "1": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 45
+            },
+            "2": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -1.3
+            },
+            "3": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -16.7
+            },
+            "4": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -24.5
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "test-p1.png",
+          "words": 66,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "test-key-p1.png",
+          "words": 91,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          2
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 41
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          2
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 63
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    },
+    "review": {
+      "fits": {
+        "cols": 2,
+        "rows": 3,
+        "pages": 1,
+        "note": "Fits: 2 columns x 2 rows + 2 x 1 mixed, 6 per page.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 3,
+            "cellH": 81.87409551374819,
+            "line": "Fits: 2 columns x 2 rows + 2 x 1 mixed, 6 per page."
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 173939,
+      "title": "Review: multiplying two numbers with an area model",
+      "notes": [],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 76 × 74",
+          "ans": "5624",
+          "measured": {
+            "1": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 62.2
+            },
+            "2": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 15.9
+            },
+            "3": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": 0.5
+            },
+            "4": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -7.2
+            }
+          }
+        },
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 52 × 273",
+          "ans": "14196",
+          "measured": {
+            "1": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 45
+            },
+            "2": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -1.3
+            },
+            "3": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -16.7
+            },
+            "4": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -24.5
+            }
+          }
+        },
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 82 × 213",
+          "ans": "17466",
+          "measured": {
+            "1": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 45
+            },
+            "2": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -1.3
+            },
+            "3": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -16.7
+            },
+            "4": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -24.5
+            }
+          }
+        },
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 22 × 23",
+          "ans": "506",
+          "measured": {
+            "1": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 65.7
+            },
+            "2": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 19.4
+            },
+            "3": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 4
+            },
+            "4": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -3.7
+            }
+          }
+        },
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 18 × 81",
+          "ans": "1458",
+          "measured": {
+            "1": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 65.7
+            },
+            "2": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 19.4
+            },
+            "3": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 4
+            },
+            "4": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -3.7
+            }
+          }
+        },
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 28 × 81",
+          "ans": "2268",
+          "measured": {
+            "1": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 62.2
+            },
+            "2": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 15.9
+            },
+            "3": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": 0.5
+            },
+            "4": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -7.2
+            }
+          }
+        },
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 61 × 136",
+          "ans": "8296",
+          "measured": {
+            "1": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 50.2
+            },
+            "2": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -11.5
+            },
+            "4": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -19.2
+            }
+          }
+        },
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 66 × 182",
+          "ans": "12012",
+          "measured": {
+            "1": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 50.2
+            },
+            "2": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 3.9
+            },
+            "3": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -11.5
+            },
+            "4": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -19.2
+            }
+          }
+        },
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 45 × 21",
+          "ans": "945",
+          "measured": {
+            "1": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 65.7
+            },
+            "2": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 19.4
+            },
+            "3": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 4
+            },
+            "4": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -3.7
+            }
+          }
+        },
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 53 × 68",
+          "ans": "3604",
+          "measured": {
+            "1": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 62.2
+            },
+            "2": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 15.9
+            },
+            "3": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": 0.5
+            },
+            "4": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -7.2
+            }
+          }
+        },
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 81 × 51",
+          "ans": "4131",
+          "measured": {
+            "1": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 62.2
+            },
+            "2": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 15.9
+            },
+            "3": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": 0.5
+            },
+            "4": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -7.2
+            }
+          }
+        },
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 51 × 88",
+          "ans": "4488",
+          "measured": {
+            "1": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 62.2
+            },
+            "2": {
+              "hMm": 76.5,
+              "fits": true,
+              "slackMm": 15.9
+            },
+            "3": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": 0.5
+            },
+            "4": {
+              "hMm": 76.5,
+              "fits": false,
+              "slackMm": -7.2
+            }
+          }
+        },
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 2 × 343",
+          "ans": "686",
+          "measured": {
+            "1": {
+              "hMm": 51.3,
+              "fits": true,
+              "slackMm": 57.2
+            },
+            "2": {
+              "hMm": 51.3,
+              "fits": true,
+              "slackMm": 10.9
+            },
+            "3": {
+              "hMm": 51.3,
+              "fits": false,
+              "slackMm": -4.5
+            },
+            "4": {
+              "hMm": 51.3,
+              "fits": false,
+              "slackMm": -12.2
+            }
+          }
+        },
+        {
+          "template": "area-model",
+          "fclass": "standard",
+          "text": "Use the area model to find 2 × 68",
+          "ans": "136",
+          "measured": {
+            "1": {
+              "hMm": 51.3,
+              "fits": true,
+              "slackMm": 67.5
+            },
+            "2": {
+              "hMm": 51.3,
+              "fits": true,
+              "slackMm": 21.2
+            },
+            "3": {
+              "hMm": 51.3,
+              "fits": true,
+              "slackMm": 5.7
+            },
+            "4": {
+              "hMm": 51.3,
+              "fits": false,
+              "slackMm": -2
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "review-p1.png",
+          "words": 109,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "review-key-p1.png",
+          "words": 160,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 84
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 132
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "screen": {
+    "card-1280": {
+      "answerType": "area-model",
+      "printFormat": "area-model-mult-hard",
+      "text": "Use the area model to find 94 × 181",
+      "ans": "17014",
+      "measure": {
+        "hScroll": 0,
+        "colours": [
+          [
+            "box-shadow",
+            6
+          ],
+          [
+            "color:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "color:rgb(79, 75, 107)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 224, 242)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(255, 138, 61)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 114, 43)",
+            2
+          ],
+          [
+            "color:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "color:rgb(124, 92, 230)",
+            1
+          ],
+          [
+            "backgroundColor:rgb(244, 239, 255)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(181, 165, 244)",
+            1
+          ]
+        ],
+        "fonts": [
+          [
+            "Andika",
+            11
+          ],
+          [
+            "Nunito",
+            7
+          ]
+        ],
+        "smallTargets": [],
+        "smallTargetCount": 0
+      }
+    },
+    "card-820": {
+      "answerType": "area-model",
+      "printFormat": "area-model-mult-hard",
+      "text": "Use the area model to find 26 × 15",
+      "ans": "390",
+      "measure": {
+        "hScroll": 0,
+        "colours": [
+          [
+            "box-shadow",
+            6
+          ],
+          [
+            "color:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "color:rgb(79, 75, 107)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 224, 242)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(255, 138, 61)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 114, 43)",
+            2
+          ],
+          [
+            "color:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "color:rgb(124, 92, 230)",
+            1
+          ],
+          [
+            "backgroundColor:rgb(244, 239, 255)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(181, 165, 244)",
+            1
+          ]
+        ],
+        "fonts": [
+          [
+            "Andika",
+            10
+          ],
+          [
+            "Nunito",
+            7
+          ]
+        ],
+        "smallTargets": [],
+        "smallTargetCount": 0
+      }
+    },
+    "card-390": {
+      "answerType": "area-model",
+      "printFormat": "area-model-mult-hard",
+      "text": "Use the area model to find 26 × 15",
+      "ans": "390",
+      "measure": {
+        "hScroll": 0,
+        "colours": [
+          [
+            "box-shadow",
+            6
+          ],
+          [
+            "color:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(43, 40, 64)",
+            2
+          ],
+          [
+            "color:rgb(79, 75, 107)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 224, 242)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(255, 138, 61)",
+            2
+          ],
+          [
+            "borderTopColor:rgb(229, 114, 43)",
+            2
+          ],
+          [
+            "color:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(139, 135, 159)",
+            1
+          ],
+          [
+            "color:rgb(124, 92, 230)",
+            1
+          ],
+          [
+            "backgroundColor:rgb(244, 239, 255)",
+            1
+          ],
+          [
+            "borderTopColor:rgb(181, 165, 244)",
+            1
+          ]
+        ],
+        "fonts": [
+          [
+            "Andika",
+            10
+          ],
+          [
+            "Nunito",
+            7
+          ]
+        ],
+        "smallTargets": [],
+        "smallTargetCount": 0
+      }
+    },
+    "worksheet-1280": {
+      "cards": 6,
+      "measure": {
+        "hScroll": 0,
+        "colours": [
+          [
+            "borderTopColor:rgb(221, 214, 238)",
+            12
+          ],
+          [
+            "color:rgb(79, 75, 107)",
+            12
+          ],
+          [
+            "backgroundColor:rgb(244, 240, 251)",
+            12
+          ],
+          [
+            "box-shadow",
+            7
+          ],
+          [
+            "borderTopColor:rgb(79, 75, 107)",
+            6
+          ],
+          [
+            "color:rgb(229, 114, 43)",
+            6
+          ],
+          [
+            "borderTopColor:rgb(255, 138, 61)",
+            6
+          ],
+          [
+            "backgroundColor:rgb(255, 251, 224)",
+            1
+          ],
+          [
+            "backgroundColor:rgb(255, 225, 78)",
+            1
+          ]
+        ],
+        "fonts": [
+          [
+            "Andika",
+            56
+          ],
+          [
+            "Nunito",
+            18
+          ]
+        ],
+        "smallTargets": [],
+        "smallTargetCount": 0
+      }
+    },
+    "quiz-1280": {
+      "questions": 3,
+      "measure": {
+        "hScroll": 0,
+        "colours": [
+          [
+            "color:rgb(43, 40, 64)",
+            11
+          ],
+          [
+            "borderTopColor:rgb(43, 40, 64)",
+            11
+          ],
+          [
+            "color:rgb(139, 135, 159)",
+            5
+          ],
+          [
+            "borderTopColor:rgb(244, 240, 251)",
+            3
+          ],
+          [
+            "borderTopColor:rgb(139, 135, 159)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(244, 240, 251)",
+            2
+          ],
+          [
+            "box-shadow",
+            2
+          ],
+          [
+            "borderTopColor:rgb(124, 92, 230)",
+            2
+          ],
+          [
+            "backgroundColor:rgb(220, 238, 238)",
+            2
+          ],
+          [
+            "color:rgb(124, 92, 230)",
+            1
+          ],
+          [
+            "backgroundColor:rgb(255, 226, 80)",
+            1
+          ],
+          [
+            "backgroundColor:rgb(124, 92, 230)",
+            1
+          ]
+        ],
+        "fonts": [
+          [
+            "Nunito",
+            11
+          ],
+          [
+            "Andika",
+            9
+          ]
+        ],
+        "smallTargets": [],
+        "smallTargetCount": 0
+      }
+    }
+  },
+  "consoleErrors": []
+}
