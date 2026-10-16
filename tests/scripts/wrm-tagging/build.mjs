@@ -26,6 +26,13 @@ const {SKILL_ALIASES}=await import(root+'js/modules/skill-aliases.js');
 const BL=await import(root+'js/modules/build-list.js');
 const OV=(await import(HERE+'overrides.mjs?'+Date.now()));
 const W=JSON.parse(fs.readFileSync(root+'data/curriculum/wrm-steps.json'));
+// r11 (critic r10 N9): the PASSED lanes' links files are read-only inputs (vendored copies under
+// design/audit/runs/wrm-tagging/inputs/, from the R/Y1 and Y4 lane branches). An R.* / Y1.* step's skills and their opts
+// come from its lane's file, so a K rung of a Grade 1 skill keeps its opts ({usd, like, band 50}) instead of arriving as {}.
+const INP=root+'design/audit/runs/wrm-tagging/inputs/';
+const LANE={};for(const y of ['R','Y1'])LANE[y]=JSON.parse(fs.readFileSync(INP+y+'.json','utf8'));
+const laneStep=id=>{const y=id.split('.')[0];return LANE[y]?.steps?.[id]||null;};
+const SO=await import(root+'js/modules/skill-options.js');
 
 const label={};for(const[c,l]of Object.entries(SKILLS))for(const s of l||[])if(s&&s.v)label[c+':'+s.v]=s.l;
 const live=k=>!!label[k];
@@ -76,12 +83,14 @@ const noteOpts=n=>{const m=/^band (\d+)$/.exec(n||'');return m?{band:+m[1]}:{};}
 // a step's skills: its direct ones, else (rule 12) its partial ones
 const directOf=id=>{const o={...(OV.steps[id]||{}),...(OV.r3?.[id]||{})};let d,p;if(o?.direct||o?.partials){d=(o.direct||[]).map(x=>x.key);p=(o.partials||[]).map(x=>x.key);}else{d=(tags[id]||[]).filter(t=>!t.partial).map(t=>t.key);p=(tags[id]||[]).filter(t=>t.partial).map(t=>t.key);}return d.length?d:p;};
 // r3: every skill of a step (direct and partial), and the latest EARLIER step of the same year that has a key
-const allOf=id=>{const o={...(OV.steps[id]||{}),...(OV.r3?.[id]||{})};let d,p;if(o?.direct||o?.partials){d=(o.direct||[]).map(x=>x.key);p=(o.partials||[]).map(x=>x.key);}else{d=(tags[id]||[]).filter(t=>!t.partial).map(t=>t.key);p=(tags[id]||[]).filter(t=>t.partial).map(t=>t.key);}return [...new Set([...d,...p].map(k=>resolve(k)).filter(Boolean))];};
+const allOf=id=>{const ls=laneStep(id);if(ls)return [...new Set([...ls.direct,...ls.partial].map(e=>resolve(e.key)).filter(Boolean))];const o={...(OV.steps[id]||{}),...(OV.r3?.[id]||{})};if(o.mergeOnly)return allOf0(id,o).filter(k=>!o.mergeOnly.includes(k));return allOf0(id,o);};
+// r11: o.mergeOnly = a partial tag carried for the cross-lane merge only (another lane's clause): never a link source
+const allOf0=(id,o)=>{let d,p;if(o?.direct||o?.partials){d=(o.direct||[]).map(x=>x.key);p=(o.partials||[]).map(x=>x.key);}else{d=(tags[id]||[]).filter(t=>!t.partial).map(t=>t.key);p=(tags[id]||[]).filter(t=>t.partial).map(t=>t.key);}return [...new Set([...d,...p].map(k=>resolve(k)).filter(Boolean))];};
 function earlierStep(k,sid,sameYear){const y=sid.split('.')[0];const at=order.indexOf(sid);for(let j=at-1;j>=0;j--){const id=order[j];if(sameYear&&!id.startsWith(y+'.'))continue;if(typeof taughtBefore==='function'&&!taughtBefore(id,sid))continue;if(allOf(id).includes(k))return id;}return null;}
 const SAMESTD_SKIP=/:mixed_|_plain$/;
 // r3 rule 18: a pre/related LINK carries opts. Hand opts on the entry win; else the opts the referenced step (the first
 // step id in its why) uses for that key; else the year's default for the key (OV.linkOpts[YEAR]); else {}.
-function stepOptsFor(id,k){const o={...(OV.steps[id]||{}),...(OV.r3?.[id]||{})};for(const d of [...(o.direct||[]),...(o.partials||[])])if(resolve(d.key)===k&&d.opts&&Object.keys(d.opts).length)return d.opts;
+function stepOptsFor(id,k){const ls=laneStep(id);if(ls){for(const d of [...ls.direct,...ls.partial])if(resolve(d.key)===k&&d.opts&&Object.keys(d.opts).length)return d.opts;return null;}const o={...(OV.steps[id]||{}),...(OV.r3?.[id]||{})};for(const d of [...(o.direct||[]),...(o.partials||[])])if(resolve(d.key)===k&&d.opts&&Object.keys(d.opts).length)return d.opts;
   for(const t of tags[id]||[])if(resolve(t.key)===k){const n=noteOpts(t.note);if(Object.keys(n).length)return n;}return null;}
 function linkOpts(e){if(e.opts)return e.opts;const ids=[...String(e.why).matchAll(/(R|Y\d)\.B\d+\.S\d+/g)].map(m=>m[0]);
   for(const id of ids){const o=stepOptsFor(id,e.key);if(o)return o;}return OV.linkOpts?.[YEAR]?.[e.key]||{};}  // null (drop) is handled after
@@ -114,6 +123,7 @@ function optsText(k,o={}){const t=[];if(o.constant)t.push((/div/.test(k)?'dividi
   if(o.rows)t.push('counting in '+o.rows.map(r=>r.step+'s').join(', ')+' from 0');if(o.parts)t.push(o.parts.map(i=>PARTS[i]).join(' and ')+' of a shape');
   if(o.notation&&o.notation.includes('across'))t.push('written across');
   if(k==='measurement:length_metric'&&o.forms)t.push(o.forms.map(f=>['cm ↔ mm','m ↔ cm','m ↔ mm','km ↔ m'][f]).join(', '));
+  if(k==='measurement:mass_volume_liquid'&&o.forms)t.push(o.forms.map(f=>['a cylinder in mL','a scale in g or kg','sorting by unit'][f]).join(', '));
   if(k==='measurement:estimate_length'&&o.forms)t.push('about how long is it? a sensible length in metric units');return t.join('; ');}
 // r8 (A3): the earlier step (this year or an earlier grade) that owns key k with opts closest to o: exact opts first, then
 // opts whose rows / tables / parts contain the link's, then any use of the key; ties go to the latest step
@@ -174,6 +184,30 @@ function whyContentBad(e){const head=String(e.why).split('—')[0].split(/\(Y\d|
   // skill they are the analogy that explains the link ("1 kg = 1,000 g is the same exchange as 1 thousand = 10 hundreds")
   const unitSkill=/^(measurement|fractions|fraction_operations|graphs|shapes_early|composing:(fraction|compose_whole))/.test(e.key);
   for(const [re,u] of UNITS){if(!unitSkill)continue;if(isTime&&/third|quarter/.test(re.source)&&!/past|to/.test(re.source))continue;if(re.test(head)&&!new RegExp(u.source,'i').test(txt))bad.push(re.source.slice(0,12));}return bad;}
+// r11 helpers for the rung chooser (critic r10 N8)
+const TABLEKEYS=new Set(['multiplication:count_by_tables','multiplication:mult_facts','division:div_facts']);
+const tabsOf=op=>Array.isArray(op?.rows)?op.rows.map(r=>r.step):Array.isArray(op?.constant)?op.constant:null;
+const CBT_HOME='Y2.B1.S15';const CBT_ROWS={rows:[2,5,10].map(n=>({step:n,start:'zero',dir:'up'}))};
+const OPTDEF=k=>{const[c,sk]=k.split(':');try{return SO.optionsFor(c,sk)||[];}catch(_){return [];}};
+const effOpts=(k,op)=>{const o={};for(const x of OPTDEF(k))if(x.default!==undefined)o[x.id]=x.default;return {...o,...(op||{})};};
+const IGN=new Set(['level','support','currency']);
+const effEq=(k,a,b)=>{const x=effOpts(k,a),y=effOpts(k,b);for(const f of ['level','support'])(delete x[f],delete y[f]);const n=o=>JSON.stringify(Object.entries(o).sort());return n(x)===n(y);};
+// the rung deals the same content as the step in a smaller band, or a subset of its forms / tables / values
+function rungSame(k,ro,dop){const a=effOpts(k,ro),b=effOpts(k,dop);for(const f of new Set([...Object.keys(a),...Object.keys(b)])){if(IGN.has(f))continue;const x=a[f],y=b[f];if(JSON.stringify(x)===JSON.stringify(y))continue;
+  if(['band','range','span'].includes(f)&&typeof x==='number'&&(y==null||(typeof y==='number'&&x<y)))continue; // a direct with no band takes the Max Number setting
+  const X=f==='rows'?tabsOf(a):x,Y=f==='rows'?tabsOf(b):y;if(Array.isArray(X)&&Array.isArray(Y)&&X.every(v=>Y.includes(v)))continue;return false;}return true;}
+// what the rung deals, in the option labels of skill-options.js, for the options where it differs from the step
+function rungDeals(k,ro,dop){const a=effOpts(k,ro),b=effOpts(k,dop);const out=[];const tb=tabsOf(a);
+  if(TABLEKEYS.has(k)&&tb)return (k==='multiplication:count_by_tables'?'counting in '+tb.map(n=>n+'s').join(', ')+' from 0':k==='division:div_facts'?'dividing by '+tb.join(', '):'the '+tb.join(', ')+' times-table'+(tb.length>1?'s':''));
+  for(const x of OPTDEF(k)){if(IGN.has(x.id))continue;const v=a[x.id],w=b[x.id];if(JSON.stringify(v)===JSON.stringify(w))continue;const lab=z=>(x.values||[]).find(q=>q.v===z)?.l??String(z);
+    let t=Array.isArray(v)?v.map(lab).join(' and '):lab(v);if(t==null||t==='undefined')continue;t=t.replace(/\s*\([^)]*\)$/,m=>/mL|g or kg/.test(m)?m:'');
+    if(a.currency==='usd')t=t.replace(/riyals or dollars/g,'dollars').replace(/riyal or dollar/g,'dollar');
+    const lb=String(x.label||x.id).toLowerCase(),tl=t.charAt(0).toLowerCase()+t.slice(1);out.push(tl.startsWith(lb)?tl:lb+': '+tl);}
+  return out.join('; ');}
+const RUNGREL={'measurement:mass_volume_liquid':'the same scale reading in another measure','measurement:length_metric':'the same exchange in another pair of units',
+  'multiplication:arrays_groups':'the same multiplication in the other picture','placevalue:more_less_100':'the same jump on a number in another size',
+  'measurement:money_count':'counting money of another kind first','measurement:money_change':'finding change with other amounts first',
+  'measurement:money_notation':'reading money of another kind first','measurement:money':'adding money in other amounts first'};
 const keyFirstWk={};for(const st of yr.blocks.flatMap(bb=>bb.steps))for(const k of allOf(st.id))keyFirstWk[k]=Math.min(keyFirstWk[k]??999,SWK[st.id]??999);
 const usedProps=new Set();const missingReview=[];
 for(const b of yr.blocks){ if(b.number>MAXB)continue;
@@ -190,9 +224,15 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
   for(const t of T){const k=resolve(t.key);const inD=direct.find(d=>d.key===k),inP=partial.find(p=>p.key===k);
     if(!k||(!inD&&!inP))out.tagFixes.push({key:t.key,step:s.id,action:'remove',why:why[t.key]||o.removeWhy||'items generated with every option do not teach this step'});
     // r10 (critic r9 N7): a partial whose clause changed is re-emitted too, so the merged SKILL_WRM clause equals this file's
-    else if(inP&&(!t.partial||t.partial!==inP.missing))out.tagFixes.push({key:k,step:s.id,action:'partial',why:inP.missing});}
-  for(const d of direct)if(!T.find(t=>resolve(t.key)===d.key&&!t.partial))out.tagFixes.push({key:d.key,step:s.id,action:'add',why:why[d.key]||('teaches the step with opts '+JSON.stringify(d.opts))});
-  for(const p of partial)if(!T.find(t=>resolve(t.key)===p.key))out.tagFixes.push({key:p.key,step:s.id,action:'add',why:'partial: '+p.missing});
+    else if(inP&&!inD&&(!t.partial||t.partial!==inP.missing))out.tagFixes.push({key:k,step:s.id,action:'partial',...(inP.opts&&Object.keys(inP.opts).length?{opts:inP.opts}:{}),why:inP.missing,partial:inP.missing});}
+  // r11 (critic r10 A3c): one tagFix shape that the R/Y1, Y4 and Y2/Y3 merge readers all read the same way:
+  //  a new or changed PARTIAL tag is action 'partial' with a `partial` field (the clause); a new FULL tag is 'add' with no
+  //  `partial`; a PARTIAL tag that becomes FULL is 'remove' then 'add' (R/Y1 reads 'add' on a partial tag as needing
+  //  "drop the partial flag", Y4 reads it as an add on an existing tag: remove + add is the same merge for both)
+  for(const d of direct)if(!T.find(t=>resolve(t.key)===d.key&&!t.partial)){
+    for(const t of T.filter(t=>resolve(t.key)===d.key&&t.partial))out.tagFixes.push({key:t.key,step:s.id,action:'remove',why:'drop the partial tag: the skill teaches the step in full with these opts, re-added full by the next fix'});
+    out.tagFixes.push({key:d.key,step:s.id,action:'add',...(d.opts&&Object.keys(d.opts).length?{opts:d.opts}:{}),why:why[d.key]||('teaches the step with opts '+JSON.stringify(d.opts))});}
+  for(const p of partial)if(!direct.find(d=>d.key===p.key)&&!T.find(t=>resolve(t.key)===p.key))out.tagFixes.push({key:p.key,step:s.id,action:'partial',...(p.opts&&Object.keys(p.opts).length?{opts:p.opts}:{}),why:p.missing,partial:p.missing});
   let build=o.build?[...o.build]:[...(propsOf[s.id]||[])];
   const verdict=o.verdict||(direct.length&&!build.length?'full':(direct.length||partial.length)?'partial':'gap');
   if(verdict==='full')build=[];
@@ -223,6 +263,7 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
   const RS=o=>Array.isArray(o?.rows)?o.rows.map(r=>r.step):null; // count rows compare by their steps
   // o.selfPre: a PARTIAL skill whose dealt content is exactly an earlier step's (the number line to 100 on an estimating step)
   const isDirectPre=(k,op)=>{if(!allDirect.has(k))return false;if((o.selfPre||[]).includes(k)&&!direct.some(d=>d.key===k))return false;const js=JSON.stringify(op||{});if(js==='{}'||dOpts[k].includes(js))return true;if(!op)return false;
+    if([...direct,...partial].some(d=>d.key===k&&effEq(k,d.opts,op)))return true; // r11: the same items as the step's own skill (key + EFFECTIVE opts) add no rung
     return [...direct,...partial].filter(d=>d.key===k).some(d=>ARR.some(a=>Array.isArray(d.opts?.[a])&&Array.isArray(op[a])&&d.opts[a].every(v=>op[a].includes(v)))||(RS(d.opts)&&RS(op)&&RS(d.opts).every(v=>RS(op).includes(v))));};
   const pre=[],preBuild=[];
   const cands=[];let ord=0;
@@ -231,18 +272,40 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
   const okKey=(k,op)=>k&&!(OV.exclude||[]).includes(k)&&!isDirectPre(k,op)&&!dropPre.has(k)&&(oddOk||!ODDEVEN.includes(k));
   const cand=(k,why,tier,opts)=>{k=resolve(k);if(okKey(k,opts))cands.push({key:k,why,tier,ord:ord++,...(opts?{opts}:{})});};
   const addPB=pid=>{if(build.includes(pid)||preBuild.includes(pid)||preBuild.length>=3)return;preBuild.push(pid);usedProps.add(pid);};
-  for(const p of [...(o.pre||[]),...(OV.extraPre?.[s.id]||[])])cand(p.key,p.why,0,p.opts);
+  const candK=(p,tier)=>{if(p.keep){const k=resolve(p.key);if(k&&!dropPre.has(k))cands.push({key:k,why:p.why,tier,ord:ord++,...(p.opts?{opts:p.opts}:{}),keep:true});}else cand(p.key,p.why,tier,p.opts);};
+  for(const p of [...(o.pre||[]),...(OV.extraPre?.[s.id]||[])])candK(p,0);
   // r10 (critic r9 N6): automatic candidates carry the cited step's own opts, so a lower rung of a direct key (same key,
   // other opts) survives isDirectPre instead of being dropped as the step's own skill
-  for(const p of o.core||[])cand(p.key,p.why,1,p.opts);
+  for(const p of o.core||[])candK(p,1);
   // r10 (critic r9 N6, rule 14): the lower rung of each of the step's own skills. The latest step taught before this one (this
   // year by school week, else the year before) that deals the same key with OTHER opts is a building block; isDirectPre still
   // drops a rung whose opts are the step's own or a superset of them.
+  // r11 (critic r10 N8): the rung is the nearest BUILDING BLOCK, not the latest use of the key.
+  //  - a table key (count_by_tables / mult_facts / div_facts): a rung whose every table divides one of the step's tables
+  //    (10 for 100, 4 for 8; the largest such table, then the latest), this year first, then the 2s/5s/10s count from 0
+  //    (Y2.B1.S15) for a count, then the year before; never a sibling table (5 for 100, {3, 5} for 10, 50 for 10);
+  //    failing all of these, the 2s/5s/10s count from 0.
+  //  - any other key: the latest earlier use with other opts, as before.
+  //  The why says "as it was met then" only when the rung deals the same content in a smaller band or a subset of the
+  //  step's forms / tables / values (rungSame); otherwise it says what the rung deals (rungDeals) and how it relates.
   if(!o.noRung)for(const d of [...direct,...partial]){const pool=order.filter(id=>id!==s.id&&(id.startsWith(YEAR+'.')?taughtBefore(id,s.id):id.startsWith(prevYear+'.'))&&allOf(id).includes(d.key));
-    const so=x=>stepOptsFor(x,d.key)||{};const rungs=pool.filter(x=>JSON.stringify(so(x))!==JSON.stringify(d.opts||{})&&Object.keys(so(x)).length&&!isDirectPre(d.key,so(x)));
-    rungs.sort((x,y)=>{const sx=x.startsWith(YEAR+'.')?1:0,sy=y.startsWith(YEAR+'.')?1:0;return sx-sy||(sx?((SWK[x]??0)-(SWK[y]??0)):0)||(order.indexOf(x)-order.indexOf(y));});
-    const r=rungs.pop();if(!r)continue;const same=r.startsWith(YEAR+'.');
-    cand(d.key,`${r.split('.').slice(0,3).join('.')} ${stepById[r].title} (${same?'taught earlier, W'+SWK[r]:'Grade '+({Y1:'K',Y2:'1',Y3:'2'}[prevYear]??prevYear)}): this step's skill as it was met then`,1,so(r));}
+    const so=x=>stepOptsFor(x,d.key)||{};let rungs=pool.filter(x=>JSON.stringify(so(x))!==JSON.stringify(d.opts||{})&&Object.keys(so(x)).length&&!isDirectPre(d.key,so(x)));
+    const latest=(x,y)=>{const sx=x.startsWith(YEAR+'.')?1:0,sy=y.startsWith(YEAR+'.')?1:0;return sx-sy||(sx?((SWK[x]??0)-(SWK[y]??0)):0)||(order.indexOf(x)-order.indexOf(y));};
+    const tabsD=TABLEKEYS.has(d.key)?tabsOf(d.opts):null;let r=null,fallback=false;
+    if(tabsD&&tabsD.length){const divs=rungs.filter(x=>{const t=tabsOf(so(x));return t&&t.length&&t.every(v=>tabsD.some(w=>w%v===0&&v*20>w));});  // 10 for 100, 5 for 10, 4 for 8; never 5 for 100
+      const pick=l=>l.sort((x,y)=>Math.max(...tabsOf(so(x)))-Math.max(...tabsOf(so(y)))||latest(x,y)).pop()||null;
+      r=pick(divs.filter(x=>x.startsWith(YEAR+'.')))||pick(divs.filter(x=>!x.startsWith(YEAR+'.')));
+      if(!r&&CBT_HOME!==s.id&&taughtBefore(CBT_HOME,s.id))fallback=true;
+      if(fallback){const ns=tabsD;const tn=ns.map(n=>n+'s').join(' and ');
+        const w=`counting in 2s, 5s and 10s from 0: `+(d.key==='division:div_facts'?`the multiples this step divides${ns.every(n=>[2,5,10].includes(n))?' ('+tn+')':' are counted the same way, in '+tn}`:ns.every(n=>[2,5,10].includes(n))?`the count this step writes as a table (${tn})`:`the same count from 0 that this step makes in ${tn}`)+` — ${CBT_HOME} Count in 2s, 5s and 10s (${CBT_HOME.startsWith(YEAR+'.')?'W'+SWK[CBT_HOME]:'Grade '+({Y1:'K',Y2:'1',Y3:'2'}[prevYear]??prevYear)})`;
+        if(!dropPre.has('multiplication:count_by_tables')&&!cands.some(c=>c.key==='multiplication:count_by_tables'))cands.push({key:'multiplication:count_by_tables',why:w,tier:1,ord:ord++,opts:CBT_ROWS,keep:true});
+        continue;}}
+    else{rungs.sort(latest);r=rungs.pop()||null;}
+    if(!r)continue;const same=r.startsWith(YEAR+'.');const ro=so(r);const when=same?'taught earlier, W'+SWK[r]:'Grade '+({Y1:'K',Y2:'1',Y3:'2'}[prevYear]??prevYear);
+    let rel;if(rungSame(d.key,ro,d.opts))rel="this step's skill as it was met then"+(rungDeals(d.key,ro,d.opts)?' ('+rungDeals(d.key,ro,d.opts)+')':'');
+    else if(tabsD){const t=tabsOf(ro);const big=tabsD.filter(w=>t.every(v=>w%v===0));rel=`${rungDeals(d.key,ro,d.opts)}: every multiple of ${big.join(' and ')} is a multiple of ${t.join(' and ')}`;}
+    else rel=`${rungDeals(d.key,ro,d.opts)||'the same skill with other options'}: ${RUNGREL[d.key]||'a neighbouring rung of this step\'s skill, not the step itself'}`;
+    cand(d.key,`${rel} — ${r} ${stepById[r].title} (${when})`,1,ro);}
   // rule 14: a related key that is the skill of an EARLIER step of this year is a building block -> pre
   // r8 (A4): relOnly with its own related list (even []) replaces extraRelated and relR3
   const handRelAll=o.relOnly&&o.related?[...o.related]:[...(o.related||[]),...(OV.extraRelated?.[s.id]||[]),...(OV.relR3?.[s.id]||[])];
@@ -263,7 +326,7 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
    // r8 (A1, rule 19): every block step TAUGHT EARLIER (school week), nearest week first, whatever its WRM position
    {let n=0;for(const st of b.steps.filter(x=>x.id!==s.id&&x.id!==prev?.id&&topic(x)===topic(s)&&taughtBefore(x.id,s.id)).sort((a,c)=>((SWK[c.id]??0)-(SWK[a.id]??0))||(order.indexOf(c.id)-order.indexOf(a.id)))){if(n>=3)break;const ks=allOf(st.id);if(ks.length)n++;for(const k of ks.slice(0,1))cand(k,`${st.id} ${st.title} (taught earlier, W${SWK[st.id]})`,4,stepOptsFor(st.id,k)||undefined);}}
   }
-  const take=()=>{pre.length=0;const seen=new Set();for(const c of [...cands].sort((a,b)=>a.tier-b.tier||a.ord-b.ord)){if(seen.has(c.key)||pre.length>=14)continue;seen.add(c.key);pre.push({key:c.key,why:c.why,...(c.opts?{opts:c.opts}:{})});}};
+  const take=()=>{pre.length=0;const seen=new Set();for(const c of [...cands].sort((a,b)=>a.tier-b.tier||a.ord-b.ord)){const sk=c.keep?c.key+'|'+JSON.stringify(c.opts||{}):c.key;if(seen.has(sk)||(!c.keep&&seen.has(c.key))||pre.length>=14)continue;seen.add(sk);seen.add(c.key);pre.push({key:c.key,why:c.why,...(c.opts?{opts:c.opts}:{}),...(c.keep?{keep:true}:{})});}};
   take();
   if(pre.length<3&&prevYear&&!o.preOnly){const py=W.years.find(y=>y.id===prevYear);const cand6=py.blocks.flatMap(bb=>bb.steps).filter(st=>topic(st)===topic(s)).reverse();
     let n=0;for(const st of cand6){if(n>=2)break;const ks=allOf(st.id);if(!ks.length)continue;const k0=resolve(ks[0]);if(!okKey(k0,stepOptsFor(st.id,k0))||cands.find(c=>c.key===k0))continue;cand(k0,`${st.id} ${st.title} (${prevYear}, same topic)`,6,stepOptsFor(st.id,k0)||undefined);n++;}
@@ -301,7 +364,7 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
     list[j]={key:sw.to,why:sw.to===e.key?e.why:descWhy(sw.to,sw.opts||{},s.id,''),opts:sw.opts||{},swapped:true};}
   for(const list of [pre,related]){const seen=new Set();const preKO=new Set(pre.map(x=>x.key+'|'+JSON.stringify(x.opts||{})));const preK=new Set(pre.map(x=>x.key));for(let j=0;j<list.length;j++){const k=list[j].key;const ko=k+'|'+JSON.stringify(list[j].opts||{});
     // r9: a related link repeats a pre only when its opts are the same (or it has none): mult_facts {2} next to pre mult_facts {5,10} is a new table
-    const dupPre=list===related&&preK.has(k)&&!pre.filter(p=>p.key===k).every(p=>disjointOpts(p.opts,list[j].opts));if((list===pre?isDirectPre:isDirectRel)(k,list[j].opts)||seen.has(k)||dupPre){list.splice(j,1);j--;}else seen.add(k);}}
+    const dupPre=list===related&&preK.has(k)&&!pre.filter(p=>p.key===k).every(p=>disjointOpts(p.opts,list[j].opts));if(list[j].keep?seen.has(ko):((list===pre?isDirectPre:isDirectRel)(k,list[j].opts)||seen.has(k)||dupPre)){list.splice(j,1);j--;}else{seen.add(k);seen.add(ko);}}}
   if(pre.length<3)for(const l of (OV.ladders?.[topic(s)]||[])){const k=resolve(l.key);if(pre.length>=3)break;if(isDirectPre(k,l.opts)||pre.find(x=>x.key===k)||(SW[k]&&!SW[k].to&&(!SW[k].only||SW[k].only.test(s.id))))continue;const rr=related.findIndex(x=>x.key===k);if(rr>=0)related.splice(rr,1);pre.push({key:k,why:l.why+' (topic ladder)',opts:l.opts||OV.linkOpts?.[YEAR]?.[k]||{}});}
   // r5 (rules 18-19): every link must be content met by this step's SCHOOL week. A pre that cites a step of this year
   // taught later is dropped; a link whose generated items carry a content marker first met later (scan TOL 2 weeks) tries
@@ -319,7 +382,7 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
     const ne=fixLink(e);if(!ne){if(list===pre&&coreKeys.has(e.key)){console.error('COREDROP',s.id,e.key,markerHits(e.key,e.opts,s.id).map(h=>h.m).join(','));process.exitCode=1;}dropped.push(e.key+' ('+markerHits(e.key,e.opts,s.id).map(h=>h.m).join(',')+')');list.splice(j,1);}else list[j]=ne;}
   for(const list of [pre,related]){const seen=new Set();const preKO=new Set(pre.map(x=>x.key+'|'+JSON.stringify(x.opts||{})));const preK=new Set(pre.map(x=>x.key));for(let j=0;j<list.length;j++){const k=list[j].key;const ko=k+'|'+JSON.stringify(list[j].opts||{});
     // r9: a related link repeats a pre only when its opts are the same (or it has none): mult_facts {2} next to pre mult_facts {5,10} is a new table
-    const dupPre=list===related&&preK.has(k)&&!pre.filter(p=>p.key===k).every(p=>disjointOpts(p.opts,list[j].opts));if((list===pre?isDirectPre:isDirectRel)(k,list[j].opts)||seen.has(k)||dupPre){list.splice(j,1);j--;}else seen.add(k);}}
+    const dupPre=list===related&&preK.has(k)&&!pre.filter(p=>p.key===k).every(p=>disjointOpts(p.opts,list[j].opts));if(list[j].keep?seen.has(ko):((list===pre?isDirectPre:isDirectRel)(k,list[j].opts)||seen.has(k)||dupPre)){list.splice(j,1);j--;}else{seen.add(k);seen.add(ko);}}}
   if(pre.length<3)for(const l of (OV.ladders?.[topic(s)]||[])){const k=resolve(l.key);if(pre.length>=3)break;if(isDirectPre(k,l.opts)||pre.find(x=>x.key===k))continue;
     const e={key:k,why:l.why+' (topic ladder)',opts:l.opts||OV.linkOpts?.[YEAR]?.[k]||{}};if(citesLater(e))continue;const ne=fixLink(e);if(!ne)continue;const rr=related.findIndex(x=>x.key===ne.key);if(rr>=0)related.splice(rr,1);pre.push(ne);}
   // a kept pre whose why also names a same-year step taught LATER (the content is earlier-grade learning): drop that name
@@ -342,12 +405,13 @@ for(const b of yr.blocks){ if(b.number>MAXB)continue;
     e.why=String(e.why).replace(/\s*\[rule \d+[^\]]*\]/g,'');
     // r7: a cited step whose own opts for this key differ from the link's: cite the step that uses these opts instead
     if(e.opts&&Object.keys(e.opts).length&&!/\((next step|a later step|taught earlier|taught later|the same week)/.test(e.why))for(const c of [...String(e.why).matchAll(/Y\d\.B\d+\.S\d+/g)].map(m=>m[0])){const so=stepOptsFor(c,e.key);if(JSON.stringify(so||{})!==JSON.stringify(e.opts)){const t=taughtAt(e.key,s.id,e.opts);if(t&&t!==c&&JSON.stringify(stepOptsFor(t,e.key))===JSON.stringify(e.opts))e.why=e.why.replace(c,t).replace(stepById[c].title,stepById[t].title);}}
+    e.why=e.why.replace(/\b((?:R|Y\d)\.B\d+\.S\d+)\s*\/\s*\1\b/g,'$1');
     if(whyMismatch(e))e.why=descWhy(e.key,e.opts,s.id,e.why);
     // r10 (critic r9 N5b): share_into_groups deals GROUPING only ("Make groups of M. How many groups?"): never cite a sharing step
     if(e.key==='division:share_into_groups'&&/shar/i.test(e.why))e.why=(YEAR==='Y2'?'Y1.B9.S8':'Y2.B5.S7')+' making equal groups (grouping): ring the counters in groups of a size';
     if(COUNTKEY.test(e.key)&&COUNTCITE.test(e.why)&&!/from any number|counting on/i.test(e.why)){const ns=countNs(e.why);const fr=countMultFrac(e,ns);if(fr<0.9){console.error('COUNTCHECK',s.id,e.key,JSON.stringify(e.opts),'counts',ns.join('/'),'multiples',fr.toFixed(2),'|',e.why.slice(0,80));process.exitCode=1;}}
     if(whyContentBad(e).length)console.error('WHYBAD',s.id,e.key,JSON.stringify(e.opts),whyContentBad(e).join(','),'|',e.why.slice(0,80));}
-  pre.splice(8);related.splice(6);
+  pre.splice(8);related.splice(6);for(const e of [...pre,...related])delete e.keep;
   // r6: never-in-grade content on the step's own skills must be named (critic r5: B4.S8 class)
   for(const d of [...direct,...partial])for(const h of markerHits(d.key,d.opts,s.id).filter(h=>MK.NEVERDIRECT[YEAR].includes(h.m)))
     if(!(o.neverNamed||[]).includes(d.key))console.error('NEVERDIRECT',s.id,verdict,d.key,JSON.stringify(d.opts||{}),h.m,h.ex);

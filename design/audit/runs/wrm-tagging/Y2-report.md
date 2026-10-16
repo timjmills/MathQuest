@@ -1,4 +1,4 @@
-# Wave 2 tagging: Year 2 (US Grade 1) — round 10
+# Wave 2 tagging: Year 2 (US Grade 1) — round 11
 
 Output: `data/curriculum/links/Y2.json` (124 steps, 11 blocks, block order, none skipped). Items: `Y2-Y3-items.md`.
 
@@ -6,9 +6,64 @@ Output: `data/curriculum/links/Y2.json` (124 steps, 11 blocks, block order, none
 
 | Steps | full | partial | gap | proposals new | proposals reused | tag fixes | entries with real opts |
 |---|---|---|---|---|---|---|---|
-| 124 | 63 | 36 | 25 | 10 | 37 | 61 | 75 |
+| 124 | 63 | 36 | 25 | 10 | 36 | 65 | 76 |
 
 New proposals: `one_digit_addend`, `make_amount_notes`, `money_difference`, `single_fraction`, `time_past_to`, and in round 3 `sub_from_ten`, `order_pictures`, `compare_measures` (extended to lengths in one unit; shared with Y3).
+
+## Round 11 (after critic Y2–Y3 r10, 7.94 / 7.97): rung chooser, prior-lane opts, the five-year merge
+
+Generator (`tests/scripts/wrm-tagging/build.mjs`, `mergecheck23.mjs`, new `mergeall5.mjs`; inputs vendored read-only under
+`design/audit/runs/wrm-tagging/inputs/`: `R.json`, `Y1.json` from the R/Y1 lane, `Y4.json` from the Y4 lane):
+
+- **A1 (N8, rung chooser).** For `count_by_tables` / `mult_facts` / `div_facts` the lower rung is a step whose every table
+  divides one of the step's tables, with the rung at least 1/20 of it (10 for 100, 4 for 8, 2 for 4, 5 for 10; never 5 for
+  100, {3, 5} for 10 or 50 for 10). The largest such table wins, then the latest, this year first. Failing that, the
+  2s/5s/10s count from 0 (Y2.B1.S15). Other keys keep the latest earlier use with other opts.
+  - "this step's skill as it was met then" is written only when the rung deals the same content in a smaller band, or in
+    a subset of the step's forms / tables / values (`rungSame`, on effective opts).
+  - Otherwise the why says what the rung deals, in the option labels of `skill-options.js` ("read the scale (g or kg)",
+    "what to count: notes"), and how it relates ("every multiple of 8 is a multiple of 4", "the same scale reading in
+    another measure").
+  - A pre with the same items as the step's own skill (key + effective opts) is dropped: it adds no rung. The selfPre
+    number lines (Y2.B1.S11, Y3.B1.S3) stay, as r10 accepted.
+  - Re-scan of the 52 "as it was met then" links (the critic's `asmet.mjs`): 39 remain, and each is a smaller band or a
+    subset of the step's own forms. Every other rung states what it deals.
+- **A2 (N9, prior-lane opts).** `stepOptsFor()` and the skill list of an R.* / Y1.* step now come from the passed lane's
+  file. K rungs arrive with their opts, so they are no longer dropped as "the step itself". The critic's `n9.mjs` goes
+  from 34 rows to 4: quarters for a half step, and halves for a thirds step. Those are sibling denominators, left out
+  by design.
+- **A3 (merge).**
+  - (a) Y2.B1.S15 carries `patterns:count_by_step_up {step:[0]}` as a partial, with Y4's clause word for word. It is
+    `mergeOnly`, so it is never a link source for other steps.
+  - (b) `mergecheck23` loads the R, Y1 and Y4 tagFixes on Y2/Y3 steps and merges them both before and after this file's
+    own fixes.
+  - (c) Every partial-setting tagFix is `action:'partial'` with a `partial` field. A new full tag is `add`. A partial
+    tag that becomes full is `remove` + `add`, which R/Y1 and Y4 both read the same way.
+
+Checks:
+- Each year was built twice, and both runs are byte-identical.
+- `linkscan` OK.
+- `mergecheck23` reports 0 + 0 problems.
+- The R/Y1 lane's `mergecheck.mjs` on Y2/Y3 reports 0 + 0; it reported 24 before.
+- The Y4 lane's `mergecheck.mjs` on Y2/Y3 reports 0 + 0; it reported 102 before.
+- `mergeall5.mjs` (R+Y1+Y2+Y3+Y4, both orders): 661 tags, 0 problems.
+  - It is the critic's merge with one change: an agreeing cross-lane fix is a NOTE, not a problem.
+  - The critic's own `mergeall.mjs` still lists 2 lines. Both are notes about the identical Y4 fix: "fix on another
+    year's step" and "also fixed by Y2". Y2's EXTRA line is gone.
+
+Step rows:
+- **Y2.B4.S1.** The lead pre is `money_count {usd, like, band 50, values [1,5,10]}` "Y1.B13.S4 Count in coins (K, on the
+  W32 list)". It is followed by `money_count {usd, note, band 100}` "Y1.B13.S3 Recognise notes (K)". Items: like coins
+  of 1, 5 or 10 to 50, and $1–$50 notes to 100.
+- **Y2.B2.S20.** The lead pre is `placevalue:compare {band:99}` "Y2.B1.S13 comparing with <, > and = (W4)". Items:
+  "Compare: 76 ___ 90".
+- **Y2.B5.S13.** The {3, 5} count is gone. The pre is `count_by_tables {2,5,10 from 0}` "Y2.B1.S15".
+- **Y2.B7.S6 / S7.** The why reads "read the scale (g or kg): the same scale reading in another measure — Y2.B7.S3".
+- **Y2.B8.S4.** Pre `patterns:halve {band:10, range:10}` "Y1.B10.S4" (Half of 4, 6, 10).
+- **Y2.B2.S21.** Pre `addition:cloze_addition {range:20}` "Y1.B5.S10" (two parts that make 17).
+- **Y2.B1.S15.** Partial `count_by_step_up {step:[0]}` (A3a).
+- `money_notes` is no longer a preBuild of the B4 money steps: Y1.B13.S3 Recognise notes now has its skills from the
+  R/Y1 lane, so `proposals reused` falls from 37 to 36.
 
 ## Round 10 (after critic Y2–Y3 r9, 7.81 / 7.78): lower rungs, counts from 0, the merge check
 
@@ -345,6 +400,7 @@ Round 3 step fixes (S8):
 
 ## Owner questions (with suggested answers)
 
+0. (r11) The passed Y4 file tags `count_by_step_up {step:[0]}` PARTIAL on Y2.B1.S15, and Y2.json now carries the identical tag and clause. *Suggested: merge both lanes as they are; the tag comes out the same in either order (`mergeall5.mjs`). No ruling is needed unless the owner wants each lane to touch only its own year, in which case drop the fix from Y4.json.*
 1. `count_edges_faces_vertices` says a cylinder has 3 faces; WRM Y2 says 2 flat faces and 1 curved surface. *Suggested: follow WRM — count flat faces, name the curved surface.*
 2. `fraction_of_set` ignores `denoms` in its missing-numerator items. *Suggested: fix the generator before `single_fraction`/`fos_kind`.*
 3. Above-grade WRM steps (×/÷, g/kg, ml/l) at Grade 1: *suggested: keep them tagged; pages use the smallest band.*

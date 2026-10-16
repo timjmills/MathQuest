@@ -1207,3 +1207,31 @@ Object.assign(whyText, { 'division:share_into_groups': 'making equal groups (gro
 for (const id of ['Y3.B4.S9', 'Y3.B6.S7']) if (r3[id]) delete r3[id].relNote;
 for (const id of ['Y2.B7.S2', 'Y2.B7.S3']) relR3[id] = relR3[id].map(r => r.key === 'measurement:mass_volume_liquid' ? R(r.key, 'Y2.B7.S6 reading a millilitre scale (a later step, W36): the same scale reading', { forms: [0] }) : r);
 r3['Y2.B10.S7'].core = [C('multiplication:count_by_tables', 'Y2.B1.S15 counting in 2s, 5s and 10s from 0: reading a key', CROWS(2, 5, 10))];
+
+// ======================= round 11 (critic Y2-Y3 r10: N8 rung chooser, N9 prior-lane opts, merge with Y4) =======================
+// A3a: the passed Y4 lane tags count_by_step_up {step:[0]} PARTIAL on Y2.B1.S15 (critic Y4 r12); this file carries the same
+// tag with Y4's clause word for word, so the merged SKILL_WRM equals both files whichever lane merges first
+r3['Y2.B1.S15'] = { ...(r3['Y2.B1.S15'] || {}), partials: [P('patterns:count_by_step_up', 'counts on in 2s, 5s and 10s from any number (381, 386 ...), not the multiples from 0; answers pass 100 even at Max Number 100 (to 190)', { step: [0] })] };
+// Y2.B4.S1 (W32 list: K Recognise coins, Recognise notes, Count in coins): counting coins of one kind leads; the K notes rung
+// is the same key with other opts, so it is kept beside it (keep)
+prePatch['Y2.B4.S1'] = { ...prePatch['Y2.B4.S1'], pre: [
+  R('measurement:money_count', 'Y1.B13.S4 Count in coins (K, on the W32 list): counting coins of one kind', { currency: 'usd', kind: 'like', band: 50, values: [1, 5, 10] }),
+  { ...R('measurement:money_count', 'Y1.B13.S3 Recognise notes (K, on the W32 list): counting dollar notes', { currency: 'usd', kind: 'note', band: 100 }), keep: true },
+  ...prePatch['Y2.B4.S1'].pre] };
+// Y2.B2.S20 Compare number sentences: the signs <, > and = between two numbers (Y2.B1.S13, W4) are the main building block
+r3['Y2.B2.S20'] = { ...(r3['Y2.B2.S20'] || {}), pre: [R('placevalue:compare', 'Y2.B1.S13 comparing with <, > and = (W4): the same signs, now between two sentences', { band: 99 }), ...((r3['Y2.B2.S20'] || {}).pre || [])] };
+// Y3.B1.S4 Hundreds: counting in 10s from 0 (ten 10s make 100) and making 10s, never the 5s
+r3['Y3.B1.S4'] = { ...(r3['Y3.B1.S4'] || {}), core: [
+  C('multiplication:count_by_tables', 'Y2.B1.S15 / Y2.B5.S13 counting in 10s from 0 (Grade 1): ten 10s make 100', ZR(10)),
+  C('composing:base10_build', 'Y2.B1.S2 Count objects to 100 by making 10s (Grade 1, on the W1 list)', { band: 99 }),
+  ...((r3['Y3.B1.S4'] || {}).core || []).filter(c => c.key !== 'multiplication:count_by_tables')] };
+// Y2.B5.S13 The 10 times-table: the count it is built on is Y2.B1.S15 (2s, 5s and 10s from 0), not the 3s
+r3['Y2.B5.S13'] = { ...(r3['Y2.B5.S13'] || {}), core: [
+  { ...C('multiplication:count_by_tables', 'Y2.B1.S15 Count in 2s, 5s and 10s (W4): counting in 10s from 0 is the 10 times-table as a count', ZR(2, 5, 10)), keep: true },
+  ...((r3['Y2.B5.S13'] || {}).core || []).filter(c => !/seq_10$|count_by_tables$/.test(c.key))] };
+// N9 K rungs named by the critic (also reached by the lane-file opts)
+r3['Y2.B8.S4'] = { ...(r3['Y2.B8.S4'] || {}), core: [...((r3['Y2.B8.S4'] || {}).core || []), C('patterns:halve', 'Y1.B10.S4 Find a half of a quantity (K): halving within 10', { band: 10, range: 10 })] };
+r3['Y2.B2.S21'] = { ...(r3['Y2.B2.S21'] || {}), core: [...((r3['Y2.B2.S21'] || {}).core || []), C('addition:cloze_addition', 'Y1.B5.S10 Missing number problems (K): the two parts that make a total within 20', { range: 20 })] };
+// N8: the scale skill deals mL (form 0) or g/kg (form 1): the why names the form it deals
+whyText['measurement:mass_volume_liquid'] = 'reading a scale';
+r3['Y2.B1.S15'].mergeOnly = ['patterns:count_by_step_up'];

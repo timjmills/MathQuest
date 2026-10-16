@@ -26,7 +26,7 @@
    "pre": [
     {
      "key": "composing:base10_build",
-     "why": "Y2.B1.S1 Numbers to 20 (Grade 1): this step's skill as it was met then",
+     "why": "this step's skill as it was met then (numbers to: 20) — Y2.B1.S1 Numbers to 20 (Grade 1)",
      "opts": {
       "band": 20
      }
@@ -263,15 +263,22 @@
    "pre": [
     {
      "key": "multiplication:count_by_tables",
-     "why": "Y2.B5.S15 The 5 times-table (Grade 1): this step's skill as it was met then",
+     "why": "Y2.B5.S13 counting in 10s from 0 (Grade 1): ten 10s make 100",
      "opts": {
       "rows": [
        {
-        "step": 5,
+        "step": 10,
         "start": "zero",
         "dir": "up"
        }
       ]
+     }
+    },
+    {
+     "key": "composing:base10_build",
+     "why": "Y2.B1.S2 Count objects to 100 by making 10s (Grade 1, on the W1 list)",
+     "opts": {
+      "band": 99
      }
     },
     {
@@ -315,13 +322,6 @@
      "why": "Y2.B1.S4 Use a place value chart (prior learning wk W01)",
      "opts": {
       "band": 99
-     }
-    },
-    {
-     "key": "composing:tens_foundation_visual",
-     "why": "Y2.B1.S3 Recognise tens and ones (prior learning wk W01)",
-     "opts": {
-      "band": 90
      }
     }
    ],
@@ -467,14 +467,14 @@
    "pre": [
     {
      "key": "placevalue:expand",
-     "why": "Y3.B1.S2 Partition numbers to 100 (taught earlier, W1): this step's skill as it was met then",
+     "why": "this step's skill as it was met then (numbers to: 99) — Y3.B1.S2 Partition numbers to 100 (taught earlier, W1)",
      "opts": {
       "band": 99
      }
     },
     {
      "key": "placevalue:unit_form",
-     "why": "Y3.B1.S1 Represent numbers to 100 (taught earlier, W1): this step's skill as it was met then",
+     "why": "this step's skill as it was met then (numbers to: 99) — Y3.B1.S1 Represent numbers to 100 (taught earlier, W1)",
      "opts": {
       "band": 99
      }
@@ -670,21 +670,21 @@
    "pre": [
     {
      "key": "placevalue:identify",
-     "why": "Y2.B1.S4 Use a place value chart (Grade 1): this step's skill as it was met then",
+     "why": "this step's skill as it was met then (numbers to: 99) — Y2.B1.S4 Use a place value chart (Grade 1)",
      "opts": {
       "band": 99
      }
     },
     {
      "key": "placevalue:value",
-     "why": "Y2.B1.S4 Use a place value chart (Grade 1): this step's skill as it was met then",
+     "why": "this step's skill as it was met then (numbers to: 99) — Y2.B1.S4 Use a place value chart (Grade 1)",
      "opts": {
       "band": 99
      }
     },
     {
      "key": "placevalue:unit_form",
-     "why": "Y3.B1.S1 Represent numbers to 100 (taught earlier, W1): this step's skill as it was met then",
+     "why": "this step's skill as it was met then (numbers to: 99) — Y3.B1.S1 Represent numbers to 100 (taught earlier, W1)",
      "opts": {
       "band": 99
      }
@@ -977,7 +977,7 @@
    "pre": [
     {
      "key": "placevalue:compare",
-     "why": "Y2.B1.S13 Compare numbers (Grade 1): this step's skill as it was met then",
+     "why": "this step's skill as it was met then (numbers to: 99) — Y2.B1.S13 Compare numbers (Grade 1)",
      "opts": {
       "band": 99
      }
@@ -1076,14 +1076,14 @@
    "pre": [
     {
      "key": "placevalue:order_least_to_greatest",
-     "why": "Y2.B1.S14 Order objects and numbers (Grade 1): this step's skill as it was met then",
+     "why": "this step's skill as it was met then (numbers to: 99) — Y2.B1.S14 Order objects and numbers (Grade 1)",
      "opts": {
       "band": 99
      }
     },
     {
      "key": "placevalue:order_greatest_to_least",
-     "why": "Y2.B1.S14 Order objects and numbers (Grade 1): this step's skill as it was met then",
+     "why": "this step's skill as it was met then (numbers to: 99) — Y2.B1.S14 Order objects and numbers (Grade 1)",
      "opts": {
       "band": 99
      }
@@ -1192,16 +1192,11 @@
     },
     {
      "key": "multiplication:count_by_tables",
-     "why": "counting in equal steps from 0 (counting in 10s, 100s from 0) — Y3.B1.S4 Hundreds",
+     "why": "counting in 10s from 0: every multiple of 50 is a multiple of 10 — Y2.B5.S13 The 10 times-table (Grade 1)",
      "opts": {
       "rows": [
        {
         "step": 10,
-        "start": "zero",
-        "dir": "up"
-       },
-       {
-        "step": 100,
         "start": "zero",
         "dir": "up"
        }
@@ -1377,7 +1372,7 @@
    "pre": [
     {
      "key": "placevalue:more_less_100",
-     "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (taught earlier, W2): this step's skill as it was met then",
+     "why": "how much more or less: both: 10 and 100: the same jump on a number in another size — Y3.B1.S9 Find 1, 10 or 100 more or less (taught earlier, W2)",
      "opts": {
       "step": 0
      }
@@ -1476,7 +1471,7 @@
    "pre": [
     {
      "key": "placevalue:more_less_100",
-     "why": "Y3.B2.S3 Add and subtract 10s (taught earlier, W3): this step's skill as it was met then",
+     "why": "how much more or less: 10: the same jump on a number in another size — Y3.B2.S3 Add and subtract 10s (taught earlier, W3)",
      "opts": {
       "step": 10
      }
@@ -1783,13 +1778,6 @@
    ],
    "pre": [
     {
-     "key": "subtraction:sub_50_regroup",
-     "why": "Y2.B2.S12 Subtract a 1-digit number from a 2-digit number (across a 10) (Grade 1): this step's skill as it was met then",
-     "opts": {
-      "band": 50
-     }
-    },
-    {
      "key": "addition:add_sub_10s",
      "why": "Y2.B2.S14 Add and subtract 10s (prior learning wk W05)",
      "opts": {}
@@ -1826,6 +1814,11 @@
     {
      "key": "composing:make_ten",
      "why": "Y2.B2.S1 Bonds to 10 (prior learning wk W05)",
+     "opts": {}
+    },
+    {
+     "key": "addition:add_sub_100s",
+     "why": "Y3.B2.S4 Add and subtract 100s (taught earlier, W4)",
      "opts": {}
     }
    ],
@@ -2876,7 +2869,7 @@
     },
     {
      "key": "multiplication:arrays_groups",
-     "why": "Y2.B5.S6 Use arrays (Grade 1): this step's skill as it was met then",
+     "why": "the picture: arrays: the same multiplication in the other picture — Y2.B5.S6 Use arrays (Grade 1)",
      "opts": {
       "forms": [
        0
@@ -2885,7 +2878,7 @@
     },
     {
      "key": "multiplication:repeated_add_to_mult",
-     "why": "Y2.B5.S3 Add equal groups (Grade 1): this step's skill as it was met then",
+     "why": "this step's skill as it was met then (groups and group size to: 5) — Y2.B5.S3 Add equal groups (Grade 1)",
      "opts": {
       "band": 25
      }
@@ -2988,7 +2981,7 @@
     },
     {
      "key": "multiplication:arrays_groups",
-     "why": "Y3.B3.S1 Multiplication - equal groups (taught earlier, W10): this step's skill as it was met then",
+     "why": "the picture: equal groups: the same multiplication in the other picture — Y3.B3.S1 Multiplication - equal groups (taught earlier, W10)",
      "opts": {
       "forms": [
        1
@@ -3334,16 +3327,6 @@
      }
     },
     {
-     "key": "multiplication:mult_facts",
-     "why": "Y2.B5.S17 The 5 and 10 times-tables (Grade 1): this step's skill as it was met then",
-     "opts": {
-      "constant": [
-       5,
-       10
-      ]
-     }
-    },
-    {
      "key": "patterns:double",
      "why": "Y2.B5.S11 Doubling and halving (prior learning wk W11)",
      "opts": {
@@ -3355,6 +3338,15 @@
      "why": "Y2.B5.S11 Doubling and halving (prior learning wk W11)",
      "opts": {
       "band": 20
+     }
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "why": "Y2.B5.S9 The 2 times-table (prior learning wk W11)",
+     "opts": {
+      "constant": [
+       2
+      ]
      }
     },
     {
@@ -3446,19 +3438,19 @@
      }
     },
     {
-     "key": "division:div_facts",
-     "why": "Y2.B5.S16 Divide by 5 (Grade 1): this step's skill as it was met then",
-     "opts": {
-      "constant": [
-       5
-      ]
-     }
-    },
-    {
      "key": "patterns:double",
      "why": "Y2.B5.S11 Doubling and halving (prior learning wk W31)",
      "opts": {
       "band": 20
+     }
+    },
+    {
+     "key": "division:div_facts",
+     "why": "Y2.B5.S10 Divide by 2 (prior learning wk W31)",
+     "opts": {
+      "constant": [
+       2
+      ]
      }
     },
     {
@@ -3547,9 +3539,19 @@
     },
     {
      "key": "multiplication:count_by_tables",
-     "why": "Y3.B4.S1 Multiples of 10 (taught earlier, W9): this step's skill as it was met then",
+     "why": "counting in 2s, 5s and 10s from 0: the same count from 0 that this step makes in 3s — Y2.B1.S15 Count in 2s, 5s and 10s (Grade 1)",
      "opts": {
       "rows": [
+       {
+        "step": 2,
+        "start": "zero",
+        "dir": "up"
+       },
+       {
+        "step": 5,
+        "start": "zero",
+        "dir": "up"
+       },
        {
         "step": 10,
         "start": "zero",
@@ -3739,10 +3741,10 @@
     },
     {
      "key": "division:div_facts",
-     "why": "Y3.B3.S7 Divide by 3 (taught earlier, W31): this step's skill as it was met then",
+     "why": "dividing by 2: every multiple of 4 is a multiple of 2 — Y2.B5.S10 Divide by 2 (Grade 1)",
      "opts": {
       "constant": [
-       3
+       2
       ]
      }
     },
@@ -3841,20 +3843,20 @@
    "pre": [
     {
      "key": "multiplication:mult_facts",
-     "why": "Y3.B3.S8 The 3 times-table (taught earlier, W11): this step's skill as it was met then",
+     "why": "the 2 times-table: every multiple of 4 is a multiple of 2 — Y2.B5.S9 The 2 times-table (Grade 1)",
      "opts": {
       "constant": [
-       3
+       2
       ]
      }
     },
     {
      "key": "multiplication:count_by_tables",
-     "why": "Y3.B3.S8 The 3 times-table (taught earlier, W11): this step's skill as it was met then",
+     "why": "counting in 2s from 0: every multiple of 4 is a multiple of 2 — Y2.B5.S9 The 2 times-table (Grade 1)",
      "opts": {
       "rows": [
        {
-        "step": 3,
+        "step": 2,
         "start": "zero",
         "dir": "up"
        }
@@ -3971,7 +3973,7 @@
     },
     {
      "key": "multiplication:mult_facts",
-     "why": "Y3.B3.S11 The 4 times-table (taught earlier, W11): this step's skill as it was met then",
+     "why": "the 4 times-table: every multiple of 8 is a multiple of 4 — Y3.B3.S11 The 4 times-table (taught earlier, W11)",
      "opts": {
       "constant": [
        4
@@ -4066,7 +4068,7 @@
     },
     {
      "key": "division:div_facts",
-     "why": "Y3.B3.S10 Divide by 4 (taught earlier, W31): this step's skill as it was met then",
+     "why": "dividing by 4: every multiple of 8 is a multiple of 4 — Y3.B3.S10 Divide by 4 (taught earlier, W31)",
      "opts": {
       "constant": [
        4
@@ -4180,7 +4182,7 @@
     },
     {
      "key": "multiplication:count_by_tables",
-     "why": "Y3.B3.S11 The 4 times-table (taught earlier, W11): this step's skill as it was met then",
+     "why": "counting in 4s from 0: every multiple of 8 is a multiple of 4 — Y3.B3.S11 The 4 times-table (taught earlier, W11)",
      "opts": {
       "rows": [
        {
@@ -4412,11 +4414,11 @@
     },
     {
      "key": "multiplication:count_by_tables",
-     "why": "Y3.B1.S14 Count in 50s (taught earlier, W3): this step's skill as it was met then",
+     "why": "counting in 5s from 0: every multiple of 10 is a multiple of 5 — Y2.B5.S15 The 5 times-table (Grade 1)",
      "opts": {
       "rows": [
        {
-        "step": 50,
+        "step": 5,
         "start": "zero",
         "dir": "up"
        }
@@ -4481,7 +4483,7 @@
     },
     {
      "key": "multiplication:mult_zeros",
-     "why": "Y3.B4.S1 Multiples of 10 (taught earlier, W9): this step's skill as it was met then",
+     "why": "this step's skill as it was met then (which kind: × 10) — Y3.B4.S1 Multiples of 10 (taught earlier, W9)",
      "opts": {
       "forms": [
        0
@@ -5690,7 +5692,7 @@
    "pre": [
     {
      "key": "measurement:length_metric",
-     "why": "Y3.B5.S1 Measure in metres and centimetres (taught earlier, W13): this step's skill as it was met then",
+     "why": "this step's skill as it was met then (which units: m to cm) — Y3.B5.S1 Measure in metres and centimetres (taught earlier, W13)",
      "opts": {
       "forms": [
        1
@@ -5819,7 +5821,7 @@
    "pre": [
     {
      "key": "measurement:length_metric",
-     "why": "Y3.B5.S5 Equivalent lengths (metres and centimetres) (taught earlier, W14): this step's skill as it was met then",
+     "why": "which units: m to cm: the same exchange in another pair of units — Y3.B5.S5 Equivalent lengths (metres and centimetres) (taught earlier, W14)",
      "opts": {
       "forms": [
        1
@@ -6239,7 +6241,7 @@
    "pre": [
     {
      "key": "fractions:identify",
-     "why": "Y2.B8.S13 Recognise three-quarters (Grade 1): this step's skill as it was met then",
+     "why": "this step's skill as it was met then (denominators: halves, quarters, eighths) — Y2.B8.S13 Recognise three-quarters (Grade 1)",
      "opts": {
       "denoms": [
        2
@@ -6248,7 +6250,7 @@
     },
     {
      "key": "fractions:write_fraction",
-     "why": "Y2.B8.S11 Non-unit fractions (Grade 1): this step's skill as it was met then",
+     "why": "this step's skill as it was met then (denominators: halves, quarters, eighths and Thirds, sixths, ninths, twelfths) — Y2.B8.S11 Non-unit fractions (Grade 1)",
      "opts": {
       "denoms": [
        2,
@@ -6424,7 +6426,7 @@
     },
     {
      "key": "fractions:write_fraction",
-     "why": "Y2.B8.S11 Non-unit fractions (Grade 1): this step's skill as it was met then",
+     "why": "this step's skill as it was met then (denominators: halves, quarters, eighths and Thirds, sixths, ninths, twelfths) — Y2.B8.S11 Non-unit fractions (Grade 1)",
      "opts": {
       "denoms": [
        2,
@@ -6434,7 +6436,7 @@
     },
     {
      "key": "fractions:shade_fraction",
-     "why": "Y2.B8.S14 Find three-quarters (Grade 1): this step's skill as it was met then",
+     "why": "this step's skill as it was met then (denominators: halves, quarters, eighths) — Y2.B8.S14 Find three-quarters (Grade 1)",
      "opts": {
       "denoms": [
        2
@@ -6849,7 +6851,7 @@
    "pre": [
     {
      "key": "fractions:equiv_frac_visual",
-     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (Grade 1): this step's skill as it was met then",
+     "why": "this step's skill as it was met then (denominators: halves, quarters, eighths) — Y2.B8.S12 Recognise the equivalence of a half and two quarters (Grade 1)",
      "opts": {
       "denoms": [
        2
@@ -6929,7 +6931,7 @@
    "pre": [
     {
      "key": "fractions:equiv_frac_visual",
-     "why": "Y2.B8.S12 Recognise the equivalence of a half and two quarters (Grade 1): this step's skill as it was met then",
+     "why": "this step's skill as it was met then (denominators: halves, quarters, eighths) — Y2.B8.S12 Recognise the equivalence of a half and two quarters (Grade 1)",
      "opts": {
       "denoms": [
        2
@@ -7024,7 +7026,7 @@
    "pre": [
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "reading a scale in mL: this step's skill as it was met then — Y2.B7.S7 Measure in litres",
+     "why": "this step's skill as it was met then (what the items ask: read the cylinder (mL)) — Y2.B7.S7 Measure in litres (Grade 1)",
      "opts": {
       "forms": [
        0
@@ -7104,7 +7106,7 @@
     },
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "reading a scale in mL: this step's skill as it was met then — Y2.B7.S7 Measure in litres",
+     "why": "what the items ask: read the cylinder (mL): the same scale reading in another measure — Y2.B7.S7 Measure in litres (Grade 1)",
      "opts": {
       "forms": [
        0
@@ -7179,7 +7181,7 @@
     },
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "reading a scale in mL: this step's skill as it was met then — Y2.B7.S7 Measure in litres",
+     "why": "what the items ask: read the cylinder (mL): the same scale reading in another measure — Y2.B7.S7 Measure in litres (Grade 1)",
      "opts": {
       "forms": [
        0
@@ -7415,7 +7417,7 @@
     },
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "Y3.B7.S3 Measure mass in kilograms and grams (taught earlier, W35): this step's skill as it was met then",
+     "why": "what the items ask: read the scale (g or kg): the same scale reading in another measure — Y3.B7.S3 Measure mass in kilograms and grams (taught earlier, W35)",
      "opts": {
       "forms": [
        1
@@ -7466,7 +7468,7 @@
     },
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "Y3.B7.S3 Measure mass in kilograms and grams (taught earlier, W35): this step's skill as it was met then",
+     "why": "what the items ask: read the scale (g or kg): the same scale reading in another measure — Y3.B7.S3 Measure mass in kilograms and grams (taught earlier, W35)",
      "opts": {
       "forms": [
        1
@@ -7515,7 +7517,7 @@
     },
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "reading a scale in mL — Y2.B7.S7 Measure in litres",
+     "why": "reading a scale (a cylinder in mL) — Y2.B7.S7 Measure in litres",
      "opts": {
       "forms": [
        0
@@ -7587,7 +7589,7 @@
    "pre": [
     {
      "key": "measurement:mass_volume_liquid",
-     "why": "reading a scale in mL — Y2.B7.S7 Measure in litres",
+     "why": "reading a scale (a cylinder in mL) — Y2.B7.S7 Measure in litres",
      "opts": {
       "forms": [
        0
@@ -8272,7 +8274,7 @@
    "pre": [
     {
      "key": "measurement:money_count",
-     "why": "Y2.B4.S2 Count money - pounds (notes and coins) (Grade 1): this step's skill as it was met then",
+     "why": "what to count: notes: counting money of another kind first — Y2.B4.S2 Count money - pounds (notes and coins) (Grade 1)",
      "opts": {
       "currency": "usd",
       "kind": "note"
@@ -8356,7 +8358,7 @@
    "pre": [
     {
      "key": "measurement:money_notation",
-     "why": "Y3.B9.S1 Pounds and pence (taught earlier, W19): this step's skill as it was met then",
+     "why": "the pupil reads: notes and coins: reading money of another kind first — Y3.B9.S1 Pounds and pence (taught earlier, W19)",
      "opts": {
       "currency": "usd"
      }
@@ -8437,7 +8439,7 @@
    "pre": [
     {
      "key": "measurement:money",
-     "why": "Y2.B4.S7 Calculate with money (Grade 1): this step's skill as it was met then",
+     "why": "prices in steps of: whole dollars: adding money in other amounts first — Y2.B4.S7 Calculate with money (Grade 1)",
      "opts": {
       "currency": "usd"
      }
@@ -8532,7 +8534,7 @@
     },
     {
      "key": "measurement:money_change",
-     "why": "Y2.B4.S9 Find change (Grade 1): this step's skill as it was met then",
+     "why": "totals to: 20 dollars; prices in steps of: whole dollars; paid with: the next note: finding change with other amounts first — Y2.B4.S9 Find change (Grade 1)",
      "opts": {
       "currency": "usd",
       "step": 100,
@@ -8629,7 +8631,7 @@
     },
     {
      "key": "measurement:money_change",
-     "why": "Y3.B9.S4 Subtract money (taught earlier, W19): this step's skill as it was met then",
+     "why": "paid with: the next whole dollar: finding change with other amounts first — Y3.B9.S4 Subtract money (taught earlier, W19)",
      "opts": {
       "currency": "usd",
       "step": 5
@@ -8733,7 +8735,7 @@
    "pre": [
     {
      "key": "measurement:time_5min",
-     "why": "Y2.B9.S4 Tell time to the hour (Grade 1): this step's skill as it was met then",
+     "why": "what the pupil reads: words: \"five past two\": a neighbouring rung of this step's skill, not the step itself — Y2.B9.S4 Tell time to the hour (Grade 1)",
      "opts": {
       "stimulus": "words-past"
      }
@@ -9496,7 +9498,14 @@
     {
      "key": "shapes_early:name_2d_shapes",
      "why": "Y1.B3.S3 naming 2-D shapes (topic ladder)",
-     "opts": {}
+     "opts": {
+      "shapes": [
+       0,
+       1,
+       2,
+       4
+      ]
+     }
     }
    ],
    "preBuild": [
@@ -9718,7 +9727,7 @@
    "pre": [
     {
      "key": "shapes_early:count_sides_vertices_2d",
-     "why": "Y2.B3.S3 Count vertices on 2-D shapes (Grade 1): this step's skill as it was met then",
+     "why": "this step's skill as it was met then (what is counted: vertices) — Y2.B3.S3 Count vertices on 2-D shapes (Grade 1)",
      "opts": {
       "forms": [
        1
@@ -9832,7 +9841,7 @@
    "pre": [
     {
      "key": "shapes_early:count_edges_faces_vertices",
-     "why": "Y2.B3.S10 Count vertices on 3-D shapes (Grade 1): this step's skill as it was met then",
+     "why": "this step's skill as it was met then (what is counted: vertices) — Y2.B3.S10 Count vertices on 3-D shapes (Grade 1)",
      "opts": {
       "forms": [
        2
@@ -9964,7 +9973,7 @@
    "pre": [
     {
      "key": "graphs:pictograph",
-     "why": "reading a picture graph with a key: this step's skill as it was met then — Y2.B10.S7 Interpret pictograms (2, 5 and 10)",
+     "why": "this step's skill as it was met then (max number: up to 50) — Y2.B10.S7 Interpret pictograms (2, 5 and 10) (Grade 1)",
      "opts": {
       "range": 50,
       "scale": [
@@ -12027,36 +12036,70 @@
    "key": "composing:base10_build_hundreds",
    "step": "Y3.B1.S4",
    "action": "partial",
-   "why": "builds 3-digit numbers; counting in 100s and 10 hundreds = 1,000 are not dealt"
+   "why": "builds 3-digit numbers; counting in 100s and 10 hundreds = 1,000 are not dealt",
+   "partial": "builds 3-digit numbers; counting in 100s and 10 hundreds = 1,000 are not dealt"
   },
   {
    "key": "multiplication:count_by_tables",
    "step": "Y3.B1.S4",
-   "action": "add",
-   "why": "partial: counts in 100s from 0 but runs past 1,000 (to 1,100)"
+   "action": "partial",
+   "opts": {
+    "rows": [
+     {
+      "step": 100,
+      "start": "zero",
+      "dir": "up"
+     }
+    ]
+   },
+   "why": "counts in 100s from 0 but runs past 1,000 (to 1,100)",
+   "partial": "counts in 100s from 0 but runs past 1,000 (to 1,100)"
   },
   {
    "key": "placevalue:more_less_100",
    "step": "Y3.B1.S9",
    "action": "partial",
-   "why": "steps of 10 and 100 only (step \"mixed\" also adds 1,000 more, past the step); 1 more and 1 less on a 3-digit number is not dealt"
+   "opts": {
+    "step": 0
+   },
+   "why": "steps of 10 and 100 only (step \"mixed\" also adds 1,000 more, past the step); 1 more and 1 less on a 3-digit number is not dealt",
+   "partial": "steps of 10 and 100 only (step \"mixed\" also adds 1,000 more, past the step); 1 more and 1 less on a 3-digit number is not dealt"
   },
   {
    "key": "number_sense:place_on_number_line",
    "step": "Y3.B1.S10",
    "action": "partial",
-   "why": "marks a number between two hundreds; a whole 0-1,000 line counted in 100s, and reading the value at an arrow, are not dealt"
+   "opts": {
+    "span": 100,
+    "band": 1000
+   },
+   "why": "marks a number between two hundreds; a whole 0-1,000 line counted in 100s, and reading the value at an arrow, are not dealt",
+   "partial": "marks a number between two hundreds; a whole 0-1,000 line counted in 100s, and reading the value at an arrow, are not dealt"
   },
   {
    "key": "number_sense:place_on_number_line",
    "step": "Y3.B1.S11",
-   "action": "add",
-   "why": "partial: the hundreds are marked; estimating on a line with only the ends (0 and 1,000) marked is not dealt"
+   "action": "partial",
+   "opts": {
+    "span": 100,
+    "band": 1000
+   },
+   "why": "the hundreds are marked; estimating on a line with only the ends (0 and 1,000) marked is not dealt",
+   "partial": "the hundreds are marked; estimating on a line with only the ends (0 and 1,000) marked is not dealt"
   },
   {
    "key": "multiplication:count_by_tables",
    "step": "Y3.B1.S14",
    "action": "add",
+   "opts": {
+    "rows": [
+     {
+      "step": 50,
+      "start": "zero",
+      "dir": "up"
+     }
+    ]
+   },
    "why": "teaches the step with opts {\"rows\":[{\"step\":50,\"start\":\"zero\",\"dir\":\"up\"}]}"
   },
   {
@@ -12074,14 +12117,16 @@
   {
    "key": "addition:add_sub_10s",
    "step": "Y3.B2.S1",
-   "action": "add",
-   "why": "partial: a decade ± 10 only; 30 + 40 from 3 + 4 is not dealt"
+   "action": "partial",
+   "why": "a decade ± 10 only; 30 + 40 from 3 + 4 is not dealt",
+   "partial": "a decade ± 10 only; 30 + 40 from 3 + 4 is not dealt"
   },
   {
    "key": "addition:add_sub_100s",
    "step": "Y3.B2.S1",
-   "action": "add",
-   "why": "partial: a hundred ± 100 only; 300 + 400 from 3 + 4 is not dealt"
+   "action": "partial",
+   "why": "a hundred ± 100 only; 300 + 400 from 3 + 4 is not dealt",
+   "partial": "a hundred ± 100 only; 300 + 400 from 3 + 4 is not dealt"
   },
   {
    "key": "addition:add_100_no_regroup",
@@ -12093,49 +12138,63 @@
    "key": "addition:add_sub_10s",
    "step": "Y3.B2.S3",
    "action": "partial",
-   "why": "a decade ± 10 only; adding and subtracting 10s to a 2- or 3-digit number (234 + 30) is not dealt"
+   "why": "a decade ± 10 only; adding and subtracting 10s to a 2- or 3-digit number (234 + 30) is not dealt",
+   "partial": "a decade ± 10 only; adding and subtracting 10s to a 2- or 3-digit number (234 + 30) is not dealt"
   },
   {
    "key": "placevalue:more_less_100",
    "step": "Y3.B2.S3",
    "action": "partial",
-   "why": "10 more / 10 less only, not several tens"
+   "opts": {
+    "step": 10
+   },
+   "why": "10 more / 10 less only, not several tens",
+   "partial": "10 more / 10 less only, not several tens"
   },
   {
    "key": "addition:add_sub_100s",
    "step": "Y3.B2.S4",
    "action": "partial",
-   "why": "a hundred ± 100 only; adding hundreds to a 3-digit number (234 + 200) is not dealt"
+   "why": "a hundred ± 100 only; adding hundreds to a 3-digit number (234 + 200) is not dealt",
+   "partial": "a hundred ± 100 only; adding hundreds to a 3-digit number (234 + 200) is not dealt"
   },
   {
    "key": "placevalue:more_less_100",
    "step": "Y3.B2.S4",
-   "action": "add",
-   "why": "partial: 100 more / 100 less only"
+   "action": "partial",
+   "opts": {
+    "step": 100
+   },
+   "why": "100 more / 100 less only",
+   "partial": "100 more / 100 less only"
   },
   {
    "key": "addition:add_1k_regroup",
    "step": "Y3.B2.S13",
    "action": "partial",
-   "why": "exchanges in the ones and the tens are mixed (167 + 499 exchanges twice); a page with one exchange in the ones only is not available"
+   "why": "exchanges in the ones and the tens are mixed (167 + 499 exchanges twice); a page with one exchange in the ones only is not available",
+   "partial": "exchanges in the ones and the tens are mixed (167 + 499 exchanges twice); a page with one exchange in the ones only is not available"
   },
   {
    "key": "addition:add_1k_regroup",
    "step": "Y3.B2.S14",
    "action": "partial",
-   "why": "exchanges are mixed; a page with one exchange in the tens (across a 100) only is not available"
+   "why": "exchanges are mixed; a page with one exchange in the tens (across a 100) only is not available",
+   "partial": "exchanges are mixed; a page with one exchange in the tens (across a 100) only is not available"
   },
   {
    "key": "subtraction:sub_1k_regroup",
    "step": "Y3.B2.S15",
    "action": "partial",
-   "why": "exchanges are mixed (307 − 278 exchanges twice); one exchange from the tens only is not available"
+   "why": "exchanges are mixed (307 − 278 exchanges twice); one exchange from the tens only is not available",
+   "partial": "exchanges are mixed (307 − 278 exchanges twice); one exchange from the tens only is not available"
   },
   {
    "key": "subtraction:sub_1k_regroup",
    "step": "Y3.B2.S16",
    "action": "partial",
-   "why": "exchanges are mixed; one exchange from the hundreds only is not available"
+   "why": "exchanges are mixed; one exchange from the hundreds only is not available",
+   "partial": "exchanges are mixed; one exchange from the hundreds only is not available"
   },
   {
    "key": "subtraction:sub_across_zeros",
@@ -12147,55 +12206,80 @@
    "key": "addition:add_1k_mixed",
    "step": "Y3.B2.S17",
    "action": "partial",
-   "why": "mostly 3-digit + 3-digit (404 + 134); a page of 2-digit + 3-digit is not available"
+   "why": "mostly 3-digit + 3-digit (404 + 134); a page of 2-digit + 3-digit is not available",
+   "partial": "mostly 3-digit + 3-digit (404 + 134); a page of 2-digit + 3-digit is not available"
   },
   {
    "key": "subtraction:sub_1k_mixed",
    "step": "Y3.B2.S18",
    "action": "partial",
-   "why": "mostly 3-digit − 3-digit (538 − 404); a page of 3-digit − 2-digit is not available"
+   "why": "mostly 3-digit − 3-digit (538 − 404); a page of 3-digit − 2-digit is not available",
+   "partial": "mostly 3-digit − 3-digit (538 − 404); a page of 3-digit − 2-digit is not available"
   },
   {
    "key": "number_sense:estimate_sum",
    "step": "Y3.B2.S20",
    "action": "partial",
-   "why": "rounds 2-digit numbers to the nearest 10 (56 + 24); estimating 3-digit sums to the nearest 100 within 1,000 is not dealt (place 100 also deals sums past 1,000: 538 + 775)"
+   "opts": {
+    "place": 10
+   },
+   "why": "rounds 2-digit numbers to the nearest 10 (56 + 24); estimating 3-digit sums to the nearest 100 within 1,000 is not dealt (place 100 also deals sums past 1,000: 538 + 775)",
+   "partial": "rounds 2-digit numbers to the nearest 10 (56 + 24); estimating 3-digit sums to the nearest 100 within 1,000 is not dealt (place 100 also deals sums past 1,000: 538 + 775)"
   },
   {
    "key": "number_sense:estimate_sums_diffs",
    "step": "Y3.B2.S20",
    "action": "partial",
-   "why": "the same: 2-digit only at place 10"
+   "opts": {
+    "place": 10
+   },
+   "why": "the same: 2-digit only at place 10",
+   "partial": "the same: 2-digit only at place 10"
   },
   {
    "key": "number_theory:multiples",
    "step": "Y3.B3.S3",
    "action": "partial",
-   "why": "lists multiples, but of any number to 12 (multiples of 6, 7, 9: \"7, 14, 21 …\", beyond the Grade 2 tables); multiples of 2 as the even numbers to 100 are not a page of their own"
+   "why": "lists multiples, but of any number to 12 (multiples of 6, 7, 9: \"7, 14, 21 …\", beyond the Grade 2 tables); multiples of 2 as the even numbers to 100 are not a page of their own",
+   "partial": "lists multiples, but of any number to 12 (multiples of 6, 7, 9: \"7, 14, 21 …\", beyond the Grade 2 tables); multiples of 2 as the even numbers to 100 are not a page of their own"
   },
   {
    "key": "number_theory:multiples",
    "step": "Y3.B3.S4",
    "action": "partial",
-   "why": "lists multiples, but of any number to 12 (multiples of 6, 7, 9: \"7, 14, 21 …\", beyond the Grade 2 tables); a page of multiples of 5 and 10 only is not available"
+   "why": "lists multiples, but of any number to 12 (multiples of 6, 7, 9: \"7, 14, 21 …\", beyond the Grade 2 tables); a page of multiples of 5 and 10 only is not available",
+   "partial": "lists multiples, but of any number to 12 (multiples of 6, 7, 9: \"7, 14, 21 …\", beyond the Grade 2 tables); a page of multiples of 5 and 10 only is not available"
   },
   {
    "key": "division:div_word_problems",
    "step": "Y3.B3.S5",
    "action": "partial",
-   "why": "sharing and grouping stories, but ÷6 and ÷7 facts beyond the Grade 2 tables appear (42 ÷ 6, 36 ÷ 6, 49 ÷ 7)"
+   "why": "sharing and grouping stories, but ÷6 and ÷7 facts beyond the Grade 2 tables appear (42 ÷ 6, 36 ÷ 6, 49 ÷ 7)",
+   "partial": "sharing and grouping stories, but ÷6 and ÷7 facts beyond the Grade 2 tables appear (42 ÷ 6, 36 ÷ 6, 49 ÷ 7)"
   },
   {
    "key": "division:share_into_groups",
    "step": "Y3.B3.S5",
    "action": "partial",
-   "why": "grouping only (make groups of M, how many groups); sharing into a given number of groups is not dealt"
+   "opts": {
+    "band": 12
+   },
+   "why": "grouping only (make groups of M, how many groups); sharing into a given number of groups is not dealt",
+   "partial": "grouping only (make groups of M, how many groups); sharing into a given number of groups is not dealt"
   },
   {
    "key": "multiplication:mult_facts",
    "step": "Y3.B3.S15",
    "action": "partial",
-   "why": "drills the three tables mixed; the doubling link (2 → 4 → 8) is not taught"
+   "opts": {
+    "constant": [
+     2,
+     4,
+     8
+    ]
+   },
+   "why": "drills the three tables mixed; the doubling link (2 → 4 → 8) is not taught",
+   "partial": "drills the three tables mixed; the doubling link (2 → 4 → 8) is not taught"
   },
   {
    "key": "patterns:seq_10",
@@ -12207,61 +12291,101 @@
    "key": "multiplication:count_by_tables",
    "step": "Y3.B4.S1",
    "action": "add",
+   "opts": {
+    "rows": [
+     {
+      "step": 10,
+      "start": "zero",
+      "dir": "up"
+     }
+    ]
+   },
    "why": "teaches the step with opts {\"rows\":[{\"step\":10,\"start\":\"zero\",\"dir\":\"up\"}]}"
   },
   {
    "key": "multiplication:mult_zeros",
    "step": "Y3.B4.S2",
    "action": "partial",
-   "why": "related calculations with a multiple of 10 (3 × 4 = 12, so 30 × 4 = 120) are dealt, but ×6, ×7 and ×9 facts beyond the Grade 2 tables appear too (7 × 60, 70 × 7, 3 × 60); a page on the 2, 3, 4, 5, 8 and 10 tables only is not available"
+   "why": "related calculations with a multiple of 10 (3 × 4 = 12, so 30 × 4 = 120) are dealt, but ×6, ×7 and ×9 facts beyond the Grade 2 tables appear too (7 × 60, 70 × 7, 3 × 60); a page on the 2, 3, 4, 5, 8 and 10 tables only is not available",
+   "partial": "related calculations with a multiple of 10 (3 × 4 = 12, so 30 × 4 = 120) are dealt, but ×6, ×7 and ×9 facts beyond the Grade 2 tables appear too (7 × 60, 70 × 7, 3 × 60); a page on the 2, 3, 4, 5, 8 and 10 tables only is not available"
   },
   {
    "key": "multiplication:mult_properties",
    "step": "Y3.B4.S3",
    "action": "partial",
-   "why": "×6 and ×7 items (7 × 6 = 3 × 6 + 4 × 6, 9 × 1) beyond the Grade 2 tables are mixed in; a page on the 2, 3, 4, 5, 8 and 10 tables only is not available"
+   "why": "×6 and ×7 items (7 × 6 = 3 × 6 + 4 × 6, 9 × 1) beyond the Grade 2 tables are mixed in; a page on the 2, 3, 4, 5, 8 and 10 tables only is not available",
+   "partial": "×6 and ×7 items (7 × 6 = 3 × 6 + 4 × 6, 9 × 1) beyond the Grade 2 tables are mixed in; a page on the 2, 3, 4, 5, 8 and 10 tables only is not available"
   },
   {
    "key": "multiplication:multiply",
    "step": "Y3.B4.S4",
    "action": "partial",
-   "why": "2-digit × 1-digit with and without exchanges mixed (53 × 8), and ×6, ×7, ×9 items beyond the Grade 2 tables (23 × 9, 7 × 63); a no-exchange page on the 2, 3, 4, 5 and 8 tables is not available"
+   "opts": {
+    "tiles": 21
+   },
+   "why": "2-digit × 1-digit with and without exchanges mixed (53 × 8), and ×6, ×7, ×9 items beyond the Grade 2 tables (23 × 9, 7 × 63); a no-exchange page on the 2, 3, 4, 5 and 8 tables is not available",
+   "partial": "2-digit × 1-digit with and without exchanges mixed (53 × 8), and ×6, ×7, ×9 items beyond the Grade 2 tables (23 × 9, 7 × 63); a no-exchange page on the 2, 3, 4, 5 and 8 tables is not available"
   },
   {
    "key": "multiplication:area_model_mult",
    "step": "Y3.B4.S4",
    "action": "partial",
-   "why": "the partition picture, exchanges mixed, and ×6, ×7, ×9 items"
+   "opts": {
+    "tiles": 21
+   },
+   "why": "the partition picture, exchanges mixed, and ×6, ×7, ×9 items",
+   "partial": "the partition picture, exchanges mixed, and ×6, ×7, ×9 items"
   },
   {
    "key": "multiplication:multiply",
    "step": "Y3.B4.S5",
    "action": "partial",
-   "why": "mostly with an exchange, but no-exchange items (30 × 2) are mixed in, and ×6, ×7, ×9 items beyond the Grade 2 tables (23 × 9)"
+   "opts": {
+    "tiles": 21
+   },
+   "why": "mostly with an exchange, but no-exchange items (30 × 2) are mixed in, and ×6, ×7, ×9 items beyond the Grade 2 tables (23 × 9)",
+   "partial": "mostly with an exchange, but no-exchange items (30 × 2) are mixed in, and ×6, ×7, ×9 items beyond the Grade 2 tables (23 × 9)"
   },
   {
    "key": "multiplication:area_model_mult",
    "step": "Y3.B4.S5",
    "action": "partial",
-   "why": "the partition picture; exchanges are not controlled (3 × 13), and ×6, ×7, ×9 items appear"
+   "opts": {
+    "tiles": 21
+   },
+   "why": "the partition picture; exchanges are not controlled (3 × 13), and ×6, ×7, ×9 items appear",
+   "partial": "the partition picture; exchanges are not controlled (3 × 13), and ×6, ×7, ×9 items appear"
   },
   {
    "key": "multiplication:mult_div_fact_family",
    "step": "Y3.B4.S6",
    "action": "partial",
-   "why": "fact families, but with ×6, ×7, ×9 and ×11 facts (6, 7, 42; 9, 11, 99) beyond the Grade 2 tables"
+   "why": "fact families, but with ×6, ×7, ×9 and ×11 facts (6, 7, 42; 9, 11, 99) beyond the Grade 2 tables",
+   "partial": "fact families, but with ×6, ×7, ×9 and ×11 facts (6, 7, 42; 9, 11, 99) beyond the Grade 2 tables"
   },
   {
    "key": "division:missing_mult_div",
    "step": "Y3.B4.S6",
    "action": "partial",
-   "why": "missing-number × and ÷ sentences, but ÷6, ÷7, ÷9, ×11 and ÷12 items beyond the Grade 2 tables appear (84 ÷ 7, 7 × 11, ___ × 6 = 72, 108 ÷ 12)"
+   "why": "missing-number × and ÷ sentences, but ÷6, ÷7, ÷9, ×11 and ÷12 items beyond the Grade 2 tables appear (84 ÷ 7, 7 × 11, ___ × 6 = 72, 108 ÷ 12)",
+   "partial": "missing-number × and ÷ sentences, but ÷6, ÷7, ÷9, ×11 and ÷12 items beyond the Grade 2 tables appear (84 ÷ 7, 7 × 11, ___ × 6 = 72, 108 ÷ 12)"
   },
   {
    "key": "division:box_division_easy",
    "step": "Y3.B4.S7",
    "action": "partial",
-   "why": "regroup \"none\" still deals 75 ÷ 5 (an exchange of tens) and 1-digit dividends (15 ÷ 3); a page of 2-digit ÷ 1-digit with no exchange is not available. `constant` keeps it to the Grade 2 tables (no ÷6, ÷7, ÷9)"
+   "opts": {
+    "regroup": "none",
+    "constant": [
+     2,
+     3,
+     4,
+     5,
+     8
+    ]
+   },
+   "why": "regroup \"none\" still deals 75 ÷ 5 (an exchange of tens) and 1-digit dividends (15 ÷ 3); a page of 2-digit ÷ 1-digit with no exchange is not available. `constant` keeps it to the Grade 2 tables (no ÷6, ÷7, ÷9)",
+   "partial": "regroup \"none\" still deals 75 ÷ 5 (an exchange of tens) and 1-digit dividends (15 ÷ 3); a page of 2-digit ÷ 1-digit with no exchange is not available. `constant` keeps it to the Grade 2 tables (no ÷6, ÷7, ÷9)"
   },
   {
    "key": "division:area_model_div_2by1",
@@ -12273,85 +12397,140 @@
    "key": "multiplication:mult_comparison",
    "step": "Y3.B4.S10",
    "action": "partial",
-   "why": "\"times as many\" stories, but with ×6, ×7 and ×9 facts (6 times as many as 6; 63 is 9 times as many) beyond the Grade 2 tables"
+   "why": "\"times as many\" stories, but with ×6, ×7 and ×9 facts (6 times as many as 6; 63 is 9 times as many) beyond the Grade 2 tables",
+   "partial": "\"times as many\" stories, but with ×6, ×7 and ×9 facts (6 times as many as 6; 63 is 9 times as many) beyond the Grade 2 tables"
   },
   {
    "key": "measurement:length_metric",
    "step": "Y3.B5.S1",
    "action": "partial",
-   "why": "converts whole metres to cm; measuring in m and cm with a mixed answer (1 m 25 cm) is not dealt"
+   "opts": {
+    "forms": [
+     1
+    ]
+   },
+   "why": "converts whole metres to cm; measuring in m and cm with a mixed answer (1 m 25 cm) is not dealt",
+   "partial": "converts whole metres to cm; measuring in m and cm with a mixed answer (1 m 25 cm) is not dealt"
   },
   {
    "key": "measurement:reading_ruler",
    "step": "Y3.B5.S2",
    "action": "partial",
-   "why": "reads an INCH ruler (whole inches); a ruler marked in cm and mm, and measuring in millimetres, are not dealt"
+   "why": "reads an INCH ruler (whole inches); a ruler marked in cm and mm, and measuring in millimetres, are not dealt",
+   "partial": "reads an INCH ruler (whole inches); a ruler marked in cm and mm, and measuring in millimetres, are not dealt"
   },
   {
    "key": "measurement:length_metric",
    "step": "Y3.B5.S5",
    "action": "partial",
-   "why": "whole metres to cm only (3 m = 300 cm); mixed units (1 m 20 cm = 120 cm) are not dealt"
+   "opts": {
+    "forms": [
+     1
+    ]
+   },
+   "why": "whole metres to cm only (3 m = 300 cm); mixed units (1 m 20 cm = 120 cm) are not dealt",
+   "partial": "whole metres to cm only (3 m = 300 cm); mixed units (1 m 20 cm = 120 cm) are not dealt"
   },
   {
    "key": "measurement:length_metric",
    "step": "Y3.B5.S6",
    "action": "partial",
-   "why": "whole cm to mm only; mixed units (4 cm 5 mm = 45 mm) are not dealt"
+   "opts": {
+    "forms": [
+     0
+    ]
+   },
+   "why": "whole cm to mm only; mixed units (4 cm 5 mm = 45 mm) are not dealt",
+   "partial": "whole cm to mm only; mixed units (4 cm 5 mm = 45 mm) are not dealt"
   },
   {
    "key": "fractions:identify",
    "step": "Y3.B6.S1",
    "action": "partial",
-   "why": "names fractions of shapes, but most items are non-unit fractions or ask for the numerator (\"the numerator of 5/9\"), which is Y3.B6.S3; a page of unit fractions (1/2, 1/3, 1/4, 1/5) is not available"
+   "why": "names fractions of shapes, but most items are non-unit fractions or ask for the numerator (\"the numerator of 5/9\"), which is Y3.B6.S3; a page of unit fractions (1/2, 1/3, 1/4, 1/5) is not available",
+   "partial": "names fractions of shapes, but most items are non-unit fractions or ask for the numerator (\"the numerator of 5/9\"), which is Y3.B6.S3; a page of unit fractions (1/2, 1/3, 1/4, 1/5) is not available"
   },
   {
    "key": "fractions:write_fraction",
    "step": "Y3.B6.S1",
    "action": "partial",
-   "why": "writes the fraction shaded, but non-unit fractions (3/5, 2/3) are most of the items; unit fractions only are not available"
+   "why": "writes the fraction shaded, but non-unit fractions (3/5, 2/3) are most of the items; unit fractions only are not available",
+   "partial": "writes the fraction shaded, but non-unit fractions (3/5, 2/3) are most of the items; unit fractions only are not available"
   },
   {
    "key": "fractions:compare",
    "step": "Y3.B6.S2",
    "action": "partial",
-   "why": "compares any two fractions (2/6 and 7/8); a page of unit fractions only is not available"
+   "opts": {
+    "forms": [
+     0
+    ]
+   },
+   "why": "compares any two fractions (2/6 and 7/8); a page of unit fractions only is not available",
+   "partial": "compares any two fractions (2/6 and 7/8); a page of unit fractions only is not available"
   },
   {
    "key": "fractions:order_fractions",
    "step": "Y3.B6.S2",
    "action": "partial",
-   "why": "orders non-unit fractions too"
+   "why": "orders non-unit fractions too",
+   "partial": "orders non-unit fractions too"
   },
   {
    "key": "fractions:compare",
    "step": "Y3.B6.S5",
    "action": "partial",
-   "why": "forms [1] mixes same-denominator pairs (3/10, 9/10) with others (5/8, 1/3)"
+   "opts": {
+    "forms": [
+     1
+    ]
+   },
+   "why": "forms [1] mixes same-denominator pairs (3/10, 9/10) with others (5/8, 1/3)",
+   "partial": "forms [1] mixes same-denominator pairs (3/10, 9/10) with others (5/8, 1/3)"
   },
   {
    "key": "fractions:order_fractions",
    "step": "Y3.B6.S5",
    "action": "partial",
-   "why": "mixed denominators"
+   "why": "mixed denominators",
+   "partial": "mixed denominators"
   },
   {
    "key": "measurement:mass_volume_liquid",
    "step": "Y3.B7.S1",
    "action": "partial",
-   "why": "reads one kind of scale each; scales with different intervals are not dealt"
+   "opts": {
+    "forms": [
+     0,
+     1
+    ]
+   },
+   "why": "reads one kind of scale each; scales with different intervals are not dealt",
+   "partial": "reads one kind of scale each; scales with different intervals are not dealt"
   },
   {
    "key": "measurement:mass_volume_liquid",
    "step": "Y3.B7.S2",
    "action": "partial",
-   "why": "grams on a scale, but some items ask the mass in kg (answer 0) on the same scale"
+   "opts": {
+    "forms": [
+     1
+    ]
+   },
+   "why": "grams on a scale, but some items ask the mass in kg (answer 0) on the same scale",
+   "partial": "grams on a scale, but some items ask the mass in kg (answer 0) on the same scale"
   },
   {
    "key": "measurement:mass_volume_liquid",
    "step": "Y3.B7.S3",
    "action": "partial",
-   "why": "g or kg alone; mixed kg and g readings are not dealt"
+   "opts": {
+    "forms": [
+     1
+    ]
+   },
+   "why": "g or kg alone; mixed kg and g readings are not dealt",
+   "partial": "g or kg alone; mixed kg and g readings are not dealt"
   },
   {
    "key": "measurement:unit_conversions",
@@ -12363,25 +12542,49 @@
    "key": "measurement:heavier_lighter_visual",
    "step": "Y3.B7.S5",
    "action": "partial",
-   "why": "pictured objects; comparing masses in g and kg with <, > and = is not dealt"
+   "why": "pictured objects; comparing masses in g and kg with <, > and = is not dealt",
+   "partial": "pictured objects; comparing masses in g and kg with <, > and = is not dealt"
   },
   {
    "key": "measurement:mass_volume_liquid",
    "step": "Y3.B7.S8",
    "action": "partial",
-   "why": "millilitres only; mixed l and ml readings are not dealt"
+   "opts": {
+    "forms": [
+     0
+    ]
+   },
+   "why": "millilitres only; mixed l and ml readings are not dealt",
+   "partial": "millilitres only; mixed l and ml readings are not dealt"
   },
   {
    "key": "measurement:capacity",
    "step": "Y3.B7.S9",
    "action": "partial",
-   "why": "L ↔ mL but with decimals (1.5 L), above the step; mixed units (1 l 500 ml) are not dealt"
+   "opts": {
+    "units": [
+     1
+    ],
+    "forms": [
+     0
+    ]
+   },
+   "why": "L ↔ mL but with decimals (1.5 L), above the step; mixed units (1 l 500 ml) are not dealt",
+   "partial": "L ↔ mL but with decimals (1.5 L), above the step; mixed units (1 l 500 ml) are not dealt"
   },
   {
    "key": "fraction_operations:add_fractions_like",
    "step": "Y3.B8.S1",
    "action": "partial",
-   "why": "sums pass one whole (4/5 + 2/5 = 1 1/5), above the step; adding within a whole only is not available"
+   "opts": {
+    "denoms": [
+     2,
+     3,
+     5
+    ]
+   },
+   "why": "sums pass one whole (4/5 + 2/5 = 1 1/5), above the step; adding within a whole only is not available",
+   "partial": "sums pass one whole (4/5 + 2/5 = 1 1/5), above the step; adding within a whole only is not available"
   },
   {
    "key": "fraction_operations:add_frac_like_nv",
@@ -12393,55 +12596,94 @@
    "key": "fraction_operations:sub_fractions_like",
    "step": "Y3.B8.S2",
    "action": "partial",
-   "why": "subtracts within a whole with a bar picture, but \"differences less than 1/2\" sort items are mixed in; a page of subtraction only is not available"
+   "opts": {
+    "denoms": [
+     2,
+     3,
+     5
+    ]
+   },
+   "why": "subtracts within a whole with a bar picture, but \"differences less than 1/2\" sort items are mixed in; a page of subtraction only is not available",
+   "partial": "subtracts within a whole with a bar picture, but \"differences less than 1/2\" sort items are mixed in; a page of subtraction only is not available"
   },
   {
    "key": "fraction_operations:sub_frac_like_nv",
    "step": "Y3.B8.S2",
    "action": "partial",
-   "why": "forms [0] is plain subtraction, but the compare-to-1/2 sort items are still mixed in and the families deal eighths and tenths"
+   "opts": {
+    "denoms": [
+     2,
+     3,
+     5
+    ],
+    "forms": [
+     0
+    ]
+   },
+   "why": "forms [0] is plain subtraction, but the compare-to-1/2 sort items are still mixed in and the families deal eighths and tenths",
+   "partial": "forms [0] is plain subtraction, but the compare-to-1/2 sort items are still mixed in and the families deal eighths and tenths"
   },
   {
    "key": "fractions:fraction_of_set",
    "step": "Y3.B8.S4",
    "action": "partial",
-   "why": "mixes non-unit fractions (3/5 of the cats) and ignores denoms in missing-numerator items (generator bug); a page of unit fractions of a set is not available"
+   "why": "mixes non-unit fractions (3/5 of the cats) and ignores denoms in missing-numerator items (generator bug); a page of unit fractions of a set is not available",
+   "partial": "mixes non-unit fractions (3/5 of the cats) and ignores denoms in missing-numerator items (generator bug); a page of unit fractions of a set is not available"
   },
   {
    "key": "fractions:fraction_of_set",
    "step": "Y3.B8.S5",
    "action": "partial",
-   "why": "mixes unit fractions (1/5 of 60) and missing-numerator items, and ignores denoms there (generator bug); a page of non-unit fractions of a set (3/5 of 20) is not available"
+   "why": "mixes unit fractions (1/5 of 60) and missing-numerator items, and ignores denoms there (generator bug); a page of non-unit fractions of a set (3/5 of 20) is not available",
+   "partial": "mixes unit fractions (1/5 of 60) and missing-numerator items, and ignores denoms there (generator bug); a page of non-unit fractions of a set (3/5 of 20) is not available"
   },
   {
    "key": "fractions:fraction_of_set_nv",
    "step": "Y3.B8.S5",
    "action": "partial",
-   "why": "mixes unit and non-unit fractions, without the set pictured"
+   "why": "mixes unit and non-unit fractions, without the set pictured",
+   "partial": "mixes unit and non-unit fractions, without the set pictured"
   },
   {
    "key": "measurement:money_notation",
    "step": "Y3.B9.S2",
-   "action": "add",
-   "why": "partial: writes \"7 dollars 5 cents\" or \"75 cents\" as $7.05 / $0.75; converting a number of cents to dollars and cents and back (345 cents = $3.45, $2.10 = 210 cents) is not dealt"
+   "action": "partial",
+   "opts": {
+    "currency": "usd",
+    "task": "words"
+   },
+   "why": "writes \"7 dollars 5 cents\" or \"75 cents\" as $7.05 / $0.75; converting a number of cents to dollars and cents and back (345 cents = $3.45, $2.10 = 210 cents) is not dealt",
+   "partial": "writes \"7 dollars 5 cents\" or \"75 cents\" as $7.05 / $0.75; converting a number of cents to dollars and cents and back (345 cents = $3.45, $2.10 = 210 cents) is not dealt"
   },
   {
    "key": "measurement:money_change",
    "step": "Y3.B9.S4",
    "action": "partial",
-   "why": "subtracts a price from a whole-dollar payment; subtracting any two amounts (a difference) is not dealt"
+   "opts": {
+    "currency": "usd",
+    "step": 5
+   },
+   "why": "subtracts a price from a whole-dollar payment; subtracting any two amounts (a difference) is not dealt",
+   "partial": "subtracts a price from a whole-dollar payment; subtracting any two amounts (a difference) is not dealt"
   },
   {
    "key": "angles_lines:identify_angles",
    "step": "Y3.B11.S3",
-   "action": "add",
-   "why": "partial: names one angle at a time as acute, right or obtuse (and also deals straight angles, above the step); comparing two angles, or an angle with a right angle, using a right-angle tester is not dealt"
+   "action": "partial",
+   "opts": {
+    "forms": [
+     0
+    ]
+   },
+   "why": "names one angle at a time as acute, right or obtuse (and also deals straight angles, above the step); comparing two angles, or an angle with a right angle, using a right-angle tester is not dealt",
+   "partial": "names one angle at a time as acute, right or obtuse (and also deals straight angles, above the step); comparing two angles, or an angle with a right angle, using a right-angle tester is not dealt"
   },
   {
    "key": "measurement:reading_ruler",
    "step": "Y3.B11.S4",
    "action": "partial",
-   "why": "reads an INCH ruler; drawing a line of a given length and measuring in mm are not dealt"
+   "why": "reads an INCH ruler; drawing a line of a given length and measuring in mm are not dealt",
+   "partial": "reads an INCH ruler; drawing a line of a given length and measuring in mm are not dealt"
   }
  ],
  "retireBuilt": [
