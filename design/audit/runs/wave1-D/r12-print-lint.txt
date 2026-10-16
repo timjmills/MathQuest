@@ -1,196 +1,22 @@
-##### opts=default size=S
-ws-print-lint: source kit, 4 skill(s)
-  multiplication:area_model_mult: 2+1 pages, 0 finding(s)
-  multiplication:area_model_mult#more-practice: 4+2 pages, 0 finding(s)
-  multiplication:area_model_mult_hard: 2+1 pages, 0 finding(s)
-  multiplication:area_model_mult_hard#more-practice: 4+2 pages, 0 finding(s)
-  division:area_model_div_2by1: 2+1 pages, 0 finding(s)
-  division:area_model_div_2by1#more-practice: 4+2 pages, 0 finding(s)
-  division:area_model_div_3by1: 2+1 pages, 0 finding(s)
-  division:area_model_div_3by1#more-practice: 4+2 pages, 0 finding(s)
-
-document                                             pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT  result
-multiplication:area_model_mult                         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-multiplication:area_model_mult#more-practice           4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-multiplication:area_model_mult_hard                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-multiplication:area_model_mult_hard#more-practice      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_2by1                           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_2by1#more-practice             4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_3by1                           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_3by1#more-practice             4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-TOTAL                                                          .     .    .    .        .     .       .    .     .       .     .    .      .       .
-
-ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
-exit 0
-##### opts=default size=M
-ws-print-lint: source kit, 4 skill(s)
-  multiplication:area_model_mult: 2+1 pages, 0 finding(s)
-  multiplication:area_model_mult#more-practice: 4+2 pages, 0 finding(s)
-  multiplication:area_model_mult_hard: 2+1 pages, 0 finding(s)
-  multiplication:area_model_mult_hard#more-practice: 4+2 pages, 0 finding(s)
-  division:area_model_div_2by1: 2+1 pages, 0 finding(s)
-  division:area_model_div_2by1#more-practice: 4+2 pages, 0 finding(s)
-  division:area_model_div_3by1: 2+1 pages, 0 finding(s)
-  division:area_model_div_3by1#more-practice: 4+2 pages, 0 finding(s)
-
-document                                             pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT  result
-multiplication:area_model_mult                         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-multiplication:area_model_mult#more-practice           4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-multiplication:area_model_mult_hard                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-multiplication:area_model_mult_hard#more-practice      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_2by1                           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_2by1#more-practice             4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_3by1                           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_3by1#more-practice             4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-TOTAL                                                          .     .    .    .        .     .       .    .     .       .     .    .      .       .
-
-ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
-exit 0
-##### opts=default size=L
-ws-print-lint: source kit, 4 skill(s)
-  multiplication:area_model_mult: 2+1 pages, 0 finding(s)
-  multiplication:area_model_mult#more-practice: 4+2 pages, 0 finding(s)
-  multiplication:area_model_mult_hard: 2+1 pages, 0 finding(s)
-  multiplication:area_model_mult_hard#more-practice: 4+2 pages, 0 finding(s)
-  division:area_model_div_2by1: 2+1 pages, 0 finding(s)
-  division:area_model_div_2by1#more-practice: 4+2 pages, 0 finding(s)
-  division:area_model_div_3by1: 2+1 pages, 0 finding(s)
-  division:area_model_div_3by1#more-practice: 4+2 pages, 0 finding(s)
-
-document                                             pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT  result
-multiplication:area_model_mult                         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-multiplication:area_model_mult#more-practice           4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-multiplication:area_model_mult_hard                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-multiplication:area_model_mult_hard#more-practice      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_2by1                           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_2by1#more-practice             4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_3by1                           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_3by1#more-practice             4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-TOTAL                                                          .     .    .    .        .     .       .    .     .       .     .    .      .       .
-
-ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
-exit 0
-##### opts={"amEdges":"blank"} size=S
-ws-print-lint: source kit, 4 skill(s)
-  multiplication:area_model_mult: 2+1 pages, 0 finding(s)
-  multiplication:area_model_mult#more-practice: 4+2 pages, 0 finding(s)
-  multiplication:area_model_mult_hard: 2+1 pages, 0 finding(s)
-  multiplication:area_model_mult_hard#more-practice: 4+2 pages, 0 finding(s)
-  division:area_model_div_2by1: 2+1 pages, 0 finding(s)
-  division:area_model_div_2by1#more-practice: 4+2 pages, 0 finding(s)
-  division:area_model_div_3by1: 2+1 pages, 0 finding(s)
-  division:area_model_div_3by1#more-practice: 4+2 pages, 0 finding(s)
-
-document                                             pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT  result
-multiplication:area_model_mult                         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-multiplication:area_model_mult#more-practice           4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-multiplication:area_model_mult_hard                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-multiplication:area_model_mult_hard#more-practice      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_2by1                           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_2by1#more-practice             4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_3by1                           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_3by1#more-practice             4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-TOTAL                                                          .     .    .    .        .     .       .    .     .       .     .    .      .       .
-
-ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
-exit 0
-##### opts={"amEdges":"blank"} size=M
-ws-print-lint: source kit, 4 skill(s)
-  multiplication:area_model_mult: 2+1 pages, 0 finding(s)
-  multiplication:area_model_mult#more-practice: 4+2 pages, 0 finding(s)
-  multiplication:area_model_mult_hard: 2+1 pages, 0 finding(s)
-  multiplication:area_model_mult_hard#more-practice: 4+2 pages, 0 finding(s)
-  division:area_model_div_2by1: 2+1 pages, 0 finding(s)
-  division:area_model_div_2by1#more-practice: 4+2 pages, 0 finding(s)
-  division:area_model_div_3by1: 2+1 pages, 0 finding(s)
-  division:area_model_div_3by1#more-practice: 4+2 pages, 0 finding(s)
-
-document                                             pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT  result
-multiplication:area_model_mult                         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-multiplication:area_model_mult#more-practice           4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-multiplication:area_model_mult_hard                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-multiplication:area_model_mult_hard#more-practice      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_2by1                           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_2by1#more-practice             4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_3by1                           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_3by1#more-practice             4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-TOTAL                                                          .     .    .    .        .     .       .    .     .       .     .    .      .       .
-
-ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
-exit 0
-##### opts={"amEdges":"blank"} size=L
-ws-print-lint: source kit, 4 skill(s)
-  multiplication:area_model_mult: 2+1 pages, 0 finding(s)
-  multiplication:area_model_mult#more-practice: 4+2 pages, 0 finding(s)
-  multiplication:area_model_mult_hard: 2+1 pages, 0 finding(s)
-  multiplication:area_model_mult_hard#more-practice: 4+2 pages, 0 finding(s)
-  division:area_model_div_2by1: 2+1 pages, 0 finding(s)
-  division:area_model_div_2by1#more-practice: 4+2 pages, 0 finding(s)
-  division:area_model_div_3by1: 2+1 pages, 0 finding(s)
-  division:area_model_div_3by1#more-practice: 4+2 pages, 0 finding(s)
-
-document                                             pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT  result
-multiplication:area_model_mult                         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-multiplication:area_model_mult#more-practice           4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-multiplication:area_model_mult_hard                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-multiplication:area_model_mult_hard#more-practice      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_2by1                           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_2by1#more-practice             4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_3by1                           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_3by1#more-practice             4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-TOTAL                                                          .     .    .    .        .     .       .    .     .       .     .    .      .       .
-
-ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
-exit 0
-##### opts={"amEdges":"mixed"} size=S
-ws-print-lint: source kit, 4 skill(s)
-  multiplication:area_model_mult: 2+1 pages, 0 finding(s)
-  multiplication:area_model_mult#more-practice: 4+2 pages, 0 finding(s)
-  multiplication:area_model_mult_hard: 2+1 pages, 0 finding(s)
-  multiplication:area_model_mult_hard#more-practice: 4+2 pages, 0 finding(s)
-  division:area_model_div_2by1: 2+1 pages, 0 finding(s)
-  division:area_model_div_2by1#more-practice: 4+2 pages, 0 finding(s)
-  division:area_model_div_3by1: 2+1 pages, 0 finding(s)
-  division:area_model_div_3by1#more-practice: 4+2 pages, 0 finding(s)
-
-document                                             pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT  result
-multiplication:area_model_mult                         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-multiplication:area_model_mult#more-practice           4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-multiplication:area_model_mult_hard                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-multiplication:area_model_mult_hard#more-practice      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_2by1                           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_2by1#more-practice             4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_3by1                           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_3by1#more-practice             4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-TOTAL                                                          .     .    .    .        .     .       .    .     .       .     .    .      .       .
-
-ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
-exit 0
-##### opts={"amEdges":"mixed"} size=M
-ws-print-lint: source kit, 4 skill(s)
-  multiplication:area_model_mult: 2+1 pages, 0 finding(s)
-  multiplication:area_model_mult#more-practice: 4+2 pages, 0 finding(s)
-  multiplication:area_model_mult_hard: 2+1 pages, 0 finding(s)
-  multiplication:area_model_mult_hard#more-practice: 4+2 pages, 0 finding(s)
-  division:area_model_div_2by1: 2+1 pages, 0 finding(s)
-  division:area_model_div_2by1#more-practice: 4+2 pages, 0 finding(s)
-  division:area_model_div_3by1: 2+1 pages, 0 finding(s)
-  division:area_model_div_3by1#more-practice: 4+2 pages, 0 finding(s)
-
-document                                             pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT  result
-multiplication:area_model_mult                         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-multiplication:area_model_mult#more-practice           4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-multiplication:area_model_mult_hard                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-multiplication:area_model_mult_hard#more-practice      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_2by1                           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_2by1#more-practice             4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_3by1                           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-division:area_model_div_3by1#more-practice             4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
-TOTAL                                                          .     .    .    .        .     .       .    .     .       .     .    .      .       .
-
-ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
-exit 0
-##### opts={"amEdges":"mixed"} size=L
-ws-print-lint: source kit, 4 skill(s)
-  multiplication:area_model_mult: 2+1 pages, 0 finding(s)
-  multiplication:area_model_mult#more-practice: 4+2 pages, 0 finding(s)
+o1 S opts={} exit=0 :: ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
+o1 M opts={} exit=0 :: ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
+o1 L opts={} exit=0 :: ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
+o2 S opts={"amEdges":"blank"} exit=0 :: ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
+o2 M opts={"amEdges":"blank"} exit=0 :: ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
+o2 L opts={"amEdges":"blank"} exit=0 :: ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
+o3 S opts={"amEdges":"mixed"} exit=0 :: ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
+o3 M opts={"amEdges":"mixed"} exit=0 :: ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
+o3 L opts={"amEdges":"mixed"} exit=0 :: ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
+o4 S opts={"amForm":["long"]} exit=0 :: ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
+o4 M opts={"amForm":["long"]} exit=0 :: ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
+o4 L opts={"amForm":["long"]} exit=0 :: ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
+o5 S opts={"amForm":["fraction"]} exit=0 :: ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
+o5 M opts={"amForm":["fraction"]} exit=0 :: ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
+o5 L opts={"amForm":["fraction"]} exit=0 :: ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
+o6 S opts={"amEdges":"mixed","amForm":["sign","long","fraction"]} exit=0 :: ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
+o6 M opts={"amEdges":"mixed","amForm":["sign","long","fraction"]} exit=0 :: ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
+o6 L opts={"amEdges":"mixed","amForm":["sign","long","fraction"]} exit=0 :: ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
+o7 S opts={"amEdges":"blank","amForm":["long","fraction"]} exit=0 :: ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
+o7 M opts={"amEdges":"blank","amForm":["long","fraction"]} exit=0 :: ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
+o7 L opts={"amEdges":"blank","amForm":["long","fraction"]} exit=0 :: ws-print-lint: OK (8 document(s), source kit; 0 finding(s) in 0 document(s))
+ALLDONE
