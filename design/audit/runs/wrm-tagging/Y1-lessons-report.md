@@ -184,7 +184,7 @@ counts the sides and vertices of a square and a rectangle, but nothing compares 
 | lesson tagFixes | 0 |
 | ws-wrm-extract --check --site … | exit 0 |
 | ws-boot-smoke | OK |
-| two clean `git archive` builds of the commit (dump.mjs → gen.py → Y1/build.py) | byte-identical to each other and to the committed file (sha256 in the commit message's report line) |
+| two clean `git archive` builds of the commit (dump.mjs → gen.py → Y1/build.py) | byte-identical to each other and to the committed file (Y1.json sha256 66ba2bb55935344a…); p4 targets classify_count_all (cuboid_find is withdrawn) |
 
 **Mutations.** `lessonmut.py` (the builder's own): **59, 0 missed** — A (lessonfit): the 41 of round 1 plus NOPIC (lesson 12
 clause re-injected), ASKED (lesson 24 clause re-injected), share (lesson 25 related re-injected), column (a related "in a column"
