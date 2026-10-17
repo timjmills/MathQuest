@@ -2,8 +2,10 @@
 Owner rule 2026-10-16 (every site lesson tagged). Y1's WRM steps passed the R/Y1 lane's critic r12 and are FROZEN: the steps,
 the tagFixes and every step proposal stay byte for byte as the R/Y1 lane wrote them.
 
-Order of the two builds (documented, the lead's rule):
-  1. tests/scripts/wrm-tagging/gen.py (the R/Y1 lane's generator, with spec.py) writes R.json and Y1.json WITHOUT a lessons section
+Order of the builds (documented, the lead's rule; lessons critic r1 D1: in a clean `git archive` tree gen.py needs dump.json and
+bl.json, which only dump.mjs writes, so it runs first):
+  0. node tests/scripts/wrm-tagging/dump.mjs          (writes tests/scripts/wrm-tagging/dump.json and bl.json)
+  1. python3 tests/scripts/wrm-tagging/gen.py <repo root> (the R/Y1 lane's generator, with spec.py) writes R.json and Y1.json WITHOUT a lessons section
      (a rerun overwrites it);
   2. THIS build runs LAST: python3 tests/scripts/wrm-tagging/Y1/build.py
 It reads Y1.json, strips anything a previous run of this build added (the lessons section, the lesson-only proposals, a base
@@ -15,7 +17,8 @@ Inputs: spec_lessons.py (the 39 lessons), lessons.py (shape, checks, proposals; 
 phases of the Support lessons), R.json (the R lane's proposals, reused verbatim), live keys / proposals / SKILL_WRM (keys.mjs) and
 the Kindergarten school weeks (prior.mjs), both regenerated into a scratch dir ($WRM_TAG_DATA or a fresh temp dir).
 Gates, all must be 0: the frozen gate (before and after writing), the lesson checks of lessons.py, lessonspec.py (the written
-file's links are the spec's), lessonfit.mjs (every link judged from generated items), mergecheck.mjs (Y1 alone, then with
+file's links are the spec's), lessoncheck.py (the lesson rules re-run on the WRITTEN file and every lesson field / proposal lesson
+field equal to the snapshot finish() returned, critic r1 G1; full_audit.json holds a hand-audit row per FULL lesson, G4), lessonfit.mjs (every link judged from generated items), mergecheck.mjs (Y1 alone, then with
 R, Y2, Y3, Y4, Y5, Y6 in the repo, one by one, then all at once).
 usage: python3 tests/scripts/wrm-tagging/Y1/build.py [--no-fit]      (lessonmut.py also uses --spec <file> --dry and --frozen-check <file>)
 """
@@ -76,6 +79,12 @@ ns['setup'](ns)
 exec(compile(open(SPEC_FILE).read(), 'spec_lessons.py', 'exec'), ns)
 out = copy.deepcopy(base)
 lessons, SPEC = ns['finish'](out['steps'], out['proposals'], out['tagFixes'], props, keys, titles, wk, order, errs)
+# lessons critic r1 G1: the snapshot of every lesson field and every proposal's lesson fields, taken from finish()'s own result before
+# anything is assigned into the output; lessoncheck.py compares the WRITTEN file with it (and re-runs the lesson rules on it)
+def _plf(p): return {'lessons': copy.deepcopy(p.get('lessons')), 'lessonCloses': copy.deepcopy(p.get('lessonCloses')),
+                     'closes': {k: v for k, v in p['closes'].items() if '|-|' in k} if isinstance(p.get('closes'), dict) else None}
+SNAP = {'lessons': copy.deepcopy(lessons), 'newIds': sorted(ns['LNEW']),
+        'proposals': {pid: _plf(p) for pid, p in out['proposals'].items() if p.get('lessons') or p.get('lessonCloses') or (isinstance(p.get('closes'), dict) and any('|-|' in k for k in p['closes']))}}
 out['lessons'] = lessons
 if errs:
     print('\n'.join(errs)); sys.exit(f'build: {len(errs)} errors')
@@ -93,6 +102,8 @@ def run(cmd, name):
     if r.returncode:
         print(r.stdout[-6000:], r.stderr[-2000:]); fails += 1
 run([sys.executable, os.path.join(H, 'lessonspec.py'), OUT, spec_path], 'lessonspec')
+snap_path = os.path.join(DATA, 'lesson-snapshot.json'); json.dump(SNAP, open(snap_path, 'w'), ensure_ascii=False, indent=1)
+run([sys.executable, os.path.join(H, 'lessoncheck.py'), OUT, snap_path], 'lessoncheck')
 L = R + 'data/curriculum/links/'
 run(['node', os.path.join(H, 'mergecheck.mjs'), OUT], 'mergecheck Y1')
 for y in ('R', 'Y2', 'Y3', 'Y4', 'Y5', 'Y6'): run(['node', os.path.join(H, 'mergecheck.mjs'), OUT, L + f'{y}.json'], f'mergecheck Y1+{y}')

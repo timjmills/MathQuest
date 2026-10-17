@@ -4,6 +4,8 @@ CAUGHT by that gate's own message (the Y6 lane's lessonmut.py, for the Kindergar
   B. build.py --spec <mutated spec> --dry: the lesson checks of lessons.py (verdict shape, rule 15, related citing, class F keys …)
   C. lessonspec.py: a re-option after finish(); build.py --frozen-check: a frozen step / tagFix / step proposal changed;
      mergecheck.mjs: a tagFix that names a lesson
+  D. lessoncheck.py (lessons critic r1 G1): edits to the WRITTEN file after finish() (the critic's p1-p8 and more) against the
+     snapshot of the unmutated file
 usage: python3 tests/scripts/wrm-tagging/Y1/lessonmut.py      (exit 1 if any mutation is missed)"""
 import json, copy, subprocess, os, sys, tempfile, re
 H = os.path.dirname(os.path.abspath(__file__))
@@ -60,11 +62,25 @@ def _(d): L(d, 'compositionof4and5bonds')['pre'].append({'key': 'composing:numbe
 @m('DUP: two related links with the same items', r'duplicate')
 def _(d): L(d, 'takingaway')['related'].append(copy.deepcopy(L(d, 'takingaway')['related'][0]) | {'why': 'joining two groups again'})
 @m('M: a clause denies what compose_shapes shapes=1 "A square or a rectangle" deals, and no link uses it', r'^M: ')
-def _(d): L(d, 'shapeswith4sidessquaresandrectangles')['partial'][0]['missing'] = 'clicks every square or rectangle; never counts the 4 sides and 4 corners that make it a square or a rectangle'; L(d, 'shapeswith4sidessquaresandrectangles')['related'][0]['opts'] = {'shapes': [0]}
+def _(d): l = L(d, 'shapeswith4sidessquaresandrectangles'); l['partial'][0]['missing'] = 'clicks every square or rectangle; never counts the 4 sides and 4 corners that make it a square or a rectangle'; l['related'][0]['opts'] = {'shapes': [0]}; l['note'] = l['note'].replace('compose_shapes', 'the composing skill')
 @m('TITLEREP FULL: 3-D lesson made full (the cuboid is never asked)', r'TITLEREP FULL.*cuboid')
 def _(d): l = L(d, '3dshapescubecuboidsphereconecylinder'); l.update(verdict='full', missing='', build=[], direct=[{'key': 'shapes_early:name_3d_shapes', 'opts': {'forms': [1]}}], partial=[])
 @m('TITLEREP CLAUSE: vertical lesson clause never names the vertical form', r'TITLEREP CLAUSE.*vertically')
-def _(d): l = L(d, 'addandsubtractwithin5writtenverticallycolumnform'); l['missing'] = 'addition and subtraction facts within 5'; l['partial'] = [{'key': 'subtraction:sub_5_pictures', 'missing': 'take away from 5 with pictures; adds too'}]
+def _(d): l = L(d, 'addandsubtractwithin5writtenverticallycolumnform'); l.update(verdict='partial', direct=[], build=['add_10_pictures'], missing='addition and subtraction facts within 5', partial=[{'key': 'addition:add_facts', 'opts': {'notation': ['across'], 'band': 5}, 'missing': 'addition facts within 5; never a subtraction'}])
+@m('G2 NOPIC: lesson 12 clause "told in words, no pictures to count" (the story cell pictures both groups)', r'says no pictures, but')
+def _(d): L(d, 'combining2groups')['partial'][1]['missing'] = 'combine and add-more stories with totals to 7, told in words, no pictures to count'
+@m('G2 ASKED: lesson 24 clause "clicks every ... rectangular prism" (the prism is only drawn)', r'asked for the cuboid')
+def _(d): L(d, 'deepeningunderstandingconsolidate2d3dshapes')['partial'][1]['missing'] = 'clicks every sphere, cylinder, cube, cone or rectangular prism among other solids; never links a solid to its flat faces'
+@m('G2 share: lesson 25 related share_into_groups band 12 why "sharing a group equally" (the items group)', r'why says "sharing"')
+def _(d): L(d, 'doublingupto55')['related'] = [{'key': 'division:share_into_groups', 'opts': {'band': 12}, 'why': 'sharing a group equally: the inverse of doubling'}]
+@m('G3 column: lesson 22 related add_facts across band 5 why "written in a column"', r'why says column but no item is in columns')
+def _(d): L(d, 'compositionof4and5bonds')['related'].append({'key': 'addition:add_facts', 'opts': {'notation': ['across'], 'band': 5}, 'why': 'facts within 5 written in a column'})
+@m('G5 bound: lesson 9 pre number_bonds why "(wholes to 20)" on band 10', r'says "wholes to 20" but the largest number dealt is')
+def _(d): L(d, 'bondsto10explorecombinationsthatmake10')['pre'][0]['why'] += ' (wholes to 20)'
+@m('G4 FULLAUDIT: lesson 26 made FULL (no hand-audit row against K.G.A.2)', r'FULLAUDIT: full, but no hand-audit row')
+def _(d): l = L(d, 'explore2dshapescircletrianglerectanglesquare'); l.update(verdict='full', missing='', build=[], envision=[], direct=[{'key': 'shapes_early:name_2d_shapes', 'opts': {'forms': [1], 'shapes': [0, 1, 2]}}], partial=[])
+@m('G4 FULLAUDIT: lesson 5 direct re-optioned away from its audit row', r"FULLAUDIT: the audit row's links")
+def _(d): L(d, '3dshapescubecuboidsphereconecylinder')['direct'] = [{'key': 'shapes_early:name_3d_shapes', 'opts': {'forms': [0]}}]
 @m('RANGE full: 1-2-3 lesson made full on number_bonds band 5', r'RANGE: full')
 def _(d): l = L(d, 'compositionof123partsmakethewhole'); l.update(verdict='full', missing='', build=[], direct=[{'key': 'composing:number_bonds', 'opts': {'band': 5}}], partial=[])
 @m('RANGE partial: clause silent on numbers past the lesson', r'RANGE: \d+ items')
@@ -86,7 +102,7 @@ for name, target, f in M:
 SPEC = open(os.path.join(H, 'spec_lessons.py')).read()
 B = [('full with a build', "    direct=[('composing:make_ten', {'band': 10})],\n    verdict='full',", "    direct=[('composing:make_ten', {'band': 10})],\n    verdict='full', build=['number_focus'],", r'full but build'),
      ('rule 15: 2 pre, no "Pre-skills are few"', "         ('comparing:compare_groups', {'band': 5, 'level': [1]}, 'R.B1.S7', 'fewer: none is the fewest of all')],", "         ],", r'rule 15'),
-     ('related cites a step (belongs in pre)', "related=[('subtraction:sub_5_pictures', {}, 'taking away from 5 and saying how many are left')]", "related=[('subtraction:sub_5_pictures', {}, 'R.B14.S3 taking away from 5 and saying how many are left')]", r'belongs in pre'),
+     ('related cites a step (belongs in pre)', "related=[('addition:add_5_pictures', {}, 'the inverse: join two groups and say how many in all')]", "related=[('addition:add_5_pictures', {}, 'R.B9.S9 the inverse: join two groups and say how many in all')]", r'belongs in pre'),
      ('class F key: a pre repeats the partial key', "    pre=[('counting:count_sequence', {'band': 10, 'dir': 'back'}, 'R.B11.S6', 'one less: taking one away'),", "    pre=[('subtraction:sub_5_pictures', {'objects': 'pictures'}, 'R.B11.S6', 'one less: taking one away'),", r'class F'),
      ('unknown skill key', "('composing:make_ten', {'band': 5}, 'how many more make 5: the missing part of a fact within 5')", "('composing:make_eleven', {'band': 5}, 'how many more make 5')", r'unknown or retired'),
      ('closes names a proposal outside the build', "    closes={'sort_groups': 'sorting every object", "    closes={'nl_20': 'x', 'sort_groups': 'sorting every object", r'not its build'),
@@ -127,6 +143,35 @@ d = copy.deepcopy(base); del d['lessons'][K + 'takingaway']; json.dump(d, open(p
 r = subprocess.run(['node', os.path.join(H, 'mergecheck.mjs'), p], capture_output=True, text=True)
 ok = r.returncode == 1 and 'site lesson not in the lessons section' in r.stdout; missed += 0 if ok else 1
 print(f"{'CAUGHT' if ok else 'MISSED'} exit {r.returncode} | C mergecheck: a site lesson missing from the section")
-n = len(M) + len(B) + 1 + 4 + 2
+# ── D. lessoncheck.py (critic r1 G1): an edit made after finish(), on the written file, against the snapshot finish() returned ──
+def _plf(p): return {'lessons': copy.deepcopy(p.get('lessons')), 'lessonCloses': copy.deepcopy(p.get('lessonCloses')),
+                     'closes': {k: v for k, v in p['closes'].items() if '|-|' in k} if isinstance(p.get('closes'), dict) else None}
+SN = os.path.join(TMP, 'snap.json')
+json.dump({'lessons': base['lessons'], 'newIds': sorted(q for q, p in base['proposals'].items() if p.get('reused') is False and not p.get('steps') and p.get('lessons')),
+           'proposals': {q: _plf(p) for q, p in base['proposals'].items() if p.get('lessons') or p.get('lessonCloses') or (isinstance(p.get('closes'), dict) and any('|-|' in k for k in p['closes']))}},
+          open(SN, 'w'), ensure_ascii=False)
+def _p7(d): L(d, 'bondsto10explorecombinationsthatmake10')['build'] = ['zero']
+def _p4(d):
+    q = [x for x in d['proposals'] if (d['proposals'][x].get('lessons') or []) and d['proposals'][x].get('reused') is False and not d['proposals'][x].get('steps')][0]
+    d['proposals'][q]['lessons'] = []
+D = [('p1 re-option of lesson 39 pre count_sequence to band 20', lambda d: L(d, 'takingaway')['pre'][0]['opts'].update(band=20)),
+     ('p2 lesson 26 verdict flipped to full', lambda d: L(d, 'explore2dshapescircletrianglerectanglesquare').update(verdict='full')),
+     ('p3 zero.lessonCloses[introducingzero] = "counting to 100"', lambda d: d['proposals']['zero'].setdefault('lessonCloses', {}).update({K + 'introducingzero': 'counting to 100'})),
+     ('p4 a lesson-only proposal\'s lessons emptied', _p4),
+     ('p5 lesson 39 missing changed', lambda d: L(d, 'takingaway').update(missing='taking away from 20 with a number line')),
+     ('p7 FULL lesson 9 given build zero', _p7),
+     ('p8 lesson 39 pre why "wholes to 100"', lambda d: L(d, 'takingaway')['pre'][1].update(why=L(d, 'takingaway')['pre'][1]['why'] + ' (wholes to 100)')),
+     ('a lesson note changed', lambda d: L(d, 'makingpairs').update(note='x')),
+     ('an envision closes changed', lambda d: L(d, 'takingaway')['envision'][0].update(closes='y')),
+     ('a FULL lesson\'s audit row: lesson 1 back to partial with its row kept', lambda d: L(d, 'addandsubtractwithin5writtenverticallycolumnform').update(verdict='partial'))]
+r0 = subprocess.run([sys.executable, os.path.join(H, 'lessoncheck.py'), Y1, SN], capture_output=True, text=True)
+ok = r0.returncode == 0; missed += 0 if ok else 1
+print(f"{'OK    ' if ok else 'FAILED'} exit {r0.returncode} | D lessoncheck: the built file passes unmutated")
+for name, f in D:
+    d = copy.deepcopy(base); f(d); json.dump(d, open(p, 'w'), ensure_ascii=False)
+    r = subprocess.run([sys.executable, os.path.join(H, 'lessoncheck.py'), p, SN], capture_output=True, text=True)
+    ok = r.returncode == 1; missed += 0 if ok else 1
+    print(f"{'CAUGHT' if ok else 'MISSED'} exit {r.returncode} | D lessoncheck: {name}\n      {r.stdout.strip().splitlines()[:1]}")
+n = len(M) + len(B) + 1 + 4 + 2 + 1 + len(D)
 print(f'lessonmut: {n} mutations, {missed} missed')
 sys.exit(1 if missed else 0)

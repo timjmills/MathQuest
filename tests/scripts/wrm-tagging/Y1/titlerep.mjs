@@ -82,6 +82,10 @@ const story = i => (i.text || '').split(/\s+/).length >= 9 && /\?/.test(i.text |
 // usAdaptation lists $1 with the bills), so the pound coins of the UK title are dollar bills, not cent coins
 export const usTitle = t => String(t).replace(TITLE_SKIP, ' ').replace(/\bpounds \(notes and coins\)/gi, 'dollars (bills)').replace(/\bpounds\b/gi, 'dollars').replace(/\bpound\b/gi, 'dollar').replace(/\bpence\b/gi, 'cents').replace(/\bnotes\b/gi, 'bills').replace(/£/g, '$');
 
+// lessons critic r1 G3: an item written in columns: the kit's stack cell, the fact cell with notation vertical (add_facts / sub_facts
+// {notation:[stacked]}), the legacy facts-column-visual, or a stack / column-addition visual
+export const isColumnItem = i => i.tpl === 'stack' || (i.tpl === 'fact' && /"notation":"vertical"/.test(i.pay || ''))
+  || /facts-column-visual|column (?:addition|subtraction)|stacked/i.test(`${i.vis || ''} ${i.raw || ''}`);
 // a multiplication grid (mult-grid payload rows / cols / blanks): every blank is a fact of the table n
 const gridHit = (i, n) => { if (n == null || i.tpl !== 'mult-grid') return false; try { const p = JSON.parse(i.pay), b = p.blanks || []; return b.length > 0 && b.filter(([r, c]) => p.rows[r] === n || p.cols[c] === n).length >= Math.ceil(b.length / 3); } catch { return false; } };
 // the claims a title makes, judged on items: [{claim, word, hit, n, ok}]
@@ -147,7 +151,7 @@ export const Y6_TITLE_CLAIMS = [
   { re: /\bword form\b/i, n: 'word form', s: 0.2, test: i => /\b(?:one|two|three|four|five|six|seven|eight|nine|ten|hundred|thousand)(?:th|ths)?\b/i.test(T(i)), named: /\bwords?\b/i },
   { re: /\bdigit values?\b|\b10 times\b/i, n: '10 times / 1/10 of', s: 0.3, test: i => /\b10 times\b|\bten times\b|\b1\/10\b|\bone tenth\b|×\s*10\b|÷\s*10\b/i.test(T(i)), named: /\b10 times\b|\bten times\b|\bcompar/i },
   // ---- Y1 (Kindergarten site lessons): each title word is a claim on the items a FULL lesson deals, or the clause must name it
-  { re: /written vertically|column form/i, n: 'written vertically (column form)', s: 0.5, test: i => i.tpl === 'stack' || /column (?:addition|subtraction)|stacked/i.test(`${i.vis || ''} ${i.raw || ''}`), named: /\bvertical|\bcolumn|\bstacked\b/i },
+  { re: /written vertically|column form/i, n: 'written vertically (column form)', s: 0.5, test: i => isColumnItem(i), named: /\bvertical|\bcolumn|\bstacked\b/i },
   { re: /\badd and subtract\b/i, n: 'subtracts as well as adds', s: 0.2, test: i => /−|(?<![a-z])-\s*\d|subtract|take away|left/i.test(i.text || ''), named: /\bsubtract|\btake away\b|\bboth operations\b/i },
   { re: /\badd and subtract\b/i, n: 'adds as well as subtracts', s: 0.2, test: i => /\+|\badd\b|in all/i.test(i.text || ''), named: /\badd|\bboth operations\b/i },
   { re: /\bfind the total\b/i, n: 'the total of the groups', s: 0.3, test: i => /\btotal\b|in all|altogether|how many (?:things|objects|pictures) are there/i.test(i.text || ''), named: /\btotal\b/i },
@@ -160,9 +164,11 @@ export const Y6_TITLE_CLAIMS = [
   { re: /\bpairs\b/i, n: 'pairs', s: 0.3, test: i => /\bpairs?\b|\bodd\b|\beven\b/i.test(`${i.text || ''} ${i.vis || ''}`), named: /\bpair/i },
   { re: /\bmore and less\b|\bone more\b|\b1 more\b/i, n: 'one more', s: 0.2, test: i => /\bmore\b|\bafter\b|\bnext\b/i.test(i.text || ''), named: /\bmore\b|\bafter\b/i },
   { re: /\bmore and less\b|\bone less\b|\b1 less\b/i, n: 'one less', s: 0.2, test: i => /\bless\b|\bbefore\b|\bfewer\b/i.test(i.text || ''), named: /\bless\b|\bbefore\b/i },
+  // lessons critic r1 G6 (seed robustness): a title listing five shapes, judged on the pooled items of two forms, gives each shape
+  // about a tenth of the items, so the floor is half that (one in twenty); a shape never asked still fails (0 items)
   ...[['cube', /\bcubes?\b/], ['cuboid', /\bcuboids?\b|rectangular prisms?/], ['sphere', /\bspheres?\b/], ['cone', /\bcones?\b/], ['cylinder', /\bcylinders?\b/],
       ['circle', /\bcircles?\b/], ['triangle', /\btriangles?\b/], ['rectangle', /\brectangles?\b/], ['square', /\bsquares?\b/]].map(([w, iw]) =>
-    ({ re: new RegExp(`(?:shapes|\\b2d|\\b3d|sides)[^]*\\b${w}s?\\b|\\b${w}s? and\\b|\\b${w}s?,`, 'i'), n: `asks for the ${w}`, s: 0.1, test: i => new RegExp(`(?:click|find|name|which|what|is it an?)[^.?]*${iw.source}`, 'i').test(i.text || '') || (iw.test(String(i.a || '')) && !/^\s*\[/.test(String(i.a || ''))), named: new RegExp(`\\b${w}`, 'i') })),
+    ({ re: new RegExp(`(?:shapes|\\b2d|\\b3d|sides)[^]*\\b${w}s?\\b|\\b${w}s? and\\b|\\b${w}s?,`, 'i'), n: `asks for the ${w}`, s: 0.05, test: i => new RegExp(`(?:click|find|name|which|what|is it an?)[^.?]*${iw.source}`, 'i').test(i.text || '') || (new RegExp(iw.source, 'i').test(String(i.a || '')) && !/^\s*\[/.test(String(i.a || ''))), named: new RegExp(`\\b${w}`, 'i') })),
   { re: /\bproperties\b/i, n: 'properties (sides, corners, curved or straight)', s: 0.5, test: i => /\bsides?\b|corners?|vert(?:ex|ices)|curved|straight|roll|stack/i.test(T(i)), named: /\bpropert|\bsides?\b|\bcorners?\b/i },
   ...['on', 'under', 'in', 'next to'].map(w => ({ re: new RegExp(`\\blanguage\\b.*\\b${w}\\b`, 'i'), n: `the position word "${w}"`, s: 0.1, test: i => new RegExp(`(?:^|[\\s;{"])${w}(?:$|[\\s;}"?.])`, 'i').test(`${i.a || ''} ; ${i.x || ''}`), named: new RegExp(`(?:^|[\\s,"(])${w}(?:$|[\\s,")])`, 'i') })),
   { re: /\bpositional language\b/i, n: 'positional words (in front, behind, on, under …)', s: 0.3, test: i => /\b(?:in front|behind|under|on top|inside|next to|beside|above|below|between)\b/i.test(`${i.a || ''} ${i.x || ''}`), named: /\bposition/i },

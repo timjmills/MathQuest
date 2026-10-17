@@ -1,0 +1,44 @@
+{
+ "_doc": "Lessons critic r1 G4: the hand audit of every FULL Y1 site lesson against its title AND every CCSS code the site tags it with (data/standards/ccss-math.json descriptors), read from generated items. lessoncheck.py and lessonfit.mjs read it: a FULL lesson with no row, a row whose links are not the lesson's direct links, a row missing one of the lesson's site CCSS codes, or a row for a lesson that is not FULL fails the build. A code the content does not teach is marked 'site tag:' with the reason (owner questions in the report).",
+ "K|-|addandsubtractwithin5writtenverticallycolumnform": {
+  "links": [{"key": "addition:add_facts", "opts": {"notation": ["stacked"], "band": 5}}, {"key": "subtraction:sub_facts", "opts": {"notation": ["stacked"], "band": 5}}],
+  "title": "Add and subtract within 5: add_facts deals + facts with sums 0 to 5 (0 + 4, 3 + 2) and sub_facts deals − facts from 5 or less (5 − 5, 3 − 2), every fact in reach; written vertically (column form): every item is in a column (add_facts: the fact cell with notation vertical; sub_facts: the column facts visual, facts-column-visual), the top number above the sign and the second number, a rule, one answer box; no carrying or borrowing row",
+  "ccss": {"K.OA.A.5": "Fluently add and subtract within 5: both operations, every sum and every number taken from at most 5, as fact practice (one fact a cell, answer recalled); standards-audit.js already rules K.OA.A.5 FULL on these two skills at band 5"}
+ },
+ "K|-|composeshapesfromsmallershapes": {
+  "links": [{"key": "shapes_early:compose_shapes", "opts": {}}, {"key": "shapes_early:compose_hexagon", "opts": {}}],
+  "title": "Compose shapes from smaller shapes: compose_shapes joins two drawn pieces and asks which shape they make (triangle, square, rectangle or hexagon); compose_hexagon fills a hexagon outline with pattern blocks",
+  "ccss": {"K.G.B.6": "Compose simple shapes to form larger shapes (two triangles with full sides touching make a rectangle): compose_shapes asks exactly that join, compose_hexagon fills a larger shape with smaller ones"}
+ },
+ "K|-|3dshapescubecuboidsphereconecylinder": {
+  "links": [{"key": "shapes_early:name_3d_shapes", "opts": {"forms": [0]}}, {"key": "shapes_early:name_3d_shapes", "opts": {"forms": [1]}}],
+  "title": "3D shapes (cube, cuboid, sphere, cone, cylinder): forms 0 shows one drawn solid and the pupil picks its name, all five named (the cuboid as Rectangular Prism, its US name: 14 of 60 items at seed 4111); forms 1 asks the pupil to click every sphere, cylinder, cube or cone among other solids",
+  "ccss": {"1.G.A.1": "site tag: the Grade 1 standard (defining versus non-defining attributes; build and draw shapes) is not this lesson's content. The lesson is the Reception step R.B12.S1 'Recognise and name 3-D shapes' under another title (full there on forms 1); naming the five solids is K.G.A.2 / K.G.A.3, which the two forms deal (owner question)"}
+ },
+ "K|-|bondsto10explorecombinationsthatmake10": {
+  "links": [{"key": "composing:make_ten", "opts": {"band": 10}}],
+  "title": "Bonds to 10, explore combinations that make 10: make_ten shows a ten frame with 1 to 9 counters and asks how many more make 10, every pair 1 + 9 to 9 + 1 dealt 5 to 7 times in 50 items",
+  "ccss": {"K.OA.A.4": "For any number from 1 to 9, find the number that makes 10, with a drawing: each item draws the frame with the given number and the pupil records the missing part",
+           "1.OA.C.6": "site tag: of the Grade 1 standard only its making-ten strategy is this lesson's content; adding and subtracting within 20 is not (the title bounds the lesson at 10, the Reception step R.B11.S8 'Bonds to 10 (2 parts)')"}
+ },
+ "K|-|compareamountsmorefewersame": {
+  "links": [{"key": "comparing:compare_groups", "opts": {"band": 5, "level": [1]}}],
+  "title": "Compare amounts (more, fewer, same): two pictured groups of 2 to 5, the pupil says which has more, which has fewer, or whether they are the same (33 more / fewer, 17 same? in 50)",
+  "ccss": {"K.CC.C.6": "Identify whether one group is greater than, less than or equal to another by matching and counting: level 1 draws the two groups with no numbers, so the pupil matches or counts"}
+ },
+ "K|-|comparemass1": {
+  "links": [{"key": "measurement:heavier_lighter_visual", "opts": {}}],
+  "title": "Compare mass (1): two or three pictured objects, which is heavier, which is lighter",
+  "ccss": {"K.MD.A.2": "Directly compare two objects with a measurable attribute (mass) and describe which has more of it: the pupil picks the heavier or the lighter object and says heavier / lighter (the Say: frame)"}
+ },
+ "K|-|comparemass2": {
+  "links": [{"key": "measurement:heavier_lighter_visual", "opts": {}}],
+  "title": "Compare mass (2): the same content as Compare mass (1); the site gives the second session no other content (if it is the balance session R.B8.S2, it is partial with build balance: owner question)",
+  "ccss": {"K.MD.A.2": "Directly compare two objects with a measurable attribute (mass) and describe which has more of it: the pupil picks the heavier or the lighter object and says heavier / lighter"}
+ },
+ "K|-|representnumbersto5": {
+  "links": [{"key": "composing:ten_frame_build", "opts": {"band": 5}}],
+  "title": "Represent numbers to 5: the pupil builds each number 1 to 5 (10 of each in 50) with counters on a ten frame",
+  "ccss": {"2.NBT.A.1": "site tag: the Grade 2 place-value standard is not this lesson's content; the content is K.CC.B.4 (connect a number to its quantity) and K.CC.A.3 (a numeral and a set of objects), which the frame build deals (owner question 3)"}
+ }
+}

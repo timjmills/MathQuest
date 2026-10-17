@@ -6527,8 +6527,8 @@
    ],
    "lessonCloses": {
     "K|-|9and10countrepresentorder": "ordering numbers and groups to 10 (put 9, 7, 10, 8 in order)",
-    "K|-|comparingnumbersto10": "comparing written numbers (numerals) to 10, beside their groups: 7 is more than 5",
-    "K|-|comparingnumbersto5": "comparing written numbers (numerals) to 5, beside their groups: 4 is more than 2"
+    "K|-|comparingnumbersto10": "comparing two written numbers (numerals) to 10 without their groups (7 and 5: which is greater, which is less), with the words greater than and less than (K.CC.C.7)",
+    "K|-|comparingnumbersto5": "comparing two written numbers (numerals) to 5 without their groups (4 and 2: which is greater, which is less), with the words greater than and less than (K.CC.C.7)"
    }
   },
   "nl_20": {
@@ -6655,7 +6655,13 @@
    ],
    "why": "existing WRM_PROPOSALS entry; covers these steps",
    "closes": "Y1.B2.S6: listing bonds of a number in order (0 + 5, 1 + 4 ...) and seeing the pattern",
-   "reused": true
+   "reused": true,
+   "lessons": [
+    "K|-|compositionof4and5bonds"
+   ],
+   "lessonCloses": {
+    "K|-|compositionof4and5bonds": "every bond of 4 and of 5 listed in order (0 + 5, 1 + 4, 2 + 3 ...)"
+   }
   },
   "add_10_pictures": {
    "kind": "new",
@@ -6679,8 +6685,8 @@
     "K|-|combining2groups"
    ],
    "lessonCloses": {
-    "K|-|addingmorefirstthennowstories": "adding more with pictures to 10 (a group and the ones that join it)",
-    "K|-|combining2groups": "combining two pictured groups with totals 6, 7 and 8 (Growing 6, 7, 8)"
+    "K|-|addingmorefirstthennowstories": "adding more to 10 in a picture-only cell with no story to read (a group and the ones that join it, then how many)",
+    "K|-|combining2groups": "combining two pictured groups with totals 6, 7 and 8 in a picture-only cell, no story to read (Growing 6, 7, 8)"
    }
   },
   "k_story": {
@@ -6895,7 +6901,7 @@
    "lessonCloses": {
     "K|-|67and8countingandsubitising": "counting groups of 6, 7 and 8 only (the band deals 1 to 10)",
     "K|-|9and10countrepresentorder": "counting and representing 9 and 10 only (the skills deal 1 to 10)",
-    "K|-|compositionof4and5bonds": "a page on the bonds of 4 and 5 only (4 = 3 + 1, 5 = 2 + 3), every pair in order",
+    "K|-|compositionof4and5bonds": "a page on the wholes 4 and 5 only (the band deals 2 to 5)",
     "K|-|countingpatternsbeyond10teennumbers": "the counting pattern of the teen numbers only (11 to 20: ten and one, ten and two …)"
    }
   },
@@ -7366,30 +7372,6 @@
    "closes": "Y1.B14.S4: choosing hours, minutes or seconds for an activity",
    "reused": true
   },
-  "k_vertical_5": {
-   "also": [
-    "subtraction:sub_10_no_regroup"
-   ],
-   "ccss": [
-    "K.OA.A.5"
-   ],
-   "closes": {
-    "K|-|addandsubtractwithin5writtenverticallycolumnform": "addition and subtraction within 5 written vertically, on one page (3 above + 2; 5 above − 4), with no carrying or borrowing row"
-   },
-   "family": "addition",
-   "kind": "option",
-   "lessons": [
-    "K|-|addandsubtractwithin5writtenverticallycolumnform"
-   ],
-   "name": "Add and Subtract Within 5, Written Vertically (option)",
-   "option": "band \"within 5\" (sums and minuends to 5) with the stacked layout and no carrying / borrowing row, and a mix value that puts + and − on one page, the sign printed large beside the top number",
-   "representation": "the existing stack cell: two one-digit numbers in a column, a large + or − sign, the rule and one answer box; five counters or a five frame beside it as a fading hint; no carrying row",
-   "reused": false,
-   "skill": "addition:add_10_no_regroup",
-   "steps": [],
-   "teaches": "reading and solving an addition or a subtraction within 5 written in a column (3 above + 2, with a rule under it), the same facts the pupil already knows across, with counters beside the column as a hint that fades",
-   "why": "add_10_no_regroup / sub_10_no_regroup {notation:[stacked]} deal column facts within 10 (2 + 6, 9 − 3) with a \"Use top row for carrying\" row, one operation per skill; no live skill deals the within-5 column facts with + and − mixed"
-  },
   "classify_count_all": {
    "ccss": [
     "K.MD.B.3",
@@ -7453,27 +7435,6 @@
    "teaches": "modelling a triangle, square or rectangle from components: counting the sticks (sides) and clay balls (corners) it needs, then building it and drawing it on dots",
    "why": "shape_attributes counts the sides and the vertices of a drawn shape; nothing asks the pupil to build a shape from parts (K.G.B.5 \"sticks and clay balls\")"
   },
-  "cuboid_find": {
-   "ccss": [
-    "K.G.A.2"
-   ],
-   "closes": {
-    "K|-|3dshapescubecuboidsphereconecylinder": "finding and naming the cuboid (rectangular prism) as well as the cube, sphere, cone and cylinder"
-   },
-   "family": "shapes_early",
-   "kind": "option",
-   "lessons": [
-    "K|-|3dshapescubecuboidsphereconecylinder"
-   ],
-   "name": "Find the Cuboid Too (option)",
-   "option": "forms 1 (\"click every shape of one kind\") also asks for the rectangular prism, labelled \"cuboid (rectangular prism)\", as often as the other four solids",
-   "representation": "the existing click-every cell: four drawn solids, the pupil ticks every box shape; the name printed under the instruction",
-   "reused": false,
-   "skill": "shapes_early:name_3d_shapes",
-   "steps": [],
-   "teaches": "finding every cuboid (rectangular prism, a box shape) among other solids, as the pupil already finds every cube, sphere, cone and cylinder",
-   "why": "name_3d_shapes {forms:[1]} draws the rectangular prism only as a distractor: in 40 items it asks for spheres, cubes, cones and cylinders, never the cuboid"
-  },
   "vis_story_strip": {
    "after": [
     "sort_groups"
@@ -7512,7 +7473,7 @@
    ],
    "closes": {
     "K|-|circlesandtrianglesproperties": "the properties of circles and triangles compared: a circle has one curved side and no corners, a triangle has 3 straight sides and 3 corners",
-    "K|-|shapeswith4sidessquaresandrectangles": "the 4 sides (and 4 corners) of squares and rectangles: counting them and comparing the two shapes"
+    "K|-|shapeswith4sidessquaresandrectangles": "comparing the square and the rectangle: both have 4 straight sides and 4 corners, and a square's sides are all the same length"
    },
    "family": "geometry",
    "kind": "new",
@@ -8206,32 +8167,30 @@
     "block": null,
     "power": true
    },
-   "direct": [],
-   "partial": [
+   "direct": [
     {
-     "key": "addition:add_10_no_regroup",
+     "key": "addition:add_facts",
      "opts": {
       "notation": [
        "stacked"
-      ]
-     },
-     "missing": "one-digit addition written in a column (2 + 6 = 8), with sums to 10, past 5, and a \"Use top row for carrying\" line; never a subtraction"
+      ],
+      "band": 5
+     }
     },
     {
-     "key": "subtraction:sub_10_no_regroup",
+     "key": "subtraction:sub_facts",
      "opts": {
       "notation": [
        "stacked"
-      ]
-     },
-     "missing": "one-digit subtraction written in a column (9 − 3 = 6), from numbers to 10, past 5, and a \"Use top row for borrowing\" line; never an addition"
+      ],
+      "band": 5
+     }
     }
    ],
-   "verdict": "partial",
-   "missing": "addition and subtraction within 5 written vertically, on one page (3 above + 2; 5 above − 4), with no carrying or borrowing row",
-   "build": [
-    "k_vertical_5"
-   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
    "pre": [
     {
      "key": "addition:add_5_pictures",
@@ -8259,17 +8218,7 @@
      "why": "how many more make 5: the missing part of a fact within 5"
     }
    ],
-   "note": "Domain-test build lesson (site: \"New CCSS BUILD lesson so the domain test only asks what has been taught\"), W15-W16, K.OA.A.5. The site puts it after \"Addition - add together\" (W14) and \"Subtraction - take away\" (W14-W15). No live skill writes facts within 5 in a column: the stacked skills start at 10 and carry a regrouping row a Kindergarten page should not show.",
-   "envision": [
-    {
-     "proposal": "k_vertical_5",
-     "name": "Add and Subtract Within 5, Written Vertically (option)",
-     "kind": "option on addition:add_10_no_regroup",
-     "teaches": "reading and solving an addition or a subtraction within 5 written in a column (3 above + 2, with a rule under it), the same facts the pupil already knows across, with counters beside the column as a hint that fades",
-     "closes": "addition and subtraction within 5 written vertically, on one page (3 above + 2; 5 above − 4), with no carrying or borrowing row",
-     "representation": "the existing stack cell: two one-digit numbers in a column, a large + or − sign, the rule and one answer box"
-    }
-   ]
+   "note": "Domain-test build lesson (site: \"New CCSS BUILD lesson so the domain test only asks what has been taught\"), W15-W16, K.OA.A.5. The site puts it after \"Addition - add together\" (W14) and \"Subtraction - take away\" (W14-W15). add_facts and sub_facts with {notation:[stacked], band:5} write every fact in a column (add_facts as the fact cell with notation vertical, sub_facts as the column facts visual: 3 above + 2, a rule, one answer box), with the sum or the number taken from at most 5 (0 + 4, 5 - 5) and no carrying or borrowing row; standards-audit rules K.OA.A.5 full on the same two skills at band 5. The two skills are one operation each, so a page of both is two sections of one sheet."
   },
   "K|-|sortintocategoriescounteachgroupandfindthetotal": {
    "title": "Sort into categories, count each group and find the total",
@@ -8433,7 +8382,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Awsaj supplement lesson, W29-W30, K.G.B.5, block Y1.B3 (Shape). The Y1.B3 shape steps have no school week in the xlsx, so they are not cited; Reception taught the shapes it builds. shape_draw (WRM_PROPOSALS) is the drawing half. No related: the side-counting skills name quadrilaterals and vertices, above Kindergarten.",
+   "note": "Awsaj supplement lesson, W29-W30, K.G.B.5, block Y1.B3 (Shape). The Y1.B3 shape steps have no school week in the xlsx, so they are not cited; Reception taught the shapes it builds. shape_draw (WRM_PROPOSALS) is the drawing half. No related: shape_corners_count {band:4} deals only 2 distinct items (one triangle, one square), and the other side-counting skills name quadrilaterals or reach 8 corners, above Kindergarten.",
    "envision": [
     {
      "proposal": "shape_draw",
@@ -8530,23 +8479,28 @@
     "block": null,
     "power": false
    },
-   "direct": [],
-   "partial": [
+   "direct": [
+    {
+     "key": "shapes_early:name_3d_shapes",
+     "opts": {
+      "forms": [
+       0
+      ]
+     }
+    },
     {
      "key": "shapes_early:name_3d_shapes",
      "opts": {
       "forms": [
        1
       ]
-     },
-     "missing": "clicks every sphere, cube, cone or cylinder among other solids; the rectangular prism (cuboid) is only ever a distractor, never the solid asked for"
+     }
     }
    ],
-   "verdict": "partial",
-   "missing": "finding and naming the cuboid (rectangular prism) as well as the cube, sphere, cone and cylinder",
-   "build": [
-    "cuboid_find"
-   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
    "pre": [
     {
      "key": "shapes_early:name_2d_shapes",
@@ -8585,17 +8539,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Support lesson from \"Building 9 and 10\" (Phase 7) = R.B12.S1 \"Recognise and name 3-D shapes\" under another title. name_3d_shapes {forms:[1]} asks the pupil to click every sphere, cylinder, cube or cone; the rectangular prism (the US name of the cuboid) is drawn but never asked for. No related: the other 3-D skills ask for vertices or match written names, above Reception.",
-   "envision": [
-    {
-     "proposal": "cuboid_find",
-     "name": "Find the Cuboid Too (option)",
-     "kind": "option on shapes_early:name_3d_shapes",
-     "teaches": "finding every cuboid (rectangular prism, a box shape) among other solids, as the pupil already finds every cube, sphere, cone and cylinder",
-     "closes": "finding and naming the cuboid (rectangular prism) as well as the cube, sphere, cone and cylinder",
-     "representation": "the existing click-every cell: four drawn solids, the pupil ticks every box shape"
-    }
-   ]
+   "note": "Support lesson from \"Building 9 and 10\" (Phase 7) = R.B12.S1 \"Recognise and name 3-D shapes\" under another title (full there on forms 1). name_3d_shapes forms 0 shows one drawn solid and the pupil picks its name (\"What 3D shape is this?\": cube, rectangular prism (the US name of the cuboid), sphere, cone or cylinder, all five named); forms 1 asks the pupil to click every sphere, cylinder, cube or cone among other solids. A name pick is the response compose_shapes uses at Reception in this file. The site tags 1.G.A.1 (defining attributes); the content is naming the five solids (K.G.A.2 / K.G.A.3), see FULL_AUDIT. No related: the other 3-D skills ask for vertices or match written names, above Reception."
   },
   "K|-|67and8countingandsubitising": {
    "title": "6, 7 and 8 - counting and subitising",
@@ -8823,7 +8767,7 @@
      "opts": {
       "band": 10
      },
-     "missing": "add-more stories to 10 told in words (I have 3 balls. I get 2 more balls.); no first / then / now pictures, the pupil reads the story"
+     "missing": "add-more stories to 10 told in words (I have 3 balls. I get 2 more balls.), the two groups pictured in one row under the story; never three panels (first, then, now) and the pupil must read the story"
     }
    ],
    "verdict": "partial",
@@ -8870,7 +8814,7 @@
      "name": "Add Within 10 with Pictures",
      "kind": "new skill addition:add_10_pictures",
      "teaches": "count two pictured groups (combine) or a group and the ones that join it (add more) and write how many in all",
-     "closes": "adding more with pictures to 10 (a group and the ones that join it)",
+     "closes": "adding more to 10 in a picture-only cell with no story to read (a group and the ones that join it, then how many)",
      "representation": "two groups of counters (or a ten frame split in two) in one cell"
     },
     {
@@ -9027,7 +8971,7 @@
      "why": "the teen numbers in order on a number track, counting on past 10"
     }
    ],
-   "note": "Support lesson from \"To 20 and Beyond\" (Phase 8) = R.B13.S1 / S3 \"Build numbers beyond 10\".",
+   "note": "Support lesson from \"To 20 and Beyond\" (Phase 8) = R.B13.S1 / S3 \"Build numbers beyond 10\". make_ten {band:20} (\"The frame shows 14. How many more make 20?\") completes 20 as two full frames, but asks for the missing part, never builds 20, and its key is already this lesson's pre (make_ten {band:10}), so it is not listed again (one key, one role).",
    "envision": [
     {
      "proposal": "teen_structure",
@@ -9150,11 +9094,11 @@
      "opts": {
       "band": 7
      },
-     "missing": "combine and add-more stories with totals to 7, told in words, no pictures to count"
+     "missing": "combine and add-more stories with totals to 7 told in words, both groups pictured under the story (2 stars and 5 stars); the pupil must read the story, and the total is never 8"
     }
    ],
    "verdict": "partial",
-   "missing": "combining two pictured groups with totals 6, 7 and 8 (Growing 6, 7, 8)",
+   "missing": "combining two pictured groups with totals 6, 7 and 8 in a picture-only cell, no story to read (Growing 6, 7, 8)",
    "build": [
     "add_10_pictures"
    ],
@@ -9196,7 +9140,7 @@
      "name": "Add Within 10 with Pictures",
      "kind": "new skill addition:add_10_pictures",
      "teaches": "count two pictured groups (combine) or a group and the ones that join it (add more) and write how many in all",
-     "closes": "combining two pictured groups with totals 6, 7 and 8 (Growing 6, 7, 8)",
+     "closes": "combining two pictured groups with totals 6, 7 and 8 in a picture-only cell, no story to read (Growing 6, 7, 8)",
      "representation": "two groups of counters (or a ten frame split in two) in one cell"
     }
    ]
@@ -9411,7 +9355,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Support lesson from \"Alive in 5!\" (Phase 5) = R.B8.S1 \"Compare mass\" (the first of the two mass lessons; full there with the same skill): two or three pictured objects, which is heavier, which is lighter. Pre-skills are few: before this phase Reception compares mass only in R.B2.S2 with the lesson's own key; the other comparing steps are listed. No related: the balance (R.B8.S2) is not built yet (build balance), and comparing capacity has no live skill."
+   "note": "Support lesson from \"Alive in 5!\" (Phase 5) = R.B8.S1 \"Compare mass\" (the first of the two mass lessons; full there with the same skill): two or three pictured objects, which is heavier, which is lighter. Pre-skills are few: before this phase Reception compares mass only in R.B2.S2 with the lesson's own key; the other comparing steps are listed. No related: the balance (R.B8.S2) is not built yet (build balance), and comparing capacity has no live skill. The site gives the two mass lessons the same title and no other content, so both are judged as R.B8.S1; if the school teaches (2) as the balance session (R.B8.S2 \"Find a balance\"), it is partial with build balance (owner question)."
   },
   "K|-|comparemass2": {
    "title": "Compare mass (2)",
@@ -9458,7 +9402,7 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Support lesson from \"Alive in 5!\" (Phase 5) = R.B8.S1 \"Compare mass\" (the second of the two mass lessons; full there with the same skill): two or three pictured objects, which is heavier, which is lighter. Pre-skills are few: before this phase Reception compares mass only in R.B2.S2 with the lesson's own key; the other comparing steps are listed. No related: the balance (R.B8.S2) is not built yet (build balance), and comparing capacity has no live skill."
+   "note": "Support lesson from \"Alive in 5!\" (Phase 5) = R.B8.S1 \"Compare mass\" (the second of the two mass lessons; full there with the same skill): two or three pictured objects, which is heavier, which is lighter. Pre-skills are few: before this phase Reception compares mass only in R.B2.S2 with the lesson's own key; the other comparing steps are listed. No related: the balance (R.B8.S2) is not built yet (build balance), and comparing capacity has no live skill. The site gives the two mass lessons the same title and no other content, so both are judged as R.B8.S1; if the school teaches (2) as the balance session (R.B8.S2 \"Find a balance\"), it is partial with build balance (owner question)."
   },
   "K|-|comparesizemassandcapacityinformally": {
    "title": "Compare size, mass and capacity informally",
@@ -9553,14 +9497,15 @@
      "opts": {
       "band": 10,
       "level": [
-       1
+       1,
+       2
       ]
      },
-     "missing": "compares two pictured groups to 10 (which has more, fewer, the same); the numbers are never written, so no numerals are compared"
+     "missing": "compares two pictured groups to 10 (which has more, fewer, the same); level 1 leaves the pupil to match one to one, level 2 writes how many under each group, so the numerals are compared beside their groups; never two numerals without their groups, never the words greater than / less than"
     }
    ],
    "verdict": "partial",
-   "missing": "comparing written numbers (numerals) to 10, beside their groups: 7 is more than 5",
+   "missing": "comparing two written numbers (numerals) to 10 without their groups (7 and 5: which is greater, which is less), with the words greater than and less than (K.CC.C.7)",
    "build": [
     "compare_small"
    ],
@@ -9601,14 +9546,14 @@
      "why": "the numbers to 10 in order on a number track: a later number is bigger"
     }
    ],
-   "note": "Support lesson from \"Building 9 and 10\" (Phase 7) = R.B11.S2 \"Compare numbers to 10\" (partial there with the same skill and build).",
+   "note": "Support lesson from \"Building 9 and 10\" (Phase 7) = R.B11.S2 \"Compare numbers to 10\" (partial there with the same skill and build). The only live numeral comparison, placevalue:compare, starts at band 99 and answers with <, > or =, above Reception.",
    "envision": [
     {
      "proposal": "compare_small",
      "name": "Compare Numbers to 10 and 20 (option)",
      "kind": "option on placevalue:compare",
      "teaches": "comparing and ordering numbers and groups of objects within 10 and 20 (and tens-and-ones pictures to 100) with <, >, = and the words greater than / less than / equal to (the lowest band today is 99)",
-     "closes": "comparing written numbers (numerals) to 10, beside their groups: 7 is more than 5",
+     "closes": "comparing two written numbers (numerals) to 10 without their groups (7 and 5: which is greater, which is less), with the words greater than and less than (K.CC.C.7)",
      "representation": "band options 10 and 20 on placevalue:compare and the two order skills, a ten-frame or tens-and-ones picture support level"
     }
    ]
@@ -9638,14 +9583,15 @@
      "opts": {
       "band": 5,
       "level": [
-       1
+       1,
+       2
       ]
      },
-     "missing": "compares two pictured groups to 5 (which has more, fewer, the same); the numbers are never written, so no numerals are compared"
+     "missing": "compares two pictured groups to 5 (which has more, fewer, the same); level 1 leaves the pupil to match one to one, level 2 writes how many under each group, so the numerals are compared beside their groups; never two numerals without their groups, never the words greater than / less than"
     }
    ],
    "verdict": "partial",
-   "missing": "comparing written numbers (numerals) to 5, beside their groups: 4 is more than 2",
+   "missing": "comparing two written numbers (numerals) to 5 without their groups (4 and 2: which is greater, which is less), with the words greater than and less than (K.CC.C.7)",
    "build": [
     "compare_small"
    ],
@@ -9684,14 +9630,14 @@
      "why": "comparing two towers: which is taller (the same more / less idea for size)"
     }
    ],
-   "note": "Support lesson from \"Alive in 5!\" (Phase 5): Reception compares numbers to 5 before R.B11.S2 compares to 10; same build.",
+   "note": "Support lesson from \"Alive in 5!\" (Phase 5): Reception compares numbers to 5 before R.B11.S2 compares to 10; same build. The only live numeral comparison, placevalue:compare, starts at band 99 and answers with <, > or =, above Reception.",
    "envision": [
     {
      "proposal": "compare_small",
      "name": "Compare Numbers to 10 and 20 (option)",
      "kind": "option on placevalue:compare",
      "teaches": "comparing and ordering numbers and groups of objects within 10 and 20 (and tens-and-ones pictures to 100) with <, >, = and the words greater than / less than / equal to (the lowest band today is 99)",
-     "closes": "comparing written numbers (numerals) to 5, beside their groups: 4 is more than 2",
+     "closes": "comparing two written numbers (numerals) to 5 without their groups (4 and 2: which is greater, which is less), with the words greater than and less than (K.CC.C.7)",
      "representation": "band options 10 and 20 on placevalue:compare and the two order skills, a ten-frame or tens-and-ones picture support level"
     }
    ]
@@ -9797,7 +9743,8 @@
    "verdict": "partial",
    "missing": "a page on the bonds of 4 and 5 only (4 = 3 + 1, 5 = 2 + 3), every pair in order",
    "build": [
-    "number_focus"
+    "number_focus",
+    "systematic_bonds"
    ],
    "pre": [
     {
@@ -9841,8 +9788,16 @@
      "name": "Number Focus Window (option)",
      "kind": "option on counting:count_objects",
      "teaches": "deal only the numbers the step works on (4 and 5, 6 to 8, 9 and 10, 10 to 13, 14 to 20, 11 to 13, 14 to 16, 17 to 19, 20 to 50 or 50 to 100), with a smaller number as at most one review item",
-     "closes": "a page on the bonds of 4 and 5 only (4 = 3 + 1, 5 = 2 + 3), every pair in order",
+     "closes": "a page on the wholes 4 and 5 only (the band deals 2 to 5)",
      "representation": "the skill's own cell"
+    },
+    {
+     "proposal": "systematic_bonds",
+     "name": "Number Bonds in Order",
+     "kind": "new skill composing:bonds_in_order",
+     "teaches": "listing all the bonds of a number systematically (0+5, 1+4, 2+3 ...) and seeing the pattern",
+     "closes": "every bond of 4 and of 5 listed in order (0 + 5, 1 + 4, 2 + 3 ...)",
+     "representation": "a two-column table with the first rows filled"
     }
    ]
   },
@@ -9971,7 +9926,7 @@
        1
       ]
      },
-     "missing": "clicks every sphere, cylinder, cube, cone or rectangular prism among other solids; never links a solid to its flat faces"
+     "missing": "clicks every sphere, cylinder, cube or cone among other solids (the rectangular prism is only drawn as a distractor); never links a solid to its flat faces"
     }
    ],
    "verdict": "partial",
@@ -10052,6 +10007,13 @@
       ]
      },
      "missing": "doubles written as sums from 1 + 1 up to 10 + 10, past 5 + 5; no pictures of two equal groups"
+    },
+    {
+     "key": "patterns:double",
+     "opts": {
+      "band": 20
+     },
+     "missing": "doubles 2 to 10 (double 9 is 18) with another equal bar drawn beside the first; past 5 + 5, and bars, never two equal pictured groups"
     }
    ],
    "verdict": "partial",
@@ -10082,11 +10044,11 @@
    "preBuild": [],
    "related": [
     {
-     "key": "division:share_into_groups",
+     "key": "patterns:halve",
      "opts": {
-      "band": 12
+      "band": 10
      },
-     "why": "sharing a group equally: the inverse of doubling"
+     "why": "halving a number to 10 (half of 8 is 4), a bar split into 2 equal parts: the inverse of doubling"
     }
    ],
    "note": "Support lesson from \"Find My Pattern\" (Phase 10) = R.B11.S11 / S12 \"Doubles to 10\" (partial there with the same skill and build); R.B16.S6 too.",
@@ -10185,8 +10147,13 @@
     "power": false
    },
    "direct": [],
-   "partial": [],
-   "verdict": "gap",
+   "partial": [
+    {
+     "key": "subtraction:sub_5_pictures",
+     "missing": "takes away from a pictured group to 5 and asks how many are left; about 1 item in 10 takes every counter away, so the answer is 0 (start with 4, take away 4); never an empty set to count on its own and never 0 as a number to write or find on a track"
+    }
+   ],
+   "verdict": "partial",
    "missing": "zero as the count of an empty set (no counters left, an empty plate) and writing 0",
    "build": [
     "zero"
@@ -10219,13 +10186,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "subtraction:sub_5_pictures",
-     "why": "taking away from 5 and saying how many are left"
-    }
-   ],
-   "note": "Support lesson from \"Alive in 5!\" (Phase 5) = R.B7.S1 \"Introduce zero\" (a gap there with the same build).",
+   "related": [],
+   "note": "Support lesson from \"Alive in 5!\" (Phase 5) = R.B7.S1 \"Introduce zero\" (a gap there with the same build). Lessons r2 (rule 5, missed live skill): sub_5_pictures, the round-1 related, deals 0 as the answer when every counter is taken away (10 of 100 items, the counters cell with n = m), so the lesson is partial on it here; the R lane's gap verdict for R.B7.S1 is frozen and is noted for its next round. No related: the count skills start at 1 and no live skill shows an empty set.",
    "envision": [
     {
      "proposal": "zero",
@@ -10293,7 +10255,7 @@
      "opts": {
       "band": 5
      },
-     "why": "R.B5.S3 Represent 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): building a number on a frame: counters fill the frame in twos, one above the other"
+     "why": "R.B5.S3 Represent 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): building a number to 5 on a frame: one counter in each box, matched one to one"
     }
    ],
    "preBuild": [],
@@ -10445,15 +10407,10 @@
    "build": [
     "position_map"
    ],
-   "pre": [
-    {
-     "key": "comparing:compare_objects",
-     "why": "R.B2.S1 Compare size (Pre-K, block R.B2, before this Support lesson's source phase): comparing two objects side by side: the words of where things are start here"
-    }
-   ],
+   "pre": [],
    "preBuild": [],
    "related": [],
-   "note": "Support lesson from \"It's Me 1, 2, 3\" (Phase 3) = R.B4.S4 \"Describe position\" (partial there with the same skill and build). Pre-skills are few: before this phase Reception teaches only R.B1-R.B2, none of them about position except the side-by-side comparisons. No related: shape_positions is the only live position skill.",
+   "note": "Support lesson from \"It's Me 1, 2, 3\" (Phase 3) = R.B4.S4 \"Describe position\" (partial there with the same skill and build). Pre-skills are few: before this phase Reception teaches only R.B1-R.B2 (match, sort, compare, patterns, measure talk), none of them about position. No related: shape_positions is the only live position skill.",
    "envision": [
     {
      "proposal": "position_map",
@@ -10608,10 +10565,20 @@
       ]
      },
      "missing": "clicks every square or every rectangle among other shapes; it never counts sides or corners"
+    },
+    {
+     "key": "shapes_early:shape_attributes",
+     "opts": {
+      "forms": [
+       0
+      ],
+      "band": 4
+     },
+     "missing": "asks how many sides or vertices a triangle, square or rectangle has (a square has 4 sides); says vertices, not corners, also shows triangles, and never compares the square with the rectangle"
     }
    ],
    "verdict": "partial",
-   "missing": "the 4 sides (and 4 corners) of squares and rectangles: counting them and comparing the two shapes",
+   "missing": "comparing the square and the rectangle: both have 4 straight sides and 4 corners, and a square's sides are all the same length",
    "build": [
     "compare_shapes"
    ],
@@ -10647,14 +10614,14 @@
      "why": "two shapes put together make a new shape"
     }
    ],
-   "note": "Support lesson from \"Light and Dark\" (Phase 4) = R.B6.S1 \"Identify and name shapes with 4 sides\". The R lane judged that step full on naming; this title also names the property, 4 sides, which no live Reception item counts. Pre-skills are few: naming circles and triangles (R.B4.S1) uses the lesson's own key; R.B1-R.B4 give the sorting and counting listed.",
+   "note": "Support lesson from \"Light and Dark\" (Phase 4) = R.B6.S1 \"Identify and name shapes with 4 sides\". The R lane judged that step full on naming; this title also names the property, 4 sides: shape_attributes counts the sides and the vertices of a square and of a rectangle, but nothing compares the two shapes (compose_shapes, the related, makes a square or a rectangle from two pieces, never compares them); shape_corners_count {band:4} says corners but deals only 2 distinct items (one triangle, one square). Pre-skills are few: naming circles and triangles (R.B4.S1) uses the lesson's own key; R.B1-R.B4 give the sorting and counting listed.",
    "envision": [
     {
      "proposal": "compare_shapes",
      "name": "Same and Different Shapes",
      "kind": "new skill shapes_early:compare_two_shapes",
      "teaches": "comparing two shapes by sides, corners and straight or curved edges",
-     "closes": "the 4 sides (and 4 corners) of squares and rectangles: counting them and comparing the two shapes",
+     "closes": "comparing the square and the rectangle: both have 4 straight sides and 4 corners, and a square's sides are all the same length",
      "representation": "two shapes side by side with a same/different checklist (sides, corners, curved)"
     }
    ]
@@ -10854,18 +10821,11 @@
       ]
      },
      "why": "R.B4.S1 Identify and name circles and triangles (Pre-K, block R.B4, before this Support lesson's source phase): naming triangles, the parts of a square"
-    },
-    {
-     "key": "composing:number_bonds",
-     "opts": {
-      "band": 10
-     },
-     "why": "R.B11.S7 Composition to 10 (Pre-K, block R.B11, before this Support lesson's source phase): parts make a whole: the same idea with numbers"
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Support lesson from \"First Then Now\" (Phase 9) = R.B15.S5 \"Compose shapes\" and R.B15.S6 \"Decompose shapes\". No related: compose_hexagon fills hexagons and compose_rect_from_squares writes \"2 × 3\", above Reception.",
+   "note": "Support lesson from \"First Then Now\" (Phase 9) = R.B15.S5 \"Compose shapes\" and R.B15.S6 \"Decompose shapes\". Pre-skills are few: the composing steps R.B6.S2 and R.B15.S5 use the lesson's own key (compose_shapes); the two naming steps are listed. No related: compose_hexagon fills hexagons and compose_rect_from_squares writes \"2 × 3\", above Reception.",
    "envision": [
     {
      "proposal": "decompose_shapes",

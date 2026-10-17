@@ -21,14 +21,6 @@ LANE.update({'band_3': 'R', 'more_less_pictures': 'R', 'compare_shapes': 'R', 'c
              'odd_even_pairs': 'R', 'shape_fit_turn': 'R', 'decompose_shapes': 'R', 'defining_attributes': 'R'})
 
 # ── new proposals (only what no existing proposal does) ──
-LNEW['k_vertical_5'] = {
-    'kind': 'option', 'skill': 'addition:add_10_no_regroup', 'also': ['subtraction:sub_10_no_regroup'],
-    'option': 'band "within 5" (sums and minuends to 5) with the stacked layout and no carrying / borrowing row, and a mix value that puts + and − on one page, the sign printed large beside the top number',
-    'name': 'Add and Subtract Within 5, Written Vertically (option)',
-    'teaches': 'reading and solving an addition or a subtraction within 5 written in a column (3 above + 2, with a rule under it), the same facts the pupil already knows across, with counters beside the column as a hint that fades',
-    'representation': 'the existing stack cell: two one-digit numbers in a column, a large + or − sign, the rule and one answer box; five counters or a five frame beside it as a fading hint; no carrying row',
-    'family': 'addition', 'ccss': ['K.OA.A.5'],
-    'why': 'add_10_no_regroup / sub_10_no_regroup {notation:[stacked]} deal column facts within 10 (2 + 6, 9 − 3) with a "Use top row for carrying" row, one operation per skill; no live skill deals the within-5 column facts with + and − mixed'}
 LNEW['classify_count_all'] = {
     'kind': 'option', 'skill': 'comparing:classify_count',
     'option': 'form "count every group": the pupil sorts all the pictured objects into 2 or 3 labelled groups, writes how many are in each group and the total, and says which group has the most',
@@ -37,14 +29,6 @@ LNEW['classify_count_all'] = {
     'representation': 'the existing classify-count cell: the bag of pictures above, 2 or 3 sorting boxes each labelled with a picture and an answer box under it, then "Total" with one answer box',
     'family': 'comparing', 'ccss': ['K.MD.B.3', 'K.CC.B.5'],
     'why': 'classify_count asks for the count of ONE kind in a mixed bag ("Count only the apples"); no skill counts every category or asks for the total of the sorted groups'}
-LNEW['cuboid_find'] = {
-    'kind': 'option', 'skill': 'shapes_early:name_3d_shapes',
-    'option': 'forms 1 ("click every shape of one kind") also asks for the rectangular prism, labelled "cuboid (rectangular prism)", as often as the other four solids',
-    'name': 'Find the Cuboid Too (option)',
-    'teaches': 'finding every cuboid (rectangular prism, a box shape) among other solids, as the pupil already finds every cube, sphere, cone and cylinder',
-    'representation': 'the existing click-every cell: four drawn solids, the pupil ticks every box shape; the name printed under the instruction',
-    'family': 'shapes_early', 'ccss': ['K.G.A.2'],
-    'why': 'name_3d_shapes {forms:[1]} draws the rectangular prism only as a distractor: in 40 items it asks for spheres, cubes, cones and cylinders, never the cuboid'}
 LNEW['shape_build_kit'] = {
     'kind': 'option', 'skill': 'shapes_early:shape_attributes',
     'option': 'form "build it": a pictured shape with its sides as sticks and its corners as clay balls, the pupil writes how many sticks and how many balls build it; then the matching dot-grid cell to draw it (shape_draw)',
@@ -56,18 +40,18 @@ LNEW['shape_build_kit'] = {
 
 # ───────────────────────── committee lessons (Awsaj supplements and domain-test builds, Kindergarten) ─────────────────────────
 lesson(K_ + 'addandsubtractwithin5writtenverticallycolumnform',
-    partial=[('addition:add_10_no_regroup', {'notation': ['stacked']}, 'one-digit addition written in a column (2 + 6 = 8), with sums to 10, past 5, and a "Use top row for carrying" line; never a subtraction'),
-             ('subtraction:sub_10_no_regroup', {'notation': ['stacked']}, 'one-digit subtraction written in a column (9 − 3 = 6), from numbers to 10, past 5, and a "Use top row for borrowing" line; never an addition')],
-    verdict='partial',
-    missing='addition and subtraction within 5 written vertically, on one page (3 above + 2; 5 above − 4), with no carrying or borrowing row',
-    build=['k_vertical_5'],
+    direct=[('addition:add_facts', {'notation': ['stacked'], 'band': 5}), ('subtraction:sub_facts', {'notation': ['stacked'], 'band': 5})],
+    verdict='full',
     pre=[('addition:add_5_pictures', {}, 'Y1.B2.S8', 'adding two pictured groups within 5 (1 + 3 = 4)'),
          ('subtraction:sub_5_pictures', {}, 'Y1.B2.S14', 'taking away from 5 with pictures (5 take away 2 leaves 3)'),
          ('composing:number_bonds', {'band': 5}, 'Y1.B2.S5', 'the parts and the whole of every number to 5: the same facts, in a part-whole model')],
     related=[('composing:make_ten', {'band': 5}, 'how many more make 5: the missing part of a fact within 5')],
     note='Domain-test build lesson (site: "New CCSS BUILD lesson so the domain test only asks what has been taught"), W15-W16, K.OA.A.5. '
-         'The site puts it after "Addition - add together" (W14) and "Subtraction - take away" (W14-W15). No live skill writes facts within 5 in a column: '
-         'the stacked skills start at 10 and carry a regrouping row a Kindergarten page should not show.')
+         'The site puts it after "Addition - add together" (W14) and "Subtraction - take away" (W14-W15). add_facts and sub_facts with '
+         '{notation:[stacked], band:5} write every fact in a column (add_facts as the fact cell with notation vertical, sub_facts as the column '
+         'facts visual: 3 above + 2, a rule, one answer box), '
+         'with the sum or the number taken from at most 5 (0 + 4, 5 - 5) and no carrying or borrowing row; standards-audit rules K.OA.A.5 full on '
+         'the same two skills at band 5. The two skills are one operation each, so a page of both is two sections of one sheet.')
 
 lesson(K_ + 'sortintocategoriescounteachgroupandfindthetotal',
     partial=[('comparing:classify_count', {'band': 10, 'objects': 'pictures'}, 'counts ONE kind of object in a mixed bag of pictures to 10 ("Count only the apples"); never sorts every object, never counts each group or finds the total')],
@@ -95,7 +79,9 @@ lesson(K_ + 'buildanddrawshapes',
          ('shapes_early:compose_shapes', {'shapes': [0, 1]}, 'R.B15.S5', 'two shapes put together make a new shape')],
     related=[],
     note='Awsaj supplement lesson, W29-W30, K.G.B.5, block Y1.B3 (Shape). The Y1.B3 shape steps have no school week in the xlsx, so they are not cited; '
-         'Reception taught the shapes it builds. shape_draw (WRM_PROPOSALS) is the drawing half. No related: the side-counting skills name quadrilaterals and vertices, above Kindergarten.')
+         'Reception taught the shapes it builds. shape_draw (WRM_PROPOSALS) is the drawing half. '
+         'No related: shape_corners_count {band:4} deals only 2 distinct items (one triangle, one square), and the other side-counting skills '
+         'name quadrilaterals or reach 8 corners, above Kindergarten.')
 
 lesson(K_ + 'composeshapesfromsmallershapes',
     direct=[('shapes_early:compose_shapes', {}), ('shapes_early:compose_hexagon', {})],
@@ -111,17 +97,18 @@ lesson(K_ + 'composeshapesfromsmallershapes',
 
 # ───────────────────────── Support lessons (Reception, "Source: GPK") ─────────────────────────
 lesson(K_ + '3dshapescubecuboidsphereconecylinder',
-    partial=[('shapes_early:name_3d_shapes', {'forms': [1]}, 'clicks every sphere, cube, cone or cylinder among other solids; the rectangular prism (cuboid) is only ever a distractor, never the solid asked for')],
-    verdict='partial',
-    missing='finding and naming the cuboid (rectangular prism) as well as the cube, sphere, cone and cylinder',
-    build=['cuboid_find'],
+    direct=[('shapes_early:name_3d_shapes', {'forms': [0]}), ('shapes_early:name_3d_shapes', {'forms': [1]})],
+    verdict='full',
     pre=[('shapes_early:name_2d_shapes', {'forms': [1], 'shapes': [0, 1]}, 'R.B4.S1', 'circles and triangles: shapes the pupil later sees on the faces of solids'),
          ('shapes_early:name_2d_shapes', {'forms': [1], 'shapes': [2]}, 'R.B6.S1', 'squares and rectangles: the shapes of the faces of boxes'),
          ('comparing:classify_count', {'band': 3, 'tiles': 2, 'objects': 'pictures'}, 'R.B1.S4', 'picking out every object of one kind among others')],
     related=[],
-    note='Support lesson from "Building 9 and 10" (Phase 7) = R.B12.S1 "Recognise and name 3-D shapes" under another title. name_3d_shapes {forms:[1]} '
-         'asks the pupil to click every sphere, cylinder, cube or cone; the rectangular prism (the US name of the cuboid) is drawn but never asked for. No related: the other 3-D skills '
-         'ask for vertices or match written names, above Reception.')
+    note='Support lesson from "Building 9 and 10" (Phase 7) = R.B12.S1 "Recognise and name 3-D shapes" under another title (full there on forms 1). '
+         'name_3d_shapes forms 0 shows one drawn solid and the pupil picks its name ("What 3D shape is this?": cube, rectangular prism (the US name '
+         'of the cuboid), sphere, cone or cylinder, all five named); forms 1 asks the pupil to click every sphere, cylinder, cube or cone among other '
+         'solids. A name pick is the response compose_shapes uses at Reception in this file. The site tags 1.G.A.1 (defining attributes); the '
+         'content is naming the five solids (K.G.A.2 / K.G.A.3), see FULL_AUDIT. No related: the other 3-D skills ask for vertices or match '
+         'written names, above Reception.')
 
 lesson(K_ + '67and8countingandsubitising',
     partial=[('counting:count_objects', {'band': 10, 'objects': 'frame'}, 'counts counters in ten frames from 1 to 10, not only 6, 7 and 8'),
@@ -153,11 +140,11 @@ lesson(K_ + '9and10countrepresentorder',
 
 lesson(K_ + 'addingmorefirstthennowstories',
     partial=[('addition:add_5_pictures', {}, 'a pictured join within 5 written as a sum (1 + 3 = ?, "How many in all?"); never a first / then / now story and never a total past 5'),
-             ('addition:add_wp_10', {'band': 10}, 'add-more stories to 10 told in words (I have 3 balls. I get 2 more balls.); no first / then / now pictures, the pupil reads the story')],
+             ('addition:add_wp_10', {'band': 10}, 'add-more stories to 10 told in words (I have 3 balls. I get 2 more balls.), the two groups pictured in one row under the story; never three panels (first, then, now) and the pupil must read the story')],
     verdict='partial',
     missing='pictured First / Then / Now add-more stories to 10: a first picture, then some more come, now how many',
     build=['add_10_pictures', 'vis_story_strip'],
-    closes={'add_10_pictures': 'adding more with pictures to 10 (a group and the ones that join it)',
+    closes={'add_10_pictures': 'adding more to 10 in a picture-only cell with no story to read (a group and the ones that join it, then how many)',
             'vis_story_strip': 'the three-panel First / Then / Now story strip the lesson is taught with'},
     pre=[('composing:number_bonds', {'band': 10}, 'R.B11.S7', 'two parts make a whole to 10: the "then" part joins the "first" part'),
          ('counting:count_sequence', {'band': 10, 'dir': 'forward'}, 'R.B11.S5', 'one more: adding 1 is the smallest "then"'),
@@ -185,8 +172,11 @@ lesson(K_ + 'buildingnumbersbeyond10',
          ('composing:ten_frame_build', {'band': 10}, 'R.B11.S3', 'building 9 and 10 on a ten frame'),
          ('counting:count_objects', {'band': 10, 'objects': 'frame'}, 'R.B11.S1', 'counting counters in ten frames to 10'),
          ('composing:number_bonds', {'band': 10}, 'R.B11.S7', 'a number to 10 made of two parts: 10 and 4 is the next step')],
-    related=[('counting:number_seq_fill', {'step': 1, 'dir': 'forward', '@max': 20}, 'the teen numbers in order on a number track, counting on past 10')],
-    note='Support lesson from "To 20 and Beyond" (Phase 8) = R.B13.S1 / S3 "Build numbers beyond 10".')
+    related=[('counting:number_seq_fill', {'step': 1, 'dir': 'forward', '@max': 20}, 'the teen numbers in order on a number track, counting on past 10'),
+],
+    note='Support lesson from "To 20 and Beyond" (Phase 8) = R.B13.S1 / S3 "Build numbers beyond 10". make_ten {band:20} ("The frame shows 14. '
+         'How many more make 20?") completes 20 as two full frames, but asks for the missing part, never builds 20, and its key is already this '
+         'lesson\'s pre (make_ten {band:10}), so it is not listed again (one key, one role).')
 
 lesson(K_ + 'circlesandtrianglesproperties',
     partial=[('shapes_early:shape_attributes', {'forms': [0], 'band': 4}, 'counts the sides or the vertices of a triangle, a square or a rectangle (a triangle has 3 sides); never a circle, never a curved side, never compares a circle with a triangle')],
@@ -202,9 +192,9 @@ lesson(K_ + 'circlesandtrianglesproperties',
 
 lesson(K_ + 'combining2groups',
     partial=[('addition:add_5_pictures', {}, 'combines two pictured groups with totals to 5 only (2 + 3 = 5)'),
-             ('addition:add_wp_10', {'band': 7}, 'combine and add-more stories with totals to 7, told in words, no pictures to count')],
+             ('addition:add_wp_10', {'band': 7}, 'combine and add-more stories with totals to 7 told in words, both groups pictured under the story (2 stars and 5 stars); the pupil must read the story, and the total is never 8')],
     verdict='partial',
-    missing='combining two pictured groups with totals 6, 7 and 8 (Growing 6, 7, 8)',
+    missing='combining two pictured groups with totals 6, 7 and 8 in a picture-only cell, no story to read (Growing 6, 7, 8)',
     build=['add_10_pictures'],
     pre=[('composing:number_bonds', {'band': 5}, 'R.B5.S7', 'two parts make a whole to 5'),
          ('counting:count_sequence', {'band': 10, 'dir': 'forward'}, 'R.B5.S4', 'one more: adding one object to a group'),
@@ -243,7 +233,9 @@ for n_ in ('1', '2'):
         note=f'Support lesson from "Alive in 5!" (Phase 5) = R.B8.S1 "Compare mass" ({"the first" if n_ == "1" else "the second"} of the two mass lessons; full there with the same skill): '
              'two or three pictured objects, which is heavier, which is lighter. Pre-skills are few: before this phase Reception compares mass only in R.B2.S2 '
              'with the lesson\'s own key; the other comparing steps are listed. No related: the balance (R.B8.S2) is not built yet (build balance), '
-             'and comparing capacity has no live skill.')
+             'and comparing capacity has no live skill. The site gives the two mass lessons the same title and no other content, so both are '
+             'judged as R.B8.S1; if the school teaches (2) as the balance session (R.B8.S2 "Find a balance"), it is partial with build balance '
+             '(owner question).')
 
 lesson(K_ + 'comparesizemassandcapacityinformally',
     partial=[('measurement:heavier_lighter_visual', {}, 'compares mass only: which pictured object is heavier or lighter'),
@@ -259,26 +251,28 @@ lesson(K_ + 'comparesizemassandcapacityinformally',
          + FEW_P12.format(ph='Just Like Me!, Phase 2'))
 
 lesson(K_ + 'comparingnumbersto10',
-    partial=[('comparing:compare_groups', {'band': 10, 'level': [1]}, 'compares two pictured groups to 10 (which has more, fewer, the same); the numbers are never written, so no numerals are compared')],
+    partial=[('comparing:compare_groups', {'band': 10, 'level': [1, 2]}, 'compares two pictured groups to 10 (which has more, fewer, the same); level 1 leaves the pupil to match one to one, level 2 writes how many under each group, so the numerals are compared beside their groups; never two numerals without their groups, never the words greater than / less than')],
     verdict='partial',
-    missing='comparing written numbers (numerals) to 10, beside their groups: 7 is more than 5',
+    missing='comparing two written numbers (numerals) to 10 without their groups (7 and 5: which is greater, which is less), with the words greater than and less than (K.CC.C.7)',
     build=['compare_small'],
     pre=[('counting:count_objects', {'band': 10, 'objects': 'frame'}, 'R.B9.S1', 'counting a group of 6, 7 or 8 and saying the number'),
          ('counting:count_sequence', {'band': 10, 'dir': 'forward'}, 'R.B9.S3', 'the number after: one more is a bigger number'),
          ('composing:ten_frame_build', {'band': 10}, 'R.B9.S2', 'building a number on a ten frame so two numbers can be seen side by side')],
     related=[('counting:number_seq_fill', {'step': 1, 'dir': 'forward', '@max': 10}, 'the numbers to 10 in order on a number track: a later number is bigger')],
-    note='Support lesson from "Building 9 and 10" (Phase 7) = R.B11.S2 "Compare numbers to 10" (partial there with the same skill and build).')
+    note='Support lesson from "Building 9 and 10" (Phase 7) = R.B11.S2 "Compare numbers to 10" (partial there with the same skill and build). '
+         'The only live numeral comparison, placevalue:compare, starts at band 99 and answers with <, > or =, above Reception.')
 
 lesson(K_ + 'comparingnumbersto5',
-    partial=[('comparing:compare_groups', {'band': 5, 'level': [1]}, 'compares two pictured groups to 5 (which has more, fewer, the same); the numbers are never written, so no numerals are compared')],
+    partial=[('comparing:compare_groups', {'band': 5, 'level': [1, 2]}, 'compares two pictured groups to 5 (which has more, fewer, the same); level 1 leaves the pupil to match one to one, level 2 writes how many under each group, so the numerals are compared beside their groups; never two numerals without their groups, never the words greater than / less than')],
     verdict='partial',
-    missing='comparing written numbers (numerals) to 5, beside their groups: 4 is more than 2',
+    missing='comparing two written numbers (numerals) to 5 without their groups (4 and 2: which is greater, which is less), with the words greater than and less than (K.CC.C.7)',
     build=['compare_small'],
     pre=[('counting:count_objects', {'band': 5, 'objects': 'pictures'}, 'R.B5.S1', 'counting a group of 4 or 5 and saying the number'),
          ('counting:count_objects', {'band': 5, 'objects': 'dice'}, 'R.B5.S2', 'seeing how many dots: a number for each group'),
          ('composing:ten_frame_build', {'band': 5}, 'R.B5.S3', 'building a number to 5 on a frame so two numbers can be seen side by side')],
     related=[('comparing:compare_objects', {'task': 'height'}, 'comparing two towers: which is taller (the same more / less idea for size)')],
-    note='Support lesson from "Alive in 5!" (Phase 5): Reception compares numbers to 5 before R.B11.S2 compares to 10; same build.')
+    note='Support lesson from "Alive in 5!" (Phase 5): Reception compares numbers to 5 before R.B11.S2 compares to 10; same build. '
+         'The only live numeral comparison, placevalue:compare, starts at band 99 and answers with <, > or =, above Reception.')
 
 lesson(K_ + 'compositionof123partsmakethewhole',
     partial=[('composing:number_bonds', {'band': 5}, 'parts and the whole for wholes 2 to 5 (2 + 3 = 5); never a whole of 1 and never a zero part')],
@@ -295,7 +289,9 @@ lesson(K_ + 'compositionof4and5bonds',
     partial=[('composing:number_bonds', {'band': 5}, 'parts and the whole for wholes 2 to 5 (2 + 1 = 3); not only 4 and 5')],
     verdict='partial',
     missing='a page on the bonds of 4 and 5 only (4 = 3 + 1, 5 = 2 + 3), every pair in order',
-    build=['number_focus'],
+    build=['number_focus', 'systematic_bonds'],
+    closes={'number_focus': 'a page on the wholes 4 and 5 only (the band deals 2 to 5)',
+            'systematic_bonds': 'every bond of 4 and of 5 listed in order (0 + 5, 1 + 4, 2 + 3 ...)'},
     pre=[('composing:ten_frame_build', {'band': 5}, 'R.B5.S3', 'building 4 and 5 on a frame'),
          ('counting:count_objects', {'band': 5, 'objects': 'pictures'}, 'R.B5.S1', 'finding groups of 4 and 5'),
          ('counting:count_objects', {'band': 5, 'objects': 'dice'}, 'R.B5.S2', 'seeing 4 and 5 as dot patterns (2 and 2, 3 and 2)')],
@@ -316,7 +312,7 @@ lesson(K_ + 'countingpatternsbeyond10teennumbers',
 
 lesson(K_ + 'deepeningunderstandingconsolidate2d3dshapes',
     partial=[('shapes_early:name_2d_shapes', {'forms': [1], 'shapes': [0, 1, 2]}, 'clicks every circle, triangle, square or rectangle among other shapes'),
-             ('shapes_early:name_3d_shapes', {'forms': [1]}, 'clicks every sphere, cylinder, cube, cone or rectangular prism among other solids; never links a solid to its flat faces')],
+             ('shapes_early:name_3d_shapes', {'forms': [1]}, 'clicks every sphere, cylinder, cube or cone among other solids (the rectangular prism is only drawn as a distractor); never links a solid to its flat faces')],
     verdict='partial',
     missing='consolidating 2-D and 3-D shapes together: the flat faces of 3-D shapes and shapes found in the world around the pupil',
     build=['shape_3d_tasks', 'shapes_world'],
@@ -330,14 +326,15 @@ lesson(K_ + 'deepeningunderstandingconsolidate2d3dshapes',
          'No related: every other shape skill is its own direct or pre, or asks for vertices above Reception.')
 
 lesson(K_ + 'doublingupto55',
-    partial=[('number_sense:doubles_near_doubles', {'forms': [0]}, 'doubles written as sums from 1 + 1 up to 10 + 10, past 5 + 5; no pictures of two equal groups')],
+    partial=[('number_sense:doubles_near_doubles', {'forms': [0]}, 'doubles written as sums from 1 + 1 up to 10 + 10, past 5 + 5; no pictures of two equal groups'),
+             ('patterns:double', {'band': 20}, 'doubles 2 to 10 (double 9 is 18) with another equal bar drawn beside the first; past 5 + 5, and bars, never two equal pictured groups')],
     verdict='partial',
     missing='doubles to 5 + 5 only, shown as two equal pictured groups (dice, fingers, a mirror)',
     build=['doubles_pictured'],
     pre=[('composing:number_bonds', {'band': 10}, 'R.B11.S7', 'a whole to 10 split into two parts'),
          ('addition:add_5_pictures', {}, 'R.B9.S9', 'combining two pictured groups'),
          ('composing:make_ten', {'band': 10}, 'R.B11.S8', 'the pairs that make 10, 5 and 5 among them')],
-    related=[('division:share_into_groups', {'band': 12}, 'sharing a group equally: the inverse of doubling')],
+    related=[('patterns:halve', {'band': 10}, 'halving a number to 10 (half of 8 is 4), a bar split into 2 equal parts: the inverse of doubling')],
     note='Support lesson from "Find My Pattern" (Phase 10) = R.B11.S11 / S12 "Doubles to 10" (partial there with the same skill and build); R.B16.S6 too.')
 
 lesson(K_ + 'explore2dshapescircletrianglerectanglesquare',
@@ -353,14 +350,18 @@ lesson(K_ + 'explore2dshapescircletrianglerectanglesquare',
          + FEW_P12.format(ph='Just Like Me!, Phase 2'))
 
 lesson(K_ + 'introducingzero',
-    verdict='gap',
+    partial=[('subtraction:sub_5_pictures', {}, 'takes away from a pictured group to 5 and asks how many are left; about 1 item in 10 takes every counter away, so the answer is 0 (start with 4, take away 4); never an empty set to count on its own and never 0 as a number to write or find on a track')],
+    verdict='partial',
     missing='zero as the count of an empty set (no counters left, an empty plate) and writing 0',
     build=['zero'],
     pre=[('counting:count_objects', {'band': 5, 'objects': 'pictures'}, 'R.B5.S1', 'counting a group to 5: zero is the count when there are none'),
          ('composing:ten_frame_build', {'band': 5}, 'R.B5.S3', 'building a number to 5 on a frame: an empty frame shows 0'),
          ('comparing:compare_groups', {'band': 5, 'level': [1]}, 'R.B1.S7', 'fewer: none is the fewest of all')],
-    related=[('subtraction:sub_5_pictures', {}, 'taking away from 5 and saying how many are left')],
-    note='Support lesson from "Alive in 5!" (Phase 5) = R.B7.S1 "Introduce zero" (a gap there with the same build).')
+    related=[],
+    note='Support lesson from "Alive in 5!" (Phase 5) = R.B7.S1 "Introduce zero" (a gap there with the same build). Lessons r2 (rule 5, missed '
+         'live skill): sub_5_pictures, the round-1 related, deals 0 as the answer when every counter is taken away (10 of 100 items, the '
+         'counters cell with n = m), so the lesson is partial on it here; the R lane\'s gap verdict for R.B7.S1 is frozen and is noted for '
+         'its next round. No related: the count skills start at 1 and no live skill shows an empty set.')
 
 lesson(K_ + 'makingpairs',
     partial=[('composing:odd_even', {'forms': [2], 'range': 10}, 'picks the odd or the even number from three written numbers to 10; never pairs objects')],
@@ -369,7 +370,7 @@ lesson(K_ + 'makingpairs',
     build=['odd_even_pairs'],
     pre=[('counting:count_objects', {'band': 5, 'objects': 'pictures'}, 'R.B5.S1', 'counting a small group of pictures'),
          ('composing:number_bonds', {'band': 5}, 'R.B5.S6', 'a number to 5 as two parts'),
-         ('composing:ten_frame_build', {'band': 5}, 'R.B5.S3', 'building a number on a frame: counters fill the frame in twos, one above the other')],
+         ('composing:ten_frame_build', {'band': 5}, 'R.B5.S3', 'building a number to 5 on a frame: one counter in each box, matched one to one')],
     related=[('comparing:compare_groups', {'band': 10, 'dir': 'same'}, 'are two groups the same: matching objects one to one, as pairs do')],
     note='Support lesson from "Growing 6, 7, 8" (Phase 6) = R.B9.S6 "Make pairs - odd and even" (partial there with the same skill and build).')
 
@@ -392,10 +393,10 @@ lesson(K_ + 'positionallanguage',
     verdict='partial',
     missing='the positional words in front, behind, on top, under, in and next to, said about real objects',
     build=['position_map'],
-    pre=[('comparing:compare_objects', {}, 'R.B2.S1', 'comparing two objects side by side: the words of where things are start here')],
+    pre=[],
     related=[],
     note='Support lesson from "It\'s Me 1, 2, 3" (Phase 3) = R.B4.S4 "Describe position" (partial there with the same skill and build). '
-         'Pre-skills are few: before this phase Reception teaches only R.B1-R.B2, none of them about position except the side-by-side comparisons. '
+         'Pre-skills are few: before this phase Reception teaches only R.B1-R.B2 (match, sort, compare, patterns, measure talk), none of them about position. '
          'No related: shape_positions is the only live position skill.')
 
 lesson(K_ + 'positionallanguageonunderinnextto',
@@ -419,15 +420,18 @@ lesson(K_ + 'representnumbersto5',
          '(R.B5.S3 "Represent 4 and 5" is the same skill with a narrower window). The site tags it 2.NBT.A.1; the content is K.CC.B.4.')
 
 lesson(K_ + 'shapeswith4sidessquaresandrectangles',
-    partial=[('shapes_early:name_2d_shapes', {'forms': [1], 'shapes': [2]}, 'clicks every square or every rectangle among other shapes; it never counts sides or corners')],
+    partial=[('shapes_early:name_2d_shapes', {'forms': [1], 'shapes': [2]}, 'clicks every square or every rectangle among other shapes; it never counts sides or corners'),
+             ('shapes_early:shape_attributes', {'forms': [0], 'band': 4}, 'asks how many sides or vertices a triangle, square or rectangle has (a square has 4 sides); says vertices, not corners, also shows triangles, and never compares the square with the rectangle'),
+],
     verdict='partial',
-    missing='the 4 sides (and 4 corners) of squares and rectangles: counting them and comparing the two shapes',
+    missing='comparing the square and the rectangle: both have 4 straight sides and 4 corners, and a square\'s sides are all the same length',
     build=['compare_shapes'],
     pre=[('comparing:classify_count', {'band': 3, 'tiles': 2, 'objects': 'pictures'}, 'R.B1.S4', 'picking out every object of one kind'),
          ('counting:count_objects', {'band': 5, 'objects': 'shapes'}, 'R.B3.S1', 'counting a group to 5 one by one')],
     related=[('shapes_early:compose_shapes', {'shapes': [0, 1]}, 'two shapes put together make a new shape')],
     note='Support lesson from "Light and Dark" (Phase 4) = R.B6.S1 "Identify and name shapes with 4 sides". The R lane judged that step full on naming; '
-         'this title also names the property, 4 sides, which no live Reception item counts. Pre-skills are few: naming circles and triangles (R.B4.S1) '
+         'this title also names the property, 4 sides: shape_attributes counts the sides and the vertices of a square and of a rectangle, '
+         'but nothing compares the two shapes (compose_shapes, the related, makes a square or a rectangle from two pieces, never compares them); shape_corners_count {band:4} says corners but deals only 2 distinct items (one triangle, one square). Pre-skills are few: naming circles and triangles (R.B4.S1) '
          'uses the lesson\'s own key; R.B1-R.B4 give the sorting and counting listed.')
 
 lesson(K_ + 'sortobjectsbyoneattributecoloursizeshape',
@@ -461,9 +465,10 @@ lesson(K_ + 'spatialreasoning2composeanddecompose',
     build=['decompose_shapes'],
     pre=[('shapes_early:name_2d_shapes', {'forms': [1], 'shapes': [2]}, 'R.B6.S1', 'naming squares and rectangles, the shapes that are made and split'),
          ('shapes_early:name_2d_shapes', {'forms': [1], 'shapes': [0, 1]}, 'R.B4.S1', 'naming triangles, the parts of a square'),
-         ('composing:number_bonds', {'band': 10}, 'R.B11.S7', 'parts make a whole: the same idea with numbers')],
+],
     related=[],
-    note='Support lesson from "First Then Now" (Phase 9) = R.B15.S5 "Compose shapes" and R.B15.S6 "Decompose shapes". No related: compose_hexagon '
+    note='Support lesson from "First Then Now" (Phase 9) = R.B15.S5 "Compose shapes" and R.B15.S6 "Decompose shapes". Pre-skills are few: the '
+         'composing steps R.B6.S2 and R.B15.S5 use the lesson\'s own key (compose_shapes); the two naming steps are listed. No related: compose_hexagon '
          'fills hexagons and compose_rect_from_squares writes "2 × 3", above Reception.')
 
 lesson(K_ + 'spatialreasoning3visualizebuild',

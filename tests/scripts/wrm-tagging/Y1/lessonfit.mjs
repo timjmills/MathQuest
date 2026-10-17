@@ -209,6 +209,23 @@ export function digitSymbolChecks(text, items) {
     if (over.length) out.push(`says "${m[0]}" but ${over.length} of ${N} items pass ${L} (${over[0].text.trim().slice(0, 60)})`); }
   return out;
 }
+const ASKED = [['cube', /\bcubes?\b/i, /\bcubes?\b/i], ['cuboid', /\bcuboids?\b|rectangular prisms?/i, /\bcuboids?\b|rectangular prisms?/i], ['sphere', /\bspheres?\b/i, /\bspheres?\b/i],
+  ['cone', /\bcones?\b/i, /\bcones?\b/i], ['cylinder', /\bcylinders?\b/i, /\bcylinders?\b/i]];
+const NOPIC = /\b(?:no|never|without)\b[^;.]{0,40}\bpictur/i;
+const hasPic = i => /"pic":\s*[\[{"]/.test(i.pay || '');
+// G5 (lessons critic r1): a bound the text states ("wholes to 20", "numbers to 100") must be reached: a bound past 1.5 x the largest
+// number dealt (and past it + 2) is a false claim; a negated bound ("never past 10") is not a claim
+export function boundTooBig(text, items) {
+  const t = String(text || ''), out = [], M = Math.max(0, ...items.map(i => i.max || 0));
+  if (!items.length) return out;
+  for (const m of t.matchAll(/\b(?:numbers? (?:to|within|up to)|within|totals? (?:to|within)|wholes? (?:to|within)|sums? (?:to|within)|bonds? (?:to|within)|facts? (?:to|within)|count(?:ing)? (?:to|within)|(?:0|1) to)\s+(\d+)\b/gi)) {
+    const pre = t.slice(Math.max(0, m.index - 30), m.index);
+    if (/\b(?:never|no|not|only past|past|beyond|above|over)\b[^;]*$/i.test(pre)) continue;
+    const L = +m[1];
+    if (L > Math.max(1.5 * M, M + 2)) out.push(`says "${m[0]}" but the largest number dealt is ${M}`);
+  }
+  return out;
+}
 const SHAPES = ['triangle', 'circle', 'square', 'rectangle', 'cube', 'cuboid', 'sphere', 'cone', 'cylinder', 'number line', 'ten frame', 'number track', 'dice', 'balance'];
 function whyCheck(e, r) {
   const w0 = String(e.why || ''), out = [];
@@ -221,7 +238,18 @@ function whyCheck(e, r) {
     const re = new RegExp(shp === 'ten frame' ? 'ten[- ]?frame|tenframe|"frames?"|"objects":"frame"' : shp === 'number track' ? 'track|seqstrip' : shp === 'dice' ? 'dice|"objects":"dice"' : shp === 'cuboid' ? 'cuboid|rectangular prism' : shp === 'balance' ? 'balance|scale' : `\\b${shp}`, 'i');
     if (!r.items.some(i => re.test(`${i.text} ${i.a} ${i.x} ${i.vis} ${i.tpl} ${(i.pay || '').slice(0, 400)}`))) out.push(`why names "${shp}" but no item shows one`);
   }
-  if (/\bcolumn\b/i.test(pos) && !r.items.some(i => i.tpl === 'stack' || /column/i.test(`${i.text} ${i.vis}`))) out.push('why says column but no item is in columns');
+  if (/\bcolumn\b/i.test(pos) && !r.items.some(i => TR.isColumnItem(i) || /column/i.test(`${i.text} ${i.vis}`))) out.push('why says column but no item is in columns');   // G3
+  // lessons critic r1 G2: a shape the text says the pupil is ASKED for (click / find / name / pick / ask) must be asked by an item (its
+  // question names it, or it is the answer), not only drawn as a distractor; a parenthesis that calls a shape a distractor is not a claim
+  const posA = pos.replace(/\([^)]*distractor[^)]*\)/gi, ' ');
+  if (/\b(?:click|find|name|pick|ask)\w*\b/i.test(posA)) for (const [shp, sre, ire] of ASKED) {
+    if (!sre.test(posA)) continue;
+    if (!r.items.some(i => ire.test(i.text || '') || (ire.test(String(i.a || '')) && !/^\s*\[/.test(String(i.a || ''))))) out.push(`says the pupil is asked for the ${shp}, but no item asks for one (only drawn)`);
+  }
+  // G2: "no pictures" / "told in words, no pictures" is false when the story cell pictures the groups (payload.pic)
+  if (NOPIC.test(w0) && r.items.filter(hasPic).length > N / 3) out.push(`says no pictures, but ${r.items.filter(hasPic).length} of ${N} items picture the groups (payload pic)`);
+  // G5: a bound the text names ("wholes to 20", "to 100") that the items never come near
+  for (const f of boundTooBig(w, r.items)) out.push(f);
   if (/\bpictures?\b|\bpictured\b/i.test(pos) && r.items.filter(i => /<svg|<img|emoji|counters|"shape"|"bag"|"objects"|"kind"/i.test(`${i.raw} ${i.pay}`) || /[\u{1F300}-\u{1FAFF}]/u.test(`${i.x} ${i.vis}`)).length < N / 2) out.push('why says pictured but most items have no picture');
   for (const tc of TR.tableClaims(pos)) { const hit = r.items.filter(i => tc.re.test(`${CL.itemWords(i)} ¦ ${i.pay || ''}`)).length;
     if (hit < tc.s * N) out.push(`why claims "${tc.word}" (${tc.n}) but only ${hit} of ${N} items deal it`); }
@@ -229,7 +257,8 @@ function whyCheck(e, r) {
   // the K / R words a why uses for what the items do (Y1): more / fewer, heavier / lighter, longer / taller, odd / even, double, story
   const KW = [[/\bheavier|\blighter\b/i, /heav|light/i], [/\blonger\b|\bshorter\b/i, /long|short/i], [/\btaller\b/i, /tall|short/i], [/\bodd\b|\beven\b/i, /\bodd\b|\beven\b/i],
     [/\bdoubles?\b/i, /doubl|\b(\d+) \+ \1\b/i], [/\bstor(?:y|ies)\b/i, /[a-z]\.\s+[A-Z][^?]*\?/], [/\bone more\b|\b1 more\b/i, /\bmore\b|\bafter\b|\bnext\b/i], [/\bone less\b|\b1 less\b/i, /\bless\b|\bbefore\b/i],
-    [/\bsort(?:s|ing)?\b/i, /sort|count only|ring|group/i], [/\bsides\b/i, /\bsides?\b/i], [/\bcorners\b/i, /corner|vert/i]];
+    [/\bsort(?:s|ing)?\b/i, /sort|count only|ring|group/i], [/\bsides\b/i, /\bsides?\b/i], [/\bcorners\b/i, /corner|vert/i],
+    [/\bshar(?:e|es|ed|ing)\b/i, /\bshare|\bshared|\bsharing|each (?:child|friend|plate|person|bag) gets?|\bhalf\b|\bhalve/i]];   // G2: sharing is not grouping
   for (const [c, i] of KW) if (c.test(pos) && r.items.filter(it => i.test(`${it.text} ${it.a} ${it.x} ${it.vis}`)).length < N / 5) out.push(`why says "${(pos.match(c) || [''])[0]}" but fewer than a fifth of the items do it`);
   return out;
 }
@@ -297,6 +326,22 @@ function missedOptions(s) {
         if (!used) out.push(`a clause says "never / no …" what ${k} option ${def.id}=${JSON.stringify(v.v)} "${v.l}" deals; use the option (key + value) or name the skill and say why not`); } } }
   return [...new Set(out)];
 }
+// lessons critic r1 G4: a FULL lesson is held to its title AND to every CCSS code the site tags it with, through the hand-audit row
+// of full_audit.json (read from items, one entry per code); the row must name exactly the lesson's direct links, and a lesson that is
+// not FULL has no row
+const AUDIT = JSON.parse(fs.readFileSync(new URL('full_audit.json', import.meta.url), 'utf8'));
+const sigL = l => JSON.stringify(l.map(e => ({ key: e.key, opts: e.opts || {} })));
+export function fullAuditCheck(id, s) {
+  const row = AUDIT[id], out = [];
+  if (s.verdict !== 'full') { if (row) out.push('an audit row for a lesson that is not full'); return out; }
+  if (!row) return ['full, but no hand-audit row in full_audit.json (title and every site CCSS code)'];
+  if (sigL(row.links || []) !== sigL(s.direct)) out.push(`the audit row's links ${sigL(row.links || [])} are not the direct links ${sigL(s.direct)}`);
+  if (String(row.title || '').length < 40) out.push('the audit row does not read the title');
+  for (const c of s.site.ccss || []) if (String((row.ccss || {})[c] || '').length < 40) out.push(`the audit row does not read the site's ${c}`);
+  for (const c of Object.keys(row.ccss || {})) if (!(s.site.ccss || []).includes(c)) out.push(`the audit row reads ${c}, which the site does not tag`);
+  return out;
+}
+for (const id of Object.keys(AUDIT)) if (!id.startsWith('_') && !(d.lessons || {})[id]) { console.log(`FULLAUDIT: a row for ${id}, not a lesson`); process.exitCode = 1; }
 let bad = 0, checked = 0;
 for (const [id, s] of Object.entries(d.lessons || {})) {
   const fails = [];
@@ -323,6 +368,8 @@ for (const [id, s] of Object.entries(d.lessons || {})) {
       for (const h of CL.claimHits(e.missing, r.items, { gateOnly: true })) if (!h.ok) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause claims "${h.word}" (${h.claim}) but only ${h.hit} of ${h.n} items show it`);
       for (const h of CL.negatedHits(e.missing, r.items)) if (!h.ok) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause says "${h.part}" is not dealt, but ${h.hit} of ${h.n} items do it (${h.claim})`);
       for (const f of digitSymbolChecks(e.missing, r.items)) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})}: ${f}`);
+      if (NOPIC.test(e.missing) && r.items.filter(hasPic).length > r.items.length / 3) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause says no pictures, but ${r.items.filter(hasPic).length} of ${r.items.length} items picture the groups (payload pic)`);
+      for (const f of boundTooBig(e.missing, r.items)) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause: ${f}`);
       for (const f of whyCheck({ why: e.missing.replace(/\b(?:never|no|not|without)\b[^;.]*/gi, ' ') }, r)) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause: ${f}`);
     }
   }
@@ -333,6 +380,7 @@ for (const [id, s] of Object.entries(d.lessons || {})) {
       if (ownSig.has(sg)) fails.push(`${role} ${e.key}${JSON.stringify(e.opts || {})}: deals the same items as the lesson's own ${ownSig.get(sg)} (class F)`);
       if (seen.has(sg)) fails.push(`${role} ${e.key}: duplicate of ${seen.get(sg)} (same items)`); else seen.set(sg, e.key); } }
   for (const f of missedOptions(s)) fails.push(`M: ${f}`);
+  for (const f of fullAuditCheck(id, s)) fails.push(`FULLAUDIT: ${f}`);
   const one = { steps: {}, lessons: { [id]: s } };
   for (const x of TR.titleRepFinds(one, (k, o) => { const e = [...s.direct, ...s.partial].find(z => z.key === k && JSON.stringify(z.opts || {}) === JSON.stringify(o || {})); return probe(k, o || {}, e ? rangeOf(e) : 10000).items; }).finds) fails.push(`TITLEREP ${x.kind}: ${x.msg}`);
   { const clause = [s.missing, ...s.partial.map(p => p.missing)].join(' ; ');
@@ -346,4 +394,4 @@ for (const [id, s] of Object.entries(d.lessons || {})) {
   if (fails.length || ALL) console.log(`${id} [${isSupport(id) ? 'Support, Reception, ' + (phaseOf(id)?.name || '?') : lessonWk(id)}] ceiling ${own}: ${fails.length ? fails.length + ' FAIL\n   ' + fails.join('\n   ') : 'ok'}`);
 }
 console.log(`lessonfit: ${Object.keys(d.lessons || {}).length} lessons, ${checked} links, ${NPER} items a link; ${bad} findings`);
-process.exitCode = bad ? 1 : 0;
+process.exitCode = bad || process.exitCode ? 1 : 0;

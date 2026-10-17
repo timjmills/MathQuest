@@ -105,6 +105,10 @@ export function claimHits(text, items, { rulesOnly = false, gateOnly = false, ru
     if (ruleSet && !ruleSet.has(cl.n)) continue;
     if (!cl.c.test(pos)) continue;
     if (cl.n === 'litres' && /\b[IVXCDM]\b.*\b[IVXCDM]\b/.test(pos)) continue;   // "D, C, L and X" are Roman numerals
+    // lessons critic r1 G6: a cylinder named among solids (3-D shapes, sphere, cube, cone, prism) is a solid, not a measuring cylinder
+    // (titlerep.mjs has the same exemption for titles); only a ruler / scale / thermometer / jug word still makes the claim
+    if (cl.n === 'ruler / scale' && /\bcylinders?\b/i.test(pos) && /\b3-?d\b|\bsolids?\b|\bspheres?\b|\bcubes?\b|\bcones?\b|\bprisms?\b|\bcuboids?\b/i.test(pos)
+        && !/\bruler\b|\bscales?\b(?! factor)|thermometer|\bjug\b/i.test(pos)) continue;
     const hit = cl.n === 'story' ? items.filter(story).length : items.filter(i => cl.i.test(cl.all ? repStr(i) : cl.form ? formStr(i) : itemWords(i))).length;
     const share = cl.unit && nUnits > 2 ? Math.max(0.05, cl.s / (nUnits - 1)) : cl.s;
     out.push({ claim: cl.n, word: (pos.match(cl.c) || [''])[0], hit, n: N, ok: hit >= share * N });

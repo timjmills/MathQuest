@@ -6,24 +6,24 @@ print path, the link's own opts). Format: `question → answer {options} [answer
 
 ## Add and subtract within 5 written vertically (column form)
 
-`K|-|addandsubtractwithin5writtenverticallycolumnform` · W15 · committee · partial — missing: addition and subtraction within 5 written vertically, on one page (3 above + 2; 5 above − 4), with no carrying or borrowing row
+`K|-|addandsubtractwithin5writtenverticallycolumnform` · W15 · committee · full
 
-- **partial** `addition:add_10_no_regroup {"notation":["stacked"]}` — clause: one-digit addition written in a column (2 + 6 = 8), with sums to 10, past 5, and a "Use top row for carrying" line; never a subtraction
-  - max 9; types: number
-  - 1 + 2 = ? → 3
-  - 4 + 3 = ? → 7
-  - 2 + 5 = ? → 7
-  - 2 + 5 = ? → 7
-  - 8 + 1 = ? → 9
-  - 1 + 2 = ? → 3
-- **partial** `subtraction:sub_10_no_regroup {"notation":["stacked"]}` — clause: one-digit subtraction written in a column (9 − 3 = 6), from numbers to 10, past 5, and a "Use top row for borrowing" line; never an addition
-  - max 9; types: number
-  - 3 − 1 = ? → 2
-  - 7 − 4 = ? → 3
-  - 7 − 2 = ? → 5
-  - 7 − 2 = ? → 5
-  - 9 − 8 = ? → 1
-  - 3 − 1 = ? → 2
+- **direct** `addition:add_facts {"notation":["stacked"],"band":5}` — 
+  - max 5; types: number fact
+  - 5 + 0 = ? → 5
+  - 4 + 1 = ? → 5
+  - 1 + 3 = ? → 4
+  - 3 + 2 = ? → 5
+  - 5 + 0 = ? → 5
+  - 4 + 1 = ? → 5
+- **direct** `subtraction:sub_facts {"notation":["stacked"],"band":5}` — 
+  - max 5; types: number
+  - 5 − 5 = ? → 0
+  - 5 − 4 = ? → 1
+  - 4 − 3 = ? → 1
+  - 5 − 2 = ? → 3
+  - 5 − 5 = ? → 0
+  - 5 − 4 = ? → 1
 - **pre** `addition:add_5_pictures` — why: Y1.B2.S8 Addition - add together (taught earlier this year, wk W14): adding two pictured groups within 5 (1 + 3 = 4)
   - max 5; types: number counters
   - How many in all? 2 + 3 = ? → 5
@@ -178,9 +178,17 @@ print path, the link's own opts). Format: `question → answer {options} [answer
 
 ## 3D shapes (cube, cuboid, sphere, cone, cylinder)
 
-`K|-|3dshapescubecuboidsphereconecylinder` · no week · enrich-native · partial — missing: finding and naming the cuboid (rectangular prism) as well as the cube, sphere, cone and cylinder
+`K|-|3dshapescubecuboidsphereconecylinder` · no week · enrich-native · full
 
-- **partial** `shapes_early:name_3d_shapes {"forms":[1]}` — clause: clicks every sphere, cube, cone or cylinder among other solids; the rectangular prism (cuboid) is only ever a distractor, never the solid asked for
+- **direct** `shapes_early:name_3d_shapes {"forms":[0]}` — 
+  - max 3; types: multiple-choice
+  - What 3D shape is this? → Cylinder {Cylinder ; Cone ; Sphere ; Rectangular Prism}
+  - What 3D shape is this? → Cylinder {Sphere ; Cube ; Rectangular Prism ; Cylinder}
+  - What 3D shape is this? → Sphere {Rectangular Prism ; Cone ; Sphere ; Cube}
+  - What 3D shape is this? → Sphere {Rectangular Prism ; Cube ; Cylinder ; Sphere}
+  - What 3D shape is this? → Rectangular Prism {Rectangular Prism ; Cube ; Cylinder ; Sphere}
+  - What 3D shape is this? → Rectangular Prism {Cylinder ; Cube ; Rectangular Prism ; Sphere}
+- **direct** `shapes_early:name_3d_shapes {"forms":[1]}` — 
   - max 3; types: multi-select-check
   - Click ALL the spheres. → ["opt2"] {🔋 cylinder ; 🧊 cube ; ⚪ sphere ; 🍦 cone}
   - Click ALL the cones. → ["opt1","opt2"] {⛰️ pyramid ; 🍦 cone ; 🍦 cone ; ⚪ sphere}
@@ -331,7 +339,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - How many in all? 3 + 1 = ? → 4
   - How many in all? 2 + 3 = ? → 5
   - How many in all? 2 + 3 = ? → 5
-- **partial** `addition:add_wp_10 {"band":10}` — clause: add-more stories to 10 told in words (I have 3 balls. I get 2 more balls.); no first / then / now pictures, the pupil reads the story
+- **partial** `addition:add_wp_10 {"band":10}` — clause: add-more stories to 10 told in words (I have 3 balls. I get 2 more balls.), the two groups pictured in one row under the story; never three panels (first, then, now) and the pupil must read the story
   - max 10; types: number word-work
   - There are 5 balls in a box. 5 more balls roll in. How many balls are there now? → 10
   - 3 apples are in a bag. 2 apples are on a plate. How many apples are there in all? → 5
@@ -517,7 +525,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
 
 ## Combining 2 groups
 
-`K|-|combining2groups` · no week · enrich-native · partial — missing: combining two pictured groups with totals 6, 7 and 8 (Growing 6, 7, 8)
+`K|-|combining2groups` · no week · enrich-native · partial — missing: combining two pictured groups with totals 6, 7 and 8 in a picture-only cell, no story to read (Growing 6, 7, 8)
 
 - **partial** `addition:add_5_pictures` — clause: combines two pictured groups with totals to 5 only (2 + 3 = 5)
   - max 5; types: number counters
@@ -527,7 +535,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - How many in all? 3 + 1 = ? → 4
   - How many in all? 2 + 3 = ? → 5
   - How many in all? 2 + 3 = ? → 5
-- **partial** `addition:add_wp_10 {"band":7}` — clause: combine and add-more stories with totals to 7, told in words, no pictures to count
+- **partial** `addition:add_wp_10 {"band":7}` — clause: combine and add-more stories with totals to 7 told in words, both groups pictured under the story (2 stars and 5 stars); the pupil must read the story, and the total is never 8
   - max 7; types: number word-work
   - I have 2 balls. I get 2 more balls. How many balls do I have now? → 4
   - There are 4 apples in a bag. 3 more apples are put in. How many apples are there now? → 7
@@ -744,9 +752,9 @@ print path, the link's own opts). Format: `question → answer {options} [answer
 
 ## Comparing numbers to 10
 
-`K|-|comparingnumbersto10` · no week · enrich-native · partial — missing: comparing written numbers (numerals) to 10, beside their groups: 7 is more than 5
+`K|-|comparingnumbersto10` · no week · enrich-native · partial — missing: comparing two written numbers (numerals) to 10 without their groups (7 and 5: which is greater, which is less), with the words greater than and less than (K.CC.C.7)
 
-- **partial** `comparing:compare_groups {"band":10,"level":[1]}` — clause: compares two pictured groups to 10 (which has more, fewer, the same); the numbers are never written, so no numerals are compared
+- **partial** `comparing:compare_groups {"band":10,"level":[1,2]}` — clause: compares two pictured groups to 10 (which has more, fewer, the same); level 1 leaves the pupil to match one to one, level 2 writes how many under each group, so the numerals are compared beside their groups; never two numerals without their groups, never the words greater than / less than
   - max 0; types: text compare
   - Do the groups have the same number of counters? → not the same
   - Which group has more counters? → A
@@ -789,9 +797,9 @@ print path, the link's own opts). Format: `question → answer {options} [answer
 
 ## Comparing numbers to 5
 
-`K|-|comparingnumbersto5` · no week · enrich-native · partial — missing: comparing written numbers (numerals) to 5, beside their groups: 4 is more than 2
+`K|-|comparingnumbersto5` · no week · enrich-native · partial — missing: comparing two written numbers (numerals) to 5 without their groups (4 and 2: which is greater, which is less), with the words greater than and less than (K.CC.C.7)
 
-- **partial** `comparing:compare_groups {"band":5,"level":[1]}` — clause: compares two pictured groups to 5 (which has more, fewer, the same); the numbers are never written, so no numerals are compared
+- **partial** `comparing:compare_groups {"band":5,"level":[1,2]}` — clause: compares two pictured groups to 5 (which has more, fewer, the same); level 1 leaves the pupil to match one to one, level 2 writes how many under each group, so the numerals are compared beside their groups; never two numerals without their groups, never the words greater than / less than
   - max 0; types: text compare
   - Do the groups have the same number of counters? → not the same
   - Which group has more counters? → A
@@ -979,7 +987,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Click ALL the triangles. → ["opt1","opt2"] {🟦 square ; 🔺 triangle ; 🔺 triangle ; ▭ rectangle}
   - Click ALL the rectangles. → ["opt1","opt3"] {🟦 square ; ▭ rectangle ; ⭐ star ; ▭ rectangle}
   - Click ALL the circles. → ["opt0"] {⭕ circle ; ▭ rectangle ; 🟦 square ; ⬟ pentagon}
-- **partial** `shapes_early:name_3d_shapes {"forms":[1]}` — clause: clicks every sphere, cylinder, cube, cone or rectangular prism among other solids; never links a solid to its flat faces
+- **partial** `shapes_early:name_3d_shapes {"forms":[1]}` — clause: clicks every sphere, cylinder, cube or cone among other solids (the rectangular prism is only drawn as a distractor); never links a solid to its flat faces
   - max 3; types: multi-select-check
   - Click ALL the spheres. → ["opt2"] {🔋 cylinder ; 🧊 cube ; ⚪ sphere ; 🍦 cone}
   - Click ALL the cones. → ["opt1","opt2"] {⛰️ pyramid ; 🍦 cone ; 🍦 cone ; ⚪ sphere}
@@ -1024,6 +1032,14 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Double it! 2 + 2 = ? → 4
   - Double it! 9 + 9 = ? → 18
   - Double it! 3 + 3 = ? → 6
+- **partial** `patterns:double {"band":20}` — clause: doubles 2 to 10 (double 9 is 18) with another equal bar drawn beside the first; past 5 + 5, and bars, never two equal pictured groups
+  - max 20; types: number
+  - Double 6 → 12
+  - Double 6 → 12
+  - Double 5 → 10
+  - Double 10 → 20
+  - Double 9 → 18
+  - Double 6 → 12
 - **pre** `composing:number_bonds {"band":10}` — why: R.B11.S7 Composition to 10 (Pre-K, block R.B11, before this Support lesson's source phase): a whole to 10 split into two parts
   - max 10; types: number bond
   - ? + 3 = 7 → 4
@@ -1048,14 +1064,14 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - The frame shows 5. How many more make 10? → 5
   - The frame shows 6. How many more make 10? → 4
   - The frame shows 7. How many more make 10? → 3
-- **related** `division:share_into_groups {"band":12}` — why: sharing a group equally: the inverse of doubling
-  - max 12; types: number counters
-  - There are 12 counters. Make groups of 4. How many groups are there? → 3
-  - There are 12 counters. Make groups of 3. How many groups are there? → 4
-  - There are 10 counters. Make groups of 5. How many groups are there? → 2
-  - There are 9 counters. Make groups of 3. How many groups are there? → 3
-  - There are 12 counters. Make groups of 3. How many groups are there? → 4
-  - There are 8 counters. Make groups of 4. How many groups are there? → 2
+- **related** `patterns:halve {"band":10}` — why: halving a number to 10 (half of 8 is 4), a bar split into 2 equal parts: the inverse of doubling
+  - max 10; types: number
+  - Half of 6 → 3
+  - Half of 6 → 3
+  - Half of 4 → 2
+  - Half of 10 → 5
+  - Half of 10 → 5
+  - Half of 6 → 3
 
 ## Explore 2D shapes (circle, triangle, rectangle, square)
 
@@ -1080,8 +1096,16 @@ print path, the link's own opts). Format: `question → answer {options} [answer
 
 ## Introducing zero
 
-`K|-|introducingzero` · no week · enrich-native · gap — missing: zero as the count of an empty set (no counters left, an empty plate) and writing 0
+`K|-|introducingzero` · no week · enrich-native · partial — missing: zero as the count of an empty set (no counters left, an empty plate) and writing 0
 
+- **partial** `subtraction:sub_5_pictures` — clause: takes away from a pictured group to 5 and asks how many are left; about 1 item in 10 takes every counter away, so the answer is 0 (start with 4, take away 4); never an empty set to count on its own and never 0 as a number to write or find on a track
+  - max 5; types: number counters
+  - Start with 5, take away 0. How many are left? → 5
+  - Start with 5, take away 1. How many are left? → 4
+  - Start with 5, take away 2. How many are left? → 3
+  - Start with 2, take away 1. How many are left? → 1
+  - Start with 5, take away 3. How many are left? → 2
+  - Start with 5, take away 1. How many are left? → 4
 - **pre** `counting:count_objects {"band":5,"objects":"pictures"}` — why: R.B5.S1 Find 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): counting a group to 5: zero is the count when there are none
   - max 5; types: number counters
   - How many balls are there? → 1
@@ -1106,14 +1130,6 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Which group has fewer counters? → B
   - Do the groups have the same number of counters? → not the same
   - Which group has fewer counters? → A
-- **related** `subtraction:sub_5_pictures` — why: taking away from 5 and saying how many are left
-  - max 5; types: number counters
-  - Start with 5, take away 0. How many are left? → 5
-  - Start with 5, take away 1. How many are left? → 4
-  - Start with 5, take away 2. How many are left? → 3
-  - Start with 2, take away 1. How many are left? → 1
-  - Start with 5, take away 3. How many are left? → 2
-  - Start with 5, take away 1. How many are left? → 4
 
 ## Making pairs
 
@@ -1139,11 +1155,11 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - max 5; types: number bond
   - ? + 1 = 2 → 1
   - 1 + ? = 5 → 4
-  - 2 + 1 = ? → 3
+  - 2 + 2 = ? → 4
   - ? + 1 = 3 → 2
   - 4 + ? = 5 → 1
-  - 1 + 2 = ? → 3
-- **pre** `composing:ten_frame_build {"band":5}` — why: R.B5.S3 Represent 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): building a number on a frame: counters fill the frame in twos, one above the other
+  - 1 + 3 = ? → 4
+- **pre** `composing:ten_frame_build {"band":5}` — why: R.B5.S3 Represent 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): building a number to 5 on a frame: one counter in each box, matched one to one
   - max 5; types: ten-frame-build tenframe
   - Build 1 on the ten frame. → 1
   - Build 4 on the ten frame. → 4
@@ -1225,14 +1241,6 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Where is the ball compared to the heart? → Above {Between ; Above ; Beside ; Below}
   - Where is the heart compared to the star? → Between {Above ; Below ; Between ; Beside}
   - Where is the ball compared to the heart? → Above {Between ; Below ; Beside ; Above}
-- **pre** `comparing:compare_objects` — why: R.B2.S1 Compare size (Pre-K, block R.B2, before this Support lesson's source phase): comparing two objects side by side: the words of where things are start here
-  - max 0; types: text
-  - Which line is shorter? → B
-  - Which tower is taller? → A
-  - Which tower is shorter? → A
-  - Which bar is thicker? → B
-  - Which bar is thinner? → B
-  - Which line is longer? → B
 
 ## Positional language (on, under, in, next to)
 
@@ -1271,10 +1279,10 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - max 5; types: number bond
   - ? + 1 = 2 → 1
   - 1 + ? = 5 → 4
-  - 2 + 1 = ? → 3
+  - 2 + 2 = ? → 4
   - ? + 1 = 3 → 2
   - 4 + ? = 5 → 1
-  - 1 + 2 = ? → 3
+  - 1 + 3 = ? → 4
 - **pre** `comparing:compare_groups {"band":5,"level":[1]}` — why: R.B1.S7 Compare amounts (Pre-K, block R.B1, before this Support lesson's source phase): comparing two small groups
   - max 0; types: text compare
   - Do the groups have the same number of counters? → not the same
@@ -1294,7 +1302,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
 
 ## Shapes with 4 sides (squares and rectangles)
 
-`K|-|shapeswith4sidessquaresandrectangles` · no week · enrich-native · partial — missing: the 4 sides (and 4 corners) of squares and rectangles: counting them and comparing the two shapes
+`K|-|shapeswith4sidessquaresandrectangles` · no week · enrich-native · partial — missing: comparing the square and the rectangle: both have 4 straight sides and 4 corners, and a square's sides are all the same length
 
 - **partial** `shapes_early:name_2d_shapes {"forms":[1],"shapes":[2]}` — clause: clicks every square or every rectangle among other shapes; it never counts sides or corners
   - max 3; types: multi-select-check
@@ -1304,6 +1312,14 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Click ALL the rectangles. → ["opt2"] {⭕ circle ; 🟦 square ; ▭ rectangle ; ⭐ star}
   - Click ALL the rectangles. → ["opt1","opt3"] {🟦 square ; ▭ rectangle ; ⭐ star ; ▭ rectangle}
   - Click ALL the squares. → ["opt2"] {⬟ pentagon ; 🔺 triangle ; 🟦 square ; ⭐ star}
+- **partial** `shapes_early:shape_attributes {"forms":[0],"band":4}` — clause: asks how many sides or vertices a triangle, square or rectangle has (a square has 4 sides); says vertices, not corners, also shows triangles, and never compares the square with the rectangle
+  - max 4; types: number
+  - How many vertices does a triangle have? → 3
+  - How many sides does a triangle have? → 3
+  - How many sides does a rectangle have? → 4
+  - How many vertices does a square have? → 4
+  - How many sides does a triangle have? → 3
+  - How many sides does a square have? → 4
 - **pre** `comparing:classify_count {"band":3,"tiles":2,"objects":"pictures"}` — why: R.B1.S4 Sort objects to a type (Pre-K, block R.B1, before this Support lesson's source phase): picking out every object of one kind
   - max 3; types: number counters
   - Count only the fish. → 1
@@ -1415,14 +1431,6 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Click ALL the triangles. → ["opt1","opt2"] {🟦 square ; 🔺 triangle ; 🔺 triangle ; ▭ rectangle}
   - Click ALL the circles. → ["opt2"] {▭ rectangle ; 🔺 triangle ; ⭕ circle ; ⭐ star}
   - Click ALL the circles. → ["opt0"] {⭕ circle ; ▭ rectangle ; 🟦 square ; ⬟ pentagon}
-- **pre** `composing:number_bonds {"band":10}` — why: R.B11.S7 Composition to 10 (Pre-K, block R.B11, before this Support lesson's source phase): parts make a whole: the same idea with numbers
-  - max 10; types: number bond
-  - ? + 3 = 7 → 4
-  - 2 + ? = 10 → 8
-  - 2 + 2 = ? → 4
-  - ? + 2 = 5 → 3
-  - 1 + ? = 10 → 9
-  - 2 + 8 = ? → 10
 
 ## Spatial reasoning (3) - visualize, build
 
