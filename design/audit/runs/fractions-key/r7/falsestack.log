@@ -1,0 +1,80 @@
+prompts with n/d 662 stacked 737
+composing:fraction_number_line all=true cell=false | Place 1/8 on ## shows 2/3 shaded?
+counting_mixed:counting_all all=true cell=false | Place 4/5 on
+integers:ordering_rationals all=true cell=false | GREATEST: -1/2, 0.6, || 0.25, 1/2 ## GREATEST: -1/2, -1/3, ## -0.2, 3/4, -1/2,
+fractions:identify all=true cell=true | shows 2/8? ## of 2/10? ## shows 4/8?
+fractions:shade_fraction all=true cell=true | Show 4/8 on ## Show 2/10 on ## Show 3/8 on
+fractions:equiv_frac_visual all=true cell=true | shows 3/5. Write ## shows 2/6. Write ## shows 1/6. Write
+fractions:equiv_frac_nv all=true cell=false | number: 2/5 = ## to 2/4. ## Are 2/4 and ||  6/12 equivalent
+fractions:select_equiv_frac all=true cell=false | to 3/6. ## to 2/8. ## to 2/6.
+fractions:equivalent all=true cell=false | make 3/4 equivalent: ## Are 2/6 and ||  6/18 equivalent? ## to 1/2.
+fractions:fraction_of_set all=false cell=true | away 1/3 of ## away 4/4 of ## away 1/6 of
+fractions:fraction_of_set all=true cell=true | away 1/3 of ## away 4/4 of ## away 1/6 of
+fractions:fraction_of_set_hard all=false cell=true | away 2/4 of ## away 6/6 of ## takes 3/6 of
+fractions:fraction_of_set_hard all=true cell=true | away 2/4 of ## away 6/6 of ## takes 3/6 of
+fractions:compare all=true cell=true | fractions: 1/5 and ||  1/8. ## fractions: 6/12 and ||  1/3. ## fractions: 3/6 and ||  2/4.
+fractions:simplify all=true cell=false | simplify 10/15.) ## Is 5/6 already ## simplify 14/21.)
+fractions:compose_target_frac all=true cell=false | make 6/10. ## make 4/12. ## make 4/10.
+fractions:fraction_of_set_nv all=false cell=false | is 1/8 of ## is 3/4 of ## is 1/3 of
+fractions:fraction_of_set_nv all=true cell=false | is 1/8 of ## stickers. 1/3 are ## is 3/4 of
+fractions:fraction_of_set_hard_nv all=false cell=false | is 2/12 of ## 3/5 of ## is 2/4 of
+fractions:fraction_of_set_hard_nv all=true cell=false | is 2/12 of ## jellybeans. 2/4 are ## 3/5 of
+fractions:order_frac_numline all=true cell=false | shows 5/8 on ## shows 1/6 on ## shows 1/5 on
+fractions:benchmark_fractions all=true cell=false | Is 3/5 closest || 0, 1/4, 1/2, ||  3/4, or ## Is 2/5 closest || 0, 1/4, 1/2, ||  3/4, or ## to 1/2.
+fractions:compare_frac_lcd all=true cell=false | Compare: 2/6 ___ ||  5/8  ## Compare: 1/3 ___ ||  2/5  ## Compare: 2/4 ___ ||  4/6 
+fractions:graph_fractions all=true cell=false | Place 1/2 on ## Place 1/4 on ## Place 3/8 on
+fractions:round_fractions all=true cell=false | 5 2/6 to ## 2 2/5 to ## 4 2/6 to
+fractions:fraction_bar_ops all=true cell=false | bars: 3/5 − ||  2/5 = ## bars: 2/4 − ||  1/4 = ## bars: 1/2 − ||  1/2 =
+fractions:fraction_nl_drag all=true cell=true | Put 1/6 on ## Put 4/8 on ## Put 3/5 on
+fraction_operations:add_fractions_like all=true cell=true | Calculate: 4/7 + ||  3/7 = ## Calculate: 2/4 + ||  2/4 = ## Calculate: 3/5 + ||  2/5 =
+fraction_operations:sub_fractions_like all=true cell=true | Calculate: 5/7 − ||  2/7 = ## Calculate: 3/4 − ||  1/4 = ## Calculate: 4/5 − ||  2/5 =
+fraction_operations:add_mixed_like all=true cell=true | 2 3/5 + || 2 4/5 = ## 2 1/4 + || 2 2/4 = ## 2 3/5 + || 1 2/5 =
+fraction_operations:sub_mixed_like all=true cell=true | 4 2/5 − || 3 3/5 = ## 3 1/3 − || 1 1/3 = ## 4 2/4 − || 2 1/4 =
+fraction_operations:mult_frac_whole all=true cell=true | Calculate: 3/5 × ## × 1/3 = ## Calculate: 2/4 ×
+fraction_operations:decompose_fractions all=true cell=false | Write 4/5 as ## Write 2/3 as ## Write 3/4 as
+fraction_operations:frac_word_problems all=false cell=false | ate 3/6 of || ate 1/6. How ## ate 1/5 of || ate 1/5. How ## had 3/4 of || ate 1/4 of
+fraction_operations:frac_word_problems all=true cell=false | ate 3/6 of || ate 1/6. How ## ate 1/5 of || ate 1/5. How ## had 3/4 of || ate 1/4 of
+fraction_operations:frac_word_problems_plain all=false cell=false | ate 3/6 of || ate 1/6. How ## ate 1/5 of || ate 1/5. How ## had 3/4 of || ate 1/4 of
+fraction_operations:frac_word_problems_plain all=true cell=false | ate 3/6 of || ate 1/6. How ## ate 1/5 of || ate 1/5. How ## had 3/4 of || ate 1/4 of
+fraction_operations:frac_10_100 all=true cell=false | Write 5/10 as ## Write 2/10 as ## Write 4/10 as
+fraction_operations:add_frac_unlike all=true cell=true | Calculate: 2/6 + ||  5/8 = ## Calculate: 1/3 + ||  2/5 = ## Calculate: 2/4 + ||  4/6 =
+fraction_operations:sub_frac_unlike all=true cell=true | Calculate: 5/8 − ||  2/6 = ## Calculate: 2/5 − ||  1/3 = ## Calculate: 4/6 − ||  2/4 =
+fraction_operations:add_mixed_unlike all=true cell=true | 2 3/4 + || 2 7/8 = ## 2 1/2 + || 2 2/6 = ## 2 2/3 + || 1 2/6 =
+fraction_operations:sub_mixed_unlike all=true cell=true | 4 1/3 − || 3 3/6 = ## 3 1/2 − || 1 2/4 = ## 4 1/3 − || 2 1/4 =
+fraction_operations:add_frac_like_nv all=true cell=false | 2/7 + ||  1/7 = ## simplify: 2/4 + ||  2/4 ## simplify: 3/5 + ||  2/5
+fraction_operations:sub_frac_like_nv all=true cell=false | 3/7 − ||  1/7 = ## simplify: 3/4 − ||  1/4 ## simplify: 4/5 − ||  2/5
+fraction_operations:add_frac_unlike_nv all=true cell=false | 1/3 + ||  1/8 = ## 1/3 + || = 11/15. Find ## 2/3 +
+fraction_operations:sub_frac_unlike_nv all=true cell=false | 1/3 − ||  1/8 = ## 1/3 − || = 2/15. Find ## 2/3 − || = 1/3. Find
+fraction_operations:add_mixed_like_nv all=true cell=false | 9 2/6 + || 1 2/6 = ## 2 4/8 + || 4 7/8. Find ## 4 4/6 + || 5 4/6 =
+fraction_operations:sub_mixed_like_nv all=true cell=false | 9 2/6 − || 1 1/6 = ## 4 4/8 − || 2 1/8. Find ## 5 2/6 − || 3 4/6 =
+fraction_operations:add_mixed_unlike_nv all=true cell=false | 6 1/4 + || 1 4/10 = ## 1 3/6 + || 3 5/6. Find ## 3 3/6 + || 4 5/10 =
+fraction_operations:sub_mixed_unlike_nv all=true cell=false | 6 1/4 − || 1 4/10 = ## 3 1/6 − || 1 8/12 = ## 4 3/6 − || 2 6/10 =
+fraction_operations:mult_frac_whole_nv all=true cell=false | × 3/5 = ## × 1/3 ## 2/4 ×
+fraction_operations:decompose_frac_nv all=true cell=false | Write 3/5 as ## Write 2/3 as ## many 1/4's make || up 3/4?
+fraction_operations:frac_10_100_nv all=true cell=false | Write 9/10 as ## 2/10 + ||  5/100 = ## 4/10 =
+fraction_operations:mult_frac_frac_nv all=true cell=false | 2/4 × ||  3/5 = ## 1/3 × || = 1/12. Find ## simplify: 1/3 × ||  2/4
+fraction_operations:div_unit_frac_nv all=true cell=false | ÷ 1/6 = ## 1/3 ÷ ## ÷ 1/3 =
+fraction_operations:frac_as_div_nv all=true cell=false | If 7/3 means ## If 7/4 means ## If 13/6 means
+fraction_operations:mult_scaling_nv all=true cell=false | Is 1/3 × ## =: 5/3 × ## =: 2/6 ×
+fraction_operations:mult_frac_frac all=true cell=true | Calculate: 3/5 × ||  2/3 = ## Calculate: 1/4 × ||  1/3 = ## Calculate: 2/4 × ||  1/3 =
+fraction_operations:mult_frac_frac all=true cell=false | to 1/2.
+fraction_operations:div_unit_fraction all=true cell=true | 1/5 ÷ ## ÷ 1/4 = ## ÷ 1/5 =
+fraction_operations:mult_scaling all=true cell=false | Is 4/5 × ## Is 4/2 × ## Is 2/2 ×
+fraction_operations:frac_mult_word all=false cell=false | is 1/3 of || and 2/4 of ## uses 2/5 of ## is 1/2 of || and 2/3 of
+fraction_operations:frac_mult_word all=true cell=false | is 1/3 of || and 2/4 of ## needs 1/3 cup ## uses 2/5 of
+fraction_operations:frac_mult_word_plain all=false cell=false | is 1/3 of || and 2/4 of ## uses 2/5 of ## is 1/2 of || and 2/3 of
+fraction_operations:frac_mult_word_plain all=true cell=false | is 1/3 of || and 2/4 of ## needs 1/3 cup ## uses 2/5 of
+fraction_operations:frac_word_mixed_plain all=false cell=false | had 5/8 of || ate 1/8 of ## ate 1/6 of || ate 3/6. How ## is 2/3 of || and 1/3 of
+fraction_operations:frac_word_mixed_plain all=true cell=false | had 5/8 of || ate 1/8 of ## ate 1/6 of || ate 3/6. How ## is 2/3 of || and 1/3 of
+fraction_operations:estimate_frac_ops all=true cell=false | Estimate: 2/6 - ||  2/8 ## Estimate: 2/4 - ||  2/6 ## Estimate: 2/5 - ||  1/6
+conversions:f_to_d all=true cell=false | decimal: 1/100 ## decimal: 25/100 ## decimal: 3/10
+conversions:f_to_p all=true cell=false | percent: 1/100 ## percent: 25/100 ## percent: 9/10
+frac_dec_mixed:fractions_all all=true cell=true | shows 1/3. Write ## Put 1/4 on ## fractions: 2/5 and ||  1/2.
+frac_dec_mixed:fractions_all all=true cell=false | to 2/8. ## shows 1/5 on ## bars: 3/9 + ||  2/3 =
+frac_dec_mixed:conversions_all all=true cell=false | percent: 8/10 ## decimal: 1/10
+frac_dec_mixed:fdp_all all=true cell=false | 2 1/4. ## decompose 2/3 into
+frac_dec_mixed:fdp_all all=true cell=true | shows 1/4. Write ## 2 1/3 − || 1 3/4 =
+graphs:line_plot all=true cell=false | measured 2/4 inches? ## measured 1/4 inches? ## measured 5/8 inches?
+graphs:line_plot_fractions all=true cell=false | at 3/4? ## at 1/4? ## at 1/8?
+probability:probability_basic all=true cell=false | than 1/2.
+vocabulary:vocab_grade_6_fractions all=true cell=false | sign. -1/2 is || of 1/2."

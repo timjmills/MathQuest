@@ -1,0 +1,60 @@
+ws-print-lint: source kit, 5 skill(s)
+  fractions:fraction_of_set#review: 2+1 pages, 13 finding(s)
+  fractions:fraction_of_set#review@s1: 2+1 pages, 9 finding(s)
+  fractions:fraction_of_set_hard#review: 2+1 pages, 0 finding(s)
+  fractions:fraction_of_set_hard#review@s1: 2+1 pages, 0 finding(s)
+  fraction_operations:add_fractions_like#review: 2+1 pages, 0 finding(s)
+  fraction_operations:add_fractions_like#review@s1: 2+1 pages, 0 finding(s)
+  fraction_operations:sub_fractions_like#review: 2+1 pages, 2 finding(s)
+  fraction_operations:sub_fractions_like#review@s1: 2+1 pages, 2 finding(s)
+  fraction_operations:add_frac_unlike#review: 2+1 pages, 12 finding(s)
+  fraction_operations:add_frac_unlike#review@s1: 2+1 pages, 12 finding(s)
+
+document                                            pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT  result
+fractions:fraction_of_set#review                      2+1k    .     .   12    .        .     .       .    1     .       .     .    .      .       .  FAIL
+fractions:fraction_of_set#review@s1                   2+1k    .     .    8    .        .     .       .    1     .       .     .    .      .       .  FAIL
+fractions:fraction_of_set_hard#review                 2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:fraction_of_set_hard#review@s1              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_fractions_like#review         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_fractions_like#review@s1      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:sub_fractions_like#review         2+1k    .     .    .    .        .     .       2    .     .       .     .    .      .       .  FAIL
+fraction_operations:sub_fractions_like#review@s1      2+1k    .     .    .    .        .     .       2    .     .       .     .    .      .       .  FAIL
+fraction_operations:add_frac_unlike#review            2+1k    .     .   12    .        .     .       .    .     .       .     .    .      .       .  FAIL
+fraction_operations:add_frac_unlike#review@s1         2+1k    .     .   12    .        .     .       .    .     .       .     .    .      .       .  FAIL
+TOTAL                                                         .     .   44    .        .     .       4    2     .       .     .    .      .       .
+
+fractions:fraction_of_set#review (Fraction of a Set (Visual) (review))
+  [L-KEY AK-4 critical] (p2) key page 2 has 8 answer slots, pupil page 1 has 6 (AK-4)
+  [L-FONT TY-1 major] x8 (p1,2 cells 7,7,8,8,7,7,8,8) font-family "Arial, Helvetica, sans-serif": every character of question content is Andika (TY-1)
+      e.g. <div> "Are and equivalent fractions..." | <span> "Answer:"
+  [L-FONT TY-1 major] x2 (p1,2) printed page 1: 2 text run(s) embedded in "LiberationSans-Bold", not Andika (e.g. "Answer:") (TY-1, TY-3)
+  [L-FONT TY-1 major] x2 (p1,2) printed page 1: 8 text run(s) embedded in "LiberationSans", not Andika (e.g. "Are") (TY-1, TY-3)
+
+fractions:fraction_of_set#review@s1 (Fraction of a Set (Visual) (review))
+  [L-KEY AK-4 critical] (p2) key page 2 has 5 answer slots, pupil page 1 has 4 (AK-4)
+  [L-FONT TY-1 major] x4 (p1,2 cells 5,5,5,5) font-family "Arial, Helvetica, sans-serif": every character of question content is Andika (TY-1)
+      e.g. <div> "Are and equivalent fractions..." | <span> "Answer:"
+  [L-FONT TY-1 major] x2 (p1,2) printed page 1: 1 text run(s) embedded in "LiberationSans-Bold", not Andika (e.g. "Answer:") (TY-1, TY-3)
+  [L-FONT TY-1 major] x2 (p1,2) printed page 1: 4 text run(s) embedded in "LiberationSans", not Andika (e.g. "Are") (TY-1, TY-3)
+
+fraction_operations:sub_fractions_like#review (Subtract Fractions (Like Denom) (Visual) (review))
+  [L-DENSITY H13 major] x2 (p1,2 cells 3,3) one empty band 60.4 mm wide in a 184.9 mm cell (33%): the content is pinned to one side (RUBRIC H13)
+      e.g. <div.ws-cell.mqt--frac-model[data-ws-cell="frac-model"]> "c. 6 7 + 5 7 =" | <div.ws-cell.mqt--frac-model[data-ws-cell="frac-model"]> "c. 6 7 + 5 7 = 1 4 7"
+
+fraction_operations:sub_fractions_like#review@s1 (Subtract Fractions (Like Denom) (Visual) (review))
+  [L-DENSITY H13 major] x2 (p1,2 cells 3,3) one empty band 60.4 mm wide in a 184.9 mm cell (33%): the content is pinned to one side (RUBRIC H13)
+      e.g. <div.ws-cell.mqt--frac-model[data-ws-cell="frac-model"]> "c. 4 6 + 3 6 =" | <div.ws-cell.mqt--frac-model[data-ws-cell="frac-model"]> "c. 4 6 + 3 6 = 1 1 6"
+
+fraction_operations:add_frac_unlike#review (Add Fractions (Unlike Denom) (Visual) (review))
+  [L-FONT TY-2 major] x8 (p1,2 cells 3,3,3,3,3,3,3,3) font-weight 600: Andika has only 400 and 700 (TY-2)
+      e.g. <span.num> "4" | <span.den> "10"
+  [L-FONT TY-7 major] x4 (p1,2 cells 3,3,3,3) slash fraction "4/10": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)
+      e.g. <div> "Write 4/10 as a fraction wit..." | <div> "4/10"
+
+fraction_operations:add_frac_unlike#review@s1 (Add Fractions (Unlike Denom) (Visual) (review))
+  [L-FONT TY-2 major] x8 (p1,2 cells 3,3,3,3,3,3,3,3) font-weight 600: Andika has only 400 and 700 (TY-2)
+      e.g. <span.num> "3" | <span.den> "10"
+  [L-FONT TY-7 major] x4 (p1,2 cells 3,3,3,3) slash fraction "3/10": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)
+      e.g. <div> "Write 3/10 as a fraction wit..." | <div> "3/10"
+
+ws-print-lint: FAIL - 10 document(s), source kit; 50 finding(s) in 6 document(s)

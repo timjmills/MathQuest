@@ -1,0 +1,33 @@
+ws-boot-smoke exit 0
+mp-fos-seeds exit 0
+mp-other exit 0
+mp-regress-r6probe exit 0
+ws-print-lint-S exit 0
+ws-print-lint-M exit 0
+ws-print-lint-L exit 0
+ws-print-lint-S-short exit 0
+ws-print-lint-L-short exit 0
+ws-print-lint-review exit 1
+ws-screen-answer exit 0
+ws-chromebook-fit exit 0
+ws-code-snapshot exit 0
+ws-content-audit exit 0
+DONE
+render exit 0
+screens exit 0
+tap exit 0
+card-stack exit 1
+falsestack exit 0
+card-shot-fwp exit 0
+formb exit 1
+DONE2
+base-review-lint exit 1
+base-render exit 0
+base-mp7 exit 0
+DONE3
+falsestack7 exit 0
+card-stack-2 exit 0
+formb exit 0
+card-shot-prob exit 0
+card-shot-fwp390 exit 0
+DONE4

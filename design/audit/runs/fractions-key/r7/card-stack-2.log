@@ -1,0 +1,12 @@
+ratio_intro s1 (no n/d in prompt) There are 8 pencils and 12 pens. What is the ratio of pencils to pens?
+unit_rate_intro s1 (no n/d in prompt) An author wrote 9 pages in 3 days. How many pages per day?
+percent_of_number s1 (no n/d in prompt) What is 20% of 45?
+percent_of_number s2 {"src":"Click ALL expressions equal to 10% of 80.","stacked":["10100","8010"],"shown":"Tap ALL expressions equal to 10% of 80."}
+percent_of_number s3 {"src":"Click ALL expressions equal to 50% of 40.","stacked":["4050"],"shown":"Tap ALL expressions equal to 50% of 40."}
+fraction_of_set_hard_nv s1 {"src":"Click ALL expressions equal to 3/4 of 12.","stacked":["43","34"],"shown":"Tap ALL expressions equal to 34 of 12."}
+fraction_of_set_hard_nv s2 {"src":"What is 3/8 of 88?","stacked":["38"],"shown":"What is 3 8 of 88?"}
+fraction_of_set_hard_nv s3 {"src":"4/9 of a number is 16. What is the number?","stacked":["49"],"shown":"4 9 of a number is 16. What is the number?"}
+fraction_of_set_hard_nv s4 {"src":"Click ALL expressions equal to 2/3 of 12.","stacked":["32","243","23"],"shown":"Tap ALL expressions equal to 23 of 12."}
+fraction_of_set_hard_nv s5 {"src":"What is 2/12 of 96?","stacked":["212"],"shown":"What is 2 12 of 96?"}
+fraction_of_set_hard_nv s6 {"src":"A farm has 20 animals. 3/4 are chickens. How many?","stacked":[],"shown":"A farm has 20 animals. 3/4 are chickens. How many?"}
+pageerrors 0 

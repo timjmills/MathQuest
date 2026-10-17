@@ -1,0 +1,4 @@
+prompts with n/d 662 changed under all=false 75
+fraction_operations:frac_word_problems | stacked-not-of: a cake. Mason ate 1/6. How much d | still slashed:  ## stacked-not-of: e bar. Sophia ate 1/5. How much d | still slashed:  ## stacked-not-of:  cake. Sophia ate 1/5. How much d | still slashed: 
+fraction_operations:frac_word_problems_plain | stacked-not-of: a cake. Mason ate 1/6. How much d | still slashed:  ## stacked-not-of: e bar. Sophia ate 1/5. How much d | still slashed:  ## stacked-not-of:  cake. Sophia ate 1/5. How much d | still slashed: 
+fraction_operations:frac_word_mixed_plain | stacked-not-of: minutes. Emma ate 3/6. How much d | still slashed:  ## stacked-not-of:  minutes. Kai ate 1/4. How much d | still slashed:  ## stacked-not-of: a pie. Sophia ate 2/4. How much d | still slashed: 
