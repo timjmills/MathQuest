@@ -99,6 +99,8 @@ export function applyWordWork(q) {
         }
     } catch (e) { payload = null; }
     if (!payload) return q;
+    // `wpFrames` (detailed lesson 7): one number sentence a step (the kit cell's `layout: 'frames'`)
+    if (opt('wpFrames') && !payload.bar) payload.layout = 'frames';
     // the retold story is the item's text on every host (the card, the worksheet, the quiz, print)
     const retold = q.text !== payload.lines.join(' ');
     q.text = payload.lines.join(' ');

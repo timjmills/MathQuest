@@ -118,7 +118,9 @@
     "tenValues": "4F",
     "tenPlain": "4G",
     "tenWrite": "4H",
-    "tenTask": "4I"
+    "tenTask": "4I",
+    "msOps": "4P",
+    "wpFrames": "4Q"
   },
   "blocks": {
     "0": {
@@ -767,7 +769,14 @@
     "tenTask": {
       "compare": "C",
       "story": "S"
-    }
+    },
+    "msOps": {
+      "addsub": "A",
+      "mult": "M",
+      "div": "D",
+      "multdiv": "B"
+    },
+    "wpFrames": {}
   },
   "scalarOnly": {
     "range": "decimal",
@@ -811,7 +820,8 @@
     "minFactor": "decimal",
     "ftTrap": "bool",
     "tenValues": "bool",
-    "tenPlain": "bool"
+    "tenPlain": "bool",
+    "wpFrames": "bool"
   },
   "subranges": {
     "3B-3M": "build lane k2 (BUILD_LIST.md)",

@@ -5094,6 +5094,44 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                 const msName = pick(msNames);
                 const msItem = pick(msItems);
 
+                // msOps (3.OA.D.8, detailed lesson g3-oa8-two-step-wp): a × or ÷ step that feeds a + or − step.
+                // Facts within 10 × 10; the Step 2 number is no Step 1 number; the answer is no story number
+                // and not the Step 1 answer (M1 / M3 always give a different number). Fixed domain: the
+                // Max Number does not apply. Default 'addsub' = the four + / − archetypes below, unchanged.
+                const msOpsOpt = state.skillOptions && typeof state.skillOptions.msOps === 'string' ? state.skillOptions.msOps : 'addsub';
+                if (msOpsOpt === 'mult' || msOpsOpt === 'div' || msOpsOpt === 'multdiv') {
+                    const first = msOpsOpt === 'multdiv' ? pick(['mult', 'div']) : msOpsOpt;
+                    let s1a, s1b, p1, c2, op2, fin, guard = 0;
+                    for (;;) {
+                        guard++;
+                        op2 = pick(['+', '-']);
+                        if (first === 'mult') { s1a = rng(2, 6); s1b = rng(2, 9); p1 = s1a * s1b; }
+                        else { const d = rng(2, 6), qq = rng(2, 9); s1a = d * qq; s1b = d; p1 = qq; }
+                        const small = first === 'mult' ? [s1a, s1b] : [s1b, p1];
+                        c2 = op2 === '+' ? rng(2, first === 'mult' ? 20 : 9) : rng(2, Math.max(2, p1 - 1));
+                        fin = op2 === '+' ? p1 + c2 : p1 - c2;
+                        const story = [s1a, s1b, c2];
+                        const ok = s1a !== s1b && !(first === 'div' && s1b === p1) && fin >= 1 && fin <= 100
+                            && !story.slice(0, 2).includes(c2) && c2 !== p1 && !story.includes(fin) && fin !== p1
+                            && !small.includes(fin) && c2 >= 2;
+                        if (ok || guard > 400) break;
+                    }
+                    const G1 = first === 'mult' ? '×' : '÷', G2 = op2 === '+' ? '+' : '−';
+                    q._variant = `${first}_then_${op2 === '+' ? 'add' : 'sub'}`;
+                    q.msOps = { first, op2, a: s1a, b: s1b, step1: p1, c: c2 };
+                    q.text = first === 'mult'
+                        ? `${msName} has ${s1a} bags. Each bag has ${s1b} ${msItem}. ${op2 === '+' ? `${msName} gets ${c2} more ${msItem}.` : `${msName} gives away ${c2} ${msItem}.`} How many ${msItem} does ${msName} have ${op2 === '+' ? 'now' : 'left'}?`
+                        : `${msName} has ${s1a} ${msItem}. ${msName} shares them equally among ${s1b} friends. Each friend ${op2 === '+' ? `gets ${c2} more` : `gives away ${c2}`}. How many ${msItem} does each friend have now?`;
+                    q.ans = fin;
+                    q.op = G1; q.a = s1a; q.b = s1b;
+                    q.hint = `Step 1: ${s1a} ${G1} ${s1b} = ${p1}. Step 2: ${p1} ${G2} ${c2} = ${fin}`;
+                    q.skillLabel = 'Multi-Step';
+                    q.printFormat = 'multi-step-word';
+                    q.options = buildNumericOptions(fin);
+                    q.answerType = 'number';
+                    return;
+                }
+
                 // LRU rotation across the 4 multi-step archetypes so students see all forms.
                 const problemType = (typeof window !== 'undefined' && window.pickVariant)
                     ? window.pickVariant('multi_step_word', ["add_then_sub", "sub_then_add", "add_then_add", "sub_then_sub"])
@@ -5137,6 +5175,12 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     step2Text = `gave away ${step2Val}`;
                 }
 
+                // (no cancel - lesson 7 research: "got 9 more, then lost 9" leaves the start, a one-step answer)
+                if ((problemType === "add_then_sub" || problemType === "sub_then_add") && step2Val === step1Val) {
+                    step2Val += step2Val > 3 ? -1 : 1;
+                    finalVal = problemType === "add_then_sub" ? afterStep1 - step2Val : afterStep1 + step2Val;
+                    step2Text = problemType === "add_then_sub" ? `gave ${step2Val} to a friend` : `found ${step2Val} more`;
+                }
                 q.text = `${msName} had ${startVal} ${msItem}. She ${step1Text}, then ${step2Text}. How many ${msItem} does she have now?`;
                 q.ans = finalVal;
 

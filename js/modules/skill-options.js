@@ -2585,6 +2585,19 @@ Object.assign(P12_OPTIONS, {
         ['Sort by how likely (drag)', 'Drag each']])],
 });
 
+// msOps (3.OA.D.8, detailed lesson g3-oa8-two-step-wp; build list multi_step_four_ops): the first step's
+// operation. 'addsub' = the four + / − archetypes (the default, every old code unchanged); 'mult' / 'div' = a ×
+// or ÷ step that feeds a + or − step (facts within 10 × 10, the answer never a story number).
+const _msOps = () => ({
+    id: 'msOps', label: 'Two steps: the first step', type: 'enum', default: 'addsub', group: 'difficulty',
+    values: [
+        { v: 'addsub', l: 'Add or take away, then add or take away' },
+        { v: 'mult', l: 'Multiply, then add or take away (4 bags of 6, 5 given away)' },
+        { v: 'div', l: 'Divide, then add or take away (24 shared by 4, 2 more each)' },
+        { v: 'multdiv', l: 'Multiply or divide, then add or take away' },
+    ],
+    help: 'The new thing in Grade 3 is a × or ÷ step whose answer is used in the + or − step. One first step at a time, then mixed.',
+});
 // ======================= WORD PROBLEMS: WHAT IS MISSING (gen-operations.js) ===============
 // The story kinds each word-problem generator already rotates through (pickVariant) become the
 // teacher's "What is missing" control, added to the P11 panel. The _plain twin carries the same
@@ -2609,7 +2622,7 @@ Object.assign(P12_OPTIONS, {
     'division:div_word_problems': [...(SKILL_OPTIONS['division:div_word_problems'] || []), _wpDiv()],
     'division:div_word_problems_plain': [_wpDiv()],
     'algebra:multi_step_word_plain': [_p12Variants('multi_step_word', ['add_then_sub', 'sub_then_add', 'add_then_add', 'sub_then_sub'],
-        ['Add, then take away', 'Take away, then add', 'Add twice', 'Take away twice'], { label: 'The two steps' })],
+        ['Add, then take away', 'Take away, then add', 'Add twice', 'Take away twice'], { label: 'The two steps' }), _msOps()],
 });
 
 // ======================= FRACTION AND MEASUREMENT LEFTOVERS =================================
@@ -2714,7 +2727,7 @@ Object.assign(P12_OPTIONS, {
     'algebra:tape_diagram_plain': [_p12Kinds('forms', 'The story', [['Joining (gets more)', 'gets \\d+ more'], ['Taking away (used some)', 'used \\d+'],
         ['How many more are needed', 'needs \\d+']])],
     'algebra:multi_step_word': [_p12Variants('multi_step_word', ['add_then_sub', 'sub_then_add', 'add_then_add', 'sub_then_sub'],
-        ['Add, then take away', 'Take away, then add', 'Add twice', 'Take away twice'], { label: 'The two steps' })],
+        ['Add, then take away', 'Take away, then add', 'Add twice', 'Take away twice'], { label: 'The two steps' }), _msOps()],
     'algebra:solve_unknown': [_p12Match([['x + a = b', 'Solve: x \\+'], ['x − a = b', 'Solve: x -'], ['ax = b', 'Solve: \\d+x ='], ['Click the values that work', '^Click ALL']])],
     'algebra:balance_addsub': [_p12Kinds('unknown', 'Where the blank is', [['At the start (___ + 4 = 9 − 2)', 'equal: ___'], ['In the middle (12 − ___ = 3 + 4)', 'equal: \\d+ - ___'],
         ['On the right (5 + 3 = ___ + 2)', '= ___ \\+']])],
@@ -3339,6 +3352,13 @@ const WORD_WORK_OPTIONS = (bar) => [
         const hasBar = cur.some(o => o.id === 'support' && Array.isArray(o.values) && o.values.some(v => v.v === 'bar'));
         SKILL_OPTIONS[key] = [...cur, ...WORD_WORK_OPTIONS(!hasBar)];
     }
+}
+// `wpFrames` (detailed lesson 7, 2026-10-17): the compact form - one number sentence a step - on the × / ÷ and
+// two-step stories its lesson deals (the exit slip and the Prerequisite Check).
+for (const key of ['multiplication:mult_word_problems', 'division:div_word_problems', 'algebra:multi_step_word']) {
+    for (const k of [key, `${key}_plain`]) SKILL_OPTIONS[k] = [...(SKILL_OPTIONS[k] || []), {
+        id: 'wpFrames', label: 'Number sentences, no column boxes', type: 'bool', default: false, group: 'layout',
+        help: 'Each step is written as one number sentence (Step 1: __ ○ __ = __), the unit word printed. The fade of the column boxes; a compact story.' }];
 }
 
 // ================ O6 · APPEARANCE: OPERATIONS, CLOCKS, MONEY  (lane AP4, 2026-09-25) ================

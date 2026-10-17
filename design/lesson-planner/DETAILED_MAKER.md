@@ -238,3 +238,17 @@ Lesson 6 round 2 (critic r1 D1-D4):
   its own twin (screen-cell.js `pvTimesTwin`): the chart, typed value boxes and the ring words as tap tiles into a word
   box (slot kind `word`); `ws-screen-answer --skills placevalue:value --opts {...}` passes on card, worksheet and quiz
   for every form the lesson prints.
+
+## Lesson 7 additions (two-step stories, 3.OA.D.8, 2026-10-17)
+
+Built for `g3-oa8-two-step-wp` (build list `multi_step_four_ops`, first part):
+- **Skill options** `algebra:multi_step_word(_plain)` `msOps` (codec 4P: `addsub` default | `mult` | `div` | `multdiv`): a × or
+  ÷ table fact feeding a + or − step; guards: the Step 2 number is no Step 1 number, the answer is no story number and not
+  the Step 1 answer. The + / − archetypes also lost their cancelling case (got 9, lost 9). Every word-work skill: `wpFrames`
+  (codec 4Q): the compact cell, one number sentence a step (`Step 1: [ ] ( ) [ ] = [ ]`), the unit printed.
+- **Kit** (sheet/cells/word-work.js): `tellTwoStep` × / ÷ grammar; `layout: 'frames'`; `twoStepPart(p, k, ctx)` (a chart
+  panel's own part); `traceOp0` (Guided cell 1's Step 1 sign ringed grey); `factDiv` (a ÷ fact first step: no working rows).
+- **Provider**: four worked steps for a × / ÷-first story (the last unmarked: the chart's closing line), and the two-step
+  wrong answers `ms-stop-step1`, `ms-story-number`, `ms-one-op` (Check Question, T6).
+- **Lesson data**: `chartRow` (with `chartWide`: heads beside the drawings), `noStripChant`, `tailRead`. Case tests `ms*`.
+- **P5** `wordProblem.eqSteps` (with the vars hook `eqSteps`): one number-sentence line a step. Library string `story-steps`.

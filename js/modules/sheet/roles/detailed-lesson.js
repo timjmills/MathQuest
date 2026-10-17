@@ -340,6 +340,21 @@ export function wordProblemPlan(wp, frame) {
             return `<div class="dl-eq2">${line1}<div class="dl-eq">${tparts.map((v, i) => box(`f${i}`, Math.max(2, String(v).length))).join(`<span>${esc(wp.op || '+')}</span>`)}<span>=</span>${box('eq2', Math.max(2, String(eqN).length))}</div></div>`;
         },
     };
+    // (`eqSteps` [{parts: [x, y], op, n}] - the detailed lesson maker, lesson 7: a two-step story writes one number
+    // sentence a step, "Step 1: [ ] ( ) [ ] = [ ]", the pupil writing every number and sign; absent, as before)
+    if (Array.isArray(wp.eqSteps) && wp.eqSteps.length) {
+        const sk = { slots: {} };
+        wp.eqSteps.forEach((st, i) => {
+            sk.slots[`s${i}a`] = { value: String(st.parts[0]) }; sk.slots[`s${i}op`] = { value: String(st.op) };
+            sk.slots[`s${i}b`] = { value: String(st.parts[1]) }; sk.slots[`s${i}r`] = { value: String(st.n) };
+        });
+        eqKey.slots = sk.slots;
+        eqItem.render = (c) => {
+            const k = c.state === 'answered' ? sk : null;
+            const box = (id, v) => blank({ id, kind: 'number', shape: 'box', digits: Math.max(2, String(v).length), graded: false }, c, k);
+            return `<div class="dl-eq2">${wp.eqSteps.map((st, i) => `<div class="dl-eq"><span class="dl-eqcap">Step ${i + 1}:</span>${box(`s${i}a`, st.parts[0])}${blank({ id: `s${i}op`, kind: 'text', shape: 'circle', graded: false }, c, k)}${box(`s${i}b`, st.parts[1])}<span>=</span>${box(`s${i}r`, st.n)}</div>`).join('')}</div>`;
+        };
+    }
     const panelItem = { nolabel: true, q: { cell: { template: 'rcdws', payload: {} }, text: '' }, drawsAnswer: true, key: { slots: {} } };
     // (`tableItem`, lesson 5 r3: the story's table is the lesson's own cell - its rule frame is the answer; no drawing,
     // no equation frame, and the story has no answer line)
@@ -368,7 +383,7 @@ export function wordProblemPlan(wp, frame) {
         // (`schematic` {rows, cols} - lesson 3a r4, critic r2 m4: a story array past 5 in a row is drawn as a box with its
         // two sides named, not as counters - RP-21; the pupil draws the turned box beside it)
         { kind: 'band', label: 'Workspace:', instr: '', grow: true, content: { kind: 'html', html: `<div class="dl-work" data-work data-draw>${wp.schematic ? schematicSvg(wp.schematic) : ''}</div>` } },
-        { kind: 'grid', cols: 1, rows: 1, items: [eqItem], cls: 'fixed dl-wpeq', height: wp.eqTurn ? '44mm' : '26mm' },
+        { kind: 'grid', cols: 1, rows: 1, items: [eqItem], cls: 'fixed dl-wpeq', height: wp.eqTurn || (wp.eqSteps && wp.eqSteps.length > 1) ? '44mm' : '26mm' },
         { kind: 'say', frame: wp.say, digits },
     ];
     return Object.assign({ role: 'word-problem', ctx: { look: 'ican', size: 'L', paper: 'A4', scaffoldLevel: 1 }, cls: 'dl-page dl-pupil', pages: [{ sections }] }, frame);
@@ -450,6 +465,7 @@ export const DETAILED_PUPIL_CSS = `
 .ws-page .dl-wpeq .ws-cell{justify-content:center;align-items:center}
 .ws-page .dl-eq{display:flex;align-items:center;gap:5mm;font-size:28pt}
 .ws-page .dl-eq2{display:flex;flex-direction:column;align-items:center;gap:4mm}
+.ws-page .dl-eq .dl-eqcap{font-size:16pt;font-weight:700;min-width:24mm}
 .ws-page .dl-eq .ws-box{min-width:24mm}
 .ws-page .dl-eq .ws-box{height:14mm;display:inline-flex;align-items:center;justify-content:center;font-size:28pt;font-weight:400}
 .ws-page.dl-land .ws-body>.mq-row{flex:1 1 auto}

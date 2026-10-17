@@ -4209,6 +4209,8 @@ async function buildDetailedLesson(req = {}) {
     wpV.eq = `${eqParts.join(` ${eqOp} `)} = ${eqN}` + (eqTurn ? ` · ${eqParts.slice().reverse().join(` ${eqOp} `)} = ${eqN}` : '');
     const wpPlan = wordProblemPlan({
         lines, answerLine: fillPlaceholders(d.wordProblem.answerLine, { wp: wpV }), wordsLine: d.wordProblem.wordsLine ? fillPlaceholders(d.wordProblem.wordsLine, { wp: wpV }) : '', words: wpV.words, say: fillPlaceholders(d.wordProblem.say, { wp: wpV }), n: wpV.wpAns !== undefined ? wpV.wpAns : wpV.ans, eqN, eqTurn, schematic: d.wordProblem.schematic && wpV.rows ? { rows: wpV.rows, cols: wpV.cols } : null, parts: eqParts, op: eqOp, signSlot: !!d.wordProblem.signSlot, item: String(wpD.key),
+        // (`wordProblem.eqSteps` - lesson 7: one number sentence a step, from the lesson's vars hook `eqSteps`)
+        eqSteps: d.wordProblem.eqSteps && Array.isArray(wpV.eqSteps) ? wpV.eqSteps : null,
         instruction: d.wordProblem.instruction || INSTRUCTION_LIBRARY['story-rcdws'] || INSTRUCTION_LIBRARY.story,
         // (`wordProblem.tableItem` - lesson 5 r3: the story's own table, its rule frame the answer, under the story)
         panelRows: d.wordProblem.panelRows || null, topMm: d.wordProblem.topMm || null,

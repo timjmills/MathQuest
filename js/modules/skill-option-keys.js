@@ -199,6 +199,10 @@ export const MULTI_KEYS = Object.freeze({
     tenWrite: '4H',      // value form times: both values / the top value only (lesson 6 r2)
     tenTask: '4I',       // value form times: compare / story (700 ÷ 70 = 10)
     // NEXT FREE IN 4E-4O: 4J.
+    // Build lane algebra (sub-range 4P-4Z): multi_step_four_ops (detailed lesson 7, 2026-10-17).
+    msOps: '4P',         // multi_step_word(_plain): the first step - + / − (default), ×, ÷ or × / ÷ mixed
+    wpFrames: '4Q',      // every word-work story: one number sentence a step, no column boxes (detailed lesson 7)
+    // NEXT FREE IN 4P-4Z: 4R.
 
     // Block 5 — P12 (were "XA"–"XM" before any of them shipped)
     members: '5A',       // mixed pools: which member skills / categories the pool draws from
@@ -348,6 +352,7 @@ export const VALUE_TOKENS = Object.freeze({
     tenDir: Object.freeze({ times: 'T', tenth: 'E', both: 'B' }),
     tenWrite: Object.freeze({ both: 'B', top: 'T' }),
     tenTask: Object.freeze({ compare: 'C', story: 'S' }),
+    msOps: Object.freeze({ addsub: 'A', mult: 'M', div: 'D', multdiv: 'B' }),
     frame: Object.freeze({ boxes: 'B', line: 'L' }),
     responseScope: Object.freeze({ full: 'F', notation: 'N', decision: 'D', judge: 'J' }),
     divForm: Object.freeze({ standard: 'S', long: 'L', fraction: 'F', vertical: 'V', mix: 'M' }),
@@ -451,7 +456,7 @@ export const SCALAR_ONLY = Object.freeze({
     // `cover` and `mix` were built by S2 and now carry VALUE_TOKENS; `touch` rides in `support`.)
     touch: 'reserved', cover: 'reserved', mix: 'reserved', anchors: 'reserved',
     // block 8 (word problems)
-    wpCues: 'bool', wpBank: 'bool', wpBar: 'bool',
+    wpCues: 'bool', wpBank: 'bool', wpBar: 'bool', wpFrames: 'bool',
     // Wave 1 lane A
     calculator: 'bool', skipAfter: 'decimal',
     // lessons 4 and 5 (2026-10-16)
