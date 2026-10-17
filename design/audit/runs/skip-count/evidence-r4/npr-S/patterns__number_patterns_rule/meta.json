@@ -1,0 +1,102 @@
+{
+  "skill": "patterns:number_patterns_rule",
+  "category": "patterns",
+  "skillId": "number_patterns_rule",
+  "label": "Number Patterns: Count On, Count Back, Double",
+  "grade": "3",
+  "dir": "patterns__number_patterns_rule",
+  "roles": {
+    "scripted-model": {
+      "fits": {
+        "cols": 2,
+        "rows": 5,
+        "pages": 1,
+        "note": "Fits: 5 states, 1 page.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 5,
+            "line": "Fits: 5 states, 1 page."
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 507272,
+      "title": "I Can find the rule of a number pattern",
+      "notes": [],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Find the rule. Write the missing numbers and the rule.",
+          "ans": "39, 49, 59, 69, 79, 10",
+          "measured": {
+            "1": {
+              "hMm": 26,
+              "fits": true,
+              "slackMm": 31.2
+            },
+            "2": {
+              "hMm": 26,
+              "fits": false,
+              "slackMm": -15.1
+            },
+            "3": {
+              "hMm": 26,
+              "fits": false,
+              "slackMm": -30.5
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "scripted-model-p1.png",
+          "words": 143,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "scripted-model-key-p1.png",
+          "words": 143,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          5
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 61
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          5
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 61
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

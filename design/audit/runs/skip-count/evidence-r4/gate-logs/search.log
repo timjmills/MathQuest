@@ -1,0 +1,10 @@
+ws-search-terms: 123/123 rank-1 queries pass
+ws-search-terms: 592/592 skills found by their own label
+ws-search-terms: 4 rank-2, 19 expected-empty and 18 correction checks run
+ws-search-terms: 169 primary-skill queries rank 1 in the list and in grouped pickers
+ws-search-terms: 592 skills, terms per skill min 16 / median 48 / max 194; 239/239 queries pass
+ws-search-terms: OK
+(node:24474) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/user/MathQuest/js/modules/skill-finder.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/user/MathQuest/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)

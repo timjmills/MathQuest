@@ -1,0 +1,253 @@
+[
+  {
+    "skill": "multiplication:count_by_tables",
+    "category": "multiplication",
+    "skillId": "count_by_tables",
+    "label": "Skip counting: count by 1–12",
+    "grade": "3",
+    "dir": "multiplication__count_by_tables",
+    "roles": {
+      "opener": {
+        "fits": {
+          "cols": 1,
+          "rows": 2,
+          "pages": 1,
+          "note": "Fits: 1 model, 2 guided, 0 independent. What's New is omitted: the skill has no whatsNew string yet.",
+          "sections": [
+            {
+              "cols": 1,
+              "rows": 2,
+              "rowMm": 56.5,
+              "growMm": 0.8499999999999943,
+              "line": "Fits: 1 model, 2 guided, 0 independent."
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 247553,
+        "title": "I Can count by 100,000 from 1,000,000",
+        "notes": [
+          "What's New is omitted: the skill has no whatsNew string yet."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 100,000. Write the missing numbers.",
+            "ans": "1300000, 1400000, 1800000, 2000000, 2100000",
+            "measured": {
+              "1": {
+                "hMm": 31,
+                "fits": true,
+                "slackMm": 5.7
+              },
+              "2": {
+                "hMm": 90.7,
+                "fits": true,
+                "slackMm": 6.5
+              },
+              "3": {
+                "hMm": 31,
+                "fits": false,
+                "slackMm": -56
+              },
+              "4": {
+                "hMm": 31,
+                "fits": false,
+                "slackMm": -63.8
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 100,000. Write the missing numbers.",
+            "ans": "1300000, 1600000, 1800000, 1900000, 2100000",
+            "measured": {
+              "1": {
+                "hMm": 55.5,
+                "fits": true,
+                "slackMm": 3.4
+              },
+              "2": {
+                "hMm": 55.5,
+                "fits": false,
+                "slackMm": -42.9
+              },
+              "3": {
+                "hMm": 55.5,
+                "fits": false,
+                "slackMm": -58.3
+              },
+              "4": {
+                "hMm": 55.5,
+                "fits": false,
+                "slackMm": -66
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 100,000. Write the missing numbers.",
+            "ans": "1200000, 1400000, 1700000, 1900000, 2000000",
+            "measured": {
+              "1": {
+                "hMm": 55.5,
+                "fits": true,
+                "slackMm": 3.4
+              },
+              "2": {
+                "hMm": 55.5,
+                "fits": false,
+                "slackMm": -42.9
+              },
+              "3": {
+                "hMm": 55.5,
+                "fits": false,
+                "slackMm": -58.3
+              },
+              "4": {
+                "hMm": 55.5,
+                "fits": false,
+                "slackMm": -66
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 100,000. Write the missing numbers.",
+            "ans": "1500000, 1700000, 1800000, 1900000, 2100000",
+            "measured": {
+              "1": {
+                "hMm": 55.5,
+                "fits": true,
+                "slackMm": 3.4
+              },
+              "2": {
+                "hMm": 55.5,
+                "fits": false,
+                "slackMm": -42.9
+              },
+              "3": {
+                "hMm": 55.5,
+                "fits": false,
+                "slackMm": -58.3
+              },
+              "4": {
+                "hMm": 55.5,
+                "fits": false,
+                "slackMm": -66
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 100,000. Write the missing numbers.",
+            "ans": "1200000, 1500000, 1600000, 1700000, 1900000",
+            "measured": {
+              "1": {
+                "hMm": 55.5,
+                "fits": true,
+                "slackMm": 3.4
+              },
+              "2": {
+                "hMm": 55.5,
+                "fits": false,
+                "slackMm": -42.9
+              },
+              "3": {
+                "hMm": 55.5,
+                "fits": false,
+                "slackMm": -58.3
+              },
+              "4": {
+                "hMm": 55.5,
+                "fits": false,
+                "slackMm": -66
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 100,000. Write the missing numbers.",
+            "ans": "1200000, 1300000, 1800000, 1900000, 2100000",
+            "measured": {
+              "1": {
+                "hMm": 55.5,
+                "fits": true,
+                "slackMm": 3.4
+              },
+              "2": {
+                "hMm": 55.5,
+                "fits": false,
+                "slackMm": -42.9
+              },
+              "3": {
+                "hMm": 55.5,
+                "fits": false,
+                "slackMm": -58.3
+              },
+              "4": {
+                "hMm": 55.5,
+                "fits": false,
+                "slackMm": -66
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "opener-p1.png",
+            "words": 125,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "opener-key-p1.png",
+            "words": 138,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            3
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 60
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            3
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 70
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      }
+    },
+    "consoleErrors": []
+  }
+]

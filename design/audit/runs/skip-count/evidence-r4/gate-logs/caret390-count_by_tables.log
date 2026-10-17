@@ -1,0 +1,73 @@
+PASS multiplication:count_by_tables [390x844 quiz default] 5 boxes, each takes the row's widest number: 2 digits (2/2/2/2/2)
+PASS multiplication:count_by_tables [390x844 quiz default] the row says how to move on (tap)
+PASS multiplication:count_by_tables [390x844 quiz default] tap + type: 6|10|14|18|22 (want 6|10|14|18|22)
+PASS multiplication:count_by_tables [390x844 quiz default] keyboard + Space on the phone: 6|10|14|18|22 (want 6|10|14|18|22)
+PASS multiplication:count_by_tables [390x844 quiz default] every focused box whole inside its window (0 not)
+PASS multiplication:count_by_tables [390x844 quiz default] no page errors 
+PASS multiplication:count_by_tables [390x844 quiz by25] 5 boxes, each takes the row's widest number: 3 digits (3/3/3/3/3)
+PASS multiplication:count_by_tables [390x844 quiz by25] the row says how to move on (tap)
+PASS multiplication:count_by_tables [390x844 quiz by25] tap + type: 125|200|250|275|300 (want 125|200|250|275|300)
+PASS multiplication:count_by_tables [390x844 quiz by25] keyboard + Space on the phone: 125|200|250|275|300 (want 125|200|250|275|300)
+PASS multiplication:count_by_tables [390x844 quiz by25] every focused box whole inside its window (0 not)
+PASS multiplication:count_by_tables [390x844 quiz by25] no page errors 
+PASS multiplication:count_by_tables [390x844 quiz by25lines] 5 boxes, each takes the row's widest number: 3 digits (3/3/3/3/3)
+PASS multiplication:count_by_tables [390x844 quiz by25lines] the row says how to move on (tap)
+PASS multiplication:count_by_tables [390x844 quiz by25lines] tap + type: 125|200|250|275|300 (want 125|200|250|275|300)
+PASS multiplication:count_by_tables [390x844 quiz by25lines] keyboard + Space on the phone: 125|200|250|275|300 (want 125|200|250|275|300)
+PASS multiplication:count_by_tables [390x844 quiz by25lines] every focused box whole inside its window (0 not)
+PASS multiplication:count_by_tables [390x844 quiz by25lines] no page errors 
+PASS multiplication:count_by_tables [390x844 quiz by7] 5 boxes, each takes the row's widest number: 2 digits (2/2/2/2/2)
+PASS multiplication:count_by_tables [390x844 quiz by7] the row says how to move on (tap)
+PASS multiplication:count_by_tables [390x844 quiz by7] tap + type: 28|35|70|77|84 (want 28|35|70|77|84)
+PASS multiplication:count_by_tables [390x844 quiz by7] keyboard + Space on the phone: 28|35|70|77|84 (want 28|35|70|77|84)
+PASS multiplication:count_by_tables [390x844 quiz by7] every focused box whole inside its window (0 not)
+PASS multiplication:count_by_tables [390x844 quiz by7] no page errors 
+PASS multiplication:count_by_tables [390x844 card default] 5 boxes, each takes the row's widest number: 2 digits (2/2/2/2/2)
+PASS multiplication:count_by_tables [390x844 card default] the row says how to move on (tap)
+PASS multiplication:count_by_tables [390x844 card default] tap + type: 6|10|14|18|22 (want 6|10|14|18|22)
+PASS multiplication:count_by_tables [390x844 card default] keyboard + Space on the phone: 6|10|14|18|22 (want 6|10|14|18|22)
+PASS multiplication:count_by_tables [390x844 card default] every focused box whole inside its window (0 not)
+PASS multiplication:count_by_tables [390x844 card default] no page errors 
+PASS multiplication:count_by_tables [390x844 card by25] 5 boxes, each takes the row's widest number: 3 digits (3/3/3/3/3)
+PASS multiplication:count_by_tables [390x844 card by25] the row says how to move on (tap)
+PASS multiplication:count_by_tables [390x844 card by25] tap + type: 125|200|250|275|300 (want 125|200|250|275|300)
+PASS multiplication:count_by_tables [390x844 card by25] keyboard + Space on the phone: 125|200|250|275|300 (want 125|200|250|275|300)
+PASS multiplication:count_by_tables [390x844 card by25] every focused box whole inside its window (0 not)
+PASS multiplication:count_by_tables [390x844 card by25] no page errors 
+PASS multiplication:count_by_tables [390x844 card by25lines] 5 boxes, each takes the row's widest number: 3 digits (3/3/3/3/3)
+PASS multiplication:count_by_tables [390x844 card by25lines] the row says how to move on (tap)
+PASS multiplication:count_by_tables [390x844 card by25lines] tap + type: 125|200|250|275|300 (want 125|200|250|275|300)
+PASS multiplication:count_by_tables [390x844 card by25lines] keyboard + Space on the phone: 125|200|250|275|300 (want 125|200|250|275|300)
+PASS multiplication:count_by_tables [390x844 card by25lines] every focused box whole inside its window (0 not)
+PASS multiplication:count_by_tables [390x844 card by25lines] no page errors 
+PASS multiplication:count_by_tables [390x844 card by7] 5 boxes, each takes the row's widest number: 2 digits (2/2/2/2/2)
+PASS multiplication:count_by_tables [390x844 card by7] the row says how to move on (tap)
+PASS multiplication:count_by_tables [390x844 card by7] tap + type: 28|35|70|77|84 (want 28|35|70|77|84)
+PASS multiplication:count_by_tables [390x844 card by7] keyboard + Space on the phone: 28|35|70|77|84 (want 28|35|70|77|84)
+PASS multiplication:count_by_tables [390x844 card by7] every focused box whole inside its window (0 not)
+PASS multiplication:count_by_tables [390x844 card by7] no page errors 
+PASS multiplication:count_by_tables [390x844 worksheet default] 5 boxes, each takes the row's widest number: 2 digits (2/2/2/2/2)
+PASS multiplication:count_by_tables [390x844 worksheet default] the row says how to move on (tap)
+PASS multiplication:count_by_tables [390x844 worksheet default] tap + type: 6|12|16|20|22 (want 6|12|16|20|22)
+PASS multiplication:count_by_tables [390x844 worksheet default] keyboard + Space on the phone: 8|10|16|18|24 (want 8|10|16|18|24)
+PASS multiplication:count_by_tables [390x844 worksheet default] every focused box whole inside its window (0 not)
+PASS multiplication:count_by_tables [390x844 worksheet default] no page errors 
+PASS multiplication:count_by_tables [390x844 worksheet by25] 5 boxes, each takes the row's widest number: 3 digits (3/3/3/3/3)
+PASS multiplication:count_by_tables [390x844 worksheet by25] the row says how to move on (tap)
+PASS multiplication:count_by_tables [390x844 worksheet by25] tap + type: 100|150|225|250|275 (want 100|150|225|250|275)
+PASS multiplication:count_by_tables [390x844 worksheet by25] keyboard + Space on the phone: 75|150|200|250|300 (want 75|150|200|250|300)
+PASS multiplication:count_by_tables [390x844 worksheet by25] every focused box whole inside its window (0 not)
+PASS multiplication:count_by_tables [390x844 worksheet by25] no page errors 
+PASS multiplication:count_by_tables [390x844 worksheet by25lines] 5 boxes, each takes the row's widest number: 3 digits (3/3/3/3/3)
+PASS multiplication:count_by_tables [390x844 worksheet by25lines] the row says how to move on (tap)
+PASS multiplication:count_by_tables [390x844 worksheet by25lines] tap + type: 100|125|225|275|300 (want 100|125|225|275|300)
+PASS multiplication:count_by_tables [390x844 worksheet by25lines] keyboard + Space on the phone: 75|175|200|250|300 (want 75|175|200|250|300)
+PASS multiplication:count_by_tables [390x844 worksheet by25lines] every focused box whole inside its window (0 not)
+PASS multiplication:count_by_tables [390x844 worksheet by25lines] no page errors 
+PASS multiplication:count_by_tables [390x844 worksheet by7] 5 boxes, each takes the row's widest number: 2 digits (2/2/2/2/2)
+PASS multiplication:count_by_tables [390x844 worksheet by7] the row says how to move on (tap)
+PASS multiplication:count_by_tables [390x844 worksheet by7] tap + type: 21|28|49|56|70 (want 21|28|49|56|70)
+PASS multiplication:count_by_tables [390x844 worksheet by7] keyboard + Space on the phone: 28|35|56|70|84 (want 28|35|56|70|84)
+PASS multiplication:count_by_tables [390x844 worksheet by7] every focused box whole inside its window (0 not)
+PASS multiplication:count_by_tables [390x844 worksheet by7] no page errors 
+small-fixes-countrow-caret: OK
