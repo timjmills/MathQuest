@@ -248,6 +248,8 @@ export const CASE_TESTS = Object.freeze({
     // chartBigOdd: an odd x odd product of 21 or more (5 x 7 = 35, 7 x 9 = 63) - the ★★★ last row.
     chartBigOdd: (it) => { const p = multGridOf(it); return !!p && p.rows.some((r) => r % 2 === 1 && p.cols.some((c) => c % 2 === 1 && r * c >= 35)); },
     // chartColsOdd: more odd columns than even ones, so most even products come from an even ROW.
+    // chartColsEven: more even columns than odd ones (2 x 3: even-odd-even) - the odd row's even boxes carry it.
+    chartColsEven: (it) => { const p = multGridOf(it); return !!p && CASE_TESTS.chartMixed(it) && p.cols.filter((v) => v % 2 === 0).length > p.cols.filter((v) => v % 2 === 1).length; },
     chartColsOdd: (it) => { const p = multGridOf(it); return !!p && CASE_TESTS.chartMixed(it) && p.cols.filter((v) => v % 2 === 1).length > p.cols.filter((v) => v % 2 === 0).length; },
     // (a x fact with no factor 0 or 1 - lesson 3a r2's spaced retrieval: x 1 and x 0 are lesson 3b)
     factNoZeroOne: (it) => { const o = operandsOf((it && it.q) || {}).map(Number); return o.length >= 2 && o.every((v) => Number.isFinite(v) && v >= 2); },

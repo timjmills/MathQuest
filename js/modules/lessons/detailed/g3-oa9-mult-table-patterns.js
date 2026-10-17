@@ -71,7 +71,8 @@ export default {
         if (rows.length && cols.length) {
             const er = rows.find((v) => v % 2 === 0), ec = cols.find((v) => v % 2 === 0);
             const or = rows.filter((v) => v % 2 === 1).pop(), oc = cols.filter((v) => v % 2 === 1).pop();
-            const out = { rows: rows.join(', '), cols: cols.join(', ') };
+            const prods = [...new Set(rows.flatMap((r) => cols.map((c) => r * c)))].sort((x, y) => x - y);
+            const out = { rows: rows.join(', '), cols: cols.join(', '), shaded: prods.filter((v) => v % 2 === 0).join(', '), white: prods.filter((v) => v % 2 === 1).join(', ') };
             if (er !== undefined) Object.assign(out, { er, erHalf: er / 2 });
             if (ec !== undefined) Object.assign(out, { ec });
             if (or !== undefined && oc !== undefined) Object.assign(out, { oa: or, ob: oc, op: or * oc });
@@ -114,7 +115,7 @@ export default {
     prerequisites: [
         { atom: 1, items: 1, ref: CB(2), lesson: { id: '2.OA.C.3', title: 'Even numbers: count by 2s' } },
         { atom: 2, items: 2, ref: FACT([2], { minNum: 12, maxNum: 18 }), lesson: { id: '3.OA.C.7', title: 'Multiply by 2' } },
-        { atom: 3, items: 1, ref: CHART({}, { task: 'fill', winRows: 3, winCols: 4 }), lesson: { id: '3.OA.C.7', title: 'Read the multiplication chart' } },
+        { atom: 3, items: 1, ref: CHART({}, { task: 'fill', winRows: 2, winCols: 3 }), lesson: { id: '3.OA.C.7', title: 'Read the multiplication chart' } },
         { atom: 4, items: 2, ref: FACT([4], { minNum: 12, maxNum: 36 }), lesson: { id: '3.OA.C.7', title: 'Multiply by 4' } },
     ],
 
@@ -141,10 +142,11 @@ export default {
 
     // ------------------------------------------------------------------ P6 Exit slip (fresh windows)
     // Designed around the 4 x 5 window the generator cuts today (B3 would allow the 2 x 3 of RESEARCH.md).
+    // (four 2 x 3 windows, two across: a 3-row window leaves a half's cell no free room - never shrunk)
     exit: [
         { case: 'an even row (odd columns)', ref: CHART({ pageGroup: 'exit' }, { winRows: 2, winCols: 3 }), want: 'chartColsOdd', cols: 2, detects: 'Misses the even row.' },
-        { case: 'odd rows, an even column (Critical Atom)', ref: CHART({ pageGroup: 'exit' }, { winRows: 3, winCols: 3 }), want: 'evenColOnly', cols: 2, detects: 'Leaves an even column white.' },
-        { case: 'odd x odd stays white', ref: CHART({ pageGroup: 'exit' }, { winRows: 3, winCols: 3 }), want: 'chartOddOdd', cols: 2, detects: 'Shades an odd × odd box.' },
+        { case: 'the odd row: its even column (Critical Atom)', ref: CHART({ pageGroup: 'exit' }, { winRows: 2, winCols: 3 }), want: 'chartColsEven', cols: 2, detects: 'Leaves an even column white.' },
+        { case: 'odd x odd stays white', ref: CHART({ pageGroup: 'exit' }, { winRows: 2, winCols: 3 }), want: 'chartOddOdd', cols: 2, detects: 'Shades an odd × odd box.' },
         { case: 'rows and columns', ref: CHART({ pageGroup: 'exit' }, { winRows: 2, winCols: 3 }), want: 'chartMixed', cols: 2, detects: 'Shades one line only.' },
     ],
     exitInstruction: 'Shade every even product.',
@@ -239,8 +241,8 @@ export default {
             rows: [
                 { say: 'Finger on the row number. Finger on the column number.' },
                 { ask: 'Is one of them even?', note: 'Listen for "row or column".' },
-                { do: 'Pupils shade {we.0.rows} × {we.0.cols} with you.', note: 'Expected ★: [[{we.0.ans}]].' },
-                { do: 'Pupils shade the second window alone.', note: 'Expected ★: [[{we.1.ans}]].' },
+                { do: 'Pupils shade {we.0.rows} × {we.0.cols} with you.', note: 'Expected ★: [[{we.0.shaded}]].' },
+                { do: 'Pupils shade the second window alone.', note: 'Expected ★: [[{we.1.shaded}]].' },
             ] },
         { n: 7, name: 'Check Question', min: 3, page: '',
             rows: [
@@ -261,7 +263,7 @@ export default {
         { n: 10, name: 'Plenary and exit slip', min: 5, page: 'P6',
             rows: [
                 { say: 'If one number is even, the product is even.', note: 'The Remember line. Say it twice.' },
-                { do: 'Hand out the exit slip. No help. Sort by the boxes ticked.', note: 'a. [[{exit.0.ans}]] · b. [[{exit.1.ans}]] · c. [[{exit.2.ans}]] · d. [[{exit.3.ans}]].' },
+                { do: 'Hand out the exit slip. No help. Sort by the boxes ticked.', note: 'a. [[{exit.0.shaded}]] · b. [[{exit.1.shaded}]] · c. [[{exit.2.shaded}]] · d. [[{exit.3.shaded}]].' },
                 { say: 'Tomorrow we use rules to make number patterns.' },
             ] },
     ],
