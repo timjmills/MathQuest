@@ -86,3 +86,21 @@
 - Optional minors from critic r8 (no grade change): claims.mjs array claim on picture only; M check strip bracketed examples;
   B7.S10 round_decimals {precision:[0]}; lesson 6/8/20 whys; B14.S4 typo.
 - Owner questions with recommendations: Y5-report.md (site lessons section + rounds 2-6).
+
+## Y2-Y3 re-check + site lessons — helper session_01LVDoUbPMFjuTAdwUzzWVDL — PASSED 2026-10-17
+- Branch `claude/sweet-newton-c8wrv1-wip-wrm-tag-y2-y3`. Rounds this session: critic r10 FAIL 7.94/7.97, builder r11,
+  critic r11 FAIL 7.96/7.96, builder r12 (ESCALATED to mq-opus-medium: pre lead/ordering survived r10-r11; paused for the
+  one-year-at-a-time rule, resumed after Y5: tooling to tests/scripts/wrm-tagging/Y2-Y3/, base merged, PR #8 kg-dial clauses,
+  OPTGATE no silent re-optioning, claims/sweep, site lessons), critic r12 FAIL (Y2.B8.S12 7: denoms payload blind spot),
+  builder r13 (denoms.mjs, SPECOPTS), critic r13 FAIL (Y3.B6.S9/S10), builder r14 (TITLEREP), critic r14 FAIL (three false
+  FULL), builder r15 (verb/clock/range gates + full audit by hand of every full step: 12 demoted), critic r15 PASS: 82 entries
+  all 8 (Y2 steps 30, Y3 steps 32, lessons 9 + 11); all 95 remaining FULL steps' items read, no false FULL found.
+- Build byte-identical from clean `git archive`; mergeall R..Y6 1,042 tags 0 problems both orders (only shared key|step:
+  count_by_step_up Y2.B1.S15, Y2 and Y4 identical partial); `ws-wrm-extract --check` exit 0.
+- Y2: 124 steps (55 full / 44 partial / 25 gap), 11 lessons. Y3: 134 steps (45 / 59 / 30), 25 lessons. Same lessons shape as Y5.
+- LEAD at merge (critic r15 M25): Y2/Y3 follow the R/Y1 convention of no `opts` tagFix on an already-live tag, so some
+  options live only in the step's direct/partial lists — notably Y2.B10.S7 is full only with {range:20}, and Y2.B9.S2 /
+  Y3.B10.S4 second-link opts. Read opts from each step's direct/partial when merging (43 Y2 / 39 Y3 skills, R 76, Y1 103).
+- Optional minors (critic r15 M21-M28) and generator bugs (equiv_frac_nv keys equal pairs "no"; denoms filter ignores
+  q.cell.payload in generate-question.js itemDenominators) are in the reports and GENERATOR-FIXES-2026-10-16.md.
+- Owner questions with recommendations: Y2-report.md / Y3-report.md.

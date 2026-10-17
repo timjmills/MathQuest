@@ -44,3 +44,24 @@ Clauses to tighten (Y5):
 - **Y5.B4.S11 Add fractions, total > 1**: the class-A cap (45/60 unrelated pairs) no longer applies.
 - **Y5.B4.S13** (`add_mixed_unlike`, `sub_mixed_unlike`): drop "the click-all and sort items ignore
   {denoms:…}". The related-denominator claim now holds on every form.
+
+## 3. Open, not fixed: `fractions:equiv_frac_nv` keys an equal pair "no" (Y2-Y3 critic r14 M20)
+
+**Where.** In the yes / no items of `equiv_frac_nv` (`js/modules/gen-fractions.js`, about lines 4372–4377), the "no" item
+uses a distractor.
+
+**What goes wrong.** The "only the top number changed" distractor is clamped to `d − 1`. On a /2, /3 or /4 base that clamp,
+and then the `+1` retry, can give back the base fraction itself. The item then asks "Are 1/2 and 1/2 equivalent fractions?"
+and keys **no**.
+
+**How often** (200 items, seeds 61001 + 277 i):
+
+| Opts | Yes / no items | Equal pairs keyed "no" | Pairs seen |
+|---|---|---|---|
+| `{denoms:[2]}` | 65 | 13 | 1/2 and 1/2, 3/4 and 3/4 |
+| `{denoms:[2,3]}` | 74 | 13 | adds 2/3 and 2/3, 5/6 and 5/6 |
+
+**Fix.** When the distractor equals the base fraction, redraw it, for example by changing the denominator instead.
+
+**Tagging lanes.** Y3.B6.S9 and S10 link the skill as related only. Their why ("the same amount as two fractions without a
+picture") stays true, and no clause relies on the key.
