@@ -387,6 +387,8 @@ const lineW = (d) => Math.max(34, d.colW * 2 - 8);
 /** "Rule:" beside the frame when the row fits the cell, else "The rule is:" on its own line. */
 const fixRuleW = (p, g, d) => Math.max(d.boxW, ruleText(p.rule, { variable: false }).length * 0.5 * g.E + 4);
 function ruleInline(p, g, d, ctx, fx = { on: false }) {
+    // (`ruleBelow`, a payload flag - detailed lesson 5's exit slip, three tables across a 132.5 mm half: "The rule is:" above the frame)
+    if (p.ruleBelow) return false;
     const w = (p.support === 'line' ? lineW(d) + 0.6 * g.E + 2 : d.frameW) + (fx.on && !fx.below ? 3 + 4 * 0.55 * d.textMm + 1 + fixRuleW(p, g, d) : 0);
     return 5 * 0.55 * d.textMm + 2 + w <= availMm(ctx);
 }

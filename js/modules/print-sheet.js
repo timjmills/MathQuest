@@ -3368,7 +3368,8 @@ async function buildDetailedLesson(req = {}) {
     // ---------------------------------------------------------------- P6 Exit slip (2-up)
     const exitGen = exitD.map((x, i) => ({ q: x.q, skill: Object.assign({}, d.exit[i].ref) }));
     const exitItems = exitGen.map((g) => hostItem(g, 0, 'L'));
-    measureItems(exitItems, { size: 'L', look: 'ican', colsList: [1, 2] });
+    // (an exit item's `cols: 3` - lesson 5: three tall tables one row across a half; measured at 3 only then)
+    measureItems(exitItems, { size: 'L', look: 'ican', colsList: d.exit.some((e) => Number(e.cols) === 3) ? [1, 2, 3] : [1, 2] });
     // GROUPS (critic D14: one slip, both chunks): a run of items of one skill and one instruction.
     // Each group takes two across when all its items fit a 66 mm column, else one; the groups share
     // the half's body by their own heights (up to 1.65x, H13). A group repeats the instruction
@@ -3383,7 +3384,7 @@ async function buildDetailedLesson(req = {}) {
         const its = g.idx.map((i) => exitItems[i]);
         // (`exitCols` 1 - the detailed lesson maker, lesson 2: full-size bar items print one across a half)
         // (an exit item's own `cols` 1 | 2 - lesson 3a: the array and its turn one across, the facts two)
-        const own = g.idx.map((i) => Number(d.exit[i].cols)).find((c) => c === 1 || c === 2);
+        const own = g.idx.map((i) => Number(d.exit[i].cols)).find((c) => c === 1 || c === 2 || c === 3);
         g.cols = own || (Number(d.exitCols) === 1 ? 1 : its.every((it) => !it.measured || !it.measured[2] || it.measured[2].fits !== false) ? 2 : 1);
         g.rows = Math.ceil(its.length / g.cols);
         g.own = Math.max(...its.map((it) => (it.measured && it.measured[g.cols] && Number.isFinite(it.measured[g.cols].hMm) ? it.measured[g.cols].hMm : 40)));

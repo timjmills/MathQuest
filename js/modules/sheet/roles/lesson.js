@@ -292,11 +292,11 @@ export const CASE_TESTS = Object.freeze({
     wpBridgeBigFirstPT: (it) => CASE_TESTS.wpBridgeBigFirst(it) && CASE_TESTS.wpPutTogether(it),
     pvEdge: (it) => { const n = pvNumberOf(it); return n !== null && (n === 1000 || (n >= 100 && (Math.floor(n / 10) % 10 === 0 || n % 10 === 0 || Math.floor(n / 10) % 10 === 1))); },
     // The detailed lesson maker, lesson 5 (find the rule, 3.OA.D.9): a one-step find-the-rule table.
-    // + / − / × with a plain first row (it fits no other one-step rule of the same number); the trap:
+    // + / − / × with a plain first row (+: not 1 -> 1 + k, which is also x (1 + k)); the trap:
     // a × table whose first row is k → k × k (2 → 4: + 2 or × 2), so only row 2 decides.
-    ftAdd: (it) => { const p = ftRuleOf(it); return !!p && p.op === '+' && p.k >= 2 && p.x1 !== p.k; },
+    ftAdd: (it) => { const p = ftRuleOf(it); return !!p && p.op === '+' && p.k >= 2 && p.x1 !== p.k && p.x1 >= 2; },
     ftSub: (it) => { const p = ftRuleOf(it); return !!p && p.op === '-' && p.k >= 2 && p.x1 !== 2 * p.k; },
-    ftTimes: (it) => { const p = ftRuleOf(it); return !!p && p.op === 'x' && [2, 3, 4, 5, 10].includes(p.k) && p.x1 !== p.k && p.x1 >= 2; },
+    ftTimes: (it) => { const p = ftRuleOf(it); return !!p && p.op === 'x' && [2, 3, 4, 5, 10].includes(p.k) && p.x1 !== p.k; },
     ftTimesTrap: (it) => { const p = ftRuleOf(it); return !!p && p.op === 'x' && [2, 3, 4, 5].includes(p.k) && p.x1 === p.k; },
     // (+ / − traps: row 1 k -> 2k also fits x 2; row 1 2k -> k also fits ÷ 2 - Practice 1's ★★★ row)
     ftTrapAdd: (it) => { const p = ftRuleOf(it); return !!p && p.op === '+' && p.k >= 2 && p.x1 === p.k; },
