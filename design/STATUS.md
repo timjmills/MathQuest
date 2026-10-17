@@ -523,6 +523,7 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
   the owner's order puts the card first. Gates: ws-wrm-page-unit (+ --curated) to-make gate, ws-teacher-wrm to-make step. Evidence
   `design/audit/runs/wrm-page/tomake/`. Merged main 0aa50562 (preset skills) in; gates rerun on the merged tree. Not deployed, not
   stamped; no critic yet.
+- 2026-10-17: Owner request recorded, NOT built: carry digits UNDER the answer line as a teacher option (add, short and long multiplication, subtraction; off by default; smaller box). Spec + one open subtraction question: `design/audit/runs/next-session/CARRY-BELOW-SPEC.md`. Add a build-list entry (operations lane, appended) after the current deploy.
 - Held for after these land: Lane B answer boxes + regroup boxes (spec `design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md`),
   placevalue:identify write-value (spec `design/audit/runs/next-session/PV-IDENTIFY-WRITE-VALUE-SPEC.md`).
 
