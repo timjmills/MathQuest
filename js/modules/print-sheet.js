@@ -448,6 +448,17 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
     // count for the probe and the final run, so an item is the same item in both.
     const perSkill = itemCount ? new Map(dealSkills(skills, itemCount).map((s) => [`${s.categoryId}:${s.skillId}`, 0])) : null;
     if (perSkill) for (const s of dealSkills(skills, itemCount)) { const k = `${s.categoryId}:${s.skillId}`; perSkill.set(k, perSkill.get(k) + 1); }
+    // (an `lr6` run - the detailed lesson maker, lesson 2 r5: a greedy deal can corner itself, 7 + 8 and 4 + 8 leaving
+    // no third story that is not a near twin though 44 sets of four exist. So a run whose + / − item had to drop an
+    // LR-6 rule is dealt again under the next seed, up to 12 times, keeping the deal whose first such item comes
+    // latest. Attempt 0 is the run's own seed: a run with nothing dropped deals exactly as before.)
+    const lr6Run = slots.some((sk) => sk.lr6 && sk.avoidKeys);
+    const seen0 = lr6Run ? new Set(seen) : null, kept0 = lr6Run ? new Map(kept) : null;
+    let best = null;
+    for (let att = 0; att < (lr6Run ? 12 : 1); att++) {
+    if (att) { seen.clear(); for (const x of seen0) seen.add(x); kept.clear(); for (const [a, b] of kept0) kept.set(a, b); }
+    const runSeed = (baseSeed + att * 104729) >>> 0;
+    const relaxedAt = [];
     const out = [];
     // `edgeLast.first` (the detailed lesson maker, lesson 2 r4): the ★★★ places are dealt FIRST, so the
     // page's other items keep LR-6 against them (every equal-parts story is a near twin of 7 + 8, so a
@@ -485,7 +496,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         const pass = (rotate, relaxLast, soft, words = true) => {
             let got = null;
             for (let k = 0; k <= tries; k++) {
-                const seed = (baseSeed + i + 7919 * k) >>> 0;
+                const seed = (runSeed + i + 7919 * k) >>> 0;
                 let cand = null;
                 try { cand = generateQuestionFor(Object.assign({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex: edgeWant || rotate ? itemIndex + k : itemIndex, itemCount: perSkill ? perSkill.get(key) : undefined }, sk.range ? { range: sk.range } : {})); } catch (e) { cand = null; }
                 if (!cand) continue;
@@ -507,7 +518,6 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // all - lesson 2 r4, critic r2 D2: the relaxed last try printed a repeat and a twin answer)
         // (an `lr6` ref then drops only the story-words rule before it relaxes the soft floors)
         const wordsOff = () => (sk.lr6 ? pass(true, false, true, false) || pass(true, false, true, 'none') : null);
-        if (typeof window !== 'undefined' && window.__dbg && sk.lr6 && !sk.edgeLast && sk.skillId === 'add_wp_20') { const t = [pass(false, false, true), pass(true, false, true), pass(true, false, true, false), pass(true, false, true, 'none')].map((x) => (x ? factKeyOf(x) : '-')); window.__dbg[`${i} ${t.join(' ')} | ${[...seen].filter((x) => /lr6p|ansAll/.test(x)).join(',')}`] = 1; }
         q = hard ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, false, false))
             : sk.avoidKeys ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, true, true)) : pass(false, true, true);
         if (!q) return;
@@ -522,12 +532,18 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // (`sectionLabel` on the ref: the Mixed page names the item's band by it - the detailed lesson maker)
         if (sk.sectionLabel) q = Object.assign({}, q, { sectionLabel: String(sk.sectionLabel) });
         seen.add(signature(q));
+        if (lr6Run && sk.lr6 && lr6Of(q).op && !refAccepts(sk, q, key, seen, kept, pg, rowK, false)) relaxedAt.push(j);
         refRecord(sk, q, key, seen, kept, pg, rowK);
         kept.set(key, itemIndex + 1);
         placed[j] = { q, skill: sk };
     });
     for (const x of placed) if (x) out.push(x);
-    return out;
+    const firstRelax = relaxedAt.length ? Math.min(...relaxedAt) : Infinity;
+    if (!best || firstRelax > best.firstRelax) best = { out, firstRelax, seen: lr6Run ? new Set(seen) : null, kept: lr6Run ? new Map(kept) : null };
+    if (firstRelax === Infinity) break;
+    }
+    if (lr6Run) { seen.clear(); for (const x of best.seen) seen.add(x); kept.clear(); for (const [a, b] of best.kept) kept.set(a, b); }
+    return best.out;
 }
 
 /* =================================================================== the cell of one item */

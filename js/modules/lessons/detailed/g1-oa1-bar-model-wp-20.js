@@ -117,7 +117,7 @@ export default {
         // (both parts 2 or more: "4 and 1" can be answered by "one more", with no part-whole idea - critic r2 n5)
         { atom: 2, ref: { categoryId: 'composing', skillId: 'number_bonds', opts: { band: 10, unknown: 'answer', orientation: 'horizontal' }, minOperand: 3, partMin: 3 },
             lesson: { id: 'Y1 B2 S2', title: 'Part-whole model' } },
-        { atom: 3, items: 4, ref: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20, notation: ['stacked'] }, minNum: 11, maxNum: 16 },
+        { atom: 3, items: 4, ref: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20, notation: ['stacked'] }, minNum: 11, maxNum: 16, noPart: [10] },
             lesson: { id: 'G1 OA 6', title: 'Add within 20' } },
     ],
 
@@ -244,10 +244,9 @@ export default {
                 { say: 'The whole is missing. Add.', note: 'Step 3. Push the cubes together under the top box. Count on.' },
                 { say: 'Wrong. {chart.whole} is the whole. The whole goes on top.', note: 'First model it wrong: write {chart.whole} in a lower box. Then move it.' },
                 { ask: '{chart.question}', note: 'Step 4. Expected: [[{chart.whole}]] {chart.unit}.' },
-                { do: 'Now an add-to story. Write on the board: {chart2.text}' },
-                { say: 'Gets more: a part. Now: the whole.', note: 'Parts [[{chart2.parts}]]; whole [[{chart2.whole}]].' },
+                { say: 'Now an add-to story. Gets more: a part. Now: the whole.', note: 'Write on the board: {chart2.text} Parts [[{chart2.parts}]]; whole [[{chart2.whole}]].' },
                 // (the chart's third example, on the board: equal parts - the ★★★ row's case, modelled - critic r3 m4)
-                { do: 'Equal parts. Write on the board: {chart3.text}', note: 'Still add the parts: [[{chart3.parts}]], whole [[{chart3.whole}]].' },
+                { say: 'Equal parts? Still add the parts.', note: 'Write on the board: {chart3.text} Parts [[{chart3.parts}]]; whole [[{chart3.whole}]].' },
                 { ask: 'Swap the cube trains. Same whole?', note: 'Expected: yes, the bar is the same length.' },
             ] },
         { n: 6, name: 'We Do: Guided Practice', min: 8, page: 'P3', boxes: [{ kind: 'feedback', title: 'Fix it at once', text: 'Fix: touch the top box and ask “Is that a part?”' }],
