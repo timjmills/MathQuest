@@ -670,7 +670,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
 
 `G5|-|fractionlineplots` · W25 · committee · partial — missing: making a line plot of measurements in halves, quarters and eighths from a data list, and using fraction operations on it (the total, the difference, sharing the total equally)
 
-- **partial** `graphs:line_plot_fractions` — clause: reads a drawn line plot in halves and quarters (how many measurements, the most common, how many at one mark); never makes the plot and never uses fraction operations on the data
+- **partial** `graphs:line_plot_fractions` — clause: reads a drawn line plot in halves, quarters and eighths (how many measurements, the most common, how many at one mark); never makes the plot and never uses fraction operations on the data
   - max 14; types: number, choice
   - How many measurements are at 1? → 3
   - How many total measurements are there? → 12
@@ -715,7 +715,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
 
 `G5|-|classifytwodimensionalfiguresinahierarchy` · W29 · committee · partial — missing: placing quadrilaterals and triangles in a hierarchy diagram by their properties, and reasoning that a property of a category belongs to every subcategory (all rectangles have four right angles, so squares do)
 
-- **partial** `shapes_classify:classify_quads` — clause: ticks every name that fits one drawn quadrilateral (a square is a rectangle, a rhombus and a parallelogram); never the hierarchy itself and never a property passed down to a subcategory
+- **partial** `shapes_classify:classify_quads` — clause: ticks every category a drawn quadrilateral belongs to (a square is a rectangle, a rhombus and a parallelogram), or clicks every shape of one kind; never the hierarchy itself and never a property passed down to a subcategory
   - max 3; types: multi-select-check
   - Click ALL the quadrilaterals. → ["opt2","opt3"] {triangle ; pentagon ; rectangle ; parallelogram}
   - Click ALL categories that apply (select 1). → ["cat3"] {Square ; Rhombus ; Rectangle ; Parallelogram}
@@ -821,7 +821,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
 
 `G5|-|endofyearinvestigationprojects` · W38 · other · gap — missing: an open investigation over several linked tasks (plan a class trip: a budget, times, distances and a table of results) ending with a written explanation
 
-- **pre** `algebra:multi_step_word` — why: Y6.B2.S14 Solve multi-step problems (taught earlier this year, wk W11): multi-step problems with the four operations
+- **pre** `algebra:multi_step_word` — why: Y6.B2.S14 Solve multi-step problems (taught earlier this year, wk W11): two-step adding and subtracting stories (had 66, gave away 13, then found 26 more)
   - max 116; types: number word-work
   - Aya had 66 crayons. Aya gave away 13. Then Aya found 26 more. How many crayons does Aya have now? → 79
   - Ravi had 69 stamps. Ravi got 48 more. Then Ravi lost 48. How many stamps does Ravi have now? → 69
@@ -866,7 +866,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
 
 `G5|-|problemsolvingacrossstrands` · W38 · other · partial — missing: problems that cross strands: a measure with a unit change, a fraction or decimal amount, an area or volume, or a data value in the same problem
 
-- **partial** `algebra:multi_step_word` — clause: two- and three-step four-operation stories with whole numbers; never a problem that joins measures with fractions or shapes or data
+- **partial** `algebra:multi_step_word` — clause: two-step adding and subtracting stories with whole numbers to about 100; never a problem that joins measures with fractions or shapes or data
   - max 116; types: number word-work
   - Aya had 66 crayons. Aya gave away 13. Then Aya found 26 more. How many crayons does Aya have now? → 79
   - Ravi had 69 stamps. Ravi got 48 more. Then Ravi lost 48. How many stamps does Ravi have now? → 69
@@ -874,6 +874,14 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Tom had 41 shells. Tom got 8 more. Then Tom lost 33. How many shells does Tom have now? → 16
   - Sam had 89 cards. Sam gave away 21. Then Sam lost 23. How many cards does Sam have now? → 45
   - Leo had 44 marbles. Leo got 6 more. Then Leo found 29 more. How many marbles does Leo have now? → 79
+- **partial** `number_ops_mixed:word_problems_mixed` — clause: one-step stories with the four operations and times-as-many (90 marbles, 9 in each bag); one strand at a time: never a measure or fraction or shape
+  - max 162; types: number word-work
+  - Kofi has 56 crayons. Ben has 13 crayons. How many more crayons does Kofi have than Ben? → 43
+  - Ben has 5 jars. Each jar has 5 stamps. How many stamps are there in all? → 25
+  - Lena has 3 plates. Each plate has 4 beads. How many beads are there in all? → 12
+  - Yuki has 48 shells. Aya has 61 shells. How many shells do they have in all? → 109
+  - Aya has 18 cards. Ravi has 144 cards. How many times as many cards does Ravi have? → 8
+  - Ravi had some marbles. Ravi gave away 48 marbles. Now Ravi has 22 marbles. How many marbles did Ravi have at first? → 70
 - **pre** `fraction_operations:frac_word_mixed` — why: Y6.B3.S9 Multi-step problems (taught earlier this year, wk W16): fraction word problems
   - max 44; types: fraction-input, text, multi-select-check
   - Ava ate 1/10 of a cake. Imani ate 3/10. How much did they eat in total? → 2/5
@@ -906,7 +914,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - 93.3 × 2 = ? → 186.6
   - 84.76 × 8 = ? → 678.08
   - 45.7 × 2 = ? → 91.4
-- **related** `algebra:algebra_word_mixed` — why: word problems written as an equation with a letter for the unknown
+- **related** `algebra:algebra_word_mixed` — why: joining, taking-away and how-many-more stories within about 100, one and two steps: the pool the cross-strand problems grow from
   - max 200; types: number, number word-work
   - Ava needs 31 cards. He already has 24. How many more does he need? → 7
   - Zara had 58 books. Zara got 17 more. Then Zara lost 26. How many books does Zara have now? → 49
@@ -988,7 +996,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Put each number on the number line. → 0.5, 0.6, 0.7
   - Put 0.5 on the number line. → 0.5
   - Put each number on the number line. → 0.2, 0.3, 0.9
-- **pre** `conversions:d_to_f {"forms":[0]}` — why: Y4.B8.S2 Tenths as decimals (Grade 3, this Support lesson's source year): tenths and hundredths written as decimals and fractions
+- **pre** `conversions:d_to_f {"forms":[0]}` — why: Y4.B8.S2 Tenths as decimals (Grade 3, this Support lesson's source year): a decimal written as a fraction (0.7 = 7/10; 0.25 = 1/4)
   - max 10; types: text
   - Convert 0.7 to a fraction. → 7/10 {4/5 ; 3/4 ; 7/10 ; 1/2}
   - Convert 0.6 to a fraction. → 3/5 {9/10 ; 3/4 ; 4/5 ; 3/5}
@@ -1017,7 +1025,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Order these fractions from greatest to least: → 3/4,2/3,1/2,1/4
   - Order these fractions from greatest to least: → 9/10,5/6,3/4,5/8,1/2,1/8
   - Order these fractions from greatest to least: → 11/12,2/3,1/2,3/10,1/6
-- **pre** `fractions:identify {"forms":[1]}` — why: Y3.B6.S1 Understand the denominators of unit fractions (Grade 2, this Support lesson's source year): naming the fraction a shaded shape shows
+- **pre** `fractions:identify {"forms":[1]}` — why: Y3.B6.S1 Understand the denominators of unit fractions (Grade 2, this Support lesson's source year): choosing the model that shows a fraction
   - max 8; types: multiple-choice frac-model
   - Which model shows 3/4? → D {A ; B ; C ; D}
   - Which model shows 3/5? → A {A ; B ; C ; D}
@@ -1041,7 +1049,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - What fraction or mixed number is at the arrow? → 4/3
   - What fraction or mixed number is at the arrow? → 9/5
   - Place 1/6 on the number line by clicking the correct tick mark. → 1
-- **related** `fractions:order_frac_numline` — why: ordering fractions by placing them on a number line, the next step: its sets are unlike fractions (3/4, 7/10), beyond the Grade 2 source
+- **related** `fractions:order_frac_numline` — why: fractions found on a 0-1 number line (which letter shows 5/8?) and dragged into order: the line an order is read from; its fractions are unlike (5/8, 4/5), the next step after the Grade 2 source
   - max 12; types: multiple-choice, dnd-generic
   - Which letter shows 3/4 on the number line? → C {E ; D ; C ; A ; B}
   - Which letter shows 1/4 on the number line? → B {E ; C ; B ; A ; D}
