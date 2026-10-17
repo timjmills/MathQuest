@@ -320,17 +320,61 @@ function tableHtml(p, g, d, vals, ink, slotsById, ctx, fx = { on: false }) {
     (p.rows || []).forEach((r, i) => {
         const inS = slotsById[`r${i}in`];
         const outS = slotsById[`r${i}out`];
-        const cells = [td(g, inS ? slotBox(g, inS, d, vals, ink) : numCell(r.x), { w: d.colW, h: d.rowH })];
+        // (`ftRing`, the anchor chart's look step - detailed lesson 5: the row's In and Out ringed grey)
+        const ring = ctx.ftRing && ctx.ftRing.includes(i) ? `outline:${HEAVY} solid ${INK.grey};outline-offset:-${g.em(1.2)};` : '';
+        const cells = [td(g, inS ? slotBox(g, inS, d, vals, ink) : numCell(r.x), { w: d.colW, h: d.rowH, extra: ring })];
         if (expr) cells.push(td(g, txt(g, esc(ruleOn(p.rule, r.x))), { w: d.exprW, h: d.rowH }));
-        cells.push(td(g, outS ? slotBox(g, outS, d, vals, ink) : numCell(r.y), { w: d.colW, h: d.rowH }));
+        cells.push(td(g, outS ? slotBox(g, outS, d, vals, ink) : numCell(r.y), { w: d.colW, h: d.rowH, extra: ring }));
         if (fixCol) {
             const ids = [inS, outS].filter(Boolean).map((t) => t.id);
             cells.push(td(g, ids.length ? fixBox(g, d, fx, ids, { value: ids.map((id) => fx.key[id]).join(', ') }) : '', { w: d.colW, h: d.rowH, extra: `border-left:${HEAVY} solid ${INK.ink};` }));
         }
         rows += `<tr>${cells.join('')}</tr>`;
     });
-    return `<table class="ft-table" role="grid" aria-label="function table" style="border-collapse:collapse;table-layout:fixed;margin:0 auto;`
+    const table = `<table class="ft-table" role="grid" aria-label="function table" style="border-collapse:collapse;table-layout:fixed;margin:0 auto;`
         + `border:${HEAVY} solid ${INK.ink};background:#fff">${rows}</table>`;
+    if (!Array.isArray(ctx.ftNotes)) return table;
+    // (`ftNotes`, the anchor chart's step states - detailed lesson 5: what the step wrote beside each row,
+    // "+ 8 ✓", the newest step grey and earlier steps black, in a column outside the table; an equal
+    // empty column on the left keeps the table centred)
+    const nw = NOTE_MM;
+    const notes = (p.rows || []).map((r, i) => {
+        const n = ctx.ftNotes[i];
+        return `<div style="height:${g.em(d.rowH)};display:flex;align-items:center;white-space:nowrap">${n ? `<span style="font-size:${g.textEm.toFixed(3)}em;font-weight:700;white-space:nowrap;color:${n.grey ? INK.grey : INK.ink}">${esc(n.text)}</span>` : ''}</div>`;
+    }).join('');
+    return `<div style="display:flex;justify-content:center;align-items:flex-start"><div style="width:${g.em(nw)}"></div>${table}`
+        + `<div class="ft-notes" style="width:${g.em(nw)};padding-top:${g.em(d.headH + 0.5)};padding-left:${g.em(1.5)};box-sizing:border-box">${notes}</div></div>`;
+}
+const NOTE_MM = 19;
+
+/**
+ * The anchor-chart step states of a one-step find-the-rule table (detailed lesson 5; the provider's
+ * four worked steps: look, the change, test every row, write the rule): step 0 rings rows 1 and 2
+ * grey; + / −: step 1 writes the change beside row 1, step 2 ticks it on the other rows; × / ÷: step 1
+ * tests "+ the change" and crosses it on row 2, step 2 ticks the real rule on every row; step 3
+ * writes the rule in the frame (grey). Any other table: blank, then answered grey on the last state.
+ */
+function ftStepState(p, steps, k, ctx) {
+    const n = Array.isArray(steps) ? steps.length : 0;
+    const last = k >= n - 1;
+    const rule = p.rule || [];
+    const rows = p.rows || [];
+    const plain = p.task === 'rule' && rule.length === 1 && !p.check && n === 4 && rows.length >= 2;
+    const c = Object.assign({}, ctx, { state: last ? 'traced' : 'blank' });
+    if (!plain) return this.render(p, c);
+    const G = { '+': '+', '-': '−', x: '×', '/': '÷' };
+    const r0 = rule[0];
+    const addish = r0.op === '+' || r0.op === '-';
+    const gap = rows[0].y - rows[0].x;
+    const change = addish ? `${G[r0.op]} ${r0.n}` : `${gap >= 0 ? '+' : '−'} ${Math.abs(gap)}`;
+    const notes = rows.map(() => null);
+    if (k === 0) c.ftRing = [0, 1];
+    if (k >= 1) notes[0] = { text: change, grey: k === 1 };
+    if (addish && k >= 2) rows.forEach((r, i) => { if (i) notes[i] = { text: `${change} ✓`, grey: k === 2 }; });
+    if (!addish && k === 1) notes[1] = { text: `${change} ✗`, grey: true };
+    if (!addish && k >= 2) rows.forEach((r, i) => { notes[i] = { text: `${G[r0.op]} ${r0.n} ✓`, grey: k === 2 }; });
+    c.ftNotes = notes;
+    return this.render(p, c);
 }
 
 /** The width a cell gives its content at the section's column count (unknown: one column). */
@@ -522,4 +566,5 @@ register('function-table', {
         }));
     },
     layout() { return { card: 'card-medium-visual', checker: 'list', requiresVisual: true }; },
+    stepState: ftStepState,
 });

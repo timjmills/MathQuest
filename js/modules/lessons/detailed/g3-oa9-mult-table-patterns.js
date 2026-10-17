@@ -51,7 +51,7 @@ export default {
     practicePages: 1,
     // (Practice windows are 3 x 3, the lesson sheet's 3 x 4: the 2-9 chart holds too few 3 x 3 windows that are not
     // near twins - more than half their boxes shared, either way round - for eleven of one shape)
-    practiceSheets: [{ skill: CHART({ tries: 600 }, { winRows: 3, winCols: 3 }), shape: [6, 2], edgeLast: { per: 6, cols: 2, wants: ['chartBigOdd', 'chartBigOdd'] } }],
+    practiceSheets: [{ steps: true, skill: CHART({ tries: 600 }, { winRows: 2, winCols: 4 }), shape: [6, 2], edgeLast: { per: 6, cols: 2, wants: ['chartBigOdd', 'chartBigOdd'] } }],
     // (no Mixed page: the facts the windows rest on are P0 and the spaced retrieval; one full Practice page)
 
     // The lesson's own names for a dealt window: first even row / column, an odd x odd box, a reason fact.
@@ -89,7 +89,7 @@ export default {
         vocab: [
             { word: 'even', meaning: 'makes pairs, none left over', picture: { kind: 'text', text: '●● ●● ●●' } },
             { word: 'odd', meaning: 'one is left over', picture: { kind: 'text', text: '●● ●● ●● ●' } },
-            { word: 'product', meaning: 'the answer when you multiply', picture: { kind: 'text', text: '4 × 3 = 12' } },
+            { word: 'product', meaning: 'the answer when you multiply', picture: { kind: 'fact', a: 4, b: 3 } },
         ],
         steps: [
             { icon: 'look', text: 'Shade the even rows.' },
@@ -136,12 +136,12 @@ export default {
 
     // ------------------------------------------------------------------ P6 Exit slip (fresh windows)
     // Designed around the 4 x 5 window the generator cuts today (B3 would allow the 2 x 3 of RESEARCH.md).
-    // (four 2 x 3 windows, two across: a 3-row window leaves a half's cell no free room - never shrunk)
+    // (three 2 x 3 windows, each fresh: no other page's window holds half its boxes, either way round. The 2-9 chart is
+    // spent by the lesson's pages, so they may use the 11 and 12 rows (chartFresh, products to 100); a fourth finds none)
     exit: [
-        { case: 'an even row (odd columns)', ref: CHART({ pageGroup: 'exit' }, { winRows: 2, winCols: 3 }), want: 'chartColsOdd', cols: 2, detects: 'Misses the even row.' },
-        { case: 'the odd row: its even column (Critical Atom)', ref: CHART({ pageGroup: 'exit' }, { winRows: 2, winCols: 3 }), want: 'chartColsEven', cols: 2, detects: 'Leaves an even column white.' },
-        { case: 'odd x odd stays white', ref: CHART({ pageGroup: 'exit' }, { winRows: 2, winCols: 3 }), want: 'chartOddOdd', cols: 2, detects: 'Shades an odd × odd box.' },
-        { case: 'rows and columns', ref: CHART({ pageGroup: 'exit' }, { winRows: 2, winCols: 3 }), want: 'chartMixed', cols: 2, detects: 'Shades one line only.' },
+        { case: 'an even row (odd columns)', ref: CHART({ pageGroup: 'exit', gridFresh: true, allTest: 'chartFresh' }, { winRows: 2, winCols: 3, band: 144 }), want: 'chartColsOdd', cols: 2, detects: 'Misses the even row.' },
+        { case: 'the odd row: its even column (Critical Atom)', ref: CHART({ pageGroup: 'exit', gridFresh: true, allTest: 'chartFresh' }, { winRows: 2, winCols: 3, band: 144 }), want: 'chartMixed', cols: 2, detects: 'Leaves an even column white.' },
+        { case: 'odd x odd stays white', ref: CHART({ pageGroup: 'exit', gridFresh: true, allTest: 'chartFresh' }, { winRows: 2, winCols: 3, band: 144 }), want: 'chartOddOdd', cols: 2, detects: 'Shades an odd × odd box.' },
     ],
     exitInstruction: 'Shade every even product.',
     exitSay: 'b. {say.ca} × {say.cb}: {say.cb} is even. So {say.cp} is __.',
@@ -167,12 +167,12 @@ export default {
     vocabulary: [
         { word: 'even', gloss: 'makes pairs, none left over', diagram: { kind: 'text', text: '●● ●● ●●' } },
         { word: 'odd', gloss: 'one is left over', diagram: { kind: 'text', text: '●● ●● ●● ●' } },
-        { word: 'product', gloss: 'the answer when you multiply', diagram: { kind: 'text', text: '4 × 3 = 12' } },
+        { word: 'product', gloss: 'the answer when you multiply', diagram: { kind: 'fact', a: 4, b: 3 } },
     ],
 
     // ------------------------------------------------------------------ T2 Atomisation template
     atoms: [
-        { type: 'Category', prereq: true, skill: 'Even numbers: the count by 2s', notes: 'Prerequisite Check {pre.0.letters}.' },
+        { type: 'Category', prereq: true, skill: 'Even numbers: the count by 2s (2, 4, 6, 8 ...)', notes: 'Prerequisite Check {pre.0.letters}.' },
         { type: 'Fact', prereq: true, skill: 'Facts of 2 and 4: 4 × n is 2 × n twice', notes: 'Prerequisite Check {pre.1.letters}.' },
         { type: 'Fact', prereq: true, skill: 'Read the chart: row meets column', notes: 'Prerequisite Check {pre.2.letters}.' },
         { type: 'Comparative', skill: 'Even row: every product is even', notes: 'Anchor chart, the even rows.' },
@@ -192,9 +192,9 @@ export default {
         { name: 'Odd × odd = even', step: 3, looks: '{cq.B}', fix: 'Count the pairs: one is left over.', option: 'B', misconception: 'odd-odd-shaded' },
         { name: 'Tens digit decides', step: 1, looks: '{chart.trap} left white (its tens digit is odd)', fix: 'Cover the tens. Read the ones.', option: '', caught: 'Practice 1, a white box' },
         { name: 'Any odd factor is odd', step: 2, looks: '{chart.ca} × {chart.cb} left white', fix: 'One even number is enough.', option: '', caught: 'Exit b' },
-        { name: 'Columns only', step: 1, looks: 'The {chart.ec} column shaded, the {chart.er} row white', fix: 'Rows first, then columns: finger on each header.', option: '', caught: 'Exit a, d' },
+        { name: 'Columns only', step: 1, looks: 'The {chart.ec} column shaded, the {chart.er} row white', fix: 'Rows first, then columns: finger on each header.', option: '', caught: 'Exit a' },
     ],
-    checkQuestion: { want: 'chartMixed', correct: 'C', ref: CHART({}, { winRows: 2, winCols: 4 }) },
+    checkQuestion: { want: 'chartMixed', correct: 'C', ref: CHART({ gridFresh: true, allTest: 'chartFresh' }, { winRows: 2, winCols: 4, band: 144 }) },
 
     // ------------------------------------------------------------------ T3-T5 delivery scripts
     sections: [
@@ -263,7 +263,7 @@ export default {
         { n: 10, name: 'Plenary and exit slip', min: 5, page: 'P6',
             rows: [
                 { say: 'If one number is even, the product is even.', note: 'The Remember line. Say it twice.' },
-                { do: 'Hand out the exit slip. No help. Sort by the boxes ticked.', note: 'a. [[{exit.0.shaded}]] · b. [[{exit.1.shaded}]] · c. [[{exit.2.shaded}]] · d. [[{exit.3.shaded}]].' },
+                { do: 'Hand out the exit slip. No help. Sort by the boxes ticked.', note: 'a. [[{exit.0.shaded}]] · b. [[{exit.1.shaded}]] · c. [[{exit.2.shaded}]].' },
                 { say: 'Tomorrow we use rules to make number patterns.' },
             ] },
     ],
@@ -282,7 +282,7 @@ export default {
         { wrote: '{exit.2.wrong.oddoddshaded}', mistake: 'Odd × odd = even', next: 'Count the pairs: one is left over.' },
         { wrote: '{exit.1.cp} left white ({exit.1.ca} is odd)', mistake: 'Any odd factor is odd', next: 'One even number is enough.' },
         { wrote: '{exit.0.trap} left white (its tens digit is odd)', mistake: 'Tens digit decides', next: 'Cover the tens. Read the ones.' },
-        { wrote: 'The {exit.3.ec} column shaded, the {exit.3.er} row white', mistake: 'Columns only', next: 'Rows first, then columns: finger on each header.' },
+        { wrote: 'The {exit.1.ec} column shaded, the {exit.1.er} row white', mistake: 'Columns only', next: 'Rows first, then columns: finger on each header.' },
         { wrote: 'Word problem: {wp.p}, "odd"', mistake: 'Any odd factor is odd', next: 'Find one even number: {wp.a}. So {wp.p} is even.' },
         { wrote: 'Word problem: {wp.sum}', mistake: 'Added the numbers', next: '{wp.a} groups of {wp.b}: draw the groups, then multiply.' },
     ],

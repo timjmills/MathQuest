@@ -327,6 +327,8 @@ export function itemNumberOf(q) {
     const p = (q.cell && q.cell.payload) || {};
     if (q.pv && Number.isFinite(Number(q.pv.n))) return Number(q.pv.n);
     if (Number.isFinite(Number(p.n))) return Number(p.n);
+    // (a number pattern, lesson 5: its first number - the ref floors minNum / maxNum read it)
+    if (q.pattern && Array.isArray(q.pattern.values) && Number.isFinite(Number(q.pattern.values[0]))) return Number(q.pattern.values[0]);
     // (an array and its turn, lesson 3a: its product - the ref floors minNum / maxNum read it)
     if (q.cell && q.cell.template === 'arrays-turn' && Number.isFinite(Number(p.rows) * Number(p.cols))) return Number(p.rows) * Number(p.cols);
     const a = typeof q.ans === 'object' ? null : String(q.ans).replace(/,/g, '').trim();
@@ -385,6 +387,13 @@ export function factKeyOf(q) {
         const a = `${p.rows[0]}-${p.rows[p.rows.length - 1]}`, b = `${p.cols[0]}-${p.cols[p.cols.length - 1]}`;
         const [x, y] = p.rows[0] < p.cols[0] || (p.rows[0] === p.cols[0] && p.rows.length <= p.cols.length) ? [a, b] : [b, a];
         return `grid${x}x${y}${q.chartTask ? ':' + q.chartTask : ''}`; }
+    // (a function table - lesson 5: its rule and its In numbers, so one table is one item of the pool)
+    if (q.cell && q.cell.template === 'function-table' && q.cell.payload && Array.isArray(q.cell.payload.rule) && Array.isArray(q.cell.payload.rows)) {
+        const p = q.cell.payload;
+        return `ft${p.task}${p.rule.map((r) => `${r.op}${r.n}`).join('')}:${p.rows.map((r) => r.x).join(',')}`;
+    }
+    // (a number pattern - lesson 5's Number sense and Mixed: its kind, step and start)
+    if (q.pattern && Array.isArray(q.pattern.values) && q.pattern.values.length) return `pat${q.pattern.kind}${q.pattern.step}:${q.pattern.values[0]}`;
     const op = composeOpOf(q);
     const ops = op ? composeOperandsOf(q) : [];
     if (op && ops.length >= 2) return ops.join(composeGlyphOf(op) || op);
@@ -2766,7 +2775,7 @@ async function buildLesson(n, metaOf) {
     // `tagLine` (the detailed lesson maker): the LESSON's tags, validated against standards.js by
     // the caller, printed on every sheet instead of the skill's own.
     const tagLine = n.tagLine || lessonTagLine({ skillId: sk.skillId, grade: meta.grade, ccss, ee });
-    const header = Object.assign({}, n.header, { footerLeft: tagLine }, Array.isArray(n.packTab) ? { tabStrand: n.packTab[1] } : {});
+    const header = Object.assign({}, n.header, { footerLeft: tagLine }, Array.isArray(n.packTab) ? { tabStrand: n.packTab[1], tabLevel: n.packTab[0] } : {});
     // (A chunked detailed lesson numbers its sheets '1a', '1b': V22 Chunked Flow.)
     const lessonNo = /^\d+[a-z]$/.test(String(n.lesson || '')) ? String(n.lesson) : Math.max(1, Number(n.lesson) || 1);
 
@@ -2862,7 +2871,7 @@ async function buildLesson(n, metaOf) {
             const own = ps.skill ? Object.assign({}, ps.skill, packNums ? { avoidKeys: packNums.slice(), tries: Math.max(300, Number(ps.skill.tries) || 0), lr6: true } : {}) : practiceSk;
             const shape = Array.isArray(ps.shape) ? ps.shape : stackShapes[stackShapes.length - 1];
             const sk1 = Object.assign({}, own, n.edgeLast || ps.edgeLast ? { edgeLast: ps.edgeLast || { per: shape[0], cols: shape[1] } } : {});
-            const withStrip = !ps.skill && stripHtml;
+            const withStrip = (!ps.skill || ps.steps) && stripHtml;   // (`steps`: a sheet with its own skill ref keeps the lesson's Steps - lesson 4 r2)
             const res = await buildSheet(Object.assign({}, common, {
                 size: practiceSize, role: 'independent', tabId: `Practice ${k}`,
                 // (the pack's own tab: every Practice sheet names the lesson's strand)
@@ -3065,6 +3074,11 @@ function dealOne1(ref, seed, used, want, avoidAns, near, names, fresh) {
         // (`pageGroup`, lesson 4: the refs of one page - the exit slip - keep its windows apart, any shape)
         const grp = ref.pageGroup ? (DL_GROUPS.get(used) || DL_GROUPS.set(used, new Map()).get(used)) : null;
         if (grp && gridNear(key, grp.get(ref.pageGroup) || [])) { why.near++; continue; }
+        // (and no two windows of one grid row with the same rows or columns, either way round - the window form of LR-6's × rule)
+        const spans = (k) => (String(k).match(/^grid(\d+-\d+)x(\d+-\d+)/) || []).slice(1);
+        // (one grid row of the slip is two windows: `pageCols`, default 2)
+        const gl = grp ? grp.get(ref.pageGroup) || [] : [], pc = Number(ref.pageCols) || 2, rowMates = gl.slice(gl.length - (gl.length % pc));
+        if (grp && spans(key).some((sp) => rowMates.some((u) => spans(u).includes(sp)))) { why.near++; continue; }
         if (avoidAns && avoidAns.has(dlAns(q))) { why.ans++; continue; }
         if (!refHardOk(ref, q)) { why.hard++; continue; }
         // (`near`: the page's one-number items by skill - LR-6 no near twins, critic r3 N1)
@@ -3082,7 +3096,7 @@ function dealOne1(ref, seed, used, want, avoidAns, near, names, fresh) {
         if (grp) grp.set(ref.pageGroup, (grp.get(ref.pageGroup) || []).concat([key]));
         return { q, v, key };
     }
-    throw new Error(`detailed lesson: no ${ref.skillId} item for "${want || 'any'}" (turned away: ${Object.entries(why).filter((e) => e[1]).map((e) => e.join(' ')).join(', ')})`);
+    throw new Error(`detailed lesson: no ${ref.skillId} item for "${want || 'any'}" (turned away: ${Object.entries(why).filter((e) => e[1]).map((e) => e.join(' ')).join(', ')})${ref.gridFresh ? ' windows: ' + [...used].filter((u) => /^grid/.test(u)).join(' ') : ''}`);
 }
 
 /**
@@ -3346,7 +3360,7 @@ async function buildDetailedLesson(req = {}) {
     const eqTurn = !!(wpV.eqTurn && d.wordProblem.eqTurn);
     wpV.eq = `${eqParts.join(` ${eqOp} `)} = ${eqN}` + (eqTurn ? ` · ${eqParts.slice().reverse().join(` ${eqOp} `)} = ${eqN}` : '');
     const wpPlan = wordProblemPlan({
-        lines, answerLine: fillPlaceholders(d.wordProblem.answerLine, { wp: wpV }), wordsLine: d.wordProblem.wordsLine ? fillPlaceholders(d.wordProblem.wordsLine, { wp: wpV }) : '', words: wpV.words, say: fillPlaceholders(d.wordProblem.say, { wp: wpV }), n: wpV.ans, eqN, eqTurn, schematic: d.wordProblem.schematic && wpV.rows ? { rows: wpV.rows, cols: wpV.cols } : null, parts: eqParts, op: eqOp, signSlot: !!d.wordProblem.signSlot, item: String(wpD.key),
+        lines, answerLine: fillPlaceholders(d.wordProblem.answerLine, { wp: wpV }), wordsLine: d.wordProblem.wordsLine ? fillPlaceholders(d.wordProblem.wordsLine, { wp: wpV }) : '', words: wpV.words, say: fillPlaceholders(d.wordProblem.say, { wp: wpV }), n: wpV.wpAns !== undefined ? wpV.wpAns : wpV.ans, eqN, eqTurn, schematic: d.wordProblem.schematic && wpV.rows ? { rows: wpV.rows, cols: wpV.cols } : null, parts: eqParts, op: eqOp, signSlot: !!d.wordProblem.signSlot, item: String(wpD.key),
         instruction: d.wordProblem.instruction || INSTRUCTION_LIBRARY['story-rcdws'] || INSTRUCTION_LIBRARY.story,
     }, frameP('Word problem', 1));
     const p5 = renderPlan(wpPlan, { key: true });

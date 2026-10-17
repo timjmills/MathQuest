@@ -32,6 +32,7 @@ import { stepIcon } from '../lesson-icons.js';
 import { esc, blank } from '../cell.js';
 import { story, headerFields, strandTab, pageTitle } from '../frame.js';
 import { barMini } from '../cells/word-work.js';
+import { factGridMini } from '../cells/mult-grid.js';
 
 export const ROLE_ID = 'detailed-lesson';
 
@@ -95,6 +96,7 @@ export function teacherBands(d, V, pages) {
         if (!g) return '';
         if (g.kind === 'digit') return `<span class="dl-digit">${esc(g.text)}</span>`;
         if (g.kind === 'bar') return barMini({ whole: g.whole, a: g.a, b: g.b, mark: g.mark || '', wMm: 36, pt: 12 });
+        if (g.kind === 'fact') return factGridMini(Number(g.a), Number(g.b));
         if (g.kind === 'pv') return `<span class="dl-pv"><span>H</span><span>T</span><span>O</span>${String(g.digits).split('').map((c) => `<span>${esc(c)}</span>`).join('')}</span>`;
         return esc(g.text || '');
     };

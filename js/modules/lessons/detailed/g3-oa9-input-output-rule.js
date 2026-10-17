@@ -14,8 +14,9 @@
 // ccss / ee against the skill's tags); the C.4 Remember string 'one-pair'.
 
 const FT = (opts, extra) => Object.assign({ categoryId: 'algebra', skillId: 'function_table_easy', opts: Object.assign({ ftTask: 'rule', ftRules: ['+', '-', 'x'], band: 20, ftTable: 31, support: 'frame' }, opts || {}) }, extra || {});
-// P1 bank types: earlier content only (place value and count-on patterns), never today's rule-finding.
+// P1 bank types: earlier content only (place value: 1 / 10 more and less, compare, unit form), never today's rule-finding.
 const NS = (categoryId, skillId, opts, extra) => Object.assign({ categoryId, skillId, opts }, extra || {});
+const ML = (step, dir, extra) => Object.assign({ categoryId: 'placevalue', skillId: 'more_less_10', opts: { step, dir, band: 100 } }, extra || {});
 const GLYPH = { '+': '+', '-': '−', x: '×', '/': '÷' };
 
 export default {
@@ -40,21 +41,16 @@ export default {
     // Find the one-step rule of a 3-row table (+, − or ×), numbers to 20, In in order, frame + machine.
     skill: FT(),
     // The ★★★ last row: a × table whose first row also fits a + rule (2 → 4), and a − rule.
-    edgeTest: 'ftTimesTrap',
+    edgeTest: 'ftTrapAny',
     practicePages: 2,
     // Practice 1: + and − rules (★, ★★). Practice 2: × then mixed, numbers to 50, In out of order,
     // the machine picture faded (★★★).
     practiceSheets: [
-        { skill: FT({ ftRules: ['+', '-'] }), shape: [6, 2] },
-        { skill: FT({ ftRules: ['+', '-', 'x'], band: 50, ftTable: 32, support: 'frame-bare' }), shape: [6, 2], edgeLast: { per: 6, cols: 2, wants: ['ftTimesTrap', 'ftSub'] } },
+        { skill: FT({ ftRules: ['+', '-'] }), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['ftTrapAdd', 'ftTrapSub'] } },
+        { skill: FT({ ftRules: ['x', '+', '-'], band: 50, ftTable: 32, support: 'frame-bare' }), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['ftTimesTrap', 'ftTrapSub'] } },
     ],
-    // Mixed: earlier content only (use a given rule, count-on patterns, facts).
-    mixed: { skills: [
-        FT({ ftTask: 'outputs', ftRules: ['+', '-'] }),
-        { categoryId: 'patterns', skillId: 'number_patterns_rule', opts: { pattern: ['add', 'sub'], places: [1], rule: false } },
-        { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20 } },
-        { categoryId: 'subtraction', skillId: 'sub_facts', opts: { band: 20 } },
-    ], strip: false },
+    // No Mixed page (V22 §9.5: optional): a function table is a tall item, and a page that mixes them with
+    // earlier facts cannot give the lesson's own skill half the page (E33).
 
     // The lesson's own placeholder names: one table's rows and rule (the function-table payload).
     vars: (q) => {
@@ -71,7 +67,7 @@ export default {
             sign, k: s.n, rule: `${sign} ${s.n}`, d, plus: r2.x + d,
             word: s.op === 'x' ? 'times' : s.op === '-' ? 'take away' : 'add',
             rows: `${r1.x} → ${r1.y}, ${r2.x} → ${r2.y}, ${r3.x} → ${r3.y}`,
-            next, nextOut, eqParts: [next, s.n], eqOp: sign,
+            next, nextOut, wpAns: nextOut, eqN: nextOut, eqParts: [next, s.n], eqOp: sign,
         };
     },
 
@@ -88,14 +84,15 @@ export default {
             { word: 'rule', meaning: 'what the machine does to every number', picture: { kind: 'text', text: '4 → + 3 → 7' } },
         ],
         steps: [
-            { icon: 'look', text: 'Look at In and Out.' },
-            { icon: 'decide', text: 'Find the change.' },
-            { icon: 'check', text: 'Test every row.' },
+            { icon: 'look', text: 'Read row 1 across: In, then Out.' },
+            { icon: 'decide', text: 'Bigger or smaller? Find the change.' },
+            { icon: 'check', text: 'Test the rule on every row.' },
+            { icon: 'write', text: 'Write the sign and the number.' },
         ],
         // No chant (research §4): the three steps are said in the Say band.
         chant: '',
         guidedRows: 2,
-        practiceShape: [6, 2],
+        practiceShape: [4, 2],
         format: {
             kind: 'numbered steps with icons',
             why: 'The step pupils skip is step 3: a rule read off row 1 alone. Panel 3 shows it failing.',
@@ -113,29 +110,20 @@ export default {
             lesson: { id: '2.OA.B.2', title: 'Add within 20' } },
         { atom: 2, items: 2, ref: { categoryId: 'subtraction', skillId: 'sub_facts', opts: { band: 20 } },
             lesson: { id: '2.OA.B.2', title: 'Subtract within 20' } },
-        { atom: 3, items: 3, ref: { categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: [2, 5, 10] } },
+        { atom: 3, items: 2, ref: { categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: [2, 5, 10] } },
             lesson: { id: '3.OA.C.7', title: 'Multiply by 2, 5 and 10' } },
-        { atom: 4, items: 1, ref: FT({ ftTask: 'outputs', ftRules: ['+'] }),
+        { atom: 4, items: 1, ref: FT({ ftTask: 'outputs', ftRules: ['+'], support: 'frame-bare' }),
             lesson: { id: '4.OA.C.5', title: 'Use a rule to fill a table' } },
     ],
 
     // ------------------------------------------------------------------ P1 Number sense
     // Five bank types, one a row, the same order in A and B; B the harder numbers.
     numberSense: {
-        A: { items: [
-            NS('placevalue', 'more_less_10', { step: 10, dir: 'more', band: 100 }, { maxNum: 60 }),
-            NS('placevalue', 'compare', { band: 99, closeness: 'far' }),
-            NS('patterns', 'number_patterns_rule', { pattern: ['add'], places: [1], rule: false }),
-            NS('placevalue', 'more_less_10', { step: 10, dir: 'less', band: 100 }, { maxNum: 60 }),
-            NS('patterns', 'number_patterns_rule', { pattern: ['sub'], places: [10], rule: false }),
-        ] },
-        B: { items: [
-            NS('placevalue', 'more_less_10', { step: 10, dir: 'more', band: 100 }, { minNum: 61 }),
-            NS('placevalue', 'compare', { band: 99, closeness: 'close' }),
-            NS('patterns', 'number_patterns_rule', { pattern: ['add'], places: [10], rule: false }),
-            NS('placevalue', 'more_less_10', { step: 10, dir: 'less', band: 100 }, { minNum: 61 }),
-            NS('patterns', 'number_patterns_rule', { pattern: ['sub'], places: [10], rule: false }, { minNum: 50 }),
-        ] },
+        A: { items: [ML(1, 'less', { minNum: 11, maxNum: 50 }), ML(10, 'more', { minNum: 10, maxNum: 60 }), NS('placevalue', 'compare', { band: 99, closeness: 'far' }),
+            NS('placevalue', 'unit_form', { band: 99 }, { maxNum: 50 }), ML(10, 'less', { minNum: 20, maxNum: 60 })] },
+        B: { items: [ML(1, 'less', { minNum: 102, maxNum: 119, opts: { step: 1, dir: 'less', band: 120 } }), NS('placevalue', 'more_less_100', { step: 10, dir: 'more' }, { minNum: 120, maxNum: 880 }),
+            NS('placevalue', 'compare', { band: 999, closeness: 'close' }, { minNum: 100 }), NS('placevalue', 'unit_form', { band: 99 }, { minNum: 50 }),
+            NS('placevalue', 'more_less_100', { step: 10, dir: 'less' }, { minNum: 120, maxNum: 980 })] },
     },
 
     // ------------------------------------------------------------------ P5 Word problem
@@ -145,18 +133,20 @@ export default {
         ref: FT({ ftRules: ['x'], band: 50 }),
         want: 'ftTimes',
         instruction: 'Read the story. Draw it. Solve.',
-        lines: ['A machine makes toy cars.', 'Put in {wp.x1} boxes, get {wp.y1} cars.', 'Put in {wp.x2} boxes, get {wp.y2} cars.', 'Put in {wp.x3} boxes, get {wp.y3} cars.', 'What is the rule? How many cars for {wp.next} boxes?'],
-        answerLine: 'The rule is __. {wp.next} boxes make __ cars.',
+        lines: ['A machine: {wp.x1} boxes make {wp.y1} cars.', '{wp.x2} boxes make {wp.y2} cars.', '{wp.x3} boxes make {wp.y3} cars.', 'How many cars do {wp.next} boxes make?'],
+        answerLine: '{wp.next} boxes make __ cars.',
+        // (the pupil writes the sign: a printed × would give the rule away)
+        signSlot: true,
         say: 'The rule is __. The answer is __ cars.',
     },
 
     // ------------------------------------------------------------------ P6 Exit slip
     // One item per rule kind taught, then the Critical Atom's case (row 1 also fits +).
     exit: [
-        { case: 'a + rule', ref: FT({ ftRules: ['+'] }), want: 'ftAdd', instr: 'Find the rule. Write the rule.', detects: 'Reads down the Out column: the gap between Outs.' },
-        { case: 'a − rule', ref: FT({ ftRules: ['-'] }), want: 'ftSub', instr: 'Find the rule. Write the rule.', detects: 'Sign flipped: + when Out is smaller.' },
-        { case: 'a × rule', ref: FT({ ftRules: ['x'], band: 50 }), want: 'ftTimes', instr: 'Find the rule. Write the rule.', detects: 'Adds for times: + read off row 1.' },
-        { case: 'row 1 also fits + (Critical Atom)', ref: FT({ ftRules: ['x'], band: 50 }), want: 'ftTimesTrap', instr: 'Find the rule. Write the rule.', detects: 'One pair only: never tests row 2.' },
+        { case: 'a + rule', ref: FT({ ftRules: ['+'], support: 'frame-bare' }), want: 'ftAdd', instr: 'Find the rule. Write the rule.', detects: 'Reads down the Out column: the gap between Outs.' },
+        { case: 'a − rule', ref: FT({ ftRules: ['-'], support: 'frame-bare' }), want: 'ftSub', instr: 'Find the rule. Write the rule.', detects: 'Sign flipped: + when Out is smaller.' },
+        { case: 'a × rule', ref: FT({ ftRules: ['x'], band: 50, support: 'frame-bare' }), want: 'ftTimes', instr: 'Find the rule. Write the rule.', detects: 'Adds for times: + read off row 1.' },
+        { case: 'row 1 also fits + (Critical Atom)', ref: FT({ ftRules: ['x'], band: 50, ftTrap: true, support: 'frame-bare' }), want: 'ftTimesTrap', instr: 'Find the rule. Write the rule.', detects: 'One pair only: never tests row 2.' },
     ],
     exitInstruction: 'Find the rule. Write the rule.',
     exitSay: 'In {say.x1}, out {say.y1}. The rule is __.',
@@ -164,7 +154,7 @@ export default {
     // ------------------------------------------------------------------ retrieval (MWB)
     retrieval: [
         { ref: { categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: [2, 5, 10] } }, ask: '{ret.0.text}' },
-        { ref: { categoryId: 'subtraction', skillId: 'sub_facts', opts: { band: 20 }, minNum: 11 }, ask: '{ret.1.text}' },
+        { ref: { categoryId: 'subtraction', skillId: 'sub_facts', opts: { band: 20 } }, ask: '{ret.1.text}' },
         { ref: { categoryId: 'placevalue', skillId: 'more_less_10', opts: { step: 10, dir: 'more', band: 100 }, maxNum: 89 }, ask: '{ret.2.text}' },
     ],
 
@@ -175,7 +165,7 @@ export default {
         { kind: 'watch', title: 'One row is not enough', text: '2 → 4 fits + 2 and × 2. Test every row, aloud.' },
     ],
     slotRows: [{ shape: 'rule frame', use: 'the sign in the circle, the number in the box' }],
-    caseNames: { ftTimesTrap: 'row 1 also fits +', ftSub: 'a − rule', ftTimes: 'a × rule', ftAdd: 'a + rule' },
+    caseNames: { ftTimesTrap: 'row 1 also fits +', ftTrapAdd: 'row 1 also fits × 2', ftTrapSub: 'row 1 also fits ÷ 2', ftSub: 'a − rule', ftTimes: 'a × rule', ftAdd: 'a + rule' },
     routeNote: 'No site lesson exists yet for these prerequisites: T6 names a CCSS code and a short title (V22 Appendix H).',
     materials: ['A paper “rule machine” box with In and Out slots', 'Number cards 1 to 20', 'Reading strips (card to cover the other rows)', 'Mini whiteboards and pens', 'Pupil packet, one per pupil', 'Exit slips, cut in half'],
     vocabulary: [
@@ -265,7 +255,7 @@ export default {
             loop: { most: 'Go on to You Do.', half: 'Reteach “test every row” with the machine, then two more.', fewer: 'Stop. Feed {chart3.x2} through the machine. Test + {chart3.d} together.' } },
         { n: 8, name: 'You Do: Independent Practice', min: 12, page: 'P4', boxes: [{ kind: 'watch', title: 'The last rows', text: 'Walk to the last rows first: {p4.last}.' }],
             rows: [
-                { do: 'Pupils finish the lesson sheet, then Practice 1 and 2. Mixed 1 is homework.' },
+                { do: 'Pupils finish the lesson sheet, then Practice 1 and 2.' },
                 { say: 'Use the Steps at the top of the page.' },
                 { ask: 'Does it work on row 3?', note: 'Visit the one-pair group first.' },
                 { do: 'Practice 2: In numbers out of order. Read each row across.', note: 'Look for the gap between Outs written as the rule.' },

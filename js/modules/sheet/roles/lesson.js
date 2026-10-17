@@ -50,7 +50,7 @@ import {
 } from './compose.js';
 import { resolveCtx, numeralTracksHTML } from '../index.js';
 import { workedStepsOf, stepTemplateOf, unslot, easeScore, stepLines } from '../anchors.js';
-import { evenGridState } from '../cells/mult-grid.js';
+import { evenGridState, factGridMini } from '../cells/mult-grid.js';
 import { dotTile, countCueOf, countCueRow } from './guided.js';
 import { stepIcon, iconForText } from '../lesson-icons.js';
 import { numberWords } from '../cells/words.js';
@@ -168,8 +168,10 @@ const sigOf = (it) => {
 const digitsOfOps = (it) => operandsOf((it && it.q) || {}).map((v) => String(Math.abs(Math.trunc(v))).length).join(',');
 
 /** A mult-grid window's {rows, cols} (detailed lesson 4), else null. */
-const multGridOf = (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'mult-grid' && c.payload; if (!p || !Array.isArray(p.rows) || !Array.isArray(p.cols)) return null; const g = { rows: p.rows.map(Number), cols: p.cols.map(Number) }; return g.rows.concat(g.cols).every((v) => v >= 2 && v <= 9) ? g : null; };
+const multGridOf = (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'mult-grid' && c.payload; if (!p || !Array.isArray(p.rows) || !Array.isArray(p.cols)) return null; const g = { rows: p.rows.map(Number), cols: p.cols.map(Number) }; return g.rows.concat(g.cols).every((v) => v >= 2 && v <= 12 && v !== 10) && Math.max(...g.rows) * Math.max(...g.cols) <= 100 ? g : null; };
 // (no 1 and no 10 in a lesson 4 window: x 1 is the other number, x 10 ends in 0 - both give the parity away)
+/** A one-step find-the-rule function table's {op, k, x1} (detailed lesson 5), else null. */
+const ftRuleOf = (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'function-table' && c.payload; if (!p || p.task !== 'rule' || !Array.isArray(p.rule) || p.rule.length !== 1 || !Array.isArray(p.rows) || p.rows.length < 3) return null; return { op: p.rule[0].op, k: Number(p.rule[0].n), x1: Number(p.rows[0].x) }; };
 /** An arrays-turn payload's {rows, cols} (detailed lesson 3a), else null. */
 const arrTurnOf = (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'arrays-turn' && c.payload; return p ? { rows: Number(p.rows), cols: Number(p.cols) } : null; };
 
@@ -240,7 +242,10 @@ export const CASE_TESTS = Object.freeze({
     arrP1: (it) => { const p = arrTurnOf(it); return !!p && ((CASE_TESTS.arrNonSq(it) && p.rows !== 5 && p.cols !== 5) || (p.rows === 3 && p.cols === 5) || (p.rows === 5 && p.cols === 2) || CASE_TESTS.arrBigSquare(it)); },
     // The detailed lesson maker, lesson 4 (even products, 3.OA.D.9): a mult-grid shading window.
     // chartMixed: even and odd rows AND even and odd columns (every case on one window).
-    chartIn9: (it) => !!multGridOf(it),
+    chartIn9: (it) => { const p = multGridOf(it); return !!p && p.rows.concat(p.cols).every((v) => v <= 9); },
+    // (an exit / Check Question window, lesson 4 r2: fresh windows need the 11 and 12 rows - no 1, no 10; the 2-9 chart
+    // is spent by the lesson's own pages. The rule is the same; the numbers are new: transfer.)
+    chartFresh: (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'mult-grid' && c.payload; return !!p && p.rows.concat(p.cols).every((v) => v >= 2 && v <= 12 && v !== 10) && p.rows.some((r) => p.cols.some((k) => r * k > 0)); },
     chartMixed: (it) => { const p = multGridOf(it); return !!p && [p.rows, p.cols].every((l) => l.some((v) => v % 2 === 0) && l.some((v) => v % 2 === 1)); },
     // evenColOnly: more odd rows than even ones, so most even products come from an even COLUMN (the Critical Atom).
     evenColOnly: (it) => { const p = multGridOf(it); return !!p && CASE_TESTS.chartMixed(it) && p.rows.filter((v) => v % 2 === 1).length > p.rows.filter((v) => v % 2 === 0).length; },
@@ -286,6 +291,17 @@ export const CASE_TESTS = Object.freeze({
     wpBridgeSmallFirstAT: (it) => CASE_TESTS.wpBridgeSmallFirst(it) && CASE_TESTS.wpAddToAny(it),
     wpBridgeBigFirstPT: (it) => CASE_TESTS.wpBridgeBigFirst(it) && CASE_TESTS.wpPutTogether(it),
     pvEdge: (it) => { const n = pvNumberOf(it); return n !== null && (n === 1000 || (n >= 100 && (Math.floor(n / 10) % 10 === 0 || n % 10 === 0 || Math.floor(n / 10) % 10 === 1))); },
+    // The detailed lesson maker, lesson 5 (find the rule, 3.OA.D.9): a one-step find-the-rule table.
+    // + / − / × with a plain first row (it fits no other one-step rule of the same number); the trap:
+    // a × table whose first row is k → k × k (2 → 4: + 2 or × 2), so only row 2 decides.
+    ftAdd: (it) => { const p = ftRuleOf(it); return !!p && p.op === '+' && p.k >= 2 && p.x1 !== p.k; },
+    ftSub: (it) => { const p = ftRuleOf(it); return !!p && p.op === '-' && p.k >= 2 && p.x1 !== 2 * p.k; },
+    ftTimes: (it) => { const p = ftRuleOf(it); return !!p && p.op === 'x' && [2, 3, 4, 5, 10].includes(p.k) && p.x1 !== p.k && p.x1 >= 2; },
+    ftTimesTrap: (it) => { const p = ftRuleOf(it); return !!p && p.op === 'x' && [2, 3, 4, 5].includes(p.k) && p.x1 === p.k; },
+    // (+ / − traps: row 1 k -> 2k also fits x 2; row 1 2k -> k also fits ÷ 2 - Practice 1's ★★★ row)
+    ftTrapAdd: (it) => { const p = ftRuleOf(it); return !!p && p.op === '+' && p.k >= 2 && p.x1 === p.k; },
+    ftTrapSub: (it) => { const p = ftRuleOf(it); return !!p && p.op === '-' && p.k >= 2 && p.x1 === 2 * p.k; },
+    ftTrapAny: (it) => CASE_TESTS.ftTimesTrap(it) || CASE_TESTS.ftTrapAdd(it) || CASE_TESTS.ftTrapSub(it),
 });
 
 /** A two-part story's parts [a, b] as numbers, or null. */
@@ -1046,6 +1062,8 @@ function vocabPicture(pic, c) {
     switch (pic && pic.kind) {
         // a small part-whole bar (detailed lesson 2): {whole, a, b, mark: 'whole' | 'parts'}
         case 'bar': return barMini({ whole: pic.whole, a: pic.a, b: pic.b, mark: pic.mark || '', wMm: 36, pt: 12 });
+        // (one product, detailed lesson 4: the chart corner a × b with its product boxed)
+        case 'fact': return factGridMini(Number(pic.a), Number(pic.b));
         case 'glyph': return `<span class="mq-lvpic-glyph" style="font-size:${Math.round(m.digitPt * 1.3)}pt">${esc(pic.text)}</span>`;
         // A longer text picture ("10, 20, 30") at four fifths, so it never crowds its neighbour.
         case 'text': return `<span class="mq-lvpic-text" style="font-size:${String(pic.text || '').length > 7 ? Math.round(m.digitPt * 0.8) : m.digitPt}pt">${esc(pic.text)}</span>`;

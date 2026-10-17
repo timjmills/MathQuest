@@ -117,6 +117,14 @@ export function evenGridState(p, groups, k) {
     return { shade, ring };
 }
 
+/** A vocabulary picture of one product (detailed lesson 4): a two-by-two corner of the chart, the product boxed. */
+export function factGridMini(a, b, pt = 14) {
+    const td = (v, x) => `<td style="box-sizing:border-box;width:10mm;height:9mm;padding:0;text-align:center;vertical-align:middle;border:0.75pt solid #000;font-size:${pt}pt;line-height:1;${x || ''}">${v}</td>`;
+    return `<table class="mq-lvpic-grid" aria-label="${a} times ${b}" style="border-collapse:collapse;margin:0 auto;background:#fff"><tr>${td('<b>×</b>', 'border-right:1.5pt solid #000;border-bottom:1.5pt solid #000;')}${td(`<b>${b}</b>`, 'border-bottom:1.5pt solid #000;')}</tr>`
+        + `<tr>${td(`<b>${a}</b>`, 'border-right:1.5pt solid #000;')}${td(String(a * b), 'outline:1.5pt solid #000;outline-offset:-1.5mm;')}</tr></table>`;
+}
+
+
 register('mult-grid', {
     render(p, ctx) {
         const size = sizeOf(ctx);
