@@ -11,7 +11,7 @@
 // Built for it: CASE_TESTS ftAdd / ftSub / ftTimes / ftSubZero / ftEdge (roles/lesson.js), the options ftTrap and
 // ftFactors, the chart step states (cells/function-table.js), table identity by rule and pairs (print-sheet.js ftClash).
 
-const FT = (opts, extra) => Object.assign({ categoryId: 'algebra', skillId: 'function_table_easy', opts: Object.assign({ ftTask: 'rule', ftRules: ['+', '-', 'x'], band: 50, ftTable: 31, support: 'frame', ftFactors: '2-5-10' }, opts || {}) }, extra || {});
+const FT = (opts, extra) => Object.assign({ categoryId: 'algebra', skillId: 'function_table_easy', opts: Object.assign({ ftTask: 'rule', ftRules: ['+', '-', 'x'], band: 50, ftTable: 31, support: 'frame', ftFactors: '2-3-5-10' }, opts || {}) }, extra || {});
 // P1 bank types: earlier content only (place value: 1 / 10 more and less, compare, unit form), never today's rule-finding.
 const NS = (categoryId, skillId, opts, extra) => Object.assign({ categoryId, skillId, opts }, extra || {});
 const ML = (step, dir, extra) => Object.assign({ categoryId: 'placevalue', skillId: 'more_less_10', opts: { step, dir, band: 100 } }, extra || {});
@@ -37,8 +37,9 @@ export default {
 
     // ------------------------------------------------------------------ the practice skill
     // Find the one-step rule of a table (+, − or ×), numbers to 50 on every page from the chart on (r3, critic D3:
-    // nothing new on Practice), In in order, + / − by 2 to 10, × by 2, 5 or 10 (ftFactors, the Prerequisite Check's facts).
-    skill: FT(),
+    // nothing new on Practice), In in order, + / − by 2 to 10, × by 2, 3, 5 or 10 (ftFactors, the Prerequisite Check's facts).
+    // (every chart and lesson-sheet table one of the taught kinds: + / − by 2 to 10, × by 2, 3, 5 or 10)
+    skill: FT({}, { allTest: 'ftLessonAny' }),
     // The ★★★ last row: the × table (its row 1 also fits a + rule - the Critical Atom) and a − table with an Out of 0.
     edgeTest: 'ftEdge',
     // (a × table only on the ★★★ last row, one a page: rows above are + / − tables whose row 1 fits no × rule)
@@ -104,9 +105,9 @@ export default {
         practiceShape: [4, 2],
         format: {
             kind: 'numbered steps with icons',
-            why: 'The step pupils skip is step 3: a rule read off row 1 alone. Panel 3 shows it failing.',
+            why: 'The step pupils skip is step 3: a rule read off row 1 alone. The × example (the last panel) shows it failing.',
         },
-        // Panel 1: a + rule; panel 2: a − rule; panel 3: the × table whose row 1 suggests + (the trap).
+        // Step panels 1-4: a + rule; then the − example and the × example whose row 1 suggests + (the trap).
         example: { match: 'Test', test: 'ftAdd' },
         second: { test: 'ftSub', label: 'Out smaller? Try −.' },
         third: { test: 'ftTimesTrap', label: '+ fails on row 2? Try ×.' },
@@ -119,8 +120,8 @@ export default {
             lesson: { id: '2.OA.B.2', title: 'Add within 20' } },
         { atom: 2, items: 4, ref: { categoryId: 'subtraction', skillId: 'sub_facts', opts: { band: 20 }, minNum: 3, maxNum: 10 },
             lesson: { id: '2.OA.B.2', title: 'Subtract within 20' } },
-        { atom: 3, items: 4, ref: { categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: [2, 5, 10] }, minNum: 20, allTest: 'factTen' },
-            lesson: { id: '3.OA.C.7', title: 'Multiply by 2, 5 and 10' } },
+        { atom: 3, items: 4, ref: { categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: [2, 3, 5, 10] }, minNum: 20, allTest: 'factTen' },
+            lesson: { id: '3.OA.C.7', title: 'Multiply by 2, 3, 5 and 10' } },
     ],
 
     // ------------------------------------------------------------------ P1 Number sense
@@ -135,7 +136,7 @@ export default {
 
     // ------------------------------------------------------------------ P5 Word problem
     // No skill deals a story read from a table (proposal algebra:function_table_story). Our own
-    // story; its numbers are a dealt × table (no trap) and one more In past the table.
+    // story; its numbers are a dealt + table (Ann is always k years older than Ben), printed under it.
     wordProblem: {
         // (r3, critic D4: the lesson's own task - the story's table printed, find the rule, the rule frame; a + rule
         // that makes sense: Ann is always the same number of years older than Ben)
@@ -157,8 +158,8 @@ export default {
     exit: [
         // Three tables one row across a half (four tall tables do not fit two rows of a 132.5 mm half; never shrunk):
         // a + rule, a − rule, and the Critical Atom's × table whose row 1 also fits + (it is the × item too).
-        { case: 'a + rule', ref: FT({ ftRules: ['+'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true } }), want: 'ftAdd', cols: 3, instr: 'Find the rule. Write the rule.', detects: 'Reads down the Out column: the gap between Outs.' },
-        { case: 'a − rule', ref: FT({ ftRules: ['-'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true } }), want: 'ftSub', cols: 3, instr: 'Find the rule. Write the rule.', detects: 'Sign flipped: + when Out is smaller.' },
+        { case: 'a + rule', ref: FT({ ftRules: ['+'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true }, ftRuleMax: 1, dealTries: 3000 }), want: ['ftAdd', 'ftSpread'], cols: 3, instr: 'Find the rule. Write the rule.', detects: 'Reads down the Out column: the gap between Outs.' },
+        { case: 'a − rule', ref: FT({ ftRules: ['-'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true }, ftRuleMax: 1, dealTries: 3000 }), want: ['ftSub', 'ftSpread'], cols: 3, instr: 'Find the rule. Write the rule.', detects: 'Sign flipped: + when Out is smaller.' },
         { case: 'a × rule, row 1 also fits + (Critical Atom)', ref: FT({ ftRules: ['x'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true } }), want: 'ftTimes', cols: 3, instr: 'Find the rule. Write the rule.', detects: 'One pair only: + read off row 1, never tested on row 2.' },
     ],
     // (T2b: what each label means in THIS pack - critic r1 n3: nothing on the Guided page is traced)
@@ -171,7 +172,7 @@ export default {
 
     // ------------------------------------------------------------------ retrieval (MWB)
     retrieval: [
-        { ref: { categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: [2, 5, 10] } }, ask: '{ret.0.text}' },
+        { ref: { categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: [2, 3, 5, 10] } }, ask: '{ret.0.text}' },
         { ref: { categoryId: 'subtraction', skillId: 'sub_facts', opts: { band: 20 } }, ask: '{ret.1.text}' },
         { ref: { categoryId: 'placevalue', skillId: 'more_less_10', opts: { step: 10, dir: 'more', band: 100 }, maxNum: 89 }, ask: '{ret.2.text}' },
     ],
@@ -196,7 +197,7 @@ export default {
     atoms: [
         { type: 'Fact', prereq: true, skill: 'Add facts to 20', notes: 'Find a change fast. Prerequisite Check {pre.0.letters}.' },
         { type: 'Fact', prereq: true, skill: 'Subtract facts to 20', notes: 'Prerequisite Check {pre.1.letters}.' },
-        { type: 'Fact', prereq: true, skill: '×2, ×5, ×10 facts', notes: 'Prerequisite Check {pre.2.letters}.' },
+        { type: 'Fact', prereq: true, skill: '×2, ×3, ×5, ×10 facts', notes: 'Prerequisite Check {pre.2.letters}.' },
         { type: 'Category', skill: 'In and Out: each row is a pair', notes: 'Read across, not down.' },
         { type: 'Comparative', skill: 'Bigger or smaller', notes: 'Out bigger: + or ×. Out smaller: −.' },
         { type: 'Conceptual', critical: true, skill: 'Test every row', notes: 'A rule from one row may be wrong (2 → 4).' },
@@ -204,7 +205,7 @@ export default {
         { type: 'Category', skill: 'An Out of 0', notes: 'In = the number taken away: Out is 0. Test that row too.' },
     ],
     routine: [
-        { step: 'Read In and Out across row 1.', tag: 'New', check: '“Point to In. Point to Out.”' },
+        { step: 'Read rows 1 and 2 across.', tag: 'New', check: '“Point to In. Point to Out.”' },
         { step: 'Find the change: bigger or smaller, by how much.', tag: 'Pre-requisite', check: 'Prerequisite Check: add and subtract' },
         { step: 'Test the rule on every row.', tag: 'New', critical: true, check: 'Check Question; exit slip c' },
         { step: 'Write the sign in the circle, the number in the box.', tag: 'Pre-requisite', check: 'Guided cell 2' },
@@ -215,10 +216,10 @@ export default {
     mistakes: [
         { name: 'One pair only', step: 3, looks: '{cq.A} for {cq.rows}', fix: 'Test row 2 aloud.', option: 'A', misconception: 'add-for-times' },
         { name: 'Down the Out column', step: 1, looks: '{cq.B} for {cq.rows}', fix: 'Reading strip: one row across.', option: 'B', misconception: 'neighbour-outputs' },
-        { name: 'Sign flipped', step: 2, looks: '+ {exit.1.k} for {exit.1.rows}', fix: '“Bigger or smaller?”', option: '', caught: 'Exit b · Practice 1' },
+        { name: 'Sign flipped', step: 2, looks: '+ {exit.1.k} for {exit.1.rows}', fix: '“Bigger or smaller?”', option: '', caught: 'Exit b · Practice 1 and 2 − tables' },
     ],
     // (each option the rule as a pupil writes it: "+ 6", never the slot list "+, 6")
-    checkQuestion: { want: 'ftTimes', ref: FT({ ftRules: ['x'] }, { ftRuleMax: 3, dealTries: 3000 }), correct: 'C', show: (v) => String(v).replace(/^([+−×÷-]),\s*(\d+)$/, '$1 $2') },
+    checkQuestion: { want: 'ftTimes', ref: FT({ ftRules: ['x'] }, { ftRuleMax: 2, dealTries: 3000 }), correct: 'C', show: (v) => String(v).replace(/^([+−×÷-]),\s*(\d+)$/, '$1 $2') },
 
     // ------------------------------------------------------------------ T3-T5 delivery scripts
     sections: [
@@ -247,14 +248,14 @@ export default {
                 { say: 'Yesterday each times row went up by the same number.' },
                 { say: 'Today the machine has a rule. We find it.' },
             ] },
-        { n: 5, name: 'I Do: the anchor chart', min: 10, page: 'P2', boxes: [{ kind: 'watch', title: 'The nodders', text: 'Pupils who nod at + {chart3.d} on panel 3 are the one-pair group.' }],
+        { n: 5, name: 'I Do: the anchor chart', min: 10, page: 'P2', boxes: [{ kind: 'watch', title: 'The nodders', text: 'Pupils who nod at + {chart3.d} on panel {panel.third} are the one-pair group.' }],
             rows: [
                 { do: 'Feed card {chart.x1} into the rule machine. Show {chart.y1}.' },
                 { say: 'In {chart.x1}, out {chart.y1}. It got bigger.', note: 'Step 1 and step 2.' },
                 { ask: 'Bigger by how much?', note: 'Expected: [[{chart.d}]].' },
                 { say: 'Test every row: {chart.x2} {chart.sign} {chart.k} is {chart.y2}.', note: 'Step 3. Then row 3. The rule: [[{chart.rule}]].' },
-                { say: 'In {chart2.x1}, out {chart2.y1}. It got smaller.', note: 'Panel 2. The rule: [[{chart2.rule}]].' },
-                { say: 'In {chart3.x1}, out {chart3.y1}. Plus {chart3.d}? Test row 2.', note: 'Panel 3: the trap.' },
+                { say: 'In {chart2.x1}, out {chart2.y1}. It got smaller.', note: 'Panel {panel.second}. The rule: [[{chart2.rule}]].' },
+                { say: 'In {chart3.x1}, out {chart3.y1}. Plus {chart3.d}? Test row 2.', note: 'Panel {panel.third}: the trap.' },
                 { say: '{chart3.x2} plus {chart3.d} is {chart3.plus}. Not {chart3.y2}. Try times.', note: 'Write “Wrong” beside + {chart3.d} on the board only.' },
                 { say: 'The rule is {chart3.word} {chart3.k}. It works for every row.', note: 'Pupils repeat. The rule: [[{chart3.rule}]].' },
             ] },
@@ -264,6 +265,7 @@ export default {
                 { ask: 'Bigger or smaller? By how much?', note: 'Expected ★: [[{we.0.rule}]].' },
                 { do: 'Pairs do {we.1.rows}: A reads a row, B tests it.', note: 'Expected ★: [[{we.1.rule}]].' },
                 { ask: 'Cell 2: is Out bigger or smaller?', note: 'Smaller, so −. Expected: [[{we.1.rule}]].' },
+                { say: 'If Out is 0, In is the number taken away.', note: 'The ★★★ rows have one Out of 0. Test it like any row.' },
                 { say: 'In ___, out ___. The rule is ___.', note: 'The Say frame, for every row.' },
                 { do: 'Cell 3, {we.2.rows}: test + {we.2.d} on row 2 together.', note: 'It fails. Expected ★: [[{we.2.rule}]].' },
             ] },
@@ -306,8 +308,6 @@ export default {
         { wrote: '{exit.2.wrong.addfortimes} for {exit.2.rows}', mistake: 'One pair only', next: 'Test row 2 aloud.' },
         { wrote: '{exit.0.wrong.neighbouroutputs} for {exit.0.rows}', mistake: 'Down the Out column', next: 'Reading strip: one row across.' },
         { wrote: '+ {exit.1.k} for {exit.1.rows}', mistake: 'Sign flipped', next: '“Bigger or smaller?” first.' },
-        { wrote: '{exit.2.wrong.neighbouroutputs} for {exit.2.rows}', mistake: 'Down the Out column', next: 'Reading strip: one row across.' },
-        { wrote: '{exit.1.wrong.neighbouroutputs} for {exit.1.rows}', mistake: 'Down the Out column', next: 'Reading strip: one row across.' },
         { wrote: '{we.0.wrong.neighbouroutputs} for {we.0.rows} (Guided 1)', mistake: 'Down the Out column', next: 'Cover the rows; read row 1 across.' },
         { wrote: '{we.1.wrong.signflip} for {we.1.rows} (Guided 2)', mistake: 'Sign flipped', next: 'Point: is Out smaller? Then −.' },
         { wrote: '{we.2.wrong.addfortimes} for {we.2.rows} (Guided 3)', mistake: 'One pair only', next: 'Test it on row 2 together.' },

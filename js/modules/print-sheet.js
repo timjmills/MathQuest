@@ -286,6 +286,12 @@ function refAccepts(sk, cand, key, seen, kept, pg = '', row = '', words = true) 
         // than half of, or lies more than half inside, an earlier page's window, never a copy - so the FRESH windows are left
         // for the exit slip and the Check Question, which must be fresh against every page)
         if (gridKeyOf(k) && sk.gridRevisit && sk.lr6 && !gridOverHalf(k, sk.avoidKeys || [], true)) return false;
+        // (r5, critic r2: first a revisit that can be DRAWN without a block of an earlier window in the same orientation -
+        // as dealt or turned; the later passes (story words relaxed) take any revisit, then drawn turned where that helps)
+        if (gridKeyOf(k) && sk.gridRevisit && sk.lr6 && words === true && Array.isArray(sk.gridShown) && cand.cell && cand.cell.payload) {
+            const pl = cand.cell.payload, tq = { cell: { template: 'mult-grid', payload: { rows: pl.cols, cols: pl.rows } } };
+            if (gridBlock(gridShownOf(cand), sk.gridShown) && gridBlock(gridShownOf(tq), sk.gridShown)) return false;
+        }
         if (!refHardOk(sk, cand)) return false;
         if (sk.edge) { const t = LESSON_CASE_TESTS[sk.edgeTest || 'pvEdge']; if (t && !t({ q: cand })) return false; }
         if (seen.has(`key:${k}`)) return false;
@@ -378,8 +384,12 @@ export const gridOverHalf = (k, keys, anyTask = false) => { const a = gridKeyOf(
 export const gridCopy = (k, keys) => { const a = gridKeyOf(k); if (!a) return false; const ca = gridCells(k);
     for (const u of keys) { const b = gridKeyOf(u); if (!b) continue; const B = new Set(gridCells(u)); if (ca.every((x) => B.has(x))) return true; }
     return false; };
-/** Does window `k` hold a block of two boxes or more of a window in `keys` (any task) in the SAME orientation - its rows
- *  and columns overlapping that window's rows and columns in two cells or more? (lesson 4 r5: a revisit is turned) */
+/** A mult-grid window as it is DRAWN - "grid r0-r1 x c0-c1", printed rows first - unlike factKeyOf, which keys a window and
+ *  its turn as one (lesson 4 r5); null for anything else. */
+export const gridShownOf = (q) => { const p = q && q.cell && q.cell.template === 'mult-grid' && q.cell.payload; if (!p || !Array.isArray(p.rows) || !Array.isArray(p.cols) || !p.rows.length || !p.cols.length) return null;
+    return `grid${p.rows[0]}-${p.rows[p.rows.length - 1]}x${p.cols[0]}-${p.cols[p.cols.length - 1]}`; };
+/** Does drawn window `k` (gridShownOf) hold a block of two boxes or more of a drawn window in `keys` in the SAME orientation -
+ *  its rows and columns overlapping that window's rows and columns in two cells or more? (lesson 4 r5: a revisit is turned) */
 export const gridBlock = (k, keys) => { const a = gridKeyOf(k); if (!a) return false;
     const ov = (x0, x1, y0, y1) => Math.max(0, Math.min(x1, y1) - Math.max(x0, y0) + 1);
     for (const u of keys) { const b = gridKeyOf(u); if (b && ov(a.r0, a.r1, b.r0, b.r1) * ov(a.c0, a.c1, b.c0, b.c1) >= 2) return true; }
@@ -637,10 +647,10 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         if (sk.cellPayload && q.cell && q.cell.payload) q = Object.assign({}, q, { cell: Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, sk.cellPayload) }) });
         // (`gridRevisit`, lesson 4 r5 - critic r2: a revisit that shows a block of an earlier page's window in the SAME
         // orientation is drawn turned - rows for columns: the same boxes and products, a different picture)
-        if (sk.gridRevisit && q.cell && q.cell.template === 'mult-grid' && q.cell.payload && Array.isArray(q.cell.payload.rows) && !q.cell.payload.blanks && !q.cell.payload.hdr) {
-            const k0 = factKeyOf(q), pl = q.cell.payload;
+        if (sk.gridRevisit && q.cell && q.cell.template === 'mult-grid' && q.cell.payload && Array.isArray(q.cell.payload.rows) && !((q.cell.payload.blanks || []).length) && !q.cell.payload.hdr && q.chartTask !== 'fill') {
+            const pl = q.cell.payload, shown = sk.gridShown || [];
             const qt = Object.assign({}, q, { cell: Object.assign({}, q.cell, { payload: Object.assign({}, pl, { rows: pl.cols.slice(), cols: pl.rows.slice() }) }) });
-            if (gridBlock(k0, sk.avoidKeys || []) && !gridBlock(factKeyOf(qt), sk.avoidKeys || [])) q = qt;
+            if (gridBlock(gridShownOf(q), shown) && !gridBlock(gridShownOf(qt), shown)) q = qt;
         }
         if (sk.instructionKey && q) q = Object.assign({}, q, { instructionKey: sk.instructionKey });
         if (sk.shortQuestion) q = shortStoryQ(q);
@@ -2923,7 +2933,10 @@ async function buildLesson(n, metaOf) {
         let k = 0;
         for (const ps of n.practiceSheets) {
             k++;
-            const own = ps.skill ? Object.assign({}, ps.skill, packNums ? { avoidKeys: packNums.slice(), tries: Math.max(300, Number(ps.skill.tries) || 0), lr6: true } : {}) : practiceSk;
+            const own0 = ps.skill ? Object.assign({}, ps.skill, packNums ? { avoidKeys: packNums.slice(), tries: Math.max(300, Number(ps.skill.tries) || 0), lr6: true } : {}) : practiceSk;
+            // (`gridRevisit`, lesson 4 r5: the windows as the chart and the lesson sheet DRAW them, so a revisit is drawn turned)
+            const planQs = (res) => { const out = []; for (const pl of res.keyPlans || [res.plan]) for (const pg of (pl && pl.pages) || []) { const walk = (part) => { if (!part) return; if (part.kind === 'grid') (part.items || []).forEach((it) => { if (it && it.q) out.push(it.q); }); if (part.content) walk(part.content); (part.contents || []).forEach(walk); (part.parts || []).forEach(walk); }; (pg.sections || []).forEach(walk); } return out; };
+            const own = ps.skill && ps.skill.gridRevisit ? Object.assign({}, own0, { gridShown: [...planQs(chart), ...chartQs, ...planQs(teach)].map(gridShownOf).filter(Boolean) }) : own0;
             const shape = Array.isArray(ps.shape) ? ps.shape : stackShapes[stackShapes.length - 1];
             const sk1 = Object.assign({}, own, n.edgeLast || ps.edgeLast ? { edgeLast: ps.edgeLast || { per: shape[0], cols: shape[1] } } : {});
             const withStrip = (!ps.skill || ps.steps) && stripHtml;   // (`steps`: a sheet with its own skill ref keeps the lesson's Steps - lesson 4 r2)
@@ -3563,6 +3576,9 @@ async function buildDetailedLesson(req = {}) {
         }),
         p0: { list: p0Cells.map((c, j) => `${'abcdefghijklmnop'[j]}. ${dlAns(c.q)}`).join(' · ') },
         ns: { A: nsBands[0].its.map((it) => dlItemVars(it.q, d)), B: nsBands[1].its.map((it) => dlItemVars(it.q, d)) },
+        // ({panel.second} / {panel.third} - lesson 5 r4, critic r2 D8: the printed panel numbers of the chart's other examples,
+        // after its step panels, so a script never names an example by its order)
+        panel: { steps: ((d.lessonData && d.lessonData.steps) || []).length, second: ((d.lessonData && d.lessonData.steps) || []).length + 1, third: ((d.lessonData && d.lessonData.steps) || []).length + 2 },
         ret: retD.map((r) => dlItemVars(r.q, d)), cq: Object.assign(dlItemVars(cqD.q, d), dlCheckQuestion(cqD.q, d)),
         wp: wpV, exit: exVars, say: sayV,
     };
@@ -3629,7 +3645,8 @@ async function buildDetailedLesson(req = {}) {
     }
     if (mixedNo) glance.push({ page: 'P4 Mixed', answers: cellsOf(partPlan('mixed')).map((c) => dlAns(c.q)).join(' · '), fade: '★★' });
     // (the story's own answer first when the frame totals something else - lesson 3a r4, critic r2 m7)
-    glance.push({ page: 'P5 Word problem', answers: eqN !== wpV.ans ? `${wpV.ans} · ${wpV.eq}` : wpV.eq, fade: DL_FADE.P5 });
+    // (a table word problem - lesson 5 r4, critic r2 D7: its answer is the rule only; no equation is asked)
+    glance.push({ page: 'P5 Word problem', answers: d.wordProblem.tableItem ? String(wpV.ans) : eqN !== wpV.ans ? `${wpV.ans} · ${wpV.eq}` : wpV.eq, fade: DL_FADE.P5 });
     glance.push({ page: 'P6 Exit slip', answers: exVars.map((x, i) => `${'abcd'[i]}. ${x.ans}`).join(' · '), fade: DL_FADE.P6 });
     const prereqAtoms = d.atoms.filter((x) => x.prereq);
     const routing = d.prerequisites.map((p, i) => {
@@ -3739,6 +3756,8 @@ async function buildDetailedLesson(req = {}) {
         edge: [...new Set(places.filter((x) => edgeTest && edgeTest({ q: x.q })).map((x) => x.item))],
         // (`edgeOnlyLast` on the description - lesson 3a r4, critic r2 m3: the items of THAT case may sit only on the
         // ★★★ last row of a Practice page; E24b reads this list. Absent on every other pack.)
+        // (board-only function tables - the Check Question, lesson 5 r4: E37 counts their rules)
+        ...(cqD && ftParts(cqD.key) ? { board: [cqD.key] } : {}),
         ...(d.edgeOnlyLast && LESSON_CASE_TESTS[d.edgeOnlyLast] ? { edgeOnly: { test: d.edgeOnlyLast, items: [...new Set(places.filter((x) => LESSON_CASE_TESTS[d.edgeOnlyLast]({ q: x.q })).map((x) => x.item))] } } : {}),
         // (each place's answer too: LR-6 'no two answers alike on a page' is checked on every pupil page)
         // (a + / − item's grid too, so E24b reads LR-6's "a row of the grid" on a Mixed page, whose

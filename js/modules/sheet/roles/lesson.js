@@ -177,7 +177,7 @@ const multGridOf = (it) => { const c = it && it.q && it.q.cell; const p = c && c
 /** A one-step find-the-rule function table's {op, k, x1} (detailed lesson 5), else null. */
 const ftRuleOf = (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'function-table' && c.payload; if (!p || p.task !== 'rule' || !Array.isArray(p.rule) || p.rule.length !== 1 || !Array.isArray(p.rows) || p.rows.length < 3) return null; return { op: p.rule[0].op, k: Number(p.rule[0].n), x1: Number(p.rows[0].x), y1: Number(p.rows[0].y), yMin: Math.min(...p.rows.map((r) => Number(r.y))) }; };
 /** Row 1 of a + table fits no taught × rule (x 2, x 5, x 10): 2 -> 10 is also x 5 (lesson 5 r3, critic D2). */
-const ftPlainFirst = (p) => ![2, 5, 10].some((m) => p.x1 * m === p.y1);
+const ftPlainFirst = (p) => ![2, 3, 5, 10].some((m) => p.x1 * m === p.y1);
 /** An arrays-turn payload's {rows, cols} (detailed lesson 3a), else null. */
 const arrTurnOf = (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'arrays-turn' && c.payload; return p ? { rows: Number(p.rows), cols: Number(p.cols) } : null; };
 
@@ -318,13 +318,16 @@ export const CASE_TESTS = Object.freeze({
     ftAdd: (it) => { const p = ftRuleOf(it); return !!p && p.op === '+' && p.k >= 2 && p.k <= 10 && p.x1 >= 2 && ftPlainFirst(p); },
     ftSub: (it) => { const p = ftRuleOf(it); return !!p && p.op === '-' && p.k >= 2 && p.k <= 10 && p.y1 >= 1 && p.yMin >= 1 && p.x1 !== 2 * p.k; },
     // (any × table is the trap: its row 1 also fits a + rule, so only row 2 decides - the Critical Atom; lesson 5 r3)
-    ftTimes: (it) => { const p = ftRuleOf(it); return !!p && p.op === 'x' && [2, 5, 10].includes(p.k) && p.x1 >= 2; },
+    ftTimes: (it) => { const p = ftRuleOf(it); return !!p && p.op === 'x' && [2, 3, 5, 10].includes(p.k) && p.x1 >= 2; },
     ftTimesTrap: (it) => CASE_TESTS.ftTimes(it),
     // (an edge of − : a row whose Out is 0)
     ftSubZero: (it) => { const p = ftRuleOf(it); return !!p && p.op === '-' && p.k >= 2 && p.k <= 10 && p.yMin === 0; },
     // (a fact with both factors 10 or less - lesson 5 r3, the Prerequisite Check's x 2 / x 5 / x 10 facts: not 2 x 11)
     factTen: (it) => { const o = operandsOf((it && it.q) || {}).map(Number); return o.length >= 2 && o.every((v) => v >= 1 && v <= 10); },
+    // (no two Ins back to back - lesson 5 r4, critic r2 n14: testing row 3 after row 2 is then a real test)
+    ftSpread: (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'function-table' && c.payload; if (!p || !Array.isArray(p.rows)) return false; const xs = p.rows.map((r) => Number(r.x)).sort((a, b) => a - b); return xs.every((v, i) => !i || v - xs[i - 1] >= 2); },
     ftEdge: (it) => CASE_TESTS.ftTimes(it) || CASE_TESTS.ftSubZero(it),
+    ftLessonAny: (it) => CASE_TESTS.ftAdd(it) || CASE_TESTS.ftSub(it) || CASE_TESTS.ftTimes(it),
     ftPracticeAny: (it) => CASE_TESTS.ftAdd(it) || CASE_TESTS.ftSub(it) || CASE_TESTS.ftEdge(it),
 });
 

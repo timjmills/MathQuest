@@ -1,6 +1,6 @@
 # V22 self-check: g3-oa9-input-output-rule
 
-Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to the kit's markup; Chromium print media) on `pack.html`, seed 4242, 2026-10-17. **46 / 46 PASS**.
+Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to the kit's markup; Chromium print media) on `pack.html`, seed 4242, 2026-10-17. **47 / 47 PASS**.
 
 | # | Check | Measured | Result |
 |---|---|---|---|
@@ -14,7 +14,7 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | E7 | Teacher text ≥ 10 pt | smallest 10 pt (T1 "#", T2 "#") | PASS |
 | E8 | Working digits 28 pt outside the anchor chart | the kit sets --ws-digit 28pt at size L on every pupil page (one size L pack); measured by ws-print-lint --source kit | PASS |
 | E9 | Every page ≥ 50 % used, nothing past the body | min 89 %; overflow none; under 50 %: none | PASS |
-| E9c | Teacher pages: one continued is ≥ 92 % used (V22 3131); every teacher page listed | T1 96, T2 93, T2b 97, T3 97, T4 93, T5 94, T6 93; continued under 92 %: none | PASS |
+| E9c | Teacher pages: one continued is ≥ 92 % used (V22 3131); every teacher page listed | T1 96, T2 93, T2b 97, T3 97, T4 98, T5 94, T6 96; continued under 92 %: none | PASS |
 | E9b | Body ≤ 8 % blank below its last band (site lint) | max 4 %; over 8 %: none | PASS |
 | E10 | Every item cell ≥ 40 % free (reading cells exempt) | 98 cells; min free 50 %; below 40 %: none | PASS |
 | E11 | No empty band ≥ 30 % in a cell (the site sheetCheck H13, from the border box) | worst 29 %; failing: none | PASS |
@@ -44,14 +44,15 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | E36 | Exit slip + items: no part equals the difference of the parts; each fresh (on no other page, nor turned round) | no + exit items | PASS |
 | E37 | Function tables: no (In, Out) pair on two pages, no rule on more than two tables (table identity = rule + pairs) | 18 tables: fresh | PASS |
 | E38 | No unfilled {placeholder} on any page | none | PASS |
+| E39 | No band has more columns than items (an empty bordered track reads as a missing item) | 30 grids, none | PASS |
 | E30 | No boardOnly number on a pupil page or key (item, answer, digits or name) | none declared: on no pupil page or key (16 pages) | PASS |
-| E29 | Every item letter and answer a teacher page quotes is on the pupil page it names (T3 §1, T5 §10, T6 routing) | 10 quotes, all on their pages | PASS |
+| E29 | Every item letter and answer a teacher page quotes is on the pupil page it names (T3 §1, T5 §10, T6 routing, T6 P5 glance) | 11 quotes, all on their pages | PASS |
 | E28 | No Say:, Rule: or Remember: band on a Practice page | 4 Practice / Mixed pages; extra bands 0 | PASS |
 | E27 | Counters in rows of at most 5 | no counters | PASS |
 | E26 | Every anchor-chart step panel adds a grey (newest) mark | P2 4 / 4 panels | PASS |
 | E25 | One key per pupil page (anchor chart included) | 8 pupil pages, 8 keys | PASS |
 
-**46 / 46 pass.**
+**47 / 47 pass.**
 
 ## Per page
 
@@ -61,7 +62,7 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | T2 | teacher | 93 | 0 | 10 | 0 | — | #000000 #5b2a86 |
 | T2b | teacher | 97 | 0 | 10 | 0 | — | #000000 #5b2a86 #ffffff |
 | T3 | teacher | 97 | 0 | 11 | 0 | — | #000000 #5b2a86 #c2410c |
-| T4 | teacher | 93 | 0 | 11 | 0 | — | #000000 #5b2a86 #c2410c |
+| T4 | teacher | 98 | 0 | 11 | 0 | — | #000000 #5b2a86 #c2410c |
 | T5 | teacher | 94 | 0 | 11 | 0 | — | #000000 #5b2a86 #c2410c #ffffff |
 | P0 | pupil | 91 | 2 | 12 | 12 | 67 | #000000 #ffffff |
 | P1 | pupil | 95 | 3 | 12 | 10 | 50 | #000000 #ffffff |
@@ -79,7 +80,7 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | P4-2-key | key | 96 | 0 | 12 | 4 | 81 | #000000 #5b2a86 #949494 #c2410c #ffffff |
 | P5-key | key | 96 | 4 | 12 | 3 | 73 | #000000 #5b2a86 #949494 #c2410c #ffffff |
 | P6-key | key | 96 | 0 | 12 | 6 | 68 | #000000 #949494 #c2410c #ffffff |
-| T6 | teacher | 93 | 0 | 10 | 0 | — | #000000 #c2410c |
+| T6 | teacher | 96 | 0 | 10 | 0 | — | #000000 #c2410c |
 
 ## Notes from the build
 

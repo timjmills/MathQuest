@@ -159,7 +159,7 @@ export function generateFunctionTable(q, skillId) {
     let rule = null, pool = [];
     const attempt = (k, st) => {
         for (let tries = 0; tries < 40 && !rule; tries++) {
-            const r = makeRule(k, st, cap, need, o.ftFactors === '2-5-10' ? [2, 5, 10] : null);
+            const r = makeRule(k, st, cap, need, o.ftFactors === '2-5-10' ? [2, 5, 10] : o.ftFactors === '2-3-5-10' ? [2, 3, 5, 10] : null);
             const p = inputPool(r, cap);
             if (p.length >= need) { rule = r; pool = p; }
         }

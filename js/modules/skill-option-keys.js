@@ -366,7 +366,7 @@ export const VALUE_TOKENS = Object.freeze({
     ftRules: Object.freeze({ '+': 'A', '-': 'S', x: 'M', '/': 'D', 'x+': 'P', 'x-': 'N', '/+': 'Q', '/-': 'R' }),
     ftTask: Object.freeze({ outputs: 'G', 'outputs-check': 'H', rule: 'Y', 'rule-check': 'Z', inputs: 'V', 'inputs-check': 'W',
         mixed: 'M', 'mixed-check': 'N', make: 'K' }),
-    ftFactors: Object.freeze({ any: 'A', '2-5-10': 'T' }),
+    ftFactors: Object.freeze({ any: 'A', '2-5-10': 'T', '2-3-5-10': 'F' }),
     // block 1 (P10 time + money)
     review: Object.freeze({ none: 'N', some: 'S' }),
     stimulus: Object.freeze({ clock: 'C', words: 'W', 'words-past': 'P', 'words-oh': 'O' }),

@@ -1937,7 +1937,7 @@ const _ftOptions = (easy) => [
     {
         // Lesson 5 r2: × and ÷ rules only by the numbers the class has learned (the Prerequisite Check's 2, 5 and 10).
         id: 'ftFactors', label: '× and ÷ by', type: 'enum', default: 'any', group: 'difficulty',
-        values: [{ v: 'any', l: 'Any number to 10' }, { v: '2-5-10', l: '2, 5 and 10 only' }],
+        values: [{ v: 'any', l: 'Any number to 10' }, { v: '2-5-10', l: '2, 5 and 10 only' }, { v: '2-3-5-10', l: '2, 3, 5 and 10 only' }],
         help: 'The number a × or ÷ rule uses. "2, 5 and 10 only" keeps the rules to the facts a Grade 3 class learns first.',
     },
     {

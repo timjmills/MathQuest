@@ -539,6 +539,8 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
             ruleN.set(t.rule, (ruleN.get(t.rule) || 0) + 1);
             for (const pr of t.pairs) { const was = pairAt.get(pr); if (was && was !== x.page.replace(/-key$/, '')) probs.push(`${pr} on ${was} and ${x.page}`); else pairAt.set(pr, x.page.replace(/-key$/, '')); }
         }
+        // (board-only tables count too - the Check Question, r4 critic r2 n9: R.pool.board lists their keys)
+        for (const k of (R.pool && R.pool.board) || []) { const t = /^ft[a-z]+[^:]+:/.test(String(k)) ? parts(k) : null; if (t) ruleN.set(t.rule, (ruleN.get(t.rule) || 0) + 1); }
         for (const [r, n] of ruleN) if (n > 2) probs.push(`rule ${r} on ${n} tables`);
         row('E37', 'Function tables: no (In, Out) pair on two pages, no rule on more than two tables (table identity = rule + pairs)', pl.length ? (probs.length ? probs.slice(0, 6).join('; ') : `${seenItem.size} tables: fresh`) : 'no tables', !probs.length);
     }
@@ -595,7 +597,11 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
             const lo = m[1].charCodeAt(0), hi = (m[2] || m[1]).charCodeAt(0);
             for (let k = lo; k <= hi; k++) if (!p0.includes(String.fromCharCode(k))) probs.push(`routing names ${String.fromCharCode(k)}, P0 has no such item`);
         }
-        row('E29', 'Every item letter and answer a teacher page quotes is on the pupil page it names (T3 §1, T5 §10, T6 routing)', probs.length ? probs.slice(0, 6).join('; ') : `${n} quotes, all on their pages`, n > 0 && !probs.length);
+        // (lesson 5 r4, critic r2 D7: T6's P5 glance row - every number it prints is a key mark of the P5 key)
+        { const gl = (t6.match(/P5 Word problem\s+([^★]*)★/) || [])[1] || '';
+            const k5 = pages.find((p) => p.id === 'P5-key'); const marks = k5 ? (k5.bodyText || '') : '';
+            for (const v of gl.match(/\d+/g) || []) { n++; if (!new RegExp(`(^|[^0-9])${v}([^0-9]|$)`).test(marks)) probs.push(`T6 P5 glance ${v} is not on the P5 key`); } }
+        row('E29', 'Every item letter and answer a teacher page quotes is on the pupil page it names (T3 §1, T5 §10, T6 routing, T6 P5 glance)', probs.length ? probs.slice(0, 6).join('; ') : `${n} quotes, all on their pages`, n > 0 && !probs.length);
     }
     const p4 = pages.filter((p) => /^P4/.test(p.id)), extra = p4.flatMap((p) => p.bandLabels.filter((t) => /^(Say|Rule|Remember):/.test(t)).map((t) => `${p.id} ${t}`));
     row('E28', 'No Say:, Rule: or Remember: band on a Practice page', `${p4.length} Practice / Mixed pages; extra bands ${extra.join(', ') || 0}`, p4.length > 0 && !extra.length);
