@@ -2,7 +2,9 @@
 import { state } from './state.js';
 import { randInt, shuffle, pick, buildNumericOptions, pickName } from './utils.js';
 import { createAngleSVG, createRectangleSVG, createSquareSVG, createTriangleSVG, createShapeSVG, create3DBoxSVG, createLShapeSVG, createTShapeSVG, createWordProblemShapeSVG, createLabeledRectSVG, computeTriangleAngles } from './svg-geometry.js';
-import { COLORS, STROKE, FONTS, MONO, softFill, categoricalFill } from './design-tokens.js';
+import { COLORS, STROKE, FONTS, softFill, categoricalFill } from './design-tokens.js';
+import { MONO_2D, MONO_3D, shapeTile as _shTile, shapeFigure as _shFigure, pictureKey as _shKey,
+    countShape2d, selectShape2d, countSolid, selectSolid, netNameItem, cubeNetsItem } from './shape-art.js';
 import { optionsFor } from './skill-options.js';
 
 // O6 appearance (lane AP2): the "Figure labels" choice for the skill being generated — 'all',
@@ -32,66 +34,26 @@ const STUDENT_DEF_AREA = `<div class="student-def"><strong>Area</strong> = the a
 const STUDENT_DEF_AREA_TRIANGLE = `<div class="student-def"><strong>Triangle area</strong> = (base × height) ÷ 2. Multiply base × height, then divide by 2.</div>`;
 const STUDENT_DEF_PERIMETER = `<div class="student-def"><b>Perimeter</b> = the total distance around the outside of a shape. Add up all the side lengths.</div>`;
 
-// ===== Black-and-white shape drawings for name_2d_shapes / name_3d_shapes =====
-// WORKSHEET_DESIGN_STANDARD INK-1 / section 4.2: ink outlines on paper white, no fill colour,
-// no emoji. Strokes are non-scaling so a drawing keeps its weight at every size: 2 px = 1.5 pt
-// (the outline of a shape being judged), 1 px = 0.75 pt (right-angle marks), 0.67 px = 0.5 pt
-// (hidden edges of a solid, solid not dashed — LS-2). The drawing never carries the shape's
-// name: the name is the answer.
-const _SH_INK = MONO.ink;
-const _SH_PAPER = MONO.paper;
-const _shAttr = (px) => `fill="${_SH_PAPER}" stroke="${_SH_INK}" stroke-width="${px}" stroke-linejoin="round" vector-effect="non-scaling-stroke"`;
-const _SH_OUT = _shAttr(2);
-const _SH_HAIR = _shAttr(1).replace(`fill="${_SH_PAPER}"`, 'fill="none"');
-const _SH_HID = _shAttr(0.67).replace(`fill="${_SH_PAPER}"`, 'fill="none"');
-const _shPoly = (n, r, rot = -Math.PI / 2, cx = 60, cy = 60) => Array.from({ length: n }, (_, i) => {
-    const a = rot + (Math.PI * 2 / n) * i;
-    return `${(cx + r * Math.cos(a)).toFixed(1)},${(cy + r * Math.sin(a)).toFixed(1)}`;
-}).join(' ');
-const _shCorner = (x, y, dx, dy) => `<polyline points="${x + dx},${y} ${x + dx},${y + dy} ${x},${y + dy}" ${_SH_HAIR}/>`;
-// viewBox 0 0 120 120, keyed by the lower-case name the generator uses.
-const MONO_2D = {
-    circle: `<circle cx="60" cy="60" r="48" ${_SH_OUT}/>`,
-    oval: `<ellipse cx="60" cy="60" rx="54" ry="34" ${_SH_OUT}/>`,
-    square: `<rect x="14" y="14" width="92" height="92" ${_SH_OUT}/>` + _shCorner(14, 14, 10, 10) + _shCorner(106, 14, -10, 10) + _shCorner(14, 106, 10, -10) + _shCorner(106, 106, -10, -10),
-    rectangle: `<rect x="6" y="28" width="108" height="64" ${_SH_OUT}/>` + _shCorner(6, 28, 10, 10) + _shCorner(114, 28, -10, 10),
-    triangle: `<polygon points="60,12 5,107 115,107" ${_SH_OUT}/>`,
-    pentagon: `<polygon points="${_shPoly(5, 52, -Math.PI / 2, 60, 64)}" ${_SH_OUT}/>`,
-    hexagon: `<polygon points="${_shPoly(6, 52)}" ${_SH_OUT}/>`,
-    rhombus: `<polygon points="29,41 77,55 91,103 43,89" ${_SH_OUT}/>`,
-    diamond: `<polygon points="60,6 98,60 60,114 22,60" ${_SH_OUT}/>`,
-    star: `<polygon points="${Array.from({ length: 10 }, (_, i) => { const a = -Math.PI / 2 + Math.PI / 5 * i, r = i % 2 ? 22 : 54; return `${(60 + r * Math.cos(a)).toFixed(1)},${(64 + r * Math.sin(a)).toFixed(1)}`; }).join(' ')}" ${_SH_OUT}/>`,
-};
-const MONO_3D = {
-    cube: `<polygon points="14,46 80,46 80,112 14,112" ${_SH_OUT}/>`
-        + `<polygon points="14,46 40,20 106,20 80,46" ${_SH_OUT}/><polygon points="80,46 106,20 106,86 80,112" ${_SH_OUT}/>`
-        + `<polyline points="14,112 40,86 106,86" ${_SH_HID}/><line x1="40" y1="86" x2="40" y2="20" ${_SH_HID}/>`,
-    'rectangular prism': `<polygon points="4,52 88,52 88,108 4,108" ${_SH_OUT}/>`
-        + `<polygon points="4,52 30,28 114,28 88,52" ${_SH_OUT}/><polygon points="88,52 114,28 114,84 88,108" ${_SH_OUT}/>`
-        + `<polyline points="4,108 30,84 114,84" ${_SH_HID}/><line x1="30" y1="84" x2="30" y2="28" ${_SH_HID}/>`,
-    sphere: `<circle cx="60" cy="60" r="50" ${_SH_OUT}/><path d="M10,60 A50,14 0 0 0 110,60" ${_SH_HAIR}/><path d="M10,60 A50,14 0 0 1 110,60" ${_SH_HID}/>`,
-    cylinder: `<path d="M22,26 L22,96 A38,12 0 0 0 98,96 L98,26" ${_SH_OUT}/><ellipse cx="60" cy="26" rx="38" ry="12" ${_SH_OUT}/>`
-        + `<path d="M22,96 A38,12 0 0 1 98,96" ${_SH_HID}/>`,
-    cone: `<path d="M60,10 L18,98 A42,13 0 0 0 102,98 Z" ${_SH_OUT}/><path d="M18,98 A42,13 0 0 1 102,98" ${_SH_HID}/>`,
-    pyramid: `<polygon points="60,10 10,104 82,104" ${_SH_OUT}/><polygon points="60,10 82,104 110,82" ${_SH_OUT}/>`
-        + `<polyline points="10,104 38,82 110,82" ${_SH_HID}/><line x1="38" y1="82" x2="60" y2="10" ${_SH_HID}/>`,
-};
-// One picture tile for a "Click ALL the …" option: the drawing only, no name, no emoji.
-const _shTile = (inner) => `<svg viewBox="0 0 120 120" role="img" aria-label="shape" style="display:block;margin:0 auto;width:min(150px,100%);height:auto;overflow:visible;">${inner}</svg>`;
-// The printed key for a picture option set: which pictures (1st, 2nd …) the pupil rings.
-const _ORD = ['1st', '2nd', '3rd', '4th', '5th', '6th'];
-const _shKey = (opts) => {
-    const at = opts.map((o, i) => (o.correct ? _ORD[i] : null)).filter(Boolean);
-    return at.length > 1 ? `${at.slice(0, -1).join(', ')} and ${at[at.length - 1]}` : at[0] || '';
-};
-// The single-shape drawing for "What shape is this?": a black outline in a plain centred box.
-const _shFigure = (inner) => `<div style="text-align:center;"><svg viewBox="0 0 120 120" role="img" aria-label="a shape" style="display:block;margin:0 auto;width:min(240px,80%);height:auto;max-width:100%;overflow:visible;">${inner}</svg></div>`;
+// name_2d_shapes / name_3d_shapes: the teacher's ticked "What the items ask" kinds, or null when
+// they are the default (the deal then runs exactly as before, using no random number). Kinds 0
+// and 1 are the naming forms below; 2 and up are the shape-art.js counting / net builders.
+function _shapeForm(dflt) {
+    const o = state.skillOptions;
+    const v = o && Array.isArray(o.forms) ? o.forms : null;
+    if (!v || !v.length || (v.length === dflt.length && v.every(x => dflt.includes(x)))) return null;
+    return pick(v);
+}
 
 export function generateGeometryQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
 
+            // ===== NAME 2D SHAPES — the counting and "with N sides" kinds (options only) =====
+            const _f2 = mappedSkill === "name_2d_shapes" ? _shapeForm([0, 1]) : null;
+            if (_f2 === 2 || _f2 === 3) { countShape2d(q, _f2 === 2 ? 'sides' : 'vertices'); return; }
+            if (_f2 === 4 || _f2 === 5) { selectShape2d(q, _f2 === 4 ? 'sides' : 'vertices'); return; }
+
             // ===== NAME 2D SHAPES (Grade K) — multi-select variant =====
-            if (mappedSkill === "name_2d_shapes" && Math.random() < 0.30) {
+            if (mappedSkill === "name_2d_shapes" && _f2 !== 0 && (_f2 === 1 || Math.random() < 0.30)) {
                 // Each option is the shape's black line drawing only: a name or an emoji beside it
                 // would let the pupil find the answer by reading the word (Y1 lessons critic r2 n7).
                 const allShapes = ['triangle', 'square', 'circle', 'rectangle', 'pentagon', 'hexagon', 'star', 'diamond']
@@ -153,8 +115,15 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 return;
             }
 
+            // ===== NAME 3D SHAPES — the counting, "with N faces" and net kinds (options only) =====
+            const _f3 = mappedSkill === "name_3d_shapes" ? _shapeForm([0, 1]) : null;
+            if (_f3 >= 2 && _f3 <= 4) { countSolid(q, ['faces', 'edges', 'vertices'][_f3 - 2]); return; }
+            if (_f3 === 5 || _f3 === 6) { selectSolid(q, _f3 === 5 ? 'faces' : 'vertices'); return; }
+            if (_f3 === 7) { netNameItem(q); return; }
+            if (_f3 === 8) { cubeNetsItem(q); return; }
+
             // ===== NAME 3D SHAPES (Grade K) — multi-select variant =====
-            if (mappedSkill === "name_3d_shapes" && Math.random() < 0.30) {
+            if (mappedSkill === "name_3d_shapes" && _f3 !== 0 && (_f3 === 1 || Math.random() < 0.30)) {
                 // Each option is the solid's black line drawing only (no name, no emoji): the name
                 // belongs in the question alone.
                 const all3d = ['cube', 'sphere', 'cylinder', 'cone', 'rectangular prism', 'pyramid']
