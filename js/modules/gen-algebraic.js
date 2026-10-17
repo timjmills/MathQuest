@@ -4015,9 +4015,12 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
             if (algSkill === "distributive_expr") {
                 if (Math.random() < 0.4) {
                     // Factor out the GCF variant
+                    // The inner terms must be coprime, or gcf is only A common factor, not the greatest
+                    // (2 * 6x + 2 * 9 = 12x + 18 factors by 6, not 2).
                     const gcf = pick([2, 3, 4, 5]);
-                    const inA = randInt(2, 6);
-                    const inB = randInt(2, 6);
+                    const _g = (a, b) => (b ? _g(b, a % b) : a);
+                    let inA = randInt(2, 6), inB = randInt(2, 6);
+                    while (_g(inA, inB) !== 1) { inA = randInt(2, 6); inB = randInt(2, 6); }
                     const aTotal = gcf * inA;
                     const bTotal = gcf * inB;
                     q.text = `Factor out the GCF: ${aTotal}x + ${bTotal}`;
