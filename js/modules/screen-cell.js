@@ -1675,12 +1675,17 @@ function wireSwipeRows(cellEl) {
             const a = its[0].getBoundingClientRect(), b = its[1].getBoundingClientRect();
             const pitch = b.left - a.left, gap = pitch - a.width;
             if (!(pitch > 0)) return;
-            const cellEl2 = frame.closest('.mq-scell');
-            const lr = ln.getBoundingClientRect(), pad = parseFloat(getComputedStyle(ln).paddingLeft) || 0;
-            let right = w.getBoundingClientRect().right;
-            if (cellEl2) { const cr = cellEl2.getBoundingClientRect(), cs = getComputedStyle(cellEl2); right = Math.min(right, cr.right - parseFloat(cs.paddingRight || 0) - parseFloat(cs.borderRightWidth || 0)); }
-            const k = Math.max(1, Math.floor((right - lr.left - pad + gap + 0.5) / pitch));
-            const per = Math.ceil(its.length / Math.ceil(its.length / k));
+            // critic r9 E3: the room is the count row's own block (the cell's inner width), never the window's current width,
+            // so a fresh load and a resize to the same width balance the same way
+            const rootEl = frame.closest('.k2-countrow') || frame.parentElement;
+            const rs = getComputedStyle(rootEl);
+            const room = rootEl.clientWidth - (parseFloat(rs.paddingLeft) || 0) - (parseFloat(rs.paddingRight) || 0);
+            const pad = parseFloat(getComputedStyle(ln).paddingLeft) || 0;
+            const k = Math.max(1, Math.floor((room - pad + gap + 0.5) / pitch));
+            // critic r9 E1 (TY-10a, SL-3a): never more than half the row on a screen line (12 -> 6 + 6, 15 -> 5 + 5 + 5)
+            const half = its.length >= 13 ? 5 : Math.ceil(its.length / 2);
+            const lines = Math.max(Math.ceil(its.length / Math.min(k, half)), 1);
+            const per = Math.ceil(its.length / lines);
             ln.style.maxWidth = `${Math.ceil(pad + per * pitch - gap + 1)}px`;
         };
         const mode = () => {
@@ -1688,7 +1693,8 @@ function wireSwipeRows(cellEl) {
             frame.removeAttribute('data-mq-swipes'); w.style.width = ''; frame.style.minWidth = ''; w.style.maxWidth = ''; w.style.overflowX = 'auto'; body.style.paddingRight = '0px';
             // critic r7 O9: a wide row drawn as one wrapping line (desktop / tablet, count-row.js) never swipes: its step tab
             // stands above it and the line wraps to the cell's width
-            if (body.dataset.mqWrap === '1') { frame.setAttribute('data-mq-swipes', ''); w.style.overflowX = 'visible'; w.style.width = '100%'; balanceWrap(); level(); return; }
+            // critic r9 E2: the wrapped row (its step tab above it) is centred in the cell on every host
+            if (body.dataset.mqWrap === '1') { frame.setAttribute('data-mq-swipes', ''); w.style.overflowX = 'visible'; w.style.width = ''; frame.style.width = 'fit-content'; frame.style.marginLeft = 'auto'; frame.style.marginRight = 'auto'; balanceWrap(); level(); return; }
             const its = items();
             const fw = frame.parentElement ? frame.parentElement.getBoundingClientRect().width : frame.getBoundingClientRect().width;
             if (body.getBoundingClientRect().width + col.getBoundingClientRect().width <= fw + 1 || its.length < 2) { level(); return; }

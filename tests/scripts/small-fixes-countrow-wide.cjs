@@ -16,7 +16,7 @@ const { open } = require('../lib/ws-harness.cjs');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let fails = 0;
 const check = (ok, msg) => { console.log((ok ? 'PASS ' : 'FAIL ') + msg); if (!ok) fails++; };
-const SIZES = [{ width: 1366, height: 650 }, { width: 1280, height: 600 }, { width: 390, height: 844 }].filter((v) => !process.env.SIZES || process.env.SIZES.split(',').map(Number).includes(v.width));
+const SIZES = [{ width: 1366, height: 650 }, { width: 1280, height: 600 }, { width: 820, height: 1180 }, { width: 768, height: 1024 }, { width: 390, height: 844 }].filter((v) => !process.env.SIZES || process.env.SIZES.split(',').map(Number).includes(v.width));
 const WIDE = { rows: [{ step: 100000, start: 'custom', at: 1000000 }] };
 const ROWS = {
   '100000': WIDE,
@@ -147,6 +147,8 @@ const dismiss = (page) => page.evaluate(() => { const d = document.getElementByI
             check(m.fit.every(Boolean), `${tag} every box holds "${m.widest}" (${m.fit.filter((f) => !f).length} too narrow)`);
             check(Math.min(...m.perLine) >= 3, `${tag} at least 3 numbers to every line (${m.perLine.join('+')})`);
             check(m.band < 30, `${tag} right-hand empty band ${m.band}% < 30%`);
+            const half = m.perLine.reduce((a, b) => a + b, 0) >= 13 ? 5 : Math.ceil(m.perLine.reduce((a, b) => a + b, 0) / 2);
+            check(Math.max(...m.perLine) <= half, `${tag} no screen line holds more than half the row (${m.perLine.join('+')}, at most ${half}) (TY-10a, SL-3a)`);
             check(!m.cue && m.swipeOver <= 1, `${tag} no desktop swipe (cue ${m.cue}, overflow ${m.swipeOver}px)`);
           } else {
             const key = `${host} ${rk}`;
@@ -191,10 +193,27 @@ const dismiss = (page) => page.evaluate(() => { const d = document.getElementByI
       check(cards.every((c) => c.vband < 30), `${tag} no card stretched with a vertical empty band >= 30% (${cards.map((c) => c.vband).join(', ')})`);
       check(ms.every((m) => Math.abs(m.givenPx - 29) <= 0.5 && Math.abs(m.inputPx - 29) <= 0.5 && m.maxPx <= 29.5), `${tag} every row at 29 px (${ms.map((m) => m.inputPx).join(', ')})`);
       check(ms.every((m) => Math.min(...m.perLine) >= 3 && m.band < 30 && !m.cue && m.swipeOver <= 1), `${tag} every row 3+ to a line, band < 30%, no swipe`);
+      check(ms.every((m) => Math.max(...m.perLine) <= 6), `${tag} no line holds more than half a row (${ms.map((m) => m.perLine.join('+')).join(', ')})`);
       check(errs.length === 0, `${tag} no page errors ${errs.join(' ')}`);
     } catch (e) {
       check(false, `${tag} ${e.message}`);
     } finally { if (app) await app.close(); }
+  }
+  // critic r9 E3: a row balances the same on a fresh load and after a resize to the same width
+  for (const host of ['worksheet', 'card', 'quiz']) {
+    if (process.env.SIZES && !process.env.SIZES.split(',').includes('768')) break;
+    const tag = `[768 ${host} 100000 load vs resize]`;
+    let app;
+    try {
+      const b = await boot({ width: 768, height: 1024 }); app = b.app; const { page } = b;
+      await mount(page, host, WIDE, 11);
+      await sleep(1200); await dismiss(page); await sleep(300);
+      const root = host === 'quiz' ? '#quizTakeView' : host === 'card' ? '#questionCard' : '#ws_card_0';
+      const m0 = await measure(page, root, host, 0);
+      for (const v of [{ width: 1366, height: 650 }, { width: 1100, height: 700 }, { width: 768, height: 800 }]) { await page.setViewport(Object.assign({ deviceScaleFactor: 1 }, v)); await sleep(700); }
+      const m1 = await measure(page, root, host, 0);
+      check(m0.perLine.join('+') === m1.perLine.join('+'), `${tag} ${m0.perLine.join('+')} on load, ${m1.perLine.join('+')} after resizing back`);
+    } catch (e) { check(false, `${tag} ${e.message}`); } finally { if (app) await app.close(); }
   }
   if (PIN) console.log('PHONE_PIN = ' + JSON.stringify(pinOut));
   console.log(fails ? `small-fixes-countrow-wide: FAIL (${fails})` : 'small-fixes-countrow-wide: OK');
