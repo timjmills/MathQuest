@@ -23,7 +23,7 @@
 //     `patterns_notice` -> patterns:notice_patterns narrowed to parity: P4 page 2, the Check
 //     Question 9 x 4 form, exit a/b/d. Meanwhile those slots use the chart window.
 
-const CHART = (extra, opts) => Object.assign({ categoryId: 'multiplication', skillId: 'mult_chart', allTest: 'chartIn9',
+const CHART = (extra, opts) => Object.assign({ categoryId: 'multiplication', skillId: 'mult_chart', allTest: 'chartIn9', gridApart: true,
     opts: Object.assign({ chart: 'window', band: 100, task: 'even', minFactor: 2 }, opts || {}) }, extra || {});
 const FACT = (tables, extra) => Object.assign({ categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: tables, notation: ['stacked'], band: 100 } }, extra || {});
 const ML = (step, dir, extra) => Object.assign({ categoryId: 'placevalue', skillId: 'more_less_10', opts: { step, dir, band: 100 } }, extra || {});
@@ -58,7 +58,7 @@ export default {
 
     // ------------------------------------------------------------------ the practice skill
     // A 4 x 5 window of the 10 x 10 chart; shade the even products (meanwhile: multiples of 2).
-    skill: CHART({}, { winRows: 3, winCols: 3 }),
+    skill: CHART({ tries: 600 }, { winRows: 3, winCols: 3 }),
     edgeTest: 'chartBigOdd',
     practicePages: 1,
     practiceSheets: [{ shape: [6, 2], edgeLast: { per: 2, cols: 2, wants: ['chartBigOdd', 'chartBigOdd'] } }],

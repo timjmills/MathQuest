@@ -261,7 +261,8 @@ function refAccepts(sk, cand, key, seen, kept, pg = '', row = '', words = true) 
     // page of the pack dealt; `minNum` / `maxNum` - the item's number (or answer) in range; `edge`
     // with `edgeTest` - only the lesson's edge cases (roles/lesson.js CASE_TESTS). Absent on every
     // other request.
-    if (sk.avoidKeys || sk.minNum !== undefined || sk.maxNum !== undefined || sk.edge || sk.boardOnly) {
+    // (`gridApart`, lesson 4: a window ref keeps its keys on every place, so no window near-twins another on its page)
+    if (sk.avoidKeys || sk.minNum !== undefined || sk.maxNum !== undefined || sk.edge || sk.boardOnly || sk.gridApart) {
         const k = factKeyOf(cand);
         if (k === null) return false;
         if (sk.avoidKeys && sk.avoidKeys.includes(k)) return false;
@@ -470,7 +471,7 @@ function refRecord(sk, q, key, seen, kept, pg = '', row = '') {
     if (sk.lr6) lr6Record(q, key, seen, pg, row);
     if (sk.noTurnaround && ops.length >= 2) seen.add(`pair:${key}:${ops.slice().sort((x, y) => x - y).join(',')}`);
     if (sk.maxSmall !== undefined && ops.length >= 2 && ops[1] < 10) kept.set(`small:${key}`, (kept.get(`small:${key}`) || 0) + 1);
-    if (sk.avoidKeys || sk.minNum !== undefined || sk.maxNum !== undefined || sk.edge || sk.boardOnly) { const k = factKeyOf(q); if (k !== null) seen.add(`key:${k}`); }
+    if (sk.avoidKeys || sk.minNum !== undefined || sk.maxNum !== undefined || sk.edge || sk.boardOnly || sk.gridApart) { const k = factKeyOf(q); if (k !== null) seen.add(`key:${k}`); }
 }
 
 const refAnswer = (q) => String(q && q.ans !== undefined ? (typeof q.ans === 'object' ? JSON.stringify(q.ans) : q.ans) : '');
