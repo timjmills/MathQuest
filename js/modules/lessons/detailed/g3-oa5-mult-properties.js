@@ -62,12 +62,12 @@ export default {
     // ★★★ last row: a square array (does it change when turned?) and a 5-row array.
     edgeTest: 'arrEdge',
     // ★★ Practice 1: the known fact gives the turned fact (pictures; a square or a 5 in every place), its last
-    // row a 4 x 4 square and 5 rows (dealt first, `first`); Practice 2:
+    // row a 4 x 4 square and 5 rows; Practice 2:
     // facts only, the missing number, its last row a square and a 5.
     practiceSheets: [
         // (products to 16: rows + in each row at most 8, so the array and its turn fit a half-width cell at L)
-        { skill: TURN(1, { minNum: 6, maxNum: 16, allTest: 'arrNoSmall' }), shape: [4, 2], edgeLast: { per: 4, cols: 2, first: true, wants: ['arrBigSquare', 'arrFiveRows'] } },
-        { skill: FACTS({ minNum: 12, distinctFirst: true }), shape: [10, 2], edgeLast: { per: 10, cols: 2, wants: ['arrSquare', 'arrFive'] } },
+        { skill: TURN(1, { minNum: 6, maxNum: 16, allTest: 'arrNoSmall' }), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['arrBigSquare', 'arrFiveRows'] } },
+        { skill: FACTS({ minNum: 12, factorCap: 3 }), shape: [10, 2], edgeLast: { per: 10, cols: 2, first: true, wants: ['arrSquare', 'arrFive'] } },
     ],
     // No Mixed page: a Mixed page leads with the lesson skill (half its items), and only ten arrays up to
     // 5 x 5 exist - the chart, the lesson sheet, Practice 1, the exit slip and the Check Question use them
@@ -160,7 +160,7 @@ export default {
     // Three items (V22: 3 when 4 full-size items do not fit a half - an array and its turn is a whole row),
     // the array one across, the two facts two across: the turned fact from a picture, the Critical Atom without a picture, the ★★★ square.
     exit: [
-        { case: 'an array: the known fact gives the turned fact', ref: TURN(1, { maxNum: 20 }), want: 'arrNonSq', instr: 'Turn the array. Write the new fact.', detects: 'Copies the first fact: no swap.', cols: 1 },
+        { case: 'an array: the known fact gives the turned fact', ref: TURN(1, { maxNum: 12 }), want: 'arrSmall', instr: 'Turn the array. Write the new fact.', detects: 'Copies the first fact: no swap.', cols: 1 },
         { case: 'same product, no picture (Critical Atom)', ref: FACTS(), want: 'arrProduct', instr: 'Write the missing number.', detects: 'Multiplies again and slips: not the same product.', cols: 2 },
         { case: 'a square fact, the missing factor', ref: FACTS(), want: 'arrSquareFactor', instr: 'Write the missing number.', detects: 'Thinks a square cannot turn.', cols: 2 },
     ],
@@ -247,6 +247,7 @@ export default {
             rows: [
                 { say: 'Last time: one array gives a fact.' },
                 { say: 'Today: one array gives two facts. Same answer.' },
+                { do: 'Show the tray. Pupils count the counters once.', note: 'They keep the total in mind for the turn.' },
             ] },
         { n: 5, name: 'I Do: the anchor chart', min: 10, page: 'P2', boxes: [{ kind: 'watch', title: 'Turn slowly', text: 'Let them see that no dot leaves the tray.' }],
             rows: [
@@ -300,6 +301,7 @@ export default {
     accepted: [
         'Prerequisite Check arrays: rows and in each row in either order.',
         'Exit a: only {exit.0.turned}; writing {exit.0.fact} again is the no-swap mistake.',
+        'Practice 2 and exit b, c: one number in each box, no working needed.',
         'Egg story: {wp.rows} × {wp.cols} or {wp.cols} × {wp.rows}; the label “eggs” may be left off.',
     ],
     wrongAnswers: [
@@ -307,5 +309,7 @@ export default {
         { wrote: '{exit.0.wrong.turnnoswap} (a)', mistake: 'Copies the fact: no swap', next: 'Count the turned rows aloud.' },
         { wrote: '{exit.2.wrong.turnproductfactor} (c)', mistake: 'Product as a factor', next: 'The box map: the product is last.' },
         { wrote: '{exit.0.wrong.turnproductfactor} (a)', mistake: 'Product as a factor', next: 'The product is always last.' },
+        { wrote: '{exit.1.wrong.turnproductfactor} (b)', mistake: 'Adds the two factors', next: '“Times, not plus.” Say the fact aloud.' },
+        { wrote: 'A box left empty on Practice 2', mistake: 'Not sure which number moved', next: 'Point: the two factors swap places.' },
     ],
 };

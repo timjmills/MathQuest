@@ -216,8 +216,8 @@ export const CASE_TESTS = Object.freeze({
     arrAny: (it) => !!arrTurnOf(it),
     // (the chart's example: plain digits and at most 4 by 4)
     arrTurnSmall: (it) => CASE_TESTS.arrTurn(it) && CASE_TESTS.arrSmall(it),
-    // (Practice 1, lesson 3a: every place a square or an array with a 5; its last row a big square and 5 rows)
-    arrNoSmall: (it) => { const p = arrTurnOf(it); return !!p && (p.rows === p.cols || p.rows === 5 || p.cols === 5); },
+    // (Practice 1, lesson 3a: every place a square, 2 rows of 5 or 5 rows; its last row a big square and 5 rows)
+    arrNoSmall: (it) => { const p = arrTurnOf(it); return !!p && (p.rows === p.cols || p.rows === 5 || (p.rows === 2 && p.cols === 5)); },
     arrBigSquare: (it) => { const p = arrTurnOf(it); return !!p && p.rows === p.cols && p.rows >= 4; },
     arrFiveRows: (it) => { const p = arrTurnOf(it); return !!p && p.rows === 5 && p.cols !== 5; },
     // (4 rows of 5 or 5 rows of 4: the widest array - a lesson sheet's second Guided cell)

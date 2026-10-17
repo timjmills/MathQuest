@@ -252,6 +252,8 @@ function refAccepts(sk, cand, key, seen, kept, pg = '', row = '', words = true) 
     if (sk.lr6 && !lr6Ok(cand, key, seen, pg, row, words)) return false;
     if (sk.noTurnaround && ops.length >= 2 && seen.has(`pair:${key}:${ops.slice().sort((x, y) => x - y).join(',')}`)) return false;
     if (sk.maxSmall !== undefined && ops.length >= 2 && ops[1] < 10 && (kept.get(`small:${key}`) || 0) >= Number(sk.maxSmall)) return false;
+    // (`factorCap` n, lesson 3a: no factor on more than n items of a page - a facts page that leans on 7s)
+    if (sk.factorCap !== undefined && [...new Set(ops)].some((f) => (kept.get(`fac:${key}:${f}`) || 0) >= Number(sk.factorCap))) return false;
     if (Array.isArray(sk.avoidTexts) && sk.avoidTexts.includes(refText(cand))) return false;
     // The detailed lesson maker (LR-5, V22 §9.5): `avoidKeys` - never an item (its fact key) another
     // page of the pack dealt; `minNum` / `maxNum` - the item's number (or answer) in range; `edge`
@@ -410,11 +412,13 @@ function shortStoryQ(q) {
 }
 
 /** A one-number item's number for LR-6's near-twin rule (an operation item: null). */
-const nearKeyOf = (q) => (composeOpOf(q) ? null : itemNumberOf(q));
+// (an array and its turn is a pair of factors, not one number: never a near twin by its product - lesson 3a)
+const nearKeyOf = (q) => (composeOpOf(q) || turnedKeyOf(q) !== null ? null : itemNumberOf(q));
 
 /** Records what `refAccepts` checks the next items against. */
 function refRecord(sk, q, key, seen, kept, pg = '', row = '') {
     const ops = refOperands(q);
+    if (sk.factorCap !== undefined) for (const f of new Set(ops)) kept.set(`fac:${key}:${f}`, (kept.get(`fac:${key}:${f}`) || 0) + 1);
     if (sk.distinctFirst) seen.add(`first:${key}:${ops[0]}`);
     if (sk.distinctAnswer) seen.add(`ans:${key}:${refAnswer(q)}`);
     if (sk.avoidKeys) seen.add(`ansAll${pg}:${dlAns(q).replace(/[^0-9a-z<>=]/gi, '')}`);
@@ -2971,7 +2975,7 @@ function dealOne(ref, seed, used, want, avoidAns = null, near = null, names = nu
         used.add(key);
         return { q, v, key };
     }
-    throw new Error(`detailed lesson: no ${ref.skillId} item for "${want || 'any'}" DBG ${[...used].filter((k) => /x/.test(k)).join(" ")}`);
+    throw new Error(`detailed lesson: no ${ref.skillId} item for "${want || 'any'}"`);
 }
 
 /**
