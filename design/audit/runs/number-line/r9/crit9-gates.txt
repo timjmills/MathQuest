@@ -1,0 +1,15 @@
+== boot
+ws-boot-smoke: OK
+exit 0
+== snl
+  R8-D1 untimed link nl_mult 1366x650: ok 599 frames, held scroll 0
+support-numberline: OK
+exit 0
+== sa
+live green (card, quiz)            ok
+ws-screen-answer: OK
+exit 0
+== lint
+
+ws-print-lint: FAIL - 191 document(s), source kit; 461 finding(s) in 33 document(s)
+exit 1

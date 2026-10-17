@@ -1,0 +1,8 @@
+nl_mult indep end copy                     P[band 0,10,20..100] cells4  P[band 0,10,20..100] cells4  K[band 0,10,20..100]+ink cells4  K[band 0,10,20..100]+ink cells4 
+nl_mult indep after-page copy              P[band 0,10,20..100] cells4  K[band 0,10,20..100]+ink cells4  P[band 0,10,20..100] cells4  K[band 0,10,20..100]+ink cells4 
+nl_mult indep after-page short             P[band 0,10,20..100] cells4  K[no band]+ink cells0  P[band 0,10,20..100] cells4  K[no band]+ink cells0 
+sub_100_regroup indep after-page short     P[band 0,5,10..100] cells9  K[no band]+ink cells0  P[band 0,5,10..100] cells9  K[no band]+ink cells0 
+add_facts test hints OFF                   P[no band] cells12  K[no band]+ink cells12 
+add_facts test hints ON                    P[band 0,1,2..20] cells12  K[band 0,1,2..20]+ink cells12 
+add_facts test hints ON after-page short   P[band 0,1,2..20] cells12  K[no band]+ink cells0 
+add_facts indep line OFF after-page short  P[no band] cells12  K[no band]+ink cells0  P[no band] cells12  K[no band]+ink cells0 

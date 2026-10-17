@@ -107,6 +107,12 @@ export function frameOf({ skills = [], input = {}, tabId, title, twoLine = false
     };
     const contTab = tab ? (tab.length > 1 ? [tab.slice(0, -1).join(' · '), tab[tab.length - 1]] : tab.slice()) : false;
     const contHeader = { name: on('name'), date: false, score: false, title: '', tab: contTab };
+    // Wave 5.2: the reference number line under the header of every page (the host reserved its
+    // height: it rides in `header.refBandMm`, which layoutHeader passes to every body budget).
+    if (h.refBand && Number(h.refBandMm) > 0) {
+        header.refBand = contHeader.refBand = String(h.refBand);
+        header.refBandMm = contHeader.refBandMm = Number(h.refBandMm);
+    }
     const seed = input.seed;
     const form = input.form || 'A';
     const right = footerRight !== undefined ? footerRight
@@ -115,7 +121,7 @@ export function frameOf({ skills = [], input = {}, tabId, title, twoLine = false
 }
 
 /** The header the layout sees (only what changes its height). */
-export const layoutHeader = (header) => ({ tab: header.tab, title: header.title, titleLines: header.titleLines });
+export const layoutHeader = (header) => ({ tab: header.tab, title: header.title, titleLines: header.titleLines, refBandMm: Number(header.refBandMm) || 0 });
 
 /* ================================================================= banded-page budget */
 

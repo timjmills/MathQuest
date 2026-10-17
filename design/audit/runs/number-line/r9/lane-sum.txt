@@ -1,0 +1,741 @@
+1366x650 sub_100_regroup queue mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,85,90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 sub_100_regroup queue touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,85,90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 sub_100_regroup T300 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 sub_100_regroup T300 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 sub_100_regroup T0 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 sub_100_regroup T0 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 nl_mult queue mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,90,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 nl_mult queue touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,90,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 nl_mult T300 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 nl_mult T300 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 nl_mult T0 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 nl_mult T0 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 add_facts queue mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:16,17,18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 add_facts queue touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:16,17,18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 add_facts T300 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 add_facts T300 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 add_facts T0 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 add_facts T0 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 mixed_addition queue mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,85,90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy138/h59/b-68[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x95>138/-68x85
+   q2-checked:sy152/h59/b-82[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3:sy183/h59/b-113[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 152/-82x93>183/-113x87
+   q3-checked:sy219/h59/b-149[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+1366x650 mixed_addition queue touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,85,90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 mixed_addition T300 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy138/h59/b-68[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x96>138/-68x85
+   q2-checked:sy152/h59/b-82[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2-forced
+   q3:sy205/h59/b-135[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 152/-82x305>205/-135x84
+   q3-checked:sy219/h59/b-149[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+1366x650 mixed_addition T300 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy138/h59/b-68[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x94>138/-68x85
+   q2-checked:sy152/h59/b-82[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3:sy8/h59/b62 seg 152/-82x186>8/62x172
+   q3-checked:sy8/h59/b62
+1366x650 mixed_addition T0 mouse line
+   q1:sy138/h59/b-68[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x1>138/-68x94
+   q1-checked:sy152/h59/b-82[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2:sy119/h59/b-49[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 152/-82x93>119/-49x88
+   q2-checked:sy183/h59/b-113[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3:sy183/h59/b-113[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3-checked:sy183/h59/b-113[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+1366x650 mixed_addition T0 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy138/h59/b-68[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x96>138/-68x85
+   q2-checked:sy152/h59/b-82[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3:sy0/h59/b70 seg 152/-82x93>7/63x1>0/70x87
+   q3-checked:sy0/h59/b70
+1280x600 sub_100_regroup queue mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,85,90,95,100]
+   q1-checked:sy4/h59/b66
+   q2:sy4/h59/b66
+   q2-checked:sy4/h59/b66
+   q3:sy4/h59/b66
+   q3-checked:sy4/h59/b66
+1280x600 sub_100_regroup queue touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,85,90,95,100]
+   q1-checked:sy4/h59/b66
+   q2:sy4/h59/b66
+   q2-checked:sy4/h59/b66
+   q3:sy4/h59/b66
+   q3-checked:sy4/h59/b66
+1280x600 sub_100_regroup T300 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy4/h59/b66
+   q2:sy4/h59/b66
+   q2-checked:sy4/h59/b66
+   q3:sy4/h59/b66
+   q3-checked:sy4/h59/b66
+1280x600 sub_100_regroup T300 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy4/h59/b66
+   q2:sy4/h59/b66
+   q2-checked:sy4/h59/b66
+   q3:sy4/h59/b66
+   q3-checked:sy4/h59/b66
+1280x600 sub_100_regroup T0 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy4/h59/b66
+   q2:sy4/h59/b66
+   q2-checked:sy4/h59/b66
+   q3:sy4/h59/b66
+   q3-checked:sy4/h59/b66
+1280x600 sub_100_regroup T0 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy4/h59/b66
+   q2:sy4/h59/b66
+   q2-checked:sy4/h59/b66
+   q3:sy4/h59/b66
+   q3-checked:sy4/h59/b66
+1280x600 nl_mult queue mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,90,100]
+   q1-checked:sy5/h59/b65
+   q2:sy5/h59/b65
+   q2-checked:sy5/h59/b65
+   q3:sy5/h59/b65
+   q3-checked:sy5/h59/b65
+1280x600 nl_mult queue touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,90,100]
+   q1-checked:sy5/h59/b65
+   q2:sy5/h59/b65
+   q2-checked:sy5/h59/b65
+   q3:sy5/h59/b65
+   q3-checked:sy5/h59/b65
+1280x600 nl_mult T300 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,100]
+   q1-checked:sy5/h59/b65
+   q2:sy5/h59/b65
+   q2-checked:sy5/h59/b65
+   q3:sy5/h59/b65
+   q3-checked:sy5/h59/b65
+1280x600 nl_mult T300 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,100]
+   q1-checked:sy5/h59/b65
+   q2:sy5/h59/b65
+   q2-checked:sy5/h59/b65
+   q3:sy5/h59/b65
+   q3-checked:sy5/h59/b65
+1280x600 nl_mult T0 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,100]
+   q1-checked:sy5/h59/b65
+   q2:sy5/h59/b65
+   q2-checked:sy5/h59/b65
+   q3:sy5/h59/b65
+   q3-checked:sy5/h59/b65
+1280x600 nl_mult T0 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,100]
+   q1-checked:sy5/h59/b65
+   q2:sy5/h59/b65
+   q2-checked:sy5/h59/b65
+   q3:sy5/h59/b65
+   q3-checked:sy5/h59/b65
+1280x600 add_facts queue mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:16,17,18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x600 add_facts queue touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:16,17,18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x600 add_facts T300 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x600 add_facts T300 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x600 add_facts T0 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x600 add_facts T0 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x600 mixed_addition queue mouse line
+   q1:sy188/h59/b-118[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x1>188/-118x96
+   q1-checked:sy202/h59/b-132[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q1-forced
+   q2:sy202/h59/b-132[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2-checked:sy202/h59/b-132[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3:sy7/h59/b63 seg 202/-132x188>76/-6x2>7/63x172
+   q3-checked:sy7/h59/b63
+1280x600 mixed_addition queue touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,85,90,95,100]
+   q1-checked:sy4/h59/b66
+   q2:sy188/h59/b-118[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 4/66x96>188/-118x85
+   q2-checked:sy202/h59/b-132[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3:sy202/h59/b-132[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3-checked:sy99/h59/b-29[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 414/-344x64>99/-29x8
+1280x600 mixed_addition T300 mouse line
+   q1:sy77/h59/b-7[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x3>77/-7x4>0/70x2>77/-7x2>0/70x1>77/-7x26>0/70x1>77/-7x55
+   q1-checked:sy0/h59/b70
+   q2:sy45/h59/b25[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x95>45/25x85
+   q2-checked:sy48/h59/b22[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3:sy80/h59/b-10[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 48/22x95>0/70x4>80/-10x6>0/70x2>80/-10x2>0/70x1>80/-10x26>0/70x1>80/-10x43
+   q3-checked:sy0/h59/b70
+1280x600 mixed_addition T300 touch line
+   q1:sy188/h59/b-118[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x1>188/-118x95
+   q1-checked:sy202/h59/b-132[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2:sy233/h59/b-163[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 202/-132x93>233/-163x87
+   q2-checked:sy233/h59/b-163[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3:sy0/h59/b70 seg 233/-163x93>0/70x87
+   q3-checked:sy0/h59/b70
+1280x600 mixed_addition T0 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy80/h59/b-10[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x99>77/-7x6>0/70x2>80/-10x2>0/70x1>80/-10x26>0/70x1>80/-10x44
+   q2-checked:sy0/h59/b70
+   q3:sy45/h59/b25[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x96>45/25x85
+   q3-checked:sy48/h59/b22[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+1280x600 mixed_addition T0 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy4/h59/b66
+   q2:sy77/h59/b-7[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 4/66x95>0/70x2>77/-7x2>0/70x1>77/-7x6>0/70x1>77/-7x1>0/70x1>77/-7x1>0/70x1>77/-7x26>0/70x1>77/-7x44
+   q2-checked:sy0/h59/b70
+   q3:sy94/h59/b-24[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x96>94/-24x85
+   q3-checked:sy452/h59/b-382[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+1366x768 sub_100_regroup queue mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,85,90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x768 sub_100_regroup queue touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,85,90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x768 sub_100_regroup T300 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x768 sub_100_regroup T300 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x768 sub_100_regroup T0 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x768 sub_100_regroup T0 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x768 nl_mult queue mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,90,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x768 nl_mult queue touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,90,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x768 nl_mult T300 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x768 nl_mult T300 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x768 nl_mult T0 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x768 nl_mult T0 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x768 add_facts queue mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:16,17,18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x768 add_facts queue touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:16,17,18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x768 add_facts T300 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x768 add_facts T300 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x768 add_facts T0 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x768 add_facts T0 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x768 mixed_addition queue mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,85,90,95,100]
+   q1-checked:sy0/h59/b70
+   q1-forced
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x768 mixed_addition queue touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,85,90,95,100]
+   q1-checked:sy368/h59/b-298[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q1-forced
+   q2:sy0/h59/b70 seg 368/-298x304>0/70x86
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x768 mixed_addition T300 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy34/h59/b36[BAND-UNDER-HDR(fits)]
+   q2:sy0/h59/b70 seg 34/36x90>0/70x90
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x768 mixed_addition T300 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy34/h59/b36[band-under-hdr(too-tall)]
+1366x768 mixed_addition T0 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy29/h59/b41[BAND-UNDER-HDR(fits)]
+   q3:sy0/h59/b70 seg 29/41x92>0/70x88
+   q3-checked:sy0/h59/b70
+1366x768 mixed_addition T0 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy149/h59/b-79[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 246/-176x64>149/-79x5
+1280x720 sub_100_regroup queue mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,85,90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x720 sub_100_regroup queue touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,85,90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x720 sub_100_regroup T300 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x720 sub_100_regroup T300 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x720 sub_100_regroup T0 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x720 sub_100_regroup T0 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x720 nl_mult queue mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,90,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x720 nl_mult queue touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,90,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x720 nl_mult T300 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x720 nl_mult T300 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x720 nl_mult T0 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x720 nl_mult T0 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x720 add_facts queue mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:16,17,18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x720 add_facts queue touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:16,17,18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x720 add_facts T300 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x720 add_facts T300 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x720 add_facts T0 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x720 add_facts T0 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x720 mixed_addition queue mouse line
+   q1:sy68/h59/b2[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x1>68/2x94
+   q1-checked:sy82/h59/b-12[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2:sy0/h59/b70 seg 82/-12x92>0/70x87
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x720 mixed_addition queue touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,85,90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy68/h59/b2[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x95>68/2x85
+   q3-checked:sy82/h59/b-12[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+1280x720 mixed_addition T300 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy68/h59/b2[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x95>68/2x85
+   q2-checked:sy82/h59/b-12[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3:sy82/h59/b-12[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3-checked:sy82/h59/b-12[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+1280x720 mixed_addition T300 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy68/h59/b2[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x96>68/2x85
+   q3-checked:sy82/h59/b-12[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+1280x720 mixed_addition T0 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x720 mixed_addition T0 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy68/h59/b2[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x78>68/2x86
+   q2-checked:sy82/h59/b-12[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3:sy0/h59/b70 seg 82/-12x93>0/70x86
+   q3-checked:sy0/h59/b70
+390x844 sub_100_regroup queue touch line
+   q1:sy403/h0/b389[CHECK-OUT] seg 0/816x1>403/413x95
+   q1-checked:sy403/h0/b389
+   q1-forced
+   q2:sy403/h0/b389[CHECK-OUT]
+   q2-checked:sy403/h0/b389
+   q3:sy403/h0/b389[CHECK-OUT]
+   q3-checked:sy403/h0/b389
+390x844 sub_100_regroup T0 touch line
+   q1:sy293/h0/b407[CHECK-OUT] seg 0/724x1>293/431x95
+   q1-checked:sy293/h0/b407
+   q1-forced
+   q2:sy293/h0/b407[CHECK-OUT]
+   q2-checked:sy293/h0/b407
+   q3:sy293/h0/b407[CHECK-OUT]
+   q3-checked:sy293/h0/b407
+390x844 nl_mult queue touch line
+   q1:sy452/h0/b340[CHECK-OUT] seg 0/816x1>426/390x3>452/362x93
+   q1-checked:sy452/h0/b340
+   q1-forced
+   q2:sy452/h0/b340[CHECK-OUT]
+   q2-checked:sy452/h0/b340
+   q3:sy452/h0/b340[CHECK-OUT]
+   q3-checked:sy452/h0/b340
+390x844 nl_mult T0 touch line
+   q1:sy341/h0/b359[CHECK-OUT] seg 0/724x1>316/408x4>341/379x92
+   q1-checked:sy341/h0/b359
+   q1-forced
+   q2:sy341/h0/b359[CHECK-OUT]
+   q2-checked:sy341/h0/b359
+   q3:sy341/h0/b359[CHECK-OUT]
+   q3-checked:sy341/h0/b359
+390x844 add_facts queue touch line
+   q1:sy351/h0/b441[CHECK-OUT] seg 0/816x1>351/465x96
+   q1-checked:sy351/h0/b441
+   q1-forced
+   q2:sy351/h0/b441[CHECK-OUT]
+   q2-checked:sy351/h0/b441
+   q3:sy351/h0/b441[CHECK-OUT]
+   q3-checked:sy351/h0/b441
+390x844 add_facts T0 touch line
+   q1:sy241/h0/b459[CHECK-OUT] seg 0/724x1>241/483x97
+   q1-checked:sy241/h0/b459
+   q1-forced
+   q2:sy241/h0/b459[CHECK-OUT]
+   q2-checked:sy241/h0/b459
+   q3:sy241/h0/b459[CHECK-OUT]
+   q3-checked:sy241/h0/b459
+390x844 mixed_addition queue touch line
+   q1:sy351/h0/b441[CHECK-OUT] seg 0/816x1>351/465x98
+   q1-checked:sy351/h0/b441
+   q1-forced
+   q2:sy576/h0/b216[CHECK-OUT] seg 351/441x610>576/216x170
+   q2-checked:sy584/h0/b208
+   q3:sy584/h0/b208[CHECK-OUT]
+   q3-checked:sy584/h0/b208
+390x844 mixed_addition T0 touch line
+   q1:sy245/h0/b455[CHECK-OUT] seg 0/724x1>245/479x96
+   q1-checked:sy245/h0/b455
+   q1-forced
+   q2:sy245/h0/b455[CHECK-OUT]
+   q2-checked:sy245/h0/b455
+   q3:sy318/h0/b382[CHECK-OUT] seg 245/455x94>318/382x88
+   q3-checked:sy466/h0/b234 seg 775/-75x65>588/112x1>466/234x7
+TOTAL {"cases":104,"fitsUnder":9,"boxOut":0,"chkOut":24,"labels":49,"labelsQ1":96,"bounces":4,"bigJumps":33,"err":0,"tapJump":0,"pageErr":0}

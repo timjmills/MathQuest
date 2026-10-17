@@ -1,7 +1,7 @@
 // generate-question.js - Dispatcher: routes to domain-specific question generators
 import { state } from './state.js';
 import { DEFAULT_TABLES, SKILLS, DOMAINS, SKILL_GRADES, getSkillGrade, isMixedMetaSkill, getSkillsForCategory, getMixedPoolSkills, getSkillsForDomain, getSkillsForGrade, getCategoryForSkill, getMixedSkillScope } from './data.js';
-import { randInt, pick, buildNumericOptions } from './utils.js';
+import { randInt, pick, buildNumericOptions, denomAllowed } from './utils.js';
 
 // Domain-specific generators
 import { generateOperationsQuestion, generateIntegersQuestion } from './gen-operations.js';
@@ -202,6 +202,20 @@ export function generateQuestionFor({ category, skill, range, decimals, opts, se
 }
 
 /**
+ * Print's view of an item (critic nl-r5 D1). A review / mixed item now carries its REAL category
+ * (generateQuestion all_mixed branch) so the screen hosts find its skill's options; a printed page
+ * keeps the pair it asked for on the item, as it always has (the section's provider, instruction,
+ * grade settling and answer-key tags read it). The real category stays on `memberCategoryId`.
+ */
+export function configuredItem(q, category) {
+    if (q && q.mixedHost && category && q.categoryId !== category) {
+        q.memberCategoryId = q.categoryId;
+        q.categoryId = category;
+    }
+    return q;
+}
+
+/**
  * Swap in a seeded generator for the duration of one call so the same seed reprints the same
  * page. mulberry32: small, fast and stable across browsers, which matters because a teacher may
  * reprint form B on a different machine.
@@ -311,6 +325,10 @@ export function itemDenominators(q) {
         return out.filter(d => d > 1);
     };
     const question = [...dens(q.text, true), ...dens(q.printText, true), ...dens(q.visual, true)];
+    // A click-all or sort item shows its fractions on its choices and tiles, not in its words.
+    for (const o of [...(Array.isArray(q.options) ? q.options : []), ...(Array.isArray(q.tiles) ? q.tiles : [])]) {
+        if (o && typeof o === 'object' && o.label != null) question.push(...dens(o.label, true));
+    }
     // The answer counts too: a page of halves, quarters and eighths must not have 6/12 in its key.
     const a = typeof q.ans === 'string' || typeof q.ans === 'number' ? dens(q.ans, false) : [];
     return [...question, ...a];
@@ -333,23 +351,8 @@ function p12Post(q) {
     q.printFormat = 'word-plain';
     return q;
 }
-/** Denominator families (the `denoms` option): 2 = halves / quarters / eighths, 3 = thirds /
- *  sixths / ninths / twelfths, 5 = fifths / tenths / hundredths, 7 = sevenths, elevenths and the
- *  other primes. A denominator is allowed when every odd prime in it has its family ticked (a
- *  fifteenth needs 3 and 5); a power of two needs family 2. */
-export function denomAllowed(d, ticked) {
-    let n = Math.round(Number(d));
-    if (!(n > 1)) return true;
-    while (n % 2 === 0) n /= 2;
-    const fam = (p) => (p === 3 ? 3 : p === 5 ? 5 : 7);
-    const fams = new Set();
-    for (let p = 3; n > 1 && p * p <= n; p += 2) {
-        while (n % p === 0) { fams.add(fam(p)); n /= p; }
-    }
-    if (n > 1) fams.add(fam(n));
-    if (!fams.size) return ticked.includes(2);
-    return [...fams].every(f => ticked.includes(f));
-}
+// denomAllowed (the `denoms` families) lives in utils.js so the generators can draw from it too.
+export { denomAllowed };
 /** The words and numbers of an item, as the pupil reads them (tags stripped, thousands commas out). */
 export function itemPlainText(q) {
     const strip = (s) => String(s == null ? '' : s).replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/−/g, '-');
@@ -965,6 +968,13 @@ function generateResolvedQuestion() {
 
             q.skillLabel = window.getSkillLabelForQuestion ? window.getSkillLabelForQuestion(targetSkill, targetCategory) : '';
             q.skillId = targetSkill;
+            // Critic nl-r5 D1: the item carries its REAL category with its skill, so every screen
+            // host (the number line, the screen cell's support model) finds the options the
+            // teacher set on that skill in a queue / shared-link / custom_mixed session.
+            // `mixedHost` remembers the review / mixed pair the item was asked for: print keeps
+            // that pair on the page (print-sheet.js configuredItem), as it always has.
+            q.categoryId = targetCategory;
+            q.mixedHost = { categoryId: savedCategory, skillId: savedSkill };
             q.poolMember = targetCategory;   // P12: the topic this item came from (a grade / "_all" review)
 
             break;
@@ -1041,7 +1051,9 @@ function generateResolvedQuestion() {
         && state.quizMode !== true
         // a kit fraction cell (frac-model.js) draws its own numerator / denominator boxes; a number
         // placed on a line (nl-place.js) is answered on the line, never typed
-        && !(q.cell && (q.cell.template === 'frac-model' || q.cell.template === 'nl-place'))) {
+        && !(q.cell && (q.cell.template === 'frac-model' || q.cell.template === 'nl-place'))
+        // a legacy drawing that draws its own numerator / denominator boxes (data-mq-join="/")
+        && !(typeof q.visual === 'string' && q.visual.includes('data-mq-join="/"'))) {
         q.answerType = 'fraction-input';
     }
 

@@ -1,0 +1,4423 @@
+{
+ "meta": {
+  "title": "Site lessons that are not White Rose small steps (Awsaj CCSS builds and any other non-WRM lesson), from the school curriculum site",
+  "generatedBy": "node tests/scripts/ws-wrm-extract.cjs --site <awsajacademymath/index.html> (writes wrm-steps.json and this file)",
+  "source": "School curriculum site https://timjmills.github.io/awsajacademymath/: PACING (weeks, tracks, st.f flags), CURRICULUM (domain, unit, note, enrich = Support lists)",
+  "idFormat": "<school grade id>|-|<title slug>: the site's own tracker key for a lesson with no WRM block/step (trkRow/trkTk in the site: slug = title lower-cased with every run of non [a-z0-9] removed). Example: G4|-|lineplotswithfractions (Grade 4 \"Line plots with fractions\"). Stable while the site keeps the title; a retitle on the site is a new id (the old one disappears from this file, which a --check run reports).",
+  "grades": "school grade ids: PK, K, G1 ... G5; wrmYear = the WRM year taught in that grade (PK = R, K = Y1, G1 = Y2 ... G5 = Y6)",
+  "flags": {
+   "committee": "site label \"CCSS custom - build required\": an Awsaj-authored lesson that closes a CCSS standard White Rose does not teach (pacing st.f \"committee\", st.s \"SUP\" = supplement). Not a WRM small step.",
+   "enrich-native": "site label \"Support\": an earlier year's WRM step listed as support in a later grade. These ARE WRM steps: they are recorded on the step (wrm-steps.json steps[].site.supportIn), also when the title matches a step of another grade than the site's stated source (a disagreement records that); only a Support title that matches no WRM step of any grade is listed here.",
+   "native": "a CURRICULUM core title (site flag native / above) that matches no WRM step title of any grade and is not scheduled as a step: listed so no site title is unaccounted for; the note names the step when the pacing reviews it under that title",
+   "non-ccss": "site label \"Non-CCSS extra\": a WRM step with no CCSS code (wrm-steps.json step.flag)",
+   "other": "a pacing entry with no block, step or flag (G5 end-of-year: consolidation, investigation projects, problem solving, reasoning tasks)",
+   "above": "site label \"Above grade\": a WRM step whose CCSS is above the school grade (wrm-steps.json step.flag); listed here only for a CURRICULUM core title that matches no WRM step (see native)"
+  },
+  "fields": {
+   "id": "stable id (idFormat)",
+   "grade": "school grade id",
+   "usGrade": "US grade",
+   "wrmYear": "WRM year of that grade",
+   "title": "the site title",
+   "flag": "site flag (committee)",
+   "supplement": "pacing marks it st.s === \"SUP\"",
+   "ccss": "CCSS codes from the site, primary first",
+   "ee": "Wisconsin EE linked to them in data/standards/ccss-math.json",
+   "power": "a power standard lesson",
+   "domain": "CCSS domain code (site CURRICULUM)",
+   "unit": "site curriculum unit name (e.g. \"Awsaj supplement lessons (domain tests)\")",
+   "paceUnit": "the pacing unit whose week range holds firstWeek: {key, name}",
+   "block": "the WRM block the pacing places it in (Y5.B14), or null",
+   "firstWeek": "first school week it is scheduled on any track (W01..), null when listed in the curriculum only",
+   "weeks": "every scheduled week",
+   "tracks": "pacing tracks (standard, priority, intervention)",
+   "note": "the site curriculum note"
+  },
+  "assessments": "domain exams and MAP windows from the pacing (st.f \"exam\" / \"map\"): not lessons, listed so nothing on the site is unaccounted for",
+  "counts": {
+   "lessons": 143,
+   "byYearAndFlag": {
+    "Y1 committee": 4,
+    "Y1 enrich-native": 35,
+    "Y2 committee": 3,
+    "Y2 enrich-native": 5,
+    "Y2 above": 3,
+    "Y3 committee": 14,
+    "Y3 enrich-native": 11,
+    "Y4 committee": 11,
+    "Y4 enrich-native": 11,
+    "Y4 native": 1,
+    "Y5 committee": 16,
+    "Y5 enrich-native": 5,
+    "Y6 committee": 16,
+    "Y6 other": 4,
+    "Y6 enrich-native": 4
+   },
+   "assessments": 34,
+   "supportTitlesMatchedToWrmSteps": 1204,
+   "supportTitlesUnmatched": 71
+  }
+ },
+ "lessons": [
+  {
+   "id": "K|-|addandsubtractwithin5writtenverticallycolumnform",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Add and subtract within 5 written vertically (column form)",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "K.OA.A.5"
+   ],
+   "ee": [],
+   "power": true,
+   "domain": "OA",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "2",
+    "name": "Operations & Algebraic Thinking"
+   },
+   "block": null,
+   "firstWeek": "W15",
+   "weeks": [
+    "W15",
+    "W16"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "K|-|sortintocategoriescounteachgroupandfindthetotal",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Sort into categories, count each group and find the total",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "K.MD.B.3",
+    "K.CC.B.5"
+   ],
+   "ee": [
+    "M.EE.K.MD.3",
+    "M.EE.K.CC.6"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "3",
+    "name": "Number & Operations in Base Ten"
+   },
+   "block": null,
+   "firstWeek": "W21",
+   "weeks": [
+    "W21"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "K|-|buildanddrawshapes",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Build and draw shapes",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "K.G.B.5"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "G",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "5",
+    "name": "Geometry"
+   },
+   "block": "Y1.B3",
+   "firstWeek": "W29",
+   "weeks": [
+    "W29",
+    "W30"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "K|-|composeshapesfromsmallershapes",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Compose shapes from smaller shapes",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "K.G.B.6"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "G",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "5",
+    "name": "Geometry"
+   },
+   "block": "Y1.B3",
+   "firstWeek": "W29",
+   "weeks": [
+    "W29",
+    "W30"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "K|-|3dshapescubecuboidsphereconecylinder",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "3D shapes (cube, cuboid, sphere, cone, cylinder)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "1.G.A.1"
+   ],
+   "ee": [
+    "M.EE.1.G.1"
+   ],
+   "power": false,
+   "domain": "CC",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Building 9 and 10 (Phase 7). (Reception Spring.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|67and8countingandsubitising",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "6, 7 and 8 - counting and subitising",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.CC.B.4"
+   ],
+   "ee": [
+    "M.EE.K.CC.4"
+   ],
+   "power": false,
+   "domain": "CC",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Growing 6, 7, 8 (Phase 6). (Reception Spring.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|9and10countrepresentorder",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "9 and 10 - count, represent, order",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.CC.B.5"
+   ],
+   "ee": [
+    "M.EE.K.CC.6"
+   ],
+   "power": false,
+   "domain": "CC",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Building 9 and 10 (Phase 7). (Reception Spring.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|addingmorefirstthennowstories",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Adding more (First/Then/Now stories)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.OA.A.1",
+    "K.OA.A.2"
+   ],
+   "ee": [
+    "M.EE.K.OA.1"
+   ],
+   "power": false,
+   "domain": "OA",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From First Then Now (Phase 9). (Reception Summer.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|bondsto10explorecombinationsthatmake10",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Bonds to 10 (explore combinations that make 10)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "1.OA.C.6",
+    "K.OA.A.4"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "CC",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Building 9 and 10 (Phase 7). (Reception Spring.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|buildingnumbersbeyond10",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Building numbers beyond 10",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.CC.B.5",
+    "K.NBT.A.1"
+   ],
+   "ee": [
+    "M.EE.K.CC.6"
+   ],
+   "power": false,
+   "domain": "CC",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From To 20 and Beyond (Phase 8). (Reception Summer.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|circlesandtrianglesproperties",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Circles and triangles (properties)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.G.B.4"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "CC",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From It's Me 1, 2, 3 (Phase 3). (Reception Autumn.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|combining2groups",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Combining 2 groups",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.OA.A.1",
+    "K.OA.A.2"
+   ],
+   "ee": [
+    "M.EE.K.OA.1"
+   ],
+   "power": false,
+   "domain": "CC",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Growing 6, 7, 8 (Phase 6). (Reception Spring.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|compareamountsmorefewersame",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Compare amounts (more, fewer, same)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.CC.C.6"
+   ],
+   "ee": [
+    "M.EE.K.CC.7"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Just Like Me! (Phase 2). (Reception Autumn.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|comparecapacity1",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Compare capacity (1)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.MD.A.2"
+   ],
+   "ee": [
+    "M.EE.K.MD.2"
+   ],
+   "power": false,
+   "domain": "CC",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Alive in 5! (Phase 5). (Reception Spring.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|comparecapacity2",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Compare capacity (2)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.MD.A.2"
+   ],
+   "ee": [
+    "M.EE.K.MD.2"
+   ],
+   "power": false,
+   "domain": "CC",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Alive in 5! (Phase 5). (Reception Spring.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|comparemass1",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Compare mass (1)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.MD.A.2"
+   ],
+   "ee": [
+    "M.EE.K.MD.2"
+   ],
+   "power": false,
+   "domain": "CC",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Alive in 5! (Phase 5). (Reception Spring.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|comparemass2",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Compare mass (2)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.MD.A.2"
+   ],
+   "ee": [
+    "M.EE.K.MD.2"
+   ],
+   "power": false,
+   "domain": "CC",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Alive in 5! (Phase 5). (Reception Spring.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|comparesizemassandcapacityinformally",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Compare size, mass and capacity informally",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.MD.A.2"
+   ],
+   "ee": [
+    "M.EE.K.MD.2"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Just Like Me! (Phase 2). (Reception Autumn.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|comparingnumbersto10",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Comparing numbers to 10",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.CC.C.6",
+    "K.CC.C.7"
+   ],
+   "ee": [
+    "M.EE.K.CC.7"
+   ],
+   "power": false,
+   "domain": "CC",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Building 9 and 10 (Phase 7). (Reception Spring.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|comparingnumbersto5",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Comparing numbers to 5",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.CC.C.7",
+    "1.NBT.B.3"
+   ],
+   "ee": [
+    "M.EE.1.NBT.3"
+   ],
+   "power": false,
+   "domain": "CC",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Alive in 5! (Phase 5). (Reception Spring.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|compositionof123partsmakethewhole",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Composition of 1, 2, 3 (parts make the whole)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.OA.A.3"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "CC",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From It's Me 1, 2, 3 (Phase 3). (Reception Autumn.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|compositionof4and5bonds",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Composition of 4 and 5 (bonds)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.OA.A.3"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "CC",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Alive in 5! (Phase 5). (Reception Spring.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|countingpatternsbeyond10teennumbers",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Counting patterns beyond 10 (teen numbers)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.CC.A.2",
+    "K.CC.B.4"
+   ],
+   "ee": [
+    "M.EE.K.CC.4"
+   ],
+   "power": false,
+   "domain": "CC",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From To 20 and Beyond (Phase 8). (Reception Summer.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|deepeningunderstandingconsolidate2d3dshapes",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Deepening understanding (consolidate 2D/3D shapes)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [],
+   "ee": [],
+   "power": false,
+   "domain": "G",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From On the Move (Phase 11). (Reception Summer.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|doublingupto55",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Doubling (up to 5+5)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.OA.A.3"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "OA",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Find My Pattern (Phase 10). (Reception Summer.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|explore2dshapescircletrianglerectanglesquare",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Explore 2D shapes (circle, triangle, rectangle, square)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.G.A.2"
+   ],
+   "ee": [
+    "M.EE.K.G.2"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Just Like Me! (Phase 2). (Reception Autumn.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|introducingzero",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Introducing zero",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.CC.A.3",
+    "K.CC.B.4"
+   ],
+   "ee": [
+    "M.EE.K.CC.4"
+   ],
+   "power": false,
+   "domain": "CC",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Alive in 5! (Phase 5). (Reception Spring.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|makingpairs",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Making pairs",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.CC.B.4"
+   ],
+   "ee": [
+    "M.EE.K.CC.4"
+   ],
+   "power": false,
+   "domain": "CC",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Growing 6, 7, 8 (Phase 6). (Reception Spring.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|onemoreandlesswithin5",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "One more and less within 5",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.CC.B.4"
+   ],
+   "ee": [
+    "M.EE.K.CC.4"
+   ],
+   "power": false,
+   "domain": "CC",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Light and Dark (Phase 4). (Reception Autumn.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|positionallanguage",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Positional language",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.G.A.1"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "CC",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From It's Me 1, 2, 3 (Phase 3). (Reception Autumn.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|positionallanguageonunderinnextto",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Positional language (on, under, in, next to)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.G.A.1"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "MD",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Getting to Know You (Phase 1). (Reception Autumn.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|representnumbersto5",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Represent numbers to 5",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "2.NBT.A.1"
+   ],
+   "ee": [
+    "M.EE.2.NBT.1"
+   ],
+   "power": false,
+   "domain": "CC",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Light and Dark (Phase 4). (Reception Autumn.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|shapeswith4sidessquaresandrectangles",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Shapes with 4 sides (squares and rectangles)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.G.B.6"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "CC",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Light and Dark (Phase 4). (Reception Autumn.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|sortobjectsbyoneattributecoloursizeshape",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Sort objects by one attribute (colour, size, shape)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.G.B.4"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "MD",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Just Like Me! (Phase 2). (Reception Autumn.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|spatialreasoning1matchrotatemanipulate",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Spatial reasoning (1) - match, rotate, manipulate",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.G.B.5"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "CC",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From To 20 and Beyond (Phase 8). (Reception Summer.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|spatialreasoning2composeanddecompose",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Spatial reasoning (2) - compose and decompose",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.G.B.5"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "OA",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From First Then Now (Phase 9). (Reception Summer.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|spatialreasoning3visualizebuild",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Spatial reasoning (3) - visualize, build",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.G.B.5"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "OA",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Find My Pattern (Phase 10). (Reception Summer.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|spatialreasoning4mappingdirection",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Spatial reasoning (4) - mapping, direction",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.G.B.5"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "G",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From On the Move (Phase 11). (Reception Summer.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "K|-|takingaway",
+   "grade": "K",
+   "usGrade": "K",
+   "wrmYear": "Y1",
+   "title": "Taking away",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.OA.A.2"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "OA",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From First Then Now (Phase 9). (Reception Summer.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "G1|-|solveonestepwordproblemswithin20usingbarmodels",
+   "grade": "G1",
+   "usGrade": "1",
+   "wrmYear": "Y2",
+   "title": "Solve one-step word problems within 20 using bar models",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "1.OA.A.1"
+   ],
+   "ee": [
+    "M.EE.1.OA.1"
+   ],
+   "power": true,
+   "domain": "OA",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "1",
+    "name": "Operations & Algebraic Thinking"
+   },
+   "block": null,
+   "firstWeek": "W03",
+   "weeks": [
+    "W03",
+    "W04"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G1|-|countonto120",
+   "grade": "G1",
+   "usGrade": "1",
+   "wrmYear": "Y2",
+   "title": "Count on to 120",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "1.NBT.A.1"
+   ],
+   "ee": [
+    "M.EE.1.NBT.1"
+   ],
+   "power": false,
+   "domain": "NBT",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "2",
+    "name": "Number & Operations in Base Ten"
+   },
+   "block": "Y2.B1",
+   "firstWeek": "W08",
+   "weeks": [
+    "W08",
+    "W09"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G1|-|composeandrecomposeshapes",
+   "grade": "G1",
+   "usGrade": "1",
+   "wrmYear": "Y2",
+   "title": "Compose and recompose shapes",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "1.G.A.2"
+   ],
+   "ee": [
+    "M.EE.1.G.2"
+   ],
+   "power": true,
+   "domain": "G",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "3",
+    "name": "Geometry"
+   },
+   "block": "Y2.B3",
+   "firstWeek": "W15",
+   "weeks": [
+    "W15",
+    "W16"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G1|-|bondsto10explorecombinationsthatmake10",
+   "grade": "G1",
+   "usGrade": "1",
+   "wrmYear": "Y2",
+   "title": "Bonds to 10 (explore combinations that make 10)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [],
+   "ee": [],
+   "power": false,
+   "domain": "OA",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From earlier work. (Prerequisite ladder.) Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "G1|-|comparemass1",
+   "grade": "G1",
+   "usGrade": "1",
+   "wrmYear": "Y2",
+   "title": "Compare mass (1)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [],
+   "ee": [],
+   "power": false,
+   "domain": "MD",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From earlier work. (Prerequisite ladder.) Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "G1|-|comparemass2",
+   "grade": "G1",
+   "usGrade": "1",
+   "wrmYear": "Y2",
+   "title": "Compare mass (2)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [],
+   "ee": [],
+   "power": false,
+   "domain": "MD",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From earlier work. (Prerequisite ladder.) Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "G1|-|countmoneynotesandcoinsusdollarscents",
+   "grade": "G1",
+   "usGrade": "1",
+   "wrmYear": "Y2",
+   "title": "Count money - notes and coins (US: dollars & cents)",
+   "flag": "above",
+   "supplement": false,
+   "ccss": [
+    "2.MD.C.8"
+   ],
+   "ee": [
+    "M.EE.2.MD.8"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": "Money",
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Above grade. Curriculum core title (site flag above) that matches no WRM step title of any grade; the pacing reviews it as Y2.B4.S2 (same block/step numbers, retitled)."
+  },
+  {
+   "id": "G1|-|doublingupto55",
+   "grade": "G1",
+   "usGrade": "1",
+   "wrmYear": "Y2",
+   "title": "Doubling (up to 5+5)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [],
+   "ee": [],
+   "power": false,
+   "domain": "OA",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From earlier work. (Prerequisite ladder.) Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "G1|-|findthetotalusdollarscents",
+   "grade": "G1",
+   "usGrade": "1",
+   "wrmYear": "Y2",
+   "title": "Find the total (US: dollars & cents)",
+   "flag": "above",
+   "supplement": false,
+   "ccss": [
+    "1.NBT.C.4",
+    "2.MD.C.8"
+   ],
+   "ee": [
+    "M.EE.1.NBT.4",
+    "M.EE.2.MD.8"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": "Money",
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Above grade. Auto-matched by keyword scan; verify. Curriculum core title (site flag above) that matches no WRM step title of any grade."
+  },
+  {
+   "id": "G1|-|lengthandheightcompareorder",
+   "grade": "G1",
+   "usGrade": "1",
+   "wrmYear": "Y2",
+   "title": "Length and height (compare, order)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "1.MD.A.1",
+    "2.MD.A.4"
+   ],
+   "ee": [
+    "M.EE.1.MD.1",
+    "M.EE.2.MD.4"
+   ],
+   "power": false,
+   "domain": "CC",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Growing 6, 7, 8 (Phase 6). (Reception Spring.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "G1|-|selectmoneyusdollarscents",
+   "grade": "G1",
+   "usGrade": "1",
+   "wrmYear": "Y2",
+   "title": "Select money (US: dollars & cents)",
+   "flag": "above",
+   "supplement": false,
+   "ccss": [
+    "2.MD.C.8"
+   ],
+   "ee": [
+    "M.EE.2.MD.8"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": "Money",
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Above grade. Curriculum core title (site flag above) that matches no WRM step title of any grade."
+  },
+  {
+   "id": "G2|-|readandwritenumbersto1000inwordsnumeralsandexpandedform",
+   "grade": "G2",
+   "usGrade": "2",
+   "wrmYear": "Y3",
+   "title": "Read and write numbers to 1,000 in words, numerals and expanded form",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "2.NBT.A.3"
+   ],
+   "ee": [
+    "M.EE.2.NBT.3"
+   ],
+   "power": true,
+   "domain": "NBT",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "1",
+    "name": "Number & Operations in Base Ten"
+   },
+   "block": null,
+   "firstWeek": "W02",
+   "weeks": [
+    "W02"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G2|-|adduptofourtwodigitnumbers",
+   "grade": "G2",
+   "usGrade": "2",
+   "wrmYear": "Y3",
+   "title": "Add up to four two-digit numbers",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "2.NBT.B.6"
+   ],
+   "ee": [
+    "M.EE.2.NBT.6"
+   ],
+   "power": false,
+   "domain": "NBT",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "1",
+    "name": "Number & Operations in Base Ten"
+   },
+   "block": "Y3.B2",
+   "firstWeek": "W09",
+   "weeks": [
+    "W09"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G2|-|solveonestepwordproblemsusingbarmodels",
+   "grade": "G2",
+   "usGrade": "2",
+   "wrmYear": "Y3",
+   "title": "Solve one-step word problems using bar models",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "2.OA.A.1"
+   ],
+   "ee": [],
+   "power": true,
+   "domain": "OA",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "1",
+    "name": "Number & Operations in Base Ten"
+   },
+   "block": "Y3.B2",
+   "firstWeek": "W09",
+   "weeks": [
+    "W09",
+    "W10"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G2|-|solvetwostepwordproblemsidentifyingbothoperations",
+   "grade": "G2",
+   "usGrade": "2",
+   "wrmYear": "Y3",
+   "title": "Solve two-step word problems identifying both operations",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "2.OA.A.1"
+   ],
+   "ee": [],
+   "power": true,
+   "domain": "OA",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "1",
+    "name": "Number & Operations in Base Ten"
+   },
+   "block": "Y3.B2",
+   "firstWeek": "W09",
+   "weeks": [
+    "W09",
+    "W10"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G2|-|oddandevennumbers",
+   "grade": "G2",
+   "usGrade": "2",
+   "wrmYear": "Y3",
+   "title": "Odd and even numbers",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "2.OA.C.3"
+   ],
+   "ee": [
+    "M.EE.2.OA.3"
+   ],
+   "power": true,
+   "domain": "OA",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "2",
+    "name": "Operations & Algebraic Thinking"
+   },
+   "block": "Y3.B3",
+   "firstWeek": "W12",
+   "weeks": [
+    "W12",
+    "W13"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G2|-|addandsubtractwithin100onanumberlinejumpsoftensandones",
+   "grade": "G2",
+   "usGrade": "2",
+   "wrmYear": "Y3",
+   "title": "Add and subtract within 100 on a number line (jumps of tens and ones)",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "2.MD.B.6",
+    "2.NBT.B.5"
+   ],
+   "ee": [
+    "M.EE.2.MD.6",
+    "M.EE.2.NBT.5"
+   ],
+   "power": true,
+   "domain": "MD",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "2",
+    "name": "Operations & Algebraic Thinking"
+   },
+   "block": null,
+   "firstWeek": "W13",
+   "weeks": [
+    "W13",
+    "W14"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G2|-|compareunitsinchesfeetyardsandcentimetres",
+   "grade": "G2",
+   "usGrade": "2",
+   "wrmYear": "Y3",
+   "title": "Compare units: inches, feet, yards and centimetres",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "2.MD.A.2",
+    "2.MD.A.3"
+   ],
+   "ee": [
+    "M.EE.2.MD.3"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "3",
+    "name": "Measurement & Data"
+   },
+   "block": null,
+   "firstWeek": "W17",
+   "weeks": [
+    "W17"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G2|-|measureandestimateininchesandfeet",
+   "grade": "G2",
+   "usGrade": "2",
+   "wrmYear": "Y3",
+   "title": "Measure and estimate in inches and feet",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "2.MD.A.3"
+   ],
+   "ee": [
+    "M.EE.2.MD.3"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "3",
+    "name": "Measurement & Data"
+   },
+   "block": "Y3.B5",
+   "firstWeek": "W17",
+   "weeks": [
+    "W17"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G2|-|measurelengthsofasetofobjectstothenearestwholeunit",
+   "grade": "G2",
+   "usGrade": "2",
+   "wrmYear": "Y3",
+   "title": "Measure lengths of a set of objects to the nearest whole unit",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "2.MD.D.9"
+   ],
+   "ee": [
+    "M.EE.2.MD.9"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "3",
+    "name": "Measurement & Data"
+   },
+   "block": "Y3.B5",
+   "firstWeek": "W17",
+   "weeks": [
+    "W17",
+    "W18"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G2|-|recordthemeasurementdatainatable",
+   "grade": "G2",
+   "usGrade": "2",
+   "wrmYear": "Y3",
+   "title": "Record the measurement data in a table",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "2.MD.D.9"
+   ],
+   "ee": [
+    "M.EE.2.MD.9"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "3",
+    "name": "Measurement & Data"
+   },
+   "block": "Y3.B5",
+   "firstWeek": "W17",
+   "weeks": [
+    "W17",
+    "W18"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G2|-|showmeasurementdataonalineplot",
+   "grade": "G2",
+   "usGrade": "2",
+   "wrmYear": "Y3",
+   "title": "Show measurement data on a line plot",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "2.MD.D.9"
+   ],
+   "ee": [
+    "M.EE.2.MD.9"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "3",
+    "name": "Measurement & Data"
+   },
+   "block": "Y3.B5",
+   "firstWeek": "W18",
+   "weeks": [
+    "W18"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G2|-|solvelongerbyproblemsusingbarmodels",
+   "grade": "G2",
+   "usGrade": "2",
+   "wrmYear": "Y3",
+   "title": "Solve 'longer by' problems using bar models",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "2.MD.B.5"
+   ],
+   "ee": [
+    "M.EE.2.MD.5"
+   ],
+   "power": true,
+   "domain": "MD",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "3",
+    "name": "Measurement & Data"
+   },
+   "block": "Y3.B5",
+   "firstWeek": "W18",
+   "weeks": [
+    "W18",
+    "W19"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G2|-|solveshorterbyproblemsusingbarmodels",
+   "grade": "G2",
+   "usGrade": "2",
+   "wrmYear": "Y3",
+   "title": "Solve 'shorter by' problems using bar models",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "2.MD.B.5"
+   ],
+   "ee": [
+    "M.EE.2.MD.5"
+   ],
+   "power": true,
+   "domain": "MD",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "3",
+    "name": "Measurement & Data"
+   },
+   "block": "Y3.B5",
+   "firstWeek": "W18",
+   "weeks": [
+    "W18",
+    "W19"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G2|-|partitionarectangleintorowsandcolumnsofsquares",
+   "grade": "G2",
+   "usGrade": "2",
+   "wrmYear": "Y3",
+   "title": "Partition a rectangle into rows and columns of squares",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "2.G.A.2"
+   ],
+   "ee": [],
+   "power": true,
+   "domain": "G",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "4",
+    "name": "Geometry"
+   },
+   "block": null,
+   "firstWeek": "W26",
+   "weeks": [
+    "W26"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G2|-|comparecapacity1",
+   "grade": "G2",
+   "usGrade": "2",
+   "wrmYear": "Y3",
+   "title": "Compare capacity (1)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [],
+   "ee": [],
+   "power": false,
+   "domain": "MD",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From earlier work. (Prerequisite ladder.) Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "G2|-|comparemass1",
+   "grade": "G2",
+   "usGrade": "2",
+   "wrmYear": "Y3",
+   "title": "Compare mass (1)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [],
+   "ee": [],
+   "power": false,
+   "domain": "MD",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From earlier work. (Prerequisite ladder.) Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "G2|-|comparemass2",
+   "grade": "G2",
+   "usGrade": "2",
+   "wrmYear": "Y3",
+   "title": "Compare mass (2)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [],
+   "ee": [],
+   "power": false,
+   "domain": "MD",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From earlier work. (Prerequisite ladder.) Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "G2|-|comparesizemassandcapacityinformally",
+   "grade": "G2",
+   "usGrade": "2",
+   "wrmYear": "Y3",
+   "title": "Compare size, mass and capacity informally",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [],
+   "ee": [],
+   "power": false,
+   "domain": "MD",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From earlier work. (Prerequisite ladder.) Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "G2|-|countmoneynotesandcoins",
+   "grade": "G2",
+   "usGrade": "2",
+   "wrmYear": "Y3",
+   "title": "Count money - notes and coins",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "2.MD.C.8"
+   ],
+   "ee": [
+    "M.EE.2.MD.8"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: G1.. From Money. (Y2 Spring.). Support title that matches no WRM step of G1."
+  },
+  {
+   "id": "G2|-|evenandoddfairnotfairshares",
+   "grade": "G2",
+   "usGrade": "2",
+   "wrmYear": "Y3",
+   "title": "Even and odd (fair/not fair shares)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "2.OA.C.3"
+   ],
+   "ee": [
+    "M.EE.2.OA.3"
+   ],
+   "power": false,
+   "domain": "OA",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Find My Pattern (Phase 10). (Reception Summer.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "G2|-|findthetotal",
+   "grade": "G2",
+   "usGrade": "2",
+   "wrmYear": "Y3",
+   "title": "Find the total",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "1.NBT.C.4",
+    "2.MD.C.8"
+   ],
+   "ee": [
+    "M.EE.1.NBT.4",
+    "M.EE.2.MD.8"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: G1.. From Money. (Y2 Spring.). Auto-matched by keyword scan; verify. Support title that matches no WRM step of G1."
+  },
+  {
+   "id": "G2|-|groupequally",
+   "grade": "G2",
+   "usGrade": "2",
+   "wrmYear": "Y3",
+   "title": "Group equally",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "3.OA.A.2"
+   ],
+   "ee": [
+    "M.EE.3.OA.2"
+   ],
+   "power": false,
+   "domain": "OA",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: G1.. From Multiplication and Division. (Y2 Spring.). Support title that matches no WRM step of G1."
+  },
+  {
+   "id": "G2|-|recordresultsusingtallymarksorasimplepicturegraph",
+   "grade": "G2",
+   "usGrade": "2",
+   "wrmYear": "Y3",
+   "title": "Record results using tally marks or a simple picture graph",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "2.MD.D.10"
+   ],
+   "ee": [
+    "M.EE.2.MD.10"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GK.. From Classify & Count Objects by Attribute. (Committee-authored). Support title that matches no WRM step of K."
+  },
+  {
+   "id": "G2|-|selectmoney",
+   "grade": "G2",
+   "usGrade": "2",
+   "wrmYear": "Y3",
+   "title": "Select money",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "2.MD.C.8"
+   ],
+   "ee": [
+    "M.EE.2.MD.8"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: G1.. From Money. (Y2 Spring.). Support title that matches no WRM step of G1."
+  },
+  {
+   "id": "G2|-|shareequally",
+   "grade": "G2",
+   "usGrade": "2",
+   "wrmYear": "Y3",
+   "title": "Share equally",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "3.OA.A.2"
+   ],
+   "ee": [
+    "M.EE.3.OA.2"
+   ],
+   "power": false,
+   "domain": "OA",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: G1.. From Multiplication and Division. (Y2 Spring.). Support title that matches no WRM step of G1."
+  },
+  {
+   "id": "G3|-|findtheruleinaninputoutputtable",
+   "grade": "G3",
+   "usGrade": "3",
+   "wrmYear": "Y4",
+   "title": "Find the rule in an input-output table",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "3.OA.D.9"
+   ],
+   "ee": [
+    "M.EE.3.OA.8"
+   ],
+   "power": false,
+   "domain": "OA",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "1",
+    "name": "Operations & Algebraic Thinking"
+   },
+   "block": null,
+   "firstWeek": "W05",
+   "weeks": [
+    "W05",
+    "W06",
+    "W07"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G3|-|patternsonthemultiplicationtable",
+   "grade": "G3",
+   "usGrade": "3",
+   "wrmYear": "Y4",
+   "title": "Patterns on the multiplication table",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "3.OA.C.7",
+    "3.OA.D.9"
+   ],
+   "ee": [
+    "M.EE.3.OA.6",
+    "M.EE.3.OA.8"
+   ],
+   "power": true,
+   "domain": "OA",
+   "unit": "Multiplication and Division A",
+   "paceUnit": {
+    "key": "1",
+    "name": "Operations & Algebraic Thinking"
+   },
+   "block": "Y4.B4",
+   "firstWeek": "W05",
+   "weeks": [
+    "W05",
+    "W06"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G3|-|propertiesofmultiplicationcommutativeidentityanddistributive",
+   "grade": "G3",
+   "usGrade": "3",
+   "wrmYear": "Y4",
+   "title": "Properties of multiplication: commutative, identity and distributive",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "3.OA.B.5"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "OA",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "1",
+    "name": "Operations & Algebraic Thinking"
+   },
+   "block": null,
+   "firstWeek": "W05",
+   "weeks": [
+    "W05",
+    "W06"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G3|-|twostepwordproblemswiththefouroperations",
+   "grade": "G3",
+   "usGrade": "3",
+   "wrmYear": "Y4",
+   "title": "Two-step word problems with the four operations",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "3.OA.D.8"
+   ],
+   "ee": [
+    "M.EE.3.OA.7"
+   ],
+   "power": false,
+   "domain": "OA",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "1",
+    "name": "Operations & Algebraic Thinking"
+   },
+   "block": "Y4.B4",
+   "firstWeek": "W06",
+   "weeks": [
+    "W06",
+    "W07"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G3|-|partitionshapesintoequalareas",
+   "grade": "G3",
+   "usGrade": "3",
+   "wrmYear": "Y4",
+   "title": "Partition shapes into equal areas",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "3.G.A.2"
+   ],
+   "ee": [
+    "M.EE.3.G.2"
+   ],
+   "power": true,
+   "domain": "MD",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "1",
+    "name": "Operations & Algebraic Thinking"
+   },
+   "block": "Y4.B7",
+   "firstWeek": "W07",
+   "weeks": [
+    "W07"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G3|-|solveadditionandsubtractionwordproblemswithin1000usingbarmodels",
+   "grade": "G3",
+   "usGrade": "3",
+   "wrmYear": "Y4",
+   "title": "Solve addition and subtraction word problems within 1,000 using bar models",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "3.NBT.A.2",
+    "3.OA.D.8"
+   ],
+   "ee": [
+    "M.EE.3.NBT.2",
+    "M.EE.3.OA.7"
+   ],
+   "power": false,
+   "domain": "NBT",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "3",
+    "name": "Number & Operations in Base Ten"
+   },
+   "block": null,
+   "firstWeek": "W17",
+   "weeks": [
+    "W17"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G3|-|areaasmultiplication",
+   "grade": "G3",
+   "usGrade": "3",
+   "wrmYear": "Y4",
+   "title": "Area as multiplication",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "3.MD.C.7",
+    "3.MD.C.7a",
+    "3.MD.C.7b"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "MD",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "4",
+    "name": "Measurement & Data"
+   },
+   "block": "Y4.B3",
+   "firstWeek": "W20",
+   "weeks": [
+    "W20"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G3|-|distributiveandadditivearea",
+   "grade": "G3",
+   "usGrade": "3",
+   "wrmYear": "Y4",
+   "title": "Distributive and additive area",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "3.MD.C.7",
+    "3.MD.C.7c",
+    "3.MD.C.7d"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "MD",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "4",
+    "name": "Measurement & Data"
+   },
+   "block": "Y4.B3",
+   "firstWeek": "W20",
+   "weeks": [
+    "W20",
+    "W21"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G3|-|measureandestimatemassandliquidvolumegkgmll",
+   "grade": "G3",
+   "usGrade": "3",
+   "wrmYear": "Y4",
+   "title": "Measure and estimate mass and liquid volume (g, kg, ml, l)",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "3.MD.A.2"
+   ],
+   "ee": [
+    "M.EE.3.MD.2"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "4",
+    "name": "Measurement & Data"
+   },
+   "block": "Y4.B6",
+   "firstWeek": "W22",
+   "weeks": [
+    "W22",
+    "W23"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G3|-|measuretothehalfandquarterinch",
+   "grade": "G3",
+   "usGrade": "3",
+   "wrmYear": "Y4",
+   "title": "Measure to the half and quarter inch",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "3.MD.B.4"
+   ],
+   "ee": [
+    "M.EE.3.MD.4"
+   ],
+   "power": true,
+   "domain": "MD",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "4",
+    "name": "Measurement & Data"
+   },
+   "block": "Y4.B13",
+   "firstWeek": "W27",
+   "weeks": [
+    "W27",
+    "W28"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G3|-|buildalineplotfrominchmeasurements",
+   "grade": "G3",
+   "usGrade": "3",
+   "wrmYear": "Y4",
+   "title": "Build a line plot from inch measurements",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "3.MD.B.4"
+   ],
+   "ee": [
+    "M.EE.3.MD.4"
+   ],
+   "power": true,
+   "domain": "MD",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "4",
+    "name": "Measurement & Data"
+   },
+   "block": "Y4.B13",
+   "firstWeek": "W28",
+   "weeks": [
+    "W28"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G3|-|compareamountsmorefewersame",
+   "grade": "G3",
+   "usGrade": "3",
+   "wrmYear": "Y4",
+   "title": "Compare amounts (more, fewer, same)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [],
+   "ee": [],
+   "power": false,
+   "domain": "MD",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From earlier work. (Prerequisite ladder.) Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "G3|-|comparedurationsoftime",
+   "grade": "G3",
+   "usGrade": "3",
+   "wrmYear": "Y4",
+   "title": "Compare durations of time",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "3.MD.A.1"
+   ],
+   "ee": [
+    "M.EE.3.MD.1"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: G1.. From Time. (Y2 Summer.). Support title that matches no WRM step of G1."
+  },
+  {
+   "id": "G3|-|comparingmultiplicationstatements",
+   "grade": "G3",
+   "usGrade": "3",
+   "wrmYear": "Y4",
+   "title": "Comparing multiplication statements",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "3.OA.B.5",
+    "3.OA.C.7"
+   ],
+   "ee": [
+    "M.EE.3.OA.6"
+   ],
+   "power": false,
+   "domain": "OA",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: G2.. From Multiplication and Division B. (Y3 Spring.). Support title that matches no WRM step of G2."
+  },
+  {
+   "id": "G3|-|countmoneynotesandcoins",
+   "grade": "G3",
+   "usGrade": "3",
+   "wrmYear": "Y4",
+   "title": "Count money - notes and coins",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [],
+   "ee": [],
+   "power": false,
+   "domain": "MD",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: G1.. From earlier work. (Prerequisite ladder.) Support title that matches no WRM step of G1."
+  },
+  {
+   "id": "G3|-|doublesandneardoubleswithin20",
+   "grade": "G3",
+   "usGrade": "3",
+   "wrmYear": "Y4",
+   "title": "Doubles and near-doubles within 20",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "2.OA.B.2"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "OA",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: G2.. From Mental Fluency: Add and Subtract within 20. (Committee-authored). Support title that matches no WRM step of G2."
+  },
+  {
+   "id": "G3|-|finddurationsoftime",
+   "grade": "G3",
+   "usGrade": "3",
+   "wrmYear": "Y4",
+   "title": "Find durations of time",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "3.MD.A.1"
+   ],
+   "ee": [
+    "M.EE.3.MD.1"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: G1.. From Time. (Y2 Summer.). Support title that matches no WRM step of G1."
+  },
+  {
+   "id": "G3|-|introducecapacityandvolume",
+   "grade": "G3",
+   "usGrade": "3",
+   "wrmYear": "Y4",
+   "title": "Introduce capacity and volume",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.MD.A.1",
+    "K.MD.A.2"
+   ],
+   "ee": [
+    "M.EE.K.MD.1",
+    "M.EE.K.MD.2"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GK.. From Mass and Volume. (Y1 Spring.). Support title that matches no WRM step of K."
+  },
+  {
+   "id": "G3|-|introduceweightandmass",
+   "grade": "G3",
+   "usGrade": "3",
+   "wrmYear": "Y4",
+   "title": "Introduce weight and mass",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "K.MD.A.1",
+    "K.MD.A.2"
+   ],
+   "ee": [
+    "M.EE.K.MD.1",
+    "M.EE.K.MD.2"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GK.. From Mass and Volume. (Y1 Spring.). Support title that matches no WRM step of K."
+  },
+  {
+   "id": "G3|-|orderfractions",
+   "grade": "G3",
+   "usGrade": "3",
+   "wrmYear": "Y4",
+   "title": "Order fractions",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "3.NF.A.3d"
+   ],
+   "ee": [
+    "M.EE.3.NF.3"
+   ],
+   "power": false,
+   "domain": "NF",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: G2.. From Fractions B. (Y3 Summer.). Support title that matches no WRM step of G2."
+  },
+  {
+   "id": "G3|-|poundstensonesandpenceusdollarscents",
+   "grade": "G3",
+   "usGrade": "3",
+   "wrmYear": "Y4",
+   "title": "Pounds, tens, ones and pence (US: dollars & cents)",
+   "flag": "native",
+   "supplement": false,
+   "ccss": [
+    "2.MD.C.8"
+   ],
+   "ee": [
+    "M.EE.2.MD.8"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": "Money",
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Curriculum core title (site flag native) that matches no WRM step title of any grade; the pacing reviews it as Y4.B10.S1 (same block/step numbers, retitled)."
+  },
+  {
+   "id": "G3|-|selectmoney",
+   "grade": "G3",
+   "usGrade": "3",
+   "wrmYear": "Y4",
+   "title": "Select money",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [],
+   "ee": [],
+   "power": false,
+   "domain": "MD",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: G1.. From earlier work. (Prerequisite ladder.) Support title that matches no WRM step of G1."
+  },
+  {
+   "id": "G3|-|sharingandgroupingfairshares",
+   "grade": "G3",
+   "usGrade": "3",
+   "wrmYear": "Y4",
+   "title": "Sharing and grouping (fair shares)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "3.OA.A.2"
+   ],
+   "ee": [
+    "M.EE.3.OA.2"
+   ],
+   "power": false,
+   "domain": "OA",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From Find My Pattern (Phase 10). (Reception Summer.). Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "G4|-|placevalue10timesandonetenthofadigitsvalue",
+   "grade": "G4",
+   "usGrade": "4",
+   "wrmYear": "Y5",
+   "title": "Place value: 10 times and one tenth of a digit's value",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "4.NBT.A.1",
+    "5.NBT.A.1"
+   ],
+   "ee": [
+    "M.EE.5.NBT.1"
+   ],
+   "power": true,
+   "domain": "NBT",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "1",
+    "name": "Number & Operations in Base Ten"
+   },
+   "block": null,
+   "firstWeek": "W05",
+   "weeks": [
+    "W05",
+    "W06"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G4|-|multiplyanddividemultiplesof10usingbasicfactseg90x5030030",
+   "grade": "G4",
+   "usGrade": "4",
+   "wrmYear": "Y5",
+   "title": "Multiply and divide multiples of 10 using basic facts (e.g., 90 x 50, 300 ÷ 30)",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "4.NBT.A.1",
+    "4.NBT.B.5",
+    "4.NBT.B.6"
+   ],
+   "ee": [],
+   "power": true,
+   "domain": "NBT",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "1",
+    "name": "Number & Operations in Base Ten"
+   },
+   "block": null,
+   "firstWeek": "W06",
+   "weeks": [
+    "W06",
+    "W07"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G4|-|extendgrowingshapepatterns",
+   "grade": "G4",
+   "usGrade": "4",
+   "wrmYear": "Y5",
+   "title": "Extend growing shape patterns",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "4.OA.C.5"
+   ],
+   "ee": [
+    "M.EE.4.OA.5"
+   ],
+   "power": false,
+   "domain": "OA",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "2",
+    "name": "Operations & Algebraic Thinking"
+   },
+   "block": null,
+   "firstWeek": "W09",
+   "weeks": [
+    "W09",
+    "W10"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G4|-|findemergentfeaturesegunitsdigitcycle",
+   "grade": "G4",
+   "usGrade": "4",
+   "wrmYear": "Y5",
+   "title": "Find emergent features (e.g., units digit cycle)",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "4.OA.C.5"
+   ],
+   "ee": [
+    "M.EE.4.OA.5"
+   ],
+   "power": false,
+   "domain": "OA",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "2",
+    "name": "Operations & Algebraic Thinking"
+   },
+   "block": "Y5.B3",
+   "firstWeek": "W09",
+   "weeks": [
+    "W09"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G4|-|followagivenruletoextendanumberpattern",
+   "grade": "G4",
+   "usGrade": "4",
+   "wrmYear": "Y5",
+   "title": "Follow a given rule to extend a number pattern",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "4.OA.C.5"
+   ],
+   "ee": [
+    "M.EE.4.OA.5"
+   ],
+   "power": false,
+   "domain": "OA",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "2",
+    "name": "Operations & Algebraic Thinking"
+   },
+   "block": "Y5.B3",
+   "firstWeek": "W09",
+   "weeks": [
+    "W09"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G4|-|multiplicativecomparisontimesasmany",
+   "grade": "G4",
+   "usGrade": "4",
+   "wrmYear": "Y5",
+   "title": "Multiplicative comparison: times as many",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "4.OA.A.1"
+   ],
+   "ee": [
+    "M.EE.4.OA.1"
+   ],
+   "power": true,
+   "domain": "OA",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "2",
+    "name": "Operations & Algebraic Thinking"
+   },
+   "block": "Y5.B3",
+   "firstWeek": "W10",
+   "weeks": [
+    "W10"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G4|-|multiplicativecomparisonwordproblemshowmanytimesasmanyunknownmultiplier",
+   "grade": "G4",
+   "usGrade": "4",
+   "wrmYear": "Y5",
+   "title": "Multiplicative comparison word problems: how many times as many? (unknown multiplier)",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "4.OA.A.2"
+   ],
+   "ee": [
+    "M.EE.4.OA.2"
+   ],
+   "power": false,
+   "domain": "OA",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "2",
+    "name": "Operations & Algebraic Thinking"
+   },
+   "block": null,
+   "firstWeek": "W10",
+   "weeks": [
+    "W10"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G4|-|multistepwordproblemsdivideandinterprettheremainder",
+   "grade": "G4",
+   "usGrade": "4",
+   "wrmYear": "Y5",
+   "title": "Multi-step word problems: divide and interpret the remainder",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "4.OA.A.3",
+    "5.NBT.B.6"
+   ],
+   "ee": [
+    "M.EE.4.OA.3",
+    "M.EE.5.NBT.6"
+   ],
+   "power": true,
+   "domain": "OA",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "2",
+    "name": "Operations & Algebraic Thinking"
+   },
+   "block": null,
+   "firstWeek": "W11",
+   "weeks": [
+    "W11"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G4|-|decomposeafractionintoasumoffractionsequationsanddrawings",
+   "grade": "G4",
+   "usGrade": "4",
+   "wrmYear": "Y5",
+   "title": "Decompose a fraction into a sum of fractions (equations and drawings)",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "4.NF.B.3"
+   ],
+   "ee": [
+    "M.EE.4.NF.3"
+   ],
+   "power": true,
+   "domain": "NF",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "3",
+    "name": "Number & Operations: Fractions"
+   },
+   "block": null,
+   "firstWeek": "W13",
+   "weeks": [
+    "W13"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G4|-|addtenthsandhundredthsrenametenthsashundredths",
+   "grade": "G4",
+   "usGrade": "4",
+   "wrmYear": "Y5",
+   "title": "Add tenths and hundredths (rename tenths as hundredths)",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "4.NF.C.5"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "NF",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "3",
+    "name": "Number & Operations: Fractions"
+   },
+   "block": null,
+   "firstWeek": "W18",
+   "weeks": [
+    "W18",
+    "W19"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G4|-|pointslineslinesegmentsandrays",
+   "grade": "G4",
+   "usGrade": "4",
+   "wrmYear": "Y5",
+   "title": "Points, lines, line segments and rays",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "4.G.A.1"
+   ],
+   "ee": [
+    "M.EE.4.G.1"
+   ],
+   "power": true,
+   "domain": "G",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "3",
+    "name": "Number & Operations: Fractions"
+   },
+   "block": null,
+   "firstWeek": "W21",
+   "weeks": [
+    "W21"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G4|-|anglesareadditivefindanunknownangleinadecomposedangle",
+   "grade": "G4",
+   "usGrade": "4",
+   "wrmYear": "Y5",
+   "title": "Angles are additive: find an unknown angle in a decomposed angle",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "4.MD.C.7"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "MD",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "5",
+    "name": "Measurement & Data"
+   },
+   "block": null,
+   "firstWeek": "W28",
+   "weeks": [
+    "W28"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G4|-|lineplotswithfractions",
+   "grade": "G4",
+   "usGrade": "4",
+   "wrmYear": "Y5",
+   "title": "Line plots with fractions",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "4.MD.B.4"
+   ],
+   "ee": [
+    "M.EE.4.MD.4"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "5",
+    "name": "Measurement & Data"
+   },
+   "block": "Y5.B9",
+   "firstWeek": "W28",
+   "weeks": [
+    "W28"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G4|-|customarycapacitycupspintsquartsandgallons",
+   "grade": "G4",
+   "usGrade": "4",
+   "wrmYear": "Y5",
+   "title": "Customary capacity: cups, pints, quarts and gallons",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "4.MD.A.1"
+   ],
+   "ee": [
+    "M.EE.4.MD.1"
+   ],
+   "power": true,
+   "domain": "MD",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "5",
+    "name": "Measurement & Data"
+   },
+   "block": "Y5.B14",
+   "firstWeek": "W30",
+   "weeks": [
+    "W30",
+    "W31"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G4|-|customarylengthandweightinchesfeetyardsouncesandpounds",
+   "grade": "G4",
+   "usGrade": "4",
+   "wrmYear": "Y5",
+   "title": "Customary length and weight - inches, feet, yards, ounces and pounds",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "4.MD.A.1"
+   ],
+   "ee": [
+    "M.EE.4.MD.1"
+   ],
+   "power": true,
+   "domain": "MD",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "5",
+    "name": "Measurement & Data"
+   },
+   "block": "Y5.B14",
+   "firstWeek": "W31",
+   "weeks": [
+    "W31"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G4|-|measurementwordproblemsdistancetimemassmoneyandcapacity",
+   "grade": "G4",
+   "usGrade": "4",
+   "wrmYear": "Y5",
+   "title": "Measurement word problems: distance, time, mass, money and capacity",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "4.MD.A.2"
+   ],
+   "ee": [
+    "M.EE.4.MD.2"
+   ],
+   "power": true,
+   "domain": "MD",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "5",
+    "name": "Measurement & Data"
+   },
+   "block": "Y5.B14",
+   "firstWeek": "W31",
+   "weeks": [
+    "W31",
+    "W32"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G4|-|3dshapescubecuboidsphereconecylinder",
+   "grade": "G4",
+   "usGrade": "4",
+   "wrmYear": "Y5",
+   "title": "3D shapes (cube, cuboid, sphere, cone, cylinder)",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [],
+   "ee": [],
+   "power": false,
+   "domain": "MD",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: GPK.. From earlier work. (Prerequisite ladder.) Support title that matches no WRM step of PK."
+  },
+  {
+   "id": "G4|-|comparefractions",
+   "grade": "G4",
+   "usGrade": "4",
+   "wrmYear": "Y5",
+   "title": "Compare fractions",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "3.NF.A.3d"
+   ],
+   "ee": [
+    "M.EE.3.NF.3"
+   ],
+   "power": false,
+   "domain": "NF",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: G2.. From Fractions B. (Y3 Summer.). Support title that matches no WRM step of G2."
+  },
+  {
+   "id": "G4|-|dividea1digitnumberby100",
+   "grade": "G4",
+   "usGrade": "4",
+   "wrmYear": "Y5",
+   "title": "Divide a 1-digit number by 100",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "4.NF.C.6",
+    "5.NBT.A.2"
+   ],
+   "ee": [
+    "M.EE.5.NBT.2"
+   ],
+   "power": false,
+   "domain": "NF",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: G3.. From Decimals A. (Y4 Spring.). Support title that matches no WRM step of G3."
+  },
+  {
+   "id": "G4|-|hundredths",
+   "grade": "G4",
+   "usGrade": "4",
+   "wrmYear": "Y5",
+   "title": "Hundredths",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "3.NF.A.1",
+    "4.NF.C.5"
+   ],
+   "ee": [
+    "M.EE.3.NF.1"
+   ],
+   "power": false,
+   "domain": "NF",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: G3.. From Decimals A. (Y4 Spring.). Support title that matches no WRM step of G3."
+  },
+  {
+   "id": "G4|-|orderfractions",
+   "grade": "G4",
+   "usGrade": "4",
+   "wrmYear": "Y5",
+   "title": "Order fractions",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [],
+   "ee": [],
+   "power": false,
+   "domain": "NF",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: G2.. From earlier work. (Prerequisite ladder.) Support title that matches no WRM step of G2."
+  },
+  {
+   "id": "G5|-|comparedigitvaluesadigitisworth10timestheplacetoitsrightand110oftheplacetoitsleft",
+   "grade": "G5",
+   "usGrade": "5",
+   "wrmYear": "Y6",
+   "title": "Compare digit values: a digit is worth 10 times the place to its right and 1/10 of the place to its left",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "5.NBT.A.1"
+   ],
+   "ee": [
+    "M.EE.5.NBT.1"
+   ],
+   "power": true,
+   "domain": "NBT",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "1",
+    "name": "Number & Operations in Base Ten"
+   },
+   "block": null,
+   "firstWeek": "W06",
+   "weeks": [
+    "W06"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G5|-|readandwritedecimalstothousandthsinwordformandexpandedform",
+   "grade": "G5",
+   "usGrade": "5",
+   "wrmYear": "Y6",
+   "title": "Read and write decimals to thousandths in word form and expanded form",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "5.NBT.A.3a"
+   ],
+   "ee": [
+    "M.EE.5.NBT.3"
+   ],
+   "power": false,
+   "domain": "NBT",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "1",
+    "name": "Number & Operations in Base Ten"
+   },
+   "block": null,
+   "firstWeek": "W06",
+   "weeks": [
+    "W06"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G5|-|multiplyanddividedecimalsbypowersof10writtenwithexponents101102103andexplainthepattern",
+   "grade": "G5",
+   "usGrade": "5",
+   "wrmYear": "Y6",
+   "title": "Multiply and divide decimals by powers of 10 written with exponents (10^1, 10^2, 10^3) and explain the pattern",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "5.NBT.A.2"
+   ],
+   "ee": [
+    "M.EE.5.NBT.2"
+   ],
+   "power": true,
+   "domain": "NBT",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "1",
+    "name": "Number & Operations in Base Ten"
+   },
+   "block": null,
+   "firstWeek": "W07",
+   "weeks": [
+    "W07",
+    "W08"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G5|-|dividebyadecimal",
+   "grade": "G5",
+   "usGrade": "5",
+   "wrmYear": "Y6",
+   "title": "Divide by a decimal",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "5.NBT.B.7"
+   ],
+   "ee": [
+    "M.EE.5.NBT.7"
+   ],
+   "power": true,
+   "domain": "NBT",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "1",
+    "name": "Number & Operations in Base Ten"
+   },
+   "block": null,
+   "firstWeek": "W08",
+   "weeks": [
+    "W08",
+    "W09"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G5|-|multiplydecimalsbydecimals",
+   "grade": "G5",
+   "usGrade": "5",
+   "wrmYear": "Y6",
+   "title": "Multiply decimals by decimals",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "5.NBT.B.7"
+   ],
+   "ee": [
+    "M.EE.5.NBT.7"
+   ],
+   "power": true,
+   "domain": "NBT",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "1",
+    "name": "Number & Operations in Base Ten"
+   },
+   "block": null,
+   "firstWeek": "W08",
+   "weeks": [
+    "W08",
+    "W09"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G5|-|evaluateexpressionswithparenthesesbracketsandbraces",
+   "grade": "G5",
+   "usGrade": "5",
+   "wrmYear": "Y6",
+   "title": "Evaluate expressions with parentheses, brackets and braces",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "5.OA.A.1"
+   ],
+   "ee": [],
+   "power": true,
+   "domain": "OA",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "2",
+    "name": "Operations & Algebraic Thinking"
+   },
+   "block": null,
+   "firstWeek": "W11",
+   "weeks": [
+    "W11"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G5|-|writeandinterpretnumericalexpressionswordstoexpressionsexpressionstowords",
+   "grade": "G5",
+   "usGrade": "5",
+   "wrmYear": "Y6",
+   "title": "Write and interpret numerical expressions (words to expressions, expressions to words)",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "5.OA.A.2"
+   ],
+   "ee": [],
+   "power": true,
+   "domain": "OA",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "2",
+    "name": "Operations & Algebraic Thinking"
+   },
+   "block": null,
+   "firstWeek": "W11",
+   "weeks": [
+    "W11"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G5|-|formorderedpairsfromcorrespondingterms",
+   "grade": "G5",
+   "usGrade": "5",
+   "wrmYear": "Y6",
+   "title": "Form ordered pairs from corresponding terms",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "5.OA.B.3"
+   ],
+   "ee": [
+    "M.EE.5.OA.3"
+   ],
+   "power": true,
+   "domain": "OA",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "2",
+    "name": "Operations & Algebraic Thinking"
+   },
+   "block": "Y6.B7",
+   "firstWeek": "W13",
+   "weeks": [
+    "W13"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G5|-|generatetwosequencesusingtwodifferentrules",
+   "grade": "G5",
+   "usGrade": "5",
+   "wrmYear": "Y6",
+   "title": "Generate two sequences using two different rules",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "5.OA.B.3"
+   ],
+   "ee": [
+    "M.EE.5.OA.3"
+   ],
+   "power": true,
+   "domain": "OA",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "2",
+    "name": "Operations & Algebraic Thinking"
+   },
+   "block": "Y6.B7",
+   "firstWeek": "W13",
+   "weeks": [
+    "W13"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G5|-|multiplicationasscaling",
+   "grade": "G5",
+   "usGrade": "5",
+   "wrmYear": "Y6",
+   "title": "Multiplication as scaling",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "5.NF.B.5",
+    "5.NF.B.5a",
+    "5.NF.B.5b"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "NF",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "3",
+    "name": "Number & Operations: Fractions"
+   },
+   "block": "Y6.B3",
+   "firstWeek": "W16",
+   "weeks": [
+    "W16",
+    "W17"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G5|-|findtheareaofarectanglewithfractionalsidelengths",
+   "grade": "G5",
+   "usGrade": "5",
+   "wrmYear": "Y6",
+   "title": "Find the area of a rectangle with fractional side lengths",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "5.NF.B.4b"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "NF",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "3",
+    "name": "Number & Operations: Fractions"
+   },
+   "block": null,
+   "firstWeek": "W17",
+   "weeks": [
+    "W17"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G5|-|divideawholenumberbyaunitfraction",
+   "grade": "G5",
+   "usGrade": "5",
+   "wrmYear": "Y6",
+   "title": "Divide a whole number by a unit fraction",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "5.NF.B.7",
+    "5.NF.B.7b",
+    "5.NF.B.7c"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "NF",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "3",
+    "name": "Number & Operations: Fractions"
+   },
+   "block": "Y6.B4",
+   "firstWeek": "W18",
+   "weeks": [
+    "W18",
+    "W19"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G5|-|convertcustomaryunitsoflengthinchesfeetyardsmiles",
+   "grade": "G5",
+   "usGrade": "5",
+   "wrmYear": "Y6",
+   "title": "Convert customary units of length (inches, feet, yards, miles)",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "5.MD.A.1"
+   ],
+   "ee": [
+    "M.EE.5.MD.1"
+   ],
+   "power": true,
+   "domain": "MD",
+   "unit": "Awsaj supplement lessons (domain tests)",
+   "paceUnit": {
+    "key": "4",
+    "name": "Measurement & Data"
+   },
+   "block": null,
+   "firstWeek": "W21",
+   "weeks": [
+    "W21"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "New CCSS BUILD lesson so the domain test only asks what has been taught. Still to be made."
+  },
+  {
+   "id": "G5|-|volumeofcompositesolids",
+   "grade": "G5",
+   "usGrade": "5",
+   "wrmYear": "Y6",
+   "title": "Volume of composite solids",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "5.MD.C.5",
+    "5.MD.C.5c"
+   ],
+   "ee": [
+    "M.EE.5.MD.5"
+   ],
+   "power": true,
+   "domain": "MD",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "4",
+    "name": "Measurement & Data"
+   },
+   "block": "Y6.B10",
+   "firstWeek": "W24",
+   "weeks": [
+    "W24",
+    "W25"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G5|-|fractionlineplots",
+   "grade": "G5",
+   "usGrade": "5",
+   "wrmYear": "Y6",
+   "title": "Fraction line plots",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "5.MD.B.2"
+   ],
+   "ee": [
+    "M.EE.5.MD.2"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "4",
+    "name": "Measurement & Data"
+   },
+   "block": "Y6.B11",
+   "firstWeek": "W25",
+   "weeks": [
+    "W25",
+    "W26"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G5|-|classifytwodimensionalfiguresinahierarchy",
+   "grade": "G5",
+   "usGrade": "5",
+   "wrmYear": "Y6",
+   "title": "Classify two-dimensional figures in a hierarchy",
+   "flag": "committee",
+   "supplement": true,
+   "ccss": [
+    "5.G.B.3",
+    "5.G.B.4"
+   ],
+   "ee": [
+    "M.EE.5.G.3",
+    "M.EE.5.G.4"
+   ],
+   "power": true,
+   "domain": "G",
+   "unit": "Awsaj supplement lessons",
+   "paceUnit": {
+    "key": "5",
+    "name": "Geometry"
+   },
+   "block": "Y6.B12",
+   "firstWeek": "W29",
+   "weeks": [
+    "W29"
+   ],
+   "tracks": [
+    "intervention",
+    "priority",
+    "standard"
+   ],
+   "note": "Awsaj-authored lesson · closes a Common Core standard White Rose does not teach. Materials need to be made."
+  },
+  {
+   "id": "G5|-|consolidationofarithmetic",
+   "grade": "G5",
+   "usGrade": "5",
+   "wrmYear": "Y6",
+   "title": "Consolidation of arithmetic",
+   "flag": "other",
+   "supplement": false,
+   "ccss": [
+    "5.OA.A.1"
+   ],
+   "ee": [],
+   "power": true,
+   "domain": "OA",
+   "unit": "Projects & Taskmaster",
+   "paceUnit": {
+    "key": "E",
+    "name": "Enrichment lessons"
+   },
+   "block": "Y6.B14",
+   "firstWeek": "W38",
+   "weeks": [
+    "W38"
+   ],
+   "tracks": [
+    "standard"
+   ],
+   "note": ""
+  },
+  {
+   "id": "G5|-|endofyearinvestigationprojects",
+   "grade": "G5",
+   "usGrade": "5",
+   "wrmYear": "Y6",
+   "title": "End-of-year investigation projects",
+   "flag": "other",
+   "supplement": false,
+   "ccss": [
+    "5.OA.A.1"
+   ],
+   "ee": [],
+   "power": true,
+   "domain": "OA",
+   "unit": "Projects & Taskmaster",
+   "paceUnit": {
+    "key": "E",
+    "name": "Enrichment lessons"
+   },
+   "block": "Y6.B14",
+   "firstWeek": "W38",
+   "weeks": [
+    "W38"
+   ],
+   "tracks": [
+    "standard"
+   ],
+   "note": ""
+  },
+  {
+   "id": "G5|-|problemsolvingacrossstrands",
+   "grade": "G5",
+   "usGrade": "5",
+   "wrmYear": "Y6",
+   "title": "Problem solving across strands",
+   "flag": "other",
+   "supplement": false,
+   "ccss": [
+    "5.OA.A.1"
+   ],
+   "ee": [],
+   "power": true,
+   "domain": "OA",
+   "unit": "Projects & Taskmaster",
+   "paceUnit": {
+    "key": "E",
+    "name": "Enrichment lessons"
+   },
+   "block": "Y6.B14",
+   "firstWeek": "W38",
+   "weeks": [
+    "W38"
+   ],
+   "tracks": [
+    "standard"
+   ],
+   "note": ""
+  },
+  {
+   "id": "G5|-|reasoningtasks",
+   "grade": "G5",
+   "usGrade": "5",
+   "wrmYear": "Y6",
+   "title": "Reasoning tasks",
+   "flag": "other",
+   "supplement": false,
+   "ccss": [
+    "5.OA.A.1"
+   ],
+   "ee": [],
+   "power": true,
+   "domain": "OA",
+   "unit": "Projects & Taskmaster",
+   "paceUnit": {
+    "key": "E",
+    "name": "Enrichment lessons"
+   },
+   "block": "Y6.B14",
+   "firstWeek": "W38",
+   "weeks": [
+    "W38"
+   ],
+   "tracks": [
+    "standard"
+   ],
+   "note": ""
+  },
+  {
+   "id": "G5|-|dividea2digitnumberby100",
+   "grade": "G5",
+   "usGrade": "5",
+   "wrmYear": "Y6",
+   "title": "Divide a 2-digit number by 100",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "4.NF.C.6",
+    "5.NBT.A.2"
+   ],
+   "ee": [
+    "M.EE.5.NBT.2"
+   ],
+   "power": false,
+   "domain": "NF",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: G3.. From Decimals A. (Y4 Spring.). Support title that matches no WRM step of G3."
+  },
+  {
+   "id": "G5|-|orderfractions",
+   "grade": "G5",
+   "usGrade": "5",
+   "wrmYear": "Y6",
+   "title": "Order fractions",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [],
+   "ee": [],
+   "power": false,
+   "domain": "NF",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: G2.. From earlier work. (Prerequisite ladder.) Support title that matches no WRM step of G2."
+  },
+  {
+   "id": "G5|-|whatisvolume",
+   "grade": "G5",
+   "usGrade": "5",
+   "wrmYear": "Y6",
+   "title": "What is volume?",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "5.MD.C.3"
+   ],
+   "ee": [
+    "M.EE.5.MD.3"
+   ],
+   "power": false,
+   "domain": "MD",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: G4.. From Volume. (Y5 Summer.). Support title that matches no WRM step of G4."
+  },
+  {
+   "id": "G5|-|writedecimals",
+   "grade": "G5",
+   "usGrade": "5",
+   "wrmYear": "Y6",
+   "title": "Write decimals",
+   "flag": "enrich-native",
+   "supplement": false,
+   "ccss": [
+    "4.NF.C.6"
+   ],
+   "ee": [],
+   "power": false,
+   "domain": "NF",
+   "unit": null,
+   "paceUnit": null,
+   "block": null,
+   "firstWeek": null,
+   "weeks": [],
+   "tracks": [],
+   "note": "Source: G3.. From Decimals B. (Y4 Summer.). Support title that matches no WRM step of G3."
+  }
+ ],
+ "assessments": [
+  {
+   "id": "K|-|domainexamcountingcardinality",
+   "grade": "K",
+   "wrmYear": "Y1",
+   "title": "Domain exam · Counting & Cardinality",
+   "kind": "exam",
+   "domain": "CC",
+   "weeks": [
+    "W10"
+   ]
+  },
+  {
+   "id": "K|-|domainexamoperationsalgebraicthinking",
+   "grade": "K",
+   "wrmYear": "Y1",
+   "title": "Domain exam · Operations & Algebraic Thinking",
+   "kind": "exam",
+   "domain": "OA",
+   "weeks": [
+    "W18"
+   ]
+  },
+  {
+   "id": "K|-|domainexamnumberoperationsinbaseten",
+   "grade": "K",
+   "wrmYear": "Y1",
+   "title": "Domain exam · Number & Operations in Base Ten",
+   "kind": "exam",
+   "domain": "NBT",
+   "weeks": [
+    "W21"
+   ]
+  },
+  {
+   "id": "K|-|domainexammeasurementdata",
+   "grade": "K",
+   "wrmYear": "Y1",
+   "title": "Domain exam · Measurement & Data",
+   "kind": "exam",
+   "domain": "MD",
+   "weeks": [
+    "W25"
+   ]
+  },
+  {
+   "id": "K|-|domainexamgeometry",
+   "grade": "K",
+   "wrmYear": "Y1",
+   "title": "Domain exam · Geometry",
+   "kind": "exam",
+   "domain": "G",
+   "weeks": [
+    "W30"
+   ]
+  },
+  {
+   "id": "K|-|mapgrowthwindowspring",
+   "grade": "K",
+   "wrmYear": "Y1",
+   "title": "MAP Growth window (spring)",
+   "kind": "map",
+   "domain": null,
+   "weeks": [
+    "W30"
+   ]
+  },
+  {
+   "id": "G1|-|domainexamoperationsalgebraicthinking",
+   "grade": "G1",
+   "wrmYear": "Y2",
+   "title": "Domain exam · Operations & Algebraic Thinking",
+   "kind": "exam",
+   "domain": "OA",
+   "weeks": [
+    "W04"
+   ]
+  },
+  {
+   "id": "G1|-|domainexamnumberoperationsinbaseten",
+   "grade": "G1",
+   "wrmYear": "Y2",
+   "title": "Domain exam · Number & Operations in Base Ten",
+   "kind": "exam",
+   "domain": "NBT",
+   "weeks": [
+    "W12"
+   ]
+  },
+  {
+   "id": "G1|-|domainexamgeometry",
+   "grade": "G1",
+   "wrmYear": "Y2",
+   "title": "Domain exam · Geometry",
+   "kind": "exam",
+   "domain": "G",
+   "weeks": [
+    "W20"
+   ]
+  },
+  {
+   "id": "G1|-|domainexammeasurementdata",
+   "grade": "G1",
+   "wrmYear": "Y2",
+   "title": "Domain exam · Measurement & Data",
+   "kind": "exam",
+   "domain": "MD",
+   "weeks": [
+    "W25"
+   ]
+  },
+  {
+   "id": "G1|-|mapgrowthwindowspring",
+   "grade": "G1",
+   "wrmYear": "Y2",
+   "title": "MAP Growth window (spring)",
+   "kind": "map",
+   "domain": null,
+   "weeks": [
+    "W25"
+   ]
+  },
+  {
+   "id": "G2|-|domainexamnumberoperationsinbaseten",
+   "grade": "G2",
+   "wrmYear": "Y3",
+   "title": "Domain exam · Number & Operations in Base Ten",
+   "kind": "exam",
+   "domain": "NBT",
+   "weeks": [
+    "W09"
+   ]
+  },
+  {
+   "id": "G2|-|domainexamoperationsalgebraicthinking",
+   "grade": "G2",
+   "wrmYear": "Y3",
+   "title": "Domain exam · Operations & Algebraic Thinking",
+   "kind": "exam",
+   "domain": "OA",
+   "weeks": [
+    "W13"
+   ]
+  },
+  {
+   "id": "G2|-|domainexammeasurementdata",
+   "grade": "G2",
+   "wrmYear": "Y3",
+   "title": "Domain exam · Measurement & Data",
+   "kind": "exam",
+   "domain": "MD",
+   "weeks": [
+    "W25"
+   ]
+  },
+  {
+   "id": "G2|-|domainexamgeometry",
+   "grade": "G2",
+   "wrmYear": "Y3",
+   "title": "Domain exam · Geometry",
+   "kind": "exam",
+   "domain": "G",
+   "weeks": [
+    "W30"
+   ]
+  },
+  {
+   "id": "G2|-|mapgrowthwindowspring",
+   "grade": "G2",
+   "wrmYear": "Y3",
+   "title": "MAP Growth window (spring)",
+   "kind": "map",
+   "domain": null,
+   "weeks": [
+    "W30"
+   ]
+  },
+  {
+   "id": "G3|-|domainexamoperationsalgebraicthinking",
+   "grade": "G3",
+   "wrmYear": "Y4",
+   "title": "Domain exam · Operations & Algebraic Thinking",
+   "kind": "exam",
+   "domain": "OA",
+   "weeks": [
+    "W07"
+   ]
+  },
+  {
+   "id": "G3|-|domainexamnumberoperationsfractions",
+   "grade": "G3",
+   "wrmYear": "Y4",
+   "title": "Domain exam · Number & Operations: Fractions",
+   "kind": "exam",
+   "domain": "NF",
+   "weeks": [
+    "W11"
+   ]
+  },
+  {
+   "id": "G3|-|domainexamnumberoperationsinbaseten",
+   "grade": "G3",
+   "wrmYear": "Y4",
+   "title": "Domain exam · Number & Operations in Base Ten",
+   "kind": "exam",
+   "domain": "NBT",
+   "weeks": [
+    "W19"
+   ]
+  },
+  {
+   "id": "G3|-|domainexammeasurementdata",
+   "grade": "G3",
+   "wrmYear": "Y4",
+   "title": "Domain exam · Measurement & Data",
+   "kind": "exam",
+   "domain": "MD",
+   "weeks": [
+    "W28"
+   ]
+  },
+  {
+   "id": "G3|-|domainexamgeometry",
+   "grade": "G3",
+   "wrmYear": "Y4",
+   "title": "Domain exam · Geometry",
+   "kind": "exam",
+   "domain": "G",
+   "weeks": [
+    "W30"
+   ]
+  },
+  {
+   "id": "G3|-|mapgrowthwindowspring",
+   "grade": "G3",
+   "wrmYear": "Y4",
+   "title": "MAP Growth window (spring)",
+   "kind": "map",
+   "domain": null,
+   "weeks": [
+    "W30"
+   ]
+  },
+  {
+   "id": "G4|-|domainexamnumberoperationsinbaseten",
+   "grade": "G4",
+   "wrmYear": "Y5",
+   "title": "Domain exam · Number & Operations in Base Ten",
+   "kind": "exam",
+   "domain": "NBT",
+   "weeks": [
+    "W08"
+   ]
+  },
+  {
+   "id": "G4|-|domainexamoperationsalgebraicthinking",
+   "grade": "G4",
+   "wrmYear": "Y5",
+   "title": "Domain exam · Operations & Algebraic Thinking",
+   "kind": "exam",
+   "domain": "OA",
+   "weeks": [
+    "W11"
+   ]
+  },
+  {
+   "id": "G4|-|domainexamnumberoperationsfractions",
+   "grade": "G4",
+   "wrmYear": "Y5",
+   "title": "Domain exam · Number & Operations: Fractions",
+   "kind": "exam",
+   "domain": "NF",
+   "weeks": [
+    "W21"
+   ]
+  },
+  {
+   "id": "G4|-|domainexamgeometry",
+   "grade": "G4",
+   "wrmYear": "Y5",
+   "title": "Domain exam · Geometry",
+   "kind": "exam",
+   "domain": "G",
+   "weeks": [
+    "W25"
+   ]
+  },
+  {
+   "id": "G4|-|domainexammeasurementdata",
+   "grade": "G4",
+   "wrmYear": "Y5",
+   "title": "Domain exam · Measurement & Data",
+   "kind": "exam",
+   "domain": "MD",
+   "weeks": [
+    "W32"
+   ]
+  },
+  {
+   "id": "G4|-|mapgrowthwindowspring",
+   "grade": "G4",
+   "wrmYear": "Y5",
+   "title": "MAP Growth window (spring)",
+   "kind": "map",
+   "domain": null,
+   "weeks": [
+    "W32"
+   ]
+  },
+  {
+   "id": "G5|-|domainexamnumberoperationsinbaseten",
+   "grade": "G5",
+   "wrmYear": "Y6",
+   "title": "Domain exam · Number & Operations in Base Ten",
+   "kind": "exam",
+   "domain": "NBT",
+   "weeks": [
+    "W09"
+   ]
+  },
+  {
+   "id": "G5|-|domainexamoperationsalgebraicthinking",
+   "grade": "G5",
+   "wrmYear": "Y6",
+   "title": "Domain exam · Operations & Algebraic Thinking",
+   "kind": "exam",
+   "domain": "OA",
+   "weeks": [
+    "W13"
+   ]
+  },
+  {
+   "id": "G5|-|domainexamnumberoperationsfractions",
+   "grade": "G5",
+   "wrmYear": "Y6",
+   "title": "Domain exam · Number & Operations: Fractions",
+   "kind": "exam",
+   "domain": "NF",
+   "weeks": [
+    "W19"
+   ]
+  },
+  {
+   "id": "G5|-|domainexammeasurementdata",
+   "grade": "G5",
+   "wrmYear": "Y6",
+   "title": "Domain exam · Measurement & Data",
+   "kind": "exam",
+   "domain": "MD",
+   "weeks": [
+    "W28"
+   ]
+  },
+  {
+   "id": "G5|-|domainexamgeometry",
+   "grade": "G5",
+   "wrmYear": "Y6",
+   "title": "Domain exam · Geometry",
+   "kind": "exam",
+   "domain": "G",
+   "weeks": [
+    "W30"
+   ]
+  },
+  {
+   "id": "G5|-|mapgrowthwindowspring",
+   "grade": "G5",
+   "wrmYear": "Y6",
+   "title": "MAP Growth window (spring)",
+   "kind": "map",
+   "domain": null,
+   "weeks": [
+    "W30"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,8 @@
+  R7-D1 timed queue sub_100_regroup 1280x600: ok scroll 7 bar-bottom 59 band 63-116 box - check 546-592
+  R7-D1 timed link sub_100_regroup 1280x600: ok scroll 7 bar-bottom 59 band 63-116 box - check 546-592
+  R7-D1 timed queue nl_mult 1280x600: ok scroll 7 bar-bottom 59 band 63-116 box 440-509 check 540-586
+  R7-D1 timed link nl_mult 1280x600: ok scroll 7 bar-bottom 59 band 63-116 box 440-509 check 540-586
+  R7-D1 timed queue sub_100_regroup 1366x650: ok scroll 7 bar-bottom 59 band 63-116 box - check 546-592
+  R7-D1 timed link sub_100_regroup 1366x650: ok scroll 7 bar-bottom 59 band 63-116 box - check 546-592
+  R7-D1 timed queue nl_mult 1366x650: ok scroll 10 bar-bottom 59 band 60-113 box 437-506 check 537-583
+  R7-D1 timed link nl_mult 1366x650: ok scroll 10 bar-bottom 59 band 60-113 box 437-506 check 537-583

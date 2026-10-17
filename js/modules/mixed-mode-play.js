@@ -580,6 +580,13 @@ export function showMixedPlayToast(message) {
     `;
     toast.textContent = message;
     document.body.appendChild(toast);
+    // owner rule (no pop-ups during play): a toast raised just before play goes once a play view shows
+    const inPlay = () => ['gameView', 'worksheetView', 'quizTakeView'].some(id => { const v = document.getElementById(id); return !!v && v.classList.contains('active'); });
+    if (inPlay()) { toast.remove(); return; }
+    const watch = setInterval(() => {
+        if (!toast.isConnected) { clearInterval(watch); return; }
+        if (inPlay()) { clearInterval(watch); toast.remove(); }
+    }, 100);
 
     setTimeout(() => {
         toast.style.animation = 'toastSlideDown 0.3s ease-out forwards';

@@ -33,6 +33,8 @@ import { cellFootprint } from './registry.js';
 export const PT_MM = 25.4 / 72;
 const r2 = (n) => Math.round(n * 100) / 100;
 const r3 = (n) => Math.round(n * 1000) / 1000;
+/** Down to the micron: a height shared out over rows, so rows x it never rounds past the grid (critic nl-r4 D1). */
+const f3 = (n) => Math.floor(n * 1000 - 1e-6) / 1000;
 
 /** PG-1: the live width is 186 mm on every paper. */
 export const LIVE_W_MM = 186;
@@ -178,12 +180,14 @@ export function paperOf(paper) {
  * @param {{cont?: boolean}} [opts]  `cont`: a continuation page (HD-20), always 12 mm
  */
 export function headerHeightMm(header = {}, { cont = false } = {}) {
-    if (cont) return CONT_HEADER_MM;
+    // Wave 5.2: a reference number line under the header (sheet/refline.js) on EVERY page.
+    const band = Math.max(0, Number(header && header.refBandMm) || 0);
+    if (cont) return CONT_HEADER_MM + band;
     const h = HEADER_PARTS_MM;
     const hasTab = Array.isArray(header.tab) ? header.tab.length > 0 : !!header.tab;
     const hasTitle = !!header.title;
     const lines = Math.max(1, Number(header.titleLines) || 1);
-    return (hasTab ? h.rowTab : h.rowNoTab) + (hasTitle ? h.title + h.titleWrap * (lines - 1) : 0) + h.rule;
+    return (hasTab ? h.rowTab : h.rowNoTab) + (hasTitle ? h.title + h.titleWrap * (lines - 1) : 0) + h.rule + band;
 }
 
 /** PG-2 / HD-12: body = live height - header - footer block. */
@@ -467,7 +471,52 @@ export function sectionClass(infos) {
  *   hMin: number, requested: 'auto'|number, ceiling: number, fill: boolean, count: number,
  * }}
  */
+/**
+ * Wave 5.2 (critic nl-r3 D5): the number-line band under the header comes out of the cells'
+ * SLACK before it costs a row. The section is laid out with and without the band; when the band
+ * would drop rows and the band-less grid's rows still fit the shorter grid at their minimum height
+ * (hMin: the content never shrinks), the page keeps that grid with each row giving up its share.
+ */
 export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_PAPER, availableWidthMm = LIVE_W_MM, ctx = {}) {
+    const L1 = resolveSectionLayoutCore(section, items, paper, availableWidthMm, ctx);
+    const band = Number(ctx.header && ctx.header.refBandMm) || 0;
+    if (!(band > 0) || Number(section.gridH) > 0) return L1;
+    const L0 = resolveSectionLayoutCore(section, items, paper, availableWidthMm, Object.assign({}, ctx, { header: Object.assign({}, ctx.header, { refBandMm: 0 }) }));
+    // (critic nl-r4 D2) The band-less grid is kept, rows giving up slack, also when the band would
+    // keep the count but change the grid's SHAPE (3 x 4 -> 4 x 3): the new shape's rows stop at
+    // their fill limit and leave a strip at the foot several times the band's height.
+    // The same shape is checked below: its rows may still sit on the far side of the fill rule's
+    // 0.8 fallback (add_sub_10s @M: 38 mm cells off, 29 mm on), so they take the grid's height too.
+    const sameShape = L0.perPage === L1.perPage && L0.cols === L1.cols && L0.rows === L1.rows;
+    // When the band does cost a row (the content leaves no slack to give), the rows that are left
+    // may stretch to the H13 cap (FILL_CAP) to take the row's place, not leave it blank at the foot.
+    const keep = () => Object.assign({}, L1, { fillRefH: sameShape ? L0.cellH : L1.perPage < L0.perPage ? 1e6 : 0 });
+    if (L0.perPage < L1.perPage || (L0.packed && sameShape)) return keep();
+    const G = L1.gridH;
+    const hMin = Math.max(L0.hMin, L1.hMin);
+    if (!(hMin > 0)) return keep();
+    if (L0.packed) {
+        // Rows sized to what they hold: keep as many of the band-less rows as their OWN heights
+        // (tallest first, as packByHeight pages them) fit in the shorter grid.
+        const ord = groupByHeight(items || [], L0.cols);
+        const rowH = [];
+        for (let i = 0; i < ord.length; i += L0.cols) rowH.push(Math.max(...ord.slice(i, i + L0.cols).map((it) => measuredH(it, L0.cols))));
+        let k = 0, sum = 0;
+        while (k < Math.min(L0.rows, rowH.length) && sum + rowH[k] <= G - SAFETY_H_MM) { sum += rowH[k]; k++; }
+        if (k * L0.cols < L1.perPage || (k * L0.cols === L1.perPage && L0.cols === L1.cols)) return keep();
+        const note = [L0.note, 'Rows gave up room to the number line.'].filter(Boolean).join(' ');
+        return Object.assign({}, L0, { rows: k, perPage: k * L0.cols, pages: L0.count ? Math.ceil(L0.count / (k * L0.cols)) : 1, gridH: G, gridHCont: L1.gridHCont,
+            cellH: f3(Math.min(L0.cellH, (G - SAFETY_H_MM) / k)), note, notes: (L0.notes || []).concat('Rows gave up room to the number line.'), bandSqueezed: true });
+    }
+    if (L0.rows * hMin > G - SAFETY_H_MM) return keep();
+    const cellH = f3(Math.min(L0.cellH, (G - SAFETY_H_MM) / L0.rows));
+    if (sameShape && !(cellH > L1.cellH + 0.01)) return keep();
+    const pages = L0.count ? Math.ceil(L0.count / L0.perPage) : 1;
+    const note = [L0.note, 'Rows gave up room to the number line.'].filter(Boolean).join(' ');
+    return Object.assign({}, L0, { gridH: G, gridHCont: L1.gridHCont, cellH, hMin: r2(hMin), pages, fill: L0.fill && cellH >= G / L0.rows - 0.01, note, notes: (L0.notes || []).concat('Rows gave up room to the number line.'), bandSqueezed: true, fillRefH: L0.cellH });
+}
+
+function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPER, availableWidthMm = LIVE_W_MM, ctx = {}) {
     const size = SIZES[ctx.size] ? ctx.size : DEFAULT_SIZE;
     const look = LOOKS[ctx.look] ? ctx.look : DEFAULT_LOOK;
     const role = section.role || 'independent';
@@ -777,7 +826,7 @@ export function groupByHeight(items, cols) {
  *
  * @returns {{rowsTpl: string, heightMm: number} | null}
  */
-export function rowShape(items, cols, rows, cellH) {
+export function rowShape(items, cols, rows, cellH, fillRefH = 0) {
     if (!items.length || rows < 1) return null;
     const w = [];
     const mins = [];
@@ -801,7 +850,9 @@ export function rowShape(items, cols, rows, cellH) {
     // The same fallback as the layout's cell height: when the fill limit would leave more than a
     // fifth of the grid it was given under the rows, they take up to FILL_CAP x their content
     // (critic guided-r1 lint: a compare page at L left an 80 mm strip under 18 short rows).
-    if (H.reduce((a, b) => a + b, 0) < 0.8 * rows * cellH) H = w.map((x, r) => Math.max(x, Math.min(k * x, FILL_CAP * mins[r])));
+    // (`fillRefH`, Wave 5.2 critic nl-r4 D2: the cell height the grid had without the number-line
+    // band, so the band's 13 mm never tips a page across this threshold and doubles its cost.)
+    if (H.reduce((a, b) => a + b, 0) < 0.8 * rows * Math.max(cellH, Number(fillRefH) || 0)) H = w.map((x, r) => Math.max(x, Math.min(k * x, FILL_CAP * mins[r])));
     const total = H.reduce((a, b) => a + b, 0);
     return { rowsTpl: H.map((x) => `${Math.round(x * 10) / 10}fr`).join(' '), heightMm: Math.round(total * 100) / 100 };
 }

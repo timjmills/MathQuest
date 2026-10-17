@@ -1,0 +1,105 @@
+  offered on 131 of 601 skills; codec round trips checked
+  add_facts @S: line 0 to 20 by 1, band 12.1 mm, 1+1 pages
+  add_100 @S: line 0 to 100 by 5, band 12.1 mm, 1+1 pages
+  frac_quarters @S: line 0 to 2 by 1/4, band 15.9 mm, 1+1 pages
+  dec_tenths @S: line 0 to 20 by 0.1, band 12.1 mm, 1+1 pages (ticks every 2 steps (the range is long))
+  int_10 @S: line -10 to 10 by 1, band 12.1 mm, 1+1 pages
+  add_facts @L: line 0 to 20 by 1, band 13.2 mm, 1+1 pages
+  add_100 @L: line 0 to 100 by 5, band 13.2 mm, 1+1 pages
+  frac_quarters @L: line 0 to 2 by 1/4, band 18.3 mm, 1+1 pages
+  dec_tenths @L: line 0 to 20 by 0.1, band 13.2 mm, 1+1 pages (ticks every 2 steps (the range is long))
+  int_10 @L: line -10 to 10 by 1, band 13.2 mm, 1+1 pages
+  auto count_sequence: 0 to 20 by 1, labels auto (every 1)
+  auto seq_2: 0 to 110 by 10 / 10, labels all (every 1)
+  auto seq_5: 0 to 120 by 10 / 10, labels all (every 1)
+  auto count_by_tables: 0 to 150 by 10 / 10, labels all (every 1)
+  auto skip_count_line: 0 to 180 by 10 / 10, labels all (every 1)
+  auto count_by_step_up: 0 to 180 by 10 / 10, labels all (every 1)
+  auto order_fdp: 0 to 1 by 0.1 / 10, labels auto (every 1)
+  auto mixed_integers: -100 to 100 by 10, labels auto (every 1)
+  auto equivalent: 0 to 1 by 0.5, labels auto (every 1)
+  auto add_decimal: 0 to 20 by 1 / 10, labels auto (every 1)
+  r3: mixed pools need both ends; pattern rule count on/back only; ordering_rationals labels −5/6 −2/3 −1/2 −1/3 −1/6 1/6 1/3 1/2 2/3 5/6; lines seq_2 0..110, seq_5 0..120, seq_10 0..130, estimate_sum 0..200, mixed_add_sub 0..200
+  sweep: 393 builds (S, M, L); band on every page of 393; pages added 0; blank strips 0; 18 lose capacity to the band (D7, recorded): add_three@M 8→6, add_wp_10@L 4→2, add_wp_10_plain@M 6→4, unknown_start_wp@M 3→2, sub_wp_10@M 6→4, sub_wp_10_plain@M 6→4, nl_mult@S 6→5, nl_mult@L 5→4, count_by_tables@M 7→6, nl_div@S 6→5, nl_div@L 5→4, equiv_frac_nv@L 4→2, compare@S 16→14, order_frac_numline@M 3→2, order_frac_numline@L 3→2, round_sort_10@L 4→3, round_sort_100@L 4→3, round_sort_1000@L 4→3
+  more-practice: line 0 to 20, 2 pages
+  guided: line 0 to 20, 2 pages
+  scripted-model: n/a (This skill has no worked steps yet (strings.steps / workedSteps), so it has no Scripted Model page.)
+  mixed-practice: line 0 to 20, 2 pages
+  review: line 0 to 20, 2 pages
+  stretch: line 0 to 20, 2 pages
+  reason-it: line 0 to 20, 2 pages
+  error-analysis: line 0 to 20, 2 pages
+  test: no line (check page), 2 pages
+  pre-skill-check: no line (check page), 2 pages
+  real-flow worksheet: number line 0 to 20, steps of 1
+  auto: seq_2 0..110 by 10 (landmarks), add_wp_20 0..20, round_sort_1000 0..10000, order_negatives -100..100, order_fractions 1/2
+  roles: {"independent":"0..20/1","guided":"0..20/1","review":"0..20/1","mixed-practice":"0..20/1","stretch":"0..20/1","reason-it":"0..20/1"}; mixed: 0..20 by 1/2
+  pools on screen: mixed_addition:bare card none ws none; mixed_addition:ends card number line 0 to 1000, steps of 50 ws number line 0 to 1000, steps of 50; mixed_subtraction:bare card none ws none; mixed_subtraction:ends card number line 0 to 1000, steps of 50 ws number line 0 to 1000, steps of 50
+  queue path: add_facts number line 0 to 20, steps of 1 / ws number line 0 to 20, steps of 1; mixed_addition bare none, ends number line 0 to 1000, steps of 50; two-skill seq_2 none
+  Direct link: add_facts AY~_0R1 -> number line 0 to 20, steps of 1; mixed_addition ends SF~_0R1_0S0_0T1000 -> number line 0 to 1000, steps of 50; mixed_addition SF~_0R1 -> none
+  R6-D1 queue N10 line 1366x650: ok dots 1059-1241 x 151-183 band 70-123 card top 145
+  R6-D1 queue N10 no line 1366x650: ok dots 1059-1241 x 82-114 band - card top 76
+  R6-D1 queue N20 line 1366x650: ok dots 879-1241 x 151-183 band 70-123 card top 145
+  R6-D1 queue N20 no line 1366x650: ok dots 879-1241 x 82-114 band - card top 76
+  R6-D1 link N10 line 1366x650: ok dots 1059-1241 x 151-183 band 70-123 card top 145
+  R6-D1 link N10 no line 1366x650: ok dots 1059-1241 x 82-114 band - card top 76
+  R6-D1 link N20 line 1366x650: ok dots 879-1241 x 151-183 band 70-123 card top 145
+  R6-D1 link N20 no line 1366x650: ok dots 879-1241 x 82-114 band - card top 76
+  R6-D1 queue N10 line 1280x600: ok dots 1016-1198 x 151-183 band 70-123 card top 145
+  R6-D1 queue N10 no line 1280x600: ok dots 1016-1198 x 82-114 band - card top 76
+  R6-D1 queue N20 line 1280x600: ok dots 836-1198 x 151-183 band 70-123 card top 145
+  R6-D1 queue N20 no line 1280x600: ok dots 836-1198 x 82-114 band - card top 76
+  R6-D1 link N10 line 1280x600: ok dots 1016-1198 x 151-183 band 70-123 card top 145
+  R6-D1 link N10 no line 1280x600: ok dots 1016-1198 x 82-114 band - card top 76
+  R6-D1 link N20 line 1280x600: ok dots 836-1198 x 151-183 band 70-123 card top 145
+  R6-D1 link N20 no line 1280x600: ok dots 836-1198 x 82-114 band - card top 76
+  R8-D1 timed queue sub_100_regroup 1280x600 q1: scroll 0 bar-bottom 59 band 70-123 box 445-512 check 549-595
+  R8-D1 timed queue sub_100_regroup 1280x600 q2: scroll 4 bar-bottom 59 band 66-119 box 441-508 check 550-596
+  R8-D1 timed queue sub_100_regroup 1280x600 q3: scroll 4 bar-bottom 59 band 66-119 box 441-508 check 550-596
+  R8-D1 timed queue sub_100_regroup 1280x600: ok 603 frames, held scroll 0 > 4
+  R8-D1 timed link sub_100_regroup 1280x600 q1: scroll 0 bar-bottom 59 band 70-123 box 445-512 check 549-595
+  R8-D1 timed link sub_100_regroup 1280x600 q2: scroll 4 bar-bottom 59 band 66-119 box 441-508 check 550-596
+  R8-D1 timed link sub_100_regroup 1280x600 q3: scroll 4 bar-bottom 59 band 66-119 box 441-508 check 550-596
+  R8-D1 timed link sub_100_regroup 1280x600: ok 601 frames, held scroll 0 > 4
+  R8-D1 untimed link sub_100_regroup 1280x600 q1: scroll 0 bar-bottom 59 band 70-123 box 445-512 check 549-595
+  R8-D1 untimed link sub_100_regroup 1280x600 q2: scroll 4 bar-bottom 59 band 66-119 box 441-508 check 550-596
+  R8-D1 untimed link sub_100_regroup 1280x600 q3: scroll 4 bar-bottom 59 band 66-119 box 441-508 check 550-596
+  R8-D1 untimed link sub_100_regroup 1280x600: ok 605 frames, held scroll 0 > 4
+  R8-D1 timed queue nl_mult 1280x600 q1: scroll 0 bar-bottom 59 band 70-123 box 447-516 check 547-593
+  R8-D1 timed queue nl_mult 1280x600 q2: scroll 5 bar-bottom 59 band 65-118 box 441-510 check 542-588
+  R8-D1 timed queue nl_mult 1280x600 q3: scroll 5 bar-bottom 59 band 65-118 box 441-510 check 542-588
+  R8-D1 timed queue nl_mult 1280x600: ok 589 frames, held scroll 0 > 5
+  R8-D1 timed link nl_mult 1280x600 q1: scroll 0 bar-bottom 59 band 70-123 box 447-516 check 547-593
+  R8-D1 timed link nl_mult 1280x600 q2: scroll 5 bar-bottom 59 band 65-118 box 441-510 check 542-588
+  R8-D1 timed link nl_mult 1280x600 q3: scroll 5 bar-bottom 59 band 65-118 box 441-510 check 542-588
+  R8-D1 timed link nl_mult 1280x600: ok 598 frames, held scroll 0 > 5
+  R8-D1 untimed link nl_mult 1280x600 q1: scroll 0 bar-bottom 59 band 70-123 box 447-516 check 547-593
+  R8-D1 untimed link nl_mult 1280x600 q2: scroll 5 bar-bottom 59 band 65-118 box 441-510 check 542-588
+  R8-D1 untimed link nl_mult 1280x600 q3: scroll 5 bar-bottom 59 band 65-118 box 441-510 check 542-588
+  R8-D1 untimed link nl_mult 1280x600: ok 600 frames, held scroll 0 > 5
+  R8-D1 timed queue sub_100_regroup 1366x650 q1: scroll 0 bar-bottom 59 band 70-123 box 445-512 check 553-599
+  R8-D1 timed queue sub_100_regroup 1366x650 q2: scroll 0 bar-bottom 59 band 70-123 box 445-512 check 554-600
+  R8-D1 timed queue sub_100_regroup 1366x650 q3: scroll 0 bar-bottom 59 band 70-123 box 445-512 check 554-600
+  R8-D1 timed queue sub_100_regroup 1366x650: ok 602 frames, held scroll 0
+  R8-D1 timed link sub_100_regroup 1366x650 q1: scroll 0 bar-bottom 59 band 70-123 box 445-512 check 553-599
+  R8-D1 timed link sub_100_regroup 1366x650 q2: scroll 0 bar-bottom 59 band 70-123 box 445-512 check 554-600
+  R8-D1 timed link sub_100_regroup 1366x650 q3: scroll 0 bar-bottom 59 band 70-123 box 445-512 check 554-600
+  R8-D1 timed link sub_100_regroup 1366x650: ok 602 frames, held scroll 0
+  R8-D1 untimed link sub_100_regroup 1366x650 q1: scroll 0 bar-bottom 59 band 70-123 box 445-512 check 553-599
+  R8-D1 untimed link sub_100_regroup 1366x650 q2: scroll 0 bar-bottom 59 band 70-123 box 445-512 check 554-600
+  R8-D1 untimed link sub_100_regroup 1366x650 q3: scroll 0 bar-bottom 59 band 70-123 box 445-512 check 554-600
+  R8-D1 untimed link sub_100_regroup 1366x650: ok 604 frames, held scroll 0
+  R8-D1 timed queue nl_mult 1366x650 q1: scroll 0 bar-bottom 59 band 70-123 box 447-516 check 547-593
+  R8-D1 timed queue nl_mult 1366x650 q2: scroll 0 bar-bottom 59 band 70-123 box 446-515 check 547-593
+  R8-D1 timed queue nl_mult 1366x650 q3: scroll 0 bar-bottom 59 band 70-123 box 446-515 check 547-593
+  R8-D1 timed queue nl_mult 1366x650: ok 599 frames, held scroll 0
+  R8-D1 timed link nl_mult 1366x650 q1: scroll 0 bar-bottom 59 band 70-123 box 447-516 check 547-593
+  R8-D1 timed link nl_mult 1366x650 q2: scroll 0 bar-bottom 59 band 70-123 box 446-515 check 547-593
+  R8-D1 timed link nl_mult 1366x650 q3: scroll 0 bar-bottom 59 band 70-123 box 446-515 check 547-593
+  R8-D1 timed link nl_mult 1366x650: ok 597 frames, held scroll 0
+  R8-D1 untimed link nl_mult 1366x650 q1: scroll 0 bar-bottom 59 band 70-123 box 447-516 check 547-593
+  R8-D1 untimed link nl_mult 1366x650 q2: scroll 0 bar-bottom 59 band 70-123 box 446-515 check 547-593
+  R8-D1 untimed link nl_mult 1366x650 q3: scroll 0 bar-bottom 59 band 70-123 box 446-515 check 547-593
+  R8-D1 untimed link nl_mult 1366x650: ok 599 frames, held scroll 0
+support-numberline: OK
+exit 0
