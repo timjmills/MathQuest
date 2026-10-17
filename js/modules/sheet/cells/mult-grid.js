@@ -99,7 +99,7 @@ function shownValues(p, ctx, slots) {
  * The anchor-chart step states of an even-products window (detailed lesson 4; marks 'even-rows',
  * 'even-cols', 'odd-odd' from the countby provider's CHART_STEPS.even): state k shades the boxes of
  * every step up to k; the NEWEST step's row / column numbers are ringed grey (P-LC-9), and the last
- * step rings each odd x odd box (left white) with a grey dashed line. Only that lesson calls it.
+ * step rings each odd x odd box (left white) with a solid grey line. Only that lesson calls it.
  */
 export function evenGridState(p, groups, k) {
     const rows = p.rows || [], cols = p.cols || [];
@@ -180,7 +180,7 @@ register('mult-grid', {
                 if (n !== undefined) { html += slotTd(n); return; }
                 const prod = rv * cv;
                 const gs = ctx.gridSteps;
-                const shade = gs ? (gs.shade.has(`${i},${j}`) ? `background:${GREY};` : '') + (gs.ring.has(`c${i},${j}`) ? `outline:${HEAVY} dashed ${GREY};outline-offset:-${B(ctx, 3)};` : '')
+                const shade = gs ? (gs.shade.has(`${i},${j}`) ? `background:${GREY};` : '') + (gs.ring.has(`c${i},${j}`) ? `outline:${HEAVY} solid ${GREY};outline-offset:-${B(ctx, 3)};` : '')
                     : (shadeOn && prod % Number(p.shade) === 0) || (shadedByPupil && shadedByPupil.has(prod)) ? `background:${GREY};` : '';
                 html += productTd(prod, shade);
             });

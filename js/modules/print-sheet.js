@@ -427,6 +427,9 @@ function lr6Ok(q, key, seen, pg = '', row = '', words = true) {
     // (× - lead ruling 2026-10-17, lesson 3a r4: no first factor twice in one grid row; only x keys, so + / − packs deal as before)
     const mx = String(factKeyOf(q) || '').match(/^(\d+)[x×](\d+)$/);
     if (mx && row && seen.has(`lr6x${pg}${row}:${key}:${mx[1]}`)) return false;
+    // (a mult-grid window - lesson 4 r2, lead: the × rule for windows - no two windows in one grid row with the same rows or columns)
+    const gw = String(factKeyOf(q) || '').match(/^grid(\d+-\d+)x(\d+-\d+)/);
+    if (gw && row && (seen.has(`lr6g${pg}${row}:${gw[1]}`) || seen.has(`lr6g${pg}${row}:${gw[2]}`))) return false;
     if (x.op === '+' && seen.has(`lr6f${pg}${row}:${key}:${x.a}`)) return false;
     if (x.op === '−' && seen.has(`lr6s${pg}:${x.b}`)) return false;
     if (x.op) for (let da = -2; da <= 2; da++) for (let db = -2; db <= 2; db++) if (nearPair(x.op, da, db) && seen.has(`lr6p${pg}:${x.op}:${x.a + da}:${x.b + db}`)) return false;
@@ -441,6 +444,8 @@ function lr6Record(q, key, seen, pg = '', row = '') {
     const x = lr6Of(q);
     const mx = String(factKeyOf(q) || '').match(/^(\d+)[x×](\d+)$/);
     if (mx && row) seen.add(`lr6x${pg}${row}:${key}:${mx[1]}`);
+    const gw = String(factKeyOf(q) || '').match(/^grid(\d+-\d+)x(\d+-\d+)/);
+    if (gw && row) { seen.add(`lr6g${pg}${row}:${gw[1]}`); seen.add(`lr6g${pg}${row}:${gw[2]}`); }
     if (x.op === '+') seen.add(`lr6f${pg}${row}:${key}:${x.a}`);
     if (x.op === '−') seen.add(`lr6s${pg}:${x.b}`);
     if (x.op) seen.add(`lr6p${pg}:${x.op}:${x.a}:${x.b}`);

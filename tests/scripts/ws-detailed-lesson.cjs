@@ -95,7 +95,8 @@ function measure(LIBRARY) {
         // E14 dashes: only the cut line (data-cut / .ws-cut) and the missing-digit box
         P.dashed = all.filter((e) => { const cs = getComputedStyle(e);
             if (e instanceof SVGElement) { const dd = e.getAttribute('stroke-dasharray'); return dd && !/^0[ ,]/.test(dd.trim()) && !e.closest('[data-cut], [data-ws-cut]'); }
-            return ['Top', 'Right', 'Bottom', 'Left'].some((s) => cs['border' + s + 'Style'] === 'dashed' && parseFloat(cs['border' + s + 'Width']) > 0)
+            // (an outline too - lesson 4 r2: the chart's odd x odd ring was a dashed outline the border test missed)
+            return (['Top', 'Right', 'Bottom', 'Left'].some((s) => cs['border' + s + 'Style'] === 'dashed' && parseFloat(cs['border' + s + 'Width']) > 0) || (/dashed|dotted/.test(cs.outlineStyle) && parseFloat(cs.outlineWidth) > 0))
                 && !e.closest('[data-cut], [data-ws-cut]') && !e.classList.contains('ws-box--unknown'); }).length;
         // E13 underscores (pupil text, footer excepted)
         P.underscores = teacher ? 0 : texts.filter((x) => /_/.test(x.textContent) && !x.parentElement.closest('.ws-foot')).length;
@@ -402,6 +403,9 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
             const rows = {};
             for (const x of pl.filter((y) => y.page === pgid && MD(y) && y.rep !== 'count_by_tables')) { mdN++; const o = MD(x); const k = `${o.op}${x.grid || 0}:${x.row}`; (rows[k] = rows[k] || []).push(o.f); }
             for (const [r, a] of Object.entries(rows)) { const d2 = a.filter((v, i) => a.indexOf(v) !== i); if (d2.length) probs.push(`${r[0] === '÷' ? 'divisor' : 'first factor'} ${d2[0]} twice in a row (${r.slice(1)}) on ${pgid}`); }
+            // (mult-grid windows - lesson 4 r2, lead: no two windows in one grid row with the same rows or the same columns)
+            const gr = {};
+            for (const x of pl.filter((y) => y.page === pgid)) { const m = String(x.item || '').match(/^grid(\d+-\d+)x(\d+-\d+)/); if (m) for (const sp of [m[1], m[2]]) { const k = `${x.grid || 0}:${x.row}:${sp}`; if (gr[k]) probs.push(`windows ${gr[k]} / ${x.item} share ${sp} in a row on ${pgid}`); else gr[k] = x.item; } }
         }
         // (`edgeOnly` - a description's declared case, lesson 3a r4 m3: only on the ★★★ last row of a Practice page)
         const eo = R.pool.edgeOnly;
