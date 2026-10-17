@@ -2222,6 +2222,26 @@ async function buildSheetDeal(req = {}) {
                         if (fixed) items = fixed;
                         sec.floor = floorFor(items);
                     }
+                    // Wave 1 lane D r12c: a pool page whose groups are whole rows takes another whole
+                    // row - of column work, else of the other problems - while the page still holds it
+                    // (the true cell heights, r12c, made mixed_subtraction M a page of 2 stories and 3
+                    // stacks whose rows were stretched to half full, L-DENSITY SPREAD).
+                    h = holeOf(items);
+                    if (pool && !h.rem && !h.frem && h.fineCols > 0) {
+                        const whole = (its) => { sec.floor = floorFor(its); const hx = holeOf(its); return hx.cap >= its.length && its.length <= ceilF * pagesWanted && !hx.rem && !hx.frem && hx.fineCols > 0; };
+                        const other = (q, sk) => !fineQ(q, sk);
+                        for (let r = 0; r < 2; r++) {
+                            const hx = holeOf(items);
+                            const tryRow = (cnt, want, fine, salt) => {
+                                const more = items.concat(dealtAt(items, cnt, want, salt));
+                                return more.length === items.length + cnt && more.every((it, i) => i < items.length || isFine(it) === fine) && whole(more) ? more : null;
+                            };
+                            const more = tryRow(hx.fineCols, fineQ, true, 6000 + 10 * r + items.length) || tryRow(hx.cols, other, false, 6500 + 10 * r + items.length);
+                            if (!more) break;
+                            items = more;
+                        }
+                        sec.floor = floorFor(items);
+                    }
                     // A single-skill page never prints the same problem twice to fill its grid
                     // (round 4: add_sub_10s S filled 3 x 10 from a pool of about 20 facts, so 30 + 10
                     // printed three times). It holds the skill's distinct problems, in whole rows.
