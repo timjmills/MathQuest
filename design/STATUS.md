@@ -495,6 +495,7 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
   also a named, findable PRESET skill that opens the host skill with those options set. Not built yet: needs a preset registry
   (skill id -> {host, opts}) wired into data.js/skill finder/share codes/generateQuestionFor, then an audit of existing options
   (first candidates: multiply tiles 21/31/22, the area-model options, count_by_tables tables) and a flag on build-list option entries.
+- 2026-10-17: Owner archived all idle sessions. **Pick-up list for next week: `design/HANDOVER-2026-10-17.md`** (open PRs #11, #13, #14 with their branches, states and next steps; paused lanes; other projects).
 - Held for after these land: Lane B answer boxes + regroup boxes (spec `design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md`),
   placevalue:identify write-value (spec `design/audit/runs/next-session/PV-IDENTIFY-WRITE-VALUE-SPEC.md`).
 
