@@ -18,6 +18,25 @@ The tooling is ported from the Y1 lessons lane, which passed critic r3: its gate
 | Lesson tagFixes | 0 |
 | Lesson links | 88 pre / related links, plus 29 direct / partial links (round 2: lesson 5's related dropped) |
 
+## Round 3 (lessons critic r2: FAIL, mean 7.96; lesson 8 at 7)
+
+The steps, the tagFixes and the step proposals are still frozen (frozen gate OK; the step build writes sha `d4d03a36…`).
+
+| Row | Change | Checked on items |
+|---|---|---|
+| F4 (lesson 8) | The related `composite_shapes {forms: [1], band: 25}` why now says what the items do: "the perimeter and the area of a small L- or T-shape (areas 14 to 24); two side lengths are not labelled and are worked out from the others first". The link is kept, because it is the lesson's only perimeter-and-area practice on a composite shape. The why says that the missing sides come first (Y4.B6.S6, W20, is a gap step) | 60 fresh items (seed 91813, stride 53): areas 14-24, 42 L and 18 T. Every item labels 4 sides: 4 `<text>` labels in the screen SVG, and `geometryData.dims` has 4 entries. Print draws the same `createLShapeSVG` / `createTShapeSVG` from those dims (`print-generate.js` 9857-9860) |
+| G4 (lessonfit) | `claimLists` adds four checks. (1) A layout claim ("every / each / all side(s) (length) given / labelled / shown", "no side to work out", "no missing side", "nothing to work out") is read against `geometryData`: an L with fewer than 6 labelled dims, or a T / U with fewer than 8, fails. (2) A list "groups of 3, 4 or 5" is complete: a group size outside it that is dealt (`payload.size`, or "groups of N" / "N in each" in the text) fails, unless the list follows "such as / like / for example / including". (3) A coin denial on a money skill ("never a quarter", "no 25-cent coins", "never uses dimes or nickels") is read against the payload's coins (`values` with `counts` > 0, `coins` / `set` / `given`, coin words in the text). The coin must be the denial's own object, so "never the amount split into tens, ones, dimes and pennies" is not read as a coin denial. A money clause is no longer matched to a time skill's option (class M skips TIME keys when the lesson has no time link), so "never a quarter" no longer fails for the wrong reason. (4) "the other models show …" and "all the other models show …" are read like "are all in …" | The critic's N15, N15b, N18, N19, N19b, N26 and N27 are now caught by G4 |
+| G5 (lessonfit) | `supportTables`: a Support lesson's pre or related fails when it uses a times table its source year has not met. The table comes from `opts.constant` / `tables` / `table` / `factors`, or from "N times-table" in the why. Grade 2 (WRM Y3) knows 2, 5, 10, 3, 4 and 8. Grade 1 (WRM Y2) knows 2, 5 and 10 (WRM Y2 teaches those tables; the critic's "every × at Grade 1" would fail lesson 15's true counting in 5s and 10s pres, both cited to Y2 steps). Kindergarten and below know none | N5b is caught ("the 7 times-table is beyond … Y3") |
+| n7 | `citeCheck` reads "week N" and "wk N" as well as "wk Wnn", and compares the week numbers | N25 ("week 9" for a W02 step) is caught |
+
+**Round-3 sweep.** Every why and clause of all 23 lessons was re-read with the new rules, and lessonfit was run at n = 60 on 3 fresh seed sets: `[[31337,59],[80021,41]]`, `[[45007,67],[19993,29]]` and `[[60661,83],[27011,37]]`. Each gave 0 findings. The first build under the new rules found 3 findings, all false positives of the new checks, so the checks were fixed and the data was left as it was:
+1. G5 at Grade 1. Lesson 15's pres `count_by_tables` ×5 and ×10 cite Y2.B5.S15 / S13, which are Grade 1 steps. The Grade 1 table set is now 2, 5 and 10.
+2. G4 coins. Lesson 21's clause "never the amount split into tens, ones, dimes and pennies" denies a split, not a coin. The coin must now be the denial's own object.
+
+I also grepped every why and clause for layout, list, coin, week and table wording. Every hit is true on its items. This includes lesson 23's "groups of 3, 4, 5 or 6", which is a complete list, and lesson 22's coin set.
+
+**Mutations.** Every critic r2 lessonfit mutation was re-run in this tree (`mymut.py` and `mymut2.py`, seeds `[[70001,43],[51229,61]]`). The controls are clean, and 42 of 43 are caught, each for the right reason. The 43rd, N26, was an "in file" no-op that is now a re-injection. Re-injected by hand and in `lessonmut.py`, it is caught by G4. `lessonmut.py` gains 11 mutations: 2 layout, 2 lists, 3 coins, 1 "show", 2 G5 and 1 n7. The total is **117 mutations and controls, 0 missed**. The critic's post-finish edits (`postmut.py`, clean tree C) were re-run with 2 more: p26 restores the old lesson 8 why, and p27 adds "never a quarter" to lesson 22. **27 / 27 are caught**, and the control exits 0 with sha `1bed00da…`.
+
 ## Round 2 (lessons critic r1: FAIL, mean 7.87; lessons 4, 8 and 10 at 7)
 
 Every row of the critic's fix table is done. The steps, the tagFixes and the step proposals are still frozen (frozen gate OK, sha `d4d03a36…` after strip).
@@ -80,12 +99,12 @@ The new files are all in `tests/scripts/wrm-tagging/Y4/`:
 
 | Gate | Result |
 |---|---|
-| Two clean `git archive` builds (dump, step build, lessons build) | Byte-identical: sha256 `2596565b…` (round 2; build B deleted Y4.json first and ran with a fresh data dir and no `WRM_TAG_DATA`) |
+| Two clean `git archive` builds (dump, step build, lessons build) | Byte-identical: sha256 `1bed00da2aae20dc103ff6f3b92893516f60bee951a0e0eae40a597ef8c7d103` (round 3; round 2 `2596565b…`; build B deleted Y4.json first and ran with a fresh data dir and no `WRM_TAG_DATA`) |
 | Frozen gate | OK |
 | lessonspec | 0 differences |
 | lessoncheck | 0 differences |
 | lessonfit | Round 2: 0 findings at the default seeds and on 3 fresh seed sets at n=60 (`[[13579,41],[24680,43]]`, `[[31415,47],[27182,53]]`, `[[11111,59],[99991,61]]`) |
-| lessonmut | Round 2: **106 mutations and controls, 0 missed** (the 92 of round 1 plus 14 for G1-G3) |
+| lessonmut | Round 3: **117 mutations and controls, 0 missed** (round 2's 106 plus 11 for G4, G5 and n7) |
 | lessonmerge Y4 alone, and Y4 with R, Y1, Y2, Y3, Y5, Y6 one by one | 0 problems |
 | lessonmerge all seven at once | 0 real conflicts, 0 lesson tagFixes |
 | lessonmerge with Y1 from /home/user/wt-l1 (with its lessons) | 0 problems |
