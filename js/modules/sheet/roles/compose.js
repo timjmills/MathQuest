@@ -189,6 +189,20 @@ export function fitsAt(items, cols, ctx) {
     });
 }
 
+/**
+ * Wave 1 lane D r12c (RUBRIC H13): the problems of a set that fit two columns and those that fit
+ * only one (an area model of three parts at M), or null when the set is one width. A Test or a
+ * Review band prints the two in groups of their own (practice.js splitWide), never the narrow
+ * ones in full-width cells.
+ */
+export function splitByWidth(items, ctx) {
+    if (!items || items.length < 3) return null;
+    const narrow = items.filter((it) => fitsAt([it], 2, ctx));
+    const wide = items.filter((it) => !fitsAt([it], 2, ctx));
+    if (!wide.length || narrow.length < 2) return null;
+    return { narrow, wide };
+}
+
 /** The largest column count in `options` (descending) at which every item fits. */
 export function bestCols(items, options, ctx) {
     for (const c of options) if (fitsAt(items, c, ctx)) return c;
