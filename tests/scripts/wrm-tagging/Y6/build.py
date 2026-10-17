@@ -10,7 +10,11 @@ Inputs (all in the repo except the generated scratch data):
   Scratch (keys.json, prior.json) goes to $WRM_TAG_DATA or a fresh temp dir; nothing is read from outside the repo.
 Derived here: pre citations as step ids, rule checks, tagFixes against the live SKILL_WRM (with a structured `partial`
 clause), proposals, the envisioned skill of every partial or gap step. The build runs mergecheck.mjs (Y6 alone, then with
-R, Y1, Y4), optcheck.mjs and linkfit.mjs, checks the notes against the data (class N), and fails on any problem.
+R, Y1, Y4, then with Y5 too), optcheck.mjs and linkfit.mjs, checks the notes against the data (class N), and fails on any problem.
+SITE LESSONS (owner rule 2026-10-16): lessons.py + spec_z_lessons.py write the top-level "lessons" section (the 24 wrmYear Y6
+entries of data/curriculum/site-lessons.json, in the Y5 lane's shape); lessons.py holds every lesson to its spec (no pass may
+re-option, add or drop a link) and lessonfit.mjs judges every lesson link from generated items (lessonmut.py proves each gate fires).
+Lessons emit no tagFixes. The steps, the tagFixes and the steps' fields of every proposal are frozen (Y6 steps passed critic r5).
 usage: python3 tests/scripts/wrm-tagging/Y6/build.py
 """
 import json, re, sys, os, glob, subprocess, copy
@@ -73,6 +77,10 @@ for sid, sp in STEPS.items():
     for e in sp['pre']: e['why'] = cite_norm(e['why'])
 NEW = copy.deepcopy(base['newProposals'])
 ns = {'STEPS': STEPS, 'NEW': NEW, 'props': props, 'keys': keys, 'wk': wk, 'titles': titles, 'ENVISION': {}, 'ENVTEACH': {}, 'CLOSES': {}, 'ENVREP': {}, 'errs': errs}
+# site lessons (lessons.py): `lesson()` and the lesson proposal tables, set up before the spec files run (spec_z_lessons.py uses them)
+LNS = {'R': R, 'errs': errs}
+exec(open(os.path.join(H, 'lessons.py')).read(), LNS)
+LNS['setup'](ns)
 for f in sorted(glob.glob(os.path.join(H, 'spec_*.py'))): exec(open(f).read(), ns)
 ENV, ENVTEACH, CLOSES, ENVREP = ns['ENVISION'], ns['ENVTEACH'], ns['CLOSES'], ns['ENVREP']
 
@@ -280,7 +288,11 @@ for (key, sid) in sorted(cur, key=lambda x: (order.index(x[1]), x[0])):
     tagfixes.append({'key': key, 'step': sid, 'action': 'remove',
                      'why': WHY.get((key, sid)) or ('generated items do not teach this step' + (f'; kept as a {where} skill' if where else ''))})
 
-doc = {'year': 'Y6', 'generatedBy': 'wave2-tagging', 'steps': out_steps, 'proposals': dict(sorted(proposals.items())), 'tagFixes': tagfixes}
+# ---- 7. site lessons (lessons.py): checked, pre whys written, proposals merged (`lessons`, closes[<lesson id>]), envisioned,
+# and held to their spec; they emit no tagFixes
+out_lessons, SPEC_LESSONS = LNS['finish'](out_steps, proposals, tagfixes, props, keys, titles, wk, order, errs)
+json.dump(SPEC_LESSONS, open(os.path.join(DATA, 'spec-lessons.json'), 'w'), indent=1, ensure_ascii=False, sort_keys=True)
+doc = {'year': 'Y6', 'generatedBy': 'wave2-tagging', 'steps': out_steps, 'lessons': out_lessons, 'proposals': dict(sorted(proposals.items())), 'tagFixes': tagfixes}
 OUT = R + 'data/curriculum/links/Y6.json'
 json.dump(doc, open(OUT, 'w'), indent=1, ensure_ascii=False)
 open(OUT, 'a').write('\n')
@@ -290,7 +302,11 @@ print('steps', len(out_steps), dict(c))
 print('proposals new', sum(1 for p in proposals.values() if not p['reused']), 'reused', sum(1 for p in proposals.values() if p['reused']),
       '| tagFixes', len(tagfixes), {a: sum(1 for t in tagfixes if t['action'] == a) for a in ('add', 'full', 'partial', 'opts', 'remove')})
 print('pre citations re-cited to a tagged step (H):', recited)
-for args in ([OUT], [OUT] + OTHER):
+print('lessons', len(out_lessons), dict(Counter(s['verdict'] for s in out_lessons.values())), '| site-lessons Y6', len(LNS['LES']),
+      '| proposals used by lessons', sum(1 for p in proposals.values() if p.get('lessons')), 'new', sum(1 for p in proposals.values() if p.get('lessons') and not p['reused']))
+# mergecheck: Y6 alone, with the lanes whose tags the steps were built against (R, Y1, Y4), and with every passed lane in the repo
+# (Y5 too: its lessons section and tagFixes); 0 problems, and no tagFix may name a site lesson
+for args in ([OUT], [OUT] + OTHER, [OUT] + OTHER + [R + 'data/curriculum/links/Y5.json']):
     mc = subprocess.run(['node', os.path.join(H, 'mergecheck.mjs')] + args, capture_output=True, text=True)
     print((mc.stdout.strip().splitlines() or ['mergecheck: no output'])[-2])
     if mc.returncode: errs.append('mergecheck.mjs FAILED:\n' + mc.stdout.strip()[-3000:] + mc.stderr.strip()[-500:])
@@ -300,5 +316,9 @@ if oc.returncode: errs.append('optcheck.mjs FAILED:\n' + oc.stdout.strip()[-3000
 lf = subprocess.run(['node', os.path.join(H, 'linkfit.mjs'), OUT], capture_output=True, text=True, env={**os.environ, 'WRM_TAG_DATA': DATA})
 print((lf.stdout.strip().splitlines() or ['linkfit: no output'])[-1])
 if lf.returncode: errs.append('linkfit.mjs FAILED:\n' + lf.stdout.strip()[-3000:])
+lsf = subprocess.run(['node', os.path.join(H, 'lessonfit.mjs'), OUT], capture_output=True, text=True, env={**os.environ, 'WRM_TAG_DATA': DATA})
+open(os.path.join(DATA, 'lessonfit.txt'), 'w').write(lsf.stdout + lsf.stderr)
+print((lsf.stdout.strip().splitlines() or ['lessonfit: no output'])[-1])
+if lsf.returncode: errs.append('lessonfit.mjs FAILED (site lessons):\n' + lsf.stdout.strip()[-6000:] + lsf.stderr.strip()[-1500:])
 print('\n'.join(errs) or 'OK')
 sys.exit(1 if errs else 0)

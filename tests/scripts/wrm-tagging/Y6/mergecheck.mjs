@@ -54,6 +54,21 @@ for (const d of docs) {
   }
   for (const id of tag.keys()) { const sid = id.split('|')[1]; if (d.steps[sid] && !want.has(id)) problems.push(`${yr}: ${id}: still tagged after the merge, but not a direct or partial skill`); }
 }
+// site lessons (owner rule 2026-10-16): a lesson is not a WRM small step, so no file's tagFixes may name one, every tagFix of the
+// first file names a step of that file (an older lane may tag another year's step), and the first file's `lessons` section holds exactly its year's entries of data/curriculum/site-lessons.json
+{
+  const site = JSON.parse(fs.readFileSync(R + 'data/curriculum/site-lessons.json', 'utf8')).lessons;
+  for (const d of docs) for (const t of d.tagFixes) {
+    if (/\|-\|/.test(t.step) || (d.lessons && d.lessons[t.step])) problems.push(`${d.year}: tagFix names a site lesson: ${t.key}|${t.step}`);
+    else if (d === docs[0] && !d.steps[t.step]) problems.push(`${d.year}: tagFix names a step outside its own file: ${t.key}|${t.step}`);
+  }
+  const d0 = docs[0];
+  if (d0.lessons) {
+    const want = site.filter(l => l.wrmYear === d0.year).map(l => l.id), got = Object.keys(d0.lessons);
+    for (const id of want) if (!d0.lessons[id]) problems.push(`${d0.year}: site lesson not in the lessons section: ${id}`);
+    for (const id of got) if (!want.includes(id)) problems.push(`${d0.year}: lessons section has ${id}, not a ${d0.year} entry of site-lessons.json`);
+  }
+}
 console.log(problems.join('\n'));
 console.log(`mergecheck: ${docs.map(d => d.year).join(' + ')}: ${nWant} direct/partial tags, ${docs.reduce((a, d) => a + d.tagFixes.length, 0)} tagFixes; ${problems.length} problems`);
 console.log(problems.length ? 'mergecheck: FAIL' : 'mergecheck: OK');
