@@ -123,6 +123,36 @@ def _(d): l = L(d, 'countmoneynotesandcoins'); l['title'] = 'Count money in deci
 def _(d): l = L(d, 'introduceweightandmass'); l.update(verdict='full', missing='', build=[], envision=[], direct=[{'key': 'measurement:heavier_lighter_visual', 'opts': {}}], partial=[])
 @m("FULLAUDIT: a full lesson re-optioned away from its row", r"FULLAUDIT: the audit row's links")
 def _(d): L(d, 'finddurationsoftime')['direct'] = [{'key': 'measurement:elapsed_visual_easy', 'opts': {'notation': 'digital'}}]
+# ── A, round 2 (lessons critic r1 G1-G3 and its 12 missed mutations) ──
+def _f(lst, key): return [e for e in lst if e['key'] == key][0]
+@m('G1 story tables: L4 pre div_word_problems without its range (÷ 13-15)', r'G1 rule 19: a story step')
+def _(d): _f(L(d, 'twostepwordproblemswiththefouroperations')['pre'], 'division:div_word_problems').pop('opts', None)
+@m('G1 lesson own maximum: L8 related composite_shapes at the default band (areas to 200)', r'size \d+ > 45 \(the lesson deals to')
+def _(d): _f(L(d, 'distributiveandadditivearea')['related'], 'area_perimeter:composite_shapes')['opts'] = {'forms': [1]}
+@m('G1 lesson own maximum: L3 related dot_array_mult band 100', r'size \d+ > 30 \(the lesson deals to')
+def _(d): L(d, 'propertiesofmultiplicationcommutativeidentityanddistributive')['related'][0]['opts'] = {'band': 100}
+@m('G1 a pre past the tables: L4 pre word_problems_mixed at the default Max Number', r'G1 rule 19: a story step')
+def _(d): L(d, 'twostepwordproblemswiththefouroperations')['pre'].append({'key': 'number_ops_mixed:word_problems_mixed', 'why': 'Y3.B3.S5 Sharing and grouping (Grade 2, lower grade): one-step stories'})
+@m('G2 "never dividing by more than 12" with ÷ 13-15 dealt', r'G2: says "never dividing by more than 12"')
+def _(d): e = _f(L(d, 'twostepwordproblemswiththefouroperations')['pre'], 'division:div_word_problems'); e.pop('opts', None); e['why'] = e['why'].split(':')[0] + ': a one-step ÷ story, never dividing by more than 12'
+@m('G2 "products to 90" with 108 dealt', r'G2: says "products to 90"')
+def _(d): P_('patternsonthemultiplicationtable', 1)(d)['why'] += ', products to 90'
+@m('G2 lower bound: L7 "areas 9 to 48" (4 dealt)', r'G2: says "areas 9 to 48", but items go below')
+def _(d): p = L(d, 'areaasmultiplication')['partial'][0]; p['missing'] = p['missing'].replace('areas 4 to 48', 'areas 9 to 48')
+@m('G2 "within the tables": L4 partial word_problems_mixed loses Max Number 100', r'G2: says "within the tables"')
+def _(d): L(d, 'twostepwordproblemswiththefouroperations')['partial'][1].pop('maxNumber', None)
+@m('G3 groups list: L23 "groups of 2, 3, 4, 5 or 6" (2 never dealt)', r'G3: says "groups of 2, 3, 4, 5 or 6"')
+def _(d): p = L(d, 'sharingandgroupingfairshares')['partial'][0]; p['missing'] = p['missing'].replace('groups of 3, 4, 5 or 6', 'groups of 2, 3, 4, 5 or 6')
+@m('G3 "never thirds" on a non-fraction skill (thirds dealt)', r'G3: says "never [^"]*thirds"')
+def _(d): p = L(d, 'partitionshapesintoequalareas')['partial'][0]; p['missing'] = p['missing'].replace('never sixths or eighths', 'never thirds, sixths or eighths')
+@m('G3 money: L21 "never a $5 or a $10 bill" ($5 dealt)', r'items show a \$5 bill')
+def _(d): p = L(d, 'poundstensonesandpenceusdollarscents')['partial'][0]; p['missing'] = p['missing'].replace('never a $10 bill', 'never a $5 or a $10 bill')
+@m('G3 "the other models in thirds, fifths or sixths" (r1 why)', r'G3: says "the other models')
+def _(d): e = _f(L(d, 'measuretothehalfandquarterinch')['pre'], 'fractions:identify'); e['why'] = e['why'].replace('; some of the other models are in thirds, fifths or sixths', ' (the other models in thirds, fifths or sixths)')
+@m('duration claim: L13 related why "how long an activity takes, in minutes"', r'ask for a duration')
+def _(d): L(d, 'comparedurationsoftime')['related'][0]['why'] = 'how long an activity takes, in minutes'
+@m('CITE week text: L1 pre why "(wk W09)" for a W02 step', r'the why says wk W09')
+def _(d): P_('findtheruleinaninputoutputtable', 1)(d)['why'] += ' (wk W09)'
 AUD = json.load(open(os.path.join(H, 'full_audit.json')))
 AM = []
 def _a1(d, a): a[G + 'solveadditionandsubtractionwordproblemswithin1000usingbarmodels']['ccss']['3.OA.D.8'] = 'Solve two-step word problems with the four operations: the stories are dealt with a bar model on every item, as the title asks'

@@ -33,6 +33,12 @@
 //   FULLAUDIT a FULL lesson has a hand-audit row (full_audit.json) naming its direct links, reading its title and every site CCSS
 //             code; a code the row reads as dealt is dealt by the items (STD_ITEM); a group / size range the row states holds
 //   DENOMS, G the Y6 lane's denominator-family and decimal rules
+//   ROUND 2 (lessons critic r1 G1-G3): SIZE holds every pre / related to the lesson's OWN dealt maximum (its direct / partial items;
+//             CEIL only for a lesson that deals none) and a pre also to its cited unit's; a story cell's steps (a × b, a ÷ b) past 12 or
+//             of tables untaught by the week fail (G1); a bound the items break fails: "areas 4 to 48" read both ways, "products to 90",
+//             "never more than N", "dividing by 2 to 8", "within the tables" (G2); a listed group size must be dealt, a negated fraction
+//             family holds on every skill, a $N bill named or denied holds against the payload's notes, "the other models in ..." holds
+//             for every distractor (G3); a "how long" / duration claim needs duration items; a "wk Wnn" in a why is the cited step's week
 // usage: node lessonfit.mjs [<Y4.json>] [--all] [--n 40] [--seeds '[[s1,stride],[s2,stride]]']       (exit 1 on any finding)
 const _m = new Map(); globalThis.localStorage = { getItem: k => _m.get(k) ?? null, setItem: (k, v) => _m.set(k, String(v)), removeItem: k => _m.delete(k) };
 globalThis.window = globalThis; globalThis.document = undefined;

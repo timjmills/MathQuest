@@ -16,7 +16,42 @@ The tooling is ported from the Y1 lessons lane, which passed critic r3: its gate
 | Reused proposals | 1 Y4 base (`time_units`), 8 WRM_PROPOSALS, 6 STANDARD_PROPOSALS, 2 copied verbatim from passed lanes (`make_amount_notes` from Y3.json, `frac_compare_same_part` from Y5.json) |
 | New proposals | `estimate_mass_volume`, `ruler_object_inch`, `money_place_value`, `area_split_tiles`, `compare_durations` |
 | Lesson tagFixes | 0 |
-| Lesson links | 89 pre / related links, plus 29 direct / partial links |
+| Lesson links | 88 pre / related links, plus 29 direct / partial links (round 2: lesson 5's related dropped) |
+
+## Round 2 (lessons critic r1: FAIL, mean 7.87; lessons 4, 8 and 10 at 7)
+
+Every row of the critic's fix table is done. The steps, the tagFixes and the step proposals are still frozen (frozen gate OK, sha `d4d03a36…` after strip).
+
+| Row | Change | Checked on items |
+|---|---|---|
+| F1 (lesson 4) | The pre `division:div_word_problems` gets `{range: 100}`, the step lane's option; its why says "dividing by 2 to 8". The partial `word_problems_mixed` gets Max Number 100 and its clause now names the factors and divisors within the tables and the "times as many" comparisons (about 1 in 5, 4.OA.A.2, Grade 4 content) | 200 items at range 100: divisors 2-8 only, 0 past 12. `word_problems_mixed` at 100, 300 items: every × / ÷ factor or divisor 3-10; "times as many" 37 / 200 |
+| F2 (lesson 8) | The related `composite_shapes {forms: [1]}` gets `band: 25`; its why says "a small L- or T-shape with every side length given (areas 14 to 24)" | 600 items: areas 14-24, perimeters 22-24, largest number 24 (the lesson's own items stop at 30) |
+| F3 (lesson 10) | The pre `identify {forms: [1], denoms: [2]}` why: "…halves, quarters or eighths; some of the other models are in thirds, fifths or sixths" | The new G3 gate reads every distractor of the payload's `terms` |
+| G1 (lessonfit) | SIZE holds every pre / related to the lesson's own dealt maximum (its direct and partial items; the CEIL bound only for a gap lesson), and a pre also to its cited unit's maximum, with max(1.5 × c, c + 2). A story cell's `steps[]` (a × b, a ÷ b) with a factor, divisor or quotient past 12, or of tables untaught by the week, is a finding. A function table's In / Out numbers (`rows[].x / y`, skipped as layout before) now count | Mutation 1 and F2 fail; the per-lesson rule found 5 more relateds (below) |
+| G2 | New `boundBreaks`: "<areas / products / sums / totals / quotients / differences / answers / perimeters> A to B" is read both ways (an item below A or above B fails), "… to N" one way, "never / no … more than / past / above N" against the largest number, "never … by more than N" against the divisors and factors, "dividing by A to B" against the divisors, "within the tables" against the story steps | Mutations 2, 3, 6, 7, 14 fail |
+| G3 | New `claimLists`: every size in "groups of 2, 3 … or 6" is dealt; a negated fraction family ("never thirds") holds on any skill, not only one with a `denoms` option; a $N bill named or denied holds against the payload's `notes`; "the other models (are) in …" holds for every distractor unless the why says "some" | Mutations 4, 8, 9, 12 fail |
+| n1 (lesson 7) | "areas 4 to 48" restored | 400 items: 4 to 48 (G2 now gates it both ways) |
+| n2 (lesson 9) | `estimate_mass_volume`'s why and lesson 9's rule-5 record name Y5's `capacity_estimate` (the volume half, 3.MD.A.2) and say why the option is still needed (the mass half). **The lead reconciles at merge** | |
+| n3 (lesson 13) | The related `time_sense` (a.m. / p.m.) is replaced by `elapsed_hour`: "a time on a time line 1, 2 or 3 hours later or earlier than a start time". `compare_durations.closes` now equals the clause it closes ("which took longer"; "by how much" is gone) | 60 items: intervals 60 / 120 / 180 min, later and earlier |
+| n4 (lesson 15) | The audit row says "totals to about 100 dollars ($100.46 is dealt)" | |
+| n5 (lesson 21) | `money_place_value`'s why and lesson 21's rule-5 record name VISUAL_BUILDS `vis_coin_options` (a coin chart £1 / 10p / 1p) and `money_convert`'s place chart $ \| ¢, and say why a chart with a tens column of dollars to $99.99 is still a separate option. **The lead reconciles at merge** | |
+| n6 (lesson 23) | Left as is (optional): the R lane's own R.B11.S12 link, its why true, no band below 20 | |
+
+**Round-2 sweep.** Every why and clause of all 23 lessons was re-read against 45 fresh items a link (seed 424243, stride 67) and run through the new rules on the default seeds and 3 fresh seed sets at n=60. The new rules found 6 links; all are fixed:
+
+| Lesson | Finding | Fix |
+|---|---|---|
+| 1 Find the rule | `number_patterns_rule` held to 30: a gate fault, the function table's In / Out numbers were skipped as layout keys | The gate reads `rows[].x / y` (the lesson deals to 99) |
+| 3 Properties of multiplication | related `dot_array_mult {band: 100}` deals 90; the lesson's items stop at 20 | `band: 25` (products to 25) |
+| 5 Partition shapes | related `whole_as_fraction` writes wholes to 10; the lesson's parts are 2 to 4 | Dropped, with a "No related" note (the other fraction skills duplicate the pre) |
+| 8 Distributive area | the new why said "areas 18 to 24"; 14 is dealt | "areas 14 to 24" |
+| 10 Measure to the inch | related `line_plot_fractions` totals to 11; the lesson deals to 6 | `tiles: 6` (to 8) |
+| 11 Build a line plot | related `bar_graph {forms: [0, 1]}` values to 45; the lesson deals to 11 | `most: 10` |
+| 13 Compare durations | the first `elapsed_hour` why said "duration"; the items ask for a time | Reworded to the time later or earlier |
+
+**Mutations.** The critic's 19 lessonfit mutations were re-run (`mymut2.py`, re-injecting the three in-file defects): all 18 valid ones and 6 more variants are caught, the control is clean. `lessonmut.py` keeps 14 of them (106 mutations, 0 missed). The critic's 19 post-finish edits (`postmut.py`, run in clean tree A, p1 now strips the range) are all caught; the control exits 0 with sha `2596565b…`.
+
+**Merge.** `lessonmerge.mjs` with all lanes (Y1 from /home/user/wt-l1 with 39 lessons, Y2 / Y3 from /home/user/MathQuest) and the critic's `merge.mjs`: 0 real conflicts, order independent, 0 lesson tagFixes, every lessons section exact and in order; the 41 differing core fields are the same as round 1 (none a value Y4 contributes).
 
 ## Build and gates
 
@@ -45,12 +80,12 @@ The new files are all in `tests/scripts/wrm-tagging/Y4/`:
 
 | Gate | Result |
 |---|---|
-| Two clean `git archive` builds (dump, step build, lessons build) | Byte-identical: sha256 `092c0eb1…` |
+| Two clean `git archive` builds (dump, step build, lessons build) | Byte-identical: sha256 `2596565b…` (round 2; build B deleted Y4.json first and ran with a fresh data dir and no `WRM_TAG_DATA`) |
 | Frozen gate | OK |
 | lessonspec | 0 differences |
 | lessoncheck | 0 differences |
-| lessonfit | 0 findings on 5 seed sets (default, and `[[13579,41],[24680,59]]`, `[[31337,29],[70707,61]]`, `[[11213,31],[98765,67]]`, `[[61001,37],[90907,53]]` at n=60) |
-| lessonmut | **92 mutations and controls, 0 missed**: lessonfit classes, audit rows, lessons.py checks, lessonspec, frozen, lessonmerge, post-finish edits and source gates |
+| lessonfit | Round 2: 0 findings at the default seeds and on 3 fresh seed sets at n=60 (`[[13579,41],[24680,43]]`, `[[31415,47],[27182,53]]`, `[[11111,59],[99991,61]]`) |
+| lessonmut | Round 2: **106 mutations and controls, 0 missed** (the 92 of round 1 plus 14 for G1-G3) |
 | lessonmerge Y4 alone, and Y4 with R, Y1, Y2, Y3, Y5, Y6 one by one | 0 problems |
 | lessonmerge all seven at once | 0 real conflicts, 0 lesson tagFixes |
 | lessonmerge with Y1 from /home/user/wt-l1 (with its lessons) | 0 problems |
@@ -116,7 +151,7 @@ Every partial or gap lesson carries the search record in `lessons[...].rule5`. I
 | Partition | `partition_shapes` forms / parts; `identify` / `shade` / `write_fraction`; `compose_whole`; `whole_as_fraction`; `half_or_not` |
 | Area as mult | `area_unit_squares` 0 / 1; `area` 0-2 (forms 0 includes triangles); `area_perimeter`; `compose_rect_from_squares`; `dot_array_mult` / `arrays_groups` |
 | Distributive area | `area_distributive_visual` 30 / 50; `area_polygon_decompose` 0-2; `composite_shapes` 0 / 1; `area` forms 2; `mult_properties` 1 |
-| Mass and volume | `mass_volume_liquid` 0-2; `capacity` units / forms; `unit_conversions`; `unit_conversion_word`; `estimate_length`; `heavier_lighter` |
+| Mass and volume | `mass_volume_liquid` 0-2; `capacity` units / forms; `unit_conversions`; `unit_conversion_word`; `estimate_length`; `heavier_lighter`; overlap (round 2, n2): Y5's proposal `capacity_estimate` covers the volume half of `estimate_mass_volume`, for the lead to reconcile |
 | Half / quarter inch | `reading_ruler` parts / labels; `reading_ruler_hard`; `estimate_length`; `length_customary`; make_line_plot / ruler_difference (builds) |
 | Line plot | `line_plot` 0 / 1; `line_plot_g2` 0-2; `line_plot_fractions` 0-2; `build_bar_graph`; `build_pictograph` |
 | Compare durations | `elapsed_visual_*`; `elapsed_find_duration`; `elapsed_hour` / 30min / 15min; `order_clocks_*`; `time_sense` |
@@ -124,7 +159,7 @@ Every partial or gap lesson carries the search record in `lessons[...].rule5`. I
 | Capacity | `capacity` (units, conversions); `mass_volume_liquid` 0; `compare_objects`; `heavier_lighter` |
 | Weight | `heavier_lighter` 0 / 1; `mass_volume_liquid` 1; `compare_objects` |
 | Order fractions | `order_fractions` 0-2; `order_frac_numline`; `compare` denoms / forms; `compare_frac_lcd` |
-| Pounds, tens, ones | `money_notation` collection / words; `money_count` kinds; `coin_value`; `money_compare`; money_convert (Y4); `placevalue:identify` |
+| Pounds, tens, ones | `money_notation` collection / words; `money_count` kinds; `coin_value`; `money_compare`; money_convert (Y4, its spec's place chart $ \| ¢); VISUAL_BUILDS `vis_coin_options` (a coin chart, no tens of dollars); `placevalue:identify`; overlap (round 2, n5) for the lead to reconcile |
 | Select money | `make_change_least_coins`; `equiv_coin_sets`; `money_count`; `money`; `enough_money` |
 | Sharing and grouping | `share_into_groups` 12 / 24; `div_word_problems`; `fraction_of_set`; `odd_even` |
 
