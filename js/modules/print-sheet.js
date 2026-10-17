@@ -2227,8 +2227,9 @@ async function buildSheetDeal(req = {}) {
                     // (the true cell heights, r12c, made mixed_subtraction M a page of 2 stories and 3
                     // stacks whose rows were stretched to half full, L-DENSITY SPREAD).
                     h = holeOf(items);
-                    if (pool && !h.rem && !h.frem && h.fineCols > 0) {
-                        const whole = (its) => { sec.floor = floorFor(its); const hx = holeOf(its); return hx.cap >= its.length && its.length <= ceilF * pagesWanted && !hx.rem && !hx.frem && hx.fineCols > 0; };
+                    if (pool && !h.rem && !h.frem) {
+                        const hadFine = h.fineCols > 0;
+                        const whole = (its) => { sec.floor = floorFor(its); const hx = holeOf(its); return hx.cap >= its.length && its.length <= ceilF * pagesWanted && !hx.rem && !hx.frem && (hx.fineCols > 0) === hadFine; };
                         const other = (q, sk) => !fineQ(q, sk);
                         for (let r = 0; r < 2; r++) {
                             const hx = holeOf(items);
@@ -2236,7 +2237,7 @@ async function buildSheetDeal(req = {}) {
                                 const more = items.concat(dealtAt(items, cnt, want, salt));
                                 return more.length === items.length + cnt && more.every((it, i) => i < items.length || isFine(it) === fine) && whole(more) ? more : null;
                             };
-                            const more = tryRow(hx.fineCols, fineQ, true, 6000 + 10 * r + items.length) || tryRow(hx.cols, other, false, 6500 + 10 * r + items.length);
+                            const more = (hx.fineCols > 0 ? tryRow(hx.fineCols, fineQ, true, 6000 + 10 * r + items.length) : null) || tryRow(hx.cols, other, false, 6500 + 10 * r + items.length);
                             if (!more) break;
                             items = more;
                         }
@@ -3199,9 +3200,31 @@ function pageCheck(html) {
                 const ft = foot.getBoundingClientRect().top;
                 if (ft > top) fill = Math.min(fill, (bot - top) / (ft - top));
             }
+            // r12c: lint L-DENSITY SPREAD - per row, the tallest drawing (20 mm or more, the label
+            // and the padding left out) against the row's inner height; the median row under half
+            // is a page of stretched rows (mixed_multiplication L: a lone row of facts at 86 mm)
+            const spreadRows = new Map();
+            const lastOfSeveral = pages.length > 1 && i === pages.length - 1;
             for (const c of pg.querySelectorAll('.ws-grid > .ws-cell:not(.blankrun)')) {
                 if (c.closest('.mq-anchorgrid') || c.querySelector('[data-ws-anchor]')) continue;
                 const cr = c.getBoundingClientRect();
+                if (!lastOfSeveral && c.querySelector('[data-ws-label]')) {
+                    const ccs = getComputedStyle(c);
+                    let t = Infinity, b = -Infinity;
+                    for (const d of c.querySelectorAll('*')) {
+                        if (d.matches('[data-ws-label], [data-ws-label] *') || !shown(d)) continue;
+                        const r = d.getBoundingClientRect();
+                        if (!r.height || !r.width || r.height >= cr.height - 1) continue;
+                        t = Math.min(t, r.top); b = Math.max(b, r.bottom);
+                    }
+                    const inner = cr.height - (parseFloat(ccs.paddingTop) || 0) - (parseFloat(ccs.paddingBottom) || 0);
+                    if (b > t && inner > 0) {
+                        const k = Math.round(cr.top);
+                        const row = spreadRows.get(k) || { h: 0, inner };
+                        row.h = Math.max(row.h, (b - t) / PX_PER_MM); row.inner = Math.max(row.inner, inner / PX_PER_MM);
+                        spreadRows.set(k, row);
+                    }
+                }
                 // PG-12: nothing sticks out of its cell (lint L-OVERFLOW's 0.75 px)
                 for (const d of c.querySelectorAll('*')) {
                     if (!shown(d)) continue;
@@ -3229,6 +3252,11 @@ function pageCheck(html) {
                     bands++;
                     banded.push(`${c.getAttribute('data-ws-cell') || '?'} ${vBand >= 0.29 * cr.height ? 'v' : 'h'}${Math.round(100 * Math.max(vBand / cr.height, hBand / cr.width))}%`);
                 }
+            }
+            const fills = [...spreadRows.values()].filter((r) => r.h >= 20).map((r) => r.h / r.inner).sort((a, b) => a - b);
+            if (fills.length) {
+                const med = fills[Math.floor((fills.length - 1) / 2)];
+                if (med < 0.52) { bands++; banded.push(`spread ${Math.round(med * 100)}%`); }
             }
         });
         return { fill, bands, over, banded };
