@@ -217,6 +217,62 @@ export function sequenceGrades() {
     }));
 }
 
+/* ---- the page's navigation (owner 2026-10-17: "show the grade, the domain, and then the lessons in list form in
+ * order ... the extra lessons/projects/enrichment come up as the last domain section") ----------------------------
+ * A CORE lesson is a sequence row the school site lists inside a core domain unit (White Rose, copied in, CCSS BUILD,
+ * above grade, non-CCSS). Everything else is an EXTRA lesson: the site's support lessons, its projects and other
+ * school lessons (the step flag "other", e.g. Grade 5's end-of-year investigation projects), enrichment lessons and
+ * the assessments. */
+export function isCoreLesson(l) {
+    if (!l || !l.seq || l.unit === 'E' || l.type === 'enrich' || l.type === 'assessment') return false;
+    return ((l.siteInfo && l.siteInfo.flag) || l.flag || '') !== 'other';
+}
+/** The groups of the Extra lessons section, in the order the page shows them. */
+export const EXTRA_KINDS = [
+    ['support', 'Support lessons'],
+    ['other', 'Projects and other school lessons'],
+    ['enrich', 'Enrichment lessons'],
+    ['assessment', 'Assessments'],
+];
+/** Which Extra lessons group a non-core lesson belongs to. */
+export function extraKind(l) {
+    if (l.type === 'assessment') return 'assessment';
+    if (l.type === 'enrich' || l.unit === 'E') return 'enrich';
+    const f = (l.siteInfo && l.siteInfo.flag) || l.flag || '';
+    return f === 'enrich-native' ? 'support' : 'other';
+}
+/**
+ * A grade's list as the page shows it: one section per domain in the site's order (its core lessons in the site's
+ * order; Pre-K's small units of a domain are parts of one section), then the "Extra lessons" section holding every
+ * non-core lesson of the grade exactly once, grouped by EXTRA_KINDS.
+ * [{ key, domain, name, extra, parts: [{ unit, name, lessons }], groups?: [{ kind, label, lessons }], lessons }]
+ * `key` is the section's bookmark segment: the first unit id of the domain, or 'extra'.
+ */
+export function gradeSections(gradeId) {
+    unpack();
+    const g = WRM_SEQUENCE.find((x) => x.id === String(gradeId));
+    if (!g) return [];
+    const out = [];
+    const byDom = new Map();
+    const extra = [];
+    for (const u of g.units) {
+        const list = UNIT_ORDER.get(`${g.id}:${u.id}`) || [];
+        const core = list.filter(isCoreLesson);
+        if (core.length) {
+            let s = byDom.get(u.domain);
+            if (!s) { s = { key: u.id, domain: u.domain, name: domainName(u.domain), extra: false, parts: [] }; byDom.set(u.domain, s); out.push(s); }
+            s.parts.push({ unit: u.id, name: u.name, lessons: core });
+        }
+        for (const l of list) if (!isCoreLesson(l)) extra.push(l);
+    }
+    for (const s of out) s.lessons = s.parts.flatMap((p) => p.lessons);
+    if (extra.length) {
+        const groups = EXTRA_KINDS.map(([kind, label]) => ({ kind, label, lessons: extra.filter((l) => extraKind(l) === kind) })).filter((x) => x.lessons.length);
+        out.push({ key: 'extra', domain: '', name: 'Extra lessons', extra: true, parts: [], groups, lessons: groups.flatMap((x) => x.lessons) });
+    }
+    return out;
+}
+
 export function allLessons() { unpack(); return LESSONS.slice(); }
 export function lessonByKey(key) { unpack(); return BY_KEY.get(String(key || '')) || null; }
 export function weekInfo(gradeId, week) {

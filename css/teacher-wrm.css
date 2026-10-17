@@ -331,3 +331,104 @@ html.dark body.teacher-mode .tvw-tag.tvw-tm-kind { color: #f2f2f2; border-color:
     .tvw-tm .tvw-tm-link, .tvw-tmu .tvw-tm-link { white-space: normal; text-align: center; padding: 6px 10px; font-size: 14px; }
     .tvw-tm .tvw-tm-link svg, .tvw-tmu .tvw-tm-link svg { display: none; }
 }
+
+/* ---------------------------------------------------------------- Owner 2026-10-17: grade → domain → lesson list, the lesson on the side.
+   teacher-wrm.js: a grade row, a domain row (site order, then Extra lessons), the grade's list (a heading per domain, its
+   lessons numbered beneath, title + at most two small tags) and the lesson panel: a right column at 1024 px and wider (the
+   list keeps its own scroll box beside it), a slide-over with Back on narrower screens. Additive: new classes only. */
+.tvw-nfind { gap: 10px; }
+.tvw-navrow { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
+.tvw-navrow .tvw-pick-h { flex: none; width: 64px; padding-top: 14px; }
+.tvw-navbtns { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; flex: 1 1 auto; }
+.tv-chip.tvw-gradebtn { width: auto; height: auto; min-height: 44px; min-width: 56px; padding: 0 14px; font-size: 16px; font-weight: 600; }
+.tv-chip.tvw-dombtn { width: auto; height: auto; min-height: 44px; max-width: 100%; padding: 6px 14px; font-size: 14px; line-height: 18px; font-weight: 600; white-space: normal; text-align: left; }
+.tv-chip.tvw-dombtn.is-extra { border-style: dashed; }
+.tv-chip.tvw-dombtn[aria-current="true"] { border-color: var(--tv-selected); box-shadow: inset 0 0 0 1px var(--tv-selected); color: var(--tv-text); }
+
+.tvw-ngrid { display: grid; grid-template-columns: minmax(280px, 380px) minmax(0, 1fr); gap: 20px; align-items: start; }
+.tvw-navlist {
+    position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto; overscroll-behavior: contain;
+    background: var(--tv-surface); border: 1px solid var(--tv-border); border-radius: 12px; padding: 4px 8px 16px; min-width: 0;
+}
+.tvw-sec { display: flex; flex-direction: column; gap: 6px; padding: 12px 0 8px; }
+.tvw-sec + .tvw-sec { border-top: 2px solid var(--tv-text); margin-top: 8px; }
+.tvw-sec-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 0; padding: 4px 8px; font-size: 18px; line-height: 24px; font-weight: 700; color: var(--tv-text); scroll-margin-top: 8px; }
+.tvw-sec-h:focus-visible { outline: 2px solid var(--tv-accent); outline-offset: 2px; border-radius: 6px; }
+.tvw-sec-n { font-size: 13px; line-height: 18px; font-weight: 600; color: var(--tv-caption); }
+.tvw-sec-cap { margin: 0; padding: 0 8px; font-size: 13px; line-height: 18px; color: var(--tv-text-2); }
+.tvw-nsub { margin: 10px 8px 2px; }
+.tvw-tmu-wrap { display: flex; flex-direction: column; gap: 8px; padding: 0 8px 4px; min-width: 0; }
+.tv-btn.tvw-tmu-fold { align-self: flex-start; height: auto; min-height: 44px; max-width: 100%; white-space: normal; text-align: left; line-height: 18px; padding: 6px 12px; font-weight: 600; }
+.tvw-tmu-wrap > .tvw-tmu { margin: 0; padding: 12px; }
+.tvw-tmu-h { font-size: 16px; line-height: 22px; }
+
+.tvw-lesson.tvw-nrow {
+    display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; grid-template-areas: "n t g";
+    column-gap: 8px; row-gap: 4px; align-items: start; min-height: 44px; padding: 8px 6px 8px 4px;
+}
+.tvw-nrow-n { grid-area: n; font-size: 15px; line-height: 22px; font-weight: 700; color: var(--tv-caption); text-align: right; font-variant-numeric: tabular-nums; }
+.tvw-nrow-t { grid-area: t; min-width: 0; font-size: 16px; line-height: 22px; font-weight: 600; overflow-wrap: anywhere; }
+.tvw-nrow-tags { grid-area: g; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; padding-top: 1px; }
+.tvw-tag.tvw-ntag { white-space: nowrap; min-height: 20px; padding: 0 7px; font-size: 12px; line-height: 18px; font-weight: 600; border: 1px solid var(--tv-border); background: transparent; color: var(--tv-text-2); }
+.tvw-tag.tvw-ntag.is-full { border-color: var(--tv-text); color: var(--tv-text); }
+.tvw-tag.tvw-ntag.is-partial { background: var(--tv-subtle); }
+.tvw-tag.tvw-ntag.is-gap { border-style: dashed; }
+.tvw-tag.tvw-ntag.is-build { background: var(--tv-text); border-color: var(--tv-text); color: var(--tv-surface); }
+.tvw-lesson.tvw-nrow[aria-current="true"] { background: var(--tv-accent-tint); border-color: var(--tv-selected); box-shadow: inset 3px 0 0 var(--tv-selected); }
+.tvw-lesson.tvw-nrow[aria-current="true"] .tvw-nrow-n { color: var(--tv-text); }
+
+.tvw-panel { container: tvwpanel / inline-size; }
+.tvw-panel-top { display: none; }
+.tvw-title:focus-visible { outline: 2px solid var(--tv-accent); outline-offset: 2px; border-radius: 6px; }
+
+/* a narrower panel (1024–1279 px) wraps its rows as the phone does */
+@container tvwpanel (max-width: 760px) { .tv-actionbar.tvw-bar { flex-wrap: wrap; } }
+@container tvwpanel (max-width: 600px) {
+    .tvw-q .tv-btn span { display: none; }
+    .tvw-viewtog { margin-left: 0; }
+    .tvw-row { flex-wrap: wrap; align-items: flex-start; row-gap: 4px; padding: 4px; }
+    .tvw-row-main { flex: 1 1 calc(100% - 104px); min-width: 200px; }
+    .tvw-row .tvp-info { margin-left: 0; }
+    .tvw-row .tvw-q { flex: 0 1 auto; margin-left: auto; display: flex; justify-content: flex-end; gap: 8px; }
+    .tvw-row .tvw-q .tv-btn { padding: 0 8px; }
+    .tvw-group { padding: 10px; }
+    .tvw-q .tv-btn { min-width: 44px; min-height: 44px; }
+    .tvw-q .tv-btn span { display: inline; }
+    .tvw-bar-btns { display: flex; width: 100%; min-width: 0; flex-wrap: nowrap; }
+    .tvw-bar-btns .tv-btn { flex: 1 1 0; min-width: 0; }
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+    .tvw-ngrid { grid-template-columns: minmax(250px, 300px) minmax(0, 1fr); gap: 16px; }
+    #teacherMain:has(.tv-screen.is-active .tvw-ngrid) { padding-left: 24px; padding-right: 24px; }
+}
+
+/* narrower than 1024 px: the list is the page; a lesson slides over it with Back */
+@media (max-width: 1023px) {
+    .tvw-ngrid { grid-template-columns: minmax(0, 1fr); }
+    .tvw-navlist { position: static; max-height: none; overflow: visible; }
+    .tvw-ngrid > .tvw-panel { display: none; }
+    .tvw-ngrid.is-open > .tvw-panel {
+        display: flex; position: fixed; top: 0; bottom: 0; right: 0; left: var(--tv-side-w, 72px); z-index: 45;
+        overflow-y: auto; overscroll-behavior: contain; background: var(--tv-page); padding: 0 16px; gap: 16px;
+        box-shadow: -8px 0 24px rgba(20, 20, 30, .18);
+    }
+    .tvw-ngrid.is-open > .tvw-panel > :last-child { margin-bottom: 0; }
+    .tvw-panel-top {
+        display: flex; position: sticky; top: 0; z-index: 6; margin: 0 -16px; padding: 10px 16px;
+        background: var(--tv-page); border-bottom: 1px solid var(--tv-border);
+    }
+    .tvw-back { font-weight: 700; }
+    .tvw-navrow .tvw-pick-h { width: auto; padding-top: 0; }
+    .tvw-navrow { flex-direction: column; gap: 6px; }
+}
+@media (max-width: 420px) {
+    .tvw-lesson.tvw-nrow { grid-template-columns: 30px minmax(0, 1fr); grid-template-areas: "n t" "n g"; }
+    .tvw-nrow-tags { flex-direction: row; flex-wrap: wrap; align-items: flex-start; }
+}
+@media (max-width: 600px) {
+    .tvw-ngrid.is-open > .tvw-panel { padding: 0 12px; }
+    .tvw-panel-top { margin: 0 -12px; padding: 8px 12px; }
+    .tv-chip.tvw-dombtn { flex: 1 1 140px; }
+}
+html.dark body.teacher-mode .tvw-ngrid.is-open > .tvw-panel { box-shadow: -8px 0 24px rgba(0, 0, 0, .5); }

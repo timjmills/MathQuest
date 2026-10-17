@@ -41,6 +41,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const links = await import(path.join(ROOT, 'js/modules/wrm-links.js'));
   for (const y of CUR_YEARS) links.addCuratedYear(JSON.parse(fs.readFileSync(path.join(DATA_DIR, `${y}.json`), 'utf8')));
   const all = links.allLessons();
+  // the list section a lesson is listed in (owner 2026-10-17 navigation): its domain section's key, or 'extra'
+  const secOf = (l) => (links.gradeSections(l.grade).find((s) => s.lessons.includes(l)) || {}).key;
   const pref = (f) => all.find((l) => l.grade === '2' && f(l)) || all.find((l) => l.type === 'wr' && f(l));
   const builtLesson = CUR_YEARS.length ? pref((l) => links.linksFor(l).build.length) : null;
   const optLesson = CUR_YEARS.length ? pref((l) => links.linksFor(l).prereq.some((x) => x.opts)) : null;
@@ -120,6 +122,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const step = async (name, fn) => { try { await fn(); } catch (e) { failures.push(`${name}: ${(e && e.message) || e}`); } };
   const shot = async (name) => { if (SHOTS) { fs.mkdirSync(OUT, { recursive: true }); await page.screenshot({ path: path.join(OUT, `${name}.png`) }); } };
   const hash = () => page.evaluate(() => location.hash);
+  // owner 2026-10-17 navigation evidence: design/audit/runs/wrm-page/nav/
+  const shotNav = async (name) => { if (SHOTS) { fs.mkdirSync(path.join(OUT, 'nav'), { recursive: true }); await page.screenshot({ path: path.join(OUT, 'nav', `${name}.png`) }); } };
   // round 7: a FULL page load at a hash (index.json and the detailed-lessons file are read once per load; a goto that
   // only changes the hash is a same-document navigation). The teacher role is set again after the load.
   const freshLoad = async (h, sel = '[data-screen="wrm"].is-active .tvw-lesson') => {
@@ -195,26 +199,74 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await page.click('#teacherApp [data-tv-go="wrm"]');
     await waitFor(page, () => !!document.querySelector('[data-screen="wrm"] .tvw-lesson'), 20000, 'wrm lessons');
     check(await page.evaluate(() => document.querySelector('#teacherMain .tv-screen.is-active').dataset.screen === 'wrm'), 'nav: wrm screen not active');
-    check(/^#wrm\/2\/D1$/.test(await hash()), `hash on open: ${await hash()}`);
+    check(/^#wrm\/2$/.test(await hash()), `hash on open: ${await hash()}`);
     const grades = await page.$$eval('[data-w-grade]', (b) => b.map((x) => x.textContent.trim()));
-    check(grades.join() === 'Pre-K,K,1,2,3,4,5'.replace('Pre-K', grades[0]) && grades.length === 7, `grade chips ${grades}`);
+    check(grades.join() === 'Pre-K,K,Grade 1,Grade 2,Grade 3,Grade 4,Grade 5', `grade row ${grades}`);
     check(await page.$eval('.tvw-empty', (e) => /Choose a lesson/.test(e.textContent)), 'empty detail: no "Choose a lesson"');
     await fit('1366 start');
     await shot('01-start-1366');
 
-    /* ---------------------------------------------------- grade → unit → lesson */
+    /* ---------------------------------------------------- the navigation (owner 2026-10-17): grade → domains → the list */
+    // what the list shows, read from the page, against gradeSections() (domains in the site's order, Extra lessons last,
+    // every lesson of the grade once, numbered 1, 2, 3 within its section, title + at most two small tags, no weeks)
+    const navCheck = async (g, tag) => {
+      const want = links.gradeSections(g);
+      const r = await page.evaluate(() => {
+        const list = document.querySelector('[data-screen="wrm"].is-active #tvwLessons');
+        return {
+          doms: [...document.querySelectorAll('[data-screen="wrm"].is-active #tvwDoms [data-w-sec]')].map((b) => [b.dataset.wSec, b.textContent.trim()]),
+          secs: [...list.querySelectorAll('[data-w-secbox]')].map((s) => ({ key: s.dataset.wSecbox, name: s.querySelector('.tvw-sec-t').textContent.trim(),
+            rows: [...s.querySelectorAll('.tvw-nrow')].map((b) => ({ key: b.dataset.wLesson, n: b.querySelector('.tvw-nrow-n').textContent.trim(),
+              tags: [...b.querySelectorAll('.tvw-nrow-tags .tvw-tag')].map((x) => x.textContent.trim()), all: b.querySelectorAll('.tvw-tag').length })),
+            tmuHidden: !s.querySelector('.tvw-tmu') || s.querySelector('.tvw-tmu').hidden })),
+          text: list.innerText,
+          pressed: [...document.querySelectorAll('[data-screen="wrm"].is-active [data-w-grade][aria-pressed="true"]')].map((b) => b.dataset.wGrade),
+        };
+      });
+      check(r.pressed.join() === g, `${tag}: grade row marks ${r.pressed} not ${g}`);
+      check(JSON.stringify(r.doms) === JSON.stringify(want.map((s) => [s.key, s.name])), `${tag}: domain row ${JSON.stringify(r.doms)} not ${JSON.stringify(want.map((s) => [s.key, s.name]))}`);
+      check(r.secs.map((s) => s.key).join() === want.map((s) => s.key).join() && r.secs.map((s) => s.name).join() === want.map((s) => s.name).join(), `${tag}: sections ${r.secs.map((s) => s.name)}`);
+      const extraWant = want.find((s) => s.extra);
+      if (extraWant) check(r.secs[r.secs.length - 1].key === 'extra' && r.secs[r.secs.length - 1].name === 'Extra lessons', `${tag}: Extra lessons is not the last section`);
+      const mine = all.filter((l) => l.grade === g);
+      const keys = r.secs.flatMap((s) => s.rows.map((x) => x.key));
+      check(keys.length === mine.length && new Set(keys).size === keys.length && mine.every((l) => keys.includes(l.key)), `${tag}: ${keys.length} rows for ${mine.length} lessons (each once)`);
+      const extraRows = (r.secs.find((s) => s.key === 'extra') || { rows: [] }).rows.map((x) => x.key);
+      const nonCore = mine.filter((l) => !links.isCoreLesson(l)).map((l) => l.key);
+      check(extraRows.length === nonCore.length && nonCore.every((k) => extraRows.includes(k)), `${tag}: Extra lessons holds ${extraRows.length} rows, ${nonCore.length} non-core lessons`);
+      for (const [i, s] of r.secs.entries()) {
+        check(JSON.stringify(s.rows.map((x) => x.key)) === JSON.stringify(want[i].lessons.map((l) => l.key)), `${tag} ${s.key}: rows not in the site's order`);
+        check(s.rows.every((x, j) => x.n === String(j + 1)), `${tag} ${s.key}: rows not numbered 1, 2, 3 …`);
+        check(s.rows.every((x) => x.all <= 2 && x.tags.every((t) => /^(Full|Covers part|No skill yet|CCSS · BUILD)$/.test(t))), `${tag} ${s.key}: a row with other tags ${JSON.stringify(s.rows.find((x) => x.all > 2 || x.tags.some((t) => !/^(Full|Covers part|No skill yet|CCSS · BUILD)$/.test(t))))}`);
+        check(s.tmuHidden, `${tag} ${s.key}: the Skills to be made card is open by default`);
+      }
+      const wk = /\bWeeks?\b|\bW\d\d\b|\b\d{1,2}\s*(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b|\bStrand|\+\d\b/.exec(r.text);
+      check(!wk, `${tag}: week / date text in the list: "${wk && r.text.slice(Math.max(0, wk.index - 30), wk.index + 20)}"`);
+    };
+    await navCheck('2', 'nav Grade 2');
+
+    /* ---------------------------------------------------- grade → domain → lesson */
     await page.click('[data-w-grade="3"]');
     await waitFor(page, () => document.querySelector('[data-w-grade="3"]')?.getAttribute('aria-pressed') === 'true', 8000, 'grade 3');
-    check(/^#wrm\/3\/D1$/.test(await hash()), `hash after grade: ${await hash()}`);
-    const units3 = await page.$$eval('[data-w-unit]', (b) => b.map((x) => x.dataset.wUnit));
-    check(units3.join() === 'D1,D2,D3,D4,D5', `grade 3 units ${units3}`);
+    check(/^#wrm\/3$/.test(await hash()), `hash after grade: ${await hash()}`);
+    const units3 = await page.$$eval('[data-w-sec]', (b) => b.map((x) => x.dataset.wSec));
+    check(units3.join() === 'D1,D2,D3,D4,D5,extra', `grade 3 domain row ${units3}`);
+    await navCheck('3', 'nav Grade 3');
+    // a domain button jumps the list to that section (its heading in the list's view) and is the bookmark
+    await page.click('[data-w-sec="D4"]');
+    await sleep(200);
+    const jump = await page.evaluate(() => { const l = document.querySelector('#tvwLessons').getBoundingClientRect(); const h = document.querySelector('#tvwSecH-D4').getBoundingClientRect(); return { inList: h.top >= l.top - 1 && h.top < l.top + 80, focus: document.activeElement && document.activeElement.id }; });
+    check(jump.inList && jump.focus === 'tvwSecH-D4' && (await hash()) === '#wrm/3/D4', `domain jump: ${JSON.stringify(jump)} ${await hash()}`);
     await page.click('[data-w-grade="2"]');
     await waitFor(page, () => document.querySelector('[data-w-grade="2"]')?.getAttribute('aria-pressed') === 'true', 8000, 'grade 2');
-    await page.click(`[data-w-unit="${rich.unit}"]`);
+    await page.click(`[data-w-sec="${secOf(rich)}"]`);
     await sleep(300);
-    await page.click(`[data-w-lesson="${rich.key}"]`);
+    await tap(`.tvw-nrow[data-w-lesson="${rich.key}"]`);
     await waitFor(page, () => !!document.querySelector('.tvw-head'), 5000, 'detail');
     check((await hash()) === `${links.lessonHash(rich)}`, `hash after lesson: ${await hash()}`);
+    // the lesson opens BESIDE the list (right column), the list stays on screen
+    const side0 = await page.evaluate(() => { const l = document.querySelector('#tvwLessons').getBoundingClientRect(); const d = document.querySelector('#tvwDetail').getBoundingClientRect(); const row = document.querySelector('.tvw-nrow[aria-current="true"]'); return { beside: d.left >= l.right, listOn: l.width > 200 && l.bottom > 100, rowOn: !!row && row.getBoundingClientRect().width > 0, fixed: getComputedStyle(document.querySelector('#tvwDetail')).position, back: (document.querySelector('[data-w-back]') || { getClientRects: () => [] }).getClientRects().length }; });
+    check(side0.beside && side0.listOn && side0.rowOn && side0.fixed !== 'fixed' && !side0.back, `1366 side panel: ${JSON.stringify(side0)}`);
     const d = await page.evaluate(() => ({
       title: document.querySelector('.tvw-title').textContent,
       groups: [...document.querySelectorAll('[data-w-group]')].map((g) => [g.dataset.wGroup, g.querySelectorAll('.tvw-row').length]),
@@ -333,15 +385,25 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await shot('08-build-lesson-1366');
 
     /* ---------------------------------------------------- Pre-K */
-    // with a lesson open the finder is one line; "Change grade or unit" opens it
-    check(await page.$eval('.tvw-pick', (p) => p.hidden), 'finder not folded while a lesson is open');
-    await tap('[data-w-finder]');
-    await sleep(150);
+    // the grade and domain rows stay on screen while a lesson is open
+    await page.evaluate(() => window.scrollTo(0, 0));
     await page.click('[data-w-grade="PK"]');
-    await sleep(200);
+    await sleep(300);
     const pk = await page.$$eval('.tvw-lesson', (b) => b.length);
     check(pk > 5, `Pre-K: ${pk} lessons`);
+    await navCheck('PK', 'nav Pre-K');
     await shot('09-prek-1366');
+    // a search finds lessons in every grade: from Pre-K, a Grade 4 lesson opens Grade 4 at that lesson
+    {
+      const g4 = all.find((l) => l.grade === '4' && links.isCoreLesson(l) && l.title.length > 12 && links.searchLessons(l.title, 10, 'PK')[0] === l);
+      await page.click('#tvwSearch', { clickCount: 3 });
+      await page.type('#tvwSearch', g4.title);
+      await sleep(300);
+      await page.keyboard.press('Enter');
+      await waitFor(page, `location.hash === ${JSON.stringify(links.lessonHash(g4))} && !!document.querySelector('#tvwDetail .tvw-head')`, 8000, 'search across grades');
+      const sg = await page.evaluate(() => ({ g: (document.querySelector('[data-w-grade][aria-pressed="true"]') || {}).dataset?.wGrade, cur: (document.querySelector('.tvw-nrow[aria-current="true"]') || {}).dataset?.wLesson }));
+      check(sg.g === '4' && sg.cur === g4.key, `search across grades: ${JSON.stringify(sg)} want 4 ${g4.key}`);
+    }
 
     /* ---------------------------------------------------- bookmark: reload at a hash */
     await page.goto(`${base}/index.html${links.lessonHash(rich)}`, { waitUntil: 'networkidle2', timeout: 60000 });
@@ -353,7 +415,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await page.setViewport({ width: 1280, height: 720, deviceScaleFactor: 1 });
     await sleep(300);
     await fit('1280 list');
-    await page.click(`[data-w-lesson="${rich.key}"]`).catch(() => {});
+    await page.click(`.tvw-nrow[data-w-lesson="${rich.key}"]`).catch(() => {});
     await sleep(500);
     await clearOfBar('1280 lesson open');
     await shot('10-lesson-list-1280');
@@ -377,11 +439,29 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await sleep(150);
     await shot('13-dark-1280');
     await page.evaluate(() => document.documentElement.classList.remove('dark'));
-    if (await page.$('[data-w-finder]')) { await tap('[data-w-finder]'); await sleep(150); }
     await page.focus('[data-w-grade="4"]');
     await page.keyboard.press('Enter');
-    await sleep(200);
-    check(/^#wrm\/4\//.test(await hash()), 'keyboard: Enter on a grade chip did nothing');
+    await sleep(300);
+    check(/^#wrm\/4$/.test(await hash()), `keyboard: Enter on a grade button gave ${await hash()}`);
+    // the list: arrow keys move through the rows (across sections), End to the last, Enter opens the row with the focus
+    {
+      const order = links.gradeSections('4').flatMap((s) => s.lessons.map((l) => l.key));
+      await page.focus(`.tvw-nrow[data-w-lesson="${order[0]}"]`);
+      await page.keyboard.press('ArrowDown');
+      await page.keyboard.press('ArrowDown');
+      const k2 = await page.evaluate(() => document.activeElement && document.activeElement.dataset.wLesson);
+      await page.keyboard.press('ArrowUp');
+      const k1 = await page.evaluate(() => document.activeElement && document.activeElement.dataset.wLesson);
+      await page.keyboard.press('End');
+      const kEnd = await page.evaluate(() => document.activeElement && document.activeElement.dataset.wLesson);
+      check(k2 === order[2] && k1 === order[1] && kEnd === order[order.length - 1], `keyboard: arrows went ${k2}, ${k1}, End ${kEnd}`);
+      await page.keyboard.press('Home');
+      await page.keyboard.press('ArrowDown');
+      await page.keyboard.press('Enter');
+      await waitFor(page, `location.hash === ${JSON.stringify(links.lessonHash(links.lessonByKey(order[1])))} && !!document.querySelector('#tvwDetail .tvw-head')`, 8000, 'keyboard Enter opens');
+      const kf = await page.evaluate(() => document.activeElement && document.activeElement.dataset.wLesson);
+      check(kf === order[1], `keyboard: after Enter the focus is on ${kf}, not the row`);
+    }
 
     /* ---------------------------------------------------- the pupil link opens the pupil flow */
     const ctx = await browser.createBrowserContext();
@@ -551,42 +631,49 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       await page.evaluate((id) => { window.__tmo = id; }, first);
       await waitFor(page, () => !!document.querySelector(`[data-screen="todo"].is-active [data-t-item="${CSS.escape(window.__tmo)}"].is-open`), 15000, 'todo at the to-make entry');
       // the unit cards: Grade 3 · Operations & Algebraic Thinking and Grade 4 · Number & Operations in Base Ten
-      const unitOf = (g, dom) => (all.find((l) => l.grade === g && l.domain === dom && l.type !== 'copied') || {}).unit;
+      const unitOf = (g, dom) => (links.gradeSections(g).find((s) => s.domain === dom) || {}).key;
       for (const [g, dom, name] of [['3', 'OA', 'unit-g3-operations-algebraic-thinking'], ['4', 'NBT', 'unit-g4-number-operations-base-ten']]) {
         const u = unitOf(g, dom);
         if (!u) { failures.push(`to-make unit: no Grade ${g} ${dom} unit`); continue; }
-        const lessons = links.unitLessons(g, u).filter(Boolean);
+        // owner 2026-10-17 navigation: the card sits at the top of the domain's section, folded until the teacher opens it
+        const lessons = (links.gradeSections(g).find((s) => s.key === u) || { lessons: [] }).lessons;
         const rows = TMK.unitToMake(lessons.map((l) => ({ lesson: l, links: links.linksFor(l), detailed: DLK.detailedOf(dlx, l) })), { queue: Qi });
+        const CARD = `[data-screen="wrm"].is-active #tvwTmu-${u}`;
         for (const [w, h] of [[390, 844], [1280, 800]]) {
           await vp(w, h);
-          await page.evaluate(() => window.tvGo('home'));
-          await page.evaluate((hh) => { location.hash = hh; }, `#wrm/${g}/${u}`);
-          await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active #tvwUnitToMake:not([data-w-tomake-unit="loading"])'), 20000, `unit card ${g} ${u}`);
+          // a fresh load: the card is folded on every new visit
+          await freshLoad(`#wrm/${g}/${u}`, `${CARD}:not([data-w-tomake-unit="loading"])`);
+          await page.evaluate(() => { navigator.clipboard.writeText = (t) => { window.__copied = t; return Promise.resolve(); }; });
           await sleep(150);
-          const uf = await page.evaluate(() => {
-            const c = document.querySelector('#tvwUnitToMake');
-            return { title: c.querySelector('#tvwTmuH').textContent, count: +(c.querySelector('.tvw-tm-count') || {}).textContent, shown: c.querySelectorAll('.tvw-tm-row').length,
+          const fold = await page.$eval(`[data-screen="wrm"].is-active [data-w-tmu-toggle="${u}"]`, (b) => ({ text: b.textContent.trim(), exp: b.getAttribute('aria-expanded'), hidden: document.querySelector(`#tvwTmu-${b.dataset.wTmuToggle}`).hidden }));
+          check(fold.exp === 'false' && fold.hidden && fold.text === `Skills to be made for this domain (${rows.length}) — show`, `unit ${g} ${u} @${w}: folded button ${JSON.stringify(fold)}`);
+          await tap(`[data-screen="wrm"].is-active [data-w-tmu-toggle="${u}"]`);
+          await sleep(150);
+          const uf = await page.evaluate((sel) => {
+            const c = document.querySelector(sel);
+            const sec = c.closest('[data-w-secbox]');
+            return { title: c.querySelector('.tvw-tmu-h').textContent, count: +(c.querySelector('.tvw-tm-count') || {}).textContent, shown: c.querySelectorAll('.tvw-tm-row').length, hidden: c.hidden,
               all: (c.querySelector('[data-w-tmu-all]') || {}).textContent || '', empty: (c.querySelector('.tvw-tm-empty') || {}).textContent || '',
               forOk: [...c.querySelectorAll('.tvw-tm-row')].every((r) => r.querySelector('.tvw-tm-for [data-w-lesson]') && r.querySelector('.tvw-tm-name') && r.querySelector('.tvw-tm-kind') && r.querySelector('.tvw-tm-what') && r.querySelector('.tvw-tm-status') && r.querySelector('[data-todo-open], [data-w-dl-goto]')),
-              aboveGrid: c.nextElementSibling && c.nextElementSibling.classList.contains('tvw-grid') };
-          });
+              atTop: !!sec && sec.dataset.wSecbox === c.dataset.wTmuSec && !!(c.compareDocumentPosition(sec.querySelector('.tvw-nlist')) & Node.DOCUMENT_POSITION_FOLLOWING) };
+          }, CARD);
           const wantTitle = `Skills to be made for Grade ${g} · ${links.domainName(dom)}`;
-          check(uf.title === wantTitle && uf.aboveGrid, `unit ${g} ${u} @${w}: title "${uf.title}" (want "${wantTitle}"), above the lesson list ${uf.aboveGrid}`);
+          check(!uf.hidden && uf.title === wantTitle && uf.atTop, `unit ${g} ${u} @${w}: title "${uf.title}" (want "${wantTitle}"), open ${!uf.hidden}, at the top of its section ${uf.atTop}`);
           check(uf.count === rows.length && uf.shown === Math.min(6, rows.length), `unit ${g} ${u} @${w}: badge ${uf.count} rows ${uf.shown}, want ${rows.length} (first 6 shown)`);
           check(rows.length ? uf.forOk : uf.empty === TMK.EMPTY_UNIT, `unit ${g} ${u} @${w}: a row lacks its parts or lessons`);
           if (rows.length > 6) check(uf.all === `Show all ${rows.length}`, `unit ${g} ${u}: "Show all" button "${uf.all}"`);
           await fit(`unit ${g} ${u} @${w}`);
-          { const ov = await page.$$eval('#tvwToMake button, #tvwUnitToMake button', (bs) => bs.filter((x) => x.getClientRects().length && x.scrollWidth > x.clientWidth + 1).map((x) => x.textContent.trim()));
+          { const ov = await page.$$eval(`#tvwToMake button, ${CARD} button, [data-w-tmu-toggle]`, (bs) => bs.filter((x) => x.getClientRects().length && x.scrollWidth > x.clientWidth + 1).map((x) => x.textContent.trim()));
             check(!ov.length, `to-make @${w}: button text spills out of its button: ${ov.slice(0, 3).join(', ')}`); }
-          await page.evaluate(() => window.scrollTo(0, 0));
-          await elShot('#tvwUnitToMake', `${name}-${w}`);
+          await page.$eval(CARD, (el) => el.scrollIntoView({ block: 'start' }));
+          await elShot(CARD, `${name}-${w}`);
           if (w === 1280 && rows.length > 6) {
-            await tap('[data-w-tmu-all]');
+            await tap(`${CARD} [data-w-tmu-all]`);
             await sleep(150);
-            check(await page.$$eval('#tvwUnitToMake .tvw-tm-row', (r) => r.length) === rows.length, `unit ${g} ${u}: "Show all" does not show all`);
+            check(await page.$$eval(`${CARD} .tvw-tm-row`, (r) => r.length) === rows.length, `unit ${g} ${u}: "Show all" does not show all`);
             // a lesson button opens that lesson
-            const lk = await page.$eval('#tvwUnitToMake .tvw-tm-lesson', (x) => x.dataset.wLesson);
-            await tap('#tvwUnitToMake .tvw-tm-lesson');
+            const lk = await page.$eval(`${CARD} .tvw-tm-lesson`, (x) => x.dataset.wLesson);
+            await tap(`${CARD} .tvw-tm-lesson`);
             await waitFor(page, `location.hash === ${JSON.stringify(links.lessonHash(links.lessonByKey(lk)))}`, 8000, 'unit lesson link');
           }
         }
@@ -638,7 +725,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await page.evaluate(() => window.scrollTo(0, 0));
     await fit('1366 todo filtered', 'todo');
     await shot('21-todo-search-open-1366');
-    // print (clean page of the filtered list) and CSV
+    // print (clean page of the filtered list) and CSV (the window.open stand-in again: the domain cards' case reloads the page)
+    await page.evaluate(() => { window.__opened = ''; window.open = () => ({ document: { open() {}, write(h) { window.__opened += h; }, close() {} }, focus() {}, print() {} }); });
     await page.click('[data-t-act="print"]');
     await sleep(200);
     const ph = await page.evaluate(() => window.__opened);
@@ -808,7 +896,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       const wtxt = await page.$eval('[data-screen="wrm"].is-active', (e) => e.innerText);
       const wcode = /\bW\d\d\b/.exec(wtxt);
       check(!wcode, `m4: raw week code on the White Rose screen: ${wcode && wtxt.slice(Math.max(0, wcode.index - 40), wcode.index + 20)}`);
-      check(/Weeks? \d+(–\d+)? \(\d+ [A-Z][a-z]{2} – \d+ [A-Z][a-z]{2}\)/.test(wtxt), 'm4: unit caption lacks "Weeks 1–9 (6 Sep – 5 Nov)"');
+      // owner 2026-10-17 ("don't worry about the dates"): the list shows no weeks or dates (the panel's kicker may)
+      const ltxt = await page.$eval('[data-screen="wrm"].is-active #tvwLessons', (e) => e.innerText);
+      check(!/\bWeeks?\b|\(\d+ [A-Z][a-z]{2} – \d+ [A-Z][a-z]{2}\)/.test(ltxt), 'm4: the lesson list shows weeks or dates');
       // m5: the Start tab is not remembered
       await page.goto(`${base}/index.html#map/start`, { waitUntil: 'networkidle2', timeout: 60000 });
       await waitFor(page, () => !!document.querySelector('[data-screen="map"].is-active [data-map-tab]'), 20000, 'm5 map');
@@ -986,17 +1076,23 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
       check(siteBuild && supportLesson && assessLesson, 'data: no CCSS BUILD, support lesson or assessment to test');
       if (CUR_YEARS.includes('Y5')) check(!!siteTagged, 'data: Y5 is loaded but no site lesson is tagged');
-      // the unit list mixes the White Rose steps and the site's lessons in the order unitLessons() gives
+      // owner 2026-10-17: the site's own lessons and assessments are the Extra lessons section, grouped (support lessons,
+      // projects and other school lessons, enrichment, assessments); the domain sections hold the site's core lessons
       const unitOf = assessLesson;
-      await freshLoad(`#wrm/${unitOf.grade}/${unitOf.unit}`);
-      const rows = await page.$$eval('[data-screen="wrm"].is-active .tvw-lesson', (b) => b.map((x) => ({ key: x.dataset.wLesson, site: x.dataset.wSite || '', flag: (x.querySelector('.tvw-flag') || {}).textContent || '' })));
-      const want = links.unitLessons(unitOf.grade, unitOf.unit);
-      check(rows.map((r) => r.key).join('|') === want.map((l) => l.key).join('|'), `site unit: rows ${rows.length} differ from unitLessons ${want.length}`);
-      check(rows.some((r) => r.site && !/:/.test(r.key)) && rows.some((r) => !r.site), 'site unit: the list does not mix White Rose steps and site lessons');
-      check(rows.filter((r) => r.site && !/:/.test(r.key)).every((r) => /^(CCSS · BUILD|Support lesson|Assessment|School lesson|Above grade)$/.test(r.flag)), `site unit: a site row without its flag ${JSON.stringify(rows.filter((r) => r.site && !r.flag).slice(0, 2))}`);
-      await fit('1366 site unit');
+      await freshLoad(`#wrm/${unitOf.grade}/extra`);
+      await navCheck(unitOf.grade, `nav Grade ${unitOf.grade} (fresh load at #wrm/${unitOf.grade}/extra)`);
+      const ex = await page.evaluate(() => {
+        const s = document.querySelector('[data-screen="wrm"].is-active [data-w-secbox="extra"]');
+        const l = document.querySelector('#tvwLessons').getBoundingClientRect();
+        return { groups: [...s.querySelectorAll('[data-w-extra-kind]')].map((h) => [h.dataset.wExtraKind, h.textContent.trim(), h.nextElementSibling.querySelectorAll('.tvw-nrow').length]),
+          inView: s.querySelector('.tvw-sec-h').getBoundingClientRect().top < l.top + 80 && s.querySelector('.tvw-sec-h').getBoundingClientRect().top >= l.top - 1 };
+      });
+      const exWant = links.gradeSections(unitOf.grade).find((s) => s.extra).groups.map((x) => [x.kind, x.label, x.lessons.length]);
+      check(JSON.stringify(ex.groups) === JSON.stringify(exWant) && ex.inView, `Extra lessons: groups ${JSON.stringify(ex.groups)} want ${JSON.stringify(exWant)}, at the top of the list ${ex.inView}`);
+      await fit('1366 extra lessons');
+      await shot('30-extra-lessons-1366');
       // an assessment: its flag, the plain no-skills sentence, no tick groups
-      await tap(`[data-w-lesson="${assessLesson.key}"]`);
+      await tap(`.tvw-nrow[data-w-lesson="${assessLesson.key}"]`);
       await waitFor(page, `location.hash === ${JSON.stringify(links.lessonHash(assessLesson))} && !!document.querySelector('#tvwDetail .tvw-head')`, 8000, 'assessment');
       const as = await page.evaluate(() => ({ flag: (document.querySelector('#tvwDetail [data-w-flag]') || {}).textContent || '', v: (document.querySelector('#tvwDetail .tvw-verdict') || {}).textContent || '', groups: document.querySelectorAll('#tvwDetail [data-w-group]').length, bar: !!document.querySelector('#tvwDetail .tvw-bar') }));
       check(as.flag === 'Assessment' && /No skills are linked to this assessment/.test(as.v) && !as.groups && !as.bar, `assessment detail ${JSON.stringify(as)}`);
@@ -1004,15 +1100,15 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       await freshLoad(links.lessonHash(siteBuild), '[data-screen="wrm"].is-active #tvwDetail .tvw-head');
       const un = await page.evaluate(() => ({ title: document.querySelector('.tvw-title').textContent, flag: (document.querySelector('#tvwDetail [data-w-flag]') || {}).textContent || '', tag: (document.querySelector('#tvwDetail [data-w-verdict-tag]') || {}).dataset?.wVerdictTag || '', cur: (document.querySelector('.tvw-lesson[aria-current="true"]') || {}).dataset?.wLesson || '' }));
       check(un.title.includes(siteBuild.title) && un.flag === 'CCSS · BUILD' && (!siteUntagged || un.tag === 'untagged') && un.cur === siteBuild.key, `CCSS BUILD site lesson by bookmark ${JSON.stringify(un)}`);
-      // a support lesson with no week: listed under the unit's "no week set" heading
+      // a support lesson: listed in Extra lessons under "Support lessons"
       await page.evaluate((x) => { location.hash = x; }, links.lessonHash(supportLesson));
       await waitFor(page, `(document.querySelector('[data-screen="wrm"].is-active .tvw-lesson[aria-current="true"]') || {}).dataset?.wLesson === ${JSON.stringify(supportLesson.key)} && !!document.querySelector('#tvwDetail .tvw-head')`, 20000, 'support lesson');
-      check(await page.evaluate(() => /no week set/.test((document.querySelector('.tvw-lesson[aria-current="true"]')?.closest('ol')?.previousElementSibling || {}).textContent || '') && /Support lesson/.test(document.querySelector('#tvwDetail .tvw-tags').textContent)), 'support lesson: not under "no week set" or no flag');
+      check(await page.evaluate(() => { const r = document.querySelector('.tvw-lesson[aria-current="true"]'); return /^Support lessons$/.test((r?.closest('ol')?.previousElementSibling || {}).textContent || '') && !!r.closest('[data-w-secbox="extra"]') && /Support lesson/.test(document.querySelector('#tvwDetail .tvw-tags').textContent); }), 'support lesson: not under Extra lessons › Support lessons, or no flag');
       // a tagged site lesson: verdict, skills, Tick → Practice link decodes to the lesson's teaching skills
       if (siteTagged) {
-        await page.goto(`${base}/index.html#wrm/${siteTagged.grade}/${siteTagged.unit}`, { waitUntil: 'networkidle2', timeout: 60000 });
+        await page.goto(`${base}/index.html#wrm/${siteTagged.grade}/${secOf(siteTagged)}`, { waitUntil: 'networkidle2', timeout: 60000 });
         await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active .tvw-lesson'), 20000, 'tagged unit');
-        await tap(`[data-w-lesson="${siteTagged.key}"]`);
+        await tap(`.tvw-nrow[data-w-lesson="${siteTagged.key}"]`);
         await waitFor(page, `location.hash === ${JSON.stringify(links.lessonHash(siteTagged))} && !!document.querySelector('#tvwDetail [data-w-group="direct"] .tvw-tick')`, 8000, 'tagged site lesson');
         const tv = await page.evaluate(() => ({ tag: (document.querySelector('#tvwDetail [data-w-verdict-tag]') || {}).dataset?.wVerdictTag || '', flag: (document.querySelector('#tvwDetail [data-w-flag]') || {}).textContent || '' }));
         const r = links.linksFor(siteTagged);
@@ -1085,8 +1181,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
             await freshLoad(links.lessonHash(l), '[data-screen="wrm"].is-active .tvw-head');
             const card = `[data-screen="wrm"].is-active [data-w-dl="${r.id}"]`;
             await waitFor(page, `!!document.querySelector(${JSON.stringify(card)})`, 20000, `detailed card ${r.id}`);
-            // the row in the unit list says so
-            check(await page.$(`[data-screen="wrm"].is-active .tvw-lesson[data-w-site="${l.site}"] .tvw-dl-tag`), `${vw} detailed ${r.id}: no "Detailed lesson" tag on its row`);
+            // the lesson's head says so (owner 2026-10-17: the list rows carry only coverage and CCSS · BUILD)
+            check(await page.$('[data-screen="wrm"].is-active #tvwDetail .tvw-head .tvw-dl-tag'), `${vw} detailed ${r.id}: no "Detailed lesson" tag in the lesson head`);
+            check(!(await page.$(`[data-screen="wrm"].is-active .tvw-lesson[data-w-site="${l.site}"] .tvw-dl-tag`)), `${vw} detailed ${r.id}: the list row still carries a "Detailed lesson" tag`);
             // the lesson file: a path inside the site that exists on disk, opened in a new tab
             const a = await page.$eval(`${card} [data-w-dl-pack]`, (x) => [x.getAttribute('href'), x.target, x.rel]).catch(() => null);
             check(a && a[0] === r.pack && a[1] === '_blank' && /noopener/.test(a[2]) && fs.existsSync(path.join(ROOT, a[0])), `${vw} detailed ${r.id}: lesson file link ${JSON.stringify(a)}`);
@@ -1137,6 +1234,65 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
       await freshLoad('#wrm/2/D1/2', '[data-screen="wrm"].is-active .tvw-head');   // back on the White Rose screen for the phone checks
     }
+
+    /* ==================================================== owner 2026-10-17: the list beside the panel (1280, 1024), deep links */
+    await step('nav side panel and deep links', async () => {
+      const besideCheck = async (tag) => {
+        const r = await page.evaluate(() => {
+          const l = document.querySelector('#tvwLessons').getBoundingClientRect();
+          const d = document.querySelector('#tvwDetail').getBoundingClientRect();
+          const row = document.querySelector('.tvw-nrow[aria-current="true"]');
+          const q = row && row.getBoundingClientRect();
+          return { beside: d.left >= l.right - 1, listW: Math.round(l.width), panelW: Math.round(d.width), rowIn: !!q && q.top >= l.top - 1 && q.bottom <= l.bottom + 1 && q.bottom <= innerHeight, fixed: getComputedStyle(document.querySelector('#tvwDetail')).position };
+        });
+        check(r.beside && r.listW >= 240 && r.panelW >= 380 && r.rowIn && r.fixed !== 'fixed', `${tag}: list beside the panel ${JSON.stringify(r)}`);
+      };
+      for (const [w, h] of [[1280, 800], [1024, 768]]) {
+        await page.setViewport({ width: w, height: h, deviceScaleFactor: 1 });
+        await freshLoad('#wrm/3');
+        await navCheck('3', `nav Grade 3 @${w}`);
+        await fit(`${w} Grade 3 list`);
+        if (w === 1280) await shotNav('1280-list-grade3');
+        // an old D-number bookmark (#wrm/<grade>/<unit>/<n>) opens its lesson, beside the list
+        const l = links.lessonByKey('3:D1:3');
+        await freshLoad('#wrm/3/D1/3', '[data-screen="wrm"].is-active #tvwDetail .tvw-head');
+        const t = await page.evaluate(() => ({ title: document.querySelector('#tvwDetail .tvw-title').textContent, n: document.querySelector('#tvwDetail .tvw-title-n').textContent, cur: (document.querySelector('.tvw-nrow[aria-current="true"]') || {}).dataset?.wLesson }));
+        check(t.title.includes(l.title) && t.cur === l.key && t.n === `Lesson ${links.gradeSections('3')[0].lessons.indexOf(l) + 1}`, `old link #wrm/3/D1/3 @${w}: ${JSON.stringify(t)}`);
+        await besideCheck(`${w} lesson`);
+        await fit(`${w} lesson beside the list`);
+        await clearOfBar(`${w} lesson beside the list`);
+        await page.evaluate(() => window.scrollTo(0, 0));
+        await shotNav(`${w}-lesson-panel`);
+        // a second lesson from the list: the list stays, the panel follows
+        const next = links.gradeSections('3')[0].lessons[5];
+        await tap(`.tvw-nrow[data-w-lesson="${next.key}"]`);
+        await waitFor(page, `location.hash === ${JSON.stringify(links.lessonHash(next))} && (document.querySelector('#tvwDetail .tvw-title') || {}).textContent?.includes(${JSON.stringify(next.title.slice(0, 12))})`, 8000, `second lesson ${w}`);
+        await besideCheck(`${w} second lesson`);
+      }
+      await page.setViewport({ width: 1280, height: 800, deviceScaleFactor: 1 });
+      // the Extra lessons section (domain button), with a support lesson open beside it
+      await freshLoad(`${links.lessonHash(supportLesson)}`, '[data-screen="wrm"].is-active #tvwDetail .tvw-head');
+      await page.click('[data-w-sec="extra"]');
+      await sleep(200);
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await shotNav('1280-extra-lessons');
+      // deep links: a domain section, Extra lessons, a Pre-K small unit (opens its domain)
+      for (const [h, sec] of [['#wrm/3/D4', 'D4'], ['#wrm/5/extra', 'extra'], ['#wrm/PK/CC3', 'CC1'], ['#wrm/K/D5', 'D5']]) {
+        await freshLoad(h);
+        const r = await page.evaluate((sec) => { const l = document.querySelector('#tvwLessons').getBoundingClientRect(); const s = document.querySelector(`#tvwSecH-${sec}`); const q = s && s.getBoundingClientRect(); return { hash: location.hash, top: !!q && q.top >= l.top - 1 && q.top < l.top + 80, empty: !!document.querySelector('#tvwDetail .tvw-empty') }; }, sec);
+        check(r.top && r.empty, `deep link ${h}: section ${sec} at the top of the list ${JSON.stringify(r)}`);
+      }
+      // a link from before the site order (#wrm/<grade>/E/<n>: the workbook's enrichment unit is gone) opens the grade's list
+      await freshLoad('#wrm/3/E/1');
+      check(await page.evaluate(() => !!document.querySelector('#tvwDetail .tvw-empty') && /^#wrm\/3$/.test(location.hash)), `old enrichment link #wrm/3/E/1 does not fall back to the Grade 3 list (${await hash()})`);
+      // the grade is remembered per viewer: a plain #wrm opens the last grade chosen
+      await page.click('[data-w-grade="4"]');
+      await sleep(200);
+      await freshLoad('#wrm');
+      check(await page.evaluate(() => (document.querySelector('[data-w-grade][aria-pressed="true"]') || {}).dataset?.wGrade === '4' && location.hash === '#wrm/4'), `the chosen grade is not remembered (${await hash()})`);
+      await page.evaluate(() => { try { localStorage.removeItem('mq_teacher_wrm_grade'); } catch (e) {} });
+      await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
+    });
 
     /* ==================================================== phone basic check (390x844): nothing scrolls sideways */
     await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
@@ -1209,10 +1365,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await step('site lessons 390 touch', async () => {
       await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
       for (const l of [siteTagged || siteBuild, assessLesson, supportLesson]) {
-        await freshLoad(`#wrm/${l.grade}/${l.unit}`, `[data-screen="wrm"].is-active [data-w-lesson="${l.key}"]`);
-        await page.$eval(`[data-w-lesson="${l.key}"]`, (el) => el.scrollIntoView({ block: 'center' }));
+        await freshLoad(`#wrm/${l.grade}/${secOf(l)}`, `[data-screen="wrm"].is-active .tvw-nrow[data-w-lesson="${l.key}"]`);
+        await page.$eval(`.tvw-nrow[data-w-lesson="${l.key}"]`, (el) => el.scrollIntoView({ block: 'center' }));
         await sleep(80);
-        await page.tap(`[data-w-lesson="${l.key}"]`);
+        await page.tap(`.tvw-nrow[data-w-lesson="${l.key}"]`);
         await waitFor(page, `location.hash === ${JSON.stringify(links.lessonHash(l))} && (document.querySelector('#tvwDetail .tvw-title') || {}).textContent?.includes(${JSON.stringify(l.title.slice(0, 12))})`, 8000, `390 tap ${l.key}`);
         await sleep(200);
         await side(`site lesson ${l.key}`);
@@ -1221,6 +1377,51 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         check(flagOn, `390: ${l.key} shows no flag`);
       }
     });
+
+    /* ==================================================== owner 2026-10-17: the lesson slides over the list (390, 820) with Back */
+    for (const [w, h, touch] of [[390, 844, true], [820, 1180, false]]) {
+      await step(`slide-over ${w}`, async () => {
+        await page.setViewport({ width: w, height: h, deviceScaleFactor: 1, isMobile: touch, hasTouch: touch });
+        const l = all.find((x) => x.grade === '3' && links.isCoreLesson(x) && links.linksFor(x).direct.length);
+        await freshLoad('#wrm/3');
+        await navCheck('3', `nav Grade 3 @${w}`);
+        await side(`Grade 3 list @${w}`);
+        if (w === 390) await shotNav('390-list-grade3');
+        await page.$eval(`.tvw-nrow[data-w-lesson="${l.key}"]`, (el) => el.scrollIntoView({ block: 'center' }));
+        await sleep(80);
+        if (touch) await page.tap(`.tvw-nrow[data-w-lesson="${l.key}"]`); else await page.click(`.tvw-nrow[data-w-lesson="${l.key}"]`);
+        await waitFor(page, `location.hash === ${JSON.stringify(links.lessonHash(l))} && !!document.querySelector('#tvwDetail .tvw-head')`, 8000, `slide-over open ${w}`);
+        await sleep(200);
+        const o = await page.evaluate(() => {
+          const d = document.querySelector('#tvwDetail');
+          const r = d.getBoundingClientRect();
+          const back = d.querySelector('[data-w-back]');
+          const b = back && back.getBoundingClientRect();
+          return { fixed: getComputedStyle(d).position, top: Math.round(r.top), right: Math.round(r.right), bottom: Math.round(r.bottom), W: innerWidth, H: innerHeight,
+            back: b ? [Math.round(b.width), Math.round(b.height), Math.round(b.top), back.textContent.trim()] : null, focus: document.activeElement === back };
+        });
+        check(o.fixed === 'fixed' && o.top === 0 && o.right === o.W && o.bottom === o.H && o.back && o.back[0] >= 44 && o.back[1] >= 44 && o.back[2] >= 0 && o.back[3] === 'Back to the lessons' && o.focus,
+          `slide-over @${w}: ${JSON.stringify(o)}`);
+        await side(`slide-over @${w}`);
+        await rows390(`slide-over @${w}`);
+        await shotNav(`${w}-lesson-panel`);
+        // Back closes it: the list again, the row the teacher came from has the focus, the hash is the grade's
+        if (touch) await page.tap('#tvwDetail [data-w-back]'); else await page.click('#tvwDetail [data-w-back]');
+        await sleep(250);
+        const c = await page.evaluate(() => ({ shown: !!document.querySelector('#tvwDetail').getClientRects().length, open: document.querySelector('#tvwGrid').classList.contains('is-open'), focus: document.activeElement && document.activeElement.dataset.wLesson, hash: location.hash }));
+        check(!c.shown && !c.open && c.focus === l.key && /^#wrm\/3(\/[A-Za-z0-9]+)?$/.test(c.hash), `slide-over Back @${w}: ${JSON.stringify(c)}`);
+        // Escape closes it too (keyboard)
+        if (!touch) {
+          await page.click(`.tvw-nrow[data-w-lesson="${l.key}"]`);
+          await waitFor(page, () => document.querySelector('#tvwGrid').classList.contains('is-open'), 5000, 'reopen');
+          await sleep(150);
+          await page.keyboard.press('Escape');
+          await sleep(150);
+          check(!(await page.evaluate(() => document.querySelector('#tvwGrid').classList.contains('is-open'))), `slide-over @${w}: Escape did not close it`);
+        }
+      });
+    }
+    await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
 
     if (app.problems.length) failures.push(`console/page errors: ${app.problems.slice(0, 5).map((p) => `[${p.type}] ${p.text}`).join(' | ')}`);
   } catch (e) {

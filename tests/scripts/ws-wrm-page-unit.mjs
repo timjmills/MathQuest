@@ -623,6 +623,48 @@ ok(!jBad, `plain-English gate: ${jBad} of ${jLines} teacher-facing lines ${JSON.
 console.log(`plain-English gate: ${jLines} teacher-facing lines checked, ${jBad} not plain ${JSON.stringify(jByKind)}`);
 console.log(`free-text notes hidden (not plain as written; the composed sentence stands): ${Object.entries(hidden).map(([f, [n, h]]) => `${f} ${h}/${n} (${Math.round((100 * h) / n)}%)`).join(', ')}`);
 
+// THE NAVIGATION (owner 2026-10-17: grade → domains in the site's order → lessons in order; the extra lessons,
+// projects and enrichment as the last section). gradeSections() is what the page lists.
+{
+    const W = await import('../../js/modules/wrm-links.js');
+    let nSec = 0, nExtra = 0;
+    for (const g of WRM_SEQUENCE) {
+        const secs = W.gradeSections(g.id);
+        const mine = L.filter((l) => l.grade === g.id);
+        const listed = secs.flatMap((s) => s.lessons);
+        // every lesson of the grade exactly once
+        ok(listed.length === mine.length && new Set(listed.map((l) => l.key)).size === listed.length && mine.every((l) => listed.includes(l)),
+            `nav ${g.id}: ${listed.length} listed rows for ${mine.length} lessons (each exactly once)`);
+        // the domains in the site's order (the order of the grade's units), Extra lessons last
+        const doms = [...new Set(g.units.filter((u) => unitLessons(g.id, u.id).some(W.isCoreLesson)).map((u) => u.domain))];
+        const core = secs.filter((s) => !s.extra);
+        ok(core.map((s) => s.domain).join() === doms.join(), `nav ${g.id}: domains ${core.map((s) => s.domain)} not in the site's order ${doms}`);
+        ok(secs.filter((s) => s.extra).length <= 1 && (!secs.some((s) => s.extra) || secs[secs.length - 1].extra), `nav ${g.id}: Extra lessons is not the last section`);
+        for (const s of core) {
+            ok(s.lessons.every(W.isCoreLesson) && s.lessons.every((l) => l.domain === s.domain), `nav ${g.id} ${s.key}: a non-core or other-domain lesson in a domain section`);
+            // the site's order inside each unit: the sequence rows in their own order
+            for (const p of s.parts) ok(p.lessons.every((l, i) => !i || l.n > p.lessons[i - 1].n), `nav ${g.id} ${p.unit}: lessons not in the site's order`);
+            nSec += 1;
+        }
+        const extra = secs.find((s) => s.extra);
+        const want = mine.filter((l) => !W.isCoreLesson(l));
+        ok((extra ? extra.lessons.length : 0) === want.length && want.every((l) => extra.lessons.includes(l)), `nav ${g.id}: Extra lessons holds ${extra ? extra.lessons.length : 0} of the ${want.length} non-core lessons`);
+        if (extra) {
+            nExtra += extra.lessons.length;
+            ok(extra.name === 'Extra lessons' && extra.key === 'extra', `nav ${g.id}: the last section is "${extra.name}"`);
+            ok(extra.groups.every((x) => x.lessons.every((l) => W.extraKind(l) === x.kind)), `nav ${g.id}: an extra lesson in the wrong group`);
+        }
+        // every assessment and every site-only lesson is an extra lesson
+        ok(mine.filter((l) => l.type === 'assessment' || !l.seq).every((l) => !W.isCoreLesson(l)), `nav ${g.id}: an assessment or a site-only lesson is listed in a domain`);
+    }
+    ok(W.gradeSections('3').map((s) => s.name).join(' | ') === 'Operations & Algebraic Thinking | Number & Operations in Base Ten | Fractions | Measurement & Data | Geometry | Extra lessons',
+        `nav Grade 3 sections: ${W.gradeSections('3').map((s) => s.name).join(' | ')}`);
+    const proj = L.find((l) => l.grade === '5' && /^End-of-year investigation projects/.test(l.title));
+    ok(proj && !W.isCoreLesson(proj) && W.extraKind(proj) === 'other', 'nav: Grade 5 "End-of-year investigation projects" is an extra lesson (projects)');
+    ok(L.filter((l) => l.type === 'build').every(W.isCoreLesson), 'nav: every CCSS BUILD row stays in its domain');
+    console.log(`navigation: ${nSec} domain sections, ${nExtra} extra lessons, every lesson listed once`);
+}
+
 // search
 ok(searchLessons('Represent numbers to 100')[0].title === 'Represent numbers to 100', 'search exact title first');
 ok(searchLessons('3.NF.A.1').length > 0, 'search by CCSS code');
