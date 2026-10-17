@@ -2,10 +2,10 @@
 // order given, and check that every step of every file comes out as that file says: each direct skill tagged FULL, each
 // partial skill tagged PARTIAL with the file's clause (the structured `partial` field), nothing else tagged to its steps,
 // and no two files touching the same skill+step. In wrm.js a string or {step, note} is FULL; {step, partial} is PARTIAL.
-// usage: node tests/scripts/wrm-tagging/mergecheck.mjs [Y6.json] [R.json Y1.json Y4.json ...]   (the first file must give
+// usage: node tests/scripts/wrm-tagging/Y6/mergecheck.mjs [Y6.json] [R.json Y1.json Y4.json ...]   (the first file must give
 // every partial clause in the structured `partial` field; the others may keep it in `why`, as R and Y1 do)
 globalThis.window = globalThis;
-const R = new URL('../../../', import.meta.url).pathname;
+const R = new URL('../../../../', import.meta.url).pathname;
 const { SKILL_WRM } = await import(R + 'js/modules/wrm.js');
 const fs = await import('fs');
 const files = process.argv.slice(2).length ? process.argv.slice(2) : [R + 'data/curriculum/links/Y6.json'];
@@ -53,6 +53,21 @@ for (const d of docs) {
     else if (w.status === 'partial' && got.clause !== w.clause) problems.push(`${yr}: ${id}: clause after the merge differs\n     merged: ${got.clause}\n     file:   ${w.clause}`);
   }
   for (const id of tag.keys()) { const sid = id.split('|')[1]; if (d.steps[sid] && !want.has(id)) problems.push(`${yr}: ${id}: still tagged after the merge, but not a direct or partial skill`); }
+}
+// site lessons (owner rule 2026-10-16): a lesson is not a WRM small step, so no file's tagFixes may name one, every tagFix of the
+// first file names a step of that file (an older lane may tag another year's step), and the first file's `lessons` section holds exactly its year's entries of data/curriculum/site-lessons.json
+{
+  const site = JSON.parse(fs.readFileSync(R + 'data/curriculum/site-lessons.json', 'utf8')).lessons;
+  for (const d of docs) for (const t of d.tagFixes) {
+    if (/\|-\|/.test(t.step) || (d.lessons && d.lessons[t.step])) problems.push(`${d.year}: tagFix names a site lesson: ${t.key}|${t.step}`);
+    else if (d === docs[0] && !d.steps[t.step]) problems.push(`${d.year}: tagFix names a step outside its own file: ${t.key}|${t.step}`);
+  }
+  const d0 = docs[0];
+  if (d0.lessons) {
+    const want = site.filter(l => l.wrmYear === d0.year).map(l => l.id), got = Object.keys(d0.lessons);
+    for (const id of want) if (!d0.lessons[id]) problems.push(`${d0.year}: site lesson not in the lessons section: ${id}`);
+    for (const id of got) if (!want.includes(id)) problems.push(`${d0.year}: lessons section has ${id}, not a ${d0.year} entry of site-lessons.json`);
+  }
 }
 console.log(problems.join('\n'));
 console.log(`mergecheck: ${docs.map(d => d.year).join(' + ')}: ${nWant} direct/partial tags, ${docs.reduce((a, d) => a + d.tagFixes.length, 0)} tagFixes; ${problems.length} problems`);

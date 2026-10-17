@@ -1,5 +1,180 @@
 # Y6 (US Grade 5) — Wave 2 tagging report
 
+## Site lessons (owner rule 2026-10-16: every site lesson tagged) — 2026-10-17
+
+### Lessons fix round r2 (after the lessons critic r1: FAIL narrowly, lessons 21 and 24 at 7, mean 7.96) — 2026-10-17
+
+Builder: Opus 5.5, low effort. Steps, tagFixes and step proposals stay frozen; only `lessons`, the lesson-only proposal text that
+mirrors a lesson's `missing` (`closes[<lesson>]`) and the lane's own gates changed.
+
+| Row | Change |
+|---|---|
+| F1 lesson 21 | Partial clause now: "divides 3-digit numbers by 100 (697 ÷ 100 = 6.97); now and then a 2-digit number (89 ÷ 100 = 0.89, about 1 item in 10), never a 1-digit number; no option gives a page of the small dividends". `missing` (and so `closes[div10_small_numbers]`): "a page of 1- and 2-digit numbers divided by 100 …". Hand-audit row corrected |
+| F2 lesson 24 | Related `compare_decimal {}` → `{forms:[1]}` (click the decimals greater / less than one given: tenths and hundredths, 0 thousandths). Pre `frac_10_100` (offers 7/1000, 70/1000 distractors) replaced by `fractions:write_fraction {denoms:[5]}` cited to Y4.B8.S1 (tenths, fifths mixed in, said so) |
+| F3 | `lessonfit` SUPPORT rule: a Support lesson's links (every role) are read on every shown word (question, answer, options and distractors, picture text) for content above the source year that the Grade 5 FIRST table cannot see: thousandths (3 dp, /1000, the word) for source ≤ Y4, any decimal for source ≤ Y3. Lesson 24 as committed in r1 fails it |
+| F4 | `lessonfit` CLAUSE: digit-count and symbol claims of every partial clause and every pre / related why are read against the items: "never a N-digit number" (a divisor "by a 2-digit number" excepted), "N-digit only", "never square brackets / braces / parentheses / an exponent", "parentheses only". Lesson 21 as committed in r1 fails it |
+| F5 | New `lessonspec.py` (Y5 `specopts.py` for lessons): the FINAL written `Y6.json` lessons against `spec-lessons.json`, every role, in order; build.py runs it as its last data gate. The critic's m4 (mult_facts re-optioned to `{constant:[7]}` after `finish()`) inserted in a clean `git archive` tree: **exit 1** (`lessonspec: … 1 differences`) |
+| F6 | `titlerep.mjs` Y6_TITLE_CLAIMS: braces, brackets, parentheses, exponents, explain the pattern, hierarchy, ordered pairs, two rules, words ↔ expressions, both conversion directions (to a smaller / to a larger unit), tiling, decimal divisor, decimal × decimal, whole ÷ unit fraction, "N-digit number", volume, composite solid, scaling, thousandths, word form, 10 times / 1/10. Each is held on a FULL lesson's direct items and must be named by a partial / gap clause (all 24 clauses already name theirs) |
+| M1 lesson 15 | `div_unit_frac_nv {forms:[2,3]}` why: "mostly a unit fraction divided by a whole number …, with some clicks of a whole number divided by a unit fraction" |
+| M2 lesson 17 | `paren_multi` why from the idea: "a written calculation done in the right order", the placeholder-CCSS reason dropped |
+| M3 lesson 18 | Pre `percent_of_number {forms:[0]}` swapped for `mult_decimal` (Y6.B8.S7, "costing several of one item"): its answer keys are wrong (below). `mean` why says it rounds to one decimal place (133 ÷ 4 = 33.25, written 33.3) |
+| M4 lesson 13 | Kept as a related: its why already says "both ways … with weight and capacity mixed in"; length is too rare (4 of 40) for a partial of a length lesson |
+| M5 lesson 4 | Not added: `div_decimal {forms:[0]}` has the partial's key, and a pre may not repeat a partial key (class F, lessons.py). The lesson note names it (Y6.B8.S8, the same week) |
+| M6 lesson 5 | For the lead's merge: widen `decimal_models`' option text in build-list.js to "area model for decimal × whole and decimal × decimal" (build-list.js is frozen for this lane) |
+| M7 lesson 12 | Unchanged: the report and note already say the ribbon stories are dealt by the related `frac_mult_word_plain` (about 1 in 4), too few for a partial |
+| M8 lesson 19 | `mult_decimal` why: "the multiplying of this step, as bare numbers (49.6 × 5)" |
+| M9 | Generator note below (`distributive_expr` GCF) |
+| Sweep (F3 / F4 / times-table rules, 6 fresh seed pairs × 60 items a link: 48311/60607, 7777/3131, 2468/9001, 1111/2222, 3333/4242, 8181/5151) | Lesson 11 pre `fractions:simplify {}` → `{forms:[2]}` (GCF first): forms 0 offer negative distractors (−1/10, −1/4; 19 of 480), 0 of 480 at forms 2. Lesson 9 pre `lcm {forms:[1]}` why drops "4 and 6" (the new times-table claim: 6 in 10 of 60). Lesson 19 pre `volume {forms:[2]}` dropped (stories to 21 × 21 × 21 = 9,261 pass the size limit on fresh seeds; 3 pre remain). After them: 0 findings on all six seed pairs |
+| Critic mutation 5 | `lessonfit` WHY now reads times-table claims ("the 7 times-table", "multiply by 6") with titlerep's `tableClaims`; caught |
+
+**Gates (lessons r2)**: build.py exit 0 (steps 114 / tagFixes 148 identical to the base; lessonfit 24 lessons, 101 links, 0 findings;
+lessonspec 126 links, 0 differences); lessonfit on 6 fresh seed pairs × 60: 0 findings each; lessonmut 24 mutations, 0 missed (incl.
+F3, F4, F6, the critic's mutation 5 and the F5 lessonspec proof); the critic's `mymut.py`: 12 of 12 exit 1; the critic's m4 in a clean
+`git archive` tree: exit 1; mergecheck with Y2 / Y3 from the passed lane: Y6 contributes 0 (the only 2 lines are the known Y4 × Y2
+same-outcome Y2.B1.S15 overlap; without either of Y2 / Y4: 0 problems); the critic's `merge_r1.mjs`: 0 real conflicts, order
+independent; `ws-wrm-extract --check` exit 0; `ws-boot-smoke` OK.
+
+**Generator bugs (recorded, not fixed: gen-*.js is outside this lane)**
+- `conversions:percent_of_number` (`js/modules/gen-fractions.js`, about line 6904): 33% is treated as one third. "What is 33% of 90? → 30"
+  (true 29.7), "33% of 60 → 20" (true 19.8): 5 to 7 of 40 `{forms:[0]}` answer keys are wrong. No Y6 lesson links it any more.
+- `data_analysis:mean` rounds to one decimal place without saying so in the question (61.75 → 61.8).
+- `fractions:simplify {forms:[0]}`: the choice list offers negative fractions and 0/1 as distractors ("→ 1/5 ; 0/1 ; 1/2 ; 1/5 ; -1/10", with the answer listed twice).
+- `algebra:distributive_expr`: "Factor out the GCF: 24x + 12 → 4(6x + 3)" (the GCF is 12).
+
+
+Builder: Opus 5.5, low effort (`mq-opus-low`), first round. The Y6 WRM steps passed critic r5 and are **frozen**: `steps`, `tagFixes`
+and every step field of every proposal are byte-identical to the base (checked by diffing the built file against the merged
+base). The only additions are the top-level `lessons` section and, on the proposals lessons use, the `lessons` list and
+`closes[<lesson id>]` entries (plus the 20 proposals only lessons use).
+
+### Tooling (one folder per year)
+The Y6 tooling moved from `tests/scripts/wrm-tagging/` to `tests/scripts/wrm-tagging/Y6/` (`git mv`; R/Y1's `gen.py`, `spec.py`,
+`dump.mjs`, `*_ry1.mjs`, `content_weeks.json`, `reads_range.json`, `maxdealt.mjs` and `wholes.mjs` stay where the R/Y1 lane uses
+them). After the move `Y6.json` rebuilt byte-identical to the base (commit fece619c). New files:
+
+| File | What it does |
+|---|---|
+| `Y6/spec_z_lessons.py` | the 24 lessons: direct / partial with opts and clause, verdict, missing, build + closes, pre (cited unit + reason), related, note; the 9 new proposals (`LNEW`) and the passed-lane proposals reused verbatim (`LANE`) |
+| `Y6/lessons.py` | exec'd by `build.py`: `lesson()`, the structure checks, the pre whys ("`<cited id> <its title> (<where it sits>)`: reason"), the proposal merge, the envisioned skills, and the **spec gate**: every written direct / partial / pre / related equals its spec link (key, opts, Max Number, order), else the build fails |
+| `Y6/lessonfit.mjs` | every lesson link judged from 40 generated items (two fresh seed sets, print path); the gates below. Run by `build.py`; any finding fails the build |
+| `Y6/claims.mjs`, `Y6/titlerep.mjs` | copies of the Y5 lane's claim checker and the Y2-Y3 lane's TITLEREP gate (one change: the line-plot item regex no longer matches any SVG's `x="…"`) |
+| `Y6/lessonmut.py` | 15 mutations of the built lessons, one per failure class; each must be caught by its own gate (`lessonmut: 15 mutations, 0 missed`) |
+| `Y6/lessonitems.mjs` | `design/audit/runs/wrm-tagging/Y6-lesson-items.md`: 30 items of every lesson link from another fresh seed, 6 shown, for the hand re-read |
+| `Y6/mergecheck.mjs` | now also fails a tagFix that names a site lesson (any file), a tagFix of the checked file on a step outside it, and a `lessons` section that is not exactly the year's entries of `site-lessons.json` |
+
+### Every critic failure class is a gate (not avoided by hand)
+| Class (critic) | Gate | Proven by |
+|---|---|---|
+| False why after a silent re-option (Y5 r5-r7 N) | `lessons.py` spec gate: no pass may change a link's opts, add or drop one; `lessonfit` claims gate on every why | build-tree mutation (a re-option and a dropped pre inside `finish()`: 2 SPECOPTS errors, exit 1); lessonmut "N" |
+| A why's claim false of the items (K, L, N, N′: units, metric / customary, representations judged on the picture, forms) | `claims.mjs` gated claims on the why **and the cited unit's full title**; the Y6 linkfit why rules (sizes, shapes, columns, units, families) | lessonmut "claims" (a "number line" why on bare expressions) |
+| FULL that does less than the title's verb / range / representation (Y2-Y3 r13-r15) | TITLEREP (FULL: the direct items show every title claim; partial / gap: the clause names it); RANGE (title bound, or a Support lesson's source-year range) | lessonmut "TITLEREP FULL", "TITLEREP CLAUSE", "RANGE" |
+| Customary vs metric (Y5 r6 K) | a customary unit in any link of a metric lesson; a why that claims customary / metric units is checked by claims | lessonmut "K" |
+| Pre harder than the entry; content not yet taught (rule 18, 19) | SIZE (1.5 × the larger of the lesson's ceiling and its cited unit's, floor 1,000; Support: 1.5 × the source year's range), Grade 5 FIRST table by school week (pre: none later; related: 2 weeks ahead at most), beyond-Grade-5 content | lessonmut "rule 19" |
+| Denominators off-family hidden in the cell payload (Y2-Y3 r12-r14 N12) | DENOMS: a link with `denoms` read on text, picture **and payload**; every off-family family must be named, a named word dealt, a denied word not dealt | lessonmut "DENOMS" (`equiv_frac_visual {denoms:[2]}` "halves and quarters": the payload deals thirds) |
+| Pre identical to the lesson's own skill (Y5 r5 F) | build: no pre / related key equals a direct / partial key; lessonfit: no link deals the same generated items | lessonmut "F" |
+| Support lessons judged vs source grade (Y5 r5-r6 H, H′) | a Support lesson's links are judged at week 0 (no Grade 5 content at all), its pre may cite only its source year or below (never a Y6 step), no pre that compares unlike fractions below a Grade 4 source, sizes within the source range | lessonmut "H Support pre", "H Support cites" |
+| Pre cite not true (Y5 r5 H, rule 19) | CITE: a pre's why starts with the cited step or lesson and its own title; that unit teaches the key (live SKILL_WRM, R / Y1 / Y4 / Y5 tagFixes, Y6 steps, Y5 and Y6 lessons); a Y6 unit is taught by the lesson's week | lessonmut "CITE" |
+| A clause that denies what the items do | CLAUSE: a partial clause's gated claims are true of its items, and a negated operation is not dealt | lessonmut "CLAUSE negated op" |
+| An existing option missed (Y5 r6 M, r7-r8 M′) | M: a "never / no …" clause read against every labelled option value of the listed skills; now also through a bracketed example ("never a story (a box, a tank)": the r8 hole) | lessonmut "M" |
+| A decimals lesson FULL on whole-number operands (Y5 r5 G) | G | lessonmut "G" |
+
+### Counts
+24 lessons = the 24 `wrmYear: "Y6"` entries of `site-lessons.json`, in the site's order: 16 committee (all SUP; 9 Awsaj
+supplements with a WRM block, 7 domain-test builds), 4 unflagged Grade 5 end-of-year entries (Projects & Taskmaster, W38) and
+4 Support titles (enrich-native). HELPERS' Awsaj supplements are all present: scaling (10), ÷ unit fraction (12), ordered pairs ×2
+(8, 9), composite volume (14), fraction line plots (15), 2-D hierarchy (16).
+
+| Verdict | Lessons |
+|---|---|
+| full | **0** |
+| partial | 20 |
+| gap | 4: decimals in word / expanded form (2), composite volume (14), investigation projects (18), What is volume? (23) |
+
+Proposals used by lessons: **24** — **9 new** (`div_by_decimal_model`, `oop_braces`, `scaling_equiv`, `whole_div_unit_frac`,
+`length_customary_both`, `shape_hierarchy`, `g5_arith_review`, `cross_strand_problems`, `investigation_project`) and **15 reused**:
+4 already Y6 step proposals (`value_ten_times`, `thousandths_pv`, `pv10_exponents`, `volume_cubes`), 6 from STANDARD_PROPOSALS /
+VISUAL_BUILDS (`mult_dec_dec`, `decimal_models`, `write_numeric_expression`, `pattern_pairs_graph`, `volume_composite_repair`,
+`vis_reasoning_frames`), and 5 verbatim from a passed lane (Y5 `make_line_plot`, `frac_compare_same_part`; MAP
+`map_frac_side_area`; Y4 `div10_small_numbers`, `dec_fraction_basics`). Lesson-only proposals have `steps: []` and carry
+`lessons` and `closes[<lesson id>]` (the lead's WRM_PROPOSALS merge must read `lessons`). 102 links (77 pre, 25 related), every
+lesson ≥ 3 pre cited by the step or lesson that teaches the key and that the pupil has met by the lesson's week. Lessons emit
+**no tagFixes**.
+
+| # | Lesson | Wk | Flag | CCSS | Verdict | Direct / partial (opts) | Build | Pre/rel |
+|---|---|---|---|---|---|---|---|---|
+| 1 | Compare digit values (10 times / 1/10) | W06 | committee | 5.NBT.A.1 | partial | `value {"band":999999}` | value_ten_times | 3/2 |
+| 2 | Decimals to thousandths in word and expanded form | W06 | committee | 5.NBT.A.3a | gap | — | thousandths_pv | 4/1 |
+| 3 | × ÷ decimals by powers of 10 with exponents | W07 | committee | 5.NBT.A.2 | partial | `place_value_10x {"decimals":true}` | pv10_exponents | 3/1 |
+| 4 | Divide by a decimal | W08 | committee | 5.NBT.B.7 | partial | `div_decimal {"forms":[1,2]}` | div_by_decimal_model | 3/1 |
+| 5 | Multiply decimals by decimals | W08 | committee | 5.NBT.B.7 | partial | `mult_decimal` | mult_dec_dec, decimal_models | 3/1 |
+| 6 | Expressions with parentheses, brackets and braces | W11 | committee | 5.OA.A.1 | partial | `nested_complex {"band":50}`; `oop_hard {"forms":[0],"band":50}` | oop_braces | 3/1 |
+| 7 | Write and interpret numerical expressions | W11 | committee | 5.OA.A.2 | partial | `write_expression {"forms":[0]}` | write_numeric_expression | 3/1 |
+| 8 | Form ordered pairs from corresponding terms | W13 | committee | 5.OA.B.3 | partial | `pattern_relationship {"forms":[0]}` | pattern_pairs_graph | 3/1 |
+| 9 | Generate two sequences using two rules | W13 | committee | 5.OA.B.3 | partial | `number_patterns_rule {"pattern":["add"],"places":[1],"rule":false}`; `pattern_relationship {"forms":[0]}` | pattern_pairs_graph | 3/1 |
+| 10 | Multiplication as scaling | W16 | committee | 5.NF.B.5a/b | partial | `mult_scaling_nv` | scaling_equiv | 4/1 |
+| 11 | Area of a rectangle with fractional sides | W17 | committee | 5.NF.B.4b | partial | `mult_frac_frac` | map_frac_side_area | 3/1 |
+| 12 | Divide a whole number by a unit fraction | W18 | committee | 5.NF.B.7b/c | partial | `div_unit_frac_nv {"forms":[0,1]}`; `div_unit_fraction` | whole_div_unit_frac | 3/1 |
+| 13 | Convert customary units of length | W21 | committee | 5.MD.A.1 | partial | `length_customary` | length_customary_both | 3/1 |
+| 14 | Volume of composite solids | W24 | committee | 5.MD.C.5c | gap | — | volume_composite_repair | 3/1 |
+| 15 | Fraction line plots | W25 | committee | 5.MD.B.2 | partial | `line_plot_fractions` | make_line_plot | 3/1 |
+| 16 | Classify 2-D figures in a hierarchy | W29 | committee | 5.G.B.3, 5.G.B.4 | partial | `classify_quads`; `classify_triangles` | shape_hierarchy | 3/1 |
+| 17 | Consolidation of arithmetic | W38 | other | (5.OA.A.1) | partial | `mixed {"decimals":2}` | g5_arith_review | 4/1 |
+| 18 | End-of-year investigation projects | W38 | other | (5.OA.A.1) | gap | — | investigation_project | 4/1 |
+| 19 | Problem solving across strands | W38 | other | (5.OA.A.1) | partial | `multi_step_word`; `word_problems_mixed` | cross_strand_problems | 4/1 |
+| 20 | Reasoning tasks | W38 | other | (5.OA.A.1) | partial | `compare_expressions {"forms":[1],"band":20}` | vis_reasoning_frames | 3/1 |
+| 21 | Divide a 2-digit number by 100 (Support, source Gr 3) | — | enrich-native | 4.NF.C.6, 5.NBT.A.2 | partial | `place_value_10x {"op":"/","power":[100],"decimals":true}` | div10_small_numbers | 3/1 |
+| 22 | Order fractions (Support, source Gr 2) | — | enrich-native | — | partial | `order_fractions` | frac_compare_same_part | 3/1 |
+| 23 | What is volume? (Support, source Gr 4) | — | enrich-native | 5.MD.C.3 | gap | — | volume_cubes | 3/1 |
+| 24 | Write decimals (Support, source Gr 3) | — | enrich-native | 4.NF.C.6 | partial | `f_to_d {"denoms":[5]}` | dec_fraction_basics | 3/1 |
+
+### Hand audit against every clause of the title and the CCSS descriptor (Grade 5 range)
+No lesson is FULL. The audit below covers the lessons a reader (or `standards-audit.js`) might call full, read on generated items
+(`Y6-lesson-items.md`, 30 items a link, plus lessonfit's 40):
+
+| Lesson | Title / CCSS clause | Dealt by the items? | Verdict |
+|---|---|---|---|
+| 6 Parentheses, brackets and braces | evaluate with parentheses ✓, brackets ✓ (`nested_complex`: 5 × [2 + (6 × 3)] ÷ 5; `oop_hard`), **braces** (title "and braces"; CCSS "or braces") | braces in 0 of 70 items | partial (`oop_braces`). 5.OA.A.1 alone is met ("or"); the title is not |
+| 10 Multiplication as scaling | 5a compare a product with a factor without multiplying ✓ (4/3 × 12 vs 12); 5b fraction > 1 / < 1 ✓, whole number > 1 as the familiar case ✓ (`mult_comparison` pre); **a/b = (n × a)/(n × b) as multiplying by n/n = 1** | n/n only as "8/8 × 10 = 10" (the "equal" bin), never as fraction equivalence; the scaled number is always whole | partial (`scaling_equiv`). standards-audit calls 5.NF.B.5a/b full |
+| 16 2-D hierarchy | 5.G.B.4 classify in a hierarchy: categories of one quadrilateral ✓ ("a shape can belong to more than one category"); **the hierarchy itself**; 5.G.B.3 **a category's property inherited by its subcategories**; triangles by sides **and** angles | 0 of 70 | partial (`shape_hierarchy`). standards-audit calls both full |
+| 12 ÷ unit fraction | compute whole ÷ unit fraction ✓ (`div_unit_frac_nv {forms:[0,1]}`: 40 / 40); visual model ✓ only on `div_unit_fraction`, which mixes in 1/2 ÷ 4; **story context** (7b, 7c); the × check (7b) only as a pre | stories 0 of 70 on the partials (the ribbon stories are in the related `frac_mult_word_plain`, 10 of 40) | partial (`whole_div_unit_frac`) |
+| 11 Area, fractional sides | multiply fractional sides ✓ (`mult_frac_frac` overlap model); **tile with unit-fraction squares and show area = product** | 0 | partial (`map_frac_side_area`) |
+| 13 Customary length | in, ft, yd, mi ✓; larger → smaller ✓; **smaller → larger, mixed units, fractional amounts (5.MD.A.1 "5 cm to 0.05 m"), multi-step problems** | 0 of 40 (`length_customary` forms are all larger → smaller) | partial (`length_customary_both`) |
+| 4 Divide by a decimal / 5 Multiply decimals by decimals | 5.NBT.B.7 to hundredths **with models / place-value strategies** | div: tenths divisors only, numbers only; mult: decimal × 1-digit whole only | partial |
+| 21-24 Support | judged at the source grade (Year 4, 3, 5, 4): numbers ≤ 1.5 × the source range, no Grade 5 content, pre cite the source year or below | ÷ 100 deals 3-digit dividends, a 2-digit one now and then (about 1 in 10; 89 ÷ 100), never a 1-digit one, and no option gives a page of them (corrected in lessons r2: r1 said "3-digit only"); order_fractions deals unlike sets; f_to_d mixes fifths, no picture | partial / gap |
+
+Every other clause is in the lesson's `missing` and its partials' clauses, which `lessonfit` holds to the items (CLAUSE, M,
+TITLEREP).
+
+### Generator notes (record only; app code not edited)
+- `div_unit_frac_nv`: forms 0/1 and 2/3 have swapped labels (already in this report): `{forms:[0,1]}` deals whole ÷ unit fraction, 40 / 40.
+- `place_value_10x {decimals:true}`: ignores `band` (3-digit dividends at any band).
+- `conversions:f_to_d` has no `forms` option (a passed `{forms:[0]}` is ignored); with `denoms:[5]` every item is one conversion.
+- `algebra:multi_step_word`: two-step + and − stories only (its forms are add/take-away orders); the multi-step skills deal no × or ÷.
+- `percent_of_number {forms:[0]}`: "What is 33% of 90? → 30" (33% treated as a third).
+
+### Owner questions (recommendation)
+1. **Composite volume (W24) is scheduled before the WRM volume steps** (Y6.B10.S7-S8, W25), so no pre can be a volume skill. *Recommend moving the lesson to W25-W26 (after Volume of a cuboid); until then its pre are the 2-D area skills and `volume` is a related one week ahead.*
+2. **Braces**: the title says "parentheses, brackets and braces"; 5.OA.A.1 says "or". *Recommend keeping braces (build `oop_braces`, small); the lesson is otherwise met by `nested_complex` + `oop_hard`.*
+3. **The four "Projects & Taskmaster" entries list 5.OA.A.1** for all four. *Recommend the site leaves their CCSS empty or names the strands each project uses; the tags here do not treat 5.OA.A.1 as their content.*
+4. **Support lessons that are WRM steps under another title** (Divide a 2-digit number by 100 = Y4.B8.S10; Order fractions = Y3.B6.S2 / S5; What is volume? ≈ Y5.B15.S1; Write decimals = Y4.B8.S2 / S8). *Recommend the site use the WRM titles so they resolve to the step (as recommended for Y5).*
+5. **`thousandths_pv` text**: the Y6 step proposal carries the WRM_PROPOSALS wording; lesson 2 needs the WRM_EXTENSIONS addition ("number names and expanded form to thousandths"). *Recommend the lead merge the extension into the proposal text (with Y5's patch).*
+
+### Gates (this round)
+| Gate | Result |
+|---|---|
+| Two clean `git archive HEAD` builds (`env -u WRM_TAG_DATA`) | exit 0 both, `Y6.json` byte-identical to each other and to the committed file; logs identical |
+| Steps / tagFixes vs the base | identical (114 steps 24 / 70 / 20; 148 tagFixes); base proposals unchanged except `lessons` + `closes[<lesson>]` on 4 |
+| mergecheck Y6; Y6 + R + Y1 + Y4; Y6 + R + Y1 + Y4 + Y5 (every passed lane in the repo; Y2 / Y3 are not in the repo) | 0 problems each; 0 tagFixes name a lesson |
+| optcheck / linkfit (steps) | 0 / 0 |
+| lessonfit (24 lessons, 102 links, 40 items a link) | 0 findings |
+| lessons.py spec gate | 0 differences; a re-option + drop injected in a scratch tree: exit 1 |
+| lessonmut.py | 15 mutations, 0 missed |
+| `ws-wrm-extract --check --site …/scratchpad/site/index.html` | exit 0 (both files up to date) |
+| `ws-boot-smoke` | OK |
+
+Rebuild: `python3 tests/scripts/wrm-tagging/Y6/build.py` (exit 1 on any problem); proof: `python3 tests/scripts/wrm-tagging/Y6/lessonmut.py`;
+items: `node tests/scripts/wrm-tagging/Y6/lessonitems.mjs --md design/audit/runs/wrm-tagging/Y6-lesson-items.md`.
+
 ## Fix round r2 (after critic r4: FAIL on three 7s, B2.S6, B9.S9 and B6.S5, and reproducibility) — 2026-10-16
 
 All changes are in the build's spec files (`spec_r2_a_critic_r4.py` for the §7 rows, `spec_r2_b_sweep.py` for the class B
@@ -72,7 +247,7 @@ beyond the 23 rows the critic named, all fixed in `spec_r2_b_sweep.py`. The kind
 
 ## Fix round r1 (after the lead's local critic r1, FAIL 7.02 against BRIEF rules 1-19) — 2026-10-16
 
-`data/curriculum/links/Y6.json` is now **GENERATED**: `python3 tests/scripts/wrm-tagging/build.py` builds it from
+`data/curriculum/links/Y6.json` is now **GENERATED**: `python3 tests/scripts/wrm-tagging/Y6/build.py` builds it from
 `spec_base.json` (the helper's round-3 tagging, frozen) plus the fix rounds `spec_r0_helpers.py`, `spec_r1_*.py`, with the
 live `wrm.js`, `data.js`, `build-list.js`, the xlsx sheet "Grade 5" and the passed lane files R.json, Y1.json, Y4.json
 (`WRM_LINKS_OTHER`, default `/home/user/ref/...`). It derives the citations, the tagFixes, the proposals and the envisioned
