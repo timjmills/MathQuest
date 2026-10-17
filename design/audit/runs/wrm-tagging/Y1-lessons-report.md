@@ -230,30 +230,37 @@ Judged not full on audit: **3D shapes** (round 3, F11: each solid is one fixed d
 of their orientations or overall size" is not dealt; partial, build defining_attributes), **Shapes with 4 sides** (shape_attributes
 counts the sides and vertices of a square and a rectangle, but nothing compares the two; partial, build compare_shapes).
 
-## Gates (all 0)
+## Gates (all 0), round 3
 
 | Gate | Result |
 |---|---|
 | frozen: Y1 steps / tagFixes / step proposals byte for byte the base (sha256 da295cff…), input and output | OK |
 | lessons.py checks (shape, verdicts, rule 15, related never cites earlier learning, class F keys, closes ⊆ build, every Y1 site lesson once) | 0 errors |
-| lessonspec.py (the written links are the spec's, key + opts + Max Number, in order) | 166 links, 0 differences |
-| lessoncheck.py (round 2, G1 / G4: the lesson rules on the WRITTEN file + every lesson field and proposal lesson field equal to finish()'s snapshot) | 39 lessons, 28 proposals, 0 differences |
-| lessonfit.mjs (CITE, SIZE, CONTENT, RESPONSE, WHY, CLAUSE, OWN, DUP, M, TITLEREP, RANGE; round 2: NOPIC, ASKED, share, column, bound, FULLAUDIT) | 39 lessons, 116 links, 0 findings at the build seeds and `--n 60` on 8 seed pairs: the critic's [[11213,31],[98765,67]] (flapped in r1) and [[83117,37],[52021,47]], [[50505,29],[77777,71]], [[12345,53],[67890,37]] (both flapped before G6), [[24681,43],[13579,59]], [[70001,41],[33331,61]], [[31415,47],[27182,83]], and the three fresh sets [[90001,43],[40003,67]], [[55511,31],[22277,59]], [[80808,37],[19191,71]] |
-| mergecheck Y1 alone; Y1 + R, + Y2, + Y3, + Y4, + Y5, + Y6 one by one | OK each |
+| lessonspec.py (the written links are the spec's, key + opts + Max Number, in order) | 167 links, 0 differences |
+| lessoncheck.py (G1 / G4; round 3 G7: every field of every lesson proposal = the snapshot, R.json / live copies = their source) | 39 lessons, 29 proposals, 0 differences |
+| lessonfit.mjs (CITE, SIZE, CONTENT, RESPONSE, WHY, CLAUSE, OWN, DUP, M, TITLEREP, RANGE, NOPIC, ASKED, share, column, bound, FULLAUDIT; round 3: NOPIC wordings, positive pictures, ASKED every shape, split, fill order, R10, WINDOW, ZERO, NEVER0, ORIENT, OBJN, story kind, GROUPRANGE, STD_ITEM) | 39 lessons, 116 links, 0 findings at the build seeds, and `--n 60` on the critic's [[72421,43],[38003,61]] and six fresh sets: [[24611,37],[81013,59]], [[55003,47],[16661,71]], [[3307,83],[99991,29]], [[41017,43],[73009,61]], [[28657,37],[46368,59]], [[61613,47],[19937,71]] |
+| mergecheck Y1 alone; Y1 + R, + Y2, + Y3, + Y4, + Y5, + Y6 one by one (round 3: shared proposal ids compared, kind / skill / name / teaches) | OK each |
 | mergecheck Y1 + R + Y2 … Y6 at once | 0 problems of this lane; the one base overlap is Y2 / Y4 (patterns:count_by_step_up\|Y2.B1.S15), not Y1 |
+| critic's `merge2.mjs` (R, Y1, Y4, Y5 worktree; Y2, Y3 main; Y6 origin with lessons) | 0 real conflicts, order independent (200 orders), 0 own-step mismatches, 0 lesson-naming tagFixes, lessons = site in every lane, 124 shared ids with 0 differing kind / skill |
 | lesson tagFixes | 0 |
 | ws-wrm-extract --check --site … | exit 0 |
 | ws-boot-smoke | OK |
-| two clean `git archive` builds of the commit (dump.mjs → gen.py → Y1/build.py) | byte-identical to each other and to the committed file (Y1.json sha256 66ba2bb55935344a…); p4 targets classify_count_all (cuboid_find is withdrawn) |
+| two clean `git archive` builds of fb5ed907 (dump.mjs → gen.py → Y1/build.py; B with TMPDIR in scratch and no WRM_TAG_DATA) | gen.py writes R b7fd3ef6… and Y1 da295cff… (= frozen); both builds exit 0 and write Y1.json sha256 e6f63aeb5b919801849c2077ebefb780bfe11b3ac17e91be2e1e4eb2698589c0 = the committed file |
 
-**Mutations.** `lessonmut.py` (the builder's own): **59, 0 missed** — A (lessonfit): the 41 of round 1 plus NOPIC (lesson 12
-clause re-injected), ASKED (lesson 24 clause re-injected), share (lesson 25 related re-injected), column (a related "in a column"
-on across facts), bound (lesson 9 "wholes to 20"), FULLAUDIT (lesson 26 made full; lesson 5 re-optioned off its row);
-B (lessons.py); C (lessonspec, frozen, mergecheck); D (lessoncheck on the written file after finish(): the critic's p1, p2, p3,
-p4, p5, p7, p8, plus a note, an envision closes and a full lesson flipped to partial with its audit row kept). The critic's
-`mymut.py` list re-run on the round-2 file with the three defects that were in the file re-injected (`r2mut.py`, scratch):
-**21 caught of 21** (1, 6, 8b, 10, 11 and the G-class rows were missed in round 1; 18b, a column-control on stacked facts, is caught only by R_EQ, its column check correctly silent). The critic's `postmut.sh` p1-p8 in clean
-`git archive` trees of the round-2 commit: **all exit 1** (p6 by the frozen gate, the rest by lessoncheck / lessonfit).
+**Mutations.** `lessonmut.py` (the builder's own): **82, 0 missed**. Round 3 adds: F12, F13 and the orientation claim re-injected;
+G8's NOPIC ("without any drawing"), a positive picture claim on `sub_wp_10`, ASKED (pyramid), split into 2 equal groups, the fill
+order, R10; the sweep classes WINDOW, ZERO, OBJN and the story kind; three audit-row mutations through a mutated `full_audit.json`
+(`WRM_FULL_AUDIT`): F11 (lesson 5 full with its round-2 row claiming K.G.A.2 / K.G.A.3), n6 (K.CC.A.3) and "groups of 2 to 5";
+D: p15, p16, a live copy's teaches, the new proposal's representation, two source-gate cases (an R.json and a VISUAL_BUILDS copy
+edited in the file AND the snapshot alike: still caught), and mergecheck on a proposal shared with R.json.
+The critic's `mymut2.py` on the round-3 file: **24 caught**; of the 4 not caught, 2 are its by-design controls ("numbers to 7"
+inside the 1.5× slack; a cylinder among solids) and 2 are its "in the file" no-ops (F12, F13), which are fixed in the file and
+re-injected by `lessonmut.py`, caught. The critic's 9 misses are all caught now (NOPIC "without any drawing", the positive picture
+claim, ASKED pyramid, split into 2 equal groups, the fill order, F12, F13, the turned compose why, R10).
+`postmut3.sh` (scratch; the critic's postmut2 p1-p16 rebuilt from its report, plus p17 `solids_turned.teaches` and p18
+`shape_draw.name`), each in a clean `git archive` tree of fb5ed907 with the full build: **p0 exit 0, p1-p18 all exit 1** (p6, p12
+by the frozen gate; p15 / p16 / p17 by the G7 snapshot, p16 also by the R.json source gate and mergecheck Y1+R; p18 by the live
+source gate and mergecheck Y1+Y2; the rest by lessoncheck / lessonspec / lessonfit).
 
 ## Owner questions (with recommendations)
 
