@@ -514,13 +514,15 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
   from links.build, WRM_PROPOSALS / Skills to be made entries naming the step or school lesson, every build entry a partial / gap
   verdict of the lesson's CCSS/EE codes (and lettered parts) sends a missing clause to, and the detailed lesson's to-make items; rows =
   name ("<option> — a new choice on <skill>", "Fix: …"), kind tag, "Covers:" (the lesson's own gap line, else the audit clause that
-  shares words with the entry, else what it teaches) with codes, status (Planned; no lane-active data, so never "Being built"), and
+  shares words with the entry, else what it teaches; the entry's own fuller coverage wins when it names more, e.g. mult_standard:
+  every size, which exist as preset skills, which are still to build) with codes, status (Planned; no lane-active data, so never "Being built"), and
   "See it on Skills to be made". Lesson card right after the head (replaces the head and do-first "Still to make" lines; the
   detailed card points to it), "Earlier skills to be made first" from links.preBuild, honest empty lines. Unit card "Skills to be made
   for <Grade> · <Domain>" at the top of the unit view (first 6, "Show all N", "For lessons 26, 27 …" links); with a lesson open it
   moves below the lesson. B5 check in ws-teacher-wrm now asks for the card heading (not the first skill row) above the Chromebook bar:
   the owner's order puts the card first. Gates: ws-wrm-page-unit (+ --curated) to-make gate, ws-teacher-wrm to-make step. Evidence
-  `design/audit/runs/wrm-page/tomake/`. Not deployed, not stamped; no critic yet.
+  `design/audit/runs/wrm-page/tomake/`. Merged main 0aa50562 (preset skills) in; gates rerun on the merged tree. Not deployed, not
+  stamped; no critic yet.
 - Held for after these land: Lane B answer boxes + regroup boxes (spec `design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md`),
   placevalue:identify write-value (spec `design/audit/runs/next-session/PV-IDENTIFY-WRITE-VALUE-SPEC.md`).
 

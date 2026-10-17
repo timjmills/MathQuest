@@ -87,6 +87,33 @@ export function joinClauses(list) {
     return isPlain(line) ? line : `${parts[0]}.`;
 }
 
+const andWords = (a) => (a.length < 2 ? a.join('') : `${a.slice(0, -1).join(', ')} and ${a[a.length - 1]}`);
+/** "2-digit × 1-digit" → "2 × 1"; "4×1" → "4 × 1". */
+const sizeShort = (t) => String(t).trim().replace(/(\d+)-digit\s*×\s*(\d+)-digit/g, '$1 × $2').replace(/(\d)\s*×\s*(\d)/g, '$1 × $2');
+/**
+ * What the entry itself will cover, in full and short (coordinator 2026-10-17: a proposal whose own teaches names more
+ * than the audit clause shows its whole coverage): its teaches line, an option list written out as sizes, and, when
+ * part of it already exists as skills (`built`), which parts exist and which are still to build. '' when not plain.
+ */
+export function entryCoverage(e, id) {
+    const p = STANDARD_PROPOSALS[id] || WRM_PROPOSALS[id] || {};
+    const raw = String((e && e.teaches) || p.teaches || '');
+    const m = /^(.*?);\s*option\s+"([a-z]+)"\s*:\s*(.+)$/i.exec(raw);
+    if (!m) return plainNote(raw);
+    const head = plainNote(m[1]).replace(/\.$/, '');
+    const vals = m[3].split(/\s*,\s*/).map(sizeShort).filter(Boolean);
+    if (!head || !vals.length) return '';
+    const word = m[2].toLowerCase() === 'size' ? 'sizes' : `${m[2].toLowerCase()} choices`;
+    let line = `${head}, at the ${word} ${andWords(vals)}.`;
+    const built = p.built || (e && e.built);
+    if (built && Array.isArray(built.remaining) && built.remaining.length) {
+        const left = built.remaining.map(sizeShort);
+        const have = vals.filter((x) => !left.includes(x));
+        if (have.length) line += ` ${andWords(have)} ${have.length > 1 ? 'are' : 'is'} already skills in the app; ${andWords(left)} ${left.length > 1 ? 'are' : 'is'} still to build.`;
+    }
+    return isPlain(line) ? line : plainNote(raw);
+}
+
 /** The ids of the Skills to be made entries a raw detailed-lesson item names ("new skill patterns:notice_patterns …"). */
 function idsInText(raw, byId, bySkill) {
     const out = [];
@@ -201,7 +228,14 @@ export function lessonToMake(lesson, links, { queue = [], detailed = [] } = {}) 
             .filter((g) => own1 || overlap(contentWords(g.text), entryWords(e, id)) > 0).map((g) => plainClause(g.text)).find(Boolean) : '';
         const clause = h ? joinClauses(h.clauses) : '';
         const ext = WRM_EXTENSIONS[id] && rc.some((c) => (WRM_EXTENSIONS[id].ccss || []).includes(c) || (WRM_EXTENSIONS[id].ee || []).includes(c)) ? plainClause(WRM_EXTENSIONS[id].adds) : '';
-        const covers = gapHere || clause || ext || (e ? todoTeaches(e) : '') || 'The part of the lesson no skill teaches yet.';
+        // the entry's own coverage wins when it names more than the line found: an option list or a part already built,
+        // or every word of that line is in it
+        const full = entryCoverage(e, id);
+        const found = gapHere || clause || ext;
+        const rawT = String((e && e.teaches) || (STANDARD_PROPOSALS[id] || WRM_PROPOSALS[id] || {}).teaches || '');
+        const namesMore = !!full && (/;\s*option\s+"/i.test(rawT) || !!(STANDARD_PROPOSALS[id] || {}).built
+            || (!!found && [...contentWords(found)].every((w) => contentWords(full).has(w)) && contentWords(full).size > contentWords(found).size));
+        const covers = (namesMore ? full : found) || full || (e ? todoTeaches(e) : '') || 'The part of the lesson no skill teaches yet.';
         const status = e && e.building ? 'building' : 'planned';
         return { id, name: rowName(e, id, kind), kind, kindTag: KIND_TAG[kind], covers, codes: uniq(rc).map((c) => c.replace(/^M\./, '')), status, statusTag: STATUS_TAG[status],
             sources: h ? [...h.sources] : ['earlier'], todo: id };

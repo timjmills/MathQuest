@@ -440,6 +440,8 @@ const toMakeGate = (tag, Qc) => {
     for (const l of ms) {
         const row = perLesson.get(l.key).items.find((x) => x.todo === 'mult_standard');
         ok(row && row.name === 'Multi-Digit Multiplication: Standard Algorithm' && row.kindTag === 'New skill', `to-make ${tag} ${l.key} (${l.title}): mult_standard not listed as a new skill`);
+        // coordinator 2026-10-17: its whole coverage (every size, which exist as skills, which are still to build)
+        ok(row && /2 × 1, 3 × 1, 4 × 1, 2 × 2 and 3 × 2/.test(row.covers) && /already skills in the app; 4 × 1 and 3 × 2 are still to build/.test(row.covers), `to-make ${tag} ${l.key}: mult_standard covers "${row && row.covers}"`);
     }
     // Grade 3 "Properties of multiplication" (CCSS BUILD): the associative property and the detailed lesson's follow-ons
     const pm = L.find((l) => l.grade === '3' && /^Properties of multiplication/.test(l.title));
