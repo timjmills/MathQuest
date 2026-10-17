@@ -239,6 +239,7 @@ Gate failures and load numbers measured before this fix (~12:30 UTC) are not tru
 - 2026-10-09 Wave 1 lane "Search terms for every skill" (`a21ec3ef403026c80`) fix round 6: builder escalated to Opus medium (the ceiling) - the "Showing results for" correction notice failed critic rounds 1 to 5 (r5: no regression 7, the Navigator notice truncated at Chromebook size and the student notice lost on "+" / refocus).
 
 - 2026-10-10 small fixes lane, item 7 (Opener count-row fit) fix round 6: builder escalated to Opus medium (the ceiling) - critic rounds 1-5 each failed the Opener's fit (D5, N3/N4, N8/N9, N12, N13) with Opus-low builders.
+- 2026-10-17 Skip-count lane fix round 5: builder escalated to Opus medium (the ceiling) - a Model state alone on a page (D8 at critic r2, D12 at critic r4) survived builder rounds 3 and 4.
 
 ### Answer-key options (4.4): open after critic r4 (recorded 2026-10-10, fix round 5 fixed R4-1 only)
 
