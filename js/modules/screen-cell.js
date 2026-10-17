@@ -1873,10 +1873,17 @@ function wireSwipeRows(cellEl) {
             const a = its[0].getBoundingClientRect(), b = its[1].getBoundingClientRect();
             const pitch = b.left - a.left, gap = pitch - a.width;
             // the window may start right of the cell's inner edge (the drawing's own margin): that is room it does not get (r3 D9)
+            // critic skip-count r3 D9 residue: the room ends at the NEAREST CLIP, not the cell: the card's
+            // #questionCard .visual-aid (overflow auto) ends 12 px inside .mq-scell. So the right edge is the minimum inner
+            // right edge over the cell and every ancestor whose overflow-x is not visible.
+            const innerRight = (el) => { const r = el.getBoundingClientRect(), cs = getComputedStyle(el);
+                return r.right - parseFloat(cs.paddingRight || 0) - parseFloat(cs.borderRightWidth || 0); };
             const scell = w.closest('.mq-scell');
-            const sr = scell.getBoundingClientRect(), scs = getComputedStyle(scell);
-            const rightEdge = sr.right - parseFloat(scs.paddingRight || 0) - parseFloat(scs.borderRightWidth || 0);
-            const avail = isAxis ? Math.min(inner, rightEdge - w.getBoundingClientRect().left) : inner;
+            let rightEdge = scell ? innerRight(scell) : Infinity;
+            for (let el = w.parentElement; el && el !== document.body && el !== document.documentElement; el = el.parentElement) {
+                if (getComputedStyle(el).overflowX !== 'visible') rightEdge = Math.min(rightEdge, innerRight(el));
+            }
+            const avail = Number.isFinite(rightEdge) ? Math.min(inner, rightEdge - w.getBoundingClientRect().left) : inner;
             // the line's lead-in before its first number (an axis starts left of it) is room the columns do not get (r3 D9)
             const lead = Math.max(0, a.left - w.getBoundingClientRect().left);
             const n = Math.max(1, Math.floor((avail - lead + gap + 0.5) / pitch));

@@ -122,7 +122,7 @@ function geom(p, ctx) {
     // size's working digit size (16 pt at S), exactly as it was. A row whose widest number (> 3 characters) cannot be written
     // on one line at FLOOR_PT shrinks its digits down to the floor first (TY-10a) and otherwise takes two lines of six.
     if (look === 'arcs' && p.lines) return linesGeom(p, ctx, { size, n, tabBody, tab, live, lblPt, lblChars, hasLbl, lblH });
-    if (look === 'arcs' && p.compact && shape === 'box') {
+    if (look === 'arcs' && p.compact && shape === 'box' && (isTwin(ctx) || !wideNeedMm(p))) {
         // Owner 2026-10-03: each box is its MINIMUM writing width (the widest number at the working size + a margin, never under
         // COMPACT_MIN_BOX) and the rest of the line is the gaps, so every jump arrow keeps >= 1 mm clear each side (COMPACT_MIN_GAP).
         // A row too wide for that (3+ digits) shrinks its digits under TY-10a, never below FLOOR_PT; otherwise two lines of six.
@@ -220,7 +220,13 @@ function linesGeom(p, ctx, c) {
     // write-on lines (~14 mm); only size S keeps 12 on one line with narrow lines (SL-3a, S only)
     const twoLines = !twin && !p.compact && size !== 'S';
     if (twoLines) w = Math.max(w, LINE_ROOMY_MM);
-    if (!twin && (twoLines || gapFor(n, w, false) < minGap - 1e-6)) {
+    // critic skip-count r3 D11: a 6+ digit row writes on lines of >= 5 mm a digit, fewer numbers a line, on paper at every size
+    const wideNeed = !twin ? wideNeedMm(p) : 0;
+    if (wideNeed) {
+        w = Math.max(basePt === pt ? w : need(basePt), wideNeed, need(basePt), LINE_ROOMY_MM); pt = basePt;
+        const lineAt = (per) => (live - tab - (Math.ceil(n / per) > 1 ? EXIT_MM : 0) - (per - 1) * minGap) / per;
+        perRow = widePerRow(n, n >= 13 ? [5, 4, 3] : [4, 3, 2], lineAt, w);
+    } else if (!twin && (twoLines || gapFor(n, w, false) < minGap - 1e-6)) {
         perRow = n >= 13 ? 5 : Math.ceil(n / 2);
         if (gapFor(perRow, w, true) < minGap) {
             w = (live - tab - EXIT_MM - (perRow - 1) * minGap) / perRow;
@@ -239,19 +245,48 @@ function linesGeom(p, ctx, c) {
     return { size, n, look: 'arcs', shape: 'box', w, h, pitch: w + gap, gap, tab, tabBody, perRow, rows, arcH: 0, pt, tabPt: basePt, hasLbl, lblH, lblPt, compact: !!p.compact, lines: true };
 }
 
+/**
+ * critic skip-count r3 D11 (lead ruling, reversible; STATUS owner question): a row whose numbers reach 6 or more DIGITS
+ * (custom steps such as 25,000 or 100,000) is a hand-writing row: its answer box is at least 5 mm a digit plus the commas
+ * (WIDE_COMMA_MM each) and at least the widest number at the row's own digit size, and the row takes fewer numbers a line
+ * (3 lines of 4 for 12; 4 lines of 3 when 4 a line cannot hold that box beside the step tab), on paper only. 0 when the row
+ * is narrower (its layout is unchanged).
+ */
+export const WIDE_DIGITS = 6;
+const WIDE_DIGIT_MM = 5;
+const WIDE_COMMA_MM = 1.2;
+function wideNeedMm(p) {
+    const strs = (p.values || []).map((v) => fmt(v));
+    const digits = Math.max(0, ...strs.map((t) => (t.match(/\d/g) || []).length));
+    if (digits < WIDE_DIGITS) return 0;
+    const commas = Math.max(0, ...strs.map((t) => (t.match(/,/g) || []).length));
+    return digits * WIDE_DIGIT_MM + commas * WIDE_COMMA_MM;
+}
+/** The numbers a line of a wide row takes: the most of `cands` whose box (`boxFor(per)`) holds `need`. */
+function widePerRow(n, cands, boxFor, need) {
+    for (const per of cands) if (per <= n && boxFor(per) >= need) return per;
+    return cands[cands.length - 1];
+}
+
 function arcsGeom(p, ctx, c) {
     const { size, n, shape, tabBody, tab, baseH, live, lblPt: lblPt0, lblChars, hasLbl, lblH } = c;
-    const perRow = p.axis ? n : n >= 13 ? 5 : Math.ceil(n / 2);   // 12 -> 6 + 6; 15 -> 5 + 5 + 5; a number line is one line
-    const rows = Math.ceil(n / perRow);
+    let perRow = p.axis ? n : n >= 13 ? 5 : Math.ceil(n / 2);   // 12 -> 6 + 6; 15 -> 5 + 5 + 5; a number line is one line
     const chars = maxDigits(p);
     const basePt = Math.min(digitPt(ctx) * (p.compact ? 1 : 0.64), 18);
+    const shapeK = shape === 'hex' || shape === 'mixed' ? 1.12 : 1;
+    const glyphMm = chars * 0.56 * basePt * PT_MM + 2.4;
+    const wideNeed = !p.axis && !isTwin(ctx) ? wideNeedMm(p) : 0;
+    if (wideNeed) {
+        const boxAt = (per) => ((live - tab - (Math.ceil(n / per) > 1 ? EXIT_MM : 0) + MIN_GAP) / per - MIN_GAP) / shapeK;
+        perRow = widePerRow(n, n >= 13 ? [5, 4, 3] : [4, 3, 2], boxAt, Math.max(wideNeed, glyphMm));
+    }
+    const rows = Math.ceil(n / perRow);
     const avail = live - tab - (rows > 1 ? EXIT_MM : 0);        // the width the numbers of one line may fill
     const pitch = (avail + MIN_GAP) / perRow;                   // box + gap, so six boxes and five gaps fill the line
-    const shapeK = shape === 'hex' || shape === 'mixed' ? 1.12 : 1;
     const maxW = (pitch - MIN_GAP) / shapeK;                    // the widest box that leaves the least gap
-    const boxMin = Math.max(MIN_BOX[size], chars * 0.56 * basePt * PT_MM + 2.4);   // wide enough for today's digits
+    const boxMin = Math.max(MIN_BOX[size], glyphMm, wideNeed);   // wide enough for today's digits (and a wide row's hand)
     const boxCap = PITCH[size] + 2;                             // a table's box stays near today's writing width
-    let boxW = maxW >= boxMin ? Math.min(maxW, Math.max(boxMin, boxCap)) : maxW;
+    let boxW = maxW >= boxMin ? Math.min(maxW, Math.max(boxMin, wideNeed ? boxMin : boxCap)) : maxW;
     const sz = shape === 'box' ? { w: boxW, h: baseH } : tileSize(shape === 'mixed' ? 'hex' : shape, boxW, baseH);
     if (sz.w > pitch - 1) { sz.w = pitch - 1; }
     // the screen twin (critic C2 r6): the gap between columns is capped at TWIN_GAP_MM (about 24 px on a phone card), so four

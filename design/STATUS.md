@@ -38,6 +38,7 @@ passes, finish the print backlog (Lane D), then STOP. Lane B stays on its wip br
 - place-value rename sentences wrapping at 390 ("=" at a line start, number split from its unit)
 - four-place disk mat at 390: swipe (provisional SP-11a) vs 2 x 2 layout — owner question
 - count-row arrow clearance at 390 (smaller arrow to keep 3 columns) — owner question
+- count_by_tables rows of 6+ digit answers (custom steps such as 25,000 / 100,000; skip-count critic r3 D11) — owner question. Lead ruling (reversible), built in skip-count fix r4: such a row's answer box is >= 5 mm a digit plus 1.2 mm a comma and never narrower than its number at the page's digit size or than today's box; the row takes fewer numbers a line (12 -> 3 lines of 4, or 4 lines of 3 when the step tab leaves 4 a line too narrow, e.g. 7 digits) on every print page type including the model, at S, M and L; screen hosts unchanged (the twin keeps its swipe/wrap). Recommended answer: keep it.
 - add_three overflow at 390 (Lane B R5) unless the page itself overflows
 - count rows, Answer spaces: Lines, card at 390 (critic countby-arrows r1 D1/D7): check the next-box yellow and right/wrong tints never cover a jump arrow at phone width (the input is now clamped to its drawn line; Chromebook hosts measure 0 overlaps)
 

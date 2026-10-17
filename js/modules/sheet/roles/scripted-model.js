@@ -82,8 +82,12 @@ export function plan(input = {}) {
         if (Math.floor(room1 / H1) >= steps.length) { textH = (m.pitch + 1.5) + 6; H = H1; }
     }
     // critic skip-count r2 D8: a taller drawing (a fact under each number, three lines of 5) may still leave the last state
-    // alone on a page; then the two parallel middle steps ("a + n = b. Write b.") become one state, so the model stays whole
-    if (Math.floor(room1 / H) < steps.length && Math.floor(room1 / H) >= steps.length - 1 && steps.length >= 4) {
+    // alone on a page; then the two parallel middle steps ("a + n = b. Write b.") become one state, so the model stays whole.
+    // critic skip-count r3 D10: ONLY a count row's steps are parallel (marks non-null = q.cell.template 'count-row' with the
+    // provider's traced steps); and only when steps 2 and 3 are both the same action "a + n = b. Write b." (a rule-finding step never merges);
+    // every other skill keeps one action per state (PEDAGOGY P-1) and the caps rebalance below
+    const parallel = (t) => /^[\d,]+ [+\u2212-] [\d,]+ = [\d,]+\. Write [\d,]+\.$/.test(String(t).trim());
+    if (marks && parallel(steps[1]) && parallel(steps[2]) && Math.floor(room1 / H) < steps.length && Math.floor(room1 / H) >= steps.length - 1 && steps.length >= 4) {
         steps = [steps[0], `${steps[1]} ${steps[2]}`, ...steps.slice(3)];
         if (marks) marks = [marks[0], marks[2], ...marks.slice(3)];
     }
