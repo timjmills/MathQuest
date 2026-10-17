@@ -14,7 +14,7 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | E7 | Teacher text ≥ 10 pt | smallest 10 pt (T1 "#", T2 "#") | PASS |
 | E8 | Working digits 28 pt outside the anchor chart | the kit sets --ws-digit 28pt at size L on every pupil page (one size L pack); measured by ws-print-lint --source kit | PASS |
 | E9 | Every page ≥ 50 % used, nothing past the body | min 89 %; overflow none; under 50 %: none | PASS |
-| E9c | Teacher pages: one continued is ≥ 92 % used (V22 3131); every teacher page listed | T1 96, T2 89, T2b 97, T3 97, T4 93, T5 94, T6 91; continued under 92 %: none | PASS |
+| E9c | Teacher pages: one continued is ≥ 92 % used (V22 3131); every teacher page listed | T1 96, T2 93, T2b 97, T3 97, T4 93, T5 94, T6 93; continued under 92 %: none | PASS |
 | E9b | Body ≤ 8 % blank below its last band (site lint) | max 4 %; over 8 %: none | PASS |
 | E10 | Every item cell ≥ 40 % free (reading cells exempt) | 98 cells; min free 50 %; below 40 %: none | PASS |
 | E11 | No empty band ≥ 30 % in a cell (the site sheetCheck H13, from the border box) | worst 29 %; failing: none | PASS |
@@ -31,7 +31,7 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | E19 | One identical I Can title on every page | I Can find the rule in a table | PASS |
 | E20 | No lone item (word problem v1 and the anchor chart excepted) | none | PASS |
 | E21b | T1 Flow word: Chunked when T2 has ≥ 4 routine rows tagged New | T2 New rows 2 → Standard; T1 "Standard" | PASS |
-| E21 | T2: ≥ 5 atoms of the four types; no ★ in the atom tables | 7 atoms: Fact, Fact, Fact, Category, Comparative, Conceptual, Comparative; ★ false | PASS |
+| E21 | T2: ≥ 5 atoms of the four types; no ★ in the atom tables | 8 atoms: Fact, Fact, Fact, Category, Comparative, Conceptual, Comparative, Category; ★ false | PASS |
 | E22 | Every delivery page (T3–T5) shows a pupil-page thumbnail | T3: 1, T4: 2, T5: 1 | PASS |
 | E23 | Every row of T6 "Answers at a glance" carries ★ / ★★ / ★★★ | 4/4 | PASS |
 | E24 | Item pool read from the pack (LR-5): pool recomputed from its rule; 0 repeats of (number, representation); a number never twice on a page; chart examples and their turn-arounds never return; no turn-around pair on a page | 40 places (40 numbers), usable pool 40 (pool 40 keys, 40 facts, recomputed from its list rule: matches; forbidden 0); repeats 0; chart examples or their turn-arounds returning 0; same-page turn-arounds 0; outside the pool / forbidden 0; items without a rep 0 | PASS |
@@ -58,7 +58,7 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | Page | Kind | Used % | Bottom blank % | Min text pt | Cells | Min free % | Paints |
 |---|---|---|---|---|---|---|---|
 | T1 | teacher | 96 | 0 | 10 | 0 | — | #000000 |
-| T2 | teacher | 89 | 0 | 10 | 0 | — | #000000 #5b2a86 |
+| T2 | teacher | 93 | 0 | 10 | 0 | — | #000000 #5b2a86 |
 | T2b | teacher | 97 | 0 | 10 | 0 | — | #000000 #5b2a86 #ffffff |
 | T3 | teacher | 97 | 0 | 11 | 0 | — | #000000 #5b2a86 #c2410c |
 | T4 | teacher | 93 | 0 | 11 | 0 | — | #000000 #5b2a86 #c2410c |
@@ -79,7 +79,7 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | P4-2-key | key | 96 | 0 | 12 | 4 | 81 | #000000 #5b2a86 #949494 #c2410c #ffffff |
 | P5-key | key | 96 | 4 | 12 | 3 | 73 | #000000 #5b2a86 #949494 #c2410c #ffffff |
 | P6-key | key | 96 | 0 | 12 | 6 | 68 | #000000 #949494 #c2410c #ffffff |
-| T6 | teacher | 91 | 0 | 10 | 0 | — | #000000 #c2410c |
+| T6 | teacher | 93 | 0 | 10 | 0 | — | #000000 #c2410c |
 
 ## Notes from the build
 
