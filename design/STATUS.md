@@ -330,3 +330,20 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
   list M.EE.3.OA.9); 1.OA.A.1 audit verdict should be partial.
 - Held for after these land: Lane B answer boxes + regroup boxes (spec `design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md`),
   placevalue:identify write-value (spec `design/audit/runs/next-session/PV-IDENTIFY-WRITE-VALUE-SPEC.md`).
+
+## HELPER PAUSED 2026-10-17 — WRM tagging helper session_01LVDoUbPMFjuTAdwUzzWVDL (owner wind-down)
+- PASSED and pushed: Y5 (bd2f4ff2, critic r8), Y2-Y3 (7ee69f33, critic r15), Y6 site lessons (6c920c45, lessons critic r2),
+  Y1 site lessons (branch -wip-wrm-lessons-y1 d4994b4b, lessons critic r3). Y6 steps already on main.
+- OPEN: Y4 site lessons, branch `claude/sweet-newton-c8wrv1-wip-wrm-lessons-y4` (this commit). Critic r4 FAIL 7.96: only
+  lesson 7 at 7. Builder escalated to mq-opus-medium (r4).
+- NEXT STEPS (Y4 lessons, see Y4-lessons-critic-r4.md fix table, wordings measured):
+  1. F6 lesson 7: area {forms:[2]} clause -> "a story of a rectangular kitchen floor, room, patio, wall or garden bed in
+     feet whose area is the side lengths multiplied (8 ft by 5 ft: 40 square feet); never tiled".
+  2. M1: merge main (bf378b7b+, has generator fix 8fbe02c4: denoms reads the payload) and re-measure lesson 10's pre
+     fractions:identify {forms:[1], denoms:[2]} — its why becomes false on main (~1 in 10 off-family); re-option or reword.
+  3. G9 lessonfit: object/scale/range/count/hour lists, positive fraction families, half-unit claims; G2 bounds on the
+     fixed G6 probe. Optional n9 ruler wording.
+  4. Rebuild (Y4/build.py then Y4/lessons_build.py), all gates, then critic r5.
+- OPEN OWNER QUESTIONS: Y4-lessons-report.md (FULL lessons with unnamed 3.OA clauses — critic agrees keep FULL; bar-models
+  3.OA.D.8; "Pounds, tens, ones and pence" = money place value?); Y1-lessons-report.md 1-7; Y6-report.md site lessons;
+  Y5-report.md; Y2/Y3 reports. Lead merge notes (lessonCloses, opts in step lists, lesson-only proposals) in HELPERS.md.
