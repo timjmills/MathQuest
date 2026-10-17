@@ -1651,7 +1651,8 @@ function wireSwipeRows(cellEl) {
             const v = w.getBoundingClientRect();
             return [...w.querySelectorAll('.k2-countrow-body .k2-given, .k2-countrow-body input')].some((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.right > v.right + 1; });
         };
-        // the cue stays on ONE line inside a narrow window (29 px digits on a phone, TY-10b): its type shrinks to fit, never under 14 px
+        // the cue stays on ONE line inside a narrow window: its type shrinks to fit, never under 14 px (a count row no longer swipes
+        // on a phone: owner ruling 2026-10-17, it wraps; the cue serves any other swiping row)
         const fitCue = (win) => {
             const cues = w.querySelector('.k2-swipe-cues');
             if (!cues) return;
@@ -1672,8 +1673,9 @@ function wireSwipeRows(cellEl) {
             const its = items();
             if (!ln || its.length < 2) return;
             ln.style.maxWidth = '';
-            const a = its[0].getBoundingClientRect(), b = its[1].getBoundingClientRect();
-            const pitch = b.left - a.left, gap = pitch - a.width;
+            // the pitch from the item's width and the line's own gap, so it reads true when the items already stand on separate lines
+            const a = its[0].getBoundingClientRect();
+            const gap = parseFloat(getComputedStyle(ln).columnGap) || 0, pitch = a.width + gap;
             if (!(pitch > 0)) return;
             // critic r9 E3: the room is the count row's own block (the cell's inner width), never the window's current width,
             // so a fresh load and a resize to the same width balance the same way
@@ -3078,17 +3080,16 @@ export function cellDigitTarget(cellEl) {
  * null: the item keeps the host's legacy path.
  */
 /**
- * A count-by row drawn again for the screen it is shown on. TY-10b (critic phone29): on a phone (`phoneGap`, the worksheet and
- * the quiz) its gap is capped at 24 px absolute, so the geometry (box pitch, arcs) is laid out on the narrower pitch and three
- * whole columns fit the window. Critic r7 O9: above a phone a row too wide for six boxes wraps onto more lines at the host's
- * digit size (`twinWrap`, count-row.js) instead of shrinking under TY-10a. Any other item comes back as it is.
+ * A count-by row drawn again for the screen it is shown on. Critic r7 O9 / r8: on every screen the row is drawn as one wrapping
+ * line at the host's digit size (`twinWrap`, count-row.js), balanced by wireSwipeRows, instead of shrinking under TY-10a or
+ * swiping. Owner ruling 2026-10-17: count rows wrap on the phone at the host digit size (`twinPhone`: 29 px); they no longer
+ * swipe or shrink (this replaced the TY-10b phone swipe and its 24 px gap cap). Any other item comes back as it is.
  */
-export function countRowTwin(q, { phoneGap = true } = {}) {
+export function countRowTwin(q) {
     if (!q || !q.cell || q.cell.template !== 'count-row' || !q.cell.payload || typeof window === 'undefined'
         || !/class="k2-twin"/.test(String(q.visual || ''))) return q;
     const phone = window.innerWidth <= 480;
-    if (phone && !phoneGap) return q;
-    try { return Object.assign({}, q, { visual: k2Twin('count-row', Object.assign({}, q.cell.payload, phone ? { twinGapPx: 24 } : { twinWrap: true, twinWrapAll: true })) }); } catch (e) { return q; /* keep the stored twin */ }
+    try { return Object.assign({}, q, { visual: k2Twin('count-row', Object.assign({}, q.cell.payload, { twinWrap: true, twinWrapAll: true }, phone ? { twinPhone: true } : {})) }); } catch (e) { return q; /* keep the stored twin */ }
 }
 
 export function screenTwin(q, { categoryId = '', typedOrder = false } = {}) {
@@ -3231,8 +3232,11 @@ export function fitTwinRows(root) {
             // shrink the millimetre only as far as keeps every box a 44 px touch target, then it swipes (SP-10, SP-11a)
             const cur = parseFloat(getComputedStyle(twin).getPropertyValue('--mq-k2')) || 3.4;
             const need = sw.scrollWidth, have = sw.clientWidth;
-            // owner ruling 2026-10-03 (TY-10b): on a phone the row is drawn at about 29 px digits (boxes scale with them) and swipes;
+            // owner ruling 2026-10-03 (TY-10b, superseded 2026-10-17 for count rows, which now wrap and return above): a non-wrapping
+            // row on a phone is drawn at about 29 px digits (boxes scale with them) and swipes;
             // a row whose numbers TY-10a already shrank (wider than six boxes hold) keeps that shrink, scaled by the same factor
+            // owner ruling 2026-10-17: a wrapping count row (every count row on a screen) is already at the host digit size
+            if (twin.querySelector('.k2-countrow-body[data-mq-wrap="1"]')) return;
             if (typeof window !== 'undefined' && window.innerWidth <= 480 && have > 0) {
                 const dg = twin.querySelector('.k2-countrow-body .k2-given, .k2-countrow-body input.mq-cellslot');
                 const fs = dg ? parseFloat(getComputedStyle(dg).fontSize) : 0;

@@ -8,15 +8,17 @@
 //   - no "Swipe for more boxes" cue, no swipe overflow (SP-11a: count rows swipe only at 480 px and under), no page scroll
 // A worksheet that mixes rows (by 5, by 100,000 from 1,000,000, by 25,000; 6 problems, D2): every card the same width, every
 // row at 29 px, card heights even (tallest / shortest <= 1.35) and no card with a vertical empty band of 30 % or more.
-// At 390 (phone, TY-10b) the rows are UNCHANGED: the measures are pinned to 810c0894 (PHONE_PIN).
+// Owner ruling 2026-10-17: at 480 px and below (390, 360, 430) every row wraps the same way at the phone's 29 px on every host
+// (at least 2 to a line there), with no swipe and no cue; it replaced the TY-10b phone swipe that PHONE_PIN used to pin.
+// Every row: the jump arrow's ink stands >= 1.0 mm (at the row's own scale) clear of the numbers beside it (SL-3a, critic r10 F1).
 // Run: node tests/scripts/small-fixes-countrow-wide.cjs   (SHOTS=<dir> saves screenshots; SIZES=1366,390 limits the viewports;
-// PIN=1 prints the phone measures as a PHONE_PIN object)
+// the phone measures are no longer pinned)
 const path = require('path');
 const { open } = require('../lib/ws-harness.cjs');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let fails = 0;
 const check = (ok, msg) => { console.log((ok ? 'PASS ' : 'FAIL ') + msg); if (!ok) fails++; };
-const SIZES = [{ width: 1366, height: 650 }, { width: 1280, height: 600 }, { width: 820, height: 1180 }, { width: 768, height: 1024 }, { width: 390, height: 844 }].filter((v) => !process.env.SIZES || process.env.SIZES.split(',').map(Number).includes(v.width));
+const SIZES = [{ width: 1366, height: 650 }, { width: 1280, height: 600 }, { width: 820, height: 1180 }, { width: 768, height: 1024 }, { width: 430, height: 932 }, { width: 390, height: 844 }, { width: 360, height: 780 }].filter((v) => !process.env.SIZES || process.env.SIZES.split(',').map(Number).includes(v.width));
 const WIDE = { rows: [{ step: 100000, start: 'custom', at: 1000000 }] };
 const ROWS = {
   '100000': WIDE,
@@ -30,17 +32,7 @@ const ROWS = {
 const MIXED = { rows: [{ step: 5 }, { step: 100000, start: 'custom', at: 1000000 }, { step: 25000 }] };
 const HOST_PX = { worksheet: 29, card: 40, quiz: 40 };
 const SHOTS = process.env.SHOTS || '';
-const PIN = !!process.env.PIN;
-// TY-10b: the phone rows as 810c0894 draws them (givens px, inputs px, swipe overflow px, cue shown), seed 11
-const PHONE_PIN = {
-  'worksheet 100000': [16.1, 16.1, 375, true], 'worksheet 25000': [18.8, 18.8, 398, true], 'worksheet 100000-lines': [29, 29, 933, true],
-  'worksheet by2': [29, 29, 418, true], 'worksheet by5': [29, 29, 418, true], 'worksheet by10': [29, 29, 418, true], 'worksheet by25': [29, 29, 418, true],
-  'card 100000': [14.6, 14.6, 410, true], 'card 25000': [17, 17, 423, true], 'card 100000-lines': [29, 29, 901, true],
-  'card by2': [29, 29, 450, true], 'card by5': [29, 29, 450, true], 'card by10': [29, 29, 450, true], 'card by25': [29, 29, 450, true],
-  'quiz 100000': [14.6, 14.6, 339, true], 'quiz 25000': [17, 17, 360, true], 'quiz 100000-lines': [29, 29, 933, true],
-  'quiz by2': [29, 29, 418, true], 'quiz by5': [29, 29, 418, true], 'quiz by10': [29, 29, 418, true], 'quiz by25': [29, 29, 418, true],
-};
-const pinOut = {};
+
 
 async function mount(page, host, opts, seed, count) {
   return page.evaluate(async (host, opts, seed, count) => {
@@ -99,6 +91,33 @@ async function measure(page, root, host, qi) {
       maxPx: Math.max(0, ...givens.concat(ins).map(fz)),
       cue, swipeOver: sw ? sw.scrollWidth - sw.clientWidth : 0, perLine, band: Math.round(band * 1000) / 10,
       cellW: cell ? Math.round(cell.getBoundingClientRect().width) : 0,
+      // whether two numbers can stand on one line of this cell at all (the room of the count row's block)
+      twoFit: (() => {
+        const ln = r.querySelector('.k2-countrow-line [data-mq-wrapped]'); const rt = r.querySelector('.k2-countrow');
+        if (!ln || !rt || !ln.children[0]) return true;
+        const rs = getComputedStyle(rt), ls = getComputedStyle(ln);
+        const room = rt.clientWidth - parseFloat(rs.paddingLeft) - parseFloat(rs.paddingRight);
+        return parseFloat(ls.paddingLeft) + 2 * ln.children[0].getBoundingClientRect().width + parseFloat(ls.columnGap) <= room + 0.5;
+      })(),
+      clearMm: (() => {
+        // the jump arrow's ink against the numbers beside it, in mm at the row's own scale (its gap is WRAP_GAP = 4.2 mm wide)
+        let min = 99;
+        const ink = (el) => { const g = el.querySelector('.k2-given'); if (g && g.firstChild) { const rg = document.createRange(); rg.selectNodeContents(g); return rg.getBoundingClientRect(); } return el.getBoundingClientRect(); };
+        r.querySelectorAll('.k2-countrow-body .k2-jumpcell').forEach((jc) => {
+          const j = jc.querySelector('.k2-jump'); const prev = jc.previousElementSibling;
+          if (!j || !prev) return;
+          const sh = [...j.querySelectorAll('path, polygon')].map((e) => e.getBoundingClientRect());
+          if (!sh.length) return;
+          const L = Math.min(...sh.map((b) => b.left)), R = Math.max(...sh.map((b) => b.right));
+          const mmPx = j.getBoundingClientRect().width / 4.2;
+          const num = (el) => (el.classList.contains('k2-jumpcell') ? [...el.children].find((c) => !c.classList.contains('k2-jump')) || el : el);
+          const pn = num(prev), kid = num(jc);
+          if (Math.abs(pn.getBoundingClientRect().top - kid.getBoundingClientRect().top) > 8) return;   // a new line starts here
+          const a = ink(pn), b = ink(kid);
+          min = Math.min(min, (L - a.right) / mmPx, (b.left - R) / mmPx);
+        });
+        return Math.round(min * 100) / 100;
+      })(),
       pageScroll: document.documentElement.scrollWidth - window.innerWidth };
   }, root, host, qi);
 }
@@ -135,27 +154,27 @@ const dismiss = (page) => page.evaluate(() => { const d = document.getElementByI
             await el.evaluate((e) => e.scrollIntoView({ block: 'start' }));
             await page.screenshot({ path: path.join(SHOTS, `screen-${vp.width}-${host}-${rk}.png`) });
           }
-          if (SHOTS && phone && host === 'worksheet' && rk === '100000') {
+          if (SHOTS && ((vp.width === 390 && ['100000', '25000', 'by5', '100000-lines'].includes(rk)) || (vp.width === 360 && host === 'worksheet' && rk === '100000'))) {
             const el = await page.$(root);
             await el.evaluate((e) => e.scrollIntoView({ block: 'start' }));
-            await page.screenshot({ path: path.join(SHOTS, `screen-390-worksheet-100000.png`) });
+            await page.screenshot({ path: path.join(SHOTS, `screen-${vp.width}-${host}-${rk}.png`), fullPage: true });
           }
           check(m.n >= 2, `${tag} ${m.n} answer boxes`);
-          if (!phone) {
-            const px = HOST_PX[host];
+          {
+            const px = phone ? 29 : HOST_PX[host];
+            const tot = m.perLine.reduce((x, y) => x + y, 0);
+            const half = tot >= 13 ? 5 : Math.ceil(tot / 2);
             check(m.givenPx >= px - 0.5 && m.inputPx >= px - 0.5 && m.maxPx <= px + 0.5, `${tag} givens ${m.givenPx}px and inputs ${m.inputPx}px at the host's ${px}px`);
             check(m.fit.every(Boolean), `${tag} every box holds "${m.widest}" (${m.fit.filter((f) => !f).length} too narrow)`);
-            check(Math.min(...m.perLine) >= 3, `${tag} at least 3 numbers to every line (${m.perLine.join('+')})`);
+            // a phone line takes 2 or more; only where two of the widest boxes cannot stand on one line at 29 px (1,000,000 at 360)
+            // does it take one, centred, under the same band rule
+            const minPer = phone ? (m.twoFit ? 2 : 1) : 3;
+            check(Math.min(...m.perLine) >= minPer, `${tag} at least ${minPer} numbers to every line (${m.perLine.join('+')}${m.twoFit ? '' : '; two do not fit at 29 px'})`);
+            check(Math.max(...m.perLine) - Math.min(...m.perLine) <= 1, `${tag} balanced lines (${m.perLine.join('+')})`);
             check(m.band < 30, `${tag} right-hand empty band ${m.band}% < 30%`);
-            const half = m.perLine.reduce((a, b) => a + b, 0) >= 13 ? 5 : Math.ceil(m.perLine.reduce((a, b) => a + b, 0) / 2);
             check(Math.max(...m.perLine) <= half, `${tag} no screen line holds more than half the row (${m.perLine.join('+')}, at most ${half}) (TY-10a, SL-3a)`);
-            check(!m.cue && m.swipeOver <= 1, `${tag} no desktop swipe (cue ${m.cue}, overflow ${m.swipeOver}px)`);
-          } else {
-            const key = `${host} ${rk}`;
-            pinOut[key] = [Math.round(m.givenPx * 10) / 10, Math.round(m.inputPx * 10) / 10, m.swipeOver, m.cue];
-            const pin = PHONE_PIN[key];
-            check(!!pin && Math.abs(pin[0] - pinOut[key][0]) <= 0.2 && Math.abs(pin[1] - pinOut[key][1]) <= 0.2 && Math.abs(pin[2] - m.swipeOver) <= 2 && pin[3] === m.cue,
-              `${tag} TY-10b phone row unchanged (${JSON.stringify(pinOut[key])} vs pin ${JSON.stringify(pin)})`);
+            check(!m.cue && m.swipeOver <= 1, `${tag} no swipe (cue ${m.cue}, overflow ${m.swipeOver}px)`);
+            check(m.clearMm >= 1.0, `${tag} jump arrows >= 1.0 mm clear of the numbers (${m.clearMm} mm)`);
           }
           check(m.pageScroll <= 0, `${tag} the page never scrolls sideways (${m.pageScroll}px)`);
           check(errs.length === 0, `${tag} no page errors ${errs.join(' ')}`);
@@ -200,22 +219,21 @@ const dismiss = (page) => page.evaluate(() => { const d = document.getElementByI
     } finally { if (app) await app.close(); }
   }
   // critic r9 E3: a row balances the same on a fresh load and after a resize to the same width
-  for (const host of ['worksheet', 'card', 'quiz']) {
-    if (process.env.SIZES && !process.env.SIZES.split(',').includes('768')) break;
-    const tag = `[768 ${host} 100000 load vs resize]`;
+  for (const [w0, h0, path0] of [[768, 1024, [[1366, 650], [1100, 700], [768, 800]]], [390, 844, [[430, 932], [360, 780], [390, 844]]]]) for (const host of ['worksheet', 'card', 'quiz']) {
+    if (process.env.SIZES && !process.env.SIZES.split(',').includes(String(w0))) break;
+    const tag = `[${w0} ${host} 100000 load vs resize]`;
     let app;
     try {
-      const b = await boot({ width: 768, height: 1024 }); app = b.app; const { page } = b;
+      const b = await boot({ width: w0, height: h0 }); app = b.app; const { page } = b;
       await mount(page, host, WIDE, 11);
       await sleep(1200); await dismiss(page); await sleep(300);
       const root = host === 'quiz' ? '#quizTakeView' : host === 'card' ? '#questionCard' : '#ws_card_0';
       const m0 = await measure(page, root, host, 0);
-      for (const v of [{ width: 1366, height: 650 }, { width: 1100, height: 700 }, { width: 768, height: 800 }]) { await page.setViewport(Object.assign({ deviceScaleFactor: 1 }, v)); await sleep(700); }
+      for (const [vw, vh] of path0) { await page.setViewport({ width: vw, height: vh, deviceScaleFactor: 1, isMobile: w0 <= 480, hasTouch: w0 <= 480 }); await sleep(700); }
       const m1 = await measure(page, root, host, 0);
       check(m0.perLine.join('+') === m1.perLine.join('+'), `${tag} ${m0.perLine.join('+')} on load, ${m1.perLine.join('+')} after resizing back`);
     } catch (e) { check(false, `${tag} ${e.message}`); } finally { if (app) await app.close(); }
   }
-  if (PIN) console.log('PHONE_PIN = ' + JSON.stringify(pinOut));
-  console.log(fails ? `small-fixes-countrow-wide: FAIL (${fails})` : 'small-fixes-countrow-wide: OK');
+    console.log(fails ? `small-fixes-countrow-wide: FAIL (${fails})` : 'small-fixes-countrow-wide: OK');
   process.exit(fails ? 1 : 0);
 })();

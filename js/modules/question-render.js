@@ -2161,8 +2161,8 @@ function _renderQuestionImpl() {
 
     if (requiresVisual || q.visual) {
         visualAid.style.display = "block";
-        // a count-by row too wide for six boxes wraps at the card's digit size above a phone (critic r7 O9)
-        visualAid.innerHTML = countRowTwin(q, { phoneGap: false }).visual;
+        // a count-by row wraps at the card's digit size on every screen (critic r7 O9; owner ruling 2026-10-17 for the phone)
+        visualAid.innerHTML = countRowTwin(q).visual;
         // Auto-advance focus on column-answer-input boxes (long division
         // quotient, column add/sub/mult result). When the student fills a
         // 1-character box, focus jumps to the next empty input. Enter
