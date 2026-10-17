@@ -350,6 +350,12 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
      (critic r8 FAIL R8-1/R8-2, r9 WIP); both touch print-sheet.js + ws-print-lint.cjs (conflicts expected).
      Owner question: G4 like-denominator keys show 2/8 = 1/4 (recommended).
   5. Skip-count @ 37f3d627 (r5 unreviewed) and White Rose page `-wip-wrm-page` @ 25b453e7 (r10 WIP) — see their entries.
+- 2026-10-17 ~09:45: **Owner answers (all recommended):** (1) G4 like-denominator fraction keys show the unsimplified answer then the
+  simplest form, e.g. 2/8 = 1/4; (2) wide skip-count rows wrap and keep size (>= 5 mm per digit, 7 digits = 4 lines of 3; the Opener
+  is NOT exempt); (3) on a phone the skip-count card opens scrolled to the first answer box; (4) White Rose "Skills to be made" shows
+  composed sentences only, free-text build notes stay in the CSV; (5) detailed lessons 2/4/5: the owner list's EE comes first, the repo
+  EE stays recorded beside it; (6) 1.OA.A.1 audit verdict becomes partial. Owner: finish Y4 site lessons (accept r4 7.96 after the F6
+  fix, no further critic), finish White Rose page + skip-count defects, merge, then STOP all work.
 - Held for after these land: Lane B answer boxes + regroup boxes (spec `design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md`),
   placevalue:identify write-value (spec `design/audit/runs/next-session/PV-IDENTIFY-WRITE-VALUE-SPEC.md`).
 - 2026-10-17 generator bug fixes (branch claude/sweet-newton-c8wrv1-wip-genbugs; seeded 1-600 before/after): (1) `equiv_frac_nv` yes/no: the distractor clamp could land on an equivalent pair keyed "no" (seed 206: 2/3 vs 2/3) - the denominator now moves until the cross products differ (2 -> 0 bad); (2) `itemDenominators` now reads `q.cell.payload` ({n,d} terms, "a/b" strings), so kit cells obey the denominators filter (`equiv_frac_visual {denoms:[2]}` 22 -> 0 items with no denominators seen); (3) `percent_of_number`: the 33% combos keyed one third (33% of 60 = 20) are now 30% with exact whole answers (53 -> 0); (4) `simplify`: distractor numerators are 1-3 off and never below 1 (no 0 or negative options; 23 -> 0); (5) `distributive_expr` factor-out: inner terms are coprime so the stated factor is the GCF (10x + 30 -> 10(x + 3), 126 -> 0).
