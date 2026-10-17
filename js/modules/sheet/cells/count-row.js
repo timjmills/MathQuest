@@ -138,7 +138,9 @@ function geom(p, ctx) {
     let wide = Math.max(0, maxDigits(p) - (look === 'train' ? 2 : 3)) * 3;
     const gap = p.compact ? COMPACT_GAP_MM : GAP_MM;
     // The step tab grows with its text ("−25,000"): the pentagon's point and padding plus the digits at the tab's own size.
-    const tabPtEst = Math.min(Math.max(tightPractice(p, ctx) ? GIVEN_MIN_PT : 0, digitPt(ctx) * (p.compact || p.fullPt ? 1 : 0.64)) * 1.05, 20);
+    // critic skip-count r4 N10: a wide (6+ digit) paper row prints its numbers at >= GIVEN_MIN_PT (11 pt, the reading floor), its tab too
+    const wideFloor = !isTwin(ctx) && !(ctx && ctx.tightRows) && wideNeedMm(p) ? GIVEN_MIN_PT : 0;
+    const tabPtEst = Math.min(Math.max(tightPractice(p, ctx) ? GIVEN_MIN_PT : 0, wideFloor, digitPt(ctx) * (p.compact || p.fullPt ? 1 : 0.64)) * 1.05, 20);
     const tabLen = String(tabOf(p, ctx)).length;
     const tabBody = look === 'arcs' && tabOf(p, ctx) ? (tabLen <= 2 ? TAB_MM[size] : Math.max(TAB_MM[size], tabLen * 0.6 * tabPtEst * PT_MM + 7)) : 0;
     const tab = tabBody ? tabBody + 2 : 0;
@@ -331,7 +333,8 @@ const LINE_ROOMY_MM = 14;   // a Lines write-on line at M and L is at least this
 function linesGeom(p, ctx, c) {
     const { size, n, tabBody, tab, live, lblPt: lblPt0, lblChars, hasLbl } = c;
     const chars = maxDigits(p);
-    const basePt = Math.min(digitPt(ctx) * (p.compact || p.fullPt ? 1 : 0.64), 18);
+    const wideFloor = !isTwin(ctx) && !(ctx && ctx.tightRows) && wideNeedMm(p) ? GIVEN_MIN_PT : 0;   // critic skip-count r4 N10
+    const basePt = Math.max(wideFloor, Math.min(digitPt(ctx) * (p.compact || p.fullPt ? 1 : 0.64), 18));
     const need = (pt) => Math.max(7, chars * 0.56 * pt * PT_MM + 2.4);   // the line is as wide as its widest number + a margin
     const minGap = p.compact ? LINE_GAP_MIN.compact : LINE_GAP_MIN.paper;
     const gapFor = (per, w, exit) => (live - tab - (exit ? EXIT_MM : 0) - per * w) / Math.max(1, per - 1);
@@ -389,6 +392,8 @@ function linesGeom(p, ctx, c) {
 export const WIDE_DIGITS = 6;
 const WIDE_DIGIT_MM = 5;
 const WIDE_COMMA_MM = 1.2;
+/** Is this a wide (6+ digit) hand-writing row (D11)? The Scripted Model reads it (critic skip-count r4 D12). */
+export const isWideRow = (p) => wideNeedMm(p || {}) > 0;
 function wideNeedMm(p) {
     const strs = (p.values || []).map((v) => fmt(v));
     const digits = Math.max(0, ...strs.map((t) => (t.match(/\d/g) || []).length));
@@ -407,7 +412,10 @@ function arcsGeom(p, ctx, c) {
     let perRow = p.axis ? n : n >= 13 ? 5 : Math.ceil(n / 2);   // 12 -> 6 + 6; 15 -> 5 + 5 + 5; a number line is one line
     let rows = Math.ceil(n / perRow);
     const chars = maxDigits(p);
-    const basePt = Math.min(digitPt(ctx) * (p.compact || p.fullPt ? 1 : 0.64), 18);
+    // critic skip-count r4 N10: a wide (6+ digit) paper row's numbers print at >= GIVEN_MIN_PT (11 pt, the rubric's reading floor;
+    // S gave 16 x 0.64 = 10.2 pt). Its box is >= 5 mm a digit (D11), so 11 pt (about 2.2 mm a digit) never shrinks or wraps it
+    const wideFloor = !p.axis && !isTwin(ctx) && !(ctx && ctx.tightRows) && wideNeedMm(p) ? GIVEN_MIN_PT : 0;
+    const basePt = Math.max(wideFloor, Math.min(digitPt(ctx) * (p.compact || p.fullPt ? 1 : 0.64), 18));
     const shapeK = shape === 'hex' || shape === 'mixed' ? 1.12 : 1;
     const glyphMm = chars * 0.56 * basePt * PT_MM + 2.4;
     const wideNeed = !p.axis && !isTwin(ctx) && !(ctx && ctx.tightRows) ? wideNeedMm(p) : 0;   // the Opener sizes its own rows (base r6 N15)
@@ -445,7 +453,7 @@ function arcsGeom(p, ctx, c) {
     let gap = pitch - sz.w;
     if (isTwin(ctx) && gap > TWIN_GAP_MM) gap = TWIN_GAP_MM;
     // digits: today's size, shrunk only as far as the widest number needs, never below the floor
-    const pt = Math.max(FLOOR_PT, Math.min(basePt, (sz.w - 2) / (0.56 * Math.max(2, chars)) * 72 / 25.4));
+    const pt = Math.max(FLOOR_PT, wideFloor, Math.min(basePt, (sz.w - 2) / (0.56 * Math.max(2, chars)) * 72 / 25.4));
     // the PHONE twin (TY-10b, critic phone29): the screen draws the digits at ~29 px, so px per mm there is 29 / (pt mm);
     // the gap is capped at `twinGapPx` px absolute (24, set by the screen host on a phone), never under MIN_GAP
     if (isTwin(ctx) && Number(p.twinGapPx) > 0) {
