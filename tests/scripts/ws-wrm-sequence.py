@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 """ws-wrm-sequence.py -- build the White Rose small-step page sequence (GENERATED data).
 
-Primary source: the school's own domain sequence workbook
+PRIMARY source (owner 2026-10-17): the LIVE school curriculum site https://timjmills.github.io/awsajacademymath/ —
+its CURRICULUM.grades (decoded from the page's <script id="__data"> block) gives each grade's domains in the site's order,
+their core units and lessons in the site's order, the CCSS codes and the step flags (native / above / committee = CCSS
+BUILD / non-ccss). Extracted, data only, to data/curriculum/source/awsaj-preview-sequence.json
+(`--preview <saved index.html> --save-preview` refreshes it).
+Secondary: the school's domain sequence workbook
   data/curriculum/source/Awsaj-Domain-Sequence-K-5-2026-27.xlsx
 (one sheet per grade: Week | Qtr | Week of | Days | Unit | Domain | Lesson | CCSS | Power | Type | From | S | P | I |
- support-blocks list on the first lesson of each week).
-Cross-check (optional): the curriculum-site preview (`--preview <index.html | data.json>`), whose CURRICULUM.grades
-gives each lesson its White Rose block (unit) name. PK has no workbook sheet: PK comes from the preview when given.
+ support-blocks list on the first lesson of each week) — used ONLY for what the site lacks: weeks, strands, power,
+copied-from, the week's support blocks, unit weeks / power / tests, and the enrichment lessons the site does not list.
+A workbook core lesson the site does not list is dropped and reported. PK comes from the site alone.
 
 Every lesson is mapped to our WRM step id (data/curriculum/wrm-steps.json; R = PK, Y1 = K ... Y6 = Grade 5). Nothing is
 guessed silently: every lesson that cannot be mapped, every WRM step the sequence leaves out and every workbook / preview
@@ -16,7 +21,7 @@ Writes:
   data/curriculum/wrm-sequence.json        the full GENERATED sequence
   js/modules/wrm-sequence-db.js            the compact browser copy (never hand-edit)
   design/audit/runs/wrm-page/MAPPING_REPORT.md
-Usage: python3 tests/scripts/ws-wrm-sequence.py [--preview <file>] [--check]
+Usage: python3 tests/scripts/ws-wrm-sequence.py [--preview <file>] [--save-preview] [--check]
   --check  exit 1 when the generated files differ from what is on disk (no write).
 """
 import base64, gzip, json, os, re, sys
@@ -184,6 +189,115 @@ def split_ccss(v):
     return [c.strip() for c in str(v or '').split(',') if c.strip()]
 
 
+DOMAIN_NAME = {v: k for k, v in DOMAIN_CODE.items()}
+SITE_GRADE = {'PK': 'PK', 'K': 'K', '1': 'G1', '2': 'G2', '3': 'G3', '4': 'G4', '5': 'G5'}
+SITE_LESSONS_JSON = os.path.join(ROOT, 'data', 'curriculum', 'site-lessons.json')
+
+
+def site_lesson_ids():
+    """(site grade, title slug) -> the site-lessons.json record (the school site's id for a lesson with no WRM step)."""
+    out = {}
+    for r in json.load(open(SITE_LESSONS_JSON, encoding='utf-8')).get('lessons', []):
+        gid, _, slug = r['id'].partition('|-|')
+        out[(gid, slug)] = r
+    return out
+KEEP_FLAGS = ('above', 'non-ccss', 'committee')
+
+
+def site_order(g, pg, mp, report, label):
+    """Owner 2026-10-17: the LIVE school site is the primary source of order and membership. Each site domain becomes
+    one unit (D1.. in the site's domain order), its core units' steps in the site's order; the workbook gives only what
+    the site lacks (weeks, strands, power, copied-from, the unit's weeks / power / test). Workbook core lessons the site
+    does not list are dropped and reported; workbook enrichment lessons the site does not list stay as enrichment."""
+    wb_units = g['units']
+    # the workbook pass's mapping notes are re-made below for the lessons the page keeps
+    for k in ('unmapped', 'ambiguous', 'crossYear'):
+        report[k] = [r for r in report.get(k, []) if r[0] != label]
+    site_ids = site_lesson_ids()
+    by_title = {}
+    for u in wb_units:
+        for l in u['lessons']:
+            by_title.setdefault(norm(l['title']), []).append((u, l))
+    site_titles = set()
+    units = []
+    near = None
+    # a site domain with no core lessons (Grade 1 CC: one support lesson only) gets no unit; its support lessons
+    # join the nearest unit on the page (wrm-links.js placeUnit)
+    doms = [d for d in pg.get('domains', []) if any(cu['steps'] for cu in d.get('coreUnits', []))]
+    for d in pg.get('domains', []):
+        if d not in doms:
+            report.setdefault('emptyDomain', []).append((label, d['code']))
+    for di, dom in enumerate(doms):
+        code = dom['code']
+        wbu = next((u for u in wb_units if u['domain'] == code), None)
+        u = {'id': 'D%d' % (di + 1), 'domain': code, 'name': DOMAIN_NAME.get(code, dom['name']),
+             'weeks': wbu['weeks'] if wbu else '', 'power': wbu['power'] if wbu else [], 'test': wbu['test'] if wbu else '',
+             'lessons': []}
+        for cu in dom.get('coreUnits', []):
+            for st in cu['steps']:
+                key = norm(st['title'])
+                site_titles.add(key)
+                hits = by_title.get(key, [])
+                hit = next((l for wu, l in hits if wu['domain'] == code), None) or (hits[0][1] if hits else None)
+                flag = st.get('flag') or ''
+                cc = list(st.get('ccss') or [])
+                sl = site_ids.get((SITE_GRADE[g['id']], re.sub(r'[^a-z0-9]', '', st['title'].lower())))
+                if flag == 'committee':
+                    sid, typ, how = None, 'build', 'CCSS BUILD'
+                    if not sl:
+                        report['unmapped'].append((label, u['id'], '', st['title'], flag, 'CCSS BUILD with no site-lessons.json id'))
+                elif hit and hit['type'] != 'build' and hit['step']:
+                    sid, typ, how = hit['step'], ('copied' if hit['type'] == 'copied' else 'wr'), hit.get('how', 'workbook')
+                else:
+                    sid, how = mp.lesson(g['id'], st['title'], cc, 'wr', hit.get('from') if hit else None, near)
+                    typ = 'wr'
+                if sid and ('CROSS-YEAR' in how or 'ADAPT' in how):
+                    report.setdefault('crossYear', []).append((label, u['id'], st['title'], sid, how))
+                if sid and 'nearest' in how:
+                    report['ambiguous'].append((label, u['id'], st['title'], sid, how))
+                if not sid and flag != 'committee':
+                    if sl:
+                        report.setdefault('siteId', []).append((label, u['id'], st['title'], sl['id']))
+                    else:
+                        report['unmapped'].append((label, u['id'], ','.join(hit['weeks']) if hit else '', st['title'], flag or 'wr', how))
+                if sid:
+                    near = sid
+                # weeks: the workbook's; a lesson the workbook does not list takes the site's own pacing weeks
+                les = {'n': len(u['lessons']) + 1, 'title': st['title'], 'step': sid, 'ccss': cc,
+                       'power': bool(hit['power']) if hit else bool(sl and sl.get('power')), 'type': typ,
+                       'weeks': list(hit['weeks']) if hit else list((sl or {}).get('weeks') or []),
+                       'strands': hit['strands'] if hit else ''.join(k for k, t in (('S', 'standard'), ('P', 'priority'), ('I', 'intervention')) if t in ((sl or {}).get('tracks') or [])),
+                       'siteUnit': cu['name']}
+                if flag in KEEP_FLAGS:
+                    les['flag'] = flag
+                if hit and hit.get('from'):
+                    les['from'] = hit['from']
+                if hit and hit.get('note'):
+                    les['note'] = hit['note']
+                elif 'ADAPT' in how:
+                    les['note'] = 'ADAPT: US money'
+                if not hit:
+                    report.setdefault('siteOnly', []).append((label, u['id'], st['title'], flag, ', '.join(les['weeks'])))
+                u['lessons'].append(les)
+        units.append(u)
+    # workbook lessons the site does not list
+    for wu in wb_units:
+        for l in wu['lessons']:
+            if norm(l['title']) in site_titles:
+                continue
+            if wu['id'] != 'E':
+                report['disagree'].append((label, 'in workbook, not on the site (dropped)', '%s: %s' % (wu['id'], l['title'])))
+    enrich = next((u for u in wb_units if u['id'] == 'E'), None)
+    if enrich:
+        kept = [l for l in enrich['lessons'] if norm(l['title']) not in site_titles]
+        for i, l in enumerate(kept):
+            l['n'] = i + 1
+        if kept:
+            units.append(dict(enrich, lessons=kept))
+    g['units'] = units
+    g['source'] = 'site (order, membership) + workbook (weeks, strands, power)'
+
+
 def build(preview_path):
     steps, blocks, by_title = load_steps()
     preview = load_preview(preview_path)
@@ -264,9 +378,13 @@ def build(preview_path):
                     les['from'] = frm
                 if 'ADAPT' in how:
                     les['note'] = 'ADAPT: US money'
+                les['how'] = how
                 u['lessons'].append(les)
-            # cross-check with the preview's core steps
-            if preview:
+            # the live site orders the grade (owner 2026-10-17); the old cross-check below is kept for the workbook
+            if preview and preview['CURRICULUM']['grades'].get(PREVIEW_GRADE[gid]):
+                site_order(g, preview['CURRICULUM']['grades'][PREVIEW_GRADE[gid]], mp, report, label)
+                report.setdefault('siteCount', {})[gid] = sum(len(cu['steps']) for d in preview['CURRICULUM']['grades'][PREVIEW_GRADE[gid]]['domains'] for cu in d.get('coreUnits', []))
+            elif preview:
                 pg = preview['CURRICULUM']['grades'].get(PREVIEW_GRADE[gid])
                 ours = {norm(l['title']) for u in g['units'] if u['id'] != 'E' for l in u['lessons']}
                 theirs = {}
@@ -283,6 +401,7 @@ def build(preview_path):
                     report['disagree'].append((label, 'in workbook, not in preview', t))
         elif preview and preview['CURRICULUM']['grades'].get('PK'):
             pg = preview['CURRICULUM']['grades']['PK']
+            report.setdefault('siteCount', {})['PK'] = sum(len(cu['steps']) for d in pg['domains'] for cu in d.get('coreUnits', []))
             for di, dom in enumerate(pg['domains']):
                 for un in dom.get('coreUnits', []):
                     u = {'id': '%s%d' % (dom['code'], un['num']), 'domain': dom['code'], 'name': '%s: %s' % (dom['name'], un['name']),
@@ -309,17 +428,26 @@ def build(preview_path):
         grades.append(g)
     # WRM steps the sequence leaves out (prior-learning lists count as "used" only for the report's second column)
     prior_used = {p['step'] for g in grades for w in g['weeks'].values() for p in w['prior'] if p['step']}
+    used = {l['step'] for g in grades for u in g['units'] for l in u['lessons'] if l['step']}
+    for g in grades:
+        for u in g['units']:
+            for l in u['lessons']:
+                l.pop('how', None)
     for sid in sorted(steps, key=step_order):
         if sid not in used:
             report['missing'].setdefault(steps[sid]['year'], []).append((sid, steps[sid]['title'], sid in prior_used))
     return {'meta': {
         'title': 'Awsaj White Rose small-step sequence, K to Grade 5 by CCSS domain, 2026-27',
         'generatedBy': 'python3 tests/scripts/ws-wrm-sequence.py' + (' --preview <preview>' if preview else ''),
-        'source': 'data/curriculum/source/Awsaj-Domain-Sequence-K-5-2026-27.xlsx (primary: order, weeks, strands, power, prior learning); '
-                  'curriculum-site preview (Pre-K and the cross-check)',
+        'source': 'the live school site https://timjmills.github.io/awsajacademymath/ (PRIMARY since 2026-10-17: domain order, '
+                  'units and lessons in its order, CCSS codes, step flags; extracted to data/curriculum/source/awsaj-preview-sequence.json); '
+                  'data/curriculum/source/Awsaj-Domain-Sequence-K-5-2026-27.xlsx (only what the site lacks: weeks, strands, power, '
+                  'copied-from, prior learning, unit weeks / power / tests, and the enrichment lessons the site does not list)',
         'fields': {'step': 'our WRM step id (null: CCSS BUILD lesson or unmapped)', 'type': 'wr | copied | build | enrich',
                    'strands': 'S = Standard, P = Priority, I = Intervention', 'weeks': 'weeks the lesson is taught',
-                   'prior': "the week's support-block lessons (prior learning), mapped to WRM steps"},
+                   'prior': "the week's support-block lessons (prior learning), mapped to WRM steps",
+                   'flag': 'the site\'s step flag when it is above | non-ccss | committee (committee = CCSS BUILD)',
+                   'siteUnit': 'the site\'s core unit (White Rose block) the lesson sits in'},
     }, 'grades': grades}, report
 
 
@@ -338,7 +466,17 @@ def write_report(seq, rep):
          '| Mapped to another year\'s step, or adapted (check) | %d |' % len(rep.get('crossYear', [])),
          '| Prior-learning entries | %d (unmapped %d) |' % (len(prior), len(rep['priorUnmapped'])),
          '| WRM steps the sequence leaves out | %d |' % sum(len(v) for v in rep['missing'].values()),
-         '| Workbook / preview disagreements (core units; enrichment not compared) | %d |' % len(rep['disagree']), '']
+         '| Workbook / site disagreements (core units; enrichment not compared) | %d |' % len(rep['disagree']),
+         '| Site lessons with no workbook row (weeks from the site\'s pacing) | %d |' % len(rep.get('siteOnly', [])),
+         '| No WRM step, mapped to a school-site id (not CCSS BUILD) | %d |' % len(rep.get('siteId', [])), '']
+    L += ['## Per grade: live site core lessons vs the page', '', '| Grade | site core lessons | page lessons (domain units) | CCSS BUILD | above | non-CCSS | enrichment kept |', '|---|---|---|---|---|---|---|']
+    for g in seq['grades']:
+        core = [l for u in g['units'] if u['id'] != 'E' for l in u['lessons']]
+        en = [l for u in g['units'] if u['id'] == 'E' for l in u['lessons']]
+        L.append('| %s | %s | %d | %d | %d | %d | %d |' % (g['label'], rep.get('siteCount', {}).get(g['id'], '-'), len(core),
+                 sum(1 for l in core if l.get('flag') == 'committee'), sum(1 for l in core if l.get('flag') == 'above'),
+                 sum(1 for l in core if l.get('flag') == 'non-ccss'), len(en)))
+    L += ['']
     L += ['## Unmapped lessons', '']
     L += ['- %s %s %s: "%s" (%s) — %s' % r for r in rep['unmapped']] or ['None.']
     L += ['', '## Same-title steps settled by nearest block', '']
@@ -354,8 +492,20 @@ def write_report(seq, rep):
         L.append('')
         L += ['- %s %s%s' % (sid, t, ' (prior)' if p else '') for sid, t, p in v] or ['None.']
         L.append('')
-    L += ['## Workbook / preview disagreements', '']
+    L += ['## Domain order (the site\'s, used by the page)', '']
+    L += ['- %s: %s' % (g['label'], ' > '.join(u['domain'] for u in g['units'] if u['id'] != 'E' and not u['id'][:2].isalpha() or u['id'].startswith('D')) if g['id'] != 'PK'
+          else ' > '.join(dict.fromkeys(u['domain'] for u in g['units']))) for g in seq['grades']]
+    L += ['', 'The workbook ordered Grade 1 NBT > OA > G > MD, Grade 2 NBT > OA > MD > G, Grade 3 OA > NF > NBT > MD > G, Grade 4 '
+          'OA > NBT > NF > G > MD and Grade 5 NBT > OA > NF > MD > G.', '']
+    L += ['- %s: the site\'s %s domain has no core lessons (support lessons only), so the page has no unit for it; its support '
+          'lessons join the nearest unit.' % r for r in rep.get('emptyDomain', [])] + ([''] if rep.get('emptyDomain') else [])
+    L += ['## Workbook / site disagreements', '', 'The site wins: a workbook lesson the site does not list is dropped from the page. '
+          'Every dropped lesson is a workbook "COPIED IN" lesson (an earlier grade\'s step taught again); the site no longer lists them.', '']
     L += ['- %s, %s: %s' % r for r in rep['disagree']] or ['None (or no preview given).']
+    L += ['', '## Site lessons with no workbook row (listed in the site\'s place; weeks from the site\'s pacing)', '']
+    L += ['- %s %s: "%s"%s%s' % (a, b, c, ' (%s)' % d if d else '', ', site weeks %s' % w if w else '') for a, b, c, d, w in rep.get('siteOnly', [])] or ['None.']
+    L += ['', '## Lessons with no WRM step, mapped to their school-site id (site-lessons.json)', '']
+    L += ['- %s %s: "%s" -> %s' % r for r in rep.get('siteId', [])] or ['None.']
     return '\n'.join(L) + '\n'
 
 
@@ -370,12 +520,14 @@ def compact_js(seq):
         info = {k: {kk: w[kk] for kk in ('weekOf', 'exam', 'map') if w.get(kk)} for k, w in g['weeks'].items()}
         grades.append({'id': g['id'], 'label': g['label'], 'year': g['year'], 'units': [
             {'id': u['id'], 'domain': u['domain'], 'name': u['name'], 'weeks': u['weeks'], 'power': u['power'],
-             'lessons': [[l['title'], l['step'], l['ccss'], 1 if l['power'] else 0, l['type'], l['weeks'], l['strands'], l.get('from', '')] + ([l['note']] if l.get('note') else [])
+             'lessons': [[l['title'], l['step'], l['ccss'], 1 if l['power'] else 0, l['type'], l['weeks'], l['strands'], l.get('from', '')]
+                         + ([l.get('note', ''), l['flag']] if l.get('flag') else [l['note']] if l.get('note') else [])
                          for l in u['lessons']]} for u in g['units']], 'prior': weeks, 'weekInfo': info})
     body = ',\n'.join('    ' + json.dumps(g, ensure_ascii=False, separators=(',', ':')) for g in grades)
     return ('// wrm-sequence-db.js — GENERATED by `python3 tests/scripts/ws-wrm-sequence.py` from the school\'s\n'
-            '// domain-sequence workbook (data/curriculum/source/) and the curriculum-site preview. Never hand-edit.\n'
-            '// Lesson tuple: [title, wrmStepId|null, ccss[], power(0/1), type (wr|copied|build|enrich), weeks[], strands, fromGrade, note?].\n'
+            '// live curriculum site (order) and domain-sequence workbook (weeks) in data/curriculum/source/. Never hand-edit.\n'
+            '// Lesson tuple: [title, wrmStepId|null, ccss[], power(0/1), type (wr|copied|build|enrich), weeks[], strands, fromGrade, note?, siteFlag?].\n'
+            '// Order and membership: the live school site (domains, units, lessons in its order); weeks etc.: the workbook.\n'
             '// prior: week -> WRM step ids of that week\'s prior-learning (support block) lessons, in the workbook\'s order.\n\n'
             'export const WRM_SEQUENCE = [\n' + body + ',\n];\n\n'
             '// step id -> [lesson file id, teaching guide file id, video url] (Google Drive, the school\'s White Rose folder).\n'
@@ -385,6 +537,14 @@ def compact_js(seq):
 def main():
     args = sys.argv[1:]
     preview = args[args.index('--preview') + 1] if '--preview' in args else PREVIEW_DEFAULT
+    if '--save-preview' in args:
+        pv = load_preview(preview)
+        keep = {'note': 'Extracted from the live school curriculum site (https://timjmills.github.io/awsajacademymath/, the '
+                        '<script id="__data"> block): grade -> domain (site order) -> core units -> steps (title, CCSS, note, flag) '
+                        'and each domain\'s enrich list. Data only; the PRIMARY order source of tests/scripts/ws-wrm-sequence.py.',
+                'CURRICULUM': {'grades': pv['CURRICULUM']['grades']}}
+        open(PREVIEW_DEFAULT, 'w', encoding='utf-8').write(json.dumps(keep, ensure_ascii=False, indent=1) + '\n')
+        preview = PREVIEW_DEFAULT
     seq, rep = build(preview)
     outs = {OUT_JSON: json.dumps(seq, ensure_ascii=False, indent=1) + '\n', OUT_JS: compact_js(seq), OUT_REPORT: write_report(seq, rep)}
     if '--check' in args:

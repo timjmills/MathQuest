@@ -2,47 +2,60 @@
 
 | | count |
 |---|---|
-| Lessons in the sequence (unique per unit) | 945 |
-| Mapped to a WRM step | 897 |
-| CCSS BUILD lessons (no White Rose lesson exists; expected) | 44 |
-| Unmapped (not CCSS BUILD) | 4 |
-| Same-title steps settled by nearest block (check) | 2 |
+| Lessons in the sequence (unique per unit) | 962 |
+| Mapped to a WRM step | 894 |
+| CCSS BUILD lessons (no White Rose lesson exists; expected) | 64 |
+| Unmapped (not CCSS BUILD) | 0 |
+| Same-title steps settled by nearest block (check) | 4 |
 | Mapped to another year's step, or adapted (check) | 18 |
 | Prior-learning entries | 2235 (unmapped 0) |
 | WRM steps the sequence leaves out | 4 |
-| Workbook / preview disagreements (core units; enrichment not compared) | 11 |
+| Workbook / site disagreements (core units; enrichment not compared) | 11 |
+| Site lessons with no workbook row (weeks from the site's pacing) | 20 |
+| No WRM step, mapped to a school-site id (not CCSS BUILD) | 4 |
+
+## Per grade: live site core lessons vs the page
+
+| Grade | site core lessons | page lessons (domain units) | CCSS BUILD | above | non-CCSS | enrichment kept |
+|---|---|---|---|---|---|---|
+| Pre-K | 119 | 119 | 0 | 0 | 0 | 0 |
+| Kindergarten | 123 | 123 | 4 | 53 | 2 | 0 |
+| Grade 1 | 132 | 132 | 3 | 46 | 2 | 0 |
+| Grade 2 | 148 | 148 | 14 | 44 | 2 | 0 |
+| Grade 3 | 147 | 147 | 11 | 40 | 1 | 0 |
+| Grade 4 | 155 | 155 | 16 | 23 | 2 | 0 |
+| Grade 5 | 138 | 138 | 16 | 0 | 15 | 0 |
 
 ## Unmapped lessons
 
-- Grade 5 E W38: "Consolidation of arithmetic" (enrich) — no WRM step with this title
-- Grade 5 E W38: "Problem solving across strands" (enrich) — no WRM step with this title
-- Grade 5 E W38: "End-of-year investigation projects" (enrich) — no WRM step with this title
-- Grade 5 E W38: "Reasoning tasks" (enrich) — no WRM step with this title
+None.
 
 ## Same-title steps settled by nearest block
 
-- Kindergarten D1: "1 more, 1 less" -> Y1.B6.S8 (title, nearest of 2)
 - Kindergarten D3: "Partition into tens and ones" -> Y1.B6.S5 (title, nearest of 2)
+- Kindergarten D3: "1 more, 1 less" -> Y1.B6.S8 (title, nearest of 2)
+- Kindergarten D3: "Partition into tens and ones" -> Y1.B6.S5 (title, nearest of 2)
+- Kindergarten D3: "1 more, 1 less" -> Y1.B6.S8 (title, nearest of 2)
 
 ## Mapped to another year's step, or adapted (US money)
 
 - Kindergarten D1: "Verbal counting patterns" -> R.B13.S6 (title (CROSS-YEAR from R))
-- Grade 1 D1: "Find the total (US: dollars & cents)" -> Y2.B4.S7 (ADAPT: US money)
-- Grade 1 D2: "Find the difference (US: dollars & cents)" -> Y2.B4.S7 (ADAPT: US money)
-- Grade 1 E: "Count money - notes and coins (US: dollars & cents)" -> Y2.B4.S2 (ADAPT: US money)
-- Grade 1 E: "Select money (US: dollars & cents)" -> Y2.B4.S4 (ADAPT: US money)
-- Grade 1 E: "Hours and minutes - use start and end times" -> Y3.B10.S8 (title (CROSS-YEAR from Y3))
-- Grade 3 D2: "Fractions on a number line" -> Y3.B6.S7 (title (CROSS-YEAR from Y3))
+- Grade 1 D3: "Count money - notes and coins (US: dollars & cents)" -> Y2.B4.S2 (ADAPT: US money)
+- Grade 1 D3: "Select money (US: dollars & cents)" -> Y2.B4.S4 (ADAPT: US money)
+- Grade 1 D3: "Find the total (US: dollars & cents)" -> Y2.B4.S7 (ADAPT: US money)
+- Grade 1 D3: "Find the difference (US: dollars & cents)" -> Y2.B4.S7 (ADAPT: US money)
+- Grade 1 D3: "Hours and minutes - use start and end times" -> Y3.B10.S8 (title (CROSS-YEAR from Y3))
+- Grade 3 D2: "Negative numbers" -> Y6.B1.S8 (title (CROSS-YEAR from Y6))
+- Grade 3 D3: "Fractions on a number line" -> Y3.B6.S7 (title (CROSS-YEAR from Y3))
 - Grade 3 D4: "Pounds, tens, ones and pence (US: dollars & cents)" -> Y4.B10.S1 (ADAPT: US money)
 - Grade 3 D4: "Solve problems with time" -> Y3.B10.S12 (title (CROSS-YEAR from Y3))
-- Grade 3 D4: "Draw bar charts" -> Y3.B12.S4 (title (CROSS-YEAR from Y3))
 - Grade 3 D4: "Draw pictograms" -> Y3.B12.S2 (title (CROSS-YEAR from Y3))
 - Grade 3 D4: "Interpret pictograms" -> Y3.B12.S1 (title (CROSS-YEAR from Y3))
-- Grade 3 E: "Negative numbers" -> Y6.B1.S8 (title (CROSS-YEAR from Y6))
+- Grade 3 D4: "Draw bar charts" -> Y3.B12.S4 (title (CROSS-YEAR from Y3))
+- Grade 4 D2: "Negative numbers" -> Y6.B1.S8 (title (CROSS-YEAR from Y6))
 - Grade 4 D3: "Add two or more fractions" -> Y4.B7.S11 (title (CROSS-YEAR from Y4))
-- Grade 4 D5: "Metric measures" -> Y6.B5.S1 (title (CROSS-YEAR from Y6))
-- Grade 4 E: "Negative numbers" -> Y6.B1.S8 (title (CROSS-YEAR from Y6))
-- Grade 5 D1: "Multiply up to a 4-digit number by a 1-digit number" -> Y5.B5.S1 (title (CROSS-YEAR from Y5))
+- Grade 4 D4: "Metric measures" -> Y6.B5.S1 (title (CROSS-YEAR from Y6))
+- Grade 5 D2: "Multiply up to a 4-digit number by a 1-digit number" -> Y5.B5.S1 (title (CROSS-YEAR from Y5))
 - Grade 5 D2: "Factors" -> Y5.B3.S3 (title (CROSS-YEAR from Y5))
 
 ## Prior-learning entries that match no WRM step
@@ -83,16 +96,62 @@ None.
 
 None.
 
-## Workbook / preview disagreements
+## Domain order (the site's, used by the page)
 
-- Grade 1, in workbook, not in preview: Measure length using objects
-- Grade 2, in workbook, not in preview: Count squares
-- Grade 3, in workbook, not in preview: Multiplication - equal groups
-- Grade 3, in workbook, not in preview: Compare and order non-unit fractions
-- Grade 3, in workbook, not in preview: Sharing and grouping
-- Grade 4, in workbook, not in preview: Understand angles as turns
-- Grade 4, in workbook, not in preview: Identify angles
-- Grade 4, in workbook, not in preview: Parallel and perpendicular
-- Grade 4, in workbook, not in preview: Triangles
-- Grade 5, in workbook, not in preview: Order and compare any decimals with up to 3 decimal places
-- Grade 5, in workbook, not in preview: Cubic centimetres
+- Pre-K: CC > OA > MD > G
+- Kindergarten: CC > OA > NBT > MD > G
+- Grade 1: OA > NBT > MD > G
+- Grade 2: OA > NBT > NF > MD > G
+- Grade 3: OA > NBT > NF > MD > G
+- Grade 4: OA > NBT > NF > MD > G
+- Grade 5: OA > NBT > NF > MD > G
+
+The workbook ordered Grade 1 NBT > OA > G > MD, Grade 2 NBT > OA > MD > G, Grade 3 OA > NF > NBT > MD > G, Grade 4 OA > NBT > NF > G > MD and Grade 5 NBT > OA > NF > MD > G.
+
+- Grade 1: the site's CC domain has no core lessons (support lessons only), so the page has no unit for it; its support lessons join the nearest unit.
+
+## Workbook / site disagreements
+
+The site wins: a workbook lesson the site does not list is dropped from the page. Every dropped lesson is a workbook "COPIED IN" lesson (an earlier grade's step taught again); the site no longer lists them.
+
+- Grade 1, in workbook, not on the site (dropped): D4: Measure length using objects
+- Grade 2, in workbook, not on the site (dropped): D4: Count squares
+- Grade 3, in workbook, not on the site (dropped): D1: Multiplication - equal groups
+- Grade 3, in workbook, not on the site (dropped): D1: Sharing and grouping
+- Grade 3, in workbook, not on the site (dropped): D2: Compare and order non-unit fractions
+- Grade 4, in workbook, not on the site (dropped): D4: Parallel and perpendicular
+- Grade 4, in workbook, not on the site (dropped): D4: Triangles
+- Grade 4, in workbook, not on the site (dropped): D5: Understand angles as turns
+- Grade 4, in workbook, not on the site (dropped): D5: Identify angles
+- Grade 5, in workbook, not on the site (dropped): D1: Order and compare any decimals with up to 3 decimal places
+- Grade 5, in workbook, not on the site (dropped): D4: Cubic centimetres
+
+## Site lessons with no workbook row (listed in the site's place; weeks from the site's pacing)
+
+- Kindergarten D2: "Add and subtract within 5 written vertically (column form)" (committee), site weeks W15, W16
+- Kindergarten D4: "Sort into categories, count each group and find the total" (committee), site weeks W21
+- Grade 1 D1: "Solve one-step word problems within 20 using bar models" (committee), site weeks W03, W04
+- Grade 2 D2: "Read and write numbers to 1,000 in words, numerals and expanded form" (committee), site weeks W02
+- Grade 2 D4: "Add and subtract within 100 on a number line (jumps of tens and ones)" (committee), site weeks W13, W14
+- Grade 3 D1: "Properties of multiplication: commutative, identity and distributive" (committee), site weeks W05, W06
+- Grade 3 D1: "Find the rule in an input-output table" (committee), site weeks W05, W06, W07
+- Grade 3 D2: "Solve addition and subtraction word problems within 1,000 using bar models" (committee), site weeks W17
+- Grade 4 D1: "Multiplicative comparison word problems: how many times as many? (unknown multiplier)" (committee), site weeks W10
+- Grade 4 D2: "Multiply and divide multiples of 10 using basic facts (e.g., 90 x 50, 300 ÷ 30)" (committee), site weeks W06, W07
+- Grade 4 D3: "Decompose a fraction into a sum of fractions (equations and drawings)" (committee), site weeks W13
+- Grade 4 D3: "Add tenths and hundredths (rename tenths as hundredths)" (committee), site weeks W18, W19
+- Grade 4 D4: "Angles are additive: find an unknown angle in a decomposed angle" (committee), site weeks W28
+- Grade 5 D1: "Evaluate expressions with parentheses, brackets and braces" (committee), site weeks W11
+- Grade 5 D1: "Write and interpret numerical expressions (words to expressions, expressions to words)" (committee), site weeks W11
+- Grade 5 D2: "Compare digit values: a digit is worth 10 times the place to its right and 1/10 of the place to its left" (committee), site weeks W06
+- Grade 5 D2: "Read and write decimals to thousandths in word form and expanded form" (committee), site weeks W06
+- Grade 5 D2: "Multiply and divide decimals by powers of 10 written with exponents (10^1, 10^2, 10^3) and explain the pattern" (committee), site weeks W07, W08
+- Grade 5 D3: "Find the area of a rectangle with fractional side lengths" (committee), site weeks W17
+- Grade 5 D4: "Convert customary units of length (inches, feet, yards, miles)" (committee), site weeks W21
+
+## Lessons with no WRM step, mapped to their school-site id (site-lessons.json)
+
+- Grade 5 D1: "End-of-year investigation projects" -> G5|-|endofyearinvestigationprojects
+- Grade 5 D1: "Consolidation of arithmetic" -> G5|-|consolidationofarithmetic
+- Grade 5 D1: "Problem solving across strands" -> G5|-|problemsolvingacrossstrands
+- Grade 5 D1: "Reasoning tasks" -> G5|-|reasoningtasks

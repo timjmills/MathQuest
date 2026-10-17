@@ -34,12 +34,15 @@ for (const l of L) {
 const SEQ_L = L.filter((l) => l.seq);   // the White Rose sequence rows (the site's own lessons are checked below)
 const mapped = SEQ_L.filter((l) => l.step).length;
 ok(mapped / SEQ_L.length > 0.9, `>90% of the sequence mapped (${mapped}/${SEQ_L.length})`);
-const g2 = lessonByKey('2:D1:1');
-ok(g2 && g2.title === 'Represent numbers to 100' && g2.step === 'Y3.B1.S1' && g2.power && g2.weeks[0] === 'W01', 'Grade 2 D1 lesson 1 = Y3.B1.S1, power, W01');
-const copied = L.find((l) => l.type === 'copied');
-ok(copied && copied.from, 'copied-in lesson keeps its source grade');
+// owner 2026-10-17: the live school site orders the page (domains, units, lessons); the keys are found, not fixed
+const K21 = (L.find((l) => l.seq && l.grade === '2' && l.step === 'Y3.B1.S1') || {}).key;
+const K22 = (L.find((l) => l.seq && l.grade === '2' && l.step === 'Y3.B1.S2') || {}).key;
+const g2 = lessonByKey(K21);
+ok(g2 && g2.title === 'Represent numbers to 100' && g2.power && g2.weeks[0] === 'W01', `Grade 2 "Represent numbers to 100" = Y3.B1.S1, power, W01 (${K21})`);
+ok(WRM_SEQUENCE.find((g) => g.id === '2').units.map((u) => u.domain).join() === 'OA,NBT,NF,MD,G', 'Grade 2 domains in the site order (OA, NBT, NF, MD, G)');
+for (const l of L.filter((x) => x.type === 'copied')) ok(l.from, `${l.key}: a copied-in lesson keeps its source grade`);
 ok(WRM_SEQUENCE.find((g) => g.id === '2').prior.W01.length >= 5, 'Grade 2 W01 has prior-learning steps');
-ok(WRM_SEQUENCE.find((g) => g.id === '2').units.map((u) => u.id).slice(0, 2).join() === 'D1,D2', 'units in workbook order');
+ok(WRM_SEQUENCE.find((g) => g.id === '2').units.map((u) => u.id).slice(0, 2).join() === 'D1,D2', 'units numbered in the site order');
 
 // mapping (critic r1 B1): an exact title maps to its exact step; no two White Rose lessons of a grade share
 // a step unless their titles are the same lesson; cross-year and adapted mappings are in the report.
@@ -80,32 +83,32 @@ for (const l of L) {
     if (l.step) ok(r.direct.length === skillsForWrmStep(l.step, { withPartial: true }).length, `${l.key} direct = SKILL_WRM tags`);
     ok(['full', 'partial', 'gap'].includes(r.verdict), `${l.key} verdict`);
 }
-ok(JSON.stringify(linksFor('2:D1:1')) === JSON.stringify(linksFor('2:D1:1')), 'deterministic');
-ok(linksFor('2:D1:1').prereq[0].why.startsWith('Taught before'), 'workbook prior learning comes first');
+ok(JSON.stringify(linksFor(K21)) === JSON.stringify(linksFor(K21)), 'deterministic');
+ok(linksFor(K21).prereq[0].why.startsWith('Taught before'), 'workbook prior learning comes first');
 // override
-const second = linksFor('2:D1:1').prereq[1].key;
+const second = linksFor(K21).prereq[1].key;
 WRM_LINK_OVERRIDES['Y3.B1.S1'] = { prereq: { add: ['counting:count_objects'], remove: [second] } };
-const ov = linksFor('2:D1:1');
+const ov = linksFor(K21);
 ok(ov.prereq[0].key === 'counting:count_objects' && ov.prereq[0].why === 'Added by the school', 'override add goes first');
 ok(!ov.prereq.some((x) => x.key === second), 'override remove');
 delete WRM_LINK_OVERRIDES['Y3.B1.S1'];
 // curated data wins; absent steps fall back
 addCuratedYear(JSON.parse(readFileSync(new URL('../fixtures/wrm-links-sample.json', import.meta.url))));
-const c = linksFor('2:D1:1');
+const c = linksFor(K21);
 ok(c.source === 'curated' && c.verdict === 'partial' && c.direct.length === 2 && c.direct[1].partial, 'curated direct + partial');
 ok(c.prereq.length === 1 && c.prereq[0].key === 'counting:count_objects', 'curated pre, duplicate of direct dropped');
 ok(c.build[0] === 'fixture_pv_model' && proposalName('fixture_pv_model') === 'Fixture place value model', 'curated proposal name');
 ok(proposalName('pattern_make') === 'Make a Pattern', 'WRM_PROPOSALS name');
-ok(linksFor('2:D1:2').source === 'rules', 'absent step falls back to rules');
+ok(linksFor(K22).source === 'rules', 'absent step falls back to rules');
 // curated opts survive on pre and related (critic r1 B2)
 addCuratedYear({ steps: { 'Y3.B1.S2': { title: 'x', direct: [], verdict: 'gap', pre: [{ key: 'placevalue:combine', opts: { band: 99 }, why: 'Y3.B1.S1 Represent numbers to 100 (step before in the block)' }],
     related: [{ key: 'number_sense:place_on_number_line', opts: { span: 10, band: 100 }, why: 'Y2.B1.S8 Write numbers (prior learning wk W01)' }] } } });
-const co = linksFor('2:D1:2');
+const co = linksFor(K22);
 ok(co.prereq[0].opts && co.prereq[0].opts.band === 99 && co.related[0].opts.span === 10, 'curated pre / related keep opts');
 ok(!/Y\d\.B\d|prior learning|wk W/.test(co.prereq[0].why + co.related[0].why), `why lines in plain words: "${co.prereq[0].why}" / "${co.related[0].why}"`);
 ok(co.prereq[0].why === 'The step before: "Represent numbers to 100".', `composed: the step before -> "${co.prereq[0].why}"`);
 clearCurated();
-ok(linksFor('2:D1:1').source === 'rules', 'clearCurated');
+ok(linksFor(K21).source === 'rules', 'clearCurated');
 // the curated files on disk and data/curriculum/links/index.json agree
 const dir = new URL('../../data/curriculum/links/', import.meta.url);
 const files = existsSync(dir) ? readdirSync(dir) : [];
@@ -453,7 +456,7 @@ for (const l of L) { const r = linksFor(l); gate(`lesson (rules) ${l.key}`, [r.v
     for (const s of site.lessons) { const l = lessonBySite(s.id); if (l) { const r = linksFor(l); gate(`site lesson (rules) ${s.id}`, [...r.prereq.map((x) => x.why), ...r.related.map((x) => x.why)]); } }
     ok(reach === ids.length, `every site lesson and assessment reachable by its unit and bookmark (${reach}/${ids.length})`);
     // ids stable: the sequence rows keep their numbers; a site lesson's key is its site id unless it is a sequence row
-    ok(lessonByKey('2:D1:1') && lessonByKey('2:D1:1').title === 'Represent numbers to 100', 'the sequence keys are unchanged');
+    ok(lessonByKey(K21) && lessonByKey(K21).title === 'Represent numbers to 100', 'a sequence row keeps its key');
     ok(L.filter((l) => !l.seq).every((l) => l.key === l.site && !l.n), 'a site-only lesson is keyed by its site id and has no number');
     ok(new Set(L.map((l) => l.key)).size === L.length, 'lesson keys unique');
     // school-week order inside every unit: a dated site lesson never sits after a later week's dated lesson of the site

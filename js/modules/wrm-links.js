@@ -142,12 +142,12 @@ function unpack() {
         for (const u of g.units) {
             const list = [];
             u.lessons.forEach((t, i) => {
-                const [rawTitle, step, ccss, power, type, weeks, strands, from, note] = t;
-                const title = String(rawTitle).replace(/\(\s+/g, '(').replace(/\s+\)/g, ')');   // "(How many left )"
+                const [rawTitle, step, ccss, power, type, weeks, strands, from, note, flag] = t;
+                const title = tidyTitle(rawTitle);   // "(How many left )", "10^1" -> "10¹"
                 const l = {
                     key: `${g.id}:${u.id}:${i + 1}`, grade: g.id, gradeLabel: g.label, unit: u.id, domain: u.domain,
                     unitName: u.name, n: i + 1, title, step, ccss, power: !!power, type, weeks, strands, from, note: note || '',
-                    seq: true, year: g.year, site: '', siteInfo: null,
+                    seq: true, year: g.year, site: '', siteInfo: null, flag: flag || '', rawTitle: String(rawTitle),
                 };
                 LESSONS.push(l);
                 BY_KEY.set(l.key, l);
@@ -165,7 +165,7 @@ function unpack() {
         const g = WRM_SEQUENCE.find((x) => x.id === grade);
         if (!g) continue;
         const info = { id, flag, supplement: !!supplement, ee, block, week, weeks, domainTest: !!domainTest, kind: 'lesson' };
-        const twin = LESSONS.find((l) => l.seq && l.grade === grade && !l.site && titleSlug(l.title) === siteSlug(id));
+        const twin = LESSONS.find((l) => l.seq && l.grade === grade && !l.site && titleSlug(l.rawTitle || l.title) === siteSlug(id));
         if (twin) { twin.site = id; twin.siteInfo = info; BY_SITE.set(id, twin); continue; }
         const u = placeUnit(g, placeDomain(grade, ccss, domain), week);
         fresh.push({ key: id, grade, gradeLabel: g.label, unit: u.id, domain: u.domain, unitName: u.name, n: 0, title: tidyTitle(title), step: null,
@@ -697,8 +697,10 @@ const weeksWords = (ns) => {
 
 /** The flag a lesson of the school site carries, in plain words ('' for a White Rose lesson the site does not flag). */
 export function siteFlagText(l) {
-    const f = l && l.siteInfo ? l.siteInfo.flag : '';
+    // the live site's step flag rides on the sequence row (owner 2026-10-17: the site orders the page)
+    const f = l && l.siteInfo ? l.siteInfo.flag : (l && l.flag) || '';
     if (l && l.type === 'assessment') return 'Assessment';
+    if (f === 'non-ccss') return 'Non-CCSS extra';
     if (f === 'committee' || (l && l.type === 'build')) return 'CCSS · BUILD';
     if (f === 'enrich-native') return 'Support lesson';
     if (f === 'above') return 'Above grade';

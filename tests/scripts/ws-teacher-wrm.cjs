@@ -54,8 +54,11 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const buildLesson = all.find((l) => l.grade === '3' && l.type === 'build');
   const rich = all.find((l) => l.grade === '2' && links.linksFor(l).direct.length >= 2 && links.linksFor(l).prereq.length >= 2 && links.linksFor(l).related.length >= 1);
   // round 7: the school site's own lessons (a tagged one when a year file has a "lessons" section)
-  const siteTagged = all.find((l) => l.type === 'site' && links.linksFor(l).source === 'curated' && links.linksFor(l).direct.length);
-  const siteUntagged = all.find((l) => l.type === 'site' && l.siteInfo.flag === 'committee' && links.linksFor(l).source !== 'curated');
+  // owner 2026-10-17: the site orders the page, so its CCSS BUILD lessons are sequence rows that carry their site id
+  const siteTagged = all.find((l) => l.site && !l.step && l.siteInfo && l.siteInfo.kind === 'lesson' && links.linksFor(l).source === 'curated' && links.linksFor(l).direct.length);
+  const siteUntagged = all.find((l) => l.site && l.siteInfo && l.siteInfo.flag === 'committee' && links.linksFor(l).source !== 'curated');
+  // as shipped every CCSS BUILD lesson may be tagged; the bookmark case then opens a tagged one
+  const siteBuild = siteUntagged || all.find((l) => l.site && l.siteInfo && l.siteInfo.flag === 'committee');
   const supportLesson = all.find((l) => l.type === 'site' && l.siteInfo.flag === 'enrich-native');
   const assessLesson = all.find((l) => l.type === 'assessment' && l.grade === '4') || all.find((l) => l.type === 'assessment');
 
@@ -201,7 +204,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await waitFor(page, () => document.querySelector('[data-w-grade="3"]')?.getAttribute('aria-pressed') === 'true', 8000, 'grade 3');
     check(/^#wrm\/3\/D1$/.test(await hash()), `hash after grade: ${await hash()}`);
     const units3 = await page.$$eval('[data-w-unit]', (b) => b.map((x) => x.dataset.wUnit));
-    check(units3[0] === 'D1' && units3.includes('E'), `grade 3 units ${units3}`);
+    check(units3.join() === 'D1,D2,D3,D4,D5', `grade 3 units ${units3}`);
     await page.click('[data-w-grade="2"]');
     await waitFor(page, () => document.querySelector('[data-w-grade="2"]')?.getAttribute('aria-pressed') === 'true', 8000, 'grade 2');
     await page.click(`[data-w-unit="${rich.unit}"]`);
@@ -275,9 +278,12 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await sleep(600);
     const pr = await page.evaluate((names) => {
       const el = document.querySelector('#teacherMain .tv-screen.is-active');
-      return { screen: el && el.dataset.screen, has: names.filter((n) => el.textContent.includes(n) || el.textContent.includes(n.replace(/([A-Za-z]{2,}), (?=[A-Za-z]{2,}\b)/g, "$1/"))).length, hash: location.hash };
+      // the Print screen may name a skill by its library label ("(B&W)") or without the bracket
+      const forms = (n) => [n, n.replace(/([A-Za-z]{2,}), (?=[A-Za-z]{2,}\b)/g, "$1/"), n.replace(/\(black and white\)/g, '(B&W)'), n.replace(/\s*\(black and white\)/g, '')];
+      const miss = names.filter((n) => !forms(n).some((f) => el.textContent.includes(f)));
+      return { screen: el && el.dataset.screen, has: names.length - miss.length, miss, hash: location.hash };
     }, labels);
-    check(pr.screen === 'print' && pr.has === labels.length, `print: ${JSON.stringify(pr)} of ${labels.length}`);
+    check(pr.screen === 'print' && pr.has === labels.length, `print: ${JSON.stringify(pr)} of ${labels.length} (${rich.key})`);
     check(pr.hash === '', `print: hash not cleared (${pr.hash})`);
 
     /* ---------------------------------------------------- Back returns to the lesson */
@@ -829,7 +835,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     /* ==================================================== round 7: the school site's own lessons (1366) */
     await step('site lessons 1366', async () => {
       await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
-      check(siteUntagged && supportLesson && assessLesson, 'data: no untagged CCSS BUILD, support lesson or assessment to test');
+      check(siteBuild && supportLesson && assessLesson, 'data: no CCSS BUILD, support lesson or assessment to test');
       if (CUR_YEARS.includes('Y5')) check(!!siteTagged, 'data: Y5 is loaded but no site lesson is tagged');
       // the unit list mixes the White Rose steps and the site's lessons in the order unitLessons() gives
       const unitOf = assessLesson;
@@ -846,9 +852,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       const as = await page.evaluate(() => ({ flag: (document.querySelector('#tvwDetail [data-w-flag]') || {}).textContent || '', v: (document.querySelector('#tvwDetail .tvw-verdict') || {}).textContent || '', groups: document.querySelectorAll('#tvwDetail [data-w-group]').length, bar: !!document.querySelector('#tvwDetail .tvw-bar') }));
       check(as.flag === 'Assessment' && /No skills are linked to this assessment/.test(as.v) && !as.groups && !as.bar, `assessment detail ${JSON.stringify(as)}`);
       // a CCSS BUILD lesson only the site has, with no links entry: "Skills not tagged yet"
-      await freshLoad(links.lessonHash(siteUntagged), '[data-screen="wrm"].is-active #tvwDetail .tvw-head');
+      await freshLoad(links.lessonHash(siteBuild), '[data-screen="wrm"].is-active #tvwDetail .tvw-head');
       const un = await page.evaluate(() => ({ title: document.querySelector('.tvw-title').textContent, flag: (document.querySelector('#tvwDetail [data-w-flag]') || {}).textContent || '', tag: (document.querySelector('#tvwDetail [data-w-verdict-tag]') || {}).dataset?.wVerdictTag || '', cur: (document.querySelector('.tvw-lesson[aria-current="true"]') || {}).dataset?.wLesson || '' }));
-      check(un.title.includes(siteUntagged.title) && un.flag === 'CCSS · BUILD' && un.tag === 'untagged' && un.cur === siteUntagged.key, `untagged site lesson by bookmark ${JSON.stringify(un)}`);
+      check(un.title.includes(siteBuild.title) && un.flag === 'CCSS · BUILD' && (!siteUntagged || un.tag === 'untagged') && un.cur === siteBuild.key, `CCSS BUILD site lesson by bookmark ${JSON.stringify(un)}`);
       // a support lesson with no week: listed under the unit's "no week set" heading
       await page.evaluate((x) => { location.hash = x; }, links.lessonHash(supportLesson));
       await waitFor(page, `(document.querySelector('[data-screen="wrm"].is-active .tvw-lesson[aria-current="true"]') || {}).dataset?.wLesson === ${JSON.stringify(supportLesson.key)} && !!document.querySelector('#tvwDetail .tvw-head')`, 20000, 'support lesson');
@@ -872,7 +878,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         await clearOfBar('1366 tagged site lesson');
       }
       // search finds a site lesson and jumps to its bookmark
-      const sl = siteTagged || siteUntagged;
+      const sl = siteTagged || siteBuild;
       await page.evaluate(() => window.scrollTo(0, 0));
       await page.click('#tvwSearch', { clickCount: 3 });
       await page.type('#tvwSearch', sl.title.slice(0, 24));
@@ -1053,7 +1059,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     /* ==================================================== round 7: site lessons at 390 with touch */
     await step('site lessons 390 touch', async () => {
       await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
-      for (const l of [siteTagged || siteUntagged, assessLesson, supportLesson]) {
+      for (const l of [siteTagged || siteBuild, assessLesson, supportLesson]) {
         await freshLoad(`#wrm/${l.grade}/${l.unit}`, `[data-screen="wrm"].is-active [data-w-lesson="${l.key}"]`);
         await page.$eval(`[data-w-lesson="${l.key}"]`, (el) => el.scrollIntoView({ block: 'center' }));
         await sleep(80);
