@@ -2,7 +2,7 @@
 import { state } from './state.js';
 import { randInt, shuffle, pick, buildNumericOptions, pickName } from './utils.js';
 import { createAngleSVG, createRectangleSVG, createSquareSVG, createTriangleSVG, createShapeSVG, create3DBoxSVG, createLShapeSVG, createTShapeSVG, createWordProblemShapeSVG, createLabeledRectSVG, computeTriangleAngles } from './svg-geometry.js';
-import { COLORS, STROKE, FONTS, softFill, categoricalFill } from './design-tokens.js';
+import { COLORS, STROKE, FONTS, MONO, softFill, categoricalFill } from './design-tokens.js';
 import { optionsFor } from './skill-options.js';
 
 // O6 appearance (lane AP2): the "Figure labels" choice for the skill being generated — 'all',
@@ -32,21 +32,70 @@ const STUDENT_DEF_AREA = `<div class="student-def"><strong>Area</strong> = the a
 const STUDENT_DEF_AREA_TRIANGLE = `<div class="student-def"><strong>Triangle area</strong> = (base × height) ÷ 2. Multiply base × height, then divide by 2.</div>`;
 const STUDENT_DEF_PERIMETER = `<div class="student-def"><b>Perimeter</b> = the total distance around the outside of a shape. Add up all the side lengths.</div>`;
 
+// ===== Black-and-white shape drawings for name_2d_shapes / name_3d_shapes =====
+// WORKSHEET_DESIGN_STANDARD INK-1 / section 4.2: ink outlines on paper white, no fill colour,
+// no emoji. Strokes are non-scaling so a drawing keeps its weight at every size: 2 px = 1.5 pt
+// (the outline of a shape being judged), 1 px = 0.75 pt (right-angle marks), 0.67 px = 0.5 pt
+// (hidden edges of a solid, solid not dashed — LS-2). The drawing never carries the shape's
+// name: the name is the answer.
+const _SH_INK = MONO.ink;
+const _SH_PAPER = MONO.paper;
+const _shAttr = (px) => `fill="${_SH_PAPER}" stroke="${_SH_INK}" stroke-width="${px}" stroke-linejoin="round" vector-effect="non-scaling-stroke"`;
+const _SH_OUT = _shAttr(2);
+const _SH_HAIR = _shAttr(1).replace(`fill="${_SH_PAPER}"`, 'fill="none"');
+const _SH_HID = _shAttr(0.67).replace(`fill="${_SH_PAPER}"`, 'fill="none"');
+const _shPoly = (n, r, rot = -Math.PI / 2, cx = 60, cy = 60) => Array.from({ length: n }, (_, i) => {
+    const a = rot + (Math.PI * 2 / n) * i;
+    return `${(cx + r * Math.cos(a)).toFixed(1)},${(cy + r * Math.sin(a)).toFixed(1)}`;
+}).join(' ');
+const _shCorner = (x, y, dx, dy) => `<polyline points="${x + dx},${y} ${x + dx},${y + dy} ${x},${y + dy}" ${_SH_HAIR}/>`;
+// viewBox 0 0 120 120, keyed by the lower-case name the generator uses.
+const MONO_2D = {
+    circle: `<circle cx="60" cy="60" r="48" ${_SH_OUT}/>`,
+    oval: `<ellipse cx="60" cy="60" rx="54" ry="34" ${_SH_OUT}/>`,
+    square: `<rect x="14" y="14" width="92" height="92" ${_SH_OUT}/>` + _shCorner(14, 14, 10, 10) + _shCorner(106, 14, -10, 10) + _shCorner(14, 106, 10, -10) + _shCorner(106, 106, -10, -10),
+    rectangle: `<rect x="6" y="28" width="108" height="64" ${_SH_OUT}/>` + _shCorner(6, 28, 10, 10) + _shCorner(114, 28, -10, 10),
+    triangle: `<polygon points="60,12 5,107 115,107" ${_SH_OUT}/>`,
+    pentagon: `<polygon points="${_shPoly(5, 52, -Math.PI / 2, 60, 64)}" ${_SH_OUT}/>`,
+    hexagon: `<polygon points="${_shPoly(6, 52)}" ${_SH_OUT}/>`,
+    rhombus: `<polygon points="29,41 77,55 91,103 43,89" ${_SH_OUT}/>`,
+    diamond: `<polygon points="60,6 98,60 60,114 22,60" ${_SH_OUT}/>`,
+    star: `<polygon points="${Array.from({ length: 10 }, (_, i) => { const a = -Math.PI / 2 + Math.PI / 5 * i, r = i % 2 ? 22 : 54; return `${(60 + r * Math.cos(a)).toFixed(1)},${(64 + r * Math.sin(a)).toFixed(1)}`; }).join(' ')}" ${_SH_OUT}/>`,
+};
+const MONO_3D = {
+    cube: `<polygon points="14,46 80,46 80,112 14,112" ${_SH_OUT}/>`
+        + `<polygon points="14,46 40,20 106,20 80,46" ${_SH_OUT}/><polygon points="80,46 106,20 106,86 80,112" ${_SH_OUT}/>`
+        + `<polyline points="14,112 40,86 106,86" ${_SH_HID}/><line x1="40" y1="86" x2="40" y2="20" ${_SH_HID}/>`,
+    'rectangular prism': `<polygon points="4,52 88,52 88,108 4,108" ${_SH_OUT}/>`
+        + `<polygon points="4,52 30,28 114,28 88,52" ${_SH_OUT}/><polygon points="88,52 114,28 114,84 88,108" ${_SH_OUT}/>`
+        + `<polyline points="4,108 30,84 114,84" ${_SH_HID}/><line x1="30" y1="84" x2="30" y2="28" ${_SH_HID}/>`,
+    sphere: `<circle cx="60" cy="60" r="50" ${_SH_OUT}/><path d="M10,60 A50,14 0 0 0 110,60" ${_SH_HAIR}/><path d="M10,60 A50,14 0 0 1 110,60" ${_SH_HID}/>`,
+    cylinder: `<path d="M22,26 L22,96 A38,12 0 0 0 98,96 L98,26" ${_SH_OUT}/><ellipse cx="60" cy="26" rx="38" ry="12" ${_SH_OUT}/>`
+        + `<path d="M22,96 A38,12 0 0 1 98,96" ${_SH_HID}/>`,
+    cone: `<path d="M60,10 L18,98 A42,13 0 0 0 102,98 Z" ${_SH_OUT}/><path d="M18,98 A42,13 0 0 1 102,98" ${_SH_HID}/>`,
+    pyramid: `<polygon points="60,10 10,104 82,104" ${_SH_OUT}/><polygon points="60,10 82,104 110,82" ${_SH_OUT}/>`
+        + `<polyline points="10,104 38,82 110,82" ${_SH_HID}/><line x1="38" y1="82" x2="60" y2="10" ${_SH_HID}/>`,
+};
+// One picture tile for a "Click ALL the …" option: the drawing only, no name, no emoji.
+const _shTile = (inner) => `<svg viewBox="0 0 120 120" role="img" aria-label="shape" style="display:block;margin:0 auto;width:min(150px,100%);height:auto;overflow:visible;">${inner}</svg>`;
+// The printed key for a picture option set: which pictures (1st, 2nd …) the pupil rings.
+const _ORD = ['1st', '2nd', '3rd', '4th', '5th', '6th'];
+const _shKey = (opts) => {
+    const at = opts.map((o, i) => (o.correct ? _ORD[i] : null)).filter(Boolean);
+    return at.length > 1 ? `${at.slice(0, -1).join(', ')} and ${at[at.length - 1]}` : at[0] || '';
+};
+// The single-shape drawing for "What shape is this?": a black outline in a plain centred box.
+const _shFigure = (inner) => `<div style="text-align:center;"><svg viewBox="0 0 120 120" role="img" aria-label="a shape" style="display:block;margin:0 auto;width:min(240px,80%);height:auto;max-width:100%;overflow:visible;">${inner}</svg></div>`;
+
 export function generateGeometryQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
 
             // ===== NAME 2D SHAPES (Grade K) — multi-select variant =====
             if (mappedSkill === "name_2d_shapes" && Math.random() < 0.30) {
-                const allShapes = [
-                    { name: 'triangle', emoji: '\u{1F53A}' },
-                    { name: 'square', emoji: '\u{1F7E6}' },
-                    { name: 'circle', emoji: '⭕' },
-                    { name: 'rectangle', emoji: '▭' },
-                    { name: 'pentagon', emoji: '⬟' },
-                    { name: 'hexagon', emoji: '⬢' },
-                    { name: 'star', emoji: '⭐' },
-                    { name: 'diamond', emoji: '\u{1F537}' }
-                ];
+                // Each option is the shape's black line drawing only: a name or an emoji beside it
+                // would let the pupil find the answer by reading the word (Y1 lessons critic r2 n7).
+                const allShapes = ['triangle', 'square', 'circle', 'rectangle', 'pentagon', 'hexagon', 'star', 'diamond']
+                    .map(name => ({ name, svg: MONO_2D[name] }));
                 const target = pick(['triangle', 'square', 'circle', 'rectangle', 'pentagon', 'hexagon']);
                 // Cap to exactly 4 shapes per problem (was 6) so the chooser
                 // stays focused and individual shapes can render large.
@@ -65,10 +114,12 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 sample = shuffle(sample);
                 const opts = sample.map((s, i) => ({
                     id: 'opt' + i,
-                    label: `${s.emoji} ${s.name}`,
+                    svg: _shTile(s.svg),
+                    label: '',
                     correct: s.name === target
                 }));
                 const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.printAnswer = _shKey(opts);
                 q.text = `Click ALL the ${target}s.`;
                 q.ans = ans;
                 q.options = opts;
@@ -81,49 +132,10 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
 
             // ===== NAME 2D SHAPES (Grade K) =====
             if (mappedSkill === "name_2d_shapes") {
-                const _s = (i) => shapeStyle(i);
                 const shapes2d = [
-                    { name: "Circle", sides: 0, svgFn: () => { const s = _s(0); return `<ellipse cx="100" cy="100" rx="80" ry="80" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; } },
-                    { name: "Square", sides: 4, svgFn: () => {
-                        const s = _s(1);
-                        // Mark all 4 right angles + equal-tick on each side per spec.
-                        const rect = `<rect x="20" y="20" width="160" height="160" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`;
-                        const m = (x, y) => `<rect x="${x}" y="${y}" width="14" height="14" fill="none" stroke="${s.stroke}" stroke-width="1.5"/>`;
-                        return rect + m(20,20) + m(166,20) + m(20,166) + m(166,166);
-                    }},
-                    { name: "Rectangle", sides: 4, svgFn: () => {
-                        const s = _s(2);
-                        // Mark right angles (top corners) so it's clearly NOT a parallelogram.
-                        const rect = `<rect x="10" y="40" width="180" height="120" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`;
-                        const m = (x, y) => `<rect x="${x}" y="${y}" width="14" height="14" fill="none" stroke="${s.stroke}" stroke-width="1.5"/>`;
-                        return rect + m(10,40) + m(176,40);
-                    }},
-                    // Equilateral triangle: side ≈ 170, height = side·√3/2 ≈ 147.2.
-                    // Apex (100, 37.8), base (15, 185)→(185, 185). All sides ≈ 170.
-                    { name: "Triangle", sides: 3, svgFn: () => { const s = _s(3); return `<polygon points="100,37.8 15,185 185,185" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; } },
-                    { name: "Hexagon", sides: 6, svgFn: () => {
-                        const pts = [];
-                        for (let i = 0; i < 6; i++) {
-                            const a = Math.PI / 3 * i - Math.PI / 2;
-                            pts.push(`${100 + 80 * Math.cos(a)},${100 + 80 * Math.sin(a)}`);
-                        }
-                        const s = _s(4);
-                        return `<polygon points="${pts.join(' ')}" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`;
-                    }},
-                    { name: "Pentagon", sides: 5, svgFn: () => {
-                        const pts = [];
-                        for (let i = 0; i < 5; i++) {
-                            const a = Math.PI * 2 / 5 * i - Math.PI / 2;
-                            pts.push(`${100 + 80 * Math.cos(a)},${100 + 80 * Math.sin(a)}`);
-                        }
-                        const s = _s(5);
-                        return `<polygon points="${pts.join(' ')}" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`;
-                    }},
-                    { name: "Oval", sides: 0, svgFn: () => { const s = _s(0); return `<ellipse cx="100" cy="100" rx="90" ry="60" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; } },
-                    // Rhombus: 4 equal sides (~83.6) but UNEQUAL diagonals
-                    // (~146 vs ~80) — visibly NOT a square per shape-id spec.
-                    // Built from u=(80,24), v=(24,80), centered around (100,100).
-                    { name: "Rhombus", sides: 4, svgFn: () => { const s = _s(1); return `<polygon points="48,68 128,92 152,172 72,148" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; } }
+                    { name: "Circle", sides: 0 }, { name: "Square", sides: 4 }, { name: "Rectangle", sides: 4 },
+                    { name: "Triangle", sides: 3 }, { name: "Hexagon", sides: 6 }, { name: "Pentagon", sides: 5 },
+                    { name: "Oval", sides: 0 }, { name: "Rhombus", sides: 4 }
                 ];
 
                 const shape2d = pick(shapes2d);
@@ -135,12 +147,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const _distractors = shuffle(_all2d.filter(n => n !== shape2d.name)).slice(0, 3);
                 q.options = shuffle([shape2d.name, ..._distractors]);
                 q.hint = shape2d.sides > 0 ? `Count the sides. This shape has ${shape2d.sides} sides.` : `This shape has no straight sides - it is curved.`;
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.1rem;">Name This Shape</div>
-                    <svg viewBox="0 0 200 200" style="display:block;margin:0 auto;width:min(260px,80%);height:auto;max-width:100%;">
-                        ${shape2d.svgFn()}
-                    </svg>
-                </div>`;
+                q.visual = _shFigure(MONO_2D[shape2d.name.toLowerCase()]);
                 q.skillLabel = '2D Shapes';
                 q.printFormat = 'geometry-2d-shapes';
                 return;
@@ -148,14 +155,10 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
 
             // ===== NAME 3D SHAPES (Grade K) — multi-select variant =====
             if (mappedSkill === "name_3d_shapes" && Math.random() < 0.30) {
-                const all3d = [
-                    { name: 'cube', emoji: '\u{1F9CA}' },
-                    { name: 'sphere', emoji: '⚪' },
-                    { name: 'cylinder', emoji: '\u{1F50B}' },
-                    { name: 'cone', emoji: '\u{1F366}' },
-                    { name: 'rectangular prism', emoji: '\u{1F9F1}' },
-                    { name: 'pyramid', emoji: '⛰️' }
-                ];
+                // Each option is the solid's black line drawing only (no name, no emoji): the name
+                // belongs in the question alone.
+                const all3d = ['cube', 'sphere', 'cylinder', 'cone', 'rectangular prism', 'pyramid']
+                    .map(name => ({ name, svg: MONO_3D[name] }));
                 const target = pick(['cube', 'sphere', 'cylinder', 'cone']);
                 // Cap to exactly 4 shapes per problem (was 5) so each tile is large.
                 let sample = shuffle([...all3d]).slice(0, 4);
@@ -170,10 +173,12 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 sample = shuffle(sample);
                 const opts = sample.map((s, i) => ({
                     id: 'opt' + i,
-                    label: `${s.emoji} ${s.name}`,
+                    svg: _shTile(s.svg),
+                    label: '',
                     correct: s.name === target
                 }));
                 const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.printAnswer = _shKey(opts);
                 q.text = `Click ALL the ${target}s.`;
                 q.ans = ans;
                 q.options = opts;
@@ -186,37 +191,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
 
             // ===== NAME 3D SHAPES (Grade K) =====
             if (mappedSkill === "name_3d_shapes") {
-                // Single primary-blue palette across all 3D shapes (IXL convention).
-                // Three opacity tiers (front/right/top) give the 3D illusion via
-                // value contrast, not via three different hues.
-                const _3D_STROKE = COLORS.primaryDark;            // #1565c0
-                const _3D_FILL_FRONT = softFill(COLORS.fill[0]);  // 18% blue
-                const _3D_FILL_TOP   = COLORS.fill[0] + '14';     // ~8% blue (lighter top face)
-                const _3D_FILL_RIGHT = COLORS.fill[0] + '40';     // ~25% blue (medium right face)
-                const _3D_SW = STROKE.bold;
-                const shapes3d = [
-                    { name: "Cube", svgFn: () => `
-                        <polygon points="60,160 160,160 160,60 60,60" fill="${_3D_FILL_FRONT}" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>
-                        <polygon points="60,60 160,60 200,30 100,30" fill="${_3D_FILL_TOP}" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>
-                        <polygon points="160,60 200,30 200,130 160,160" fill="${_3D_FILL_RIGHT}" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>` },
-                    { name: "Sphere", svgFn: () => `
-                        <circle cx="120" cy="110" r="75" fill="${_3D_FILL_FRONT}" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>
-                        <ellipse cx="120" cy="110" rx="75" ry="20" fill="none" stroke="${_3D_STROKE}" stroke-width="${STROKE.normal}" stroke-dasharray="6,4"/>
-                        <ellipse cx="120" cy="110" rx="20" ry="75" fill="none" stroke="${_3D_STROKE}" stroke-width="${STROKE.normal}" stroke-dasharray="6,4"/>` },
-                    { name: "Cylinder", svgFn: () => `
-                        <rect x="60" y="60" width="120" height="120" fill="${_3D_FILL_FRONT}" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>
-                        <ellipse cx="120" cy="60" rx="60" ry="20" fill="${_3D_FILL_TOP}" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>
-                        <ellipse cx="120" cy="180" rx="60" ry="20" fill="${_3D_FILL_FRONT}" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>
-                        <line x1="60" y1="60" x2="60" y2="180" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>
-                        <line x1="180" y1="60" x2="180" y2="180" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>` },
-                    { name: "Cone", svgFn: () => `
-                        <polygon points="120,25 55,175 185,175" fill="${_3D_FILL_FRONT}" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>
-                        <ellipse cx="120" cy="175" rx="65" ry="20" fill="${_3D_FILL_RIGHT}" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>` },
-                    { name: "Rectangular Prism", svgFn: () => `
-                        <polygon points="40,170 170,170 170,60 40,60" fill="${_3D_FILL_FRONT}" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>
-                        <polygon points="40,60 170,60 210,35 80,35" fill="${_3D_FILL_TOP}" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>
-                        <polygon points="170,60 210,35 210,145 170,170" fill="${_3D_FILL_RIGHT}" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>` }
-                ];
+                const shapes3d = ["Cube", "Sphere", "Cylinder", "Cone", "Rectangular Prism"].map(name => ({ name }));
 
                 const shape3d = pick(shapes3d);
                 q.text = `What 3D shape is this?`;
@@ -227,12 +202,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const _distractors3d = shuffle(_all3d.filter(n => n !== shape3d.name)).slice(0, 3);
                 q.options = shuffle([shape3d.name, ..._distractors3d]);
                 q.hint = `All flat faces? Cube or rectangular prism. Round all over? Sphere. Flat circle + curved side? Cylinder or cone.`;
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.1rem;">Name This 3D Shape</div>
-                    <svg viewBox="0 0 240 210" style="display:block;margin:0 auto;width:min(280px,85%);height:auto;max-width:100%;">
-                        ${shape3d.svgFn()}
-                    </svg>
-                </div>`;
+                q.visual = _shFigure(MONO_3D[shape3d.name.toLowerCase()]);
                 q.skillLabel = '3D Shapes';
                 q.printFormat = 'geometry-3d-shapes';
                 return;
