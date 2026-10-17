@@ -153,6 +153,10 @@ function _fDenFilter(list, getD, min = 1) {
     const ok = list.filter(x => denomAllowed(getD(x), fams));
     return ok.length >= min ? ok : list;
 }
+// P12 `forms` read by the generator itself: is form `i` allowed (untouched, or ticked)? Is it
+// the only one ticked?
+function _fFormOn(i) { const t = _fChanged('forms'); return !t || t.includes(i); }
+function _fFormOnly(i) { const t = _fChanged('forms'); return !!t && t.length === 1 && t[0] === i; }
 // The same for a list of denominator pairs ({d1, d2} or [d1, d2]): both must be in a ticked family.
 function _fDenPairs(pairs) {
     const fams = _fChanged('denoms');
@@ -2292,7 +2296,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Decompose Frac";
                 return;
 
-            } else if (fracSkill === "frac_10_100_nv" && Math.random() < 0.25) {
+            } else if (fracSkill === "frac_10_100_nv" && _fFormOn(3) && (_fFormOnly(3) || Math.random() < 0.25)) {
                 // Phase 4.5 batch 9: multi-select-check variant — same as frac_10_100 but for NV
                 const targetN100 = pick([5, 7, 10, 15, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90]);
                 const decStr = targetN100 < 10 ? `0.0${targetN100}` : `0.${targetN100 < 100 && targetN100 % 10 === 0 ? targetN100 / 10 : targetN100}`;
@@ -2339,7 +2343,12 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
             } else if (fracSkill === "frac_10_100_nv") {
                 // Grade 4: Fractions with denominators 10 and 100 (no visual)
                 // LRU rotation across 3 sub-types (was Math.random() chain).
-                const roll = (typeof window !== 'undefined' && window.pickVariant)
+                // P12 `forms` (0 write as hundredths, 1 missing numerator, 2 add, 3 click-all): the
+                // rotation would deal the same unticked kind on every redraw, so pick from the ticked ones.
+                const _f10 = _fChanged('forms');
+                const _f10Rolls = _f10 ? ["type1", "type2", "type3"].filter((_, i) => _f10.includes(i)) : [];
+                const roll = _f10Rolls.length ? pick(_f10Rolls)
+                    : (typeof window !== 'undefined' && window.pickVariant)
                     ? window.pickVariant('frac_10_100_nv', ["type1","type2","type3"])
                     : (Math.random() < 0.5 ? 'type1' : (Math.random() < 0.5 ? 'type2' : 'type3'));
                 q._variant = roll;
