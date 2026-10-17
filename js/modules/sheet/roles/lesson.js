@@ -421,6 +421,10 @@ export const CASE_TESTS = Object.freeze({
     tenOnesTimes: (it) => CASE_TESTS.tenOnes(it) && CASE_TESTS.tenTimes(it) && CASE_TESTS.tenMixed(it),
     // (the chart's other example, lesson 6 r2 n7: one tenth on another place pair than the main example's H / T)
     tenTenthOther: (it) => { const p = tenOf(it); return !!p && p.dir === 'tenth' && !p.plain && !(Math.min(p.place, p.placeM) === 10 && Math.max(p.place, p.placeM) === 100); },
+    // (a Guided 10 times cell, lesson 6 r3: H / T or Th / H, other digits round it - not the ones edge)
+    tenTimesGuided: (it) => CASE_TESTS.tenTimes(it) && CASE_TESTS.tenMixed(it) && !CASE_TESTS.tenOnes(it),
+    tenTenthGuided: (it) => CASE_TESTS.tenTenth(it) && CASE_TESTS.tenMixed(it) && !CASE_TESTS.tenOnes(it),
+    tenNoOnes: (it) => CASE_TESTS.tenMixed(it) && !CASE_TESTS.tenOnes(it),
     tenTimesMid: (it) => CASE_TESTS.tenTimes(it) && !CASE_TESTS.tenEdge(it),
     tenTenthMid: (it) => CASE_TESTS.tenTenth(it) && !CASE_TESTS.tenEdge(it),
     pvEdge: (it) => { const n = pvNumberOf(it); return n !== null && (n === 1000 || (n >= 100 && (Math.floor(n / 10) % 10 === 0 || n % 10 === 0 || Math.floor(n / 10) % 10 === 1))); },

@@ -13,8 +13,8 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | E6 | Pupil text ≥ 11 pt (quiet letters, tab, footer excepted) | smallest 11.76 pt (P0 "Th", P0-key "Th") | PASS |
 | E7 | Teacher text ≥ 10 pt | smallest 10 pt (T1 "#", T2 "#") | PASS |
 | E8 | Working digits 28 pt outside the anchor chart | the kit sets --ws-digit 28pt at size L on every pupil page (one size L pack); measured by ws-print-lint --source kit | PASS |
-| E9 | Every page ≥ 50 % used, nothing past the body | min 79 %; overflow none; under 50 %: none | PASS |
-| E9c | Teacher pages: one continued is ≥ 92 % used (V22 3131); every teacher page listed | T1 95, T2 92, T2b 93, T3 91, T4 81, T5 95, T6 79; continued under 92 %: none | PASS |
+| E9 | Every page ≥ 50 % used, nothing past the body | min 81 %; overflow none; under 50 %: none | PASS |
+| E9c | Teacher pages: one continued is ≥ 92 % used (V22 3131); every teacher page listed | T1 95, T2 92, T2b 93, T3 91, T4 81, T5 95, T6 81; continued under 92 %: none | PASS |
 | E9b | Body ≤ 8 % blank below its last band (site lint) | max 8 %; over 8 %: none | PASS |
 | E10 | Every item cell ≥ 40 % free (reading cells exempt) | 84 cells; min free 40 %; below 40 %: none | PASS |
 | E11 | No empty band ≥ 30 % in a cell (the site sheetCheck H13, from the border box) | worst 25 %; failing: none | PASS |
@@ -68,7 +68,7 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | P0 | pupil | 90 | 8 | 11.76 | 8 | 58 | #000000 #ffffff |
 | P1 | pupil | 95 | 3 | 12 | 10 | 52 | #000000 #ffffff |
 | P2 | pupil | 98 | 0 | 12 | 3 | 56 | #000000 #5b2a86 #949494 #ffffff |
-| P3 | pupil | 96 | 1 | 12 | 4 | 50 | #000000 #5b2a86 #949494 #ffffff |
+| P3 | pupil | 96 | 1 | 12 | 4 | 49 | #000000 #5b2a86 #949494 #ffffff |
 | P4-1 | pupil | 96 | 0 | 12 | 4 | 62 | #000000 #5b2a86 #ffffff |
 | P4-2 | pupil | 96 | 0 | 12 | 4 | 55 | #000000 #5b2a86 #ffffff |
 | P5 | pupil | 100 | 0 | 12 | 3 | 58 | #000000 #5b2a86 #ffffff |
@@ -76,12 +76,12 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | P0-key | key | 90 | 8 | 11.76 | 8 | 58 | #000000 #c2410c #ffffff |
 | P1-key | key | 95 | 3 | 12 | 10 | 52 | #000000 #c2410c #ffffff |
 | P2-key | key | 98 | 0 | 12 | 3 | 56 | #000000 #5b2a86 #949494 #ffffff |
-| P3-key | key | 96 | 1 | 12 | 4 | 50 | #000000 #5b2a86 #c2410c #ffffff |
+| P3-key | key | 96 | 1 | 12 | 4 | 49 | #000000 #5b2a86 #c2410c #ffffff |
 | P4-1-key | key | 96 | 0 | 12 | 4 | 62 | #000000 #5b2a86 #c2410c #ffffff |
 | P4-2-key | key | 96 | 0 | 12 | 4 | 55 | #000000 #5b2a86 #c2410c #ffffff |
 | P5-key | key | 100 | 0 | 12 | 3 | 58 | #000000 #5b2a86 #c2410c #ffffff |
 | P6-key | key | 96 | 0 | 12 | 6 | 40 | #000000 #c2410c #ffffff |
-| T6 | teacher | 79 | 0 | 10 | 0 | — | #000000 #c2410c |
+| T6 | teacher | 81 | 0 | 10 | 0 | — | #000000 #c2410c |
 
 ## Notes from the build
 

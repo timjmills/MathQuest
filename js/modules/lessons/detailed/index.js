@@ -148,6 +148,11 @@ export function validateDescription(d) {
     for (const s of d.sections || []) for (const r of s.rows || []) for (const k of ['say', 'ask']) {
         if (r[k] && String(r[k]).replace(/\{[^}]+\}/g, 'x').split(/\s+/).length > 12) errs.push(`section ${s.n}: a ${k} line over 12 words`);
     }
+    // (`ringWords`, lesson 6 r2 D1: an answer word a script may only say through the placeholder of the item it names -
+    // a literal goes stale when the deal changes; absent on every other lesson)
+    for (const w of d.ringWords || []) for (const s of d.sections || []) for (const r of s.rows || []) for (const k of ['do', 'say', 'ask', 'note']) {
+        if (r[k] && String(r[k]).replace(/\{[^}]+\}/g, '').toLowerCase().includes(String(w).toLowerCase())) errs.push(`section ${s.n}: "${w}" written literally (name the item: {x.rel})`);
+    }
     return errs;
 }
 

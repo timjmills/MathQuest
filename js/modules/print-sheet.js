@@ -368,6 +368,8 @@ function refAccepts(sk, cand, key, seen, kept, pg = '', row = '', words = true) 
         // counted over the pack's keys and this page's; absent on every other ref)
         if (sk.spreadMax && typeof cand.spreadKey === 'string' && [...(sk.avoidKeys || []), ...[...seen].map((x) => String(x).replace(/^key:/, ''))]
             .filter((x) => String(x).startsWith(`${cand.spreadKey}:`)).length >= Number(sk.spreadMax)) return false;
+        // (and at most one a page while the page can be dealt - lead ruling, lesson 6 r2 n11; `seen` is this page's)
+        if (sk.spreadMax && sk.lr6 && typeof cand.spreadKey === 'string' && [...seen].some((x) => String(x).replace(/^key:/, '').startsWith(`${cand.spreadKey}:`))) return false;
         // (a function table: no shared (In, Out) pair, no rule on a third table - across the pack and on this page; lesson 5 r3)
         if (ftParts(k) && ftClash(k, (sk.avoidKeys || []).concat([...seen].filter((x) => /^key:ft/.test(x))))) return false;
         // (a + fact's identity across the pack is its unordered pair - 7 + 5 and 5 + 7 are one fact: lead ruling and
@@ -3872,6 +3874,7 @@ function dealOne(ref, seed, used, want, avoidAns = null, near = null, names = nu
     return dealOne1(ref, seed, used, want, avoidAns, near, names, null);
 }
 const DL_GROUPS = new WeakMap();
+const DL_SPREAD = new WeakMap();
 function dealOne1(ref, seed, used, want, avoidAns, near, names, fresh) {
     const ok = dlWant(want);
     // (why each candidate was turned away: named in the error when none is left)
@@ -3891,6 +3894,9 @@ function dealOne1(ref, seed, used, want, avoidAns, near, names, fresh) {
         if (key === null || (ok && !ok({ q }))) { why.want++; continue; }
         if (used.has(key)) { why.used++; continue; }
         if (ref.spreadMax && typeof q.spreadKey === 'string' && [...used].filter((x) => String(x).startsWith(`${q.spreadKey}:`)).length >= Number(ref.spreadMax)) { why.used++; continue; }
+        // (`spreadPage`, lesson 6 r3: the refs of one page - the exit slip - hold one spread key each)
+        const spg = ref.spreadPage && typeof q.spreadKey === 'string' ? (DL_SPREAD.get(used) || DL_SPREAD.set(used, new Map()).get(used)) : null;
+        if (spg && (spg.get(ref.spreadPage) || []).includes(q.spreadKey)) { why.near++; continue; }
         // (a function table's rule and pairs across the pack - lesson 5 r3: `ftRuleMax` 1 keeps a rule off every other table)
         if (ftParts(key) && ftClash(key, used, ref.ftRuleMax || 2)) { why.used++; continue; }
         // (a + fact turned round is the same fact across the pack - E24's unordered identity)
@@ -3928,6 +3934,7 @@ function dealOne1(ref, seed, used, want, avoidAns, near, names, fresh) {
         if (near) lr6Record(q, ref.skillId, near);
         for (const x of nms) names.add(x);
         used.add(key);
+        if (spg) spg.set(ref.spreadPage, (spg.get(ref.spreadPage) || []).concat([q.spreadKey]));
         if (grp) grp.set(ref.pageGroup, (grp.get(ref.pageGroup) || []).concat([key]));
         return { q, v, key };
     }

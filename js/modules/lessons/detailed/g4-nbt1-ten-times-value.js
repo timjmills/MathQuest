@@ -32,6 +32,8 @@ export default {
     eeOwnerList: ['M.EE.5.NBT.1'],
     eeNote: 'Wisconsin files 4.NBT.1 as "use M.EE.5.NBT.1"',
     cra: 'Pictorial → Abstract',
+    // (critic r2 D1: the relation words a script may say only through a {placeholder} of the item it names - validateDescription)
+    ringWords: ['10 times', 'one tenth of'],
     flowNote: 'One chunk: 10 times first, then one tenth; the same chart every time.',
     followOn: [
         { title: 'Ten times and one tenth with decimals', skill: 'placevalue:value', opts: { form: 'times' }, ccss: '5.NBT.A.1' },
@@ -44,7 +46,7 @@ export default {
     edgeTest: 'tenEdge',
     practicePages: 2,
     practiceSheets: [
-        { steps: true, skill: TEN({}, { allTest: 'tenMixed' }), shape: [4, 1], edgeLast: { per: 4, cols: 1, wants: ['tenThouTenth'] } },
+        { steps: true, skill: TEN({}, { allTest: 'tenNoOnes' }), shape: [4, 1], edgeLast: { per: 4, cols: 1, wants: ['tenThouTenth'] } },
         // Practice 2: the same steps, numbers to 99,999 (the one new thing: bigger numbers).
         { steps: true, skill: TEN({ band: 99999 }, { allTest: 'tenMixed' }), shape: [4, 1], edgeLast: { per: 4, cols: 1, wants: ['tenOnesTimes'] } },
     ],
@@ -58,7 +60,7 @@ export default {
         return {
             d: p.digit, nF: n, mF: m, v0: fmt(p.v0), v1: fmt(p.v1), rel: p.rel,
             place: WORD[p.place] || fmt(p.place), placeM: WORD[p.placeM] || fmt(p.placeM),
-            relShort: p.dir === 'times' ? '10 times' : 'one tenth',
+            bigSmall: p.v0 > p.v1 ? 'Bigger' : 'Smaller',
             big: fmt(Math.max(p.v0, p.v1)), small: fmt(Math.min(p.v0, p.v1)),
             sent: `The ${p.digit} in ${n} is ${p.rel} the ${p.digit} in ${m}`,
             sentQ: `The ${p.digit} in ${n} is ___ the ${p.digit} in ${m}`,
@@ -91,7 +93,7 @@ export default {
         },
         example: { test: 'tenChart' },
         second: { test: 'tenTenthOther', label: 'One place right? One tenth.' },
-        guided: ['tenTimesMid', 'tenTenthMid'],
+        guided: ['tenTimesGuided', 'tenTenthGuided'],
         practiceShape: [4, 1],
         mixWith: [],
     },
@@ -129,9 +131,9 @@ export default {
     // Three items: four of the chart-and-sentence cells do not fit a 132.5 mm half (never shrunk).
     exit: [
         // (r2, critic D3: every item writes a value - the top row's - then rings; one worth box so a 132.5 mm half holds three)
-        { case: '10 times, hundreds and tens', ref: TEN({ tenDir: 'times', tenWrite: 'top' }, { cellPayload: { sayTwo: true } }), want: 'tenTimesMid', instr: 'Write the top value. Circle 10 times or one tenth.', detects: 'Writes the digit as its value: 4 for 400.' },
-        { case: 'one tenth (Critical Atom: the other way)', ref: TEN({ tenDir: 'tenth', tenWrite: 'top' }, { cellPayload: { sayTwo: true } }), want: 'tenTenthMid', instr: 'Write the top value. Circle 10 times or one tenth.', detects: 'Right value, then 10 times circled: the smaller value read as 10 times.' },
-        { case: 'one tenth, thousands and hundreds', ref: TEN({ tenDir: 'tenth', tenWrite: 'top' }, { cellPayload: { sayTwo: true } }), want: 'tenThouTenth', instr: 'Write the top value. Circle 10 times or one tenth.', detects: 'Uses the place next to it: a thousands value for a hundreds digit.' },
+        { case: '10 times, hundreds and tens', ref: TEN({ tenDir: 'times', tenWrite: 'top' }, { cellPayload: { sayTwo: true }, spreadPage: 'P6' }), want: 'tenTimesMid', instr: 'Write the top value. Circle 10 times or one tenth.', detects: 'Writes the digit as its value: 4 for 400.' },
+        { case: 'one tenth (Critical Atom: the other way)', ref: TEN({ tenDir: 'tenth', tenWrite: 'top' }, { cellPayload: { sayTwo: true }, spreadPage: 'P6' }), want: 'tenTenthMid', instr: 'Write the top value. Circle 10 times or one tenth.', detects: 'Right value, then 10 times circled: the smaller value read as 10 times.' },
+        { case: 'one tenth, thousands and hundreds', ref: TEN({ tenDir: 'tenth', tenWrite: 'top' }, { cellPayload: { sayTwo: true }, spreadPage: 'P6' }), want: 'tenThouTenth', instr: 'Write the top value. Circle 10 times or one tenth.', detects: 'Uses the place next to it: a thousands value for a hundreds digit.' },
     ],
     exitInstruction: 'Write the top value. Circle 10 times or one tenth.',
     exitSay: 'Left is ten times. Right is one tenth.',
@@ -140,7 +142,7 @@ export default {
     // ------------------------------------------------------------------ retrieval (MWB)
     retrieval: [
         { ref: { categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: [10] } }, ask: '{ret.0.text}' },
-        { ref: PV('unit_form', { band: 999 }), ask: '{ret.1.text}' },
+        { ref: PV('unit_form', { band: 9999 }), ask: '{ret.1.text}' },
         { ref: PV('compare', { band: 999, closeness: 'close' }, { minNum: 100 }), ask: 'Which is bigger: {ret.2.a} or {ret.2.b}?' },
     ],
 
@@ -198,7 +200,7 @@ export default {
             rows: [
                 { do: 'Hand out the Number sense page.' },
                 { say: 'Band A: read each row. Write the answer.' },
-                { ask: '{ns.A.0.text}', note: 'Expected: [[{ns.A.0.ans}]]. Band B: the same five kinds, crossing a hundred.' },
+                { ask: '{ns.A.0.text}', note: 'Expected: [[{ns.A.0.ans}]]. Band B: the same five kinds, harder numbers.' },
             ] },
         { n: 3, name: 'Spaced retrieval', min: 3, page: '',
             rows: [
@@ -218,16 +220,16 @@ export default {
                 { do: 'Put anchor chart up. Point to {chart.nF} and {chart.mF}.' },
                 { say: 'The {chart.d} in {chart.nF} is in the {chart.place} place.', note: 'Step 1: worth [[{chart.v0}]].' },
                 { say: 'The {chart.d} in {chart.mF} is in the {chart.placeM} place.', note: 'Step 1 again: worth [[{chart.v1}]].' },
-                { say: '{chart.v0} is 10 times {chart.v1}. One place left.', note: 'Step 2: circle [[10 times]].' },
-                { say: 'Now the other way: {chart2.v0} is one tenth of {chart2.v1}.', note: 'Another example. Circle [[one tenth of]].' },
-                { say: 'Any two places side by side: 10 times.', note: 'Point along the Th H T O heads.' },
+                { say: '{chart.v0} is {chart.rel} {chart.v1}.', note: 'Step 2: circle [[{chart.rel}]].' },
+                { say: 'Now the other way: {chart2.v0} is {chart2.rel} {chart2.v1}.', note: 'Another example. Circle [[{chart2.rel}]].' },
+                { say: 'Any two places side by side: the same rule.', note: 'Point along the Th H T O heads.' },
             ] },
         { n: 6, name: 'We Do: Guided Practice', min: 8, page: 'P3', boxes: [{ kind: 'feedback', title: 'Fix it at once', text: 'Fix: cover one row. “What is this {we.0.d} worth?”' }],
             rows: [
                 { say: 'Look at {we.0.nF} and {we.0.mF}. Step 1 is in grey.' },
                 { ask: 'What is each {we.0.d} worth?', note: 'Expected ★: [[{we.0.v0}]], [[{we.0.v1}]]; circle [[{we.0.rel}]].' },
                 { do: 'Pairs do cell 2: {we.1.nF} and {we.1.mF}.', note: 'Expected ★: [[{we.1.worths}]].' },
-                { ask: 'Cell 2: is the top value bigger or smaller?', note: 'Smaller, so [[one tenth of]].' },
+                { ask: 'Cell 2: is the top value bigger or smaller?', note: '{we.1.bigSmall}, so [[{we.1.rel}]].' },
                 { do: 'Pupils do the Independent Practice. Walk and check.', note: 'Expected ★★: [[{indepList}]].' },
                 { say: 'Left is ten times. Right is one tenth.', note: 'The chant. Say it twice together.' },
             ] },
@@ -241,14 +243,14 @@ export default {
             rows: [
                 { do: 'Pupils finish the lesson sheet, then Practice 1 and 2.' },
                 { say: '{p4.steps}' },
-                { ask: 'Which value is bigger?', note: 'Visit pupils who circle 10 times every time.' },
+                { ask: 'Which value is bigger?', note: 'Visit pupils who circle the same word every time.' },
                 { do: 'Practice 2: the same steps, numbers to 99,999.', note: 'Look for the digit written in a worth box.' },
             ] },
         { n: 9, name: 'Word problem', min: 4, page: 'P5',
             rows: [
                 { do: 'Read the story aloud two times. Pupils tick each box.' },
                 { ask: 'What is each {wp.d} worth?', note: 'Expected: [[{wp.v0}]] and [[{wp.v1}]].' },
-                { ask: 'How many times as much?', note: 'Expected: [[{wp.v0} ÷ {wp.v1} = 10]]: 10 times.' },
+                { ask: 'How many times as much?', note: 'Expected: [[{wp.v0} ÷ {wp.v1} = {wp.eqN}]].' },
             ] },
         { n: 10, name: 'Plenary and exit slip', min: 4, page: 'P6',
             rows: [
