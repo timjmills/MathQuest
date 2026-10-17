@@ -142,9 +142,9 @@ export default {
     // (three 2 x 3 windows, each fresh: no other page's window holds half its boxes, either way round. The 2-9 chart is
     // spent by the lesson's pages, so they may use the 11 and 12 rows (chartFresh, products to 100); a fourth finds none)
     exit: [
-        { case: 'an even row (odd columns)', ref: CHART({ pageGroup: 'exit', gridFresh: true, allTest: 'chartFresh' }, { winRows: 2, winCols: 3, band: 144 }), want: ['chartColsOdd', 'chartIn9'], cols: 1, group: 'a', detects: 'Misses the even row.' },
-        { case: 'the odd row: its even column (Critical Atom)', ref: CHART({ pageGroup: 'exit', gridFresh: true, allTest: 'chartFresh' }, { winRows: 2, winCols: 3, band: 144 }), want: ['chartMixed', 'chartRowOnly'], cols: 2, group: 'bc', detects: 'Leaves an even column white.' },
-        { case: 'odd x odd stays white', ref: CHART({ pageGroup: 'exit', gridFresh: true, allTest: 'chartFresh' }, { winRows: 2, winCols: 3, band: 144 }), want: 'chartOddOdd', cols: 2, group: 'bc', detects: 'Shades an odd × odd box.' },
+        { case: 'an even row (odd columns)', ref: CHART({ pageGroup: 'exit', gridFresh: true, allTest: 'chartTo100' }, { winRows: 2, winCols: 3, band: 144 }), want: ['chartColsOdd', 'chartIn9'], cols: 1, group: 'a', detects: 'Misses the even row.' },
+        { case: 'the odd row: its even column (Critical Atom)', ref: CHART({ pageGroup: 'exit', gridFresh: true, allTest: 'chartTo100' }, { winRows: 2, winCols: 3, band: 144 }), want: ['chartMixed', 'chartRowOnly'], cols: 2, group: 'bc', detects: 'Leaves an even column white.' },
+        { case: 'odd x odd stays white', ref: CHART({ pageGroup: 'exit', gridFresh: true, allTest: 'chartTo100' }, { winRows: 2, winCols: 3, band: 144 }), want: 'chartOddOdd', cols: 2, group: 'bc', detects: 'Shades an odd × odd box.' },
     ],
     exitInstruction: 'Shade every even product.',
 
@@ -194,7 +194,7 @@ export default {
         { name: 'Any odd factor is odd', step: 2, looks: '{chart.ca} × {chart.cb} left white', fix: 'One even number is enough.', option: '', caught: 'Exit b' },
         { name: 'Columns only', step: 1, looks: 'The {exit.0.ec} column shaded, the {exit.0.er} row white', fix: 'Rows first, then columns: finger on each header.', option: '', caught: 'Exit a' },
     ],
-    checkQuestion: { want: 'chartMixed', correct: 'C', ref: CHART({ gridFresh: true, allTest: 'chartFresh' }, { winRows: 2, winCols: 4, band: 144 }) },
+    checkQuestion: { want: 'chartMixed', correct: 'C', ref: CHART({ gridFresh: true, allTest: 'chartTo100' }, { winRows: 2, winCols: 4, band: 144 }) },
 
     // ------------------------------------------------------------------ T3-T5 delivery scripts
     sections: [
