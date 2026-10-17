@@ -1,0 +1,173 @@
+PASS [1366x650 quiz default] 5 boxes, each takes the row's widest number: 2 digits (2/2/2/2/2)
+PASS [1366x650 quiz default] the row says how to move on (Space)
+PASS [1366x650 quiz default] slow typing, Space after each number: 6|10|14|18|22 (want 6|10|14|18|22)
+PASS [1366x650 quiz default] the caret never moved by itself inside a number (0)
+PASS [1366x650 quiz default] the quiz answer composes one number per box (6, 10, 14, 18, 22)
+PASS [1366x650 quiz default] comma between numbers: 6|10|14|18|22
+PASS [1366x650 quiz default] enter between numbers: 6|10|14|18|22
+PASS [1366x650 quiz default] tab between numbers: 6|10|14|18|22
+PASS [1366x650 quiz default] no separator, mixed lengths: no digit lost, no box over 2 (61|01|41|82|2)
+PASS [1366x650 quiz default] a number longer than the row's widest keeps every digit (60|0|||)
+PASS [1366x650 quiz default] the last box keeps a digit past the row's width (999)
+PASS [1366x650 quiz default] no page errors 
+PASS [1366x650 quiz by25] 5 boxes, each takes the row's widest number: 3 digits (3/3/3/3/3)
+PASS [1366x650 quiz by25] the row says how to move on (Space)
+PASS [1366x650 quiz by25] slow typing, Space after each number: 125|200|250|275|300 (want 125|200|250|275|300)
+PASS [1366x650 quiz by25] the caret never moved by itself inside a number (0)
+PASS [1366x650 quiz by25] the quiz answer composes one number per box (125, 200, 250, 275, 300)
+PASS [1366x650 quiz by25] comma between numbers: 125|200|250|275|300
+PASS [1366x650 quiz by25] enter between numbers: 125|200|250|275|300
+PASS [1366x650 quiz by25] tab between numbers: 125|200|250|275|300
+PASS [1366x650 quiz by25] numbers all 3 digits, typed straight on: 125|200|250|275|300
+PASS [1366x650 quiz by25] a number longer than the row's widest keeps every digit (125|0|||)
+PASS [1366x650 quiz by25] the last box keeps a digit past the row's width (9999)
+PASS [1366x650 quiz by25] no page errors 
+PASS [1366x650 quiz by25lines] 5 boxes, each takes the row's widest number: 3 digits (3/3/3/3/3)
+PASS [1366x650 quiz by25lines] the row says how to move on (Space)
+PASS [1366x650 quiz by25lines] slow typing, Space after each number: 125|200|250|275|300 (want 125|200|250|275|300)
+PASS [1366x650 quiz by25lines] the caret never moved by itself inside a number (0)
+PASS [1366x650 quiz by25lines] the quiz answer composes one number per box (125, 200, 250, 275, 300)
+PASS [1366x650 quiz by25lines] comma between numbers: 125|200|250|275|300
+PASS [1366x650 quiz by25lines] enter between numbers: 125|200|250|275|300
+PASS [1366x650 quiz by25lines] tab between numbers: 125|200|250|275|300
+PASS [1366x650 quiz by25lines] numbers all 3 digits, typed straight on: 125|200|250|275|300
+PASS [1366x650 quiz by25lines] a number longer than the row's widest keeps every digit (125|0|||)
+PASS [1366x650 quiz by25lines] the last box keeps a digit past the row's width (9999)
+PASS [1366x650 quiz by25lines] no page errors 
+PASS [1366x650 quiz by7] 5 boxes, each takes the row's widest number: 2 digits (2/2/2/2/2)
+PASS [1366x650 quiz by7] the row says how to move on (Space)
+PASS [1366x650 quiz by7] slow typing, Space after each number: 28|35|70|77|84 (want 28|35|70|77|84)
+PASS [1366x650 quiz by7] the caret never moved by itself inside a number (0)
+PASS [1366x650 quiz by7] the quiz answer composes one number per box (28, 35, 70, 77, 84)
+PASS [1366x650 quiz by7] comma between numbers: 28|35|70|77|84
+PASS [1366x650 quiz by7] enter between numbers: 28|35|70|77|84
+PASS [1366x650 quiz by7] tab between numbers: 28|35|70|77|84
+PASS [1366x650 quiz by7] numbers all 2 digits, typed straight on: 28|35|70|77|84
+PASS [1366x650 quiz by7] a number longer than the row's widest keeps every digit (28|0|||)
+PASS [1366x650 quiz by7] the last box keeps a digit past the row's width (999)
+PASS [1366x650 quiz by7] no page errors 
+PASS [1366x650 card default] 5 boxes, each takes the row's widest number: 2 digits (2/2/2/2/2)
+PASS [1366x650 card default] the row says how to move on (Space)
+PASS [1366x650 card default] slow typing, Space after each number: 6|10|14|18|22 (want 6|10|14|18|22)
+PASS [1366x650 card default] comma between numbers: 6|10|14|18|22
+PASS [1366x650 card default] enter between numbers: 6|10|14|18|22
+PASS [1366x650 card default] tab between numbers: 6|10|14|18|22
+PASS [1366x650 card default] no separator, mixed lengths: no digit lost, no box over 2 (6|10|14|18|22)
+PASS [1366x650 card default] a number longer than the row's widest keeps every digit (6|00|||)
+PASS [1366x650 card default] the last box keeps a digit past the row's width (999)
+PASS [1366x650 card default] no page errors 
+PASS [1366x650 card by25] 5 boxes, each takes the row's widest number: 3 digits (3/3/3/3/3)
+PASS [1366x650 card by25] the row says how to move on (Space)
+PASS [1366x650 card by25] slow typing, Space after each number: 125|200|250|275|300 (want 125|200|250|275|300)
+PASS [1366x650 card by25] comma between numbers: 125|200|250|275|300
+PASS [1366x650 card by25] enter between numbers: 125|200|250|275|300
+PASS [1366x650 card by25] tab between numbers: 125|200|250|275|300
+PASS [1366x650 card by25] numbers all 3 digits, typed straight on: 125|200|250|275|300
+PASS [1366x650 card by25] a number longer than the row's widest keeps every digit (125|0|||)
+PASS [1366x650 card by25] the last box keeps a digit past the row's width (9999)
+PASS [1366x650 card by25] no page errors 
+PASS [1366x650 card by25lines] 5 boxes, each takes the row's widest number: 3 digits (3/3/3/3/3)
+PASS [1366x650 card by25lines] the row says how to move on (Space)
+PASS [1366x650 card by25lines] slow typing, Space after each number: 125|200|250|275|300 (want 125|200|250|275|300)
+PASS [1366x650 card by25lines] comma between numbers: 125|200|250|275|300
+PASS [1366x650 card by25lines] enter between numbers: 125|200|250|275|300
+PASS [1366x650 card by25lines] tab between numbers: 125|200|250|275|300
+PASS [1366x650 card by25lines] numbers all 3 digits, typed straight on: 125|200|250|275|300
+PASS [1366x650 card by25lines] a number longer than the row's widest keeps every digit (125|0|||)
+PASS [1366x650 card by25lines] the last box keeps a digit past the row's width (9999)
+PASS [1366x650 card by25lines] no page errors 
+PASS [1366x650 card by7] 5 boxes, each takes the row's widest number: 2 digits (2/2/2/2/2)
+PASS [1366x650 card by7] the row says how to move on (Space)
+PASS [1366x650 card by7] slow typing, Space after each number: 28|35|70|77|84 (want 28|35|70|77|84)
+PASS [1366x650 card by7] comma between numbers: 28|35|70|77|84
+PASS [1366x650 card by7] enter between numbers: 28|35|70|77|84
+PASS [1366x650 card by7] tab between numbers: 28|35|70|77|84
+PASS [1366x650 card by7] numbers all 2 digits, typed straight on: 28|35|70|77|84
+PASS [1366x650 card by7] a number longer than the row's widest keeps every digit (28|0|||)
+PASS [1366x650 card by7] the last box keeps a digit past the row's width (999)
+PASS [1366x650 card by7] no page errors 
+PASS [1366x650 worksheet default] 5 boxes, each takes the row's widest number: 2 digits (2/2/2/2/2)
+PASS [1366x650 worksheet default] the row says how to move on (Space)
+PASS [1366x650 worksheet default] slow typing, Space after each number: 8|12|14|20|24 (want 8|12|14|20|24)
+PASS [1366x650 worksheet default] comma between numbers: 8|12|14|20|24
+PASS [1366x650 worksheet default] enter between numbers: 8|12|14|20|24
+PASS [1366x650 worksheet default] tab between numbers: 8|12|14|20|24
+PASS [1366x650 worksheet default] no separator, mixed lengths: no digit lost, no box over 2 (81|21|42|02|4)
+PASS [1366x650 worksheet default] a number longer than the row's widest keeps every digit (80|0|||)
+PASS [1366x650 worksheet default] the last box keeps a digit past the row's width (999)
+PASS [1366x650 worksheet default] no page errors 
+PASS [1366x650 worksheet by25] 5 boxes, each takes the row's widest number: 3 digits (3/3/3/3/3)
+PASS [1366x650 worksheet by25] the row says how to move on (Space)
+PASS [1366x650 worksheet by25] slow typing, Space after each number: 75|100|250|275|300 (want 75|100|250|275|300)
+PASS [1366x650 worksheet by25] comma between numbers: 75|100|250|275|300
+PASS [1366x650 worksheet by25] enter between numbers: 75|100|250|275|300
+PASS [1366x650 worksheet by25] tab between numbers: 75|100|250|275|300
+PASS [1366x650 worksheet by25] no separator, mixed lengths: no digit lost, no box over 3 (75|100|250|275|300)
+PASS [1366x650 worksheet by25] a number longer than the row's widest keeps every digit (75|00|||)
+PASS [1366x650 worksheet by25] the last box keeps a digit past the row's width (9999)
+PASS [1366x650 worksheet by25] no page errors 
+PASS [1366x650 worksheet by25lines] 5 boxes, each takes the row's widest number: 3 digits (3/3/3/3/3)
+PASS [1366x650 worksheet by25lines] the row says how to move on (Space)
+PASS [1366x650 worksheet by25lines] slow typing, Space after each number: 100|125|150|200|250 (want 100|125|150|200|250)
+PASS [1366x650 worksheet by25lines] comma between numbers: 100|125|150|200|250
+PASS [1366x650 worksheet by25lines] enter between numbers: 100|125|150|200|250
+PASS [1366x650 worksheet by25lines] tab between numbers: 100|125|150|200|250
+PASS [1366x650 worksheet by25lines] numbers all 3 digits, typed straight on: 100|125|150|200|250
+PASS [1366x650 worksheet by25lines] a number longer than the row's widest keeps every digit (100|0|||)
+PASS [1366x650 worksheet by25lines] the last box keeps a digit past the row's width (9999)
+PASS [1366x650 worksheet by25lines] no page errors 
+PASS [1366x650 worksheet by7] 5 boxes, each takes the row's widest number: 2 digits (2/2/2/2/2)
+PASS [1366x650 worksheet by7] the row says how to move on (Space)
+PASS [1366x650 worksheet by7] slow typing, Space after each number: 28|49|63|70|77 (want 28|49|63|70|77)
+PASS [1366x650 worksheet by7] comma between numbers: 28|49|63|70|77
+PASS [1366x650 worksheet by7] enter between numbers: 28|49|63|70|77
+PASS [1366x650 worksheet by7] tab between numbers: 28|49|63|70|77
+PASS [1366x650 worksheet by7] numbers all 2 digits, typed straight on: 28|49|63|70|77
+PASS [1366x650 worksheet by7] a number longer than the row's widest keeps every digit (28|0|||)
+PASS [1366x650 worksheet by7] the last box keeps a digit past the row's width (999)
+PASS [1366x650 worksheet by7] no page errors 
+PASS [1280x600 quiz default] 5 boxes, each takes the row's widest number: 2 digits (2/2/2/2/2)
+PASS [1280x600 quiz default] the row says how to move on (Space)
+PASS [1280x600 quiz default] slow typing, Space after each number: 6|10|14|18|22 (want 6|10|14|18|22)
+PASS [1280x600 quiz default] the caret never moved by itself inside a number (0)
+PASS [1280x600 quiz default] the quiz answer composes one number per box (6, 10, 14, 18, 22)
+PASS [1280x600 quiz default] comma between numbers: 6|10|14|18|22
+PASS [1280x600 quiz default] enter between numbers: 6|10|14|18|22
+PASS [1280x600 quiz default] tab between numbers: 6|10|14|18|22
+PASS [1280x600 quiz default] no separator, mixed lengths: no digit lost, no box over 2 (61|01|41|82|2)
+PASS [1280x600 quiz default] a number longer than the row's widest keeps every digit (60|0|||)
+PASS [1280x600 quiz default] the last box keeps a digit past the row's width (999)
+PASS [1280x600 quiz default] no page errors 
+PASS [1280x600 quiz by25] 5 boxes, each takes the row's widest number: 3 digits (3/3/3/3/3)
+PASS [1280x600 quiz by25] the row says how to move on (Space)
+PASS [1280x600 quiz by25] slow typing, Space after each number: 125|200|250|275|300 (want 125|200|250|275|300)
+PASS [1280x600 quiz by25] the caret never moved by itself inside a number (0)
+PASS [1280x600 quiz by25] the quiz answer composes one number per box (125, 200, 250, 275, 300)
+PASS [1280x600 quiz by25] comma between numbers: 125|200|250|275|300
+PASS [1280x600 quiz by25] enter between numbers: 125|200|250|275|300
+PASS [1280x600 quiz by25] tab between numbers: 125|200|250|275|300
+PASS [1280x600 quiz by25] numbers all 3 digits, typed straight on: 125|200|250|275|300
+PASS [1280x600 quiz by25] a number longer than the row's widest keeps every digit (125|0|||)
+PASS [1280x600 quiz by25] the last box keeps a digit past the row's width (9999)
+PASS [1280x600 quiz by25] no page errors 
+/home/user/MathQuest/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/LifecycleWatcher.js:36
+    #error = new Error('LifecycleWatcher terminated');
+             ^
+
+Error: Navigating frame was detached
+    at <instance_members_initializer> (/home/user/MathQuest/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/LifecycleWatcher.js:36:14)
+    at new LifecycleWatcher (/home/user/MathQuest/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/LifecycleWatcher.js:40:16)
+    at CdpFrame.goto (/home/user/MathQuest/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/Frame.js:149:29)
+    at CdpFrame.<anonymous> (/home/user/MathQuest/node_modules/puppeteer-core/lib/cjs/puppeteer/util/decorators.js:109:27)
+    at CdpPage.goto (/home/user/MathQuest/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Page.js:580:43)
+    at open (/home/user/MathQuest/tests/lib/ws-harness.cjs:69:14)
+    at async /home/user/MathQuest/tests/scripts/small-fixes-countrow-caret.cjs:83:21 {
+  cause: Error: LifecycleWatcher disposed
+      at LifecycleWatcher.dispose (/home/user/MathQuest/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/LifecycleWatcher.js:173:29)
+      at CdpFrame.goto (/home/user/MathQuest/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/Frame.js:169:25)
+      at async CdpPage.goto (/home/user/MathQuest/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Page.js:580:20)
+      at async open (/home/user/MathQuest/tests/lib/ws-harness.cjs:69:3)
+      at async /home/user/MathQuest/tests/scripts/small-fixes-countrow-caret.cjs:83:21
+}
+
+Node.js v22.22.0
