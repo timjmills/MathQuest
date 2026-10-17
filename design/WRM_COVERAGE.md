@@ -22,20 +22,20 @@ Sources:
 ## Summary
 
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
-- Covered 513 (59%), partial only 149 (17%), gap 210 (24%).
+- Covered 513 (59%), partial only 151 (17%), gap 208 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 328 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
+- 332 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
 | Reception | PK | 18 | 119 | 58 (49%) | 28 | 33 |
 | Year 1 | K | 14 | 116 | 72 (62%) | 24 | 20 |
-| Year 2 | 1 | 11 | 124 | 80 (65%) | 18 | 26 |
-| Year 3 | 2 | 12 | 134 | 78 (58%) | 24 | 32 |
+| Year 2 | 1 | 11 | 124 | 80 (65%) | 19 | 25 |
+| Year 3 | 2 | 12 | 134 | 78 (58%) | 25 | 31 |
 | Year 4 | 3 | 14 | 129 | 81 (63%) | 18 | 30 |
 | Year 5 | 4 | 15 | 136 | 81 (60%) | 22 | 33 |
 | Year 6 | 5 | 13 | 114 | 63 (55%) | 15 | 36 |
-| **All** | | **97** | **872** | **513 (59%)** | **149** | **210** |
+| **All** | | **97** | **872** | **513 (59%)** | **151** | **208** |
 
 ## Source disagreements
 
@@ -52,8 +52,10 @@ Where the Drive folders, the site pacing, the v3 crosswalk and our standards dat
 - EE 6.EE.B.6: our ee-math.json links [M.EE.6.EE.5-7], the site EEMAP links [none]
 - EE 6.EE.B.7: our ee-math.json links [M.EE.6.EE.5-7], the site EEMAP links [none]
 - Y6.B11.S6 "The mean": pacing CCSS [5.MD.B.2], v3 curriculum CCSS []
-- site G1 W28: review step "Count money - notes and coins (US: dollars & cents)" matches no WRM step
-- site G3 W22: review step "Pounds, tens, ones and pence (US: dollars & cents)" matches no WRM step
+- site G1 W28: review step "Count money - notes and coins (US: dollars & cents)" is Y2.B4.S2 "Count money - pounds (notes and coins)" by its block/step numbers (retitled on the site); recorded on Y2.B4.S2
+- site G3 W22: review step "Pounds, tens, ones and pence (US: dollars & cents)" is Y4.B10.S1 "Write money using decimals" by its block/step numbers (retitled on the site); recorded on Y4.B10.S1
+- site G3 Support "Measure in grams": the site gives source G2, but the title is exactly Y2.B7.S2 (G1); recorded on Y2.B7.S2
+- site G4 Support "Measure in centimetres": the site gives source K, but the title is exactly Y2.B6.S1 (G1); recorded on Y2.B6.S1
 - Drive vs site: the site RESOURCES tree is the Drive tree (same folder and file ids). Spot checks against live Drive listings matched: the Year 3 folder (1l9hjSYKWnwYnfwPj7Nui4Re5CDWJfWFi) block folders, the Teaching Guides of Year 3 Spring Block 3 (Fractions A), and the guides for Y3.B2.S21, Y4.B1.S16 and Y6.B1.S4. The Drive connector returns at most 5 files per page, so the 872 steps were not re-listed one by one.
 - Site pacing vs Drive: every Drive small step is in the site pacing under the same block and step number, with the same title except where the school teaches money in US dollars (the pacing adds "(US: dollars & cents)"; kept as usAdaptation). The pacing also schedules 36 Awsaj-authored "committee" lessons (kept as block supplements, not WRM steps).
 - v3 sheet vs site: the sheet says it is generated from the same data as the site, and its per-step CCSS codes are the site's. Its summary says "913 distinct White Rose small steps (PK4-Grade 5) plus 16 CCSS custom lessons still to be built". Drive has 872 small steps (Reception 119, Y1 116, Y2 124, Y3 134, Y4 129, Y5 136, Y6 114); the site's per-grade lesson lists hold 878 distinct titles (a title repeated inside Reception counts once; above-grade steps are listed in two grades) and 36 committee lessons; the sheet's lesson tabs have 849 rows. Neither 913 nor 16 could be reproduced from any source; the 872 Drive steps are the inventory used here.
@@ -1638,6 +1640,7 @@ whatever happens to the WRM gaps.
   Proposal: Complete the Symmetric Shape  
   Vocabulary: mirror line, vertex, reflection  
 - **Y2.B3.S7** Sort 2-D shapes — PARTIAL. _1.G.A.1, K.G.B.4, M.EE.1.G.1_  
+  Partial: Sort 2D Shapes by Sides or Vertices (Click All) (`shapes_early:sort_2d_by_count`), missing selecting every shape with a given number of sides or vertices; no sorting rings or rule naming  
   Partial: Find Shapes by Attributes (Multi-Select) (`shapes_early:compose_from_attributes`), missing sorting into labelled groups  
   Proposal: Sort 2-D and 3-D Shapes  
   Vocabulary: sort, group, property  
@@ -1651,7 +1654,8 @@ whatever happens to the WRM gaps.
 - **Y2.B3.S10** Count vertices on 3-D shapes — covered. _1.G.A.1, 2.G.A.1, M.EE.1.G.1, M.EE.2.G.1_  
   Skills: Count Edges, Faces & Vertices on 3D Shape (Visual) (`shapes_early:count_edges_faces_vertices`)  
   Vocabulary: vertex, edge, face  
-- **Y2.B3.S11** Sort 3-D shapes — GAP. _1.G.A.1, K.G.B.4, M.EE.1.G.1_  
+- **Y2.B3.S11** Sort 3-D shapes — PARTIAL. _1.G.A.1, K.G.B.4, M.EE.1.G.1_  
+  Partial: Sort 3D Shapes by Faces or Vertices (Click All) (`shapes_early:sort_3d_by_count`), missing selecting every shape with a given number of faces or vertices; no sorting rings or rule naming  
   Proposal: Sort 2-D and 3-D Shapes  
   Vocabulary: sort, property, curved surface, odd one out  
 - **Y2.B3.S12** Make patterns with 2-D and 3-D shapes — covered. _K.G.A.2, M.EE.K.G.2_  
@@ -2367,7 +2371,8 @@ whatever happens to the WRM gaps.
 - **Y3.B11.S9** Recognise and describe 3-D shapes — covered. _2.G.A.1, 1.G.A.1, M.EE.2.G.1, M.EE.1.G.1_  
   Skills: Identify 3D Shapes (Visual) (`shapes_early:name_3d_shapes`); Count Edges, Faces & Vertices on 3D Shape (Visual) (`shapes_early:count_edges_faces_vertices`)  
   Vocabulary: face, edge, vertex  
-- **Y3.B11.S10** Make 3-D shapes — GAP. _2.G.A.1, 1.G.A.1, K.G.B.5, 1.G.A.2, M.EE.2.G.1, M.EE.1.G.1, M.EE.1.G.2_  
+- **Y3.B11.S10** Make 3-D shapes — PARTIAL. _2.G.A.1, 1.G.A.1, K.G.B.5, 1.G.A.2, M.EE.2.G.1, M.EE.1.G.1, M.EE.1.G.2_  
+  Partial: Which 3D Shape Does This Net Make? (Visual) (`shapes_classify:net_to_solid`), missing matching a net to its shape; no skeleton models  
   Proposal: Make 3-D Shapes  
   Vocabulary: edge, face, vertex  
 
@@ -3724,7 +3729,7 @@ whatever happens to the WRM gaps.
   Proposal: Draw Shapes Accurately  
   Vocabulary: base, perpendicular height, protractor, accurate  
 - **Y6.B12.S11** Nets of 3-D shapes — covered. _6.G.A.4_  
-  Skills: Identify Net of 3D Shape (Visual) (`shapes_classify:net_identify`)  
+  Skills: Identify Net of 3D Shape (Visual) (`shapes_classify:net_identify`); Which 3D Shape Does This Net Make? (Visual) (`shapes_classify:net_to_solid`); Find the Nets of a Cube (Click All) (`shapes_classify:cube_nets`)  
   Vocabulary: net, face, edge  
 - _Awsaj supplement (not a WRM step):_ Classify two-dimensional figures in a hierarchy — 5.G.B.3, 5.G.B.4
 

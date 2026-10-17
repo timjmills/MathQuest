@@ -48,7 +48,8 @@ export const SKILL_GRADES = {
     'area_distributive_visual': 4,
     'area_triangle': 6, 'area_polygon_decompose': 6,
     'coord_polygon': 6, 'net_surface_area': 6,
-    'net_identify': 5, 'cross_section_3d': 6, 'compose_from_attributes': 'M',
+    'net_identify': 5, 'cross_section_3d': 6,
+    'sort_2d_by_count': 'M', 'sort_3d_by_count': 2, 'net_to_solid': 5, 'cube_nets': 5, 'compose_from_attributes': 'M',
     'more_less_10': 1, 'more_less_100': 2,
     'odd_even': 2, 'number_word_form': 2,
     // MAP gap fills (Phase 6) — multi-select-check & balance/remainder
@@ -947,6 +948,9 @@ export const SKILLS = {
         { v: "shape_attributes", l: "Shapes by Attributes (Visual)" },
         { v: "compose_from_attributes", l: "Find Shapes by Attributes (Multi-Select)" },
         { v: "mixed_shapes_early", l: "Mixed Early Shapes" },
+        // 2026-10-17 appends (owner: count and select by sides, vertices, faces). APPEND ONLY.
+        { v: "sort_2d_by_count", l: "Sort 2D Shapes by Sides or Vertices (Click All)" },
+        { v: "sort_3d_by_count", l: "Sort 3D Shapes by Faces or Vertices (Click All)" },
     ],
     area_perimeter: [
         { v: "perimeter_intro", l: "Perimeter Intro - Sum the Sides (Visual)" },
@@ -979,6 +983,9 @@ export const SKILLS = {
         { v: "net_identify", l: "Identify Net of 3D Shape (Visual)" },
         { v: "cross_section_3d", l: "Cross-Section of 3D Shape (Visual)" },
         { v: "mixed_shapes", l: "Mixed Shape Classification" },
+        // 2026-10-17 appends (owner: nets). APPEND ONLY.
+        { v: "net_to_solid", l: "Which 3D Shape Does This Net Make? (Visual)" },
+        { v: "cube_nets", l: "Find the Nets of a Cube (Click All)" },
     ],
     coordinates: [
         { v: "coordinate_q1", l: "Coordinates (Quadrant I)" },
@@ -1602,7 +1609,8 @@ export const SKILL_TIME_CATEGORY = {
     area_distributive_visual: "extended",
     area_triangle: "extended", area_polygon_decompose: "extended",
     coord_polygon: "extended", net_surface_area: "extended",
-    net_identify: "extended", cross_section_3d: "extended", compose_from_attributes: "extended",
+    net_identify: "extended", cross_section_3d: "extended",
+    sort_2d_by_count: "quick", sort_3d_by_count: "quick", net_to_solid: "quick", cube_nets: "quick", compose_from_attributes: "extended",
     // New fraction operations (extended by default)
     add_fractions_like: "quick", sub_fractions_like: "quick",
     add_frac_like_nv: "quick", sub_frac_like_nv: "quick",
@@ -1999,7 +2007,8 @@ export const SKILL_PRINT_SIZE = {
     area_distributive_visual: "medium",
     area_triangle: "medium", area_polygon_decompose: "wide",
     coord_polygon: "wide", net_surface_area: "wide",
-    net_identify: "wide", cross_section_3d: "wide", compose_from_attributes: "wide",
+    net_identify: "wide", cross_section_3d: "wide",
+    sort_2d_by_count: "wide", sort_3d_by_count: "wide", net_to_solid: "medium", cube_nets: "wide", compose_from_attributes: "wide",
     mult_properties: "medium", div_remainders: "medium",
     mult_chart: "medium",
     mult_chart_easy: "wide", mult_chart_medium: "wide", mult_chart_hard: "wide",

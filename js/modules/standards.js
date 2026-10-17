@@ -374,6 +374,8 @@ export const SKILL_STANDARDS = {
     'shapes_early:shape_corners_count': { ccss: ['K.G.B.4'], ee: [] }, // Count Corners on a Shape (Visual)
     'shapes_early:count_edges_faces_vertices': { ccss: ['2.G.A.1'], ee: ['M.EE.2.G.1'] }, // Count Edges, Faces & Vertices on 3D Shape (Visual)
     'shapes_early:count_sides_vertices_2d': { ccss: ['2.G.A.1', 'K.G.B.4'], ee: ['M.EE.2.G.1', 'M.EE.3.G.1'] }, // Count Sides & Vertices on 2D Shape (Visual)
+    'shapes_early:sort_2d_by_count': { ccss: ['2.G.A.1', 'K.G.B.4'], ee: ['M.EE.2.G.1'] }, // Sort 2D Shapes by Sides or Vertices (Click All)
+    'shapes_early:sort_3d_by_count': { ccss: ['2.G.A.1'], ee: ['M.EE.2.G.1'] }, // Sort 3D Shapes by Faces or Vertices (Click All)
     'shapes_early:order_objects_length': { ccss: ['1.MD.A.1'], ee: ['M.EE.1.MD.1', 'M.EE.2.MD.3', 'M.EE.2.MD.4'] }, // Order Objects by Length (Visual)
     'shapes_early:measure_nonstandard': { ccss: ['1.MD.A.2'], ee: ['M.EE.1.MD.2', 'M.EE.2.MD.1'] }, // Measure with Non-Standard Units (Visual)
     'shapes_early:compose_shapes': { ccss: ['K.G.B.6', '1.G.A.2'], ee: ['M.EE.1.G.2', 'M.EE.1.G.3'] }, // Combine Shapes (Visual)
@@ -413,6 +415,8 @@ export const SKILL_STANDARDS = {
     'shapes_classify:classify_quads': { ccss: ['5.G.B.4', '5.G.B.3', '3.G.A.1', '4.G.A.2'], ee: ['M.EE.5.G.4', 'M.EE.5.G.3'] }, // Classify Quadrilaterals
     'shapes_classify:hotspot_quads': { ccss: ['3.G.A.1'], ee: ['M.EE.3.G.1'] }, // Circle the Quadrilaterals
     'shapes_classify:net_identify': { ccss: ['6.G.A.4'], ee: [] }, // Identify Net of 3D Shape (Visual)
+    'shapes_classify:net_to_solid': { ccss: ['6.G.A.4'], ee: [] }, // Which 3D Shape Does This Net Make? (Visual)
+    'shapes_classify:cube_nets': { ccss: ['6.G.A.4'], ee: [] }, // Find the Nets of a Cube (Click All)
     'shapes_classify:cross_section_3d': { ccss: ['6.G.A.4'], ee: [], approx: true, note: "Cross-sections are CCSS 7.G.A.3 (grade 7); 6.G.4 (nets of 3-D figures) is the closest K-6 standard." }, // Cross-Section of 3D Shape (Visual)
     'shapes_classify:mixed_shapes': { ccss: [], ee: [], pool: true }, // Mixed Shape Classification
 

@@ -661,6 +661,12 @@ export const SKILL_WRM = {
         { step: 'Y2.B3.S3', note: 'vertices' },
         'Y3.B11.S7',
     ],
+    'shapes_early:sort_2d_by_count': [
+        { step: 'Y2.B3.S7', partial: 'selecting every shape with a given number of sides or vertices; no sorting rings or rule naming' },
+    ],
+    'shapes_early:sort_3d_by_count': [
+        { step: 'Y2.B3.S11', partial: 'selecting every shape with a given number of faces or vertices; no sorting rings or rule naming' },
+    ],
     'shapes_early:order_objects_length': ['Y1.B7.S1', 'Y2.B6.S3', 'Y2.B6.S4'],
     'shapes_early:measure_nonstandard': ['Y1.B7.S2'],
     'shapes_early:compose_shapes': [
@@ -744,6 +750,8 @@ export const SKILL_WRM = {
     'shapes_classify:classify_quads': ['Y4.B12.S5'],
     'shapes_classify:hotspot_quads': ['Y4.B12.S5'],
     'shapes_classify:net_identify': ['Y6.B12.S11'],
+    'shapes_classify:net_to_solid': ['Y6.B12.S11', { step: 'Y3.B11.S10', partial: 'matching a net to its shape; no skeleton models' }],
+    'shapes_classify:cube_nets': ['Y6.B12.S11'],
 
     // ---- coordinates
     'coordinates:coordinate_q1': ['Y4.B14.S1', 'Y4.B14.S2', 'Y5.B11.S1', 'Y6.B13.S1'],

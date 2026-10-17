@@ -111,8 +111,14 @@ function bounds(faces) {
     return [x0 * S, y0 * S, x1 * S, y1 * S];
 }
 /** The SVG of a net (an array of faces), sized by `width` (CSS). */
-export function netSVG(faces, width = 'min(150px,100%)') {
-    const [x0, y0, x1, y1] = bounds(faces);
+export function netSVG(faces, width = 'min(150px,100%)', { box = null } = {}) {
+    let [x0, y0, x1, y1] = bounds(faces);
+    // `box` [w, h] in net units: every net of a set is centred in the same frame, so their faces
+    // print at one size (a five-square row is not shrunk to fit beside a cross).
+    if (box) {
+        const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, hw = box[0] * S / 2, hh = box[1] * S / 2;
+        [x0, y0, x1, y1] = [cx - hw, cy - hh, cx + hw, cy + hh];
+    }
     const pad = 4;
     const vb = `${f1(x0 - pad)} ${f1(y0 - pad)} ${f1(x1 - x0 + pad * 2)} ${f1(y1 - y0 + pad * 2)}`;
     const body = faces.map(f => faceSvg(f, `fill="none" stroke="${INK}" stroke-width="4" stroke-linejoin="round" vector-effect="non-scaling-stroke"`)).join('')
@@ -273,7 +279,7 @@ export function netNameItem(q) {
 
 /** "Click ALL the nets that fold to make a cube." — real nets among non-nets. */
 export function cubeNetsItem(q) {
-    const item = (c, ok) => ({ svg: netSVG(cells(c), 'min(130px,100%)'), ok });
+    const item = (c, ok) => ({ svg: netSVG(cells(c), 'min(150px,100%)', { box: [5, 4] }), ok });
     pictureSelect(q, {
         text: 'Click ALL the nets that fold to make a cube.',
         right: CUBE_NETS.map(c => item(c, true)), wrong: CUBE_NON_NETS.map(c => item(c, false)), maxRight: 3,

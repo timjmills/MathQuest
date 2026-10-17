@@ -37,6 +37,12 @@ const STUDENT_DEF_PERIMETER = `<div class="student-def"><b>Perimeter</b> = the t
 // name_2d_shapes / name_3d_shapes: the teacher's ticked "What the items ask" kinds, or null when
 // they are the default (the deal then runs exactly as before, using no random number). Kinds 0
 // and 1 are the naming forms below; 2 and up are the shape-art.js counting / net builders.
+/** One of the ticked "What the items ask" kinds, or of `all` when none is ticked. */
+function _tickedForm(all) {
+    const o = state.skillOptions;
+    const v = o && Array.isArray(o.forms) ? o.forms.filter(x => all.includes(x)) : [];
+    return pick(v.length ? v : all);
+}
 function _shapeForm(dflt) {
     const o = state.skillOptions;
     const v = o && Array.isArray(o.forms) ? o.forms : null;
@@ -46,6 +52,12 @@ function _shapeForm(dflt) {
 
 export function generateGeometryQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
+
+            // ===== SORT BY COUNT / NETS (2026-10-17): the shape-art.js builders as skills of their own =====
+            if (mappedSkill === "sort_2d_by_count") { selectShape2d(q, ['sides', 'vertices'][_tickedForm([0, 1])]); return; }
+            if (mappedSkill === "sort_3d_by_count") { selectSolid(q, ['faces', 'vertices'][_tickedForm([0, 1])]); return; }
+            if (mappedSkill === "net_to_solid") { netNameItem(q); return; }
+            if (mappedSkill === "cube_nets") { cubeNetsItem(q); return; }
 
             // ===== NAME 2D SHAPES — the counting and "with N sides" kinds (options only) =====
             const _f2 = mappedSkill === "name_2d_shapes" ? _shapeForm([0, 1]) : null;
