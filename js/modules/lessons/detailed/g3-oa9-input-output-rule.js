@@ -106,11 +106,11 @@ export default {
 
     // ------------------------------------------------------------------ P0 Prerequisite Check
     prerequisites: [
-        { atom: 1, items: 2, ref: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20 }, minNum: 11, maxNum: 20 },
+        { atom: 1, items: 4, ref: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20, notation: ['across'] }, minNum: 11, maxNum: 20 },
             lesson: { id: '2.OA.B.2', title: 'Add within 20' } },
-        { atom: 2, items: 2, ref: { categoryId: 'subtraction', skillId: 'sub_facts', opts: { band: 20 } },
+        { atom: 2, items: 4, ref: { categoryId: 'subtraction', skillId: 'sub_facts', opts: { band: 20, notation: ['across'] } },
             lesson: { id: '2.OA.B.2', title: 'Subtract within 20' } },
-        { atom: 3, items: 2, ref: { categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: [2, 5, 10] } },
+        { atom: 3, items: 4, ref: { categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: [2, 5, 10], notation: ['across'] } },
             lesson: { id: '3.OA.C.7', title: 'Multiply by 2, 5 and 10' } },
         { atom: 4, items: 1, ref: FT({ ftTask: 'outputs', ftRules: ['+'], support: 'frame-bare' }),
             lesson: { id: '4.OA.C.5', title: 'Use a rule to fill a table' } },
