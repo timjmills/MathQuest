@@ -104,3 +104,15 @@
 - Optional minors (critic r15 M21-M28) and generator bugs (equiv_frac_nv keys equal pairs "no"; denoms filter ignores
   q.cell.payload in generate-question.js itemDenominators) are in the reports and GENERATOR-FIXES-2026-10-16.md.
 - Owner questions with recommendations: Y2-report.md / Y3-report.md.
+## Y6 site lessons — helper session_01LVDoUbPMFjuTAdwUzzWVDL — PASSED 2026-10-17
+- Branch `claude/sweet-newton-c8wrv1-wip-wrm-tag-y6`. Steps/tagFixes FROZEN (identical to base); only a top-level "lessons"
+  section added (24 lessons = the wrmYear Y6 entries of site-lessons.json: 0 full / 20 partial / 4 gap). Tooling moved to
+  tests/scripts/wrm-tagging/Y6/ (R/Y1 shared files stay top-level). Critic r1 FAIL 7.96 (lessons 21, 24), builder r2
+  (lessonspec.py post-finish spec gate, Support above-source-year content, digit/symbol clause reading, Y6 title claims),
+  critic r2 PASS: mean 8.04, min 8. Byte-identical builds; merge with all six other lanes 0 real conflicts, 0 lesson tagFixes.
+- Proposals: 24 used by lessons (9 new; 20 lesson-only with `steps: []` — the WRM_PROPOSALS merge must read `lessons`).
+- Non-blocking (critic r2 G1-G5, n1-n3): gate holes no current data uses; lessonfit not seed-robust on one seed pair
+  (build seeds are fixed, so the build is unaffected); three why wordings. Generator bugs recorded in Y6-report.md
+  (percent_of_number 33% as a third, simplify negative distractors, distributive_expr GCF, …).
+- Owner questions (Y6-report.md "Site lessons"): composite volume W24 before volume W25; braces; Projects 5.OA.A.1
+  placeholder; Support titles that are WRM steps; thousandths_pv WRM_EXTENSIONS text at merge.

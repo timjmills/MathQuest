@@ -9,7 +9,7 @@
 // usage: node linkfit.mjs [--all] [--steps Y6.B1.S2,Y6.B7.S8] [Y6.json]
 const _m = new Map(); globalThis.localStorage = { getItem: k => _m.get(k) ?? null, setItem: (k, v) => _m.set(k, String(v)), removeItem: k => _m.delete(k) };
 globalThis.window = globalThis; globalThis.document = undefined;
-const R = new URL('../../../', import.meta.url).pathname;
+const R = new URL('../../../../', import.meta.url).pathname;
 const g = await import(R + 'js/modules/generate-question.js');
 const fs = await import('fs');
 // prior.json (each step's school week) comes from WRM_TAG_DATA (build.py passes its scratch dir), else it is made in a temp dir
