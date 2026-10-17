@@ -90,7 +90,9 @@ export function frameOf({ skills = [], input = {}, tabId, title, twoLine = false
     const finalTitle = typeof h.title === 'string' && h.title.trim() ? h.title.trim() : derived;
     const strands = [...new Set(words.map((w) => w.strand).filter(Boolean))];
     const level = levelLine(skills.flatMap((s) => s.grades || [s.grade]));
+    // (`tabStrand`: the pack's own strand on every sheet - the detailed lesson maker)
     const tabLines = Array.isArray(h.tab) && h.tab.length ? h.tab.map(String)
+        : h.tabStrand ? [h.tabLevel ? String(h.tabLevel) : level, String(h.tabStrand), tabId]
         : !twoLine && strands.length === 1 ? [level, strands[0], tabId] : [level, tabId];
     const ids = [...new Set(skills.map((s) => s.skillId).filter(Boolean))];
     const idText = ids.length > 3 ? `${ids.slice(0, 3).join(', ')} +${ids.length - 3}` : ids.join(', ');

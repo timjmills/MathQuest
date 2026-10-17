@@ -38,6 +38,9 @@ export const OPTIONAL_MEMBERS = Object.freeze([
     // `stories(q, {seed}) -> Story | null`: an original story carrying ONE item's numbers, with a
     // number + label answer, for the word-problem role (section 3.8; providers/stories.js).
     'stories',
+    // `wrongAnswers(q) -> WrongAnswer[]`: EVERY misconception's wrong answer for one item (the detailed
+    // lesson's Check Question options, 2026-10-16); `wrongAnswer` stays the one a page shows.
+    'wrongAnswers',
 ]);
 
 /* ================================================== the controlled instruction library */
@@ -75,6 +78,14 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'ring-groups': 'Circle groups of {n}. Write how many groups.',
     'groups-of': 'Write how many groups. Write how many in each group.',
     array: 'Write how many rows. Write how many in each row.',
+    'turn-facts': 'Look at the array. Write two facts.',
+    'turn-new': 'Turn the array. Write the new fact.',
+    // (a lesson sheet's Guided header beside its Steps: one line - detailed lesson 3a)
+    'turn-two': 'Write the two facts.',
+    // (detailed lesson 3a r2: the turned array is already drawn - n5; the fact turned with no picture; the P0 array frame)
+    'turn-look': 'Look at the turned array. Write the new fact.',
+    'turn-fact': 'Turn the fact. Write the new fact.',
+    'array-total': 'Write the rows, the number in each row and the total.',
     'skip-count': 'Count by {n}. Write the missing numbers.',
     expanded: 'Write the number in expanded form.',
     'digit-value': 'Write the value of the underlined digit.',
@@ -136,6 +147,10 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'story-k2': 'Solve. Write the number.',
     // Every whole-number word problem (owner ruling 2026-09-25): the word-work cell.
     'story-work': 'Circle the sign. Write the numbers in the boxes. Solve.',
+    // the detailed lesson's word problem page with the RCDWS panel (V22 §9.6, C.1 `story-rcdws`)
+    'story-rcdws': 'Read the story. Draw it. Solve.',
+    // detailed lesson 2 (2026-10-16): the word-work cell's compact bar form (story, bar, answer)
+    'story-bar': 'Read the story. Fill in the bar. Solve.',
     'pick-parts': 'Write one number from each list to make the sum.',
     'fact-family': 'Use the three numbers. Fill in the fact family.',
     'chart-fill': 'Fill in the missing products.',
@@ -180,6 +195,7 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'chart-fill-all': 'Fill in the whole multiplication chart.',
     'chart-headers': 'Fill in the missing row and column numbers.',
     'shade-multiples': 'Shade every multiple of {n}.',
+    'shade-even': 'Shade every even product.',
     'chart-row-rule': 'Fill in the row. Write the rule.',
     'hop-draw': 'Draw the hops on the line. Write the product.',
     'hop-draw-div': 'Draw hops of the number you divide by. Write how many hops.',
@@ -191,6 +207,8 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'place-write': 'Write the place of the underlined digit.',
     'unit-form': 'Write how many of each place.',
     'standard-form': 'Write the number.',
+    // detailed lesson 1 (2026-10-16): composing:number_word_form, numeral to words
+    'number-words': 'Write the number in words.',
     'disk-read': 'Count the disks. Write the number.',
     'disk-count': 'Count the disks in the zone. Write how many.',
     'draw-disks': 'Draw disks to show the number.',

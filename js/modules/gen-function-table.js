@@ -74,13 +74,15 @@ function inputPool(rule, cap) {
 }
 
 /** One rule of the asked kind, inside the band. */
-function makeRule(kind, steps, cap, need) {
+function makeRule(kind, steps, cap, need, factors = null) {
     const hi = (k) => Math.max(2, Math.min(10, Math.floor(cap / Math.max(1, k))));
     if (steps === 1) {
         if (kind === '+' || kind === '-') {
             const top = cap <= 10 ? 5 : cap <= 20 ? 9 : cap <= 50 ? 20 : cap <= 100 ? 30 : Math.floor(cap / 4);
             return [{ op: kind, n: niceAmount(1, Math.max(1, Math.min(top, cap - need)), cap) }];
         }
+        // (`ftFactors` '2-5-10', lesson 5 r2: only the factors the band leaves room for, of 2, 5 and 10)
+        if (factors) { const ok = factors.filter((f) => f <= hi(need)); if (ok.length) return [{ op: kind, n: ok[randInt(0, ok.length - 1)] }]; }
         return [{ op: kind, n: randInt(2, hi(need)) }];
     }
     // Two steps: × or ÷ first, then + or −, so "x × 2 + 1" is read left to right (no brackets).
@@ -157,7 +159,7 @@ export function generateFunctionTable(q, skillId) {
     let rule = null, pool = [];
     const attempt = (k, st) => {
         for (let tries = 0; tries < 40 && !rule; tries++) {
-            const r = makeRule(k, st, cap, need);
+            const r = makeRule(k, st, cap, need, o.ftFactors === '2-5-10' ? [2, 5, 10] : o.ftFactors === '2-3-5-10' ? [2, 3, 5, 10] : null);
             const p = inputPool(r, cap);
             if (p.length >= need) { rule = r; pool = p; }
         }
@@ -170,8 +172,23 @@ export function generateFunctionTable(q, skillId) {
     // The In numbers: distinct, then in order or out of order.
     let xs = [];
     let check = null;
+    // ftTrap (lesson 5): row 1 fits a + rule and a × / ÷ rule, so only the later rows decide.
+    // + d: In d (d → 2d is also × 2); − d: In 2d (2d → d is also ÷ 2); × k / ÷ k: every row also fits
+    // a + / − rule, so row 1 is the smallest In (2 → 4 for × 2).
+    let trapX = null;
+    if (o.ftTrap === true && rule.length === 1 && task !== 'make') {
+        const r0 = rule[0];
+        const want = r0.op === '+' ? r0.n : r0.op === '-' ? 2 * r0.n : r0.op === 'x' ? (pool.includes(r0.n) ? r0.n : pool[0]) : pool[0];
+        if (pool.includes(want) && pool.length >= need) trapX = want;
+    }
     for (let tries = 0; tries < 40; tries++) {
-        const pickd = shuffle(pool.slice()).slice(0, need);
+        let pickd = shuffle(pool.slice()).slice(0, need);
+        if (trapX !== null) {
+            // the trap leads; the rest are bigger when the table runs in order (so it stays row 1)
+            const rest = pool.filter((v) => v !== trapX && (scrambled || v > trapX));
+            const from = rest.length >= need - 1 ? rest : pool.filter((v) => v !== trapX);
+            pickd = [trapX, ...shuffle(from.slice()).slice(0, need - 1)];
+        }
         xs = pickd.slice(0, rowsN);
         const cx = wantCheck ? pickd[rowsN] : null;
         if (scrambled) {
@@ -180,8 +197,10 @@ export function generateFunctionTable(q, skillId) {
                 const asc = xs.every((v, i) => i === 0 || v > xs[i - 1]);
                 const desc = xs.every((v, i) => i === 0 || v < xs[i - 1]);
                 if (!asc && !desc) break;
-                xs = shuffle(xs);
+                xs = trapX !== null ? [trapX, ...shuffle(xs.slice(1))] : shuffle(xs);
             }
+        } else if (trapX !== null) {
+            xs = [trapX, ...xs.slice(1).sort((a, b) => a - b)];
         } else {
             xs.sort((a, b) => a - b);
         }
@@ -211,6 +230,7 @@ export function generateFunctionTable(q, skillId) {
 
     const payload = {
         task, rule, rows, check,
+        ...(trapX !== null ? { trap: true } : {}),
         support: /^line/.test(String(o.support)) ? 'line' : 'frame',
         machine: !/-bare$/.test(String(o.support)) && o.pictures !== false,
     };
@@ -221,6 +241,9 @@ export function generateFunctionTable(q, skillId) {
     try {
         q.visual = renderCell({ cell: q.cell }, { mode: 'screen', static: true, size: 'L', look: 'ican', state: 'blank' });
     } catch (e) { q.visual = ''; }
+    // The page instruction is the item's own task (print-sheet instructionKeyFor reads q.instructionKey first):
+    // a section's strings are otherwise asked without an item and fall back to the skill's default task.
+    q.instructionKey = { outputs: 'table', rule: 'table-rule', inputs: 'table-in', mixed: 'table', make: 'table-make' }[task];
     q.text = INSTRUCTION[task];
     q.printText = INSTRUCTION[task];
     q.ans = parts.join(', ');

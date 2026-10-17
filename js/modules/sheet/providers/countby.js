@@ -310,6 +310,13 @@ const CHART_STEPS = {
         'Shade every box that holds one.',
         'Look at the pattern the shaded boxes make.',
     ],
+    // Lesson 4 (g3-oa9-mult-table-patterns evenSteps): shade every even product.
+    even: [
+        'Find the even row numbers.',
+        'Every box in an even row is even. Shade it.',
+        'Find the even column numbers. Shade those boxes too.',
+        'Both numbers odd? Leave the box white.',
+    ],
     pattern: [
         'Read the row number on the left.',
         'Find how much the row goes up from one column to the next.',
@@ -323,20 +330,23 @@ registerSkill('multiplication:mult_chart_easy', chartProvider());
 
 function chartProvider() {
     return {
-        strings: stringsBy((q) => {
-            const task = chartTask(q);
+        strings: stringsBy((q, ref) => {
+            // A section's strings are asked with the skill's options and no item (roles/practice.js): read its task there.
+            const task = q ? chartTask(q) : (ref && ref.opts && ref.opts.task) || 'fill';
             const complete = q && /whole multiplication chart/i.test(String(q.text || ''));
             return {
-                iCan: task === 'shade' ? 'I Can find the multiples of a number in the chart'
+                iCan: task === 'even' ? 'I Can find even products'
+                    : task === 'shade' ? 'I Can find the multiples of a number in the chart'
                     : task === 'pattern' ? 'I Can find the pattern in a row of the chart'
                         : 'I Can use a multiplication chart to find products',
-                instructionKey: task === 'headers' ? 'chart-headers' : task === 'shade' ? 'shade-multiples' : task === 'pattern' ? 'chart-row-rule'
+                instructionKey: task === 'headers' ? 'chart-headers' : task === 'even' ? 'shade-even' : task === 'shade' ? 'shade-multiples' : task === 'pattern' ? 'chart-row-rule'
                     : complete ? 'chart-fill-all' : 'chart-fill',
                 instructionVars: task === 'shade' ? (item) => ({ n: (item && item.shadeOf) || 2 }) : undefined,
                 steps: CHART_STEPS[task] || CHART_STEPS.fill,
                 say: '__ times __ equals __.',
                 sayValues: (item) => {
                     const t = chartTask(item);
+                    if (t === 'even') return 'An even row or column: the product is even.';
                     if (t === 'shade') return `${item.shadeOf || 2}, ${2 * (item.shadeOf || 2)}, ${3 * (item.shadeOf || 2)}: these are multiples of ${item.shadeOf || 2}.`;
                     if (t === 'pattern') return `The ${item.chartRow} row goes up by ${item.chartRow} each time.`;
                     if (t === 'headers') { const k = listOf(item); return k.length ? `The missing number is ${k[0]}.` : null; }
@@ -345,10 +355,20 @@ function chartProvider() {
                 },
             };
         }),
-        misconceptions: ['read-next-column', 'added', 'next-factor', 'missed-multiple', 'shaded-non-multiple', 'counted-by-one'],
+        misconceptions: ['read-next-column', 'added', 'next-factor', 'missed-multiple', 'shaded-non-multiple', 'counted-by-one', 'row-only', 'odd-odd-shaded'],
         workedSteps: (q) => {
             const task = chartTask(q);
             const key = listOf(q);
+            if (task === 'even') {
+                const p = (q.cell && q.cell.payload) || {};
+                const er = arr(p.rows).filter((v) => v % 2 === 0), ec = arr(p.cols).filter((v) => v % 2 === 0);
+                const want = arr(q.options).filter((o) => o.correct).map((o) => o.label);
+                const out = [];
+                out.push(step(er.length ? `The even row numbers: ${er.join(', ')}. Shade every box in ${er.length > 1 ? 'those rows' : 'that row'}.` : 'No row number is even.', [{ slot: 'even-rows' }]));
+                out.push(step(ec.length ? `The even column numbers: ${ec.join(', ')}. Shade those boxes too.` : 'No column number is even.', [{ slot: 'even-cols' }]));
+                out.push(step(`Both numbers odd? Leave the box white. The even products: ${want.slice(0, 6).join(', ')}${want.length > 6 ? ' …' : '.'}`, [{ slot: 'answer', value: want.join(', ') }, { slot: 'odd-odd' }]));
+                return clampSteps(out);
+            }
             if (task === 'shade') {
                 const n = q.shadeOf || 2;
                 const all = arr(q.options).map((o) => o.label);
@@ -391,6 +411,34 @@ function chartProvider() {
         },
         wrongAnswer: (q) => {
             const task = chartTask(q);
+            if (task === 'even') {
+                const p = (q.cell && q.cell.payload) || {};
+                const opts = arr(q.options);
+                const idOf = new Map(opts.map((o) => [Number(o.label), o.id]));
+                const right = opts.filter((o) => o.correct).map((o) => o.id);
+                const rowsArr = arr(p.rows), colsArr = arr(p.cols);
+                const c = [];
+                // row-only: shaded the even ROWS, left the even columns of the odd rows white
+                const rowSet = new Set(rowsArr.filter((r) => r % 2 === 0).flatMap((r) => colsArr.map((cc) => r * cc)));
+                const rowOnly = opts.filter((o) => rowSet.has(Number(o.label))).map((o) => o.id);
+                if (rowOnly.length && rowOnly.length < right.length) {
+                    c.push({ value: rowOnly, misconception: 'row-only', slot: 'answer', slots: { answer: rowOnly.join(', ') }, explain: 'Shaded the even rows only: an even column makes the product even too.' });
+                }
+                // odd-odd-shaded: shaded a box whose row and column numbers are both odd
+                const oddR = rowsArr.filter((r) => r % 2 === 1), oddC = colsArr.filter((cc) => cc % 2 === 1);
+                // (lesson 4 critic r1 D7: the pupil who holds "odd x odd is even" shades EVERY odd x odd box - so every box)
+                const ooIds = [...new Set(oddR.flatMap((r) => oddC.map((cc) => r * cc)))].filter((v) => idOf.has(v)).map((v) => idOf.get(v));
+                if (ooIds.length) {
+                    const all = right.concat(ooIds);
+                    c.push({ value: all, misconception: 'odd-odd-shaded', slot: 'answer', slots: { answer: all.join(', ') }, explain: 'Shaded the odd x odd boxes too: both numbers odd, so the product is odd.' });
+                }
+                const w = chooseWrong(q, c);
+                if (w) {
+                    const lab = new Map(opts.map((o) => [o.id, o.label]));
+                    w.display = (Array.isArray(w.value) ? w.value : []).map((id) => lab.get(id)).join(', ');
+                }
+                return w;
+            }
             if (task === 'shade') {
                 const opts = arr(q.options);
                 const right = opts.filter((o) => o.correct).map((o) => o.id);

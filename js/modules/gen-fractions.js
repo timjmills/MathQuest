@@ -153,6 +153,10 @@ function _fDenFilter(list, getD, min = 1) {
     const ok = list.filter(x => denomAllowed(getD(x), fams));
     return ok.length >= min ? ok : list;
 }
+// P12 `forms` read by the generator itself: is form `i` allowed (untouched, or ticked)? Is it
+// the only one ticked?
+function _fFormOn(i) { const t = _fChanged('forms'); return !t || t.includes(i); }
+function _fFormOnly(i) { const t = _fChanged('forms'); return !!t && t.length === 1 && t[0] === i; }
 // The same for a list of denominator pairs ({d1, d2} or [d1, d2]): both must be in a ticked family.
 function _fDenPairs(pairs) {
     const fams = _fChanged('denoms');
@@ -2292,7 +2296,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Decompose Frac";
                 return;
 
-            } else if (fracSkill === "frac_10_100_nv" && Math.random() < 0.25) {
+            } else if (fracSkill === "frac_10_100_nv" && _fFormOn(3) && (_fFormOnly(3) || Math.random() < 0.25)) {
                 // Phase 4.5 batch 9: multi-select-check variant — same as frac_10_100 but for NV
                 const targetN100 = pick([5, 7, 10, 15, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90]);
                 const decStr = targetN100 < 10 ? `0.0${targetN100}` : `0.${targetN100 < 100 && targetN100 % 10 === 0 ? targetN100 / 10 : targetN100}`;
@@ -2339,7 +2343,12 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
             } else if (fracSkill === "frac_10_100_nv") {
                 // Grade 4: Fractions with denominators 10 and 100 (no visual)
                 // LRU rotation across 3 sub-types (was Math.random() chain).
-                const roll = (typeof window !== 'undefined' && window.pickVariant)
+                // P12 `forms` (0 write as hundredths, 1 missing numerator, 2 add, 3 click-all): the
+                // rotation would deal the same unticked kind on every redraw, so pick from the ticked ones.
+                const _f10 = _fChanged('forms');
+                const _f10Rolls = _f10 ? ["type1", "type2", "type3"].filter((_, i) => _f10.includes(i)) : [];
+                const roll = _f10Rolls.length ? pick(_f10Rolls)
+                    : (typeof window !== 'undefined' && window.pickVariant)
                     ? window.pickVariant('frac_10_100_nv', ["type1","type2","type3"])
                     : (Math.random() < 0.5 ? 'type1' : (Math.random() < 0.5 ? 'type2' : 'type3'));
                 q._variant = roll;
@@ -4372,9 +4381,9 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         const distractor = strategy.fn();
                         efnvNum2 = Math.max(1, Math.min(distractor.d - 1, distractor.n));
                         efnvDen2 = Math.max(2, distractor.d);
-                        if (efnvNum2 / efnvDen2 === efnvBaseNum / efnvBaseDen) {
-                            efnvNum2 = Math.max(1, Math.min(efnvDen2 - 1, efnvNum2 + 1));
-                        }
+                        // Clamping can land back on an equivalent pair (e.g. 1/2 vs 2/2 -> 1/2): move the
+                        // denominator until the cross products differ, so the key's "no" is true.
+                        while (efnvNum2 * efnvBaseDen === efnvBaseNum * efnvDen2) efnvDen2++;
                         // Correct answer is "no"; "yes" is the wrong pick — tag it.
                         if (typeof window !== 'undefined' && typeof window.tagDistractor === 'function') {
                             window.tagDistractor(q, "yes", strategy.msg);
@@ -5798,7 +5807,10 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 let simpAttempts = 0;
                 while (wrongs.size < 3 && simpAttempts < 30) {
                     simpAttempts++;
-                    const wrongSimp = simplifyFraction(rawNum + randInt(-3,3), rawDen);
+                    // A plausible slip: a numerator one to three off, never zero or negative.
+                    const wrongNum = rawNum + pick([-3, -2, -1, 1, 2, 3]);
+                    if (wrongNum < 1) continue;
+                    const wrongSimp = simplifyFraction(wrongNum, rawDen);
                     if (wrongSimp !== q.ans) wrongs.add(wrongSimp);
                 }
                 q.options = shuffle([q.ans, ...wrongs]);
@@ -6953,7 +6965,7 @@ export function generateConversionsQuestion(q, mappedSkill, helpers) {
                     { pct: 25, base: 40, ans: 10 }, { pct: 25, base: 80, ans: 20 }, { pct: 25, base: 120, ans: 30 },
                     { pct: 50, base: 36, ans: 18 }, { pct: 50, base: 48, ans: 24 }, { pct: 50, base: 90, ans: 45 },
                     { pct: 75, base: 40, ans: 30 }, { pct: 75, base: 80, ans: 60 }, { pct: 75, base: 120, ans: 90 },
-                    { pct: 33, base: 30, ans: 10 }, { pct: 33, base: 60, ans: 20 }, { pct: 33, base: 90, ans: 30 },
+                    { pct: 30, base: 30, ans: 9 }, { pct: 30, base: 60, ans: 18 }, { pct: 30, base: 90, ans: 27 },
                     { pct: 15, base: 60, ans: 9 }, { pct: 40, base: 50, ans: 20 }, { pct: 60, base: 50, ans: 30 }
                 ];
                 const combo = pick(combos);

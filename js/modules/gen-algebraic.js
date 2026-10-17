@@ -2544,8 +2544,28 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                     return String(n);
                 };
 
-                const maxNum = Math.max(10, Math.min(range, 9999));
-                const num = rng(10, maxNum);
+                // `band` (0 = the Max Number setting, the old behaviour) and `zeroPlace` bound the
+                // number itself: band 1000 deals 101-1,000, band 100 deals 21-100, band 20 deals 11-20.
+                const wfO = state.skillOptions || {};
+                const wfBand = [20, 100, 1000].includes(Number(wfO.band)) ? Number(wfO.band) : 0;
+                let num;
+                if (wfBand) {
+                    const lo = wfBand === 1000 ? 101 : wfBand === 100 ? 21 : 11;
+                    const k = Number.isFinite(state.itemIndex) ? state.itemIndex : 0;
+                    const wantZero = wfBand >= 100 && (wfO.zeroPlace === 'always' || (wfO.zeroPlace === 'some' && k % 3 === 2));
+                    num = rng(lo, wfBand);
+                    // A zero place: a 0 in the ones (or, at 1,000, the tens) - dealt, not hoped for.
+                    if (wantZero && !(wfBand === 1000 && num === 1000)) {
+                        if (wfBand === 100) num = Math.max(30, Math.floor(num / 10) * 10);
+                        // (1,000 is the band's own zero-place case: 0 hundreds, 0 tens, 0 ones - one zero item in four)
+                        else if (rng(0, 3) === 0) num = 1000;
+                        // (the 0 alternates: a 0 in the tens, then a 0 in the ones - both cases on every page)
+                        else num = Math.floor(num / 100) * 100 + (Math.floor(k / 3) % 2 === 0 ? rng(1, 9) : rng(1, 9) * 10);
+                    }
+                } else {
+                    const maxNum = Math.max(10, Math.min(range, 9999));
+                    num = rng(10, maxNum);
+                }
                 const wordForm = numberToWordForm(num);
                 // Which way round is DEALT off state.itemIndex, not rolled: see wordFormWay() at
                 // the top of this file. An LRU rotation still changed the task between cells of
@@ -2569,6 +2589,11 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                     q.options = buildNumericOptions(num);
                 }
                 q.skillLabel = 'Word Form';
+                // The kit cell (detailed lesson 1, 2026-10-16): the same item drawn by the `words`
+                // template on paper and screen; the legacy visual below stays for the old print path.
+                q.pv = { kind: 'words', n: num, words: wordForm, way: mode };
+                q.instructionKey = mode === 'to_words' ? 'number-words' : 'standard-form';
+                q.cell = { template: 'words', payload: Object.assign({ n: num, words: wordForm, way: mode, ans: mode === 'to_words' ? wordForm : String(num) }, mode !== 'to_words' && wfO.answerSlot === 'hto' && num <= 1000 ? { slot: 'hto' } : {}) };
 
                 // Place value chart visual
                 const digits = num.toString().split('');
@@ -3830,9 +3855,12 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
             if (algSkill === "distributive_expr") {
                 if (Math.random() < 0.4) {
                     // Factor out the GCF variant
+                    // The inner terms must be coprime, or gcf is only A common factor, not the greatest
+                    // (2 * 6x + 2 * 9 = 12x + 18 factors by 6, not 2).
                     const gcf = pick([2, 3, 4, 5]);
-                    const inA = randInt(2, 6);
-                    const inB = randInt(2, 6);
+                    const _g = (a, b) => (b ? _g(b, a % b) : a);
+                    let inA = randInt(2, 6), inB = randInt(2, 6);
+                    while (_g(inA, inB) !== 1) { inA = randInt(2, 6); inB = randInt(2, 6); }
                     const aTotal = gcf * inA;
                     const bTotal = gcf * inB;
                     q.text = `Factor out the GCF: ${aTotal}x + ${bTotal}`;

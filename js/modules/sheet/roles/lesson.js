@@ -50,8 +50,11 @@ import {
 } from './compose.js';
 import { resolveCtx, numeralTracksHTML } from '../index.js';
 import { workedStepsOf, stepTemplateOf, unslot, easeScore, stepLines } from '../anchors.js';
+import { evenGridState, factGridMini } from '../cells/mult-grid.js';
 import { dotTile, countCueOf, countCueRow } from './guided.js';
 import { stepIcon, iconForText } from '../lesson-icons.js';
+import { numberWords } from '../cells/words.js';
+import { barMini } from '../cells/word-work.js';
 
 export const ROLE_ID = 'lesson';
 /**
@@ -164,6 +167,20 @@ const sigOf = (it) => {
 };
 const digitsOfOps = (it) => operandsOf((it && it.q) || {}).map((v) => String(Math.abs(Math.trunc(v))).length).join(',');
 
+/** Two mult-grid windows that share a box, a turned box counted (lesson 4 critic r1 D5): never on one page. */
+const winBoxes = (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'mult-grid' && c.payload; const o = new Set();
+    if (p && Array.isArray(p.rows) && Array.isArray(p.cols)) for (const r of p.rows) for (const k of p.cols) o.add(`${Math.min(r, k)},${Math.max(r, k)}`); return o; };
+export const winShare = (x, y) => { const A = winBoxes(x); if (!A.size) return false; for (const b of winBoxes(y)) if (A.has(b)) return true; return false; };
+/** A mult-grid window's {rows, cols} (detailed lesson 4), else null. */
+const multGridOf = (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'mult-grid' && c.payload; if (!p || !Array.isArray(p.rows) || !Array.isArray(p.cols)) return null; const g = { rows: p.rows.map(Number), cols: p.cols.map(Number) }; return g.rows.concat(g.cols).every((v) => v >= 2 && v <= 12) ? g : null; };
+// (no 1 and no 10 in a lesson 4 window: x 1 is the other number, x 10 ends in 0 - both give the parity away)
+/** A one-step find-the-rule function table's {op, k, x1} (detailed lesson 5), else null. */
+const ftRuleOf = (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'function-table' && c.payload; if (!p || p.task !== 'rule' || !Array.isArray(p.rule) || p.rule.length !== 1 || !Array.isArray(p.rows) || p.rows.length < 3) return null; return { op: p.rule[0].op, k: Number(p.rule[0].n), x1: Number(p.rows[0].x), y1: Number(p.rows[0].y), yMin: Math.min(...p.rows.map((r) => Number(r.y))) }; };
+/** Row 1 of a + table fits no taught × rule (x 2, x 5, x 10): 2 -> 10 is also x 5 (lesson 5 r3, critic D2). */
+const ftPlainFirst = (p) => ![2, 3, 5, 10].some((m) => p.x1 * m === p.y1);
+/** An arrays-turn payload's {rows, cols} (detailed lesson 3a), else null. */
+const arrTurnOf = (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'arrays-turn' && c.payload; return p ? { rows: Number(p.rows), cols: Number(p.cols) } : null; };
+
 /**
  * The named cases a lesson's examples are chosen by (lesson data `example.test`, `second.test`):
  * the chart models BOTH cases the practice pages deal (lessons r1).
@@ -183,7 +200,151 @@ export const CASE_TESTS = Object.freeze({
         const n = c && c.payload ? Number(c.payload.n) : NaN;
         return roundRest(it) !== null && (Number(c.payload.place) || 10) === 10 && n >= 95 && n <= 99;
     },
+    // The detailed lesson maker (numbers to 1,000, 2026-10-16): a 3-digit place-value item with no
+    // 0 place, a 0 in the tens, a 0 in the ones (lessons/detailed/g2-nbt3-read-write-1000.js).
+    // (no 0 place and no teen ending: the plain case - critic D14)
+    pvNoZero: (it) => { const n = pvNumberOf(it); return n !== null && n >= 100 && n <= 999 && !String(n).includes('0') && Math.floor(n / 10) % 10 !== 1; },
+    pvThousand: (it) => pvNumberOf(it) === 1000,
+    // (a chart model: no 0, no teen, three different digits - critic r2: which 5 made which word?)
+    pvPlain: (it) => { const n = pvNumberOf(it); return n !== null && n >= 100 && n <= 999 && !String(n).includes('0') && Math.floor(n / 10) % 10 !== 1 && new Set(String(n)).size === 3; },
+    pvZeroTens: (it) => { const n = pvNumberOf(it); return n !== null && n >= 100 && n <= 999 && Math.floor(n / 10) % 10 === 0 && n % 10 !== 0; },
+    pvZeroOnes: (it) => { const n = pvNumberOf(it); return n !== null && n >= 100 && n <= 999 && n % 10 === 0 && Math.floor(n / 10) % 10 !== 0; },
+    pvTeen: (it) => { const n = pvNumberOf(it); return n !== null && n >= 100 && n <= 999 && Math.floor(n / 10) % 10 === 1 && n % 10 !== 0; },
+    // an edge case of numbers to 1,000: a 0 place, a teen ending, or 1,000 itself
+    // The detailed lesson maker, lesson 2 (put together / add to within 20, RESEARCH.md): two parts.
+    // The detailed lesson maker, lesson 3a (turn an array, 3.OA.B.5): an arrays-turn payload.
+    // arrTurn: non-square, no repeated digit across rows, cols and product (which 3 was which?).
+    arrTurn: (it) => { const p = arrTurnOf(it); return !!p && p.rows !== p.cols && p.rows >= 2 && p.cols >= 2 && new Set(`${p.rows}${p.cols}${p.rows * p.cols}`).size === `${p.rows}${p.cols}${p.rows * p.cols}`.length; },
+    // (any non-square array: the pack's other pictured items - only five arrays to 5 x 5 pass arrTurn)
+    arrNonSq: (it) => { const p = arrTurnOf(it); return !!p && p.rows !== p.cols && p.rows >= 2 && p.cols >= 2; },
+    arrSquare: (it) => { const p = arrTurnOf(it); return !!p && p.rows === p.cols && p.rows >= 2; },
+    arrFive: (it) => { const p = arrTurnOf(it); return !!p && p.rows !== p.cols && (p.rows === 5 || p.cols === 5); },
+    // (a facts-only turn that asks for the factor: 6 x [ ] = 24)
+    arrFactor: (it) => { const c = it && it.q && it.q.cell; return !!arrTurnOf(it) && CASE_TESTS.arrNonSq(it) && c.payload.type === 'missing' && c.payload.ask === 'factor'; },
+    arrProduct: (it) => { const c = it && it.q && it.q.cell; return !!arrTurnOf(it) && CASE_TESTS.arrNonSq(it) && c.payload.type === 'missing' && c.payload.ask !== 'factor'; },
+    // (a facts-only square that asks for the factor: 9 x [ ] = 81 - the product alone would be a giveaway)
+    arrSquareFactor: (it) => { const c = it && it.q && it.q.cell; return CASE_TESTS.arrSquare(it) && c.payload.type === 'missing' && c.payload.ask === 'factor'; },
+    arrEdge: (it) => CASE_TESTS.arrSquare(it) || CASE_TESTS.arrFive(it),
+    arrAny: (it) => !!arrTurnOf(it),
+    // (the chart's example: plain digits and at most 4 by 4)
+    arrTurnSmall: (it) => CASE_TESTS.arrTurn(it) && CASE_TESTS.arrSmall(it),
+    // (Practice 1, lesson 3a: every place a square, 2 rows of 5 or 5 rows; its last row a big square and 5 rows)
+    arrNoSmall: (it) => { const p = arrTurnOf(it); return !!p && (p.rows === p.cols || p.rows === 5 || (p.rows === 2 && p.cols === 5)); },
+    arrBigSquare: (it) => { const p = arrTurnOf(it); return !!p && p.rows === p.cols && p.rows >= 4; },
+    arrFiveRows: (it) => { const p = arrTurnOf(it); return !!p && p.rows === 5 && p.cols !== 5; },
+    // (4 rows of 5 or 5 rows of 4: the widest array - a lesson sheet's second Guided cell)
+    arrFourFive: (it) => { const p = arrTurnOf(it); return !!p && p.rows * p.cols === 20; },
+    // (a non-square array at most 4 by 4: two of them and their turns stack on a lesson sheet)
+    arrSmall: (it) => { const p = arrTurnOf(it); return !!p && CASE_TESTS.arrNonSq(it) && p.rows <= 4 && p.cols <= 4; },
+    // (lesson 3a r2: the pack's six non-square arrays to 5 x 5 are spent once each (LR-5, critic D6): the chart and
+    // Guided cell 1 two of 2 x 3, 2 x 4, 3 x 4 (both products; the first factor never 4, n2), Guided cell 2 4 x 5 (the
+    // known fact in three boxes - the Practice 1 response, D2), Practice 1 the rest and the 5s)
+    arrBothChart: (it) => { const p = arrTurnOf(it); return !!p && it.q.cell.payload.type === 'both' && CASE_TESTS.arrTurnSmall(it) && p.rows !== 4; },
+    arrSmallBoth: (it) => { const p = arrTurnOf(it); return !!p && it.q.cell.payload.type === 'both' && CASE_TESTS.arrSmall(it) && p.rows !== 4; },
+    arrKnownG: (it) => { const p = arrTurnOf(it); return !!p && it.q.cell.payload.type === 'known' && p.rows * p.cols === 20; },
+    // (Practice 1, critic D1: row 1 two non-squares - one with no 5, and 2 rows of 5 -, the last row the one square,
+    // 4 x 4, and 5 rows of 3: the 5s spent where they teach)
+    // (r4, critic r2 m1: row 1 2 x 4 and 3 x 5 - no first factor twice in a row -, the last row 4 x 4 and 5 rows of 2)
+    arrP1: (it) => { const p = arrTurnOf(it); return !!p && ((CASE_TESTS.arrNonSq(it) && p.rows !== 5 && p.cols !== 5) || (p.rows === 3 && p.cols === 5) || (p.rows === 5 && p.cols === 2) || CASE_TESTS.arrBigSquare(it)); },
+    // The detailed lesson maker, lesson 4 (even products, 3.OA.D.9): a mult-grid shading window.
+    // chartMixed: even and odd rows AND even and odd columns (every case on one window).
+    // (lesson 4 r3: the chart example stays on the 2-9 chart; the Check Question shows the 11 / 12 rows first, critic r1 D3)
+    chartExample: (it) => CASE_TESTS.chartMixed(it) && CASE_TESTS.chartIn9(it) && CASE_TESTS.chartOddOdd(it),
+    chartEleven: (it) => { const p = multGridOf(it); return !!p && CASE_TESTS.chartMixed(it) && p.rows.concat(p.cols).some((v) => v >= 11); },
+    // (the ★★★ last row, critic r1 D5: the "tens digit decides" trap - two even products with an odd tens digit, 36 56 72 -
+    // or an odd x odd product of 35 or more; the rows above hold neither)
+    // (r4, lead ruling: a REAL trap - even products in the 30s, 50s, 70s or 90s; 12 or 16 is no trap, every window holds one)
+    chartTrap: (it) => { const p = multGridOf(it); if (!p) return false; const pr = [...new Set(p.rows.flatMap((r) => p.cols.map((c) => r * c)))]; return pr.filter((v) => v % 2 === 0 && v >= 30 && Math.floor(v / 10) % 2 === 1).length >= 2; },
+    // (the row-only mistake shows on it: an odd row's even box whose product no even row holds)
+    chartRowOnly: (it) => { const p = multGridOf(it); if (!p) return false; const er = new Set(p.rows.filter((r) => r % 2 === 0).flatMap((r) => p.cols.map((c) => r * c)));
+        return p.rows.some((r) => r % 2 === 1 && p.cols.some((c) => c % 2 === 0 && !er.has(r * c))); },
+    chartEdge: (it) => CASE_TESTS.chartTrap(it) || CASE_TESTS.chartBigOdd(it),
+    chartIn9: (it) => { const p = multGridOf(it); return !!p && p.rows.concat(p.cols).every((v) => v <= 9); },
+    // (an exit / Check Question window, lesson 4 r3: the 10 row may show there - the pool of fresh windows needs it)
+    // (an exit / Check Question window, lesson 4 r2: fresh windows need the 11 and 12 rows - no 1, no 10; the 2-9 chart
+    // is spent by the lesson's own pages. The rule is the same; the numbers are new: transfer.)
+    // (products to 100 on the lesson pages; an exit / Check Question window may reach 12 x 12 - its products are printed)
+    // (a Practice window, lesson 4 r3: 2-12, the 10 row allowed, products to 100 - six windows that share no box need the room)
+    chartTo100: (it) => { const p = multGridOf(it); return !!p && Math.max(...p.rows) * Math.max(...p.cols) <= 100; },
+    chartFresh: (it) => { const p = multGridOf(it); return !!p && !p.rows.concat(p.cols).includes(10) && Math.max(...p.rows) * Math.max(...p.cols) <= 100; },
+    chartMixed: (it) => { const p = multGridOf(it); return !!p && [p.rows, p.cols].every((l) => l.some((v) => v % 2 === 0) && l.some((v) => v % 2 === 1)); },
+    // evenColOnly: more odd rows than even ones, so most even products come from an even COLUMN (the Critical Atom).
+    evenColOnly: (it) => { const p = multGridOf(it); return !!p && CASE_TESTS.chartMixed(it) && p.rows.filter((v) => v % 2 === 1).length > p.rows.filter((v) => v % 2 === 0).length; },
+    // chartOddOdd: an odd x odd box whose product is two-digit (both 3 or more: 3 x 7 = 21, not 1 x 9).
+    chartOddOdd: (it) => { const p = multGridOf(it); return !!p && p.rows.some((r) => r % 2 === 1 && r >= 3 && p.cols.some((c) => c % 2 === 1 && c >= 3 && r * c >= 10)); },
+    // chartBigOdd: an odd x odd product of 55 or more (7 x 9 = 63, 11 x 5) - the ★★★ last row.
+    chartBigOdd: (it) => { const p = multGridOf(it); return !!p && p.rows.some((r) => r % 2 === 1 && p.cols.some((c) => c % 2 === 1 && r * c >= 55)); },
+    // chartColsOdd: more odd columns than even ones, so most even products come from an even ROW.
+    // chartColsEven: more even columns than odd ones (2 x 3: even-odd-even) - the odd row's even boxes carry it.
+    chartColsEven: (it) => { const p = multGridOf(it); return !!p && CASE_TESTS.chartMixed(it) && p.cols.filter((v) => v % 2 === 0).length > p.cols.filter((v) => v % 2 === 1).length; },
+    chartColsOdd: (it) => { const p = multGridOf(it); return !!p && CASE_TESTS.chartMixed(it) && p.cols.filter((v) => v % 2 === 1).length > p.cols.filter((v) => v % 2 === 0).length; },
+    // (a x fact with no factor 0 or 1 - lesson 3a r2's spaced retrieval: x 1 and x 0 are lesson 3b)
+    factNoZeroOne: (it) => { const o = operandsOf((it && it.q) || {}).map(Number); return o.length >= 2 && o.every((v) => Number.isFinite(v) && v >= 2); },
+    // (Practice 2, lesson 3a r2, critic D6: no factor 2 - the Prerequisite Check's x 2 facts)
+    arrP2: (it) => { const p = arrTurnOf(it); return !!p && p.rows >= 3 && p.cols >= 3; },
+    // (exit c, lesson 3a r2, critic D4: the missing factor of a non-square fact with no factor 2)
+    arrFactorP2: (it) => CASE_TESTS.arrFactor(it) && CASE_TESTS.arrP2(it),
+    arrProductP2: (it) => { const p = arrTurnOf(it); return CASE_TESTS.arrProduct(it) && CASE_TESTS.arrP2(it) && p.rows !== 4; },
+    // (exit a, lesson 3a r2: a known fact with no arrays - nothing to recount)
+    arrKnownBare: (it) => { const p = arrTurnOf(it); return !!p && CASE_TESTS.arrNonSq(it) && it.q.cell.payload.type === 'known' && it.q.cell.payload.draw === 'none' && p.rows >= 3 && p.cols >= 3; },
+    // (P5, lesson 3a r2, critic D5: 5 rows of 6-9 - a count by 5 - and the turned fact's missing factor)
+    arrWpTurn: (it) => { const p = arrTurnOf(it); return !!p && CASE_TESTS.arrFactor(it) && p.rows === 5 && p.cols >= 6; },
+    // (a Prerequisite Check array, lesson 3a r2: a square - the pack's few non-square arrays are the lesson's)
+    arrGridSquare: (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'arrays' && c.payload; return !!p && Number(p.rows) === Number(p.cols); },
+    wpBridge: (it) => { const o = wpParts(it); return !!o && o[0] >= 2 && o[1] >= 2 && o[0] <= 9 && o[1] <= 9 && o[0] + o[1] >= 11; },
+    wpBridgeBigFirst: (it) => { const o = wpParts(it); return !!o && CASE_TESTS.wpBridge(it) && o[0] > o[1]; },
+    wpBridgeSmallFirst: (it) => { const o = wpParts(it); return !!o && CASE_TESTS.wpBridge(it) && o[0] < o[1]; },
+    // (a bridge whose whole is 14+: counting on past 10 by 4 or more - where the count slip shows)
+    wpBridgeHigh: (it) => { const o = wpParts(it); return !!o && CASE_TESTS.wpBridge(it) && o[0] + o[1] >= 14 && o[0] !== o[1]; },
+    wpEqual: (it) => { const o = wpParts(it); return !!o && o[0] === o[1] && o[0] >= 2; },
+    wpWhole20: (it) => { const o = wpParts(it); return !!o && o[0] + o[1] === 20 && o[0] >= 2 && o[1] >= 2 && o[0] !== o[1] && o[0] !== 10; },
+    wpEdge: (it) => CASE_TESTS.wpEqual(it) || CASE_TESTS.wpWhole20(it),
+    wpSixSeven: (it) => { const o = wpParts(it); return !!o && o[0] === 6 && o[1] === 7; },
+    wpNineFour: (it) => { const o = wpParts(it); return !!o && o[0] === 9 && o[1] === 4; },
+    wpAddTo: (it) => { const o = wpParts(it); return !!o && /\bmore\b/i.test(String((it && it.q && it.q.text) || '')) && o[0] > o[1]; },
+    // (lesson 2 r4, critic r2 D1/D4: the story's SITUATION, read from its own words - add to: one
+    // person "gets ... more", "now"; put together: two people, "in all", nothing more)
+    wpAddToAny: (it) => { const t = String((it && it.q && it.q.text) || ''); return !!wpParts(it) && /\bmore\b/i.test(t) && /\bnow\b/i.test(t); },
+    wpPutTogether: (it) => { const t = String((it && it.q && it.q.text) || ''); return !!wpParts(it) && /\bin all\b/i.test(t) && !/\bmore\b/i.test(t); },
+    // (exit slip, critic r3 D3: no part is the difference of the parts - 4 + 8 written 8 − 4 = 4 copies a story number)
+    wpClean: (it) => { const o = wpParts(it); return !!o && o[0] !== 2 * o[1] && o[1] !== 2 * o[0]; },
+    wpBridgePT: (it) => CASE_TESTS.wpBridge(it) && CASE_TESTS.wpPutTogether(it) && !CASE_TESTS.wpEqual(it),
+    wpBridgeSmallFirstAT: (it) => CASE_TESTS.wpBridgeSmallFirst(it) && CASE_TESTS.wpAddToAny(it),
+    wpBridgeBigFirstPT: (it) => CASE_TESTS.wpBridgeBigFirst(it) && CASE_TESTS.wpPutTogether(it),
+    pvEdge: (it) => { const n = pvNumberOf(it); return n !== null && (n === 1000 || (n >= 100 && (Math.floor(n / 10) % 10 === 0 || n % 10 === 0 || Math.floor(n / 10) % 10 === 1))); },
+    // The detailed lesson maker, lesson 5 (find the rule, 3.OA.D.9): a one-step find-the-rule table.
+    // + / − / × with a plain first row (+: not 1 -> 1 + k, which is also x (1 + k)); the trap:
+    // a × table whose first row is k → k × k (2 → 4: + 2 or × 2), so only row 2 decides.
+    ftAdd: (it) => { const p = ftRuleOf(it); return !!p && p.op === '+' && p.k >= 2 && p.k <= 10 && p.x1 >= 2 && ftPlainFirst(p); },
+    ftSub: (it) => { const p = ftRuleOf(it); return !!p && p.op === '-' && p.k >= 2 && p.k <= 10 && p.y1 >= 1 && p.yMin >= 1 && p.x1 !== 2 * p.k; },
+    // (any × table is the trap: its row 1 also fits a + rule, so only row 2 decides - the Critical Atom; lesson 5 r3)
+    ftTimes: (it) => { const p = ftRuleOf(it); return !!p && p.op === 'x' && [2, 3, 5, 10].includes(p.k) && p.x1 >= 2; },
+    ftTimesTrap: (it) => CASE_TESTS.ftTimes(it),
+    // (an edge of − : a row whose Out is 0)
+    ftSubZero: (it) => { const p = ftRuleOf(it); return !!p && p.op === '-' && p.k >= 2 && p.k <= 10 && p.yMin === 0; },
+    // (a fact with both factors 10 or less - lesson 5 r3, the Prerequisite Check's x 2 / x 5 / x 10 facts: not 2 x 11)
+    factTen: (it) => { const o = operandsOf((it && it.q) || {}).map(Number); return o.length >= 2 && o.every((v) => v >= 1 && v <= 10); },
+    // (no two Ins back to back - lesson 5 r4, critic r2 n14: testing row 3 after row 2 is then a real test)
+    ftSpread: (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'function-table' && c.payload; if (!p || !Array.isArray(p.rows)) return false; const xs = p.rows.map((r) => Number(r.x)).sort((a, b) => a - b); return xs.every((v, i) => !i || v - xs[i - 1] >= 2); },
+    ftEdge: (it) => CASE_TESTS.ftTimes(it) || CASE_TESTS.ftSubZero(it),
+    ftLessonAny: (it) => CASE_TESTS.ftAdd(it) || CASE_TESTS.ftSub(it) || CASE_TESTS.ftTimes(it),
+    ftPracticeAny: (it) => CASE_TESTS.ftAdd(it) || CASE_TESTS.ftSub(it) || CASE_TESTS.ftEdge(it),
 });
+
+/** A two-part story's parts [a, b] as numbers, or null. */
+function wpParts(it) {
+    const o = operandsOf((it && it.q) || {}).map(Number);
+    return o.length >= 2 && o.every(Number.isFinite) ? o : null;
+}
+
+/** A place-value item's number (its `q.pv.n` or cell payload `n`), or null. */
+function pvNumberOf(it) {
+    const q = (it && it.q) || {};
+    let v = q.pv && q.pv.n !== undefined ? q.pv.n : q.cell && q.cell.payload ? q.cell.payload.n : undefined;
+    // (a numeral answer - "Write the number." from expanded form or words - is the item's number)
+    if ((v === undefined || v === null) && /^\d{1,4}$/.test(String(q.ans === undefined ? '' : q.ans).trim())) v = Number(q.ans);
+    return Number.isFinite(Number(v)) && v !== undefined && v !== null ? Number(v) : null;
+}
 
 /** A rounding item's ones digit on the tenths scale of its place (0-9), or null. */
 function roundRest(it) {
@@ -273,7 +434,9 @@ export function pickWeDo(items, example, data, n) {
     const re = data && data.example && data.example.match ? new RegExp(data.example.match, 'i') : null;
     const ex = sigOf(example);
     const shape = digitsOfOps(example);
-    const rest = items.filter((it) => sigOf(it) !== ex);
+    // (an array's turn draws the example's own two arrays - lesson 3a: never a Guided cell)
+    const exT = arrTurnOf(example);
+    const rest = items.filter((it) => sigOf(it) !== ex && !(exT && arrTurnOf(it) && arrTurnOf(it).rows === exT.cols && arrTurnOf(it).cols === exT.rows));
     const pref = data && data.example && data.example.prefer ? new RegExp(data.example.prefer) : null;
     const same = rest.filter((it) => (!re || re.test(workedStepsOf(it).map((s) => s.text).join(' '))) && digitsOfOps(it) === shape);
     // The Steps beside the cells are the example's steps: a Guided cell first works the SAME
@@ -285,6 +448,31 @@ export function pickWeDo(items, example, data, n) {
     const liked = pref ? same.filter((it) => pref.test(String((it.q && it.q.text) || ''))) : [];
     let order = [...new Set([...liked.filter((it) => !kind || sameKind.includes(it)), ...same.filter((it) => sameKind.includes(it)), ...sameKind,
         ...liked, ...same, ...rest])];
+    // (`guidedWants` - the detailed lesson maker, lesson 2: the Guided cells' cases, in order, first)
+    if (data && Array.isArray(data.guidedWants)) {
+        const lead = [];
+        // (lesson 2 r4, LR-6: a later Guided case is never a near twin of an earlier one - 7 + 9 then 7 + 8 -
+        // nor the same answer; a + item only, so other lessons' wants pick as before)
+        const plus = (x) => { const q = (x && x.q) || {}; const st = q.cell && q.cell.payload && (q.cell.payload.steps || [])[0]; const o = operandsOf(q).map(Number); return (q.op === '+' || (st && st.op === '+')) && o.length >= 2 ? o : null; };
+        const twin = (x, y) => { const a = plus(x), b = plus(y); if (!a || !b) return false; const da = Math.abs(a[0] - b[0]), db = Math.abs(a[1] - b[1]); return a[0] + a[1] === b[0] + b[1] || (da <= 2 && db <= 2); };
+        // (the chart's own fact or its turn-around - LR-5, critic r3 D1)
+        const sameFact = (x, y) => { const a = plus(x), b = plus(y); return !!a && !!b && (a.join() === b.join() || a.join() === [b[1], b[0]].join()); };
+        // (the first set of cells, in order, that meets every want with no twins and not the chart's own fact)
+        // (lesson 2 r5, critic r3 m3: no story person twice on the sheet while the deal can - "Lena has 7 cards" and "Lena has 6")
+        const people = (x) => { const ls = (x && x.q && x.q.cell && x.q.cell.payload && x.q.cell.payload.lines) || []; return ls.slice(0, -1).map((l) => (String(l).match(/^([A-Z][a-z]+)\b/) || [])[1]).filter(Boolean); };
+        const meets = (x, y, nm) => twin(x, y) || winShare(x, y) || (nm && people(x).some((p) => people(y).includes(p)));
+        const pickLead = (k, chosen, nm) => {
+            if (k === data.guidedWants.length) return chosen;
+            const t = CASE_TESTS[data.guidedWants[k]];
+            if (!t) return pickLead(k + 1, chosen, nm);
+            for (const x of order) if (!chosen.includes(x) && t(x) && !chosen.some((y) => meets(x, y, nm)) && !sameFact(x, example) && !winShare(x, example)) { const r = pickLead(k + 1, [...chosen, x], nm); if (r) return r; }
+            return null;
+        };
+        const fit = pickLead(0, [], true) || pickLead(0, [], false);
+        if (fit) lead.push(...fit);
+        else for (const w of data.guidedWants) { const t = CASE_TESTS[w]; const it = t && order.find((x) => !lead.includes(x) && t(x)); if (it) lead.push(it); }
+        order = [...lead, ...order.filter((x) => !lead.includes(x))];
+    }
     // div_facts Mix (critic R1 D7): the Guided set tries each written form - the forms the
     // example did not show first.
     if (order.length && order.every((it) => it.q && it.q.divMix)) {
@@ -532,10 +720,95 @@ const isRound = (it) => {
 };
 
 /** The drawing of state k of the example (no slots: the Model is never scored, AK-1). */
+/** A place-value expanded-form item (pv `expand`): the detailed lesson's chart (2026-10-16). */
+const isExpand = (it) => { const cl = it && it.q && it.q.cell; return !!(cl && cl.template === 'pv' && cl.payload && cl.payload.kind === 'expand'); };
+
+/**
+ * The state of an expanded-form problem after step k (P-LC-9): a box is empty until the step that
+ * first writes it, grey at that step (the newest mark), black after; a box a later step names
+ * again ("So 539 = 500 + 30 + 9") is grey again on that step's panel. The cell is the pv template's
+ * own drawing, answered, with the boxes of later steps emptied.
+ */
+function expandState(it, groups, k, c) {
+    const first = new Map();
+    groups.forEach((g, gi) => (g.marks || []).forEach((m) => { if (m && m.slot && !first.has(m.slot)) first.set(m.slot, gi); }));
+    const newest = new Set(((groups[k] && groups[k].marks) || []).map((m) => m && m.slot).filter(Boolean));
+    const ctx = resolveCtx(Object.assign({}, c, { state: 'answered', scaffoldLevel: 1, metrics: undefined }));
+    let html = it.render(ctx, { cols: 1 });
+    html = html.replace(/<span class="ws-box([^"]*)"([^>]*?) data-ws-slot="(part\d+)"([^>]*)>([^<]*)<\/span>/g, (m, cls, pre, slot, post, val) => {
+        const g = first.has(slot) ? first.get(slot) : 0;
+        const attrs = `${pre} data-ws-slot="${slot}"${post.replace(/ data-ws-ink="[a-z]+"/, '')}`;
+        if (g > k) return `<span class="ws-box${cls}"${attrs}></span>`;
+        if (newest.has(slot)) return `<span class="ws-box${cls} ws-trace"${attrs} data-ws-ink="trace">${val}</span>`;
+        return `<span class="ws-box${cls}"${attrs} data-ws-ink="solid">${val}</span>`;
+    });
+    return html;
+}
+
+/* ---------------------------------------------- a one-step story with its part-whole bar */
+
+/** A word-work story cell drawn with its part-whole bar (add_wp_* with support 'bar'). */
+const isWordBar = (it) => { const cl = it && it.q && it.q.cell; return !!(cl && cl.template === 'word-work' && cl.payload && cl.payload.bar && cl.payload.barKind === 'whole' && (cl.payload.steps || []).length === 1); };
+const barNums = (it) => { const st = it.q.cell.payload.steps[0]; return { a: st.a, b: st.b, ans: st.ans, unit: it.q.cell.payload.unit || '' }; };
+
+/**
+ * `chartSteps` (lesson data; the detailed lesson maker): the chart's steps of a bar story are the
+ * LESSON's steps (find the parts - write them in the bar - add for the whole - write the answer and
+ * label), each panel's words the lesson's line with the story's numbers ({a} {b} {ans} {unit}).
+ */
+function chartStepsOf(it, data) {
+    const v = barNums(it);
+    const fill = (t) => String(t).replace(/\{(a|b|ans|unit)\}/g, (m, k) => String(v[k]));
+    return data.chartSteps.map((t, i) => ({ text: fill(t), marks: [{ slot: `bar-step-${i}`, value: '1' }] }));
+}
+
+/** Grey (the newest mark) or black on a span that carries an inline colour. */
+const inkSpan = (html, grey) => html.replace(/color:#000(000)?;?/g, '').replace(/^<span /, `<span data-ws-ink="${grey ? 'trace' : 'solid'}" `).replace(/ style="/, ` style="color:${grey ? '#949494' : '#000'};`);
+
+/**
+ * The state of a bar story after step k (P-LC-9: the newest mark grey, earlier ones black):
+ *   0  the two story numbers ringed     1  the parts written in the part boxes
+ *   2  the whole written in the top box  3  the answer and its label written
+ * The cell is the word-work template's own drawing, answered, with later marks emptied.
+ */
+function barState(it, k, c, { keepSlots = false } = {}) {
+    const v = barNums(it);
+    const ctx = resolveCtx(Object.assign({}, c, { state: 'answered', scaffoldLevel: 1, metrics: undefined }));
+    // (a compact `layout: 'bar'` cell - the detailed lesson maker - sits in a half-width chart panel)
+    const half = ((it.q && it.q.cell && it.q.cell.payload) || {}).layout === 'bar';
+    let html = it.render(ctx, { cols: half ? 2 : 1 });
+    // the bar labels in drawing order: whole, part a, part b
+    let i = 0;
+    html = html.replace(/<span data-ws-graded="0" data-ws-slot="bar"([^>]*)>([^<]*)<\/span>/g, (m, attrs, val) => {
+        const idx = i++;
+        const at = idx === 0 ? 2 : 1;
+        const shown = k >= at;
+        const span = `<span data-ws-graded="0" data-ws-slot="bar"${attrs.replace(/ data-ws-ink="[a-z]+"/, '')}>${shown ? val : ''}</span>`;
+        return shown ? inkSpan(span, k === at) : span;
+    });
+    // the answer box and its label word: written at step 3
+    html = html.replace(/(<span[^>]*data-ws-slot="(answer|answer-label)"[^>]*>)([^<]*)(<\/span>)/g, (m, open, id, val, close) => {
+        if (k < 3) return open.replace(/ data-ws-ink="[a-z]+"/, '') + close;
+        return k === 3 ? inkSpan(open + val + close, true) : open + val + close;
+    });
+    // step 0: the two story numbers ringed in grey (later: black) - text only, never inside a tag
+    let ringed = 0;
+    html = html.replace(/>([^<>]*)</g, (m, text) => (ringed >= 2 ? m : `>${text.replace(new RegExp(`\\b(${v.a}|${v.b})\\b`, 'g'), (n) => (ringed < 2 ? (ringed++, `<span class="mq-lring${k === 0 ? ' mq-lring-t' : ''}">${n}</span>`) : n))}<`));
+    return keepSlots ? html : html;
+}
+
 function stateDrawing(it, steps, groups, k, c) {
+    if (isWordBar(it) && steps.length && /^bar-step-/.test((((steps[0] || {}).marks || [])[0] || {}).slot || '')) return unslot(barState(it, k, c));
     const merged = groups.map((g) => ({ marks: g.marks }));
     const ctx = resolveCtx(Object.assign({}, c, { state: 'blank', scaffoldLevel: 3, metrics: undefined }));
     if (isRound(it)) return unslot(roundState(it, k, ctx, Number(c.chartLineMm) > 0 ? Number(c.chartLineMm) : ({ S: 44, M: 52, L: 58 }[c.size] || 58)));
+    if (isExpand(it)) return unslot(expandState(it, merged, k, c));
+    // (an even-products window, detailed lesson 4: its own step states - the rows, then the columns, then odd x odd)
+    if (it.q && it.q.cell && it.q.cell.template === 'mult-grid' && merged.some((g) => (g.marks || []).some((m) => m && m.slot === 'even-rows'))) {
+        let html = '';
+        try { html = it.render(Object.assign({}, ctx, { gridSteps: evenGridState(it.q.cell.payload || {}, merged, k) }), { cols: 2 }); } catch (e) { html = ''; }
+        return unslot(html);
+    }
     const t = stepTemplateOf(it);
     if (t) {
         const payload = Object.assign({}, it.q.cell.payload || {});
@@ -597,7 +870,10 @@ export function namedSteps(steps, data, { general = false } = {}) {
 export const stepMarker = (n) => `<em class="mq-lnum" data-mq-accent>${n}</em>`;
 
 /** The chart layout by state count: 4 -> 2 x 2 panels; 2 or 3 -> full-width rows. */
-export const chartLayout = (n) => (n >= 4 ? { cols: 2, rows: Math.ceil(n / 2), variant: 'col' } : { cols: 1, rows: n, variant: 'row' });
+export const chartLayout = (n, data = null) => (data && data.chartWide ? { cols: 1, rows: n, variant: 'col' }
+    : n >= 4 ? { cols: 2, rows: Math.ceil(n / 2), variant: 'col' } : { cols: 1, rows: n, variant: 'row' });
+// `chartWide` (lesson data; the detailed lesson maker, 2026-10-16): a drawing too wide for half the
+// page (expanded form, 3 boxes) - every panel is a full-width row, the step head above its drawing.
 
 /**
  * The ANCHOR CHART's state items (owner ruling 2026-09-25: "the I Do example should be like an
@@ -607,11 +883,14 @@ export const chartLayout = (n) => (n >= 4 ? { cols: 2, rows: Math.ceil(n / 2), v
  * Host-shaped so the host measures them; `drawOnly` measures the drawing alone (for its zoom).
  */
 export function stateItems(example, data) {
-    const steps = workedStepsOf(example);
+    const ws = data && Array.isArray(data.chartSteps) && isWordBar(example) ? chartStepsOf(example, data) : workedStepsOf(example);
+    // `tailLast` (lesson data; the detailed lesson maker): the closing step ("Read it with plus")
+    // writes nothing new - it is the line under the panels, not a panel of its own.
+    const steps = data && data.tailLast ? ws.map((st, i) => (i === ws.length - 1 ? Object.assign({}, st, { marks: [] }) : st)) : ws;
     if (!steps.length) return [];
     const groups = stateGroups(steps);
     const named = namedSteps(steps, data);
-    const { variant } = chartLayout(groups.length);
+    const { variant } = chartLayout(groups.length, data);
     const drawing = (k, c) => stateDrawing(example, steps, groups, k, c);
     // Lessons r1: a closing step that draws nothing ("Check: add back") is not squeezed into the
     // last panel: it gets a line of its own under the panels, its words beside its name.
@@ -744,6 +1023,17 @@ function finalDrawing(it, c) {
     const groups = stateGroups(steps);
     const ctx = resolveCtx(Object.assign({}, c, { state: 'blank', scaffoldLevel: 3, metrics: undefined }));
     if (isRound(it)) return unslot(roundState(it, 4, ctx, Number(c.chartLineMm) > 0 ? Number(c.chartLineMm) : 58));
+    // An expanded-form example with a 0 place (the detailed lesson, critic r2): the newest (grey)
+    // mark is its 0 part - the part the panel teaches - every other part black.
+    if (isExpand(it)) {
+        const parts = (it.q.cell.payload.parts || []).map(Number);
+        const zeros = parts.map((v, i) => (v === 0 ? `part${i}` : null)).filter(Boolean);
+        if (zeros.length) {
+            const all = parts.map((v, i) => ({ slot: `part${i}`, value: String(v) }));
+            const merged = [{ marks: all.filter((m) => !zeros.includes(m.slot)) }, { marks: all.filter((m) => zeros.includes(m.slot)) }];
+            return unslot(expandState(it, merged, 1, c));
+        }
+    }
     const t = stepTemplateOf(it);
     if (t && it.q.cell.template !== 'fact') {
         const merged = groups.map((g) => ({ marks: g.marks })).concat([{ marks: [] }]);
@@ -797,6 +1087,10 @@ function vocabPicture(pic, c) {
     const m = c.metrics;
     const mm = (v) => `${v.toFixed(2)}mm`;
     switch (pic && pic.kind) {
+        // a small part-whole bar (detailed lesson 2): {whole, a, b, mark: 'whole' | 'parts'}
+        case 'bar': return barMini({ whole: pic.whole, a: pic.a, b: pic.b, mark: pic.mark || '', wMm: 36, pt: 12 });
+        // (one product, detailed lesson 4: the chart corner a × b with its product boxed)
+        case 'fact': return factGridMini(Number(pic.a), Number(pic.b));
         case 'glyph': return `<span class="mq-lvpic-glyph" style="font-size:${Math.round(m.digitPt * 1.3)}pt">${esc(pic.text)}</span>`;
         // A longer text picture ("10, 20, 30") at four fifths, so it never crowds its neighbour.
         case 'text': return `<span class="mq-lvpic-text" style="font-size:${String(pic.text || '').length > 7 ? Math.round(m.digitPt * 0.8) : m.digitPt}pt">${esc(pic.text)}</span>`;
@@ -849,6 +1143,22 @@ function vocabPicture(pic, c) {
             b += `<text x="${X(pic.mark).toFixed(2)}" y="${(top - 1).toFixed(2)}" text-anchor="middle" font-size="${f}" font-weight="700">${pic.mark}</text>`;
             b += `<circle cx="${X(pic.mark).toFixed(2)}" cy="${axisY}" r="1.2" fill="#000"/>`;
             return `<svg viewBox="0 0 ${W} ${H.toFixed(2)}" width="${mm(W)}" height="${mm(H)}" aria-hidden="true" style="font-family:'Andika',sans-serif">${b}</svg>`;
+        }
+        // a small dot array (detailed lesson 3a): {rows, cols, mark: 'row' | 'turn'}
+        case 'array': {
+            // (dots at the arrays template's floor: at least 4 mm across - RP-21)
+            const pitch = { S: 5.4, M: 5.6, L: 5.8 }[c.size] || 5.8, r = 2.05;
+            const R = Math.min(5, pic.rows || 1), C = Math.min(5, pic.cols || 1);
+            const one = (rows, cols, x0) => { let b = ''; for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) b += `<circle cx="${(x0 + pitch / 2 + j * pitch).toFixed(2)}" cy="${(pitch / 2 + i * pitch).toFixed(2)}" r="${r.toFixed(2)}" fill="#000"/>`; return b; };
+            let b = one(R, C, 0), W = C * pitch, H = R * pitch;
+            if (pic.mark === 'row') b += `<rect x="0.3" y="0.3" width="${(W - 0.6).toFixed(2)}" height="${(pitch - 0.6).toFixed(2)}" rx="${(pitch / 2).toFixed(2)}" fill="none" stroke="#000" stroke-width="${(0.75 * PT_MM).toFixed(3)}"/>`;
+            if (pic.mark === 'turn') {
+                const ax = W + 2, aw = 7, ay = H / 2;
+                b += `<path d="M${ax} ${ay} H${ax + aw - 1.6}" stroke="#000" stroke-width="${(1.5 * PT_MM).toFixed(3)}"/><path d="M${ax + aw - 2} ${ay - 1.3} L${ax + aw} ${ay} L${ax + aw - 2} ${ay + 1.3} Z" fill="#000"/>`;
+                b += one(C, R, ax + aw + 2);
+                W = ax + aw + 2 + R * pitch; H = Math.max(H, C * pitch);
+            }
+            return `<svg viewBox="0 0 ${W.toFixed(2)} ${H.toFixed(2)}" width="${mm(W)}" height="${mm(H)}" data-per-row="${Math.max(C, pic.mark === 'turn' ? R : 0)}" aria-hidden="true">${b}</svg>`;
         }
         default: return `<span class="mq-lvpic-text">${esc((pic && pic.text) || '')}</span>`;
     }
@@ -941,7 +1251,8 @@ export function extras(input = {}) {
     const data = lesson.data || null;
     const main = poolItems(input, 'main');
     const ex = pickExample(main, data);
-    const steps = ex ? workedStepsOf(ex) : [];
+    // (a bar story with the lesson's own chart steps: the Steps zone and strip name those steps)
+    const steps = ex ? (data && Array.isArray(data.chartSteps) && isWordBar(ex) ? chartStepsOf(ex, data) : workedStepsOf(ex)) : [];
     const out = [];
     if (ex) out.push(...stateItems(ex, data));
     const { ex2, ex3, ex4 } = otherExamples(input, ex, data);
@@ -1001,7 +1312,7 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
     const header = Object.assign({}, f.header, { name: false, date: false, score: false });
     const m = bandMetrics(ctx, layoutHeader(header));
     const n = states.length;
-    const lay = chartLayout(n);
+    const lay = chartLayout(n, data);
     const chant = data && data.chant ? data.chant : '';
     const chantH = chant ? { S: 13, M: 15, L: 17 }[ctx.size] + 1.5 : 0;
     const cols = lay.cols === 2 ? 2 : 1;
@@ -1039,14 +1350,16 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
     let z = 0;
     let hF = 0;
     // 1. row: the second example's states under the panels, the panels at zoom 1 or more.
-    if (k2 && lay.rows * H(1) + band2 <= avail) { mode = 'row'; z = solve((q) => lay.rows * H(q), avail - band2, 1, zMax); }
+    const wide = !!(data && data.chartWide);
+    if (k2 && !wide && lay.rows * H(1) + band2 <= avail) { mode = 'row'; z = solve((q) => lay.rows * H(q), avail - band2, 1, zMax); }
     // 2. final: the other examples whole, side by side - three across where a third case fits
     //    (lessons r3: rounding's 90s -> 100), else two; the panels a little smaller.
     let finShown = fin;
     let finCols = 2;
-    for (const [list, c] of [[finals.slice(0, 3), 3], [fin, 2]]) {
-        if (mode !== 'one' || lay.cols !== 2 || list.length !== c || (c === 3 && !list.every(fits3))) continue;
-        const hF1 = Math.max(...list.map((x) => hOf(x, c)));
+    // `chartWide` (one drawing a row): the other examples whole, one under the other.
+    for (const [list, c] of wide ? [[fin, 1], [fin.slice(0, 1), 1]] : [[finals.slice(0, 3), 3], [fin, 2]]) {
+        if (mode !== 'one' || (!wide && (lay.cols !== 2 || list.length !== c || (c === 3 && !list.every(fits3)))) || !list.length) continue;
+        const hF1 = wide ? list.reduce((a, x) => a + hOf(x, 1), 0) : Math.max(...list.map((x) => hOf(x, c)));
         const HF = (q) => hF1 - (1 - q) * dLast;
         const zb = solve((q) => lay.rows * H(q) + HF(q), avail, 0.85, 1);
         if (zb) { mode = 'final'; z = zb; hF = HF(zb); finShown = list; finCols = c; }
@@ -1062,7 +1375,11 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
         const zc = solve((q) => sum(rowsAt(q)), availAll, 0.8, 1);
         if (zc) { mode = 'grid3'; z = zc; }
     }
-    if (mode === 'one') z = solve((q) => lay.rows * H(q), avail, 1, zMax) || 1;
+    // (a chart with a step-n band under its panels - lesson 3a r4, critic r2 D1: the panels never overflow into the
+    // band; below zoom 1 the drawing shrinks a little rather than spill past the grid's rule)
+    // (the band's grid takes its own frame rule: a panel measured one-up may still wrap its name - leave it 4 mm a row)
+    const availP = tailItem ? avail - 4 * lay.rows : avail;
+    if (mode === 'one') z = solve((q) => lay.rows * H(q), availP, 1, zMax) || (tailItem ? solve((q) => lay.rows * H(q), availP, 0.7, 1) || 0.7 : 1);
     const withZoom = (x, c) => Object.assign(planItem(Object.assign({}, x, { render: (cc, o) => x.render(Object.assign({}, cc, { chartZoom: z }), o) }), { cols: c, nolabel: true }), { cls: x.cellCls });
     const sections = [];
     let rowH;
@@ -1073,7 +1390,8 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
         const tot = sum(hr);
         // The spare height goes to the rows in proportion (a row grows by a quarter at most).
         const k = Math.min(1.25, room / tot);
-        const rowsMm = hr.map((h) => h * k);
+        // (`chartEqualRows`, lesson data - the detailed lesson maker, lesson 5: every row of the grid one height, PG-11)
+        const rowsMm = data && data.chartEqualRows ? hr.map(() => Math.max(...hr) * Math.min(1.25, room / (Math.max(...hr) * hr.length))) : hr.map((h) => h * k);
         rowH = Math.max(...rowsMm);
         const grid = gridPart(cells3.map((x) => withZoom(x, 3)), { cols: 3, rows: rows3, labels: 'none', cls: 'mq-chartgrid' });
         grid.rowsTpl = rowsMm.map((h) => `${Math.round(h * 10) / 10}fr`).join(' ');
@@ -1088,7 +1406,7 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
         const fill = lay.variant === 'row' || lay.rows * rowH >= room - 2;
         const grid = gridPart(states.map((st) => withZoom(st, cols)), { cols, rows: lay.rows, cellH: rowH, labels: 'none', cls: 'mq-chartgrid' });
         sections.push(fill ? Object.assign(grid, { cls: 'mq-chartgrid', height: '' }) : grid);
-        if (tailItem) sections.push(gridPart([Object.assign(planItem(tailItem, { cols: 1, nolabel: true }), { cls: tailItem.cellCls })], { cols: 1, rows: 1, cellH: tailH, labels: 'none' }));
+        if (tailItem) sections.push(gridPart([Object.assign(planItem(tailItem, { cols: 1, nolabel: true }), { cls: tailItem.cellCls })], { cols: 1, rows: 1, cellH: tailH, labels: 'none', cls: 'mq-ctailgrid' }));
         // Height still spare after the panels: the other examples take it, up to a third more.
         const spare = Math.max(0, room - lay.rows * rowH);
         if (mode === 'row') {
@@ -1098,9 +1416,17 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
                 content: gridPart(second.map((x) => Object.assign(planItem(x, { cols: Math.min(4, k2), nolabel: true }), { cls: x.cellCls })), { cols: k2, rows: 1, cellH: h2 + Math.min(spare, h2 * 0.3), labels: 'none' }),
             });
         }
-        if (mode === 'final') sections.push(gridPart(finShown.map((x) => withZoom(x, finCols)), { cols: finCols, rows: 1, cellH: hF + Math.min(spare, hF * 0.3), labels: 'none', cls: 'mq-cfinalgrid' }));
+        if (mode === 'final') {
+            const fr = Math.max(1, Math.ceil(finShown.length / finCols));
+            sections.push(gridPart(finShown.map((x) => withZoom(x, finCols)), { cols: finCols, rows: fr, cellH: (hF + Math.min(spare, hF * 0.3)) / fr, labels: 'none', cls: 'mq-cfinalgrid' }));
+        }
     }
-    sections.push({ kind: 'say', frame: oralFrameOf(example || {}, { fill: true }), digits: 2 });
+    // `sayWords` (lesson data; the detailed lesson maker): the Say line reads the example's number
+    // name, so the chart shows the number in all three forms (numeral, expanded, words).
+    const sayN = data && data.sayWords ? pvNumberOf(example) : null;
+    // (`chartSay(q)`, lesson data - the detailed lesson maker, lesson 5 r3: the chart's Say in the lesson's own words, In / Out)
+    const ownSay = data && typeof data.chartSay === 'function' && example ? (() => { try { return data.chartSay(example.q); } catch (e) { return ''; } })() : '';
+    sections.push({ kind: 'say', frame: ownSay || (sayN !== null ? `${sayN} is ${numberWords(sayN)}.` : oralFrameOf(example || {}, { fill: true })), digits: 2 });
     if (chant) sections.push({ kind: 'html', html: `<div class="ws-band mq-cchantband" style="height:${chantH - 1.5}mm"><div class="mq-cchant"><b>Rule:</b><span>${esc(chant)}</span></div></div>` });
     const shown = mode === 'row' ? 1 : mode === 'final' ? finShown.length : mode === 'grid3' ? fin.length : 0;
     return {
@@ -1239,7 +1565,9 @@ export function plan(input = {}) {
     const shortH = Math.max(20, hAt(rest.slice(0, 3), 2) + lineExtra(rest.slice(0, 3)));
     // (one stacked row is not a stack: it left a single Guided cell beside the Steps - critic R1,
     // div_facts long-division lesson - so a stack is at least two rows)
-    const stackRows = zH > 0 && rest.length >= 3 && fitsWidth(rest.slice(0, 3), 2) && shortH * 1.8 <= zH && Math.floor(zH / shortH) >= 2 ? Math.min(3, Math.floor(zH / shortH)) : 0;
+    // (`guidedStack` k on lesson data - the detailed lesson maker, lesson 2: k cells too wide to stand side by side stack beside the Steps)
+    const forceStack = data && Number(data.guidedStack) >= 2 && rest.length >= Number(data.guidedStack) ? Math.min(3, Number(data.guidedStack)) : 0;
+    const stackRows = forceStack || (zH > 0 && rest.length >= 3 && fitsWidth(rest.slice(0, 3), 2) && shortH * 1.8 <= zH && Math.floor(zH / shortH) >= 2 ? Math.min(3, Math.floor(zH / shortH)) : 0);
     if (stackRows) gk = stackRows;
     const weDoPool = main.filter((it) => it !== example2 && it !== example3 && it !== example4);
     let weDo = example ? pickWeDo(weDoPool, example, data, gk) : rest.slice(0, gk);
@@ -1253,7 +1581,14 @@ export function plan(input = {}) {
     const stripX = extrasList.find((x) => x.lessonStrip);
     const wantN = data && Array.isArray(data.guided) ? Math.min(3, data.guided.length) : 0;
     let top = null;
-    if (stepsZone && stripX && weDo.length && !stackRows && (gH < 0.72 * zH || wantN > weDo.length)) {
+    // `chartWide` (the detailed lesson maker): a Guided problem too wide to stand beside the Steps
+    // takes the strip over the cells and two full-width rows (cell 1 the Model's case).
+    const wideG = !!(data && data.chartWide);
+    if (wideG && stepsZone && stripX && example) {
+        const gw = Math.max(2, Math.min(4, Number(data.guidedRows) || 2));
+        const set = pickWeDo(weDoPool, example, data, gw).slice(0, gw);
+        if (set.length) top = { set, cols: 1, rows: set.length, h: Math.max(20, hAt(set, 1)) };
+    } else if (stepsZone && stripX && weDo.length && !stackRows && (gH < 0.72 * zH || wantN > weDo.length)) {
         const w3 = example ? pickWeDo(weDoPool, example, data, 3) : rest.slice(0, 3);
         const k = w3.length >= 3 && fitsWidth(w3.slice(0, 3), 3) ? 3 : Math.min(2, w3.length);
         const set = w3.slice(0, k);
@@ -1277,7 +1612,7 @@ export function plan(input = {}) {
     // (or to the Steps beside them); the Independent rows under them take the rest.
     if (top) {
         const items = weDo.map((it, i) => planItem(Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }), { cols: top.cols, level: 2, render: weDoRender(it, i), nolabel: true }));
-        const grid = gridPart(items, { cols: weDo.length, rows: 1, cellH: top.h, labels: 'none' });
+        const grid = top.rows ? gridPart(items, { cols: 1, rows: top.rows, cellH: top.h, labels: 'none' }) : gridPart(items, { cols: weDo.length, rows: 1, cellH: top.h, labels: 'none' });
         const stripH = hOf(stripX, 1);
         // The chant: on the Remember line when the sheet has one (it becomes the Rule line - the
         // rule is what the pupil needs beside the Guided cells), else under the strip.
@@ -1286,7 +1621,7 @@ export function plan(input = {}) {
         const chantH = data && data.chant && !rem ? m.instr : 0;
         const chantHtml = chantH ? `<div class="mq-lstripchant" style="height:${chantH.toFixed(2)}mm"><b>Rule:</b><span>${esc(data.chant)}</span></div>` : '';
         const content = { kind: 'col', cls: 'mq-lwedotop', parts: [{ kind: 'html', html: stripHtml(data, exSteps, ctx.size) + chantHtml }, grid] };
-        groups.push(band(m.strip + stripH + chantH + top.h, { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content }, { h: top.h, grid: [grid], cap: 0.1, capIfEmpty: 0.35 }));
+        groups.push(band(m.strip + stripH + chantH + top.h * (top.rows || 1), { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content }, { h: top.h * (top.rows || 1), grid: [grid], cap: 0.1, capIfEmpty: 0.35 }));
     } else if (weDo.length) groups.push(band(m.strip + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: 0.1, capIfEmpty: 0.35 }));
 
     /* ---- the Remember strip gives way when it alone pushes the Guided band overleaf */
@@ -1308,7 +1643,17 @@ export function plan(input = {}) {
 
     /* ---- Independent Practice: whole rows filling the last page (PT-OPN-7, H5) */
     const used = new Set([example, example2, example3, example4, ...weDo]);
-    const indepPool = main.filter((it) => !used.has(it));
+    const indepPool0 = main.filter((it) => !used.has(it));
+    // `independent` (lesson data; the detailed lesson maker, critic r2 R3): the cases the Independent
+    // cells must hold, one cell each, first (the Critical Atom's case on every sheet that states it).
+    const indepFirst = [];
+    for (const name of (data && Array.isArray(data.independent) ? data.independent : [])) {
+        const t = CASE_TESTS[name];
+        // (a window never shares a box with another window of the sheet - lesson 4 critic r1 D5)
+        const hit = t ? indepPool0.find((it) => !indepFirst.includes(it) && t(it) && ![...weDo, ...indepFirst].some((y) => winShare(it, y))) : null;
+        if (hit) indepFirst.push(hit);
+    }
+    const indepPool = indepFirst.concat(indepPool0.filter((it) => !indepFirst.includes(it)));
     const icWanted = AUTO_COLS[ctx.size];
     // One across look on the page (critic R3 N-2): the Guided cells keep a division fact's line
     // beside the sentence, so the Independent band takes only columns where it stays beside.
@@ -1374,11 +1719,18 @@ export function plan(input = {}) {
     const noRows = indep.length === 0;
     for (const pg of pages) {
         const spare = pg.budget - pg.used;
-        const grows = pg.grows.filter((g) => g.grid && (g.cap > 0 || (noRows && g.capIfEmpty > 0)));
+        const wide = noRows || !!(data && data.growAll);
+        const grows = pg.grows.filter((g) => g.grid && (g.cap > 0 || (wide && g.capIfEmpty > 0)));
         if (spare <= 2 || !grows.length) continue;
-        for (const g of grows) {
-            const cap = noRows && g.capIfEmpty !== undefined ? g.capIfEmpty : (g.cap !== undefined ? g.cap : 0.35);
-            const add = Math.min(spare / grows.length, g.h * cap);
+        // (`growAll`, lesson data - the detailed lesson maker, lesson 5: every band may grow as on a page with no
+        // Independent rows, and a band that reaches its cap passes the rest of its share to the bands after it, so the
+        // sheet does not end on a blank band; absent, as before)
+        let left = spare;
+        for (const [gi, g] of grows.entries()) {
+            const cap0 = wide && g.capIfEmpty !== undefined ? g.capIfEmpty : (g.cap !== undefined ? g.cap : 0.35);
+            const cap = data && data.growAll ? Math.max(cap0, 0.5) : cap0;
+            const add = data && data.growAll ? Math.min(left / (grows.length - gi), g.h * cap) : Math.min(spare / grows.length, g.h * cap);
+            left -= add;
             for (const part of g.grid) part.height = `${Math.round(((parseFloat(part.height) || g.h) + add) * 100) / 100}mm`;
             if (g.box) g.box.html = g.box.html.replace(/height:[\d.]+mm/, `height:${(g.h + add).toFixed(2)}mm`);
         }
@@ -1409,6 +1761,8 @@ export function plan(input = {}) {
             example2: secondShown && example2 ? String((example2.q && example2.q.text) || '') : '', part, chartSizing,
             example2Found: example2 ? String((example2.q && example2.q.text) || '') : '',
             example3: example3 ? String((example3.q && example3.q.text) || '') : '', example4: example4 ? String((example4.q && example4.q.text) || '') : '', bandSizes,
+            // the chart's items themselves (the detailed lesson maker reads its scripts' numbers from them)
+            exampleQs: [example, example2, example3, example4].filter(Boolean).map((x) => x.q),
             fits: [{ cols: 1, rows: out.length, line: `Fits: an anchor chart of ${states.length} steps, ${warmCount} warm-up, ${weDo.length} guided and ${indep.length} independent on ${out.length} page${out.length > 1 ? 's' : ''}.` }],
             notes: data ? [] : ['No lesson data for this skill yet: the warm-up uses the skills listed before it, with no vocabulary.'],
         },
@@ -1461,6 +1815,53 @@ function weDoRender(it, i) {
             // The stack keeps its own answer slot (AK-4: the key has the pupil page's slots).
             // ('answered': the key's working is black, never the Guided grey.)
             if (t && steps.length) return t.stepState(Object.assign({}, it.q.cell.payload || {}), steps.concat([{ marks: [] }]), steps.length, Object.assign({}, c, { state: 'answered', scaffoldLevel: 2 }));
+        }
+        // An expanded-form Guided cell 1 (the detailed lesson maker): step 1 done in grey - the
+        // hundreds box traced, the other boxes empty; every box keeps its slot.
+        // A bar story's Guided cell 1 (the detailed lesson maker): step 1 done in grey - the two
+        // story numbers ringed; the bar and the answer stay the pupil's.
+        // (the key rings them too: it is the page's facsimile, so the rings are not read as answers)
+        if (i === 0 && isWordBar(it)) {
+            const v = barNums(it);
+            let ringed = 0;
+            return it.render(c, o).replace(/>([^<>]*)</g, (m, text) => (ringed >= 2 ? m : `>${text.replace(new RegExp(`\\b(${v.a}|${v.b})\\b`, 'g'), (n) => (ringed < 2 ? (ringed++, `<span class="mq-lring mq-lring-t">${n}</span>`) : n))}<`));
+        }
+        if (!answered && i === 0 && isExpand(it)) {
+            const html = it.render(resolveCtx(Object.assign({}, c, { state: 'answered', metrics: undefined })), o);
+            return html.replace(/<span class="ws-box([^"]*)"([^>]*?) data-ws-slot="(part\d+)"([^>]*)>([^<]*)<\/span>/g, (m, cls, pre, slot, post, val) => {
+                const attrs = `${pre} data-ws-slot="${slot}"${post.replace(/ data-ws-ink="[a-z]+"/, '')}`;
+                return slot === 'part0' ? `<span class="ws-box${cls} ws-trace"${attrs} data-ws-ink="trace">${val}</span>` : `<span class="ws-box${cls}"${attrs}></span>`;
+            });
+        }
+        // A name-to-numeral Guided cell 1 in H T O boxes (the detailed lesson maker): step 1 done in
+        // grey - the hundreds digit traced in the H box, the hundreds words underlined.
+        if (i === 0 && it.q && it.q.cell && it.q.cell.template === 'words' && it.q.cell.payload && it.q.cell.payload.slot === 'hto') {
+            const t = stepTemplateOf(it);
+            const steps = workedStepsOf(it);
+            // (the key: every box answered, the prompt drawn exactly as on the pupil page - INK-31, critic r2 R9)
+            if (t && steps.length > 1) return answered ? t.render(Object.assign({}, it.q.cell.payload, { under: 0 }), c) : t.stepState(Object.assign({}, it.q.cell.payload), steps.map((s) => ({ marks: s.marks || [] })), 0, c);
+        }
+        // An array-and-turn Guided cell 1 (the detailed lesson maker, lesson 3a): step 2 done in grey - the
+        // first product traced; the turned fact stays the pupil's (the Critical Atom).
+        if (!answered && i === 0 && it.q && it.q.cell && it.q.cell.template === 'arrays-turn' && it.q.cell.payload && it.q.cell.payload.type === 'both') {
+            const t = stepTemplateOf(it);
+            const p = it.q.cell.payload;
+            if (t) return t.render(Object.assign({}, p), Object.assign({}, c, { state: 'blank', stepVals: { array: { ink: 'solid' }, turn: { ink: 'solid' }, a: { value: String(Number(p.rows) * Number(p.cols)), ink: 'trace' } } }));
+        }
+        // (a known-fact Guided cell, lesson 3a r2, critic D2: the turned fact's first box traced - its rows - so the
+        // three-box response is guided before Practice 1, which then changes only the fade)
+        if (!answered && it.q && it.q.cell && it.q.cell.template === 'arrays-turn' && it.q.cell.payload && it.q.cell.payload.type === 'known') {
+            const t = stepTemplateOf(it);
+            const p = it.q.cell.payload;
+            if (t) return t.render(Object.assign({}, p), Object.assign({}, c, { state: 'blank', stepVals: { array: { ink: 'solid' }, turn: { ink: 'solid' }, b1: { value: String(Number(p.cols)), ink: 'trace' } } }));
+        }
+        // (an even-products Guided cell, lesson 4 critic r1 D6: the even row and column numbers ringed grey - a hint the
+        // Independent cells drop; cell 1 also has step 1 done in grey - its even rows shaded)
+        if (!answered && it.q && it.q.cell && it.q.cell.template === 'mult-grid' && it.q.cell.payload && it.q.cell.payload.shadeSlots) {
+            const p = it.q.cell.payload, ring = new Set(), shade = new Set();
+            (p.rows || []).forEach((r, ri) => { if (r % 2 === 0) { ring.add(`r${ri}`); if (i === 0) (p.cols || []).forEach((cc, j) => shade.add(`${ri},${j}`)); } });
+            (p.cols || []).forEach((cc, j) => { if (cc % 2 === 0) ring.add(`h${j}`); });
+            return it.render(Object.assign({}, c, { gridSteps: { shade, ring } }), o);
         }
         if (!answered && i === 0) {
             const t = stepTemplateOf(it);

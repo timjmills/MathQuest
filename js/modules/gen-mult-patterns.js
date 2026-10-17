@@ -427,11 +427,19 @@ export function genMultChart(q, skill) {
     // The chart: the whole block 1..T, or a 4 x 5 window cut from it that holds the focus table.
     let rows, cols;
     if (whole) { rows = allT.slice(); cols = allT.slice(); } else {
-        const R = Math.min(4, T), C = Math.min(5, T);
+        // B3 (lesson 4): the window's size (winRows x winCols, default 4 x 5) and its smallest
+        // factor (minFactor 2: no 1 row and no 1 column in the window).
+        const wR = [2, 3, 4].includes(Number(opt('winRows'))) ? Number(opt('winRows')) : 4;
+        const wC = [3, 4, 5].includes(Number(opt('winCols'))) ? Number(opt('winCols')) : 5;
+        const lo = Math.min(Number(opt('minFactor')) === 2 ? 2 : 1, Math.max(1, T - Math.max(wR, wC) + 1));
+        const R = Math.min(wR, T - lo + 1), C = Math.min(wC, T - lo + 1);
         const inRows = task === 'pattern' || randInt(0, 1) === 0;
-        const place = (n, t) => randInt(Math.max(1, t - n + 1), Math.min(t, T - n + 1));
-        const r0 = inRows ? place(R, focus) : randInt(1, T - R + 1);
-        const c0 = inRows ? randInt(1, T - C + 1) : place(C, focus);
+        const place = (n, t) => {
+            const a = Math.max(lo, t - n + 1), b = Math.min(t, T - n + 1);
+            return a <= b ? randInt(a, b) : randInt(lo, T - n + 1);   // a focus of 1 with no 1 row: anywhere
+        };
+        const r0 = inRows ? place(R, focus) : randInt(lo, T - R + 1);
+        const c0 = inRows ? randInt(lo, T - C + 1) : place(C, focus);
         rows = Array.from({ length: R }, (_, i) => r0 + i);
         cols = Array.from({ length: C }, (_, j) => c0 + j);
     }
@@ -497,9 +505,10 @@ export function genMultChart(q, skill) {
         q.keyParts = vals.map(String);
         q.acceptedAnswers = acceptLists(vals);
         q.hint = 'Look at a product and the number you know on its edge. What times that number makes the product?';
-    } else if (task === 'shade') {
+    } else if (task === 'shade' || task === 'even') {
+        // B1 (lesson 4): 'even' shades the even products: the multiples of 2, on the same cell and check.
         const shadeOf = tabs.filter(v => v >= 2);
-        const n = shadeOf.length ? shadeOf[dealIndex('chart-shade', shadeOf.length)] : 2;
+        const n = task === 'even' ? 2 : shadeOf.length ? shadeOf[dealIndex('chart-shade', shadeOf.length)] : 2;
         payload.shade = n;
         const distinct = [...new Set(rows.flatMap(r => cols.map(c => r * c)))].sort((a, b) => a - b);
         const opts = distinct.map((v, k) => ({ id: 'opt' + k, label: String(v), correct: v % n === 0 }));
@@ -511,7 +520,13 @@ export function genMultChart(q, skill) {
         q.printAnswer = opts.filter(o => o.correct).map(o => o.label).join(', ');
         q.answerType = 'multi-select-check';
         q.shadeOf = n;
-        q.hint = `A multiple of ${n} is in the ${n} times table: ${n}, ${2 * n}, ${3 * n} … Look for the pattern the shaded boxes make.`;
+        if (task === 'even') {
+            q.text = 'Tap every even product.';
+            q.printText = 'Shade every even product.';
+            q.instructionKey = 'shade-even';
+            payload.shadeSlots = true;   // each box is a response place on paper (shade it or leave it white)   // the page instruction (print-sheet instructionKeyFor reads the item's own key)
+        }
+        q.hint = task === 'even' ? 'An even row number or an even column number makes the product even. Both numbers odd: the product is odd.' : `A multiple of ${n} is in the ${n} times table: ${n}, ${2 * n}, ${3 * n} … Look for the pattern the shaded boxes make.`;
     } else {
         // pattern: one row of the focus table with gaps, and the rule it follows
         const i = rows.indexOf(focus) >= 0 ? rows.indexOf(focus) : 0;
@@ -531,13 +546,13 @@ export function genMultChart(q, skill) {
         q.chartRow = t;
         q.hint = `Along a row the products go up by the row number. How much does the ${t} row go up each time?`;
     }
-    if (task !== 'shade') { q.answerType = 'text'; q.options = []; }
+    if (task !== 'shade' && task !== 'even') { q.answerType = 'text'; q.options = []; }
     q.selfAnswering = true;
     q.chartTask = task;
     q.cell = { template: 'mult-grid', v: 1, payload };
     q.visual = k2Twin('mult-grid', payload);
     q.printFormat = 'mult-grid';
-    q.skillLabel = task === 'fill' ? 'Mult Chart' : task === 'headers' ? 'Mult Chart: Factors' : task === 'shade' ? 'Mult Chart: Multiples' : 'Mult Chart: Pattern';
+    q.skillLabel = task === 'fill' ? 'Mult Chart' : task === 'headers' ? 'Mult Chart: Factors' : task === 'shade' ? 'Mult Chart: Multiples' : task === 'even' ? 'Mult Chart: Even Products' : 'Mult Chart: Pattern';
     if (!allTicked) q.chartTables = tabs.slice();
     return q;
 }

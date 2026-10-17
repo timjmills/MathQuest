@@ -237,6 +237,11 @@ Gate failures and load numbers measured before this fix (~12:30 UTC) are not tru
 - 2026-10-09 Wave 1 lane "Touch numerals" round 5: builder escalated to Opus medium (the ceiling) - the screen hosts failed critic rounds 1 to 4 (teacher dots dropped on a wrong answer, stack Start again covered, column wording, quiz count-all line).
 - 2026-10-09 Wave 1 lane "Answer-key options" (4.4) fix round 4: builder escalated to Opus medium (the ceiling) - the key-ink tagging failed critic rounds 1, 2 and 3 (r3: design 6 - given lines and boxes orange on 215 skills, two keys all black, stroked disk numerals).
 - 2026-10-09 Wave 1 lane "Search terms for every skill" (`a21ec3ef403026c80`) fix round 6: builder escalated to Opus medium (the ceiling) - the "Showing results for" correction notice failed critic rounds 1 to 5 (r5: no regression 7, the Navigator notice truncated at Chromebook size and the student notice lost on "+" / refocus).
+- 2026-10-16 Wave 2 WRM tagging Y2-Y3 round 12: builder escalated to Opus medium (the ceiling) - the pre-skill lead / ordering defect (rule 14: lead pre not the nearest building block) survived critic rounds 10 and 11 (r11 N11, Y2.B2.S15 = 7).
+- 2026-10-16 Wave 2 WRM tagging Y2-Y3 round 13: builder still at Opus medium (the ceiling) - critic r12 failed narrowly (Y2 steps 7.96: N12, `equiv_frac_visual {denoms:[2]}` deals off-family = / ≠ items the lane's denominator check could not see, because their fractions live only in the cell payload).
+- 2026-10-16 Wave 2 WRM tagging Y2-Y3 round 14: builder still at Opus medium (the ceiling) - critic r13 failed narrowly (Y3 steps 7.93: N13 Y3.B6.S10 full on circles, N14 Y3.B6.S9 built the wrong proposal); root-cause gate TITLEREP added.
+- 2026-10-16 Wave 2 WRM tagging Y2-Y3 round 15: builder still at Opus medium (the ceiling) - critic r14 failed narrowly (Y2 7.93 / Y3 7.96: N15 / N16 / N17, false FULL verdicts in a fresh sample for the 4th round running); class gates added (TITLEREP title verbs, clock precision, digital, solve problems; RANGECHECK rule 7) and every full step / lesson re-audited by hand: 12 fulls demoted (Y2 63->55, Y3 49->45), 5 kept full with a live option.
+- 2026-10-17 Wave 2 WRM tagging Y1 site lessons round 3: builder escalated from Opus low to Opus medium (the ceiling) - false whys / clauses and an overclaimed FULL survived builder rounds 1 and 2 (critic r2 FAIL 7.92: F11 lesson 5 full on K.G.A.2 / K.G.A.3, F12 lesson 27 "never 0 to write", F13 lesson 35 "whichever way it is drawn", the last in the file since round 1).
 
 - 2026-10-10 small fixes lane, item 7 (Opener count-row fit) fix round 6: builder escalated to Opus medium (the ceiling) - critic rounds 1-5 each failed the Opener's fit (D5, N3/N4, N8/N9, N12, N13) with Opus-low builders.
 - 2026-10-17 Skip-count lane fix round 5: builder escalated to Opus medium (the ceiling) - a Model state alone on a page (D8 at critic r2, D12 at critic r4) survived builder rounds 3 and 4.
@@ -251,6 +256,20 @@ Gate failures and load numbers measured before this fix (~12:30 UTC) are not tru
   and placement belong to the legacy-migration work.
 - **N-5 (for the lessons wave, Wave 8/9)**: the `nl_add` Lesson anchor chart number line runs past the cell and its
   labels overlap ("110121132143154"); the Say frame reads "10 plus 10 equals 10." while the steps say "You land on 20".
+
+- **2026-10-16, detailed lesson maker, lesson 1 (g2-nbt3-read-write-1000)**: builder escalated mq-opus-low ->
+  mq-opus-medium for critic r3 S1 (1,000 still dealt on Practice 2 after the board-only ruling; R2 of r2, open two
+  rounds) and S2 (T2 continuation page under the fill floor; D5 r1 -> R5 r2 -> S2 r3). Reports:
+  `design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r{1,2,3}.md`.
+
+- **2026-10-16, detailed lesson 2 (g1-oa1-bar-model-wp-20)**: builder escalated mq-opus-low -> mq-opus-medium for
+  critic r2 D1 (put-together never modelled; r1 D3 -> r2 D1) and D4 (exit slip; r1 D11 -> r2 D4). Reports:
+  `design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r{1,2}.md`.
+
+- **2026-10-17, detailed lesson 4 (g3-oa9-mult-table-patterns)**: builder escalated mq-opus-low -> mq-opus-medium for
+  critic r1 D5 (Practice windows overlapping / copied, still failing after fix round 3). Lead ruling: same-page windows
+  share at most half their boxes (turned boxes counted), never a verbatim copy of an earlier page; exit and Check
+  Question fresh against every page. Report: `design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r1.md`.
 
 ## 10. Wave 8 (lessons) — word-problem lesson pages, found 2026-10-03 and left as on main
 
@@ -299,5 +318,25 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - 2026-10-16: session_01X3UTDSXAaEp5yiDxwukHaa started (owner: start now, first 5 lessons only) — builds the V22 detailed lesson maker as a kit role beside the current maker, then lessons 1-5 of the owner list (G2 numbers to 1,000 in words; G1 one-step word problems with bar models; G3 multiplication properties; G3 patterns on the multiplication table; G3 input-output rules), each critic >= 8 on every page; branch `claude/sweet-newton-c8wrv1-wip-detailed-lessons`; records lessons in a data file for the White Rose page.
 - 2026-10-16: WRM tagging Y5 merged (critic r8 PASS, steps 8.07 / site lessons 8.05, min 8); combined mergecheck OK; `data/curriculum/site-lessons.json` (143 non-WRM site lessons + 34 assessments; id = site tracker key "<grade>|-|<slug>") and the per-year `lessons` section shape are in `design/audit/runs/wrm-tagging/Y5-report.md` "Site lessons". For the later proposal merge into wrm.js / build-list.js: proposals used only by lessons have empty `steps` (read `lessons` too); Y5 vs Y6 differ on `thousandths_pv` text (keep Y5) and `reflex_angles`; Y6 B5.S2/S5 mass workaround `{forms:[0,2]}` can be relaxed now PR #8 is on master.
 - 2026-10-16: small fixes merged into main (critic r7 PASS); quick gates OK; NOT deployed yet — deploy together with the number line lane (full gates + stamp once). Owner questions Q1-Q3 (critic-r7.md) taken at the recommended answers.
+- 2026-10-17: DEPLOYED small fixes + custom number line (master 626318fa, live globals.js?v=8a5b527f8f confirmed): full gates OK, print-lint 461/33 (baseline 463/33; needs `pip install pymupdf` in a fresh container), master PR #9 merged in first. Helper session_01Qt98Wm6Wp75BgsTgX2oCVK archived. Open minor: R9-D1 mixed-pool scroll flicker at 1280x600 with the line on; N1 start toast over the band.
+- 2026-10-17: WRM tagging Y2-Y3 merged (critic r15 PASS, all 82 graded entries 8); mergeall R..Y6 1,042 tags 0 problems. Every WRM year is now tagged. Site lessons for Y6, Y1, Y4 follow (branches -wip-wrm-tag-y6, -wip-wrm-lessons-y1, -wip-wrm-lessons-y4). At the proposal merge read opts from step direct/partial lists (R/Y1/Y2/Y3 write no opts tagFix on live tags). Generator bugs to fix in a small lane: equiv_frac_nv keys equal pairs as "no" (gen-fractions.js ~4372); denoms filter ignores q.cell.payload (generate-question.js itemDenominators) — see GENERATOR-FIXES-2026-10-16.md.
+- 2026-10-17: **DETAILED LESSON MAKER + first 5 lessons PASSED** (helper session on `claude/sweet-newton-c8wrv1-wip-detailed-lessons`;
+  not merged, not deployed). Maker: `buildSheet({role:'detailed-lesson', lessonId, seed})` (`sheet/roles/detailed-lesson.js`,
+  `teacher-parts.js`, `teacher-icons.js`, cells `rcdws`, `words`, `arrays-turn`; lessons in `js/modules/lessons/detailed/`),
+  "Lesson: detailed" card in teacher-print beside the current maker (renamed "Lesson: standard"; its pages are byte-identical).
+  Gate `node tests/scripts/ws-detailed-lesson.cjs --lesson <id> --check` (V22 Appendix E ported + E29-E39). Docs
+  `design/lesson-planner/DETAILED_MAKER.md`; record `data/curriculum/detailed-lessons.json`; packs `design/lesson-samples/detailed/<id>/`.
+  Critic PASS (every page >= 8): g2-nbt3-read-write-1000 r4, g1-oa1-bar-model-wp-20 r4, g3-oa5-mult-properties (3a commutative) r3,
+  g3-oa9-mult-table-patterns r3, g3-oa9-input-output-rule r3. Escalations in section 9. Skills built: number_word_form options,
+  mult_properties form 0 redo, mult_chart task even + window options, function_table ftTrap/ftFactors (codec keys 5P-5U, lessons
+  sub-range). Before deploy: `ws-stamp-assets` (new modules). Owner questions open: EE set for lessons 4/5 (repo M.EE.3.OA.8 vs owner
+  list M.EE.3.OA.9); 1.OA.A.1 audit verdict should be partial.
+- 2026-10-17: DEPLOYED the detailed lesson maker (V22, "Lesson: detailed" beside "Lesson: standard") + the first 5 lessons (G2 numbers to 1,000; G1 bar-model word problems; G3 commutative; G3 multiplication-table patterns; G3 input-output rules; all critic PASS, every page >= 8). master 65babbb6; live serves sheet/roles/detailed-lesson.js. Deploy fixes: ws-teacher-shell role list gains detailed-lesson; mult_properties legacy forms print ×. Session session_01X3UTDSXAaEp5yiDxwukHaa archived. Y6 site lessons merged (critic r2 PASS).
+- 2026-10-17: Y1 site lessons merged (critic r3 PASS); mergeall 1,042 tags 0 problems. Started session_01Mp7KgtodxgpQGxJ2Vyxgrj
+  for owner lessons 6-10 (G4 10x / one tenth of a digit; G3 two-step word problems; G4 multiply/divide multiples of 10; G5 digit
+  values 10x / 1/10; G5 decimals to thousandths in words and expanded form; all overdue) on `claude/sweet-newton-c8wrv1-wip-detailed-lessons-2`.
+  Generator bug lane (equiv_frac_nv, denoms payload, percent_of_number 33%, simplify negatives, distributive_expr GCF) runs as a
+  local builder on `claude/sweet-newton-c8wrv1-wip-genbugs`.
 - Held for after these land: Lane B answer boxes + regroup boxes (spec `design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md`),
   placevalue:identify write-value (spec `design/audit/runs/next-session/PV-IDENTIFY-WRITE-VALUE-SPEC.md`).
+- 2026-10-17 generator bug fixes (branch claude/sweet-newton-c8wrv1-wip-genbugs; seeded 1-600 before/after): (1) `equiv_frac_nv` yes/no: the distractor clamp could land on an equivalent pair keyed "no" (seed 206: 2/3 vs 2/3) - the denominator now moves until the cross products differ (2 -> 0 bad); (2) `itemDenominators` now reads `q.cell.payload` ({n,d} terms, "a/b" strings), so kit cells obey the denominators filter (`equiv_frac_visual {denoms:[2]}` 22 -> 0 items with no denominators seen); (3) `percent_of_number`: the 33% combos keyed one third (33% of 60 = 20) are now 30% with exact whole answers (53 -> 0); (4) `simplify`: distractor numerators are 1-3 off and never below 1 (no 0 or negative options; 23 -> 0); (5) `distributive_expr` factor-out: inner terms are coprime so the stated factor is the GCF (10x + 30 -> 10(x + 3), 126 -> 0).
