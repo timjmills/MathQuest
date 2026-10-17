@@ -595,7 +595,10 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
         // pictures, mixed_comparing L) are paged by their own rows too when that holds a whole row
         // more than sizing every row for the tallest; their rows stay in dealt order (groupByHeight
         // sorts only past 1.6 x), so the rows counted are the rows printed.
-        const nearMix = measuredAll && !tallMix && Math.max(...hs) - Math.min(...hs) >= 2;
+        // (r12d: one skill's problems only - a mixed pool's later deals differ from its sample, so a
+        // pool page is judged on the printed page instead, print-sheet.js pageCheck)
+        const oneSkill = new Set((items || []).map((it) => (it && it.skill) || '')).size <= 1;
+        const nearMix = measuredAll && oneSkill && !tallMix && Math.max(...hs) - Math.min(...hs) >= 2;
         if (tallMix || nearMix) {
             // (a div_facts Mix section keeps its dealt order - groupByHeight - so its rows are
             // the rows it will print, not the tall-first ones)
@@ -615,7 +618,23 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
             // (a div_facts Mix page holds every row it fits - 2 x 7 at L, not the two-column row
             // step down to 2 x 5; critic R1 D14)
             if (keepOrder) { /* every row it fits */ } else if (cols === 2 && fit > 1 && !section.freeRows) fit = TWO_COL_ROWS.find((r) => r <= fit) || fit;
-            if (fit > rows && nearMix) nearPack = { cols, rows: fit };
+            // (r12d) rows of nearly one height count from the TALLEST rows the sample holds, the
+            // tallest paired first - never from the average, which a pool's later deal can exceed
+            // (mixed_multiplication S More Practice: deals counted by the average ran onto a
+            // second page and were dealt again, p90 7 s)
+            if (nearMix) {
+                const desc = hs.slice().sort((a, b) => b - a);
+                let sum = 0, nr = 0;
+                for (let i = 0; i < desc.length; i += cols) {
+                    if (sum + desc[i] > G - SAFETY_H_MM) break;
+                    sum += desc[i]; nr++;
+                }
+                // past the sample, every further row is the sample's tallest
+                while (nr * cols >= desc.length && sum + desc[0] <= G - SAFETY_H_MM) { sum += desc[0]; nr++; }
+                let nf = Math.min(nr, Math.max(ceilRows, Math.floor(packCeil / cols)));
+                if (cols === 2 && nf > 1 && !section.freeRows) nf = TWO_COL_ROWS.find((r) => r <= nf) || nf;
+                if (nf > rows) nearPack = { cols, rows: nf };
+            } else if (fit > rows && nearMix) nearPack = { cols, rows: fit };
             else if (fit > rows) {
                 rows = fit;
                 packed = true;

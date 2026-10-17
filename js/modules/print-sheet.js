@@ -2227,7 +2227,7 @@ async function buildSheetDeal(req = {}) {
                     // (the true cell heights, r12c, made mixed_subtraction M a page of 2 stories and 3
                     // stacks whose rows were stretched to half full, L-DENSITY SPREAD).
                     h = holeOf(items);
-                    if (pool && !h.rem && !h.frem) {
+                    if (pool && !h.rem && !h.frem && !ROW_FILL.off) {
                         const hadFine = h.fineCols > 0;
                         const whole = (its) => { sec.floor = floorFor(its); const hx = holeOf(its); return hx.cap >= its.length && its.length <= ceilF * pagesWanted && !hx.rem && !hx.frem && (hx.fineCols > 0) === hadFine; };
                         const other = (q, sk) => !fineQ(q, sk);
@@ -2240,6 +2240,7 @@ async function buildSheetDeal(req = {}) {
                             const more = (hx.fineCols > 0 ? tryRow(hx.fineCols, fineQ, true, 6000 + 10 * r + items.length) : null) || tryRow(hx.cols, other, false, 6500 + 10 * r + items.length);
                             if (!more) break;
                             items = more;
+                            ROW_FILL.used = true;
                         }
                         sec.floor = floorFor(items);
                     }
@@ -3291,6 +3292,8 @@ function poolQuality(x) {
     }
 }
 
+/** r12d: the pool page's whole-row fill (buildSheetOnce): `used` when it added a row, `off` to build a deal without it. */
+const ROW_FILL = { used: false, off: false };
 /** PAGEFILL (RUBRIC H13): an Auto pool page leaves no strip over a fifth of its problem area. */
 const POOL_FILL_FLOOR = 0.81;   // measured on the printed page (pageCheck): 1 % of margin over the lint's 80 %
 /** A review page deals at least this many problems where a deal on the page allows it: one 12 x 12
@@ -3462,7 +3465,16 @@ async function poolPage(req) {
     const clean = (rk) => !!rk && rk[0] === 0 && rk[1] === 1 && rk[2] >= POOL_MIN_ITEMS;
     for (let k = 0; k < POOL_DEALS_WIDE; k++) {
         if (k >= POOL_DEALS && clean(bestRank)) break;
-        const x = await buildSheetOnce(Object.assign({}, req, { seed: k ? (base + k * 7919) >>> 0 : base }));
+        const dealReq = Object.assign({}, req, { seed: k ? (base + k * 7919) >>> 0 : base });
+        ROW_FILL.used = false;
+        let x = await buildSheetOnce(dealReq);
+        // r12d: the whole-row fill counts its page from the layout's estimate; when the row it
+        // added runs the deal onto another page, the same deal is built again without it (one
+        // build, never a lost deal: mixed_multiplication S More Practice tried 17 deals)
+        if (ROW_FILL.used && x && x.pageCount > wanted) {
+            ROW_FILL.off = true;
+            try { x = await buildSheetOnce(dealReq); } finally { ROW_FILL.off = false; }
+        }
         if (!first) first = x;
         if (!x || !Array.isArray(x.items) || x.pageCount > wanted || blank(x) || dupOf(x)) { tried.push(`${k}:invalid`); continue; }
         await nextTask();
