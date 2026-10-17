@@ -523,6 +523,26 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
   the owner's order puts the card first. Gates: ws-wrm-page-unit (+ --curated) to-make gate, ws-teacher-wrm to-make step. Evidence
   `design/audit/runs/wrm-page/tomake/`. Merged main 0aa50562 (preset skills) in; gates rerun on the merged tree. Not deployed, not
   stamped; no critic yet.
+- 2026-10-17 (owner: "the website WRM part difficult to navigate ... grade, the domain, and then the lessons in list form in
+  order ... information comes up on the side ... extra lessons/projects/enrichment as the last domain section"): White Rose page
+  navigation on branch `claude/sweet-newton-c8wrv1-wip-wrm-nav` (builder Opus medium, the page lane's level). This replaces the
+  unit chips, compact finder, "This week" button and unit week caption with a grade row (Pre-K, K, Grade 1 … Grade 5, remembered per viewer in
+  localStorage `mq_teacher_wrm_grade`), a domain row in the site's order with "Extra lessons" last, and the grade's list. The list
+  has a heading per domain with its core lessons numbered 1, 2, 3 in the site's order. Each row is the title plus at most two tags
+  (Full / Covers part / No skill yet; CCSS · BUILD), with no weeks or dates. `wrm-links.js` gains `gradeSections`, `isCoreLesson`,
+  `extraKind` and `EXTRA_KINDS`. Extra lessons holds every non-core lesson once: the site's support lessons, projects and other
+  school lessons (step flag "other", e.g. Grade 5's four end-of-year rows), enrichment and assessments. CCSS BUILD, above-grade
+  and non-CCSS rows stay in their domain. Clicking a lesson opens it in a right column at 1024 px and wider, with the list in a sticky
+  scroll box beside it. Below 1024 px it slides over the list with "Back to the lessons" (Escape closes it too). The panel is the old
+  lesson view; the "Detailed lesson" tag moved from the row to the head, and the lesson number is the list number. The domain
+  "Skills to be made" card sits folded at the top of each section ("Skills to be made for this domain (N) — show"). Arrow keys,
+  Home and End move through the list; Enter opens. Bookmarks: lesson links are unchanged, so old `#wrm/<g>/<D#>/<n|slug>` links
+  open; `#wrm/<g>/<D#|extra>` opens a section, and a Pre-K small-unit id opens its domain. Links from before the site order
+  (`#wrm/<g>/E/<n>`, the workbook's enrichment unit is gone) open the grade's list with no lesson. CSS changes are additive.
+  Gates on the merged tree (ae93568a): ws-wrm-page-unit and --curated OK (new navigation checks), ws-plain-words --check OK (db
+  regenerated), ws-teacher-wrm --shots OK. Stopped for the owner's "asap push" and NOT re-run after the last merge:
+  ws-teacher-wrm --curated, ws-teacher-shell, ws-teacher-library, ws-chromebook-fit, ws-boot-smoke. Evidence
+  `design/audit/runs/wrm-page/nav/`. Not deployed, not stamped, no critic yet.
 - 2026-10-17: Owner request recorded, NOT built: carry digits UNDER the answer line as a teacher option (addition, short and long multiplication; subtraction stays at the top; off by default; smaller box). Spec: `design/audit/runs/next-session/CARRY-BELOW-SPEC.md`. Add a build-list entry (operations lane, appended) after the current deploy.
 - 2026-10-17 ~19:45: **DEPLOYED** master ae66125c (live confirmed): 14 preset skills (mechanism `js/modules/skill-presets.js`, `design/PRESET_SKILLS.md`) and the White Rose "Skills to be made" cards per lesson and per grade/domain (`js/modules/lesson-tomake.js`). Full gates OK, print-lint 460/33. In flight: presets batch 2 (`-wip-presets-2`), White Rose simpler navigation (`-wip-wrm-nav`). Carry-below build-list entry waits for presets batch 2 (both edit build-list.js).
 - 2026-10-17: **Preset skills batch 2 (Opus low)** on `claude/sweet-newton-c8wrv1-wip-presets-2` (not merged, no critic).
