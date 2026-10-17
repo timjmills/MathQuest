@@ -11,7 +11,8 @@ const { ready: jargonReady, jargonHit } = createRequire(import.meta.url)('../lib
 await jargonReady();
 import { WRM_SEQUENCE } from '../../js/modules/wrm-sequence-db.js';
 import { WRM_STEPS, skillsForWrmStep } from '../../js/modules/wrm.js';
-import { linksFor, allLessons, lessonByKey, searchLessons, addCuratedYear, clearCurated, proposalName,
+import { linksFor, allLessons, lessonByKey, searchLessons, addCuratedYear, clearCurated, proposalName, unitLessons, lessonBySite, lessonBySiteSlug,
+    lessonHash, siteSlug, siteFlagText, lessonAbout, siteLessonLabel,
     PREREQ_CAP, RELATED_CAP, WRM_LINK_OVERRIDES, REP_PAIRS, composeWhy, composePartial, composeMissing, proposalLabel, stepsInNote, taskName, MAP_STRANDS, strandOfKey, repPairsOfText } from '../../js/modules/wrm-links.js';
 import { buildQueue, passes, toCSV, CSV_HEAD, KINDS, gradesOfText, gradeOfCode, gradeOfRit, closesText, stepName } from '../../js/modules/build-queue.js';
 
@@ -27,8 +28,9 @@ for (const l of L) {
     if (l.step) ok(stepIds.has(l.step), `${l.key} maps to a real step ${l.step}`);
     if (l.type === 'build') ok(!l.step, `${l.key} CCSS BUILD has no step`);
 }
-const mapped = L.filter((l) => l.step).length;
-ok(mapped / L.length > 0.9, `>90% mapped (${mapped}/${L.length})`);
+const SEQ_L = L.filter((l) => l.seq);   // the White Rose sequence rows (the site's own lessons are checked below)
+const mapped = SEQ_L.filter((l) => l.step).length;
+ok(mapped / SEQ_L.length > 0.9, `>90% of the sequence mapped (${mapped}/${SEQ_L.length})`);
 const g2 = lessonByKey('2:D1:1');
 ok(g2 && g2.title === 'Represent numbers to 100' && g2.step === 'Y3.B1.S1' && g2.power && g2.weeks[0] === 'W01', 'Grade 2 D1 lesson 1 = Y3.B1.S1, power, W01');
 const copied = L.find((l) => l.type === 'copied');
@@ -105,7 +107,9 @@ ok(linksFor('2:D1:1').source === 'rules', 'clearCurated');
 const dir = new URL('../../data/curriculum/links/', import.meta.url);
 const files = existsSync(dir) ? readdirSync(dir) : [];
 const onDisk = files.filter((f) => /^(R|Y[1-6])\.json$/.test(f)).map((f) => f.replace('.json', '')).sort();
-const want = { years: ['R', 'Y1', 'Y2', 'Y3', 'Y4', 'Y5', 'Y6'].filter((y) => onDisk.includes(y)), map: files.includes('MAP.json') };
+// round 7: "detailed" says whether data/curriculum/detailed-lessons.json exists (the page fetches it only then)
+const detailedOnDisk = existsSync(new URL('../detailed-lessons.json', dir));
+const want = { years: ['R', 'Y1', 'Y2', 'Y3', 'Y4', 'Y5', 'Y6'].filter((y) => onDisk.includes(y)), map: files.includes('MAP.json'), detailed: detailedOnDisk };
 if (process.argv.includes('--write-index')) {
     writeFileSync(new URL('index.json', dir), `${JSON.stringify(want, null, 2)}\n`);
     console.log(`wrote data/curriculum/links/index.json ${JSON.stringify(want)}`);
@@ -113,6 +117,7 @@ if (process.argv.includes('--write-index')) {
 const idx = JSON.parse(readFileSync(new URL('index.json', dir)));
 ok(JSON.stringify(onDisk) === JSON.stringify([...idx.years].sort()), `index.json years ${JSON.stringify(idx.years)} = files on disk ${JSON.stringify(onDisk)}`);
 ok(!!idx.map === files.includes('MAP.json'), `index.json map ${idx.map} = MAP.json on disk ${files.includes('MAP.json')} (fix: node tests/scripts/ws-wrm-page-unit.mjs --write-index)`);
+ok(!!idx.detailed === detailedOnDisk, `index.json detailed ${idx.detailed} = data/curriculum/detailed-lessons.json on disk ${detailedOnDisk} (fix: node tests/scripts/ws-wrm-page-unit.mjs --write-index)`);
 
 // representation pairs and strands
 ok(REP_PAIRS.length === 8, 'eight representation pairs');
@@ -235,7 +240,7 @@ for (const dir of dirs) {
         if (!existsSync(f)) continue;
         const d = JSON.parse(readFileSync(f, 'utf8'));
         years.push(d);
-        for (const st of Object.values(d.steps || {})) {
+        for (const st of [...Object.values(d.steps || {}), ...Object.values(d.lessons || {})]) {
             for (const g of ['pre', 'related']) for (const x of st[g] || []) count(`${y}.json`, x.why);
             for (const x of st.partial || []) count(`${y}.json`, x.missing);
             count(`${y}.json`, st.missing);
@@ -260,15 +265,78 @@ for (const dir of dirs) {
         }
         // the lessons themselves, through linksFor (what the screen shows)
         for (const l of L) {
-            if (!l.step || !years.some((d) => d.steps && d.steps[l.step])) continue;
+            if (!(l.step && years.some((d) => d.steps && d.steps[l.step])) && !(l.site && years.some((d) => d.lessons && d.lessons[l.site]))) continue;
             const r = linksFor(l);
-            gate(`lesson ${l.key}`, [r.missing ? `These skills cover part of the lesson. Not yet: ${r.missing}` : '', ...r.direct.map((x) => x.partial), ...r.prereq.map((x) => x.why), ...r.related.map((x) => x.why), ...r.build.map(proposalLabel), ...r.preBuild.map(proposalLabel), l.title]);
+            if (l.site && !l.step) ok(r.source === 'curated', `site lesson ${l.site}: its links entry is read (source ${r.source})`);
+            gate(`lesson ${l.key}`, [r.missing ? `These skills cover part of the lesson. Not yet: ${r.missing}` : '', ...r.direct.map((x) => x.partial), ...r.prereq.map((x) => x.why), ...r.related.map((x) => x.why), ...r.build.map(proposalLabel), ...r.preBuild.map(proposalLabel), l.title, ...lessonAbout(l)]);
         }
         clearCurated();
     }
 }
 // rules mode: every lesson's lines with no link files
-for (const l of L) { const r = linksFor(l); gate(`lesson (rules) ${l.key}`, [r.missing ? `These skills cover part of the lesson. Not yet: ${r.missing}` : '', ...r.direct.map((x) => x.partial), ...r.prereq.map((x) => x.why), ...r.related.map((x) => x.why), l.title]); }
+for (const l of L) { const r = linksFor(l); gate(`lesson (rules) ${l.key}`, [r.missing ? `These skills cover part of the lesson. Not yet: ${r.missing}` : '', ...r.direct.map((x) => x.partial), ...r.prereq.map((x) => x.why), ...r.related.map((x) => x.why), l.title, siteFlagText(l), ...lessonAbout(l)]); }
+
+// THE SCHOOL SITE'S OWN LESSONS (round 7, owner: every lesson on the school site visible with its skills)
+{
+    const site = JSON.parse(readFileSync(new URL('../../data/curriculum/site-lessons.json', import.meta.url), 'utf8'));
+    const { execFileSync } = await import('node:child_process');
+    let fresh = true;
+    try { execFileSync(process.execPath, [new URL('./ws-site-lessons.mjs', import.meta.url).pathname, '--check'], { stdio: 'pipe' }); } catch (e) { fresh = false; }
+    ok(fresh, 'js/modules/site-lessons-db.js is stale (fix: node tests/scripts/ws-site-lessons.mjs)');
+    const GR = (g) => String(g).replace(/^G(?=\d)/, '');
+    const ids = [...site.lessons.map((x) => ({ ...x, kind: 'lesson' })), ...site.assessments.map((x) => ({ ...x, kind: 'assessment' }))];
+    let reach = 0, twins = 0, tagged = 0, untagged = 0, assessments = 0;
+    for (const s of ids) {
+        const l = lessonBySite(s.id);
+        ok(l, `site lesson ${s.id} "${s.title}" is listed`);
+        if (!l) continue;
+        // reachable: in its unit's list, its grade is the site's, its bookmark opens it, and the id is the bookmark
+        ok(l.grade === GR(s.grade), `${s.id}: listed under grade ${l.grade}, the site says ${s.grade}`);
+        const inUnit = unitLessons(l.grade, l.unit).includes(l);
+        ok(inUnit, `${s.id}: not in the list of ${l.grade} ${l.unit}`);
+        const h = lessonHash(l);
+        const m = /^#wrm\/([^/]+)\/([^/]+)\/([^/]+)$/.exec(h);
+        ok(m && m[3] === siteSlug(s.id) && !/^\d+$/.test(m[3]) && lessonBySiteSlug(decodeURIComponent(m[1]), m[3]) === l, `${s.id}: bookmark ${h} does not reopen it`);
+        if (inUnit && m) reach += 1;
+        if (l.seq) twins += 1;
+        if (s.kind === 'assessment') { assessments += 1; ok(l.type === 'assessment' && siteFlagText(l) === 'Assessment' && !linksFor(l).direct.length, `${s.id}: an assessment, flagged and with no skills`); continue; }
+        ok(siteFlagText(l), `${s.id}: no flag on the row`);
+        gate(`site lesson ${s.id}`, [l.title, siteFlagText(l), ...lessonAbout(l)]);
+    }
+    // tagged / untagged with every links file on disk
+    clearCurated();
+    for (const y of ['R', 'Y1', 'Y2', 'Y3', 'Y4', 'Y5', 'Y6']) { const f = new URL(`${y}.json`, dir); if (existsSync(f)) addCuratedYear(JSON.parse(readFileSync(f, 'utf8'))); }
+    for (const s of site.lessons) { const l = lessonBySite(s.id); if (!l || l.step) continue; if (linksFor(l).source === 'curated') tagged += 1; else untagged += 1; }
+    // every site lesson's screen lines, in both data modes
+    for (const s of site.lessons) {
+        const l = lessonBySite(s.id);
+        if (!l) continue;
+        const r = linksFor(l);
+        gate(`site lesson ${s.id} links`, [r.missing ? `These skills cover part of the lesson. Not yet: ${r.missing}` : '', ...r.direct.map((x) => x.partial), ...r.prereq.map((x) => x.why), ...r.related.map((x) => x.why), ...r.build.map(proposalLabel), ...r.preBuild.map(proposalLabel)]);
+        ok(siteLessonLabel(s.id).includes(l.title), `${s.id}: label for other screens`);
+    }
+    clearCurated();
+    for (const s of site.lessons) { const l = lessonBySite(s.id); if (l) { const r = linksFor(l); gate(`site lesson (rules) ${s.id}`, [...r.prereq.map((x) => x.why), ...r.related.map((x) => x.why)]); } }
+    ok(reach === ids.length, `every site lesson and assessment reachable by its unit and bookmark (${reach}/${ids.length})`);
+    // ids stable: the sequence rows keep their numbers; a site lesson's key is its site id unless it is a sequence row
+    ok(lessonByKey('2:D1:1') && lessonByKey('2:D1:1').title === 'Represent numbers to 100', 'the sequence keys are unchanged');
+    ok(L.filter((l) => !l.seq).every((l) => l.key === l.site && !l.n), 'a site-only lesson is keyed by its site id and has no number');
+    ok(new Set(L.map((l) => l.key)).size === L.length, 'lesson keys unique');
+    // school-week order inside every unit: a dated site lesson never sits after a later week's dated lesson of the site
+    for (const g of WRM_SEQUENCE) for (const u of g.units) {
+        const list = unitLessons(g.id, u.id).filter((l) => !l.seq && l.weeks.length);
+        const wk = list.map((l) => +l.weeks[0].slice(1));
+        ok(wk.every((w, i) => !i || w >= wk[i - 1]), `${g.id} ${u.id}: site lessons out of week order ${wk}`);
+        const all = unitLessons(g.id, u.id);
+        const firstUndated = all.findIndex((l) => !l.seq && !l.weeks.length);
+        ok(firstUndated < 0 || all.slice(firstUndated).every((l) => !l.seq && !l.weeks.length), `${g.id} ${u.id}: the lessons with no week come last`);
+    }
+    ok(searchLessons('Line plots with fractions', 5).some((l) => l.site === 'G4|-|lineplotswithfractions'), 'search finds a site lesson by title');
+    ok(searchLessons('assessment', 40).filter((l) => l.type === 'assessment').length >= 10, 'search "assessment" finds the assessments');
+    ok(searchLessons('ccss build', 80, '4').some((l) => l.site && !l.step), 'search "ccss build" finds the CCSS BUILD lessons');
+    console.log(`site lessons: ${site.lessons.length} lessons + ${assessments} assessments listed (${twins} are sequence rows the site also names); tagged ${tagged}, not tagged ${untagged} (site-only lessons with no step)`);
+}
+
 ok(!jBad, `plain-English gate: ${jBad} of ${jLines} teacher-facing lines ${JSON.stringify(jByForm)}`);
 console.log(`plain-English gate: ${jLines} teacher-facing lines checked, ${jBad} not plain ${JSON.stringify(jByKind)}`);
 console.log(`free-text notes hidden (not plain as written; the composed sentence stands): ${Object.entries(hidden).map(([f, [n, h]]) => `${f} ${h}/${n} (${Math.round((100 * h) / n)}%)`).join(', ')}`);

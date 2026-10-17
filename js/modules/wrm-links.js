@@ -24,6 +24,7 @@ import { skillsForWrmStep, wrmStep, wrmFor, WRM_PROPOSALS } from './wrm.js';
 import { skillsForStandard, SKILL_STANDARDS } from './standards.js';
 import { STANDARD_PROPOSALS, WRM_EXTENSIONS } from './build-list.js';
 import { plainNote, isPlain } from './plain-words.js';
+import { SITE_LESSONS, SITE_ASSESSMENTS, STEP_SITE } from './site-lessons-db.js';
 
 // ---- curated links (data/curriculum/links/<YEAR>.json, written by the tagging lane) ------------
 // When a step has a curated record it wins over the computed rules: direct (with opts and partial),
@@ -33,16 +34,22 @@ import { plainNote, isPlain } from './plain-words.js';
 // costs a failed request). Add a year there in the same change that adds its file; ws-wrm-page-unit
 // checks both agree.
 const CURATED = new Map();       // step id -> record
+// A year file's top-level `lessons` section (round 7): the school site's own lessons, keyed by their site id
+// ("G4|-|lineplotswithfractions", data/curriculum/site-lessons.json), with the same record shape as a step.
+const CURATED_LESSONS = new Map();
 const CURATED_PROPOSALS = {};    // proposal id -> { name, ... }
 export function addCuratedYear(data) {
     if (!data || typeof data !== 'object' || !data.steps) return 0;
     let n = 0;
     for (const [id, rec] of Object.entries(data.steps)) { if (rec && typeof rec === 'object') { CURATED.set(id, rec); n += 1; } }
+    for (const [id, rec] of Object.entries(data.lessons || {})) { if (rec && typeof rec === 'object') { CURATED_LESSONS.set(id, rec); n += 1; } }
     Object.assign(CURATED_PROPOSALS, data.proposals || {});
     return n;
 }
-export function clearCurated() { CURATED.clear(); for (const k of Object.keys(CURATED_PROPOSALS)) delete CURATED_PROPOSALS[k]; }
+export function clearCurated() { CURATED.clear(); CURATED_LESSONS.clear(); for (const k of Object.keys(CURATED_PROPOSALS)) delete CURATED_PROPOSALS[k]; }
 export function curatedFor(stepId) { return CURATED.get(stepId) || null; }
+/** The curated record of a school-site lesson (its site id), or null. */
+export function curatedLessonFor(siteId) { return CURATED_LESSONS.get(siteId) || null; }
 
 /** A proposal's plain name: the year file's proposals first, then WRM_PROPOSALS, then the build list. */
 const EXTRA_NAMES = {};          // proposal id -> { name } from MAP.json and the build list (addProposalNames)
@@ -78,24 +85,109 @@ export function gradeOfYear(y) { return YEAR_LABEL[y] || y; }
 // ---- the sequence, unpacked once -------------------------------------------------------------
 let LESSONS = null;
 let BY_KEY = null;
+let BY_SITE = null;      // site id -> lesson (a sequence row the site names, or a lesson only the site has)
+let UNIT_ORDER = null;   // 'grade:unit' -> [lesson] in school-week order (the unit's list on screen)
+/** The slug part of a site id ("G4|-|lineplotswithfractions" -> "lineplotswithfractions"). */
+export const siteSlug = (id) => String(id || '').split('|-|')[1] || '';
+const titleSlug = (t) => String(t || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+const weekNo = (w) => +String(w || '').replace(/\D/g, '') || 0;
+/** The site's grade prefix for a screen grade id: '4' -> 'G4', 'K' -> 'K'. */
+const siteGrade = (g) => (/^\d$/.test(String(g)) ? `G${g}` : String(g || ''));
+
+/**
+ * The unit a site lesson sits in: the grade's unit of its CCSS domain (the one whose weeks hold its first week
+ * when two share the domain), else the unit taught that week, else Enrichment. Never moves a sequence row.
+ */
+function placeUnit(g, domain, week) {
+    const units = g.units.filter((u) => u.id !== 'E');
+    const inWeeks = (u) => { const ws = (String(u.weeks || '').match(/W\d+/g) || []).map(weekNo); return ws.length && week && weekNo(week) >= ws[0] && weekNo(week) <= ws[ws.length - 1]; };
+    const byDom = domain ? units.filter((u) => u.domain === domain) : [];
+    if (byDom.length) return byDom.find(inWeeks) || byDom[0];
+    const alt = { CC: 'NBT', NBT: 'CC' }[domain];
+    return (alt && units.find((u) => u.domain === alt)) || units.find(inWeeks) || g.units.find((u) => u.id === 'E') || g.units[0];
+}
+/** Put a lesson after the last lesson of the unit taught in its week or before (a lesson with no week goes last). */
+function insertByWeek(list, l) {
+    const w = weekNo(l.weeks[0]);
+    if (!w) { list.push(l); return; }
+    let at = 0;
+    list.forEach((x, i) => { const xw = weekNo((x.weeks || [])[0]); if (xw && xw <= w) at = i + 1; else if (!xw && x.seq && at === i) at = i + 1; });
+    list.splice(at, 0, l);
+}
+
 function unpack() {
     if (LESSONS) return;
     LESSONS = [];
     BY_KEY = new Map();
+    BY_SITE = new Map();
+    UNIT_ORDER = new Map();
     for (const g of WRM_SEQUENCE) {
         for (const u of g.units) {
+            const list = [];
             u.lessons.forEach((t, i) => {
                 const [rawTitle, step, ccss, power, type, weeks, strands, from, note] = t;
                 const title = String(rawTitle).replace(/\(\s+/g, '(').replace(/\s+\)/g, ')');   // "(How many left )"
                 const l = {
                     key: `${g.id}:${u.id}:${i + 1}`, grade: g.id, gradeLabel: g.label, unit: u.id, domain: u.domain,
                     unitName: u.name, n: i + 1, title, step, ccss, power: !!power, type, weeks, strands, from, note: note || '',
+                    seq: true, year: g.year, site: '', siteInfo: null,
                 };
                 LESSONS.push(l);
                 BY_KEY.set(l.key, l);
+                list.push(l);
             });
+            UNIT_ORDER.set(`${g.id}:${u.id}`, list);
         }
     }
+    // The school site's own lessons (round 7, owner: "every lesson on the school site must be visible with its
+    // skills"). A site lesson whose title is a row of the grade's sequence IS that row (the row keeps its place and
+    // number and gains the site id); any other joins its unit in school-week order, the dated ones first.
+    const fresh = [];
+    for (const t of SITE_LESSONS) {
+        const [id, grade, title, flag, supplement, ccss, ee, power, domain, block, week, weeks, strands, domainTest] = t;
+        const g = WRM_SEQUENCE.find((x) => x.id === grade);
+        if (!g) continue;
+        const info = { id, flag, supplement: !!supplement, ee, block, week, weeks, domainTest: !!domainTest, kind: 'lesson' };
+        const twin = LESSONS.find((l) => l.seq && l.grade === grade && !l.site && titleSlug(l.title) === siteSlug(id));
+        if (twin) { twin.site = id; twin.siteInfo = info; BY_SITE.set(id, twin); continue; }
+        const u = placeUnit(g, domain, week);
+        fresh.push({ key: id, grade, gradeLabel: g.label, unit: u.id, domain: u.domain, unitName: u.name, n: 0, title: tidyTitle(title), step: null,
+            ccss, power: !!power, type: 'site', weeks: weeks.length ? weeks : week ? [week] : [], strands, from: '', note: '', seq: false, year: g.year,
+            site: id, siteInfo: info });
+    }
+    for (const t of SITE_ASSESSMENTS) {
+        const [id, grade, title, kind, domain, weeks] = t;
+        const g = WRM_SEQUENCE.find((x) => x.id === grade);
+        if (!g) continue;
+        const u = placeUnit(g, domain, weeks[0]);
+        fresh.push({ key: id, grade, gradeLabel: g.label, unit: u.id, domain: u.domain, unitName: u.name, n: 0, title: tidyTitle(title), step: null,
+            ccss: [], power: false, type: 'assessment', weeks, strands: '', from: '', note: '', seq: false, year: g.year, site: id,
+            siteInfo: { id, flag: kind === 'map' ? 'map' : 'exam', supplement: false, ee: [], block: null, week: weeks[0] || null, weeks, domainTest: false, kind: 'assessment' } });
+    }
+    // dated lessons by week (lessons before the assessment of the same week), then the undated ones by title
+    const dated = fresh.filter((l) => l.weeks.length).sort((a, b) => weekNo(a.weeks[0]) - weekNo(b.weeks[0]) || (a.type === 'assessment') - (b.type === 'assessment'));
+    const undated = fresh.filter((l) => !l.weeks.length).sort((a, b) => a.title.localeCompare(b.title));
+    for (const l of [...dated, ...undated]) {
+        LESSONS.push(l);
+        BY_KEY.set(l.key, l);
+        BY_SITE.set(l.site, l);
+        insertByWeek(UNIT_ORDER.get(`${l.grade}:${l.unit}`), l);
+    }
+}
+
+/** A unit's lessons as the screen lists them: the sequence's rows with the site's own lessons in week order. */
+export function unitLessons(gradeId, unitId) { unpack(); return (UNIT_ORDER.get(`${gradeId}:${unitId}`) || []).slice(); }
+/** The lesson a site id names (a sequence row the site also lists, or a lesson only the site has), or null. */
+export function lessonBySite(id) { unpack(); return BY_SITE.get(String(id || '')) || null; }
+/** The lesson of a grade whose site id ends in this slug (the bookmark form), or null. */
+export function lessonBySiteSlug(gradeId, slug) { unpack(); return BY_SITE.get(`${siteGrade(gradeId)}|-|${String(slug || '')}`) || null; }
+/**
+ * The bookmark of a lesson: #wrm/<grade>/<unit>/<n> for a White Rose row, #wrm/<grade>/<unit>/<site slug> for a
+ * lesson the school site names (stable while the site keeps the title, wherever the lesson is listed).
+ */
+export function lessonHash(l) {
+    if (!l) return '#wrm';
+    return `#wrm/${encodeURIComponent(l.grade)}/${encodeURIComponent(l.unit)}/${l.site ? siteSlug(l.site) : l.n}`;
 }
 
 /** Every grade: [{ id, label, units: [{ id, domain, name, weeks, power, lessons: [lesson] }] }]. */
@@ -115,9 +207,10 @@ export function weekInfo(gradeId, week) {
     return (g && g.weekInfo && g.weekInfo[week]) || {};
 }
 
+/** The White Rose sequence rows of the lesson's unit (the computed rules read only these). */
 function siblings(lesson) {
     unpack();
-    return LESSONS.filter((l) => l.grade === lesson.grade && l.unit === lesson.unit);
+    return LESSONS.filter((l) => l.seq && l.grade === lesson.grade && l.unit === lesson.unit);
 }
 
 const clusterOf = (code) => {
@@ -154,8 +247,10 @@ export function linksFor(lessonOrKey, opts = {}) {
     if (!lesson) return null;
     const live = opts.live || (() => true);
     const ovr = WRM_LINK_OVERRIDES[lesson.step || lesson.key] || {};
-    const cur = lesson.step ? CURATED.get(lesson.step) : null;
+    const cur = (lesson.step ? CURATED.get(lesson.step) : null) || (lesson.site ? CURATED_LESSONS.get(lesson.site) : null);
     if (cur) return curatedLinks(lesson, cur, ovr, live);
+    // an assessment lists no skills (the site links none)
+    if (lesson.type === 'assessment') return { lesson, step: null, direct: [], prereq: [], related: [], verdict: 'gap', missing: '', build: [], preBuild: [], source: 'assessment' };
     const direct = applyOverride(directOf(lesson.step, live), ovr.direct, 'Added by the school', 0)
         .map((x) => ({ key: x.key, partial: x.partial ? composePartial(x.partial) : '' }));
     const taken = new Set(direct.map((x) => x.key));
@@ -178,7 +273,7 @@ export function linksFor(lessonOrKey, opts = {}) {
     }
     const sib = siblings(lesson);
     const at = sib.findIndex((l) => l.key === lesson.key);
-    for (let k = at - 1; k >= Math.max(0, at - 3); k -= 1) {
+    for (let k = at - 1; at > 0 && k >= Math.max(0, at - 3); k -= 1) {
         for (const d of directOf(sib[k].step, live)) push(pre, d.key, `Earlier in this unit: "${sib[k].title}"`);
     }
     if (!pre.length) {
@@ -203,7 +298,7 @@ export function linksFor(lessonOrKey, opts = {}) {
     for (const code of lesson.ccss) {
         for (const key of skillsForStandard(code)) push(rel, key, `Same standard (${code})`);
     }
-    for (let k = at + 1; k <= Math.min(sib.length - 1, at + 3); k += 1) {
+    for (let k = at + 1; at >= 0 && k <= Math.min(sib.length - 1, at + 3); k += 1) {
         for (const d of directOf(sib[k].step, live)) push(rel, d.key, `Next in this unit: "${sib[k].title}"`);
     }
     const related = applyOverride(rel, ovr.related, 'Added by the school', RELATED_CAP);
@@ -227,7 +322,7 @@ function curatedLinks(lesson, cur, ovr, live) {
     const related = applyOverride((cur.related || []).map(withOpts('related')), ovr.related, 'Added by the school', 0).filter(keep);
     const verdict = ['full', 'partial', 'gap'].includes(cur.verdict) ? cur.verdict
         : !direct.length ? 'gap' : direct.some((x) => !x.partial) ? 'full' : 'partial';
-    return { lesson, step: wrmStep(lesson.step), direct, prereq, related, verdict, missing: composeMissing(cur.missing, build, cur.envision),
+    return { lesson, step: lesson.step ? wrmStep(lesson.step) : null, direct, prereq, related, verdict, missing: composeMissing(cur.missing, build, cur.envision),
         build, preBuild: (cur.preBuild || []).slice(), note: cur.note || '', source: 'curated' };
 }
 
@@ -247,8 +342,10 @@ export function liveSkillLabel(id) { return skillLabeler && id ? skillLabeler(id
  * note is shown only when it passes plain-words.js WHOLE; it is never partly rewritten. The notes stay in the
  * link files and the CSV for the build team.
  */
-/** A title as written, with stray spaces inside brackets closed up ("(How many left )"). */
-export const tidyTitle = (t) => String(t || '').replace(/\(\s+/g, '(').replace(/\s+\)/g, ')').replace(/\s{2,}/g, ' ').trim();
+const SUP = { 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹' };
+/** A title as written, with stray spaces inside brackets closed up and powers written raised ("10^3" -> "10³"). */
+export const tidyTitle = (t) => String(t || '').replace(/\(\s+/g, '(').replace(/\s+\)/g, ')').replace(/\s{2,}/g, ' ')
+    .replace(/(\d)\^(\d+)/g, (m, a, b) => a + [...b].map((d) => SUP[d]).join('')).trim();
 /** A White Rose step's title, tidied, or ''. */
 export function stepTitle(id) { const r = wrmStep(id); return r ? tidyTitle(r.title) : ''; }
 /**
@@ -294,11 +391,16 @@ export function weeksInNote(text) {
     return out;
 }
 
-/** How a step sits against this lesson's step. */
-export function relationOf(sid, lessonStep) {
+/** How a step sits against this lesson's step (or, for a school-site lesson with no step, against its year). */
+export function relationOf(sid, lessonStep, lessonYear = '') {
     const a = STEP_PART.exec(sid || ''), b = STEP_PART.exec(lessonStep || '');
     if (!a) return 'other';
-    if (!b) return 'grade';
+    if (!b) {
+        const yb = YEAR_ORDER.indexOf(lessonYear || '');
+        if (yb < 0) return 'grade';
+        const ya = YEAR_ORDER.indexOf(a[2]);
+        return ya < yb ? 'earlierGrade' : ya > yb ? 'laterGrade' : 'sameGrade';
+    }
     if (a[1] === b[1]) { const d = +a[4] - +b[4]; return d === -1 ? 'before' : d < 0 ? 'earlier' : d === 1 ? 'next' : d > 0 ? 'later' : 'same'; }
     const ya = YEAR_ORDER.indexOf(a[2]), yb = YEAR_ORDER.indexOf(b[2]);
     if (ya !== yb) return ya < yb ? 'earlierGrade' : 'laterGrade';
@@ -312,14 +414,14 @@ const REL_LEAD = {
     before: () => 'The step before', earlier: () => 'Earlier in the same White Rose block', next: () => 'The next step',
     later: () => 'Later in the same White Rose block', same: () => 'This lesson\'s own White Rose step',
     earlierGrade: (g) => `Taught before, in ${g}`, laterGrade: (g) => `Taught later, in ${g}`, earlierBlock: (g) => `Taught earlier in ${g}`,
-    laterBlock: (g) => `Taught later in ${g}`, grade: (g) => g,
+    laterBlock: (g) => `Taught later in ${g}`, grade: (g) => g, sameGrade: (g) => `In ${g}`,
 };
-const REL_ORDER = ['before', 'earlier', 'earlierBlock', 'earlierGrade', 'next', 'later', 'laterBlock', 'laterGrade', 'grade', 'same'];
+const REL_ORDER = ['before', 'earlier', 'earlierBlock', 'earlierGrade', 'sameGrade', 'next', 'later', 'laterBlock', 'laterGrade', 'grade', 'same'];
 /** "Taught before, in Grade 2: "Hundreds, tens and ones" (support block, week 11)." for a list of steps. */
-export function stepsSentence(steps, lessonStep, { weeks = [], support = false } = {}) {
+export function stepsSentence(steps, lessonStep, { weeks = [], support = false, year = '' } = {}) {
     const groups = new Map();
     for (const sid of steps) {
-        const rel = relationOf(sid, lessonStep);
+        const rel = relationOf(sid, lessonStep, year);
         if (rel === 'other') continue;
         const g = gradeOfYear(sid.split('.')[0]);
         const k = `${rel}|${g}`;
@@ -342,13 +444,16 @@ const uniqBy = (a) => [...new Set(a)];
 function skillReason(key, lesson, group) {
     const [c, s] = String(key || '').split(':');
     const mine = lesson.step || '';
-    const steps = c && s ? wrmFor(c, s).map((x) => x.id).filter((id) => id !== mine && relationOf(id, mine) !== 'other') : [];
-    const want = group === 'prereq' ? ['before', 'earlier', 'earlierBlock', 'earlierGrade'] : REL_ORDER;
-    const pick = steps.filter((id) => want.includes(relationOf(id, mine)));
+    const yr = mine ? '' : lesson.year || '';
+    const rel = (id) => relationOf(id, mine, yr);
+    const myYear = mine ? mine.split('.')[0] : yr;
+    const steps = c && s ? wrmFor(c, s).map((x) => x.id).filter((id) => id !== mine && rel(id) !== 'other') : [];
+    const want = group === 'prereq' ? ['before', 'earlier', 'earlierBlock', 'earlierGrade', 'sameGrade'] : REL_ORDER;
+    const pick = steps.filter((id) => want.includes(rel(id)));
     // nearest first: the same block, then the nearest grade
-    pick.sort((a, b) => REL_ORDER.indexOf(relationOf(a, mine)) - REL_ORDER.indexOf(relationOf(b, mine))
-        || Math.abs(YEAR_ORDER.indexOf(a.split('.')[0]) - YEAR_ORDER.indexOf(mine.split('.')[0])) - Math.abs(YEAR_ORDER.indexOf(b.split('.')[0]) - YEAR_ORDER.indexOf(mine.split('.')[0])));
-    if (pick.length) return stepsSentence(pick.slice(0, 2), mine);
+    pick.sort((a, b) => REL_ORDER.indexOf(rel(a)) - REL_ORDER.indexOf(rel(b))
+        || Math.abs(YEAR_ORDER.indexOf(a.split('.')[0]) - YEAR_ORDER.indexOf(myYear)) - Math.abs(YEAR_ORDER.indexOf(b.split('.')[0]) - YEAR_ORDER.indexOf(myYear)));
+    if (pick.length) return stepsSentence(pick.slice(0, 2), mine, { year: yr });
     const codes = (SKILL_STANDARDS[key] || {}).ccss || [];
     const shared = codes.filter((x) => (lesson.ccss || []).includes(x));
     if (shared.length) return `Same standard as this lesson: ${uniqBy(shared).slice(0, 2).join(', ')}.`;
@@ -370,7 +475,7 @@ export function composeWhy(note, { key = '', lesson = {}, group = 'prereq' } = {
     if (whole) return whole;
     const steps = stepsInNote(note);
     if (steps.length) {
-        const s = stepsSentence(steps, lesson.step || '', { weeks: weeksInNote(note), support: /prior learning/i.test(note) });
+        const s = stepsSentence(steps, lesson.step || '', { weeks: weeksInNote(note), support: /prior learning/i.test(note), year: lesson.step ? '' : lesson.year || '' });
         if (s) return s;
     }
     if (/added by the school/i.test(String(note || ''))) return 'Added by the school.';
@@ -389,16 +494,85 @@ const namesOf = (ids) => quoteJoin((ids || []).map(proposalLabel));
 /** "Covers part" beside one skill: the note when plain, else what will close the rest. */
 export function composePartial(note, build = []) {
     const whole = plainNote(note);
-    if (whole) return `Not yet: ${/^[A-Z][a-z]/.test(whole) ? whole.charAt(0).toLowerCase() + whole.slice(1) : whole}`;
+    if (whole) return `Not yet: ${/^(?:[A-Z][a-z]|A )/.test(whole) ? whole.charAt(0).toLowerCase() + whole.slice(1) : whole}`;
     return build.length ? `The rest of the lesson comes with ${namesOf(build)}, still to be built.` : 'The rest of the lesson has no skill yet.';
 }
 /** What follows "Not yet:" for a lesson only partly taught: the note when plain, else what the entries to build will add. */
 export function composeMissing(note, build = [], envision = []) {
-    const low = (t) => (/^[A-Z][a-z]/.test(t) ? t.charAt(0).toLowerCase() + t.slice(1) : t);
+    const low = (t) => (/^(?:[A-Z][a-z]|A )/.test(t) ? t.charAt(0).toLowerCase() + t.slice(1) : t);
     const whole = plainNote(note);
     if (whole) return low(whole);
     for (const e of envision || []) { const t = plainNote(e && e.teaches); if (t) return low(t); }
     return build.length ? `the part ${namesOf(build)} will add.` : '';
+}
+
+/* ================================================================= the school site's lessons (round 7) */
+const gradeName = (id) => { const g = WRM_SEQUENCE.find((x) => x.id === String(id)); return g ? g.label : String(id || ''); };
+const andJoin = (a) => (a.length < 2 ? a.join('') : `${a.slice(0, -1).join(', ')} and ${a[a.length - 1]}`);
+const weeksWords = (ns) => {
+    const w = [...new Set(ns)].sort((a, b) => a - b);
+    if (!w.length) return '';
+    return w.length > 3 ? `weeks ${w.slice(0, 3).join(', ')} and ${w.length - 3} more` : `week${w.length > 1 ? 's' : ''} ${andJoin(w.map(String))}`;
+};
+
+/** The flag a lesson of the school site carries, in plain words ('' for a White Rose lesson the site does not flag). */
+export function siteFlagText(l) {
+    const f = l && l.siteInfo ? l.siteInfo.flag : '';
+    if (l && l.type === 'assessment') return 'Assessment';
+    if (f === 'committee' || (l && l.type === 'build')) return 'CCSS · BUILD';
+    if (f === 'enrich-native') return 'Support lesson';
+    if (f === 'above') return 'Above grade';
+    if (f === 'native' || f === 'other') return 'School lesson';
+    return '';
+}
+
+/** A school-site lesson as a teacher reads it in another screen's sentence: 'Grade 4, "Line plots with fractions"'. */
+export function siteLessonLabel(id) {
+    const l = lessonBySite(id);
+    return l ? `${l.gradeLabel}, "${l.title}"` : '';
+}
+
+/**
+ * What the lesson is, in sentences composed from the site's fields (never its notes): the kind of school lesson,
+ * the domain test it comes before, the week the site plans it when the workbook says another week, and for a White
+ * Rose step the other grades that teach it (copied in, reviewed, in a support block) and an enrichment mark.
+ */
+export function lessonAbout(l) {
+    if (!l) return [];
+    const out = [];
+    const si = l.siteInfo;
+    if (l.type === 'assessment') {
+        out.push(si && si.flag === 'map' ? 'The MAP Growth test window on the school calendar.' : 'A domain test on the school calendar. It checks the lessons of this unit.');
+    } else if (si && si.flag === 'committee') {
+        out.push('A lesson the school writes for a CCSS standard that White Rose does not teach.');
+        if (si.domainTest) out.push('It comes before the domain test, so the test only asks what has been taught.');
+    } else if (si && si.flag === 'enrich-native') {
+        out.push('A support lesson the school site lists for this grade. No White Rose lesson has this title.');
+    } else if (si && (si.flag === 'other' || si.flag === 'native')) {
+        out.push('A lesson the school site lists for this grade.');
+    }
+    if (si && l.seq && si.week && !l.weeks.includes(si.week)) out.push(`The school site plans it for week ${weekNo(si.week)}.`);
+    if (!l.step) return out;
+    const rec = STEP_SITE[l.step] || {};
+    const taught = (rec.t || []).filter((x) => x[0] !== l.grade);
+    const copied = taught.filter((x) => x[1] !== 'review').map((x) => `${gradeName(x[0])}${x[2] ? ` (from week ${weekNo(x[2])})` : ''}`);
+    const review = taught.filter((x) => x[1] === 'review').map((x) => `${gradeName(x[0])}${x[2] ? ` (week ${weekNo(x[2])})` : ''}`);
+    if (copied.length) out.push(`Also taught in ${andJoin(copied)}.`);
+    if (review.length) out.push(`Reviewed in ${andJoin(review)}.`);
+    // the support blocks that list the step: the workbook's weeks, else the grades the site names
+    const sup = [];
+    for (const g of WRM_SEQUENCE) {
+        const ws = Object.entries(g.prior || {}).filter(([, ids]) => (ids || []).includes(l.step)).map(([w]) => weekNo(w));
+        if (ws.length) sup.push(`${g.label}, ${weeksWords(ws)}`);
+    }
+    for (const gid of rec.s || []) if (!WRM_SEQUENCE.some((g) => g.id === gid && Object.values(g.prior || {}).some((ids) => (ids || []).includes(l.step)))) sup.push(gradeName(gid));
+    if (sup.length) out.push(`Also in the support block: ${sup.slice(0, 4).join('; ')}${sup.length > 4 ? `; and ${sup.length - 4} more grade${sup.length > 5 ? 's' : ''}` : ''}.`);
+    if (rec.e && l.type !== 'enrich') {
+        const why = /^(?:true|1)$/i.test(String(rec.e)) ? '' : String(rec.e).replace(/\.$/, '');
+        const t = `The school marks it as an enrichment lesson${why ? ` (${why})` : ''}.`;
+        if (isPlain(t)) out.push(t);
+    }
+    return out;
 }
 
 /**
@@ -418,7 +592,7 @@ export function searchLessons(text, limit = 12, grade = '') {
     for (const l of LESSONS) {
         const title = l.title.toLowerCase();
         const codes = l.ccss.join(' ').toLowerCase();
-        const unit = `${l.unitName} ${domainName(l.domain)}`.toLowerCase();
+        const unit = `${l.unitName} ${domainName(l.domain)} ${siteFlagText(l)}`.toLowerCase();
         let s = 0;
         if (wk) { if (l.weeks.some((w) => +w.replace(/\D/g, '') === +wk[1])) s = 70 + (l.grade === grade ? 20 : 0); }
         else if (title === q) s = 100;

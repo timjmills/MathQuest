@@ -53,18 +53,36 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     || all.find((l) => l.type === 'wr' && l.step && !links.linksFor(l).direct.length);
   const buildLesson = all.find((l) => l.grade === '3' && l.type === 'build');
   const rich = all.find((l) => l.grade === '2' && links.linksFor(l).direct.length >= 2 && links.linksFor(l).prereq.length >= 2 && links.linksFor(l).related.length >= 1);
+  // round 7: the school site's own lessons (a tagged one when a year file has a "lessons" section)
+  const siteTagged = all.find((l) => l.type === 'site' && links.linksFor(l).source === 'curated' && links.linksFor(l).direct.length);
+  const siteUntagged = all.find((l) => l.type === 'site' && l.siteInfo.flag === 'committee' && links.linksFor(l).source !== 'curated');
+  const supportLesson = all.find((l) => l.type === 'site' && l.siteInfo.flag === 'enrich-native');
+  const assessLesson = all.find((l) => l.type === 'assessment' && l.grade === '4') || all.find((l) => l.type === 'assessment');
 
   const app = await open({ seed: 11, viewport: { width: 1366, height: 768, deviceScaleFactor: 1 } });
   const { page, browser, base } = app;
-  if (CUR_DIR || FALLBACK) {
-    await page.setRequestInterception(true);
-    page.on('request', (req) => {
-      const m = /\/data\/curriculum\/links\/([A-Za-z0-9]+)\.json(\?|$)/.exec(req.url());
-      if (!m) { req.continue(); return; }
-      const body = m[1] === 'index' ? JSON.stringify(FALLBACK ? { years: [], map: false } : { years: CUR_YEARS, map: !!CUR_MAP }) : fs.readFileSync(path.join(CUR_DIR, `${m[1]}.json`), 'utf8');
-      req.respond({ status: 200, contentType: 'application/json', body });
-    });
-  }
+  // One request handler for every mode: --curated / --fallback answer the link files; the detailed-lessons hook
+  // case (round 7) turns DETAILED on, which adds "detailed": true to index.json and serves a fixture file.
+  let DETAILED = null;            // the fixture's lessons while the "present" case runs
+  const detailedAsked = [];       // every request for data/curriculum/detailed-lessons.json
+  await page.setRequestInterception(true);
+  page.on('request', (req) => {
+    if (req.isInterceptResolutionHandled && req.isInterceptResolutionHandled()) return;
+    if (/\/data\/curriculum\/detailed-lessons\.json(\?|$)/.test(req.url())) {
+      detailedAsked.push(req.url());
+      if (DETAILED) { req.respond({ status: 200, contentType: 'application/json', body: JSON.stringify({ lessons: DETAILED }) }); return; }
+      req.continue();
+      return;
+    }
+    const m = /\/data\/curriculum\/links\/([A-Za-z0-9]+)\.json(\?|$)/.exec(req.url());
+    if (!m || (!(CUR_DIR || FALLBACK) && !(DETAILED && m[1] === 'index'))) { req.continue(); return; }
+    let body;
+    if (m[1] === 'index') {
+      const base0 = CUR_DIR || FALLBACK ? (FALLBACK ? { years: [], map: false } : { years: CUR_YEARS, map: !!CUR_MAP }) : JSON.parse(fs.readFileSync(path.join(SHIP_DIR, 'index.json'), 'utf8'));
+      body = JSON.stringify({ ...base0, detailed: !!DETAILED });
+    } else body = fs.readFileSync(path.join(CUR_DIR, `${m[1]}.json`), 'utf8');
+    req.respond({ status: 200, contentType: 'application/json', body });
+  });
   // fix round 6: the plain-English check over the FULL rendered text of a screen (chrome lines may start lower
   // case: "and 3 more") and over every teacher field on it as a sentence (no fragment) — the same check the
   // screens use to decide whether a note is shown (js/modules/plain-words.js).
@@ -99,6 +117,17 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const step = async (name, fn) => { try { await fn(); } catch (e) { failures.push(`${name}: ${(e && e.message) || e}`); } };
   const shot = async (name) => { if (SHOTS) { fs.mkdirSync(OUT, { recursive: true }); await page.screenshot({ path: path.join(OUT, `${name}.png`) }); } };
   const hash = () => page.evaluate(() => location.hash);
+  // round 7: a FULL page load at a hash (index.json and the detailed-lessons file are read once per load; a goto that
+  // only changes the hash is a same-document navigation). The teacher role is set again after the load.
+  const freshLoad = async (h, sel = '[data-screen="wrm"].is-active .tvw-lesson') => {
+    await page.goto('about:blank');
+    await page.goto(`${base}/index.html${h}`, { waitUntil: 'networkidle2', timeout: 60000 });
+    await waitFor(page, () => typeof window.setUserRole === 'function' && typeof window.tvGo === 'function', 30000, 'fresh boot');
+    await page.evaluate(() => { navigator.clipboard.writeText = () => Promise.resolve(); window.setUserRole('teacher'); });
+    await waitFor(page, `!!document.querySelector(${JSON.stringify(sel)})`, 20000, `fresh load ${h}`);
+    await page.evaluate(() => document.fonts && document.fonts.ready);
+    await sleep(300);
+  };
   // Click as a teacher would: scroll the target to the middle first, so the sticky action bar
   // (which covers the bottom of the window by design) is never what gets the click.
   const tap = async (sel) => {
@@ -179,7 +208,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await sleep(300);
     await page.click(`[data-w-lesson="${rich.key}"]`);
     await waitFor(page, () => !!document.querySelector('.tvw-head'), 5000, 'detail');
-    check((await hash()) === `#wrm/2/${rich.unit}/${rich.n}`, `hash after lesson: ${await hash()}`);
+    check((await hash()) === `${links.lessonHash(rich)}`, `hash after lesson: ${await hash()}`);
     const d = await page.evaluate(() => ({
       title: document.querySelector('.tvw-title').textContent,
       groups: [...document.querySelectorAll('[data-w-group]')].map((g) => [g.dataset.wGroup, g.querySelectorAll('.tvw-row').length]),
@@ -246,7 +275,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await sleep(600);
     const pr = await page.evaluate((names) => {
       const el = document.querySelector('#teacherMain .tv-screen.is-active');
-      return { screen: el && el.dataset.screen, has: names.filter((n) => el.textContent.includes(n)).length, hash: location.hash };
+      return { screen: el && el.dataset.screen, has: names.filter((n) => el.textContent.includes(n) || el.textContent.includes(n.replace(/([A-Za-z]{2,}), (?=[A-Za-z]{2,}\b)/g, "$1/"))).length, hash: location.hash };
     }, labels);
     check(pr.screen === 'print' && pr.has === labels.length, `print: ${JSON.stringify(pr)} of ${labels.length}`);
     check(pr.hash === '', `print: hash not cleared (${pr.hash})`);
@@ -276,7 +305,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     check(target >= 0, `search: "${gapLesson.title}" not offered`);
     if (target >= 0) (await page.$$('.tvw-hit'))[target].click();
     await sleep(300);
-    check((await hash()) === `#wrm/${gapLesson.grade}/${gapLesson.unit}/${gapLesson.n}`, `search jump hash ${await hash()}`);
+    check((await hash()) === `${links.lessonHash(gapLesson)}`, `search jump hash ${await hash()}`);
 
     /* ---------------------------------------------------- gap and to-be-built lessons */
     const gap = await page.evaluate(() => ({ none: (document.querySelector('[data-w-group="direct"] .tvw-none') || {}).textContent || '', verdict: (document.querySelector('.tvw-verdict') || {}).textContent || '', rowGap: !!document.querySelector('.tvw-lesson[aria-current="true"].is-gap') }));
@@ -284,10 +313,13 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await fit('1366 gap');
     await page.evaluate(() => window.scrollTo(0, 0));
     await shot('07-gap-lesson-1366');
-    await page.evaluate((h) => { location.hash = h; }, `#wrm/${buildLesson.grade}/${buildLesson.unit}/${buildLesson.n}`);
+    await page.evaluate((h) => { location.hash = h; }, `${links.lessonHash(buildLesson)}`);
     await sleep(500);
     const bl = await page.evaluate(() => (document.querySelector('.tvw-verdict') || {}).textContent || '');
-    check(/still to write/.test(bl), `build lesson verdict "${bl}"`);
+    // a CCSS BUILD row: "still to write" (no site id), "Skills not tagged yet" (the site names it, no links entry)
+    // or the links file's verdict when the year file tags it (round 7)
+    check(/still to write|Skills not tagged yet|teach every part|cover part|No skill teaches/.test(bl), `build lesson verdict "${bl}"`);
+    check(await page.evaluate(() => /CCSS · BUILD/.test((document.querySelector('.tvw-head .tvw-tags') || {}).textContent || '')), 'build lesson: no "CCSS · BUILD" flag');
     await page.evaluate(() => window.scrollTo(0, 0));
     await shot('08-build-lesson-1366');
 
@@ -303,7 +335,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await shot('09-prek-1366');
 
     /* ---------------------------------------------------- bookmark: reload at a hash */
-    await page.goto(`${base}/index.html#wrm/${rich.grade}/${rich.unit}/${rich.n}`, { waitUntil: 'networkidle2', timeout: 60000 });
+    await page.goto(`${base}/index.html${links.lessonHash(rich)}`, { waitUntil: 'networkidle2', timeout: 60000 });
     await waitFor(page, () => !!document.querySelector('.tvw-head'), 20000, 'bookmark reload');
     const bm = await page.evaluate(() => ({ screen: document.querySelector('#teacherMain .tv-screen.is-active').dataset.screen, title: document.querySelector('.tvw-title').textContent }));
     check(bm.screen === 'wrm' && bm.title.includes(rich.title), `bookmark: ${JSON.stringify(bm)}`);
@@ -371,7 +403,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await page.evaluate(() => { window.__opened = ''; window.open = () => ({ document: { open() {}, write(h) { window.__opened += h; }, close() {} }, focus() {}, print() {} }); });
     if (builtLesson) {
       await page.evaluate(() => window.tvGo('home'));
-      await page.evaluate((h) => { location.hash = h; }, `#wrm/${builtLesson.grade}/${builtLesson.unit}/${builtLesson.n}`);
+      await page.evaluate((h) => { location.hash = h; }, `${links.lessonHash(builtLesson)}`);
       await waitFor(page, () => !!document.querySelector('.tvw-head .tvw-tbb-link'), 10000, 'to be built link');
       const tbbId = await page.$eval('.tvw-head .tvw-tbb-link', (b) => b.dataset.todoOpen);
       await page.evaluate(() => window.scrollTo(0, 0));
@@ -387,7 +419,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     /* ==================================================== curated options travel into the link (B2) */
     if (optLesson) {
       await page.evaluate(() => window.tvGo('home'));
-      await page.evaluate((h) => { location.hash = h; }, `#wrm/${optLesson.grade}/${optLesson.unit}/${optLesson.n}`);
+      await page.evaluate((h) => { location.hash = h; }, `${links.lessonHash(optLesson)}`);
       await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active .tvw-head'), 10000, 'opt lesson');
       await sleep(300);
       await tap('[data-w-quick="prereq"]');
@@ -482,7 +514,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       await tap(`[data-t-item="${withStep.id}"] [data-t-step="${withStep.step}"]`);
       await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active .tvw-head'), 15000, 'step to wrm');
       const want = all.find((l) => l.step === withStep.step);
-      check((await hash()) === `#wrm/${want.grade}/${want.unit}/${want.n}`, `todo step → ${await hash()} (want ${want.key})`);
+      check((await hash()) === `${links.lessonHash(want)}`, `todo step → ${await hash()} (want ${want.key})`);
     }
     // 1280x720
     await page.evaluate(() => window.tvGo('todo'));
@@ -543,7 +575,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     const mlabels = await page.$$eval('#tvmkDetail .tvw-row', (rows) => rows.filter((r) => r.querySelector('.tvw-tick[aria-checked="true"]')).map((r) => r.querySelector('.tvw-row-name').textContent.trim()));
     await tap('#tvmkDetail [data-w-act="print"]');
     await sleep(600);
-    const mpr = await page.evaluate((names) => { const el = document.querySelector('#teacherMain .tv-screen.is-active'); return { screen: el.dataset.screen, has: names.filter((n) => el.textContent.includes(n)).length }; }, mlabels);
+    const mpr = await page.evaluate((names) => { const el = document.querySelector('#teacherMain .tv-screen.is-active'); return { screen: el.dataset.screen, has: names.filter((n) => el.textContent.includes(n) || el.textContent.includes(n.replace(/([A-Za-z]{2,}), (?=[A-Za-z]{2,}\b)/g, "$1/"))).length }; }, mlabels);
     check(mpr.screen === 'print' && mpr.has === mlabels.length, `map print: ${JSON.stringify(mpr)} of ${mlabels.length}`);
 
     // a MAP task bookmark reopens the task; Back returns to it from another screen
@@ -683,7 +715,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
       const t7 = await page.evaluate(async () => {
         const m = await import('./js/modules/teacher-todo.js');
-        for (let i = 0; i < 400; i += 1) { const b = document.querySelector('[data-screen="todo"].is-active [data-t-open][aria-expanded="false"]'); if (!b) break; b.click(); }
+        for (let i = 0; i < 2000; i += 1) { const b = document.querySelector('[data-screen="todo"].is-active [data-t-open][aria-expanded="false"]'); if (!b) break; b.click(); }
         const scr = document.querySelector('[data-screen="todo"].is-active');
         const txt = [...scr.querySelectorAll('.tvt-item')].map((x) => x.innerText).join('\n');
         const d = { innerText: m.todoPrintHTML().replace(/^[\s\S]*<body>/, '').replace(/<[^>]+>/g, '\n').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>') };
@@ -743,7 +775,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
       // B8: as shipped (no interception), the real files load: a lesson the files mark "Covers part" says so
       if (partLesson) {
-        await page.goto(`${base}/index.html#wrm/${partLesson.grade}/${partLesson.unit}/${partLesson.n}`, { waitUntil: 'networkidle2', timeout: 60000 });
+        await page.goto(`${base}/index.html${links.lessonHash(partLesson)}`, { waitUntil: 'networkidle2', timeout: 60000 });
         await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active [data-w-verdict-tag]'), 20000, 'B8 lesson');
         const vt = await page.$eval('[data-screen="wrm"].is-active [data-w-verdict-tag]', (e) => e.dataset.wVerdictTag);
         check(vt === 'partial', `B8: ${partLesson.key} shows verdict ${vt}, the file says partial`);
@@ -776,7 +808,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       }
       // N20: a copied-in lesson names its grade in words
       if (copiedLesson) {
-        await page.goto(`${base}/index.html#wrm/${copiedLesson.grade}/${copiedLesson.unit}/${copiedLesson.n}`, { waitUntil: 'networkidle2', timeout: 60000 });
+        await page.goto(`${base}/index.html${links.lessonHash(copiedLesson)}`, { waitUntil: 'networkidle2', timeout: 60000 });
         await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active .tvw-head'), 20000, 'N20');
         const head = await page.$eval('[data-screen="wrm"].is-active .tvw-head', (e) => e.innerText);
         check(!/\bG\d\b/.test(head) && /Copied in from (Grade \d|Kindergarten|Pre-K)/.test(head), `N20: copied-in head "${head.slice(0, 160)}"`);
@@ -785,13 +817,115 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       const bad = [];
       let nLines = 0;
       for (const l of all) {
-        const h = `#wrm/${l.grade}/${l.unit}/${l.n}`;
+        const h = `${links.lessonHash(l)}`;
         await page.evaluate((x) => { location.hash = x; }, h);
         await waitFor(page, `location.hash === ${JSON.stringify(h)} && (document.querySelector('[data-screen="wrm"].is-active #tvwDetail .tvw-title') || {}).textContent?.includes(${JSON.stringify(l.title.slice(0, 12))})`, 8000, l.key);
         nLines += await plainSweep('[data-screen="wrm"].is-active', l.key, bad);
       }
       check(!bad.length, `plain English: ${bad.length} White Rose lines not plain: ${bad.slice(0, 5).join(' || ')} — forms: ${summ(bad)}`);
       console.log(`rendered-text sweep: ${all.length} lessons (${curLessons.length} curated), ${nLines} lines, ${bad.length} not plain`);
+    });
+
+    /* ==================================================== round 7: the school site's own lessons (1366) */
+    await step('site lessons 1366', async () => {
+      await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
+      check(siteUntagged && supportLesson && assessLesson, 'data: no untagged CCSS BUILD, support lesson or assessment to test');
+      if (CUR_YEARS.includes('Y5')) check(!!siteTagged, 'data: Y5 is loaded but no site lesson is tagged');
+      // the unit list mixes the White Rose steps and the site's lessons in the order unitLessons() gives
+      const unitOf = assessLesson;
+      await freshLoad(`#wrm/${unitOf.grade}/${unitOf.unit}`);
+      const rows = await page.$$eval('[data-screen="wrm"].is-active .tvw-lesson', (b) => b.map((x) => ({ key: x.dataset.wLesson, site: x.dataset.wSite || '', flag: (x.querySelector('.tvw-flag') || {}).textContent || '' })));
+      const want = links.unitLessons(unitOf.grade, unitOf.unit);
+      check(rows.map((r) => r.key).join('|') === want.map((l) => l.key).join('|'), `site unit: rows ${rows.length} differ from unitLessons ${want.length}`);
+      check(rows.some((r) => r.site && !/:/.test(r.key)) && rows.some((r) => !r.site), 'site unit: the list does not mix White Rose steps and site lessons');
+      check(rows.filter((r) => r.site && !/:/.test(r.key)).every((r) => /^(CCSS · BUILD|Support lesson|Assessment|School lesson|Above grade)$/.test(r.flag)), `site unit: a site row without its flag ${JSON.stringify(rows.filter((r) => r.site && !r.flag).slice(0, 2))}`);
+      await fit('1366 site unit');
+      // an assessment: its flag, the plain no-skills sentence, no tick groups
+      await tap(`[data-w-lesson="${assessLesson.key}"]`);
+      await waitFor(page, `location.hash === ${JSON.stringify(links.lessonHash(assessLesson))} && !!document.querySelector('#tvwDetail .tvw-head')`, 8000, 'assessment');
+      const as = await page.evaluate(() => ({ flag: (document.querySelector('#tvwDetail [data-w-flag]') || {}).textContent || '', v: (document.querySelector('#tvwDetail .tvw-verdict') || {}).textContent || '', groups: document.querySelectorAll('#tvwDetail [data-w-group]').length, bar: !!document.querySelector('#tvwDetail .tvw-bar') }));
+      check(as.flag === 'Assessment' && /No skills are linked to this assessment/.test(as.v) && !as.groups && !as.bar, `assessment detail ${JSON.stringify(as)}`);
+      // a CCSS BUILD lesson only the site has, with no links entry: "Skills not tagged yet"
+      await freshLoad(links.lessonHash(siteUntagged), '[data-screen="wrm"].is-active #tvwDetail .tvw-head');
+      const un = await page.evaluate(() => ({ title: document.querySelector('.tvw-title').textContent, flag: (document.querySelector('#tvwDetail [data-w-flag]') || {}).textContent || '', tag: (document.querySelector('#tvwDetail [data-w-verdict-tag]') || {}).dataset?.wVerdictTag || '', cur: (document.querySelector('.tvw-lesson[aria-current="true"]') || {}).dataset?.wLesson || '' }));
+      check(un.title.includes(siteUntagged.title) && un.flag === 'CCSS · BUILD' && un.tag === 'untagged' && un.cur === siteUntagged.key, `untagged site lesson by bookmark ${JSON.stringify(un)}`);
+      // a support lesson with no week: listed under the unit's "no week set" heading
+      await page.evaluate((x) => { location.hash = x; }, links.lessonHash(supportLesson));
+      await waitFor(page, `(document.querySelector('[data-screen="wrm"].is-active .tvw-lesson[aria-current="true"]') || {}).dataset?.wLesson === ${JSON.stringify(supportLesson.key)} && !!document.querySelector('#tvwDetail .tvw-head')`, 20000, 'support lesson');
+      check(await page.evaluate(() => /no week set/.test((document.querySelector('.tvw-lesson[aria-current="true"]')?.closest('ol')?.previousElementSibling || {}).textContent || '') && /Support lesson/.test(document.querySelector('#tvwDetail .tvw-tags').textContent)), 'support lesson: not under "no week set" or no flag');
+      // a tagged site lesson: verdict, skills, Tick → Practice link decodes to the lesson's teaching skills
+      if (siteTagged) {
+        await page.goto(`${base}/index.html#wrm/${siteTagged.grade}/${siteTagged.unit}`, { waitUntil: 'networkidle2', timeout: 60000 });
+        await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active .tvw-lesson'), 20000, 'tagged unit');
+        await tap(`[data-w-lesson="${siteTagged.key}"]`);
+        await waitFor(page, `location.hash === ${JSON.stringify(links.lessonHash(siteTagged))} && !!document.querySelector('#tvwDetail [data-w-group="direct"] .tvw-tick')`, 8000, 'tagged site lesson');
+        const tv = await page.evaluate(() => ({ tag: (document.querySelector('#tvwDetail [data-w-verdict-tag]') || {}).dataset?.wVerdictTag || '', flag: (document.querySelector('#tvwDetail [data-w-flag]') || {}).textContent || '' }));
+        const r = links.linksFor(siteTagged);
+        check(tv.tag === r.verdict && tv.flag === links.siteFlagText(siteTagged), `tagged site lesson head ${JSON.stringify(tv)} want ${r.verdict}`);
+        await tap('[data-w-quick="direct"]');
+        await tap('[data-w-act="link"]');
+        await waitFor(page, () => !!document.querySelector('#tvwLink'), 5000, 'site link');
+        const sd = await decode(await page.$eval('#tvwLink', (i) => i.value));
+        const wantKeys = r.direct.map((x) => x.key.replace(':', '|'));
+        check(sd.length === wantKeys.length && wantKeys.every((k) => sd.includes(k)), `site lesson link decodes to ${JSON.stringify(sd)} not ${JSON.stringify(wantKeys)}`);
+        await fit('1366 tagged site lesson');
+        await clearOfBar('1366 tagged site lesson');
+      }
+      // search finds a site lesson and jumps to its bookmark
+      const sl = siteTagged || siteUntagged;
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await page.click('#tvwSearch', { clickCount: 3 });
+      await page.type('#tvwSearch', sl.title.slice(0, 24));
+      await sleep(300);
+      const ti = await page.$$eval('.tvw-hit', (b, key) => b.findIndex((x) => x.dataset.wJump === key), sl.key);
+      check(ti >= 0, `search: site lesson "${sl.title}" not offered`);
+      if (ti >= 0) { (await page.$$('.tvw-hit'))[ti].click(); await sleep(400); check((await hash()) === links.lessonHash(sl), `search jump to a site lesson: ${await hash()}`); }
+      // the detailed-lessons hook, ABSENT (as shipped): nothing requested, no link, no console noise
+      check(!detailedAsked.length, `detailed lessons fetched while index.json says the file is absent: ${detailedAsked.length}`);
+      check(!(await page.$('[data-w-detailed]')), 'a "Detailed lesson" link shows with no file');
+    });
+
+    /* ==================================================== round 7: Skills to be made → a school lesson it closes */
+    if (CUR_YEARS.includes('Y5')) {
+      await step('todo school lesson', async () => {
+        await page.evaluate(() => window.tvGo('todo'));
+        await waitFor(page, () => !!document.querySelector('[data-screen="todo"].is-active .tvt-item'), 20000, 'todo (site)');
+        const hit = await page.evaluate(() => {
+          for (const b of document.querySelectorAll('[data-screen="todo"].is-active .tvt-row')) {
+            if (b.getAttribute('aria-expanded') !== 'true') b.click();
+            const li = document.querySelector(`[data-t-item="${CSS.escape(b.dataset.tOpen)}"]`);
+            const x = li && li.querySelector('[data-t-lesson]');
+            if (x) return { id: b.dataset.tOpen, lesson: x.dataset.tLesson, text: x.textContent };
+          }
+          return null;
+        });
+        check(hit, 'todo: no entry lists a school lesson');
+        if (hit) {
+          await tap(`[data-t-item="${hit.id}"] [data-t-lesson="${hit.lesson}"]`);
+          await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active .tvw-head'), 15000, 'todo lesson to wrm');
+          check((await hash()) === links.lessonHash(links.lessonBySite(hit.lesson)), `todo school lesson → ${await hash()}`);
+        }
+      });
+    }
+
+    /* ==================================================== round 7: the detailed-lessons hook, PRESENT (fixture by interception) */
+    await step('detailed lessons present', async () => {
+      const fresh = (h) => freshLoad(h, '[data-screen="wrm"].is-active .tvw-head');
+      DETAILED = { [rich.step]: { url: 'lessons/fixture-detailed.html', title: 'Fixture' }, [siteUntagged.site]: [{ url: 'https://example.org/detailed.html' }, { url: 'javascript:alert(1)' }] };
+      await fresh(links.lessonHash(rich));
+      await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active [data-w-detailed]'), 20000, 'detailed link (step)');
+      const a1 = await page.$$eval('[data-w-detailed]', (a) => a.map((x) => [x.getAttribute('href'), x.textContent.trim(), x.target]));
+      check(a1.length === 1 && a1[0][0] === 'lessons/fixture-detailed.html' && a1[0][1] === 'Detailed lesson' && a1[0][2] === '_blank', `detailed (step) ${JSON.stringify(a1)}`);
+      await fresh(links.lessonHash(siteUntagged));
+      await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active [data-w-detailed]'), 20000, 'detailed link (site lesson)');
+      const a2 = await page.$$eval('[data-w-detailed]', (a) => a.map((x) => x.getAttribute('href')));
+      check(a2.length === 1 && a2[0] === 'https://example.org/detailed.html', `detailed (site lesson): only the https link ${JSON.stringify(a2)}`);
+      await fit('1366 detailed');
+      await shot('r7-detailed-1366');
+      DETAILED = null;
+      await fresh(links.lessonHash(rich));
+      await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active .tvw-head'), 20000, 'detailed off');
+      check(!(await page.$('[data-w-detailed]')), 'detailed link still shown after the file is gone');
     });
 
     /* ==================================================== phone basic check (390x844): nothing scrolls sideways */
@@ -830,7 +964,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await shot('40-wrm-lesson-390');
     if (longWhyLesson) {
       await step('390 long why lesson', async () => {
-        await page.goto(`${base}/index.html#wrm/${longWhyLesson.grade}/${longWhyLesson.unit}/${longWhyLesson.n}`, { waitUntil: 'networkidle2', timeout: 60000 });
+        await page.goto(`${base}/index.html${links.lessonHash(longWhyLesson)}`, { waitUntil: 'networkidle2', timeout: 60000 });
         await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active .tvw-head'), 20000, '390 long why');
         await sleep(300);
         await rows390(`long why lines (${longWhyLesson.key})`);
@@ -860,6 +994,23 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await sleep(300);
     await side('Skills to be made');
     await shot('41-todo-390');
+
+    /* ==================================================== round 7: site lessons at 390 with touch */
+    await step('site lessons 390 touch', async () => {
+      await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
+      for (const l of [siteTagged || siteUntagged, assessLesson, supportLesson]) {
+        await freshLoad(`#wrm/${l.grade}/${l.unit}`, `[data-screen="wrm"].is-active [data-w-lesson="${l.key}"]`);
+        await page.$eval(`[data-w-lesson="${l.key}"]`, (el) => el.scrollIntoView({ block: 'center' }));
+        await sleep(80);
+        await page.tap(`[data-w-lesson="${l.key}"]`);
+        await waitFor(page, `location.hash === ${JSON.stringify(links.lessonHash(l))} && (document.querySelector('#tvwDetail .tvw-title') || {}).textContent?.includes(${JSON.stringify(l.title.slice(0, 12))})`, 8000, `390 tap ${l.key}`);
+        await sleep(200);
+        await side(`site lesson ${l.key}`);
+        await rows390(`site lesson ${l.key}`);
+        const flagOn = await page.evaluate(() => { const f = document.querySelector('#tvwDetail [data-w-flag]'); return !!f && f.getBoundingClientRect().width > 0; });
+        check(flagOn, `390: ${l.key} shows no flag`);
+      }
+    });
 
     if (app.problems.length) failures.push(`console/page errors: ${app.problems.slice(0, 5).map((p) => `[${p.type}] ${p.text}`).join(' | ')}`);
   } catch (e) {

@@ -7,7 +7,7 @@
 // Pure: no window, no DOM, no state. The page installs real skill labels through wrm-links' setSkillLabeler
 // (Node gates install theirs), and the queue's entries through setTodoNames().
 
-import { liveSkillLabel, proposalName, gradeOfYear, stepTitle, taskName } from './wrm-links.js';
+import { liveSkillLabel, proposalName, gradeOfYear, stepTitle, taskName, siteLessonLabel } from './wrm-links.js';
 import { wrmStep } from './wrm.js';
 import { optionsFor } from './skill-options.js';
 import { plainNote, isPlain } from './plain-words.js';
@@ -73,6 +73,7 @@ export function todoCloses(e) {
         const note = plainNote(g.text);
         let line = '';
         if (g.step) line = stepLabel(g.step) ? `${stepLabel(g.step)}: ${note || 'no skill teaches all of it yet.'}` : note;
+        else if (g.lesson) { const lab = siteLessonLabel(g.lesson); line = lab ? `${lab}, a school lesson: ${note || 'no skill teaches all of it yet.'}` : note; }
         else if (g.code) line = `${g.code}: ${note || 'not yet fully taught.'}`;
         else if (g.map) { const tn = taskName(g.map); line = isPlain(`MAP task "${tn}"`) ? `MAP task "${tn}": ${note || 'no skill practises it yet.'}` : ''; }
         else if (g.none) line = `No skill teaches ${stepsJoin(g.none)}.`;

@@ -179,6 +179,9 @@ function specHTML(e) {
         ? `<button type="button" class="tvt-step" data-t-step="${esc(s)}" title="Open this lesson on the White Rose screen (${esc(s)})">${esc(Q.stepName(s))}</button>`
         : `<span class="tvw-tag" title="${esc(s)}">${esc(Q.stepName(s))}</span>`)).join(' ');
     const maps = e.map.map((m) => `<li>${esc(TT.mapLine(m))}</li>`).join('');
+    // round 7: the school site's own lessons the entry closes open on the White Rose screen
+    const lessons = (e.siteLessons || []).map((id) => [id, W.siteLessonLabel(id)]).filter((x) => x[1])
+        .map(([id, lab]) => `<button type="button" class="tvt-step" data-t-lesson="${esc(id)}" title="Open this lesson on the White Rose screen">${esc(lab)}</button>`).join(' ');
     const pairs = e.pairs.map((p) => (W.REP_PAIRS.find((x) => x.id === p) || {}).label).filter(Boolean);
     return `<div class="tvt-spec" id="tvtS-${esc(e.id)}">
       <dl class="tvt-dl">
@@ -188,6 +191,7 @@ function specHTML(e) {
         <dt>How it looks</dt><dd>${esc(todoLooks(e))}${pairs.length ? ` <span class="tvw-tag">${esc(pairs.join(' · '))}</span>` : ''}</dd>
         ${e.ccss.length || e.ee.length ? `<dt>Standards</dt><dd class="tvt-codes">${[...e.ccss, ...e.ee].map((c) => `<span class="tvw-tag tvw-code">${esc(c)}</span>`).join(' ')}</dd>` : ''}
         ${steps ? `<dt>White Rose steps</dt><dd class="tvt-codes">${steps}</dd>` : ''}
+        ${lessons ? `<dt>School lessons</dt><dd class="tvt-codes">${lessons}</dd>` : ''}
         ${maps ? `<dt>MAP tasks</dt><dd><ul class="tvt-ul">${maps}</ul></dd>` : ''}
       </dl>
       <div class="tvt-more" data-t-spec-slot="${esc(e.id)}"></div>
@@ -267,6 +271,10 @@ function wire(el) {
             const e2 = queue.items.find((x) => x.id === d.tOpen);
             li.outerHTML = itemHTML(e2);
             root.querySelector(`[data-t-open="${CSS.escape(d.tOpen)}"]`)?.focus();
+            return;
+        }
+        if (d.tLesson) {
+            import('./teacher-wrm.js').then((m) => m.openWrmLesson(d.tLesson)).then((ok) => { if (!ok) toast('This lesson is not on the White Rose screen'); });
             return;
         }
         if (d.tStep) {

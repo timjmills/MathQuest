@@ -19,7 +19,7 @@ import { buildList } from './build-list.js';
 import { WRM_PROPOSALS, wrmStep } from './wrm.js';
 import { WRM_STEPS } from './wrm-db.js';
 import { CCSS_AUDIT, EE_AUDIT } from './standards-audit.js';
-import { repPairsOfText, gradeOfYear, addProposalNames, allLessons, stepTitle } from './wrm-links.js';
+import { repPairsOfText, gradeOfYear, addProposalNames, allLessons, stepTitle, siteLessonLabel } from './wrm-links.js';
 
 export const SOURCES = ['CCSS', 'EE', 'WRM', 'MAP'];
 export const GRADES = ['PK', 'K', '1', '2', '3', '4', '5', '6'];
@@ -44,6 +44,9 @@ export function domainOfCode(code) {
     return ['CC', 'OA', 'NBT', 'NF', 'MD', 'G'].includes(m[1]) ? m[1] : 'X';
 }
 export function gradeOfStep(id) { return YEAR_GRADE[String(id || '').split('.')[0]] || ''; }
+/** A school-site lesson id ("G4|-|…", data/curriculum/site-lessons.json) and its grade ('4'). */
+export const SITE_ID = /^(PK|K|G[1-6])\|-\|[a-z0-9]+$/;
+export function gradeOfSiteLesson(id) { const m = SITE_ID.exec(String(id || '')); return m ? m[1].replace(/^G/, '') : ''; }
 /** A rough grade for a MAP RIT band (its low end): the NWEA K–5 norms' median spring scores. */
 export function gradeOfRit(band) {
     const lo = parseInt(String(band || ''), 10);
@@ -89,11 +92,11 @@ export function gapsOf(v) {
     if (v == null || v === '') return [];
     if (typeof v === 'string') return [{ text: v }];
     if (Array.isArray(v)) return v.flatMap(gapsOf);
-    if (typeof v === 'object') return Object.entries(v).map(([k, t]) => (/^(R|Y[1-6])\.B\d+\.S\d+$/.test(k) ? { step: k, text: String(t) } : { code: k, text: String(t) }));
+    if (typeof v === 'object') return Object.entries(v).map(([k, t]) => (/^(R|Y[1-6])\.B\d+\.S\d+$/.test(k) ? { step: k, text: String(t) } : SITE_ID.test(k) ? { lesson: k, text: String(t) } : { code: k, text: String(t) }));
     return [{ text: String(v) }];
 }
 /** A gap as the build team wrote it (the CSV). */
-export const gapText = (g) => `${g.step ? `${g.step}: ` : g.code ? `${g.code}: ` : g.map ? `MAP task "${g.map}": ` : ''}${g.none ? `no skill teaches ${g.none.join(', ')}` : g.improves ? `only part of ${g.improves.join(', ')}` : g.text || ''}`;
+export const gapText = (g) => `${g.step ? `${g.step}: ` : g.lesson ? `${g.lesson}: ` : g.code ? `${g.code}: ` : g.map ? `MAP task "${g.map}": ` : ''}${g.none ? `no skill teaches ${g.none.join(', ')}` : g.improves ? `only part of ${g.improves.join(', ')}` : g.text || ''}`;
 /** `closes` as plain strings, as written (kept for the CSV and older callers). */
 export function closesText(v) { return gapsOf(v).map(gapText); }
 const CLOSE_PAIR = /((?:R|Y[1-6])\.B\d+\.S\d+)\s*:\s*([\s\S]+?)\s*(?=;\s*(?:R|Y[1-6])\.B\d+\.S\d+\s*:|;?\s*$)/g;
@@ -109,7 +112,7 @@ export function buildQueue({ curated = [], map = null } = {}) {
     const get = (id) => {
         if (!byId.has(id)) {
             byId.set(id, { id, name: '', kind: 'other', kindRaw: '', skill: '', option: '', sources: new Set(), grades: [], domain: '',
-                family: '', teaches: '', closes: [], gaps: [], representation: '', ccss: [], ee: [], wrmSteps: [], improves: [], map: [], spec: null, closedSteps: new Set() });
+                family: '', teaches: '', closes: [], gaps: [], representation: '', ccss: [], ee: [], wrmSteps: [], siteLessons: [], improves: [], map: [], spec: null, closedSteps: new Set() });
         }
         return byId.get(id);
     };
@@ -173,6 +176,8 @@ export function buildQueue({ curated = [], map = null } = {}) {
             fill(e, p);
             e.ccss.push(...(p.ccss || []));
             e.wrmSteps.push(...(p.steps || []));
+            e.siteLessons.push(...(p.lessons || []).filter((x) => SITE_ID.test(x)));
+            if (p.closes && typeof p.closes === 'object' && !Array.isArray(p.closes)) e.siteLessons.push(...Object.keys(p.closes).filter((x) => SITE_ID.test(x)));
             if (p.closes) {
                 // "R.B1.S1: text; R.B1.S2: text" → one line per step, keyed by the step (critic r4 M4)
                 const pairs = typeof p.closes === 'string' ? [...p.closes.matchAll(CLOSE_PAIR)] : [];
@@ -194,6 +199,16 @@ export function buildQueue({ curated = [], map = null } = {}) {
                 e.wrmSteps.push(sid);
                 if (st.missing && !e.closedSteps.has(sid)) e.gaps.push({ step: sid, text: st.missing });   // N16: one line per step
                 e.closedSteps.add(sid);
+            }
+        }
+        // the school site's own lessons in the year file (round 7): the entries they need, one line per lesson
+        for (const [lid, st] of Object.entries(y.lessons || {})) {
+            for (const id of [...(st.build || [])]) {
+                const e = byId.get(id);
+                if (!e) continue;
+                e.siteLessons.push(lid);
+                if (st.missing && !e.closedSteps.has(lid)) e.gaps.push({ lesson: lid, text: st.missing });
+                e.closedSteps.add(lid);
             }
         }
     }
@@ -228,7 +243,7 @@ export function buildQueue({ curated = [], map = null } = {}) {
         const W = WRM_PROPOSALS[e.id];
         if (W) fill(e, W);
         if (!e.name) e.name = e.id.replace(/_/g, ' ');
-        e.ccss = uniq(e.ccss); e.ee = uniq(e.ee); e.wrmSteps = uniq(e.wrmSteps);
+        e.ccss = uniq(e.ccss); e.ee = uniq(e.ee); e.wrmSteps = uniq(e.wrmSteps); e.siteLessons = uniq(e.siteLessons);
         const seenGap = new Set();
         e.gaps = e.gaps.filter((g) => { const k = JSON.stringify(g); return !seenGap.has(k) && seenGap.add(k); });
         if (!e.gaps.length && e.wrmSteps.length) e.gaps.push({ none: e.wrmSteps.slice() });
@@ -236,7 +251,7 @@ export function buildQueue({ curated = [], map = null } = {}) {
         if (!e.gaps.length && e.improves.length) e.gaps.push({ improves: e.improves.slice() });
         if (!e.gaps.length && e.ccss.length) e.gaps.push({ text: `Not yet fully taught: ${e.ccss.join(', ')}.` });
         e.closes = uniq(e.gaps.map(gapText));   // the build team's words, for the CSV and the search
-        const g = [...e.grades, ...e.ccss.map(gradeOfCode), ...e.ee.map(gradeOfCode), ...e.wrmSteps.map(gradeOfStep)];
+        const g = [...e.grades, ...e.ccss.map(gradeOfCode), ...e.ee.map(gradeOfCode), ...e.wrmSteps.map(gradeOfStep), ...e.siteLessons.map(gradeOfSiteLesson)];
         if (!g.filter(Boolean).length) g.push(...e.map.map((f) => gradeOfRit(f.ritBand)));
         e.grades = sortGrades(g);
         const stepCodes = e.wrmSteps.flatMap((s) => (wrmStep(s) || {}).ccss || []);
@@ -263,7 +278,7 @@ export function passes(e, f) {
     if (f.kinds && f.kinds.size && !f.kinds.has(e.kind)) return false;
     if (f.pair && !e.pairs.includes(f.pair)) return false;
     if (f.q) {
-        const hay = [e.id, e.name, e.skill, e.option, e.teaches, e.representation, ...e.closes, ...e.ccss, ...e.ee, ...e.wrmSteps,
+        const hay = [e.id, e.name, e.skill, e.option, e.teaches, e.representation, ...e.closes, ...e.ccss, ...e.ee, ...e.wrmSteps, ...(e.siteLessons || []).map(siteLessonLabel),
             ...e.map.map((m) => `${m.task || ''} ${m.taskType} ${m.strand}`)].join(' ').toLowerCase();
         if (!String(f.q).toLowerCase().split(/\s+/).filter(Boolean).every((w) => hay.includes(w))) return false;
     }

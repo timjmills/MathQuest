@@ -22,15 +22,16 @@ import { PLAIN_WORDS } from './plain-words-db.js';
 const WORDS = new Set(PLAIN_WORDS.split(' '));
 /** Build words that never pass, even when a source happens to contain them. */
 export const DENY = new Set(['band', 'bands', 'legacy', 'template', 'templates', 'generator', 'generators', 'pane', 'panes', 'kit',
-    'opts', 'variant', 'variants', 'proposal', 'proposals', 'lane', 'lanes', 'tagged', 'tagging', 'tagfix', 'registry',
+    'opts', 'variant', 'variants', 'proposal', 'proposals', 'lane', 'lanes', 'tagging', 'tagfix', 'registry',
     'dispatcher', 'dispatch', 'cell', 'andika', 'deals', 'dealt', 'reception', 'spec', 'specs', 'json', 'js', 'md', 'csv',
     'id', 'ids', 'path', 'repo', 'regrade', 'grader', 'sampled', 'resampled', 'audit', 'audited', 'verdict', 'verdicts', 'mc', 'wrm',
     'deal', 'dealing', 'gr', 'yr', 'pk', 'rec', 'wk', 'descartes', 'nwea', 'payload', 'render', 'renders', 'rendered', 'host', 'hosts', 'svg', 'html',
     'enum', 'bool', 'config', 'param', 'params', 'stub', 'tombstone', 'alias', 'aliases', 'routes', 'routed', 'schema', 'lint', 'critic',
     'rubric', 'fallback', 'migrate', 'migrated', 'migration', 'facsimile', 'provider', 'providers', 'footprint', 'seed', 'seeded']);
-/** Upper-case words a teacher reads on these screens: MAP and its RIT scale, the standards (CCSS, EE) and the
- *  CCSS domain letters the school's units are named by. */
-export const ACRONYMS = new Set(['MAP', 'RIT', 'CCSS', 'EE', 'K', 'US', 'AM', 'PM', 'I', 'CC', 'OA', 'NBT', 'NF', 'MD', 'G', 'E',
+/** Upper-case words a teacher reads on these screens: MAP and its RIT scale, the standards (CCSS, EE), the
+ *  CCSS domain letters the school's units are named by, and BUILD, the school site's own flag for a CCSS lesson the
+ *  school writes ("CCSS · BUILD"). "tagged" left DENY in round 7: the owner's words "Skills not tagged yet". */
+export const ACRONYMS = new Set(['BUILD', 'MAP', 'RIT', 'CCSS', 'EE', 'K', 'US', 'AM', 'PM', 'I', 'CC', 'OA', 'NBT', 'NF', 'MD', 'G', 'E',
     'RP', 'NS', 'SP', 'GCF', 'LCM', 'ALL', 'CSV', 'LCD', 'IQR', 'MAD', 'FDP']);
 /** Single letters: "a", "I", the times sign x, and N / M / n as "a number" ("share N among M"). Any other single
  *  letter passes only in a maths context, next to an operator or in a list ("a/b = a ÷ b", "(g, kg, mL, L)"). */

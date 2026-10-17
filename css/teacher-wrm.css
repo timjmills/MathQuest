@@ -252,3 +252,25 @@ body:has(#teacherMain .tv-screen.is-active .tvw-bar) .tv-toast { bottom: calc(va
     font: inherit; font-size: 13px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; border-radius: 8px; }
 .tvw-more:hover { background: var(--tv-accent-tint); }
 .tvw-more:focus-visible { outline: 2px solid var(--tv-accent); outline-offset: 2px; }
+
+/* Round 7: the school site's own lessons and assessments in the unit list (additive) */
+.tvw-tag.tvw-flag { background: #e8eefc; color: #1f3f8f; letter-spacing: .01em; }
+.tvw-tag.tvw-flag.is-assess { background: #efe9f8; color: #4b2a85; }
+.tvw-lesson.is-site .tvw-n { display: flex; justify-content: flex-end; padding-top: 2px; color: #1f3f8f; }
+.tvw-lesson.is-assess .tvw-n { color: #4b2a85; }
+.tvw-count.is-quiet { color: var(--tv-caption); font-weight: 600; }
+.tvw-verdict.is-quiet { color: var(--tv-text-2); }
+.tvw-tag.tvw-verdict-tag.is-untagged { background: transparent; color: var(--tv-text-2); border: 1px dashed var(--tv-border); }
+.tvw-about { display: flex; flex-direction: column; gap: 4px; }
+.tvw-about p { margin: 0; font-size: 14px; line-height: 20px; color: var(--tv-text-2); }
+html.dark body.teacher-mode .tvw-tag.tvw-flag { background: #1f2c4f; color: #c9d7ff; }
+html.dark body.teacher-mode .tvw-tag.tvw-flag.is-assess { background: #33245a; color: #e0d2ff; }
+html.dark body.teacher-mode .tvw-lesson.is-site .tvw-n { color: #c9d7ff; }
+html.dark body.teacher-mode .tvw-lesson.is-assess .tvw-n { color: #e0d2ff; }
+
+/* Round 7 (390 px): a row with a "more" button keeps to two lines — the Practice / Print icons drop, the words stay */
+@media (max-width: 420px) {
+    .tvw-row .tvw-q { gap: 6px; }
+    .tvw-row .tvw-q .tv-btn svg { display: none; }
+    .tvw-row .tvw-more { padding: 0 4px; }
+}

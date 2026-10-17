@@ -6,5 +6,6 @@
     "Y5",
     "Y6"
   ],
-  "map": true
+  "map": true,
+  "detailed": false
 }

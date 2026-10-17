@@ -6,7 +6,8 @@
 //
 // The words come only from text a teacher already reads in MathQuest or in the school's own documents:
 //   skill labels (data.js), option labels and value labels (skill-options.js), White Rose step titles
-//   (wrm-db.js), the school sequence's lesson and unit names (wrm-sequence-db.js), the visible text of
+//   (wrm-db.js), the school sequence's lesson and unit names (wrm-sequence-db.js), the school site's own lesson and
+//   assessment titles (site-lessons-db.js), the visible text of
 //   index.html and of the teacher screens' templates (js/modules/teacher-*.js), the instruction library (sheet/contract.js), the CCSS and Essential Element wording
 //   (data/standards), the Teaching Guides' key vocabulary (data/curriculum/wrm-vocab.json), and the hand list
 //   data/curriculum/plain-words-hand.txt (common English and maths words, read by a person, one per line).
@@ -38,6 +39,9 @@ for (const s of WRM_STEPS) texts.push(String(s.title || ''));
 for (const b of WRM_BLOCKS) texts.push(String(b.title || b.name || ''));
 const { WRM_SEQUENCE } = await import('../../js/modules/wrm-sequence-db.js');
 for (const g of WRM_SEQUENCE) for (const u of g.units) { texts.push(String(u.name || '')); for (const l of u.lessons) texts.push(String(l[0] || '')); }
+// the school site's own lesson and assessment titles (round 7: listed beside the White Rose steps)
+const { SITE_LESSONS, SITE_ASSESSMENTS } = await import('../../js/modules/site-lessons-db.js');
+for (const l of [...SITE_LESSONS, ...SITE_ASSESSMENTS]) texts.push(String(l[2] || ''));
 const html = rd('index.html').replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ');
 texts.push(html);
 // the teacher screens' own words: text between tags in their templates, and quoted sentences (toasts, labels)

@@ -21,7 +21,7 @@
 import { icon, esc, hideToast } from './teacher-ui.js';
 import { skillView } from './teacher-preview.js';
 import { createPicker, liveKey, toBeBuiltHTML, skillLabelOf } from './teacher-skillpick.js';
-import { loadYear } from './links-data.js';
+import { loadYear, loadDetailed } from './links-data.js';
 
 let L = null;          // the wrm-links.js module
 let SEQ = null;        // the wrm-sequence-db.js module
@@ -46,6 +46,7 @@ const v = {
     query: '',
 };
 let links = null;                    // linksFor(current lesson)
+let detailed = null;                 // data/curriculum/detailed-lessons.json's lessons, when the file exists (see links-data.js)
 const pick = createPicker({ idp: 'tvw', root: () => root, redraw: () => redrawDetail() });
 
 function load() {
@@ -53,6 +54,8 @@ function load() {
     if (!loading) {
         loading = Promise.all([import('./wrm-links.js'), import('./wrm-sequence-db.js')]).then(([a, b]) => { L = a; SEQ = b; L.setSkillLabeler(skillLabelOf); })
             .catch((e) => { console.warn('[teacher-wrm] load', e); loading = null; });
+        // the detailed-lessons hook: nothing is fetched unless index.json says the file exists
+        loadDetailed().then((d) => { detailed = d; if (d && root && root.isConnected && v.lesson && L) redrawDetail(); });
     }
     return loading;
 }
@@ -67,6 +70,19 @@ function ensureCurated() {
     const want = [...years].filter((y) => !curatedDone.has(y));
     if (!want.length) return Promise.resolve();
     return Promise.all(want.map((y) => loadYear(y).then((d) => { curatedDone.add(y); if (d) L.addCuratedYear(d); })));
+}
+
+/** Open the screen at a school-site lesson by its site id (from the Skills to be made screen). False when it is not listed. */
+export function openWrmLesson(siteId) {
+    return load().then(() => {
+        const l = L && L.lessonBySite(siteId);
+        if (!l) return false;
+        Object.assign(v, { grade: l.grade, unit: l.unit, lesson: l.key });
+        v.finderOpen = false;
+        pick.reset();
+        writeHash(false);
+        return ensureCurated().then(() => { window.tvGo?.('wrm'); return true; });
+    });
 }
 
 /** Open the screen at a White Rose step (from the Skills to be made screen). False when no lesson teaches it. */
@@ -86,22 +102,33 @@ export function openWrmStep(stepId) {
 
 export function wrmHashActive() { return /^#wrm(\/|$)/.test(location.hash || ''); }
 
+// #wrm/<grade>/<unit>/<n> opens a White Rose row; #wrm/<grade>/<unit>/<site slug> a lesson the school site names
+// (round 7: the site id is the bookmark, so it opens wherever the lesson is listed).
 function readHash() {
-    const m = /^#wrm(?:\/([^/]*))?(?:\/([^/]*))?(?:\/(\d+))?/.exec(location.hash || '');
+    const m = /^#wrm(?:\/([^/]*))?(?:\/([^/]*))?(?:\/([^/?#]+))?/.exec(location.hash || '');
     if (!m) return;
     const grade = decodeURIComponent(m[1] || '');
     const unit = decodeURIComponent(m[2] || '');
     if (grade && SEQ.WRM_SEQUENCE.some((g) => g.id === grade)) v.grade = grade;
     if (unit && unitsOf(v.grade).some((u) => u.id === unit)) v.unit = unit;
-    const key = m[3] ? `${v.grade}:${v.unit}:${m[3]}` : '';
-    v.lesson = key && L.lessonByKey(key) ? key : '';
+    const seg = decodeURIComponent(m[3] || '');
+    if (/^\d+$/.test(seg)) {
+        const key = `${v.grade}:${v.unit}:${seg}`;
+        v.lesson = L.lessonByKey(key) ? key : '';
+    } else if (seg) {
+        const l = L.lessonBySiteSlug(v.grade, seg);
+        if (l) { v.unit = l.unit; v.lesson = l.key; } else v.lesson = '';
+    } else v.lesson = '';
 }
 
 function writeHash(replace) {
     let h = '#wrm';
-    if (v.grade) h += `/${encodeURIComponent(v.grade)}`;
-    if (v.grade && v.unit) h += `/${encodeURIComponent(v.unit)}`;
-    if (v.lesson) h += `/${v.lesson.split(':')[2]}`;
+    const l = v.lesson ? L.lessonByKey(v.lesson) : null;
+    if (l) h = L.lessonHash(l);
+    else {
+        if (v.grade) h += `/${encodeURIComponent(v.grade)}`;
+        if (v.grade && v.unit) h += `/${encodeURIComponent(v.unit)}`;
+    }
     if (location.hash === h) return;
     if (replace) history.replaceState(history.state, '', h);
     else history.pushState(history.state, '', h);
@@ -119,7 +146,8 @@ function grades() { return SEQ.WRM_SEQUENCE; }
 function gradeRec() { return grades().find((g) => g.id === v.grade) || null; }
 function unitsOf(gid) { const g = grades().find((x) => x.id === gid); return g ? g.units : []; }
 function unitRec() { return unitsOf(v.grade).find((u) => u.id === v.unit) || null; }
-function lessonsOf(u) { return u.lessons.map((_, i) => L.lessonByKey(`${v.grade}:${u.id}:${i + 1}`)); }
+/** A unit's lessons in school-week order: the White Rose rows and the school site's own lessons and assessments. */
+function lessonsOf(u) { return L.unitLessons(v.grade, u.id); }
 const live = liveKey;
 
 /** "Week 1 (6–10 Sep)" — the pacing guide's words. */
@@ -136,12 +164,14 @@ function strandText(st) {
     return st.split('').map((c) => STRAND[c]).filter(Boolean).join(' + ') + (st.length === 1 ? ' only' : '');
 }
 
-/** { n, verdict } for a lesson row: the curated record when present, else the computed rules. */
+/** { n, verdict, source } for a lesson row: the curated record when present, else the computed rules. */
 function rowFacts(lesson) {
-    if (!lesson.step) return { n: 0, verdict: 'gap' };
+    if (!lesson.step && !lesson.site) return { n: 0, verdict: 'gap', source: 'rules' };
     const r = L.linksFor(lesson, { live });
-    return { n: r.direct.length, verdict: r.verdict };
+    return { n: r.direct.length, verdict: r.verdict, source: r.source };
 }
+/** A school-site lesson (or a CCSS BUILD row the site names) that no links file tags yet. */
+const untagged = (l, source) => !!l.site && !l.step && l.type !== 'assessment' && source !== 'curated';
 
 /* ================================================================= render */
 
@@ -221,14 +251,18 @@ function unitChips() {
 
 function lessonRowHTML(l) {
     const f = rowFacts(l);
-    const gap = l.type === 'build' ? 'CCSS lesson to be built' : !l.step ? 'Not a White Rose step' : f.n ? '' : 'No skill yet';
+    const tagged = f.source === 'curated';
+    const gap = l.type === 'assessment' ? 'No skills linked' : untagged(l, f.source) ? 'Skills not tagged yet'
+        : l.type === 'build' && !tagged ? 'CCSS lesson to be built' : !l.step && !tagged ? 'Not a White Rose step' : f.n ? '' : 'No skill yet';
     const meta = [weekText(l), strandText(l.strands)].filter(Boolean).join(' · ');
     const part = gap ? '' : f.verdict === 'partial' ? ' <span class="tvw-tag tvw-part">Covers part</span>' : ' <span class="tvw-tag tvw-verdict-tag is-full">Full</span>';
-    return `<li><button type="button" class="tvw-lesson${gap ? ' is-gap' : ''}" data-w-lesson="${esc(l.key)}" data-w-verdict="${gap ? 'gap' : f.verdict}"${l.key === v.lesson ? ' aria-current="true"' : ''}>
-      <span class="tvw-n">${l.n}</span>
+    const flag = L.siteFlagText(l);
+    const mark = l.n ? `${l.n}` : icon(l.type === 'assessment' ? 'check' : 'bookmark', 16);
+    return `<li><button type="button" class="tvw-lesson${gap ? ' is-gap' : ''}${l.n ? '' : ' is-site'}${l.type === 'assessment' ? ' is-assess' : ''}" data-w-lesson="${esc(l.key)}" data-w-verdict="${gap ? 'gap' : f.verdict}"${l.site ? ` data-w-site="${esc(l.site)}"` : ''}${l.key === v.lesson ? ' aria-current="true"' : ''}>
+      <span class="tvw-n">${mark}</span>
       <span class="tvw-lt"><span class="tvw-lt-title">${esc(l.title)}</span>
-        <span class="tvw-lt-meta">${esc(meta)}${l.power ? ' <span class="tvw-tag tvw-power">Power</span>' : ''}${l.type === 'copied' ? ` <span class="tvw-tag">From ${esc(gradeWord(l.from))}</span>` : ''}${part}</span></span>
-      <span class="tvw-count${gap ? ' is-gap' : ''}">${gap ? esc(gap) : `${f.n} skill${f.n === 1 ? '' : 's'}`}</span></button></li>`;
+        <span class="tvw-lt-meta">${esc(meta)}${flag ? ` <span class="tvw-tag tvw-flag${l.type === 'assessment' ? ' is-assess' : ''}">${esc(flag)}</span>` : ''}${l.power ? ' <span class="tvw-tag tvw-power">Power</span>' : ''}${l.type === 'copied' ? ` <span class="tvw-tag">From ${esc(gradeWord(l.from))}</span>` : ''}${part}</span></span>
+      <span class="tvw-count${gap ? ' is-gap' : ''}${l.type === 'assessment' || untagged(l, f.source) ? ' is-quiet' : ''}">${gap ? esc(gap) : `${f.n} skill${f.n === 1 ? '' : 's'}`}</span></button></li>`;
 }
 
 /** "This week" (critic r2 m3): the first lesson of the grade taught in the school week of today. */
@@ -269,9 +303,25 @@ function lessonListHTML() {
         return `<h2 class="tv-h3 tvw-unit-title" id="tvwUnitTitle">${esc(L.domainName(u.domain))}</h2>
           ${units.map((x) => `<h3 class="tvw-sub-h">${esc(x.name.replace(/^[^:]*:\s*/, ''))}</h3><ol class="tvw-list">${lessonsOf(x).map(lessonRowHTML).join('')}</ol>`).join('')}`;
     }
+    // the school site's lessons with no school week come last, under their own heading
+    const all = lessonsOf(u);
+    const dated = all.filter((l) => l.seq || l.weeks.length);
+    const undated = all.filter((l) => !l.seq && !l.weeks.length);
     return `<h2 class="tv-h3 tvw-unit-title" id="tvwUnitTitle">${esc(u.id === 'E' ? 'Enrichment lessons (after MAP)' : `${u.id} ${u.name}`)}</h2>${thisWeekHTML()}
       <p class="tv-cap tvw-pad">${esc(unitWeeks(u))}${u.power && u.power.length ? ` · Power standards ${esc(u.power.join(', '))}` : ''}</p>
-      <ol class="tvw-list">${lessonsOf(u).map(lessonRowHTML).join('')}</ol>`;
+      <ol class="tvw-list">${dated.map(lessonRowHTML).join('')}</ol>
+      ${undated.length ? `<h3 class="tvw-sub-h">${undated.every((l) => L.siteFlagText(l) === 'Support lesson') ? 'Support lessons from the school site' : 'Lessons from the school site'} (no week set)</h3><ol class="tvw-list">${undated.map(lessonRowHTML).join('')}</ol>` : ''}`;
+}
+
+/**
+ * The detailed-lessons hook (round 7): the lessons made with the V22 lesson maker, when
+ * data/curriculum/detailed-lessons.json exists (links-data.js documents the shape). Keyed by the White Rose step id
+ * or the school-site lesson id. Only a web link or a path inside the site is followed.
+ */
+function detailedFor(l) {
+    if (!detailed || !l) return [];
+    const recs = [l.step, l.site].filter(Boolean).flatMap((k) => [].concat(detailed[k] || []));
+    return recs.filter((r) => r && typeof r.url === 'string' && /^(?:https:\/\/|[A-Za-z0-9_][A-Za-z0-9_./%-]*$)/.test(r.url) && !/\.\./.test(r.url));
 }
 
 function detailHTML() {
@@ -284,21 +334,32 @@ function detailHTML() {
     }
     links = L.linksFor(l, { live });
     pick.setGroups({ direct: links.direct, prereq: links.prereq, related: links.related });
+    const assess = l.type === 'assessment';
+    const tagged = links.source === 'curated';
+    const notTagged = untagged(l, links.source);
     const files = l.step ? (SEQ.WRM_STEP_FILES[l.step] || []) : [];
     const fileBtn = (id, label, ic, url) => (id ? `<a class="tv-btn${label.startsWith('Open lesson') ? ' tv-btn-primary' : ''}" href="${esc(url || `https://drive.google.com/file/d/${encodeURIComponent(id)}/view`)}" target="_blank" rel="noopener">${icon(ic, 18)}<span>${label}</span></a>` : '');
-    const ee = (links.step && links.step.ee) || [];
+    const deep = detailedFor(l).map((r, i) => `<a class="tv-btn${files.length ? '' : ' tv-btn-primary'}" data-w-detailed="${i}" href="${esc(r.url)}" target="_blank" rel="noopener">${icon('sheet', 18)}<span>Detailed lesson</span></a>`).join('');
+    const ee = (links.step && links.step.ee) || (l.siteInfo && l.siteInfo.ee) || [];
     const strands = l.strands.split('').map((s) => STRAND[s]).filter(Boolean);
-    const vd = l.type === 'build' ? null : VERDICT[links.verdict];
-    const verdict = l.type === 'build'
-        ? 'A CCSS lesson the school is still to write — there is no White Rose lesson for it.'
-        : links.verdict === 'full' ? 'The skills below teach every part of this lesson.'
-            : links.verdict === 'partial' ? `These skills cover part of the lesson${links.missing ? `. Not yet: ${esc(links.missing)}` : '.'}` : 'No skill teaches this lesson yet.';
+    const vd = assess || notTagged || (l.type === 'build' && !tagged) ? null : VERDICT[links.verdict];
+    const verdict = assess ? 'No skills are linked to this assessment. Practise the lessons of this unit before it.'
+        : notTagged ? `Skills not tagged yet.${links.prereq.length || links.related.length ? ' The skills below share its standards or come before it.' : ''}`
+            : l.type === 'build' && !tagged ? 'A CCSS lesson the school is still to write — there is no White Rose lesson for it.'
+                : links.verdict === 'full' ? 'The skills below teach every part of this lesson.'
+                    : links.verdict === 'partial' ? `These skills cover part of the lesson${links.missing ? `. Not yet: ${esc(links.missing)}` : '.'}` : 'No skill teaches this lesson yet.';
     const u = unitRec();
+    const flag = L.siteFlagText(l);
+    const about = L.lessonAbout(l);
+    const lead = l.n ? `Lesson ${l.n}` : assess ? 'Assessment' : 'School lesson';
     return `<div class="tv-card tvw-head">
         <p class="tvw-kicker">${esc(gradeRec().label)} · ${esc(u.id === 'E' ? 'Enrichment' : v.grade === 'PK' ? L.domainName(u.domain) : `${u.id} ${L.domainName(u.domain)}`)}${l.weeks.length ? ` · Week ${esc(l.weeks.map((w) => w.replace(/^W0?/, '')).join(', '))}` : ''}</p>
-        <h2 class="tv-h2 tvw-title"><span class="tvw-title-n">Lesson ${l.n}</span> ${esc(l.title)}</h2>
+        <h2 class="tv-h2 tvw-title"><span class="tvw-title-n">${esc(lead)}</span> ${esc(l.title)}</h2>
         <div class="tvw-tags">
+          ${flag ? `<span class="tvw-tag tvw-flag${assess ? ' is-assess' : ''}" data-w-flag="${esc(flag)}">${esc(flag)}</span>` : ''}
           ${vd ? `<span class="tvw-tag tvw-verdict-tag ${vd[1]}" data-w-verdict-tag="${links.verdict}">${vd[0]}</span>` : ''}
+          ${notTagged ? '<span class="tvw-tag tvw-verdict-tag is-untagged" data-w-verdict-tag="untagged">Skills not tagged yet</span>' : ''}
+          ${l.siteInfo && l.siteInfo.supplement ? '<span class="tvw-tag">Supplement</span>' : ''}
           ${l.power ? '<span class="tvw-tag tvw-power">Power standard</span>' : ''}
           ${l.type === 'copied' ? `<span class="tvw-tag">Copied in from ${esc(gradeWord(l.from))} — teach it from that grade's files</span>` : ''}
           ${l.type === 'enrich' ? '<span class="tvw-tag">Enrichment (after MAP)</span>' : ''}
@@ -307,16 +368,17 @@ function detailHTML() {
           ${l.ccss.map((c) => `<span class="tvw-tag tvw-code">${esc(c)}</span>`).join('')}
           ${ee.slice(0, 3).map((c) => `<span class="tvw-tag tvw-code tvw-ee">${esc(c.replace(/^M\./, ''))}</span>`).join('')}
         </div>
-        ${files.length ? `<div class="tvw-files">${fileBtn(files[0], l.type === 'copied' && l.from ? `Open lesson (${gradeWord(l.from)} files)` : 'Open lesson', 'external')}${fileBtn(files[1], 'Teaching guide', 'book')}${files[2] ? fileBtn('x', 'Video', 'play', files[2]) : ''}</div>` : ''}
-        <p class="tvw-verdict${links.verdict === 'gap' || l.type === 'build' ? ' is-gap' : ''}">${verdict}</p>${toBeBuiltHTML(links.build, L.proposalLabel)}
-        ${pick.quickHTML([['direct', 'All teaching skills'], ['prereq', 'Do-first skills'], ['related', 'Go-with skills'], ['all', 'Everything']])}
+        ${about.length ? `<div class="tvw-about">${about.map((t) => `<p>${esc(t)}</p>`).join('')}</div>` : ''}
+        ${files.length || deep ? `<div class="tvw-files">${fileBtn(files[0], l.type === 'copied' && l.from ? `Open lesson (${gradeWord(l.from)} files)` : 'Open lesson', 'external')}${fileBtn(files[1], 'Teaching guide', 'book')}${files[2] ? fileBtn('x', 'Video', 'play', files[2]) : ''}${deep}</div>` : ''}
+        <p class="tvw-verdict${assess || notTagged ? ' is-quiet' : links.verdict === 'gap' || (l.type === 'build' && !tagged) ? ' is-gap' : ''}">${verdict}</p>${toBeBuiltHTML(links.build, L.proposalLabel)}
+        ${assess ? '' : pick.quickHTML([['direct', 'All teaching skills'], ['prereq', 'Do-first skills'], ['related', 'Go-with skills'], ['all', 'Everything']])}
       </div>
-      ${GROUPS.map(([g, h, cap]) => pick.groupHTML(g, h, cap, emptyText(g, l), g === 'prereq' ? toBeBuiltHTML(links.preBuild, L.proposalLabel, 'Still to make') : '')).join('')}
-      ${pick.barWrapHTML()}`;
+      ${assess ? '' : GROUPS.map(([g, h, cap]) => pick.groupHTML(g, h, cap, emptyText(g, l, notTagged), g === 'prereq' ? toBeBuiltHTML(links.preBuild, L.proposalLabel, 'Still to make') : '')).join('')}
+      ${assess ? '' : pick.barWrapHTML()}`;
 }
 
-function emptyText(g, l) {
-    if (g === 'direct') return l.type === 'build' ? 'No skill yet: this lesson is still to be written.' : 'No skill teaches this lesson yet. The skills below still help.';
+function emptyText(g, l, notTagged) {
+    if (g === 'direct') return notTagged ? 'Skills not tagged yet: no skill is linked to this lesson so far.' : l.type === 'build' ? 'No skill yet: this lesson is still to be written.' : 'No skill teaches this lesson yet. The skills below still help.';
     return g === 'prereq' ? 'No earlier skills found for this lesson.' : 'No other skills share this lesson\'s standard.';
 }
 
@@ -351,7 +413,7 @@ function searchHits(box, q) {
     box.hidden = !q.trim();
     box.innerHTML = hits.length
         ? hits.map((l) => `<li role="option"><button type="button" class="tvw-hit" data-w-jump="${esc(l.key)}"><span class="tvw-hit-t">${esc(l.title)}</span>
-            <span class="tvw-hit-m">${esc(l.gradeLabel)} · ${esc(l.unit === 'E' ? 'Enrichment' : `${l.unit} ${L.domainName(l.domain)}`)}${l.ccss.length ? ` · ${esc(matchedCode(l, q))}` : ''}</span></button></li>`).join('')
+            <span class="tvw-hit-m">${esc(l.gradeLabel)} · ${esc(l.unit === 'E' ? 'Enrichment' : `${l.unit} ${L.domainName(l.domain)}`)}${L.siteFlagText(l) ? ` · ${esc(L.siteFlagText(l))}` : ''}${l.ccss.length ? ` · ${esc(matchedCode(l, q))}` : ''}</span></button></li>`).join('')
         : '<li class="tvw-hit-none">No lesson matches. Try a shorter word or a standard such as 2.NBT.A.1.</li>';
 }
 
