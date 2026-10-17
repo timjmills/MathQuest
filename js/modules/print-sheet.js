@@ -2971,7 +2971,7 @@ function dealOne(ref, seed, used, want, avoidAns = null, near = null, names = nu
         used.add(key);
         return { q, v, key };
     }
-    throw new Error(`detailed lesson: no ${ref.skillId} item for "${want || 'any'}"`);
+    throw new Error(`detailed lesson: no ${ref.skillId} item for "${want || 'any'}" DBG ${[...used].filter((k) => /x/.test(k)).join(" ")}`);
 }
 
 /**

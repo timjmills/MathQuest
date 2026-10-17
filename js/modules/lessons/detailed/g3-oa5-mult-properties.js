@@ -160,7 +160,7 @@ export default {
     // Three items (V22: 3 when 4 full-size items do not fit a half - an array and its turn is a whole row),
     // the array one across, the two facts two across: the turned fact from a picture, the Critical Atom without a picture, the ★★★ square.
     exit: [
-        { case: 'an array: the known fact gives the turned fact', ref: TURN(1, { maxNum: 12 }), want: 'arrSmall', instr: 'Turn the array. Write the new fact.', detects: 'Copies the first fact: no swap.', cols: 1 },
+        { case: 'an array: the known fact gives the turned fact', ref: TURN(1, { maxNum: 20 }), want: 'arrNonSq', instr: 'Turn the array. Write the new fact.', detects: 'Copies the first fact: no swap.', cols: 1 },
         { case: 'same product, no picture (Critical Atom)', ref: FACTS(), want: 'arrProduct', instr: 'Write the missing number.', detects: 'Multiplies again and slips: not the same product.', cols: 2 },
         { case: 'a square fact, the missing factor', ref: FACTS(), want: 'arrSquareFactor', instr: 'Write the missing number.', detects: 'Thinks a square cannot turn.', cols: 2 },
     ],
