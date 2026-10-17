@@ -621,12 +621,13 @@ function refreshQuizChrome() {
     const c = document.getElementById('quizTakeView');
     if (!c) return;
     const total = state.quizAllQuestions.length;
-    const answered = quizAnswers.filter(a => a.studentAnswer !== '').length;
+    // the same rule as a full re-render (isAnswered): a row with an empty box is not answered yet
+    const answered = quizAnswers.filter(isAnswered).length;
     const count = c.querySelector('.qt-topbar-right > span:last-child');
     if (count) count.textContent = `${answered}/${total} answered`;
     c.querySelectorAll('.qt-q-grid .qt-q-dot').forEach((d, i) => {
         const a = quizAnswers[state.quizOrder[i]];
-        if (a) d.classList.toggle('answered', a.studentAnswer !== '');
+        if (a) d.classList.toggle('answered', isAnswered(a));
     });
 }
 
@@ -668,7 +669,9 @@ function recordAnswer(flatIdx, studentAnswer) {
         if (boxes.length > 1 && String(studentAnswer).trim() !== '') {
             const rows = new Map();
             partial = boxes.some((b) => {
-                const row = b.closest('.mq-wwans');
+                // the ROW of digit boxes (each .mq-wwans wraps one box): "[_|8|1|_]" with the ones box empty is partial
+                const box = b.closest('.mq-wwans');
+                const row = box && (box.closest('.mq-wwcols') || box.parentElement);
                 if (row) { if (!rows.has(row)) rows.set(row, []); rows.get(row).push(b); return false; }
                 return !filled(b);
             });
@@ -695,6 +698,8 @@ function recordAnswer(flatIdx, studentAnswer) {
 
     // Broadcast answer to monitor dashboard
     broadcastQuizAnswer(flatIdx, studentAnswer, correct);
+    // the page dots and the answered count follow every answer path (a drawing's own boxes record here directly)
+    try { refreshQuizChrome(); } catch (e) { /* no quiz screen */ }
 }
 
 // ---- Navigation ----

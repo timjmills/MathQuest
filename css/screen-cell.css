@@ -1771,6 +1771,14 @@ html body .mq-scell [data-mq-swiperow][data-mq-wrapfit] .k2-swipe-cues > .k2-swi
 html body .mq-scell [data-mq-swiperow][data-mq-wrapfit] .k2-swipe-cues > .k2-swipe-back { display: none; }
 .mq-scell [data-mq-swiperow][data-mq-wrapfit] { scroll-snap-type: none; }
 
+/* Small fixes item 1 (critic r2 N1): a count-by row says how to move on between its boxes - Space on a keyboard,
+   a tap on a touch screen (the caret never moves by itself). */
+.k2-countrow-keys .k2-keys-touch { display: none; }
+@media (hover: none) and (pointer: coarse) {
+    .k2-countrow-keys .k2-keys-type { display: none; }
+    .k2-countrow-keys .k2-keys-touch { display: inline; }
+}
+
 /* ---- Bracket hug (owner 2026-10-09; critic div-facts-forms R4 nit c, "7)  28", "2)  8"): the
    dividend's column is as wide as its digits, as on paper, so the arc and the vinculum hug them.
    The quotient box no longer sizes that column (`contain: inline-size` keeps it out of the grid's

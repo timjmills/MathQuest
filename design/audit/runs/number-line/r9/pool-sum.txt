@@ -1,0 +1,187 @@
+1366x650 mixed_addition queue mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,85,90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 mixed_addition queue touch line
+   q1:sy138/h59/b-68[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x1>138/-68x95
+   q1-checked:sy152/h59/b-82[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2:sy0/h59/b70 seg 152/-82x92>0/70x87
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 mixed_addition T300 mouse line
+   q1:sy138/h59/b-68[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x1>138/-68x94
+   q1-checked:sy152/h59/b-82[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2:sy152/h59/b-82[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2-checked:sy0/h59/b70 seg 364/-294x64>0/70x7
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 mixed_addition T300 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q2-forced
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 mixed_addition T0 mouse line
+   q1:sy138/h59/b-68[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x1>138/-68x93
+   q1-checked:sy152/h59/b-82[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2:sy0/h59/b70 seg 152/-82x93>0/70x86
+   q2-checked:sy0/h59/b70
+   q3:sy138/h59/b-68[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x92>138/-68x88
+   q3-checked:sy152/h59/b-82[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+1366x650 mixed_addition T0 touch line
+   q1:sy138/h59/b-68[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x1>138/-68x93
+   q1-checked:sy152/h59/b-82[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2:sy7/h59/b63 seg 152/-82x93>7/63x86
+   q2-checked:sy7/h59/b63
+   q3:sy138/h59/b-68[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 7/63x94>138/-68x86
+   q3-checked:sy152/h59/b-82[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+1280x600 mixed_addition queue mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,85,90,95,100]
+   q1-checked:sy4/h59/b66
+   q2:sy77/h59/b-7[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 4/66x96>0/70x2>77/-7x6>0/70x2>77/-7x2>0/70x1>77/-7x26>0/70x1>77/-7x44
+   q2-checked:sy0/h59/b70
+   q3:sy188/h59/b-118[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x95>188/-118x85
+   q3-checked:sy201/h59/b-131[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+1280x600 mixed_addition queue touch line
+   q1:sy77/h59/b-7[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x3>77/-7x3>0/70x3>77/-7x26>0/70x1>77/-7x55
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy4/h59/b66
+   q3:sy4/h59/b66
+   q3-checked:sy4/h59/b66
+1280x600 mixed_addition T300 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy188/h59/b-118[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x94>188/-118x86
+   q2-checked:sy202/h59/b-132[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3:sy0/h59/b70 seg 202/-132x94>0/70x88
+   q3-checked:sy0/h59/b70
+1280x600 mixed_addition T300 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy4/h59/b66
+   q2:sy77/h59/b-7[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 4/66x95>0/70x2>77/-7x1>0/70x1>77/-7x6>0/70x1>77/-7x1>0/70x1>77/-7x1>0/70x1>77/-7x26>0/70x1>77/-7x44
+   q2-checked:sy0/h59/b70
+   q3:sy77/h59/b-7[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x98>77/-7x1>0/70x1>77/-7x6>0/70x2>77/-7x2>0/70x1>77/-7x26>0/70x1>77/-7x42
+   q3-checked:sy0/h59/b70
+1280x600 mixed_addition T0 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy4/h59/b66
+   q2:sy4/h59/b66
+   q2-checked:sy4/h59/b66
+   q3:sy188/h59/b-118[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 4/66x95>188/-118x85
+   q3-checked:sy202/h59/b-132[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+1280x600 mixed_addition T0 touch line
+   q1:sy255/h59/b-185[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x1>255/-185x95
+   q1-checked:sy269/h59/b-199[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2:sy7/h59/b63 seg 269/-199x93>76/-6x1>7/63x86
+   q2-checked:sy7/h59/b63
+   q3:sy188/h59/b-118[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 7/63x95>188/-118x86
+   q3-checked:sy202/h59/b-132[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+1366x768 mixed_addition queue mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,85,90,95,100]
+   q1-checked:sy34/h59/b36[BAND-UNDER-HDR(fits)]
+   q2:sy0/h59/b70 seg 34/36x92>0/70x88
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy34/h59/b36[BAND-UNDER-HDR(fits)]
+1366x768 mixed_addition queue touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,85,90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x768 mixed_addition T300 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy34/h59/b36[band-under-hdr(too-tall)]
+   q2-forced
+   q3:sy0/h59/b70 seg 34/36x304>0/70x84
+   q3-checked:sy0/h59/b70
+1366x768 mixed_addition T300 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy34/h59/b36[BAND-UNDER-HDR(fits)]
+   q2:sy0/h59/b70 seg 34/36x93>0/70x86
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x768 mixed_addition T0 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy87/h59/b-17[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x95>87/-17x85
+   q2-checked:sy101/h59/b-31[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3:sy0/h59/b70 seg 101/-31x93>0/70x88
+   q3-checked:sy0/h59/b70
+1366x768 mixed_addition T0 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x720 mixed_addition queue mouse line
+   q1:sy68/h59/b2[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x1>68/2x95
+   q1-checked:sy82/h59/b-12[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2:sy0/h59/b70 seg 82/-12x93>0/70x88
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x720 mixed_addition queue touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,85,90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x720 mixed_addition T300 mouse line
+   q1:sy68/h59/b2[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x1>68/2x95
+   q1-checked:sy82/h59/b-12[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2:sy82/h59/b-12[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2-checked:sy82/h59/b-12[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3:sy82/h59/b-12[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3-checked:sy82/h59/b-12[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+1280x720 mixed_addition T300 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70 seg 294/-224x64>0/70x8
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x720 mixed_addition T0 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy118/h59/b-48[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x96>118/-48x85
+   q3-checked:sy126/h59/b-56[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+1280x720 mixed_addition T0 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy32/h59/b38[BAND-UNDER-HDR(fits)]
+   q2:sy0/h59/b70 seg 32/38x92>0/70x88
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+390x844 mixed_addition queue touch line
+   q1:sy403/h0/b389[CHECK-OUT] seg 0/816x1>403/413x97
+   q1-checked:sy403/h0/b389
+   q1-forced
+   q2:sy474/h0/b318[CHECK-OUT] seg 403/389x612>474/318x166
+   q2-checked:sy474/h0/b318
+   q3:sy474/h0/b318[CHECK-OUT]
+   q3-checked:sy474/h0/b318
+390x844 mixed_addition T0 touch line
+   q1:sy391/h0/b309[CHECK-OUT] seg 0/nullx2>391/333x95
+   q1-checked:sy391/h0/b309
+   q1-forced
+   q2:sy466/h0/b234[CHECK-OUT] seg 391/309x305>466/234x84
+   q2-checked:sy474/h0/b226
+   q3:sy466/h0/b234[CHECK-OUT] seg 474/226x95>466/234x86
+   q3-checked:sy466/h0/b234
+TOTAL {"cases":26,"fitsUnder":10,"boxOut":0,"chkOut":6,"labels":31,"labelsQ1":24,"bounces":4,"bigJumps":28,"err":0,"tapJump":0,"pageErr":0}

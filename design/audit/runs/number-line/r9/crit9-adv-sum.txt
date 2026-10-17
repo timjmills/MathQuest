@@ -1,0 +1,176 @@
+== 1280x600 sub_100_regroup line base sy0 docH667 band70
+  PgDn-in-input 0 > 7 > 7 | 0x1>3x1>9x1>7x5>11x1>7x98
+  Arrow-body 7 | 7x25
+  silent 7 7 | 7x106
+  tab hintBtn@7 ttsBtn@7 qcCheckBtn@7 mystats-bar-btn@0(OUT) mqPlayMenuBtn@0(OUT) settings-panel-close@0(OUT) btn btn-sm btn-secondary@0(OUT) column-answer-input mq-d@4 | 7x16>0x22>4x5
+  typing 0x1>4x53 end sy 4
+  hint true 7 7 | 0x36>7x96
+  read true 7 7 | 0x36>7x96
+  solution true 7 7 | 0x37>7x97
+  listeners stable 2 scroll
+  leave {"docH":1482,"vh":600,"band":{"h":0,"top":0},"syAfter80":300,"syAfter480":300}
+== 1280x600 sub_100_regroup OFF base sy0 docH600 band-
+  PgDn-in-input 0 > 0 > 0 | 0x107
+  Arrow-body 0 | 0x26
+  silent 0 0 | 0x106
+  tab hintBtn@0 ttsBtn@0 qcCheckBtn@0 mystats-bar-btn@0(OUT) mqPlayMenuBtn@0(OUT) settings-panel-close@0(OUT) btn btn-sm btn-secondary@0(OUT) column-answer-input mq-d@0 | 0x42
+  typing 0x57 end sy 0
+  hint true 0 0 | 0x133
+  read true 0 0 | 0x133
+  solution true 0 0 | 0x133
+  listeners stable 1 scroll
+  leave {"docH":1469,"vh":600,"band":null,"syAfter80":300,"syAfter480":300}
+== 1280x600 nl_mult line base sy0 docH660 band70
+  PgDn-in-input 0 > 0 > 0 | 0x106
+  Arrow-body 40 | 0x1>1x1>4x1>9x1>16x1>23x1>30x1>36x1>39x1>40x16
+  silent 7 7 | 7x106
+  tab hintBtn@7 ttsBtn@7 qcCheckBtn@7 mystats-bar-btn@0(OUT) mqPlayMenuBtn@0(OUT) settings-panel-close@0(OUT) btn btn-sm btn-secondary@0(OUT) mq-nl-tick mq-nl-start@0 | 7x16>0x26
+  typing 5x56 end sy 5
+  hint true 7 7 | 0x34>7x97
+  read true 7 7 | 0x36>7x96
+  solution true 7 7 | 0x36>7x97
+  listeners stable 2 scroll
+  leave {"docH":1670,"vh":600,"band":{"h":0,"top":0},"syAfter80":300,"syAfter480":300}
+== 1280x600 nl_mult OFF base sy0 docH600 band-
+  PgDn-in-input 0 > 0 > 0 | 0x106
+  Arrow-body 0 | 0x25
+  silent 0 0 | 0x105
+  tab hintBtn@0 ttsBtn@0 qcCheckBtn@0 mystats-bar-btn@0(OUT) mqPlayMenuBtn@0(OUT) settings-panel-close@0(OUT) btn btn-sm btn-secondary@0(OUT) mq-nl-tick mq-nl-start@0 | 0x42
+  typing 0x56 end sy 0
+  hint true 0 0 | 0x130
+  read true 0 0 | 0x133
+  solution true 0 0 | 0x133
+  listeners stable 1 scroll
+  leave {"docH":1657,"vh":600,"band":null,"syAfter80":300,"syAfter480":300}
+== 1280x600 add_facts line base sy0 docH601 band70
+  PgDn-in-input 0 > 0 > 1 | 0x5>1x102
+  Arrow-body 1 | 0x5>1x19
+  silent 1 1 | 1x107
+  tab hintBtn@1 ttsBtn@1 qcCheckBtn@1 mystats-bar-btn@0(OUT) mqPlayMenuBtn@0(OUT) settings-panel-close@0(OUT) btn btn-sm btn-secondary@0(OUT) answerInput@0 | 1x15>0x27
+  typing 0x57 end sy 0
+  hint true 1 1 | 0x36>1x96
+  read true 1 1 | 0x36>1x97
+  solution true 1 1 | 0x37>1x97
+  listeners stable 2 scroll
+  leave {"docH":1482,"vh":600,"band":{"h":0,"top":0},"syAfter80":300,"syAfter480":300}
+== 1280x600 add_facts OFF base sy0 docH600 band-
+  PgDn-in-input 0 > 0 > 0 | 0x106
+  Arrow-body 0 | 0x25
+  silent 0 0 | 0x106
+  tab hintBtn@0 ttsBtn@0 qcCheckBtn@0 mystats-bar-btn@0(OUT) mqPlayMenuBtn@0(OUT) settings-panel-close@0(OUT) btn btn-sm btn-secondary@0(OUT) answerInput@0 | 0x42
+  typing 0x57 end sy 0
+  hint true 0 0 | 0x133
+  read true 0 0 | 0x133
+  solution true 0 0 | 0x133
+  listeners stable 1 scroll
+  leave {"docH":1469,"vh":600,"band":null,"syAfter80":300,"syAfter480":300}
+== 1280x600 mixed_addition line base sy188 docH917 band-118
+  PgDn-in-input 7 > 7 > 7 | 7x106
+  Arrow-body 26 | 77x2>80x1>0x1>11x1>0x1>15x1>21x1>25x1>26x17
+  silent 77 77 | 172x1>0x1>77x1>0x1>77x1>0x1>77x26>0x1>77x73
+  tab hintBtn@7 ttsBtn@7 qcCheckBtn@7 mystats-bar-btn@0(OUT) mqPlayMenuBtn@0(OUT) settings-panel-close@0(OUT) btn btn-sm btn-secondary@0(OUT) column-answer-input mq-d@4 | 7x16>0x21>4x6
+  typing 79x1>0x1>77x1>0x1>79x1>0x2>77x2>79x1>0x1>77x2>79x1>0x49 end sy 0
+  hint true 7 7 | 0x36>7x97
+  read true 99 99 | 45x36>99x97
+  solution true 7 7 | 0x36>7x97
+  listeners stable 2 scroll
+  leave {"docH":1482,"vh":600,"band":{"h":0,"top":0},"syAfter80":300,"syAfter480":300}
+== 1280x600 mixed_addition OFF base sy248 docH848 band-
+  PgDn-in-input 0 > 0 > 0 | 0x1>5x1>0x2>44x1>64x1>0x1>27x1>33x1>34x24>0x73
+  Arrow-body 0 | 0x25
+  silent 0 0 | 0x106
+  tab number-family-input mq-a@24 number-family-input mq-a@381 number-family-input mq-a@381 number-family-input mq-a@403 number-family-input mq-a@403 number-family-input mq-a@760 number-family-input mq-a@760 BUTTON@760 | 24x7>381x12>403x12>760x19
+  typing 0x62 end sy 0
+  hint true 248 248 | 0x15>248x116
+  read true 145 145 | 25x36>145x97
+  solution true 0 0 | 0x133
+  listeners stable 1 scroll
+  leave {"docH":1469,"vh":600,"band":null,"syAfter80":300,"syAfter480":300}
+== 1366x650 sub_100_regroup line base sy0 docH667 band70
+  PgDn-in-input 0 > 5 > 10 | 0x1>1x1>2x1>5x1>8x1>11x1>7x1>9x1>10x98
+  Arrow-body 10 | 10x25
+  silent 7 7 | 7x106
+  tab hintBtn@7 ttsBtn@7 qcCheckBtn@7 mystats-bar-btn@0(OUT) mqPlayMenuBtn@0(OUT) settings-panel-close@0(OUT) btn btn-sm btn-secondary@0(OUT) column-answer-input mq-d@0 | 0x1>7x15>0x26
+  typing 0x55 end sy 0
+  hint true 7 7 | 0x36>7x97
+  read true 7 7 | 0x36>7x96
+  solution true 7 7 | 0x36>7x97
+  listeners stable 2 scroll
+  leave {"docH":1482,"vh":650,"band":{"h":0,"top":0},"syAfter80":300,"syAfter480":300}
+== 1366x650 sub_100_regroup OFF base sy0 docH650 band-
+  PgDn-in-input 0 > 0 > 0 | 0x106
+  Arrow-body 0 | 0x25
+  silent 0 0 | 0x106
+  tab hintBtn@0 ttsBtn@0 qcCheckBtn@0 mystats-bar-btn@0(OUT) mqPlayMenuBtn@0(OUT) settings-panel-close@0(OUT) btn btn-sm btn-secondary@0(OUT) column-answer-input mq-d@0 | 0x44
+  typing 0x57 end sy 0
+  hint true 0 0 | 0x133
+  read true 0 0 | 0x133
+  solution true 0 0 | 0x133
+  listeners stable 1 scroll
+  leave {"docH":1469,"vh":650,"band":null,"syAfter80":300,"syAfter480":300}
+== 1366x650 nl_mult line base sy0 docH660 band70
+  PgDn-in-input 0 > 0 > 0 | 0x107
+  Arrow-body 10 | 0x2>1x1>3x1>5x1>7x1>8x1>9x1>10x17
+  silent 10 10 | 10x106
+  tab hintBtn@10 ttsBtn@10 qcCheckBtn@10 mystats-bar-btn@0(OUT) mqPlayMenuBtn@0(OUT) settings-panel-close@0(OUT) btn btn-sm btn-secondary@0(OUT) mq-nl-tick mq-nl-start@0 | 10x16>0x26
+  typing 0x57 end sy 0
+  hint true 10 10 | 0x33>10x96
+  read true 10 10 | 0x36>10x97
+  solution true 10 10 | 0x36>10x97
+  listeners stable 2 scroll
+  leave {"docH":1670,"vh":650,"band":{"h":0,"top":0},"syAfter80":300,"syAfter480":300}
+== 1366x650 nl_mult OFF base sy0 docH650 band-
+  PgDn-in-input 0 > 0 > 0 | 0x106
+  Arrow-body 0 | 0x25
+  silent 0 0 | 0x106
+  tab hintBtn@0 ttsBtn@0 qcCheckBtn@0 mystats-bar-btn@0(OUT) mqPlayMenuBtn@0(OUT) settings-panel-close@0(OUT) btn btn-sm btn-secondary@0(OUT) mq-nl-tick mq-nl-start@0 | 0x43
+  typing 0x56 end sy 0
+  hint true 0 0 | 0x130
+  read true 0 0 | 0x133
+  solution true 0 0 | 0x132
+  listeners stable 1 scroll
+  leave {"docH":1657,"vh":650,"band":null,"syAfter80":300,"syAfter480":300}
+== 1366x650 add_facts line base sy0 docH650 band70
+  PgDn-in-input 0 > 0 > 0 | 0x106
+  Arrow-body 0 | 0x25
+  silent 0 0 | 0x106
+  tab hintBtn@0 ttsBtn@0 qcCheckBtn@0 mystats-bar-btn@0(OUT) mqPlayMenuBtn@0(OUT) settings-panel-close@0(OUT) btn btn-sm btn-secondary@0(OUT) answerInput@0 | 0x42
+  typing 0x57 end sy 0
+  hint true 0 0 | 0x132
+  read true 0 0 | 0x133
+  solution true 0 0 | 0x132
+  listeners stable 2 scroll
+  leave {"docH":1482,"vh":650,"band":{"h":0,"top":0},"syAfter80":300,"syAfter480":300}
+== 1366x650 add_facts OFF base sy0 docH650 band-
+  PgDn-in-input 0 > 0 > 0 | 0x107
+  Arrow-body 0 | 0x26
+  silent 0 0 | 0x107
+  tab hintBtn@0 ttsBtn@0 qcCheckBtn@0 mystats-bar-btn@0(OUT) mqPlayMenuBtn@0(OUT) settings-panel-close@0(OUT) btn btn-sm btn-secondary@0(OUT) answerInput@0 | 0x42
+  typing 0x57 end sy 0
+  hint true 0 0 | 0x132
+  read true 0 0 | 0x133
+  solution true 0 0 | 0x133
+  listeners stable 1 scroll
+  leave {"docH":1469,"vh":650,"band":null,"syAfter80":300,"syAfter480":300}
+== 1366x650 mixed_addition line base sy138 docH917 band-68
+  PgDn-in-input 0 > 0 > 0 | 0x106
+  Arrow-body 0 | 0x26
+  silent 7 7 | 7x106
+  tab mq-cellslot mq-active-bo@152 mq-cellslot mq-active-bo@152 mq-wwword@267 mq-wwword@267 mq-wwword@267 hintBtn@267 ttsBtn@267 qcCheckBtn@267 | 152x10>267x32
+  typing 29x1>0x1>27x1>0x1>29x1>0x2>27x2>29x1>0x1>27x3>29x1>0x1>27x3>29x1>0x1>27x2>29x1>0x49 end sy 0
+  hint true 0 0 | 0x133
+  read true 7 7 | 0x36>7x97
+  solution true 122 122 | 27x2>0x2>27x2>0x1>27x26>0x1>27x3>122x96
+  listeners stable 2 scroll
+  leave {"docH":1482,"vh":650,"band":{"h":0,"top":0},"syAfter80":300,"syAfter480":300}
+== 1366x650 mixed_addition OFF base sy198 docH848 band-
+  PgDn-in-input 198 > 198 > 198 | 198x106
+  Arrow-body 198 | 198x25
+  silent 198 198 | 198x106
+  tab mq-cellslot mq-active-bo@198 mq-cellslot mq-active-bo@198 mq-cellslot mq-active-bo@198 mq-cellslot mq-active-bo@198 mq-cellslot mq-active-bo@198 mq-wwword@198 mq-wwword@198 mq-wwword@198 | 198x44
+  typing 0x71 end sy 0
+  hint true 53 53 | 0x36>53x97
+  read true 53 53 | 0x36>53x97
+  solution true 265 265 | 265x133
+  listeners stable 1 scroll
+  leave {"docH":1469,"vh":650,"band":null,"syAfter80":300,"syAfter480":300}

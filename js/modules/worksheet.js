@@ -9,6 +9,7 @@ import { isTimeSkill, timeAnswersMatch } from './answer-check.js';
 import { openZoomModal, ZOOM_CLICK_IS_ANSWER_TYPES } from './question-render.js';
 import { generateQuestion, generateQuestionFor } from './generate-question.js';
 import { deriveSeed } from './sheet/index.js';
+import { syncWorksheetRefLine } from './refline-screen.js';
 import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry, screenSupportsFor,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, plainText, hideRepeatedPrompt,
@@ -1761,6 +1762,8 @@ export function newWorksheet() {
     }
     _wsScheduleLayout(grid);
     _wsHeaderPill();
+    // Wave 5.2: the skill's number line above the sheet, covering every item on it.
+    try { syncWorksheetRefLine(state.worksheetQs, { categoryId: state.category, skillId: state.skill, opts: state.skillOptions || null, pool: !state.isMixedMode }); } catch (e) { /* a hint: never block the sheet */ }
 
     document.getElementById("worksheetResult").innerText = "";
 }
@@ -1778,6 +1781,7 @@ export function addMoreProblems() {
         _wsRenderCard(grid, q, i);
     }
     _wsScheduleLayout(grid);
+    try { syncWorksheetRefLine(state.worksheetQs, { categoryId: state.category, skillId: state.skill, opts: state.skillOptions || null, pool: !state.isMixedMode }); } catch (e) { /* a hint */ }
 
     // Scroll to the new problems
     const firstNewCard = document.getElementById(`ws_card_${startIndex}`);

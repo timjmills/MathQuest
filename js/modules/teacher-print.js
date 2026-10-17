@@ -107,6 +107,10 @@ function initState() {
         anchors: 'off',
         header: { name: true, date: true, score: true, tab: true, title: true },
         key: true,
+        // PEDAGOGY P-SC-5: hints (the number line at the top of the page) on test and check pages
+        // are the teacher's option, off by default.
+        testHints: false,
+
         // Wave 4.4: where the key prints and what it looks like (default = today's key; the
         // teacher's last choice is remembered in the print defaults).
         keyPlace: d.keyPlace, keyStyle: d.keyStyle, keyNewSheet: !!d.keyNewSheet,
@@ -319,6 +323,8 @@ function onClick(e) {
         case 'paper': pr.paper = d.v; renderSetup(); scheduleBuild(); break;
         case 'anchors': if (b.getAttribute('aria-disabled') === 'true') break; pr.anchors = d.v; renderSetup(); scheduleBuild(); break;
         case 'header': pr.header[d.v] = !pr.header[d.v]; renderSetup(); scheduleBuild(); break;
+        case 'test-hints': pr.testHints = !pr.testHints; renderSetup(); scheduleBuild(); break;
+
         case 'key-place': pr.keyPlace = d.v === 'after-page' ? 'after-page' : 'end'; rememberKeyDefaults(); renderSetup(); scheduleBuild(); break;
         case 'key-style': pr.keyStyle = d.v === 'short' ? 'short' : 'copy'; rememberKeyDefaults(); renderSetup(); scheduleBuild(); break;
         case 'key-newsheet': pr.keyNewSheet = !pr.keyNewSheet; rememberKeyDefaults(); renderSetup(); scheduleBuild(); break;
@@ -687,7 +693,11 @@ function renderSetup() {
     <div class="tv-setting tv-divided">
       <div><div class="tv-h3" id="tvKeyL">Answer key</div><p class="tv-cap" id="tvKeyD">${pr.keyStyle === 'short' ? 'A short list of every answer, page by page.' : 'The same page with the answers written in.'}</p></div>
       <button type="button" class="tv-switch" role="switch" aria-checked="${pr.key}" aria-labelledby="tvKeyL" aria-describedby="tvKeyD" data-act="key"></button>
-    </div>${pr.key ? keyOptionsHTML() : ''}
+    </div>${pr.key ? keyOptionsHTML() : ''}${pr.sections.some((s) => ['test', 'pre-skill-check', 'fact-probe'].includes(s.role)) ? `
+    <div class="tv-setting tv-divided">
+      <div><div class="tv-h3" id="tvHintsL">Hints on tests</div><p class="tv-cap" id="tvHintsD">Off: test and check pages print without the number line at the top. On: they print it like the other pages.</p></div>
+      <button type="button" class="tv-switch" role="switch" aria-checked="${!!pr.testHints}" aria-labelledby="tvHintsL" aria-describedby="tvHintsD" data-act="test-hints"></button>
+    </div>` : ''}
   </div>
   <div style="padding:16px 24px 24px;border-top:1px solid var(--tv-rule);display:flex;flex-direction:column;gap:8px;">
     <button type="button" class="tv-btn tv-btn-primary tv-btn-block" data-act="print"${pages ? '' : ' aria-disabled="true"'}${sheetCap ? ' aria-describedby="tvPrintSheets"' : ''}>${icon('print', 18)}<span>${printLabel}</span></button>${sheetCap ? `
@@ -809,6 +819,7 @@ function requestFor(s, i) {
         photocopySafe: pr.photocopySafe,
         anchors: anchorsBlocked() ? 'off' : (pr.anchors || 'off'),
         header: { name: h.name, date: h.date, score: h.score, tab: h.tab ? undefined : false, title: h.title ? (pr.title.trim() || true) : false },
+        testHints: !!pr.testHints,
         key: { on: !!pr.key, placement: pr.keyPlace || 'end', style: pr.keyStyle || 'copy', newSheet: !!pr.keyNewSheet },
         seed: (pr.seed + i * 7919) >>> 0,
     };

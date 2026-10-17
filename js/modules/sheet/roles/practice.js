@@ -567,6 +567,12 @@ export function sheetHeaders(input, words, score) {
     };
     const contTab = tab ? (tab.length > 1 ? [tab.slice(0, -1).join(' · '), tab[tab.length - 1]] : tab.slice()) : false;
     const cont = { name: on('name'), date: false, score: false, title: '', tab: contTab };
+    // Wave 5.2: the reference number line rides under the header of every page (the layout took
+    // its height off the body: sheetLayout's refBandMm).
+    if (h.refBand && Number(h.refBandMm) > 0) {
+        first.refBand = cont.refBand = String(h.refBand);
+        first.refBandMm = cont.refBandMm = Number(h.refBandMm);
+    }
     return { first, cont };
 }
 
@@ -613,6 +619,24 @@ export function splitCellH(L) {
     return Math.round(Math.min(L.cellH, L.hMin * DENSE_ROOM, (L.gridH - 1) / Math.max(1, L.rows)) * 1000) / 1000;
 }
 
+/**
+ * Wave 5.2 (critic nl-r4 D1 / D2): the row heights of a split section's two parts when the
+ * number-line band shortens their page. `rowsN` rows of the narrow part at `hN` and `rowsW`
+ * full-width rows at `hW` must fit `budgetMm`; when they do not, both give up the same share of
+ * their slack above their content (`hMinN`, `hMinW`: the content never shrinks). null when even
+ * the content does not fit.
+ */
+export function splitPairH(hN, hMinN, rowsN, hW, hMinW, rowsW, budgetMm) {
+    const need = rowsN * hN + rowsW * hW;
+    if (need <= budgetMm) return { hN, hW, squeezed: false };
+    const slack = rowsN * Math.max(0, hN - hMinN) + rowsW * Math.max(0, hW - hMinW);
+    const excess = need - budgetMm;
+    if (!(slack > 0) || excess > slack) return null;
+    const t = excess / slack;
+    const fl = (x) => Math.floor(x * 1000 - 1e-6) / 1000;
+    return { hN: fl(hN - Math.max(0, hN - hMinN) * t), hW: fl(hW - Math.max(0, hW - hMinW) * t), squeezed: true };
+}
+
 function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, headerFirst, availableWidthMm, anchors }) {
     const instr = instructionMm(size);
     const body = bodyHeightMm(paper, headerFirst);
@@ -639,6 +663,24 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
         const bp = blockPlan({ cols: L.cols, hMin: L.hMin, cellH: L.cellH, bodyMm: sec.gridH ? sec.gridH + instr : body, instrMm: instr, anchorMm: aMm });
         return Object.assign({}, L, { cellH: bp.cellH, perPage: bp.perPage, rows: bp.blocksPerPage * bp.blockRows, blocks: bp, anchorMm: aMm });
     });
+    // Wave 5.2 (critic nl-r4 D1 / D2): with the number-line band, a split section's two parts
+    // that the host counted onto one page share its shorter height (splitPairH), each part's rows
+    // giving up the same share of their slack, instead of the full-width group going overleaf
+    // or the host dealing fewer problems.
+    if (Number(headerFirst && headerFirst.refBandMm) > 0 && !anchors) {
+        sectionsIn.forEach((sec, sj) => {
+            const si = sec.splitOf;
+            if (si === undefined || si === null || !layouts[si] || !layouts[sj]) return;
+            const Ln = layouts[si], Lw = layouts[sj];
+            const rowsN = Math.min(Ln.rows, Math.ceil(itemsBySection[si].length / Math.max(1, Ln.cols)));
+            const rowsW = Math.min(Lw.rows, itemsBySection[sj].length);
+            const fit = splitPairH(Ln.cellH, Ln.hMin, rowsN, Lw.cellH, Lw.hMin, rowsW, body - 1 - instr - 0.01);
+            if (fit && fit.squeezed) {
+                layouts[si] = Object.assign({}, Ln, { cellH: fit.hN });
+                layouts[sj] = Object.assign({}, Lw, { cellH: fit.hW });
+            }
+        });
+    }
     const chunksBySection = layouts.map((L, si) => (L.blocks
         ? blockPages(itemsBySection[si].length, L.blocks, L.cols, L.anchorMm)
         : L.pairs
@@ -689,6 +731,7 @@ function sheetLayout(role, input, norm, sheetItems, tabId) {
         tab: input.header && input.header.tab === false ? false : words.tabLines,
         title: input.header && input.header.title === false ? '' : words.title,
         titleLines,
+        refBandMm: (input.header && Number(input.header.refBandMm)) || 0,
     };
     const W = Number(norm.ctxIn.availableWidthMm) || LIVE_W_MM;
     const anchors = input.anchors || null;
@@ -718,7 +761,7 @@ export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM
     const items = [];
     norm.sections.forEach((sec, si) => {
         const its = sheetItems[si] || [];
-        const keep = () => { sections.push(sec); items.push(its); };
+        const keep = () => { sections.push(Object.assign({}, sec, { srcIndex: si })); items.push(its); };
         if (its.length < 2 || its.some((it) => it.anchor)) return keep();
         const base = { role, columns: sec.columns, count: its.length, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap };
         const whole = resolveSectionLayout(Object.assign({ floor: sec.floor }, base), its, paper, availableWidthMm, { size, look });
@@ -733,9 +776,9 @@ export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM
         // The narrow part keeps the section's floor: print-sheet.js measures it over the skill's
         // narrow problems only (floorOf), so the columns the page was counted for are the columns
         // it prints, whichever of the skill's problems this page happens to hold (PT-ENG-9).
-        sections.push(Object.assign({}, sec));
+        sections.push(Object.assign({}, sec, { srcIndex: si }));
         items.push(narrow);
-        sections.push(Object.assign({}, sec, { columns: 1, floor: null, splitOf: sections.length - 1 }));
+        sections.push(Object.assign({}, sec, { columns: 1, floor: null, splitOf: sections.length - 1, srcIndex: si }));
         items.push(wide);
     });
     return { norm: Object.assign({}, norm, { sections }), items };
@@ -887,7 +930,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             // (`noCap`, a lesson practice page: one frame, every row the same, no row gaps.)
             const noCapSec = !!(norm.sections[part.section] || {}).noCap;
             const shape = part.chunk.gridMm ? { heightMm: part.chunk.gridMm, rowsTpl: part.chunk.rowsTpl || '' }
-                : its.some((it) => it.anchor) || noCapSec ? null : rowShape(its, L.cols, part.chunk.rows, L.cellH);
+                : its.some((it) => it.anchor) || noCapSec ? null : rowShape(its, L.cols, part.chunk.rows, L.cellH, L.fillRefH);
             // A lone grid shorter than its page (the teacher's count, a capped row) spends the
             // spare height as whitespace between its rows (grid.js rowGap), never inside cells.
             const avail = pg.cont ? L.gridHCont : L.gridH;
@@ -906,7 +949,19 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 items: its.map((it) => planItem(it, level, L.cols)),
             });
         }
-        return { header: pg.cont ? cont : first, sections };
+        // Wave 5.2: a page none of whose sections asked for the number line prints without it
+        // (its height stays reserved, so every page keeps one geometry).
+        // A part split off a section ("full width, at the bottom": splitOf) belongs to that section
+        // (critic nl-r2 D6), and so do the sub-sections a section was split into.
+        const refSec = (si) => {
+            const sec = norm.sections[si];
+            return input.refSections.includes(sec && Number.isInteger(sec.srcIndex) ? sec.srcIndex : si);
+        };
+        let head = pg.cont ? cont : first;
+        if (head.refBand && Array.isArray(input.refSections) && !pg.parts.some((pt) => refSec(pt.section))) {
+            head = Object.assign({}, head, { refBand: `<div class="ws-refline-gap" style="flex:none;height:${Number(head.refBandMm)}mm"></div>` });
+        }
+        return { header: head, sections };
     });
 
     const fits = layouts.map((L, si) => ({

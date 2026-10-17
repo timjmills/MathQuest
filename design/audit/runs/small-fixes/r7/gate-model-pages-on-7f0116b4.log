@@ -1,0 +1,211 @@
+FAIL default | opener | S | A4                            pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 24 %, foot 15.1 mm, room 12.1 mm  slot 15.5 mm / 2 ch, given 10.2 pt  given numbers at 10.2 pt (< 11 pt)
+FAIL default | opener | S | Letter                        pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 22 %, foot 10.6 mm, room 7.6 mm  slot 15.5 mm / 2 ch, given 10.2 pt  given numbers at 10.2 pt (< 11 pt)
+ok   default | opener | M | A4                            pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 2  cells 4, band 22 %, foot 12 mm, room 9 mm  slot 16 mm / 2 ch, given 14.1 pt
+ok   default | opener | M | Letter                        pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 2  cells 4, band 19 %, foot 4.5 mm, room 1.5 mm  slot 16 mm / 2 ch, given 14.1 pt
+ok   default | opener | L | A4                            pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 1  cells 3, band 20 %, foot 22.4 mm, room 19.4 mm  slot 17.5 mm / 2 ch, given 17.9 pt
+ok   default | opener | L | Letter                        pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 1  cells 3, band 19 %, foot 8.3 mm, room 5.3 mm  slot 17.5 mm / 2 ch, given 17.9 pt
+ok   default | scripted-model | S | A4                    pages 1/1 -> 1/1
+ok   default | scripted-model | S | Letter                pages 1/1 -> 1/1
+ok   default | scripted-model | M | A4                    pages 1/1 -> 1/1
+ok   default | scripted-model | M | Letter                pages 2/2 -> 2/2
+ok   default | scripted-model | L | A4                    pages 2/2 -> 2/2
+ok   default | scripted-model | L | Letter                pages 2/2 -> 2/2
+ok   one page | opener | S | A4                           pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 28 %, foot 57.6 mm, room 54.6 mm  slot 9 mm / 2 ch, given 16 pt
+ok   one page | opener | S | Letter                       pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 28 %, foot 40 mm, room 37 mm  slot 9 mm / 2 ch, given 16 pt
+ok   one page | opener | M | A4                           pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 28 %, foot 57.6 mm, room 54.6 mm  slot 9 mm / 2 ch, given 16 pt
+ok   one page | opener | M | Letter                       pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 28 %, foot 40 mm, room 37 mm  slot 9 mm / 2 ch, given 16 pt
+ok   one page | opener | L | A4                           pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 28 %, foot 57.6 mm, room 54.6 mm  slot 9 mm / 2 ch, given 16 pt
+ok   one page | opener | L | Letter                       pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 28 %, foot 40 mm, room 37 mm  slot 9 mm / 2 ch, given 16 pt
+ok   one page | scripted-model | S | A4                   pages 1/1 -> 1/1
+ok   one page | scripted-model | S | Letter               pages 1/1 -> 1/1
+ok   one page | scripted-model | M | A4                   pages 1/1 -> 1/1
+ok   one page | scripted-model | M | Letter               pages 1/1 -> 1/1
+ok   one page | scripted-model | L | A4                   pages 1/1 -> 1/1
+ok   one page | scripted-model | L | Letter               pages 1/1 -> 1/1
+FAIL Lines | opener | S | A4                              pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 25 %, foot 87.2 mm, room 84.2 mm  slot 7 mm / 2 ch, given 10.2 pt  given numbers at 10.2 pt (< 11 pt)
+FAIL Lines | opener | S | Letter                          pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 25 %, foot 69.6 mm, room 66.6 mm  slot 7 mm / 2 ch, given 10.2 pt  given numbers at 10.2 pt (< 11 pt)
+FAIL Lines | opener | M | A4                              pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 23 %, foot 50.3 mm, room 47.3 mm  slot 8 mm / 2 ch, given 14.1 pt  answer slot 8 mm < 2 characters x 0.55 x 8 mm = 8.8 mm (8.0 mm for "12")
+FAIL Lines | opener | M | Letter                          pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 23 %, foot 32.7 mm, room 29.7 mm  slot 8 mm / 2 ch, given 14.1 pt  answer slot 8 mm < 2 characters x 0.55 x 8 mm = 8.8 mm (8.0 mm for "12")
+ok   Lines | opener | L | A4                              pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 1  cells 3, band 20 %, foot 32.4 mm, room 29.4 mm  slot 16.5 mm / 2 ch, given 17.9 pt
+ok   Lines | opener | L | Letter                          pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 1  cells 3, band 20 %, foot 14.8 mm, room 11.8 mm  slot 16.5 mm / 2 ch, given 17.9 pt
+ok   Lines | scripted-model | S | A4                      pages 1/1 -> 1/1
+ok   Lines | scripted-model | S | Letter                  pages 1/1 -> 1/1
+ok   Lines | scripted-model | M | A4                      pages 1/1 -> 1/1
+ok   Lines | scripted-model | M | Letter                  pages 1/1 -> 1/1
+ok   Lines | scripted-model | L | A4                      pages 2/2 -> 2/2
+ok   Lines | scripted-model | L | Letter                  pages 2/2 -> 2/2
+ok   Lines + one page | opener | S | A4                   pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 18 %, foot 95.2 mm, room 92.2 mm  slot 8.7 mm / 2 ch, given 16 pt
+ok   Lines + one page | opener | S | Letter               pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 18 %, foot 77.6 mm, room 74.6 mm  slot 8.7 mm / 2 ch, given 16 pt
+ok   Lines + one page | opener | M | A4                   pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 18 %, foot 95.2 mm, room 92.2 mm  slot 8.7 mm / 2 ch, given 16 pt
+ok   Lines + one page | opener | M | Letter               pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 18 %, foot 77.6 mm, room 74.6 mm  slot 8.7 mm / 2 ch, given 16 pt
+ok   Lines + one page | opener | L | A4                   pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 18 %, foot 95.2 mm, room 92.2 mm  slot 8.7 mm / 2 ch, given 16 pt
+ok   Lines + one page | opener | L | Letter               pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 18 %, foot 77.6 mm, room 74.6 mm  slot 8.7 mm / 2 ch, given 16 pt
+ok   Lines + one page | scripted-model | S | A4           pages 1/1 -> 1/1
+ok   Lines + one page | scripted-model | S | Letter       pages 1/1 -> 1/1
+ok   Lines + one page | scripted-model | M | A4           pages 1/1 -> 1/1
+ok   Lines + one page | scripted-model | M | Letter       pages 1/1 -> 1/1
+ok   Lines + one page | scripted-model | L | A4           pages 1/1 -> 1/1
+ok   Lines + one page | scripted-model | L | Letter       pages 1/1 -> 1/1
+FAIL step 25 | opener | S | A4                            pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 24 %, foot 17.2 mm, room 14.2 mm  slot 15.5 mm / 3 ch, given 10.2 pt  given numbers at 10.2 pt (< 11 pt)
+FAIL step 25 | opener | S | Letter                        pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 22 %, foot 10.6 mm, room 7.6 mm  slot 15.5 mm / 3 ch, given 10.2 pt  given numbers at 10.2 pt (< 11 pt)
+ok   step 25 | opener | M | A4                            pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 2  cells 4, band 22 %, foot 12 mm, room 9 mm  slot 16 mm / 3 ch, given 14.1 pt
+ok   step 25 | opener | M | Letter                        pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 2  cells 4, band 19 %, foot 4.5 mm, room 1.5 mm  slot 16 mm / 3 ch, given 14.1 pt
+ok   step 25 | opener | L | A4                            pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 1  cells 3, band 20 %, foot 22.4 mm, room 19.4 mm  slot 17.5 mm / 3 ch, given 17.9 pt
+ok   step 25 | opener | L | Letter                        pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 1  cells 3, band 19 %, foot 8.3 mm, room 5.3 mm  slot 17.5 mm / 3 ch, given 17.9 pt
+ok   step 25 | scripted-model | S | A4                    pages 1/1 -> 1/1
+ok   step 25 | scripted-model | S | Letter                pages 1/1 -> 1/1
+ok   step 25 | scripted-model | M | A4                    pages 1/1 -> 1/1
+ok   step 25 | scripted-model | M | Letter                pages 2/2 -> 2/2
+ok   step 25 | scripted-model | L | A4                    pages 2/2 -> 2/2
+ok   step 25 | scripted-model | L | Letter                pages 2/2 -> 2/2
+ok   step 25 + one page | opener | S | A4                 pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 28 %, foot 57.6 mm, room 54.6 mm  slot 10.3 mm / 3 ch, given 14.4 pt
+ok   step 25 + one page | opener | S | Letter             pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 28 %, foot 40 mm, room 37 mm  slot 10.3 mm / 3 ch, given 14.4 pt
+ok   step 25 + one page | opener | M | A4                 pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 28 %, foot 57.6 mm, room 54.6 mm  slot 10.3 mm / 3 ch, given 14.4 pt
+ok   step 25 + one page | opener | M | Letter             pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 28 %, foot 40 mm, room 37 mm  slot 10.3 mm / 3 ch, given 14.4 pt
+ok   step 25 + one page | opener | L | A4                 pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 28 %, foot 57.6 mm, room 54.6 mm  slot 10.3 mm / 3 ch, given 14.4 pt
+ok   step 25 + one page | opener | L | Letter             pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 28 %, foot 40 mm, room 37 mm  slot 10.3 mm / 3 ch, given 14.4 pt
+ok   step 25 + one page | scripted-model | S | A4         pages 2/2 -> 2/2
+ok   step 25 + one page | scripted-model | S | Letter     pages 2/2 -> 2/2
+ok   step 25 + one page | scripted-model | M | A4         pages 2/2 -> 2/2
+ok   step 25 + one page | scripted-model | M | Letter     pages 2/2 -> 2/2
+ok   step 25 + one page | scripted-model | L | A4         pages 2/2 -> 2/2
+ok   step 25 + one page | scripted-model | L | Letter     pages 2/2 -> 2/2
+FAIL 1,000 from 14,000 | opener | S | A4                  pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 23 %, foot 10.6 mm, room 7.6 mm  slot 15.5 mm / 6 ch, given 10.2 pt  answer slot 15.5 mm < 6 characters x 0.55 x 6 mm = 19.8 mm (15.5 mm for "16,000"); given numbers at 10.2 pt (< 11 pt)
+FAIL 1,000 from 14,000 | opener | S | Letter              pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 19 %, foot 10.6 mm, room 7.6 mm  slot 15.5 mm / 6 ch, given 10.2 pt  answer slot 15.5 mm < 6 characters x 0.55 x 6 mm = 19.8 mm (15.5 mm for "16,000"); given numbers at 10.2 pt (< 11 pt)
+FAIL 1,000 from 14,000 | opener | M | A4                  pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 2  cells 4, band 22 %, foot 11.7 mm, room 8.7 mm  slot 17.9 mm / 6 ch, given 13.4 pt  answer slot 17.9 mm < 6 characters x 0.55 x 8 mm = 26.4 mm (17.9 mm for "16,000")
+FAIL 1,000 from 14,000 | opener | M | Letter              pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 2  cells 4, band 19 %, foot 4.5 mm, room 1.5 mm  slot 17.9 mm / 6 ch, given 13.4 pt  answer slot 17.9 mm < 6 characters x 0.55 x 8 mm = 26.4 mm (17.9 mm for "16,000")
+FAIL 1,000 from 14,000 | opener | L | A4                  pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 1  cells 3, band 20 %, foot 19.2 mm, room 16.2 mm  slot 17.2 mm / 6 ch, given 12.8 pt  answer slot 17.2 mm < 6 characters x 0.55 x 10 mm = 33.0 mm (17.2 mm for "16,000")
+FAIL 1,000 from 14,000 | opener | L | Letter              pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 1  cells 3, band 17 %, foot 8.3 mm, room 5.3 mm  slot 17.2 mm / 6 ch, given 12.8 pt  answer slot 17.2 mm < 6 characters x 0.55 x 10 mm = 33.0 mm (17.2 mm for "16,000")
+ok   1,000 from 14,000 | scripted-model | S | A4          pages 1/1 -> 1/1
+ok   1,000 from 14,000 | scripted-model | S | Letter      pages 1/1 -> 1/1
+ok   1,000 from 14,000 | scripted-model | M | A4          pages 1/1 -> 1/1
+ok   1,000 from 14,000 | scripted-model | M | Letter      pages 2/2 -> 2/2
+ok   1,000 from 14,000 | scripted-model | L | A4          pages 2/2 -> 2/2
+ok   1,000 from 14,000 | scripted-model | L | Letter      pages 2/2 -> 2/2
+FAIL 1,000 from 14,000 + one page | opener | S | A4       pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 13 %, foot 10.6 mm, room 7.6 mm  slot 18.3 mm / 6 ch, given 13.7 pt  answer slot 18.3 mm < 6 characters x 0.55 x 6 mm = 19.8 mm (18.3 mm for "16,000")
+FAIL 1,000 from 14,000 + one page | opener | S | Letter   pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 2  cells 4, band 17 %, foot 13.2 mm, room 10.2 mm  slot 18.3 mm / 6 ch, given 13.7 pt  answer slot 18.3 mm < 6 characters x 0.55 x 6 mm = 19.8 mm (18.3 mm for "16,000")
+FAIL 1,000 from 14,000 + one page | opener | M | A4       pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 13 %, foot 10.6 mm, room 7.6 mm  slot 18.3 mm / 6 ch, given 13.7 pt  answer slot 18.3 mm < 6 characters x 0.55 x 6 mm = 19.8 mm (18.3 mm for "16,000")
+FAIL 1,000 from 14,000 + one page | opener | M | Letter   pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 2  cells 4, band 17 %, foot 13.2 mm, room 10.2 mm  slot 18.3 mm / 6 ch, given 13.7 pt  answer slot 18.3 mm < 6 characters x 0.55 x 6 mm = 19.8 mm (18.3 mm for "16,000")
+FAIL 1,000 from 14,000 + one page | opener | L | A4       pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 13 %, foot 10.6 mm, room 7.6 mm  slot 18.3 mm / 6 ch, given 13.7 pt  answer slot 18.3 mm < 6 characters x 0.55 x 6 mm = 19.8 mm (18.3 mm for "16,000")
+FAIL 1,000 from 14,000 + one page | opener | L | Letter   pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 2  cells 4, band 17 %, foot 13.2 mm, room 10.2 mm  slot 18.3 mm / 6 ch, given 13.7 pt  answer slot 18.3 mm < 6 characters x 0.55 x 6 mm = 19.8 mm (18.3 mm for "16,000")
+ok   1,000 from 14,000 + one page | scripted-model | S | A4 pages 2/2 -> 2/2
+ok   1,000 from 14,000 + one page | scripted-model | S | Letter pages 2/2 -> 2/2
+ok   1,000 from 14,000 + one page | scripted-model | M | A4 pages 2/2 -> 2/2
+ok   1,000 from 14,000 + one page | scripted-model | M | Letter pages 2/2 -> 2/2
+ok   1,000 from 14,000 + one page | scripted-model | L | A4 pages 2/2 -> 2/2
+ok   1,000 from 14,000 + one page | scripted-model | L | Letter pages 2/2 -> 2/2
+FAIL step 25,000 | opener | S | A4                        pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 23 %, foot 10.6 mm, room 7.6 mm  slot 16.6 mm / 7 ch, given 10.2 pt  answer slot 16.6 mm < 7 characters x 0.55 x 6 mm = 23.1 mm (16.6 mm for "125,000"); given numbers at 10.2 pt (< 11 pt)
+FAIL step 25,000 | opener | S | Letter                    pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 19 %, foot 10.6 mm, room 7.6 mm  slot 16.6 mm / 7 ch, given 10.2 pt  answer slot 16.6 mm < 7 characters x 0.55 x 6 mm = 23.1 mm (16.6 mm for "125,000"); given numbers at 10.2 pt (< 11 pt)
+FAIL step 25,000 | opener | M | A4                        pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 2  cells 4, band 22 %, foot 11.7 mm, room 8.7 mm  slot 17.4 mm / 7 ch, given 11.1 pt  answer slot 17.4 mm < 7 characters x 0.55 x 8 mm = 30.8 mm (17.4 mm for "125,000")
+FAIL step 25,000 | opener | M | Letter                    pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 2  cells 4, band 19 %, foot 4.5 mm, room 1.5 mm  slot 17.4 mm / 7 ch, given 11.1 pt  answer slot 17.4 mm < 7 characters x 0.55 x 8 mm = 30.8 mm (17.4 mm for "125,000")
+FAIL step 25,000 | opener | L | A4                        pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 1  cells 3, band 20 %, foot 19.2 mm, room 16.2 mm  slot 16.5 mm / 7 ch, given 10.5 pt  answer slot 16.5 mm < 7 characters x 0.55 x 10 mm = 38.5 mm (16.5 mm for "125,000"); given numbers at 10.5 pt (< 11 pt)
+FAIL step 25,000 | opener | L | Letter                    pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 1  cells 3, band 17 %, foot 8.3 mm, room 5.3 mm  slot 16.5 mm / 7 ch, given 10.5 pt  answer slot 16.5 mm < 7 characters x 0.55 x 10 mm = 38.5 mm (16.5 mm for "125,000"); given numbers at 10.5 pt (< 11 pt)
+ok   step 25,000 | scripted-model | S | A4                pages 1/1 -> 1/1
+ok   step 25,000 | scripted-model | S | Letter            pages 1/1 -> 1/1
+ok   step 25,000 | scripted-model | M | A4                pages 1/1 -> 1/1
+ok   step 25,000 | scripted-model | M | Letter            pages 2/2 -> 2/2
+ok   step 25,000 | scripted-model | L | A4                pages 2/2 -> 2/2
+ok   step 25,000 | scripted-model | L | Letter            pages 2/2 -> 2/2
+FAIL step 25,000 + one page | opener | S | A4             pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 13 %, foot 10.6 mm, room 7.6 mm  slot 17.7 mm / 7 ch, given 11.3 pt  answer slot 17.7 mm < 7 characters x 0.55 x 6 mm = 23.1 mm (17.7 mm for "125,000")
+FAIL step 25,000 + one page | opener | S | Letter         pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 2  cells 4, band 17 %, foot 13.2 mm, room 10.2 mm  slot 17.7 mm / 7 ch, given 11.3 pt  answer slot 17.7 mm < 7 characters x 0.55 x 6 mm = 23.1 mm (17.7 mm for "125,000")
+FAIL step 25,000 + one page | opener | M | A4             pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 13 %, foot 10.6 mm, room 7.6 mm  slot 17.7 mm / 7 ch, given 11.3 pt  answer slot 17.7 mm < 7 characters x 0.55 x 6 mm = 23.1 mm (17.7 mm for "125,000")
+FAIL step 25,000 + one page | opener | M | Letter         pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 2  cells 4, band 17 %, foot 13.2 mm, room 10.2 mm  slot 17.7 mm / 7 ch, given 11.3 pt  answer slot 17.7 mm < 7 characters x 0.55 x 6 mm = 23.1 mm (17.7 mm for "125,000")
+FAIL step 25,000 + one page | opener | L | A4             pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 13 %, foot 10.6 mm, room 7.6 mm  slot 17.7 mm / 7 ch, given 11.3 pt  answer slot 17.7 mm < 7 characters x 0.55 x 6 mm = 23.1 mm (17.7 mm for "125,000")
+FAIL step 25,000 + one page | opener | L | Letter         pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 2  cells 4, band 17 %, foot 13.2 mm, room 10.2 mm  slot 17.7 mm / 7 ch, given 11.3 pt  answer slot 17.7 mm < 7 characters x 0.55 x 6 mm = 23.1 mm (17.7 mm for "125,000")
+ok   step 25,000 + one page | scripted-model | S | A4     pages 2/2 -> 2/2
+ok   step 25,000 + one page | scripted-model | S | Letter pages 2/2 -> 2/2
+ok   step 25,000 + one page | scripted-model | M | A4     pages 2/2 -> 2/2
+ok   step 25,000 + one page | scripted-model | M | Letter pages 2/2 -> 2/2
+ok   step 25,000 + one page | scripted-model | L | A4     pages 2/2 -> 2/2
+ok   step 25,000 + one page | scripted-model | L | Letter pages 2/2 -> 2/2
+FAIL 100,000 from 1,000,000 | opener | S | A4             pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 18 %, foot 10.6 mm, room 7.6 mm  slot 17.8 mm / 9 ch, given 9 pt  answer slot 17.8 mm < 9 characters x 0.55 x 6 mm = 29.7 mm (17.8 mm for "1,300,000"); given numbers at 9 pt (< 11 pt)
+FAIL 100,000 from 1,000,000 | opener | S | Letter         pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 2  cells 4, band 22 %, foot 10.6 mm, room 7.6 mm  slot 17.8 mm / 9 ch, given 9 pt  answer slot 17.8 mm < 9 characters x 0.55 x 6 mm = 29.7 mm (17.8 mm for "1,300,000"); given numbers at 9 pt (< 11 pt)
+FAIL 100,000 from 1,000,000 | opener | M | A4             pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 2  cells 4, band 16 %, foot 4.5 mm, room 1.5 mm  slot 16.8 mm / 9 ch, given 9 pt  answer slot 16.8 mm < 9 characters x 0.55 x 8 mm = 39.6 mm (16.8 mm for "1,300,000"); given numbers at 9 pt (< 11 pt)
+FAIL 100,000 from 1,000,000 | opener | M | Letter         pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 1  cells 3, band 22 %, foot 7.8 mm, room 4.8 mm  slot 16.8 mm / 9 ch, given 9 pt  answer slot 16.8 mm < 9 characters x 0.55 x 8 mm = 39.6 mm (16.8 mm for "1,300,000"); given numbers at 9 pt (< 11 pt)
+FAIL 100,000 from 1,000,000 | opener | L | A4             pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 0  cells 3, band 20 %, foot 3.8 mm, room 0.8 mm  slot 15.8 mm / 9 ch, given 9 pt  answer slot 15.8 mm < 9 characters x 0.55 x 10 mm = 49.5 mm (15.8 mm for "1,300,000"); given numbers at 9 pt (< 11 pt)
+FAIL 100,000 from 1,000,000 | opener | L | Letter         pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 0  cells 2, band 20 %, foot 30 mm, room 27 mm  slot 15.8 mm / 9 ch, given 9 pt  answer slot 15.8 mm < 9 characters x 0.55 x 10 mm = 49.5 mm (15.8 mm for "1,300,000"); given numbers at 9 pt (< 11 pt)
+ok   100,000 from 1,000,000 | scripted-model | S | A4     pages 1/1 -> 1/1
+ok   100,000 from 1,000,000 | scripted-model | S | Letter pages 1/1 -> 1/1
+ok   100,000 from 1,000,000 | scripted-model | M | A4     pages 1/1 -> 1/1
+ok   100,000 from 1,000,000 | scripted-model | M | Letter pages 2/2 -> 2/2
+ok   100,000 from 1,000,000 | scripted-model | L | A4     pages 2/2 -> 2/2
+ok   100,000 from 1,000,000 | scripted-model | L | Letter pages 2/2 -> 2/2
+FAIL 100,000 from 1,000,000 + Lines | opener | S | A4     pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 2  cells 4, band 15 %, foot 24.7 mm, room 21.7 mm  slot 19.1 mm / 9 ch, given 9.4 pt  answer slot 19.1 mm < 9 characters x 0.55 x 6 mm = 29.7 mm (19.1 mm for "1,300,000"); given numbers at 9.4 pt (< 11 pt)
+FAIL 100,000 from 1,000,000 + Lines | opener | S | Letter pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 1  cells 3, band 14 %, foot 37.7 mm, room 34.7 mm  slot 19.1 mm / 9 ch, given 9.4 pt  answer slot 19.1 mm < 9 characters x 0.55 x 6 mm = 29.7 mm (19.1 mm for "1,300,000"); given numbers at 9.4 pt (< 11 pt)
+FAIL 100,000 from 1,000,000 + Lines | opener | M | A4     pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 1  cells 3, band 13 %, foot 24.9 mm, room 21.9 mm  slot 18.1 mm / 9 ch, given 9 pt  answer slot 18.1 mm < 9 characters x 0.55 x 8 mm = 39.6 mm (18.1 mm for "1,300,000"); given numbers at 9 pt (< 11 pt)
+FAIL 100,000 from 1,000,000 + Lines | opener | M | Letter pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 1  cells 3, band 13 %, foot 7.3 mm, room 4.3 mm  slot 18.1 mm / 9 ch, given 9 pt  answer slot 18.1 mm < 9 characters x 0.55 x 8 mm = 39.6 mm (18.1 mm for "1,300,000"); given numbers at 9 pt (< 11 pt)
+FAIL 100,000 from 1,000,000 + Lines | opener | L | A4     pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 0  cells 2, band 12 %, foot 42.1 mm, room 39.1 mm  slot 17.1 mm / 9 ch, given 9 pt  answer slot 17.1 mm < 9 characters x 0.55 x 10 mm = 49.5 mm (17.1 mm for "1,300,000"); given numbers at 9 pt (< 11 pt)
+FAIL 100,000 from 1,000,000 + Lines | opener | L | Letter pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 0  cells 2, band 12 %, foot 24.5 mm, room 21.5 mm  slot 17.1 mm / 9 ch, given 9 pt  answer slot 17.1 mm < 9 characters x 0.55 x 10 mm = 49.5 mm (17.1 mm for "1,300,000"); given numbers at 9 pt (< 11 pt)
+ok   100,000 from 1,000,000 + Lines | scripted-model | S | A4 pages 1/1 -> 1/1
+ok   100,000 from 1,000,000 + Lines | scripted-model | S | Letter pages 1/1 -> 1/1
+ok   100,000 from 1,000,000 + Lines | scripted-model | M | A4 pages 1/1 -> 1/1
+ok   100,000 from 1,000,000 + Lines | scripted-model | M | Letter pages 2/2 -> 2/2
+ok   100,000 from 1,000,000 + Lines | scripted-model | L | A4 pages 2/2 -> 2/2
+ok   100,000 from 1,000,000 + Lines | scripted-model | L | Letter pages 2/2 -> 2/2
+FAIL times under each | opener | S | A4                   pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 2  cells 4, band 17 %, foot 10.6 mm, room 7.6 mm  slot 15.5 mm / 2 ch, given 10.2 pt  given numbers at 10.2 pt (< 11 pt)
+FAIL times under each | opener | S | Letter               pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 2  cells 4, band 12 %, foot 10.6 mm, room 7.6 mm  slot 15.5 mm / 2 ch, given 10.2 pt  given numbers at 10.2 pt (< 11 pt)
+ok   times under each | opener | M | A4                   pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 1  cells 3, band 15 %, foot 26.9 mm, room 23.9 mm  slot 16 mm / 2 ch, given 14.1 pt
+ok   times under each | opener | M | Letter               pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 1  cells 3, band 15 %, foot 9.3 mm, room 6.3 mm  slot 16 mm / 2 ch, given 14.1 pt
+ok   times under each | opener | L | A4                   pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 0  cells 3, band 14 %, foot 4.9 mm, room 1.9 mm  slot 17.5 mm / 2 ch, given 17.9 pt
+ok   times under each | opener | L | Letter               pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 0  cells 2, band 14 %, foot 41.8 mm, room 38.8 mm  slot 17.5 mm / 2 ch, given 17.9 pt
+ok   times under each | scripted-model | S | A4           pages 2/2 -> 2/2
+ok   times under each | scripted-model | S | Letter       pages 2/2 -> 2/2
+ok   times under each | scripted-model | M | A4           pages 2/2 -> 2/2
+ok   times under each | scripted-model | M | Letter       pages 2/2 -> 2/2
+ok   times under each | scripted-model | L | A4           pages 2/2 -> 2/2
+ok   times under each | scripted-model | L | Letter       pages 2/2 -> 2/2
+ok   step 25 + Lines + one page | opener | S | A4         pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 10 %, foot 38.6 mm, room 35.6 mm  slot 17.5 mm / 3 ch, given 16 pt
+ok   step 25 + Lines + one page | opener | S | Letter     pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 10 %, foot 21 mm, room 18 mm  slot 17.5 mm / 3 ch, given 16 pt
+ok   step 25 + Lines + one page | opener | M | A4         pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 10 %, foot 38.6 mm, room 35.6 mm  slot 17.5 mm / 3 ch, given 16 pt
+ok   step 25 + Lines + one page | opener | M | Letter     pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 10 %, foot 21 mm, room 18 mm  slot 17.5 mm / 3 ch, given 16 pt
+ok   step 25 + Lines + one page | opener | L | A4         pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 10 %, foot 38.6 mm, room 35.6 mm  slot 17.5 mm / 3 ch, given 16 pt
+ok   step 25 + Lines + one page | opener | L | Letter     pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 10 %, foot 21 mm, room 18 mm  slot 17.5 mm / 3 ch, given 16 pt
+ok   step 25 + Lines + one page | scripted-model | S | A4 pages 2/2 -> 2/2
+ok   step 25 + Lines + one page | scripted-model | S | Letter pages 2/2 -> 2/2
+ok   step 25 + Lines + one page | scripted-model | M | A4 pages 2/2 -> 2/2
+ok   step 25 + Lines + one page | scripted-model | M | Letter pages 2/2 -> 2/2
+ok   step 25 + Lines + one page | scripted-model | L | A4 pages 2/2 -> 2/2
+ok   step 25 + Lines + one page | scripted-model | L | Letter pages 2/2 -> 2/2
+FAIL times under each + Lines | opener | S | A4           pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 16 %, foot 66.5 mm, room 63.5 mm  slot 7 mm / 2 ch, given 10.2 pt  given numbers at 10.2 pt (< 11 pt)
+FAIL times under each + Lines | opener | S | Letter       pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 16 %, foot 48.9 mm, room 46 mm  slot 7 mm / 2 ch, given 10.2 pt  given numbers at 10.2 pt (< 11 pt)
+FAIL times under each + Lines | opener | M | A4           pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 14 %, foot 34.3 mm, room 31.3 mm  slot 8 mm / 2 ch, given 14.1 pt  answer slot 8 mm < 2 characters x 0.55 x 8 mm = 8.8 mm (8.0 mm for "28")
+FAIL times under each + Lines | opener | M | Letter       pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 2  cells 5, band 14 %, foot 16.7 mm, room 13.7 mm  slot 8 mm / 2 ch, given 14.1 pt  answer slot 8 mm < 2 characters x 0.55 x 8 mm = 8.8 mm (8.0 mm for "28")
+ok   times under each + Lines | opener | L | A4           pages 1/1 -> 1/1  guided 1 -> 1, independent rows 0 -> 1  cells 3, band 8 %, foot 11.2 mm, room 8.2 mm  slot 16.5 mm / 2 ch, given 17.9 pt
+ok   times under each + Lines | opener | L | Letter       pages 1/1 -> 1/1  guided 1 -> 2, independent rows 0 -> 0  cells 3, band 8 %, foot 8.1 mm, room 5.1 mm  slot 16.5 mm / 2 ch, given 17.9 pt
+ok   times under each + Lines | scripted-model | S | A4   pages 1/1 -> 1/1
+ok   times under each + Lines | scripted-model | S | Letter pages 1/1 -> 1/1
+ok   times under each + Lines | scripted-model | M | A4   pages 1/1 -> 1/1
+ok   times under each + Lines | scripted-model | M | Letter pages 1/1 -> 1/1
+ok   times under each + Lines | scripted-model | L | A4   pages 2/2 -> 2/2
+ok   times under each + Lines | scripted-model | L | Letter pages 2/2 -> 2/2
+ok   default | opener | S/M/L | A4                        given numbers 10.2 / 14.1 / 17.9 pt
+ok   default | opener | S/M/L | Letter                    given numbers 10.2 / 14.1 / 17.9 pt
+ok   one page | opener | S/M/L | A4                       given numbers 16 / 16 / 16 pt
+ok   one page | opener | S/M/L | Letter                   given numbers 16 / 16 / 16 pt
+ok   Lines | opener | S/M/L | A4                          given numbers 10.2 / 14.1 / 17.9 pt
+ok   Lines | opener | S/M/L | Letter                      given numbers 10.2 / 14.1 / 17.9 pt
+ok   Lines + one page | opener | S/M/L | A4               given numbers 16 / 16 / 16 pt
+ok   Lines + one page | opener | S/M/L | Letter           given numbers 16 / 16 / 16 pt
+ok   step 25 | opener | S/M/L | A4                        given numbers 10.2 / 14.1 / 17.9 pt
+ok   step 25 | opener | S/M/L | Letter                    given numbers 10.2 / 14.1 / 17.9 pt
+ok   step 25 + one page | opener | S/M/L | A4             given numbers 14.4 / 14.4 / 14.4 pt
+ok   step 25 + one page | opener | S/M/L | Letter         given numbers 14.4 / 14.4 / 14.4 pt
+FAIL 1,000 from 14,000 | opener | S/M/L | A4              given numbers 10.2 / 13.4 / 12.8 pt  (a larger size prints them smaller)
+FAIL 1,000 from 14,000 | opener | S/M/L | Letter          given numbers 10.2 / 13.4 / 12.8 pt  (a larger size prints them smaller)
+ok   1,000 from 14,000 + one page | opener | S/M/L | A4   given numbers 13.7 / 13.7 / 13.7 pt
+ok   1,000 from 14,000 + one page | opener | S/M/L | Letter given numbers 13.7 / 13.7 / 13.7 pt
+FAIL step 25,000 | opener | S/M/L | A4                    given numbers 10.2 / 11.1 / 10.5 pt  (a larger size prints them smaller)
+FAIL step 25,000 | opener | S/M/L | Letter                given numbers 10.2 / 11.1 / 10.5 pt  (a larger size prints them smaller)
+ok   step 25,000 + one page | opener | S/M/L | A4         given numbers 11.3 / 11.3 / 11.3 pt
+ok   step 25,000 + one page | opener | S/M/L | Letter     given numbers 11.3 / 11.3 / 11.3 pt
+ok   100,000 from 1,000,000 | opener | S/M/L | A4         given numbers 9 / 9 / 9 pt
+ok   100,000 from 1,000,000 | opener | S/M/L | Letter     given numbers 9 / 9 / 9 pt
+FAIL 100,000 from 1,000,000 + Lines | opener | S/M/L | A4 given numbers 9.4 / 9 / 9 pt  (a larger size prints them smaller)
+FAIL 100,000 from 1,000,000 + Lines | opener | S/M/L | Letter given numbers 9.4 / 9 / 9 pt  (a larger size prints them smaller)
+ok   times under each | opener | S/M/L | A4               given numbers 10.2 / 14.1 / 17.9 pt
+ok   times under each | opener | S/M/L | Letter           given numbers 10.2 / 14.1 / 17.9 pt
+ok   step 25 + Lines + one page | opener | S/M/L | A4     given numbers 16 / 16 / 16 pt
+ok   step 25 + Lines + one page | opener | S/M/L | Letter given numbers 16 / 16 / 16 pt
+ok   times under each + Lines | opener | S/M/L | A4       given numbers 10.2 / 14.1 / 17.9 pt
+ok   times under each + Lines | opener | S/M/L | Letter   given numbers 10.2 / 14.1 / 17.9 pt
+small-fixes-model-pages: FAIL (180 sheets, 56 failing)

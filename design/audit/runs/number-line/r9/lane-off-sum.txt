@@ -1,0 +1,741 @@
+1366x650 sub_100_regroup queue mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x650 sub_100_regroup queue touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x650 sub_100_regroup T300 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x650 sub_100_regroup T300 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x650 sub_100_regroup T0 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x650 sub_100_regroup T0 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x650 nl_mult queue mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x650 nl_mult queue touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x650 nl_mult T300 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x650 nl_mult T300 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x650 nl_mult T0 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x650 nl_mult T0 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x650 add_facts queue mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x650 add_facts queue touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x650 add_facts T300 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x650 add_facts T300 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x650 add_facts T0 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x650 add_facts T0 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x650 mixed_addition queue mouse OFF
+   q1:sy50/h59/b-
+   q1-checked:sy50/h59/b-
+   q2:sy73/h59/b- seg 50/nullx93>19/nullx1>73/nullx87
+   q2-checked:sy82/h59/b-
+   q3:sy0/h59/b- seg 82/nullx93>5/nullx1>0/nullx87
+   q3-checked:sy0/h59/b-
+1366x650 mixed_addition queue touch OFF
+   q1:sy198/h59/b- seg 0/nullx1>198/nullx97
+   q1-checked:sy198/h59/b-
+   q2:sy0/h59/b- seg 198/nullx93>0/nullx88
+   q2-checked:sy0/h59/b-
+   q3:sy16/h59/b- seg 0/nullx93>31/nullx1>16/nullx86
+   q3-checked:sy16/h59/b-
+1366x650 mixed_addition T300 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy198/h59/b- seg 0/nullx92>198/nullx87
+   q2-checked:sy198/h59/b-
+   q3:sy158/h59/b- seg 198/nullx93>158/nullx87
+   q3-checked:sy158/h59/b-
+1366x650 mixed_addition T300 touch OFF
+   q1:sy198/h59/b-
+   q1-checked:sy198/h59/b-
+   q2:sy198/h59/b-
+   q2-checked:sy198/h59/b-
+   q3:sy50/h59/b- seg 198/nullx94>50/nullx88
+   q3-checked:sy114/h59/b-
+1366x650 mixed_addition T0 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy6/h59/b-
+1366x650 mixed_addition T0 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy358/h59/b-
+1280x600 sub_100_regroup queue mouse OFF
+   q1:sy0/h59/b- seg 50/nullx1>0/nullx96
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x600 sub_100_regroup queue touch OFF
+   q1:sy0/h59/b- seg 0/nullx1>50/nullx1>0/nullx96
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x600 sub_100_regroup T300 mouse OFF
+   q1:sy0/h59/b- seg 50/nullx1>0/nullx96
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x600 sub_100_regroup T300 touch OFF
+   q1:sy0/h59/b- seg 50/nullx1>0/nullx96
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x600 sub_100_regroup T0 mouse OFF
+   q1:sy0/h59/b- seg 1/nullx1>0/nullx96
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x600 sub_100_regroup T0 touch OFF
+   q1:sy0/h59/b- seg 1/nullx1>0/nullx95
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x600 nl_mult queue mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x600 nl_mult queue touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x600 nl_mult T300 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x600 nl_mult T300 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x600 nl_mult T0 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x600 nl_mult T0 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x600 add_facts queue mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x600 add_facts queue touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x600 add_facts T300 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x600 add_facts T300 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x600 add_facts T0 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x600 add_facts T0 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x600 mixed_addition queue mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy28/h59/b- seg 0/nullx93>28/nullx88
+   q2-checked:sy28/h59/b-
+   q3:sy0/h59/b- seg 28/nullx93>0/nullx87
+   q3-checked:sy0/h59/b-
+1280x600 mixed_addition queue touch OFF
+   q1:sy0/h59/b- seg 50/nullx1>0/nullx96
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy248/h59/b- seg 0/nullx95>248/nullx86
+   q3-checked:sy248/h59/b-
+1280x600 mixed_addition T300 mouse OFF
+   q1:sy0/h59/b- seg 2/nullx1>0/nullx96
+   q1-checked:sy0/h59/b-
+   q2:sy248/h59/b- seg 0/nullx95>248/nullx84
+   q2-checked:sy248/h59/b-
+   q3:sy208/h59/b- seg 248/nullx93>208/nullx88
+   q3-checked:sy208/h59/b-
+1280x600 mixed_addition T300 touch OFF
+   q1:sy0/h59/b- seg 50/nullx1>0/nullx96
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x600 mixed_addition T0 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q1-forced
+   q2:sy248/h59/b- seg 0/nullx302>248/nullx84
+   q2-checked:sy248/h59/b-
+   q2-forced
+   q3:sy0/h59/b- seg 248/nullx303>58/nullx1>0/nullx85
+   q3-checked:sy0/h59/b-
+1280x600 mixed_addition T0 touch OFF
+   q1:sy119/h59/b- seg 33/nullx1>119/nullx96
+   q1-checked:sy133/h59/b-
+   q2:sy0/h59/b- seg 133/nullx93>0/nullx88
+   q2-checked:sy0/h59/b-
+   q3:sy248/h59/b- seg 0/nullx188>248/nullx176
+   q3-checked:sy248/h59/b-
+1366x768 sub_100_regroup queue mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x768 sub_100_regroup queue touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x768 sub_100_regroup T300 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x768 sub_100_regroup T300 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x768 sub_100_regroup T0 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x768 sub_100_regroup T0 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x768 nl_mult queue mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x768 nl_mult queue touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x768 nl_mult T300 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x768 nl_mult T300 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x768 nl_mult T0 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x768 nl_mult T0 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x768 add_facts queue mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x768 add_facts queue touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x768 add_facts T300 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x768 add_facts T300 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x768 add_facts T0 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x768 add_facts T0 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x768 mixed_addition queue mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x768 mixed_addition queue touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy80/h59/b- seg 0/nullx95>80/nullx85
+   q2-checked:sy80/h59/b-
+   q3:sy0/h59/b- seg 80/nullx94>0/nullx87
+   q3-checked:sy0/h59/b-
+1366x768 mixed_addition T300 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b- seg 177/nullx64>0/nullx8
+1366x768 mixed_addition T300 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b- seg 177/nullx64>0/nullx8
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x768 mixed_addition T0 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1366x768 mixed_addition T0 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x720 sub_100_regroup queue mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x720 sub_100_regroup queue touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x720 sub_100_regroup T300 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x720 sub_100_regroup T300 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x720 sub_100_regroup T0 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x720 sub_100_regroup T0 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x720 nl_mult queue mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x720 nl_mult queue touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x720 nl_mult T300 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x720 nl_mult T300 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x720 nl_mult T0 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x720 nl_mult T0 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x720 add_facts queue mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x720 add_facts queue touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x720 add_facts T300 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x720 add_facts T300 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x720 add_facts T0 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x720 add_facts T0 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x720 mixed_addition queue mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q1-forced
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy123/h59/b- seg 0/nullx93>128/nullx1>123/nullx85
+   q3-checked:sy123/h59/b-
+1280x720 mixed_addition queue touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy95/h59/b-
+   q1-forced
+   q2:sy0/h59/b- seg 95/nullx610>0/nullx166
+   q2-checked:sy0/h59/b-
+   q3:sy128/h59/b- seg 0/nullx94>128/nullx86
+   q3-checked:sy128/h59/b-
+1280x720 mixed_addition T300 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b- seg 225/nullx64>0/nullx7
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x720 mixed_addition T300 touch OFF
+   q1:sy37/h59/b-
+   q1-checked:sy37/h59/b-
+   q1-forced
+   q2:sy0/h59/b- seg 37/nullx301>0/nullx86
+   q2-checked:sy0/h59/b-
+   q3:sy128/h59/b- seg 0/nullx95>128/nullx86
+   q3-checked:sy128/h59/b-
+1280x720 mixed_addition T0 mouse OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy0/h59/b-
+   q2-checked:sy0/h59/b-
+   q3:sy0/h59/b-
+   q3-checked:sy0/h59/b-
+1280x720 mixed_addition T0 touch OFF
+   q1:sy0/h59/b-
+   q1-checked:sy0/h59/b-
+   q2:sy128/h59/b- seg 0/nullx94>128/nullx86
+   q2-checked:sy128/h59/b-
+   q3:sy0/h59/b- seg 128/nullx93>0/nullx85
+   q3-checked:sy0/h59/b-
+390x844 sub_100_regroup queue touch line
+   q1:sy403/h0/b389[CHECK-OUT] seg 0/nullx2>403/413x95
+   q1-checked:sy403/h0/b389
+   q1-forced
+   q2:sy403/h0/b389[CHECK-OUT]
+   q2-checked:sy403/h0/b389
+   q3:sy403/h0/b389[CHECK-OUT]
+   q3-checked:sy403/h0/b389
+390x844 sub_100_regroup T0 touch line
+   q1:sy293/h0/b407[CHECK-OUT] seg 0/724x1>293/431x96
+   q1-checked:sy293/h0/b407
+   q1-forced
+   q2:sy293/h0/b407[CHECK-OUT]
+   q2-checked:sy293/h0/b407
+   q3:sy293/h0/b407[CHECK-OUT]
+   q3-checked:sy293/h0/b407
+390x844 nl_mult queue touch line
+   q1:sy452/h0/b340[CHECK-OUT] seg 0/816x1>426/390x2>452/363x93
+   q1-checked:sy452/h0/b340
+   q2:sy452/h0/b340[CHECK-OUT]
+   q2-checked:sy452/h0/b340
+   q3:sy452/h0/b340[CHECK-OUT]
+   q3-checked:sy452/h0/b340
+390x844 nl_mult T0 touch line
+   q1:sy342/h0/b358[CHECK-OUT] seg 0/724x1>316/408x3>342/381x93
+   q1-checked:sy342/h0/b358
+   q2:sy342/h0/b358[CHECK-OUT]
+   q2-checked:sy342/h0/b358
+   q3:sy342/h0/b358[CHECK-OUT]
+   q3-checked:sy342/h0/b358
+390x844 add_facts queue touch line
+   q1:sy351/h0/b441[CHECK-OUT] seg 0/816x1>351/465x97
+   q1-checked:sy351/h0/b441
+   q1-forced
+   q2:sy351/h0/b441[CHECK-OUT]
+   q2-checked:sy351/h0/b441
+   q3:sy351/h0/b441[CHECK-OUT]
+   q3-checked:sy351/h0/b441
+390x844 add_facts T0 touch line
+   q1:sy241/h0/b459[CHECK-OUT] seg 0/724x1>241/483x96
+   q1-checked:sy241/h0/b459
+   q1-forced
+   q2:sy241/h0/b459[CHECK-OUT]
+   q2-checked:sy241/h0/b459
+   q3:sy241/h0/b459[CHECK-OUT]
+   q3-checked:sy241/h0/b459
+390x844 mixed_addition queue touch line
+   q1:sy355/h0/b437[CHECK-OUT] seg 0/816x1>355/461x97
+   q1-checked:sy355/h0/b437
+   q1-forced
+   q2:sy355/h0/b437[BOX-OUT CHECK-OUT]
+   q2-checked:sy355/h0/b437
+   q2-forced
+   q3:sy355/h0/b437[BOX-OUT CHECK-OUT]
+   q3-checked:sy355/h0/b437
+390x844 mixed_addition T0 touch line
+   q1:sy323/h0/b377[CHECK-OUT] seg 0/724x1>323/401x93
+   q1-checked:sy323/h0/b377
+   q1-forced
+   q2:sy399/h0/b301[CHECK-OUT] seg 323/377x612>399/301x170
+   q2-checked:sy399/h0/b301
+   q3:sy399/h0/b301[CHECK-OUT]
+   q3-checked:sy399/h0/b301
+TOTAL {"cases":104,"fitsUnder":0,"boxOut":2,"chkOut":24,"labels":0,"labelsQ1":0,"bounces":0,"bigJumps":26,"err":0,"tapJump":0,"pageErr":0}
