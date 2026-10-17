@@ -15,6 +15,8 @@ import { linksFor, allLessons, lessonByKey, searchLessons, addCuratedYear, clear
     lessonHash, siteSlug, siteFlagText, lessonAbout, siteLessonLabel,
     PREREQ_CAP, RELATED_CAP, WRM_LINK_OVERRIDES, REP_PAIRS, composeWhy, composePartial, composeMissing, proposalLabel, stepsInNote, taskName, MAP_STRANDS, strandOfKey, repPairsOfText,
     partialVerdict, LATER_LEAD, supportWeeksOf, placeDomain, curatedFor, curatedLessonFor, baseKey } from '../../js/modules/wrm-links.js';
+import * as P0 from '../../js/modules/plain-words.js';
+import { VISUALS } from '../../js/modules/visual-catalogue.js';
 import { buildQueue, passes, toCSV, CSV_HEAD, KINDS, gradesOfText, gradeOfCode, gradeOfRit, closesText, stepName } from '../../js/modules/build-queue.js';
 
 let fails = 0;
@@ -292,6 +294,47 @@ const gate = (where, out, opts) => {
 // M11 (critic r7): no "How it looks", Kind, name or teaches line is a template-id list or the build list's syntax
 const KIT_ID = /\b(?:hop-line|mult-grid|count-row|area-model|word-work|function-table|data-table|coord-grid|frac-model|nl-place|value-line|money-columns|mult-chart|arrays-turn|fact-family|cloze-bank|tally-chart|bar-graph|perimeter-shape|picture-row|measure-scale|graph-axes|shape-grid|pv-support|angle-kit|solid-kit|chartwindow|seqstrip|tenframe|wordpic|rcdws)\b/i;
 let m11 = 0;
+// M12 (critic r8): "How it looks" never guesses. Its response agrees with the entry's own answer field and the Kind
+// line's "How the pupil answers"; no answer field, no response; a drawing noun only from its structured source.
+const ROOT = { writing: /\bwrit(?:e|es|ten|ing)\b/i, typing: /\btype\b/i, 'filling in': /\b(?:fill|complete)\b/i, numbering: /\bnumber\b/i,
+    circling: /\b(?:circle|ring)\b/i, ticking: /\btick\b/i, drawing: /\bdraw(?:n)?\b/i, 'plotting points': /\bplot\b/i, marking: /\bmark\b/i,
+    'making tally marks': /\btally\b/i, shading: /\bshade\b/i, colouring: /\bcolou?r\b/i, matching: /\bmatch\b/i, dragging: /\bdrag\b/i,
+    building: /\bbuild\b/i, tapping: /\btap\b/i, choosing: /\b(?:choose|pick)\b/i, saying: /\bsay\b/i, copying: /\bcopy\b/i, counting: /\bcount\b/i, ordering: /\border\b/i };
+const NOTE_VERB = { write: /\bwrit(?:e|es|ten)\b|\btype\b/i, circle: /\b(?:circle|ring|tap|choose|pick)\b/i, tick: /\b(?:tick|tap|choose|pick)\b/i, draw: /\bdraw\b/i,
+    shade: /\b(?:shade|colou?r)\b/i, match: /\bmatch\b/i, drag: /\bdrag\b/i, tap: /\b(?:tap|circle|ring|tick|choose|pick)\b/i, choose: /\b(?:choose|pick|tap|circle|ring|tick)\b/i, pick: /\b(?:choose|pick|tap|circle|ring|tick)\b/i, ring: /\b(?:circle|ring|tap|choose|pick)\b/i };
+const NOUN_SRC = { shapes: /\b(?:triangles?|rectangles?|polygons?|quadrilaterals?|pentagons?|hexagons?|shapes?|solids)\b/i, coins: /\bcoins?\b/i, notes: /\bnotes\b/i,
+    'fraction pictures': /\bfraction\b/i, 'shaded fraction pictures': /\bfraction/i };
+let m12 = 0;
+const m12bad = (msg) => { m12 += 1; if (m12 <= 12) console.log('M12', msg); };
+const looksGate = (tag, e, looks) => {
+    if (!looks) return;
+    const ans = `${(e.spec && typeof e.spec === 'object' && e.spec.answer) || ''}; ${TT.optionResponse(e)}`;
+    const declared = /[a-z]/i.test(ans.replace(/;/g, ''));
+    const rep = String(e.representation || '');
+    const by = /the pupil answers by (.+?)\.$/.exec(looks);
+    if (by) {
+        if (!declared) m12bad(`${tag} ${e.id}: a response with no answer field: "${looks}"`);
+        for (const g of by[1].split(/, | and | or /)) if (!ROOT[g] || !ROOT[g].test(TT.optionResponse(e) || ans)) m12bad(`${tag} ${e.id}: "${g}" is not the declared answer "${ans}"`);
+    } else if (/\bthe pupil\b/i.test(looks) && looks !== P0.plainNote(rep)) m12bad(`${tag} ${e.id}: a response not from the answer field: "${looks}"`);
+    if (looks === P0.plainNote(rep)) {
+        // a build note shown whole: every response it names is one the entry declares
+        for (const [v, re] of Object.entries(NOTE_VERB)) if (new RegExp(`\\b${v}\\b`, 'i').test(looks) && !(declared && re.test(ans))) m12bad(`${tag} ${e.id}: the note says "${v}", the answer is "${ans}"`);
+        return;
+    }
+    const shows = /^Shows (.+?) in black and white/.exec(looks);
+    if (!shows) return;
+    if (/^the White Rose pictures? /.test(shows[1])) {
+        for (const [, n] of shows[1].matchAll(/"([^"]+)"/g)) if (!Object.values(VISUALS).some(([, name, ids]) => (ids || []).includes(e.id) && String(name).startsWith(n))) m12bad(`${tag} ${e.id}: White Rose picture "${n}" not in VISUALS for it`);
+        return;
+    }
+    const ids = String(rep).toLowerCase().split(/[\s,.+:]+/);
+    for (const w of shows[1].split(/, | and (?=a |an |[a-z]+ ?[a-z]*$)/)) {
+        const fromKit = Object.entries(TT.KIT_WORDS).some(([k, v]) => v === w && ids.includes(k));
+        const noun = TT.DRAW_NOUNS.find(([, v]) => v === w);
+        if (!fromKit && !(noun && noun[0].test(rep))) m12bad(`${tag} ${e.id}: "${w}" has no source in "${rep.slice(0, 80)}"`);
+        if (NOUN_SRC[w] && !fromKit && !NOUN_SRC[w].test(rep)) m12bad(`${tag} ${e.id}: "${w}" without its word in the note`);
+    }
+};
 const todoGate = (tag, Q) => {
     TT.setTodoNames(Q.items);
     for (const e of Q.items) {
@@ -301,6 +344,7 @@ const todoGate = (tag, Q) => {
             const bad = (f === 'looks' && TT.TEMPLATE_LIST.test(x)) || /\+ new:|\(tiles \d+\)|\bresponse "|^The existing\b|^The skill['’]s own\b|\bA new picture in\b|^[a-z]+ ["']/.test(x) || KIT_ID.test(x);
             if (bad) { m11 += 1; if (m11 <= 10) console.log('M11', tag, e.id, f, '|', x); }
         }
+        looksGate(tag, e, T.looks);
         // m17: "no skill teaches all of it yet" once per entry at most
         ok(T.closes.filter((x) => /no skill teaches all of it yet/.test(x)).length <= 1, `m17 ${tag} ${e.id}: "no skill teaches all of it yet" more than once`);
         for (const [f, v] of Object.entries(T)) gate(`${tag} ${e.id} ${f}`, f === 'kind' ? [(KINDS.find((x) => x[0] === e.kind) || [])[1], ...v].join(' · ') : v);
@@ -469,6 +513,8 @@ for (const l of L) { const r = linksFor(l); gate(`lesson (rules) ${l.key}`, [r.v
 }
 ok(!m11, `M11: ${m11} Skills to be made lines are template-id lists or build syntax`);
 console.log(`M11 gate: template-id / build-syntax lines on Skills to be made: ${m11}`);
+ok(!m12, `M12: ${m12} "How it looks" lines name a response or a drawing the entry does not declare`);
+console.log(`M12 gate: "How it looks" lines against the answer field, the Kind line and the drawing sources: ${m12}`);
 ok(!truthBad, `truth gate (M8 order / support week, M9 said once): ${truthBad} of ${truthLines} lesson lines`);
 console.log(`truth gate: ${truthLines} lesson lines, ${truthBad} untrue or repeated`);
 ok(!jBad, `plain-English gate: ${jBad} of ${jLines} teacher-facing lines ${JSON.stringify(jByForm)}`);

@@ -43,11 +43,20 @@ export function todoName(e) {
     const n = String(e.name || '');
     const mig = /^Migrate Legacy (.+?)(?: Visuals?)? to (?:the )?B&W .+$/i.exec(n);
     if (mig) return isPlain(`${mig[1]} pictures`) ? `${mig[1]} pictures redrawn in the black-and-white worksheet style` : 'Pictures redrawn in the black-and-white worksheet style';
-    const t = n.replace(/\s*\(new skill [^)]*\)/i, '').replace(/\s*\((?:template )?option\)\s*$/i, ' (new option on an existing skill)');
+    // n40 (critic r8): the build list's priority marker ("(low)") is not part of the name
+    const t = n.replace(/\s*\((?:low|medium|high)\)\s*$/i, '').replace(/\s*\(new skill [^)]*\)/i, '').replace(/\s*\((?:template )?option\)\s*$/i, ' (new option on an existing skill)');
     if (isPlain(t)) return t;
     const bare = t.replace(/\s*\([^()]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim();
     if (bare && isPlain(bare)) return bare;
-    if (isVisual(e)) { const w = visualWhat(e); if (w) return `New pictures: ${w}`; }
+    if (isVisual(e)) {
+        const w = visualWhat(e);
+        if (w) return `New pictures: ${w}`;
+        // n41 (critic r8): the picture the build note describes after its colon ("a row of three boxes (…)")
+        for (const src of [e.representation, e.teaches]) {
+            const tail = String(src || '').split(':').pop().trim();
+            for (const c of [tail, tail.replace(/\s*\([^()]*\)/g, '').trim()]) if (c && c.length > 8 && isPlain(c, { fragment: false })) return `New picture: ${lowerFirst(c)}`;
+        }
+    }
     const lab = e.skill ? liveSkillLabel(e.skill) : null;
     if (lab && isPlain(lab)) return `${lab}: a new option`;
     const st = (e.wrmSteps || []).map(stepTitle).find(Boolean);
@@ -67,34 +76,100 @@ const stepsJoin = (ids) => {
 /** "What pupils will do": the plain teaches sentence, else composed from the name and its first step. */
 export function todoTeaches(e) {
     if (isMigrate(e)) return 'The same questions as now, drawn in the black-and-white worksheet style, the same on paper and on screen.';
-    if (isVisual(e)) { const w = visualPicture(e); return `New pictures on worksheets and on screen: ${w}. The pupil answers from the picture.`; }
+    // n40 (critic r8): the picture is named once, in the entry's name
+    if (isVisual(e)) return 'New pictures for worksheets and the screen; the pupil answers questions about them.';
     const note = plainNote(e.teaches);
     if (note) return note;
     const st = (e.wrmSteps || []).find((s) => wrmStep(s));
     return st ? `Practise "${nameWords(e)}", for ${stepLabel(st)}.` : `Practise "${nameWords(e)}".`;
 }
 
-// m12 (critic r6): "How it looks" names WHAT the entry draws and how the pupil answers, read from its
-// representation against this fixed table of drawings (our words, never the note's), so 436 entries do not share
-// one sentence. An option that draws nothing new says nothing here: its Kind line already names the setting.
-const DRAWS = [
-    [/ten[- ]?frames?/i, 'a ten frame'], [/\bcounters?\b/i, 'counters'], [/\bdominoe?s?\b/i, 'dominoes'], [/\bdots?\b|dot (?:array|cards?)/i, 'dots'],
-    [/base[- ]?(?:10|ten)|\brods?\b|\bflats?\b/i, 'base-ten blocks'], [/place[- ]value (?:chart|dis[ck]s?|counters)/i, 'a place-value chart'],
-    [/number[- ]?lines?/i, 'a number line'], [/\btracks?\b|hundred square|number (?:chart|grid)/i, 'a number chart'],
-    [/two-bar|bar comparison|comparison bars?/i, 'two bars to compare'], [/part[- ]whole|cherry|bar model|bar diagram/i, 'a part-whole or bar model'],
-    [/\barrays?\b/i, 'an array'], [/equal groups|\bgroups\b/i, 'groups of objects'], [/\bcubes?\b/i, 'cubes'],
-    [/\bclocks?\b|clock face/i, 'a clock face'], [/\bcoins?\b|\bmoney\b|dollars?|cents?\b/i, 'coins and notes'], [/\brulers?\b/i, 'a ruler'],
-    [/thermometer/i, 'a thermometer'], [/protractor|\bangles?\b/i, 'angles'], [/fraction (?:bars?|strips?|circles?|walls?)|\bshaded?\b|\bshading\b/i, 'shaded fraction pictures'],
-    [/\bshapes?\b|polygons?|triangles?|quadrilaterals?|outlines?|\bsolids?\b|\b3-?d\b|\b2-?d\b/i, 'shapes'],
-    [/coordinate|\bgrids?\b|\baxes\b/i, 'a grid'], [/\bgraphs?\b|pictograph|line plot|bar chart|tally/i, 'a graph or chart'], [/\btables?\b/i, 'a table'],
-    [/\bscales?\b|balance/i, 'a scale'], [/\bobjects?\b|line-art|\bpictures?\b|\bpictured\b|\bpicture-row\b|wordpic/i, 'pictures of objects'],
-    [/count[- ]by row|counting row|\bcount-row\b/i, 'a counting row'], [/\bstory|stories|word problem/i, 'a short story'], [/equation|number sentence|\bsentences?\b/i, 'a number sentence'],
+// M12 (critic r8): "How it looks" NEVER GUESSES. The response clause comes only from the entry's own `spec.answer`
+// or its option's "How the pupil answers" value (the Kind line's source, so the two cannot disagree); no answer
+// field, no response clause. The drawing clause comes only from structured data: the kit template ids of a
+// representation written as an id list, the White Rose pictures (VISUALS) the entry closes, or an exact whole-word
+// drawing noun from DRAW_NOUNS in the representation (never a negated one, never the problem types).
+/** Response verbs, each to the group it belongs to and its "answers by …" words. */
+const RESPONSE = [
+    ['write', 'write', 'writing'], ['writes', 'write', 'writing'], ['written', 'write', 'writing'], ['type', 'write', 'typing'],
+    ['fill', 'write', 'filling in'], ['complete', 'write', 'filling in'], ['number', 'write', 'numbering'],
+    ['circle', 'circle', 'circling'], ['ring', 'circle', 'circling'], ['tick', 'tick', 'ticking'],
+    ['draw', 'draw', 'drawing'], ['drawn', 'draw', 'drawing'], ['plot', 'draw', 'plotting points'], ['mark', 'draw', 'marking'], ['tally', 'draw', 'making tally marks'],
+    ['shade', 'shade', 'shading'], ['colour', 'shade', 'colouring'], ['color', 'shade', 'colouring'],
+    ['match', 'match', 'matching'], ['drag', 'drag', 'dragging'], ['build', 'drag', 'building'],
+    ['tap', 'choose', 'tapping'], ['choose', 'choose', 'choosing'], ['pick', 'choose', 'choosing'],
+    ['say', 'say', 'saying'], ['copy', 'write', 'copying'], ['count', 'count', 'counting'], ['order', 'write', 'ordering'],
 ];
-const ANSWERS = [
-    [/\btick\b|tick boxes|check box/i, 'ticks a box'], [/\bcircles?\b(?! (?:and|or) )|\bring\b/i, 'circles the answer'], [/\bshade\b/i, 'shades the part'],
-    [/\bdraw(?:s|ing)? (?:the|a|dots|lines?)\b/i, 'draws the answer'], [/\btap\b|\bchoose\b|\bpick\b|which (?:one|picture|diagram)/i, 'chooses the answer'],
-    [/\bmatch\b/i, 'matches the pairs'], [/\bwrite\b|answer box|\bslots?\b|\bboxes?\b/i, 'writes the answer'],
+const RESP = new Map(RESPONSE.map(([w, g, ing]) => [w, { g, ing }]));
+/** groups that answer one another (a screen tap is the paper circle or tick; a typed digit is the written one) */
+const RESP_SAME = { choose: ['circle', 'tick', 'choose'], circle: ['circle', 'choose'], tick: ['tick', 'choose'] };
+/** The option's "How the pupil answers" value as written in the build list (`response "drag"`, `response: pick …`). */
+export function optionResponse(e) {
+    const m = /\bresponse\s*(?::\s*|")([^"—(;]+)/i.exec(String(e && e.option || ''));
+    return m ? m[1].trim() : '';
+}
+/**
+ * The response verbs of an answer text, in order: every clause's first word ("write the total; ring the pair"), and
+ * a verb after "or" / "," inside a clause ("circle or write"). A clause that does not start with a verb adds nothing,
+ * except "written" / "drawn" ("the written numeral in a large box").
+ */
+export function responseVerbs(text) {
+    const out = [];
+    const add = (w) => { const r = RESP.get(String(w || '').toLowerCase()); if (r && !out.some((x) => x.ing === r.ing)) out.push(r); };
+    for (const clause of String(text || '').replace(/\([^()]*\)/g, '').split(/;|\bthen\b/)) {
+        const words = clause.trim().split(/[\s,]+/);
+        if (!words[0]) continue;
+        if (RESP.has(words[0].toLowerCase()) && !/^(?:written|drawn)$/i.test(words[0])) {
+            add(words[0]);
+            // "circle or write", "tick, count or draw": the verbs joined to the first
+            for (const [, w] of clause.matchAll(/(?:,|\bor\b|\band\b)\s+([a-z]+)/gi)) if (RESP.has(w.toLowerCase()) && !/^(?:number|order|count)$/i.test(w)) add(w);
+        } else for (const w of words) if (/^(?:written|drawn)$/i.test(w)) add(w);
+    }
+    return out;
+}
+/** The response groups the entry declares (its answer field and its option's response), for the gate too. */
+export function declaredResponse(e) {
+    const src = [e && e.spec && typeof e.spec === 'object' ? e.spec.answer : '', optionResponse(e)].filter(Boolean).join('; ');
+    return responseVerbs(src);
+}
+/** "answers by writing", "answers by circling or writing", "answers by ticking and writing" */
+function responseClause(e) {
+    const opt = optionResponse(e);
+    // the option's response is what the Kind line names: it leads when there is one
+    const vs = opt ? responseVerbs(opt) : responseVerbs(e && e.spec && e.spec.answer);
+    if (!vs.length) return '';
+    const ing = vs.slice(0, 3).map((v) => v.ing);
+    const joint = !opt && /\bor\b/.test(String(e.spec.answer).split(';')[0]) && !/;/.test(String(e.spec.answer)) ? ' or ' : ' and ';
+    return `the pupil answers by ${ing.length < 2 ? ing[0] : `${ing.slice(0, -1).join(', ')}${joint}${ing[ing.length - 1]}`}`;
+}
+/** Exact whole-word drawing nouns (and only these) a representation may name, in our words. */
+export const DRAW_NOUNS = [
+    [/\bten[- ]frames?\b/i, 'a ten frame'], [/\bcounters\b/i, 'counters'], [/\bdominoe?s\b/i, 'dominoes'],
+    [/\bbase[- ](?:10|ten) (?:blocks?|rods?|pictures?)\b|\btens rods?\b/i, 'base-ten blocks'], [/\bplace[- ]value (?:charts?|counters|dis[ck]s)\b/i, 'a place-value chart'],
+    [/\bnumber lines?\b/i, 'a number line'], [/\bnumber tracks?\b/i, 'a number track'], [/\bhundred (?:square|chart)s?\b/i, 'a hundred chart'],
+    [/\bbar models?\b/i, 'a bar model'], [/\bpart[- ]whole (?:diagrams?|models?|bonds?)\b/i, 'a part-whole diagram'],
+    [/\barrays?\b/i, 'an array'], [/\bcube trains?\b/i, 'cube trains'], [/\bclock faces?\b|\banalogue clocks?\b/i, 'a clock face'],
+    [/\bcoins?\b/i, 'coins'], [/\bbank ?notes\b/i, 'notes'], [/\bprice tags?\b/i, 'price tags'], [/\brulers?\b/i, 'a ruler'], [/\bthermometers?\b/i, 'a thermometer'],
+    [/\bprotractors?\b/i, 'a protractor'], [/\bpan balance\b|\bbalance scales?\b/i, 'a pan balance'], [/\bmeasuring jugs?\b/i, 'a measuring jug'],
+    [/\bfraction (?:bars?|strips?|circles?|walls?|shapes?)\b/i, 'fraction pictures'],
+    // "circles" and "squares" are left out: in a note they are as often sharing rings or grid squares as shapes
+    [/\b(?:triangles?|rectangles?|polygons?|quadrilaterals?|pentagons?|hexagons?|(?<!number )shapes?|solids)\b/i, 'shapes'],
+    [/\bcoordinate grids?\b|\bdot grids?\b|\bsquared paper\b/i, 'a grid'], [/\bbar (?:charts?|graphs?)\b|\bline graphs?\b|\bline plots?\b|\bpictographs?\b|\bpictograms?\b/i, 'a graph or chart'],
+    [/\btally charts?\b/i, 'a tally chart'], [/\b(?:two-column |two-way |input-output |ratio )?tables?\b/i, 'a table'],
+    [/\bsorting rings?\b|\bvenn diagrams?\b/i, 'sorting rings'], [/\bcalendars?\b/i, 'a calendar'], [/\btimelines?\b|\btime lines?\b/i, 'a timeline'],
 ];
+/** A representation without its negated drawings ("no column boxes", "without a number line"). */
+const unNegated = (t) => String(t || '').replace(/\b(?:no|not|without)\s+(?:a\s+|an\s+|the\s+)?[\w-]+(?:\s+[\w-]+)?/gi, ' ');
+/** The structured drawing sources of an entry: kit ids, White Rose pictures, exact drawing nouns. */
+export function looksDrawings(e) {
+    const raw = String(e.representation || '').trim();
+    const idList = TEMPLATE_LIST.test(raw.charAt(0).toUpperCase() + raw.slice(1)) || /\+ new:/.test(raw);
+    if (idList) { const k = [...new Set(kitIds(raw).map((x) => KIT_WORDS[x]))]; if (k.length) return { from: 'kit', words: k }; }
+    const wr = visualNames(e);
+    if (wr.length) return { from: 'visual', words: wr };
+    const t = unNegated(raw);
+    return { from: 'noun', words: [...new Set(DRAW_NOUNS.filter(([re]) => re.test(t)).map(([, w]) => w))] };
+}
 // M11 (critic r7): the sheet kit's template ids (js/modules/sheet/cells/, plus the ones the build list names as new),
 // in a teacher's words. A representation note that is a list of these ids is never shown as written.
 export const KIT_WORDS = {
@@ -107,7 +182,7 @@ export const KIT_WORDS = {
     'long-division': 'a long division', 'money-columns': 'money in columns', 'mult-chart': 'part of a multiplication chart',
     'mult-grid': 'a multiplication grid', 'nl-place': 'a number line', 'number-line': 'a number line', 'perimeter-shape': 'a shape with its sides',
     pictograph: 'a pictograph', pv: 'a place-value chart', rcdws: 'a word problem checklist', remainder: 'a division with a remainder',
-    ruler: 'a ruler', seqstrip: 'a number track', shapes: 'shapes', stack: 'a column sum', 'tally-chart': 'a tally chart', tenframe: 'a ten frame',
+    ruler: 'a ruler', seqstrip: 'a number track', shapes: 'shapes', stack: 'a column method', 'tally-chart': 'a tally chart', tenframe: 'a ten frame',
     thermometer: 'a thermometer', timeline: 'a timeline', 'value-line': 'a number line', 'word-work': 'a short story', wordpic: 'a picture story',
     words: 'number words',
     // the new ones the build list names ("+ new: …")
@@ -118,29 +193,42 @@ export const KIT_WORDS = {
 export const TEMPLATE_LIST = /^[A-Z][a-z0-9-]+(?:, [a-z0-9-]+)*(?: \+ new: [a-z0-9-]+(?:, [a-z0-9-]+)*)?\.?$/;
 export const BUILD_NOTE = /\+ new:|^The existing\b|^The skill['’]s own\b|\bno [a-z]+ (?:row|boxes|bank)\b/i;
 const kitIds = (t) => String(t || '').toLowerCase().split(/[\s,.+:]+/).filter((w) => Object.prototype.hasOwnProperty.call(KIT_WORDS, w));
-/** A picture entry's picture, named by what it adds (the catalogue's words), else its own name when plain. */
-function visualPicture(e) {
-    const n = nameWords(e);
-    if (/^New pictures: /.test(n)) return n.slice(14);
-    if (/^A new picture for /.test(n)) return lowerFirst(n);
-    if (!placeholder(n)) return `"${n}"`;
-    return visualWhat(e) || 'a new picture';
+/** White Rose picture names (VISUALS) an entry closes, plain, as the catalogue names them. */
+function visualNames(e) {
+    const names = [];
+    for (const [, name, ids] of Object.values(VISUALS)) {
+        if (!(ids || []).includes(e.id)) continue;
+        const t = String(name).replace(/\s*\([^()]*\)/g, '').split(/[,;:]/)[0].replace(/\s*\/\s*/g, ' or ').replace(/\s{2,}/g, ' ').trim();
+        if (t && isPlain(t, { fragment: false }) && !names.includes(t)) names.push(t);
+    }
+    return names.slice(0, 3);
 }
-/** "How it looks": the plain representation note, else what it draws and how the pupil answers, else '' (hidden). */
+/** A plain representation note may stand whole only when every response it names is one the entry declares. */
+function noteAgrees(e, note) {
+    const said = String(note).toLowerCase().match(/\b[a-z]+\b/g) || [];
+    const verbs = [...new Set(said.filter((w) => RESP.has(w) && !/^(?:number|order|count|build|written|drawn|mark|tally|say|copy|complete|fill)$/.test(w)).map((w) => RESP.get(w).g))];
+    if (!verbs.length) return true;
+    const decl = declaredResponse(e).map((v) => v.g);
+    if (!decl.length) return false;
+    const ok = (g) => decl.includes(g) || (RESP_SAME[g] || []).some((x) => decl.includes(x)) || decl.some((d) => (RESP_SAME[d] || []).includes(g));
+    return verbs.every(ok);
+}
+/** "How it looks": the plain representation note when it agrees, else composed from structured fields only. */
 export function todoLooks(e) {
     if (isMigrate(e)) return 'Black-and-white boxed questions, drawn the same on paper and on screen.';
-    if (isVisual(e)) return `A new black-and-white line drawing: ${visualPicture(e)}, the same on paper and on screen.`;
+    // n40 (critic r8): the picture is named once, in the entry's name
+    if (isVisual(e)) return 'Black-and-white line drawings, the same on paper and on screen.';
     const raw = String(e.representation || '').trim();
     const idList = TEMPLATE_LIST.test(raw.charAt(0).toUpperCase() + raw.slice(1)) || /\+ new:/.test(raw);
     const whole = plainNote(raw);
-    if (whole && !idList && !BUILD_NOTE.test(whole)) return whole;
-    const rep = `${raw} ${e.spec && typeof e.spec === 'object' ? [].concat(e.spec.problemTypes || []).join(' ') : ''}`;
-    const kit = idList ? [...new Set(kitIds(raw).map((k) => KIT_WORDS[k]))] : [];
-    const draws = [...new Set([...kit, ...DRAWS.filter(([re]) => re.test(rep)).map(([, w]) => w)])].slice(0, 3);
-    const ans = (ANSWERS.find(([re]) => re.test(rep)) || [])[1] || '';
-    if (!draws.length) return e.kind === 'option' ? '' : ans ? `Black-and-white boxed questions; the pupil ${ans}.` : '';
-    const t = `Shows ${draws.length < 2 ? draws[0] : `${draws.slice(0, -1).join(', ')} and ${draws[draws.length - 1]}`} in black and white${ans ? `; the pupil ${ans}` : ''}.`;
-    return isPlain(t) ? t : '';
+    if (whole && !idList && !BUILD_NOTE.test(whole) && noteAgrees(e, whole)) return whole;
+    const d = looksDrawings(e);
+    const ans = responseClause(e);
+    const draws = d.words.slice(0, 3);
+    if (!draws.length) return ans ? `Black-and-white boxed questions, the same on paper and on screen; ${ans}.` : e.kind === 'option' ? '' : 'Black-and-white boxed questions, the same on paper and on screen.';
+    const list = d.from === 'visual' ? `the White Rose picture${draws.length > 1 ? 's' : ''} ${andList(draws.map((w) => `"${w}"`))}` : andList(draws);
+    const t = `Shows ${list} in black and white${ans ? `; ${ans}` : ''}.`;
+    return isPlain(t) ? t : ans ? `Black-and-white boxed questions, the same on paper and on screen; ${ans}.` : '';
 }
 
 /**
