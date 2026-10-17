@@ -116,3 +116,18 @@
   (percent_of_number 33% as a third, simplify negative distractors, distributive_expr GCF, …).
 - Owner questions (Y6-report.md "Site lessons"): composite volume W24 before volume W25; braces; Projects 5.OA.A.1
   placeholder; Support titles that are WRM steps; thousandths_pv WRM_EXTENSIONS text at merge.
+
+## Y1 site lessons — helper session_01LVDoUbPMFjuTAdwUzzWVDL — PASSED 2026-10-17
+- Branch `claude/sweet-newton-c8wrv1-wip-wrm-lessons-y1`. Y1 steps/tagFixes/step proposals and R.json FROZEN; only a
+  top-level "lessons" section added (39 lessons = the wrmYear Y1 entries of site-lessons.json: 7 full / 28 partial / 4 gap;
+  167 links; 29 proposals, 3 new: classify_count_all, shape_build_kit, solids_turned). Critic r1 FAIL 7.69, r2 FAIL 7.92,
+  builder r3 ESCALATED to mq-opus-medium (false whys survived r1-r2; root-cause sweep of all 39 lessons), critic r3 PASS:
+  every lesson 8. Byte-identical builds; merge with R, Y2-Y6 0 real conflicts, 0 lesson tagFixes; ws-wrm-extract --check 0.
+- BUILD ORDER: `node tests/scripts/wrm-tagging/dump.mjs` → R/Y1 `gen.py` (rewrites Y1.json WITHOUT lessons) →
+  `tests/scripts/wrm-tagging/Y1/build.py` (adds lessons; idempotent; frozen gate vs base sha).
+- LEAD at merge: frozen R/Y1 proposals store `closes` as a string, so lesson clauses are in `lessonCloses` — fold into
+  per-lesson `closes` dicts when normalising (81 string/dict mismatches across lanes); 14 lesson-only proposals.
+- Non-blocking (critic r3 G9, n9-n12): narrow claim-rule wordings (none present in the file), word-work cell asks Reception
+  pupils for an operation/unit bank (lessons 8, 12, 39), two pre whys (lessons 1, 11), shape_build_kit vs build-list
+  shape_draw (lesson 3).
+- Owner questions 1-7 with recommendations: Y1-lessons-report.md.
