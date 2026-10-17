@@ -87,6 +87,19 @@ function supportTables(id, e) {
   for (const k of ['constant', 'tables', 'table', 'factors']) for (const v of [].concat(o[k] ?? [])) if (typeof v === 'number') used.add(v);
   for (const m of String(e.why || '').matchAll(/\b(\d{1,2})\s*(?:times[- ]tables?|×\s*tables?)\b/gi)) used.add(+m[1]);
   for (const v of used) if (!ok.has(v)) out.push(`G5 rule 19: the ${v} times-table is beyond this Support lesson's source year ${YR[SRC[id]]}`);
+  // G8 (critic r3): the facts the items DEAL, whatever the options say: a × fact a × b needs a or b in a known table, a ÷ fact a ÷ b = c
+  // needs b or c; a count-by-tables sequence's step is its table. Read from the question, the kit payload (a, b, op) and a story's steps.
+  const offT = new Set(); let nOff = 0;
+  for (const q of P(e).qs) { const facts = [], txt = strip(q.text), p = q.cell ? q.cell.payload || {} : {};
+    for (const m of txt.matchAll(/(\d+)\s*[×x]\s*(\d+)/g)) facts.push(['*', +m[1], +m[2]]);
+    for (const m of txt.matchAll(/(\d+)\s*÷\s*(\d+)/g)) facts.push(['/', +m[1], +m[2]]);
+    if (typeof p.a === 'number' && typeof p.b === 'number' && /^[*×x/÷]$/.test(String(p.op || ''))) facts.push([/[*×x]/.test(p.op) ? '*' : '/', p.a, p.b]);
+    for (const st of Array.isArray(p.steps) ? p.steps : []) if (/^[*×x/÷]$/.test(String(st.op || ''))) facts.push([/[*×x]/.test(st.op) ? '*' : '/', +st.a, +st.b]);
+    if (/count_by_tables/.test(e.key)) for (const m of strip(q.visual).matchAll(/\+(\d+)\s*→/g)) facts.push(['step', +m[1]]);
+    for (const [op, a, b] of facts) { const bad = op === 'step' ? (!ok.has(a) ? a : null) : op === '*' ? (a <= 12 && b <= 12 && !ok.has(a) && !ok.has(b) ? Math.min(a, b) : null)
+        : (b && a % b === 0 && b <= 12 && a / b <= 12 && !ok.has(b) && !ok.has(a / b) ? b : null);
+      if (bad != null) { nOff++; if (offT.size < 4) offT.add(op === 'step' ? `counting in ${a}s` : `${a} ${op === '*' ? '×' : '÷'} ${b}`); } } }
+  if (nOff) out.push(`G8 rule 19: ${nOff} dealt facts are in no times-table of this Support lesson's source year ${YR[SRC[id]]} (${[...offT].join(', ')})`);
   return out;
 }
 const srcYear = id => YR[SRC[id]];
@@ -141,10 +154,13 @@ const R_WRITTEN = /^(measurement:(time_|clock_)|multiplication:)/;
 const TIME = /^measurement:(time|elapsed|clock|order_clocks|mixed_time)/;
 const MONEYK = /^measurement:(money|coin_value|equiv_coin|enough_money|make_change)/;
 const cache = new Map();
-function probe(key, opts, range) {
-  const id = key + JSON.stringify(opts || {}) + range; if (cache.has(id)) return cache.get(id);
+// G6 (lessons critic r3): the SIZE bound's own maximum (the lesson's direct / partial items, a cited unit's items) comes from a FIXED,
+// larger probe (OWN_SEEDS x OWN_PER = 200 items), never from the --seeds / --n sample under test, so the bound does not flap with the seeds
+const OWN_SEEDS = [[50021, 41], [73019, 59], [11027, 67], [88001, 43]], OWN_N = 200;
+function probe(key, opts, range, seeds = SEEDS, nper = NPER) {
+  const id = key + JSON.stringify(opts || {}) + range + JSON.stringify(seeds) + nper; if (cache.has(id)) return cache.get(id);
   const [c, k] = key.split(':'); let max = 0, ex = ''; const items = [], qs = [], flags = {}, c19 = {};
-  for (const [base, step] of SEEDS) for (let i = 0; i < NPER / SEEDS.length; i++) {
+  for (const [base, step] of seeds) for (let i = 0; i < nper / seeds.length; i++) {
     let q; console.log = () => {}; try { q = g.generateQuestionFor({ category: c, skill: k, opts: opts || {}, range, seed: base + i * step, itemIndex: i % 20, itemCount: 20 }); } catch (e) { items.push({ err: e.message }); continue; } finally { console.log = _log; }
     if (!q) continue;
     const text = strip(q.text), a = strip(typeof q.ans === 'object' ? JSON.stringify(q.ans) : q.ans), pay = q.cell ? JSON.stringify(q.cell.payload) : '';
@@ -169,6 +185,7 @@ function probe(key, opts, range) {
 }
 const rangeOf = e => e.maxNumber || 10000;
 const P = e => probe(e.key, e.opts || {}, rangeOf(e));
+const PO = (key, opts, range) => probe(key, opts || {}, range, OWN_SEEDS, OWN_N);   // G6: the fixed probe of a bound's own maximum
 const itemsOf = (key, opts) => probe(key, opts || {}, 10000).items;
 const titleNums = t => (String(t).match(/(?<![23]-|\d)\b\d+\b(?!-?D\b)/gi) || []).map(Number);
 // ---- Grade 3 rule 19 (the Y4 step lane's linkfit.mjs FIRST table, xlsx Grade 3 sheet): the week the school first teaches each
@@ -373,11 +390,92 @@ export function boundBreaks(text, items) {
 // G3 (a) a listed group size must be dealt; (b) a negated fraction family on ANY skill; (c) money bills; (d) "the other models in …"
 const FAMW = [[2, 'halves|half'], [3, 'thirds?'], [4, 'quarters?|fourths?'], [5, 'fifths?'], [6, 'sixths?'], [8, 'eighths?'], [10, 'tenths?'], [12, 'twelfths?']];
 const famSet = s => new Set(FAMW.filter(([, re]) => new RegExp(`\\b(?:${re})\\b`, 'i').test(s)).map(([d]) => d));
+const NUMW = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12 };
+const numify = x => String(x || '').replace(/\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\b/gi, w => NUMW[w.toLowerCase()]);
+// every list of group sizes a text states: "groups of 3, 4 or 5", "groups of 3 to 5", "3, 4 or 5 in each group", "3 to 5 in each"
+const LISTRE = '(?:\\d+,\\s*)*\\d+,?\\s+(?:or|and)\\s+\\d+';
+export function groupLists(text) {
+  const src = numify(text), out = [];
+  const list = (m, body, index) => { const v = body.match(/\d+/g).map(Number); out.push({ text: m, index, src, named: v, ok: x => v.includes(x) }); };
+  const range = (m, lo, hi, index) => out.push({ text: m, index, src, named: [lo, hi], ok: x => x >= lo && x <= hi });
+  for (const m of src.matchAll(new RegExp(`\\bgroups? of (${LISTRE})\\b`, 'gi'))) list(m[0], m[1], m.index);
+  for (const m of src.matchAll(/\bgroups? of (\d+) to (\d+)\b/gi)) range(m[0], +m[1], +m[2], m.index);
+  for (const m of src.matchAll(new RegExp(`\\b(${LISTRE}) in each\\b`, 'gi'))) list(m[0], m[1], m.index);
+  for (const m of src.matchAll(/\b(\d+) to (\d+) in each\b/gi)) range(m[0], +m[1], +m[2], m.index);
+  return out;
+}
+const COIN = [[1, 'penn(?:y|ies)|1-cent'], [5, 'nickels?|5-cent'], [10, 'dimes?|10-cent'], [25, 'quarters?|25-cent'], [50, 'half[- ]dollars?|50-cent'], [100, 'dollar coins?']];
+const COIN_ONE = `(?:${COIN.map(c => c[1]).join('|')})(?:\\s+coins?)?`;
+const COIN_LIST = `(?:an?\\s+)?${COIN_ONE}(?:\\s*(?:,|or|and|nor)\\s*(?:an?\\s+)?${COIN_ONE})*`;
+const coinVals = x => new Set(COIN.filter(([, re]) => new RegExp(`\\b(?:${re})\\b`, 'i').test(x)).map(([v]) => v));
+export function coinsOf(i) {
+  const c = new Set();
+  const walk = o => { if (o == null || typeof o !== 'object') return; if (Array.isArray(o)) { o.forEach(walk); return; }
+    if (Array.isArray(o.values) && Array.isArray(o.counts)) o.values.forEach((v, j) => { if (o.counts[j] > 0 && typeof v === 'number') c.add(v); });
+    for (const k of ['coins', 'set', 'given']) if (Array.isArray(o[k])) for (const x of o[k]) { const v = typeof x === 'number' ? x : (x && (x.v ?? x.value ?? x.c)); if (typeof v === 'number') c.add(v); }
+    for (const v of Object.values(o)) if (v && typeof v === 'object') walk(v); };
+  walk(payOf(i));
+  for (const v of coinVals(`${i.text || ''} ${i.a || ''}`)) c.add(v);
+  return c;
+}
+// a coin denial: the coin is the denial's own object, before ("never a quarter", "never uses dimes or nickels") or after it ("quarters
+// are never used", "dimes never appear"), not a word inside another denied thing ("never the amount split into tens, ones, dimes ...")
+export function coinDenials(t) {
+  const out = [];
+  for (const m of String(t).matchAll(new RegExp(`\\b(?:no|never|not|without|nor)\\s+(?:(?:uses?|shows?|chooses?|gives?|deals?|with|any|an?|one|single)\\s+){0,3}(${COIN_LIST})\\b`, 'gi')))
+    for (const v of coinVals(m[1])) out.push({ v, text: m[0].trim() });
+  for (const m of String(t).matchAll(new RegExp(`\\b(${COIN_LIST})\\s+(?:(?:is|are)\\s+)?(?:never|not)\\s+(?:(?:be\\s+)?(?:used|shown|dealt|given|appear\\w*|show\\w*|in))\\b`, 'gi')))
+    for (const v of coinVals(m[1])) out.push({ v, text: m[0].trim() });
+  return out;
+}
+// G4 / G7 (critic r3): the layout of a composite shape. A shape's sides are 6 (L) or 8 (T, U); its labelled sides are the number labels
+// the picture draws (<text> holding a number; the dims when there is no picture); an unlabelled side is one the pupil works out.
+// (1) "every / each / all side(s) given / labelled / shown", "no side to work out", "no missing / unknown side": every item labels
+// every side. (2) "not every side is labelled", "some sides are not labelled": no item labels every side. (3) A COUNT, overall ("two
+// side lengths are not labelled", "one side is missing") or per shape ("2 sides of the L, 4 of the T", "2 of the L's 6 sides"), is the
+// number of unlabelled sides of every item of that shape (and its total, when given); a per-shape list names every shape dealt.
+const SIDES = { L: 6, T: 8, U: 8 };
+export const labelsOf = q => { const v = String(q.visual || ''); const n = (v.match(/<text\b[^>]*>\s*\d+(?:\.\d+)?\s*<\/text>/g) || []).length;
+  return n || Object.keys((q.geometryData || {}).dims || {}).length; };
+const UNL = '(?:not labell?ed|unlabell?ed|missing|not given|not shown|not marked|left blank|unknown|to (?:work out|find))';
+export function layoutChecks(text, qs) {
+  const t = numify(text), out = [];
+  const shapes = qs.filter(q => q && q.geometryData && SIDES[q.geometryData.shapeType]).map(q => ({ s: q.geometryData.shapeType, n: SIDES[q.geometryData.shapeType], lab: labelsOf(q) }));
+  if (!shapes.length) return out;
+  const N = shapes.length, unl = x => x.n - x.lab;
+  if (/(?<!\bnot\s)\b(?:every|each|all(?: the)?) sides?(?: lengths?)?(?: is| are)? (?:given|labell?ed|shown|marked)\b|\bno (?:missing |unknown )?(?:side|length)s?(?: lengths?)? to (?:work out|find)\b|\bnothing to work out\b|\bno (?:missing|unknown) (?:side|length)s?\b/i.test(t)) {
+    const bad = shapes.filter(x => unl(x) > 0).length;
+    if (bad) out.push(`G4: says every side is given, but ${bad} of ${N} items label fewer sides than the shape has (sides to work out first)`); }
+  if (/\bnot (?:every|all(?: the)?) sides?(?: lengths?)? (?:is |are )?(?:given|labell?ed|shown|marked)\b|\bsome sides?(?: lengths?)? (?:is |are )?(?:not labell?ed|unlabell?ed|missing)\b/i.test(t)) {
+    const bad = shapes.filter(x => unl(x) === 0).length;
+    if (bad) out.push(`G7: says not every side is labelled, but ${bad} of ${N} items label every side`); }
+  const per = [...t.matchAll(/\b(\d+)\s+(?:(?:sides?|side lengths?)\s+)?of the ([LTU])(?:-shape)?(?:'s|s)?(?:\s+(\d+)(?:\s+sides?)?)?/g)];
+  if (per.length && new RegExp(`\\b${UNL}|\\bnot every side`, 'i').test(t)) {
+    const named = new Set();
+    for (const m of per) { const k = +m[1], S = m[2], tot = m[3] ? +m[3] : null; named.add(S);
+      const of = shapes.filter(x => x.s === S);
+      if (!of.length) { out.push(`G7: says "${m[0].trim()}", but no item deals ${S === 'L' ? 'an' : 'a'} ${S}-shape`); continue; }
+      if (tot != null && of.some(x => x.n !== tot)) out.push(`G7: says the ${S} has ${tot} sides, but it has ${SIDES[S]}`);
+      const bad = of.filter(x => unl(x) !== k); if (bad.length) out.push(`G7: says "${m[0].trim()}" (unlabelled), but ${bad.length} of ${of.length} ${S}-shapes leave ${[...new Set(bad.map(unl))].join(' / ')} sides unlabelled`); }
+    const miss = [...new Set(shapes.map(x => x.s))].filter(S => !named.has(S));
+    if (miss.length) out.push(`G7: the per-shape count of unlabelled sides leaves out the ${miss.join(', ')}-shape the items deal`);
+  } else for (const m of t.matchAll(new RegExp(`\\b(\\d+)\\s+(?:of the\\s+)?(?:sides?|side lengths?|lengths?)(?:\\s+lengths?)?\\s+(?:(?:is|are)\\s+)?(?:still\\s+)?${UNL}`, 'gi'))) {
+    const k = +m[1], bad = shapes.filter(x => unl(x) !== k);
+    if (bad.length) out.push(`G7: says "${m[0].trim()}", but ${bad.length} of ${N} items leave ${[...new Set(bad.map(unl))].sort().join(' / ')} sides unlabelled (${[...new Set(bad.map(x => x.s))].join(', ')}-shapes)`); }
+  return out;
+}
 export function claimLists(text, items, qs, e) {
   const t = String(text || ''), out = [], N = items.length; if (!N) return out;
-  for (const m of t.matchAll(/\bgroups? of ((?:\d+,\s*)*\d+,?\s+(?:or|and)\s+\d+)\b/gi)) { if (negBefore(t, m.index)) continue;
-    for (const s of m[1].match(/\d+/g).map(Number)) if (!items.some(i => new RegExp(`\\bgroups? of ${s}\\b|\\b${s} in each\\b`, 'i').test(i.text || '') || payOf(i).size === s))
-      out.push(`G3: says "groups of ${m[1]}", but no item has groups of ${s}`); }
+  // G3 / G4 / G8 (critic r3): a listed set of group sizes, in any of its forms: "groups of 3, 4 or 5", "groups of 3 to 5" (a range),
+  // number words ("groups of three, four or five") and the postfix "3, 4 or 5 in each group"; every named size (a range: both ends)
+  // is dealt (G3) and the list is complete: a dealt size outside it fails (G4), unless it follows "such as / like / for example"
+  const sizesOf = i => { const z = new Set(); const sz = payOf(i).size; if (typeof sz === 'number') z.add(sz);
+    for (const mm of numify(i.text || '').matchAll(/\bgroups? of (\d+)\b|\b(\d+) in each\b/gi)) z.add(+(mm[1] || mm[2])); return z; };
+  const dealtSizes = new Set(); for (const i of items) for (const z of sizesOf(i)) dealtSizes.add(z);
+  for (const L of groupLists(t)) { if (negBefore(L.src, L.index)) continue;
+    for (const sz of L.named) if (!items.some(i => sizesOf(i).has(sz))) out.push(`G3: says "${L.text}", but no item has groups of ${sz}`);
+    if (/\b(?:such as|like|e\.g\.|for example|including|among them)\s*$/i.test(L.src.slice(0, L.index))) continue;
+    const off = [...dealtSizes].filter(x => !L.ok(x)); if (off.length) out.push(`G4: says "${L.text}", but items have groups of ${off.sort((a, b) => a - b).join(', ')} (the list is not complete)`); }
   if (!(e && e.opts && e.opts.denoms)) {
     const NEGF = /\b(?:no|never|not(?!\s+(?:only|just|always|all)\b)|without|nor)\b[^;,.:()]*/gi;
     const dealt = new Set(); qs.forEach((q, j) => { for (const x of itemDens(q)) dealt.add(x); for (const mm of `${items[j]?.text || ''} ${items[j]?.a || ''} ${items[j]?.x || ''}`.matchAll(/(?<![\d.])\d+\/(\d+)\b/g)) dealt.add(+mm[1]); });
@@ -393,26 +491,19 @@ export function claimLists(text, items, qs, e) {
     const bad = items.filter(i => { const p = payOf(i); if (!Array.isArray(p.terms)) return false; const ans = p.answer?.letter;
       return p.terms.some(x => x.letter !== ans && !fam.has(x.d)); }).length;
     if (bad) out.push(`G3: says "${m[0].trim()}", but ${bad} of ${N} items show another model outside ${[...fam].map(x => '/' + x).join(' ')}`); }
-  // G4 (critic r2): a listed set of group sizes is complete: an item with a size outside the list fails ("groups of 3, 4 or 5", 6 dealt)
-  for (const m of t.matchAll(/\bgroups? of ((?:\d+,\s*)*\d+,?\s+(?:or|and)\s+\d+)\b/gi)) { if (negBefore(t, m.index) || /\b(?:such as|like|e\.g\.|for example|including|among them)\s*$/i.test(t.slice(0, m.index))) continue;
-    const list = new Set(m[1].match(/\d+/g).map(Number)), sizes = new Set();
-    for (const i of items) { const sz = payOf(i).size; if (typeof sz === 'number') sizes.add(sz); for (const mm of String(i.text || '').matchAll(/\bgroups? of (\d+)\b|\b(\d+) in each\b/gi)) sizes.add(+(mm[1] || mm[2])); }
-    const off = [...sizes].filter(x => !list.has(x)); if (off.length) out.push(`G4: says "groups of ${m[1]}", but items have groups of ${off.sort((a, b) => a - b).join(', ')} (the list is not complete)`); }
-  // G4: a coin the text denies ("never a quarter", "no 25-cent coin", "never dimes") is not in any money item's payload
-  if (e && MONEYK.test(e.key)) { const COIN = [[1, 'penn(?:y|ies)|1-cent'], [5, 'nickels?|5-cent'], [10, 'dimes?|10-cent'], [25, 'quarters?|25-cent'], [50, 'half[- ]dollars?|50-cent'], [100, 'dollar coins?']];
-    const coinsOf = i => { const p = payOf(i), c = new Set(); if (Array.isArray(p.values) && Array.isArray(p.counts)) p.values.forEach((v, j) => { if (p.counts[j] > 0) c.add(v); });
-      for (const k of ['coins', 'set', 'given']) if (Array.isArray(p[k])) for (const x of p[k]) { const v = typeof x === 'number' ? x : (x && (x.v ?? x.value ?? x.c)); if (typeof v === 'number') c.add(v); }
-      for (const [v, re] of COIN) if (new RegExp(`\\b(?:${re})\\b`, 'i').test(`${i.text || ''} ${i.a || ''}`)) c.add(v); return c; };
+  // G4 / G8 (critic r3): coins. The dealt coins are read from the whole payload (nested a.coins / b.coins of money_compare too), plus
+  // the coin words of the question and the answer. (1) A coin the text denies, before it ("never a quarter", "no 25-cent coins", "never
+  // uses dimes or nickels") or after it ("quarters are never used"), is not dealt. (2) A positive-only list ("only dimes and pennies")
+  // holds every dealt coin. (3) A coin the text names positively is dealt by some item.
+  if (e && MONEYK.test(e.key)) {
     const dealt = new Set(); for (const i of items) for (const v of coinsOf(i)) dealt.add(v);
-    // the coin is the denial's own object ("never a quarter", "no 25-cent coins", "never uses dimes or nickels"), not a word inside
-    // another denied thing ("never the amount split into tens, ones, dimes and pennies")
-    for (const [v, re] of COIN) for (const mm of t.matchAll(new RegExp(`\\b(?:no|never|not|without|nor)\\s+(?:(?:uses?|shows?|chooses?|gives?|deals?|with|any|an?|one|single)\\s+){0,3}(?:(?:${COIN.map(c => c[1]).join('|')})(?:\\s+coins?)?\\s*(?:,|or|and|nor)\\s*(?:an?\\s+)?)*(?:${re})\\b`, 'gi')))
-      if (dealt.has(v)) out.push(`G4: says "${mm[0].trim()}", but items deal a ${v}-cent coin`); }
-  // G4: a layout claim ("every side length given / labelled", "no side to work out") is read against the shape's labels and sides
-  if (/\b(?:every|each|all(?: the)?) sides?(?: lengths?)?(?: is| are)? (?:given|labell?ed|shown|marked)\b|\bno (?:missing )?(?:side|length)s?(?: lengths?)? to (?:work out|find)\b|\bnothing to work out\b|\bno missing (?:side|length)s?\b/i.test(t)) {
-    const SIDES = { L: 6, T: 8, U: 8, rectangle: 4, square: 4 };
-    const bad = qs.filter(q => { const gd = q && q.geometryData; if (!gd || !gd.dims || !SIDES[gd.shapeType]) return false; return Object.keys(gd.dims).length < SIDES[gd.shapeType] && !['rectangle', 'square'].includes(gd.shapeType); }).length;
-    if (bad) out.push(`G4: says every side is given, but ${bad} of ${N} items label fewer sides than the shape has (sides to work out first)`); }
+    for (const d of coinDenials(t)) if (dealt.has(d.v)) out.push(`G4: says "${d.text}", but items deal a ${d.v}-cent coin`);
+    for (const m of t.matchAll(new RegExp(`\\bonly\\s+(?:(?:uses?|shows?|with|gives?|deals?)\\s+)?(${COIN_LIST})`, 'gi'))) { const ok = coinVals(m[1]);
+      const off = [...dealt].filter(v => !ok.has(v)); if (off.length) out.push(`G8: says "${m[0].trim()}", but items deal ${off.sort((a, b) => a - b).map(v => v + '-cent').join(', ')} coins too`); }
+    let pos = t; for (const d of coinDenials(t)) pos = pos.split(d.text).join(' ');
+    pos = pos.replace(/\b(?:no|never|not|without|nor)\b[^;.]*/gi, ' ');   // a denied clause runs to its ; or . ("never the amount split into tens, ones, dimes and pennies")
+    for (const [v, re] of COIN) if (new RegExp(`\\b(?:${re})\\b`, 'i').test(pos) && !dealt.has(v)) out.push(`G8: names ${(pos.match(new RegExp(`\\b(?:${re})\\b`, 'i')) || [''])[0]}, but no item deals a ${v}-cent coin`); }
+  for (const f of layoutChecks(t, qs)) out.push(f);
   return out;
 }
 // a why that says the items ask how long something takes (a duration) needs items that ask for one
@@ -457,7 +548,10 @@ function whyCheck(e, r) {
   if (/\badd-more stor(?:y|ies)\b/i.test(pos) && !/put-together|\bcombin/i.test(pos) && r.items.filter(i => /\bin all\?/i.test(i.text || '')).length >= N / 5) out.push(`says add-more stories, but ${r.items.filter(i => /\bin all\?/i.test(i.text || '')).length} of ${N} items are put-together stories (how many in all?)`);
   for (const tc of TR.tableClaims(pos)) { const hit = r.items.filter(i => tc.re.test(`${CL.itemWords(i)} ¦ ${i.pay || ''}`)).length;
     if (hit < tc.s * N) out.push(`why claims "${tc.word}" (${tc.n}) but only ${hit} of ${N} items deal it`); }
-  for (const h of CL.claimHits(CL.claimText(w0, titles), r.items, { gateOnly: true })) if (!h.ok) out.push(`why claims "${h.word}" (${h.claim}) but only ${h.hit} of ${h.n} items show it`);
+  for (const h of CL.claimHits(CL.claimText(w0, titles), r.items, { gateOnly: true })) {
+    // G8: a money link's coins sit in its payload (money_compare draws coins and writes no money word); a coin picture is money
+    if (!h.ok && h.claim === 'money' && MONEYK.test(e.key)) { const hit = r.items.filter(i => coinsOf(i).size || /\$|¢|dollar|cent|coin/i.test(CL.itemWords(i))).length; if (hit >= 0.2 * N) continue; }
+    if (!h.ok) out.push(`why claims "${h.word}" (${h.claim}) but only ${h.hit} of ${h.n} items show it`); }
   // the K / R words a why uses for what the items do (Y1): more / fewer, heavier / lighter, longer / taller, odd / even, double, story
   const KW = [[/\bheavier|\blighter\b/i, /heav|light/i], [/\blonger\b|\bshorter\b/i, /long|short/i], [/\btaller\b/i, /tall|short/i], [/\bodd\b|\beven\b/i, /\bodd\b|\beven\b/i],
     [/\bdoubles?\b/i, /doubl|\b(\d+) \+ \1\b/i], [/\bstor(?:y|ies)\b/i, /[a-z]\.\s+[A-Z][^?]*\?/], [/\bone more\b|\b1 more\b/i, /\bmore\b|\bafter\b|\bnext\b/i], [/\bone less\b|\b1 less\b/i, /\bless\b|\bbefore\b/i],
@@ -495,7 +589,7 @@ function y6Why(e, r) {
     const hit = texts.filter(t => new RegExp(`\\b(${UNIT[um[1].toLowerCase()]})\\b`, 'i').test(t)).length;
     if (hit < N / 5) { out.push(`why names ${um[1]} but only ${hit} of ${N} items have that unit`); break; } }
   const FAM = { halves: [2], quarters: [4], fourths: [4], eighths: [8], thirds: [3], sixths: [6], ninths: [9], twelfths: [12], fifths: [5], tenths: [10], hundredths: [100], thousandths: [1000] };
-  const fams = Object.keys(FAM).filter(f => new RegExp(`\\b${f}\\b`, 'i').test(CL.positive(w)));
+  const fams = Object.keys(FAM).filter(f => new RegExp(`\\b${f}\\b`, 'i').test(CL.positive(w)) && !(f === 'quarters' && MONEYK.test(e.key)));   // G8: a quarter on a money link is a coin (claimLists reads it)
   if (fams.length) {
     const ok = new Set(fams.flatMap(f => FAM[f]));
     const per = r.items.map(i => `${i.text || ''} ${i.a || ''} ${i.x || ''} ${i.vis || ''} ${i.pay || ''}`).map(t => new Set([...t.matchAll(/(?:\b\d+|\?|_+)\/(\d+)\b|"d":(\d+)/g)].map(m => +(m[1] || m[2])).concat([...t.matchAll(/(?<![\d,])\d*\.(\d+)\b/g)].map(m => 10 ** m[1].length))));
@@ -540,7 +634,7 @@ function citeCheck(id, e) {
   if (!String(e.why).startsWith(`${ref} ${titles[ref]}`)) out.push(`the why does not give the cited unit's own title after ${ref}`);
   if (!(taught[e.key] && taught[e.key].has(ref))) out.push(`cites ${ref}, which ${e.key} is not tagged to (and is not that unit's direct / partial)`);
   if (ref === id) out.push('cites the lesson itself');
-  for (const m of String(e.why).matchAll(/\b(?:wk|week)\s+W?(\d{1,2})\b/gi)) if (wkOf(ref) && +m[1] !== n(wkOf(ref))) out.push(`the why says ${m[0]}, but ${ref} is taught ${wkOf(ref)}`);
+  for (const m of String(e.why).matchAll(/\b(?:wk|week)\s+W?(\d{1,2})\b|(?<!(?:wk|week)\s+)\bW(\d{2})\b/gi)) if (wkOf(ref) && +(m[1] || m[2]) !== n(wkOf(ref))) out.push(`the why says ${m[0]}, but ${ref} is taught ${wkOf(ref)}`);   // n7 / n7b
   const ry = unitYear(ref), ri = YR.indexOf(ry);
   if (isSupport(id)) {
     const ph = phaseOf(id);
@@ -562,7 +656,7 @@ const citedCeil = ref => {
   if (!ref) return 0;
   if (siteOf[ref]) return CEIL[slug(ref)] || YEAR_CEIL[siteOf[ref].wrmYear] || 0;
   let c = titleCeilN(titles[ref] || ''); const s = STEP_OF[ref];
-  if (s) for (const e of [...s.direct, ...s.partial]) c = Math.max(c, probe(e.key, e.opts || {}, e.maxNumber || (e.opts || {}).range || 10000).max);
+  if (s) for (const e of [...s.direct, ...s.partial]) c = Math.max(c, PO(e.key, e.opts || {}, e.maxNumber || (e.opts || {}).range || 10000).max);
   if (unitYear(ref) === 'R') c = Math.max(c, R_BLOCK_CEIL[blockNo(ref)] || 0);
   return c || YEAR_CEIL[unitYear(ref)] || 0;
 };
@@ -634,7 +728,7 @@ let bad = 0, checked = 0;
 for (const [id, s] of Object.entries(d.lessons || {})) {
   const fails = [];
   let own; try { own = ceilOf(id); } catch (er) { fails.push(er.message); own = 10; }
-  const ownItems = [...s.direct, ...s.partial].filter(e => !TIME.test(e.key)).flatMap(e => P(e).items);
+  const ownItems = [...s.direct, ...s.partial].filter(e => !TIME.test(e.key)).flatMap(e => PO(e.key, e.opts, rangeOf(e)).items);   // G6: fixed 200-item probe
   const ownMax = ownItems.length ? Math.max(0, ...ownItems.map(i => i.max || 0)) : own;
   for (const role of ['pre', 'related']) for (const e of s[role]) {
     checked++;
@@ -668,7 +762,7 @@ for (const [id, s] of Object.entries(d.lessons || {})) {
       for (const f of digitSymbolChecks(e.missing, r.items)) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})}: ${f}`);
       for (const f of denomsCheck(e, 'partial', e.missing)) fails.push(`partial ${e.key}: ${f}`);
       for (const f of [...unitNegChecks(e.missing, r.items), ...betweenChecks(e.missing, r.items)]) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause: ${f}`);
-      for (const f of y6Why({ why: e.missing.replace(/\b(?:never|no|not|without)\b[^;.]*/gi, ' ') }, r)) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause: ${f}`);
+      for (const f of y6Why({ why: e.missing.replace(/\b(?:never|no|not|without)\b[^;.]*/gi, ' '), key: e.key }, r)) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause: ${f}`);
       if (NOPIC.test(e.missing) && noPicHits(e.missing, r.items) > r.items.length / 3) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause says no pictures, but ${noPicHits(e.missing, r.items)} of ${r.items.length} items show a picture`);
       // lessons critic r2 F12: "never 0 as a number to write / find / answer" is false when an item answers 0
       for (const p of CL.negatedParts(e.missing)) if (/(?<![\d.])0(?![\d.])|\bzero\b/i.test(p) && /\bwrit|\banswer|\bfind|\bas a number\b/i.test(p)) {
@@ -701,7 +795,7 @@ for (const [id, s] of Object.entries(d.lessons || {})) {
       else if (!/\b(?:above|beyond|over|past|larger than|bigger than|more than|to|up to)\s+\d+|\b\d+\s*\+\s*\d+\b/i.test(clause)) fails.push(`RANGE: ${over.length} items of ${role} ${e.key} pass the ceiling ${own} and the clause never says so`);
     } }
   bad += fails.length;
-  if (fails.length || ALL) console.log(`${id} [${isSupport(id) ? 'Support, source ' + srcYear(id) + (phaseOf(id) ? ', ' + phaseOf(id).name : '') : lessonWk(id)}] ceiling ${own}: ${fails.length ? fails.length + ' FAIL\n   ' + fails.join('\n   ') : 'ok'}`);
+  if (fails.length || ALL) console.log(`${id} [${isSupport(id) ? 'Support, source ' + srcYear(id) + (phaseOf(id) ? ', ' + phaseOf(id).name : '') : lessonWk(id)}] ceiling ${own}${ALL ? ', own max ' + ownMax + ' (fixed probe)' : ''}: ${fails.length ? fails.length + ' FAIL\n   ' + fails.join('\n   ') : 'ok'}`);
 }
 console.log(`lessonfit: ${Object.keys(d.lessons || {}).length} lessons, ${checked} links, ${NPER} items a link; ${bad} findings`);
 process.exitCode = bad || process.exitCode ? 1 : 0;

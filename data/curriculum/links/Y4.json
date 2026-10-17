@@ -12447,7 +12447,7 @@
      "opts": {
       "band": 25
      },
-     "why": "a dot array read as rows times columns: the product of the turned array is the same"
+     "why": "a dot array read as rows times columns, one array at a time (products to 25): the array the lesson then turns"
     }
    ],
    "note": "Domain-test build lesson, W05-W06, 3.OA.B.5. mult_properties {forms: 0, 1, 2} deals the three properties the title names: forms 0 an array and its turn, two facts with one product (3 × 4 = 4 × 3, commutative); forms 1 breaking a fact apart by its rows (5 × 9 = 1 × 9 + 4 × 9, distributive); forms 2 times 1 (1 × 11 = 11, identity). Forms 3 (times 0) is left out: the title does not name it. The associative property of 3.OA.B.5 is not in the title; Y4.B4.S13 \"Multiply three numbers\" (W04, a gap, mult_three) is the step that teaches it."
@@ -12473,7 +12473,7 @@
    "partial": [
     {
      "key": "algebra:multi_step_word",
-     "missing": "two-step stories that only add and subtract (add twice, add then take away, take away then add, take away twice), with numbers to about 120; never a × or ÷ step and never a letter for the unknown"
+     "missing": "two-step stories that only add and subtract (add twice, add then take away, take away then add, take away twice), with numbers to 150 (most below 110); never a × or ÷ step and never a letter for the unknown"
     },
     {
      "key": "number_ops_mixed:word_problems_mixed",
@@ -12843,7 +12843,7 @@
       ],
       "band": 25
      },
-     "why": "the perimeter and the area of a small L- or T-shape (areas 14 to 24); two side lengths are not labelled and are worked out from the others first"
+     "why": "the perimeter and the area of a small L- or T-shape (areas 14 to 24); not every side is labelled (2 of the L's 6 sides, 4 of the T's 8 sides), so the missing lengths are worked out from the labelled ones first; the T's two undersides together are its top width take away its stem width (one underside alone can be a half, such as 2.5)"
     }
    ],
    "note": "Awsaj supplement lesson, W20-W21, 3.MD.C.7, 7c, 7d, block Y4.B3. The story forms of other skills are not this clause: area_perimeter:area forms 2 tells a story of ONE rectangle (linked in the area-as-multiplication lesson), area_perimeter:perimeter forms 2 a perimeter story and area_perimeter:volume forms 2 a box (3-D); none is a rectilinear floor plan.",
@@ -12903,7 +12903,7 @@
        2
       ]
      },
-     "missing": "sorts or picks objects by the unit they are measured in (g, kg, mL, L); never an amount to read or write"
+     "missing": "sorts objects by the unit they are measured in (g, kg, mL or L), or clicks every object best measured in grams rather than kilograms; never an amount to read or write"
     }
    ],
    "verdict": "partial",
@@ -13070,7 +13070,7 @@
    "partial": [
     {
      "key": "graphs:line_plot_fractions",
-     "missing": "reads a drawn line plot of measurements in halves and quarters, some in eighths (how many at a mark, the most common, how many in all); never makes the plot"
+     "missing": "reads a drawn line plot of measurements in halves, quarters or eighths, many of the plots in halves only (how many at a mark, the most common, how many in all); never makes the plot"
     }
    ],
    "verdict": "partial",
@@ -13528,7 +13528,7 @@
       "task": "all",
       "dir": "mixed"
      },
-     "why": "R.B2.S1 Compare size (Pre-K, below the source grade): comparing two objects by size: longer, taller, shorter"
+     "why": "R.B2.S1 Compare size (Pre-K, below the source grade): comparing two objects by size: longer or shorter lines, taller or shorter towers, thicker or thinner bars"
     },
     {
      "key": "measurement:heavier_lighter_visual",
@@ -13599,7 +13599,7 @@
       "task": "all",
       "dir": "mixed"
      },
-     "why": "R.B2.S1 Compare size (Pre-K, below the source grade): comparing two objects by size: longer, taller, shorter"
+     "why": "R.B2.S1 Compare size (Pre-K, below the source grade): comparing two objects by size: longer or shorter lines, taller or shorter towers, thicker or thinner bars"
     },
     {
      "key": "comparing:compare_groups",
@@ -13758,7 +13758,7 @@
      "opts": {
       "band": 999
      },
-     "why": "Y3.B1.S8 Hundreds, tens and ones (Grade 2, lower grade): hundreds, tens and ones in a place-value chart"
+     "why": "Y3.B1.S8 Hundreds, tens and ones (Grade 2, lower grade): naming the place of an underlined digit: hundreds, tens or ones"
     },
     {
      "key": "measurement:coin_value",
@@ -13775,7 +13775,7 @@
      "opts": {
       "response": "sign"
      },
-     "why": "which of two amounts is more, written with < or >"
+     "why": "which of two sets of coins is worth more, or that they are equal, written with <, > or ="
     }
    ],
    "note": "Native lesson (site flag native), the pacing's retitled Y4.B10.S1 \"Write money using decimals\" (school week W37), 2.MD.C.8. money_notation is FULL at Y4.B10.S1 (write the amount with the point); this title asks for the place value of the amount.",

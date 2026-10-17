@@ -129,7 +129,7 @@ def _f(lst, key): return [e for e in lst if e['key'] == key][0]
 def _(d): _f(L(d, 'twostepwordproblemswiththefouroperations')['pre'], 'division:div_word_problems').pop('opts', None)
 @m('G1 lesson own maximum: L8 related composite_shapes at the default band (areas to 200)', r'size \d+ > 45 \(the lesson deals to')
 def _(d): _f(L(d, 'distributiveandadditivearea')['related'], 'area_perimeter:composite_shapes')['opts'] = {'forms': [1]}
-@m('G1 lesson own maximum: L3 related dot_array_mult band 100', r'size \d+ > 30 \(the lesson deals to')
+@m('G1 lesson own maximum: L3 related dot_array_mult band 100', r'size \d+ > [\d.]+ \(the lesson deals to 2\d\)')
 def _(d): L(d, 'propertiesofmultiplicationcommutativeidentityanddistributive')['related'][0]['opts'] = {'band': 100}
 @m('G1 a pre past the tables: L4 pre word_problems_mixed at the default Max Number', r'G1 rule 19: a story step')
 def _(d): L(d, 'twostepwordproblemswiththefouroperations')['pre'].append({'key': 'number_ops_mixed:word_problems_mixed', 'why': 'Y3.B3.S5 Sharing and grouping (Grade 2, lower grade): one-step stories'})
@@ -164,7 +164,7 @@ def _(d): q = L(d, 'sharingandgroupingfairshares')['partial'][0]; q['missing'] =
 def _(d): q = L(d, 'sharingandgroupingfairshares')['partial'][0]; q['missing'] = q['missing'].replace('groups of 3, 4, 5 or 6', 'groups of 3 or 4')
 @m('G4 coin denial: L22 clause "never a quarter"', r'G4: says "never a quarter", but items deal a 25-cent coin')
 def _(d): q = L(d, 'selectmoney')['partial'][0]; q['missing'] = q['missing'].replace('never chooses bills', 'never a quarter, never chooses bills')
-@m('G4 coin denial: L22 clause "never a 25-cent coin"', r'G4: says "never a 25-cent", but items deal a 25-cent coin')
+@m('G4 coin denial: L22 clause "never a 25-cent coin"', r'G4: says "never a 25-cent(?: coin)?", but items deal a 25-cent coin')
 def _(d): q = L(d, 'selectmoney')['partial'][0]; q['missing'] = q['missing'].replace('never chooses bills', 'never a 25-cent coin, never chooses bills')
 @m('G4 coin denial: L22 clause "never uses dimes or nickels"', r'G4: says "never uses dimes or nickels"')
 def _(d): q = L(d, 'selectmoney')['partial'][0]; q['missing'] = q['missing'].replace('never chooses bills', 'never uses dimes or nickels, never chooses bills')
@@ -176,6 +176,44 @@ def _(d): e = L(d, 'comparingmultiplicationstatements')['pre'][0]; e['opts'] = {
 def _(d): e = [x for x in L(d, 'countmoneynotesandcoins')['pre'] if x['key'] == 'multiplication:count_by_tables'][0]; e['opts'] = {'constant': [3]}
 @m('n7 free-text week: L2 pre why "week 9" for a W02 step', r'the why says week 9')
 def _(d): e = L(d, 'patternsonthemultiplicationtable')['pre'][1]; e['why'] = e['why'].replace('wk W02', 'week 9')
+# lessons critic r3 F5 / G7 / G8 / n7b (round 4)
+L8W = lambda w: (lambda d: L(d, 'distributiveandadditivearea')['related'][0].update(why=w))
+_A = 'the perimeter and the area of a small L- or T-shape (areas 14 to 24); '
+for _n, _w, _t in [
+    ('G7 count: the r3 why "two side lengths are not labelled" (T leaves 4)', _A + 'two side lengths are not labelled and are worked out from the others first', r'G7: says "2 side lengths are not labelled".*T-shapes'),
+    ('G7 count: "one side length is not labelled"', _A + 'one side length is not labelled and is worked out first', r'G7: says "1 side length is not labelled"'),
+    ('G4 layout: "with no unknown sides"', _A + 'with no unknown sides', r'G4: says every side is given'),
+    ('G7 per shape: "2 sides of the L" (the T left out)', _A + 'not every side is labelled (2 sides of the L)', r'G7: the per-shape count .* leaves out the T'),
+    ('G7 per shape: "2 of the T\'s 8 sides" (4 dealt)', _A + "not every side is labelled (2 of the L's 6 sides, 2 of the T's 8 sides)", r'G7: says "2 of the T.s 8 sides" \(unlabelled\)'),
+    ('G7 per shape: "the T\'s 6 sides" (it has 8)', _A + "not every side is labelled (2 of the L's 6 sides, 4 of the T's 6 sides)", r'G7: says the T has 6 sides')]:
+    m(_n, _t)(L8W(_w))
+def _c23(new):
+    def f(d): q = L(d, 'sharingandgroupingfairshares')['partial'][0]; q['missing'] = q['missing'].replace('groups of 3, 4, 5 or 6', new)
+    return f
+for _n, _w, _t in [('G8 list range: "groups of 3 to 5" (6 dealt)', 'groups of 3 to 5', r'G4: says "groups of 3 to 5".*not complete'),
+                   ('G8 list in words: "groups of three, four or five"', 'groups of three, four or five', r'G4: says "groups of 3, 4 or 5".*not complete'),
+                   ('G8 list postfix: "3, 4 or 5 in each group"', '3, 4 or 5 in each group', r'G4: says "3, 4 or 5 in each".*not complete')]:
+    m(_n, _t)(_c23(_w))
+def _c22(ins):
+    def f(d): q = L(d, 'selectmoney')['partial'][0]; q['missing'] = q['missing'].replace('never chooses bills', ins + ', never chooses bills')
+    return f
+m('G8 coin denial after the coin: "quarters are never used"', r'G4: says "quarters are never used", but items deal a 25-cent coin')(_c22('quarters are never used'))
+m('G8 positive-only coins: "only dimes and pennies"', r'G8: says "only dimes and pennies"')(_c22('only dimes and pennies'))
+@m('G8 nested coins: L15 related money_compare why "never a quarter" (a.coins / b.coins)', r'G4: says "never a quarter", but items deal a 25-cent coin')
+def _(d): L(d, 'countmoneynotesandcoins')['related'][0]['why'] += ', never a quarter'
+@m('G8 table skill with no table option: L14 pre mult_facts {}', r'G8 rule 19: \d+ dealt facts are in no times-table')
+def _(d): [x for x in L(d, 'comparingmultiplicationstatements')['pre'] if x['key'] == 'multiplication:mult_facts'][0]['opts'] = {}
+@m('G8 table skill with no table option: L14 related div_facts {}', r'G8 rule 19: \d+ dealt facts are in no times-table')
+def _(d): L(d, 'comparingmultiplicationstatements')['related'].append({'key': 'division:div_facts', 'opts': {}, 'why': 'division facts: the inverse of the statements'})
+@m('n7b bare week: L1 pre why "W09" for a W02 step', r'the why says W09')
+def _(d): e = L(d, 'findtheruleinaninputoutputtable')['pre'][0]; e['why'] = e['why'].replace('wk W02', 'W09')
+@m('sweep: L21 related money_compare why names a coin it never deals ("half-dollars")', r'G8: names half-dollars, but no item deals a 50-cent coin')
+def _(d): L(d, 'poundstensonesandpenceusdollarscents')['related'][0]['why'] += ', with half-dollars'
+# controls: true claims of the same forms pass (the link has no finding)
+CTRL = [('control: L8 related "(2 sides of the L, 4 of the T)"', 'distributiveandadditivearea', L8W(_A + 'not every side is labelled (2 sides of the L, 4 of the T), so the missing lengths are worked out first')),
+        ('control: L23 "groups such as 3 or 4"', 'sharingandgroupingfairshares', _c23('groups such as 3 or 4')),
+        ('control: L22 "never a half-dollar"', 'selectmoney', _c22('never a half-dollar')),
+        ('control: L15 pre count_by_tables x5 at Grade 1', 'countmoneynotesandcoins', lambda d: None)]
 AUD = json.load(open(os.path.join(H, 'full_audit.json')))
 AM = []
 def _a1(d, a): a[G + 'solveadditionandsubtractionwordproblemswithin1000usingbarmodels']['ccss']['3.OA.D.8'] = 'Solve two-step word problems with the four operations: the stories are dealt with a bar model on every item, as the title asks'
@@ -199,6 +237,13 @@ for name, target, f in M:
     ok = bool(hit) and r.returncode == 1
     missed += 0 if ok else 1
     print(f"{'CAUGHT' if ok else 'MISSED'} exit {r.returncode} | A {name}\n      {hit[0][:200] if hit else (lines[:1] or [r.stderr[-200:]])[0][:200]}")
+for name, slug, f in CTRL:
+    d = copy.deepcopy(base); f(d); p = os.path.join(TMP, 'm.json'); json.dump(d, open(p, 'w'), ensure_ascii=False)
+    r = runfit(p)
+    bad = [l.strip() for l in r.stdout.splitlines() if l.startswith(G + slug)]
+    ok = r.returncode == 0 and not bad
+    missed += 0 if ok else 1
+    print(f"{'OK    ' if ok else 'FAILED'} exit {r.returncode} | A {name}\n      {(bad or [r.stdout.strip().splitlines()[-1] if r.stdout.strip() else ''])[0][:200]}")
 for name, target, f in AM:
     d = copy.deepcopy(base); a = copy.deepcopy(AUD); f(d, a); p = os.path.join(TMP, 'm.json'); json.dump(d, open(p, 'w'), ensure_ascii=False)
     ap = os.path.join(TMP, 'audit.json'); json.dump(a, open(ap, 'w'), ensure_ascii=False)
@@ -304,6 +349,6 @@ for name, pid, f in [('make_amount_notes (Y3.json copy) teaches, snapshot edited
     r = subprocess.run([sys.executable, os.path.join(H, 'lessoncheck.py'), p, sp, KJ], capture_output=True, text=True)
     ok = r.returncode == 1 and 'differs from' in r.stdout; missed += 0 if ok else 1; D.append((name, None))
     print(f"{'CAUGHT' if ok else 'MISSED'} exit {r.returncode} | D lessoncheck source gate: {name}\n      {r.stdout.strip().splitlines()[:1]}")
-n = len(M) + len(AM) + len(B) + 1 + len(FROZ) + 1 + 3 + len(D) + 1
+n = len(M) + len(CTRL) + len(AM) + len(B) + 1 + len(FROZ) + 1 + 3 + len(D) + 1
 print(f'lessonmut: {n} mutations and controls, {missed} missed')
 sys.exit(1 if missed else 0)
