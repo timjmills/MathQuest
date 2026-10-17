@@ -163,7 +163,7 @@
      8
     ],
     "reports": "design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r1..r4.md",
-    "note": "P6 Say band made generic after E16c (2 pages; re-check in lesson 4 critic r2)"
+    "note": "P6 Say band made generic after E16c; re-checked 9/9/8/8 (lesson 4 critic r2): PASS stands"
    },
    "status": "passed",
    "pack": {
@@ -339,7 +339,7 @@
       "key": "algebra:function_table_easy",
       "opts": {
        "ftTask": "rule",
-       "ftFactors": "2-5-10"
+       "ftFactors": "2-3-5-10"
       },
       "role": "main"
      },
@@ -364,16 +364,26 @@
     ]
    },
    "critic": {
-    "verdict": "in review",
-    "round": 2
+    "verdict": "PASS",
+    "round": 3,
+    "min": [
+     8,
+     8,
+     8,
+     9
+    ],
+    "reports": "design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r1..r3.md"
    },
-   "status": "in review",
+   "status": "passed",
    "pack": {
     "dir": "design/lesson-samples/detailed/g3-oa9-input-output-rule/",
     "pdf": "design/lesson-samples/detailed/g3-oa9-input-output-rule/pack.pdf",
     "html": "design/lesson-samples/detailed/g3-oa9-input-output-rule/pack.html",
     "selfCheck": "design/lesson-samples/detailed/g3-oa9-input-output-rule/SELF-CHECK.md"
-   }
+   },
+   "rulings": [
+    "x rules x2, x3, x5, x10 (x10 alone ran out of fresh pairs; P0 has a x3 band)"
+   ]
   }
  ]
 }
