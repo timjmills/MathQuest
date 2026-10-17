@@ -302,6 +302,7 @@ export default {
         'Prerequisite Check arrays: rows and in each row in either order.',
         'Exit a: only {exit.0.turned}; writing {exit.0.fact} again is the no-swap mistake.',
         'Practice 2 and exit b, c: one number in each box, no working needed.',
+        'Practice 1: a turned fact read off the turned array is right even if the pupil counted it.',
         'Egg story: {wp.rows} × {wp.cols} or {wp.cols} × {wp.rows}; the label “eggs” may be left off.',
     ],
     wrongAnswers: [
@@ -310,6 +311,7 @@ export default {
         { wrote: '{exit.2.wrong.turnproductfactor} (c)', mistake: 'Product as a factor', next: 'The box map: the product is last.' },
         { wrote: '{exit.0.wrong.turnproductfactor} (a)', mistake: 'Product as a factor', next: 'The product is always last.' },
         { wrote: '{exit.1.wrong.turnproductfactor} (b)', mistake: 'Adds the two factors', next: '“Times, not plus.” Say the fact aloud.' },
+        { wrote: 'The first fact copied on Practice 1', mistake: 'Copies the fact: no swap', next: 'Turn the page a quarter way: count the rows.' },
         { wrote: 'A box left empty on Practice 2', mistake: 'Not sure which number moved', next: 'Point: the two factors swap places.' },
     ],
 };

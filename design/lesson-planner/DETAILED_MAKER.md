@@ -68,10 +68,13 @@ facsimile key from the same plan (`answer-key.js`). Additive hooks, each absent 
   item (`dealOne`), and the Guided set never turns the chart example. Only ten arrays fit 5 x 5 (RP-21), so the
   pack uses them sparingly; the Check Question (board only) may turn a Guided array (`checkQuestion.ref.turnedOk`).
 - **Case tests** (roles/lesson.js): `arrTurn` (non-square, no repeated digit), `arrNonSq`, `arrSquare`, `arrFive`,
-  `arrEdge`, `arrSmall`, `arrProduct`, `arrFactor`, `arrSquareFactor`, `arrAny`.
-- **Hooks**, each absent on every other lesson: `checkQuestion.ref`; `exit[i].cols` (1 | 2, its group's columns);
-  `eeAccess` (T1 prints "EE none · access point ..."); lesson data `guidedStripMm` (a Guided header that wraps
-  beside the Steps books its extra height); `accepted` lines take placeholders. The vocabulary picture kind
+  `arrEdge`, `arrSmall`, `arrTurnSmall`, `arrFourFive`, `arrNoSmall`, `arrBigSquare`, `arrFiveRows`, `arrProduct`,
+  `arrFactor`, `arrSquareFactor`, `arrAny`.
+- **Hooks**, each absent on every other lesson: `checkQuestion.ref` and `checkQuestion.show(value, q)` (each option
+  written as a fact); `exit[i].cols` (1 | 2, its group's columns); `eeAccess` (T1 prints "EE none · access point
+  ..."); ref floors `allTest` (a case test every place passes) and `factorCap` (no factor on more than n items of a
+  page); `accepted` lines take placeholders; the library string `turn-two` (a one-line Guided header). Guided cell 1
+  of an arrays-turn lesson has its first product traced in grey. An array is never a near twin by its product. The vocabulary picture kind
   `array` ({rows, cols, mark: 'row' | 'turn'}); the step icon `turn` (lesson-icons.js); the arrays-turn template
   writes `data-per-row` on each array (E27).
 

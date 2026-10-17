@@ -167,6 +167,7 @@ function measure(LIBRARY) {
             const cs = getComputedStyle(x), lh = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.2;
             return { t: x.textContent.trim().slice(0, 40), n: Math.round(x.getBoundingClientRect().height / lh) };
         }));
+        P.hasSteps = !!pg.querySelector('[data-mq-lesson-strip]');
         P.bandHs = [...pg.querySelectorAll(':scope > .ws-body > .ws-band')].map((b) => [((b.querySelector(':scope > .ws-strip > b') || {}).textContent || '').slice(0, 14), Math.round(b.getBoundingClientRect().height / MM)]);
         P.bandLabels = [...pg.querySelectorAll('.ws-strip > b')].filter((b) => !b.closest('.dl-thumb')).map((b) => b.textContent.trim());
         P.thumbs = pg.querySelectorAll(':scope .dl-thumb').length;
@@ -217,9 +218,12 @@ function poolCheck(POOL) {
     const usable = inPool.size - forb.size, small = usable < 12;
     const seenRep = new Set(), seenPage = new Set(), first = new Map(), rep = [], soft = [], bad = [], noRep = [];
     const pageOf = (p) => String(p).replace(/-key$/, '');
-    const chart = new Set(all.filter((x) => pageOf(x.page) === 'P2').map((x) => x.item)); const chartBack = [];
+    // LR-5 (V22 Appendix E `js v21-selfcheck` poolCheck: "a chart (P2) example never returns, in any
+    // representation, on any page, nor does its turn-around" - the port had dropped `turn`; lesson 2 critic r3 D1)
+    const turn = (k) => { const m = String(k).match(/^(\d+)\+(\d+)$/); return m ? `${m[2]}+${m[1]}` : String(k); };
+    const chart = new Set(all.filter((x) => /^P2/.test(pageOf(x.page))).flatMap((x) => [x.item, turn(x.item)])); const chartBack = [];
     for (const x of all) {
-        if (pageOf(x.page) !== 'P2' && chart.has(x.item)) chartBack.push(`${x.item} (${x.rep}) ${x.page}`);
+        if (!/^P2/.test(pageOf(x.page)) && chart.has(x.item)) chartBack.push(`${x.item} (${x.rep}) ${x.page}`);
         if (!inPool.has(x.item) || forb.has(x.item)) bad.push(`${x.item} ${x.page}`);
         if (!x.rep) noRep.push(`${x.item} ${x.page}`);
         const kr = `${x.item}|${x.rep}`, kp = `${x.item}|${x.page}`;
@@ -227,8 +231,12 @@ function poolCheck(POOL) {
         else if (first.has(x.item)) (small ? soft : rep).push(`${x.item} (${x.rep}) ${x.page}`);
         seenRep.add(kr); seenPage.add(kp); if (!first.has(x.item)) first.set(x.item, x.page);
     }
-    return { ok: ruleOk && !bad.length && !noRep.length && !rep.length && !chartBack.length && (small || all.length <= usable),
-        msg: `${all.length} places (${first.size} numbers), usable pool ${usable} (pool ${inPool.size} recomputed from its list rule: ${ruleOk ? 'matches' : 'MISMATCH'}); repeats ${rep.length ? rep.join(', ') : 0}; chart examples returning ${chartBack.length ? chartBack.join(', ') : 0}; outside the pool ${bad.length ? bad.join(', ') : 0}; items without a rep ${noRep.length}` };
+    // (V22: no turn-around pair on one page)
+    const turns = [];
+    for (const pg of [...new Set(all.map((x) => pageOf(x.page)))]) { const s2 = new Set(all.filter((x) => pageOf(x.page) === pg).map((x) => x.item));
+        for (const k of s2) { const m = String(k).match(/^(\d+)\+(\d+)$/); if (m && +m[1] > +m[2] && s2.has(turn(k))) turns.push(`${k} on ${pg}`); } }
+    return { ok: ruleOk && !bad.length && !noRep.length && !rep.length && !chartBack.length && !turns.length && (small || all.length <= usable),
+        msg: `${all.length} places (${first.size} numbers), usable pool ${usable} (pool ${inPool.size} recomputed from its list rule: ${ruleOk ? 'matches' : 'MISMATCH'}); repeats ${rep.length ? rep.join(', ') : 0}; chart examples or their turn-arounds returning ${chartBack.length ? chartBack.join(', ') : 0}; same-page turn-arounds ${turns.length ? turns.join(', ') : 0}; outside the pool / forbidden ${bad.length ? bad.join(', ') : 0}; items without a rep ${noRep.length}` };
 }
 
 /* ------------------------------------------------------------------------- evaluate */
@@ -319,7 +327,7 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
     const t6 = pages.filter((p) => /^T6/.test(p.id) && p.fadeRows);
     row('E23', 'Every row of T6 "Answers at a glance" carries ★ / ★★ / ★★★', t6.length ? t6.map((p) => `${p.fadeRows.filter(Boolean).length}/${p.fadeRows.length}`).join(', ') : 'no table', t6.length > 0 && t6.every((p) => p.fadeRows.every(Boolean)));
     const e24 = poolCheck(R.pool);
-    row('E24', 'Item pool read from the pack (LR-5): pool recomputed from its rule; 0 repeats of (number, representation); a number never twice on a page; chart examples never return', e24.msg, e24.ok);
+    row('E24', 'Item pool read from the pack (LR-5): pool recomputed from its rule; 0 repeats of (number, representation); a number never twice on a page; chart examples and their turn-arounds never return; no turn-around pair on a page', e24.msg, e24.ok);
     let e24b = { ok: false, msg: 'no pool' };
     if (R.pool && R.pool.places) {
         const edge = new Set(R.pool.edge), probs = [];
@@ -357,14 +365,14 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
             if (new Set(subs).size !== subs.length) probs.push(`a number taken away twice on ${pgid}`);
             for (let i = 0; i < xs.length; i++) for (let j = i + 1; j < xs.length; j++) {
                 const A = xs[i].o, B = xs[j].o;
-                // (− both numbers within 2; + one number the same and the other within 2: 5 + 7 / 5 + 6, 8 + 5 / 8 + 6)
+                // (V22 2983 as written: both numbers within 2 of the other's, place by place - 7 + 8 / 8 + 6, 51 − 44 / 53 − 45)
                 const da = Math.abs(A.a - B.a), db = Math.abs(A.b - B.b);
-                if (A.op === B.op && xs[i].item !== xs[j].item && (A.op === '−' ? da <= 2 && db <= 2 : (da === 0 && db <= 2) || (db === 0 && da <= 2))) probs.push(`near twins ${xs[i].item} / ${xs[j].item} on ${pgid}`);
+                if (A.op === B.op && xs[i].item !== xs[j].item && da <= 2 && db <= 2) probs.push(`near twins ${xs[i].item} / ${xs[j].item} on ${pgid}`);
             }
         }
         e24b = { ok: !probs.length && prPages.length > 0, msg: probs.length ? probs.join('; ') : `${prPages.length} Practice pages: last rows all edge cases (${[...edge].length} edge numbers dealt); no twin answers and no near twins on any page; ${opN} + / − items: no first addend twice in a grid row, no number taken away twice, no near twins` };
     }
-    row('E24b', 'Practice last row only edge cases (★★★); LR-6 no twin answers and no near twins (one skill, numbers within 2) on a page; + / − items (stories too): no first addend twice in a grid row or three running, no number taken away twice, no near twins (− both numbers within 2; + one the same, the other within 2)', e24b.msg, e24b.ok);
+    row('E24b', 'Practice last row only edge cases (★★★); LR-6 no twin answers and no near twins (one skill, numbers within 2) on a page; + / − items (stories too): no first addend twice in a grid row or three running, no number taken away twice, no near twins (both numbers within 2, place by place: V22 2983)', e24b.msg, e24b.ok);
     // E31 (lesson 2 r4, critic r2 D1 / D4): a lesson that declares its SITUATIONS (put together, add to)
     // models each in I Do (the chart or its board example: a P2 place), practises nothing it did not
     // model, and assesses each on the exit slip. A lesson without `situations` passes trivially.
@@ -410,7 +418,22 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
         const board = [...t4.matchAll(/(?:Write on the board|Read the story):\s*([^?]*\?)/g)].map((m) => m[1]);
         const qs = [...t4.matchAll(/How many [^?.]*\?/g)].map((m) => m[0]);
         const bad = qs.filter((q) => !printed.includes(q) && !board.some((b) => b.includes(q)));
-        row('E35', 'T4 quotes only story questions the pack prints or writes on the board', sits.length ? (bad.length ? bad.join('; ') : `${qs.length} questions, all printed or on the board`) : 'no situations declared', !sits.length || !bad.length);
+        // (critic r3 D2: a teacher page that sends pupils to "the Steps at the top of the page" names a Practice page that prints them)
+        const tAll = teach.map((p) => p.text || '').join(' ');
+        const p41 = pages.find((p) => p.id === 'P4-1');
+        const stepsBad = /Steps are at the top of the page/.test(tAll) && !(p41 && p41.hasSteps);
+        row('E35', 'T4 quotes only story questions the pack prints or writes on the board; a "Steps at the top" line names a page that prints them', `${sits.length ? (bad.length ? bad.join('; ') : `${qs.length} questions, all printed or on the board`) : 'no situations declared'}; Practice 1 Steps band ${p41 && p41.hasSteps ? 'printed' : 'not printed'}${stepsBad ? ' - but a teacher page says "The Steps are at the top of the page"' : ''}`, (!sits.length || !bad.length) && !stepsBad);
+    }
+    // E36 (critic r3 D3): each exit-slip + item separates its mistakes - no part is the difference of the parts
+    // (4 + 8: 8 − 4 = 4 is a story number) - and is fresh: neither it nor its turn-around on a lesson page (P3-P5).
+    {
+        const pl = (R.pool && R.pool.places) || [];
+        const ex = pl.filter((x) => x.page === 'P6' && OPI(x) && OPI(x).op === '+');
+        const tn = (k) => { const m = String(k).match(/^(\d+)\+(\d+)$/); return m ? `${m[2]}+${m[1]}` : k; };
+        const on = new Set(pl.filter((x) => /^P[345]/.test(x.page)).flatMap((x) => [String(x.item), tn(x.item)]));
+        const probs = [];
+        for (const x of ex) { const o = OPI(x), d0 = Math.abs(o.a - o.b); if (d0 === o.a || d0 === o.b) probs.push(`${x.item}: ${Math.max(o.a, o.b)} − ${Math.min(o.a, o.b)} = ${d0} is a part`); if (on.has(String(x.item))) probs.push(`${x.item} (or its turn-around) is on a lesson page`); }
+        row('E36', 'Exit slip + items: no part equals the difference of the parts; each fresh (not on P3–P5, nor turned round)', ex.length ? (probs.length ? probs.join('; ') : `${ex.map((x) => x.item).join(', ')}: clean and fresh`) : 'no + exit items', !probs.length);
     }
     // E30 (critic r3 S1): a number the lesson declares `boardOnly` (shown on the board only) is never a
     // pupil item's number or answer, and never printed on a pupil page or key (digits, with or without

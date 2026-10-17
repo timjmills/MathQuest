@@ -239,6 +239,8 @@ export const CASE_TESTS = Object.freeze({
     // person "gets ... more", "now"; put together: two people, "in all", nothing more)
     wpAddToAny: (it) => { const t = String((it && it.q && it.q.text) || ''); return !!wpParts(it) && /\bmore\b/i.test(t) && /\bnow\b/i.test(t); },
     wpPutTogether: (it) => { const t = String((it && it.q && it.q.text) || ''); return !!wpParts(it) && /\bin all\b/i.test(t) && !/\bmore\b/i.test(t); },
+    // (exit slip, critic r3 D3: no part is the difference of the parts - 4 + 8 written 8 − 4 = 4 copies a story number)
+    wpClean: (it) => { const o = wpParts(it); return !!o && o[0] !== 2 * o[1] && o[1] !== 2 * o[0]; },
     wpBridgePT: (it) => CASE_TESTS.wpBridge(it) && CASE_TESTS.wpPutTogether(it) && !CASE_TESTS.wpEqual(it),
     wpBridgeSmallFirstAT: (it) => CASE_TESTS.wpBridgeSmallFirst(it) && CASE_TESTS.wpAddToAny(it),
     wpBridgeBigFirstPT: (it) => CASE_TESTS.wpBridgeBigFirst(it) && CASE_TESTS.wpPutTogether(it),
@@ -368,8 +370,9 @@ export function pickWeDo(items, example, data, n) {
         // (lesson 2 r4, LR-6: a later Guided case is never a near twin of an earlier one - 7 + 9 then 7 + 8 -
         // nor the same answer; a + item only, so other lessons' wants pick as before)
         const plus = (x) => { const q = (x && x.q) || {}; const st = q.cell && q.cell.payload && (q.cell.payload.steps || [])[0]; const o = operandsOf(q).map(Number); return (q.op === '+' || (st && st.op === '+')) && o.length >= 2 ? o : null; };
-        const twin = (x, y) => { const a = plus(x), b = plus(y); if (!a || !b) return false; const da = Math.abs(a[0] - b[0]), db = Math.abs(a[1] - b[1]); return a[0] + a[1] === b[0] + b[1] || (da === 0 && db <= 2) || (db === 0 && da <= 2); };
-        const sameFact = (x, y) => { const a = plus(x), b = plus(y); return !!a && !!b && a.join() === b.join(); };
+        const twin = (x, y) => { const a = plus(x), b = plus(y); if (!a || !b) return false; const da = Math.abs(a[0] - b[0]), db = Math.abs(a[1] - b[1]); return a[0] + a[1] === b[0] + b[1] || (da <= 2 && db <= 2); };
+        // (the chart's own fact or its turn-around - LR-5, critic r3 D1)
+        const sameFact = (x, y) => { const a = plus(x), b = plus(y); return !!a && !!b && (a.join() === b.join() || a.join() === [b[1], b[0]].join()); };
         // (the first set of cells, in order, that meets every want with no twins and not the chart's own fact)
         const pickLead = (k, chosen) => {
             if (k === data.guidedWants.length) return chosen;
@@ -1517,9 +1520,7 @@ export function plan(input = {}) {
         const chantHtml = chantH ? `<div class="mq-lstripchant" style="height:${chantH.toFixed(2)}mm"><b>Rule:</b><span>${esc(data.chant)}</span></div>` : '';
         const content = { kind: 'col', cls: 'mq-lwedotop', parts: [{ kind: 'html', html: stripHtml(data, exSteps, ctx.size) + chantHtml }, grid] };
         groups.push(band(m.strip + stripH + chantH + top.h * (top.rows || 1), { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content }, { h: top.h * (top.rows || 1), grid: [grid], cap: 0.1, capIfEmpty: 0.35 }));
-    // (`guidedStripMm` on lesson data - the detailed lesson maker, lesson 3a: the Guided header wraps to two
-    // lines beside the Steps; the band books that extra height, so the page is not 1-2 mm over)
-    } else if (weDo.length) groups.push(band(m.strip + (Number(data && data.guidedStripMm) || 0) + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: 0.1, capIfEmpty: 0.35 }));
+    } else if (weDo.length) groups.push(band(m.strip + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: 0.1, capIfEmpty: 0.35 }));
 
     /* ---- the Remember strip gives way when it alone pushes the Guided band overleaf */
     const total = groups.reduce((a, g) => a + g.h, 0);

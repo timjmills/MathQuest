@@ -9,7 +9,9 @@
 // Every number a script speaks is a {placeholder} filled from the DEALT items, never typed here.
 
 const NS = (categoryId, skillId, opts, extra) => Object.assign({ categoryId, skillId, opts }, extra || {});
-const WP = (extra, payload) => Object.assign({ categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'bar', wpCues: false, wpBank: false }, partMin: 3, noPart: [10], crossTen: true, crossTenExcept: [20], cellPayload: Object.assign({ layout: 'bar' }, payload || {}), instructionKey: 'story-bar', shortQuestion: true }, extra || {});
+const WP = (extra, payload) => Object.assign({ categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'bar', wpCues: false, wpBank: false }, partMin: 3, noPart: [10], crossTen: true, crossTenExcept: [20], cellPayload: Object.assign({ layout: 'bar' }, payload || {}), instructionKey: 'story-bar', shortQuestion: true, fresh: true, itemSpread: true }, extra || {});
+// (`fresh` / `itemSpread` - the items dealt one by one (exit slip, Check Question): first a story whose turn-around no
+// page dealt (V22: a turn-around only when the pool is spent), and every name and noun the generator has - critic r3 D3, m3)
 // (`shortQuestion`: the question in its short form - "How many books now?", "How many books in all?" -
 // so every sentence of a story fits ONE line of its cell, three lines a story: AX-3, SF-50; critic r2 D4.)
 // (The exit slip: full-size bar items, the story ABOVE its bar, one across a 132.5 mm half - two a half:
@@ -60,7 +62,8 @@ export default {
     // Mixed: EARLIER skills only (V22 §9.5): number bonds and facts within 20.
     mixed: { skills: [
         // (no + 0 and no 1 + 1: both numbers 2 or more)
-        { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20 }, sectionLabel: 'Add facts', minOperand: 2 },
+        // (within 10: the stories hold the sums past 10, so the facts never take a story's fact - critic r3 D1)
+        { categoryId: 'addition', skillId: 'add_facts', opts: { band: 10 }, sectionLabel: 'Add facts', minOperand: 2 },
         { categoryId: 'subtraction', skillId: 'sub_facts', opts: { band: 10 }, sectionLabel: 'Take-away facts', minOperand: 2 },
     // (`leadDrop`: the stories hold at least half the page - a partner's only shelf may go, V22 §9.5, critic r2 D3)
     ], leadDrop: true },
@@ -112,7 +115,7 @@ export default {
         { atom: 1, ref: { categoryId: 'counting', skillId: 'count_objects', opts: { band: 20, objects: 'frame' }, minNum: 17, maxNum: 20 },
             lesson: { id: 'K CC 5', title: 'Count to 20' } },
         // (both parts 2 or more: "4 and 1" can be answered by "one more", with no part-whole idea - critic r2 n5)
-        { atom: 2, ref: { categoryId: 'composing', skillId: 'number_bonds', opts: { band: 10, unknown: 'answer', orientation: 'horizontal' }, minOperand: 2 },
+        { atom: 2, ref: { categoryId: 'composing', skillId: 'number_bonds', opts: { band: 10, unknown: 'answer', orientation: 'horizontal' }, minOperand: 3, partMin: 3 },
             lesson: { id: 'Y1 B2 S2', title: 'Part-whole model' } },
         { atom: 3, items: 4, ref: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20, notation: ['stacked'] }, minNum: 11, maxNum: 16 },
             lesson: { id: 'G1 OA 6', title: 'Add within 20' } },
@@ -131,7 +134,7 @@ export default {
     // ------------------------------------------------------------------ P5 Word problem
     // The same skill with the bar OFF: the pupil draws the bar (the fade).
     wordProblem: {
-        ref: { categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'none', wpCues: false, wpBank: false }, minNum: 11, maxNum: 19, partMin: 3, noPart: [10], crossTen: true, shortQuestion: true },
+        ref: { categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'none', wpCues: false, wpBank: false }, minNum: 11, maxNum: 19, partMin: 3, noPart: [10], crossTen: true, shortQuestion: true, fresh: true, itemSpread: true },
         want: 'wpBridgeSmallFirst',
         // The dealt story itself (its own words and numbers); the bar is OFF - the pupil draws it in the Workspace.
         answerLine: 'The answer: __ {wp.unit}.',
@@ -147,8 +150,8 @@ export default {
     exit: [
         // (two a half, full size: the story above its bar, so each sentence keeps its line - critic r2 D4. Both
         // situations are assessed: a. put together, b. add to.)
-        { case: 'put together, big part first, a whole of 14 or more', ref: WP({ minNum: 14, maxNum: 19 }, EXIT_BAR), want: ['wpBridgeHigh', 'wpBridgeBigFirst', 'wpPutTogether'], detects: 'Copies a story number as the answer; count slip past 10.' },
-        { case: 'add to, small part first (Critical Atom)', ref: WP({ minNum: 11, maxNum: 19 }, EXIT_BAR), want: ['wpBridgeSmallFirst', 'wpAddToAny'], detects: 'The whole written in a part box.' },
+        { case: 'put together, big part first, a whole of 14 or more', ref: WP({ minNum: 14, maxNum: 19 }, EXIT_BAR), want: ['wpBridgeHigh', 'wpBridgeBigFirst', 'wpPutTogether', 'wpClean'], detects: 'Copies a story number as the answer; count slip past 10.' },
+        { case: 'add to, small part first (Critical Atom)', ref: WP({ minNum: 11, maxNum: 19 }, EXIT_BAR), want: ['wpBridgeSmallFirst', 'wpAddToAny', 'wpClean'], detects: 'The whole written in a part box.' },
     ],
     exitCols: 1,
     exitInstruction: 'Read the story. Fill in the bar. Solve.',
@@ -158,7 +161,7 @@ export default {
 
     // ------------------------------------------------------------------ retrieval (MWB)
     retrieval: [
-        { ref: { categoryId: 'composing', skillId: 'number_bonds', opts: { band: 10, unknown: 'answer' } }, ask: 'Write the whole: the bond on the board.' },
+        { ref: { categoryId: 'composing', skillId: 'number_bonds', opts: { band: 10, unknown: 'answer' }, partMin: 3 }, ask: 'Write the whole: the bond on the board.' },
         { ref: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20, notation: ['across'] }, minNum: 11, maxNum: 19 }, ask: 'Solve the fact on the board.' },
     ],
 
@@ -243,6 +246,8 @@ export default {
                 { ask: '{chart.question}', note: 'Step 4. Expected: [[{chart.whole}]] {chart.unit}.' },
                 { do: 'Now an add-to story. Write on the board: {chart2.text}' },
                 { say: 'Gets more: a part. Now: the whole.', note: 'Parts [[{chart2.parts}]]; whole [[{chart2.whole}]].' },
+                // (the chart's third example, on the board: equal parts - the ★★★ row's case, modelled - critic r3 m4)
+                { do: 'Equal parts. Write on the board: {chart3.text}', note: 'Still add the parts: [[{chart3.parts}]], whole [[{chart3.whole}]].' },
                 { ask: 'Swap the cube trains. Same whole?', note: 'Expected: yes, the bar is the same length.' },
             ] },
         { n: 6, name: 'We Do: Guided Practice', min: 8, page: 'P3', boxes: [{ kind: 'feedback', title: 'Fix it at once', text: 'Fix: touch the top box and ask “Is that a part?”' }],
@@ -261,7 +266,8 @@ export default {
             loop: { most: 'Go on to You Do.', half: 'Redo one story on the bar mat with cubes, then two more.', fewer: 'Stop. Cubes again with two stories. Write each part under its train.' } },
         { n: 8, name: 'You Do: Independent Practice', min: 10, page: 'P4', boxes: [{ kind: 'watch', title: 'The last row', text: 'The last row (★★★): equal parts and a whole of 20. Walk there first.' }],
             rows: [
-                { do: 'Pupils do Practice 1. The Steps are at the top of the page.' },
+                // ({p4.steps}: read from whether Practice 1 prints its Steps band - critic r3 D2)
+                { do: 'Pupils do Practice 1. {p4.steps}' },
                 { do: 'Visit ELL and SPED pupils first, within 60 seconds.' },
                 { ask: 'Point to the parts. Point to the whole.', note: 'Praise: “You put the parts below. That is step 2.”' },
                 { do: 'Early finishers: Mixed 1, the stories and the facts. Or send it home.', note: 'Mixed 1 answers: T6.' },
