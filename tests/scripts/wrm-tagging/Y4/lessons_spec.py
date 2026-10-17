@@ -185,7 +185,7 @@ lesson(G + 'distributiveandadditivearea',
     pre=[('area_perimeter:area_unit_squares', {'forms': [1]}, 'Y4.B3.S2', 'counting the unit squares of an L-shape'),
          ('multiplication:mult_properties', {'forms': [1]}, 'Y4.B5.S2', 'breaking a fact apart by its rows (5 × 8 = 4 × 8 + 1 × 8)'),
          ('multiplication:area_model_mult', {'tiles': 21}, 'Y4.B5.S9', 'a number split into tens and ones, each part multiplied and the parts added')],
-    related=[('area_perimeter:composite_shapes', {'forms': [1], 'band': 25}, 'the perimeter and the area of a small L- or T-shape with every side length given (areas 14 to 24)')],
+    related=[('area_perimeter:composite_shapes', {'forms': [1], 'band': 25}, 'the perimeter and the area of a small L- or T-shape (areas 14 to 24); two side lengths are not labelled and are worked out from the others first')],
     note='Awsaj supplement lesson, W20-W21, 3.MD.C.7, 7c, 7d, block Y4.B3. The story forms of other skills are not this clause: area_perimeter:area '
          'forms 2 tells a story of ONE rectangle (linked in the area-as-multiplication lesson), area_perimeter:perimeter forms 2 a perimeter story and '
          'area_perimeter:volume forms 2 a box (3-D); none is a rectilinear floor plan.',

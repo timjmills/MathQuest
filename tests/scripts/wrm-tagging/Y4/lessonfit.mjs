@@ -78,6 +78,17 @@ const YR = ['R', 'Y1', 'Y2', 'Y3', 'Y4', 'Y5', 'Y6'];
 const SRC = {};
 for (const l of SITE) { const m = l.flag === 'enrich-native' && String(l.note || '').match(/^Source: G?(PK|K|\d)\./); if (m) SRC[l.id] = m[1] === 'PK' ? 0 : m[1] === 'K' ? 1 : +m[1] + 1; }
 const isSupport = id => SRC[id] != null && SRC[id] < 4;
+// G5 (critic r2): the times tables a Support lesson's source year knows (Grade 2 = WRM Y3: 2, 5, 10 and 3, 4, 8; Grade 1 = WRM Y2:
+// 2, 5, 10); none at Kindergarten or below
+const SRC_TABLES = { 3: new Set([1, 2, 3, 4, 5, 8, 10]), 2: new Set([1, 2, 5, 10]), 1: new Set(), 0: new Set() };   // WRM Y2 (Grade 1) teaches the 2, 5 and 10 tables
+function supportTables(id, e) {
+  if (!isSupport(id) || !SRC_TABLES[SRC[id]]) return [];
+  const ok = SRC_TABLES[SRC[id]], out = [], o = e.opts || {}, used = new Set();
+  for (const k of ['constant', 'tables', 'table', 'factors']) for (const v of [].concat(o[k] ?? [])) if (typeof v === 'number') used.add(v);
+  for (const m of String(e.why || '').matchAll(/\b(\d{1,2})\s*(?:times[- ]tables?|×\s*tables?)\b/gi)) used.add(+m[1]);
+  for (const v of used) if (!ok.has(v)) out.push(`G5 rule 19: the ${v} times-table is beyond this Support lesson's source year ${YR[SRC[id]]}`);
+  return out;
+}
 const srcYear = id => YR[SRC[id]];
 const phaseOf = id => { const m = String(siteOf[id]?.note || '').match(/\(Phase (\d+)\)/); return m ? PH[m[1]] : null; };
 const NATIVE_STEP = { 'G3|-|poundstensonesandpenceusdollarscents': 'Y4.B10.S1' };   // the retitled Y4 step (site note)
@@ -376,12 +387,32 @@ export function claimLists(text, items, qs, e) {
     const shown = v => items.some(i => (payOf(i).notes || []).includes(v) || new RegExp(`\\$${v} bill`).test(i.text || ''));
     for (const v of vals) { if (neg && shown(v)) out.push(`G3: says "${t.slice(Math.max(0, m.index - 12), m.index + m[0].length).trim()}", but items show a $${v} bill`);
       if (!neg && !shown(v)) out.push(`G3: names a $${v} bill, but no item shows one`); } }
-  for (const m of t.matchAll(/\b(\w+\s+of\s+)?the other (?:models|pictures|shapes|choices|options)(?:\s+are)?\s+(?:all\s+)?in\s+([a-z ,]+)/gi)) {
+  for (const m of t.matchAll(/\b(\w+\s+of\s+)?the other (?:models|pictures|shapes|choices|options)(?:\s+are)?\s+(?:all\s+)?(?:in|shows?|are)\s+([a-z ,]+)/gi)) {
     if (m[1] && /some|most|many|a few/i.test(m[1])) continue;
     const fam = famSet(m[2]); if (!fam.size) continue;
     const bad = items.filter(i => { const p = payOf(i); if (!Array.isArray(p.terms)) return false; const ans = p.answer?.letter;
       return p.terms.some(x => x.letter !== ans && !fam.has(x.d)); }).length;
     if (bad) out.push(`G3: says "${m[0].trim()}", but ${bad} of ${N} items show another model outside ${[...fam].map(x => '/' + x).join(' ')}`); }
+  // G4 (critic r2): a listed set of group sizes is complete: an item with a size outside the list fails ("groups of 3, 4 or 5", 6 dealt)
+  for (const m of t.matchAll(/\bgroups? of ((?:\d+,\s*)*\d+,?\s+(?:or|and)\s+\d+)\b/gi)) { if (negBefore(t, m.index) || /\b(?:such as|like|e\.g\.|for example|including|among them)\s*$/i.test(t.slice(0, m.index))) continue;
+    const list = new Set(m[1].match(/\d+/g).map(Number)), sizes = new Set();
+    for (const i of items) { const sz = payOf(i).size; if (typeof sz === 'number') sizes.add(sz); for (const mm of String(i.text || '').matchAll(/\bgroups? of (\d+)\b|\b(\d+) in each\b/gi)) sizes.add(+(mm[1] || mm[2])); }
+    const off = [...sizes].filter(x => !list.has(x)); if (off.length) out.push(`G4: says "groups of ${m[1]}", but items have groups of ${off.sort((a, b) => a - b).join(', ')} (the list is not complete)`); }
+  // G4: a coin the text denies ("never a quarter", "no 25-cent coin", "never dimes") is not in any money item's payload
+  if (e && MONEYK.test(e.key)) { const COIN = [[1, 'penn(?:y|ies)|1-cent'], [5, 'nickels?|5-cent'], [10, 'dimes?|10-cent'], [25, 'quarters?|25-cent'], [50, 'half[- ]dollars?|50-cent'], [100, 'dollar coins?']];
+    const coinsOf = i => { const p = payOf(i), c = new Set(); if (Array.isArray(p.values) && Array.isArray(p.counts)) p.values.forEach((v, j) => { if (p.counts[j] > 0) c.add(v); });
+      for (const k of ['coins', 'set', 'given']) if (Array.isArray(p[k])) for (const x of p[k]) { const v = typeof x === 'number' ? x : (x && (x.v ?? x.value ?? x.c)); if (typeof v === 'number') c.add(v); }
+      for (const [v, re] of COIN) if (new RegExp(`\\b(?:${re})\\b`, 'i').test(`${i.text || ''} ${i.a || ''}`)) c.add(v); return c; };
+    const dealt = new Set(); for (const i of items) for (const v of coinsOf(i)) dealt.add(v);
+    // the coin is the denial's own object ("never a quarter", "no 25-cent coins", "never uses dimes or nickels"), not a word inside
+    // another denied thing ("never the amount split into tens, ones, dimes and pennies")
+    for (const [v, re] of COIN) for (const mm of t.matchAll(new RegExp(`\\b(?:no|never|not|without|nor)\\s+(?:(?:uses?|shows?|chooses?|gives?|deals?|with|any|an?|one|single)\\s+){0,3}(?:(?:${COIN.map(c => c[1]).join('|')})(?:\\s+coins?)?\\s*(?:,|or|and|nor)\\s*(?:an?\\s+)?)*(?:${re})\\b`, 'gi')))
+      if (dealt.has(v)) out.push(`G4: says "${mm[0].trim()}", but items deal a ${v}-cent coin`); }
+  // G4: a layout claim ("every side length given / labelled", "no side to work out") is read against the shape's labels and sides
+  if (/\b(?:every|each|all(?: the)?) sides?(?: lengths?)?(?: is| are)? (?:given|labell?ed|shown|marked)\b|\bno (?:missing )?(?:side|length)s?(?: lengths?)? to (?:work out|find)\b|\bnothing to work out\b|\bno missing (?:side|length)s?\b/i.test(t)) {
+    const SIDES = { L: 6, T: 8, U: 8, rectangle: 4, square: 4 };
+    const bad = qs.filter(q => { const gd = q && q.geometryData; if (!gd || !gd.dims || !SIDES[gd.shapeType]) return false; return Object.keys(gd.dims).length < SIDES[gd.shapeType] && !['rectangle', 'square'].includes(gd.shapeType); }).length;
+    if (bad) out.push(`G4: says every side is given, but ${bad} of ${N} items label fewer sides than the shape has (sides to work out first)`); }
   return out;
 }
 // a why that says the items ask how long something takes (a duration) needs items that ask for one
@@ -509,7 +540,7 @@ function citeCheck(id, e) {
   if (!String(e.why).startsWith(`${ref} ${titles[ref]}`)) out.push(`the why does not give the cited unit's own title after ${ref}`);
   if (!(taught[e.key] && taught[e.key].has(ref))) out.push(`cites ${ref}, which ${e.key} is not tagged to (and is not that unit's direct / partial)`);
   if (ref === id) out.push('cites the lesson itself');
-  for (const m of String(e.why).matchAll(/\b(?:wk|week)\s+(W\d\d)\b/gi)) if (wkOf(ref) && m[1] !== wkOf(ref)) out.push(`the why says ${m[0]}, but ${ref} is taught ${wkOf(ref)}`);
+  for (const m of String(e.why).matchAll(/\b(?:wk|week)\s+W?(\d{1,2})\b/gi)) if (wkOf(ref) && +m[1] !== n(wkOf(ref))) out.push(`the why says ${m[0]}, but ${ref} is taught ${wkOf(ref)}`);
   const ry = unitYear(ref), ri = YR.indexOf(ry);
   if (isSupport(id)) {
     const ph = phaseOf(id);
@@ -554,6 +585,7 @@ function missedOptions(s) {
   const near = (p, ws) => { for (let j = 0; j + 1 < p.length; j++) for (let q = j + 1; q <= j + 3 && q < p.length; q++) if (p[j] === ws[0] && p[q] === ws[1]) return true; return false; };
   for (const k of pool) { const [c, sk] = k.split(':');
     if (isNamed(c, sk)) continue;
+    if (TIME.test(k) && !mine.some(e => TIME.test(e.key))) continue;   // G4: a coin denial ("never a quarter") is not a time option
     for (const def of so.optionsFor(c, sk) || []) { if (!def.values || def.group === 'support' || ['band', 'range', 'support', 'cover', 'mix'].includes(def.id)) continue;
       for (const v of def.values) { const L = String(v.l ?? '');
         if (/^(no|off|none)\b/i.test(L)) continue;
@@ -614,7 +646,7 @@ for (const [id, s] of Object.entries(d.lessons || {})) {
     if (!TIME.test(e.key) && r.max > limit) fails.push(`${tag}: size ${r.max} > ${limit} (the lesson deals to ${ownMax}${cm ? ', its cited unit to ' + citedCeil(cm[1]) : ''}) — ${r.ex}`);
     const wS = stripCited(e.why);
     for (const f of [...boundBreaks(wS, r.items), ...claimLists(wS, r.items, r.qs, e), ...durationClaim(CL.positive(wS), r.items)]) fails.push(`${tag}: ${f}`);
-    for (const f of [...content(id, e, r, role), ...whyCheck(e, r), ...y6Why(e, r), ...digitSymbolChecks(e.why, r.items), ...unitNegChecks(e.why, r.items), ...betweenChecks(e.why, r.items), ...(role === 'pre' ? citeCheck(id, e) : []), ...denomsCheck(e, role, CL.claimText(e.why, titles))]) fails.push(`${tag}: ${f}`);
+    for (const f of [...content(id, e, r, role), ...whyCheck(e, r), ...y6Why(e, r), ...digitSymbolChecks(e.why, r.items), ...unitNegChecks(e.why, r.items), ...betweenChecks(e.why, r.items), ...(role === 'pre' ? citeCheck(id, e) : []), ...supportTables(id, e), ...denomsCheck(e, role, CL.claimText(e.why, titles))]) fails.push(`${tag}: ${f}`);
   }
   for (const role of ['direct', 'partial']) for (const e of s[role]) {
     const r = P(e);

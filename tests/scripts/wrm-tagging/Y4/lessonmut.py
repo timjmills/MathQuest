@@ -153,6 +153,29 @@ def _(d): e = _f(L(d, 'measuretothehalfandquarterinch')['pre'], 'fractions:ident
 def _(d): L(d, 'comparedurationsoftime')['related'][0]['why'] = 'how long an activity takes, in minutes'
 @m('CITE week text: L1 pre why "(wk W09)" for a W02 step', r'the why says wk W09')
 def _(d): P_('findtheruleinaninputoutputtable', 1)(d)['why'] += ' (wk W09)'
+# critic r2 G4 / G5 / n7 (round 3)
+@m('G4 layout: L8 related why "every side length given" (4 labels on 6 / 8 sides)', r'G4: says every side is given')
+def _(d): L(d, 'distributiveandadditivearea')['related'][0]['why'] = 'the perimeter and the area of a small L- or T-shape with every side length given (areas 14 to 24)'
+@m('G4 layout: L8 related why "with no side to work out"', r'G4: says every side is given')
+def _(d): L(d, 'distributiveandadditivearea')['related'][0]['why'] = 'the perimeter and the area of a small L- or T-shape with no side to work out (areas 14 to 24)'
+@m('G4 incomplete list: L23 clause "groups of 3, 4 or 5" (6 dealt)', r'G4: says "groups of 3, 4 or 5".*not complete')
+def _(d): q = L(d, 'sharingandgroupingfairshares')['partial'][0]; q['missing'] = q['missing'].replace('groups of 3, 4, 5 or 6', 'groups of 3, 4 or 5')
+@m('G4 incomplete list: L23 clause "groups of 3 or 4"', r'G4: says "groups of 3 or 4".*not complete')
+def _(d): q = L(d, 'sharingandgroupingfairshares')['partial'][0]; q['missing'] = q['missing'].replace('groups of 3, 4, 5 or 6', 'groups of 3 or 4')
+@m('G4 coin denial: L22 clause "never a quarter"', r'G4: says "never a quarter", but items deal a 25-cent coin')
+def _(d): q = L(d, 'selectmoney')['partial'][0]; q['missing'] = q['missing'].replace('never chooses bills', 'never a quarter, never chooses bills')
+@m('G4 coin denial: L22 clause "never a 25-cent coin"', r'G4: says "never a 25-cent", but items deal a 25-cent coin')
+def _(d): q = L(d, 'selectmoney')['partial'][0]; q['missing'] = q['missing'].replace('never chooses bills', 'never a 25-cent coin, never chooses bills')
+@m('G4 coin denial: L22 clause "never uses dimes or nickels"', r'G4: says "never uses dimes or nickels"')
+def _(d): q = L(d, 'selectmoney')['partial'][0]; q['missing'] = q['missing'].replace('never chooses bills', 'never uses dimes or nickels, never chooses bills')
+@m('G4 "all the other models show thirds, fifths or sixths"', r'G3: says "the other models show')
+def _(d): e = [x for x in L(d, 'measuretothehalfandquarterinch')['pre'] if x['key'] == 'fractions:identify'][0]; e['why'] = e['why'].replace('some of the other models are in thirds, fifths or sixths', 'all the other models show thirds, fifths or sixths')
+@m('G5 Support Grade 2 source: L14 pre mult_facts x7, why "the 7 times-table"', r'G5 rule 19: the 7 times-table')
+def _(d): e = L(d, 'comparingmultiplicationstatements')['pre'][0]; e['opts'] = {'constant': [7]}; e['why'] = 'Y3.B3.S11 The 4 times-table (Grade 2, the source grade): the 7 times-table facts'
+@m('G5 Support Grade 1 source: L15 pre count_by_tables x3', r'G5 rule 19: the 3 times-table')
+def _(d): e = [x for x in L(d, 'countmoneynotesandcoins')['pre'] if x['key'] == 'multiplication:count_by_tables'][0]; e['opts'] = {'constant': [3]}
+@m('n7 free-text week: L2 pre why "week 9" for a W02 step', r'the why says week 9')
+def _(d): e = L(d, 'patternsonthemultiplicationtable')['pre'][1]; e['why'] = e['why'].replace('wk W02', 'week 9')
 AUD = json.load(open(os.path.join(H, 'full_audit.json')))
 AM = []
 def _a1(d, a): a[G + 'solveadditionandsubtractionwordproblemswithin1000usingbarmodels']['ccss']['3.OA.D.8'] = 'Solve two-step word problems with the four operations: the stories are dealt with a bar model on every item, as the title asks'
