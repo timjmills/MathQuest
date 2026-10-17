@@ -75,9 +75,9 @@ export function plan(input = {}) {
     // full width, with its step text over it in the same row (PT-MOD-2 cannot hold it beside).
     let H = cols === 2 ? Math.max(hMinAt([it], 2, ctx), textH) : hMinAt([it], 1, ctx) + textH;
     // critic skip-count r1 D5: a full-width state whose steps are all short (one line across the page) gives its text one
-    // line, when that is what keeps the whole model on one page (L: four count-row states and the Say band)
+    // line, when that is what keeps the whole model on one page (L: four count-row states and the Say band) - count rows only (merge round: other skills keep the base layout)
     const room1 = m.budget - m.strip - m.say;
-    if (cols === 1 && Math.floor(room1 / H) < steps.length && steps.every((t) => t.length <= 48)) {
+    if (marks && cols === 1 && Math.floor(room1 / H) < steps.length && steps.every((t) => t.length <= 48)) {
         const H1 = hMinAt([it], 1, ctx) + (m.pitch + 1.5) + 6;
         if (Math.floor(room1 / H1) >= steps.length) { textH = (m.pitch + 1.5) + 6; H = H1; }
     }
