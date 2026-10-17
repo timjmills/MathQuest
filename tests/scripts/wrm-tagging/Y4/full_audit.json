@@ -1,0 +1,126 @@
+{
+ "_doc": "The hand audit of every FULL Y4 site lesson against its title AND every CCSS code the site tags it with (data/standards/ccss-math.json descriptors), read from generated items (60 a link, seed 24680, plus the gates' 40). lessoncheck.py and lessonfit.mjs read it: a FULL lesson with no row, a row whose links are not the lesson's direct links, a row missing one of the lesson's site CCSS codes, a row reading a code the site does not tag, or a row for a lesson that is not FULL fails the build. A code (or a clause of one) the content does not teach is marked 'site tag:' with the reason (owner questions in the report).",
+ "G3|-|findtheruleinaninputoutputtable": {
+  "links": [
+   {
+    "key": "algebra:function_table_easy",
+    "opts": {
+     "ftTask": "rule",
+     "ftRules": [
+      "+",
+      "-"
+     ],
+     "band": 100
+    }
+   },
+   {
+    "key": "algebra:function_table_easy",
+    "opts": {
+     "ftTask": "rule",
+     "ftRules": [
+      "x",
+      "/"
+     ],
+     "band": 20
+    }
+   }
+  ],
+  "title": "Find the rule in an input-output table: every item is an In / Out table (function machine frame) with all four rows filled, and the pupil writes the rule as an operation and a number: + 23 or − 10 with numbers to 100 (first link), × 2 to × 5 or ÷ 2 to ÷ 5 with every number to 20, so every row is a table fact (second link: × 4, 2 → 8; ÷ 4, 12 → 3)",
+  "ccss": {
+   "3.OA.D.9": "Identify arithmetic patterns: the rule of a table is the pattern the pupil identifies, in all four operations. Site tag: explaining a pattern with the properties of operations (4 × a number is always even) is not dealt here; it is the same week's lesson 'Patterns on the multiplication table' (partial, build patterns_notice)"
+  }
+ },
+ "G3|-|propertiesofmultiplicationcommutativeidentityanddistributive": {
+  "links": [
+   {
+    "key": "multiplication:mult_properties",
+    "opts": {
+     "forms": [
+      0,
+      1,
+      2
+     ]
+    }
+   }
+  ],
+  "title": "Properties of multiplication, the three the title names: commutative (forms 0: an array, the pupil writes both facts, 4 × 5 = 20 and 5 × 4 = 20), identity (forms 2: 7 × 1 = 7, 1 × 11 = 11, with 'any number times 1 is that number') and distributive (forms 1: 4 × 6 = 1 × 6 + __ × 6, the fact broken apart by its rows), each about a third of the items",
+  "ccss": {
+   "3.OA.B.5": "Apply properties of operations as strategies: the commutative example (6 × 4 known gives 4 × 6) and the distributive idea (8 × 7 as 8 × 5 + 8 × 2; the items break the other factor, 4 × 6 = 1 × 6 + 3 × 6) are dealt as items. Site tag: the associative property (3 × 5 × 2) is not in the title and not dealt; the step that teaches it is Y4.B4.S13 'Multiply three numbers' (W04, a gap, build mult_three)"
+  }
+ },
+ "G3|-|solveadditionandsubtractionwordproblemswithin1000usingbarmodels": {
+  "links": [
+   {
+    "key": "addition:add_wp_1k",
+    "opts": {
+     "band": 1000,
+     "support": "bar"
+    }
+   },
+   {
+    "key": "subtraction:sub_wp_1k",
+    "opts": {
+     "band": 1000,
+     "support": "bar"
+    }
+   }
+  ],
+  "title": "Solve addition and subtraction word problems within 1000 using bar models: add_wp_1k tells join and put-together stories (Omar has 329 marbles, Kofi has 92, how many in all) and sub_wp_1k take-away stories (483 dollars, gives 330), every number and answer within 1,000, with the bar model drawn under the story on every item (payload bar: true); the pupil picks the operation and writes the answer",
+  "ccss": {
+   "3.NBT.A.2": "Add and subtract within 1000: every story is one addition or one subtraction of 3-digit numbers (or a 3-digit and a 2-digit number) with the answer within 1,000, worked in the word-work cell",
+   "3.OA.D.8": "Site tag: 3.OA.D.8 is two-step problems with the four operations and a letter for the unknown; these stories are one step. The two-step lesson of the site is 'Two-step word problems with the four operations' (W06, partial, build multi_step_four_ops); owner question 2"
+  }
+ },
+ "G3|-|compareamountsmorefewersame": {
+  "links": [
+   {
+    "key": "comparing:compare_groups",
+    "opts": {
+     "band": 5,
+     "level": [
+      1
+     ]
+    }
+   }
+  ],
+  "title": "Compare amounts (more, fewer, same), judged at Reception (source Pre-K): two groups of counters, each group 1 to 5, and the pupil says which group has more, which has fewer, or whether the two are the same or not the same (all three questions dealt; the counts are not written, level 1)",
+  "ccss": {}
+ },
+ "G3|-|countmoneynotesandcoins": {
+  "links": [
+   {
+    "key": "measurement:money_count",
+    "opts": {
+     "currency": "usd",
+     "kind": "both"
+    }
+   }
+  ],
+  "title": "Count money, notes and coins, judged at Grade 1 (WRM Year 2): every item draws dollar bills ($1 to $50) and coins (pennies to quarters); the pupil counts the bills, then the coins, and writes both numbers (16 dollars, 36 cents), totals to 100 dollars, as the Grade 2 lane judged the same Support title",
+  "ccss": {}
+ },
+ "G3|-|doublesandneardoubleswithin20": {
+  "links": [
+   {
+    "key": "number_sense:doubles_near_doubles",
+    "opts": {}
+   }
+  ],
+  "title": "Doubles and near doubles within 20, judged at Grade 2 (WRM Year 3): doubles (5 + 5, 8 + 8), doubles plus one (7 + 8 from 7 + 7 = 14) and doubles minus one (8 + 7 from 8 + 8 = 16), every sum from 2 to 20, each kind about a third of the items",
+  "ccss": {
+   "2.OA.B.2": "Fluently add within 20 using mental strategies: the doubles and near-doubles strategy for sums within 20 is dealt. Site tag: subtraction within 20 is not in the title and not dealt; the rest of the fluency standard belongs to the Grade 2 fact lessons"
+  }
+ },
+ "G3|-|finddurationsoftime": {
+  "links": [
+   {
+    "key": "measurement:elapsed_visual_easy",
+    "opts": {}
+   }
+  ],
+  "title": "Find durations of time, judged at Grade 1 (WRM Year 2): two clock faces (start and end) and a time line with the hours written; the pupil writes how long it takes in hours and minutes, every duration a whole or a half hour from 30 minutes to 3 hours",
+  "ccss": {
+   "3.MD.A.1": "Site tag: the Grade 3 standard asks for times to the nearest minute and intervals in minutes; this Support lesson is judged at its Grade 1 source, where durations are whole and half hours on a time line, which the items deal. Owner question 3"
+  }
+ }
+}
