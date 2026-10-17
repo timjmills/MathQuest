@@ -329,5 +329,10 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
   sub-range). Before deploy: `ws-stamp-assets` (new modules). Owner questions open: EE set for lessons 4/5 (repo M.EE.3.OA.8 vs owner
   list M.EE.3.OA.9); 1.OA.A.1 audit verdict should be partial.
 - 2026-10-17: DEPLOYED the detailed lesson maker (V22, "Lesson: detailed" beside "Lesson: standard") + the first 5 lessons (G2 numbers to 1,000; G1 bar-model word problems; G3 commutative; G3 multiplication-table patterns; G3 input-output rules; all critic PASS, every page >= 8). master 65babbb6; live serves sheet/roles/detailed-lesson.js. Deploy fixes: ws-teacher-shell role list gains detailed-lesson; mult_properties legacy forms print ×. Session session_01X3UTDSXAaEp5yiDxwukHaa archived. Y6 site lessons merged (critic r2 PASS).
+- 2026-10-17: Y1 site lessons merged (critic r3 PASS); mergeall 1,042 tags 0 problems. Started session_01Mp7KgtodxgpQGxJ2Vyxgrj
+  for owner lessons 6-10 (G4 10x / one tenth of a digit; G3 two-step word problems; G4 multiply/divide multiples of 10; G5 digit
+  values 10x / 1/10; G5 decimals to thousandths in words and expanded form; all overdue) on `claude/sweet-newton-c8wrv1-wip-detailed-lessons-2`.
+  Generator bug lane (equiv_frac_nv, denoms payload, percent_of_number 33%, simplify negatives, distributive_expr GCF) runs as a
+  local builder on `claude/sweet-newton-c8wrv1-wip-genbugs`.
 - Held for after these land: Lane B answer boxes + regroup boxes (spec `design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md`),
   placevalue:identify write-value (spec `design/audit/runs/next-session/PV-IDENTIFY-WRITE-VALUE-SPEC.md`).
