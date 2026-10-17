@@ -1,0 +1,21 @@
+note composing/mixed_composing  "Mixed Number Sense"  [mixed pool]
+       . [mixed-pool] deliberately mixed: draws from 16 sibling skills in composing, whose names together declare +
+       . [cell-shape] mixed practice, so 10 different cell shapes on one page: base10 19%, picture:number 30%, chart 10%, tenframe 13%, picture:fraction-input 6%, select 8%, tiles 3%, oddeven 5%, rods 4%, numberline 2% (base10-build, (none), hundreds-chart-fill, ten-frame-build, multi-select, compose-fraction-tiles, odd-even, tens-foundation, fraction-number-line)
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+       . [mc-label] 10 of 240 items answer by picking a label from a bank rather than writing; allowed, but the printed cell must draw the same bank
+
+Failures by class:
+     0  (none)
+
+Notes by class:
+     1  mixed-pool
+     1  cell-shape
+     1  not-checked
+     1  mc-label
+
+By family:
+  k2            1 skills, 0 failing
+
+Coverage: 0 skills where NOTHING could be checked against the name; 1 more with at least one check that could not be applied.
+
+ws-content-audit: OK (1 fraction_of_set,fraction_of_set_hard,add_fractions_like,sub_fractions_like,add_frac_unlike,mixed_composing skills, 240 items each, Max Number 100, 0 failing, 1 mixed pools held to their pool union, 4 notes)

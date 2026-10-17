@@ -1,0 +1,91 @@
+sub_fractions_like S s0 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 2690680083"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 1046032136"] FLAGS KEYLET p1 | KEYLET p2
+sub_fractions_like S s0 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 2690680083"] FLAGS KEYLET p1
+sub_fractions_like S s1 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 3838365172"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 1188045823"] FLAGS KEYLET p1 | KEYLET p2
+sub_fractions_like S s1 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 3838365172"] FLAGS KEYLET p1
+sub_fractions_like S s2 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 1562497397"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 3139740678"] FLAGS KEYLET p1 | KEYLET p2
+sub_fractions_like S s2 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 1562497397"] FLAGS KEYLET p1
+sub_fractions_like S s7 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 2753073657"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 572233450"] FLAGS KEYLET p1 | KEYLET p2
+sub_fractions_like S s7 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 2753073657"] FLAGS KEYLET p1
+sub_fractions_like S s16 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 648913456"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 2830445211"] FLAGS KEYLET p1 | KEYLET p2
+sub_fractions_like S s16 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 648913456"] FLAGS KEYLET p1
+sub_fractions_like M s0 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 2690680083"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 1046032136"] FLAGS KEYLET p1 | KEYLET p2
+sub_fractions_like M s0 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 2690680083"] FLAGS KEYLET p1
+sub_fractions_like M s1 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 3838365172"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 1188045823"] FLAGS KEYLET p1 | KEYLET p2
+sub_fractions_like M s1 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 3838365172"] FLAGS KEYLET p1
+sub_fractions_like M s2 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 1562497397"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 3139740678"] FLAGS KEYLET p1 | KEYLET p2
+sub_fractions_like M s2 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 1562497397"] FLAGS KEYLET p1
+sub_fractions_like M s7 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 2753073657"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 572233450"] FLAGS KEYLET p1 | KEYLET p2
+sub_fractions_like M s7 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 2753073657"] FLAGS KEYLET p1
+sub_fractions_like M s16 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 648913456"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 2830445211"] FLAGS KEYLET p1 | KEYLET p2
+sub_fractions_like M s16 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 648913456"] FLAGS KEYLET p1
+sub_fractions_like L s0 AB {"A":4,"B":4} pages 2 key 2 [A n4 rows 427/427 strip 1% foot "Form A · seed 2690680083"] [B n4 rows 427/427 strip 1% foot "Form B · seed 1046032136"] FLAGS KEYLET p1 | KEYLET p2
+sub_fractions_like L s0 none {"A":4} pages 1 key 1 [A n4 rows 427/427 strip 1% foot "Form A · seed 2690680083"] FLAGS KEYLET p1
+sub_fractions_like L s1 AB {"A":4,"B":4} pages 2 key 2 [A n4 rows 427/427 strip 1% foot "Form A · seed 3838365172"] [B n4 rows 427/427 strip 1% foot "Form B · seed 1188045823"] FLAGS KEYLET p1 | KEYLET p2
+sub_fractions_like L s1 none {"A":4} pages 1 key 1 [A n4 rows 427/427 strip 1% foot "Form A · seed 3838365172"] FLAGS KEYLET p1
+sub_fractions_like L s2 AB {"A":4,"B":4} pages 2 key 2 [A n4 rows 427/427 strip 1% foot "Form A · seed 1562497397"] [B n4 rows 427/427 strip 1% foot "Form B · seed 3139740678"] FLAGS KEYLET p1 | KEYLET p2
+sub_fractions_like L s2 none {"A":4} pages 1 key 1 [A n4 rows 427/427 strip 1% foot "Form A · seed 1562497397"] FLAGS KEYLET p1
+sub_fractions_like L s7 AB {"A":4,"B":4} pages 2 key 2 [A n4 rows 427/427 strip 1% foot "Form A · seed 2753073657"] [B n4 rows 427/427 strip 1% foot "Form B · seed 572233450"] FLAGS KEYLET p1 | KEYLET p2
+sub_fractions_like L s7 none {"A":4} pages 1 key 1 [A n4 rows 427/427 strip 1% foot "Form A · seed 2753073657"] FLAGS KEYLET p1
+sub_fractions_like L s16 AB {"A":4,"B":4} pages 2 key 2 [A n4 rows 427/427 strip 1% foot "Form A · seed 648913456"] [B n4 rows 427/427 strip 1% foot "Form B · seed 2830445211"] FLAGS KEYLET p1 | KEYLET p2
+sub_fractions_like L s16 none {"A":4} pages 1 key 1 [A n4 rows 427/427 strip 1% foot "Form A · seed 648913456"] FLAGS KEYLET p1
+add_fractions_like S s0 AB {"A":9,"B":6} pages 2 key 2 [A n9 rows 285/285/285 strip 1% foot "Form A · seed 3083242614"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 2579766949"] FLAGS KEYLET p1 | KEYLET p2
+add_fractions_like S s0 none {"A":9} pages 1 key 1 [A n9 rows 285/285/285 strip 1% foot "Form A · seed 3083242614"] FLAGS KEYLET p1
+add_fractions_like S s1 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 772049863"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 2885485404"] FLAGS KEYLET p1 | KEYLET p2
+add_fractions_like S s1 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 772049863"] FLAGS KEYLET p1
+add_fractions_like S s2 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 3836621335"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 1655089580"] FLAGS KEYLET p1 | KEYLET p2
+add_fractions_like S s2 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 3836621335"] FLAGS KEYLET p1
+add_fractions_like S s7 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 1199075738"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 3379915945"] FLAGS KEYLET p1 | KEYLET p2
+add_fractions_like S s7 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 1199075738"] FLAGS KEYLET p1
+add_fractions_like S s16 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 1200361820"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 3381893575"] FLAGS KEYLET p1 | KEYLET p2
+add_fractions_like S s16 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 1200361820"] FLAGS KEYLET p1
+add_fractions_like M s0 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 3083242614"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 2579766949"] FLAGS KEYLET p1 | KEYLET p2
+add_fractions_like M s0 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 3083242614"] FLAGS KEYLET p1
+add_fractions_like M s1 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 772049863"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 2885485404"] FLAGS KEYLET p1 | KEYLET p2
+add_fractions_like M s1 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 772049863"] FLAGS KEYLET p1
+add_fractions_like M s2 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 3836621335"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 1655089580"] FLAGS KEYLET p1 | KEYLET p2
+add_fractions_like M s2 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 3836621335"] FLAGS KEYLET p1
+add_fractions_like M s7 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 1199075738"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 3379915945"] FLAGS KEYLET p1 | KEYLET p2
+add_fractions_like M s7 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 1199075738"] FLAGS KEYLET p1
+add_fractions_like M s16 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 1200361820"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 3381893575"] FLAGS KEYLET p1 | KEYLET p2
+add_fractions_like M s16 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 1200361820"] FLAGS KEYLET p1
+add_fractions_like L s0 AB {"A":4,"B":4} pages 2 key 2 [A n4 rows 427/427 strip 1% foot "Form A · seed 3083242614"] [B n4 rows 427/427 strip 1% foot "Form B · seed 2579766949"] FLAGS KEYLET p1 | KEYLET p2
+add_fractions_like L s0 none {"A":4} pages 1 key 1 [A n4 rows 427/427 strip 1% foot "Form A · seed 3083242614"] FLAGS KEYLET p1
+add_fractions_like L s1 AB {"A":4,"B":4} pages 2 key 2 [A n4 rows 427/427 strip 1% foot "Form A · seed 772049863"] [B n4 rows 427/427 strip 1% foot "Form B · seed 2885485404"] FLAGS KEYLET p1 | KEYLET p2
+add_fractions_like L s1 none {"A":4} pages 1 key 1 [A n4 rows 427/427 strip 1% foot "Form A · seed 772049863"] FLAGS KEYLET p1
+add_fractions_like L s2 AB {"A":4,"B":4} pages 2 key 2 [A n4 rows 427/427 strip 1% foot "Form A · seed 3836621335"] [B n4 rows 427/427 strip 1% foot "Form B · seed 1655089580"] FLAGS KEYLET p1 | KEYLET p2
+add_fractions_like L s2 none {"A":4} pages 1 key 1 [A n4 rows 427/427 strip 1% foot "Form A · seed 3836621335"] FLAGS KEYLET p1
+add_fractions_like L s7 AB {"A":4,"B":4} pages 2 key 2 [A n4 rows 427/427 strip 1% foot "Form A · seed 1199075738"] [B n4 rows 427/427 strip 1% foot "Form B · seed 3379915945"] FLAGS KEYLET p1 | KEYLET p2
+add_fractions_like L s7 none {"A":4} pages 1 key 1 [A n4 rows 427/427 strip 1% foot "Form A · seed 1199075738"] FLAGS KEYLET p1
+add_fractions_like L s16 AB {"A":4,"B":4} pages 2 key 2 [A n4 rows 427/427 strip 1% foot "Form A · seed 1200361820"] [B n4 rows 427/427 strip 1% foot "Form B · seed 3381893575"] FLAGS KEYLET p1 | KEYLET p2
+add_fractions_like L s16 none {"A":4} pages 1 key 1 [A n4 rows 427/427 strip 1% foot "Form A · seed 1200361820"] FLAGS KEYLET p1
+add_frac_unlike S s0 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 1916722208"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 4098253963"] FLAGS KEYLET p1 | KEYLET p2
+add_frac_unlike S s0 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 1916722208"] FLAGS KEYLET p1
+add_frac_unlike S s1 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 3106175969"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 2535884018"] FLAGS KEYLET p1 | KEYLET p2
+add_frac_unlike S s1 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 3106175969"] FLAGS KEYLET p1
+add_frac_unlike S s2 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 3986362878"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 261687533"] FLAGS KEYLET p1 | KEYLET p2
+add_frac_unlike S s2 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 3986362878"] FLAGS KEYLET p1
+add_frac_unlike S s7 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 2905715608"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 1329163875"] FLAGS KEYLET p1 | KEYLET p2
+add_frac_unlike S s7 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 2905715608"] FLAGS KEYLET p1
+add_frac_unlike S s16 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 2402818694"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 825575413"] FLAGS KEYLET p1 | KEYLET p2
+add_frac_unlike S s16 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 2402818694"] FLAGS KEYLET p1
+add_frac_unlike M s0 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 1916722208"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 4098253963"] FLAGS KEYLET p1 | KEYLET p2
+add_frac_unlike M s0 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 1916722208"] FLAGS KEYLET p1
+add_frac_unlike M s1 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 3106175969"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 2535884018"] FLAGS KEYLET p1 | KEYLET p2
+add_frac_unlike M s1 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 3106175969"] FLAGS KEYLET p1
+add_frac_unlike M s2 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 3986362878"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 261687533"] FLAGS KEYLET p1 | KEYLET p2
+add_frac_unlike M s2 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 3986362878"] FLAGS KEYLET p1
+add_frac_unlike M s7 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 2905715608"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 1329163875"] FLAGS KEYLET p1 | KEYLET p2
+add_frac_unlike M s7 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 2905715608"] FLAGS KEYLET p1
+add_frac_unlike M s16 AB {"A":6,"B":6} pages 2 key 2 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 2402818694"] [B n6 rows 285/285/285 strip 1% foot "Form B · seed 825575413"] FLAGS KEYLET p1 | KEYLET p2
+add_frac_unlike M s16 none {"A":6} pages 1 key 1 [A n6 rows 285/285/285 strip 1% foot "Form A · seed 2402818694"] FLAGS KEYLET p1
+add_frac_unlike L s0 AB {"A":4,"B":4} pages 2 key 2 [A n4 rows 427/427 strip 1% foot "Form A · seed 1916722208"] [B n4 rows 427/427 strip 1% foot "Form B · seed 4098253963"] FLAGS KEYLET p1 | KEYLET p2
+add_frac_unlike L s0 none {"A":4} pages 1 key 1 [A n4 rows 427/427 strip 1% foot "Form A · seed 1916722208"] FLAGS KEYLET p1
+add_frac_unlike L s1 AB {"A":4,"B":4} pages 2 key 2 [A n4 rows 427/427 strip 1% foot "Form A · seed 3106175969"] [B n4 rows 427/427 strip 1% foot "Form B · seed 2535884018"] FLAGS KEYLET p1 | KEYLET p2
+add_frac_unlike L s1 none {"A":4} pages 1 key 1 [A n4 rows 427/427 strip 1% foot "Form A · seed 3106175969"] FLAGS KEYLET p1
+add_frac_unlike L s2 AB {"A":4,"B":4} pages 2 key 2 [A n4 rows 427/427 strip 1% foot "Form A · seed 3986362878"] [B n4 rows 427/427 strip 1% foot "Form B · seed 261687533"] FLAGS KEYLET p1 | KEYLET p2
+add_frac_unlike L s2 none {"A":4} pages 1 key 1 [A n4 rows 427/427 strip 1% foot "Form A · seed 3986362878"] FLAGS KEYLET p1
+add_frac_unlike L s7 AB {"A":4,"B":4} pages 2 key 2 [A n4 rows 427/427 strip 1% foot "Form A · seed 2905715608"] [B n4 rows 427/427 strip 1% foot "Form B · seed 1329163875"] FLAGS KEYLET p1 | KEYLET p2
+add_frac_unlike L s7 none {"A":4} pages 1 key 1 [A n4 rows 427/427 strip 1% foot "Form A · seed 2905715608"] FLAGS KEYLET p1
+add_frac_unlike L s16 AB {"A":4,"B":4} pages 2 key 2 [A n4 rows 427/427 strip 1% foot "Form A · seed 2402818694"] [B n4 rows 427/427 strip 1% foot "Form B · seed 825575413"] FLAGS KEYLET p1 | KEYLET p2
+add_frac_unlike L s16 none {"A":4} pages 1 key 1 [A n4 rows 427/427 strip 1% foot "Form A · seed 2402818694"] FLAGS KEYLET p1
+mp7 done, flagged 90

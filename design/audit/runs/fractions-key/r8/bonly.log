@@ -1,0 +1,7 @@
+fraction_of_set L s8 AB {"A":6,"B":4} B-alone {"B":6} A-alone {"A":6} LESS
+fraction_of_set L s9 AB {"A":6,"B":4} B-alone {"B":6} A-alone {"A":6} LESS
+fraction_of_set_hard L s14 AB {"A":6,"B":4} B-alone {"B":4} A-alone {"A":6} ok
+fraction_of_set_hard M s7 AB {"A":6,"B":6} B-alone {"B":6} A-alone {"A":6} ok
+sub_wp_20 M s0 AB {"A":6,"B":4} B-alone {"B":4} A-alone {"A":6} ok
+mixed_addition S s2 AB {"A":6,"B":4} B-alone {"B":4} A-alone {"A":6} ok
+fraction_of_set S s5 AB {"A":6,"B":8} B-alone {"B":8} A-alone {"A":6} ok

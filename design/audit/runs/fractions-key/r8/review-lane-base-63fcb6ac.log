@@ -1,0 +1,16 @@
+fraction_of_set S s0 n15 main 12 mixed 3 [fractions:equiv_frac_nv legacy] pages 1/1 [n9 rows 182/167/171/302 strip 2% slack 21/30 13/19 18/30 14/31 14/7 19/19 28/35 28/39 12/21] FLAGS SLACK p1 v28 h39
+fraction_of_set M s0 n14 main 12 mixed 2 [fractions:equiv_frac_nv legacy] pages 1/1 [n8 rows 207/222/221/171 strip 2% slack 10/28 13/18 16/28 9/29 9/7 19/20 16/57 16/59] FLAGS SLACK p1 v19 h59
+fraction_of_set L s0 n7 main 6 mixed 1 [fractions:equiv_frac_nv legacy] pages 1/1 [n5 rows 296/307/197 strip 2% slack 17/24 20/14 21/24 15/24 24/78] FLAGS SLACK p1 v24 h78
+fraction_of_set_hard S s0 n20 main 18 mixed 2 [fractions:fraction_of_set fos] pages 1/1 [n8 rows 215/204/183/219 strip 2% slack 21/8 16/19 17/7 16/8 17/19 17/8 17/11 15/10] ok
+fraction_of_set_hard M s0 n14 main 12 mixed 2 [fractions:fraction_of_set fos] pages 1/1 [n6 rows 269/265/285 strip 2% slack 17/9 19/18 21/6 16/7 21/9 16/12] ok
+fraction_of_set_hard L s0 n7 main 6 mixed 1 [fractions:fraction_of_set fos] pages 1/1 [n3 rows 368/408 strip 5% slack 20/14 24/13 20/32] FLAGS SLACK p1 v24 h32
+add_fractions_like S s0 n20 main 18 mixed 2 [fractions:fraction_nl_drag nl-place] pages 1/1 [n8 rows 256/256/312 strip 2% slack 10/11 10/11 10/11 10/11 10/11 12/17 17/12 8/7] ok
+add_fractions_like M s0 n7 main 6 mixed 1 [fractions:fraction_nl_drag nl-place] pages 1/1 [n5 rows 280/280/262 strip 2% slack 7/20 7/20 7/20 7/20 7/31] FLAGS SLACK p1 v7 h31
+add_fractions_like L s0 n7 main 6 mixed 1 [fractions:fraction_nl_drag nl-place] pages 1/1 [n3 rows 428/381 strip 2% slack 17/15 17/15 17/31] FLAGS SLACK p1 v17 h31
+sub_fractions_like S s0 n20 main 18 mixed 2 [fraction_operations:add_fractions_like frac-model] pages 1/1 [n8 rows 274/274/274 strip 2% slack 13/11 13/11 13/11 13/11 13/11 13/11 13/24 13/24] ok
+sub_fractions_like M s0 n7 main 6 mixed 1 [fraction_operations:add_fractions_like frac-model] pages 1/1 [n3 rows 402/402 strip 4% slack 20/20 20/20 20/35] FLAGS SLACK p1 v20 h35
+sub_fractions_like L s0 n7 main 6 mixed 1 [fraction_operations:add_fractions_like frac-model] pages 1/1 [n3 rows 404/404 strip 2% slack 15/15 15/15 15/32] FLAGS SLACK p1 v15 h32
+add_frac_unlike S s0 n11 main 9 mixed 2 [fraction_operations:frac_10_100 legacy] pages 1/1 [n5 rows 301/522 strip 2% slack 16/11 16/11 18/10 14/5 14/5] ok
+add_frac_unlike M s0 n7 main 6 mixed 1 [fraction_operations:frac_10_100 legacy] pages 1/1 [n3 rows 331/493 strip 2% slack 13/20 13/20 13/2] ok
+add_frac_unlike L s0 n7 main 6 mixed 1 [fraction_operations:frac_10_100 legacy] pages 1/1 [n3 rows 346/463 strip 2% slack 9/15 9/15 10/2] ok
+rv8 done

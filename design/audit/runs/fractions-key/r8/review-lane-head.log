@@ -1,0 +1,46 @@
+fraction_of_set S s0 n24 main 18 mixed 6 [fractions:equiv_frac_visual frac-model] pages 1/1 [n8 rows 195/186/190/243 strip 2% slack 23/30 15/19 22/30 17/31 17/7 22/19 15/21 15/21] FLAGS SLACK p1 v23 h31
+fraction_of_set S s1 n24 main 18 mixed 6 [fractions:equiv_frac_visual frac-model] pages 1/1 [n8 rows 207/186/186/243 strip 2% slack 21/8 17/13 22/30 17/31 18/12 17/29 15/21 15/21] FLAGS SLACK p1 v22 h31
+fraction_of_set S s2 n24 main 18 mixed 6 [fractions:equiv_frac_visual frac-model] pages 1/1 [n8 rows 179/199/195/234 strip 3% slack 20/30 16/31 19/9 15/9 23/11 12/7 14/21 14/21] FLAGS SLACK p1 v23 h31
+fraction_of_set M s0 n18 main 12 mixed 6 [fractions:equiv_frac_visual frac-model] pages 1/1 [n6 rows 255/265/295 strip 3% slack 17/28 20/18 21/28 16/29 16/16 16/16] ok
+fraction_of_set M s1 n18 main 12 mixed 6 [fractions:equiv_frac_visual frac-model] pages 1/1 [n6 rows 245/265/289 strip 4% slack 22/7 13/18 21/28 16/29 16/16 16/16] ok
+fraction_of_set M s2 n18 main 12 mixed 6 [fractions:equiv_frac_visual frac-model] pages 1/1 [n6 rows 245/295/283 strip 2% slack 16/28 16/28 15/18 20/10 15/16 15/16] ok
+fraction_of_set L s0 n18 main 12 mixed 6 [fractions:equiv_frac_visual frac-model] pages 1/1 [n6 rows 245/259/279 strip 4% slack 9/24 13/14 15/24 9/24 9/11 9/11] ok
+fraction_of_set L s1 n18 main 12 mixed 6 [fractions:equiv_frac_visual frac-model] pages 1/1 [n6 rows 251/256/275 strip 4% slack 11/13 9/14 15/24 9/24 8/11 8/11] ok
+fraction_of_set L s2 n18 main 12 mixed 6 [fractions:equiv_frac_visual frac-model] pages 1/1 [n6 rows 236/278/269 strip 4% slack 8/24 9/24 7/36 7/14 7/11 7/11] FLAGS SLACK p1 v9 h36
+fraction_of_set_hard S s0 n24 main 18 mixed 6 [fractions:equiv_frac_visual frac-model] pages 1/1 [n8 rows 210/199/179/234 strip 2% slack 20/8 15/19 17/7 15/8 16/19 17/8 14/21 14/21] ok
+fraction_of_set_hard S s1 n24 main 18 mixed 6 [fractions:equiv_frac_visual frac-model] pages 1/1 [n8 rows 205/175/213/228 strip 2% slack 14/13 18/7 16/8 15/19 21/10 14/8 13/21 13/21] ok
+fraction_of_set_hard S s2 n24 main 18 mixed 6 [fractions:equiv_frac_visual frac-model] pages 1/1 [n8 rows 175/204/214/229 strip 2% slack 15/8 16/8 14/19 20/28 21/13 14/8 13/21 13/21] ok
+fraction_of_set_hard M s0 n18 main 12 mixed 6 [fractions:equiv_frac_visual frac-model] pages 1/1 [n6 rows 267/265/289 strip 2% slack 16/9 19/18 21/6 16/7 16/16 16/16] ok
+fraction_of_set_hard M s1 n18 main 12 mixed 6 [fractions:equiv_frac_visual frac-model] pages 1/1 [n6 rows 265/245/308 strip 2% slack 19/12 21/6 22/7 19/20 18/16 18/16] ok
+fraction_of_set_hard M s2 n18 main 12 mixed 6 [fractions:equiv_frac_visual frac-model] pages 1/1 [n6 rows 243/278/302 strip 2% slack 19/9 22/7 18/9 20/23 17/16 17/16] ok
+fraction_of_set_hard L s0 n12 main 6 mixed 6 [fractions:equiv_frac_visual frac-model] pages 1/1 [n4 rows 368/383 strip 7% slack 20/14 24/13 20/11 20/11] ok
+fraction_of_set_hard L s1 n18 main 12 mixed 6 [fractions:equiv_frac_visual frac-model] pages 1/1 [n6 rows 283/233/266 strip 4% slack 13/14 6/14 8/13 11/17 7/11 7/11] ok
+fraction_of_set_hard L s2 n18 main 12 mixed 6 [fractions:equiv_frac_visual frac-model] pages 1/1 [n6 rows 246/256/281 strip 4% slack 11/14 10/13 9/11 12/18 9/11 9/11] ok
+add_fractions_like S s0 n24 main 18 mixed 6 [fractions:fraction_nl_drag nl-place] pages 1/1 [n8 rows 256/256/312 strip 2% slack 10/11 10/11 10/11 10/11 10/11 12/17 17/12 8/7] ok
+add_fractions_like S s1 n24 main 18 mixed 6 [fractions:fraction_nl_drag nl-place] pages 1/1 [n8 rows 256/256/312 strip 2% slack 10/11 10/11 10/11 10/11 12/17 10/11 8/7 17/12] ok
+add_fractions_like S s2 n24 main 18 mixed 6 [fractions:fraction_nl_drag nl-place] pages 1/1 [n8 rows 276/276/270 strip 2% slack 13/11 13/11 13/11 15/17 13/11 13/11 12/12 12/12] ok
+add_fractions_like M s0 n12 main 6 mixed 6 [fractions:fraction_nl_drag nl-place] pages 1/1 [n4 rows 374/449 strip 2% slack 17/20 17/20 25/12 17/7] ok
+add_fractions_like M s1 n12 main 6 mixed 6 [fractions:fraction_nl_drag nl-place] pages 1/1 [n4 rows 374/449 strip 2% slack 17/20 17/20 17/7 25/12] ok
+add_fractions_like M s2 n12 main 6 mixed 6 [fractions:fraction_nl_drag nl-place] pages 1/1 [n4 rows 402/375 strip 6% slack 20/20 20/20 20/12 20/12] ok
+add_fractions_like L s0 n12 main 6 mixed 6 [fractions:fraction_nl_drag nl-place] pages 1/1 [n4 rows 372/436 strip 2% slack 12/15 12/15 22/12 11/7] ok
+add_fractions_like L s1 n12 main 6 mixed 6 [fractions:fraction_nl_drag nl-place] pages 1/1 [n4 rows 372/436 strip 2% slack 12/15 12/15 11/7 22/12] ok
+add_fractions_like L s2 n12 main 6 mixed 6 [fractions:fraction_nl_drag nl-place] pages 1/1 [n4 rows 428/381 strip 2% slack 17/15 17/15 17/12 17/12] ok
+sub_fractions_like S s0 n24 main 18 mixed 6 [fractions:fraction_nl_drag nl-place] pages 1/1 [n8 rows 275/275/274 strip 2% slack 13/11 13/11 13/11 13/11 13/11 13/11 13/12 13/12] ok
+sub_fractions_like S s1 n24 main 18 mixed 6 [fractions:fraction_nl_drag nl-place] pages 1/1 [n8 rows 275/275/274 strip 2% slack 13/11 13/11 13/11 13/11 13/11 13/11 13/12 13/12] ok
+sub_fractions_like S s2 n24 main 18 mixed 6 [fractions:fraction_nl_drag nl-place] pages 1/1 [n8 rows 259/259/306 strip 2% slack 10/11 10/11 10/11 10/11 10/11 10/11 17/12 9/12] ok
+sub_fractions_like M s0 n12 main 6 mixed 6 [fractions:fraction_nl_drag nl-place] pages 1/1 [n4 rows 402/375 strip 6% slack 20/20 20/20 20/12 20/12] ok
+sub_fractions_like M s1 n12 main 6 mixed 6 [fractions:fraction_nl_drag nl-place] pages 1/1 [n4 rows 402/375 strip 6% slack 20/20 20/20 20/12 20/12] ok
+sub_fractions_like M s2 n12 main 6 mixed 6 [fractions:fraction_nl_drag nl-place] pages 1/1 [n4 rows 384/440 strip 2% slack 18/20 18/20 24/12 18/12] ok
+sub_fractions_like L s0 n12 main 6 mixed 6 [fractions:fraction_nl_drag nl-place] pages 1/1 [n4 rows 428/381 strip 2% slack 17/15 17/15 17/12 17/12] ok
+sub_fractions_like L s1 n12 main 6 mixed 6 [fractions:fraction_nl_drag nl-place] pages 1/1 [n4 rows 428/381 strip 2% slack 17/15 17/15 17/12 17/12] ok
+sub_fractions_like L s2 n12 main 6 mixed 6 [fractions:fraction_nl_drag nl-place] pages 1/1 [n4 rows 382/427 strip 2% slack 13/15 13/15 21/12 12/12] ok
+add_frac_unlike S s0 n27 main 18 mixed 9 [fraction_operations:mult_frac_whole frac-model+legacy] pages 1/1 [n9 rows 260/260/302 strip 2% slack 11/11 11/11 12/10 11/11 11/11 11/11 9/18 15/18 9/18] ok
+add_frac_unlike S s1 n27 main 18 mixed 9 [fraction_operations:mult_frac_whole frac-model+legacy] pages 1/1 [n9 rows 260/260/302 strip 2% slack 11/11 12/10 11/11 11/11 11/11 11/11 15/18 9/18 9/18] ok
+add_frac_unlike S s2 n27 main 18 mixed 9 [fraction_operations:mult_frac_whole frac-model+legacy] pages 1/1 [n9 rows 260/260/302 strip 2% slack 11/11 11/11 11/11 11/11 12/10 11/11 9/18 9/18 15/18] ok
+add_frac_unlike M s0 n12 main 6 mixed 6 [fraction_operations:mult_frac_whole frac-model] pages 1/1 [n4 rows 379/444 strip 2% slack 18/20 18/20 17/26 22/26] ok
+add_frac_unlike M s1 n12 main 6 mixed 6 [fraction_operations:mult_frac_whole frac-model+legacy] pages 1/1 [n4 rows 379/444 strip 2% slack 18/20 29/8 22/26 17/26] ok
+add_frac_unlike M s2 n12 main 6 mixed 6 [fraction_operations:mult_frac_whole frac-model+legacy] pages 1/1 [n4 rows 379/444 strip 2% slack 18/20 18/20 17/26 17/26] ok
+add_frac_unlike L s0 n12 main 6 mixed 6 [fraction_operations:mult_frac_whole frac-model] pages 1/1 [n4 rows 371/438 strip 2% slack 12/15 12/15 11/21 16/21] ok
+add_frac_unlike L s1 n12 main 6 mixed 6 [fraction_operations:mult_frac_whole frac-model+legacy] pages 1/1 [n4 rows 378/430 strip 2% slack 13/15 13/18 16/21 10/21] ok
+add_frac_unlike L s2 n12 main 6 mixed 6 [fraction_operations:mult_frac_whole frac-model+legacy] pages 1/1 [n4 rows 371/438 strip 2% slack 12/15 12/15 11/21 11/21] ok
+rv8 done

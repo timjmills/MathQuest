@@ -1,0 +1,97 @@
+add_facts S s0 n36 main 24 mixed 12 [addition:add fact] pages 1/1 [n16 rows 206/206/206/205 strip 2% slack 40/25 40/25 40/25 40/25 40/25 40/25 40/25 40/25 40/25 40/25 40/25 40/25 40/25 40/25 40/25 40/25] FLAGS SLACK p1 v40 h25
+add_facts S s1 n36 main 24 mixed 12 [addition:add fact] pages 1/1 [n16 rows 206/206/206/205 strip 2% slack 40/25 40/25 40/25 40/25 40/25 40/25 40/25 40/25 40/25 40/25 40/25 40/25 40/25 40/25 40/25 40/25] FLAGS SLACK p1 v40 h25
+add_facts M s0 n33 main 24 mixed 9 [addition:add fact] pages 1/1 [n12 rows 206/206/206/205 strip 2% slack 40/31 40/31 40/31 40/31 40/31 40/31 40/31 40/31 40/31 40/31 40/31 40/31] FLAGS SLACK p1 v40 h31
+add_facts M s1 n33 main 24 mixed 9 [addition:add fact] pages 1/1 [n12 rows 206/206/206/205 strip 2% slack 40/31 40/31 40/31 40/31 40/31 40/31 40/31 40/31 40/31 40/31 40/31 40/31] FLAGS SLACK p1 v40 h31
+add_facts L s0 n33 main 24 mixed 9 [addition:add fact] pages 1/1 [n12 rows 202/202/202/201 strip 2% slack 39/31 39/31 39/31 39/31 39/31 39/31 39/31 39/31 39/31 39/31 39/31 39/31] FLAGS SLACK p1 v39 h31
+add_facts L s1 n33 main 24 mixed 9 [addition:add fact] pages 1/1 [n12 rows 202/202/202/201 strip 2% slack 39/31 39/31 39/31 39/31 39/31 39/31 39/31 39/31 39/31 39/31 39/31 39/31] FLAGS SLACK p1 v39 h31
+number_families_add S s0 n12 main 6 mixed 6 [addition:add_sub_fact_family fact-family] pages 1/1 [n4 rows 475/349 strip 2% slack 21/5 21/5 19/28 19/28] ok
+number_families_add S s1 n12 main 6 mixed 6 [addition:add_sub_fact_family fact-family] pages 1/1 [n4 rows 475/349 strip 2% slack 21/5 21/5 19/28 19/28] ok
+number_families_add M s0 n12 main 6 mixed 6 [addition:add_sub_fact_family fact-family] pages 1/1 [n4 rows 427/396 strip 2% slack 17/5 17/5 14/19 14/19] ok
+number_families_add M s1 n12 main 6 mixed 6 [addition:add_sub_fact_family fact-family] pages 1/1 [n4 rows 427/396 strip 2% slack 17/5 17/5 14/19 14/19] ok
+number_families_add L s0 n12 main 6 mixed 6 [addition:add_sub_fact_family fact-family] pages 1/1 [n4 rows 384/424 strip 2% slack 13/5 13/5 9/10 9/10] ok
+number_families_add L s1 n12 main 6 mixed 6 [addition:add_sub_fact_family fact-family] pages 1/1 [n4 rows 384/424 strip 2% slack 13/5 13/5 9/10 9/10] ok
+sub_20_regroup S s0 n42 main 24 mixed 18 [subtraction:sub_5_pictures counters] pages 1/1 [n14 rows 205/205/137/137/137 strip 2% slack 12/23 12/23 12/23 12/23 12/23 12/23 12/23 12/23 16/24 16/31 16/17 16/24 16/31 16/17] FLAGS SLACK p1 v16 h31
+sub_20_regroup S s1 n42 main 24 mixed 18 [subtraction:sub_5_pictures counters] pages 1/1 [n14 rows 205/205/137/137/137 strip 2% slack 12/23 12/23 12/23 12/23 12/23 12/23 12/23 12/23 16/24 16/17 16/17 16/24 16/17 16/31] FLAGS SLACK p1 v16 h31
+sub_20_regroup M s0 n30 main 18 mixed 12 [subtraction:sub_5_pictures counters] pages 1/1 [n10 rows 242/242/168/168 strip 2% slack 17/30 17/30 17/30 17/30 17/30 17/30 20/24 20/27 20/17 20/24] FLAGS SLACK p1 v20 h30
+sub_20_regroup M s1 n30 main 18 mixed 12 [subtraction:sub_5_pictures counters] pages 1/1 [n10 rows 242/242/168/168 strip 2% slack 17/30 17/30 17/30 17/30 17/30 17/30 20/24 20/17 20/17 20/24] FLAGS SLACK p1 v20 h30
+sub_20_regroup L s0 n30 main 18 mixed 12 [subtraction:sub_5_pictures counters] pages 1/1 [n10 rows 235/235/169/169 strip 2% slack 15/30 15/30 15/30 15/30 15/30 15/30 18/24 18/24 18/17 18/24] FLAGS SLACK p1 v18 h30
+sub_20_regroup L s1 n30 main 18 mixed 12 [subtraction:sub_5_pictures counters] pages 1/1 [n10 rows 235/235/169/169 strip 2% slack 15/30 15/30 15/30 15/30 15/30 15/30 18/24 18/17 18/17 18/24] FLAGS SLACK p1 v18 h30
+mult_facts S s0 n24 main 24 mixed 0 [- ] pages 1/1 [n16 rows 213/213/213/213 strip 2% slack 40/22 40/22 40/22 40/22 40/22 40/22 40/22 40/22 40/22 40/22 40/22 40/22 40/22 40/22 40/22 40/22] FLAGS SLACK p1 v40 h22
+mult_facts S s1 n24 main 24 mixed 0 [- ] pages 1/1 [n16 rows 213/213/213/213 strip 2% slack 40/22 40/22 40/22 40/22 40/22 40/22 40/22 40/22 40/22 40/22 40/22 40/22 40/22 40/22 40/22 40/22] FLAGS SLACK p1 v40 h22
+mult_facts M s0 n24 main 24 mixed 0 [- ] pages 1/1 [n12 rows 213/213/213/213 strip 2% slack 40/29 40/29 40/29 40/29 40/29 40/29 40/29 40/29 40/29 40/29 40/29 40/29] FLAGS SLACK p1 v40 h29
+mult_facts M s1 n24 main 24 mixed 0 [- ] pages 1/1 [n12 rows 213/213/213/213 strip 2% slack 40/29 40/29 40/29 40/29 40/29 40/29 40/29 40/29 40/29 40/29 40/29 40/29] FLAGS SLACK p1 v40 h29
+mult_facts L s0 n24 main 24 mixed 0 [- ] pages 1/1 [n12 rows 211/211/211/211 strip 2% slack 40/29 40/29 40/29 40/29 40/29 40/29 40/29 40/29 40/29 40/29 40/29 40/29] FLAGS SLACK p1 v40 h29
+mult_facts L s1 n24 main 24 mixed 0 [- ] pages 1/1 [n12 rows 211/211/211/211 strip 2% slack 40/29 40/29 40/29 40/29 40/29 40/29 40/29 40/29 40/29 40/29 40/29 40/29] FLAGS SLACK p1 v40 h29
+dot_array_mult S s0 n24 main 18 mixed 6 [multiplication:arrays_groups arrays] pages 1/1 [n8 rows 323/323/178 strip 2% slack 26/46 15/24 32/32 34/17 31/17 18/11 14/29 14/23] FLAGS SLACK p1 v34 h46
+dot_array_mult S s1 n24 main 18 mixed 6 [multiplication:arrays_groups arrays] pages 1/1 [n8 rows 323/323/178 strip 2% slack 15/24 32/32 34/17 31/17 18/11 26/39 22/23 14/23] FLAGS SLACK p1 v34 h39
+dot_array_mult M s0 n15 main 9 mixed 6 [multiplication:arrays_groups arrays] pages 1/1 [n8 rows 314/314/195 strip 2% slack 25/46 13/24 31/32 33/17 30/17 17/11 11/22 11/21] FLAGS SLACK p1 v33 h46
+dot_array_mult M s1 n15 main 9 mixed 6 [multiplication:arrays_groups arrays] pages 1/1 [n8 rows 314/314/195 strip 2% slack 13/24 31/32 33/17 30/17 17/11 25/39 20/21 11/21] FLAGS SLACK p1 v33 h39
+dot_array_mult L s0 n15 main 9 mixed 6 [multiplication:arrays_groups arrays] pages 1/1 [n5 rows 462/297 strip 6% slack 32/46 24/24 36/32 21/16 21/16] FLAGS SLACK p1 v36 h46
+dot_array_mult L s1 n15 main 9 mixed 6 [multiplication:arrays_groups arrays] pages 1/1 [n5 rows 462/297 strip 6% slack 24/24 36/32 38/16 27/16 21/16] FLAGS SLACK p1 v38 h32
+div_facts S s0 n36 main 24 mixed 12 [multiplication:count_by_tables count-row] pages 1/1 [n16 rows 96/96/96/132/132/132/132 strip 2% slack 28/29 28/26 28/29 28/29 28/22 28/29 28/29 28/33 28/29 28/26 28/29 28/29 27/5 27/5 27/5 27/5] FLAGS SLACK p1 v28 h33
+div_facts S s1 n36 main 24 mixed 12 [multiplication:count_by_tables count-row] pages 1/1 [n16 rows 96/96/96/132/132/132/132 strip 2% slack 28/26 28/29 28/29 28/22 28/29 28/29 28/26 28/33 28/33 28/29 28/29 28/26 27/5 27/5 27/5 27/5] FLAGS SLACK p1 v28 h33
+div_facts M s0 n33 main 24 mixed 9 [multiplication:count_by_tables count-row] pages 1/1 [n12 rows 76/76/76/165/165/165 strip 10% slack 33/15 33/12 33/15 33/15 33/8 33/15 33/15 33/19 33/15 27/5 27/5 27/5] FLAGS SLACK p1 v33 h19
+div_facts M s1 n33 main 24 mixed 9 [multiplication:count_by_tables count-row] pages 1/1 [n12 rows 76/76/76/165/165/165 strip 10% slack 33/12 33/15 33/15 33/8 33/15 33/15 33/12 33/19 33/19 27/5 27/5 27/5] FLAGS SLACK p1 v33 h19
+div_facts L s0 n33 main 24 mixed 9 [multiplication:count_by_tables count-row] pages 1/1 [n12 rows 117/117/117/143/143/143 strip 2% slack 17/21 17/16 17/21 17/21 17/12 17/21 17/21 17/26 17/21 18/5 18/5 18/5] ok
+div_facts L s1 n33 main 24 mixed 9 [multiplication:count_by_tables count-row] pages 1/1 [n12 rows 117/117/117/143/143/143 strip 2% slack 17/16 17/21 17/21 17/12 17/21 17/21 17/16 17/26 17/26 18/5 18/5 18/5] ok
+equiv_frac_visual S s0 n24 main 24 mixed 0 [- ] pages 1/1 [n8 rows 213/213/213/213 strip 2% slack 10/21 10/21 10/21 10/21 10/21 10/21 14/21 10/21] ok
+equiv_frac_visual S s1 n24 main 24 mixed 0 [- ] pages 1/1 [n8 rows 213/213/213/213 strip 2% slack 10/21 10/21 10/21 10/21 10/21 14/21 10/21 14/21] ok
+equiv_frac_visual M s0 n18 main 18 mixed 0 [- ] pages 1/1 [n6 rows 284/284/284 strip 2% slack 15/16 15/16 15/16 15/16 15/16 15/16] ok
+equiv_frac_visual M s1 n18 main 18 mixed 0 [- ] pages 1/1 [n6 rows 284/284/284 strip 2% slack 15/16 15/16 15/16 15/16 15/16 18/16] ok
+equiv_frac_visual L s0 n18 main 18 mixed 0 [- ] pages 1/1 [n6 rows 282/282/282 strip 2% slack 9/11 9/11 9/11 9/11 9/11 9/11] ok
+equiv_frac_visual L s1 n18 main 18 mixed 0 [- ] pages 1/1 [n6 rows 282/282/282 strip 2% slack 9/11 9/11 9/11 9/11 9/11 11/11] ok
+compare S s0 n36 main 24 mixed 12 [fractions:fraction_of_set_hard fos+legacy] pages 1/1 [n12 rows 157/87/87/87/178/217 strip 2% slack 15/21 15/21 24/34 24/34 24/34 24/34 24/34 24/34 15/10 15/7 13/19 21/9] FLAGS SLACK p1 v24 h34
+compare S s1 n36 main 24 mixed 12 [fractions:fraction_of_set_hard fos+legacy] pages 1/1 [n12 rows 142/142/78/78/176/190 strip 3% slack 11/21 11/21 11/21 34/34 21/34 21/34 21/34 21/34 15/7 11/10 17/9 10/9] FLAGS SLACK p1 v34 h34
+compare M s0 n30 main 24 mixed 6 [fractions:fraction_of_set_hard fos+legacy] pages 1/1 [n8 rows 181/104/104/305 strip 13% slack 13/16 13/16 20/33 20/33 20/32 20/33 21/20 21/7] FLAGS SLACK p1 v21 h33
+compare M s1 n30 main 18 mixed 12 [fractions:fraction_of_set_hard fos+legacy] pages 1/1 [n10 rows 172/98/98/219/233 strip 2% slack 11/16 11/16 18/33 18/33 18/33 18/33 9/7 9/16 9/24 9/12] FLAGS SLACK p1 v18 h33
+compare L s0 n24 main 18 mixed 6 [fractions:fraction_of_set_hard fos+legacy] pages 1/1 [n10 rows 194/114/114/114/270 strip 2% slack 9/10 9/10 15/32 15/32 15/29 15/32 15/29 15/32 11/17 7/15] FLAGS SLACK p1 v15 h32
+compare L s1 n24 main 18 mixed 6 [fractions:fraction_of_set_hard fos+legacy] pages 1/1 [n8 rows 214/126/126/314 strip 4% slack 13/10 13/10 19/32 19/32 19/32 19/32 13/15 17/14] FLAGS SLACK p1 v19 h32
+mult_frac_whole S s0 n15 main 9 mixed 6 [fraction_operations:sub_mixed_like frac-model+legacy] pages 1/1 [n9 rows 267/267/289 strip 2% slack 10/18 16/17 2/18 17/18 17/18 10/18 8/12 6/12 8/12] ok
+mult_frac_whole S s1 n15 main 9 mixed 6 [fraction_operations:sub_mixed_like frac-model+legacy] pages 1/1 [n5 rows 408/414 strip 2% slack 20/18 20/18 28/18 20/25 21/25] ok
+mult_frac_whole M s0 n15 main 9 mixed 6 [fraction_operations:sub_mixed_like frac-model+legacy] pages 1/1 [n5 rows 412/412 strip 2% slack 19/13 24/33 15/13 15/22 15/22] FLAGS SLACK p1 v24 h33
+mult_frac_whole M s1 n15 main 9 mixed 6 [fraction_operations:sub_mixed_like frac-model+legacy] pages 1/1 [n5 rows 412/412 strip 2% slack 15/13 15/13 24/13 15/22 15/22] ok
+mult_frac_whole L s0 n18 main 18 mixed 0 [- ] pages 1/1 [n6 rows 423/423 strip 2% slack 15/7 15/7 10/7 21/7 21/7 15/7] ok
+mult_frac_whole L s1 n12 main 12 mixed 0 [- ] pages 1/1 [n4 rows 467/354 strip 4% slack 14/21 14/21 15/21 15/21] ok
+frac_word_problems S s0 n9 main 9 mixed 0 [- ] pages 1/1 [n3 rows 266/266/266 strip 6% slack -9/2 -9/2 28/10] FLAGS OVERFLOW p1 12/0
+frac_word_problems S s1 n9 main 9 mixed 0 [- ] pages 1/1 [n3 rows 266/266/266 strip 6% slack -9/2 28/10 -9/2] FLAGS OVERFLOW p1 12/0
+frac_word_problems M s0 n6 main 6 mixed 0 [- ] pages 1/1 [n2 rows 427/427 strip 2% slack 17/2 17/2] ok
+frac_word_problems M s1 n6 main 6 mixed 0 [- ] pages 1/1 [n2 rows 307/307 strip 23% slack 3/2 21/70] FLAGS STRIP p1 23% | SLACK p1 v21 h70
+frac_word_problems L s0 n6 main 6 mixed 0 [- ] pages 1/1 [n2 rows 423/423 strip 2% slack 16/2 16/2] ok
+frac_word_problems L s1 n6 main 6 mixed 0 [- ] pages 1/1 [n2 rows 352/352 strip 14% slack 9/2 20/54] FLAGS SLACK p1 v20 h54
+add_decimal S s0 n33 main 24 mixed 9 [fraction_operations:sub_mixed_unlike frac-model+legacy] pages 1/1 [n11 rows 225/225/373 strip 2% slack 17/21 17/27 17/27 17/27 17/27 17/27 17/21 17/27 11/12 11/12 16/12] ok
+add_decimal S s1 n33 main 24 mixed 9 [fraction_operations:sub_mixed_unlike frac-model+legacy] pages 1/1 [n11 rows 225/225/373 strip 2% slack 17/27 17/27 17/27 17/27 17/27 17/21 17/27 17/27 11/12 16/12 11/12] ok
+add_decimal M s0 n24 main 18 mixed 6 [fraction_operations:sub_mixed_unlike frac-model+legacy] pages 1/1 [n9 rows 215/215/393 strip 2% slack 15/28 15/33 15/33 15/33 15/33 15/33 8/7 8/7 13/7] FLAGS SLACK p1 v15 h33
+add_decimal M s1 n24 main 18 mixed 6 [fraction_operations:sub_mixed_unlike frac-model+legacy] pages 1/1 [n9 rows 215/215/393 strip 2% slack 15/33 15/33 15/33 15/33 15/33 15/28 8/7 13/7 8/7] FLAGS SLACK p1 v15 h33
+add_decimal L s0 n15 main 9 mixed 6 [fraction_operations:sub_mixed_unlike frac-model+legacy] pages 1/1 [n5 rows 267/542 strip 2% slack 21/28 21/33 21/33 14/18 14/18] FLAGS SLACK p1 v21 h33
+add_decimal L s1 n15 main 9 mixed 6 [fraction_operations:sub_mixed_unlike frac-model+legacy] pages 1/1 [n5 rows 267/542 strip 2% slack 21/33 21/33 21/33 14/18 18/18] FLAGS SLACK p1 v21 h33
+time_quarter S s0 n36 main 24 mixed 12 [measurement:time_half_hour clock] pages 1/1 [n12 rows 274/274/274 strip 2% slack 18/13 18/13 18/13 18/13 18/13 18/13 18/13 18/13 18/13 18/13 18/13 18/13] ok
+time_quarter S s1 n36 main 24 mixed 12 [measurement:time_half_hour clock] pages 1/1 [n12 rows 274/274/274 strip 2% slack 18/13 18/13 18/13 18/13 18/13 18/13 18/13 18/13 18/13 18/13 18/13 18/13] ok
+time_quarter M s0 n27 main 18 mixed 9 [measurement:time_half_hour clock] pages 1/1 [n9 rows 274/274/274 strip 2% slack 13/17 13/17 13/17 13/17 13/17 13/17 13/17 13/17 13/17] ok
+time_quarter M s1 n27 main 18 mixed 9 [measurement:time_half_hour clock] pages 1/1 [n9 rows 274/274/274 strip 2% slack 13/17 13/17 13/17 13/17 13/17 13/17 13/17 13/17 13/17] ok
+time_quarter L s0 n15 main 9 mixed 6 [measurement:time_half_hour clock] pages 1/1 [n5 rows 399/399 strip 3% slack 20/11 20/11 20/11 20/24 20/24] ok
+time_quarter L s1 n15 main 9 mixed 6 [measurement:time_half_hour clock] pages 1/1 [n5 rows 399/399 strip 3% slack 20/11 20/11 20/11 20/24 20/24] ok
+value S s0 n36 main 24 mixed 12 [placevalue:identify pv] pages 1/1 [n16 rows 141/141/141/219 strip 18% slack 25/20 25/20 25/20 25/20 25/20 25/20 25/20 25/20 25/20 25/20 25/20 25/20 24/16 24/16 24/16 24/16] ok
+value S s1 n36 main 24 mixed 12 [placevalue:identify pv] pages 1/1 [n16 rows 141/141/141/219 strip 18% slack 25/20 25/20 25/20 25/20 25/20 25/20 25/20 25/20 25/20 25/20 25/20 25/20 24/16 24/16 24/16 24/16] ok
+value M s0 n30 main 18 mixed 12 [placevalue:identify pv] pages 1/1 [n10 rows 169/169/173/173 strip 14% slack 24/22 24/22 24/22 24/22 24/22 24/22 26/13 26/13 26/13 26/13] ok
+value M s1 n30 main 18 mixed 12 [placevalue:identify pv] pages 1/1 [n10 rows 169/169/173/173 strip 14% slack 24/22 24/22 24/22 24/22 24/22 24/22 26/13 26/13 26/13 26/13] ok
+value L s0 n30 main 18 mixed 12 [placevalue:identify pv] pages 1/1 [n10 rows 201/201/196/196 strip 3% slack 23/16 23/16 23/16 23/16 23/16 23/16 25/10 25/10 25/10 25/10] ok
+value L s1 n30 main 18 mixed 12 [placevalue:identify pv] pages 1/1 [n10 rows 201/201/196/196 strip 3% slack 23/16 23/16 23/16 23/16 23/16 23/16 25/10 25/10 25/10 25/10] ok
+make_ten S s0 n30 main 18 mixed 12 [composing:number_bonds bond] pages 1/1 [n10 rows 219/219/191/191 strip 2% slack 11/7 11/7 11/7 11/7 11/7 11/7 12/20 12/20 12/20 12/20] ok
+make_ten S s1 n30 main 18 mixed 12 [composing:number_bonds bond] pages 1/1 [n10 rows 219/219/191/191 strip 2% slack 11/7 11/7 11/7 11/7 11/7 11/7 12/20 12/20 12/20 12/20] ok
+make_ten M s0 n30 main 18 mixed 12 [composing:number_bonds bond] pages 1/1 [n10 rows 209/209/201/201 strip 2% slack 8/7 8/7 8/7 8/7 8/7 8/7 8/15 8/15 8/15 8/15] ok
+make_ten M s1 n30 main 18 mixed 12 [composing:number_bonds bond] pages 1/1 [n10 rows 209/209/201/201 strip 2% slack 8/7 8/7 8/7 8/7 8/7 8/7 8/15 8/15 8/15 8/15] ok
+make_ten L s0 n24 main 18 mixed 6 [composing:number_bonds bond] pages 1/1 [n8 rows 256/256/295 strip 2% slack 15/7 15/7 15/7 15/7 15/7 15/7 14/6 14/6] ok
+make_ten L s1 n24 main 18 mixed 6 [composing:number_bonds bond] pages 1/1 [n8 rows 256/256/295 strip 2% slack 15/7 15/7 15/7 15/7 15/7 15/7 14/6 14/6] ok
+seq_5 S s0 n42 main 24 mixed 18 [placevalue:more_less_10 pv] pages 1/1 [n16 rows 107/107/107/107/107/97/82 strip 11% slack -62/16 34/5 34/19 34/5 34/19 34/31 34/43 34/31 34/31 34/43 25/27 25/27 25/27 20/27 20/29 40/8] FLAGS OVERFLOW p1 8/0 | SLACK p1 v40 h43
+seq_5 S s1 n42 main 24 mixed 18 [placevalue:more_less_10 pv] pages 1/1 [n16 rows 107/107/107/107/107/110/82 strip 10% slack 34/5 34/19 34/5 34/19 34/31 34/5 34/43 34/31 34/31 34/5 28/27 28/27 28/27 20/27 20/29 40/8] FLAGS SLACK p1 v40 h43
+seq_5 M s0 n36 main 24 mixed 12 [placevalue:more_less_10 pv] pages 1/1 [n12 rows 121/121/121/121/76/76 strip 18% slack -48/16 34/5 34/19 34/5 34/19 34/31 34/43 34/31 33/11 33/12 33/8 33/10] FLAGS OVERFLOW p1 7/0 | SLACK p1 v34 h43
+seq_5 M s1 n36 main 24 mixed 12 [placevalue:more_less_10 pv] pages 1/1 [n12 rows 115/115/115/115/76/76 strip 20% slack 33/5 33/19 33/5 33/19 33/31 33/5 33/43 33/31 33/11 33/12 33/8 33/10] FLAGS SLACK p1 v33 h43
+seq_5 L s0 n36 main 24 mixed 12 [placevalue:more_less_10 pv] pages 1/1 [n10 rows 128/128/128/128/89 strip 20% slack -42/16 34/5 34/19 34/5 34/19 34/31 34/43 34/31 30/5 30/7] FLAGS OVERFLOW p1 7/0 | SLACK p1 v34 h43
+seq_5 L s1 n36 main 24 mixed 12 [placevalue:more_less_10 pv] pages 1/1 [n10 rows 126/126/126/126/89 strip 21% slack 33/5 33/19 33/5 33/19 33/31 33/5 33/43 33/31 30/5 30/7] FLAGS STRIP p1 21% | SLACK p1 v33 h43
+area_unit_squares S s0 n3 main 3 mixed 0 [- ] pages 1/1 [n1 rows 511 strip 32% slack 20/2] FLAGS STRIP p1 32% | THIN n3
+area_unit_squares S s1 n6 main 6 mixed 0 [- ] pages 1/1 [n2 rows 427/427 strip 2% slack 14/2 2/2] ok
+area_unit_squares M s0 n3 main 3 mixed 0 [- ] pages 1/1 [n1 rows 525 strip 31% slack 20/2] FLAGS STRIP p1 31% | THIN n3
+area_unit_squares M s1 n6 main 6 mixed 0 [- ] pages 1/1 [n2 rows 427/427 strip 2% slack 13/2 0/2] FLAGS OVERFLOW p1 5/0
+area_unit_squares L s0 n3 main 3 mixed 0 [- ] pages 1/1 [n1 rows 541 strip 29% slack 20/2] FLAGS STRIP p1 29% | THIN n3
+area_unit_squares L s1 n3 main 3 mixed 0 [- ] pages 1/1 [n2 rows 423/423 strip 2% slack 12/2 -3/2] FLAGS OVERFLOW p1 7/0 | THIN n3
+rv8 done
