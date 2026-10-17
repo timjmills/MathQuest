@@ -51,6 +51,10 @@ outrank any general design advice or skill:
   the design rule and the automatic check for each, and a PRE-FLIGHT checklist every lane runs before it reports.
 - **8 or better, everywhere.** A redone skill is done only when it scores ≥ 8 on all four criteria
   of `design/audit/RUBRIC.md` on every page type and every screen host, graded by an independent critic.
+- **A lesson's skills cover the lesson (owner, 2026-10-17).** Every item type a lesson pack prints is dealt by a skill
+  + options whose online practice matches the paper, and the lesson's skills together cover every atom and every
+  clause of its standard(s); gaps are built, not proposed. Rule and record format: `design/lesson-planner/DETAILED_MAKER.md`
+  "Skill coverage rule".
 - Use `generateQuestionFor({category, skill, range, decimals, opts, seed})` for any generation
   outside live play. It carries the skill's options, restores state in `finally`, and its seed makes
   a page reproducible.
