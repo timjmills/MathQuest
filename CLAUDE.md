@@ -42,9 +42,11 @@ outrank any general design advice or skill:
 - **Options live on the skill, not the page.** A skill declares its own option schema in
   `js/modules/skill-options.js`; the chosen values travel with it into every role. A ladder step is
   a skill plus option values, not a new skill id.
-- **A distinct option is ALSO a findable skill (owner rule, 2026-10-17).** When an option makes the skill
-  teach something different enough to be its own lesson or page (e.g. "2-digit × 2-digit standard
-  algorithm" on `multiplication:multiply`, a new task kind, a new representation), it is ALSO recorded
+- **A distinct option is ALSO a findable skill (owner rule, 2026-10-17).** When an option is a distinct
+  new DIFFICULTY or a distinct new SKILL — it makes the skill teach something different enough to be its
+  own lesson or page (e.g. "2-digit × 2-digit standard algorithm" on `multiplication:multiply`, a harder
+  size class, a new task kind, a new representation) — it is recorded BOTH as an option AND as a skill
+  that defaults to that option. Every new option is checked against this rule when it is added. It is ALSO recorded
   as its own named skill: own label, grade, `SKILL_STANDARDS`/`SKILL_WRM` tags, search terms, and an
   appended share code. That skill is a **preset**: choosing it opens the host skill with those option
   values already set (the options stay editable). It is not a copy of the generator. Small tweaks
