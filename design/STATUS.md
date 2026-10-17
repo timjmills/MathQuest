@@ -232,6 +232,7 @@ Gate failures and load numbers measured before this fix (~12:30 UTC) are not tru
 - 2026-10-09 Wave 1 lane "Search terms for every skill" (`a21ec3ef403026c80`) fix round 6: builder escalated to Opus medium (the ceiling) - the "Showing results for" correction notice failed critic rounds 1 to 5 (r5: no regression 7, the Navigator notice truncated at Chromebook size and the student notice lost on "+" / refocus).
 
 - 2026-10-10 small fixes lane, item 7 (Opener count-row fit) fix round 6: builder escalated to Opus medium (the ceiling) - critic rounds 1-5 each failed the Opener's fit (D5, N3/N4, N8/N9, N12, N13) with Opus-low builders.
+- 2026-10-17 small fixes lane, item 8 (count rows on screen) fix round 5: builder escalated to Opus medium (the ceiling) - the jump-arrow clearance defect (critic r10 F1, r11 G2) persisted across two Opus-low rounds; round 5 also takes r11 G1 (1,000,000 one a line at 360), G3 (caret below the fold), G4 (rotation), G5 (gates), G6 (docs).
 
 ### Answer-key options (4.4): open after critic r4 (recorded 2026-10-10, fix round 5 fixed R4-1 only)
 
@@ -270,3 +271,5 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - 2026-10-10 White Rose page (recommended answers kept, per owner): the 13 lessons that map to another year's WRM step stay mapped and are listed in MAPPING_REPORT; Kindergarten's two duplicate titles (1 more, 1 less; Partition into tens and ones) resolve to the nearest block.
 - 2026-10-10: WRM tagging Y4 PASSED critic r13 (every graded step 9, no defects; independent merge simulation 0 problems; build reproducible). Lane frozen after three optional tidy-ups; waits for the lead merge.
 - 2026-10-10: WRM tagging R + Y1 PASSED critic r12 (both 8.00, every graded step 8; independent merge simulation 0 problems). Lane frozen after four text tidy-ups; waits for the lead merge.
+- 2026-10-17: owner ruling: count-by rows (`multiplication:count_by_tables`) wrap on the phone (480 px and under) at the host digit size (~29 px) on the card, the online worksheet and the quiz; they no longer swipe or shrink. TY-10b, SL-3a and SP-11a amended; built in small fixes item 8 round 4.
+- 2026-10-17: small fixes item 8 round 5 (critic r11 G1-G6): a count row's phone drawing is chosen in CSS (29 px at 540 px and under; a 3.05 mm lead-in, the arrow's own ink; the cell and card side padding taken at 480 px and under), so 1,000,000 stands 2 a line at 360 on every host and a device turn re-draws it; long numbers' boxes are their true Andika advance and screen arrows keep 1.15 mm, so arrow ink stands >= 1.0 mm clear everywhere; a focused count-row box scrolls wholly into view clear of the pinned bars. The one-a-line fallback now applies only below 360 px and is not an owner ruling.

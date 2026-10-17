@@ -1611,6 +1611,54 @@ export function wireDiskSwipe(root) {
     });
 }
 
+/**
+ * Critic r11 G3: a count-row box that takes the pupil's focus comes FULLY into view, clear of any bar pinned over the page (the
+ * practice card's sticky Check bar, the worksheet's header, the quiz's footer) and of the screen's own edges, with 8 px to
+ * spare. The bars are found where they are, by what stands at the box's column at the top and the bottom of the viewport, so
+ * a host's own bar needs no list here. It runs at once and again after the layout settles (the late fit, a re-balance).
+ */
+function revealBox(el, margin = 8) {
+    const once = () => {
+        if (!el || !el.isConnected || document.activeElement !== el) return;
+        const b = el.getBoundingClientRect();
+        if (!(b.height > 0)) return;
+        const vv = window.visualViewport;
+        const vh = vv && vv.height > 0 ? Math.min(window.innerHeight, vv.height + (vv.offsetTop || 0)) : window.innerHeight;
+        const cx = Math.min(window.innerWidth - 1, Math.max(0, b.left + b.width / 2));
+        const barAt = (y) => {
+            let h = document.elementFromPoint(cx, y);
+            while (h && h !== document.body && h !== document.documentElement) {
+                const pos = getComputedStyle(h).position;
+                if ((pos === 'fixed' || pos === 'sticky') && !h.contains(el)) {
+                    const r = h.getBoundingClientRect();
+                    return r.height > 0 && r.height < vh / 2 ? r : null;
+                }
+                h = h.parentElement;
+            }
+            return null;
+        };
+        const top = barAt(1), bot = barAt(vh - 2);
+        const lo = (top && top.bottom < vh / 2 ? top.bottom : 0) + margin;
+        const hi = (bot && bot.top > vh / 2 ? bot.top : vh) - margin;
+        let dy = 0;
+        if (b.bottom > hi) dy = b.bottom - hi;
+        if (b.top - dy < lo) dy = b.top - lo;
+        if (Math.abs(dy) < 0.5) return;
+        let sc = el.parentElement;
+        while (sc && sc !== document.body && sc !== document.documentElement) {
+            const cs = getComputedStyle(sc);
+            if (/(auto|scroll)/.test(cs.overflowY) && sc.scrollHeight > sc.clientHeight + 1) break;
+            sc = sc.parentElement;
+        }
+        if (sc && sc !== document.body && sc !== document.documentElement) sc.scrollTop += dy;
+        else window.scrollBy(0, dy);
+    };
+    once();
+    requestAnimationFrame(once);
+    setTimeout(once, 160);
+    setTimeout(once, 420);
+}
+
 /** A count-by row swipes sideways inside its cell on a phone; a box that takes focus scrolls into view so no gap is missed. */
 function wireSwipeRows(cellEl) {
     cellEl.querySelectorAll('[data-mq-swiperow]').forEach((w) => {
@@ -1651,7 +1699,8 @@ function wireSwipeRows(cellEl) {
             const v = w.getBoundingClientRect();
             return [...w.querySelectorAll('.k2-countrow-body .k2-given, .k2-countrow-body input')].some((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.right > v.right + 1; });
         };
-        // the cue stays on ONE line inside a narrow window (29 px digits on a phone, TY-10b): its type shrinks to fit, never under 14 px
+        // the cue stays on ONE line inside a narrow window: its type shrinks to fit, never under 14 px (a count row no longer swipes
+        // on a phone: owner ruling 2026-10-17, it wraps; the cue serves any other swiping row)
         const fitCue = (win) => {
             const cues = w.querySelector('.k2-swipe-cues');
             if (!cues) return;
@@ -1665,9 +1714,40 @@ function wireSwipeRows(cellEl) {
                 cues.querySelectorAll('.k2-swipe-cue, .k2-swipe-back').forEach((x) => { x.style.fontSize = nf; });
             }
         };
+        // critic r8 D1: the wrapping line takes as many numbers as the cell holds, in even lines (12 -> 6 + 6, 4 + 4 + 4,
+        // 3 + 3 + 3 + 3), so no line is left with one or two numbers
+        const balanceWrap = () => {
+            const ln = w.querySelector('.k2-countrow-line [data-mq-wrapped]');
+            const its = items();
+            if (!ln || its.length < 2) return;
+            ln.style.maxWidth = '';
+            // the pitch from the item's width and the line's own gap, so it reads true when the items already stand on separate lines
+            const a = its[0].getBoundingClientRect();
+            const gap = parseFloat(getComputedStyle(ln).columnGap) || 0, pitch = a.width + gap;
+            if (!(pitch > 0)) return;
+            // critic r9 E3: the room is the count row's own block (the cell's inner width), never the window's current width,
+            // so a fresh load and a resize to the same width balance the same way
+            const rootEl = frame.closest('.k2-countrow') || frame.parentElement;
+            const rs = getComputedStyle(rootEl);
+            // (the block's fractional width, not clientWidth's rounded one: a line that needs 440.95 px of a 440.81 px block
+            // takes one number fewer, so the balance never asks for more than a line holds - 5 + 5 + 2 at 520 px, round 5)
+            const room = rootEl.getBoundingClientRect().width - (parseFloat(rs.paddingLeft) || 0) - (parseFloat(rs.paddingRight) || 0)
+                - (parseFloat(rs.borderLeftWidth) || 0) - (parseFloat(rs.borderRightWidth) || 0);
+            const pad = parseFloat(getComputedStyle(ln).paddingLeft) || 0;
+            const k = Math.max(1, Math.floor((room - pad + gap + 0.01) / pitch));
+            // critic r9 E1 (TY-10a, SL-3a): never more than half the row on a screen line (12 -> 6 + 6, 15 -> 5 + 5 + 5)
+            const half = its.length >= 13 ? 5 : Math.ceil(its.length / 2);
+            const lines = Math.max(Math.ceil(its.length / Math.min(k, half)), 1);
+            const per = Math.ceil(its.length / lines);
+            ln.style.maxWidth = `${Math.ceil(pad + per * pitch - gap + 1)}px`;
+        };
         const mode = () => {
             if (!frame || !body) return;
             frame.removeAttribute('data-mq-swipes'); w.style.width = ''; frame.style.minWidth = ''; w.style.maxWidth = ''; w.style.overflowX = 'auto'; body.style.paddingRight = '0px';
+            // critic r7 O9: a wide row drawn as one wrapping line (desktop / tablet, count-row.js) never swipes: its step tab
+            // stands above it and the line wraps to the cell's width
+            // critic r9 E2: the wrapped row (its step tab above it) is centred in the cell on every host
+            if (body.dataset.mqWrap === '1') { frame.setAttribute('data-mq-swipes', ''); w.style.overflowX = 'visible'; w.style.width = ''; frame.style.width = 'fit-content'; frame.style.marginLeft = 'auto'; frame.style.marginRight = 'auto'; balanceWrap(); level(); return; }
             const its = items();
             const fw = frame.parentElement ? frame.parentElement.getBoundingClientRect().width : frame.getBoundingClientRect().width;
             if (body.getBoundingClientRect().width + col.getBoundingClientRect().width <= fw + 1 || its.length < 2) { level(); return; }
@@ -1698,6 +1778,19 @@ function wireSwipeRows(cellEl) {
         };
         mode();
         window.addEventListener('resize', mode);
+        // a wrapping row re-balances when its cell settles (fonts, the card's own layout passes)
+        if (body && body.dataset.mqWrap === '1' && typeof ResizeObserver !== 'undefined') {
+            let lastW = -1;
+            const ro = new ResizeObserver(() => {
+                if (!w.isConnected) { ro.disconnect(); return; }
+                const c = frame.closest('.mq-scell') || w;
+                const it0 = items()[0];
+                const cw = `${Math.round(c.getBoundingClientRect().width)}:${it0 ? Math.round(it0.getBoundingClientRect().width) : 0}`;
+                if (cw !== lastW) { lastW = cw; balanceWrap(); level(); }
+            });
+            ro.observe(frame.closest('.mq-scell') || w);
+            if (items()[0]) ro.observe(items()[0]);
+        }
         const upd = () => { level(); lastSL = w.scrollLeft; w.toggleAttribute('data-mq-scrolled', w.scrollLeft > 1); w.toggleAttribute('data-mq-end', !moreRight()); };
         w.addEventListener('scroll', upd, { passive: true });
         window.addEventListener('resize', upd);
@@ -1762,6 +1855,8 @@ function wireSwipeRows(cellEl) {
             };
             if (!first) w.dataset.mqMoved = '1';
             w.dataset.mqFocused = '1';
+            // critic r11 G3: the pupil's own move (a tap, Tab, a step from another box) shows the whole box, clear of the pinned bars
+            if (user) revealBox(t);
             // a box the pupil TAPPED is in view already: the row does not move under the finger
             if (tapped) { const v0 = w.getBoundingClientRect(), r0 = t.getBoundingClientRect(); if (r0.left >= v0.left - 0.5 && r0.right <= v0.right + 0.5) { upd(); return; } }
             const progFirst = first && !user;
@@ -1883,12 +1978,13 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
                 const nx = nextEmpty;
                 nx.focus({ preventScroll: true });
                 try { nx.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (err) { /* ignore */ }   // a box 1 px under the fold too
+                revealBox(nx);   // critic r11 G3: wholly in view, clear of the sticky Check bar and the quiz footer
                 return;
             }
             if (e.key === 'Enter') {
                 e.preventDefault();
                 const next = boxes[k + 1];
-                if (next && !next.value) next.focus();
+                if (next && !next.value) { next.focus(); if (join.trim() === ',') revealBox(next); }
                 else if (onChange) onChange(compose());
                 else input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
             }
@@ -3037,14 +3133,24 @@ export function cellDigitTarget(cellEl) {
  *   build    the body holds a build mat (mountBuild writes the mat's value into the input)
  * null: the item keeps the host's legacy path.
  */
+/**
+ * A count-by row drawn again for the screen it is shown on. Critic r7 O9 / r8: on every screen the row is drawn as one wrapping
+ * line at the host's digit size (`twinWrap`, count-row.js), balanced by wireSwipeRows, instead of shrinking under TY-10a or
+ * swiping. Owner ruling 2026-10-17: count rows wrap on the phone at 29 px (set in CSS, screen-cell.css); they no longer
+ * swipe or shrink (this replaced the TY-10b phone swipe and its 24 px gap cap). Any other item comes back as it is.
+ */
+export function countRowTwin(q) {
+    if (!q || !q.cell || q.cell.template !== 'count-row' || !q.cell.payload || typeof window === 'undefined'
+        || !/class="k2-twin"/.test(String(q.visual || ''))) return q;
+    // critic r11 G4: the drawing no longer depends on the window's width when it is made. The phone's 29 px digits are
+    // chosen by CSS (--mq-crow-cap at 540 px and under, screen-cell.css), so a turn of the
+    // device re-chooses them at once, with every typed answer and the focus kept; the ResizeObserver in wireSwipeRows re-balances
+    try { return Object.assign({}, q, { visual: k2Twin('count-row', Object.assign({}, q.cell.payload, { twinWrap: true, twinWrapAll: true })) }); } catch (e) { return q; /* keep the stored twin */ }
+}
+
 export function screenTwin(q, { categoryId = '', typedOrder = false } = {}) {
     if (!q) return null;
-    // TY-10b (critic phone29): on a phone a count-by row is drawn again with its gap capped at 24 px absolute, so the
-    // geometry (box pitch, arcs) is laid out on the narrower pitch and three whole columns fit the worksheet / quiz window
-    if (q.cell && q.cell.template === 'count-row' && q.cell.payload && typeof window !== 'undefined' && window.innerWidth <= 480
-        && /class="k2-twin"/.test(String(q.visual || ''))) {
-        try { q = Object.assign({}, q, { visual: k2Twin('count-row', Object.assign({}, q.cell.payload, { twinGapPx: 24 })) }); } catch (e) { /* keep the stored twin */ }
-    }
+    q = countRowTwin(q);
     const kt = kitCellTwin(q, { categoryId, typedOrder });
     if (kt) return kt;
     const t = q.answerType;
@@ -3182,8 +3288,11 @@ export function fitTwinRows(root) {
             // shrink the millimetre only as far as keeps every box a 44 px touch target, then it swipes (SP-10, SP-11a)
             const cur = parseFloat(getComputedStyle(twin).getPropertyValue('--mq-k2')) || 3.4;
             const need = sw.scrollWidth, have = sw.clientWidth;
-            // owner ruling 2026-10-03 (TY-10b): on a phone the row is drawn at about 29 px digits (boxes scale with them) and swipes;
+            // owner ruling 2026-10-03 (TY-10b, superseded 2026-10-17 for count rows, which now wrap and return above): a non-wrapping
+            // row on a phone is drawn at about 29 px digits (boxes scale with them) and swipes;
             // a row whose numbers TY-10a already shrank (wider than six boxes hold) keeps that shrink, scaled by the same factor
+            // owner ruling 2026-10-17: a wrapping count row (every count row on a screen) is already at the host digit size
+            if (twin.querySelector('.k2-countrow-body[data-mq-wrap="1"]')) return;
             if (typeof window !== 'undefined' && window.innerWidth <= 480 && have > 0) {
                 const dg = twin.querySelector('.k2-countrow-body .k2-given, .k2-countrow-body input.mq-cellslot');
                 const fs = dg ? parseFloat(getComputedStyle(dg).fontSize) : 0;

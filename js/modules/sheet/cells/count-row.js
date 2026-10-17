@@ -317,6 +317,34 @@ const IN_MM = 7.5;          // the lane a line starts with when the step tab sta
  */
 const LINE_GAP_MIN = { paper: 2 * 1.0 + 3, compact: 2 * 1.0 + 3 };   // a 3 mm arrow (head 2.4 mm), 1 mm clear each side
 const LINE_GAP_MAX = 10;
+/** Screen wrap (critic r8): the widest number's width in em (digits 0.56 em, separators 0.3 em), and the gap of a wrapping row. */
+const wrapEm = (p) => Math.max(1, ...(p.values || []).map((v) => { const t = fmt(v); const d = t.replace(/\D/g, '').length; return d * 0.56 + (t.length - d) * 0.3; }));
+/**
+ * Critic r11 G2: the width a number really takes in Andika Bold, in em (measured: every digit advances 0.6055 em, the comma
+ * 0.3247 em, the minus 0.586 em; every glyph's ink stands 0.027 em or more inside its advance). The estimate above (0.56 / 0.3)
+ * is 7.5 % short, so a long given ("1,000,000") overhung its box and the jump arrow's ink stood 0.58 mm from it. A long number's
+ * box is now its true advance, so its ink always lies inside the box and every arrow keeps 1.0 mm + the glyph's bearing.
+ */
+const ADV_EM = { digit: 0.6055, ',': 0.3247, '-': 0.437, '\u2212': 0.5859 };
+// each glyph's side bearings (ink inside its advance), em: [left, right]
+const BEAR_EM = { 0: [0.0313, 0.0273], 1: [0.0938, 0.0586], 2: [0.0625, 0.0586], 3: [0.0469, 0.043], 4: [0.0313, 0.0273], 5: [0.0469, 0.0586],
+    6: [0.0469, 0.0273], 7: [0.0469, 0.043], 8: [0.0313, 0.043], 9: [0.0313, 0.043], '-': [0.0313, 0.0308], '\u2212': [0.0625, 0.0703] };
+const inkOfText = (t) => {
+    const cs = [...t];
+    const adv = cs.reduce((a, ch) => a + (/[0-9]/.test(ch) ? ADV_EM.digit : ADV_EM[ch] || ADV_EM.digit), 0);
+    const l = (BEAR_EM[cs[0]] || [0, 0])[0], r = (BEAR_EM[cs[cs.length - 1]] || [0, 0])[1];
+    return { adv, ink: adv - l - r + 0.01, l, r };   // + 0.01 em: a hair for rendering
+};
+const inkEm = (p) => Math.max(1, ...(p.values || []).map((v) => inkOfText(fmt(v)).ink));
+// the box: a short number (up to 999) keeps 1.9 em or its width + 2.4 mm; a long one (1,000 up) is exactly as wide as the
+// widest number's INK, and each given is centred on its ink, so no given overhangs its box and the arrows' clearance is
+// measured to the ink (G2)
+const longWrap = (p) => wrapEm(p) >= 2.5;
+const wrapBoxMm = (p, em) => (longWrap(p) ? inkEm(p) * em : wrapEm(p) * em + 2.4);
+const WRAP_GAP = 4.2;
+// critic r11 G2: a wrapping screen row's arrow keeps 1.15 mm from each box edge (its ink then measures >= 1.0 mm at any pixel
+// ratio), and a wrapped line's lead-in pad is the lead-in arrow's own ink (WRAP_GAP - WRAP_CLEAR = 3.05 mm), no wider (G1)
+const WRAP_CLEAR = 1.15;   // a short jump arrow with 1 mm clear each side (critic r9 E2: three 1,000,000 boxes on a 768 card)
 function linesGeom(p, ctx, c) {
     const { size, n, tabBody, tab, live, lblPt: lblPt0, lblChars, hasLbl } = c;
     const chars = maxDigits(p);
@@ -330,6 +358,14 @@ function linesGeom(p, ctx, c) {
     // lines narrow (digits down to FLOOR_PT) before the row splits. At M and L, and on the one-page sheet, a row never shrinks
     // its digits or tab below the size's working size - it takes two lines of six. On SCREEN Lines wraps 6 + 6 like Boxes.
     const mayNarrow = !twin && !p.compact && size === 'S';
+    // critic r8 D3 (SL-3a): on a screen (`twinWrap`; owner ruling 2026-10-17: the phone too) a Lines row is ONE wrapping line at today's digits, each line as wide as
+    // the widest answer, and the screen scales it to the host's digit size (as the Boxes row does): it wraps, never swipes
+    if (twin && p.twinWrap && narrowCols(p, ctx) === 1 && !p.compact) {
+        const wW = Math.max(7, wrapBoxMm(p, basePt * PT_MM)), gW = WRAP_GAP;
+        const h0 = S(ctx).writeMm + 1;
+        const lblPtW = hasLbl ? Math.max(8, Math.min(lblPt0, (wW + gW - 0.8) / (Math.max(1, lblChars) * 0.6 * PT_MM))) : lblPt0;
+        return { size, n, look: 'arcs', shape: 'box', w: wW, h: h0, pitch: wW + gW, gap: gW, tab, tabBody, perRow: n, rows: 1, arcH: 0, pt: basePt, tabPt: basePt, hasLbl, lblH: hasLbl ? lblPtW * PT_MM * 1.2 + 0.9 : 0, lblPt: lblPtW, compact: false, lines: true, wrap: true };
+    }
     if (twin) perRow = n >= 13 ? 5 : Math.ceil(n / 2);
     else if (gapFor(n, w, false) < minGap && n <= 12 && mayNarrow) {
         const w1 = (live - tab - (n - 1) * minGap) / n, pt1 = (w1 - 2.4) / (chars * 0.56 * PT_MM);
@@ -381,6 +417,27 @@ function arcsGeom(p, ctx, c) {
             rows = Math.ceil(n / perRow);
         }
     }
+    // critic r7 O9: on a screen (the host asks with `twinWrap`; owner ruling 2026-10-17: the phone too, at 29 px, no swipe) a row whose numbers six
+    // boxes cannot hold at today's digits is not shrunk under TY-10a: it is drawn as ONE wrapping line at today's digits, each
+    // box wide enough for the widest answer, and the screen scales the whole row so its digits reach the host's digit size
+    // (min(--mq-digit, 40 px): 29 px on the online worksheet, 40 px on the card and the quiz). The browser wraps the line to
+    // the cell, so the row takes more lines instead of swiping. Paper is unchanged.
+    if (isTwin(ctx) && p.twinWrap && narrowCols(p, ctx) === 1 && !p.compact) {
+        const avail0 = live - tab - (rows > 1 ? EXIT_MM : 0);
+        const kS0 = shape === 'hex' || shape === 'mixed' ? 1.12 : 1;
+        const need0 = Math.max(MIN_BOX[size], chars * 0.56 * basePt * PT_MM + 2.4);
+        // critic r8 D2: EVERY desktop row is drawn this way (a row that fits as well), so every count row on a host is at that
+        // host's digit size and the cards of one skill match; the line wraps only where the cell is too narrow, never swipes
+        if (p.twinWrapAll || (avail0 + MIN_GAP) / perRow - MIN_GAP < need0 * kS0) {
+            // the box holds the widest number as written (digits 0.56 em, separators 0.3 em) plus a margin; the gap keeps a
+            // short jump arrow with 1 mm clear each side, so three or more numbers stand on a line of the host's cell
+            const w = Math.max(1.9 * basePt * PT_MM, wrapBoxMm(p, basePt * PT_MM));   // a short number keeps a box of 1.9 em
+            const sz = shape === 'box' ? { w, h: baseH } : tileSize(shape === 'mixed' ? 'hex' : shape, w, baseH);
+            const lblPt = hasLbl ? Math.max(8, Math.min(lblPt0, (sz.w + WRAP_GAP - 0.8) / (Math.max(1, lblChars) * 0.6 * PT_MM))) : lblPt0;
+            const lblHh = hasLbl ? lblPt * PT_MM * 1.2 + 0.9 : lblH;
+            return { size, n, look: 'arcs', shape, w: sz.w, h: sz.h, pitch: sz.w + WRAP_GAP, gap: WRAP_GAP, tab, tabBody, perRow: n, rows: 1, arcH: 0, pt: basePt, hasLbl, lblH: lblHh, lblPt, compact: false, wrap: true };
+        }
+    }
     const avail = live - tab - (rows > 1 ? EXIT_MM : 0);        // the width the numbers of one line may fill
     const pitch = (avail + MIN_GAP) / perRow;                   // box + gap, so six boxes and five gaps fill the line
     const shapeK = shape === 'hex' || shape === 'mixed' ? 1.12 : 1;
@@ -396,14 +453,6 @@ function arcsGeom(p, ctx, c) {
     if (isTwin(ctx) && gap > TWIN_GAP_MM) gap = TWIN_GAP_MM;
     // digits: today's size, shrunk only as far as the widest number needs, never below the floor
     const pt = Math.max(FLOOR_PT, Math.min(basePt, (sz.w - 2) / (0.56 * Math.max(2, chars)) * 72 / 25.4));
-    // the PHONE twin (TY-10b, critic phone29): the screen draws the digits at ~29 px, so px per mm there is 29 / (pt mm);
-    // the gap is capped at `twinGapPx` px absolute (24, set by the screen host on a phone), never under MIN_GAP
-    if (isTwin(ctx) && Number(p.twinGapPx) > 0) {
-        const kPhone = 29 / Math.max(1, pt * PT_MM);
-        // the cap wins over the paper's arrow clearance (MIN_GAP): the jump arrow sizes itself to the gap it gets, and the
-        // gap never falls under 14 px (3 mm on the phone) so the arrow still reads (lane a91a01fc, after merging TY-10b)
-        gap = Math.min(gap, Math.max(14 / kPhone, Number(p.twinGapPx) / kPhone));
-    }
     // the multiplication label shrinks to its box pitch too (a hint: floor 8 pt, TY-11)
     const lblPt = hasLbl ? Math.max(8, Math.min(lblPt0, (pitch - 0.8) / (Math.max(1, lblChars) * 0.6 * PT_MM))) : lblPt0;
     const lblHh = hasLbl ? lblPt * PT_MM * 1.2 + 0.9 : lblH;
@@ -469,9 +518,12 @@ function jumpArrow(ctx, g, w) {
     const h = g.h, mid = h / 2;
     // owner mark-up (2026-10-03): a short BOLD arrow centred in the gap, >= 1.5 mm clear of both neighbours (CLEAR_MM). Only
     // the one-page sheet's 12-number line has no room for that and keeps COMPACT_CLEAR_MM.
-    const clear = w >= 2 * CLEAR_MM + 4 ? CLEAR_MM : COMPACT_CLEAR_MM;
+    // critic r11 G2: a screen row's arrow (the wrap, gap 4.2 mm) keeps 1.15 mm from each box edge, so its INK measures 1.0 mm or
+    // more from a box border at every screen scale and pixel ratio (1.0 mm exactly read 0.95 mm at 3x on a desktop card)
+    const clear = g.wrap ? WRAP_CLEAR : w >= 2 * CLEAR_MM + 4 ? CLEAR_MM : COMPACT_CLEAR_MM;
     const len = g.compact && !g.lines ? Math.min(COMPACT_ARROW_MM, w - 2 * clear) : Math.max(0.6, Math.min(w - 2 * clear, 5));
-    const head = Math.min(2.5, len * 0.8), half = Math.max(head * 0.5, 0.9);
+    // a screen row's shorter arrow keeps a visible shaft: its head is 0.62 of its length there (paper: 0.8, unchanged)
+    const head = Math.min(2.5, len * (g.wrap ? 0.62 : 0.8)), half = Math.max(head * 0.5, 0.9);
     const x0 = (w - len) / 2, x1 = x0 + len;
     const body = (len - head > 0.3 ? `<path d="M${n2(x0)} ${n2(mid)} H${n2(x1 - head + 0.2)}" fill="none" stroke="${INK}" stroke-width="${n2(SW.heavy)}" stroke-linecap="butt"/>` : '')
         + `<polygon points="${n2(x1 - head)},${n2(mid - half)} ${n2(x1)},${n2(mid)} ${n2(x1 - head)},${n2(mid + half)}" fill="${INK}" stroke="none"/>`;
@@ -538,7 +590,14 @@ register('count-row', {
             if (k < 0) {
                 const text = fmt(over !== undefined ? over : v);
                 if (plainGiven) {
-                    return `<span class="k2-given"${over !== undefined ? ' data-ws-shown="1"' : ''} style="flex:none;display:inline-flex;align-items:center;justify-content:center;`
+                    // a long number on a wrapping screen row: its box is the row's widest INK, so the text (its advance a hair
+                    // wider) is shifted by its own side bearings to centre its ink in the box (critic r11 G2)
+                    let inkShift = '';
+                    if (g.wrap && longWrap(p)) {
+                        const k = inkOfText(text), d = (k.l - k.r) * g.pt * PT_MM;
+                        if (Math.abs(d) > 0.005) inkShift = `box-sizing:border-box;${d > 0 ? 'padding-right' : 'padding-left'}:${L(ctx, Math.abs(d))};`;
+                    }
+                    return `<span class="k2-given"${over !== undefined ? ' data-ws-shown="1"' : ''} style="flex:none;display:inline-flex;align-items:center;justify-content:center;${inkShift}`
                         + `width:${L(ctx, g.gw || g.w)};height:${L(ctx, g.h)};font-size:${P(ctx, g.pt)};font-weight:700;line-height:1;">${esc(text)}</span>`;
                 }
                 return tile(ctx, { shape: sh, w: g.w, h: g.h, pt: g.pt, value: text, shown: over !== undefined });
@@ -577,7 +636,7 @@ register('count-row', {
             const exitArrow = turns && r < g.rows - 1 ? `<span style="flex:none;width:${L(ctx, 6)};margin-left:${L(ctx, 1.5)};${lift}">${turnArrow(ctx, g, 'out', 6)}</span>` : '';
             rowsHtml.push(`<div class="k2-countrow-line"${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;align-items:flex-end;justify-content:${g.tab ? 'flex-start' : 'center'};${r ? `margin-top:${L(ctx, lg)};` : ''}">`
                 + `${swipeTabs ? '' : tabCol}<div style="display:flex;flex-direction:column;align-items:flex-start;">${arcs}`
-                + `<div${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;align-items:flex-start;gap:${L(ctx, g.gap)};">${lineCells.join('')}</div></div>${exitArrow}</div>`);
+                + `<div${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;align-items:flex-start;gap:${L(ctx, g.gap)};${g.wrap ? `flex-wrap:wrap;row-gap:${L(ctx, 3)};padding-left:${L(ctx, g.gap - WRAP_CLEAR)};` : ''}">${lineCells.join('')}</div></div>${exitArrow}</div>`);
         }
         let caption = '';
         if (p.rule) {
@@ -603,7 +662,7 @@ register('count-row', {
         return root(ctx, `k2-countrow k2-countrow-${g.look}`,
             `${caption}${swipeTabs ? `<div class="k2-countrow-frame" style="display:flex;align-items:flex-start;max-width:100%;min-width:0;"><div class="k2-countrow-tabs" data-mq-tabcol="1" style="flex:none;">${tabsCol.join('')}</div>` : ''}`
             + `${isTwin(ctx) && g.look === 'arcs' ? `<div data-mq-swiperow="1" style="overflow-x:auto;max-width:100%;padding-bottom:1px;${swipeTabs ? 'flex:1 1 auto;min-width:0;width:auto;' : ''}">` : ''}`
-            + `<div class="k2-countrow-body" data-mq-join=", " style="display:inline-block;text-align:left;">${rowsHtml.join('')}</div>`
+            + `<div class="k2-countrow-body" data-mq-join=", " style="display:inline-block;text-align:left;${g.wrap ? `--mq-k2:calc(min(var(--mq-digit, 40px), var(--mq-crow-cap, 40px)) / ${n2(g.pt * PT_MM)});` : ''}"${g.wrap ? ' data-mq-wrap="1"' : ''}>${rowsHtml.join('')}</div>`
             + `${isTwin(ctx) && g.look === 'arcs' ? '<div class="k2-swipe-cues" aria-hidden="true"><span class="k2-swipe-back"><i>&#10229;</i> <b>Back<span class="k2-cue-long"> to the start</span></b></span><span class="k2-swipe-cue"><b>Swipe</b> <i>&#10142;</i> <b>for more boxes</b></span></div></div>' : ''}${swipeTabs ? '</div>' : ''}${keys}${ruleFrame}`,
             { style: `text-align:${align};${vp ? `padding:${L(ctx, vp)} 0;` : ''}${inset ? `padding-left:${L(ctx, inset)};` : ''}` });
     },

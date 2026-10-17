@@ -1,6 +1,9 @@
-// Wave 1 lane C2, phone (390 px) practice card and online worksheet for count_by_tables (SP-11a extended to count-by rows):
-//  - a row wider than its cell swipes inside it and shows the cue ("Swipe -> for more boxes"): visible while not at the end, hidden at
-//    the end, never over a box;
+// Wave 1 lane C2, phone (390 px) practice card, online worksheet and quiz for count_by_tables.
+// Owner ruling 2026-10-17 (TY-10b amended): count rows wrap on the phone at the host digit size (~29 px); they no longer swipe or
+// shrink. The assertions of the old phone swipe (window of whole columns, scroll-snap, back / forward cues, the forced-hidden first
+// box and its negative control, the TY-10a shrink of wide rows, the 2.4-2.9 box:digit ratio) are replaced by the wrap rule: every
+// number and box shows at load with the row unscrolled, no cue, digits ~29 px for every row, boxes >= 48 px touch targets (SP-10).
+//  - the cue is hidden (no row overflows its cell);
 //  - Tab through EVERY box: each is fully visible inside the swipe window and inside every clipping ancestor (the card's bottom edge too);
 //  - no box's rect is clipped vertically by any ancestor; the page never scrolls sideways.
 // Run: /tmp/mq-browser-run.sh node tests/scripts/wave1-c2-phone.cjs
@@ -124,7 +127,8 @@ const MEASURE = () => {
     const named = !!opts.$firstCol;
     check(t0.ok && t0.scrollLeft === 0 && t0.startShown && !f0.hiddenFocus, `${tag}: at load the row rests at 0 (scrollLeft ${t0.scrollLeft}) with the first given number${t0.startShown ? '' : ' NOT'} fully in the ${t0.win} px window, the first box${t0.boxShown ? '' : ' NOT'} fully in it, focus ${f0.inRow ? (f0.hiddenFocus ? 'ON A HIDDEN BOX' : 'on a box in view') : 'not in the row'}, nothing cut at either edge${t0.ok ? '' : ' (' + t0.why + ')'}`);
     if (host === 'card') check(t0.boxShown ? f0.first : !f0.inRow, `${tag}: the card's auto-focus ${t0.boxShown ? (f0.first ? 'is on the first box (it shows at the start)' : 'is NOT on the first box though it shows') : (f0.inRow ? 'went INTO A HIDDEN BOX' : 'is withheld: the first box does not show at the start, so nothing is typed blind')}`);
-    if (named) check(!t0.boxShown && !f0.inRow, `${tag}: the seeded first box (column ${opts.$firstCol + 1}) lies past the window at load (shown: ${t0.boxShown}) and holds no focus`);
+    // owner ruling 2026-10-17: the row wraps, so even a first box seeded in column 6 shows at load (and the card focuses it)
+    if (named) check(t0.boxShown && (host !== 'card' || f0.first), `${tag}: the seeded first box (column ${opts.$firstCol + 1}) shows at load with the row unscrolled (shown: ${t0.boxShown}${host === 'card' ? `, focused: ${f0.first}` : ''})`);
     check(t0.ok, `${tag}: after load the step tab is clear of the row, nothing under it${t0.ok ? '' : ' (' + t0.why + ')'}`);
     // owner 2026-10-03 (TY-10b): on a phone the row's digits are about 29 px, the boxes scaled with them (>= 48 px touch targets);
     // critic C2 r8 (a): the window shows as many WHOLE columns as fit in the cell's inner box
@@ -132,47 +136,34 @@ const MEASURE = () => {
       const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent);
       const g = w.querySelector('.k2-given'), i = w.querySelector('input.mq-cellslot'), ir = i.getBoundingClientRect(), v = w.getBoundingClientRect();
       const its = [...w.querySelector('.k2-countrow-line [data-mq-wrapped]').children];
-      const a = its[0].getBoundingClientRect(), b = its[1].getBoundingClientRect(), pitch = b.left - a.left, gap = pitch - a.width;
+      const a = its[0].getBoundingClientRect(), b = its[1].getBoundingClientRect(), gap = parseFloat(getComputedStyle(its[0].parentElement).columnGap) || (b.left - a.right), pitch = a.width + gap;
       const cell = w.closest('.mq-scell'), cr = cell.getBoundingClientRect(), cs = getComputedStyle(cell);
       const room = cr.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - parseFloat(cs.borderLeftWidth) - parseFloat(cs.borderRightWidth);
       const shown = its.filter((e) => { const r = e.getBoundingClientRect(); return r.left >= v.left - 1 && r.right <= v.right + 1; }).length;
       const firstBoxCol = its.findIndex((e) => e.querySelector('input.mq-cellslot') || e.matches('input.mq-cellslot'));
       const digits = Math.max(...[...w.querySelectorAll('.k2-given')].map((e) => e.textContent.replace(/[^0-9]/g, '').length));
       return { fs: parseFloat(getComputedStyle(g).fontSize), bfs: parseFloat(getComputedStyle(i).fontSize), bw: ir.width, bh: ir.height, shown, fit: Math.min(its.length, Math.max(1, Math.floor((room + gap + 0.5) / pitch))), room: Math.round(room), swipes: w.scrollWidth > w.clientWidth + 1,
-        gap, pitch, item: a.width, item2: b.width, win: v.width, firstBoxCol, digits, cols: its.length };
+        gap, pitch, item: a.width, item2: b.width, win: v.width, firstBoxCol, digits, cols: its.length, perLine: its.filter((e) => Math.abs(e.getBoundingClientRect().top - a.top) < 8).length };
     });
     // a number too wide for six boxes shrinks under TY-10a (floor 9 pt), so the 29 px rule is checked on rows that keep their size
-    const big = !/1,000|100,000/.test(name);
-    if (big) check(sz.fs >= 28 && sz.fs <= 31 && Math.abs(sz.bfs - sz.fs) < 0.5 && Math.min(sz.bw, sz.bh) >= 48 && sz.bw / sz.fs > 2.4 && sz.bw / sz.fs < 2.9, `${tag}: digits ${sz.fs.toFixed(1)} px (about 29), box ${Math.round(sz.bw)} x ${Math.round(sz.bh)} px (>= 48, width:digit ${(sz.bw / sz.fs).toFixed(2)}, 2.6 before the change)`);
-    else check(Math.min(sz.bw, sz.bh) >= 44, `${tag}: a wide number row (TY-10a): digits ${sz.fs.toFixed(1)} px, box ${Math.round(sz.bw)} x ${Math.round(sz.bh)} px (>= 44)`);
+    // owner ruling 2026-10-17: every row, a wide one too, is at ~29 px (no TY-10a shrink on a screen), each box a >= 48 px target (SP-10: digit inputs >= 48 px; critic r11 G5 restored it from 44)
+    check(sz.fs >= 28 && sz.fs <= 30 && Math.abs(sz.bfs - sz.fs) < 0.5 && Math.min(sz.bw, sz.bh) >= 48, `${tag}: digits ${sz.fs.toFixed(1)} px (about 29), box ${Math.round(sz.bw)} x ${Math.round(sz.bh)} px (>= 48)`);
     const cueFit = await page.evaluate(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); const c = w.querySelector('.k2-swipe-cue');
       if (!c || getComputedStyle(c).display === 'none') return { ok: true, why: 'no forward cue (the row fits)' };
       const v = w.getBoundingClientRect(), r = c.getBoundingClientRect(), fs = parseFloat(getComputedStyle(c).fontSize);
       return { ok: c.scrollWidth <= c.clientWidth + 1 && r.right <= v.right + 1 && r.left >= v.left - 1 && r.height < 2.2 * fs && fs >= 14, why: `${Math.round(r.width)} px in a ${Math.round(v.width)} px window, ${fs} px type, ${Math.round(r.height)} px high` }; });
-    check(cueFit.ok, `${tag}: the forward cue is whole, on one line, inside the window (${cueFit.why})`);
-    check(!sz.swipes || sz.shown === sz.fit, `${tag}: the window shows ${sz.shown} whole columns; ${sz.fit} fit in the cell's ${sz.room} px inner box`);
+    check(cueFit.ok && /no forward cue/.test(cueFit.why), `${tag}: no forward cue on a wrapping row (${cueFit.why})`);
+    check(!sz.swipes && sz.shown === sz.cols, `${tag}: the row wraps in its cell: no swipe, all ${sz.cols} numbers in view (${sz.shown} shown) in the ${sz.room} px inner box`);
     // critic phone29 (1): on the phone worksheet and quiz the gap between columns is capped at 24 px (never under 3 mm = 13.8 px),
     // the geometry is laid out on that pitch, and a row of up to 3 digits shows 3 whole columns
     if (host !== 'card') {
       const gapOk = sz.gap >= 13.8 - 0.5 && sz.gap <= 24.5;
       const pitchOk = Math.abs(sz.pitch - (sz.item + sz.gap)) <= 1 && Math.abs(sz.item2 - sz.item) <= 1;
       check(gapOk && pitchOk, `${tag}: gap ${sz.gap.toFixed(1)} px (13.8-24.5), pitch ${sz.pitch.toFixed(1)} = item ${sz.item.toFixed(1)} + gap`);
-      if (sz.digits <= 3) check(sz.shown === 3 && sz.win >= 3 * sz.item + 2 * sz.gap - 0.5, `${tag}: a row of ${sz.digits}-digit numbers shows ${sz.shown} whole columns (want 3) in a ${sz.win.toFixed(1)} px window (>= 3 x ${sz.item.toFixed(1)} + 2 x ${sz.gap.toFixed(1)} = ${(3 * sz.item + 2 * sz.gap).toFixed(1)})`);
+      if (sz.digits <= 3) check(sz.perLine >= 3, `${tag}: a row of ${sz.digits}-digit numbers stands at least 3 to a line (${sz.perLine} on the first line)`);
     }
-    // critic phone29 (2): a first box hidden at load is FORCED, not a layout fault: it lies past the shown columns, and the window
-    // shows every column that fits. The negative control narrows the window by one column on purpose and the check must then fail.
-    const hiddenForced = (s) => s.firstBoxCol >= s.shown && s.shown === s.fit;
-    if (!t0.boxShown) {
-      check(hiddenForced(sz), `${tag}: the hidden first box (column ${sz.firstBoxCol + 1}) lies past the ${sz.shown} shown columns, and ${sz.fit} fit`);
-      const narrowed = await page.evaluate(({ pitch, gap }) => {
-        const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); const old = w.style.width;
-        const v0 = w.getBoundingClientRect(); w.style.width = `${v0.width - pitch}px`;
-        const v = w.getBoundingClientRect(); const its = [...w.querySelector('.k2-countrow-line [data-mq-wrapped]').children];
-        const shown = its.filter((e) => { const r = e.getBoundingClientRect(); return r.left >= v.left - 1 && r.right <= v.right + 1; }).length;
-        w.style.width = old; return { shown };
-      }, { pitch: sz.pitch, gap: sz.gap });
-      check(!hiddenForced(Object.assign({}, sz, { shown: narrowed.shown })), `${tag}: negative control: with the window narrowed by one column (${narrowed.shown} shown of ${sz.fit} that fit) the forced-hidden check FAILS as it must`);
-    }
+    // owner ruling 2026-10-17: no box is hidden at load any more (the forced-hidden check and its negative control are retired)
+    check(t0.boxShown, `${tag}: the first box shows at load`);
     // critic C2 r8 (b): focus held back -> the first digit key typed with nothing focused goes to the first box, shown whole, as Tab does
     if (host === 'card' && !t0.boxShown && !f0.inRow) {   // (at 29 px digits a default row may hold its first box past the start too)
       await page.keyboard.press('5'); await sleep(300);
@@ -181,22 +172,12 @@ const MEASURE = () => {
       await sleep(300);
       check(dk.focused && dk.value === '5' && dk.shown, `${tag}: with focus held back, typing 5 moves to the first box (focused ${dk.focused}, value "${dk.value}", fully shown ${dk.shown})`);
     }
-    // a programmatic scroll settles on a column start (scroll-snap): no number or box is cut at the row's left edge
-    await page.evaluate(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); const its = [...w.querySelector('.k2-countrow-line [data-mq-wrapped]').children]; w.scrollLeft = Math.round((its[1].getBoundingClientRect().left - its[0].getBoundingClientRect().left) * 0.7); });
-    await sleep(700);
-    const tS = await page.evaluate(TABCHK);
-    const backCue = await page.evaluate(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); const b = w.querySelector('.k2-swipe-back'); return w.scrollLeft > 1 ? !!b && getComputedStyle(b).display !== 'none' : true; });
-    check(tS.ok && tS.scrollLeft > 0 && backCue, `${tag}: after a scroll of 0.7 column the row settles on the next column start (scrollLeft ${tS.scrollLeft}), nothing cut, the back cue shows${tS.ok ? '' : ' (' + tS.why + ')'}`);
-    const strip1 = await page.evaluate(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); const c = w.querySelector('.k2-swipe-cues'); const sh = (e) => getComputedStyle(e).display !== 'none';
-      return { h: sh(c) ? c.getBoundingClientRect().height : 0, back: sh(w.querySelector('.k2-swipe-back')), fwd: sh(w.querySelector('.k2-swipe-cue')), text: c.innerText.replace(/\s+/g, ' ').trim() }; });
-    check(!(strip1.back && strip1.fwd) || strip1.h <= 40, `${tag}: one column in, ${strip1.back && strip1.fwd ? `both cues show on ONE line, ${Math.round(strip1.h)} px ("${strip1.text}")` : `one cue shows ("${strip1.text}", ${Math.round(strip1.h)} px)`}`);
+    // owner ruling 2026-10-17: a wrapping row has nothing to scroll: setting scrollLeft leaves it at 0, and neither cue shows
     await page.evaluate(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); w.scrollLeft = 130; });
-    await sleep(700);
+    await sleep(500);
     const tM = await page.evaluate(TABCHK);
-    const backCue2 = await page.evaluate(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); const b = w.querySelector('.k2-swipe-back'); return w.scrollLeft > 1 ? !!b && getComputedStyle(b).display !== 'none' : true; });
-    const strip = await page.evaluate(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); const c = w.querySelector('.k2-swipe-cues'); const b = w.querySelector('.k2-countrow-body'); return { h: c && getComputedStyle(c).display !== 'none' ? c.getBoundingClientRect().height : 0, body: b.getBoundingClientRect().height, back: getComputedStyle(w.querySelector('.k2-swipe-back')).display !== 'none', fwd: getComputedStyle(w.querySelector('.k2-swipe-cue')).display !== 'none' }; });
-    check(strip.h > 0 && strip.h <= 60 && strip.h <= 0.5 * strip.body, `${tag}: mid-row, the cues share one strip ${Math.round(strip.h)} px high (<= 60 and <= half the ${Math.round(strip.body)} px row; back ${strip.back ? 'shown' : 'hidden'}, forward ${strip.fwd ? 'shown' : 'hidden'})`);
-    check(tM.ok && backCue2, `${tag}: after scrollLeft = 130 the row settles on a column start (scrollLeft ${tM.scrollLeft}), nothing cut, the back cue shows${tM.ok ? '' : ' (' + tM.why + ')'}`);
+    const cues = await page.evaluate(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); const sh = (e) => !!e && getComputedStyle(e).display !== 'none' && e.getBoundingClientRect().height > 0; return { back: sh(w.querySelector('.k2-swipe-back')), fwd: sh(w.querySelector('.k2-swipe-cue')) }; });
+    check(tM.ok && tM.scrollLeft === 0 && !cues.back && !cues.fwd, `${tag}: scrollLeft = 130 leaves the wrapping row at 0 (scrollLeft ${tM.scrollLeft}), no back or forward cue${tM.ok ? '' : ' (' + tM.why + ')'}`);
     await page.evaluate(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); w.style.scrollSnapType = 'none'; w.scrollLeft = 0; w.style.scrollSnapType = ''; if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); delete w.dataset.mqFocused; });
     await sleep(200);
     // a PROGRAM focus (an auto-focus) of the first box: taken only when the box shows at the start, refused otherwise; the row stays at 0

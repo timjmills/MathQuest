@@ -1786,3 +1786,30 @@ html body .mq-scell .k2-shape-line > .k2-line-slot[data-mq-cell] > input.mq-cell
    width over the dividend's column (that column no longer stretches to the box), never shrinking
    below the touch target (critic ldiv-hug R1 D-1). */
 .mq-scell .mq-rembrk .mq-cellbox { flex: none; }
+
+/* critic r9 E1: a count-row card on the online worksheet (a row of 6 + 6 at 29 px) is one even card width for the whole
+   skill, centred in the sheet, so a fitting row's two lines of six do not leave a wide empty band on a desktop sheet */
+.online-edition .problems-grid.mq-wsgrid.mq-wsfit > .problem-card.mq-wscard.mq-span-row.mq-countrow-card { width: 100%; max-width: 760px; justify-self: center; box-sizing: border-box; }
+
+/* Small fixes item 8, round 5 (critic r11 G1, G4). A wrapping count row's phone drawing is chosen HERE, not when the row is
+   made (countRowTwin), so a turn of the device re-chooses it with every typed answer and the focus kept:
+   - at 540 px and under its digits are min(host digit, 29 px) (owner ruling 2026-10-17: the phone's 29 px; up to 540 px so a
+     card or a quiz at 481-540 px stands two 1,000,000 numbers a line instead of one at 40 px).
+   At 480 px and under a count row also takes the cell's and the card's side padding (down to 4 px between the cell border and
+   the row, so the row block stands about 19 px from the screen edge), so two 1,000,000 numbers stand on a 360 px line on
+   every host. Only a card holding a wrapping count row changes. Additive. */
+@media (max-width: 540px) {
+    .k2-countrow-body[data-mq-wrap="1"] { --mq-crow-cap: 29px; }
+}
+@media (max-width: 480px) {
+    #gameView #questionCard.mq-card:has(.k2-countrow-body[data-mq-wrap="1"]) { padding-left: 4px; padding-right: 4px; }
+    #gameView #questionCard.mq-card #questionPaper.mq-qpaper:has(.k2-countrow-body[data-mq-wrap="1"]) { grid-template-columns: 4px minmax(0, 1fr) 4px; }
+    .online-edition .problems-grid.mq-wsgrid > .problem-card.mq-wscard.mq-countrow-card,
+    .online-edition .problems-grid.mq-wsgrid.mq-wsfit > .problem-card.mq-wscard.mq-span-row.mq-countrow-card {
+        width: calc(100% + 8px); max-width: none; margin-left: -4px; margin-right: -4px; justify-self: start; padding-left: 2px; padding-right: 2px;
+    }
+    .online-edition .problem-card.mq-wscard.mq-countrow-card > .mq-wspaper { padding-left: 0; padding-right: 0; }
+    .online-edition .problem-card.mq-wscard.mq-countrow-card .ws-cell.mq-scell:has(.k2-countrow-body[data-mq-wrap="1"]) { padding-left: 4px; padding-right: 4px; }
+    #quizTakeView .qt-question-card:has(.k2-countrow-body[data-mq-wrap="1"]) { padding-left: 4px; padding-right: 4px; }
+    #quizTakeView .qt-question-card .ws-cell.mq-scell:has(.k2-countrow-body[data-mq-wrap="1"]) { padding-left: 4px; padding-right: 4px; }
+}
