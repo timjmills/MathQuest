@@ -339,6 +339,17 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
   `-wip-a79237e5c40225940` @ 37f3d627 (critic r4 FAIL on D12 only; fix r5 b19172b4 unreviewed, partly ungated); White Rose page
   `-wip-wrm-page` @ 25b453e7 (critic r8 FAIL on M12 only; f075caa9 round 10 WIP unverified). Next for each: finish gates, critic, merge.
   Lessons 6-10 helper reports an owner rule (skill coverage) and an audit of lessons 1-5 (`design/lesson-planner/lessons/SKILL-COVERAGE-AUDIT-1-5.md`).
+- 2026-10-17 ~09:40: **OWNER WIND-DOWN — all helpers paused and archived; nothing running.** Each lane branch carries its own
+  "HELPER PAUSED 2026-10-17" STATUS entry with exact next steps. Resume list:
+  1. Deploy main (generator fixes bf378b7b etc.): full gates + ws-stamp-assets + push master.
+  2. Y4 site lessons `-wip-wrm-lessons-y4` @ 9f81d54f: critic r4 FAIL 7.96 (lesson 7 area-story objects 3 vs 5); rewrite F6, merge main
+     (denoms payload fix changes lesson 10 identify {denoms:[2]} why), fill lessonfit gaps, critic r5, merge.
+  3. Lessons 6-10 `-wip-detailed-lessons-2` @ 2e1b7c11: lesson 6 fix r3 88f7d2d0 ungraded; lesson 7 built ungraded; 8-10 researched;
+     unapplied patches in `design/lesson-planner/wip-2026-10-17/` (coverage lanes for lessons 1-5, vocab letters).
+  4. Lane D `-wip-a3256e8dfc9684535` @ a31555a6 (r12d WIP, critic r9 not run) and fraction key `-wip-adbb61b8450078736` @ 4f510ce5
+     (critic r8 FAIL R8-1/R8-2, r9 WIP); both touch print-sheet.js + ws-print-lint.cjs (conflicts expected).
+     Owner question: G4 like-denominator keys show 2/8 = 1/4 (recommended).
+  5. Skip-count @ 37f3d627 (r5 unreviewed) and White Rose page `-wip-wrm-page` @ 25b453e7 (r10 WIP) — see their entries.
 - Held for after these land: Lane B answer boxes + regroup boxes (spec `design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md`),
   placevalue:identify write-value (spec `design/audit/runs/next-session/PV-IDENTIFY-WRITE-VALUE-SPEC.md`).
 - 2026-10-17 generator bug fixes (branch claude/sweet-newton-c8wrv1-wip-genbugs; seeded 1-600 before/after): (1) `equiv_frac_nv` yes/no: the distractor clamp could land on an equivalent pair keyed "no" (seed 206: 2/3 vs 2/3) - the denominator now moves until the cross products differ (2 -> 0 bad); (2) `itemDenominators` now reads `q.cell.payload` ({n,d} terms, "a/b" strings), so kit cells obey the denominators filter (`equiv_frac_visual {denoms:[2]}` 22 -> 0 items with no denominators seen); (3) `percent_of_number`: the 33% combos keyed one third (33% of 60 = 20) are now 30% with exact whole answers (53 -> 0); (4) `simplify`: distractor numerators are 1-3 off and never below 1 (no 0 or negative options; 23 -> 0); (5) `distributive_expr` factor-out: inner terms are coprime so the stated factor is the GCF (10x + 30 -> 10(x + 3), 126 -> 0).
