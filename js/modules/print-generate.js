@@ -11541,7 +11541,13 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
     // this branch caught its "___ rows of ___" items first and printed them with no array at
     // all (critic, baseline 2026-09-24: "asks about an array with no array drawn").
     if (text.includes("___") && problem.printFormat !== 'arrays-groups') {
-        const formattedText = text.replace(/___/g, `<span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>`);
+        // A generator that names this blank as THE answer place (`printSlot`, one ___ only) gets a
+        // real `line` slot, so the pupil page and the key count the same slot and the key writes
+        // the answer on it (AK-4; mult_properties "break apart", 2026-10-17). Others are unchanged.
+        const oneSlot = problem.printSlot && text.split('___').length === 2;
+        const formattedText = oneSlot
+            ? text.replace('___', wsAnswerLine(Math.max(1, String(problem.answer ?? problem.ans ?? '').length)).replace('data-ws-shape="line"', 'data-ws-shape="line" data-ws-slot="answer"'))
+            : text.replace(/___/g, `<span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>`);
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}

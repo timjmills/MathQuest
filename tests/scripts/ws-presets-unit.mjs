@@ -101,14 +101,19 @@ const app = await open({ seed: 1 });
 try {
     const res = await app.page.evaluate((list) => {
         const out = [];
-        const strip = (q) => q && J2({ t: q.text, a: q.ans, v: q.visual, c: q.cell });
+        // the area model's input ids open with Date.now() (a per-call DOM id, not content): drop the clock part
+        const strip = (q) => q && J2({ t: q.text, a: q.ans, v: q.visual, c: q.cell }).replace(/(data-area-idx=\\?")\d+/g, '$1');
         function J2(x) { return JSON.stringify(x); }
         for (const [key, p] of list) {
             const [cat, id] = key.split(':');
+            // A whole page of the preset, then a whole page of the host with the preset values: a page's
+            // deals are cached per page (page-deal.js), so the two are compared page against page, never
+            // interleaved item by item (an interleaved host item would reuse the preset page's decks).
+            const page = (skill, opts) => Array.from({ length: 6 }, (_, i) =>
+                window.generateQuestionFor({ category: cat, skill, opts, seed: 1000 + i * 7, itemIndex: i, itemCount: 6 }));
+            const pa = page(id), pb = page(p.skill, p.opts);
             for (let i = 0; i < 6; i++) {
-                const seed = 1000 + i * 7;
-                const a = window.generateQuestionFor({ category: cat, skill: id, seed, itemIndex: i, itemCount: 6 });
-                const b = window.generateQuestionFor({ category: cat, skill: p.skill, opts: p.opts, seed, itemIndex: i, itemCount: 6 });
+                const a = pa[i], b = pb[i];
                 if (!a) { out.push(`${key} item ${i}: generated nothing`); continue; }
                 if (strip(a) !== strip(b)) out.push(`${key} item ${i}: differs from ${p.skill} with ${J2(p.opts)}`);
                 if (a.presetId !== id || a.skillId !== p.skill) out.push(`${key} item ${i}: presetId=${a.presetId} skillId=${a.skillId}`);

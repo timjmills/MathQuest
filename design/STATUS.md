@@ -525,6 +525,13 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
   stamped; no critic yet.
 - 2026-10-17: Owner request recorded, NOT built: carry digits UNDER the answer line as a teacher option (addition, short and long multiplication; subtraction stays at the top; off by default; smaller box). Spec: `design/audit/runs/next-session/CARRY-BELOW-SPEC.md`. Add a build-list entry (operations lane, appended) after the current deploy.
 - 2026-10-17 ~19:45: **DEPLOYED** master ae66125c (live confirmed): 14 preset skills (mechanism `js/modules/skill-presets.js`, `design/PRESET_SKILLS.md`) and the White Rose "Skills to be made" cards per lesson and per grade/domain (`js/modules/lesson-tomake.js`). Full gates OK, print-lint 460/33. In flight: presets batch 2 (`-wip-presets-2`), White Rose simpler navigation (`-wip-wrm-nav`). Carry-below build-list entry waits for presets batch 2 (both edit build-list.js).
+- 2026-10-17: **Preset skills batch 2 (Opus low)** on `claude/sweet-newton-c8wrv1-wip-presets-2` (not merged, no critic).
+  Owner: every "ask owner" row of `design/PRESET_SKILLS.md` is a preset. 100 presets made (114 in all), codes VT..Y5 pinned
+  (VH, VR, VS, WH, WL, W3, YS, YT, VY, VZ unused). Not made, host option does not deal what it says: mult/div/add word-problem story
+  kinds (word-work retell), ratio part-to-whole, "is it reasonable?" for sums and products (content-audit pv-band), area model 2x2 / 2x3 (host print-lint findings). Host fixes:
+  mult_properties break-apart key AK-4 (`printSlot` line slot); P12 accept-layer redraws on a page (page-deal `setRedraw`);
+  div_unit_frac_nv option labels; two click-all branches honour `forms`; codec writes empty `rows` as X; ws-presets-unit page vs page.
+  Build-list preset:true entries say they become named skills when built.
 - Held for after these land: Lane B answer boxes + regroup boxes (spec `design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md`),
   placevalue:identify write-value (spec `design/audit/runs/next-session/PV-IDENTIFY-WRITE-VALUE-SPEC.md`).
 

@@ -18,7 +18,7 @@ import { presetOf } from './skill-presets.js';
 import { normalizeOptions, pvRefusal, optionsFor, p12RouteFor } from './skill-options.js';
 import { registerVariantOverride } from './variant-cycler.js';
 // L10: the page dealer. Every choice dealt down a page goes through it; reset at item 0.
-import { dealIndex, resetPageDeals } from './page-deal.js';
+import { dealIndex, resetPageDeals, setRedraw } from './page-deal.js';
 // Every whole-number word problem is drawn as ONE cell type: the story, a small + − × ÷ row,
 // column boxes and "Answer: [ ] ____" (owner ruling 2026-09-25; word-work.js).
 import { applyWordWork } from './word-work.js';
@@ -326,8 +326,14 @@ export function generateQuestion() {
         // no change; the values offered for each skill are the ones its generator was measured to
         // draw often enough that a redraw finds one. The last draw is kept if none fits.
         let q = null;
+        // On a page (state.itemIndex set) page-deal.js gives item k the SAME slot on every draw, so a
+        // redraw of a kind dealt by pickVariant / dealIndex came back the same kind 80 times and the
+        // wrong kind was kept (a "x + a = b" page printed x − a and drag items). A redraw deals each
+        // choice as a plain seeded draw (page-deal.js setRedraw), so it can reach the asked kind; the
+        // first draw keeps the page's deal. (Preset skills batch 2, 2026-10-17.)
         for (let t = 0; t < 80; t++) {
-            q = generateAliasedQuestion();
+            if (t > 0) setRedraw(true);
+            try { q = generateAliasedQuestion(); } finally { setRedraw(false); }
             if (!q || accept(q)) break;
         }
         return applyWordWork(p12Post(q));
