@@ -134,16 +134,55 @@ function valueParts(q) {
     return p.place ? { ...p, value: p.digit * p.place, word: PLACE_WORD[p.place] } : null;
 }
 
-registerSkill('placevalue:value', {
-    strings: strings({
+// value_ten_times (form "times", 4.NBT.A.1): the same digit one place apart (gen-pv.js genTimesValue).
+const TEN_REL = { times: '10 times', tenth: 'one tenth of' };
+const TIMES_VALUES = {
+    iCan: 'I Can say a digit is 10 times the place to its right',
+    instructionKey: 'ten-times',
+    steps: ['Write what each digit is worth.', 'Bigger value: 10 times. Smaller: one tenth.'],
+    say: 'The __ is __ the __.',
+    sayValues: (q) => { const p = pvOf(q); return p.kind === 'times' ? [`${p.digit} in ${f(p.n)}`, p.rel, `${p.digit} in ${f(p.m)}`] : null; },
+};
+const TIMES_RING = { ...TIMES_VALUES, instructionKey: 'ten-times-ring' };
+const VALUE_PLAIN = {
         iCan: 'I Can write the value of a digit',
         instructionKey: 'digit-value',
         steps: ['Find the underlined digit and its place.', 'The place says what one of it is worth.', 'Multiply the digit by its place: 7 hundreds is 700.'],
         say: 'The __ is worth __.',
         sayValues: (q) => { const v = valueParts(q); return v ? [v.digit, v.value] : null; },
-    }),
-    misconceptions: ['M-V2', 'M-V4', 'M-V5', 'M-V14'],
+};
+function timesSteps(q) {
+    const p = pvOf(q);
+    const out = [];
+    if (p.values) {
+        out.push(step(`The ${p.digit} in ${f(p.n)} is worth ${f(p.v0)}. The ${p.digit} in ${f(p.m)} is worth ${f(p.v1)}.`,
+            [{ slot: 'v0', value: f(p.v0) }, { slot: 'v1', value: f(p.v1) }]));
+    }
+    out.push(step(p.dir === 'times' ? `${f(p.v0)} is 10 times ${f(p.v1)}. Circle 10 times.` : `${f(p.v0)} is one tenth of ${f(p.v1)}. Circle one tenth.`, [{ slot: 'rel', value: p.rel }]));
+    return out;
+}
+function timesWrong(q) {
+    const p = pvOf(q);
+    const swap = p.dir === 'times' ? TEN_REL.tenth : TEN_REL.times;
+    if (!p.values) {
+        return choose(q, [
+            { value: swap, misconception: 'M-T1', explain: 'Read the comparison the wrong way round.', slots: { rel: swap } },
+            { value: 'the same as', misconception: 'M-V2', explain: 'Saw the same digit and called the values equal.', slots: { rel: 'the same as' } },
+            { value: p.dir === 'times' ? '100 times' : 'one hundredth of', misconception: 'M-V14', explain: 'Counted one place too many.', slots: { rel: p.dir === 'times' ? '100 times' : 'one hundredth of' } },
+        ]);
+    }
+    return choose(q, [
+        { value: `${f(p.v0)}, ${f(p.v1)}, ${swap}`, misconception: 'M-T1', explain: 'Wrote the values, then rang the comparison the wrong way round.', slots: { v0: f(p.v0), v1: f(p.v1), rel: swap } },
+        { value: `${p.digit}, ${p.digit}, ${p.rel}`, misconception: 'M-V2', explain: 'Wrote the digit, not what it is worth.', slots: { v0: String(p.digit), v1: String(p.digit), rel: p.rel } },
+        { value: `${f(p.v0 * 10)}, ${f(p.v1)}, ${p.rel}`, misconception: 'M-V14', explain: 'Used the place next to it.', slots: { v0: f(p.v0 * 10), v1: f(p.v1), rel: p.rel } },
+    ]);
+}
+
+registerSkill('placevalue:value', {
+    strings: stringsBy((q) => (pvOf(q).kind === 'times' ? (pvOf(q).values ? TIMES_VALUES : TIMES_RING) : null), VALUE_PLAIN),
+    misconceptions: ['M-V2', 'M-V4', 'M-V5', 'M-V14', 'M-T1'],
     workedSteps: (q) => {
+        if (pvOf(q).kind === 'times') return timesSteps(q);
         const v = valueParts(q);
         if (!v) return [];
         const last = v.form === 'unit' ? step(`Write ${v.digit} ${v.word}.`, [{ slot: 'b0', value: String(v.digit) }, { slot: 'b1', value: v.word }])
@@ -157,6 +196,7 @@ registerSkill('placevalue:value', {
         ];
     },
     wrongAnswer: (q) => {
+        if (pvOf(q).kind === 'times') return timesWrong(q);
         const v = valueParts(q);
         if (!v) return null;
         if (v.form === 'unit' || v.form === 'notation') {

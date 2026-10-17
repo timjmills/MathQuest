@@ -192,6 +192,11 @@ export const MULTI_KEYS = Object.freeze({
     mix: '4C',
     anchors: '4D',
     // NEXT FREE IN BLOCK 4: 4E.
+    // Build lane placevalue (sub-range 4E-4O): value_ten_times (detailed lesson 6, 2026-10-17).
+    tenDir: '4E',        // value form times: the first digit one place left (times) / right (tenth) / both
+    tenValues: '4F',     // value form times: write both values before circling
+    tenPlain: '4G',      // value form times: the digit and zeros only (700 and 70)
+    // NEXT FREE IN 4E-4O: 4H.
 
     // Block 5 — P12 (were "XA"–"XM" before any of them shipped)
     members: '5A',       // mixed pools: which member skills / categories the pool draws from
@@ -337,7 +342,8 @@ export const VALUE_TOKENS = Object.freeze({
     units: Object.freeze({ metric: 'M', customary: 'C', mixed: 'X' }),
     // Numeric sets whose members are not all under 36: one digit per power of ten.
     // P9 step 8 (block 0)
-    form: Object.freeze({ value: 'V', unit: 'U', notation: 'N', sum: 'S' }),
+    form: Object.freeze({ value: 'V', unit: 'U', notation: 'N', sum: 'S', times: 'T' }),
+    tenDir: Object.freeze({ times: 'T', tenth: 'E', both: 'B' }),
     frame: Object.freeze({ boxes: 'B', line: 'L' }),
     responseScope: Object.freeze({ full: 'F', notation: 'N', decision: 'D', judge: 'J' }),
     divForm: Object.freeze({ standard: 'S', long: 'L', fraction: 'F', vertical: 'V', mix: 'M' }),
@@ -446,6 +452,8 @@ export const SCALAR_ONLY = Object.freeze({
     calculator: 'bool', skipAfter: 'decimal',
     // lessons 4 and 5 (2026-10-16)
     winRows: 'decimal', winCols: 'decimal', minFactor: 'decimal', ftTrap: 'bool',
+    // lesson 6 (2026-10-17)
+    tenValues: 'bool', tenPlain: 'bool',
     // wave 5.2: the number line (Start / End are signed decimals: N = minus, P = point)
     nlOn: 'bool', nlHops: 'bool', nlFrom: 'decimal', nlTo: 'decimal',
 });

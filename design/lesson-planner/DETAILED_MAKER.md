@@ -190,3 +190,17 @@ to `SELF-CHECK.md` in V22's table format. They are V22's `js v21-selfcheck` port
 | E35 | with `situations`: T4 quotes only story questions the pack prints or writes on the board; any "Steps are at the top of the page" line names a Practice 1 that prints its Steps band |
 | E36 | exit-slip + items: no part equals the difference of the parts (4 + 8: 8 − 4 = 4), and none is a fact (unordered) of any other page |
 | E30 | `boardOnly` (description): numbers shown on the board only (lesson 1: 1,000). The bridge passes them to every ref as a HARD bound (`refHardOk`: never relaxed, not on a ref's last try); E30 fails if one is an item, an answer, or printed (digits or name) on any pupil page or key |
+
+## Lesson 6 additions (10 times and one tenth, 4.NBT.A.1, 2026-10-17)
+
+Built for `g4-nbt1-ten-times-value` and meant for lesson 9 (5.NBT.A.1, decimals) too:
+- **Skill option** `placevalue:value` form `times` (build list `value_ten_times`) with `tenDir` (times / tenth / both),
+  `tenValues` (write both values before ringing) and `tenPlain` (700 and 70); codec keys 4E-4G, `form` token T.
+- **Template** `pv-times` (`sheet/cells/pv-times.js`): a two-row place chart, a worth box per row, the ring sentence.
+  Rows are strings with their places (a point column when a row has decimals), the choices come from the payload.
+  `stepState` draws the chart; `guidedStepOne: true` opts a template into Guided cell 1 drawn at step 1 (roles/lesson.js,
+  generic for any template with a stepState).
+- **Case tests** `ten*` (roles/lesson.js), read from `q.pv` kind `times`.
+- **Bridge** `q.dealAnswer` (print-sheet.js `dlAns`): what tells an item apart when its answer is one of two words (a
+  ring), so two ring items of one page are not the same answer. Absent on every other item: lessons 1-5 render
+  byte-identical.

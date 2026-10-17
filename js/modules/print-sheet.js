@@ -3846,7 +3846,9 @@ function planCells(plan) {
 const dlRep = (q) => String((q && q.skillId) || '') + (q && q.cell && q.cell.template === 'arrays-turn' && q.cell.payload && q.cell.payload.type ? `:${q.cell.payload.type}` : '');
 const dlTag = (html, id, kind) => String(html).replace(/<section (data-ws-sheet="[^"]*" )?class="ws-page/, (m, sh) => `<section data-dl-page="${id}" data-dl-kind="${kind}" ${sh || ''}class="ws-page`);
 // (a tap / shade item - lesson 4's windows: its printed answer, the shaded numbers, never its option ids)
-const dlAns = (q) => (q && q.answerType === 'multi-select-check' && q.printAnswer ? String(q.printAnswer) : q && typeof q.ans === 'object' ? (Array.isArray(q.ans) ? q.ans.join(', ') : JSON.stringify(q.ans)) : String(q && q.ans !== undefined ? q.ans : ''));
+// (`dealAnswer`, lesson 6: an item whose answer is one of two words - a ring - names what tells it apart, so two
+// ring items of one page are not "the same answer"; absent on every other item)
+const dlAns = (q) => (q && typeof q.dealAnswer === 'string' ? q.dealAnswer : q && q.answerType === 'multi-select-check' && q.printAnswer ? String(q.printAnswer) : q && typeof q.ans === 'object' ? (Array.isArray(q.ans) ? q.ans.join(', ') : JSON.stringify(q.ans)) : String(q && q.ans !== undefined ? q.ans : ''));
 /** A `want`: a case test of roles/lesson.js (bigFirst, pvZeroTens, ...); '' or unknown = any item. */
 // (a list of names: every test must pass - lesson 2 r4, the exit slip's situation AND its case)
 const dlWant = (want) => (Array.isArray(want) ? (want.every((w) => LESSON_CASE_TESTS[w]) && want.length ? (it) => want.every((w) => LESSON_CASE_TESTS[w](it)) : null) : (want && LESSON_CASE_TESTS[want]) || null);

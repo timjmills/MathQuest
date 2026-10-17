@@ -579,7 +579,7 @@ export const SKILL_STANDARDS = {
     'placevalue:number_word_names': { ccss: ['4.NBT.A.2', '2.NBT.A.3'], ee: ['M.EE.4.NBT.2', 'M.EE.2.NBT.3'] }, // Choose the Word Name
     'placevalue:place_value_10x': { ccss: ['5.NBT.A.2', '5.NBT.A.1'], ee: ['M.EE.5.NBT.2', 'M.EE.5.NBT.1'] }, // Multiply and Divide by 10, 100, 1,000
     'placevalue:identify': { ccss: ['2.NBT.A.1', '4.NBT.A.1'], ee: ['M.EE.2.NBT.1'] }, // Name the Place
-    'placevalue:value': { ccss: ['2.NBT.A.1', '4.NBT.A.1'], ee: ['M.EE.2.NBT.1'] }, // Value of a Digit
+    'placevalue:value': { ccss: ['2.NBT.A.1', '4.NBT.A.1'], ee: ['M.EE.2.NBT.1', 'M.EE.5.NBT.1'] }, // Value of a Digit (M.EE.5.NBT.1: Wisconsin's EE for 4.NBT.A.1, form "times" - lesson 6)
     'placevalue:compare': { ccss: ['2.NBT.A.4', '4.NBT.A.2', '1.NBT.B.3', 'K.CC.C.7'], ee: ['M.EE.2.NBT.4', 'M.EE.4.NBT.2', 'M.EE.1.NBT.3', 'M.EE.5.NBT.3', 'M.EE.5.NBT.1'] }, // Compare Numbers (>, <, =)
     'placevalue:expand': { ccss: ['2.NBT.A.3', '4.NBT.A.2'], ee: ['M.EE.2.NBT.3', 'M.EE.4.NBT.2'] }, // Expanded Form
     'placevalue:unit_form': { ccss: ['2.NBT.A.1', '2.NBT.A.3'], ee: ['M.EE.2.NBT.3'] }, // Unit Form

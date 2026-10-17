@@ -255,6 +255,8 @@ const ftRuleOf = (it) => { const c = it && it.q && it.q.cell; const p = c && c.t
 /** Row 1 of a + table fits no taught × rule (x 2, x 5, x 10): 2 -> 10 is also x 5 (lesson 5 r3, critic D2). */
 const ftPlainFirst = (p) => ![2, 3, 5, 10].some((m) => p.x1 * m === p.y1);
 /** An arrays-turn payload's {rows, cols} (detailed lesson 3a), else null. */
+/** A value form "times" item's description (gen-pv.js), else null. */
+const tenOf = (it) => { const p = it && it.q && it.q.pv; return p && p.kind === 'times' ? p : null; };
 const arrTurnOf = (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'arrays-turn' && c.payload; return p ? { rows: Number(p.rows), cols: Number(p.cols) } : null; };
 
 /**
@@ -397,6 +399,28 @@ export const CASE_TESTS = Object.freeze({
     wpBridgePT: (it) => CASE_TESTS.wpBridge(it) && CASE_TESTS.wpPutTogether(it) && !CASE_TESTS.wpEqual(it),
     wpBridgeSmallFirstAT: (it) => CASE_TESTS.wpBridgeSmallFirst(it) && CASE_TESTS.wpAddToAny(it),
     wpBridgeBigFirstPT: (it) => CASE_TESTS.wpBridgeBigFirst(it) && CASE_TESTS.wpPutTogether(it),
+    // The detailed lesson maker, lesson 6 (the same digit one place apart, 4.NBT.A.1; value form "times"): read
+    // from q.pv (gen-pv.js genTimesValue), so lesson 9 (decimals, 5.NBT.A.1) reuses them.
+    tenAny: (it) => !!tenOf(it),
+    tenTimes: (it) => { const p = tenOf(it); return !!p && p.dir === 'times'; },
+    tenTenth: (it) => { const p = tenOf(it); return !!p && p.dir === 'tenth'; },
+    tenPlain: (it) => { const p = tenOf(it); return !!p && !!p.plain; },
+    tenMixed: (it) => { const p = tenOf(it); return !!p && !p.plain; },
+    // (the two numbers of different lengths: the digits do not line up by position from the left)
+    tenLengths: (it) => { const p = tenOf(it); return !!p && String(p.n).length !== String(p.m).length; },
+    // (the pair reaches the thousands: Th and H)
+    tenThou: (it) => { const p = tenOf(it); return !!p && Math.max(p.place, p.placeM) >= 1000; },
+    // (the pair is tens and ones: 7 and 70)
+    tenOnes: (it) => { const p = tenOf(it); return !!p && Math.min(p.place, p.placeM) === 1; },
+    // (★★★: the thousands, or the ones, with numbers of different lengths)
+    tenEdge: (it) => (CASE_TESTS.tenThou(it) || CASE_TESTS.tenOnes(it)) && CASE_TESTS.tenMixed(it),
+    // (the chart model: hundreds and tens, other digits round them, 10 times)
+    tenChart: (it) => { const p = tenOf(it); return !!p && p.dir === 'times' && !p.plain && Math.min(p.place, p.placeM) === 10 && Math.max(p.place, p.placeM) === 100; },
+    tenThouTimes: (it) => CASE_TESTS.tenThou(it) && CASE_TESTS.tenTimes(it),
+    tenThouTenth: (it) => CASE_TESTS.tenThou(it) && CASE_TESTS.tenTenth(it) && CASE_TESTS.tenMixed(it),
+    tenOnesTimes: (it) => CASE_TESTS.tenOnes(it) && CASE_TESTS.tenTimes(it) && CASE_TESTS.tenMixed(it),
+    tenTimesMid: (it) => CASE_TESTS.tenTimes(it) && !CASE_TESTS.tenEdge(it),
+    tenTenthMid: (it) => CASE_TESTS.tenTenth(it) && !CASE_TESTS.tenEdge(it),
     pvEdge: (it) => { const n = pvNumberOf(it); return n !== null && (n === 1000 || (n >= 100 && (Math.floor(n / 10) % 10 === 0 || n % 10 === 0 || Math.floor(n / 10) % 10 === 1))); },
     // The detailed lesson maker, lesson 5 (find the rule, 3.OA.D.9): a one-step find-the-rule table.
     // + / − / × with a plain first row (+: not 1 -> 1 + k, which is also x (1 + k)); the trap:
@@ -1984,6 +2008,13 @@ function weDoRender(it, i) {
             const steps = workedStepsOf(it);
             // (the key: every box answered, the prompt drawn exactly as on the pupil page - INK-31, critic r2 R9)
             if (t && steps.length > 1) return answered ? t.render(Object.assign({}, it.q.cell.payload, { under: 0 }), c) : t.stepState(Object.assign({}, it.q.cell.payload), steps.map((s) => ({ marks: s.marks || [] })), 0, c);
+        }
+        // (a template that opts in with `guidedStepOne` - pv-times, lesson 6: Guided cell 1 drawn at its first
+        // step, that step's marks traced grey; generic for any template with a stepState)
+        if (!answered && i === 0) {
+            const t = stepTemplateOf(it);
+            const steps = workedStepsOf(it);
+            if (t && t.guidedStepOne && steps.length > 1) return t.stepState(Object.assign({}, it.q.cell.payload), steps.map((s) => ({ marks: s.marks || [] })), 0, c);
         }
         // An array-and-turn Guided cell 1 (the detailed lesson maker, lesson 3a): step 2 done in grey - the
         // first product traced; the turned fact stays the pupil's (the Critical Atom).
