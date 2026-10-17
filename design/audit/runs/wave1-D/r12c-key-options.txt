@@ -1,0 +1,234 @@
+  add_facts S end/copy: PPPKKK
+  add_facts S end/short: PPPK
+  add_facts S after-page/copy: PKPKPK
+  add_facts S after-page/short: PKPKPK
+  add_20_regroup S end/copy: PPPKKK
+  add_20_regroup S end/short: PPPK
+  add_20_regroup S after-page/copy: PKPKPK
+  add_20_regroup S after-page/short: PKPKPK
+  shade_fraction S end/copy: PPPKKK
+  shade_fraction S end/short: PPPK
+  shade_fraction S after-page/copy: PKPKPK
+  shade_fraction S after-page/short: PKPKPK
+  time_half_hour S end/copy: PPPKKK
+  time_half_hour S end/short: PPPK
+  time_half_hour S after-page/copy: PKPKPK
+  time_half_hour S after-page/short: PKPKPK
+  mixed S end/copy: PPPPPPPPPKKKKKKKKK
+  mixed S end/short: PPPPPPPPPK
+  mixed S after-page/copy: PKPKPKPKPKPKPKPKPK
+  mixed S after-page/short: PKPKPKPKPKPKPKPKPK
+  add_facts L end/copy: PPPKKK
+  add_facts L end/short: PPPK
+  add_facts L after-page/copy: PKPKPK
+  add_facts L after-page/short: PKPKPK
+  add_20_regroup L end/copy: PPPKKK
+  add_20_regroup L end/short: PPPK
+  add_20_regroup L after-page/copy: PKPKPK
+  add_20_regroup L after-page/short: PKPKPK
+  shade_fraction L end/copy: PPPKKK
+  shade_fraction L end/short: PPPK
+  shade_fraction L after-page/copy: PKPKPK
+  shade_fraction L after-page/short: PKPKPK
+  time_half_hour L end/copy: PPPKKK
+  time_half_hour L end/short: PPPK
+  time_half_hour L after-page/copy: PKPKPK
+  time_half_hour L after-page/short: PKPKPK
+  mixed L end/copy: PPPPPPPPPKKKKKKKKK
+  mixed L end/short: PPPPPPPPPK
+  mixed L after-page/copy: PKPKPKPKPKPKPKPKPK
+  mixed L after-page/short: PKPKPKPKPKPKPKPKPK
+  sweep lesson add_facts: 3p, 48 answers tagged, carries 0 written / 0 empty, short "5 | 7 | 9" heads Anchor chart | Lesson 1 | Practice 1
+  sweep lesson add_20_regroup: 3p, 32 answers tagged, carries 0 written / 0 empty, short "11 | 18 | 6" heads Lesson 1, page 1 of 2 | Lesson 1, page 2 of 2 | Practice 1
+  sweep lesson sub_100_regroup: 3p, 104 answers tagged, carries 27 written / 6 empty, short "49 | 59 | 77" heads Anchor chart | Lesson 1 | Practice 1
+  sweep lesson mult_facts: 3p, 63 answers tagged, carries 0 written / 0 empty, short "80 | 108 | 36" heads Anchor chart | Lesson 1 | Practice 1
+  sweep lesson shade_fraction: 3p, 32 answers tagged, carries 0 written / 0 empty, short "1 of 10 parts shaded | 2/3 | 6" heads Anchor chart | Lesson 1 | Practice 1
+  sweep lesson write_fraction: 3p, 22 answers tagged, carries 0 written / 0 empty, short "2/3 | 1/3 | C" heads Anchor chart | Lesson 1 | Practice 1
+  sweep lesson time_half_hour: 4p, 22 answers tagged, carries 0 written / 0 empty, short "12:30 | 9:30 | 12:00" heads Anchor chart | Lesson 1 | Practice 1, page 1 of 2
+  sweep lesson more_less_10: 4p, 13 answers tagged, carries 0 written / 0 empty, short "1 | 56 | 100" heads Anchor chart | Lesson 1 | Practice 1, page 1 of 2
+  sweep lesson place_value_disks: 4p, 10 answers tagged, carries 0 written / 0 empty, short "599 | 186 | 44" heads Anchor chart | Lesson 1 | Practice 1, page 1 of 2
+  sweep scripted-model add_facts: 2p, 0 answers tagged, carries 0 written / 0 empty, short "" heads Model, page 1 of 2 | Model, page 2 of 2
+  sweep scripted-model add_20_regroup: skipped (This skill has no worked steps yet (strings.steps / workedSteps), so it has no S)
+  sweep scripted-model sub_100_regroup: 2p, 0 answers tagged, carries 2 written / 8 empty, short "" heads Model, page 1 of 2 | Model, page 2 of 2
+  sweep scripted-model mult_facts: 1p, 0 answers tagged, carries 0 written / 0 empty, short "" heads Model
+  sweep scripted-model shade_fraction: 1p, 0 answers tagged, carries 0 written / 0 empty, short "" heads Model
+  sweep scripted-model write_fraction: 1p, 0 answers tagged, carries 0 written / 0 empty, short "" heads Model
+  sweep scripted-model time_half_hour: 2p, 0 answers tagged, carries 0 written / 0 empty, short "" heads Model, page 1 of 2 | Model, page 2 of 2
+  sweep scripted-model more_less_10: 1p, 0 answers tagged, carries 0 written / 0 empty, short "" heads Model
+  sweep scripted-model place_value_disks: 2p, 0 answers tagged, carries 0 written / 0 empty, short "" heads Model, page 1 of 2 | Model, page 2 of 2
+  sweep guided add_facts: 1p, 13 answers tagged, carries 0 written / 0 empty, short "17 | 15 | 5" heads Lesson 1
+  sweep guided add_20_regroup: 1p, 11 answers tagged, carries 0 written / 0 empty, short "11 | 18 | 20" heads Lesson 1
+  sweep guided sub_100_regroup: 1p, 39 answers tagged, carries 12 written / 0 empty, short "49 | 59 | 77" heads Lesson 1
+  sweep guided mult_facts: 1p, 16 answers tagged, carries 0 written / 0 empty, short "121 | 84 | 30" heads Lesson 1
+  sweep guided shade_fraction: 1p, 3 answers tagged, carries 0 written / 0 empty, short "1 of 3 parts shaded | 1 of 10 parts shaded | 1 of 2 parts shaded" heads Lesson 1
+  sweep guided write_fraction: 1p, 8 answers tagged, carries 0 written / 0 empty, short "1/3 | 1/10 | 1/2" heads Lesson 1
+  sweep guided time_half_hour: 2p, 16 answers tagged, carries 0 written / 0 empty, short "9:30 | 11:30 | 8:30" heads Lesson 1, page 1 of 2 | Lesson 1, page 2 of 2
+  sweep guided more_less_10: 1p, 5 answers tagged, carries 0 written / 0 empty, short "1 | 100 | 58" heads Lesson 1
+  sweep guided place_value_disks: 2p, 3 answers tagged, carries 0 written / 0 empty, short "130 | 891 | 609" heads Lesson 1, page 1 of 2 | Lesson 1, page 2 of 2
+  sweep independent add_facts: 1p, 31 answers tagged, carries 0 written / 0 empty, short "13 | 17 | 15" heads Lesson 1
+  sweep independent add_20_regroup: 1p, 25 answers tagged, carries 0 written / 0 empty, short "12 | 11 | 18" heads Lesson 1
+  sweep independent sub_100_regroup: 1p, 81 answers tagged, carries 18 written / 0 empty, short "13 | 49 | 59" heads Lesson 1
+  sweep independent mult_facts: 1p, 36 answers tagged, carries 0 written / 0 empty, short "36 | 121 | 84" heads Lesson 1
+  sweep independent shade_fraction: 1p, 9 answers tagged, carries 0 written / 0 empty, short "2 of 3 parts shaded | 1 of 3 parts shaded | 1 of 10 parts shaded" heads Lesson 1
+  sweep independent write_fraction: 1p, 12 answers tagged, carries 0 written / 0 empty, short "2/3 | 1/3 | 1/10" heads Lesson 1
+  sweep independent time_half_hour: 1p, 12 answers tagged, carries 0 written / 0 empty, short "12:30 | 9:30 | 11:30" heads Lesson 1
+  sweep independent more_less_10: 1p, 10 answers tagged, carries 0 written / 0 empty, short "99 | 52 | 100" heads Lesson 1
+  sweep independent place_value_disks: 1p, 3 answers tagged, carries 0 written / 0 empty, short "599 | 130 | 891" heads Lesson 1
+  sweep more-practice add_facts: 2p, 63 answers tagged, carries 0 written / 0 empty, short "13 | 11 | 9" heads Practice A | Practice B
+  sweep more-practice add_20_regroup: 2p, 52 answers tagged, carries 0 written / 0 empty, short "17 | 18 | 20" heads Practice A | Practice B
+  sweep more-practice sub_100_regroup: 2p, 162 answers tagged, carries 36 written / 0 empty, short "9 | 19 | 59" heads Practice A | Practice B
+  sweep more-practice mult_facts: 2p, 71 answers tagged, carries 0 written / 0 empty, short "12 | 33 | 49" heads Practice A | Practice B
+  sweep more-practice shade_fraction: 2p, 42 answers tagged, carries 0 written / 0 empty, short "8 of 10 parts shaded | 4 of 10 parts shaded | 1 of 2 parts shaded" heads Practice A | Practice B
+  sweep more-practice write_fraction: 2p, 28 answers tagged, carries 0 written / 0 empty, short "1/5 | 5/6 | 1/2" heads Practice A | Practice B
+  sweep more-practice time_half_hour: 2p, 24 answers tagged, carries 0 written / 0 empty, short "12:30 | 6:30 | 2:30" heads Practice A | Practice B
+  sweep more-practice more_less_10: 2p, 20 answers tagged, carries 0 written / 0 empty, short "40 | 69 | 100" heads Practice A | Practice B
+  sweep more-practice place_value_disks: 2p, 6 answers tagged, carries 0 written / 0 empty, short "198 | 704 | 611" heads Practice A | Practice B
+  sweep mixed-practice add_facts: 1p, 42 answers tagged, carries 0 written / 0 empty, short "13 | 17 | 15" heads Mixed 1
+  sweep mixed-practice add_20_regroup: 1p, 33 answers tagged, carries 0 written / 0 empty, short "12 | 11 | 18" heads Mixed 1
+  sweep mixed-practice sub_100_regroup: 1p, 54 answers tagged, carries 12 written / 0 empty, short "13 | 49 | 59" heads Mixed 1
+  sweep mixed-practice mult_facts: 1p, 48 answers tagged, carries 0 written / 0 empty, short "36 | 121 | 84" heads Mixed 1
+  sweep mixed-practice shade_fraction: 1p, 9 answers tagged, carries 0 written / 0 empty, short "2 of 3 parts shaded | 1 of 3 parts shaded | 1 of 10 parts shaded" heads Mixed 1
+  sweep mixed-practice write_fraction: 1p, 12 answers tagged, carries 0 written / 0 empty, short "2/3 | 1/3 | 1/10" heads Mixed 1
+  sweep mixed-practice time_half_hour: 1p, 8 answers tagged, carries 0 written / 0 empty, short "12:30 | 9:30 | 11:30" heads Mixed 1
+  sweep mixed-practice more_less_10: 1p, 5 answers tagged, carries 0 written / 0 empty, short "56 | 1 | 100" heads Mixed 1
+  sweep mixed-practice place_value_disks: 1p, 3 answers tagged, carries 0 written / 0 empty, short "599 | 130 | 891" heads Mixed 1
+  sweep review add_facts: 1p, 26 answers tagged, carries 0 written / 0 empty, short "13 | 17 | 15" heads Review 1
+  sweep review add_20_regroup: 1p, 25 answers tagged, carries 0 written / 0 empty, short "12 | 11 | 18" heads Review 1
+  sweep review sub_100_regroup: 1p, 63 answers tagged, carries 12 written / 6 empty, short "13 | 49 | 59" heads Review 1
+  sweep review mult_facts: 1p, 22 answers tagged, carries 0 written / 0 empty, short "36 | 121 | 84" heads Review 1
+  sweep review shade_fraction: 1p, 9 answers tagged, carries 0 written / 0 empty, short "2 of 3 parts shaded | 1 of 3 parts shaded | 1 of 10 parts shaded" heads Review 1
+  sweep review write_fraction: 1p, 14 answers tagged, carries 0 written / 0 empty, short "2/3 | 1/3 | 1/10" heads Review 1
+  sweep review time_half_hour: 1p, 10 answers tagged, carries 0 written / 0 empty, short "12:30 | 9:30 | 11:30" heads Review 1
+  sweep review more_less_10: 1p, 9 answers tagged, carries 0 written / 0 empty, short "56 | 1 | 100" heads Review 1
+  sweep review place_value_disks: 1p, 3 answers tagged, carries 0 written / 0 empty, short "599 | 130 | 186" heads Review 1
+  sweep test add_facts: 1p, 31 answers tagged, carries 0 written / 0 empty, short "13 | 17 | 15" heads Test A
+  sweep test add_20_regroup: 1p, 25 answers tagged, carries 0 written / 0 empty, short "12 | 11 | 18" heads Test A
+  sweep test sub_100_regroup: 1p, 27 answers tagged, carries 0 written / 0 empty, short "13 | 49 | 59" heads Test A
+  sweep test mult_facts: 1p, 36 answers tagged, carries 0 written / 0 empty, short "36 | 121 | 84" heads Test A
+  sweep test shade_fraction: 1p, 9 answers tagged, carries 0 written / 0 empty, short "2 of 3 parts shaded | 1 of 3 parts shaded | 1 of 10 parts shaded" heads Test A
+  sweep test write_fraction: 1p, 16 answers tagged, carries 0 written / 0 empty, short "2/3 | 1/3 | 1/10" heads Test A
+  sweep test time_half_hour: 1p, 12 answers tagged, carries 0 written / 0 empty, short "12:30 | 9:30 | 11:30" heads Test A
+  sweep test more_less_10: 1p, 10 answers tagged, carries 0 written / 0 empty, short "56 | 1 | 100" heads Test A
+  sweep test place_value_disks: 1p, 3 answers tagged, carries 0 written / 0 empty, short "599 | 130 | 891" heads Test A
+  sweep error-analysis add_facts: 1p, 6 answers tagged, carries 0 written / 0 empty, short "Fix it: 5 | Correct | Correct" heads Check it
+  sweep error-analysis add_20_regroup: 1p, 6 answers tagged, carries 0 written / 0 empty, short "Fix it: 12 | Correct | Correct" heads Check it
+  sweep error-analysis sub_100_regroup: 1p, 6 answers tagged, carries 0 written / 8 empty, short "Fix it: 13 | Correct | Correct" heads Check it
+  sweep error-analysis mult_facts: 1p, 6 answers tagged, carries 0 written / 0 empty, short "Fix it: 36 | Correct | Correct" heads Check it
+  sweep error-analysis shade_fraction: 1p, 6 answers tagged, carries 0 written / 0 empty, short "Correct | Fix it: 1 of 2 parts shaded | Correct" heads Check it
+  sweep error-analysis write_fraction: 1p, 8 answers tagged, carries 0 written / 0 empty, short "Fix it: 2/3 | Correct | Correct" heads Check it
+  sweep error-analysis time_half_hour: 1p, 8 answers tagged, carries 0 written / 0 empty, short "Fix it: 12:30 | Correct | Correct" heads Check it
+  sweep error-analysis more_less_10: 1p, 6 answers tagged, carries 0 written / 0 empty, short "Fix it: 56 | Correct | Correct" heads Check it
+  sweep error-analysis place_value_disks: 1p, 5 answers tagged, carries 0 written / 0 empty, short "Fix it: 599 | Correct | Fix it: 609" heads Check it
+  sweep reason-it add_facts: 1p, 6 answers tagged, carries 0 written / 0 empty, short "A: 13 | B: 17" heads Reason It A
+  sweep reason-it add_20_regroup: 1p, 6 answers tagged, carries 0 written / 0 empty, short "A: 12 | B: 11" heads Reason It A
+  sweep reason-it sub_100_regroup: 1p, 6 answers tagged, carries 0 written / 8 empty, short "A: 13 | B: 49" heads Reason It A
+  sweep reason-it mult_facts: 1p, 6 answers tagged, carries 0 written / 0 empty, short "A: 36 | B: 121" heads Reason It A
+  sweep reason-it shade_fraction: 1p, 6 answers tagged, carries 0 written / 0 empty, short "A: 2 of 3 parts shaded | B: 1 of 3 parts shaded" heads Reason It A
+  sweep reason-it write_fraction: 1p, 6 answers tagged, carries 0 written / 0 empty, short "A: 2/3 | B: 1/3" heads Reason It A
+  sweep reason-it time_half_hour: 1p, 6 answers tagged, carries 0 written / 0 empty, short "A: 12:30 | B: 9:30" heads Reason It A
+  sweep reason-it more_less_10: 1p, 6 answers tagged, carries 0 written / 0 empty, short "A: 56 | B: 1" heads Reason It A
+  sweep reason-it place_value_disks: 1p, 6 answers tagged, carries 0 written / 0 empty, short "A: 599 | B: 130" heads Reason It A
+  sweep stretch add_facts: 1p, 20 answers tagged, carries 0 written / 0 empty, short "13 + 0 = 13; 11 + 2 = 13; 9 + 4 = 13; 7 + 6 = 13; 5 + 8 = 13; 3 + 10 = 13. I found 7. There are more." heads Stretch A
+  sweep stretch add_20_regroup: 1p, 20 answers tagged, carries 0 written / 0 empty, short "12 + 0 = 12; 10 + 2 = 12; 8 + 4 = 12; 6 + 6 = 12; 4 + 8 = 12; 2 + 10 = 12. I found 7. There are more." heads Stretch A
+  sweep stretch sub_100_regroup: 1p, 20 answers tagged, carries 0 written / 0 empty, short "14 − 1 = 13; 16 − 3 = 13; 18 − 5 = 13; 20 − 7 = 13; 22 − 9 = 13; 24 − 11 = 13. I found 7. There are more." heads Stretch A
+  sweep stretch mult_facts: 1p, 20 answers tagged, carries 0 written / 0 empty, short "1 × 36 = 36; 2 × 18 = 36; 3 × 12 = 36; 6 × 6 = 36; 9 × 4 = 36; 12 × 3 = 36. I found 7. There are more." heads Stretch A
+  sweep stretch shade_fraction: skipped (No Stretch for this skill yet: it has no open problem of its own. Choose Reason )
+  sweep stretch write_fraction: skipped (No Stretch for this skill yet: it has no open problem of its own. Choose Reason )
+  sweep stretch time_half_hour: skipped (No Stretch for this skill yet: it has no open problem of its own. Choose Reason )
+  sweep stretch more_less_10: skipped (No Stretch for this skill yet: it has no open problem of its own. Choose Reason )
+  sweep stretch place_value_disks: skipped (No Stretch for this skill yet: it has no open problem of its own. Choose Reason )
+  sweep true-false add_facts: 1p, 8 answers tagged, carries 0 written / 0 empty, short "True; 13 | False; 17 | False; 15" heads True or False
+  sweep true-false add_20_regroup: 1p, 8 answers tagged, carries 0 written / 0 empty, short "True; 12 | False; 11 | False; 18" heads True or False
+  sweep true-false sub_100_regroup: 1p, 8 answers tagged, carries 0 written / 8 empty, short "True; 13 | False; 49 | False; 59" heads True or False
+  sweep true-false mult_facts: 1p, 8 answers tagged, carries 0 written / 0 empty, short "True; 36 | False; 121 | False; 84" heads True or False
+  sweep true-false shade_fraction: 1p, 8 answers tagged, carries 0 written / 0 empty, short "True; 2 of 3 parts shaded | False; 1 of 3 parts shaded | False; 1 of 10 parts shaded" heads True or False
+  sweep true-false write_fraction: 1p, 8 answers tagged, carries 0 written / 0 empty, short "True; 2/3 | False; 1/3 | False; 1/10" heads True or False
+  sweep true-false time_half_hour: 1p, 8 answers tagged, carries 0 written / 0 empty, short "True; 12:30 | False; 9:30 | False; 11:30" heads True or False
+  sweep true-false more_less_10: 1p, 8 answers tagged, carries 0 written / 0 empty, short "True; 56 | False; 1 | False; 100" heads True or False
+  sweep true-false place_value_disks: 1p, 4 answers tagged, carries 0 written / 0 empty, short "True; 599 | False; 130" heads True or False
+  sweep opener add_facts: 1p, 26 answers tagged, carries 0 written / 0 empty, short "17 | 15 | 5" heads Lesson 1
+  sweep opener add_20_regroup: 1p, 15 answers tagged, carries 0 written / 0 empty, short "11 | 18 | 20" heads Lesson 1
+  sweep opener sub_100_regroup: 1p, 24 answers tagged, carries 8 written / 0 empty, short "49 | 59 | 77" heads Lesson 1
+  sweep opener mult_facts: 1p, 21 answers tagged, carries 0 written / 0 empty, short "121 | 84 | 30" heads Lesson 1
+  sweep opener shade_fraction: 1p, 6 answers tagged, carries 0 written / 0 empty, short "1 of 3 parts shaded | 1 of 10 parts shaded | 1 of 2 parts shaded" heads Lesson 1
+  sweep opener write_fraction: 1p, 12 answers tagged, carries 0 written / 0 empty, short "1/3 | 1/10 | 1/2" heads Lesson 1
+  sweep opener time_half_hour: 1p, 6 answers tagged, carries 0 written / 0 empty, short "9:30 | 11:30 | 8:30" heads Lesson 1
+  sweep opener more_less_10: 1p, 1 answers tagged, carries 0 written / 0 empty, short "1" heads Lesson 1
+  sweep opener place_value_disks: 1p, 1 answers tagged, carries 0 written / 0 empty, short "130" heads Lesson 1
+  sweep word-problems add_facts: 1p, 6 answers tagged, carries 0 written / 0 empty, short "13 cups | 17 beads" heads Lesson 1
+  sweep word-problems add_20_regroup: skipped (Word problems need a story skill (a word-problem generator or provider stories).)
+  sweep word-problems sub_100_regroup: 1p, 6 answers tagged, carries 0 written / 0 empty, short "13 beads | 49 pencils" heads Lesson 1
+  sweep word-problems mult_facts: 1p, 6 answers tagged, carries 0 written / 0 empty, short "36 apples | 121 flowers" heads Lesson 1
+  sweep word-problems shade_fraction: skipped (Word problems need a story skill (a word-problem generator or provider stories).)
+  sweep word-problems write_fraction: skipped (Word problems need a story skill (a word-problem generator or provider stories).)
+  sweep word-problems time_half_hour: skipped (Word problems need a story skill (a word-problem generator or provider stories).)
+  sweep word-problems more_less_10: skipped (Word problems need a story skill (a word-problem generator or provider stories).)
+  sweep word-problems place_value_disks: skipped (Word problems need a story skill (a word-problem generator or provider stories).)
+  sweep fact-rows add_facts: 1p, 67 answers tagged, carries 0 written / 0 empty, short "13 | 17 | 15" heads Facts
+  sweep fact-rows add_20_regroup: 1p, 75 answers tagged, carries 0 written / 0 empty, short "12 | 11 | 18" heads Facts
+  sweep fact-rows sub_100_regroup: 1p, 68 answers tagged, carries 0 written / 0 empty, short "13 | 49 | 59" heads Facts
+  sweep fact-rows mult_facts: 1p, 75 answers tagged, carries 0 written / 0 empty, short "36 | 121 | 84" heads Facts
+  sweep fact-rows shade_fraction: skipped (Fact rows need a fact or a one-step computation (add, subtract, multiply or divi)
+  sweep fact-rows write_fraction: skipped (Fact rows need a fact or a one-step computation (add, subtract, multiply or divi)
+  sweep fact-rows time_half_hour: skipped (Fact rows need a fact or a one-step computation (add, subtract, multiply or divi)
+  sweep fact-rows more_less_10: skipped (Fact rows need a fact or a one-step computation (add, subtract, multiply or divi)
+  sweep fact-rows place_value_disks: skipped (Fact rows need a fact or a one-step computation (add, subtract, multiply or divi)
+  sweep pre-skill-check add_facts: 1p, 11 answers tagged, carries 0 written / 0 empty, short "13 | 17 | 15" heads Check A
+  sweep pre-skill-check add_20_regroup: 2p, 36 answers tagged, carries 0 written / 0 empty, short "6 | 9 | 3" heads Check A, page 1 of 2 | Check A, page 2 of 2
+  sweep pre-skill-check sub_100_regroup: 2p, 24 answers tagged, carries 0 written / 0 empty, short "2 | 3 | 14" heads Check A, page 1 of 2 | Check A, page 2 of 2
+  sweep pre-skill-check mult_facts: 1p, 13 answers tagged, carries 0 written / 0 empty, short "36 | 121 | 84" heads Check A
+  sweep pre-skill-check shade_fraction: 1p, 7 answers tagged, carries 0 written / 0 empty, short "2 | 1/3 | 2/3" heads Check A
+  sweep pre-skill-check write_fraction: 1p, 5 answers tagged, carries 0 written / 0 empty, short "2 | 1/3 | D" heads Check A
+  sweep pre-skill-check time_half_hour: 1p, 8 answers tagged, carries 0 written / 0 empty, short "12:00 | 9:00 | 11:00" heads Check A
+  sweep pre-skill-check more_less_10: 1p, 4 answers tagged, carries 0 written / 0 empty, short "56 | 1 | 100" heads Check A
+  sweep pre-skill-check place_value_disks: 1p, 8 answers tagged, carries 0 written / 0 empty, short "56 | 1 | 100" heads Check A
+  two sections: Section 1: I Can add facts to 20 · Lesson 1, page 1 of 2 | Section 1: I Can add facts to 20 · Lesson 1, page 2 of 2 | Section 2: I Can add within 20 (with regrouping) · Lesson 1, page 1 of 2 | Section 2: I Can add within 20 (with regrouping) · Lesson 1, page 2 of 2
+  new sheet: copy PBKBPBKBPBKB short PBKBPBKBPBKB
+  align independent: 20/568
+  align independent: 40/568
+  align independent: 60/568
+  align independent: 80/568
+  align independent: 100/568
+  align independent: 120/568
+  align independent: 140/568
+  align independent: 160/568
+  align independent: 180/568
+  align independent: 200/568
+  align independent: 220/568
+  align independent: 240/568
+  align independent: 260/568
+  align independent: 280/568
+  align independent: 300/568
+  align independent: 320/568
+  align independent: 340/568
+  align independent: 360/568
+  align independent: 380/568
+  align independent: 400/568
+  align independent: 420/568
+  align independent: 440/568
+  align independent: 460/568
+  align independent: 480/568
+  align independent: 500/568
+  align independent: 520/568
+  align independent: 540/568
+  align independent: 560/568
+  align independent: 568/568
+  align opener: 20/41
+  align opener: 40/41
+  align opener: 41/41
+  align lesson: 20/41
+  align lesson: 40/41
+  align lesson: 41/41
+  print button 1366x768 A/Bp new-sheet off: "Print 2 pupil pages + key" | "" h 54
+  print button 1366x768 A/Bp new-sheet on: "Print 2 pupil pages + key" | "On 4 sheets, double-sided." h 54
+  print button 1366x768 allp new-sheet off: "Print 3 pupil pages + key" | "" h 54
+  print button 1366x768 allp new-sheet on: "Print 3 pupil pages + key" | "On 6 sheets, double-sided." h 54
+  print button 1280x720 A/Bp new-sheet off: "Print 2 pupil pages + key" | "" h 48
+  print button 1280x720 A/Bp new-sheet on: "Print 2 pupil pages + key" | "On 4 sheets, double-sided." h 48
+  print button 1280x720 allp new-sheet off: "Print 3 pupil pages + key" | "" h 48
+  print button 1280x720 allp new-sheet on: "Print 3 pupil pages + key" | "On 6 sheets, double-sided." h 48
+  print button 1024x768 A/Bp new-sheet off: "Print 2 pupil pages + key" | "" h 48
+  print button 1024x768 A/Bp new-sheet on: "Print 2 pupil pages + key" | "On 4 sheets, double-sided." h 48
+  print button 1024x768 allp new-sheet off: "Print 3 pupil pages + key" | "" h 48
+  print button 1024x768 allp new-sheet on: "Print 3 pupil pages + key" | "On 6 sheets, double-sided." h 48
+key-options: OK

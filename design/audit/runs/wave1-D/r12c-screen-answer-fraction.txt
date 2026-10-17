@@ -1,0 +1,6 @@
+multiplication:area_model_mult     card ok | worksheet ok (3/3) | quiz ok (3/3)
+multiplication:area_model_mult_hard card ok | worksheet ok (3/3) | quiz ok (3/3)
+division:area_model_div_2by1       card ok | worksheet ok (3/3) | quiz ok (3/3)
+division:area_model_div_3by1       card ok | worksheet ok (3/3) | quiz ok (3/3)
+live green (card, quiz)            ok
+ws-screen-answer: OK

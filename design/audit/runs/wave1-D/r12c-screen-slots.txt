@@ -1,0 +1,15 @@
+
+suspects (an empty drawn box beside a visible host field; not failed):
+  composing:number_word_form                   card       host field + 2 empty drawn box(es) (check by eye)
+  composing:number_word_form                   quiz       host field + 2 empty drawn box(es) (check by eye)
+  composing:compose_whole                      worksheet  host field + 1 empty drawn box(es) (check by eye)
+  composing:compose_whole                      quiz       host field + 1 empty drawn box(es) (check by eye)
+  decimals:round_decimals                      quiz       host field + 1 empty drawn box(es) (check by eye)
+  algebra:write_equation                       card       host field + 1 empty drawn box(es) (check by eye)
+  algebra:write_equation                       quiz       host field + 1 empty drawn box(es) (check by eye)
+  composing:number_word_form                   map        host field + 2 empty drawn box(es) (check by eye)
+  algebra:write_expression                     map        host field + 1 empty drawn box(es) (check by eye)
+  algebra:write_equation                       map        host field + 1 empty drawn box(es) (check by eye)
+
+609 skills, 2436 host renders, 0 doubled answer area(s), 0 paper verb(s) on screen
+ws-screen-slots: OK
