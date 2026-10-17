@@ -1,0 +1,379 @@
+{
+ "meta": {
+  "what": "Lessons made with the DETAILED lesson maker (Atomisation Lesson Planner V22 inside the sheet kit)",
+  "maker": "buildSheet({role:'detailed-lesson', lessonId, seed}) - design/lesson-planner/DETAILED_MAKER.md",
+  "descriptions": "js/modules/lessons/detailed/<id>.js",
+  "gate": "node tests/scripts/ws-detailed-lesson.cjs --lesson <id> --check",
+  "source": "data/curriculum/source/Lessons_To_Build_K-5_2026-27.xlsx, sheet 'Build order (all grades)', rows 1-5 (owner 2026-10-16)",
+  "joins": "siteLessonId = data/curriculum/site-lessons.json lessons[].id; skills keys = 'category:skill' as in data/curriculum/links/*.json",
+  "updated": "2026-10-17"
+ },
+ "lessons": [
+  {
+   "id": "g2-nbt3-read-write-1000",
+   "order": 1,
+   "grade": "2",
+   "level": 2,
+   "title": "I Can read and write numbers to 1,000",
+   "ownerTitle": "Read and write numbers to 1,000 in words, numerals and expanded form",
+   "siteLessonId": "G2|-|readandwritenumbersto1000inwordsnumeralsandexpandedform",
+   "wrmYear": "Y3",
+   "wrmSteps": [],
+   "wrmNear": [
+    "Y2.B1.S6",
+    "Y2.B1.S8",
+    "Y3.B1.S5",
+    "Y3.B1.S6"
+   ],
+   "ccss": [
+    "2.NBT.A.3"
+   ],
+   "ee": [
+    "M.EE.2.NBT.3"
+   ],
+   "flow": "Chunked (a: numeral <-> expanded form; b: number name -> numeral)",
+   "skills": {
+    "used": [
+     {
+      "key": "placevalue:expand",
+      "role": "main (chunk a)"
+     },
+     {
+      "key": "composing:number_word_form",
+      "opts": {
+       "band": 1000,
+       "answerSlot": "hto"
+      },
+      "role": "main (chunk b)"
+     },
+     {
+      "key": "placevalue:combine",
+      "role": "P1 / exit"
+     },
+     {
+      "key": "placevalue:identify",
+      "role": "P0 / Mixed"
+     },
+     {
+      "key": "placevalue:unit_form",
+      "role": "P0 / Mixed"
+     },
+     {
+      "key": "placevalue:value",
+      "role": "P0 / Mixed"
+     }
+    ],
+    "built": [
+     "composing:number_word_form options band, zeroPlace, answerSlot (codec keys B, Z, 5P) and the kit `words` cell + provider"
+    ],
+    "proposed": [
+     "follow-on lesson: Write numbers to 1,000 in words (numeral -> words written by the pupil)"
+    ]
+   },
+   "rulings": [
+    "writing number words is a follow-on lesson (said, not written, today)",
+    "1,000 is board-only"
+   ],
+   "critic": {
+    "verdict": "PASS",
+    "round": 4,
+    "min": [
+     8,
+     8,
+     8,
+     8
+    ],
+    "reports": "design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1..r4.md",
+    "note": "6 chart pages re-graded 9/9/9/9 after the generic chart-grid fix (lesson 3a critic r3)"
+   },
+   "status": "passed",
+   "pack": {
+    "dir": "design/lesson-samples/detailed/g2-nbt3-read-write-1000/",
+    "pdf": "design/lesson-samples/detailed/g2-nbt3-read-write-1000/pack.pdf",
+    "html": "design/lesson-samples/detailed/g2-nbt3-read-write-1000/pack.html",
+    "selfCheck": "design/lesson-samples/detailed/g2-nbt3-read-write-1000/SELF-CHECK.md"
+   }
+  },
+  {
+   "id": "g1-oa1-bar-model-wp-20",
+   "order": 2,
+   "grade": "1",
+   "level": 1,
+   "title": "I Can solve word problems with a bar",
+   "ownerTitle": "Solve one-step word problems within 20 using bar models",
+   "siteLessonId": "G1|-|solveonestepwordproblemswithin20usingbarmodels",
+   "wrmYear": "Y2",
+   "wrmSteps": [],
+   "wrmNear": [
+    "Y1.B2.S2"
+   ],
+   "ccss": [
+    "1.OA.A.1"
+   ],
+   "ee": [
+    "M.EE.1.OA.1"
+   ],
+   "eeOwnerList": [
+    "M.EE.1.OA.1.a",
+    "M.EE.1.OA.1.b"
+   ],
+   "eeNote": "the repo EE set has only M.EE.1.OA.1",
+   "flow": "Standard (whole unknown: put together + add to)",
+   "skills": {
+    "used": [
+     {
+      "key": "addition:add_wp_20",
+      "opts": {
+       "support": "bar",
+       "pictures": false
+      },
+      "role": "main; P5 with the bar off"
+     },
+     {
+      "key": "counting:count_objects",
+      "role": "P0"
+     },
+     {
+      "key": "composing:number_bonds",
+      "role": "P0 / P1"
+     },
+     {
+      "key": "addition:add_facts",
+      "role": "P0 / P1"
+     }
+    ],
+    "built": [],
+    "proposed": [
+     "option wpSituation (story type) on the add/sub word-problem skills",
+     "option barFill (known parts printed in the bar)",
+     "follow-on lessons: take from, take apart (part unknown), change/start unknown, compare with two bars, both addends unknown"
+    ]
+   },
+   "rulings": [
+    "bars are schematic (contract RP-72)",
+    "optional Mixed page dropped (no fresh stories under unordered-fact identity)"
+   ],
+   "critic": {
+    "verdict": "PASS",
+    "round": 4,
+    "min": [
+     8,
+     8,
+     8,
+     8
+    ],
+    "reports": "design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r1..r4.md",
+    "note": "P6 Say band made generic after E16c (2 pages; re-check in lesson 4 critic r2)"
+   },
+   "status": "passed",
+   "pack": {
+    "dir": "design/lesson-samples/detailed/g1-oa1-bar-model-wp-20/",
+    "pdf": "design/lesson-samples/detailed/g1-oa1-bar-model-wp-20/pack.pdf",
+    "html": "design/lesson-samples/detailed/g1-oa1-bar-model-wp-20/pack.html",
+    "selfCheck": "design/lesson-samples/detailed/g1-oa1-bar-model-wp-20/SELF-CHECK.md"
+   }
+  },
+  {
+   "id": "g3-oa5-mult-properties",
+   "order": 3,
+   "grade": "3",
+   "level": 3,
+   "title": "I Can turn an array to multiply",
+   "ownerTitle": "Properties of multiplication: commutative, identity and distributive",
+   "part": "3a (commutative)",
+   "siteLessonId": "G3|-|propertiesofmultiplicationcommutativeidentityanddistributive",
+   "wrmYear": "Y4",
+   "wrmSteps": [],
+   "wrmNear": [],
+   "ccss": [
+    "3.OA.B.5"
+   ],
+   "ee": [],
+   "eeNote": "no EE at grade 3; DLM access point M.EE.N.CN.2 (a see-reference only in ee-math.json)",
+   "flow": "Standard",
+   "skills": {
+    "used": [
+     {
+      "key": "multiplication:mult_properties",
+      "opts": {
+       "forms": [
+        0
+       ]
+      },
+      "role": "main (both / known / missing)"
+     },
+     {
+      "key": "multiplication:arrays_groups",
+      "role": "P0"
+     },
+     {
+      "key": "multiplication:count_by_tables",
+      "role": "P0"
+     },
+     {
+      "key": "multiplication:mult_facts",
+      "role": "P0 / retrieval"
+     }
+    ],
+    "built": [
+     "multiplication:mult_properties form 0 redone: kit template arrays-turn, provider (turn-recount / turn-no-swap / turn-product-factor), options task / band / pictures"
+    ],
+    "proposed": [
+     "follow-on lesson 3b: x 1 (x 0 as contrast)",
+     "follow-on lesson 3c: distributive (break at 5)",
+     "redo mult_properties forms 1-3 (legacy)"
+    ]
+   },
+   "followOn": [
+    "3b",
+    "3c"
+   ],
+   "critic": {
+    "verdict": "PASS",
+    "round": 3,
+    "min": [
+     8,
+     8,
+     8,
+     9
+    ],
+    "reports": "design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r1..r3.md"
+   },
+   "status": "passed",
+   "pack": {
+    "dir": "design/lesson-samples/detailed/g3-oa5-mult-properties/",
+    "pdf": "design/lesson-samples/detailed/g3-oa5-mult-properties/pack.pdf",
+    "html": "design/lesson-samples/detailed/g3-oa5-mult-properties/pack.html",
+    "selfCheck": "design/lesson-samples/detailed/g3-oa5-mult-properties/SELF-CHECK.md"
+   }
+  },
+  {
+   "id": "g3-oa9-mult-table-patterns",
+   "order": 4,
+   "grade": "3",
+   "level": 3,
+   "title": "I Can find even products",
+   "ownerTitle": "Patterns on the multiplication table",
+   "siteLessonId": "G3|-|patternsonthemultiplicationtable",
+   "wrmYear": "Y4",
+   "wrmBlock": "Y4.B4",
+   "wrmSteps": [],
+   "wrmNear": [],
+   "ccss": [
+    "3.OA.C.7",
+    "3.OA.D.9"
+   ],
+   "ee": [
+    "M.EE.3.OA.8"
+   ],
+   "eeOwnerList": [
+    "M.EE.3.OA.9"
+   ],
+   "eeNote": "owner list (DLM v4) vs repo EE set",
+   "flow": "Standard (even products; odd x odd as contrast)",
+   "skills": {
+    "used": [
+     {
+      "key": "multiplication:mult_chart",
+      "opts": {
+       "task": "even",
+       "chart": "window"
+      },
+      "role": "main"
+     },
+     {
+      "key": "multiplication:count_by_tables",
+      "role": "P0"
+     },
+     {
+      "key": "multiplication:mult_facts",
+      "role": "P0"
+     }
+    ],
+    "built": [
+     "mult_chart / mult_chart_easy option task 'even' (shade-even), CHART_STEPS.even, wrong answers row-only / odd-odd-shaded, window options winRows / winCols / minFactor (codec 5Q-5S)"
+    ],
+    "proposed": [
+     "new skill patterns:notice_patterns (n x m: Even or Odd, reason bank) - adds a second Practice page and a Mixed page"
+    ]
+   },
+   "critic": {
+    "verdict": "in review",
+    "round": 2
+   },
+   "status": "in review",
+   "pack": {
+    "dir": "design/lesson-samples/detailed/g3-oa9-mult-table-patterns/",
+    "pdf": "design/lesson-samples/detailed/g3-oa9-mult-table-patterns/pack.pdf",
+    "html": "design/lesson-samples/detailed/g3-oa9-mult-table-patterns/pack.html",
+    "selfCheck": "design/lesson-samples/detailed/g3-oa9-mult-table-patterns/SELF-CHECK.md"
+   }
+  },
+  {
+   "id": "g3-oa9-input-output-rule",
+   "order": 5,
+   "grade": "3",
+   "level": 3,
+   "title": "I Can find the rule in a table",
+   "ownerTitle": "Find the rule in an input-output table",
+   "siteLessonId": "G3|-|findtheruleinaninputoutputtable",
+   "wrmYear": "Y4",
+   "wrmSteps": [],
+   "wrmNear": [
+    "Y6.B7.S1"
+   ],
+   "ccss": [
+    "3.OA.D.9"
+   ],
+   "ee": [
+    "M.EE.3.OA.8"
+   ],
+   "eeOwnerList": [
+    "M.EE.3.OA.9"
+   ],
+   "eeNote": "owner list (DLM v4) vs repo EE set",
+   "flow": "Standard (+, -, x one-step rules; test every row)",
+   "skills": {
+    "used": [
+     {
+      "key": "algebra:function_table_easy",
+      "opts": {
+       "ftTask": "rule",
+       "ftFactors": "2-5-10"
+      },
+      "role": "main"
+     },
+     {
+      "key": "addition:add_facts",
+      "role": "P0"
+     },
+     {
+      "key": "subtraction:sub_facts",
+      "role": "P0"
+     },
+     {
+      "key": "multiplication:mult_facts",
+      "role": "P0"
+     }
+    ],
+    "built": [
+     "function_table_easy/_hard options ftTrap (5T) and ftFactors (5U), +/- rule worked-step order, sign-flip wrong answer, chart step states; function_table_easy also tagged 3.OA.D.9 / M.EE.3.OA.8"
+    ],
+    "proposed": [
+     "new skill algebra:function_table_story (word problems about a table rule)"
+    ]
+   },
+   "critic": {
+    "verdict": "in review",
+    "round": 2
+   },
+   "status": "in review",
+   "pack": {
+    "dir": "design/lesson-samples/detailed/g3-oa9-input-output-rule/",
+    "pdf": "design/lesson-samples/detailed/g3-oa9-input-output-rule/pack.pdf",
+    "html": "design/lesson-samples/detailed/g3-oa9-input-output-rule/pack.html",
+    "selfCheck": "design/lesson-samples/detailed/g3-oa9-input-output-rule/SELF-CHECK.md"
+   }
+  }
+ ]
+}
