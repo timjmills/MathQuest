@@ -274,3 +274,11 @@ html.dark body.teacher-mode .tvw-lesson.is-assess .tvw-n { color: #e0d2ff; }
     .tvw-row .tvw-q .tv-btn svg { display: none; }
     .tvw-row .tvw-more { padding: 0 4px; }
 }
+
+/* WRM page round 9: the DETAILED lesson card (data/curriculum/detailed-lessons.json) and its row tag. Additive. */
+.tvw-dl { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+.tvw-dl .tv-h3 { margin: 0; }
+.tvw-dl .tv-cap { margin: 0; }
+.tvw-dl-skills { margin: 0; font-size: 14px; line-height: 20px; color: var(--tv-ink, inherit); overflow-wrap: anywhere; }
+.tvw-dl-build { color: var(--tv-caption); }
+.tvw-dl-tag { border-style: dashed; }

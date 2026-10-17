@@ -154,7 +154,11 @@ export function renderPrintScreen(el) {
     root.querySelector('#tvSheetTitle').value = pr.title;
     renderWhat();
     renderSetup();
-    scheduleBuild(0);
+    // N34 (WRM page r9): coming back to an unchanged sheet (Forward after Back) keeps the preview it built; a rebuild
+    // would replace the preview frame while its fonts load
+    let same = false;
+    try { same = !!(last && last.req && JSON.stringify(last.req) === JSON.stringify(currentReq())); } catch (e) { same = false; }
+    if (!same) scheduleBuild(0);
 }
 
 /**
@@ -183,6 +187,25 @@ export function printSkills(skills) {
     pr.sections = [newSection((skills || []).map((s) => ({ ...s })))];
     pr.seed = freshSeed();
     pr.view = 0;
+}
+
+/**
+ * Open a DETAILED lesson on this screen (the White Rose lessons screen's "Make it", WRM page round 9): one section, role
+ * "Lesson: detailed", that lesson chosen. False when the lesson maker has no lesson with this id. The caller then
+ * shows this screen with tvGo('print').
+ */
+export function printDetailedLesson(lessonId) {
+    if (!detailedLessonFor(lessonId)) return false;
+    if (!pr) initState();
+    pr.title = '';
+    const s = newSection([]);
+    s.role = 'detailed-lesson';
+    s.lessonId = String(lessonId);
+    dlSkills(s, true);
+    pr.sections = [s];
+    pr.seed = freshSeed();
+    pr.view = 0;
+    return true;
 }
 
 /** Re-print a stored printout (Home, "Recent printouts"). */

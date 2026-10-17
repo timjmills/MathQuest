@@ -19,7 +19,7 @@ let detP = null;
 
 const get = (f) => fetch(`data/curriculum/links/${f}`).then((r) => (r.ok ? r.json() : null)).catch(() => null);
 
-/** → Promise<{ years: [...], map: bool }> */
+/** → Promise<{ years: [...], map: bool, detailed: bool }> */
 export function loadIndex() {
     if (!idxP) {
         idxP = get('index.json').then((idx) => ({
@@ -44,19 +44,16 @@ export function loadMap() {
 }
 
 /**
- * The detailed-lessons hook (round 7). data/curriculum/detailed-lessons.json comes later from another session (lessons
- * made with the V22 lesson maker). It is fetched only when index.json says "detailed": true, so while the file is
- * absent nothing is requested and nothing errors. Expected shape:
- *   { "lessons": { "<WRM step id, e.g. Y5.B1.S2 | school-site lesson id, e.g. G4|-|lineplotswithfractions>":
- *                  { "url": "lessons/y5-b1-s2.html" | "https://…", "title": "…", "updated": "2026-10-20" }
- *                  (or a list of such records) } }
- * `url` is a path inside this site or an https link; it opens in a new tab as "Detailed lesson".
- * → Promise<{ [key]: record | record[] } | null>
+ * The DETAILED lessons (round 9: the real file, data/curriculum/detailed-lessons.json, made with the V22 lesson maker).
+ * Fetched only when index.json says "detailed": true. Shape (its meta.joins): { meta, lessons: [{ id, title, grade,
+ * siteLessonId (= site-lessons.json lessons[].id), wrmSteps[], skills { used [{key, opts, role}], proposed [] },
+ * pack { pdf, html }, … }] }. detailed-links.js indexes it for the White Rose screen.
+ * → Promise<{ meta, lessons: [...] } | null>
  */
 export function loadDetailed() {
     if (!detP) {
         detP = loadIndex().then((idx) => (idx.detailed ? fetch('data/curriculum/detailed-lessons.json').then((r) => (r.ok ? r.json() : null)).catch(() => null) : null))
-            .then((d) => (d && d.lessons && typeof d.lessons === 'object' ? d.lessons : null));
+            .then((d) => (d && Array.isArray(d.lessons) ? d : null));
     }
     return detP;
 }

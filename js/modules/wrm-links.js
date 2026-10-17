@@ -285,13 +285,15 @@ export function linksFor(lessonOrKey, opts = {}) {
     }).sort((a, b) => a.shares - b.shares || a.yr - b.yr || b.i - a.i);
     for (const r of ranked) {
         for (const d of directOf(r.sid, live)) {
-            push(pre, d.key, `Taught before: ${gradeOfYear(r.sid.split('.')[0])}, "${r.rec ? tidyTitle(r.rec.title) : r.sid}"`);
+            // N35 (critic r7): the same composed sentence as the curated path ('Taught before, in Pre-K: "…".')
+            push(pre, d.key, stepsSentence([r.sid], lesson.step || '', { lesson, group: 'prereq', support: true, weeks: [weekNo(lesson.weeks[0])].filter(Boolean) })
+                || `Taught before, in ${gradeOfYear(r.sid.split('.')[0])}: "${r.rec ? tidyTitle(r.rec.title) : r.sid}".`);
         }
     }
     const sib = siblings(lesson);
     const at = sib.findIndex((l) => l.key === lesson.key);
     for (let k = at - 1; at > 0 && k >= Math.max(0, at - 3); k -= 1) {
-        for (const d of directOf(sib[k].step, live)) push(pre, d.key, `Earlier in this unit: "${sib[k].title}"`);
+        for (const d of directOf(sib[k].step, live)) push(pre, d.key, `Earlier in this unit: "${sib[k].title}".`);
     }
     if (!pre.length) {
         const lower = [];
@@ -305,7 +307,7 @@ export function linksFor(lessonOrKey, opts = {}) {
             }
         }
         lower.sort((a, b) => a.gap - b.gap || a.key.localeCompare(b.key));
-        for (const x of lower) push(pre, x.key, `Earlier grade, same standard group (${x.code})`);
+        for (const x of lower) push(pre, x.key, `Earlier grade, same standard group (${x.code}).`);
     }
     const prereq = applyOverride(pre, ovr.prereq, 'Added by the school', PREREQ_CAP);
     prereq.forEach((x) => taken.add(x.key));
@@ -313,10 +315,10 @@ export function linksFor(lessonOrKey, opts = {}) {
     // RELATED
     const rel = [];
     for (const code of lesson.ccss) {
-        for (const key of skillsForStandard(code)) push(rel, key, `Same standard (${code})`);
+        for (const key of skillsForStandard(code)) push(rel, key, `Same standard (${code}).`);
     }
     for (let k = at + 1; at >= 0 && k <= Math.min(sib.length - 1, at + 3); k += 1) {
-        for (const d of directOf(sib[k].step, live)) push(rel, d.key, `Next in this unit: "${sib[k].title}"`);
+        for (const d of directOf(sib[k].step, live)) push(rel, d.key, `Next in this unit: "${sib[k].title}".`);
     }
     const related = applyOverride(rel, ovr.related, 'Added by the school', RELATED_CAP);
     const verdict = !direct.length ? 'gap' : direct.some((x) => !x.part) ? 'full' : 'partial';
@@ -350,12 +352,15 @@ function curatedLinks(lesson, cur, ovr, live) {
  * as above").
  */
 const lineKey = (t) => String(t || '').toLowerCase().replace(/^not yet:\s*/, '').replace(/[.\s]+$/, '').trim();
+/** The support-block clause a composed line may end with (said once per lesson). */
+export const SUP_CLAUSE = / Revisited in this grade's support block, weeks? [\d, and]+\.$/;
+/** m15 (critic r7): two lines that differ only by the support clause are the same reason. */
+export const baseKey = (t) => lineKey(String(t || '').replace(SUP_CLAUSE, ''));
 function onceEach(r) {
     const seen = new Set();
     if (r.missing) seen.add(lineKey(r.missing));
     for (const x of r.direct) { if (!x.partial) continue; const k = lineKey(x.partial); if (seen.has(k)) x.partial = ''; else seen.add(k); }
     // the support week is one fact about the lesson: said on the first row that names it, not on every row
-    const SUP_CLAUSE = / Revisited in this grade's support block, weeks? [\d, and]+\.$/;
     const supSaid = new Set();
     for (const g of ['prereq', 'related']) for (const x of r[g]) {
         const m = SUP_CLAUSE.exec(x.why || '');
@@ -364,13 +369,20 @@ function onceEach(r) {
     }
     for (const g of ['prereq', 'related']) {
         const firstAt = new Map();
-        r[g].forEach((x, i) => { const k = lineKey(x.why); if (k && !firstAt.has(k)) firstAt.set(k, i); });
-        const order = r[g].map((x, i) => ({ x, i, at: x.why ? firstAt.get(lineKey(x.why)) : i }));
+        r[g].forEach((x, i) => { const k = baseKey(x.why); if (k && !firstAt.has(k)) firstAt.set(k, i); });
+        const order = r[g].map((x, i) => ({ x, i, at: x.why ? firstAt.get(baseKey(x.why)) : i }));
         order.sort((a, b) => a.at - b.at || a.i - b.i);
+        const firstRow = new Map();
         r[g] = order.map(({ x }) => {
-            const k = lineKey(x.why);
-            if (k && seen.has(k)) return { ...x, why: '', same: true };
-            if (k) seen.add(k);
+            const k = baseKey(x.why);
+            if (k && seen.has(k)) {
+                // a repeat that carried the support clause hands it to the first row with that reason
+                const m = SUP_CLAUSE.exec(x.why || '');
+                const f = firstRow.get(k);
+                if (m && f && !SUP_CLAUSE.test(f.why)) f.why = `${f.why}${m[0]}`;
+                return { ...x, why: '', same: true };
+            }
+            if (k) { seen.add(k); firstRow.set(k, x); }
             return x;
         });
     }
@@ -405,7 +417,8 @@ export function stepTitle(id) { const r = wrmStep(id); return r ? tidyTitle(r.ti
  */
 export function taskName(raw) {
     const t = tidyTitle(raw).replace(/\s*<->\s*/g, ' ↔ ').replace(/\s*->\s*/g, ' → ').replace(/\bGr\.?\s?(\d)\b/g, 'Grade $1')
-        .replace(/\bB&W\b/g, 'black-and-white').replace(/\b([Aa])dd\/sub\b/g, '$1dd and subtract').replace(/\(Q1\)/g, '(first quadrant)').replace(/\(upper band\)/g, '(higher RIT scores)');
+        .replace(/\bB&W\b/g, 'black-and-white').replace(/\b([Aa])dd\/sub\b/g, '$1dd and subtract').replace(/\(Q1\)/g, '(first quadrant)').replace(/\(upper band\)/g, '(higher RIT scores)')
+        .replace(/\bincl\.\s*/g, 'including ');
     if (isPlain(t, { fragment: false })) return t;
     return t.replace(/\s*\(([^()]*)\)/g, (m, x) => (isPlain(x, { fragment: false }) ? m : '')).trim();
 }
@@ -507,9 +520,27 @@ export function relationIn(sid, lesson = {}, group = 'related') {
         // the same school week: White Rose's own order holds inside it ("The step before"), but never "later"
         else if (ws.includes(lw)) out = ['before', 'earlier'].includes(base) ? { rel: base, weeks: [] } : { rel: 'schoolSame', weeks: [lw] };
         else out = { rel: 'schoolLater', weeks: ws.filter((w) => w > lw).slice(0, 2) };
-    } else out = { rel: base, weeks: [] };
+    } else if (ws.length && lesson.gradeLabel) out = { rel: 'alsoGrade', weeks: ws.slice(0, 2), g: lesson.gradeLabel };   // a lesson with no week
+    else out = { rel: base, weeks: [] };
+    out = ownGradeRel(out, sid, lesson, group);
     if (group === 'prereq' && LATER_RELS.includes(out.rel)) out = { rel: 'alsoGrade', weeks: out.rel === 'schoolLater' ? out.weeks : [], g: out.rel === 'laterGrade' ? '' : lesson.gradeLabel || '' };
     return out;
+}
+/**
+ * m16 (critic r7): a grade word is measured against the lesson's OWN grade, never against the year of the step it is
+ * mapped to (a Grade 3 lesson on a Grade 5 step). A step of a lower grade is "Taught before, in Grade N"; of a higher
+ * grade "Taught later, in Grade N" (a Do-first line: "Also taught in Grade N"); of the lesson's own grade that the
+ * school's sequence does not list, "In the White Rose Grade N lessons" (no order word).
+ */
+function ownGradeRel(out, sid, lesson, group) {
+    const own = YEAR_ORDER.indexOf((WRM_SEQUENCE.find((g) => g.id === String(lesson.grade || '')) || {}).year);
+    if (own < 0) return out;
+    const cross = ['earlierGrade', 'laterGrade', 'earlierBlock', 'laterBlock'].includes(out.rel);
+    if (!cross && !(group === 'prereq' && ['next', 'later'].includes(out.rel))) return out;
+    const yi = YEAR_ORDER.indexOf(String(sid).split('.')[0]);
+    if (yi < own) return { rel: 'earlierGrade', weeks: [] };
+    if (yi > own) return group === 'prereq' ? { rel: 'alsoGrade', weeks: [], g: '' } : { rel: 'laterGrade', weeks: [] };
+    return out.rel === 'earlierBlock' ? out : { rel: 'wrGrade', weeks: [] };
 }
 /** The leads a Do-first line may never use (critic r6 M8; ws-wrm-page-unit checks the same pattern). */
 export const LATER_LEAD = /(?:^|\. )(?:Later\b|Taught later\b|The next step\b)/;
@@ -520,11 +551,11 @@ const REL_LEAD = {
     earlierGrade: (g) => `Taught before, in ${g}`, laterGrade: (g) => `Taught later, in ${g}`, earlierBlock: (g) => `Taught earlier in ${g}`,
     laterBlock: (g) => `Taught later in ${g}`, grade: (g) => g, sameGrade: (g) => `In ${g}`,
     schoolEarlier: () => 'Taught earlier this year', schoolSame: () => 'Taught the same week', schoolLater: () => 'Taught later this year',
-    alsoGrade: (g) => `Also taught in ${g}`,
+    alsoGrade: (g) => `Also taught in ${g}`, wrGrade: (g) => `In the White Rose ${g} lessons`,
 };
-const REL_ORDER = ['schoolEarlier', 'before', 'earlier', 'earlierBlock', 'earlierGrade', 'sameGrade', 'schoolSame', 'alsoGrade', 'schoolLater', 'next', 'later', 'laterBlock', 'laterGrade', 'grade', 'same'];
+const REL_ORDER = ['schoolEarlier', 'before', 'earlier', 'earlierBlock', 'earlierGrade', 'sameGrade', 'wrGrade', 'schoolSame', 'alsoGrade', 'schoolLater', 'next', 'later', 'laterBlock', 'laterGrade', 'grade', 'same'];
 /** The relations a Do-first line may state (none says "later" or "next"). */
-export const PREREQ_RELS = ['schoolEarlier', 'before', 'earlier', 'earlierBlock', 'earlierGrade', 'sameGrade', 'schoolSame', 'alsoGrade', 'grade'];
+export const PREREQ_RELS = ['schoolEarlier', 'before', 'earlier', 'earlierBlock', 'earlierGrade', 'sameGrade', 'wrGrade', 'schoolSame', 'alsoGrade', 'grade'];
 const weekClause = (ws) => (ws.length ? ` (${weeksWords(ws)})` : '');
 /**
  * 'Taught before, in Grade 2: "Hundreds, tens and ones". Revisited in this grade's support block, week 11.' for a
@@ -542,9 +573,12 @@ export function stepsSentence(steps, lessonStep, { weeks = [], support = false, 
         const k = `${r.rel}|${g}`;
         if (!groups.has(k)) groups.set(k, { rel: r.rel, g, yi: YEAR_ORDER.indexOf(yr), titles: [], weeks: [] });
         const x = groups.get(k);
-        x.titles.push(stepTitle(sid));
-        for (const w of r.weeks) if (!x.weeks.includes(w)) x.weeks.push(w);
+        const t = stepTitle(sid);
+        x.titles.push(t);
+        // N36 (critic r7): only the weeks of the steps the line names (titles stop at three)
+        if ([...new Set(x.titles)].indexOf(t) < 3) for (const w of r.weeks) if (!x.weeks.includes(w)) x.weeks.push(w);
     }
+    for (const x of groups.values()) x.weeks.sort((a, b) => a - b);
     // the same titles in two grades are said once, the grades in order ("in Grade 2 and Grade 3")
     const merged = [];
     for (const x of [...groups.values()].sort((a, b) => REL_ORDER.indexOf(a.rel) - REL_ORDER.indexOf(b.rel) || a.yi - b.yi)) {
@@ -657,7 +691,8 @@ const andJoin = (a) => (a.length < 2 ? a.join('') : `${a.slice(0, -1).join(', ')
 const weeksWords = (ns) => {
     const w = [...new Set(ns)].sort((a, b) => a - b);
     if (!w.length) return '';
-    return w.length > 3 ? `weeks ${w.slice(0, 3).join(', ')} and ${w.length - 3} more` : `week${w.length > 1 ? 's' : ''} ${andJoin(w.map(String))}`;
+    // N36 (critic r7): every week is named ("and 1 more" read like the step "1 more"); a long list ends "and more weeks"
+    return w.length > 6 ? `weeks ${w.slice(0, 5).join(', ')} and more weeks` : `week${w.length > 1 ? 's' : ''} ${andJoin(w.map(String))}`;
 };
 
 /** The flag a lesson of the school site carries, in plain words ('' for a White Rose lesson the site does not flag). */
@@ -709,13 +744,14 @@ export function lessonAbout(l) {
     if (copied.length) out.push(`Also taught in ${andJoin(copied)}.`);
     if (review.length) out.push(`Reviewed in ${andJoin(review)}.`);
     // the support blocks that list the step: the workbook's weeks, else the grades the site names
+    // m17 (critic r7): in grade order, every grade named (there are at most seven)
     const sup = [];
-    for (const g of WRM_SEQUENCE) {
+    WRM_SEQUENCE.forEach((g, gi) => {
         const ws = Object.entries(g.prior || {}).filter(([, ids]) => (ids || []).includes(l.step)).map(([w]) => weekNo(w));
-        if (ws.length) sup.push(`${g.label}, ${weeksWords(ws)}`);
-    }
-    for (const gid of rec.s || []) if (!WRM_SEQUENCE.some((g) => g.id === gid && Object.values(g.prior || {}).some((ids) => (ids || []).includes(l.step)))) sup.push(gradeName(gid));
-    if (sup.length) out.push(`Also in the support block: ${sup.slice(0, 4).join('; ')}${sup.length > 4 ? `; and ${sup.length - 4} more grade${sup.length > 5 ? 's' : ''}` : ''}.`);
+        if (ws.length) sup.push([gi, `${g.label}, ${weeksWords(ws)}`]);
+        else if ((rec.s || []).includes(g.id)) sup.push([gi, g.label]);
+    });
+    if (sup.length) out.push(`Also in the support block: ${sup.sort((a, b) => a[0] - b[0]).map((x) => x[1]).join('; ')}.`);
     if (rec.e && l.type !== 'enrich') {
         const why = /^(?:true|1)$/i.test(String(rec.e)) ? '' : String(rec.e).replace(/\.$/, '');
         const t = `The school marks it as an enrichment lesson${why ? ` (${why})` : ''}.`;

@@ -92,7 +92,7 @@ function showScreen(key) {
     document.body.classList.remove('tv-play', 'tv-bigboard');
     hideToast();
     // The White Rose screen keeps its place in the URL hash (#wrm/...); every other screen drops it.
-    if (key !== 'wrm') clearWrmHash();
+    if (key !== 'wrm') clearWrmHash(key);
     if (key !== 'map') clearMapHash();
     if (key !== 'todo') clearTodoHash();
     document.querySelectorAll('#teacherMain .tv-screen').forEach((s) => s.classList.toggle('is-active', s.dataset.screen === key));
@@ -249,6 +249,9 @@ function start() {
     window.addEventListener('hashchange', () => {
         if (isTeacher() && mapHashActive()) { tvGo('map'); return; }   // #map/... (MAP task views)
         if (isTeacher() && todoHashActive()) { tvGo('todo'); return; } // #todo/<entry> (Skills to be made, critic r6 m11)
+        // N34 (critic r7): Forward onto the entry a screen made when it left the White Rose screen (no hash)
+        const back = history.state && typeof history.state === 'object' ? history.state.tvScreen : '';
+        if (isTeacher() && !location.hash && back && back !== current) { tvGo(back); return; }
         if (!isTeacher() || !wrmHashActive()) return;
         if (current !== 'wrm' || !document.body.classList.contains('tv-on-screen')) tvGo('wrm');
         else wrmOnHashChange();

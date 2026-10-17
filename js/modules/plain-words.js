@@ -26,7 +26,7 @@ export const DENY = new Set(['band', 'bands', 'legacy', 'template', 'templates',
     'dispatcher', 'dispatch', 'cell', 'andika', 'deals', 'dealt', 'reception', 'spec', 'specs', 'json', 'js', 'md', 'csv',
     'id', 'ids', 'path', 'repo', 'regrade', 'grader', 'sampled', 'resampled', 'audit', 'audited', 'verdict', 'verdicts', 'mc', 'wrm',
     'deal', 'dealing', 'gr', 'yr', 'pk', 'rec', 'wk', 'descartes', 'nwea', 'payload', 'render', 'renders', 'rendered', 'host', 'hosts', 'svg', 'html',
-    'enum', 'bool', 'config', 'param', 'params', 'stub', 'tombstone', 'alias', 'aliases', 'routes', 'routed', 'schema', 'lint', 'critic',
+    'live', 'enum', 'bool', 'config', 'param', 'params', 'stub', 'tombstone', 'alias', 'aliases', 'routes', 'routed', 'schema', 'lint', 'critic',
     'rubric', 'fallback', 'migrate', 'migrated', 'migration', 'facsimile', 'provider', 'providers', 'footprint', 'seed', 'seeded']);
 /** Upper-case words a teacher reads on these screens: MAP and its RIT scale, the standards (CCSS, EE), the
  *  CCSS domain letters the school's units are named by, and BUILD, the school site's own flag for a CCSS lesson the
@@ -43,7 +43,8 @@ const UNIT_WORDS = new Set(['cm', 'mm', 'km', 'kg', 'mL', 'ml', 'ft', 'yd', 'oz'
 // — a run of underscores alone is a blank to fill ("7 + 5 = __ + 3")
 const CODE_CHARS = /[{}[\]`|\\~^]|[A-Za-z0-9]_|_[A-Za-z0-9]/;
 const STD_CODE = /\b(?:M\.)?(?:EE\.)?[K1-8]\.[A-Z]{1,3}(?:\.[A-Z])?(?:\.\d{1,2}[a-z]?)?(?:\.[A-Za-z])?\b/g;
-const ABBR = /\b(?:e\.g|i\.e|a\.m|p\.m|incl|approx)\.?(?![A-Za-z])/g;
+// N37 (critic r7): "incl." is a build-note short form, no longer passed
+const ABBR = /\b(?:e\.g|i\.e|a\.m|p\.m|approx)\.?(?![A-Za-z])/g;
 const UNITS = 'cm|mm|km|kg|mL|ml|L|g|m|ft|yd|oz|lbs?|min|mins|hr|hrs|mi|p|c';
 
 /** The tokens of a line: runs of letters and digits ("week", "12", "2s", "D1", "S13"); standard codes and
@@ -119,8 +120,12 @@ export const isPlain = (text, opts) => !plainProblem(text, opts);
 export function plainNote(text) {
     // N28 (critic r6): the build team's "live skill(s)" is said as "skill(s) in the app"
     const s = String(text == null ? '' : text).replace(/\s+/g, ' ').trim().replace(/[;,:]$/, '')
-        .replace(/\blive skills\b/g, 'skills in the app').replace(/\blive skill\b/g, 'skill in the app');
+        .replace(/\blive skills\b/g, 'skills in the app').replace(/\blive skill\b/g, 'skill in the app')
+        // N37 (critic r7): "live multi-step skills" too
+        .replace(/\blive ([a-z-]+ skills?)\b/g, '$1 in the app').replace(/\bincl\.\s*/g, 'including ');
     if (!s) return '';
+    // N38 (critic r7): a one-word note ("Order.") is not a reason; the composed sentence says more
+    if (wordTokens(s).length < 2) return '';
     const cap = s.charAt(0).toUpperCase() + s.slice(1);
     // N32: a note that ends in a bracket still ends with a full stop ("… (then the third angle).")
     const out = /[.!?"”]$/.test(cap) || /[.!?]\)$/.test(cap) ? cap : `${cap}.`;

@@ -14,7 +14,7 @@ import { WRM_STEPS, skillsForWrmStep } from '../../js/modules/wrm.js';
 import { linksFor, allLessons, lessonByKey, searchLessons, addCuratedYear, clearCurated, proposalName, unitLessons, lessonBySite, lessonBySiteSlug,
     lessonHash, siteSlug, siteFlagText, lessonAbout, siteLessonLabel,
     PREREQ_CAP, RELATED_CAP, WRM_LINK_OVERRIDES, REP_PAIRS, composeWhy, composePartial, composeMissing, proposalLabel, stepsInNote, taskName, MAP_STRANDS, strandOfKey, repPairsOfText,
-    partialVerdict, LATER_LEAD, supportWeeksOf, placeDomain, curatedFor, curatedLessonFor } from '../../js/modules/wrm-links.js';
+    partialVerdict, LATER_LEAD, supportWeeksOf, placeDomain, curatedFor, curatedLessonFor, baseKey } from '../../js/modules/wrm-links.js';
 import { buildQueue, passes, toCSV, CSV_HEAD, KINDS, gradesOfText, gradeOfCode, gradeOfRit, closesText, stepName } from '../../js/modules/build-queue.js';
 
 let fails = 0;
@@ -247,9 +247,30 @@ function truth(l, r) {
     for (const t of lines) {
         if (/the part "/.test(t)) tbad(`M9 ${l.key} "${t}"`);
         if (/\(new option on an existing skill\)./.test(t)) tbad(`M9 ${l.key} option suffix inside a sentence "${t}"`);
-        const k = t.toLowerCase().replace(/^not yet:\s*/, '').replace(/[.\s]+$/, '');
-        if (seen.has(k)) tbad(`M9 ${l.key} said twice: "${t}"`);
+        // m15 (critic r7): two lines that differ only by the support clause are the same line
+        const k = baseKey(t);
+        if (seen.has(k)) tbad(`M9/m15 ${l.key} said twice: "${t}"`);
         seen.add(k);
+        // N36: no "and 1 more" (it reads like the step "1 more"); m17: every support grade named
+        if (/\bweeks? [\d, ]+ and \d+ more\b|\bmore grades?\b/.test(t)) tbad(`N36/m17 ${l.key} hides a week or a grade: "${t}"`);
+    }
+    // m16 (critic r7): a grade word agrees with the lesson's OWN grade
+    const GI = (g) => ['Pre-K', 'Kindergarten', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5'].indexOf(g);
+    const own = GI(l.gradeLabel);
+    for (const t of [...r.prereq.map((x) => x.why), ...r.related.map((x) => x.why)].filter(Boolean)) {
+        for (const s of t.split(/(?<=\.)\s+(?=[A-Z])/)) {
+            const gs = (s.match(/Pre-K|Kindergarten|Grade \d/g) || []).map(GI);
+            if (/^Taught before, in /.test(s) && gs.some((g) => g >= own)) tbad(`m16 ${l.key} (${l.gradeLabel}) "Taught before" names a grade not below it: "${s}"`);
+            if (/^Taught later,? in /.test(s) && gs.some((g) => g <= own)) tbad(`m16 ${l.key} (${l.gradeLabel}) "Taught later" names a grade not above it: "${s}"`);
+            if (/^Taught earlier in /.test(s) && gs.some((g) => g !== own)) tbad(`m16 ${l.key} (${l.gradeLabel}) "Taught earlier in" names another grade: "${s}"`);
+            if (/^Also taught in /.test(s) && gs[0] === own && !/\(weeks? \d/.test(s)) tbad(`m16 ${l.key} "Also taught in" its own grade with no week: "${s}"`);
+        }
+    }
+    // m17: the support block lists its grades in order
+    for (const t of lessonAbout(l)) {
+        if (!/^Also in the support block: /.test(t)) continue;
+        const gs = (t.match(/Pre-K|Kindergarten|Grade \d/g) || []).map(GI);
+        if (gs.some((g, i) => i && g < gs[i - 1])) tbad(`m17 ${l.key} support grades out of order: "${t}"`);
     }
 }
 
@@ -268,10 +289,20 @@ const gate = (where, out, opts) => {
         if (h) { jBad += 1; jByForm[h.name] = (jByForm[h.name] || 0) + 1; if (jBad <= (process.env.SHOWALL ? 9999 : 15)) console.log('NOT PLAIN', h.name, '|', where, '|', h.snippet); }
     }
 };
+// M11 (critic r7): no "How it looks", Kind, name or teaches line is a template-id list or the build list's syntax
+const KIT_ID = /\b(?:hop-line|mult-grid|count-row|area-model|word-work|function-table|data-table|coord-grid|frac-model|nl-place|value-line|money-columns|mult-chart|arrays-turn|fact-family|cloze-bank|tally-chart|bar-graph|perimeter-shape|picture-row|measure-scale|graph-axes|shape-grid|pv-support|angle-kit|solid-kit|chartwindow|seqstrip|tenframe|wordpic|rcdws)\b/i;
+let m11 = 0;
 const todoGate = (tag, Q) => {
     TT.setTodoNames(Q.items);
     for (const e of Q.items) {
         const T = TT.todoTexts(e);
+        for (const [f, v] of Object.entries(T)) for (const x of [].concat(v)) {
+            if (!x || f === 'closes') continue;
+            const bad = (f === 'looks' && TT.TEMPLATE_LIST.test(x)) || /\+ new:|\(tiles \d+\)|\bresponse "|^The existing\b|^The skill['’]s own\b|\bA new picture in\b|^[a-z]+ ["']/.test(x) || KIT_ID.test(x);
+            if (bad) { m11 += 1; if (m11 <= 10) console.log('M11', tag, e.id, f, '|', x); }
+        }
+        // m17: "no skill teaches all of it yet" once per entry at most
+        ok(T.closes.filter((x) => /no skill teaches all of it yet/.test(x)).length <= 1, `m17 ${tag} ${e.id}: "no skill teaches all of it yet" more than once`);
         for (const [f, v] of Object.entries(T)) gate(`${tag} ${e.id} ${f}`, f === 'kind' ? [(KINDS.find((x) => x[0] === e.kind) || [])[1], ...v].join(' · ') : v);
         gate(`${tag} ${e.id} steps`, e.wrmSteps.map(stepName));
         gate(`${tag} ${e.id} map`, e.map.map(TT.mapLine), { fragment: false });
@@ -410,6 +441,34 @@ for (const l of L) { const r = linksFor(l); gate(`lesson (rules) ${l.key}`, [r.v
     console.log(`site lessons: ${site.lessons.length} lessons + ${assessments} assessments listed (${twins} are sequence rows the site also names); tagged ${tagged}, not tagged ${untagged} (site-only lessons with no step)`);
 }
 
+// DETAILED LESSONS (round 9): data/curriculum/detailed-lessons.json — every record joins a real school-site lesson
+// (siteLessonId), names real White Rose steps, points at a lesson file on disk, uses live skills, has a lesson in the
+// maker for "Make it", and every line the White Rose screen composes for it is plain.
+{
+    const D = await import('../../js/modules/detailed-links.js');
+    const { liveSkillLabel } = await import('../../js/modules/wrm-links.js');
+    const { detailedLessonFor } = await import('../../js/modules/lessons/detailed/index.js');
+    const raw = JSON.parse(readFileSync(new URL('../../data/curriculum/detailed-lessons.json', import.meta.url), 'utf8'));
+    const idx = D.indexDetailed(raw);
+    ok(idx.all.length === raw.lessons.length && idx.all.length > 0, `detailed lessons read: ${idx.all.length} of ${raw.lessons.length}`);
+    let joined = 0;
+    for (const r of idx.all) {
+        const l = lessonBySite(r.site);
+        ok(!!l, `detailed ${r.id}: siteLessonId ${r.site} is a real school-site lesson`);
+        if (l) { ok(D.detailedOf(idx, l).includes(r), `detailed ${r.id}: shown on ${l.key}`); joined += 1; }
+        for (const st of r.steps) ok(stepIds.has(st) && L.some((x) => x.step === st), `detailed ${r.id}: White Rose step ${st} is listed`);
+        ok(!!r.pack && existsSync(new URL(`../../${r.pack}`, import.meta.url)), `detailed ${r.id}: lesson file on disk (${r.pack})`);
+        for (const x of r.used) { const [c, k] = x.key.split(':'); ok((DATA.SKILLS[c] || []).some((y) => y.v === k), `detailed ${r.id}: skill ${x.key} is live`); }
+        ok(!!detailedLessonFor(r.id), `detailed ${r.id}: the lesson maker has it ("Make it")`);
+        const T = D.detailedTexts(r, (k) => liveSkillLabel(k));
+        ok(T.some((t) => /^Its skills: /.test(t)), `detailed ${r.id}: its skills are named`);
+        gate(`detailed lesson ${r.id}`, T);
+    }
+    ok(D.safeHref('javascript:alert(1)') === '' && D.safeHref('../x.pdf') === '' && D.safeHref('https://example.org/a.pdf') && D.safeHref('design/a/pack.pdf'), 'detailed: only site paths or https links are followed');
+    console.log(`detailed lessons: ${idx.all.length} read, ${joined} joined to a school-site lesson`);
+}
+ok(!m11, `M11: ${m11} Skills to be made lines are template-id lists or build syntax`);
+console.log(`M11 gate: template-id / build-syntax lines on Skills to be made: ${m11}`);
 ok(!truthBad, `truth gate (M8 order / support week, M9 said once): ${truthBad} of ${truthLines} lesson lines`);
 console.log(`truth gate: ${truthLines} lesson lines, ${truthBad} untrue or repeated`);
 ok(!jBad, `plain-English gate: ${jBad} of ${jLines} teacher-facing lines ${JSON.stringify(jByForm)}`);
