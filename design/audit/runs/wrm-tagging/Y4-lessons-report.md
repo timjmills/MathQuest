@@ -18,6 +18,71 @@ The tooling is ported from the Y1 lessons lane, which passed critic r3: its gate
 | Lesson tagFixes | 0 |
 | Lesson links | 88 pre / related links, plus 29 direct / partial links (round 2: lesson 5's related dropped) |
 
+## Round 4 (lessons critic r3: FAIL, mean 7.96; lesson 8 at 7). Builder escalated to mq-opus-medium
+
+The builder was escalated from mq-opus-low to mq-opus-medium (CLAUDE.md rule): lesson 8's related why failed two builder rounds (r2 "every side given", r3 "two sides unlabelled", false for the T). The escalation is recorded in `design/STATUS.md`. The steps, the tagFixes and the step proposals are still frozen (frozen gate OK; the step build writes sha `d4d03a36…`).
+
+### F5: the lesson 8 related why, measured per shape
+
+The why was not copied from the r3 fix table. I generated 240 items of `composite_shapes {forms: [1], band: 25}` (seeds 40961 / 59, 70117 / 31 and 12011 / 83, `l4r4/f5.mjs`). Each item was counted on screen (`q.visual`, `createLShapeSVG` / `createTShapeSVG`) and in print (`formatProblemForPrint`, the `geometry-composite` branch):
+
+| Shape | Items | Sides (outline vertices) | Labelled: screen / print | Unlabelled, worked out by the pupil | Areas | Perimeters |
+|---|---|---|---|---|---|---|
+| L | 158 | 6 | 4 / 4 (top width, top height, bottom width, total height) | 2: the step (bottom width − top width) and the lower right side (total height − top height). The area also needs total height − top height | 14-24 | 18-24 |
+| T | 82 | 8 | 4 / 4 (top width, top height, stem width, stem height) | 4: the other end of the bar (= top height), the other side of the stem (= stem height) and the two undersides, each (top width − stem width) ÷ 2. On **36 of 82** T's that is a half (2.5, 1.5). The area needs no working out: top width × top height + stem width × stem height | 18-24 | 22-24 |
+
+Every item asks "Find BOTH the perimeter AND area of this L- / T-shape" (answer type `dual`). The largest number is 24.
+
+New why: "the perimeter and the area of a small L- or T-shape (areas 14 to 24); not every side is labelled (2 of the L's 6 sides, 4 of the T's 8 sides), so the missing lengths are worked out from the labelled ones first; the T's two undersides together are its top width take away its stem width (one underside alone can be a half, such as 2.5)".
+- Every clause is true on all 240 items.
+- It names the halves, because about 2 T's in 5 have half-unit undersides (Grade 3 pupils add whole numbers here). The pupil can avoid the half: the two undersides together are a whole number.
+- The link is kept. It is the lesson's only practice of perimeter and area on a composite shape, and the why now tells the teacher what the pupil meets.
+
+### Gates (lessonfit)
+
+| Row | Change | Proof |
+|---|---|---|
+| G7 | `layoutChecks` reads a composite shape's sides (L 6, T / U 8) and its labelled sides: the number labels the picture draws, or else its dims. (1) "every / each / all side(s) given / labelled / shown", "no side to work out" and "no missing / unknown side(s)" need every side labelled. A "not every side" before it is excluded, so it is no longer read as "every side". (2) "not every side is labelled" needs no fully labelled item. (3) A count, overall ("two side lengths are not labelled", "one side is missing") or per shape ("2 of the L's 6 sides, 4 of the T's 8 sides", "2 sides of the L, 4 of the T"), must equal the unlabelled sides of every item of that shape, and its total when given. A per-shape list must name every shape the items deal | The r3 why fails: "G7: says "2 side lengths are not labelled", but 8 of 40 items leave 4 sides unlabelled (T-shapes)". The new why passes. Also caught: "one side length is not labelled", "with no unknown sides", "(2 sides of the L)" (T left out), "2 of the T's 8 sides" and "the T's 6 sides". Control: the critic's "(2 sides of the L, 4 of the T)" passes |
+| G8 lists | `groupLists` reads "groups of 3, 4 or 5", "groups of 3 to 5" (a range), number words ("groups of three, four or five") and the postfix "3, 4 or 5 in each group". Every named size (for a range, both ends) must be dealt (G3). The list must be complete (G4), unless it follows "such as / like / for example" | The critic's Q6-Q9 are caught. The control Q10 passes |
+| G8 coins | `coinsOf` walks the whole payload, so nested `a.coins` / `b.coins` (money_compare) are read. `coinDenials` reads a denial before the coin ("never a quarter") or after it ("quarters are never used"). "only dimes and pennies" must hold every dealt coin. A coin named positively must be dealt. On a money link, "quarters" is a coin, not the fraction family, and the "money" claim reads the payload coins | Q11-Q14 and Q16 are caught by the coin rules. "quarters are never used" now fails as a G4 coin denial only. The control "never a half-dollar" passes |
+| G8 / G5 tables | A Support link's dealt facts are read from the items: "a × b" and "a ÷ b" in the question, the kit payload's a / b / op, a story's steps, and a count-by-tables step. A × fact needs a factor in the source year's tables. A ÷ fact needs the divisor or the quotient. This covers table skills with no table option | `mult_facts {}` and `div_facts {}` at lesson 14 (Grade 2) are caught (Q18, Q24). ×5 at Grade 1 passes |
+| G6 | SIZE takes the lesson's own maximum, and a cited unit's maximum, from a FIXED 200-item probe (4 seed sets × 50), never from the `--seeds` / `--n` sample under test | Lesson 4's own maximum is now 194, so its limit is 291. `tape_diagram` reaches 200. 0 findings at the critic's flapping seeds `[[83117,47],[29303,67]]` (n 40 and n 60). Also 0 at 3 fresh sets, `[[64013,71],[22307,43]]`, `[[90121,53],[37019,89]]` and `[[15551,61],[70709,37]]`, each at n 40 and n 60. Also 0 at the default seeds, `[[77711,53],[15013,79]]` and `[[70001,43],[51229,61]]` (n 60) |
+| n7b | `citeCheck` reads a bare "W09" or "(W09)" in a pre why, as well as "wk" / "week" | Q26 is caught |
+| n8 | Lesson 4's `multi_step_word` clause now reads "numbers to 150 (most below 110)". 3,000 items: p90 106, p99 135, max 149. The generator's bound is a start of 100 plus 50. The "numbers to 150" bound is gated strictly | |
+
+### The round-4 sweep: per-shape and per-form claims
+
+I dumped every link of the 23 lessons. For each link I took 120 items, grouped by sub-kind (variant, shape, template + payload kind, answer type, stem), and read every why and clause against every kind (`l4r4/kinds.mjs`). I then tallied 300 items for each claim in doubt (`chk*.mjs`). Each finding below is true for only some item kinds, the class behind F5 and r1's lesson 10. All are fixed:
+
+| Lesson | Link | Was | Measured (300 items) | Now |
+|---|---|---|---|---|
+| 3 | related `dot_array_mult {band: 25}` | "…the product of the turned array is the same" | No item turns an array (one array, rows × columns) | "a dot array read as rows times columns, one array at a time (products to 25): the array the lesson then turns" |
+| 9 | partial `mass_volume_liquid {forms: [2]}` | "sorts or picks objects by the unit … (g, kg, mL, L)" | The pick form (179 / 300) is always "best measured in grams (not kilograms)". Only the sort form has mL / L | "sorts objects by the unit … (g, kg, mL or L), or clicks every object best measured in grams rather than kilograms" |
+| 11 | partial `line_plot_fractions {}` | "measurements in halves and quarters, some in eighths" | Halves only on 139 / 300 plots, quarters only 8, quarters + eighths 13 | "measurements in halves, quarters or eighths, many of the plots in halves only" |
+| 18, 19 | pre `compare_objects {task: all}` | "longer, taller, shorter" | thicker / thinner bars on 100 / 300 items | "longer or shorter lines, taller or shorter towers, thicker or thinner bars" |
+| 21 | pre `placevalue:identify {band: 999}` | "hundreds, tens and ones in a place-value chart" | The pv `place` kind draws an underlined numeral and a ring row. There is no chart | "naming the place of an underlined digit: hundreds, tens or ones" |
+| 21 | related `money_compare {response: sign}` | "which of two amounts is more, written with < or >" | "=" on 53 / 300 | "which of two sets of coins is worth more, or that they are equal, written with <, > or =" |
+
+Checked and true on every kind:
+- the bar on every `tape_diagram` item;
+- two analogue faces on every `elapsed_visual_easy` item;
+- three wholes on every `mixed_nl_drag` line;
+- the "Multiply the sides" hint on every `area_unit_squares` forms 0 item;
+- multiples from 3 on every `count_by_tables` ×3 row;
+- an L on every `area_unit_squares` forms 1 item;
+- L, T and U all dealt by `area_polygon_decompose`;
+- 1 whole on every `compose_whole` item;
+- "Across the N row, add N" with 2 blanks on every `mult_chart` pattern item.
+
+### Mutations and post-finish edits
+
+| Run | Result |
+|---|---|
+| `lessonmut.py` (round 4 adds 16 mutations and 4 controls) | **137 mutations and controls, 0 missed** (clean tree A) |
+| Critic r1 / r2 lessonfit mutations (`mymut.py`, `mymut2.py`, seeds `[[70001,43],[51229,61]]`) | 43 / 43 caught, each for the intended reason. Controls clean |
+| Critic r3 mutations (`mymut3.py`, same seeds) | 23 / 23 caught. The 4 controls (Q0, Q10, Q15, Q21) pass. Q5 (count), Q4 ("no unknown sides"), Q7-Q9 (lists), Q13 / Q14 / Q16 (coins), Q18 / Q24 (tables) and Q26 ("W09") were the r3 holes |
+| Post-finish edits (`postmut.py`, clean tree C) | p1-p31 plus p32 (the r3 lesson 8 why restored) and p33 (the old lesson 4 clause restored): **33 / 33 caught**. The control exits 0 with sha `e4363da0…` |
+
 ## Round 3 (lessons critic r2: FAIL, mean 7.96; lesson 8 at 7)
 
 The steps, the tagFixes and the step proposals are still frozen (frozen gate OK; the step build writes sha `d4d03a36…`).
@@ -99,12 +164,12 @@ The new files are all in `tests/scripts/wrm-tagging/Y4/`:
 
 | Gate | Result |
 |---|---|
-| Two clean `git archive` builds (dump, step build, lessons build) | Byte-identical: sha256 `1bed00da2aae20dc103ff6f3b92893516f60bee951a0e0eae40a597ef8c7d103` (round 3; round 2 `2596565b…`; build B deleted Y4.json first and ran with a fresh data dir and no `WRM_TAG_DATA`) |
+| Two clean `git archive` builds (dump, step build, lessons build) | Byte-identical: sha256 `e4363da04f8ed1cd8aa518554e47bafecf482655e0b3122057feb06f4f5502de` (round 4; round 3 `1bed00da…`; round 2 `2596565b…`; build B deleted Y4.json first and ran with a fresh data dir and no `WRM_TAG_DATA`) |
 | Frozen gate | OK |
 | lessonspec | 0 differences |
 | lessoncheck | 0 differences |
-| lessonfit | Round 2: 0 findings at the default seeds and on 3 fresh seed sets at n=60 (`[[13579,41],[24680,43]]`, `[[31415,47],[27182,53]]`, `[[11111,59],[99991,61]]`) |
-| lessonmut | Round 3: **117 mutations and controls, 0 missed** (round 2's 106 plus 11 for G4, G5 and n7) |
+| lessonfit | Round 4: 0 findings at the default seeds, the critic's r3 seeds `[[83117,47],[29303,67]]` (n 40 / 60), `[[77711,53],[15013,79]]`, `[[70001,43],[51229,61]]` and 3 fresh sets (`[[64013,71],[22307,43]]`, `[[90121,53],[37019,89]]`, `[[15551,61],[70709,37]]`; n 40 and 60). Round 2: 0 findings at the default seeds and on 3 fresh seed sets at n=60 (`[[13579,41],[24680,43]]`, `[[31415,47],[27182,53]]`, `[[11111,59],[99991,61]]`) |
+| lessonmut | Round 4 (clean tree A): **137 mutations and controls, 0 missed** (round 3's 117, plus 16 mutations and 4 controls for F5 / G7 / G8 / n7b and the sweep; the G1 dot_array message now reads the fixed-probe maximum 25). Round 3: 117 mutations and controls, 0 missed (round 2's 106 plus 11 for G4, G5 and n7) |
 | lessonmerge Y4 alone, and Y4 with R, Y1, Y2, Y3, Y5, Y6 one by one | 0 problems |
 | lessonmerge all seven at once | 0 real conflicts, 0 lesson tagFixes |
 | lessonmerge with Y1 from /home/user/wt-l1 (with its lessons) | 0 problems |
