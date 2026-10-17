@@ -92,6 +92,7 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     // value_ten_times (4.NBT.A.1, detailed lesson 6): the same digit one place apart.
     'ten-times': 'Write what each digit is worth. Circle 10 times or one tenth.',
     'ten-times-ring': 'Circle 10 times or one tenth.',
+    'ten-times-one': 'Write the top value. Circle 10 times or one tenth.',
     round: 'Round to the nearest {place}.',
     'more-less': 'Write 1 more and 1 less.',
     shade: 'Shade the fraction.',

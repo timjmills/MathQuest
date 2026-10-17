@@ -51,6 +51,8 @@ function chartHTML(p, ctx) {
         : td(LETTER[pow(e)] || '', `min-width:${colW.toFixed(1)}mm;font-size:${pt(Math.max(9, m.zonePt || 10))};font-weight:400;border-bottom:0.75pt solid #000;`))).join('');
     const worth = (i) => {
         if (!p.values) return '';
+        // (`oneValue`, the exit slip half: one worth box, the first row's - its value, then the ring; lesson 6 r2)
+        if (p.oneValue && i > 0) return '';
         const id = `v${i}`;
         const c = slotState(p, ctx, id);
         // (one width for every item with numbers this long - the box never tells how long its value is)
@@ -81,14 +83,19 @@ function ringHTML(p, ctx) {
     const text = (t) => `<span style="font-weight:400;">${esc(t)}</span>`;
     const d = esc(p.digit);
     const [a, b] = (p.rows || []).map((r) => esc(Number(r.n).toLocaleString('en-US', { maximumFractionDigits: 6 })));
-    return `<div class="pv-times-say" style="font-size:${pt(ctx.metrics.textPt + 1)};line-height:1.3;text-align:left;">`
-        + `<div>${text('The')} <b>${d}</b> ${text('in')} <b>${a}</b> ${text('is')}</div><div style="font-weight:700;white-space:nowrap;margin-left:-2.4mm;">${(p.choices || []).map(choice).join('')}</div>`
+    return `<div class="pv-times-say" style="font-size:${pt(ctx.metrics.textPt + (p.sayTwo ? 0 : 1))};line-height:1.3;text-align:left;">`
+        + (p.sayTwo
+            // (`sayTwo`, a narrow column - the exit slip half: the two choices one under the other, so the sentence
+            // stands beside the chart in four short lines)
+            ? `<div style="white-space:nowrap;">${text('The')} <b>${d}</b> ${text('in')} <b>${a}</b> ${text('is')}</div>`
+              + (p.choices || []).map((w) => `<div style="font-weight:700;white-space:nowrap;margin-left:-2.4mm;">${choice(w)}</div>`).join('')
+            : `<div>${text('The')} <b>${d}</b> ${text('in')} <b>${a}</b> ${text('is')}</div><div style="font-weight:700;white-space:nowrap;margin-left:-2.4mm;">${(p.choices || []).map(choice).join('')}</div>`)
         + `<div>${text('the')} <b>${d}</b> ${text('in')} <b>${b}</b>.</div></div>`;
 }
 
 function renderTimes(p, ctx) {
     // The chart and its sentence side by side: one full-width row (the sentence is three short lines).
-    return `<div class="pv-cell pv-times" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;column-gap:7mm;row-gap:2mm;">`
+    return `<div class="pv-cell pv-times" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;column-gap:${p.sayTwo ? 4 : 7}mm;row-gap:2mm;">`
         + `<div>${chartHTML(p, ctx)}</div>${ringHTML(p, ctx)}</div>`;
 }
 
@@ -97,7 +104,7 @@ register('pv-times', {
     answerKey(p) {
         const k = p.keys || {};
         const slots = { rel: { value: String(k.rel || ''), graded: true } };
-        if (p.values) { slots.v0 = { value: String(k.v0), graded: true }; slots.v1 = { value: String(k.v1), graded: true }; }
+        if (p.values) { slots.v0 = { value: String(k.v0), graded: true }; if (!p.oneValue) slots.v1 = { value: String(k.v1), graded: true }; }
         const value = p.keyValue !== undefined ? String(p.keyValue) : String(k.rel || '');
         return { value, display: value, slots };
     },
@@ -106,7 +113,7 @@ register('pv-times', {
     },
     inputs(p) {
         const out = [];
-        if (p && p.values) { out.push({ id: 'v0', kind: 'number', shape: 'box', graded: true, order: 0, scopes: ['full', 'answer-only'] }); out.push({ id: 'v1', kind: 'number', shape: 'box', graded: true, order: 1, scopes: ['full', 'answer-only'] }); }
+        if (p && p.values) { out.push({ id: 'v0', kind: 'number', shape: 'box', graded: true, order: 0, scopes: ['full', 'answer-only'] }); if (!p.oneValue) out.push({ id: 'v1', kind: 'number', shape: 'box', graded: true, order: 1, scopes: ['full', 'answer-only'] }); }
         out.push({ id: 'rel', kind: 'text', shape: 'ring', graded: true, order: out.length, scopes: ['full', 'answer-only'] });
         return out;
     },

@@ -176,6 +176,20 @@ function measure(LIBRARY) {
             const cs = getComputedStyle(x), lh = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.2;
             return { t: x.textContent.trim().slice(0, 40), n: Math.round(x.getBoundingClientRect().height / lh) };
         }));
+        // E40 (lesson 6 critic r1 D1): no text or slot drawn outside its cell's box (a clipped or overlapping item: E9 reads
+        // the body and E11 the cell's own ink, so a line cut inside a fixed-height row passed both)
+        P.clip = teacher ? [] : [...pg.querySelectorAll('.ws-cell')].filter((c) => !c.closest('.dl-thumb')).flatMap((c) => {
+            const cr = c.getBoundingClientRect(); if (!cr.width || !cr.height) return [];
+            const tol = 0.6 * MM, out = [];
+            for (const dd of c.querySelectorAll('*')) {
+                const s = getComputedStyle(dd); if (s.visibility === 'hidden' || s.display === 'none') continue;
+                const own = [...dd.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) || dd.hasAttribute('data-ws-slot');
+                if (!own) continue;
+                const r = dd.getBoundingClientRect(); if (!r.width || !r.height) continue;
+                if (r.bottom > cr.bottom + tol || r.top < cr.top - tol || r.right > cr.right + tol || r.left < cr.left - tol) out.push(`"${(dd.textContent || dd.getAttribute('data-ws-slot') || '').trim().slice(0, 18)}"`);
+            }
+            return out.length ? [`${out.slice(0, 2).join(' ')}`] : [];
+        });
         P.hasSteps = !!pg.querySelector('[data-mq-lesson-strip]');
         P.bandHs = [...pg.querySelectorAll(':scope > .ws-body > .ws-band')].map((b) => [((b.querySelector(':scope > .ws-strip > b') || {}).textContent || '').slice(0, 14), Math.round(b.getBoundingClientRect().height / MM)]);
         P.bandLabels = [...pg.querySelectorAll('.ws-strip > b')].filter((b) => !b.closest('.dl-thumb')).map((b) => b.textContent.trim());
@@ -548,6 +562,9 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
         const bad = pages.filter((p) => p.braces && p.braces.length);
         row('E38', 'No unfilled {placeholder} on any page', bad.length ? bad.map((p) => `${p.id}: ${p.braces.join(' ')}`).join('; ') : 'none', !bad.length);
     }
+    // E40 (lesson 6 critic r1 D1): nothing drawn past its cell
+    { const bad = [...pupil, ...keys].flatMap((p) => (p.clip || []).map((t) => `${p.id} ${t}`));
+        row('E40', 'No item text or slot drawn outside its cell (clipped or overlapping)', bad.length ? bad.slice(0, 8).join('; ') : 'none', !bad.length); }
     // E39 (lesson 4 critic r2 D9): no band lays out its items in more columns than it has items
     { const bad = [...pupil, ...keys].flatMap((p) => (p.gridFill || []).filter((g) => g.items > 0 && g.items < g.cols).map((g) => `${p.id} ${g.items} item${g.items > 1 ? 's' : ''} in ${g.cols} columns`));
         row('E39', 'No band has more columns than items (an empty bordered track reads as a missing item)', bad.length ? bad.join('; ') : `${[...pupil, ...keys].reduce((a, p) => a + (p.gridFill || []).length, 0)} grids, none`, !bad.length); }

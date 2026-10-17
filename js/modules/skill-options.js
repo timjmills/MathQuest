@@ -636,6 +636,13 @@ const _pvTenOptions = () => [
         help: 'Ten times only. On: the pupil writes what each digit is worth, then circles. Off: circle only (the fade).' },
     { id: 'tenPlain', label: 'Ten times: the digit and zeros only (700 and 70)', type: 'bool', default: false, group: 'difficulty',
         help: 'Ten times only. On: numbers like 700 and 70. Off: other digits round the digit (740 and 372).' },
+    // (lesson 6 r2, owner skill-coverage rule: the exit slip's item and the word problem are skill options, not page code)
+    { id: 'tenWrite', label: 'Ten times: values written', type: 'enum', default: 'both', group: 'support',
+        values: [{ v: 'both', l: 'Both values' }, { v: 'top', l: 'The top value only (a short check)' }],
+        help: 'Ten times with values on. Top: one worth box, the first number\'s digit, then circle.' },
+    { id: 'tenTask', label: 'Ten times: the task', type: 'enum', default: 'compare', group: 'layout',
+        values: [{ v: 'compare', l: 'Compare the digit in two numbers' }, { v: 'story', l: 'A story: how many times as many? (700 ÷ 70 = 10)' }],
+        help: 'Ten times only. Story: two amounts, the digit and zeros (6,000 and 600); the pupil writes the division and 10.' },
 ];
 const _pvZeroDigit = () => ({
     id: 'zeroDigit', label: 'Ask the value of a 0', type: 'bool', default: false, group: 'difficulty',

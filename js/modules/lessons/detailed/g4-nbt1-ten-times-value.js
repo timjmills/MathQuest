@@ -13,7 +13,8 @@
 // See the format in ./index.js. Pure data (no DOM, no state). Every number a script speaks is a
 // {placeholder} filled from the DEALT items.
 
-const TEN = (opts, extra) => Object.assign({ categoryId: 'placevalue', skillId: 'value', opts: Object.assign({ form: 'times', band: 9999, tenDir: 'both', tenValues: true, tenPlain: false }, opts || {}) }, extra || {});
+// (`spreadMax` 2: no digit on more than two of the pack's items - critic r1 D2)
+const TEN = (opts, extra) => Object.assign({ categoryId: 'placevalue', skillId: 'value', spreadMax: 2, opts: Object.assign({ form: 'times', band: 9999, tenDir: 'both', tenValues: true, tenPlain: false }, opts || {}) }, extra || {});
 const PV = (skillId, opts, extra) => Object.assign({ categoryId: 'placevalue', skillId, opts: opts || {} }, extra || {});
 const fmt = (v) => Number(v).toLocaleString('en-US', { maximumFractionDigits: 6 });
 const WORD = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands', 10000: 'ten thousands', 100000: 'hundred thousands' };
@@ -62,7 +63,7 @@ export default {
             sent: `The ${p.digit} in ${n} is ${p.rel} the ${p.digit} in ${m}`,
             sentQ: `The ${p.digit} in ${n} is ___ the ${p.digit} in ${m}`,
             worths: `${fmt(p.v0)} and ${fmt(p.v1)}, ${p.rel}`,
-            eqN: 10, eqParts: [Math.max(p.v0, p.v1), Math.min(p.v0, p.v1)], eqOp: '÷',
+            eqN: 10, wpAns: 10, eqParts: [fmt(Math.max(p.v0, p.v1)), fmt(Math.min(p.v0, p.v1))], eqOp: '÷',
         };
     },
 
@@ -89,7 +90,7 @@ export default {
             why: 'Writing both values first makes the comparison a comparison of numbers, not of digits: the 7 and the 7 look the same.',
         },
         example: { test: 'tenChart' },
-        second: { test: 'tenTenthMid', label: 'One place right? One tenth.' },
+        second: { test: 'tenTenthOther', label: 'One place right? One tenth.' },
         guided: ['tenTimesMid', 'tenTenthMid'],
         practiceShape: [4, 1],
         mixWith: [],
@@ -115,23 +116,26 @@ export default {
 
     // ------------------------------------------------------------------ P5 Word problem
     wordProblem: {
-        ref: TEN({ tenDir: 'times', tenPlain: true, band: 9999 }),
-        want: ['tenPlain', 'tenTimes', 'tenThou'],
+        // (r2, owner skill-coverage rule: the story is the skill's own item - value form times, tenTask story)
+        ref: TEN({ tenTask: 'story', tenDir: 'times', band: 9999 }),
+        want: ['tenThou'],
         instruction: 'Read the story. Draw it. Solve.',
-        lines: ['Mia has {wp.nF} stickers.', 'Leo has {wp.mF} stickers.', 'Look at the {wp.d} in each number.', 'How many times as much is Mia’s?'],
         answerLine: '',
-        say: 'It is worth __ times as much.',
+        say: 'Mia has __ times as many.',
+        sayAns: '{wp.eqN}',
     },
 
     // ------------------------------------------------------------------ P6 Exit slip
     // Three items: four of the chart-and-sentence cells do not fit a 132.5 mm half (never shrunk).
     exit: [
-        { case: '10 times, hundreds and tens', ref: TEN({ tenDir: 'times', tenValues: false }), want: 'tenTimesMid', instr: 'Circle 10 times or one tenth.', detects: 'Circles by the digits, not the places.' },
-        { case: 'one tenth (Critical Atom: the other way)', ref: TEN({ tenDir: 'tenth', tenValues: false }), want: 'tenTenthMid', instr: 'Circle 10 times or one tenth.', detects: 'Circles 10 times for every pair: reads the digits, not the places.' },
-        { case: 'one tenth, thousands and hundreds', ref: TEN({ tenDir: 'tenth', tenValues: false }), want: 'tenThouTenth', instr: 'Circle 10 times or one tenth.', detects: 'Counts two places or says 100 times.' },
+        // (r2, critic D3: every item writes a value - the top row's - then rings; one worth box so a 132.5 mm half holds three)
+        { case: '10 times, hundreds and tens', ref: TEN({ tenDir: 'times', tenWrite: 'top' }, { cellPayload: { sayTwo: true } }), want: 'tenTimesMid', instr: 'Write the top value. Circle 10 times or one tenth.', detects: 'Writes the digit as its value: 4 for 400.' },
+        { case: 'one tenth (Critical Atom: the other way)', ref: TEN({ tenDir: 'tenth', tenWrite: 'top' }, { cellPayload: { sayTwo: true } }), want: 'tenTenthMid', instr: 'Write the top value. Circle 10 times or one tenth.', detects: 'Right value, then 10 times circled: the smaller value read as 10 times.' },
+        { case: 'one tenth, thousands and hundreds', ref: TEN({ tenDir: 'tenth', tenWrite: 'top' }, { cellPayload: { sayTwo: true } }), want: 'tenThouTenth', instr: 'Write the top value. Circle 10 times or one tenth.', detects: 'Uses the place next to it: a thousands value for a hundreds digit.' },
     ],
-    exitInstruction: 'Circle 10 times or one tenth.',
+    exitInstruction: 'Write the top value. Circle 10 times or one tenth.',
     exitSay: 'Left is ten times. Right is one tenth.',
+    exitSayItem: 0,
 
     // ------------------------------------------------------------------ retrieval (MWB)
     retrieval: [
@@ -149,7 +153,7 @@ export default {
     slotRows: [{ shape: 'ring', use: 'circle 10 times or one tenth of' }],
     caseNames: { tenThouTenth: 'one tenth, thousands and hundreds', tenOnesTimes: 'ones and tens, 10 times', tenTimes: '10 times', tenTenth: 'one tenth' },
     routeNote: 'No site lesson exists yet for these prerequisites: T6 names a CCSS code and a short title (V22 Appendix H).',
-    materials: ['Base-ten blocks: cubes, rods, flats, a big cube', 'A Th H T O place chart on the board', 'Two digit cards the same (two 7s)', 'Mini whiteboards and pens', 'Pupil packet, one per pupil', 'Exit slips, cut in half'],
+    materials: ['Base-ten blocks: cubes, rods, flats, a big cube', 'A Th H T O place chart on the board', 'Mini whiteboards and pens', 'Pupil packet, one per pupil', 'Exit slips, cut in half'],
     vocabulary: [
         { word: 'digit', gloss: 'one of 0 to 9', diagram: { kind: 'digit', text: '7' } },
         { word: 'value', gloss: 'what a digit is worth', diagram: { kind: 'text', text: '7 tens = 70' } },
@@ -194,7 +198,7 @@ export default {
             rows: [
                 { do: 'Hand out the Number sense page.' },
                 { say: 'Band A: read each row. Write the answer.' },
-                { ask: '{ns.A.0.text}', note: 'Expected: [[{ns.A.0.ans}]]. Band B: the same five kinds, bigger numbers.' },
+                { ask: '{ns.A.0.text}', note: 'Expected: [[{ns.A.0.ans}]]. Band B: the same five kinds, crossing a hundred.' },
             ] },
         { n: 3, name: 'Spaced retrieval', min: 3, page: '',
             rows: [
@@ -215,7 +219,7 @@ export default {
                 { say: 'The {chart.d} in {chart.nF} is in the {chart.place} place.', note: 'Step 1: worth [[{chart.v0}]].' },
                 { say: 'The {chart.d} in {chart.mF} is in the {chart.placeM} place.', note: 'Step 1 again: worth [[{chart.v1}]].' },
                 { say: '{chart.v0} is 10 times {chart.v1}. One place left.', note: 'Step 2: circle [[10 times]].' },
-                { say: 'Now the other way: {chart2.v0} is one tenth of {chart2.v1}.', note: 'Panel {panel.second}. Circle [[one tenth of]].' },
+                { say: 'Now the other way: {chart2.v0} is one tenth of {chart2.v1}.', note: 'Another example. Circle [[one tenth of]].' },
                 { say: 'Any two places side by side: 10 times.', note: 'Point along the Th H T O heads.' },
             ] },
         { n: 6, name: 'We Do: Guided Practice', min: 8, page: 'P3', boxes: [{ kind: 'feedback', title: 'Fix it at once', text: 'Fix: cover one row. “What is this {we.0.d} worth?”' }],
@@ -249,7 +253,7 @@ export default {
         { n: 10, name: 'Plenary and exit slip', min: 4, page: 'P6',
             rows: [
                 { say: 'Left is ten times. Right is one tenth.', note: 'Say the chant together twice.' },
-                { do: 'Hand out the exit slip. No help. Sort the slips by item b.', note: 'a. [[{exit.0.rel}]] · b. [[{exit.1.rel}]] · c. [[{exit.2.rel}]].' },
+                { do: 'Hand out the exit slip. No help. Sort the slips by item b.', note: 'a. [[{exit.0.v0}]], [[{exit.0.rel}]] · b. [[{exit.1.v0}]], [[{exit.1.rel}]] · c. [[{exit.2.v0}]], [[{exit.2.rel}]].' },
             ] },
     ],
     transitionsMin: 4,
@@ -261,9 +265,10 @@ export default {
         'A right ring with an empty worth box: not yet right; ask “what is it worth?”.',
     ],
     wrongAnswers: [
-        { wrote: '“{exit.1.wrong.MT1}” for {exit.1.v0} and {exit.1.v1} (exit b)', mistake: 'Wrong way round', next: '“Which value is bigger?” first.' },
-        { wrote: '“{exit.0.wrong.MV2}” for {exit.0.v0} and {exit.0.v1} (exit a)', mistake: 'Same digit, same value', next: 'Cover one row; write its value.' },
-        { wrote: '“{exit.2.wrong.MV14}” for {exit.2.v0} and {exit.2.v1} (exit c)', mistake: 'Counted two places', next: 'Point to the two columns: one apart.' },
+        // (each row an answer the slip can show: two values and a ring - critic r1 D3)
+        { wrote: '{exit.0.wrong.MV2} for {exit.0.nF} and {exit.0.mF} (exit a)', mistake: 'Digit, not value', next: 'Cover one row; write its value.' },
+        { wrote: '{exit.1.wrong.MT1} for {exit.1.nF} and {exit.1.mF} (exit b)', mistake: 'Wrong way round', next: '“Which value is bigger?” first.' },
+        { wrote: '{exit.2.wrong.MV14} for {exit.2.nF} and {exit.2.mF} (exit c)', mistake: 'Place next to it', next: 'Point to the heads: read the place.' },
         { wrote: '“{cq.wrong.MT1}” for {cq.v0} and {cq.v1} (Check Question)', mistake: 'Wrong way round', next: 'Rods and a flat: which is more?' },
     ],
 };

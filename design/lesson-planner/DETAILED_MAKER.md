@@ -155,6 +155,25 @@ The pool keys are `factKeyOf(q)` (an operation item's operands and sign, else it
 instruction is `wordProblem.instruction` (fallback: the kit's `story` string); its lines are the
 description's (placeholders) or the dealt item's own story.
 
+## Skill coverage rule (owner, 2026-10-17) — every lesson, lessons 1-5 included
+
+A lesson is not done until its practice skills cover it on screen exactly as the paper does:
+
+1. **Paper = skill + options.** Every item type printed on a pupil page (P0, P1, P2 chart examples, P3 Guided,
+   P4 Practice, Mixed, P5, P6, the Check Question) is dealt by a registered skill with option values — never a
+   hand-written item. A pupil who practises that skill with those options online (practice card, online
+   worksheet, quiz) meets the same item type, the same response (what is written, ringed or chosen), the same
+   number range and the same edge cases as on the paper.
+2. **The skills cover the lesson and its standard.** Taken together, the lesson's skills + options deal every
+   atom and routine step the lesson teaches and every clause of each CCSS standard it is tagged to (its lettered
+   part where tagged). A clause the lesson deliberately leaves to another lesson is named, with that lesson or
+   skill; anything else missing is built (option or skill, per CLAUDE.md) in the same change — not proposed.
+3. **Recorded.** `data/curriculum/detailed-lessons.json` gives each lesson `skills.used` (every page role with its
+   skill key and opts) and `skills.coverage`: one row per standard clause and per lesson atom → the skill + opts
+   that deal it, `full` / `partial` / `elsewhere: <lesson or skill>`. A lesson passes only with no `partial` row.
+4. **Checked.** The critic checks rules 1-3 for every page; a printed item type with no skill + options that
+   deal it, or a standard clause with no covering skill, is a blocker.
+
 ## Adding a lesson
 
 1. Write `js/modules/lessons/detailed/<id>.js` in the format documented at the top of `index.js` (every
@@ -204,3 +223,18 @@ Built for `g4-nbt1-ten-times-value` and meant for lesson 9 (5.NBT.A.1, decimals)
 - **Bridge** `q.dealAnswer` (print-sheet.js `dlAns`): what tells an item apart when its answer is one of two words (a
   ring), so two ring items of one page are not the same answer. Absent on every other item: lessons 1-5 render
   byte-identical.
+
+Lesson 6 round 2 (critic r1 D1-D4):
+- `q.factKey` (print-sheet.js `factKeyOf`): a generator names the fact the pupil produces; for "10 times" items the
+  digit and the place pair, either direction ONE key, so no chart example, Guided item or Practice item returns and
+  no turn-around shares a page (LR-5 / E24 read the same key).
+- `spreadMax` (ref) with `q.spreadKey`: no more than n items of the pack share a spread key (lesson 6: a digit, 2).
+- `pv-times` payload `sayTwo` (the sentence beside the chart, choices stacked) and `oneValue` (one worth box): the
+  exit slip half holds three items that each write a value.
+- P1 rows: the instruction column is 50 mm and a pv frame does not wrap, so a "100 more than ___" row stays on one line.
+- Gate **E40**: no item text or slot drawn outside its cell (a clip inside a fixed-height row passed E9 / E11).
+- Skill coverage (owner rule): the exit item is `placevalue:value` form times `tenWrite: 'top'` (codec 4H) and the word
+  problem `tenTask: 'story'` (4I; `q.storyText` prints the story without its screen blanks). On screen `pv-times` has
+  its own twin (screen-cell.js `pvTimesTwin`): the chart, typed value boxes and the ring words as tap tiles into a word
+  box (slot kind `word`); `ws-screen-answer --skills placevalue:value --opts {...}` passes on card, worksheet and quiz
+  for every form the lesson prints.

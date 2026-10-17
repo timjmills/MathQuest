@@ -266,6 +266,10 @@ function refAccepts(sk, cand, key, seen, kept, pg = '', row = '', words = true) 
         const k = factKeyOf(cand);
         if (k === null) return false;
         if (sk.avoidKeys && sk.avoidKeys.includes(k)) return false;
+        // (`spreadMax` with `q.spreadKey`, lesson 6 r2: no more than n items of the pack share a spread key - one digit -
+        // counted over the pack's keys and this page's; absent on every other ref)
+        if (sk.spreadMax && typeof cand.spreadKey === 'string' && [...(sk.avoidKeys || []), ...[...seen].map((x) => String(x).replace(/^key:/, ''))]
+            .filter((x) => String(x).startsWith(`${cand.spreadKey}:`)).length >= Number(sk.spreadMax)) return false;
         // (a function table: no shared (In, Out) pair, no rule on a third table - across the pack and on this page; lesson 5 r3)
         if (ftParts(k) && ftClash(k, (sk.avoidKeys || []).concat([...seen].filter((x) => /^key:ft/.test(x))))) return false;
         // (a + fact's identity across the pack is its unordered pair - 7 + 5 and 5 + 7 are one fact: lead ruling and
@@ -417,6 +421,9 @@ export const gridNear = (k, keys, sameShape = false, anyTask = false) => {
  */
 export function factKeyOf(q) {
     if (!q) return null;
+    // (`q.factKey`, lesson 6: a generator that names the fact the pupil produces - the digit and the place pair of a
+    // "10 times" item, either direction one fact - keys it so; absent on every other item)
+    if (typeof q.factKey === 'string' && q.factKey) return q.factKey;
     // An array (arrays-turn, lesson 3a): keyed rows x cols, so 3 x 4, 4 x 3 and 2 x 6 are three facts. The
     // pictured arrays stop at 5 x 5 (RP-21): one key per turned pair would leave a pack ten arrays, and it
     // needs about fourteen. The turned pair is kept off ONE page instead (turnedKeyOf, refAccepts).
@@ -3134,6 +3141,7 @@ function dealOne1(ref, seed, used, want, avoidAns, near, names, fresh) {
         const key = factKeyOf(q), v = itemNumberOf(q);
         if (key === null || (ok && !ok({ q }))) { why.want++; continue; }
         if (used.has(key)) { why.used++; continue; }
+        if (ref.spreadMax && typeof q.spreadKey === 'string' && [...used].filter((x) => String(x).startsWith(`${q.spreadKey}:`)).length >= Number(ref.spreadMax)) { why.used++; continue; }
         // (a function table's rule and pairs across the pack - lesson 5 r3: `ftRuleMax` 1 keeps a rule off every other table)
         if (ftParts(key) && ftClash(key, used, ref.ftRuleMax || 2)) { why.used++; continue; }
         // (a + fact turned round is the same fact across the pack - E24's unordered identity)
@@ -3430,7 +3438,8 @@ async function buildDetailedLesson(req = {}) {
 
     // ---------------------------------------------------------------- P5 Word problem
     const wpV = dlItemVars(wpD.q, d);
-    const storyText = String(wpD.q.text || '').replace(/<[^>]+>/g, ' ');
+    // (`q.storyText`, lesson 6 r2: a story item whose screen text also carries its answer blanks prints the story alone)
+    const storyText = String((typeof wpD.q.storyText === 'string' && wpD.q.storyText) || wpD.q.text || '').replace(/<[^>]+>/g, ' ');
     const lines = Array.isArray(d.wordProblem.lines) && d.wordProblem.lines.length
         ? d.wordProblem.lines.map((l) => fillPlaceholders(l, { wp: wpV }))
         : storyText.split(/(?<=[.?!])\s+/).map((x) => x.trim()).filter(Boolean);

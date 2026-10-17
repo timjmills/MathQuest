@@ -171,6 +171,14 @@ function timesWrong(q) {
             { value: p.dir === 'times' ? '100 times' : 'one hundredth of', misconception: 'M-V14', explain: 'Counted one place too many.', slots: { rel: p.dir === 'times' ? '100 times' : 'one hundredth of' } },
         ]);
     }
+    if (p.top) {
+        // (tenWrite top: one worth box, then the ring - the wrong answers as the slip shows them)
+        return choose(q, [
+            { value: `${f(p.v0)}, ${swap}`, misconception: 'M-T1', explain: 'Wrote the value, then ringed the comparison the wrong way round.', slots: { v0: f(p.v0), rel: swap } },
+            { value: `${p.digit}, ${p.rel}`, misconception: 'M-V2', explain: 'Wrote the digit, not what it is worth.', slots: { v0: String(p.digit), rel: p.rel } },
+            { value: `${f(p.v0 * 10)}, ${p.rel}`, misconception: 'M-V14', explain: 'Used the place next to it.', slots: { v0: f(p.v0 * 10), rel: p.rel } },
+        ]);
+    }
     return choose(q, [
         { value: `${f(p.v0)}, ${f(p.v1)}, ${swap}`, misconception: 'M-T1', explain: 'Wrote the values, then rang the comparison the wrong way round.', slots: { v0: f(p.v0), v1: f(p.v1), rel: swap } },
         { value: `${p.digit}, ${p.digit}, ${p.rel}`, misconception: 'M-V2', explain: 'Wrote the digit, not what it is worth.', slots: { v0: String(p.digit), v1: String(p.digit), rel: p.rel } },
