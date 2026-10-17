@@ -727,6 +727,22 @@ export const STANDARD_PROPOSALS = {
         ladder: 'O2 two choices → three · O3 activity picture → words only · O6 digital / analogue',
         misconceptions: ['picks the earliest time every time', 'confuses 12:00 noon and midnight'], wrmSteps: [], after: [],
     }),
+
+    // ------------------------------------------------------------------ operations (appended 2026-10-17, owner)
+    // Owner 2026-10-17: "normal multidigit multiplication" (the standard column algorithm) as skills to build, sizes
+    // 2 by 1, 3 by 1, 4 by 1, 2 by 2 and 3 by 2. One skill, the size is its option (CLAUDE.md: a ladder step is a skill
+    // plus option values). multiply's tiles 21 / 31 / 22 already stack these sizes inside "Basic Multiplication"
+    // (mixed with the facts); this is the dedicated, findable standard-algorithm skill with all five sizes.
+    mult_standard: P({
+        kind: 'new', skill: 'multiplication:mult_standard', name: 'Multi-Digit Multiplication: Standard Algorithm',
+        grade: '4', family: 'operations', standards: ['4.NBT.B.5', '5.NBT.B.5'], ee: ['M.EE.5.NBT.5'],
+        teaches: 'multiplying multi-digit whole numbers with the standard column algorithm; option "size": 2-digit × 1-digit, 3-digit × 1-digit, 4-digit × 1-digit, 2-digit × 2-digit, 3-digit × 2-digit',
+        problemTypes: ['multiply in the column with carry boxes', 'two-digit multiplier: two partial-product rows, the placeholder zero, then add', 'estimate first, then check the product', 'find the error in a worked column'],
+        templates: ['stack'], newTemplates: ['long-multiplication'], answer: 'write the digits of the product in the grid (carries and partial products in their boxes)',
+        ladder: 'O2 size 2×1 → 3×1 → 4×1 → 2×2 → 3×2, each first without then with carries, then zero digits · O3 carry boxes, placeholder-zero box and partial-product rows (structural, stay) · traced first digit (hint, fades) · O6 column only',
+        misconceptions: ['forgets to add the carry', 'leaves out the placeholder zero in the second row', 'multiplies only the ones by the tens digit', 'adds the partial products in the wrong columns'],
+        wrmSteps: ['Y4.B5.S11', 'Y5.B5.S1'], after: [],
+    }),
 };
 
 /* ================================================================ added from the visual catalogue */

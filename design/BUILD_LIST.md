@@ -19,8 +19,8 @@ FULL in `standards-audit.js`, and delete the entry (the WRM gate and `ws-standar
 
 ## Summary
 
-- 275 entries: **132 new skills, 88 new options, 2 repairs**, and **53 added from the visual catalogue** (1 wiring, 10 template, 6 pane, 28 option, 1 skill, 6 migration, 1 band).
-- 162 from the White Rose audit (42 extended for standards), 60 from the standards audit.
+- 276 entries: **133 new skills, 88 new options, 2 repairs**, and **53 added from the visual catalogue** (1 wiring, 10 template, 6 pane, 28 option, 1 skill, 6 migration, 1 band).
+- 162 from the White Rose audit (42 extended for standards), 61 from the standards audit.
 - They close 114 CCSS leaves and parts and 36 Essential Elements that are not FULL today, and every White Rose small step without a full-coverage skill.
 - The visual catalogue: 210 representations (MATCH 6, PARTIAL 103, GAP 101); every PARTIAL and GAP one is on an entry below.
 - 30 new sheet-kit templates and panes are needed; each is owned by one lane.
@@ -29,7 +29,7 @@ FULL in `standards-audit.js`, and delete the entry (the WRM gate and `ws-standar
 | Lane | Entries | New skills | Options | Repairs | Added from visual catalogue | Standards closed | WRM steps closed | Representations drawn | Visual reach (steps) |
 |---|---|---|---|---|---|---|---|---|---|
 | Counting and early number (K-1 pictures) (`k2`) | 35 | 16 | 7 | 0 | 12 | 20 | 34 | 55 | 454 |
-| Operations (+ − × ÷, facts, multi-digit, integers arithmetic) (`operations`) | 40 | 18 | 10 | 1 | 11 | 21 | 50 | 35 | 316 |
+| Operations (+ − × ÷, facts, multi-digit, integers arithmetic) (`operations`) | 41 | 19 | 10 | 1 | 11 | 21 | 50 | 35 | 316 |
 | Place value, rounding and estimation (the pv kit) (`placevalue`) | 21 | 4 | 8 | 0 | 9 | 9 | 36 | 23 | 327 |
 | Patterns, algebra, order of operations, strategies (gen-algebraic) (`algebra`) | 28 | 14 | 10 | 0 | 4 | 19 | 20 | 17 | 104 |
 | Fractions, decimals, conversions, ratio (`fractions`) | 45 | 17 | 21 | 0 | 7 | 19 | 49 | 23 | 233 |
@@ -87,7 +87,7 @@ positions are share codes, so nothing is spliced and the integrator fixes the fi
 | `balance` | `measurement` | a pan balance, tipped or level, with objects or cubes in each pan | 3 entries |
 | `calendar` | `timemoney` | a calendar page or day strip (days, weeks, months, seasons) | 2 entries |
 | `expression` | `algebra` | an expression or formula with brackets, boxed parts and labels (term, factor, coefficient) | 5 entries |
-| `long-multiplication` | `operations` | the long-multiplication grid with carry boxes and the placeholder row | 1 entries |
+| `long-multiplication` | `operations` | the long-multiplication grid with carry boxes and the placeholder row | 2 entries |
 | `beadstring` | `k2` | pane: a bead string of 10, 20 or 100 beads in runs of five or ten (unit 1, 0.1 or 1 %) | 1 entries |
 | `cover` | `k2` | pane: an outline cover box with "?" laid over part of a picture, a bond part, digits or a chart | 1 entries |
 | `split-op` | `operations` | a part-whole split with an operation arrow under each part and the recombined answer | 1 entries |
@@ -526,7 +526,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 8 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-## Lane `operations`: Operations (+ − × ÷, facts, multi-digit, integers arithmetic) (40)
+## Lane `operations`: Operations (+ − × ÷, facts, multi-digit, integers arithmetic) (41)
 
 Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/modules/sheet/cells/{stack,fact,family,equation,cloze-bank,arrays,area-model,mult-grid,mult-chart,division,long-division,ops-counters,ops-common,hop-line,number-line}.js`, `js/modules/sheet/providers/{addition,subtraction,multiplication,division,countby}.js`. Builds templates: `bar-model`, `long-multiplication`.
 
@@ -616,7 +616,19 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 +10 → +30 → −40 · O3 line with 100 marked → none · O6 line.
 - **Misconceptions:** 180 + 30 = 1,110; forgets the hundreds change.
 
-### 8. Multiply Three Numbers — `mult_three`
+### 8. Multi-Digit Multiplication: Standard Algorithm — `mult_standard`
+
+- **What:** new skill `multiplication:mult_standard`. Grade 4 · family operations · source standards audit.
+- **Closes (standards):** 4.NBT.B.5, 5.NBT.B.5 · tag with CCSS 4.NBT.B.5, 5.NBT.B.5, EE M.EE.5.NBT.5
+- **Closes (White Rose steps):** none · strengthens Y4.B5.S11, Y5.B5.S1
+- **Teaches:** multiplying multi-digit whole numbers with the standard column algorithm; option "size": 2-digit × 1-digit, 3-digit × 1-digit, 4-digit × 1-digit, 2-digit × 2-digit, 3-digit × 2-digit.
+- **Problem types:** (1) multiply in the column with carry boxes; (2) two-digit multiplier: two partial-product rows, the placeholder zero, then add; (3) estimate first, then check the product; (4) find the error in a worked column.
+- **Representation:** Templates: `stack`; new: `long-multiplication`.
+- **Answer:** write the digits of the product in the grid (carries and partial products in their boxes).
+- **Ladder:** O2 size 2×1 → 3×1 → 4×1 → 2×2 → 3×2, each first without then with carries, then zero digits · O3 carry boxes, placeholder-zero box and partial-product rows (structural, stay) · traced first digit (hint, fades) · O6 column only.
+- **Misconceptions:** forgets to add the carry; leaves out the placeholder zero in the second row; multiplies only the ones by the tens digit; adds the partial products in the wrong columns.
+
+### 9. Multiply Three Numbers — `mult_three`
 
 - **What:** new skill `multiplication:multiply_three_numbers`. Grade 3 · family operations · source White Rose audit.
 - **Closes (standards):** 3.OA.B.5 · tag with CCSS 3.OA.B.5, 3.OA.B.6, 4.OA.B.4, EE M.EE.4.OA.4
@@ -629,7 +641,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 with 10 → any 1-digit · O3 bracket prompt → none · O6 brackets / plain.
 - **Misconceptions:** adds the third number; multiplies two and stops.
 
-### 9. Add and Subtract With a Base-10 Picture (option) — `stack_base10_support`
+### 10. Add and Subtract With a Base-10 Picture (option) — `stack_base10_support`
 
 - **What:** option on `addition:add_100_mixed` (and `subtraction:sub_100_mixed`, `addition:add_1k_mixed`, `subtraction:sub_1k_mixed`): support "base-10 picture" beside the column (a structural drawing of tens and ones / hundreds that regroups with the written method). Grade 1-2 · family operations · source standards audit.
 - **Closes (standards):** 1.NBT.C.4, 2.NBT.B.7 · tag with CCSS 1.NBT.C.4, 2.NBT.B.7, EE M.EE.2.NBT.7
@@ -641,7 +653,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 within 100 → 1,000; no regroup → regroup · O3 picture with exchange drawn → picture only → none · O6 rods / place-value disks.
 - **Misconceptions:** adds the tens as ones; exchanges but forgets to add the new ten.
 
-### 10. Related Times-Tables — `tables_links`
+### 11. Related Times-Tables — `tables_links`
 
 - **What:** new skill `multiplication:related_tables`. Grade 2-3 · family operations · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 3.OA.B.5, 3.OA.C.7, 3.OA.D.9, 3.NBT.A.3, 3.OA.B.6, EE M.EE.3.OA.6, M.EE.3.OA.8, M.EE.3.NBT.3
@@ -653,7 +665,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 2→4 → 3→6 → 4→8 → 9s · O3 known table given → none · O6 table / columns.
 - **Misconceptions:** adds 2 instead of doubling; doubles the factor and the product.
 
-### 11. Add and Subtract Multiples of Ten (option) — `tens_any`
+### 12. Add and Subtract Multiples of Ten (option) — `tens_any`
 
 - **What:** option on `addition:add_sub_10s`: task: any multiple of 10 from a multiple of 10 (70 − 30), and a 2-digit number ± a multiple of 10 (34 + 20); support: tens rods. Grade 1 · family operations · source standards audit.
 - **Closes (standards):** 1.NBT.C.4, 1.NBT.C.6 · tag with CCSS 1.NBT.C.4, 1.NBT.C.6, EE M.EE.1.NBT.4
@@ -665,7 +677,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 ± 10 (today) → multiples of 10 → 2-digit ± multiple of 10 · O3 rods drawn and crossed out → none · O6 rods / number line.
 - **Misconceptions:** 70 − 30 = 4; 34 + 20 = 36 (adds to the ones).
 
-### 12. Add or Subtract 1 or 2 — `add_sub_1_2`
+### 13. Add or Subtract 1 or 2 — `add_sub_1_2`
 
 - **What:** new skill `addition:add_sub_1_or_2`. Grade K · family operations · source White Rose audit.
 - **Closes (standards):** K.CC.B.4c · tag with CCSS K.OA.A.5, K.CC.B.4c, EE M.EE.1.OA.5
@@ -678,7 +690,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 within 10 → 20 · O3 track with start circled → none · O6 track / objects.
 - **Misconceptions:** counts the start number; adds instead of taking away.
 
-### 13. Make Equal Groups — `equal_groups_early`
+### 14. Make Equal Groups — `equal_groups_early`
 
 - **What:** new skill `multiplication:make_equal_groups`. Grade 1 · family operations · source White Rose audit.
 - **Closes (standards):** 2.OA.C.4 · tag with CCSS 3.OA.A.1, 2.OA.C.4, EE M.EE.3.OA.1
@@ -691,7 +703,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 2s, 5s, 10s → any to 25 · O3 groups ringed → none · O6 rings / arrays.
 - **Misconceptions:** counts groups as the total; adds unequal groups as equal.
 
-### 14. Bonds to 100 — `bonds_100`
+### 15. Bonds to 100 — `bonds_100`
 
 - **What:** new skill `addition:bonds_to_100`. Grade 1-2 · family operations · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 1.NBT.B.2, 1.NBT.C.4, K.OA.A.4, 2.NBT.B.5, EE M.EE.1.NBT.2, M.EE.1.NBT.4, M.EE.2.NBT.5
@@ -703,7 +715,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 tens → multiples of 5 → any · O3 hundred square shaded → none · O6 square / bond.
 - **Misconceptions:** 37 + 73 = 100; makes 100 in each place (37 + 73).
 
-### 15. Times as Many: Statements and Equations (option) — `comparison_statements`
+### 16. Times as Many: Statements and Equations (option) — `comparison_statements`
 
 - **What:** option on `multiplication:mult_comparison` (and `multiplication:mult_comparison_plain`): form "statement ↔ equation": 35 = 5 × 7 read as "35 is 5 times as many as 7" (and 7 times as many as 5), and the equation written for a comparison sentence. Grade 4 · family operations · source standards audit.
 - **Closes (standards):** 4.OA.A.1 · tag with CCSS 4.OA.A.1, EE M.EE.4.OA.1
@@ -715,7 +727,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 facts to 5 × 5 → 10 × 10 · O3 comparison bar model → none · O6 bars / plain.
 - **Misconceptions:** reads 5 × 7 as "5 more than 7"; only one of the two statements is true.
 
-### 16. True or False Equations (repair) — `equal_sign_repair`
+### 17. True or False Equations (repair) — `equal_sign_repair`
 
 - **What:** repair on `addition:equal_sign`: route the skill to its own generator (it deals plain column addition today) and add the forms 6 = 6, 7 = 8 − 1, 5 + 2 = 2 + 5, 4 + 1 = 5 + 2. Grade 1 · family operations · source standards audit.
 - **Closes (standards):** 1.OA.D.7 · tag with CCSS 1.OA.D.7, EE M.EE.1.OA.7, M.EE.6.EE.1-2
@@ -727,7 +739,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 within 10 → 20; + only → + and − · O3 balance picture under each side → none · O6 balance / plain.
 - **Misconceptions:** = means "the answer comes next"; 7 = 8 − 1 is false because the answer is on the left.
 
-### 17. Multiply a 4-Digit Number by a 1-Digit Number (option) — `mult_4x1`
+### 18. Multiply a 4-Digit Number by a 1-Digit Number (option) — `mult_4x1`
 
 - **What:** option on `multiplication:multiply` (and `multiplication:area_model_mult`): size "4-digit × 1-digit" (tiles 41) on the column method and the area model. Grade 4 · family operations · source standards audit.
 - **Closes (standards):** 4.NBT.B.5 · tag with CCSS 4.NBT.B.5, EE -
@@ -739,7 +751,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 no carry → carries → zero digits (3,045 × 6) · O3 carry boxes and partial products → none · O6 area model / column.
 - **Misconceptions:** forgets a carry into the thousands; multiplies a zero digit as 1.
 
-### 18. What Do +, − and = Mean? (option) — `sign_meanings`
+### 19. What Do +, − and = Mean? (option) — `sign_meanings`
 
 - **What:** option on `number_ops_mixed:which_sign`: range 10 with + − = only and the words plus / add / combine, take away / subtract / separate, the same as / equal. Grade 2 · family operations · source standards audit.
 - **Closes (standards):** M.EE.2.NBT.5
@@ -751,7 +763,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 + and − → with = · O3 picture beside the words → words only · O6 pictures / plain.
 - **Misconceptions:** = means "write the answer"; take away written with +.
 
-### 19. Correspondence Problems — `correspondence`
+### 20. Correspondence Problems — `correspondence`
 
 - **What:** new skill `multiplication:correspondence_problems`. Grade 3 · family operations · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 3.OA.A.3, 3.OA.D.8, EE M.EE.3.OA.7
@@ -763,7 +775,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 2 × 3 → 4 × 5 · O3 table started → none · O6 table / tree.
 - **Misconceptions:** adds; misses a pairing.
 
-### 20. Find the Difference — `difference`
+### 21. Find the Difference — `difference`
 
 - **What:** new skill `subtraction:find_the_difference`. Grade K · family operations · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS K.OA.A.1, 1.OA.C.5, EE M.EE.K.OA.1, M.EE.1.OA.5
@@ -775,7 +787,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 within 10 → 20 · O3 cubes paired → none · O6 cubes / bars / line.
 - **Misconceptions:** adds the two amounts; counts the larger bar.
 
-### 21. Division Using Factors — `div_factors`
+### 22. Division Using Factors — `div_factors`
 
 - **What:** new skill `division:divide_using_factors`. Grade 5 · family operations · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 5.NBT.B.6, 3.OA.B.5, EE M.EE.5.NBT.6
@@ -787,7 +799,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 ÷ 4, 6 → ÷ 12, 15 · O3 arrow diagram → none · O6 arrows / plain.
 - **Misconceptions:** divides by the sum of factors; uses a non-factor pair.
 
-### 22. How Many Ways? — `how_many_ways`
+### 23. How Many Ways? — `how_many_ways`
 
 - **What:** new skill `multiplication:how_many_ways`. Grade 2 · family operations · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 3.OA.A.3, EE -
@@ -799,7 +811,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 2 × 3 → 3 × 4 → 3 × 5 · O3 table started → none · O6 pictures / table.
 - **Misconceptions:** adds instead of multiplies; misses pairs.
 
-### 23. Inverse Operations (option) — `inverse_check`
+### 24. Inverse Operations (option) — `inverse_check`
 
 - **What:** option on `subtraction:sub_check_by_adding`: large numbers and addition. Grade 4 · family operations · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 4.NBT.B.4, EE M.EE.4.NBT.4
@@ -811,7 +823,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 to 10,000 → 1,000,000 · O3 check frame → none · O6 stack.
 - **Misconceptions:** subtracts the wrong numbers; checks with the same operation.
 
-### 24. Reason from Known Facts — `known_facts`
+### 25. Reason from Known Facts — `known_facts`
 
 - **What:** new skill `multiplication:reason_from_known_facts`. Grade 5 · family operations · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 5.NBT.B.5, 3.OA.B.5, EE M.EE.5.NBT.5
@@ -823,7 +835,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 +1 factor → ×10 → decimals · O3 link arrow → none · O6 plain.
 - **Misconceptions:** recalculates from scratch; adds 1 to the product.
 
-### 25. Long Division with Remainders (option) — `long_div_rem`
+### 26. Long Division with Remainders (option) — `long_div_rem`
 
 - **What:** option on `division:long_div_2digit`: remainders. Grade 5 · family operations · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 5.NBT.B.6, EE M.EE.5.NBT.6
@@ -835,7 +847,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 r → fraction → decimal · O3 remainder box → none · O6 bus stop / long.
 - **Misconceptions:** writes the remainder as a decimal digit (r 3 = .3); fraction over the quotient.
 
-### 26. Mental or Written? — `make_decisions`
+### 27. Mental or Written? — `make_decisions`
 
 - **What:** new skill `addition:choose_a_method`. Grade 2 · family operations · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 2.NBT.B.5, 2.NBT.B.7, EE M.EE.2.NBT.5, M.EE.2.NBT.7
@@ -847,7 +859,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 within 100 → 1,000 · O3 reason bank → none · O6 list.
 - **Misconceptions:** everything written; no regrouping check.
 
-### 27. Mental Addition and Subtraction — `mental_add_sub`
+### 28. Mental Addition and Subtraction — `mental_add_sub`
 
 - **What:** new skill `addition:mental_strategies`. Grade 4 · family operations · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 4.NBT.B.4, EE M.EE.4.NBT.4
@@ -859,7 +871,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 4-digit → 6-digit · O3 strategy prompt → none · O6 plain.
 - **Misconceptions:** compensates the wrong way; loses a place.
 
-### 28. Multiples of 10, 100 and 1,000 (option) — `mult_multiples`
+### 29. Multiples of 10, 100 and 1,000 (option) — `mult_multiples`
 
 - **What:** option on `multiplication:mult_zeros`: multiples of 10, 100, 1,000. Grade 4 · family operations · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 4.OA.B.4, EE M.EE.4.OA.4
@@ -871,7 +883,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 - **Ladder:** O2 10 → 100 → 1,000 · O3 rule → none · O6 list.
 - **Misconceptions:** 1,050 is a multiple of 100; every even is a multiple of 10.
 
-### 29. Partition to Multiply — `informal_mult`
+### 30. Partition to Multiply — `informal_mult`
 
 - **What:** new skill `multiplication:partition_multiply`. Grade 3 · family operations · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 3.OA.B.5, 4.NBT.B.5, EE -
@@ -887,7 +899,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 
 Your existing entries that also draw catalogued representations (build them with these pictures): `share_group` (V040); `long_mult` (V191); `mult_three` (V158); `tens_any` (V089); `equal_groups_early` (V037); `comparison_statements` (V028); `difference` (V108); `div_factors` (V192); `known_facts` (V193); `long_div_rem` (V190); `mult_multiples` (V160).
 
-### 30. The Bar-Model Family (every WRM bar) — `vis_bar_family`
+### 31. The Bar-Model Family (every WRM bar) — `vis_bar_family`
 
 - **Added from visual catalogue.** template · grade K-5 · lane `operations`.
 - **Build:** the bar-model template in full: part-whole (numbers, fractions, letters, degrees), comparison (difference arrow; sum-and-difference brace; two unknowns), equal parts with `fill: 'counters' | 'disks' | 'numbers'` and `task: 'part' | 'whole'`, scaling (1 box vs n boxes) and ratio rows (a : b, a : b : c), nested / halving stacks with link arrows, unit-conversion bars (1 m cells over 100 cm), the percentage bar ("100 %" over 2–20 cells; two levels) and the journey line; offered as `model: 'bar'` on the operations hosts, and used by the fractions, algebra and measurement entries that name bar-model.
@@ -897,7 +909,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 122 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 31. Pictures on Word Problems — `vis_word_pictures`
+### 32. Pictures on Word Problems — `vis_word_pictures`
 
 - **Added from visual catalogue.** option · grade K-5 · lane `operations`.
 - **Build:** `pictures` option on word-work: grouped-object pictures (bags, packs, jars, egg boxes) and price-tagged items drawn beside the problem, answer-free.
@@ -907,7 +919,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 87 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 32. Array Options (split, hidden, place-value counters, three factors) — `vis_array_options`
+### 33. Array Options (split, hidden, place-value counters, three factors) — `vis_array_options`
 
 - **Added from visual catalogue.** option · grade K-5 · lane `operations`.
 - **Build:** arrays gain a split line, a hidden part, finish-the-array, `counter: 'one' | 'ten' | 'hundred'`, `model: 'array-groups'` (an array of arrays for three factors) and expression matching; mult-grid takes non-consecutive heads.
@@ -917,7 +929,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 42 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 33. Cloze Banks: Word Banks and Digit-Card Boxes — `vis_cloze_boxes`
+### 34. Cloze Banks: Word Banks and Digit-Card Boxes — `vis_cloze_boxes`
 
 - **Added from visual catalogue.** option · grade K-5 · lane `operations`.
 - **Build:** cloze-bank gains word banks (`response: 'word'`: fewer / more / same, less than / greater than) and digit-card box templates (□□□ × □□, □.□□, □ < □) where the pupil places given cards.
@@ -927,7 +939,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 41 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 34. Division Layouts: Bus Stop, Notes, Missing Digits — `vis_division_layouts`
+### 35. Division Layouts: Bus Stop, Notes, Missing Digits — `vis_division_layouts`
 
 - **Added from visual catalogue.** option · grade K-5 · lane `operations`.
 - **Build:** the division template gains `layout: 'short'` (bus stop with small exchange-digit slots, an r slot, a decimal point and trailing zeros), `support: 'multiples'` (a multiples list beside), step notes, and `unknown` digits; box_division_* leave the legacy path.
@@ -937,7 +949,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 33 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 35. Open Number Line (template option) — `vis_open_line`
+### 36. Open Number Line (template option) — `vis_open_line`
 
 - **Added from visual catalogue.** option · grade K-5 · lane `operations`.
 - **Build:** number-line gains `line: 'open'` (no ticks, labelled hops) with `hops: 'bridge' | 'compensate' | 'count-on'` and decimal, fraction and integer values, beyond 0–20.
@@ -947,7 +959,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 32 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 36. Column Layouts: Decimal Point Track and Expanded Column — `vis_stack_layouts`
+### 37. Column Layouts: Decimal Point Track and Expanded Column — `vis_stack_layouts`
 
 - **Added from visual catalogue.** option · grade 2-5 · lane `operations`.
 - **Build:** stack gains the decimal-point track `dp: 1..3` (lifted from money-columns) so decimal add / subtract leave the legacy decimal-column-add print, and `form: 'expanded'` (the partial-product column with annotations).
@@ -957,7 +969,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 29 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 37. Hop Lines: Through Zero, Chunks, Fact Labels — `vis_hop_line_options`
+### 38. Hop Lines: Through Zero, Chunks, Fact Labels — `vis_hop_line_options`
 
 - **Added from visual catalogue.** option · grade K-4 · lane `operations`.
 - **Build:** hop-line gains a negative start and `bridge: 0`, unequal "chunk" arcs, and `labels: 'facts'` ("n × 2" above each tick, values below).
@@ -967,7 +979,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 16 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 38. Split and Operate (template) — `vis_split_op`
+### 39. Split and Operate (template) — `vis_split_op`
 
 - **Added from visual catalogue.** template · grade 2-5 · lane `operations`.
 - **Build:** a new split-op template: a part-whole split with an operation arrow (× n or ÷ n) under each part and the recombined answer, for partitioning in multiplication and division.
@@ -977,7 +989,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 10 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 39. Area Model: 2 × 2 and 2 × 3 Grids — `vis_area_model_rows`
+### 40. Area Model: 2 × 2 and 2 × 3 Grids — `vis_area_model_rows`
 
 - **Added from visual catalogue.** option · grade 2-5 · lane `operations`.
 - **Build:** area-model gains `rows` (2 × 2, 2 × 3 grids), `fill: 'base10' | 'disks'` inside the cells and the +1 row / column adjust strip; area_model_mult_hard leaves the legacy path.
@@ -987,7 +999,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 7 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 40. Bridging Split Mark (pane) — `vis_split_mark`
+### 41. Bridging Split Mark (pane) — `vis_split_mark`
 
 - **Added from visual catalogue.** pane · grade 1-4 · lane `operations`.
 - **Build:** a new pane:split: the second number split under the calculation to make the next ten, hundred or whole (6 → 2 + 4; 0.67 → 0.55 + 0.12), a support value on the add / subtract hosts.
