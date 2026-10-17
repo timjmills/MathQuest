@@ -3366,11 +3366,16 @@ async function buildDetailedLesson(req = {}) {
         ...((lesson.lesson && lesson.lesson.chart && lesson.lesson.chart.exampleQs) || []).filter(Boolean).map(factKeyOf)].filter((k) => k !== null));
     const wpD = dealOne(bo(d.wordProblem.ref), (seed + 307) >>> 0, used, d.wordProblem.want, null, null, storyNames, lessonKeys);
     lessonKeys.add(wpD.key);
+    // (`checkQuestion.first`, lesson 4 r4: the Check Question is dealt before the exit slip - both must be fresh against
+    // every page, and the slip's three windows, dealt first, left no fresh window with the row-only case; absent, as before)
+    const cqFirst = !!(d.checkQuestion && d.checkQuestion.first);
+    const cqDeal = () => dealOne(bo((d.checkQuestion || {}).ref || d.skill), (seed + 601) >>> 0, used, (d.checkQuestion || {}).want || '', null, null, storyNames);
+    const cqD0 = cqFirst ? cqDeal() : null;
     const exitD = d.exit.map((e, i) => { const x = dealOne(bo(e.ref), (seed + 401 + 97 * i) >>> 0, used, e.want, exAns, exNear, storyNames, lessonKeys); exAns.add(dlAns(x.q)); return x; });
     // (`want` on a retrieval row - lesson 3a r2: no x 0 or x 1 fact, lesson 3b's content; absent = any, as before)
     const retD = (d.retrieval || []).map((r, i) => dealOne(bo(r.ref), (seed + 503 + 89 * i) >>> 0, used, r.want));
     // (`checkQuestion.ref`, lesson 3a: the Check Question's own form of the skill; absent = the lesson skill)
-    const cqD = dealOne(bo((d.checkQuestion || {}).ref || d.skill), (seed + 601) >>> 0, used, (d.checkQuestion || {}).want || '', null, null, storyNames);
+    const cqD = cqFirst ? cqD0 : cqDeal();
     // The exit slip's Say line reads a FRESH item of the slip's kind, never one of its four (V22 §9.7).
     // (`exitSayItem` k - the detailed lesson maker, lesson 2: a story slip's Say reads ITS OWN item k, whose
     // story the pupil can see; a fresh item would be one the pupil never sees)

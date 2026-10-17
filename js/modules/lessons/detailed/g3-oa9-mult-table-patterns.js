@@ -46,13 +46,15 @@ export default {
 
     // ------------------------------------------------------------------ the practice skill
     // A 4 x 5 window of the 10 x 10 chart; shade the even products (meanwhile: multiples of 2).
-    // (r3, critic r1 D5: no two windows of a page share a box, so the lesson pages use the 2-12 chart without 10, products to 100;
-    // the chart example stays on 2-9 - chartExample)
+    // (the lesson pages use the 2-12 chart without 10, products to 100 - chartFresh; the chart example stays on 2-9 - chartExample;
+    // r4: the sheet's spare height goes into its cells, lessonData.growAll)
     skill: CHART({ tries: 600, allTest: 'chartFresh' }, { winRows: 2, winCols: 4, band: 144 }),
     edgeTest: 'chartEdge',
     practicePages: 1,
-    // (Practice windows are 3 x 3, the lesson sheet's 3 x 4: the 2-9 chart holds too few 3 x 3 windows that are not
-    // near twins - more than half their boxes shared, either way round - for eleven of one shape)
+    // (r4, lead ruling: Practice windows are 2 x 3; two of a page share at most half their boxes (turned boxes counted), none
+    // copies another page's window, and each REVISITS the lesson's ground (`gridRevisit`: more than half shared with an
+    // earlier page's window), so the fresh windows are left for the exit slip and the Check Question. The ★★★ row is
+    // chartEdge - even products in the 30s / 50s / 70s / 90s, or an odd x odd product of 55 or more - and no row above holds one.)
     practiceSheets: [{ steps: true, skill: CHART({ tries: 600, allTest: 'chartFresh', gridRevisit: true }, { winRows: 2, winCols: 3, band: 144 }), shape: [6, 2], edgeLast: { per: 6, cols: 2, first: true, wants: ['chartEdge', 'chartEdge'] } }],
     // (no Mixed page: the facts the windows rest on are P0 and the spaced retrieval; one full Practice page)
 
@@ -141,8 +143,9 @@ export default {
 
     // ------------------------------------------------------------------ P6 Exit slip (fresh windows)
     // Designed around the 4 x 5 window the generator cuts today (B3 would allow the 2 x 3 of RESEARCH.md).
-    // (three 2 x 3 windows, each fresh: no other page's window holds half its boxes, either way round. The 2-9 chart is
-    // spent by the lesson's pages, so they may use the 11 and 12 rows (chartFresh, products to 100); a fourth finds none)
+    // (three 2 x 3 windows, each fresh: no window of any page, any task, holds more than half its boxes; the slip's windows
+    // share none if they can, else at most half. They may use the 11 and 12 rows, modelled on the lesson sheet and Practice,
+    // never the 10 row, which no page models (chartFresh, products to 100). The Check Question is dealt first - `first`.)
     exit: [
         { case: 'an even row (odd columns)', ref: CHART({ pageGroup: 'exit', gridFresh: true, allTest: 'chartFresh' }, { winRows: 2, winCols: 3, band: 144 }), want: ['chartColsOdd', 'chartIn9'], cols: 1, group: 'a', detects: 'Misses the even row.' },
         { case: 'the odd row: its even column (Critical Atom)', ref: CHART({ pageGroup: 'exit', gridFresh: true, allTest: 'chartFresh' }, { winRows: 2, winCols: 3, band: 144 }), want: ['chartMixed', 'chartRowOnly'], cols: 2, group: 'bc', detects: 'Leaves an even column white.' },
@@ -165,7 +168,7 @@ export default {
     ],
     caseNames: { chartBigOdd: 'odd × odd stays white', evenColOnly: 'even column only' },
     routeNote: 'No site lesson exists yet for these prerequisites: T6 names a CCSS code and a short title (V22 Appendix H).',
-    materials: ['Interlocking cubes: a teacher set of 60', 'Mini whiteboards and pens', 'Anchor chart (a 3 × 4 window), A3 or projected', 'Pupil packet, one per pupil', 'Exit slips, cut in half'],
+    materials: ['Interlocking cubes: a teacher set of 60', 'Mini whiteboards and pens', 'Anchor chart (a 2 × 4 window), A3 or projected', 'Pupil packet, one per pupil', 'Exit slips, cut in half'],
     vocabulary: [
         { word: 'even', gloss: 'makes pairs, none left over', diagram: { kind: 'text', text: '●● ●● ●●' } },
         { word: 'odd', gloss: 'one is left over', diagram: { kind: 'text', text: '●● ●● ●● ●' } },
@@ -196,7 +199,7 @@ export default {
         { name: 'Any odd factor is odd', step: 2, looks: '{chart.ca} × {chart.cb} left white', fix: 'One even number is enough.', option: '', caught: 'Exit b' },
         { name: 'Columns only', step: 1, looks: 'The {exit.0.ec} column shaded, the {exit.0.er} row white', fix: 'Rows first, then columns: finger on each header.', option: '', caught: 'Exit a' },
     ],
-    checkQuestion: { want: ['chartMixed', 'chartRowOnly'], correct: 'C', ref: CHART({ gridFresh: true, allTest: 'chartFresh' }, { winRows: 2, winCols: 3, band: 144 }) },
+    checkQuestion: { want: ['chartMixed', 'chartRowOnly'], first: true, correct: 'C', ref: CHART({ gridFresh: true, allTest: 'chartFresh' }, { winRows: 2, winCols: 3, band: 144 }) },
 
     // ------------------------------------------------------------------ T3-T5 delivery scripts
     sections: [
