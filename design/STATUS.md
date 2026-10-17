@@ -309,6 +309,7 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - 2026-10-16: WRM tagging Y6 merged (critic r5 PASS vs rules 1-19, mean 8.91, min 8); combined mergecheck Y6+R+Y1+Y4: 0 problems. Owner: tagging now ONE YEAR AT A TIME (Y5, then Y2-Y3), and every lesson on the live school site must be tagged, incl. CCSS-only "committee" (CCSS · BUILD), supplement, non-CCSS and support lessons (new `lessons` section per year; extractor to write data/curriculum/site-lessons.json); then the same for R, Y1, Y4, Y6.
   - 2026-10-16: WRM tagging Y5 round 5 builder ESCALATED mq-opus-low -> mq-opus-medium (the ceiling): false whys / unit-mismatched links (rule 18) survived builder rounds 2, 3 and 4 in new places each time (critic r6 classes K, L, M); round 5 adds claim rules to linkfit and a root-cause sweep of every link and clause.
   - 2026-10-16: WRM tagging Y5 round 6 (critic r7 FAIL narrowly, class N third time): builder still at mq-opus-medium (ceiling). Structural fix: `linkfit --fit` is a report only, every link's opts come from the spec (`spec_zz_r7.py` writes the 143 re-options and 96 drops by hand), `specopts.py` fails the build on any difference; form / representation claims gated (picture-only representations), M gate reads every option.
+  - 2026-10-17: WRM tagging Y4 site lessons round 4 builder ESCALATED mq-opus-low -> mq-opus-medium (the ceiling): lesson 8's related `composite_shapes` why failed builder rounds 2 and 3 (r2 "every side given", r3 "two sides unlabelled", false for the T: 4 of its 8 sides). Round 4 measures the sides per shape (L 2 of 6 unlabelled, T 4 of 8) and gates count claims in lessonfit (G7).
 - Owner 2026-10-16: redesign the Atomisation Lesson Planner V20 (`design/lesson-planner/`) to the site's lesson/worksheet design profile for SPED pupils — audit running, then V21 + a rendered sample pack, critic >= 8.
 - Owner 2026-10-16: archive each helper session as soon as its final report is in and its lane branch is pushed (the lead does it).
 - 2026-10-16: **Lesson planner PASSED** independent critic round 7 (every page of both sample packs >= 8; document fidelity 8, completeness 8, decision rules 8, checkability 9). Renamed **V22** per owner: `design/lesson-planner/Atomisation_Lesson_Planner_V22.md`, samples `sample-v22/` (add 1-3) and `sample-v22-sub/` (subtract with regrouping), fixtures in `fixtures/`; critic reports `critic-r1..r7.md` keep their V21 names as history. Next: the lesson-building session (owner list, 67 lessons) on the site's own code per MASTER_PLAN Wave 8.
@@ -358,4 +359,26 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
   fix, no further critic), finish White Rose page + skip-count defects, merge, then STOP all work.
 - Held for after these land: Lane B answer boxes + regroup boxes (spec `design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md`),
   placevalue:identify write-value (spec `design/audit/runs/next-session/PV-IDENTIFY-WRITE-VALUE-SPEC.md`).
+
+## HELPER PAUSED 2026-10-17 — WRM tagging helper session_01LVDoUbPMFjuTAdwUzzWVDL (owner wind-down)
+- PASSED and pushed: Y5 (bd2f4ff2, critic r8), Y2-Y3 (7ee69f33, critic r15), Y6 site lessons (6c920c45, lessons critic r2),
+  Y1 site lessons (branch -wip-wrm-lessons-y1 d4994b4b, lessons critic r3). Y6 steps already on main.
+- **Y4 site lessons FINAL (owner accepted r4 7.96 after F6 fix)**, branch `claude/sweet-newton-c8wrv1-wip-wrm-lessons-y4`.
+  No critic r5 (owner decision 2026-10-17). Builder on mq-opus-low.
+  - F6 lesson 7 `area {forms:[2]}` clause, measured (600 items, seeds 70913/11 x 300): kitchen floor 130, patio 129, wall 121,
+    room 112, garden bed 108; ft 600/600; areas 6-90; no visual on any item -> "a story of a rectangular kitchen floor, room,
+    patio, wall or garden bed in feet ... (8 ft by 5 ft: 40 square feet); no picture, never a drawn grid" ("never tiled" dropped:
+    the kitchen-floor story says "tiling").
+  - M1: merged origin/claude/sweet-newton-c8wrv1 (8fbe02c4). Lesson 10 pre `identify {forms:[1], denoms:[2]}` re-measured on
+    the merged tree (300 items, seed 71003000+i): target off the 2/4/8 family on 21/300, a 3/5/6 among the others on 38/300 ->
+    why now "picking the model that shows a fraction, most in halves, quarters or eighths (about 1 in 14 in thirds, fifths or
+    sixths); some of the other models are in thirds, fifths or sixths".
+  - NOT DONE (G9, too large for a final fix; new lessonfit rule classes): object/scale lists in a story clause, count and range
+    lists, direction / interval (hour) lists, positive fraction families, half-unit claims, and G2 bounds read on the fixed G6
+    probe instead of the sample. Optional n9 ruler wording. Every such string was hand-checked by critic r4.
+  - Step-lane scripts Y4/check.py, linkfit.mjs, build.py hard-code an old session's data dir (pass WRM_TAG_DATA / edit path);
+    optcheck reports 2 pre-existing problems on FROZEN steps (Y4.B1.S1 / S13 related `number_word_form` has no option "range").
+- OPEN OWNER QUESTIONS: Y4-lessons-report.md (FULL lessons with unnamed 3.OA clauses — critic agrees keep FULL; bar-models
+  3.OA.D.8; "Pounds, tens, ones and pence" = money place value?); Y1-lessons-report.md 1-7; Y6-report.md site lessons;
+  Y5-report.md; Y2/Y3 reports. Lead merge notes (lessonCloses, opts in step lists, lesson-only proposals) in HELPERS.md.
 - 2026-10-17 generator bug fixes (branch claude/sweet-newton-c8wrv1-wip-genbugs; seeded 1-600 before/after): (1) `equiv_frac_nv` yes/no: the distractor clamp could land on an equivalent pair keyed "no" (seed 206: 2/3 vs 2/3) - the denominator now moves until the cross products differ (2 -> 0 bad); (2) `itemDenominators` now reads `q.cell.payload` ({n,d} terms, "a/b" strings), so kit cells obey the denominators filter (`equiv_frac_visual {denoms:[2]}` 22 -> 0 items with no denominators seen); (3) `percent_of_number`: the 33% combos keyed one third (33% of 60 = 20) are now 30% with exact whole answers (53 -> 0); (4) `simplify`: distractor numerators are 1-3 off and never below 1 (no 0 or negative options; 23 -> 0); (5) `distributive_expr` factor-out: inner terms are coprime so the stated factor is the GCF (10x + 30 -> 10(x + 3), 126 -> 0).

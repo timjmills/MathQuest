@@ -9764,7 +9764,13 @@
     "Y1.B14.S4"
    ],
    "reused": true,
-   "source": "WRM_PROPOSALS"
+   "source": "WRM_PROPOSALS",
+   "lessons": [
+    "G3|-|comparedurationsoftime"
+   ],
+   "closes": {
+    "G3|-|comparedurationsoftime": "which of two activities takes longer, from a sense of hours, minutes and seconds (a film or a walk)"
+   }
   },
   "time_24h_convert": {
    "kind": "new",
@@ -9965,6 +9971,600 @@
    ],
    "reused": true,
    "source": "WRM_PROPOSALS"
+  },
+  "patterns_notice": {
+   "after": [],
+   "answer": "tick statements from a bank; write terms",
+   "closes": {
+    "G3|-|patternsonthemultiplicationtable": "explaining the patterns of the multiplication table with the properties of multiplication: the table is the same on both sides of its diagonal (3 × 7 = 7 × 3), an even factor makes an even product (4 × a number is always even: it is double 2 × that number), the 9s go up one ten and down one one"
+   },
+   "ee": [
+    "M.EE.3.OA.8",
+    "M.EE.4.OA.5"
+   ],
+   "family": "algebra",
+   "grade": "3-4",
+   "kind": "new",
+   "ladder": "O2 addition table → multiplication table → rule sequences · O3 pattern shaded → none · O6 table / track",
+   "lessons": [
+    "G3|-|patternsonthemultiplicationtable"
+   ],
+   "misconceptions": [
+    "a pattern seen in three terms always continues",
+    "odd × odd is even"
+   ],
+   "name": "What Do You Notice?",
+   "newTemplates": [],
+   "problemTypes": [
+    "shade the pattern in the table, tick what you notice",
+    "true or false: every product in the 5 row ends in 0 or 5",
+    "generate the terms, then say what alternates",
+    "why is 4 × n always even? (reason bank)",
+    "predict the 10th term"
+   ],
+   "reused": true,
+   "skill": "patterns:notice_patterns",
+   "source": "STANDARD_PROPOSALS",
+   "standards": [
+    "3.OA.D.9",
+    "4.OA.C.5"
+   ],
+   "steps": [],
+   "teaches": "identifying arithmetic patterns in the addition and multiplication tables and in rule sequences, and explaining them with properties (4 × a number is always even; add 3 from 1 alternates odd, even)",
+   "templates": [
+    "mult-grid",
+    "count-row"
+   ],
+   "wrmSteps": [
+    "Y3.B3.S13",
+    "Y4.B4.S15"
+   ]
+  },
+  "multi_step_four_ops": {
+   "after": [],
+   "also": [
+    "algebra:multi_step_word_plain"
+   ],
+   "answer": "write each step answer; write the equation",
+   "closes": {
+    "G3|-|twostepwordproblemswiththefouroperations": "two-step stories that mix × or ÷ with + or − (3 boxes of 8 pens and 5 more pens), written as an equation with a letter for the unknown and checked by estimating"
+   },
+   "ee": [
+    "M.EE.3.OA.7",
+    "M.EE.4.OA.3"
+   ],
+   "family": "algebra",
+   "grade": "3-4",
+   "kind": "option",
+   "ladder": "O2 within 100 → 1,000; two steps → three · O3 bar model and step boxes → step boxes → none · O6 pictures / plain",
+   "lessons": [
+    "G3|-|twostepwordproblemswiththefouroperations"
+   ],
+   "misconceptions": [
+    "answers the first step",
+    "uses the letter as a label, not a number",
+    "ignores the remainder"
+   ],
+   "name": "Two-Step Problems With All Four Operations (option)",
+   "newTemplates": [
+    "bar-model"
+   ],
+   "option": "two steps with × and ÷ (3 packs of 6, 4 eaten), write the equation with a letter for the unknown, remainder steps, and a \"reasonable?\" estimate",
+   "problemTypes": [
+    "× then −",
+    "÷ then +",
+    "write the equation with n",
+    "remainder decides the answer",
+    "is the answer reasonable? (round)"
+   ],
+   "reused": true,
+   "skill": "algebra:multi_step_word",
+   "source": "STANDARD_PROPOSALS",
+   "standards": [
+    "3.OA.D.8",
+    "4.OA.A.3"
+   ],
+   "steps": [],
+   "teaches": "two-step and multistep word problems with the four operations, represented by an equation with a letter, remainders interpreted, and checked by estimating",
+   "templates": [
+    "word-work"
+   ],
+   "wrmSteps": [
+    "Y3.B4.S10",
+    "Y4.B5.S13"
+   ]
+  },
+  "partition_draw": {
+   "after": [],
+   "answer": "draw the cut lines; write the unit fraction",
+   "closes": {
+    "G3|-|partitionshapesintoequalareas": "partitioning a shape into 2, 3, 4, 6 or 8 parts with equal areas (the pupil draws the cuts; sixths and eighths among them) and naming the area of each part as a unit fraction of the whole (each part is 1/6 of the area)"
+   },
+   "ee": [
+    "M.EE.3.G.2"
+   ],
+   "family": "geometry",
+   "grade": "3",
+   "kind": "option",
+   "ladder": "O2 halves/quarters → thirds/sixths → eighths · O3 grid under the shape → dots → none · O6 rectangles / circles / hexagons",
+   "lessons": [
+    "G3|-|partitionshapesintoequalareas"
+   ],
+   "misconceptions": [
+    "equal parts must be the same shape",
+    "counts parts that are not equal"
+   ],
+   "name": "Cut Into Equal Areas (option)",
+   "newTemplates": [
+    "shape-grid"
+   ],
+   "option": "task \"draw the cuts\": partition a shape into n equal-area parts and write the unit fraction of each part",
+   "problemTypes": [
+    "draw lines to make 4 equal parts; each is __ of the shape",
+    "are these parts equal in area?",
+    "two different ways to cut into quarters",
+    "name one part"
+   ],
+   "reused": true,
+   "skill": "shapes_early:partition_shapes",
+   "source": "STANDARD_PROPOSALS",
+   "standards": [
+    "3.G.A.2"
+   ],
+   "steps": [],
+   "teaches": "partitioning shapes into parts with equal areas and naming each part as a unit fraction of the whole",
+   "templates": [
+    "frac-model"
+   ],
+   "wrmSteps": [
+    "Y3.B6.S1"
+   ]
+  },
+  "area_tile_multiply": {
+   "after": [],
+   "answer": "write the area with its square unit; write the multiplication",
+   "closes": {
+    "G3|-|areaasmultiplication": "showing on the tiled rectangle that the count of unit squares equals the side lengths multiplied (rows × columns = the area)"
+   },
+   "ee": [
+    "M.EE.4.MD.3",
+    "M.EE.6.G.1"
+   ],
+   "family": "geometry",
+   "grade": "3",
+   "kind": "option",
+   "ladder": "O2 rectangles to 24 → to 60 · O3 squares numbered → rows numbered → none · O6 unit name shown / pupil writes it",
+   "lessons": [
+    "G3|-|areaasmultiplication"
+   ],
+   "misconceptions": [
+    "writes cm for cm²",
+    "counts the perimeter squares only"
+   ],
+   "name": "Area by Tiling and Multiplying (option)",
+   "newTemplates": [
+    "shape-grid"
+   ],
+   "option": "unit label (square units, cm², m², in², ft²) and form \"tile, then multiply\" (count the squares, then write rows × columns)",
+   "problemTypes": [
+    "count the squares; write the unit",
+    "count, then rows × columns",
+    "same area, check by multiplying",
+    "which unit square was used?"
+   ],
+   "reused": true,
+   "skill": "area_perimeter:area_unit_squares",
+   "source": "STANDARD_PROPOSALS",
+   "standards": [
+    "3.MD.C.5a",
+    "3.MD.C.6",
+    "3.MD.C.7a"
+   ],
+   "steps": [],
+   "teaches": "area measured in square units of a named size, and that the tiled count equals side × side",
+   "templates": [
+    "legacy"
+   ],
+   "wrmSteps": [
+    "Y3.B4.S3"
+   ]
+  },
+  "area_split_tiles": {
+   "ccss": [
+    "3.MD.C.7c",
+    "3.MD.C.7d"
+   ],
+   "closes": {
+    "G3|-|distributiveandadditivearea": "the split rectangle tiled in unit squares to show a × (b + c) = a × b + a × c, and the area of a rectilinear floor plan in a story"
+   },
+   "family": "area_perimeter",
+   "kind": "option",
+   "lessons": [
+    "G3|-|distributiveandadditivearea"
+   ],
+   "name": "Split Rectangles on Unit Squares, and Floor Plans (option)",
+   "option": "form \"tile the parts\": the split rectangle drawn on unit squares (a by b + c), the pupil counts or multiplies each part and writes a × (b + c) = a × b + a × c; form \"rooms\": a floor plan of two rectangles in a story (a room and a hall), find the floor area",
+   "representation": "one boxed cell: the rectangle on a black-line unit grid with the split line heavy, the two part areas and the total as answer slots and the equation a × (b + c) = a × b + a × c; the floor-plan form draws the plan with its side lengths and a one-line story",
+   "reused": false,
+   "skill": "area_perimeter:area_distributive_visual",
+   "steps": [],
+   "teaches": "showing with unit squares that a rectangle a by (b + c) has the area a × b + a × c (the distributive property), and finding the area of a rectilinear floor plan in a story by adding the areas of its rectangles",
+   "why": "area_distributive_visual labels a split rectangle with its side lengths (no unit squares, no equation a × (b + c)); area_polygon_decompose finds the area of an L-, T- or U-shape with no story; no item ties the split to the distributive property or sets the area in a real-world plan"
+  },
+  "mass_scales": {
+   "closes": {
+    "G3|-|measureandestimatemassandliquidvolumegkgmll": "reading litres on a jug scale, and scales stepped in 1s, 2s, 5s or 10s (the skill reads millilitres, grams and kilograms on 100- or 200-step scales)"
+   },
+   "family": "measurement",
+   "kind": "new",
+   "lessons": [
+    "G3|-|measureandestimatemassandliquidvolumegkgmll"
+   ],
+   "name": "Read Scales (g, kg, ml, l)",
+   "representation": "a drawn dial or jug scale; write the reading with the unit; option: scale step",
+   "reused": true,
+   "skill": "measurement:read_scales",
+   "source": "WRM_PROPOSALS",
+   "steps": [
+    "Y2.B7.S2",
+    "Y2.B7.S3",
+    "Y2.B7.S7",
+    "Y3.B7.S1",
+    "Y3.B7.S3",
+    "Y3.B7.S4",
+    "Y3.B7.S8"
+   ],
+   "teaches": "reading mass and capacity scales in grams, kilograms, millilitres and litres with scale steps of 1, 2, 5, 10, 100"
+  },
+  "estimate_mass_volume": {
+   "ccss": [
+    "3.MD.A.2"
+   ],
+   "closes": {
+    "G3|-|measureandestimatemassandliquidvolumegkgmll": "estimating a mass in grams or kilograms and a liquid volume in litres against a benchmark"
+   },
+   "family": "measurement",
+   "kind": "option",
+   "lessons": [
+    "G3|-|measureandestimatemassandliquidvolumegkgmll"
+   ],
+   "name": "Estimate a Mass or a Liquid Volume (option)",
+   "option": "form \"about how much?\": one pictured object or container and a benchmark (a paper clip is about 1 g, a bag of flour about 1 kg, a water bottle about 1 L); the pupil picks the sensible estimate from three amounts in the same unit",
+   "representation": "one boxed cell: the object drawn in black line beside its benchmark, three estimates in a bank below and one answer slot; no colour fill",
+   "reused": false,
+   "skill": "measurement:mass_volume_liquid",
+   "steps": [],
+   "teaches": "estimating the mass of an object in grams or kilograms and the liquid volume of a container in litres or millilitres against a known benchmark, before measuring",
+   "why": "mass_volume_liquid reads a drawn scale (forms 0, 1) or sorts objects by the unit to measure them in (forms 2); nothing asks the pupil how heavy or how full a thing is likely to be (3.MD.A.2 \"measure and estimate\"). Overlap (critic r1 n2): Y5's capacity_estimate (\"Estimate Capacity (option)\", 3.MD.A.2) already plans the liquid-volume half; this option is still needed for the mass half (grams and kilograms against a benchmark), and the lead may merge the volume half into capacity_estimate"
+  },
+  "mass_ops": {
+   "closes": {
+    "G3|-|measureandestimatemassandliquidvolumegkgmll": "one-step stories that add, subtract, multiply or divide masses or liquid volumes in the same unit (3.MD.A.2)"
+   },
+   "family": "measurement",
+   "kind": "new",
+   "lessons": [
+    "G3|-|measureandestimatemassandliquidvolumegkgmll"
+   ],
+   "name": "Mass and Capacity Word Problems",
+   "representation": "picture of scales/jugs with values; write the answer with the unit",
+   "reused": true,
+   "skill": "measurement:mass_capacity_word_problems",
+   "source": "WRM_PROPOSALS",
+   "steps": [
+    "Y2.B7.S4",
+    "Y2.B7.S8",
+    "Y3.B7.S5",
+    "Y3.B7.S6",
+    "Y3.B7.S10",
+    "Y3.B7.S11"
+   ],
+   "teaches": "adding, subtracting, multiplying and dividing masses and capacities in context"
+  },
+  "ruler_object_inch": {
+   "ccss": [
+    "3.MD.B.4"
+   ],
+   "closes": {
+    "G3|-|measuretothehalfandquarterinch": "measuring a drawn object with the inch ruler to the nearest half or quarter inch"
+   },
+   "family": "measurement",
+   "kind": "option",
+   "lessons": [
+    "G3|-|measuretothehalfandquarterinch"
+   ],
+   "name": "Measure an Object to the Nearest Half or Quarter Inch (option)",
+   "option": "form \"measure the object\": a drawn object (pencil, crayon, leaf, key) laid along an inch ruler marked in halves or quarters, its left end at 0 or at a whole inch; the pupil writes its length to the nearest half or quarter inch",
+   "representation": "one boxed cell: the ruler in black line with the object drawn on it, the answer slot \"__ in\"; the same cell can list 4 to 8 measured objects for a line plot",
+   "reused": false,
+   "skill": "measurement:reading_ruler",
+   "steps": [],
+   "teaches": "measuring a drawn object with an inch ruler marked in halves and fourths: lining up its end, reading where the other end falls, and writing the length to the nearest half or quarter inch",
+   "why": "reading_ruler {parts: halves / quarters} reads where an arrow points; no item lays an object on the ruler, so the pupil never measures a length (3.MD.B.4 \"generate measurement data by measuring lengths\")"
+  },
+  "make_line_plot": {
+   "after": [],
+   "answer": "draw the × marks; write the answers",
+   "closes": {
+    "G3|-|buildalineplotfrominchmeasurements": "making a line plot from inch measurements: marking a scale in halves or quarters and drawing an x for each measurement"
+   },
+   "ee": [
+    "M.EE.2.MD.9",
+    "M.EE.3.MD.4",
+    "M.EE.4.MD.4",
+    "M.EE.5.MD.2"
+   ],
+   "family": "data",
+   "grade": "2-6",
+   "kind": "new",
+   "ladder": "O2 whole units → halves/quarters → eighths; plot → compute · O3 scale drawn with every tick labelled → ends only · O6 × / dots",
+   "lessons": [
+    "G3|-|buildalineplotfrominchmeasurements"
+   ],
+   "misconceptions": [
+    "puts marks side by side instead of stacking",
+    "fraction ticks spaced unevenly",
+    "counts marks as the measurement"
+   ],
+   "name": "Make a Line Plot",
+   "newTemplates": [
+    "graph-axes",
+    "measure-scale"
+   ],
+   "problemTypes": [
+    "measure the objects, then plot",
+    "plot a list of measurements",
+    "difference between longest and shortest",
+    "total or share equally (Grade 5 redistribute)",
+    "how many measured more than …?"
+   ],
+   "reused": true,
+   "skill": "graphs:make_a_line_plot",
+   "source": "STANDARD_PROPOSALS",
+   "standards": [
+    "2.MD.D.9",
+    "3.MD.B.4",
+    "4.MD.B.4",
+    "5.MD.B.2"
+   ],
+   "steps": [],
+   "teaches": "measuring objects (ruler pictures) or reading a data list, then making a line plot (dot plot) on a scale of whole numbers, halves, quarters or eighths, and solving problems from it",
+   "templates": [
+    "legacy"
+   ],
+   "wrmSteps": [
+    "Y3.B12.S5"
+   ]
+  },
+  "compare_durations": {
+   "ccss": [
+    "3.MD.A.1"
+   ],
+   "closes": {
+    "G3|-|comparedurationsoftime": "two durations found from their start and end times and compared: which took longer"
+   },
+   "family": "measurement",
+   "kind": "option",
+   "lessons": [
+    "G3|-|comparedurationsoftime"
+   ],
+   "name": "Which Took Longer? Compare Two Durations (option)",
+   "option": "form \"which took longer?\": two activities, each with a start clock and an end clock on its own time line; the pupil writes both durations (whole and half hours, later quarter hours) and ticks the one that took longer",
+   "representation": "one boxed cell: two rows, each an activity word, a start clock, an end clock and a time line with an answer slot \"__ h __ min\"; a tick box beside each row for \"took longer\"",
+   "reused": false,
+   "skill": "measurement:elapsed_visual_easy",
+   "steps": [],
+   "teaches": "finding two durations from their start and end times and comparing them: which activity took longer and which took less time",
+   "why": "elapsed_visual_easy / medium / hard and elapsed_find_duration find ONE duration; no time item shows two activities side by side to compare how long each took"
+  },
+  "compare_sentences": {
+   "closes": {
+    "G3|-|comparingmultiplicationstatements": "comparing two multiplication statements with <, > or = by reasoning (4 × 5 ○ 4 × 6; 3 × 8 ○ 8 × 3; 5 × 4 ○ 2 × 10)"
+   },
+   "family": "operations",
+   "kind": "new",
+   "lessons": [
+    "G3|-|comparingmultiplicationstatements"
+   ],
+   "name": "Compare Number Sentences",
+   "representation": "two expressions with a circle between; write <, > or =",
+   "reused": true,
+   "skill": "algebra:compare_number_sentences",
+   "source": "WRM_PROPOSALS",
+   "steps": [
+    "Y2.B2.S20"
+   ],
+   "teaches": "comparing two expressions with <, > or = by reasoning, not only calculating (7 + 5 ___ 7 + 6)"
+  },
+  "capacity_early": {
+   "closes": {
+    "G3|-|introducecapacityandvolume": "capacity and volume words (full, empty, half full) and comparing how much two containers hold or how much water is in them (holds more, holds less)"
+   },
+   "family": "measurement",
+   "kind": "new",
+   "lessons": [
+    "G3|-|introducecapacityandvolume"
+   ],
+   "name": "Full, Empty, Holds More",
+   "representation": "outline containers with a drawn fill line; circle full/empty or the one that holds more; option: order three",
+   "reused": true,
+   "skill": "comparing:compare_capacity",
+   "source": "WRM_PROPOSALS",
+   "steps": [
+    "R.B2.S3",
+    "R.B8.S3",
+    "R.B8.S4",
+    "Y1.B8.S4",
+    "Y1.B8.S5",
+    "Y2.B7.S5"
+   ],
+   "teaches": "capacity language (full, empty, half full, nearly full) and comparing how much two containers hold"
+  },
+  "measurable_attributes": {
+   "after": [],
+   "answer": "tick words from a picture-word bank",
+   "closes": {
+    "G3|-|introduceweightandmass": "describing weight as one of the measurable attributes of an object (how heavy, how long, how much it holds; K.MD.A.1)"
+   },
+   "ee": [
+    "M.EE.K.MD.1"
+   ],
+   "family": "measurement",
+   "grade": "K",
+   "kind": "new",
+   "ladder": "O2 two attributes (long, heavy) → four (tall, holds) · O3 icons beside each word → words only · O6 objects",
+   "lessons": [
+    "G3|-|introduceweightandmass"
+   ],
+   "misconceptions": [
+    "colour is something we measure",
+    "only length can be measured"
+   ],
+   "name": "What Can We Measure?",
+   "newTemplates": [
+    "picture-row"
+   ],
+   "problemTypes": [
+    "tick every word that you can measure for this object",
+    "which question can a ruler answer?",
+    "match the attribute to the tool",
+    "long or heavy? sort the questions"
+   ],
+   "reused": true,
+   "skill": "comparing:what_can_we_measure",
+   "source": "STANDARD_PROPOSALS",
+   "standards": [
+    "K.MD.A.1"
+   ],
+   "steps": [],
+   "teaches": "naming measurable attributes of one object (how long, how tall, how heavy, how much it holds) and telling measurable from not measurable (colour)",
+   "templates": [
+    "wordpic"
+   ],
+   "wrmSteps": [
+    "R.B2.S1",
+    "R.B8.S3"
+   ]
+  },
+  "balance": {
+   "closes": {
+    "G3|-|introduceweightandmass": "comparing two objects on a pan balance: the lower pan holds the heavier object, a level balance means the same mass"
+   },
+   "family": "measurement",
+   "kind": "new",
+   "lessons": [
+    "G3|-|introduceweightandmass"
+   ],
+   "name": "Balanced or Not?",
+   "representation": "a drawn pan balance tipped or level with objects in each pan; tick heavier, lighter or balanced",
+   "reused": true,
+   "skill": "measurement:balance_scales",
+   "source": "WRM_PROPOSALS",
+   "steps": [
+    "R.B8.S2"
+   ],
+   "teaches": "a balance scale shows heavier, lighter or equal (balanced) mass"
+  },
+  "frac_compare_same_part": {
+   "also": [
+    "fractions:order_fractions"
+   ],
+   "ccss": [
+    "3.NF.A.3d"
+   ],
+   "closes": {
+    "G3|-|orderfractions": "ordering unit fractions, or fractions with the same denominator, only"
+   },
+   "family": "fractions",
+   "kind": "option",
+   "lessons": [
+    "G3|-|orderfractions"
+   ],
+   "name": "Compare Fractions With the Same Numerator or Denominator (option)",
+   "option": "pairs \"same denominator\" | \"same numerator\" (3.NF.A.3d)",
+   "representation": "the existing compare cell with two bars of the same whole; the < > = answer box",
+   "reused": true,
+   "skill": "fractions:compare",
+   "source": "Y5.json (passed lane; same id, same spec)",
+   "steps": [],
+   "teaches": "comparing two fractions that share a denominator (3/8 < 5/8) or a numerator (3/4 > 3/8), with bars, and saying why",
+   "why": "generated fractions:compare {denoms:[2,3]} mixes unlike pairs (1/4 vs 7/10, 3/5 vs 1/2) with same-part pairs; Grade 3 compares same numerator or same denominator only"
+  },
+  "money_place_value": {
+   "ccss": [
+    "2.MD.C.8",
+    "4.NF.C.6"
+   ],
+   "closes": {
+    "G3|-|poundstensonesandpenceusdollarscents": "the place value of money: an amount to $99.99 read as tens and ones of dollars and dimes and pennies of cents ($24.53 = 2 tens, 4 ones, 5 dimes, 3 pennies)"
+   },
+   "family": "measurement",
+   "kind": "option",
+   "lessons": [
+    "G3|-|poundstensonesandpenceusdollarscents"
+   ],
+   "name": "Dollars and Cents in a Place-Value Chart (option)",
+   "option": "task \"place value\": an amount to $99.99 shown with $10 bills, $1 bills, dimes and pennies; the pupil fills a chart (tens, ones . dimes, pennies) and writes the amount with $ and the point ($24.53 = 2 tens, 4 ones, 5 dimes, 3 pennies)",
+   "representation": "one boxed cell: the bills and coins drawn in black line, a four-column chart (tens | ones . dimes | pennies) and one money slot \"$__.__\"",
+   "reused": false,
+   "skill": "measurement:money_notation",
+   "steps": [],
+   "teaches": "the place value of money: dollars as tens and ones, cents as dimes (tenths of a dollar) and pennies (hundredths), read from bills and coins, written in a chart and with $ and the point",
+   "why": "money_notation writes amounts under $10 from $5 / $1 bills and coins (never a $10 bill, never a tens digit of dollars) and no money item splits an amount into tens, ones, dimes and pennies; money_convert (Y4) converts cents to dollars and cents. Overlaps (critic r1 n5): VISUAL_BUILDS vis_coin_options plans a place-value chart of coins (£1 / 10p / 1p) and Y4's money_convert spec a place chart $ | ¢; neither has a tens column of dollars or bills to $99.99, so the tens-and-ones-of-dollars chart is still a separate option (the lead may fold the coin chart into it)"
+  },
+  "make_amount_notes": {
+   "ccss": [
+    "2.MD.C.8"
+   ],
+   "closes": {
+    "G3|-|selectmoney": "choosing bills and coins to make an amount in dollars and cents, any way that works ($35 = $20 + $10 + $5)"
+   },
+   "family": "measurement",
+   "kind": "option",
+   "kindText": "option on measurement:equiv_coin_sets",
+   "lessons": [
+    "G3|-|selectmoney"
+   ],
+   "name": "Make an Amount With Bills and Coins (option)",
+   "option": "task \"make\": choose bills and coins to make a given amount, any way (drawn bills $1/$5/$10/$20 and coins)",
+   "representation": "the amount in a box; a bank of drawn bills and coins to ring or tally; answer: tally boxes under each value",
+   "reused": true,
+   "skill": "measurement:equiv_coin_sets",
+   "source": "Y3.json (passed lane; same id, same spec)",
+   "steps": [],
+   "teaches": "choosing bills and coins to make an amount ($35 = $20 + $10 + $5) and finding more than one way",
+   "why": "make_change_least_coins uses coins only and asks for the fewest coins; no skill deals bills to make an amount"
+  },
+  "share_group": {
+   "closes": {
+    "G3|-|sharingandgroupingfairshares": "sharing a small amount equally between 2, 3 or 4 (one for you, one for me), and telling a fair share from an unfair one (odd amounts that do not share)"
+   },
+   "family": "operations",
+   "kind": "new",
+   "lessons": [
+    "G3|-|sharingandgroupingfairshares"
+   ],
+   "name": "Share and Make Groups",
+   "representation": "counters drawn next to plates or rings; draw them shared or grouped; write how many each / how many groups; option: fair or not fair",
+   "reused": true,
+   "skill": "division:share_and_group_early",
+   "source": "WRM_PROPOSALS",
+   "steps": [
+    "R.B9.S6",
+    "R.B9.S8",
+    "R.B11.S10",
+    "R.B11.S12",
+    "R.B11.S13",
+    "R.B14.S2",
+    "R.B14.S4",
+    "R.B16.S1",
+    "R.B16.S2",
+    "R.B16.S3",
+    "R.B16.S5",
+    "Y1.B9.S9",
+    "Y2.B5.S8"
+   ],
+   "teaches": "sharing a small amount equally (one for you, one for me) and grouping into equal groups within 10, including odd amounts that do not share fairly"
   }
  },
  "tagFixes": [
@@ -11600,5 +12200,1750 @@
    "why": "its step [0] counts in 2s, 5s and 10s, but from any number and past 100: a partial cover of Y2.B1.S15 (critic Y4 r12)",
    "partial": "counts on in 2s, 5s and 10s from any number (381, 386 ...), not the multiples from 0; answers pass 100 even at Max Number 100 (to 190)"
   }
- ]
+ ],
+ "lessons": {
+  "G3|-|findtheruleinaninputoutputtable": {
+   "title": "Find the rule in an input-output table",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W05",
+    "ccss": [
+     "3.OA.D.9"
+    ],
+    "ee": [
+     "M.EE.3.OA.8"
+    ],
+    "domain": "OA",
+    "unit": "Awsaj supplement lessons (domain tests)",
+    "block": null,
+    "power": false
+   },
+   "direct": [
+    {
+     "key": "algebra:function_table_easy",
+     "opts": {
+      "ftTask": "rule",
+      "ftRules": [
+       "+",
+       "-"
+      ],
+      "band": 100
+     }
+    },
+    {
+     "key": "algebra:function_table_easy",
+     "opts": {
+      "ftTask": "rule",
+      "ftRules": [
+       "x",
+       "/"
+      ],
+      "band": 20
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "constant": [
+       6
+      ]
+     },
+     "why": "Y4.B4.S3 6 times-table and division facts (taught earlier this year, wk W02): the 6 times-table facts: a × rule is a times-table"
+    },
+    {
+     "key": "division:div_facts",
+     "opts": {
+      "constant": [
+       9
+      ]
+     },
+     "why": "Y4.B4.S4 Multiply and divide by 9 (taught earlier this year, wk W02): dividing by 9: a ÷ rule undoes a times-table"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "opts": {
+      "constant": [
+       3
+      ]
+     },
+     "why": "Y4.B4.S1 Multiples of 3 (taught earlier this year, wk W01): counting in 3s: the Out numbers of a × 3 rule"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "patterns:number_patterns_rule",
+     "opts": {
+      "pattern": "add",
+      "places": 1
+     },
+     "why": "a rule continued along a sequence (count on by the same number each time)"
+    }
+   ],
+   "note": "Domain-test build lesson (site: \"New CCSS BUILD lesson so the domain test only asks what has been taught\"), W05-W07, 3.OA.D.9. function_table_easy {ftTask: rule} shows an In / Out table with every row filled and the pupil writes the rule: the + and − rules with numbers to 100 (+ 23, − 10), the × and ÷ rules (× 2 to × 5, ÷ 2 to ÷ 5) with every number to 20, so every row is a table fact (× 4: 2 → 8; ÷ 4: 12 → 3); at band 100 the × and ÷ rows leave the tables (× 6: 15 → 90; ÷ 3: 87 → 29, a division taught in W06), so the two kinds of rule are two links. The two-step rules (× then +) are left out at W05. Explaining a pattern with the properties of operations (the other half of 3.OA.D.9) is the same week's \"Patterns on the multiplication table\" lesson (partial, patterns_notice)."
+  },
+  "G3|-|patternsonthemultiplicationtable": {
+   "title": "Patterns on the multiplication table",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W05",
+    "ccss": [
+     "3.OA.C.7",
+     "3.OA.D.9"
+    ],
+    "ee": [
+     "M.EE.3.OA.6",
+     "M.EE.3.OA.8"
+    ],
+    "domain": "OA",
+    "unit": "Multiplication and Division A",
+    "block": "Y4.B4",
+    "power": true
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "multiplication:mult_chart",
+     "opts": {
+      "task": "pattern"
+     },
+     "missing": "fills two blanks in one row of a window of the chart and writes the row's rule (across the 7 row, add 7 each time); never asks why a pattern holds"
+    },
+    {
+     "key": "multiplication:mult_chart",
+     "opts": {
+      "task": "even"
+     },
+     "missing": "shades every even product in a window of the chart; never asks which factors make an even product or why"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "explaining the patterns of the multiplication table with the properties of multiplication: the table is the same on both sides of its diagonal (3 × 7 = 7 × 3), an even factor makes an even product (4 × a number is always even: it is double 2 × that number), the 9s go up one ten and down one one",
+   "build": [
+    "patterns_notice"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:count_by_tables",
+     "opts": {
+      "constant": [
+       3
+      ]
+     },
+     "why": "Y4.B4.S1 Multiples of 3 (taught earlier this year, wk W01): counting in 3s: one row of the table"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "constant": [
+       9
+      ]
+     },
+     "why": "Y4.B4.S5 9 times-table and division facts (taught earlier this year, wk W02): the 9 times-table facts"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "constant": [
+       7
+      ]
+     },
+     "why": "Y4.B4.S8 7 times-table and division facts (taught earlier this year, wk W03): the 7 times-table facts"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:mult_chart_easy",
+     "why": "filling the missing products of the chart: the table the patterns are found in"
+    }
+   ],
+   "note": "Awsaj supplement lesson, W05-W06, 3.OA.C.7 and 3.OA.D.9, block Y4.B4. Y4.B4.S6 \"The 3, 6 and 9 times-tables\" (W02) uses the lesson's own mult_chart key, so it is not listed as a pre (one key, one role). mult_chart finds a pattern but never explains it, which is the core of 3.OA.D.9 (\"observe that 4 times a number is always even, and explain why\").",
+   "rule5": "Searched skill-options.js and the generators for an item that explains a multiplication-table pattern: mult_chart tasks fill / headers / shade / pattern / even (none asks why), mult_chart_easy (the same tasks), mult_properties forms 0-3 (one property at a time, never read off the table), count_by_tables, number_patterns_rule (sequences, not the table). None explains a pattern; patterns_notice (STANDARD_PROPOSALS) is the build.",
+   "envision": [
+    {
+     "proposal": "patterns_notice",
+     "name": "What Do You Notice?",
+     "kind": "new skill patterns:notice_patterns",
+     "teaches": "identifying arithmetic patterns in the addition and multiplication tables and in rule sequences, and explaining them with properties (4 × a number is always even",
+     "closes": "explaining the patterns of the multiplication table with the properties of multiplication: the table is the same on both sides of its diagonal (3 × 7 = 7 × 3), an even factor makes an even product (4 × a number is always even: it is double 2 × that number), the 9s go up one ten and down one one",
+     "representation": "one boxed cell: a window of the multiplication table with a pattern shaded, the question \"What do you notice? Why?\" and a sentence frame with a property …"
+    }
+   ]
+  },
+  "G3|-|propertiesofmultiplicationcommutativeidentityanddistributive": {
+   "title": "Properties of multiplication: commutative, identity and distributive",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W05",
+    "ccss": [
+     "3.OA.B.5"
+    ],
+    "ee": [],
+    "domain": "OA",
+    "unit": "Awsaj supplement lessons (domain tests)",
+    "block": null,
+    "power": false
+   },
+   "direct": [
+    {
+     "key": "multiplication:mult_properties",
+     "opts": {
+      "forms": [
+       0,
+       1,
+       2
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "constant": [
+       0,
+       1
+      ]
+     },
+     "why": "Y4.B4.S11 Multiply by 1 and 0 (taught earlier this year, wk W03): multiplying by 1 and by 0: the identity facts"
+    },
+    {
+     "key": "multiplication:arrays_groups",
+     "opts": {
+      "forms": [
+       0
+      ]
+     },
+     "why": "Y3.B3.S2 Use arrays (Grade 2, lower grade): an array of rows of dots read as a multiplication"
+    },
+    {
+     "key": "division:div_facts",
+     "opts": {
+      "constant": [
+       1
+      ]
+     },
+     "why": "Y4.B4.S12 Divide a number by 1 and itself (taught earlier this year, wk W04): dividing by 1: the number is unchanged"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:dot_array_mult",
+     "opts": {
+      "band": 25
+     },
+     "why": "a dot array read as rows times columns, one array at a time (products to 25): the array the lesson then turns"
+    }
+   ],
+   "note": "Domain-test build lesson, W05-W06, 3.OA.B.5. mult_properties {forms: 0, 1, 2} deals the three properties the title names: forms 0 an array and its turn, two facts with one product (3 × 4 = 4 × 3, commutative); forms 1 breaking a fact apart by its rows (5 × 9 = 1 × 9 + 4 × 9, distributive); forms 2 times 1 (1 × 11 = 11, identity). Forms 3 (times 0) is left out: the title does not name it. The associative property of 3.OA.B.5 is not in the title; Y4.B4.S13 \"Multiply three numbers\" (W04, a gap, mult_three) is the step that teaches it."
+  },
+  "G3|-|twostepwordproblemswiththefouroperations": {
+   "title": "Two-step word problems with the four operations",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W06",
+    "ccss": [
+     "3.OA.D.8"
+    ],
+    "ee": [
+     "M.EE.3.OA.7"
+    ],
+    "domain": "OA",
+    "unit": "Awsaj supplement lessons",
+    "block": "Y4.B4",
+    "power": false
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "algebra:multi_step_word",
+     "missing": "two-step stories that only add and subtract (add twice, add then take away, take away then add, take away twice), with numbers to 150 (most below 110); never a × or ÷ step and never a letter for the unknown"
+    },
+    {
+     "key": "number_ops_mixed:word_problems_mixed",
+     "maxNumber": 100,
+     "missing": "one-step stories with +, −, × or ÷ (5 plates of 8 beads; 10 stamps, 2 in each jar; how many more), the factors and divisors within the tables at Max Number 100, and \"times as many\" comparisons in about 1 in 5 (Noor has 90 crayons, 9 times as many as Omar: 4.OA.A.2, Grade 4 content); never a second step"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "two-step stories that mix × or ÷ with + or − (3 boxes of 8 pens and 5 more pens), written as an equation with a letter for the unknown and checked by estimating",
+   "build": [
+    "multi_step_four_ops"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "constant": [
+       7
+      ]
+     },
+     "why": "Y4.B4.S8 7 times-table and division facts (taught earlier this year, wk W03): the 7 times-table facts used in a × step"
+    },
+    {
+     "key": "division:div_word_problems",
+     "opts": {
+      "range": 100
+     },
+     "why": "Y3.B3.S5 Sharing and grouping (Grade 2, lower grade): sharing and grouping stories: a one-step ÷ story, dividing by 2 to 8"
+    },
+    {
+     "key": "addition:add_wp_100",
+     "opts": {
+      "band": 100
+     },
+     "why": "Y2.B2.S19 Mixed addition and subtraction (Grade 1, lower grade): a one-step addition story to 100"
+    },
+    {
+     "key": "subtraction:sub_wp_100",
+     "opts": {
+      "band": 100
+     },
+     "why": "Y2.B2.S19 Mixed addition and subtraction (Grade 1, lower grade): a one-step subtraction story to 100"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "algebra:tape_diagram",
+     "why": "a bar model of a one-step story: one of the two bars of a two-step story"
+    }
+   ],
+   "note": "Awsaj supplement lesson, W06-W07, 3.OA.D.8, block Y4.B4.",
+   "rule5": "Searched for a two-step story with a × or ÷ step: algebra:multi_step_word forms 0-3 (+ and − only, wpBar draws a bar but keeps + and −), algebra:multi_step_word_plain (the same), number_ops_mixed:word_problems_mixed (four operations, one step), algebra:algebra_word_mixed (one equation), multiplication:mult_word_problems forms 0-2 (one step), measurement:money (one step). None has two steps with × or ÷; multi_step_four_ops (STANDARD_PROPOSALS) is the build.",
+   "envision": [
+    {
+     "proposal": "multi_step_four_ops",
+     "name": "Two-Step Problems With All Four Operations (option)",
+     "kind": "option on algebra:multi_step_word",
+     "teaches": "two-step and multistep word problems with the four operations, represented by an equation with a letter, remainders interpreted, and checked by estimating",
+     "closes": "two-step stories that mix × or ÷ with + or − (3 boxes of 8 pens and 5 more pens), written as an equation with a letter for the unknown and checked by estimating",
+     "representation": "the existing word-work cell with two steps: the story, two operation choices (+ − × ÷), a letter equation slot and the answer"
+    }
+   ]
+  },
+  "G3|-|partitionshapesintoequalareas": {
+   "title": "Partition shapes into equal areas",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W07",
+    "ccss": [
+     "3.G.A.2"
+    ],
+    "ee": [
+     "M.EE.3.G.2"
+    ],
+    "domain": "MD",
+    "unit": "Awsaj supplement lessons",
+    "block": "Y4.B7",
+    "power": true
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "shapes_early:partition_shapes",
+     "missing": "counts the equal parts of a shape already cut into halves, thirds or fourths, or picks the fraction shaded (1/4, 2/4, 2/3); never cuts a shape itself and never sixths or eighths"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "partitioning a shape into 2, 3, 4, 6 or 8 parts with equal areas (the pupil draws the cuts; sixths and eighths among them) and naming the area of each part as a unit fraction of the whole (each part is 1/6 of the area)",
+   "build": [
+    "partition_draw"
+   ],
+   "pre": [
+    {
+     "key": "fractions:identify",
+     "opts": {
+      "forms": [
+       1
+      ]
+     },
+     "why": "Y3.B6.S1 Understand the denominators of unit fractions (Grade 2, lower grade): picking the model, cut into equal parts, that shows a fraction"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (Grade 2, lower grade): shading a fraction of a shape cut into equal parts"
+    },
+    {
+     "key": "composing:compose_whole",
+     "why": "Y3.B6.S4 Understand the whole (Grade 2, lower grade): making 1 whole from smaller pieces"
+    }
+   ],
+   "preBuild": [],
+   "related": [],
+   "note": "Awsaj supplement lesson, W07, 3.G.A.2, block Y4.B7. No related: composing:whole_as_fraction (the round-1 related) writes wholes to 10 as fractions, past this lesson's own numbers (parts 2 to 4; lessons critic r1 G1), and the other fraction skills read or shade a cut shape, which the pre already do.",
+   "rule5": "Searched for an item that cuts a shape into equal areas: shapes_early:partition_shapes forms 0 / 1 and parts 0-2 (halves, thirds, fourths; the shape is cut already), fractions:identify / shade_fraction / write_fraction (a cut shape is read or shaded), composing:compose_whole, whole_as_fraction, half_or_not (Y2, \"is it a half?\"). None asks the pupil to cut, none deals sixths or eighths as equal areas; partition_draw (STANDARD_PROPOSALS) is the build.",
+   "envision": [
+    {
+     "proposal": "partition_draw",
+     "name": "Cut Into Equal Areas (option)",
+     "kind": "option on shapes_early:partition_shapes",
+     "teaches": "partitioning shapes into parts with equal areas and naming each part as a unit fraction of the whole",
+     "closes": "partitioning a shape into 2, 3, 4, 6 or 8 parts with equal areas (the pupil draws the cuts; sixths and eighths among them) and naming the area of each part as a unit fraction of the whole (each part is 1/6 of the area)",
+     "representation": "one boxed cell: a shape outline with dots on its sides"
+    }
+   ]
+  },
+  "G3|-|solveadditionandsubtractionwordproblemswithin1000usingbarmodels": {
+   "title": "Solve addition and subtraction word problems within 1,000 using bar models",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W17",
+    "ccss": [
+     "3.NBT.A.2",
+     "3.OA.D.8"
+    ],
+    "ee": [
+     "M.EE.3.NBT.2",
+     "M.EE.3.OA.7"
+    ],
+    "domain": "NBT",
+    "unit": "Awsaj supplement lessons (domain tests)",
+    "block": null,
+    "power": false
+   },
+   "direct": [
+    {
+     "key": "addition:add_wp_1k",
+     "opts": {
+      "band": 1000,
+      "support": "bar"
+     }
+    },
+    {
+     "key": "subtraction:sub_wp_1k",
+     "opts": {
+      "band": 1000,
+      "support": "bar"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "addition:add_1k_regroup",
+     "why": "Y3.B2.S14 Add two numbers (across a 100) (Grade 2, lower grade): adding two 3-digit numbers with an exchange"
+    },
+    {
+     "key": "subtraction:sub_1k_regroup",
+     "why": "Y3.B2.S16 Subtract two numbers (across a 100) (Grade 2, lower grade): subtracting two 3-digit numbers with an exchange"
+    },
+    {
+     "key": "number_sense:nearest_100",
+     "why": "Y4.B1.S15 Round to the nearest 100 (taught earlier this year, wk W13): rounding a number to the nearest 100: the estimate that checks an answer"
+    },
+    {
+     "key": "addition:add_wp_100",
+     "opts": {
+      "band": 100
+     },
+     "why": "Y2.B2.S19 Mixed addition and subtraction (Grade 1, lower grade): a one-step addition story to 100"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "addition:comparison_word",
+     "why": "how many more or how many fewer stories to 20: the compare story, which these items do not tell"
+    }
+   ],
+   "note": "Domain-test build lesson, W17, 3.NBT.A.2 and 3.OA.D.8. add_wp_1k and sub_wp_1k {band 1000, support: bar} tell a one-step story within 1,000 (join, put together; take away) and draw the bar model under it (payload bar: true on every item); the pupil writes the operation and the answer. The two-step stories of 3.OA.D.8 are the W06 lesson \"Two-step word problems with the four operations\"."
+  },
+  "G3|-|areaasmultiplication": {
+   "title": "Area as multiplication",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W20",
+    "ccss": [
+     "3.MD.C.7",
+     "3.MD.C.7a",
+     "3.MD.C.7b"
+    ],
+    "ee": [],
+    "domain": "MD",
+    "unit": "Awsaj supplement lessons",
+    "block": "Y4.B3",
+    "power": false
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "area_perimeter:area_unit_squares",
+     "opts": {
+      "forms": [
+       0
+      ]
+     },
+     "missing": "counts the unit squares that cover a shape drawn on a grid (areas 4 to 48) under the printed hint \"Multiply the sides\"; never writes the rows × the columns beside the count"
+    },
+    {
+     "key": "area_perimeter:area",
+     "opts": {
+      "forms": [
+       2
+      ]
+     },
+     "maxNumber": 100,
+     "missing": "a story of a rectangular kitchen floor, room, patio, wall or garden bed in feet whose area is the side lengths multiplied (8 ft by 5 ft: 40 square feet); no picture, never a drawn grid"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "showing on the tiled rectangle that the count of unit squares equals the side lengths multiplied (rows × columns = the area)",
+   "build": [
+    "area_tile_multiply"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:arrays_groups",
+     "opts": {
+      "forms": [
+       0
+      ]
+     },
+     "why": "Y3.B3.S2 Use arrays (Grade 2, lower grade): an array of rows of dots read as a multiplication"
+    },
+    {
+     "key": "area_perimeter:perimeter_grid",
+     "opts": {
+      "forms": [
+       0,
+       1
+      ]
+     },
+     "why": "Y4.B6.S3 Perimeter on a grid (taught earlier this year, wk W19): the side lengths of a shape on a grid"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "constant": [
+       7
+      ]
+     },
+     "why": "Y4.B4.S7 Multiply and divide by 7 (taught earlier this year, wk W02): the 7 times-table facts: side lengths multiplied"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "area_perimeter:area_distributive_visual",
+     "opts": {
+      "band": 30
+     },
+     "why": "a rectangle split into two parts and their areas added: the same week's next lesson"
+    }
+   ],
+   "note": "Awsaj supplement lesson, W20, 3.MD.C.7, 7a, 7b, block Y4.B3. area forms 0 is not linked: it mixes triangles (base × height ÷ 2), which is Grade 6. Forms 2 deals 3.MD.C.7b (multiply side lengths in a real-world story); 7a (tiling shown equal to multiplying) is missing.",
+   "rule5": "Searched for an item that tiles a rectangle and writes rows × columns: area_perimeter:area_unit_squares forms 0 / 1 (count only, a printed hint), area forms 0-2 (forms 0 multiplies side lengths, with triangles; forms 1 a missing side; forms 2 a story), area_perimeter:area_perimeter, shapes_early:compose_rect_from_squares, multiplication:dot_array_mult / arrays_groups (arrays of dots, not area). None shows the tiled count equal to the product; area_tile_multiply (STANDARD_PROPOSALS) is the build.",
+   "envision": [
+    {
+     "proposal": "area_tile_multiply",
+     "name": "Area by Tiling and Multiplying (option)",
+     "kind": "option on area_perimeter:area_unit_squares",
+     "teaches": "area measured in square units of a named size, and that the tiled count equals side × side",
+     "closes": "showing on the tiled rectangle that the count of unit squares equals the side lengths multiplied (rows × columns = the area)",
+     "representation": "one boxed cell: a rectangle on a black-line unit grid"
+    }
+   ]
+  },
+  "G3|-|distributiveandadditivearea": {
+   "title": "Distributive and additive area",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W20",
+    "ccss": [
+     "3.MD.C.7",
+     "3.MD.C.7c",
+     "3.MD.C.7d"
+    ],
+    "ee": [],
+    "domain": "MD",
+    "unit": "Awsaj supplement lessons",
+    "block": "Y4.B3",
+    "power": false
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "area_perimeter:area_distributive_visual",
+     "opts": {
+      "band": 30
+     },
+     "missing": "a rectangle split into two parts with its side lengths labelled; the pupil adds the two areas (3 × 4 + 3 × 2 = 18); never on unit squares and never written as 3 × (4 + 2)"
+    },
+    {
+     "key": "area_perimeter:area_polygon_decompose",
+     "opts": {
+      "band": 25
+     },
+     "missing": "the area of an L-, T- or U-shape split into rectangles and added; never a story"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "the split rectangle tiled in unit squares to show a × (b + c) = a × b + a × c, and the area of a rectilinear floor plan in a story",
+   "build": [
+    "area_split_tiles"
+   ],
+   "pre": [
+    {
+     "key": "area_perimeter:area_unit_squares",
+     "opts": {
+      "forms": [
+       1
+      ]
+     },
+     "why": "Y4.B3.S2 Count squares (taught earlier this year, wk W18): counting the unit squares of an L-shape"
+    },
+    {
+     "key": "multiplication:mult_properties",
+     "opts": {
+      "forms": [
+       1
+      ]
+     },
+     "why": "Y4.B5.S2 Use factor pairs (taught earlier this year, wk W05): breaking a fact apart by its rows (5 × 8 = 4 × 8 + 1 × 8)"
+    },
+    {
+     "key": "multiplication:area_model_mult",
+     "opts": {
+      "tiles": 21
+     },
+     "why": "Y4.B5.S9 Multiply a 2-digit number by a 1-digit number (taught earlier this year, wk W17): a number split into tens and ones, each part multiplied and the parts added"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "area_perimeter:composite_shapes",
+     "opts": {
+      "forms": [
+       1
+      ],
+      "band": 25
+     },
+     "why": "the perimeter and the area of a small L- or T-shape (areas 14 to 24); not every side is labelled (2 of the L's 6 sides, 4 of the T's 8 sides), so the missing lengths are worked out from the labelled ones first; the T's two undersides together are its top width take away its stem width (one underside alone can be a half, such as 2.5)"
+    }
+   ],
+   "note": "Awsaj supplement lesson, W20-W21, 3.MD.C.7, 7c, 7d, block Y4.B3. The story forms of other skills are not this clause: area_perimeter:area forms 2 tells a story of ONE rectangle (linked in the area-as-multiplication lesson), area_perimeter:perimeter forms 2 a perimeter story and area_perimeter:volume forms 2 a box (3-D); none is a rectilinear floor plan.",
+   "rule5": "Searched for a split rectangle on unit squares written as a × (b + c), and for a rectilinear area story: area_distributive_visual (band 30 / 50, labelled sides only), area_polygon_decompose shapes 0-2 (L, U, T, no story), composite_shapes forms 0 / 1 (perimeter, perimeter and area, no story), area forms 2 (stories of one rectangle), mult_properties forms 1 (breaking apart, no area). None does either; area_tile_multiply (STANDARD_PROPOSALS) tiles one rectangle only, so area_split_tiles is new.",
+   "envision": [
+    {
+     "proposal": "area_split_tiles",
+     "name": "Split Rectangles on Unit Squares, and Floor Plans (option)",
+     "kind": "option on area_perimeter:area_distributive_visual",
+     "teaches": "showing with unit squares that a rectangle a by (b + c) has the area a × b + a × c (the distributive property), and finding the area of a rectilinear floor plan in a story by adding the areas of its rectangles",
+     "closes": "the split rectangle tiled in unit squares to show a × (b + c) = a × b + a × c, and the area of a rectilinear floor plan in a story",
+     "representation": "one boxed cell: the rectangle on a black-line unit grid with the split line heavy, the two part areas and the total as answer slots and the equation a × (b …"
+    }
+   ]
+  },
+  "G3|-|measureandestimatemassandliquidvolumegkgmll": {
+   "title": "Measure and estimate mass and liquid volume (g, kg, ml, l)",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W22",
+    "ccss": [
+     "3.MD.A.2"
+    ],
+    "ee": [
+     "M.EE.3.MD.2"
+    ],
+    "domain": "MD",
+    "unit": "Awsaj supplement lessons",
+    "block": "Y4.B6",
+    "power": false
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:mass_volume_liquid",
+     "opts": {
+      "forms": [
+       0
+      ]
+     },
+     "missing": "reads the millilitres of water in a drawn graduated cylinder (scales to 100, 200, 500 or 1,000 mL); never litres, never estimates"
+    },
+    {
+     "key": "measurement:mass_volume_liquid",
+     "opts": {
+      "forms": [
+       1
+      ]
+     },
+     "missing": "reads a dial scale in grams (to 2,000 g) or in kilograms (to 10 kg); never estimates"
+    },
+    {
+     "key": "measurement:mass_volume_liquid",
+     "opts": {
+      "forms": [
+       2
+      ]
+     },
+     "missing": "sorts objects by the unit they are measured in (g, kg, mL or L), or clicks every object best measured in grams rather than kilograms; never an amount to read or write"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "reading litres on a scale, estimating a mass or a liquid volume against a benchmark, and one-step stories that add, subtract, multiply or divide masses or volumes in the same unit",
+   "build": [
+    "mass_scales",
+    "estimate_mass_volume",
+    "mass_ops"
+   ],
+   "pre": [
+    {
+     "key": "number_sense:estimate_sums_diffs",
+     "opts": {
+      "place": 100
+     },
+     "why": "Y4.B2.S9 Estimate answers (taught earlier this year, wk W16): estimating a sum or a difference"
+    },
+    {
+     "key": "addition:add_wp_100",
+     "opts": {
+      "band": 100
+     },
+     "why": "Y2.B2.S19 Mixed addition and subtraction (Grade 1, lower grade): a one-step addition story to 100"
+    },
+    {
+     "key": "division:div_facts",
+     "opts": {
+      "constant": [
+       6
+      ]
+     },
+     "why": "Y4.B4.S2 Multiply and divide by 6 (taught earlier this year, wk W01): dividing by 6"
+    }
+   ],
+   "preBuild": [],
+   "related": [],
+   "note": "Awsaj supplement lesson, W22-W23, 3.MD.A.2, block Y4.B6. Grade 2 met grams, kilograms, millilitres and litres in Y3.B7, whose steps use this lesson's own mass_volume_liquid key (so they are not listed as pre). No related: the other measure skills (measurement:capacity, unit_conversions, unit_conversion_word) change units with decimals (taught W29) or numbers past 1,000.",
+   "rule5": "Searched for grams / litres scales, estimates and mass or volume stories: mass_volume_liquid forms 0-2 (mL cylinder, kg scale, sort by unit), measurement:capacity units 0 / 1 forms 0 / 1 (convert, click containers above 1 L), measurement:unit_conversions and unit_conversion_word (change units), measurement:estimate_length (estimates length only), heavier_lighter_visual (no units), Y5's proposal capacity_estimate (estimates capacity only: the volume half of estimate_mass_volume, an overlap the lead reconciles). None reads grams or litres on a scale, estimates a mass or volume, or tells a same-unit story; mass_scales and mass_ops (WRM_PROPOSALS) and the new estimate_mass_volume.",
+   "envision": [
+    {
+     "proposal": "mass_scales",
+     "name": "Read Scales (g, kg, ml, l)",
+     "kind": "new skill measurement:read_scales",
+     "teaches": "reading mass and capacity scales in grams, kilograms, millilitres and litres with scale steps of 1, 2, 5, 10, 100",
+     "closes": "reading litres on a jug scale, and scales stepped in 1s, 2s, 5s or 10s (the skill reads millilitres, grams and kilograms on 100- or 200-step scales)",
+     "representation": "a drawn dial or jug scale"
+    },
+    {
+     "proposal": "estimate_mass_volume",
+     "name": "Estimate a Mass or a Liquid Volume (option)",
+     "kind": "option on measurement:mass_volume_liquid",
+     "teaches": "estimating the mass of an object in grams or kilograms and the liquid volume of a container in litres or millilitres against a known benchmark, before measuring",
+     "closes": "estimating a mass in grams or kilograms and a liquid volume in litres against a benchmark",
+     "representation": "one boxed cell: the object drawn in black line beside its benchmark, three estimates in a bank below and one answer slot"
+    },
+    {
+     "proposal": "mass_ops",
+     "name": "Mass and Capacity Word Problems",
+     "kind": "new skill measurement:mass_capacity_word_problems",
+     "teaches": "adding, subtracting, multiplying and dividing masses and capacities in context",
+     "closes": "one-step stories that add, subtract, multiply or divide masses or liquid volumes in the same unit (3.MD.A.2)",
+     "representation": "picture of scales/jugs with values"
+    }
+   ]
+  },
+  "G3|-|measuretothehalfandquarterinch": {
+   "title": "Measure to the half and quarter inch",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W27",
+    "ccss": [
+     "3.MD.B.4"
+    ],
+    "ee": [
+     "M.EE.3.MD.4"
+    ],
+    "domain": "MD",
+    "unit": "Awsaj supplement lessons",
+    "block": "Y4.B13",
+    "power": true
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:reading_ruler",
+     "opts": {
+      "parts": [
+       1,
+       2
+      ]
+     },
+     "missing": "reads where an arrow points on a 6-inch ruler marked in halves or quarters (3 1/4, 4 1/2); never lays an object on the ruler"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "measuring a drawn object with the inch ruler to the nearest half or quarter inch",
+   "build": [
+    "ruler_object_inch"
+   ],
+   "pre": [
+    {
+     "key": "composing:fraction_number_line",
+     "why": "Y3.B6.S7 Fractions on a number line (Grade 2, lower grade): reading and placing a fraction on a number line (1/2, 3/8, 5/2)"
+    },
+    {
+     "key": "fractions:mixed_nl_drag",
+     "why": "Y4.B7.S4 Number lines with mixed numbers (taught earlier this year, wk W08): placing fractions and mixed numbers on a number line of three wholes"
+    },
+    {
+     "key": "fractions:identify",
+     "opts": {
+      "forms": [
+       1
+      ],
+      "denoms": [
+       2
+      ]
+     },
+     "why": "Y2.B8.S10 Unit fractions (Grade 1, lower grade): picking the model that shows a fraction, most in halves, quarters or eighths (about 1 in 14 in thirds, fifths or sixths); some of the other models are in thirds, fifths or sixths"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "graphs:line_plot_fractions",
+     "opts": {
+      "tiles": 6
+     },
+     "why": "measurements shown on a line plot: the next lesson"
+    }
+   ],
+   "note": "Awsaj supplement lesson, W27-W28, 3.MD.B.4, block Y4.B13. The ruler cell is in inches (the US customary unit 3.MD.B.4 names).",
+   "rule5": "Searched for an item that measures an object in inches: reading_ruler parts 0-2 and labels (an arrow on the ruler), reading_ruler_hard (the same), measurement:estimate_length (estimates, sorts by unit), length_customary (conversions), make_line_plot (STANDARD, a build: measuring for a line plot), ruler_difference (STANDARD, how much longer, a build). None lays an object on the ruler; ruler_object_inch is new.",
+   "envision": [
+    {
+     "proposal": "ruler_object_inch",
+     "name": "Measure an Object to the Nearest Half or Quarter Inch (option)",
+     "kind": "option on measurement:reading_ruler",
+     "teaches": "measuring a drawn object with an inch ruler marked in halves and fourths: lining up its end, reading where the other end falls, and writing the length to the nearest half or quarter inch",
+     "closes": "measuring a drawn object with the inch ruler to the nearest half or quarter inch",
+     "representation": "one boxed cell: the ruler in black line with the object drawn on it, the answer slot \"__ in\""
+    }
+   ]
+  },
+  "G3|-|buildalineplotfrominchmeasurements": {
+   "title": "Build a line plot from inch measurements",
+   "site": {
+    "flag": "committee",
+    "supplement": true,
+    "firstWeek": "W28",
+    "ccss": [
+     "3.MD.B.4"
+    ],
+    "ee": [
+     "M.EE.3.MD.4"
+    ],
+    "domain": "MD",
+    "unit": "Awsaj supplement lessons",
+    "block": "Y4.B13",
+    "power": true
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "graphs:line_plot_fractions",
+     "missing": "reads a drawn line plot of measurements in halves, quarters or eighths, many of the plots in halves only (how many at a mark, the most common, how many in all); never makes the plot"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "making a line plot from inch measurements: marking a scale in halves or quarters and drawing an x for each measurement",
+   "build": [
+    "make_line_plot"
+   ],
+   "pre": [
+    {
+     "key": "measurement:reading_ruler",
+     "opts": {
+      "parts": [
+       1,
+       2
+      ]
+     },
+     "why": "G3|-|measuretothehalfandquarterinch Measure to the half and quarter inch (site lesson taught earlier this year, wk W27): reading an inch ruler marked in halves and quarters"
+    },
+    {
+     "key": "graphs:tally_chart",
+     "why": "Y4.B13.S1 Interpret charts (taught earlier this year, wk W25): reading data from a tally chart"
+    },
+    {
+     "key": "fractions:mixed_nl_drag",
+     "why": "Y4.B7.S4 Number lines with mixed numbers (taught earlier this year, wk W08): placing fractions and mixed numbers on a number line: the scale of the plot"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "graphs:bar_graph",
+     "opts": {
+      "forms": [
+       0,
+       1
+      ],
+      "most": 10
+     },
+     "why": "another way to show counted data"
+    }
+   ],
+   "note": "Awsaj supplement lesson, W28, 3.MD.B.4, block Y4.B13.",
+   "rule5": "Searched for an item that builds a line plot: graphs:line_plot forms 0 / 1 (reads, eighths), line_plot_g2 forms 0-2 (reads whole-number sizes), line_plot_fractions forms 0-2 (reads), build_bar_graph and build_pictograph (other graphs). None builds a line plot; make_line_plot (STANDARD_PROPOSALS) is the build.",
+   "envision": [
+    {
+     "proposal": "make_line_plot",
+     "name": "Make a Line Plot",
+     "kind": "new skill graphs:make_a_line_plot",
+     "teaches": "measuring objects (ruler pictures) or reading a data list, then making a line plot (dot plot) on a scale of whole numbers, halves, quarters or eighths, and solving problems from it",
+     "closes": "making a line plot from inch measurements: marking a scale in halves or quarters and drawing an x for each measurement",
+     "representation": "one boxed cell: a list of 6 to 10 measurements (or ruler pictures) and a number line marked in halves or quarters to draw an x above each measurement"
+    }
+   ]
+  },
+  "G3|-|compareamountsmorefewersame": {
+   "title": "Compare amounts (more, fewer, same)",
+   "site": {
+    "flag": "enrich-native",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [],
+    "ee": [],
+    "domain": "MD",
+    "unit": null,
+    "block": null,
+    "power": false
+   },
+   "direct": [
+    {
+     "key": "comparing:compare_groups",
+     "opts": {
+      "band": 5,
+      "level": [
+       1
+      ]
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "comparing:classify_count",
+     "opts": {
+      "band": 3,
+      "tiles": 2,
+      "objects": "pictures"
+     },
+     "why": "R.B1.S4 Sort objects to a type (Pre-K, the source grade): picking out every object of one kind among others and counting them"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "counting:count_objects",
+     "opts": {
+      "band": 5
+     },
+     "why": "counting a group of objects to 5"
+    }
+   ],
+   "note": "Support lesson (source Pre-K, \"Prerequisite ladder\"), judged at Reception. compare_groups {band 5, level 1} shows two pictured groups of 1 to 5 counters and asks which has more, which has fewer, or whether they are the same: the content of R.B1.S7 \"Compare amounts\", the first block of Reception. Pre-skills are few: only R.B1 comes before it, and its matching and sorting steps are the building blocks; R.B1.S7 itself uses the lesson's own key."
+  },
+  "G3|-|comparedurationsoftime": {
+   "title": "Compare durations of time",
+   "site": {
+    "flag": "enrich-native",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [
+     "3.MD.A.1"
+    ],
+    "ee": [
+     "M.EE.3.MD.1"
+    ],
+    "domain": "MD",
+    "unit": null,
+    "block": null,
+    "power": false
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:elapsed_visual_easy",
+     "missing": "finds one duration between two clocks on a time line, in whole and half hours (1 h 30 min); never two durations compared"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "comparing two durations: which takes longer (a film of 1 hour or a walk of 20 minutes; two start and end times)",
+   "build": [
+    "time_units",
+    "compare_durations"
+   ],
+   "pre": [
+    {
+     "key": "measurement:time_half_hour",
+     "why": "Y2.B9.S1 O'clock and half past (Grade 1, the source grade): telling the time to the hour and half hour"
+    },
+    {
+     "key": "measurement:time_5min",
+     "why": "Y2.B9.S5 Tell the time to 5 minutes (Grade 1, the source grade): telling the time to 5 minutes"
+    },
+    {
+     "key": "measurement:time_quarter",
+     "why": "Y2.B9.S2 Quarter past and quarter to (Grade 1, the source grade): quarter past and quarter to"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:elapsed_hour",
+     "why": "a time on a time line 1, 2 or 3 hours later or earlier than a start time"
+    }
+   ],
+   "note": "Support lesson (source Grade 1, Time, Y2 Summer), judged at Grade 1 (WRM Year 2). The site tags 3.MD.A.1 (Grade 3); at the source grade the durations are whole and half hours.",
+   "rule5": "Searched for an item that compares two durations: elapsed_visual_easy / medium / hard (one duration), elapsed_find_duration (one duration), elapsed_hour, elapsed_30min, elapsed_15min (a later or earlier time), order_clocks_* (orders times, not durations), time_sense (a.m. / p.m.). None compares two durations; time_units (Y4's own, WRM_PROPOSALS \"Hours, Minutes or Seconds?\", with its longer / shorter option) closes the sense of which activity is longer, and compare_durations (new) the comparison of two durations read from clocks.",
+   "envision": [
+    {
+     "proposal": "time_units",
+     "name": "Hours, Minutes or Seconds?",
+     "kind": "new skill measurement:hours_minutes_seconds",
+     "teaches": "a sense of time units: which activities take seconds, minutes or hours",
+     "closes": "which of two activities takes longer, from a sense of hours, minutes and seconds (a film or a walk)",
+     "representation": "activity pictures with a unit word bank"
+    },
+    {
+     "proposal": "compare_durations",
+     "name": "Which Took Longer? Compare Two Durations (option)",
+     "kind": "option on measurement:elapsed_visual_easy",
+     "teaches": "finding two durations from their start and end times and comparing them: which activity took longer and which took less time",
+     "closes": "two durations found from their start and end times and compared: which took longer",
+     "representation": "one boxed cell: two rows, each an activity word, a start clock, an end clock and a time line with an answer slot \"__ h __ min\""
+    }
+   ]
+  },
+  "G3|-|comparingmultiplicationstatements": {
+   "title": "Comparing multiplication statements",
+   "site": {
+    "flag": "enrich-native",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [
+     "3.OA.B.5",
+     "3.OA.C.7"
+    ],
+    "ee": [
+     "M.EE.3.OA.6"
+    ],
+    "domain": "OA",
+    "unit": null,
+    "block": null,
+    "power": false
+   },
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "comparing two multiplication statements with <, > or = by reasoning (4 × 5 ○ 4 × 6; 3 × 8 ○ 8 × 3; 5 × 4 ○ 2 × 10)",
+   "build": [
+    "compare_sentences"
+   ],
+   "pre": [
+    {
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "constant": [
+       4
+      ]
+     },
+     "why": "Y3.B3.S11 The 4 times-table (Grade 2, the source grade): the 4 times-table facts"
+    },
+    {
+     "key": "multiplication:mult_facts",
+     "opts": {
+      "constant": [
+       8
+      ]
+     },
+     "why": "Y3.B3.S14 The 8 times-table (Grade 2, the source grade): the 8 times-table facts"
+    },
+    {
+     "key": "placevalue:compare",
+     "opts": {
+      "band": 99
+     },
+     "why": "Y2.B1.S13 Compare numbers (Grade 1, below the source grade): comparing two numbers with <, > or ="
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "multiplication:mult_properties",
+     "opts": {
+      "forms": [
+       0
+      ]
+     },
+     "why": "an array and its turn give the same product (3 × 4 = 4 × 3): one statement that is equal"
+    }
+   ],
+   "note": "Support lesson (source Grade 2, Multiplication and Division B, Y3 Spring), judged at Grade 2 (WRM Year 3).",
+   "rule5": "Searched for an item that compares two products with <, > or =: order_of_operations:compare_expressions forms 0 / 1 (mixes + with × and ÷ under the order of operations, above Grade 2), placevalue:compare (two numbers), addition:equal_sign (true / false + facts), algebra:balance_addsub (+ only), multiplication:mult_properties forms 0 (writes the two equal facts of one array, never compares). None compares two multiplication statements; compare_sentences (WRM_PROPOSALS \"Compare Number Sentences\") is the build.",
+   "envision": [
+    {
+     "proposal": "compare_sentences",
+     "name": "Compare Number Sentences",
+     "kind": "new skill algebra:compare_number_sentences",
+     "teaches": "comparing two expressions with <, > or = by reasoning, not only calculating (7 + 5 ___ 7 + 6)",
+     "closes": "comparing two multiplication statements with <, > or = by reasoning (4 × 5 ○ 4 × 6; 3 × 8 ○ 8 × 3; 5 × 4 ○ 2 × 10)",
+     "representation": "two expressions with a circle between"
+    }
+   ]
+  },
+  "G3|-|countmoneynotesandcoins": {
+   "title": "Count money - notes and coins",
+   "site": {
+    "flag": "enrich-native",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [],
+    "ee": [],
+    "domain": "MD",
+    "unit": null,
+    "block": null,
+    "power": false
+   },
+   "direct": [
+    {
+     "key": "measurement:money_count",
+     "opts": {
+      "currency": "usd",
+      "kind": "both"
+     }
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:coin_value",
+     "opts": {
+      "currency": "usd"
+     },
+     "why": "Y1.B13.S2 Recognise coins (Kindergarten, below the source grade): the value of each coin"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "opts": {
+      "constant": [
+       5
+      ]
+     },
+     "why": "Y2.B5.S15 The 5 times-table (Grade 1, the source grade): counting in 5s"
+    },
+    {
+     "key": "multiplication:count_by_tables",
+     "opts": {
+      "constant": [
+       10
+      ]
+     },
+     "why": "Y2.B5.S13 The 10 times-table (Grade 1, the source grade): counting in 10s"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:money_compare",
+     "why": "which of two sets of coins is worth more"
+    }
+   ],
+   "note": "Support lesson (source Grade 1, \"Prerequisite ladder\"), judged at Grade 1 (WRM Year 2), tagged as the Grade 2 lane tagged the same Support title (Y3.json, G2|-|countmoneynotesandcoins, critic passed). money_count {kind: both} counts the bills, then the coins, and writes both numbers. The Grade 2 lane's pre counted money with the lesson's own money_count key; one key, one role here, so the pre are the coin values and counting in 5s and 10s."
+  },
+  "G3|-|doublesandneardoubleswithin20": {
+   "title": "Doubles and near-doubles within 20",
+   "site": {
+    "flag": "enrich-native",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [
+     "2.OA.B.2"
+    ],
+    "ee": [],
+    "domain": "OA",
+    "unit": null,
+    "block": null,
+    "power": false
+   },
+   "direct": [
+    {
+     "key": "number_sense:doubles_near_doubles",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "patterns:double",
+     "opts": {
+      "band": 20
+     },
+     "why": "Y2.B5.S11 Doubling and halving (Grade 1, below the source grade): doubling a number"
+    },
+    {
+     "key": "composing:make_ten",
+     "opts": {
+      "band": 10
+     },
+     "why": "Y2.B2.S1 Bonds to 10 (Grade 1, below the source grade): the number bonds to 10"
+    },
+    {
+     "key": "counting:count_sequence",
+     "opts": {
+      "band": 20,
+      "dir": "forward"
+     },
+     "why": "Y1.B4.S7 1 more and 1 less (Kindergarten, below the source grade): one more than a number"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "number_sense:make_a_ten",
+     "why": "another mental strategy for sums within 20: make a ten first"
+    }
+   ],
+   "note": "Support lesson (source Grade 2, Mental Fluency, committee-authored), judged at Grade 2 (WRM Year 3). doubles_near_doubles deals all three forms: doubles (6 + 6), doubles plus one (8 + 9) and doubles minus one (8 + 7), sums 2 to 20."
+  },
+  "G3|-|finddurationsoftime": {
+   "title": "Find durations of time",
+   "site": {
+    "flag": "enrich-native",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [
+     "3.MD.A.1"
+    ],
+    "ee": [
+     "M.EE.3.MD.1"
+    ],
+    "domain": "MD",
+    "unit": null,
+    "block": null,
+    "power": false
+   },
+   "direct": [
+    {
+     "key": "measurement:elapsed_visual_easy",
+     "opts": {}
+    }
+   ],
+   "partial": [],
+   "verdict": "full",
+   "missing": "",
+   "build": [],
+   "pre": [
+    {
+     "key": "measurement:time_half_hour",
+     "why": "Y2.B9.S1 O'clock and half past (Grade 1, the source grade): telling the time to the hour and half hour"
+    },
+    {
+     "key": "measurement:time_5min",
+     "why": "Y2.B9.S5 Tell the time to 5 minutes (Grade 1, the source grade): telling the time to 5 minutes"
+    },
+    {
+     "key": "measurement:time_quarter",
+     "why": "Y2.B9.S2 Quarter past and quarter to (Grade 1, the source grade): quarter past and quarter to"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:elapsed_30min",
+     "why": "the time 30 minutes later or earlier"
+    }
+   ],
+   "note": "Support lesson (source Grade 1, Time, Y2 Summer), judged at Grade 1 (WRM Year 2). elapsed_visual_easy shows two clocks and a time line and the pupil writes how long it takes, in whole and half hours (0 h 30 min to 3 h 0 min)."
+  },
+  "G3|-|introducecapacityandvolume": {
+   "title": "Introduce capacity and volume",
+   "site": {
+    "flag": "enrich-native",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [
+     "K.MD.A.1",
+     "K.MD.A.2"
+    ],
+    "ee": [
+     "M.EE.K.MD.1",
+     "M.EE.K.MD.2"
+    ],
+    "domain": "MD",
+    "unit": null,
+    "block": null,
+    "power": false
+   },
+   "direct": [],
+   "partial": [],
+   "verdict": "gap",
+   "missing": "capacity and volume words (full, empty, half full) and comparing how much two containers hold or how much water is in them (holds more, holds less)",
+   "build": [
+    "capacity_early"
+   ],
+   "pre": [
+    {
+     "key": "comparing:compare_objects",
+     "opts": {
+      "task": "all",
+      "dir": "mixed"
+     },
+     "why": "R.B2.S1 Compare size (Pre-K, below the source grade): comparing two objects by size: longer or shorter lines, taller or shorter towers, thicker or thinner bars"
+    },
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "why": "R.B2.S2 Compare mass (Pre-K, below the source grade): comparing two objects by mass: heavier and lighter"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "opts": {
+      "band": 5,
+      "level": [
+       1
+      ]
+     },
+     "why": "R.B1.S7 Compare amounts (Pre-K, below the source grade): more, fewer and the same"
+    }
+   ],
+   "preBuild": [],
+   "related": [],
+   "note": "Support lesson (source Kindergarten, Mass and Volume, Y1 Spring), judged at Kindergarten (WRM Year 1). No related: the only capacity skills (measurement:capacity, mass_volume_liquid) convert or read litres and millilitres, above Kindergarten.",
+   "rule5": "Searched for an item about full, empty or holds more: measurement:capacity units 0 / 1 forms 0 / 1 (customary or metric units: convert, click containers above 1 L), mass_volume_liquid forms 0 (read mL), comparing:compare_objects tasks length / height / thickness (no capacity), heavier_lighter_visual (mass). None deals capacity at Kindergarten; capacity_early (WRM_PROPOSALS \"Full, Empty, Holds More\") is the build.",
+   "envision": [
+    {
+     "proposal": "capacity_early",
+     "name": "Full, Empty, Holds More",
+     "kind": "new skill comparing:compare_capacity",
+     "teaches": "capacity language (full, empty, half full, nearly full) and comparing how much two containers hold",
+     "closes": "capacity and volume words (full, empty, half full) and comparing how much two containers hold or how much water is in them (holds more, holds less)",
+     "representation": "outline containers with a drawn fill line"
+    }
+   ]
+  },
+  "G3|-|introduceweightandmass": {
+   "title": "Introduce weight and mass",
+   "site": {
+    "flag": "enrich-native",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [
+     "K.MD.A.1",
+     "K.MD.A.2"
+    ],
+    "ee": [
+     "M.EE.K.MD.1",
+     "M.EE.K.MD.2"
+    ],
+    "domain": "MD",
+    "unit": null,
+    "block": null,
+    "power": false
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:heavier_lighter_visual",
+     "missing": "picks the heavier or the lighter of 2 or 3 pictured objects by what they are; never a balance and never \"as heavy as\""
+    }
+   ],
+   "verdict": "partial",
+   "missing": "describing weight as a thing to measure about an object (how heavy it is, beside how long and how much it holds: K.MD.A.1), and comparing two objects on a pan balance: the lower pan holds the heavier object, a level balance means the same mass",
+   "build": [
+    "measurable_attributes",
+    "balance"
+   ],
+   "pre": [
+    {
+     "key": "comparing:compare_objects",
+     "opts": {
+      "task": "all",
+      "dir": "mixed"
+     },
+     "why": "R.B2.S1 Compare size (Pre-K, below the source grade): comparing two objects by size: longer or shorter lines, taller or shorter towers, thicker or thinner bars"
+    },
+    {
+     "key": "comparing:compare_groups",
+     "opts": {
+      "band": 5,
+      "level": [
+       1
+      ]
+     },
+     "why": "R.B1.S7 Compare amounts (Pre-K, below the source grade): more, fewer and the same"
+    },
+    {
+     "key": "comparing:classify_count",
+     "opts": {
+      "band": 3,
+      "tiles": 2,
+      "objects": "pictures"
+     },
+     "why": "R.B1.S4 Sort objects to a type (Pre-K, below the source grade): picking out every object of one kind among others"
+    }
+   ],
+   "preBuild": [],
+   "related": [],
+   "note": "Support lesson (source Kindergarten, Mass and Volume, Y1 Spring), judged at Kindergarten (WRM Year 1). The WRM step Y1.B8.S1 \"Heavier and lighter\" is FULL on the same heavier_lighter_visual (Y1 lane); this title introduces weight as an attribute, and the site tags K.MD.A.1 (\"describe several measurable attributes of a single object\"), which no item deals, so the lesson is partial. Y1.B8.S1 and R.B8.S1 use the lesson's own key, so they are not listed as pre. No related: the other mass skill (mass_volume_liquid) reads grams and kilograms on a scale, above Kindergarten.",
+   "rule5": "Searched for a balance, an equal-mass item and an item naming what can be measured about one object: heavier_lighter_visual forms 0 / 1 (heavier, lighter, pictures only), mass_volume_liquid forms 1 (a g or kg scale), comparing:compare_objects (length, height, thickness of two objects). None draws a balance or names the attributes of one object; balance (WRM_PROPOSALS \"Balanced or Not?\") and measurable_attributes (STANDARD_PROPOSALS \"What Can We Measure?\") are the builds.",
+   "envision": [
+    {
+     "proposal": "measurable_attributes",
+     "name": "What Can We Measure?",
+     "kind": "new skill comparing:what_can_we_measure",
+     "teaches": "naming measurable attributes of one object (how long, how tall, how heavy, how much it holds) and telling measurable from not measurable (colour)",
+     "closes": "describing weight as one of the measurable attributes of an object (how heavy, how long, how much it holds; K.MD.A.1)",
+     "representation": "one boxed cell: one pictured object and the words long, tall, heavy, holds"
+    },
+    {
+     "proposal": "balance",
+     "name": "Balanced or Not?",
+     "kind": "new skill measurement:balance_scales",
+     "teaches": "a balance scale shows heavier, lighter or equal (balanced) mass",
+     "closes": "comparing two objects on a pan balance: the lower pan holds the heavier object, a level balance means the same mass",
+     "representation": "a drawn pan balance tipped or level with objects in each pan"
+    }
+   ]
+  },
+  "G3|-|orderfractions": {
+   "title": "Order fractions",
+   "site": {
+    "flag": "enrich-native",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [
+     "3.NF.A.3d"
+    ],
+    "ee": [
+     "M.EE.3.NF.3"
+    ],
+    "domain": "NF",
+    "unit": null,
+    "block": null,
+    "power": false
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "fractions:order_fractions",
+     "missing": "orders three to six fractions, most with unlike denominators (1/3, 1/2, 3/4; 1/6, 2/5, 1/2, 2/3), some shown in larger terms (2/12 for 1/6); a page of unit fractions or of one denominator only is not dealt"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "ordering unit fractions, or fractions with the same denominator, only",
+   "build": [
+    "frac_compare_same_part"
+   ],
+   "pre": [
+    {
+     "key": "fractions:identify",
+     "opts": {
+      "forms": [
+       1
+      ]
+     },
+     "why": "Y3.B6.S1 Understand the denominators of unit fractions (Grade 2, the source grade): picking the model that shows a fraction"
+    },
+    {
+     "key": "fractions:shade_fraction",
+     "why": "Y3.B6.S3 Understand the numerators of non-unit fractions (Grade 2, the source grade): shading the numerator of a fraction on a model"
+    },
+    {
+     "key": "composing:compose_whole",
+     "why": "Y3.B6.S4 Understand the whole (Grade 2, the source grade): making 1 whole from smaller pieces"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "composing:fraction_number_line",
+     "why": "placing a fraction on a number line"
+    }
+   ],
+   "note": "Support lesson (source Grade 2, Fractions B, Y3 Summer), judged at Grade 2 (WRM Year 3), as the Grade 4 lane judged its \"Order fractions\" (Y5.json, partial, frac_compare_same_part). Its pre compare or order no unlike fractions.",
+   "rule5": "Searched for ordering unit fractions or one denominator: fractions:order_fractions forms 0-2 (unlike denominators mixed in), order_frac_numline, fractions:compare denoms 2 / 3 forms 0-2 (two fractions, not an order), compare_frac_lcd (above Grade 2). None orders same-denominator or unit fractions only; frac_compare_same_part (Y5.json, passed lane) is the build.",
+   "envision": [
+    {
+     "proposal": "frac_compare_same_part",
+     "name": "Compare Fractions With the Same Numerator or Denominator (option)",
+     "kind": "option on fractions:compare",
+     "teaches": "comparing two fractions that share a denominator (3/8 < 5/8) or a numerator (3/4 > 3/8), with bars, and saying why",
+     "closes": "ordering unit fractions, or fractions with the same denominator, only",
+     "representation": "the existing compare cell with two bars of the same whole"
+    }
+   ]
+  },
+  "G3|-|poundstensonesandpenceusdollarscents": {
+   "title": "Pounds, tens, ones and pence (US: dollars & cents)",
+   "site": {
+    "flag": "native",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [
+     "2.MD.C.8"
+    ],
+    "ee": [
+     "M.EE.2.MD.8"
+    ],
+    "domain": "MD",
+    "unit": "Money",
+    "block": null,
+    "power": false
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:money_notation",
+     "opts": {
+      "currency": "usd"
+     },
+     "missing": "writes an amount under $10 from $5 and $1 bills and coins with $ and the point ($8.05); never a $10 bill and never the amount split into tens, ones, dimes and pennies"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "the place value of money: an amount to $99.99 read as tens and ones of dollars and dimes and pennies of cents ($24.53 = 2 tens, 4 ones, 5 dimes, 3 pennies)",
+   "build": [
+    "money_place_value"
+   ],
+   "pre": [
+    {
+     "key": "measurement:money_count",
+     "opts": {
+      "currency": "usd",
+      "kind": "both"
+     },
+     "why": "Y3.B9.S1 Pounds and pence (Grade 2, lower grade): counting bills and coins"
+    },
+    {
+     "key": "placevalue:identify",
+     "opts": {
+      "band": 999
+     },
+     "why": "Y3.B1.S8 Hundreds, tens and ones (Grade 2, lower grade): naming the place of an underlined digit: hundreds, tens or ones"
+    },
+    {
+     "key": "measurement:coin_value",
+     "opts": {
+      "currency": "usd"
+     },
+     "why": "Y1.B13.S2 Recognise coins (Kindergarten, lower grade): the value of each coin"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:money_compare",
+     "opts": {
+      "response": "sign"
+     },
+     "why": "which of two sets of coins is worth more, or that they are equal, written with <, > or ="
+    }
+   ],
+   "note": "Native lesson (site flag native), the pacing's retitled Y4.B10.S1 \"Write money using decimals\" (school week W37), 2.MD.C.8. money_notation is FULL at Y4.B10.S1 (write the amount with the point); this title asks for the place value of the amount.",
+   "rule5": "Searched for a money place-value item: money_notation tasks collection / words (amounts under $10, no chart), money_count kinds like / two / mixed / note / both (counts), coin_value, money_compare, money_convert (Y4's own option: cents to dollars; its spec plans a place chart $ | ¢, no tens of dollars), VISUAL_BUILDS vis_coin_options (a coin chart £1 / 10p / 1p, no tens of dollars), placevalue:identify (whole numbers). None splits an amount into tens, ones, dimes and pennies; money_place_value is new.",
+   "envision": [
+    {
+     "proposal": "money_place_value",
+     "name": "Dollars and Cents in a Place-Value Chart (option)",
+     "kind": "option on measurement:money_notation",
+     "teaches": "the place value of money: dollars as tens and ones, cents as dimes (tenths of a dollar) and pennies (hundredths), read from bills and coins, written in a chart and with $ and the point",
+     "closes": "the place value of money: an amount to $99.99 read as tens and ones of dollars and dimes and pennies of cents ($24.53 = 2 tens, 4 ones, 5 dimes, 3 pennies)",
+     "representation": "one boxed cell: the bills and coins drawn in black line, a four-column chart (tens | ones . dimes | pennies) and one money slot \"$__.__\""
+    }
+   ]
+  },
+  "G3|-|selectmoney": {
+   "title": "Select money",
+   "site": {
+    "flag": "enrich-native",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [],
+    "ee": [],
+    "domain": "MD",
+    "unit": null,
+    "block": null,
+    "power": false
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "measurement:make_change_least_coins",
+     "opts": {
+      "currency": "usd"
+     },
+     "missing": "chooses the fewest coins for an amount to 50 cents and writes how many of each; never chooses bills, and never any set that makes the amount"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "choosing bills and coins to make an amount in dollars and cents, any way that works ($35 = $20 + $10 + $5)",
+   "build": [
+    "make_amount_notes"
+   ],
+   "pre": [
+    {
+     "key": "measurement:money_count",
+     "opts": {
+      "currency": "usd",
+      "kind": "both"
+     },
+     "why": "Y2.B4.S3 Count money - pounds and pence (Grade 1, the source grade): counting bills and coins"
+    },
+    {
+     "key": "measurement:coin_value",
+     "opts": {
+      "currency": "usd"
+     },
+     "why": "Y1.B13.S2 Recognise coins (Kindergarten, below the source grade): the value of each coin"
+    },
+    {
+     "key": "measurement:equiv_coin_sets",
+     "opts": {
+      "currency": "usd"
+     },
+     "why": "Y2.B4.S5 Make the same amount (Grade 1, the source grade): checking that a set of coins makes the amount"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "measurement:money_compare",
+     "why": "which set has more money"
+    }
+   ],
+   "note": "Support lesson (source Grade 1, \"Prerequisite ladder\"), judged at Grade 1 (WRM Year 2), tagged as the Grade 2 lane tagged the same Support title (Y3.json, G2|-|selectmoney, critic passed); nearest WRM step Y2.B4.S4 Choose notes and coins.",
+   "rule5": "Searched for choosing bills and coins to make an amount: make_change_least_coins (coins only, the fewest), equiv_coin_sets (checks a given set), money_count (counts), money (adds), enough_money (is there enough?). None chooses bills and coins any way; make_amount_notes (Y3.json, passed lane) is the build.",
+   "envision": [
+    {
+     "proposal": "make_amount_notes",
+     "name": "Make an Amount With Bills and Coins (option)",
+     "kind": "option on measurement:equiv_coin_sets",
+     "teaches": "choosing bills and coins to make an amount ($35 = $20 + $10 + $5) and finding more than one way",
+     "closes": "choosing bills and coins to make an amount in dollars and cents, any way that works ($35 = $20 + $10 + $5)",
+     "representation": "the amount in a box"
+    }
+   ]
+  },
+  "G3|-|sharingandgroupingfairshares": {
+   "title": "Sharing and grouping (fair shares)",
+   "site": {
+    "flag": "enrich-native",
+    "supplement": false,
+    "firstWeek": null,
+    "ccss": [
+     "3.OA.A.2"
+    ],
+    "ee": [
+     "M.EE.3.OA.2"
+    ],
+    "domain": "OA",
+    "unit": null,
+    "block": null,
+    "power": false
+   },
+   "direct": [],
+   "partial": [
+    {
+     "key": "division:share_into_groups",
+     "opts": {
+      "band": 12
+     },
+     "missing": "grouping only: 8 to 12 counters put into groups of 3, 4, 5 or 6, and the pupil says how many groups; never shares into a given number of groups and never an amount that does not share fairly"
+    }
+   ],
+   "verdict": "partial",
+   "missing": "sharing a small amount equally between 2, 3 or 4 (one for you, one for me), and telling a fair share from an unfair one (odd amounts that do not share)",
+   "build": [
+    "share_group"
+   ],
+   "pre": [
+    {
+     "key": "patterns:double",
+     "opts": {
+      "band": 20
+     },
+     "why": "R.B11.S12 Doubles to 10 (make a double) (Pre-K, block R.B11, before this Support lesson's source phase): doubling a number: two equal bars"
+    },
+    {
+     "key": "composing:number_bonds",
+     "opts": {
+      "band": 10
+     },
+     "why": "R.B11.S7 Composition to 10 (Pre-K, block R.B11, before this Support lesson's source phase): a number to 10 made of two parts"
+    },
+    {
+     "key": "counting:count_objects",
+     "opts": {
+      "band": 10,
+      "objects": "frame"
+     },
+     "why": "R.B11.S1 Find 9 and 10 (Pre-K, block R.B11, before this Support lesson's source phase): counting a group of objects to 10"
+    }
+   ],
+   "preBuild": [],
+   "related": [
+    {
+     "key": "composing:odd_even",
+     "opts": {
+      "forms": [
+       2
+      ]
+     },
+     "maxNumber": 10,
+     "why": "telling an odd number from an even number to 10"
+    }
+   ],
+   "note": "Support lesson from \"Find My Pattern\" (Phase 10, from R.B16), judged at Reception: the content of R.B16 \"Sharing and grouping\", whose steps use the lesson's own share_into_groups key. The site tags 3.OA.A.2 (Grade 3 division); at the source year it is fair sharing and grouping of small amounts.",
+   "rule5": "Searched for sharing into a given number of groups and for fair / unfair shares: division:share_into_groups band 12 / 24 (grouping only), div_word_problems (written ÷ stories, above Reception), fractions:fraction_of_set (fractions), composing:odd_even (odd / even numbers). None shares into a given number of groups at Reception; share_group (WRM_PROPOSALS \"Share and Make Groups\") is the build.",
+   "envision": [
+    {
+     "proposal": "share_group",
+     "name": "Share and Make Groups",
+     "kind": "new skill division:share_and_group_early",
+     "teaches": "sharing a small amount equally (one for you, one for me) and grouping into equal groups within 10, including odd amounts that do not share fairly",
+     "closes": "sharing a small amount equally between 2, 3 or 4 (one for you, one for me), and telling a fair share from an unfair one (odd amounts that do not share)",
+     "representation": "counters drawn next to plates or rings"
+    }
+   ]
+  }
+ }
 }
