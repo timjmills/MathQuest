@@ -8146,7 +8146,7 @@
        1
       ]
      },
-     "why": "Y6.B2.S3 Common multiples (taught earlier this year, wk W09): the multiples of two numbers listed and compared (common multiples of 4 and 6)"
+     "why": "Y6.B2.S3 Common multiples (taught earlier this year, wk W09): the multiples of two numbers listed side by side and compared for the ones they share"
     },
     {
      "key": "algebra:function_table_easy",
@@ -8292,7 +8292,12 @@
     },
     {
      "key": "fractions:simplify",
-     "why": "Y6.B3.S1 Equivalent fractions and simplifying (taught earlier this year, wk W14): simplifying a fraction (6/12 = 1/2): the product written in its simplest form"
+     "opts": {
+      "forms": [
+       2
+      ]
+     },
+     "why": "Y6.B3.S1 Equivalent fractions and simplifying (taught earlier this year, wk W14): simplifying a fraction by its greatest common factor first: the product written in its simplest form"
     }
    ],
    "preBuild": [],
@@ -8598,7 +8603,7 @@
        3
       ]
      },
-     "why": "Y6.B4.S3 Divide a fraction by an integer (taught earlier this year, wk W17): a unit fraction divided by a whole number (1/4 ÷ 2 = 1/8): sharing a total equally"
+     "why": "Y6.B4.S3 Divide a fraction by an integer (taught earlier this year, wk W17): mostly a unit fraction divided by a whole number (1/4 ÷ 2 = 1/8), with some clicks of a whole number divided by a unit fraction: sharing a total equally"
     }
    ],
    "preBuild": [],
@@ -8743,7 +8748,7 @@
      "opts": {
       "band": 50
      },
-     "why": "expressions with two operations and parentheses, the site's CCSS for these lessons (5.OA.A.1)"
+     "why": "expressions with two operations and parentheses (3 × (4 + 5)): a written calculation done in the right order"
     }
    ],
    "note": "Grade 5 end-of-year entry (site unit \"Projects & Taskmaster\", Enrichment, W38, standard track only; the site lists 5.OA.A.1 for all four, a placeholder). A consolidation lesson: the review draws on the year's calculation skills. fraction_operations:mixed_fraction_ops (a pre) is the fractions-only pool; no live pool mixes it with the whole-number and decimal skills, which is the build.",
@@ -8796,16 +8801,11 @@
     },
     {
      "key": "data_analysis:mean",
-     "why": "Y6.B11.S6 The mean (taught earlier this year, wk W26): the mean of a set of results"
+     "why": "Y6.B11.S6 The mean (taught earlier this year, wk W26): the mean of a set of results, rounded to one decimal place when it does not come out exactly (133 ÷ 4 = 33.25, written 33.3)"
     },
     {
-     "key": "conversions:percent_of_number",
-     "opts": {
-      "forms": [
-       0
-      ]
-     },
-     "why": "Y6.B9.S7 Percentage of an amount – one step (taught earlier this year, wk W36): a percentage of an amount (a discount on a budget)"
+     "key": "decimals:mult_decimal",
+     "why": "Y6.B8.S7 Multiply decimals by integers (taught earlier this year, wk W07): a decimal times a whole number (18.56 × 4): costing several of one item"
     }
    ],
    "preBuild": [],
@@ -8873,17 +8873,8 @@
      "why": "Y6.B5.S3 Calculate with metric measures (taught earlier this year, wk W21): metric conversion stories"
     },
     {
-     "key": "area_perimeter:volume",
-     "opts": {
-      "forms": [
-       2
-      ]
-     },
-     "why": "Y6.B10.S8 Volume of a cuboid (taught earlier this year, wk W25): volume stories (a box, a tank)"
-    },
-    {
      "key": "decimals:mult_decimal",
-     "why": "Y6.B8.S9 Multiply and divide decimals in context (taught earlier this year, wk W09): multiplying decimals, in context in Y6.B8.S9"
+     "why": "Y6.B8.S9 Multiply and divide decimals in context (taught earlier this year, wk W09): the multiplying of this step, as bare numbers (a decimal times a whole number, 49.6 × 5)"
     }
    ],
    "preBuild": [],
@@ -9009,11 +9000,11 @@
       ],
       "decimals": true
      },
-     "missing": "divides 3-digit numbers by 100 (697 ÷ 100 = 6.97); never a 2-digit number (34 ÷ 100 = 0.34)"
+     "missing": "divides 3-digit numbers by 100 (697 ÷ 100 = 6.97); now and then a 2-digit number (89 ÷ 100 = 0.89, about 1 item in 10), never a 1-digit number; no option gives a page of the small dividends"
     }
    ],
    "verdict": "partial",
-   "missing": "a 2-digit number divided by 100 (34 ÷ 100 = 0.34; 7 ÷ 100 = 0.07), the digits moving two places right past the point",
+   "missing": "a page of 1- and 2-digit numbers divided by 100 (34 ÷ 100 = 0.34; 7 ÷ 100 = 0.07), the digits moving two places right past the point",
    "build": [
     "div10_small_numbers"
    ],
@@ -9060,7 +9051,7 @@
      "name": "Divide 1- and 2-Digit Numbers by 10 and 100 (option)",
      "kind": "option on placevalue:place_value_10x",
      "teaches": "7 ÷ 10 = 0.7, 34 ÷ 10 = 3.4, 7 ÷ 100 = 0.07, 34 ÷ 100 = 0.34 on a place-value chart with the digits sliding right",
-     "closes": "a 2-digit number divided by 100 (34 ÷ 100 = 0.34; 7 ÷ 100 = 0.07), the digits moving two places right past the point",
+     "closes": "a page of 1- and 2-digit numbers divided by 100 (34 ÷ 100 = 0.34; 7 ÷ 100 = 0.07), the digits moving two places right past the point",
      "representation": "the shift-chart cell with tenths and hundredths columns added (O . t h"
     }
    ]
@@ -9245,15 +9236,25 @@
      "why": "Y4.B8.S4 Tenths on a number line (Grade 3, this Support lesson's source year): tenths on a number line"
     },
     {
-     "key": "fraction_operations:frac_10_100",
-     "why": "Y4.B8.S7 Hundredths as fractions (Grade 3, this Support lesson's source year): hundredths as fractions (40/100 = 4/10)"
+     "key": "fractions:write_fraction",
+     "opts": {
+      "denoms": [
+       5
+      ]
+     },
+     "why": "Y4.B8.S1 Tenths as fractions (Grade 3, this Support lesson's source year): a shaded fraction written down: tenths (8/10), fifths mixed in"
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "decimals:compare_decimal",
-     "why": "comparing two decimals: the written decimal read for its size"
+     "opts": {
+      "forms": [
+       1
+      ]
+     },
+     "why": "clicking every decimal greater or less than a given one, in tenths and hundredths: the written decimal read for its size"
     }
    ],
    "note": "Support lesson (site flag enrich-native, \"From Decimals B (Y4 Summer)\", source Grade 3); nearest WRM steps Y4.B8.S2 / S8 (Tenths / Hundredths as decimals). Judged at its source year (Year 4). Reuses the Y4 lane's dec_fraction_basics.",
@@ -9585,7 +9586,7 @@
     "5.NBT.A.2"
    ],
    "closes": {
-    "G5|-|dividea2digitnumberby100": "a 2-digit number divided by 100 (34 ÷ 100 = 0.34; 7 ÷ 100 = 0.07), the digits moving two places right past the point"
+    "G5|-|dividea2digitnumberby100": "a page of 1- and 2-digit numbers divided by 100 (34 ÷ 100 = 0.34; 7 ÷ 100 = 0.07), the digits moving two places right past the point"
    },
    "family": "placevalue",
    "kind": "option",

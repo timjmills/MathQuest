@@ -27,7 +27,7 @@
 //             not full, and a partial clause must say so (Y2-Y3 r15 RANGECHECK)
 //   DENOMS    a link with a `denoms` option is read on everything the item shows, the kit payload included: every off-family
 //             family dealt is named, every denominator word named is dealt, a denied one is not dealt (Y2-Y3 r13-r14 N12)
-// usage: node lessonfit.mjs <Y6.json> [--all] [--n 40]       (exit 1 on any finding)
+// usage: node lessonfit.mjs <Y6.json> [--all] [--n 40] [--seeds '[[s1,stride],[s2,stride]]']       (exit 1 on any finding)
 const _m = new Map(); globalThis.localStorage = { getItem: k => _m.get(k) ?? null, setItem: (k, v) => _m.set(k, String(v)), removeItem: k => _m.delete(k) };
 globalThis.window = globalThis; globalThis.document = undefined;
 const R = new URL('../../../../', import.meta.url).pathname;
@@ -44,7 +44,7 @@ const FILE = args.find(a => a.endsWith('.json')) || R + 'data/curriculum/links/Y
 const d = JSON.parse(fs.readFileSync(FILE, 'utf8'));
 const ALL = args.includes('--all');
 const NPER = args.includes('--n') ? +args[args.indexOf('--n') + 1] : 40;
-const SEEDS = [[61001, 37], [90907, 53]];
+const SEEDS = args.includes('--seeds') ? JSON.parse(args[args.indexOf('--seeds') + 1]) : [[61001, 37], [90907, 53]];   // --seeds '[[a,stride],[b,stride]]': a fresh-seed self-check
 const wrm = JSON.parse(fs.readFileSync(R + 'data/curriculum/wrm-steps.json', 'utf8'));
 const titles = {}, yearOf = {}; for (const y of wrm.years) for (const b of y.blocks) for (const s of b.steps) { titles[s.id] = s.title; yearOf[s.id] = y.id; }
 const SITE = JSON.parse(fs.readFileSync(R + 'data/curriculum/site-lessons.json', 'utf8')).lessons;
@@ -157,6 +157,38 @@ function content(id, e, r, role) {
   const ahead = w => role === 'related' && !isSupport(id) ? n(w) > n(wk) + 2 : n(w) > n(wk);
   if (link) for (const [nm, w, f] of FIRST) if (ahead(w) && f(said, all)) out.push(`rule 19: ${nm} first taught ${w}, the lesson is ${isSupport(id) ? `a Support lesson judged at its source grade (${YR[SRC[id]]})` : wk}${role === 'related' && !isSupport(id) ? ' (related: more than 2 weeks ahead)' : ''}`);
   if (isSupport(id) && role === 'pre' && SRC[id] <= 4 && unlikeCompare(r)) out.push(`H: compares or orders unlike fractions (4.NF.A.2), above this Support lesson's source year ${YR[SRC[id]]}`);
+  // lessons critic r1 F3: content above a Support lesson's SOURCE year that Grade 5 teaches before its first FIRST row (so the FIRST
+  // table cannot see it), read on every word an item shows: question, answer, options and distractors, the picture's text
+  if (isSupport(id)) { const shown = said + ' | ' + r.items.map(i => i.vis || '').join(' | ');
+    for (const [nm, maxSrc, re] of SRC_ABOVE) if (SRC[id] <= maxSrc) { const m = shown.match(re); if (m) out.push(`SUPPORT: ${nm} ("${m[0]}"), above this Support lesson's source year ${YR[SRC[id]]} (distractors count)`); } }
+  return out;
+}
+// [what, the highest source year index it is above (Y4 = 4), regex on the item's shown words]
+const SRC_ABOVE = [
+  ['thousandths (3 decimal places or /1000, 5.NBT.A.3, Y5)', 4, /(?<![\d.])\d*\.\d{3}(?!\d)|\d\s*\/\s*1000(?!\d)|thousandths/i],
+  ['decimals (4.NF.C.6, Y4)', 3, /(?<![\d.$£¢])\d*\.\d+(?!\d)|\btenths\b|\bhundredths\b/i],
+];
+// lessons critic r1 F4: the digit-count and symbol claims of a clause or a why, read against the items. "never a 2-digit number",
+// "no 3-digit numbers", "never square brackets", "never braces", "never an exponent": not one item may show it; "only 3-digit
+// numbers" / "3-digit numbers only": every item's first number has 3 digits; "parentheses only": no [ ] or { }
+const WHOLES = t => [...String(t || '').replace(/(\d),(?=\d{3}\b)/g, '$1').matchAll(/(?<![\d.\/])\d+(?![\d.\/]|\.\d)/g)].map(m => m[0]);
+const SYMS = [['square brackets', /\b(?:square )?brackets?\b|\[ ?\]/i, i => /\[/.test(i.text || '')], ['braces', /\bbraces\b|\{ ?\}/i, i => /\{/.test(i.text || '')],
+  ['parentheses', /\bparenthes[ie]s\b|\( ?\)/i, i => /\(/.test(i.text || '')], ['an exponent', /\bexponents?\b|\bpowers? notation\b/i, i => /\^\s*\d|10\s*[¹²³]/.test(i.text || '') || /<sup/.test(i.raw || '')]];
+export function digitSymbolChecks(text, items) {
+  const out = [], t = String(text || ''), N = items.length || 1;
+  const negs = [...t.matchAll(/\b(?:never|no|not|without|nor)\b([^;.]*)/gi)].map(m => m[1].replace(/\([^)]*\)/g, ' '));
+  for (const p of negs) {
+    for (const m of p.matchAll(/\b(\d)-digit\b/g)) { const D = +m[1];
+      if (/\bonly\b|now and then|sometimes|rarely/i.test(p.slice(0, m.index))) continue;
+      if (/\bby an?\s*$/i.test(p.slice(0, m.index)) || /^-digit (?:number )?divisor/i.test(p.slice(m.index + 1))) continue;   // a divisor ("long division by a 2-digit number")
+      const hit = items.filter(i => WHOLES(i.text).some(w => w.length === D)).length;
+      if (hit) out.push(`CLAUSE: says never a ${D}-digit number, but ${hit} of ${N} items show one (${items.find(i => WHOLES(i.text).some(w => w.length === D)).text.trim().slice(0, 60)})`); }
+    for (const [nm, re, f] of SYMS) if (re.test(p)) { const hit = items.filter(f).length; if (hit) out.push(`CLAUSE: says never ${nm}, but ${hit} of ${N} items show them`); }
+  }
+  for (const m of t.matchAll(/\bonly (\d)-digit\b|\b(\d)-digit (?:numbers? |dividends? )?only\b/gi)) { const D = +(m[1] || m[2]);
+    const off = items.filter(i => { const w = WHOLES(i.text)[0]; return w && w.length !== D; });
+    if (off.length) out.push(`CLAUSE: says ${D}-digit only, but ${off.length} of ${N} items start with another size (${off[0].text.trim().slice(0, 60)})`); }
+  for (const [nm, re, f] of SYMS.slice(2, 3)) if (new RegExp(`(?:${re.source})\\s+only|only\\s+(?:${re.source})`, 'i').test(t)) { const hit = items.filter(i => /[\[{]/.test(i.text || '')).length; if (hit) out.push(`CLAUSE: says ${nm} only, but ${hit} of ${N} items show [ ] or { }`); }
   return out;
 }
 const SHAPES = ['parallelogram', 'cube', 'cuboid', 'triangle', 'pie chart', 'line graph', 'bar model', 'number line', 'protractor'];
@@ -179,6 +211,9 @@ function whyCheck(e, r) {
     }
   }
   if (/\bcolumn\b/i.test(CL.positive(w)) && !r.items.some(i => i.tpl === 'stack' || /column/i.test(i.text || '') || /stack|column/i.test(i.vis || ''))) out.push('why says column but no item is in columns');
+  // lessons critic r1 mutation 5: a times-table claim of the why ("the 7 times-table", "multiply by 6") is a claim on the items
+  for (const tc of TR.tableClaims(CL.positive(w))) { const hit = r.items.filter(i => tc.re.test(`${CL.itemWords(i)} ¦ ${i.pay || ''}`)).length;
+    if (hit < tc.s * N) out.push(`why claims "${tc.word}" (${tc.n}) but only ${hit} of ${N} items deal it`); }
   const mm = w.match(/\bmultiples of (\d+)\b/i);
   if (mm && texts.filter(t => new RegExp(`\\b${mm[1]}\\b`).test(t)).length < N / 3) out.push(`why says multiples of ${mm[1]} but few items use ${mm[1]}`);
   const said = texts, seen = r.items.map(i => `${i.text || ''} ${i.a || ''} ${i.x || ''} ${i.vis || ''} ${i.tpl || ''} ${i.draw || ''} ${(i.pay || '').slice(0, 600)}`);
@@ -319,7 +354,7 @@ for (const [id, s] of Object.entries(d.lessons || {})) {
     let limit = Math.max(1.5 * Math.max(own, cited), 1000);
     if (isSupport(id)) limit = Math.min(limit, Math.max(1.5 * YEAR_RANGE[YR[SRC[id]]], 100));
     if (!TIME.test(e.key) && r.max > limit) fails.push(`${tag}: size ${r.max} > ${limit} — ${r.ex}`);
-    const fs_ = [...content(id, e, r, role), ...whyCheck(e, r), ...(role === 'pre' ? citeCheck(id, e) : []), ...denomsCheck(e, role, CL.claimText(e.why, titles))];
+    const fs_ = [...content(id, e, r, role), ...whyCheck(e, r), ...digitSymbolChecks(e.why, r.items), ...(role === 'pre' ? citeCheck(id, e) : []), ...denomsCheck(e, role, CL.claimText(e.why, titles))];
     for (const f of fs_) fails.push(`${tag}: ${f}`);
   }
   // direct / partial: content (a partial may deal later content only when its clause names it), claims of the clause
@@ -334,6 +369,7 @@ for (const [id, s] of Object.entries(d.lessons || {})) {
       for (const h of CL.claimHits(e.missing, r.items, { gateOnly: true })) if (!h.ok) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause claims "${h.word}" (${h.claim}) but only ${h.hit} of ${h.n} items show it`);
       for (const h of CL.negatedHits(e.missing, r.items)) if (!h.ok) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause says "${h.part}" is not dealt, but ${h.hit} of ${h.n} items do it (${h.claim})`);
       for (const f of denomsCheck(e, 'partial', e.missing)) fails.push(`partial ${e.key}: ${f}`);
+      for (const f of digitSymbolChecks(e.missing, r.items)) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})}: ${f}`);
     }
   }
   // F: a link that deals the lesson's own items; DUP: two links of one role with the same items

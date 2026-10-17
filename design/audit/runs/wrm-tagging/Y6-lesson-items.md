@@ -400,7 +400,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Look at the two patterns. How do you get from Pattern A to Pattern B? → Multiply by 2 {Multiply by 2 ; Multiply by 2 ; Multiply by 3 ; Add 2}
   - Look at the two patterns. How do you get from Pattern A to Pattern B? → Add 15 {Multiply by 15 ; Add 15 ; Add 14 ; Add 16}
   - Look at the two patterns. How do you get from Pattern A to Pattern B? → Add 3 {Add 3 ; Multiply by 3 ; Add 4 ; Add 2}
-- **pre** `number_theory:lcm {"forms":[1]}` — why: Y6.B2.S3 Common multiples (taught earlier this year, wk W09): the multiples of two numbers listed and compared (common multiples of 4 and 6)
+- **pre** `number_theory:lcm {"forms":[1]}` — why: Y6.B2.S3 Common multiples (taught earlier this year, wk W09): the multiples of two numbers listed side by side and compared for the ones they share
   - max 61; types: multi-select-check
   - Click ALL common multiples of 6 and 8 less than 61. → ["opt0","opt5"] {24 ; 30 ; 60 ; 40 ; 42 ; 48}
   - Click ALL common multiples of 4 and 6 less than 49. → ["opt1","opt3","opt5"] {20 ; 36 ; 16 ; 24 ; 42 ; 12}
@@ -514,12 +514,12 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Calculate: 5 × 1/3 = ? → 1 2/3
   - Calculate: 4/6 × 6 = ? → 4
   - Calculate: 6 × 1/6 = ? → 1
-- **pre** `fractions:simplify` — why: Y6.B3.S1 Equivalent fractions and simplifying (taught earlier this year, wk W14): simplifying a fraction (6/12 = 1/2): the product written in its simplest form
-  - max 30; types: multiple-choice, text, number, multi-select-check
-  - Is 4/6 already in simplest form? → No {Yes ; No}
-  - Simplify this fraction: → 4/5 {3/5 ; 4/5 ; 1/1 ; 2/3}
-  - Is 7/9 already in simplest form? → Yes {Yes ; No}
-  - Simplify this fraction: → 2/3 {1/2 ; 1/6 ; 2/3 ; 5/6}
+- **pre** `fractions:simplify {"forms":[2]}` — why: Y6.B3.S1 Equivalent fractions and simplifying (taught earlier this year, wk W14): simplifying a fraction by its greatest common factor first: the product written in its simplest form
+  - max 30; types: number, multi-select-check
+  - What is the GCF of 15 and 25? (Use this to simplify 15/25.) → 5
+  - What is the GCF of 18 and 24? (Use this to simplify 18/24.) → 6
+  - What is the GCF of 9 and 12? (Use this to simplify 9/12.) → 3
+  - What is the GCF of 12 and 18? (Use this to simplify 12/18.) → 6
   - What is the GCF of 15 and 25? (Use this to simplify 15/25.) → 5
   - What is the GCF of 20 and 30? (Use this to simplify 20/30.) → 10
 - **related** `fraction_operations:frac_mult_word {"denoms":[2,5]}` — why: fraction stories, some the area of a garden bed with fractional sides
@@ -694,7 +694,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Calculate: 5 × 1/3 = ? → 1 2/3
   - Calculate: 4/6 × 6 = ? → 4
   - Calculate: 6 × 1/6 = ? → 1
-- **pre** `fraction_operations:div_unit_frac_nv {"forms":[2,3]}` — why: Y6.B4.S3 Divide a fraction by an integer (taught earlier this year, wk W17): a unit fraction divided by a whole number (1/4 ÷ 2 = 1/8): sharing a total equally
+- **pre** `fraction_operations:div_unit_frac_nv {"forms":[2,3]}` — why: Y6.B4.S3 Divide a fraction by an integer (taught earlier this year, wk W17): mostly a unit fraction divided by a whole number (1/4 ÷ 2 = 1/8), with some clicks of a whole number divided by a unit fraction: sharing a total equally
   - max 36; types: number, fraction-input, multi-select-check
   - 1/4 ÷ ? = 1/8. Find the missing number. → 2
   - 1/5 ÷ 6 = ? → 1/30
@@ -808,7 +808,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Jin ate 2/4 of a cake. Emma ate 1/4. How much did they eat in total? → 3/4
   - 8 candy bars are shared equally by 6 people. How much does each person get? → 1 1/3
   - Jamal ate 1/4 of a watermelon. Zoe ate 2/4. How much did they eat in total? → 3/4
-- **related** `order_of_operations:paren_multi {"band":50}` — why: expressions with two operations and parentheses, the site's CCSS for these lessons (5.OA.A.1)
+- **related** `order_of_operations:paren_multi {"band":50}` — why: expressions with two operations and parentheses (3 × (4 + 5)): a written calculation done in the right order
   - max 49; types: number
   - (5 + 2) × (5 + 2) = ? → 49
   - 4 × (6 + 8) - 10 = ? → 46
@@ -837,7 +837,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - A bag of apples weighs 1 kg. How many g is that? → 1000
   - A bottle contains 8 L. How many mL is that? → 8000
   - A snake measured 6 m. How many cm is that? → 600
-- **pre** `data_analysis:mean` — why: Y6.B11.S6 The mean (taught earlier this year, wk W26): the mean of a set of results
+- **pre** `data_analysis:mean` — why: Y6.B11.S6 The mean (taught earlier this year, wk W26): the mean of a set of results, rounded to one decimal place when it does not come out exactly (133 ÷ 4 = 33.25, written 33.3)
   - max 100; types: number, multi-select-check
   - Find the mean: 74, 91, 8, 90, 74 → 67.4
   - Find the mean: 62, 95, 95, 22, 10 → 56.8
@@ -845,14 +845,14 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Click ALL data sets where the mean equals 12. → ["opt0","opt3"] {{16, 6, 14} ; {7, 16, 2} ; {9, 7, 14} ; {17, 4, 15}}
   - Find the mean: 77, 79, 91, 64, 68, 55 → 72.3
   - Find the mean: 69, 6, 84, 17, 94 → 54
-- **pre** `conversions:percent_of_number {"forms":[0]}` — why: Y6.B9.S7 Percentage of an amount – one step (taught earlier this year, wk W36): a percentage of an amount (a discount on a budget)
-  - max 120; types: number
-  - What is 50% of 90? → 45
-  - What is 50% of 48? → 24
-  - What is 25% of 80? → 20
-  - What is 75% of 120? → 90
-  - What is 33% of 90? → 30
-  - What is 10% of 80? → 8
+- **pre** `decimals:mult_decimal` — why: Y6.B8.S7 Multiply decimals by integers (taught earlier this year, wk W07): a decimal times a whole number (18.56 × 4): costing several of one item
+  - max 785.79; types: number
+  - 47.7 × 9 = ? → 429.3
+  - 51.61 × 9 = ? → 464.49
+  - 35.31 × 9 = ? → 317.79
+  - 93.3 × 2 = ? → 186.6
+  - 84.76 × 8 = ? → 678.08
+  - 45.7 × 2 = ? → 91.4
 - **related** `decimals:add_decimal` — why: adding decimals to hundredths, the commonest step of a project budget
   - max 187.13; types: col-arith
   - 47.7 + 90.1 = ? → 137.8
@@ -898,15 +898,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - A bag of apples weighs 1 kg. How many g is that? → 1000
   - A bottle contains 8 L. How many mL is that? → 8000
   - A snake measured 6 m. How many cm is that? → 600
-- **pre** `area_perimeter:volume {"forms":[2]}` — why: Y6.B10.S8 Volume of a cuboid (taught earlier this year, wk W25): volume stories (a box, a tank)
-  - max 7200; types: number
-  - Sara has a rectangular sandbox that is 17 ft long, 20 ft wide, and 3 ft tall. What is its volume in cubic feet? → 1020
-  - Carlos has a rectangular sandbox that is 14 ft long, 20 ft wide, and 20 ft tall. What is its volume in cubic feet? → 5600
-  - Diego has a rectangular storage box that is 8 ft long, 19 ft wide, and 15 ft tall. What is its volume in cubic feet? → 2280
-  - Zoe has a rectangular cooler that is 7 ft long, 3 ft wide, and 15 ft tall. What is its volume in cubic feet? → 315
-  - Amari has a rectangular cooler that is 18 ft long, 17 ft wide, and 20 ft tall. What is its volume in cubic feet? → 6120
-  - Sara has a rectangular sandbox that is 16 ft long, 2 ft wide, and 18 ft tall. What is its volume in cubic feet? → 576
-- **pre** `decimals:mult_decimal` — why: Y6.B8.S9 Multiply and divide decimals in context (taught earlier this year, wk W09): multiplying decimals, in context in Y6.B8.S9
+- **pre** `decimals:mult_decimal` — why: Y6.B8.S9 Multiply and divide decimals in context (taught earlier this year, wk W09): the multiplying of this step, as bare numbers (a decimal times a whole number, 49.6 × 5)
   - max 785.79; types: number
   - 47.7 × 9 = ? → 429.3
   - 51.61 × 9 = ? → 464.49
@@ -970,9 +962,9 @@ print path, the link's own opts). Format: `question → answer {options} [answer
 
 ## Divide a 2-digit number by 100
 
-`G5|-|dividea2digitnumberby100` · no week · enrich-native · partial — missing: a 2-digit number divided by 100 (34 ÷ 100 = 0.34; 7 ÷ 100 = 0.07), the digits moving two places right past the point
+`G5|-|dividea2digitnumberby100` · no week · enrich-native · partial — missing: a page of 1- and 2-digit numbers divided by 100 (34 ÷ 100 = 0.34; 7 ÷ 100 = 0.07), the digits moving two places right past the point
 
-- **partial** `placevalue:place_value_10x {"op":"/","power":[100],"decimals":true}` — clause: divides 3-digit numbers by 100 (697 ÷ 100 = 6.97); never a 2-digit number (34 ÷ 100 = 0.34)
+- **partial** `placevalue:place_value_10x {"op":"/","power":[100],"decimals":true}` — clause: divides 3-digit numbers by 100 (697 ÷ 100 = 6.97); now and then a 2-digit number (89 ÷ 100 = 0.89, about 1 item in 10), never a 1-digit number; no option gives a page of the small dividends
   - max 983; types: number pv
   - 220 ÷ 100 = ? → 2.2
   - 586 ÷ 100 = ? → 5.86
@@ -1123,20 +1115,20 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Put each number on the number line. → 0.5, 0.6, 0.7
   - Put 0.5 on the number line. → 0.5
   - Put each number on the number line. → 0.2, 0.3, 0.9
-- **pre** `fraction_operations:frac_10_100` — why: Y4.B8.S7 Hundredths as fractions (Grade 3, this Support lesson's source year): hundredths as fractions (40/100 = 4/10)
-  - max 1000; types: fraction-input, multi-select-check
-  - Write 7/10 as a fraction with denominator 100. → 70/100
-  - Write 6/10 as a fraction with denominator 100. → 60/100
-  - Write 3/10 as a fraction with denominator 100. → 30/100
-  - Write 3/10 as a fraction with denominator 100. → 30/100
-  - Write 7/10 as a fraction with denominator 100. → 70/100
-  - Write 7/10 as a fraction with denominator 100. → 70/100
-- **related** `decimals:compare_decimal` — why: comparing two decimals: the written decimal read for its size
-  - max 99.8; types: dnd-generic, choice, multi-select-check
-  - Drag the decimals from least to greatest. → ["t0","t1","t2","t3"] {6.9 ; 14.5 ; 72.5 ; 73.9}
-  - Compare: 94.94 ___ 21.09 → > {> ; < ; =}
-  - Compare: 89.6 ___ 42.3 → > {> ; < ; =}
-  - Drag the decimals from greatest to least. → ["t0","t3","t1","t2"] {67.27 ; 65.06 ; 27.07 ; 65.29}
-  - Compare: 78.901 ___ 62.67 → > {> ; < ; =}
-  - Drag the decimals from least to greatest. → ["t3","t0","t1","t2"] {67.1 ; 83.2 ; 93.6 ; 2.8}
+- **pre** `fractions:write_fraction {"denoms":[5]}` — why: Y4.B8.S1 Tenths as fractions (Grade 3, this Support lesson's source year): a shaded fraction written down: tenths (8/10), fifths mixed in
+  - max 10; types: text frac-model
+  - Write the fraction that is shaded. → 3/5
+  - Write the fraction that is shaded. → 6/10
+  - Write the fraction that is shaded. → 2/5
+  - Write the fraction that is shaded. → 3/10
+  - Write the fraction that is shaded. → 7/10
+  - Write the fraction that is shaded. → 3/5
+- **related** `decimals:compare_decimal {"forms":[1]}` — why: clicking every decimal greater or less than a given one, in tenths and hundredths: the written decimal read for its size
+  - max 99.78; types: multi-select-check
+  - Click ALL the decimals less than 53.75. → ["opt1","opt2","opt3","opt4","opt6","opt7"] {94.95 ; 11.34 ; 41.93 ; 18.39 ; 18.22 ; 96.17 ; 33.55 ; 29.25}
+  - Click ALL the decimals less than 74.3. → ["opt0","opt2","opt3","opt4","opt5","opt6","opt7"] {31.2 ; 80.6 ; 37.6 ; 29.7 ; 56.8 ; 25.1 ; 53.2 ; 0.9}
+  - Click ALL the decimals less than 34.5. → ["opt0","opt2","opt3","opt4","opt5","opt6","opt7"] {2.4 ; 51.1 ; 24.8 ; 16.1 ; 31.1 ; 0.2 ; 27.8 ; 21.4}
+  - Click ALL the decimals greater than 93.43. → ["opt1","opt3","opt5","opt6"] {76.62 ; 98.84 ; 57.46 ; 99.11 ; 81.91 ; 99.78 ; 96.14}
+  - Click ALL the decimals greater than 64.52. → ["opt4","opt5"] {56.09 ; 3.26 ; 28.5 ; 20.66 ; 65.55 ; 72.95}
+  - Click ALL the decimals less than 76.4. → ["opt0","opt1","opt2","opt3","opt5"] {61.6 ; 46.7 ; 62.9 ; 8.3 ; 87.4 ; 20.4}
 

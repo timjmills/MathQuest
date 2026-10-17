@@ -1,5 +1,6 @@
 // Y6 copy of the Y2-Y3 lane's titlerep.mjs (critic r13-r15: the title's representation, operation, verb, clock and table claims), run on
-// the Y6 site lessons by lessonfit.mjs. Unchanged except this header and the line-plot item regex (marked "Y6" below).
+// the Y6 site lessons by lessonfit.mjs. Unchanged except this header, the line-plot item regex (marked "Y6" below) and the Y6 lesson-title claims
+// (Y6_TITLE_CLAIMS, lessons critic r1 F6: braces, exponents, hierarchy, ordered pairs, two rules, both directions, tiling …).
 // r14 TITLEREP (critic r13 N13 / M11, the class behind Y3.B6.S10 "as bar models" marked full on circles): the step TITLE is
 // a claim too. Every representation, operation, unit or context the title names (bar model, number line, part-whole, array,
 // column method, ten frame, money, grams, litres, a clock, a word problem, adds / subtracts …; claims.mjs CLAIMS plus the
@@ -100,10 +101,54 @@ export function titleClaims(title, items) {
     const hit = items.filter(i => tc.re.test(`${CL.itemWords(i)} ¦ ${i.pay || ''}`) || gridHit(i, tc.num)).length;
     out.push({ claim: tc.n, word: tc.word, hit, n: N, ok: hit >= tc.s * N, need: tc.s, re: tc.re });
   }
+  for (const yc of y6Claims(t)) {
+    const hit = items.filter(yc.test).length;
+    out.push({ claim: yc.n, word: yc.word, hit, n: N, ok: hit >= yc.s * N, need: yc.s, re: yc.re });
+  }
   for (const vc of verbClaims(t)) {
     const hit = items.filter(vc.test).length;
     out.push({ claim: vc.n, word: vc.word, hit, n: N, ok: hit >= vc.s * N, need: vc.s, re: vc.named });
   }
+  return out;
+}
+
+// ---- Y6 (lessons critic r1 F6): the Y6 site-lesson titles' own claims. Each is { n, re (on the title), s (share), test(item),
+// named (the clause names it) }; a FULL lesson's direct items must show it at its share, a partial / gap clause must name it.
+const num1 = i => { const m = String(i.text || '').replace(/(\d),(?=\d{3}\b)/g, '$1').match(/(?<![\d.])\d+(?:\.\d+)?(?![\d.])/); return m ? +m[0] : null; };
+const ansNum = i => { const m = String(i.a || '').replace(/(\d),(?=\d{3}\b)/g, '$1').match(/(?<![\d.])\d+(?:\.\d+)?(?![\d.])/); return m ? +m[0] : null; };
+const T = i => `${i.text || ''} ¦ ${i.a || ''} ¦ ${i.x || ''}`;
+export const Y6_TITLE_CLAIMS = [
+  { re: /\bbraces\b/i, n: 'braces { }', s: 0.2, test: i => /\{/.test(i.text || ''), named: /\bbraces\b/i },
+  { re: /\bbrackets\b/i, n: 'square brackets [ ]', s: 0.2, test: i => /\[/.test(i.text || ''), named: /\bbrackets?\b/i },
+  { re: /\bparentheses\b/i, n: 'parentheses ( )', s: 0.2, test: i => /\(/.test(i.text || ''), named: /\bparenthes/i },
+  { re: /\bexponents?\b|10\^\d/i, n: 'exponents (10^2, 10²)', s: 0.3, test: i => /\^\s*\d|10\s*[¹²³]|exponent|\bpowers? of\b/i.test(T(i)) || /<sup/.test(i.raw || ''), named: /\bexponent|\bpowers? of\b/i },
+  { re: /\bexplain the pattern\b/i, n: 'explains the pattern', s: 0.2, test: i => /pattern|explain|\bwhy\b/i.test(i.text || ''), named: /\bpattern\b/i },
+  { re: /\bhierarch/i, n: 'hierarchy', s: 0.3, test: i => /hierarch|subcategor/i.test(T(i)), named: /\bhierarch/i },
+  { re: /\bordered pairs?\b/i, n: 'ordered pairs', s: 0.3, test: i => /\(\s*\d+\s*,\s*\d+\s*\)|ordered pair/i.test(T(i)), named: /\bordered pairs?\b|\bpairs\b/i },
+  { re: /\btwo (?:different )?rules\b|\btwo sequences\b/i, n: 'two sequences from two rules', s: 0.3, test: i => /pattern a\b[\s\S]*pattern b|\brule a\b[\s\S]*\brule b|two rules|sequence a\b/i.test(T(i)), named: /\btwo (?:rules|sequences|patterns)\b|\bboth rules\b|\bpattern a\b/i },
+  { re: /\bwords to expressions\b/i, n: 'words to expressions', s: 0.2, test: i => /\d\s*[+\-−×÷]\s*\(?\d/.test(`${i.a || ''}`) && !/\d\s*[+\-−×÷]\s*\d/.test(i.text || ''), named: /\bwords? to (?:an? )?(?:numerical )?expressions?\b|\bfrom words\b|\bwrit(?:e|es|ing) (?:a |the )?(?:numerical )?expressions?\b/i },
+  { re: /\bexpressions to words\b/i, n: 'expressions to words', s: 0.2, test: i => /\d\s*[+\-−×÷]\s*\(?\d/.test(i.text || '') && /\b(?:sum|product|difference|quotient|times|twice|half|more than|less than|add|subtract|multiply|divide)\b/i.test(`${i.a || ''} ${i.x || ''}`), named: /\bexpressions? (?:to|into|in) words\b|\binterpret/i },
+  { re: /\bconvert\b[^]*\b(?:inches|feet|yards|miles|units)\b/i, n: 'converts to a smaller unit', s: 0.2, test: i => { const a = num1(i), b = ansNum(i); return a != null && b != null && b > a; }, named: /\bsmaller unit\b|\blarger (?:unit )?to (?:a )?smaller\b|\bboth (?:ways|directions)\b/i },
+  { re: /\bconvert\b[^]*\b(?:inches|feet|yards|miles|units)\b/i, n: 'converts to a larger unit', s: 0.2, test: i => { const a = num1(i), b = ansNum(i); return a != null && b != null && b < a; }, named: /\bsmaller (?:unit )?to (?:a )?larger\b|\blarger unit\b|\bboth (?:ways|directions)\b/i },
+  { re: /\bunits of length\b[^]*\b(?:inches|feet|yards|miles)\b/i, n: 'customary length in most items', s: 0.5, test: i => /\d\s*(?:in|inch(?:es)?|ft|feet|foot|yd|yards?|mi|miles?)\b/i.test(i.text || ''), named: /\bweight\b|\bcapacity\b|\blength\b/i },
+  { re: /\bfractional side/i, n: 'tiling with unit-fraction squares', s: 0.3, test: i => /\btil(?:e|es|ed|ing)\b|unit squares?/i.test(`${T(i)} ${i.pay || ''}`), named: /\btil(?:e|es|ed|ing)\b/i },
+  { re: /\bdivide (?:\S+ ){0,2}by a decimal\b/i, n: 'a decimal divisor', s: 0.5, test: i => /÷\s*\d*\.\d/.test(i.text || ''), named: /\bdivisor\b|\bdivided by a (?:tenths |hundredths )?decimal\b/i },
+  { re: /\bdecimals by decimals\b/i, n: 'decimal × decimal', s: 0.5, test: i => /(?<![\d.])\d*\.\d+\s*[×x]\s*\d*\.\d+/.test(i.text || ''), named: /\bdecimal (?:times|×|multiplied by) a decimal\b|\bdecimal × decimal\b/i },
+  { re: /\bwhole number by a unit fraction\b/i, n: 'whole ÷ unit fraction', s: 0.5, test: i => /(?<![\/\d])\d+\s*÷\s*1\s*\/\s*\d+/.test(i.text || ''), named: /\bunit fraction\b/i },
+  { re: /\b(\d)-digit number\b/i, n: 'N-digit number', s: 0.5, digit: true, named: null },
+  { re: /\bvolume\b/i, n: 'volume', s: 0.5, test: i => /\bvolume\b|cubic|cm³|in³|unit cubes?/i.test(T(i)), named: /\bvolume\b/i },
+  { re: /\bcomposite solids?\b/i, n: 'composite solid', s: 0.3, test: i => /composite|two (?:boxes|prisms|cuboids)|l-shaped|joined/i.test(T(i)), named: /\bcomposite\b|\btwo (?:non-overlapping )?(?:cuboids|prisms|boxes)\b/i },
+  { re: /\bscaling\b/i, n: 'scaling (greater or less without calculating)', s: 0.3, test: i => /greater|less|bigger|smaller|scal|same/i.test(T(i)), named: /\bscal/i },
+  { re: /\bthousandths\b/i, n: 'thousandths', s: 0.3, test: i => /\d\.\d{3}(?!\d)|\/\s*1000\b|thousandths/i.test(T(i)), named: /\bthousandths?\b/i },
+  { re: /\bword form\b/i, n: 'word form', s: 0.2, test: i => /\b(?:one|two|three|four|five|six|seven|eight|nine|ten|hundred|thousand)(?:th|ths)?\b/i.test(T(i)), named: /\bwords?\b/i },
+  { re: /\bdigit values?\b|\b10 times\b/i, n: '10 times / 1/10 of', s: 0.3, test: i => /\b10 times\b|\bten times\b|\b1\/10\b|\bone tenth\b|×\s*10\b|÷\s*10\b/i.test(T(i)), named: /\b10 times\b|\bten times\b|\bcompar/i },
+];
+export function y6Claims(title) {
+  const t = String(title), out = [];
+  for (const c of Y6_TITLE_CLAIMS) { const m = t.match(c.re); if (!m) continue;
+    if (c.digit) { const D = +m[1]; out.push({ n: `${D}-digit number`, word: `${D}-digit`, s: c.s, re: new RegExp(`\\b${D}-digit\\b`, 'i'),
+      test: i => { const v = num1(i); return v != null && Number.isInteger(v) && String(v).length === D; } }); continue; }
+    out.push({ n: c.n, word: m[0], s: c.s, test: c.test, re: c.named }); }
   return out;
 }
 

@@ -2,6 +2,46 @@
 
 ## Site lessons (owner rule 2026-10-16: every site lesson tagged) — 2026-10-17
 
+### Lessons fix round r2 (after the lessons critic r1: FAIL narrowly, lessons 21 and 24 at 7, mean 7.96) — 2026-10-17
+
+Builder: Opus 5.5, low effort. Steps, tagFixes and step proposals stay frozen; only `lessons`, the lesson-only proposal text that
+mirrors a lesson's `missing` (`closes[<lesson>]`) and the lane's own gates changed.
+
+| Row | Change |
+|---|---|
+| F1 lesson 21 | Partial clause now: "divides 3-digit numbers by 100 (697 ÷ 100 = 6.97); now and then a 2-digit number (89 ÷ 100 = 0.89, about 1 item in 10), never a 1-digit number; no option gives a page of the small dividends". `missing` (and so `closes[div10_small_numbers]`): "a page of 1- and 2-digit numbers divided by 100 …". Hand-audit row corrected |
+| F2 lesson 24 | Related `compare_decimal {}` → `{forms:[1]}` (click the decimals greater / less than one given: tenths and hundredths, 0 thousandths). Pre `frac_10_100` (offers 7/1000, 70/1000 distractors) replaced by `fractions:write_fraction {denoms:[5]}` cited to Y4.B8.S1 (tenths, fifths mixed in, said so) |
+| F3 | `lessonfit` SUPPORT rule: a Support lesson's links (every role) are read on every shown word (question, answer, options and distractors, picture text) for content above the source year that the Grade 5 FIRST table cannot see: thousandths (3 dp, /1000, the word) for source ≤ Y4, any decimal for source ≤ Y3. Lesson 24 as committed in r1 fails it |
+| F4 | `lessonfit` CLAUSE: digit-count and symbol claims of every partial clause and every pre / related why are read against the items: "never a N-digit number" (a divisor "by a 2-digit number" excepted), "N-digit only", "never square brackets / braces / parentheses / an exponent", "parentheses only". Lesson 21 as committed in r1 fails it |
+| F5 | New `lessonspec.py` (Y5 `specopts.py` for lessons): the FINAL written `Y6.json` lessons against `spec-lessons.json`, every role, in order; build.py runs it as its last data gate. The critic's m4 (mult_facts re-optioned to `{constant:[7]}` after `finish()`) inserted in a clean `git archive` tree: **exit 1** (`lessonspec: … 1 differences`) |
+| F6 | `titlerep.mjs` Y6_TITLE_CLAIMS: braces, brackets, parentheses, exponents, explain the pattern, hierarchy, ordered pairs, two rules, words ↔ expressions, both conversion directions (to a smaller / to a larger unit), tiling, decimal divisor, decimal × decimal, whole ÷ unit fraction, "N-digit number", volume, composite solid, scaling, thousandths, word form, 10 times / 1/10. Each is held on a FULL lesson's direct items and must be named by a partial / gap clause (all 24 clauses already name theirs) |
+| M1 lesson 15 | `div_unit_frac_nv {forms:[2,3]}` why: "mostly a unit fraction divided by a whole number …, with some clicks of a whole number divided by a unit fraction" |
+| M2 lesson 17 | `paren_multi` why from the idea: "a written calculation done in the right order", the placeholder-CCSS reason dropped |
+| M3 lesson 18 | Pre `percent_of_number {forms:[0]}` swapped for `mult_decimal` (Y6.B8.S7, "costing several of one item"): its answer keys are wrong (below). `mean` why says it rounds to one decimal place (133 ÷ 4 = 33.25, written 33.3) |
+| M4 lesson 13 | Kept as a related: its why already says "both ways … with weight and capacity mixed in"; length is too rare (4 of 40) for a partial of a length lesson |
+| M5 lesson 4 | Not added: `div_decimal {forms:[0]}` has the partial's key, and a pre may not repeat a partial key (class F, lessons.py). The lesson note names it (Y6.B8.S8, the same week) |
+| M6 lesson 5 | For the lead's merge: widen `decimal_models`' option text in build-list.js to "area model for decimal × whole and decimal × decimal" (build-list.js is frozen for this lane) |
+| M7 lesson 12 | Unchanged: the report and note already say the ribbon stories are dealt by the related `frac_mult_word_plain` (about 1 in 4), too few for a partial |
+| M8 lesson 19 | `mult_decimal` why: "the multiplying of this step, as bare numbers (49.6 × 5)" |
+| M9 | Generator note below (`distributive_expr` GCF) |
+| Sweep (F3 / F4 / times-table rules, 6 fresh seed pairs × 60 items a link: 48311/60607, 7777/3131, 2468/9001, 1111/2222, 3333/4242, 8181/5151) | Lesson 11 pre `fractions:simplify {}` → `{forms:[2]}` (GCF first): forms 0 offer negative distractors (−1/10, −1/4; 19 of 480), 0 of 480 at forms 2. Lesson 9 pre `lcm {forms:[1]}` why drops "4 and 6" (the new times-table claim: 6 in 10 of 60). Lesson 19 pre `volume {forms:[2]}` dropped (stories to 21 × 21 × 21 = 9,261 pass the size limit on fresh seeds; 3 pre remain). After them: 0 findings on all six seed pairs |
+| Critic mutation 5 | `lessonfit` WHY now reads times-table claims ("the 7 times-table", "multiply by 6") with titlerep's `tableClaims`; caught |
+
+**Gates (lessons r2)**: build.py exit 0 (steps 114 / tagFixes 148 identical to the base; lessonfit 24 lessons, 101 links, 0 findings;
+lessonspec 126 links, 0 differences); lessonfit on 6 fresh seed pairs × 60: 0 findings each; lessonmut 24 mutations, 0 missed (incl.
+F3, F4, F6, the critic's mutation 5 and the F5 lessonspec proof); the critic's `mymut.py`: 12 of 12 exit 1; the critic's m4 in a clean
+`git archive` tree: exit 1; mergecheck with Y2 / Y3 from the passed lane: Y6 contributes 0 (the only 2 lines are the known Y4 × Y2
+same-outcome Y2.B1.S15 overlap; without either of Y2 / Y4: 0 problems); the critic's `merge_r1.mjs`: 0 real conflicts, order
+independent; `ws-wrm-extract --check` exit 0; `ws-boot-smoke` OK.
+
+**Generator bugs (recorded, not fixed: gen-*.js is outside this lane)**
+- `conversions:percent_of_number` (`js/modules/gen-fractions.js`, about line 6904): 33% is treated as one third. "What is 33% of 90? → 30"
+  (true 29.7), "33% of 60 → 20" (true 19.8): 5 to 7 of 40 `{forms:[0]}` answer keys are wrong. No Y6 lesson links it any more.
+- `data_analysis:mean` rounds to one decimal place without saying so in the question (61.75 → 61.8).
+- `fractions:simplify {forms:[0]}`: the choice list offers negative fractions and 0/1 as distractors ("→ 1/5 ; 0/1 ; 1/2 ; 1/5 ; -1/10", with the answer listed twice).
+- `algebra:distributive_expr`: "Factor out the GCF: 24x + 12 → 4(6x + 3)" (the GCF is 12).
+
+
 Builder: Opus 5.5, low effort (`mq-opus-low`), first round. The Y6 WRM steps passed critic r5 and are **frozen**: `steps`, `tagFixes`
 and every step field of every proposal are byte-identical to the base (checked by diffing the built file against the merged
 base). The only additions are the top-level `lessons` section and, on the proposals lessons use, the `lessons` list and
@@ -100,7 +140,7 @@ No lesson is FULL. The audit below covers the lessons a reader (or `standards-au
 | 11 Area, fractional sides | multiply fractional sides ✓ (`mult_frac_frac` overlap model); **tile with unit-fraction squares and show area = product** | 0 | partial (`map_frac_side_area`) |
 | 13 Customary length | in, ft, yd, mi ✓; larger → smaller ✓; **smaller → larger, mixed units, fractional amounts (5.MD.A.1 "5 cm to 0.05 m"), multi-step problems** | 0 of 40 (`length_customary` forms are all larger → smaller) | partial (`length_customary_both`) |
 | 4 Divide by a decimal / 5 Multiply decimals by decimals | 5.NBT.B.7 to hundredths **with models / place-value strategies** | div: tenths divisors only, numbers only; mult: decimal × 1-digit whole only | partial |
-| 21-24 Support | judged at the source grade (Year 4, 3, 5, 4): numbers ≤ 1.5 × the source range, no Grade 5 content, pre cite the source year or below | ÷ 100 deals 3-digit dividends only; order_fractions deals unlike sets; f_to_d mixes fifths, no picture | partial / gap |
+| 21-24 Support | judged at the source grade (Year 4, 3, 5, 4): numbers ≤ 1.5 × the source range, no Grade 5 content, pre cite the source year or below | ÷ 100 deals 3-digit dividends, a 2-digit one now and then (about 1 in 10; 89 ÷ 100), never a 1-digit one, and no option gives a page of them (corrected in lessons r2: r1 said "3-digit only"); order_fractions deals unlike sets; f_to_d mixes fifths, no picture | partial / gap |
 
 Every other clause is in the lesson's `missing` and its partials' clauses, which `lessonfit` holds to the items (CLAUSE, M,
 TITLEREP).
