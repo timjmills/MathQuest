@@ -21,12 +21,12 @@ the first entry.
 
 - **575 year rows** (Reception 67, Year 1 79, Year 2 75, Year 3 84, Year 4 89, Year 5 92, Year 6 89) → **210 representations**.
 - **MATCH 6 · PARTIAL 103 · GAP 101.**
-- The 204 PARTIAL / GAP representations are closed by 93 existing build-list entries (merged) and 53 entries added from this catalogue.
+- The 204 PARTIAL / GAP representations are closed by 93 existing build-list entries (merged) and 54 entries added from this catalogue.
 
 | Lane | Representations it owns | MATCH | PARTIAL | GAP | Entries added from the catalogue |
 |---|---|---|---|---|---|
 | `k2` | 50 | 0 | 21 | 29 | 12 |
-| `operations` | 32 | 0 | 20 | 12 | 11 |
+| `operations` | 32 | 0 | 20 | 12 | 12 |
 | `placevalue` | 17 | 0 | 9 | 8 | 9 |
 | `algebra` | 15 | 0 | 6 | 9 | 4 |
 | `fractions` | 18 | 0 | 11 | 7 | 7 |
@@ -81,7 +81,7 @@ the first entry.
 | V027 | Equal-parts bar (fraction of an amount, find the whole) | Y1 R57, Y2 R27, Y3 R27, Y4 R22, Y5 R27, Y6 R27 | 31 | GAP | `division:share_into_groups`, `division:div_equation_parts`, `division:div_facts` | `vis_bar_family`*, `frac_find_whole` | `operations` |
 | V028 | Scaling / ratio bar (1 box vs n boxes; a : b rows) | Y2 R28, Y3 R28, Y6 R28 | 8 | GAP | `multiplication:mult_comparison`, `conversions:ratio_intro`, `conversions:equiv_ratios`, `conversions:ratio_tables` | `vis_bar_family`*, `comparison_statements`, `ratio_problems` | `operations` |
 | V029 | Unit-conversion bars (1 m cells over 100 cm) | Y2 R29, Y3 R29, Y4 R66, Y5 R29, Y6 R29 | 10 | GAP | `measurement:length_metric`, `measurement:unit_conversions` | `vis_bar_family`*, `vis_conversion_models`* | `operations` |
-| V030 | Column method on squared paper (to 7 digits; decimal point track) | Y3 R30 (MATCH), Y4 R16 (MATCH), Y5 R30 (M/P), Y6 R30 (M/P) | 27 | PARTIAL | `template:stack`, `pane:gridpaper`, `subtraction:sub_across_zeros`, `addition:add_missing_digit`, `template:money-columns`, `addition:add_1m_mixed` | `vis_stack_layouts`* | `operations` |
+| V030 | Column method on squared paper (to 7 digits; decimal point track) | Y3 R30 (MATCH), Y4 R16 (MATCH), Y5 R30 (M/P), Y6 R30 (M/P) | 27 | PARTIAL | `template:stack`, `pane:gridpaper`, `subtraction:sub_across_zeros`, `addition:add_missing_digit`, `template:money-columns`, `addition:add_1m_mixed` | `vis_stack_layouts`*, `vis_carry_below`* | `operations` |
 | V031 | Place-value chart beside the method with exchanges (+ − × ÷, decimals) | Y2 R31, Y3 R31, Y4 R17, Y4 R39, Y5 R31, Y6 R31 | 38 | GAP | `pane:pvgrid` | `vis_pv_exchange`* | `placevalue` |
 | V032 | Crossed-out counters, blocks, disks and fraction parts | R R21 (M/P), R R47 (MATCH), Y1 R34 (M/P), Y2 R32, Y3 R32, Y4 R57 (GAP), Y5 R32, Y6 R32 | 27 | PARTIAL | `subtraction:sub_5_pictures`, `pane:tenframe`, `template:counters`, `pane:objects`, `pane:rekenrek`, `pane:disks` | `vis_frac_bar_modes`*, `vis_pv_dot_disks`*, `vis_base10_read`* | `fractions` |
 | V033 | Missing-digit boxes (column, bus stop, long division) | Y1 R37 (MATCH), Y2 R33 (MATCH), Y3 R33 (MATCH), Y5 R33 (MATCH), Y6 R33 (M/P) | 29 | PARTIAL | `template:equation`, `addition:cloze_addition`, `subtraction:missing_add_sub`, `addition:add_missing_digit`, `subtraction:sub_missing_digit`, `multiplication:mult_missing_digit` | `vis_division_layouts`* | `operations` |
@@ -212,7 +212,7 @@ the first entry.
 | V158 | Array of arrays (three factors) | Y4 R33 | 1 | GAP | `multiplication:mult_properties` | `vis_array_options`*, `mult_three` | `operations` |
 | V159 | Factor pairs: arrays of n, factor bug / rainbow, pair table | Y4 R36, Y5 N5-12 | 4 | PARTIAL | - | `vis_factor_diagrams`* | `numtheory` |
 | V160 | Two stacked PV charts with a × / ÷ 10, 100 shift arrow | Y4 R37 (GAP), Y6 N03 (MATCH) | 10 | PARTIAL | `placevalue:place_value_10x`, `multiplication:mult_zeros` | `mult_multiples` | `operations` |
-| V161 | Short multiplication column; expanded partial-product column | Y4 R38 (MATCH / GAP) | 2 | PARTIAL | `template:stack`, `multiplication:multiply`, `multiplication:mult_missing_digit` | `vis_stack_layouts`* | `operations` |
+| V161 | Short multiplication column; expanded partial-product column | Y4 R38 (MATCH / GAP) | 2 | PARTIAL | `template:stack`, `multiplication:multiply`, `multiplication:mult_missing_digit` | `vis_stack_layouts`*, `vis_carry_below`* | `operations` |
 | V162 | Area by unit squares (half squares; same area) | Y4 R43, Y6 N31 | 5 | PARTIAL | `area_perimeter:area_unit_squares`, `area_perimeter:area` | `area_compare`, `same_area`, `vis_migrate_area_volume`* | `geometry` |
 | V163 | Regular polygons with equal-side hatch marks | Y4 R46 | 3 | GAP | `area_perimeter:perimeter` | `regular_polygon`, `polygons` | `geometry` |
 | V164 | Mixed numbers / improper fractions across several wholes | Y4 R50 | 9 | PARTIAL | `fractions:mixed_improper_visual`, `fractions:improper_mixed` | `vis_frac_bar_modes`*, `frac_beyond_1` | `fractions` |
@@ -380,6 +380,7 @@ Every entry of `design/BUILD_LIST.md` that draws a catalogued representation, wi
 | `vis_division_layouts` Division Layouts: Bus Stop, Notes, Missing Digits | `operations` | added from visual catalogue | V033, V189, V190 | 33 |
 | `vis_open_line` Open Number Line (template option) | `operations` | added from visual catalogue | V020 | 32 |
 | `vis_stack_layouts` Column Layouts: Decimal Point Track and Expanded Column | `operations` | added from visual catalogue | V030, V161 | 29 |
+| `vis_carry_below` Carry Digits Under the Line (option) | `operations` | added from visual catalogue | V030, V161 | 29 |
 | `equal_groups_early` Make Equal Groups | `operations` | White Rose audit | V037 | 24 |
 | `share_group` Share and Make Groups | `operations` | White Rose audit | V040 | 23 |
 | `vis_hop_line_options` Hop Lines: Through Zero, Chunks, Fact Labels | `operations` | added from visual catalogue | V019, V092 | 16 |

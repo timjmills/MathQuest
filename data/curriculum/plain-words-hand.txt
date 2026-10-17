@@ -371,3 +371,5 @@ files
 # the lesson and unit "Skills to be made" cards (2026-10-17)
 planned
 redone
+millimeters
+millimeter

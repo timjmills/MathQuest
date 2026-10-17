@@ -19,7 +19,7 @@ FULL in `standards-audit.js`, and delete the entry (the WRM gate and `ws-standar
 
 ## Summary
 
-- 276 entries: **133 new skills, 88 new options, 2 repairs**, and **53 added from the visual catalogue** (1 wiring, 10 template, 6 pane, 28 option, 1 skill, 6 migration, 1 band).
+- 277 entries: **133 new skills, 88 new options, 2 repairs**, and **54 added from the visual catalogue** (1 wiring, 10 template, 6 pane, 29 option, 1 skill, 6 migration, 1 band).
 - 162 from the White Rose audit (42 extended for standards), 61 from the standards audit.
 - They close 114 CCSS leaves and parts and 36 Essential Elements that are not FULL today, and every White Rose small step without a full-coverage skill.
 - The visual catalogue: 210 representations (MATCH 6, PARTIAL 103, GAP 101); every PARTIAL and GAP one is on an entry below.
@@ -29,7 +29,7 @@ FULL in `standards-audit.js`, and delete the entry (the WRM gate and `ws-standar
 | Lane | Entries | New skills | Options | Repairs | Added from visual catalogue | Standards closed | WRM steps closed | Representations drawn | Visual reach (steps) |
 |---|---|---|---|---|---|---|---|---|---|
 | Counting and early number (K-1 pictures) (`k2`) | 35 | 16 | 7 | 0 | 12 | 20 | 34 | 55 | 454 |
-| Operations (+ − × ÷, facts, multi-digit, integers arithmetic) (`operations`) | 41 | 19 | 10 | 1 | 11 | 21 | 50 | 35 | 316 |
+| Operations (+ − × ÷, facts, multi-digit, integers arithmetic) (`operations`) | 42 | 19 | 10 | 1 | 12 | 21 | 50 | 35 | 316 |
 | Place value, rounding and estimation (the pv kit) (`placevalue`) | 21 | 4 | 8 | 0 | 9 | 9 | 36 | 23 | 327 |
 | Patterns, algebra, order of operations, strategies (gen-algebraic) (`algebra`) | 28 | 14 | 10 | 0 | 4 | 19 | 20 | 17 | 104 |
 | Fractions, decimals, conversions, ratio (`fractions`) | 45 | 17 | 21 | 0 | 7 | 19 | 49 | 23 | 233 |
@@ -526,7 +526,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 8 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-## Lane `operations`: Operations (+ − × ÷, facts, multi-digit, integers arithmetic) (41)
+## Lane `operations`: Operations (+ − × ÷, facts, multi-digit, integers arithmetic) (42)
 
 Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/modules/sheet/cells/{stack,fact,family,equation,cloze-bank,arrays,area-model,mult-grid,mult-chart,division,long-division,ops-counters,ops-common,hop-line,number-line}.js`, `js/modules/sheet/providers/{addition,subtraction,multiplication,division,countby}.js`. Builds templates: `bar-model`, `long-multiplication`.
 
@@ -959,7 +959,17 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 32 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 37. Column Layouts: Decimal Point Track and Expanded Column — `vis_stack_layouts`
+### 37. Carry Digits Under the Line (option) — `vis_carry_below`
+
+- **Added from visual catalogue.** option · grade 2-5 · lane `operations`.
+- **Build:** `carry: 'top' | 'bottom'` option (default top) on the column methods: the carried digit sits in a smaller box (about two-thirds of a digit box) UNDER the answer line in the next column; long multiplication gets a carry row under each partial-product row; the cell grows, digits never shrink; keys show the carries; on screen the carry boxes are optional and unscored. Subtraction stays at the top (owner)..
+- **Offered on:** `addition:add`, `addition:add_column_multi`, `multiplication:multiply`.
+- **Templates:** `stack`. **Files:** `js/modules/sheet/cells/stack.js`, `js/modules/skill-options.js`, `js/modules/screen-cell.js`.
+- **Draws (visual catalogue):** V030 Column method on squared paper (to 7 digits; decimal point track); V161 Short multiplication column; expanded partial-product column.
+- **Reach:** 29 White Rose small steps use these pictures.
+- **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
+
+### 38. Column Layouts: Decimal Point Track and Expanded Column — `vis_stack_layouts`
 
 - **Added from visual catalogue.** option · grade 2-5 · lane `operations`.
 - **Build:** stack gains the decimal-point track `dp: 1..3` (lifted from money-columns) so decimal add / subtract leave the legacy decimal-column-add print, and `form: 'expanded'` (the partial-product column with annotations).
@@ -969,7 +979,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 29 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 38. Hop Lines: Through Zero, Chunks, Fact Labels — `vis_hop_line_options`
+### 39. Hop Lines: Through Zero, Chunks, Fact Labels — `vis_hop_line_options`
 
 - **Added from visual catalogue.** option · grade K-4 · lane `operations`.
 - **Build:** hop-line gains a negative start and `bridge: 0`, unequal "chunk" arcs, and `labels: 'facts'` ("n × 2" above each tick, values below).
@@ -979,7 +989,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 16 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 39. Split and Operate (template) — `vis_split_op`
+### 40. Split and Operate (template) — `vis_split_op`
 
 - **Added from visual catalogue.** template · grade 2-5 · lane `operations`.
 - **Build:** a new split-op template: a part-whole split with an operation arrow (× n or ÷ n) under each part and the recombined answer, for partitioning in multiplication and division.
@@ -989,7 +999,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 10 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 40. Area Model: 2 × 2 and 2 × 3 Grids — `vis_area_model_rows`
+### 41. Area Model: 2 × 2 and 2 × 3 Grids — `vis_area_model_rows`
 
 - **Added from visual catalogue.** option · grade 2-5 · lane `operations`.
 - **Build:** area-model gains `rows` (2 × 2, 2 × 3 grids), `fill: 'base10' | 'disks'` inside the cells and the +1 row / column adjust strip; area_model_mult_hard leaves the legacy path.
@@ -999,7 +1009,7 @@ Your existing entries that also draw catalogued representations (build them with
 - **Reach:** 7 White Rose small steps use these pictures.
 - **Done means:** B&W kit drawing on every page type and screen host, answer-free where it is a support, ≥ 8 on the RUBRIC and OPTIONS-RUBRIC; then set each representation it closes to MATCH in its year catalogue.
 
-### 41. Bridging Split Mark (pane) — `vis_split_mark`
+### 42. Bridging Split Mark (pane) — `vis_split_mark`
 
 - **Added from visual catalogue.** pane · grade 1-4 · lane `operations`.
 - **Build:** a new pane:split: the second number split under the calculation to make the next ten, hundred or whole (6 → 2 + 4; 0.67 → 0.55 + 0.12), a support value on the add / subtract hosts.
