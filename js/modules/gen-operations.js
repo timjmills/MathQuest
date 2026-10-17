@@ -4216,9 +4216,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const b = rng(2, 9);
                     const missingPart = a - splitPart;
                     const product = a * b;
-                    q.text = `${a} x ${b} = ${splitPart} x ${b} + ___ x ${b}. What is the missing number?`;
+                    q.text = `${a} × ${b} = ${splitPart} × ${b} + ___ × ${b}. What is the missing number?`;
                     q.ans = missingPart;
-                    q.hint = `Distributive property: ${a} x ${b} = (${splitPart} + ?) x ${b}. Since ${splitPart} + ${missingPart} = ${a}, the missing number is ${missingPart}`;
+                    q.hint = `Distributive property: ${a} × ${b} = (${splitPart} + ?) × ${b}. Since ${splitPart} + ${missingPart} = ${a}, the missing number is ${missingPart}`;
                     q.answerType = "number";
                     q.options = buildNumericOptions(missingPart);
 
@@ -4243,7 +4243,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                     q.visual = `<div style="text-align:center;">
                         <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Distributive Property</div>
-                        <div style="margin-bottom:8px;font-size:1.1rem;">${a} x ${b} = <span style="color:var(--accent-green);">${splitPart} x ${b}</span> + <span style="color:var(--accent-orange);">? x ${b}</span></div>
+                        <div style="margin-bottom:8px;font-size:1.1rem;">${a} × ${b} = <span style="color:var(--accent-green);">${splitPart} × ${b}</span> + <span style="color:var(--accent-orange);">? × ${b}</span></div>
                         <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="max-width:100%;">
                             <rect x="0" y="0" width="${svgW}" height="${svgH}" rx="8" fill="var(--bg-card)" stroke="var(--accent-cyan)" stroke-width="2"/>
                             ${splitDots}
@@ -4258,12 +4258,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const num = rng(2, 12);
                     const order = pick(['num_first', 'one_first']);
                     if (order === 'num_first') {
-                        q.text = `What is ${num} x 1?`;
+                        q.text = `What is ${num} × 1?`;
                     } else {
-                        q.text = `What is 1 x ${num}?`;
+                        q.text = `What is 1 × ${num}?`;
                     }
                     q.ans = num;
-                    q.hint = `Identity property: Any number times 1 equals itself. ${num} x 1 = ${num}`;
+                    q.hint = `Identity property: Any number times 1 equals itself. ${num} × 1 = ${num}`;
                     q.answerType = "number";
                     q.options = buildNumericOptions(num);
 
@@ -4276,7 +4276,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                             <span style="margin:0 8px;">=</span>
                             <span style="color:var(--accent-cyan);font-weight:700;">?</span>
                         </div>
-                        <div style="margin-top:10px;font-size:0.9rem;color:var(--text-dim);">Any number x 1 = that number</div>
+                        <div style="margin-top:10px;font-size:0.9rem;color:var(--text-dim);">Any number × 1 = that number</div>
                     </div>`;
 
                 } else {
@@ -4284,12 +4284,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const num = rng(1, 12);
                     const order = pick(['num_first', 'zero_first']);
                     if (order === 'num_first') {
-                        q.text = `What is ${num} x 0?`;
+                        q.text = `What is ${num} × 0?`;
                     } else {
-                        q.text = `What is 0 x ${num}?`;
+                        q.text = `What is 0 × ${num}?`;
                     }
                     q.ans = 0;
-                    q.hint = `Zero property: Any number times 0 equals 0. ${num} x 0 = 0`;
+                    q.hint = `Zero property: Any number times 0 equals 0. ${num} × 0 = 0`;
                     q.answerType = "number";
                     q.options = buildNumericOptions(0);
 
