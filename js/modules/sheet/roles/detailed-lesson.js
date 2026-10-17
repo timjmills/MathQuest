@@ -459,7 +459,8 @@ export const DETAILED_PUPIL_CSS = `
 .ws-page .dl-exitgrid .pv-expand{gap:1.5mm}
 .ws-page .dl-exitgrid .pv-expand .o{width:auto;padding:0 0.5mm}
 .ws-page .dl-nsgrid .ws-cell{justify-content:stretch;align-items:center}
-.ws-page .dl-nsrow{display:grid;grid-template-columns:58mm 1fr;align-items:center;width:100%;gap:3mm;padding-left:5mm;box-sizing:border-box}
+.ws-page .dl-nsrow{display:grid;grid-template-columns:50mm 1fr;align-items:center;width:100%;gap:3mm;padding-left:5mm;box-sizing:border-box}
+.ws-page .dl-nsitem .pv-frame{flex-wrap:nowrap}
 .ws-page .dl-nsrow>.dl-nsinstr{height:auto;padding:0;font-size:15pt;line-height:1.2;white-space:normal}
 .ws-page .dl-nsitem{display:flex;justify-content:center;align-items:center;min-width:0}
 `;

@@ -116,7 +116,9 @@
     "ftFactors": "5U",
     "tenDir": "4E",
     "tenValues": "4F",
-    "tenPlain": "4G"
+    "tenPlain": "4G",
+    "tenWrite": "4H",
+    "tenTask": "4I"
   },
   "blocks": {
     "0": {
@@ -757,7 +759,15 @@
       "both": "B"
     },
     "tenValues": {},
-    "tenPlain": {}
+    "tenPlain": {},
+    "tenWrite": {
+      "both": "B",
+      "top": "T"
+    },
+    "tenTask": {
+      "compare": "C",
+      "story": "S"
+    }
   },
   "scalarOnly": {
     "range": "decimal",

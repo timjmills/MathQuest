@@ -313,8 +313,10 @@ function genTimesValue(q, o) {
     const places = Array.from({ length: nd - 1 }, (_, i) => 10 ** (i + 1));
     const P = places[blockOrder(places.length)[slot(places.length)]];
     const dir = o.tenDir === 'times' || o.tenDir === 'tenth' ? o.tenDir : (Math.floor(_at / places.length) + slot(2)) % 2 ? 'tenth' : 'times';
+    const story = o.tenTask === 'story';
     const values = o.tenValues !== false;
-    const plain = !!o.tenPlain;
+    const top = values && o.tenWrite === 'top';
+    const plain = !!o.tenPlain || story;
     const d = randInt(1, 9);
     // A number holding `d` once, at place `pl`, its length between pl's and nd digits.
     const withDigit = (pl, avoid) => {
@@ -343,14 +345,36 @@ function genTimesValue(q, o) {
     const rel = TEN_REL[dir];
     const F = fmt(first), S = fmt(second);
     q.skillLabel = 'Ten Times the Place to the Right';
+    if (story) {
+        // (`tenTask` story, 4.NBT.A.1's own example: 700 ÷ 70 = 10 - two amounts, the digit and zeros, the bigger first)
+        const B = Math.max(first, second), Sm = Math.min(first, second);
+        q.text = `Mia has ${fmt(B)} stickers. Leo has ${fmt(Sm)} stickers. Look at the ${d} in each number. Mia has how many times as many?`;
+        q.printText = q.text;
+        q.storyText = q.text;
+        inlineBlanks(q, `${q.text} ___ ÷ ___ = ___`, [[B, Sm, 10], [fmt(B), fmt(Sm), 10]], [String(B).length + 2, String(Sm).length + 2, 3]);
+        q.ans = 10;
+        q.hint = `Write ${fmt(B)} ÷ ${fmt(Sm)}. The ${d} moved one place: 10 times.`;
+        q.pv = { kind: 'times', n: B, m: Sm, place: P, placeM: P / 10, digit: d, dir: 'times', values: false, plain: true, v0: B, v1: Sm, rel: TEN_REL.times, story: true };
+        q.cell = null;
+        q.wpParts = [B, Sm];
+        q.spreadKey = `ten:${d}`;
+        q.factKey = `ten:${d}:${P}/${P / 10}`;
+        return;
+    }
     q.hint = 'Write what each underlined digit is worth. One place to the left is worth 10 times as much.';
-    q.printText = values ? 'Write what each digit is worth. Circle 10 times or one tenth.' : 'Circle 10 times or one tenth.';
-    q.instructionKey = values ? 'ten-times' : 'ten-times-ring';
+    q.printText = top ? 'Write the top value. Circle 10 times or one tenth.' : values ? 'Write what each digit is worth. Circle 10 times or one tenth.' : 'Circle 10 times or one tenth.';
+    q.instructionKey = top ? 'ten-times-one' : values ? 'ten-times' : 'ten-times-ring';
     const alt = dir === 'times' ? ['10 times', 'ten times', '10 times as much as'] : ['one tenth of', '1/10 of', 'a tenth of'];
-    if (values) {
+    if (top) {
+        inlineBlanks(q, `The ${d} in ${F} is worth ___. The ${d} in ${F} is ___ the ${d} in ${S}.`,
+            alt.map((a) => [v0, a]), [String(Math.max(first, second)).length + 2, 12]);
+        q.ans = `${v0}, ${rel}`;
+        q.dealAnswer = `${fmt(v0)}, ${rel}`;
+    } else if (values) {
         inlineBlanks(q, `The ${d} in ${F} is worth ___. The ${d} in ${S} is worth ___. The ${d} in ${F} is ___ the ${d} in ${S}.`,
             alt.map((a) => [v0, v1, a]), [String(va).length + 2, String(va).length + 2, 12]);
-        q.ans = `${fmt(v0)}, ${fmt(v1)}, ${rel}`;
+        q.ans = `${v0}, ${v1}, ${rel}`;
+        q.dealAnswer = `${fmt(v0)}, ${fmt(v1)}, ${rel}`;
     } else {
         q.text = `The ${d} in ${F} is ___ the ${d} in ${S}.`;
         q.answerType = 'multiple-choice';
@@ -359,14 +383,17 @@ function genTimesValue(q, o) {
         // (the key names the two values too, so two ring items of a page never share one key line)
         q.dealAnswer = `${rel} (${fmt(v0)} and ${fmt(v1)})`;
     }
-    q.pv = { kind: 'times', n: first, m: second, place: dir === 'times' ? P : P / 10, placeM: dir === 'times' ? P / 10 : P, digit: d, dir, values, plain, v0, v1, rel };
+    q.pv = { kind: 'times', n: first, m: second, place: dir === 'times' ? P : P / 10, placeM: dir === 'times' ? P / 10 : P, digit: d, dir, values, plain, v0, v1, rel, top };
     q.cell = { template: 'pv-times', v: 1, payload: {
-        kind: 'times', digit: d, dir, values,
+        kind: 'times', digit: d, dir, values, ...(top ? { oneValue: true } : {}),
         rows: [{ n: String(first), place: q.pv.place }, { n: String(second), place: q.pv.placeM }],
         keys: { v0: fmt(v0), v1: fmt(v1), rel }, choices: [TEN_REL.times, TEN_REL.tenth], keyValue: q.ans,
     } };
     q.printFormat = 'pv-cell';
     q.visual = '';
+    // (the fact the pupil produces: the digit and the place pair, either direction one fact - print-sheet.js factKeyOf)
+    q.spreadKey = `ten:${d}`;
+    q.factKey = `ten:${d}:${P}/${P / 10}`;
 }
 
 function wantZero(o) {

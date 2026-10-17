@@ -196,7 +196,9 @@ export const MULTI_KEYS = Object.freeze({
     tenDir: '4E',        // value form times: the first digit one place left (times) / right (tenth) / both
     tenValues: '4F',     // value form times: write both values before circling
     tenPlain: '4G',      // value form times: the digit and zeros only (700 and 70)
-    // NEXT FREE IN 4E-4O: 4H.
+    tenWrite: '4H',      // value form times: both values / the top value only (lesson 6 r2)
+    tenTask: '4I',       // value form times: compare / story (700 ÷ 70 = 10)
+    // NEXT FREE IN 4E-4O: 4J.
 
     // Block 5 — P12 (were "XA"–"XM" before any of them shipped)
     members: '5A',       // mixed pools: which member skills / categories the pool draws from
@@ -344,6 +346,8 @@ export const VALUE_TOKENS = Object.freeze({
     // P9 step 8 (block 0)
     form: Object.freeze({ value: 'V', unit: 'U', notation: 'N', sum: 'S', times: 'T' }),
     tenDir: Object.freeze({ times: 'T', tenth: 'E', both: 'B' }),
+    tenWrite: Object.freeze({ both: 'B', top: 'T' }),
+    tenTask: Object.freeze({ compare: 'C', story: 'S' }),
     frame: Object.freeze({ boxes: 'B', line: 'L' }),
     responseScope: Object.freeze({ full: 'F', notation: 'N', decision: 'D', judge: 'J' }),
     divForm: Object.freeze({ standard: 'S', long: 'L', fraction: 'F', vertical: 'V', mix: 'M' }),

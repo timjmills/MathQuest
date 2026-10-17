@@ -52,3 +52,22 @@ Sources: the CCSS text quoted in the New Jersey Grade 4 Unit 1 CAR template (nj.
 ## 5. Owner questions
 1. One tenth written as the words "one tenth of" (ring) rather than the fraction 1/10? Recommend: words in Grade 4; 1/10 and 0.1 in lesson 9.
 2. Two digits in ONE number (4,440: which 4 is worth 10 times the other?) — a later option `tenOne`? Recommend: yes, as a stretch page after lesson 9; not today (one new thing).
+
+## 6. Skill coverage (owner rule, round 2)
+skills.used (all `placevalue:*`, value = `placevalue:value` form `times`):
+- P0: `identify` {band 999, circle} · `value` {band 9999, form value} · `place_value_10x` {op x, power [10], band 1000} · `place_value_10x` {op /, power [10], band 1000}
+- P1: `more_less_100` {step 10 more / 100 less / 100 more / 10 less} · `compare` {band 999, far | close}
+- P2 chart, P3 Guided + Independent, P4-1: value {form times, band 9999, tenDir both, tenValues on}; P4-2: the same, band 99999
+- P5: value {form times, tenTask story, tenDir times, band 9999} · P6: value {form times, tenWrite top, tenDir times | tenth, band 9999}
+- Check Question: value {form times, tenValues off, band 9999}
+
+skills.coverage:
+| Clause / atom | Skill + opts | Verdict |
+|---|---|---|
+| 4.NBT.A.1 "a digit in one place represents ten times what it represents in the place to its right" | value {form times, tenDir times} | full |
+| 4.NBT.A.1 "multi-digit whole number" | value {form times, band 9999 / 99999 / 999999} | full |
+| 4.NBT.A.1 "recognize that 700 ÷ 70 = 10 by applying place value and division" | value {form times, tenTask story} | full |
+| one tenth, whole numbers (the site lesson's title; 5.NBT.A.1 clause in words) | value {form times, tenDir tenth} | full |
+| 5.NBT.A.1 with decimals; 1/10 written as a fraction or 0.1 | — | elsewhere: lesson 9 (5.NBT.A.1), the same template with decimal rows |
+| Atoms 1-4 (places, value, × 10, ÷ 10) | identify · value {form value} · place_value_10x {x | /} | full |
+| Atoms 5-8 (one place left, left or right, any place, one tenth) | value {form times, tenDir both, bands to 99999} | full |
