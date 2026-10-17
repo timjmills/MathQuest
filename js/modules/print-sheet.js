@@ -3220,7 +3220,7 @@ function pageCheck(html) {
                     const inner = cr.height - (parseFloat(ccs.paddingTop) || 0) - (parseFloat(ccs.paddingBottom) || 0);
                     if (b > t && inner > 0) {
                         const k = Math.round(cr.top);
-                        const row = spreadRows.get(k) || { h: 0, inner };
+                        const row = spreadRows.get(k) || { h: 0, inner: 0 };
                         row.h = Math.max(row.h, (b - t) / PX_PER_MM); row.inner = Math.max(row.inner, inner / PX_PER_MM);
                         spreadRows.set(k, row);
                     }
@@ -3256,7 +3256,7 @@ function pageCheck(html) {
             const fills = [...spreadRows.values()].filter((r) => r.h >= 20).map((r) => r.h / r.inner).sort((a, b) => a - b);
             if (fills.length) {
                 const med = fills[Math.floor((fills.length - 1) / 2)];
-                if (med < 0.52) { bands++; banded.push(`spread ${Math.round(med * 100)}%`); }
+                if (med < 0.51) { bands++; banded.push(`spread ${Math.round(med * 100)}%`); }
             }
         });
         return { fill, bands, over, banded };
