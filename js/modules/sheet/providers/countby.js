@@ -392,9 +392,11 @@ function chartProvider() {
                 }
                 // odd-odd-shaded: shaded a box whose row and column numbers are both odd
                 const oddR = rowsArr.filter((r) => r % 2 === 1), oddC = colsArr.filter((cc) => cc % 2 === 1);
-                const oo = oddR.flatMap((r) => oddC.map((cc) => [r, cc])).sort((x, y) => (y[0] * y[1] > 9) - (x[0] * x[1] > 9))[0];
-                if (oo && idOf.has(oo[0] * oo[1])) {
-                    c.push({ value: right.concat([idOf.get(oo[0] * oo[1])]), misconception: 'odd-odd-shaded', slot: 'answer', slots: { answer: right.concat([idOf.get(oo[0] * oo[1])]).join(', ') }, explain: `Shaded ${oo[0] * oo[1]} (${oo[0]} × ${oo[1]}): both numbers are odd, so the product is odd.` });
+                // (lesson 4 critic r1 D7: the pupil who holds "odd x odd is even" shades EVERY odd x odd box - so every box)
+                const ooIds = [...new Set(oddR.flatMap((r) => oddC.map((cc) => r * cc)))].filter((v) => idOf.has(v)).map((v) => idOf.get(v));
+                if (ooIds.length) {
+                    const all = right.concat(ooIds);
+                    c.push({ value: all, misconception: 'odd-odd-shaded', slot: 'answer', slots: { answer: all.join(', ') }, explain: 'Shaded the odd x odd boxes too: both numbers odd, so the product is odd.' });
                 }
                 const w = chooseWrong(q, c);
                 if (w) {

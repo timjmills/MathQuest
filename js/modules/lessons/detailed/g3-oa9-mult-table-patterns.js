@@ -15,7 +15,7 @@
 // NOT BUILT (proposal, build list `patterns_notice`): B5 patterns:notice_patterns, the Even / Odd check of a fact
 // with a reason bank. Until then the lesson is windows only: ONE Practice page of six windows and no Mixed page.
 
-const CHART = (extra, opts) => Object.assign({ categoryId: 'multiplication', skillId: 'mult_chart', allTest: 'chartIn9', gridApart: true,
+const CHART = (extra, opts) => Object.assign({ categoryId: 'multiplication', skillId: 'mult_chart', allTest: 'chartIn9', allHard: true, gridApart: true,
     opts: Object.assign({ chart: 'window', band: 100, task: 'even', minFactor: 2 }, opts || {}) }, extra || {});
 const FACT = (tables, extra) => Object.assign({ categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: tables, notation: ['stacked'], band: 100 } }, extra || {});
 const ML = (step, dir, extra) => Object.assign({ categoryId: 'placevalue', skillId: 'more_less_10', opts: { step, dir, band: 100 } }, extra || {});
@@ -46,12 +46,14 @@ export default {
 
     // ------------------------------------------------------------------ the practice skill
     // A 4 x 5 window of the 10 x 10 chart; shade the even products (meanwhile: multiples of 2).
-    skill: CHART({ tries: 600 }, { winRows: 3, winCols: 4 }),
-    edgeTest: 'chartBigOdd',
+    // (r3, critic r1 D5: no two windows of a page share a box, so the lesson pages use the 2-12 chart without 10, products to 100;
+    // the chart example stays on 2-9 - chartExample)
+    skill: CHART({ tries: 600, allTest: 'chartFresh' }, { winRows: 2, winCols: 4, band: 144 }),
+    edgeTest: 'chartEdge',
     practicePages: 1,
     // (Practice windows are 3 x 3, the lesson sheet's 3 x 4: the 2-9 chart holds too few 3 x 3 windows that are not
     // near twins - more than half their boxes shared, either way round - for eleven of one shape)
-    practiceSheets: [{ steps: true, skill: CHART({ tries: 600 }, { winRows: 2, winCols: 4 }), shape: [6, 2], edgeLast: { per: 6, cols: 2, wants: ['chartBigOdd', 'chartBigOdd'] } }],
+    practiceSheets: [{ steps: true, skill: CHART({ tries: 600, allTest: 'chartFresh' }, { winRows: 2, winCols: 3, band: 144 }), shape: [6, 2], edgeLast: { per: 6, cols: 2, first: true } }],
     // (no Mixed page: the facts the windows rest on are P0 and the spaced retrieval; one full Practice page)
 
     // The lesson's own names for a dealt window: first even row / column, an odd x odd box, a reason fact.
@@ -98,11 +100,12 @@ export default {
         ],
         chant: '',
         guidedRows: 2,
-        practiceShape: [6, 2],
+        practiceShape: [4, 2],
         format: { kind: 'numbered steps with icons', why: 'The step pupils break is step 2: they look at the row only.' },
-        example: { test: 'evenColOnly' },
-        guided: ['chartMixed', 'evenColOnly'],
-        independent: ['chartMixed', 'evenColOnly'],
+        example: { test: 'chartExample' },
+        guided: ['chartMixed', 'chartMixed'],
+        guidedWants: ['chartMixed', 'chartMixed'],
+        independent: ['chartMixed', 'chartMixed'],
         mixWith: [],
     },
 
@@ -110,7 +113,7 @@ export default {
     prerequisites: [
         { atom: 1, items: 1, ref: CB(2), lesson: { id: '2.OA.C.3', title: 'Even numbers: count by 2s' } },
         { atom: 2, items: 4, ref: FACT([2, 4], { minNum: 12, maxNum: 36 }), lesson: { id: '3.OA.C.7', title: 'Multiply by 2 and 4' } },
-        { atom: 3, items: 2, ref: CHART({}, { task: 'fill', winRows: 2, winCols: 3 }), lesson: { id: '3.OA.C.7', title: 'Read the multiplication chart' } },
+        { atom: 3, items: 1, ref: CHART({}, { task: 'fill', winRows: 2, winCols: 3 }), lesson: { id: '3.OA.C.7', title: 'Read the multiplication chart' } },
     ],
 
     // ------------------------------------------------------------------ P1 Number sense (earlier content)
@@ -130,7 +133,7 @@ export default {
         instruction: 'Read the story. Draw it. Solve.',
         lines: ['There are {wp.a} bags.', 'Each bag has {wp.b} apples.', 'How many apples? Is it even or odd?'],
         answerLine: 'There are __ apples.',
-        say: 'One number is even. So {wp.p} is __.',
+        say: 'One number is even. So the product is __.',
         sayAns: 'even',
     },
 
@@ -139,14 +142,11 @@ export default {
     // (three 2 x 3 windows, each fresh: no other page's window holds half its boxes, either way round. The 2-9 chart is
     // spent by the lesson's pages, so they may use the 11 and 12 rows (chartFresh, products to 100); a fourth finds none)
     exit: [
-        { case: 'an even row (odd columns)', ref: CHART({ pageGroup: 'exit', gridFresh: true, allTest: 'chartFresh' }, { winRows: 2, winCols: 3, band: 144 }), want: 'chartColsOdd', cols: 2, detects: 'Misses the even row.' },
-        { case: 'the odd row: its even column (Critical Atom)', ref: CHART({ pageGroup: 'exit', gridFresh: true, allTest: 'chartFresh' }, { winRows: 2, winCols: 3, band: 144 }), want: 'chartMixed', cols: 2, detects: 'Leaves an even column white.' },
-        { case: 'odd x odd stays white', ref: CHART({ pageGroup: 'exit', gridFresh: true, allTest: 'chartFresh' }, { winRows: 2, winCols: 3, band: 144 }), want: 'chartOddOdd', cols: 2, detects: 'Shades an odd × odd box.' },
+        { case: 'an even row (odd columns)', ref: CHART({ pageGroup: 'exit', gridFresh: true, allTest: 'chartFresh' }, { winRows: 2, winCols: 3, band: 144 }), want: ['chartColsOdd', 'chartIn9'], cols: 1, group: 'a', detects: 'Misses the even row.' },
+        { case: 'the odd row: its even column (Critical Atom)', ref: CHART({ pageGroup: 'exit', gridFresh: true, allTest: 'chartFresh' }, { winRows: 2, winCols: 3, band: 144 }), want: ['chartMixed', 'chartRowOnly'], cols: 2, group: 'bc', detects: 'Leaves an even column white.' },
+        { case: 'odd x odd stays white', ref: CHART({ pageGroup: 'exit', gridFresh: true, allTest: 'chartFresh' }, { winRows: 2, winCols: 3, band: 144 }), want: 'chartOddOdd', cols: 2, group: 'bc', detects: 'Shades an odd × odd box.' },
     ],
     exitInstruction: 'Shade every even product.',
-    exitSay: 'b. {say.ca} × {say.cb}: {say.cb} is even. So {say.cp} is __.',
-    exitSayItem: 1,
-    exitSayAns: 'even',
 
     // ------------------------------------------------------------------ retrieval (MWB, earlier content)
     retrieval: [
@@ -157,13 +157,13 @@ export default {
 
     // ------------------------------------------------------------------ T1
     t1Boxes: [
-        { kind: 'tip', title: 'Cubes in pairs first', text: 'The 4 row is two 2 rows: every product splits into pairs.' },
+        { kind: 'tip', title: 'Cubes: two equal parts', text: 'Build {chart.wa} rows of {chart.wb}: {chart.wh} and {chart.wh}, two equal parts, so it is even.' },
         { kind: 'language', title: 'Row OR column', text: 'Say "row or column" every time. One even number is enough.' },
         { kind: 'watch', title: 'Row only', text: 'The mistake to stop today: an even column left white.' },
     ],
     caseNames: { chartBigOdd: 'odd × odd stays white', evenColOnly: 'even column only' },
     routeNote: 'No site lesson exists yet for these prerequisites: T6 names a CCSS code and a short title (V22 Appendix H).',
-    materials: ['Interlocking cubes, 20 per pair', 'Mini whiteboards and pens', 'Anchor chart (a 3 × 4 window), A3 or projected', 'Pupil packet, one per pupil', 'Exit slips, cut in half'],
+    materials: ['Interlocking cubes: a teacher set of 60', 'Mini whiteboards and pens', 'Anchor chart (a 3 × 4 window), A3 or projected', 'Pupil packet, one per pupil', 'Exit slips, cut in half'],
     vocabulary: [
         { word: 'even', gloss: 'makes pairs, none left over', diagram: { kind: 'text', text: '●● ●● ●●' } },
         { word: 'odd', gloss: 'one is left over', diagram: { kind: 'text', text: '●● ●● ●● ●' } },
@@ -176,7 +176,7 @@ export default {
         { type: 'Fact', prereq: true, skill: 'Facts of 2 and 4: 4 × n is 2 × n twice', notes: 'Prerequisite Check {pre.1.letters}.' },
         { type: 'Fact', prereq: true, skill: 'Read the chart: row meets column', notes: 'Prerequisite Check {pre.2.letters}.' },
         { type: 'Comparative', skill: 'Even row: every product is even', notes: 'Anchor chart, the even rows.' },
-        { type: 'Conceptual', skill: 'Why: 4 × n is two equal parts', notes: 'Cubes: the 4 row is two 2 rows.' },
+        { type: 'Conceptual', skill: 'Why: an even row splits into two equal parts', notes: 'Cubes: {chart.wa} rows of {chart.wb}, {chart.wh} and {chart.wh}.' },
         { type: 'Category', critical: true, skill: 'One even factor is enough: row OR column', notes: 'Routine step 2.' },
         { type: 'Comparative', skill: 'Odd × odd is odd (contrast)', notes: 'The last Practice row only.' },
     ],
@@ -185,14 +185,14 @@ export default {
         { step: 'Shade the even columns too.', tag: 'New', critical: true, check: 'Guided 2, Check Question, exit b' },
         { step: 'Both odd? Leave it white.', tag: 'New', check: 'Practice last row, exit c' },
     ],
-    howToTeach: 'Show, then name. Build the 2 row and the 4 row with cubes in pairs, then shade them on the window, then the even columns. Odd × odd is shown last, as a contrast, never as a second rule.',
+    howToTeach: 'Show, then name. Build the even row of the chart with cubes and split it into two equal parts, then shade the even rows on the window, then the even columns. Odd × odd is shown last, as a contrast, never as a second rule.',
     board: 'Window rows {chart.rows} × columns {chart.cols}.',
     mistakes: [
         { name: 'Row only', step: 2, looks: '{cq.A}', fix: 'Row OR column? Check both.', option: 'A', misconception: 'row-only' },
         { name: 'Odd × odd = even', step: 3, looks: '{cq.B}', fix: 'Count the pairs: one is left over.', option: 'B', misconception: 'odd-odd-shaded' },
         { name: 'Tens digit decides', step: 1, looks: '{chart.trap} left white (its tens digit is odd)', fix: 'Cover the tens. Read the ones.', option: '', caught: 'Practice 1, a white box' },
         { name: 'Any odd factor is odd', step: 2, looks: '{chart.ca} × {chart.cb} left white', fix: 'One even number is enough.', option: '', caught: 'Exit b' },
-        { name: 'Columns only', step: 1, looks: 'The {chart.ec} column shaded, the {chart.er} row white', fix: 'Rows first, then columns: finger on each header.', option: '', caught: 'Exit a' },
+        { name: 'Columns only', step: 1, looks: 'The {exit.0.ec} column shaded, the {exit.0.er} row white', fix: 'Rows first, then columns: finger on each header.', option: '', caught: 'Exit a' },
     ],
     checkQuestion: { want: 'chartMixed', correct: 'C', ref: CHART({ gridFresh: true, allTest: 'chartFresh' }, { winRows: 2, winCols: 4, band: 144 }) },
 
@@ -225,12 +225,12 @@ export default {
         { n: 5, name: 'I Do: the anchor chart', min: 10, page: 'P2', boxes: [{ kind: 'watch', title: 'Row only', text: 'Point to the row number AND the column number, every box.' }],
             rows: [
                 { do: 'Put the anchor chart up: rows {chart.rows}, columns {chart.cols}.' },
-                { do: 'Build {chart.er} rows of cubes in pairs.' },
+                { do: 'Build {chart.wa} rows of {chart.wb} cubes.' },
                 { say: '{chart.er} is even. Every box in that row is even.', note: 'Step 1: shade the row.' },
                 { ask: 'What about the {chart.ec} column?', note: 'Expected: even. Shade the column.' },
                 { say: '{chart.ca} is odd. {chart.cb} is even. So {chart.cp} is even.', note: 'Step 2, the Critical Atom: one is enough.' },
                 { say: '{chart.oa} and {chart.ob} are both odd. So {chart.op} is odd.', note: 'Leave it white. Contrast only.' },
-                { do: 'Point to {chart.wa} × {chart.wb} = {chart.wp}. Make it with cubes.' },
+                { do: 'Point to {chart.wa} × {chart.wb} = {chart.wp}: the cubes. Split them into two equal parts.' },
                 { say: '{chart.wp} is {chart.wh} and {chart.wh}: two equal parts.', note: 'Why it is even: it splits into two equal parts.' },
             ] },
         { n: 6, name: 'We Do: Guided Practice', min: 7, page: 'P3', boxes: [{ kind: 'feedback', title: 'Fix it at once', text: 'Fix: "Check the row AND the column."' }],
@@ -245,10 +245,10 @@ export default {
             ] },
         { n: 7, name: 'Check Question', min: 3, page: '',
             rows: [
-                { do: 'Show the window {cq.rows} × {cq.cols}. A: {cq.A} · B: {cq.B} · C: {cq.C}.' },
+                { do: 'Draw the window rows {cq.rows} × columns {cq.cols} three times. Shade A: {cq.A} · B: {cq.B} · C: {cq.C}.' },
                 { ask: 'Which shading is right? Show fingers.', note: 'Correct: [[{cq.right}]]. {cq.why}' },
             ],
-            loop: { most: 'Go on to You Do.', half: 'Re-show the odd row with an even column, then one more.', fewer: 'Back to cubes: build {chart.ca} rows of {chart.cb}, pair them up.' } },
+            loop: { most: 'Go on to You Do.', half: 'Re-show the odd row with an even column, then one more.', fewer: 'Back to the cubes: {chart.wa} rows of {chart.wb}, two equal parts.' } },
         { n: 8, name: 'You Do: Independent Practice', min: 9, page: 'P4', boxes: [{ kind: 'watch', title: 'The last row', text: 'Walk to the last rows first: {p4.last}.' }],
             rows: [
                 { do: 'Pupils do Practice 1. {p4.steps}' },
@@ -272,7 +272,7 @@ export default {
     // ------------------------------------------------------------------ T6
     accepted: [
         'A shade drawn as a hatch, a fill or a ring around the number.',
-        'Word problem: the product and "even"; the bar may be drawn as groups or as equal parts.',
+        'Word problem: the product and "even"; the drawing may be groups or equal parts.',
         'A box shaded by mistake and crossed out: mark the pupil\'s last choice.',
         'A window is right only when every box is right: shaded even, white odd.',
         'The Say lines are spoken, not marked: listen for "row or column" and "even".',
@@ -282,7 +282,7 @@ export default {
         { wrote: '{exit.2.wrong.oddoddshaded}', mistake: 'Odd × odd = even', next: 'Count the pairs: one is left over.' },
         { wrote: '{exit.1.cp} left white ({exit.1.ca} is odd)', mistake: 'Any odd factor is odd', next: 'One even number is enough.' },
         { wrote: '{exit.0.trap} left white (its tens digit is odd)', mistake: 'Tens digit decides', next: 'Cover the tens. Read the ones.' },
-        { wrote: 'The {exit.1.ec} column shaded, the {exit.1.er} row white', mistake: 'Columns only', next: 'Rows first, then columns: finger on each header.' },
+        { wrote: 'The even columns shaded, the {exit.0.er} row white', mistake: 'Columns only', next: 'Rows first, then columns: finger on each header.' },
         { wrote: 'Word problem: {wp.p}, "odd"', mistake: 'Any odd factor is odd', next: 'Find one even number: {wp.a}. So {wp.p} is even.' },
         { wrote: 'Word problem: {wp.sum}', mistake: 'Added the numbers', next: '{wp.a} groups of {wp.b}: draw the groups, then multiply.' },
     ],

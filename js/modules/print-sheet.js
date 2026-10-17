@@ -277,6 +277,9 @@ function refAccepts(sk, cand, key, seen, kept, pg = '', row = '', words = true) 
         if (sk.avoidKeys && mulUsed(k, sk.avoidKeys)) return false;
         // (a mult-grid window that is a near twin of one on this page or another page of the pack - lesson 4)
         if (gridKeyOf(k) && (gridNear(k, sk.avoidKeys || [], true) || gridNear(k, seen))) return false;
+        // (`gridApart` windows on a Practice page (`lr6`), lesson 4 critic r1 D5: none shares a box with another window of its
+        // page - turned boxes counted - nor repeats a row segment of another page's window; the lesson sheet picks apart)
+        if (gridKeyOf(k) && sk.gridApart && sk.lr6 && (gridShares(k, [...seen].filter((x) => /^key:grid/.test(x))) || gridSegment(k, sk.avoidKeys || []))) return false;
         if (!refHardOk(sk, cand)) return false;
         if (sk.edge) { const t = LESSON_CASE_TESTS[sk.edgeTest || 'pvEdge']; if (t && !t({ q: cand })) return false; }
         if (seen.has(`key:${k}`)) return false;
@@ -292,9 +295,11 @@ function refAccepts(sk, cand, key, seen, kept, pg = '', row = '', words = true) 
  * the soft floors these are never relaxed, not even on a ref's last try (critic r3 S1: the last try
  * "took what it got" and printed 1,000 on a pupil page past `maxNum: 999`).
  */
-export const refHasHard = (sk) => !!sk && (sk.minNum !== undefined || sk.maxNum !== undefined || (Array.isArray(sk.boardOnly) && sk.boardOnly.length > 0) || sk.partMin !== undefined || Array.isArray(sk.noPart) || !!sk.crossTen);
+export const refHasHard = (sk) => !!sk && (!!sk.allHard || sk.minNum !== undefined || sk.maxNum !== undefined || (Array.isArray(sk.boardOnly) && sk.boardOnly.length > 0) || sk.partMin !== undefined || Array.isArray(sk.noPart) || !!sk.crossTen);
 export function refHardOk(sk, cand) {
     if (!refHasHard(sk)) return true;
+    // (`allHard`, lesson 4 r3: the ref's `allTest` is a HARD bound - a window never takes a 10 row on a relaxed try)
+    if (sk.allHard && sk.allTest && LESSON_CASE_TESTS[sk.allTest] && !LESSON_CASE_TESTS[sk.allTest]({ q: cand })) return false;
     const v = itemNumberOf(cand);
     if (sk.minNum !== undefined && !(v !== null && v >= Number(sk.minNum))) return false;
     if (sk.maxNum !== undefined && !(v !== null && v <= Number(sk.maxNum))) return false;
@@ -350,13 +355,24 @@ export const turnedKeyOf = (q) => (q && q.cell && q.cell.template === 'arrays-tu
 /** Two mult-grid windows of one task that share more than half the smaller one's boxes (lesson 4: a near twin -
  *  the same products again). `k` a factKeyOf grid key; `keys` any keys (strings; 'key:' prefixes are read too). */
 const gridKeyOf = (k) => { const m = String(k || '').replace(/^key:/, '').match(/^grid(\d+)-(\d+)x(\d+)-(\d+)(?::(\w+))?$/); return m ? { r0: +m[1], r1: +m[2], c0: +m[3], c1: +m[4], t: m[5] || '' } : null; };
-export const gridNear = (k, keys, sameShape = false) => {
+/** The unordered boxes {r, c} of a window key (a turned box is the same box): lesson 4 critic r1 D5. */
+const gridBoxes = (k) => { const g = gridKeyOf(k); const out = new Set(); if (!g) return out; for (let r = g.r0; r <= g.r1; r++) for (let c = g.c0; c <= g.c1; c++) out.add(`${Math.min(r, c)},${Math.max(r, c)}`); return out; };
+/** Does window `k` share any box (turned boxes counted) with a window of one task in `keys`? */
+export const gridShares = (k, keys) => { const a = gridKeyOf(k); if (!a) return false; const A = gridBoxes(k);
+    for (const u of keys) { const b = gridKeyOf(u); if (!b || b.t !== a.t) continue; for (const x of gridBoxes(u)) if (A.has(x)) return true; } return false; };
+/** Does window `k` repeat a row segment (two boxes or more of one row, either way round) of a window in `keys`? */
+const gridSegment = (k, keys) => { const a = gridKeyOf(k); if (!a) return false;
+    const ov = (x0, x1, y0, y1) => Math.max(0, Math.min(x1, y1) - Math.max(x0, y0) + 1);
+    for (const u of keys) { const b0 = gridKeyOf(u); if (!b0 || b0.t !== a.t) continue;
+        for (const b of [b0, { r0: b0.c0, r1: b0.c1, c0: b0.r0, c1: b0.r1 }]) if ((ov(a.r0, a.r1, b.r0, b.r1) >= 1 && ov(a.c0, a.c1, b.c0, b.c1) >= 2) || (ov(a.c0, a.c1, b.c0, b.c1) >= 1 && ov(a.r0, a.r1, b.r0, b.r1) >= 2)) return true; }
+    return false; };
+export const gridNear = (k, keys, sameShape = false, anyTask = false) => {
     const a = gridKeyOf(k);
     if (!a) return false;
     const n = (g) => (g.r1 - g.r0 + 1) * (g.c1 - g.c0 + 1);
     for (const u of keys) {
         const b0 = gridKeyOf(u);
-        if (!b0 || b0.t !== a.t) continue;
+        if (!b0 || (b0.t !== a.t && !anyTask)) continue;
         // (a window turned round - rows for columns - holds the same products: a turn-around twin)
         for (const b of [b0, { r0: b0.c0, r1: b0.c1, c0: b0.r0, c1: b0.r1 }]) {
             // (across pages only a window of the same shape, either way round: a 2 x 3 exit window always sits inside a bigger one)
@@ -3070,10 +3086,11 @@ function dealOne1(ref, seed, used, want, avoidAns, near, names, fresh) {
         // (a x fact's unordered pair, any glyph: the Prerequisite Check's 2 × 8 is the array 8 x 2 - lesson 3a r2, D6)
         if (!ref.turnedOk && mulUsed(key, used)) continue;
         // (`gridFresh`, an exit window's first try: no window of ANY shape it mostly repeats - it is not inside a Practice one)
-        if (gridNear(key, used, !ref.gridFresh)) { why.used++; continue; }
+        // (a fresh window is fresh against every task's window too: the Prerequisite Check's fill windows - critic r1 D3)
+        if (gridNear(key, used, !ref.gridFresh, !!ref.gridFresh)) { why.used++; continue; }
         // (`pageGroup`, lesson 4: the refs of one page - the exit slip - keep its windows apart, any shape)
         const grp = ref.pageGroup ? (DL_GROUPS.get(used) || DL_GROUPS.set(used, new Map()).get(used)) : null;
-        if (grp && gridNear(key, grp.get(ref.pageGroup) || [])) { why.near++; continue; }
+        if (grp && (gridNear(key, grp.get(ref.pageGroup) || []) || gridShares(key, grp.get(ref.pageGroup) || []))) { why.near++; continue; }
         // (and no two windows of one grid row with the same rows or columns, either way round - the window form of LR-6's × rule)
         const spans = (k) => (String(k).match(/^grid(\d+-\d+)x(\d+-\d+)/) || []).slice(1);
         // (one grid row of the slip is two windows: `pageCols`, default 2)
@@ -3377,7 +3394,8 @@ async function buildDetailedLesson(req = {}) {
     const exGroups = [];
     exitItems.forEach((it, i) => {
         const e = d.exit[i], last = exGroups[exGroups.length - 1];
-        const k = `${e.ref.categoryId}:${e.ref.skillId}|${e.instr || d.exitInstruction}`;
+        // (`group`, lesson 4 critic r1 D4: items of one skill in groups of their own - a full-width item over two)
+        const k = `${e.ref.categoryId}:${e.ref.skillId}|${e.instr || d.exitInstruction}${e.group ? `|${e.group}` : ''}`;
         if (last && last.k === k) last.idx.push(i); else exGroups.push({ k, instr: e.instr || d.exitInstruction, idx: [i] });
     });
     for (const g of exGroups) {
@@ -3506,7 +3524,8 @@ async function buildDetailedLesson(req = {}) {
                 k++;
                 const its = cs.filter((c) => c.page === pg);
                 const last = Math.max(...its.map((c) => c.row));
-                parts.push(`Practice ${k}: ${its.filter((c) => c.row === last).map((c) => { const w = named(c.q); return `${itemNumberOf(c.q) !== null ? itemNumberOf(c.q) : dlAns(c.q)}${w ? ` (${w})` : ''}`; }).join(', ')}`);
+                // (a function table - lesson 5: its rule as written, "n + 9", not its slot list)
+                parts.push(`Practice ${k}: ${its.filter((c) => c.row === last).map((c) => { const w = named(c.q); return `${c.q && c.q.ftRule && itemNumberOf(c.q) === null ? c.q.ftRule : itemNumberOf(c.q) !== null ? itemNumberOf(c.q) : dlAns(c.q)}${w ? ` (${w})` : ''}`; }).join(', ')}`);
             }
         }
         // ({p4.steps}, lesson 2 r5 - critic r3 D2: where the Steps are, read from whether Practice 1 PRINTS its Steps band)
@@ -3567,6 +3586,8 @@ async function buildDetailedLesson(req = {}) {
     const blankPupil = (id) => { const x = P.find((p) => p.id === id); return x ? x.html : ''; };
     const thumbs = { P0: blankPupil('P0'), P2: blankPupil('P2'), P3: blankPupil('P3'), P4: blankPupil('P4-1') };
     for (const { ch } of chunkRes) { thumbs[`P2${ch.id}`] = blankPupil(`P2${ch.id}`); thumbs[`P3${ch.id}`] = blankPupil(`P3${ch.id}`); }
+    // (`answerShow(text)`, a description hook - lesson 5: an answer as the pupil writes it, "+ 8" for the slot list "+, 8")
+    if (typeof d.answerShow === 'function') for (const g of glance) { try { g.answers = String(d.answerShow(String(g.answers))); } catch (e) { /* as dealt */ } }
     const { bands, flow } = teacherBands(d, V, { thumbs, glance, routing, tags });
     const order = ['T1', 'T2', 'T2b', 'T3', 'T4', 'T5'];
     const groups = [...order, 'T6'];

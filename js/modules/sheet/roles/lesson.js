@@ -167,8 +167,12 @@ const sigOf = (it) => {
 };
 const digitsOfOps = (it) => operandsOf((it && it.q) || {}).map((v) => String(Math.abs(Math.trunc(v))).length).join(',');
 
+/** Two mult-grid windows that share a box, a turned box counted (lesson 4 critic r1 D5): never on one page. */
+const winBoxes = (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'mult-grid' && c.payload; const o = new Set();
+    if (p && Array.isArray(p.rows) && Array.isArray(p.cols)) for (const r of p.rows) for (const k of p.cols) o.add(`${Math.min(r, k)},${Math.max(r, k)}`); return o; };
+export const winShare = (x, y) => { const A = winBoxes(x); if (!A.size) return false; for (const b of winBoxes(y)) if (A.has(b)) return true; return false; };
 /** A mult-grid window's {rows, cols} (detailed lesson 4), else null. */
-const multGridOf = (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'mult-grid' && c.payload; if (!p || !Array.isArray(p.rows) || !Array.isArray(p.cols)) return null; const g = { rows: p.rows.map(Number), cols: p.cols.map(Number) }; return g.rows.concat(g.cols).every((v) => v >= 2 && v <= 12 && v !== 10) && Math.max(...g.rows) * Math.max(...g.cols) <= 100 ? g : null; };
+const multGridOf = (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'mult-grid' && c.payload; if (!p || !Array.isArray(p.rows) || !Array.isArray(p.cols)) return null; const g = { rows: p.rows.map(Number), cols: p.cols.map(Number) }; return g.rows.concat(g.cols).every((v) => v >= 2 && v <= 12) ? g : null; };
 // (no 1 and no 10 in a lesson 4 window: x 1 is the other number, x 10 ends in 0 - both give the parity away)
 /** A one-step find-the-rule function table's {op, k, x1} (detailed lesson 5), else null. */
 const ftRuleOf = (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'function-table' && c.payload; if (!p || p.task !== 'rule' || !Array.isArray(p.rule) || p.rule.length !== 1 || !Array.isArray(p.rows) || p.rows.length < 3) return null; return { op: p.rule[0].op, k: Number(p.rule[0].n), x1: Number(p.rows[0].x) }; };
@@ -242,17 +246,31 @@ export const CASE_TESTS = Object.freeze({
     arrP1: (it) => { const p = arrTurnOf(it); return !!p && ((CASE_TESTS.arrNonSq(it) && p.rows !== 5 && p.cols !== 5) || (p.rows === 3 && p.cols === 5) || (p.rows === 5 && p.cols === 2) || CASE_TESTS.arrBigSquare(it)); },
     // The detailed lesson maker, lesson 4 (even products, 3.OA.D.9): a mult-grid shading window.
     // chartMixed: even and odd rows AND even and odd columns (every case on one window).
+    // (lesson 4 r3: the chart example stays on the 2-9 chart; the Check Question shows the 11 / 12 rows first, critic r1 D3)
+    chartExample: (it) => CASE_TESTS.chartMixed(it) && CASE_TESTS.chartIn9(it) && CASE_TESTS.chartOddOdd(it),
+    chartEleven: (it) => { const p = multGridOf(it); return !!p && CASE_TESTS.chartMixed(it) && p.rows.concat(p.cols).some((v) => v >= 11); },
+    // (the ★★★ last row, critic r1 D5: the "tens digit decides" trap - two even products with an odd tens digit, 36 56 72 -
+    // or an odd x odd product of 35 or more; the rows above hold neither)
+    chartTrap: (it) => { const p = multGridOf(it); if (!p) return false; const pr = [...new Set(p.rows.flatMap((r) => p.cols.map((c) => r * c)))]; return pr.filter((v) => v % 2 === 0 && v >= 10 && Math.floor(v / 10) % 2 === 1).length >= 2; },
+    // (the row-only mistake shows on it: an odd row's even box whose product no even row holds)
+    chartRowOnly: (it) => { const p = multGridOf(it); if (!p) return false; const er = new Set(p.rows.filter((r) => r % 2 === 0).flatMap((r) => p.cols.map((c) => r * c)));
+        return p.rows.some((r) => r % 2 === 1 && p.cols.some((c) => c % 2 === 0 && !er.has(r * c))); },
+    chartEdge: (it) => CASE_TESTS.chartTrap(it) || CASE_TESTS.chartBigOdd(it),
     chartIn9: (it) => { const p = multGridOf(it); return !!p && p.rows.concat(p.cols).every((v) => v <= 9); },
+    // (an exit / Check Question window, lesson 4 r3: the 10 row may show there - the pool of fresh windows needs it)
     // (an exit / Check Question window, lesson 4 r2: fresh windows need the 11 and 12 rows - no 1, no 10; the 2-9 chart
     // is spent by the lesson's own pages. The rule is the same; the numbers are new: transfer.)
-    chartFresh: (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'mult-grid' && c.payload; return !!p && p.rows.concat(p.cols).every((v) => v >= 2 && v <= 12 && v !== 10) && p.rows.some((r) => p.cols.some((k) => r * k > 0)); },
+    // (products to 100 on the lesson pages; an exit / Check Question window may reach 12 x 12 - its products are printed)
+    // (a Practice window, lesson 4 r3: 2-12, the 10 row allowed, products to 100 - six windows that share no box need the room)
+    chartTo100: (it) => { const p = multGridOf(it); return !!p && Math.max(...p.rows) * Math.max(...p.cols) <= 100; },
+    chartFresh: (it) => { const p = multGridOf(it); return !!p && !p.rows.concat(p.cols).includes(10) && Math.max(...p.rows) * Math.max(...p.cols) <= 100; },
     chartMixed: (it) => { const p = multGridOf(it); return !!p && [p.rows, p.cols].every((l) => l.some((v) => v % 2 === 0) && l.some((v) => v % 2 === 1)); },
     // evenColOnly: more odd rows than even ones, so most even products come from an even COLUMN (the Critical Atom).
     evenColOnly: (it) => { const p = multGridOf(it); return !!p && CASE_TESTS.chartMixed(it) && p.rows.filter((v) => v % 2 === 1).length > p.rows.filter((v) => v % 2 === 0).length; },
     // chartOddOdd: an odd x odd box whose product is two-digit (both 3 or more: 3 x 7 = 21, not 1 x 9).
     chartOddOdd: (it) => { const p = multGridOf(it); return !!p && p.rows.some((r) => r % 2 === 1 && r >= 3 && p.cols.some((c) => c % 2 === 1 && c >= 3 && r * c >= 10)); },
-    // chartBigOdd: an odd x odd product of 21 or more (5 x 7 = 35, 7 x 9 = 63) - the ★★★ last row.
-    chartBigOdd: (it) => { const p = multGridOf(it); return !!p && p.rows.some((r) => r % 2 === 1 && p.cols.some((c) => c % 2 === 1 && r * c >= 35)); },
+    // chartBigOdd: an odd x odd product of 55 or more (7 x 9 = 63, 11 x 5) - the ★★★ last row.
+    chartBigOdd: (it) => { const p = multGridOf(it); return !!p && p.rows.some((r) => r % 2 === 1 && p.cols.some((c) => c % 2 === 1 && r * c >= 55)); },
     // chartColsOdd: more odd columns than even ones, so most even products come from an even ROW.
     // chartColsEven: more even columns than odd ones (2 x 3: even-odd-even) - the odd row's even boxes carry it.
     chartColsEven: (it) => { const p = multGridOf(it); return !!p && CASE_TESTS.chartMixed(it) && p.cols.filter((v) => v % 2 === 0).length > p.cols.filter((v) => v % 2 === 1).length; },
@@ -295,7 +313,7 @@ export const CASE_TESTS = Object.freeze({
     // + / − / × with a plain first row (+: not 1 -> 1 + k, which is also x (1 + k)); the trap:
     // a × table whose first row is k → k × k (2 → 4: + 2 or × 2), so only row 2 decides.
     ftAdd: (it) => { const p = ftRuleOf(it); return !!p && p.op === '+' && p.k >= 2 && p.x1 !== p.k && p.x1 >= 2; },
-    ftSub: (it) => { const p = ftRuleOf(it); return !!p && p.op === '-' && p.k >= 2 && p.x1 !== 2 * p.k; },
+    ftSub: (it) => { const p = ftRuleOf(it); return !!p && p.op === '-' && p.k >= 2 && p.x1 !== 2 * p.k && p.x1 > p.k; },
     ftTimes: (it) => { const p = ftRuleOf(it); return !!p && p.op === 'x' && [2, 3, 4, 5, 10].includes(p.k) && p.x1 !== p.k; },
     ftTimesTrap: (it) => { const p = ftRuleOf(it); return !!p && p.op === 'x' && [2, 3, 4, 5].includes(p.k) && p.x1 === p.k; },
     // (+ / − traps: row 1 k -> 2k also fits x 2; row 1 2k -> k also fits ÷ 2 - Practice 1's ★★★ row)
@@ -433,12 +451,12 @@ export function pickWeDo(items, example, data, n) {
         // (the first set of cells, in order, that meets every want with no twins and not the chart's own fact)
         // (lesson 2 r5, critic r3 m3: no story person twice on the sheet while the deal can - "Lena has 7 cards" and "Lena has 6")
         const people = (x) => { const ls = (x && x.q && x.q.cell && x.q.cell.payload && x.q.cell.payload.lines) || []; return ls.slice(0, -1).map((l) => (String(l).match(/^([A-Z][a-z]+)\b/) || [])[1]).filter(Boolean); };
-        const meets = (x, y, nm) => twin(x, y) || (nm && people(x).some((p) => people(y).includes(p)));
+        const meets = (x, y, nm) => twin(x, y) || winShare(x, y) || (nm && people(x).some((p) => people(y).includes(p)));
         const pickLead = (k, chosen, nm) => {
             if (k === data.guidedWants.length) return chosen;
             const t = CASE_TESTS[data.guidedWants[k]];
             if (!t) return pickLead(k + 1, chosen, nm);
-            for (const x of order) if (!chosen.includes(x) && t(x) && !chosen.some((y) => meets(x, y, nm)) && !sameFact(x, example)) { const r = pickLead(k + 1, [...chosen, x], nm); if (r) return r; }
+            for (const x of order) if (!chosen.includes(x) && t(x) && !chosen.some((y) => meets(x, y, nm)) && !sameFact(x, example) && !winShare(x, example)) { const r = pickLead(k + 1, [...chosen, x], nm); if (r) return r; }
             return null;
         };
         const fit = pickLead(0, [], true) || pickLead(0, [], false);
@@ -1363,7 +1381,8 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
         const tot = sum(hr);
         // The spare height goes to the rows in proportion (a row grows by a quarter at most).
         const k = Math.min(1.25, room / tot);
-        const rowsMm = hr.map((h) => h * k);
+        // (`chartEqualRows`, lesson data - the detailed lesson maker, lesson 5: every row of the grid one height, PG-11)
+        const rowsMm = data && data.chartEqualRows ? hr.map(() => Math.max(...hr) * Math.min(1.25, room / (Math.max(...hr) * hr.length))) : hr.map((h) => h * k);
         rowH = Math.max(...rowsMm);
         const grid = gridPart(cells3.map((x) => withZoom(x, 3)), { cols: 3, rows: rows3, labels: 'none', cls: 'mq-chartgrid' });
         grid.rowsTpl = rowsMm.map((h) => `${Math.round(h * 10) / 10}fr`).join(' ');
@@ -1619,7 +1638,8 @@ export function plan(input = {}) {
     const indepFirst = [];
     for (const name of (data && Array.isArray(data.independent) ? data.independent : [])) {
         const t = CASE_TESTS[name];
-        const hit = t ? indepPool0.find((it) => !indepFirst.includes(it) && t(it)) : null;
+        // (a window never shares a box with another window of the sheet - lesson 4 critic r1 D5)
+        const hit = t ? indepPool0.find((it) => !indepFirst.includes(it) && t(it) && ![...weDo, ...indepFirst].some((y) => winShare(it, y))) : null;
         if (hit) indepFirst.push(hit);
     }
     const indepPool = indepFirst.concat(indepPool0.filter((it) => !indepFirst.includes(it)));
@@ -1688,11 +1708,18 @@ export function plan(input = {}) {
     const noRows = indep.length === 0;
     for (const pg of pages) {
         const spare = pg.budget - pg.used;
-        const grows = pg.grows.filter((g) => g.grid && (g.cap > 0 || (noRows && g.capIfEmpty > 0)));
+        const wide = noRows || !!(data && data.growAll);
+        const grows = pg.grows.filter((g) => g.grid && (g.cap > 0 || (wide && g.capIfEmpty > 0)));
         if (spare <= 2 || !grows.length) continue;
-        for (const g of grows) {
-            const cap = noRows && g.capIfEmpty !== undefined ? g.capIfEmpty : (g.cap !== undefined ? g.cap : 0.35);
-            const add = Math.min(spare / grows.length, g.h * cap);
+        // (`growAll`, lesson data - the detailed lesson maker, lesson 5: every band may grow as on a page with no
+        // Independent rows, and a band that reaches its cap passes the rest of its share to the bands after it, so the
+        // sheet does not end on a blank band; absent, as before)
+        let left = spare;
+        for (const [gi, g] of grows.entries()) {
+            const cap0 = wide && g.capIfEmpty !== undefined ? g.capIfEmpty : (g.cap !== undefined ? g.cap : 0.35);
+            const cap = data && data.growAll ? Math.max(cap0, 0.5) : cap0;
+            const add = data && data.growAll ? Math.min(left / (grows.length - gi), g.h * cap) : Math.min(spare / grows.length, g.h * cap);
+            left -= add;
             for (const part of g.grid) part.height = `${Math.round(((parseFloat(part.height) || g.h) + add) * 100) / 100}mm`;
             if (g.box) g.box.html = g.box.html.replace(/height:[\d.]+mm/, `height:${(g.h + add).toFixed(2)}mm`);
         }
@@ -1816,6 +1843,14 @@ function weDoRender(it, i) {
             const t = stepTemplateOf(it);
             const p = it.q.cell.payload;
             if (t) return t.render(Object.assign({}, p), Object.assign({}, c, { state: 'blank', stepVals: { array: { ink: 'solid' }, turn: { ink: 'solid' }, b1: { value: String(Number(p.cols)), ink: 'trace' } } }));
+        }
+        // (an even-products Guided cell, lesson 4 critic r1 D6: the even row and column numbers ringed grey - a hint the
+        // Independent cells drop; cell 1 also has step 1 done in grey - its even rows shaded)
+        if (!answered && it.q && it.q.cell && it.q.cell.template === 'mult-grid' && it.q.cell.payload && it.q.cell.payload.shadeSlots) {
+            const p = it.q.cell.payload, ring = new Set(), shade = new Set();
+            (p.rows || []).forEach((r, ri) => { if (r % 2 === 0) { ring.add(`r${ri}`); if (i === 0) (p.cols || []).forEach((cc, j) => shade.add(`${ri},${j}`)); } });
+            (p.cols || []).forEach((cc, j) => { if (cc % 2 === 0) ring.add(`h${j}`); });
+            return it.render(Object.assign({}, c, { gridSteps: { shade, ring } }), o);
         }
         if (!answered && i === 0) {
             const t = stepTemplateOf(it);

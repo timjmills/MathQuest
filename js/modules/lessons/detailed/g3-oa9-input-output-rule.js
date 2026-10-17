@@ -46,14 +46,16 @@ export default {
     // Practice 1: + and − rules. Practice 2: × then + and −, numbers to 50, In out of order. The ★★★ last
     // row of each: the trap (row 1 fits two rules). The machine picture fades on the exit slip.
     practiceSheets: [
-        { skill: FT({ ftRules: ['+', '-'] }), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['ftTrapAdd', 'ftTrapSub'] } },
-        { skill: FT({ ftRules: ['x', '+', '-'], band: 50, ftTable: 32 }), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['ftTimesTrap', 'ftTrapSub'] } },
+        { steps: true, skill: FT({ ftRules: ['+', '-'] }), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['ftTrapAdd', 'ftTrapSub'] } },
+        { steps: true, skill: FT({ ftRules: ['x', '+', '-'], band: 50, ftTable: 32 }), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['ftTimesTrap', 'ftTrapSub'] } },
     ],
     // No Mixed page (V22 §9.5: optional): a function table is a tall item, and a page that mixes them with
     // earlier facts cannot give the lesson's own skill half the page (E33).
 
     // The lesson's own placeholder names: one table's rows and rule (the function-table payload).
-    vars: (q) => {
+    vars: (q, base) => {
+        // (a wrong rule the provider writes as its slot list "+, 6": quoted as the pupil writes it, "+ 6")
+        const wrong = Object.fromEntries(Object.entries((base && base.wrong) || {}).map(([k, v]) => [k, String(v).replace(/^([+−×÷-]),\s*(\d+)$/, '$1 $2')]));
         const p = (q && q.cell && q.cell.template === 'function-table' && q.cell.payload) || (q && q.ftCheck) || null;
         if (!p || !Array.isArray(p.rows) || p.rows.length < 3 || !Array.isArray(p.rule) || !p.rule.length) return {};
         const [r1, r2, r3] = p.rows;
@@ -63,6 +65,7 @@ export default {
         const next = Math.max(r1.x, r2.x, r3.x) + 1;
         const nextOut = s.op === 'x' ? next * s.n : s.op === '+' ? next + s.n : next - s.n;
         return {
+            wrong,
             x1: r1.x, y1: r1.y, x2: r2.x, y2: r2.y, x3: r3.x, y3: r3.y,
             sign, k: s.n, rule: `${sign} ${s.n}`, d, plus: r2.x + d,
             word: s.op === 'x' ? 'times' : s.op === '-' ? 'take away' : 'add',
@@ -84,14 +87,16 @@ export default {
             { word: 'rule', meaning: 'what the machine does to every number', picture: { kind: 'text', text: '4 → + 3 → 7' } },
         ],
         steps: [
-            { icon: 'look', text: 'Read row 1 across: In, then Out.' },
-            { icon: 'decide', text: 'Bigger or smaller? Find the change.' },
-            { icon: 'check', text: 'Test the rule on every row.' },
-            { icon: 'write', text: 'Write the sign and the number.' },
+            { icon: 'look', text: 'Read row 1 across.' },
+            { icon: 'decide', text: 'Bigger or smaller? By how much?' },
+            { icon: 'check', text: 'Test every row.' },
+            { icon: 'write', text: 'Write the rule.' },
         ],
         // No chant (research §4): the three steps are said in the Say band.
         chant: '',
-        guidedRows: 2,
+        guidedRows: 3,
+        chartEqualRows: true,
+        growAll: true,
         // (Guided: one table of each rule the chart modelled, in its order: +, −, ×)
         guided: ['ftAdd', 'ftSub', 'ftTimes'],
         practiceShape: [4, 2],
@@ -137,7 +142,8 @@ export default {
         answerLine: '{wp.next} boxes make __ cars.',
         // (the pupil writes the sign: a printed × would give the rule away)
         signSlot: true,
-        say: 'The rule is __. The answer is __ cars.',
+        say: 'The rule is __.',
+        sayAns: '{wp.rule}',
     },
 
     // ------------------------------------------------------------------ P6 Exit slip
@@ -151,6 +157,9 @@ export default {
     ],
     exitInstruction: 'Find the rule. Write the rule.',
     exitSay: 'In {say.x1}, out {say.y1}. The rule is __.',
+    exitSayAns: '{say.rule}',
+    // (T6 Answers at a glance: a rule as the pupil writes it, "+ 8", not the slot list "+, 8")
+    answerShow: (t) => t.replace(/([+−×÷-]),\s*(\d+)/g, '$1 $2'),
 
     // ------------------------------------------------------------------ retrieval (MWB)
     retrieval: [
@@ -187,7 +196,7 @@ export default {
     ],
     routine: [
         { step: 'Read In and Out across row 1.', tag: 'New', check: '“Point to In. Point to Out.”' },
-        { step: 'Find the change: bigger or smaller, by how much.', tag: 'Pre-requisite', check: 'Prerequisite Check a to c' },
+        { step: 'Find the change: bigger or smaller, by how much.', tag: 'Pre-requisite', check: 'Prerequisite Check {pre.0.letters}, {pre.1.letters}' },
         { step: 'Test the rule on every row.', tag: 'New', critical: true, check: 'Check Question; exit slip c' },
         { step: 'Write the sign in the circle, the number in the box.', tag: 'Pre-requisite', check: 'Guided cell 2' },
     ],
@@ -199,7 +208,8 @@ export default {
         { name: 'Down the Out column', step: 1, looks: '{cq.B} for {cq.rows}', fix: 'Reading strip: one row across.', option: 'B', misconception: 'neighbour-outputs' },
         { name: 'Sign flipped', step: 2, looks: '+ {exit.1.k} for {exit.1.rows}', fix: '“Bigger or smaller?”', option: '', caught: 'Exit b · Practice 1' },
     ],
-    checkQuestion: { want: 'ftTimes', correct: 'C' },
+    // (each option the rule as a pupil writes it: "+ 6", never the slot list "+, 6")
+    checkQuestion: { want: 'ftTimes', correct: 'C', show: (v) => String(v).replace(/^([+−×÷-]),\s*(\d+)$/, '$1 $2') },
 
     // ------------------------------------------------------------------ T3-T5 delivery scripts
     sections: [
@@ -244,7 +254,7 @@ export default {
                 { ask: 'Bigger or smaller? By how much?', note: 'Expected ★: [[{we.0.rule}]].' },
                 { do: 'Pairs do {we.1.rows}: A reads a row, B tests it.', note: 'Expected ★: [[{we.1.rule}]].' },
                 { say: 'In ___, out ___. The rule is ___.', note: 'The Say frame, for every row.' },
-                { do: 'Pupils do the Independent Practice. Walk and check.', note: 'Expected ★★: [[{indepList}]].' },
+                { do: 'Cell 3, {we.2.rows}: test + {we.2.d} on row 2 together.', note: 'It fails. Expected ★: [[{we.2.rule}]].' },
             ] },
         { n: 7, name: 'Check Question', min: 3, page: '',
             rows: [
@@ -255,7 +265,7 @@ export default {
         { n: 8, name: 'You Do: Independent Practice', min: 12, page: 'P4', boxes: [{ kind: 'watch', title: 'The last rows', text: 'Walk to the last rows first: {p4.last}.' }],
             rows: [
                 { do: 'Pupils finish the lesson sheet, then Practice 1 and 2.' },
-                { say: 'Use the Steps at the top of the page.' },
+                { say: '{p4.steps}' },
                 { ask: 'Does it work on row 3?', note: 'Visit the one-pair group first.' },
                 { do: 'Practice 2: In numbers out of order. Read each row across.', note: 'Look for the gap between Outs written as the rule.' },
             ] },

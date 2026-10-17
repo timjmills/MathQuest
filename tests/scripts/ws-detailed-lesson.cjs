@@ -117,6 +117,8 @@ function measure(LIBRARY) {
             return { s, words, verbs, lib }; });
         // E16 say blanks
         P.sayBlanks = [...pg.querySelectorAll('.ws-band--say')].map((e) => e.querySelectorAll('.ws-line').length);
+        // (E16c, lesson 4 critic r1 D1/D2: the Say band's own words, blanks left out)
+        P.sayText = [...pg.querySelectorAll('.ws-band--say')].filter((e) => !e.closest('.dl-thumb')).map((e) => { const c = e.cloneNode(true); c.querySelectorAll('.ws-line, [data-ws-key-ans]').forEach((x) => x.remove()); return c.textContent.replace(/\s+/g, ' ').trim(); });
         // E17 slots (Say blanks excluded: said, not written; a Workspace drawing is not a slot)
         P.slots = [...pg.querySelectorAll('[data-ws-slot]')].filter((e) => !e.closest('.dl-thumb') && !e.closest('.ws-band--say') && !e.closest('[data-work]')).length;
         P.graded = [...pg.querySelectorAll('[data-ws-slot]')].filter((e) => !e.closest('.dl-thumb') && !e.closest('.ws-band--say') && e.getAttribute('data-ws-graded') !== '0').length;
@@ -328,6 +330,20 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
     // (sheet/contract.js) is that library's source, so a kit string passes and is listed here.
     row('E15', `Instructions ≤ 12 words, print verb first, string in the controlled library (V22 Appendix C.1: ${LIB.length} strings; the kit's PED 10.1 library: ${KIT.length})`, `${ins.length} instructions; failing: ${[...new Set(insBad.map((i) => `${i.page} "${i.s}"`))].join(' | ') || 'none'}; in the kit library but missing from V22 C.1: ${kitOnly.map((x) => `"${x}"`).join(', ') || 'none'}`, !insBad.length);
     const say = pages.flatMap((p) => p.sayBlanks);
+    // E16c (lesson 4 critic r1 D1/D2): a pupil page's Say band never prints an answer of that page's items, nor walks
+    // one item through ("b. 11 × 4: ..." - a frame that names an item letter coaches that item)
+    {
+        const pl = (R.pool && R.pool.places) || [];
+        const nums = (t) => (String(t).match(/\d+/g) || []).map(Number);
+        const bad = [];
+        for (const p of pages.filter((x) => x.kind === 'pupil' && !/^P2/.test(x.id))) for (const t of p.sayText || []) {
+            const ans = new Set(pl.filter((x) => x.page === p.id).flatMap((x) => nums(x.ans)));
+            const hit = nums(t).filter((v) => ans.has(v));
+            if (hit.length) bad.push(`${p.id} says ${hit[0]} (an answer)`);
+            if (/(^|["“\s])[a-h]\.\s/.test(t)) bad.push(`${p.id} Say names an item`);
+        }
+        row('E16c', 'No Say band prints an answer of its page or names one item', bad.length ? bad.join('; ') : 'none', !bad.length);
+    }
     row('E16', 'Every Say frame ≤ 2 blanks', `${say.length} frames; blanks ${[...new Set(say)].join(', ') || '—'}`, say.every((n) => n <= 2));
     const panel = pages.flatMap((p) => p.panelRows);
     row('E16b', 'RCDWS panel: one action per box, each row one line (≤ 9 mm)', `${panel.length} rows; tallest ${Math.max(0, ...panel)} mm`, panel.length >= 6 && panel.every((h) => h <= 9.05));
@@ -403,6 +419,10 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
             const rows = {};
             for (const x of pl.filter((y) => y.page === pgid && MD(y) && y.rep !== 'count_by_tables')) { mdN++; const o = MD(x); const k = `${o.op}${x.grid || 0}:${x.row}`; (rows[k] = rows[k] || []).push(o.f); }
             for (const [r, a] of Object.entries(rows)) { const d2 = a.filter((v, i) => a.indexOf(v) !== i); if (d2.length) probs.push(`${r[0] === '÷' ? 'divisor' : 'first factor'} ${d2[0]} twice in a row (${r.slice(1)}) on ${pgid}`); }
+            // (mult-grid windows - lesson 4 critic r1 D5: no two windows of one page share a box, turned boxes counted)
+            { const wins = pl.filter((y) => y.page === pgid).map((y) => [y.item, String(y.item || '').match(/^grid(\d+)-(\d+)x(\d+)-(\d+)(:\w+)?/)]).filter((w) => w[1]);
+                const box = (m) => { const o = new Set(); for (let r = +m[1]; r <= +m[2]; r++) for (let c = +m[3]; c <= +m[4]; c++) o.add(`${Math.min(r, c)},${Math.max(r, c)}`); return o; };
+                for (let i = 0; i < wins.length; i++) for (let j = i + 1; j < wins.length; j++) { const A = box(wins[i][1]); if ((wins[i][1][5] || '') === (wins[j][1][5] || '') && [...box(wins[j][1])].some((x) => A.has(x))) probs.push(`windows ${wins[i][0]} / ${wins[j][0]} share a box on ${pgid}`); } }
             // (mult-grid windows - lesson 4 r2, lead: no two windows in one grid row with the same rows or the same columns)
             const gr = {};
             for (const x of pl.filter((y) => y.page === pgid)) { const m = String(x.item || '').match(/^grid(\d+-\d+)x(\d+-\d+)/); if (m) for (const sp of [m[1], m[2]]) { const k = `${x.grid || 0}:${x.row}:${sp}`; if (gr[k]) probs.push(`windows ${gr[k]} / ${x.item} share ${sp} in a row on ${pgid}`); else gr[k] = x.item; } }
