@@ -324,16 +324,19 @@ const looksGate = (tag, e, looks) => {
     const shows = /^Shows (.+?) in black and white/.exec(looks);
     if (!shows) return;
     if (/^the White Rose pictures? /.test(shows[1])) {
-        for (const [, n] of shows[1].matchAll(/"([^"]+)"/g)) if (!Object.values(VISUALS).some(([, name, ids]) => (ids || []).includes(e.id) && String(name).startsWith(n))) m12bad(`${tag} ${e.id}: White Rose picture "${n}" not in VISUALS for it`);
+        // the catalogue's own name, with its brackets dropped and "/" read as "or", must start with the shown name
+        const norm = (x) => String(x).replace(/\s*\([^()]*\)/g, '').replace(/\s*\/\s*/g, ' or ').replace(/\s{2,}/g, ' ').trim();
+        for (const [, n] of shows[1].matchAll(/"([^"]+)"/g)) if (!Object.values(VISUALS).some(([, name, ids]) => (ids || []).includes(e.id) && norm(name).startsWith(n))) m12bad(`${tag} ${e.id}: White Rose picture "${n}" not in VISUALS for it`);
         return;
     }
+    // every drawing named must be a kit id's words (the id is in the representation) or a drawing noun whose
+    // whole word is in the representation; after removing those, only the list joiners may be left
     const ids = String(rep).toLowerCase().split(/[\s,.+:]+/);
-    for (const w of shows[1].split(/, | and (?=a |an |[a-z]+ ?[a-z]*$)/)) {
-        const fromKit = Object.entries(TT.KIT_WORDS).some(([k, v]) => v === w && ids.includes(k));
-        const noun = TT.DRAW_NOUNS.find(([, v]) => v === w);
-        if (!fromKit && !(noun && noun[0].test(rep))) m12bad(`${tag} ${e.id}: "${w}" has no source in "${rep.slice(0, 80)}"`);
-        if (NOUN_SRC[w] && !fromKit && !NOUN_SRC[w].test(rep)) m12bad(`${tag} ${e.id}: "${w}" without its word in the note`);
-    }
+    const srcs = [...Object.entries(TT.KIT_WORDS).filter(([k]) => ids.includes(k)).map(([, v]) => v),
+        ...TT.DRAW_NOUNS.filter(([re, v]) => re.test(rep) && (!NOUN_SRC[v] || NOUN_SRC[v].test(rep))).map(([, v]) => v)].sort((a, b) => b.length - a.length);
+    let left = shows[1];
+    for (const w of srcs) left = left.split(w).join('');
+    if (left.replace(/,|\band\b/g, '').trim()) m12bad(`${tag} ${e.id}: "${left.trim()}" (of "${shows[1]}") has no source in "${rep.slice(0, 80)}"`);
 };
 const todoGate = (tag, Q) => {
     TT.setTodoNames(Q.items);
@@ -345,6 +348,10 @@ const todoGate = (tag, Q) => {
             if (bad) { m11 += 1; if (m11 <= 10) console.log('M11', tag, e.id, f, '|', x); }
         }
         looksGate(tag, e, T.looks);
+        // m18 (critic r8): one lesson title leads at most one gap line (its notes are grouped under it)
+        { const labs = T.closes.map((x) => (/^((?:Pre-K|Kindergarten|Grade \d+), "[^"]*")/.exec(x) || [])[1]).filter(Boolean);
+            const dup = labs.filter((x, i) => labs.indexOf(x) !== i);
+            ok(!dup.length, `m18 ${tag} ${e.id}: the gap list names ${dup.join(', ')} more than once`); }
         // m17: "no skill teaches all of it yet" once per entry at most
         ok(T.closes.filter((x) => /no skill teaches all of it yet/.test(x)).length <= 1, `m17 ${tag} ${e.id}: "no skill teaches all of it yet" more than once`);
         for (const [f, v] of Object.entries(T)) gate(`${tag} ${e.id} ${f}`, f === 'kind' ? [(KINDS.find((x) => x[0] === e.kind) || [])[1], ...v].join(' · ') : v);

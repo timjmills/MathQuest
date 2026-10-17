@@ -249,7 +249,7 @@ export function buildQueue({ curated = [], map = null } = {}) {
         if (!e.gaps.length && e.wrmSteps.length) e.gaps.push({ none: e.wrmSteps.slice() });
         e.improves = uniq(e.improves).filter((s) => !e.wrmSteps.includes(s));
         if (!e.gaps.length && e.improves.length) e.gaps.push({ improves: e.improves.slice() });
-        if (!e.gaps.length && e.ccss.length) e.gaps.push({ text: `Not yet fully taught: ${e.ccss.join(', ')}.` });
+        if (!e.gaps.length && e.ccss.length) e.gaps.push({ text: `${e.ccss.join(', ')}: not yet fully taught.` });
         e.closes = uniq(e.gaps.map(gapText));   // the build team's words, for the CSV and the search
         const g = [...e.grades, ...e.ccss.map(gradeOfCode), ...e.ee.map(gradeOfCode), ...e.wrmSteps.map(gradeOfStep), ...e.siteLessons.map(gradeOfSiteLesson)];
         if (!g.filter(Boolean).length) g.push(...e.map.map((f) => gradeOfRit(f.ritBand)));

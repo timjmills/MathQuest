@@ -241,14 +241,24 @@ export function todoCloses(e) {
     const bare = [];
     let bareAt = -1;
     const addBare = (lab) => { if (bareAt < 0) { bareAt = out.length; out.push(''); } if (!bare.includes(lab)) bare.push(lab); };
+    const labelled = new Map();
+    const addLabelled = (lab, school, note) => {
+        const key = `${lab}\u0000${school}`;
+        if (!labelled.has(key)) { labelled.set(key, { lab, school, at: out.length, notes: [] }); out.push(''); }
+        const n = String(note).trim().replace(/\.$/, '');
+        const L = labelled.get(key);
+        if (n && !L.notes.some((x) => x.toLowerCase() === n.toLowerCase())) L.notes.push(n);
+    };
     for (const g of e.gaps || []) {
         if (/^\s*none\.?\s*$/i.test(String(g.text || '')) && !g.step && !g.lesson && !g.code && !g.map) continue;   // m12: no "None." line
         const note = plainNote(g.text);
         let line = '';
         if (g.step && stepLabel(g.step) && !note) { addBare(stepLabel(g.step)); continue; }
         if (g.lesson && siteLessonLabel(g.lesson) && !note) { addBare(siteLessonLabel(g.lesson)); continue; }
-        if (g.step) line = stepLabel(g.step) ? `${stepLabel(g.step)}: ${note}` : note;
-        else if (g.lesson) { const lab = siteLessonLabel(g.lesson); line = lab ? `${lab}, a school lesson: ${note}` : note; }
+        // m18 (critic r8): steps or school lessons that share one title are one line, their notes grouped under it
+        if (g.step && stepLabel(g.step)) { addLabelled(stepLabel(g.step), '', note); continue; }
+        if (g.lesson && siteLessonLabel(g.lesson)) { addLabelled(siteLessonLabel(g.lesson), 'school ', note); continue; }
+        if (g.step || g.lesson) line = note;
         else if (g.code) line = `${g.code}: ${note || 'not yet fully taught.'}`;
         else if (g.map) { const tn = taskName(g.map); line = isPlain(`MAP task "${tn}"`) ? `MAP task "${tn}": ${note || 'no skill practises it yet.'}` : ''; }
         else if (g.none) line = `No skill teaches ${stepsJoin(g.none)}.`;
@@ -256,6 +266,17 @@ export function todoCloses(e) {
         else if (!/\breused\b/i.test(String(g.text || ''))) line = note;
         if (line && !out.includes(line)) out.push(line);
     }
+    // m18: a title that has a note elsewhere in the list is not also listed bare
+    const noted = new Set([...labelled.values()].map((L) => L.lab));
+    for (let i = bare.length - 1; i >= 0; i -= 1) if (noted.has(bare[i])) bare.splice(i, 1);
+    if (bareAt >= 0 && !bare.length) { out.splice(bareAt, 1); for (const L of labelled.values()) if (L.at > bareAt) L.at -= 1; bareAt = -1; }
+    const COUNT = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+    for (const { lab, school, at, notes } of labelled.values()) {
+        const many = notes.length > 1 ? ` (${COUNT[notes.length] || notes.length} ${school}lessons)` : school ? ', a school lesson' : '';
+        const body = notes.map((n, i) => (i ? lowerFirst(n) : n)).join('; ');
+        out[at] = `${lab}${many}: ${body}.`;
+    }
+    for (let i = out.length - 1; i >= 0; i -= 1) if (out[i] && out.indexOf(out[i]) < i) { out.splice(i, 1); if (bareAt > i) bareAt -= 1; }
     if (bareAt >= 0) {
         if (bare.length === 1) out[bareAt] = `${bare[0]}: no skill teaches all of it yet.`;
         else {
@@ -268,7 +289,7 @@ export function todoCloses(e) {
         }
     }
     if (!out.length && (e.wrmSteps || []).length) out.push(`No skill teaches ${stepsJoin(e.wrmSteps)}.`);
-    if (!out.length && (e.ccss || []).length) out.push(`Not yet fully taught: ${e.ccss.join(', ')}.`);
+    if (!out.length && (e.ccss || []).length) out.push(`${e.ccss.join(', ')}: not yet fully taught.`);   // n44: one form of the gap lead
     return out;
 }
 

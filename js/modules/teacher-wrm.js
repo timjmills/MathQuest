@@ -367,12 +367,15 @@ function detailHTML() {
     const assess = l.type === 'assessment';
     const tagged = links.source === 'curated';
     const notTagged = untagged(l, links.source);
+    // m20 (WRM page critic r8): a lesson with a detailed lesson names that lesson's skills, so its empty lines say so
+    const hasDl = detailedOf(detailed, l).length > 0;
     const files = l.step ? (SEQ.WRM_STEP_FILES[l.step] || []) : [];
     const fileBtn = (id, label, ic, url) => (id ? `<a class="tv-btn${label.startsWith('Open lesson') ? ' tv-btn-primary' : ''}" href="${esc(url || `https://drive.google.com/file/d/${encodeURIComponent(id)}/view`)}" target="_blank" rel="noopener">${icon(ic, 18)}<span>${label}</span></a>` : '');
     const ee = (links.step && links.step.ee) || (l.siteInfo && l.siteInfo.ee) || [];
     const strands = l.strands.split('').map((s) => STRAND[s]).filter(Boolean);
     const vd = assess || notTagged || (l.type === 'build' && !tagged) ? null : VERDICT[links.verdict];
     const verdict = assess ? 'No skills are linked to this assessment. Practise the lessons of this unit before it.'
+        : notTagged && hasDl ? 'Skills not tagged to this lesson yet. The detailed lesson below names the skills it uses.'
         : notTagged ? `Skills not tagged yet.${links.prereq.length || links.related.length ? ' The skills below share its standards or come before it.' : ''}`
             : l.type === 'build' && !tagged ? 'A CCSS lesson the school is still to write — there is no White Rose lesson for it.'
                 : links.verdict === 'full' ? 'The skills below teach every part of this lesson.'
@@ -403,11 +406,12 @@ function detailHTML() {
         ${assess ? '' : pick.quickHTML([['direct', 'All teaching skills'], ['prereq', 'Do-first skills'], ['related', 'Go-with skills'], ['all', 'Everything']])}
       </div>
       ${detailedHTML(l)}
-      ${assess ? '' : GROUPS.map(([g, h, cap]) => pick.groupHTML(g, h, cap, emptyText(g, l, notTagged), g === 'prereq' ? toBeBuiltHTML(links.preBuild, L.proposalLabel, 'Still to make') : '')).join('')}
+      ${assess ? '' : GROUPS.map(([g, h, cap]) => pick.groupHTML(g, h, cap, emptyText(g, l, notTagged, hasDl), g === 'prereq' ? toBeBuiltHTML(links.preBuild, L.proposalLabel, 'Still to make') : '')).join('')}
       ${assess ? '' : pick.barWrapHTML()}`;
 }
 
-function emptyText(g, l, notTagged) {
+function emptyText(g, l, notTagged, hasDl) {
+    if (g === 'direct' && notTagged && hasDl) return 'Not tagged here yet; the detailed lesson above names its skills.';
     if (g === 'direct') return notTagged ? 'Skills not tagged yet: no skill is linked to this lesson so far.' : l.type === 'build' ? 'No skill yet: this lesson is still to be written.' : 'No skill teaches this lesson yet. The skills below still help.';
     return g === 'prereq' ? 'No earlier skills found for this lesson.' : 'No other skills share this lesson\'s standard.';
 }

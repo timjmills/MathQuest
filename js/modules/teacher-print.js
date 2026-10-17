@@ -194,6 +194,7 @@ export function printSkills(skills) {
  * "Lesson: detailed", that lesson chosen. False when the lesson maker has no lesson with this id. The caller then
  * shows this screen with tvGo('print').
  */
+const DL_PACK_SEED = 4242;
 export function printDetailedLesson(lessonId) {
     if (!detailedLessonFor(lessonId)) return false;
     if (!pr) initState();
@@ -203,7 +204,10 @@ export function printDetailedLesson(lessonId) {
     s.lessonId = String(lessonId);
     dlSkills(s, true);
     pr.sections = [s];
-    pr.seed = freshSeed();
+    // m19 (WRM page critic r8): the seed every ready-made detailed pack was built and checked with (SELF-CHECK.md),
+    // so "Make it" does not work or fail at random; "New numbers" still deals fresh ones
+    pr.seed = DL_PACK_SEED;
+    pr.dlRetry = true;
     pr.view = 0;
     return true;
 }
@@ -969,7 +973,13 @@ async function runBuild() {
             if (pr.sections[si]) pr.sections[si].unsupported = { role: pr.sections[si].role, why: e.message };
             renderWhat();
         }
-        msg.textContent = e && e.unsupported ? `${e.message}` : 'This page could not be built. Try another page type, or the auto-layout worksheet under Page setup.';
+        // m19 (WRM page critic r8): a detailed lesson made from the White Rose screen tries one other seed, then
+        // points back to its ready-made file instead of to page types it does not have
+        const dl = !(e && e.unsupported) && pr.sections.length === 1 && pr.sections[0].role === 'detailed-lesson';
+        if (dl && pr.dlRetry) { pr.dlRetry = false; pr.seed = freshSeed(); scheduleBuild(0); return; }
+        msg.textContent = e && e.unsupported ? `${e.message}` : dl
+            ? "This lesson could not be made with these choices. Press New numbers to try again, or go Back and use 'Open the detailed lesson' for the ready-made file."
+            : 'This page could not be built. Try another page type, or the auto-layout worksheet under Page setup.';
         msg.hidden = false;
         root.querySelector('#tvStage').dataset.state = 'error';
         root.querySelector('#tvFits').innerHTML = '';
