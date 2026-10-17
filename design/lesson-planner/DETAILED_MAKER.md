@@ -78,6 +78,32 @@ facsimile key from the same plan (`answer-key.js`). Additive hooks, each absent 
   `array` ({rows, cols, mark: 'row' | 'turn'}); the step icon `turn` (lesson-icons.js); the arrays-turn template
   writes `data-per-row` on each array (E27).
 
+## Lesson 2 additions (word problems with a bar, rounds 4-5, 2026-10-17)
+
+Description keys (each absent on every other lesson, so lessons 1 and 3a deal as before):
+- `situations` [{id, test}] (CASE_TESTS names): the story situations the lesson teaches; each story place in the pool
+  carries its `sit`, and E31 holds the pack to modelling, practising and assessing exactly those.
+- `fade` {P5, P6}: the lesson's own fade labels on T6.
+- `mixed.leadDrop`: `leadHalf` may drop a partner's only shelf, then narrow the last partner's shelf to the next
+  lattice divisor, until the lesson skill holds half the Mixed page (V22 §9.5).
+- `practiceSheets[k].edgeLast.first`: the ★★★ places are dealt first, so the rows above keep LR-6 against them.
+- Ref keys: `shortQuestion` (the question sentence in its short library form, so a story is one sentence a line),
+  `cellPayload.storyTight` / `gradeParts` (word-work bar cell: Practice-size story in a one-across cell; graded bar
+  boxes), `fresh` (a dealt-one item that is no lesson page's fact turned round, while the pool lasts), `itemSpread`
+  (dealOne runs the item index through every name and noun), `tries`. `want` may be a list (every test must pass).
+- Placeholders: `{p4.steps}` (where the Steps are, read from whether Practice 1 prints its Steps band), the
+  description's `vars` `question` (the story's own printed question).
+
+Bridge rules for the detailed lesson's printed pages (refs flagged `lr6` by the bridge: Practice, Mixed, P0):
+- LR-6 for + / − items and stories (`lr6Ok`): no first addend twice in a grid row, no number taken away twice, no near
+  twins (V22 2983 as written: both numbers within 2, place by place - read in either order it leaves at most 3
+  crossing-ten stories with parts 3-9 on a page, so a 6-item page could not be dealt), no answer twice, and while it
+  can, no story name or unit word twice. Per page (`edgeLast.per`), the first-addend rule per row. A Mixed page deals
+  each skill against the ones already placed. An `lr6` run that had to drop a rule is dealt again under the next seed
+  (up to 12; attempt 0 is the run's own seed, so a clean run deals as before).
+- LR-5 identity (E24): a + fact is its UNORDERED pair across the pack (7 + 5 and 5 + 7 are one fact); the chart's
+  examples, board examples included, and their turn-arounds are never dealt (`plusTurn`, the pool's `forbidden`).
+
 ## Generic by design (round 2)
 
 `print-sheet.js` holds no per-family code. Script values come from each dealt item through the kit's own
@@ -112,4 +138,12 @@ to `SELF-CHECK.md` in V22's table format. They are V22's `js v21-selfcheck` port
 | E15 | V22 Appendix C.1 **or** the kit's `INSTRUCTION_LIBRARY` (sheet/contract.js, the PED 10.1 library C.1 copies); strings found only in the kit are listed in the result |
 | E24, E24b | read the `#v21-pool` JSON. Its `places` list is the kit equivalent of V22's `data-item` / `data-rep` / `data-row`: the bridge reads every PRINTED cell from the plans the pages render from. The pool is V22's `{kind: 'list'}` form (the description's range, lesson 1: 21–999). E24b also fails near twins: two one-number items of one skill on a page within 2 (405 / 406, V22 LR-6) |
 | E9 (no exemption), E9c | E9: every page 50–100 % used, teacher continuation pages included (critic r3: the old E9 exemption was reverted). E9c (V22 3131): a teacher page that continues onto another is ≥ 92 % used; `paginateTeacher` packs greedily first and only rebalances when that misses |
+| E24 (round 5) | V22's `poolCheck` turn-around test restored (`turn()`: a chart example never returns turned round; no turn-around pair on a page). One canonical sign in every key (× / x / *, − / -), and a commutative fact (+, ×) is its unordered pair across the pack, − and ÷ ordered; inside one item a turned pair may be the content (an arrays-turn cell) |
+| E24b (round 4-5) | also reads + / − items (stories too): first addend twice in a grid row (a place's `grid` and `row`) or three running, a number taken away twice, near twins (both numbers within 2, place by place), and a story's and a fact's equal answers as twins |
+| E31 | declared `situations`: each modelled on P2 (chart or board example), assessed on P6; nothing practised that was not modelled |
+| E32 | stories: one sentence per line (AX-3), at most 4 lines (SF-50), measured as each sentence's height over its line height |
+| E33 | Mixed page: the lesson's own skills (P2, P3, P4, P6) hold at least half the items (V22 §9.5) |
+| E34 | T2b scores the exit slip by its own item count |
+| E35 | with `situations`: T4 quotes only story questions the pack prints or writes on the board; any "Steps are at the top of the page" line names a Practice 1 that prints its Steps band |
+| E36 | exit-slip + items: no part equals the difference of the parts (4 + 8: 8 − 4 = 4), and none is a P3-P5 fact or its turn-around |
 | E30 | `boardOnly` (description): numbers shown on the board only (lesson 1: 1,000). The bridge passes them to every ref as a HARD bound (`refHardOk`: never relaxed, not on a ref's last try); E30 fails if one is an item, an answer, or printed (digits or name) on any pupil page or key |

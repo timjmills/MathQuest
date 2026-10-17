@@ -265,9 +265,9 @@ function refAccepts(sk, cand, key, seen, kept, pg = '', row = '', words = true) 
         const k = factKeyOf(cand);
         if (k === null) return false;
         if (sk.avoidKeys && sk.avoidKeys.includes(k)) return false;
-        // (an `lr6` ref, lesson 2 r5: no turn-around of an item another page dealt while the deal can - V22: "using a
-        // turn-around ... when the pool is spent"; dropped with the story words on the ref's last strict pass)
-        if (sk.lr6 && words === true && plusTurn(k) && sk.avoidKeys && sk.avoidKeys.includes(plusTurn(k))) return false;
+        // (a + fact's identity across the pack is its unordered pair - 7 + 5 and 5 + 7 are one fact: lead ruling and
+        // E24, 2026-10-17. Only + keys turn, so every other pack deals as before.)
+        if (sk.avoidKeys && plusTurn(k) && (sk.avoidKeys.includes(plusTurn(k)) || seen.has(`key:${plusTurn(k)}`))) return false;
         // (`allTest`, the detailed lesson maker - lesson 3a: a case test EVERY place of the ref passes)
         if (sk.allTest && LESSON_CASE_TESTS[sk.allTest] && !LESSON_CASE_TESTS[sk.allTest]({ q: cand })) return false;
         // (an array's turned pair, lesson 3a: 4 x 3 after 3 x 4 draws the same two arrays - never on another page either)
@@ -2990,6 +2990,8 @@ function dealOne1(ref, seed, used, want, avoidAns, near, names, fresh) {
         if (ref.shortQuestion) q = shortStoryQ(q);
         const key = factKeyOf(q), v = itemNumberOf(q);
         if (key === null || used.has(key) || (ok && !ok({ q }))) continue;
+        // (a + fact turned round is the same fact across the pack - E24's unordered identity)
+        if (plusTurn(key) && used.has(plusTurn(key))) continue;
         if (fresh && plusTurn(key) && fresh.has(plusTurn(key))) continue;
         // (an array's turned pair is the same two pictures: not dealt again unless the ref allows it - the Check
         // Question on the board may turn a Guided array, lesson 3a `turnedOk`)

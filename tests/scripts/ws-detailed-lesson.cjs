@@ -211,30 +211,36 @@ function measure(LIBRARY) {
 function poolCheck(POOL) {
     if (!POOL || !Array.isArray(POOL.places) || !POOL.places.length) return { ok: false, msg: 'no pool JSON or no items in the pack' };
     const d = POOL.decl || {};
-    const inPool = new Set(POOL.pool), forb = new Set(POOL.forbidden || []);
-    const re = d.kind === 'list' ? d.items.map(String) : [];
+    // (one canonical sign in every fact key - the bridge wrote "2×8" for a P0 fact and "2x8" for an array, so E24
+    // missed the repeat; lesson 3a critic r1 D6) and an item's IDENTITY across the pack: for a commutative sign
+    // (+, ×) the unordered pair {a, b}, for − and ÷ the ordered pair (lead ruling, 2026-10-17). Inside one item a
+    // turned pair may be its content (an arrays-turn cell); across items 3 + 4 and 4 + 3 are one fact.
+    const canon = (k) => String(k).replace(/^(\d+)\s*[x*×]\s*(\d+)$/, '$1×$2').replace(/^(\d+)\s*-\s*(\d+)$/, '$1−$2');
+    const ident = (k) => { const c = canon(k), m = c.match(/^(\d+)([+×])(\d+)$/); return m ? [+m[1], +m[3]].sort((x, y) => x - y).join(m[2]) : c; };
+    const inPool = new Set(POOL.pool.map(canon)), forb = new Set((POOL.forbidden || []).map(canon));
+    const re = d.kind === 'list' ? d.items.map(canon) : [];
     const ruleOk = re.length > 0 && re.length === inPool.size && re.every((x) => inPool.has(x));
-    const all = POOL.places.filter((x) => !x.copy);
+    const all = POOL.places.filter((x) => !x.copy).map((x) => Object.assign({}, x, { item: canon(x.item), id: ident(x.item) }));
     const usable = inPool.size - forb.size, small = usable < 12;
     const seenRep = new Set(), seenPage = new Set(), first = new Map(), rep = [], soft = [], bad = [], noRep = [];
     const pageOf = (p) => String(p).replace(/-key$/, '');
     // LR-5 (V22 Appendix E `js v21-selfcheck` poolCheck: "a chart (P2) example never returns, in any
     // representation, on any page, nor does its turn-around" - the port had dropped `turn`; lesson 2 critic r3 D1)
-    const turn = (k) => { const m = String(k).match(/^(\d+)\+(\d+)$/); return m ? `${m[2]}+${m[1]}` : String(k); };
-    const chart = new Set(all.filter((x) => /^P2/.test(pageOf(x.page))).flatMap((x) => [x.item, turn(x.item)])); const chartBack = [];
+    // (a chart's turn-around is its identity too: ident() is the unordered pair)
+    const chart = new Set(all.filter((x) => /^P2/.test(pageOf(x.page))).map((x) => x.id)); const chartBack = [];
     for (const x of all) {
-        if (!/^P2/.test(pageOf(x.page)) && chart.has(x.item)) chartBack.push(`${x.item} (${x.rep}) ${x.page}`);
+        if (!/^P2/.test(pageOf(x.page)) && chart.has(x.id)) chartBack.push(`${x.item} (${x.rep}) ${x.page}`);
         if (!inPool.has(x.item) || forb.has(x.item)) bad.push(`${x.item} ${x.page}`);
         if (!x.rep) noRep.push(`${x.item} ${x.page}`);
-        const kr = `${x.item}|${x.rep}`, kp = `${x.item}|${x.page}`;
+        const kr = `${x.id}|${x.rep}`, kp = `${x.id}|${pageOf(x.page)}`;
         if (seenRep.has(kr) || seenPage.has(kp)) rep.push(`${x.item} (${x.rep}) ${x.page}`);
-        else if (first.has(x.item)) (small ? soft : rep).push(`${x.item} (${x.rep}) ${x.page}`);
-        seenRep.add(kr); seenPage.add(kp); if (!first.has(x.item)) first.set(x.item, x.page);
+        else if (first.has(x.id)) (small ? soft : rep).push(`${x.item} (${x.rep}) ${x.page}`);
+        seenRep.add(kr); seenPage.add(kp); if (!first.has(x.id)) first.set(x.id, x.page);
     }
     // (V22: no turn-around pair on one page)
     const turns = [];
-    for (const pg of [...new Set(all.map((x) => pageOf(x.page)))]) { const s2 = new Set(all.filter((x) => pageOf(x.page) === pg).map((x) => x.item));
-        for (const k of s2) { const m = String(k).match(/^(\d+)\+(\d+)$/); if (m && +m[1] > +m[2] && s2.has(turn(k))) turns.push(`${k} on ${pg}`); } }
+    for (const pg of [...new Set(all.map((x) => pageOf(x.page)))]) { const xs = all.filter((x) => pageOf(x.page) === pg);
+        for (const x of xs) if (x.item !== x.id && xs.some((y) => y.item === x.id)) turns.push(`${x.item} on ${pg}`); }
     return { ok: ruleOk && !bad.length && !noRep.length && !rep.length && !chartBack.length && !turns.length && (small || all.length <= usable),
         msg: `${all.length} places (${first.size} numbers), usable pool ${usable} (pool ${inPool.size} recomputed from its list rule: ${ruleOk ? 'matches' : 'MISMATCH'}); repeats ${rep.length ? rep.join(', ') : 0}; chart examples or their turn-arounds returning ${chartBack.length ? chartBack.join(', ') : 0}; same-page turn-arounds ${turns.length ? turns.join(', ') : 0}; outside the pool / forbidden ${bad.length ? bad.join(', ') : 0}; items without a rep ${noRep.length}` };
 }
