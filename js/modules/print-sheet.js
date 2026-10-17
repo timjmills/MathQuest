@@ -507,6 +507,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // all - lesson 2 r4, critic r2 D2: the relaxed last try printed a repeat and a twin answer)
         // (an `lr6` ref then drops only the story-words rule before it relaxes the soft floors)
         const wordsOff = () => (sk.lr6 ? pass(true, false, true, false) || pass(true, false, true, 'none') : null);
+        if (typeof window !== 'undefined' && window.__dbg && sk.lr6 && !sk.edgeLast && sk.skillId === 'add_wp_20') { const t = [pass(false, false, true), pass(true, false, true), pass(true, false, true, false), pass(true, false, true, 'none')].map((x) => (x ? factKeyOf(x) : '-')); window.__dbg[`${i} ${t.join(' ')} | ${[...seen].filter((x) => /lr6p|ansAll/.test(x)).join(',')}`] = 1; }
         q = hard ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, false, false))
             : sk.avoidKeys ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, true, true)) : pass(false, true, true);
         if (!q) return;
