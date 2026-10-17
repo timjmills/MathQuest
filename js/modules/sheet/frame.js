@@ -109,6 +109,8 @@ export const instruction = (text) => `<div class="ws-instrline">${esc(text)}</di
 export const BAND_LABELS = Object.freeze([
     'Model:', 'Steps:', 'Say:', 'Vocabulary:', 'Guided Practice:', 'Independent Practice:',
     'More Practice:', 'Review:', 'Check:', 'Stretch:', 'Word Problems:', 'Rule:',
+    // The detailed lesson maker (V22 §8.8; owner defaults Q4 / Q5 accepted 2026-10-16).
+    'Number sense: A', 'Number sense: B', 'Workspace:',
 ]);
 
 /**

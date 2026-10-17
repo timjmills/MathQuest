@@ -47,6 +47,8 @@ ${ICON_CSS}
 :is(.ws-page,.ws-sheet) .mq-cdraw{display:flex;justify-content:center;align-items:flex-start}
 :is(.ws-page,.ws-sheet) .mq-cstate-col>.mq-cdraw{flex:none;align-items:center}
 :is(.ws-page,.ws-sheet) .ws-cell.mq-ctailcell{justify-content:center;align-items:stretch;padding:2mm 4mm}
+:is(.ws-page,.ws-sheet) .ws-grid.mq-chartgrid:has(+ .ws-grid.mq-ctailgrid){border-bottom-width:var(--ws-cell)}
+:is(.ws-page,.ws-sheet) .ws-grid.mq-ctailgrid{border-top-width:0}
 :is(.ws-page,.ws-sheet) .mq-ctail{display:flex;flex-direction:column;gap:1.5mm}
 :is(.ws-page,.ws-sheet) .mq-ctailw{margin-left:6mm;font-size:var(--ws-text);font-weight:400}
 :is(.ws-page,.ws-sheet) .ws-cell.mq-c2cell{justify-content:center;align-items:center;padding:2mm 2mm}
@@ -76,6 +78,7 @@ ${ICON_CSS}
 :is(.ws-page,.ws-sheet) .mq-lround-top{display:flex;align-items:flex-end;gap:1mm;white-space:nowrap}
 :is(.ws-page,.ws-sheet) .mq-lring{outline:var(--ws-hair) solid var(--ws-ink);outline-offset:.06em;border-radius:50%}
 :is(.ws-page,.ws-sheet) .mq-lring.mq-lring-t{outline:1pt solid #949494}
+:is(.ws-page,.ws-sheet) .mq-wwbarlayout .mq-lring{display:inline-block;margin:0 .2em;padding:0 .08em;line-height:1.05}
 :is(.ws-page,.ws-sheet) .mq-luline{border-bottom:1pt solid #949494;display:inline-block;line-height:1}
 :is(.ws-page,.ws-sheet) .ws-cell.mq-lvocabcell{justify-content:center;align-items:stretch;padding:2.5mm 3mm}
 :is(.ws-page,.ws-sheet) .mq-lvocab{width:100%;display:flex;flex-direction:column}

@@ -224,3 +224,124 @@ registerSkill('multiplication:area_model_mult_hard', {
 // mult_chart and mult_chart_easy moved to countby.js (2026-09-25): the chart now has four tasks
 // (fill, the factors on its edges, shading multiples, a row's rule), and each needs its own words.
 
+
+/* ===================================================================== mult_properties */
+// Form 0 (the order property, lesson 3a) draws the `arrays-turn` cell; forms 1-3 are still legacy
+// items, so every hook below answers for a turn item and stays out of the way of the others.
+
+const turnOf = (q) => {
+    const c = q && q.cell;
+    if (!c || c.template !== 'arrays-turn') return null;
+    const p = obj(c.payload);
+    if (!p) return null;
+    const rows = num(p.rows), cols = num(p.cols);
+    if (!Number.isFinite(rows) || !Number.isFinite(cols)) return null;
+    return { rows, cols, product: rows * cols, type: p.type || 'known', ask: p.ask || 'product' };
+};
+
+const TURN_STRINGS = {
+    both: strings({
+        iCan: 'I Can turn an array to multiply',
+        instructionKey: 'turn-facts',
+        steps: ['Look at the array.', 'Write the fact.', 'Turn the array.', 'Write the new fact.', 'Check: same product.'],
+        say: '__ times __ equals __ times __.',
+        sayValues: (q) => { const t = turnOf(q); return t ? [t.rows, t.cols, t.cols, t.rows] : ''; },
+    }),
+    known: strings({
+        iCan: 'I Can turn an array to multiply',
+        instructionKey: 'turn-new',
+        steps: ['Look at the array.', 'Read the fact.', 'Turn the array.', 'Write the new fact.', 'Check: same product.'],
+        say: '__ times __ equals __ times __.',
+        sayValues: (q) => { const t = turnOf(q); return t ? [t.rows, t.cols, t.cols, t.rows] : ''; },
+    }),
+    missing: strings({
+        iCan: 'I Can turn a fact to multiply',
+        instructionKey: 'missing',
+        steps: ['Read the fact.', 'Turn it: swap the two factors.', 'The product stays the same.', 'Write the missing number.'],
+        say: '__ times __ equals __ times __.',
+        sayValues: (q) => { const t = turnOf(q); return t ? [t.rows, t.cols, t.cols, t.rows] : ''; },
+    }),
+    other: strings({
+        iCan: 'I Can use the properties of multiplication',
+        instructionKey: 'missing',
+        steps: ['Read the fact.', 'Look at the numbers that change.', 'Write the missing number.'],
+        say: 'The answer is __.',
+        sayValues: (q) => [q && q.ans],
+    }),
+};
+
+registerSkill('multiplication:mult_properties', {
+    strings: (ref = {}) => {
+        const t = turnOf(ref && ref.q);
+        const q = ref && ref.q;
+        if (t) return TURN_STRINGS[t.type] ? TURN_STRINGS[t.type](ref) : TURN_STRINGS.known(ref);
+        // A page with no item yet (the dialog, the anchor chart before dealing): the order property.
+        return q ? TURN_STRINGS.other(ref) : TURN_STRINGS.both(ref);
+    },
+    misconceptions: ['turn-recount', 'turn-no-swap', 'turn-product-factor'],
+    workedSteps: (q) => {
+        const t = turnOf(q);
+        if (!t) return [];
+        const { rows: r, cols: c, product: P } = t;
+        if (t.type === 'missing') {
+            const v = t.ask === 'factor' ? r : P;
+            return [
+                step(`Read the fact: ${r} × ${c} = ${P}.`),
+                step(`Turn it: ${c} × ${r}. The same two factors.`),
+                step(`The product stays ${P}.`),
+                step(`Write ${v}.`, [{ slot: 'answer', value: String(v) }]),
+            ];
+        }
+        const first = t.type === 'both'
+            ? step(`Write the fact: ${r} × ${c} = ${P}.`, [{ slot: 'fact', value: String(P) }])
+            : step(`Read the fact: ${r} × ${c} = ${P}.`);
+        const last = t.type === 'both'
+            ? step(`Write the new fact: ${c} × ${r} = ${P}.`, [{ slot: 'turned', value: String(P) }])
+            : step(`Write the new fact: ${c} × ${r} = ${P}.`, [{ slot: 'b1', value: String(c) }, { slot: 'b2', value: String(r) }, { slot: 'b3', value: String(P) }]);
+        return [
+            step(`Look at the array: ${r} rows of ${c}.`, [{ slot: 'array', value: 'shown' }]),
+            first,
+            step(`Turn the array: ${c} rows of ${r}.`, [{ slot: 'turn', value: 'shown' }]),
+            last,
+            // (lesson 3a r2, critic D3: the Critical Atom is a step of its own - it writes nothing, so the chart
+            // prints it as the line under its panels and the Steps list carries it)
+            step(`Check: same product, ${P}. No recount.`),
+        ];
+    },
+    wrongAnswer: (q) => {
+        const t = turnOf(q);
+        if (!t) return null;
+        const { rows: r, cols: c, product: P } = t;
+        // A recount that is one row short: the turned array counted again, a row missed.
+        const recount = P - r;
+        if (t.type === 'both') {
+            return chooseWrong(q, [
+                { value: `${P}, ${recount}`, misconception: 'turn-recount', slot: 'b', slots: { a: String(P), b: String(recount) },
+                    explain: `Counted the turned array again and missed a row: ${recount}. Turning it does not change the total.` },
+            ]);
+        }
+        if (t.type === 'known') {
+            const cands = [
+                { value: `${c}, ${r}, ${recount}`, misconception: 'turn-recount', slot: 'b3', slots: { b1: String(c), b2: String(r), b3: String(recount) },
+                    explain: `Counted the turned array again and got ${recount}. It is the same ${P} dots.` },
+                { value: `${c}, ${P}, ${P}`, misconception: 'turn-product-factor', slot: 'b2', slots: { b1: String(c), b2: String(P), b3: String(P) },
+                    explain: `Wrote the product ${P} as a factor. The new fact is ${c} × ${r}.` },
+            ];
+            // Wrote the same order: only a different answer when the array is not a square.
+            if (r !== c) cands.unshift({ value: `${r}, ${c}, ${P}`, misconception: 'turn-no-swap', slot: 'b1', slots: { b1: String(r), b2: String(c), b3: String(P) },
+                explain: `Wrote ${r} × ${c} again. The turned array has ${c} rows of ${r}.` });
+            return chooseWrong(q, cands);
+        }
+        if (t.ask === 'factor') {
+            return chooseWrong(q, [
+                ...(r !== c ? [{ value: c, misconception: 'turn-no-swap', slot: 'answer', explain: `Wrote ${c} again. ${c} × ${r} needs the other factor, ${r}.` }] : []),
+                { value: P, misconception: 'turn-product-factor', slot: 'answer', explain: `Wrote the product ${P} as a factor.` },
+            ]);
+        }
+        return chooseWrong(q, [
+            { value: recount, misconception: 'turn-recount', slot: 'answer', explain: `Worked it out again and got ${recount}. Turning a fact keeps the product: ${P}.` },
+            { value: r + c, misconception: 'turn-product-factor', slot: 'answer', explain: `Added ${r} and ${c}. The product is ${P}.` },
+        ]);
+    },
+    footprint: { kind: 'arrays-turn', factLike: false, maxCols: 2, measure: true },
+});
