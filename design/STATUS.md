@@ -552,6 +552,7 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
   mult_properties break-apart key AK-4 (`printSlot` line slot); P12 accept-layer redraws on a page (page-deal `setRedraw`);
   div_unit_frac_nv option labels; two click-all branches honour `forms`; codec writes empty `rows` as X; ws-presets-unit page vs page.
   Build-list preset:true entries say they become named skills when built.
+- 2026-10-17: Defect to fix (pre-existing, identical on master ae66125c, intermittent — the full run before that deploy passed): ws-screen-slots "1 doubled answer area": `measurement:reading_ruler_hard` on the practice CARD shows the host answer field AND 2 drawn answer places. Reproduce: `node tests/scripts/ws-screen-slots.cjs --skills measurement:reading_ruler_hard`.
 - Held for after these land: Lane B answer boxes + regroup boxes (spec `design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md`),
   placevalue:identify write-value (spec `design/audit/runs/next-session/PV-IDENTIFY-WRITE-VALUE-SPEC.md`).
 
