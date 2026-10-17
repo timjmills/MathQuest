@@ -1,0 +1,339 @@
+1280x600 sub_100_regroup queue mouse line
+   q1:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 119/-49x1>67/3x94
+   q1-checked:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2-checked:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3-checked:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+1280x600 sub_100_regroup queue touch line
+   q1:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 119/-49x1>67/3x96
+   q1-checked:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2-checked:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3-checked:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+1280x600 sub_100_regroup T300 mouse line
+   q1:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 119/-49x1>67/3x95
+   q1-checked:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2-checked:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3-checked:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+1280x600 sub_100_regroup T300 touch line
+   q1:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 119/-49x1>67/3x94
+   q1-checked:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2-checked:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3-checked:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+1280x600 sub_100_regroup T0 mouse line
+   q1:sy1/h59/b69[LABELS-HIDDEN:90,95,100] seg 0/nullx1>1/69x96
+   q1-checked:sy4/h59/b66
+   q2:sy22/h59/b48[BAND-UNDER-HDR(fits)] seg 4/66x95>22/48x87
+   q2-checked:sy22/h59/b48[BAND-UNDER-HDR(fits)]
+   q3:sy22/h59/b48[BAND-UNDER-HDR(fits)]
+   q3-checked:sy22/h59/b48[BAND-UNDER-HDR(fits)]
+1280x600 sub_100_regroup T0 touch line
+   q1:sy1/h59/b69[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy4/h59/b66
+   q2:sy22/h59/b48[BAND-UNDER-HDR(fits)] seg 4/66x94>22/48x88
+   q2-checked:sy22/h59/b48[BAND-UNDER-HDR(fits)]
+   q3:sy22/h59/b48[BAND-UNDER-HDR(fits)]
+   q3-checked:sy22/h59/b48[BAND-UNDER-HDR(fits)]
+1280x600 nl_mult queue mouse line
+   q1:sy60/h59/b10[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,10,20,30,40,50,60,70,80,90,100]
+   q1-checked:sy60/h59/b10[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,10,20,30,40,50,60,70,80,90,100]
+   q2:sy58/h59/b12[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,10,20,30,40,50,60,70,80,90,100] seg 60/10x93>58/12x86
+   q2-checked:sy58/h59/b12[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,10,20,30,40,50,60,70,80,90,100]
+   q3:sy58/h59/b12[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,10,20,30,40,50,60,70,80,90,100]
+   q3-checked:sy58/h59/b12[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,10,20,30,40,50,60,70,80,90,100]
+1280x600 nl_mult queue touch line
+   q1:sy60/h59/b10[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,10,20,30,40,50,60,70,80,90,100]
+   q1-checked:sy60/h59/b10[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,10,20,30,40,50,60,70,80,90,100]
+   q2:sy58/h59/b12[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,10,20,30,40,50,60,70,80,90,100] seg 60/10x88>58/12x88
+   q2-checked:sy58/h59/b12[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,10,20,30,40,50,60,70,80,90,100]
+   q3:sy58/h59/b12[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,10,20,30,40,50,60,70,80,90,100]
+   q3-checked:sy58/h59/b12[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,10,20,30,40,50,60,70,80,90,100]
+1280x600 nl_mult T300 mouse line
+   q1:sy60/h59/b10[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,10,20,30,40,50,60,70,80,90,100]
+   q1-checked:sy60/h59/b10[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,10,20,30,40,50,60,70,80,90,100]
+   q2:sy58/h59/b12[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,10,20,30,40,50,60,70,80,90,100] seg 60/10x92>58/12x86
+   q2-checked:sy58/h59/b12[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,10,20,30,40,50,60,70,80,90,100]
+   q3:sy58/h59/b12[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,10,20,30,40,50,60,70,80,90,100]
+   q3-checked:sy58/h59/b12[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,10,20,30,40,50,60,70,80,90,100]
+1280x600 nl_mult T300 touch line
+   q1:sy60/h59/b10[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,10,20,30,40,50,60,70,80,90,100]
+   q1-checked:sy60/h59/b10[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,10,20,30,40,50,60,70,80,90,100]
+   q2:sy58/h59/b12[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,10,20,30,40,50,60,70,80,90,100] seg 60/10x93>58/12x86
+   q2-checked:sy58/h59/b12[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,10,20,30,40,50,60,70,80,90,100]
+   q3:sy58/h59/b12[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,10,20,30,40,50,60,70,80,90,100]
+   q3-checked:sy58/h59/b12[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,10,20,30,40,50,60,70,80,90,100]
+1280x600 nl_mult T0 mouse line
+   q1:sy1/h59/b69[LABELS-HIDDEN:90,100]
+   q1-checked:sy5/h59/b65
+   q2:sy5/h59/b65
+   q2-checked:sy5/h59/b65
+   q3:sy5/h59/b65
+   q3-checked:sy5/h59/b65
+1280x600 nl_mult T0 touch line
+   q1:sy1/h59/b69[LABELS-HIDDEN:90,100] seg 0/nullx1>1/69x95
+   q1-checked:sy5/h59/b65
+   q2:sy5/h59/b65
+   q2-checked:sy5/h59/b65
+   q3:sy5/h59/b65
+   q3-checked:sy5/h59/b65
+1280x600 add_facts queue mouse line
+   q1:sy1/h59/b69[LABELS-HIDDEN:16,17,18,19,20]
+   q1-checked:sy1/h59/b69
+   q2:sy0/h59/b70 seg 1/69x92>0/70x89
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x600 add_facts queue touch line
+   q1:sy1/h59/b69[LABELS-HIDDEN:16,17,18,19,20] seg 0/nullx1>1/69x95
+   q1-checked:sy1/h59/b69
+   q2:sy0/h59/b70 seg 1/69x92>0/70x89
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x600 add_facts T300 mouse line
+   q1:sy1/h59/b69[LABELS-HIDDEN:18,19,20]
+   q1-checked:sy1/h59/b69
+   q2:sy0/h59/b70 seg 1/69x92>0/70x89
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x600 add_facts T300 touch line
+   q1:sy1/h59/b69[LABELS-HIDDEN:18,19,20]
+   q1-checked:sy1/h59/b69
+   q2:sy0/h59/b70 seg 1/69x92>0/70x89
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x600 add_facts T0 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x600 add_facts T0 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1280x600 mixed_addition queue mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:80,85,90,95,100]
+   q1-checked:sy0/h59/b70
+   q1-forced
+   q2:sy317/h59/b-247[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x303>317/-247x85
+   q2-checked:sy317/h59/b-247[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3:sy0/h59/b70 seg 317/-247x93>0/70x88
+   q3-checked:sy0/h59/b70
+1280x600 mixed_addition queue touch line
+   q1:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 119/-49x1>67/3x95
+   q1-checked:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2-checked:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3-checked:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+1280x600 mixed_addition T300 mouse line
+   q1:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 119/-49x1>67/3x94
+   q1-checked:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2:sy67/h59/b3[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2-checked:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 365/-295x64>67/3x7
+   q3:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3-checked:sy67/h59/b3[BAND-UNDER-HDR(fits) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+1280x600 mixed_addition T300 touch line
+   q1:sy362/h59/b-292[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q1-checked:sy362/h59/b-292[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2:sy0/h59/b70 seg 362/-292x93>0/70x88
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy5/h59/b65
+1280x600 mixed_addition T0 mouse line
+   q1:sy188/h59/b-118[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 33/37x1>188/-118x94
+   q1-checked:sy202/h59/b-132[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2:sy80/h59/b-10[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 202/-132x93>0/70x2>77/-7x1>0/70x2>80/-10x4>0/70x1>80/-10x26>0/70x1>80/-10x45
+   q2-checked:sy0/h59/b70
+   q3:sy77/h59/b-7[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x97>77/-7x1>0/70x2>77/-7x6>0/70x2>77/-7x2>0/70x1>77/-7x26>0/70x1>77/-7x43
+   q3-checked:sy0/h59/b70
+1280x600 mixed_addition T0 touch line
+   q1:sy296/h59/b-226[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q1-checked:sy296/h59/b-226[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2:sy0/h59/b70 seg 296/-226x93>0/70x88
+   q2-checked:sy0/h59/b70
+   q3:sy77/h59/b-7[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x91>22/48x1>0/70x2>77/-7x5>0/70x2>77/-7x3>0/70x1>77/-7x26>0/70x1>77/-7x46
+   q3-checked:sy0/h59/b70
+1366x650 sub_100_regroup queue mouse line
+   q1:sy17/h59/b53[BAND-UNDER-HDR(fits) LABELS-HIDDEN:80,85,90,95,100] seg 0/nullx1>43/27x1>17/53x95
+   q1-checked:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+   q2:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+   q2-checked:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+   q3:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+   q3-checked:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+1366x650 sub_100_regroup queue touch line
+   q1:sy17/h59/b53[BAND-UNDER-HDR(fits) LABELS-HIDDEN:80,85,90,95,100] seg 43/27x1>17/53x94
+   q1-checked:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+   q2:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+   q2-checked:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+   q3:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+   q3-checked:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+1366x650 sub_100_regroup T300 mouse line
+   q1:sy17/h59/b53[BAND-UNDER-HDR(fits) LABELS-HIDDEN:90,95,100] seg 43/27x1>17/53x95
+   q1-checked:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+   q2:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+   q2-checked:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+   q3:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+   q3-checked:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+1366x650 sub_100_regroup T300 touch line
+   q1:sy17/h59/b53[BAND-UNDER-HDR(fits) LABELS-HIDDEN:90,95,100] seg 43/27x1>17/53x90
+   q1-checked:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+   q2:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+   q2-checked:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+   q3:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+   q3-checked:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+1366x650 sub_100_regroup T0 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 sub_100_regroup T0 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 nl_mult queue mouse line
+   q1:sy10/h59/b60[LABELS-HIDDEN:80,90,100]
+   q1-checked:sy10/h59/b60
+   q2:sy8/h59/b62 seg 10/60x92>8/62x87
+   q2-checked:sy8/h59/b62
+   q3:sy8/h59/b62
+   q3-checked:sy8/h59/b62
+1366x650 nl_mult queue touch line
+   q1:sy10/h59/b60[LABELS-HIDDEN:80,90,100]
+   q1-checked:sy10/h59/b60
+   q2:sy8/h59/b62 seg 10/60x92>8/62x88
+   q2-checked:sy8/h59/b62
+   q3:sy8/h59/b62
+   q3-checked:sy8/h59/b62
+1366x650 nl_mult T300 mouse line
+   q1:sy10/h59/b60[LABELS-HIDDEN:90,100]
+   q1-checked:sy10/h59/b60
+   q2:sy8/h59/b62 seg 10/60x92>8/62x87
+   q2-checked:sy8/h59/b62
+   q3:sy8/h59/b62
+   q3-checked:sy8/h59/b62
+1366x650 nl_mult T300 touch line
+   q1:sy10/h59/b60[LABELS-HIDDEN:90,100]
+   q1-checked:sy10/h59/b60
+   q2:sy8/h59/b62 seg 10/60x93>8/62x88
+   q2-checked:sy8/h59/b62
+   q3:sy8/h59/b62
+   q3-checked:sy8/h59/b62
+1366x650 nl_mult T0 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 nl_mult T0 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 add_facts queue mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:16,17,18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 add_facts queue touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:16,17,18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 add_facts T300 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 add_facts T300 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 add_facts T0 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 add_facts T0 touch line
+   q1:sy0/h59/b70[LABELS-HIDDEN:18,19,20]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 mixed_addition queue mouse line
+   q1:sy267/h59/b-197[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q1-checked:sy267/h59/b-197[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2:sy267/h59/b-197[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2-checked:sy267/h59/b-197[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3:sy267/h59/b-197[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3-checked:sy267/h59/b-197[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+1366x650 mixed_addition queue touch line
+   q1:sy43/h59/b27[band-under-hdr(too-tall)]
+   q1-checked:sy43/h59/b27[BAND-UNDER-HDR(fits)]
+   q2:sy0/h59/b70 seg 43/27x95>0/70x86
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 mixed_addition T300 mouse line
+   q1:sy17/h59/b53[BAND-UNDER-HDR(fits) LABELS-HIDDEN:90,95,100] seg 43/27x1>17/53x95
+   q1-checked:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+   q2:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+   q2-checked:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+   q3:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+   q3-checked:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+1366x650 mixed_addition T300 touch line
+   q1:sy27/h59/b43[band-under-hdr(too-tall) LABELS-HIDDEN:90,95,100] seg 43/27x1>0/70x3>27/43x20>0/70x1>27/43x67
+   q1-checked:sy0/h59/b70
+   q2:sy267/h59/b-197[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 0/70x95>267/-197x86
+   q2-checked:sy267/h59/b-197[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q3:sy0/h59/b70 seg 267/-197x93>26/44x1>0/70x86
+   q3-checked:sy0/h59/b70
+1366x650 mixed_addition T0 mouse line
+   q1:sy0/h59/b70[LABELS-HIDDEN:90,95,100]
+   q1-checked:sy0/h59/b70
+   q2:sy0/h59/b70
+   q2-checked:sy0/h59/b70
+   q3:sy0/h59/b70
+   q3-checked:sy0/h59/b70
+1366x650 mixed_addition T0 touch line
+   q1:sy138/h59/b-68[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100] seg 15/55x1>138/-68x95
+   q1-checked:sy152/h59/b-82[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2:sy152/h59/b-82[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2-checked:sy152/h59/b-82[band-under-hdr(too-tall) LABELS-HIDDEN:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
+   q2-forced
+   q3:sy17/h59/b53[BAND-UNDER-HDR(fits)] seg 152/-82x300>76/-6x1>17/53x84
+   q3-checked:sy17/h59/b53[BAND-UNDER-HDR(fits)]
+TOTAL {"cases":48,"fitsUnder":100,"boxOut":0,"chkOut":0,"labels":68,"labelsQ1":47,"bounces":2,"bigJumps":12,"err":0,"tapJump":0,"pageErr":0}

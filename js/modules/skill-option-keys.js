@@ -74,7 +74,7 @@ export const ONE_LETTER_KEYS = Object.freeze({
 // `status`: 'assigned' (ids below), 'reserved' (the wave owns `keys` and fills in its ids when it
 // merges — nobody else may take one), 'spare' (unallocated; claim a whole block here first).
 export const KEY_BLOCKS = Object.freeze({
-    0: Object.freeze({ owner: 'P9 place value (second wave)', status: 'assigned', keys: '0A-0R' }),
+    0: Object.freeze({ owner: 'P9 place value (second wave)', status: 'assigned', keys: '0A-0Q' }),
     1: Object.freeze({ owner: 'P10 time and money', status: 'assigned', keys: '1A-1O' }),
     2: Object.freeze({ owner: 'count-by, patterns, multiplication chart', status: 'assigned', keys: '2A-2F' }),
     3: Object.freeze({ owner: 'function tables', status: 'assigned', keys: '3A-3A' }),
@@ -107,6 +107,7 @@ export const KEY_SUBRANGES = Object.freeze([
     Object.freeze({ keys: '6X-6Z', owner: 'Wave 1 lane A (pupil practice: calculator, skip)' }),
     Object.freeze({ keys: '2U-2Z', owner: 'wave 1 lane C: skip-count lines and the number grid' }),
     Object.freeze({ keys: '1W-1Z', owner: 'wave 1 lane C2: count_by_tables row list and multiplication labels' }),
+    Object.freeze({ keys: '0R-0X', owner: 'wave 5.2: the custom number line at the top of the page' }),
 ]);
 
 // Option id -> its multi-character key. APPEND-ONLY. Take the next letter of your OWN block.
@@ -127,7 +128,7 @@ export const MULTI_KEYS = Object.freeze({
     source: '0N',        // pv_digit_drag: word / expanded / numeral
     rename: '0P',        // unit_form: standard / more than 9 of one place
     span: '0Q',          // place_on_number_line: one ten / hundred / thousand to the next
-    answerSlot: '0R',    // number_word_form: the numeral on a line / in H T O boxes (detailed lesson 1, 2026-10-16)
+    answerSlot: '5P',    // number_word_form (5P: lessons sub-range; 0R went to nlOn on main): the numeral on a line / in H T O boxes (detailed lesson 1, 2026-10-16)
     // NEXT FREE IN BLOCK 0: 0R.
 
     // Block 1 — P10 time and money (design/research/time-money.md §20). Its other options reuse
@@ -158,9 +159,9 @@ export const MULTI_KEYS = Object.freeze({
     chart: '2D',         // mult_chart: a window / the whole chart
     ticks: '2E',         // nl_mult, nl_div: labels every step / every number
     shape: '2F',         // count_by_tables, number_patterns_rule, number_seq_fill: box / circle / hexagon
-    winRows: '2G',       // mult_chart (lesson 4, 2026-10-16): rows in the window (2 / 3 / 4)
-    winCols: '2H',       // mult_chart: columns in the window (3 / 4 / 5)
-    minFactor: '2I',     // mult_chart: the window's smallest row / column number (1 or 2)
+    winRows: '5Q',       // mult_chart (lesson 4, 2026-10-16): rows in the window (2 / 3 / 4)
+    winCols: '5R',       // mult_chart: columns in the window (3 / 4 / 5)
+    minFactor: '5S',     // mult_chart: the window's smallest row / column number (1 or 2)
     // NEXT FREE IN BLOCK 2: 2J.
     // Lane C sub-range 2U-2Z (wave 1): skip-count lines and the number grid.
     fill: '2U',          // count_by_tables: how many numbers are printed at the start (two / one / half)
@@ -177,7 +178,7 @@ export const MULTI_KEYS = Object.freeze({
     // tokens only (task, response, order: inorder, support); `ops` is its own key because the
     // deployed decoder would read an unknown `op` token as an EMPTY set (every operation).
     ops: '3A',           // function_table_easy / _hard: the operations a rule may use (+ − × ÷)
-    ftTrap: '3B',        // function tables (lesson 5, 2026-10-16): row 1 fits a + and a × rule
+    ftTrap: '5T',        // function tables (lesson 5, 2026-10-16): row 1 fits a + and a × rule
     // NEXT FREE IN BLOCK 3: 3C.
 
     // Block 4 — SUPPORTS (S2: `cover` and `mix` are live; `touch` is unused - touch dots are
@@ -233,6 +234,15 @@ export const MULTI_KEYS = Object.freeze({
     // ride on the reserved `labels` (5E).
     bars: '9F',          // bar graphs: bars standing up (vertical) / lying down (horizontal)
     // NEXT FREE FOR AP2: 9G (to 9J).
+
+    // Sub-range 0R-0X — wave 5.2 (2026-10-03): the number line at the top of the page.
+    nlOn: '0R',          // the line on / off
+    nlFrom: '0S',        // start (signed decimal: N = minus, P = point; empty = Auto)
+    nlTo: '0T',          // end (as nlFrom)
+    nlStep: '0U',        // step between ticks: whole, fraction or decimal
+    nlLabels: '0V',      // which ticks carry a number
+    nlMinor: '0W',       // small ticks between two steps
+    nlHops: '0X',        // hop arrows over each step
 });
 
 /** Every option id -> its key (one letter, or digit + letter). */
@@ -373,6 +383,11 @@ export const VALUE_TOKENS = Object.freeze({
     step: Object.freeze({ 45: 'X' }),
     power: Object.freeze({ 10: '1', 100: '2', 1000: '3' }),
     places: Object.freeze({ 1: '0', 10: '1', 100: '2', 1000: '3', 10000: '4', 100000: '5' }),
+    // wave 5.2: the number line at the top of the page
+    nlStep: Object.freeze({ auto: 'A', 1: '1', 2: '2', 5: '5', 10: 'T', 20: 'U', 25: 'Q', 50: 'F', 100: 'H', 1000: 'K',
+        '1/2': 'B', '1/3': 'C', '1/4': 'D', '1/5': 'E', '1/6': 'G', '1/8': 'I', '1/10': 'J', '1/12': 'L', '0.1': 'M', '0.01': 'N' }),
+    nlLabels: Object.freeze({ auto: 'A', all: 'L', 2: '2', 5: '5', 10: 'T', ends: 'E', none: 'N' }),
+    nlMinor: Object.freeze({ auto: 'A', 0: '0', 2: '2', 4: '4', 5: '5', 10: 'T' }),
 });
 
 // Every member a numeric SET option takes on any skill, written as itself in base 36 (7 -> "7",
@@ -425,6 +440,8 @@ export const SCALAR_ONLY = Object.freeze({
     calculator: 'bool', skipAfter: 'decimal',
     // lessons 4 and 5 (2026-10-16)
     winRows: 'decimal', winCols: 'decimal', minFactor: 'decimal', ftTrap: 'bool',
+    // wave 5.2: the number line (Start / End are signed decimals: N = minus, P = point)
+    nlOn: 'bool', nlHops: 'bool', nlFrom: 'decimal', nlTo: 'decimal',
 });
 
 /**

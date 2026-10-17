@@ -214,6 +214,14 @@ export const CASE_TESTS = Object.freeze({
     arrSquareFactor: (it) => { const c = it && it.q && it.q.cell; return CASE_TESTS.arrSquare(it) && c.payload.type === 'missing' && c.payload.ask === 'factor'; },
     arrEdge: (it) => CASE_TESTS.arrSquare(it) || CASE_TESTS.arrFive(it),
     arrAny: (it) => !!arrTurnOf(it),
+    // (the chart's example: plain digits and at most 4 by 4)
+    arrTurnSmall: (it) => CASE_TESTS.arrTurn(it) && CASE_TESTS.arrSmall(it),
+    // (Practice 1, lesson 3a: every place a square or an array with a 5; its last row a big square and 5 rows)
+    arrNoSmall: (it) => { const p = arrTurnOf(it); return !!p && (p.rows === p.cols || p.rows === 5 || p.cols === 5); },
+    arrBigSquare: (it) => { const p = arrTurnOf(it); return !!p && p.rows === p.cols && p.rows >= 4; },
+    arrFiveRows: (it) => { const p = arrTurnOf(it); return !!p && p.rows === 5 && p.cols !== 5; },
+    // (4 rows of 5 or 5 rows of 4: the widest array - a lesson sheet's second Guided cell)
+    arrFourFive: (it) => { const p = arrTurnOf(it); return !!p && p.rows * p.cols === 20; },
     // (a non-square array at most 4 by 4: two of them and their turns stack on a lesson sheet)
     arrSmall: (it) => { const p = arrTurnOf(it); return !!p && CASE_TESTS.arrNonSq(it) && p.rows <= 4 && p.cols <= 4; },
     wpBridge: (it) => { const o = wpParts(it); return !!o && o[0] >= 2 && o[1] >= 2 && o[0] <= 9 && o[1] <= 9 && o[0] + o[1] >= 11; },
@@ -1040,7 +1048,8 @@ function vocabPicture(pic, c) {
         }
         // a small dot array (detailed lesson 3a): {rows, cols, mark: 'row' | 'turn'}
         case 'array': {
-            const pitch = { S: 3.6, M: 3.9, L: 4.2 }[c.size] || 4.2, r = pitch * 0.34;
+            // (dots at the arrays template's floor: at least 4 mm across - RP-21)
+            const pitch = { S: 5.4, M: 5.6, L: 5.8 }[c.size] || 5.8, r = 2.05;
             const R = Math.min(5, pic.rows || 1), C = Math.min(5, pic.cols || 1);
             const one = (rows, cols, x0) => { let b = ''; for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) b += `<circle cx="${(x0 + pitch / 2 + j * pitch).toFixed(2)}" cy="${(pitch / 2 + i * pitch).toFixed(2)}" r="${r.toFixed(2)}" fill="#000"/>`; return b; };
             let b = one(R, C, 0), W = C * pitch, H = R * pitch;
@@ -1720,6 +1729,13 @@ function weDoRender(it, i) {
             const steps = workedStepsOf(it);
             // (the key: every box answered, the prompt drawn exactly as on the pupil page - INK-31, critic r2 R9)
             if (t && steps.length > 1) return answered ? t.render(Object.assign({}, it.q.cell.payload, { under: 0 }), c) : t.stepState(Object.assign({}, it.q.cell.payload), steps.map((s) => ({ marks: s.marks || [] })), 0, c);
+        }
+        // An array-and-turn Guided cell 1 (the detailed lesson maker, lesson 3a): step 2 done in grey - the
+        // first product traced; the turned fact stays the pupil's (the Critical Atom).
+        if (!answered && i === 0 && it.q && it.q.cell && it.q.cell.template === 'arrays-turn' && it.q.cell.payload && it.q.cell.payload.type === 'both') {
+            const t = stepTemplateOf(it);
+            const p = it.q.cell.payload;
+            if (t) return t.render(Object.assign({}, p), Object.assign({}, c, { state: 'blank', stepVals: { array: { ink: 'solid' }, turn: { ink: 'solid' }, a: { value: String(Number(p.rows) * Number(p.cols)), ink: 'trace' } } }));
         }
         if (!answered && i === 0) {
             const t = stepTemplateOf(it);

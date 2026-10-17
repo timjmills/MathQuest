@@ -1,0 +1,7 @@
+timedHeaderCases (tests/lib/refline-dots.cjs) run by neg.cjs
+== pre-fix tree (789f23f7 with question-render.js from e189119f): FAIL 6 of 8
+  sub_100_regroup 1280x600 queue/link: scroll 67, bar bottom 59, band 3-56
+  nl_mult         1280x600 queue/link: scroll 60, bar bottom 59, band 10-63
+  sub_100_regroup 1366x650 queue/link: scroll 17, bar bottom 59, band 53-106
+  nl_mult         1366x650 queue/link: ok (band 60-113)
+== this tree (789f23f7): PASS 8 of 8 (band 63-116 at 1280x600 and 1366x650 sub_100_regroup; 60-113 nl_mult @1366)

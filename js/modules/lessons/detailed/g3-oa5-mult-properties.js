@@ -54,18 +54,20 @@ export default {
     ],
 
     // ------------------------------------------------------------------ the practice skill
-    // (products to 9: the chart and two Guided arrays stay at most 4 high, so two fit the lesson sheet)
-    skill: TURN(0, { maxNum: 12 }),
+    // (products to 20: the chart and Guided cell 1 at most 4 by 4, Guided cell 2 the widest, 4 by 5;
+    // `turn-two` keeps the Guided header on one line beside the Steps)
+    skill: TURN(0, { maxNum: 20, instructionKey: 'turn-two' }),
     // (no pool: the pack's own places; there are only 10 rows-by-cols pairs, so ONE Practice page)
     practicePages: 2,
     // ★★★ last row: a square array (does it change when turned?) and a 5-row array.
     edgeTest: 'arrEdge',
-    // ★★ Practice 1: the known fact gives the turned fact (pictures), its last row two squares; Practice 2:
+    // ★★ Practice 1: the known fact gives the turned fact (pictures; a square or a 5 in every place), its last
+    // row a 4 x 4 square and 5 rows (dealt first, `first`); Practice 2:
     // facts only, the missing number, its last row a square and a 5.
     practiceSheets: [
         // (products to 16: rows + in each row at most 8, so the array and its turn fit a half-width cell at L)
-        { skill: TURN(1, { minNum: 6, maxNum: 16 }), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['arrSquare', 'arrSquare'] } },
-        { skill: FACTS({ minNum: 12 }), shape: [10, 2], edgeLast: { per: 10, cols: 2, wants: ['arrSquare', 'arrFive'] } },
+        { skill: TURN(1, { minNum: 6, maxNum: 16, allTest: 'arrNoSmall' }), shape: [4, 2], edgeLast: { per: 4, cols: 2, first: true, wants: ['arrBigSquare', 'arrFiveRows'] } },
+        { skill: FACTS({ minNum: 12, distinctFirst: true }), shape: [10, 2], edgeLast: { per: 10, cols: 2, wants: ['arrSquare', 'arrFive'] } },
     ],
     // No Mixed page: a Mixed page leads with the lesson skill (half its items), and only ten arrays up to
     // 5 x 5 exist - the chart, the lesson sheet, Practice 1, the exit slip and the Check Question use them
@@ -88,8 +90,9 @@ export default {
     lessonData: {
         skills: [],
         concepts: [
+            // (the facts-only rule, on the pupil's own page - modelled in the I Do, T4 §5)
+            { id: 'same', text: 'Same two numbers, same product.' },
             { id: 'turn', text: 'Turn the array: rows become columns.' },
-            { id: 'same', text: 'No dot comes or goes. The total stays the same.' },
         ],
         vocab: [
             { word: 'array', meaning: 'dots in equal rows', picture: { kind: 'array', rows: 2, cols: 3 } },
@@ -108,14 +111,12 @@ export default {
         chant: '',
         // (two arrays-and-turns are too wide to stand side by side: they stack beside the Steps)
         guidedStack: 2,
-        // (its header "Guided Practice: Look at the array. Write two facts." takes two lines in the 1fr zone)
-        guidedStripMm: 6,
-        guidedWants: ['arrSmall', 'arrSmall', 'arrSmall'],
+        guidedWants: ['arrSmall', 'arrFourFive'],
         guidedRows: 2,
         practiceShape: [6, 2],
         format: { kind: 'numbered steps with icons', why: 'Step 5 is the Critical Atom: the pupil checks, never recounts.' },
         // A non-square array, no repeated digit, a product the pupils can count (3 rows of 4).
-        example: { test: 'arrTurn' },
+        example: { test: 'arrTurnSmall' },
         // (no second or third example: the chart's four step panels fill the page, and only ten arrays
         // to 5 x 5 exist - every one the chart does not print is one more for the pupil pages)
         mixWith: [],
@@ -159,7 +160,7 @@ export default {
     // Three items (V22: 3 when 4 full-size items do not fit a half - an array and its turn is a whole row),
     // the array one across, the two facts two across: the turned fact from a picture, the Critical Atom without a picture, the ★★★ square.
     exit: [
-        { case: 'an array: the known fact gives the turned fact', ref: TURN(1), want: 'arrNonSq', instr: 'Turn the array. Write the new fact.', detects: 'Copies the first fact: no swap.', cols: 1 },
+        { case: 'an array: the known fact gives the turned fact', ref: TURN(1, { maxNum: 12 }), want: 'arrSmall', instr: 'Turn the array. Write the new fact.', detects: 'Copies the first fact: no swap.', cols: 1 },
         { case: 'same product, no picture (Critical Atom)', ref: FACTS(), want: 'arrProduct', instr: 'Write the missing number.', detects: 'Multiplies again and slips: not the same product.', cols: 2 },
         { case: 'a square fact, the missing factor', ref: FACTS(), want: 'arrSquareFactor', instr: 'Write the missing number.', detects: 'Thinks a square cannot turn.', cols: 2 },
     ],
@@ -211,14 +212,15 @@ export default {
     // do not exist yet - see the build list): recount (a new product), no swap (the same fact again),
     // product as a factor.
     mistakes: [
-        { name: 'Recounts: a new product', step: 5, looks: '{cq.A}', fix: '“Did a dot move away?”', option: 'A', misconception: 'turn-recount' },
-        { name: 'Copies the fact: no swap', step: 4, looks: '{cq.B}', fix: 'Count the turned rows aloud.', option: 'B', misconception: 'turn-no-swap' },
-        { name: 'Product as a factor', step: 4, looks: '{cq.C}', fix: 'The product is always last.', option: 'C', misconception: 'turn-product-factor' },
-        { name: 'Recounts the turned array', step: 5, looks: '{exit.1.wrong.turnrecount} for {exit.1.turned}', fix: 'Turn the tray: same dots.', option: '', caught: 'Exit b · Practice 2' },
+        { name: 'Recounts: a new product', step: 5, looks: '{cq.A}', fix: '“Did a dot move away?”', option: 'A', misconception: 'turn-recount', caught: 'Exit b' },
+        { name: 'Adds the two factors', step: 5, looks: '{cq.B}', fix: '“Times, not plus: same product.”', option: 'B', misconception: 'turn-product-factor' },
+        { name: 'Copies the fact: no swap', step: 4, looks: '{exit.0.wrong.turnnoswap} for {exit.0.turned}', fix: 'Count the turned rows aloud.', option: '', caught: 'Exit a · Practice 1' },
+        { name: 'Product as a factor', step: 4, looks: '{exit.2.wrong.turnproductfactor} in the box of exit c', fix: 'The product is always last.', option: '', caught: 'Exit c · Practice 2' },
     ],
-    // (`turnedOk`: only six non-square arrays fit 5 x 5 and the pupil pages use them all; the board question may
-    // turn a Guided array - it is the property itself)
-    checkQuestion: { ref: Object.assign(TURN(1), { turnedOk: true }), want: 'arrNonSq', correct: 'D' },
+    // The Check Question is a fact on the board (no dots: the Critical Atom, same product, after the I Do's
+    // facts-only rows), a fresh pair; its options are the provider's wrong products, each written as a fact.
+    checkQuestion: { ref: FACTS(), want: 'arrProduct', correct: 'C',
+        show: (v, q) => { const p = (q && q.cell && q.cell.payload) || {}; return `${p.cols} × ${p.rows} = ${v}`; } },
 
     // ------------------------------------------------------------------ T3-T5 delivery scripts
     sections: [
@@ -255,6 +257,9 @@ export default {
                 { say: '{chart.cols} rows of {chart.rows} is {chart.total}.', note: 'Step 4: write [[{chart.turned}]].' },
                 { ask: 'Did a dot move away?', note: 'Expected: no. Step 5: same product.' },
                 { say: '{chart.rows} times {chart.cols} equals {chart.cols} times {chart.rows}.', note: 'The Say frame. Pupils repeat twice.' },
+                { do: 'Cover the dots. Point to {chart.fact} on the chart.', note: 'One new thing: no dots. Practice 2 and exit b, c.' },
+                { ask: 'So what is {chart.cols} × {chart.rows}?', note: 'Expected: [[{chart.total}]]. Same two numbers, same product.' },
+                { do: 'Write {chart.cols} × □ = {chart.total} on the board.', note: 'Expected: [[{chart.rows}]]: the factor that moved.' },
             ] },
         { n: 6, name: 'We Do: Guided Practice', min: 8, page: 'P3', boxes: [{ kind: 'feedback', title: 'Fix it at once', text: 'Fix: turn the tray again and ask “Same dots?”' }],
             rows: [
@@ -262,14 +267,13 @@ export default {
                 { ask: 'How many rows? How many in each row?', note: 'Expected ★: [[{we.0.fact}]]; turned [[{we.0.turned}]].' },
                 { do: 'Pupils do the second array on their own.', note: 'Expected ★: [[{we.1.fact}]]; turned [[{we.1.turned}]].' },
                 { ask: 'Turn it. What is the new fact?', note: 'Pupils say it; write it on the board.' },
-                { do: 'Cover the dots. Write {chart.fact} on the board.', note: 'Practice 2 has no dots: model it once.' },
-                { ask: 'So what is {chart.cols} × {chart.rows}?', note: 'Expected: [[{chart.total}]]. Same two numbers, same product.' },
+                { say: 'Cover the dots of the second array. Read its first fact.', note: 'Expected: [[{we.1.fact}]]; no dots, the same turned fact.' },
             ] },
         { n: 7, name: 'Check Question', min: 3, page: '',
             rows: [
-                { do: 'Draw {cq.rows} rows of {cq.cols} dots. Write {cq.fact}.' },
-                { do: 'Turn it on the board. A: {cq.A} · B: {cq.B} · C: {cq.C} · D: {cq.D}.' },
-                { ask: 'Which is the turned fact? Show fingers.', note: 'Correct: [[{cq.right}]]. {cq.why}' },
+                { do: 'Write {cq.fact} on the board. No dots.' },
+                { do: 'Write three turned facts. A: {cq.A} · B: {cq.B} · C: {cq.C}.' },
+                { ask: 'Which turned fact is true? Show fingers.', note: 'Correct: [[{cq.right}]]. {cq.why}' },
             ],
             loop: { most: 'Go on to You Do.', half: 'Reteach step 5 with the tray, then two more.', fewer: 'Stop. Whole class: We Do again with a new tray.' } },
         { n: 8, name: 'You Do: Independent Practice', min: 9, page: 'P4', boxes: [{ kind: 'watch', title: 'The last row', text: 'Walk to the last row first: {p4.last}.' }],

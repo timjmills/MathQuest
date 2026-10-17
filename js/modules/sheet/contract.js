@@ -80,6 +80,8 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     array: 'Write how many rows. Write how many in each row.',
     'turn-facts': 'Look at the array. Write two facts.',
     'turn-new': 'Turn the array. Write the new fact.',
+    // (a lesson sheet's Guided header beside its Steps: one line - detailed lesson 3a)
+    'turn-two': 'Write the two facts.',
     'skip-count': 'Count by {n}. Write the missing numbers.',
     expanded: 'Write the number in expanded form.',
     'digit-value': 'Write the value of the underlined digit.',

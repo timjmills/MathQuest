@@ -1,6 +1,8 @@
 import { DOMAINS, SKILLS, SKILL_FULL_LABELS, getSkillPrintSize, PRINT_SIZE_COLUMNS, getSkillGrade, gradeCircleHTML, getCategoryForSkill, getDomainByCategory } from './data.js';
 import { randInt, shuffle } from './utils.js';
-import { generateQuestionFor } from './generate-question.js';
+import { generateQuestionFor as _generateQuestionFor, configuredItem } from './generate-question.js';
+// Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
+const generateQuestionFor = (req) => configuredItem(_generateQuestionFor(req), req && req.category);
 import { formatProblemForPrint, formatWorkedSolutionForPrint } from './print-generate.js';
 import { getSkillIndex, searchSkillIndex } from './skill-search.js';
 import { optionsFor, offeredOptionsFor, describeOptions, normalizeOptions, packOptions, factSetTitle, UNIVERSAL_OPTIONS, pvRefusal } from './skill-options.js';
@@ -334,7 +336,7 @@ export function setPrintSkillOption(sIdx, skIdx, optId, raw) {
         if (!def) return;
         if (def.type === 'bool') { next[optId] = !!raw; return; }
         if (def.type === 'rows') { next[optId] = normalizeRows(raw); return; }
-        if (def.type === 'int') { const n = Number(raw); if (Number.isFinite(n)) next[optId] = n; return; }
+        if (def.type === 'int') { if (def.nullable && (raw === '' || raw === null)) { next[optId] = null; return; } const n = Number(raw); if (Number.isFinite(n)) next[optId] = n; return; }
         if (def.type === 'enum') {
             const hit = (def.values || [])[Number(raw)];
             if (hit) next[optId] = hit.v;
