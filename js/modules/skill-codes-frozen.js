@@ -310,6 +310,10 @@ export const FROZEN_SKILL_CODES = {
     // Pinned at the codes the auto assigner gave them.
     "number_sense:round_nl_thousands": "U6", "number_sense:round_nl_ten_thousands": "U7",
     "number_sense:round_nl_hundred_thousands": "U8",
+    // ---- 2026-10-17 appends (owner): sort shapes by sides / faces, nets. APPEND ONLY. ----
+    // Pinned at the codes the auto assigner gave them.
+    "shapes_early:sort_2d_by_count": "VA", "shapes_early:sort_3d_by_count": "VB",
+    "shapes_classify:net_to_solid": "VC", "shapes_classify:cube_nets": "VD",
 };
 
 // Per-category positional order (index = the number used by settings codes, MX- codes and
@@ -422,6 +426,8 @@ export const FROZEN_CATEGORY_ORDER = {
         "shape_corners_count", "count_edges_faces_vertices", "count_sides_vertices_2d", "order_objects_length",
         "measure_nonstandard", "compose_shapes", "compose_hexagon", "compose_rect_from_squares", "partition_shapes",
         "shape_attributes", "compose_from_attributes", "mixed_shapes_early",
+        // 2026-10-17 appends — APPEND ONLY.
+        "sort_2d_by_count", "sort_3d_by_count",
     ],
     "area_perimeter": [
         "perimeter_intro", "area_unit_squares", "perimeter_grid", "perimeter", "area", "area_perimeter",
@@ -434,6 +440,8 @@ export const FROZEN_CATEGORY_ORDER = {
     ],
     "shapes_classify": [
         "classify_triangles", "classify_quads", "hotspot_quads", "net_identify", "cross_section_3d", "mixed_shapes",
+        // 2026-10-17 appends — APPEND ONLY.
+        "net_to_solid", "cube_nets",
     ],
     "coordinates": [
         "coordinate_q1", "coordinate_all", "coordinate_graph", "coord_distance_q1", "coord_polygon",

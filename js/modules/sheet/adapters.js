@@ -222,7 +222,11 @@ const LEGACY_TEMPLATE = register('legacy', {
         const value = p && p.ans !== undefined ? p.ans : '';
         // SCC-A7: a simple value stamps itself; anything else is stamped with the legacy hint.
         let display;
-        if (value !== null && typeof value === 'object') {
+        if (value !== null && typeof value === 'object' && p.printAnswer != null && p.printAnswer !== '') {
+            // The generator's paper answer (as print-settings.js _formatAnsForKey reads it): a
+            // "Click ALL" item's q.ans is option ids ["opt1","opt3"], which no teacher can mark from.
+            display = String(p.printAnswer);
+        } else if (value !== null && typeof value === 'object') {
             const hint = callDep('answerKeyHint', [p], '');
             display = hint ? `${hint} = ${JSON.stringify(value)}` : JSON.stringify(value);
         } else {

@@ -277,8 +277,8 @@ export const CONCEPT_RULES = [
     [/(^|[\s_:])ratios?(?![a-z])|unit_rate|double_num_line/, ['ratio'], { label: true }],
     [/partition_shapes/, ['partition_shapes']],
     // ---- geometry
-    [/name_2d|shape_name_match_2d|count_sides_vertices_2d|shape_corners|compose_shapes|compose_hexagon|compose_rect|shape_attributes|compose_from_attributes|shape_positions|hotspot_quads|classify_quads|classify_triangles|shape_pattern/, ['shapes_2d']],
-    [/name_3d|shape_name_match_3d|edges_faces|net_identify|cross_section|net_surface/, ['shapes_3d']],
+    [/name_2d|shape_name_match_2d|count_sides_vertices_2d|sort_2d_by_count|shape_corners|compose_shapes|compose_hexagon|compose_rect|shape_attributes|compose_from_attributes|shape_positions|hotspot_quads|classify_quads|classify_triangles|shape_pattern/, ['shapes_2d']],
+    [/name_3d|shape_name_match_3d|edges_faces|sort_3d_by_count|net_identify|net_to_solid|cube_nets|cross_section|net_surface/, ['shapes_3d']],
     [/quads/, ['quadrilaterals']],
     [/triangle/, ['triangles']],
     [/shape_positions/, ['position']],
@@ -452,6 +452,10 @@ export const SKILL_TERMS = {
     'angles_lines:identify_angles': ['angles', 'right angle', 'acute', 'obtuse', 'types of angles', 'clockwise', 'anticlockwise', 'counterclockwise', 'quarter turn', 'half turn', 'turns'],
     // critic r3 C-E
     'shapes_early:count_sides_vertices_2d': ['vertex', 'corner'],
+    'shapes_early:sort_2d_by_count': ['sort shapes', 'sides', 'vertices', 'corners', 'shapes with 4 sides', 'click all shapes', 'polygon sort'],
+    'shapes_early:sort_3d_by_count': ['sort 3d shapes', 'faces', 'vertices', 'corners', 'solids', 'prism', 'pyramid'],
+    'shapes_classify:net_to_solid': ['net', 'nets', 'fold', 'folding', 'net of a cube', 'net of a prism', 'net of a pyramid', 'cylinder net'],
+    'shapes_classify:cube_nets': ['net', 'nets', 'cube net', 'nets of a cube', 'fold', 'folding'],
     // critic r5 P-E / C-G: what _mpTypes really deals (commutative, distributive, identity, zero), never associative
     'multiplication:mult_properties': ['commutative', 'commutative property', 'commutative property of multiplication', 'turnaround facts',
         'distributive property', 'distributive property of multiplication', 'identity', 'identity property', 'identity property of multiplication',

@@ -2378,6 +2378,10 @@ Object.assign(P12_OPTIONS, {
     { label: 'Which pairs', help: 'A trailing zero changes nothing: 0.450 = 0.45. A page of those alone teaches it; the default mixes one in four.' })],
 });
 
+/** name_2d_shapes / name_3d_shapes "Which shapes": a kind also passes every item whose words name
+ *  no shape (a counting or net item), so it narrows only the naming items. */
+const _shapeKinds = (pairs) => pairs.map(([l, re]) => [l, `${re}|^How many |^Click ALL the (shapes with|nets)|this net`]);
+
 /** A set option of kinds told apart by the item's words or answer (see _p12Match), any id. */
 const _p12Kinds = (id, label, pairs, help) => ({
     ..._p12Match(pairs, { label, help: help || 'Tick one for a page of it alone, or several. All ticked mixes them.' }), id,
@@ -2385,16 +2389,33 @@ const _p12Kinds = (id, label, pairs, help) => ({
 
 // ======================= GEOMETRY (gen-geometry.js, gen-measurement.js) ====================
 Object.assign(P12_OPTIONS, {
+    // Kinds 2+ are opt-in (shape-art.js builders, read by gen-geometry.js _shapeForm): the default
+    // page stays the two naming kinds. "Which shapes" narrows the naming items only; the counting
+    // and net items pass it (their words name no shape).
     'shapes_early:name_2d_shapes': [
-        _p12Match([['Name the shape (write its name)', '^What shape'], ['Click every shape of one kind', '^Click ALL']]),
-        _p12Kinds('shapes', 'Which shapes', [['Circles and ovals', '\\b(circles?|ovals?)\\b'], ['Triangles', '\\btriangles?\\b'],
+        _p12Match([['Name the shape (write its name)', '^What shape'], ['Click every shape of one kind', '^Click ALL the (?!shapes with)'],
+            ['Count the sides', '^How many sides'], ['Count the vertices (corners)', '^How many vertices'],
+            ['Click every shape with N sides', '^Click ALL the shapes with \\d+ sides?\\b'],
+            ['Click every shape with N vertices', '^Click ALL the shapes with \\d+ vert']],
+        { dflt: [0, 1], help: 'Naming is the default. Tick a counting kind for a page of sides or vertices (corners); the "with N" kinds are a picture choice.' }),
+        _p12Kinds('shapes', 'Which shapes', _shapeKinds([['Circles and ovals', '\\b(circles?|ovals?)\\b'], ['Triangles', '\\btriangles?\\b'],
             ['Squares and rectangles', '\\b(squares?|rectangles?)\\b'], ['Rhombuses', '\\brhomb'], ['Pentagons and hexagons', '\\b(pentagons?|hexagons?)\\b']]),
+            'Narrows the naming items. Tick one for a page of it alone, or several.'),
     ],
     'shapes_early:name_3d_shapes': [
-        _p12Match([['Name the shape (write its name)', '^What'], ['Click every shape of one kind', '^Click ALL']]),
-        _p12Kinds('shapes', 'Which shapes', [['Spheres', 'spheres?\\b'], ['Cylinders', 'cylinders?\\b'], ['Cubes', 'cubes?\\b'],
-            ['Cones', 'cones?\\b'], ['Rectangular prisms', 'rectangular prism']]),
+        _p12Match([['Name the shape (write its name)', '^What 3D'], ['Click every shape of one kind', '^Click ALL the (?!shapes with|nets)'],
+            ['Count the faces', '^How many faces'], ['Count the edges', '^How many edges'], ['Count the vertices', '^How many vertices'],
+            ['Click every shape with N faces', '^Click ALL the shapes with \\d+ faces?\\b'],
+            ['Click every shape with N vertices', '^Click ALL the shapes with \\d+ vert'],
+            ['Which shape does this net make?', '^What shape does this net'], ['Click every net of a cube', '^Click ALL the nets']],
+        { dflt: [0, 1], help: 'Naming is the default. Counting faces, edges and vertices uses prisms and pyramids; the net kinds fold a net in the mind.' }),
+        _p12Kinds('shapes', 'Which shapes', _shapeKinds([['Spheres', 'spheres?\\b'], ['Cylinders', 'cylinders?\\b'], ['Cubes', 'cubes?\\b'],
+            ['Cones', 'cones?\\b'], ['Rectangular prisms', 'rectangular prism']]), 'Narrows the naming items. Tick one for a page of it alone, or several.'),
     ],
+    'shapes_early:sort_2d_by_count': [_p12Match([['Shapes with N sides', 'with \\d+ sides?\\b'], ['Shapes with N vertices (corners)', 'with \\d+ vert']],
+        { label: 'Sort by', help: 'Tick one for a page of it alone. Sides come first; vertices (corners) are the same count, met a second way.' })],
+    'shapes_early:sort_3d_by_count': [_p12Match([['Shapes with N faces', 'with \\d+ faces?\\b'], ['Shapes with N vertices', 'with \\d+ vert']],
+        { label: 'Sort by', help: 'Faces use prisms and pyramids only; vertices add the sphere, cylinder and cone (0, 0 and 1).' })],
     'shapes_early:shape_positions': [_p12Kinds('forms', 'Which position words', [['Above and below', '=> (Above|Below)$'],
         ['Beside', '=> Beside$'], ['Between', '=> Between$']], 'Above and below come first; between is the hardest (two shapes to look at).')],
     'shapes_early:shape_corners_count': [_p12Max([4, 6], 8, { label: 'Corners up to', help: 'The most corners a shape on the page has.' })],
@@ -2455,6 +2476,8 @@ Object.assign(P12_OPTIONS, {
         _p12Kinds('shapes', 'Classified by', [['Sides (equilateral, isosceles, scalene)', '(equilateral|isosceles|scalene)|=> (Equilateral|Isosceles|Scalene)$'],
             ['Angles (acute, right, obtuse)', '(acute|right|obtuse) triangles|=> (Acute|Right|Obtuse)$']])],
     'shapes_classify:classify_quads': [_p12Match([['Tick every name that fits one shape', 'categories that apply'], ['Click every shape of one kind', '^Click ALL the']])],
+    'shapes_classify:net_to_solid': [_p12Kinds('shapes', 'Which nets', [['Cubes and prisms', 'cube|prism'], ['Pyramids', 'pyramid'],
+        ['Cylinders and cones', 'cylinder|cone']], 'Cubes and prisms first: their faces are all squares and rectangles.')],
     'shapes_classify:net_identify': [_p12Kinds('shapes', 'Which solids', [['Cubes and rectangular prisms', 'cube|rectangular pri'], ['Pyramids and triangular prisms', 'pyramid|triangular pris']])],
     'shapes_classify:cross_section_3d': [_p12Kinds('forms', 'Which slice', [['Sliced across (horizontally)', 'horizontally'], ['Sliced top to bottom (vertically)', 'vertically']])],
     'coordinates:net_surface_area': [_p12Variants('net_surface_area', ['identify', 'sa'], ['Which solid does the net make?', 'Find the surface area'])],

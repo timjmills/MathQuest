@@ -24,7 +24,7 @@ Sources:
 
 ## Summary
 
-- Skills mapped: 601 live skills; 492 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
+- Skills mapped: 605 live skills; 496 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
 - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
 - **Full coverage: CCSS 76 of 177 standards FULL, 90 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 103 FULL, 92 PARTIAL, 22 GAP.
 - **Essential Elements: 81 of 117 FULL, 33 PARTIAL, 3 GAP** (tagged: 115).
@@ -1112,6 +1112,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **K.G.B.4** — PARTIAL. Analyze and compare two- and three-dimensional shapes, in different sizes and orientations, using informal language to describe their similarities, differences, parts (e.g., number of sides and vertices/“corners”) and other attributes (e.g., having sides of equal length).  
   In part: Count Corners on a Shape (Visual) (`shapes_early:shape_corners_count`); Count Sides & Vertices on 2D Shape (Visual) (`shapes_early:count_sides_vertices_2d`)  
   Missing: compare two shapes: similarities and differences; the parts of 3-D shapes; sides of equal length → `compare_shapes`, `shape_3d_tasks`  
+  Also tagged: `shapes_early:sort_2d_by_count`
 - **K.G.B.5** — GAP. Model shapes in the world by building shapes from components (e.g., sticks and clay balls) and drawing shapes.  
   Missing: build shapes from components (sticks and balls); draw shapes → `shape_draw`, `make_3d`  
 - **K.G.B.6** — FULL. Compose simple shapes to form larger shapes. For example, “Can you join these two triangles with full sides touching to make a rectangle?”  
@@ -1320,6 +1321,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **2.G.A.1** — PARTIAL. Recognize and draw shapes having specified attributes, such as a given number of angles or a given number of equal faces. Identify triangles, quadrilaterals, pentagons, hexagons, and cubes.  
   In part: Count Sides & Vertices on 2D Shape (Visual) (`shapes_early:count_sides_vertices_2d`); Find Shapes by Attributes (Multi-Select) (`shapes_early:compose_from_attributes`); Count Edges, Faces & Vertices on 3D Shape (Visual) (`shapes_early:count_edges_faces_vertices`)  
   Missing: draw shapes with specified attributes → `shape_draw`  
+  Also tagged: `shapes_early:sort_2d_by_count`, `shapes_early:sort_3d_by_count`
 - **2.G.A.2** — PARTIAL. Partition a rectangle into rows and columns of same-size squares and count to find the total number of them.  
   In part: Compose a Rectangle from Squares (`shapes_early:compose_rect_from_squares`)  
   Missing: partition a rectangle into rows and columns of any size (the skill fills one 2 × 3 rectangle); count the squares to find the total → `rect_rows_columns`  
@@ -1367,7 +1369,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **3.OA.D.9** — PARTIAL. Identify arithmetic patterns (including patterns in the addition table or multiplication table), and explain them using properties of operations. For example, observe that 4 times a number is always even, and explain why 4 times a number can be decomposed into two equal addends.  
   In part: Multiplication Chart (Visual) (`multiplication:mult_chart`); Number Patterns: Count On, Count Back, Double (`patterns:number_patterns_rule`); Count-By Fill-In (1-12) (`patterns:count_by_fill`)  
   Missing: patterns in the addition table; explain a pattern with a property (4 × n is always even) → `patterns_notice`  
-  Also tagged: `multiplication:mult_chart_easy`, `multiplication:count_by_tables`, `patterns:count_by_step_up`, `patterns:count_by_step_down`
+  Also tagged: `multiplication:mult_chart_easy`, `multiplication:count_by_tables`, `patterns:count_by_step_up`, `patterns:count_by_step_down`, `algebra:function_table_easy`
 #### Number and Operations in Base Ten (3.NBT)
 
 *A. Use place value understanding and properties of operations to perform multi-digit arithmetic.*
@@ -1861,6 +1863,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **6.G.A.4** — PARTIAL. Represent three-dimensional figures using nets made up of rectangles and triangles, and use the nets to find the surface area of these figures. Apply these techniques in the context of solving real-world and mathematical problems.  
   In part: Identify Net of 3D Shape (Visual) (`shapes_classify:net_identify`); Net → Surface Area (Visual) (`coordinates:net_surface_area`)  
   Missing: nets with triangles and the surface area of pyramids and triangular prisms → `net_sa_triangles`  
+  Also tagged: `shapes_classify:net_to_solid`, `shapes_classify:cube_nets`
 #### Statistics and Probability (6.SP)
 
 *A. Develop understanding of statistical variability.*
