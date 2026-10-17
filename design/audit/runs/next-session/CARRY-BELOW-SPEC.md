@@ -7,7 +7,7 @@ rather than the top like they do in their lessons. Boxes would have to be adjust
 - **Where:** UNDER the answer line, in the next column to the left (the White Rose / UK "carry under" style): the pupil
   writes the answer digit, then the carried digit in a small box under the line beside it.
 - **Which methods:** column addition (incl. 3- and 4-addend), column (short) multiplication 2×1 / 3×1 / 4×1, long
-  multiplication partial-product rows (2×2, 3×2: carries for each row), and column subtraction.
+  multiplication partial-product rows (2×2, 3×2: carries for each row). Subtraction stays at the top (owner, 2026-10-17).
 - **Default:** a teacher setting, OFF. Top stays the default. New option on each column skill, e.g.
   `carry: 'top' | 'bottom'` ("Carry digits: at the top / under the line"), saved with the skill, in share codes
   (append-only codec key), honoured on every page type, every answer key, and every screen host.
@@ -22,10 +22,5 @@ rather than the top like they do in their lessons. Boxes would have to be adjust
 - Long multiplication: one carry row under EACH partial-product row's line, cleared between rows (or a fresh row).
 - Not a preset skill (CLAUDE.md "distinct option" rule): it is a layout preference, not a new difficulty or skill.
 
-## Open question for the owner before building — subtraction
-Exchange marks are normally made at the TOP (cross out, write the new digit above). "At the bottom" for subtraction
-needs one choice:
-- (a) suggested: keep crossing out at the top but write the exchanged 1 (the "ten ones") as a small digit under the
-  line in the column that receives it — mirroring addition; or
-- (b) the borrowed ten written beside the bottom number's digit (the "equal addition" / borrow-and-pay-back method,
-  which changes the method itself).
+## Subtraction — decided
+Owner 2026-10-17: leave subtraction at the top. Only addition and multiplication get the under-the-line option.
