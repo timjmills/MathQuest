@@ -483,6 +483,12 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
   composed sentences only, free-text build notes stay in the CSV; (5) detailed lessons 2/4/5: the owner list's EE comes first, the repo
   EE stays recorded beside it; (6) 1.OA.A.1 audit verdict becomes partial. Owner: finish Y4 site lessons (accept r4 7.96 after the F6
   fix, no further critic), finish White Rose page + skip-count defects, merge, then STOP all work.
+- 2026-10-17 ~13:45: **DEPLOYED** master 8eecabd2 (live confirmed): generator bug fixes; Y4 site lessons (owner accepted r4 7.96 after
+  F6); White Rose page r10 (M12/m18-m20; lesson sequence now from the live school site, domain order, all 64 CCSS BUILD lessons; per-grade
+  counts match the site; no critic r9 per owner); skip-count r5 (D12 fixed, no critic r5 per owner); MAP fix (a named MAP-test entry
+  beats a stale #map hash; ws-teacher-library opens the Start tab); build list gains `mult_standard` (owner: standard-algorithm
+  multiplication 2x1, 3x1, 4x1, 2x2, 3x2 as one skill with a size option). Full gates OK; print-lint 460/33. Owner: STOP after this.
+  Still paused on branches: lessons 6-10 (-wip-detailed-lessons-2), Lane D, fraction key — see their entries.
 - Held for after these land: Lane B answer boxes + regroup boxes (spec `design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md`),
   placevalue:identify write-value (spec `design/audit/runs/next-session/PV-IDENTIFY-WRITE-VALUE-SPEC.md`).
 
