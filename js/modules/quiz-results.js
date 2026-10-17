@@ -4,6 +4,7 @@
 import { SKILLS } from './data.js';
 import { compressTestForURL, loadTest, listTests, getResultsForTest, exportResultsCSV, saveResult, migrateTestToSections, getAllQuestionsFlat, getGlobalOffset, getTotalQuestionCount } from './quiz-storage.js';
 import { shuffle } from './utils.js';
+import { multiSelectAnswerText } from './widgets/multi-select-check.js';
 import { icon, cleanLabel, copyText, fmtDay } from './teacher-ui.js';
 import { note, backHTML, goQuizzes } from './teacher-quiz-ui.js';
 
@@ -260,6 +261,8 @@ export async function showStudentQuizDetail(resultId, testId) {
         ? Math.max(0, Math.round((result.completedAt - result.startedAt) / 60000))
         : 0;
 
+    // "Click ALL the ..." answers are option ids: the teacher reads the options' labels
+    const ansText = (qd, v) => (qd && qd.answerType === 'multi-select-check' && Array.isArray(qd.options)) ? multiSelectAnswerText(qd, v) : String(v);
     const qRow = (i, q) => {
         const a = result.answers && result.answers[i];
         const tag = a ? (a.correct ? '<span class="tvq-tag is-strong">Right</span>' : '<span class="tvq-tag is-weak">Wrong</span>') : '<span class="tvq-tag">Skipped</span>';
@@ -267,8 +270,8 @@ export async function showStudentQuizDetail(resultId, testId) {
         return `<tr>
           <td data-label="Question">Q${i + 1}</td>
           <td data-label="Skill"><span class="tv-cell-title tvq-plain" title="${label}">${label}</span></td>
-          <td data-label="Pupil's answer">${a ? escHtml(String(a.studentAnswer || '–')) : '–'}</td>
-          <td data-label="Right answer">${escHtml(String(q.questionData.ans))}</td>
+          <td data-label="Pupil's answer">${a ? escHtml(a.studentAnswer ? ansText(q.questionData, a.studentAnswer) : '–') : '–'}</td>
+          <td data-label="Right answer">${escHtml(ansText(q.questionData, q.questionData.ans))}</td>
           <td data-label="Result">${tag}</td>
         </tr>`;
     };
@@ -494,7 +497,7 @@ export function printQuizTest(quiz, options = {}) {
         for (let i = 0; i < allQs.length; i++) {
             const q = allQs[i].question;
             const qd = q.questionData;
-            let ansDisplay = String(qd.ans);
+            let ansDisplay = (qd.answerType === 'multi-select-check' && Array.isArray(qd.options)) ? multiSelectAnswerText(qd, qd.ans) : String(qd.ans);
             html += `<div class="ak-item">
                 <span class="ak-num">Q${i + 1}</span>
                 <span class="ak-ans">${escHtml(ansDisplay)}</span>

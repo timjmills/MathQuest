@@ -751,6 +751,11 @@ function answerTokens(q, steps) {
         if (t) { out.add(String(Number(t[1]))); out.add(t[2]); out.add(String(Number(t[2]))); }
     };
     if (q && (typeof q.ans === 'string' || typeof q.ans === 'number')) add(q.ans);
+    // a set of chosen option ids ("Click ALL ..."): the steps print it joined ("Answer: opt0,opt2")
+    if (q && q.answerType === 'multi-select-check' && Array.isArray(q.ans) && q.ans.length) {
+        q.ans.forEach(add);
+        out.add(q.ans.join(',')); out.add(q.ans.join(', '));
+    }
     (steps || []).forEach((st) => (Array.isArray(st.marks) ? st.marks : []).forEach((m) => {
         if (m && (m.slot === 'ans' || m.slot === 'answer' || m.slot === 'hour' || m.slot === 'minute' || /^ans/.test(String(m.slot)))) add(m.value);
     }));

@@ -175,3 +175,25 @@ export let onMultiSelectSubmit = function (_q, _selectedIds) { /* noop */ };
 export function setOnMultiSelectSubmit(fn) {
     if (typeof fn === 'function') onMultiSelectSubmit = fn;
 }
+
+// A saved answer is the chosen ids joined by commas ("opt1,opt3"), the form the quiz stores in
+// its one answer string. Set equality against q.ans; order and spacing do not matter.
+export function parseMultiSelectAnswer(value) {
+    if (Array.isArray(value)) return value.map(String).filter(Boolean);
+    return String(value == null ? '' : value).split(',').map(s => s.trim()).filter(Boolean);
+}
+
+export function multiSelectMatches(q, value) {
+    if (!q || !Array.isArray(q.ans)) return false;
+    const sel = Array.from(new Set(parseMultiSelectAnswer(value)));
+    return checkMultiSelectCheck({ ans: q.ans.map(String) }, sel);
+}
+
+// The ids a reader sees as the options' labels ("circle, square"), for feedback, results and keys.
+export function multiSelectAnswerText(q, value) {
+    const opts = (q && Array.isArray(q.options)) ? q.options : [];
+    return parseMultiSelectAnswer(value).map(id => {
+        const o = opts.find(x => String(x.id) === id);
+        return (o && o.label != null && String(o.label).trim()) ? String(o.label).replace(/<[^>]*>/g, '') : id;
+    }).join(', ');
+}
