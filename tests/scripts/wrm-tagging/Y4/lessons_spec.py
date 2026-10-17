@@ -34,7 +34,7 @@ LNEW['estimate_mass_volume'] = {
     'teaches': 'estimating the mass of an object in grams or kilograms and the liquid volume of a container in litres or millilitres against a known benchmark, before measuring',
     'representation': 'one boxed cell: the object drawn in black line beside its benchmark, three estimates in a bank below and one answer slot; no colour fill',
     'family': 'measurement', 'ccss': ['3.MD.A.2'],
-    'why': 'mass_volume_liquid reads a drawn scale (forms 0, 1) or sorts objects by the unit to measure them in (forms 2); nothing asks the pupil how heavy or how full a thing is likely to be (3.MD.A.2 "measure and estimate")'}
+    'why': 'mass_volume_liquid reads a drawn scale (forms 0, 1) or sorts objects by the unit to measure them in (forms 2); nothing asks the pupil how heavy or how full a thing is likely to be (3.MD.A.2 "measure and estimate"). Overlap (critic r1 n2): Y5\'s capacity_estimate ("Estimate Capacity (option)", 3.MD.A.2) already plans the liquid-volume half; this option is still needed for the mass half (grams and kilograms against a benchmark), and the lead may merge the volume half into capacity_estimate'}
 LNEW['ruler_object_inch'] = {
     'kind': 'option', 'skill': 'measurement:reading_ruler',
     'option': 'form "measure the object": a drawn object (pencil, crayon, leaf, key) laid along an inch ruler marked in halves or quarters, its left end at 0 or at a whole inch; the pupil writes its length to the nearest half or quarter inch',
@@ -50,7 +50,7 @@ LNEW['money_place_value'] = {
     'teaches': 'the place value of money: dollars as tens and ones, cents as dimes (tenths of a dollar) and pennies (hundredths), read from bills and coins, written in a chart and with $ and the point',
     'representation': 'one boxed cell: the bills and coins drawn in black line, a four-column chart (tens | ones . dimes | pennies) and one money slot "$__.__"',
     'family': 'measurement', 'ccss': ['2.MD.C.8', '4.NF.C.6'],
-    'why': 'money_notation writes amounts under $10 from $5 / $1 bills and coins (never a $10 bill, never a tens digit of dollars) and no money item splits an amount into tens, ones, dimes and pennies; money_convert (Y4) converts cents to dollars and cents'}
+    'why': 'money_notation writes amounts under $10 from $5 / $1 bills and coins (never a $10 bill, never a tens digit of dollars) and no money item splits an amount into tens, ones, dimes and pennies; money_convert (Y4) converts cents to dollars and cents. Overlaps (critic r1 n5): VISUAL_BUILDS vis_coin_options plans a place-value chart of coins (£1 / 10p / 1p) and Y4\'s money_convert spec a place chart $ | ¢; neither has a tens column of dollars or bills to $99.99, so the tens-and-ones-of-dollars chart is still a separate option (the lead may fold the coin chart into it)'}
 LNEW['area_split_tiles'] = {
     'kind': 'option', 'skill': 'area_perimeter:area_distributive_visual',
     'option': 'form "tile the parts": the split rectangle drawn on unit squares (a by b + c), the pupil counts or multiplies each part and writes a × (b + c) = a × b + a × c; form "rooms": a floor plan of two rectangles in a story (a room and a hall), find the floor area',
@@ -110,7 +110,7 @@ lesson(G + 'propertiesofmultiplicationcommutativeidentityanddistributive',
     pre=[('multiplication:mult_facts', {'constant': [0, 1]}, 'Y4.B4.S11', 'multiplying by 1 and by 0: the identity facts'),
          ('multiplication:arrays_groups', {'forms': [0]}, 'Y3.B3.S2', 'an array of rows of dots read as a multiplication'),
          ('division:div_facts', {'constant': [1]}, 'Y4.B4.S12', 'dividing by 1: the number is unchanged')],
-    related=[('multiplication:dot_array_mult', {'band': 100}, 'a dot array read as rows times columns: the product of the turned array is the same')],
+    related=[('multiplication:dot_array_mult', {'band': 25}, 'a dot array read as rows times columns: the product of the turned array is the same')],
     note='Domain-test build lesson, W05-W06, 3.OA.B.5. mult_properties {forms: 0, 1, 2} deals the three properties the title names: forms 0 an '
          'array and its turn, two facts with one product (3 × 4 = 4 × 3, commutative); forms 1 breaking a fact apart by its rows (5 × 9 = 1 × 9 + 4 × 9, distributive); '
          'forms 2 times 1 (1 × 11 = 11, identity). Forms 3 (times 0) is left out: the title does not name it. The associative property of '
@@ -118,12 +118,12 @@ lesson(G + 'propertiesofmultiplicationcommutativeidentityanddistributive',
 
 lesson(G + 'twostepwordproblemswiththefouroperations',
     partial=[('algebra:multi_step_word', {}, 'two-step stories that only add and subtract (add twice, add then take away, take away then add, take away twice), with numbers to about 120; never a × or ÷ step and never a letter for the unknown'),
-             ('number_ops_mixed:word_problems_mixed', {}, 'one-step stories with +, −, × or ÷ (5 plates of 8 beads; 10 stamps, 2 in each jar; how many more); never a second step')],
+             ('number_ops_mixed:word_problems_mixed', {'@max': 100}, 'one-step stories with +, −, × or ÷ (5 plates of 8 beads; 10 stamps, 2 in each jar; how many more), the factors and divisors within the tables at Max Number 100, and "times as many" comparisons in about 1 in 5 (Noor has 90 crayons, 9 times as many as Omar: 4.OA.A.2, Grade 4 content); never a second step')],
     verdict='partial',
     missing='two-step stories that mix × or ÷ with + or − (3 boxes of 8 pens and 5 more pens), written as an equation with a letter for the unknown and checked by estimating',
     build=['multi_step_four_ops'],
     pre=[('multiplication:mult_facts', {'constant': [7]}, 'Y4.B4.S8', 'the 7 times-table facts used in a × step'),
-         ('division:div_word_problems', {}, 'Y3.B3.S5', 'sharing and grouping stories: a one-step ÷ story'),
+         ('division:div_word_problems', {'range': 100}, 'Y3.B3.S5', 'sharing and grouping stories: a one-step ÷ story, dividing by 2 to 8'),
          ('addition:add_wp_100', {'band': 100}, 'Y2.B2.S19', 'a one-step addition story to 100'),
          ('subtraction:sub_wp_100', {'band': 100}, 'Y2.B2.S19', 'a one-step subtraction story to 100')],
     related=[('algebra:tape_diagram', {}, 'a bar model of a one-step story: one of the two bars of a two-step story')],
@@ -141,8 +141,7 @@ lesson(G + 'partitionshapesintoequalareas',
     pre=[('fractions:identify', {'forms': [1]}, 'Y3.B6.S1', 'picking the model, cut into equal parts, that shows a fraction'),
          ('fractions:shade_fraction', {}, 'Y3.B6.S3', 'shading a fraction of a shape cut into equal parts'),
          ('composing:compose_whole', {}, 'Y3.B6.S4', 'making 1 whole from smaller pieces')],
-    related=[('composing:whole_as_fraction', {}, 'a whole number written as a fraction (1 = 4/4, 5 = 5/1): the next idea this week')],
-    note='Awsaj supplement lesson, W07, 3.G.A.2, block Y4.B7.',
+    note='Awsaj supplement lesson, W07, 3.G.A.2, block Y4.B7. No related: composing:whole_as_fraction (the round-1 related) writes wholes to 10 as fractions, past this lesson\'s own numbers (parts 2 to 4; lessons critic r1 G1), and the other fraction skills read or shade a cut shape, which the pre already do.',
     search='Searched for an item that cuts a shape into equal areas: shapes_early:partition_shapes forms 0 / 1 and parts 0-2 (halves, thirds, fourths; '
            'the shape is cut already), fractions:identify / shade_fraction / write_fraction (a cut shape is read or shaded), composing:compose_whole, '
            'whole_as_fraction, half_or_not (Y2, "is it a half?"). None asks the pupil to cut, none deals sixths or eighths as equal areas; '
@@ -161,7 +160,7 @@ lesson(G + 'solveadditionandsubtractionwordproblemswithin1000usingbarmodels',
          'operation and the answer. The two-step stories of 3.OA.D.8 are the W06 lesson "Two-step word problems with the four operations".')
 
 lesson(G + 'areaasmultiplication',
-    partial=[('area_perimeter:area_unit_squares', {'forms': [0]}, 'counts the unit squares that cover a shape drawn on a grid (areas 6 to 48) under the printed hint "Multiply the sides"; never writes the rows × the columns beside the count'),
+    partial=[('area_perimeter:area_unit_squares', {'forms': [0]}, 'counts the unit squares that cover a shape drawn on a grid (areas 4 to 48) under the printed hint "Multiply the sides"; never writes the rows × the columns beside the count'),
              ('area_perimeter:area', {'forms': [2], '@max': 100}, 'a story of a rectangular floor, patio or wall in feet whose area is the side lengths multiplied (8 ft by 5 ft: 40 square feet); never tiled')],
     verdict='partial',
     missing='showing on the tiled rectangle that the count of unit squares equals the side lengths multiplied (rows × columns = the area)',
@@ -186,7 +185,7 @@ lesson(G + 'distributiveandadditivearea',
     pre=[('area_perimeter:area_unit_squares', {'forms': [1]}, 'Y4.B3.S2', 'counting the unit squares of an L-shape'),
          ('multiplication:mult_properties', {'forms': [1]}, 'Y4.B5.S2', 'breaking a fact apart by its rows (5 × 8 = 4 × 8 + 1 × 8)'),
          ('multiplication:area_model_mult', {'tiles': 21}, 'Y4.B5.S9', 'a number split into tens and ones, each part multiplied and the parts added')],
-    related=[('area_perimeter:composite_shapes', {'forms': [1]}, 'the perimeter and the area of an L-, T- or U-shape')],
+    related=[('area_perimeter:composite_shapes', {'forms': [1], 'band': 25}, 'the perimeter and the area of a small L- or T-shape with every side length given (areas 14 to 24)')],
     note='Awsaj supplement lesson, W20-W21, 3.MD.C.7, 7c, 7d, block Y4.B3. The story forms of other skills are not this clause: area_perimeter:area '
          'forms 2 tells a story of ONE rectangle (linked in the area-as-multiplication lesson), area_perimeter:perimeter forms 2 a perimeter story and '
          'area_perimeter:volume forms 2 a box (3-D); none is a rectilinear floor plan.',
@@ -214,7 +213,7 @@ lesson(G + 'measureandestimatemassandliquidvolumegkgmll',
          'unit_conversions, unit_conversion_word) change units with decimals (taught W29) or numbers past 1,000.',
     search='Searched for grams / litres scales, estimates and mass or volume stories: mass_volume_liquid forms 0-2 (mL cylinder, kg scale, sort by unit), '
            'measurement:capacity units 0 / 1 forms 0 / 1 (convert, click containers above 1 L), measurement:unit_conversions and unit_conversion_word '
-           '(change units), measurement:estimate_length (estimates length only), heavier_lighter_visual (no units). None reads grams or litres on a '
+           '(change units), measurement:estimate_length (estimates length only), heavier_lighter_visual (no units), Y5\'s proposal capacity_estimate (estimates capacity only: the volume half of estimate_mass_volume, an overlap the lead reconciles). None reads grams or litres on a '
            'scale, estimates a mass or volume, or tells a same-unit story; mass_scales and mass_ops (WRM_PROPOSALS) and the new estimate_mass_volume.')
 
 lesson(G + 'measuretothehalfandquarterinch',
@@ -224,8 +223,8 @@ lesson(G + 'measuretothehalfandquarterinch',
     build=['ruler_object_inch'],
     pre=[('composing:fraction_number_line', {}, 'Y3.B6.S7', 'reading and placing a fraction on a number line (1/2, 3/8, 5/2)'),
          ('fractions:mixed_nl_drag', {}, 'Y4.B7.S4', 'placing fractions and mixed numbers on a number line of three wholes'),
-         ('fractions:identify', {'forms': [1], 'denoms': [2]}, 'Y2.B8.S10', 'picking the model that shows halves, quarters or eighths (the other models in thirds, fifths or sixths)')],
-    related=[('graphs:line_plot_fractions', {}, 'measurements shown on a line plot: the next lesson')],
+         ('fractions:identify', {'forms': [1], 'denoms': [2]}, 'Y2.B8.S10', 'picking the model that shows halves, quarters or eighths; some of the other models are in thirds, fifths or sixths')],
+    related=[('graphs:line_plot_fractions', {'tiles': 6}, 'measurements shown on a line plot: the next lesson')],
     note='Awsaj supplement lesson, W27-W28, 3.MD.B.4, block Y4.B13. The ruler cell is in inches (the US customary unit 3.MD.B.4 names).',
     search='Searched for an item that measures an object in inches: reading_ruler parts 0-2 and labels (an arrow on the ruler), reading_ruler_hard (the same), '
            'measurement:estimate_length (estimates, sorts by unit), length_customary (conversions), make_line_plot (STANDARD, a build: measuring for a '
@@ -239,7 +238,7 @@ lesson(G + 'buildalineplotfrominchmeasurements',
     pre=[('measurement:reading_ruler', {'parts': [1, 2]}, G + 'measuretothehalfandquarterinch', 'reading an inch ruler marked in halves and quarters'),
          ('graphs:tally_chart', {}, 'Y4.B13.S1', 'reading data from a tally chart'),
          ('fractions:mixed_nl_drag', {}, 'Y4.B7.S4', 'placing fractions and mixed numbers on a number line: the scale of the plot')],
-    related=[('graphs:bar_graph', {'forms': [0, 1]}, 'another way to show counted data')],
+    related=[('graphs:bar_graph', {'forms': [0, 1], 'most': 10}, 'another way to show counted data')],
     note='Awsaj supplement lesson, W28, 3.MD.B.4, block Y4.B13.',
     search='Searched for an item that builds a line plot: graphs:line_plot forms 0 / 1 (reads, eighths), line_plot_g2 forms 0-2 (reads whole-number sizes), '
            'line_plot_fractions forms 0-2 (reads), build_bar_graph and build_pictograph (other graphs). None builds a line plot; make_line_plot '
@@ -262,11 +261,11 @@ lesson(G + 'comparedurationsoftime',
     missing='comparing two durations: which takes longer (a film of 1 hour or a walk of 20 minutes; two start and end times)',
     build=['time_units', 'compare_durations'],
     closes={'time_units': 'which of two activities takes longer, from a sense of hours, minutes and seconds (a film or a walk)',
-            'compare_durations': 'two durations found from their start and end times and compared: which took longer, and by how much'},
+            'compare_durations': 'two durations found from their start and end times and compared: which took longer'},
     pre=[('measurement:time_half_hour', {}, 'Y2.B9.S1', 'telling the time to the hour and half hour'),
          ('measurement:time_5min', {}, 'Y2.B9.S5', 'telling the time to 5 minutes'),
          ('measurement:time_quarter', {}, 'Y2.B9.S2', 'quarter past and quarter to')],
-    related=[('measurement:time_sense', {}, 'whether a time is in the morning or the afternoon')],
+    related=[('measurement:elapsed_hour', {}, 'a time on a time line 1, 2 or 3 hours later or earlier than a start time')],
     note='Support lesson (source Grade 1, Time, Y2 Summer), judged at Grade 1 (WRM Year 2). The site tags 3.MD.A.1 (Grade 3); at the source grade '
          'the durations are whole and half hours.',
     search='Searched for an item that compares two durations: elapsed_visual_easy / medium / hard (one duration), elapsed_find_duration (one duration), '
@@ -382,7 +381,7 @@ lesson(G + 'poundstensonesandpenceusdollarscents',
     note='Native lesson (site flag native), the pacing\'s retitled Y4.B10.S1 "Write money using decimals" (school week W37), 2.MD.C.8. '
          'money_notation is FULL at Y4.B10.S1 (write the amount with the point); this title asks for the place value of the amount.',
     search='Searched for a money place-value item: money_notation tasks collection / words (amounts under $10, no chart), money_count kinds like / two / '
-           'mixed / note / both (counts), coin_value, money_compare, money_convert (Y4\'s own option: cents to dollars), placevalue:identify (whole '
+           'mixed / note / both (counts), coin_value, money_compare, money_convert (Y4\'s own option: cents to dollars; its spec plans a place chart $ | ¢, no tens of dollars), VISUAL_BUILDS vis_coin_options (a coin chart £1 / 10p / 1p, no tens of dollars), placevalue:identify (whole '
            'numbers). None splits an amount into tens, ones, dimes and pennies; money_place_value is new.')
 
 lesson(G + 'selectmoney',

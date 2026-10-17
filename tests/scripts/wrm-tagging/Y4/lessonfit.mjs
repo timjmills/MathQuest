@@ -140,6 +140,7 @@ function probe(key, opts, range) {
     for (const m of t.matchAll(/\d+/g)) m0 = Math.max(m0, +m[0]);
     const walk = (v, kk) => { if (v == null || SKIPK.has(kk)) return; if (typeof v === 'number' && Number.isFinite(v)) m0 = Math.max(m0, v); else if (Array.isArray(v)) v.forEach(z => walk(z, kk)); else if (typeof v === 'object') for (const [aa, bb] of Object.entries(v)) walk(bb, aa); };
     if (q.cell && !TIME.test(key) && !MONEYK.test(key)) walk(q.cell.payload, '');   // a money payload holds cents (805 for $8.05)
+    if (q.cell && Array.isArray(q.cell.payload?.rows)) for (const rw of q.cell.payload.rows) for (const v of [rw?.x, rw?.y]) if (typeof v === 'number') m0 = Math.max(m0, v);   // a function table's In / Out numbers
     if (k === 'tens_foundation_visual' && q.cell?.payload?.n) m0 = Math.max(m0, q.cell.payload.n * 10);
     it.max = m0; if (m0 > max) { max = m0; ex = text.trim().slice(0, 70); }
     const full = `${text} ${JSON.stringify(q.ans ?? '')} ${pay} ${strip(q.visual || '').slice(0, 400)}`;   // maxdealt.mjs: the options are not read (a pick's distractor names)
@@ -200,6 +201,7 @@ function content(id, e, r, role) {
     for (const [nm, w, f] of FIRST) if (w > lim && f(e, said, r)) out.push(`rule 19: ${nm} first taught ${w}, the lesson is ${wk}${role === 'related' ? ' (related: more than 2 weeks ahead)' : ''}`);
     const tb = tablesBy(lim);
     for (const i of r.items) { const m = `${i.text || ''}`.match(/\b(\d{1,2})\s*[×x]\s*(\d{1,2})\b/); if (m && +m[1] <= 12 && +m[2] <= 12 && !tb.has(+m[1]) && !tb.has(+m[2])) { out.push(`rule 19: the ${m[1]} and ${m[2]} tables (${m[0]}) are not taught by ${lim}`); break; } }
+    for (const f of storyTableChecks(r.items, tb, lim)) out.push(f);
     const dens = [...all.matchAll(/(?:\b\d+|\?|_+)\/(\d+)\b/g)].map(m => +m[1]).filter(x => x > 12 && x !== 100);
     if (dens.length) out.push(`denominator ${Math.max(...dens)} (Grade 3 stops at twelfths)`);
     if ((/\d+\s*°(?!\s*[FC])/.test(all) || /\bdegrees\b(?! (Celsius|C\b))/.test(said)) && !/temperature/.test(e.key)) out.push('angle measured in degrees (4.MD.C)');
@@ -303,6 +305,84 @@ export function betweenChecks(text, items) {
     const off = items.filter(i => String(i.a || '').split(/,\s*/).map(fracVal).some(v => v != null && (v < lo || v > hi)));
     if (off.length) out.push(`BETWEEN: says "${m[0]}", but ${off.length} of ${items.length} items answer outside it (${off[0].a})`); }
   return out;
+}
+// ---- round 2 (lessons critic r1 G1-G3): the classes the r1 gates let through
+// G1 a story cell's own steps: a factor or divisor past 12, or of a table the school has not taught by the week, is a finding
+const payOf = i => { try { return JSON.parse(i.pay || '{}') || {}; } catch (er) { return {}; } };
+const stepsOf = i => { const p = payOf(i); return Array.isArray(p.steps) ? p.steps : []; };
+export function storyTableChecks(items, tb, lim) {
+  const out = [];
+  for (const i of items) for (const s of stepsOf(i)) {
+    const op = String(s.op || ''), mul = /^[*×x]$/.test(op), div = /^[\/÷]$/.test(op);
+    if (!mul && !div) continue;
+    const f = mul ? [+s.a, +s.b] : [+s.b, +(s.ans ?? s.q)];
+    if (f.some(x => x > 12)) { out.push(`G1 rule 19: a story step ${s.a} ${mul ? '×' : '÷'} ${s.b} goes past the 12 times-table (${String(i.text).trim().slice(0, 60)})`); return out; }
+    if (tb && f.every(x => !tb.has(x))) { out.push(`G1 rule 19: a story step ${s.a} ${mul ? '×' : '÷'} ${s.b} uses tables not taught by ${lim}`); return out; }
+  }
+  return out;
+}
+// G2 / G3 helpers: the values an item gives for a noun
+const NUMS = t => [...String(t ?? '').replace(/(\d),(?=\d{3}\b)/g, '$1').matchAll(/\d+(?:\.\d+)?/g)].map(m => +m[0]);
+const ansVals = i => NUMS(i.a);
+const NOUNVAL = { area: i => { const m = String(i.a).match(/A\s*=\s*(\d+)/); return m ? [+m[1]] : ansVals(i); },
+  product: ansVals, sum: ansVals, total: ansVals, quotient: ansVals, difference: ansVals, answer: ansVals, perimeter: i => { const m = String(i.a).match(/P\s*=\s*(\d+)/); return m ? [+m[1]] : ansVals(i); } };
+const NOUNRE = '(areas?|products?|sums?|totals?|quotients?|differences?|answers?|perimeters?)';
+const nounOf = w => w.toLowerCase().replace(/s$/, '');
+const divisorsOf = i => { const v = []; for (const s of stepsOf(i)) { if (/^[\/÷]$/.test(String(s.op))) v.push(+s.b); if (/^[*×x]$/.test(String(s.op))) v.push(+s.a, +s.b); }
+  for (const m of String(i.text || '').matchAll(/(\d+)\s*÷\s*(\d+)/g)) v.push(+m[2]); return v; };
+const negBefore = (t, idx) => /\b(?:never|no|not|without|nor)\b[^;]*$/i.test(t.slice(Math.max(0, idx - 40), idx));
+export function boundBreaks(text, items) {
+  const t = String(text || ''), out = [], N = items.length; if (!N) return out;
+  for (const m of t.matchAll(new RegExp(`\\b${NOUNRE}\\s+(?:of\\s+)?(\\d+) to (\\d+)\\b`, 'gi'))) { if (negBefore(t, m.index)) continue;
+    const f = NOUNVAL[nounOf(m[1])], lo = +m[2], hi = +m[3], v = items.flatMap(f);
+    const below = v.filter(x => x < lo), above = v.filter(x => x > hi);
+    if (below.length) out.push(`G2: says "${m[0]}", but items go below ${lo} (${Math.min(...below)})`);
+    if (above.length) out.push(`G2: says "${m[0]}", but items pass ${hi} (${Math.max(...above)})`); }
+  for (const m of t.matchAll(new RegExp(`\\b${NOUNRE}\\s+(?:up )?to (?:about )?(\\d+)\\b`, 'gi'))) { if (negBefore(t, m.index)) continue;
+    const f = NOUNVAL[nounOf(m[1])], hi = +m[2], v = items.flatMap(f), above = v.filter(x => x > hi * (/about/.test(m[0]) ? 1.25 : 1));
+    if (above.length) out.push(`G2: says "${m[0]}", but items pass ${hi} (${Math.max(...above)})`); }
+  for (const m of t.matchAll(/\b(?:never|no|not)\b[^;.]{0,40}?\b(by )?(?:more than|past|above|over|beyond) (\d+)\b/gi)) { const L = +m[2];
+    if (/\b(?:a second|two|steps?)\b/i.test(m[0])) continue;
+    if (m[1]) { const v = items.flatMap(divisorsOf).filter(x => x > L); if (v.length) out.push(`G2: says "${m[0]}", but an item divides or multiplies by ${Math.max(...v)}`); }
+    else { const over = items.filter(i => (i.max || 0) > L); if (over.length) out.push(`G2: says "${m[0]}", but ${over.length} of ${N} items pass ${L}`); } }
+  // a story claimed "within the tables" (or "never past the tables") has no × or ÷ step past 12 x 12
+  if (/\bwithin the (?:times[- ])?tables\b|\bnever past the (?:times[- ])?tables\b/i.test(t)) for (const f of storyTableChecks(items, null, '')) out.push(`G2: says "within the tables", but ${f.replace(/^G1 rule 19: /, '')}`);
+  for (const m of t.matchAll(/\b(?:dividing|divided|multiplying|multiplied|sharing|shared) by (\d+) to (\d+)\b/gi)) { if (negBefore(t, m.index)) continue;
+    const lo = +m[1], hi = +m[2], v = items.flatMap(divisorsOf);
+    if (!v.length) { out.push(`G2: says "${m[0]}", but no item has a × or ÷ step`); continue; }
+    const off = v.filter(x => x < lo || x > hi); if (off.length) out.push(`G2: says "${m[0]}", but an item uses ${off[0]}`); }
+  return out;
+}
+// G3 (a) a listed group size must be dealt; (b) a negated fraction family on ANY skill; (c) money bills; (d) "the other models in …"
+const FAMW = [[2, 'halves|half'], [3, 'thirds?'], [4, 'quarters?|fourths?'], [5, 'fifths?'], [6, 'sixths?'], [8, 'eighths?'], [10, 'tenths?'], [12, 'twelfths?']];
+const famSet = s => new Set(FAMW.filter(([, re]) => new RegExp(`\\b(?:${re})\\b`, 'i').test(s)).map(([d]) => d));
+export function claimLists(text, items, qs, e) {
+  const t = String(text || ''), out = [], N = items.length; if (!N) return out;
+  for (const m of t.matchAll(/\bgroups? of ((?:\d+,\s*)*\d+,?\s+(?:or|and)\s+\d+)\b/gi)) { if (negBefore(t, m.index)) continue;
+    for (const s of m[1].match(/\d+/g).map(Number)) if (!items.some(i => new RegExp(`\\bgroups? of ${s}\\b|\\b${s} in each\\b`, 'i').test(i.text || '') || payOf(i).size === s))
+      out.push(`G3: says "groups of ${m[1]}", but no item has groups of ${s}`); }
+  if (!(e && e.opts && e.opts.denoms)) {
+    const NEGF = /\b(?:no|never|not(?!\s+(?:only|just|always|all)\b)|without|nor)\b[^;,.:()]*/gi;
+    const dealt = new Set(); qs.forEach((q, j) => { for (const x of itemDens(q)) dealt.add(x); for (const mm of `${items[j]?.text || ''} ${items[j]?.a || ''} ${items[j]?.x || ''}`.matchAll(/(?<![\d.])\d+\/(\d+)\b/g)) dealt.add(+mm[1]); });
+    for (const nm of t.matchAll(NEGF)) for (const d of famSet(nm[0])) if (dealt.has(d)) out.push(`G3: says "${nm[0].trim()}", but items show /${d}`); }
+  for (const m of t.matchAll(/((?:\$\d+\s*(?:,|and|or|\/)?\s*(?:an?\s+)?)+)bills?\b/gi)) {
+    const vals = m[1].match(/\d+/g).map(Number), neg = negBefore(t, m.index);
+    const shown = v => items.some(i => (payOf(i).notes || []).includes(v) || new RegExp(`\\$${v} bill`).test(i.text || ''));
+    for (const v of vals) { if (neg && shown(v)) out.push(`G3: says "${t.slice(Math.max(0, m.index - 12), m.index + m[0].length).trim()}", but items show a $${v} bill`);
+      if (!neg && !shown(v)) out.push(`G3: names a $${v} bill, but no item shows one`); } }
+  for (const m of t.matchAll(/\b(\w+\s+of\s+)?the other (?:models|pictures|shapes|choices|options)(?:\s+are)?\s+(?:all\s+)?in\s+([a-z ,]+)/gi)) {
+    if (m[1] && /some|most|many|a few/i.test(m[1])) continue;
+    const fam = famSet(m[2]); if (!fam.size) continue;
+    const bad = items.filter(i => { const p = payOf(i); if (!Array.isArray(p.terms)) return false; const ans = p.answer?.letter;
+      return p.terms.some(x => x.letter !== ans && !fam.has(x.d)); }).length;
+    if (bad) out.push(`G3: says "${m[0].trim()}", but ${bad} of ${N} items show another model outside ${[...fam].map(x => '/' + x).join(' ')}`); }
+  return out;
+}
+// a why that says the items ask how long something takes (a duration) needs items that ask for one
+export function durationClaim(pos, items) {
+  if (!/\bhow long\b|\bdurations?\b|\bin minutes\b/i.test(pos)) return [];
+  const hit = items.filter(i => /how long|\bmin\b|minutes|"answer":"dur|duration/i.test(`${i.text || ''} ${i.a || ''} ${i.pay || ''}`)).length;
+  return hit < items.length / 2 ? [`says "${(pos.match(/\bhow long\b|\bdurations?\b|\bin minutes\b/i) || [''])[0]}", but only ${hit} of ${items.length} items ask for a duration`] : [];
 }
 const SHAPES = ['triangle', 'circle', 'square', 'rectangle', 'cube', 'cuboid', 'sphere', 'cone', 'cylinder', 'number line', 'ten frame', 'number track', 'dice', 'balance'];
 function whyCheck(e, r) {
@@ -413,6 +493,7 @@ function denomsCheck(e, role, text) {
   for (const [dd, re] of WORDS) if (new RegExp(`\\b(?:${re})\\b`, 'i').test(nt) && dealt.has(dd)) out.push(`DENOMS: denies ${re.split('|')[0]} but items deal /${dd}`);
   return out;
 }
+const stripCited = w0 => { let w = String(w0 || ''); for (const id of w.match(/(?:R|Y\d)\.B\d+\.S\d+|(?:G\d|K|PK)\|-\|[a-z0-9]+/g) || []) w = w.split(id).join(' ').split(titles[id] || '\0').join(' '); return w; };
 const CITE = /^((?:R|Y\d)\.B\d+\.S\d+|(?:G\d|K|PK)\|-\|[a-z0-9]+)\b/;
 function citeCheck(id, e) {
   const m = String(e.why || '').match(CITE);
@@ -422,6 +503,7 @@ function citeCheck(id, e) {
   if (!String(e.why).startsWith(`${ref} ${titles[ref]}`)) out.push(`the why does not give the cited unit's own title after ${ref}`);
   if (!(taught[e.key] && taught[e.key].has(ref))) out.push(`cites ${ref}, which ${e.key} is not tagged to (and is not that unit's direct / partial)`);
   if (ref === id) out.push('cites the lesson itself');
+  for (const m of String(e.why).matchAll(/\b(?:wk|week)\s+(W\d\d)\b/gi)) if (wkOf(ref) && m[1] !== wkOf(ref)) out.push(`the why says ${m[0]}, but ${ref} is taught ${wkOf(ref)}`);
   const ry = unitYear(ref), ri = YR.indexOf(ry);
   if (isSupport(id)) {
     const ph = phaseOf(id);
@@ -514,12 +596,18 @@ let bad = 0, checked = 0;
 for (const [id, s] of Object.entries(d.lessons || {})) {
   const fails = [];
   let own; try { own = ceilOf(id); } catch (er) { fails.push(er.message); own = 10; }
+  const ownItems = [...s.direct, ...s.partial].filter(e => !TIME.test(e.key)).flatMap(e => P(e).items);
+  const ownMax = ownItems.length ? Math.max(0, ...ownItems.map(i => i.max || 0)) : own;
   for (const role of ['pre', 'related']) for (const e of s[role]) {
     checked++;
     const r = P(e), tag = `${role} ${e.key}${e.opts ? JSON.stringify(e.opts) : ''}${e.maxNumber ? '@' + e.maxNumber : ''}`;
     const cm = role === 'pre' && String(e.why).match(CITE);
-    const c = Math.max(own, cm ? citedCeil(cm[1]) : 0), limit = Math.max(1.5 * c, c + 2);
-    if (!TIME.test(e.key) && r.max > limit) fails.push(`${tag}: size ${r.max} > ${limit} — ${r.ex}`);
+    // G1 (lessons critic r1): each link is held to the lesson's OWN dealt maximum (its direct / partial items; the CEIL bound only when
+    // it deals none, a gap lesson), and a pre also to its cited unit's own maximum; never to the year-wide ceiling
+    const c = Math.max(ownMax, cm ? citedCeil(cm[1]) : 0), limit = Math.max(1.5 * c, c + 2);
+    if (!TIME.test(e.key) && r.max > limit) fails.push(`${tag}: size ${r.max} > ${limit} (the lesson deals to ${ownMax}${cm ? ', its cited unit to ' + citedCeil(cm[1]) : ''}) — ${r.ex}`);
+    const wS = stripCited(e.why);
+    for (const f of [...boundBreaks(wS, r.items), ...claimLists(wS, r.items, r.qs, e), ...durationClaim(CL.positive(wS), r.items)]) fails.push(`${tag}: ${f}`);
     for (const f of [...content(id, e, r, role), ...whyCheck(e, r), ...y6Why(e, r), ...digitSymbolChecks(e.why, r.items), ...unitNegChecks(e.why, r.items), ...betweenChecks(e.why, r.items), ...(role === 'pre' ? citeCheck(id, e) : []), ...denomsCheck(e, role, CL.claimText(e.why, titles))]) fails.push(`${tag}: ${f}`);
   }
   for (const role of ['direct', 'partial']) for (const e of s[role]) {
@@ -549,6 +637,7 @@ for (const [id, s] of Object.entries(d.lessons || {})) {
         const z = r.items.filter(i => String(i.a).trim() === '0').length;
         if (z) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause says "never ${p}", but ${z} of ${r.items.length} items have the answer 0`); }
       for (const f of boundTooBig(e.missing, r.items)) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause: ${f}`);
+      for (const f of [...boundBreaks(e.missing, r.items), ...claimLists(e.missing, r.items, r.qs, e)]) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause: ${f}`);
       for (const f of whyCheck({ why: e.missing.replace(/\b(?:never|no|not|without)\b[^;.]*/gi, ' ') }, r)) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause: ${f}`);
     }
   }

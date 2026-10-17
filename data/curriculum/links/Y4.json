@@ -10235,7 +10235,7 @@
    "skill": "measurement:mass_volume_liquid",
    "steps": [],
    "teaches": "estimating the mass of an object in grams or kilograms and the liquid volume of a container in litres or millilitres against a known benchmark, before measuring",
-   "why": "mass_volume_liquid reads a drawn scale (forms 0, 1) or sorts objects by the unit to measure them in (forms 2); nothing asks the pupil how heavy or how full a thing is likely to be (3.MD.A.2 \"measure and estimate\")"
+   "why": "mass_volume_liquid reads a drawn scale (forms 0, 1) or sorts objects by the unit to measure them in (forms 2); nothing asks the pupil how heavy or how full a thing is likely to be (3.MD.A.2 \"measure and estimate\"). Overlap (critic r1 n2): Y5's capacity_estimate (\"Estimate Capacity (option)\", 3.MD.A.2) already plans the liquid-volume half; this option is still needed for the mass half (grams and kilograms against a benchmark), and the lead may merge the volume half into capacity_estimate"
   },
   "mass_ops": {
    "closes": {
@@ -10341,7 +10341,7 @@
     "3.MD.A.1"
    ],
    "closes": {
-    "G3|-|comparedurationsoftime": "two durations found from their start and end times and compared: which took longer, and by how much"
+    "G3|-|comparedurationsoftime": "two durations found from their start and end times and compared: which took longer"
    },
    "family": "measurement",
    "kind": "option",
@@ -10510,7 +10510,7 @@
    "skill": "measurement:money_notation",
    "steps": [],
    "teaches": "the place value of money: dollars as tens and ones, cents as dimes (tenths of a dollar) and pennies (hundredths), read from bills and coins, written in a chart and with $ and the point",
-   "why": "money_notation writes amounts under $10 from $5 / $1 bills and coins (never a $10 bill, never a tens digit of dollars) and no money item splits an amount into tens, ones, dimes and pennies; money_convert (Y4) converts cents to dollars and cents"
+   "why": "money_notation writes amounts under $10 from $5 / $1 bills and coins (never a $10 bill, never a tens digit of dollars) and no money item splits an amount into tens, ones, dimes and pennies; money_convert (Y4) converts cents to dollars and cents. Overlaps (critic r1 n5): VISUAL_BUILDS vis_coin_options plans a place-value chart of coins (£1 / 10p / 1p) and Y4's money_convert spec a place chart $ | ¢; neither has a tens column of dollars or bills to $99.99, so the tens-and-ones-of-dollars chart is still a separate option (the lead may fold the coin chart into it)"
   },
   "make_amount_notes": {
    "ccss": [
@@ -12445,7 +12445,7 @@
     {
      "key": "multiplication:dot_array_mult",
      "opts": {
-      "band": 100
+      "band": 25
      },
      "why": "a dot array read as rows times columns: the product of the turned array is the same"
     }
@@ -12477,7 +12477,8 @@
     },
     {
      "key": "number_ops_mixed:word_problems_mixed",
-     "missing": "one-step stories with +, −, × or ÷ (5 plates of 8 beads; 10 stamps, 2 in each jar; how many more); never a second step"
+     "maxNumber": 100,
+     "missing": "one-step stories with +, −, × or ÷ (5 plates of 8 beads; 10 stamps, 2 in each jar; how many more), the factors and divisors within the tables at Max Number 100, and \"times as many\" comparisons in about 1 in 5 (Noor has 90 crayons, 9 times as many as Omar: 4.OA.A.2, Grade 4 content); never a second step"
     }
    ],
    "verdict": "partial",
@@ -12497,7 +12498,10 @@
     },
     {
      "key": "division:div_word_problems",
-     "why": "Y3.B3.S5 Sharing and grouping (Grade 2, lower grade): sharing and grouping stories: a one-step ÷ story"
+     "opts": {
+      "range": 100
+     },
+     "why": "Y3.B3.S5 Sharing and grouping (Grade 2, lower grade): sharing and grouping stories: a one-step ÷ story, dividing by 2 to 8"
     },
     {
      "key": "addition:add_wp_100",
@@ -12583,13 +12587,8 @@
     }
    ],
    "preBuild": [],
-   "related": [
-    {
-     "key": "composing:whole_as_fraction",
-     "why": "a whole number written as a fraction (1 = 4/4, 5 = 5/1): the next idea this week"
-    }
-   ],
-   "note": "Awsaj supplement lesson, W07, 3.G.A.2, block Y4.B7.",
+   "related": [],
+   "note": "Awsaj supplement lesson, W07, 3.G.A.2, block Y4.B7. No related: composing:whole_as_fraction (the round-1 related) writes wholes to 10 as fractions, past this lesson's own numbers (parts 2 to 4; lessons critic r1 G1), and the other fraction skills read or shade a cut shape, which the pre already do.",
    "rule5": "Searched for an item that cuts a shape into equal areas: shapes_early:partition_shapes forms 0 / 1 and parts 0-2 (halves, thirds, fourths; the shape is cut already), fractions:identify / shade_fraction / write_fraction (a cut shape is read or shaded), composing:compose_whole, whole_as_fraction, half_or_not (Y2, \"is it a half?\"). None asks the pupil to cut, none deals sixths or eighths as equal areas; partition_draw (STANDARD_PROPOSALS) is the build.",
    "envision": [
     {
@@ -12697,7 +12696,7 @@
        0
       ]
      },
-     "missing": "counts the unit squares that cover a shape drawn on a grid (areas 6 to 48) under the printed hint \"Multiply the sides\"; never writes the rows × the columns beside the count"
+     "missing": "counts the unit squares that cover a shape drawn on a grid (areas 4 to 48) under the printed hint \"Multiply the sides\"; never writes the rows × the columns beside the count"
     },
     {
      "key": "area_perimeter:area",
@@ -12841,9 +12840,10 @@
      "opts": {
       "forms": [
        1
-      ]
+      ],
+      "band": 25
      },
-     "why": "the perimeter and the area of an L-, T- or U-shape"
+     "why": "the perimeter and the area of a small L- or T-shape with every side length given (areas 14 to 24)"
     }
    ],
    "note": "Awsaj supplement lesson, W20-W21, 3.MD.C.7, 7c, 7d, block Y4.B3. The story forms of other skills are not this clause: area_perimeter:area forms 2 tells a story of ONE rectangle (linked in the area-as-multiplication lesson), area_perimeter:perimeter forms 2 a perimeter story and area_perimeter:volume forms 2 a box (3-D); none is a rectilinear floor plan.",
@@ -12941,7 +12941,7 @@
    "preBuild": [],
    "related": [],
    "note": "Awsaj supplement lesson, W22-W23, 3.MD.A.2, block Y4.B6. Grade 2 met grams, kilograms, millilitres and litres in Y3.B7, whose steps use this lesson's own mass_volume_liquid key (so they are not listed as pre). No related: the other measure skills (measurement:capacity, unit_conversions, unit_conversion_word) change units with decimals (taught W29) or numbers past 1,000.",
-   "rule5": "Searched for grams / litres scales, estimates and mass or volume stories: mass_volume_liquid forms 0-2 (mL cylinder, kg scale, sort by unit), measurement:capacity units 0 / 1 forms 0 / 1 (convert, click containers above 1 L), measurement:unit_conversions and unit_conversion_word (change units), measurement:estimate_length (estimates length only), heavier_lighter_visual (no units). None reads grams or litres on a scale, estimates a mass or volume, or tells a same-unit story; mass_scales and mass_ops (WRM_PROPOSALS) and the new estimate_mass_volume.",
+   "rule5": "Searched for grams / litres scales, estimates and mass or volume stories: mass_volume_liquid forms 0-2 (mL cylinder, kg scale, sort by unit), measurement:capacity units 0 / 1 forms 0 / 1 (convert, click containers above 1 L), measurement:unit_conversions and unit_conversion_word (change units), measurement:estimate_length (estimates length only), heavier_lighter_visual (no units), Y5's proposal capacity_estimate (estimates capacity only: the volume half of estimate_mass_volume, an overlap the lead reconciles). None reads grams or litres on a scale, estimates a mass or volume, or tells a same-unit story; mass_scales and mass_ops (WRM_PROPOSALS) and the new estimate_mass_volume.",
    "envision": [
     {
      "proposal": "mass_scales",
@@ -13023,13 +13023,16 @@
        2
       ]
      },
-     "why": "Y2.B8.S10 Unit fractions (Grade 1, lower grade): picking the model that shows halves, quarters or eighths (the other models in thirds, fifths or sixths)"
+     "why": "Y2.B8.S10 Unit fractions (Grade 1, lower grade): picking the model that shows halves, quarters or eighths; some of the other models are in thirds, fifths or sixths"
     }
    ],
    "preBuild": [],
    "related": [
     {
      "key": "graphs:line_plot_fractions",
+     "opts": {
+      "tiles": 6
+     },
      "why": "measurements shown on a line plot: the next lesson"
     }
    ],
@@ -13103,7 +13106,8 @@
       "forms": [
        0,
        1
-      ]
+      ],
+      "most": 10
      },
      "why": "another way to show counted data"
     }
@@ -13219,8 +13223,8 @@
    "preBuild": [],
    "related": [
     {
-     "key": "measurement:time_sense",
-     "why": "whether a time is in the morning or the afternoon"
+     "key": "measurement:elapsed_hour",
+     "why": "a time on a time line 1, 2 or 3 hours later or earlier than a start time"
     }
    ],
    "note": "Support lesson (source Grade 1, Time, Y2 Summer), judged at Grade 1 (WRM Year 2). The site tags 3.MD.A.1 (Grade 3); at the source grade the durations are whole and half hours.",
@@ -13239,7 +13243,7 @@
      "name": "Which Took Longer? Compare Two Durations (option)",
      "kind": "option on measurement:elapsed_visual_easy",
      "teaches": "finding two durations from their start and end times and comparing them: which activity took longer and which took less time",
-     "closes": "two durations found from their start and end times and compared: which took longer, and by how much",
+     "closes": "two durations found from their start and end times and compared: which took longer",
      "representation": "one boxed cell: two rows, each an activity word, a start clock, an end clock and a time line with an answer slot \"__ h __ min\""
     }
    ]
@@ -13775,7 +13779,7 @@
     }
    ],
    "note": "Native lesson (site flag native), the pacing's retitled Y4.B10.S1 \"Write money using decimals\" (school week W37), 2.MD.C.8. money_notation is FULL at Y4.B10.S1 (write the amount with the point); this title asks for the place value of the amount.",
-   "rule5": "Searched for a money place-value item: money_notation tasks collection / words (amounts under $10, no chart), money_count kinds like / two / mixed / note / both (counts), coin_value, money_compare, money_convert (Y4's own option: cents to dollars), placevalue:identify (whole numbers). None splits an amount into tens, ones, dimes and pennies; money_place_value is new.",
+   "rule5": "Searched for a money place-value item: money_notation tasks collection / words (amounts under $10, no chart), money_count kinds like / two / mixed / note / both (counts), coin_value, money_compare, money_convert (Y4's own option: cents to dollars; its spec plans a place chart $ | ¢, no tens of dollars), VISUAL_BUILDS vis_coin_options (a coin chart £1 / 10p / 1p, no tens of dollars), placevalue:identify (whole numbers). None splits an amount into tens, ones, dimes and pennies; money_place_value is new.",
    "envision": [
     {
      "proposal": "money_place_value",
