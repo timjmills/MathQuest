@@ -1,0 +1,11 @@
+fraction_of_set CARD {"text":"Click 2/4 of the circles.","n":6,"N":12,"sc":6} 
+  short(n-1 last): {"fb":"Tap 6. You tapped 5.","green":0,"wrong":0,"missed":0,"sel":5,"score":0,"streak":0} 
+  then +1 (last n): {"fb":"🎉 Correct! (Got it on a retry — keep practicing!)","green":0,"wrong":0,"missed":0,"sel":0,"score":0,"streak":0}
+  over(n+1 first): {"fb":"Tap 6. You tapped 7.","green":0,"wrong":0,"missed":0,"sel":7,"score":0,"streak":0}
+  QUIZ last-n / last-(n-1) / middle-n:  
+fraction_of_set_hard CARD {"text":"Click 3/5 of the circles.","n":6,"N":10,"sc":6} 
+  short(n-1 last): {"fb":"Tap 6. You tapped 5.","green":0,"wrong":0,"missed":0,"sel":5,"score":0,"streak":0} 
+  then +1 (last n): {"fb":"🎉 Correct! (Got it on a retry — keep practicing!)","green":0,"wrong":0,"missed":0,"sel":0,"score":0,"streak":0}
+  over(n+1 first): {"fb":"Tap 6. You tapped 7.","green":0,"wrong":0,"missed":0,"sel":7,"score":0,"streak":0}
+  QUIZ last-n / last-(n-1) / middle-n:  
+pageerrors 0 

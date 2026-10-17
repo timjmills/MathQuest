@@ -139,6 +139,17 @@ const PROSE_DATE_BEFORE = /\b(?:on|dated?|due|born|until|till|since|scored?(?:\s
 export function stackProseFractions(text, { all = false } = {}) {
     const s = String(text == null ? '' : text);
     if (/</.test(s)) return s;
+    // Critic fractions-key r6 (R6-2): decided per line, not per token. A line that holds one
+    // "n/d of" phrase is a fraction story, so every other fraction in it stacks too ("Amari ate
+    // 3/10 of a cake. Kai ate 2/10."), the date and score guards still holding.
+    if (!all) {
+        const once = stackProseFractionsPass(s, false);
+        return once === s ? s : stackProseFractionsPass(s, true);
+    }
+    return stackProseFractionsPass(s, true);
+}
+
+function stackProseFractionsPass(s, all) {
     return s.replace(/(\d+)\/(\d+)(?![\d/])([.,;:!?)]+)?/g, (m, n, d, p, at) => {
         const before = s.slice(0, at), after = s.slice(at + m.length - (p ? p.length : 0));
         if (/[\d/]$/.test(before)) return m;                 // part of a longer token: 1/2/2026, 12/3

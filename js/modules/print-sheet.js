@@ -1829,34 +1829,75 @@ async function buildSheetCore(req = {}) {
             }
             let byLetter = letters.map((L, k) => finalRun(sec, si, letterBase(L), perLetter[k], probeOf(L)));
             sec.floor = floorWith(si, [...probes.values()].flatMap((p) => p.items).concat(...byLetter));
-            // The count may also GROW, as on an Independent page (critic fractions-key D9): the
-            // first letter's probe can hold a taller problem than the letters dealt, and a page
-            // sized for it leaves rows empty (ws-print-lint L-DENSITY PAGEFILL, fraction_of_set
-            // r6). A page-sized letter takes what the measured page holds.
-            if (!(n.letters && n.letters.length) && !sec.count && shared[si] === null) {
-                // Only ever grows, and a grown run is kept only if the page still holds it (a mixed
-                // pool's extra problems can be taller) and holds no full-width problem: otherwise
-                // the letters stay as dealt.
-                for (let pass = 0; pass < 3; pass++) {
-                    const fit = Math.min(MAX_ITEMS, capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, byLetter.flat()), n, lctx)));
-                    if (!(fit > 0) || perLetter.every((c) => c >= fit)) break;
-                    // a split page (full-width problems under the columns) is counted from the
-                    // probe's share of wide problems: it is left as dealt
-                    if (byLetter.flat().some((it) => oneColumnOnly(it, n))) break;
-                    const prev = { perLetter, byLetter, floor: sec.floor };
-                    const grown = perLetter.map(() => fit);
-                    const next = letters.map((L, k) => finalRun(sec, si, letterBase(L), grown[k], probeOf(L)));
-                    sec.floor = floorWith(si, [...probes.values()].flatMap((p) => p.items).concat(...next));
-                    const holds = Math.min(MAX_ITEMS, capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, next.flat()), n, lctx)));
-                    if (holds < fit || next.flat().some((it) => oneColumnOnly(it, n))) { perLetter = prev.perLetter; byLetter = prev.byLetter; sec.floor = prev.floor; break; }
-                    perLetter = grown; byLetter = next;
-                }
+            // Each letter is its own page, so each is sized from ITS OWN problems (critic
+            // fractions-key r6 R6-1): the first letter's probe can hold a taller problem than any
+            // letter is dealt, and a page sized for it leaves rows empty (L-DENSITY PAGEFILL). A
+            // letter whose own page holds more problems is dealt more under its own seed, and is
+            // kept only while that page still holds them all on one side and none is full width.
+            // Named letters (the teacher print screen sends ['A', 'B']) and page-sized letters
+            // alike; never a set count or shared rows. The letter's floor goes to the plan.
+            const ownFloor = new Map();
+            if (!sec.count && shared[si] === null && anchorMode === 'off') {
+                // The letter keeps the section's columns: it only takes more ROWS of the same
+                // problems, so a page that is not grown is laid out exactly as before.
+                const cols = L0.cols;
+                const fitOf = (its) => {
+                    const f = floorWith(si, its);
+                    const L = layoutOf(n.role, Object.assign({}, sec, { floor: f, columns: cols }), withTwins(si, its), n, lctx);
+                    return { f, cap: L.cols === cols ? Math.min(MAX_ITEMS, capFromL(sec, si, L)) : 0 };
+                };
+                byLetter = byLetter.map((items, k) => {
+                    if (!items.length || items.some((it) => oneColumnOnly(it, n))) return items;
+                    let cur = items;
+                    let m = fitOf(cur);
+                    if (m.cap < cur.length) return items;          // the shared check below shrinks it
+                    for (let pass = 0; pass < 3 && m.cap > cur.length; pass++) {
+                        const next = finalRun(sec, si, letterBase(letters[k]), m.cap, probeOf(letters[k]));
+                        if (next.length <= cur.length || next.some((it) => oneColumnOnly(it, n))) break;
+                        const m2 = fitOf(next);
+                        if (m2.cap < next.length) break;
+                        cur = next; m = m2;
+                    }
+                    // The dealt run's next problem can be taller than this page's rows (a big set,
+                    // a long story): then the letter is filled with the next problems of its own
+                    // run that fit the rows it has, in the order they were dealt (one skill only;
+                    // never a second choose-all list).
+                    if (m.cap > cur.length && sec.skills.length === 1) {
+                        const want = m.cap - cur.length;
+                        const pr = probeOf(letters[k]);
+                        finalRun(sec, si, letterBase(letters[k]), cur.length + want * 4 + 4, pr);
+                        const taken = new Set(cur);
+                        const isList = (it) => it.q && it.q.printFormat === 'multi-select';
+                        let lists = cur.filter(isList).length;
+                        const fitsRows = (it) => Object.entries(it.measured || {}).every(([c, mm]) => {
+                            const f = m.f[c];
+                            return !f || ((mm.hMm || 0) <= f.hMm + 0.01 && (mm.fits !== false || f.fits === false));
+                        });
+                        const add = [];
+                        for (const it of pr.items) {
+                            if (add.length >= want) break;
+                            if (taken.has(it) || oneColumnOnly(it, n) || !fitsRows(it)) continue;
+                            if (isList(it)) { if (lists >= 1 && cur.some((x) => !isList(x))) continue; lists++; }
+                            add.push(it);
+                        }
+                        if (add.length) {
+                            const next = cur.concat(add);
+                            const m2 = fitOf(next);
+                            if (m2.cap >= next.length) { cur = next; m = m2; }
+                        }
+                    }
+                    if (cur.length <= items.length) return items;  // not grown: the letter is as dealt
+                    perLetter[k] = cur.length;
+                    ownFloor.set(letters[k], { floor: m.f, columns: cols });
+                    return cur;
+                });
             }
             if (anchorMode === 'side' && anchorSets[si]) anchorSets[si].grow(byLetter.flat().length + 2);
             const cap = shared[si] !== null ? shared[si] : capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, byLetter.flat()), n, lctx));
-            if (perLetter.some((c) => c > cap)) {
-                byLetter = letters.map((L, k) => (perLetter[k] > cap ? finalRun(sec, si, letterBase(L), cap, probeOf(L)) : byLetter[k]));
+            if (perLetter.some((c, k) => c > cap && !ownFloor.has(letters[k]))) {
+                byLetter = letters.map((L, k) => (perLetter[k] > cap && !ownFloor.has(L) ? finalRun(sec, si, letterBase(L), cap, probeOf(L)) : byLetter[k]));
             }
+            if (ownFloor.size) sec.letterFloor = Object.fromEntries(ownFloor);
             byLetter.forEach((items, k) => items.forEach((it) => { it.letter = letters[k]; }));
             for (const items of byLetter) hostItems = hostItems.concat(items);
         });
@@ -1894,7 +1935,7 @@ async function buildSheetCore(req = {}) {
         items: hostItems,
         skills,
         anchors: anchorsIn,
-        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap })),
+        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap, letterFloor: s.letterFloor })),
         ctx: { size: n.size, look: n.look, paper, photocopySafe: n.photocopySafe },
         header,
         form: n.form,

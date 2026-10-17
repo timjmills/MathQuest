@@ -34,6 +34,8 @@
 //   --opts '{"notation":["across"]}'  kit: option values every skill in scope carries (O6 appearance)
 //   --no-combined             legacy: skip the combined multi-section sheet (see below)
 //   --seeds N                 kit: lint every document from N seeds (default 1, the skill's own seed)
+//   --letters A,B             kit, more-practice: name the letters, as the teacher print screen does
+//                             (default: none - one page-sized Practice A)
 //   --key-place end|after-page  kit: where the key prints (Wave 4.4; default end = today)
 //   --key-style copy|short    kit: the facsimile key (default) or the short answers-only key
 //   --lints L-INK,L-KEY       only report these lints (the others still run)
@@ -1714,7 +1716,7 @@ async function runApp(source) {
                     await renderPrint(page, s, { problemCount: COUNT, includeAnswerKey: true });
                     html = await legacyDocumentHtml(page);
                 } else {
-                    html = await page.evaluate(async ({ s, seed, COUNT, role, ANCHORS, SUPPORTS, COVER, MIX, OPTS, KIT_SIZE, KEY_OPTS }) => {
+                    html = await page.evaluate(async ({ s, seed, LETTERS, COUNT, role, ANCHORS, SUPPORTS, COVER, MIX, OPTS, KIT_SIZE, KEY_OPTS }) => {
                         // js/modules/print-sheet.js buildSheet(req): sections carry the skills; the result has
                         // pupilHtml and keyHtml (the facsimile key, same plan).
                         const practice = role === 'independent' || role === 'more-practice';
@@ -1730,11 +1732,14 @@ async function runApp(source) {
                             }
                         }
                         const req = { role, sections: [{ skills: [{ categoryId: s.categoryId, skillId: s.skillId, opts }], count: practice ? COUNT : undefined }], size: KIT_SIZE, look: practice ? 'ican' : 'auto', key: KEY_OPTS || true, seed, anchors: ANCHORS, coverage: COVER || undefined, mix: MIX || undefined };
+                        // --letters A,B: More Practice as the teacher print screen requests it (teacher-print.js
+                        // always names its letters), so every letter's page is linted, not only a page-sized A.
+                        if (role === 'more-practice' && LETTERS) req.letters = LETTERS.slice();
                         let out;
                         try { out = await window.buildSheet(req); } catch (e) { if (e && e.unsupported) return { unsupported: e.message }; throw e; }
                         const body = out.docHtml || [out.pupilHtml, out.keyHtml].filter(Boolean).join('\n');
                         return { doc: window.sheetDocument(body, s.label), pupilHtml: out.pupilHtml, keyHtml: out.keyHtml };
-                    }, { s, seed, COUNT: arg('count', 'auto') === 'auto' ? undefined : parseInt(arg('count', '6'), 10), role, ANCHORS: arg('anchors', 'off'), SUPPORTS: arg('supports', null), COVER: arg('cover', null), MIX: arg('mix', null), OPTS: arg('opts', null) ? JSON.parse(arg('opts', '{}')) : null, KIT_SIZE, KEY_OPTS: arg('key-place', null) || arg('key-style', null) ? { on: true, placement: arg('key-place', 'end'), style: arg('key-style', 'copy') } : null });
+                    }, { s, seed, LETTERS: arg('letters', null) ? arg('letters', '').split(',').map((x) => x.trim().toUpperCase()).filter(Boolean) : null, COUNT: arg('count', 'auto') === 'auto' ? undefined : parseInt(arg('count', '6'), 10), role, ANCHORS: arg('anchors', 'off'), SUPPORTS: arg('supports', null), COVER: arg('cover', null), MIX: arg('mix', null), OPTS: arg('opts', null) ? JSON.parse(arg('opts', '{}')) : null, KIT_SIZE, KEY_OPTS: arg('key-place', null) || arg('key-style', null) ? { on: true, placement: arg('key-place', 'end'), style: arg('key-style', 'copy') } : null });
                     if (html && html.doc) { kitHalves = html; html = html.doc; }
                 }
                 if (html && html.unsupported) {

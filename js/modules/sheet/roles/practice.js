@@ -1104,9 +1104,15 @@ export function composePractice(role, input = {}) {
     const sheets = groups.slice(0, LETTERS.length).map(({ letter, secs }) => {
         const L = LETTERS[Math.min(letter, LETTERS.length - 1)];
         const seedL = letterSeed(seed, L);
-        const sheet = composeSheet(role, input, norm, secs, { tabId: `Practice ${L}`, seed: seedL, form });
+        // A letter sized from its own problems (print-sheet.js, critic fractions-key r6 R6-1) is
+        // laid out on its own floor, so its rows are the rows its count was dealt for.
+        const own = (input.sections || []).map((sec) => (sec && sec.letterFloor && sec.letterFloor[L]) || null);
+        const normL = own.some(Boolean) ? Object.assign({}, norm, { sections: norm.sections.map((sec, si) => (own[si] ? Object.assign({}, sec, { floor: own[si].floor, columns: own[si].columns }) : sec)) }) : norm;
+        // The footer names the page's own letter: Practice B reads "Form B" (critic fractions-key r6).
+        const sheet = composeSheet(role, input, normL, secs, { tabId: `Practice ${L}`, seed: seedL, form: L });
         return base(sheet, {
             seed: seedL,
+            form: L,
             meta: {
                 role, letter: L, items: secs.flat().length, scoreOutOf: sheet.score, pages: sheet.pages.length,
                 fits: sheet.fits, notes: sheet.fits.map((f) => f.note).filter(Boolean),

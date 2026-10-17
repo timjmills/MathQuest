@@ -1,0 +1,15 @@
+boot exit 0
+mp-regress exit 0
+mp-fos exit 0
+card-stack exit 0
+falsestack exit 0
+tap6 exit 0
+lint-S exit 0
+lint-M exit 0
+lint-L exit 0
+screen-answer exit 0
+content-audit exit 0
+determinism exit 0
+falsestack-builder exit 0
+snapshot exit 0
+DONE
