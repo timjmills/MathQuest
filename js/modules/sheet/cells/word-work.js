@@ -808,12 +808,36 @@ function keywordBank(ctx) {
         + `<div style="font-weight:700;">Key words</div>${rows}</div>`;
 }
 
+/**
+ * A small part-whole bar for a vocabulary card or a chart caption (detailed lesson 2): the whole
+ * box on top, the two part boxes under it (widths in proportion), the labels written in; `mark`
+ * ('whole' | 'parts') draws that box (or boxes) at 1.5 pt, the rest at 0.75 pt. Line art, black.
+ */
+export function barMini({ whole, a, b, mark = '', wMm = 40, pt = 13 } = {}) {
+    const H = 7, W = wMm, PTMM = 25.4 / 72;
+    // schematic (RP-72): equal parts equal, else the bigger part the longer stock length
+    const wa = a === b ? W / 2 : (a > b ? 0.6 * W : 0.4 * W);
+    const sw = (m) => ((m ? 1.5 : 0.75) * PTMM).toFixed(3);
+    const box = (x, y, w, label, m) => `<rect x="${x.toFixed(2)}" y="${y}" width="${w.toFixed(2)}" height="${H}" fill="#fff" stroke="#000" stroke-width="${sw(m)}"/>`
+        + `<text x="${(x + w / 2).toFixed(2)}" y="${(y + H / 2 + pt * PTMM * 0.35).toFixed(2)}" text-anchor="middle" font-family="Andika" font-weight="700" font-size="${(pt * PTMM).toFixed(2)}">${esc(String(label))}</text>`;
+    // The named thing is pointed at (critic r1 D9: a thicker line alone is too faint a cue for an ELL
+    // match): an arrow at the left of the whole's row or the parts' row; "bar" rings the whole figure.
+    const L0 = 6, y2 = H + 1.5;
+    const arrow = (y) => `<path d="M0 ${(y + H / 2 - 2.2).toFixed(2)} L4.2 ${(y + H / 2).toFixed(2)} L0 ${(y + H / 2 + 2.2).toFixed(2)} Z" fill="#000"/>`;
+    const ring = mark ? '' : `<rect x="${(L0 - 1.6).toFixed(2)}" y="-0.4" width="${(W + 3.2).toFixed(2)}" height="${(2 * H + 1.5 + 0.8).toFixed(2)}" rx="1.5" fill="none" stroke="#000" stroke-width="${sw(false)}"/>`;
+    const point = mark === 'whole' ? arrow(0) : mark === 'parts' ? arrow(y2) : '';
+    const g = `<g transform="translate(${L0} 0)">` + box(0, 0, W, whole, mark === 'whole') + box(0, y2, wa, a, mark === 'parts') + box(wa, y2, W - wa, b, mark === 'parts') + '</g>';
+    const VW = W + L0 + 2.2, VH = 2 * H + 1.5 + 1;
+    return `<svg class="mq-barmini" viewBox="-0.5 -0.5 ${VW.toFixed(2)} ${VH.toFixed(2)}" width="${VW.toFixed(1)}mm" height="${VH.toFixed(1)}mm" aria-label="bar model">`
+        + ring + point + g + '</svg>';
+}
+
 /** A bar model with blank label boxes (the key writes the numbers and the answer). */
-function barModel(ctx, p) {
+function barModel(ctx, p, W = 150) {
     const st = p.steps[0];
     const put = filled(ctx);
     const ink = inkOf(ctx);
-    const W = 150, H = 8;
+    const H = 8;
     // A bar label is written on paper and typed on screen (scratch, never graded, SP-1 parity).
     const lab = (v, w) => (isTwin(ctx)
         ? `<input type="text" class="mq-wwork" data-mq-kind="number" data-mq-expect="${esc(String(v).replace(/,/g, ''))}" data-ws-graded="0" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="bar label" style="box-sizing:border-box;width:${L(ctx, Math.max(w, 16))};min-width:44px;height:max(44px, ${L(ctx, 7)});border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;color:${INK};font-family:'Andika','Open Sans',sans-serif;font-size:${P(ctx, zonePt(ctx) + 2)};font-weight:700;text-align:center;padding:0;">`
@@ -840,8 +864,10 @@ function barModel(ctx, p) {
         const whole = st.op === '+' ? st.ans : st.top;
         const pa = st.op === '+' ? st.top : st.bottom;
         const pb = st.op === '+' ? st.bottom : st.ans;
-        const wa = Math.max(30, Math.min(W - 30, W * pa / Math.max(1, whole)));
-        body = row(seg(W, lab(fmt(whole), 16), false)) + row(seg(wa, lab(fmt(pa), 16), false) + seg(W - wa, lab(fmt(pb), 16), false));
+        const mp = Math.min(30, W * 0.38);
+        const wa = Math.max(mp, Math.min(W - mp, W * pa / Math.max(1, whole)));
+        const lw = Math.min(16, mp - 3);
+        body = row(seg(W, lab(fmt(whole), lw), false)) + row(seg(wa, lab(fmt(pa), lw), false) + seg(W - wa, lab(fmt(pb), lw), false));
     }
     return `<div class="mq-wwbar" aria-label="bar model" style="display:flex;flex-direction:column;gap:${L(ctx, 1.2)};margin-top:${L(ctx, 1.5)};">${body}</div>`;
 }
@@ -931,9 +957,57 @@ function shownSteps(p, ctx) {
     return { steps: out, picks: out.map((s) => s.op), ans: w.value !== undefined && w.value !== null ? String(w.value) : String(last.op === '/' ? last.q : last.ans) };
 }
 
+/**
+ * `layout: 'bar'` (a lesson's ref payload, the detailed lesson maker - lesson 2): the story, its
+ * part-whole bar as wide as the cell, and one answer box with the label word PRINTED beside it. No
+ * sign row, no column boxes, no unit bank: the bar IS the working (RCDWS "Draw it").
+ */
+function barLayout(p, ctx) {
+    const cols = Math.max(1, Number(ctx.columns || 1));
+    const size = sizeOf(ctx);
+    const put = filled(ctx);
+    const ink = put ? inkOf(ctx) : null;
+    const st = p.steps[0];
+    // RP-70 / RP-72 (V22 XP-G-15): a SCHEMATIC part-whole bar - 14 mm tall at L, at least 42 mm
+    // long, never proportional: equal parts are drawn equal, else the bigger part from the longer
+    // stock length (60 / 40). Its writing boxes are slot size (Hw x B(2)), digits at working size.
+    const segH = { S: 11, M: 12.5, L: 14 }[size] || 14;
+    const hw = { S: 8, M: 9, L: 10 }[size] || 10;
+    const lw = Math.max(14, blankWidth(2, size));
+    const W = Number(p.barW) > 0 ? Math.max(42, Number(p.barW)) : (cols >= 2 ? 52 : 70);
+    const whole = st.op === '+' ? st.ans : st.top;
+    const pa = st.op === '+' ? st.top : st.bottom;
+    const pb = st.op === '+' ? st.bottom : st.ans;
+    // (the short stock length always holds its writing box: at least the box + 5 mm)
+    const small = Math.min(W / 2, Math.max(0.4 * W, lw + 5));
+    const wa = pa === pb ? W / 2 : (pa > pb ? W - small : small);
+    const fmt = (n) => Number(n).toLocaleString('en-US');
+    // (`gradeParts`, lesson 2 r4 - critic r2 n9: the exit slip's sort reads the bar, so its boxes are graded there)
+    const lab = (v) => `<span${p.gradeParts ? '' : ' data-ws-graded="0"'} data-ws-slot="bar" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-width:${L(ctx, lw)};height:${L(ctx, hw)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;padding:0 ${L(ctx, 1)};color:${ink === 'trace' ? GREY : INK};${KEY_FEATURES}"${put && ink ? ` data-ws-ink="${ink}"` : ''}>${put ? esc(fmt(v)) : ''}</span>`;
+    const seg = (w, v, left) => `<span style="display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, w)};height:${L(ctx, segH)};border:${B(ctx, 1)} solid ${INK};${left ? '' : 'border-left:none;'}background:#fff;">${lab(v)}</span>`;
+    const bar = `<div class="mq-wwbar" aria-label="bar model" style="flex:none;display:flex;flex-direction:column;gap:${L(ctx, 1.5)};">`
+        + `<div style="display:flex;">${seg(W, whole, true)}</div><div style="display:flex;">${seg(wa, pa, true)}${seg(W - wa, pb, false)}</div></div>`;
+    const bx = boxMm(ctx);
+    const aw = Math.max(blankWidth(2, size), bx * 1.4);
+    const shown = put ? String(p.ans) : '';
+    const box = `<span data-ws-slot="answer" data-ws-shape="box"${ink ? ` data-ws-ink="${ink}"` : ''} style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${tw(ctx, aw)};height:${tw(ctx, bx + 1)};border:${B(ctx, 1.5)} solid ${INK};border-radius:${L(ctx, 1.25)};background:#fff;font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;color:${ink === 'trace' ? GREY : INK};${KEY_FEATURES}">${esc(shown)}</span>`;
+    const ans = `<div class="mq-wwanswer" style="flex:none;display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 1)};font-size:${P(ctx, textPt(ctx) + 1)};">${box}${p.unit ? `<span style="font-weight:700;line-height:1.1;">${esc(p.unit)}</span>` : ''}</div>`;
+    const work = `<div style="flex:none;display:flex;align-items:flex-end;gap:${L(ctx, 3)};">${bar}${ans}</div>`;
+    // (`storyTight`, lesson 2 r4: a one-across cell sets its story at the Practice cells' size and leading,
+    // so two full-size stories with their bars fit a 132.5 mm exit-slip half)
+    // (`beside`: the story on the left, the bar and answer on the right - a one-across cell on a half page)
+    if (p.beside) {
+        return `<div class="mq-ww mq-wwbarlayout" data-ww-ops="${st.op}" data-read style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${L(ctx, 2.5)};display:flex;align-items:center;gap:${L(ctx, 3)};">`
+            + `<div style="flex:1 1 auto;min-width:0;">${storyHTML(ctx, p, true)}</div>${work}</div>`;
+    }
+    return `<div class="mq-ww mq-wwbarlayout" data-ww-ops="${st.op}" data-read style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${L(ctx, 2.5)};${p.storyTight ? `padding-top:${L(ctx, 2.5)};` : ''}">${storyHTML(ctx, p, cols >= 2 || !!p.storyTight)}`
+        + `<div style="margin-top:${L(ctx, 1.5)};">${work}</div></div>`;
+}
+
 register(WW_TEMPLATE, {
     render(p, ctx) {
         if (!p || !Array.isArray(p.steps) || !p.steps.length) return '';
+        if (p.layout === 'bar' && p.bar && p.steps.length === 1 && !isTwin(ctx)) return barLayout(p, ctx);
         const twin = isTwin(ctx);
         // A cell in a 2- or 3-column grid (and the screen twin) stacks its zones: story, sign
         // row, columns, answer. A full-width cell puts the answer beside the columns, so a page
@@ -980,13 +1054,13 @@ register(WW_TEMPLATE, {
     answerKey(p) {
         const slots = { answer: { value: String(p.ans), graded: true, accept: [Number(p.ans).toLocaleString('en-US')] } };
         // the answer row's digit boxes (the one answer place when the answer is the row's result)
-        if (p.inRow !== false && Array.isArray(p.steps) && p.steps.length) {
+        if (p.inRow !== false && p.layout !== 'bar' && Array.isArray(p.steps) && p.steps.length) {
             const st = p.steps[p.steps.length - 1];
             const T = st.op === '/' ? digitsOf(st.top).length : columnRows(st, p.tracks).T;
             const d = String(p.ans).padStart(T, ' ');
             for (let i = 0; i < T; i++) slots[`ans-${i}`] = { value: d[i] === ' ' ? '' : d[i], graded: d[i] !== ' ' };
         }
-        if (p.unit) slots['answer-label'] = { value: p.unit, graded: false };
+        if (p.unit && p.layout !== 'bar') slots['answer-label'] = { value: p.unit, graded: false };
         (p.steps || []).forEach((s, i) => { slots[`op${i}`] = { value: GLYPH[s.op], graded: false }; });
         return { value: p.ans, display: p.unit ? `${Number(p.ans).toLocaleString('en-US')} ${p.unit}` : String(p.ans), slots };
     },

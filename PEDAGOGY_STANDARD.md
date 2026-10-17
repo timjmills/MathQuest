@@ -1308,6 +1308,7 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `chart-fill-all` | Fill in the whole multiplication chart. | the blank chart (100%) |
 | `chart-headers` | Fill in the missing row and column numbers. | multiplication chart: the factors on its edges |
 | `shade-multiples` | Shade every multiple of {n}. | multiplication chart: find the multiples |
+| `shade-even` | Shade every even product. | multiplication chart: shade the even products (screen: Tap every even product.) |
 | `chart-row-rule` | Fill in the row. Write the rule. | multiplication chart: a row's pattern |
 | `hop-draw` | Draw the hops on the line. Write the product. | multiplication on a number line |
 | `hop-draw-div` | Draw hops of the number you divide by. Write how many hops. | division on a number line |
@@ -1325,6 +1326,15 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `default-circle-all` | Circle all the correct answers. | default adapter: multi-select items |
 | `default-order` | Write the numbers in order. | default adapter: ordering items with no stated direction |
 | `default-solve` | Solve. | default adapter: any other answer type |
+| `standard-form` | Write the number. | expanded form or a number name to a numeral (already in the kit library; recorded 2026-10-16, detailed lessons) |
+| `unit-form` | Write how many of each place. | unit form: hundreds, tens and ones (already in the kit library; recorded 2026-10-16, detailed lessons) |
+| `number-words` | Write the number in words. | numeral to number name (added 2026-10-16, detailed lessons, composing:number_word_form) |
+| `story-bar` | Read the story. Fill in the bar. Solve. | word problem with a part-whole bar to fill (added 2026-10-16, detailed lesson 2) |
+| `turn-facts` | Look at the array. Write two facts. | an array and its turn: write both multiplication facts (added 2026-10-16, mult_properties form 0) |
+| `turn-new` | Turn the array. Write the new fact. | one fact known, write the turned fact (added 2026-10-16, mult_properties form 0) |
+| `turn-look` | Look at the turned array. Write the new fact. | the turned array is drawn; write its fact (added 2026-10-17, detailed lesson 3a) |
+| `turn-fact` | Turn the fact. Write the new fact. | a fact with no picture; write its turn (added 2026-10-17, detailed lesson 3a) |
+| `array-total` | Write the rows, the number in each row and the total. | read an array: rows, columns, total (added 2026-10-17, detailed lesson 3a prerequisite) |
 
 | Id | Rule |
 |---|---|

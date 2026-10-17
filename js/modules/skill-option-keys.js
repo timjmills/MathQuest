@@ -128,6 +128,7 @@ export const MULTI_KEYS = Object.freeze({
     source: '0N',        // pv_digit_drag: word / expanded / numeral
     rename: '0P',        // unit_form: standard / more than 9 of one place
     span: '0Q',          // place_on_number_line: one ten / hundred / thousand to the next
+    answerSlot: '5P',    // number_word_form (5P: lessons sub-range; 0R went to nlOn on main): the numeral on a line / in H T O boxes (detailed lesson 1, 2026-10-16)
     // NEXT FREE IN BLOCK 0: 0R.
 
     // Block 1 — P10 time and money (design/research/time-money.md §20). Its other options reuse
@@ -158,7 +159,10 @@ export const MULTI_KEYS = Object.freeze({
     chart: '2D',         // mult_chart: a window / the whole chart
     ticks: '2E',         // nl_mult, nl_div: labels every step / every number
     shape: '2F',         // count_by_tables, number_patterns_rule, number_seq_fill: box / circle / hexagon
-    // NEXT FREE IN BLOCK 2: 2G.
+    winRows: '5Q',       // mult_chart (lesson 4, 2026-10-16): rows in the window (2 / 3 / 4)
+    winCols: '5R',       // mult_chart: columns in the window (3 / 4 / 5)
+    minFactor: '5S',     // mult_chart: the window's smallest row / column number (1 or 2)
+    // NEXT FREE IN BLOCK 2: 2J.
     // Lane C sub-range 2U-2Z (wave 1): skip-count lines and the number grid.
     fill: '2U',          // count_by_tables: how many numbers are printed at the start (two / one / half)
     jumps: '2V',         // count_by_tables: the row runs to 12 or to 15 jumps
@@ -174,7 +178,9 @@ export const MULTI_KEYS = Object.freeze({
     // tokens only (task, response, order: inorder, support); `ops` is its own key because the
     // deployed decoder would read an unknown `op` token as an EMPTY set (every operation).
     ops: '3A',           // function_table_easy / _hard: the operations a rule may use (+ − × ÷)
-    // NEXT FREE IN BLOCK 3: 3B.
+    ftTrap: '5T',        // function tables (lesson 5, 2026-10-16): row 1 fits a + and a × rule
+    ftFactors: '5U',     // function tables (lesson 5 r2): the × / ÷ numbers a rule may use (any | 2, 5 and 10)
+    // NEXT FREE IN BLOCK 3: 3C.
 
     // Block 4 — SUPPORTS (S2: `cover` and `mix` are live; `touch` is unused - touch dots are
     // values of the unified `support` set; `anchors` is the sheet-level S6 request field)
@@ -278,11 +284,14 @@ export const VALUE_TOKENS = Object.freeze({
         length: 'L', height: 'H', thickness: 'T', all: 'A',
         // block 2 (2026-09-25): the multiplication chart
         fill: 'Q', headers: 'Z', shade: 'X', pattern: 'J',
+        // lesson 4 (2026-10-16): shade every even product
+        even: 'S',
         // block 3 (2026-09-25): function tables (O U I W F D left to P10 and count-by)
         outputs: 'G', rule: 'Y', inputs: 'V', mixed: 'M', make: 'K',
         // block 1 P10 time + money (`all` reuses A)
         find: 'F', order: 'O', collection: 'D', words: 'W', missing: 'I', numerals: 'U', hands: 'B' }),
     zeroPlace: Object.freeze({ none: 'N', some: 'S', always: 'A' }),
+    answerSlot: Object.freeze({ line: 'L', hto: 'H' }),
     op: Object.freeze({ x: 'M', '/': 'D', both: 'B' }),
     order: Object.freeze({ largest: 'L', scrambled: 'S',
         // block 2 (2026-09-25): count by 1-12 rows
@@ -357,6 +366,7 @@ export const VALUE_TOKENS = Object.freeze({
     ftRules: Object.freeze({ '+': 'A', '-': 'S', x: 'M', '/': 'D', 'x+': 'P', 'x-': 'N', '/+': 'Q', '/-': 'R' }),
     ftTask: Object.freeze({ outputs: 'G', 'outputs-check': 'H', rule: 'Y', 'rule-check': 'Z', inputs: 'V', 'inputs-check': 'W',
         mixed: 'M', 'mixed-check': 'N', make: 'K' }),
+    ftFactors: Object.freeze({ any: 'A', '2-5-10': 'T', '2-3-5-10': 'F' }),
     // block 1 (P10 time + money)
     review: Object.freeze({ none: 'N', some: 'S' }),
     stimulus: Object.freeze({ clock: 'C', words: 'W', 'words-past': 'P', 'words-oh': 'O' }),
@@ -430,6 +440,8 @@ export const SCALAR_ONLY = Object.freeze({
     wpCues: 'bool', wpBank: 'bool', wpBar: 'bool',
     // Wave 1 lane A
     calculator: 'bool', skipAfter: 'decimal',
+    // lessons 4 and 5 (2026-10-16)
+    winRows: 'decimal', winCols: 'decimal', minFactor: 'decimal', ftTrap: 'bool',
     // wave 5.2: the number line (Start / End are signed decimals: N = minus, P = point)
     nlOn: 'bool', nlHops: 'bool', nlFrom: 'decimal', nlTo: 'decimal',
 });

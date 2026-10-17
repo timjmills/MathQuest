@@ -89,11 +89,14 @@ function workedSteps(q) {
         if (rule.length === 1 && (rule[0].op === 'x' || rule[0].op === '/')) {
             out.push(step(`Test + ${a.y - a.x}: ${b.x} + ${a.y - a.x} = ${b.x + a.y - a.x}, not ${b.y}.`));
         } else if (rule.length === 1) {
-            out.push(step(`Test × and ÷ first: they do not fit every row.`));
+            // Lesson 5 order for + / − (the sign picks the variant): bigger or smaller first, then the change.
+            const bigger = rule[0].op === '+';
+            out.push(step(`Out is ${bigger ? 'bigger' : 'smaller'}: try ${bigger ? '+' : '−'}. ${a.x} to ${a.y} is ${bigger ? '+' : '−'}\u00a0${rule[0].n}.`));
+            out.push(step(`Test ${ruleText(rule)} on every row: ${p.rows.slice(1).map((r) => `${ruleOn(rule, r.x)} = ${r.y}`).join(', ')}. It works.`));
         } else {
             out.push(step(`One + or one × does not fit every row: try two steps.`));
         }
-        out.push(step(`Test ${ruleText(rule)} on every row. It works.`));
+        if (!(rule.length === 1 && (rule[0].op === '+' || rule[0].op === '-'))) out.push(step(`Test ${ruleText(rule)} on every row. It works.`));
         if (p.check) out.push(step(`Check: ${ruleOn(rule, p.check.x)} = ${p.check.y}.`, [{ slot: 'chk', value: String(p.check.y) }]));
         out.push(step(`Write the rule ${ruleText(rule)}.`, all));
         return clampSteps(out);
@@ -167,6 +170,12 @@ function wrongAnswer(q) {
             withCheck(repl, [{ op: '+', n: gap }].concat(rule.length === 2 ? [rule[1]] : []));
             c.push(mk(repl, 'neighbour-outputs', `Looked only down the Out column and wrote + ${gap}, the gap between two Outs.`, p.support === 'line' ? 'rule' : 'n0'));
         }
+        // sign-flip (lesson 5, M3): a − table written as + (the right number, the wrong sign)
+        if (rule.length === 1 && rule[0].op === '-') {
+            const repl = p.support === 'line' ? { rule: `+ ${rule[0].n}` } : { s0: '+', n0: rule[0].n };
+            withCheck(repl, [{ op: '+', n: rule[0].n }]);
+            c.push(mk(repl, 'sign-flip', `Out is smaller than In, but wrote + ${rule[0].n}: the sign is flipped.`, p.support === 'line' ? 'rule' : 's0'));
+        }
         // the Check row: the rule done to the Out of the row above
         if (p.check) {
             const w = applyRule(rule, applyRule(rule, p.check.x));
@@ -232,7 +241,7 @@ function wrongAnswer(q) {
     return chooseWrong(q, c);
 }
 
-const MISCONCEPTIONS = ['rule-on-output', 'add-for-times', 'neighbour-outputs', 'backwards'];
+const MISCONCEPTIONS = ['rule-on-output', 'add-for-times', 'neighbour-outputs', 'backwards', 'sign-flip'];
 const FOOTPRINT = { kind: 'table', factLike: false, maxCols: 3, perPage: { ican: 6, daily: 6 } };
 
 registerSkill('algebra:function_table_easy', {

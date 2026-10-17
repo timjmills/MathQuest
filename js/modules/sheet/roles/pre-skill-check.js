@@ -34,13 +34,24 @@ export function sources(skills, { earlier }) {
     return list.slice(0, 4).map((sk, i) => ({ id: `q${i}`, skills: [sk] }));
 }
 export const measureCols = () => [1, 2, 4];
-export const counts = (pools) => Object.fromEntries(Object.keys(pools).map((id) => [id, PER_QUAD]));
+// The detailed lesson's check grows its rows to fill the body (critic r3 R7: no bordered empty strip
+// under the last row). Its items are centred in their cells (mq-lvcenter), so a cell keeps no empty
+// band of 30 % (H13) up to about 2.5 x its content; 2 x the measured minimum stays well inside that.
+const GROW_MAX = 2;
+// `input.perQuestion` (the detailed lesson's Prerequisite Check, V22 §9.1: 3-4 questions, up to 8
+// items): items per prerequisite when a caller asks; PER_QUAD otherwise.
+// (An array gives each question its own count, in order.)
+const perQuad = (input, i = 0) => {
+    const v = input && Array.isArray(input.perQuestion) ? input.perQuestion[i] : input && input.perQuestion;
+    return Number(v) >= 1 && Number(v) <= PER_QUAD ? Number(v) : PER_QUAD;
+};
+export const counts = (pools, input) => Object.fromEntries(Object.keys(pools).map((id) => [id, perQuad(input, Number(String(id).replace(/\D/g, '')) || 0)]));
 
 export function plan(input = {}) {
     const ctx = ctxOf(input);
     const form = String(input.form || 'A').toUpperCase() === 'B' ? 'B' : 'A';
     const quads = [0, 1, 2, 3].map((i) => {
-        let its = poolItems(input, `q${i}`).slice(0, PER_QUAD);
+        let its = poolItems(input, `q${i}`).slice(0, perQuad(input, i));
         if (form === 'B') its = shuffle(rng(deriveSeed(input.seed === undefined ? 0 : input.seed, ROLE_ID, 'B', i)), its);
         return its;
     }).filter((q) => q.length);
@@ -56,8 +67,9 @@ export function plan(input = {}) {
     let start = 1;
     const band = (its, cols, rows, cellH, pageCols) => {
         const b = {
-            kind: 'band', label: '', instr: instructionText(instructionKeyOf(its, input.skills), its), extra: scoreTag(its.length),
-            content: gridPart(its.map((it) => planItem(it, { cols: pageCols, level: 0 })), { cols, rows, cellH, labels, start }),
+            kind: 'band', label: '', instr: instructionText(instructionKeyOf(its, input.skills), its), extra: input.perQuestion ? '' : scoreTag(its.length),
+            // (the detailed lesson's check centres each item in its grown cell, H13)
+            content: gridPart(its.map((it) => planItem(input.perQuestion ? Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }) : it, { cols: pageCols, level: 0 })), { cols, rows, cellH, labels, start }),
         };
         start += its.length;
         return b;
@@ -80,19 +92,39 @@ export function plan(input = {}) {
         // keeps the whole rows its share of one page holds (at least one row), so four wide
         // pictures print one page of four one-row bands instead of four pages.
         let cur = { sections: [], used: 0, budget: m.budget };
+        // `perQuestion` (the detailed lesson's Prerequisite Check, V22 §9.1): the bands fill the body
+        // (flex weights by content), each cell growing to at most 1.45 x its content so no empty band
+        // reaches 30 % (H13). Absent on every other check.
+        let grow = 1;
+        let whole = false;
+        if (input.perQuestion) {
+            const own = quads.map((q0) => { const c = [4, 2, 1].find((cc) => fitsAt(q0, cc, ctx)) || 1; return { h: hMinAt(q0, c, ctx), rows: Math.ceil(q0.length / c) }; });
+            const need = own.reduce((a, o) => a + m.strip + o.rows * o.h, 0);
+            const rowsH = own.reduce((a, o) => a + o.rows * o.h, 0);
+            if (need < m.budget && rowsH > 0) grow = Math.min(GROW_MAX, 1 + (m.budget - need - 1) / rowsH);
+            // (every item the description asks for prints when the whole check fits one page - critic D15)
+            whole = need <= m.budget;
+        }
         for (const q0 of quads) {
             const cols = [4, 2, 1].find((c) => fitsAt(q0, c, ctx)) || 1;
-            const h = hMinAt(q0, cols, ctx);
+            const h = hMinAt(q0, cols, ctx) * grow;
             const share = m.budget / quads.length - m.strip;
-            const q = q0.slice(0, Math.min(q0.length, cols * Math.max(1, Math.floor(share / Math.max(1, h)))));
+            const q = whole ? q0 : q0.slice(0, Math.min(q0.length, cols * Math.max(1, Math.floor(share / Math.max(1, h)))));
             kept += q.length;
             const rows = Math.ceil(q.length / cols);
             const bandH = m.strip + rows * h;
             if (cur.sections.length && cur.used + bandH > cur.budget) { pages.push(cur); cur = { sections: [], used: 0, budget: mCont.budget }; }
-            cur.sections.push(band(q, cols, rows, h, cols));
+            // (the detailed lesson's check never lays a band out in more columns than it has items: one item in a two-up
+            // band left an empty bordered half - lesson 4 critic r2 D9; the item keeps its measured size, centred)
+            cur.sections.push(band(q, input.perQuestion ? Math.max(1, Math.min(cols, q.length)) : cols, rows, h, cols));
             cur.used += bandH;
         }
         if (cur.sections.length) pages.push(cur);
+        // The detailed lesson's check: the last band takes the page's spare height (one unruled
+        // trailing area inside the frame, V22 §8.12.4), so the body is not blank at its foot.
+        // (only when the rows could not grow to the body: an empty bordered strip under the last row reads
+        // as a missing item - critic r2 R7)
+        if (input.perQuestion && grow >= GROW_MAX) for (const pg of pages) { const last = pg.sections[pg.sections.length - 1]; if (last) last.grow = true; }
     }
     const n = kept || all.length;
     const finalFrame = n === all.length ? frame : frameOf({ skills: skillsOn.length ? skillsOn : input.skills || [], input: Object.assign({}, input, { form }),

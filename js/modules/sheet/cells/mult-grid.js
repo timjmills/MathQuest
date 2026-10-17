@@ -95,6 +95,36 @@ function shownValues(p, ctx, slots) {
     return slots.map((s) => s.value);
 }
 
+/**
+ * The anchor-chart step states of an even-products window (detailed lesson 4; marks 'even-rows',
+ * 'even-cols', 'odd-odd' from the countby provider's CHART_STEPS.even): state k shades the boxes of
+ * every step up to k; the NEWEST step's row / column numbers are ringed grey (P-LC-9), and the last
+ * step rings each odd x odd box (left white) with a solid grey line. Only that lesson calls it.
+ */
+export function evenGridState(p, groups, k) {
+    const rows = p.rows || [], cols = p.cols || [];
+    const has = (g, id) => ((g && g.marks) || []).some((m) => m && m.slot === id);
+    const upto = groups.slice(0, k + 1);
+    const shade = new Set(), ring = new Set();
+    const on = (id) => upto.some((g) => has(g, id));
+    rows.forEach((r, i) => cols.forEach((c, j) => {
+        if ((on('even-rows') && r % 2 === 0) || (on('even-cols') && c % 2 === 0)) shade.add(`${i},${j}`);
+    }));
+    const g = groups[k];
+    if (has(g, 'even-rows')) rows.forEach((r, i) => { if (r % 2 === 0) ring.add(`r${i}`); });
+    if (has(g, 'even-cols')) cols.forEach((c, j) => { if (c % 2 === 0) ring.add(`h${j}`); });
+    if (has(g, 'odd-odd')) rows.forEach((r, i) => cols.forEach((c, j) => { if (r % 2 === 1 && c % 2 === 1) ring.add(`c${i},${j}`); }));
+    return { shade, ring };
+}
+
+/** A vocabulary picture of one product (detailed lesson 4): a two-by-two corner of the chart, the product boxed. */
+export function factGridMini(a, b, pt = 14) {
+    const td = (v, x) => `<td style="box-sizing:border-box;width:10mm;height:9mm;padding:0;text-align:center;vertical-align:middle;border:0.75pt solid #000;font-size:${pt}pt;line-height:1;${x || ''}">${v}</td>`;
+    return `<table class="mq-lvpic-grid" aria-label="${a} times ${b}" style="border-collapse:collapse;margin:0 auto;background:#fff"><tr>${td('<b>×</b>', 'border-right:1.5pt solid #000;border-bottom:1.5pt solid #000;')}${td(`<b>${b}</b>`, 'border-bottom:1.5pt solid #000;')}</tr>`
+        + `<tr>${td(`<b>${a}</b>`, 'border-right:1.5pt solid #000;')}${td(String(a * b), 'outline:1.5pt solid #000;outline-offset:-1.5mm;')}</tr></table>`;
+}
+
+
 register('mult-grid', {
     render(p, ctx) {
         const size = sizeOf(ctx);
@@ -132,23 +162,35 @@ register('mult-grid', {
                 + `style="${fill}outline:${heavy} solid ${INK};outline-offset:-${heavy};font-weight:700;color:${vInk === 'trace' ? GREY : INK};${KEY_FEATURES}">${esc(v)}</span></td>`;
         };
         const printed = (v, extra, bold) => `<td style="${base}border:${B(ctx, 0.75)} solid ${INK};${extra || ''}"><span style="${fill}${bold ? 'font-weight:700;' : ''}">${esc(v)}</span></td>`;
+        // (an even-products window on paper, lesson 4: every product box is a response place - shade it or leave it
+        // white - so the page counts its boxes as its graded places)
+        const shadeSlot = p.shadeSlots && !isTwin(ctx);
+        let shN = 0;
+        // (on the key a shaded box is the answer: its number carries the key mark, so the key reads its answers)
+        const productTd = (v, extra) => (shadeSlot
+            ? `<td style="${base}border:${B(ctx, 0.75)} solid ${INK};${extra || ''}"><span data-ws-slot="sh${shN++}" data-ws-shape="shade"${shadeOn && Number(v) % Number(p.shade) === 0 ? ' data-ws-key-ans' : ''} style="display:inline-block;">${esc(v)}</span></td>`
+            : printed(v, extra, false));
         const HEAVY = B(ctx, 1.5);
         let html = `<tr>${printed('×', `border-right:${HEAVY} solid ${INK};border-bottom:${HEAVY} solid ${INK};`, true)}`;
         cols.forEach((cv, j) => {
             const n = at.get(`h${j}`);
-            html += n !== undefined ? slotTd(n, `border-bottom:${HEAVY} solid ${INK};`) : printed(cv, `border-bottom:${HEAVY} solid ${INK};`, true);
+            const ringH = ctx.gridSteps && ctx.gridSteps.ring.has(`h${j}`) ? `outline:${HEAVY} solid ${GREY};outline-offset:-${B(ctx, 3)};` : '';
+            html += n !== undefined ? slotTd(n, `border-bottom:${HEAVY} solid ${INK};`) : printed(cv, `border-bottom:${HEAVY} solid ${INK};${ringH}`, true);
         });
         html += '</tr>';
         rows.forEach((rv, i) => {
             html += '<tr>';
             const nh = at.get(`r${i}`);
-            html += nh !== undefined ? slotTd(nh, `border-right:${HEAVY} solid ${INK};`) : printed(rv, `border-right:${HEAVY} solid ${INK};`, true);
+            const ringR = ctx.gridSteps && ctx.gridSteps.ring.has(`r${i}`) ? `outline:${HEAVY} solid ${GREY};outline-offset:-${B(ctx, 3)};` : '';
+            html += nh !== undefined ? slotTd(nh, `border-right:${HEAVY} solid ${INK};`) : printed(rv, `border-right:${HEAVY} solid ${INK};${ringR}`, true);
             cols.forEach((cv, j) => {
                 const n = at.get(`c${i},${j}`);
                 if (n !== undefined) { html += slotTd(n); return; }
                 const prod = rv * cv;
-                const shade = (shadeOn && prod % Number(p.shade) === 0) || (shadedByPupil && shadedByPupil.has(prod)) ? `background:${GREY};` : '';
-                html += printed(prod, shade, false);
+                const gs = ctx.gridSteps;
+                const shade = gs ? (gs.shade.has(`${i},${j}`) ? `background:${GREY};` : '') + (gs.ring.has(`c${i},${j}`) ? `outline:${HEAVY} solid ${GREY};outline-offset:-${B(ctx, 3)};` : '')
+                    : (shadeOn && prod % Number(p.shade) === 0) || (shadedByPupil && shadedByPupil.has(prod)) ? `background:${GREY};` : '';
+                html += productTd(prod, shade);
             });
             html += '</tr>';
         });

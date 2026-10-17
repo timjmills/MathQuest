@@ -1318,7 +1318,8 @@ const _chartTask = () => ({
     values: [{ v: 'fill', l: 'Fill in the missing products' },
         { v: 'headers', l: 'Fill in the missing row and column numbers' },
         { v: 'shade', l: 'Shade every multiple of a number' },
-        { v: 'pattern', l: 'Find the pattern in one row (write the rule)' }],
+        { v: 'pattern', l: 'Find the pattern in one row (write the rule)' },
+        { v: 'even', l: 'Shade every even product' }],
     help: 'One task per page. Shade and pattern print every product; the pupil looks for the pattern.',
 });
 const _hopLine = (div) => [
@@ -1480,6 +1481,22 @@ const CB_CHART_LINE_OPTIONS = {
             help: 'How many of the products (or, for Task: row and column numbers, the factors) are left blank. 100% is a blank chart to fill in.' }),
         _cbTables(1, 'Tables with blanks', 'Times tables', 'Only the rows and columns of the ticked tables have blanks (tick 7 and 8 to practise those two).'),
         _chartTask(),
+        // Lesson 4 (B3): the window's size and its smallest factor. A window only; the whole chart ignores them.
+        {
+            id: 'winRows', label: 'Window rows', type: 'enum', default: 4, group: 'layout',
+            values: [2, 3, 4].map(v => ({ v, l: `${v} rows` })),
+            help: 'How many rows the window of the chart holds. A smaller window is a quicker item (an exit slip).',
+        },
+        {
+            id: 'winCols', label: 'Window columns', type: 'enum', default: 5, group: 'layout',
+            values: [3, 4, 5].map(v => ({ v, l: `${v} columns` })),
+            help: 'How many columns the window of the chart holds.',
+        },
+        {
+            id: 'minFactor', label: 'Smallest row and column', type: 'enum', default: 1, group: 'difficulty',
+            values: [{ v: 1, l: 'From 1 (the 1 row and column may show)' }, { v: 2, l: 'From 2 (no 1 row, no 1 column)' }],
+            help: 'From 2 keeps the 1 row and the 1 column out of the window, where every product is just the other number.',
+        },
     ],
     'multiplication:mult_chart_easy': [
         levelSubset([2, 1, 0], 2, 'The same chart every time: level 2 leaves 8 cells to fill, level 1 leaves 16, '
@@ -1521,6 +1538,24 @@ SKILL_OPTIONS['composing:number_word_form'] = [{
         { v: 'to_words', l: 'Numeral to words (write forty-one)' }],
     allLabel: 'Both ways, alternating',
     help: 'Writing the words is harder (it is spelling too). Tick both and the page alternates.',
+}, {
+    // Detailed lesson 1 (2026-10-16): "Numbers to" bounds the number itself (the answer). 0 = the
+    // Max Number setting, the old behaviour (10 up to Max Number), so every saved code deals as it
+    // did. 20 / 100 / 1,000 deal from just above the band below (11-20, 21-100, 101-1,000).
+    id: 'band', label: 'Numbers to', type: 'enum', default: 0, group: 'difficulty',
+    values: [{ v: 0, l: 'Max Number setting' }, { v: 20, l: '20' }, { v: 100, l: '100' }, { v: 1000, l: '1,000' }],
+    help: 'The numbers the page reads and writes. 1,000 deals 101 to 1,000.',
+}, {
+    id: 'zeroPlace', label: 'A zero place (305, 340)', type: 'enum', default: 'none', group: 'difficulty',
+    values: [{ v: 'none', l: 'Never' }, { v: 'some', l: 'Some numbers (every third)' }, { v: 'always', l: 'Every number' }],
+    help: 'A missing tens or ones word means a 0 in that place: "three hundred five" is 305. Needs Numbers to 100 or 1,000.',
+}, {
+    // Detailed lesson 1 r3 (critic D16): words to numeral written in the place boxes, one digit a
+    // box under H T O - the scaffold that stops 35 for "three hundred five". The default keeps
+    // the answer line every saved page prints.
+    id: 'answerSlot', label: 'Write the number', type: 'enum', default: 'line', group: 'support',
+    values: [{ v: 'line', l: 'On a line' }, { v: 'hto', l: 'In H T O boxes (one digit a box)' }],
+    help: 'H T O boxes: three boxes, three digits - a missing tens word still gets its 0. Words to numeral only.',
 }];
 
 // ===========================================================================
@@ -1894,6 +1929,18 @@ const _ftOptions = (easy) => [
         help: 'Three rows are enough to find a rule. Out of order stops the pupil just following the Out column down. A tall table fits four to a page instead of six.',
     },
     {
+        // Lesson 5 (RESEARCH proposal 1): row 1 fits a + rule AND a × (or ÷) rule (2 → 4: + 2 or × 2), so only
+        // the later rows decide. Off by default.
+        id: 'ftTrap', label: 'First row fits two rules', type: 'bool', default: false, group: 'difficulty',
+        help: 'On: the first row fits a + rule and a × rule (2 → 4 is + 2 and × 2; 3 → 6 is + 3 and × 2), so the pupil must test the other rows. The rule is still the only one that fits every row.',
+    },
+    {
+        // Lesson 5 r2: × and ÷ rules only by the numbers the class has learned (the Prerequisite Check's 2, 5 and 10).
+        id: 'ftFactors', label: '× and ÷ by', type: 'enum', default: 'any', group: 'difficulty',
+        values: [{ v: 'any', l: 'Any number to 10' }, { v: '2-5-10', l: '2, 5 and 10 only' }, { v: '2-3-5-10', l: '2, 3, 5 and 10 only' }],
+        help: 'The number a × or ÷ rule uses. "2, 5 and 10 only" keeps the rules to the facts a Grade 3 class learns first.',
+    },
+    {
         id: 'support', label: 'Support', type: 'enum', default: 'frame', group: 'support',
         values: [
             { v: 'frame', l: 'Frame and machine picture' },
@@ -2011,6 +2058,14 @@ const P12_OPTIONS = {
         formsOption([{ v: 0, l: 'Order (3 × 4 = 4 × 3)' }, { v: 1, l: 'Breaking apart (6 × 7 = 6 × 5 + 6 × 2)' },
             { v: 2, l: 'Times 1' }, { v: 3, l: 'Times 0' }], { label: 'Which property' }),
         _p12Pictures('Off prints the question alone: no arrays and no property name (the name tells the pupil which rule to use).'),
+        // Lesson 3a (2026-10-16): what an Order item asks (form 0 only), and how big its factors get.
+        { id: 'task', label: 'Order items ask', type: 'set', group: 'difficulty', default: [0],
+            values: [{ v: 0, l: 'An array and its turn: write both products' }, { v: 1, l: 'A known fact: write the turned fact' },
+                { v: 2, l: 'Facts only, no pictures: the missing number' }],
+            allLabel: 'All three, mixed',
+            help: 'Order (3 × 4 = 4 × 3) items only. One kind is one page instruction; tick more to mix them. The pictured arrays are at most 5 rows of 5.' },
+        _opsBand([25, 81], 25, { label: 'Order factors to', labels: { 25: '5 (5 × 5)', 81: '9 (9 × 9, facts only)' },
+            help: 'The largest factor of an Order item: the product is at most 25 or 81. The arrays stay at 5 × 5; 9 reaches the facts-only items.' }),
     ],
     'multiplication:area_model_mult': [_p12Enum('tiles', 'Digits × digit', [
         { v: null, l: 'Both sizes, dealt' }, { v: 21, l: '2-digit × 1-digit (4 × 36)' }, { v: 31, l: '3-digit × 1-digit (3 × 135)' }],

@@ -126,9 +126,26 @@ function packing(poolsIn, input) {
             const shelves = ids.reduce((a, id) => a + shelf[id].n, 0);
             if (shelves < maxShelves * basePages && used + bandH(lead, false) <= m.budget) { shelf[lead].n++; used += bandH(lead, false); continue; }
             const drop = ids.slice(1).filter((id) => shelf[id].n > 1).sort((a, b) => cnt(b) - cnt(a))[0];
-            if (!drop) break;
-            shelf[drop].n--;
-            used -= bandH(drop, false);
+            if (drop) { shelf[drop].n--; used -= bandH(drop, false); continue; }
+            // `leadDrop` (the detailed lesson maker, lesson 2 r4 - critic r2 D3: 2 stories of 14 items):
+            // every partner is down to one shelf, so the LAST partner with the most items gives its
+            // whole band up (one partner always stays); the last partner left narrows its shelf to
+            // the next lattice divisor (6 facts -> 3, wider cells, never an empty cell).
+            if (!input.leadDrop) break;
+            const live = ids.slice(1).filter((id) => shelf[id].n > 0);
+            if (live.length > 1) {
+                const most = Math.max(...live.map(cnt));
+                const gone = live.filter((id) => cnt(id) === most).pop();
+                shelf[gone].n = 0;
+                used -= bandH(gone, true);
+                continue;
+            }
+            const last = live[0];
+            const k2 = last ? divisorsDesc(N).find((dv) => dv < shelf[last].k && fitsAt(poolsIn[last], dv, ctx)) : 0;
+            if (!k2) break;
+            const h2 = hMinAt(poolsIn[last], k2, ctx);
+            used += (Number.isFinite(h2) ? h2 : shelf[last].h) - shelf[last].h;
+            Object.assign(shelf[last], { k: k2, per: k2, h: Number.isFinite(h2) ? h2 : shelf[last].h });
         }
     }
     return { ctx, m, mCont, N, ids, shelf, used, pages: basePages };
@@ -175,9 +192,24 @@ export function plan(input = {}) {
     const spare = p.pages > 1 ? 0 : Math.max(0, m.budget - used - (input.fill ? 1 : 0));
     // The spare height is shared into the shelves only as far as a cell keeps its drawing filling
     // it (H13: never an empty band of 30% of a cell): a tenth of a shelf's own height at most.
-    const growOf = (sh) => (shelves.length ? (input.fill ? Math.min(sh.h * 0.35, spare / shelves.length) : Math.min(12, sh.h * 0.1, spare / shelves.length)) : 0);
+    const growOf = (sh) => (shelves.length ? ((input.fill || input.growLast) ? Math.min(sh.h * 0.35, spare / shelves.length) : Math.min(12, sh.h * 0.1, spare / shelves.length)) : 0);
+    // `growLast` (the detailed lesson maker): the spare is water-filled - a shelf that reaches its
+    // 35 % cap passes the rest to the others - so no bordered empty strip is left under the
+    // last row (critic r3 nit, P4m-1). Absent on every other Mixed page (equal shares, as before).
+    const fillShares = (() => {
+        if (!input.growLast || !shelves.length) return null;
+        const g = shelves.map(() => 0);
+        let left = spare, open = shelves.map((_, i) => i);
+        for (let it = 0; it < 8 && left > 0.05 && open.length; it++) {
+            const each = left / open.length;
+            const next = [];
+            for (const i of open) { const room = shelves[i].h * 0.35 - g[i]; const add = Math.min(room, each); g[i] += add; left -= add; if (room - add > 0.05) next.push(i); }
+            open = next;
+        }
+        return g;
+    })();
     for (const [i, sh] of shelves.entries()) {
-        const grow = growOf(sh);
+        const grow = fillShares ? fillShares[i] : growOf(sh);
         const firstOfSkill = i === 0 || shelves[i - 1].id !== sh.id;
         const budget = pages.length > 1 ? p.mCont.budget : m.budget;   // the page `cur` is on
         let bandH = m.strip + sh.h + grow + (sh.anchor ? sh.bandMm : 0);
@@ -191,7 +223,8 @@ export function plan(input = {}) {
         }
         const first = sh.items.find((it) => !it.anchor);
         const skill = (input.skills || []).find((s) => first && first.q && s.skillId === first.q.skillId) || {};
-        const title = STRAND_BY_CATEGORY[skill.categoryId] || skillWords(skill).strand || 'Practice';
+        // `sectionLabel` on the skill ref (the detailed lesson maker, critic D17): the band's own name.
+        const title = (first && first.q && first.q.sectionLabel) || STRAND_BY_CATEGORY[skill.categoryId] || skillWords(skill).strand || 'Practice';
         const pupil = sh.items.filter((it) => !it.anchor);
         const grid = gridPart(sh.items.map((it) => (it.anchor ? anchorPlanItem(it, Math.min(sh.k, 6)) : planItem(it, { cols: Math.min(sh.k, 6) }))), { cols: sh.k, rows: 1, cellH: sh.h + grow, labels, start });
         if (joins) {
@@ -214,6 +247,10 @@ export function plan(input = {}) {
         start += pupil.length;
         cur.used += bandH;
     }
+    // `growLast` (the detailed lesson maker's Mixed page): the last band of each page takes the spare
+    // height - one unruled trailing area inside the frame (V22 §8.12.4) - so the body never ends
+    // blank. Absent on every other Mixed page.
+    if (input.growLast) for (const pg of pages) { const bands = pg.sections.filter((x) => x.kind === 'band'); if (bands.length) bands[bands.length - 1].grow = true; }
     const achieved = {};
     for (const sh of shelves) achieved[sh.id] = (achieved[sh.id] || 0) + sh.items.filter((it) => !it.anchor).length;
     return assemble(ROLE_ID, input, frame, pages.map((pg) => ({ sections: pg.sections })), {

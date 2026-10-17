@@ -249,9 +249,15 @@ function arrow(g, wMm) {
 /** The function machine: In -> [ rule ] -> Out, a box and two arrows (no picture, no colour). */
 function machine(p, g, d, wMm) {
     const given = p.task !== 'rule';
-    const inner = given ? txt(g, ruleHtml(p.rule), { bold: true }) : txt(g, 'rule');
+    // (`machineText` {text, grey}: an anchor-chart step state writes the rule it is trying in the box - detailed lesson 5)
+    const mt = p.machineText;
+    const inner = mt ? `<span style="font-size:${g.textEm.toFixed(3)}em;font-weight:700;white-space:nowrap;color:${mt.grey ? INK.grey : INK.ink}">${esc(mt.text)}</span>`
+        : given ? txt(g, ruleHtml(p.rule), { bold: true }) : txt(g, 'rule');
     const boxH = d.machineH;
-    return `<div class="ft-machine" data-ft-machine="1" style="display:flex;align-items:center;justify-content:center;gap:${g.em(1.5)};`
+    // (`machineTried`: the wrong try of a chart's whole example, crossed, on a line above the machine - lesson 5 r2)
+    const tried = p.machineTried ? `<div style="display:flex;align-items:center;justify-content:center;gap:${g.em(1.5)};margin:0 auto ${g.em(0.6)};white-space:nowrap">`
+        + `${txt(g, `${esc(p.machineTried)}?`, { bold: true })}${markSvg(g, true, INK.ink)}${txt(g, 'row 2')}</div>` : '';
+    return tried + `<div class="ft-machine" data-ft-machine="1" style="display:flex;align-items:center;justify-content:center;gap:${g.em(1.5)};`
         + `width:${g.em(wMm)};margin:0 auto ${g.em(0.8)};white-space:nowrap">`
         + `${txt(g, 'In', { bold: true })}${arrow(g, 7)}`
         + `<span style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-width:${g.em(18)};height:${g.em(boxH)};`
@@ -320,17 +326,80 @@ function tableHtml(p, g, d, vals, ink, slotsById, ctx, fx = { on: false }) {
     (p.rows || []).forEach((r, i) => {
         const inS = slotsById[`r${i}in`];
         const outS = slotsById[`r${i}out`];
-        const cells = [td(g, inS ? slotBox(g, inS, d, vals, ink) : numCell(r.x), { w: d.colW, h: d.rowH })];
+        // (`ftRing`, the anchor chart's look step - detailed lesson 5: the row's In and Out ringed grey)
+        const ring = ctx.ftRing && ctx.ftRing.includes(i) ? `outline:${HEAVY} solid ${INK.grey};outline-offset:-${g.em(1.2)};` : '';
+        const cells = [td(g, inS ? slotBox(g, inS, d, vals, ink) : numCell(r.x), { w: d.colW, h: d.rowH, extra: ring })];
         if (expr) cells.push(td(g, txt(g, esc(ruleOn(p.rule, r.x))), { w: d.exprW, h: d.rowH }));
-        cells.push(td(g, outS ? slotBox(g, outS, d, vals, ink) : numCell(r.y), { w: d.colW, h: d.rowH }));
+        cells.push(td(g, outS ? slotBox(g, outS, d, vals, ink) : numCell(r.y), { w: d.colW, h: d.rowH, extra: ring }));
         if (fixCol) {
             const ids = [inS, outS].filter(Boolean).map((t) => t.id);
             cells.push(td(g, ids.length ? fixBox(g, d, fx, ids, { value: ids.map((id) => fx.key[id]).join(', ') }) : '', { w: d.colW, h: d.rowH, extra: `border-left:${HEAVY} solid ${INK.ink};` }));
         }
         rows += `<tr>${cells.join('')}</tr>`;
     });
-    return `<table class="ft-table" role="grid" aria-label="function table" style="border-collapse:collapse;table-layout:fixed;margin:0 auto;`
+    const table = `<table class="ft-table" role="grid" aria-label="function table" style="border-collapse:collapse;table-layout:fixed;margin:0 auto;`
         + `border:${HEAVY} solid ${INK.ink};background:#fff">${rows}</table>`;
+    if (!Array.isArray(ctx.ftNotes)) return table;
+    // (`ftNotes`, the anchor chart's step states - detailed lesson 5: a tick or a cross beside each row the step
+    // tested, the newest step grey and earlier steps black, in a narrow column outside the table, so the
+    // drawing still fits a third of the chart)
+    const nw = NOTE_MM;
+    const notes = (p.rows || []).map((r, i) => {
+        const n = ctx.ftNotes[i];
+        return `<div style="height:${g.em(d.rowH)};display:flex;align-items:center;white-space:nowrap">${n ? markSvg(g, n.text === '✗', n.grey ? INK.grey : INK.ink) : ''}</div>`;
+    }).join('');
+    return `<div style="display:flex;justify-content:center;align-items:flex-start">${table}`
+        + `<div class="ft-notes" style="width:${g.em(nw)};padding-top:${g.em(d.headH + 0.5)};padding-left:${g.em(1.5)};box-sizing:border-box">${notes}</div></div>`;
+}
+const NOTE_MM = 8;
+/** A drawn tick (or cross), 1.5 pt, about a digit's x-height: a font tick is thin and falls back off Andika. */
+const markSvg = (g, cross, color) => `<svg viewBox="0 0 10 10" style="width:${g.em(5)};height:${g.em(5)};display:block" aria-label="${cross ? 'no' : 'yes'}">`
+    + (cross ? `<path d="M2 2 L8 8 M8 2 L2 8" fill="none" stroke="${color}" stroke-width="1.6" stroke-linecap="round"/>`
+        : `<path d="M1.5 5.5 L4 8 L8.5 2" fill="none" stroke="${color}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>`) + '</svg>';
+
+/**
+ * The anchor-chart step states of a one-step find-the-rule table (detailed lesson 5; the provider's
+ * four worked steps: look, the change, test every row, write the rule). Step 0 rings rows 1 and 2
+ * grey. + / −: step 1 writes the change in the machine's box, step 2 ticks rows 2 and 3. × / ÷: step 1
+ * tries "+ the change" in the box and crosses row 2; step 2 writes the real rule and ticks every row.
+ * Step 3 writes the rule in the frame. The newest marks grey, earlier ones black (P-LC-9). Any other
+ * table: blank, then answered grey on the last state.
+ */
+function ftStepState(p, steps, k, ctx) {
+    let n = Array.isArray(steps) ? steps.length : 0;
+    // (the chart's other examples, whole - roles/lesson.js finalDrawing: the steps plus one empty state, drawn at
+    // that state: every mark of the method in black - the wrong try crossed, the rule ticked on every row)
+    const whole = n === 5 && k === 4 && !((steps[4] && steps[4].marks) || []).length;
+    if (whole) n = 4;
+    const last = k >= n - 1;
+    const rule = p.rule || [];
+    const rows = p.rows || [];
+    const c = Object.assign({}, ctx, { state: whole ? 'answered' : last ? 'traced' : 'blank' });
+    const plain = p.task === 'rule' && rule.length === 1 && !p.check && n === 4 && rows.length >= 2 && p.machine;
+    if (!plain) return this.render(p, c);
+    const G = { '+': '+', '-': '−', x: '×', '/': '÷' };
+    const r0 = rule[0];
+    const addish = r0.op === '+' || r0.op === '-';
+    const gap = rows[0].y - rows[0].x;
+    const real = `n ${G[r0.op]} ${r0.n}`;
+    const tried = `n ${gap >= 0 ? '+' : '−'} ${Math.abs(gap)}`;
+    const notes = rows.map(() => null);
+    let mt = null;
+    if (whole) {
+        rows.forEach((r, i) => { if (i || !addish) notes[i] = { text: '✓', grey: false }; });
+        c.ftNotes = notes;
+        return this.render(Object.assign({}, p, { machineText: { text: real, grey: false }, ...(addish ? {} : { machineTried: tried }) }), c);
+    }
+    if (k === 0) c.ftRing = [0, 1];
+    if (addish) {
+        if (k >= 1) mt = { text: real, grey: k === 1 };
+        if (k >= 2) rows.forEach((r, i) => { if (i) notes[i] = { text: '✓', grey: k === 2 }; });
+    } else {
+        if (k === 1) { mt = { text: tried, grey: true }; notes[1] = { text: '✗', grey: true }; }
+        if (k >= 2) { mt = { text: real, grey: k === 2 }; rows.forEach((r, i) => { notes[i] = { text: '✓', grey: k === 2 }; }); }
+    }
+    c.ftNotes = notes;
+    return this.render(Object.assign({}, p, mt ? { machineText: mt } : {}), c);
 }
 
 /** The width a cell gives its content at the section's column count (unknown: one column). */
@@ -343,6 +412,8 @@ const lineW = (d) => Math.max(34, d.colW * 2 - 8);
 /** "Rule:" beside the frame when the row fits the cell, else "The rule is:" on its own line. */
 const fixRuleW = (p, g, d) => Math.max(d.boxW, ruleText(p.rule, { variable: false }).length * 0.5 * g.E + 4);
 function ruleInline(p, g, d, ctx, fx = { on: false }) {
+    // (`ruleBelow`, a payload flag - detailed lesson 5's exit slip, three tables across a 132.5 mm half: "The rule is:" above the frame)
+    if (p.ruleBelow) return false;
     const w = (p.support === 'line' ? lineW(d) + 0.6 * g.E + 2 : d.frameW) + (fx.on && !fx.below ? 3 + 4 * 0.55 * d.textMm + 1 + fixRuleW(p, g, d) : 0);
     return 5 * 0.55 * d.textMm + 2 + w <= availMm(ctx);
 }
@@ -522,4 +593,5 @@ register('function-table', {
         }));
     },
     layout() { return { card: 'card-medium-visual', checker: 'list', requiresVisual: true }; },
+    stepState: ftStepState,
 });

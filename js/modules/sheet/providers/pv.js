@@ -1120,3 +1120,55 @@ export const PV_PROVIDER_IDS = Object.freeze([
     ...Object.keys(RNL_SIZE).map((s) => `number_sense:${s}`),
     ...EST.map(([s]) => `number_sense:${s}`),
 ]);
+
+/* =============================================================================== number names */
+// composing:number_word_form (detailed lesson 1, 2026-10-16): words to numeral, numeral to words.
+// The item's own description is `q.pv` {kind: 'words', n, words, way}. The wrong answers are the
+// lesson's misconceptions: the 0 place dropped (305 -> 35), the parts written side by side
+// (305 -> 3005), teen / ty swapped (213 -> 230).
+const WORDS_TO_NUMBER = { iCan: 'I Can write a number from its name', instructionKey: 'standard-form',
+    steps: ['Read the hundreds word.', 'Read the last words as one number.', 'No tens or ones word? Write 0.', 'Write the digits.'],
+    say: '__ is __.', sayValues: (q) => { const p = pvOf(q); return p.n ? [p.words, p.n] : null; } };
+const NUMBER_TO_WORDS = { iCan: 'I Can write a number in words', instructionKey: 'number-words',
+    steps: ['Say the hundreds: three hundred.', 'Say the last two digits as one number.', 'Write the words.'],
+    say: '__ is __.', sayValues: (q) => { const p = pvOf(q); return p.n ? [p.n, p.words] : null; } };
+const swapTeen = (n) => { const t = Math.floor(n / 10) % 10, o = n % 10; return t === 1 && o > 2 ? n - 10 - o + o * 10 : null; };
+
+registerSkill('composing:number_word_form', {
+    strings: stringsBy((q) => (pvOf(q).way === 'to_words' ? NUMBER_TO_WORDS : null), WORDS_TO_NUMBER),
+    misconceptions: ['M-Z1', 'M-V9', 'M-L3'],
+    workedSteps: (q) => {
+        const p = pvOf(q);
+        const n = num(p.n);
+        if (!Number.isFinite(n)) return [];
+        const h = Math.floor(n / 100), r = n % 100;
+        if (p.way === 'to_words') {
+            return clampSteps([step(`${f(n)}: the ${h || 'no'} is in the hundreds place.`), step(`The last two digits read ${r}.`), step(`So ${f(n)} is ${p.words}.`, [{ slot: 'answer', value: String(p.words) }])]);
+        }
+        // H T O boxes (option answerSlot, the chart's words panels): each step writes its boxes.
+        if (q && q.cell && q.cell.payload && q.cell.payload.slot === 'hto') {
+            if (n === 1000) return clampSteps([step('"one thousand": 1 in the Th box.', [{ slot: 'pv-0', value: '1' }]),
+                step('No hundreds, tens or ones words: write 0, 0, 0.', [{ slot: 'pv-1', value: '0' }, { slot: 'pv-2', value: '0' }, { slot: 'pv-3', value: '0' }]), step('Read it: 1,000.')]);
+            const t = Math.floor(r / 10), o = r % 10;
+            const rest = String(p.words).split(' hundred')[1] ? String(p.words).split(' hundred')[1].trim() : '';
+            const two = !r ? 'No tens or ones words: write 0 tens, 0 ones.'
+                : r < 10 ? `"${rest}": no tens word, so 0 tens, ${o} ones.`
+                    : `"${rest}": ${t} ten${t === 1 ? '' : 's'}, ${o} ones.`;
+            return clampSteps([step(`"${String(p.words).split(' hundred')[0]} hundred": ${h} in the H box.`, [{ slot: 'pv-0', value: String(h) }]),
+                step(two, [{ slot: 'pv-1', value: String(t) }, { slot: 'pv-2', value: String(o) }]), step(`Read it: ${f(n)}.`)]);
+        }
+        return clampSteps([step(`"${String(p.words).split(' hundred')[0]} hundred": ${h} in the hundreds.`), step(r ? `The rest is ${r}: ${Math.floor(r / 10)} tens ${r % 10} ones.` : 'No tens or ones words: 0 tens 0 ones.'),
+            step(`Write ${f(n)}.`, [{ slot: 'answer', value: String(n) }])]);
+    },
+    wrongAnswer: (q) => {
+        const p = pvOf(q);
+        const n = num(p.n);
+        if (!Number.isFinite(n) || p.way === 'to_words') return null;
+        const h = Math.floor(n / 100), r = n % 100;
+        const c = [];
+        if (h && (Math.floor(n / 10) % 10 === 0 || n % 10 === 0)) c.push({ value: Number(String(n).replace(/0/g, '')) || h, misconception: 'M-Z1', explain: 'Left out the 0 place.' });
+        if (h) c.push({ value: Number(`${h * 100}${r || ''}`), misconception: 'M-V9', explain: 'Wrote the hundred and the rest side by side.' });
+        const s = swapTeen(n); if (s) c.push({ value: s, misconception: 'M-L3', explain: 'Heard the teen as a ty word.' });
+        return choose(q, c.filter((x) => x.value !== n));
+    },
+});

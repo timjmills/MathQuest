@@ -107,7 +107,12 @@
     "nlStep": "0U",
     "nlLabels": "0V",
     "nlMinor": "0W",
-    "nlHops": "0X"
+    "nlHops": "0X",
+    "answerSlot": "5P",
+    "winRows": "5Q",
+    "winCols": "5R",
+    "minFactor": "5S",
+    "ftTrap": "5T"
   },
   "blocks": {
     "0": {
@@ -294,7 +299,8 @@
       "words": "W",
       "missing": "I",
       "numerals": "U",
-      "hands": "B"
+      "hands": "B",
+      "even": "S"
     },
     "zeroPlace": {
       "none": "N",
@@ -726,7 +732,15 @@
       "10": "T",
       "auto": "A"
     },
-    "nlHops": {}
+    "nlHops": {},
+    "answerSlot": {
+      "line": "L",
+      "hto": "H"
+    },
+    "winRows": {},
+    "winCols": {},
+    "minFactor": {},
+    "ftTrap": {}
   },
   "scalarOnly": {
     "range": "decimal",
@@ -764,7 +778,11 @@
     "nlOn": "bool",
     "nlHops": "bool",
     "nlFrom": "decimal",
-    "nlTo": "decimal"
+    "nlTo": "decimal",
+    "winRows": "decimal",
+    "winCols": "decimal",
+    "minFactor": "decimal",
+    "ftTrap": "bool"
   },
   "subranges": {
     "3B-3M": "build lane k2 (BUILD_LIST.md)",
