@@ -43,7 +43,7 @@ export default {
     // The ★★★ last row: a × table whose first row also fits a + rule (2 → 4), and a − rule.
     edgeTest: 'ftTrapAny',
     // (a first row that fits two rules only on the ★★★ last rows - the Critical Atom's case is never practised early)
-    edgeOnlyLast: 'ftTrapAny',
+    edgeOnlyLast: 'ftTimesTrap',
     practicePages: 2,
     // Practice 1: + and − rules. Practice 2: × then + and −, numbers to 50, In out of order. The ★★★ last
     // row of each: the trap (row 1 fits two rules). The machine picture fades on the exit slip.
@@ -226,6 +226,7 @@ export default {
                 { do: 'Hand out the Number sense page.' },
                 { say: 'Band A: read each row. Write the answer.' },
                 { ask: '{ns.A.0.text}', note: 'Expected: [[{ns.A.0.ans}]]. Band B: the same five kinds, harder numbers.' },
+                { ask: '{ns.B.1.text}', note: 'Expected: [[{ns.B.1.ans}]].' },
             ] },
         { n: 3, name: 'Spaced retrieval', min: 3, page: '',
             rows: [
@@ -255,6 +256,7 @@ export default {
                 { say: 'Look at {we.0.rows}. Read row 1 across with me.' },
                 { ask: 'Bigger or smaller? By how much?', note: 'Expected ★: [[{we.0.rule}]].' },
                 { do: 'Pairs do {we.1.rows}: A reads a row, B tests it.', note: 'Expected ★: [[{we.1.rule}]].' },
+                { ask: 'Cell 2: is Out bigger or smaller?', note: 'Smaller, so −. Expected: [[{we.1.rule}]].' },
                 { say: 'In ___, out ___. The rule is ___.', note: 'The Say frame, for every row.' },
                 { do: 'Cell 3, {we.2.rows}: test + {we.2.d} on row 2 together.', note: 'It fails. Expected ★: [[{we.2.rule}]].' },
             ] },
@@ -290,10 +292,18 @@ export default {
         'The sign written + or “add”; × written x.',
         'One-step rules only: “+ 2 then …” is not the answer.',
         'Said aloud: “add 3”, “plus 3” and “3 more” are all right.',
+        'The number in the box with no sign in the circle: not yet right; ask “add or take away?”.',
+        'A right rule with no rows tested: right; ask the pupil to test it aloud.',
     ],
     wrongAnswers: [
         { wrote: '{exit.2.wrong.addfortimes} for {exit.2.rows}', mistake: 'One pair only', next: 'Test row 2 aloud.' },
         { wrote: '{exit.0.wrong.neighbouroutputs} for {exit.0.rows}', mistake: 'Down the Out column', next: 'Reading strip: one row across.' },
         { wrote: '+ {exit.1.k} for {exit.1.rows}', mistake: 'Sign flipped', next: '“Bigger or smaller?” first.' },
+        { wrote: '{exit.1.wrong.neighbouroutputs} for {exit.1.rows}', mistake: 'Down the Out column', next: 'Reading strip: one row across.' },
+        { wrote: '{we.0.wrong.neighbouroutputs} for {we.0.rows} (Guided 1)', mistake: 'Down the Out column', next: 'Cover the rows; read row 1 across.' },
+        { wrote: '{we.1.wrong.signflip} for {we.1.rows} (Guided 2)', mistake: 'Sign flipped', next: 'Point: is Out smaller? Then −.' },
+        { wrote: '{we.2.wrong.addfortimes} for {we.2.rows} (Guided 3)', mistake: 'One pair only', next: 'Test it on row 2 together.' },
+        { wrote: '{cq.wrong.neighbouroutputs} for {cq.rows} (Check Question)', mistake: 'Down the Out column', next: 'Cover the rows; read one across.' },
+        { wrote: '{wp.wrong.addfortimes} for the story (Word problem)', mistake: 'One pair only', next: 'Test the rule on {wp.x2} boxes too.' },
     ],
 };

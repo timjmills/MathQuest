@@ -277,9 +277,13 @@ function refAccepts(sk, cand, key, seen, kept, pg = '', row = '', words = true) 
         if (sk.avoidKeys && mulUsed(k, sk.avoidKeys)) return false;
         // (a mult-grid window that is a near twin of one on this page or another page of the pack - lesson 4)
         if (gridKeyOf(k) && (gridNear(k, sk.avoidKeys || [], true) || gridNear(k, seen))) return false;
-        // (`gridApart` windows on a Practice page (`lr6`), lesson 4 critic r1 D5: none shares a box with another window of its
-        // page - turned boxes counted - nor repeats a row segment of another page's window; the lesson sheet picks apart)
-        if (gridKeyOf(k) && sk.gridApart && sk.lr6 && (gridShares(k, [...seen].filter((x) => /^key:grid/.test(x))) || gridSegment(k, sk.avoidKeys || []))) return false;
+        // (`gridApart` windows, lesson 4 critic r1 D5 - lead ruling r4: two windows of one page share AT MOST HALF their boxes,
+        // turned boxes counted; a Practice window (`lr6`) is never a copy of another page's window - all its boxes inside one)
+        if (gridKeyOf(k) && sk.gridApart && (gridOverHalf(k, [...seen].filter((x) => /^key:grid/.test(x))) || (sk.lr6 && gridCopy(k, sk.avoidKeys || [])))) return false;
+        // (`gridRevisit` on a Practice ref, lesson 4 r4: Practice revisits the lesson sheet's ground - each window holds more
+        // than half of, or lies more than half inside, an earlier page's window, never a copy - so the FRESH windows are left
+        // for the exit slip and the Check Question, which must be fresh against every page)
+        if (gridKeyOf(k) && sk.gridRevisit && sk.lr6 && !gridOverHalf(k, sk.avoidKeys || [], true)) return false;
         if (!refHardOk(sk, cand)) return false;
         if (sk.edge) { const t = LESSON_CASE_TESTS[sk.edgeTest || 'pvEdge']; if (t && !t({ q: cand })) return false; }
         if (seen.has(`key:${k}`)) return false;
@@ -360,11 +364,17 @@ const gridBoxes = (k) => { const g = gridKeyOf(k); const out = new Set(); if (!g
 /** Does window `k` share any box (turned boxes counted) with a window of one task in `keys`? */
 export const gridShares = (k, keys) => { const a = gridKeyOf(k); if (!a) return false; const A = gridBoxes(k);
     for (const u of keys) { const b = gridKeyOf(u); if (!b || b.t !== a.t) continue; for (const x of gridBoxes(u)) if (A.has(x)) return true; } return false; };
-/** Does window `k` repeat a row segment (two boxes or more of one row, either way round) of a window in `keys`? */
-const gridSegment = (k, keys) => { const a = gridKeyOf(k); if (!a) return false;
-    const ov = (x0, x1, y0, y1) => Math.max(0, Math.min(x1, y1) - Math.max(x0, y0) + 1);
-    for (const u of keys) { const b0 = gridKeyOf(u); if (!b0 || b0.t !== a.t) continue;
-        for (const b of [b0, { r0: b0.c0, r1: b0.c1, c0: b0.r0, c1: b0.r1 }]) if ((ov(a.r0, a.r1, b.r0, b.r1) >= 1 && ov(a.c0, a.c1, b.c0, b.c1) >= 2) || (ov(a.c0, a.c1, b.c0, b.c1) >= 1 && ov(a.r0, a.r1, b.r0, b.r1) >= 2)) return true; }
+/** The cells of a window key as unordered boxes, one entry a cell (a window may hold a box and its turn: two cells). */
+const gridCells = (k) => { const g = gridKeyOf(k); const out = []; if (!g) return out; for (let r = g.r0; r <= g.r1; r++) for (let c = g.c0; c <= g.c1; c++) out.push(`${Math.min(r, c)},${Math.max(r, c)}`); return out; };
+/** Lead ruling (lesson 4 r4): do window `k` and a window of one task in `keys` share MORE than half the cells of either -
+ *  a cell shared when its box (turned boxes counted) is in the other window? Exported for the gate's twin. */
+export const gridOverHalf = (k, keys, anyTask = false) => { const a = gridKeyOf(k); if (!a) return false; const ca = gridCells(k), A = new Set(ca);
+    for (const u of keys) { const b = gridKeyOf(u); if (!b || (b.t !== a.t && !anyTask)) continue; const cb = gridCells(u), B = new Set(cb);
+        if (ca.filter((x) => B.has(x)).length * 2 > ca.length || cb.filter((x) => A.has(x)).length * 2 > cb.length) return true; }
+    return false; };
+/** Is window `k` a copy of a window (any task) in `keys` - every one of its boxes (turned counted) inside that one window? */
+export const gridCopy = (k, keys) => { const a = gridKeyOf(k); if (!a) return false; const ca = gridCells(k);
+    for (const u of keys) { const b = gridKeyOf(u); if (!b) continue; const B = new Set(gridCells(u)); if (ca.every((x) => B.has(x))) return true; }
     return false; };
 export const gridNear = (k, keys, sameShape = false, anyTask = false) => {
     const a = gridKeyOf(k);
@@ -3056,6 +3066,9 @@ function dealOne(ref, seed, used, want, avoidAns = null, near = null, names = nu
     // the chart, lesson sheet, Practice and word-problem facts), then any - V22: a turn-around when the pool is spent)
     if (ref.fresh && lessonKeys) { try { return dealOne1(ref, seed, used, want, avoidAns, near, names, lessonKeys); } catch (e) { /* the pool is spent */ } }
     if (ref.pageGroup && !ref.gridFresh) { try { return dealOne1(Object.assign({}, ref, { gridFresh: true }), seed, used, want, avoidAns, near, names, null); } catch (e) { /* none left: the same shape only */ } }
+    // (a fresh window of a page group - the exit slip, lesson 4 r4 - first shares NO box with the slip's other windows; else
+    // at most half of them, the lead ruling for any two windows of one page)
+    if (ref.pageGroup && ref.gridFresh) { try { return dealOne1(Object.assign({}, ref, { gridDisjoint: true }), seed, used, want, avoidAns, near, names, null); } catch (e) { /* none disjoint: at most half */ } }
     return dealOne1(ref, seed, used, want, avoidAns, near, names, null);
 }
 const DL_GROUPS = new WeakMap();
@@ -3088,9 +3101,11 @@ function dealOne1(ref, seed, used, want, avoidAns, near, names, fresh) {
         // (`gridFresh`, an exit window's first try: no window of ANY shape it mostly repeats - it is not inside a Practice one)
         // (a fresh window is fresh against every task's window too: the Prerequisite Check's fill windows - critic r1 D3)
         if (gridNear(key, used, !ref.gridFresh, !!ref.gridFresh)) { why.used++; continue; }
+        // (lead ruling r4: fresh means no window of any page, any task, holds more than half its boxes - turned boxes counted)
+        if (ref.gridFresh && gridOverHalf(key, used, true)) { why.used++; continue; }
         // (`pageGroup`, lesson 4: the refs of one page - the exit slip - keep its windows apart, any shape)
         const grp = ref.pageGroup ? (DL_GROUPS.get(used) || DL_GROUPS.set(used, new Map()).get(used)) : null;
-        if (grp && (gridNear(key, grp.get(ref.pageGroup) || []) || gridShares(key, grp.get(ref.pageGroup) || []))) { why.near++; continue; }
+        if (grp && (gridNear(key, grp.get(ref.pageGroup) || []) || (ref.gridDisjoint ? gridShares : gridOverHalf)(key, grp.get(ref.pageGroup) || []))) { why.near++; continue; }
         // (and no two windows of one grid row with the same rows or columns, either way round - the window form of LR-6's × rule)
         const spans = (k) => (String(k).match(/^grid(\d+-\d+)x(\d+-\d+)/) || []).slice(1);
         // (one grid row of the slip is two windows: `pageCols`, default 2)

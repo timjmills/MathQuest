@@ -53,7 +53,7 @@ export default {
     practicePages: 1,
     // (Practice windows are 3 x 3, the lesson sheet's 3 x 4: the 2-9 chart holds too few 3 x 3 windows that are not
     // near twins - more than half their boxes shared, either way round - for eleven of one shape)
-    practiceSheets: [{ steps: true, skill: CHART({ tries: 600, allTest: 'chartFresh' }, { winRows: 2, winCols: 3, band: 144 }), shape: [6, 2], edgeLast: { per: 6, cols: 2, first: true } }],
+    practiceSheets: [{ steps: true, skill: CHART({ tries: 600, allTest: 'chartFresh', gridRevisit: true }, { winRows: 2, winCols: 3, band: 144 }), shape: [6, 2], edgeLast: { per: 6, cols: 2, first: true, wants: ['chartEdge', 'chartEdge'] } }],
     // (no Mixed page: the facts the windows rest on are P0 and the spaced retrieval; one full Practice page)
 
     // The lesson's own names for a dealt window: first even row / column, an odd x odd box, a reason fact.
@@ -100,6 +100,8 @@ export default {
         ],
         chant: '',
         guidedRows: 2,
+        // (r4, E9b: the sheet's spare height goes into its cells - V22 OR-a, the work space first - not a blank band)
+        growAll: true,
         practiceShape: [4, 2],
         format: { kind: 'numbered steps with icons', why: 'The step pupils break is step 2: they look at the row only.' },
         example: { test: 'chartExample' },
@@ -113,7 +115,7 @@ export default {
     prerequisites: [
         { atom: 1, items: 1, ref: CB(2), lesson: { id: '2.OA.C.3', title: 'Even numbers: count by 2s' } },
         { atom: 2, items: 4, ref: FACT([2, 4], { minNum: 12, maxNum: 36 }), lesson: { id: '3.OA.C.7', title: 'Multiply by 2 and 4' } },
-        { atom: 3, items: 1, ref: CHART({}, { task: 'fill', winRows: 2, winCols: 3 }), lesson: { id: '3.OA.C.7', title: 'Read the multiplication chart' } },
+        { atom: 3, items: 1, ref: CHART({ gridRevisit: true }, { task: 'fill', winRows: 2, winCols: 3 }), lesson: { id: '3.OA.C.7', title: 'Read the multiplication chart' } },
     ],
 
     // ------------------------------------------------------------------ P1 Number sense (earlier content)
@@ -142,9 +144,9 @@ export default {
     // (three 2 x 3 windows, each fresh: no other page's window holds half its boxes, either way round. The 2-9 chart is
     // spent by the lesson's pages, so they may use the 11 and 12 rows (chartFresh, products to 100); a fourth finds none)
     exit: [
-        { case: 'an even row (odd columns)', ref: CHART({ pageGroup: 'exit', gridFresh: true, allTest: 'chartTo100' }, { winRows: 2, winCols: 3, band: 144 }), want: ['chartColsOdd', 'chartIn9'], cols: 1, group: 'a', detects: 'Misses the even row.' },
-        { case: 'the odd row: its even column (Critical Atom)', ref: CHART({ pageGroup: 'exit', gridFresh: true, allTest: 'chartTo100' }, { winRows: 2, winCols: 3, band: 144 }), want: ['chartMixed', 'chartRowOnly'], cols: 2, group: 'bc', detects: 'Leaves an even column white.' },
-        { case: 'odd x odd stays white', ref: CHART({ pageGroup: 'exit', gridFresh: true, allTest: 'chartTo100' }, { winRows: 2, winCols: 3, band: 144 }), want: 'chartOddOdd', cols: 2, group: 'bc', detects: 'Shades an odd × odd box.' },
+        { case: 'an even row (odd columns)', ref: CHART({ pageGroup: 'exit', gridFresh: true, allTest: 'chartFresh' }, { winRows: 2, winCols: 3, band: 144 }), want: ['chartColsOdd', 'chartIn9'], cols: 1, group: 'a', detects: 'Misses the even row.' },
+        { case: 'the odd row: its even column (Critical Atom)', ref: CHART({ pageGroup: 'exit', gridFresh: true, allTest: 'chartFresh' }, { winRows: 2, winCols: 3, band: 144 }), want: ['chartMixed', 'chartRowOnly'], cols: 2, group: 'bc', detects: 'Leaves an even column white.' },
+        { case: 'odd x odd stays white', ref: CHART({ pageGroup: 'exit', gridFresh: true, allTest: 'chartFresh' }, { winRows: 2, winCols: 3, band: 144 }), want: 'chartOddOdd', cols: 2, group: 'bc', detects: 'Shades an odd × odd box.' },
     ],
     exitInstruction: 'Shade every even product.',
 
@@ -194,7 +196,7 @@ export default {
         { name: 'Any odd factor is odd', step: 2, looks: '{chart.ca} × {chart.cb} left white', fix: 'One even number is enough.', option: '', caught: 'Exit b' },
         { name: 'Columns only', step: 1, looks: 'The {exit.0.ec} column shaded, the {exit.0.er} row white', fix: 'Rows first, then columns: finger on each header.', option: '', caught: 'Exit a' },
     ],
-    checkQuestion: { want: 'chartMixed', correct: 'C', ref: CHART({ gridFresh: true, allTest: 'chartTo100' }, { winRows: 2, winCols: 4, band: 144 }) },
+    checkQuestion: { want: ['chartMixed', 'chartRowOnly'], correct: 'C', ref: CHART({ gridFresh: true, allTest: 'chartFresh' }, { winRows: 2, winCols: 3, band: 144 }) },
 
     // ------------------------------------------------------------------ T3-T5 delivery scripts
     sections: [

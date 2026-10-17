@@ -251,7 +251,8 @@ export const CASE_TESTS = Object.freeze({
     chartEleven: (it) => { const p = multGridOf(it); return !!p && CASE_TESTS.chartMixed(it) && p.rows.concat(p.cols).some((v) => v >= 11); },
     // (the ★★★ last row, critic r1 D5: the "tens digit decides" trap - two even products with an odd tens digit, 36 56 72 -
     // or an odd x odd product of 35 or more; the rows above hold neither)
-    chartTrap: (it) => { const p = multGridOf(it); if (!p) return false; const pr = [...new Set(p.rows.flatMap((r) => p.cols.map((c) => r * c)))]; return pr.filter((v) => v % 2 === 0 && v >= 10 && Math.floor(v / 10) % 2 === 1).length >= 2; },
+    // (r4, lead ruling: a REAL trap - even products in the 30s, 50s, 70s or 90s; 12 or 16 is no trap, every window holds one)
+    chartTrap: (it) => { const p = multGridOf(it); if (!p) return false; const pr = [...new Set(p.rows.flatMap((r) => p.cols.map((c) => r * c)))]; return pr.filter((v) => v % 2 === 0 && v >= 30 && Math.floor(v / 10) % 2 === 1).length >= 2; },
     // (the row-only mistake shows on it: an odd row's even box whose product no even row holds)
     chartRowOnly: (it) => { const p = multGridOf(it); if (!p) return false; const er = new Set(p.rows.filter((r) => r % 2 === 0).flatMap((r) => p.cols.map((c) => r * c)));
         return p.rows.some((r) => r % 2 === 1 && p.cols.some((c) => c % 2 === 0 && !er.has(r * c))); },

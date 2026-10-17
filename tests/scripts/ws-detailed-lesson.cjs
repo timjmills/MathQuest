@@ -265,6 +265,11 @@ function poolCheck(POOL) {
         msg: `${all.length} places (${first.size} numbers), usable pool ${usable} (pool ${inPool.size} keys, ${ids.size} facts, recomputed from its ${d.kind || '?'} rule: ${ruleOk ? 'matches' : 'MISMATCH'}; forbidden ${forb.size ? [...forb].join(', ') : 0}); repeats ${rep.length ? rep.join(', ') : 0}; chart examples or their turn-arounds returning ${chartBack.length ? chartBack.join(', ') : 0}; same-page turn-arounds ${turns.length ? turns.join(', ') : 0}; outside the pool / forbidden ${bad.length ? bad.join(', ') : 0}; items without a rep ${noRep.length}` };
 }
 
+// mult-grid windows (lesson 4): a pool key "grid r0-r1 x c0-c1:task", its cells as unordered boxes (a turned box is the same
+// box; one entry a cell), and the lead ruling's near twin - more than half of either window's cells inside the other.
+const WIN = (k) => { const m = String(k || '').match(/^grid(\d+)-(\d+)x(\d+)-(\d+)(?::(\w+))?$/); return m ? { r0: +m[1], r1: +m[2], c0: +m[3], c1: +m[4], t: m[5] || '' } : null; };
+const CELLS = (k) => { const g = WIN(k), o = []; if (g) for (let r = g.r0; r <= g.r1; r++) for (let c = g.c0; c <= g.c1; c++) o.push(`${Math.min(r, c)},${Math.max(r, c)}`); return o; };
+const OVER = (a, b) => { const A = CELLS(a), B = CELLS(b); return A.filter((x) => B.includes(x)).length * 2 > A.length || B.filter((x) => A.includes(x)).length * 2 > B.length; };
 /* ------------------------------------------------------------------------- evaluate */
 // A + / − place's sign and numbers ("7+6" -> {op: '+', a: 7, b: 6}), else null.
 const OPI = (x) => { const m = canon((x && x.item) || '').match(/^(\d+)([+−])(\d+)$/); return m ? { op: m[2], a: Number(m[1]), b: Number(m[3]) } : null; };
@@ -412,27 +417,38 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
         }
         // (× / ÷ - lead ruling 2026-10-17, lesson 3a critic r2 m1: V22's both-within-2 cannot be met on a 10-item ×
         // page, so its LR-6 rule is the + analogue: no first factor (÷: no divisor) twice in one grid row)
-        let mdN = 0;
+        let mdN = 0, winN = 0;
         const MD = (x) => { const m = String((x && x.item) || '').match(/^(\d+)\s*([x×÷])\s*(\d+)$/); return m ? { op: m[2] === '÷' ? '÷' : '×', f: Number(m[2] === '÷' ? m[3] : m[1]) } : null; };
         // (Practice, Mixed and exit pages: a Prerequisite Check's × 2 recall row is one table on purpose)
         for (const pgid of [...new Set(pl.filter((x) => /^P(4|6)/.test(x.page)).map((x) => x.page))]) {
             const rows = {};
             for (const x of pl.filter((y) => y.page === pgid && MD(y) && y.rep !== 'count_by_tables')) { mdN++; const o = MD(x); const k = `${o.op}${x.grid || 0}:${x.row}`; (rows[k] = rows[k] || []).push(o.f); }
             for (const [r, a] of Object.entries(rows)) { const d2 = a.filter((v, i) => a.indexOf(v) !== i); if (d2.length) probs.push(`${r[0] === '÷' ? 'divisor' : 'first factor'} ${d2[0]} twice in a row (${r.slice(1)}) on ${pgid}`); }
-            // (mult-grid windows - lesson 4 critic r1 D5: no two windows of one page share a box, turned boxes counted)
-            { const wins = pl.filter((y) => y.page === pgid).map((y) => [y.item, String(y.item || '').match(/^grid(\d+)-(\d+)x(\d+)-(\d+)(:\w+)?/)]).filter((w) => w[1]);
-                const box = (m) => { const o = new Set(); for (let r = +m[1]; r <= +m[2]; r++) for (let c = +m[3]; c <= +m[4]; c++) o.add(`${Math.min(r, c)},${Math.max(r, c)}`); return o; };
-                for (let i = 0; i < wins.length; i++) for (let j = i + 1; j < wins.length; j++) { const A = box(wins[i][1]); if ((wins[i][1][5] || '') === (wins[j][1][5] || '') && [...box(wins[j][1])].some((x) => A.has(x))) probs.push(`windows ${wins[i][0]} / ${wins[j][0]} share a box on ${pgid}`); } }
             // (mult-grid windows - lesson 4 r2, lead: no two windows in one grid row with the same rows or the same columns)
             const gr = {};
             for (const x of pl.filter((y) => y.page === pgid)) { const m = String(x.item || '').match(/^grid(\d+-\d+)x(\d+-\d+)/); if (m) for (const sp of [m[1], m[2]]) { const k = `${x.grid || 0}:${x.row}:${sp}`; if (gr[k]) probs.push(`windows ${gr[k]} / ${x.item} share ${sp} in a row on ${pgid}`); else gr[k] = x.item; } }
+        }
+        // (mult-grid windows - lesson 4 critic r1 D5, lead ruling r4, on every pupil page: two windows of one page share AT
+        // MOST HALF their boxes, turned boxes counted - more than half of either window's cells in the other is a near twin; a
+        // Practice window is never a copy of an earlier page's window - all its boxes inside that one; an exit window is
+        // fresh - no window of another page, of any task, holds more than half its cells; the ★★★ row is the windows' real
+        // edge case, so no Practice row above it holds one. WIN / CELLS / OVER are above evaluate.)
+        for (const pgid of [...new Set(pl.filter((x) => /^P\d/.test(x.page) && !/-key$/.test(x.page) && WIN(x.item)).map((x) => x.page))]) {
+            const wins = pl.filter((y) => y.page === pgid && WIN(y.item));
+            const others = pl.filter((u) => WIN(u.item) && u.page !== pgid && !/-key$/.test(u.page));
+            const before = pl.slice(0, pl.findIndex((x) => x.page === pgid)).filter((u) => WIN(u.item) && !/-key$/.test(u.page));
+            for (let i = 0; i < wins.length; i++) for (let j = i + 1; j < wins.length; j++) if (WIN(wins[i].item).t === WIN(wins[j].item).t && OVER(wins[i].item, wins[j].item)) probs.push(`windows ${wins[i].item} / ${wins[j].item} share more than half their boxes on ${pgid}`);
+            if (/^P4/.test(pgid)) for (const w of wins) { const c = before.find((u) => CELLS(w.item).every((x) => CELLS(u.item).includes(x))); if (c) probs.push(`window ${w.item} on ${pgid} copies ${c.item} (${c.page})`); }
+            if (/^P6/.test(pgid)) for (const w of wins) { const c = others.find((u) => OVER(w.item, u.item)); if (c) probs.push(`exit window ${w.item} not fresh: ${c.item} (${c.page}) holds more than half`); }
+            if (/^P4-\d/.test(pgid)) { const last = Math.max(...pl.filter((x) => x.page === pgid).map((x) => x.row)); wins.filter((w) => w.row !== last && edge.has(w.item)).forEach((w) => probs.push(`${w.item} an edge case above the last row on ${pgid}`)); }
+            winN += wins.length;
         }
         // (`edgeOnly` - a description's declared case, lesson 3a r4 m3: only on the ★★★ last row of a Practice page)
         const eo = R.pool.edgeOnly;
         if (eo) for (const pgid of prPages) { const its = pl.filter((x) => x.page === pgid); const last = Math.max(...its.map((x) => x.row));
             its.filter((x) => x.row !== last && eo.items.includes(x.item)).forEach((x) => probs.push(`${x.item} (${eo.test}) before the last row on ${pgid}`));
             if (its.filter((x) => eo.items.includes(x.item)).length > 1) probs.push(`more than one ${eo.test} on ${pgid}`); }
-        e24b = { ok: !probs.length && prPages.length > 0, msg: probs.length ? probs.join('; ') : `${prPages.length} Practice pages: last rows all edge cases (${[...edge].length} edge numbers dealt); no twin answers on any page; near twins checked for one-number and + / − items (${opN} + / −: no first addend twice in a grid row, no number taken away twice, both numbers within 2); ${mdN} × / ÷ items: no first factor / divisor twice in a grid row${eo ? `; ${eo.test} only on the last row, at most one a page` : ''}` };
+        e24b = { ok: !probs.length && prPages.length > 0, msg: probs.length ? probs.join('; ') : `${prPages.length} Practice pages: last rows all edge cases (${[...edge].length} edge numbers dealt); no twin answers on any page; near twins checked for one-number and + / − items (${opN} + / −: no first addend twice in a grid row, no number taken away twice, both numbers within 2); ${mdN} × / ÷ items: no first factor / divisor twice in a grid row${winN ? `; ${winN} windows: no two of a page share more than half their boxes, no Practice window copies an earlier one, exit windows fresh, no edge case above a ★★★ row` : ''}${eo ? `; ${eo.test} only on the last row, at most one a page` : ''}` };
     }
     row('E24b', 'Practice last row only edge cases (★★★); LR-6 no twin answers and no near twins (one skill, numbers within 2) on a page; + / − items (stories too): no first addend twice in a grid row or three running, no number taken away twice, no near twins (both numbers within 2, place by place: V22 2983); × / ÷ (lead ruling): no first factor / divisor twice in a grid row; a declared edgeOnly case only on the last row', e24b.msg, e24b.ok);
     // E31 (lesson 2 r4, critic r2 D1 / D4): a lesson that declares its SITUATIONS (put together, add to)
