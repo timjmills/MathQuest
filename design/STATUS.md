@@ -489,6 +489,12 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
   beats a stale #map hash; ws-teacher-library opens the Start tab); build list gains `mult_standard` (owner: standard-algorithm
   multiplication 2x1, 3x1, 4x1, 2x2, 3x2 as one skill with a size option). Full gates OK; print-lint 460/33. Owner: STOP after this.
   Still paused on branches: lessons 6-10 (-wip-detailed-lessons-2), Lane D, fraction key — see their entries.
+- 2026-10-17 ~13:50: Owner requests: (1) White Rose page must clearly list, PER LESSON and PER GRADE/DOMAIN, every skill that
+  will be made to fully cover the lesson/standard — builder on `claude/sweet-newton-c8wrv1-wip-wrm-tomake` (not merged yet).
+  (2) NEW RULE (CLAUDE.md "A distinct option is ALSO a findable skill"): an option different enough to be its own lesson/page is
+  also a named, findable PRESET skill that opens the host skill with those options set. Not built yet: needs a preset registry
+  (skill id -> {host, opts}) wired into data.js/skill finder/share codes/generateQuestionFor, then an audit of existing options
+  (first candidates: multiply tiles 21/31/22, the area-model options, count_by_tables tables) and a flag on build-list option entries.
 - Held for after these land: Lane B answer boxes + regroup boxes (spec `design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md`),
   placevalue:identify write-value (spec `design/audit/runs/next-session/PV-IDENTIFY-WRITE-VALUE-SPEC.md`).
 
