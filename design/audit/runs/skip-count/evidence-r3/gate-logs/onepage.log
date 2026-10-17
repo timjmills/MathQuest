@@ -1,0 +1,33 @@
+ok   A4 | default                                 identical to base; 1 page + 1 key page, 12 items
+ok   A4 | max blanks (100 %, first only)          identical to base; 1 page + 1 key page, 12 items
+ok   A4 | max blanks (100 %, first two)           identical to base; 1 page + 1 key page, 12 items
+ok   A4 | half                                    identical to base; 1 page + 1 key page, 12 items
+ok   A4 | 20 % blank                              identical to base; 1 page + 1 key page, 12 items
+ok   A4 | 90 % blank, first only                  identical to base; 1 page + 1 key page, 12 items
+ok   Letter | default                             identical to base; 1 page + 1 key page, 12 items
+ok   Letter | max blanks (100 %, first only)      identical to base; 1 page + 1 key page, 12 items
+ok   Letter | max blanks (100 %, first two)       identical to base; 1 page + 1 key page, 12 items
+ok   Letter | half                                identical to base; 1 page + 1 key page, 12 items
+ok   Letter | 20 % blank                          identical to base; 1 page + 1 key page, 12 items
+ok   Letter | 90 % blank, first only              identical to base; 1 page + 1 key page, 12 items
+ok   A4 | invariants Boxes: 1 page + 1 key, 12 rows, one line each true; 8 rows at 16 pt with columns aligned true; 3-digit rows >= 14.7 pt
+ok   A4 | invariants Lines: 1 page + 1 key, 12 rows, one digit size on every row true (16.0-16.0 pt)
+ok   Letter | invariants Boxes: 1 page + 1 key, 12 rows, one line each true; 8 rows at 16 pt with columns aligned true; 3-digit rows >= 14.7 pt
+ok   Letter | invariants Lines: 1 page + 1 key, 12 rows, one digit size on every row true (16.0-16.0 pt)
+ok   A4 | rows: five rows                    5 of 5 rows, 1 page + 1 key page, each once, in order; panel says 5; tab text >= 14.6 pt
+ok   A4 | rows: wide rows first              8 of 8 rows, 1 page + 1 key page, each once, in order; panel says 8; tab text >= 14.0 pt
+ok   A4 | rows: twelve rows, shuffled order  12 of 12 rows, 1 page + 1 key page, each once, in order; panel says 12; tab text >= 15.4 pt
+ok   A4 | rows: twelve wide rows (cut)       7 of 12 rows, 1 page + 1 key page, each once, in order; tight: one more row makes 2 pages; panel says 7; tab text >= 14.7 pt
+ok   A4 | rows: one row                      1 of 1 rows, 1 page + 1 key page, each once, in order; panel says 1; tab text >= 15.4 pt
+ok   A4 | rows: seven rows by 1,000s (cut)   7 of 7 rows, 1 page + 1 key page, each once, in order; panel says 7; tab text >= 14.7 pt
+ok   A4 | rows: wide and plain mixed (cut)   8 of 12 rows, 1 page + 1 key page, each once, in order; tight: one more row makes 2 pages; panel says 8; tab text >= 14.0 pt
+ok   A4 | rows: wide row in the middle       7 of 7 rows, 1 page + 1 key page, each once, in order; panel says 7; tab text >= 14.1 pt
+ok   Letter | rows: five rows                    5 of 5 rows, 1 page + 1 key page, each once, in order; panel says 5; tab text >= 14.6 pt
+ok   Letter | rows: wide rows first              8 of 8 rows, 1 page + 1 key page, each once, in order; panel says 8; tab text >= 14.0 pt
+ok   Letter | rows: twelve rows, shuffled order  12 of 12 rows, 1 page + 1 key page, each once, in order; panel says 12; tab text >= 15.4 pt
+ok   Letter | rows: twelve wide rows (cut)       6 of 12 rows, 1 page + 1 key page, each once, in order; tight: one more row makes 2 pages; panel says 6; tab text >= 14.7 pt
+ok   Letter | rows: one row                      1 of 1 rows, 1 page + 1 key page, each once, in order; panel says 1; tab text >= 15.4 pt
+ok   Letter | rows: seven rows by 1,000s (cut)   6 of 7 rows, 1 page + 1 key page, each once, in order; tight: one more row makes 2 pages; panel says 6; tab text >= 14.7 pt
+ok   Letter | rows: wide and plain mixed (cut)   8 of 12 rows, 1 page + 1 key page, each once, in order; tight: one more row makes 2 pages; panel says 8; tab text >= 14.0 pt
+ok   Letter | rows: wide row in the middle       7 of 7 rows, 1 page + 1 key page, each once, in order; panel says 7; tab text >= 14.1 pt
+wave1-c2-onepage: OK

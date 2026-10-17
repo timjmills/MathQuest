@@ -1,0 +1,2020 @@
+{
+  "skill": "multiplication:count_by_tables",
+  "category": "multiplication",
+  "skillId": "count_by_tables",
+  "label": "Skip counting: count by 1–12",
+  "grade": "3",
+  "dir": "multiplication__count_by_tables",
+  "roles": {
+    "scripted-model": {
+      "fits": {
+        "cols": 2,
+        "rows": 4,
+        "pages": 1,
+        "note": "Fits: 4 states, 1 page.",
+        "sections": [
+          {
+            "cols": 2,
+            "rows": 4,
+            "line": "Fits: 4 states, 1 page."
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 283712,
+      "title": "I Can count by 1 to 12",
+      "notes": [],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 2. Write the missing numbers.",
+          "ans": "8, 10, 16, 18, 22",
+          "measured": {
+            "1": {
+              "hMm": 26.9,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.9,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.9,
+              "fits": false,
+              "slackMm": -53.2
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "scripted-model-p1.png",
+          "words": 122,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "scripted-model-key-p1.png",
+          "words": 122,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          4
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 65
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          4
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 65
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    },
+    "guided": {
+      "fits": {
+        "cols": 1,
+        "rows": 5,
+        "pages": 1,
+        "note": "Fits: 1 columns x 5 rows, 5 guided cells.",
+        "sections": [
+          {
+            "cols": 1,
+            "rows": 5,
+            "cellH": 38.69316666666667,
+            "line": "Fits: 1 columns x 5 rows, 5 guided cells."
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 972334,
+      "title": "I Can count by 1 to 12",
+      "notes": [],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 2. Write the missing numbers.",
+          "ans": "6, 12, 14, 20, 24",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 3. Write the missing numbers.",
+          "ans": "12, 18, 24, 30, 36",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 4. Write the missing numbers.",
+          "ans": "16, 20, 32, 40, 48",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 5. Write the missing numbers.",
+          "ans": "15, 25, 40, 45, 55",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 6. Write the missing numbers.",
+          "ans": "24, 36, 48, 54, 72",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "guided-p1.png",
+          "words": 163,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "guided-key-p1.png",
+          "words": 186,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          5
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 75
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          5
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 95
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    },
+    "independent": {
+      "fits": {
+        "cols": 1,
+        "rows": 8,
+        "perPage": 8,
+        "pages": 1,
+        "note": "Fits: 1 column x 8 rows, 8 per page, 1 page. Digits 16 pt. Dense: 1 x 8, cells sized to the problems.",
+        "sections": [
+          {
+            "cols": 1,
+            "rows": 8,
+            "perPage": 8,
+            "pages": 1,
+            "cellW": 186,
+            "cellH": 28.5,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Dense: 1 x 8, cells sized to the problems.",
+            "line": "Fits: 1 column x 8 rows, 8 per page, 1 page. Digits 16 pt. Dense: 1 x 8, cells sized to the problems.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 26.6,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 244652,
+      "title": "I Can count by 1 to 12",
+      "notes": [
+        "Dense: 1 x 8, cells sized to the problems."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 2. Write the missing numbers.",
+          "ans": "8, 10, 16, 18, 24",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -65.6
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 3. Write the missing numbers.",
+          "ans": "12, 15, 21, 27, 33",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -65.6
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 4. Write the missing numbers.",
+          "ans": "16, 24, 28, 40, 48",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -65.6
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 5. Write the missing numbers.",
+          "ans": "15, 30, 40, 45, 60",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -65.6
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 6. Write the missing numbers.",
+          "ans": "18, 30, 42, 60, 72",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -65.6
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 7. Write the missing numbers.",
+          "ans": "28, 35, 49, 70, 84",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -65.6
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 8. Write the missing numbers.",
+          "ans": "24, 48, 64, 72, 96",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -65.6
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 9. Write the missing numbers.",
+          "ans": "36, 54, 63, 81, 108",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -65.6
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 119,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 162,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          8
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 86
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          8
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 126
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    },
+    "more-practice": {
+      "fits": {
+        "cols": 1,
+        "rows": 8,
+        "perPage": 8,
+        "pages": 1,
+        "note": "Fits: 1 column x 8 rows, 8 per page, 1 page. Digits 16 pt. Dense: 1 x 8, cells sized to the problems.",
+        "sections": [
+          {
+            "cols": 1,
+            "rows": 8,
+            "perPage": 8,
+            "pages": 1,
+            "cellW": 186,
+            "cellH": 28.5,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Dense: 1 x 8, cells sized to the problems.",
+            "line": "Fits: 1 column x 8 rows, 8 per page, 1 page. Digits 16 pt. Dense: 1 x 8, cells sized to the problems.",
+            "cls": "standard",
+            "digitPt": 16,
+            "hMin": 26.6,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 720587,
+      "title": "I Can count by 1 to 12",
+      "notes": [
+        "Dense: 1 x 8, cells sized to the problems."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 2. Write the missing numbers.",
+          "ans": "8, 12, 16, 20, 22",
+          "letter": "A",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -65.6
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 3. Write the missing numbers.",
+          "ans": "9, 18, 24, 30, 36",
+          "letter": "A",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -65.6
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 4. Write the missing numbers.",
+          "ans": "12, 24, 32, 36, 44",
+          "letter": "A",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -65.6
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 5. Write the missing numbers.",
+          "ans": "20, 30, 40, 45, 55",
+          "letter": "A",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -65.6
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 6. Write the missing numbers.",
+          "ans": "24, 36, 48, 54, 66",
+          "letter": "A",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -65.6
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 7. Write the missing numbers.",
+          "ans": "21, 35, 49, 70, 84",
+          "letter": "A",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -65.6
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 8. Write the missing numbers.",
+          "ans": "32, 48, 64, 72, 88",
+          "letter": "A",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -65.6
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 9. Write the missing numbers.",
+          "ans": "36, 45, 63, 81, 99",
+          "letter": "A",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            },
+            "5": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -65.6
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "more-practice-p1.png",
+          "words": 119,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "more-practice-key-p1.png",
+          "words": 162,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          8
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 86
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          8
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 126
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    },
+    "review": {
+      "fits": {
+        "cols": 1,
+        "rows": 8,
+        "pages": 1,
+        "note": "Fits: 1 columns x 6 rows + 2 x 2 mixed, 10 per page.",
+        "sections": [
+          {
+            "cols": 1,
+            "rows": 8,
+            "cellH": 29.28488372093023,
+            "line": "Fits: 1 columns x 6 rows + 2 x 2 mixed, 10 per page."
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 977982,
+      "title": "Review: counting by 1 to 12",
+      "notes": [],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 2. Write the missing numbers.",
+          "ans": "6, 10, 16, 18, 24",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 3. Write the missing numbers.",
+          "ans": "9, 18, 21, 30, 33",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 4. Write the missing numbers.",
+          "ans": "12, 24, 32, 40, 44",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 5. Write the missing numbers.",
+          "ans": "20, 25, 40, 45, 60",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 6. Write the missing numbers.",
+          "ans": "18, 30, 48, 54, 66",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 7. Write the missing numbers.",
+          "ans": "28, 35, 49, 70, 77",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 8. Write the missing numbers.",
+          "ans": "24, 48, 64, 80, 96",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 9. Write the missing numbers.",
+          "ans": "36, 54, 72, 81, 108",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 10. Write the missing numbers.",
+          "ans": "40, 50, 80, 100, 120",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 11. Write the missing numbers.",
+          "ans": "44, 66, 88, 99, 132",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 12. Write the missing numbers.",
+          "ans": "48, 72, 96, 108, 132",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 2. Write the missing numbers.",
+          "ans": "8, 10, 14, 18, 22",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 3. Write the missing numbers.",
+          "ans": "12, 15, 21, 27, 33",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 4. Write the missing numbers.",
+          "ans": "16, 20, 32, 40, 48",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 5. Write the missing numbers.",
+          "ans": "20, 25, 40, 50, 55",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 6. Write the missing numbers.",
+          "ans": "24, 36, 42, 54, 72",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 7. Write the missing numbers.",
+          "ans": "28, 42, 49, 63, 84",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 8. Write the missing numbers.",
+          "ans": "24, 48, 64, 80, 88",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "8 × 100 = ?",
+          "ans": "800",
+          "measured": {
+            "1": {
+              "hMm": 19.4,
+              "fits": true,
+              "slackMm": 59.8
+            },
+            "2": {
+              "hMm": 19.4,
+              "fits": true,
+              "slackMm": 13.5
+            },
+            "3": {
+              "hMm": 17.8,
+              "fits": false,
+              "slackMm": -0.4
+            },
+            "4": {
+              "hMm": 16.3,
+              "fits": false,
+              "slackMm": -2.9
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "80 × 7 = ?",
+          "ans": "560",
+          "measured": {
+            "1": {
+              "hMm": 19.4,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 19.4,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 17.8,
+              "fits": true,
+              "slackMm": 3.8
+            },
+            "4": {
+              "hMm": 16.3,
+              "fits": false,
+              "slackMm": 0.4
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "5 × 10 = ?",
+          "ans": "50",
+          "measured": {
+            "1": {
+              "hMm": 19.4,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 19.4,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 17.8,
+              "fits": true,
+              "slackMm": 3.8
+            },
+            "4": {
+              "hMm": 16.3,
+              "fits": false,
+              "slackMm": 0.4
+            }
+          }
+        },
+        {
+          "template": "legacy",
+          "fclass": "standard",
+          "text": "2 × 40 = ?",
+          "ans": "80",
+          "measured": {
+            "1": {
+              "hMm": 19.4,
+              "fits": true,
+              "slackMm": 62.7
+            },
+            "2": {
+              "hMm": 19.4,
+              "fits": true,
+              "slackMm": 16.4
+            },
+            "3": {
+              "hMm": 17.8,
+              "fits": true,
+              "slackMm": 3.8
+            },
+            "4": {
+              "hMm": 16.3,
+              "fits": false,
+              "slackMm": 0.4
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "review-p1.png",
+          "words": 123,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "review-key-p1.png",
+          "words": 160,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          10
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 90
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          10
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 124
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    },
+    "test": {
+      "fits": {
+        "cols": 1,
+        "rows": 8,
+        "perPage": 8,
+        "pages": 1,
+        "note": "Fits: 1 column x 8 rows, 8 per page, 1 page. Digits 16 pt. Dense: 1 x 8, cells sized to the problems.",
+        "sections": [
+          {
+            "role": "test",
+            "cls": "standard",
+            "requested": "auto",
+            "cols": 1,
+            "rows": 8,
+            "perPage": 8,
+            "pages": 1,
+            "count": 8,
+            "cellW": 186,
+            "innerW": 184.942,
+            "cellH": 28.5,
+            "hMin": 26.6,
+            "gridH": 228,
+            "gridHCont": 242,
+            "fill": true,
+            "packed": false,
+            "filled": false,
+            "ceiling": 20,
+            "clamped": false,
+            "reason": "",
+            "note": "Dense: 1 x 8, cells sized to the problems.",
+            "notes": [
+              "Dense: 1 x 8, cells sized to the problems."
+            ],
+            "digitPt": 16,
+            "trackMm": null,
+            "size": "S",
+            "look": "ican",
+            "availableWidthMm": 186,
+            "line": "Fits: 1 column x 8 rows, 8 per page, 1 page. Digits 16 pt. Dense: 1 x 8, cells sized to the problems."
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 657182,
+      "title": "Test A: counting by 1 to 12",
+      "notes": [
+        "Dense: 1 x 8, cells sized to the problems."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 2. Write the missing numbers.",
+          "ans": "8, 10, 14, 20, 22",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 3. Write the missing numbers.",
+          "ans": "12, 15, 24, 30, 33",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 4. Write the missing numbers.",
+          "ans": "16, 24, 28, 36, 48",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 5. Write the missing numbers.",
+          "ans": "15, 25, 40, 50, 55",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 6. Write the missing numbers.",
+          "ans": "18, 30, 48, 54, 66",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 7. Write the missing numbers.",
+          "ans": "21, 35, 49, 70, 84",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 8. Write the missing numbers.",
+          "ans": "24, 48, 64, 72, 88",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 9. Write the missing numbers.",
+          "ans": "27, 54, 72, 90, 99",
+          "measured": {
+            "1": {
+              "hMm": 26.6,
+              "fits": true,
+              "slackMm": 8.5
+            },
+            "2": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -37.8
+            },
+            "3": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -53.2
+            },
+            "4": {
+              "hMm": 26.6,
+              "fits": false,
+              "slackMm": -60.9
+            }
+          }
+        }
+      ],
+      "pages": [
+        {
+          "file": "test-p1.png",
+          "words": 119,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "test-key-p1.png",
+          "words": 162,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          8
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 86
+        },
+        "fontsReady": true,
+        "andika": true
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          8
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 126
+        },
+        "fontsReady": true,
+        "andika": true
+      }
+    }
+  },
+  "consoleErrors": []
+}

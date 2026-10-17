@@ -1,0 +1,302 @@
+PASS count_by_tables seed 7 S: 4 model states
+PASS count_by_tables seed 7 S: state k traces the answers of steps 2..k (traced per state 0,1,2,5)
+PASS count_by_tables seed 7 S: step 2 "6 + 2 = 8. Write 8." shows its written answer
+PASS count_by_tables seed 7 S: step 3 "8 + 2 = 10. Write 10." shows its written answer
+PASS count_by_tables seed 7 S: the model fits one page (1 page(s), 4 states)
+PASS count_by_tables seed 7 M: 4 model states
+PASS count_by_tables seed 7 M: state k traces the answers of steps 2..k (traced per state 0,1,2,5)
+PASS count_by_tables seed 7 M: step 2 "6 + 2 = 8. Write 8." shows its written answer
+PASS count_by_tables seed 7 M: step 3 "8 + 2 = 10. Write 10." shows its written answer
+PASS count_by_tables seed 7 M: the model fits one page (1 page(s), 4 states)
+PASS count_by_tables seed 7 L: 4 model states
+PASS count_by_tables seed 7 L: state k traces the answers of steps 2..k (traced per state 0,1,2,5)
+PASS count_by_tables seed 7 L: step 2 "6 + 2 = 8. Write 8." shows its written answer
+PASS count_by_tables seed 7 L: step 3 "8 + 2 = 10. Write 10." shows its written answer
+PASS count_by_tables seed 7 L: the model fits one page (1 page(s), 4 states)
+PASS skip_count_grid seed 7 S: 4 model states
+PASS skip_count_grid seed 7 S: state k traces the answers of steps 2..k (traced per state 0,1,2,5)
+PASS skip_count_grid seed 7 S: step 2 "15 + 5 = 20. Write 20." shows its written answer
+PASS skip_count_grid seed 7 S: step 3 "20 + 5 = 25. Write 25." shows its written answer
+PASS skip_count_grid seed 7 S: the model fits one page (1 page(s), 4 states)
+PASS skip_count_grid seed 7 M: 4 model states
+PASS skip_count_grid seed 7 M: state k traces the answers of steps 2..k (traced per state 0,1,2,5)
+PASS skip_count_grid seed 7 M: step 2 "15 + 5 = 20. Write 20." shows its written answer
+PASS skip_count_grid seed 7 M: step 3 "20 + 5 = 25. Write 25." shows its written answer
+PASS skip_count_grid seed 7 M: the model fits one page (1 page(s), 4 states)
+PASS skip_count_grid seed 7 L: 4 model states
+PASS skip_count_grid seed 7 L: state k traces the answers of steps 2..k (traced per state 0,1,2,5)
+PASS skip_count_grid seed 7 L: step 2 "15 + 5 = 20. Write 20." shows its written answer
+PASS skip_count_grid seed 7 L: step 3 "20 + 5 = 25. Write 25." shows its written answer
+PASS skip_count_grid seed 7 L: the model fits one page (1 page(s), 4 states)
+PASS skip_count_line seed 7 S: 4 model states
+PASS skip_count_line seed 7 S: state k traces the answers of steps 2..k (traced per state 0,1,2,3)
+PASS skip_count_line seed 7 S: step 2 "40 + 5 = 45. Write 45." shows its written answer
+PASS skip_count_line seed 7 S: step 3 "45 + 5 = 50. Write 50." shows its written answer
+PASS skip_count_line seed 7 S: the model fits one page (1 page(s), 4 states)
+PASS skip_count_line seed 7 M: 4 model states
+PASS skip_count_line seed 7 M: state k traces the answers of steps 2..k (traced per state 0,1,2,3)
+PASS skip_count_line seed 7 M: step 2 "40 + 5 = 45. Write 45." shows its written answer
+PASS skip_count_line seed 7 M: step 3 "45 + 5 = 50. Write 50." shows its written answer
+PASS skip_count_line seed 7 M: the model fits one page (1 page(s), 4 states)
+PASS skip_count_line seed 7 L: 4 model states
+PASS skip_count_line seed 7 L: state k traces the answers of steps 2..k (traced per state 0,1,2,3)
+PASS skip_count_line seed 7 L: step 2 "40 + 5 = 45. Write 45." shows its written answer
+PASS skip_count_line seed 7 L: step 3 "45 + 5 = 50. Write 50." shows its written answer
+PASS skip_count_line seed 7 L: the model fits one page (1 page(s), 4 states)
+PASS count_by_tables{"times":"each"} seed 7 S: 4 model states
+PASS count_by_tables{"times":"each"} seed 7 S: state k traces the answers of steps 2..k (traced per state 0,1,2,5)
+PASS count_by_tables{"times":"each"} seed 7 S: step 2 "6 + 2 = 8. Write 8." shows its written answer
+PASS count_by_tables{"times":"each"} seed 7 S: step 3 "8 + 2 = 10. Write 10." shows its written answer
+PASS count_by_tables{"times":"each"} seed 7 S: the model fits one page (1 page(s), 4 states)
+PASS count_by_tables{"times":"each"} seed 7 M: 3 model states
+PASS count_by_tables{"times":"each"} seed 7 M: state k traces the answers of steps 2..k (traced per state 0,2,5)
+PASS count_by_tables{"times":"each"} seed 7 M: step 2 "6 + 2 = 8. Write 8. 8 + 2 = 10. Write 10." shows its written answer
+PASS count_by_tables{"times":"each"} seed 7 M: the model fits one page (1 page(s), 3 states)
+PASS count_by_tables{"times":"each"} seed 7 L: 3 model states
+PASS count_by_tables{"times":"each"} seed 7 L: state k traces the answers of steps 2..k (traced per state 0,2,5)
+PASS count_by_tables{"times":"each"} seed 7 L: step 2 "6 + 2 = 8. Write 8. 8 + 2 = 10. Write 10." shows its written answer
+PASS count_by_tables{"times":"each"} seed 7 L: the model fits one page (1 page(s), 3 states)
+PASS count_by_tables{"times":"each"} seed 11 S: 4 model states
+PASS count_by_tables{"times":"each"} seed 11 S: state k traces the answers of steps 2..k (traced per state 0,1,2,5)
+PASS count_by_tables{"times":"each"} seed 11 S: step 2 "4 + 2 = 6. Write 6." shows its written answer
+PASS count_by_tables{"times":"each"} seed 11 S: step 3 "8 + 2 = 10. Write 10." shows its written answer
+PASS count_by_tables{"times":"each"} seed 11 S: the model fits one page (1 page(s), 4 states)
+PASS count_by_tables{"times":"each"} seed 11 M: 3 model states
+PASS count_by_tables{"times":"each"} seed 11 M: state k traces the answers of steps 2..k (traced per state 0,2,5)
+PASS count_by_tables{"times":"each"} seed 11 M: step 2 "4 + 2 = 6. Write 6. 8 + 2 = 10. Write 10." shows its written answer
+PASS count_by_tables{"times":"each"} seed 11 M: the model fits one page (1 page(s), 3 states)
+PASS count_by_tables{"times":"each"} seed 11 L: 3 model states
+PASS count_by_tables{"times":"each"} seed 11 L: state k traces the answers of steps 2..k (traced per state 0,2,5)
+PASS count_by_tables{"times":"each"} seed 11 L: step 2 "4 + 2 = 6. Write 6. 8 + 2 = 10. Write 10." shows its written answer
+PASS count_by_tables{"times":"each"} seed 11 L: the model fits one page (1 page(s), 3 states)
+PASS count_by_tables{"times":"each"} seed 23 S: 4 model states
+PASS count_by_tables{"times":"each"} seed 23 S: state k traces the answers of steps 2..k (traced per state 0,1,2,5)
+PASS count_by_tables{"times":"each"} seed 23 S: step 2 "6 + 2 = 8. Write 8." shows its written answer
+PASS count_by_tables{"times":"each"} seed 23 S: step 3 "8 + 2 = 10. Write 10." shows its written answer
+PASS count_by_tables{"times":"each"} seed 23 S: the model fits one page (1 page(s), 4 states)
+PASS count_by_tables{"times":"each"} seed 23 M: 3 model states
+PASS count_by_tables{"times":"each"} seed 23 M: state k traces the answers of steps 2..k (traced per state 0,2,5)
+PASS count_by_tables{"times":"each"} seed 23 M: step 2 "6 + 2 = 8. Write 8. 8 + 2 = 10. Write 10." shows its written answer
+PASS count_by_tables{"times":"each"} seed 23 M: the model fits one page (1 page(s), 3 states)
+PASS count_by_tables{"times":"each"} seed 23 L: 3 model states
+PASS count_by_tables{"times":"each"} seed 23 L: state k traces the answers of steps 2..k (traced per state 0,2,5)
+PASS count_by_tables{"times":"each"} seed 23 L: step 2 "6 + 2 = 8. Write 8. 8 + 2 = 10. Write 10." shows its written answer
+PASS count_by_tables{"times":"each"} seed 23 L: the model fits one page (1 page(s), 3 states)
+PASS count_by_tables{"jumps":15} seed 7 S: 4 model states
+PASS count_by_tables{"jumps":15} seed 7 S: state k traces the answers of steps 2..k (traced per state 0,1,2,7)
+PASS count_by_tables{"jumps":15} seed 7 S: step 2 "6 + 2 = 8. Write 8." shows its written answer
+PASS count_by_tables{"jumps":15} seed 7 S: step 3 "8 + 2 = 10. Write 10." shows its written answer
+PASS count_by_tables{"jumps":15} seed 7 S: the model fits one page (1 page(s), 4 states)
+PASS count_by_tables{"jumps":15} seed 7 M: 3 model states
+PASS count_by_tables{"jumps":15} seed 7 M: state k traces the answers of steps 2..k (traced per state 0,2,7)
+PASS count_by_tables{"jumps":15} seed 7 M: step 2 "6 + 2 = 8. Write 8. 8 + 2 = 10. Write 10." shows its written answer
+PASS count_by_tables{"jumps":15} seed 7 M: the model fits one page (1 page(s), 3 states)
+PASS count_by_tables{"jumps":15} seed 7 L: 4 model states
+PASS count_by_tables{"jumps":15} seed 7 L: state k traces the answers of steps 2..k (traced per state 0,1,2,7)
+PASS count_by_tables{"jumps":15} seed 7 L: step 2 "6 + 2 = 8. Write 8." shows its written answer
+PASS count_by_tables{"jumps":15} seed 7 L: step 3 "8 + 2 = 10. Write 10." shows its written answer
+PASS count_by_tables{"jumps":15} seed 7 L: the model fits one page, or no page holds a lone state (2 page(s), 4 states)
+PASS count_by_tables{"jumps":15} seed 11 S: 4 model states
+PASS count_by_tables{"jumps":15} seed 11 S: state k traces the answers of steps 2..k (traced per state 0,1,2,7)
+PASS count_by_tables{"jumps":15} seed 11 S: step 2 "4 + 2 = 6. Write 6." shows its written answer
+PASS count_by_tables{"jumps":15} seed 11 S: step 3 "8 + 2 = 10. Write 10." shows its written answer
+PASS count_by_tables{"jumps":15} seed 11 S: the model fits one page (1 page(s), 4 states)
+PASS count_by_tables{"jumps":15} seed 11 M: 3 model states
+PASS count_by_tables{"jumps":15} seed 11 M: state k traces the answers of steps 2..k (traced per state 0,2,7)
+PASS count_by_tables{"jumps":15} seed 11 M: step 2 "4 + 2 = 6. Write 6. 8 + 2 = 10. Write 10." shows its written answer
+PASS count_by_tables{"jumps":15} seed 11 M: the model fits one page (1 page(s), 3 states)
+PASS count_by_tables{"jumps":15} seed 11 L: 4 model states
+PASS count_by_tables{"jumps":15} seed 11 L: state k traces the answers of steps 2..k (traced per state 0,1,2,7)
+PASS count_by_tables{"jumps":15} seed 11 L: step 2 "4 + 2 = 6. Write 6." shows its written answer
+PASS count_by_tables{"jumps":15} seed 11 L: step 3 "8 + 2 = 10. Write 10." shows its written answer
+PASS count_by_tables{"jumps":15} seed 11 L: the model fits one page, or no page holds a lone state (2 page(s), 4 states)
+PASS count_by_tables{"jumps":15} seed 23 S: 4 model states
+PASS count_by_tables{"jumps":15} seed 23 S: state k traces the answers of steps 2..k (traced per state 0,1,2,7)
+PASS count_by_tables{"jumps":15} seed 23 S: step 2 "6 + 2 = 8. Write 8." shows its written answer
+PASS count_by_tables{"jumps":15} seed 23 S: step 3 "8 + 2 = 10. Write 10." shows its written answer
+PASS count_by_tables{"jumps":15} seed 23 S: the model fits one page (1 page(s), 4 states)
+PASS count_by_tables{"jumps":15} seed 23 M: 3 model states
+PASS count_by_tables{"jumps":15} seed 23 M: state k traces the answers of steps 2..k (traced per state 0,2,7)
+PASS count_by_tables{"jumps":15} seed 23 M: step 2 "6 + 2 = 8. Write 8. 8 + 2 = 10. Write 10." shows its written answer
+PASS count_by_tables{"jumps":15} seed 23 M: the model fits one page (1 page(s), 3 states)
+PASS count_by_tables{"jumps":15} seed 23 L: 4 model states
+PASS count_by_tables{"jumps":15} seed 23 L: state k traces the answers of steps 2..k (traced per state 0,1,2,7)
+PASS count_by_tables{"jumps":15} seed 23 L: step 2 "6 + 2 = 8. Write 8." shows its written answer
+PASS count_by_tables{"jumps":15} seed 23 L: step 3 "8 + 2 = 10. Write 10." shows its written answer
+PASS count_by_tables{"jumps":15} seed 23 L: the model fits one page, or no page holds a lone state (2 page(s), 4 states)
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 7 S: 3 model states
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 7 S: state k traces the answers of steps 2..k (traced per state 0,2,5)
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 7 S: step 2 "1,200,000 + 100,000 = 1,300,000. Write 1,300,000. 1,300,000 + 100,000 = 1,400,000. Write 1,400,000." shows its written answer
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 7 S: the model fits one page, or no page holds a lone state (1 page(s), 3 states)
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 7 M: 4 model states
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 7 M: state k traces the answers of steps 2..k (traced per state 0,1,2,5)
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 7 M: step 2 "1,200,000 + 100,000 = 1,300,000. Write 1,300,000." shows its written answer
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 7 M: step 3 "1,300,000 + 100,000 = 1,400,000. Write 1,400,000." shows its written answer
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 7 M: the model fits one page, or no page holds a lone state (2 page(s), 4 states)
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 7 L: 4 model states
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 7 L: state k traces the answers of steps 2..k (traced per state 0,1,2,5)
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 7 L: step 2 "1,200,000 + 100,000 = 1,300,000. Write 1,300,000." shows its written answer
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 7 L: step 3 "1,300,000 + 100,000 = 1,400,000. Write 1,400,000." shows its written answer
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 7 L: the model fits one page, or no page holds a lone state (2 page(s), 4 states)
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 11 S: 3 model states
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 11 S: state k traces the answers of steps 2..k (traced per state 0,2,5)
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 11 S: step 2 "1,100,000 + 100,000 = 1,200,000. Write 1,200,000. 1,200,000 + 100,000 = 1,300,000. Write 1,300,000." shows its written answer
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 11 S: the model fits one page, or no page holds a lone state (1 page(s), 3 states)
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 11 M: 4 model states
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 11 M: state k traces the answers of steps 2..k (traced per state 0,1,2,5)
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 11 M: step 2 "1,100,000 + 100,000 = 1,200,000. Write 1,200,000." shows its written answer
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 11 M: step 3 "1,200,000 + 100,000 = 1,300,000. Write 1,300,000." shows its written answer
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 11 M: the model fits one page, or no page holds a lone state (2 page(s), 4 states)
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 11 L: 4 model states
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 11 L: state k traces the answers of steps 2..k (traced per state 0,1,2,5)
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 11 L: step 2 "1,100,000 + 100,000 = 1,200,000. Write 1,200,000." shows its written answer
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 11 L: step 3 "1,200,000 + 100,000 = 1,300,000. Write 1,300,000." shows its written answer
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 11 L: the model fits one page, or no page holds a lone state (2 page(s), 4 states)
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 23 S: 3 model states
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 23 S: state k traces the answers of steps 2..k (traced per state 0,2,5)
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 23 S: step 2 "1,100,000 + 100,000 = 1,200,000. Write 1,200,000. 1,200,000 + 100,000 = 1,300,000. Write 1,300,000." shows its written answer
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 23 S: the model fits one page, or no page holds a lone state (1 page(s), 3 states)
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 23 M: 4 model states
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 23 M: state k traces the answers of steps 2..k (traced per state 0,1,2,5)
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 23 M: step 2 "1,100,000 + 100,000 = 1,200,000. Write 1,200,000." shows its written answer
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 23 M: step 3 "1,200,000 + 100,000 = 1,300,000. Write 1,300,000." shows its written answer
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 23 M: the model fits one page, or no page holds a lone state (2 page(s), 4 states)
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 23 L: 4 model states
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 23 L: state k traces the answers of steps 2..k (traced per state 0,1,2,5)
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 23 L: step 2 "1,100,000 + 100,000 = 1,200,000. Write 1,200,000." shows its written answer
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 23 L: step 3 "1,200,000 + 100,000 = 1,300,000. Write 1,300,000." shows its written answer
+PASS count_by_tables{"rows":[{"step":100000,"start":"custom","at":1000000}]} seed 23 L: the model fits one page, or no page holds a lone state (2 page(s), 4 states)
+PASS wide {"rows":[{"step":1000,"start":"custom","at":14000}]} scripted-model pupil S: 8 written answers, none outside its box
+PASS wide {"rows":[{"step":1000,"start":"custom","at":14000}]} scripted-model key S: 8 written answers, none outside its box
+PASS wide {"rows":[{"step":1000,"start":"custom","at":14000}]} scripted-model pupil M: 8 written answers, none outside its box
+PASS wide {"rows":[{"step":1000,"start":"custom","at":14000}]} scripted-model key M: 8 written answers, none outside its box
+PASS wide {"rows":[{"step":1000,"start":"custom","at":14000}]} scripted-model pupil L: 8 written answers, none outside its box
+PASS wide {"rows":[{"step":1000,"start":"custom","at":14000}]} scripted-model key L: 8 written answers, none outside its box
+PASS wide {"rows":[{"step":1000,"start":"custom","at":14000}]} independent pupil S: 0 written answers, none outside its box
+PASS wide {"rows":[{"step":1000,"start":"custom","at":14000}]} independent key S: 20 written answers, none outside its box
+PASS wide {"rows":[{"step":1000,"start":"custom","at":14000}]} independent pupil M: 0 written answers, none outside its box
+PASS wide {"rows":[{"step":1000,"start":"custom","at":14000}]} independent key M: 20 written answers, none outside its box
+PASS wide {"rows":[{"step":1000,"start":"custom","at":14000}]} independent pupil L: 0 written answers, none outside its box
+PASS wide {"rows":[{"step":1000,"start":"custom","at":14000}]} independent key L: 20 written answers, none outside its box
+PASS wide {"rows":[{"step":1000,"start":"custom","at":14000}]} guided pupil S: 5 written answers, none outside its box
+PASS wide {"rows":[{"step":1000,"start":"custom","at":14000}]} guided key S: 25 written answers, none outside its box
+PASS wide {"rows":[{"step":1000,"start":"custom","at":14000}]} guided pupil M: 5 written answers, none outside its box
+PASS wide {"rows":[{"step":1000,"start":"custom","at":14000}]} guided key M: 20 written answers, none outside its box
+PASS wide {"rows":[{"step":1000,"start":"custom","at":14000}]} guided pupil L: 5 written answers, none outside its box
+PASS wide {"rows":[{"step":1000,"start":"custom","at":14000}]} guided key L: 35 written answers, none outside its box
+PASS wide {"rows":[{"step":1000,"start":"custom","at":14000}]} test pupil S: 0 written answers, none outside its box
+PASS wide {"rows":[{"step":1000,"start":"custom","at":14000}]} test key S: 20 written answers, none outside its box
+PASS wide {"rows":[{"step":1000,"start":"custom","at":14000}]} test pupil M: 0 written answers, none outside its box
+PASS wide {"rows":[{"step":1000,"start":"custom","at":14000}]} test key M: 20 written answers, none outside its box
+PASS wide {"rows":[{"step":1000,"start":"custom","at":14000}]} test pupil L: 0 written answers, none outside its box
+PASS wide {"rows":[{"step":1000,"start":"custom","at":14000}]} test key L: 20 written answers, none outside its box
+PASS wide {"rows":[{"step":25000}]} scripted-model pupil S: 7 written answers, none outside its box
+PASS wide {"rows":[{"step":25000}]} scripted-model pupil S: a 6+ digit box gives 5.20 mm a digit (>= 5)
+PASS wide {"rows":[{"step":25000}]} scripted-model key S: 7 written answers, none outside its box
+PASS wide {"rows":[{"step":25000}]} scripted-model key S: a 6+ digit box gives 5.20 mm a digit (>= 5)
+PASS wide {"rows":[{"step":25000}]} scripted-model pupil M: 8 written answers, none outside its box
+PASS wide {"rows":[{"step":25000}]} scripted-model pupil M: a 6+ digit box gives 5.20 mm a digit (>= 5)
+PASS wide {"rows":[{"step":25000}]} scripted-model key M: 8 written answers, none outside its box
+PASS wide {"rows":[{"step":25000}]} scripted-model key M: a 6+ digit box gives 5.20 mm a digit (>= 5)
+PASS wide {"rows":[{"step":25000}]} scripted-model pupil L: 8 written answers, none outside its box
+PASS wide {"rows":[{"step":25000}]} scripted-model pupil L: a 6+ digit box gives 5.20 mm a digit (>= 5)
+PASS wide {"rows":[{"step":25000}]} scripted-model key L: 8 written answers, none outside its box
+PASS wide {"rows":[{"step":25000}]} scripted-model key L: a 6+ digit box gives 5.20 mm a digit (>= 5)
+PASS wide {"rows":[{"step":25000}]} independent pupil S: 0 written answers, none outside its box
+PASS wide {"rows":[{"step":25000}]} independent key S: 20 written answers, none outside its box
+PASS wide {"rows":[{"step":25000}]} independent key S: a 6+ digit box gives 5.20 mm a digit (>= 5)
+PASS wide {"rows":[{"step":25000}]} independent pupil M: 0 written answers, none outside its box
+PASS wide {"rows":[{"step":25000}]} independent key M: 20 written answers, none outside its box
+PASS wide {"rows":[{"step":25000}]} independent key M: a 6+ digit box gives 5.20 mm a digit (>= 5)
+PASS wide {"rows":[{"step":25000}]} independent pupil L: 0 written answers, none outside its box
+PASS wide {"rows":[{"step":25000}]} independent key L: 20 written answers, none outside its box
+PASS wide {"rows":[{"step":25000}]} independent key L: a 6+ digit box gives 5.20 mm a digit (>= 5)
+PASS wide {"rows":[{"step":25000}]} guided pupil S: 5 written answers, none outside its box
+PASS wide {"rows":[{"step":25000}]} guided pupil S: a 6+ digit box gives 5.20 mm a digit (>= 5)
+PASS wide {"rows":[{"step":25000}]} guided key S: 35 written answers, none outside its box
+PASS wide {"rows":[{"step":25000}]} guided key S: a 6+ digit box gives 5.20 mm a digit (>= 5)
+PASS wide {"rows":[{"step":25000}]} guided pupil M: 5 written answers, none outside its box
+PASS wide {"rows":[{"step":25000}]} guided pupil M: a 6+ digit box gives 5.20 mm a digit (>= 5)
+PASS wide {"rows":[{"step":25000}]} guided key M: 25 written answers, none outside its box
+PASS wide {"rows":[{"step":25000}]} guided key M: a 6+ digit box gives 5.20 mm a digit (>= 5)
+PASS wide {"rows":[{"step":25000}]} guided pupil L: 5 written answers, none outside its box
+PASS wide {"rows":[{"step":25000}]} guided pupil L: a 6+ digit box gives 5.20 mm a digit (>= 5)
+PASS wide {"rows":[{"step":25000}]} guided key L: 20 written answers, none outside its box
+PASS wide {"rows":[{"step":25000}]} guided key L: a 6+ digit box gives 5.20 mm a digit (>= 5)
+PASS wide {"rows":[{"step":25000}]} test pupil S: 0 written answers, none outside its box
+PASS wide {"rows":[{"step":25000}]} test key S: 20 written answers, none outside its box
+PASS wide {"rows":[{"step":25000}]} test key S: a 6+ digit box gives 5.20 mm a digit (>= 5)
+PASS wide {"rows":[{"step":25000}]} test pupil M: 0 written answers, none outside its box
+PASS wide {"rows":[{"step":25000}]} test key M: 20 written answers, none outside its box
+PASS wide {"rows":[{"step":25000}]} test key M: a 6+ digit box gives 5.20 mm a digit (>= 5)
+PASS wide {"rows":[{"step":25000}]} test pupil L: 0 written answers, none outside its box
+PASS wide {"rows":[{"step":25000}]} test key L: 15 written answers, none outside its box
+PASS wide {"rows":[{"step":25000}]} test key L: a 6+ digit box gives 5.20 mm a digit (>= 5)
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} scripted-model pupil S: 7 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} scripted-model pupil S: a 6+ digit box gives 5.34 mm a digit (>= 5)
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} scripted-model key S: 7 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} scripted-model key S: a 6+ digit box gives 5.34 mm a digit (>= 5)
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} scripted-model pupil M: 8 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} scripted-model pupil M: a 6+ digit box gives 5.34 mm a digit (>= 5)
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} scripted-model key M: 8 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} scripted-model key M: a 6+ digit box gives 5.34 mm a digit (>= 5)
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} scripted-model pupil L: 8 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} scripted-model pupil L: a 6+ digit box gives 5.34 mm a digit (>= 5)
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} scripted-model key L: 8 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} scripted-model key L: a 6+ digit box gives 5.34 mm a digit (>= 5)
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} independent pupil S: 0 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} independent key S: 20 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} independent key S: a 6+ digit box gives 5.34 mm a digit (>= 5)
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} independent pupil M: 0 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} independent key M: 20 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} independent key M: a 6+ digit box gives 5.34 mm a digit (>= 5)
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} independent pupil L: 0 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} independent key L: 20 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} independent key L: a 6+ digit box gives 5.34 mm a digit (>= 5)
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} guided pupil S: 5 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} guided pupil S: a 6+ digit box gives 5.34 mm a digit (>= 5)
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} guided key S: 35 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} guided key S: a 6+ digit box gives 5.34 mm a digit (>= 5)
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} guided pupil M: 5 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} guided pupil M: a 6+ digit box gives 5.34 mm a digit (>= 5)
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} guided key M: 25 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} guided key M: a 6+ digit box gives 5.34 mm a digit (>= 5)
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} guided pupil L: 5 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} guided pupil L: a 6+ digit box gives 5.34 mm a digit (>= 5)
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} guided key L: 20 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} guided key L: a 6+ digit box gives 5.34 mm a digit (>= 5)
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} test pupil S: 0 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} test key S: 20 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} test key S: a 6+ digit box gives 5.34 mm a digit (>= 5)
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} test pupil M: 0 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} test key M: 20 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} test key M: a 6+ digit box gives 5.34 mm a digit (>= 5)
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} test pupil L: 0 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} test key L: 15 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}]} test key L: a 6+ digit box gives 5.34 mm a digit (>= 5)
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}],"spaces":"line"} scripted-model pupil S: 7 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}],"spaces":"line"} scripted-model key S: 7 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}],"spaces":"line"} scripted-model pupil M: 8 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}],"spaces":"line"} scripted-model key M: 8 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}],"spaces":"line"} scripted-model pupil L: 8 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}],"spaces":"line"} scripted-model key L: 8 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}],"spaces":"line"} independent pupil S: 0 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}],"spaces":"line"} independent key S: 20 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}],"spaces":"line"} independent pupil M: 0 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}],"spaces":"line"} independent key M: 20 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}],"spaces":"line"} independent pupil L: 0 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}],"spaces":"line"} independent key L: 20 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}],"spaces":"line"} guided pupil S: 5 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}],"spaces":"line"} guided key S: 35 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}],"spaces":"line"} guided pupil M: 5 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}],"spaces":"line"} guided key M: 25 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}],"spaces":"line"} guided pupil L: 5 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}],"spaces":"line"} guided key L: 25 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}],"spaces":"line"} test pupil S: 0 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}],"spaces":"line"} test key S: 20 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}],"spaces":"line"} test pupil M: 0 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}],"spaces":"line"} test key M: 20 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}],"spaces":"line"} test pupil L: 0 written answers, none outside its box
+PASS wide {"rows":[{"step":100000,"start":"custom","at":1000000}],"spaces":"line"} test key L: 15 written answers, none outside its box
+PASS no page errors
+wave1-c2-model: OK

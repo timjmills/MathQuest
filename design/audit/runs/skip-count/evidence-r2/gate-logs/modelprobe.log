@@ -1,0 +1,106 @@
+FAIL count_by_tables {"rows":[{"step":100000,"start":"custom","at":1000000}]} L seed 1: pages 2; 
+FAIL count_by_tables {"rows":[{"step":100000,"start":"custom","at":1000000}]} L seed 2: pages 2; 
+FAIL count_by_tables {"rows":[{"step":100000,"start":"custom","at":1000000}]} L seed 3: pages 2; 
+FAIL count_by_tables {"rows":[{"step":100000,"start":"custom","at":1000000}]} L seed 4: pages 2; 
+FAIL count_by_tables {"rows":[{"step":100000,"start":"custom","at":1000000}]} L seed 5: pages 2; 
+FAIL count_by_tables {"rows":[{"step":100000,"start":"custom","at":1000000}]} L seed 6: pages 2; 
+FAIL count_by_tables {"rows":[{"step":100000,"start":"custom","at":1000000}]} L seed 7: pages 2; 
+FAIL count_by_tables {"rows":[{"step":100000,"start":"custom","at":1000000}]} L seed 8: pages 2; 
+FAIL count_by_tables {"rows":[{"step":100000,"start":"custom","at":1000000}]} L seed 9: pages 2; 
+FAIL count_by_tables {"rows":[{"step":100000,"start":"custom","at":1000000}]} L seed 10: pages 2; 
+FAIL count_by_tables {"rows":[{"step":100000,"start":"custom","at":1000000}]} L seed 11: pages 2; 
+FAIL count_by_tables {"rows":[{"step":100000,"start":"custom","at":1000000}]} L seed 12: pages 2; 
+FAIL count_by_tables {"jumps":15} M seed 1: pages 2; 
+FAIL count_by_tables {"jumps":15} M seed 2: pages 2; 
+FAIL count_by_tables {"jumps":15} M seed 3: pages 2; 
+FAIL count_by_tables {"jumps":15} M seed 4: pages 2; 
+FAIL count_by_tables {"jumps":15} M seed 5: pages 2; 
+FAIL count_by_tables {"jumps":15} M seed 6: pages 2; 
+FAIL count_by_tables {"jumps":15} M seed 7: pages 2; 
+FAIL count_by_tables {"jumps":15} M seed 8: pages 2; 
+FAIL count_by_tables {"jumps":15} M seed 9: pages 2; 
+FAIL count_by_tables {"jumps":15} M seed 10: pages 2; 
+FAIL count_by_tables {"jumps":15} M seed 11: pages 2; 
+FAIL count_by_tables {"jumps":15} M seed 12: pages 2; 
+FAIL count_by_tables {"jumps":15} L seed 1: pages 2; 
+FAIL count_by_tables {"jumps":15} L seed 2: pages 2; 
+FAIL count_by_tables {"jumps":15} L seed 3: pages 2; 
+FAIL count_by_tables {"jumps":15} L seed 4: pages 2; 
+FAIL count_by_tables {"jumps":15} L seed 5: pages 2; 
+FAIL count_by_tables {"jumps":15} L seed 6: pages 2; 
+FAIL count_by_tables {"jumps":15} L seed 7: pages 2; 
+FAIL count_by_tables {"jumps":15} L seed 8: pages 2; 
+FAIL count_by_tables {"jumps":15} L seed 9: pages 2; 
+FAIL count_by_tables {"jumps":15} L seed 10: pages 2; 
+FAIL count_by_tables {"jumps":15} L seed 11: pages 2; 
+FAIL count_by_tables {"jumps":15} L seed 12: pages 2; 
+FAIL count_by_tables {"times":"each"} M seed 1: pages 2; 
+FAIL count_by_tables {"times":"each"} M seed 2: pages 2; 
+FAIL count_by_tables {"times":"each"} M seed 3: pages 2; 
+FAIL count_by_tables {"times":"each"} M seed 4: pages 2; 
+FAIL count_by_tables {"times":"each"} M seed 5: pages 2; 
+FAIL count_by_tables {"times":"each"} M seed 6: pages 2; 
+FAIL count_by_tables {"times":"each"} M seed 7: pages 2; 
+FAIL count_by_tables {"times":"each"} M seed 8: pages 2; 
+FAIL count_by_tables {"times":"each"} M seed 9: pages 2; 
+FAIL count_by_tables {"times":"each"} M seed 10: pages 2; 
+FAIL count_by_tables {"times":"each"} M seed 11: pages 2; 
+FAIL count_by_tables {"times":"each"} M seed 12: pages 2; 
+FAIL count_by_tables {"times":"each"} L seed 1: pages 2; 
+FAIL count_by_tables {"times":"each"} L seed 2: pages 2; 
+FAIL count_by_tables {"times":"each"} L seed 3: pages 2; 
+FAIL count_by_tables {"times":"each"} L seed 4: pages 2; 
+FAIL count_by_tables {"times":"each"} L seed 5: pages 2; 
+FAIL count_by_tables {"times":"each"} L seed 6: pages 2; 
+FAIL count_by_tables {"times":"each"} L seed 7: pages 2; 
+FAIL count_by_tables {"times":"each"} L seed 8: pages 2; 
+FAIL count_by_tables {"times":"each"} L seed 9: pages 2; 
+FAIL count_by_tables {"times":"each"} L seed 10: pages 2; 
+FAIL count_by_tables {"times":"each"} L seed 11: pages 2; 
+FAIL count_by_tables {"times":"each"} L seed 12: pages 2; 
+PASS count_by_tables {} S: model page counts over 12 seeds {"1":12}
+PASS count_by_tables {} M: model page counts over 12 seeds {"1":12}
+PASS count_by_tables {} L: model page counts over 12 seeds {"1":12}
+PASS count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]} S: model page counts over 12 seeds {"1":12}
+PASS count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]} M: model page counts over 12 seeds {"1":12}
+PASS count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]} L: model page counts over 12 seeds {"1":12}
+PASS count_by_tables {"rows":[{"step":100000,"start":"custom","at":1000000}]} S: model page counts over 12 seeds {"1":12}
+PASS count_by_tables {"rows":[{"step":100000,"start":"custom","at":1000000}]} M: model page counts over 12 seeds {"1":12}
+FAIL count_by_tables {"rows":[{"step":100000,"start":"custom","at":1000000}]} L: model page counts over 12 seeds {"2":12}
+PASS count_by_tables {"rows":[{"step":7,"start":"custom","at":3}]} S: model page counts over 12 seeds {"1":12}
+PASS count_by_tables {"rows":[{"step":7,"start":"custom","at":3}]} M: model page counts over 12 seeds {"1":12}
+PASS count_by_tables {"rows":[{"step":7,"start":"custom","at":3}]} L: model page counts over 12 seeds {"1":12}
+PASS count_by_tables {"jumps":15} S: model page counts over 12 seeds {"1":12}
+FAIL count_by_tables {"jumps":15} M: model page counts over 12 seeds {"2":12}
+FAIL count_by_tables {"jumps":15} L: model page counts over 12 seeds {"2":12}
+PASS count_by_tables {"times":"each"} S: model page counts over 12 seeds {"1":12}
+FAIL count_by_tables {"times":"each"} M: model page counts over 12 seeds {"2":12}
+FAIL count_by_tables {"times":"each"} L: model page counts over 12 seeds {"2":12}
+PASS count_by_tables {"spaces":"line"} S: model page counts over 12 seeds {"1":12}
+PASS count_by_tables {"spaces":"line"} M: model page counts over 12 seeds {"1":12}
+PASS count_by_tables {"spaces":"line"} L: model page counts over 12 seeds {"1":12}
+PASS skip_count_grid {} S: model page counts over 12 seeds {"1":12}
+PASS skip_count_grid {} M: model page counts over 12 seeds {"1":12}
+PASS skip_count_grid {} L: model page counts over 12 seeds {"1":12}
+PASS skip_count_line {} S: model page counts over 12 seeds {"1":12}
+PASS skip_count_line {} M: model page counts over 12 seeds {"1":12}
+PASS skip_count_line {} L: model page counts over 12 seeds {"1":12}
+PASS skip_count_grid review: titles ["Review: skip counting by 2s, 5s and 10s"]
+PASS skip_count_grid test: titles ["Test A: skip counting by 2s, 5s and 10s"]
+PASS skip_count_grid guided: titles ["I Can skip count by 2s, 5s and 10s"]
+PASS skip_count_grid independent: titles ["I Can skip count by 2s, 5s and 10s"]
+PASS skip_count_grid more-practice: titles ["I Can skip count by 2s, 5s and 10s"]
+PASS skip_count_grid scripted-model: titles ["I Can skip count by 2s, 5s and 10s"]
+PASS skip_count_line review: titles ["Review: skip counting on a number line"]
+PASS skip_count_line test: titles ["Test A: skip counting on a number line"]
+PASS skip_count_line guided: titles ["I Can skip count on a number line"]
+PASS skip_count_line independent: titles ["I Can skip count on a number line"]
+PASS skip_count_line more-practice: titles ["I Can skip count on a number line"]
+PASS skip_count_line scripted-model: titles ["I Can skip count on a number line"]
+PASS count_by_tables review: titles ["Review: counting by 1 to 12"]
+PASS count_by_tables test: titles ["Test A: counting by 1 to 12"]
+PASS count_by_tables guided: titles ["I Can count by 1 to 12"]
+PASS count_by_tables independent: titles ["I Can count by 1 to 12"]
+PASS count_by_tables more-practice: titles ["I Can count by 1 to 12"]
+PASS count_by_tables scripted-model: titles ["I Can count by 1 to 12"]
+model-probe-r2: FAIL (65)

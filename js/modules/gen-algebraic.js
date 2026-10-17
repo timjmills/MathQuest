@@ -7,7 +7,7 @@ import { optionsFor, pvCap } from './skill-options.js';
 import { generatePvRounding, generatePvPlaceValue, generatePvEstimation, pvSpan, pvRefuse, pvOptions } from './gen-pv.js';
 import { numeralTracksHTML } from './sheet/index.js';
 import { generateFunctionTable } from './gen-function-table.js';
-import { genNumberPatterns } from './gen-mult-patterns.js';
+import { genNumberPatterns, genSkipCountGrid, genSkipCountLine } from './gen-mult-patterns.js';
 
 // ===========================================================================
 // THE ODD / EVEN SORT ON PAPER
@@ -1839,171 +1839,11 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                     q.visual = createHalveBarGraph(base);
                 }
             } else if (patternSkill === "skip_count_line") {
-                // Skip Counting on a Number Line - 3-4 missing numbers
-                let skipOptions = [2, 3, 4, 5, 6, 10];
-                if (range >= 100) skipOptions.push(25);
-                if (range >= 500) skipOptions.push(50);
-                if (range >= 1000) skipOptions.push(100);
-                const skipBy = pick(skipOptions);
-                const maxStartMult = Math.max(1, Math.min(Math.floor(range / skipBy / 8), 20));
-                const startVal = rng(0, maxStartMult) * skipBy;
-                const numMarks = 8;
-                const values = Array.from({length: numMarks}, (_, i) => startVal + skipBy * i);
-
-                const numMissing = rng(3, 4);
-                const candidateIndices = [];
-                for (let i = 1; i <= numMarks - 2; i++) candidateIndices.push(i);
-                shuffle(candidateIndices);
-                const missingIndices = candidateIndices.slice(0, numMissing).sort((a, b) => a - b);
-                const missingValues = missingIndices.map(i => values[i]);
-                const answerStr = missingValues.join(", ");
-
-                q.text = `Fill in the missing numbers. Skip count by ${skipBy}s.`;
-                q.ans = answerStr;
-                q.hint = `Each mark increases by ${skipBy}. Fill in all ${numMissing} blanks separated by commas.`;
-                q.skillLabel = 'Skip Count';
-                q.printFormat = 'skip-count-line';
-                q.answerType = "text";
-                q.options = [];
-
-                const svgW = 420;
-                const svgH = 80;
-                const leftPad = 30;
-                const rightPad = 30;
-                const lineY = 40;
-                const spacing = (svgW - leftPad - rightPad) / (numMarks - 1);
-                const missingSet = new Set(missingIndices);
-
-                let ticksSVG = '';
-                for (let i = 0; i < numMarks; i++) {
-                    const x = leftPad + i * spacing;
-                    const isMissing = missingSet.has(i);
-                    ticksSVG += `<line x1="${x}" y1="${lineY - 10}" x2="${x}" y2="${lineY + 10}" stroke="currentColor" stroke-width="${STROKE.normal}"/>`;
-                    if (isMissing) {
-                        ticksSVG += `<circle cx="${x}" cy="${lineY}" r="14" fill="${COLORS.fill[2]}" opacity="0.3"/>`;
-                        ticksSVG += `<text x="${x}" y="${lineY + 30}" text-anchor="middle" font-family='${FONTS.sans}' fill="${COLORS.fill[2]}" font-size="18" font-weight="bold">?</text>`;
-                    } else {
-                        ticksSVG += `<text x="${x}" y="${lineY + 28}" text-anchor="middle" font-family='${FONTS.sans}' fill="currentColor" font-size="15" font-weight="bold">${values[i].toLocaleString()}</text>`;
-                    }
-                }
-                let arrowsSVG = '';
-                for (let i = 0; i < numMarks - 1; i++) {
-                    const x1 = leftPad + i * spacing + 8;
-                    const x2 = leftPad + (i + 1) * spacing - 8;
-                    arrowsSVG += `<line x1="${x1}" y1="${lineY - 18}" x2="${x2}" y2="${lineY - 18}" stroke="${COLORS.primary}" stroke-width="${STROKE.normal}" marker-end="url(#skipArrow)"/>`;
-                }
-
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.2rem;">Skip Count by ${skipBy}s</div>
-                    <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:600px;height:auto;">
-                        <defs>
-                            <marker id="skipArrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-                                <path d="M 0 0 L 6 3 L 0 6" fill="none" stroke="${COLORS.primary}" stroke-width="1"/>
-                            </marker>
-                        </defs>
-                        <line x1="${leftPad}" y1="${lineY}" x2="${svgW - rightPad}" y2="${lineY}" stroke="currentColor" stroke-width="${STROKE.normal}"/>
-                        ${arrowsSVG}
-                        ${ticksSVG}
-                    </svg>
-                    <div style="font-size:0.85rem;color:var(--text-dim);margin-top:5px;">+${skipBy} each step | Type all ${numMissing} missing numbers separated by commas</div>
-                </div>`;
+                // Kit count-row on a number line (2026-10-03): gen-mult-patterns.js genSkipCountLine.
+                genSkipCountLine(q, range);
             } else if (patternSkill === "skip_count_grid") {
-                // Skip Counting Grid - emits grid-fill answerType with 1-7 blanks.
-                // Widget consumes q.gridFill.cells[i] = {row, col, value, blank}.
-                const multiplier = rng(1, 12);
-                const gridRows = 2;
-                const gridCols = 6;
-                const gridSize = gridRows * gridCols; // 12 cells
-                const allMultiples = Array.from({length: gridSize}, (_, i) => multiplier * (i + 1));
-
-                // Pick blank count: weight toward 3-5 for solvability.
-                // Distribution: 1:8%, 2:12%, 3:20%, 4:20%, 5:20%, 6:12%, 7:8%
-                const blankWeights = [0, 8, 12, 20, 20, 20, 12, 8];
-                const totalWeight = blankWeights.reduce((a, b) => a + b, 0);
-                let roll = rng(1, totalWeight);
-                let numBlanks = 1;
-                for (let n = 1; n <= 7; n++) {
-                    roll -= blankWeights[n];
-                    if (roll <= 0) { numBlanks = n; break; }
-                }
-
-                // Pick blank positions subject to constraints:
-                //  (1) at least 1, never more than 7
-                //  (2) don't blank ALL cells of any row or column
-                //  (3) don't blank both first AND last cells together
-                let blankIndices;
-                for (let attempt = 0; attempt < 50; attempt++) {
-                    const candidateIdx = Array.from({length: gridSize}, (_, i) => i);
-                    shuffle(candidateIdx);
-                    const trial = new Set(candidateIdx.slice(0, numBlanks));
-
-                    // Check constraint (3): not both first AND last
-                    if (trial.has(0) && trial.has(gridSize - 1)) continue;
-
-                    // Check constraint (2): no fully blank row or column
-                    let rowBlankCounts = new Array(gridRows).fill(0);
-                    let colBlankCounts = new Array(gridCols).fill(0);
-                    trial.forEach(idx => {
-                        rowBlankCounts[Math.floor(idx / gridCols)]++;
-                        colBlankCounts[idx % gridCols]++;
-                    });
-                    if (rowBlankCounts.some(c => c === gridCols)) continue;
-                    if (colBlankCounts.some(c => c === gridRows)) continue;
-
-                    blankIndices = trial;
-                    break;
-                }
-                // Fallback: just take first cell as the only blank
-                if (!blankIndices) {
-                    blankIndices = new Set([rng(1, gridSize - 2)]);
-                    numBlanks = 1;
-                }
-
-                const blankArray = [...blankIndices].sort((a, b) => a - b);
-                const blankValues = blankArray.map(i => allMultiples[i]);
-
-                // Build cells array for the grid-fill widget
-                const cells = allMultiples.map((val, i) => ({
-                    row: Math.floor(i / gridCols),
-                    col: i % gridCols,
-                    value: val,
-                    blank: blankIndices.has(i),
-                }));
-
-                q.text = `Fill in all the blank cells. Count by ${multiplier}s.`;
-                q.hint = `Count by ${multiplier}s: ${multiplier}, ${multiplier * 2}, ${multiplier * 3}... Fill in each blank cell.`;
-                q.skillLabel = 'Skip Count Grid';
-                q.answerType = 'grid-fill';
-                q.gridFill = {
-                    rows: gridRows,
-                    cols: gridCols,
-                    cells: cells,
-                    label: `x ${multiplier} Grid`,
-                };
-                // Legacy fallback: array of expected blank values (in row-major order)
-                q.ans = blankValues;
-                q.options = [];
-                q.printFormat = 'skip-count-grid';
-
-                // Keep a static visual for any path that hasn't been migrated to
-                // the widget yet (worksheet/print modes still consume q.visual).
-                const gridCellsHTML = allMultiples.map((val, i) => {
-                    const isBlank = blankIndices.has(i);
-                    if (isBlank) {
-                        return `<div style="aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;border-radius:10px;background:var(--bg-card-light);min-height:95px;">
-                            <span style="display:inline-block;width:60%;border-bottom:3px solid var(--text-dim);"></span>
-                        </div>`;
-                    } else {
-                        return `<div style="aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;background:var(--accent-cyan);color:white;border-radius:10px;font-weight:700;font-size:1.85rem;min-height:95px;">${val}</div>`;
-                    }
-                });
-
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.2rem;">x ${multiplier} Grid</div>
-                    <div style="display:grid;grid-template-columns:repeat(${gridCols},1fr);gap:10px;max-width:820px;width:100%;margin:0 auto;">
-                        ${gridCellsHTML.join('')}
-                    </div>
-                </div>`;
+                // Kit count-row, two lines of six (2026-10-03): gen-mult-patterns.js genSkipCountGrid.
+                genSkipCountGrid(q);
             } else if (patternSkill === "number_seq_fill") {
                 // Number Sequence Fill — ONE ROW OF TEN boxes with 2-4 of them missing.
                 //

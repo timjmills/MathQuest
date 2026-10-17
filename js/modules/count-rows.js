@@ -132,6 +132,20 @@ export function rowLines(row, signed = false, n = 12) {
     // the cell's compactFit (sheet/cells/count-row.js) at its worst case (every number a box), kept in step: boxes at their
     // writing width (>= 9 mm), every gap >= S_GAP (a 2.2 mm arrow, 1 mm clear each side); digits may shrink to FLOOR (TY-10a)
     const k = values.length, avail = S_LIVE - tab, PT = 0.3528;
+    // critic skip-count r3 D11 (kept in step with count-row.js wideNeedMm / arcsGeom): a row of 6+ digit numbers writes in
+    // boxes of >= 5 mm a digit (+1.2 mm a comma), so it takes 3 lines of 4 (or 4 of 3) on the one-page sheet too
+    const strs = values.map((v) => Number(v).toLocaleString('en-US'));
+    const digits = Math.max(0, ...strs.map((t) => (t.match(/\d/g) || []).length));
+    if (digits >= 6) {
+        const commas = Math.max(0, ...strs.map((t) => (t.match(/,/g) || []).length));
+        const need = Math.max(digits * 5 + commas * 1.2, chars * 0.56 * Math.min(16, 18) * PT + 2.4);
+        const MIN_GAP = 6.5, EXIT = 7.5;
+        for (const per of (k >= 13 ? [5, 4, 3] : [4, 3, 2])) {
+            const lines = Math.ceil(k / per);
+            if ((avail - (lines > 1 ? EXIT : 0) + MIN_GAP) / per - MIN_GAP >= need) return lines;
+        }
+        return Math.ceil(k / 2);
+    }
     const room = avail - (k - 1) * S_GAP;
     const w = room / k;
     if (w >= 9 && (w - 1.8) / (chars * 0.56 * PT) >= FLOOR) return 1;
@@ -146,7 +160,7 @@ export const ONE_PAGE_ITEMS = 12;
  * height those cells share under the header and the instruction. Both are measured on the sheet (wave1-c2-onepage asserts the
  * cap is tight: the next chosen row would make a second page, on A4 and on Letter).
  */
-export const ROW_MM = { 1: 16.5, 2: 32.0 };   // re-measured 2026-10-03: the jump arrows replaced the arcs over each line
+export const ROW_MM = { 1: 16.5, 2: 32.0, 3: 47.5, 4: 63.0, 5: 78.5, 6: 94.0 };   // 3+: wide (6+ digit) rows, r3 D11   // re-measured 2026-10-03: the jump arrows replaced the arcs over each line
 export const ONE_PAGE_BODY = { A4: 226, Letter: 208 };
 export const MIX_ROW_MM = 0.6;
 let _paper = 'A4';
@@ -170,7 +184,7 @@ export function onePagePlan(rows, paper = _paper) {
     // MIX_ROW_MM to every row; a page of one kind is a plain grid
     const total = (hs) => hs.reduce((a, h) => a + h, 0) + (new Set(hs).size > 1 ? MIX_ROW_MM * hs.length : 0);
     for (const r of list) {
-        const h = ROW_MM[rowLines(r, signed) === 1 ? 1 : 2];
+        const h = ROW_MM[Math.min(6, rowLines(r, signed))];
         if (out.length && total([...heights, h]) > body + 1e-9) break;
         out.push(r); heights.push(h);
     }

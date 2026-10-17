@@ -1,0 +1,38 @@
+PASS count_by_tables S: 4 model states
+PASS count_by_tables S: state k traces the answers of steps 2..k (traced per state 0,1,2,5)
+PASS count_by_tables S: step 2 "6 + 2 = 8. Write 8." shows its written answer
+PASS count_by_tables S: the model fits one page (1)
+PASS count_by_tables M: 4 model states
+PASS count_by_tables M: state k traces the answers of steps 2..k (traced per state 0,1,2,5)
+PASS count_by_tables M: step 2 "6 + 2 = 8. Write 8." shows its written answer
+PASS count_by_tables M: the model fits one page (1)
+PASS count_by_tables L: 4 model states
+PASS count_by_tables L: state k traces the answers of steps 2..k (traced per state 0,1,2,5)
+PASS count_by_tables L: step 2 "6 + 2 = 8. Write 8." shows its written answer
+PASS count_by_tables L: the model fits one page (1)
+PASS skip_count_grid S: 4 model states
+PASS skip_count_grid S: state k traces the answers of steps 2..k (traced per state 0,1,2,5)
+PASS skip_count_grid S: step 2 "15 + 5 = 20. Write 20." shows its written answer
+PASS skip_count_grid S: the model fits one page (1)
+PASS skip_count_grid M: 4 model states
+PASS skip_count_grid M: state k traces the answers of steps 2..k (traced per state 0,1,2,5)
+PASS skip_count_grid M: step 2 "15 + 5 = 20. Write 20." shows its written answer
+PASS skip_count_grid M: the model fits one page (1)
+PASS skip_count_grid L: 4 model states
+PASS skip_count_grid L: state k traces the answers of steps 2..k (traced per state 0,1,2,5)
+PASS skip_count_grid L: step 2 "15 + 5 = 20. Write 20." shows its written answer
+PASS skip_count_grid L: the model fits one page (1)
+PASS skip_count_line S: 4 model states
+PASS skip_count_line S: state k traces the answers of steps 2..k (traced per state 0,1,2,3)
+PASS skip_count_line S: step 2 "40 + 5 = 45. Write 45." shows its written answer
+PASS skip_count_line S: the model fits one page (1)
+PASS skip_count_line M: 4 model states
+PASS skip_count_line M: state k traces the answers of steps 2..k (traced per state 0,1,2,3)
+PASS skip_count_line M: step 2 "40 + 5 = 45. Write 45." shows its written answer
+PASS skip_count_line M: the model fits one page (1)
+PASS skip_count_line L: 4 model states
+PASS skip_count_line L: state k traces the answers of steps 2..k (traced per state 0,1,2,3)
+PASS skip_count_line L: step 2 "40 + 5 = 45. Write 45." shows its written answer
+PASS skip_count_line L: the model fits one page (1)
+PASS no page errors
+wave1-c2-model: OK

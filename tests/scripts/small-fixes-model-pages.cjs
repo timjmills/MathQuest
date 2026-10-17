@@ -1,7 +1,8 @@
 // Small-fixes lane, item 7 (critic r2 N3): the count row that wraps in the Model cell must never cost a page.
 // For every count_by_tables option combo, size S/M/L and paper A4/Letter, the Opener and the Scripted Model
 // print no more pupil pages (and no more key pages) on this tree than on a base checkout (main before the lane).
-// It also asserts the Scripted Model is byte-identical to the base (it never overflowed there) and prints the
+// It also asserts the Opener is byte-identical to the base, and that no Scripted Model page holds a lone state (the count-row
+// Model is the skip-count lane's intended change, so it is not byte-compared: see the comment at the check), and prints the
 // Opener's Independent row count per sheet beside the base's, so a fuller page shows up in the log.
 // Critic r3 N8/N9: every Opener pupil page (this tree only) is also rendered in Chromium and every cell measured - no cell may be
 // EMPTY (a bordered box with no ink), and no cell's largest empty band (top or bottom, from the cell's inner edge to the nearest
@@ -135,7 +136,9 @@ async function digest() {
         const r = await window.buildSheet({ role, sections: [{ skills: [{ categoryId: 'multiplication', skillId: 'count_by_tables', opts: c.opts }] }], size, paper, seed: 4242, key: true });
         const note = String((r.fits && r.fits.note) || '');
         const ind = /(\d+) independent/.exec(note), gd = /(\d+) guided/.exec(note);
+        const statesPer = (h) => { const dd = document.createElement('div'); dd.innerHTML = h || ''; return [...dd.querySelectorAll('section.ws-page')].map((pg) => pg.querySelectorAll('.k2-countrow').length); };
         res[k] = { onePage: !!c.opts.onePage, pages: r.pageCount, keyPages: r.keyPageCount, html: r.pupilHtml + r.keyHtml, indep: ind ? Number(ind[1]) : null,
+          states: role === 'scripted-model' ? statesPer(r.pupilHtml) : null, keyStates: role === 'scripted-model' ? statesPer(r.keyHtml) : null,
           guided: gd ? Number(gd[1]) : null, cols: r.fits && r.fits.cols };
         const sec = (r.fits && r.fits.sections && r.fits.sections[0]) || {};
         if (sec.rowMm !== undefined) Object.assign(res[k], { rowMm: sec.rowMm, growMm: sec.growMm || 0 });
@@ -167,9 +170,26 @@ async function digest() {
     const errs = [];
     if (a.error) errs.push(`error ${a.error}`);
     if (!a.error && !b.error) {
-      if (a.pages > b.pages) errs.push(`pupil pages ${b.pages} -> ${a.pages}`);
-      if (a.keyPages > b.keyPages) errs.push(`key pages ${b.keyPages} -> ${a.keyPages}`);
-      if (k.includes('| scripted-model |') && a.sha !== b.sha) errs.push('scripted model differs from base');
+      const model = k.includes('| scripted-model |');
+      // skip-count lane (critic r3 D11, fix round 5 / critic r4 N9): a 6+ digit row is a hand-writing row (>= 5 mm a digit), so its
+      // Model may go from 1 page to 2 - only as 2 + 2 states (no lone state). That is the lane's one intended page increase.
+      const wideRow = /\b(25,000|100,000)\b/.test(k);
+      const okRise = (n0, n1, st) => model && wideRow && n0 === 1 && n1 === 2 && JSON.stringify(st) === '[2,2]';
+      if (a.pages > b.pages && !okRise(b.pages, a.pages, a.states)) errs.push(`pupil pages ${b.pages} -> ${a.pages}`);
+      if (a.keyPages > b.keyPages && !okRise(b.keyPages, a.keyPages, a.keyStates)) errs.push(`key pages ${b.keyPages} -> ${a.keyPages}`);
+      // The Scripted Model of a COUNT ROW is the skip-count lane's intended change (critic skip-count r4 N9), so it is not byte-compared
+      // with the base: traced partial states (r1 D5), "Write 10." (N2), the one-line step text (D5), steps 2 and 3 merged when they are
+      // the same parallel action (D8 / D10), wide-row boxes and digits >= 11 pt (D11 / N10), and the one-page option ignored by a wide
+      // row's Model with its states paired (D12). Instead it is held to the lane's rule: no page holds a lone state (pupil and key).
+      // Every other role compared here (the Opener) must still be byte-identical to the base.
+      if (model) {
+        for (const [which, st] of [['pupil', a.states], ['key', a.keyStates]]) {
+          if (Array.isArray(st) && st.length > 1 && st.some((n) => n < 2)) errs.push(`${which} model states per page ${JSON.stringify(st)} (a lone state)`);
+        }
+      } else if (a.sha !== b.sha && !(/Lines/.test(k) && /\| (M|L) \|/.test(k))) errs.push(`${k.split(' | ')[1]} differs from base`);
+      // (the one Opener exemption: its Model cell of a Lines row at M and L draws the lane's owner-ruled Lines - two lines of 6 with
+      // ~14 mm write-on lines, owner 2026-10-09, skip-count critic r1 D2/D3 - and the rows under it re-fit to that cell; those sheets
+      // keep every other check here: pages, empty cells, bands, slots and given sizes)
     }
     if (a.cells) {
       // A row the plan left out "fits" when the body still holds it within PT-ENG-3's budget (fixed heights <= bodyH - 4): the room
@@ -204,7 +224,8 @@ async function digest() {
     }
     if (errs.length) bad++;
     const ind = k.includes('| opener |') ? `  guided ${b.guided === undefined ? '?' : b.guided} -> ${a.guided}, independent rows ${b.indep} -> ${a.indep}${a.cells ? `  cells ${a.cells.n}, band ${Math.round(a.cells.maxBand * 100)} %, foot ${a.cells.footMm} mm, room ${a.cells.roomMm} mm` : ''}${a.write && a.write.cells ? `  slot ${a.write.minW} mm / ${a.write.maxLen} ch, given ${a.write.minPt} pt` : ''}` : '';
-    console.log(`${errs.length ? 'FAIL' : 'ok  '} ${k.padEnd(52)} pages ${b.pages}/${b.keyPages} -> ${a.pages}/${a.keyPages}${ind}${errs.length ? '  ' + errs.join('; ') : ''}`);
+    const st = a.states ? `  states ${JSON.stringify(b.states || '?')} -> ${JSON.stringify(a.states)}` : '';
+    console.log(`${errs.length ? 'FAIL' : 'ok  '} ${k.padEnd(52)} pages ${b.pages}/${b.keyPages} -> ${a.pages}/${a.keyPages}${st}${ind}${errs.length ? '  ' + errs.join('; ') : ''}`);
   }
   // critic r6 N15 (lessons-learned L1): the givens never get smaller as the size grows (L >= M >= S), per combo and paper
   for (const c of COMBOS) for (const paper of PAPERS) {

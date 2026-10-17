@@ -1,0 +1,41 @@
+ok   S: Lines draws 60 write-on lines and no answer boxes
+ok   S: the key writes every answer on its line
+ok   S: a table row is ONE line of 12 with 11 jump arrows (lines 1, 12 per line, 11 arrows)
+ok   S: Lines fits more rows on a page than Boxes (12 vs 6)
+     S 3-digit: 1 line(s), 12 numbers per line
+     S 5-digit: 2 line(s), 6 numbers per line
+ok   M: Lines draws 60 write-on lines and no answer boxes
+ok   M: the key writes every answer on its line
+ok   M tables: digits keep the working size (14.1 pt >= 14.1)
+ok   M tables: the step tab keeps the working size (14.8 pt)
+ok   M tables: two lines of 6 (2 x 6, 10 arrows)
+ok   M tables: every row on the page takes two lines (2,2,2,2,2,2,2,2,2,2,2,2)
+ok   M tables: every write-on line is >= 14 mm (16.7 mm)
+ok   M 3-digit: digits keep the working size (14.1 pt >= 14.1)
+ok   M 3-digit: the step tab keeps the working size (14.8 pt)
+ok   M 3-digit: two lines of 6 (2 x 6, 10 arrows)
+ok   M 3-digit: every row on the page takes two lines (2,2,2,2,2,2,2,2,2,2,2,2)
+ok   M 3-digit: every write-on line is >= 14 mm (16.7 mm)
+ok   M: Lines fits no fewer rows on a page than Boxes (6 vs 6)
+     M 3-digit: 2 line(s), 6 numbers per line
+     M 5-digit: 2 line(s), 6 numbers per line
+ok   L: Lines draws 60 write-on lines and no answer boxes
+ok   L: the key writes every answer on its line
+ok   L tables: digits keep the working size (17.9 pt >= 17.9)
+ok   L tables: the step tab keeps the working size (18.8 pt)
+ok   L tables: two lines of 6 (2 x 6, 10 arrows)
+ok   L tables: every row on the page takes two lines (2,2,2,2,2,2,2,2,2,2,2,2)
+ok   L tables: every write-on line is >= 14 mm (16.5 mm)
+ok   L 3-digit: digits keep the working size (17.9 pt >= 17.9)
+ok   L 3-digit: the step tab keeps the working size (18.8 pt)
+ok   L 3-digit: two lines of 6 (2 x 6, 10 arrows)
+ok   L 3-digit: every row on the page takes two lines (2,2,2,2,2,2,2,2,2,2,2,2)
+ok   L 3-digit: every write-on line is >= 14 mm (16.5 mm)
+ok   L: Lines fits no fewer rows on a page than Boxes (6 vs 4)
+     L 3-digit: 2 line(s), 6 numbers per line
+     L 5-digit: 2 line(s), 6 numbers per line
+ok   one-page sheet with Lines: 12 rows, 1 page + 1 key page
+ok   card 390: every line holds an input (5/5)
+ok   worksheet 390: every line holds an input (5/5)
+ok   no page errors
+wave1-c2-lines: OK

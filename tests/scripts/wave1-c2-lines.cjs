@@ -2,6 +2,7 @@
 // jump arrows between neighbours (no arcs over the row).
 //  - every missing number is a write-on LINE (data-ws-shape="line", a bottom rule only), never a box, on the pupil page; the key
 //    writes each answer on its line;
+//  - owner ruling 2026-10-09: at M and L EVERY row takes two lines of 6 with write-on lines >= 14 mm (one rhythm);
 //  - a table row (1-2 and 3 digits) holds its 12 numbers on ONE line at S; at M and L (owner 2026-10-09, critic r1 D3) a row never
 //    shrinks its digits or its step tab below the size's working size (22 x 0.64 pt at M, 28 x 0.64 at L): a row that does not fit
 //    12 at that size takes two lines of 6; wide numbers take two lines of 6;
@@ -36,6 +37,8 @@ const check = (ok, msg) => { console.log((ok ? 'ok   ' : 'FAIL ') + msg); if (!o
           arcs: d.querySelectorAll('path[d*=" Q"]').length - d.querySelectorAll('.k2-countrow-line > span svg path[d*=" Q"]').length,
           linePt: Math.min(...[...d.querySelectorAll('[data-ws-shape="line"]')].map((e) => parseFloat(e.style.fontSize))),
           tabPt: Math.min(...[...d.querySelectorAll('.k2-steptab text')].map((e) => parseFloat(e.getAttribute('font-size')) * 72 / 25.4)),
+          rowLines: [...d.querySelectorAll('.k2-countrow-body')].map((b) => b.querySelectorAll('.k2-countrow-line').length),
+          minLineMm: Math.min(...[...d.querySelectorAll('.k2-shape-line')].map((e) => { const v = parseFloat(e.style.width); return /mm$/.test(e.style.width) ? v : /px$/.test(e.style.width) ? v * 25.4 / 96 : v; })),
           keyFilled: [...k.querySelectorAll('[data-ws-shape="line"]')].every((e) => e.textContent.trim() !== ''),
         };
       }
@@ -57,7 +60,10 @@ const check = (ok, msg) => { console.log((ok ? 'ok   ' : 'FAIL ') + msg); if (!o
         const r = res[`${size} ${n}`];
         check(r.linePt >= work - 0.15, `${size} ${n}: digits keep the working size (${r.linePt.toFixed(1)} pt >= ${work.toFixed(1)})`);
         check(r.tabPt >= work * 1.05 - 0.2, `${size} ${n}: the step tab keeps the working size (${r.tabPt.toFixed(1)} pt)`);
-        check((r.firstLines === 1 && r.perLine === 12 && r.arrows === 11) || (r.firstLines === 2 && r.perLine === 6 && r.arrows === 10), `${size} ${n}: one line of 12 or two lines of 6 (${r.firstLines} x ${r.perLine}, ${r.arrows} arrows)`);
+        // owner ruling 2026-10-09: at M and L EVERY row takes two lines of 6 with roomy (>= 14 mm) write-on lines
+        check(r.firstLines === 2 && r.perLine === 6 && r.arrows === 10, `${size} ${n}: two lines of 6 (${r.firstLines} x ${r.perLine}, ${r.arrows} arrows)`);
+        check(r.rowLines.length > 0 && r.rowLines.every((k) => k === 2), `${size} ${n}: every row on the page takes two lines (${r.rowLines.join(',')})`);
+        check(r.minLineMm >= 14 - 0.05, `${size} ${n}: every write-on line is >= 14 mm (${r.minLineMm.toFixed(1)} mm)`);
       }
       check(t.perPage >= b.perPage, `${size}: Lines fits no fewer rows on a page than Boxes (${t.perPage} vs ${b.perPage})`);
     }

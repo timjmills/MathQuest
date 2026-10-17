@@ -1,0 +1,475 @@
+PASS card 390 | default tables: at load the row rests at 0 (scrollLeft 0) with the first given number fully in the 308 px window, the first box NOT fully in it, focus not in the row, nothing cut at either edge
+PASS card 390 | default tables: the card's auto-focus is withheld: the first box does not show at the start, so nothing is typed blind
+PASS card 390 | default tables: after load the step tab is clear of the row, nothing under it
+PASS card 390 | default tables: digits 29.0 px (about 29), box 76 x 53 px (>= 48, width:digit 2.63, 2.6 before the change)
+PASS card 390 | default tables: the forward cue is whole, on one line, inside the window (200 px in a 308 px window, 17 px type, 25 px high)
+PASS card 390 | default tables: the window shows 3 whole columns; 3 fit in the 322 px up to the nearest clip
+PASS card 390 | default tables: the hidden first box (column 4) lies past the 3 shown columns, and 3 fit
+PASS card 390 | default tables: negative control: with the window narrowed by one column (2 shown of 3 that fit) the forced-hidden check FAILS as it must
+PASS card 390 | default tables: with focus held back, typing 5 moves to the first box (focused true, value "5", fully shown true)
+PASS card 390 | default tables: after a scroll of 0.7 column the row settles on the next column start (scrollLeft 112), nothing cut, the back cue shows
+PASS card 390 | default tables: one column in, both cues show on ONE line, 33 px ("⟵ Back Swipe ➞")
+PASS card 390 | default tables: mid-row, the cues share one strip 33 px high (<= 60 and <= half the 126 px row; back shown, forward shown)
+PASS card 390 | default tables: after scrollLeft = 130 the row settles on a column start (scrollLeft 112), nothing cut, the back cue shows
+PASS card 390 | default tables: a program focus of the first box is refused (it does not show at the start), the row stays at 0 (scrollLeft 0), the start in the 308 px window
+PASS card 390 | default tables: Tab into the row focuses the first box, fully in the window, the row at the leftmost start that shows it (scrollLeft 112, want 112)
+PASS card 390 | default tables: after Tab, typing 7 writes "7" into the first box
+PASS card 390 | default tables: a tap on the first box (row swiped to 112) focuses it in view, the row does not move (scrollLeft 112), typing 7 writes "7"
+PASS card 390 | default tables: Tab reached 5/5 boxes, each fully visible
+PASS card 390 | default tables: no box clipped at the card's bottom or any ancestor edge, page scroll width 0
+PASS card 390 | default tables: swipe cue "Swipe ➞ for more boxes" shown at the start, hidden at the end, over a box: false
+PASS card 390 | by 1,000 from 14,000: at load the row rests at 0 (scrollLeft 0) with the first given number fully in the 299 px window, the first box NOT fully in it, focus not in the row, nothing cut at either edge
+PASS card 390 | by 1,000 from 14,000: the card's auto-focus is withheld: the first box does not show at the start, so nothing is typed blind
+PASS card 390 | by 1,000 from 14,000: after load the step tab is clear of the row, nothing under it
+PASS card 390 | by 1,000 from 14,000: a wide number row (TY-10a): digits 20.7 px, box 75 x 53 px (>= 44)
+PASS card 390 | by 1,000 from 14,000: the forward cue is whole, on one line, inside the window (200 px in a 299 px window, 17 px type, 25 px high)
+PASS card 390 | by 1,000 from 14,000: the window shows 3 whole columns; 3 fit in the 322 px up to the nearest clip
+PASS card 390 | by 1,000 from 14,000: the hidden first box (column 4) lies past the 3 shown columns, and 3 fit
+PASS card 390 | by 1,000 from 14,000: negative control: with the window narrowed by one column (2 shown of 3 that fit) the forced-hidden check FAILS as it must
+PASS card 390 | by 1,000 from 14,000: with focus held back, typing 5 moves to the first box (focused true, value "5", fully shown true)
+PASS card 390 | by 1,000 from 14,000: after a scroll of 0.7 column the row settles on the next column start (scrollLeft 109), nothing cut, the back cue shows
+PASS card 390 | by 1,000 from 14,000: one column in, both cues show on ONE line, 33 px ("⟵ Back Swipe ➞")
+PASS card 390 | by 1,000 from 14,000: mid-row, the cues share one strip 33 px high (<= 60 and <= half the 126 px row; back shown, forward shown)
+PASS card 390 | by 1,000 from 14,000: after scrollLeft = 130 the row settles on a column start (scrollLeft 109), nothing cut, the back cue shows
+PASS card 390 | by 1,000 from 14,000: a program focus of the first box is refused (it does not show at the start), the row stays at 0 (scrollLeft 0), the start in the 299 px window
+PASS card 390 | by 1,000 from 14,000: Tab into the row focuses the first box, fully in the window, the row at the leftmost start that shows it (scrollLeft 109, want 109)
+PASS card 390 | by 1,000 from 14,000: after Tab, typing 7 writes "7" into the first box
+PASS card 390 | by 1,000 from 14,000: a tap on the first box (row swiped to 109) focuses it in view, the row does not move (scrollLeft 109), typing 7 writes "7"
+PASS card 390 | by 1,000 from 14,000: Tab reached 5/5 boxes, each fully visible
+PASS card 390 | by 1,000 from 14,000: no box clipped at the card's bottom or any ancestor edge, page scroll width 0
+PASS card 390 | by 1,000 from 14,000: swipe cue "Swipe ➞ for more boxes" shown at the start, hidden at the end, over a box: false
+PASS card 390 | by 100,000 from 1,000,000 (15): at load the row rests at 0 (scrollLeft 0) with the first given number fully in the 219 px window, the first box NOT fully in it, focus not in the row, nothing cut at either edge
+PASS card 390 | by 100,000 from 1,000,000 (15): the card's auto-focus is withheld: the first box does not show at the start, so nothing is typed blind
+PASS card 390 | by 100,000 from 1,000,000 (15): after load the step tab is clear of the row, nothing under it
+PASS card 390 | by 100,000 from 1,000,000 (15): a wide number row (TY-10a): digits 16.7 px, box 89 x 53 px (>= 44)
+PASS card 390 | by 100,000 from 1,000,000 (15): the forward cue is whole, on one line, inside the window (200 px in a 219 px window, 17 px type, 25 px high)
+PASS card 390 | by 100,000 from 1,000,000 (15): the window shows 2 whole columns; 2 fit in the 322 px up to the nearest clip
+PASS card 390 | by 100,000 from 1,000,000 (15): the hidden first box (column 3) lies past the 2 shown columns, and 2 fit
+PASS card 390 | by 100,000 from 1,000,000 (15): negative control: with the window narrowed by one column (1 shown of 2 that fit) the forced-hidden check FAILS as it must
+PASS card 390 | by 100,000 from 1,000,000 (15): with focus held back, typing 5 moves to the first box (focused true, value "5", fully shown true)
+PASS card 390 | by 100,000 from 1,000,000 (15): after a scroll of 0.7 column the row settles on the next column start (scrollLeft 123), nothing cut, the back cue shows
+PASS card 390 | by 100,000 from 1,000,000 (15): one column in, both cues show on ONE line, 33 px ("⟵ Back Swipe ➞")
+PASS card 390 | by 100,000 from 1,000,000 (15): mid-row, the cues share one strip 33 px high (<= 60 and <= half the 195 px row; back shown, forward shown)
+PASS card 390 | by 100,000 from 1,000,000 (15): after scrollLeft = 130 the row settles on a column start (scrollLeft 123), nothing cut, the back cue shows
+PASS card 390 | by 100,000 from 1,000,000 (15): a program focus of the first box is refused (it does not show at the start), the row stays at 0 (scrollLeft 0), the start in the 219 px window
+PASS card 390 | by 100,000 from 1,000,000 (15): Tab into the row focuses the first box, fully in the window, the row at the leftmost start that shows it (scrollLeft 123, want 123)
+PASS card 390 | by 100,000 from 1,000,000 (15): after Tab, typing 7 writes "7" into the first box
+PASS card 390 | by 100,000 from 1,000,000 (15): a tap on the first box (row swiped to 123) focuses it in view, the row does not move (scrollLeft 123), typing 7 writes "7"
+PASS card 390 | by 100,000 from 1,000,000 (15): Tab reached 7/7 boxes, each fully visible
+PASS card 390 | by 100,000 from 1,000,000 (15): no box clipped at the card's bottom or any ancestor edge, page scroll width 0
+PASS card 390 | by 100,000 from 1,000,000 (15): swipe cue "Swipe ➞ for more boxes" shown at the start, hidden at the end, over a box: false
+PASS card 390 | times each, back: at load the row rests at 0 (scrollLeft 0) with the first given number fully in the 308 px window, the first box fully in it, focus on a box in view, nothing cut at either edge
+PASS card 390 | times each, back: the card's auto-focus is on the first box (it shows at the start)
+PASS card 390 | times each, back: after load the step tab is clear of the row, nothing under it
+PASS card 390 | times each, back: digits 29.0 px (about 29), box 76 x 53 px (>= 48, width:digit 2.63, 2.6 before the change)
+PASS card 390 | times each, back: the forward cue is whole, on one line, inside the window (200 px in a 308 px window, 17 px type, 25 px high)
+PASS card 390 | times each, back: the window shows 3 whole columns; 3 fit in the 322 px up to the nearest clip
+PASS card 390 | times each, back: after a scroll of 0.7 column the row settles on the next column start (scrollLeft 112), nothing cut, the back cue shows
+PASS card 390 | times each, back: one column in, both cues show on ONE line, 33 px ("⟵ Back Swipe ➞")
+PASS card 390 | times each, back: mid-row, the cues share one strip 33 px high (<= 60 and <= half the 200 px row; back shown, forward shown)
+PASS card 390 | times each, back: after scrollLeft = 130 the row settles on a column start (scrollLeft 112), nothing cut, the back cue shows
+PASS card 390 | times each, back: a program focus of the first box is taken (it shows at the start), the row stays at 0 (scrollLeft 0), the start in the 308 px window
+PASS card 390 | times each, back: Tab into the row focuses the first box, fully in the window, the row at the leftmost start that shows it (scrollLeft 0, want 0)
+PASS card 390 | times each, back: after Tab, typing 7 writes "7" into the first box
+PASS card 390 | times each, back: a tap on the first box (row swiped to 0) focuses it in view, the row does not move (scrollLeft 0), typing 7 writes "7"
+PASS card 390 | times each, back: Tab reached 5/5 boxes, each fully visible
+PASS card 390 | times each, back: no box clipped at the card's bottom or any ancestor edge, page scroll width 0
+PASS card 390 | times each, back: swipe cue "Swipe ➞ for more boxes" shown at the start, hidden at the end, over a box: false
+PASS card 390 | by 7 from 3: at load the row rests at 0 (scrollLeft 0) with the first given number fully in the 308 px window, the first box fully in it, focus on a box in view, nothing cut at either edge
+PASS card 390 | by 7 from 3: the card's auto-focus is on the first box (it shows at the start)
+PASS card 390 | by 7 from 3: after load the step tab is clear of the row, nothing under it
+PASS card 390 | by 7 from 3: digits 29.0 px (about 29), box 76 x 53 px (>= 48, width:digit 2.63, 2.6 before the change)
+PASS card 390 | by 7 from 3: the forward cue is whole, on one line, inside the window (200 px in a 308 px window, 17 px type, 25 px high)
+PASS card 390 | by 7 from 3: the window shows 3 whole columns; 3 fit in the 322 px up to the nearest clip
+PASS card 390 | by 7 from 3: after a scroll of 0.7 column the row settles on the next column start (scrollLeft 112), nothing cut, the back cue shows
+PASS card 390 | by 7 from 3: one column in, both cues show on ONE line, 33 px ("⟵ Back Swipe ➞")
+PASS card 390 | by 7 from 3: mid-row, the cues share one strip 33 px high (<= 60 and <= half the 126 px row; back shown, forward shown)
+PASS card 390 | by 7 from 3: after scrollLeft = 130 the row settles on a column start (scrollLeft 112), nothing cut, the back cue shows
+PASS card 390 | by 7 from 3: a program focus of the first box is taken (it shows at the start), the row stays at 0 (scrollLeft 0), the start in the 308 px window
+PASS card 390 | by 7 from 3: Tab into the row focuses the first box, fully in the window, the row at the leftmost start that shows it (scrollLeft 0, want 0)
+PASS card 390 | by 7 from 3: after Tab, typing 7 writes "7" into the first box
+PASS card 390 | by 7 from 3: a tap on the first box (row swiped to 0) focuses it in view, the row does not move (scrollLeft 0), typing 7 writes "7"
+PASS card 390 | by 7 from 3: Tab reached 5/5 boxes, each fully visible
+PASS card 390 | by 7 from 3: no box clipped at the card's bottom or any ancestor edge, page scroll width 0
+PASS card 390 | by 7 from 3: swipe cue "Swipe ➞ for more boxes" shown at the start, hidden at the end, over a box: false
+PASS card 390 | by 25: at load the row rests at 0 (scrollLeft 0) with the first given number fully in the 308 px window, the first box NOT fully in it, focus not in the row, nothing cut at either edge
+PASS card 390 | by 25: the card's auto-focus is withheld: the first box does not show at the start, so nothing is typed blind
+PASS card 390 | by 25: after load the step tab is clear of the row, nothing under it
+PASS card 390 | by 25: digits 29.0 px (about 29), box 76 x 53 px (>= 48, width:digit 2.63, 2.6 before the change)
+PASS card 390 | by 25: the forward cue is whole, on one line, inside the window (200 px in a 308 px window, 17 px type, 25 px high)
+PASS card 390 | by 25: the window shows 3 whole columns; 3 fit in the 322 px up to the nearest clip
+PASS card 390 | by 25: the hidden first box (column 4) lies past the 3 shown columns, and 3 fit
+PASS card 390 | by 25: negative control: with the window narrowed by one column (2 shown of 3 that fit) the forced-hidden check FAILS as it must
+PASS card 390 | by 25: with focus held back, typing 5 moves to the first box (focused true, value "5", fully shown true)
+PASS card 390 | by 25: after a scroll of 0.7 column the row settles on the next column start (scrollLeft 112), nothing cut, the back cue shows
+PASS card 390 | by 25: one column in, both cues show on ONE line, 33 px ("⟵ Back Swipe ➞")
+PASS card 390 | by 25: mid-row, the cues share one strip 33 px high (<= 60 and <= half the 126 px row; back shown, forward shown)
+PASS card 390 | by 25: after scrollLeft = 130 the row settles on a column start (scrollLeft 112), nothing cut, the back cue shows
+PASS card 390 | by 25: a program focus of the first box is refused (it does not show at the start), the row stays at 0 (scrollLeft 0), the start in the 308 px window
+PASS card 390 | by 25: Tab into the row focuses the first box, fully in the window, the row at the leftmost start that shows it (scrollLeft 112, want 112)
+PASS card 390 | by 25: after Tab, typing 7 writes "7" into the first box
+PASS card 390 | by 25: a tap on the first box (row swiped to 112) focuses it in view, the row does not move (scrollLeft 112), typing 7 writes "7"
+PASS card 390 | by 25: Tab reached 5/5 boxes, each fully visible
+PASS card 390 | by 25: no box clipped at the card's bottom or any ancestor edge, page scroll width 0
+PASS card 390 | by 25: swipe cue "Swipe ➞ for more boxes" shown at the start, hidden at the end, over a box: false
+PASS card 390 | missing 20 % (first box in column 6): at load the row rests at 0 (scrollLeft 0) with the first given number fully in the 308 px window, the first box NOT fully in it, focus not in the row, nothing cut at either edge
+PASS card 390 | missing 20 % (first box in column 6): the card's auto-focus is withheld: the first box does not show at the start, so nothing is typed blind
+PASS card 390 | missing 20 % (first box in column 6): the seeded first box (column 6) lies past the window at load (shown: false) and holds no focus
+PASS card 390 | missing 20 % (first box in column 6): after load the step tab is clear of the row, nothing under it
+PASS card 390 | missing 20 % (first box in column 6): digits 29.0 px (about 29), box 76 x 53 px (>= 48, width:digit 2.63, 2.6 before the change)
+PASS card 390 | missing 20 % (first box in column 6): the forward cue is whole, on one line, inside the window (200 px in a 308 px window, 17 px type, 25 px high)
+PASS card 390 | missing 20 % (first box in column 6): the window shows 3 whole columns; 3 fit in the 322 px up to the nearest clip
+PASS card 390 | missing 20 % (first box in column 6): the hidden first box (column 6) lies past the 3 shown columns, and 3 fit
+PASS card 390 | missing 20 % (first box in column 6): negative control: with the window narrowed by one column (2 shown of 3 that fit) the forced-hidden check FAILS as it must
+PASS card 390 | missing 20 % (first box in column 6): with focus held back, typing 5 moves to the first box (focused true, value "5", fully shown true)
+PASS card 390 | missing 20 % (first box in column 6): after a scroll of 0.7 column the row settles on the next column start (scrollLeft 112), nothing cut, the back cue shows
+PASS card 390 | missing 20 % (first box in column 6): one column in, both cues show on ONE line, 33 px ("⟵ Back Swipe ➞")
+PASS card 390 | missing 20 % (first box in column 6): mid-row, the cues share one strip 33 px high (<= 60 and <= half the 126 px row; back shown, forward shown)
+PASS card 390 | missing 20 % (first box in column 6): after scrollLeft = 130 the row settles on a column start (scrollLeft 112), nothing cut, the back cue shows
+PASS card 390 | missing 20 % (first box in column 6): a program focus of the first box is refused (it does not show at the start), the row stays at 0 (scrollLeft 0), the start in the 308 px window
+PASS card 390 | missing 20 % (first box in column 6): Tab into the row focuses the first box, fully in the window, the row at the leftmost start that shows it (scrollLeft 337, want 337)
+PASS card 390 | missing 20 % (first box in column 6): after Tab, typing 7 writes "7" into the first box
+PASS card 390 | missing 20 % (first box in column 6): a tap on the first box (row swiped to 337) focuses it in view, the row does not move (scrollLeft 337), typing 7 writes "7"
+PASS card 390 | missing 20 % (first box in column 6): Tab reached 2/2 boxes, each fully visible
+PASS card 390 | missing 20 % (first box in column 6): no box clipped at the card's bottom or any ancestor edge, page scroll width 0
+PASS card 390 | missing 20 % (first box in column 6): swipe cue "Swipe ➞ for more boxes" shown at the start, hidden at the end, over a box: false
+PASS card 390 | missing 90 % first only: at load the row rests at 0 (scrollLeft 0) with the first given number fully in the 308 px window, the first box fully in it, focus on a box in view, nothing cut at either edge
+PASS card 390 | missing 90 % first only: the card's auto-focus is on the first box (it shows at the start)
+PASS card 390 | missing 90 % first only: after load the step tab is clear of the row, nothing under it
+PASS card 390 | missing 90 % first only: digits 29.0 px (about 29), box 76 x 53 px (>= 48, width:digit 2.63, 2.6 before the change)
+PASS card 390 | missing 90 % first only: the forward cue is whole, on one line, inside the window (200 px in a 308 px window, 17 px type, 25 px high)
+PASS card 390 | missing 90 % first only: the window shows 3 whole columns; 3 fit in the 322 px up to the nearest clip
+PASS card 390 | missing 90 % first only: after a scroll of 0.7 column the row settles on the next column start (scrollLeft 112), nothing cut, the back cue shows
+PASS card 390 | missing 90 % first only: one column in, both cues show on ONE line, 33 px ("⟵ Back Swipe ➞")
+PASS card 390 | missing 90 % first only: mid-row, the cues share one strip 33 px high (<= 60 and <= half the 126 px row; back shown, forward shown)
+PASS card 390 | missing 90 % first only: after scrollLeft = 130 the row settles on a column start (scrollLeft 112), nothing cut, the back cue shows
+PASS card 390 | missing 90 % first only: a program focus of the first box is taken (it shows at the start), the row stays at 0 (scrollLeft 0), the start in the 308 px window
+PASS card 390 | missing 90 % first only: Tab into the row focuses the first box, fully in the window, the row at the leftmost start that shows it (scrollLeft 0, want 0)
+PASS card 390 | missing 90 % first only: after Tab, typing 7 writes "7" into the first box
+PASS card 390 | missing 90 % first only: a tap on the first box (row swiped to 0) focuses it in view, the row does not move (scrollLeft 0), typing 7 writes "7"
+PASS card 390 | missing 90 % first only: Tab reached 10/10 boxes, each fully visible
+PASS card 390 | missing 90 % first only: no box clipped at the card's bottom or any ancestor edge, page scroll width 0
+PASS card 390 | missing 90 % first only: swipe cue "Swipe ➞ for more boxes" shown at the start, hidden at the end, over a box: false
+PASS worksheet 390 | default tables: at load the row rests at 0 (scrollLeft 0) with the first given number fully in the 292 px window, the first box fully in it, focus on a box in view, nothing cut at either edge
+PASS worksheet 390 | default tables: after load the step tab is clear of the row, nothing under it
+PASS worksheet 390 | default tables: digits 29.0 px (about 29), box 76 x 53 px (>= 48, width:digit 2.63, 2.6 before the change)
+PASS worksheet 390 | default tables: the forward cue is whole, on one line, inside the window (200 px in a 292 px window, 17 px type, 25 px high)
+PASS worksheet 390 | default tables: the window shows 3 whole columns; 3 fit in the 304 px up to the nearest clip
+PASS worksheet 390 | default tables: gap 24.0 px (13.8-24.5), pitch 104.3 = item 80.3 + gap
+PASS worksheet 390 | default tables: a row of 2-digit numbers shows 3 whole columns (want 3) in a 291.9 px window (>= 3 x 80.3 + 2 x 24.0 = 288.9)
+PASS worksheet 390 | default tables: after a scroll of 0.7 column the row settles on the next column start (scrollLeft 104), nothing cut, the back cue shows
+PASS worksheet 390 | default tables: one column in, both cues show on ONE line, 33 px ("⟵ Back Swipe ➞")
+PASS worksheet 390 | default tables: mid-row, the cues share one strip 33 px high (<= 60 and <= half the 126 px row; back shown, forward shown)
+PASS worksheet 390 | default tables: after scrollLeft = 130 the row settles on a column start (scrollLeft 104), nothing cut, the back cue shows
+PASS worksheet 390 | default tables: a program focus of the first box is taken (it shows at the start), the row stays at 0 (scrollLeft 0), the start in the 292 px window
+PASS worksheet 390 | default tables: Tab into the row focuses the first box, fully in the window, the row at the leftmost start that shows it (scrollLeft 0, want 0)
+PASS worksheet 390 | default tables: after Tab, typing 7 writes "7" into the first box
+PASS worksheet 390 | default tables: a tap on the first box (row swiped to 0) focuses it in view, the row does not move (scrollLeft 0), typing 7 writes "7"
+PASS worksheet 390 | default tables: Tab reached 5/5 boxes, each fully visible
+PASS worksheet 390 | default tables: no box clipped at the card's bottom or any ancestor edge, page scroll width 0
+PASS worksheet 390 | default tables: swipe cue "Swipe ➞ for more boxes" shown at the start, hidden at the end, over a box: false
+PASS worksheet 390 | by 1,000 from 14,000: at load the row rests at 0 (scrollLeft 0) with the first given number fully in the 202 px window, the first box NOT fully in it, focus not in the row, nothing cut at either edge
+PASS worksheet 390 | by 1,000 from 14,000: after load the step tab is clear of the row, nothing under it
+PASS worksheet 390 | by 1,000 from 14,000: a wide number row (TY-10a): digits 23.0 px, box 83 x 60 px (>= 44)
+PASS worksheet 390 | by 1,000 from 14,000: the forward cue is whole, on one line, inside the window (190 px in a 202 px window, 16 px type, 25 px high)
+PASS worksheet 390 | by 1,000 from 14,000: the window shows 2 whole columns; 2 fit in the 304 px up to the nearest clip
+PASS worksheet 390 | by 1,000 from 14,000: gap 24.0 px (13.8-24.5), pitch 111.3 = item 87.3 + gap
+PASS worksheet 390 | by 1,000 from 14,000: the hidden first box (column 3) lies past the 2 shown columns, and 2 fit
+PASS worksheet 390 | by 1,000 from 14,000: negative control: with the window narrowed by one column (1 shown of 2 that fit) the forced-hidden check FAILS as it must
+PASS worksheet 390 | by 1,000 from 14,000: after a scroll of 0.7 column the row settles on the next column start (scrollLeft 111), nothing cut, the back cue shows
+PASS worksheet 390 | by 1,000 from 14,000: one column in, both cues show on ONE line, 33 px ("⟵ Back Swipe ➞")
+PASS worksheet 390 | by 1,000 from 14,000: mid-row, the cues share one strip 33 px high (<= 60 and <= half the 140 px row; back shown, forward shown)
+PASS worksheet 390 | by 1,000 from 14,000: after scrollLeft = 130 the row settles on a column start (scrollLeft 111), nothing cut, the back cue shows
+PASS worksheet 390 | by 1,000 from 14,000: a program focus of the first box is refused (it does not show at the start), the row stays at 0 (scrollLeft 0), the start in the 202 px window
+PASS worksheet 390 | by 1,000 from 14,000: Tab into the row focuses the first box, fully in the window, the row at the leftmost start that shows it (scrollLeft 111, want 111)
+PASS worksheet 390 | by 1,000 from 14,000: after Tab, typing 7 writes "7" into the first box
+PASS worksheet 390 | by 1,000 from 14,000: a tap on the first box (row swiped to 111) focuses it in view, the row does not move (scrollLeft 111), typing 7 writes "7"
+PASS worksheet 390 | by 1,000 from 14,000: Tab reached 5/5 boxes, each fully visible
+PASS worksheet 390 | by 1,000 from 14,000: no box clipped at the card's bottom or any ancestor edge, page scroll width 0
+PASS worksheet 390 | by 1,000 from 14,000: swipe cue "Swipe ➞ for more boxes" shown at the start, hidden at the end, over a box: false
+PASS worksheet 390 | by 100,000 from 1,000,000 (15): at load the row rests at 0 (scrollLeft 0) with the first given number fully in the 233 px window, the first box NOT fully in it, focus not in the row, nothing cut at either edge
+PASS worksheet 390 | by 100,000 from 1,000,000 (15): after load the step tab is clear of the row, nothing under it
+PASS worksheet 390 | by 100,000 from 1,000,000 (15): a wide number row (TY-10a): digits 18.5 px, box 99 x 60 px (>= 44)
+PASS worksheet 390 | by 100,000 from 1,000,000 (15): the forward cue is whole, on one line, inside the window (200 px in a 233 px window, 17 px type, 25 px high)
+PASS worksheet 390 | by 100,000 from 1,000,000 (15): the window shows 2 whole columns; 2 fit in the 304 px up to the nearest clip
+PASS worksheet 390 | by 100,000 from 1,000,000 (15): gap 24.0 px (13.8-24.5), pitch 127.2 = item 103.2 + gap
+PASS worksheet 390 | by 100,000 from 1,000,000 (15): the hidden first box (column 5) lies past the 2 shown columns, and 2 fit
+PASS worksheet 390 | by 100,000 from 1,000,000 (15): negative control: with the window narrowed by one column (1 shown of 2 that fit) the forced-hidden check FAILS as it must
+PASS worksheet 390 | by 100,000 from 1,000,000 (15): after a scroll of 0.7 column the row settles on the next column start (scrollLeft 127), nothing cut, the back cue shows
+PASS worksheet 390 | by 100,000 from 1,000,000 (15): one column in, both cues show on ONE line, 33 px ("⟵ Back Swipe ➞")
+PASS worksheet 390 | by 100,000 from 1,000,000 (15): mid-row, the cues share one strip 33 px high (<= 60 and <= half the 216 px row; back shown, forward shown)
+PASS worksheet 390 | by 100,000 from 1,000,000 (15): after scrollLeft = 130 the row settles on a column start (scrollLeft 127), nothing cut, the back cue shows
+PASS worksheet 390 | by 100,000 from 1,000,000 (15): a program focus of the first box is refused (it does not show at the start), the row stays at 0 (scrollLeft 0), the start in the 233 px window
+PASS worksheet 390 | by 100,000 from 1,000,000 (15): Tab into the row focuses the first box, fully in the window, the row at the leftmost start that shows it (scrollLeft 382, want 382)
+PASS worksheet 390 | by 100,000 from 1,000,000 (15): after Tab, typing 7 writes "7" into the first box
+PASS worksheet 390 | by 100,000 from 1,000,000 (15): a tap on the first box (row swiped to 382) focuses it in view, the row does not move (scrollLeft 382), typing 7 writes "7"
+PASS worksheet 390 | by 100,000 from 1,000,000 (15): Tab reached 7/7 boxes, each fully visible
+PASS worksheet 390 | by 100,000 from 1,000,000 (15): no box clipped at the card's bottom or any ancestor edge, page scroll width 0
+PASS worksheet 390 | by 100,000 from 1,000,000 (15): swipe cue "Swipe ➞ for more boxes" shown at the start, hidden at the end, over a box: false
+PASS worksheet 390 | times each, back: at load the row rests at 0 (scrollLeft 0) with the first given number fully in the 292 px window, the first box NOT fully in it, focus not in the row, nothing cut at either edge
+PASS worksheet 390 | times each, back: after load the step tab is clear of the row, nothing under it
+PASS worksheet 390 | times each, back: digits 29.0 px (about 29), box 76 x 53 px (>= 48, width:digit 2.63, 2.6 before the change)
+PASS worksheet 390 | times each, back: the forward cue is whole, on one line, inside the window (200 px in a 292 px window, 17 px type, 25 px high)
+PASS worksheet 390 | times each, back: the window shows 3 whole columns; 3 fit in the 304 px up to the nearest clip
+PASS worksheet 390 | times each, back: gap 24.0 px (13.8-24.5), pitch 104.3 = item 80.3 + gap
+PASS worksheet 390 | times each, back: a row of 3-digit numbers shows 3 whole columns (want 3) in a 291.9 px window (>= 3 x 80.3 + 2 x 24.0 = 288.9)
+PASS worksheet 390 | times each, back: the hidden first box (column 4) lies past the 3 shown columns, and 3 fit
+PASS worksheet 390 | times each, back: negative control: with the window narrowed by one column (2 shown of 3 that fit) the forced-hidden check FAILS as it must
+PASS worksheet 390 | times each, back: after a scroll of 0.7 column the row settles on the next column start (scrollLeft 104), nothing cut, the back cue shows
+PASS worksheet 390 | times each, back: one column in, both cues show on ONE line, 33 px ("⟵ Back Swipe ➞")
+PASS worksheet 390 | times each, back: mid-row, the cues share one strip 33 px high (<= 60 and <= half the 200 px row; back shown, forward shown)
+PASS worksheet 390 | times each, back: after scrollLeft = 130 the row settles on a column start (scrollLeft 104), nothing cut, the back cue shows
+PASS worksheet 390 | times each, back: a program focus of the first box is refused (it does not show at the start), the row stays at 0 (scrollLeft 0), the start in the 292 px window
+PASS worksheet 390 | times each, back: Tab into the row focuses the first box, fully in the window, the row at the leftmost start that shows it (scrollLeft 104, want 104)
+PASS worksheet 390 | times each, back: after Tab, typing 7 writes "7" into the first box
+PASS worksheet 390 | times each, back: a tap on the first box (row swiped to 104) focuses it in view, the row does not move (scrollLeft 104), typing 7 writes "7"
+PASS worksheet 390 | times each, back: Tab reached 5/5 boxes, each fully visible
+PASS worksheet 390 | times each, back: no box clipped at the card's bottom or any ancestor edge, page scroll width 0
+PASS worksheet 390 | times each, back: swipe cue "Swipe ➞ for more boxes" shown at the start, hidden at the end, over a box: false
+PASS worksheet 390 | by 7 from 3: at load the row rests at 0 (scrollLeft 0) with the first given number fully in the 292 px window, the first box NOT fully in it, focus not in the row, nothing cut at either edge
+PASS worksheet 390 | by 7 from 3: after load the step tab is clear of the row, nothing under it
+PASS worksheet 390 | by 7 from 3: digits 29.0 px (about 29), box 76 x 53 px (>= 48, width:digit 2.63, 2.6 before the change)
+PASS worksheet 390 | by 7 from 3: the forward cue is whole, on one line, inside the window (200 px in a 292 px window, 17 px type, 25 px high)
+PASS worksheet 390 | by 7 from 3: the window shows 3 whole columns; 3 fit in the 304 px up to the nearest clip
+PASS worksheet 390 | by 7 from 3: gap 24.0 px (13.8-24.5), pitch 104.3 = item 80.3 + gap
+PASS worksheet 390 | by 7 from 3: a row of 2-digit numbers shows 3 whole columns (want 3) in a 291.9 px window (>= 3 x 80.3 + 2 x 24.0 = 288.9)
+PASS worksheet 390 | by 7 from 3: the hidden first box (column 4) lies past the 3 shown columns, and 3 fit
+PASS worksheet 390 | by 7 from 3: negative control: with the window narrowed by one column (2 shown of 3 that fit) the forced-hidden check FAILS as it must
+PASS worksheet 390 | by 7 from 3: after a scroll of 0.7 column the row settles on the next column start (scrollLeft 104), nothing cut, the back cue shows
+PASS worksheet 390 | by 7 from 3: one column in, both cues show on ONE line, 33 px ("⟵ Back Swipe ➞")
+PASS worksheet 390 | by 7 from 3: mid-row, the cues share one strip 33 px high (<= 60 and <= half the 126 px row; back shown, forward shown)
+PASS worksheet 390 | by 7 from 3: after scrollLeft = 130 the row settles on a column start (scrollLeft 104), nothing cut, the back cue shows
+PASS worksheet 390 | by 7 from 3: a program focus of the first box is refused (it does not show at the start), the row stays at 0 (scrollLeft 0), the start in the 292 px window
+PASS worksheet 390 | by 7 from 3: Tab into the row focuses the first box, fully in the window, the row at the leftmost start that shows it (scrollLeft 104, want 104)
+PASS worksheet 390 | by 7 from 3: after Tab, typing 7 writes "7" into the first box
+PASS worksheet 390 | by 7 from 3: a tap on the first box (row swiped to 104) focuses it in view, the row does not move (scrollLeft 104), typing 7 writes "7"
+PASS worksheet 390 | by 7 from 3: Tab reached 5/5 boxes, each fully visible
+PASS worksheet 390 | by 7 from 3: no box clipped at the card's bottom or any ancestor edge, page scroll width 0
+PASS worksheet 390 | by 7 from 3: swipe cue "Swipe ➞ for more boxes" shown at the start, hidden at the end, over a box: false
+PASS worksheet 390 | by 25: at load the row rests at 0 (scrollLeft 0) with the first given number fully in the 292 px window, the first box NOT fully in it, focus not in the row, nothing cut at either edge
+PASS worksheet 390 | by 25: after load the step tab is clear of the row, nothing under it
+PASS worksheet 390 | by 25: digits 29.0 px (about 29), box 76 x 53 px (>= 48, width:digit 2.63, 2.6 before the change)
+PASS worksheet 390 | by 25: the forward cue is whole, on one line, inside the window (200 px in a 292 px window, 17 px type, 25 px high)
+PASS worksheet 390 | by 25: the window shows 3 whole columns; 3 fit in the 304 px up to the nearest clip
+PASS worksheet 390 | by 25: gap 24.0 px (13.8-24.5), pitch 104.3 = item 80.3 + gap
+PASS worksheet 390 | by 25: a row of 3-digit numbers shows 3 whole columns (want 3) in a 291.9 px window (>= 3 x 80.3 + 2 x 24.0 = 288.9)
+PASS worksheet 390 | by 25: the hidden first box (column 6) lies past the 3 shown columns, and 3 fit
+PASS worksheet 390 | by 25: negative control: with the window narrowed by one column (2 shown of 3 that fit) the forced-hidden check FAILS as it must
+PASS worksheet 390 | by 25: after a scroll of 0.7 column the row settles on the next column start (scrollLeft 104), nothing cut, the back cue shows
+PASS worksheet 390 | by 25: one column in, both cues show on ONE line, 33 px ("⟵ Back Swipe ➞")
+PASS worksheet 390 | by 25: mid-row, the cues share one strip 33 px high (<= 60 and <= half the 126 px row; back shown, forward shown)
+PASS worksheet 390 | by 25: after scrollLeft = 130 the row settles on a column start (scrollLeft 104), nothing cut, the back cue shows
+PASS worksheet 390 | by 25: a program focus of the first box is refused (it does not show at the start), the row stays at 0 (scrollLeft 0), the start in the 292 px window
+PASS worksheet 390 | by 25: Tab into the row focuses the first box, fully in the window, the row at the leftmost start that shows it (scrollLeft 313, want 313)
+PASS worksheet 390 | by 25: after Tab, typing 7 writes "7" into the first box
+PASS worksheet 390 | by 25: a tap on the first box (row swiped to 313) focuses it in view, the row does not move (scrollLeft 313), typing 7 writes "7"
+PASS worksheet 390 | by 25: Tab reached 5/5 boxes, each fully visible
+PASS worksheet 390 | by 25: no box clipped at the card's bottom or any ancestor edge, page scroll width 0
+PASS worksheet 390 | by 25: swipe cue "Swipe ➞ for more boxes" shown at the start, hidden at the end, over a box: false
+PASS worksheet 390 | missing 20 % (first box in column 6): at load the row rests at 0 (scrollLeft 0) with the first given number fully in the 292 px window, the first box NOT fully in it, focus not in the row, nothing cut at either edge
+PASS worksheet 390 | missing 20 % (first box in column 6): the seeded first box (column 6) lies past the window at load (shown: false) and holds no focus
+PASS worksheet 390 | missing 20 % (first box in column 6): after load the step tab is clear of the row, nothing under it
+PASS worksheet 390 | missing 20 % (first box in column 6): digits 29.0 px (about 29), box 76 x 53 px (>= 48, width:digit 2.63, 2.6 before the change)
+PASS worksheet 390 | missing 20 % (first box in column 6): the forward cue is whole, on one line, inside the window (200 px in a 292 px window, 17 px type, 25 px high)
+PASS worksheet 390 | missing 20 % (first box in column 6): the window shows 3 whole columns; 3 fit in the 304 px up to the nearest clip
+PASS worksheet 390 | missing 20 % (first box in column 6): gap 24.0 px (13.8-24.5), pitch 104.3 = item 80.3 + gap
+PASS worksheet 390 | missing 20 % (first box in column 6): a row of 2-digit numbers shows 3 whole columns (want 3) in a 291.9 px window (>= 3 x 80.3 + 2 x 24.0 = 288.9)
+PASS worksheet 390 | missing 20 % (first box in column 6): the hidden first box (column 6) lies past the 3 shown columns, and 3 fit
+PASS worksheet 390 | missing 20 % (first box in column 6): negative control: with the window narrowed by one column (2 shown of 3 that fit) the forced-hidden check FAILS as it must
+PASS worksheet 390 | missing 20 % (first box in column 6): after a scroll of 0.7 column the row settles on the next column start (scrollLeft 104), nothing cut, the back cue shows
+PASS worksheet 390 | missing 20 % (first box in column 6): one column in, both cues show on ONE line, 33 px ("⟵ Back Swipe ➞")
+PASS worksheet 390 | missing 20 % (first box in column 6): mid-row, the cues share one strip 33 px high (<= 60 and <= half the 126 px row; back shown, forward shown)
+PASS worksheet 390 | missing 20 % (first box in column 6): after scrollLeft = 130 the row settles on a column start (scrollLeft 104), nothing cut, the back cue shows
+PASS worksheet 390 | missing 20 % (first box in column 6): a program focus of the first box is refused (it does not show at the start), the row stays at 0 (scrollLeft 0), the start in the 292 px window
+PASS worksheet 390 | missing 20 % (first box in column 6): Tab into the row focuses the first box, fully in the window, the row at the leftmost start that shows it (scrollLeft 313, want 313)
+PASS worksheet 390 | missing 20 % (first box in column 6): after Tab, typing 7 writes "7" into the first box
+PASS worksheet 390 | missing 20 % (first box in column 6): a tap on the first box (row swiped to 313) focuses it in view, the row does not move (scrollLeft 313), typing 7 writes "7"
+PASS worksheet 390 | missing 20 % (first box in column 6): Tab reached 2/2 boxes, each fully visible
+PASS worksheet 390 | missing 20 % (first box in column 6): no box clipped at the card's bottom or any ancestor edge, page scroll width 0
+PASS worksheet 390 | missing 20 % (first box in column 6): swipe cue "Swipe ➞ for more boxes" shown at the start, hidden at the end, over a box: false
+PASS worksheet 390 | missing 90 % first only: at load the row rests at 0 (scrollLeft 0) with the first given number fully in the 292 px window, the first box fully in it, focus on a box in view, nothing cut at either edge
+PASS worksheet 390 | missing 90 % first only: after load the step tab is clear of the row, nothing under it
+PASS worksheet 390 | missing 90 % first only: digits 29.0 px (about 29), box 76 x 53 px (>= 48, width:digit 2.63, 2.6 before the change)
+PASS worksheet 390 | missing 90 % first only: the forward cue is whole, on one line, inside the window (200 px in a 292 px window, 17 px type, 25 px high)
+PASS worksheet 390 | missing 90 % first only: the window shows 3 whole columns; 3 fit in the 304 px up to the nearest clip
+PASS worksheet 390 | missing 90 % first only: gap 24.0 px (13.8-24.5), pitch 104.3 = item 80.3 + gap
+PASS worksheet 390 | missing 90 % first only: a row of 2-digit numbers shows 3 whole columns (want 3) in a 291.9 px window (>= 3 x 80.3 + 2 x 24.0 = 288.9)
+PASS worksheet 390 | missing 90 % first only: after a scroll of 0.7 column the row settles on the next column start (scrollLeft 104), nothing cut, the back cue shows
+PASS worksheet 390 | missing 90 % first only: one column in, both cues show on ONE line, 33 px ("⟵ Back Swipe ➞")
+PASS worksheet 390 | missing 90 % first only: mid-row, the cues share one strip 33 px high (<= 60 and <= half the 126 px row; back shown, forward shown)
+PASS worksheet 390 | missing 90 % first only: after scrollLeft = 130 the row settles on a column start (scrollLeft 104), nothing cut, the back cue shows
+PASS worksheet 390 | missing 90 % first only: a program focus of the first box is taken (it shows at the start), the row stays at 0 (scrollLeft 0), the start in the 292 px window
+PASS worksheet 390 | missing 90 % first only: Tab into the row focuses the first box, fully in the window, the row at the leftmost start that shows it (scrollLeft 0, want 0)
+PASS worksheet 390 | missing 90 % first only: after Tab, typing 7 writes "7" into the first box
+PASS worksheet 390 | missing 90 % first only: a tap on the first box (row swiped to 0) focuses it in view, the row does not move (scrollLeft 0), typing 7 writes "7"
+PASS worksheet 390 | missing 90 % first only: Tab reached 10/10 boxes, each fully visible
+PASS worksheet 390 | missing 90 % first only: no box clipped at the card's bottom or any ancestor edge, page scroll width 0
+PASS worksheet 390 | missing 90 % first only: swipe cue "Swipe ➞ for more boxes" shown at the start, hidden at the end, over a box: false
+PASS quiz 390 | default tables: at load the row rests at 0 (scrollLeft 0) with the first given number fully in the 292 px window, the first box NOT fully in it, focus not in the row, nothing cut at either edge
+PASS quiz 390 | default tables: after load the step tab is clear of the row, nothing under it
+PASS quiz 390 | default tables: digits 29.0 px (about 29), box 76 x 53 px (>= 48, width:digit 2.63, 2.6 before the change)
+PASS quiz 390 | default tables: the forward cue is whole, on one line, inside the window (200 px in a 292 px window, 17 px type, 25 px high)
+PASS quiz 390 | default tables: the window shows 3 whole columns; 3 fit in the 304 px up to the nearest clip
+PASS quiz 390 | default tables: gap 24.0 px (13.8-24.5), pitch 104.3 = item 80.3 + gap
+PASS quiz 390 | default tables: a row of 2-digit numbers shows 3 whole columns (want 3) in a 291.9 px window (>= 3 x 80.3 + 2 x 24.0 = 288.9)
+PASS quiz 390 | default tables: the hidden first box (column 4) lies past the 3 shown columns, and 3 fit
+PASS quiz 390 | default tables: negative control: with the window narrowed by one column (2 shown of 3 that fit) the forced-hidden check FAILS as it must
+PASS quiz 390 | default tables: after a scroll of 0.7 column the row settles on the next column start (scrollLeft 104), nothing cut, the back cue shows
+PASS quiz 390 | default tables: one column in, both cues show on ONE line, 33 px ("⟵ Back Swipe ➞")
+PASS quiz 390 | default tables: mid-row, the cues share one strip 33 px high (<= 60 and <= half the 126 px row; back shown, forward shown)
+PASS quiz 390 | default tables: after scrollLeft = 130 the row settles on a column start (scrollLeft 104), nothing cut, the back cue shows
+PASS quiz 390 | default tables: a program focus of the first box is refused (it does not show at the start), the row stays at 0 (scrollLeft 0), the start in the 292 px window
+PASS quiz 390 | default tables: Tab into the row focuses the first box, fully in the window, the row at the leftmost start that shows it (scrollLeft 104, want 104)
+PASS quiz 390 | default tables: after Tab, typing 7 writes "7" into the first box
+PASS quiz 390 | default tables: a tap on the first box (row swiped to 104) focuses it in view, the row does not move (scrollLeft 104), typing 7 writes "7"
+PASS quiz 390 | default tables: Tab reached 5/5 boxes, each fully visible
+PASS quiz 390 | default tables: no box clipped at the card's bottom or any ancestor edge, page scroll width 0
+PASS quiz 390 | default tables: swipe cue "Swipe ➞ for more boxes" shown at the start, hidden at the end, over a box: false
+PASS quiz 390 | by 1,000 from 14,000: at load the row rests at 0 (scrollLeft 0) with the first given number fully in the 288 px window, the first box fully in it, focus on a box in view, nothing cut at either edge
+PASS quiz 390 | by 1,000 from 14,000: after load the step tab is clear of the row, nothing under it
+PASS quiz 390 | by 1,000 from 14,000: a wide number row (TY-10a): digits 20.7 px, box 75 x 53 px (>= 44)
+PASS quiz 390 | by 1,000 from 14,000: the forward cue is whole, on one line, inside the window (200 px in a 288 px window, 17 px type, 25 px high)
+PASS quiz 390 | by 1,000 from 14,000: the window shows 3 whole columns; 3 fit in the 304 px up to the nearest clip
+PASS quiz 390 | by 1,000 from 14,000: gap 24.0 px (13.8-24.5), pitch 102.8 = item 78.8 + gap
+PASS quiz 390 | by 1,000 from 14,000: after a scroll of 0.7 column the row settles on the next column start (scrollLeft 103), nothing cut, the back cue shows
+PASS quiz 390 | by 1,000 from 14,000: one column in, both cues show on ONE line, 33 px ("⟵ Back Swipe ➞")
+PASS quiz 390 | by 1,000 from 14,000: mid-row, the cues share one strip 33 px high (<= 60 and <= half the 126 px row; back shown, forward shown)
+PASS quiz 390 | by 1,000 from 14,000: after scrollLeft = 130 the row settles on a column start (scrollLeft 103), nothing cut, the back cue shows
+PASS quiz 390 | by 1,000 from 14,000: a program focus of the first box is taken (it shows at the start), the row stays at 0 (scrollLeft 0), the start in the 288 px window
+PASS quiz 390 | by 1,000 from 14,000: Tab into the row focuses the first box, fully in the window, the row at the leftmost start that shows it (scrollLeft 0, want 0)
+PASS quiz 390 | by 1,000 from 14,000: after Tab, typing 7 writes "7" into the first box
+PASS quiz 390 | by 1,000 from 14,000: a tap on the first box (row swiped to 0) focuses it in view, the row does not move (scrollLeft 0), typing 7 writes "7"
+PASS quiz 390 | by 1,000 from 14,000: Tab reached 5/5 boxes, each fully visible
+PASS quiz 390 | by 1,000 from 14,000: no box clipped at the card's bottom or any ancestor edge, page scroll width 0
+PASS quiz 390 | by 1,000 from 14,000: swipe cue "Swipe ➞ for more boxes" shown at the start, hidden at the end, over a box: false
+PASS quiz 390 | by 100,000 from 1,000,000 (15): at load the row rests at 0 (scrollLeft 0) with the first given number fully in the 214 px window, the first box NOT fully in it, focus not in the row, nothing cut at either edge
+PASS quiz 390 | by 100,000 from 1,000,000 (15): after load the step tab is clear of the row, nothing under it
+PASS quiz 390 | by 100,000 from 1,000,000 (15): a wide number row (TY-10a): digits 16.7 px, box 89 x 53 px (>= 44)
+PASS quiz 390 | by 100,000 from 1,000,000 (15): the forward cue is whole, on one line, inside the window (200 px in a 214 px window, 17 px type, 25 px high)
+PASS quiz 390 | by 100,000 from 1,000,000 (15): the window shows 2 whole columns; 2 fit in the 304 px up to the nearest clip
+PASS quiz 390 | by 100,000 from 1,000,000 (15): gap 24.0 px (13.8-24.5), pitch 117.3 = item 93.3 + gap
+PASS quiz 390 | by 100,000 from 1,000,000 (15): the hidden first box (column 4) lies past the 2 shown columns, and 2 fit
+PASS quiz 390 | by 100,000 from 1,000,000 (15): negative control: with the window narrowed by one column (1 shown of 2 that fit) the forced-hidden check FAILS as it must
+PASS quiz 390 | by 100,000 from 1,000,000 (15): after a scroll of 0.7 column the row settles on the next column start (scrollLeft 117), nothing cut, the back cue shows
+PASS quiz 390 | by 100,000 from 1,000,000 (15): one column in, both cues show on ONE line, 33 px ("⟵ Back Swipe ➞")
+PASS quiz 390 | by 100,000 from 1,000,000 (15): mid-row, the cues share one strip 33 px high (<= 60 and <= half the 195 px row; back shown, forward shown)
+PASS quiz 390 | by 100,000 from 1,000,000 (15): after scrollLeft = 130 the row settles on a column start (scrollLeft 117), nothing cut, the back cue shows
+PASS quiz 390 | by 100,000 from 1,000,000 (15): a program focus of the first box is refused (it does not show at the start), the row stays at 0 (scrollLeft 0), the start in the 214 px window
+PASS quiz 390 | by 100,000 from 1,000,000 (15): Tab into the row focuses the first box, fully in the window, the row at the leftmost start that shows it (scrollLeft 235, want 235)
+PASS quiz 390 | by 100,000 from 1,000,000 (15): after Tab, typing 7 writes "7" into the first box
+PASS quiz 390 | by 100,000 from 1,000,000 (15): a tap on the first box (row swiped to 235) focuses it in view, the row does not move (scrollLeft 235), typing 7 writes "7"
+PASS quiz 390 | by 100,000 from 1,000,000 (15): Tab reached 7/7 boxes, each fully visible
+PASS quiz 390 | by 100,000 from 1,000,000 (15): no box clipped at the card's bottom or any ancestor edge, page scroll width 0
+PASS quiz 390 | by 100,000 from 1,000,000 (15): swipe cue "Swipe ➞ for more boxes" shown at the start, hidden at the end, over a box: false
+PASS quiz 390 | times each, back: at load the row rests at 0 (scrollLeft 0) with the first given number fully in the 292 px window, the first box NOT fully in it, focus not in the row, nothing cut at either edge
+PASS quiz 390 | times each, back: after load the step tab is clear of the row, nothing under it
+PASS quiz 390 | times each, back: digits 29.0 px (about 29), box 76 x 53 px (>= 48, width:digit 2.63, 2.6 before the change)
+PASS quiz 390 | times each, back: the forward cue is whole, on one line, inside the window (200 px in a 292 px window, 17 px type, 25 px high)
+PASS quiz 390 | times each, back: the window shows 3 whole columns; 3 fit in the 304 px up to the nearest clip
+PASS quiz 390 | times each, back: gap 24.0 px (13.8-24.5), pitch 104.3 = item 80.3 + gap
+PASS quiz 390 | times each, back: a row of 3-digit numbers shows 3 whole columns (want 3) in a 291.9 px window (>= 3 x 80.3 + 2 x 24.0 = 288.9)
+PASS quiz 390 | times each, back: the hidden first box (column 4) lies past the 3 shown columns, and 3 fit
+PASS quiz 390 | times each, back: negative control: with the window narrowed by one column (2 shown of 3 that fit) the forced-hidden check FAILS as it must
+PASS quiz 390 | times each, back: after a scroll of 0.7 column the row settles on the next column start (scrollLeft 104), nothing cut, the back cue shows
+PASS quiz 390 | times each, back: one column in, both cues show on ONE line, 33 px ("⟵ Back Swipe ➞")
+PASS quiz 390 | times each, back: mid-row, the cues share one strip 33 px high (<= 60 and <= half the 200 px row; back shown, forward shown)
+PASS quiz 390 | times each, back: after scrollLeft = 130 the row settles on a column start (scrollLeft 104), nothing cut, the back cue shows
+PASS quiz 390 | times each, back: a program focus of the first box is refused (it does not show at the start), the row stays at 0 (scrollLeft 0), the start in the 292 px window
+PASS quiz 390 | times each, back: Tab into the row focuses the first box, fully in the window, the row at the leftmost start that shows it (scrollLeft 104, want 104)
+PASS quiz 390 | times each, back: after Tab, typing 7 writes "7" into the first box
+PASS quiz 390 | times each, back: a tap on the first box (row swiped to 104) focuses it in view, the row does not move (scrollLeft 104), typing 7 writes "7"
+PASS quiz 390 | times each, back: Tab reached 5/5 boxes, each fully visible
+PASS quiz 390 | times each, back: no box clipped at the card's bottom or any ancestor edge, page scroll width 0
+PASS quiz 390 | times each, back: swipe cue "Swipe ➞ for more boxes" shown at the start, hidden at the end, over a box: false
+PASS quiz 390 | by 7 from 3: at load the row rests at 0 (scrollLeft 0) with the first given number fully in the 292 px window, the first box NOT fully in it, focus not in the row, nothing cut at either edge
+PASS quiz 390 | by 7 from 3: after load the step tab is clear of the row, nothing under it
+PASS quiz 390 | by 7 from 3: digits 29.0 px (about 29), box 76 x 53 px (>= 48, width:digit 2.63, 2.6 before the change)
+PASS quiz 390 | by 7 from 3: the forward cue is whole, on one line, inside the window (200 px in a 292 px window, 17 px type, 25 px high)
+PASS quiz 390 | by 7 from 3: the window shows 3 whole columns; 3 fit in the 304 px up to the nearest clip
+PASS quiz 390 | by 7 from 3: gap 24.0 px (13.8-24.5), pitch 104.3 = item 80.3 + gap
+PASS quiz 390 | by 7 from 3: a row of 2-digit numbers shows 3 whole columns (want 3) in a 291.9 px window (>= 3 x 80.3 + 2 x 24.0 = 288.9)
+PASS quiz 390 | by 7 from 3: the hidden first box (column 4) lies past the 3 shown columns, and 3 fit
+PASS quiz 390 | by 7 from 3: negative control: with the window narrowed by one column (2 shown of 3 that fit) the forced-hidden check FAILS as it must
+PASS quiz 390 | by 7 from 3: after a scroll of 0.7 column the row settles on the next column start (scrollLeft 104), nothing cut, the back cue shows
+PASS quiz 390 | by 7 from 3: one column in, both cues show on ONE line, 33 px ("⟵ Back Swipe ➞")
+PASS quiz 390 | by 7 from 3: mid-row, the cues share one strip 33 px high (<= 60 and <= half the 126 px row; back shown, forward shown)
+PASS quiz 390 | by 7 from 3: after scrollLeft = 130 the row settles on a column start (scrollLeft 104), nothing cut, the back cue shows
+PASS quiz 390 | by 7 from 3: a program focus of the first box is refused (it does not show at the start), the row stays at 0 (scrollLeft 0), the start in the 292 px window
+PASS quiz 390 | by 7 from 3: Tab into the row focuses the first box, fully in the window, the row at the leftmost start that shows it (scrollLeft 104, want 104)
+PASS quiz 390 | by 7 from 3: after Tab, typing 7 writes "7" into the first box
+PASS quiz 390 | by 7 from 3: a tap on the first box (row swiped to 104) focuses it in view, the row does not move (scrollLeft 104), typing 7 writes "7"
+PASS quiz 390 | by 7 from 3: Tab reached 5/5 boxes, each fully visible
+PASS quiz 390 | by 7 from 3: no box clipped at the card's bottom or any ancestor edge, page scroll width 0
+PASS quiz 390 | by 7 from 3: swipe cue "Swipe ➞ for more boxes" shown at the start, hidden at the end, over a box: false
+PASS quiz 390 | by 25: at load the row rests at 0 (scrollLeft 0) with the first given number fully in the 292 px window, the first box NOT fully in it, focus not in the row, nothing cut at either edge
+PASS quiz 390 | by 25: after load the step tab is clear of the row, nothing under it
+PASS quiz 390 | by 25: digits 29.0 px (about 29), box 76 x 53 px (>= 48, width:digit 2.63, 2.6 before the change)
+PASS quiz 390 | by 25: the forward cue is whole, on one line, inside the window (200 px in a 292 px window, 17 px type, 25 px high)
+PASS quiz 390 | by 25: the window shows 3 whole columns; 3 fit in the 304 px up to the nearest clip
+PASS quiz 390 | by 25: gap 24.0 px (13.8-24.5), pitch 104.3 = item 80.3 + gap
+PASS quiz 390 | by 25: a row of 3-digit numbers shows 3 whole columns (want 3) in a 291.9 px window (>= 3 x 80.3 + 2 x 24.0 = 288.9)
+PASS quiz 390 | by 25: the hidden first box (column 4) lies past the 3 shown columns, and 3 fit
+PASS quiz 390 | by 25: negative control: with the window narrowed by one column (2 shown of 3 that fit) the forced-hidden check FAILS as it must
+PASS quiz 390 | by 25: after a scroll of 0.7 column the row settles on the next column start (scrollLeft 104), nothing cut, the back cue shows
+PASS quiz 390 | by 25: one column in, both cues show on ONE line, 33 px ("⟵ Back Swipe ➞")
+PASS quiz 390 | by 25: mid-row, the cues share one strip 33 px high (<= 60 and <= half the 126 px row; back shown, forward shown)
+PASS quiz 390 | by 25: after scrollLeft = 130 the row settles on a column start (scrollLeft 104), nothing cut, the back cue shows
+PASS quiz 390 | by 25: a program focus of the first box is refused (it does not show at the start), the row stays at 0 (scrollLeft 0), the start in the 292 px window
+PASS quiz 390 | by 25: Tab into the row focuses the first box, fully in the window, the row at the leftmost start that shows it (scrollLeft 104, want 104)
+PASS quiz 390 | by 25: after Tab, typing 7 writes "7" into the first box
+PASS quiz 390 | by 25: a tap on the first box (row swiped to 104) focuses it in view, the row does not move (scrollLeft 104), typing 7 writes "7"
+PASS quiz 390 | by 25: Tab reached 5/5 boxes, each fully visible
+PASS quiz 390 | by 25: no box clipped at the card's bottom or any ancestor edge, page scroll width 0
+PASS quiz 390 | by 25: swipe cue "Swipe ➞ for more boxes" shown at the start, hidden at the end, over a box: false
+PASS quiz 390 | missing 20 % (first box in column 6): at load the row rests at 0 (scrollLeft 0) with the first given number fully in the 292 px window, the first box NOT fully in it, focus not in the row, nothing cut at either edge
+PASS quiz 390 | missing 20 % (first box in column 6): the seeded first box (column 6) lies past the window at load (shown: false) and holds no focus
+PASS quiz 390 | missing 20 % (first box in column 6): after load the step tab is clear of the row, nothing under it
+PASS quiz 390 | missing 20 % (first box in column 6): digits 29.0 px (about 29), box 76 x 53 px (>= 48, width:digit 2.63, 2.6 before the change)
+PASS quiz 390 | missing 20 % (first box in column 6): the forward cue is whole, on one line, inside the window (200 px in a 292 px window, 17 px type, 25 px high)
+PASS quiz 390 | missing 20 % (first box in column 6): the window shows 3 whole columns; 3 fit in the 304 px up to the nearest clip
+PASS quiz 390 | missing 20 % (first box in column 6): gap 24.0 px (13.8-24.5), pitch 104.3 = item 80.3 + gap
+PASS quiz 390 | missing 20 % (first box in column 6): a row of 2-digit numbers shows 3 whole columns (want 3) in a 291.9 px window (>= 3 x 80.3 + 2 x 24.0 = 288.9)
+PASS quiz 390 | missing 20 % (first box in column 6): the hidden first box (column 6) lies past the 3 shown columns, and 3 fit
+PASS quiz 390 | missing 20 % (first box in column 6): negative control: with the window narrowed by one column (2 shown of 3 that fit) the forced-hidden check FAILS as it must
+PASS quiz 390 | missing 20 % (first box in column 6): after a scroll of 0.7 column the row settles on the next column start (scrollLeft 104), nothing cut, the back cue shows
+PASS quiz 390 | missing 20 % (first box in column 6): one column in, both cues show on ONE line, 33 px ("⟵ Back Swipe ➞")
+PASS quiz 390 | missing 20 % (first box in column 6): mid-row, the cues share one strip 33 px high (<= 60 and <= half the 126 px row; back shown, forward shown)
+PASS quiz 390 | missing 20 % (first box in column 6): after scrollLeft = 130 the row settles on a column start (scrollLeft 104), nothing cut, the back cue shows
+PASS quiz 390 | missing 20 % (first box in column 6): a program focus of the first box is refused (it does not show at the start), the row stays at 0 (scrollLeft 0), the start in the 292 px window
+PASS quiz 390 | missing 20 % (first box in column 6): Tab into the row focuses the first box, fully in the window, the row at the leftmost start that shows it (scrollLeft 313, want 313)
+PASS quiz 390 | missing 20 % (first box in column 6): after Tab, typing 7 writes "7" into the first box
+PASS quiz 390 | missing 20 % (first box in column 6): a tap on the first box (row swiped to 313) focuses it in view, the row does not move (scrollLeft 313), typing 7 writes "7"
+PASS quiz 390 | missing 20 % (first box in column 6): Tab reached 2/2 boxes, each fully visible
+PASS quiz 390 | missing 20 % (first box in column 6): no box clipped at the card's bottom or any ancestor edge, page scroll width 0
+PASS quiz 390 | missing 20 % (first box in column 6): swipe cue "Swipe ➞ for more boxes" shown at the start, hidden at the end, over a box: false
+PASS quiz 390 | missing 90 % first only: at load the row rests at 0 (scrollLeft 0) with the first given number fully in the 292 px window, the first box fully in it, focus on a box in view, nothing cut at either edge
+PASS quiz 390 | missing 90 % first only: after load the step tab is clear of the row, nothing under it
+PASS quiz 390 | missing 90 % first only: digits 29.0 px (about 29), box 76 x 53 px (>= 48, width:digit 2.63, 2.6 before the change)
+PASS quiz 390 | missing 90 % first only: the forward cue is whole, on one line, inside the window (200 px in a 292 px window, 17 px type, 25 px high)
+PASS quiz 390 | missing 90 % first only: the window shows 3 whole columns; 3 fit in the 304 px up to the nearest clip
+PASS quiz 390 | missing 90 % first only: gap 24.0 px (13.8-24.5), pitch 104.3 = item 80.3 + gap
+PASS quiz 390 | missing 90 % first only: a row of 2-digit numbers shows 3 whole columns (want 3) in a 291.9 px window (>= 3 x 80.3 + 2 x 24.0 = 288.9)
+PASS quiz 390 | missing 90 % first only: after a scroll of 0.7 column the row settles on the next column start (scrollLeft 104), nothing cut, the back cue shows
+PASS quiz 390 | missing 90 % first only: one column in, both cues show on ONE line, 33 px ("⟵ Back Swipe ➞")
+PASS quiz 390 | missing 90 % first only: mid-row, the cues share one strip 33 px high (<= 60 and <= half the 126 px row; back shown, forward shown)
+PASS quiz 390 | missing 90 % first only: after scrollLeft = 130 the row settles on a column start (scrollLeft 104), nothing cut, the back cue shows
+PASS quiz 390 | missing 90 % first only: a program focus of the first box is taken (it shows at the start), the row stays at 0 (scrollLeft 0), the start in the 292 px window
+PASS quiz 390 | missing 90 % first only: Tab into the row focuses the first box, fully in the window, the row at the leftmost start that shows it (scrollLeft 0, want 0)
+PASS quiz 390 | missing 90 % first only: after Tab, typing 7 writes "7" into the first box
+PASS quiz 390 | missing 90 % first only: a tap on the first box (row swiped to 0) focuses it in view, the row does not move (scrollLeft 0), typing 7 writes "7"
+PASS quiz 390 | missing 90 % first only: Tab reached 10/10 boxes, each fully visible
+PASS quiz 390 | missing 90 % first only: no box clipped at the card's bottom or any ancestor edge, page scroll width 0
+PASS quiz 390 | missing 90 % first only: swipe cue "Swipe ➞ for more boxes" shown at the start, hidden at the end, over a box: false
+PASS card 1280 | by 100,000 from 1,000,000 (15): every column fits: no scroll (scrollWidth 554 / window 554), forward cue hidden, 2/2 turn arrows inside the window, page scroll 0
+PASS card 1280 | by 1,000 from 14,000: every column fits: no scroll (scrollWidth 583 / window 583), forward cue hidden, 1/1 turn arrows inside the window, page scroll 0
+PASS card 1280 | default tables: every column fits: no scroll (scrollWidth 630 / window 630), forward cue hidden, 1/1 turn arrows inside the window, page scroll 0
+PASS quiz 1280 | by 100,000 from 1,000,000 (15): every column fits: no scroll (scrollWidth 493 / window 493), forward cue hidden, 2/2 turn arrows inside the window, page scroll 0
+PASS quiz 1280 | by 1,000 from 14,000: every column fits: no scroll (scrollWidth 535 / window 535), forward cue hidden, 1/1 turn arrows inside the window, page scroll 0
+PASS quiz 1280 | default tables: every column fits: no scroll (scrollWidth 608 / window 608), forward cue hidden, 1/1 turn arrows inside the window, page scroll 0
+PASS card 820 | by 100,000 from 1,000,000 (15): every column fits: no scroll (scrollWidth 547 / window 547), forward cue hidden, 2/2 turn arrows inside the window, page scroll 0
+PASS card 820 | by 1,000 from 14,000: every column fits: no scroll (scrollWidth 579 / window 579), forward cue hidden, 1/1 turn arrows inside the window, page scroll 0
+PASS card 820 | default tables: every column fits: no scroll (scrollWidth 630 / window 630), forward cue hidden, 1/1 turn arrows inside the window, page scroll 0
+PASS quiz 820 | by 100,000 from 1,000,000 (15): every column fits: no scroll (scrollWidth 521 / window 521), forward cue hidden, 2/2 turn arrows inside the window, page scroll 0
+PASS quiz 820 | by 1,000 from 14,000: every column fits: no scroll (scrollWidth 558 / window 558), forward cue hidden, 1/1 turn arrows inside the window, page scroll 0
+PASS quiz 820 | default tables: every column fits: no scroll (scrollWidth 619 / window 619), forward cue hidden, 1/1 turn arrows inside the window, page scroll 0
+wave1-c2-phone: OK

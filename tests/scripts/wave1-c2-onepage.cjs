@@ -36,7 +36,9 @@ async function digest() {
   }, CASES, PAPERS);
   await app.close();
   const dig = {};
-  for (const [k, v] of Object.entries(out)) dig[k] = { pupil: sha(v.pupil), key: sha(v.key), pages: v.pages, keyPages: v.keyPages, items: v.items };
+  // the base merge 60a5e836 added a data-ws-key-ans attribute on the key's answer slots (pixels unchanged): compared without it
+  const noKeyAns = (h) => String(h).replace(/\s+data-ws-key-ans(="[^"]*")?/g, '');
+  for (const [k, v] of Object.entries(out)) dig[k] = { pupil: sha(noKeyAns(v.pupil)), key: sha(noKeyAns(v.key)), pages: v.pages, keyPages: v.keyPages, items: v.items };
   return dig;
 }
 

@@ -1,0 +1,360 @@
+PASS 1366 count_by_tables {}: 20 count rows, 100 inputs (a number line is checked by the layout pass below)
+PASS 1366 count_by_tables {}: no swipe cue shows (0)
+PASS 1366 count_by_tables {}: no count row scrolls sideways (0)
+PASS 1366 count_by_tables {}: every input inside its card
+PASS 1366 count_by_tables {}: no input clipped
+PASS 1366 count_by_tables {}: no sideways page scroll (0)
+PASS 1366 count_by_tables {"spaces":"line"}: 20 count rows, 100 inputs (a number line is checked by the layout pass below)
+PASS 1366 count_by_tables {"spaces":"line"}: no swipe cue shows (0)
+PASS 1366 count_by_tables {"spaces":"line"}: no count row scrolls sideways (0)
+PASS 1366 count_by_tables {"spaces":"line"}: every input inside its card
+PASS 1366 count_by_tables {"spaces":"line"}: no input clipped
+PASS 1366 count_by_tables {"spaces":"line"}: no sideways page scroll (0)
+PASS 1366 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: 20 count rows, 100 inputs (a number line is checked by the layout pass below)
+PASS 1366 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: no swipe cue shows (0)
+PASS 1366 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: no count row scrolls sideways (0)
+PASS 1366 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: every input inside its card
+PASS 1366 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: no input clipped
+PASS 1366 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: no sideways page scroll (0)
+PASS 1366 skip_count_grid {}: 20 count rows, 94 inputs (a number line is checked by the layout pass below)
+PASS 1366 skip_count_grid {}: no swipe cue shows (0)
+PASS 1366 skip_count_grid {}: no count row scrolls sideways (0)
+PASS 1366 skip_count_grid {}: every input inside its card
+PASS 1366 skip_count_grid {}: no input clipped
+PASS 1366 skip_count_grid {}: no sideways page scroll (0)
+PASS 1366 skip_count_line {}: 20 count rows, 0 inputs (a number line is checked by the layout pass below)
+PASS 1366 skip_count_line {}: no swipe cue shows (0)
+PASS 1366 skip_count_line {}: no count row scrolls sideways (0)
+PASS 1366 skip_count_line {}: every input inside its card
+PASS 1366 skip_count_line {}: no input clipped
+PASS 1366 skip_count_line {}: no sideways page scroll (0)
+PASS 1280 count_by_tables {}: 20 count rows, 100 inputs (a number line is checked by the layout pass below)
+PASS 1280 count_by_tables {}: no swipe cue shows (0)
+PASS 1280 count_by_tables {}: no count row scrolls sideways (0)
+PASS 1280 count_by_tables {}: every input inside its card
+PASS 1280 count_by_tables {}: no input clipped
+PASS 1280 count_by_tables {}: no sideways page scroll (0)
+PASS 1280 count_by_tables {"spaces":"line"}: 20 count rows, 100 inputs (a number line is checked by the layout pass below)
+PASS 1280 count_by_tables {"spaces":"line"}: no swipe cue shows (0)
+PASS 1280 count_by_tables {"spaces":"line"}: no count row scrolls sideways (0)
+PASS 1280 count_by_tables {"spaces":"line"}: every input inside its card
+PASS 1280 count_by_tables {"spaces":"line"}: no input clipped
+PASS 1280 count_by_tables {"spaces":"line"}: no sideways page scroll (0)
+PASS 1280 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: 20 count rows, 100 inputs (a number line is checked by the layout pass below)
+PASS 1280 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: no swipe cue shows (0)
+PASS 1280 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: no count row scrolls sideways (0)
+PASS 1280 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: every input inside its card
+PASS 1280 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: no input clipped
+PASS 1280 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: no sideways page scroll (0)
+PASS 1280 skip_count_grid {}: 20 count rows, 105 inputs (a number line is checked by the layout pass below)
+PASS 1280 skip_count_grid {}: no swipe cue shows (0)
+PASS 1280 skip_count_grid {}: no count row scrolls sideways (0)
+PASS 1280 skip_count_grid {}: every input inside its card
+PASS 1280 skip_count_grid {}: no input clipped
+PASS 1280 skip_count_grid {}: no sideways page scroll (0)
+PASS 1280 skip_count_line {}: 20 count rows, 0 inputs (a number line is checked by the layout pass below)
+PASS 1280 skip_count_line {}: no swipe cue shows (0)
+PASS 1280 skip_count_line {}: no count row scrolls sideways (0)
+PASS 1280 skip_count_line {}: every input inside its card
+PASS 1280 skip_count_line {}: no input clipped
+PASS 1280 skip_count_line {}: no sideways page scroll (0)
+PASS 390 count_by_tables {}: the phone never wraps a row (it keeps the swipe where a row is too wide: 20 cue(s) shown, 0 wrapped)
+PASS 390 count_by_tables {}: no sideways page scroll (0)
+PASS card 1366x650 count_by_tables {}: 1 count row(s) shown
+PASS card 1366x650 count_by_tables {}: the card/quiz row is not wrapped (it fits whole, as on the baseline): whole
+PASS card 1366x650 count_by_tables {}: a number line is never wrapped
+PASS card 1366x650 count_by_tables {}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS card 1366x650 count_by_tables {"spaces":"line"}: 1 count row(s) shown
+PASS card 1366x650 count_by_tables {"spaces":"line"}: the card/quiz row is not wrapped (it fits whole, as on the baseline): whole
+PASS card 1366x650 count_by_tables {"spaces":"line"}: a number line is never wrapped
+PASS card 1366x650 count_by_tables {"spaces":"line"}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS card 1366x650 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: 1 count row(s) shown
+PASS card 1366x650 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: the card/quiz row is not wrapped (it fits whole, as on the baseline): whole
+PASS card 1366x650 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: a number line is never wrapped
+PASS card 1366x650 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS card 1366x650 skip_count_grid {}: 1 count row(s) shown
+PASS card 1366x650 skip_count_grid {}: the card/quiz row is not wrapped (it fits whole, as on the baseline): whole
+PASS card 1366x650 skip_count_grid {}: a number line is never wrapped
+PASS card 1366x650 skip_count_grid {}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS card 1366x650 skip_count_line {}: 1 count row(s) shown
+PASS card 1366x650 skip_count_line {}: the card/quiz row is not wrapped (it fits whole, as on the baseline): whole
+PASS card 1366x650 skip_count_line {}: a number line is never wrapped
+PASS card 1366x650 skip_count_line {}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS quiz 1366x650 count_by_tables {}: 1 count row(s) shown
+PASS quiz 1366x650 count_by_tables {}: the card/quiz row is not wrapped (it fits whole, as on the baseline): whole
+PASS quiz 1366x650 count_by_tables {}: a number line is never wrapped
+PASS quiz 1366x650 count_by_tables {}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS quiz 1366x650 count_by_tables {"spaces":"line"}: 1 count row(s) shown
+PASS quiz 1366x650 count_by_tables {"spaces":"line"}: the card/quiz row is not wrapped (it fits whole, as on the baseline): whole
+PASS quiz 1366x650 count_by_tables {"spaces":"line"}: a number line is never wrapped
+PASS quiz 1366x650 count_by_tables {"spaces":"line"}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS quiz 1366x650 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: 1 count row(s) shown
+PASS quiz 1366x650 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: the card/quiz row is not wrapped (it fits whole, as on the baseline): whole
+PASS quiz 1366x650 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: a number line is never wrapped
+PASS quiz 1366x650 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS quiz 1366x650 skip_count_grid {}: 1 count row(s) shown
+PASS quiz 1366x650 skip_count_grid {}: the card/quiz row is not wrapped (it fits whole, as on the baseline): whole
+PASS quiz 1366x650 skip_count_grid {}: a number line is never wrapped
+PASS quiz 1366x650 skip_count_grid {}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS quiz 1366x650 skip_count_line {}: 1 count row(s) shown
+PASS quiz 1366x650 skip_count_line {}: the card/quiz row is not wrapped (it fits whole, as on the baseline): whole
+PASS quiz 1366x650 skip_count_line {}: a number line is never wrapped
+PASS quiz 1366x650 skip_count_line {}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS worksheet 1366x650 count_by_tables {}: 20 count row(s) shown
+PASS worksheet 1366x650 count_by_tables {}: a number line is never wrapped
+PASS worksheet 1366x650 count_by_tables {}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS worksheet 1366x650 count_by_tables {"spaces":"line"}: 20 count row(s) shown
+PASS worksheet 1366x650 count_by_tables {"spaces":"line"}: a number line is never wrapped
+PASS worksheet 1366x650 count_by_tables {"spaces":"line"}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS worksheet 1366x650 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: 20 count row(s) shown
+PASS worksheet 1366x650 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: a number line is never wrapped
+PASS worksheet 1366x650 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS worksheet 1366x650 skip_count_grid {}: 20 count row(s) shown
+PASS worksheet 1366x650 skip_count_grid {}: a number line is never wrapped
+PASS worksheet 1366x650 skip_count_grid {}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS worksheet 1366x650 skip_count_line {}: 20 count row(s) shown
+PASS worksheet 1366x650 skip_count_line {}: a number line is never wrapped
+PASS worksheet 1366x650 skip_count_line {}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS card 1280x600 count_by_tables {}: 1 count row(s) shown
+PASS card 1280x600 count_by_tables {}: the card/quiz row is not wrapped (it fits whole, as on the baseline): whole
+PASS card 1280x600 count_by_tables {}: a number line is never wrapped
+PASS card 1280x600 count_by_tables {}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS card 1280x600 count_by_tables {"spaces":"line"}: 1 count row(s) shown
+PASS card 1280x600 count_by_tables {"spaces":"line"}: the card/quiz row is not wrapped (it fits whole, as on the baseline): whole
+PASS card 1280x600 count_by_tables {"spaces":"line"}: a number line is never wrapped
+PASS card 1280x600 count_by_tables {"spaces":"line"}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS card 1280x600 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: 1 count row(s) shown
+PASS card 1280x600 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: the card/quiz row is not wrapped (it fits whole, as on the baseline): whole
+PASS card 1280x600 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: a number line is never wrapped
+PASS card 1280x600 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS card 1280x600 skip_count_grid {}: 1 count row(s) shown
+PASS card 1280x600 skip_count_grid {}: the card/quiz row is not wrapped (it fits whole, as on the baseline): whole
+PASS card 1280x600 skip_count_grid {}: a number line is never wrapped
+PASS card 1280x600 skip_count_grid {}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS card 1280x600 skip_count_line {}: 1 count row(s) shown
+PASS card 1280x600 skip_count_line {}: the card/quiz row is not wrapped (it fits whole, as on the baseline): whole
+PASS card 1280x600 skip_count_line {}: a number line is never wrapped
+PASS card 1280x600 skip_count_line {}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS quiz 1280x600 count_by_tables {}: 1 count row(s) shown
+PASS quiz 1280x600 count_by_tables {}: the card/quiz row is not wrapped (it fits whole, as on the baseline): whole
+PASS quiz 1280x600 count_by_tables {}: a number line is never wrapped
+PASS quiz 1280x600 count_by_tables {}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS quiz 1280x600 count_by_tables {"spaces":"line"}: 1 count row(s) shown
+PASS quiz 1280x600 count_by_tables {"spaces":"line"}: the card/quiz row is not wrapped (it fits whole, as on the baseline): whole
+PASS quiz 1280x600 count_by_tables {"spaces":"line"}: a number line is never wrapped
+PASS quiz 1280x600 count_by_tables {"spaces":"line"}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS quiz 1280x600 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: 1 count row(s) shown
+PASS quiz 1280x600 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: the card/quiz row is not wrapped (it fits whole, as on the baseline): whole
+PASS quiz 1280x600 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: a number line is never wrapped
+PASS quiz 1280x600 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS quiz 1280x600 skip_count_grid {}: 1 count row(s) shown
+PASS quiz 1280x600 skip_count_grid {}: the card/quiz row is not wrapped (it fits whole, as on the baseline): whole
+PASS quiz 1280x600 skip_count_grid {}: a number line is never wrapped
+PASS quiz 1280x600 skip_count_grid {}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS quiz 1280x600 skip_count_line {}: 1 count row(s) shown
+PASS quiz 1280x600 skip_count_line {}: the card/quiz row is not wrapped (it fits whole, as on the baseline): whole
+PASS quiz 1280x600 skip_count_line {}: a number line is never wrapped
+PASS quiz 1280x600 skip_count_line {}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS worksheet 1280x600 count_by_tables {}: 20 count row(s) shown
+PASS worksheet 1280x600 count_by_tables {}: a number line is never wrapped
+PASS worksheet 1280x600 count_by_tables {}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS worksheet 1280x600 count_by_tables {"spaces":"line"}: 20 count row(s) shown
+PASS worksheet 1280x600 count_by_tables {"spaces":"line"}: a number line is never wrapped
+PASS worksheet 1280x600 count_by_tables {"spaces":"line"}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS worksheet 1280x600 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: 20 count row(s) shown
+PASS worksheet 1280x600 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: a number line is never wrapped
+PASS worksheet 1280x600 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS worksheet 1280x600 skip_count_grid {}: 20 count row(s) shown
+PASS worksheet 1280x600 skip_count_grid {}: a number line is never wrapped
+PASS worksheet 1280x600 skip_count_grid {}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS worksheet 1280x600 skip_count_line {}: 20 count row(s) shown
+PASS worksheet 1280x600 skip_count_line {}: a number line is never wrapped
+PASS worksheet 1280x600 skip_count_line {}: layout clean (even split, numbers on ticks, exit arrow by its line, no band, jumps inside and level, whole or cued swipe)
+PASS card 683x650 count_by_tables {}: layout clean
+PASS card 683x650 count_by_tables {}: no cue unless a number lies past the window (no cue/all shown)
+PASS card 683x650 count_by_tables {}: no number or box straddles the right edge
+PASS card 683x650 count_by_tables {"spaces":"line"}: layout clean
+PASS card 683x650 count_by_tables {"spaces":"line"}: no cue unless a number lies past the window (no cue/all shown)
+PASS card 683x650 count_by_tables {"spaces":"line"}: no number or box straddles the right edge
+PASS card 683x650 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: layout clean
+PASS card 683x650 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: no cue unless a number lies past the window (no cue/all shown)
+PASS card 683x650 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: no number or box straddles the right edge
+PASS card 683x650 skip_count_grid {}: layout clean
+PASS card 683x650 skip_count_grid {}: no cue unless a number lies past the window (no cue/all shown)
+PASS card 683x650 skip_count_grid {}: no number or box straddles the right edge
+PASS card 683x650 skip_count_line {}: layout clean
+PASS card 683x650 skip_count_line {}: no cue unless a number lies past the window (no cue/all shown)
+PASS card 683x650 skip_count_line {}: no number or box straddles the right edge
+PASS card 820x1180 count_by_tables {}: layout clean
+PASS card 820x1180 count_by_tables {}: no cue unless a number lies past the window (no cue/all shown)
+PASS card 820x1180 count_by_tables {}: no number or box straddles the right edge
+PASS card 820x1180 count_by_tables {"spaces":"line"}: layout clean
+PASS card 820x1180 count_by_tables {"spaces":"line"}: no cue unless a number lies past the window (no cue/all shown)
+PASS card 820x1180 count_by_tables {"spaces":"line"}: no number or box straddles the right edge
+PASS card 820x1180 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: layout clean
+PASS card 820x1180 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: no cue unless a number lies past the window (no cue/all shown)
+PASS card 820x1180 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: no number or box straddles the right edge
+PASS card 820x1180 skip_count_grid {}: layout clean
+PASS card 820x1180 skip_count_grid {}: no cue unless a number lies past the window (no cue/all shown)
+PASS card 820x1180 skip_count_grid {}: no number or box straddles the right edge
+PASS card 820x1180 skip_count_line {}: layout clean
+PASS card 820x1180 skip_count_line {}: no cue unless a number lies past the window (no cue/all shown)
+PASS card 820x1180 skip_count_line {}: no number or box straddles the right edge
+PASS card 1024x768 count_by_tables {}: layout clean
+PASS card 1024x768 count_by_tables {}: no cue unless a number lies past the window (no cue/all shown)
+PASS card 1024x768 count_by_tables {}: no number or box straddles the right edge
+PASS card 1024x768 count_by_tables {"spaces":"line"}: layout clean
+PASS card 1024x768 count_by_tables {"spaces":"line"}: no cue unless a number lies past the window (no cue/all shown)
+PASS card 1024x768 count_by_tables {"spaces":"line"}: no number or box straddles the right edge
+PASS card 1024x768 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: layout clean
+PASS card 1024x768 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: no cue unless a number lies past the window (no cue/all shown)
+PASS card 1024x768 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: no number or box straddles the right edge
+PASS card 1024x768 skip_count_grid {}: layout clean
+PASS card 1024x768 skip_count_grid {}: no cue unless a number lies past the window (no cue/all shown)
+PASS card 1024x768 skip_count_grid {}: no number or box straddles the right edge
+PASS card 1024x768 skip_count_line {}: layout clean
+PASS card 1024x768 skip_count_line {}: no cue unless a number lies past the window (no cue/all shown)
+PASS card 1024x768 skip_count_line {}: no number or box straddles the right edge
+PASS card 1100x650 count_by_tables {}: layout clean
+PASS card 1100x650 count_by_tables {}: no cue unless a number lies past the window (no cue/all shown)
+PASS card 1100x650 count_by_tables {}: no number or box straddles the right edge
+PASS card 1100x650 count_by_tables {"spaces":"line"}: layout clean
+PASS card 1100x650 count_by_tables {"spaces":"line"}: no cue unless a number lies past the window (no cue/all shown)
+PASS card 1100x650 count_by_tables {"spaces":"line"}: no number or box straddles the right edge
+PASS card 1100x650 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: layout clean
+PASS card 1100x650 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: no cue unless a number lies past the window (no cue/all shown)
+PASS card 1100x650 count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: no number or box straddles the right edge
+PASS card 1100x650 skip_count_grid {}: layout clean
+PASS card 1100x650 skip_count_grid {}: no cue unless a number lies past the window (no cue/all shown)
+PASS card 1100x650 skip_count_grid {}: no number or box straddles the right edge
+PASS card 1100x650 skip_count_line {}: layout clean
+PASS card 1100x650 skip_count_line {}: no cue unless a number lies past the window (no cue/all shown)
+PASS card 1100x650 skip_count_line {}: no number or box straddles the right edge
+PASS card skip_count_line: digits at 820 (27.2392 px) >= digits at 683 (22.9416 px)
+PASS card 390 skip_count_line seed 9: no number or box straddles the window's right edge
+PASS card 390 skip_count_line seed 9: cue only while a number lies past the window
+PASS card 390 skip_count_line seed 21: no number or box straddles the window's right edge
+PASS card 390 skip_count_line seed 21: cue only while a number lies past the window
+PASS card 390 skip_count_line seed 33: no number or box straddles the window's right edge
+PASS card 390 skip_count_line seed 33: cue only while a number lies past the window
+PASS card 390 skip_count_line seed 45: no number or box straddles the window's right edge
+PASS card 390 skip_count_line seed 45: cue only while a number lies past the window
+PASS card 390 skip_count_line seed 57: no number or box straddles the window's right edge
+PASS card 390 skip_count_line seed 57: cue only while a number lies past the window
+PASS worksheet 390 skip_count_line seed 9: no number or box straddles the window's right edge
+PASS worksheet 390 skip_count_line seed 9: cue only while a number lies past the window
+PASS worksheet 390 skip_count_line seed 21: no number or box straddles the window's right edge
+PASS worksheet 390 skip_count_line seed 21: cue only while a number lies past the window
+PASS worksheet 390 skip_count_line seed 33: no number or box straddles the window's right edge
+PASS worksheet 390 skip_count_line seed 33: cue only while a number lies past the window
+PASS worksheet 390 skip_count_line seed 45: no number or box straddles the window's right edge
+PASS worksheet 390 skip_count_line seed 45: cue only while a number lies past the window
+PASS worksheet 390 skip_count_line seed 57: no number or box straddles the window's right edge
+PASS worksheet 390 skip_count_line seed 57: cue only while a number lies past the window
+PASS quiz 390 skip_count_line seed 9: no number or box straddles the window's right edge
+PASS quiz 390 skip_count_line seed 9: cue only while a number lies past the window
+PASS quiz 390 skip_count_line seed 21: no number or box straddles the window's right edge
+PASS quiz 390 skip_count_line seed 21: cue only while a number lies past the window
+PASS quiz 390 skip_count_line seed 33: no number or box straddles the window's right edge
+PASS quiz 390 skip_count_line seed 33: cue only while a number lies past the window
+PASS quiz 390 skip_count_line seed 45: no number or box straddles the window's right edge
+PASS quiz 390 skip_count_line seed 45: cue only while a number lies past the window
+PASS quiz 390 skip_count_line seed 57: no number or box straddles the window's right edge
+PASS quiz 390 skip_count_line seed 57: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 1: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 1: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 2: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 2: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 3: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 3: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 4: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 4: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 5: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 5: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 6: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 6: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 7: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 7: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 8: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 8: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 9: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 9: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 10: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 10: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 11: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 11: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 12: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 12: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 13: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 13: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 14: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 14: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 15: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 15: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 16: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 16: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 17: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 17: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 18: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 18: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 19: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 19: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 20: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 20: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 21: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 21: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 22: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 22: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 23: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 23: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 24: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 24: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 25: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 25: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 26: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 26: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 27: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 27: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 28: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 28: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 29: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 29: cue only while a number lies past the window
+PASS card 390 skip_count_line generateQuestionFor seed 30: no column straddles the clip edge
+PASS card 390 skip_count_line generateQuestionFor seed 30: cue only while a number lies past the window
+PASS resize count_by_tables {} -> 1366: clean
+PASS resize count_by_tables {} -> 390: clean
+PASS resize count_by_tables {} -> 390: identical to a fresh 390 load
+PASS resize count_by_tables {} -> 1280: clean
+PASS resize count_by_tables {} -> 683: clean
+PASS resize count_by_tables {} -> 1366: clean
+PASS resize count_by_tables {}: 390->1366->390->1280->683->1366 ends identical to a fresh 1366 load
+PASS resize count_by_tables {"spaces":"line"} -> 1366: clean
+PASS resize count_by_tables {"spaces":"line"} -> 390: clean
+PASS resize count_by_tables {"spaces":"line"} -> 390: identical to a fresh 390 load
+PASS resize count_by_tables {"spaces":"line"} -> 1280: clean
+PASS resize count_by_tables {"spaces":"line"} -> 683: clean
+PASS resize count_by_tables {"spaces":"line"} -> 1366: clean
+PASS resize count_by_tables {"spaces":"line"}: 390->1366->390->1280->683->1366 ends identical to a fresh 1366 load
+PASS resize count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]} -> 1366: clean
+PASS resize count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]} -> 390: clean
+PASS resize count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]} -> 390: identical to a fresh 390 load
+PASS resize count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]} -> 1280: clean
+PASS resize count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]} -> 683: clean
+PASS resize count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]} -> 1366: clean
+PASS resize count_by_tables {"rows":[{"step":1000,"start":"custom","at":14000}]}: 390->1366->390->1280->683->1366 ends identical to a fresh 1366 load
+PASS resize skip_count_grid {} -> 1366: clean
+PASS resize skip_count_grid {} -> 390: clean
+PASS resize skip_count_grid {} -> 390: identical to a fresh 390 load
+PASS resize skip_count_grid {} -> 1280: clean
+PASS resize skip_count_grid {} -> 683: clean
+PASS resize skip_count_grid {} -> 1366: clean
+PASS resize skip_count_grid {}: 390->1366->390->1280->683->1366 ends identical to a fresh 1366 load
+PASS resize skip_count_line {} -> 1366: clean
+PASS resize skip_count_line {} -> 390: clean
+PASS resize skip_count_line {} -> 390: identical to a fresh 390 load
+PASS resize skip_count_line {} -> 1280: clean
+PASS resize skip_count_line {} -> 683: clean
+PASS resize skip_count_line {} -> 1366: clean
+PASS resize skip_count_line {}: 390->1366->390->1280->683->1366 ends identical to a fresh 1366 load
+PASS no page errors
+wave1-c2-cbwrap: OK

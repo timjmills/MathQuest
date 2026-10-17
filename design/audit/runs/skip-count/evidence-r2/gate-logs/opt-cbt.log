@@ -1,0 +1,30 @@
+multiplication:count_by_tables  (27 values)
+   ok   rows=[{"step":7}]  warn print: 6/6 answer(s) not found in the key text (e.g. "28, 49, 56, 77, 84")
+   ok   rows=[{"step":25000}]  warn print: 6/6 answer(s) not found in the key text (e.g. "125000, 150000, 200000, 225000, 250000")
+   ok   rows=[{"step":4,"start":"zero"}]  warn print: 6/6 answer(s) not found in the key text (e.g. "24, 28, 36, 40, 44")
+   ok   rows=[{"step":5,"start":"custom","at":3}]  warn print: 6/6 answer(s) not found in the key text (e.g. "23, 28, 48, 53, 58")
+   ok   rows=[{"step":1000,"start":"custom","at":14000,"dir":"down"}]  warn print: 6/6 answer(s) not found in the key text (e.g. "10000, 8000, 7000, 4000, 3000")
+   ok   rows=[{"step":6,"dir":"down"}]  warn print: 6/6 answer(s) not found in the key text (e.g. "54, 48, 36, 30, 12")
+   ok   rows=[{"step":2,"start":"zero"},{"step":5,"start":"custom","at":3},{"step":25,"start":"custom","at":100,"dir":"down"},{"step":1000,"start":"custom","at":2000,"dir":"down"}]  warn print: 6/6 answer(s) not found in the key text (e.g. "4, 10, 18, 20, 22")
+   ok   fill="one"  warn print: 6/6 answer(s) not found in the key text (e.g. "6, 8, 14, 18, 20, 22")
+   ok   fill="half"  warn print: 6/6 answer(s) not found in the key text (e.g. "8, 10, 12, 18, 22, 24")
+   ok   missing=20  warn print: 6/6 answer(s) not found in the key text (e.g. "14, 22")
+   ok   missing=70  warn print: 6/6 answer(s) not found in the key text (e.g. "8, 10, 12, 14, 20, 22, 24")
+   ok   missing=80  warn print: 6/6 answer(s) not found in the key text (e.g. "8, 10, 12, 14, 16, 18, 20, 22")
+   ok   missing=90  warn print: 6/6 answer(s) not found in the key text (e.g. "6, 8, 10, 12, 14, 16, 18, 20, 22")
+   ok   missing=100  warn print: 6/6 answer(s) not found in the key text (e.g. "6, 8, 10, 12, 14, 16, 18, 20, 22, 24")
+   ok   times="each"  warn print: 6/6 answer(s) not found in the key text (e.g. "8, 10, 16, 20, 22")
+   ok   times="given"  warn print: 6/6 answer(s) not found in the key text (e.g. "8, 10, 16, 20, 22")
+   ok   onePage=true  warn print: 12/12 answer(s) not found in the key text (e.g. "4, 6, 7, 10, 12")
+   ok   jumps=15  warn print: 6/6 answer(s) not found in the key text (e.g. "8, 10, 16, 20, 22, 26, 30")
+   ok   order="mixed"  warn print: 6/6 answer(s) not found in the key text (e.g. "33, 66, 88, 99, 132")
+   ok   shape="circle"  warn print: 6/6 answer(s) not found in the key text (e.g. "8, 10, 16, 20, 22")
+   ok   shape="hex"  warn print: 6/6 answer(s) not found in the key text (e.g. "8, 10, 16, 20, 22")
+   ok   shape="mixed"  warn print: 6/6 answer(s) not found in the key text (e.g. "8, 10, 16, 20, 22")
+   ok   spaces="line"  warn print: 6/6 answer(s) not found in the key text (e.g. "8, 10, 16, 20, 22")
+   ok   calculator=true  
+   ok   skipAfter=0  
+   ok   skipAfter=2  
+   ok   skipAfter=20  
+skills: 1 with options (0 with none) · values 27: 27 pass, 0 fail (0 gated) · skills passing 1/1
+ws-options-verify: OK

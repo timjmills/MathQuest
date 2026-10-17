@@ -1,0 +1,13 @@
+multiplication:count_by_tables:S pages 1 -> 1 steps 4 -> 4
+multiplication:count_by_tables:M pages 1 -> 1 steps 4 -> 4
+multiplication:count_by_tables:L pages 1 -> 1 steps 4 -> 4
+patterns:skip_count_line:S pages 1 -> 1 steps 4 -> 4
+patterns:skip_count_line:M pages 1 -> 1 steps 4 -> 4
+patterns:skip_count_line:L pages 1 -> 1 steps 4 -> 4
+patterns:skip_count_grid:S pages 1 -> 1 steps 4 -> 4
+patterns:skip_count_grid:M pages 1 -> 1 steps 4 -> 4
+patterns:skip_count_grid:L pages 1 -> 1 steps 4 -> 4
+patterns:number_patterns_rule:S pages 1 -> 1 steps 5 -> 5
+patterns:number_patterns_rule:M pages 2 -> 2 steps 5 -> 5
+patterns:number_patterns_rule:L pages 2 -> 2 steps 5 -> 5
+changed 12 of 1707

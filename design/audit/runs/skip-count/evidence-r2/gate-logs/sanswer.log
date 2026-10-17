@@ -1,0 +1,5 @@
+multiplication:count_by_tables     card ok | worksheet ok (3/3) | quiz ok (3/3)
+patterns:skip_count_grid           card ok | worksheet ok (3/3) | quiz ok (3/3)
+patterns:skip_count_line           card ok | worksheet ok (3/3) | quiz ok (3/3)
+live green (card, quiz)            ok
+ws-screen-answer: OK

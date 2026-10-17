@@ -753,7 +753,7 @@ export const SKILLS = {
         { v: "mult_placeholder_zero", l: "Write the Placeholder Zero" },             // MB-9: the placeholder-zero box (M-M6, the biggest 2×2 error)
         { v: "mult_missing_digit", l: "Find the Missing Digit (Multiplication)" },   // MB-12
         // APPENDED 2026-09-25 (owner): one count-by row per table, to 12x (3.OA.7 prep).
-        { v: "count_by_tables", l: "Count by 1–12" },
+        { v: "count_by_tables", l: "Skip counting: count by 1–12" },
     ],
     division: [
         { v: "div_facts", l: "Division Facts (1-12)" },
@@ -1094,8 +1094,8 @@ export const SKILLS = {
         { v: "seq_5", l: "Count by 5s" },
         { v: "seq_10", l: "Count by 10s" },
         { v: "count_by_fill", l: "Count-By Fill-In (1-12)" },
-        { v: "skip_count_line", l: "Skip Counting Number Line (Visual)" },
-        { v: "skip_count_grid", l: "Skip Counting Grid (Visual)" },
+        { v: "skip_count_line", l: "Skip counting on a number line (2s, 5s, 10s)" },
+        { v: "skip_count_grid", l: "Skip counting by 2s, 5s and 10s (rows)" },
         { v: "count_by_step_up", l: "Count Up by Step (Grid)" },
         { v: "count_by_step_down", l: "Count Down by Step (Grid)" },
         { v: "count_by_powers_of_10", l: "Count by Powers of 10 (Grid)" },

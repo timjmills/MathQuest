@@ -23,6 +23,9 @@ const BAD_BG = 'rgb(253, 231, 228)';
 
 const SCENARIOS = [
   { c: 'multiplication', k: 'count_by_tables', kind: 'row', shot: true },
+  // 2026-10-03: the skip-count number line and row (the same count-row boxes, on a line / in two lines of six)
+  { c: 'patterns', k: 'skip_count_line', kind: 'row', shot: true },
+  { c: 'patterns', k: 'skip_count_grid', kind: 'row', shot: true },
   { c: 'composing', k: 'hundreds_chart_fill', kind: 'row', shot: true },
   { c: 'addition', k: 'add_100_regroup', kind: 'stack', shot: true },
   { c: 'addition', k: 'add_facts', kind: 'single', shot: true },

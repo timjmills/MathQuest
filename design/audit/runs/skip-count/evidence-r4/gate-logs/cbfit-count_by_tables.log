@@ -1,0 +1,33 @@
+home screen 1366x650 (full header)           ok (nav flex, controls flex, menu button hidden)
+play at 1366x960 (tall screen, full header)  ok (nav flex, controls flex, menu button hidden)
+R6-D1 queue N10 line 1366x650: ok dots 1059-1241 x 151-183 band 70-123 card top 145
+R6-D1 queue N10 no line 1366x650: ok dots 1059-1241 x 82-114 band - card top 76
+R6-D1 queue N20 line 1366x650: ok dots 879-1241 x 151-183 band 70-123 card top 145
+R6-D1 queue N20 no line 1366x650: ok dots 879-1241 x 82-114 band - card top 76
+R6-D1 link N10 line 1366x650: ok dots 1059-1241 x 151-183 band 70-123 card top 145
+R6-D1 link N10 no line 1366x650: ok dots 1059-1241 x 82-114 band - card top 76
+R6-D1 link N20 line 1366x650: ok dots 879-1241 x 151-183 band 70-123 card top 145
+R6-D1 link N20 no line 1366x650: ok dots 879-1241 x 82-114 band - card top 76
+R6-D1 queue N10 line 1280x600: ok dots 1016-1198 x 151-183 band 70-123 card top 145
+R6-D1 queue N10 no line 1280x600: ok dots 1016-1198 x 82-114 band - card top 76
+R6-D1 queue N20 line 1280x600: ok dots 836-1198 x 151-183 band 70-123 card top 145
+R6-D1 queue N20 no line 1280x600: ok dots 836-1198 x 82-114 band - card top 76
+R6-D1 link N10 line 1280x600: ok dots 1016-1198 x 151-183 band 70-123 card top 145
+R6-D1 link N10 no line 1280x600: ok dots 1016-1198 x 82-114 band - card top 76
+R6-D1 link N20 line 1280x600: ok dots 836-1198 x 151-183 band 70-123 card top 145
+R6-D1 link N20 no line 1280x600: ok dots 836-1198 x 82-114 band - card top 76
+multiplication:count_by_tables 1366x650      card ok box 227/650 go 399 | boss ok box 227/650 go 399 | race ok box 227/650 go 399 | worksheet ok box 233/650 go 54 cards 1 | quiz ok box 200/650 go 391
+multiplication:count_by_tables 1280x600      card ok box 227/600 go 399 | boss ok box 227/600 go 399 | race ok box 227/600 go 399 | worksheet ok box 233/600 go 54 cards 1 | quiz ok box 200/600 go 391
+addition:add_facts 1366x650 quiz touch wrong touch Next ok
+addition:add_facts 1366x650 quiz touch right touch Next ok
+subtraction:subtract 1366x650 quiz touch wrong touch Next ok
+subtraction:subtract 1366x650 quiz touch right touch Next ok
+multiplication:mult_facts 1366x650 quiz touch wrong touch Next ok
+multiplication:mult_facts 1366x650 quiz touch right touch Next ok
+addition:add_facts 1280x600 quiz touch wrong touch Next ok
+addition:add_facts 1280x600 quiz touch right touch Next ok
+subtraction:subtract 1280x600 quiz touch wrong touch Next ok
+subtraction:subtract 1280x600 quiz touch right touch Next ok
+multiplication:mult_facts 1280x600 quiz touch wrong touch Next ok
+multiplication:mult_facts 1280x600 quiz touch right touch Next ok
+ws-chromebook-fit: OK

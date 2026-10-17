@@ -13253,7 +13253,7 @@
   {
    "categoryId": "multiplication",
    "skillId": "count_by_tables",
-   "label": "Count by 1–12",
+   "label": "Skip counting: count by 1–12",
    "grade": "3",
    "n": 12,
    "errors": [],
@@ -34360,7 +34360,7 @@
   {
    "categoryId": "patterns",
    "skillId": "skip_count_line",
-   "label": "Skip Counting Number Line (Visual)",
+   "label": "Skip counting on a number line (2s, 5s, 10s)",
    "grade": "2",
    "n": 12,
    "errors": [],
@@ -34369,49 +34369,51 @@
     "text": 12
    },
    "printFormats": {
-    "skip-count-line": 12
+    "count-row": 12
    },
    "interactiveTypes": {},
    "visual": 12,
-   "colourVisual": 12,
+   "colourVisual": 0,
    "emoji": 0,
    "options": 0,
    "hint": 12,
    "keyAns": 12,
    "numericAns": 0,
-   "abop": 0,
-   "maxDigits": 0,
-   "maxOperand": 0,
-   "ops": {},
+   "abop": 12,
+   "maxDigits": 2,
+   "maxOperand": 10,
+   "ops": {
+    "+": 12
+   },
    "story": 0,
-   "maxWords": 9,
+   "maxWords": 8,
    "worked": 12,
    "workedMax": 2,
    "solSteps": 12,
-   "solStepsMax": 3,
+   "solStepsMax": 6,
    "payloadKeys": {},
    "stateLeak": false,
    "samples": [
     {
-     "text": "Fill in the missing numbers. Skip count by 3s.",
-     "ans": "9, 18, 21, 24",
-     "fmt": "skip-count-line",
+     "text": "Skip count by 2s. Write the missing numbers.",
+     "ans": "34, 40, 44",
+     "fmt": "count-row",
      "type": "text"
     },
     {
-     "text": "Fill in the missing numbers. Skip count by 2s.",
-     "ans": "8, 10, 14, 16",
-     "fmt": "skip-count-line",
+     "text": "Skip count by 5s. Write the missing numbers.",
+     "ans": "40, 55, 65",
+     "fmt": "count-row",
      "type": "text"
     },
     {
-     "text": "Fill in the missing numbers. Skip count by 2s.",
-     "ans": "10, 14, 16",
-     "fmt": "skip-count-line",
+     "text": "Skip count by 10s. Write the missing numbers.",
+     "ans": "50, 80, 100",
+     "fmt": "count-row",
      "type": "text"
     }
    ],
-   "distinct": 12,
+   "distinct": 11,
    "printSize": "medium",
    "roles": {
     "key": "ready",
@@ -34421,11 +34423,13 @@
     "subskill": "author",
     "stretch": "author",
     "word": "wrap",
-    "fact": "n/a"
+    "fact": "basic"
    },
    "pages": {
     "host": "visual-grid",
     "special": [
+     "fact-layouts",
+     "flashcards",
      "todays-number",
      "sub-notate"
     ],
@@ -34437,55 +34441,57 @@
   {
    "categoryId": "patterns",
    "skillId": "skip_count_grid",
-   "label": "Skip Counting Grid (Visual)",
+   "label": "Skip counting by 2s, 5s and 10s (rows)",
    "grade": "2",
    "n": 12,
    "errors": [],
    "empty": 0,
    "answerTypes": {
-    "grid-fill": 12
+    "text": 12
    },
    "printFormats": {
-    "skip-count-grid": 12
+    "count-row": 12
    },
    "interactiveTypes": {},
    "visual": 12,
-   "colourVisual": 12,
+   "colourVisual": 0,
    "emoji": 0,
    "options": 0,
    "hint": 12,
    "keyAns": 12,
    "numericAns": 0,
-   "abop": 0,
-   "maxDigits": 0,
-   "maxOperand": 0,
-   "ops": {},
+   "abop": 12,
+   "maxDigits": 2,
+   "maxOperand": 12,
+   "ops": {
+    "+": 12
+   },
    "story": 0,
-   "maxWords": 9,
+   "maxWords": 8,
    "worked": 12,
    "workedMax": 2,
    "solSteps": 12,
-   "solStepsMax": 3,
+   "solStepsMax": 6,
    "payloadKeys": {},
    "stateLeak": false,
    "samples": [
     {
-     "text": "Fill in all the blank cells. Count by 5s.",
-     "ans": "10,15,30,35,50,55",
-     "fmt": "skip-count-grid",
-     "type": "grid-fill"
+     "text": "Skip count by 2s. Write the missing numbers.",
+     "ans": "8, 12, 14, 18, 22",
+     "fmt": "count-row",
+     "type": "text"
     },
     {
-     "text": "Fill in all the blank cells. Count by 5s.",
-     "ans": "5,10,20,25,30,45",
-     "fmt": "skip-count-grid",
-     "type": "grid-fill"
+     "text": "Skip count by 10s. Write the missing numbers.",
+     "ans": "40, 60, 90, 110",
+     "fmt": "count-row",
+     "type": "text"
     },
     {
-     "text": "Fill in all the blank cells. Count by 6s.",
-     "ans": "18,30,36,48",
-     "fmt": "skip-count-grid",
-     "type": "grid-fill"
+     "text": "Skip count by 5s. Write the missing numbers.",
+     "ans": "25, 35, 50, 60",
+     "fmt": "count-row",
+     "type": "text"
     }
    ],
    "distinct": 12,
@@ -34498,11 +34504,13 @@
     "subskill": "author",
     "stretch": "author",
     "word": "wrap",
-    "fact": "n/a"
+    "fact": "basic"
    },
    "pages": {
     "host": "chart-table",
     "special": [
+     "fact-layouts",
+     "flashcards",
      "todays-number"
     ],
     "reviewed": true,
@@ -35133,37 +35141,38 @@
    "empty": 0,
    "answerTypes": {
     "number": 2,
-    "multiple-choice": 1,
-    "dnd-generic": 3,
-    "text": 5,
-    "grid-fill": 1
+    "multiple-choice": 2,
+    "dnd-generic": 2,
+    "text": 4,
+    "grid-fill": 2
    },
    "printFormats": {
-    "(none)": 3,
-    "dnd-generic": 3,
-    "skip-count-line": 3,
-    "grid-fill": 1,
-    "count-row": 1,
-    "shape-pattern": 1
+    "(none)": 4,
+    "dnd-generic": 2,
+    "count-row": 3,
+    "pattern-count-by-fill": 1,
+    "grid-fill": 2
    },
    "interactiveTypes": {},
    "visual": 8,
-   "colourVisual": 7,
-   "emoji": 0,
-   "options": 1,
+   "colourVisual": 5,
+   "emoji": 1,
+   "options": 2,
    "hint": 12,
    "keyAns": 12,
    "numericAns": 3,
-   "abop": 0,
-   "maxDigits": 0,
-   "maxOperand": 0,
-   "ops": {},
-   "story": 1,
+   "abop": 2,
+   "maxDigits": 2,
+   "maxOperand": 10,
+   "ops": {
+    "+": 2
+   },
+   "story": 2,
    "maxWords": 15,
    "worked": 12,
    "workedMax": 3,
    "solSteps": 12,
-   "solStepsMax": 5,
+   "solStepsMax": 6,
    "payloadKeys": {
     "patternData": 1
    },
@@ -42665,36 +42674,37 @@
    "errors": [],
    "empty": 0,
    "answerTypes": {
-    "text": 5,
-    "grid-fill": 5,
+    "text": 6,
+    "grid-fill": 4,
     "number": 2
    },
    "printFormats": {
     "number-pattern": 2,
     "pattern-count-by-fill": 2,
-    "grid-fill": 3,
+    "grid-fill": 4,
     "(none)": 2,
-    "count-row": 1,
-    "skip-count-grid": 2
+    "count-row": 2
    },
    "interactiveTypes": {},
-   "visual": 9,
-   "colourVisual": 8,
+   "visual": 8,
+   "colourVisual": 6,
    "emoji": 2,
    "options": 0,
    "hint": 12,
    "keyAns": 12,
    "numericAns": 4,
-   "abop": 0,
-   "maxDigits": 0,
-   "maxOperand": 0,
-   "ops": {},
+   "abop": 1,
+   "maxDigits": 2,
+   "maxOperand": 12,
+   "ops": {
+    "+": 1
+   },
    "story": 0,
    "maxWords": 10,
    "worked": 12,
    "workedMax": 3,
    "solSteps": 12,
-   "solStepsMax": 5,
+   "solStepsMax": 6,
    "payloadKeys": {
     "patternData": 4
    },

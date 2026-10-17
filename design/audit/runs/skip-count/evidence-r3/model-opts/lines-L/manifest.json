@@ -1,0 +1,383 @@
+[
+  {
+    "skill": "multiplication:count_by_tables",
+    "category": "multiplication",
+    "skillId": "count_by_tables",
+    "label": "Skip counting: count by 1–12",
+    "grade": "3",
+    "dir": "multiplication__count_by_tables",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 1,
+          "rows": 7,
+          "perPage": 7,
+          "pages": 1,
+          "note": "Fits: 1 column x 7 rows, 7 per page, 1 page. Digits 28 pt. Dense: 1 x 7, cells sized to the problems.",
+          "sections": [
+            {
+              "cols": 1,
+              "rows": 7,
+              "perPage": 7,
+              "pages": 1,
+              "cellW": 186,
+              "cellH": 32.429,
+              "requested": "auto",
+              "clamped": false,
+              "note": "Dense: 1 x 7, cells sized to the problems.",
+              "line": "Fits: 1 column x 7 rows, 7 per page, 1 page. Digits 28 pt. Dense: 1 x 7, cells sized to the problems.",
+              "cls": "standard",
+              "digitPt": 28,
+              "hMin": 32.1,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 244652,
+        "title": "I Can count by 1 to 12",
+        "notes": [
+          "Dense: 1 x 7, cells sized to the problems."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 2. Write the missing numbers.",
+            "ans": "8, 10, 16, 18, 24",
+            "measured": {
+              "1": {
+                "hMm": 32.1,
+                "fits": true,
+                "slackMm": 6.4
+              },
+              "2": {
+                "hMm": 32.1,
+                "fits": false,
+                "slackMm": -39.9
+              },
+              "3": {
+                "hMm": 32.1,
+                "fits": false,
+                "slackMm": -55.3
+              },
+              "4": {
+                "hMm": 32.1,
+                "fits": false,
+                "slackMm": -63
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 3. Write the missing numbers.",
+            "ans": "12, 15, 21, 27, 33",
+            "measured": {
+              "1": {
+                "hMm": 32.1,
+                "fits": true,
+                "slackMm": 6.4
+              },
+              "2": {
+                "hMm": 32.1,
+                "fits": false,
+                "slackMm": -39.9
+              },
+              "3": {
+                "hMm": 32.1,
+                "fits": false,
+                "slackMm": -55.3
+              },
+              "4": {
+                "hMm": 32.1,
+                "fits": false,
+                "slackMm": -63
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 4. Write the missing numbers.",
+            "ans": "16, 24, 28, 40, 48",
+            "measured": {
+              "1": {
+                "hMm": 32.1,
+                "fits": true,
+                "slackMm": 6.4
+              },
+              "2": {
+                "hMm": 32.1,
+                "fits": false,
+                "slackMm": -39.9
+              },
+              "3": {
+                "hMm": 32.1,
+                "fits": false,
+                "slackMm": -55.3
+              },
+              "4": {
+                "hMm": 32.1,
+                "fits": false,
+                "slackMm": -63
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 5. Write the missing numbers.",
+            "ans": "15, 30, 40, 45, 60",
+            "measured": {
+              "1": {
+                "hMm": 32.1,
+                "fits": true,
+                "slackMm": 6.4
+              },
+              "2": {
+                "hMm": 32.1,
+                "fits": false,
+                "slackMm": -39.9
+              },
+              "3": {
+                "hMm": 32.1,
+                "fits": false,
+                "slackMm": -55.3
+              },
+              "4": {
+                "hMm": 32.1,
+                "fits": false,
+                "slackMm": -63
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 6. Write the missing numbers.",
+            "ans": "18, 30, 42, 60, 72",
+            "measured": {
+              "1": {
+                "hMm": 32.1,
+                "fits": true,
+                "slackMm": 6.4
+              },
+              "2": {
+                "hMm": 32.1,
+                "fits": false,
+                "slackMm": -39.9
+              },
+              "3": {
+                "hMm": 32.1,
+                "fits": false,
+                "slackMm": -55.3
+              },
+              "4": {
+                "hMm": 32.1,
+                "fits": false,
+                "slackMm": -63
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 7. Write the missing numbers.",
+            "ans": "28, 35, 49, 70, 84",
+            "measured": {
+              "1": {
+                "hMm": 32.1,
+                "fits": true,
+                "slackMm": 6.4
+              },
+              "2": {
+                "hMm": 32.1,
+                "fits": false,
+                "slackMm": -39.9
+              },
+              "3": {
+                "hMm": 32.1,
+                "fits": false,
+                "slackMm": -55.3
+              },
+              "4": {
+                "hMm": 32.1,
+                "fits": false,
+                "slackMm": -63
+              }
+            }
+          },
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 8. Write the missing numbers.",
+            "ans": "24, 48, 64, 72, 96",
+            "measured": {
+              "1": {
+                "hMm": 32.1,
+                "fits": true,
+                "slackMm": 6.4
+              },
+              "2": {
+                "hMm": 32.1,
+                "fits": false,
+                "slackMm": -39.9
+              },
+              "3": {
+                "hMm": 32.1,
+                "fits": false,
+                "slackMm": -55.3
+              },
+              "4": {
+                "hMm": 32.1,
+                "fits": false,
+                "slackMm": -63
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 110,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 148,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            7
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 77
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            7
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 112
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      },
+      "scripted-model": {
+        "fits": {
+          "cols": 2,
+          "rows": 4,
+          "pages": 1,
+          "note": "Fits: 4 states, 1 page.",
+          "sections": [
+            {
+              "cols": 2,
+              "rows": 4,
+              "line": "Fits: 4 states, 1 page."
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 283712,
+        "title": "I Can count by 1 to 12",
+        "notes": [],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 2. Write the missing numbers.",
+            "ans": "8, 10, 16, 18, 22",
+            "measured": {
+              "1": {
+                "hMm": 31.9,
+                "fits": true,
+                "slackMm": 6.4
+              },
+              "2": {
+                "hMm": 31.9,
+                "fits": false,
+                "slackMm": -39.9
+              },
+              "3": {
+                "hMm": 31.9,
+                "fits": false,
+                "slackMm": -55.3
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "scripted-model-p1.png",
+            "words": 122,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "scripted-model-key-p1.png",
+            "words": 122,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            4
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 65
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            4
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 65
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      }
+    },
+    "consoleErrors": []
+  }
+]

@@ -1765,6 +1765,12 @@ html body .mq-scell .k2-shape-line { overflow: hidden; }
 html body .mq-scell .k2-shape-line > .k2-line-slot[data-mq-cell] { min-width: 0 !important; max-width: 100% !important; overflow: hidden; }
 html body .mq-scell .k2-shape-line > .k2-line-slot[data-mq-cell] > input.mq-cellslot { width: 100% !important; min-width: 0 !important; max-width: 100% !important; }
 
+/* owner ruling 2026-10-09: a count row that wraps inside its cell at Chromebook width (wireSwipeRows sets data-mq-wrapfit) shows no swipe cue */
+.mq-scell [data-mq-swiperow][data-mq-wrapfit] .k2-swipe-cues,
+html body .mq-scell [data-mq-swiperow][data-mq-wrapfit] .k2-swipe-cues > .k2-swipe-cue,
+html body .mq-scell [data-mq-swiperow][data-mq-wrapfit] .k2-swipe-cues > .k2-swipe-back { display: none; }
+.mq-scell [data-mq-swiperow][data-mq-wrapfit] { scroll-snap-type: none; }
+
 /* Small fixes item 1 (critic r2 N1): a count-by row says how to move on between its boxes - Space on a keyboard,
    a tap on a touch screen (the caret never moves by itself). */
 .k2-countrow-keys .k2-keys-touch { display: none; }
@@ -1786,3 +1792,11 @@ html body .mq-scell .k2-shape-line > .k2-line-slot[data-mq-cell] > input.mq-cell
    width over the dividend's column (that column no longer stretches to the box), never shrinking
    below the touch target (critic ldiv-hug R1 D-1). */
 .mq-scell .mq-rembrk .mq-cellbox { flex: none; }
+
+/* skip-count r2 (critic r1 D1-D3, 2026-10-16): a count row WRAPPED at Chromebook width puts its step tab once ABOVE line 1, as the
+   phone swipe does (no tab column beside it, so no empty band beside or above the numbers), and the jump arrow that would lead
+   into a wrapped part-line's first box hides (it would sit outside the cell, alone). Additive. */
+.mq-scell .k2-countrow-frame[data-mq-tabtop] { flex-direction: column; }
+.mq-scell .k2-countrow-frame[data-mq-tabtop] [data-mq-tabfor]:not([data-mq-tabfor="0"]) { display: none !important; }
+.mq-scell .k2-countrow-frame[data-mq-tabtop] [data-mq-tabfor="0"] { height: auto !important; margin: 0 0 4px 0 !important; }
+.mq-scell [data-mq-swiperow][data-mq-wrapfit] .k2-jumpcell[data-mq-leadin] > .k2-jump { visibility: hidden; }

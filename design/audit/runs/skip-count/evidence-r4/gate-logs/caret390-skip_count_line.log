@@ -1,0 +1,19 @@
+PASS patterns:skip_count_line [390x844 quiz default] 3 boxes, each takes the row's widest number: 2 digits (2/2/2)
+PASS patterns:skip_count_line [390x844 quiz default] the row says how to move on (tap)
+PASS patterns:skip_count_line [390x844 quiz default] tap + type: 10|14|20 (want 10|14|20)
+PASS patterns:skip_count_line [390x844 quiz default] keyboard + Space on the phone: 10|14|20 (want 10|14|20)
+PASS patterns:skip_count_line [390x844 quiz default] every focused box whole inside its window (0 not)
+PASS patterns:skip_count_line [390x844 quiz default] no page errors 
+PASS patterns:skip_count_line [390x844 card default] 3 boxes, each takes the row's widest number: 2 digits (2/2/2)
+PASS patterns:skip_count_line [390x844 card default] the row says how to move on (tap)
+PASS patterns:skip_count_line [390x844 card default] tap + type: 10|14|20 (want 10|14|20)
+PASS patterns:skip_count_line [390x844 card default] keyboard + Space on the phone: 10|14|20 (want 10|14|20)
+PASS patterns:skip_count_line [390x844 card default] every focused box whole inside its window (0 not)
+PASS patterns:skip_count_line [390x844 card default] no page errors 
+PASS patterns:skip_count_line [390x844 worksheet default] 3 boxes, each takes the row's widest number: 2 digits (2/2/2)
+PASS patterns:skip_count_line [390x844 worksheet default] the row says how to move on (tap)
+PASS patterns:skip_count_line [390x844 worksheet default] tap + type: 20|25|35 (want 20|25|35)
+PASS patterns:skip_count_line [390x844 worksheet default] keyboard + Space on the phone: 60|70|100 (want 60|70|100)
+PASS patterns:skip_count_line [390x844 worksheet default] every focused box whole inside its window (0 not)
+PASS patterns:skip_count_line [390x844 worksheet default] no page errors 
+small-fixes-countrow-caret: OK

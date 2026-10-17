@@ -134,7 +134,15 @@ const MEASURE = () => {
       const its = [...w.querySelector('.k2-countrow-line [data-mq-wrapped]').children];
       const a = its[0].getBoundingClientRect(), b = its[1].getBoundingClientRect(), pitch = b.left - a.left, gap = pitch - a.width;
       const cell = w.closest('.mq-scell'), cr = cell.getBoundingClientRect(), cs = getComputedStyle(cell);
-      const room = cr.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - parseFloat(cs.borderLeftWidth) - parseFloat(cs.borderRightWidth);
+      // critic skip-count r3 D9: the room ends at the nearest clip (the card's .visual-aid sits inside .mq-scell), and the window
+      // starts where it starts: room = min(cell inner right, every overflow-clipping ancestor's inner right) - the window's left
+      let clip = cr.right - parseFloat(cs.paddingRight) - parseFloat(cs.borderRightWidth);
+      for (let el = w.parentElement; el && el !== document.body; el = el.parentElement) {
+        const ec = getComputedStyle(el); if (ec.overflowX === 'visible') continue;
+        const er = el.getBoundingClientRect(); clip = Math.min(clip, er.right - parseFloat(ec.paddingRight) - parseFloat(ec.borderRightWidth));
+      }
+      const room = Math.min(cr.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - parseFloat(cs.borderLeftWidth) - parseFloat(cs.borderRightWidth),
+        clip - v.left) - Math.max(0, a.left - v.left);
       const shown = its.filter((e) => { const r = e.getBoundingClientRect(); return r.left >= v.left - 1 && r.right <= v.right + 1; }).length;
       const firstBoxCol = its.findIndex((e) => e.querySelector('input.mq-cellslot') || e.matches('input.mq-cellslot'));
       const digits = Math.max(...[...w.querySelectorAll('.k2-given')].map((e) => e.textContent.replace(/[^0-9]/g, '').length));
@@ -150,7 +158,7 @@ const MEASURE = () => {
       const v = w.getBoundingClientRect(), r = c.getBoundingClientRect(), fs = parseFloat(getComputedStyle(c).fontSize);
       return { ok: c.scrollWidth <= c.clientWidth + 1 && r.right <= v.right + 1 && r.left >= v.left - 1 && r.height < 2.2 * fs && fs >= 14, why: `${Math.round(r.width)} px in a ${Math.round(v.width)} px window, ${fs} px type, ${Math.round(r.height)} px high` }; });
     check(cueFit.ok, `${tag}: the forward cue is whole, on one line, inside the window (${cueFit.why})`);
-    check(!sz.swipes || sz.shown === sz.fit, `${tag}: the window shows ${sz.shown} whole columns; ${sz.fit} fit in the cell's ${sz.room} px inner box`);
+    check(!sz.swipes || sz.shown === sz.fit, `${tag}: the window shows ${sz.shown} whole columns; ${sz.fit} fit in the ${sz.room} px up to the nearest clip`);
     // critic phone29 (1): on the phone worksheet and quiz the gap between columns is capped at 24 px (never under 3 mm = 13.8 px),
     // the geometry is laid out on that pitch, and a row of up to 3 digits shows 3 whole columns
     if (host !== 'card') {

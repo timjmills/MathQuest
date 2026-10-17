@@ -1,0 +1,146 @@
+[
+  {
+    "skill": "multiplication:count_by_tables",
+    "category": "multiplication",
+    "skillId": "count_by_tables",
+    "label": "Skip counting: count by 1–12",
+    "grade": "3",
+    "dir": "multiplication__count_by_tables",
+    "roles": {
+      "scripted-model": {
+        "fits": {
+          "cols": 2,
+          "rows": 4,
+          "pages": 4,
+          "note": "Fits: 4 states, 4 pages.",
+          "sections": [
+            {
+              "cols": 2,
+              "rows": 4,
+              "line": "Fits: 4 states, 4 pages."
+            }
+          ]
+        },
+        "pageCount": 4,
+        "keyPageCount": 4,
+        "seed": 283712,
+        "title": "I Can count by 25,000",
+        "notes": [],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "count-row",
+            "fclass": "standard",
+            "text": "Count by 25,000. Write the missing numbers.",
+            "ans": "75000, 125000, 200000, 225000, 275000",
+            "measured": {
+              "1": {
+                "hMm": 87.5,
+                "fits": true,
+                "slackMm": 9
+              },
+              "2": {
+                "hMm": 87.5,
+                "fits": false,
+                "slackMm": -37.3
+              },
+              "3": {
+                "hMm": 87.5,
+                "fits": false,
+                "slackMm": -52.7
+              }
+            }
+          }
+        ],
+        "pages": [
+          {
+            "file": "scripted-model-p1.png",
+            "words": 54,
+            "w_mm": 215.9,
+            "h_mm": 279.4
+          },
+          {
+            "file": "scripted-model-p2.png",
+            "words": 51,
+            "w_mm": 215.9,
+            "h_mm": 279.4
+          },
+          {
+            "file": "scripted-model-p3.png",
+            "words": 52,
+            "w_mm": 215.9,
+            "h_mm": 279.4
+          },
+          {
+            "file": "scripted-model-p4.png",
+            "words": 65,
+            "w_mm": 215.9,
+            "h_mm": 279.4
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "scripted-model-key-p1.png",
+            "words": 54,
+            "w_mm": 215.9,
+            "h_mm": 279.4
+          },
+          {
+            "file": "scripted-model-key-p2.png",
+            "words": 51,
+            "w_mm": 215.9,
+            "h_mm": 279.4
+          },
+          {
+            "file": "scripted-model-key-p3.png",
+            "words": 52,
+            "w_mm": 215.9,
+            "h_mm": 279.4
+          },
+          {
+            "file": "scripted-model-key-p4.png",
+            "words": 65,
+            "w_mm": 215.9,
+            "h_mm": 279.4
+          }
+        ],
+        "check": {
+          "pages": 4,
+          "cells": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 92
+          },
+          "fontsReady": true,
+          "andika": true
+        },
+        "keyCheck": {
+          "pages": 4,
+          "cells": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 92
+          },
+          "fontsReady": true,
+          "andika": true
+        }
+      }
+    },
+    "consoleErrors": []
+  }
+]

@@ -22,15 +22,15 @@ Readiness is measured against the role groups in `design/PAGE_TYPES.md` section 
 | Sub-skill pages | 0 | 0 | 609 | 0 | 0 | 0 |
 | Stretch | 0 | 272 | 337 | 0 | 0 | 0 |
 | Word problems | 0 | 89 | 0 | 520 | 0 | 0 |
-| Fact layouts | 0 | 63 | 0 | 0 | 546 | 0 |
+| Fact layouts | 0 | 65 | 0 | 0 | 544 | 0 |
 
 ## Design and content flags
 
 | Flag | Skills |
 |---|---|
 | Generator error or empty question | 0 |
-| Colour inside the question or its visual | 308 |
-| Emoji inside the question or its visual | 25 |
+| Colour inside the question or its visual | 306 |
+| Emoji inside the question or its visual | 26 |
 | Multiple choice on screen (check print/screen parity) | 105 |
 | No print format set | 66 |
 | No worked steps from either source | 26 |
@@ -57,9 +57,9 @@ Readiness is measured against the role groups in `design/PAGE_TYPES.md` section 
 
 | Specialised page tag | Pages it unlocks | Skills |
 |---|---|---|
-| fact-layouts | fact rows 5-10 columns, fact fluency probe, practice strips, cumulative fact review | 39 |
+| fact-layouts | fact rows 5-10 columns, fact fluency probe, practice strips, cumulative fact review | 41 |
 | fact-family | fact-family intro, warm-up, probe A-D | 14 |
-| flashcards | flashcards (hands-on) | 96 |
+| flashcards | flashcards (hands-on) | 98 |
 | todays-number | Today's Number | 58 |
 | k-one-page | K one-page lesson (2 model / 2 guided / 2 alone) | 84 |
 | sub-decide | sub-skill: decide-only | 105 |
@@ -102,7 +102,7 @@ Readiness is measured against the role groups in `design/PAGE_TYPES.md` section 
 | data_analysis | 9 | 0 | 7 | 0 | 3 | 9 | 7 | 0 | 0 |
 | probability | 2 | 0 | 2 | 0 | 0 | 2 | 2 | 2 | 0 |
 | data_mixed | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 0 |
-| patterns | 16 | 0 | 13 | 1 | 2 | 16 | 2 | 1 | 0 |
+| patterns | 16 | 0 | 11 | 2 | 2 | 16 | 2 | 1 | 2 |
 | algebra | 23 | 0 | 13 | 6 | 0 | 23 | 5 | 7 | 0 |
 | order_of_operations | 12 | 0 | 0 | 1 | 1 | 12 | 5 | 0 | 0 |
 | placevalue | 16 | 0 | 0 | 0 | 3 | 16 | 4 | 0 | 0 |
@@ -318,7 +318,7 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `mult_zeros` Multiply by 10, 100 and Multiples of Ten | 3 | compact | number | mult-facts-horizontal | ready | ready | basic | basic | author | basic | wrap | basic |  | equation-drill | fact-layouts, flashcards |
 | `mult_placeholder_zero` Write the Placeholder Zero | 4 | standard | number | mult-placeholder-zero | ready | ready | basic | basic | author | basic | wrap | basic | V | visual-grid | fact-layouts, flashcards |
 | `mult_missing_digit` Find the Missing Digit (Multiplication) | 4 | standard | number | column-mult | ready | ready | basic | basic | author | basic | wrap | basic | V | computation-grid | fact-layouts, flashcards, sub-setup |
-| `count_by_tables` Count by 1–12 | 3 | wide | text | count-row | ready | ready | basic | author | author | author | wrap | basic | V | visual-grid | fact-layouts, flashcards |
+| `count_by_tables` Skip counting: count by 1–12 | 3 | wide | text | count-row | ready | ready | basic | author | author | author | wrap | basic | V | visual-grid | fact-layouts, flashcards |
 
 ### division
 
@@ -686,8 +686,8 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `seq_5` Count by 5s | 2 | standard | dnd-generic, number | dnd-generic, (none) | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | sub-notate, hands-order |
 | `seq_10` Count by 10s | 2 | standard | dnd-generic, number | dnd-generic, (none) | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | sub-notate, hands-order |
 | `count_by_fill` Count-By Fill-In (1-12) | 2 | standard | dnd-generic, text | dnd-generic, pattern-count-by-fill | ready | ready | basic | author | author | author | wrap | n/a | CEV | equation-drill (reviewed) | hands-order |
-| `skip_count_line` Skip Counting Number Line (Visual) | 2 | medium | text | skip-count-line | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | todays-number, sub-notate |
-| `skip_count_grid` Skip Counting Grid (Visual) | 2 | medium | grid-fill | skip-count-grid | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | todays-number |
+| `skip_count_line` Skip counting on a number line (2s, 5s, 10s) | 2 | medium | text | count-row | ready | ready | basic | author | author | author | wrap | basic | V | visual-grid (reviewed) | fact-layouts, flashcards, todays-number, sub-notate |
+| `skip_count_grid` Skip counting by 2s, 5s and 10s (rows) | 2 | medium | text | count-row | ready | ready | basic | author | author | author | wrap | basic | V | chart-table (reviewed) | fact-layouts, flashcards, todays-number |
 | `count_by_step_up` Count Up by Step (Grid) | M | wide | grid-fill | grid-fill | ready | ready | basic | author | author | author | wrap | n/a |  | chart-table (reviewed) |  |
 | `count_by_step_down` Count Down by Step (Grid) | M | wide | grid-fill | grid-fill | ready | ready | basic | author | author | author | wrap | n/a |  | chart-table (reviewed) |  |
 | `count_by_powers_of_10` Count by Powers of 10 (Grid) | M | wide | text | number-pattern | ready | ready | basic | basic | author | basic | wrap | n/a | CV | equation-drill (reviewed) |  |
@@ -696,7 +696,7 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `shape_pattern` Shape Patterns (Visual) | 4 | medium | text | shape-pattern | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
 | `number_pattern` Number Patterns | 4 | standard | dnd-generic, text | dnd-generic, number-pattern | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | sub-decide, sub-notate |
 | `pattern_relationship` Two Patterns, Find Relationship (Visual) | 5 | wide | multiple-choice, dnd-generic | (none), dnd-generic | ready | ready | basic | basic | author | author | basic | n/a | CV | chart-table (reviewed) |  |
-| `mixed_patterns` Mixed Patterns | M | standard | number, multiple-choice, dnd-generic, text, grid-fill | (none), dnd-generic, skip-count-line, grid-fill, count-row, shape-pattern | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) |  |
+| `mixed_patterns` Mixed Patterns | M | standard | number, multiple-choice, dnd-generic, text, grid-fill | (none), dnd-generic, count-row, pattern-count-by-fill, grid-fill | ready | ready | basic | author | author | author | wrap | n/a | CEV | chart-table (reviewed) |  |
 | `number_patterns_rule` Number Patterns: Count On, Count Back, Double | 3 | wide | text | count-row | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid |  |
 
 ### algebra
@@ -823,7 +823,7 @@ Columns: grade, print size class, answer types, print formats, then role readine
 
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `patterns_all` All Pattern Skills | M | standard | text, grid-fill, number | number-pattern, pattern-count-by-fill, grid-fill, (none), count-row, skip-count-grid | ready | ready | basic | author | author | author | wrap | n/a | CEV | chart-table (reviewed) |  |
+| `patterns_all` All Pattern Skills | M | standard | text, grid-fill, number | number-pattern, pattern-count-by-fill, grid-fill, (none), count-row | ready | ready | basic | author | author | author | wrap | n/a | CEV | chart-table (reviewed) |  |
 | `algebra_all` All Algebra Skills | M | standard | number, text, col-arith | tape-diagram, algebra-twostep, word-plain, word-problem, algebra-evaluate, algebra-write-eq, story-work, function-table, algebra-write | ready | ready | basic | author | author | author | wrap | n/a | CEV | equation-drill (reviewed) |  |
 | `order_ops_all` All Order of Operations | M | standard | number, multi-select-check | order-of-ops, multi-select | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) |  |
 | `placevalue_all` All Place Value Skills | M | standard | number, interactive, pv-build, symbol, multiple-choice | pv-cell | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) |  |
