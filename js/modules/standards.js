@@ -707,6 +707,21 @@ export const SKILL_STANDARDS = {
     'vocabulary:vocab_grade_6_data': { ccss: [], ee: [], reason: VOCAB }, // Math Vocabulary – Grade 6: Data (Match)
     'vocabulary:vocab_grade_6_algebra': { ccss: [], ee: [], reason: VOCAB }, // Math Vocabulary – Grade 6: Algebra (Match)
     'vocabulary:vocab_grade_6_measurement': { ccss: [], ee: [], reason: VOCAB }, // Math Vocabulary – Grade 6: Measurement (Match)
+    // PRESET skills, 2026-10-17 (skill-presets.js): the host with set options, tagged to the lesson it IS.
+    'multiplication:mult_2by1_column': { ccss: ['4.NBT.B.5'], ee: ['M.EE.5.NBT.5'] }, // Multiply 2-Digit by 1-Digit Numbers (Column)
+    'multiplication:mult_3by1_column': { ccss: ['4.NBT.B.5'], ee: ['M.EE.5.NBT.5'] }, // Multiply 3-Digit by 1-Digit Numbers (Column)
+    'multiplication:mult_2by2_standard': { ccss: ['5.NBT.B.5', '4.NBT.B.5'], ee: ['M.EE.5.NBT.5'] }, // Multiply 2-Digit by 2-Digit (Standard Algorithm)
+    'multiplication:mult_chart_shade': { ccss: ['3.OA.D.9'], ee: ['M.EE.3.OA.8'] }, // Multiplication Chart: Shade the Multiples
+    'multiplication:mult_chart_pattern': { ccss: ['3.OA.D.9'], ee: ['M.EE.3.OA.8'] }, // Multiplication Chart: Find the Pattern in a Row
+    'multiplication:mult_chart_headers': { ccss: ['3.OA.A.4', '3.OA.C.7'], ee: ['M.EE.3.OA.6'] }, // Multiplication Chart: Find the Missing Factors
+    'multiplication:mult_multiples_of_ten': { ccss: ['3.NBT.A.3'], ee: ['M.EE.3.NBT.3'] }, // Multiply by Multiples of Ten (6 × 40)
+    'division:div_2by1_long': { ccss: ['4.NBT.B.6'], ee: ['M.EE.5.NBT.6'] }, // Divide 2-Digit by 1-Digit Numbers (Long Division)
+    'division:div_3by1_long': { ccss: ['4.NBT.B.6'], ee: ['M.EE.5.NBT.6'] }, // Divide 3-Digit by 1-Digit Numbers (Long Division)
+    'division:div_4by1_long': { ccss: ['4.NBT.B.6'], ee: ['M.EE.5.NBT.6'] }, // Divide 4-Digit by 1-Digit Numbers (Long Division)
+    'division:div_3by2_long': { ccss: ['5.NBT.B.6'], ee: ['M.EE.5.NBT.6'] }, // Divide 3-Digit by 2-Digit Numbers (Long Division)
+    'fractions:compare_to_half': { ccss: ['4.NF.A.2'], ee: ['M.EE.4.NF.2'] }, // Compare Fractions to One Half
+    'placevalue:expanded_notation': { ccss: ['4.NBT.A.2', '2.NBT.A.3'], ee: ['M.EE.4.NBT.2'] }, // Write Numbers in Expanded Notation
+    'number_sense:near_doubles': { ccss: ['1.OA.C.6'], ee: [] }, // Near Doubles (Doubles Plus One, Doubles Minus One)
 };
 
 /* ================================================================= lookup */

@@ -24,7 +24,7 @@ Sources:
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
 - Covered 513 (59%), partial only 149 (17%), gap 210 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 328 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
+- 338 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
@@ -1262,7 +1262,7 @@ whatever happens to the WRM gaps.
   Skills: Doubles & Near Doubles (`number_sense:doubles_near_doubles`)  
   Vocabulary: double, equal, total  
 - **Y1.B5.S5** Near doubles — covered. _K.OA.A.1, 1.OA.C.6, M.EE.K.OA.1_  
-  Skills: Doubles & Near Doubles (`number_sense:doubles_near_doubles`)  
+  Skills: Doubles & Near Doubles (`number_sense:doubles_near_doubles`); Near Doubles (Doubles Plus One, Doubles Minus One) (`number_sense:near_doubles`)  
   Vocabulary: near double, 1 more, 1 less  
 - **Y1.B5.S6** Subtract ones using number bonds — covered. _K.OA.A.1, 1.OA.C.6, M.EE.K.OA.1_  
   Skills: Subtract — Bridging Ten (minuends 11–18) (`subtraction:sub_10_regroup`)  
@@ -1354,7 +1354,7 @@ whatever happens to the WRM gaps.
 #### Y1.B9 Summer Block 1: Multiplication and division
 
 - **Y1.B9.S1** Count in 2s — covered. _2.OA.C.3, M.EE.2.OA.3_  
-  Skills: Count by 2s (`patterns:seq_2`); Skip Counting Number Line (Visual) (`patterns:skip_count_line`) {by 2s}  
+  Skills: Count by 2s (`patterns:seq_2`); Skip counting on a number line (2s, 5s, 10s) (`patterns:skip_count_line`) {by 2s}  
   Vocabulary: pair, altogether, even  
 - **Y1.B9.S2** Count in 10s — covered. _K.CC.A.1, 2.NBT.A.2, M.EE.K.CC.1, M.EE.2.NBT.2_  
   Skills: Count by 10s (`patterns:seq_10`)  
@@ -1725,7 +1725,7 @@ whatever happens to the WRM gaps.
   Proposal: Share and Make Groups  
   Vocabulary: share, equal groups, in each group  
 - **Y2.B5.S9** The 2 times-table — covered. _2.OA.C.3, 3.OA.C.7, M.EE.2.OA.3, M.EE.3.OA.6_  
-  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 2}; Count by 1–12 (`multiplication:count_by_tables`) {2}  
+  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 2}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {2}  
   Vocabulary: times, multiply, array, even  
 - **Y2.B5.S10** Divide by 2 — covered. _3.OA.A.2, 3.OA.C.7, M.EE.3.OA.2, M.EE.3.OA.6_  
   Skills: Division Facts (1-12) (`division:div_facts`) {divide by 2}  
@@ -1737,13 +1737,13 @@ whatever happens to the WRM gaps.
   Skills: Odd or Even? (Visual) (`composing:odd_even`); Circle the Even or Odd Numbers (MAP) (`composing:select_even_odd`)  
   Vocabulary: even, odd, groups of two  
 - **Y2.B5.S13** The 10 times-table — covered. _2.NBT.A.2, 3.OA.C.7, M.EE.2.NBT.2, M.EE.3.OA.6_  
-  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 10}; Count by 1–12 (`multiplication:count_by_tables`) {10}  
+  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 10}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {10}  
   Vocabulary: groups of ten, ten times as much, altogether  
 - **Y2.B5.S14** Divide by 10 — covered. _3.OA.A.2, 3.OA.C.7, M.EE.3.OA.2, M.EE.3.OA.6_  
   Skills: Division Facts (1-12) (`division:div_facts`) {divide by 10}  
   Vocabulary: group, share, ten  
 - **Y2.B5.S15** The 5 times-table — covered. _2.NBT.A.2, 3.OA.C.7, M.EE.2.NBT.2, M.EE.3.OA.6_  
-  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 5}; Count by 1–12 (`multiplication:count_by_tables`) {5}  
+  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 5}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {5}  
   Vocabulary: lots of, groups of, multiple, times-table  
 - **Y2.B5.S16** Divide by 5 — covered. _3.OA.A.2, 3.OA.C.7, M.EE.3.OA.2, M.EE.3.OA.6_  
   Skills: Division Facts (1-12) (`division:div_facts`) {divide by 5}  
@@ -2073,7 +2073,7 @@ whatever happens to the WRM gaps.
   Skills: Division Facts (1-12) (`division:div_facts`) {divide by 3}  
   Vocabulary: share, group, divide (÷)  
 - **Y3.B3.S8** The 3 times-table — covered. _2.OA.C.4, 3.OA.C.7, M.EE.2.OA.4, M.EE.3.OA.6_  
-  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 3}; Count by 1–12 (`multiplication:count_by_tables`) {3}  
+  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 3}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {3}  
   Vocabulary: groups of 3, multiple, product  
 - **Y3.B3.S9** Multiply by 4 — covered. _2.OA.C.4, 3.OA.A.1, 3.OA.C.7, M.EE.2.OA.4, M.EE.3.OA.1, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 4}  
@@ -2082,7 +2082,7 @@ whatever happens to the WRM gaps.
   Skills: Division Facts (1-12) (`division:div_facts`) {divide by 4}  
   Vocabulary: share, group, in each  
 - **Y3.B3.S11** The 4 times-table — covered. _2.OA.C.4, 3.OA.C.7, M.EE.2.OA.4, M.EE.3.OA.6_  
-  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 4}; Count by 1–12 (`multiplication:count_by_tables`) {4}  
+  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 4}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {4}  
   Vocabulary: array, multiple of 4, double  
 - **Y3.B3.S12** Multiply by 8 — covered. _3.OA.A.1, 3.OA.C.7, M.EE.3.OA.1, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 8}  
@@ -2091,7 +2091,7 @@ whatever happens to the WRM gaps.
   Skills: Division Facts (1-12) (`division:div_facts`) {divide by 8}  
   Vocabulary: share, group, divide  
 - **Y3.B3.S14** The 8 times-table — covered. _3.OA.C.7, M.EE.3.OA.6_  
-  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 8}; Count by 1–12 (`multiplication:count_by_tables`) {8}  
+  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 8}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {8}  
   Vocabulary: eights, multiple, double  
 - **Y3.B3.S15** The 2, 4 and 8 times-tables — PARTIAL. _3.OA.B.5, 3.OA.C.7, M.EE.3.OA.6_  
   Partial: Multiplication Facts (1-12) (`multiplication:mult_facts`), missing the doubling link between the 2, 4 and 8 tables  
@@ -2105,22 +2105,22 @@ whatever happens to the WRM gaps.
   Skills: Multiply by 10, 100 and Multiples of Ten (`multiplication:mult_zeros`) {× 10}; Count by 10s (`patterns:seq_10`)  
   Vocabulary: multiple of 10, ten times the size, tens counter  
 - **Y3.B4.S2** Related calculations — covered. _3.NBT.A.3, 3.OA.B.5, M.EE.3.NBT.3_  
-  Skills: Multiply by 10, 100 and Multiples of Ten (`multiplication:mult_zeros`)  
+  Skills: Multiply by 10, 100 and Multiples of Ten (`multiplication:mult_zeros`); Multiply by Multiples of Ten (6 × 40) (`multiplication:mult_multiples_of_ten`)  
   Vocabulary: ones, tens, related calculation  
 - **Y3.B4.S3** Reasoning about multiplication — covered. _2.OA.C.4, 3.OA.B.5, M.EE.2.OA.4_  
   Skills: Multiplication Properties (Visual) (`multiplication:mult_properties`)  
   Vocabulary: commutative, factor, lots of  
 - **Y3.B4.S4** Multiply a 2-digit number by a 1-digit number - no exchange — covered. _3.OA.B.5, 4.NBT.B.5_  
-  Skills: Basic Multiplication (`multiplication:multiply`) {2-digit × 1-digit}; Area Model Multiplication (`multiplication:area_model_mult`)  
+  Skills: Basic Multiplication (`multiplication:multiply`) {2-digit × 1-digit}; Area Model Multiplication (`multiplication:area_model_mult`); Multiply 2-Digit by 1-Digit Numbers (Column) (`multiplication:mult_2by1_column`)  
   Vocabulary: partition, multiple, recombine  
 - **Y3.B4.S5** Multiply a 2-digit number by a 1-digit number - with exchange — covered. _3.OA.B.5, 4.NBT.B.5_  
-  Skills: Basic Multiplication (`multiplication:multiply`) {2-digit × 1-digit}; Area Model Multiplication (`multiplication:area_model_mult`)  
+  Skills: Basic Multiplication (`multiplication:multiply`) {2-digit × 1-digit}; Area Model Multiplication (`multiplication:area_model_mult`); Multiply 2-Digit by 1-Digit Numbers (Column) (`multiplication:mult_2by1_column`)  
   Vocabulary: partition, exchange, partial product  
 - **Y3.B4.S6** Link multiplication and division — covered. _3.OA.B.6, 3.OA.C.7, M.EE.3.OA.6_  
   Skills: Multiplication Fact Families (`multiplication:mult_div_fact_family`); Missing Factors (×/÷) (`division:missing_mult_div`)  
   Vocabulary: array, related fact, unitise  
 - **Y3.B4.S7** Divide a 2-digit number by a 1-digit number - no exchange — covered. _3.OA.A.2, 4.NBT.B.6, M.EE.3.OA.2_  
-  Skills: Box Method Division (2÷1 digit) (`division:box_division_easy`); Area Model Division (2÷1 digit) (`division:area_model_div_2by1`)  
+  Skills: Box Method Division (2÷1 digit) (`division:box_division_easy`); Area Model Division (2÷1 digit) (`division:area_model_div_2by1`); Divide 2-Digit by 1-Digit Numbers (Long Division) (`division:div_2by1_long`)  
   Vocabulary: partition, tens, ones, divide (share)  
 - **Y3.B4.S8** Divide a 2-digit number by a 1-digit number - flexible partitioning — covered. _3.OA.A.2, 4.NBT.B.6, M.EE.3.OA.2_  
   Skills: Area Model Division (2÷1 digit) (`division:area_model_div_2by1`)  
@@ -2509,7 +2509,7 @@ whatever happens to the WRM gaps.
 #### Y4.B4 Autumn Block 4: Multiplication and division
 
 - **Y4.B4.S1** Multiples of 3 — covered. _3.OA.C.7, 4.OA.B.4, M.EE.3.OA.6, M.EE.4.OA.4_  
-  Skills: Count by 1–12 (`multiplication:count_by_tables`) {3}; Multiples of a Number (`number_theory:multiples`) {3}  
+  Skills: Skip counting: count by 1–12 (`multiplication:count_by_tables`) {3}; Multiples of a Number (`number_theory:multiples`) {3}  
   Vocabulary: multiple, multiply, total  
 - **Y4.B4.S2** Multiply and divide by 6 — covered. _3.OA.B.5, 3.OA.C.7, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 6}; Division Facts (1-12) (`division:div_facts`) {divide by 6}  
@@ -2525,6 +2525,7 @@ whatever happens to the WRM gaps.
   Vocabulary: multiple, digit, sum of digits  
 - **Y4.B4.S6** The 3, 6 and 9 times-tables — PARTIAL. _3.OA.C.7, 3.OA.D.9, M.EE.3.OA.6, M.EE.3.OA.8_  
   Partial: Multiplication Chart (Visual) (`multiplication:mult_chart`), missing the links between the 3, 6 and 9 tables  
+  Partial: Multiplication Chart: Find the Pattern in a Row (`multiplication:mult_chart_pattern`), missing the links between the 3, 6 and 9 tables  
   Proposal: Related Times-Tables  
   Vocabulary: multiple, double, treble  
 - **Y4.B4.S7** Multiply and divide by 7 — covered. _3.OA.B.5, 3.OA.C.7, M.EE.3.OA.6_  
@@ -2584,19 +2585,19 @@ whatever happens to the WRM gaps.
   Proposal: Partition to Multiply  
   Vocabulary: partition, recombine, repeated addition  
 - **Y4.B5.S9** Multiply a 2-digit number by a 1-digit number — covered. _3.NBT.A.3, 4.NBT.B.5, M.EE.3.NBT.3_  
-  Skills: Basic Multiplication (`multiplication:multiply`) {2-digit × 1-digit}; Area Model Multiplication (`multiplication:area_model_mult`)  
+  Skills: Basic Multiplication (`multiplication:multiply`) {2-digit × 1-digit}; Area Model Multiplication (`multiplication:area_model_mult`); Multiply 2-Digit by 1-Digit Numbers (Column) (`multiplication:mult_2by1_column`)  
   Vocabulary: partition, partial product, exchange  
 - **Y4.B5.S10** Multiply a 3-digit number by a 1-digit number — covered. _4.NBT.B.5_  
-  Skills: Basic Multiplication (`multiplication:multiply`) {3-digit × 1-digit}; Area Model Multiplication (`multiplication:area_model_mult`)  
+  Skills: Basic Multiplication (`multiplication:multiply`) {3-digit × 1-digit}; Area Model Multiplication (`multiplication:area_model_mult`); Multiply 3-Digit by 1-Digit Numbers (Column) (`multiplication:mult_3by1_column`)  
   Vocabulary: exchange, place value, product  
 - **Y4.B5.S11** Divide a 2-digit number by a 1-digit number (1) — covered. _3.OA.B.5, 4.NBT.B.6_  
-  Skills: Box Method Division (2÷1 digit) (`division:box_division_easy`); Area Model Division (2÷1 digit) (`division:area_model_div_2by1`)  
+  Skills: Box Method Division (2÷1 digit) (`division:box_division_easy`); Area Model Division (2÷1 digit) (`division:area_model_div_2by1`); Divide 2-Digit by 1-Digit Numbers (Long Division) (`division:div_2by1_long`)  
   Vocabulary: share equally, exchange, partition  
 - **Y4.B5.S12** Divide a 2-digit number by a 1-digit number (2) — covered. _3.OA.B.5, 4.NBT.B.6_  
-  Skills: Division with Remainders (Visual) (`division:div_remainders`); Box Method Division (2÷1 digit) (`division:box_division_easy`)  
+  Skills: Division with Remainders (Visual) (`division:div_remainders`); Box Method Division (2÷1 digit) (`division:box_division_easy`); Divide 2-Digit by 1-Digit Numbers (Long Division) (`division:div_2by1_long`)  
   Vocabulary: remainder, exchange, partition  
 - **Y4.B5.S13** Divide a 3-digit number by a 1-digit number — covered. _4.NBT.B.6_  
-  Skills: Box Method Division (3÷1 digit) (`division:box_division_hard`); Area Model Division (3÷1 digit) (`division:area_model_div_3by1`)  
+  Skills: Box Method Division (3÷1 digit) (`division:box_division_hard`); Area Model Division (3÷1 digit) (`division:area_model_div_3by1`); Divide 3-Digit by 1-Digit Numbers (Long Division) (`division:div_3by1_long`)  
   Vocabulary: partition, multiple, remainder  
 - **Y4.B5.S14** Correspondence problems — GAP. _3.OA.A.3, 3.OA.D.8, M.EE.3.OA.7_  
   Proposal: Correspondence Problems  
@@ -3036,7 +3037,7 @@ whatever happens to the WRM gaps.
   Skills: Area Model (2×2 and 2×3) (`multiplication:area_model_mult_hard`) {2 × 2}  
   Vocabulary: partition, area model, partial product, total product  
 - **Y5.B5.S3** Multiply a 2-digit number by a 2-digit number — covered. _4.NBT.B.5_  
-  Skills: Basic Multiplication (`multiplication:multiply`) {2-digit × 2-digit}; Write the Placeholder Zero (`multiplication:mult_placeholder_zero`)  
+  Skills: Basic Multiplication (`multiplication:multiply`) {2-digit × 2-digit}; Write the Placeholder Zero (`multiplication:mult_placeholder_zero`); Multiply 2-Digit by 2-Digit Numbers (Standard Algorithm) (`multiplication:mult_2by2_standard`)  
   Vocabulary: partial product, place holder, exchange  
 - **Y5.B5.S4** Multiply a 3-digit number by a 2-digit number — covered. _5.NBT.B.5, M.EE.5.NBT.5_  
   Skills: Area Model (2×2 and 2×3) (`multiplication:area_model_mult_hard`) {2 × 3}; Write the Placeholder Zero (`multiplication:mult_placeholder_zero`)  
@@ -3050,6 +3051,7 @@ whatever happens to the WRM gaps.
   Vocabulary: efficient, factor pair, adjust  
 - **Y5.B5.S7** Short division — covered. _4.NBT.B.6_  
   Skills: Box Method Division (3÷1 digit) (`division:box_division_hard`); Zero in the Quotient (`division:div_zero_in_quotient`)  
+  Partial: Divide 4-Digit by 1-Digit Numbers (Long Division) (`division:div_4by1_long`), missing short division of up to 4 digits by 1 digit, no remainder by default  
   Vocabulary: exchange, greatest place value, short division, bus stop  
 - **Y5.B5.S8** Divide a 4-digit number by a 1-digit number — PARTIAL. _4.NBT.B.6_  
   Partial: Box Method Division (3÷1 digit) (`division:box_division_hard`), missing 4-digit dividends  
@@ -3407,7 +3409,7 @@ whatever happens to the WRM gaps.
   Proposal: Division Using Factors  
   Vocabulary: factor, factor pair, partition  
 - **Y6.B2.S11** Introduction to long division — covered. _5.NBT.B.6, M.EE.5.NBT.6_  
-  Skills: Divide by 2-Digit Numbers (Visual) (`division:long_div_2digit`); Fix the Estimate (Long Division) (`division:div_fix_estimate`)  
+  Skills: Divide by 2-Digit Numbers (Visual) (`division:long_div_2digit`); Fix the Estimate (Long Division) (`division:div_fix_estimate`); Divide 3-Digit by 2-Digit Numbers (Long Division) (`division:div_3by2_long`)  
   Vocabulary: multiple, exchange, bring down  
 - **Y6.B2.S12** Long division with remainders — PARTIAL. _5.NBT.B.6, M.EE.5.NBT.6_  
   Partial: Divide by 2-Digit Numbers (Visual) (`division:long_div_2digit`), missing remainders written as r, a fraction or a decimal  

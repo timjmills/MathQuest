@@ -42,6 +42,14 @@ outrank any general design advice or skill:
 - **Options live on the skill, not the page.** A skill declares its own option schema in
   `js/modules/skill-options.js`; the chosen values travel with it into every role. A ladder step is
   a skill plus option values, not a new skill id.
+- **A distinct option is ALSO a findable skill (owner rule, 2026-10-17).** When an option makes the skill
+  teach something different enough to be its own lesson or page (e.g. "2-digit × 2-digit standard
+  algorithm" on `multiplication:multiply`, a new task kind, a new representation), it is ALSO recorded
+  as its own named skill: own label, grade, `SKILL_STANDARDS`/`SKILL_WRM` tags, search terms, and an
+  appended share code. That skill is a **preset**: choosing it opens the host skill with those option
+  values already set (the options stay editable). It is not a copy of the generator. Small tweaks
+  (count, range, a scaffold on/off) stay plain options. Build-list `option` entries say whether they
+  also need a preset skill.
 - **"Within N" bounds the answer**, never the operands.
 - **Never splice a skill out of `SKILLS[category]`.** Four share-code systems index by position.
   Retire with a tombstone plus an alias in `js/modules/skill-aliases.js`.

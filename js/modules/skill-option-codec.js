@@ -69,6 +69,14 @@ function _setToken(optId, v) {
     throw new Error(`skill-option-codec: no one-character token for ${optId}=${JSON.stringify(v)}`);
 }
 
+// The enum value null ("Auto", "dealt", "Tables facts") as a token, for an enum with no token table
+// of its own. A default null is never written (packOptions drops defaults), so only a preset skill,
+// whose default is a set value, ever writes it. A deployed decoder that does not know it reads no
+// number and skips the field: the preset's own value, never a wrong one.
+const NULL_TOKEN = 'X';
+const _nullable = (def) => !!def && def.type === 'enum' && !def.tokens && !VALUE_TOKENS[def.id]
+    && (def.values || []).some(x => x.v === null);
+
 function _scalarToken(optId, v) {
     if (typeof v === 'number' && Number.isInteger(v) && v >= 0) return String(v);
     const t = VALUE_TOKENS[optId] && VALUE_TOKENS[optId][v];
@@ -127,6 +135,10 @@ export function encodeOptionPayload(categoryId, skillId, opts) {
                 if (t !== null) out.push(key + t);
             } else if (v !== null && v !== undefined) {
                 out.push(key + _scalarToken(def.id, v));
+            } else if (_nullable(def)) {
+                // A null that is NOT the default: only a PRESET (skill-presets.js) can need it, e.g.
+                // "2-digit × 1-digit" turned back to the host's "Tables facts" choice (null).
+                out.push(key + NULL_TOKEN);
             }
         } catch (e) { /* an unencodable value stays at its default rather than corrupting the code */ }
     }
@@ -192,6 +204,7 @@ export function decodeOptionPayload(categoryId, skillId, payload) {
         } else if (def.type === 'bool') {
             raw[optId] = body === '1';
         } else {
+            if (body === NULL_TOKEN && _nullable(def)) { raw[optId] = null; continue; }
             const v = _fromToken(optId, def, body, false);
             if (v !== undefined) raw[optId] = v;
         }

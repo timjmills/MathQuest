@@ -1,5 +1,6 @@
 // skill-options.js — the options a skill carries with it.
-import { normalizeRows } from './count-rows.js';   // pure, imports nothing: node still loads this file bare
+import { normalizeRows } from './count-rows.js';
+import { presetOf } from './skill-presets.js';   // pure table, imports nothing   // pure, imports nothing: node still loads this file bare
 //
 // Owner's rule (2026-09-19): options live ON THE SKILL, not on the page. A skill declares what
 // it can be configured with; the chosen values travel with it into ANY page role — lesson
@@ -2201,8 +2202,19 @@ function _vocabForms() {
     return _P12_VOCAB;
 }
 
+// A PRESET skill (skill-presets.js) shows its HOST's controls with the preset values as their
+// defaults: "preset values under any explicit opts", and a share code packs only the changes.
+function _presetDefs(categoryId, skillId, fn) {
+    const p = presetOf(categoryId, skillId);
+    if (!p) return null;
+    return fn(categoryId, p.skillId).map((o) => (o && o.id in p.opts
+        ? { ...o, default: JSON.parse(JSON.stringify(p.opts[o.id])), presetValue: true } : o));
+}
+
 /** A skill's own declared options: its registry entry, else its mixed-pool control, else none. */
 export function ownOptionsFor(categoryId, skillId) {
+    const pre = _presetDefs(categoryId, skillId, ownOptionsFor);
+    if (pre) return pre;
     const own = SKILL_OPTIONS[`${categoryId}:${skillId}`] || SKILL_OPTIONS[skillId];
     if (own) return own;
     if (categoryId === 'vocabulary' && /^vocab_grade_/.test(String(skillId))) return _vocabOptions(skillId);
@@ -3672,6 +3684,8 @@ export function numberLineSummary(cur = {}, spec = null) {
 
 /** The option definitions for a skill: its own, then the measured ones, then the universal ones. */
 export function optionsFor(categoryId, skillId) {
+    const pre = _presetDefs(categoryId, skillId, optionsFor);
+    if (pre) return pre;
     const own0 = ownOptionsFor(categoryId, skillId);
     const own = numberLineFits(categoryId, skillId) && !own0.some(o => o.id === 'nlOn') ? [...own0, ...numberLineOptions(categoryId, skillId)] : own0;
     const all = [...own, ..._measuredOptions(categoryId, skillId, own0)];
@@ -3687,6 +3701,8 @@ export function optionsFor(categoryId, skillId) {
  * teacher's screen.
  */
 export function offeredOptionsFor(categoryId, skillId) {
+    const pre = _presetDefs(categoryId, skillId, offeredOptionsFor);
+    if (pre) return pre;
     const own = ownOptionsFor(categoryId, skillId);
     const ownIds = new Set(own.map(o => o.id));
     const d = DERIVED[`${categoryId}:${skillId}`];
@@ -3725,7 +3741,8 @@ export function normalizeOptions(categoryId, skillId, opts) {
     if (!opts || typeof opts !== 'object') return out;
     // Retired controls folded into a newer one: an old code's values are rewritten into the
     // control that now carries them before anything else reads them (see OPTION_FOLDS).
-    const fold = OPTION_FOLDS[`${categoryId}:${skillId}`];
+    const preHost = presetOf(categoryId, skillId);
+    const fold = OPTION_FOLDS[`${categoryId}:${preHost ? preHost.skillId : skillId}`];
     if (fold) { try { opts = fold({ ...opts }) || opts; } catch (e) { /* keep opts as given */ } }
     for (const def of defs) {
         if (!(def.id in opts)) continue;

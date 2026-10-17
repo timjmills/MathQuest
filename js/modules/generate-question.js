@@ -14,6 +14,7 @@ import { generateNumberTheoryQuestion } from './gen-number-theory.js';
 import { generateCountingQuestion } from './gen-counting.js';
 import { generateVocabularyQuestion } from './gen-vocabulary.js';
 import { resolveSkill } from './skill-aliases.js';
+import { presetOf } from './skill-presets.js';
 import { normalizeOptions, pvRefusal, optionsFor, p12RouteFor } from './skill-options.js';
 import { registerVariantOverride } from './variant-cycler.js';
 // L10: the page dealer. Every choice dealt down a page goes through it; reset at item 0.
@@ -278,6 +279,29 @@ function applySkillSettings() {
 // that replaced it for the duration of the call, then state is put back so favourites,
 // progress keys and share codes keep seeing the id the caller selected.
 export function generateQuestion() {
+    // A PRESET skill (skill-presets.js) is its host with set option values: for this one call
+    // the host generates, with the preset values UNDER whatever options the caller or the
+    // teacher's set gave (explicit wins). The item says both ids; state is put back in finally.
+    const preset = presetOf(state.category, state.skill);
+    if (preset) {
+        const saved = { skill: state.skill, skillOptions: state.skillOptions };
+        const given = state.skillOptions != null ? state.skillOptions : lookupSetOptions(state.category, state.skill);
+        state.skillOptions = normalizeOptions(state.category, preset.skillId, normalizeOptions(state.category, saved.skill, given));
+        state.skill = preset.skillId;
+        try {
+            const q = generateQuestion();
+            if (q) {
+                q.skillId = preset.skillId;
+                q.presetId = saved.skill;
+                q.requestedSkillId = saved.skill;
+                if (!q.skillOptions) q.skillOptions = state.skillOptions;
+            }
+            return q;
+        } finally {
+            state.skill = saved.skill;
+            state.skillOptions = saved.skillOptions;
+        }
+    }
     if (state.skillOptions == null) {
         const fromSet = lookupSetOptions(state.category, state.skill);
         if (fromSet) {

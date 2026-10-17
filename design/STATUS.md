@@ -489,6 +489,25 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
   beats a stale #map hash; ws-teacher-library opens the Start tab); build list gains `mult_standard` (owner: standard-algorithm
   multiplication 2x1, 3x1, 4x1, 2x2, 3x2 as one skill with a size option). Full gates OK; print-lint 460/33. Owner: STOP after this.
   Still paused on branches: lessons 6-10 (-wip-detailed-lessons-2), Lane D, fraction key — see their entries.
+- 2026-10-17 ~13:50: Owner requests: (1) White Rose page must clearly list, PER LESSON and PER GRADE/DOMAIN, every skill that
+  will be made to fully cover the lesson/standard — builder on `claude/sweet-newton-c8wrv1-wip-wrm-tomake` (not merged yet).
+  (2) NEW RULE (CLAUDE.md "A distinct option is ALSO a findable skill"): an option different enough to be its own lesson/page is
+  also a named, findable PRESET skill that opens the host skill with those options set. Not built yet: needs a preset registry
+  (skill id -> {host, opts}) wired into data.js/skill finder/share codes/generateQuestionFor, then an audit of existing options
+  (first candidates: multiply tiles 21/31/22, the area-model options, count_by_tables tables) and a flag on build-list option entries.
+- 2026-10-17: Share-code clash to resolve when PR #13 lands: presets took codes VA-VQ (VH unused); PR #13 pinned VA-VD for its 4 shape skills — re-pin #13's skills to the next free codes.
+- 2026-10-17: Owner archived all idle sessions. **Pick-up list for next week: `design/HANDOVER-2026-10-17.md`** (open PRs #11, #13, #14 with their branches, states and next steps; paused lanes).
+- 2026-10-17 ~15:30: **Preset skills lane, first attempt (Opus low)** on `claude/sweet-newton-c8wrv1-wip-presets` (not merged, no
+  critic yet). Mechanism + audit in `design/PRESET_SKILLS.md`: `js/modules/skill-presets.js` (pure table 'cat:preset' -> {host, opts});
+  presets appended to SKILLS with `presetOf`, codes pinned VA..VQ (number_chart_fill pinned at its U9 first); skill-options gives a
+  preset the host's controls with the preset values as defaults (explicit opts win, codes pack only changes; the codec gains a null
+  token `X`); generateQuestion swaps a preset to its host for one call (item: skillId = host, presetId = preset); getProvider falls
+  back to the host; presets stay out of mixed pools; library detail notes "Uses <host> with set options". 14 presets made (multiply
+  2x1/3x1/2x2, divide 2x1/3x1/4x1/3x2, mult_chart shade/pattern/headers, multiples of ten, compare to 1/2, near doubles,
+  expanded notation); ~35 "ask owner" rows in the doc. Build list: `preset: true/false` on every option entry (9 true), `mult_standard`
+  records 2x1/3x1/2x2 built as presets, 4x1 and 3x2 remain. New gate `tests/scripts/ws-presets-unit.mjs`. Evidence
+  `design/audit/runs/presets/`. Note: the 2x2 preset prints the host's current stack cell (no partial-product rows) - the
+  long-multiplication template is still mult_standard's job.
 - 2026-10-17 (owner: "clearly say all of the planned/needed/added skills that will be made to fully cover that lesson/standard",
   "per lesson", then "per grade/domain"): White Rose page "Skills to be made" cards on branch `claude/sweet-newton-c8wrv1-wip-wrm-tomake`
   (builder Opus medium, the page lane's level since round 5). New pure `js/modules/lesson-tomake.js`: one de-duplicated list per lesson
