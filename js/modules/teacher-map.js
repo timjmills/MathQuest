@@ -85,7 +85,8 @@ export function renderMapScreen(el) {
     if (state.mapOpenTest) { m.tab = 'start'; named = true; }   // the old MAP test view, opened from anywhere
     state.mapOpenTest = false;
     seenTier = state.mapTier;
-    const hv = mapHashView();
+    const hv = named ? '' : mapHashView();   // an entry point that names the test wins over a stale #map/... hash
+    if (named) clearMapHash();
     if (hv) m.tab = hv;   // a #map/... bookmark or Back names the view
     else if (!named) m.tab = 'tasks';   // N17: every visit opens on Practise by task unless a link names the tab
     if (!root.dataset.built) {

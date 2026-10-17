@@ -208,6 +208,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       for (const key of ['library', 'map']) {
         await page.evaluate((k) => window.tvGo(k), key);
         await sleep(250);
+        // MAP opens on "Practise by task" (owner ruling N17): the test controls are on the "Start a MAP test" tab
+        if (key === 'map') { await page.click('[data-map-tab="start"]'); await sleep(150); }
         if (key === 'map') { await page.evaluate(() => { const b = document.querySelector('[data-map-act="bands"]'); if (b.getAttribute('aria-expanded') !== 'true') b.click(); }); await sleep(100); }
         const small = await page.evaluate((k) => {
           const scr = document.querySelector(`#teacherMain [data-screen="${k}"]`);
