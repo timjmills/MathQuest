@@ -114,7 +114,9 @@ export function plan(input = {}) {
             const rows = Math.ceil(q.length / cols);
             const bandH = m.strip + rows * h;
             if (cur.sections.length && cur.used + bandH > cur.budget) { pages.push(cur); cur = { sections: [], used: 0, budget: mCont.budget }; }
-            cur.sections.push(band(q, cols, rows, h, cols));
+            // (the detailed lesson's check never lays a band out in more columns than it has items: one item in a two-up
+            // band left an empty bordered half - lesson 4 critic r2 D9; the item keeps its measured size, centred)
+            cur.sections.push(band(q, input.perQuestion ? Math.max(1, Math.min(cols, q.length)) : cols, rows, h, cols));
             cur.used += bandH;
         }
         if (cur.sections.length) pages.push(cur);

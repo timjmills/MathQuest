@@ -378,6 +378,12 @@ export const gridOverHalf = (k, keys, anyTask = false) => { const a = gridKeyOf(
 export const gridCopy = (k, keys) => { const a = gridKeyOf(k); if (!a) return false; const ca = gridCells(k);
     for (const u of keys) { const b = gridKeyOf(u); if (!b) continue; const B = new Set(gridCells(u)); if (ca.every((x) => B.has(x))) return true; }
     return false; };
+/** Does window `k` hold a block of two boxes or more of a window in `keys` (any task) in the SAME orientation - its rows
+ *  and columns overlapping that window's rows and columns in two cells or more? (lesson 4 r5: a revisit is turned) */
+export const gridBlock = (k, keys) => { const a = gridKeyOf(k); if (!a) return false;
+    const ov = (x0, x1, y0, y1) => Math.max(0, Math.min(x1, y1) - Math.max(x0, y0) + 1);
+    for (const u of keys) { const b = gridKeyOf(u); if (b && ov(a.r0, a.r1, b.r0, b.r1) * ov(a.c0, a.c1, b.c0, b.c1) >= 2) return true; }
+    return false; };
 export const gridNear = (k, keys, sameShape = false, anyTask = false) => {
     const a = gridKeyOf(k);
     if (!a) return false;
@@ -629,6 +635,13 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // `cellPayload` on a lesson's ref (the detailed lesson maker): fields merged into the item's
         // kit payload (lesson 2: the word-work cell's compact `layout: 'bar'`). Absent elsewhere.
         if (sk.cellPayload && q.cell && q.cell.payload) q = Object.assign({}, q, { cell: Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, sk.cellPayload) }) });
+        // (`gridRevisit`, lesson 4 r5 - critic r2: a revisit that shows a block of an earlier page's window in the SAME
+        // orientation is drawn turned - rows for columns: the same boxes and products, a different picture)
+        if (sk.gridRevisit && q.cell && q.cell.template === 'mult-grid' && q.cell.payload && Array.isArray(q.cell.payload.rows) && !q.cell.payload.blanks && !q.cell.payload.hdr) {
+            const k0 = factKeyOf(q), pl = q.cell.payload;
+            const qt = Object.assign({}, q, { cell: Object.assign({}, q.cell, { payload: Object.assign({}, pl, { rows: pl.cols.slice(), cols: pl.rows.slice() }) }) });
+            if (gridBlock(k0, sk.avoidKeys || []) && !gridBlock(factKeyOf(qt), sk.avoidKeys || [])) q = qt;
+        }
         if (sk.instructionKey && q) q = Object.assign({}, q, { instructionKey: sk.instructionKey });
         if (sk.shortQuestion) q = shortStoryQ(q);
         if (sk.check && q.cell && q.cell.template === 'stack') q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, { check: true }) });
@@ -3566,6 +3579,9 @@ async function buildDetailedLesson(req = {}) {
                 const its = cs.filter((c) => c.page === pg);
                 const last = Math.max(...its.map((c) => c.row));
                 // (a function table - lesson 5: its rule as written, "n + 9", not its slot list)
+                // (`lastName(q)` on the description - lesson 4 r5, critic r2 n8: the lesson's own words for a last-row item,
+                // "6, 7 × 7–9: 54 and 56 even (tens digit odd), 63 white"; absent, as before)
+                if (typeof d.lastName === 'function') { parts.push(`Practice ${k}: ${its.filter((c) => c.row === last).map((c) => d.lastName(c.q)).filter(Boolean).join('; ')}`); continue; }
                 parts.push(`Practice ${k}: ${its.filter((c) => c.row === last).map((c) => { const w = named(c.q); return `${c.q && c.q.ftRule && itemNumberOf(c.q) === null ? c.q.ftRule : itemNumberOf(c.q) !== null ? itemNumberOf(c.q) : dlAns(c.q)}${w ? ` (${w})` : ''}`; }).join(', ')}`);
             }
         }

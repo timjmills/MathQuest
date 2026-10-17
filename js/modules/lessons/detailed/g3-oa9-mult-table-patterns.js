@@ -50,6 +50,18 @@ export default {
     // r4: the sheet's spare height goes into its cells, lessonData.growAll)
     skill: CHART({ tries: 600, allTest: 'chartFresh' }, { winRows: 2, winCols: 4, band: 144 }),
     edgeTest: 'chartEdge',
+    // (T5 Watch, critic r2 n8: a last-row window named by its traps - the even products with an odd tens digit, the big odd)
+    lastName: (q) => {
+        const p = (q && q.cell && q.cell.payload) || {}; const rows = p.rows || [], cols = p.cols || [];
+        if (!rows.length || !cols.length) return '';
+        const span = (l) => (l.length > 2 ? `${l[0]}–${l[l.length - 1]}` : l.join(', '));
+        const pr = [...new Set(rows.flatMap((r) => cols.map((c) => r * c)))].sort((x, y) => x - y);
+        const trap = pr.filter((v) => v % 2 === 0 && v >= 30 && Math.floor(v / 10) % 2 === 1);
+        const odd = [...new Set(rows.flatMap((r) => cols.filter((c) => r % 2 && c % 2 && r * c >= 55).map((c) => r * c)))].sort((x, y) => x - y);
+        const and = (l) => (l.length > 1 ? `${l.slice(0, -1).join(', ')} and ${l[l.length - 1]}` : String(l[0]));
+        const bits = [trap.length ? `${and(trap)} ${trap.length > 1 ? 'are' : 'is'} even (tens digit odd)` : '', odd.length ? `${and(odd)} ${odd.length > 1 ? 'stay' : 'stays'} white` : ''].filter(Boolean);
+        return `${span(rows)} × ${span(cols)}: ${bits.join(', ')}`;
+    },
     practicePages: 1,
     // (r4, lead ruling: Practice windows are 2 x 3; two of a page share at most half their boxes (turned boxes counted), none
     // copies another page's window, and each REVISITS the lesson's ground (`gridRevisit`: more than half shared with an
@@ -117,7 +129,7 @@ export default {
     prerequisites: [
         { atom: 1, items: 1, ref: CB(2), lesson: { id: '2.OA.C.3', title: 'Even numbers: count by 2s' } },
         { atom: 2, items: 4, ref: FACT([2, 4], { minNum: 12, maxNum: 36 }), lesson: { id: '3.OA.C.7', title: 'Multiply by 2 and 4' } },
-        { atom: 3, items: 1, ref: CHART({ gridRevisit: true }, { task: 'fill', winRows: 2, winCols: 3 }), lesson: { id: '3.OA.C.7', title: 'Read the multiplication chart' } },
+        { atom: 3, items: 2, ref: CHART({ gridRevisit: true }, { task: 'fill', winRows: 2, winCols: 3 }), lesson: { id: '3.OA.C.7', title: 'Read the multiplication chart' } },
     ],
 
     // ------------------------------------------------------------------ P1 Number sense (earlier content)
@@ -137,8 +149,9 @@ export default {
         instruction: 'Read the story. Draw it. Solve.',
         lines: ['There are {wp.a} bags.', 'Each bag has {wp.b} apples.', 'How many apples? Is it even or odd?'],
         answerLine: 'There are __ apples.',
-        say: 'One number is even. So the product is __.',
-        sayAns: 'even',
+        // (r5, critic r2 n10: a frame that fits an odd item as well as an even one; the numbers are the story's own)
+        say: 'Is {wp.a} or {wp.b} even? The product is __.',
+        sayAns: '{wp.parity}',
     },
 
     // ------------------------------------------------------------------ P6 Exit slip (fresh windows)
@@ -183,7 +196,7 @@ export default {
         { type: 'Comparative', skill: 'Even row: every product is even', notes: 'Anchor chart, the even rows.' },
         { type: 'Conceptual', skill: 'Why: an even row splits into two equal parts', notes: 'Cubes: {chart.wa} rows of {chart.wb}, {chart.wh} and {chart.wh}.' },
         { type: 'Category', critical: true, skill: 'One even factor is enough: row OR column', notes: 'Routine step 2.' },
-        { type: 'Comparative', skill: 'Odd × odd is odd (contrast)', notes: 'The last Practice row only.' },
+        { type: 'Comparative', skill: 'Odd × odd is odd (contrast)', notes: 'Anchor chart step 3; every window.' },
     ],
     routine: [
         { step: 'Shade the even rows.', tag: 'New', check: 'Guided 1, exit a' },
@@ -254,7 +267,7 @@ export default {
                 { ask: 'Which shading is right? Show fingers.', note: 'Correct: [[{cq.right}]]. {cq.why}' },
             ],
             loop: { most: 'Go on to You Do.', half: 'Re-show the odd row with an even column, then one more.', fewer: 'Back to the cubes: {chart.wa} rows of {chart.wb}, two equal parts.' } },
-        { n: 8, name: 'You Do: Independent Practice', min: 9, page: 'P4', boxes: [{ kind: 'watch', title: 'The last row', text: 'Walk to the last rows first: {p4.last}.' }],
+        { n: 8, name: 'You Do: Independent Practice', min: 9, page: 'P4', boxes: [{ kind: 'watch', title: 'The last row', text: 'Walk to the last row first. {p4.last}.' }],
             rows: [
                 { do: 'Pupils do Practice 1. {p4.steps}' },
                 { do: 'Circulate. Point at every white box.', note: 'Ask: "Row odd? Column odd?"' },

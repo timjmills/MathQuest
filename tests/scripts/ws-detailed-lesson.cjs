@@ -165,6 +165,10 @@ function measure(LIBRARY) {
                 skip: small, read: !!c.querySelector('[data-read], .ws-story') || !!c.closest('.dl-wppanel, .dl-wpstory'), draw: !!c.querySelector('[data-work], [data-draw]'),
                 grid: `${gridIds.get(gEl)}:${gEl.classList.contains('ws-grid') ? 'ws-grid' : ''}`, empty: !rects.length };
         });
+        // (E39, lesson 4 critic r2 D9: each item grid's column tracks and its item cells - a band of n items in more than n
+        // columns leaves an empty bordered track that reads as a missing item)
+        P.gridFill = [...pg.querySelectorAll('.ws-grid')].filter((g) => !g.closest('.dl-thumb') && g.getBoundingClientRect().height > 0).map((g) => ({
+            cols: getComputedStyle(g).gridTemplateColumns.split(/\s+/).filter(Boolean).length, items: [...g.children].filter((c) => c.classList.contains('ws-cell')).length }));
         // E32 (AX-3 / SF-50, lesson 2 r4 - critic r2 D4): every story's sentences, each with the number of
         // printed lines it takes (a Range's line boxes, by their tops)
         P.stories = teacher ? [] : [...pg.querySelectorAll('.mq-wwstory, .dl-wpstory .ws-story')].filter((s0) => !s0.closest('.dl-thumb')).map((s0) => [...s0.children].filter((x) => x.tagName === 'DIV' && !x.classList.contains('dl-ansline') && x.textContent.trim()).map((x) => {
@@ -542,6 +546,9 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
         const bad = pages.filter((p) => p.braces && p.braces.length);
         row('E38', 'No unfilled {placeholder} on any page', bad.length ? bad.map((p) => `${p.id}: ${p.braces.join(' ')}`).join('; ') : 'none', !bad.length);
     }
+    // E39 (lesson 4 critic r2 D9): no band lays out its items in more columns than it has items
+    { const bad = [...pupil, ...keys].flatMap((p) => (p.gridFill || []).filter((g) => g.items > 0 && g.items < g.cols).map((g) => `${p.id} ${g.items} item${g.items > 1 ? 's' : ''} in ${g.cols} columns`));
+        row('E39', 'No band has more columns than items (an empty bordered track reads as a missing item)', bad.length ? bad.join('; ') : `${[...pupil, ...keys].reduce((a, p) => a + (p.gridFill || []).length, 0)} grids, none`, !bad.length); }
     // E30 (critic r3 S1): a number the lesson declares `boardOnly` (shown on the board only) is never a
     // pupil item's number or answer, and never printed on a pupil page or key (digits, with or without
     // a comma, or its name). The pool JSON carries the list; an empty list passes trivially.
