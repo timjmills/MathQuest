@@ -20,7 +20,8 @@
 
 import { rankByQuery, onSkillSearchReady } from './skill-finder.js';
 import { state } from './state.js';
-import { DOMAINS } from './data.js';
+import { DOMAINS, SKILLS } from './data.js';
+import { presetOf } from './skill-presets.js';
 import { optionsFor } from './skill-options.js';
 import { addMultipleQuestions } from './quiz-builder.js';
 import {
@@ -284,6 +285,7 @@ function renderDetail() {
     <h2 class="tv-h2" id="tvlSelName">${esc(s.label)}</h2>
     <p class="tv-cap">${esc(levelText(s.level))} · ${esc(s.domainName)} · ${esc(s.categoryName)}</p>
   </div>
+  ${presetNoteHTML(s)}
   ${standardsTagsHTML(s)}
   <div class="tvl-prev">
     <div class="tvl-prev-head"><span class="tv-label" style="margin:0;">Example</span>
@@ -308,6 +310,14 @@ function renderDetail() {
   </div>
   <div class="tv-opt-panel" id="tvlOptions"${lib.optionsOpen ? '' : ' hidden'}>${lib.optionsOpen ? optionsReadOnlyHTML(s.categoryId, s.skillId, opts) : ''}</div>`;
     drawDetailPreview();
+}
+
+/** A PRESET skill (skill-presets.js) says which skill it opens: the host with set options, still editable. */
+function presetNoteHTML(s) {
+    const p = presetOf(s.categoryId, s.skillId);
+    if (!p) return '';
+    const host = (SKILLS[s.categoryId] || []).find((x) => x.v === p.skillId);
+    return `<p class="tv-cap tvl-preset-note">Uses ${esc(host ? host.l : p.skillId)} with set options (you can change them).</p>`;
 }
 
 /**

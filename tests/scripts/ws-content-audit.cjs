@@ -2422,6 +2422,7 @@ function selfTest() {
     const mjs = path.join(tmp, 'skill-options.mjs');
     fs.writeFileSync(mjs, fs.readFileSync(path.join(ROOT, 'js', 'modules', 'skill-options.js')));
     fs.writeFileSync(path.join(tmp, 'count-rows.js'), fs.readFileSync(path.join(ROOT, 'js', 'modules', 'count-rows.js')));   // skill-options.js imports it (wave 1 C2)
+    fs.writeFileSync(path.join(tmp, 'skill-presets.js'), fs.readFileSync(path.join(ROOT, 'js', 'modules', 'skill-presets.js')));   // and the preset table (2026-10-17)
     const { optionsFor, pvBandFloor, pvBand } = await import(pathToFileURL(mjs).href);
     fs.rmSync(tmp, { recursive: true, force: true });
     const withNotation = new Set(skills

@@ -310,6 +310,17 @@ export const FROZEN_SKILL_CODES = {
     // Pinned at the codes the auto assigner gave them.
     "number_sense:round_nl_thousands": "U6", "number_sense:round_nl_ten_thousands": "U7",
     "number_sense:round_nl_hundred_thousands": "U8",
+    // ---- 2026-10-17: number_chart_fill pinned at the code it already had, then the PRESET skills
+    // (skill-presets.js), pinned at the codes the auto assigner gave them (VH was a dropped draft preset and
+    // stays unused). APPEND ONLY. ----
+    "composing:number_chart_fill": "U9",
+    "multiplication:mult_2by1_column": "VA", "multiplication:mult_3by1_column": "VB",
+    "multiplication:mult_2by2_standard": "VC", "multiplication:mult_chart_shade": "VD",
+    "multiplication:mult_chart_pattern": "VE", "multiplication:mult_chart_headers": "VF",
+    "multiplication:mult_multiples_of_ten": "VG",
+    "division:div_2by1_long": "VJ", "division:div_3by1_long": "VK", "division:div_4by1_long": "VL",
+    "division:div_3by2_long": "VM", "fractions:compare_to_half": "VN",
+    "placevalue:expanded_notation": "VP", "number_sense:near_doubles": "VQ",
 };
 
 // Per-category positional order (index = the number used by settings codes, MX- codes and
