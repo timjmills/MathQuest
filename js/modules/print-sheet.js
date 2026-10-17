@@ -1838,55 +1838,93 @@ async function buildSheetCore(req = {}) {
             // alike; never a set count or shared rows. The letter's floor goes to the plan.
             const ownFloor = new Map();
             const ownHolds = new Map();
-            if (!sec.count && shared[si] === null && anchorMode === 'off') {
-                // The letter keeps the section's columns: it only takes more ROWS of the same
-                // problems, so a page that is not grown is laid out exactly as before.
-                const cols = L0.cols;
+            /**
+             * Grow one letter's deal in rows at `cols` columns from its own floor (the r6-r8 rule):
+             * re-deal at the page's count, then top up with the next problems of its own run that fit
+             * the rows of the count it grows to. Returns the letter's problems and their floor.
+             */
+            const growLetter = (items, k, cols) => {
                 const fitOf = (its) => {
                     const f = floorWith(si, its);
                     const L = layoutOf(n.role, Object.assign({}, sec, { floor: f, columns: cols }), withTwins(si, its), n, lctx);
                     return { f, cap: L.cols === cols ? Math.min(MAX_ITEMS, capFromL(sec, si, L)) : 0 };
                 };
-                byLetter = byLetter.map((items, k) => {
-                    if (!items.length || items.some((it) => oneColumnOnly(it, n))) return items;
-                    let cur = items;
-                    let m = fitOf(cur);
-                    if (m.cap < cur.length) return items;          // the shared check below shrinks it
-                    for (let pass = 0; pass < 3 && m.cap > cur.length; pass++) {
-                        const next = finalRun(sec, si, letterBase(letters[k]), m.cap, probeOf(letters[k]));
-                        if (next.length <= cur.length || next.some((it) => oneColumnOnly(it, n))) break;
+                if (!items.length || items.some((it) => oneColumnOnly(it, n))) return { cur: items, m: null };
+                let cur = items;
+                let m = fitOf(cur);
+                if (m.cap < cur.length) return { cur: items, m: null };
+                for (let pass = 0; pass < 3 && m.cap > cur.length; pass++) {
+                    const next = finalRun(sec, si, letterBase(letters[k]), m.cap, probeOf(letters[k]));
+                    if (next.length <= cur.length || next.some((it) => oneColumnOnly(it, n))) break;
+                    const m2 = fitOf(next);
+                    if (m2.cap < next.length) break;
+                    cur = next; m = m2;
+                }
+                // The dealt run's next problem can be taller than this page's rows (a big set,
+                // a long story): then the letter is filled with the next problems of its own
+                // run that fit the rows it has, in the order they were dealt (one skill only;
+                // never a second choose-all list).
+                if (m.cap > cur.length && sec.skills.length === 1) {
+                    const want = m.cap - cur.length;
+                    const pr = probeOf(letters[k]);
+                    finalRun(sec, si, letterBase(letters[k]), cur.length + want * 4 + 4, pr);
+                    const taken = new Set(cur);
+                    const isList = (it) => it.q && it.q.printFormat === 'multi-select';
+                    let lists = cur.filter(isList).length;
+                    const fitsRows = (it) => Object.entries(it.measured || {}).every(([c, mm]) => {
+                        const f = m.f[c];
+                        return !f || ((mm.hMm || 0) <= f.hMm + 0.01 && (mm.fits !== false || f.fits === false));
+                    });
+                    const add = [];
+                    for (const it of pr.items) {
+                        if (add.length >= want) break;
+                        if (taken.has(it) || oneColumnOnly(it, n) || !fitsRows(it)) continue;
+                        if (isList(it)) { if (lists >= 1 && cur.some((x) => !isList(x))) continue; lists++; }
+                        add.push(it);
+                    }
+                    if (add.length) {
+                        const next = cur.concat(add);
                         const m2 = fitOf(next);
-                        if (m2.cap < next.length) break;
-                        cur = next; m = m2;
+                        if (m2.cap >= next.length) { cur = next; m = m2; }
                     }
-                    // The dealt run's next problem can be taller than this page's rows (a big set,
-                    // a long story): then the letter is filled with the next problems of its own
-                    // run that fit the rows it has, in the order they were dealt (one skill only;
-                    // never a second choose-all list).
-                    if (m.cap > cur.length && sec.skills.length === 1) {
-                        const want = m.cap - cur.length;
-                        const pr = probeOf(letters[k]);
-                        finalRun(sec, si, letterBase(letters[k]), cur.length + want * 4 + 4, pr);
-                        const taken = new Set(cur);
-                        const isList = (it) => it.q && it.q.printFormat === 'multi-select';
-                        let lists = cur.filter(isList).length;
-                        const fitsRows = (it) => Object.entries(it.measured || {}).every(([c, mm]) => {
-                            const f = m.f[c];
-                            return !f || ((mm.hMm || 0) <= f.hMm + 0.01 && (mm.fits !== false || f.fits === false));
-                        });
-                        const add = [];
-                        for (const it of pr.items) {
-                            if (add.length >= want) break;
-                            if (taken.has(it) || oneColumnOnly(it, n) || !fitsRows(it)) continue;
-                            if (isList(it)) { if (lists >= 1 && cur.some((x) => !isList(x))) continue; lists++; }
-                            add.push(it);
-                        }
-                        if (add.length) {
-                            const next = cur.concat(add);
-                            const m2 = fitOf(next);
-                            if (m2.cap >= next.length) { cur = next; m = m2; }
-                        }
+                }
+                return { cur, m };
+            };
+            const soloLetters = !!(n.letters && n.letters.length > 1) && !sec.count && shared[si] === null
+                && anchorMode === 'off' && n.sections.length === 1;
+            if (soloLetters) {
+                // Named letters (the teacher print screen sends ['A', 'B']): each letter is exactly the
+                // page that letter prints when it is requested alone - its own probe, its own count,
+                // its own floor (critic fractions-key r8 R8-1: B started at A's count, 4 where B alone
+                // holds 6). The same steps as the one-letter path below, per letter.
+                const sized = letters.map((L, k) => {
+                    const pr = L === firstL ? firstProbes[si] : probeRun(sec, si, letterBase(L));
+                    probes.set(L, pr);
+                    const secL = Object.assign({}, sec, { floor: floorWith(si, pr.items) });
+                    const Lx = layoutOf(n.role, secL, withTwins(si, pr.items), n, lctx);
+                    const per = capFromL(secL, si, Lx);
+                    let items = finalRun(sec, si, letterBase(L), per, pr);
+                    const floorL = floorWith(si, pr.items.concat(items));
+                    const g = growLetter(items, k, Lx.cols);
+                    if (g.m && g.cur.length > items.length) return { items: g.cur, own: { floor: g.m.f, columns: Lx.cols } };
+                    const secF = Object.assign({}, sec, { floor: floorL });
+                    const capL = capFromL(secF, si, layoutOf(n.role, secF, withTwins(si, items), n, lctx));
+                    if (items.length > capL) {
+                        if (g.m) return { items, own: { floor: g.m.f, columns: Lx.cols } };
+                        items = finalRun(sec, si, letterBase(L), capL, pr);
                     }
+                    return { items, own: { floor: floorL, columns: sec.columns } };
+                });
+                byLetter = sized.map((x) => x.items);
+                perLetter = byLetter.map((x) => x.length);
+                sized.forEach((x, k) => ownFloor.set(letters[k], x.own));
+            } else if (!sec.count && shared[si] === null && anchorMode === 'off') {
+                // The letter keeps the section's columns: it only takes more ROWS of the same
+                // problems, so a page that is not grown is laid out exactly as before.
+                const cols = L0.cols;
+                byLetter = byLetter.map((items, k) => {
+                    const { cur, m } = growLetter(items, k, cols);
+                    if (!m) return items;
                     // not grown: the letter is as dealt, and its own page holds it (remembered, so
                     // another letter's taller problem never shrinks it below what it holds alone;
                     // critic fractions-key r7 R7-1)
@@ -2198,6 +2236,9 @@ function earlierSkills(sk, count = 1, { fallback = false, kitOnly = false } = {}
     // (hardest allowed) skills first; 3. the skills after it in its own category at its level or
     // below; 4. the categories after it in its domain.
     if (!fallback || out.length >= count) return out;
+    // A kit-only search keeps the order above (the categories before it in its domain, then the
+    // skills after it, then the categories after it): the Review keeps a band only when it fills the
+    // page as well as the skill's own problems do (review.js geometry, critic fractions-key r8 R8-2).
     const cats = (() => {
         for (const d of Object.values(DOMAINS || {})) {
             const ids = (d.categories || []).map((c) => c.id).filter((id) => !/mixed/.test(id));

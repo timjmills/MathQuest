@@ -56,10 +56,40 @@ function sectionFit(items, ctx) {
  */
 export function mainSet(main, ctx) {
     const opts = [AUTO_COLS[ctx.size], 3, 2, 1].filter((c, i, a) => a.indexOf(c) === i && c <= AUTO_COLS[ctx.size]);
-    if (bestCols(main, opts, ctx) > 1) return main;
+    const c = bestCols(main, opts, ctx);
+    if (c > 1) return dropTall(main, c);
     const keep = main.filter((it) => fitsAt([it], 2, ctx));
     return keep.length >= 2 && keep.length * 2 >= main.length ? keep : main;
 }
+
+/**
+ * A wider deal's odd tall problem (a choose-all list among picture sums, its legacy cell wrapping to
+ * a third line at three columns) waits for the Independent page: a Review of more rows of its own
+ * problems keeps the ones of the common height (critic fractions-key r9: the list overflowed its
+ * 3-column cell on a Review of 9 own problems). Only when enough remain for two rows.
+ */
+function dropTall(items, cols) {
+    const h = (it) => (it.measured && it.measured[cols] && it.measured[cols].hMm) || 0;
+    const hs = items.map(h).filter((x) => x > 0).sort((a, b) => a - b);
+    if (hs.length < 3) return items;
+    const med = hs[Math.floor(hs.length / 2)];
+    // only a legacy cell among kit cells (its measure is the least sure: the list overflowed a cell it
+    // measured as fitting); a page of one kind keeps its deal
+    const legacy = (it) => it.template === 'legacy' || (it.q && it.q.cell && it.q.cell.template === 'legacy');
+    if (items.filter(legacy).length * 2 >= items.length) return items;
+    const keep = items.filter((it) => !(legacy(it) && h(it) > med * 1.15));
+    return keep.length >= 2 * cols && keep.length < items.length ? keep : items;
+}
+
+/** Does a problem leave its cell at `c` columns more than 30% empty beside its ink (H13 W)? */
+const emptyAt = (it, c) => {
+    const m = it && it.measured && it.measured[c];
+    // the measured slack is the ink's, so a full-width strip (a count row) measures narrow; the
+    // one-column band is judged by its whole layout instead (the own-page comparison in geometry)
+    return c > 1 && !!m && Number.isFinite(m.slackMm) && m.slackMm > 0.3 * cellWidthMm(c).inner;
+};
+/** The earlier problems that fill a cell at `c` columns, in the order dealt (critic fractions-key r8b/r9). */
+const fillers = (items, c) => items.filter((it) => !emptyAt(it, c));
 
 /**
  * The earlier problems a Mixed Review band prints: the ones that sit two to a row, when the pool
@@ -68,10 +98,12 @@ export function mainSet(main, ctx) {
  * is a sample of the earlier step, so its wide kinds wait for that step's own pages.
  */
 export function earlierSet(earlier, ctx) {
+    // The widest row the pool can fill: at c columns, the problems that fit c (at least c of them).
     let set = earlier;
-    if (bestCols(set, [2, 1], ctx) <= 1) {
-        const keep = set.filter((it) => fitsAt([it], 2, ctx));
-        if (keep.length >= 2) set = keep;
+    for (let c = AUTO_COLS[ctx.size]; c >= 2; c--) {
+        if (bestCols(set, [c], ctx) >= c) break;
+        const keep = earlier.filter((it) => fitsAt([it], c, ctx));
+        if (keep.length >= c) { set = keep; break; }
     }
     // One kind of problem in the band (r8, H13: a choose-all list beside a picture sum sat in a row
     // a third empty): the kind the pool deals most, when it deals at least two of it.
@@ -126,10 +158,31 @@ function allocate(main, cols, mRows, skills) {
     return out.sort((a, b) => a.at - b.at).map((g) => Object.assign(g.items, { kindKey: g.k || neutralForKinds('default-write', g.items) }));
 }
 
+/**
+ * The page's geometry, tried with two Mixed Review deals - the earlier problems that sit widest
+ * (earlierSet) and the whole earlier deal - keeping the one that prints more problems, then the
+ * smaller bottom strip (critic fractions-key r8 R8-2: a narrowed deal made a page thinner).
+ */
 function geometry(pools, input) {
     const ctx = ctxOf(input);
+    const raw = pools.earlier || [];
+    const narrowed = earlierSet(raw, ctx);
+    const tries = narrowed.length === raw.length && narrowed.every((x, i) => x === raw[i]) ? [raw] : [narrowed, raw];
+    let pick = null;
+    for (const e of tries) {
+        const g = geometryWith(pools, input, e);
+        // more problems first; then the page with a Mixed Review band (PT-REV-3); then the smaller strip
+        const better = !pick || g.n > pick.n || (g.n === pick.n && ((g.eRows > 0) > (pick.eRows > 0)
+            || ((g.eRows > 0) === (pick.eRows > 0) && g.stripEst < pick.stripEst - 1e-6)));
+        if (better) pick = g;
+    }
+    return pick;
+}
+
+function geometryWith(pools, input, earlierList) {
+    const ctx = ctxOf(input);
     const main = mainSet(pools.main || [], ctx);
-    const earlier = earlierSet(pools.earlier || [], ctx);
+    const earlier = earlierList;
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Review 1', title: 'Review', score: 1 });
     const m = bandMetrics(ctx, layoutHeader(frame.header));
     const bands = earlier.length ? 2 : 1;
@@ -143,9 +196,15 @@ function geometry(pools, input) {
     // under 45% (a disks Review of three full-width charts takes a mixed row of 2, not 3).
     const eOpts = [];
     for (let c = E.cols; c >= 1; c--) eOpts.push({ c, h: c === E.cols ? E.h : hMinAt(earlier, c, ctx) });
-    const wideEmpty = (items, c) => {
-        const w = cellWidthMm(c).inner;
-        return items.some((it) => { const m = it.measured && it.measured[c]; return !!m && Number.isFinite(m.slackMm) && m.slackMm > 0.3 * w; });
+    // The mixed rows' height from the problems they would print (the fillers, in the order dealt),
+    // row by row - not the tallest of the whole wider deal.
+    const eRowsH = (eo, er) => {
+        if (!er) return 0;
+        const f = fillers(earlier, eo.c);
+        if (f.length < er * eo.c) return er * eo.h;
+        let h = 0;
+        for (let i = 0; i < er; i++) { const x = hMinAt(f.slice(i * eo.c, (i + 1) * eo.c), eo.c, ctx); h += Number.isFinite(x) && x > 0 ? x : eo.h; }
+        return h;
     };
     const availOf = (kindBands) => m.body - 2 - (bands + kindBands - 1) * m.strip - wrap;
     // What mr rows of the skill's own problems ARE: the bands allocate() prints (one per item
@@ -183,24 +242,21 @@ function geometry(pools, input) {
                 const a = mainAt(mr);
                 for (let er = 0; er <= (bands === 2 ? 10 : 0); er++) {
                     const n = a.n + er * eo.c;
-                    if (n > ceil || a.h + er * eo.h > availOf(a.bands)) continue;
+                    if (n > ceil || a.h + eRowsH(eo, er) > availOf(a.bands)) continue;
                     const share = n ? (er * eo.c) / n : 0;
                     // A page of at most four tall problems may share half (one row of the skill's
                     // own, one mixed row of the same columns): otherwise the mixed band is a lone
                     // problem in a full-width row, two thirds empty (critic fractions-key r7 R7-3,
                     // RUBRIC H13), and the page holds three.
                     const maxShare = n <= 4 && er === 1 && eo.c === M.cols ? 0.5 : 0.45;
-                    // A mixed row of ONE problem that fits beside another is a lone problem in a
-                    // full-width cell (H13: two thirds of it empty): never.
-                    if (er >= 1 && eo.c === 1 && E.cols > 1) continue;
                     // The mixed problems this row would print must fill its cells (H13 W, critic
                     // fractions-key r8b: three short stacks a row left each cell 31% empty beside
                     // the ink): measured side slack never over 30% of the cell's width.
-                    if (er >= 1 && wideEmpty(earlier.slice(0, er * eo.c), eo.c)) continue;
+                    if (er >= 1 && fillers(earlier, eo.c).length < er * eo.c) continue;
                     if (share > maxShare || (needE && (er < 1 || share < lo))) continue;
                     const d = Math.abs(share - 1 / 3);
                     const better = n > best.n || (n === best.n && (d < best.d - 1e-9 || (Math.abs(d - best.d) < 1e-9 && mr > best.mRows)));
-                    if (better) best = { mRows: mr, eRows: er, eCols: eo.c, eh: eo.h, n, d };
+                    if (better) best = { mRows: mr, eRows: er, eCols: eo.c, eh: er ? eRowsH(eo, er) / er : eo.h, n, d };
                 }
             }
         }
@@ -210,9 +266,42 @@ function geometry(pools, input) {
     if (best.n < 0 && bands === 2) best = search(0, true);
     if (best.n < 0) best = search(0, false);
     if (best.n < 0) best = { mRows: 1, eRows: 0, eCols: E.cols, eh: E.h, n: M.cols };
+    // Critic fractions-key r8 R8-2: the page of the skill's own problems only is scored too, on the
+    // whole body (no Mixed Review strip), and a band is kept only when its page prints at least as
+    // many problems with no bottom strip over 20% (or no larger than the own page's). A dropped or
+    // shortened band never leaves its height empty: the own page refills it.
+    const pageH = /letter/i.test(String(ctx.paper || '')) ? 279.4 : 297;
+    const wrapOwn = stripExtraMm(ctx, '', instructionText(instructionKeyOf(main, input.skills), main));
+    const availOwn = (kindBands) => m.body - 2 - kindBands * m.strip - wrapOwn;
+    const stripOf = (used, room) => {
+        if (!(used > 0)) return 1;
+        const k = Math.max(1, Math.min(FILL_CAP, room / used));
+        return Math.max(0, room - used * k) / pageH;
+    };
+    let own = null;
+    for (let mr = 1; mr <= Math.min(20, maxMr); mr++) {
+        const a = mainAt(mr);
+        if (a.n > ceil || a.h > availOwn(a.bands)) continue;
+        if (!own || a.n > own.n || (a.n === own.n && mr > own.mRows)) own = { mRows: mr, n: a.n, h: a.h, bands: a.bands };
+    }
+    let useOwn = false;
+    if (own && bands === 2) {
+        if (best.eRows < 1) useOwn = true;
+        else {
+            const kbB = mainAt(best.mRows).bands;
+            const sBand = stripOf(mainAt(best.mRows).h + best.eRows * best.eh, availOf(kbB));
+            const sOwn = stripOf(own.h, availOwn(own.bands));
+            if (!(best.n >= own.n && sBand <= Math.max(0.2, sOwn))) useOwn = true;
+        }
+    }
+    if (useOwn) {
+        return { cols: M.cols, eCols: E.cols, mRows: own.mRows, eRows: 0, rows: own.mRows, avail: availOwn(own.bands), h: M.h, eh: E.h, ctx, strip: m.strip, kindBands: own.bands,
+            n: own.n, stripEst: stripOf(own.h, availOwn(own.bands)), earlierUse: earlier };
+    }
     const kb = mainAt(best.mRows).bands;
     const avail = availOf(kb);
-    return { cols: M.cols, eCols: best.eCols, mRows: best.mRows, eRows: best.eRows, rows: best.mRows + best.eRows, avail, h: M.h, eh: best.eh, ctx, strip: m.strip, kindBands: kb };
+    return { cols: M.cols, eCols: best.eCols, mRows: best.mRows, eRows: best.eRows, rows: best.mRows + best.eRows, avail, h: M.h, eh: best.eh, ctx, strip: m.strip, kindBands: kb,
+        n: Math.max(0, best.n), stripEst: stripOf(mainAt(best.mRows).h + eRowsH({ c: best.eCols, h: best.eh }, best.eRows), avail), earlierUse: earlier };
 }
 
 /** Enough of each pool that the plan can fill its bands with whole rows of each kind. */
@@ -232,8 +321,8 @@ export function counts(pools, input) {
 export function plan(input = {}) {
     const ctx = ctxOf(input);
     const main = mainSet(poolItems(input, 'main'), ctx);
-    const earlier = earlierSet(poolItems(input, 'earlier'), ctx);
-    const g = geometry({ main, earlier }, input);
+    const g = geometry({ main, earlier: poolItems(input, 'earlier') }, input);
+    const earlier = g.earlierUse || [];
     // The skill under review is the first listed (sources: the main pool first); a mixed pool's
     // items carry their sub-skills' ids, one of which can be the earlier step's (critic guided-r1:
     // a mixed place-value Review titled and footed by its Mixed Review skill).
@@ -246,7 +335,9 @@ export function plan(input = {}) {
     // row, never a problem beside a ruled empty cell, PT-ENG-7).
     const eCols = Math.max(1, Math.min(g.eCols, g.eRows ? Math.min(earlier.length, g.eRows * g.eCols) : g.eCols));
     const eRowsN = g.eRows ? Math.floor(Math.min(earlier.length, g.eRows * g.eCols) / eCols) : 0;
-    const useE = eRowsN ? groupByHeight(earlier.slice(0, eRowsN * eCols), eCols) : [];
+    const fillE = fillers(earlier, eCols);
+    const poolE = fillE.length >= eRowsN * eCols ? fillE : earlier;
+    const useE = eRowsN ? groupByHeight(poolE.slice(0, eRowsN * eCols), eCols) : [];
     const n = useM.length + useE.length;
     const n0 = Math.max(1, Number(input.lesson) || 1);
     const frame = frameOf({ skills: mainSkills.length ? mainSkills : input.skills || [], input, tabId: `Review ${n0}`, title: `Review: ${topic}`, score: n });
