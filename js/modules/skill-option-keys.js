@@ -179,6 +179,7 @@ export const MULTI_KEYS = Object.freeze({
     // deployed decoder would read an unknown `op` token as an EMPTY set (every operation).
     ops: '3A',           // function_table_easy / _hard: the operations a rule may use (+ − × ÷)
     ftTrap: '5T',        // function tables (lesson 5, 2026-10-16): row 1 fits a + and a × rule
+    ftFactors: '5U',     // function tables (lesson 5 r2): the × / ÷ numbers a rule may use (any | 2, 5 and 10)
     // NEXT FREE IN BLOCK 3: 3C.
 
     // Block 4 — SUPPORTS (S2: `cover` and `mix` are live; `touch` is unused - touch dots are
@@ -365,6 +366,7 @@ export const VALUE_TOKENS = Object.freeze({
     ftRules: Object.freeze({ '+': 'A', '-': 'S', x: 'M', '/': 'D', 'x+': 'P', 'x-': 'N', '/+': 'Q', '/-': 'R' }),
     ftTask: Object.freeze({ outputs: 'G', 'outputs-check': 'H', rule: 'Y', 'rule-check': 'Z', inputs: 'V', 'inputs-check': 'W',
         mixed: 'M', 'mixed-check': 'N', make: 'K' }),
+    ftFactors: Object.freeze({ any: 'A', '2-5-10': 'T' }),
     // block 1 (P10 time + money)
     review: Object.freeze({ none: 'N', some: 'S' }),
     stimulus: Object.freeze({ clock: 'C', words: 'W', 'words-past': 'P', 'words-oh': 'O' }),

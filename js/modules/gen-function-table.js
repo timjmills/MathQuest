@@ -74,13 +74,15 @@ function inputPool(rule, cap) {
 }
 
 /** One rule of the asked kind, inside the band. */
-function makeRule(kind, steps, cap, need) {
+function makeRule(kind, steps, cap, need, factors = null) {
     const hi = (k) => Math.max(2, Math.min(10, Math.floor(cap / Math.max(1, k))));
     if (steps === 1) {
         if (kind === '+' || kind === '-') {
             const top = cap <= 10 ? 5 : cap <= 20 ? 9 : cap <= 50 ? 20 : cap <= 100 ? 30 : Math.floor(cap / 4);
             return [{ op: kind, n: niceAmount(1, Math.max(1, Math.min(top, cap - need)), cap) }];
         }
+        // (`ftFactors` '2-5-10', lesson 5 r2: only the factors the band leaves room for, of 2, 5 and 10)
+        if (factors) { const ok = factors.filter((f) => f <= hi(need)); if (ok.length) return [{ op: kind, n: ok[randInt(0, ok.length - 1)] }]; }
         return [{ op: kind, n: randInt(2, hi(need)) }];
     }
     // Two steps: × or ÷ first, then + or −, so "x × 2 + 1" is read left to right (no brackets).
@@ -157,7 +159,7 @@ export function generateFunctionTable(q, skillId) {
     let rule = null, pool = [];
     const attempt = (k, st) => {
         for (let tries = 0; tries < 40 && !rule; tries++) {
-            const r = makeRule(k, st, cap, need);
+            const r = makeRule(k, st, cap, need, o.ftFactors === '2-5-10' ? [2, 5, 10] : null);
             const p = inputPool(r, cap);
             if (p.length >= need) { rule = r; pool = p; }
         }

@@ -1935,6 +1935,12 @@ const _ftOptions = (easy) => [
         help: 'On: the first row fits a + rule and a × rule (2 → 4 is + 2 and × 2; 3 → 6 is + 3 and × 2), so the pupil must test the other rows. The rule is still the only one that fits every row.',
     },
     {
+        // Lesson 5 r2: × and ÷ rules only by the numbers the class has learned (the Prerequisite Check's 2, 5 and 10).
+        id: 'ftFactors', label: '× and ÷ by', type: 'enum', default: 'any', group: 'difficulty',
+        values: [{ v: 'any', l: 'Any number to 10' }, { v: '2-5-10', l: '2, 5 and 10 only' }],
+        help: 'The number a × or ÷ rule uses. "2, 5 and 10 only" keeps the rules to the facts a Grade 3 class learns first.',
+    },
+    {
         id: 'support', label: 'Support', type: 'enum', default: 'frame', group: 'support',
         values: [
             { v: 'frame', l: 'Frame and machine picture' },

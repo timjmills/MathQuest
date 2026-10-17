@@ -314,8 +314,11 @@ export const CASE_TESTS = Object.freeze({
     // a × table whose first row is k → k × k (2 → 4: + 2 or × 2), so only row 2 decides.
     ftAdd: (it) => { const p = ftRuleOf(it); return !!p && p.op === '+' && p.k >= 2 && p.x1 !== p.k && p.x1 >= 2; },
     ftSub: (it) => { const p = ftRuleOf(it); return !!p && p.op === '-' && p.k >= 2 && p.x1 !== 2 * p.k && p.x1 > p.k; },
-    ftTimes: (it) => { const p = ftRuleOf(it); return !!p && p.op === 'x' && [2, 3, 4, 5, 10].includes(p.k) && p.x1 !== p.k; },
-    ftTimesTrap: (it) => { const p = ftRuleOf(it); return !!p && p.op === 'x' && [2, 3, 4, 5].includes(p.k) && p.x1 === p.k; },
+    ftTimes: (it) => { const p = ftRuleOf(it); return !!p && p.op === 'x' && [2, 5, 10].includes(p.k) && p.x1 !== p.k; },
+    ftTimesTrap: (it) => { const p = ftRuleOf(it); return !!p && p.op === 'x' && [2, 5].includes(p.k) && p.x1 === p.k; },
+    // (a Practice row above the ★★★ row: no first row that fits a second one-step rule - not 1 -> 1 + k, not a trap)
+    ftPlainRow: (it) => { const p = ftRuleOf(it); return !!p && p.x1 >= 2 && !CASE_TESTS.ftTrapAny(it) && !(p.op === '-' && p.x1 === 2 * p.k); },
+    ftPracticeAny: (it) => CASE_TESTS.ftPlainRow(it) || CASE_TESTS.ftTrapAny(it),
     // (+ / − traps: row 1 k -> 2k also fits x 2; row 1 2k -> k also fits ÷ 2 - Practice 1's ★★★ row)
     ftTrapAdd: (it) => { const p = ftRuleOf(it); return !!p && p.op === '+' && p.k >= 2 && p.x1 === p.k; },
     ftTrapSub: (it) => { const p = ftRuleOf(it); return !!p && p.op === '-' && p.k >= 2 && p.x1 === 2 * p.k; },

@@ -262,6 +262,11 @@ Gate failures and load numbers measured before this fix (~12:30 UTC) are not tru
   critic r2 D1 (put-together never modelled; r1 D3 -> r2 D1) and D4 (exit slip; r1 D11 -> r2 D4). Reports:
   `design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r{1,2}.md`.
 
+- **2026-10-17, detailed lesson 4 (g3-oa9-mult-table-patterns)**: builder escalated mq-opus-low -> mq-opus-medium for
+  critic r1 D5 (Practice windows overlapping / copied, still failing after fix round 3). Lead ruling: same-page windows
+  share at most half their boxes (turned boxes counted), never a verbatim copy of an earlier page; exit and Check
+  Question fresh against every page. Report: `design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r1.md`.
+
 ## 10. Wave 8 (lessons) — word-problem lesson pages, found 2026-10-03 and left as on main
 
 These are deferred to Wave 8 (owner ruling 2026-10-03: lessons and anchor charts wait for the Lesson wave). A fix

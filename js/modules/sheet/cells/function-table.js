@@ -254,7 +254,10 @@ function machine(p, g, d, wMm) {
     const inner = mt ? `<span style="font-size:${g.textEm.toFixed(3)}em;font-weight:700;white-space:nowrap;color:${mt.grey ? INK.grey : INK.ink}">${esc(mt.text)}</span>`
         : given ? txt(g, ruleHtml(p.rule), { bold: true }) : txt(g, 'rule');
     const boxH = d.machineH;
-    return `<div class="ft-machine" data-ft-machine="1" style="display:flex;align-items:center;justify-content:center;gap:${g.em(1.5)};`
+    // (`machineTried`: the wrong try of a chart's whole example, crossed, on a line above the machine - lesson 5 r2)
+    const tried = p.machineTried ? `<div style="display:flex;align-items:center;justify-content:center;gap:${g.em(1.5)};margin:0 auto ${g.em(0.6)};white-space:nowrap">`
+        + `${txt(g, `${esc(p.machineTried)}?`, { bold: true })}${markSvg(g, true, INK.ink)}${txt(g, 'row 2')}</div>` : '';
+    return tried + `<div class="ft-machine" data-ft-machine="1" style="display:flex;align-items:center;justify-content:center;gap:${g.em(1.5)};`
         + `width:${g.em(wMm)};margin:0 auto ${g.em(0.8)};white-space:nowrap">`
         + `${txt(g, 'In', { bold: true })}${arrow(g, 7)}`
         + `<span style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-width:${g.em(18)};height:${g.em(boxH)};`
@@ -363,11 +366,15 @@ const markSvg = (g, cross, color) => `<svg viewBox="0 0 10 10" style="width:${g.
  * table: blank, then answered grey on the last state.
  */
 function ftStepState(p, steps, k, ctx) {
-    const n = Array.isArray(steps) ? steps.length : 0;
+    let n = Array.isArray(steps) ? steps.length : 0;
+    // (the chart's other examples, whole - roles/lesson.js finalDrawing: the steps plus one empty state, drawn at
+    // that state: every mark of the method in black - the wrong try crossed, the rule ticked on every row)
+    const whole = n === 5 && k === 4 && !((steps[4] && steps[4].marks) || []).length;
+    if (whole) n = 4;
     const last = k >= n - 1;
     const rule = p.rule || [];
     const rows = p.rows || [];
-    const c = Object.assign({}, ctx, { state: last ? 'traced' : 'blank' });
+    const c = Object.assign({}, ctx, { state: whole ? 'answered' : last ? 'traced' : 'blank' });
     const plain = p.task === 'rule' && rule.length === 1 && !p.check && n === 4 && rows.length >= 2 && p.machine;
     if (!plain) return this.render(p, c);
     const G = { '+': '+', '-': '−', x: '×', '/': '÷' };
@@ -378,6 +385,11 @@ function ftStepState(p, steps, k, ctx) {
     const tried = `n ${gap >= 0 ? '+' : '−'} ${Math.abs(gap)}`;
     const notes = rows.map(() => null);
     let mt = null;
+    if (whole) {
+        rows.forEach((r, i) => { if (i || !addish) notes[i] = { text: '✓', grey: false }; });
+        c.ftNotes = notes;
+        return this.render(Object.assign({}, p, { machineText: { text: real, grey: false }, ...(addish ? {} : { machineTried: tried }) }), c);
+    }
     if (k === 0) c.ftRing = [0, 1];
     if (addish) {
         if (k >= 1) mt = { text: real, grey: k === 1 };

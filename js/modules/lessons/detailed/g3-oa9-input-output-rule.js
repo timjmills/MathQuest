@@ -13,7 +13,7 @@
 // found by chance; SKILL_STANDARDS 3.OA.D.9 + M.EE.3.OA.8 on function_table_easy (the bridge checks
 // ccss / ee against the skill's tags); the C.4 Remember string 'one-pair'.
 
-const FT = (opts, extra) => Object.assign({ categoryId: 'algebra', skillId: 'function_table_easy', opts: Object.assign({ ftTask: 'rule', ftRules: ['+', '-', 'x'], band: 20, ftTable: 31, support: 'frame' }, opts || {}) }, extra || {});
+const FT = (opts, extra) => Object.assign({ categoryId: 'algebra', skillId: 'function_table_easy', opts: Object.assign({ ftTask: 'rule', ftRules: ['+', '-', 'x'], band: 20, ftTable: 31, support: 'frame', ftFactors: '2-5-10' }, opts || {}) }, extra || {});
 // P1 bank types: earlier content only (place value: 1 / 10 more and less, compare, unit form), never today's rule-finding.
 const NS = (categoryId, skillId, opts, extra) => Object.assign({ categoryId, skillId, opts }, extra || {});
 const ML = (step, dir, extra) => Object.assign({ categoryId: 'placevalue', skillId: 'more_less_10', opts: { step, dir, band: 100 } }, extra || {});
@@ -42,12 +42,14 @@ export default {
     skill: FT(),
     // The ★★★ last row: a × table whose first row also fits a + rule (2 → 4), and a − rule.
     edgeTest: 'ftTrapAny',
+    // (a first row that fits two rules only on the ★★★ last rows - the Critical Atom's case is never practised early)
+    edgeOnlyLast: 'ftTrapAny',
     practicePages: 2,
     // Practice 1: + and − rules. Practice 2: × then + and −, numbers to 50, In out of order. The ★★★ last
     // row of each: the trap (row 1 fits two rules). The machine picture fades on the exit slip.
     practiceSheets: [
-        { steps: true, skill: FT({ ftRules: ['+', '-'] }), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['ftTrapAdd', 'ftTrapSub'] } },
-        { steps: true, skill: FT({ ftRules: ['x', '+', '-'], band: 50, ftTable: 32 }), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['ftTimesTrap', 'ftTrapSub'] } },
+        { steps: true, skill: FT({ ftRules: ['+', '-'], ftTable: 41, support: 'frame-bare' }, { allTest: 'ftPracticeAny' }), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['ftTrapAdd', 'ftTrapSub'] } },
+        { steps: true, skill: FT({ ftRules: ['x', '+', '-'], band: 50, ftTable: 42, support: 'frame-bare' }, { allTest: 'ftPracticeAny' }), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['ftTimesTrap', 'ftTrapSub'] } },
     ],
     // No Mixed page (V22 §9.5: optional): a function table is a tall item, and a page that mixes them with
     // earlier facts cannot give the lesson's own skill half the page (E33).
