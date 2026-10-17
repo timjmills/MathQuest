@@ -329,6 +329,22 @@ export function itemDenominators(q) {
     for (const o of [...(Array.isArray(q.options) ? q.options : []), ...(Array.isArray(q.tiles) ? q.tiles : [])]) {
         if (o && typeof o === 'object' && o.label != null) question.push(...dens(o.label, true));
     }
+    // A kit cell carries its fractions in its payload ({n, d} terms, "a/b" chip labels), not in q.visual.
+    if (q.cell && q.cell.payload) {
+        const walk = (v, depth) => {
+            if (v == null || depth > 8) return;
+            if (typeof v === 'string') { question.push(...dens(v, true)); return; }
+            if (Array.isArray(v)) { for (const x of v) walk(x, depth + 1); return; }
+            if (typeof v !== 'object') return;
+            for (const [k, x] of Object.entries(v)) {
+                if ((k === 'd' && v.n != null) || k === 'den' || k === 'denominator') {
+                    const d = Number(x);
+                    if (Number.isInteger(d) && d > 1) question.push(d);
+                } else walk(x, depth + 1);
+            }
+        };
+        walk(q.cell.payload, 0);
+    }
     // The answer counts too: a page of halves, quarters and eighths must not have 6/12 in its key.
     const a = typeof q.ans === 'string' || typeof q.ans === 'number' ? dens(q.ans, false) : [];
     return [...question, ...a];
