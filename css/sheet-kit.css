@@ -414,3 +414,14 @@
 /* owner 2026-10-09: the blank back of a key-on-a-new-sheet run carries one very small line in the
    footer band's centre cell (6 mm band, 7 pt, regular, black), level with the facing pages' footers. Additive. */
 .ws-page.ws-blank-back .ws-blank-foot > .ws-blank-note { font-weight: 400; color: var(--ws-ink); text-align: center; white-space: nowrap; }
+
+/* Critic fractions-key r7 (R7-2): at size M a five-option list ("Circle all differences that are
+   less than 1/2.") wrapped to three rows of two, so its cell set a 2-row page. Three options fit a
+   row at M with 4 mm between them and 2 mm round the numerals (the N5 ring clearance), as at S.
+   Additive: M only. */
+:is(.ws-page, .ws-sheet).ws-M .ws-legacy .ms-print .opt-list,
+.ws-M :is(.ws-page, .ws-sheet) .ws-legacy .ms-print .opt-list,
+.ws-M .ws-legacy .ms-print .opt-list { gap: 3mm 4mm; }
+:is(.ws-page, .ws-sheet).ws-M .ws-legacy .ms-print .opt-list .opt,
+.ws-M :is(.ws-page, .ws-sheet) .ws-legacy .ms-print .opt-list .opt,
+.ws-M .ws-legacy .ms-print .opt-list .opt { padding: 2mm 2mm; }

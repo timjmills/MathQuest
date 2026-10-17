@@ -1,0 +1,106 @@
+ws-print-lint: source kit, 5 skill(s)
+  fraction_operations:add_fractions_like#review: 2+1 pages, 0 finding(s)
+  fraction_operations:add_fractions_like#review@s1: 2+1 pages, 0 finding(s)
+  fraction_operations:add_fractions_like#review@s2: 2+1 pages, 0 finding(s)
+  fraction_operations:add_fractions_like#review@s3: 2+1 pages, 0 finding(s)
+  fraction_operations:add_fractions_like#review@s4: 2+1 pages, 0 finding(s)
+  fraction_operations:add_fractions_like#review@s5: 2+1 pages, 0 finding(s)
+  fraction_operations:add_fractions_like#review@s6: 2+1 pages, 0 finding(s)
+  fraction_operations:add_fractions_like#review@s7: 2+1 pages, 0 finding(s)
+  fraction_operations:add_fractions_like#review@s8: 2+1 pages, 0 finding(s)
+  fraction_operations:add_fractions_like#review@s9: 2+1 pages, 0 finding(s)
+  fraction_operations:sub_fractions_like#review: 2+1 pages, 0 finding(s)
+  fraction_operations:sub_fractions_like#review@s1: 2+1 pages, 0 finding(s)
+  fraction_operations:sub_fractions_like#review@s2: 2+1 pages, 0 finding(s)
+  fraction_operations:sub_fractions_like#review@s3: 2+1 pages, 0 finding(s)
+  fraction_operations:sub_fractions_like#review@s4: 2+1 pages, 0 finding(s)
+  fraction_operations:sub_fractions_like#review@s5: 2+1 pages, 0 finding(s)
+  fraction_operations:sub_fractions_like#review@s6: 2+1 pages, 0 finding(s)
+  fraction_operations:sub_fractions_like#review@s7: 2+1 pages, 0 finding(s)
+  fraction_operations:sub_fractions_like#review@s8: 2+1 pages, 0 finding(s)
+  fraction_operations:sub_fractions_like#review@s9: 2+1 pages, 0 finding(s)
+  fraction_operations:add_frac_unlike#review: 2+1 pages, 0 finding(s)
+  fraction_operations:add_frac_unlike#review@s1: 2+1 pages, 0 finding(s)
+  fraction_operations:add_frac_unlike#review@s2: 2+1 pages, 0 finding(s)
+  fraction_operations:add_frac_unlike#review@s3: 2+1 pages, 0 finding(s)
+  fraction_operations:add_frac_unlike#review@s4: 2+1 pages, 0 finding(s)
+  fraction_operations:add_frac_unlike#review@s5: 2+1 pages, 0 finding(s)
+  fraction_operations:add_frac_unlike#review@s6: 2+1 pages, 0 finding(s)
+  fraction_operations:add_frac_unlike#review@s7: 2+1 pages, 0 finding(s)
+  fraction_operations:add_frac_unlike#review@s8: 2+1 pages, 0 finding(s)
+  fraction_operations:add_frac_unlike#review@s9: 2+1 pages, 0 finding(s)
+  fractions:fraction_of_set#review: 2+1 pages, 0 finding(s)
+  fractions:fraction_of_set#review@s1: 2+1 pages, 0 finding(s)
+  fractions:fraction_of_set#review@s2: 2+1 pages, 0 finding(s)
+  fractions:fraction_of_set#review@s3: 2+1 pages, 0 finding(s)
+  fractions:fraction_of_set#review@s4: 2+1 pages, 0 finding(s)
+  fractions:fraction_of_set#review@s5: 2+1 pages, 0 finding(s)
+  fractions:fraction_of_set#review@s6: 2+1 pages, 0 finding(s)
+  fractions:fraction_of_set#review@s7: 2+1 pages, 0 finding(s)
+  fractions:fraction_of_set#review@s8: 2+1 pages, 0 finding(s)
+  fractions:fraction_of_set#review@s9: 2+1 pages, 0 finding(s)
+  fractions:fraction_of_set_hard#review: 2+1 pages, 0 finding(s)
+  fractions:fraction_of_set_hard#review@s1: 2+1 pages, 0 finding(s)
+  fractions:fraction_of_set_hard#review@s2: 2+1 pages, 0 finding(s)
+  fractions:fraction_of_set_hard#review@s3: 2+1 pages, 0 finding(s)
+  fractions:fraction_of_set_hard#review@s4: 2+1 pages, 0 finding(s)
+  fractions:fraction_of_set_hard#review@s5: 2+1 pages, 0 finding(s)
+  fractions:fraction_of_set_hard#review@s6: 2+1 pages, 0 finding(s)
+  fractions:fraction_of_set_hard#review@s7: 2+1 pages, 0 finding(s)
+  fractions:fraction_of_set_hard#review@s8: 2+1 pages, 0 finding(s)
+  fractions:fraction_of_set_hard#review@s9: 2+1 pages, 0 finding(s)
+
+document                                            pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT  result
+fraction_operations:add_fractions_like#review         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_fractions_like#review@s1      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_fractions_like#review@s2      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_fractions_like#review@s3      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_fractions_like#review@s4      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_fractions_like#review@s5      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_fractions_like#review@s6      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_fractions_like#review@s7      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_fractions_like#review@s8      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_fractions_like#review@s9      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:sub_fractions_like#review         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:sub_fractions_like#review@s1      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:sub_fractions_like#review@s2      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:sub_fractions_like#review@s3      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:sub_fractions_like#review@s4      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:sub_fractions_like#review@s5      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:sub_fractions_like#review@s6      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:sub_fractions_like#review@s7      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:sub_fractions_like#review@s8      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:sub_fractions_like#review@s9      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_frac_unlike#review            2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_frac_unlike#review@s1         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_frac_unlike#review@s2         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_frac_unlike#review@s3         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_frac_unlike#review@s4         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_frac_unlike#review@s5         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_frac_unlike#review@s6         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_frac_unlike#review@s7         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_frac_unlike#review@s8         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_frac_unlike#review@s9         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:fraction_of_set#review                      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:fraction_of_set#review@s1                   2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:fraction_of_set#review@s2                   2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:fraction_of_set#review@s3                   2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:fraction_of_set#review@s4                   2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:fraction_of_set#review@s5                   2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:fraction_of_set#review@s6                   2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:fraction_of_set#review@s7                   2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:fraction_of_set#review@s8                   2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:fraction_of_set#review@s9                   2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:fraction_of_set_hard#review                 2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:fraction_of_set_hard#review@s1              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:fraction_of_set_hard#review@s2              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:fraction_of_set_hard#review@s3              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:fraction_of_set_hard#review@s4              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:fraction_of_set_hard#review@s5              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:fraction_of_set_hard#review@s6              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:fraction_of_set_hard#review@s7              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:fraction_of_set_hard#review@s8              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:fraction_of_set_hard#review@s9              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+TOTAL                                                         .     .    .    .        .     .       .    .     .       .     .    .      .       .
+
+ws-print-lint: OK (50 document(s), source kit; 0 finding(s) in 0 document(s))

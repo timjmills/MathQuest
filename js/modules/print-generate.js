@@ -5695,7 +5695,12 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         // a fraction in the prompt is stacked too (TY-7); the verb stays the legacy "Circle ALL"
         // (a kit page prints the library line once per section and keeps only the criterion here)
         const promptText = rawText.replace(/\b(?:Click|Circle) ALL\b/g, 'Circle all').replace(/^(\s*)Click\b/, '$1Circle')
-            .replace(/(^|[^<\w])(\d+)\/(\d+)\b/g, '$1<span class="mq-frac" style="font-size:1em;"><span>$2</span><span>$3</span></span>');
+            // a fraction keeps its trailing punctuation on its line ("less than ½." never wraps the
+            // "." alone; critic fractions-key r7 R7-2, the rule of utils.js stackSlashFractions)
+            .replace(/(^|[^<\w])(\d+)\/(\d+)\b([.,;:!?)]+)?/g, (m, pre, a, b, p) => {
+                const f = `<span class="mq-frac" style="font-size:1em;"><span>${a}</span><span>${b}</span></span>`;
+                return pre + (p ? `<span class="msc-frac-run" style="white-space:nowrap;">${f}${p}</span>` : f);
+            });
         // A generator that draws the figure the options refer to sets `printStem` (identify_angles:
         // "Tick every obtuse angle in this shape", its corners lettered).
         const stem = _msStem(problem) || (problem.printStem && problem.visual ? printVisualWrap(problem.visual) : '');

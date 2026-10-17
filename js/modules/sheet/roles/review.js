@@ -31,7 +31,9 @@ export const sources = (skills, { earlier }) => {
     const out = [{ id: 'main', skills }];
     // The earlier step, or (critic guided-r1) the host's fallback when the skill is the first of
     // its category: a Review always rehearses something before this skill.
-    const prev = skills.length === 1 ? earlier(skills[0], 1, { fallback: true }) : [];
+    // Only a sibling that prints through the kit (critic fractions-key r7 R7-3): a legacy sibling's
+    // cell is not the standard's; with none, the Review is the skill's own problems.
+    const prev = skills.length === 1 ? earlier(skills[0], 1, { fallback: true, kitOnly: true }) : [];
     if (prev.length) out.push({ id: 'earlier', skills: prev });
     return out;
 };
@@ -57,6 +59,28 @@ export function mainSet(main, ctx) {
     if (bestCols(main, opts, ctx) > 1) return main;
     const keep = main.filter((it) => fitsAt([it], 2, ctx));
     return keep.length >= 2 && keep.length * 2 >= main.length ? keep : main;
+}
+
+/**
+ * The earlier problems a Mixed Review band prints: the ones that sit two to a row, when the pool
+ * deals at least two (critic fractions-key r7 R7-3: one full-width "= or ≠" model in the pool held
+ * the band to one column, and a narrow problem printed alone in a full-width cell, H13). The band
+ * is a sample of the earlier step, so its wide kinds wait for that step's own pages.
+ */
+export function earlierSet(earlier, ctx) {
+    let set = earlier;
+    if (bestCols(set, [2, 1], ctx) <= 1) {
+        const keep = set.filter((it) => fitsAt([it], 2, ctx));
+        if (keep.length >= 2) set = keep;
+    }
+    // One kind of problem in the band (r8, H13: a choose-all list beside a picture sum sat in a row
+    // a third empty): the kind the pool deals most, when it deals at least two of it.
+    const n = new Map();
+    for (const it of set) { const k = itemKindSig(it); n.set(k, (n.get(k) || 0) + 1); }
+    let top = null;
+    for (const [k, c] of n) if (top === null || c > n.get(top)) top = k;
+    const same = set.filter((it) => itemKindSig(it) === top);
+    return same.length >= 2 ? same : set;
 }
 
 /**
@@ -105,7 +129,7 @@ function allocate(main, cols, mRows, skills) {
 function geometry(pools, input) {
     const ctx = ctxOf(input);
     const main = mainSet(pools.main || [], ctx);
-    const earlier = pools.earlier || [];
+    const earlier = earlierSet(pools.earlier || [], ctx);
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Review 1', title: 'Review', score: 1 });
     const m = bandMetrics(ctx, layoutHeader(frame.header));
     const bands = earlier.length ? 2 : 1;
@@ -157,7 +181,15 @@ function geometry(pools, input) {
                     const n = a.n + er * eo.c;
                     if (n > ceil || a.h + er * eo.h > availOf(a.bands)) continue;
                     const share = n ? (er * eo.c) / n : 0;
-                    if (share > 0.45 || (needE && (er < 1 || share < lo))) continue;
+                    // A page of at most four tall problems may share half (one row of the skill's
+                    // own, one mixed row of the same columns): otherwise the mixed band is a lone
+                    // problem in a full-width row, two thirds empty (critic fractions-key r7 R7-3,
+                    // RUBRIC H13), and the page holds three.
+                    const maxShare = n <= 4 && er === 1 && eo.c === M.cols ? 0.5 : 0.45;
+                    // A mixed row of ONE problem that fits beside another is a lone problem in a
+                    // full-width cell (H13: two thirds of it empty): never.
+                    if (er >= 1 && eo.c === 1 && E.cols > 1) continue;
+                    if (share > maxShare || (needE && (er < 1 || share < lo))) continue;
                     const d = Math.abs(share - 1 / 3);
                     const better = n > best.n || (n === best.n && (d < best.d - 1e-9 || (Math.abs(d - best.d) < 1e-9 && mr > best.mRows)));
                     if (better) best = { mRows: mr, eRows: er, eCols: eo.c, eh: eo.h, n, d };
@@ -183,13 +215,16 @@ export function counts(pools, input) {
     const all = pools.main || [];
     // The main band is filled from a wider deal (the kinds are shared out in whole rows), the
     // plan printing only what it places.
-    return { main: Math.min(all.length, Math.max(g.mRows * g.cols, 3 * g.mRows * g.cols)), earlier: g.eRows * g.eCols };
+    // The earlier band likewise (R7-3): a wider deal, so earlierSet can print the problems that sit
+    // two to a row.
+    const allE = pools.earlier || [];
+    return { main: Math.min(all.length, Math.max(g.mRows * g.cols, 3 * g.mRows * g.cols)), earlier: g.eRows * g.eCols > 0 ? Math.min(Math.max(allE.length, g.eRows * g.eCols), 3 * g.eRows * g.eCols) : 0 };
 }
 
 export function plan(input = {}) {
     const ctx = ctxOf(input);
     const main = mainSet(poolItems(input, 'main'), ctx);
-    const earlier = poolItems(input, 'earlier');
+    const earlier = earlierSet(poolItems(input, 'earlier'), ctx);
     const g = geometry({ main, earlier }, input);
     // The skill under review is the first listed (sources: the main pool first); a mixed pool's
     // items carry their sub-skills' ids, one of which can be the earlier step's (critic guided-r1:

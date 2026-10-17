@@ -1837,6 +1837,7 @@ async function buildSheetCore(req = {}) {
             // Named letters (the teacher print screen sends ['A', 'B']) and page-sized letters
             // alike; never a set count or shared rows. The letter's floor goes to the plan.
             const ownFloor = new Map();
+            const ownHolds = new Map();
             if (!sec.count && shared[si] === null && anchorMode === 'off') {
                 // The letter keeps the section's columns: it only takes more ROWS of the same
                 // problems, so a page that is not grown is laid out exactly as before.
@@ -1886,7 +1887,10 @@ async function buildSheetCore(req = {}) {
                             if (m2.cap >= next.length) { cur = next; m = m2; }
                         }
                     }
-                    if (cur.length <= items.length) return items;  // not grown: the letter is as dealt
+                    // not grown: the letter is as dealt, and its own page holds it (remembered, so
+                    // another letter's taller problem never shrinks it below what it holds alone;
+                    // critic fractions-key r7 R7-1)
+                    if (cur.length <= items.length) { ownHolds.set(letters[k], { floor: m.f, columns: cols }); return items; }
                     perLetter[k] = cur.length;
                     ownFloor.set(letters[k], { floor: m.f, columns: cols });
                     return cur;
@@ -1894,6 +1898,9 @@ async function buildSheetCore(req = {}) {
             }
             if (anchorMode === 'side' && anchorSets[si]) anchorSets[si].grow(byLetter.flat().length + 2);
             const cap = shared[si] !== null ? shared[si] : capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, byLetter.flat()), n, lctx));
+            // A letter the pooled floor would shrink, whose own page holds it, keeps its count on its
+            // own floor: a letter of an A,B request never holds fewer than the same letter alone.
+            letters.forEach((L, k) => { if (perLetter[k] > cap && !ownFloor.has(L) && ownHolds.has(L)) ownFloor.set(L, ownHolds.get(L)); });
             if (perLetter.some((c, k) => c > cap && !ownFloor.has(letters[k]))) {
                 byLetter = letters.map((L, k) => (perLetter[k] > cap && !ownFloor.has(L) ? finalRun(sec, si, letterBase(L), cap, probeOf(L)) : byLetter[k]));
             }
@@ -2134,7 +2141,30 @@ function settleMixedGrades(metas, items) {
     }
 }
 
-function earlierSkills(sk, count = 1, { fallback = false } = {}) {
+/**
+ * Does a skill print through the sheet kit (never the legacy wrapper)? Four seeded items are
+ * generated and each must resolve to a kit cell. Critic fractions-key r7 R7-3: a Review's Mixed
+ * Review band printed legacy siblings ("2/3 = 8 = [ ]" in Arial, a slashed "5/10" with a doubled
+ * Answer line), so a band takes only migrated siblings, as the mixed pools do.
+ */
+const _kitSkillCache = new Map();
+const _kitProbeSeed = (t) => { let h = 2166136261; for (const c of String(t)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+function printsThroughKit(ref) {
+    const key = `${ref.categoryId}:${ref.skillId}`;
+    if (_kitSkillCache.has(key)) return _kitSkillCache.get(key);
+    let ok = true;
+    for (let i = 0; i < 4 && ok; i++) {
+        let q = null;
+        try { q = generateQuestionFor({ category: ref.categoryId, skill: ref.skillId, seed: (_kitProbeSeed(`${key}:kit-probe:${i}`)) }); } catch (e) { q = null; }
+        let spec = null;
+        try { spec = q ? kitCellSpec(q) : null; } catch (e) { spec = null; }
+        ok = !!(spec && spec.template && spec.template !== 'legacy');
+    }
+    _kitSkillCache.set(key, ok);
+    return ok;
+}
+
+function earlierSkills(sk, count = 1, { fallback = false, kitOnly = false } = {}) {
     // An earlier step is never a HARDER one: a category lists its skills in groups (facts, then
     // columns, then word problems), so the skill just above a Level K word problem can be a
     // 5-digit sum. Only skills at the same level or below count.
@@ -2146,7 +2176,8 @@ function earlierSkills(sk, count = 1, { fallback = false } = {}) {
         try { if (isMixedMetaSkill(s.v)) return false; } catch (e) { /* keep */ }
         let g = null;
         try { g = GRADE_RANK(getSkillGrade(s.v, cat)); } catch (e) { g = null; }
-        return !(own !== null && (g === null || g > own));
+        if (own !== null && (g === null || g > own)) return false;
+        return !kitOnly || printsThroughKit({ categoryId: cat, skillId: s.v });
     };
     const take = (cat, idxs) => {
         const list = Array.isArray(SKILLS[cat]) ? SKILLS[cat] : [];
