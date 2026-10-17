@@ -1611,6 +1611,54 @@ export function wireDiskSwipe(root) {
     });
 }
 
+/**
+ * Critic r11 G3: a count-row box that takes the pupil's focus comes FULLY into view, clear of any bar pinned over the page (the
+ * practice card's sticky Check bar, the worksheet's header, the quiz's footer) and of the screen's own edges, with 8 px to
+ * spare. The bars are found where they are, by what stands at the box's column at the top and the bottom of the viewport, so
+ * a host's own bar needs no list here. It runs at once and again after the layout settles (the late fit, a re-balance).
+ */
+function revealBox(el, margin = 8) {
+    const once = () => {
+        if (!el || !el.isConnected || document.activeElement !== el) return;
+        const b = el.getBoundingClientRect();
+        if (!(b.height > 0)) return;
+        const vv = window.visualViewport;
+        const vh = vv && vv.height > 0 ? Math.min(window.innerHeight, vv.height + (vv.offsetTop || 0)) : window.innerHeight;
+        const cx = Math.min(window.innerWidth - 1, Math.max(0, b.left + b.width / 2));
+        const barAt = (y) => {
+            let h = document.elementFromPoint(cx, y);
+            while (h && h !== document.body && h !== document.documentElement) {
+                const pos = getComputedStyle(h).position;
+                if ((pos === 'fixed' || pos === 'sticky') && !h.contains(el)) {
+                    const r = h.getBoundingClientRect();
+                    return r.height > 0 && r.height < vh / 2 ? r : null;
+                }
+                h = h.parentElement;
+            }
+            return null;
+        };
+        const top = barAt(1), bot = barAt(vh - 2);
+        const lo = (top && top.bottom < vh / 2 ? top.bottom : 0) + margin;
+        const hi = (bot && bot.top > vh / 2 ? bot.top : vh) - margin;
+        let dy = 0;
+        if (b.bottom > hi) dy = b.bottom - hi;
+        if (b.top - dy < lo) dy = b.top - lo;
+        if (Math.abs(dy) < 0.5) return;
+        let sc = el.parentElement;
+        while (sc && sc !== document.body && sc !== document.documentElement) {
+            const cs = getComputedStyle(sc);
+            if (/(auto|scroll)/.test(cs.overflowY) && sc.scrollHeight > sc.clientHeight + 1) break;
+            sc = sc.parentElement;
+        }
+        if (sc && sc !== document.body && sc !== document.documentElement) sc.scrollTop += dy;
+        else window.scrollBy(0, dy);
+    };
+    once();
+    requestAnimationFrame(once);
+    setTimeout(once, 160);
+    setTimeout(once, 420);
+}
+
 /** A count-by row swipes sideways inside its cell on a phone; a box that takes focus scrolls into view so no gap is missed. */
 function wireSwipeRows(cellEl) {
     cellEl.querySelectorAll('[data-mq-swiperow]').forEach((w) => {
@@ -1681,9 +1729,12 @@ function wireSwipeRows(cellEl) {
             // so a fresh load and a resize to the same width balance the same way
             const rootEl = frame.closest('.k2-countrow') || frame.parentElement;
             const rs = getComputedStyle(rootEl);
-            const room = rootEl.clientWidth - (parseFloat(rs.paddingLeft) || 0) - (parseFloat(rs.paddingRight) || 0);
+            // (the block's fractional width, not clientWidth's rounded one: a line that needs 440.95 px of a 440.81 px block
+            // takes one number fewer, so the balance never asks for more than a line holds - 5 + 5 + 2 at 520 px, round 5)
+            const room = rootEl.getBoundingClientRect().width - (parseFloat(rs.paddingLeft) || 0) - (parseFloat(rs.paddingRight) || 0)
+                - (parseFloat(rs.borderLeftWidth) || 0) - (parseFloat(rs.borderRightWidth) || 0);
             const pad = parseFloat(getComputedStyle(ln).paddingLeft) || 0;
-            const k = Math.max(1, Math.floor((room - pad + gap + 0.5) / pitch));
+            const k = Math.max(1, Math.floor((room - pad + gap + 0.01) / pitch));
             // critic r9 E1 (TY-10a, SL-3a): never more than half the row on a screen line (12 -> 6 + 6, 15 -> 5 + 5 + 5)
             const half = its.length >= 13 ? 5 : Math.ceil(its.length / 2);
             const lines = Math.max(Math.ceil(its.length / Math.min(k, half)), 1);
@@ -1804,6 +1855,8 @@ function wireSwipeRows(cellEl) {
             };
             if (!first) w.dataset.mqMoved = '1';
             w.dataset.mqFocused = '1';
+            // critic r11 G3: the pupil's own move (a tap, Tab, a step from another box) shows the whole box, clear of the pinned bars
+            if (user) revealBox(t);
             // a box the pupil TAPPED is in view already: the row does not move under the finger
             if (tapped) { const v0 = w.getBoundingClientRect(), r0 = t.getBoundingClientRect(); if (r0.left >= v0.left - 0.5 && r0.right <= v0.right + 0.5) { upd(); return; } }
             const progFirst = first && !user;
@@ -1925,12 +1978,13 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
                 const nx = nextEmpty;
                 nx.focus({ preventScroll: true });
                 try { nx.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (err) { /* ignore */ }   // a box 1 px under the fold too
+                revealBox(nx);   // critic r11 G3: wholly in view, clear of the sticky Check bar and the quiz footer
                 return;
             }
             if (e.key === 'Enter') {
                 e.preventDefault();
                 const next = boxes[k + 1];
-                if (next && !next.value) next.focus();
+                if (next && !next.value) { next.focus(); if (join.trim() === ',') revealBox(next); }
                 else if (onChange) onChange(compose());
                 else input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
             }
@@ -3082,14 +3136,16 @@ export function cellDigitTarget(cellEl) {
 /**
  * A count-by row drawn again for the screen it is shown on. Critic r7 O9 / r8: on every screen the row is drawn as one wrapping
  * line at the host's digit size (`twinWrap`, count-row.js), balanced by wireSwipeRows, instead of shrinking under TY-10a or
- * swiping. Owner ruling 2026-10-17: count rows wrap on the phone at the host digit size (`twinPhone`: 29 px); they no longer
+ * swiping. Owner ruling 2026-10-17: count rows wrap on the phone at 29 px (set in CSS, screen-cell.css); they no longer
  * swipe or shrink (this replaced the TY-10b phone swipe and its 24 px gap cap). Any other item comes back as it is.
  */
 export function countRowTwin(q) {
     if (!q || !q.cell || q.cell.template !== 'count-row' || !q.cell.payload || typeof window === 'undefined'
         || !/class="k2-twin"/.test(String(q.visual || ''))) return q;
-    const phone = window.innerWidth <= 480;
-    try { return Object.assign({}, q, { visual: k2Twin('count-row', Object.assign({}, q.cell.payload, { twinWrap: true, twinWrapAll: true }, phone ? { twinPhone: true } : {})) }); } catch (e) { return q; /* keep the stored twin */ }
+    // critic r11 G4: the drawing no longer depends on the window's width when it is made. The phone's 29 px digits are
+    // chosen by CSS (--mq-crow-cap at 540 px and under, screen-cell.css), so a turn of the
+    // device re-chooses them at once, with every typed answer and the focus kept; the ResizeObserver in wireSwipeRows re-balances
+    try { return Object.assign({}, q, { visual: k2Twin('count-row', Object.assign({}, q.cell.payload, { twinWrap: true, twinWrapAll: true })) }); } catch (e) { return q; /* keep the stored twin */ }
 }
 
 export function screenTwin(q, { categoryId = '', typedOrder = false } = {}) {

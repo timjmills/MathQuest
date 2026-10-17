@@ -10,7 +10,13 @@
 // row at 29 px, card heights even (tallest / shortest <= 1.35) and no card with a vertical empty band of 30 % or more.
 // Owner ruling 2026-10-17: at 480 px and below (390, 360, 430) every row wraps the same way at the phone's 29 px on every host
 // (at least 2 to a line there), with no swipe and no cue; it replaced the TY-10b phone swipe that PHONE_PIN used to pin.
-// Every row: the jump arrow's ink stands >= 1.0 mm (at the row's own scale) clear of the numbers beside it (SL-3a, critic r10 F1).
+// Every row: the jump arrow's INK stands >= 1.0 mm (at the row's own scale) clear of the ink of the numbers and boxes beside it
+// (SL-3a, critic r10 F1, r11 G2), measured on rendered pixels at 3x as critic-r11/ink.cjs does: one shot with the arrows hidden,
+// one with them shown; arrow ink is what is dark only in the second, number and box ink what is dark in the first.
+// Critic r11 G1/G5: the phone's allowance is a FIXED constant, at least 2 numbers to a line at 360 px and up (never derived from
+// the build's own geometry); both the left and the right empty band are under 30 %; the mixed sheet runs on the phone too.
+// Critic r11 G4: at 481-540 px (the card and the quiz) a 1,000,000 row stands at least 2 a line; a turn of the device
+// (390x844 <-> 844x390) draws the row as a fresh load at the new size does, keeping the typed answer and the focus.
 // Run: node tests/scripts/small-fixes-countrow-wide.cjs   (SHOTS=<dir> saves screenshots; SIZES=1366,390 limits the viewports;
 // the phone measures are no longer pinned)
 const path = require('path');
@@ -18,7 +24,7 @@ const { open } = require('../lib/ws-harness.cjs');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let fails = 0;
 const check = (ok, msg) => { console.log((ok ? 'PASS ' : 'FAIL ') + msg); if (!ok) fails++; };
-const SIZES = [{ width: 1366, height: 650 }, { width: 1280, height: 600 }, { width: 820, height: 1180 }, { width: 768, height: 1024 }, { width: 430, height: 932 }, { width: 390, height: 844 }, { width: 360, height: 780 }].filter((v) => !process.env.SIZES || process.env.SIZES.split(',').map(Number).includes(v.width));
+const SIZES = [{ width: 1366, height: 650 }, { width: 1280, height: 600 }, { width: 820, height: 1180 }, { width: 768, height: 1024 }, { width: 520, height: 900 }, { width: 430, height: 932 }, { width: 390, height: 844 }, { width: 360, height: 780 }].filter((v) => !process.env.SIZES || process.env.SIZES.split(',').map(Number).includes(v.width));
 const WIDE = { rows: [{ step: 100000, start: 'custom', at: 1000000 }] };
 const ROWS = {
   '100000': WIDE,
@@ -32,6 +38,76 @@ const ROWS = {
 const MIXED = { rows: [{ step: 5 }, { step: 100000, start: 'custom', at: 1000000 }, { step: 25000 }] };
 const HOST_PX = { worksheet: 29, card: 40, quiz: 40 };
 const SHOTS = process.env.SHOTS || '';
+// critic r11 G1/G5: at 360 px and up a phone line holds at least two numbers - a constant, not the build's own geometry
+const PHONE_MIN_PER_LINE = 2;
+const NARROW = 540;   // at 540 px and under every host draws a count row at 29 px (owner ruling 2026-10-17, critic r11 G4)
+
+// critic r11 G2: the jump arrows' ink clearance, on pixels (port of critic-r11/ink.cjs): the smallest gap, in mm at the row's
+// own scale, between an arrow's ink and the ink (digits, box borders, write-on lines) on either side of it on its line
+async function inkClear(page, root, vp) {
+  const touch = vp.width <= 480;
+  await page.setViewport({ ...vp, deviceScaleFactor: 3, isMobile: touch, hasTouch: touch });
+  await sleep(500);
+  await page.evaluate(() => { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); });
+  await sleep(150);
+  const info = await page.evaluate((root) => {
+    const r = document.querySelector(root); const body = r.querySelector('.k2-countrow-body');
+    const probe = document.createElement('div'); probe.style.cssText = 'position:absolute;width:var(--mq-k2);height:1px;visibility:hidden;'; body.appendChild(probe);
+    const mmPx = probe.getBoundingClientRect().width; probe.remove();
+    const pg = (b) => ({ l: b.left + scrollX, r: b.right + scrollX, t: b.top + scrollY, b: b.bottom + scrollY });
+    const num = (el) => (el.classList.contains('k2-jumpcell') ? [...el.children].find((c) => !c.classList.contains('k2-jump')) || el : el);
+    const arrows = [];
+    body.querySelectorAll('.k2-jumpcell').forEach((jc) => {
+      const j = jc.querySelector('.k2-jump'); const prev = jc.previousElementSibling; if (!j || !prev) return;
+      const pn = num(prev), kid = num(jc);
+      if (Math.abs(pn.getBoundingClientRect().top - kid.getBoundingClientRect().top) > 8) return;
+      // the arrow's own drawing (its shaft and head), so nothing else that changes between the shots is read as arrow ink
+      const sh = [...j.querySelectorAll('path, polygon')].map((e) => e.getBoundingClientRect());
+      const ab = { left: Math.min(...sh.map((b) => b.left)), right: Math.max(...sh.map((b) => b.right)) };
+      arrows.push({ j: pg(ab), p: pg(pn.getBoundingClientRect()), n: pg(kid.getBoundingClientRect()) });
+    });
+    const bb = body.getBoundingClientRect();
+    return { mmPx, arrows, clip: { x: Math.max(0, Math.floor(bb.left + scrollX - 40)), y: Math.max(0, Math.floor(bb.top + scrollY - 4)), width: Math.ceil(bb.width + 80), height: Math.ceil(bb.height + 8) } };
+  }, root);
+  let res = { min: 99, arrows: info.arrows.length, noInk: 0 };
+  if (info.arrows.length) {
+    // the pulsing next box and any transition are stilled for both shots (they would differ between them and read as arrow ink)
+    const still = await page.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important;outline:none!important}' });
+    // a bar pinned over the page (the quiz footer, the Check bar) is hidden for the shots, so it never covers the row
+    await page.evaluate(() => { document.querySelectorAll('body *').forEach((e) => { const p = getComputedStyle(e).position; if ((p === 'sticky' || p === 'fixed') && !e.querySelector('.k2-countrow-body') && !e.closest('.k2-countrow-body')) { e.dataset.inkHid = e.style.visibility || '-'; e.style.visibility = 'hidden'; } }); });
+    await sleep(120);
+    const tag = await page.addStyleTag({ content: '.k2-jump{visibility:hidden!important}' });
+    await sleep(120);
+    const A = await page.screenshot({ encoding: 'base64', clip: info.clip, captureBeyondViewport: true });
+    await tag.evaluate((t) => t.remove());
+    await sleep(120);
+    const Bs = await page.screenshot({ encoding: 'base64', clip: info.clip, captureBeyondViewport: true });
+    await still.evaluate((t) => t.remove());
+    await page.evaluate(() => document.querySelectorAll('[data-ink-hid]').forEach((e) => { e.style.visibility = e.dataset.inkHid === '-' ? '' : e.dataset.inkHid; delete e.dataset.inkHid; }));
+    res = await page.evaluate(async (A, B, info) => {
+      const DSF = 3;
+      const load = (b64) => new Promise((ok) => { const im = new Image(); im.onload = () => { const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; const x = c.getContext('2d'); x.drawImage(im, 0, 0); ok({ w: im.width, h: im.height, d: x.getImageData(0, 0, im.width, im.height).data }); }; im.src = 'data:image/png;base64,' + b64; });
+      const a = await load(A), b = await load(B);
+      const dark = (img, x, y) => { if (x < 0 || y < 0 || x >= img.w || y >= img.h) return false; const i = (y * img.w + x) * 4; return (img.d[i] * 0.3 + img.d[i + 1] * 0.59 + img.d[i + 2] * 0.11) < 110; };
+      const X = (v) => (v - info.clip.x) * DSF, Y = (v) => (v - info.clip.y) * DSF;
+      let min = 99, noInk = 0;
+      for (const ar of info.arrows) {
+        const x0 = Math.floor(X(ar.j.l - 1)), x1 = Math.ceil(X(ar.j.r + 1)), y0 = Math.floor(Y(Math.min(ar.p.t, ar.n.t))), y1 = Math.ceil(Y(Math.max(ar.p.b, ar.n.b)));
+        let L = 1e9, R = -1;
+        for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) if (dark(b, x, y) && !dark(a, x, y)) { L = Math.min(L, x); R = Math.max(R, x); }
+        if (R < 0) { noInk++; continue; }
+        let pr = -1e9, nl = 1e9;
+        const lx0 = Math.floor(X(ar.p.l - 2)), rx1 = Math.ceil(X(ar.n.r + 2));
+        for (let y = y0; y < y1; y++) { for (let x = lx0; x < L; x++) if (dark(a, x, y)) pr = Math.max(pr, x); for (let x = R + 1; x < rx1; x++) if (dark(a, x, y)) { nl = Math.min(nl, x); break; } }
+        min = Math.min(min, (L - pr - 1) / DSF / info.mmPx, (nl - R - 1) / DSF / info.mmPx);
+      }
+      return { min: Math.round(min * 100) / 100, arrows: info.arrows.length, noInk };
+    }, A, Bs, info);
+  }
+  await page.setViewport({ ...vp, deviceScaleFactor: 1, isMobile: touch, hasTouch: touch });
+  await sleep(400);
+  return res;
+}
 
 
 async function mount(page, host, opts, seed, count) {
@@ -80,50 +156,24 @@ async function measure(page, root, host, qi) {
     nums.forEach((b) => { const ln = lines.find((l) => Math.abs(l.top - b.top) < 8); if (ln) ln.items.push(b); else lines.push({ top: b.top, items: [b] }); });
     const perLine = lines.map((l) => l.items.length);
     const cell = body ? body.closest('.mq-scell') : null;
-    let band = 1;
+    let band = 1, bandL = 1;
     if (cell && nums.length) {
       const cr = cell.getBoundingClientRect(), cs = getComputedStyle(cell);
       const left = cr.left + parseFloat(cs.paddingLeft) + parseFloat(cs.borderLeftWidth), right = cr.right - parseFloat(cs.paddingRight) - parseFloat(cs.borderRightWidth);
       band = (right - Math.max(...nums.map((b) => b.right))) / Math.max(1, right - left);
+      bandL = (Math.min(...nums.map((b) => b.left)) - left) / Math.max(1, right - left);
     }
     return { n: ins.length, widest, fit, inW: ins.map((e) => Math.round(e.getBoundingClientRect().width)),
       givenPx: givens.length ? Math.min(...givens.map(fz)) : 0, inputPx: ins.length ? Math.min(...ins.map(fz)) : 0,
       maxPx: Math.max(0, ...givens.concat(ins).map(fz)),
-      cue, swipeOver: sw ? sw.scrollWidth - sw.clientWidth : 0, perLine, band: Math.round(band * 1000) / 10,
+      cue, swipeOver: sw ? sw.scrollWidth - sw.clientWidth : 0, perLine, band: Math.round(band * 1000) / 10, bandL: Math.round(bandL * 1000) / 10,
       cellW: cell ? Math.round(cell.getBoundingClientRect().width) : 0,
-      // whether two numbers can stand on one line of this cell at all (the room of the count row's block)
-      twoFit: (() => {
-        const ln = r.querySelector('.k2-countrow-line [data-mq-wrapped]'); const rt = r.querySelector('.k2-countrow');
-        if (!ln || !rt || !ln.children[0]) return true;
-        const rs = getComputedStyle(rt), ls = getComputedStyle(ln);
-        const room = rt.clientWidth - parseFloat(rs.paddingLeft) - parseFloat(rs.paddingRight);
-        return parseFloat(ls.paddingLeft) + 2 * ln.children[0].getBoundingClientRect().width + parseFloat(ls.columnGap) <= room + 0.5;
-      })(),
-      clearMm: (() => {
-        // the jump arrow's ink against the numbers beside it, in mm at the row's own scale (its gap is WRAP_GAP = 4.2 mm wide)
-        let min = 99;
-        const ink = (el) => { const g = el.querySelector('.k2-given'); if (g && g.firstChild) { const rg = document.createRange(); rg.selectNodeContents(g); return rg.getBoundingClientRect(); } return el.getBoundingClientRect(); };
-        r.querySelectorAll('.k2-countrow-body .k2-jumpcell').forEach((jc) => {
-          const j = jc.querySelector('.k2-jump'); const prev = jc.previousElementSibling;
-          if (!j || !prev) return;
-          const sh = [...j.querySelectorAll('path, polygon')].map((e) => e.getBoundingClientRect());
-          if (!sh.length) return;
-          const L = Math.min(...sh.map((b) => b.left)), R = Math.max(...sh.map((b) => b.right));
-          const mmPx = j.getBoundingClientRect().width / 4.2;
-          const num = (el) => (el.classList.contains('k2-jumpcell') ? [...el.children].find((c) => !c.classList.contains('k2-jump')) || el : el);
-          const pn = num(prev), kid = num(jc);
-          if (Math.abs(pn.getBoundingClientRect().top - kid.getBoundingClientRect().top) > 8) return;   // a new line starts here
-          const a = ink(pn), b = ink(kid);
-          min = Math.min(min, (L - a.right) / mmPx, (b.left - R) / mmPx);
-        });
-        return Math.round(min * 100) / 100;
-      })(),
       pageScroll: document.documentElement.scrollWidth - window.innerWidth };
   }, root, host, qi);
 }
 
-async function boot(vp) {
-  const phone = vp.width <= 480;
+async function boot(vp, touch) {
+  const phone = touch === undefined ? vp.width <= 480 : touch;
   const app = await open({ viewport: { ...vp, deviceScaleFactor: 1, isMobile: phone, hasTouch: phone } });
   const { page } = app;
   const errs = [];
@@ -148,7 +198,7 @@ const dismiss = (page) => page.evaluate(() => { const d = document.getElementByI
           await sleep(1200); await dismiss(page); await sleep(300);
           const root = host === 'quiz' ? '#quizTakeView' : host === 'card' ? '#questionCard' : '#ws_card_0';
           const m = await measure(page, root, host, 0);
-          console.log(`  ${tag} widest ${m.widest} givens ${m.givenPx}px inputs ${m.inputPx}px boxes ${Math.min(...m.inW)}-${Math.max(...m.inW)}px cell ${m.cellW}px per line ${m.perLine.join('+')} band ${m.band}% cue ${m.cue} swipeOver ${m.swipeOver} pageScroll ${m.pageScroll}`);
+          console.log(`  ${tag} widest ${m.widest} givens ${m.givenPx}px inputs ${m.inputPx}px boxes ${Math.min(...m.inW)}-${Math.max(...m.inW)}px cell ${m.cellW}px per line ${m.perLine.join('+')} bands ${m.bandL}/${m.band}% cue ${m.cue} swipeOver ${m.swipeOver} pageScroll ${m.pageScroll}`);
           if (SHOTS && !phone && (rk === '100000' || (rk === '100000-lines' && host !== 'worksheet') || (rk === 'by5' && host === 'card'))) {
             const el = await page.$(root);
             await el.evaluate((e) => e.scrollIntoView({ block: 'start' }));
@@ -161,20 +211,20 @@ const dismiss = (page) => page.evaluate(() => { const d = document.getElementByI
           }
           check(m.n >= 2, `${tag} ${m.n} answer boxes`);
           {
-            const px = phone ? 29 : HOST_PX[host];
+            const px = vp.width <= NARROW ? 29 : HOST_PX[host];
             const tot = m.perLine.reduce((x, y) => x + y, 0);
             const half = tot >= 13 ? 5 : Math.ceil(tot / 2);
             check(m.givenPx >= px - 0.5 && m.inputPx >= px - 0.5 && m.maxPx <= px + 0.5, `${tag} givens ${m.givenPx}px and inputs ${m.inputPx}px at the host's ${px}px`);
             check(m.fit.every(Boolean), `${tag} every box holds "${m.widest}" (${m.fit.filter((f) => !f).length} too narrow)`);
-            // a phone line takes 2 or more; only where two of the widest boxes cannot stand on one line at 29 px (1,000,000 at 360)
-            // does it take one, centred, under the same band rule
-            const minPer = phone ? (m.twoFit ? 2 : 1) : 3;
-            check(Math.min(...m.perLine) >= minPer, `${tag} at least ${minPer} numbers to every line (${m.perLine.join('+')}${m.twoFit ? '' : '; two do not fit at 29 px'})`);
+            // critic r11 G1/G5: a phone line (and a 481-540 px line) takes 2 or more, a fixed allowance; 3 or more above
+            const minPer = vp.width <= NARROW ? PHONE_MIN_PER_LINE : 3;
+            check(Math.min(...m.perLine) >= minPer, `${tag} at least ${minPer} numbers to every line (${m.perLine.join('+')})`);
             check(Math.max(...m.perLine) - Math.min(...m.perLine) <= 1, `${tag} balanced lines (${m.perLine.join('+')})`);
-            check(m.band < 30, `${tag} right-hand empty band ${m.band}% < 30%`);
+            check(m.band < 30 && m.bandL < 30, `${tag} empty bands left ${m.bandL}% and right ${m.band}% < 30%`);
             check(Math.max(...m.perLine) <= half, `${tag} no screen line holds more than half the row (${m.perLine.join('+')}, at most ${half}) (TY-10a, SL-3a)`);
             check(!m.cue && m.swipeOver <= 1, `${tag} no swipe (cue ${m.cue}, overflow ${m.swipeOver}px)`);
-            check(m.clearMm >= 1.0, `${tag} jump arrows >= 1.0 mm clear of the numbers (${m.clearMm} mm)`);
+            const ink = await inkClear(page, root, vp);
+            check(ink.noInk === 0 && ink.min >= 1.0, `${tag} jump arrows' ink >= 1.0 mm clear of the numbers' and boxes' ink (${ink.min} mm, ${ink.arrows} arrows)`);
           }
           check(m.pageScroll <= 0, `${tag} the page never scrolls sideways (${m.pageScroll}px)`);
           check(errs.length === 0, `${tag} no page errors ${errs.join(' ')}`);
@@ -183,8 +233,7 @@ const dismiss = (page) => page.evaluate(() => { const d = document.getElementByI
         } finally { if (app) await app.close(); }
       }
     }
-    if (phone) continue;
-    // D2: a worksheet that mixes rows
+    // D2: a worksheet that mixes rows (critic r11 G5: on the phone too)
     const tag = `[${vp.width}x${vp.height} worksheet mixed]`;
     let app;
     try {
@@ -198,20 +247,24 @@ const dismiss = (page) => page.evaluate(() => { const d = document.getElementByI
         const cr = cell.getBoundingClientRect();
         const kids = [...cell.children].filter((k) => getComputedStyle(k).display !== 'none').map((k) => k.getBoundingClientRect()).filter((b) => b.height > 0);
         const content = kids.length ? Math.max(...kids.map((k) => k.bottom)) - Math.min(...kids.map((k) => k.top)) : 0;
-        return { w: Math.round(c.getBoundingClientRect().width), h: Math.round(c.getBoundingClientRect().height), vband: Math.round((1 - content / Math.max(1, cr.height)) * 1000) / 10 };
+        return { x: Math.round(c.getBoundingClientRect().left), w: Math.round(c.getBoundingClientRect().width), h: Math.round(c.getBoundingClientRect().height), vband: Math.round((1 - content / Math.max(1, cr.height)) * 1000) / 10 };
       }));
       console.log(`  ${tag} cards ${cards.map((c) => `${c.w}x${c.h} (v-band ${c.vband}%)`).join(', ')}`);
-      ms.forEach((m, i) => console.log(`  ${tag} #${i} givens ${m.givenPx}px inputs ${m.inputPx}px per line ${m.perLine.join('+')} band ${m.band}% cue ${m.cue}`));
+      ms.forEach((m, i) => console.log(`  ${tag} #${i} givens ${m.givenPx}px inputs ${m.inputPx}px per line ${m.perLine.join('+')} bands ${m.bandL}/${m.band}% cue ${m.cue}`));
       if (SHOTS) {
         await page.evaluate(() => document.getElementById('ws_card_0').scrollIntoView({ block: 'start' }));
         await page.screenshot({ path: path.join(SHOTS, `screen-${vp.width}-worksheet-mixed.png`), fullPage: true });
       }
       const ws = cards.map((c) => c.w), hs = cards.map((c) => c.h);
       check(cards.length === 6 && Math.max(...ws) - Math.min(...ws) <= 1, `${tag} every card the same width (${ws.join(', ')})`);
-      check(Math.max(...hs) / Math.min(...hs) <= 1.35, `${tag} card heights even (${hs.join(', ')})`);
+      // one column (a phone): the cards stand one under another and each is as tall as its own row, so heights cannot be uneven
+      const oneCol = new Set(cards.map((c) => c.x)).size === 1;
+      check(oneCol || Math.max(...hs) / Math.min(...hs) <= 1.35, `${tag} card heights even (${hs.join(', ')}${oneCol ? '; one column' : ''})`);
       check(cards.every((c) => c.vband < 30), `${tag} no card stretched with a vertical empty band >= 30% (${cards.map((c) => c.vband).join(', ')})`);
       check(ms.every((m) => Math.abs(m.givenPx - 29) <= 0.5 && Math.abs(m.inputPx - 29) <= 0.5 && m.maxPx <= 29.5), `${tag} every row at 29 px (${ms.map((m) => m.inputPx).join(', ')})`);
-      check(ms.every((m) => Math.min(...m.perLine) >= 3 && m.band < 30 && !m.cue && m.swipeOver <= 1), `${tag} every row 3+ to a line, band < 30%, no swipe`);
+      const mper = vp.width <= NARROW ? PHONE_MIN_PER_LINE : 3;
+      check(ms.every((m) => Math.min(...m.perLine) >= mper && m.band < 30 && m.bandL < 30 && !m.cue && m.swipeOver <= 1), `${tag} every row ${mper}+ to a line, bands < 30%, no swipe (${ms.map((m) => `${m.perLine.join('+')} ${m.bandL}/${m.band}%`).join(', ')})`);
+      check(ms.every((m) => m.pageScroll <= 0), `${tag} the page never scrolls sideways`);
       check(ms.every((m) => Math.max(...m.perLine) <= 6), `${tag} no line holds more than half a row (${ms.map((m) => m.perLine.join('+')).join(', ')})`);
       check(errs.length === 0, `${tag} no page errors ${errs.join(' ')}`);
     } catch (e) {
@@ -232,6 +285,37 @@ const dismiss = (page) => page.evaluate(() => { const d = document.getElementByI
       for (const [vw, vh] of path0) { await page.setViewport({ width: vw, height: vh, deviceScaleFactor: 1, isMobile: w0 <= 480, hasTouch: w0 <= 480 }); await sleep(700); }
       const m1 = await measure(page, root, host, 0);
       check(m0.perLine.join('+') === m1.perLine.join('+'), `${tag} ${m0.perLine.join('+')} on load, ${m1.perLine.join('+')} after resizing back`);
+    } catch (e) { check(false, `${tag} ${e.message}`); } finally { if (app) await app.close(); }
+  }
+  // critic r11 G4: a turn of the device re-chooses the drawing (no reload), as a fresh load at the new size draws it, and keeps
+  // the typed answer and the focus
+  const fresh = {};
+  for (const [a0, a1] of [[{ width: 390, height: 844 }, { width: 844, height: 390 }], [{ width: 844, height: 390 }, { width: 390, height: 844 }]]) for (const host of ['card', 'quiz', 'worksheet']) {
+    if (process.env.SIZES && !process.env.SIZES.split(',').includes(String(a0.width))) break;
+    const tag = `[${a0.width}x${a0.height} -> ${a1.width}x${a1.height} ${host} 100000 rotate]`;
+    const root = host === 'quiz' ? '#quizTakeView' : host === 'card' ? '#questionCard' : '#ws_card_0';
+    let app;
+    try {
+      const key = `${a1.width}:${host}`;
+      if (!fresh[key]) {
+        const b = await boot(a1, true); app = b.app;
+        await mount(b.page, host, WIDE, 11); await sleep(1200); await dismiss(b.page); await sleep(300);
+        fresh[key] = await measure(b.page, root, host, 0);
+        await app.close(); app = null;
+      }
+      const b = await boot(a0, true); app = b.app; const { page, errs } = b;
+      await mount(page, host, WIDE, 11); await sleep(1200); await dismiss(page); await sleep(300);
+      await page.evaluate((root) => { const i = document.querySelector(root).querySelector('.k2-countrow-body input.mq-cellslot:not(.mq-cellslot-host)'); i.setAttribute('data-rot', '1'); i.focus(); }, root);
+      await page.keyboard.type('123', { delay: 30 });
+      await page.setViewport({ ...a1, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
+      await sleep(1200);
+      // (read before measure(), which types the widest answer into every box to test its fit and then clears them)
+      const kept = await page.evaluate(() => { const i = document.querySelector('[data-rot="1"]'); return { v: i ? i.value : null, focus: document.activeElement === i }; });
+      const m = await measure(page, root, host, 0);
+      const f = fresh[key];
+      check(m.perLine.join('+') === f.perLine.join('+') && Math.abs(m.givenPx - f.givenPx) < 0.5, `${tag} ${m.perLine.join('+')} at ${m.givenPx}px, as a fresh load (${f.perLine.join('+')} at ${f.givenPx}px)`);
+      check(kept.v === '123' && kept.focus, `${tag} the typed answer and the focus are kept (${JSON.stringify(kept)})`);
+      check(m.pageScroll <= 0 && !m.cue && errs.length === 0, `${tag} no page scroll, no cue, no page errors ${errs.join(' ')}`);
     } catch (e) { check(false, `${tag} ${e.message}`); } finally { if (app) await app.close(); }
   }
     console.log(fails ? `small-fixes-countrow-wide: FAIL (${fails})` : 'small-fixes-countrow-wide: OK');

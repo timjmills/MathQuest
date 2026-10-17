@@ -4,13 +4,20 @@
 //   - Space, a comma, Enter or Tab after a number moves on, and the row says so under it (a tap, on a touch screen);
 //   - a box takes as many digits as the row's WIDEST number (the same for every box); a digit typed past that goes on to the
 //     next box, never lost - so a row of same-length numbers typed straight on still lands one number per box.
+// Critic r11 G3: at 360x780 and 844x390 too (touch), and with rows of 1,000,000 (Boxes and Lines): after Space the focused box
+// lies WHOLLY in the viewport and is not covered (by the sticky Check bar, the quiz footer or the page's edge), with the last
+// box still in view after its number is typed.
 // Run: node tests/scripts/small-fixes-countrow-caret.cjs     (SIZES=1366,390 to limit the viewports)
 const { open } = require('../lib/ws-harness.cjs');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let fails = 0;
 const check = (ok, msg) => { console.log((ok ? 'PASS ' : 'FAIL ') + msg); if (!ok) fails++; };
 
-const SIZES = [{ width: 1366, height: 650 }, { width: 1280, height: 600 }, { width: 390, height: 844 }];
+const SIZES = [{ width: 1366, height: 650 }, { width: 1280, height: 600 }, { width: 390, height: 844 }, { width: 360, height: 780 }, { width: 844, height: 390 }];
+const WIDE = { rows: [{ step: 100000, start: 'custom', at: 1000000 }] };
+// the tall rows that put a box under the fold (critic r11 G3), at the sizes where they do
+const TALL = { wide: WIDE, widelines: Object.assign({ spaces: 'line' }, WIDE), by25000: { rows: [{ step: 25000 }] } };
+const TALL_AT = [390, 360, 844];
 const ONLY = process.env.SIZES ? process.env.SIZES.split(',').map(Number) : null;
 const ROWS = {
   default: null,
@@ -71,15 +78,23 @@ async function tapFirst(page, touch) {
   if (touch) await b0.tap(); else await b0.click();
   await sleep(150);
 }
+// the box with focus is box i, lies wholly inside the viewport and is the element at its corners and centre (nothing over it)
+const clearInView = (page, i) => page.evaluate((i) => {
+  const el = document.activeElement; const b = el.getBoundingClientRect();
+  const pts = [[b.left + 3, b.top + 3], [b.right - 3, b.top + 3], [b.left + 3, b.bottom - 3], [b.right - 3, b.bottom - 3], [b.left + b.width / 2, b.top + b.height / 2]];
+  const hit = pts.every(([x, y]) => { const h = document.elementFromPoint(x, y); return !!h && (h === el || el.contains(h) || h.contains(el)); });
+  const focus = !!el && el.getAttribute('data-t') === String(i);
+  return { ok: focus && hit && b.top >= 0 && b.bottom <= innerHeight && b.left >= 0 && b.right <= innerWidth, focus, hit, top: Math.round(b.top), bottom: Math.round(b.bottom), vh: innerHeight };
+}, i);
 const boxVals = (page) => page.evaluate(() => [...document.querySelectorAll('[data-t]')].map((e) => e.value));
 const active = (page) => page.evaluate(() => Number((document.activeElement && document.activeElement.getAttribute('data-t')) ?? -1));
 
 (async () => {
   for (const vp of SIZES) {
     if (ONLY && !ONLY.includes(vp.width)) continue;
-    const touch = vp.width < 480;
+    const touch = vp.width < 480 || vp.height < 480;
     for (const host of ['quiz', 'card', 'worksheet']) {
-      for (const [rk, opts] of Object.entries(ROWS)) {
+      for (const [rk, opts] of Object.entries(Object.assign({}, ROWS, TALL_AT.includes(vp.width) ? TALL : {}))) {
         const app = await open({ viewport: { ...vp, deviceScaleFactor: 1, isMobile: touch, hasTouch: touch } });
         const { page } = app;
         const errs = [];
@@ -102,17 +117,39 @@ const active = (page) => page.evaluate(() => Number((document.activeElement && d
             }
             const got = (await boxVals(page)).map(digits);
             check(JSON.stringify(got) === JSON.stringify(exp), `${tag} tap + type: ${got.join('|')} (want ${exp.join('|')})`);
+            // critic r11 G3: the pupil's Space path on touch - every next box comes wholly into view, clear of the pinned bars
+            info = await setup(app, host, opts, vp);
+            await tapFirst(page, true);
+            const bad = [];
+            for (let i = 0; i < exp.length; i++) {
+              if (i) {
+                await page.keyboard.press('Space'); await sleep(500);
+                const f = await clearInView(page, i);
+                if (!f.ok) bad.push(Object.assign({ i }, f));
+              }
+              await page.keyboard.type(exp[i], { delay: 20 });
+            }
+            await sleep(500);
+            const last = await clearInView(page, exp.length - 1);
+            const got2 = (await boxVals(page)).map(digits);
+            check(JSON.stringify(got2) === JSON.stringify(exp), `${tag} Space path: ${got2.join('|')}`);
+            check(!bad.length, `${tag} after each Space the next box is wholly in view and uncovered ${JSON.stringify(bad.slice(0, 3))}`);
+            check(last.ok, `${tag} the last box is still wholly in view after its number is typed ${JSON.stringify(last)}`);
             check(errs.length === 0, `${tag} no page errors ${errs.join(' ')}`);
             continue;
           }
           // A. a SLOW pupil (750 ms between keys), Space after each number: the caret never moves inside a number
           await tapFirst(page, false);
-          let moved = 0;
+          let moved = 0; const tallBad = [];
           for (let i = 0; i < exp.length; i++) {
             for (const ch of exp[i]) { await page.keyboard.type(ch); await sleep(750); if ((await active(page)) !== i && host === 'quiz') moved++; }
-            if (i < exp.length - 1) await page.keyboard.press('Space');
+            if (i < exp.length - 1) {
+              await page.keyboard.press('Space');
+              if (TALL[rk]) { await sleep(450); const f = await clearInView(page, i + 1); if (!f.ok) tallBad.push(Object.assign({ i: i + 1 }, f)); }
+            }
             await sleep(150);
           }
+          if (TALL[rk]) check(!tallBad.length, `${tag} after each Space the next box is wholly in view and uncovered ${JSON.stringify(tallBad.slice(0, 3))}`);
           let got = (await boxVals(page)).map(digits);
           check(JSON.stringify(got) === JSON.stringify(exp), `${tag} slow typing, Space after each number: ${got.join('|')} (want ${exp.join('|')})`);
           if (host === 'quiz') check(moved === 0, `${tag} the caret never moved by itself inside a number (${moved})`);

@@ -2,7 +2,7 @@
 // Owner ruling 2026-10-17 (TY-10b amended): count rows wrap on the phone at the host digit size (~29 px); they no longer swipe or
 // shrink. The assertions of the old phone swipe (window of whole columns, scroll-snap, back / forward cues, the forced-hidden first
 // box and its negative control, the TY-10a shrink of wide rows, the 2.4-2.9 box:digit ratio) are replaced by the wrap rule: every
-// number and box shows at load with the row unscrolled, no cue, digits ~29 px for every row, boxes >= 44 px touch targets.
+// number and box shows at load with the row unscrolled, no cue, digits ~29 px for every row, boxes >= 48 px touch targets (SP-10).
 //  - the cue is hidden (no row overflows its cell);
 //  - Tab through EVERY box: each is fully visible inside the swipe window and inside every clipping ancestor (the card's bottom edge too);
 //  - no box's rect is clipped vertically by any ancestor; the page never scrolls sideways.
@@ -146,8 +146,8 @@ const MEASURE = () => {
         gap, pitch, item: a.width, item2: b.width, win: v.width, firstBoxCol, digits, cols: its.length, perLine: its.filter((e) => Math.abs(e.getBoundingClientRect().top - a.top) < 8).length };
     });
     // a number too wide for six boxes shrinks under TY-10a (floor 9 pt), so the 29 px rule is checked on rows that keep their size
-    // owner ruling 2026-10-17: every row, a wide one too, is at ~29 px (no TY-10a shrink on a screen), each box a >= 44 px target
-    check(sz.fs >= 28 && sz.fs <= 30 && Math.abs(sz.bfs - sz.fs) < 0.5 && Math.min(sz.bw, sz.bh) >= 44, `${tag}: digits ${sz.fs.toFixed(1)} px (about 29), box ${Math.round(sz.bw)} x ${Math.round(sz.bh)} px (>= 44)`);
+    // owner ruling 2026-10-17: every row, a wide one too, is at ~29 px (no TY-10a shrink on a screen), each box a >= 48 px target (SP-10: digit inputs >= 48 px; critic r11 G5 restored it from 44)
+    check(sz.fs >= 28 && sz.fs <= 30 && Math.abs(sz.bfs - sz.fs) < 0.5 && Math.min(sz.bw, sz.bh) >= 48, `${tag}: digits ${sz.fs.toFixed(1)} px (about 29), box ${Math.round(sz.bw)} x ${Math.round(sz.bh)} px (>= 48)`);
     const cueFit = await page.evaluate(() => { const w = [...document.querySelectorAll('[data-mq-swiperow]')].find((x) => x.offsetParent); const c = w.querySelector('.k2-swipe-cue');
       if (!c || getComputedStyle(c).display === 'none') return { ok: true, why: 'no forward cue (the row fits)' };
       const v = w.getBoundingClientRect(), r = c.getBoundingClientRect(), fs = parseFloat(getComputedStyle(c).fontSize);
