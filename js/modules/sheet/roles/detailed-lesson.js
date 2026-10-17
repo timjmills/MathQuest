@@ -99,7 +99,7 @@ export function teacherBands(d, V, pages) {
         return esc(g.text || '');
     };
     out.T1 = [
-        { label: null, blocks: [tLine(`<b>CCSS</b> ${esc(pages.tags.ccss.join(', '))} · <b>EE</b> ${esc(pages.tags.ee.join(', '))} · <b>CRA:</b> ${esc(d.cra)} · <b>Flow:</b> ${flow} (${newCount} new routine steps)`, 'dl-flow tline')] },
+        { label: null, blocks: [tLine(`<b>CCSS</b> ${esc(pages.tags.ccss.join(', '))} · <b>EE</b> ${esc(pages.tags.ee.length ? pages.tags.ee.join(', ') : (d.eeAccess ? `none · access point ${d.eeAccess}` : 'none'))} · <b>CRA:</b> ${esc(d.cra)} · <b>Flow:</b> ${flow} (${newCount} new routine steps)`, 'dl-flow tline')] },
         { label: 'Lesson guidance:', blocks: (d.t1Boxes || []).map((b) => tBox(b.kind, b.title, esc(f(b.text)))) },
         { label: 'Lesson flow:', blocks: [tTable(['#', 'Section', 'Pupil page', 'Min'], flowRows, { widths: ['8mm', '', '45mm', '14mm'] })] },
         { label: 'Materials:', blocks: [checkList(d.materials || [])] },
@@ -117,7 +117,8 @@ export function teacherBands(d, V, pages) {
         cells: [stepMark(i + 1), `${r.critical ? `${keyIcon()} ` : ''}${esc(r.step)}`, esc(r.tag), esc(r.check)],
     }));
     // (where each mistake is caught is the table's own column - V22 10.9, critic D7)
-    const caughtOf = (m) => (m.option ? `Check Question ${m.option}` : m.caught ? f(m.caught) : '');
+    // (an option AND `caught`: both places - lesson 2 r4, critic r2 n4)
+    const caughtOf = (m) => (m.option ? `Check Question ${m.option}${m.caught ? `, ${f(m.caught)}` : ''}` : m.caught ? f(m.caught) : '');
     // (`looks` / `fix` are filled from the dealt items - critic r3 S3: an error form such as
     // {exit.0.wrong.MV9} is the provider's own wrong answer for that item, never typed)
     const mistakeRows = d.mistakes.map((m) => [`<b>${esc(m.name)}</b>`, String(m.step), esc(f(m.looks)), esc(f(m.fix)), esc(caughtOf(m))]);
@@ -146,7 +147,7 @@ export function teacherBands(d, V, pages) {
     out.T2b = [{ label: 'Reference key:', blocks: [twoCols(
         [subHead('Pages and order'), tTable(['Page', 'Tab', 'Score'], [
             ['P0', 'Prerequisite', 'one per question'], ['P1', 'Number sense', '/10'], ['P2', 'Anchor chart', 'none (a poster)'], ['P3', 'Lesson 1', d.p3Score || 'Independent cells'],
-            ['P4', 'Practice n / Mixed n', 'every cell'], ['P5', 'Word problem', '/1'], ['P6', 'Exit slip', '/4 a half'], ['T1–T5', 'Teacher n', '—'], ['T6', 'Answer Key', '—'],
+            ['P4', 'Practice n / Mixed n', 'every cell'], ['P5', 'Word problem', '/1'], ['P6', 'Exit slip', `/${(d.exit || []).length || 4} a half`], ['T1–T5', 'Teacher n', '—'], ['T6', 'Answer Key', '—'],
         ].map((r) => r.map(cellText))),
         subHead('Fade levels'), tTable(['Label', 'Means'], [['★', 'Guided: hints on, step 1 traced'], ['★★', 'Independent: hints off'], ['★★★', 'Last row: the edge cases']].map((r) => r.map(cellText))),
         subHead('Data loop'), tLoop({ most: 'Go on.', half: 'Short reteach, then go on.', fewer: 'Stop. Reteach with a concrete example.' }),
@@ -187,7 +188,7 @@ export function teacherBands(d, V, pages) {
     out.T6 = [
         { label: 'Prerequisite routing:', blocks: [tTable(['Question', 'Prerequisite (T2 atom)', 'If missed → Lesson'], pages.routing.map((r) => [cellText(r.q), cellText(r.atom), cellText(r.lesson)])
             .concat([['', '<b>Rule</b>', '0 missed: go on · 1: that lesson · 2+: the earliest']]))] },
-        { label: 'Accepted answers:', blocks: [`<ul class="dl-list">${(d.accepted || []).map((t) => `<li>${esc(t)}</li>`).join('')}</ul>`] },
+        { label: 'Accepted answers:', blocks: [`<ul class="dl-list">${(d.accepted || []).map((t) => `<li>${esc(f(t))}</li>`).join('')}</ul>`] },
         // (in runs of 4 rows, so a long table continues on the next page instead of moving whole)
         { label: 'Answers at a glance:', blocks: chunk(pages.glance, 4).map((part, i) => tTable(i ? null : ['Page', 'Answers', 'Fade'], part.map((g) => [cellText(g.page), `<span class="dl-ka" data-ka>${esc(g.answers)}</span>`, esc(g.fade)]), { widths: ['44mm', '', '14mm'] })) },
         { label: 'Wrong answers to look for when marking:', blocks: [tTable(['Pupil wrote', 'Likely mistake', 'Next step'], d.wrongAnswers.map((w) => [cellText(f(w.wrote)), `<b>${esc(w.mistake)}</b>`, cellText(f(w.next))]))] },

@@ -52,7 +52,7 @@ function measure(LIBRARY) {
     const MM = 96 / 25.4, PT = 96 / 72;
     const rgb = (c) => { const m = c && c.match(/rgba?\(([^)]+)\)/); if (!m) return null; const v = m[1].split(',').map((x) => parseFloat(x));
         if (v.length === 4 && v[3] === 0) return null; return '#' + v.slice(0, 3).map((n) => Math.round(n).toString(16).padStart(2, '0')).join(''); };
-    const PRINT_VERBS = ['Look', 'Read', 'Say', 'Count', 'Circle', 'Underline', 'Box', 'Cross out', 'Trace', 'Write', 'Draw', 'Shade', 'Mark', 'Match', 'Measure', 'Use', 'Find', 'Fill in', 'Finish', 'Check', 'Fix', 'Think', 'Start', 'Put', 'Move', 'Add', 'Subtract', 'Multiply', 'Divide', 'Solve', 'Round', 'Compare', 'Estimate', 'Regroup', 'Bring down', 'Cut', 'Sort', 'Glue', 'Color'];
+    const PRINT_VERBS = ['Look', 'Read', 'Say', 'Count', 'Circle', 'Underline', 'Box', 'Cross out', 'Trace', 'Write', 'Draw', 'Shade', 'Mark', 'Match', 'Measure', 'Use', 'Find', 'Fill in', 'Finish', 'Check', 'Fix', 'Think', 'Start', 'Put', 'Move', 'Add', 'Subtract', 'Multiply', 'Divide', 'Solve', 'Turn', 'Round', 'Compare', 'Estimate', 'Regroup', 'Bring down', 'Cut', 'Sort', 'Glue', 'Color'];
     const emojiRe = /[\p{Extended_Pictographic}\u{1F000}-\u{1FAFF}]/u, allowed = new Set(['©', '★', '®', '™']);
     const pages = [...document.querySelectorAll('body > section.ws-page')];
     const out = { fonts: { a700: document.fonts.check('700 28px Andika'), a400: document.fonts.check('400 15px Andika') }, pages: [] };
@@ -160,6 +160,13 @@ function measure(LIBRARY) {
                 skip: small, read: !!c.querySelector('[data-read], .ws-story') || !!c.closest('.dl-wppanel, .dl-wpstory'), draw: !!c.querySelector('[data-work], [data-draw]'),
                 grid: `${gridIds.get(gEl)}:${gEl.classList.contains('ws-grid') ? 'ws-grid' : ''}`, empty: !rects.length };
         });
+        // E32 (AX-3 / SF-50, lesson 2 r4 - critic r2 D4): every story's sentences, each with the number of
+        // printed lines it takes (a Range's line boxes, by their tops)
+        P.stories = teacher ? [] : [...pg.querySelectorAll('.mq-wwstory, .dl-wpstory .ws-story')].filter((s0) => !s0.closest('.dl-thumb')).map((s0) => [...s0.children].filter((x) => x.tagName === 'DIV' && !x.classList.contains('dl-ansline') && x.textContent.trim()).map((x) => {
+            // (lines = the sentence's height over its line height: a ringed number's box is not a line)
+            const cs = getComputedStyle(x), lh = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.2;
+            return { t: x.textContent.trim().slice(0, 40), n: Math.round(x.getBoundingClientRect().height / lh) };
+        }));
         P.bandHs = [...pg.querySelectorAll(':scope > .ws-body > .ws-band')].map((b) => [((b.querySelector(':scope > .ws-strip > b') || {}).textContent || '').slice(0, 14), Math.round(b.getBoundingClientRect().height / MM)]);
         P.bandLabels = [...pg.querySelectorAll('.ws-strip > b')].filter((b) => !b.closest('.dl-thumb')).map((b) => b.textContent.trim());
         P.thumbs = pg.querySelectorAll(':scope .dl-thumb').length;
@@ -225,6 +232,8 @@ function poolCheck(POOL) {
 }
 
 /* ------------------------------------------------------------------------- evaluate */
+// A + / − place's sign and numbers ("7+6" -> {op: '+', a: 7, b: 6}), else null.
+const OPI = (x) => { const m = String((x && x.item) || '').match(/^(\d+)([+−])(\d+)$/); return m ? { op: m[2], a: Number(m[1]), b: Number(m[3]) } : null; };
 function evaluate(R, pdfPages, LIB, KIT = []) {
     const pages = R.pages, rows = [];
     const row = (id, check, measured, pass) => rows.push({ id, check, measured, pass: !!pass });
@@ -322,7 +331,8 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
         for (const pgid of [...new Set(pl.map((x) => x.page))]) { const v = pl.filter((x) => x.page === pgid).map((x) => x.item); if (new Set(v).size !== v.length) probs.push(`twin answers on ${pgid}`); }
         // (and by ANSWER on every pupil page but the charts: 10 more than 19 and 30 less 1 are twins too - critic r2)
         // (a Mixed page's skills are told apart by their own form: there the twins are counted per skill)
-        for (const pgid of [...new Set(pl.filter((x) => !/^P2/.test(x.page)).map((x) => x.page))]) { const mixed = /^P4m/.test(pgid); const v = pl.filter((x) => x.page === pgid && x.ans !== undefined && x.ans !== '').map((x) => (mixed ? `${x.rep}:` : '') + String(x.ans)); const dup = v.filter((x, i) => v.indexOf(x) !== i); if (dup.length) probs.push(`twin answers ${[...new Set(dup)].join(', ')} on ${pgid}`); }
+        // (a + / − item's answer is a plain number whatever its form - a story's 12 and a fact's 12 are twins too, critic r2 D2)
+        for (const pgid of [...new Set(pl.filter((x) => !/^P2/.test(x.page)).map((x) => x.page))]) { const mixed = /^P4m/.test(pgid); const v = pl.filter((x) => x.page === pgid && x.ans !== undefined && x.ans !== '').map((x) => (mixed && !OPI(x) ? `${x.rep}:` : '') + String(x.ans)); const dup = v.filter((x, i) => v.indexOf(x) !== i); if (dup.length) probs.push(`twin answers ${[...new Set(dup)].join(', ')} on ${pgid}`); }
         // (LR-6 near twins, V22 2983 / critic r3 N1: two one-number items of one skill on a page within 2 of
         // each other - 405 and 406 - on every pupil page but the charts)
         for (const pgid of [...new Set(pl.filter((x) => !/^P2/.test(x.page)).map((x) => x.page))]) {
@@ -330,9 +340,78 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
             for (let i = 0; i < xs.length; i++) for (let j = i + 1; j < xs.length; j++)
                 if (xs[i].rep === xs[j].rep && Math.abs(Number(xs[i].item) - Number(xs[j].item)) <= 2) probs.push(`near twins ${xs[i].item} / ${xs[j].item} on ${pgid}`);
         }
-        e24b = { ok: !probs.length && prPages.length > 0, msg: probs.length ? probs.join('; ') : `${prPages.length} Practice pages: last rows all edge cases (${[...edge].length} edge numbers dealt); no twin answers and no near twins on any page` };
+        // (LR-6 for + and − items - word problems included, read from their operands; lesson 2 r4, critic r2 D2:
+        // the old check read one-number items only, so 5 + 7 / 5 + 6 in a row passed. V22 E24b: + no first
+        // addend twice in a row of a grid (a place's grid and row) nor three times running; − no number taken
+        // away twice; no near twins - the same sign, both numbers within 2 of the other's)
+        let opN = 0;
+        for (const pgid of [...new Set(pl.filter((x) => !/^P2/.test(x.page)).map((x) => x.page))]) {
+            const xs = pl.filter((x) => x.page === pgid && OPI(x)).map((x) => Object.assign({}, x, { o: OPI(x) }));
+            opN += xs.length;
+            const rows = {};
+            for (const x of xs.filter((y) => y.o.op === '+')) (rows[`${x.grid || 0}:${x.row}`] = rows[`${x.grid || 0}:${x.row}`] || []).push(x.o.a);
+            for (const [r, a] of Object.entries(rows)) { const d2 = a.filter((v, i) => a.indexOf(v) !== i); if (d2.length) probs.push(`first addend ${d2[0]} twice in a row (${r}) on ${pgid}`); }
+            const plus = xs.filter((y) => y.o.op === '+');
+            for (let i = 2; i < plus.length; i++) if (plus[i].o.a === plus[i - 1].o.a && plus[i].o.a === plus[i - 2].o.a) probs.push(`first addend ${plus[i].o.a} three times running on ${pgid}`);
+            const subs = xs.filter((y) => y.o.op === '−').map((y) => y.o.b);
+            if (new Set(subs).size !== subs.length) probs.push(`a number taken away twice on ${pgid}`);
+            for (let i = 0; i < xs.length; i++) for (let j = i + 1; j < xs.length; j++) {
+                const A = xs[i].o, B = xs[j].o;
+                // (− both numbers within 2; + one number the same and the other within 2: 5 + 7 / 5 + 6, 8 + 5 / 8 + 6)
+                const da = Math.abs(A.a - B.a), db = Math.abs(A.b - B.b);
+                if (A.op === B.op && xs[i].item !== xs[j].item && (A.op === '−' ? da <= 2 && db <= 2 : (da === 0 && db <= 2) || (db === 0 && da <= 2))) probs.push(`near twins ${xs[i].item} / ${xs[j].item} on ${pgid}`);
+            }
+        }
+        e24b = { ok: !probs.length && prPages.length > 0, msg: probs.length ? probs.join('; ') : `${prPages.length} Practice pages: last rows all edge cases (${[...edge].length} edge numbers dealt); no twin answers and no near twins on any page; ${opN} + / − items: no first addend twice in a grid row, no number taken away twice, no near twins` };
     }
-    row('E24b', 'Practice last row only edge cases (★★★); LR-6 no twin answers and no near twins (one skill, numbers within 2) on a page', e24b.msg, e24b.ok);
+    row('E24b', 'Practice last row only edge cases (★★★); LR-6 no twin answers and no near twins (one skill, numbers within 2) on a page; + / − items (stories too): no first addend twice in a grid row or three running, no number taken away twice, no near twins (− both numbers within 2; + one the same, the other within 2)', e24b.msg, e24b.ok);
+    // E31 (lesson 2 r4, critic r2 D1 / D4): a lesson that declares its SITUATIONS (put together, add to)
+    // models each in I Do (the chart or its board example: a P2 place), practises nothing it did not
+    // model, and assesses each on the exit slip. A lesson without `situations` passes trivially.
+    {
+        const sits = (R.pool && R.pool.situations) || [], probs = [];
+        const pl = (R.pool && R.pool.places) || [];
+        const on = (re) => new Set(pl.filter((x) => re.test(x.page) && x.sit).map((x) => x.sit));
+        const p2 = on(/^P2/), p6 = on(/^P6$/), used = on(/^P[3-6]/);
+        if (sits.length && !pl.some((x) => x.sit)) probs.push('situations declared, no story read');
+        for (const s0 of sits) { if (!p2.has(s0)) probs.push(`${s0} never modelled (no chart / I Do example)`); if (!p6.has(s0)) probs.push(`${s0} not on the exit slip`); }
+        for (const s0 of used) if (!p2.has(s0)) probs.push(`${s0} practised but not modelled`);
+        row('E31', 'Every situation the lesson declares is modelled in I Do (chart or board example), assessed on the exit slip, and nothing unmodelled is practised', sits.length ? (probs.length ? probs.join('; ') : `${sits.join(', ')}: modelled on P2, practised on ${[...used].length ? 'P3–P6' : '—'}, assessed on P6`) : 'no situations declared', !probs.length);
+    }
+    // E32 (AX-3 one sentence per line in stories; SF-50 at most 4 lines - critic r2 D4): every story
+    // sentence on a pupil page or key prints on ONE line, and a story has at most 4 sentences.
+    {
+        const all = [...pupil, ...keys].flatMap((p) => (p.stories || []).map((st) => ({ p: p.id, st })));
+        const bad = all.filter((x) => x.st.length > 4 || x.st.some((l) => l.n > 1));
+        row('E32', 'Stories: one sentence per line (AX-3), at most 4 lines (SF-50)', all.length ? (bad.length ? bad.slice(0, 4).map((x) => `${x.p}: "${(x.st.find((l) => l.n > 1) || x.st[0]).t}" ${x.st.length} lines`).join('; ') : `${all.length} stories, every sentence on one line, at most ${Math.max(...all.map((x) => x.st.length))} lines`) : 'no stories', !bad.length);
+    }
+    // E33 (V22 §9.5, critic r2 D3): on a Mixed page the lesson's own skill (the chart's) holds at least half the items.
+    {
+        const pl = (R.pool && R.pool.places) || [];
+        // (the lesson's own skills: every skill its charts, lesson sheets, Practice pages and exit slip deal - a chunked lesson has several)
+        const lead = new Set(pl.filter((x) => /^P(2|3|4-|6)/.test(x.page)).map((x) => x.rep));
+        const mx = [...new Set(pl.filter((x) => /^P4m/.test(x.page)).map((x) => x.page))];
+        const res = mx.map((id) => { const its = pl.filter((x) => x.page === id); const k = its.filter((x) => lead.has(x.rep)).length; return { id, k, n: its.length }; });
+        row('E33', 'Mixed page: the lesson\'s own skills hold at least half the items (V22 §9.5)', res.length ? res.map((r) => `${r.id}: ${r.k} of ${r.n} (${[...lead].join(', ')})`).join('; ') : 'no Mixed page', res.every((r) => 2 * r.k >= r.n));
+    }
+    // E34 (critic r2 D5): T2b's exit-slip score is the slip's own item count.
+    {
+        const t2b = (pages.find((p) => p.id === 'T2b') || {}).text || '';
+        const m = t2b.match(/Exit slip \/(\d+) a half/);
+        const n6 = ((R.pool && R.pool.places) || []).filter((x) => x.page === 'P6').length;
+        row('E34', 'T2b scores the exit slip by its own item count', m ? `T2b /${m[1]}, P6 ${n6} items a half` : 'no T2b exit row', !!m && Number(m[1]) === n6);
+    }
+    // E35 (critic r2 D1): a lesson that declares situations quotes no story question on T4 that the pack
+    // does not print or write on the board ("How many books in all?" for a chart that asks "now").
+    {
+        const sits = (R.pool && R.pool.situations) || [];
+        const t4 = pages.filter((p) => /^T4/.test(p.id)).map((p) => p.text || '').join(' ');
+        const printed = [...pupil, ...keys].map((p) => p.bodyText || '').join(' | ');
+        const board = [...t4.matchAll(/(?:Write on the board|Read the story):\s*([^?]*\?)/g)].map((m) => m[1]);
+        const qs = [...t4.matchAll(/How many [^?.]*\?/g)].map((m) => m[0]);
+        const bad = qs.filter((q) => !printed.includes(q) && !board.some((b) => b.includes(q)));
+        row('E35', 'T4 quotes only story questions the pack prints or writes on the board', sits.length ? (bad.length ? bad.join('; ') : `${qs.length} questions, all printed or on the board`) : 'no situations declared', !sits.length || !bad.length);
+    }
     // E30 (critic r3 S1): a number the lesson declares `boardOnly` (shown on the board only) is never a
     // pupil item's number or answer, and never printed on a pupil page or key (digits, with or without
     // a comma, or its name). The pool JSON carries the list; an empty list passes trivially.

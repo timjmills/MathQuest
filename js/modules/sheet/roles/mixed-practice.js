@@ -126,9 +126,26 @@ function packing(poolsIn, input) {
             const shelves = ids.reduce((a, id) => a + shelf[id].n, 0);
             if (shelves < maxShelves * basePages && used + bandH(lead, false) <= m.budget) { shelf[lead].n++; used += bandH(lead, false); continue; }
             const drop = ids.slice(1).filter((id) => shelf[id].n > 1).sort((a, b) => cnt(b) - cnt(a))[0];
-            if (!drop) break;
-            shelf[drop].n--;
-            used -= bandH(drop, false);
+            if (drop) { shelf[drop].n--; used -= bandH(drop, false); continue; }
+            // `leadDrop` (the detailed lesson maker, lesson 2 r4 - critic r2 D3: 2 stories of 14 items):
+            // every partner is down to one shelf, so the LAST partner with the most items gives its
+            // whole band up (one partner always stays); the last partner left narrows its shelf to
+            // the next lattice divisor (6 facts -> 3, wider cells, never an empty cell).
+            if (!input.leadDrop) break;
+            const live = ids.slice(1).filter((id) => shelf[id].n > 0);
+            if (live.length > 1) {
+                const most = Math.max(...live.map(cnt));
+                const gone = live.filter((id) => cnt(id) === most).pop();
+                shelf[gone].n = 0;
+                used -= bandH(gone, true);
+                continue;
+            }
+            const last = live[0];
+            const k2 = last ? divisorsDesc(N).find((dv) => dv < shelf[last].k && fitsAt(poolsIn[last], dv, ctx)) : 0;
+            if (!k2) break;
+            const h2 = hMinAt(poolsIn[last], k2, ctx);
+            used += (Number.isFinite(h2) ? h2 : shelf[last].h) - shelf[last].h;
+            Object.assign(shelf[last], { k: k2, per: k2, h: Number.isFinite(h2) ? h2 : shelf[last].h });
         }
     }
     return { ctx, m, mCont, N, ids, shelf, used, pages: basePages };

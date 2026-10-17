@@ -210,7 +210,12 @@ export const CASE_TESTS = Object.freeze({
     // (a facts-only turn that asks for the factor: 6 x [ ] = 24)
     arrFactor: (it) => { const c = it && it.q && it.q.cell; return !!arrTurnOf(it) && CASE_TESTS.arrNonSq(it) && c.payload.type === 'missing' && c.payload.ask === 'factor'; },
     arrProduct: (it) => { const c = it && it.q && it.q.cell; return !!arrTurnOf(it) && CASE_TESTS.arrNonSq(it) && c.payload.type === 'missing' && c.payload.ask !== 'factor'; },
+    // (a facts-only square that asks for the factor: 9 x [ ] = 81 - the product alone would be a giveaway)
+    arrSquareFactor: (it) => { const c = it && it.q && it.q.cell; return CASE_TESTS.arrSquare(it) && c.payload.type === 'missing' && c.payload.ask === 'factor'; },
     arrEdge: (it) => CASE_TESTS.arrSquare(it) || CASE_TESTS.arrFive(it),
+    arrAny: (it) => !!arrTurnOf(it),
+    // (a non-square array at most 4 by 4: two of them and their turns stack on a lesson sheet)
+    arrSmall: (it) => { const p = arrTurnOf(it); return !!p && CASE_TESTS.arrNonSq(it) && p.rows <= 4 && p.cols <= 4; },
     wpBridge: (it) => { const o = wpParts(it); return !!o && o[0] >= 2 && o[1] >= 2 && o[0] <= 9 && o[1] <= 9 && o[0] + o[1] >= 11; },
     wpBridgeBigFirst: (it) => { const o = wpParts(it); return !!o && CASE_TESTS.wpBridge(it) && o[0] > o[1]; },
     wpBridgeSmallFirst: (it) => { const o = wpParts(it); return !!o && CASE_TESTS.wpBridge(it) && o[0] < o[1]; },
@@ -222,6 +227,13 @@ export const CASE_TESTS = Object.freeze({
     wpSixSeven: (it) => { const o = wpParts(it); return !!o && o[0] === 6 && o[1] === 7; },
     wpNineFour: (it) => { const o = wpParts(it); return !!o && o[0] === 9 && o[1] === 4; },
     wpAddTo: (it) => { const o = wpParts(it); return !!o && /\bmore\b/i.test(String((it && it.q && it.q.text) || '')) && o[0] > o[1]; },
+    // (lesson 2 r4, critic r2 D1/D4: the story's SITUATION, read from its own words - add to: one
+    // person "gets ... more", "now"; put together: two people, "in all", nothing more)
+    wpAddToAny: (it) => { const t = String((it && it.q && it.q.text) || ''); return !!wpParts(it) && /\bmore\b/i.test(t) && /\bnow\b/i.test(t); },
+    wpPutTogether: (it) => { const t = String((it && it.q && it.q.text) || ''); return !!wpParts(it) && /\bin all\b/i.test(t) && !/\bmore\b/i.test(t); },
+    wpBridgePT: (it) => CASE_TESTS.wpBridge(it) && CASE_TESTS.wpPutTogether(it) && !CASE_TESTS.wpEqual(it),
+    wpBridgeSmallFirstAT: (it) => CASE_TESTS.wpBridgeSmallFirst(it) && CASE_TESTS.wpAddToAny(it),
+    wpBridgeBigFirstPT: (it) => CASE_TESTS.wpBridgeBigFirst(it) && CASE_TESTS.wpPutTogether(it),
     pvEdge: (it) => { const n = pvNumberOf(it); return n !== null && (n === 1000 || (n >= 100 && (Math.floor(n / 10) % 10 === 0 || n % 10 === 0 || Math.floor(n / 10) % 10 === 1))); },
 });
 
@@ -328,7 +340,9 @@ export function pickWeDo(items, example, data, n) {
     const re = data && data.example && data.example.match ? new RegExp(data.example.match, 'i') : null;
     const ex = sigOf(example);
     const shape = digitsOfOps(example);
-    const rest = items.filter((it) => sigOf(it) !== ex);
+    // (an array's turn draws the example's own two arrays - lesson 3a: never a Guided cell)
+    const exT = arrTurnOf(example);
+    const rest = items.filter((it) => sigOf(it) !== ex && !(exT && arrTurnOf(it) && arrTurnOf(it).rows === exT.cols && arrTurnOf(it).cols === exT.rows));
     const pref = data && data.example && data.example.prefer ? new RegExp(data.example.prefer) : null;
     const same = rest.filter((it) => (!re || re.test(workedStepsOf(it).map((s) => s.text).join(' '))) && digitsOfOps(it) === shape);
     // The Steps beside the cells are the example's steps: a Guided cell first works the SAME
@@ -343,7 +357,22 @@ export function pickWeDo(items, example, data, n) {
     // (`guidedWants` - the detailed lesson maker, lesson 2: the Guided cells' cases, in order, first)
     if (data && Array.isArray(data.guidedWants)) {
         const lead = [];
-        for (const w of data.guidedWants) { const t = CASE_TESTS[w]; const it = t && order.find((x) => !lead.includes(x) && t(x)); if (it) lead.push(it); }
+        // (lesson 2 r4, LR-6: a later Guided case is never a near twin of an earlier one - 7 + 9 then 7 + 8 -
+        // nor the same answer; a + item only, so other lessons' wants pick as before)
+        const plus = (x) => { const q = (x && x.q) || {}; const st = q.cell && q.cell.payload && (q.cell.payload.steps || [])[0]; const o = operandsOf(q).map(Number); return (q.op === '+' || (st && st.op === '+')) && o.length >= 2 ? o : null; };
+        const twin = (x, y) => { const a = plus(x), b = plus(y); if (!a || !b) return false; const da = Math.abs(a[0] - b[0]), db = Math.abs(a[1] - b[1]); return a[0] + a[1] === b[0] + b[1] || (da === 0 && db <= 2) || (db === 0 && da <= 2); };
+        const sameFact = (x, y) => { const a = plus(x), b = plus(y); return !!a && !!b && a.join() === b.join(); };
+        // (the first set of cells, in order, that meets every want with no twins and not the chart's own fact)
+        const pickLead = (k, chosen) => {
+            if (k === data.guidedWants.length) return chosen;
+            const t = CASE_TESTS[data.guidedWants[k]];
+            if (!t) return pickLead(k + 1, chosen);
+            for (const x of order) if (!chosen.includes(x) && t(x) && !chosen.some((y) => twin(x, y)) && !sameFact(x, example)) { const r = pickLead(k + 1, [...chosen, x]); if (r) return r; }
+            return null;
+        };
+        const fit = pickLead(0, []);
+        if (fit) lead.push(...fit);
+        else for (const w of data.guidedWants) { const t = CASE_TESTS[w]; const it = t && order.find((x) => !lead.includes(x) && t(x)); if (it) lead.push(it); }
         order = [...lead, ...order.filter((x) => !lead.includes(x))];
     }
     // div_facts Mix (critic R1 D7): the Guided set tries each written form - the forms the
@@ -1011,7 +1040,7 @@ function vocabPicture(pic, c) {
         }
         // a small dot array (detailed lesson 3a): {rows, cols, mark: 'row' | 'turn'}
         case 'array': {
-            const pitch = { S: 4, M: 4.4, L: 4.8 }[c.size] || 4.8, r = pitch * 0.32;
+            const pitch = { S: 3.6, M: 3.9, L: 4.2 }[c.size] || 4.2, r = pitch * 0.34;
             const R = Math.min(5, pic.rows || 1), C = Math.min(5, pic.cols || 1);
             const one = (rows, cols, x0) => { let b = ''; for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) b += `<circle cx="${(x0 + pitch / 2 + j * pitch).toFixed(2)}" cy="${(pitch / 2 + i * pitch).toFixed(2)}" r="${r.toFixed(2)}" fill="#000"/>`; return b; };
             let b = one(R, C, 0), W = C * pitch, H = R * pitch;
@@ -1479,7 +1508,9 @@ export function plan(input = {}) {
         const chantHtml = chantH ? `<div class="mq-lstripchant" style="height:${chantH.toFixed(2)}mm"><b>Rule:</b><span>${esc(data.chant)}</span></div>` : '';
         const content = { kind: 'col', cls: 'mq-lwedotop', parts: [{ kind: 'html', html: stripHtml(data, exSteps, ctx.size) + chantHtml }, grid] };
         groups.push(band(m.strip + stripH + chantH + top.h * (top.rows || 1), { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content }, { h: top.h * (top.rows || 1), grid: [grid], cap: 0.1, capIfEmpty: 0.35 }));
-    } else if (weDo.length) groups.push(band(m.strip + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: 0.1, capIfEmpty: 0.35 }));
+    // (`guidedStripMm` on lesson data - the detailed lesson maker, lesson 3a: the Guided header wraps to two
+    // lines beside the Steps; the band books that extra height, so the page is not 1-2 mm over)
+    } else if (weDo.length) groups.push(band(m.strip + (Number(data && data.guidedStripMm) || 0) + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: 0.1, capIfEmpty: 0.35 }));
 
     /* ---- the Remember strip gives way when it alone pushes the Guided band overleaf */
     const total = groups.reduce((a, g) => a + g.h, 0);

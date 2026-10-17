@@ -982,7 +982,8 @@ function barLayout(p, ctx) {
     const small = Math.min(W / 2, Math.max(0.4 * W, lw + 5));
     const wa = pa === pb ? W / 2 : (pa > pb ? W - small : small);
     const fmt = (n) => Number(n).toLocaleString('en-US');
-    const lab = (v) => `<span data-ws-graded="0" data-ws-slot="bar" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-width:${L(ctx, lw)};height:${L(ctx, hw)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;padding:0 ${L(ctx, 1)};color:${ink === 'trace' ? GREY : INK};${KEY_FEATURES}"${put && ink ? ` data-ws-ink="${ink}"` : ''}>${put ? esc(fmt(v)) : ''}</span>`;
+    // (`gradeParts`, lesson 2 r4 - critic r2 n9: the exit slip's sort reads the bar, so its boxes are graded there)
+    const lab = (v) => `<span${p.gradeParts ? '' : ' data-ws-graded="0"'} data-ws-slot="bar" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-width:${L(ctx, lw)};height:${L(ctx, hw)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;padding:0 ${L(ctx, 1)};color:${ink === 'trace' ? GREY : INK};${KEY_FEATURES}"${put && ink ? ` data-ws-ink="${ink}"` : ''}>${put ? esc(fmt(v)) : ''}</span>`;
     const seg = (w, v, left) => `<span style="display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, w)};height:${L(ctx, segH)};border:${B(ctx, 1)} solid ${INK};${left ? '' : 'border-left:none;'}background:#fff;">${lab(v)}</span>`;
     const bar = `<div class="mq-wwbar" aria-label="bar model" style="flex:none;display:flex;flex-direction:column;gap:${L(ctx, 1.5)};">`
         + `<div style="display:flex;">${seg(W, whole, true)}</div><div style="display:flex;">${seg(wa, pa, true)}${seg(W - wa, pb, false)}</div></div>`;
@@ -992,12 +993,14 @@ function barLayout(p, ctx) {
     const box = `<span data-ws-slot="answer" data-ws-shape="box"${ink ? ` data-ws-ink="${ink}"` : ''} style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${tw(ctx, aw)};height:${tw(ctx, bx + 1)};border:${B(ctx, 1.5)} solid ${INK};border-radius:${L(ctx, 1.25)};background:#fff;font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;color:${ink === 'trace' ? GREY : INK};${KEY_FEATURES}">${esc(shown)}</span>`;
     const ans = `<div class="mq-wwanswer" style="flex:none;display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 1)};font-size:${P(ctx, textPt(ctx) + 1)};">${box}${p.unit ? `<span style="font-weight:700;line-height:1.1;">${esc(p.unit)}</span>` : ''}</div>`;
     const work = `<div style="flex:none;display:flex;align-items:flex-end;gap:${L(ctx, 3)};">${bar}${ans}</div>`;
+    // (`storyTight`, lesson 2 r4: a one-across cell sets its story at the Practice cells' size and leading,
+    // so two full-size stories with their bars fit a 132.5 mm exit-slip half)
     // (`beside`: the story on the left, the bar and answer on the right - a one-across cell on a half page)
     if (p.beside) {
         return `<div class="mq-ww mq-wwbarlayout" data-ww-ops="${st.op}" data-read style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${L(ctx, 2.5)};display:flex;align-items:center;gap:${L(ctx, 3)};">`
             + `<div style="flex:1 1 auto;min-width:0;">${storyHTML(ctx, p, true)}</div>${work}</div>`;
     }
-    return `<div class="mq-ww mq-wwbarlayout" data-ww-ops="${st.op}" data-read style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${L(ctx, 2.5)};">${storyHTML(ctx, p, cols >= 2)}`
+    return `<div class="mq-ww mq-wwbarlayout" data-ww-ops="${st.op}" data-read style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${L(ctx, 2.5)};">${storyHTML(ctx, p, cols >= 2 || !!p.storyTight)}`
         + `<div style="margin-top:${L(ctx, 1.5)};">${work}</div></div>`;
 }
 

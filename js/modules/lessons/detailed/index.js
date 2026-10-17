@@ -38,12 +38,13 @@
 //   vars(q, base) -> {...}                             the lesson's own placeholder names for one dealt item
 //                 (base = the kit's readers: n, ans, a, b, op, say, words, text); eqParts / eqOp set
 //                 the word problem's equation frame
-//   checkQuestion {want, correct}                     the Check Question item (a case test) and its right letter;
+//   checkQuestion {want, correct, ref?}               the Check Question item (a case test) and its right letter (`ref`: its own
+//                 form of the skill, default `skill`; `ref.turnedOk` lets an array turn a dealt one);
 //                 the options are the main skill provider's wrong answers, claimed by mistakes[].misconception
 //   prerequisites [{atom, items?, ref, lesson: {id, title}}]   P0: ONE question per Pre-requisite atom, most basic first
 //   numberSense   {A: ref, B: ref}                     P1 bands (5 items each)
 //   wordProblem   {ref, want, lines: [...], unit, say} P5: story lines with {wp.*} placeholders
-//   exit          [{case, ref, want, detects}] x 4 (3)  P6 items, one per case; `exitSay` its Say frame
+//   exit          [{case, ref, want, detects, cols?}] x 4 (3)  P6 items, one per case (`cols` 1 / 2: its group one or two across); `exitSay` its Say frame
 //                 `exitSayItem` k: the Say reads slip item k (its {say.*} vars and key) instead of a fresh item;
 //                 `exitCols` 1: the items print one across the half
 //   retrieval     [{ref, ask}]                         T3 spaced retrieval (mini whiteboards)
@@ -127,7 +128,9 @@ export function validateDescription(d) {
     if ((d.atoms || []).some((a, i) => a.prereq && firstNew >= 0 && i > firstNew)) errs.push('Pre-requisite atoms come first');
     if ((d.prerequisites || []).length < 3 || d.prerequisites.length > 4) errs.push('P0 needs 3-4 questions');
     // (3 when full-size items cannot fit 4 a half - the capacity rule, lesson 2's bar stories; never shrunk)
-    if (![3, 4].includes((d.exit || []).length)) errs.push('the exit slip has 4 items (3 when 4 do not fit a half)');
+    // (2 when a story must sit above its bar to keep one sentence a line - lesson 2 r4, AX-3 / SF-50; then
+    // each situation the lesson declares is one item, so 2 still assesses all of them - gate E31)
+    if (![3, 4].includes((d.exit || []).length) && !((d.exit || []).length === 2 && Array.isArray(d.situations) && d.situations.length === 2)) errs.push('the exit slip has 4 items (3 when 4 do not fit a half)');
     if ((d.vocabulary || []).length > 3 || (d.t1Boxes || []).length > 3) errs.push('at most 3 vocabulary cards and 3 T1 boxes');
     if (d.boardOnly !== undefined) {
         if (!Array.isArray(d.boardOnly) || d.boardOnly.some((v) => !Number.isFinite(Number(v)))) errs.push('boardOnly is a list of numbers');

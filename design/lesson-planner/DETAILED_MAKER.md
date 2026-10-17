@@ -60,6 +60,21 @@ facsimile key from the same plan (`answer-key.js`). Additive hooks, each absent 
 - **Keys** P1 / P5 / P6 mark their answers through `tagKeyAnswers` (the key ink); the exit key's second half reads
   Answer Key. Teacher pagination never continues a band with its last block alone (widow control).
 
+## Lesson 3a additions (turn an array, 2026-10-17)
+
+- **Array fact keys.** `factKeyOf` keys an `arrays-turn` item `rows x cols` (3x4, 4x3 and 2x6 are three keys);
+  `itemNumberOf` reads its product (so `minNum` / `maxNum` bound it). A turned pair is ONE pair of pictures, so
+  `turnedKeyOf` keeps it off a page (`seen`), off every other page of the packet (`avoidKeys`) and off every dealt
+  item (`dealOne`), and the Guided set never turns the chart example. Only ten arrays fit 5 x 5 (RP-21), so the
+  pack uses them sparingly; the Check Question (board only) may turn a Guided array (`checkQuestion.ref.turnedOk`).
+- **Case tests** (roles/lesson.js): `arrTurn` (non-square, no repeated digit), `arrNonSq`, `arrSquare`, `arrFive`,
+  `arrEdge`, `arrSmall`, `arrProduct`, `arrFactor`, `arrSquareFactor`, `arrAny`.
+- **Hooks**, each absent on every other lesson: `checkQuestion.ref`; `exit[i].cols` (1 | 2, its group's columns);
+  `eeAccess` (T1 prints "EE none · access point ..."); lesson data `guidedStripMm` (a Guided header that wraps
+  beside the Steps books its extra height); `accepted` lines take placeholders. The vocabulary picture kind
+  `array` ({rows, cols, mark: 'row' | 'turn'}); the step icon `turn` (lesson-icons.js); the arrays-turn template
+  writes `data-per-row` on each array (E27).
+
 ## Generic by design (round 2)
 
 `print-sheet.js` holds no per-family code. Script values come from each dealt item through the kit's own
