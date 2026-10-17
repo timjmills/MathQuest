@@ -85,6 +85,9 @@ if (typeof document !== 'undefined') {
     window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(() => fitMore(document.getElementById('teacherMain')), 150); });
 }
 
+/** m14 (critic r6): why a quick-tick button is off on this lesson. */
+const QUICK_NONE = { direct: 'No teaching skills on this lesson', prereq: 'No do-first skills on this lesson', related: 'No go-with skills on this lesson', all: 'No skills on this lesson' };
+
 export function createPicker(opts) {
     const p = { ticked: new Set(), link: '', linkNote: '', view: skillView(), groups: {} };
     const idp = opts.idp;
@@ -102,8 +105,9 @@ export function createPicker(opts) {
     const tickHTML = (b, label) => `<button type="button" class="tv-check tvw-tick" role="checkbox" aria-checked="${b.on}" data-w-tick="${esc(b.p)}" aria-label="Tick ${esc(label)}"><span class="tv-check-box" aria-hidden="true">${icon('check', 14)}</span></button>`;
     const quickHTML = (b, label) => `<span class="tvw-q"><button type="button" class="tv-btn tv-btn-sm" data-w-one="link" data-w-key="${esc(b.p)}" aria-label="Practice link for ${esc(label)}">${icon('link', 16)}<span>Practice</span></button>
       <button type="button" class="tv-btn tv-btn-sm" data-w-one="print" data-w-key="${esc(b.p)}" aria-label="Print ${esc(label)}">${icon('print', 16)}<span>Print</span></button></span>`;
-    const why = (x) => (x.partial ? ` · <span class="tvw-tag tvw-part">Covers part</span> <span class="tvw-why">${esc(x.partial)}</span>`
-        : x.why ? ` · <span class="tvw-why">${esc(x.why)}</span>` : '');
+    // critic r6 M9: a row whose line the lesson already says shows only its tag ("Covers part", "Same reason as above")
+    const why = (x) => (x.part || x.partial ? ` · <span class="tvw-tag tvw-part">Covers part</span>${x.partial ? ` <span class="tvw-why">${esc(x.partial)}</span>` : ''}`
+        : x.why ? ` · <span class="tvw-why">${esc(x.why)}</span>` : x.same ? ' · <span class="tvw-tag tvw-same">Same reason as above</span>' : '');
 
     function cardHTML(x) {
         const b = bits(x);
@@ -138,7 +142,7 @@ export function createPicker(opts) {
     /** The quick tick buttons: defs = [[groupId | 'all', label], ...]. */
     p.quickHTML = (defs) => `<div class="tvw-quick" role="group" aria-label="Tick a group of skills">
         <span class="tvw-pick-h">Tick</span>
-        ${defs.map(([g, label]) => `<button type="button" class="tv-btn tv-btn-sm" data-w-quick="${g}">${esc(label)}</button>`).join('')}
+        ${defs.map(([g, label]) => { const none = !(g === 'all' ? p.all() : p.groups[g] || []).length; return `<button type="button" class="tv-btn tv-btn-sm" data-w-quick="${g}"${none ? ` disabled title="${esc(QUICK_NONE[g] || 'No skills in this group')}"` : ''}>${esc(label)}</button>`; }).join('')}
         <button type="button" class="tv-btn tv-btn-sm tv-btn-ghost" data-w-quick="none">Clear</button>
         <span class="tvw-viewtog">${viewToggleHTML(p.view)}</span>
       </div>`;

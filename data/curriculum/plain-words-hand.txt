@@ -331,8 +331,6 @@ cuts
 remember
 dragging
 operate
-version
-via
 gridline
 ignores
 recalculating
@@ -346,9 +344,6 @@ levelled
 odometer
 # third read (2026-10-16): words in the MAP task names and the lesson titles
 redrawn
-nth
-xs
-sub
 equalise
 proposed
 coatracks
@@ -366,12 +361,9 @@ sept
 oct
 nov
 dec
-files
 # fourth read (2026-10-16): words in the names of entries to make
 layouts
-modes
 chunks
 widen
-wire
-tag
-tags
+revisited
+files

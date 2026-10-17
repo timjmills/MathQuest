@@ -13,7 +13,8 @@ import { WRM_SEQUENCE } from '../../js/modules/wrm-sequence-db.js';
 import { WRM_STEPS, skillsForWrmStep } from '../../js/modules/wrm.js';
 import { linksFor, allLessons, lessonByKey, searchLessons, addCuratedYear, clearCurated, proposalName, unitLessons, lessonBySite, lessonBySiteSlug,
     lessonHash, siteSlug, siteFlagText, lessonAbout, siteLessonLabel,
-    PREREQ_CAP, RELATED_CAP, WRM_LINK_OVERRIDES, REP_PAIRS, composeWhy, composePartial, composeMissing, proposalLabel, stepsInNote, taskName, MAP_STRANDS, strandOfKey, repPairsOfText } from '../../js/modules/wrm-links.js';
+    PREREQ_CAP, RELATED_CAP, WRM_LINK_OVERRIDES, REP_PAIRS, composeWhy, composePartial, composeMissing, proposalLabel, stepsInNote, taskName, MAP_STRANDS, strandOfKey, repPairsOfText,
+    partialVerdict, LATER_LEAD, supportWeeksOf, placeDomain, curatedFor, curatedLessonFor } from '../../js/modules/wrm-links.js';
 import { buildQueue, passes, toCSV, CSV_HEAD, KINDS, gradesOfText, gradeOfCode, gradeOfRit, closesText, stepName } from '../../js/modules/build-queue.js';
 
 let fails = 0;
@@ -73,7 +74,7 @@ for (const l of L) {
     const p = new Set(r.prereq.map((x) => x.key));
     ok(r.related.every((x) => !p.has(x.key)), `${l.key} related never repeats a prerequisite`);
     ok(p.size === r.prereq.length, `${l.key} prereq de-duplicated`);
-    ok(r.prereq.every((x) => x.why) && r.related.every((x) => x.why), `${l.key} every link says why`);
+    ok(r.prereq.every((x) => x.why || x.same) && r.related.every((x) => x.why || x.same), `${l.key} every link says why (or shares the row above's line)`);
     if (l.step) ok(r.direct.length === skillsForWrmStep(l.step, { withPartial: true }).length, `${l.key} direct = SKILL_WRM tags`);
     ok(['full', 'partial', 'gap'].includes(r.verdict), `${l.key} verdict`);
 }
@@ -191,17 +192,66 @@ const REAL = ['Y3.B1.S14 counts in 50s, which no live skill deals', '(Y4.B10.S2 
     'part-whole model (see Y5.B13) [rule 18: opts {"notation":["across"]} for this pupil]', 'Y1.B6.S1 and Y1.B12.S1: counting to 50, and from 50 to 100',
     'groups of 1-3 only (band 5 deals 4 and 5)', 'R.B11.S5 / S6 1 more / 1 less', 'Sum-and-difference brace; two levels) and the journey line', 'the the cat'];
 for (const t of REAL) {
-    for (const o of [composeWhy(t, { key: 'placevalue:compare', lesson: LESSON, group: 'prereq' }), composePartial(t, ['nl_20']), `Not yet: ${composeMissing(t, ['nl_20'])}`]) {
+    for (const o of [composeWhy(t, { key: 'placevalue:compare', lesson: LESSON, group: 'prereq' }), composePartial(t, ['nl_20']), composeMissing(t, ['nl_20']) ? `Not yet: ${composeMissing(t, ['nl_20'])}` : '']) {
+        if (!o) continue;
         const h = jargonHit(o); ok(!h, `real line not plain: "${t}" -> "${o}" (${h && h.name})`);
     }
 }
 { const w = composeWhy('Y3.B1.S14 counts in 50s, which no live skill deals', { key: 'x:y', lesson: LESSON });
   ok(/Grade 2/.test(w) && !/\( /.test(w), `M5 orphan bracket -> "${w}" names the grade and step`); }
 { const w = composeWhy('Y2.B1.S15 Count in 2s, 5s and 10s (prior learning wk W18)', { lesson: LESSON });
-  ok(w === 'Taught before, in Grade 1: "Count in 2s, 5s and 10s" (support block, week 18).', `composed prior learning -> "${w}"`); }
-ok(composeWhy('the same number written in unit form (4 hundreds 7 tens 6 ones)', { lesson: LESSON }) === 'The same number written in unit form (4 hundreds 7 tens 6 ones)', 'a plain note is shown whole');
+  ok(w === 'Taught before, in Grade 1: "Count in 2s, 5s and 10s".', `composed prior learning, no grade to check the support week against -> "${w}"`); }
+// critic r6 M8: the support block is THIS grade's, said as its own clause, and only in a week the data holds the step
+{ const g5 = L.find((l) => l.step === 'Y6.B10.S3' && l.grade === '5');
+  const w = composeWhy('Y1.B10.S2 Find a half (school prior learning, week W23)', { lesson: g5, group: 'prereq' });
+  ok(w === 'Taught before, in Kindergarten: "Find a half of an object or a shape". Revisited in this grade\'s support block, week 23.', `M8 support week names this grade's block -> "${w}"`); }
+// critic r6 M8: a Do-first line never says "later" — Grade 1 "Recognise equal groups" (the school teaches the 5 and 10 times-tables first)
+{ const g1 = L.find((l) => l.grade === '1' && l.title === 'Recognise equal groups');
+  const w = g1 && composeWhy('Y2.B5.S17 The 5 and 10 times-tables (taught before this step in the block)', { lesson: g1, group: 'prereq' });
+  ok(g1 && !LATER_LEAD.test(w) && /^Taught earlier this year: "The 5 and 10 times-tables" \(week \d+\)\.$/.test(w), `M8 Do-first by the school week -> "${w}"`);
+  const later = g1 && composeWhy('Y2.B5.S17 The 5 and 10 times-tables', { lesson: { ...g1, weeks: ['W01'] }, group: 'prereq' });
+  ok(later && /^Also taught in Grade 1: /.test(later), `M8 a Do-first step the school teaches later reads "Also taught in" -> "${later}"`); }
+ok(composeMissing('the part X will add', ['nl_20']) === '' && composePartial('Y5.B1.S2 the rest', ['nl_20']) === '', 'M9: a hidden note composes no sentence around the entry name');
+ok(partialVerdict({ missing: '', build: ['nl_20'] }) === 'These skills cover part of the lesson. The rest is still to be built (below).', 'M9: the plain verdict');
+ok(composeWhy('the same number written in unit form (4 hundreds 7 tens 6 ones)', { lesson: LESSON }) === 'The same number written in unit form (4 hundreds 7 tens 6 ones).', 'a plain note is shown whole (N32: with its full stop)');
 ok(stepsInNote('R.B11.S5 / S6').join() === 'R.B11.S5,R.B11.S6', 'stepsInNote: shorthand chain');
 ok(jargonHit('Grade 2/Grade 3 reading a scale') === null && jargonHit('the the cat') && jargonHit('Grade 2: Hundreds ( tens') && jargonHit('ftRules only') && jargonHit('Use band 5'), 'the plain check: plain line passes, the r5 forms fail');
+
+
+// TRUTH gate (critic r6 M8 / M9): plain words are not enough — a composed line must state the right order and say
+// each fact once. Over every lesson, in every data mode:
+//   M8a no Do-first line uses a later-relation lead ("Later …", "Taught later …", "The next step");
+//   M8b every "support block, week N" clause is "this grade's support block" and the lesson's OWN grade lists, in
+//       week N, a step the line's note names (or, with no note, any step);
+//   M9  no line holds 'the part "', no line repeats inside one lesson's view, and "(new option on an existing skill)"
+//       never sits inside a sentence.
+let truthLines = 0, truthBad = 0;
+const tbad = (msg) => { truthBad += 1; if (truthBad <= 15) console.log('UNTRUE', msg); };
+function truth(l, r) {
+    const cur = (l.step && curatedFor(l.step)) || (l.site && curatedLessonFor(l.site)) || null;
+    const rawWhy = (g, key) => { const x = cur && (cur[g === 'prereq' ? 'pre' : 'related'] || []).find((y) => y.key === key); return x ? x.why || '' : ''; };
+    const lines = [r.verdict === 'partial' ? partialVerdict(r) : '', ...r.direct.map((x) => x.partial), ...r.prereq.map((x) => x.why), ...r.related.map((x) => x.why), ...lessonAbout(l)].filter(Boolean);
+    truthLines += lines.length;
+    for (const x of r.prereq) if (x.why && LATER_LEAD.test(x.why)) tbad(`M8a ${l.key} Do-first "${x.why}"`);
+    for (const g of ['prereq', 'related']) for (const x of r[g]) {
+        if (!/support block, week/.test(x.why || '')) continue;
+        const m = /(?:^|\. )Revisited in this grade's support block, weeks? ([\d, and]+)\.$/.exec(x.why);
+        if (!m) { tbad(`M8b ${l.key} support week not this grade's: "${x.why}"`); continue; }
+        const steps = stepsInNote(rawWhy(g, x.key));
+        for (const n of m[1].split(/,| and /).map((t) => +t.trim()).filter(Boolean)) {
+            const okWeek = steps.length ? steps.some((sid) => supportWeeksOf(l.grade, sid).includes(n)) : true;
+            if (!okWeek) tbad(`M8b ${l.key} week ${n} of ${l.gradeLabel}'s support block does not hold ${steps.join(', ')}: "${x.why}"`);
+        }
+    }
+    const seen = new Set();
+    for (const t of lines) {
+        if (/the part "/.test(t)) tbad(`M9 ${l.key} "${t}"`);
+        if (/\(new option on an existing skill\)./.test(t)) tbad(`M9 ${l.key} option suffix inside a sentence "${t}"`);
+        const k = t.toLowerCase().replace(/^not yet:\s*/, '').replace(/[.\s]+$/, '');
+        if (seen.has(k)) tbad(`M9 ${l.key} said twice: "${t}"`);
+        seen.add(k);
+    }
+}
 
 const dirs = [new URL('../../data/curriculum/links/', import.meta.url).pathname];
 process.argv.forEach((a, i) => { if (a === '--curated' && process.argv[i + 1]) dirs.push(...process.argv[i + 1].split(',')); });
@@ -268,13 +318,14 @@ for (const dir of dirs) {
             if (!(l.step && years.some((d) => d.steps && d.steps[l.step])) && !(l.site && years.some((d) => d.lessons && d.lessons[l.site]))) continue;
             const r = linksFor(l);
             if (l.site && !l.step) ok(r.source === 'curated', `site lesson ${l.site}: its links entry is read (source ${r.source})`);
-            gate(`lesson ${l.key}`, [r.missing ? `These skills cover part of the lesson. Not yet: ${r.missing}` : '', ...r.direct.map((x) => x.partial), ...r.prereq.map((x) => x.why), ...r.related.map((x) => x.why), ...r.build.map(proposalLabel), ...r.preBuild.map(proposalLabel), l.title, ...lessonAbout(l)]);
+            gate(`lesson ${l.key}`, [r.verdict === 'partial' ? partialVerdict(r) : '', ...r.direct.map((x) => x.partial), ...r.prereq.map((x) => x.why), ...r.related.map((x) => x.why), ...r.build.map(proposalLabel), ...r.preBuild.map(proposalLabel), l.title, ...lessonAbout(l)]);
+            truth(l, r);
         }
         clearCurated();
     }
 }
 // rules mode: every lesson's lines with no link files
-for (const l of L) { const r = linksFor(l); gate(`lesson (rules) ${l.key}`, [r.missing ? `These skills cover part of the lesson. Not yet: ${r.missing}` : '', ...r.direct.map((x) => x.partial), ...r.prereq.map((x) => x.why), ...r.related.map((x) => x.why), l.title, siteFlagText(l), ...lessonAbout(l)]); }
+for (const l of L) { const r = linksFor(l); gate(`lesson (rules) ${l.key}`, [r.verdict === 'partial' ? partialVerdict(r) : '', ...r.direct.map((x) => x.partial), ...r.prereq.map((x) => x.why), ...r.related.map((x) => x.why), l.title, siteFlagText(l), ...lessonAbout(l)]); truth(l, r); }
 
 // THE SCHOOL SITE'S OWN LESSONS (round 7, owner: every lesson on the school site visible with its skills)
 {
@@ -312,7 +363,8 @@ for (const l of L) { const r = linksFor(l); gate(`lesson (rules) ${l.key}`, [r.m
         const l = lessonBySite(s.id);
         if (!l) continue;
         const r = linksFor(l);
-        gate(`site lesson ${s.id} links`, [r.missing ? `These skills cover part of the lesson. Not yet: ${r.missing}` : '', ...r.direct.map((x) => x.partial), ...r.prereq.map((x) => x.why), ...r.related.map((x) => x.why), ...r.build.map(proposalLabel), ...r.preBuild.map(proposalLabel)]);
+        gate(`site lesson ${s.id} links`, [r.verdict === 'partial' ? partialVerdict(r) : '', ...r.direct.map((x) => x.partial), ...r.prereq.map((x) => x.why), ...r.related.map((x) => x.why), ...r.build.map(proposalLabel), ...r.preBuild.map(proposalLabel)]);
+        truth(l, r);
         ok(siteLessonLabel(s.id).includes(l.title), `${s.id}: label for other screens`);
     }
     clearCurated();
@@ -334,9 +386,32 @@ for (const l of L) { const r = linksFor(l); gate(`lesson (rules) ${l.key}`, [r.m
     ok(searchLessons('Line plots with fractions', 5).some((l) => l.site === 'G4|-|lineplotswithfractions'), 'search finds a site lesson by title');
     ok(searchLessons('assessment', 40).filter((l) => l.type === 'assessment').length >= 10, 'search "assessment" finds the assessments');
     ok(searchLessons('ccss build', 80, '4').some((l) => l.site && !l.step), 'search "ccss build" finds the CCSS BUILD lessons');
+    // critic r6 M10: a site lesson sits in the unit of its OWN CCSS code (its grade's code first, else its first code);
+    // the site's domain field only when it has no code. The listed exception keeps a counting lesson tagged with a
+    // base-ten code of another grade in counting (placeDomain).
+    const M10_EXCEPT = new Set(['K|-|representnumbersto5']);
+    const codeDom = (c) => (/^(?:K|\d)\.([A-Z]+)\./.exec(c) || [])[1] || '';
+    let placed = 0;
+    for (const s of site.lessons) {
+        const l = lessonBySite(s.id);
+        if (!l || l.seq || !(l.ccss || []).length) continue;
+        placed += 1;
+        const pre = l.grade;
+        const want = codeDom(l.ccss.find((c) => c.split('.')[0] === pre) || l.ccss.find(codeDom) || '');
+        const hasUnit = WRM_SEQUENCE.find((g) => g.id === l.grade).units.some((u) => u.domain === want);
+        ok(!want || !hasUnit || l.domain === want || M10_EXCEPT.has(s.id), `M10: ${s.id} "${l.title}" (${l.ccss.join(', ')}) sits in ${l.grade} ${l.unit} ${l.domain}, its code says ${want}`);
+        ok(l.domain === WRM_SEQUENCE.find((g) => g.id === l.grade).units.find((u) => u.id === l.unit).domain && (!hasUnit || placeDomain(l.grade, l.ccss, s.domain) === l.domain), `M10: ${s.id} placed by placeDomain`);
+    }
+    const pos = site.lessons.filter((x) => /^Positional language/.test(x.title) && x.grade === 'K').map((x) => lessonBySite(x.id).unit);
+    ok(pos.length === 2 && pos[0] === pos[1] && pos[0] === 'D5', `M10: both Kindergarten "Positional language" lessons in D5 Geometry (${pos})`);
+    const lh = lessonBySite('G1|-|lengthandheightcompareorder');
+    ok(lh && lh.domain === 'MD', `M10: Grade 1 "Length and height" in measurement (${lh && lh.unit})`);
+    console.log(`site lessons placed by their own CCSS code: ${placed}`);
     console.log(`site lessons: ${site.lessons.length} lessons + ${assessments} assessments listed (${twins} are sequence rows the site also names); tagged ${tagged}, not tagged ${untagged} (site-only lessons with no step)`);
 }
 
+ok(!truthBad, `truth gate (M8 order / support week, M9 said once): ${truthBad} of ${truthLines} lesson lines`);
+console.log(`truth gate: ${truthLines} lesson lines, ${truthBad} untrue or repeated`);
 ok(!jBad, `plain-English gate: ${jBad} of ${jLines} teacher-facing lines ${JSON.stringify(jByForm)}`);
 console.log(`plain-English gate: ${jLines} teacher-facing lines checked, ${jBad} not plain ${JSON.stringify(jByKind)}`);
 console.log(`free-text notes hidden (not plain as written; the composed sentence stands): ${Object.entries(hidden).map(([f, [n, h]]) => `${f} ${h}/${n} (${Math.round((100 * h) / n)}%)`).join(', ')}`);

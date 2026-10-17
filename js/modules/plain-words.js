@@ -117,9 +117,12 @@ export const isPlain = (text, opts) => !plainProblem(text, opts);
 
 /** The note, whole (first letter capitalised, a final full stop), when it is plain — else ''. Never a part of it. */
 export function plainNote(text) {
-    const s = String(text == null ? '' : text).replace(/\s+/g, ' ').trim().replace(/[;,:]$/, '');
+    // N28 (critic r6): the build team's "live skill(s)" is said as "skill(s) in the app"
+    const s = String(text == null ? '' : text).replace(/\s+/g, ' ').trim().replace(/[;,:]$/, '')
+        .replace(/\blive skills\b/g, 'skills in the app').replace(/\blive skill\b/g, 'skill in the app');
     if (!s) return '';
     const cap = s.charAt(0).toUpperCase() + s.slice(1);
-    const out = /[.!?)"”]$/.test(cap) ? cap : `${cap}.`;
+    // N32: a note that ends in a bracket still ends with a full stop ("… (then the third angle).")
+    const out = /[.!?"”]$/.test(cap) || /[.!?]\)$/.test(cap) ? cap : `${cap}.`;
     return isPlain(out) ? out : '';
 }

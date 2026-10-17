@@ -56,11 +56,39 @@ export function todoTeaches(e) {
     return st ? `Practise "${nameWords(e)}", for ${stepLabel(st)}.` : `Practise "${nameWords(e)}".`;
 }
 
-/** "How it looks": the plain representation note, else a composed sentence (always composed for drawings). */
+// m12 (critic r6): "How it looks" names WHAT the entry draws and how the pupil answers, read from its
+// representation against this fixed table of drawings (our words, never the note's), so 436 entries do not share
+// one sentence. An option that draws nothing new says nothing here: its Kind line already names the setting.
+const DRAWS = [
+    [/ten[- ]?frames?/i, 'a ten frame'], [/\bcounters?\b/i, 'counters'], [/\bdominoe?s?\b/i, 'dominoes'], [/\bdots?\b|dot (?:array|cards?)/i, 'dots'],
+    [/base[- ]?(?:10|ten)|\brods?\b|\bflats?\b/i, 'base-ten blocks'], [/place[- ]value (?:chart|dis[ck]s?|counters)/i, 'a place-value chart'],
+    [/number[- ]?lines?|\btracks?\b|hundred square|number (?:chart|grid)/i, 'a number line or number chart'],
+    [/two-bar|bar comparison|comparison bars?/i, 'two bars to compare'], [/part[- ]whole|cherry|bar model|bar diagram/i, 'a part-whole or bar model'],
+    [/\barrays?\b/i, 'an array'], [/equal groups|\bgroups\b/i, 'groups of objects'], [/\bcubes?\b/i, 'cubes'],
+    [/\bclocks?\b|clock face/i, 'a clock face'], [/\bcoins?\b|\bmoney\b|dollars?|cents?\b/i, 'coins and notes'], [/\brulers?\b/i, 'a ruler'],
+    [/thermometer/i, 'a thermometer'], [/protractor|\bangles?\b/i, 'angles'], [/fraction (?:bars?|strips?|circles?|walls?)|\bshaded?\b|\bshading\b/i, 'shaded fraction pictures'],
+    [/\bshapes?\b|polygons?|triangles?|quadrilaterals?|outlines?|\bsolids?\b|\b3-?d\b|\b2-?d\b/i, 'shapes'],
+    [/coordinate|\bgrids?\b|\baxes\b/i, 'a grid'], [/\bgraphs?\b|pictograph|line plot|bar chart|tally/i, 'a graph or chart'], [/\btables?\b/i, 'a table'],
+    [/\bscales?\b|balance/i, 'a scale'], [/\bobjects?\b|line-art|\bpictures?\b|\bpictured\b|\bpicture-row\b|wordpic/i, 'pictures of objects'],
+    [/\bstory|stories|word problem/i, 'a short story'], [/equation|number sentence|\bsentences?\b/i, 'a number sentence'],
+];
+const ANSWERS = [
+    [/\btick\b|tick boxes|check box/i, 'ticks a box'], [/\bcircles?\b(?! (?:and|or) )|\bring\b/i, 'circles the answer'], [/\bshade\b/i, 'shades the part'],
+    [/\bdraw(?:s|ing)? (?:the|a|dots|lines?)\b/i, 'draws the answer'], [/\btap\b|\bchoose\b|\bpick\b|which (?:one|picture|diagram)/i, 'chooses the answer'],
+    [/\bmatch\b/i, 'matches the pairs'], [/\bwrite\b|answer box|\bslots?\b|\bboxes?\b/i, 'writes the answer'],
+];
+/** "How it looks": the plain representation note, else what it draws and how the pupil answers, else '' (hidden). */
 export function todoLooks(e) {
     if (isMigrate(e)) return 'Black-and-white boxed questions, drawn the same on paper and on screen.';
     if (isVisual(e)) return `A black-and-white line drawing of "${nameWords(e)}", the same on paper and on screen.`;
-    return plainNote(e.representation) || 'A black-and-white boxed question, the same on paper and on screen.';
+    const whole = plainNote(e.representation);
+    if (whole) return whole;
+    const rep = `${e.representation || ''} ${e.spec && typeof e.spec === 'object' ? [].concat(e.spec.problemTypes || []).join(' ') : ''}`;
+    const draws = [...new Set(DRAWS.filter(([re]) => re.test(rep)).map(([, w]) => w))].slice(0, 3);
+    const ans = (ANSWERS.find(([re]) => re.test(rep)) || [])[1] || '';
+    if (!draws.length) return e.kind === 'option' ? '' : ans ? `Black-and-white boxed questions; the pupil ${ans}.` : '';
+    const t = `Shows ${draws.length < 2 ? draws[0] : `${draws.slice(0, -1).join(', ')} and ${draws[draws.length - 1]}`} in black and white${ans ? `; the pupil ${ans}` : ''}.`;
+    return isPlain(t) ? t : '';
 }
 
 /**
@@ -70,6 +98,7 @@ export function todoLooks(e) {
 export function todoCloses(e) {
     const out = [];
     for (const g of e.gaps || []) {
+        if (/^\s*none\.?\s*$/i.test(String(g.text || '')) && !g.step && !g.lesson && !g.code && !g.map) continue;   // m12: no "None." line
         const note = plainNote(g.text);
         let line = '';
         if (g.step) line = stepLabel(g.step) ? `${stepLabel(g.step)}: ${note || 'no skill teaches all of it yet.'}` : note;
@@ -156,6 +185,11 @@ export function mapNote(text, row = {}) {
     const id = row.proposal || '';
     if (!id) return '';
     const e = row.entry || NAMES.get(id) || { id, name: proposalName(id) };
+    // N31 (critic r6): the row's own clause when the note is "<entry id> adds <what>" — what THIS task gains — read
+    // by the entry id the row names, and shown only when that clause is plain
+    const own = new RegExp(`^${id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:['’]s?)?(?: MAP clause)? (?:adds|will add)\\s+(.+)$`, 'i').exec(String(text || '').trim());
+    const clause = own ? plainNote(own[1]) : '';
+    if (clause) return `"${nameWords(e)}" will add: ${lowerFirst(clause)}`;
     const teaches = plainNote(e.teaches);
     if (teaches) return `"${nameWords(e)}" will add: ${lowerFirst(teaches)}`;
     return `"${nameWords(e)}" is still to be built.`;

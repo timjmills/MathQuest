@@ -347,7 +347,7 @@ function detailHTML() {
         : notTagged ? `Skills not tagged yet.${links.prereq.length || links.related.length ? ' The skills below share its standards or come before it.' : ''}`
             : l.type === 'build' && !tagged ? 'A CCSS lesson the school is still to write — there is no White Rose lesson for it.'
                 : links.verdict === 'full' ? 'The skills below teach every part of this lesson.'
-                    : links.verdict === 'partial' ? `These skills cover part of the lesson${links.missing ? `. Not yet: ${esc(links.missing)}` : '.'}` : 'No skill teaches this lesson yet.';
+                    : links.verdict === 'partial' ? esc(L.partialVerdict(links)) : 'No skill teaches this lesson yet.';
     const u = unitRec();
     const flag = L.siteFlagText(l);
     const about = L.lessonAbout(l);

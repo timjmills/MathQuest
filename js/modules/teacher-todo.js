@@ -21,8 +21,28 @@ let root = null;
 
 const t = {
     sources: new Set(), grades: new Set(), domains: new Set(), kinds: new Set(), pair: '', q: '',
-    open: new Set(), focus: '',
+    open: new Set(), focus: '', last: '',
 };
+
+/* ================================================================= hash (critic r6 m11)
+ * The screen keeps its place in the URL hash, like White Rose and MAP: #todo, or #todo/<entry id> for the entry
+ * opened last. A lesson opened from an entry is a new history entry (#wrm/...), so Back returns here, to that
+ * entry, open and focused. */
+export function todoHashActive() { return /^#todo(\/|$)/.test(location.hash || ''); }
+function writeTodoHash() {
+    const h = t.last ? `#todo/${encodeURIComponent(t.last)}` : '#todo';
+    if (location.hash !== h) history.replaceState(history.state, '', h);
+}
+function readTodoHash() {
+    const m = /^#todo\/([^/?#]+)/.exec(location.hash || '');
+    if (!m) return;
+    const id = decodeURIComponent(m[1]);
+    t.open.add(id); t.focus = id; t.last = id;
+}
+/** Leaving the screen: drop the hash (a new entry, so Back returns to the list). */
+export function clearTodoHash() {
+    if (todoHashActive()) history.pushState(history.state, '', location.pathname + location.search);
+}
 
 function load() {
     if (queue) return Promise.resolve();
@@ -43,6 +63,7 @@ export function openTodo(id) {
     t.sources.clear(); t.grades.clear(); t.domains.clear(); t.kinds.clear(); t.pair = ''; t.q = '';
     t.open.add(id);
     t.focus = id;
+    t.last = id;
     window.tvGo?.('todo');
 }
 
@@ -94,6 +115,8 @@ const gradeShort = (g) => (g === 'PK' ? 'Pre-K' : g === 'K' ? 'K' : g === '6' ? 
 
 export function renderTodoScreen(el) {
     root = el;
+    if (todoHashActive()) readTodoHash();
+    writeTodoHash();
     if (!el.dataset.built) {
         el.dataset.built = '1';
         el.innerHTML = `<header class="tv-header"><div><h1 class="tv-h1">Skills to be made</h1>
@@ -188,7 +211,7 @@ function specHTML(e) {
         <dt>Kind</dt><dd>${esc(kindLine(e))}</dd>
         <dt>What pupils will do</dt><dd>${esc(todoTeaches(e))}</dd>
         <dt>Gap it fills</dt><dd>${(() => { const c = todoCloses(e); return c.length > 1 ? `<ul class="tvt-ul">${c.slice(0, 6).map((x) => `<li>${esc(x)}</li>`).join('')}${c.length > 6 ? `<li>and ${c.length - 6} more</li>` : ''}</ul>` : esc(c[0] || ''); })()}</dd>
-        <dt>How it looks</dt><dd>${esc(todoLooks(e))}${pairs.length ? ` <span class="tvw-tag">${esc(pairs.join(' · '))}</span>` : ''}</dd>
+        ${todoLooks(e) || pairs.length ? `<dt>How it looks</dt><dd>${esc(todoLooks(e))}${pairs.length ? ` <span class="tvw-tag">${esc(pairs.join(' · '))}</span>` : ''}</dd>` : ''}
         ${e.ccss.length || e.ee.length ? `<dt>Standards</dt><dd class="tvt-codes">${[...e.ccss, ...e.ee].map((c) => `<span class="tvw-tag tvw-code">${esc(c)}</span>`).join(' ')}</dd>` : ''}
         ${steps ? `<dt>White Rose steps</dt><dd class="tvt-codes">${steps}</dd>` : ''}
         ${lessons ? `<dt>School lessons</dt><dd class="tvt-codes">${lessons}</dd>` : ''}
@@ -208,7 +231,7 @@ export function todoPrintHTML() {
         t.pair ? (W.REP_PAIRS.find((p) => p.id === t.pair) || {}).label : '', t.q ? `"${t.q}"` : ''].filter(Boolean).join(' · ');
     const row = (e) => `<div class="it"><h4>${esc(todoName(e))} <small>${esc(kindName(e.kind))} · ${esc(e.sources.map(srcName).join(', '))} · ${esc(gradeText(e))}</small></h4>
       <p><b>What pupils will do:</b> ${esc(todoTeaches(e))}</p><p><b>Gap it fills:</b> ${esc(todoCloses(e).slice(0, 3).join(' · '))}</p>
-      <p><b>How it looks:</b> ${esc(todoLooks(e))}</p>
+      ${todoLooks(e) ? `<p><b>How it looks:</b> ${esc(todoLooks(e))}</p>` : ''}
       ${e.ccss.length || e.ee.length || e.wrmSteps.length ? `<p class="c">${esc([...e.ccss, ...e.ee].join(', '))}${e.wrmSteps.length ? ` · White Rose: ${esc(e.wrmSteps.slice(0, 6).map(Q.stepName).join('; '))}${e.wrmSteps.length > 6 ? ' …' : ''}` : ''}</p>` : ''}</div>`;
     const body = groupsOf(items).map((g) => `<h2>${esc(gradeHead(g.grade))} (${g.n})</h2>${g.doms.map(([d, list]) => `<h3>${esc(domName(d))}</h3>${list.map(row).join('')}`).join('')}`).join('');
     return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Skills to be made</title><style>
@@ -266,13 +289,16 @@ function wire(el) {
             return;
         }
         if (d.tOpen) {
-            if (t.open.has(d.tOpen)) t.open.delete(d.tOpen); else t.open.add(d.tOpen);
+            if (t.open.has(d.tOpen)) { t.open.delete(d.tOpen); if (t.last === d.tOpen) t.last = ''; } else { t.open.add(d.tOpen); t.last = d.tOpen; }
+            writeTodoHash();
             const li = b.closest('.tvt-item');
             const e2 = queue.items.find((x) => x.id === d.tOpen);
             li.outerHTML = itemHTML(e2);
             root.querySelector(`[data-t-open="${CSS.escape(d.tOpen)}"]`)?.focus();
             return;
         }
+        // m11: the entry the button sits in is the one Back returns to
+        if (d.tLesson || d.tStep) { const it = b.closest('[data-t-item]'); if (it) { t.last = it.dataset.tItem; t.open.add(t.last); writeTodoHash(); } }
         if (d.tLesson) {
             import('./teacher-wrm.js').then((m) => m.openWrmLesson(d.tLesson)).then((ok) => { if (!ok) toast('This lesson is not on the White Rose screen'); });
             return;
