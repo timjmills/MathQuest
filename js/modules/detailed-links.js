@@ -49,6 +49,8 @@ export function detailedRecord(r) {
         id: String(r.id), title, grade: String(r.grade || ''), site: String(r.siteLessonId || ''),
         steps: (r.wrmSteps || []).filter((s) => typeof s === 'string'),
         pack: safeHref(r.pack && (r.pack.pdf || r.pack.html)), used, build, status: String(r.status || ''),
+        // the raw to-make items, so the lesson's "Skills to be made" card can join one to the entry it names
+        proposed: ((r.skills && r.skills.proposed) || []).filter((x) => typeof x === 'string'),
     };
 }
 

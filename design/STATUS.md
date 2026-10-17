@@ -489,6 +489,19 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
   beats a stale #map hash; ws-teacher-library opens the Start tab); build list gains `mult_standard` (owner: standard-algorithm
   multiplication 2x1, 3x1, 4x1, 2x2, 3x2 as one skill with a size option). Full gates OK; print-lint 460/33. Owner: STOP after this.
   Still paused on branches: lessons 6-10 (-wip-detailed-lessons-2), Lane D, fraction key — see their entries.
+- 2026-10-17 (owner: "clearly say all of the planned/needed/added skills that will be made to fully cover that lesson/standard",
+  "per lesson", then "per grade/domain"): White Rose page "Skills to be made" cards on branch `claude/sweet-newton-c8wrv1-wip-wrm-tomake`
+  (builder Opus medium, the page lane's level since round 5). New pure `js/modules/lesson-tomake.js`: one de-duplicated list per lesson
+  from links.build, WRM_PROPOSALS / Skills to be made entries naming the step or school lesson, every build entry a partial / gap
+  verdict of the lesson's CCSS/EE codes (and lettered parts) sends a missing clause to, and the detailed lesson's to-make items; rows =
+  name ("<option> — a new choice on <skill>", "Fix: …"), kind tag, "Covers:" (the lesson's own gap line, else the audit clause that
+  shares words with the entry, else what it teaches) with codes, status (Planned; no lane-active data, so never "Being built"), and
+  "See it on Skills to be made". Lesson card right after the head (replaces the head and do-first "Still to make" lines; the
+  detailed card points to it), "Earlier skills to be made first" from links.preBuild, honest empty lines. Unit card "Skills to be made
+  for <Grade> · <Domain>" at the top of the unit view (first 6, "Show all N", "For lessons 26, 27 …" links); with a lesson open it
+  moves below the lesson. B5 check in ws-teacher-wrm now asks for the card heading (not the first skill row) above the Chromebook bar:
+  the owner's order puts the card first. Gates: ws-wrm-page-unit (+ --curated) to-make gate, ws-teacher-wrm to-make step. Evidence
+  `design/audit/runs/wrm-page/tomake/`. Not deployed, not stamped; no critic yet.
 - Held for after these land: Lane B answer boxes + regroup boxes (spec `design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md`),
   placevalue:identify write-value (spec `design/audit/runs/next-session/PV-IDENTIFY-WRITE-VALUE-SPEC.md`).
 

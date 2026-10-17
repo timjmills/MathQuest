@@ -282,3 +282,52 @@ html.dark body.teacher-mode .tvw-lesson.is-assess .tvw-n { color: #e0d2ff; }
 .tvw-dl-skills { margin: 0; font-size: 14px; line-height: 20px; color: var(--tv-ink, inherit); overflow-wrap: anywhere; }
 .tvw-dl-build { color: var(--tv-caption); }
 .tvw-dl-tag { border-style: dashed; }
+
+/* Owner 2026-10-17: "Skills to be made for this lesson" (after the lesson head) and the same summary for the grade + domain
+   (above the lesson list). lesson-tomake.js composes the rows. Additive. */
+.tvw-tm, .tvw-tmu { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.tvw-tmu { margin: 0 0 16px; }
+.tvw-tm-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+.tvw-tm-head .tv-h3 { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.tvw-tm-count { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; padding: 0 8px; border-radius: 14px;
+    background: var(--tv-text, #1a1a1a); color: var(--tv-surface, #fff); font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tvw-tm-count.is-sm { min-width: 24px; height: 24px; font-size: 13px; margin-left: 4px; }
+.tvw-tmu-toggle { margin-left: auto; }
+.tvw-tm-lead { margin: 0; font-size: 15px; line-height: 22px; color: var(--tv-text); overflow-wrap: anywhere; }
+.tvw-tm-empty { margin: 0; padding: 12px; border: 1px dashed var(--tv-border); border-radius: 8px; font-size: 15px; line-height: 22px; color: var(--tv-text-2); }
+.tvw-tm-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.tvw-tm-row { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border: 1px solid var(--tv-border); border-radius: 10px; background: var(--tv-surface); min-width: 0; }
+.tvw-tm-top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 10px; }
+.tvw-tm-name { font-size: 16px; line-height: 22px; font-weight: 700; color: var(--tv-text); min-width: 0; overflow-wrap: anywhere; flex: 1 1 260px; }
+.tvw-tm-tags { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.tvw-tag.tvw-tm-kind { background: transparent; color: var(--tv-text); border: 1.5px solid var(--tv-text); }
+.tvw-tag.tvw-tm-kind.is-fix { border-style: dashed; }
+.tvw-tag.tvw-tm-status { background: var(--tv-subtle); color: var(--tv-text-2); }
+.tvw-tag.tvw-tm-status.is-building { background: var(--tv-text); color: var(--tv-surface); }
+.tvw-tm-covers { margin: 0; font-size: 14px; line-height: 20px; color: var(--tv-text-2); overflow-wrap: anywhere; }
+.tvw-tm-covers b { color: var(--tv-text); }
+.tvw-tm-covers .tvw-tag { vertical-align: baseline; }
+.tvw-tm-for { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 14px; color: var(--tv-text-2); }
+.tvw-tm-lesson {
+    display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: 0 10px; border: 1px solid var(--tv-border);
+    border-radius: 8px; background: transparent; color: var(--tv-accent); font: inherit; font-weight: 700; cursor: pointer; text-align: left; max-width: 100%; overflow-wrap: anywhere;
+}
+.tvw-tm-lesson:hover, .tvw-tm-lesson:focus-visible { background: var(--tv-accent-tint); }
+.tvw-tm-act { display: flex; flex-wrap: wrap; gap: 8px; }
+.tvw-tm .tvw-tm-link, .tvw-tmu .tvw-tm-link, .tvw-tmu .tvw-tmu-toggle, .tvw-tmu .tvw-tmu-all { min-height: 44px; height: auto; }
+.tvw-tmu-all { align-self: flex-start; margin-top: 8px; }
+.tvw-tm-sub { margin: 8px 0 0; padding-top: 10px; border-top: 1px solid var(--tv-rule); font-size: 16px; line-height: 22px; font-weight: 700; display: flex; align-items: center; }
+.tvw-tm-precap { margin: 0; }
+.tvw-dl-build .tvw-tbb-link { display: inline-flex; vertical-align: middle; }
+html.dark body.teacher-mode .tvw-tm-count { background: #f2f2f2; color: #111; }
+html.dark body.teacher-mode .tvw-tag.tvw-tm-kind { color: #f2f2f2; border-color: #f2f2f2; }
+@media (max-width: 420px) {
+    .tvw-tm-row { padding: 10px; }
+    .tvw-tm-link { width: 100%; justify-content: center; }
+    .tvw-tmu-toggle { margin-left: 0; }
+}
+.tvw-grid + .tvw-tmu { margin: 16px 0 0; }
+@media (max-width: 420px) {
+    .tvw-tm .tvw-tm-link, .tvw-tmu .tvw-tm-link { white-space: normal; text-align: center; padding: 6px 10px; font-size: 14px; }
+    .tvw-tm .tvw-tm-link svg, .tvw-tmu .tvw-tm-link svg { display: none; }
+}

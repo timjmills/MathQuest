@@ -20,8 +20,8 @@
 
 import { icon, esc, hideToast, toast, copyText } from './teacher-ui.js';
 import { skillView } from './teacher-preview.js';
-import { createPicker, liveKey, toBeBuiltHTML, skillLabelOf, makePracticeLink } from './teacher-skillpick.js';
-import { loadYear, loadDetailed } from './links-data.js';
+import { createPicker, liveKey, skillLabelOf, makePracticeLink } from './teacher-skillpick.js';
+import { loadYear, loadDetailed, loadLinksData } from './links-data.js';
 import { indexDetailed, detailedOf, DETAILED_CAP } from './detailed-links.js';
 import { printDetailedLesson } from './teacher-print.js';
 import { detailedLessonFor } from './lessons/detailed/index.js';
@@ -59,9 +59,23 @@ function load() {
             .catch((e) => { console.warn('[teacher-wrm] load', e); loading = null; });
         // the detailed-lessons hook: nothing is fetched unless index.json says the file exists
         loadDetailed().then((d) => { detailed = d ? indexDetailed(d) : null; if (detailed && root && root.isConnected && L && root.querySelector('#tvwLessons')) draw(); });
+        // owner 2026-10-17 ("clearly say all of the planned skills … per lesson", "per grade/domain"): the Skills to be
+        // made list (every source, one entry per id) names, kinds and gap lines for the lesson and unit cards
+        loading.then(() => Promise.all([import('./build-queue.js'), import('./lesson-tomake.js'), import('./todo-text.js'), loadLinksData()])).then(([Q, T, TT, data]) => {
+            if (!L) return;
+            for (const [y, d] of Object.entries(data.years || {})) if (!curatedDone.has(y)) { curatedDone.add(y); if (d) L.addCuratedYear(d); }
+            TM = T;
+            queue = Q.buildQueue({ curated: Object.values(data.years || {}), map: data.map }).items;
+            TT.setTodoNames(queue);
+            unitCache.clear();
+            if (root && root.isConnected && root.querySelector('#tvwLessons')) draw();
+        }).catch((e) => { console.warn('[teacher-wrm] to-make', e); });
     }
     return loading;
 }
+let TM = null;                       // lesson-tomake.js, once the Skills to be made list is in
+let queue = null;                    // buildQueue(...).items
+const unitCache = new Map();         // 'grade|unit' -> unitToMake rows
 
 // Curated year files (data/curriculum/links/<YEAR>.json) load on demand: the years of the steps in the
 // unit on screen (a copied-in lesson's step is another year's). They win over the computed rules.
@@ -234,10 +248,12 @@ function draw() {
             <div class="tv-chips tvw-units" role="group" aria-labelledby="tvwUnitH">${unitChips()}</div></div>
         </div>
       </div>
+      ${compact ? '' : unitToMakeHTML(false)}
       <div class="tvw-grid">
         <nav class="tv-card tv-flush tvw-lessons" aria-labelledby="tvwUnitTitle" id="tvwLessons">${lessonListHTML()}</nav>
         <section class="tvw-detail" id="tvwDetail" aria-live="polite">${detailHTML()}</section>
-      </div>`;
+      </div>
+      ${compact ? unitToMakeHTML(true) : ''}`;
     pick.after(root.querySelector('#tvwDetail'));
     const cur = body.querySelector('.tvw-lesson[aria-current="true"]');
     if (cur) cur.scrollIntoView({ block: 'nearest' });
@@ -333,7 +349,7 @@ function detailedHTML(l) {
         <h3 class="tv-h3" id="tvwDl-${esc(r.id)}">Detailed lesson: ${esc(r.title)}</h3>
         <p class="tv-cap">${esc(DETAILED_CAP)}</p>
         ${labels.length ? `<p class="tvw-dl-skills">Its skills: ${esc(labels.join(', '))}.</p>` : ''}
-        ${r.build.length ? `<p class="tvw-dl-skills tvw-dl-build">Still to make: ${esc(r.build.join('; '))}.</p>` : ''}
+        ${r.build.length ? `<p class="tvw-dl-skills tvw-dl-build">What it still needs made is listed in <button type="button" class="tvw-tbb-link" data-w-tm-goto="1">Skills to be made for this lesson</button> above.</p>` : ''}
         <div class="tvw-files">${r.pack ? `<a class="tv-btn tv-btn-primary" data-w-dl-pack="${esc(r.id)}" href="${esc(r.pack)}" target="_blank" rel="noopener">${icon('sheet', 18)}<span>Open the detailed lesson</span></a>` : ''}${live.length ? `<button type="button" class="tv-btn" data-w-dl-link="${esc(r.id)}">${icon('link', 18)}<span>Practice link</span></button>` : ''}${detailedLessonFor(r.id) ? `<button type="button" class="tv-btn" data-w-dl-make="${esc(r.id)}">${icon('print', 18)}<span>Make it</span></button>` : ''}</div>
       </section>`;
     }).join('');
@@ -352,6 +368,88 @@ async function detailedLink(id) {
     pick.redrawBar();
     toast(ok ? `Practice link copied · ${items.length} skill${items.length === 1 ? '' : 's'}` : 'Link ready: copy it from the box');
     root.querySelector('#tvwLink')?.select();
+}
+
+/* ================================================================= Skills to be made (owner 2026-10-17)
+ * One card per lesson, right after the lesson head, listing every planned item that will cover the lesson and its
+ * standards (lesson-tomake.js gathers them from the lesson's build list, White Rose, the standards audit and the
+ * detailed lesson), and the same summary for the grade + domain at the top of the unit. Each row: name, a kind tag,
+ * "Covers:" with the codes, a status tag and a link to the entry on Skills to be made. */
+const UNIT_ROWS = 6;
+
+function toMakeRowHTML(x, { lessons = null } = {}) {
+    const link = x.todo
+        ? `<button type="button" class="tv-btn tv-btn-sm tvw-tm-link" data-todo-open="${esc(x.todo)}">${icon('list', 16)}<span>See it on Skills to be made</span></button>`
+        : x.detailed ? `<button type="button" class="tv-btn tv-btn-sm tvw-tm-link" data-w-dl-goto="${esc(x.detailed)}">${icon('sheet', 16)}<span>See it in the detailed lesson</span></button>` : '';
+    const forL = lessons && lessons.length
+        ? `<p class="tvw-tm-for"><span>For lesson${lessons.length > 1 ? 's' : ''}</span> ${lessons.map((l) => `<button type="button" class="tvw-tm-lesson" data-w-lesson="${esc(l.key)}" aria-label="${esc(`Open lesson ${l.n ? `${l.n}: ` : ''}${l.title}`)}">${esc(l.n ? String(l.n) : l.title)}</button>`).join('')}</p>`
+        : '';
+    return `<li class="tvw-tm-row" data-w-tm-row="${esc(x.todo || x.name)}" data-w-tm-kind="${esc(x.kind)}" data-w-tm-status="${esc(x.status)}">
+        <div class="tvw-tm-top"><span class="tvw-tm-name">${esc(x.name)}</span>
+          <span class="tvw-tm-tags"><span class="tvw-tag tvw-tm-kind is-${esc(x.kind)}">${esc(x.kindTag)}</span><span class="tvw-tag tvw-tm-status is-${esc(x.status)}">${esc(x.statusTag)}</span></span></div>
+        <p class="tvw-tm-covers"><b>Covers:</b> <span class="tvw-tm-what">${esc(x.covers)}</span>${x.codes.map((c) => ` <span class="tvw-tag tvw-code">${esc(c)}</span>`).join('')}</p>
+        ${forL}${link ? `<div class="tvw-tm-act">${link}</div>` : ''}
+      </li>`;
+}
+
+function lessonToMakeHTML(l, lk, { fullOk }) {
+    if (l.type === 'assessment') return '';
+    if (!TM || !queue) {
+        return `<section class="tv-card tvw-tm" id="tvwToMake" aria-labelledby="tvwTmH" data-w-tomake="loading">
+          <div class="tvw-tm-head"><h3 class="tv-h3" id="tvwTmH">Skills to be made for this lesson</h3></div>
+          <p class="tv-cap">Loading the list of skills to be made…</p></section>`;
+    }
+    const r = TM.lessonToMake(l, lk, { queue, detailed: detailedOf(detailed, l) });
+    const n = r.items.length;
+    const body = n
+        ? `<p class="tvw-tm-lead">${esc(TM.leadLine(r.codes, n))}</p><ul class="tvw-tm-list" data-w-tm-list="lesson">${r.items.map((x) => toMakeRowHTML(x)).join('')}</ul>`
+        : `<p class="tvw-tm-empty" data-w-tm-empty="${fullOk ? 'full' : 'gap'}">${esc(fullOk ? TM.EMPTY_FULL : TM.EMPTY_GAP)}</p>`;
+    const pre = r.pre.length
+        ? `<h4 class="tvw-tm-sub" id="tvwTmPre">Earlier skills to be made first <span class="tvw-tm-count is-sm">${r.pre.length}</span></h4>
+           <p class="tv-cap tvw-tm-precap">Lessons before this one need these too. They help pupils get ready for it.</p>
+           <ul class="tvw-tm-list" data-w-tm-list="pre" aria-labelledby="tvwTmPre">${r.pre.map((x) => toMakeRowHTML(x)).join('')}</ul>`
+        : '';
+    return `<section class="tv-card tvw-tm" id="tvwToMake" aria-labelledby="tvwTmH" data-w-tomake="${n}">
+        <div class="tvw-tm-head"><h3 class="tv-h3" id="tvwTmH">Skills to be made for this lesson</h3><span class="tvw-tm-count" aria-label="${n} to be made">${n}</span></div>
+        ${body}${pre}
+      </section>`;
+}
+
+/** The unit's lessons (Pre-K: every small unit of the domain on screen). */
+function unitLessonsAll() {
+    const u = unitRec();
+    if (!u) return [];
+    const units = v.grade === 'PK' ? unitsOf('PK').filter((x) => x.domain === u.domain) : [u];
+    return units.flatMap((x) => lessonsOf(x)).filter(Boolean);
+}
+
+function unitToMakeHTML(compact) {
+    const u = unitRec();
+    if (!u || !gradeRec()) return '';
+    const title = `Skills to be made for ${gradeRec().label} · ${u.id === 'E' ? 'Enrichment' : L.domainName(u.domain)}`;
+    if (!TM || !queue) {
+        return `<section class="tv-card tvw-tmu" id="tvwUnitToMake" aria-labelledby="tvwTmuH" data-w-tomake-unit="loading">
+          <div class="tvw-tm-head"><h2 class="tv-h3" id="tvwTmuH">${esc(title)}</h2></div><p class="tv-cap">Loading the list of skills to be made…</p></section>`;
+    }
+    const key = `${v.grade}|${v.grade === 'PK' ? u.domain : u.id}`;
+    if (!unitCache.has(key)) {
+        unitCache.set(key, TM.unitToMake(unitLessonsAll().map((l) => ({ lesson: l, links: L.linksFor(l, { live }), detailed: detailedOf(detailed, l) })), { queue }));
+    }
+    const rows = unitCache.get(key);
+    const n = rows.length;
+    // at the top of the unit view; with a lesson open it moves below the lesson (the lesson's own skills come first)
+    const open = v.unitOpen !== `-${key}`;
+    const all = v.unitAll === key;
+    const shown = all ? rows : rows.slice(0, UNIT_ROWS);
+    const toggle = n ? `<button type="button" class="tv-btn tv-btn-sm tvw-tmu-toggle" data-w-tmu-toggle="${esc(key)}" aria-expanded="${open}" aria-controls="tvwTmuBody">${open ? 'Hide the list' : 'Show the list'}</button>` : '';
+    return `<section class="tv-card tvw-tmu" id="tvwUnitToMake" aria-labelledby="tvwTmuH" data-w-tomake-unit="${n}">
+        <div class="tvw-tm-head"><h2 class="tv-h3" id="tvwTmuH">${esc(title)}</h2><span class="tvw-tm-count" aria-label="${n} to be made">${n}</span>${toggle}</div>
+        ${!n ? `<p class="tvw-tm-empty" data-w-tm-empty="unit">${esc(TM.EMPTY_UNIT)}</p>` : `<div id="tvwTmuBody"${open ? '' : ' hidden'}>
+          <p class="tvw-tm-lead">To cover every lesson of this unit and its standards, these will be made. Each names the lessons it is for.</p>
+          <ul class="tvw-tm-list" data-w-tm-list="unit">${shown.map((x) => toMakeRowHTML(x, { lessons: x.lessons })).join('')}</ul>
+          ${n > UNIT_ROWS ? `<button type="button" class="tv-btn tv-btn-sm tvw-tmu-all" data-w-tmu-all="${esc(key)}" aria-expanded="${all}">${all ? `Show the first ${UNIT_ROWS}` : `Show all ${n}`}</button>` : ''}
+        </div>`}
+      </section>`;
 }
 
 function detailHTML() {
@@ -402,11 +500,12 @@ function detailHTML() {
         </div>
         ${about.length ? `<div class="tvw-about">${about.map((t) => `<p>${esc(t)}</p>`).join('')}</div>` : ''}
         ${files.length ? `<div class="tvw-files">${fileBtn(files[0], l.type === 'copied' && l.from ? `Open lesson (${gradeWord(l.from)} files)` : 'Open lesson', 'external')}${fileBtn(files[1], 'Teaching guide', 'book')}${files[2] ? fileBtn('x', 'Video', 'play', files[2]) : ''}</div>` : ''}
-        <p class="tvw-verdict${assess || notTagged ? ' is-quiet' : links.verdict === 'gap' || (l.type === 'build' && !tagged) ? ' is-gap' : ''}">${verdict}</p>${toBeBuiltHTML(links.build, L.proposalLabel)}
+        <p class="tvw-verdict${assess || notTagged ? ' is-quiet' : links.verdict === 'gap' || (l.type === 'build' && !tagged) ? ' is-gap' : ''}">${verdict}</p>
         ${assess ? '' : pick.quickHTML([['direct', 'All teaching skills'], ['prereq', 'Do-first skills'], ['related', 'Go-with skills'], ['all', 'Everything']])}
       </div>
+      ${lessonToMakeHTML(l, links, { fullOk: !!vd && links.verdict === 'full' })}
       ${detailedHTML(l)}
-      ${assess ? '' : GROUPS.map(([g, h, cap]) => pick.groupHTML(g, h, cap, emptyText(g, l, notTagged, hasDl), g === 'prereq' ? toBeBuiltHTML(links.preBuild, L.proposalLabel, 'Still to make') : '')).join('')}
+      ${assess ? '' : GROUPS.map(([g, h, cap]) => pick.groupHTML(g, h, cap, emptyText(g, l, notTagged, hasDl), '')).join('')}
       ${assess ? '' : pick.barWrapHTML()}`;
 }
 
@@ -466,6 +565,23 @@ function wire(el) {
             return;
         }
         if (d.wDlLink) { detailedLink(d.wDlLink); return; }
+        if (d.wTmGoto) { const c = root.querySelector('#tvwToMake'); if (c) { c.scrollIntoView({ block: 'start', behavior: 'instant' }); c.querySelector('h3')?.setAttribute('tabindex', '-1'); c.querySelector('h3')?.focus(); } return; }
+        if (d.wDlGoto) { const c = root.querySelector(`[data-w-dl="${CSS.escape(d.wDlGoto)}"]`); if (c) { c.scrollIntoView({ block: 'start', behavior: 'instant' }); c.querySelector('h3')?.setAttribute('tabindex', '-1'); c.querySelector('h3')?.focus(); } return; }
+        if (d.wTmuToggle) {
+            const k = d.wTmuToggle;
+            const open = t.getAttribute('aria-expanded') === 'true';
+            v.unitOpen = open ? `-${k}` : k;
+            draw();
+            root.querySelector(`[data-w-tmu-toggle="${CSS.escape(k)}"]`)?.focus();
+            return;
+        }
+        if (d.wTmuAll) {
+            const k = d.wTmuAll;
+            v.unitAll = v.unitAll === k ? '' : k;
+            draw();
+            root.querySelector(`[data-w-tmu-all="${CSS.escape(k)}"]`)?.focus();
+            return;
+        }
         if (d.wDlMake) {
             hideToast();
             if (printDetailedLesson(d.wDlMake)) window.tvGo?.('print'); else toast('That lesson cannot be made here yet');

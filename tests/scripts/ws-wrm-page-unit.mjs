@@ -362,6 +362,93 @@ const todoGate = (tag, Q) => {
         gate(`${tag} ${e.id} map`, e.map.map(TT.mapLine), { fragment: false });
     }
 };
+// SKILLS TO BE MADE PER LESSON AND PER UNIT (owner 2026-10-17): every lesson's card lists exactly the de-duplicated
+// union of its build list, the White Rose proposals and Skills to be made entries naming its step or school lesson, the
+// build-list entries the standards audit sends a missing clause of its codes to, and its detailed lesson's to-make
+// items; the do-first list is the rest of links.preBuild; every row has a name, a kind, "Covers:" and a status in plain
+// words; the unit card is the union of its lessons' rows, each naming exactly the lessons that list it.
+const TMK = await import('../../js/modules/lesson-tomake.js');
+const { CCSS_AUDIT, EE_AUDIT } = await import('../../js/modules/standards-audit.js');
+const { WRM_PROPOSALS: WP } = await import('../../js/modules/wrm.js');
+const DLK = await import('../../js/modules/detailed-links.js');
+const DL_INDEX = DLK.indexDetailed(JSON.parse(readFileSync(new URL('../../data/curriculum/detailed-lessons.json', import.meta.url), 'utf8')));
+const TM_KIND = new Set(Object.values(TMK.KIND_TAG));
+const TM_STATUS = new Set(Object.values(TMK.STATUS_TAG));
+let tmLessons = 0, tmRows = 0, tmUnits = 0;
+const toMakeGate = (tag, Qc) => {
+    TT.setTodoNames(Qc.items);
+    const ids = new Set(Qc.items.map((e) => e.id));
+    const perLesson = new Map();
+    for (const l of L) {
+        if (l.type === 'assessment') continue;
+        const r = linksFor(l);
+        const det = DLK.detailedOf(DL_INDEX, l);
+        const tm = TMK.lessonToMake(l, r, { queue: Qc.items, detailed: det });
+        perLesson.set(l.key, tm);
+        tmLessons += 1;
+        // the union, computed here from the sources themselves
+        const want = new Set(r.build);
+        if (l.step) for (const [id, p] of Object.entries(WP)) if ((p.steps || []).includes(l.step) || (p.improves || []).includes(l.step)) want.add(id);
+        for (const e of Qc.items) if ((l.step && e.wrmSteps.includes(l.step)) || (l.site && (e.siteLessons || []).includes(l.site))) want.add(e.id);
+        const codes = TMK.lessonCodes(l, r);
+        for (const [table, list] of [[CCSS_AUDIT, codes.ccss], [EE_AUDIT, codes.ee]]) for (const c of list) for (const [k, a] of Object.entries(table)) {
+            if ((k === c || (k.startsWith(c) && /^[a-z]$/.test(k.slice(c.length)))) && a.status !== 'full') for (const id of a.build || []) want.add(id);
+        }
+        const got = tm.items.filter((x) => x.todo).map((x) => x.todo);
+        const rawDet = det.flatMap((d) => d.proposed || []).join(' ');
+        ok(new Set(got).size === got.length, `to-make ${tag} ${l.key}: an entry listed twice`);
+        for (const id of want) ok(got.includes(id), `to-make ${tag} ${l.key}: ${id} is planned for this lesson but not on its card`);
+        // an entry beyond the union must be one the detailed lesson names
+        for (const id of got) if (!want.has(id)) ok(new RegExp(`\\b${id}\\b`).test(rawDet) || Qc.items.some((e) => e.id === id && e.skill && rawDet.includes(e.skill)), `to-make ${tag} ${l.key}: ${id} on the card comes from no source`);
+        // the detailed lesson's own rows: one per to-make item that names no entry (and reads plainly)
+        const free = tm.items.filter((x) => !x.todo);
+        ok(new Set(free.map((x) => x.name)).size === free.length, `to-make ${tag} ${l.key}: a detailed-lesson row twice`);
+        for (const x of free) ok(x.detailed && det.some((d) => d.id === x.detailed), `to-make ${tag} ${l.key}: a row with no entry and no detailed lesson "${x.name}"`);
+        const wantPre = [...new Set(r.preBuild.filter((id) => !got.includes(id)))];
+        ok(JSON.stringify(tm.pre.map((x) => x.todo)) === JSON.stringify(wantPre), `to-make ${tag} ${l.key}: the do-first list ${tm.pre.map((x) => x.todo)} is not ${wantPre}`);
+        for (const x of [...tm.items, ...tm.pre]) {
+            tmRows += 1;
+            ok(x.name && TM_KIND.has(x.kindTag) && x.covers && TM_STATUS.has(x.statusTag), `to-make ${tag} ${l.key}: a row lacks a name, kind, covers or status ${JSON.stringify(x)}`);
+            if (x.todo) ok(ids.has(x.todo) || !!proposalName(x.todo), `to-make ${tag} ${l.key}: ${x.todo} is not on Skills to be made`);
+            if (x.kind === 'option') ok(/ — a new choice on | ?A new choice on /.test(x.name), `to-make ${tag} ${l.key}: option row not named as a new choice "${x.name}"`);
+            if (x.kind === 'fix') ok(/^Fix: /.test(x.name), `to-make ${tag} ${l.key}: a repair row not named "Fix: …" "${x.name}"`);
+            for (const t of [x.name, x.covers]) {
+                // M11: no template ids or build syntax; and no skill or entry id
+                if (/\+ new:|\(tiles \d+\)|\bresponse "|^The existing\b|^The skill['’]s own\b|\bA new picture in\b|^[a-z]+ ["']/.test(t) || KIT_ID.test(t) || /\b[a-z]+_[a-z0-9_]+\b|\b[a-z_]{3,}:[a-z0-9_]{3,}\b/.test(t)) { m11 += 1; if (m11 <= 10) console.log('M11', tag, l.key, '|', t); }
+            }
+            gate(`to-make card ${tag} ${l.key}`, [x.name, x.covers]);
+            gate(`to-make card ${tag} ${l.key} tags`, [x.kindTag, x.statusTag, ...x.codes], { fragment: false });
+        }
+        gate(`to-make card ${tag} ${l.key} lead`, tm.items.length ? TMK.leadLine(tm.codes, tm.items.length) : TMK.emptyLine(r));
+        // honest empty state: "Nothing more to make" only for a lesson the verdict calls fully taught
+        if (!tm.items.length) ok(TMK.emptyLine(r) === (r.verdict === 'full' ? TMK.EMPTY_FULL : TMK.EMPTY_GAP), `to-make ${tag} ${l.key}: empty line does not follow the verdict`);
+    }
+    // the unit card
+    for (const g of WRM_SEQUENCE) for (const u of g.units) {
+        const lessons = unitLessons(g.id, u.id).filter(Boolean);
+        const rows = TMK.unitToMake(lessons.map((l) => ({ lesson: l, links: linksFor(l), detailed: DLK.detailedOf(DL_INDEX, l) })), { queue: Qc.items });
+        tmUnits += 1;
+        const key = (x) => x.todo || `~${x.name}`;
+        const want = new Map();
+        for (const l of lessons) for (const x of (perLesson.get(l.key) || { items: [] }).items) { if (!want.has(key(x))) want.set(key(x), []); if (!want.get(key(x)).includes(l.key)) want.get(key(x)).push(l.key); }
+        ok(rows.length === want.size && new Set(rows.map(key)).size === rows.length, `to-make unit ${tag} ${g.id} ${u.id}: ${rows.length} rows, want ${want.size} de-duplicated`);
+        for (const x of rows) ok(JSON.stringify(x.lessons.map((l) => l.key)) === JSON.stringify(want.get(key(x)) || []), `to-make unit ${tag} ${g.id} ${u.id}: ${key(x)} serves ${x.lessons.map((l) => l.key)} not ${want.get(key(x))}`);
+    }
+    // the owner's check: mult_standard on every 4.NBT.B.5 / 5.NBT.B.5 lesson (Grade 4 and Grade 5 multiplication)
+    const ms = L.filter((l) => l.type !== 'assessment' && l.ccss.some((c) => c === '4.NBT.B.5' || c === '5.NBT.B.5'));
+    ok(ms.some((l) => l.grade === '4') && ms.some((l) => l.grade === '5'), `to-make ${tag}: Grade 4 and Grade 5 lessons on 4.NBT.B.5 / 5.NBT.B.5`);
+    for (const l of ms) {
+        const row = perLesson.get(l.key).items.find((x) => x.todo === 'mult_standard');
+        ok(row && row.name === 'Multi-Digit Multiplication: Standard Algorithm' && row.kindTag === 'New skill', `to-make ${tag} ${l.key} (${l.title}): mult_standard not listed as a new skill`);
+    }
+    // Grade 3 "Properties of multiplication" (CCSS BUILD): the associative property and the detailed lesson's follow-ons
+    const pm = L.find((l) => l.grade === '3' && /^Properties of multiplication/.test(l.title));
+    const pr = pm && perLesson.get(pm.key);
+    ok(pr && pr.items.some((x) => x.todo === 'mult_three' && /associative/i.test(x.covers)) && pr.items.filter((x) => x.kind === 'lesson').length >= 2 && pr.items.some((x) => x.kind === 'fix'),
+        `to-make ${tag}: Grade 3 "Properties of multiplication" lists ${pr ? pr.items.map((x) => x.name).join(' | ') : 'nothing'}`);
+};
+toMakeGate('(no files)', buildQueue());
+
 // the share of the tagging lanes' free-text notes the screens now hide (shown whole only when plain)
 const P = await import('../../js/modules/plain-words.js');
 const hidden = {};
@@ -406,9 +493,12 @@ for (const dir of dirs) {
             gate(`lesson ${l.key}`, [r.verdict === 'partial' ? partialVerdict(r) : '', ...r.direct.map((x) => x.partial), ...r.prereq.map((x) => x.why), ...r.related.map((x) => x.why), ...r.build.map(proposalLabel), ...r.preBuild.map(proposalLabel), l.title, ...lessonAbout(l)]);
             truth(l, r);
         }
+        toMakeGate(`(${dir})`, Qc);
         clearCurated();
     }
 }
+ok(tmLessons > 900 && tmRows > 0 && tmUnits > 20, `to-make cards checked: ${tmLessons} lessons, ${tmRows} rows, ${tmUnits} units`);
+console.log(`to-make gate: ${tmLessons} lesson cards, ${tmRows} rows, ${tmUnits} unit cards (every row: name, kind, covers, status; union exact)`);
 // rules mode: every lesson's lines with no link files
 for (const l of L) { const r = linksFor(l); gate(`lesson (rules) ${l.key}`, [r.verdict === 'partial' ? partialVerdict(r) : '', ...r.direct.map((x) => x.partial), ...r.prereq.map((x) => x.why), ...r.related.map((x) => x.why), l.title, siteFlagText(l), ...lessonAbout(l)]); truth(l, r); }
 
