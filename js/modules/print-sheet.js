@@ -1208,9 +1208,17 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
     const host = document.createElement('div');
     host.setAttribute('aria-hidden', 'true');
     host.style.cssText = 'position:absolute;left:-10000px;top:0;width:220mm;visibility:hidden;pointer-events:none;contain:layout;';
-    host.innerHTML = `<div class="ws-sheet ws-${size} ws-${look} ws-tab${s.tabMm}" style="display:block;max-width:none;width:220mm;overflow:visible"></div>`;
+    // Wave 1 lane D r12c: each cell is measured where the page draws it - a cell of a `.ws-grid`
+    // inside a `.ws-page` - so every page-scoped cell rule applies to the measured box too. The
+    // CL-40 label keep-out (sheet-kit.css: `.ws-page .ws-grid > .ws-cell:has(> .ws-tab, > .ws-letter)`
+    // pads the top to the label side + 1 mm) did not match a bare `.ws-sheet`, so every measured
+    // cell read 3 mm of top padding where it prints with tab + 1 mm (2 / 3 / 4 mm short at S / M / L),
+    // and a row sized to the measurement ran its content past the row (area_model_div_2by1 Review M).
+    // The page and grid boxes themselves are neutralised inline (no paper size, frame or gap).
+    host.innerHTML = `<div class="ws-page ws-${size} ws-${look} ws-tab${s.tabMm}" style="display:block;max-width:none;width:220mm;height:auto;min-height:0;margin:0;padding:0;overflow:visible;break-after:auto">`
+        + '<div class="ws-grid" style="display:block;height:auto;min-height:0;border:0;background:none;gap:0;overflow:visible"></div></div>';
     document.body.appendChild(host);
-    const root = host.firstChild;
+    const root = host.firstChild.firstChild;
     const baseW = new Map();          // item -> Map(svg index -> width at 1 column)
     const baseLeaves = new Map();     // item -> widths of its grid / table leaves at 1 column
     const best = new Map(items.map((it) => [it, { hMm: 0, fits: true }]));

@@ -238,6 +238,7 @@ Gate failures and load numbers measured before this fix (~12:30 UTC) are not tru
 
 - 2026-10-09 Wave 1 lane "Search terms for every skill" (`a21ec3ef403026c80`) fix round 6: builder escalated to Opus medium (the ceiling) - the "Showing results for" correction notice failed critic rounds 1 to 5 (r5: no regression 7, the Navigator notice truncated at Chromebook size and the student notice lost on "+" / refocus).
 - 2026-10-10 Wave 1 Lane D fix round 11: builder stays on Opus medium (the ceiling) - taken over from a paused cloud helper; merges main, finishes the size-M density work, implements the owner answers of 2026-10-10.
+- 2026-10-17 Wave 1 Lane D round 12c (area models): builder escalated to Opus medium (the ceiling) - the Opus-low builder could not close the Test / Review L-DENSITY H13 bands, the cell overflow (host measurement) and the dead area-model code in rounds 12 and 12b.
 
 ### Answer-key options (4.4): open after critic r4 (recorded 2026-10-10, fix round 5 fixed R4-1 only)
 
