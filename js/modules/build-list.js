@@ -868,6 +868,12 @@ export const VISUAL_BUILDS = {
         build: '`pictures` option on word-work: grouped-object pictures (bags, packs, jars, egg boxes) and price-tagged items drawn beside the problem, answer-free',
         hosts: ['addition:add_wp_100', 'multiplication:mult_word_problems'], templates: ['word-work'], newTemplates: [],
         files: ['js/modules/sheet/cells/word-work.js (unowned today; this entry takes it)'], after: [] }),
+    // Owner 2026-10-17 (spec design/audit/runs/next-session/CARRY-BELOW-SPEC.md): carry digits UNDER the answer line, as in
+    // the school's White Rose lessons. A layout preference, not a new difficulty: a plain option, no preset skill.
+    vis_carry_below: V({ lane: 'operations', kind: 'option', name: 'Carry Digits Under the Line (option)', preset: false,
+        build: '`carry: \'top\' | \'bottom\'` option (default top) on the column methods: the carried digit sits in a smaller box (about two-thirds of a digit box) UNDER the answer line in the next column; long multiplication gets a carry row under each partial-product row; the cell grows, digits never shrink; keys show the carries; on screen the carry boxes are optional and unscored. Subtraction stays at the top (owner).',
+        hosts: ['addition:add', 'addition:add_column_multi', 'multiplication:multiply'], templates: ['stack'], newTemplates: [],
+        files: ['js/modules/sheet/cells/stack.js', 'js/modules/skill-options.js', 'js/modules/screen-cell.js'], after: [] }),
 
     // ------------------------------------------------------------------ place value
     vis_supports_wiring: V({ lane: 'placevalue', kind: 'wiring', name: 'Wire the Built Picture Panes as Supports',
