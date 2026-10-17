@@ -125,7 +125,10 @@ export function encodeOptionPayload(categoryId, skillId, opts) {
                 out.push(key + (v ? '1' : '0'));
             } else if (def.type === 'rows') {
                 const enc = encodeRows(v);
+                // An EMPTY list that is not the default (only a PRESET can need it: "Count by 3s" turned
+                // back to the host's "Tables 2 to 12", []) is written as X, which decodeRows reads as [].
                 if (enc) out.push(key + enc);
+                else out.push(key + 'X');
             } else if (def.type === 'int' && def.signed) {
                 // A signed / decimal int (the number line's Start and End): "-" is N, "." is P, so
                 // the field never holds a character a code parser splits on (-10.5 -> N10P5).

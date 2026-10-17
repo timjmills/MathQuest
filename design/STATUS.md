@@ -508,6 +508,13 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
   records 2x1/3x1/2x2 built as presets, 4x1 and 3x2 remain. New gate `tests/scripts/ws-presets-unit.mjs`. Evidence
   `design/audit/runs/presets/`. Note: the 2x2 preset prints the host's current stack cell (no partial-product rows) - the
   long-multiplication template is still mult_standard's job.
+- 2026-10-17: **Preset skills batch 2 (Opus low)** on `claude/sweet-newton-c8wrv1-wip-presets-2` (not merged, no critic).
+  Owner: every "ask owner" row of `design/PRESET_SKILLS.md` is a preset. 100 presets made (114 in all), codes VT..Y5 pinned
+  (VH, VR, VS, WH, WL, W3, YS, YT, VY, VZ unused). Not made, host option does not deal what it says: mult/div/add word-problem story
+  kinds (word-work retell), ratio part-to-whole, "is it reasonable?" for sums and products (content-audit pv-band), area model 2x2 / 2x3 (host print-lint findings). Host fixes:
+  mult_properties break-apart key AK-4 (`printSlot` line slot); P12 accept-layer redraws on a page (page-deal `setRedraw`);
+  div_unit_frac_nv option labels; two click-all branches honour `forms`; codec writes empty `rows` as X; ws-presets-unit page vs page.
+  Build-list preset:true entries say they become named skills when built.
 - Held for after these land: Lane B answer boxes + regroup boxes (spec `design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md`),
   placevalue:identify write-value (spec `design/audit/runs/next-session/PV-IDENTIFY-WRITE-VALUE-SPEC.md`).
 

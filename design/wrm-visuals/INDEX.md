@@ -94,7 +94,7 @@ the first entry.
 | V040 | Sharing vs grouping counters; remainders | R R42 (GAP), R R43, Y1 R53 (MATCH), Y1 R54 (GAP), Y2 R40 (MATCH), Y3 R40 (MATCH) | 23 | PARTIAL | `template:counters`, `division:share_into_groups` | `share_group` | `operations` |
 | V041 | Linking-cube towers and staircases | R R06, R R24 (GAP / PARTIAL), Y1 R11 (GAP), Y2 R41 (GAP), Y3 R41 (GAP), Y5 R41 (GAP), Y6 R41 (GAP) | 31 | PARTIAL | `comparing:compare_objects`, `composing:teen_compose` | `vis_object_kinds`* | `k2` |
 | V042 | Multiplication grid (partial or non-consecutive headers) | Y3 R42 (MATCH), Y4 R35 (M/P) | 3 | PARTIAL | `template:mult-grid`, `template:mult-chart`, `multiplication:mult_chart` | `vis_array_options`* | `operations` |
-| V043 | Venn diagram (2 sets; universal set; nested) | Y2 R43, Y3 R43, Y5 R43, Y6 R43 | 10 | GAP | - | `vis_sort_diagrams`*, `common_mf` | `k2` |
+| V043 | Venn diagram (2 sets; universal set; nested) | Y2 R43, Y3 R43, Y5 R43, Y6 R43 | 10 | GAP | `number_theory:common_multiples`, `number_theory:common_factors` | `vis_sort_diagrams`*, `common_mf` | `k2` |
 | V044 | Carroll diagram (2 × 2) | Y2 R44, Y3 R44, Y5 R44, Y6 R44 | 7 | GAP | - | `vis_sort_diagrams`* | `k2` |
 | V045 | Stacked halving / nested bars | Y2 R45, Y3 R45, Y4 R23, Y6 R45 | 6 | GAP | - | `vis_bar_family`* | `operations` |
 | V046 | Ruler, cm with mm (offset start; decimal labels) | Y1 R60 (GAP), Y2 R46, Y3 R46, Y5 R46 | 14 | PARTIAL | `measurement:reading_ruler` | `ruler_cm`, `vis_migrate_measures`* | `measurement` |
@@ -236,7 +236,7 @@ the first entry.
 | V182 | Two worked methods side by side | Y5 N5-26 | 7 | PARTIAL | - | `vis_reasoning_frames`* | `algebra` |
 | V183 | Partition flow for mixed numbers | Y5 N5-27 | 3 | GAP | - | `vis_bond_options`* | `k2` |
 | V184 | Counter-pattern terms | Y5 N5-28 | 1 | GAP | - | `vis_count_row_values`* | `k2` |
-| V185 | Square and cube notation | Y5 N5-29 | 3 | GAP | - | `square_cube` | `numtheory` |
+| V185 | Square and cube notation | Y5 N5-29 | 3 | GAP | `order_of_operations:cube_numbers` | `square_cube` | `numtheory` |
 | V186 | Odometer / 7-digit counter display | Y6 N04 | 1 | GAP | - | `vis_pv_bands_millions`* | `placevalue` |
 | V187 | Operator arcs (× n / ÷ n, + / − above and below a pair) | Y5 N5-08, Y6 N05 | 12 | GAP | `fractions:equivalent`, `fractions:equiv_frac_nv`, `fractions:simplify`, `template:equation`, `conversions:f_to_p` | `vis_operator_arcs`*, `add_or_mult` | `fractions` |
 | V188 | Conversion ladder (mm → cm → m → km) | Y5 N5-22, Y6 N06 | 4 | GAP | `measurement:length_metric`, `measurement:unit_conversions` | `vis_conversion_models`* | `measurement` |

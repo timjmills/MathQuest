@@ -594,7 +594,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 
 ### 6. Add Three Numbers: Stories and Make a Ten First (option) — `add_three_forms`
 
-- **What:** option on `addition:add_three`: form: word problem (three addends, sum ≤ 20) and "make a ten first" (ring the two that make 10). Grade 1 · family operations · source standards audit.
+- **What:** option on `addition:add_three`: form: word problem (three addends, sum ≤ 20) and "make a ten first" (ring the two that make 10) (also a named preset skill once built, design/PRESET_SKILLS.md). Grade 1 · family operations · source standards audit.
 - **Closes (standards):** 1.OA.A.2, 1.OA.B.3 · tag with CCSS 1.OA.A.2, 1.OA.B.3, EE M.EE.1.OA.2
 - **Closes (White Rose steps):** none · strengthens Y1.B5.S7
 - **Teaches:** solving three-addend word problems and adding three numbers by grouping two that make ten (associative and commutative properties as strategies).
@@ -741,7 +741,7 @@ Owns: `js/modules/gen-operations.js`, `js/modules/gen-mult-patterns.js`, `js/mod
 
 ### 18. Multiply a 4-Digit Number by a 1-Digit Number (option) — `mult_4x1`
 
-- **What:** option on `multiplication:multiply` (and `multiplication:area_model_mult`): size "4-digit × 1-digit" (tiles 41) on the column method and the area model. Grade 4 · family operations · source standards audit.
+- **What:** option on `multiplication:multiply` (and `multiplication:area_model_mult`): size "4-digit × 1-digit" (tiles 41) on the column method and the area model (also a named preset skill once built, design/PRESET_SKILLS.md). Grade 4 · family operations · source standards audit.
 - **Closes (standards):** 4.NBT.B.5 · tag with CCSS 4.NBT.B.5, EE -
 - **Closes (White Rose steps):** none · strengthens Y4.B5.S11
 - **Teaches:** multiplying a whole number of up to four digits by a one-digit number, with the area model and the column method side by side.
@@ -1174,7 +1174,7 @@ Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels
 
 ### 15. Ten Times the Place to the Right (option) — `value_ten_times`
 
-- **What:** option on `placevalue:value`: form "ten times / one tenth": compare the value of the same digit in two places (the 7 in 700 is 10 times the 7 in 70; 700 ÷ 70 = 10). Grade 4-5 · family placevalue · source standards audit.
+- **What:** option on `placevalue:value`: form "ten times / one tenth": compare the value of the same digit in two places (the 7 in 700 is 10 times the 7 in 70; 700 ÷ 70 = 10) (also a named preset skill once built, design/PRESET_SKILLS.md). Grade 4-5 · family placevalue · source standards audit.
 - **Closes (standards):** 4.NBT.A.1, 5.NBT.A.1 · tag with CCSS 4.NBT.A.1, 5.NBT.A.1, EE -
 - **Closes (White Rose steps):** none · strengthens Y4.B1.S2
 - **Teaches:** a digit in one place is worth 10 times what it is worth in the place to its right and 1/10 of the place to its left.
@@ -1505,7 +1505,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 
 ### 21. Write and Graph Inequalities (option) — `inequality_write_graph`
 
-- **What:** option on `algebra:inequalities`: task "write it from words" (x > c) and "show the solutions on a number line" (open/closed circle, arrow). Grade 6 · family algebra · source standards audit.
+- **What:** option on `algebra:inequalities`: task "write it from words" (x > c) and "show the solutions on a number line" (open/closed circle, arrow) (also a named preset skill once built, design/PRESET_SKILLS.md). Grade 6 · family algebra · source standards audit.
 - **Closes (standards):** 6.EE.B.8 · tag with CCSS 6.EE.B.8, EE -
 - **Closes (White Rose steps):** none
 - **Teaches:** writing x > c or x < c for a real condition and representing its infinitely many solutions on a number line.
@@ -2005,7 +2005,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 
 ### 33. Multiply Decimals by Decimals (option) — `mult_dec_dec`
 
-- **What:** option on `decimals:mult_decimal`: factors "decimal × decimal" (3.45 × 2.6) with the standard algorithm. Grade 6 · family decimals · source standards audit.
+- **What:** option on `decimals:mult_decimal`: factors "decimal × decimal" (3.45 × 2.6) with the standard algorithm (also a named preset skill once built, design/PRESET_SKILLS.md). Grade 6 · family decimals · source standards audit.
 - **Closes (standards):** 6.NS.B.3 · tag with CCSS 6.NS.B.3, EE -
 - **Closes (White Rose steps):** none · strengthens Y6.B8.S7
 - **Teaches:** multiplying multi-digit decimals by decimals with the standard algorithm and placing the point.
@@ -2017,7 +2017,7 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 
 ### 34. Ratio Tables: Plot and Compare (option) — `ratio_table_plot`
 
-- **What:** option on `conversions:ratio_tables`: task "plot the pairs" on a coordinate grid and task "compare two ratio tables". Grade 6 · family ratio · source standards audit.
+- **What:** option on `conversions:ratio_tables`: task "plot the pairs" on a coordinate grid and task "compare two ratio tables" (also a named preset skill once built, design/PRESET_SKILLS.md). Grade 6 · family ratio · source standards audit.
 - **Closes (standards):** 6.RP.A.3a · tag with CCSS 6.RP.A.3a, EE -
 - **Closes (White Rose steps):** none
 - **Teaches:** making tables of equivalent ratios, plotting the pairs and comparing ratios with tables.
@@ -2536,7 +2536,7 @@ Owns: `js/modules/gen-geometry.js`, `js/modules/svg-geometry.js`, `js/modules/sh
 
 ### 29. Measure With a Protractor (option) — `protractor_read`
 
-- **What:** option on `angles_lines:measure_angles`: form "read the protractor": a protractor drawn over the angle; write the degrees (not multiple choice). Grade 4 · family geometry · source standards audit.
+- **What:** option on `angles_lines:measure_angles`: form "read the protractor": a protractor drawn over the angle; write the degrees (not multiple choice) (also a named preset skill once built, design/PRESET_SKILLS.md). Grade 4 · family geometry · source standards audit.
 - **Closes (standards):** 4.MD.C.6 · tag with CCSS 4.MD.C.6, EE -
 - **Closes (White Rose steps):** none · strengthens Y5.B10.S2, Y5.B10.S4
 - **Teaches:** measuring angles in whole degrees with a protractor: which scale, from 0.
@@ -2989,7 +2989,7 @@ Owns: `js/modules/gen-measurement.js`, `js/modules/sheet/cells/panes/ladder.js`.
 
 ### 18. Conversion Tables (option) — `conversion_table`
 
-- **What:** option on `measurement:unit_conversions`: form "conversion table": complete a two-column table (1 ft = 12 in, 2 ft, 3 ft …) and use it. Grade 4 · family measurement · source standards audit.
+- **What:** option on `measurement:unit_conversions`: form "conversion table": complete a two-column table (1 ft = 12 in, 2 ft, 3 ft …) and use it (also a named preset skill once built, design/PRESET_SKILLS.md). Grade 4 · family measurement · source standards audit.
 - **Closes (standards):** 4.MD.A.1 · tag with CCSS 4.MD.A.1, EE M.EE.4.MD.1
 - **Closes (White Rose steps):** none · strengthens Y4.B6.S1, Y5.B14.S5
 - **Teaches:** knowing relative sizes of units in one system and recording equivalents in a two-column table (ft/in, m/cm, kg/g, lb/oz, l/ml, hr/min/sec).
@@ -3498,7 +3498,7 @@ Owns: `js/modules/gen-number-theory.js`, `js/modules/svg-factors.js`, `js/module
 
 ### 4. Factor a Sum With the GCF (option) — `gcf_distributive`
 
-- **What:** option on `number_theory:gcf_easy`: task "write the sum as a product": 36 + 8 = 4 × (9 + 2). Grade 6 · family number_theory · source standards audit.
+- **What:** option on `number_theory:gcf_easy`: task "write the sum as a product": 36 + 8 = 4 × (9 + 2) (also a named preset skill once built, design/PRESET_SKILLS.md). Grade 6 · family number_theory · source standards audit.
 - **Closes (standards):** 6.NS.B.4 · tag with CCSS 6.NS.B.4, EE -
 - **Closes (White Rose steps):** none
 - **Teaches:** using the distributive property to write a sum of two whole numbers with a common factor as the factor times a sum with no common factor.
