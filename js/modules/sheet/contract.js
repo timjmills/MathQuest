@@ -24,6 +24,8 @@
 // `gen-*.js`, `print-generate.js` or `solution-display.js`. Anything the defaults need from a
 // higher layer is INJECTED - see `installLegacyAdapters` in `adapters.js`.
 
+import { presetOf } from '../skill-presets.js';   // pure table (no window/state/DOM), SCC-01 safe
+
 /* ====================================================================== the six members */
 
 /** The six members of the contract, in the order the coverage report prints them. */
@@ -498,6 +500,10 @@ export function __resetProviders() { PROVIDERS.clear(); }
  * registered provider by accident.
  */
 export function getProvider(categoryId, skillId) {
+    // A preset skill (../skill-presets.js, a pure table) with no provider of its own answers
+    // with its host's: it IS the host with set option values.
+    const pre = !PROVIDERS.has(`${categoryId}:${skillId}`) && !PROVIDERS.has(String(skillId)) ? presetOf(categoryId, skillId) : null;
+    if (pre) return { ...getProvider(categoryId, pre.skillId), presetOf: pre.skillId };
     const key = `${categoryId}:${skillId}`;
     const raw = PROVIDERS.get(key) || PROVIDERS.get(String(skillId)) || null;
     const d = DEFAULTS;

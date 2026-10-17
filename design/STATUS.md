@@ -495,6 +495,17 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
   also a named, findable PRESET skill that opens the host skill with those options set. Not built yet: needs a preset registry
   (skill id -> {host, opts}) wired into data.js/skill finder/share codes/generateQuestionFor, then an audit of existing options
   (first candidates: multiply tiles 21/31/22, the area-model options, count_by_tables tables) and a flag on build-list option entries.
+- 2026-10-17 ~15:30: **Preset skills lane, first attempt (Opus low)** on `claude/sweet-newton-c8wrv1-wip-presets` (not merged, no
+  critic yet). Mechanism + audit in `design/PRESET_SKILLS.md`: `js/modules/skill-presets.js` (pure table 'cat:preset' -> {host, opts});
+  presets appended to SKILLS with `presetOf`, codes pinned VA..VQ (number_chart_fill pinned at its U9 first); skill-options gives a
+  preset the host's controls with the preset values as defaults (explicit opts win, codes pack only changes; the codec gains a null
+  token `X`); generateQuestion swaps a preset to its host for one call (item: skillId = host, presetId = preset); getProvider falls
+  back to the host; presets stay out of mixed pools; library detail notes "Uses <host> with set options". 14 presets made (multiply
+  2x1/3x1/2x2, divide 2x1/3x1/4x1/3x2, mult_chart shade/pattern/headers, multiples of ten, compare to 1/2, near doubles,
+  expanded notation); ~35 "ask owner" rows in the doc. Build list: `preset: true/false` on every option entry (9 true), `mult_standard`
+  records 2x1/3x1/2x2 built as presets, 4x1 and 3x2 remain. New gate `tests/scripts/ws-presets-unit.mjs`. Evidence
+  `design/audit/runs/presets/`. Note: the 2x2 preset prints the host's current stack cell (no partial-product rows) - the
+  long-multiplication template is still mult_standard's job.
 - Held for after these land: Lane B answer boxes + regroup boxes (spec `design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md`),
   placevalue:identify write-value (spec `design/audit/runs/next-session/PV-IDENTIFY-WRITE-VALUE-SPEC.md`).
 

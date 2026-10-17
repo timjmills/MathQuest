@@ -1100,6 +1100,17 @@ export const SKILL_WRM = {
         { step: 'Y6.B2.S3', partial: 'listing all common multiples' },
     ],
     'number_theory:divisibility_sort': [{ step: 'Y6.B2.S4', partial: 'stating and applying the divisibility rules' }],
+    // PRESET skills, 2026-10-17 (skill-presets.js): the host's steps that the preset's values ARE.
+    'multiplication:mult_2by1_column': ['Y3.B4.S4', 'Y3.B4.S5', 'Y4.B5.S9'],
+    'multiplication:mult_3by1_column': ['Y4.B5.S10'],
+    'multiplication:mult_2by2_standard': ['Y5.B5.S3'],
+    'multiplication:mult_chart_pattern': [{ step: 'Y4.B4.S6', partial: 'the links between the 3, 6 and 9 tables' }],
+    'multiplication:mult_multiples_of_ten': ['Y3.B4.S2'],
+    'division:div_2by1_long': ['Y3.B4.S7', 'Y4.B5.S11', 'Y4.B5.S12'],
+    'division:div_3by1_long': ['Y4.B5.S13'],
+    'division:div_4by1_long': [{ step: 'Y5.B5.S7', partial: 'short division of up to 4 digits by 1 digit, no remainder by default' }],
+    'division:div_3by2_long': ['Y6.B2.S11'],
+    'number_sense:near_doubles': ['Y1.B5.S5'],
 };
 
 export const WRM_PROPOSALS = {

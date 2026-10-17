@@ -24,7 +24,7 @@ Sources:
 
 ## Summary
 
-- Skills mapped: 601 live skills; 492 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
+- Skills mapped: 615 live skills; 506 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
 - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
 - **Full coverage: CCSS 76 of 177 standards FULL, 90 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 103 FULL, 92 PARTIAL, 22 GAP.
 - **Essential Elements: 81 of 117 FULL, 33 PARTIAL, 3 GAP** (tagged: 115).
@@ -1145,7 +1145,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **1.OA.C.6** — PARTIAL. Add and subtract within 20, demonstrating fluency for addition and subtraction within 10. Use strategies such as counting on; making ten (e.g., 8 + 6 = 8 + 2 + 4 = 10 + 4 = 14); decomposing a number leading to a ten (e.g., 13 – 4 = 13 – 3 – 1 = 10 – 1 = 9); using the relationship between addition and subtraction (e.g., knowing that 8 + 4 = 12, one knows 12 – 8 = 4); and creating equivalent but easier or known sums (e.g., adding 6 + 7 by creating the known equivalent 6 + 6 + 1 = 12 + 1 = 13).  
   In part: Addition Facts (within 20) (`addition:add_facts`); Subtraction Facts (within 20) (`subtraction:sub_facts`); Make a Ten Strategy (`number_sense:make_a_ten`); Doubles & Near Doubles (`number_sense:doubles_near_doubles`); Number Families (Add & Subtract) (`addition:number_families_add`)  
   Missing: decomposing a number leading to a ten in subtraction (13 − 4 = 13 − 3 − 1) → `make_ten_subtract`  
-  Also tagged: `composing:number_bonds`, `addition:add`, `addition:add_10_no_regroup`, `addition:add_10_regroup`, `addition:add_10_mixed`, `addition:add_20_no_regroup`, `addition:add_20_regroup`, `addition:add_20_mixed`, `subtraction:subtract`, `subtraction:sub_10_no_regroup`, `subtraction:sub_10_regroup`, `subtraction:sub_10_mixed`, `subtraction:sub_20_no_regroup`, `subtraction:sub_20_regroup`, `subtraction:sub_20_mixed`, `patterns:double`
+  Also tagged: `composing:number_bonds`, `addition:add`, `addition:add_10_no_regroup`, `addition:add_10_regroup`, `addition:add_10_mixed`, `addition:add_20_no_regroup`, `addition:add_20_regroup`, `addition:add_20_mixed`, `subtraction:subtract`, `subtraction:sub_10_no_regroup`, `subtraction:sub_10_regroup`, `subtraction:sub_10_mixed`, `subtraction:sub_20_no_regroup`, `subtraction:sub_20_regroup`, `subtraction:sub_20_mixed`, `patterns:double`, `number_sense:near_doubles`
 *D. Work with addition and subtraction equations.*
 
 - **1.OA.D.7** — PARTIAL. Understand the meaning of the equal sign, and determine if equations involving addition and subtraction are true or false. For example, which of the following equations are true and which are false? 6 = 6, 7 = 8 – 1, 5 + 2 = 2 + 5, 4 + 1 = 5 + 2.  
@@ -1258,7 +1258,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Also tagged: `measurement:time_fives_ring`, `patterns:seq_2`, `patterns:count_by_fill`, `patterns:skip_count_grid`, `patterns:count_by_step_up`, `patterns:count_by_step_down`
 - **2.NBT.A.3** — FULL. Read and write numbers to 1000 using base-ten numerals, number names, and expanded form.  
   Taught by: Number Word Form (`composing:number_word_form`); Expanded Form (`placevalue:expand`); Standard Form (`placevalue:combine`); Build 3-Digit Numbers with Flats (`composing:base10_build_hundreds`)  
-  Also tagged: `placevalue:pv_disks_build`, `placevalue:number_word_names`, `placevalue:unit_form`
+  Also tagged: `placevalue:pv_disks_build`, `placevalue:number_word_names`, `placevalue:unit_form`, `placevalue:expanded_notation`
 - **2.NBT.A.4** — FULL. Compare two three-digit numbers based on meanings of the hundreds, tens, and ones digits, using >, =, and < symbols to record the results of comparisons.  
   Taught by: Compare Numbers (>, <, =) (`placevalue:compare`)  
   Also tagged: `placevalue:order_least_to_greatest`, `placevalue:order_greatest_to_least`
@@ -1345,7 +1345,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Also tagged: `multiplication:mult_word_problems_plain`, `division:div_word_problems_plain`, `number_ops_mixed:word_problems_mixed`, `number_ops_mixed:word_problems_mixed_plain`
 - **3.OA.A.4** — FULL. Determine the unknown whole number in a multiplication or division equation relating three whole numbers. For example, determine the unknown number that makes the equation true in each of the equations 8 × ? = 48, 5 = Í÷ 3, 6 × 6 = ?.  
   Taught by: Missing Factors (×/÷) (`division:missing_mult_div`); Missing Addend or Missing Factor? (`number_ops_mixed:missing_factor_or_addend`)  
-  Also tagged: `number_ops_mixed:which_sign`
+  Also tagged: `number_ops_mixed:which_sign`, `multiplication:mult_chart_headers`
 *B. Understand properties of multiplication and the relationship between multiplication and division.*
 
 - **3.OA.B.5** — PARTIAL. Apply properties of operations as strategies to multiply and divide. Examples: If 6 × 4 = 24 is known, then 4 × 6 = 24 is also known. (Commutative property of multiplication.) 3 × 5 × 2 can be found by 3 × 5 = 15, then 15 × 2 = 30, or by 5 × 2 = 10, then 3 × 10 = 30. (Associative property of multiplication.) Knowing that 8 × 5 = 40 and 8 × 2 = 16, one can find 8 × 7 as 8 × (5 + 2) = (8 × 5) + (8 × 2) = 40 + 16 = 56. (Distributive property.)  
@@ -1358,7 +1358,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 
 - **3.OA.C.7** — FULL. Fluently multiply and divide within 100, using strategies such as the relationship between multiplication and division (e.g., knowing that 8 × 5 = 40, one knows 40 ÷ 5 = 8) or properties of operations. By the end of Grade 3, know from memory all products of two one-digit numbers.  
   Taught by: Multiplication Facts (1-12) (`multiplication:mult_facts`); Division Facts (1-12) (`division:div_facts`)  
-  Also tagged: `multiplication:multiply`, `multiplication:mult_div_fact_family`, `multiplication:number_families_mult`, `multiplication:mult_chart`, `multiplication:mult_chart_easy`, `multiplication:nl_mult`, `multiplication:count_by_tables`, `division:divide`, `division:nl_div`, `division:mixed_mult_div`
+  Also tagged: `multiplication:multiply`, `multiplication:mult_div_fact_family`, `multiplication:number_families_mult`, `multiplication:mult_chart`, `multiplication:mult_chart_easy`, `multiplication:nl_mult`, `multiplication:count_by_tables`, `division:divide`, `division:nl_div`, `division:mixed_mult_div`, `multiplication:mult_chart_headers`
 *D. Solve problems involving the four operations, and identify and explain patterns in arithmetic.*
 
 - **3.OA.D.8** — PARTIAL. Solve two-step word problems using the four operations. Represent these problems using equations with a letter standing for the unknown quantity. Assess the reasonableness of answers using mental computation and estimation strategies including rounding.  
@@ -1368,7 +1368,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **3.OA.D.9** — PARTIAL. Identify arithmetic patterns (including patterns in the addition table or multiplication table), and explain them using properties of operations. For example, observe that 4 times a number is always even, and explain why 4 times a number can be decomposed into two equal addends.  
   In part: Multiplication Chart (Visual) (`multiplication:mult_chart`); Number Patterns: Count On, Count Back, Double (`patterns:number_patterns_rule`); Count-By Fill-In (1-12) (`patterns:count_by_fill`)  
   Missing: patterns in the addition table; explain a pattern with a property (4 × n is always even) → `patterns_notice`  
-  Also tagged: `multiplication:mult_chart_easy`, `multiplication:count_by_tables`, `patterns:count_by_step_up`, `patterns:count_by_step_down`, `algebra:function_table_easy`
+  Also tagged: `multiplication:mult_chart_easy`, `multiplication:count_by_tables`, `patterns:count_by_step_up`, `patterns:count_by_step_down`, `algebra:function_table_easy`, `multiplication:mult_chart_shade`, `multiplication:mult_chart_pattern`
 #### Number and Operations in Base Ten (3.NBT)
 
 *A. Use place value understanding and properties of operations to perform multi-digit arithmetic.*
@@ -1381,6 +1381,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Also tagged: `addition:add_1k_no_regroup`, `addition:add_1k_regroup`, `addition:add_wp_1k`, `addition:add_wp_1k_plain`, `addition:add_missing_digit`, `subtraction:sub_1k_no_regroup`, `subtraction:sub_1k_regroup`, `subtraction:sub_wp_1k`, `subtraction:sub_wp_1k_plain`, `subtraction:sub_across_zeros`, `subtraction:sub_missing_digit`, `subtraction:sub_check_by_adding`, `algebra:tape_diagram`, `algebra:tape_diagram_plain`
 - **3.NBT.A.3** — FULL. Multiply one-digit whole numbers by multiples of 10 in the range 10–90 (e.g., 9 × 80, 5 × 60) using strategies based on place value and properties of operations.  
   Taught by: Multiply by 10, 100 and Multiples of Ten (`multiplication:mult_zeros`)  
+  Also tagged: `multiplication:mult_multiples_of_ten`
 #### Number and Operations—Fractions (3.NF)
 
 *A. Develop understanding of fractions as numbers.*
@@ -1503,7 +1504,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Missing: a digit is worth ten times what it is worth in the place to its right (700 ÷ 70 = 10) → `value_ten_times`  
 - **4.NBT.A.2** — FULL. Read and write multi-digit whole numbers using base-ten numerals, number names, and expanded form. Compare two multi-digit numbers based on meanings of the digits in each place, using >, =, and < symbols to record the results of comparisons.  
   Taught by: Choose the Word Name (`placevalue:number_word_names`); Expanded Form (`placevalue:expand`); Compare Numbers (>, <, =) (`placevalue:compare`); Standard Form (`placevalue:combine`)  
-  Also tagged: `composing:number_chart_fill`, `placevalue:pv_digit_drag`, `placevalue:order_least_to_greatest`, `placevalue:order_greatest_to_least`
+  Also tagged: `composing:number_chart_fill`, `placevalue:pv_digit_drag`, `placevalue:order_least_to_greatest`, `placevalue:order_greatest_to_least`, `placevalue:expanded_notation`
 - **4.NBT.A.3** — FULL. Use place value understanding to round multi-digit whole numbers to any place.  
   Taught by: Round to Nearest 1,000 (`number_sense:nearest_1000`); Round to Nearest 10,000 (`number_sense:nearest_10000`); Round to Nearest 100,000 (`number_sense:nearest_100000`); Round on a Number Line: Thousands (`number_sense:round_nl_thousands`)  
   Also tagged: `number_sense:round_nl_ten_thousands`, `number_sense:round_nl_hundred_thousands`, `number_sense:nearest_million`, `number_sense:round_sort_1000`, `number_sense:round_sort_10000`, `number_sense:round_sort_100000`, `number_sense:round_sort_million`, `number_sense:estimate_products`
@@ -1515,10 +1516,10 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **4.NBT.B.5** — PARTIAL. Multiply a whole number of up to four digits by a one-digit whole number, and multiply two two-digit numbers, using strategies based on place value and the properties of operations. Illustrate and explain the calculation by using equations, rectangular arrays, and/or area models.  
   In part: Basic Multiplication (`multiplication:multiply`); Area Model Multiplication (`multiplication:area_model_mult`); Area Model (2×2 and 2×3) (`multiplication:area_model_mult_hard`)  
   Missing: a 4-digit number × a 1-digit number (the sizes stop at 3 × 1); a dedicated standard-algorithm skill with the sizes 2 × 1 to 3 × 2 (owner 2026-10-17) → `mult_4x1`, `mult_standard`  
-  Also tagged: `multiplication:mult_placeholder_zero`, `multiplication:mult_missing_digit`
+  Also tagged: `multiplication:mult_placeholder_zero`, `multiplication:mult_missing_digit`, `multiplication:mult_2by1_column`, `multiplication:mult_3by1_column`, `multiplication:mult_2by2_standard`
 - **4.NBT.B.6** — FULL. Find whole-number quotients and remainders with up to four-digit dividends and one-digit divisors, using strategies based on place value, the properties of operations, and/or the relationship between multiplication and division. Illustrate and explain the calculation by using equations, rectangular arrays, and/or area models.  
   Taught by: Basic Division (`division:divide`); Box Method Division (3÷1 digit) (`division:box_division_hard`); Area Model Division (3÷1 digit) (`division:area_model_div_3by1`); Division with Remainders (Visual) (`division:div_remainders`) — divide at tiles 41 is 4-digit ÷ 1-digit  
-  Also tagged: `division:box_division_easy`, `division:area_model_div_2by1`, `division:div_zero_in_quotient`, `division:remainder_too_big`, `division:div_check_by_multiplying`, `number_sense:estimate_quotient`
+  Also tagged: `division:box_division_easy`, `division:area_model_div_2by1`, `division:div_zero_in_quotient`, `division:remainder_too_big`, `division:div_check_by_multiplying`, `number_sense:estimate_quotient`, `division:div_2by1_long`, `division:div_3by1_long`, `division:div_4by1_long`
 #### Number and Operations—Fractions (4.NF)
 
 *A. Extend understanding of fraction equivalence and ordering.*
@@ -1529,7 +1530,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **4.NF.A.2** — PARTIAL. Compare two fractions with different numerators and different denominators, e.g., by creating common denominators or numerators, or by comparing to a benchmark fraction such as 1/2. Recognize that comparisons are valid only when the two fractions refer to the same whole. Record the results of comparisons with symbols >, =, or <, and justify the conclusions, e.g., by using a visual fraction model.  
   In part: Compare Fractions (>, <, =) (`fractions:compare`); Compare Fractions (LCD) (`fractions:compare_frac_lcd`); Benchmark Fractions (0, ¼, ½, ¾, 1) (`fractions:benchmark_fractions`)  
   Missing: comparisons are valid only for the same whole; justify with a visual model → `frac_same_whole`  
-  Also tagged: `fractions:order_fractions`, `fractions:order_frac_numline`
+  Also tagged: `fractions:order_fractions`, `fractions:order_frac_numline`, `fractions:compare_to_half`
 *B. Build fractions from unit fractions by applying and extending previous understandings of operations on whole numbers.*
 
 - **4.NF.B.3** — FULL (from its parts). Understand a fraction a/b with a > 1 as a sum of fractions 1/b.  
@@ -1649,8 +1650,10 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **5.NBT.B.5** — PARTIAL. Fluently multiply multi-digit whole numbers using the standard algorithm.  
   In part: Basic Multiplication (`multiplication:multiply`); Area Model (2×2 and 2×3) (`multiplication:area_model_mult_hard`); Write the Placeholder Zero (`multiplication:mult_placeholder_zero`)  
   Missing: the standard algorithm beyond 2 × 2 digits (3- and 4-digit × 2-digit) worked to the end → `long_mult`, `mult_standard`  
+  Also tagged: `multiplication:mult_2by2_standard`
 - **5.NBT.B.6** — FULL. Find whole-number quotients of whole numbers with up to four-digit dividends and two-digit divisors, using strategies based on place value, the properties of operations, and/or the relationship between multiplication and division. Illustrate and explain the calculation by using equations, rectangular arrays, and/or area models.  
   Taught by: Divide by 2-Digit Numbers (Visual) (`division:long_div_2digit`); Fix the Estimate (Long Division) (`division:div_fix_estimate`); Zero in the Quotient (`division:div_zero_in_quotient`)  
+  Also tagged: `division:div_3by2_long`
 - **5.NBT.B.7** — PARTIAL. Add, subtract, multiply, and divide decimals to hundredths, using concrete models or drawings and strategies based on place value, properties of operations, and/or the relationship between addition and subtraction; relate the strategy to a written method and explain the reasoning used.  
   In part: Adding Decimals (`decimals:add_decimal`); Subtracting Decimals (`decimals:sub_decimal`); Multiplying Decimals (`decimals:mult_decimal`); Dividing Decimals (`decimals:div_decimal`)  
   Missing: concrete models or drawings for decimal operations, related to the written method → `decimal_models`, `dec_known_facts`  

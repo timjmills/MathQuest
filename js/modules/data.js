@@ -280,6 +280,12 @@ export const SKILL_GRADES = {
     'vocab_grade_5_data': 5, 'vocab_grade_5_algebra': 5, 'vocab_grade_5_measurement': 5,
     'vocab_grade_6_operations': 6, 'vocab_grade_6_fractions': 6, 'vocab_grade_6_geometry': 6,
     'vocab_grade_6_data': 6, 'vocab_grade_6_algebra': 6, 'vocab_grade_6_measurement': 6,
+    // PRESET skills, 2026-10-17 (skill-presets.js): the grade of the lesson the preset IS.
+    'mult_2by1_column': 4, 'mult_3by1_column': 4, 'mult_2by2_standard': 5,   // 4.NBT.B.5; 5.NBT.B.5 standard algorithm
+    'mult_chart_shade': 3, 'mult_chart_pattern': 3, 'mult_chart_headers': 3, // 3.OA.D.9 / 3.OA.A.4
+    'mult_multiples_of_ten': 3,                                            // 3.NBT.A.3
+    'div_2by1_long': 4, 'div_3by1_long': 4, 'div_4by1_long': 4, 'div_3by2_long': 5, // 4.NBT.B.6; 5.NBT.B.6
+    'compare_to_half': 4, 'near_doubles': 1, 'expanded_notation': 4,     // 4.NF.A.2; 1.OA.C.6; 4.NBT.A.2
 };
 
 // Look up grade for a skill, resolving category collisions
@@ -754,6 +760,14 @@ export const SKILLS = {
         { v: "mult_missing_digit", l: "Find the Missing Digit (Multiplication)" },   // MB-12
         // APPENDED 2026-09-25 (owner): one count-by row per table, to 12x (3.OA.7 prep).
         { v: "count_by_tables", l: "Skip counting: count by 1–12" },
+        // APPENDED 2026-10-17 — PRESET skills (skill-presets.js): a host skill with set option values.
+        { v: "mult_2by1_column", l: "Multiply 2-Digit by 1-Digit Numbers (Column)", presetOf: "multiply" },
+        { v: "mult_3by1_column", l: "Multiply 3-Digit by 1-Digit Numbers (Column)", presetOf: "multiply" },
+        { v: "mult_2by2_standard", l: "Multiply 2-Digit by 2-Digit Numbers (Standard Algorithm)", presetOf: "multiply" },
+        { v: "mult_chart_shade", l: "Multiplication Chart: Shade the Multiples", presetOf: "mult_chart" },
+        { v: "mult_chart_pattern", l: "Multiplication Chart: Find the Pattern in a Row", presetOf: "mult_chart" },
+        { v: "mult_chart_headers", l: "Multiplication Chart: Find the Missing Factors", presetOf: "mult_chart" },
+        { v: "mult_multiples_of_ten", l: "Multiply by Multiples of Ten (6 × 40)", presetOf: "mult_zeros" },
     ],
     division: [
         { v: "div_facts", l: "Division Facts (1-12)" },
@@ -783,6 +797,11 @@ export const SKILLS = {
         { v: "remainder_too_big", l: "Is the Remainder Finished?" },                 // DF-27: judges deliberately-wrong remainders
         { v: "div_check_by_multiplying", l: "Check a Division by Multiplying" },     // DL-8: the check is × and + on deliberately-wrong work
         { v: "div_fix_estimate", l: "Fix the Estimate (Long Division)" },            // DL-13, DL-14: a crossed-out attempt plus a second attempt
+        // APPENDED 2026-10-17 — PRESET skills (skill-presets.js): divide with its size set.
+        { v: "div_2by1_long", l: "Divide 2-Digit by 1-Digit Numbers (Long Division)", presetOf: "divide" },
+        { v: "div_3by1_long", l: "Divide 3-Digit by 1-Digit Numbers (Long Division)", presetOf: "divide" },
+        { v: "div_4by1_long", l: "Divide 4-Digit by 1-Digit Numbers (Long Division)", presetOf: "divide" },
+        { v: "div_3by2_long", l: "Divide 3-Digit by 2-Digit Numbers (Long Division)", presetOf: "divide" },
     ],
     integers: [
         { v: "number_line_int", l: "Number Lines with Negatives" },
@@ -843,6 +862,8 @@ export const SKILLS = {
         { v: "fraction_bar_ops", l: "Fraction Bar Operations (Visual)" },
         { v: "fraction_nl_drag", l: "Place Fractions on a Number Line" },
         { v: "mixed_nl_drag", l: "Place Mixed Numbers on a Number Line" },
+        // APPENDED 2026-10-17 — PRESET skill (skill-presets.js): compare with its benchmark form set.
+        { v: "compare_to_half", l: "Compare Fractions to One Half", presetOf: "compare" },
     ],
     fraction_operations: [
         // Grade 4 fraction operations
@@ -1166,6 +1187,8 @@ export const SKILLS = {
         { v: "mixed_placevalue", l: "Mixed Place Value" },
         // P9 appends, 2026-09-25 (§18) — APPEND ONLY, after every existing id.
         { v: "unit_form", l: "Unit Form (4 hundreds 7 tens 6 ones)" },
+        // APPENDED 2026-10-17 — PRESET skill (skill-presets.js): expand with its notation form set.
+        { v: "expanded_notation", l: "Write Numbers in Expanded Notation", presetOf: "expand" },
     ],
     number_sense: [
         { v: "rounding_visual", l: "Round on a Number Line" },
@@ -1200,6 +1223,8 @@ export const SKILLS = {
         { v: "round_nl_thousands", l: "Round on a Number Line: Thousands" },
         { v: "round_nl_ten_thousands", l: "Round on a Number Line: Ten Thousands" },
         { v: "round_nl_hundred_thousands", l: "Round on a Number Line: Hundred Thousands" },
+        // APPENDED 2026-10-17 — PRESET skill (skill-presets.js): doubles with only the near doubles.
+        { v: "near_doubles", l: "Near Doubles (Doubles Plus One, Doubles Minus One)", presetOf: "doubles_near_doubles" },
     ],
     number_theory: [
         { v: "prime_composite", l: "Prime vs Composite" },
@@ -1344,7 +1369,11 @@ const MIXED_POOL_EXCLUDE = {
 export function getMixedPoolSkills(categoryId, mixedSkillId) {
     const out = getSkillsForCategory(categoryId);
     const drop = MIXED_POOL_EXCLUDE[mixedSkillId];
-    return drop ? out.filter(v => !drop.includes(v)) : out;
+    // A PRESET (skill-presets.js) is its host with set options; the host is already in the pool,
+    // so a preset would only double its host's share of a mixed page.
+    const presets = new Set((SKILLS[categoryId] || []).filter(s => s.presetOf).map(s => s.v));
+    const kept = presets.size ? out.filter(v => !presets.has(v)) : out;
+    return drop ? kept.filter(v => !drop.includes(v)) : kept;
 }
 
 /** Get all non-mixed skill IDs for a domain (across all its categories) */
@@ -2155,6 +2184,16 @@ export const SKILL_PRINT_SIZE = {
     vocab_grade_6_geometry: "wide", vocab_grade_6_data: "wide",
     vocab_grade_6_algebra: "wide", vocab_grade_6_measurement: "wide",
 };
+
+// PRESET skills (skill-presets.js, SKILLS entries carrying `presetOf`) inherit their host's print
+// size and time category: they ARE the host with set option values, so they print the host's cell.
+for (const list of Object.values(SKILLS)) {
+    for (const s of list) {
+        if (!s.presetOf) continue;
+        if (SKILL_PRINT_SIZE[s.v] === undefined && SKILL_PRINT_SIZE[s.presetOf] !== undefined) SKILL_PRINT_SIZE[s.v] = SKILL_PRINT_SIZE[s.presetOf];
+        if (SKILL_TIME_CATEGORY[s.v] === undefined && SKILL_TIME_CATEGORY[s.presetOf] !== undefined) SKILL_TIME_CATEGORY[s.v] = SKILL_TIME_CATEGORY[s.presetOf];
+    }
+}
 
 // Fallback: map printFormat → size when skillId isn't in SKILL_PRINT_SIZE
 export const PRINT_FORMAT_SIZE = {

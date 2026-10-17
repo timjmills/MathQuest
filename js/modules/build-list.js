@@ -166,6 +166,10 @@ export const WRM_EXTENSIONS = {
 };
 
 /* ================================================================ the standards proposals */
+// `preset` on a `kind: 'option'` entry (owner rule 2026-10-17, design/PRESET_SKILLS.md): true when the
+// option, once built, ALSO becomes a named, findable PRESET skill (js/modules/skill-presets.js: an
+// appended SKILLS id that opens the host with the option values set) — or the doc lists it for the
+// owner to decide; false when it stays a plain option. The entry is closed only when both are built.
 const P = (o) => o;
 
 export const STANDARD_PROPOSALS = {
@@ -182,7 +186,7 @@ export const STANDARD_PROPOSALS = {
         wrmSteps: [], after: ['zero'],
     }),
     count_conserve: P({
-        kind: 'option', skill: 'counting:count_objects', option: 'task: "same number?" after the objects are moved or counted in another order',
+        kind: 'option', preset: false, skill: 'counting:count_objects', option: 'task: "same number?" after the objects are moved or counted in another order',
         name: 'Same Number After Moving (option)', grade: 'K', family: 'counting', standards: ['K.CC.B.4b'], ee: ['M.EE.K.CC.4'],
         teaches: 'the last number said tells how many, and the number of objects does not change when they are moved or counted in a different order',
         problemTypes: ['two pictures of the same set, one spread out: same number? tick', 'count in a new order: how many now?', 'which picture has the same number?'],
@@ -191,7 +195,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['spread-out objects are "more"', 'recounting from the other end gives a new number'], wrmSteps: [], after: [],
     }),
     count_objects_more: P({
-        kind: 'option', skill: 'counting:count_objects', option: 'arrangement "circle" and band 30',
+        kind: 'option', preset: false, skill: 'counting:count_objects', option: 'arrangement "circle" and band 30',
         name: 'Count in a Circle and to 30 (option)', grade: 'K', family: 'counting', standards: ['K.CC.B.5'], ee: ['M.EE.2.NBT.2'],
         teaches: 'counting up to 20 things arranged in a circle (mark the start) and up to 30 things for the EE',
         problemTypes: ['how many in the circle? (mark where you start)', 'how many in the array?', 'count to 30 in rows of ten'],
@@ -200,7 +204,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['counts round the circle twice', 'loses the place after 20'], wrmSteps: [], after: [],
     }),
     pictures_to_sentence: P({
-        kind: 'option', skill: 'addition:add_5_pictures', also: ['subtraction:sub_5_pictures'], option: 'response "write the number sentence" (the pupil writes 3 + 2 = 5 for the picture)',
+        kind: 'option', preset: false, skill: 'addition:add_5_pictures', also: ['subtraction:sub_5_pictures'], option: 'response "write the number sentence" (the pupil writes 3 + 2 = 5 for the picture)',
         name: 'Write the Number Sentence for the Picture (option)', grade: 'K', family: 'operations', standards: ['K.OA.A.1'], ee: ['M.EE.K.OA.1'],
         teaches: 'representing addition and subtraction: the pupil writes the equation a picture shows, and draws a picture for an equation',
         problemTypes: ['write the + sentence for two groups', 'write the − sentence for a take-away picture', 'draw dots for 4 + 1', 'which sentence matches the picture?'],
@@ -220,7 +224,7 @@ export const STANDARD_PROPOSALS = {
 
     // ------------------------------------------------------------------ operations (1-2)
     add_three_forms: P({
-        kind: 'option', skill: 'addition:add_three', option: 'form: word problem (three addends, sum ≤ 20) and "make a ten first" (ring the two that make 10)',
+        kind: 'option', preset: true, skill: 'addition:add_three', option: 'form: word problem (three addends, sum ≤ 20) and "make a ten first" (ring the two that make 10)',
         name: 'Add Three Numbers: Stories and Make a Ten First (option)', grade: '1', family: 'operations', standards: ['1.OA.A.2', '1.OA.B.3'], ee: ['M.EE.1.OA.2'],
         teaches: 'solving three-addend word problems and adding three numbers by grouping two that make ten (associative and commutative properties as strategies)',
         problemTypes: ['story with three addends', 'ring the pair that makes 10, then add', 'change the order to make it easier', 'which way is easier?'],
@@ -229,7 +233,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['adds only two of the three', 'always adds left to right even when a ten is hidden'], wrmSteps: ['Y1.B5.S7'], after: [],
     }),
     make_ten_subtract: P({
-        kind: 'option', skill: 'number_sense:make_a_ten', option: 'subtraction: back through ten (13 − 4 = 13 − 3 − 1)',
+        kind: 'option', preset: false, skill: 'number_sense:make_a_ten', option: 'subtraction: back through ten (13 − 4 = 13 − 3 − 1)',
         name: 'Subtract Back Through Ten (option)', grade: '1', family: 'operations', standards: ['1.OA.C.6'], ee: [],
         teaches: 'subtracting within 20 by decomposing to a ten: 13 − 4 = 13 − 3 − 1 = 10 − 1',
         problemTypes: ['split the number you take away', 'jump to 10, then the rest', 'which split gets to 10?', 'fill the steps'],
@@ -247,7 +251,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['= means "the answer comes next"', '7 = 8 − 1 is false because the answer is on the left'], wrmSteps: ['Y2.B2.S20'], after: [],
     }),
     tens_any: P({
-        kind: 'option', skill: 'addition:add_sub_10s', option: 'task: any multiple of 10 from a multiple of 10 (70 − 30), and a 2-digit number ± a multiple of 10 (34 + 20); support: tens rods',
+        kind: 'option', preset: false, skill: 'addition:add_sub_10s', option: 'task: any multiple of 10 from a multiple of 10 (70 − 30), and a 2-digit number ± a multiple of 10 (34 + 20); support: tens rods',
         name: 'Add and Subtract Multiples of Ten (option)', grade: '1', family: 'operations', standards: ['1.NBT.C.4', '1.NBT.C.6'], ee: ['M.EE.1.NBT.4'],
         teaches: 'adding and subtracting multiples of 10 (10-90) and adding a multiple of 10 to a 2-digit number, with rods, and relating it to the written sum',
         problemTypes: ['70 − 30 with rods', '34 + 20 with rods', 'which picture shows 50 − 20?', 'missing multiple of ten'],
@@ -256,7 +260,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['70 − 30 = 4', '34 + 20 = 36 (adds to the ones)'], wrmSteps: ['Y1.B12.S3'], after: [],
     }),
     stack_base10_support: P({
-        kind: 'option', skill: 'addition:add_100_mixed', also: ['subtraction:sub_100_mixed', 'addition:add_1k_mixed', 'subtraction:sub_1k_mixed'], option: 'support "base-10 picture" beside the column (a structural drawing of tens and ones / hundreds that regroups with the written method)',
+        kind: 'option', preset: false, skill: 'addition:add_100_mixed', also: ['subtraction:sub_100_mixed', 'addition:add_1k_mixed', 'subtraction:sub_1k_mixed'], option: 'support "base-10 picture" beside the column (a structural drawing of tens and ones / hundreds that regroups with the written method)',
         name: 'Add and Subtract With a Base-10 Picture (option)', grade: '1-2', family: 'operations', standards: ['1.NBT.C.4', '2.NBT.B.7'], ee: ['M.EE.2.NBT.7'],
         teaches: 'adding and subtracting within 100 and 1,000 with a drawn model that mirrors the column method (compose or decompose a ten or hundred)',
         problemTypes: ['add with the picture then the column', 'subtract with an exchange drawn', 'match the picture to the column step', 'which exchange is shown?'],
@@ -265,7 +269,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['adds the tens as ones', 'exchanges but forgets to add the new ten'], wrmSteps: ['Y2.B2.S16', 'Y3.B2.S13'], after: [],
     }),
     odd_even_pairs: P({
-        kind: 'option', skill: 'composing:odd_even', option: 'form: picture of up to 20 objects to pair up, and "write the even number as a double" (14 = 7 + 7)',
+        kind: 'option', preset: false, skill: 'composing:odd_even', option: 'form: picture of up to 20 objects to pair up, and "write the even number as a double" (14 = 7 + 7)',
         name: 'Odd or Even by Pairing (option)', grade: '2', family: 'counting', standards: ['2.OA.C.3'], ee: ['M.EE.2.OA.3'],
         teaches: 'deciding odd or even by pairing objects or counting in 2s, and writing an even number as a sum of two equal addends',
         problemTypes: ['pair the objects: odd or even?', 'count in 2s to decide', 'write 14 = 7 + 7', 'which number is a double?'],
@@ -274,7 +278,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['a number is odd if it has an odd digit anywhere', 'writes 14 = 10 + 4'], wrmSteps: ['Y2.B5.S12'], after: [],
     }),
     regroup_hundreds: P({
-        kind: 'option', skill: 'composing:base10_regroup', option: 'band 999: trade 1 hundred for 10 tens',
+        kind: 'option', preset: false, skill: 'composing:base10_regroup', option: 'band 999: trade 1 hundred for 10 tens',
         name: 'A Hundred Is Ten Tens (option)', grade: '2', family: 'placevalue', standards: ['2.NBT.A.1a'], ee: ['M.EE.2.NBT.1'],
         teaches: '100 as a bundle of ten tens: build, trade a flat for ten rods, and back',
         problemTypes: ['trade 1 hundred for 10 tens', 'how many tens in 300?', 'bundle 10 tens into a hundred', 'same number, new picture'],
@@ -283,7 +287,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['100 = 10 ones', 'a trade changes the number'], wrmSteps: ['Y3.B1.S3'], after: [],
     }),
     hundreds_foundation: P({
-        kind: 'option', skill: 'composing:tens_foundation_visual', option: 'unit "hundreds": 100, 200 … 900 as 1 … 9 hundreds (0 tens 0 ones)',
+        kind: 'option', preset: false, skill: 'composing:tens_foundation_visual', option: 'unit "hundreds": 100, 200 … 900 as 1 … 9 hundreds (0 tens 0 ones)',
         name: 'How Many Hundreds? (option)', grade: '2', family: 'placevalue', standards: ['2.NBT.A.1b'], ee: ['M.EE.2.NBT.1'],
         teaches: 'the numbers 100-900 are 1-9 hundreds and 0 tens, 0 ones',
         problemTypes: ['how many hundreds?', 'write the number for the flats', 'fill hundreds, tens, ones for 600', 'match flats to the number'],
@@ -292,7 +296,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['600 has 6 tens', 'writes 6 for 600'], wrmSteps: ['Y3.B1.S2'], after: [],
     }),
     comparison_statements: P({
-        kind: 'option', skill: 'multiplication:mult_comparison', also: ['multiplication:mult_comparison_plain'], option: 'form "statement ↔ equation": 35 = 5 × 7 read as "35 is 5 times as many as 7" (and 7 times as many as 5), and the equation written for a comparison sentence',
+        kind: 'option', preset: false, skill: 'multiplication:mult_comparison', also: ['multiplication:mult_comparison_plain'], option: 'form "statement ↔ equation": 35 = 5 × 7 read as "35 is 5 times as many as 7" (and 7 times as many as 5), and the equation written for a comparison sentence',
         name: 'Times as Many: Statements and Equations (option)', grade: '4', family: 'operations', standards: ['4.OA.A.1'], ee: ['M.EE.4.OA.1'],
         teaches: 'interpreting a multiplication equation as a multiplicative comparison and writing the equation for a verbal comparison',
         problemTypes: ['35 = 5 × 7 means … (tick both statements)', 'write the equation for "24 is 3 times as many as 8"', 'which statement matches the equation?', 'fill the blank: __ is 4 times as many as 6'],
@@ -301,7 +305,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['reads 5 × 7 as "5 more than 7"', 'only one of the two statements is true'], wrmSteps: [], after: [],
     }),
     mult_4x1: P({
-        kind: 'option', skill: 'multiplication:multiply', also: ['multiplication:area_model_mult'], option: 'size "4-digit × 1-digit" (tiles 41) on the column method and the area model',
+        kind: 'option', preset: true, skill: 'multiplication:multiply', also: ['multiplication:area_model_mult'], option: 'size "4-digit × 1-digit" (tiles 41) on the column method and the area model',
         name: 'Multiply a 4-Digit Number by a 1-Digit Number (option)', grade: '4', family: 'operations', standards: ['4.NBT.B.5'], ee: [],
         teaches: 'multiplying a whole number of up to four digits by a one-digit number, with the area model and the column method side by side',
         problemTypes: ['area model with four parts', 'column method with carries', 'match the model to the column', 'estimate first'],
@@ -320,7 +324,7 @@ export const STANDARD_PROPOSALS = {
     }),
     // ------------------------------------------------------------------ measurement
     order_length_tasks: P({
-        kind: 'option', skill: 'shapes_early:order_objects_length', option: 'task "compare using a third object" (A is longer than C, C is longer than B) and "order by counted units" (cube trains)',
+        kind: 'option', preset: false, skill: 'shapes_early:order_objects_length', option: 'task "compare using a third object" (A is longer than C, C is longer than B) and "order by counted units" (cube trains)',
         name: 'Compare Lengths Indirectly and by Units (option)', grade: '1', family: 'measurement', standards: ['1.MD.A.1'], ee: ['M.EE.2.MD.3', 'M.EE.2.MD.4'],
         teaches: 'comparing two lengths indirectly by a third object, and ordering objects by lengths measured in non-standard units',
         problemTypes: ['the string is longer than the pencil and shorter than the book: which is longest?', 'order three by cube counts', 'which is longer? use the string', 'longest / shortest'],
@@ -329,7 +333,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['the object mentioned first is longer', 'more units always means longer even with different units'], wrmSteps: ['Y1.B7.S2'], after: [],
     }),
     measure_two_units: P({
-        kind: 'option', skill: 'shapes_early:measure_nonstandard', option: 'task "measure twice": the same object in two units (paper clips and crayons; inches and cm)',
+        kind: 'option', preset: false, skill: 'shapes_early:measure_nonstandard', option: 'task "measure twice": the same object in two units (paper clips and crayons; inches and cm)',
         name: 'Measure With Two Units (option)', grade: '2', family: 'measurement', standards: ['2.MD.A.2'], ee: ['M.EE.2.MD.1'],
         teaches: 'measuring one length in two different units and relating the counts to the unit size (the bigger unit gives the smaller count)',
         problemTypes: ['how many clips? how many crayons?', 'which unit is longer?', 'why is the number smaller?', 'predict the second count'],
@@ -338,7 +342,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['more units means the object is longer', 'gaps and overlaps ignored'], wrmSteps: ['Y2.B6.S1'], after: [],
     }),
     ruler_difference: P({
-        kind: 'option', skill: 'measurement:reading_ruler', option: 'task "how much longer?": two objects on one ruler; cm and inches',
+        kind: 'option', preset: false, skill: 'measurement:reading_ruler', option: 'task "how much longer?": two objects on one ruler; cm and inches',
         name: 'How Much Longer? (option)', grade: '2', family: 'measurement', standards: ['2.MD.A.4'], ee: ['M.EE.4.MD.2'],
         teaches: 'measuring two objects with a standard unit and finding how much longer one is',
         problemTypes: ['measure both, then the difference', 'which is longer and by how much?', 'difference on the ruler (count on)', 'story: the ribbon is longer by …'],
@@ -347,7 +351,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['adds the two lengths', 'reads the end number of an object not starting at 0'], wrmSteps: ['Y2.B6.S4', 'Y3.B5.S7'], after: [],
     }),
     elapsed_stories: P({
-        kind: 'option', skill: 'measurement:elapsed_mixed', also: ['measurement:elapsed_find_duration', 'measurement:elapsed_find_start'], option: 'form "story": time-interval word problems with the time line as the drawing',
+        kind: 'option', preset: false, skill: 'measurement:elapsed_mixed', also: ['measurement:elapsed_find_duration', 'measurement:elapsed_find_start'], option: 'form "story": time-interval word problems with the time line as the drawing',
         name: 'Time Word Problems (option)', grade: '3', family: 'measurement', standards: ['3.MD.A.1'], ee: ['M.EE.3.MD.1'],
         teaches: 'word problems adding and subtracting time intervals in minutes, drawn on a number-line (time line) diagram',
         problemTypes: ['start and duration: when does it end?', 'start and end: how long?', 'end and duration: when did it start?', 'two intervals in a row'],
@@ -356,7 +360,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['treats 1:50 + 20 min as 1:70', 'subtracts times like decimals'], wrmSteps: ['Y3.B10.S9', 'Y4.B11.S6'], after: [],
     }),
     conversion_table: P({
-        kind: 'option', skill: 'measurement:unit_conversions', option: 'form "conversion table": complete a two-column table (1 ft = 12 in, 2 ft, 3 ft …) and use it',
+        kind: 'option', preset: true, skill: 'measurement:unit_conversions', option: 'form "conversion table": complete a two-column table (1 ft = 12 in, 2 ft, 3 ft …) and use it',
         name: 'Conversion Tables (option)', grade: '4', family: 'measurement', standards: ['4.MD.A.1'], ee: ['M.EE.4.MD.1'],
         teaches: 'knowing relative sizes of units in one system and recording equivalents in a two-column table (ft/in, m/cm, kg/g, lb/oz, l/ml, hr/min/sec)',
         problemTypes: ['complete the table', 'use the table to convert', '1 ft is __ times as long as 1 in', 'find the error in a table'],
@@ -376,7 +380,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['an upside-down triangle is not a triangle', 'a long thin rectangle is not a rectangle', 'an open shape counts'], wrmSteps: ['Y1.B3.S3', 'Y2.B3.S2'], after: [],
     }),
     rect_rows_columns: P({
-        kind: 'option', skill: 'shapes_early:compose_rect_from_squares', option: 'sizes up to 5 × 5 and task "partition and count": draw the rows and columns, then write the total',
+        kind: 'option', preset: false, skill: 'shapes_early:compose_rect_from_squares', option: 'sizes up to 5 × 5 and task "partition and count": draw the rows and columns, then write the total',
         name: 'Rows and Columns of Squares (option)', grade: '2', family: 'geometry', standards: ['2.G.A.2'], ee: [],
         teaches: 'partitioning a rectangle into rows and columns of same-size squares and counting them',
         problemTypes: ['draw the lines at the marks, count the squares', 'how many rows? columns? squares?', 'fill with squares (the current drag task, now any size)', 'which rectangle has 12 squares?'],
@@ -385,7 +389,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['unequal squares', 'counts lines instead of squares'], wrmSteps: ['Y3.B4.S6'], after: [],
     }),
     area_tile_multiply: P({
-        kind: 'option', skill: 'area_perimeter:area_unit_squares', option: 'unit label (square units, cm², m², in², ft²) and form "tile, then multiply" (count the squares, then write rows × columns)',
+        kind: 'option', preset: false, skill: 'area_perimeter:area_unit_squares', option: 'unit label (square units, cm², m², in², ft²) and form "tile, then multiply" (count the squares, then write rows × columns)',
         name: 'Area by Tiling and Multiplying (option)', grade: '3', family: 'geometry', standards: ['3.MD.C.5a', '3.MD.C.6', '3.MD.C.7a'], ee: ['M.EE.4.MD.3', 'M.EE.6.G.1'],
         teaches: 'area measured in square units of a named size, and that the tiled count equals side × side',
         problemTypes: ['count the squares; write the unit', 'count, then rows × columns', 'same area, check by multiplying', 'which unit square was used?'],
@@ -394,7 +398,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['writes cm for cm²', 'counts the perimeter squares only'], wrmSteps: ['Y3.B4.S3'], after: [],
     }),
     partition_draw: P({
-        kind: 'option', skill: 'shapes_early:partition_shapes', option: 'task "draw the cuts": partition a shape into n equal-area parts and write the unit fraction of each part',
+        kind: 'option', preset: false, skill: 'shapes_early:partition_shapes', option: 'task "draw the cuts": partition a shape into n equal-area parts and write the unit fraction of each part',
         name: 'Cut Into Equal Areas (option)', grade: '3', family: 'geometry', standards: ['3.G.A.2'], ee: ['M.EE.3.G.2'],
         teaches: 'partitioning shapes into parts with equal areas and naming each part as a unit fraction of the whole',
         problemTypes: ['draw lines to make 4 equal parts; each is __ of the shape', 'are these parts equal in area?', 'two different ways to cut into quarters', 'name one part'],
@@ -412,7 +416,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['a segment and a line are the same', 'lines must be horizontal to be parallel'], wrmSteps: ['Y3.B11.S6', 'Y3.B11.S7'], after: [],
     }),
     protractor_read: P({
-        kind: 'option', skill: 'angles_lines:measure_angles', option: 'form "read the protractor": a protractor drawn over the angle; write the degrees (not multiple choice)',
+        kind: 'option', preset: true, skill: 'angles_lines:measure_angles', option: 'form "read the protractor": a protractor drawn over the angle; write the degrees (not multiple choice)',
         name: 'Measure With a Protractor (option)', grade: '4', family: 'geometry', standards: ['4.MD.C.6'], ee: [],
         teaches: 'measuring angles in whole degrees with a protractor: which scale, from 0',
         problemTypes: ['read the angle on the protractor', 'which scale starts at 0?', 'is it acute or obtuse? (check the reading)', 'measure two angles and compare'],
@@ -430,7 +434,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['multiplies all the edges shown', 'counts the overlap twice'], wrmSteps: ['Y6.B10.S8'], after: ['volume_cubes'],
     }),
     coord_context: P({
-        kind: 'option', skill: 'coordinates:coordinate_q1', option: 'form "in context": points are data (hours and pages, days and height); plot them and say what a point means',
+        kind: 'option', preset: false, skill: 'coordinates:coordinate_q1', option: 'form "in context": points are data (hours and pages, days and height); plot them and say what a point means',
         name: 'Graph Points in a Real Problem (option)', grade: '5', family: 'geometry', standards: ['5.G.A.2'], ee: [],
         teaches: 'representing real-world problems by graphing points in the first quadrant and interpreting the coordinates',
         problemTypes: ['plot the table as points', 'what does (3, 12) mean in the story?', 'which point shows …?', 'read the missing value'],
@@ -439,7 +443,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['x and y swapped', 'reads the point on the wrong axis'], wrmSteps: ['Y6.B13.S2'], after: [],
     }),
     net_sa_triangles: P({
-        kind: 'option', skill: 'coordinates:net_surface_area', option: 'solids with triangle faces: triangular prisms and square pyramids',
+        kind: 'option', preset: false, skill: 'coordinates:net_surface_area', option: 'solids with triangle faces: triangular prisms and square pyramids',
         name: 'Surface Area From Nets With Triangles (option)', grade: '6', family: 'geometry', standards: ['6.G.A.4'], ee: [],
         teaches: 'nets made of rectangles and triangles and the surface area from the net',
         problemTypes: ['which solid does the net make?', 'area of each face', 'total surface area', 'find the missing face'],
@@ -448,7 +452,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['forgets to halve a triangle', 'counts a face twice'], wrmSteps: [], after: [],
     }),
     volume_fractional: P({
-        kind: 'option', skill: 'area_perimeter:volume', option: 'fractional edge lengths (1/2 and 1/4 units) and packing with unit-fraction cubes',
+        kind: 'option', preset: false, skill: 'area_perimeter:volume', option: 'fractional edge lengths (1/2 and 1/4 units) and packing with unit-fraction cubes',
         name: 'Volume With Fractional Edges (option)', grade: '6', family: 'geometry', standards: ['6.G.A.2'], ee: ['M.EE.6.G.2'],
         teaches: 'volume of a prism with fractional edges by packing 1/2-unit cubes and by V = l × w × h = B × h',
         problemTypes: ['how many 1/2-unit cubes fill it?', 'V = l × w × h with fractions', 'show the two answers match', 'story'],
@@ -459,7 +463,7 @@ export const STANDARD_PROPOSALS = {
 
     // ------------------------------------------------------------------ fractions / decimals / ratio
     whole_frac_reverse: P({
-        kind: 'option', skill: 'composing:whole_as_fraction', option: 'direction "fraction → whole" (6/1 = 6, 8/4 = 2) and "same point" on a number line (4/4 and 1)',
+        kind: 'option', preset: false, skill: 'composing:whole_as_fraction', option: 'direction "fraction → whole" (6/1 = 6, 8/4 = 2) and "same point" on a number line (4/4 and 1)',
         name: 'Fractions That Equal Whole Numbers (option)', grade: '3', family: 'fractions', standards: ['3.NF.A.3c'], ee: ['M.EE.3.NF.3'],
         teaches: 'recognising fractions equivalent to whole numbers and locating 4/4 and 1 at the same point',
         problemTypes: ['6/1 = ?', '8/4 = ? (with a model)', 'which fractions equal 1?', 'mark 4/4 and 1 on the line'],
@@ -468,7 +472,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['6/1 = 1/6', '4/4 = 4'], wrmSteps: ['Y3.B6.S8'], after: ['frac_count'],
     }),
     frac_same_whole: P({
-        kind: 'option', skill: 'fractions:compare', option: 'items "same whole?": two fractions of different-size wholes (can we compare?) and justify a comparison with a model',
+        kind: 'option', preset: false, skill: 'fractions:compare', option: 'items "same whole?": two fractions of different-size wholes (can we compare?) and justify a comparison with a model',
         name: 'Compare Fractions of the Same Whole (option)', grade: '3-4', family: 'fractions', standards: ['3.NF.A.3d', '4.NF.A.2'], ee: ['M.EE.4.NF.2'],
         teaches: 'comparisons of fractions are valid only when they refer to the same whole; justify with a visual model',
         problemTypes: ['half of a small pizza vs a third of a large one: can we compare?', 'draw both on the same whole', 'justify: tick the model that proves it', 'compare, then show'],
@@ -477,7 +481,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['a half is always bigger than a third', 'the bigger picture is the bigger fraction'], wrmSteps: [], after: ['compare_numerator'],
     }),
     dec_compare_model: P({
-        kind: 'option', skill: 'decimals:compare_decimal', option: 'support "hundred squares" beside each decimal and items "same whole?"',
+        kind: 'option', preset: false, skill: 'decimals:compare_decimal', option: 'support "hundred squares" beside each decimal and items "same whole?"',
         name: 'Compare Decimals With Models (option)', grade: '4', family: 'decimals', standards: ['4.NF.C.7'], ee: [],
         teaches: 'comparing decimals to hundredths by reasoning about size, with a hundred-square model, and only when they refer to the same whole',
         problemTypes: ['shade both, then compare', '0.5 vs 0.45 with squares', 'same whole?', 'justify: which picture proves it?'],
@@ -486,7 +490,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['0.45 > 0.5 because 45 > 5', 'more digits means bigger'], wrmSteps: ['Y4.B9.S5'], after: [],
     }),
     decimal_models: P({
-        kind: 'option', skill: 'decimals:add_decimal', also: ['decimals:sub_decimal', 'decimals:mult_decimal'], option: 'support "decimal model": hundred squares or place-value counters beside the column, and an area model for decimal × whole',
+        kind: 'option', preset: false, skill: 'decimals:add_decimal', also: ['decimals:sub_decimal', 'decimals:mult_decimal'], option: 'support "decimal model": hundred squares or place-value counters beside the column, and an area model for decimal × whole',
         name: 'Decimal Operations With Models (option)', grade: '5', family: 'decimals', standards: ['5.NBT.B.7'], ee: ['M.EE.5.NBT.7'],
         teaches: 'adding, subtracting and multiplying decimals to hundredths with a drawn model that is related to the written method',
         problemTypes: ['add with hundred squares, then the column', 'subtract with an exchange of a tenth', 'multiply a decimal by a whole with an area model', 'which model matches the column?'],
@@ -495,7 +499,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['lines up the right-hand digits, not the points', '0.3 + 0.45 = 0.48'], wrmSteps: ['Y5.B12.S3'], after: ['decimal_pv'],
     }),
     frac_wp_unlike: P({
-        kind: 'option', skill: 'fraction_operations:frac_word_problems', also: ['fraction_operations:frac_word_problems_plain'], option: 'denominators "unlike" and task "is the answer reasonable?" (benchmark estimate)',
+        kind: 'option', preset: false, skill: 'fraction_operations:frac_word_problems', also: ['fraction_operations:frac_word_problems_plain'], option: 'denominators "unlike" and task "is the answer reasonable?" (benchmark estimate)',
         name: 'Fraction Word Problems With Unlike Denominators (option)', grade: '5', family: 'fractions', standards: ['5.NF.A.2'], ee: ['M.EE.5.NF.1'],
         teaches: 'adding and subtracting fractions with unlike denominators in context, and checking with benchmarks (2/5 + 1/2 cannot be 3/7)',
         problemTypes: ['join two unlike fractions in a story', 'take away in a story', 'estimate first with 0, 1/2, 1', 'spot the unreasonable answer'],
@@ -513,7 +517,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['divides numerators and denominators straight across whatever the sizes', 'flips the wrong fraction', 'quotient must be smaller'], wrmSteps: [], after: [],
     }),
     mult_dec_dec: P({
-        kind: 'option', skill: 'decimals:mult_decimal', option: 'factors "decimal × decimal" (3.45 × 2.6) with the standard algorithm',
+        kind: 'option', preset: true, skill: 'decimals:mult_decimal', option: 'factors "decimal × decimal" (3.45 × 2.6) with the standard algorithm',
         name: 'Multiply Decimals by Decimals (option)', grade: '6', family: 'decimals', standards: ['6.NS.B.3'], ee: [],
         teaches: 'multiplying multi-digit decimals by decimals with the standard algorithm and placing the point',
         problemTypes: ['1-dp × 1-dp', '2-dp × 1-dp', 'estimate then place the point', 'find the misplaced point'],
@@ -522,7 +526,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['lines up the points as in addition', 'counts the places of one factor only'], wrmSteps: ['Y6.B8.S7'], after: [],
     }),
     unit_rate_fraction: P({
-        kind: 'option', skill: 'conversions:unit_rate_intro', option: 'unit rates that are fractions (3 cups flour to 4 cups sugar = 3/4 cup per cup) and rate language',
+        kind: 'option', preset: false, skill: 'conversions:unit_rate_intro', option: 'unit rates that are fractions (3 cups flour to 4 cups sugar = 3/4 cup per cup) and rate language',
         name: 'Fraction Unit Rates (option)', grade: '6', family: 'ratio', standards: ['6.RP.A.2'], ee: ['M.EE.6.RP.1'],
         teaches: 'the unit rate a/b of a ratio a : b, including fractional rates, said with "per" and "for each"',
         problemTypes: ['find the unit rate as a fraction', 'complete the rate sentence', 'which rate matches the ratio?', 'better buy'],
@@ -531,7 +535,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['divides the wrong way (4/3 cup per cup)', 'drops the unit'], wrmSteps: [], after: [],
     }),
     ratio_table_plot: P({
-        kind: 'option', skill: 'conversions:ratio_tables', option: 'task "plot the pairs" on a coordinate grid and task "compare two ratio tables"',
+        kind: 'option', preset: true, skill: 'conversions:ratio_tables', option: 'task "plot the pairs" on a coordinate grid and task "compare two ratio tables"',
         name: 'Ratio Tables: Plot and Compare (option)', grade: '6', family: 'ratio', standards: ['6.RP.A.3a'], ee: [],
         teaches: 'making tables of equivalent ratios, plotting the pairs and comparing ratios with tables',
         problemTypes: ['complete the table, then plot', 'which recipe is stronger? use tables', 'read a missing value from the graph', 'are these ratios equivalent?'],
@@ -540,7 +544,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['adds the same amount to both rows', 'plots (y, x)'], wrmSteps: [], after: [],
     }),
     dnl_units: P({
-        kind: 'option', skill: 'conversions:double_num_line', option: 'context "measurement units": convert units with a double number line or ratio table (12 in : 1 ft, 100 cm : 1 m)',
+        kind: 'option', preset: false, skill: 'conversions:double_num_line', option: 'context "measurement units": convert units with a double number line or ratio table (12 in : 1 ft, 100 cm : 1 m)',
         name: 'Convert Units With Ratios (option)', grade: '6', family: 'ratio', standards: ['6.RP.A.3d'], ee: [],
         teaches: 'using ratio reasoning to convert measurement units, and transforming units when multiplying or dividing quantities',
         problemTypes: ['convert with a double number line', 'convert with a ratio table', 'rate × time with units', 'which conversion is right?'],
@@ -551,7 +555,7 @@ export const STANDARD_PROPOSALS = {
 
     // ------------------------------------------------------------------ place value
     chart_120: P({
-        kind: 'option', skill: 'composing:hundreds_chart_fill', option: 'band 120: chart windows from 100 to 120 (crossing 100)',
+        kind: 'option', preset: false, skill: 'composing:hundreds_chart_fill', option: 'band 120: chart windows from 100 to 120 (crossing 100)',
         name: 'Count to 120 on the Chart (option)', grade: '1', family: 'counting', standards: ['1.NBT.A.1'], ee: ['M.EE.1.NBT.1'],
         teaches: 'counting, reading and writing numerals to 120 starting anywhere, across 100',
         problemTypes: ['fill the window 95-115', 'what comes after 109?', 'count on from 98', 'fill the row 111-120'],
@@ -560,7 +564,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['writes 1010 for 110', '109 → 200'], wrmSteps: ['Y2.B1.S5'], after: [],
     }),
     value_ten_times: P({
-        kind: 'option', skill: 'placevalue:value', option: 'form "ten times / one tenth": compare the value of the same digit in two places (the 7 in 700 is 10 times the 7 in 70; 700 ÷ 70 = 10)',
+        kind: 'option', preset: true, skill: 'placevalue:value', option: 'form "ten times / one tenth": compare the value of the same digit in two places (the 7 in 700 is 10 times the 7 in 70; 700 ÷ 70 = 10)',
         name: 'Ten Times the Place to the Right (option)', grade: '4-5', family: 'placevalue', standards: ['4.NBT.A.1', '5.NBT.A.1'], ee: [],
         teaches: 'a digit in one place is worth 10 times what it is worth in the place to its right and 1/10 of the place to its left',
         problemTypes: ['how many times greater is the 4 in 4,300 than the 4 in 430?', '700 ÷ 70 = ?', 'the 3 in 0.3 is 1/10 of the 3 in 3', 'which digit is worth ten times more?'],
@@ -569,7 +573,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['the value is the digit', 'answers "one more place" instead of ×10'], wrmSteps: ['Y4.B1.S2'], after: [],
     }),
     pv10_exponents: P({
-        kind: 'option', skill: 'placevalue:place_value_10x', option: 'notation "powers written with exponents" (× 10³) and task "compare powers of ten by counting zeros"',
+        kind: 'option', preset: false, skill: 'placevalue:place_value_10x', option: 'notation "powers written with exponents" (× 10³) and task "compare powers of ten by counting zeros"',
         name: 'Powers of Ten With Exponents (option)', grade: '5', family: 'placevalue', standards: ['5.NBT.A.2'], ee: ['M.EE.5.NBT.2'],
         teaches: 'the pattern of zeros and of the decimal point when multiplying or dividing by powers of 10, written with whole-number exponents',
         problemTypes: ['4.2 × 10² = ?', 'write 1,000 as 10³', 'how many zeros in 10⁵?', 'which is greater: 10³ or 1,000 ÷ 10?', 'explain the shift (bank)'],
@@ -578,7 +582,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['10³ = 30', 'moves the point the wrong way when dividing'], wrmSteps: ['Y5.B1.S6'], after: [],
     }),
     sign_meanings: P({
-        kind: 'option', skill: 'number_ops_mixed:which_sign', option: 'range 10 with + − = only and the words plus / add / combine, take away / subtract / separate, the same as / equal',
+        kind: 'option', preset: false, skill: 'number_ops_mixed:which_sign', option: 'range 10 with + − = only and the words plus / add / combine, take away / subtract / separate, the same as / equal',
         name: 'What Do +, − and = Mean? (option)', grade: '2', family: 'operations', standards: [], ee: ['M.EE.2.NBT.5'],
         teaches: 'the meaning of the + sign, the − sign and the = sign in words and pictures, within 10',
         problemTypes: ['match the word to the sign', 'which sign makes it true (+ or −)?', 'the = sign means …', 'picture: combine or take away?'],
@@ -598,7 +602,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['a pattern seen in three terms always continues', 'odd × odd is even'], wrmSteps: ['Y3.B3.S13', 'Y4.B4.S15'], after: [],
     }),
     multi_step_four_ops: P({
-        kind: 'option', skill: 'algebra:multi_step_word', also: ['algebra:multi_step_word_plain'], option: 'two steps with × and ÷ (3 packs of 6, 4 eaten), write the equation with a letter for the unknown, remainder steps, and a "reasonable?" estimate',
+        kind: 'option', preset: false, skill: 'algebra:multi_step_word', also: ['algebra:multi_step_word_plain'], option: 'two steps with × and ÷ (3 packs of 6, 4 eaten), write the equation with a letter for the unknown, remainder steps, and a "reasonable?" estimate',
         name: 'Two-Step Problems With All Four Operations (option)', grade: '3-4', family: 'algebra', standards: ['3.OA.D.8', '4.OA.A.3'], ee: ['M.EE.3.OA.7', 'M.EE.4.OA.3'],
         teaches: 'two-step and multistep word problems with the four operations, represented by an equation with a letter, remainders interpreted, and checked by estimating',
         problemTypes: ['× then −', '÷ then +', 'write the equation with n', 'remainder decides the answer', 'is the answer reasonable? (round)'],
@@ -607,7 +611,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['answers the first step', 'uses the letter as a label, not a number', 'ignores the remainder'], wrmSteps: ['Y3.B4.S10', 'Y4.B5.S13'], after: [],
     }),
     write_numeric_expression: P({
-        kind: 'option', skill: 'algebra:write_expression', option: 'numbers only, with brackets ("add 8 and 7, then multiply by 2" = 2 × (8 + 7)) and "interpret without calculating"',
+        kind: 'option', preset: false, skill: 'algebra:write_expression', option: 'numbers only, with brackets ("add 8 and 7, then multiply by 2" = 2 × (8 + 7)) and "interpret without calculating"',
         name: 'Write Number Expressions (option)', grade: '5', family: 'algebra', standards: ['5.OA.A.2'], ee: [],
         teaches: 'writing numerical expressions that record calculations, with brackets, and interpreting expressions without evaluating them',
         problemTypes: ['words → expression with brackets', 'expression → words (bank)', '3 × (a + b) is how many times a + b?', 'which expression matches?'],
@@ -616,7 +620,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['writes 2 × 8 + 7 for "add then multiply"', 'evaluates when asked to interpret'], wrmSteps: [], after: [],
     }),
     pattern_pairs_graph: P({
-        kind: 'option', skill: 'patterns:pattern_relationship', option: 'task "make the pairs and plot them" on a quadrant-I grid',
+        kind: 'option', preset: false, skill: 'patterns:pattern_relationship', option: 'task "make the pairs and plot them" on a quadrant-I grid',
         name: 'Two Patterns as Ordered Pairs (option)', grade: '5', family: 'algebra', standards: ['5.OA.B.3'], ee: ['M.EE.5.OA.3'],
         teaches: 'generating two patterns from two rules, forming ordered pairs of corresponding terms and graphing them, and describing the relationship',
         problemTypes: ['generate both patterns', 'write the pairs', 'plot the pairs', 'tick the relationship (B is twice A)'],
@@ -625,7 +629,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['pairs terms from different positions', 'plots (y, x)'], wrmSteps: [], after: [],
     }),
     abs_context: P({
-        kind: 'option', skill: 'integers:abs_value', option: 'context: debt, depth, temperature; and "absolute value vs order" items (a balance less than −30 is a debt greater than 30)',
+        kind: 'option', preset: false, skill: 'integers:abs_value', option: 'context: debt, depth, temperature; and "absolute value vs order" items (a balance less than −30 is a debt greater than 30)',
         name: 'Absolute Value in Context (option)', grade: '6', family: 'integers', standards: ['6.NS.C.7c', '6.NS.C.7d'], ee: ['M.EE.6.NS.7'],
         teaches: 'absolute value as distance from 0 and as size in a real situation, and telling absolute-value statements from order statements',
         problemTypes: ['|−30| = 30 describes the debt', 'which debt is greater?', 'which balance is less?', 'distance from 0 on a line'],
@@ -634,7 +638,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['−40 > −30 because 40 > 30', 'absolute value makes a number negative'], wrmSteps: [], after: ['negative_count'],
     }),
     gcf_distributive: P({
-        kind: 'option', skill: 'number_theory:gcf_easy', option: 'task "write the sum as a product": 36 + 8 = 4 × (9 + 2)',
+        kind: 'option', preset: true, skill: 'number_theory:gcf_easy', option: 'task "write the sum as a product": 36 + 8 = 4 × (9 + 2)',
         name: 'Factor a Sum With the GCF (option)', grade: '6', family: 'number_theory', standards: ['6.NS.B.4'], ee: [],
         teaches: 'using the distributive property to write a sum of two whole numbers with a common factor as the factor times a sum with no common factor',
         problemTypes: ['36 + 8 = __ × (__ + __)', 'which is fully factored?', 'check by multiplying out', 'find the GCF first'],
@@ -652,7 +656,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['the coefficient is the letter', '2(8 + 7) has three terms'], wrmSteps: [], after: [],
     }),
     equiv_expressions: P({
-        kind: 'option', skill: 'algebra:combine_like_terms', option: 'task "equivalent or not?": test two expressions with values (y + y + y and 3y)',
+        kind: 'option', preset: false, skill: 'algebra:combine_like_terms', option: 'task "equivalent or not?": test two expressions with values (y + y + y and 3y)',
         name: 'Equivalent Expressions? (option)', grade: '6', family: 'algebra', standards: ['6.EE.A.4'], ee: ['M.EE.6.EE.3'],
         teaches: 'identifying when two expressions are equivalent: they name the same number for every value',
         problemTypes: ['substitute two values into both', 'equivalent or not? tick', 'find the pair that is not equivalent', 'write an equivalent expression'],
@@ -661,7 +665,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['one value that works proves equivalence', '3y = y + 3'], wrmSteps: [], after: [],
     }),
     inequality_write_graph: P({
-        kind: 'option', skill: 'algebra:inequalities', option: 'task "write it from words" (x > c) and "show the solutions on a number line" (open/closed circle, arrow)',
+        kind: 'option', preset: true, skill: 'algebra:inequalities', option: 'task "write it from words" (x > c) and "show the solutions on a number line" (open/closed circle, arrow)',
         name: 'Write and Graph Inequalities (option)', grade: '6', family: 'algebra', standards: ['6.EE.B.8'], ee: [],
         teaches: 'writing x > c or x < c for a real condition and representing its infinitely many solutions on a number line',
         problemTypes: ['write the inequality for the rule', 'draw the solutions', 'which graph matches?', 'is 3.5 a solution?'],
@@ -681,7 +685,7 @@ export const STANDARD_PROPOSALS = {
 
     // ------------------------------------------------------------------ data
     bar_graph_scale: P({
-        kind: 'option', skill: 'graphs:build_bar_graph', option: 'scale 2, 5 or 10 per square (draw a scaled bar graph)',
+        kind: 'option', preset: false, skill: 'graphs:build_bar_graph', option: 'scale 2, 5 or 10 per square (draw a scaled bar graph)',
         name: 'Draw a Scaled Bar Graph (option)', grade: '3', family: 'data', standards: ['3.MD.B.3'], ee: ['M.EE.3.MD.3'],
         teaches: 'drawing scaled bar graphs and answering one- and two-step "how many more / less" questions from them',
         problemTypes: ['draw the bars with scale 2', 'scale 5 with halfway bars', 'how many more? (two steps)', 'which scale fits the data?'],
@@ -719,7 +723,7 @@ export const STANDARD_PROPOSALS = {
 
     // ------------------------------------------------------------------ time and money / EE
     routine_hour: P({
-        kind: 'option', skill: 'measurement:time_sense', option: 'task "which hour?": choose the digital hour that matches a routine activity',
+        kind: 'option', preset: false, skill: 'measurement:time_sense', option: 'task "which hour?": choose the digital hour that matches a routine activity',
         name: 'The Hour for the Routine (option)', grade: '2', family: 'measurement', standards: ['2.MD.C.7'], ee: ['M.EE.2.MD.7'],
         teaches: 'matching a routine activity to its hour on a digital clock (lunch at 12:00, school at 8:00)',
         problemTypes: ['which clock shows lunch time?', 'what time do you wake up? (choose)', 'order the routine by clock', 'a.m. or p.m. (today\'s skill)'],
@@ -741,6 +745,10 @@ export const STANDARD_PROPOSALS = {
         templates: ['stack'], newTemplates: ['long-multiplication'], answer: 'write the digits of the product in the grid (carries and partial products in their boxes)',
         ladder: 'O2 size 2×1 → 3×1 → 4×1 → 2×2 → 3×2, each first without then with carries, then zero digits · O3 carry boxes, placeholder-zero box and partial-product rows (structural, stay) · traced first digit (hint, fades) · O6 column only',
         misconceptions: ['forgets to add the carry', 'leaves out the placeholder zero in the second row', 'multiplies only the ones by the tens digit', 'adds the partial products in the wrong columns'],
+        // 2026-10-17: 2×1, 3×1 and 2×2 EXIST as preset skills of multiplication:multiply (tiles 21 / 31 / 22):
+        // mult_2by1_column, mult_3by1_column, mult_2by2_standard (skill-presets.js). Only the 4×1 (mult_4x1) and
+        // 3×2 sizes remain to build; each becomes a `tiles` value on multiply plus its own preset.
+        built: { presets: ['multiplication:mult_2by1_column', 'multiplication:mult_3by1_column', 'multiplication:mult_2by2_standard'], remaining: ['4×1', '3×2'] },
         wrmSteps: ['Y4.B5.S11', 'Y5.B5.S1'], after: [],
     }),
 };
