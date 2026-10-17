@@ -274,6 +274,8 @@ function refAccepts(sk, cand, key, seen, kept, pg = '', row = '', words = true) 
         if (sk.avoidKeys && turnedKeyOf(cand) !== null && sk.avoidKeys.includes(turnedKeyOf(cand))) return false;
         // (a x fact's identity is its unordered pair, whatever its sign glyph - lesson 3a r2, critic D6)
         if (sk.avoidKeys && mulUsed(k, sk.avoidKeys)) return false;
+        // (a mult-grid window that is a near twin of one on this page or another page of the pack - lesson 4)
+        if (gridKeyOf(k) && (gridNear(k, sk.avoidKeys || [], true) || gridNear(k, seen))) return false;
         if (!refHardOk(sk, cand)) return false;
         if (sk.edge) { const t = LESSON_CASE_TESTS[sk.edgeTest || 'pvEdge']; if (t && !t({ q: cand })) return false; }
         if (seen.has(`key:${k}`)) return false;
@@ -342,6 +344,23 @@ export const mulId = (k) => { const m = String(k === null || k === undefined ? '
 const mulUsed = (k, keys) => { const id = mulId(k); if (!id) return false; for (const u of keys) if (mulId(u) === id) return true; return false; };
 export const turnedKeyOf = (q) => (q && q.cell && q.cell.template === 'arrays-turn' && q.cell.payload ? `${Number(q.cell.payload.cols)}x${Number(q.cell.payload.rows)}` : null);
 
+/** Two mult-grid windows of one task that share more than half the smaller one's boxes (lesson 4: a near twin -
+ *  the same products again). `k` a factKeyOf grid key; `keys` any keys (strings; 'key:' prefixes are read too). */
+const gridKeyOf = (k) => { const m = String(k || '').replace(/^key:/, '').match(/^grid(\d+)-(\d+)x(\d+)-(\d+)(?::(\w+))?$/); return m ? { r0: +m[1], r1: +m[2], c0: +m[3], c1: +m[4], t: m[5] || '' } : null; };
+export const gridNear = (k, keys, sameShape = false) => {
+    const a = gridKeyOf(k);
+    if (!a) return false;
+    const n = (g) => (g.r1 - g.r0 + 1) * (g.c1 - g.c0 + 1);
+    for (const u of keys) {
+        const b = gridKeyOf(u);
+        if (!b || b.t !== a.t) continue;
+        // (across pages only a window of the same shape: a 2 x 3 exit window always sits inside some 3 x 4 one)
+        if (sameShape && (b.r1 - b.r0 !== a.r1 - a.r0 || b.c1 - b.c0 !== a.c1 - a.c0)) continue;
+        const ov = Math.max(0, Math.min(a.r1, b.r1) - Math.max(a.r0, b.r0) + 1) * Math.max(0, Math.min(a.c1, b.c1) - Math.max(a.c0, b.c0) + 1);
+        if (ov * 2 > Math.min(n(a), n(b))) return true;
+    }
+    return false;
+};
 /**
  * An item's FACT key for the pack's pool (LR-5): an operation item is its operands and sign
  * ("7+6"); anything else is its number (305). null when neither can be read.
@@ -355,6 +374,9 @@ export function factKeyOf(q) {
     // (an `arrays` picture - lesson 3a r2, the Prerequisite Check: its rows x cols too, so a P0 array and a lesson array
     // are one fact - D6; no other lesson deals arrays_groups)
     if (q.cell && q.cell.template === 'arrays' && q.cell.payload && Number(q.cell.payload.rows) > 0 && Number(q.cell.payload.cols) > 0) return `${Number(q.cell.payload.rows)}x${Number(q.cell.payload.cols)}`;
+    // (a mult-grid window - lesson 4: its rows and columns and its task, so one window is one item of the pool)
+    if (q.cell && q.cell.template === 'mult-grid' && q.cell.payload && Array.isArray(q.cell.payload.rows) && Array.isArray(q.cell.payload.cols)
+        && q.cell.payload.rows.length < 10) { const p = q.cell.payload; return `grid${p.rows[0]}-${p.rows[p.rows.length - 1]}x${p.cols[0]}-${p.cols[p.cols.length - 1]}${q.chartTask ? ':' + q.chartTask : ''}`; }
     const op = composeOpOf(q);
     const ops = op ? composeOperandsOf(q) : [];
     if (op && ops.length >= 2) return ops.join(composeGlyphOf(op) || op);
@@ -2991,6 +3013,7 @@ function dealOne(ref, seed, used, want, avoidAns = null, near = null, names = nu
     if (ref.fresh && lessonKeys) { try { return dealOne1(ref, seed, used, want, avoidAns, near, names, lessonKeys); } catch (e) { /* the pool is spent */ } }
     return dealOne1(ref, seed, used, want, avoidAns, near, names, null);
 }
+const DL_GROUPS = new WeakMap();
 function dealOne1(ref, seed, used, want, avoidAns, near, names, fresh) {
     const ok = dlWant(want);
     // (why each candidate was turned away: named in the error when none is left)
@@ -3017,6 +3040,10 @@ function dealOne1(ref, seed, used, want, avoidAns, near, names, fresh) {
         if (!ref.turnedOk && turnedKeyOf(q) !== null && used.has(turnedKeyOf(q))) continue;
         // (a x fact's unordered pair, any glyph: the Prerequisite Check's 2 × 8 is the array 8 x 2 - lesson 3a r2, D6)
         if (!ref.turnedOk && mulUsed(key, used)) continue;
+        if (gridNear(key, used, true)) { why.used++; continue; }
+        // (`pageGroup`, lesson 4: the refs of one page - the exit slip - keep its windows apart, any shape)
+        const grp = ref.pageGroup ? (DL_GROUPS.get(used) || DL_GROUPS.set(used, new Map()).get(used)) : null;
+        if (grp && gridNear(key, grp.get(ref.pageGroup) || [])) { why.near++; continue; }
         if (avoidAns && avoidAns.has(dlAns(q))) { why.ans++; continue; }
         if (!refHardOk(ref, q)) { why.hard++; continue; }
         // (`near`: the page's one-number items by skill - LR-6 no near twins, critic r3 N1)
@@ -3031,9 +3058,10 @@ function dealOne1(ref, seed, used, want, avoidAns, near, names, fresh) {
         if (near) lr6Record(q, ref.skillId, near);
         for (const x of nms) names.add(x);
         used.add(key);
+        if (grp) grp.set(ref.pageGroup, (grp.get(ref.pageGroup) || []).concat([key]));
         return { q, v, key };
     }
-    throw new Error(`detailed lesson: no ${ref.skillId} item for "${want || 'any'}" (turned away: ${Object.entries(why).filter((e) => e[1]).map((e) => e.join(' ')).join(', ')}) USED[${[...used].join(' ')}]`);
+    throw new Error(`detailed lesson: no ${ref.skillId} item for "${want || 'any'}" (turned away: ${Object.entries(why).filter((e) => e[1]).map((e) => e.join(' ')).join(', ')})`);
 }
 
 /**
@@ -3361,7 +3389,8 @@ async function buildDetailedLesson(req = {}) {
     for (const r of [p1, p5, p6]) r.keyPages = (r.keyPages || []).map((k, i) => tagKeyAnswers(r.pupilPages[i] || '', k));
     // The Say blank of a key reads its answer (the item the frame names), in the key ink (critic r2 R10).
     const sayFill = (html, v) => String(html).replace(/(<span class="ws-line"[^>]*data-ws-slot="say-1"[^>]*)><\/span>/g, `$1 data-ws-key-ans>${String(v).replace(/</g, '&lt;')}</span>`);
-    p5.keyPages = p5.keyPages.map((k) => sayFill(k, wpV.ans));
+    // (`wordProblem.sayAns` / `exitSayAns` - lesson 4: a Say blank that is not the item's answer, "So 42 is even")
+    p5.keyPages = p5.keyPages.map((k) => sayFill(k, d.wordProblem.sayAns ? fillPlaceholders(d.wordProblem.sayAns, { wp: wpV }) : wpV.ans));
     // (`wordProblem.keyBar` - the detailed lesson maker, lesson 2: the pupil DRAWS the bar, so the key's Workspace
     // shows the bar a pupil should draw (schematic), its numbers in the key ink; V22 E17: a key drawing in a Workspace is not a slot)
     if (d.wordProblem.keyBar && eqParts.length === 2) {
@@ -3371,7 +3400,7 @@ async function buildDetailedLesson(req = {}) {
         const bar = `<div role="img" aria-label="bar model" style="display:flex;flex-direction:column;gap:1.5mm">${bx(W, wpV.ans)}<div style="display:flex">${bx(wa, A)}${bx(W - wa, B, true)}</div></div>`;
         p5.keyPages = p5.keyPages.map((k) => String(k).replace('<div class="dl-work" data-work data-draw></div>', `<div class="dl-work" data-work data-draw style="display:flex;align-items:center;justify-content:center">${bar}</div>`));
     }
-    if (sayD) p6.keyPages = p6.keyPages.map((k) => sayFill(k, dlAns(sayD.q)));
+    if (sayD) p6.keyPages = p6.keyPages.map((k) => sayFill(k, d.exitSayAns ? fillPlaceholders(d.exitSayAns, { say: sayV }) : dlAns(sayD.q)));
     p6.keyPages = p6.keyPages.map((k) => String(k).split('<div class="ws-field name">Name<i></i></div>').join(`<div class="ws-field name"><span data-ws-key="name">Answer Key</span><i></i></div>`));
 
     // ---------------------------------------------------------------- the pupil packet and its keys

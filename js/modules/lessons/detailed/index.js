@@ -80,11 +80,13 @@
 import lesson1 from './g2-nbt3-read-write-1000.js';
 import lesson2 from './g1-oa1-bar-model-wp-20.js';
 import lesson3a from './g3-oa5-mult-properties.js';
+import lesson4 from './g3-oa9-mult-table-patterns.js';
 
 export const DETAILED_LESSONS = Object.freeze({
     [lesson1.id]: lesson1,
     [lesson2.id]: lesson2,
     [lesson3a.id]: lesson3a,
+    [lesson4.id]: lesson4,
 });
 
 /** The description of a detailed lesson, or null. */

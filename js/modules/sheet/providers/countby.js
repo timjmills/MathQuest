@@ -330,9 +330,9 @@ function chartProvider() {
                 const er = arr(p.rows).filter((v) => v % 2 === 0), ec = arr(p.cols).filter((v) => v % 2 === 0);
                 const want = arr(q.options).filter((o) => o.correct).map((o) => o.label);
                 const out = [];
-                out.push(step(er.length ? `The even row numbers: ${er.join(', ')}. Shade every box in ${er.length > 1 ? 'those rows' : 'that row'}.` : 'No row number is even.'));
-                out.push(step(ec.length ? `The even column numbers: ${ec.join(', ')}. Shade those boxes too.` : 'No column number is even.'));
-                out.push(step(`Both numbers odd? Leave the box white. The even products: ${want.slice(0, 6).join(', ')}${want.length > 6 ? ' …' : '.'}`, [{ slot: 'answer', value: want.join(', ') }]));
+                out.push(step(er.length ? `The even row numbers: ${er.join(', ')}. Shade every box in ${er.length > 1 ? 'those rows' : 'that row'}.` : 'No row number is even.', [{ slot: 'even-rows' }]));
+                out.push(step(ec.length ? `The even column numbers: ${ec.join(', ')}. Shade those boxes too.` : 'No column number is even.', [{ slot: 'even-cols' }]));
+                out.push(step(`Both numbers odd? Leave the box white. The even products: ${want.slice(0, 6).join(', ')}${want.length > 6 ? ' …' : '.'}`, [{ slot: 'answer', value: want.join(', ') }, { slot: 'odd-odd' }]));
                 return clampSteps(out);
             }
             if (task === 'shade') {

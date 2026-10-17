@@ -50,6 +50,7 @@ import {
 } from './compose.js';
 import { resolveCtx, numeralTracksHTML } from '../index.js';
 import { workedStepsOf, stepTemplateOf, unslot, easeScore, stepLines } from '../anchors.js';
+import { evenGridState } from '../cells/mult-grid.js';
 import { dotTile, countCueOf, countCueRow } from './guided.js';
 import { stepIcon, iconForText } from '../lesson-icons.js';
 import { numberWords } from '../cells/words.js';
@@ -166,6 +167,9 @@ const sigOf = (it) => {
 };
 const digitsOfOps = (it) => operandsOf((it && it.q) || {}).map((v) => String(Math.abs(Math.trunc(v))).length).join(',');
 
+/** A mult-grid window's {rows, cols} (detailed lesson 4), else null. */
+const multGridOf = (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'mult-grid' && c.payload; if (!p || !Array.isArray(p.rows) || !Array.isArray(p.cols)) return null; const g = { rows: p.rows.map(Number), cols: p.cols.map(Number) }; return g.rows.concat(g.cols).every((v) => v >= 2 && v <= 9) ? g : null; };
+// (no 1 and no 10 in a lesson 4 window: x 1 is the other number, x 10 ends in 0 - both give the parity away)
 /** An arrays-turn payload's {rows, cols} (detailed lesson 3a), else null. */
 const arrTurnOf = (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'arrays-turn' && c.payload; return p ? { rows: Number(p.rows), cols: Number(p.cols) } : null; };
 
@@ -233,6 +237,18 @@ export const CASE_TESTS = Object.freeze({
     // (Practice 1, critic D1: row 1 two non-squares - one with no 5, and 2 rows of 5 -, the last row the one square,
     // 4 x 4, and 5 rows of 3: the 5s spent where they teach)
     arrP1: (it) => { const p = arrTurnOf(it); return !!p && ((CASE_TESTS.arrNonSq(it) && p.rows !== 5 && p.cols !== 5) || (p.rows === 2 && p.cols === 5) || (p.rows === 5 && p.cols === 3) || CASE_TESTS.arrBigSquare(it)); },
+    // The detailed lesson maker, lesson 4 (even products, 3.OA.D.9): a mult-grid shading window.
+    // chartMixed: even and odd rows AND even and odd columns (every case on one window).
+    chartIn9: (it) => !!multGridOf(it),
+    chartMixed: (it) => { const p = multGridOf(it); return !!p && [p.rows, p.cols].every((l) => l.some((v) => v % 2 === 0) && l.some((v) => v % 2 === 1)); },
+    // evenColOnly: more odd rows than even ones, so most even products come from an even COLUMN (the Critical Atom).
+    evenColOnly: (it) => { const p = multGridOf(it); return !!p && CASE_TESTS.chartMixed(it) && p.rows.filter((v) => v % 2 === 1).length > p.rows.filter((v) => v % 2 === 0).length; },
+    // chartOddOdd: an odd x odd box whose product is two-digit (both 3 or more: 3 x 7 = 21, not 1 x 9).
+    chartOddOdd: (it) => { const p = multGridOf(it); return !!p && p.rows.some((r) => r % 2 === 1 && r >= 3 && p.cols.some((c) => c % 2 === 1 && c >= 3 && r * c >= 10)); },
+    // chartBigOdd: an odd x odd product of 21 or more (5 x 7 = 35, 7 x 9 = 63) - the ★★★ last row.
+    chartBigOdd: (it) => { const p = multGridOf(it); return !!p && p.rows.some((r) => r % 2 === 1 && p.cols.some((c) => c % 2 === 1 && r * c >= 35)); },
+    // chartColsOdd: more odd columns than even ones, so most even products come from an even ROW.
+    chartColsOdd: (it) => { const p = multGridOf(it); return !!p && CASE_TESTS.chartMixed(it) && p.cols.filter((v) => v % 2 === 1).length > p.cols.filter((v) => v % 2 === 0).length; },
     // (a x fact with no factor 0 or 1 - lesson 3a r2's spaced retrieval: x 1 and x 0 are lesson 3b)
     factNoZeroOne: (it) => { const o = operandsOf((it && it.q) || {}).map(Number); return o.length >= 2 && o.every((v) => Number.isFinite(v) && v >= 2); },
     // (Practice 2, lesson 3a r2, critic D6: no factor 2 - the Prerequisite Check's x 2 facts)
@@ -396,14 +412,17 @@ export function pickWeDo(items, example, data, n) {
         // (the chart's own fact or its turn-around - LR-5, critic r3 D1)
         const sameFact = (x, y) => { const a = plus(x), b = plus(y); return !!a && !!b && (a.join() === b.join() || a.join() === [b[1], b[0]].join()); };
         // (the first set of cells, in order, that meets every want with no twins and not the chart's own fact)
-        const pickLead = (k, chosen) => {
+        // (lesson 2 r5, critic r3 m3: no story person twice on the sheet while the deal can - "Lena has 7 cards" and "Lena has 6")
+        const people = (x) => { const ls = (x && x.q && x.q.cell && x.q.cell.payload && x.q.cell.payload.lines) || []; return ls.slice(0, -1).map((l) => (String(l).match(/^([A-Z][a-z]+)\b/) || [])[1]).filter(Boolean); };
+        const meets = (x, y, nm) => twin(x, y) || (nm && people(x).some((p) => people(y).includes(p)));
+        const pickLead = (k, chosen, nm) => {
             if (k === data.guidedWants.length) return chosen;
             const t = CASE_TESTS[data.guidedWants[k]];
-            if (!t) return pickLead(k + 1, chosen);
-            for (const x of order) if (!chosen.includes(x) && t(x) && !chosen.some((y) => twin(x, y)) && !sameFact(x, example)) { const r = pickLead(k + 1, [...chosen, x]); if (r) return r; }
+            if (!t) return pickLead(k + 1, chosen, nm);
+            for (const x of order) if (!chosen.includes(x) && t(x) && !chosen.some((y) => meets(x, y, nm)) && !sameFact(x, example)) { const r = pickLead(k + 1, [...chosen, x], nm); if (r) return r; }
             return null;
         };
-        const fit = pickLead(0, []);
+        const fit = pickLead(0, [], true) || pickLead(0, [], false);
         if (fit) lead.push(...fit);
         else for (const w of data.guidedWants) { const t = CASE_TESTS[w]; const it = t && order.find((x) => !lead.includes(x) && t(x)); if (it) lead.push(it); }
         order = [...lead, ...order.filter((x) => !lead.includes(x))];
@@ -738,6 +757,12 @@ function stateDrawing(it, steps, groups, k, c) {
     const ctx = resolveCtx(Object.assign({}, c, { state: 'blank', scaffoldLevel: 3, metrics: undefined }));
     if (isRound(it)) return unslot(roundState(it, k, ctx, Number(c.chartLineMm) > 0 ? Number(c.chartLineMm) : ({ S: 44, M: 52, L: 58 }[c.size] || 58)));
     if (isExpand(it)) return unslot(expandState(it, merged, k, c));
+    // (an even-products window, detailed lesson 4: its own step states - the rows, then the columns, then odd x odd)
+    if (it.q && it.q.cell && it.q.cell.template === 'mult-grid' && merged.some((g) => (g.marks || []).some((m) => m && m.slot === 'even-rows'))) {
+        let html = '';
+        try { html = it.render(Object.assign({}, ctx, { gridSteps: evenGridState(it.q.cell.payload || {}, merged, k) }), { cols: 2 }); } catch (e) { html = ''; }
+        return unslot(html);
+    }
     const t = stepTemplateOf(it);
     if (t) {
         const payload = Object.assign({}, it.q.cell.payload || {});

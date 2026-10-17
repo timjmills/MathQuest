@@ -104,6 +104,46 @@ Bridge rules for the detailed lesson's printed pages (refs flagged `lr6` by the 
 - LR-5 identity (E24): a + fact is its UNORDERED pair across the pack (7 + 5 and 5 + 7 are one fact); the chart's
   examples, board examples included, and their turn-arounds are never dealt (`plusTurn`, the pool's `forbidden`).
 
+Round 5 (2026-10-17, critic r3 D1-D3, m1-m7):
+- **No Mixed page on lesson 2** (V22 §9.5: optional). Under the unordered identity the crossing-ten stories with parts
+  3-9 are 15 facts; chart 2, Guided 2, Practice 4 (above ★★★), P5 1, exit 2 and the Check Question 1 take 12, P0 1-2,
+  so a Mixed page's 4 stories (16-18 of 15) cannot be dealt fresh. T5 §8's early-finisher row and T2b's P4 tab follow
+  (`d.mixed` absent: "Practice n").
+- **Near twins, either order: not dealable.** V22's both-within-2 test applied to the parts in either order leaves at
+  most 3 of the 15 crossing-ten pairs mutually apart, so no 6-item Practice page exists (0 deals; the critic's narrowed
+  rule in either order AND V22's ordered rule together: also 0). The bridge and E24b apply V22's rule place by place,
+  as V22's own examples do (the critic's accepted alternative).
+- `pool: {kind: 'plus', skill, partMin, noPart, crossTen, sums, maxSum}` (critic m7): the lesson skill's + facts by
+  their RULE (every ordered a + b: parts >= partMin, none in noPart, crossing ten with both parts <= 9 or a whole in
+  `sums`, the whole <= maxSum); every other skill's places by list (`decl.items`). E24 recomputes both, fails a story
+  place the rule does not hold, and counts the usable pool in FACTS (a turned pair one fact).
+- `forbidden` lists every chart / board example's turn-around, also when the rule already holds it.
+- Ref keys: `dealTries` (dealOne's seed budget, up to 6000; the first 600 seeds as before) - a put-together story with
+  the big part first and a whole of 14+ is about one try in a hundred; `lr6Names` (a story ref: the tier that drops
+  the unit word keeps every story person apart, and a run with a person twice on a page is re-dealt). `lr6Ok` now holds
+  EVERY person of a story apart, not only the first ("Leo has 3. Mia has 9." after "Mia has 7.").
+- `guidedWants` picks Guided cells with no story person in common first (roles/lesson.js), then as before.
+- `checkQuestion.want` may be a list (lesson 2: `['wpBridgeBigFirst', 'wpClean']`: option C's wrong-sign top is no
+  story number); the exit refs carry `wpClean` too.
+- `storyTight` cells take a 2.5 mm top pad (critic m5). dealOne's error names why candidates were turned away.
+
+### Hooks and checks added since lesson 1 (index)
+
+| Name | Where | What |
+|---|---|---|
+| E31 | gate | declared `situations` modelled on P2, assessed on P6, nothing practised unmodelled |
+| E32 | gate | stories one sentence a line, at most 4 lines |
+| E33 | gate | Mixed: the lesson's own skills hold at least half (passes with no Mixed page) |
+| E34 | gate | T2b's exit score = the slip's item count |
+| E35 | gate | T4 quotes only printed / board questions; "Steps are at the top of the page" only when P4-1 prints its Steps band |
+| E36 | gate | exit + items: no part = the difference of the parts; each a fact on no other page (`factId`) |
+| E24 turn-around | gate `poolCheck` | V22's `turn()` restored: chart examples and their turn-arounds never return; no turn-around pair on a page |
+| fact identity | gate `canon` / `factId`, bridge `plusTurn` / `mulId` | one sign per key (× for x * ×, − for - −, ÷ for / ÷); + and × facts unordered across the pack, − and ÷ ordered; inside one item a turned pair may be the content |
+| `lr6` | bridge | LR-6 on Practice, Mixed and P0 refs of a detailed lesson (`lr6Ok` / `lr6Record`), re-dealt up to 12 seeds |
+| `leadDrop` | `mixed.leadDrop` | the lesson skill reaches half the Mixed page by dropping / narrowing a partner shelf |
+| `edgeLast.first` | `practiceSheets[k]` | the ★★★ places are dealt first |
+| `{p4.steps}` | placeholder | the Steps line from whether Practice 1 prints its Steps band |
+
 ## Generic by design (round 2)
 
 `print-sheet.js` holds no per-family code. Script values come from each dealt item through the kit's own
@@ -138,6 +178,7 @@ to `SELF-CHECK.md` in V22's table format. They are V22's `js v21-selfcheck` port
 | E15 | V22 Appendix C.1 **or** the kit's `INSTRUCTION_LIBRARY` (sheet/contract.js, the PED 10.1 library C.1 copies); strings found only in the kit are listed in the result |
 | E24, E24b | read the `#v21-pool` JSON. Its `places` list is the kit equivalent of V22's `data-item` / `data-rep` / `data-row`: the bridge reads every PRINTED cell from the plans the pages render from. The pool is V22's `{kind: 'list'}` form (the description's range, lesson 1: 21–999). E24b also fails near twins: two one-number items of one skill on a page within 2 (405 / 406, V22 LR-6) |
 | E9 (no exemption), E9c | E9: every page 50–100 % used, teacher continuation pages included (critic r3: the old E9 exemption was reverted). E9c (V22 3131): a teacher page that continues onto another is ≥ 92 % used; `paginateTeacher` packs greedily first and only rebalances when that misses |
+| E24 (round 5, plus rule) | a `plus` decl is recomputed from its rule and list; a story place outside the rule fails; usable pool counted in facts |
 | E24 (round 5) | V22's `poolCheck` turn-around test restored (`turn()`: a chart example never returns turned round; no turn-around pair on a page). One canonical sign in every key (× / x / *, − / -), and a commutative fact (+, ×) is its unordered pair across the pack, − and ÷ ordered; inside one item a turned pair may be the content (an arrays-turn cell) |
 | E24b (round 4-5) | also reads + / − items (stories too): first addend twice in a grid row (a place's `grid` and `row`) or three running, a number taken away twice, near twins (both numbers within 2, place by place), and a story's and a fact's equal answers as twins |
 | E31 | declared `situations`: each modelled on P2 (chart or board example), assessed on P6; nothing practised that was not modelled |
@@ -145,5 +186,5 @@ to `SELF-CHECK.md` in V22's table format. They are V22's `js v21-selfcheck` port
 | E33 | Mixed page: the lesson's own skills (P2, P3, P4, P6) hold at least half the items (V22 §9.5) |
 | E34 | T2b scores the exit slip by its own item count |
 | E35 | with `situations`: T4 quotes only story questions the pack prints or writes on the board; any "Steps are at the top of the page" line names a Practice 1 that prints its Steps band |
-| E36 | exit-slip + items: no part equals the difference of the parts (4 + 8: 8 − 4 = 4), and none is a P3-P5 fact or its turn-around |
+| E36 | exit-slip + items: no part equals the difference of the parts (4 + 8: 8 − 4 = 4), and none is a fact (unordered) of any other page |
 | E30 | `boardOnly` (description): numbers shown on the board only (lesson 1: 1,000). The bridge passes them to every ref as a HARD bound (`refHardOk`: never relaxed, not on a ref's last try); E30 fails if one is an item, an answer, or printed (digits or name) on any pupil page or key |

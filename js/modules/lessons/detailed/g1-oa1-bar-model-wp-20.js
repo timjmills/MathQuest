@@ -115,8 +115,9 @@ export default {
     prerequisites: [
         { atom: 1, ref: { categoryId: 'counting', skillId: 'count_objects', opts: { band: 20, objects: 'frame' }, minNum: 17, maxNum: 20 },
             lesson: { id: 'K CC 5', title: 'Count to 20' } },
-        // (both parts 2 or more: "4 and 1" can be answered by "one more", with no part-whole idea - critic r2 n5)
-        { atom: 2, ref: { categoryId: 'composing', skillId: 'number_bonds', opts: { band: 10, unknown: 'answer', orientation: 'horizontal' }, minOperand: 3, partMin: 3 },
+        // (both parts 3 or more: "4 and 1" can be answered by "one more", with no part-whole idea - critic r2 n5; a whole of 6
+        // or more and no first part twice: not 2 and 7 / 2 and 3 - critic r3 m2)
+        { atom: 2, ref: { categoryId: 'composing', skillId: 'number_bonds', opts: { band: 10, unknown: 'answer', orientation: 'horizontal' }, minOperand: 3, partMin: 3, minNum: 6, distinctFirst: true },
             lesson: { id: 'Y1 B2 S2', title: 'Part-whole model' } },
         { atom: 3, items: 4, ref: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20, notation: ['stacked'] }, minNum: 11, maxNum: 16, noPart: [10] },
             lesson: { id: 'G1 OA 6', title: 'Add within 20' } },

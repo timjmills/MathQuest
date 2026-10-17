@@ -147,7 +147,7 @@ export function teacherBands(d, V, pages) {
     out.T2b = [{ label: 'Reference key:', blocks: [twoCols(
         [subHead('Pages and order'), tTable(['Page', 'Tab', 'Score'], [
             ['P0', 'Prerequisite', 'one per question'], ['P1', 'Number sense', '/10'], ['P2', 'Anchor chart', 'none (a poster)'], ['P3', 'Lesson 1', d.p3Score || 'Independent cells'],
-            ['P4', 'Practice n / Mixed n', 'every cell'], ['P5', 'Word problem', '/1'], ['P6', 'Exit slip', `/${(d.exit || []).length || 4} a half`], ['T1–T5', 'Teacher n', '—'], ['T6', 'Answer Key', '—'],
+            ['P4', d.mixed ? 'Practice n / Mixed n' : 'Practice n', 'every cell'], ['P5', 'Word problem', '/1'], ['P6', 'Exit slip', `/${(d.exit || []).length || 4} a half`], ['T1–T5', 'Teacher n', '—'], ['T6', 'Answer Key', '—'],
         ].map((r) => r.map(cellText))),
         subHead('Fade levels'), tTable(['Label', 'Means'], [['★', 'Guided: hints on, step 1 traced'], ['★★', 'Independent: hints off'], ['★★★', 'Last row: the edge cases']].map((r) => r.map(cellText))),
         subHead('Data loop'), tLoop({ most: 'Go on.', half: 'Short reteach, then go on.', fewer: 'Stop. Reteach with a concrete example.' }),
