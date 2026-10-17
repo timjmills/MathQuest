@@ -615,6 +615,16 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
             const packCeil = section.dense && (section.ceiling === undefined || section.ceiling === null)
                 ? bySize(section.dense === true ? DENSE_CEILING[cls] || DENSE_CEILING.standard : section.dense)[size] || ceiling : ceiling;
             let fit = Math.min(Math.max(ceilRows, Math.floor(packCeil / cols)), Math.floor((G - SAFETY_H_MM) / Math.max(1, avg)));
+            if (!keepOrder) {
+                // r12d: the page prints the TALLEST rows first (groupByHeight), so the rows it holds
+                // are counted from the tallest down, not as the average row: with the true cell heights
+                // (r12c) a page counted by the average ran onto a second page (mixed_addition M More
+                // Practice). Past the sample, further rows count as its average row.
+                let sum = 0, nr = 0;
+                for (const h of rowH) { if (sum + h > G - SAFETY_H_MM) break; sum += h; nr++; }
+                if (nr === rowH.length) nr += Math.floor((G - SAFETY_H_MM - sum) / Math.max(1, avg));
+                fit = Math.min(Math.max(ceilRows, Math.floor(packCeil / cols)), nr);
+            }
             // (a div_facts Mix page holds every row it fits - 2 x 7 at L, not the two-column row
             // step down to 2 x 5; critic R1 D14)
             if (keepOrder) { /* every row it fits */ } else if (cols === 2 && fit > 1 && !section.freeRows) fit = TWO_COL_ROWS.find((r) => r <= fit) || fit;

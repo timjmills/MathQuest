@@ -1623,9 +1623,14 @@ function layoutOf(role, section, items, n, ctx) {
         const nw = cnt('w'), nf = cnt('f'), nn = N - nw - nf;
         const rN = Math.ceil(nn / Ln.cols);
         // every row of a split-off group holds its tallest problem and its grid's borders
-        const hWr = Lw ? Math.max(hW, Lw.hMin + GRID_BORDERS_MM) : 0;
+        // r12d: never under the row a split part PRINTS (practice.js partCellH: its tallest problem's
+        // measured row + the grid's borders + 2 mm, within its cell). With the true cell heights
+        // (r12c) the old estimate had no hidden slack left, so pool deals counted ~3 mm a row short
+        // ran onto a second page (mixed_addition M More Practice letter A: 3 problems where B had 7).
+        const partH = (L) => (L ? Math.min(L.cellH, L.hMin + 1 + GRID_BORDERS_MM + 2) : 0);
+        const hWr = Lw ? Math.max(hW, Lw.hMin + GRID_BORDERS_MM, partH(Lw)) : 0;
         const groups = (rN > 0 ? 1 : 0) + (nw > 0 ? 1 : 0) + (nf > 0 ? 1 : 0);
-        const h = rN * splitCellH(Ln, fs ? rN : 0) + nw * hWr + (Lf ? Math.ceil(nf / Lf.cols) * hF : 0) + Math.max(0, groups - 1) * GRID_BORDERS_MM;
+        const h = rN * Math.max(splitCellH(Ln, fs ? rN : 0), partH(Ln)) + nw * hWr + (Lf ? Math.ceil(nf / Lf.cols) * Math.max(hF, partH(Lf)) : 0) + Math.max(0, groups - 1) * GRID_BORDERS_MM;
         if (h > G - 0.99) break;
         best = N;
     }
@@ -3459,7 +3464,7 @@ async function poolPage(req) {
     // problems for a review, then whole rows, then the fuller
     const rank = (x, q) => [-q.bands, q.fill >= POOL_FILL_FLOOR ? 1 : 0, Math.min(x.items.length, POOL_MIN_ITEMS), relaid(x) ? 0 : 1, q.fill];
     const better = (a, b) => { for (let i = 0; i < a.length; i++) { const t = i === a.length - 1 ? 0.01 : 0; if (a[i] > b[i] + t) return true; if (a[i] < b[i] - t) return false; } return false; };
-    let first = null, best = null, bestRank = null, bestK = -1;
+    let first = null, best = null, bestRank = null, bestK = -1, seenMax = 0;
     const tried = [];
     // the lint's own faults: an H13 band or an overflow, a strip under the floor, under three problems
     const clean = (rk) => !!rk && rk[0] === 0 && rk[1] === 1 && rk[2] >= POOL_MIN_ITEMS;
@@ -3480,7 +3485,11 @@ async function poolPage(req) {
         await nextTask();
         const q = poolQuality(x);
         tried.push(`${k}:${x.items.length}/${q.fill.toFixed(2)}${q.bands ? `/b${q.bands}` : ''}${relaid(x) ? '/relaid' : ''}`);
-        if (q.ok && x.items.length >= POOL_MIN_ITEMS && !relaid(x)) { x.pool = { deal: k, passed: true, tried }; return x; }
+        // r12d (PG-20 / DN-2): a passing deal is kept only when it holds at least half the problems
+        // the fullest valid deal of this page showed it can hold (mixed_addition M More Practice:
+        // letter A kept a 3-problem deal after a 7-problem one)
+        seenMax = Math.max(seenMax, x.items.length);
+        if (q.ok && x.items.length >= POOL_MIN_ITEMS && !relaid(x) && 2 * x.items.length >= seenMax) { x.pool = { deal: k, passed: true, tried }; return x; }
         const rk = rank(x, q);
         if (!best || better(rk, bestRank)) { best = x; bestRank = rk; bestK = k; }
     }
