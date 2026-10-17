@@ -2,7 +2,7 @@
 // usage: node probe.mjs <category:skill> ['{"opt":..}'] [maxNumber=10000] [N=12] [seedBase=9100]
 const _m = new Map(); globalThis.localStorage = { getItem: k => _m.get(k) ?? null, setItem: (k, v) => _m.set(k, String(v)), removeItem: k => _m.delete(k) };
 globalThis.window = globalThis; globalThis.document = undefined;
-const R = new URL('../../../', import.meta.url).pathname;
+const R = new URL('../../../../', import.meta.url).pathname;
 const { generateQuestionFor } = await import(R + 'js/modules/generate-question.js');
 const strip = s => String(s ?? '').replace(/<style[\s\S]*?<\/style>/g, '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
 const [key, o = '{}', mx = '10000', n = '12', sb = '9100'] = process.argv.slice(2);

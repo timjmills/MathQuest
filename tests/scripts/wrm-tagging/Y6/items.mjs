@@ -2,7 +2,7 @@
 // usage: node items.mjs <out.md> [stepId ...]   (no ids: every step). Print-path generation: seeded, itemIndex set.
 const _m = new Map(); globalThis.localStorage = { getItem: k => _m.get(k) ?? null, setItem: (k, v) => _m.set(k, String(v)), removeItem: k => _m.delete(k) };
 globalThis.window = globalThis; globalThis.document = undefined;
-const R = new URL('../../../', import.meta.url).pathname;
+const R = new URL('../../../../', import.meta.url).pathname;
 const { generateQuestionFor } = await import(R + 'js/modules/generate-question.js');
 const fs = await import('fs');
 const strip = s => String(s ?? '').replace(/<style[\s\S]*?<\/style>/g, '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/[|]/g, '/').replace(/\s+/g, ' ').trim();

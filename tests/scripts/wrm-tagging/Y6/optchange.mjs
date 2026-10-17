@@ -2,7 +2,7 @@
 // seeds, print path) and flag entries whose items are identical.
 const _m = new Map(); globalThis.localStorage = { getItem: k => _m.get(k) ?? null, setItem: (k, v) => _m.set(k, String(v)), removeItem: k => _m.delete(k) };
 globalThis.window = globalThis; globalThis.document = undefined;
-const R = new URL('../../../', import.meta.url).pathname;
+const R = new URL('../../../../', import.meta.url).pathname;
 const { generateQuestionFor } = await import(R + 'js/modules/generate-question.js');
 const so = await import(R + 'js/modules/skill-options.js');
 const fs = await import('fs');
