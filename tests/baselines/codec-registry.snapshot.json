@@ -112,7 +112,11 @@
     "winRows": "5Q",
     "winCols": "5R",
     "minFactor": "5S",
-    "ftTrap": "5T"
+    "ftTrap": "5T",
+    "ftFactors": "5U",
+    "tenDir": "4E",
+    "tenValues": "4F",
+    "tenPlain": "4G"
   },
   "blocks": {
     "0": {
@@ -477,7 +481,8 @@
       "value": "V",
       "unit": "U",
       "notation": "N",
-      "sum": "S"
+      "sum": "S",
+      "times": "T"
     },
     "zeroDigit": {},
     "frame": {
@@ -740,7 +745,19 @@
     "winRows": {},
     "winCols": {},
     "minFactor": {},
-    "ftTrap": {}
+    "ftTrap": {},
+    "ftFactors": {
+      "any": "A",
+      "2-5-10": "T",
+      "2-3-5-10": "F"
+    },
+    "tenDir": {
+      "times": "T",
+      "tenth": "E",
+      "both": "B"
+    },
+    "tenValues": {},
+    "tenPlain": {}
   },
   "scalarOnly": {
     "range": "decimal",
@@ -782,7 +799,9 @@
     "winRows": "decimal",
     "winCols": "decimal",
     "minFactor": "decimal",
-    "ftTrap": "bool"
+    "ftTrap": "bool",
+    "tenValues": "bool",
+    "tenPlain": "bool"
   },
   "subranges": {
     "3B-3M": "build lane k2 (BUILD_LIST.md)",

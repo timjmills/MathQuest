@@ -82,6 +82,7 @@ import lesson2 from './g1-oa1-bar-model-wp-20.js';
 import lesson3a from './g3-oa5-mult-properties.js';
 import lesson4 from './g3-oa9-mult-table-patterns.js';
 import lesson5 from './g3-oa9-input-output-rule.js';
+import lesson6 from './g4-nbt1-ten-times-value.js';
 
 export const DETAILED_LESSONS = Object.freeze({
     [lesson1.id]: lesson1,
@@ -89,6 +90,7 @@ export const DETAILED_LESSONS = Object.freeze({
     [lesson3a.id]: lesson3a,
     [lesson4.id]: lesson4,
     [lesson5.id]: lesson5,
+    [lesson6.id]: lesson6,
 });
 
 /** The description of a detailed lesson, or null. */

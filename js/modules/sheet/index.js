@@ -109,6 +109,7 @@ export {
 // The operations templates that are not a plain stack or fact (long division, area model,
 // chart window, arrays, remainder, number line, fact family, cloze bank).
 export { divisionSteps } from './cells/long-division.js';
+import './cells/pv-times.js';
 import './cells/area-model.js';
 import './cells/mult-chart.js';
 import './cells/ops-counters.js';

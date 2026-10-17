@@ -1610,6 +1610,14 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
                     if (pvDigitAt(pv.n, pv.place) !== pv.digit || (typeof want === 'number' ? Number(ans) !== want : String(ans) !== want)) add('pv-recompute', `the ${pv.digit} of ${pv.n} is worth ${want}, keyed ${ans}`);
                     break;
                 }
+                case 'times': {
+                    // value_ten_times: the same digit, one place apart; "10 times" when the first is the higher place.
+                    const okD = pvDigitAt(pv.n, pv.place) === pv.digit && pvDigitAt(pv.m, pv.placeM) === pv.digit;
+                    const ratio = pv.place / pv.placeM;
+                    const rel = ratio === 10 ? '10 times' : ratio === 0.1 ? 'one tenth of' : '?';
+                    if (!okD || rel !== pv.rel || pv.v0 !== pv.digit * pv.place || pv.v1 !== pv.digit * pv.placeM) add('pv-recompute', `the ${pv.digit} in ${pv.n} vs ${pv.m}: ${rel}, keyed ${pv.rel}`);
+                    break;
+                }
                 case 'expand': {
                     // Every part one digit times its place; the free line (frame: line) keys the
                     // non-zero parts and must accept the zero part too (owner ruling 4).

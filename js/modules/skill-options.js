@@ -619,9 +619,24 @@ const _pvValueForm = () => ({
         { v: 'value', l: 'The value (700)' },
         { v: 'unit', l: 'Unit form (7 hundreds)' },
         { v: 'notation', l: 'Expanded notation (7 × 100)' },
+        { v: 'times', l: 'Ten times / one tenth (the 7 in 700 and the 7 in 70)' },
     ],
-    help: 'One way per page. Unit form and expanded notation name the place and the digit.',
+    help: 'One way per page. Unit form and expanded notation name the place and the digit. Ten times compares the same digit in two numbers, one place apart (4.NBT.A.1).',
 });
+// value_ten_times (4.NBT.A.1, detailed lesson g4-nbt1-ten-times-value): the options of form "times" only.
+const _pvTenOptions = () => [
+    { id: 'tenDir', label: 'Ten times: which way', type: 'enum', default: 'both', group: 'difficulty',
+        values: [
+            { v: 'times', l: 'The first digit is one place left: 10 times' },
+            { v: 'tenth', l: 'The first digit is one place right: one tenth' },
+            { v: 'both', l: 'Both, mixed' },
+        ],
+        help: 'Ten times only. One way at a time first; both mixed so the order of the rows never gives the answer.' },
+    { id: 'tenValues', label: 'Ten times: write both values first', type: 'bool', default: true, group: 'support',
+        help: 'Ten times only. On: the pupil writes what each digit is worth, then circles. Off: circle only (the fade).' },
+    { id: 'tenPlain', label: 'Ten times: the digit and zeros only (700 and 70)', type: 'bool', default: false, group: 'difficulty',
+        help: 'Ten times only. On: numbers like 700 and 70. Off: other digits round the digit (740 and 372).' },
+];
 const _pvZeroDigit = () => ({
     id: 'zeroDigit', label: 'Ask the value of a 0', type: 'bool', default: false, group: 'difficulty',
     help: 'On underlines a zero on some items: its value is 0, but it holds the place.',
@@ -718,7 +733,7 @@ function _pvRoundNl(id) {
 }
 const P9_PV_OPTIONS = {
     'placevalue:identify': [_pvBand(_PV_PLACE_BANDS, 999), _pvPlaceSet(100000), _pvDigitSupport(), _pvIdentifyResponse(), _pvRepeatDigit()],
-    'placevalue:value': [_pvBand(_PV_PLACE_BANDS, 999), _pvDigitSupport(), _pvValueForm(), _pvZeroDigit()],
+    'placevalue:value': [_pvBand(_PV_PLACE_BANDS, 999), _pvDigitSupport(), _pvValueForm(), _pvZeroDigit(), ..._pvTenOptions()],
     'placevalue:expand': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true), _pvExpandFrame(), _pvExpandForm()],
     'placevalue:combine': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true), {
         id: 'order', label: 'Order of the parts', type: 'enum', default: 'largest', group: 'difficulty',
