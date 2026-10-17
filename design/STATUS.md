@@ -316,5 +316,16 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - 2026-10-16: small fixes merged into main (critic r7 PASS); quick gates OK; NOT deployed yet — deploy together with the number line lane (full gates + stamp once). Owner questions Q1-Q3 (critic-r7.md) taken at the recommended answers.
 - 2026-10-17: DEPLOYED small fixes + custom number line (master 626318fa, live globals.js?v=8a5b527f8f confirmed): full gates OK, print-lint 461/33 (baseline 463/33; needs `pip install pymupdf` in a fresh container), master PR #9 merged in first. Helper session_01Qt98Wm6Wp75BgsTgX2oCVK archived. Open minor: R9-D1 mixed-pool scroll flicker at 1280x600 with the line on; N1 start toast over the band.
 - 2026-10-17: WRM tagging Y2-Y3 merged (critic r15 PASS, all 82 graded entries 8); mergeall R..Y6 1,042 tags 0 problems. Every WRM year is now tagged. Site lessons for Y6, Y1, Y4 follow (branches -wip-wrm-tag-y6, -wip-wrm-lessons-y1, -wip-wrm-lessons-y4). At the proposal merge read opts from step direct/partial lists (R/Y1/Y2/Y3 write no opts tagFix on live tags). Generator bugs to fix in a small lane: equiv_frac_nv keys equal pairs as "no" (gen-fractions.js ~4372); denoms filter ignores q.cell.payload (generate-question.js itemDenominators) — see GENERATOR-FIXES-2026-10-16.md.
+- 2026-10-17: **DETAILED LESSON MAKER + first 5 lessons PASSED** (helper session on `claude/sweet-newton-c8wrv1-wip-detailed-lessons`;
+  not merged, not deployed). Maker: `buildSheet({role:'detailed-lesson', lessonId, seed})` (`sheet/roles/detailed-lesson.js`,
+  `teacher-parts.js`, `teacher-icons.js`, cells `rcdws`, `words`, `arrays-turn`; lessons in `js/modules/lessons/detailed/`),
+  "Lesson: detailed" card in teacher-print beside the current maker (renamed "Lesson: standard"; its pages are byte-identical).
+  Gate `node tests/scripts/ws-detailed-lesson.cjs --lesson <id> --check` (V22 Appendix E ported + E29-E39). Docs
+  `design/lesson-planner/DETAILED_MAKER.md`; record `data/curriculum/detailed-lessons.json`; packs `design/lesson-samples/detailed/<id>/`.
+  Critic PASS (every page >= 8): g2-nbt3-read-write-1000 r4, g1-oa1-bar-model-wp-20 r4, g3-oa5-mult-properties (3a commutative) r3,
+  g3-oa9-mult-table-patterns r3, g3-oa9-input-output-rule r3. Escalations in section 9. Skills built: number_word_form options,
+  mult_properties form 0 redo, mult_chart task even + window options, function_table ftTrap/ftFactors (codec keys 5P-5U, lessons
+  sub-range). Before deploy: `ws-stamp-assets` (new modules). Owner questions open: EE set for lessons 4/5 (repo M.EE.3.OA.8 vs owner
+  list M.EE.3.OA.9); 1.OA.A.1 audit verdict should be partial.
 - Held for after these land: Lane B answer boxes + regroup boxes (spec `design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md`),
   placevalue:identify write-value (spec `design/audit/runs/next-session/PV-IDENTIFY-WRITE-VALUE-SPEC.md`).

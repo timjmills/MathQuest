@@ -298,16 +298,26 @@
     ]
    },
    "critic": {
-    "verdict": "in review",
-    "round": 2
+    "verdict": "PASS",
+    "round": 3,
+    "min": [
+     8,
+     8,
+     9,
+     9
+    ],
+    "reports": "design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r1..r3.md"
    },
-   "status": "in review",
+   "status": "passed",
    "pack": {
     "dir": "design/lesson-samples/detailed/g3-oa9-mult-table-patterns/",
     "pdf": "design/lesson-samples/detailed/g3-oa9-mult-table-patterns/pack.pdf",
     "html": "design/lesson-samples/detailed/g3-oa9-mult-table-patterns/pack.html",
     "selfCheck": "design/lesson-samples/detailed/g3-oa9-mult-table-patterns/SELF-CHECK.md"
-   }
+   },
+   "rulings": [
+    "same-page windows share at most half their boxes; no copies; exit and Check Question fresh; Practice may revisit earlier windows (gridRevisit)"
+   ]
   },
   {
    "id": "g3-oa9-input-output-rule",
