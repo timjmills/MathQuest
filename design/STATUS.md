@@ -334,6 +334,11 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
   values 10x / 1/10; G5 decimals to thousandths in words and expanded form; all overdue) on `claude/sweet-newton-c8wrv1-wip-detailed-lessons-2`.
   Generator bug lane (equiv_frac_nv, denoms payload, percent_of_number 33%, simplify negatives, distributive_expr GCF) runs as a
   local builder on `claude/sweet-newton-c8wrv1-wip-genbugs`.
+- 2026-10-17: Generator bug fixes merged into main (bf378b7b; seeded before/after, 0 bad on all five), NOT deployed yet.
+  Skip-count + White Rose page helper (session_01Vvb92mUXgnNYjRvuhtnZNM) PAUSED by the owner and archived: skip-count
+  `-wip-a79237e5c40225940` @ 37f3d627 (critic r4 FAIL on D12 only; fix r5 b19172b4 unreviewed, partly ungated); White Rose page
+  `-wip-wrm-page` @ 25b453e7 (critic r8 FAIL on M12 only; f075caa9 round 10 WIP unverified). Next for each: finish gates, critic, merge.
+  Lessons 6-10 helper reports an owner rule (skill coverage) and an audit of lessons 1-5 (`design/lesson-planner/lessons/SKILL-COVERAGE-AUDIT-1-5.md`).
 - Held for after these land: Lane B answer boxes + regroup boxes (spec `design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md`),
   placevalue:identify write-value (spec `design/audit/runs/next-session/PV-IDENTIFY-WRITE-VALUE-SPEC.md`).
 - 2026-10-17 generator bug fixes (branch claude/sweet-newton-c8wrv1-wip-genbugs; seeded 1-600 before/after): (1) `equiv_frac_nv` yes/no: the distractor clamp could land on an equivalent pair keyed "no" (seed 206: 2/3 vs 2/3) - the denominator now moves until the cross products differ (2 -> 0 bad); (2) `itemDenominators` now reads `q.cell.payload` ({n,d} terms, "a/b" strings), so kit cells obey the denominators filter (`equiv_frac_visual {denoms:[2]}` 22 -> 0 items with no denominators seen); (3) `percent_of_number`: the 33% combos keyed one third (33% of 60 = 20) are now 30% with exact whole answers (53 -> 0); (4) `simplify`: distractor numerators are 1-3 off and never below 1 (no 0 or negative options; 23 -> 0); (5) `distributive_expr` factor-out: inner terms are coprime so the stated factor is the GCF (10x + 30 -> 10(x + 3), 126 -> 0).
