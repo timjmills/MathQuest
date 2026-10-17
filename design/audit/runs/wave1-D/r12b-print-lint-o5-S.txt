@@ -1,0 +1,42 @@
+ws-print-lint: source kit, 4 skill(s)
+  multiplication:area_model_mult: 2+1 pages, 0 finding(s)
+  multiplication:area_model_mult#more-practice: 4+2 pages, 0 finding(s)
+  multiplication:area_model_mult#test: 2+1 pages, 0 finding(s)
+  multiplication:area_model_mult#review: 2+1 pages, 0 finding(s)
+  multiplication:area_model_mult_hard: 2+1 pages, 0 finding(s)
+  multiplication:area_model_mult_hard#more-practice: 4+2 pages, 0 finding(s)
+  multiplication:area_model_mult_hard#test: 2+1 pages, 2 finding(s)
+  multiplication:area_model_mult_hard#review: 2+1 pages, 0 finding(s)
+  division:area_model_div_2by1: 2+1 pages, 0 finding(s)
+  division:area_model_div_2by1#more-practice: 4+2 pages, 0 finding(s)
+  division:area_model_div_2by1#test: 2+1 pages, 0 finding(s)
+  division:area_model_div_2by1#review: 2+1 pages, 0 finding(s)
+  division:area_model_div_3by1: 2+1 pages, 0 finding(s)
+  division:area_model_div_3by1#more-practice: 4+2 pages, 0 finding(s)
+  division:area_model_div_3by1#test: 2+1 pages, 0 finding(s)
+  division:area_model_div_3by1#review: 2+1 pages, 0 finding(s)
+
+document                                             pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT  result
+multiplication:area_model_mult                         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:area_model_mult#more-practice           4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:area_model_mult#test                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:area_model_mult#review                  2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:area_model_mult_hard                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:area_model_mult_hard#more-practice      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:area_model_mult_hard#test               2+1k    .     .    .    .        .     .       2    .     .       .     .    .      .       .  FAIL
+multiplication:area_model_mult_hard#review             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+division:area_model_div_2by1                           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+division:area_model_div_2by1#more-practice             4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+division:area_model_div_2by1#test                      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+division:area_model_div_2by1#review                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+division:area_model_div_3by1                           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+division:area_model_div_3by1#more-practice             4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+division:area_model_div_3by1#test                      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+division:area_model_div_3by1#review                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+TOTAL                                                          .     .    .    .        .     .       2    .     .       .     .    .      .       .
+
+multiplication:area_model_mult_hard#test (Area Model (2×2 and 2×3) (test))
+  [L-DENSITY H13 major] x2 (p1,2 cells 1,1) one empty band 59.3 mm wide in a 184.9 mm cell (32%): the content is pinned to one side (RUBRIC H13)
+      e.g. <div.ws-cell.mqt--area-model[data-ws-cell="area-model"]> "1 50 5 40 4 + + + 44 × 55 =" | <div.ws-cell.mqt--area-model[data-ws-cell="area-model"]> "1 50 5 40 2000 200 4 200 20 ..."
+
+ws-print-lint: FAIL - 16 document(s), source kit; 2 finding(s) in 1 document(s)

@@ -78,7 +78,7 @@ function extGeom(p, g) {
     const bw = boxMm(g, Math.max(...partials.map((v) => String(v).length)));
     // One edge-box width for every edge of the item, so no box tells the length of its part (L-LEAK).
     const ew = boxMm(g, Math.max(...R.concat(C).map((v) => String(v).length)));
-    const colMm = Math.max(bw + 6, blank ? ew + 4 : 0, ...C.map((v) => String(v).length * 0.62 * g.E + 4));
+    const colMm = Math.max(bw + 4, blank ? ew + 3 : 0, ...C.map((v) => String(v).length * 0.62 * g.E + 4));
     const sideMm = blank ? ew + 3 : Math.max(...R.map((v) => String(v).length)) * 0.62 * g.E + 5;
     // A grid's rows are shorter (box + 2.5 mm a side): two rows and two work lines still fit a
     // half page at L (r12b: a 2 x 3 grid overflowed its half-page cell on the Test role).
@@ -93,7 +93,7 @@ function extFootprint(p, ctx) {
     const workH = G.work ? G.R.length * (g.stripMm + 0.45 * g.E) + 3 : 0;
     const workW = G.work ? G.C.length * G.bw + (G.C.length) * g.E : 0;
     return {
-        wMm: Math.ceil(Math.max(G.C.length * G.colMm, workW) + G.sideMm + 12),
+        wMm: Math.ceil(Math.max(G.C.length * G.colMm, workW) + G.sideMm + 6),
         hMm: Math.ceil(labelH + G.R.length * G.hMm + workH + g.stripMm + 10 + (g.twin ? 0 : 3)),
         measure: true, factLike: false, maxCols: 2,
     };
