@@ -6,6 +6,7 @@ import { quizLadderWrong, drawLadder, shownOf, ladderMessage } from './support-l
 import { SKILLS } from './data.js';
 import { clearOfPinnedBar } from './touch-tap.js';
 import { shuffle } from './utils.js';
+import { renderMultiSelectCheck, multiSelectMatches, multiSelectAnswerText } from './widgets/multi-select-check.js';
 import { saveResult, decompressTestFromURL, migrateTestToSections, getAllQuestionsFlat, getTotalQuestionCount } from './quiz-storage.js';
 import { broadcastQuizJoin, broadcastQuizAnswer, broadcastQuizSubmit } from './quiz-monitor.js';
 import {
@@ -235,6 +236,13 @@ export function quizQuestionData(q) {
     return d;
 }
 
+// "Click ALL the ..." items: the widget's tap-to-choose tiles, answered by a set of option ids
+const isMultiSelect = (qd) => !!qd && qd.answerType === 'multi-select-check' && Array.isArray(qd.options) && qd.options.length > 0;
+/** An answer as the pupil and teacher read it: chosen option ids become the options' labels. */
+export function quizAnswerText(qd, value) {
+    return isMultiSelect(qd) ? multiSelectAnswerText(qd, value) : String(value);
+}
+
 // ---- Render Quiz Interface ----
 
 const _quizWorking = new Map();
@@ -335,7 +343,7 @@ function quizFeedbackHtml(answer, qd) {
         ? '<div class="qt-feedback correct">Correct!</div>'
         : lad && lad.n && !lad.spent
             ? `<div class="qt-feedback mq-ladder-feedback">${escHtml(ladderMessage(qd))}</div>`
-            : `<div class="qt-feedback incorrect">Incorrect. The answer is: ${escHtml(String(qd.ans))}</div>`;
+            : `<div class="qt-feedback incorrect">Incorrect. The answer is: ${escHtml(quizAnswerText(qd, qd.ans))}</div>`;
 }
 
 function renderQuizQuestion(qItem, flatIdx) {
@@ -348,13 +356,15 @@ function renderQuizQuestion(qItem, flatIdx) {
 
     const feedbackHtml = showInstantFeedback ? quizFeedbackHtml(answer, qd) : '';
 
-    // Always use text input — no multiple choice.
+    // Typed input for every item but "Click ALL the ...": its tiles ARE the answer (the paper
+    // item ticks boxes), so the multi-select widget mounts in the cell (_mountQuizMsc).
     // Screen parity (WORKSHEET_DESIGN_STANDARD.md section 15): the question region is the
     // black-and-white Andika cell. A fact, a column stack or a bracket division is drawn by the
     // sheet kit with the answer slot where the pupil writes on paper; any other item keeps its
     // visual inside the same cell. The header (number, skill, Flag) and the feedback are chrome.
-    const kind = cellKindFor({ ...qd, options: [] });
-    const twin = kind ? null : screenTwin({ ...qd, skillId: qd.skillId || q.skillId }, { typedOrder: true });
+    const msc = isMultiSelect(qd);
+    const kind = msc ? null : cellKindFor({ ...qd, options: [] });
+    const twin = (kind || msc) ? null : screenTwin({ ...qd, skillId: qd.skillId || q.skillId }, { typedOrder: true });
     const numeric = qd.answerType === 'number' || typeof qd.ans === 'number' || (!!kind);
     const n = numeric ? answerDigits(qd) : Math.max(4, Math.min(16, String(qd.ans == null ? '' : qd.ans).length + 2));
     const shape = kind && (kind.kind === 'fact' || kind.kind === 'division') ? ' mq-slot--box' : '';
@@ -369,7 +379,13 @@ function renderQuizQuestion(qItem, flatIdx) {
     try { qtSupports = kind ? screenSupportsFor(qd, kind, { index: flatIdx, total: (state.quizAllQuestions || []).length || 1, categoryId: qd.categoryId || q.categoryId, skillId: qd.skillId || q.skillId, options: qd.skillOptions || null }) : null; } catch (e) { qtSupports = null; }
     let instrHtml = '';
     let cellBody;
-    if (kind && kind.kind === 'stack') {
+    if (msc) {
+        // the chosen ids, joined by commas, live in a hidden #qtAnswerInput that every save path reads
+        cellBody = (qd.visual ? `<div class="qt-visual-aid">${qd.visual}</div>` : '')
+            + `<div class="qt-msc-host" id="qtMscHost"></div>`
+            + `<input type="hidden" id="qtAnswerInput" value="${escHtml(String(answer.studentAnswer || ''))}">`;
+        instrHtml = qd.text || '';
+    } else if (kind && kind.kind === 'stack') {
         // Digit boxes (right-to-left entry, SP-20) feed a hidden #qtAnswerInput, which every
         // save path of this module already reads.
         const hidden = `<input type="hidden" id="qtAnswerInput" value="${escHtml(String(answer.studentAnswer || ''))}">`;
@@ -399,7 +415,7 @@ function renderQuizQuestion(qItem, flatIdx) {
         </div>
         <div class="mq-qtpaper mq-scell">
             ${instrHtml ? `<div class="mq-instr">${instrHtml}</div>` : ''}
-            <div class="ws-cell mq-scell mq-mono qt-cell" data-ws-cell="${kind ? kind.kind : 'legacy'}" data-flat-idx="${flatIdx}">${cellBody}</div>
+            <div class="ws-cell mq-scell mq-mono qt-cell" data-ws-cell="${msc ? 'msc' : kind ? kind.kind : 'legacy'}" data-flat-idx="${flatIdx}">${cellBody}</div>
         </div>
         ${feedbackHtml}
     `;
@@ -410,6 +426,7 @@ function renderQuizQuestion(qItem, flatIdx) {
 function _mountQuizCell(flatIdx) {
     const cellEl = document.querySelector('#quizTakeView .qt-cell');
     if (!cellEl) return;
+    if (cellEl.dataset.wsCell === 'msc') _mountQuizMsc(flatIdx, cellEl);
     if (cellEl.dataset.wsCell === 'legacy') {
         hideScreenOnlyCaptions(cellEl);
         const textEl = cellEl.querySelector(':scope > .qt-question-text');
@@ -516,6 +533,61 @@ function _mountQuizCell(flatIdx) {
     // a twin's rows wrap, never clip (round 3: the outer clocks were cut at the cell edge)
     fitTwinRows(cellEl);
     setTimeout(() => { if (cellEl.isConnected) fitTwinRows(cellEl); }, 150);
+}
+
+// "Click ALL the ...": the widget's tiles in the cell. Its own Submit hook is a single module-wide
+// slot shared with the practice card and the worksheet, so the quiz never sets it: it reads the
+// tiles itself. A test without instant feedback saves every tap; with instant feedback the pupil
+// taps Check (one verdict per try, so a half-chosen set never climbs the support ladder).
+function _mountQuizMsc(flatIdx, cellEl) {
+    const host = cellEl.querySelector('#qtMscHost');
+    const hidden = cellEl.querySelector('#qtAnswerInput');
+    const qd = state.quizAllQuestions[flatIdx].question.questionData;
+    if (!host || !hidden) return;
+    renderMultiSelectCheck(qd, host);
+    const grid = host.querySelector('.msc-grid');
+    const counter = host.querySelector('.msc-counter');
+    const oldBtn = host.querySelector('.msc-submit');
+    if (!grid) return;
+    const tiles = () => Array.from(grid.querySelectorAll('.msc-opt'));
+    const chosen = () => tiles().filter(el => el.classList.contains('selected')).map(el => el.dataset.id).join(',');
+    const saved = new Set(String(hidden.value || '').split(',').map(s => s.trim()).filter(Boolean));
+    tiles().forEach(el => {
+        const on = saved.has(el.dataset.id);
+        el.classList.toggle('selected', on);
+        el.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    const total = tiles().length;
+    const instant = !!(state.currentQuiz && state.currentQuiz.settings && state.currentQuiz.settings.showFeedback === 'instant');
+    let check = null;
+    if (oldBtn) {
+        if (instant) {
+            // a fresh button: the widget's own listener would call the shared Submit hook
+            check = oldBtn.cloneNode(true);
+            check.textContent = 'Check';
+            check.classList.add('qt-msc-check');
+            oldBtn.replaceWith(check);
+            check.addEventListener('click', () => { const v = chosen(); if (v) submitQuizTextAnswer(flatIdx, v); });
+        } else oldBtn.remove();
+    }
+    const sync = () => {
+        const v = chosen();
+        hidden.value = v;
+        if (counter) counter.textContent = `${v ? v.split(',').length : 0} of ${total} selected`;
+        if (check) check.disabled = !v;
+    };
+    sync();
+    // after the widget's own toggle (its listener was added first)
+    grid.addEventListener('click', (e) => {
+        if (!e.target.closest('.msc-opt')) return;
+        sync();
+        const v = hidden.value;
+        if (!instant) { recordAnswer(flatIdx, v); return; }
+        // instant: the last verdict no longer describes the tiles; an emptied set clears the answer
+        const fb = document.querySelector('#quizTakeView .qt-question-card > .qt-feedback');
+        if (fb) fb.remove();
+        if (!v) submitQuizTextAnswer(flatIdx, '');
+    });
 }
 
 function restoreAnswer(flatIdx) {
@@ -640,9 +712,12 @@ function recordAnswer(flatIdx, studentAnswer) {
     let correct = false;
     const sNorm = String(studentAnswer).trim().toLowerCase();
     const aNorm = String(qd.ans).trim().toLowerCase();
-    const slotVerdict = slotAnswerMatches(studentAnswer, qd);
+    const slotVerdict = isMultiSelect(qd) ? null : slotAnswerMatches(studentAnswer, qd);
 
-    if (typeof slotVerdict === 'boolean') {
+    if (isMultiSelect(qd)) {
+        // a set of option ids: right when it is exactly q.ans, in any order
+        correct = multiSelectMatches(qd, studentAnswer);
+    } else if (typeof slotVerdict === 'boolean') {
         correct = slotVerdict;
     } else if (Array.isArray(qd.acceptedAnswers) && qd.acceptedAnswers.some(a => String(a).trim().toLowerCase() === sNorm)) {
         correct = true;
@@ -931,7 +1006,7 @@ function showQuizResults() {
                     : '<span class="incorrect-icon">&#10007;</span>';
                 let detail = '';
                 if (a && !a.correct && test.settings.showFeedback === 'end') {
-                    detail = `<span style="font-size:0.78rem;color:var(--text-dim);">Answer: ${escHtml(String(q.questionData.ans))}</span>`;
+                    detail = `<span style="font-size:0.78rem;color:var(--text-dim);">Answer: ${escHtml(quizAnswerText(q.questionData, q.questionData.ans))}</span>`;
                 }
                 breakdownHtml += `<div class="qt-result-q">
                     ${icon}
@@ -950,7 +1025,7 @@ function showQuizResults() {
                     : '<span class="incorrect-icon">&#10007;</span>';
                 let detail = '';
                 if (a && !a.correct && test.settings.showFeedback === 'end') {
-                    detail = `<span style="font-size:0.78rem;color:var(--text-dim);">Answer: ${escHtml(String(q.questionData.ans))}</span>`;
+                    detail = `<span style="font-size:0.78rem;color:var(--text-dim);">Answer: ${escHtml(quizAnswerText(q.questionData, q.questionData.ans))}</span>`;
                 }
                 breakdownHtml += `<div class="qt-result-q">
                     ${icon}
