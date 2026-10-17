@@ -146,6 +146,14 @@ export const DN1_MAX = 20;
 export const DN1_AT = Object.freeze({ S: 30, M: 24, L: 20 });
 const FILL_ROLES = new Set(['independent', 'more-practice']);
 export const DENSE_ROOM = 1.2;
+/**
+ * Wave 1 lane D r12c: the part of a MEASURED cell height that is the label keep-out (CL-40: the
+ * top pad is the label side + 1 mm, not the 3 mm the host measured before r12c), in mm. Room is
+ * kept over a problem's content, never over its label band, so a measured cell's room is
+ * `roomed`: room x (height - keep-out), never below the height itself.
+ */
+export const koMm = (size) => Math.max(0, ((SIZES[size] || SIZES[DEFAULT_SIZE]).tabMm || 0) - 2);
+const roomed = (pc, room) => Math.max(pc.hMin, room * Math.max(0, pc.hMin - (pc.ko || 0)));
 export const DENSE_CEILING = Object.freeze({
     short: Object.freeze({ S: 30, M: 24, L: 16 }),
     // L1: 12 at every size printed a 3 x 4 page of tiny two-digit stacks at S; S and M hold more
@@ -512,12 +520,17 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     const probe = (c, auto) => {
         const res = infos.map((i) => fitAt(i, c, { size, look, availableWidthMm: W, auto }));
         const f = floor && floor[c];
+        const fH = f && Number.isFinite(f.hMm) ? f.hMm : 0;
+        const hMin = Math.max(0, fH, ...res.map((r) => r.hMin));
+        // r12c: the tallest cell is a host MEASUREMENT (it carries the label keep-out, see koMm)
+        const meas = hMin > 0 && (fH === hMin || infos.some((i, k) => res[k].hMin === hMin && i.measured && i.measured[c] && i.measured[c].hMm === hMin));
         return {
             // An Auto probe also honours the floor's Auto fit: a column count one of the skill's
             // measured items fails under the Auto margins is not chosen for the few items kept.
             fits: res.every((r) => r.fits) && !(f && f.fits === false) && !(auto && f && f.autoFits === false),
             why: (res.find((r) => !r.fits) || {}).why || (f && f.fits === false ? 'width' : f && auto && f.autoFits === false ? 'fill' : ''),
-            hMin: Math.max(0, f && Number.isFinite(f.hMm) ? f.hMm : 0, ...res.map((r) => r.hMin)),
+            hMin,
+            ko: meas ? koMm(size) : 0,
         };
     };
 
@@ -573,13 +586,21 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     // counts, word problems, wide rows and long procedures keep the grid.
     let packed = false;
     let mixKeep = false;      // a div_facts Mix section (dealt order kept): the dense pass may still take more
+    let nearPack = null;      // r12c: rows of nearly one height, paged by their own heights (applied after the dense pass)
     if (cls !== 'word' && cls !== 'wide' && cls !== 'long' && !gridOverride) {
         const hs = (items || []).map((it) => measuredH(it, cols));
-        if (hs.length >= 2 && hs.every((h) => h > 0) && Math.max(...hs) > Math.min(...hs) * 1.6) {
+        const measuredAll = hs.length >= 2 && hs.every((h) => h > 0);
+        const tallMix = measuredAll && Math.max(...hs) > Math.min(...hs) * 1.6;
+        // Wave 1 lane D r12c: problems of NEARLY one height (a 79 mm compare among 51 mm counter
+        // pictures, mixed_comparing L) are paged by their own rows too when that holds a whole row
+        // more than sizing every row for the tallest; their rows stay in dealt order (groupByHeight
+        // sorts only past 1.6 x), so the rows counted are the rows printed.
+        const nearMix = measuredAll && !tallMix && Math.max(...hs) - Math.min(...hs) >= 2;
+        if (tallMix || nearMix) {
             // (a div_facts Mix section keeps its dealt order - groupByHeight - so its rows are
             // the rows it will print, not the tall-first ones)
-            const keepOrder = (items || []).every((it) => it && it.q && it.q.divMix);
-            mixKeep = keepOrder;
+            const keepOrder = nearMix || (items || []).every((it) => it && it.q && it.q.divMix);
+            mixKeep = keepOrder && !nearMix;
             const sorted = keepOrder ? [] : hs.slice().sort((a, b) => b - a);
             if (keepOrder) for (let i = 0; i < hs.length; i += cols) sorted.push(Math.max(...hs.slice(i, i + cols)), ...Array(Math.max(0, Math.min(cols, hs.length - i) - 1)).fill(0));
             const rowH = [];
@@ -594,7 +615,8 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
             // (a div_facts Mix page holds every row it fits - 2 x 7 at L, not the two-column row
             // step down to 2 x 5; critic R1 D14)
             if (keepOrder) { /* every row it fits */ } else if (cols === 2 && fit > 1 && !section.freeRows) fit = TWO_COL_ROWS.find((r) => r <= fit) || fit;
-            if (fit > rows) {
+            if (fit > rows && nearMix) nearPack = { cols, rows: fit };
+            else if (fit > rows) {
                 rows = fit;
                 packed = true;
                 notes.push('Rows sized to the problems they hold.');
@@ -643,7 +665,7 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
             const pc = probe(c, c > cols);
             if (!pc.fits) continue;
             // (free rows: the rows take the problems' own measured height, buildSheet checks the page)
-            let rr = Math.max(1, Math.min(Math.floor((G - SAFETY_H_MM) / (pc.hMin * (section.freeRows ? 1 : room))), Math.floor(dCeil / c)));
+            let rr = Math.max(1, Math.min(Math.floor((G - SAFETY_H_MM) / (section.freeRows ? pc.hMin : roomed(pc, room))), Math.floor(dCeil / c)));
             if (c === 2 && !section.freeRows) rr = TWO_COL_ROWS.find((x) => x <= rr) || rr;
             const tie = rr * c === best.perPage && best.cols !== c && sideBand(best.cols) >= 0.25 && sideBand(c) < sideBand(best.cols);
             if (rr * c > best.perPage || tie) best = { perPage: rr * c, cols: c, rows: rr, hMin: pc.hMin };
@@ -660,6 +682,16 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
         }
     }
 
+    // r12c: rows of nearly one height take their own heights only when that holds more problems
+    // than the dense grid does (a dense grid of short stacks keeps its columns).
+    if (nearPack && nearPack.rows * nearPack.cols > rows * cols) {
+        cols = nearPack.cols;
+        rows = nearPack.rows;
+        packed = true;
+        for (let k = notes.length - 1; k >= 0; k--) if (/^(Dense:|Tall problems:)/.test(notes[k])) notes.splice(k, 1);
+        notes.push('Rows sized to the problems they hold.');
+    }
+
     // PAGE FILL (owner 2026-09-25: "a lot of wasted space ... 5 problems could fit on one paper").
     // On the practice roles, where the rows chosen so far (the class target, the 12.1 ceiling)
     // would leave more than PAGE_FILL of the grid empty once every cell is capped at FILL_CAP x its
@@ -674,7 +706,7 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     const stacked = infos.some((i) => i.fp.tracks && !i.fp.factLike);
     if (FILL_ROLES.has(role) && !clamped && !packed && !stacked && !gridOverride && hMin > 0 && cls !== 'word' && cls !== 'long') {
         const used = rows * Math.min(G / rows, fillLimit(hMin));
-        const fit = Math.floor((G - SAFETY_H_MM) / (hMin * DENSE_ROOM));
+        const fit = Math.floor((G - SAFETY_H_MM) / roomed(atCols, DENSE_ROOM));
         if (used < PAGE_FILL * G && fit >= 5 / cols) {
             let want = Math.min(fit, Math.floor((DN1_AT[size] || DN1_MAX) / cols));
             if (cols === 2 && want > 1 && !section.freeRows) want = TWO_COL_ROWS.find((r) => r <= want) || want;
@@ -693,7 +725,22 @@ export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_P
     // The OWNER's per-skill page ceiling (print-sheet.js PAGE_CAP, critic r8 D8-2): never more
     // whole rows than it allows; the rows it keeps then share the grid (the page fills by size).
     if (Number(section.pageCap) > 0 && rows * cols > Number(section.pageCap)) {
-        rows = Math.max(1, Math.floor(Number(section.pageCap) / cols));
+        const cap = Number(section.pageCap);
+        rows = Math.max(1, Math.floor(cap / cols));
+        // Wave 1 lane D r12c (RUBRIC H13): the cap holds the same count in fewer, taller-filled
+        // columns when they fit (number_families_mult S: 8 families in 4 x 2 left 113 mm rows a
+        // third empty; 2 x 4 holds the same 8 in rows sized to them). Auto columns only.
+        if (requested === 'auto') {
+            for (let c = 1; c < cols; c++) {
+                const r = Math.floor(cap / c);
+                if (r * c < rows * cols || (c === 2 && !section.freeRows && !TWO_COL_ROWS.includes(r))) continue;
+                const pc = probe(c, true);
+                if (!pc.fits || r * Math.max(hMin, pc.hMin) > G - SAFETY_H_MM) continue;
+                cols = c;
+                rows = r;
+                break;
+            }
+        }
         notes.push(`At most ${rows * cols} problems on this page (the skill's own page size).`);
     }
     const even = G / rows;
