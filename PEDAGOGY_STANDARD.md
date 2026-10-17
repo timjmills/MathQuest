@@ -1332,6 +1332,9 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `story-bar` | Read the story. Fill in the bar. Solve. | word problem with a part-whole bar to fill (added 2026-10-16, detailed lesson 2) |
 | `turn-facts` | Look at the array. Write two facts. | an array and its turn: write both multiplication facts (added 2026-10-16, mult_properties form 0) |
 | `turn-new` | Turn the array. Write the new fact. | one fact known, write the turned fact (added 2026-10-16, mult_properties form 0) |
+| `turn-look` | Look at the turned array. Write the new fact. | the turned array is drawn; write its fact (added 2026-10-17, detailed lesson 3a) |
+| `turn-fact` | Turn the fact. Write the new fact. | a fact with no picture; write its turn (added 2026-10-17, detailed lesson 3a) |
+| `array-total` | Write the rows, the number in each row and the total. | read an array: rows, columns, total (added 2026-10-17, detailed lesson 3a prerequisite) |
 
 | Id | Rule |
 |---|---|

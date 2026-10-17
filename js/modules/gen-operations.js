@@ -4162,10 +4162,15 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     if (typeof _tSet === 'number') _tSet = [_tSet];
                     _tSet = Array.isArray(_tSet) ? [0, 1, 2].filter(v => _tSet.includes(v)) : [];
                     if (!_tSet.length) _tSet = [0];
-                    if (_opt('pictures') === false) _tSet = [2];
+                    // (pictures off: no arrays - the facts-only task, and (lesson 3a r2, exit a) a known fact
+                    // with no arrays when the known task is ticked; nothing else changes)
+                    if (_opt('pictures') === false) _tSet = _tSet.filter(v => v === 1 || v === 2).length ? _tSet.filter(v => v === 1 || v === 2) : [2];
                     const type = _tTypes[_tSet[_dealRung(_tSet.length, 'turn')]];
                     const _band = Number(_opt('band')) === 81 ? 9 : 5;
-                    const hi = type === 'missing' ? _band : 5;
+                    // (pictures off on a 'known' item, lesson 3a exit a: no arrays - the fact turned
+                    // from the fact alone - takes the abstract task's factors)
+                    const _noDraw = type === 'known' && _opt('pictures') === false;
+                    const hi = type === 'missing' || _noDraw ? _band : 5;
                     let a = rng(2, hi), b = rng(2, hi);
                     // A square turns into itself: one item in five at most, the ★★★ edge case.
                     if (a === b && rng(1, 5) > 1) b = b === hi ? b - 1 : b + 1;
@@ -4173,6 +4178,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const ask = type === 'missing' ? (_dealRung(2, 'ask') ? 'factor' : 'product') : null;
                     const payload = { kind: 'turn', rows: a, cols: b, product, type };
                     if (ask) payload.ask = ask;
+                    if (_noDraw) payload.draw = 'none';
                     q.a = a; q.b = b; q.op = '×';
                     q.cell = { template: 'arrays-turn', v: 1, payload };
                     if (type === 'both') {
@@ -4184,12 +4190,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         q.hint = `Count the dots in each array. ${a} rows of ${b}, then ${b} rows of ${a}.`;
                         q.visual = _kitTwin('arrays-turn', payload, { join: ', ' });
                     } else if (type === 'known') {
-                        q.text = 'Turn the array. Write the new fact.';
+                        q.text = _noDraw ? 'Turn the fact. Write the new fact.' : 'Turn the array. Write the new fact.';
                         q.ans = `${b}, ${a}, ${product}`;
                         q.keyParts = [String(b), String(a), String(product)];
                         q.answerType = 'text';
                         q.options = [];
-                        q.hint = `The turned array has ${b} rows of ${a}. Turning it does not change the total.`;
+                        q.hint = _noDraw ? `${b} × ${a} uses the same two numbers as ${a} × ${b}.` : `The turned array has ${b} rows of ${a}. Turning it does not change the total.`;
                         q.visual = _kitTwin('arrays-turn', payload, { join: ', ' });
                     } else {
                         q.text = ask === 'factor' ? `${a} × ${b} = ${product}. ${b} × ? = ${product}` : `${a} × ${b} = ${product}. ${b} × ${a} = ?`;
@@ -4200,7 +4206,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         q.visual = _kitTwin('arrays-turn', payload);
                     }
                     q.screenInstr = type === 'missing' ? 'Write the missing number.' : q.text;
-                    q.instructionKey = type === 'both' ? 'turn-facts' : type === 'known' ? 'turn-new' : 'missing';
+                    q.instructionKey = type === 'both' ? 'turn-facts' : type === 'known' ? (_noDraw ? 'turn-fact' : 'turn-new') : 'missing';
                     q.printFormat = 'mult-properties';
                     q.skillLabel = 'Mult Properties';
                     return;

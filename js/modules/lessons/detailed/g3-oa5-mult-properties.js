@@ -56,7 +56,8 @@ export default {
     // ------------------------------------------------------------------ the practice skill
     // (products to 20: the chart and Guided cell 1 at most 4 by 4, Guided cell 2 the widest, 4 by 5;
     // `turn-two` keeps the Guided header on one line beside the Steps)
-    skill: TURN(0, { maxNum: 20, instructionKey: 'turn-two' }),
+    // (r2, critic D2: tasks both AND known - Guided cell 2 is the known fact, the Practice 1 response, its first box traced)
+    skill: Object.assign(TURN(0, { minNum: 6, maxNum: 20, instructionKey: 'missing-many' }), { opts: { forms: [0], task: [0, 1], band: 25 } }),
     // (no pool: the pack's own places; there are only 10 rows-by-cols pairs, so ONE Practice page)
     practicePages: 2,
     // ★★★ last row: a square array (does it change when turned?) and a 5-row array.
@@ -66,8 +67,9 @@ export default {
     // facts only, the missing number, its last row a square and a 5.
     practiceSheets: [
         // (products to 16: rows + in each row at most 8, so the array and its turn fit a half-width cell at L)
-        { skill: TURN(1, { minNum: 6, maxNum: 16, allTest: 'arrNoSmall' }), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['arrBigSquare', 'arrFiveRows'] } },
-        { skill: FACTS({ minNum: 12, factorCap: 3 }), shape: [10, 2], edgeLast: { per: 10, cols: 2, first: true, wants: ['arrSquare', 'arrFive'] } },
+        // (r2, critic D1: row 1 two non-squares, the last row the one square and a 5-row array)
+        { skill: TURN(1, { minNum: 6, maxNum: 16, allTest: 'arrP1', instructionKey: 'turn-look' }), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['arrBigSquare', 'arrFiveRows'] } },
+        { skill: FACTS({ minNum: 12, factorCap: 4, allTest: 'arrP2' }), shape: [10, 2], edgeLast: { per: 10, cols: 2, first: true, wants: ['arrSquare', 'arrFive'] } },
     ],
     // No Mixed page: a Mixed page leads with the lesson skill (half its items), and only ten arrays up to
     // 5 x 5 exist - the chart, the lesson sheet, Practice 1, the exit slip and the Check Question use them
@@ -79,7 +81,7 @@ export default {
         const p = (q && q.cell && q.cell.payload) || {};
         if (p.rows !== undefined && p.cols !== undefined) {
             const r = Number(p.rows), c = Number(p.cols), t = r * c;
-            return { rows: r, cols: c, total: t, fact: `${r} × ${c} = ${t}`, turned: `${c} × ${r} = ${t}`, both: `${r} × ${c} = ${t} and ${c} × ${r} = ${t}`, eqParts: [r, c], eqOp: '×' };
+            return { rows: r, cols: c, total: t, fact: `${r} × ${c} = ${t}`, turned: `${c} × ${r} = ${t}`, both: `${r} × ${c} = ${t} and ${c} × ${r} = ${t}`, eqParts: [r, c], eqOp: '×', eqN: t, eqTurn: true };
         }
         const a = Number(b.a), c = Number(b.b);
         if (Number.isFinite(a) && Number.isFinite(c)) return { fact: `${a} × ${c} = ${a * c}`, turned: `${c} × ${a} = ${a * c}` };
@@ -107,16 +109,18 @@ export default {
             { icon: 'write', text: 'Write the new fact.' },
             { icon: 'check', text: 'Check: same product.' },
         ],
+        // (step 5 on the chart: its name is the check; its words the one thing not to do - critic D3)
+        words: [{ from: '^Check: same product, (\\d+)\\. No recount\\.$', to: 'Still $1. No recount.' }],
         // No chant: the Say frame does the work (RESEARCH §4).
         chant: '',
         // (two arrays-and-turns are too wide to stand side by side: they stack beside the Steps)
         guidedStack: 2,
-        guidedWants: ['arrSmall', 'arrFourFive'],
+        guidedWants: ['arrSmallBoth', 'arrKnownG'],
         guidedRows: 2,
         practiceShape: [6, 2],
         format: { kind: 'numbered steps with icons', why: 'Step 5 is the Critical Atom: the pupil checks, never recounts.' },
         // A non-square array, no repeated digit, a product the pupils can count (3 rows of 4).
-        example: { test: 'arrTurnSmall' },
+        example: { test: 'arrBothChart' },
         // (no second or third example: the chart's four step panels fill the page, and only ten arrays
         // to 5 x 5 exist - every one the chart does not print is one more for the pupil pages)
         mixWith: [],
@@ -125,9 +129,12 @@ export default {
     // ------------------------------------------------------------------ P0 Prerequisite Check
     // One question per Pre-requisite atom, most basic first.
     prerequisites: [
-        { atom: 1, items: 1, ref: CB(5), lesson: { id: '2.NBT.A.2', title: 'Count by 5s and 10s' } },
-        { atom: 2, items: 4, ref: { categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: [2], notation: ['stacked'], band: 100 }, minNum: 12, maxNum: 18 }, lesson: { id: '3.OA.A.1', title: 'Equal groups' } },
-        { atom: 3, items: 2, ref: ARR({ minNum: 6, maxNum: 15 }), lesson: { id: '2.OA.C.4', title: 'Use arrays' } },
+        // (r2, critic D7: each atom names what its items test - a count by 5, × 2 recall, reading an array)
+        { atom: 1, items: 1, ref: CB(5), lesson: { id: '2.NBT.A.2', title: 'Count by 5s' } },
+        { atom: 2, items: 4, ref: { categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: [2], notation: ['stacked'], band: 100 }, minNum: 12, maxNum: 18 }, lesson: { id: '3.OA.C.7', title: 'Multiply by 2' } },
+        // (squares: the pack's ten pictured pairs to 5 x 5 - the six non-squares are the chart's, the Guided cells' and
+        // Practice 1's; LR-5 holds a pair once in the pack, critic D6)
+        { atom: 3, items: 2, ref: ARR({ minNum: 4, maxNum: 25, allTest: 'arrGridSquare', instructionKey: 'array-total' }), lesson: { id: '2.OA.C.4', title: 'Use arrays' } },
     ],
 
     // ------------------------------------------------------------------ P1 Number sense
@@ -138,20 +145,24 @@ export default {
         // spaced retrieval on mini whiteboards, T3 §3)
         A: { items: [ML(10, 'more', { minNum: 10, maxNum: 60 }), ML(10, 'less', { minNum: 20, maxNum: 60 }), { categoryId: 'placevalue', skillId: 'compare', opts: { band: 99, closeness: 'far' } },
             { categoryId: 'placevalue', skillId: 'unit_form', opts: { band: 99 }, maxNum: 50 }, ML(1, 'more', { minNum: 10, maxNum: 50 })] },
-        B: { items: [ML(10, 'more', { minNum: 61, maxNum: 89 }), ML(10, 'less', { minNum: 61, maxNum: 99 }), { categoryId: 'placevalue', skillId: 'compare', opts: { band: 99, closeness: 'close' } },
-            { categoryId: 'placevalue', skillId: 'unit_form', opts: { band: 99 }, minNum: 50 }, ML(1, 'more', { minNum: 51, maxNum: 98 })] },
+        // (r2, critic n6: Band B reaches 3-digit numbers, Grade 3 - tens and ones stays 2-digit: a 3-place row does not fit)
+        B: { items: [{ categoryId: 'placevalue', skillId: 'more_less_100', opts: { step: 10, dir: 'more' }, minNum: 120, maxNum: 880 }, { categoryId: 'placevalue', skillId: 'more_less_100', opts: { step: 10, dir: 'less' }, minNum: 120, maxNum: 980 },
+            { categoryId: 'placevalue', skillId: 'compare', opts: { band: 999, closeness: 'close' }, minNum: 100 },
+            { categoryId: 'placevalue', skillId: 'unit_form', opts: { band: 99 }, minNum: 50 }, ML(1, 'more', { minNum: 101, maxNum: 118, opts: { step: 1, dir: 'more', band: 120 } })] },
     },
 
     // ------------------------------------------------------------------ P5 Word problem
     // Our own words; the numbers come from a dealt facts-only item (a non-square product item, factors to 9).
+    // (r2, critic D5: the story IS the turn - 5 rows of 6 to 9, a count by 5; it asks the turned row, and the pupil
+    // writes both facts; the Say frame holds both)
     wordProblem: {
         ref: FACTS(),
-        // (the product item: its answer is the eggs in all)
-        want: 'arrProduct',
+        want: 'arrWpTurn',
         instruction: 'Read the story. Draw it. Solve.',
-        lines: ['A box has {wp.rows} rows of eggs.', 'There are {wp.cols} eggs in each row.', 'How many eggs are in the box?'],
-        answerLine: 'There are __ eggs.',
-        say: 'There are __ eggs.',
+        lines: ['A tray has {wp.rows} rows of {wp.cols} cakes.', 'Sam turns it: now it has {wp.cols} rows.', 'How many in each row now?'],
+        answerLine: 'There are __ cakes in each row.',
+        eqTurn: true,
+        say: '{wp.rows} times {wp.cols} equals {wp.cols} times __.',
     },
 
     // ------------------------------------------------------------------ P6 Exit slip
@@ -160,19 +171,20 @@ export default {
     // Three items (V22: 3 when 4 full-size items do not fit a half - an array and its turn is a whole row),
     // the array one across, the two facts two across: the turned fact from a picture, the Critical Atom without a picture, the ★★★ square.
     exit: [
-        { case: 'an array: the known fact gives the turned fact', ref: TURN(1, { maxNum: 12 }), want: 'arrSmall', instr: 'Turn the array. Write the new fact.', detects: 'Copies the first fact: no swap.', cols: 1 },
-        { case: 'same product, no picture (Critical Atom)', ref: FACTS(), want: 'arrProduct', instr: 'Write the missing number.', detects: 'Multiplies again and slips: not the same product.', cols: 2 },
-        { case: 'a square fact, the missing factor', ref: FACTS(), want: 'arrSquareFactor', instr: 'Write the missing number.', detects: 'Thinks a square cannot turn.', cols: 2 },
+        // (r2, critic D4: no picture to recount, no square, and the Say frame states no item's answer)
+        { case: 'a known fact gives the turned fact (no picture)', ref: Object.assign(TURN(1), { opts: { forms: [0], task: [1], band: 81, pictures: false } }), want: 'arrKnownBare', instr: 'Turn the fact. Write the new fact.', detects: 'Copies the first fact: no swap.', cols: 1 },
+        { case: 'same product, no picture (Critical Atom)', ref: FACTS(), want: 'arrProductP2', instr: 'Write the missing number.', detects: 'Multiplies again and slips: not the same product.', cols: 2 },
+        { case: 'the missing factor of a turned fact', ref: FACTS(), want: 'arrFactorP2', instr: 'Write the missing number.', detects: 'Writes the product, or the same factor, in the box.', cols: 2 },
     ],
     exitInstruction: 'Write how many rows. Write how many in each row.',
     exitSayItem: 1,
-    exitSay: '{say.rows} times {say.cols} equals {say.cols} times {say.rows}.',
+    exitSay: 'Same two numbers, same product.',
 
     // ------------------------------------------------------------------ retrieval (MWB)
     retrieval: [
-        { ref: FACT(5, { maxNum: 30 }), ask: '{ret.0.text}' },
-        { ref: FACT(2, { maxNum: 20 }), ask: '{ret.1.text}' },
-        { ref: FACT(10, { maxNum: 60 }), ask: '{ret.2.text}' },
+        { ref: FACT(5, { maxNum: 50 }), want: 'factNoZeroOne', ask: '{ret.0.text}' },
+        { ref: FACT(2, { maxNum: 24 }), want: 'factNoZeroOne', ask: '{ret.1.text}' },
+        { ref: FACT(10, { maxNum: 60 }), want: 'factNoZeroOne', ask: '{ret.2.text}' },
     ],
 
     // ------------------------------------------------------------------ T1
@@ -192,8 +204,8 @@ export default {
 
     // ------------------------------------------------------------------ T2 Atomisation template
     atoms: [
-        { type: 'Fact', prereq: true, skill: 'Count by 2, 5, 10', notes: 'Prerequisite Check {pre.0.letters}.' },
-        { type: 'Fact', prereq: true, skill: '× means “groups of”, “rows of”', notes: 'Prerequisite Check {pre.1.letters}.' },
+        { type: 'Fact', prereq: true, skill: 'Count by 5', notes: 'Prerequisite Check {pre.0.letters}.' },
+        { type: 'Fact', prereq: true, skill: 'Recall × 2 facts', notes: 'Prerequisite Check {pre.1.letters}.' },
         { type: 'Conceptual', prereq: true, skill: 'Array fact: rows × in each row', notes: 'Prerequisite Check {pre.2.letters}.' },
         { type: 'Comparative', skill: 'Turned array: rows become columns', notes: 'Non-example: a dot added.' },
         { type: 'Conceptual', critical: true, skill: 'Same product: turning adds no dot', notes: 'Ask “Did a dot move away?”' },
@@ -203,8 +215,8 @@ export default {
         { step: 'Look at the array: count the rows and in each row.', tag: 'Pre-requisite', check: '“How many rows?”' },
         { step: 'Write the fact.', tag: 'Pre-requisite', check: 'Guided cell 1' },
         { step: 'Turn the array: rows become columns.', tag: 'New', check: 'Tray: “How many rows now?”' },
-        { step: 'Write the new fact.', tag: 'New', check: 'Guided cell 2' },
-        { step: 'Check: same product. No recount.', tag: 'New', critical: true, check: 'Check Question; exit b' },
+        { step: 'Write the new fact.', tag: 'New', check: 'Guided cell 2: three boxes' },
+        { step: 'Check: same product. No recount.', tag: 'New', critical: true, check: 'Check Question; exit b, c' },
     ],
     howToTeach: 'Turn a real tray of counters first: pupils count once, then see the same total. Ask “Did a dot move away?” First examples: non-square, no repeated digit.',
     board: 'Dot paper: {chart.rows} rows of {chart.cols}, then turned.',
@@ -212,14 +224,14 @@ export default {
     // do not exist yet - see the build list): recount (a new product), no swap (the same fact again),
     // product as a factor.
     mistakes: [
-        { name: 'Recounts: a new product', step: 5, looks: '{cq.A}', fix: '“Did a dot move away?”', option: 'A', misconception: 'turn-recount', caught: 'Exit b' },
+        { name: 'A new product', step: 5, looks: '{cq.A}', fix: '“Did a dot move away?”', option: 'A', misconception: 'turn-recount', caught: 'Exit b' },
         { name: 'Adds the two factors', step: 5, looks: '{cq.B}', fix: '“Times, not plus: same product.”', option: 'B', misconception: 'turn-product-factor' },
         { name: 'Copies the fact: no swap', step: 4, looks: '{exit.0.wrong.turnnoswap} for {exit.0.turned}', fix: 'Count the turned rows aloud.', option: '', caught: 'Exit a · Practice 1' },
         { name: 'Product as a factor', step: 4, looks: '{exit.2.wrong.turnproductfactor} in the box of exit c', fix: 'The product is always last.', option: '', caught: 'Exit c · Practice 2' },
     ],
     // The Check Question is a fact on the board (no dots: the Critical Atom, same product, after the I Do's
     // facts-only rows), a fresh pair; its options are the provider's wrong products, each written as a fact.
-    checkQuestion: { ref: FACTS(), want: 'arrProduct', correct: 'C',
+    checkQuestion: { ref: FACTS(), want: 'arrProductP2', correct: 'C',
         show: (v, q) => { const p = (q && q.cell && q.cell.payload) || {}; return `${p.cols} × ${p.rows} = ${v}`; } },
 
     // ------------------------------------------------------------------ T3-T5 delivery scripts
@@ -258,17 +270,17 @@ export default {
                 { say: '{chart.cols} rows of {chart.rows} is {chart.total}.', note: 'Step 4: write [[{chart.turned}]].' },
                 { ask: 'Did a dot move away?', note: 'Expected: no. Step 5: same product.' },
                 { say: '{chart.rows} times {chart.cols} equals {chart.cols} times {chart.rows}.', note: 'The Say frame. Pupils repeat twice.' },
-                { do: 'Cover the dots. Point to {chart.fact} on the chart.', note: 'One new thing: no dots. Practice 2 and exit b, c.' },
-                { ask: 'So what is {chart.cols} × {chart.rows}?', note: 'Expected: [[{chart.total}]]. Same two numbers, same product.' },
+                { ask: 'Cover the dots. So what is {chart.cols} × {chart.rows}?', note: 'Expected: [[{chart.total}]]. No dots: same two numbers, same product.' },
                 { do: 'Write {chart.cols} × □ = {chart.total} on the board.', note: 'Expected: [[{chart.rows}]]: the factor that moved.' },
+                { do: 'Write {chart.fact}, then three boxes under it. Point to the turned tray.', note: 'Fill them: [[{chart.cols}]] × [[{chart.rows}]] = [[{chart.total}]]. Guided cell 2.' },
             ] },
         { n: 6, name: 'We Do: Guided Practice', min: 8, page: 'P3', boxes: [{ kind: 'feedback', title: 'Fix it at once', text: 'Fix: turn the tray again and ask “Same dots?”' }],
             rows: [
                 { say: 'Look at the first array. Count the rows.' },
                 { ask: 'How many rows? How many in each row?', note: 'Expected ★: [[{we.0.fact}]]; turned [[{we.0.turned}]].' },
-                { do: 'Pupils do the second array on their own.', note: 'Expected ★: [[{we.1.fact}]]; turned [[{we.1.turned}]].' },
-                { ask: 'Turn it. What is the new fact?', note: 'Pupils say it; write it on the board.' },
-                { say: 'Cover the dots of the second array. Read its first fact.', note: 'Expected: [[{we.1.fact}]]; no dots, the same turned fact.' },
+                { say: 'Now the fact is given. Write the new fact.', note: 'The first box is traced: the rows of the turned array.' },
+                { do: 'Pupils do the second array on their own.', note: 'Expected ★: [[{we.1.turned}]], from [[{we.1.fact}]].' },
+                { ask: 'Same product? Did you count again?', note: 'Expected: same product, no recount. Step 5.' },
             ] },
         { n: 7, name: 'Check Question', min: 3, page: '',
             rows: [
@@ -280,14 +292,14 @@ export default {
         { n: 8, name: 'You Do: Independent Practice', min: 9, page: 'P4', boxes: [{ kind: 'watch', title: 'The last row', text: 'Walk to the last row first: {p4.last}.' }],
             rows: [
                 { do: 'Pupils finish the lesson sheet, then Practice 1 and 2.' },
-                { say: 'Write the fact. Then say the turned fact.' },
+                { say: 'Look at the turned array. Write the new fact. Check: same product.' },
                 { do: 'Circulate at ★★. Look for pupils who recount.', note: 'Ask “Did a dot move away?”' },
             ] },
         { n: 9, name: 'Word problem', min: 5, page: 'P5',
             rows: [
                 { do: 'Read the story aloud two times. Pupils tick each box.' },
-                { ask: 'How many rows? How many in each row?', note: 'Expected: [[{wp.rows}]] rows, [[{wp.cols}]] in each.' },
-                { ask: 'How many eggs? Say both facts.', note: 'Expected: [[{wp.total}]]; said: {wp.both}.' },
+                { ask: 'How many rows now? How many cakes in each row?', note: 'Expected: [[{wp.cols}]] rows, [[{wp.rows}]] in each.' },
+                { ask: 'Say both facts.', note: 'Expected: {wp.both}.' },
             ] },
         { n: 10, name: 'Plenary and exit slip', min: 4, page: 'P6',
             rows: [
@@ -303,15 +315,15 @@ export default {
         'Exit a: only {exit.0.turned}; writing {exit.0.fact} again is the no-swap mistake.',
         'Practice 2 and exit b, c: one number in each box, no working needed.',
         'Practice 1: a turned fact read off the turned array is right even if the pupil counted it.',
-        'Egg story: {wp.rows} × {wp.cols} or {wp.cols} × {wp.rows}; the label “eggs” may be left off.',
+        'Cake story: {wp.rows} in each row; the two facts {wp.both}, in either order; the label “cakes” may be left off.',
     ],
     wrongAnswers: [
-        { wrote: '{exit.1.wrong.turnrecount} (b)', mistake: 'Recounts: a new product', next: 'Tray: turn it; “Did a dot move away?”' },
+        { wrote: '{exit.1.wrong.turnrecount} (b)', mistake: 'A new product', next: 'Tray: turn it; “Did a dot move away?”' },
         { wrote: '{exit.0.wrong.turnnoswap} (a)', mistake: 'Copies the fact: no swap', next: 'Count the turned rows aloud.' },
         { wrote: '{exit.2.wrong.turnproductfactor} (c)', mistake: 'Product as a factor', next: 'The box map: the product is last.' },
-        { wrote: '{exit.0.wrong.turnproductfactor} (a)', mistake: 'Product as a factor', next: 'The product is always last.' },
         { wrote: '{exit.1.wrong.turnproductfactor} (b)', mistake: 'Adds the two factors', next: '“Times, not plus.” Say the fact aloud.' },
         { wrote: 'The first fact copied on Practice 1', mistake: 'Copies the fact: no swap', next: 'Turn the page a quarter way: count the rows.' },
+        { wrote: 'A × 2 fact missed on the Prerequisite Check', mistake: 'Not yet a × 2 fact', next: '3.OA.C.7: count by 2 to find it.' },
         { wrote: 'A box left empty on Practice 2', mistake: 'Not sure which number moved', next: 'Point: the two factors swap places.' },
     ],
 };

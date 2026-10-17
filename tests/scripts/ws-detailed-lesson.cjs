@@ -208,20 +208,36 @@ function measure(LIBRARY) {
 
 /* ------------------------------------------------------------------- E24 (pure, V22) */
 // V22 Appendix E `poolCheck`, list form, reading `places` (the kit's data-item hooks).
+// One canonical sign in every fact key (lesson 3a critic r1 D6: the bridge wrote "2×8" for a P0 fact and "2x8" for an
+// array, so E24 missed the repeat): × for x / * / ×, − for - / −, ÷ for / / ÷. An item's IDENTITY across the pack (lead
+// ruling, 2026-10-17): for a commutative sign (+, ×) the unordered pair {a, b}, for − and ÷ the ordered pair. Inside one
+// item a turned pair may be its content (an arrays-turn cell); across items 3 + 4 and 4 + 3 are one fact.
+const canon = (k) => String(k).trim().replace(/^(\d+)\s*([x*×xX]|[-−–]|[/÷]|\+)\s*(\d+)$/, (m0, a, op, b) => `${a}${/[x*×X]/.test(op) ? '×' : /[-−–]/.test(op) ? '−' : /[/÷]/.test(op) ? '÷' : '+'}${b}`);
+const factId = (k) => { const c = canon(k), m = c.match(/^(\d+)([+×])(\d+)$/); return m ? [+m[1], +m[3]].sort((x, y) => x - y).join(m[2]) : c; };
 function poolCheck(POOL) {
     if (!POOL || !Array.isArray(POOL.places) || !POOL.places.length) return { ok: false, msg: 'no pool JSON or no items in the pack' };
     const d = POOL.decl || {};
-    // (one canonical sign in every fact key - the bridge wrote "2×8" for a P0 fact and "2x8" for an array, so E24
-    // missed the repeat; lesson 3a critic r1 D6) and an item's IDENTITY across the pack: for a commutative sign
-    // (+, ×) the unordered pair {a, b}, for − and ÷ the ordered pair (lead ruling, 2026-10-17). Inside one item a
-    // turned pair may be its content (an arrays-turn cell); across items 3 + 4 and 4 + 3 are one fact.
-    const canon = (k) => String(k).replace(/^(\d+)\s*[x*×]\s*(\d+)$/, '$1×$2').replace(/^(\d+)\s*-\s*(\d+)$/, '$1−$2');
-    const ident = (k) => { const c = canon(k), m = c.match(/^(\d+)([+×])(\d+)$/); return m ? [+m[1], +m[3]].sort((x, y) => x - y).join(m[2]) : c; };
+    // (canon / factId above: one sign in every key, and a + / × fact's identity its unordered pair)
+    const all = POOL.places.filter((x) => !x.copy).map((x) => Object.assign({}, x, { item: canon(x.item), id: factId(x.item) }));
     const inPool = new Set(POOL.pool.map(canon)), forb = new Set((POOL.forbidden || []).map(canon));
-    const re = d.kind === 'list' ? d.items.map(canon) : [];
-    const ruleOk = re.length > 0 && re.length === inPool.size && re.every((x) => inPool.has(x));
-    const all = POOL.places.filter((x) => !x.copy).map((x) => Object.assign({}, x, { item: canon(x.item), id: ident(x.item) }));
-    const usable = inPool.size - forb.size, small = usable < 12;
+    const re = d.kind === 'list' ? d.items.map(canon) : [], ruleSet = new Set();
+    // (`plus` - lesson 2 r5, critic r3 m7: the lesson skill's + facts recomputed from the declared RULE - parts at least
+    // partMin, none in noPart, crossing ten (both parts 9 or less) or a whole in `sums`, the whole at most maxSum - and
+    // the other skills' places from the declared list)
+    if (d.kind === 'plus') {
+        for (let a = Number(d.partMin) || 0; a <= (Number(d.maxSum) || 20); a++) for (let b = Number(d.partMin) || 0; a + b <= (Number(d.maxSum) || 20); b++) {
+            if ((d.noPart || []).map(Number).some((x) => x === a || x === b)) continue;
+            if (d.crossTen && !(a <= 9 && b <= 9 && a + b >= 11) && !(d.sums || []).map(Number).includes(a + b)) continue;
+            re.push(`${a}+${b}`);
+        }
+        for (const k of re) ruleSet.add(k);
+        re.push(...(d.items || []).map(canon));
+    }
+    const ruleOk = re.length > 0 && new Set(re).size === inPool.size && re.every((x) => inPool.has(x));
+    // (usable: the pool's FACTS, a turned + / × pair one fact - the lead ruling's identity - less the forbidden ones that
+    // are facts of their own: a chart example's turn-around is the chart example's fact, so it is no extra fact)
+    const ids = new Set([...inPool].map(factId)), forbIds = new Set([...forb].map(factId).filter((k) => !all.some((x) => /^P2/.test(String(x.page)) && x.id === k)));
+    const usable = ids.size - forbIds.size, small = usable < 12;
     const seenRep = new Set(), seenPage = new Set(), first = new Map(), rep = [], soft = [], bad = [], noRep = [];
     const pageOf = (p) => String(p).replace(/-key$/, '');
     // LR-5 (V22 Appendix E `js v21-selfcheck` poolCheck: "a chart (P2) example never returns, in any
@@ -230,7 +246,8 @@ function poolCheck(POOL) {
     const chart = new Set(all.filter((x) => /^P2/.test(pageOf(x.page))).map((x) => x.id)); const chartBack = [];
     for (const x of all) {
         if (!/^P2/.test(pageOf(x.page)) && chart.has(x.id)) chartBack.push(`${x.item} (${x.rep}) ${x.page}`);
-        if (!inPool.has(x.item) || forb.has(x.item)) bad.push(`${x.item} ${x.page}`);
+        // (a lesson-skill place - its skill or the word problem's story - the declared rule does not hold is outside the pool)
+        if (!inPool.has(x.item) || forb.has(x.item) || (d.kind === 'plus' && (x.rep === d.skill || x.rep === 'story') && !ruleSet.has(x.item))) bad.push(`${x.item} ${x.page}`);
         if (!x.rep) noRep.push(`${x.item} ${x.page}`);
         const kr = `${x.id}|${x.rep}`, kp = `${x.id}|${pageOf(x.page)}`;
         if (seenRep.has(kr) || seenPage.has(kp)) rep.push(`${x.item} (${x.rep}) ${x.page}`);
@@ -242,12 +259,12 @@ function poolCheck(POOL) {
     for (const pg of [...new Set(all.map((x) => pageOf(x.page)))]) { const xs = all.filter((x) => pageOf(x.page) === pg);
         for (const x of xs) if (x.item !== x.id && xs.some((y) => y.item === x.id)) turns.push(`${x.item} on ${pg}`); }
     return { ok: ruleOk && !bad.length && !noRep.length && !rep.length && !chartBack.length && !turns.length && (small || all.length <= usable),
-        msg: `${all.length} places (${first.size} numbers), usable pool ${usable} (pool ${inPool.size} recomputed from its list rule: ${ruleOk ? 'matches' : 'MISMATCH'}); repeats ${rep.length ? rep.join(', ') : 0}; chart examples or their turn-arounds returning ${chartBack.length ? chartBack.join(', ') : 0}; same-page turn-arounds ${turns.length ? turns.join(', ') : 0}; outside the pool / forbidden ${bad.length ? bad.join(', ') : 0}; items without a rep ${noRep.length}` };
+        msg: `${all.length} places (${first.size} numbers), usable pool ${usable} (pool ${inPool.size} keys, ${ids.size} facts, recomputed from its ${d.kind || '?'} rule: ${ruleOk ? 'matches' : 'MISMATCH'}; forbidden ${forb.size ? [...forb].join(', ') : 0}); repeats ${rep.length ? rep.join(', ') : 0}; chart examples or their turn-arounds returning ${chartBack.length ? chartBack.join(', ') : 0}; same-page turn-arounds ${turns.length ? turns.join(', ') : 0}; outside the pool / forbidden ${bad.length ? bad.join(', ') : 0}; items without a rep ${noRep.length}` };
 }
 
 /* ------------------------------------------------------------------------- evaluate */
 // A + / − place's sign and numbers ("7+6" -> {op: '+', a: 7, b: 6}), else null.
-const OPI = (x) => { const m = String((x && x.item) || '').match(/^(\d+)([+−])(\d+)$/); return m ? { op: m[2], a: Number(m[1]), b: Number(m[3]) } : null; };
+const OPI = (x) => { const m = canon((x && x.item) || '').match(/^(\d+)([+−])(\d+)$/); return m ? { op: m[2], a: Number(m[1]), b: Number(m[3]) } : null; };
 function evaluate(R, pdfPages, LIB, KIT = []) {
     const pages = R.pages, rows = [];
     const row = (id, check, measured, pass) => rows.push({ id, check, measured, pass: !!pass });
@@ -435,11 +452,11 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
     {
         const pl = (R.pool && R.pool.places) || [];
         const ex = pl.filter((x) => x.page === 'P6' && OPI(x) && OPI(x).op === '+');
-        const tn = (k) => { const m = String(k).match(/^(\d+)\+(\d+)$/); return m ? `${m[2]}+${m[1]}` : k; };
-        const on = new Set(pl.filter((x) => /^P[345]/.test(x.page)).flatMap((x) => [String(x.item), tn(x.item)]));
+        // (fresh: its FACT - the unordered pair, factId - on no other pupil page)
+        const on = new Set(pl.filter((x) => !/^P6/.test(x.page)).map((x) => factId(x.item)));
         const probs = [];
-        for (const x of ex) { const o = OPI(x), d0 = Math.abs(o.a - o.b); if (d0 === o.a || d0 === o.b) probs.push(`${x.item}: ${Math.max(o.a, o.b)} − ${Math.min(o.a, o.b)} = ${d0} is a part`); if (on.has(String(x.item))) probs.push(`${x.item} (or its turn-around) is on a lesson page`); }
-        row('E36', 'Exit slip + items: no part equals the difference of the parts; each fresh (not on P3–P5, nor turned round)', ex.length ? (probs.length ? probs.join('; ') : `${ex.map((x) => x.item).join(', ')}: clean and fresh`) : 'no + exit items', !probs.length);
+        for (const x of ex) { const o = OPI(x), d0 = Math.abs(o.a - o.b); if (d0 === o.a || d0 === o.b) probs.push(`${x.item}: ${Math.max(o.a, o.b)} − ${Math.min(o.a, o.b)} = ${d0} is a part`); if (on.has(factId(x.item))) probs.push(`${x.item} (or its turn-around) is on another page`); }
+        row('E36', 'Exit slip + items: no part equals the difference of the parts; each fresh (on no other page, nor turned round)', ex.length ? (probs.length ? probs.join('; ') : `${ex.map((x) => x.item).join(', ')}: clean and fresh`) : 'no + exit items', !probs.length);
     }
     // E30 (critic r3 S1): a number the lesson declares `boardOnly` (shown on the board only) is never a
     // pupil item's number or answer, and never printed on a pupil page or key (digits, with or without

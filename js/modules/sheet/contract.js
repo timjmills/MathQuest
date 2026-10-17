@@ -82,6 +82,10 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'turn-new': 'Turn the array. Write the new fact.',
     // (a lesson sheet's Guided header beside its Steps: one line - detailed lesson 3a)
     'turn-two': 'Write the two facts.',
+    // (detailed lesson 3a r2: the turned array is already drawn - n5; the fact turned with no picture; the P0 array frame)
+    'turn-look': 'Look at the turned array. Write the new fact.',
+    'turn-fact': 'Turn the fact. Write the new fact.',
+    'array-total': 'Write the rows, the number in each row and the total.',
     'skip-count': 'Count by {n}. Write the missing numbers.',
     expanded: 'Write the number in expanded form.',
     'digit-value': 'Write the value of the underlined digit.',

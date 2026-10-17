@@ -1000,7 +1000,7 @@ function barLayout(p, ctx) {
         return `<div class="mq-ww mq-wwbarlayout" data-ww-ops="${st.op}" data-read style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${L(ctx, 2.5)};display:flex;align-items:center;gap:${L(ctx, 3)};">`
             + `<div style="flex:1 1 auto;min-width:0;">${storyHTML(ctx, p, true)}</div>${work}</div>`;
     }
-    return `<div class="mq-ww mq-wwbarlayout" data-ww-ops="${st.op}" data-read style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${L(ctx, 2.5)};">${storyHTML(ctx, p, cols >= 2 || !!p.storyTight)}`
+    return `<div class="mq-ww mq-wwbarlayout" data-ww-ops="${st.op}" data-read style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${L(ctx, 2.5)};${p.storyTight ? `padding-top:${L(ctx, 2.5)};` : ''}">${storyHTML(ctx, p, cols >= 2 || !!p.storyTight)}`
         + `<div style="margin-top:${L(ctx, 1.5)};">${work}</div></div>`;
 }
 

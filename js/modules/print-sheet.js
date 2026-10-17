@@ -251,7 +251,7 @@ function refAccepts(sk, cand, key, seen, kept, pg = '', row = '', words = true) 
     // (LR-6 for + and − items and stories - lesson 2 r4, critic r2 D2: E24b now reads them too)
     // (`words`: true = every LR-6 rule; false = the story words and turn-around preference dropped; 'none' = LR-6
     // dropped, LR-5 and the answers still held - the tiers an `lr6` ref falls through before its soft floors go)
-    if (sk.lr6 && words !== 'none' && !lr6Ok(cand, key, seen, pg, row, words === true)) return false;
+    if (sk.lr6 && words !== 'none' && !lr6Ok(cand, key, seen, pg, row, words === true || words === 'names' ? words : false)) return false;
     if (sk.noTurnaround && ops.length >= 2 && seen.has(`pair:${key}:${ops.slice().sort((x, y) => x - y).join(',')}`)) return false;
     if (sk.maxSmall !== undefined && ops.length >= 2 && ops[1] < 10 && (kept.get(`small:${key}`) || 0) >= Number(sk.maxSmall)) return false;
     // (`factorCap` n, lesson 3a: no factor on more than n items of a page - a facts page that leans on 7s)
@@ -272,6 +272,8 @@ function refAccepts(sk, cand, key, seen, kept, pg = '', row = '', words = true) 
         if (sk.allTest && LESSON_CASE_TESTS[sk.allTest] && !LESSON_CASE_TESTS[sk.allTest]({ q: cand })) return false;
         // (an array's turned pair, lesson 3a: 4 x 3 after 3 x 4 draws the same two arrays - never on another page either)
         if (sk.avoidKeys && turnedKeyOf(cand) !== null && sk.avoidKeys.includes(turnedKeyOf(cand))) return false;
+        // (a x fact's identity is its unordered pair, whatever its sign glyph - lesson 3a r2, critic D6)
+        if (sk.avoidKeys && mulUsed(k, sk.avoidKeys)) return false;
         if (!refHardOk(sk, cand)) return false;
         if (sk.edge) { const t = LESSON_CASE_TESTS[sk.edgeTest || 'pvEdge']; if (t && !t({ q: cand })) return false; }
         if (seen.has(`key:${k}`)) return false;
@@ -334,6 +336,10 @@ export function itemNumberOf(q) {
 /** An arrays-turn item's turned fact key (4 x 3 for 3 x 4), else null: a page never prints both (LR-6 twins). */
 /** A + fact key turned round ("7+5" -> "5+7"); null for anything else (lesson 2 r5, V22 LR-5 turn-arounds). */
 export const plusTurn = (k) => { const m = String(k === null || k === undefined ? '' : k).match(/^(\d+)\+(\d+)$/); return m && m[1] !== m[2] ? `${m[2]}+${m[1]}` : null; };
+/** A x fact key's identity across the pack, the unordered pair ("2×8", "8x2" -> "2x8"); null for any other key
+ *  (lesson 3a r2, critic D6: P0 wrote "2×8", an array "2x8" - one fact. Only x keys, so no other pack deals differently). */
+export const mulId = (k) => { const m = String(k === null || k === undefined ? '' : k).match(/^(\d+)\s*[x×]\s*(\d+)$/); return m ? [+m[1], +m[2]].sort((a, b) => a - b).join('x') : null; };
+const mulUsed = (k, keys) => { const id = mulId(k); if (!id) return false; for (const u of keys) if (mulId(u) === id) return true; return false; };
 export const turnedKeyOf = (q) => (q && q.cell && q.cell.template === 'arrays-turn' && q.cell.payload ? `${Number(q.cell.payload.cols)}x${Number(q.cell.payload.rows)}` : null);
 
 /**
@@ -346,6 +352,9 @@ export function factKeyOf(q) {
     // pictured arrays stop at 5 x 5 (RP-21): one key per turned pair would leave a pack ten arrays, and it
     // needs about fourteen. The turned pair is kept off ONE page instead (turnedKeyOf, refAccepts).
     if (q.cell && q.cell.template === 'arrays-turn' && q.cell.payload) return `${Number(q.cell.payload.rows)}x${Number(q.cell.payload.cols)}`;
+    // (an `arrays` picture - lesson 3a r2, the Prerequisite Check: its rows x cols too, so a P0 array and a lesson array
+    // are one fact - D6; no other lesson deals arrays_groups)
+    if (q.cell && q.cell.template === 'arrays' && q.cell.payload && Number(q.cell.payload.rows) > 0 && Number(q.cell.payload.cols) > 0) return `${Number(q.cell.payload.rows)}x${Number(q.cell.payload.cols)}`;
     const op = composeOpOf(q);
     const ops = op ? composeOperandsOf(q) : [];
     if (op && ops.length >= 2) return ops.join(composeGlyphOf(op) || op);
@@ -388,9 +397,11 @@ function lr6Ok(q, key, seen, pg = '', row = '', words = true) {
     if (x.op === '+' && seen.has(`lr6f${pg}${row}:${key}:${x.a}`)) return false;
     if (x.op === '−' && seen.has(`lr6s${pg}:${x.b}`)) return false;
     if (x.op) for (let da = -2; da <= 2; da++) for (let db = -2; db <= 2; db++) if (nearPair(x.op, da, db) && seen.has(`lr6p${pg}:${x.op}:${x.a + da}:${x.b + db}`)) return false;
-    // (a story's name and unit word: kept apart while the deal can - `words` false on a ref's last strict pass)
-    if (words && x.name && seen.has(`lr6n${pg}:${x.name}`)) return false;
-    if (words && x.unit && seen.has(`lr6u${pg}:${x.unit}`)) return false;
+    // (a story's name and unit word: kept apart while the deal can - `words` false on a ref's last strict pass;
+    // 'names' keeps every person of the story apart and drops only the unit word - lesson 2 r5, critic r3 m3: Mia twice)
+    // (EVERY person of the story, not only the first: "Leo has 3. Mia has 9." after "Mia has 7." - critic r3 m3)
+    if ((words === 'names' || words === true) && x.names.some((nm) => seen.has(`lr6n${pg}:${nm}`))) return false;
+    if (words === true && x.unit && seen.has(`lr6u${pg}:${x.unit}`)) return false;
     return true;
 }
 function lr6Record(q, key, seen, pg = '', row = '') {
@@ -517,7 +528,8 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // case-dealing generator can give every seed one sum at an index, and LR-6 then rejects them
         // all - lesson 2 r4, critic r2 D2: the relaxed last try printed a repeat and a twin answer)
         // (an `lr6` ref then drops only the story-words rule before it relaxes the soft floors)
-        const wordsOff = () => (sk.lr6 ? pass(true, false, true, false) || pass(true, false, true, 'none') : null);
+        // (an `lr6` story ref first drops the unit word only, keeping the story's people apart - lesson 2 r5)
+        const wordsOff = () => (sk.lr6 ? (sk.lr6Names ? pass(true, false, true, 'names') : null) || pass(true, false, true, false) || pass(true, false, true, 'none') : null);
         q = hard ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, false, false))
             : sk.avoidKeys ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, true, true)) : pass(false, true, true);
         if (!q) return;
@@ -532,7 +544,8 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // (`sectionLabel` on the ref: the Mixed page names the item's band by it - the detailed lesson maker)
         if (sk.sectionLabel) q = Object.assign({}, q, { sectionLabel: String(sk.sectionLabel) });
         seen.add(signature(q));
-        if (lr6Run && sk.lr6 && lr6Of(q).op && !refAccepts(sk, q, key, seen, kept, pg, rowK, false)) relaxedAt.push(j);
+        // (an `lr6Names` ref counts a story person twice on the page as relaxed too, so the next seed is tried)
+        if (lr6Run && sk.lr6 && lr6Of(q).op && !refAccepts(sk, q, key, seen, kept, pg, rowK, sk.lr6Names ? 'names' : false)) relaxedAt.push(j);
         refRecord(sk, q, key, seen, kept, pg, rowK);
         kept.set(key, itemIndex + 1);
         placed[j] = { q, skill: sk };
@@ -2980,7 +2993,12 @@ function dealOne(ref, seed, used, want, avoidAns = null, near = null, names = nu
 }
 function dealOne1(ref, seed, used, want, avoidAns, near, names, fresh) {
     const ok = dlWant(want);
-    for (let k = 0; k < 600; k++) {
+    // (why each candidate was turned away: named in the error when none is left)
+    const why = { want: 0, used: 0, fresh: 0, ans: 0, hard: 0, near: 0, names: 0 };
+    // (`dealTries`, lesson 2 r5: a rare case - a put-together story, big part first, a whole of 14 or more - is about
+    // one try in a hundred; the first 600 seeds are the same as before, so a ref without it deals as before)
+    const T = Math.max(600, Math.min(6000, Number(ref.dealTries) || 0));
+    for (let k = 0; k < T; k++) {
         let q = null;
         // (`itemSpread`, lesson 2 r5: a story's name and noun follow the item index, so it runs through all of them, not six)
         try { q = generateQuestionFor(Object.assign({ category: ref.categoryId, skill: ref.skillId, opts: ref.opts, seed: (seed + 7919 * k) >>> 0, itemIndex: ref.itemSpread ? k : k % 6 }, ref.range ? { range: ref.range } : {})); } catch (e) { q = null; }
@@ -2989,30 +3007,33 @@ function dealOne1(ref, seed, used, want, avoidAns, near, names, fresh) {
         if (ref.instructionKey && q) q = Object.assign({}, q, { instructionKey: ref.instructionKey });
         if (ref.shortQuestion) q = shortStoryQ(q);
         const key = factKeyOf(q), v = itemNumberOf(q);
-        if (key === null || used.has(key) || (ok && !ok({ q }))) continue;
+        if (key === null || (ok && !ok({ q }))) { why.want++; continue; }
+        if (used.has(key)) { why.used++; continue; }
         // (a + fact turned round is the same fact across the pack - E24's unordered identity)
-        if (plusTurn(key) && used.has(plusTurn(key))) continue;
-        if (fresh && plusTurn(key) && fresh.has(plusTurn(key))) continue;
+        if (plusTurn(key) && used.has(plusTurn(key))) { why.used++; continue; }
+        if (fresh && plusTurn(key) && fresh.has(plusTurn(key))) { why.fresh++; continue; }
         // (an array's turned pair is the same two pictures: not dealt again unless the ref allows it - the Check
         // Question on the board may turn a Guided array, lesson 3a `turnedOk`)
         if (!ref.turnedOk && turnedKeyOf(q) !== null && used.has(turnedKeyOf(q))) continue;
-        if (avoidAns && avoidAns.has(dlAns(q))) continue;
-        if (!refHardOk(ref, q)) continue;
+        // (a x fact's unordered pair, any glyph: the Prerequisite Check's 2 × 8 is the array 8 x 2 - lesson 3a r2, D6)
+        if (!ref.turnedOk && mulUsed(key, used)) continue;
+        if (avoidAns && avoidAns.has(dlAns(q))) { why.ans++; continue; }
+        if (!refHardOk(ref, q)) { why.hard++; continue; }
         // (`near`: the page's one-number items by skill - LR-6 no near twins, critic r3 N1)
         const nv = near ? nearKeyOf(q) : null;
-        if (nv !== null && [-2, -1, 1, 2].some((dv) => near.has(`${ref.skillId}:${nv + dv}`))) continue;
+        if (nv !== null && [-2, -1, 1, 2].some((dv) => near.has(`${ref.skillId}:${nv + dv}`))) { why.near++; continue; }
         // (`near` is the page's LR-6 set: + / − items and stories too - lesson 2 r4, critic r2 D2;
         // `names`: story names already used by the pack's other dealt stories - critic r2 n6)
-        if (near && !lr6Ok(q, ref.skillId, near)) continue;
+        if (near && !lr6Ok(q, ref.skillId, near)) { why.near++; continue; }
         const nms = names ? lr6Of(q).names : [];
-        if (nms.some((x) => names.has(x))) continue;
+        if (nms.some((x) => names.has(x))) { why.names++; continue; }
         if (nv !== null) near.add(`${ref.skillId}:${nv}`);
         if (near) lr6Record(q, ref.skillId, near);
         for (const x of nms) names.add(x);
         used.add(key);
         return { q, v, key };
     }
-    throw new Error(`detailed lesson: no ${ref.skillId} item for "${want || 'any'}"`);
+    throw new Error(`detailed lesson: no ${ref.skillId} item for "${want || 'any'}" (turned away: ${Object.entries(why).filter((e) => e[1]).map((e) => e.join(' ')).join(', ')}) USED[${[...used].join(' ')}]`);
 }
 
 /**
@@ -3251,7 +3272,8 @@ async function buildDetailedLesson(req = {}) {
     const wpD = dealOne(bo(d.wordProblem.ref), (seed + 307) >>> 0, used, d.wordProblem.want, null, null, storyNames, lessonKeys);
     lessonKeys.add(wpD.key);
     const exitD = d.exit.map((e, i) => { const x = dealOne(bo(e.ref), (seed + 401 + 97 * i) >>> 0, used, e.want, exAns, exNear, storyNames, lessonKeys); exAns.add(dlAns(x.q)); return x; });
-    const retD = (d.retrieval || []).map((r, i) => dealOne(bo(r.ref), (seed + 503 + 89 * i) >>> 0, used));
+    // (`want` on a retrieval row - lesson 3a r2: no x 0 or x 1 fact, lesson 3b's content; absent = any, as before)
+    const retD = (d.retrieval || []).map((r, i) => dealOne(bo(r.ref), (seed + 503 + 89 * i) >>> 0, used, r.want));
     // (`checkQuestion.ref`, lesson 3a: the Check Question's own form of the skill; absent = the lesson skill)
     const cqD = dealOne(bo((d.checkQuestion || {}).ref || d.skill), (seed + 601) >>> 0, used, (d.checkQuestion || {}).want || '', null, null, storyNames);
     // The exit slip's Say line reads a FRESH item of the slip's kind, never one of its four (V22 §9.7).
@@ -3269,9 +3291,13 @@ async function buildDetailedLesson(req = {}) {
     // The equation frame: the lesson's own parts (`vars` hook `eqParts`), else the item's operands.
     const eqParts = Array.isArray(wpV.eqParts) && wpV.eqParts.length ? wpV.eqParts : [wpV.a, wpV.b].filter((x) => x !== undefined);
     const eqOp = wpV.eqOp || wpV.op || '+';
-    wpV.eq = `${eqParts.join(` ${eqOp} `)} = ${wpV.ans}`;
+    // (`eqN` / `eqTurn` from the lesson's vars hook - lesson 3a r2, critic D5: the frame's total is the product while
+    // the story asks a factor, and a second line writes the turned fact)
+    const eqN = wpV.eqN !== undefined ? wpV.eqN : wpV.ans;
+    const eqTurn = !!(wpV.eqTurn && d.wordProblem.eqTurn);
+    wpV.eq = `${eqParts.join(` ${eqOp} `)} = ${eqN}` + (eqTurn ? ` · ${eqParts.slice().reverse().join(` ${eqOp} `)} = ${eqN}` : '');
     const wpPlan = wordProblemPlan({
-        lines, answerLine: fillPlaceholders(d.wordProblem.answerLine, { wp: wpV }), wordsLine: d.wordProblem.wordsLine ? fillPlaceholders(d.wordProblem.wordsLine, { wp: wpV }) : '', words: wpV.words, say: fillPlaceholders(d.wordProblem.say, { wp: wpV }), n: wpV.ans, parts: eqParts, op: eqOp, signSlot: !!d.wordProblem.signSlot, item: String(wpD.key),
+        lines, answerLine: fillPlaceholders(d.wordProblem.answerLine, { wp: wpV }), wordsLine: d.wordProblem.wordsLine ? fillPlaceholders(d.wordProblem.wordsLine, { wp: wpV }) : '', words: wpV.words, say: fillPlaceholders(d.wordProblem.say, { wp: wpV }), n: wpV.ans, eqN, eqTurn, parts: eqParts, op: eqOp, signSlot: !!d.wordProblem.signSlot, item: String(wpD.key),
         instruction: d.wordProblem.instruction || INSTRUCTION_LIBRARY['story-rcdws'] || INSTRUCTION_LIBRARY.story,
     }, frameP('Word problem', 1));
     const p5 = renderPlan(wpPlan, { key: true });
@@ -3456,7 +3482,7 @@ async function buildDetailedLesson(req = {}) {
             pNo++;
             const its = cs.filter((c) => c.page === pg);
             const last = Math.max(...its.map((c) => c.row));
-            glance.push({ page: `P4-${pNo} Practice, rows 1–${last}`, answers: its.filter((c) => c.row < last).map((c) => dlAns(c.q)).join(' · '), fade: '★★' });
+            glance.push({ page: `P4-${pNo} Practice, ${last === 1 ? 'row 1' : `rows 1–${last}`}`, answers: its.filter((c) => c.row < last).map((c) => dlAns(c.q)).join(' · '), fade: '★★' });
             glance.push({ page: `P4-${pNo} Practice, last row`, answers: its.filter((c) => c.row === last).map((c) => dlAns(c.q)).join(' · '), fade: '★★★' });
         }
     }
@@ -3541,16 +3567,29 @@ async function buildDetailedLesson(req = {}) {
     // The pool rule (V22 §9.5, data): the description's `pool` - {kind: 'range', lo, hi} (every number,
     // listed) or a list - else the list of every place (a pack whose rule is its own deal).
     const pd = d.pool || {};
+    // (`plus` - lesson 2 r5, critic r3 m7: the lesson skill's + facts by their RULE {skill, partMin, noPart, crossTen,
+    // sums, maxSum}: every ordered pair a + b with both parts at least partMin and not in noPart, crossing ten with
+    // both parts 9 or less or a whole in `sums`, the whole at most maxSum; every other skill's places by list)
+    const plusRule = pd.kind === 'plus' ? (() => { const out = [];
+        for (let a = Number(pd.partMin) || 0; a <= (Number(pd.maxSum) || 20); a++) for (let b = Number(pd.partMin) || 0; a + b <= (Number(pd.maxSum) || 20); b++) {
+            if ((pd.noPart || []).map(Number).some((x) => x === a || x === b)) continue;
+            if (pd.crossTen && !(a <= 9 && b <= 9 && a + b >= 11) && !(pd.sums || []).map(Number).includes(a + b)) continue;
+            out.push(`${a}+${b}`);
+        } return out; })() : null;
+    const plusOthers = plusRule ? [...new Set(places.filter((x) => x.rep !== pd.skill && x.rep !== 'story').map((x) => x.item))].filter((k) => !plusRule.includes(k)) : null;
     const poolKeys = pd.kind === 'range' ? Array.from({ length: pd.hi - pd.lo + 1 }, (_, i) => String(pd.lo + i))
-        : pd.kind === 'list' ? pd.items.map(String) : [...new Set(places.map((x) => x.item))];
+        : pd.kind === 'list' ? pd.items.map(String) : plusRule ? plusRule.concat(plusOthers) : [...new Set(places.map((x) => x.item))];
     const edgeTest = LESSON_CASE_TESTS[d.edgeTest || ''];
     // `situations` (lesson 2: put together, add to): each a CASE_TESTS name; a story's situation is the first that passes.
     const sits = Array.isArray(d.situations) ? d.situations.filter((x) => x && LESSON_CASE_TESTS[x.test]) : [];
     const sitOf = (q) => { const x = sits.find((t) => LESSON_CASE_TESTS[t.test]({ q })); return x ? x.id : ''; };
     // (`forbidden`: the turn-arounds of the chart's + examples - pool members no page may deal, V22 LR-5; lesson 2 r5)
-    const chartTurns = [...new Set(places.filter((x) => /^P2/.test(x.page)).map((x) => plusTurn(x.item)).filter(Boolean))].filter((k) => !poolKeys.includes(k));
+    // (every chart turn-around is forbidden; one the pool rule does not already hold is added to the pool)
+    const chartTurnsAll = [...new Set(places.filter((x) => /^P2/.test(x.page)).map((x) => plusTurn(x.item)).filter(Boolean))];
+    const chartTurns = chartTurnsAll.filter((k) => !poolKeys.includes(k));
     const pool = {
-        op: 'list', decl: { kind: 'list', items: poolKeys.concat(chartTurns) }, pool: poolKeys.concat(chartTurns), forbidden: chartTurns,
+        op: 'list', decl: plusRule ? { kind: 'plus', skill: pd.skill, partMin: pd.partMin, noPart: pd.noPart || [], crossTen: !!pd.crossTen, sums: pd.sums || [], maxSum: pd.maxSum, items: plusOthers.concat(chartTurns) } : { kind: 'list', items: poolKeys.concat(chartTurns) },
+        pool: poolKeys.concat(chartTurns), forbidden: chartTurnsAll,
         // (board-only numbers and their names: the self-check's E30 finds none on a pupil page or key)
         boardOnly: boardOnly.map((v) => ({ n: v, words: v >= 0 && v <= 1000 ? numberWords(v) : '' })),
         edge: [...new Set(places.filter((x) => edgeTest && edgeTest({ q: x.q })).map((x) => x.item))],

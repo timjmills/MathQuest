@@ -9,7 +9,7 @@
 // Every number a script speaks is a {placeholder} filled from the DEALT items, never typed here.
 
 const NS = (categoryId, skillId, opts, extra) => Object.assign({ categoryId, skillId, opts }, extra || {});
-const WP = (extra, payload) => Object.assign({ categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'bar', wpCues: false, wpBank: false }, partMin: 3, noPart: [10], crossTen: true, crossTenExcept: [20], cellPayload: Object.assign({ layout: 'bar' }, payload || {}), instructionKey: 'story-bar', shortQuestion: true, fresh: true, itemSpread: true }, extra || {});
+const WP = (extra, payload) => Object.assign({ categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'bar', wpCues: false, wpBank: false }, partMin: 3, noPart: [10], crossTen: true, crossTenExcept: [20], cellPayload: Object.assign({ layout: 'bar' }, payload || {}), instructionKey: 'story-bar', shortQuestion: true, fresh: true, itemSpread: true, dealTries: 4000, lr6Names: true }, extra || {});
 // (`fresh` / `itemSpread` - the items dealt one by one (exit slip, Check Question): first a story whose turn-around no
 // page dealt (V22: a turn-around only when the pool is spent), and every name and noun the generator has - critic r3 D3, m3)
 // (`shortQuestion`: the question in its short form - "How many books now?", "How many books in all?" -
@@ -39,7 +39,7 @@ export default {
 
     // ------------------------------------------------------------------ the practice skill
     // A join story within 20 (the sum <= 20), the kit part-part-whole bar under it, all labels blank.
-    // (the chart, Guided and Mixed stories all cross ten - no whole of 20 - so the pool holds enough
+    // (the chart, Guided and Practice stories all cross ten - no whole of 20 - so the pool holds enough
     // put-together stories for the chart AND Guided cell 2; the whole of 20 is the Practice page's ★★★ case)
     skill: WP({ minNum: 11, maxNum: 18, crossTenExcept: [], sectionLabel: 'Stories' }),
     // The last row of every Practice page (★★★): the edge cases - equal parts and a whole of 20
@@ -57,16 +57,17 @@ export default {
         const lines = Array.isArray(p.lines) ? p.lines : [];
         return { unit: p.unit || '', parts: st.a !== undefined ? `${st.a} + ${st.b}` : '', whole, slip: Number.isFinite(Number(whole)) ? Number(whole) - 1 : '', question: lines.length ? lines[lines.length - 1] : '' };
     },
-    checkQuestion: { want: 'wpBridgeBigFirst', correct: 'D' },
+    // The pool by its rule (V22 §9.5 `decl`; critic r3 m7): the stories' + facts - parts 3 or more, never 10, crossing
+    // ten (both parts 9 or less) or a whole of 20 - and every other skill's places by list. E24 recomputes it.
+    pool: { kind: 'plus', skill: 'add_wp_20', partMin: 3, noPart: [10], crossTen: true, sums: [20], maxSum: 20 },
+    // (`wpClean`: no part is the difference of the parts, so option C's wrong-sign top is no story number - critic r3 D3)
+    checkQuestion: { want: ['wpBridgeBigFirst', 'wpClean'], correct: 'D' },
     practicePages: 1,
-    // Mixed: EARLIER skills only (V22 §9.5): number bonds and facts within 20.
-    mixed: { skills: [
-        // (no + 0 and no 1 + 1: both numbers 2 or more)
-        // (within 10: the stories hold the sums past 10, so the facts never take a story's fact - critic r3 D1)
-        { categoryId: 'addition', skillId: 'add_facts', opts: { band: 10 }, sectionLabel: 'Add facts', minOperand: 2 },
-        { categoryId: 'subtraction', skillId: 'sub_facts', opts: { band: 10 }, sectionLabel: 'Take-away facts', minOperand: 2 },
-    // (`leadDrop`: the stories hold at least half the page - a partner's only shelf may go, V22 §9.5, critic r2 D3)
-    ], leadDrop: true },
+    // No Mixed page (V22 §9.5: optional). Lesson 2 r5: a + fact is ONE fact across the pack in either order (LR-5,
+    // lead ruling 2026-10-17), and the crossing-ten stories with parts 3 to 9 are 15 facts. The chart (2), Guided (2),
+    // Practice (4 above its ★★★ row), the word problem (1), the exit slip (2) and the Check Question (1) need 12, the
+    // Prerequisite Check takes 1 or 2: a Mixed page's 4 stories would need 16 to 18 of the 15.
+
 
     lessonData: {
         skills: [],
@@ -75,9 +76,9 @@ export default {
             { id: 'whole', text: 'The whole goes on top. Add the parts.' },
         ],
         vocab: [
-            { word: 'part', meaning: 'one piece of the whole', picture: { kind: 'bar', whole: 14, a: 5, b: 9, mark: 'parts' } },
-            { word: 'whole', meaning: 'all the parts together', picture: { kind: 'bar', whole: 14, a: 5, b: 9, mark: 'whole' } },
-            { word: 'bar', meaning: 'boxes that show the story', picture: { kind: 'bar', whole: 14, a: 5, b: 9 } },
+            { word: 'part', meaning: 'one piece of the whole', picture: { kind: 'bar', whole: 19, a: 9, b: 10, mark: 'parts' } },
+            { word: 'whole', meaning: 'all the parts together', picture: { kind: 'bar', whole: 19, a: 9, b: 10, mark: 'whole' } },
+            { word: 'bar', meaning: 'boxes that show the story', picture: { kind: 'bar', whole: 19, a: 9, b: 10 } },
         ],
         steps: [
             { icon: 'look', text: 'Find the two parts.' },
@@ -134,7 +135,7 @@ export default {
     // ------------------------------------------------------------------ P5 Word problem
     // The same skill with the bar OFF: the pupil draws the bar (the fade).
     wordProblem: {
-        ref: { categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'none', wpCues: false, wpBank: false }, minNum: 11, maxNum: 19, partMin: 3, noPart: [10], crossTen: true, shortQuestion: true, fresh: true, itemSpread: true },
+        ref: { categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'none', wpCues: false, wpBank: false }, minNum: 11, maxNum: 19, partMin: 3, noPart: [10], crossTen: true, shortQuestion: true, fresh: true, itemSpread: true, dealTries: 4000 },
         want: 'wpBridgeSmallFirst',
         // The dealt story itself (its own words and numbers); the bar is OFF - the pupil draws it in the Workspace.
         answerLine: 'The answer: __ {wp.unit}.',
@@ -173,9 +174,9 @@ export default {
     ],
     materials: ['Printed bar mat (boxes 20 mm high), one per pair', 'Linking cubes, 20 per pair', 'Mini whiteboards and pens', 'Anchor chart', 'Pupil packet, one per pupil', 'Exit slips, cut in half'],
     vocabulary: [
-        { word: 'part', gloss: 'one piece of the whole', diagram: { kind: 'bar', whole: 14, a: 5, b: 9, mark: 'parts' } },
-        { word: 'whole', gloss: 'all the parts together', diagram: { kind: 'bar', whole: 14, a: 5, b: 9, mark: 'whole' } },
-        { word: 'bar', gloss: 'boxes that show the story', diagram: { kind: 'bar', whole: 14, a: 5, b: 9 } },
+        { word: 'part', gloss: 'one piece of the whole', diagram: { kind: 'bar', whole: 19, a: 9, b: 10, mark: 'parts' } },
+        { word: 'whole', gloss: 'all the parts together', diagram: { kind: 'bar', whole: 19, a: 9, b: 10, mark: 'whole' } },
+        { word: 'bar', gloss: 'boxes that show the story', diagram: { kind: 'bar', whole: 19, a: 9, b: 10 } },
     ],
 
     // ------------------------------------------------------------------ T2 Atomisation template
@@ -236,13 +237,14 @@ export default {
                 { say: 'Today the numbers live in a story.' },
                 { say: 'I can solve stories with a bar. Say it.' },
             ] },
-        { n: 5, name: 'I Do: the anchor chart', min: 10, page: 'P2', boxes: [{ kind: 'watch', title: 'Whole in a part box', text: 'Model it wrong once, say “Wrong”, fix it. Never print it.' }],
+        // (no watch box here: T1 carries "Whole in a part box" and row 5 models it - T4 then holds Sections 5 and 6 on one page)
+        { n: 5, name: 'I Do: the anchor chart', min: 10, page: 'P2',
             rows: [
                 { do: 'Put the anchor chart up. Read the story two times.' },
-                { say: 'Find the two parts.', note: 'Step 1. Point at each number; lay a cube train for each.' },
+                { say: 'Find the two parts.', note: 'Step 1. Point at each number: a cube train each.' },
                 { say: 'Parts below.', note: 'Step 2: write each part in a lower box.' },
-                { say: 'The whole is missing. Add.', note: 'Step 3. Push the cubes together under the top box. Count on.' },
-                { say: 'Wrong. {chart.whole} is the whole. The whole goes on top.', note: 'First model it wrong: write {chart.whole} in a lower box. Then move it.' },
+                { say: 'The whole is missing. Add.', note: 'Step 3. Push the trains together. Count on.' },
+                { say: 'Wrong. {chart.whole} is the whole. The whole goes on top.', note: 'Model it wrong first: {chart.whole} in a lower box. Move it.' },
                 { ask: '{chart.question}', note: 'Step 4. Expected: [[{chart.whole}]] {chart.unit}.' },
                 { say: 'Now an add-to story. Gets more: a part. Now: the whole.', note: 'Write on the board: {chart2.text} Parts [[{chart2.parts}]]; whole [[{chart2.whole}]].' },
                 // (the chart's third example, on the board: equal parts - the ★★★ row's case, modelled - critic r3 m4)
@@ -269,7 +271,7 @@ export default {
                 { do: 'Pupils do Practice 1. {p4.steps}' },
                 { do: 'Visit ELL and SPED pupils first, within 60 seconds.' },
                 { ask: 'Point to the parts. Point to the whole.', note: 'Praise: “You put the parts below. That is step 2.”' },
-                { do: 'Early finishers: Mixed 1, the stories and the facts. Or send it home.', note: 'Mixed 1 answers: T6.' },
+                { do: 'Early finishers: tell a partner a story for one bar on the page. The partner points to the parts.' },
             ] },
         { n: 9, name: 'Word problem', min: 5, page: 'P5',
             rows: [

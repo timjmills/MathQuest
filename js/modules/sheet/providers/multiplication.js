@@ -243,14 +243,14 @@ const TURN_STRINGS = {
     both: strings({
         iCan: 'I Can turn an array to multiply',
         instructionKey: 'turn-facts',
-        steps: ['Look at the array.', 'Write the fact.', 'Turn the array.', 'Write the new fact.'],
+        steps: ['Look at the array.', 'Write the fact.', 'Turn the array.', 'Write the new fact.', 'Check: same product.'],
         say: '__ times __ equals __ times __.',
         sayValues: (q) => { const t = turnOf(q); return t ? [t.rows, t.cols, t.cols, t.rows] : ''; },
     }),
     known: strings({
         iCan: 'I Can turn an array to multiply',
         instructionKey: 'turn-new',
-        steps: ['Look at the array.', 'Read the fact.', 'Turn the array.', 'Write the new fact.'],
+        steps: ['Look at the array.', 'Read the fact.', 'Turn the array.', 'Write the new fact.', 'Check: same product.'],
         say: '__ times __ equals __ times __.',
         sayValues: (q) => { const t = turnOf(q); return t ? [t.rows, t.cols, t.cols, t.rows] : ''; },
     }),
@@ -303,6 +303,9 @@ registerSkill('multiplication:mult_properties', {
             first,
             step(`Turn the array: ${c} rows of ${r}.`, [{ slot: 'turn', value: 'shown' }]),
             last,
+            // (lesson 3a r2, critic D3: the Critical Atom is a step of its own - it writes nothing, so the chart
+            // prints it as the line under its panels and the Steps list carries it)
+            step(`Check: same product, ${P}. No recount.`),
         ];
     },
     wrongAnswer: (q) => {

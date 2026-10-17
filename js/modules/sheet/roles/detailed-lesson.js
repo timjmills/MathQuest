@@ -313,14 +313,21 @@ export function wordProblemPlan(wp, frame) {
     };
     const parts = wp.parts.filter((v) => v !== null && v !== undefined);
     // (`signSlot`: the pupil writes the sign in a circle - the detailed lesson maker, lesson 2: a printed + gives step 3 away)
-    const eqKey = { slots: Object.fromEntries([...parts.map((v, i) => [`e${i}`, { value: String(v) }]), ['eq', { value: String(wp.n) }], ...(wp.signSlot ? [['op', { value: String(wp.op || '+') }]] : [])]) };
+    // (`eqN`: the frame's total when the story asks something else - lesson 3a r2; `eqTurn`: a second line, the
+    // turned fact, slots f0 f1 eq2 - the story is about the turn, critic D5)
+    const eqN = wp.eqN !== undefined && wp.eqN !== null ? wp.eqN : wp.n;
+    const tparts = wp.eqTurn ? parts.slice().reverse() : [];
+    const eqKey = { slots: Object.fromEntries([...parts.map((v, i) => [`e${i}`, { value: String(v) }]), ['eq', { value: String(eqN) }], ...(wp.signSlot ? [['op', { value: String(wp.op || '+') }]] : []),
+        ...tparts.map((v, i) => [`f${i}`, { value: String(v) }]), ...(wp.eqTurn ? [['eq2', { value: String(eqN) }]] : [])]) };
     const eqItem = {
         nolabel: true, drawsAnswer: true, key: eqKey,
         render: (c) => {
             const k = c.state === 'answered' ? eqKey : null;
             const box = (id, dg) => blank({ id, kind: 'number', shape: 'box', digits: dg, graded: false }, c, k);
             const sign = wp.signSlot ? blank({ id: 'op', kind: 'text', shape: 'circle', graded: false }, c, k) : `<span>${esc(wp.op || '+')}</span>`;
-            return `<div class="dl-eq">${parts.map((v, i) => box(`e${i}`, Math.max(2, String(v).length))).join(sign)}<span>=</span>${box('eq', Math.max(2, String(wp.n).length))}</div>`;
+            const line1 = `<div class="dl-eq">${parts.map((v, i) => box(`e${i}`, Math.max(2, String(v).length))).join(sign)}<span>=</span>${box('eq', Math.max(2, String(eqN).length))}</div>`;
+            if (!wp.eqTurn) return line1;
+            return `<div class="dl-eq2">${line1}<div class="dl-eq">${tparts.map((v, i) => box(`f${i}`, Math.max(2, String(v).length))).join(`<span>${esc(wp.op || '+')}</span>`)}<span>=</span>${box('eq2', Math.max(2, String(eqN).length))}</div></div>`;
         },
     };
     const panelItem = { nolabel: true, q: { cell: { template: 'rcdws', payload: {} }, text: '' }, drawsAnswer: true, key: { slots: {} } };
@@ -331,7 +338,7 @@ export function wordProblemPlan(wp, frame) {
             { kind: 'grid', cols: 1, rows: 1, items: [panelItem], cls: 'fixed dl-wppanel', height: '72mm' },
         ] },
         { kind: 'band', label: 'Workspace:', instr: '', grow: true, content: { kind: 'html', html: '<div class="dl-work" data-work data-draw></div>' } },
-        { kind: 'grid', cols: 1, rows: 1, items: [eqItem], cls: 'fixed dl-wpeq', height: '26mm' },
+        { kind: 'grid', cols: 1, rows: 1, items: [eqItem], cls: 'fixed dl-wpeq', height: wp.eqTurn ? '44mm' : '26mm' },
         { kind: 'say', frame: wp.say, digits },
     ];
     return Object.assign({ role: 'word-problem', ctx: { look: 'ican', size: 'L', paper: 'A4', scaffoldLevel: 1 }, cls: 'dl-page dl-pupil', pages: [{ sections }] }, frame);
@@ -412,6 +419,7 @@ export const DETAILED_PUPIL_CSS = `
 .ws-page .dl-eq .ws-input--circle{align-self:center;display:inline-flex;align-items:center;justify-content:center;line-height:1}
 .ws-page .dl-wpeq .ws-cell{justify-content:center;align-items:center}
 .ws-page .dl-eq{display:flex;align-items:center;gap:5mm;font-size:28pt}
+.ws-page .dl-eq2{display:flex;flex-direction:column;align-items:center;gap:4mm}
 .ws-page .dl-eq .ws-box{min-width:24mm}
 .ws-page .dl-eq .ws-box{height:14mm;display:inline-flex;align-items:center;justify-content:center;font-size:28pt;font-weight:400}
 .ws-page.dl-land .ws-body>.mq-row{flex:1 1 auto}

@@ -10,6 +10,7 @@
 //                  array's fact is three boxes "[ ] × [ ] = [ ]": its rows, its row length, its product.
 //   type 'missing' no pictures (abstract, ★★★): the known fact "r × c = P" and its turn with one box,
 //                  `ask` 'product' ("c × r = [ ]") or 'factor' ("c × [ ] = P").
+//   draw 'none'    (on 'known') no pictures: the known fact and the three boxes of its turn.
 // Nothing names the property (RP-1: a heading naming the rule tells the pupil what to do), and no
 // product sits beside the question that asks for it, except the known fact of 'known' / 'missing',
 // which is the fact the pupil is meant to use.
@@ -96,7 +97,8 @@ function facts(p) {
 function geometry(g, p) {
     const [f1, f2] = facts(p);
     const fw = Math.max(factWidth(g, f1), factWidth(g, f2));
-    if (p.type === 'missing') return { wMm: fw, pictures: false };
+    // (`draw` 'none' on a 'known' item - lesson 3a exit a: the known fact and three boxes, no array to recount)
+    if (p.type === 'missing' || p.draw === 'none') return { wMm: fw, pictures: false };
     // The two arrays side by side, the two facts under them, one line each (the array first,
     // then its turn): two facts side by side are wider than a 2-column cell at M and L.
     const a = dotsSvg(g, N(p.rows), N(p.cols), 'solid', ''), b = dotsSvg(g, N(p.cols), N(p.rows), 'solid', '');
@@ -125,7 +127,9 @@ export function turnRender(p, ctx) {
         const B = dotsSvg(g, N(p.cols), N(p.rows), inkB, `${p.cols} rows of ${p.rows} dots`);
         const showF2 = !sv || sv.turn;
         inner = `<div style="display:flex;justify-content:center;align-items:flex-end;gap:${g.em(GAP)}">${A.svg}${B.svg}</div>`
-            + `<div style="margin-top:${g.em(3)};display:flex;flex-direction:column;align-items:center;gap:${g.em(2)}">`
+            // (a known fact's printed line is a text line, not a box: 1 mm closer, so the lesson sheet's two
+            // stacked Guided cells - lesson 3a r2 - keep the page)
+            + `<div style="margin-top:${g.em(p.type === 'known' ? 1.5 : 3)};display:flex;flex-direction:column;align-items:center;gap:${g.em(2)}">`
             + `<div>${factLine(g, f1, at)}</div><div style="visibility:${showF2 ? 'visible' : 'hidden'}">${factLine(g, f2, at)}</div></div>`;
     }
     return root(g, 'arrays-turn', inner, 'text-align:center;width:100%;', turnFootprint(p, ctx).wMm);
@@ -169,6 +173,6 @@ register('arrays-turn', {
     answerKey: turnAnswerKey,
     footprint: turnFootprint,
     inputs: turnInputs,
-    layout(p) { return { card: 'card-medium-visual', checker: (p && p.type === 'missing') ? 'value' : 'list', requiresVisual: !(p && p.type === 'missing') }; },
+    layout(p) { return { card: 'card-medium-visual', checker: (p && p.type === 'missing') ? 'value' : 'list', requiresVisual: !(p && (p.type === 'missing' || p.draw === 'none')) }; },
     stepState: turnStepState,
 });
