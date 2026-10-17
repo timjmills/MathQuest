@@ -2,10 +2,10 @@
 // order given, and check that every step of every file comes out as that file says: each direct skill tagged FULL, each
 // partial skill tagged PARTIAL with the file's clause (the structured `partial` field), nothing else tagged to its steps,
 // and no two files touching the same skill+step. In wrm.js a string or {step, note} is FULL; {step, partial} is PARTIAL.
-// usage: node tests/scripts/wrm-tagging/mergecheck.mjs [Y6.json] [R.json Y1.json Y4.json ...]   (the first file must give
+// usage: node tests/scripts/wrm-tagging/Y6/mergecheck.mjs [Y6.json] [R.json Y1.json Y4.json ...]   (the first file must give
 // every partial clause in the structured `partial` field; the others may keep it in `why`, as R and Y1 do)
 globalThis.window = globalThis;
-const R = new URL('../../../', import.meta.url).pathname;
+const R = new URL('../../../../', import.meta.url).pathname;
 const { SKILL_WRM } = await import(R + 'js/modules/wrm.js');
 const fs = await import('fs');
 const files = process.argv.slice(2).length ? process.argv.slice(2) : [R + 'data/curriculum/links/Y6.json'];

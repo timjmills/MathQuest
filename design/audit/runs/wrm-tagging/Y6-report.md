@@ -72,7 +72,7 @@ beyond the 23 rows the critic named, all fixed in `spec_r2_b_sweep.py`. The kind
 
 ## Fix round r1 (after the lead's local critic r1, FAIL 7.02 against BRIEF rules 1-19) — 2026-10-16
 
-`data/curriculum/links/Y6.json` is now **GENERATED**: `python3 tests/scripts/wrm-tagging/build.py` builds it from
+`data/curriculum/links/Y6.json` is now **GENERATED**: `python3 tests/scripts/wrm-tagging/Y6/build.py` builds it from
 `spec_base.json` (the helper's round-3 tagging, frozen) plus the fix rounds `spec_r0_helpers.py`, `spec_r1_*.py`, with the
 live `wrm.js`, `data.js`, `build-list.js`, the xlsx sheet "Grade 5" and the passed lane files R.json, Y1.json, Y4.json
 (`WRM_LINKS_OTHER`, default `/home/user/ref/...`). It derives the citations, the tagFixes, the proposals and the envisioned

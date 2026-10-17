@@ -11,11 +11,11 @@ Inputs (all in the repo except the generated scratch data):
 Derived here: pre citations as step ids, rule checks, tagFixes against the live SKILL_WRM (with a structured `partial`
 clause), proposals, the envisioned skill of every partial or gap step. The build runs mergecheck.mjs (Y6 alone, then with
 R, Y1, Y4), optcheck.mjs and linkfit.mjs, checks the notes against the data (class N), and fails on any problem.
-usage: python3 tests/scripts/wrm-tagging/build.py
+usage: python3 tests/scripts/wrm-tagging/Y6/build.py
 """
 import json, re, sys, os, glob, subprocess, copy
 H = os.path.dirname(os.path.abspath(__file__))
-R = os.path.abspath(os.path.join(H, '..', '..', '..')) + '/'
+R = os.path.abspath(os.path.join(H, '..', '..', '..', '..')) + '/'
 import tempfile
 DATA = os.environ.get('WRM_TAG_DATA') or tempfile.mkdtemp(prefix='wrm-tag-y6-')   # scratch only (keys.json, prior.json)
 # The passed lanes' files are pinned inputs in the branch (merged from origin/claude/sweet-newton-c8wrv1); nothing outside the repo.

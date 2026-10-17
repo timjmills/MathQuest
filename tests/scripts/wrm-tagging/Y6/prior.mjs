@@ -2,7 +2,7 @@
 // list mapped to WRM step ids. usage: node prior.mjs <out prior.json>
 import fs from 'fs';
 import { execFileSync } from 'child_process';
-const R=new URL('../../../',import.meta.url).pathname;
+const R=new URL('../../../../',import.meta.url).pathname;
 const d=JSON.parse(fs.readFileSync(R+'data/curriculum/wrm-steps.json','utf8'));
 const rows=JSON.parse(execFileSync('python3',['-I','-c',`
 import openpyxl,json,sys
