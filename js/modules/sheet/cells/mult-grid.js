@@ -160,7 +160,7 @@ register('mult-grid', {
         let shN = 0;
         // (on the key a shaded box is the answer: its number carries the key mark, so the key reads its answers)
         const productTd = (v, extra) => (shadeSlot
-            ? `<td style="${base}border:${B(ctx, 0.75)} solid ${INK};${extra || ''}"><span data-ws-slot="sh${shN++}" data-ws-shape="shade"${shadeOn && Number(v) % Number(p.shade) === 0 ? ' data-ws-key-ans' : ''} style="${fill}">${esc(v)}</span></td>`
+            ? `<td style="${base}border:${B(ctx, 0.75)} solid ${INK};${extra || ''}"><span data-ws-slot="sh${shN++}" data-ws-shape="shade"${shadeOn && Number(v) % Number(p.shade) === 0 ? ' data-ws-key-ans' : ''} style="display:inline-block;">${esc(v)}</span></td>`
             : printed(v, extra, false));
         const HEAVY = B(ctx, 1.5);
         let html = `<tr>${printed('×', `border-right:${HEAVY} solid ${INK};border-bottom:${HEAVY} solid ${INK};`, true)}`;

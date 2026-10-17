@@ -300,6 +300,14 @@ export const measureShell = (block) => `<div class="ws-band dl-band"><div class=
  * @param {{lines: string[], answerLine: string, say: string, n: number, parts: number[], item: string}} wp
  * @param {Object} frame   {header, footer, seed, form}
  */
+/** A story's array as a box: its rows named down the left, its row length along the top (no dots, RP-21). */
+function schematicSvg({ rows, cols }) {
+    return `<svg class="dl-schem" viewBox="0 0 92 54" style="width:92mm;height:54mm;display:block;margin:6mm 0 0 6mm" role="img" aria-label="${esc(`${rows} rows of ${cols}`)}">`
+        + `<rect x="30" y="12" width="56" height="38" fill="none" stroke="#000" stroke-width="0.6"/>`
+        + `<text x="58" y="8" text-anchor="middle" font-size="5.2" font-family="Andika">${esc(`${cols} in each row`)}</text>`
+        + `<text x="26" y="33" text-anchor="end" font-size="5.2" font-family="Andika">${esc(`${rows} rows`)}</text></svg>`;
+}
+
 export function wordProblemPlan(wp, frame) {
     const digits = String(wp.n).length;
     const ans = { slots: Object.assign({ answer: { value: String(wp.n) } }, wp.wordsLine ? { 'answer-words': { value: wp.words } } : {}), display: String(wp.n) };
@@ -337,7 +345,9 @@ export function wordProblemPlan(wp, frame) {
             { kind: 'grid', cols: 1, rows: 1, items: [storyItem], cls: 'fixed dl-wpstory', height: '72mm' },
             { kind: 'grid', cols: 1, rows: 1, items: [panelItem], cls: 'fixed dl-wppanel', height: '72mm' },
         ] },
-        { kind: 'band', label: 'Workspace:', instr: '', grow: true, content: { kind: 'html', html: '<div class="dl-work" data-work data-draw></div>' } },
+        // (`schematic` {rows, cols} - lesson 3a r4, critic r2 m4: a story array past 5 in a row is drawn as a box with its
+        // two sides named, not as counters - RP-21; the pupil draws the turned box beside it)
+        { kind: 'band', label: 'Workspace:', instr: '', grow: true, content: { kind: 'html', html: `<div class="dl-work" data-work data-draw>${wp.schematic ? schematicSvg(wp.schematic) : ''}</div>` } },
         { kind: 'grid', cols: 1, rows: 1, items: [eqItem], cls: 'fixed dl-wpeq', height: wp.eqTurn ? '44mm' : '26mm' },
         { kind: 'say', frame: wp.say, digits },
     ];

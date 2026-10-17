@@ -380,7 +380,11 @@ export function factKeyOf(q) {
     if (q.cell && q.cell.template === 'arrays' && q.cell.payload && Number(q.cell.payload.rows) > 0 && Number(q.cell.payload.cols) > 0) return `${Number(q.cell.payload.rows)}x${Number(q.cell.payload.cols)}`;
     // (a mult-grid window - lesson 4: its rows and columns and its task, so one window is one item of the pool)
     if (q.cell && q.cell.template === 'mult-grid' && q.cell.payload && Array.isArray(q.cell.payload.rows) && Array.isArray(q.cell.payload.cols)
-        && q.cell.payload.rows.length < 10) { const p = q.cell.payload; return `grid${p.rows[0]}-${p.rows[p.rows.length - 1]}x${p.cols[0]}-${p.cols[p.cols.length - 1]}${q.chartTask ? ':' + q.chartTask : ''}`; }
+        && q.cell.payload.rows.length < 10) { const p = q.cell.payload;
+        // (turned round - rows for columns - it is the same window of products: one key, the smaller side first)
+        const a = `${p.rows[0]}-${p.rows[p.rows.length - 1]}`, b = `${p.cols[0]}-${p.cols[p.cols.length - 1]}`;
+        const [x, y] = p.rows[0] < p.cols[0] || (p.rows[0] === p.cols[0] && p.rows.length <= p.cols.length) ? [a, b] : [b, a];
+        return `grid${x}x${y}${q.chartTask ? ':' + q.chartTask : ''}`; }
     const op = composeOpOf(q);
     const ops = op ? composeOperandsOf(q) : [];
     if (op && ops.length >= 2) return ops.join(composeGlyphOf(op) || op);
@@ -420,6 +424,9 @@ export function lr6Of(q) {
 }
 function lr6Ok(q, key, seen, pg = '', row = '', words = true) {
     const x = lr6Of(q);
+    // (× - lead ruling 2026-10-17, lesson 3a r4: no first factor twice in one grid row; only x keys, so + / − packs deal as before)
+    const mx = String(factKeyOf(q) || '').match(/^(\d+)[x×](\d+)$/);
+    if (mx && row && seen.has(`lr6x${pg}${row}:${key}:${mx[1]}`)) return false;
     if (x.op === '+' && seen.has(`lr6f${pg}${row}:${key}:${x.a}`)) return false;
     if (x.op === '−' && seen.has(`lr6s${pg}:${x.b}`)) return false;
     if (x.op) for (let da = -2; da <= 2; da++) for (let db = -2; db <= 2; db++) if (nearPair(x.op, da, db) && seen.has(`lr6p${pg}:${x.op}:${x.a + da}:${x.b + db}`)) return false;
@@ -432,6 +439,8 @@ function lr6Ok(q, key, seen, pg = '', row = '', words = true) {
 }
 function lr6Record(q, key, seen, pg = '', row = '') {
     const x = lr6Of(q);
+    const mx = String(factKeyOf(q) || '').match(/^(\d+)[x×](\d+)$/);
+    if (mx && row) seen.add(`lr6x${pg}${row}:${key}:${mx[1]}`);
     if (x.op === '+') seen.add(`lr6f${pg}${row}:${key}:${x.a}`);
     if (x.op === '−') seen.add(`lr6s${pg}:${x.b}`);
     if (x.op) seen.add(`lr6p${pg}:${x.op}:${x.a}:${x.b}`);
@@ -3016,6 +3025,7 @@ function dealOne(ref, seed, used, want, avoidAns = null, near = null, names = nu
     // (`fresh` - lesson 2 r5, critic r3 D3: first an item that is not a lesson page's item turned round (`lessonKeys`:
     // the chart, lesson sheet, Practice and word-problem facts), then any - V22: a turn-around when the pool is spent)
     if (ref.fresh && lessonKeys) { try { return dealOne1(ref, seed, used, want, avoidAns, near, names, lessonKeys); } catch (e) { /* the pool is spent */ } }
+    if (ref.pageGroup && !ref.gridFresh) { try { return dealOne1(Object.assign({}, ref, { gridFresh: true }), seed, used, want, avoidAns, near, names, null); } catch (e) { /* none left: the same shape only */ } }
     return dealOne1(ref, seed, used, want, avoidAns, near, names, null);
 }
 const DL_GROUPS = new WeakMap();
@@ -3045,7 +3055,8 @@ function dealOne1(ref, seed, used, want, avoidAns, near, names, fresh) {
         if (!ref.turnedOk && turnedKeyOf(q) !== null && used.has(turnedKeyOf(q))) continue;
         // (a x fact's unordered pair, any glyph: the Prerequisite Check's 2 × 8 is the array 8 x 2 - lesson 3a r2, D6)
         if (!ref.turnedOk && mulUsed(key, used)) continue;
-        if (gridNear(key, used, true)) { why.used++; continue; }
+        // (`gridFresh`, an exit window's first try: no window of ANY shape it mostly repeats - it is not inside a Practice one)
+        if (gridNear(key, used, !ref.gridFresh)) { why.used++; continue; }
         // (`pageGroup`, lesson 4: the refs of one page - the exit slip - keep its windows apart, any shape)
         const grp = ref.pageGroup ? (DL_GROUPS.get(used) || DL_GROUPS.set(used, new Map()).get(used)) : null;
         if (grp && gridNear(key, grp.get(ref.pageGroup) || [])) { why.near++; continue; }
@@ -3330,7 +3341,7 @@ async function buildDetailedLesson(req = {}) {
     const eqTurn = !!(wpV.eqTurn && d.wordProblem.eqTurn);
     wpV.eq = `${eqParts.join(` ${eqOp} `)} = ${eqN}` + (eqTurn ? ` · ${eqParts.slice().reverse().join(` ${eqOp} `)} = ${eqN}` : '');
     const wpPlan = wordProblemPlan({
-        lines, answerLine: fillPlaceholders(d.wordProblem.answerLine, { wp: wpV }), wordsLine: d.wordProblem.wordsLine ? fillPlaceholders(d.wordProblem.wordsLine, { wp: wpV }) : '', words: wpV.words, say: fillPlaceholders(d.wordProblem.say, { wp: wpV }), n: wpV.ans, eqN, eqTurn, parts: eqParts, op: eqOp, signSlot: !!d.wordProblem.signSlot, item: String(wpD.key),
+        lines, answerLine: fillPlaceholders(d.wordProblem.answerLine, { wp: wpV }), wordsLine: d.wordProblem.wordsLine ? fillPlaceholders(d.wordProblem.wordsLine, { wp: wpV }) : '', words: wpV.words, say: fillPlaceholders(d.wordProblem.say, { wp: wpV }), n: wpV.ans, eqN, eqTurn, schematic: d.wordProblem.schematic && wpV.rows ? { rows: wpV.rows, cols: wpV.cols } : null, parts: eqParts, op: eqOp, signSlot: !!d.wordProblem.signSlot, item: String(wpD.key),
         instruction: d.wordProblem.instruction || INSTRUCTION_LIBRARY['story-rcdws'] || INSTRUCTION_LIBRARY.story,
     }, frameP('Word problem', 1));
     const p5 = renderPlan(wpPlan, { key: true });
@@ -3521,7 +3532,8 @@ async function buildDetailedLesson(req = {}) {
         }
     }
     if (mixedNo) glance.push({ page: 'P4 Mixed', answers: cellsOf(partPlan('mixed')).map((c) => dlAns(c.q)).join(' · '), fade: '★★' });
-    glance.push({ page: 'P5 Word problem', answers: wpV.eq, fade: DL_FADE.P5 });
+    // (the story's own answer first when the frame totals something else - lesson 3a r4, critic r2 m7)
+    glance.push({ page: 'P5 Word problem', answers: eqN !== wpV.ans ? `${wpV.ans} · ${wpV.eq}` : wpV.eq, fade: DL_FADE.P5 });
     glance.push({ page: 'P6 Exit slip', answers: exVars.map((x, i) => `${'abcd'[i]}. ${x.ans}`).join(' · '), fade: DL_FADE.P6 });
     const prereqAtoms = d.atoms.filter((x) => x.prereq);
     const routing = d.prerequisites.map((p, i) => {
@@ -3627,6 +3639,9 @@ async function buildDetailedLesson(req = {}) {
         // (board-only numbers and their names: the self-check's E30 finds none on a pupil page or key)
         boardOnly: boardOnly.map((v) => ({ n: v, words: v >= 0 && v <= 1000 ? numberWords(v) : '' })),
         edge: [...new Set(places.filter((x) => edgeTest && edgeTest({ q: x.q })).map((x) => x.item))],
+        // (`edgeOnlyLast` on the description - lesson 3a r4, critic r2 m3: the items of THAT case may sit only on the
+        // ★★★ last row of a Practice page; E24b reads this list. Absent on every other pack.)
+        ...(d.edgeOnlyLast && LESSON_CASE_TESTS[d.edgeOnlyLast] ? { edgeOnly: { test: d.edgeOnlyLast, items: [...new Set(places.filter((x) => LESSON_CASE_TESTS[d.edgeOnlyLast]({ q: x.q })).map((x) => x.item))] } } : {}),
         // (each place's answer too: LR-6 'no two answers alike on a page' is checked on every pupil page)
         // (a + / − item's grid too, so E24b reads LR-6's "a row of the grid" on a Mixed page, whose
         // shelves are grids of one row; and, when the description declares its `situations`, each

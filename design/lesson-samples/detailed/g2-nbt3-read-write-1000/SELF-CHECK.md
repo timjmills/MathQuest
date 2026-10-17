@@ -1,6 +1,6 @@
 # V22 self-check: g2-nbt3-read-write-1000
 
-Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to the kit's markup; Chromium print media) on `pack.html`, seed 4242, 2026-10-16. **37 / 37 PASS**.
+Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to the kit's markup; Chromium print media) on `pack.html`, seed 4242, 2026-10-17. **43 / 43 PASS**.
 
 | # | Check | Measured | Result |
 |---|---|---|---|
@@ -21,7 +21,7 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | E12 | Equal cells within each grid (±0.5 mm) and across the Practice pages | all grids equal; Practice cells 17, spread 0.0 × 0.0 mm | PASS |
 | E13 | No underscore characters on pupil pages (slot widths: ws-print-lint --source kit) | underscores 0 | PASS |
 | E14 | No dashed line except the cut line and the missing-digit box | 0 outside a cut line | PASS |
-| E15 | Instructions ≤ 12 words, print verb first, string in the controlled library (V22 Appendix C.1: 130 strings; the kit's PED 10.1 library: 162) | 30 instructions; failing: none; in the kit library but missing from V22 C.1: "Write the number.", "Write how many of each place." | PASS |
+| E15 | Instructions ≤ 12 words, print verb first, string in the controlled library (V22 Appendix C.1: 130 strings; the kit's PED 10.1 library: 169) | 30 instructions; failing: none; in the kit library but missing from V22 C.1: "Write the number.", "Write how many of each place." | PASS |
 | E16 | Every Say frame ≤ 2 blanks | 12 frames; blanks 0, 1 | PASS |
 | E16b | RCDWS panel: one action per box, each row one line (≤ 9 mm) | 12 rows; tallest 9 mm | PASS |
 | E17b | The anchor chart and its key carry no answer marks | P2: 0, P2b: 0, P2-key: 0, P2b-key: 0 | PASS |
@@ -33,8 +33,14 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | E21 | T2: ≥ 5 atoms of the four types; no ★ in the atom tables | 7 atoms: Fact, Conceptual, Conceptual, Category, Conceptual, Comparative, Conceptual; ★ false | PASS |
 | E22 | Every delivery page (T3–T5) shows a pupil-page thumbnail | T3: 1, T4: 2, T5: 1 | PASS |
 | E23 | Every row of T6 "Answers at a glance" carries ★ / ★★ / ★★★ | 4/4 | PASS |
-| E24 | Item pool read from the pack (LR-5): pool recomputed from its rule; 0 repeats of (number, representation); a number never twice on a page; chart examples never return | 70 places (70 numbers), usable pool 979 (pool 979 recomputed from its list rule: matches); repeats 0; chart examples returning 0; outside the pool 0; items without a rep 0 | PASS |
-| E24b | Practice last row only edge cases (★★★); LR-6 no twin answers and no near twins (one skill, numbers within 2) on a page | 2 Practice pages: last rows all edge cases (26 edge numbers dealt); no twin answers and no near twins on any page | PASS |
+| E24 | Item pool read from the pack (LR-5): pool recomputed from its rule; 0 repeats of (number, representation); a number never twice on a page; chart examples and their turn-arounds never return; no turn-around pair on a page | 70 places (70 numbers), usable pool 979 (pool 979 keys, 979 facts, recomputed from its list rule: matches; forbidden 0); repeats 0; chart examples or their turn-arounds returning 0; same-page turn-arounds 0; outside the pool / forbidden 0; items without a rep 0 | PASS |
+| E24b | Practice last row only edge cases (★★★); LR-6 no twin answers and no near twins (one skill, numbers within 2) on a page; + / − items (stories too): no first addend twice in a grid row or three running, no number taken away twice, no near twins (both numbers within 2, place by place: V22 2983); × / ÷ (lead ruling): no first factor / divisor twice in a grid row; a declared edgeOnly case only on the last row | 2 Practice pages: last rows all edge cases (26 edge numbers dealt); no twin answers on any page; near twins checked for one-number and + / − items (0 + / −: no first addend twice in a grid row, no number taken away twice, both numbers within 2); 0 × / ÷ items: no first factor / divisor twice in a grid row | PASS |
+| E31 | Every situation the lesson declares is modelled in I Do (chart or board example), assessed on the exit slip, and nothing unmodelled is practised | no situations declared | PASS |
+| E32 | Stories: one sentence per line (AX-3), at most 4 lines (SF-50) | 2 stories, every sentence on one line, at most 3 lines | PASS |
+| E33 | Mixed page: the lesson's own skills hold at least half the items (V22 §9.5) | P4m-1: 5 of 9 (expand, number_word_form, combine) | PASS |
+| E34 | T2b scores the exit slip by its own item count | T2b /4, P6 4 items a half | PASS |
+| E35 | T4 quotes only story questions the pack prints or writes on the board; a "Steps at the top" line names a page that prints them | no situations declared; Practice 1 Steps band printed | PASS |
+| E36 | Exit slip + items: no part equals the difference of the parts; each fresh (on no other page, nor turned round) | no + exit items | PASS |
 | E30 | No boardOnly number on a pupil page or key (item, answer, digits or name) | 1000: on no pupil page or key (22 pages) | PASS |
 | E29 | Every item letter and answer a teacher page quotes is on the pupil page it names (T3 §1, T5 §10, T6 routing) | 14 quotes, all on their pages | PASS |
 | E28 | No Say:, Rule: or Remember: band on a Practice page | 6 Practice / Mixed pages; extra bands 0 | PASS |
@@ -42,7 +48,7 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | E26 | Every anchor-chart step panel adds a grey (newest) mark | P2 3 / 3 panels; P2b 2 / 2 panels | PASS |
 | E25 | One key per pupil page (anchor chart included) | 11 pupil pages, 11 keys | PASS |
 
-**37 / 37 pass.**
+**43 / 43 pass.**
 
 ## Per page
 
@@ -57,8 +63,8 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | T5 | teacher | 99 | 0 | 11 | 0 | — | #000000 #5b2a86 #c2410c #ffffff |
 | P0 | pupil | 92 | 2 | 11.76 | 9 | 66 | #000000 #ffffff |
 | P1 | pupil | 95 | 3 | 12 | 10 | 50 | #000000 #ffffff |
-| P2 | pupil | 98 | 0 | 15 | 6 | 56 | #000000 #5b2a86 #949494 #ffffff |
-| P2b | pupil | 98 | 0 | 12 | 5 | 59 | #000000 #5b2a86 #949494 #ffffff |
+| P2 | pupil | 98 | 0 | 15 | 6 | 59 | #000000 #5b2a86 #949494 #ffffff |
+| P2b | pupil | 98 | 0 | 12 | 5 | 60 | #000000 #5b2a86 #949494 #ffffff |
 | P3 | pupil | 94 | 4 | 12 | 7 | 55 | #000000 #5b2a86 #949494 #ffffff |
 | P3b | pupil | 92 | 5 | 12 | 8 | 67 | #000000 #5b2a86 #949494 #ffffff |
 | P4-1 | pupil | 97 | 0 | 12 | 9 | 64 | #000000 #5b2a86 #ffffff |
@@ -68,8 +74,8 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | P6 | pupil | 93 | 0 | 12 | 8 | 46 | #000000 #ffffff |
 | P0-key | key | 92 | 2 | 11.76 | 9 | 66 | #000000 #c2410c #ffffff |
 | P1-key | key | 95 | 3 | 12 | 10 | 50 | #000000 #c2410c #ffffff |
-| P2-key | key | 98 | 0 | 15 | 6 | 56 | #000000 #5b2a86 #949494 #ffffff |
-| P2b-key | key | 98 | 0 | 12 | 5 | 59 | #000000 #5b2a86 #949494 #ffffff |
+| P2-key | key | 98 | 0 | 15 | 6 | 59 | #000000 #5b2a86 #949494 #ffffff |
+| P2b-key | key | 98 | 0 | 12 | 5 | 60 | #000000 #5b2a86 #949494 #ffffff |
 | P3-key | key | 94 | 4 | 12 | 7 | 51 | #000000 #5b2a86 #c2410c #ffffff |
 | P3b-key | key | 92 | 5 | 12 | 8 | 67 | #000000 #5b2a86 #c2410c #ffffff |
 | P4-1-key | key | 97 | 0 | 12 | 9 | 64 | #000000 #5b2a86 #c2410c #ffffff |

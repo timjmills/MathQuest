@@ -236,7 +236,8 @@ export const CASE_TESTS = Object.freeze({
     arrKnownG: (it) => { const p = arrTurnOf(it); return !!p && it.q.cell.payload.type === 'known' && p.rows * p.cols === 20; },
     // (Practice 1, critic D1: row 1 two non-squares - one with no 5, and 2 rows of 5 -, the last row the one square,
     // 4 x 4, and 5 rows of 3: the 5s spent where they teach)
-    arrP1: (it) => { const p = arrTurnOf(it); return !!p && ((CASE_TESTS.arrNonSq(it) && p.rows !== 5 && p.cols !== 5) || (p.rows === 2 && p.cols === 5) || (p.rows === 5 && p.cols === 3) || CASE_TESTS.arrBigSquare(it)); },
+    // (r4, critic r2 m1: row 1 2 x 4 and 3 x 5 - no first factor twice in a row -, the last row 4 x 4 and 5 rows of 2)
+    arrP1: (it) => { const p = arrTurnOf(it); return !!p && ((CASE_TESTS.arrNonSq(it) && p.rows !== 5 && p.cols !== 5) || (p.rows === 3 && p.cols === 5) || (p.rows === 5 && p.cols === 2) || CASE_TESTS.arrBigSquare(it)); },
     // The detailed lesson maker, lesson 4 (even products, 3.OA.D.9): a mult-grid shading window.
     // chartMixed: even and odd rows AND even and odd columns (every case on one window).
     chartIn9: (it) => !!multGridOf(it),
@@ -1329,7 +1330,11 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
         const zc = solve((q) => sum(rowsAt(q)), availAll, 0.8, 1);
         if (zc) { mode = 'grid3'; z = zc; }
     }
-    if (mode === 'one') z = solve((q) => lay.rows * H(q), avail, 1, zMax) || 1;
+    // (a chart with a step-n band under its panels - lesson 3a r4, critic r2 D1: the panels never overflow into the
+    // band; below zoom 1 the drawing shrinks a little rather than spill past the grid's rule)
+    // (the band's grid takes its own frame rule: a panel measured one-up may still wrap its name - leave it 4 mm a row)
+    const availP = tailItem ? avail - 4 * lay.rows : avail;
+    if (mode === 'one') z = solve((q) => lay.rows * H(q), availP, 1, zMax) || (tailItem ? solve((q) => lay.rows * H(q), availP, 0.7, 1) || 0.7 : 1);
     const withZoom = (x, c) => Object.assign(planItem(Object.assign({}, x, { render: (cc, o) => x.render(Object.assign({}, cc, { chartZoom: z }), o) }), { cols: c, nolabel: true }), { cls: x.cellCls });
     const sections = [];
     let rowH;
@@ -1355,7 +1360,7 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
         const fill = lay.variant === 'row' || lay.rows * rowH >= room - 2;
         const grid = gridPart(states.map((st) => withZoom(st, cols)), { cols, rows: lay.rows, cellH: rowH, labels: 'none', cls: 'mq-chartgrid' });
         sections.push(fill ? Object.assign(grid, { cls: 'mq-chartgrid', height: '' }) : grid);
-        if (tailItem) sections.push(gridPart([Object.assign(planItem(tailItem, { cols: 1, nolabel: true }), { cls: tailItem.cellCls })], { cols: 1, rows: 1, cellH: tailH, labels: 'none' }));
+        if (tailItem) sections.push(gridPart([Object.assign(planItem(tailItem, { cols: 1, nolabel: true }), { cls: tailItem.cellCls })], { cols: 1, rows: 1, cellH: tailH, labels: 'none', cls: 'mq-ctailgrid' }));
         // Height still spare after the panels: the other examples take it, up to a third more.
         const spare = Math.max(0, room - lay.rows * rowH);
         if (mode === 'row') {

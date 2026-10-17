@@ -62,6 +62,8 @@ export default {
     practicePages: 2,
     // ★★★ last row: a square array (does it change when turned?) and a 5-row array.
     edgeTest: 'arrEdge',
+    // (r4, critic r2 m3: a square sits only on the ★★★ last row, at most one a Practice page - E24b gates it)
+    edgeOnlyLast: 'arrSquare',
     // ★★ Practice 1: the known fact gives the turned fact (pictures; a square or a 5 in every place), its last
     // row a 4 x 4 square and 5 rows; Practice 2:
     // facts only, the missing number, its last row a square and a 5.
@@ -97,9 +99,10 @@ export default {
             { id: 'turn', text: 'Turn the array: rows become columns.' },
         ],
         vocab: [
-            { word: 'array', meaning: 'dots in equal rows', picture: { kind: 'array', rows: 2, cols: 3 } },
+            // (r4, critic r2 m5: not the chart's 2 x 3)
+            { word: 'array', meaning: 'dots in equal rows', picture: { kind: 'array', rows: 3, cols: 3 } },
             { word: 'row', meaning: 'a line of dots across', picture: { kind: 'array', rows: 1, cols: 4, mark: 'row' } },
-            { word: 'turn', meaning: 'move it a quarter way round', picture: { kind: 'array', rows: 2, cols: 3, mark: 'turn' } },
+            { word: 'turn', meaning: 'move it a quarter way round', picture: { kind: 'array', rows: 1, cols: 3, mark: 'turn' } },
         ],
         // (RESEARCH §4: five steps; step 3 needs the NEW `turn` icon, Appendix H)
         steps: [
@@ -162,6 +165,8 @@ export default {
         lines: ['A tray has {wp.rows} rows of {wp.cols} cakes.', 'Sam turns it: now it has {wp.cols} rows.', 'How many in each row now?'],
         answerLine: 'There are __ cakes in each row.',
         eqTurn: true,
+        // (r4, critic r2 m4: rows of 6 are past the counters' 5 - the tray is drawn as a box, RP-21)
+        schematic: true,
         say: '{wp.rows} times {wp.cols} equals {wp.cols} times __.',
     },
 
@@ -195,7 +200,7 @@ export default {
     ],
     caseNames: { arrSquare: 'a square', arrFive: 'a 5', arrTurn: 'non-square' },
     routeNote: 'No site lesson exists yet for these prerequisites: T6 names a CCSS code and a short title (V22 Appendix H).',
-    materials: ['12 counters on a tray or card, one per pair', 'Mini whiteboards and pens', 'Dot paper for the board', 'Anchor chart', 'Pupil packet, one per pupil', 'Exit slips, cut in half'],
+    materials: ['20 counters on a tray or card, one per pair', 'Mini whiteboards and pens', 'Dot paper for the board', 'Anchor chart', 'Pupil packet, one per pupil', 'Exit slips, cut in half'],
     vocabulary: [
         { word: 'array', gloss: 'dots in equal rows', diagram: { kind: 'text', text: '• • •  /  • • •' } },
         { word: 'row', gloss: 'a line of dots across', diagram: { kind: 'text', text: '• • • •' } },

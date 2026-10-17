@@ -393,9 +393,24 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
                 if (A.op === B.op && xs[i].item !== xs[j].item && da <= 2 && db <= 2) probs.push(`near twins ${xs[i].item} / ${xs[j].item} on ${pgid}`);
             }
         }
-        e24b = { ok: !probs.length && prPages.length > 0, msg: probs.length ? probs.join('; ') : `${prPages.length} Practice pages: last rows all edge cases (${[...edge].length} edge numbers dealt); no twin answers and no near twins on any page; ${opN} + / − items: no first addend twice in a grid row, no number taken away twice, no near twins` };
+        // (× / ÷ - lead ruling 2026-10-17, lesson 3a critic r2 m1: V22's both-within-2 cannot be met on a 10-item ×
+        // page, so its LR-6 rule is the + analogue: no first factor (÷: no divisor) twice in one grid row)
+        let mdN = 0;
+        const MD = (x) => { const m = String((x && x.item) || '').match(/^(\d+)\s*([x×÷])\s*(\d+)$/); return m ? { op: m[2] === '÷' ? '÷' : '×', f: Number(m[2] === '÷' ? m[3] : m[1]) } : null; };
+        // (Practice, Mixed and exit pages: a Prerequisite Check's × 2 recall row is one table on purpose)
+        for (const pgid of [...new Set(pl.filter((x) => /^P(4|6)/.test(x.page)).map((x) => x.page))]) {
+            const rows = {};
+            for (const x of pl.filter((y) => y.page === pgid && MD(y) && y.rep !== 'count_by_tables')) { mdN++; const o = MD(x); const k = `${o.op}${x.grid || 0}:${x.row}`; (rows[k] = rows[k] || []).push(o.f); }
+            for (const [r, a] of Object.entries(rows)) { const d2 = a.filter((v, i) => a.indexOf(v) !== i); if (d2.length) probs.push(`${r[0] === '÷' ? 'divisor' : 'first factor'} ${d2[0]} twice in a row (${r.slice(1)}) on ${pgid}`); }
+        }
+        // (`edgeOnly` - a description's declared case, lesson 3a r4 m3: only on the ★★★ last row of a Practice page)
+        const eo = R.pool.edgeOnly;
+        if (eo) for (const pgid of prPages) { const its = pl.filter((x) => x.page === pgid); const last = Math.max(...its.map((x) => x.row));
+            its.filter((x) => x.row !== last && eo.items.includes(x.item)).forEach((x) => probs.push(`${x.item} (${eo.test}) before the last row on ${pgid}`));
+            if (its.filter((x) => eo.items.includes(x.item)).length > 1) probs.push(`more than one ${eo.test} on ${pgid}`); }
+        e24b = { ok: !probs.length && prPages.length > 0, msg: probs.length ? probs.join('; ') : `${prPages.length} Practice pages: last rows all edge cases (${[...edge].length} edge numbers dealt); no twin answers on any page; near twins checked for one-number and + / − items (${opN} + / −: no first addend twice in a grid row, no number taken away twice, both numbers within 2); ${mdN} × / ÷ items: no first factor / divisor twice in a grid row${eo ? `; ${eo.test} only on the last row, at most one a page` : ''}` };
     }
-    row('E24b', 'Practice last row only edge cases (★★★); LR-6 no twin answers and no near twins (one skill, numbers within 2) on a page; + / − items (stories too): no first addend twice in a grid row or three running, no number taken away twice, no near twins (both numbers within 2, place by place: V22 2983)', e24b.msg, e24b.ok);
+    row('E24b', 'Practice last row only edge cases (★★★); LR-6 no twin answers and no near twins (one skill, numbers within 2) on a page; + / − items (stories too): no first addend twice in a grid row or three running, no number taken away twice, no near twins (both numbers within 2, place by place: V22 2983); × / ÷ (lead ruling): no first factor / divisor twice in a grid row; a declared edgeOnly case only on the last row', e24b.msg, e24b.ok);
     // E31 (lesson 2 r4, critic r2 D1 / D4): a lesson that declares its SITUATIONS (put together, add to)
     // models each in I Do (the chart or its board example: a P2 place), practises nothing it did not
     // model, and assesses each on the exit slip. A lesson without `situations` passes trivially.

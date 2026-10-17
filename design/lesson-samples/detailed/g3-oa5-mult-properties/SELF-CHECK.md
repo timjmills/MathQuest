@@ -34,7 +34,7 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | E22 | Every delivery page (T3–T5) shows a pupil-page thumbnail | T3: 1, T4: 2, T5: 1 | PASS |
 | E23 | Every row of T6 "Answers at a glance" carries ★ / ★★ / ★★★ | 4/4 | PASS |
 | E24 | Item pool read from the pack (LR-5): pool recomputed from its rule; 0 repeats of (number, representation); a number never twice on a page; chart examples and their turn-arounds never return; no turn-around pair on a page | 38 places (38 numbers), usable pool 38 (pool 38 keys, 38 facts, recomputed from its list rule: matches; forbidden 0); repeats 0; chart examples or their turn-arounds returning 0; same-page turn-arounds 0; outside the pool / forbidden 0; items without a rep 0 | PASS |
-| E24b | Practice last row only edge cases (★★★); LR-6 no twin answers and no near twins (one skill, numbers within 2) on a page; + / − items (stories too): no first addend twice in a grid row or three running, no number taken away twice, no near twins (both numbers within 2, place by place: V22 2983) | 2 Practice pages: last rows all edge cases (8 edge numbers dealt); no twin answers and no near twins on any page; 0 + / − items: no first addend twice in a grid row, no number taken away twice, no near twins | PASS |
+| E24b | Practice last row only edge cases (★★★); LR-6 no twin answers and no near twins (one skill, numbers within 2) on a page; + / − items (stories too): no first addend twice in a grid row or three running, no number taken away twice, no near twins (both numbers within 2, place by place: V22 2983); × / ÷ (lead ruling): no first factor / divisor twice in a grid row; a declared edgeOnly case only on the last row | 2 Practice pages: last rows all edge cases (8 edge numbers dealt); no twin answers on any page; near twins checked for one-number and + / − items (0 + / −: no first addend twice in a grid row, no number taken away twice, both numbers within 2); 17 × / ÷ items: no first factor / divisor twice in a grid row; arrSquare only on the last row, at most one a page | PASS |
 | E31 | Every situation the lesson declares is modelled in I Do (chart or board example), assessed on the exit slip, and nothing unmodelled is practised | no situations declared | PASS |
 | E32 | Stories: one sentence per line (AX-3), at most 4 lines (SF-50) | 2 stories, every sentence on one line, at most 3 lines | PASS |
 | E33 | Mixed page: the lesson's own skills hold at least half the items (V22 §9.5) | no Mixed page | PASS |
@@ -44,7 +44,7 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | E30 | No boardOnly number on a pupil page or key (item, answer, digits or name) | none declared: on no pupil page or key (16 pages) | PASS |
 | E29 | Every item letter and answer a teacher page quotes is on the pupil page it names (T3 §1, T5 §10, T6 routing) | 13 quotes, all on their pages | PASS |
 | E28 | No Say:, Rule: or Remember: band on a Practice page | 4 Practice / Mixed pages; extra bands 0 | PASS |
-| E27 | Counters in rows of at most 5 | P2:2, P2:3, P2:2, P2:3, P2:2, P2:3, P2:2, P2:3, P3:3, P3:4, P3:3, P3:4, P3:3, P3:5, P3:4, P4-1:5, P4-1:2, P4-1:4, P4-1:2, P4-1:4, P4-1:4, P4-1:3, P4-1:5 | PASS |
+| E27 | Counters in rows of at most 5 | P2:2, P2:3, P2:2, P2:3, P2:2, P2:3, P2:2, P2:3, P3:3, P3:4, P3:3, P3:4, P3:3, P3:5, P3:4, P4-1:5, P4-1:3, P4-1:4, P4-1:2, P4-1:4, P4-1:4, P4-1:2, P4-1:5 | PASS |
 | E26 | Every anchor-chart step panel adds a grey (newest) mark | P2 4 / 4 panels | PASS |
 | E25 | One key per pupil page (anchor chart included) | 8 pupil pages, 8 keys | PASS |
 
@@ -62,7 +62,7 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | T5 | teacher | 96 | 0 | 11 | 0 | — | #000000 #5b2a86 #c2410c #ffffff |
 | P0 | pupil | 91 | 2 | 12 | 7 | 49 | #000000 #ffffff |
 | P1 | pupil | 95 | 3 | 12 | 10 | 50 | #000000 #ffffff |
-| P2 | pupil | 100 | 0 | 15 | 5 | 50 | #000000 #5b2a86 #949494 #ffffff |
+| P2 | pupil | 100 | 0 | 15 | 5 | 53 | #000000 #5b2a86 #949494 #ffffff |
 | P3 | pupil | 96 | 2 | 12 | 3 | 54 | #000000 #5b2a86 #949494 #ffffff |
 | P4-1 | pupil | 91 | 0 | 12 | 4 | 62 | #000000 #ffffff |
 | P4-2 | pupil | 96 | 0 | 12 | 10 | 74 | #000000 #ffffff |
@@ -70,7 +70,7 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | P6 | pupil | 86 | 0 | 12 | 6 | 69 | #000000 #ffffff |
 | P0-key | key | 91 | 2 | 12 | 7 | 49 | #000000 #c2410c #ffffff |
 | P1-key | key | 95 | 3 | 12 | 10 | 50 | #000000 #c2410c #ffffff |
-| P2-key | key | 100 | 0 | 15 | 5 | 50 | #000000 #5b2a86 #949494 #ffffff |
+| P2-key | key | 100 | 0 | 15 | 5 | 53 | #000000 #5b2a86 #949494 #ffffff |
 | P3-key | key | 96 | 2 | 12 | 3 | 54 | #000000 #5b2a86 #c2410c #ffffff |
 | P4-1-key | key | 91 | 0 | 12 | 4 | 62 | #000000 #c2410c #ffffff |
 | P4-2-key | key | 96 | 0 | 12 | 10 | 74 | #000000 #c2410c #ffffff |
