@@ -53,12 +53,12 @@ export default {
         'Find the even row numbers.',
         'Every box in an even row is even. Shade it.',
         'Find the even column numbers. Shade those boxes too.',
-        'Both numbers odd? Leave the box white.',
+        'Both odd? Leave it white.',
     ],
 
     // ------------------------------------------------------------------ the practice skill
     // A 4 x 5 window of the 10 x 10 chart; shade the even products (meanwhile: multiples of 2).
-    skill: CHART({}, { winRows: 3, winCols: 4 }),
+    skill: CHART({}, { winRows: 3, winCols: 3 }),
     edgeTest: 'chartBigOdd',
     practicePages: 1,
     practiceSheets: [{ shape: [6, 2], edgeLast: { per: 2, cols: 2, wants: ['chartBigOdd', 'chartBigOdd'] } }],
@@ -72,7 +72,7 @@ export default {
             const er = rows.find((v) => v % 2 === 0), ec = cols.find((v) => v % 2 === 0);
             const or = rows.filter((v) => v % 2 === 1).pop(), oc = cols.filter((v) => v % 2 === 1).pop();
             const prods = [...new Set(rows.flatMap((r) => cols.map((c) => r * c)))].sort((x, y) => x - y);
-            const out = { rows: rows.join(', '), cols: cols.join(', '), shaded: prods.filter((v) => v % 2 === 0).join(', '), white: prods.filter((v) => v % 2 === 1).join(', ') };
+            const out = { rows: rows.join(', '), cols: cols.join(', '), shaded: rows.flatMap((r) => cols.map((c) => r * c)).filter((v) => v % 2 === 0).join(', '), white: prods.filter((v) => v % 2 === 1).join(', ') };
             if (er !== undefined) Object.assign(out, { er, erHalf: er / 2 });
             if (ec !== undefined) Object.assign(out, { ec });
             if (or !== undefined && oc !== undefined) Object.assign(out, { oa: or, ob: oc, op: or * oc });
@@ -97,9 +97,9 @@ export default {
             { word: 'product', meaning: 'the answer when you multiply', picture: { kind: 'text', text: '4 × 3 = 12' } },
         ],
         steps: [
-            { icon: 'look', text: 'Find the even row numbers. Shade those rows.' },
-            { icon: 'decide', text: 'Find the even column numbers. Shade them too.' },
-            { icon: 'write', text: 'Both numbers odd? Leave the box white.' },
+            { icon: 'look', text: 'Shade the even rows.' },
+            { icon: 'decide', text: 'Shade the even columns too.' },
+            { icon: 'write', text: 'Both odd? Leave it white.' },
         ],
         chant: '',
         guidedRows: 2,
@@ -114,9 +114,9 @@ export default {
     // ------------------------------------------------------------------ P0 Prerequisite Check
     prerequisites: [
         { atom: 1, items: 1, ref: CB(2), lesson: { id: '2.OA.C.3', title: 'Even numbers: count by 2s' } },
-        { atom: 2, items: 2, ref: FACT([2], { minNum: 12, maxNum: 18 }), lesson: { id: '3.OA.C.7', title: 'Multiply by 2' } },
-        { atom: 3, items: 1, ref: CHART({}, { task: 'fill', winRows: 2, winCols: 3 }), lesson: { id: '3.OA.C.7', title: 'Read the multiplication chart' } },
-        { atom: 4, items: 2, ref: FACT([4], { minNum: 12, maxNum: 36 }), lesson: { id: '3.OA.C.7', title: 'Multiply by 4' } },
+        { atom: 2, items: 4, ref: FACT([2], { minNum: 12, maxNum: 18 }), lesson: { id: '3.OA.C.7', title: 'Multiply by 2' } },
+        { atom: 3, items: 2, ref: CHART({}, { task: 'fill', winRows: 2, winCols: 3 }), lesson: { id: '3.OA.C.7', title: 'Read the multiplication chart' } },
+        { atom: 4, items: 4, ref: FACT([4], { minNum: 12, maxNum: 36 }), lesson: { id: '3.OA.C.7', title: 'Multiply by 4' } },
     ],
 
     // ------------------------------------------------------------------ P1 Number sense (earlier content)
@@ -188,9 +188,9 @@ export default {
         { type: 'Comparative', skill: 'Odd × odd is odd (contrast)', notes: 'The last Practice row only.' },
     ],
     routine: [
-        { step: 'Find the even row numbers. Shade those rows.', tag: 'New', check: 'Guided 1, exit a' },
-        { step: 'Find the even column numbers. Shade them too.', tag: 'New', critical: true, check: 'Guided 2, Check Question, exit b' },
-        { step: 'Both numbers odd? Leave the box white.', tag: 'New', check: 'Practice last row, exit c' },
+        { step: 'Shade the even rows.', tag: 'New', check: 'Guided 1, exit a' },
+        { step: 'Shade the even columns too.', tag: 'New', critical: true, check: 'Guided 2, Check Question, exit b' },
+        { step: 'Both odd? Leave it white.', tag: 'New', check: 'Practice last row, exit c' },
     ],
     howToTeach: 'Show, then name. Build the 2 row and the 4 row with cubes in pairs, then shade them on the window, then the even columns. Odd × odd is shown last, as a contrast, never as a second rule.',
     board: 'Window rows {chart.rows} × columns {chart.cols}.',
@@ -200,7 +200,7 @@ export default {
         { name: 'Tens digit decides', step: 1, looks: '36 called odd (the 3)', fix: 'Cover the tens. Read the ones.', option: '', caught: 'Prerequisite Check · Number sense' },
         { name: 'Any odd factor is odd', step: 2, looks: '{chart.ca} × {chart.cb} left white', fix: 'One even number is enough.', option: '', caught: 'Exit b' },
     ],
-    checkQuestion: { want: 'evenColOnly', correct: 'C' },
+    checkQuestion: { want: 'evenColOnly', correct: 'C', ref: CHART({}, { winRows: 3, winCols: 4 }) },
 
     // ------------------------------------------------------------------ T3-T5 delivery scripts
     sections: [

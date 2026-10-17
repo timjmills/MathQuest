@@ -352,12 +352,15 @@ export const gridNear = (k, keys, sameShape = false) => {
     if (!a) return false;
     const n = (g) => (g.r1 - g.r0 + 1) * (g.c1 - g.c0 + 1);
     for (const u of keys) {
-        const b = gridKeyOf(u);
-        if (!b || b.t !== a.t) continue;
-        // (across pages only a window of the same shape: a 2 x 3 exit window always sits inside some 3 x 4 one)
-        if (sameShape && (b.r1 - b.r0 !== a.r1 - a.r0 || b.c1 - b.c0 !== a.c1 - a.c0)) continue;
-        const ov = Math.max(0, Math.min(a.r1, b.r1) - Math.max(a.r0, b.r0) + 1) * Math.max(0, Math.min(a.c1, b.c1) - Math.max(a.c0, b.c0) + 1);
-        if (ov * 2 > Math.min(n(a), n(b))) return true;
+        const b0 = gridKeyOf(u);
+        if (!b0 || b0.t !== a.t) continue;
+        // (a window turned round - rows for columns - holds the same products: a turn-around twin)
+        for (const b of [b0, { r0: b0.c0, r1: b0.c1, c0: b0.r0, c1: b0.r1 }]) {
+            // (across pages only a window of the same shape, either way round: a 2 x 3 exit window always sits inside a bigger one)
+            if (sameShape && !((b.r1 - b.r0 === a.r1 - a.r0 && b.c1 - b.c0 === a.c1 - a.c0) || (b.r1 - b.r0 === a.c1 - a.c0 && b.c1 - b.c0 === a.r1 - a.r0))) continue;
+            const ov = Math.max(0, Math.min(a.r1, b.r1) - Math.max(a.r0, b.r0) + 1) * Math.max(0, Math.min(a.c1, b.c1) - Math.max(a.c0, b.c0) + 1);
+            if (ov * 2 > Math.min(n(a), n(b))) return true;
+        }
     }
     return false;
 };
@@ -3001,7 +3004,8 @@ function planCells(plan) {
 // forms of one skill - three Practice sheets' cells are compared each among their own, PG-11)
 const dlRep = (q) => String((q && q.skillId) || '') + (q && q.cell && q.cell.template === 'arrays-turn' && q.cell.payload && q.cell.payload.type ? `:${q.cell.payload.type}` : '');
 const dlTag = (html, id, kind) => String(html).replace(/<section (data-ws-sheet="[^"]*" )?class="ws-page/, (m, sh) => `<section data-dl-page="${id}" data-dl-kind="${kind}" ${sh || ''}class="ws-page`);
-const dlAns = (q) => (q && typeof q.ans === 'object' ? (Array.isArray(q.ans) ? q.ans.join(', ') : JSON.stringify(q.ans)) : String(q && q.ans !== undefined ? q.ans : ''));
+// (a tap / shade item - lesson 4's windows: its printed answer, the shaded numbers, never its option ids)
+const dlAns = (q) => (q && q.answerType === 'multi-select-check' && q.printAnswer ? String(q.printAnswer) : q && typeof q.ans === 'object' ? (Array.isArray(q.ans) ? q.ans.join(', ') : JSON.stringify(q.ans)) : String(q && q.ans !== undefined ? q.ans : ''));
 /** A `want`: a case test of roles/lesson.js (bigFirst, pvZeroTens, ...); '' or unknown = any item. */
 // (a list of names: every test must pass - lesson 2 r4, the exit slip's situation AND its case)
 const dlWant = (want) => (Array.isArray(want) ? (want.every((w) => LESSON_CASE_TESTS[w]) && want.length ? (it) => want.every((w) => LESSON_CASE_TESTS[w](it)) : null) : (want && LESSON_CASE_TESTS[want]) || null);
