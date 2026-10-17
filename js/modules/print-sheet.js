@@ -266,6 +266,8 @@ function refAccepts(sk, cand, key, seen, kept, pg = '', row = '', words = true) 
         const k = factKeyOf(cand);
         if (k === null) return false;
         if (sk.avoidKeys && sk.avoidKeys.includes(k)) return false;
+        // (a function table: no shared (In, Out) pair, no rule on a third table - across the pack and on this page; lesson 5 r3)
+        if (ftParts(k) && ftClash(k, (sk.avoidKeys || []).concat([...seen].filter((x) => /^key:ft/.test(x))))) return false;
         // (a + fact's identity across the pack is its unordered pair - 7 + 5 and 5 + 7 are one fact: lead ruling and
         // E24, 2026-10-17. Only + keys turn, so every other pack deals as before.)
         if (sk.avoidKeys && plusTurn(k) && (sk.avoidKeys.includes(plusTurn(k)) || seen.has(`key:${plusTurn(k)}`))) return false;
@@ -416,7 +418,7 @@ export function factKeyOf(q) {
     // (a function table - lesson 5: its rule and its In numbers, so one table is one item of the pool)
     if (q.cell && q.cell.template === 'function-table' && q.cell.payload && Array.isArray(q.cell.payload.rule) && Array.isArray(q.cell.payload.rows)) {
         const p = q.cell.payload;
-        return `ft${p.task}${p.rule.map((r) => `${r.op}${r.n}`).join('')}:${p.rows.map((r) => r.x).join(',')}`;
+        return `ft${p.task}${p.rule.map((r) => `${r.op}${r.n}`).join('')}:${p.rows.map((r) => `${r.x}>${r.y}`).join(',')}`;
     }
     // (a number pattern - lesson 5's Number sense and Mixed: its kind, step and start)
     if (q.pattern && Array.isArray(q.pattern.values) && q.pattern.values.length) return `pat${q.pattern.kind}${q.pattern.step}:${q.pattern.values[0]}`;
@@ -425,6 +427,20 @@ export function factKeyOf(q) {
     if (op && ops.length >= 2) return ops.join(composeGlyphOf(op) || op);
     const v = itemNumberOf(q);
     return v === null ? null : String(v);
+}
+
+/**
+ * A function table's identity across the pack (lesson 5 r3, critic r1 D1): its rule and its (In, Out) pairs. Two tables
+ * clash when they share a pair, or when the rule is already on `ruleMax` tables (2: no rule on more than two tables).
+ * Only `ft` keys; every other key is never a clash.
+ */
+export const ftParts = (k) => { const m = String(k === null || k === undefined ? '' : k).replace(/^key:/, '').match(/^ft[a-z]+([^:]+):(.+)$/); return m ? { rule: m[1], pairs: m[2].split(',') } : null; };
+export function ftClash(k, keys, ruleMax = 2) {
+    const a = ftParts(k);
+    if (!a) return false;
+    let same = 0;
+    for (const u of keys) { const b = ftParts(u); if (!b) continue; if (b.pairs.some((x) => a.pairs.includes(x))) return true; if (b.rule === a.rule) same++; }
+    return same >= ruleMax;
 }
 
 /** An edge case of a numbers-to-1000 lesson: a 0 in the tens or ones, a teen ending, or 1000 (not
@@ -3090,6 +3106,8 @@ function dealOne1(ref, seed, used, want, avoidAns, near, names, fresh) {
         const key = factKeyOf(q), v = itemNumberOf(q);
         if (key === null || (ok && !ok({ q }))) { why.want++; continue; }
         if (used.has(key)) { why.used++; continue; }
+        // (a function table's rule and pairs across the pack - lesson 5 r3: `ftRuleMax` 1 keeps a rule off every other table)
+        if (ftParts(key) && ftClash(key, used, ref.ftRuleMax || 2)) { why.used++; continue; }
         // (a + fact turned round is the same fact across the pack - E24's unordered identity)
         if (plusTurn(key) && used.has(plusTurn(key))) { why.used++; continue; }
         if (fresh && plusTurn(key) && fresh.has(plusTurn(key))) { why.fresh++; continue; }
@@ -3399,6 +3417,9 @@ async function buildDetailedLesson(req = {}) {
     const wpPlan = wordProblemPlan({
         lines, answerLine: fillPlaceholders(d.wordProblem.answerLine, { wp: wpV }), wordsLine: d.wordProblem.wordsLine ? fillPlaceholders(d.wordProblem.wordsLine, { wp: wpV }) : '', words: wpV.words, say: fillPlaceholders(d.wordProblem.say, { wp: wpV }), n: wpV.wpAns !== undefined ? wpV.wpAns : wpV.ans, eqN, eqTurn, schematic: d.wordProblem.schematic && wpV.rows ? { rows: wpV.rows, cols: wpV.cols } : null, parts: eqParts, op: eqOp, signSlot: !!d.wordProblem.signSlot, item: String(wpD.key),
         instruction: d.wordProblem.instruction || INSTRUCTION_LIBRARY['story-rcdws'] || INSTRUCTION_LIBRARY.story,
+        // (`wordProblem.tableItem` - lesson 5 r3: the story's own table, its rule frame the answer, under the story)
+        panelRows: d.wordProblem.panelRows || null, topMm: d.wordProblem.topMm || null,
+        tableItem: d.wordProblem.tableItem ? composePlanItem(hostItem({ q: wpD.q, skill: Object.assign({}, d.wordProblem.ref) }, 0, 'L'), { cols: 1, level: 0 }) : null,
     }, frameP('Word problem', 1));
     const p5 = renderPlan(wpPlan, { key: true });
 

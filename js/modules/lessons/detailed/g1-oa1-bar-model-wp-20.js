@@ -157,8 +157,10 @@ export default {
     ],
     exitCols: 1,
     exitInstruction: 'Read the story. Fill in the bar. Solve.',
-    // The Say reads slip item b (the Critical Atom's case): its own unit word, one blank.
-    exitSay: 'b. The answer is __ {say.unit}.',
+    // The Say is the lesson's generic frame (E16c, lead ruling 2026-10-17: a Say band never names an item or states its
+    // answer - "b. The answer is __ beads." coached item b); one blank, the word "whole". (exitSayItem 1: no fresh item is dealt.)
+    exitSay: 'I add the parts to find the __.',
+    exitSayAns: 'whole',
     exitSayItem: 1,
 
     // ------------------------------------------------------------------ retrieval (MWB)

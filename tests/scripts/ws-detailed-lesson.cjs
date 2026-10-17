@@ -100,6 +100,8 @@ function measure(LIBRARY) {
                 && !e.closest('[data-cut], [data-ws-cut]') && !e.classList.contains('ws-box--unknown'); }).length;
         // E13 underscores (pupil text, footer excepted)
         P.underscores = teacher ? 0 : texts.filter((x) => /_/.test(x.textContent) && !x.parentElement.closest('.ws-foot')).length;
+        // E38 (lesson 5 critic r1 D5): a template placeholder left unfilled ("{pre.0.letters}") on any page
+        P.braces = (pg.innerText.match(/\{[a-zA-Z][\w.]*\}/g) || []).slice(0, 3);
         // E18 frame, E19 title
         const copy = pg.querySelector('.ws-copy');
         P.copy = !!copy && /© 20\d\d Cultivating the Digital\. All rights reserved\./.test(copy.textContent);
@@ -335,19 +337,26 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
     // (sheet/contract.js) is that library's source, so a kit string passes and is listed here.
     row('E15', `Instructions ≤ 12 words, print verb first, string in the controlled library (V22 Appendix C.1: ${LIB.length} strings; the kit's PED 10.1 library: ${KIT.length})`, `${ins.length} instructions; failing: ${[...new Set(insBad.map((i) => `${i.page} "${i.s}"`))].join(' | ') || 'none'}; in the kit library but missing from V22 C.1: ${kitOnly.map((x) => `"${x}"`).join(', ') || 'none'}`, !insBad.length);
     const say = pages.flatMap((p) => p.sayBlanks);
-    // E16c (lesson 4 critic r1 D1/D2): a pupil page's Say band never prints an answer of that page's items, nor walks
-    // one item through ("b. 11 × 4: ..." - a frame that names an item letter coaches that item)
+    // E16c (lesson 4 critic r1 D1/D2; narrowed by the lead ruling, 2026-10-17): a pupil page's Say band never states an
+    // ANSWER of that page's items that is not also one of their GIVEN numbers, and never names an item letter ("b. ..." -
+    // a frame that names an item coaches that item). A given is a number the page prints for the pupil: an item's operands
+    // (a story's numbers, the factors shown: "5x6" gives 5 and 6) and a window's headers and printed products. So "5 times
+    // 6 equals 6 times __" over the story 5 x 6 passes (5 is given), and "One number is even. So 28 is __" over 4 x 7 fails.
     {
         const pl = (R.pool && R.pool.places) || [];
         const nums = (t) => (String(t).match(/\d+/g) || []).map(Number);
+        const givenOf = (x) => { const g = WIN(x.item); if (!g) { const m = canon(x.item).match(/^(\d+)[+×−÷](\d+)$/); return m ? [+m[1], +m[2]] : []; }
+            const o = []; for (let r = g.r0; r <= g.r1; r++) o.push(r); for (let c = g.c0; c <= g.c1; c++) o.push(c);
+            if (g.t !== 'fill') for (let r = g.r0; r <= g.r1; r++) for (let c = g.c0; c <= g.c1; c++) o.push(r * c); return o; };
         const bad = [];
         for (const p of pages.filter((x) => x.kind === 'pupil' && !/^P2/.test(x.id))) for (const t of p.sayText || []) {
-            const ans = new Set(pl.filter((x) => x.page === p.id).flatMap((x) => nums(x.ans)));
-            const hit = nums(t).filter((v) => ans.has(v));
-            if (hit.length) bad.push(`${p.id} says ${hit[0]} (an answer)`);
+            const its = pl.filter((x) => x.page === p.id);
+            const ans = new Set(its.flatMap((x) => nums(x.ans))), given = new Set(its.flatMap(givenOf));
+            const hit = nums(t).filter((v) => ans.has(v) && !given.has(v));
+            if (hit.length) bad.push(`${p.id} says ${hit[0]} (an answer, not a given)`);
             if (/(^|["“\s])[a-h]\.\s/.test(t)) bad.push(`${p.id} Say names an item`);
         }
-        row('E16c', 'No Say band prints an answer of its page or names one item', bad.length ? bad.join('; ') : 'none', !bad.length);
+        row('E16c', 'No Say band states an answer of its page that is not a given number, nor names one item', bad.length ? bad.join('; ') : 'none', !bad.length);
     }
     row('E16', 'Every Say frame ≤ 2 blanks', `${say.length} frames; blanks ${[...new Set(say)].join(', ') || '—'}`, say.every((n) => n <= 2));
     const panel = pages.flatMap((p) => p.panelRows);
@@ -512,6 +521,26 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
         const probs = [];
         for (const x of ex) { const o = OPI(x), d0 = Math.abs(o.a - o.b); if (d0 === o.a || d0 === o.b) probs.push(`${x.item}: ${Math.max(o.a, o.b)} − ${Math.min(o.a, o.b)} = ${d0} is a part`); if (on.has(factId(x.item))) probs.push(`${x.item} (or its turn-around) is on another page`); }
         row('E36', 'Exit slip + items: no part equals the difference of the parts; each fresh (on no other page, nor turned round)', ex.length ? (probs.length ? probs.join('; ') : `${ex.map((x) => x.item).join(', ')}: clean and fresh`) : 'no + exit items', !probs.length);
+    }
+    // E37 (lesson 5 critic r1 D1): a function table is its rule AND its (In, Out) pairs. No pair on two pages; no rule on more
+    // than two tables of the pack; the exit slip's tables share no pair with any page. Passes with no tables.
+    {
+        const pl = ((R.pool && R.pool.places) || []).filter((x) => /^ft[a-z]+[^:]+:/.test(String(x.item)));
+        const parts = (k) => { const m = String(k).match(/^ft[a-z]+([^:]+):(.+)$/); return { rule: m[1], pairs: m[2].split(',') }; };
+        const probs = [];
+        const pairAt = new Map(), ruleN = new Map(), seenItem = new Set();
+        for (const x of pl) {
+            if (seenItem.has(`${x.page}|${x.item}`)) continue; seenItem.add(`${x.page}|${x.item}`);
+            const t = parts(x.item);
+            ruleN.set(t.rule, (ruleN.get(t.rule) || 0) + 1);
+            for (const pr of t.pairs) { const was = pairAt.get(pr); if (was && was !== x.page.replace(/-key$/, '')) probs.push(`${pr} on ${was} and ${x.page}`); else pairAt.set(pr, x.page.replace(/-key$/, '')); }
+        }
+        for (const [r, n] of ruleN) if (n > 2) probs.push(`rule ${r} on ${n} tables`);
+        row('E37', 'Function tables: no (In, Out) pair on two pages, no rule on more than two tables (table identity = rule + pairs)', pl.length ? (probs.length ? probs.slice(0, 6).join('; ') : `${seenItem.size} tables: fresh`) : 'no tables', !probs.length);
+    }
+    {
+        const bad = pages.filter((p) => p.braces && p.braces.length);
+        row('E38', 'No unfilled {placeholder} on any page', bad.length ? bad.map((p) => `${p.id}: ${p.braces.join(' ')}`).join('; ') : 'none', !bad.length);
     }
     // E30 (critic r3 S1): a number the lesson declares `boardOnly` (shown on the board only) is never a
     // pupil item's number or answer, and never printed on a pupil page or key (digits, with or without

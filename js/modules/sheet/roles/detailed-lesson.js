@@ -151,7 +151,7 @@ export function teacherBands(d, V, pages) {
             ['P0', 'Prerequisite', 'one per question'], ['P1', 'Number sense', '/10'], ['P2', 'Anchor chart', 'none (a poster)'], ['P3', 'Lesson 1', d.p3Score || 'Independent cells'],
             ['P4', d.mixed ? 'Practice n / Mixed n' : 'Practice n', 'every cell'], ['P5', 'Word problem', '/1'], ['P6', 'Exit slip', `/${(d.exit || []).length || 4} a half`], ['T1–T5', 'Teacher n', '—'], ['T6', 'Answer Key', '—'],
         ].map((r) => r.map(cellText))),
-        subHead('Fade levels'), tTable(['Label', 'Means'], [['★', 'Guided: hints on, step 1 traced'], ['★★', 'Independent: hints off'], ['★★★', 'Last row: the edge cases']].map((r) => r.map(cellText))),
+        subHead('Fade levels'), tTable(['Label', 'Means'], (Array.isArray(d.fadeMeans) ? d.fadeMeans : [['★', 'Guided: hints on, step 1 traced'], ['★★', 'Independent: hints off'], ['★★★', 'Last row: the edge cases']]).map((r) => r.map(cellText))),
         subHead('Data loop'), tLoop({ most: 'Go on.', half: 'Short reteach, then go on.', fewer: 'Stop. Reteach with a concrete example.' }),
         subHead('Abbreviations'), tTable(['Short', 'In full'], [['MWBs', 'mini whiteboards'], ['ELL', 'English language learners'], ['SPED', 'special education students'], ['RCDWS', 'Read, Circle, Draw, Write, Solve'], ['CRA', 'Concrete-Representational-Abstract']].map((r) => r.map(cellText))),
         ...(d.routeNote ? [subHead('Routing ids'), tLine(esc(d.routeNote))] : []),
@@ -341,6 +341,24 @@ export function wordProblemPlan(wp, frame) {
         },
     };
     const panelItem = { nolabel: true, q: { cell: { template: 'rcdws', payload: {} }, text: '' }, drawsAnswer: true, key: { slots: {} } };
+    // (`tableItem`, lesson 5 r3: the story's table is the lesson's own cell - its rule frame is the answer; no drawing,
+    // no equation frame, and the story has no answer line)
+    if (wp.tableItem) {
+        const st = Object.assign({}, storyItem, { key: { slots: {}, display: '' },
+            render: (c) => story(wp.lines.map((l) => `<div>${esc(l)}</div>`).join('')).replace('<div class="ws-story">', '<div class="ws-story" data-item="' + esc(wp.item) + '" data-rep="story" data-row="0">') });
+        const sectionsT = [
+            { kind: 'instruction', text: wp.instruction || 'Find the rule. Write the rule.' },
+            { kind: 'grid', cols: 1, rows: 1, items: [st], cls: 'fixed dl-wpstory', height: `${wp.topMm || 60}mm` },
+            // (the story's table beside the routine panel - in the lesson's own actions: the table is printed, so no
+            // "Draw it" / equation rows; a full-width table cell would be mostly empty, H13)
+            { kind: 'row', cls: 'dl-wptoprow', widths: ['55fr', '45fr'], height: `${wp.tableMm || 95}mm`, parts: [
+                { kind: 'grid', cols: 1, rows: 1, items: [Object.assign({}, wp.tableItem, { cellCls: [wp.tableItem.cellCls || '', 'mq-lvcenter'].join(' ').trim() })], cls: 'dl-wptable', labels: 'none' },
+                { kind: 'grid', cols: 1, rows: 1, items: [Object.assign({}, panelItem, { q: { cell: { template: 'rcdws', payload: { rows: wp.panelRows || [] } }, text: '' } })], cls: 'dl-wppanel' },
+            ] },
+            { kind: 'say', frame: wp.say, digits },
+        ];
+        return Object.assign({ role: 'word-problem', ctx: { look: 'ican', size: 'L', paper: 'A4', scaffoldLevel: 1 }, cls: 'dl-page dl-pupil', pages: [{ sections: sectionsT }] }, frame);
+    }
     const sections = [
         { kind: 'instruction', text: wp.instruction || 'Read the story. Draw it. Solve.' },
         { kind: 'row', cls: 'dl-wptoprow', widths: ['58fr', '42fr'], height: '72mm', parts: [

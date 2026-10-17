@@ -1,6 +1,6 @@
 # V22 self-check: g1-oa1-bar-model-wp-20
 
-Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to the kit's markup; Chromium print media) on `pack.html`, seed 4242, 2026-10-17. **43 / 43 PASS**.
+Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to the kit's markup; Chromium print media) on `pack.html`, seed 4242, 2026-10-17. **44 / 44 PASS**.
 
 | # | Check | Measured | Result |
 |---|---|---|---|
@@ -22,6 +22,7 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | E13 | No underscore characters on pupil pages (slot widths: ws-print-lint --source kit) | underscores 0 | PASS |
 | E14 | No dashed line except the cut line and the missing-digit box | 0 outside a cut line | PASS |
 | E15 | Instructions ≤ 12 words, print verb first, string in the controlled library (V22 Appendix C.1: 130 strings; the kit's PED 10.1 library: 169) | 19 instructions; failing: none; in the kit library but missing from V22 C.1: "Write how many of each place.", "Read the story. Fill in the bar. Solve." | PASS |
+| E16c | No Say band states an answer of its page that is not a given number, nor names one item | none | PASS |
 | E16 | Every Say frame ≤ 2 blanks | 9 frames; blanks 0, 1 | PASS |
 | E16b | RCDWS panel: one action per box, each row one line (≤ 9 mm) | 12 rows; tallest 9 mm | PASS |
 | E17b | The anchor chart and its key carry no answer marks | P2: 0, P2-key: 0 | PASS |
@@ -34,7 +35,7 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | E22 | Every delivery page (T3–T5) shows a pupil-page thumbnail | T3: 1, T4: 2, T5: 1 | PASS |
 | E23 | Every row of T6 "Answers at a glance" carries ★ / ★★ / ★★★ | 4/4 | PASS |
 | E24 | Item pool read from the pack (LR-5): pool recomputed from its rule; 0 repeats of (number, representation); a number never twice on a page; chart examples and their turn-arounds never return; no turn-around pair on a page | 32 places (32 numbers), usable pool 41 (pool 63 keys, 41 facts, recomputed from its plus rule: matches; forbidden 5+7, 3+8); repeats 0; chart examples or their turn-arounds returning 0; same-page turn-arounds 0; outside the pool / forbidden 0; items without a rep 0 | PASS |
-| E24b | Practice last row only edge cases (★★★); LR-6 no twin answers and no near twins (one skill, numbers within 2) on a page; + / − items (stories too): no first addend twice in a grid row or three running, no number taken away twice, no near twins (both numbers within 2, place by place: V22 2983) | 1 Practice pages: last rows all edge cases (4 edge numbers dealt); no twin answers and no near twins on any page; 15 + / − items: no first addend twice in a grid row, no number taken away twice, no near twins | PASS |
+| E24b | Practice last row only edge cases (★★★); LR-6 no twin answers and no near twins (one skill, numbers within 2) on a page; + / − items (stories too): no first addend twice in a grid row or three running, no number taken away twice, no near twins (both numbers within 2, place by place: V22 2983); × / ÷ (lead ruling): no first factor / divisor twice in a grid row; a declared edgeOnly case only on the last row | 1 Practice pages: last rows all edge cases (4 edge numbers dealt); no twin answers on any page; near twins checked for one-number and + / − items (15 + / −: no first addend twice in a grid row, no number taken away twice, both numbers within 2); 0 × / ÷ items: no first factor / divisor twice in a grid row | PASS |
 | E31 | Every situation the lesson declares is modelled in I Do (chart or board example), assessed on the exit slip, and nothing unmodelled is practised | put-together, add-to: modelled on P2, practised on P3–P6, assessed on P6 | PASS |
 | E32 | Stories: one sentence per line (AX-3), at most 4 lines (SF-50) | 34 stories, every sentence on one line, at most 3 lines | PASS |
 | E33 | Mixed page: the lesson's own skills hold at least half the items (V22 §9.5) | no Mixed page | PASS |
@@ -48,7 +49,7 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | E26 | Every anchor-chart step panel adds a grey (newest) mark | P2 4 / 4 panels | PASS |
 | E25 | One key per pupil page (anchor chart included) | 7 pupil pages, 7 keys | PASS |
 
-**43 / 43 pass.**
+**44 / 44 pass.**
 
 ## Per page
 

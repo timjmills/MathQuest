@@ -175,7 +175,9 @@ export const winShare = (x, y) => { const A = winBoxes(x); if (!A.size) return f
 const multGridOf = (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'mult-grid' && c.payload; if (!p || !Array.isArray(p.rows) || !Array.isArray(p.cols)) return null; const g = { rows: p.rows.map(Number), cols: p.cols.map(Number) }; return g.rows.concat(g.cols).every((v) => v >= 2 && v <= 12) ? g : null; };
 // (no 1 and no 10 in a lesson 4 window: x 1 is the other number, x 10 ends in 0 - both give the parity away)
 /** A one-step find-the-rule function table's {op, k, x1} (detailed lesson 5), else null. */
-const ftRuleOf = (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'function-table' && c.payload; if (!p || p.task !== 'rule' || !Array.isArray(p.rule) || p.rule.length !== 1 || !Array.isArray(p.rows) || p.rows.length < 3) return null; return { op: p.rule[0].op, k: Number(p.rule[0].n), x1: Number(p.rows[0].x) }; };
+const ftRuleOf = (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'function-table' && c.payload; if (!p || p.task !== 'rule' || !Array.isArray(p.rule) || p.rule.length !== 1 || !Array.isArray(p.rows) || p.rows.length < 3) return null; return { op: p.rule[0].op, k: Number(p.rule[0].n), x1: Number(p.rows[0].x), y1: Number(p.rows[0].y), yMin: Math.min(...p.rows.map((r) => Number(r.y))) }; };
+/** Row 1 of a + table fits no taught × rule (x 2, x 5, x 10): 2 -> 10 is also x 5 (lesson 5 r3, critic D2). */
+const ftPlainFirst = (p) => ![2, 5, 10].some((m) => p.x1 * m === p.y1);
 /** An arrays-turn payload's {rows, cols} (detailed lesson 3a), else null. */
 const arrTurnOf = (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'arrays-turn' && c.payload; return p ? { rows: Number(p.rows), cols: Number(p.cols) } : null; };
 
@@ -313,17 +315,17 @@ export const CASE_TESTS = Object.freeze({
     // The detailed lesson maker, lesson 5 (find the rule, 3.OA.D.9): a one-step find-the-rule table.
     // + / − / × with a plain first row (+: not 1 -> 1 + k, which is also x (1 + k)); the trap:
     // a × table whose first row is k → k × k (2 → 4: + 2 or × 2), so only row 2 decides.
-    ftAdd: (it) => { const p = ftRuleOf(it); return !!p && p.op === '+' && p.k >= 2 && p.x1 !== p.k && p.x1 >= 2; },
-    ftSub: (it) => { const p = ftRuleOf(it); return !!p && p.op === '-' && p.k >= 2 && p.x1 !== 2 * p.k && p.x1 > p.k; },
-    ftTimes: (it) => { const p = ftRuleOf(it); return !!p && p.op === 'x' && [2, 5, 10].includes(p.k) && p.x1 !== p.k; },
-    ftTimesTrap: (it) => { const p = ftRuleOf(it); return !!p && p.op === 'x' && [2, 5].includes(p.k) && p.x1 === p.k; },
-    // (a Practice row above the ★★★ row: no first row that fits a second one-step rule - not 1 -> 1 + k, not a trap)
-    ftPlainRow: (it) => { const p = ftRuleOf(it); return !!p && p.x1 >= 2 && !CASE_TESTS.ftTrapAny(it) && !(p.op === '-' && p.x1 === 2 * p.k); },
-    ftPracticeAny: (it) => CASE_TESTS.ftPlainRow(it) || CASE_TESTS.ftTrapAny(it),
-    // (+ / − traps: row 1 k -> 2k also fits x 2; row 1 2k -> k also fits ÷ 2 - Practice 1's ★★★ row)
-    ftTrapAdd: (it) => { const p = ftRuleOf(it); return !!p && p.op === '+' && p.k >= 2 && p.x1 === p.k; },
-    ftTrapSub: (it) => { const p = ftRuleOf(it); return !!p && p.op === '-' && p.k >= 2 && p.x1 === 2 * p.k; },
-    ftTrapAny: (it) => CASE_TESTS.ftTimesTrap(it) || CASE_TESTS.ftTrapAdd(it) || CASE_TESTS.ftTrapSub(it),
+    ftAdd: (it) => { const p = ftRuleOf(it); return !!p && p.op === '+' && p.k >= 2 && p.k <= 10 && p.x1 >= 2 && ftPlainFirst(p); },
+    ftSub: (it) => { const p = ftRuleOf(it); return !!p && p.op === '-' && p.k >= 2 && p.k <= 10 && p.y1 >= 1 && p.yMin >= 1 && p.x1 !== 2 * p.k; },
+    // (any × table is the trap: its row 1 also fits a + rule, so only row 2 decides - the Critical Atom; lesson 5 r3)
+    ftTimes: (it) => { const p = ftRuleOf(it); return !!p && p.op === 'x' && [2, 5, 10].includes(p.k) && p.x1 >= 2; },
+    ftTimesTrap: (it) => CASE_TESTS.ftTimes(it),
+    // (an edge of − : a row whose Out is 0)
+    ftSubZero: (it) => { const p = ftRuleOf(it); return !!p && p.op === '-' && p.k >= 2 && p.k <= 10 && p.yMin === 0; },
+    // (a fact with both factors 10 or less - lesson 5 r3, the Prerequisite Check's x 2 / x 5 / x 10 facts: not 2 x 11)
+    factTen: (it) => { const o = operandsOf((it && it.q) || {}).map(Number); return o.length >= 2 && o.every((v) => v >= 1 && v <= 10); },
+    ftEdge: (it) => CASE_TESTS.ftTimes(it) || CASE_TESTS.ftSubZero(it),
+    ftPracticeAny: (it) => CASE_TESTS.ftAdd(it) || CASE_TESTS.ftSub(it) || CASE_TESTS.ftEdge(it),
 });
 
 /** A two-part story's parts [a, b] as numbers, or null. */
@@ -1419,7 +1421,9 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
     // `sayWords` (lesson data; the detailed lesson maker): the Say line reads the example's number
     // name, so the chart shows the number in all three forms (numeral, expanded, words).
     const sayN = data && data.sayWords ? pvNumberOf(example) : null;
-    sections.push({ kind: 'say', frame: sayN !== null ? `${sayN} is ${numberWords(sayN)}.` : oralFrameOf(example || {}, { fill: true }), digits: 2 });
+    // (`chartSay(q)`, lesson data - the detailed lesson maker, lesson 5 r3: the chart's Say in the lesson's own words, In / Out)
+    const ownSay = data && typeof data.chartSay === 'function' && example ? (() => { try { return data.chartSay(example.q); } catch (e) { return ''; } })() : '';
+    sections.push({ kind: 'say', frame: ownSay || (sayN !== null ? `${sayN} is ${numberWords(sayN)}.` : oralFrameOf(example || {}, { fill: true })), digits: 2 });
     if (chant) sections.push({ kind: 'html', html: `<div class="ws-band mq-cchantband" style="height:${chantH - 1.5}mm"><div class="mq-cchant"><b>Rule:</b><span>${esc(chant)}</span></div></div>` });
     const shown = mode === 'row' ? 1 : mode === 'final' ? finShown.length : mode === 'grid3' ? fin.length : 0;
     return {

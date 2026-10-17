@@ -8,12 +8,10 @@
 // multiplication chart, no even/odd property. See the format in ./index.js. Pure data (no DOM, no
 // state). Every number a script speaks is a {placeholder} filled from the DEALT items.
 //
-// NEEDS (not built here, listed for the lead): the CASE_TESTS ftAdd / ftSub / ftTimes / ftTimesTrap
-// in sheet/roles/lesson.js; the option ftTrap (RESEARCH §3 proposal 1) so ftTimesTrap is dealt, not
-// found by chance; SKILL_STANDARDS 3.OA.D.9 + M.EE.3.OA.8 on function_table_easy (the bridge checks
-// ccss / ee against the skill's tags); the C.4 Remember string 'one-pair'.
+// Built for it: CASE_TESTS ftAdd / ftSub / ftTimes / ftSubZero / ftEdge (roles/lesson.js), the options ftTrap and
+// ftFactors, the chart step states (cells/function-table.js), table identity by rule and pairs (print-sheet.js ftClash).
 
-const FT = (opts, extra) => Object.assign({ categoryId: 'algebra', skillId: 'function_table_easy', opts: Object.assign({ ftTask: 'rule', ftRules: ['+', '-', 'x'], band: 20, ftTable: 31, support: 'frame', ftFactors: '2-5-10' }, opts || {}) }, extra || {});
+const FT = (opts, extra) => Object.assign({ categoryId: 'algebra', skillId: 'function_table_easy', opts: Object.assign({ ftTask: 'rule', ftRules: ['+', '-', 'x'], band: 50, ftTable: 31, support: 'frame', ftFactors: '2-5-10' }, opts || {}) }, extra || {});
 // P1 bank types: earlier content only (place value: 1 / 10 more and less, compare, unit form), never today's rule-finding.
 const NS = (categoryId, skillId, opts, extra) => Object.assign({ categoryId, skillId, opts }, extra || {});
 const ML = (step, dir, extra) => Object.assign({ categoryId: 'placevalue', skillId: 'more_less_10', opts: { step, dir, band: 100 } }, extra || {});
@@ -38,18 +36,17 @@ export default {
     ],
 
     // ------------------------------------------------------------------ the practice skill
-    // Find the one-step rule of a 3-row table (+, − or ×), numbers to 20, In in order, frame + machine.
+    // Find the one-step rule of a table (+, − or ×), numbers to 50 on every page from the chart on (r3, critic D3:
+    // nothing new on Practice), In in order, + / − by 2 to 10, × by 2, 5 or 10 (ftFactors, the Prerequisite Check's facts).
     skill: FT(),
-    // The ★★★ last row: a × table whose first row also fits a + rule (2 → 4), and a − rule.
-    edgeTest: 'ftTrapAny',
-    // (a first row that fits two rules only on the ★★★ last rows - the Critical Atom's case is never practised early)
-    edgeOnlyLast: 'ftTimesTrap',
+    // The ★★★ last row: the × table (its row 1 also fits a + rule - the Critical Atom) and a − table with an Out of 0.
+    edgeTest: 'ftEdge',
+    // (a × table only on the ★★★ last row, one a page: rows above are + / − tables whose row 1 fits no × rule)
+    edgeOnlyLast: 'ftTimes',
     practicePages: 2,
-    // Practice 1: + and − rules. Practice 2: × then + and −, numbers to 50, In out of order. The ★★★ last
-    // row of each: the trap (row 1 fits two rules). The machine picture fades on the exit slip.
     practiceSheets: [
-        { steps: true, skill: FT({ ftRules: ['+', '-'], ftTable: 41, support: 'frame-bare' }, { allTest: 'ftPracticeAny' }), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['ftTrapAdd', 'ftTrapSub'] } },
-        { steps: true, skill: FT({ ftRules: ['x', '+', '-'], band: 50, ftTable: 42, support: 'frame-bare' }, { allTest: 'ftPracticeAny' }), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['ftTimesTrap', 'ftTrapSub'] } },
+        { steps: true, skill: FT({ ftTable: 41, support: 'frame-bare' }, { allTest: 'ftPracticeAny' }), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['ftTimes', 'ftSubZero'] } },
+        { steps: true, skill: FT({ ftTable: 41, support: 'frame-bare' }, { allTest: 'ftPracticeAny' }), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['ftSubZero', 'ftTimes'] } },
     ],
     // No Mixed page (V22 §9.5: optional): a function table is a tall item, and a page that mixes them with
     // earlier facts cannot give the lesson's own skill half the page (E33).
@@ -89,7 +86,7 @@ export default {
             { word: 'rule', meaning: 'what the machine does to every number', picture: { kind: 'text', text: '4 → + 3 → 7' } },
         ],
         steps: [
-            { icon: 'look', text: 'Read row 1 across.' },
+            { icon: 'look', text: 'Read rows 1 and 2 across.' },
             { icon: 'decide', text: 'Bigger or smaller? By how much?' },
             { icon: 'check', text: 'Test every row.' },
             { icon: 'write', text: 'Write the rule.' },
@@ -98,6 +95,9 @@ export default {
         chant: '',
         guidedRows: 3,
         chartEqualRows: true,
+        // (the chart's Say in the pupils' words, In / Out - critic r1 n2)
+        chartSay: (q) => { const p = q && q.cell && q.cell.payload; const r = p && p.rows && p.rows[0]; const s0 = p && p.rule && p.rule[0];
+            return r && s0 ? `In ${r.x}, out ${r.y}. ${r.x} ${{ '+': '+', '-': '−', x: '×' }[s0.op]} ${s0.n} = ${r.y}. I test every row.` : ''; },
         growAll: true,
         // (Guided: one table of each rule the chart modelled, in its order: +, −, ×)
         guided: ['ftAdd', 'ftSub', 'ftTimes'],
@@ -119,7 +119,7 @@ export default {
             lesson: { id: '2.OA.B.2', title: 'Add within 20' } },
         { atom: 2, items: 4, ref: { categoryId: 'subtraction', skillId: 'sub_facts', opts: { band: 20 }, minNum: 3, maxNum: 10 },
             lesson: { id: '2.OA.B.2', title: 'Subtract within 20' } },
-        { atom: 3, items: 4, ref: { categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: [2, 5, 10] }, minNum: 20 },
+        { atom: 3, items: 4, ref: { categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: [2, 5, 10] }, minNum: 20, allTest: 'factTen' },
             lesson: { id: '3.OA.C.7', title: 'Multiply by 2, 5 and 10' } },
     ],
 
@@ -137,14 +137,18 @@ export default {
     // No skill deals a story read from a table (proposal algebra:function_table_story). Our own
     // story; its numbers are a dealt × table (no trap) and one more In past the table.
     wordProblem: {
-        ref: FT({ ftRules: ['x'], band: 50 }),
-        want: 'ftTimes',
-        instruction: 'Read the story. Draw it. Solve.',
-        lines: ['A machine: {wp.x1} boxes make {wp.y1} cars.', '{wp.x2} boxes make {wp.y2} cars.', '{wp.x3} boxes make {wp.y3} cars.', 'How many cars do {wp.next} boxes make?'],
-        answerLine: '{wp.next} boxes make __ cars.',
-        // (the pupil writes the sign: a printed × would give the rule away)
-        signSlot: true,
-        say: 'The rule is __.',
+        // (r3, critic D4: the lesson's own task - the story's table printed, find the rule, the rule frame; a + rule
+        // that makes sense: Ann is always the same number of years older than Ben)
+        ref: FT({ ftRules: ['+'], support: 'frame-bare' }),
+        want: 'ftAdd',
+        tableItem: true,
+        panelRows: [{ icon: 'read', text: 'Read it two times.' }, { icon: 'ringnum', text: 'Circle the numbers.' }, { icon: 'underline', text: 'Underline the question.' },
+            { icon: 'read', text: 'Read the table.' }, { icon: 'check', text: 'Test every row.' }, { icon: 'write', text: 'Write the rule.' }],
+        instruction: 'Find the rule. Write the rule.',
+        lines: ['When Ben is {wp.x1}, Ann is {wp.y1}.', 'When Ben is {wp.x2}, Ann is {wp.y2}.', 'When Ben is {wp.x3}, Ann is {wp.y3}.', 'What is the rule from Ben to Ann?'],
+        topMm: 112,
+        answerLine: '',
+        say: 'I tested every row. The rule is __.',
         sayAns: '{wp.rule}',
     },
 
@@ -155,11 +159,13 @@ export default {
         // a + rule, a − rule, and the Critical Atom's × table whose row 1 also fits + (it is the × item too).
         { case: 'a + rule', ref: FT({ ftRules: ['+'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true } }), want: 'ftAdd', cols: 3, instr: 'Find the rule. Write the rule.', detects: 'Reads down the Out column: the gap between Outs.' },
         { case: 'a − rule', ref: FT({ ftRules: ['-'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true } }), want: 'ftSub', cols: 3, instr: 'Find the rule. Write the rule.', detects: 'Sign flipped: + when Out is smaller.' },
-        { case: 'a × rule, row 1 also fits + (Critical Atom)', ref: FT({ ftRules: ['x'], band: 50, ftTrap: true, support: 'frame-bare' }, { cellPayload: { ruleBelow: true } }), want: 'ftTimesTrap', cols: 3, instr: 'Find the rule. Write the rule.', detects: 'One pair only: + read off row 1, never tested on row 2.' },
+        { case: 'a × rule, row 1 also fits + (Critical Atom)', ref: FT({ ftRules: ['x'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true } }), want: 'ftTimes', cols: 3, instr: 'Find the rule. Write the rule.', detects: 'One pair only: + read off row 1, never tested on row 2.' },
     ],
+    // (T2b: what each label means in THIS pack - critic r1 n3: nothing on the Guided page is traced)
+    fadeMeans: [['★', 'Guided: the machine picture and the Steps; the teacher leads'], ['★★', 'Practice: Steps only, no machine picture'], ['★★★', 'Last row: a × table (row 1 also fits +) and a − table with an Out of 0']],
     exitInstruction: 'Find the rule. Write the rule.',
-    exitSay: 'In {say.x1}, out {say.y1}. The rule is __.',
-    exitSayAns: '{say.rule}',
+    // (r3, critic D6: never a rule from one pair - the Critical Atom said aloud)
+    exitSay: 'I test every row. Then I write the rule.',
     // (T6 Answers at a glance: a rule as the pupil writes it, "+ 8", not the slot list "+, 8")
     answerShow: (t) => t.replace(/([+−×÷-]),\s*(\d+)/g, '$1 $2'),
 
@@ -177,9 +183,9 @@ export default {
         { kind: 'watch', title: 'One row is not enough', text: '2 → 4 fits + 2 and × 2. Test every row, aloud.' },
     ],
     slotRows: [{ shape: 'rule frame', use: 'the sign in the circle, the number in the box' }],
-    caseNames: { ftTimesTrap: 'row 1 also fits +', ftTrapAdd: 'row 1 also fits × 2', ftTrapSub: 'row 1 also fits ÷ 2', ftSub: 'a − rule', ftTimes: 'a × rule', ftAdd: 'a + rule' },
+    caseNames: { ftTimes: 'a × rule: row 1 also fits +', ftSubZero: 'a − rule with an Out of 0', ftSub: 'a − rule', ftAdd: 'a + rule' },
     routeNote: 'No site lesson exists yet for these prerequisites: T6 names a CCSS code and a short title (V22 Appendix H).',
-    materials: ['A paper “rule machine” box with In and Out slots', 'Number cards 1 to 20', 'Reading strips (card to cover the other rows)', 'Mini whiteboards and pens', 'Pupil packet, one per pupil', 'Exit slips, cut in half'],
+    materials: ['A paper “rule machine” box with In and Out slots', 'Number cards 1 to 50', 'Reading strips (card to cover the other rows)', 'Mini whiteboards and pens', 'Pupil packet, one per pupil', 'Exit slips, cut in half'],
     vocabulary: [
         { word: 'In', gloss: 'the number that goes in', diagram: { kind: 'text', text: '4 →' } },
         { word: 'Out', gloss: 'the number that comes out', diagram: { kind: 'text', text: '→ 7' } },
@@ -195,10 +201,11 @@ export default {
         { type: 'Comparative', skill: 'Bigger or smaller', notes: 'Out bigger: + or ×. Out smaller: −.' },
         { type: 'Conceptual', critical: true, skill: 'Test every row', notes: 'A rule from one row may be wrong (2 → 4).' },
         { type: 'Comparative', skill: '+ or ×', notes: '+ fails on row 2? Try ×.' },
+        { type: 'Category', skill: 'An Out of 0', notes: 'In = the number taken away: Out is 0. Test that row too.' },
     ],
     routine: [
         { step: 'Read In and Out across row 1.', tag: 'New', check: '“Point to In. Point to Out.”' },
-        { step: 'Find the change: bigger or smaller, by how much.', tag: 'Pre-requisite', check: 'Prerequisite Check {pre.0.letters}, {pre.1.letters}' },
+        { step: 'Find the change: bigger or smaller, by how much.', tag: 'Pre-requisite', check: 'Prerequisite Check: add and subtract' },
         { step: 'Test the rule on every row.', tag: 'New', critical: true, check: 'Check Question; exit slip c' },
         { step: 'Write the sign in the circle, the number in the box.', tag: 'Pre-requisite', check: 'Guided cell 2' },
     ],
@@ -211,7 +218,7 @@ export default {
         { name: 'Sign flipped', step: 2, looks: '+ {exit.1.k} for {exit.1.rows}', fix: '“Bigger or smaller?”', option: '', caught: 'Exit b · Practice 1' },
     ],
     // (each option the rule as a pupil writes it: "+ 6", never the slot list "+, 6")
-    checkQuestion: { want: 'ftTimes', correct: 'C', show: (v) => String(v).replace(/^([+−×÷-]),\s*(\d+)$/, '$1 $2') },
+    checkQuestion: { want: 'ftTimes', ref: FT({ ftRules: ['x'] }, { ftRuleMax: 3, dealTries: 3000 }), correct: 'C', show: (v) => String(v).replace(/^([+−×÷-]),\s*(\d+)$/, '$1 $2') },
 
     // ------------------------------------------------------------------ T3-T5 delivery scripts
     sections: [
@@ -271,13 +278,13 @@ export default {
                 { do: 'Pupils finish the lesson sheet, then Practice 1 and 2.' },
                 { say: '{p4.steps}' },
                 { ask: 'Does it work on row 3?', note: 'Visit the one-pair group first.' },
-                { do: 'Practice 2: In numbers out of order. Read each row across.', note: 'Look for the gap between Outs written as the rule.' },
+                { do: 'Practice 2: the same steps. Read each row across.', note: 'Look for the gap between Outs written as the rule.' },
             ] },
         { n: 9, name: 'Word problem', min: 5, page: 'P5',
             rows: [
                 { do: 'Read the story aloud two times. Pupils tick each box.' },
-                { ask: 'Boxes in, cars out. What is the rule?', note: 'Expected: [[{wp.rule}]], tested on every row.' },
-                { ask: 'How many cars for {wp.next} boxes?', note: 'Expected: [[{wp.nextOut}]] cars.' },
+                { ask: 'Ben is In, Ann is Out. Bigger or smaller?', note: 'Bigger: try +. The table is printed under the story.' },
+                { ask: 'What is the rule? Test every row.', note: 'Expected: [[{wp.rule}]]: Ann is always {wp.k} years older.' },
             ] },
         { n: 10, name: 'Plenary and exit slip', min: 4, page: 'P6',
             rows: [
@@ -299,11 +306,12 @@ export default {
         { wrote: '{exit.2.wrong.addfortimes} for {exit.2.rows}', mistake: 'One pair only', next: 'Test row 2 aloud.' },
         { wrote: '{exit.0.wrong.neighbouroutputs} for {exit.0.rows}', mistake: 'Down the Out column', next: 'Reading strip: one row across.' },
         { wrote: '+ {exit.1.k} for {exit.1.rows}', mistake: 'Sign flipped', next: '“Bigger or smaller?” first.' },
+        { wrote: '{exit.2.wrong.neighbouroutputs} for {exit.2.rows}', mistake: 'Down the Out column', next: 'Reading strip: one row across.' },
         { wrote: '{exit.1.wrong.neighbouroutputs} for {exit.1.rows}', mistake: 'Down the Out column', next: 'Reading strip: one row across.' },
         { wrote: '{we.0.wrong.neighbouroutputs} for {we.0.rows} (Guided 1)', mistake: 'Down the Out column', next: 'Cover the rows; read row 1 across.' },
         { wrote: '{we.1.wrong.signflip} for {we.1.rows} (Guided 2)', mistake: 'Sign flipped', next: 'Point: is Out smaller? Then −.' },
         { wrote: '{we.2.wrong.addfortimes} for {we.2.rows} (Guided 3)', mistake: 'One pair only', next: 'Test it on row 2 together.' },
         { wrote: '{cq.wrong.neighbouroutputs} for {cq.rows} (Check Question)', mistake: 'Down the Out column', next: 'Cover the rows; read one across.' },
-        { wrote: '{wp.wrong.addfortimes} for the story (Word problem)', mistake: 'One pair only', next: 'Test the rule on {wp.x2} boxes too.' },
+        { wrote: '{wp.wrong.neighbouroutputs} for the story (Word problem)', mistake: 'Down the Out column', next: 'Read Ben, then Ann, one row.' },
     ],
 };
