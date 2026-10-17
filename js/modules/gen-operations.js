@@ -4218,6 +4218,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const product = a * b;
                     q.text = `${a} × ${b} = ${splitPart} × ${b} + ___ × ${b}. What is the missing number?`;
                     q.ans = missingPart;
+                    q.printSlot = true;   // the ___ is the answer slot on paper (AK-4: key = pupil slots)
                     q.hint = `Distributive property: ${a} × ${b} = (${splitPart} + ?) × ${b}. Since ${splitPart} + ${missingPart} = ${a}, the missing number is ${missingPart}`;
                     q.answerType = "number";
                     q.options = buildNumericOptions(missingPart);

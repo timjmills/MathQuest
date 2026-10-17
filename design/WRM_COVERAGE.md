@@ -24,7 +24,7 @@ Sources:
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
 - Covered 513 (59%), partial only 149 (17%), gap 210 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 338 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
+- 392 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
@@ -1366,10 +1366,10 @@ whatever happens to the WRM gaps.
   Skills: Equal Groups or Not? (Visual) (`multiplication:equal_or_unequal_groups`)  
   Vocabulary: equal groups, unequal  
 - **Y1.B9.S5** Add equal groups — covered. _K.OA.A.1, 3.OA.A.1, M.EE.K.OA.1, M.EE.3.OA.1_  
-  Skills: Arrays & Equal Groups (Visual) (`multiplication:arrays_groups`) {groups}; Write Repeated Addition as Multiplication (Visual) (`multiplication:repeated_add_to_mult`)  
+  Skills: Arrays & Equal Groups (Visual) (`multiplication:arrays_groups`) {groups}; Write Repeated Addition as Multiplication (Visual) (`multiplication:repeated_add_to_mult`); Equal Groups: Rings of Dots (`multiplication:mult_equal_groups`)  
   Vocabulary: equal groups, altogether, number sentence  
 - **Y1.B9.S6** Make arrays — covered. _K.OA.A.1, 2.OA.C.4, M.EE.K.OA.1, M.EE.2.OA.4_  
-  Skills: Arrays & Equal Groups (Visual) (`multiplication:arrays_groups`) {arrays}; Dot Array Multiplication (B&W) (`multiplication:dot_array_mult`)  
+  Skills: Arrays & Equal Groups (Visual) (`multiplication:arrays_groups`) {arrays}; Dot Array Multiplication (B&W) (`multiplication:dot_array_mult`); Arrays: Rows of Dots (`multiplication:mult_arrays`)  
   Vocabulary: array, row, column  
 - **Y1.B9.S7** Make doubles — covered. _K.OA.A.1, 1.OA.C.6, M.EE.K.OA.1_  
   Skills: Doubling (`patterns:double`); Doubles & Near Doubles (`number_sense:doubles_near_doubles`)  
@@ -1504,13 +1504,13 @@ whatever happens to the WRM gaps.
   Skills: How Many Tens? (Visual) (`composing:tens_foundation_visual`); Build a Number with Base-10 Blocks (`composing:base10_build`)  
   Vocabulary: ten, ones, represent  
 - **Y2.B1.S4** Use a place value chart — covered. _1.NBT.B.2, M.EE.1.NBT.2_  
-  Skills: Name the Place (`placevalue:identify`) {band 99}; Value of a Digit (`placevalue:value`) {band 99}  
+  Skills: Name the Place (`placevalue:identify`) {band 99}; Value of a Digit (`placevalue:value`) {band 99}; Value of a Digit in Unit Form (7 Hundreds) (`placevalue:digit_value_unit_form`) {band 99}  
   Vocabulary: column, digit, represent  
 - **Y2.B1.S5** Partition numbers to 100 — covered. _1.NBT.B.2, M.EE.1.NBT.2_  
   Skills: Expanded Form (`placevalue:expand`) {band 99}; Unit Form (4 hundreds 7 tens 6 ones) (`placevalue:unit_form`) {band 99}  
   Vocabulary: tens, ones, part, whole  
 - **Y2.B1.S6** Write numbers to 100 in words — covered. _1.NBT.A.1, 2.NBT.A.3, M.EE.1.NBT.1, M.EE.2.NBT.3_  
-  Skills: Number Word Form (`composing:number_word_form`) {Max Number 100}  
+  Skills: Number Word Form (`composing:number_word_form`) {Max Number 100}; Write Numbers in Words (`composing:write_numbers_in_words`) {Max Number 100}  
   Vocabulary: numeral, word, tens word, ones word  
 - **Y2.B1.S7** Flexibly partition numbers to 100 — GAP. _1.NBT.B.2, M.EE.1.NBT.2_  
   Proposal: Partition Numbers Flexibly  
@@ -1668,10 +1668,12 @@ whatever happens to the WRM gaps.
   Vocabulary: coin, value, worth, total  
 - **Y2.B4.S2** Count money - pounds (notes and coins) — PARTIAL. _2.MD.C.8, M.EE.2.MD.8_  
   Partial: Count Coins and Notes (`measurement:money_count`), missing counting notes  
+  Partial: Count Notes (Bills) (`measurement:count_notes`), missing counting notes  
   Proposal: Count Money (option)  
   Vocabulary: note, coin, value / £  
 - **Y2.B4.S3** Count money - pounds and pence — PARTIAL. _2.MD.C.8, M.EE.2.MD.8_  
   Partial: Count Coins and Notes (`measurement:money_count`), missing counting notes and coins together as dollars and cents  
+  Partial: Count Notes and Coins (`measurement:count_notes_and_coins`), missing counting notes and coins together  
   Proposal: Count Money (option)  
   Vocabulary: pound, pence, value, total  
 - **Y2.B4.S4** Choose notes and coins — covered. _2.MD.C.8, M.EE.2.MD.8_  
@@ -1706,7 +1708,7 @@ whatever happens to the WRM gaps.
   Proposal: Make Equal Groups  
   Vocabulary: group, equal groups, groups of  
 - **Y2.B5.S3** Add equal groups — covered. _2.OA.C.4, 3.OA.A.1, M.EE.2.OA.4, M.EE.3.OA.1_  
-  Skills: Arrays & Equal Groups (Visual) (`multiplication:arrays_groups`) {groups}; Write Repeated Addition as Multiplication (Visual) (`multiplication:repeated_add_to_mult`)  
+  Skills: Arrays & Equal Groups (Visual) (`multiplication:arrays_groups`) {groups}; Write Repeated Addition as Multiplication (Visual) (`multiplication:repeated_add_to_mult`); Equal Groups: Rings of Dots (`multiplication:mult_equal_groups`)  
   Vocabulary: equal groups, altogether, add  
 - **Y2.B5.S4** Introduce the multiplication symbol — covered. _3.OA.A.1, M.EE.3.OA.1_  
   Skills: Write Repeated Addition as Multiplication (Visual) (`multiplication:repeated_add_to_mult`)  
@@ -1715,7 +1717,7 @@ whatever happens to the WRM gaps.
   Skills: Arrays & Equal Groups (Visual) (`multiplication:arrays_groups`)  
   Vocabulary: lots of, multiply / ×, total, altogether  
 - **Y2.B5.S6** Use arrays — covered. _2.OA.C.4, 3.OA.A.1, M.EE.2.OA.4, M.EE.3.OA.1_  
-  Skills: Arrays & Equal Groups (Visual) (`multiplication:arrays_groups`) {arrays}; Dot Array Multiplication (B&W) (`multiplication:dot_array_mult`)  
+  Skills: Arrays & Equal Groups (Visual) (`multiplication:arrays_groups`) {arrays}; Dot Array Multiplication (B&W) (`multiplication:dot_array_mult`); Arrays: Rows of Dots (`multiplication:mult_arrays`)  
   Vocabulary: row, column, array  
 - **Y2.B5.S7** Make equal groups – grouping — covered. _3.OA.A.2, M.EE.3.OA.2_  
   Skills: Make Equal Groups to Divide (Visual) (`division:share_into_groups`)  
@@ -1725,7 +1727,7 @@ whatever happens to the WRM gaps.
   Proposal: Share and Make Groups  
   Vocabulary: share, equal groups, in each group  
 - **Y2.B5.S9** The 2 times-table — covered. _2.OA.C.3, 3.OA.C.7, M.EE.2.OA.3, M.EE.3.OA.6_  
-  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 2}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {2}  
+  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 2}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {2}; Count by 2s (`multiplication:count_by_2s`)  
   Vocabulary: times, multiply, array, even  
 - **Y2.B5.S10** Divide by 2 — covered. _3.OA.A.2, 3.OA.C.7, M.EE.3.OA.2, M.EE.3.OA.6_  
   Skills: Division Facts (1-12) (`division:div_facts`) {divide by 2}  
@@ -1737,13 +1739,13 @@ whatever happens to the WRM gaps.
   Skills: Odd or Even? (Visual) (`composing:odd_even`); Circle the Even or Odd Numbers (MAP) (`composing:select_even_odd`)  
   Vocabulary: even, odd, groups of two  
 - **Y2.B5.S13** The 10 times-table — covered. _2.NBT.A.2, 3.OA.C.7, M.EE.2.NBT.2, M.EE.3.OA.6_  
-  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 10}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {10}  
+  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 10}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {10}; Count by 10s (`multiplication:count_by_10s`)  
   Vocabulary: groups of ten, ten times as much, altogether  
 - **Y2.B5.S14** Divide by 10 — covered. _3.OA.A.2, 3.OA.C.7, M.EE.3.OA.2, M.EE.3.OA.6_  
   Skills: Division Facts (1-12) (`division:div_facts`) {divide by 10}  
   Vocabulary: group, share, ten  
 - **Y2.B5.S15** The 5 times-table — covered. _2.NBT.A.2, 3.OA.C.7, M.EE.2.NBT.2, M.EE.3.OA.6_  
-  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 5}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {5}  
+  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 5}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {5}; Count by 5s (`multiplication:count_by_5s`)  
   Vocabulary: lots of, groups of, multiple, times-table  
 - **Y2.B5.S16** Divide by 5 — covered. _3.OA.A.2, 3.OA.C.7, M.EE.3.OA.2, M.EE.3.OA.6_  
   Skills: Division Facts (1-12) (`division:div_facts`) {divide by 5}  
@@ -1867,7 +1869,7 @@ whatever happens to the WRM gaps.
   Skills: Time to 5 Minutes (`measurement:time_5min`)  
   Vocabulary: to, quarter to, next hour  
 - **Y2.B9.S5** Tell the time to 5 minutes — covered. _2.MD.C.7, M.EE.2.MD.7_  
-  Skills: Time to 5 Minutes (`measurement:time_5min`); Count the Minutes by Fives (`measurement:time_fives_ring`)  
+  Skills: Time to 5 Minutes (`measurement:time_5min`); Count the Minutes by Fives (`measurement:time_fives_ring`); Write All the Minutes by Fives (`measurement:minutes_by_fives_all`)  
   Vocabulary: minutes past, minutes to, minute hand  
 - **Y2.B9.S6** Minutes in an hour — GAP. _1.MD.B.3, 4.MD.A.1, M.EE.1.MD.3, M.EE.4.MD.1_  
   Proposal: Minutes, Hours and Days  
@@ -2050,10 +2052,10 @@ whatever happens to the WRM gaps.
 #### Y3.B3 Autumn Block 3: Multiplication and division
 
 - **Y3.B3.S1** Multiplication - equal groups — covered. _2.OA.C.4, 3.OA.A.1, M.EE.2.OA.4, M.EE.3.OA.1_  
-  Skills: Arrays & Equal Groups (Visual) (`multiplication:arrays_groups`) {groups}; Write Repeated Addition as Multiplication (Visual) (`multiplication:repeated_add_to_mult`)  
+  Skills: Arrays & Equal Groups (Visual) (`multiplication:arrays_groups`) {groups}; Write Repeated Addition as Multiplication (Visual) (`multiplication:repeated_add_to_mult`); Equal Groups: Rings of Dots (`multiplication:mult_equal_groups`)  
   Vocabulary: equal groups, unequal  
 - **Y3.B3.S2** Use arrays — covered. _2.OA.C.4, M.EE.2.OA.4_  
-  Skills: Arrays & Equal Groups (Visual) (`multiplication:arrays_groups`) {arrays}; Dot Array Multiplication (B&W) (`multiplication:dot_array_mult`)  
+  Skills: Arrays & Equal Groups (Visual) (`multiplication:arrays_groups`) {arrays}; Dot Array Multiplication (B&W) (`multiplication:dot_array_mult`); Arrays: Rows of Dots (`multiplication:mult_arrays`)  
   Vocabulary: row, column, array  
 - **Y3.B3.S3** Multiples of 2 — PARTIAL. _2.OA.C.3, 2.OA.C.4, M.EE.2.OA.3, M.EE.2.OA.4_  
   Partial: Multiples of a Number (`number_theory:multiples`), missing multiples of 2 as even numbers to 100  
@@ -2064,7 +2066,7 @@ whatever happens to the WRM gaps.
   Proposal: Multiples of 2, 5 and 10 (option)  
   Vocabulary: multiple, ones column, both  
 - **Y3.B3.S5** Sharing and grouping — covered. _3.OA.A.2, M.EE.3.OA.2_  
-  Skills: Division Word Problems (`division:div_word_problems`); Make Equal Groups to Divide (Visual) (`division:share_into_groups`)  
+  Skills: Division Word Problems (`division:div_word_problems`); Make Equal Groups to Divide (Visual) (`division:share_into_groups`); Division Word Problems: Sharing (`division:div_sharing_word_problems`); Division Word Problems: Grouping (`division:div_grouping_word_problems`)  
   Vocabulary: share, group, altogether  
 - **Y3.B3.S6** Multiply by 3 — covered. _2.OA.C.4, 3.OA.A.1, 3.OA.C.7, M.EE.2.OA.4, M.EE.3.OA.1, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 3}  
@@ -2073,7 +2075,7 @@ whatever happens to the WRM gaps.
   Skills: Division Facts (1-12) (`division:div_facts`) {divide by 3}  
   Vocabulary: share, group, divide (÷)  
 - **Y3.B3.S8** The 3 times-table — covered. _2.OA.C.4, 3.OA.C.7, M.EE.2.OA.4, M.EE.3.OA.6_  
-  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 3}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {3}  
+  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 3}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {3}; Count by 3s (`multiplication:count_by_3s`)  
   Vocabulary: groups of 3, multiple, product  
 - **Y3.B3.S9** Multiply by 4 — covered. _2.OA.C.4, 3.OA.A.1, 3.OA.C.7, M.EE.2.OA.4, M.EE.3.OA.1, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 4}  
@@ -2082,7 +2084,7 @@ whatever happens to the WRM gaps.
   Skills: Division Facts (1-12) (`division:div_facts`) {divide by 4}  
   Vocabulary: share, group, in each  
 - **Y3.B3.S11** The 4 times-table — covered. _2.OA.C.4, 3.OA.C.7, M.EE.2.OA.4, M.EE.3.OA.6_  
-  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 4}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {4}  
+  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 4}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {4}; Count by 4s (`multiplication:count_by_4s`)  
   Vocabulary: array, multiple of 4, double  
 - **Y3.B3.S12** Multiply by 8 — covered. _3.OA.A.1, 3.OA.C.7, M.EE.3.OA.1, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 8}  
@@ -2091,7 +2093,7 @@ whatever happens to the WRM gaps.
   Skills: Division Facts (1-12) (`division:div_facts`) {divide by 8}  
   Vocabulary: share, group, divide  
 - **Y3.B3.S14** The 8 times-table — covered. _3.OA.C.7, M.EE.3.OA.6_  
-  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 8}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {8}  
+  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 8}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {8}; Count by 8s (`multiplication:count_by_8s`)  
   Vocabulary: eights, multiple, double  
 - **Y3.B3.S15** The 2, 4 and 8 times-tables — PARTIAL. _3.OA.B.5, 3.OA.C.7, M.EE.3.OA.6_  
   Partial: Multiplication Facts (1-12) (`multiplication:mult_facts`), missing the doubling link between the 2, 4 and 8 tables  
@@ -2102,7 +2104,7 @@ whatever happens to the WRM gaps.
 #### Y3.B4 Spring Block 1: Multiplication and division B
 
 - **Y3.B4.S1** Multiples of 10 — covered. _2.NBT.A.2, 3.NBT.A.3, M.EE.2.NBT.2, M.EE.3.NBT.3_  
-  Skills: Multiply by 10, 100 and Multiples of Ten (`multiplication:mult_zeros`) {× 10}; Count by 10s (`patterns:seq_10`)  
+  Skills: Multiply by 10, 100 and Multiples of Ten (`multiplication:mult_zeros`) {× 10}; Count by 10s (`patterns:seq_10`); Multiply by 10 (`multiplication:mult_by_ten`)  
   Vocabulary: multiple of 10, ten times the size, tens counter  
 - **Y3.B4.S2** Related calculations — covered. _3.NBT.A.3, 3.OA.B.5, M.EE.3.NBT.3_  
   Skills: Multiply by 10, 100 and Multiples of Ten (`multiplication:mult_zeros`); Multiply by Multiples of Ten (6 × 40) (`multiplication:mult_multiples_of_ten`)  
@@ -2111,7 +2113,7 @@ whatever happens to the WRM gaps.
   Skills: Multiplication Properties (Visual) (`multiplication:mult_properties`)  
   Vocabulary: commutative, factor, lots of  
 - **Y3.B4.S4** Multiply a 2-digit number by a 1-digit number - no exchange — covered. _3.OA.B.5, 4.NBT.B.5_  
-  Skills: Basic Multiplication (`multiplication:multiply`) {2-digit × 1-digit}; Area Model Multiplication (`multiplication:area_model_mult`); Multiply 2-Digit by 1-Digit Numbers (Column) (`multiplication:mult_2by1_column`)  
+  Skills: Basic Multiplication (`multiplication:multiply`) {2-digit × 1-digit}; Area Model Multiplication (`multiplication:area_model_mult`); Multiply 2-Digit by 1-Digit Numbers (Column) (`multiplication:mult_2by1_column`); Area Model: Multiply 2-Digit by 1-Digit (`multiplication:area_model_2by1`)  
   Vocabulary: partition, multiple, recombine  
 - **Y3.B4.S5** Multiply a 2-digit number by a 1-digit number - with exchange — covered. _3.OA.B.5, 4.NBT.B.5_  
   Skills: Basic Multiplication (`multiplication:multiply`) {2-digit × 1-digit}; Area Model Multiplication (`multiplication:area_model_mult`); Multiply 2-Digit by 1-Digit Numbers (Column) (`multiplication:mult_2by1_column`)  
@@ -2152,10 +2154,10 @@ whatever happens to the WRM gaps.
   Skills: Metric Length (mm/cm/m/km) (`measurement:length_metric`)  
   Vocabulary: millimetre (mm), centimetre (cm), metre (m)  
 - **Y3.B5.S5** Equivalent lengths (metres and centimetres) — covered. _2.MD.A.1, 4.MD.A.1, M.EE.2.MD.1, M.EE.4.MD.1_  
-  Skills: Metric Length (mm/cm/m/km) (`measurement:length_metric`) {m and cm}  
+  Skills: Metric Length (mm/cm/m/km) (`measurement:length_metric`) {m and cm}; Convert Meters to Centimeters (`measurement:convert_m_to_cm`) {m and cm}  
   Vocabulary: equivalent, convert, partition  
 - **Y3.B5.S6** Equivalent lengths (centimetres and millimetres) — covered. _2.MD.A.1, 4.MD.A.1, M.EE.2.MD.1, M.EE.4.MD.1_  
-  Skills: Metric Length (mm/cm/m/km) (`measurement:length_metric`) {cm and mm}  
+  Skills: Metric Length (mm/cm/m/km) (`measurement:length_metric`) {cm and mm}; Convert Centimeters to Millimeters (`measurement:convert_cm_to_mm`) {cm and mm}  
   Vocabulary: millimetre (mm), centimetre (cm), equivalent  
 - **Y3.B5.S7** Compare lengths — GAP. _2.MD.A.4, M.EE.2.MD.4_  
   Proposal: Compare Lengths  
@@ -2564,10 +2566,10 @@ whatever happens to the WRM gaps.
   Proposal: Multiply Three Numbers  
   Vocabulary: split, any order, partition  
 - **Y4.B5.S3** Multiply by 10 — covered. _3.NBT.A.3, 4.NBT.A.1, M.EE.3.NBT.3_  
-  Skills: Multiply by 10, 100 and Multiples of Ten (`multiplication:mult_zeros`) {× 10}; Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {× 10}  
+  Skills: Multiply by 10, 100 and Multiples of Ten (`multiplication:mult_zeros`) {× 10}; Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {× 10}; Multiply by 10 (`multiplication:mult_by_ten`)  
   Vocabulary: 10 times the size, place value, placeholder  
 - **Y4.B5.S4** Multiply by 100 — covered. _3.NBT.A.3, 4.NBT.A.1, M.EE.3.NBT.3_  
-  Skills: Multiply by 10, 100 and Multiples of Ten (`multiplication:mult_zeros`) {× 100}; Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {× 100}  
+  Skills: Multiply by 10, 100 and Multiples of Ten (`multiplication:mult_zeros`) {× 100}; Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {× 100}; Multiply by 100 (`multiplication:mult_by_hundred`)  
   Vocabulary: 100 times the size, scaling, placeholder  
 - **Y4.B5.S5** Divide by 10 — covered. _4.NBT.A.1, 5.NBT.A.2, M.EE.5.NBT.2_  
   Skills: Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {÷ 10}  
@@ -2585,10 +2587,10 @@ whatever happens to the WRM gaps.
   Proposal: Partition to Multiply  
   Vocabulary: partition, recombine, repeated addition  
 - **Y4.B5.S9** Multiply a 2-digit number by a 1-digit number — covered. _3.NBT.A.3, 4.NBT.B.5, M.EE.3.NBT.3_  
-  Skills: Basic Multiplication (`multiplication:multiply`) {2-digit × 1-digit}; Area Model Multiplication (`multiplication:area_model_mult`); Multiply 2-Digit by 1-Digit Numbers (Column) (`multiplication:mult_2by1_column`)  
+  Skills: Basic Multiplication (`multiplication:multiply`) {2-digit × 1-digit}; Area Model Multiplication (`multiplication:area_model_mult`); Multiply 2-Digit by 1-Digit Numbers (Column) (`multiplication:mult_2by1_column`); Area Model: Multiply 2-Digit by 1-Digit (`multiplication:area_model_2by1`)  
   Vocabulary: partition, partial product, exchange  
 - **Y4.B5.S10** Multiply a 3-digit number by a 1-digit number — covered. _4.NBT.B.5_  
-  Skills: Basic Multiplication (`multiplication:multiply`) {3-digit × 1-digit}; Area Model Multiplication (`multiplication:area_model_mult`); Multiply 3-Digit by 1-Digit Numbers (Column) (`multiplication:mult_3by1_column`)  
+  Skills: Basic Multiplication (`multiplication:multiply`) {3-digit × 1-digit}; Area Model Multiplication (`multiplication:area_model_mult`); Multiply 3-Digit by 1-Digit Numbers (Column) (`multiplication:mult_3by1_column`); Area Model: Multiply 3-Digit by 1-Digit (`multiplication:area_model_3by1`)  
   Vocabulary: exchange, place value, product  
 - **Y4.B5.S11** Divide a 2-digit number by a 1-digit number (1) — covered. _3.OA.B.5, 4.NBT.B.6_  
   Skills: Box Method Division (2÷1 digit) (`division:box_division_easy`); Area Model Division (2÷1 digit) (`division:area_model_div_2by1`); Divide 2-Digit by 1-Digit Numbers (Long Division) (`division:div_2by1_long`)  
@@ -2604,6 +2606,7 @@ whatever happens to the WRM gaps.
   Vocabulary: combination, possibilities, table  
 - **Y4.B5.S15** Efficient multiplication — PARTIAL. _3.OA.B.5_  
   Partial: Multiplication Properties (Visual) (`multiplication:mult_properties`), missing choosing an efficient strategy: doubling, near multiples, factor pairs  
+  Partial: Break Apart a Fact (Distributive Property) (`multiplication:mult_break_apart`), missing breaking a fact apart into two easier facts  
   Proposal: Related Times-Tables  
   Vocabulary: efficient, partition, factor  
 
@@ -2614,7 +2617,7 @@ whatever happens to the WRM gaps.
   Proposal: Kilometres and Metres (option)  
   Vocabulary: kilometre, distance, abbreviation  
 - **Y4.B6.S2** Equivalent lengths (kilometres and metres) — covered. _4.MD.A.1, M.EE.4.MD.1_  
-  Skills: Metric Length (mm/cm/m/km) (`measurement:length_metric`) {km and m}  
+  Skills: Metric Length (mm/cm/m/km) (`measurement:length_metric`) {km and m}; Convert Kilometers to Meters (`measurement:convert_km_to_m`) {km and m}  
   Vocabulary: convert, equivalent, ×1,000, ÷1,000  
 - **Y4.B6.S3** Perimeter on a grid — covered. _3.MD.D.8_  
   Skills: Perimeter - Grid Counting (Visual) (`area_perimeter:perimeter_grid`)  
@@ -2826,6 +2829,7 @@ whatever happens to the WRM gaps.
   Vocabulary: key, scale, interval  
 - **Y4.B13.S2** Comparison, sum and difference — PARTIAL. _3.MD.B.3, M.EE.3.MD.3_  
   Partial: Bar Graphs (`graphs:bar_graph`), missing comparison, sum and difference questions across a chart  
+  Partial: Bar Graphs: How Many More? (`graphs:bar_graph_how_many_more`), missing comparison questions across a chart  
   Proposal: Line Graphs  
   Vocabulary: scale, key, difference, total  
 - **Y4.B13.S3** Interpret line graphs — GAP. _5.G.A.2, M.EE.5.G.2_  
@@ -2840,10 +2844,10 @@ whatever happens to the WRM gaps.
 #### Y4.B14 Summer Block 6: Position and direction
 
 - **Y4.B14.S1** Describe position using coordinates — covered. _5.G.A.1, M.EE.5.G.1_  
-  Skills: Coordinates (Quadrant I) (`coordinates:coordinate_q1`)  
+  Skills: Coordinates (Quadrant I) (`coordinates:coordinate_q1`); Read Coordinates in the First Quadrant (`coordinates:coordinates_read_q1`)  
   Vocabulary: horizontal, vertical, coordinates  
 - **Y4.B14.S2** Plot coordinates — covered. _5.G.A.1, 5.G.A.2, M.EE.5.G.1, M.EE.5.G.2_  
-  Skills: Coordinates (Quadrant I) (`coordinates:coordinate_q1`)  
+  Skills: Coordinates (Quadrant I) (`coordinates:coordinate_q1`); Plot Points in the First Quadrant (`coordinates:coordinates_plot_q1`)  
   Vocabulary: x-axis, y-axis, coordinate, plot  
 - **Y4.B14.S3** Draw 2-D shapes on a grid — PARTIAL. _3.G.A.1, 5.G.A.1, M.EE.3.G.1, M.EE.5.G.1_  
   Partial: Polygon on Coord Grid (Side Lengths/Perimeter) (`coordinates:coord_polygon`), missing drawing a 2-D shape by plotting its vertices and finding a missing vertex  
@@ -2936,10 +2940,11 @@ whatever happens to the WRM gaps.
 #### Y5.B3 Autumn Block 3: Multiplication and division A
 
 - **Y5.B3.S1** Multiples — covered. _4.OA.B.4, M.EE.4.OA.4_  
-  Skills: Multiples of a Number (`number_theory:multiples`)  
+  Skills: Multiples of a Number (`number_theory:multiples`); List the First Multiples of a Number (`number_theory:list_multiples`)  
   Vocabulary: multiple, times-table, digit sum  
 - **Y5.B3.S2** Common multiples — PARTIAL. _4.OA.B.4, 6.NS.B.4, M.EE.4.OA.4_  
   Partial: Least Common Multiple (`number_theory:lcm`), missing listing all the common multiples, not only the least  
+  Partial: Find Every Common Multiple (`number_theory:common_multiples`), missing picking every common multiple from a set of numbers, not writing the list  
   Proposal: Common Multiples and Common Factors (option)  
   Vocabulary: multiple, common, common multiple  
 - **Y5.B3.S3** Factors — covered. _4.OA.B.4, M.EE.4.OA.4_  
@@ -2947,6 +2952,7 @@ whatever happens to the WRM gaps.
   Vocabulary: factor, factor pair, product  
 - **Y5.B3.S4** Common factors — PARTIAL. _4.OA.B.4, 6.NS.B.4, M.EE.4.OA.4_  
   Partial: Greatest Common Factor (Easy) (`number_theory:gcf_easy`), missing listing all the common factors, not only the greatest  
+  Partial: Find Every Common Factor (`number_theory:common_factors`), missing picking every common factor from a set of numbers, not writing the list  
   Proposal: Common Multiples and Common Factors (option)  
   Vocabulary: factor, common, common factor  
 - **Y5.B3.S5** Prime numbers — covered. _4.OA.B.4, M.EE.4.OA.4_  
@@ -2954,6 +2960,7 @@ whatever happens to the WRM gaps.
   Vocabulary: factor, prime, composite  
 - **Y5.B3.S6** Square numbers — PARTIAL. _6.EE.A.1, M.EE.6.EE.1-2_  
   Partial: Level 7: Exponents (`order_of_operations:exponents_simple`), missing square numbers as square arrays; recognising squares  
+  Partial: Square Numbers (5²) (`order_of_operations:square_numbers`), missing square numbers as square arrays; recognising squares  
   Proposal: Square and Cube Numbers  
   Vocabulary: square number, integer, squared (32)  
 - **Y5.B3.S7** Cube numbers — GAP. _6.EE.A.1, M.EE.6.EE.1-2_  
@@ -3127,7 +3134,7 @@ whatever happens to the WRM gaps.
   Proposal: Round Decimals to the Nearest Whole (option)  
   Vocabulary: round, whole number, integer, halfway (midpoint)  
 - **Y5.B7.S11** Round to 1 decimal place — covered. _5.NBT.A.4, M.EE.5.NBT.4_  
-  Skills: Round Thousandths (`decimals:round_thousandths`) {nearest tenth}; Rounding Sort: Nearest Tenth (`number_sense:round_sort_tenths`)  
+  Skills: Round Thousandths (`decimals:round_thousandths`) {nearest tenth}; Rounding Sort: Nearest Tenth (`number_sense:round_sort_tenths`); Round Decimals to the Nearest Tenth (`decimals:round_to_tenth`)  
   Vocabulary: tenth, nearest, placeholder zero  
 - **Y5.B7.S12** Understand percentages — covered. _4.NF.C.6, 6.RP.A.3_  
   Skills: Percent Grid (Visual) (`conversions:percent_visual`)  
@@ -3158,7 +3165,7 @@ whatever happens to the WRM gaps.
   Skills: Area Only (`area_perimeter:area`) {rectangles}  
   Vocabulary: area, square centimetre (cm²), length, width  
 - **Y5.B8.S5** Area of compound shapes — covered. _4.MD.A.3, 3.MD.C.7, M.EE.4.MD.3_  
-  Skills: Decompose Polygon Area (L/T/U) (`area_perimeter:area_polygon_decompose`); Composite Shapes (L, T, U) (`area_perimeter:composite_shapes`)  
+  Skills: Decompose Polygon Area (L/T/U) (`area_perimeter:area_polygon_decompose`); Composite Shapes (L, T, U) (`area_perimeter:composite_shapes`); Area and Perimeter of Composite Shapes (`area_perimeter:composite_area_perimeter`)  
   Vocabulary: compound shape, partition, area  
 - **Y5.B8.S6** Estimate area — GAP. _3.MD.C.6_  
   Proposal: Estimate Area  
@@ -3203,10 +3210,12 @@ whatever happens to the WRM gaps.
   Vocabulary: origin, centre point, zero line, inner, outer scale  
 - **Y5.B10.S6** Calculate angles around a point — PARTIAL. _4.MD.C.7_  
   Partial: Two Angles Sum (Visual) (`angles_lines:additive_angles`), missing angles around a point sum to 360°  
+  Partial: Angles Around a Point (360°) (`angles_lines:angles_around_point`), missing angles around a point sum to 360°  
   Proposal: Angles Around a Point and on a Line (option)  
   Vocabulary: full turn, sum, degree (°)  
 - **Y5.B10.S7** Calculate angles on a straight line — PARTIAL. _4.MD.C.7_  
   Partial: Two Angles Sum (Visual) (`angles_lines:additive_angles`), missing angles on a straight line sum to 180°  
+  Partial: Angles on a Straight Line (180°) (`angles_lines:angles_on_straight_line`), missing angles on a straight line sum to 180°  
   Proposal: Angles Around a Point and on a Line (option)  
   Vocabulary: straight line, half turn, adjacent, sum  
 - **Y5.B10.S8** Lengths and angles in shapes — GAP. _4.G.A.2, 4.MD.C.7, M.EE.4.G.2_  
@@ -3223,14 +3232,14 @@ whatever happens to the WRM gaps.
 #### Y5.B11 Summer Block 2: Position and direction
 
 - **Y5.B11.S1** Read and plot coordinates — covered. _4.G.A.1, 5.G.A.1, M.EE.4.G.1, M.EE.5.G.1_  
-  Skills: Coordinates (Quadrant I) (`coordinates:coordinate_q1`)  
+  Skills: Coordinates (Quadrant I) (`coordinates:coordinate_q1`); Read Coordinates in the First Quadrant (`coordinates:coordinates_read_q1`)  
   Vocabulary: axis, coordinate, x-coordinate, y-coordinate  
 - **Y5.B11.S2** Problem solving with coordinates — PARTIAL. _4.G.A.1, 5.G.A.1, M.EE.4.G.1, M.EE.5.G.1_  
   Partial: Polygon on Coord Grid (Side Lengths/Perimeter) (`coordinates:coord_polygon`), missing finding a missing vertex of a shape from coordinates  
   Proposal: Translate on a Grid  
   Vocabulary: coordinate, vertex, axis  
 - **Y5.B11.S3** Translation — covered. _4.G.A.1, 5.G.A.1, M.EE.4.G.1, M.EE.5.G.1_  
-  Skills: Translations (Visual, MC) (`coordinates:geo_translate`)  
+  Skills: Translations (Visual, MC) (`coordinates:geo_translate`); Translate a Shape Right and Up (`coordinates:translate_right_up`); Translate a Shape Left and Up (`coordinates:translate_left_up`); Translate a Shape Right and Down (`coordinates:translate_right_down`); Translate a Shape Left and Down (`coordinates:translate_left_down`)  
   Vocabulary: translate, squares, left, right, up, down  
 - **Y5.B11.S4** Translation with coordinates — PARTIAL. _4.G.A.1, 5.G.A.1, M.EE.4.G.1, M.EE.5.G.1_  
   Partial: Translations (Visual, MC) (`coordinates:geo_translate`), missing writing the new coordinates after a translation  
@@ -3378,10 +3387,12 @@ whatever happens to the WRM gaps.
   Vocabulary: integer, exchange, column  
 - **Y6.B2.S2** Common factors — PARTIAL. _4.OA.B.4, 6.NS.B.4, M.EE.4.OA.4_  
   Partial: Greatest Common Factor (Easy) (`number_theory:gcf_easy`), missing listing all common factors  
+  Partial: Find Every Common Factor (`number_theory:common_factors`), missing picking every common factor from a set, not writing the list  
   Proposal: Common Multiples and Common Factors (option)  
   Vocabulary: factor, common, pair  
 - **Y6.B2.S3** Common multiples — PARTIAL. _4.OA.B.4, 6.NS.B.4, M.EE.4.OA.4_  
   Partial: Least Common Multiple (`number_theory:lcm`), missing listing all common multiples  
+  Partial: Find Every Common Multiple (`number_theory:common_multiples`), missing picking every common multiple from a set, not writing the list  
   Proposal: Common Multiples and Common Factors (option)  
   Vocabulary: multiple, common, common multiple  
 - **Y6.B2.S4** Rules of divisibility — PARTIAL. _4.OA.B.4, M.EE.4.OA.4_  
@@ -3435,7 +3446,7 @@ whatever happens to the WRM gaps.
 #### Y6.B3 Autumn Block 3: Fractions A
 
 - **Y6.B3.S1** Equivalent fractions and simplifying — covered. _4.NF.A.1, M.EE.4.NF.1_  
-  Skills: Equivalent Fractions (`fractions:equivalent`); Simplify Fractions (`fractions:simplify`)  
+  Skills: Equivalent Fractions (`fractions:equivalent`); Simplify Fractions (`fractions:simplify`); Simplify Fractions Using the Greatest Common Factor (`fractions:simplify_with_gcf`)  
   Vocabulary: simplify, simplest form, common factor  
 - **Y6.B3.S2** Equivalent fractions on a number line — GAP. _4.NF.A.1, M.EE.4.NF.1_  
   Proposal: Equivalent Fractions on a Number Line (option)  
@@ -3473,7 +3484,7 @@ whatever happens to the WRM gaps.
   Skills: Fraction × Fraction (No Visuals) (`fraction_operations:mult_frac_frac_nv`); Fraction × Fraction (Visual) (`fraction_operations:mult_frac_frac`)  
   Vocabulary: of, overlap, simplify  
 - **Y6.B4.S3** Divide a fraction by an integer — covered. _5.NF.B.7_  
-  Skills: Divide with Unit Fractions (No Visuals) (`fraction_operations:div_unit_frac_nv`); Divide with Unit Fractions (Visual) (`fraction_operations:div_unit_fraction`) {fraction ÷ whole}  
+  Skills: Divide with Unit Fractions (No Visuals) (`fraction_operations:div_unit_frac_nv`); Divide with Unit Fractions (Visual) (`fraction_operations:div_unit_fraction`) {fraction ÷ whole}; Divide a Unit Fraction by a Whole Number (`fraction_operations:unit_frac_div_whole`)  
   Vocabulary: numerator, denominator, unitise  
 - **Y6.B4.S4** Divide any fraction by an integer — PARTIAL. _5.NF.B.7_  
   Partial: Divide with Unit Fractions (No Visuals) (`fraction_operations:div_unit_frac_nv`), missing a non-unit fraction divided by an integer (4/5 ÷ 3)  
@@ -3515,7 +3526,7 @@ whatever happens to the WRM gaps.
   Proposal: Add or Multiply?  
   Vocabulary: additive, multiplicative, times the size  
 - **Y6.B6.S2** Use ratio language — covered. _6.RP.A.1, M.EE.6.RP.1_  
-  Skills: Write Ratios (a:b) (`conversions:ratio_intro`)  
+  Skills: Write Ratios (a:b) (`conversions:ratio_intro`); Write a Part-to-Part Ratio (`conversions:ratio_part_to_part`)  
   Vocabulary: for every, ratio, common factor  
 - **Y6.B6.S3** Introduction to the ratio symbol — covered. _6.RP.A.1, M.EE.6.RP.1_  
   Skills: Write Ratios (a:b) (`conversions:ratio_intro`); Equivalent Ratios (`conversions:equiv_ratios`)  
@@ -3564,13 +3575,13 @@ whatever happens to the WRM gaps.
   Proposal: Formulae  
   Vocabulary: formula, variable, represents  
 - **Y6.B7.S6** Form equations — covered. _6.EE.B.6, 6.EE.B.7, M.EE.6.EE.5-7_  
-  Skills: Write Equations from Words (`algebra:write_equation`)  
+  Skills: Write Equations from Words (`algebra:write_equation`); Write an Equation for a Story (`algebra:write_equation_story`)  
   Vocabulary: expression, equation, equals  
 - **Y6.B7.S7** Solve 1-step equations — covered. _6.EE.B.7, M.EE.6.EE.5-7_  
-  Skills: Solve One-Step Equations (+/−) (`algebra:solve_eq_addsub`); Solve One-Step Equations (×/÷) (`algebra:solve_eq_multdiv`)  
+  Skills: Solve One-Step Equations (+/−) (`algebra:solve_eq_addsub`); Solve One-Step Equations (×/÷) (`algebra:solve_eq_multdiv`); Solve x + a = b (`algebra:solve_x_plus_a`); Solve x − a = b (`algebra:solve_x_minus_a`); Solve ax = b (`algebra:solve_ax_eq_b`); Solve x ÷ a = b (`algebra:solve_x_div_a`)  
   Vocabulary: balanced, inverse, solve  
 - **Y6.B7.S8** Solve 2-step equations — covered. _3.OA.D.8, M.EE.3.OA.7_  
-  Skills: Solve Two-Step Equations (`algebra:solve_eq_twostep`)  
+  Skills: Solve Two-Step Equations (`algebra:solve_eq_twostep`); Solve ax + b = c (`algebra:solve_ax_plus_b`); Solve ax − b = c (`algebra:solve_ax_minus_b`)  
   Vocabulary: equation, inverse, both sides  
 - **Y6.B7.S9** Find pairs of values — GAP. _4.OA.B.4, 6.EE.B.6, M.EE.4.OA.4, M.EE.6.EE.5-7_  
   Proposal: Pairs of Values and Two Unknowns  
@@ -3591,7 +3602,7 @@ whatever happens to the WRM gaps.
   Proposal: Decimal Place Value (option)  
   Vocabulary: tenths, hundredths, thousandths  
 - **Y6.B8.S3** Round decimals — covered. _5.NBT.A.4, M.EE.5.NBT.4_  
-  Skills: Round Decimals (Visual) (`decimals:round_decimals`); Round Thousandths (`decimals:round_thousandths`)  
+  Skills: Round Decimals (Visual) (`decimals:round_decimals`); Round Thousandths (`decimals:round_thousandths`); Round Decimals to the Nearest Hundredth (`decimals:round_to_hundredth`)  
   Vocabulary: round, nearest, previous, next, midpoint  
 - **Y6.B8.S4** Add and subtract decimals — covered. _5.NBT.B.7, M.EE.5.NBT.7_  
   Skills: Adding Decimals (`decimals:add_decimal`); Subtracting Decimals (`decimals:sub_decimal`)  
@@ -3606,7 +3617,7 @@ whatever happens to the WRM gaps.
   Skills: Multiplying Decimals (`decimals:mult_decimal`) {decimal × whole number}  
   Vocabulary: tenth, hundredth, exchange, integer  
 - **Y6.B8.S8** Divide decimals by integers — covered. _5.NBT.B.7, M.EE.5.NBT.7_  
-  Skills: Dividing Decimals (`decimals:div_decimal`) {decimal ÷ whole number}  
+  Skills: Dividing Decimals (`decimals:div_decimal`) {decimal ÷ whole number}; Divide a Decimal by a Whole Number (`decimals:div_decimal_by_whole`)  
   Vocabulary: integer, tenths, hundredths, exchange  
 - **Y6.B8.S9** Multiply and divide decimals in context — GAP. _5.NBT.B.7, M.EE.5.NBT.7_  
   Proposal: Multiply and Divide Decimals in Context (option)  
@@ -3738,7 +3749,7 @@ whatever happens to the WRM gaps.
   Skills: Coordinates (Quadrant I) (`coordinates:coordinate_q1`); Coordinate Graphing (`coordinates:coordinate_graph`)  
   Vocabulary: axis, coordinates, origin  
 - **Y6.B13.S2** Read and plot points in four quadrants — covered. _5.G.A.1, M.EE.5.G.1_  
-  Skills: Coordinates (All 4 Quadrants) (`coordinates:coordinate_all`)  
+  Skills: Coordinates (All 4 Quadrants) (`coordinates:coordinate_all`); Read Coordinates in All Four Quadrants (`coordinates:coordinates_read_all`); Plot Points in All Four Quadrants (`coordinates:coordinates_plot_all`)  
   Vocabulary: negative, quadrant, axis  
 - **Y6.B13.S3** Solve problems with coordinates — PARTIAL. _5.G.A.2, M.EE.5.G.2_  
   Partial: Polygon on Coord Grid (Side Lengths/Perimeter) (`coordinates:coord_polygon`), missing missing vertices and coordinates problems in four quadrants  
@@ -3748,6 +3759,6 @@ whatever happens to the WRM gaps.
   Skills: Translations (Visual, MC) (`coordinates:geo_translate`)  
   Vocabulary: translate, vertex, corresponding  
 - **Y6.B13.S5** Reflections — covered. _5.G.A.1, M.EE.5.G.1_  
-  Skills: Reflections (Visual, MC) (`coordinates:geo_reflect`)  
+  Skills: Reflections (Visual, MC) (`coordinates:geo_reflect`); Reflect a Shape in the x-Axis (`coordinates:reflect_x_axis`); Reflect a Shape in the y-Axis (`coordinates:reflect_y_axis`)  
   Vocabulary: reflection, mirror line, axis, distance  
 

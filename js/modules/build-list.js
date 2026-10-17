@@ -224,7 +224,7 @@ export const STANDARD_PROPOSALS = {
 
     // ------------------------------------------------------------------ operations (1-2)
     add_three_forms: P({
-        kind: 'option', preset: true, skill: 'addition:add_three', option: 'form: word problem (three addends, sum ≤ 20) and "make a ten first" (ring the two that make 10)',
+        kind: 'option', preset: true, skill: 'addition:add_three', option: 'form: word problem (three addends, sum ≤ 20) and "make a ten first" (ring the two that make 10) (also a named preset skill once built, design/PRESET_SKILLS.md)',
         name: 'Add Three Numbers: Stories and Make a Ten First (option)', grade: '1', family: 'operations', standards: ['1.OA.A.2', '1.OA.B.3'], ee: ['M.EE.1.OA.2'],
         teaches: 'solving three-addend word problems and adding three numbers by grouping two that make ten (associative and commutative properties as strategies)',
         problemTypes: ['story with three addends', 'ring the pair that makes 10, then add', 'change the order to make it easier', 'which way is easier?'],
@@ -305,7 +305,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['reads 5 × 7 as "5 more than 7"', 'only one of the two statements is true'], wrmSteps: [], after: [],
     }),
     mult_4x1: P({
-        kind: 'option', preset: true, skill: 'multiplication:multiply', also: ['multiplication:area_model_mult'], option: 'size "4-digit × 1-digit" (tiles 41) on the column method and the area model',
+        kind: 'option', preset: true, skill: 'multiplication:multiply', also: ['multiplication:area_model_mult'], option: 'size "4-digit × 1-digit" (tiles 41) on the column method and the area model (also a named preset skill once built, design/PRESET_SKILLS.md)',
         name: 'Multiply a 4-Digit Number by a 1-Digit Number (option)', grade: '4', family: 'operations', standards: ['4.NBT.B.5'], ee: [],
         teaches: 'multiplying a whole number of up to four digits by a one-digit number, with the area model and the column method side by side',
         problemTypes: ['area model with four parts', 'column method with carries', 'match the model to the column', 'estimate first'],
@@ -360,7 +360,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['treats 1:50 + 20 min as 1:70', 'subtracts times like decimals'], wrmSteps: ['Y3.B10.S9', 'Y4.B11.S6'], after: [],
     }),
     conversion_table: P({
-        kind: 'option', preset: true, skill: 'measurement:unit_conversions', option: 'form "conversion table": complete a two-column table (1 ft = 12 in, 2 ft, 3 ft …) and use it',
+        kind: 'option', preset: true, skill: 'measurement:unit_conversions', option: 'form "conversion table": complete a two-column table (1 ft = 12 in, 2 ft, 3 ft …) and use it (also a named preset skill once built, design/PRESET_SKILLS.md)',
         name: 'Conversion Tables (option)', grade: '4', family: 'measurement', standards: ['4.MD.A.1'], ee: ['M.EE.4.MD.1'],
         teaches: 'knowing relative sizes of units in one system and recording equivalents in a two-column table (ft/in, m/cm, kg/g, lb/oz, l/ml, hr/min/sec)',
         problemTypes: ['complete the table', 'use the table to convert', '1 ft is __ times as long as 1 in', 'find the error in a table'],
@@ -416,7 +416,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['a segment and a line are the same', 'lines must be horizontal to be parallel'], wrmSteps: ['Y3.B11.S6', 'Y3.B11.S7'], after: [],
     }),
     protractor_read: P({
-        kind: 'option', preset: true, skill: 'angles_lines:measure_angles', option: 'form "read the protractor": a protractor drawn over the angle; write the degrees (not multiple choice)',
+        kind: 'option', preset: true, skill: 'angles_lines:measure_angles', option: 'form "read the protractor": a protractor drawn over the angle; write the degrees (not multiple choice) (also a named preset skill once built, design/PRESET_SKILLS.md)',
         name: 'Measure With a Protractor (option)', grade: '4', family: 'geometry', standards: ['4.MD.C.6'], ee: [],
         teaches: 'measuring angles in whole degrees with a protractor: which scale, from 0',
         problemTypes: ['read the angle on the protractor', 'which scale starts at 0?', 'is it acute or obtuse? (check the reading)', 'measure two angles and compare'],
@@ -517,7 +517,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['divides numerators and denominators straight across whatever the sizes', 'flips the wrong fraction', 'quotient must be smaller'], wrmSteps: [], after: [],
     }),
     mult_dec_dec: P({
-        kind: 'option', preset: true, skill: 'decimals:mult_decimal', option: 'factors "decimal × decimal" (3.45 × 2.6) with the standard algorithm',
+        kind: 'option', preset: true, skill: 'decimals:mult_decimal', option: 'factors "decimal × decimal" (3.45 × 2.6) with the standard algorithm (also a named preset skill once built, design/PRESET_SKILLS.md)',
         name: 'Multiply Decimals by Decimals (option)', grade: '6', family: 'decimals', standards: ['6.NS.B.3'], ee: [],
         teaches: 'multiplying multi-digit decimals by decimals with the standard algorithm and placing the point',
         problemTypes: ['1-dp × 1-dp', '2-dp × 1-dp', 'estimate then place the point', 'find the misplaced point'],
@@ -535,7 +535,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['divides the wrong way (4/3 cup per cup)', 'drops the unit'], wrmSteps: [], after: [],
     }),
     ratio_table_plot: P({
-        kind: 'option', preset: true, skill: 'conversions:ratio_tables', option: 'task "plot the pairs" on a coordinate grid and task "compare two ratio tables"',
+        kind: 'option', preset: true, skill: 'conversions:ratio_tables', option: 'task "plot the pairs" on a coordinate grid and task "compare two ratio tables" (also a named preset skill once built, design/PRESET_SKILLS.md)',
         name: 'Ratio Tables: Plot and Compare (option)', grade: '6', family: 'ratio', standards: ['6.RP.A.3a'], ee: [],
         teaches: 'making tables of equivalent ratios, plotting the pairs and comparing ratios with tables',
         problemTypes: ['complete the table, then plot', 'which recipe is stronger? use tables', 'read a missing value from the graph', 'are these ratios equivalent?'],
@@ -564,7 +564,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['writes 1010 for 110', '109 → 200'], wrmSteps: ['Y2.B1.S5'], after: [],
     }),
     value_ten_times: P({
-        kind: 'option', preset: true, skill: 'placevalue:value', option: 'form "ten times / one tenth": compare the value of the same digit in two places (the 7 in 700 is 10 times the 7 in 70; 700 ÷ 70 = 10)',
+        kind: 'option', preset: true, skill: 'placevalue:value', option: 'form "ten times / one tenth": compare the value of the same digit in two places (the 7 in 700 is 10 times the 7 in 70; 700 ÷ 70 = 10) (also a named preset skill once built, design/PRESET_SKILLS.md)',
         name: 'Ten Times the Place to the Right (option)', grade: '4-5', family: 'placevalue', standards: ['4.NBT.A.1', '5.NBT.A.1'], ee: [],
         teaches: 'a digit in one place is worth 10 times what it is worth in the place to its right and 1/10 of the place to its left',
         problemTypes: ['how many times greater is the 4 in 4,300 than the 4 in 430?', '700 ÷ 70 = ?', 'the 3 in 0.3 is 1/10 of the 3 in 3', 'which digit is worth ten times more?'],
@@ -638,7 +638,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['−40 > −30 because 40 > 30', 'absolute value makes a number negative'], wrmSteps: [], after: ['negative_count'],
     }),
     gcf_distributive: P({
-        kind: 'option', preset: true, skill: 'number_theory:gcf_easy', option: 'task "write the sum as a product": 36 + 8 = 4 × (9 + 2)',
+        kind: 'option', preset: true, skill: 'number_theory:gcf_easy', option: 'task "write the sum as a product": 36 + 8 = 4 × (9 + 2) (also a named preset skill once built, design/PRESET_SKILLS.md)',
         name: 'Factor a Sum With the GCF (option)', grade: '6', family: 'number_theory', standards: ['6.NS.B.4'], ee: [],
         teaches: 'using the distributive property to write a sum of two whole numbers with a common factor as the factor times a sum with no common factor',
         problemTypes: ['36 + 8 = __ × (__ + __)', 'which is fully factored?', 'check by multiplying out', 'find the GCF first'],
@@ -665,7 +665,7 @@ export const STANDARD_PROPOSALS = {
         misconceptions: ['one value that works proves equivalence', '3y = y + 3'], wrmSteps: [], after: [],
     }),
     inequality_write_graph: P({
-        kind: 'option', preset: true, skill: 'algebra:inequalities', option: 'task "write it from words" (x > c) and "show the solutions on a number line" (open/closed circle, arrow)',
+        kind: 'option', preset: true, skill: 'algebra:inequalities', option: 'task "write it from words" (x > c) and "show the solutions on a number line" (open/closed circle, arrow) (also a named preset skill once built, design/PRESET_SKILLS.md)',
         name: 'Write and Graph Inequalities (option)', grade: '6', family: 'algebra', standards: ['6.EE.B.8'], ee: [],
         teaches: 'writing x > c or x < c for a real condition and representing its infinitely many solutions on a number line',
         problemTypes: ['write the inequality for the rule', 'draw the solutions', 'which graph matches?', 'is 3.5 a solution?'],

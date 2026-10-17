@@ -2468,7 +2468,9 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Frac × Frac";
                 return;
 
-            } else if (fracSkill === "div_unit_frac_nv" && Math.random() < 0.25) {
+            } else if (fracSkill === "div_unit_frac_nv" && Math.random() < 0.25
+                // a click-all of whole ÷ unit fraction: never on a page whose ticked forms leave that kind out (forms 0, 1)
+                && !((_fChanged('forms') || [0]).every(v => v >= 2))) {
                 // Phase 4.5 batch 9: multi-select-check variant - same as div_unit_fraction NV
                 const dDen = pick([2, 3, 4, 5]);
                 const dWhole = rng(2, 6);
@@ -5721,7 +5723,9 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 _nlKit(q);
                 return;
 
-            } else if (fracSkill === "simplify" && Math.random() < 0.25) {
+            } else if (fracSkill === "simplify" && Math.random() < 0.25
+                // a click-all of "already in simplest form": only when form 1 (is it in simplest form?) is ticked
+                && (_fChanged('forms') || [1]).includes(1)) {
                 // Phase 4.5 batch 9: multi-select-check variant — click ALL fractions in simplest form
                 // Build a pool of fractions: some already simplified, some not
                 const simplestPool = [

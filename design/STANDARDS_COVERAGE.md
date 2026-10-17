@@ -24,7 +24,7 @@ Sources:
 
 ## Summary
 
-- Skills mapped: 615 live skills; 506 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
+- Skills mapped: 715 live skills; 606 carry at least one CCSS code, 31 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
 - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
 - **Full coverage: CCSS 76 of 177 standards FULL, 90 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 103 FULL, 92 PARTIAL, 22 GAP.
 - **Essential Elements: 81 of 117 FULL, 33 PARTIAL, 3 GAP** (tagged: 115).
@@ -1126,7 +1126,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 
 - **1.OA.A.1** — FULL. Use addition and subtraction within 20 to solve word problems involving situations of adding to, taking from, putting together, taking apart, and comparing, with unknowns in all positions, e.g., by using objects, drawings, and equations with a symbol for the unknown number to represent the problem.  
   Taught by: Addition Word Problems (`addition:add_word_problems`); Subtraction Word Problems (`subtraction:sub_word_problems`); How Many More/Fewer? (Visual) (`addition:comparison_word`); Unknown Start Word Problems (Visual) (`subtraction:unknown_start_wp`); Addition Word Problems (within 20) (`addition:add_wp_20`); Subtraction Word Problems (within 20) (`subtraction:sub_wp_20`) — every situation and unknown position at range 20; bar and equation supports  
-  Also tagged: `addition:add_word_problems_plain`, `addition:add_wp_20_plain`, `subtraction:sub_word_problems_plain`, `subtraction:sub_wp_20_plain`
+  Also tagged: `addition:add_word_problems_plain`, `addition:add_wp_20_plain`, `subtraction:sub_word_problems_plain`, `subtraction:sub_wp_20_plain`, `subtraction:sub_wp_compare`, `subtraction:sub_wp_start_unknown`
 - **1.OA.A.2** — PARTIAL. Solve word problems that call for addition of three whole numbers whose sum is less than or equal to 20, e.g., by using objects, drawings, and equations with a symbol for the unknown number to represent the problem.  
   In part: Add Three Numbers (≤20) (`addition:add_three`)  
   Missing: word problems with three addends (the skill is bare sums) → `add_three_forms`  
@@ -1204,6 +1204,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 
 - **1.MD.C.4** — FULL. Organize, represent, and interpret data with up to three categories; ask and answer questions about the total number of data points, how many in each category, and how many more or less are in one category than in another.  
   Taught by: Picture Graph Intro (Visual) (`measurement:pictograph_intro`); Bar Graph Intro (Visual) (`measurement:bar_graph_intro`); Tally Charts (`graphs:tally_chart`); Build a Pictograph (`graphs:build_pictograph`) — organise and represent: build_pictograph; interpret: each category, totals, how many more  
+  Also tagged: `graphs:tally_how_many_more`
 #### Geometry (1.G)
 
 *A. Reason with shapes and their attributes.*
@@ -1225,7 +1226,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 
 - **2.OA.A.1** — FULL. Use addition and subtraction within 100 to solve one- and two-step word problems involving situations of adding to, taking from, putting together, taking apart, and comparing, with unknowns in all positions, e.g., by using drawings and equations with a symbol for the unknown number to represent the problem.  
   Taught by: Addition Word Problems (`addition:add_word_problems`); Subtraction Word Problems (`subtraction:sub_word_problems`); Unknown Start Word Problems (Visual) (`subtraction:unknown_start_wp`); Addition Word Problems (within 100) (`addition:add_wp_100`); Subtraction Word Problems (within 100) (`subtraction:sub_wp_100`); Multi-Step Word Problems (Visual) (`algebra:multi_step_word`) — one step: every situation and unknown to 100; two steps: multi_step_word (+ and −)  
-  Also tagged: `addition:add_word_problems_plain`, `addition:add_wp_50`, `addition:add_wp_50_plain`, `addition:add_wp_100_plain`, `subtraction:sub_word_problems_plain`, `subtraction:sub_wp_50`, `subtraction:sub_wp_50_plain`, `subtraction:sub_wp_100_plain`, `number_ops_mixed:word_problems_mixed`, `number_ops_mixed:word_problems_mixed_plain`, `algebra:tape_diagram`, `algebra:tape_diagram_plain`, `algebra:multi_step_word_plain`, `algebra:build_expr_addsub`
+  Also tagged: `addition:add_word_problems_plain`, `addition:add_wp_50`, `addition:add_wp_50_plain`, `addition:add_wp_100_plain`, `subtraction:sub_word_problems_plain`, `subtraction:sub_wp_50`, `subtraction:sub_wp_50_plain`, `subtraction:sub_wp_100_plain`, `number_ops_mixed:word_problems_mixed`, `number_ops_mixed:word_problems_mixed_plain`, `algebra:tape_diagram`, `algebra:tape_diagram_plain`, `algebra:multi_step_word_plain`, `algebra:build_expr_addsub`, `subtraction:sub_wp_compare`, `subtraction:sub_wp_start_unknown`
 *B. Add and subtract within 20.*
 
 - **2.OA.B.2** — FULL. Fluently add and subtract within 20 using mental strategies. By end of Grade 2, know from memory all sums of two one-digit numbers.  
@@ -1240,7 +1241,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **2.OA.C.4** — PARTIAL. Use addition to find the total number of objects arranged in rectangular arrays with up to 5 rows and up to 5 columns; write an equation to express the total as a sum of equal addends.  
   In part: Arrays & Equal Groups (Visual) (`multiplication:arrays_groups`); Dot Array Multiplication (B&W) (`multiplication:dot_array_mult`); Write Repeated Addition as Multiplication (Visual) (`multiplication:repeated_add_to_mult`)  
   Missing: the pupil writes the total of an array (to 5 × 5) as a sum of equal addends (repeated_add_to_mult prints the sum) → `equal_groups_early`  
-  Also tagged: `multiplication:equal_or_unequal_groups`
+  Also tagged: `multiplication:equal_or_unequal_groups`, `multiplication:mult_arrays`, `multiplication:mult_equal_groups`
 #### Number and Operations in Base Ten (2.NBT)
 
 *A. Understand place value.*
@@ -1248,17 +1249,17 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **2.NBT.A.1** — PARTIAL. Understand that the three digits of a three-digit number represent amounts of hundreds, tens, and ones; e.g., 706 equals 7 hundreds, 0 tens, and 6 ones. Understand the following as special cases:  
   Taught by: Build 3-Digit Numbers with Flats (`composing:base10_build_hundreds`); Read Place-Value Disks (`placevalue:place_value_disks`); Unit Form (4 hundreds 7 tens 6 ones) (`placevalue:unit_form`) — own clause: three digits are hundreds, tens, ones (706 = 7 hundreds 0 tens 6 ones)  
   Not FULL because of its lettered parts.  
-  Also tagged: `composing:base10_build`, `placevalue:pv_disks_build`, `placevalue:identify`, `placevalue:value`
+  Also tagged: `composing:base10_build`, `placevalue:pv_disks_build`, `placevalue:identify`, `placevalue:value`, `placevalue:digit_value_unit_form`, `placevalue:digit_value_notation`, `placevalue:count_pv_disks`
 -   **2.NBT.A.1a** — GAP. 100 can be thought of as a bundle of ten tens — called a “hundred.”  
   Missing: 100 as a bundle of ten tens (composing:base10_regroup trades a ten for ten ones only: its tag was removed) → `regroup_hundreds`  
 -   **2.NBT.A.1b** — GAP. The numbers 100, 200, 300, 400, 500, 600, 700, 800, 900 refer to one, two, three, four, five, six, seven, eight, or nine hundreds (and 0 tens and 0 ones).  
   Missing: 100, 200 … 900 as 1 … 9 hundreds and 0 tens, 0 ones → `hundreds_foundation`  
 - **2.NBT.A.2** — FULL. Count within 1000; skip-count by 5s, 10s, and 100s.  
   Taught by: Number Chart - Find the Missing Number (to 1,000 and beyond) (`composing:number_chart_fill`); Count by 5s (`patterns:seq_5`); Count by 10s (`patterns:seq_10`); Count by Powers of 10 (Grid) (`patterns:count_by_powers_of_10`); Skip counting on a number line (2s, 5s, 10s) (`patterns:skip_count_line`)  
-  Also tagged: `measurement:time_fives_ring`, `patterns:seq_2`, `patterns:count_by_fill`, `patterns:skip_count_grid`, `patterns:count_by_step_up`, `patterns:count_by_step_down`
+  Also tagged: `measurement:time_fives_ring`, `patterns:seq_2`, `patterns:count_by_fill`, `patterns:skip_count_grid`, `patterns:count_by_step_up`, `patterns:count_by_step_down`, `multiplication:count_by_2s`, `multiplication:count_by_5s`, `multiplication:count_by_10s`, `measurement:minutes_by_fives_all`
 - **2.NBT.A.3** — FULL. Read and write numbers to 1000 using base-ten numerals, number names, and expanded form.  
   Taught by: Number Word Form (`composing:number_word_form`); Expanded Form (`placevalue:expand`); Standard Form (`placevalue:combine`); Build 3-Digit Numbers with Flats (`composing:base10_build_hundreds`)  
-  Also tagged: `placevalue:pv_disks_build`, `placevalue:number_word_names`, `placevalue:unit_form`, `placevalue:expanded_notation`
+  Also tagged: `placevalue:pv_disks_build`, `placevalue:number_word_names`, `placevalue:unit_form`, `placevalue:expanded_notation`, `composing:write_numbers_in_words`
 - **2.NBT.A.4** — FULL. Compare two three-digit numbers based on meanings of the hundreds, tens, and ones digits, using >, =, and < symbols to record the results of comparisons.  
   Taught by: Compare Numbers (>, <, =) (`placevalue:compare`)  
   Also tagged: `placevalue:order_least_to_greatest`, `placevalue:order_greatest_to_least`
@@ -1301,11 +1302,11 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 
 - **2.MD.C.7** — FULL. Tell and write time from analog and digital clocks to the nearest five minutes, using a.m. and p.m.  
   Taught by: Time to 5 Minutes (`measurement:time_5min`); Analog and Digital Time (`measurement:time_analog_digital`); a.m. or p.m.? (`measurement:time_sense`)  
-  Also tagged: `measurement:time_quarter`, `measurement:time_match_clock`, `measurement:time_fives_ring`
+  Also tagged: `measurement:time_quarter`, `measurement:time_match_clock`, `measurement:time_fives_ring`, `measurement:minutes_by_fives_all`
 - **2.MD.C.8** — PARTIAL. Solve word problems involving dollar bills, quarters, dimes, nickels, and pennies, using $ and ¢ symbols appropriately. Example: If you have 2 dimes and 3 pennies, how many cents do you have?  
   In part: Count Coins and Notes (`measurement:money_count`); Add Money (`measurement:money`); Find the Change (`measurement:money_change`); Is There Enough Money? (`measurement:enough_money`)  
   Missing: word problems (stories) with dollar bills and coins using $ and ¢ → `money_2step`, `money_uk`  
-  Also tagged: `measurement:equiv_coin_sets`, `measurement:make_change_least_coins`, `measurement:coin_value`, `measurement:money_notation`, `measurement:money_compare`
+  Also tagged: `measurement:equiv_coin_sets`, `measurement:make_change_least_coins`, `measurement:coin_value`, `measurement:money_notation`, `measurement:money_compare`, `measurement:count_notes`, `measurement:count_notes_and_coins`, `measurement:order_notes`, `measurement:money_amount_in_words`
 *D. Represent and interpret data.*
 
 - **2.MD.D.9** — PARTIAL. Generate measurement data by measuring lengths of several objects to the nearest whole unit, or by making repeated measurements of the same object. Show the measurements by making a line plot, where the horizontal scale is marked off in whole-number units.  
@@ -1313,7 +1314,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Missing: generate the data by measuring several objects; make the line plot (the skill reads one) → `make_line_plot`  
 - **2.MD.D.10** — FULL. Draw a picture graph and a bar graph (with single-unit scale) to represent a data set with up to four categories. Solve simple put-together, take-apart, and compare problems using information presented in a bar graph.  
   Taught by: Build a Bar Graph (`graphs:build_bar_graph`); Build a Pictograph (`graphs:build_pictograph`); Bar Graph Intro (Visual) (`measurement:bar_graph_intro`)  
-  Also tagged: `measurement:pictograph_intro`
+  Also tagged: `measurement:pictograph_intro`, `graphs:bar_graph_how_many_more`, `graphs:tally_how_many_more`
 #### Geometry (2.G)
 
 *A. Reason with shapes and their attributes.*
@@ -1336,13 +1337,13 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 
 - **3.OA.A.1** — FULL. Interpret products of whole numbers, e.g., interpret 5 × 7 as the total number of objects in 5 groups of 7 objects each. For example, describe a context in which a total number of objects can be expressed as 5 × 7.  
   Taught by: Arrays & Equal Groups (Visual) (`multiplication:arrays_groups`); Write Repeated Addition as Multiplication (Visual) (`multiplication:repeated_add_to_mult`); Equal Groups or Not? (Visual) (`multiplication:equal_or_unequal_groups`); Multiplication Number Line (Visual) (`multiplication:nl_mult`)  
-  Also tagged: `multiplication:dot_array_mult`
+  Also tagged: `multiplication:dot_array_mult`, `multiplication:mult_arrays`, `multiplication:mult_equal_groups`
 - **3.OA.A.2** — FULL. Interpret whole-number quotients of whole numbers, e.g., interpret 56 ÷ 8 as the number of objects in each share when 56 objects are partitioned equally into 8 shares, or as a number of shares when 56 objects are partitioned into equal shares of 8 objects each. For example, describe a context in which a number of shares or a number of groups can be expressed as 56 ÷ 8.  
   Taught by: Division Word Problems (`division:div_word_problems`); Make Equal Groups to Divide (Visual) (`division:share_into_groups`); Division Number Line (Visual) (`division:nl_div`)  
-  Also tagged: `division:div_word_problems_plain`, `patterns:halve`
+  Also tagged: `division:div_word_problems_plain`, `patterns:halve`, `division:div_sharing_word_problems`, `division:div_grouping_word_problems`
 - **3.OA.A.3** — FULL. Use multiplication and division within 100 to solve word problems in situations involving equal groups, arrays, and measurement quantities, e.g., by using drawings and equations with a symbol for the unknown number to represent the problem.  
   Taught by: Multiplication Word Problems (`multiplication:mult_word_problems`); Division Word Problems (`division:div_word_problems`); Build the Expression: ×/÷ (`algebra:build_expr_multdiv`)  
-  Also tagged: `multiplication:mult_word_problems_plain`, `division:div_word_problems_plain`, `number_ops_mixed:word_problems_mixed`, `number_ops_mixed:word_problems_mixed_plain`
+  Also tagged: `multiplication:mult_word_problems_plain`, `division:div_word_problems_plain`, `number_ops_mixed:word_problems_mixed`, `number_ops_mixed:word_problems_mixed_plain`, `division:div_sharing_word_problems`, `division:div_grouping_word_problems`
 - **3.OA.A.4** — FULL. Determine the unknown whole number in a multiplication or division equation relating three whole numbers. For example, determine the unknown number that makes the equation true in each of the equations 8 × ? = 48, 5 = Í÷ 3, 6 × 6 = ?.  
   Taught by: Missing Factors (×/÷) (`division:missing_mult_div`); Missing Addend or Missing Factor? (`number_ops_mixed:missing_factor_or_addend`)  
   Also tagged: `number_ops_mixed:which_sign`, `multiplication:mult_chart_headers`
@@ -1351,6 +1352,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **3.OA.B.5** — PARTIAL. Apply properties of operations as strategies to multiply and divide. Examples: If 6 × 4 = 24 is known, then 4 × 6 = 24 is also known. (Commutative property of multiplication.) 3 × 5 × 2 can be found by 3 × 5 = 15, then 15 × 2 = 30, or by 5 × 2 = 10, then 3 × 10 = 30. (Associative property of multiplication.) Knowing that 8 × 5 = 40 and 8 × 2 = 16, one can find 8 × 7 as 8 × (5 + 2) = (8 × 5) + (8 × 2) = 40 + 16 = 56. (Distributive property.)  
   In part: Multiplication Properties (Visual) (`multiplication:mult_properties`)  
   Missing: the associative property (3 × 5 × 2 = 3 × 10); the skill offers order, breaking apart, × 1 and × 0 → `mult_three`  
+  Also tagged: `multiplication:mult_break_apart`
 - **3.OA.B.6** — FULL. Understand division as an unknown-factor problem. For example, find 32 ÷ 8 by finding the number that makes 32 when multiplied by 8.  
   Taught by: Multiplication Fact Families (`multiplication:mult_div_fact_family`); Missing Factors (×/÷) (`division:missing_mult_div`)  
   Also tagged: `multiplication:number_families_mult`, `division:div_check_by_multiplying`, `number_ops_mixed:number_families_mixed`
@@ -1358,7 +1360,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 
 - **3.OA.C.7** — FULL. Fluently multiply and divide within 100, using strategies such as the relationship between multiplication and division (e.g., knowing that 8 × 5 = 40, one knows 40 ÷ 5 = 8) or properties of operations. By the end of Grade 3, know from memory all products of two one-digit numbers.  
   Taught by: Multiplication Facts (1-12) (`multiplication:mult_facts`); Division Facts (1-12) (`division:div_facts`)  
-  Also tagged: `multiplication:multiply`, `multiplication:mult_div_fact_family`, `multiplication:number_families_mult`, `multiplication:mult_chart`, `multiplication:mult_chart_easy`, `multiplication:nl_mult`, `multiplication:count_by_tables`, `division:divide`, `division:nl_div`, `division:mixed_mult_div`, `multiplication:mult_chart_headers`
+  Also tagged: `multiplication:multiply`, `multiplication:mult_div_fact_family`, `multiplication:number_families_mult`, `multiplication:mult_chart`, `multiplication:mult_chart_easy`, `multiplication:nl_mult`, `multiplication:count_by_tables`, `division:divide`, `division:nl_div`, `division:mixed_mult_div`, `multiplication:mult_chart_headers`, `multiplication:count_by_2s`, `multiplication:count_by_3s`, `multiplication:count_by_4s`, `multiplication:count_by_5s`, `multiplication:count_by_6s`, `multiplication:count_by_7s`, `multiplication:count_by_8s`, `multiplication:count_by_9s`, `multiplication:count_by_10s`, `multiplication:count_by_11s`, `multiplication:count_by_12s`
 *D. Solve problems involving the four operations, and identify and explain patterns in arithmetic.*
 
 - **3.OA.D.8** — PARTIAL. Solve two-step word problems using the four operations. Represent these problems using equations with a letter standing for the unknown quantity. Assess the reasonableness of answers using mental computation and estimation strategies including rounding.  
@@ -1368,7 +1370,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **3.OA.D.9** — PARTIAL. Identify arithmetic patterns (including patterns in the addition table or multiplication table), and explain them using properties of operations. For example, observe that 4 times a number is always even, and explain why 4 times a number can be decomposed into two equal addends.  
   In part: Multiplication Chart (Visual) (`multiplication:mult_chart`); Number Patterns: Count On, Count Back, Double (`patterns:number_patterns_rule`); Count-By Fill-In (1-12) (`patterns:count_by_fill`)  
   Missing: patterns in the addition table; explain a pattern with a property (4 × n is always even) → `patterns_notice`  
-  Also tagged: `multiplication:mult_chart_easy`, `multiplication:count_by_tables`, `patterns:count_by_step_up`, `patterns:count_by_step_down`, `algebra:function_table_easy`, `multiplication:mult_chart_shade`, `multiplication:mult_chart_pattern`
+  Also tagged: `multiplication:mult_chart_easy`, `multiplication:count_by_tables`, `patterns:count_by_step_up`, `patterns:count_by_step_down`, `algebra:function_table_easy`, `multiplication:mult_chart_shade`, `multiplication:mult_chart_pattern`, `multiplication:count_by_3s`, `multiplication:count_by_4s`, `multiplication:count_by_6s`, `multiplication:count_by_7s`, `multiplication:count_by_8s`, `multiplication:count_by_9s`, `multiplication:count_by_11s`, `multiplication:count_by_12s`
 #### Number and Operations in Base Ten (3.NBT)
 
 *A. Use place value understanding and properties of operations to perform multi-digit arithmetic.*
@@ -1381,14 +1383,14 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Also tagged: `addition:add_1k_no_regroup`, `addition:add_1k_regroup`, `addition:add_wp_1k`, `addition:add_wp_1k_plain`, `addition:add_missing_digit`, `subtraction:sub_1k_no_regroup`, `subtraction:sub_1k_regroup`, `subtraction:sub_wp_1k`, `subtraction:sub_wp_1k_plain`, `subtraction:sub_across_zeros`, `subtraction:sub_missing_digit`, `subtraction:sub_check_by_adding`, `algebra:tape_diagram`, `algebra:tape_diagram_plain`
 - **3.NBT.A.3** — FULL. Multiply one-digit whole numbers by multiples of 10 in the range 10–90 (e.g., 9 × 80, 5 × 60) using strategies based on place value and properties of operations.  
   Taught by: Multiply by 10, 100 and Multiples of Ten (`multiplication:mult_zeros`)  
-  Also tagged: `multiplication:mult_multiples_of_ten`
+  Also tagged: `multiplication:mult_multiples_of_ten`, `multiplication:mult_by_ten`, `multiplication:mult_by_hundred`
 #### Number and Operations—Fractions (3.NF)
 
 *A. Develop understanding of fractions as numbers.*
 
 - **3.NF.A.1** — FULL. Understand a fraction 1/b as the quantity formed by 1 part when a whole is partitioned into b equal parts; understand a fraction a/b as the quantity formed by a parts of size 1/b.  
   Taught by: Identify Fractions (Visual) (`fractions:identify`); Write the Fraction Shown (`fractions:write_fraction`); Shade the Fraction (`fractions:shade_fraction`); Compose 1 Whole from Unit Fractions (`composing:compose_whole`)  
-  Also tagged: `fractions:fraction_of_set`, `fractions:identify_nv`, `fractions:fraction_of_set_nv`
+  Also tagged: `fractions:fraction_of_set`, `fractions:identify_nv`, `fractions:fraction_of_set_nv`, `fractions:identify_fraction_nl`, `fractions:write_fraction_nl`
 - **3.NF.A.2** — FULL (from its parts). Understand a fraction as a number on the number line; represent fractions on a number line diagram.  
 -   **3.NF.A.2a** — FULL. Represent a fraction 1/b on a number line diagram by defining the interval from 0 to 1 as the whole and partitioning it into b equal parts. Recognize that each part has size 1/b and that the endpoint of the part based at 0 locates the number 1/b on the number line.  
   Taught by: Fractions on Number Line (Visual) (`composing:fraction_number_line`); Place Fractions on Number Line (`fractions:graph_fractions`); Place Fractions on a Number Line (`fractions:fraction_nl_drag`)  
@@ -1408,6 +1410,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 -   **3.NF.A.3d** — PARTIAL. Compare two fractions with the same numerator or the same denominator by reasoning about their size. Recognize that comparisons are valid only when the two fractions refer to the same whole. Record the results of comparisons with the symbols >, =, or <, and justify the conclusions, e.g., by using a visual fraction model.  
   In part: Compare Fractions (>, <, =) (`fractions:compare`); Order Fractions (`fractions:order_fractions`)  
   Missing: same-numerator comparisons (3/5 vs 3/8); comparisons are valid only for the same whole → `compare_numerator`, `frac_same_whole`  
+  Also tagged: `fractions:compare_fractions_nl`
 #### Measurement and Data (3.MD)
 
 *A. Solve problems involving measurement and estimation of intervals of time, liquid volumes, and masses of objects.*
@@ -1424,6 +1427,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **3.MD.B.3** — PARTIAL. Draw a scaled picture graph and a scaled bar graph to represent a data set with several categories. Solve one- and two-step “how many more” and “how many less” problems using information presented in scaled bar graphs. For example, draw a bar graph in which each square in the bar graph might represent 5 pets.  
   In part: Bar Graphs (`graphs:bar_graph`); Pictographs (`graphs:pictograph`); Build a Bar Graph (`graphs:build_bar_graph`)  
   Missing: draw a scaled picture graph and a scaled bar graph (the build skills use a scale of 1) → `bar_graph_scale`, `pictogram_scale`  
+  Also tagged: `graphs:pictograph_how_many_more`, `graphs:bar_graph_how_many_more`
 - **3.MD.B.4** — PARTIAL. Generate measurement data by measuring lengths using rulers marked with halves and fourths of an inch. Show the data by making a line plot, where the horizontal scale is marked off in appropriate units— whole numbers, halves, or quarters.  
   In part: Reading a Ruler - Quarter Inches (Visual) (`measurement:reading_ruler_hard`); Line Plots (`graphs:line_plot`)  
   Missing: make the line plot from the measurements (the skill reads one) → `make_line_plot`  
@@ -1444,16 +1448,18 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Missing: show that the tiled count equals the product of the side lengths → `area_tile_multiply`  
 -   **3.MD.C.7b** — FULL. Multiply side lengths to find areas of rectangles with whole-number side lengths in the context of solving real world and mathematical problems, and represent whole-number products as rectangular areas in mathematical reasoning.  
   Taught by: Area Only (`area_perimeter:area`)  
+  Also tagged: `area_perimeter:area_missing_side`
 -   **3.MD.C.7c** — FULL. Use tiling to show in a concrete case that the area of a rectangle with whole-number side lengths a and b + c is the sum of a×b and a×c. Use area models to represent the distributive property in mathematical reasoning.  
   Taught by: Distributive Area Model (Visual) (`area_perimeter:area_distributive_visual`)  
 -   **3.MD.C.7d** — FULL. Recognize area as additive. Find areas of rectilinear figures by decomposing them into non-overlapping rectangles and adding the areas of the non-overlapping parts, applying this technique to solve real world problems.  
   Taught by: Decompose Polygon Area (L/T/U) (`area_perimeter:area_polygon_decompose`); Composite Shapes (L, T, U) (`area_perimeter:composite_shapes`)  
+  Also tagged: `area_perimeter:composite_area_perimeter`
 *D. Geometric measurement: recognize perimeter as an attribute of plane figures and distinguish between linear and area measures.*
 
 - **3.MD.D.8** — PARTIAL. Solve real world and mathematical problems involving perimeters of polygons, including finding the perimeter given the side lengths, finding an unknown side length, and exhibiting rectangles with the same perimeter and different areas or with the same area and different perimeters.  
   In part: Perimeter Only (`area_perimeter:perimeter`); Perimeter Intro - Sum the Sides (Visual) (`area_perimeter:perimeter_intro`); Perimeter - Grid Counting (Visual) (`area_perimeter:perimeter_grid`)  
   Missing: exhibit rectangles with the same perimeter and different areas, or the same area and different perimeters → `same_area`, `missing_lengths`  
-  Also tagged: `area_perimeter:area_perimeter`
+  Also tagged: `area_perimeter:area_perimeter`, `area_perimeter:perimeter_missing_side`
 #### Geometry (3.G)
 
 *A. Reason with shapes and their attributes.*
@@ -1483,18 +1489,18 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **4.OA.A.3** — PARTIAL. Solve multistep word problems posed with whole numbers and having whole-number answers using the four operations, including problems in which remainders must be interpreted. Represent these problems using equations with a letter standing for the unknown quantity. Assess the reasonableness of answers using mental computation and estimation strategies including rounding.  
   In part: Interpret the Remainder (Word Problems) (`division:remainder_interpret`); Remainder Contexts (Buses, Boxes, Cookies, Money, Cars) (`division:remainder_contexts`); Multi-Step Word Problems (Visual) (`algebra:multi_step_word`); Estimate Products (`number_sense:estimate_products`)  
   Missing: multistep problems using × and ÷; an equation with a letter for the unknown → `multi_step_four_ops`  
-  Also tagged: `algebra:multi_step_word_plain`, `algebra:algebra_word_mixed`, `algebra:algebra_word_mixed_plain`, `number_sense:estimate_quotient`
+  Also tagged: `algebra:multi_step_word_plain`, `algebra:algebra_word_mixed`, `algebra:algebra_word_mixed_plain`, `number_sense:estimate_quotient`, `number_sense:reasonable_quotients`
 *B. Gain familiarity with factors and multiples.*
 
 - **4.OA.B.4** — FULL. Find all factor pairs for a whole number in the range 1–100. Recognize that a whole number is a multiple of each of its factors. Determine whether a given whole number in the range 1–100 is a multiple of a given one-digit number. Determine whether a given whole number in the range 1–100 is prime or composite.  
   Taught by: Factor T-Chart - Easy (Visual) (`number_theory:factor_tchart_easy`); Identify Factors (Circle All) (`number_theory:factors_identify`); Multiples of a Number (`number_theory:multiples`); Prime vs Composite (`number_theory:prime_composite`); Divisibility Sort (`number_theory:divisibility_sort`)  
-  Also tagged: `number_theory:factor_tchart_medium`, `number_theory:factor_tchart_hard`, `number_theory:factor_links_easy`, `number_theory:factor_links_medium`, `number_theory:factor_links_hard`
+  Also tagged: `number_theory:factor_tchart_medium`, `number_theory:factor_tchart_hard`, `number_theory:factor_links_easy`, `number_theory:factor_links_medium`, `number_theory:factor_links_hard`, `number_theory:sort_prime_composite`, `number_theory:list_multiples`, `number_theory:missing_multiples`, `number_theory:common_factors`, `number_theory:common_multiples`
 *C. Generate and analyze patterns.*
 
 - **4.OA.C.5** — PARTIAL. Generate a number or shape pattern that follows a given rule. Identify apparent features of the pattern that were not explicit in the rule itself. For example, given the rule “Add 3” and the starting number 1, generate terms in the resulting sequence and observe that the terms appear to alternate between odd and even numbers. Explain informally why the numbers will continue to alternate in this way.  
   In part: Number Patterns: Count On, Count Back, Double (`patterns:number_patterns_rule`); Shape Patterns (Visual) (`patterns:shape_pattern`); Number Patterns (`patterns:number_pattern`)  
   Missing: identify features of the pattern not explicit in the rule, and explain them informally → `patterns_notice`  
-  Also tagged: `algebra:function_table_easy`, `algebra:function_table_hard`
+  Also tagged: `algebra:function_table_easy`, `algebra:function_table_hard`, `algebra:function_table_find_rule`, `algebra:function_table_find_inputs`
 #### Number and Operations in Base Ten (4.NBT)
 
 *A. Generalize place value understanding for multi-digit whole numbers.*
@@ -1502,9 +1508,10 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **4.NBT.A.1** — PARTIAL. Recognize that in a multi-digit whole number, a digit in one place represents ten times what it represents in the place to its right. For example, recognize that 700 ÷ 70 = 10 by applying concepts of place value and division.  
   In part: Value of a Digit (`placevalue:value`); Name the Place (`placevalue:identify`); Write the Digits in a Place-Value Chart (`placevalue:pv_digit_drag`)  
   Missing: a digit is worth ten times what it is worth in the place to its right (700 ÷ 70 = 10) → `value_ten_times`  
+  Also tagged: `multiplication:mult_by_ten`, `multiplication:mult_by_hundred`, `placevalue:digit_value_unit_form`
 - **4.NBT.A.2** — FULL. Read and write multi-digit whole numbers using base-ten numerals, number names, and expanded form. Compare two multi-digit numbers based on meanings of the digits in each place, using >, =, and < symbols to record the results of comparisons.  
   Taught by: Choose the Word Name (`placevalue:number_word_names`); Expanded Form (`placevalue:expand`); Compare Numbers (>, <, =) (`placevalue:compare`); Standard Form (`placevalue:combine`)  
-  Also tagged: `composing:number_chart_fill`, `placevalue:pv_digit_drag`, `placevalue:order_least_to_greatest`, `placevalue:order_greatest_to_least`, `placevalue:expanded_notation`
+  Also tagged: `composing:number_chart_fill`, `placevalue:pv_digit_drag`, `placevalue:order_least_to_greatest`, `placevalue:order_greatest_to_least`, `placevalue:expanded_notation`, `placevalue:digit_value_notation`
 - **4.NBT.A.3** — FULL. Use place value understanding to round multi-digit whole numbers to any place.  
   Taught by: Round to Nearest 1,000 (`number_sense:nearest_1000`); Round to Nearest 10,000 (`number_sense:nearest_10000`); Round to Nearest 100,000 (`number_sense:nearest_100000`); Round on a Number Line: Thousands (`number_sense:round_nl_thousands`)  
   Also tagged: `number_sense:round_nl_ten_thousands`, `number_sense:round_nl_hundred_thousands`, `number_sense:nearest_million`, `number_sense:round_sort_1000`, `number_sense:round_sort_10000`, `number_sense:round_sort_100000`, `number_sense:round_sort_million`, `number_sense:estimate_products`
@@ -1516,17 +1523,17 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **4.NBT.B.5** — PARTIAL. Multiply a whole number of up to four digits by a one-digit whole number, and multiply two two-digit numbers, using strategies based on place value and the properties of operations. Illustrate and explain the calculation by using equations, rectangular arrays, and/or area models.  
   In part: Basic Multiplication (`multiplication:multiply`); Area Model Multiplication (`multiplication:area_model_mult`); Area Model (2×2 and 2×3) (`multiplication:area_model_mult_hard`)  
   Missing: a 4-digit number × a 1-digit number (the sizes stop at 3 × 1); a dedicated standard-algorithm skill with the sizes 2 × 1 to 3 × 2 (owner 2026-10-17) → `mult_4x1`, `mult_standard`  
-  Also tagged: `multiplication:mult_placeholder_zero`, `multiplication:mult_missing_digit`, `multiplication:mult_2by1_column`, `multiplication:mult_3by1_column`, `multiplication:mult_2by2_standard`
+  Also tagged: `multiplication:mult_placeholder_zero`, `multiplication:mult_missing_digit`, `multiplication:mult_2by1_column`, `multiplication:mult_3by1_column`, `multiplication:mult_2by2_standard`, `multiplication:area_model_2by1`, `multiplication:area_model_3by1`
 - **4.NBT.B.6** — FULL. Find whole-number quotients and remainders with up to four-digit dividends and one-digit divisors, using strategies based on place value, the properties of operations, and/or the relationship between multiplication and division. Illustrate and explain the calculation by using equations, rectangular arrays, and/or area models.  
   Taught by: Basic Division (`division:divide`); Box Method Division (3÷1 digit) (`division:box_division_hard`); Area Model Division (3÷1 digit) (`division:area_model_div_3by1`); Division with Remainders (Visual) (`division:div_remainders`) — divide at tiles 41 is 4-digit ÷ 1-digit  
-  Also tagged: `division:box_division_easy`, `division:area_model_div_2by1`, `division:div_zero_in_quotient`, `division:remainder_too_big`, `division:div_check_by_multiplying`, `number_sense:estimate_quotient`, `division:div_2by1_long`, `division:div_3by1_long`, `division:div_4by1_long`
+  Also tagged: `division:box_division_easy`, `division:area_model_div_2by1`, `division:div_zero_in_quotient`, `division:remainder_too_big`, `division:div_check_by_multiplying`, `number_sense:estimate_quotient`, `division:div_2by1_long`, `division:div_3by1_long`, `division:div_4by1_long`, `number_sense:reasonable_quotients`
 #### Number and Operations—Fractions (4.NF)
 
 *A. Extend understanding of fraction equivalence and ordering.*
 
 - **4.NF.A.1** — FULL. Explain why a fraction a/b is equivalent to a fraction (n×a)/(n×b) by using visual fraction models, with attention to how the number and size of the parts differ even though the two fractions themselves are the same size. Use this principle to recognize and generate equivalent fractions.  
   Taught by: Equivalent Fractions (Visual) (`fractions:equiv_frac_visual`); Equivalent Fractions (`fractions:equivalent`); Equivalent Fractions (No Visuals) (`fractions:equiv_frac_nv`)  
-  Also tagged: `fractions:select_equiv_frac`, `fractions:simplify`
+  Also tagged: `fractions:select_equiv_frac`, `fractions:simplify`, `fractions:equivalent_or_not`, `fractions:simplify_with_gcf`
 - **4.NF.A.2** — PARTIAL. Compare two fractions with different numerators and different denominators, e.g., by creating common denominators or numerators, or by comparing to a benchmark fraction such as 1/2. Recognize that comparisons are valid only when the two fractions refer to the same whole. Record the results of comparisons with symbols >, =, or <, and justify the conclusions, e.g., by using a visual fraction model.  
   In part: Compare Fractions (>, <, =) (`fractions:compare`); Compare Fractions (LCD) (`fractions:compare_frac_lcd`); Benchmark Fractions (0, ¼, ½, ¾, 1) (`fractions:benchmark_fractions`)  
   Missing: comparisons are valid only for the same whole; justify with a visual model → `frac_same_whole`  
@@ -1570,13 +1577,14 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **4.MD.A.1** — PARTIAL. Know relative sizes of measurement units within one system of units including km, m, cm; kg, g; lb, oz.; l, ml; hr, min, sec. Within a single system of measurement, express measurements in a larger unit in terms of a smaller unit. Record measurement equivalents in a two-column table. For example, know that 1 ft is 12 times as long as 1 in. Express the length of a 4 ft snake as 48 in. Generate a conversion table for feet and inches listing the number pairs (1, 12), (2, 24), (3, 36), ...  
   In part: Customary Length (in/ft/yd/mi) (`measurement:length_customary`); Metric Length (mm/cm/m/km) (`measurement:length_metric`); Capacity/Volume Units (`measurement:capacity`); Measurement Conversions (Visual) (`measurement:unit_conversions`)  
   Missing: record equivalents in a two-column conversion table; time units (hr, min, sec) as conversions → `conversion_table`, `time_convert`, `time_facts`  
-  Also tagged: `measurement:elapsed_find_duration`
+  Also tagged: `measurement:elapsed_find_duration`, `measurement:convert_feet_to_inches`, `measurement:convert_yards_to_feet`, `measurement:convert_yards_to_inches`, `measurement:convert_miles_to_feet`, `measurement:convert_cm_to_mm`, `measurement:convert_m_to_cm`, `measurement:convert_m_to_mm`, `measurement:convert_km_to_m`
 - **4.MD.A.2** — PARTIAL. Use the four operations to solve word problems involving distances, intervals of time, liquid volumes, masses of objects, and money, including problems involving simple fractions or decimals, and problems that require expressing measurements given in a larger unit in terms of a smaller unit. Represent measurement quantities using diagrams such as number line diagrams that feature a measurement scale.  
   In part: Unit Conversion Word Problems (`measurement:unit_conversion_word`); Find the Change (`measurement:money_change`); How Long From Start to End? (`measurement:elapsed_find_duration`)  
   Missing: four-operation word problems with distances, liquid volumes and masses, including simple fractions or decimals; measurement-scale diagrams → `mass_ops`, `length_ops`, `money_2step`, `timetables`  
-  Also tagged: `measurement:elapsed_visual_hard`, `measurement:money`, `measurement:make_change_least_coins`, `measurement:capacity`, `measurement:money_notation`
+  Also tagged: `measurement:elapsed_visual_hard`, `measurement:money`, `measurement:make_change_least_coins`, `measurement:capacity`, `measurement:money_notation`, `measurement:money_amount_in_words`
 - **4.MD.A.3** — FULL. Apply the area and perimeter formulas for rectangles in real world and mathematical problems. For example, find the width of a rectangular room given the area of the flooring and the length, by viewing the area formula as a multiplication equation with an unknown factor.  
   Taught by: Area Only (`area_perimeter:area`); Perimeter Only (`area_perimeter:perimeter`); Area AND Perimeter (`area_perimeter:area_perimeter`)  
+  Also tagged: `area_perimeter:area_missing_side`, `area_perimeter:perimeter_missing_side`
 *B. Represent and interpret data.*
 
 - **4.MD.B.4** — PARTIAL. Make a line plot to display a data set of measurements in fractions of a unit (1/2, 1/4, 1/8). Solve problems involving addition and subtraction of fractions by using information presented in line plots. For example, from a line plot find and interpret the difference in length between the longest and shortest specimens in an insect collection.  
@@ -1595,6 +1603,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Missing: measure with a protractor (the skill picks the closest of four estimates); sketch angles of a given measure → `protractor_read`, `draw_angles`  
 - **4.MD.C.7** — FULL. Recognize angle measure as additive. When an angle is decomposed into non-overlapping parts, the angle measure of the whole is the sum of the angle measures of the parts. Solve addition and subtraction problems to find unknown angles on a diagram in real world and mathematical problems, e.g., by using an equation with a symbol for the unknown angle measure.  
   Taught by: Two Angles Sum (Visual) (`angles_lines:additive_angles`)  
+  Also tagged: `angles_lines:angles_in_right_angle`, `angles_lines:angles_on_straight_line`, `angles_lines:angles_around_point`
 #### Geometry (4.G)
 
 *A. Draw and identify lines and angles, and classify shapes by properties of their lines and angles.*
@@ -1624,7 +1633,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **5.OA.B.3** — PARTIAL. Generate two numerical patterns using two given rules. Identify apparent relationships between corresponding terms. Form ordered pairs consisting of corresponding terms from the two patterns, and graph the ordered pairs on a coordinate plane. For example, given the rule “Add 3” and the starting number 0, and given the rule “Add 6” and the starting number 0, generate terms in the resulting sequences, and observe that the terms in one sequence are twice the corresponding terms in the other sequence. Explain informally why this is so.  
   In part: Two Patterns, Find Relationship (Visual) (`patterns:pattern_relationship`); Function Tables - Easy (Visual) (`algebra:function_table_easy`)  
   Missing: form ordered pairs from the two patterns and graph them → `pattern_pairs_graph`  
-  Also tagged: `algebra:function_table_hard`
+  Also tagged: `algebra:function_table_hard`, `algebra:function_table_find_rule`, `algebra:function_table_find_inputs`
 #### Number and Operations in Base Ten (5.NBT)
 
 *A. Understand the place value system.*
@@ -1644,7 +1653,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **5.NBT.A.4** — PARTIAL. Use place value understanding to round decimals to any place.  
   In part: Round Decimals (Visual) (`decimals:round_decimals`); Round Thousandths (`decimals:round_thousandths`)  
   Missing: round to the nearest whole number → `round_whole`  
-  Also tagged: `number_sense:round_sort_tenths`, `number_sense:round_sort_hundredths`
+  Also tagged: `number_sense:round_sort_tenths`, `number_sense:round_sort_hundredths`, `decimals:round_to_tenth`, `decimals:round_to_hundredth`
 *B. Perform operations with multi-digit whole numbers and with decimals to hundredths.*
 
 - **5.NBT.B.5** — PARTIAL. Fluently multiply multi-digit whole numbers using the standard algorithm.  
@@ -1657,6 +1666,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **5.NBT.B.7** — PARTIAL. Add, subtract, multiply, and divide decimals to hundredths, using concrete models or drawings and strategies based on place value, properties of operations, and/or the relationship between addition and subtraction; relate the strategy to a written method and explain the reasoning used.  
   In part: Adding Decimals (`decimals:add_decimal`); Subtracting Decimals (`decimals:sub_decimal`); Multiplying Decimals (`decimals:mult_decimal`); Dividing Decimals (`decimals:div_decimal`)  
   Missing: concrete models or drawings for decimal operations, related to the written method → `decimal_models`, `dec_known_facts`  
+  Also tagged: `decimals:div_decimal_by_whole`, `decimals:div_by_decimal`
 #### Number and Operations—Fractions (5.NF)
 
 *A. Use equivalent fractions as a strategy to add and subtract fractions.*
@@ -1688,8 +1698,10 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **5.NF.B.7** — FULL (from its parts). Apply and extend previous understandings of division to divide unit fractions by whole numbers and whole numbers by unit fractions.  
 -   **5.NF.B.7a** — FULL. Interpret division of a unit fraction by a non-zero whole number, and compute such quotients. For example, create a story context for (1/3) ÷ 4, and use a visual fraction model to show the quotient. Use the relationship between multiplication and division to explain that (1/3) ÷ 4 = 1/12 because (1/12) × 4 = 1/3.  
   Taught by: Divide with Unit Fractions (Visual) (`fraction_operations:div_unit_fraction`); Divide with Unit Fractions (No Visuals) (`fraction_operations:div_unit_frac_nv`)  
+  Also tagged: `fraction_operations:unit_frac_div_whole`
 -   **5.NF.B.7b** — FULL. Interpret division of a whole number by a unit fraction, and compute such quotients. For example, create a story context for 4 ÷ (1/5), and use a visual fraction model to show the quotient. Use the relationship between multiplication and division to explain that 4 ÷ (1/5) = 20 because 20 × (1/5) = 4.  
   Taught by: Divide with Unit Fractions (Visual) (`fraction_operations:div_unit_fraction`); Divide with Unit Fractions (No Visuals) (`fraction_operations:div_unit_frac_nv`)  
+  Also tagged: `fraction_operations:whole_div_unit_frac`
 -   **5.NF.B.7c** — FULL. Solve real world problems involving division of unit fractions by non-zero whole numbers and division of whole numbers by unit fractions, e.g., by using visual fraction models and equations to represent the problem. For example, how much chocolate will each person get if 3 people share 1/2 lb of chocolate equally? How many 1/3-cup servings are in 2 cups of raisins?  
   Taught by: Fraction Mult/Div Word Problems (Visual) (`fraction_operations:frac_mult_word`); Fraction Mult/Div Word (No Pictures) (`fraction_operations:frac_mult_word_plain`)  
 #### Measurement and Data (5.MD)
@@ -1722,6 +1734,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Missing: pack a prism with unit cubes and show the count equals l × w × h and B × h → `volume_cubes`  
 -   **5.MD.C.5b** — FULL. Apply the formulas V = l×w×h and V = b×h for rectangular prisms to find volumes of right rectangular prisms with whole-number edge lengths in the context of solving real world and mathematical problems.  
   Taught by: Volume (Rectangular Prisms) (`area_perimeter:volume`); Composite 3D Volume (Visual) (`area_perimeter:volume_composite`) — volume_composite deals single prisms today: formula practice  
+  Also tagged: `area_perimeter:volume_missing_edge`
 -   **5.MD.C.5c** — GAP. Recognize volume as additive. Find volumes of solid figures composed of two non-overlapping right rectangular prisms by adding the volumes of the non-overlapping parts, applying this technique to solve real world problems.  
   Missing: volume of two joined non-overlapping prisms (area_perimeter:volume_composite is named for this but deals one prism: its tag was moved to 5.MD.C.5b) → `volume_composite_repair`  
 #### Geometry (5.G)
@@ -1730,10 +1743,11 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 
 - **5.G.A.1** — FULL. Use a pair of perpendicular number lines, called axes, to define a coordinate system, with the intersection of the lines (the origin) arranged to coincide with the 0 on each line and a given point in the plane located by using an ordered pair of numbers, called its coordinates. Understand that the first number indicates how far to travel from the origin in the direction of one axis, and the second number indicates how far to travel in the direction of the second axis, with the convention that the names of the two axes and the coordinates correspond (e.g., x-axis and x-coordinate, y-axis and y-coordinate).  
   Taught by: Coordinates (Quadrant I) (`coordinates:coordinate_q1`)  
-  Also tagged: `coordinates:coordinate_graph`
+  Also tagged: `coordinates:coordinate_graph`, `coordinates:coordinates_read_q1`, `coordinates:coordinates_plot_q1`
 - **5.G.A.2** — PARTIAL. Represent real world and mathematical problems by graphing points in the first quadrant of the coordinate plane, and interpret coordinate values of points in the context of the situation.  
   In part: Coordinate Graphing (`coordinates:coordinate_graph`); Coordinates (Quadrant I) (`coordinates:coordinate_q1`)  
   Missing: represent real-world problems by graphing points and interpret the coordinates in context → `coord_context`, `line_graph`  
+  Also tagged: `coordinates:coordinates_read_q1`, `coordinates:coordinates_plot_q1`
 *B. Classify two-dimensional figures into categories based on their properties.*
 
 - **5.G.B.3** — FULL. Understand that attributes belonging to a category of two-dimensional figures also belong to all subcategories of that category. For example, all rectangles have four right angles and squares are rectangles, so all squares have four right angles.  
@@ -1749,6 +1763,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 
 - **6.RP.A.1** — FULL. Understand the concept of a ratio and use ratio language to describe a ratio relationship between two quantities. For example, “The ratio of wings to beaks in the bird house at the zoo was 2:1, because for every 2 wings there was 1 beak.” “For every vote candidate A received, candidate C received nearly three votes.”  
   Taught by: Write Ratios (a:b) (`conversions:ratio_intro`)  
+  Also tagged: `conversions:ratio_part_to_part`, `conversions:ratio_simplest_form`
 - **6.RP.A.2** — PARTIAL. Understand the concept of a unit rate a/b associated with a ratio a:b with b≠ 0, and use rate language in the context of a ratio relationship. For example, “This recipe has a ratio of 3 cups of flour to 4 cups of sugar, so there is 3/4 cup of flour for each cup of sugar.” “We paid $75 for 15 hamburgers, which is a rate of $5 per hamburger.”  
   In part: Compute Unit Rates (`conversions:unit_rate_intro`)  
   Missing: unit rates that are fractions (3/4 cup per cup) and rate language → `unit_rate_fraction`  
@@ -1757,6 +1772,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 -   **6.RP.A.3a** — PARTIAL. Make tables of equivalent ratios relating quantities with whole-number measurements, find missing values in the tables, and plot the pairs of values on the coordinate plane. Use tables to compare ratios.  
   In part: Equivalent Ratios (`conversions:equiv_ratios`); Ratio Tables (Find Missing Value) (`conversions:ratio_tables`)  
   Missing: plot the pairs of a ratio table on the coordinate plane; compare ratios with tables → `ratio_table_plot`  
+  Also tagged: `conversions:ratio_simplest_form`, `conversions:ratio_equivalent_or_not`
 -   **6.RP.A.3b** — FULL. Solve unit rate problems including those involving unit pricing and constant speed. For example, if it took 7 hours to mow 4 lawns, then at that rate, how many lawns could be mowed in 35 hours? At what rate were lawns being mowed?  
   Taught by: Compute Unit Rates (`conversions:unit_rate_intro`); Double Number Lines (Visual) (`conversions:double_num_line`)  
 -   **6.RP.A.3c** — FULL. Find a percent of a quantity as a rate per 100 (e.g., 30% of a quantity means 30/100 times the quantity); solve problems involving finding the whole, given a part and the percent.  
@@ -1777,9 +1793,11 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **6.NS.B.3** — PARTIAL. Fluently add, subtract, multiply, and divide multi-digit decimals using the standard algorithm for each operation.  
   In part: Adding Decimals (`decimals:add_decimal`); Subtracting Decimals (`decimals:sub_decimal`); Multiplying Decimals (`decimals:mult_decimal`); Dividing Decimals (`decimals:div_decimal`)  
   Missing: multiply a decimal by a decimal with the standard algorithm (mult_decimal multiplies by a whole number) → `mult_dec_dec`  
+  Also tagged: `decimals:div_by_decimal`
 - **6.NS.B.4** — PARTIAL. Find the greatest common factor of two whole numbers less than or equal to 100 and the least common multiple of two whole numbers less than or equal to 12. Use the distributive property to express a sum of two whole numbers 1–100 with a common factor as a multiple of a sum of two whole numbers with no common factor. For example, express 36 + 8 as 4 (9 + 2).  
   In part: Greatest Common Factor (Easy) (`number_theory:gcf_easy`); Greatest Common Factor (Hard) (`number_theory:gcf_hard`); Least Common Multiple (`number_theory:lcm`)  
   Missing: the distributive property to write a sum as the GCF × a sum (36 + 8 = 4 × (9 + 2)) → `gcf_distributive`  
+  Also tagged: `fractions:simplify_with_gcf`, `algebra:factor_out_gcf`, `number_theory:common_factors`, `number_theory:common_multiples`
 *C. Apply and extend previous understandings of numbers to the system of rational numbers.*
 
 - **6.NS.C.5** — PARTIAL. Understand that positive and negative numbers are used together to describe quantities having opposite directions or values (e.g., temperature above/below zero, elevation above/below sea level, credits/debits, positive/negative electric charge); use positive and negative numbers to represent quantities in real-world contexts, explaining the meaning of 0 in each situation.  
@@ -1794,6 +1812,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Missing: the signs of the coordinates name the quadrant; points that differ only by signs are reflections across an axis → `four_quadrants`  
 -   **6.NS.C.6c** — FULL. Find and position integers and other rational numbers on a horizontal or vertical number line diagram; find and position pairs of integers and other rational numbers on a coordinate plane.  
   Taught by: Number Lines with Negatives (`integers:number_line_int`); Place Integers on a Number Line (`integers:integer_nl_drag`); Coordinates (All 4 Quadrants) (`coordinates:coordinate_all`); Order Rationals on a Number Line (`integers:ordering_rationals`)  
+  Also tagged: `coordinates:coordinates_read_all`, `coordinates:coordinates_plot_all`
 - **6.NS.C.7** — PARTIAL (from its parts). Understand ordering and absolute value of rational numbers.  
   Not FULL because of its lettered parts.  
 -   **6.NS.C.7a** — FULL. Interpret statements of inequality as statements about the relative position of two numbers on a number line diagram. For example, interpret –3 > –7 as a statement that –3 is located to the right of –7 on a number line oriented from left to right.  
@@ -1810,6 +1829,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **6.NS.C.8** — PARTIAL. Solve real-world and mathematical problems by graphing points in all four quadrants of the coordinate plane. Include use of coordinates and absolute value to find distances between points with the same first coordinate or the same second coordinate.  
   In part: Distance Between Points (Visual, Q1) (`coordinates:coord_distance_q1`); Coordinates (All 4 Quadrants) (`coordinates:coordinate_all`)  
   Missing: problems in all four quadrants; distances with absolute value across an axis → `four_quadrants`  
+  Also tagged: `coordinates:coordinates_read_all`, `coordinates:coordinates_plot_all`
 #### Expressions and Equations (6.EE)
 
 *A. Apply and extend previous understandings of arithmetic to algebraic expressions.*
@@ -1817,7 +1837,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **6.EE.A.1** — PARTIAL. Write and evaluate numerical expressions involving whole-number exponents.  
   In part: Level 7: Exponents (`order_of_operations:exponents_simple`); OoO Hard: Brackets & Exponents (`order_of_operations:oop_hard`)  
   Missing: write expressions with whole-number exponents (3 × 3 × 3 × 3 = 3⁴) → `square_cube`  
-  Also tagged: `algebra:evaluate_expression_hard`
+  Also tagged: `algebra:evaluate_expression_hard`, `order_of_operations:square_numbers`, `order_of_operations:cube_numbers`
 - **6.EE.A.2** — PARTIAL (from its parts). Write, read, and evaluate expressions in which letters stand for numbers.  
   Not FULL because of its lettered parts.  
 -   **6.EE.A.2a** — FULL. Write expressions that record operations with numbers and with letters standing for numbers. For example, express the calculation “Subtract y from 5” as 5 – y.  
@@ -1830,6 +1850,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Also tagged: `order_of_operations:oop_easy`, `order_of_operations:oop_hard`, `order_of_operations:two_ops_no_paren`, `order_of_operations:three_ops_no_paren`, `order_of_operations:multi_ops_no_paren`
 - **6.EE.A.3** — FULL. Apply the properties of operations to generate equivalent expressions. For example, apply the distributive property to the expression 3 (2 + x) to produce the equivalent expression 6 + 3x; apply the distributive property to the expression 24x + 18y to produce the equivalent expression 6 (4x + 3y); apply properties of operations to y + y + y to produce the equivalent expression 3y.  
   Taught by: Distributive Property of Expressions (`algebra:distributive_expr`); Combine Like Terms (`algebra:combine_like_terms`)  
+  Also tagged: `algebra:factor_out_gcf`
 - **6.EE.A.4** — PARTIAL. Identify when two expressions are equivalent (i.e., when the two expressions name the same number regardless of which value is substituted into them). For example, the expressions y + y + y and 3y are equivalent because they name the same number regardless of which number y stands for.  
   In part: Combine Like Terms (`algebra:combine_like_terms`)  
   Missing: decide whether two expressions are equivalent (the same value for every substitution) → `equiv_expressions`  
@@ -1839,9 +1860,10 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Taught by: Solve One-Step Equations (+/−) (`algebra:solve_eq_addsub`); Solve One-Step Equations (×/÷) (`algebra:solve_eq_multdiv`); Inequalities (>, <, ≥, ≤) (`algebra:inequalities`); Solve for Unknown (x + 5 = 12) (`algebra:solve_unknown`) — the "which candidates make it true?" bins  
 - **6.EE.B.6** — FULL. Use variables to represent numbers and write expressions when solving a real-world or mathematical problem; understand that a variable can represent an unknown number, or, depending on the purpose at hand, any number in a specified set.  
   Taught by: Write Equations from Words (`algebra:write_equation`)  
+  Also tagged: `algebra:write_equation_story`
 - **6.EE.B.7** — FULL. Solve real-world and mathematical problems by writing and solving equations of the form x + p = q and px = q for cases in which p, q and x are all nonnegative rational numbers.  
   Taught by: Solve One-Step Equations (+/−) (`algebra:solve_eq_addsub`); Solve One-Step Equations (×/÷) (`algebra:solve_eq_multdiv`); Write Equations from Words (`algebra:write_equation`)  
-  Also tagged: `algebra:solve_unknown`
+  Also tagged: `algebra:solve_unknown`, `algebra:solve_x_plus_a`, `algebra:solve_x_minus_a`, `algebra:solve_ax_eq_b`, `algebra:solve_x_div_a`, `algebra:write_equation_story`
 - **6.EE.B.8** — PARTIAL. Write an inequality of the form x > c or x < c to represent a constraint or condition in a real-world or mathematical problem. Recognize that inequalities of the form x > c or x < c have infinitely many solutions; represent solutions of such inequalities on number line diagrams.  
   In part: Inequalities (>, <, ≥, ≤) (`algebra:inequalities`)  
   Missing: write x > c or x < c for a real condition; show the infinitely many solutions on a number line → `inequality_write_graph`  
@@ -1857,6 +1879,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **6.G.A.1** — PARTIAL. Find the area of right triangles, other triangles, special quadrilaterals, and polygons by composing into rectangles or decomposing into triangles and other shapes; apply these techniques in the context of solving real-world and mathematical problems.  
   In part: Area of a Triangle (b×h÷2) (`area_perimeter:area_triangle`); Decompose Polygon Area (L/T/U) (`area_perimeter:area_polygon_decompose`); Composite Shapes (L, T, U) (`area_perimeter:composite_shapes`)  
   Missing: special quadrilaterals (parallelograms, trapezoids) and polygons decomposed into triangles → `parallelogram`, `area_triangle_grid`  
+  Also tagged: `area_perimeter:composite_area_perimeter`
 - **6.G.A.2** — GAP. Find the volume of a right rectangular prism with fractional edge lengths by packing it with unit cubes of the appropriate unit fraction edge lengths, and show that the volume is the same as would be found by multiplying the edge lengths of the prism. Apply the formulas V = l w h and V = b h to find volumes of right rectangular prisms with fractional edge lengths in the context of solving real-world and mathematical problems.  
   Missing: volume of prisms with fractional edges, by packing unit-fraction cubes and by formula → `volume_fractional`  
 - **6.G.A.3** — PARTIAL. Draw polygons in the coordinate plane given coordinates for the vertices; use coordinates to find the length of a side joining points with the same first coordinate or the same second coordinate. Apply these techniques in the context of solving real-world and mathematical problems.  
@@ -1881,6 +1904,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **6.SP.B.4** — PARTIAL. Display numerical data in plots on a number line, including dot plots, histograms, and box plots.  
   In part: Box Plot - Median, IQR, Range (Visual) (`data_analysis:box_plot_intro`); Read a Histogram (Visual) (`data_analysis:histogram_read`)  
   Missing: display the data: make dot plots, histograms and box plots (the skills only read them) → `make_histogram_box`, `make_line_plot`  
+  Also tagged: `data_analysis:box_plot_quartiles`
 - **6.SP.B.5** — PARTIAL (from its parts). Summarize numerical data sets in relation to their context, such as by:  
   Not FULL because of its lettered parts.  
 -   **6.SP.B.5a** — FULL. Reporting the number of observations.  
@@ -1890,7 +1914,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 -   **6.SP.B.5c** — PARTIAL. Giving quantitative measures of center (median and/or mean) and variability (interquartile range and/or mean absolute deviation), as well as describing any overall pattern and any striking deviations from the overall pattern with reference to the context in which the data were gathered.  
   In part: Mean (Average) (`data_analysis:mean`); Median (`data_analysis:median`); Box Plot - Median, IQR, Range (Visual) (`data_analysis:box_plot_intro`); Mean Absolute Deviation (MAD) (`data_analysis:mad`)  
   Missing: describe the overall pattern and striking deviations (outliers) in context → `describe_distribution`  
-  Also tagged: `data_analysis:range`
+  Also tagged: `data_analysis:range`, `data_analysis:box_plot_quartiles`
 -   **6.SP.B.5d** — GAP. Relating the choice of measures of center and variability to the shape of the data distribution and the context in which the data were gathered.  
   Missing: relate the choice of centre and variability measures to the shape of the distribution → `describe_distribution`  
 

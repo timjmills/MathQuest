@@ -286,6 +286,29 @@ export const SKILL_GRADES = {
     'mult_multiples_of_ten': 3,                                            // 3.NBT.A.3
     'div_2by1_long': 4, 'div_3by1_long': 4, 'div_4by1_long': 4, 'div_3by2_long': 5, // 4.NBT.B.6; 5.NBT.B.6
     'compare_to_half': 4, 'near_doubles': 1, 'expanded_notation': 4,     // 4.NF.A.2; 1.OA.C.6; 4.NBT.A.2
+    // PRESET skills, batch 2 (2026-10-17): the grade of the lesson the preset IS.
+    'mult_break_apart': 3, 'area_model_2by1': 4, 'area_model_3by1': 4, 
+    'mult_arrays': 2, 'mult_equal_groups': 3, 'mult_by_ten': 3, 'mult_by_hundred': 4, 'count_by_2s': 2,
+    'count_by_3s': 3, 'count_by_4s': 3, 'count_by_5s': 2, 'count_by_6s': 3, 'count_by_7s': 3,
+    'count_by_8s': 3, 'count_by_9s': 3, 'count_by_10s': 2, 'count_by_11s': 3, 'count_by_12s': 3,
+    'div_sharing_word_problems': 3, 'div_grouping_word_problems': 3, 
+    'sub_wp_compare': 1, 'sub_wp_start_unknown': 2, 'add_negative': 6, 'sub_negative': 6,
+    'identify_fraction_nl': 3, 'write_fraction_nl': 3, 'compare_fractions_nl': 3, 'equivalent_or_not': 4, 'simplify_with_gcf': 6,
+    'unit_frac_div_whole': 5, 'whole_div_unit_frac': 5, 'div_decimal_by_whole': 5, 'div_by_decimal': 6, 'round_to_tenth': 5,
+    'round_to_hundredth': 5, 'ratio_part_to_part': 6, 'ratio_simplest_form': 6, 'ratio_equivalent_or_not': 6,
+    'area_missing_side': 3, 'perimeter_missing_side': 3, 'volume_missing_edge': 5, 'composite_area_perimeter': 3, 'angles_in_right_angle': 4,
+    'angles_on_straight_line': 4, 'angles_around_point': 4, 'coordinates_read_q1': 5, 'coordinates_plot_q1': 5, 'coordinates_read_all': 6,
+    'coordinates_plot_all': 6, 'reflect_x_axis': 5, 'reflect_y_axis': 5, 'rotate_half_turn': 5, 'rotate_quarter_turn': 5,
+    'rotate_three_quarter_turn': 5, 'translate_right_up': 5, 'translate_left_up': 5, 'translate_right_down': 5, 'translate_left_down': 5,
+    'pictograph_how_many_more': 3, 'bar_graph_how_many_more': 3, 'tally_how_many_more': 2, 'box_plot_quartiles': 6, 'solve_x_plus_a': 6,
+    'solve_x_minus_a': 6, 'solve_ax_eq_b': 6, 'solve_x_div_a': 6, 'solve_ax_plus_b': 6, 'solve_ax_minus_b': 6,
+    'solve_x_div_a_plus_b': 6, 'solve_bracket_div': 6, 'write_equation_story': 6, 'factor_out_gcf': 6, 'function_table_find_rule': 4,
+    'function_table_find_inputs': 4, 'square_numbers': 5, 'cube_numbers': 5, 
+    'reasonable_quotients': 4, 'digit_value_unit_form': 2, 'digit_value_notation': 4, 'count_pv_disks': 2, 'write_numbers_in_words': 2,
+    'count_notes': 2, 'count_notes_and_coins': 2, 'convert_feet_to_inches': 4, 'convert_yards_to_feet': 4, 'convert_yards_to_inches': 4,
+    'convert_miles_to_feet': 4, 'convert_cm_to_mm': 4, 'convert_m_to_cm': 4, 'convert_m_to_mm': 4, 'convert_km_to_m': 4,
+    'clock_hands': 1, 'minutes_by_fives_all': 2, 'order_notes': 1, 'money_amount_in_words': 2, 'sort_prime_composite': 4,
+    'list_multiples': 4, 'missing_multiples': 4, 'common_factors': 5, 'common_multiples': 5,
 };
 
 // Look up grade for a skill, resolving category collisions
@@ -583,6 +606,8 @@ export const SKILLS = {
         { v: "mixed_composing", l: "Mixed Number Sense" },
         // APPENDED (owner, 2026-09-25): never splice above it — share codes index by position.
         { v: "number_chart_fill", l: "Number Chart - Find the Missing Number (to 1,000 and beyond)" },
+        // APPENDED 2026-10-17 — PRESET skills, batch 2 (skill-presets.js; owner: every "ask owner" row is a preset).
+        { v: "write_numbers_in_words", l: "Write Numbers in Words", presetOf: "number_word_form" },
     ],
     counting_mixed: [
         { v: "counting_all", l: "All Counting & Cardinality" },
@@ -726,6 +751,9 @@ export const SKILLS = {
         { v: "sub_across_zeros", l: "Subtract Across Zeros" },                       // SZ-2 … SZ-6: the WIDE regroup box spanning a run of zeros; the rungs are its `zeros` option
         { v: "sub_missing_digit", l: "Find the Missing Digit (Subtraction)" },        // SC-19
         { v: "sub_check_by_adding", l: "Check a Subtraction by Adding" },             // SC-20: the check is ADDITION on deliberately-wrong work
+        // APPENDED 2026-10-17 — PRESET skills, batch 2 (skill-presets.js; owner: every "ask owner" row is a preset).
+        { v: "sub_wp_compare", l: "Subtraction Word Problems: How Many More?", presetOf: "sub_word_problems" },
+        { v: "sub_wp_start_unknown", l: "Subtraction Word Problems: Find the Start", presetOf: "sub_word_problems" },
     ],
     multiplication: [
         { v: "mult_facts", l: "Multiplication Facts (1-12)" },
@@ -768,6 +796,25 @@ export const SKILLS = {
         { v: "mult_chart_pattern", l: "Multiplication Chart: Find the Pattern in a Row", presetOf: "mult_chart" },
         { v: "mult_chart_headers", l: "Multiplication Chart: Find the Missing Factors", presetOf: "mult_chart" },
         { v: "mult_multiples_of_ten", l: "Multiply by Multiples of Ten (6 × 40)", presetOf: "mult_zeros" },
+        // APPENDED 2026-10-17 — PRESET skills, batch 2 (skill-presets.js; owner: every "ask owner" row is a preset).
+        { v: "mult_break_apart", l: "Break Apart a Fact (Distributive Property)", presetOf: "mult_properties" },
+        { v: "area_model_2by1", l: "Area Model: Multiply 2-Digit by 1-Digit", presetOf: "area_model_mult" },
+        { v: "area_model_3by1", l: "Area Model: Multiply 3-Digit by 1-Digit", presetOf: "area_model_mult" },
+        { v: "mult_arrays", l: "Arrays: Rows of Dots", presetOf: "arrays_groups" },
+        { v: "mult_equal_groups", l: "Equal Groups: Rings of Dots", presetOf: "arrays_groups" },
+        { v: "mult_by_ten", l: "Multiply by 10", presetOf: "mult_zeros" },
+        { v: "mult_by_hundred", l: "Multiply by 100", presetOf: "mult_zeros" },
+        { v: "count_by_2s", l: "Count by 2s", presetOf: "count_by_tables" },
+        { v: "count_by_3s", l: "Count by 3s", presetOf: "count_by_tables" },
+        { v: "count_by_4s", l: "Count by 4s", presetOf: "count_by_tables" },
+        { v: "count_by_5s", l: "Count by 5s", presetOf: "count_by_tables" },
+        { v: "count_by_6s", l: "Count by 6s", presetOf: "count_by_tables" },
+        { v: "count_by_7s", l: "Count by 7s", presetOf: "count_by_tables" },
+        { v: "count_by_8s", l: "Count by 8s", presetOf: "count_by_tables" },
+        { v: "count_by_9s", l: "Count by 9s", presetOf: "count_by_tables" },
+        { v: "count_by_10s", l: "Count by 10s", presetOf: "count_by_tables" },
+        { v: "count_by_11s", l: "Count by 11s", presetOf: "count_by_tables" },
+        { v: "count_by_12s", l: "Count by 12s", presetOf: "count_by_tables" },
     ],
     division: [
         { v: "div_facts", l: "Division Facts (1-12)" },
@@ -802,6 +849,9 @@ export const SKILLS = {
         { v: "div_3by1_long", l: "Divide 3-Digit by 1-Digit Numbers (Long Division)", presetOf: "divide" },
         { v: "div_4by1_long", l: "Divide 4-Digit by 1-Digit Numbers (Long Division)", presetOf: "divide" },
         { v: "div_3by2_long", l: "Divide 3-Digit by 2-Digit Numbers (Long Division)", presetOf: "divide" },
+        // APPENDED 2026-10-17 — PRESET skills, batch 2 (skill-presets.js; owner: every "ask owner" row is a preset).
+        { v: "div_sharing_word_problems", l: "Division Word Problems: Sharing", presetOf: "div_word_problems" },
+        { v: "div_grouping_word_problems", l: "Division Word Problems: Grouping", presetOf: "div_word_problems" },
     ],
     integers: [
         { v: "number_line_int", l: "Number Lines with Negatives" },
@@ -815,6 +865,9 @@ export const SKILLS = {
         { v: "abs_value", l: "Absolute Value" },
         { v: "opposite_numbers", l: "Opposites of Integers" },
         { v: "ordering_rationals", l: "Order Rationals on a Number Line" },
+        // APPENDED 2026-10-17 — PRESET skills, batch 2 (skill-presets.js; owner: every "ask owner" row is a preset).
+        { v: "add_negative", l: "Add a Negative Number", presetOf: "add_int" },
+        { v: "sub_negative", l: "Subtract a Negative Number", presetOf: "sub_int" },
     ],
     number_ops_mixed: [
         { v: "mixed", l: "All Four Operations (+ − × ÷)" },
@@ -864,6 +917,12 @@ export const SKILLS = {
         { v: "mixed_nl_drag", l: "Place Mixed Numbers on a Number Line" },
         // APPENDED 2026-10-17 — PRESET skill (skill-presets.js): compare with its benchmark form set.
         { v: "compare_to_half", l: "Compare Fractions to One Half", presetOf: "compare" },
+        // APPENDED 2026-10-17 — PRESET skills, batch 2 (skill-presets.js; owner: every "ask owner" row is a preset).
+        { v: "identify_fraction_nl", l: "Identify Fractions on a Number Line", presetOf: "identify" },
+        { v: "write_fraction_nl", l: "Write the Fraction Shown on a Number Line", presetOf: "write_fraction" },
+        { v: "compare_fractions_nl", l: "Compare Fractions on a Number Line", presetOf: "compare" },
+        { v: "equivalent_or_not", l: "Equivalent Fractions: Yes or No?", presetOf: "equivalent" },
+        { v: "simplify_with_gcf", l: "Simplify Fractions Using the Greatest Common Factor", presetOf: "simplify" },
     ],
     fraction_operations: [
         // Grade 4 fraction operations
@@ -908,6 +967,9 @@ export const SKILLS = {
         { v: "frac_word_mixed_plain", l: "Mixed Fraction Word Problems (No Pictures)" },
         { v: "mixed_fraction_ops", l: "Mixed Fraction Operations" },
         { v: "estimate_frac_ops", l: "Estimate Fraction Sums/Differences" },
+        // APPENDED 2026-10-17 — PRESET skills, batch 2 (skill-presets.js; owner: every "ask owner" row is a preset).
+        { v: "unit_frac_div_whole", l: "Divide a Unit Fraction by a Whole Number", presetOf: "div_unit_frac_nv" },
+        { v: "whole_div_unit_frac", l: "Divide a Whole Number by a Unit Fraction", presetOf: "div_unit_frac_nv" },
     ],
     decimals: [
         { v: "add_decimal", l: "Adding Decimals" },
@@ -921,6 +983,11 @@ export const SKILLS = {
         { v: "order_decimals", l: "Order Decimals" },
         { v: "decimal_nl_drag", l: "Place Decimals on a Number Line" },
         { v: "mixed_decimals", l: "Mixed Decimals" },
+        // APPENDED 2026-10-17 — PRESET skills, batch 2 (skill-presets.js; owner: every "ask owner" row is a preset).
+        { v: "div_decimal_by_whole", l: "Divide a Decimal by a Whole Number", presetOf: "div_decimal" },
+        { v: "div_by_decimal", l: "Divide by a Decimal", presetOf: "div_decimal" },
+        { v: "round_to_tenth", l: "Round Decimals to the Nearest Tenth", presetOf: "round_thousandths" },
+        { v: "round_to_hundredth", l: "Round Decimals to the Nearest Hundredth", presetOf: "round_thousandths" },
     ],
     conversions: [
         { v: "f_to_d", l: "Fraction → Decimal" },
@@ -941,6 +1008,10 @@ export const SKILLS = {
         // Grade 6 — equivalent ratios + ratio tables (6.RP.A)
         { v: "equiv_ratios", l: "Equivalent Ratios" },
         { v: "ratio_tables", l: "Ratio Tables (Find Missing Value)" },
+        // APPENDED 2026-10-17 — PRESET skills, batch 2 (skill-presets.js; owner: every "ask owner" row is a preset).
+        { v: "ratio_part_to_part", l: "Write a Part-to-Part Ratio", presetOf: "ratio_intro" },
+        { v: "ratio_simplest_form", l: "Write a Ratio in Simplest Form", presetOf: "equiv_ratios" },
+        { v: "ratio_equivalent_or_not", l: "Equivalent Ratios: Yes or No?", presetOf: "equiv_ratios" },
     ],
     frac_dec_mixed: [
         { v: "fractions_all", l: "All Fraction Skills" },
@@ -983,6 +1054,11 @@ export const SKILLS = {
         { v: "volume", l: "Volume (Rectangular Prisms)" },
         { v: "volume_composite", l: "Composite 3D Volume (Visual)" },
         { v: "mixed_area_perimeter", l: "Mixed Area & Perimeter" },
+        // APPENDED 2026-10-17 — PRESET skills, batch 2 (skill-presets.js; owner: every "ask owner" row is a preset).
+        { v: "area_missing_side", l: "Find a Missing Side from the Area", presetOf: "area" },
+        { v: "perimeter_missing_side", l: "Find a Missing Side from the Perimeter", presetOf: "perimeter" },
+        { v: "volume_missing_edge", l: "Find a Missing Edge from the Volume", presetOf: "volume" },
+        { v: "composite_area_perimeter", l: "Area and Perimeter of Composite Shapes", presetOf: "composite_shapes" },
     ],
     angles_lines: [
         { v: "identify_angles", l: "Identify Angles" },
@@ -992,6 +1068,10 @@ export const SKILLS = {
         { v: "place_symmetry_lines", l: "Draw Lines of Symmetry" },
         { v: "additive_angles", l: "Two Angles Sum (Visual)" },
         { v: "mixed_angles_lines", l: "Mixed Angles & Lines" },
+        // APPENDED 2026-10-17 — PRESET skills, batch 2 (skill-presets.js; owner: every "ask owner" row is a preset).
+        { v: "angles_in_right_angle", l: "Missing Angle in a Right Angle (90°)", presetOf: "additive_angles" },
+        { v: "angles_on_straight_line", l: "Angles on a Straight Line (180°)", presetOf: "additive_angles" },
+        { v: "angles_around_point", l: "Angles Around a Point (360°)", presetOf: "additive_angles" },
     ],
     shapes_classify: [
         { v: "classify_triangles", l: "Classify Triangles" },
@@ -1012,6 +1092,20 @@ export const SKILLS = {
         { v: "geo_rotate", l: "Rotations (Visual, MC)" },
         { v: "geo_translate", l: "Translations (Visual, MC)" },
         { v: "mixed_coordinates", l: "Mixed Coordinates" },
+        // APPENDED 2026-10-17 — PRESET skills, batch 2 (skill-presets.js; owner: every "ask owner" row is a preset).
+        { v: "coordinates_read_q1", l: "Read Coordinates in the First Quadrant", presetOf: "coordinate_q1" },
+        { v: "coordinates_plot_q1", l: "Plot Points in the First Quadrant", presetOf: "coordinate_q1" },
+        { v: "coordinates_read_all", l: "Read Coordinates in All Four Quadrants", presetOf: "coordinate_all" },
+        { v: "coordinates_plot_all", l: "Plot Points in All Four Quadrants", presetOf: "coordinate_all" },
+        { v: "reflect_x_axis", l: "Reflect a Shape in the x-Axis", presetOf: "geo_reflect" },
+        { v: "reflect_y_axis", l: "Reflect a Shape in the y-Axis", presetOf: "geo_reflect" },
+        { v: "rotate_half_turn", l: "Rotate a Shape a Half Turn (180°)", presetOf: "geo_rotate" },
+        { v: "rotate_quarter_turn", l: "Rotate a Shape a Quarter Turn (90°)", presetOf: "geo_rotate" },
+        { v: "rotate_three_quarter_turn", l: "Rotate a Shape a Three-Quarter Turn (270°)", presetOf: "geo_rotate" },
+        { v: "translate_right_up", l: "Translate a Shape Right and Up", presetOf: "geo_translate" },
+        { v: "translate_left_up", l: "Translate a Shape Left and Up", presetOf: "geo_translate" },
+        { v: "translate_right_down", l: "Translate a Shape Right and Down", presetOf: "geo_translate" },
+        { v: "translate_left_down", l: "Translate a Shape Left and Down", presetOf: "geo_translate" },
     ],
     measurement: [
         // Time Reading Skills
@@ -1068,6 +1162,21 @@ export const SKILLS = {
         { v: "money_notation", l: "Write an Amount of Money" },
         { v: "money_change", l: "Find the Change" },
         { v: "money_compare", l: "Which Has More Money?" },
+        // APPENDED 2026-10-17 — PRESET skills, batch 2 (skill-presets.js; owner: every "ask owner" row is a preset).
+        { v: "count_notes", l: "Count Notes (Bills)", presetOf: "money_count" },
+        { v: "count_notes_and_coins", l: "Count Notes and Coins", presetOf: "money_count" },
+        { v: "convert_feet_to_inches", l: "Convert Feet to Inches", presetOf: "length_customary" },
+        { v: "convert_yards_to_feet", l: "Convert Yards to Feet", presetOf: "length_customary" },
+        { v: "convert_yards_to_inches", l: "Convert Yards to Inches", presetOf: "length_customary" },
+        { v: "convert_miles_to_feet", l: "Convert Miles to Feet", presetOf: "length_customary" },
+        { v: "convert_cm_to_mm", l: "Convert Centimeters to Millimeters", presetOf: "length_metric" },
+        { v: "convert_m_to_cm", l: "Convert Meters to Centimeters", presetOf: "length_metric" },
+        { v: "convert_m_to_mm", l: "Convert Meters to Millimeters", presetOf: "length_metric" },
+        { v: "convert_km_to_m", l: "Convert Kilometers to Meters", presetOf: "length_metric" },
+        { v: "clock_hands", l: "The Hour Hand and the Minute Hand", presetOf: "clock_parts" },
+        { v: "minutes_by_fives_all", l: "Write All the Minutes by Fives", presetOf: "time_fives_ring" },
+        { v: "order_notes", l: "Put Notes in Order by Value", presetOf: "coin_value" },
+        { v: "money_amount_in_words", l: "Write an Amount of Money from Words", presetOf: "money_notation" },
     ],
     geo_mixed: [
         { v: "geometry_all", l: "All Geometry Skills" },
@@ -1087,6 +1196,10 @@ export const SKILLS = {
         { v: "line_plot_fractions", l: "Line Plots with Fractions (Visual)" },
         { v: "pie_chart", l: "Pie Charts" },
         { v: "mixed_graphs", l: "Mixed Graphs" },
+        // APPENDED 2026-10-17 — PRESET skills, batch 2 (skill-presets.js; owner: every "ask owner" row is a preset).
+        { v: "pictograph_how_many_more", l: "Pictographs: How Many More?", presetOf: "pictograph" },
+        { v: "bar_graph_how_many_more", l: "Bar Graphs: How Many More?", presetOf: "bar_graph" },
+        { v: "tally_how_many_more", l: "Tally Charts: How Many More?", presetOf: "tally_chart" },
     ],
     data_analysis: [
         { v: "mean", l: "Mean (Average)" },
@@ -1100,6 +1213,8 @@ export const SKILLS = {
         { v: "mad", l: "Mean Absolute Deviation (MAD)" },
         { v: "statistical_question", l: "Identify Statistical Questions" },
         { v: "mixed_data_analysis", l: "Mixed Data Analysis" },
+        // APPENDED 2026-10-17 — PRESET skills, batch 2 (skill-presets.js; owner: every "ask owner" row is a preset).
+        { v: "box_plot_quartiles", l: "Quartiles and the Interquartile Range (Box Plot)", presetOf: "box_plot_intro" },
     ],
     probability: [
         { v: "probability_basic", l: "Basic Probability" },
@@ -1154,6 +1269,19 @@ export const SKILLS = {
         { v: "build_expr_addsub", l: "Build the Expression: +/−" },
         { v: "build_expr_multdiv", l: "Build the Expression: ×/÷" },
         { v: "mixed_algebra", l: "Mixed Algebra" },
+        // APPENDED 2026-10-17 — PRESET skills, batch 2 (skill-presets.js; owner: every "ask owner" row is a preset).
+        { v: "solve_x_plus_a", l: "Solve x + a = b", presetOf: "solve_eq_addsub" },
+        { v: "solve_x_minus_a", l: "Solve x − a = b", presetOf: "solve_eq_addsub" },
+        { v: "solve_ax_eq_b", l: "Solve ax = b", presetOf: "solve_eq_multdiv" },
+        { v: "solve_x_div_a", l: "Solve x ÷ a = b", presetOf: "solve_eq_multdiv" },
+        { v: "solve_ax_plus_b", l: "Solve ax + b = c", presetOf: "solve_eq_twostep" },
+        { v: "solve_ax_minus_b", l: "Solve ax − b = c", presetOf: "solve_eq_twostep" },
+        { v: "solve_x_div_a_plus_b", l: "Solve x ÷ a + b = c", presetOf: "solve_eq_twostep" },
+        { v: "solve_bracket_div", l: "Solve (x − b) ÷ a = c", presetOf: "solve_eq_twostep" },
+        { v: "write_equation_story", l: "Write an Equation for a Story", presetOf: "write_equation" },
+        { v: "factor_out_gcf", l: "Factor Out the Greatest Common Factor", presetOf: "distributive_expr" },
+        { v: "function_table_find_rule", l: "Function Tables: Find the Rule", presetOf: "function_table_easy" },
+        { v: "function_table_find_inputs", l: "Function Tables: Find the Missing In Numbers", presetOf: "function_table_easy" },
     ],
     order_of_operations: [
         { v: "oop_easy", l: "OoO Easy: Two Ops, No Parens" },
@@ -1168,6 +1296,9 @@ export const SKILLS = {
         { v: "exponents_simple", l: "Level 7: Exponents" },
         { v: "compare_expressions", l: "Compare Expressions (=, ≠, <, >)" },
         { v: "mixed_order_ops", l: "Mixed Order of Operations" },
+        // APPENDED 2026-10-17 — PRESET skills, batch 2 (skill-presets.js; owner: every "ask owner" row is a preset).
+        { v: "square_numbers", l: "Square Numbers (5²)", presetOf: "exponents_simple" },
+        { v: "cube_numbers", l: "Cube Numbers (5³)", presetOf: "exponents_simple" },
     ],
     placevalue: [
         { v: "more_less_10", l: "1 More, 1 Less, 10 More, 10 Less" },
@@ -1189,6 +1320,10 @@ export const SKILLS = {
         { v: "unit_form", l: "Unit Form (4 hundreds 7 tens 6 ones)" },
         // APPENDED 2026-10-17 — PRESET skill (skill-presets.js): expand with its notation form set.
         { v: "expanded_notation", l: "Write Numbers in Expanded Notation", presetOf: "expand" },
+        // APPENDED 2026-10-17 — PRESET skills, batch 2 (skill-presets.js; owner: every "ask owner" row is a preset).
+        { v: "digit_value_unit_form", l: "Value of a Digit in Unit Form (7 Hundreds)", presetOf: "value" },
+        { v: "digit_value_notation", l: "Value of a Digit in Expanded Notation (7 × 100)", presetOf: "value" },
+        { v: "count_pv_disks", l: "Count the Place-Value Disks in One Place", presetOf: "place_value_disks" },
     ],
     number_sense: [
         { v: "rounding_visual", l: "Round on a Number Line" },
@@ -1225,6 +1360,8 @@ export const SKILLS = {
         { v: "round_nl_hundred_thousands", l: "Round on a Number Line: Hundred Thousands" },
         // APPENDED 2026-10-17 — PRESET skill (skill-presets.js): doubles with only the near doubles.
         { v: "near_doubles", l: "Near Doubles (Doubles Plus One, Doubles Minus One)", presetOf: "doubles_near_doubles" },
+        // APPENDED 2026-10-17 — PRESET skills, batch 2 (skill-presets.js; owner: every "ask owner" row is a preset).
+        { v: "reasonable_quotients", l: "Is the Quotient Reasonable?", presetOf: "estimate_quotient" },
     ],
     number_theory: [
         { v: "prime_composite", l: "Prime vs Composite" },
@@ -1241,6 +1378,12 @@ export const SKILLS = {
         { v: "lcm", l: "Least Common Multiple" },
         { v: "divisibility_sort", l: "Divisibility Sort" },
         { v: "mixed_number_theory", l: "Mixed Number Theory" },
+        // APPENDED 2026-10-17 — PRESET skills, batch 2 (skill-presets.js; owner: every "ask owner" row is a preset).
+        { v: "sort_prime_composite", l: "Sort Numbers into Prime and Composite", presetOf: "prime_composite" },
+        { v: "list_multiples", l: "List the First Multiples of a Number", presetOf: "multiples" },
+        { v: "missing_multiples", l: "Fill In the Missing Multiples", presetOf: "multiples" },
+        { v: "common_factors", l: "Find Every Common Factor", presetOf: "gcf_easy" },
+        { v: "common_multiples", l: "Find Every Common Multiple", presetOf: "lcm" },
     ],
     algebra_mixed: [
         { v: "patterns_all", l: "All Pattern Skills" },

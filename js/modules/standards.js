@@ -722,6 +722,107 @@ export const SKILL_STANDARDS = {
     'fractions:compare_to_half': { ccss: ['4.NF.A.2'], ee: ['M.EE.4.NF.2'] }, // Compare Fractions to One Half
     'placevalue:expanded_notation': { ccss: ['4.NBT.A.2', '2.NBT.A.3'], ee: ['M.EE.4.NBT.2'] }, // Write Numbers in Expanded Notation
     'number_sense:near_doubles': { ccss: ['1.OA.C.6'], ee: [] }, // Near Doubles (Doubles Plus One, Doubles Minus One)
+    // PRESET skills, batch 2 (2026-10-17).
+    'multiplication:mult_break_apart': { ccss: ['3.OA.B.5'], ee: [] }, // Break Apart a Fact (Distributive Property)
+    'multiplication:area_model_2by1': { ccss: ['4.NBT.B.5'], ee: ['M.EE.5.NBT.5'] }, // Area Model: Multiply 2-Digit by 1-Digit
+    'multiplication:area_model_3by1': { ccss: ['4.NBT.B.5'], ee: ['M.EE.5.NBT.5'] }, // Area Model: Multiply 3-Digit by 1-Digit
+    'multiplication:mult_arrays': { ccss: ['2.OA.C.4', '3.OA.A.1'], ee: ['M.EE.2.OA.4', 'M.EE.3.OA.1'] }, // Arrays: Rows of Dots
+    'multiplication:mult_equal_groups': { ccss: ['3.OA.A.1', '2.OA.C.4'], ee: ['M.EE.3.OA.1'] }, // Equal Groups: Rings of Dots
+    'multiplication:mult_by_ten': { ccss: ['3.NBT.A.3', '4.NBT.A.1'], ee: ['M.EE.3.NBT.3'] }, // Multiply by 10
+    'multiplication:mult_by_hundred': { ccss: ['4.NBT.A.1', '3.NBT.A.3'], ee: ['M.EE.3.NBT.3'] }, // Multiply by 100
+    'multiplication:count_by_2s': { ccss: ['2.NBT.A.2', '3.OA.C.7'], ee: ['M.EE.2.NBT.2'] }, // Count by 2s
+    'multiplication:count_by_3s': { ccss: ['3.OA.C.7', '3.OA.D.9'], ee: ['M.EE.3.OA.8'] }, // Count by 3s
+    'multiplication:count_by_4s': { ccss: ['3.OA.C.7', '3.OA.D.9'], ee: ['M.EE.3.OA.8'] }, // Count by 4s
+    'multiplication:count_by_5s': { ccss: ['2.NBT.A.2', '3.OA.C.7'], ee: ['M.EE.2.NBT.2'] }, // Count by 5s
+    'multiplication:count_by_6s': { ccss: ['3.OA.C.7', '3.OA.D.9'], ee: ['M.EE.3.OA.8'] }, // Count by 6s
+    'multiplication:count_by_7s': { ccss: ['3.OA.C.7', '3.OA.D.9'], ee: ['M.EE.3.OA.8'] }, // Count by 7s
+    'multiplication:count_by_8s': { ccss: ['3.OA.C.7', '3.OA.D.9'], ee: ['M.EE.3.OA.8'] }, // Count by 8s
+    'multiplication:count_by_9s': { ccss: ['3.OA.C.7', '3.OA.D.9'], ee: ['M.EE.3.OA.8'] }, // Count by 9s
+    'multiplication:count_by_10s': { ccss: ['2.NBT.A.2', '3.OA.C.7'], ee: ['M.EE.2.NBT.2'] }, // Count by 10s
+    'multiplication:count_by_11s': { ccss: ['3.OA.C.7', '3.OA.D.9'], ee: ['M.EE.3.OA.8'] }, // Count by 11s
+    'multiplication:count_by_12s': { ccss: ['3.OA.C.7', '3.OA.D.9'], ee: ['M.EE.3.OA.8'] }, // Count by 12s
+    'division:div_sharing_word_problems': { ccss: ['3.OA.A.2', '3.OA.A.3'], ee: ['M.EE.3.OA.2'] }, // Division Word Problems: Sharing
+    'division:div_grouping_word_problems': { ccss: ['3.OA.A.2', '3.OA.A.3'], ee: ['M.EE.3.OA.2'] }, // Division Word Problems: Grouping
+    'subtraction:sub_wp_compare': { ccss: ['1.OA.A.1', '2.OA.A.1'], ee: ['M.EE.1.OA.1'] }, // Subtraction Word Problems: How Many More?
+    'subtraction:sub_wp_start_unknown': { ccss: ['1.OA.A.1', '2.OA.A.1'], ee: ['M.EE.1.OA.1'] }, // Subtraction Word Problems: Find the Start
+    'integers:add_negative': { ccss: ['6.NS.C.5', '6.NS.C.6a'], ee: ['M.EE.6.NS.5', 'M.EE.6.NS.6'], approx: true, note: 'Adding and subtracting integers is CCSS 7.NS.A.1 (grade 7); 6.NS.5-6 are the grade-6 foundation.' }, // Add a Negative Number
+    'integers:sub_negative': { ccss: ['6.NS.C.5', '6.NS.C.6a'], ee: ['M.EE.6.NS.5', 'M.EE.6.NS.6'], approx: true, note: 'Adding and subtracting integers is CCSS 7.NS.A.1 (grade 7); 6.NS.5-6 are the grade-6 foundation.' }, // Subtract a Negative Number
+    'fractions:identify_fraction_nl': { ccss: ['3.NF.A.2', '3.NF.A.1'], ee: ['M.EE.3.NF.2'] }, // Identify Fractions on a Number Line
+    'fractions:write_fraction_nl': { ccss: ['3.NF.A.2', '3.NF.A.1'], ee: ['M.EE.3.NF.2'] }, // Write the Fraction Shown on a Number Line
+    'fractions:compare_fractions_nl': { ccss: ['3.NF.A.3d', '3.NF.A.2'], ee: ['M.EE.3.NF.3'] }, // Compare Fractions on a Number Line
+    'fractions:equivalent_or_not': { ccss: ['4.NF.A.1'], ee: ['M.EE.4.NF.1'] }, // Equivalent Fractions: Yes or No?
+    'fractions:simplify_with_gcf': { ccss: ['6.NS.B.4', '4.NF.A.1'], ee: ['M.EE.4.NF.1'] }, // Simplify Fractions Using the Greatest Common Factor
+    'fraction_operations:unit_frac_div_whole': { ccss: ['5.NF.B.7a'], ee: [] }, // Divide a Unit Fraction by a Whole Number
+    'fraction_operations:whole_div_unit_frac': { ccss: ['5.NF.B.7b'], ee: [] }, // Divide a Whole Number by a Unit Fraction
+    'decimals:div_decimal_by_whole': { ccss: ['5.NBT.B.7'], ee: ['M.EE.5.NBT.7'] }, // Divide a Decimal by a Whole Number
+    'decimals:div_by_decimal': { ccss: ['6.NS.B.3', '5.NBT.B.7'], ee: ['M.EE.6.NS.3'] }, // Divide by a Decimal
+    'decimals:round_to_tenth': { ccss: ['5.NBT.A.4'], ee: ['M.EE.5.NBT.4'] }, // Round Decimals to the Nearest Tenth
+    'decimals:round_to_hundredth': { ccss: ['5.NBT.A.4'], ee: ['M.EE.5.NBT.4'] }, // Round Decimals to the Nearest Hundredth
+    'conversions:ratio_part_to_part': { ccss: ['6.RP.A.1'], ee: ['M.EE.6.RP.1'] }, // Write a Part-to-Part Ratio
+    'conversions:ratio_simplest_form': { ccss: ['6.RP.A.3a', '6.RP.A.1'], ee: ['M.EE.6.RP.1'] }, // Write a Ratio in Simplest Form
+    'conversions:ratio_equivalent_or_not': { ccss: ['6.RP.A.3a'], ee: [] }, // Equivalent Ratios: Yes or No?
+    'area_perimeter:area_missing_side': { ccss: ['3.MD.C.7b', '4.MD.A.3'], ee: ['M.EE.4.MD.3'] }, // Find a Missing Side from the Area
+    'area_perimeter:perimeter_missing_side': { ccss: ['3.MD.D.8', '4.MD.A.3'], ee: ['M.EE.4.MD.3'] }, // Find a Missing Side from the Perimeter
+    'area_perimeter:volume_missing_edge': { ccss: ['5.MD.C.5b'], ee: ['M.EE.5.MD.5'] }, // Find a Missing Edge from the Volume
+    'area_perimeter:composite_area_perimeter': { ccss: ['3.MD.C.7d', '6.G.A.1'], ee: ['M.EE.6.G.1'] }, // Area and Perimeter of Composite Shapes
+    'angles_lines:angles_in_right_angle': { ccss: ['4.MD.C.7'], ee: [] }, // Missing Angle in a Right Angle (90°)
+    'angles_lines:angles_on_straight_line': { ccss: ['4.MD.C.7'], ee: [] }, // Angles on a Straight Line (180°)
+    'angles_lines:angles_around_point': { ccss: ['4.MD.C.7'], ee: [] }, // Angles Around a Point (360°)
+    'coordinates:coordinates_read_q1': { ccss: ['5.G.A.2', '5.G.A.1'], ee: ['M.EE.5.G.1'] }, // Read Coordinates in the First Quadrant
+    'coordinates:coordinates_plot_q1': { ccss: ['5.G.A.1', '5.G.A.2'], ee: ['M.EE.5.G.1'] }, // Plot Points in the First Quadrant
+    'coordinates:coordinates_read_all': { ccss: ['6.NS.C.6c', '6.NS.C.8'], ee: ['M.EE.6.NS.6'] }, // Read Coordinates in All Four Quadrants
+    'coordinates:coordinates_plot_all': { ccss: ['6.NS.C.6c', '6.NS.C.8'], ee: ['M.EE.6.NS.6'] }, // Plot Points in All Four Quadrants
+    'coordinates:reflect_x_axis': { ccss: ['6.NS.C.6b'], ee: ['M.EE.6.NS.6'], approx: true, note: 'Reflections are CCSS 8.G.A.1 (grade 8); 6.NS.6b (points reflected across the axes) is the closest K-6 standard.' }, // Reflect a Shape in the x-Axis
+    'coordinates:reflect_y_axis': { ccss: ['6.NS.C.6b'], ee: ['M.EE.6.NS.6'], approx: true, note: 'Reflections are CCSS 8.G.A.1 (grade 8); 6.NS.6b (points reflected across the axes) is the closest K-6 standard.' }, // Reflect a Shape in the y-Axis
+    'coordinates:rotate_half_turn': { ccss: ['4.MD.C.5a'], ee: [], approx: true, note: 'Rotations are CCSS 8.G.A.1 (grade 8); 4.MD.C.5a (an angle as a turn through part of a circle) is the closest K-6 standard.' }, // Rotate a Shape a Half Turn (180°)
+    'coordinates:rotate_quarter_turn': { ccss: ['4.MD.C.5a'], ee: [], approx: true, note: 'Rotations are CCSS 8.G.A.1 (grade 8); 4.MD.C.5a (an angle as a turn through part of a circle) is the closest K-6 standard.' }, // Rotate a Shape a Quarter Turn (90°)
+    'coordinates:rotate_three_quarter_turn': { ccss: ['4.MD.C.5a'], ee: [], approx: true, note: 'Rotations are CCSS 8.G.A.1 (grade 8); 4.MD.C.5a (an angle as a turn through part of a circle) is the closest K-6 standard.' }, // Rotate a Shape a Three-Quarter Turn (270°)
+    'coordinates:translate_right_up': { ccss: ['5.G.A.1'], ee: ['M.EE.5.G.1'], approx: true, note: 'Translations are CCSS 8.G.A.1 (grade 8); 5.G.A.1 (points on a coordinate grid, moving along each axis) is the closest K-6 standard.' }, // Translate a Shape Right and Up
+    'coordinates:translate_left_up': { ccss: ['5.G.A.1'], ee: ['M.EE.5.G.1'], approx: true, note: 'Translations are CCSS 8.G.A.1 (grade 8); 5.G.A.1 (points on a coordinate grid, moving along each axis) is the closest K-6 standard.' }, // Translate a Shape Left and Up
+    'coordinates:translate_right_down': { ccss: ['5.G.A.1'], ee: ['M.EE.5.G.1'], approx: true, note: 'Translations are CCSS 8.G.A.1 (grade 8); 5.G.A.1 (points on a coordinate grid, moving along each axis) is the closest K-6 standard.' }, // Translate a Shape Right and Down
+    'coordinates:translate_left_down': { ccss: ['5.G.A.1'], ee: ['M.EE.5.G.1'], approx: true, note: 'Translations are CCSS 8.G.A.1 (grade 8); 5.G.A.1 (points on a coordinate grid, moving along each axis) is the closest K-6 standard.' }, // Translate a Shape Left and Down
+    'graphs:pictograph_how_many_more': { ccss: ['3.MD.B.3'], ee: ['M.EE.3.MD.3'] }, // Pictographs: How Many More?
+    'graphs:bar_graph_how_many_more': { ccss: ['3.MD.B.3', '2.MD.D.10'], ee: ['M.EE.3.MD.3'] }, // Bar Graphs: How Many More?
+    'graphs:tally_how_many_more': { ccss: ['2.MD.D.10', '1.MD.C.4'], ee: ['M.EE.1.MD.4'] }, // Tally Charts: How Many More?
+    'data_analysis:box_plot_quartiles': { ccss: ['6.SP.B.5c', '6.SP.B.4'], ee: ['M.EE.6.SP.5'] }, // Quartiles and the Interquartile Range (Box Plot)
+    'algebra:solve_x_plus_a': { ccss: ['6.EE.B.7'], ee: ['M.EE.6.EE.5-7'] }, // Solve x + a = b
+    'algebra:solve_x_minus_a': { ccss: ['6.EE.B.7'], ee: ['M.EE.6.EE.5-7'] }, // Solve x − a = b
+    'algebra:solve_ax_eq_b': { ccss: ['6.EE.B.7'], ee: ['M.EE.6.EE.5-7'] }, // Solve ax = b
+    'algebra:solve_x_div_a': { ccss: ['6.EE.B.7'], ee: ['M.EE.6.EE.5-7'] }, // Solve x ÷ a = b
+    'algebra:solve_ax_plus_b': { ccss: ['6.EE.B.7'], ee: ['M.EE.6.EE.5-7'], approx: true, note: 'Two-step equations are CCSS 7.EE.B.4a (grade 7); 6.EE.7 (one-step) is the closest K-6 standard.' }, // Solve ax + b = c
+    'algebra:solve_ax_minus_b': { ccss: ['6.EE.B.7'], ee: ['M.EE.6.EE.5-7'], approx: true, note: 'Two-step equations are CCSS 7.EE.B.4a (grade 7); 6.EE.7 (one-step) is the closest K-6 standard.' }, // Solve ax − b = c
+    'algebra:solve_x_div_a_plus_b': { ccss: ['6.EE.B.7'], ee: ['M.EE.6.EE.5-7'], approx: true, note: 'Two-step equations are CCSS 7.EE.B.4a (grade 7); 6.EE.7 (one-step) is the closest K-6 standard.' }, // Solve x ÷ a + b = c
+    'algebra:solve_bracket_div': { ccss: ['6.EE.B.7'], ee: ['M.EE.6.EE.5-7'], approx: true, note: 'Two-step equations are CCSS 7.EE.B.4a (grade 7); 6.EE.7 (one-step) is the closest K-6 standard.' }, // Solve (x − b) ÷ a = c
+    'algebra:write_equation_story': { ccss: ['6.EE.B.7', '6.EE.B.6'], ee: ['M.EE.6.EE.5-7'] }, // Write an Equation for a Story
+    'algebra:factor_out_gcf': { ccss: ['6.NS.B.4', '6.EE.A.3'], ee: ['M.EE.6.EE.3'] }, // Factor Out the Greatest Common Factor
+    'algebra:function_table_find_rule': { ccss: ['4.OA.C.5', '5.OA.B.3'], ee: ['M.EE.4.OA.5'] }, // Function Tables: Find the Rule
+    'algebra:function_table_find_inputs': { ccss: ['4.OA.C.5', '5.OA.B.3'], ee: ['M.EE.4.OA.5'] }, // Function Tables: Find the Missing In Numbers
+    'order_of_operations:square_numbers': { ccss: ['6.EE.A.1'], ee: ['M.EE.6.EE.1-2'] }, // Square Numbers (5²)
+    'order_of_operations:cube_numbers': { ccss: ['6.EE.A.1'], ee: ['M.EE.6.EE.1-2'] }, // Cube Numbers (5³)
+    'number_sense:reasonable_quotients': { ccss: ['4.OA.A.3', '4.NBT.B.6'], ee: ['M.EE.4.OA.3'] }, // Is the Quotient Reasonable?
+    'placevalue:digit_value_unit_form': { ccss: ['2.NBT.A.1', '4.NBT.A.1'], ee: ['M.EE.2.NBT.1'] }, // Value of a Digit in Unit Form (7 Hundreds)
+    'placevalue:digit_value_notation': { ccss: ['4.NBT.A.2', '2.NBT.A.1'], ee: ['M.EE.4.NBT.2'] }, // Value of a Digit in Expanded Notation (7 × 100)
+    'placevalue:count_pv_disks': { ccss: ['2.NBT.A.1'], ee: ['M.EE.2.NBT.1'] }, // Count the Place-Value Disks in One Place
+    'composing:write_numbers_in_words': { ccss: ['2.NBT.A.3'], ee: ['M.EE.2.NBT.3'] }, // Write Numbers in Words
+    'measurement:count_notes': { ccss: ['2.MD.C.8'], ee: ['M.EE.2.MD.8'] }, // Count Notes (Bills)
+    'measurement:count_notes_and_coins': { ccss: ['2.MD.C.8'], ee: ['M.EE.2.MD.8'] }, // Count Notes and Coins
+    'measurement:convert_feet_to_inches': { ccss: ['4.MD.A.1'], ee: ['M.EE.4.MD.1'] }, // Convert Feet to Inches
+    'measurement:convert_yards_to_feet': { ccss: ['4.MD.A.1'], ee: ['M.EE.4.MD.1'] }, // Convert Yards to Feet
+    'measurement:convert_yards_to_inches': { ccss: ['4.MD.A.1'], ee: ['M.EE.4.MD.1'] }, // Convert Yards to Inches
+    'measurement:convert_miles_to_feet': { ccss: ['4.MD.A.1'], ee: ['M.EE.4.MD.1'] }, // Convert Miles to Feet
+    'measurement:convert_cm_to_mm': { ccss: ['4.MD.A.1'], ee: ['M.EE.4.MD.1'] }, // Convert Centimeters to Millimeters
+    'measurement:convert_m_to_cm': { ccss: ['4.MD.A.1'], ee: ['M.EE.4.MD.1'] }, // Convert Meters to Centimeters
+    'measurement:convert_m_to_mm': { ccss: ['4.MD.A.1'], ee: ['M.EE.4.MD.1'] }, // Convert Meters to Millimeters
+    'measurement:convert_km_to_m': { ccss: ['4.MD.A.1'], ee: ['M.EE.4.MD.1'] }, // Convert Kilometers to Meters
+    'measurement:clock_hands': { ccss: ['1.MD.B.3'], ee: ['M.EE.1.MD.3'], approx: true, note: 'Naming the parts of the face comes before reading it; 1.MD.B.3 is the reading standard it prepares.' }, // The Hour Hand and the Minute Hand
+    'measurement:minutes_by_fives_all': { ccss: ['2.MD.C.7', '2.NBT.A.2'], ee: ['M.EE.2.MD.7'] }, // Write All the Minutes by Fives
+    'measurement:order_notes': { ccss: ['2.MD.C.8'], ee: ['M.EE.2.MD.8'] }, // Put Notes in Order by Value
+    'measurement:money_amount_in_words': { ccss: ['2.MD.C.8', '4.MD.A.2'], ee: ['M.EE.2.MD.8'] }, // Write an Amount of Money from Words
+    'number_theory:sort_prime_composite': { ccss: ['4.OA.B.4'], ee: ['M.EE.4.OA.4'] }, // Sort Numbers into Prime and Composite
+    'number_theory:list_multiples': { ccss: ['4.OA.B.4'], ee: ['M.EE.4.OA.4'] }, // List the First Multiples of a Number
+    'number_theory:missing_multiples': { ccss: ['4.OA.B.4'], ee: ['M.EE.4.OA.4'] }, // Fill In the Missing Multiples
+    'number_theory:common_factors': { ccss: ['6.NS.B.4', '4.OA.B.4'], ee: [] }, // Find Every Common Factor
+    'number_theory:common_multiples': { ccss: ['6.NS.B.4', '4.OA.B.4'], ee: [] }, // Find Every Common Multiple
 };
 
 /* ================================================================= lookup */

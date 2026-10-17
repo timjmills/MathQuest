@@ -2315,7 +2315,9 @@ Object.assign(P12_OPTIONS, {
     'fraction_operations:mult_frac_frac_nv': [_p12Denoms(), _p12Variants('mult_frac_frac_nv', ['straight', 'missing', 'simplify'],
         ['Work it out (1/2 × 2/3 = __)', 'Find the missing number', 'Work it out and simplify'])],
     'fraction_operations:div_unit_frac_nv': [_p12Denoms(), _p12Variants('div_unit_frac_nv', ['A_straight', 'A_missing', 'B_straight', 'B_missing'],
-        ['Unit fraction ÷ whole (1/3 ÷ 2)', 'Unit fraction ÷ whole, a number missing', 'Whole ÷ unit fraction (7 ÷ 1/4)', 'Whole ÷ unit fraction, a number missing'])],
+        // The labels name what the generator deals for each value (A = whole ÷ unit fraction, B = unit
+        // fraction ÷ whole); they were the wrong way round (preset skills batch 2, 2026-10-17). Values unchanged.
+        ['Whole ÷ unit fraction (7 ÷ 1/4)', 'Whole ÷ unit fraction, a number missing', 'Unit fraction ÷ whole (1/3 ÷ 2)', 'Unit fraction ÷ whole, a number missing'])],
     'fraction_operations:frac_as_div_nv': [_p12Denoms(), _p12Variants('frac_as_div_nv', ['type1', 'type2', 'type3'],
         ['Write the division as a fraction', 'A sharing story', 'Write the result as a mixed number'])],
     'fraction_operations:frac_as_div_word': [_p12Denoms([2, 3, 5, 7])],

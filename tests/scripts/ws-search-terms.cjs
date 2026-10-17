@@ -290,7 +290,7 @@ const TOP1 = [
     ['round to the nearest hundred', ['number_sense:nearest_100']],
     ['number bonds to 20', ['composing:number_bonds', 'composing:make_ten']],
     ['less', ['placevalue:more_less_10', 'comparing:compare_groups', 'placevalue:compare']],
-    ['square numbers', ['order_of_operations:exponents_simple']],
+    ['square numbers', ['order_of_operations:square_numbers', 'order_of_operations:exponents_simple']],
     ['counting to 10', ['counting:count_objects', 'counting:count_sequence']],
     ['multiplication 2 digit by 1 digit', ['multiplication:multiply']],
     ['multiply by 1 digit', ['multiplication:multiply']],
@@ -322,7 +322,7 @@ const TOP1 = [
     ['multiplcation', ['multiplication:mult_facts']],
     ['fracton', ['fractions:identify']],
     // the critic's 40-query sample (the 31 that passed must keep passing)
-    ['count by 3s', ['multiplication:count_by_tables']],
+    ['count by 3s', ['multiplication:count_by_3s', 'multiplication:count_by_tables']],
     ['times tables 7', ['multiplication:mult_facts', 'multiplication:count_by_tables']],
     ['x tables', ['multiplication:mult_facts']],
     ['long division', ['division:long_div_2digit', 'division:div_2by1_long']],

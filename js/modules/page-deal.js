@@ -108,6 +108,25 @@ export function dealAt(key, n, at, weights = null) {
     return deck[at % len];
 }
 
+// A REDRAW (generate-question.js, the P12 accept layer): the item k of a page is dealt the same
+// slot on every draw, so a redraw for an option the deal cannot see (a "x + a = b" page of a skill
+// whose kinds are dealt here) would come back the same kind every time. While a redraw runs, a deal
+// is a plain draw from the seeded rng instead: nothing cached, so the page still reproduces.
+let _redraw = false;
+export function setRedraw(on) { _redraw = !!on; }
+function redrawIndex(n, weights) {
+    n = Math.floor(Number(n));
+    const w = Array.from({ length: n }, (_, i) => {
+        const x = Array.isArray(weights) ? Number(weights[i]) : 1;
+        return Number.isFinite(x) && x > 0 ? x : (Array.isArray(weights) ? 0 : 1);
+    });
+    const tot = w.reduce((a, b) => a + b, 0);
+    if (!(tot > 0)) return Math.floor(Math.random() * n);
+    let r = Math.random() * tot;
+    for (let i = 0; i < n; i++) { r -= w[i]; if (r < 0) return i; }
+    return n - 1;
+}
+
 /**
  * The index (0 .. n-1) dealt to the current item under `key`: its kept-item index on a page, a
  * running count per key in live play.
@@ -117,6 +136,7 @@ export function dealAt(key, n, at, weights = null) {
  */
 export function dealIndex(key, n, weights = null) {
     if (!(Math.floor(Number(n)) > 1)) return 0;
+    if (_redraw) return redrawIndex(n, weights);
     let at;
     if (Number.isFinite(state.itemIndex)) at = state.itemIndex;
     else { at = _cursors.get(key) || 0; _cursors.set(key, at + 1); }
