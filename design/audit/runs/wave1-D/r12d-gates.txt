@@ -1,0 +1,6 @@
+boot-smoke exit=0 :: ws-boot-smoke: OK
+sheet-determinism exit=0 :: ws-sheet-determinism: OK
+sheet-timing exit=0 :: ws-sheet-timing: OK
+print-lint-pools-S exit=1 :: ws-print-lint: FAIL - 120 document(s), source kit; 1 finding(s) in 1 document(s)
+print-lint-pools-M exit=0 :: ws-print-lint: OK (120 document(s), source kit; 0 finding(s) in 0 document(s))
+print-lint-pools-L exit=0 :: ws-print-lint: OK (120 document(s), source kit; 0 finding(s) in 0 document(s))

@@ -1,0 +1,246 @@
+ws-print-lint: source kit, 6 skill(s)
+  multiplication:mixed_multiplication: 2+1 pages, 0 finding(s)
+  multiplication:mixed_multiplication@2697700287: 2+1 pages, 0 finding(s)
+  multiplication:mixed_multiplication@2714477906: 2+1 pages, 0 finding(s)
+  multiplication:mixed_multiplication@2731255525: 2+1 pages, 0 finding(s)
+  multiplication:mixed_multiplication@2613812192: 2+1 pages, 0 finding(s)
+  multiplication:mixed_multiplication@2630589811: 2+1 pages, 0 finding(s)
+  multiplication:mixed_multiplication@2647367430: 2+1 pages, 0 finding(s)
+  multiplication:mixed_multiplication@2664145049: 2+1 pages, 0 finding(s)
+  multiplication:mixed_multiplication@2815143620: 2+1 pages, 0 finding(s)
+  multiplication:mixed_multiplication@2831921239: 2+1 pages, 0 finding(s)
+  multiplication:mixed_multiplication#more-practice: 4+2 pages, 0 finding(s)
+  multiplication:mixed_multiplication#more-practice@2697700287: 4+2 pages, 0 finding(s)
+  multiplication:mixed_multiplication#more-practice@2714477906: 4+2 pages, 0 finding(s)
+  multiplication:mixed_multiplication#more-practice@2731255525: 4+2 pages, 0 finding(s)
+  multiplication:mixed_multiplication#more-practice@2613812192: 4+2 pages, 0 finding(s)
+  multiplication:mixed_multiplication#more-practice@2630589811: 4+2 pages, 0 finding(s)
+  multiplication:mixed_multiplication#more-practice@2647367430: 4+2 pages, 0 finding(s)
+  multiplication:mixed_multiplication#more-practice@2664145049: 4+2 pages, 0 finding(s)
+  multiplication:mixed_multiplication#more-practice@2815143620: 4+2 pages, 0 finding(s)
+  multiplication:mixed_multiplication#more-practice@2831921239: 4+2 pages, 0 finding(s)
+  addition:mixed_addition: 2+1 pages, 0 finding(s)
+  addition:mixed_addition@1226567431: 2+1 pages, 0 finding(s)
+  addition:mixed_addition@1243345050: 2+1 pages, 0 finding(s)
+  addition:mixed_addition@1260122669: 2+1 pages, 0 finding(s)
+  addition:mixed_addition@1142679336: 2+1 pages, 0 finding(s)
+  addition:mixed_addition@1159456955: 2+1 pages, 0 finding(s)
+  addition:mixed_addition@1176234574: 2+1 pages, 0 finding(s)
+  addition:mixed_addition@1193012193: 2+1 pages, 0 finding(s)
+  addition:mixed_addition@1075568860: 2+1 pages, 0 finding(s)
+  addition:mixed_addition@1092346479: 2+1 pages, 0 finding(s)
+  addition:mixed_addition#more-practice: 4+2 pages, 0 finding(s)
+  addition:mixed_addition#more-practice@1226567431: 4+2 pages, 0 finding(s)
+  addition:mixed_addition#more-practice@1243345050: 4+2 pages, 0 finding(s)
+  addition:mixed_addition#more-practice@1260122669: 4+2 pages, 0 finding(s)
+  addition:mixed_addition#more-practice@1142679336: 4+2 pages, 0 finding(s)
+  addition:mixed_addition#more-practice@1159456955: 4+2 pages, 0 finding(s)
+  addition:mixed_addition#more-practice@1176234574: 4+2 pages, 0 finding(s)
+  addition:mixed_addition#more-practice@1193012193: 4+2 pages, 0 finding(s)
+  addition:mixed_addition#more-practice@1075568860: 4+2 pages, 0 finding(s)
+  addition:mixed_addition#more-practice@1092346479: 4+2 pages, 0 finding(s)
+  subtraction:mixed_subtraction: 2+1 pages, 0 finding(s)
+  subtraction:mixed_subtraction@1142936035: 2+1 pages, 0 finding(s)
+  subtraction:mixed_subtraction@1159713654: 2+1 pages, 0 finding(s)
+  subtraction:mixed_subtraction@1176491273: 2+1 pages, 0 finding(s)
+  subtraction:mixed_subtraction@1193268892: 2+1 pages, 0 finding(s)
+  subtraction:mixed_subtraction@1210046511: 2+1 pages, 0 finding(s)
+  subtraction:mixed_subtraction@1226824130: 2+1 pages, 0 finding(s)
+  subtraction:mixed_subtraction@1243601749: 2+1 pages, 0 finding(s)
+  subtraction:mixed_subtraction@1260379368: 2+1 pages, 0 finding(s)
+  subtraction:mixed_subtraction@1277156987: 2+1 pages, 0 finding(s)
+  subtraction:mixed_subtraction#more-practice: 4+2 pages, 0 finding(s)
+  subtraction:mixed_subtraction#more-practice@1142936035: 4+2 pages, 0 finding(s)
+  subtraction:mixed_subtraction#more-practice@1159713654: 4+2 pages, 0 finding(s)
+  subtraction:mixed_subtraction#more-practice@1176491273: 4+2 pages, 0 finding(s)
+  subtraction:mixed_subtraction#more-practice@1193268892: 4+2 pages, 0 finding(s)
+  subtraction:mixed_subtraction#more-practice@1210046511: 4+2 pages, 0 finding(s)
+  subtraction:mixed_subtraction#more-practice@1226824130: 4+2 pages, 0 finding(s)
+  subtraction:mixed_subtraction#more-practice@1243601749: 4+2 pages, 0 finding(s)
+  subtraction:mixed_subtraction#more-practice@1260379368: 4+2 pages, 0 finding(s)
+  subtraction:mixed_subtraction#more-practice@1277156987: 4+2 pages, 0 finding(s)
+  composing:mixed_composing: 2+1 pages, 0 finding(s)
+  composing:mixed_composing@57332673: 2+1 pages, 0 finding(s)
+  composing:mixed_composing@6999816: 2+1 pages, 0 finding(s)
+  composing:mixed_composing@23777435: 2+1 pages, 0 finding(s)
+  composing:mixed_composing@107665530: 2+1 pages, 0 finding(s)
+  composing:mixed_composing@124443149: 2+1 pages, 0 finding(s)
+  composing:mixed_composing@74110292: 2+1 pages, 0 finding(s)
+  composing:mixed_composing@90887911: 2+1 pages, 0 finding(s)
+  composing:mixed_composing@4201301398: 2+1 pages, 0 finding(s)
+  composing:mixed_composing@4218079017: 2+1 pages, 0 finding(s)
+  composing:mixed_composing#more-practice: 4+2 pages, 0 finding(s)
+  composing:mixed_composing#more-practice@57332673: 4+2 pages, 0 finding(s)
+  composing:mixed_composing#more-practice@6999816: 4+2 pages, 0 finding(s)
+  composing:mixed_composing#more-practice@23777435: 4+2 pages, 0 finding(s)
+  composing:mixed_composing#more-practice@107665530: 4+2 pages, 0 finding(s)
+  composing:mixed_composing#more-practice@124443149: 4+2 pages, 0 finding(s)
+  composing:mixed_composing#more-practice@74110292: 4+2 pages, 0 finding(s)
+  composing:mixed_composing#more-practice@90887911: 4+2 pages, 0 finding(s)
+  composing:mixed_composing#more-practice@4201301398: 4+2 pages, 0 finding(s)
+  composing:mixed_composing#more-practice@4218079017: 4+2 pages, 0 finding(s)
+  counting_mixed:counting_all: 2+1 pages, 0 finding(s)
+  counting_mixed:counting_all@174999603: 2+1 pages, 0 finding(s)
+  counting_mixed:counting_all@191777222: 2+1 pages, 0 finding(s)
+  counting_mixed:counting_all@208554841: 2+1 pages, 0 finding(s)
+  counting_mixed:counting_all@225332460: 2+1 pages, 0 finding(s)
+  counting_mixed:counting_all@242110079: 2+1 pages, 0 finding(s)
+  counting_mixed:counting_all@258887698: 2+1 pages, 0 finding(s)
+  counting_mixed:counting_all@275665317: 2+1 pages, 0 finding(s)
+  counting_mixed:counting_all@292442936: 2+1 pages, 0 finding(s)
+  counting_mixed:counting_all@309220555: 2+1 pages, 0 finding(s)
+  counting_mixed:counting_all#more-practice: 4+2 pages, 0 finding(s)
+  counting_mixed:counting_all#more-practice@174999603: 4+2 pages, 0 finding(s)
+  counting_mixed:counting_all#more-practice@191777222: 4+2 pages, 0 finding(s)
+  counting_mixed:counting_all#more-practice@208554841: 4+2 pages, 0 finding(s)
+  counting_mixed:counting_all#more-practice@225332460: 4+2 pages, 0 finding(s)
+  counting_mixed:counting_all#more-practice@242110079: 4+2 pages, 0 finding(s)
+  counting_mixed:counting_all#more-practice@258887698: 4+2 pages, 0 finding(s)
+  counting_mixed:counting_all#more-practice@275665317: 4+2 pages, 0 finding(s)
+  counting_mixed:counting_all#more-practice@292442936: 4+2 pages, 0 finding(s)
+  counting_mixed:counting_all#more-practice@309220555: 4+2 pages, 0 finding(s)
+  comparing:mixed_comparing: 2+1 pages, 0 finding(s)
+  comparing:mixed_comparing@2696617655: 2+1 pages, 0 finding(s)
+  comparing:mixed_comparing@2713395274: 2+1 pages, 0 finding(s)
+  comparing:mixed_comparing@2730172893: 2+1 pages, 0 finding(s)
+  comparing:mixed_comparing@2612729560: 2+1 pages, 0 finding(s)
+  comparing:mixed_comparing@2629507179: 2+1 pages, 0 finding(s)
+  comparing:mixed_comparing@2646284798: 2+1 pages, 0 finding(s)
+  comparing:mixed_comparing@2663062417: 2+1 pages, 0 finding(s)
+  comparing:mixed_comparing@2545619084: 2+1 pages, 0 finding(s)
+  comparing:mixed_comparing@2562396703: 2+1 pages, 0 finding(s)
+  comparing:mixed_comparing#more-practice: 4+2 pages, 0 finding(s)
+  comparing:mixed_comparing#more-practice@2696617655: 4+2 pages, 0 finding(s)
+  comparing:mixed_comparing#more-practice@2713395274: 4+2 pages, 0 finding(s)
+  comparing:mixed_comparing#more-practice@2730172893: 4+2 pages, 0 finding(s)
+  comparing:mixed_comparing#more-practice@2612729560: 4+2 pages, 0 finding(s)
+  comparing:mixed_comparing#more-practice@2629507179: 4+2 pages, 0 finding(s)
+  comparing:mixed_comparing#more-practice@2646284798: 4+2 pages, 0 finding(s)
+  comparing:mixed_comparing#more-practice@2663062417: 4+2 pages, 0 finding(s)
+  comparing:mixed_comparing#more-practice@2545619084: 4+2 pages, 0 finding(s)
+  comparing:mixed_comparing#more-practice@2562396703: 4+2 pages, 0 finding(s)
+
+document                                                        pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT  result
+multiplication:mixed_multiplication                               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication@2697700287                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication@2714477906                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication@2731255525                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication@2613812192                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication@2630589811                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication@2647367430                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication@2664145049                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication@2815143620                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication@2831921239                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication#more-practice                 4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication#more-practice@2697700287      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication#more-practice@2714477906      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication#more-practice@2731255525      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication#more-practice@2613812192      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication#more-practice@2630589811      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication#more-practice@2647367430      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication#more-practice@2664145049      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication#more-practice@2815143620      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mixed_multiplication#more-practice@2831921239      4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+addition:mixed_addition                                           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+addition:mixed_addition@1226567431                                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+addition:mixed_addition@1243345050                                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+addition:mixed_addition@1260122669                                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+addition:mixed_addition@1142679336                                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+addition:mixed_addition@1159456955                                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+addition:mixed_addition@1176234574                                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+addition:mixed_addition@1193012193                                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+addition:mixed_addition@1075568860                                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+addition:mixed_addition@1092346479                                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+addition:mixed_addition#more-practice                             4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+addition:mixed_addition#more-practice@1226567431                  4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+addition:mixed_addition#more-practice@1243345050                  4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+addition:mixed_addition#more-practice@1260122669                  4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+addition:mixed_addition#more-practice@1142679336                  4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+addition:mixed_addition#more-practice@1159456955                  4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+addition:mixed_addition#more-practice@1176234574                  4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+addition:mixed_addition#more-practice@1193012193                  4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+addition:mixed_addition#more-practice@1075568860                  4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+addition:mixed_addition#more-practice@1092346479                  4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+subtraction:mixed_subtraction                                     2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+subtraction:mixed_subtraction@1142936035                          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+subtraction:mixed_subtraction@1159713654                          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+subtraction:mixed_subtraction@1176491273                          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+subtraction:mixed_subtraction@1193268892                          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+subtraction:mixed_subtraction@1210046511                          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+subtraction:mixed_subtraction@1226824130                          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+subtraction:mixed_subtraction@1243601749                          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+subtraction:mixed_subtraction@1260379368                          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+subtraction:mixed_subtraction@1277156987                          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+subtraction:mixed_subtraction#more-practice                       4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+subtraction:mixed_subtraction#more-practice@1142936035            4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+subtraction:mixed_subtraction#more-practice@1159713654            4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+subtraction:mixed_subtraction#more-practice@1176491273            4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+subtraction:mixed_subtraction#more-practice@1193268892            4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+subtraction:mixed_subtraction#more-practice@1210046511            4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+subtraction:mixed_subtraction#more-practice@1226824130            4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+subtraction:mixed_subtraction#more-practice@1243601749            4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+subtraction:mixed_subtraction#more-practice@1260379368            4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+subtraction:mixed_subtraction#more-practice@1277156987            4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing                                         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing@57332673                                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing@6999816                                 2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing@23777435                                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing@107665530                               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing@124443149                               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing@74110292                                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing@90887911                                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing@4201301398                              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing@4218079017                              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing#more-practice                           4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing#more-practice@57332673                  4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing#more-practice@6999816                   4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing#more-practice@23777435                  4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing#more-practice@107665530                 4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing#more-practice@124443149                 4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing#more-practice@74110292                  4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing#more-practice@90887911                  4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing#more-practice@4201301398                4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:mixed_composing#more-practice@4218079017                4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all                                       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all@174999603                             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all@191777222                             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all@208554841                             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all@225332460                             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all@242110079                             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all@258887698                             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all@275665317                             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all@292442936                             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all@309220555                             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all#more-practice                         4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all#more-practice@174999603               4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all#more-practice@191777222               4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all#more-practice@208554841               4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all#more-practice@225332460               4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all#more-practice@242110079               4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all#more-practice@258887698               4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all#more-practice@275665317               4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all#more-practice@292442936               4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting_mixed:counting_all#more-practice@309220555               4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+comparing:mixed_comparing                                         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+comparing:mixed_comparing@2696617655                              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+comparing:mixed_comparing@2713395274                              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+comparing:mixed_comparing@2730172893                              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+comparing:mixed_comparing@2612729560                              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+comparing:mixed_comparing@2629507179                              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+comparing:mixed_comparing@2646284798                              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+comparing:mixed_comparing@2663062417                              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+comparing:mixed_comparing@2545619084                              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+comparing:mixed_comparing@2562396703                              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+comparing:mixed_comparing#more-practice                           4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+comparing:mixed_comparing#more-practice@2696617655                4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+comparing:mixed_comparing#more-practice@2713395274                4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+comparing:mixed_comparing#more-practice@2730172893                4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+comparing:mixed_comparing#more-practice@2612729560                4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+comparing:mixed_comparing#more-practice@2629507179                4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+comparing:mixed_comparing#more-practice@2646284798                4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+comparing:mixed_comparing#more-practice@2663062417                4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+comparing:mixed_comparing#more-practice@2545619084                4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+comparing:mixed_comparing#more-practice@2562396703                4+2k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+TOTAL                                                                     .     .    .    .        .     .       .    .     .       .     .    .      .       .
+
+ws-print-lint: OK (120 document(s), source kit; 0 finding(s) in 0 document(s))
