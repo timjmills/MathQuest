@@ -6492,7 +6492,7 @@
     "K|-|introducingzero"
    ],
    "lessonCloses": {
-    "K|-|introducingzero": "zero as the count of an empty set (no counters left, an empty plate) and writing 0"
+    "K|-|introducingzero": "zero as the count of a group that is empty from the start (an empty plate, an empty ten frame): seeing that there are none and writing 0 for it"
    }
   },
   "compare_small": {
@@ -7435,6 +7435,28 @@
    "teaches": "modelling a triangle, square or rectangle from components: counting the sticks (sides) and clay balls (corners) it needs, then building it and drawing it on dots",
    "why": "shape_attributes counts the sides and the vertices of a drawn shape; nothing asks the pupil to build a shape from parts (K.G.B.5 \"sticks and clay balls\")"
   },
+  "solids_turned": {
+   "ccss": [
+    "K.G.A.2",
+    "1.G.A.1"
+   ],
+   "closes": {
+    "K|-|3dshapescubecuboidsphereconecylinder": "naming the five solids whatever way they are turned and whatever their size (a cone on its side, a small cube and a big cube): turning or resizing a solid does not change its name"
+   },
+   "family": "shapes_early",
+   "kind": "option",
+   "lessons": [
+    "K|-|3dshapescubecuboidsphereconecylinder"
+   ],
+   "name": "Name a Solid Any Way Up (option)",
+   "option": "form \"any way up\": the cube, cuboid (rectangular prism), sphere, cone and cylinder drawn in black line, turned (a cone point up, on its side, point down; a cylinder standing or lying) and at two or three sizes; the pupil picks the name from a word bank, and no name is printed on the picture",
+   "representation": "one boxed cell: one solid in black line, turned or resized, the five names in a word bank below it and one answer slot; a pair of cells can show the same solid two ways",
+   "reused": false,
+   "skill": "shapes_early:name_3d_shapes",
+   "steps": [],
+   "teaches": "recognising and naming a cube, cuboid, sphere, cone and cylinder whatever its orientation and overall size, and saying that turning or resizing a solid does not change its name",
+   "why": "name_3d_shapes draws each solid one fixed way (forms 0: one drawing per solid; forms 1: one emoji per solid, its name printed beside it); defining_attributes (R lane) turns and resizes 2-D shapes only, and no skill turns or resizes a solid"
+  },
   "vis_story_strip": {
    "after": [
     "sort_groups"
@@ -8205,7 +8227,7 @@
      "opts": {
       "band": 5
      },
-     "why": "Y1.B2.S5 Number bonds within 10 (taught earlier this year, wk W13): the parts and the whole of every number to 5: the same facts, in a part-whole model"
+     "why": "Y1.B2.S5 Number bonds within 10 (taught earlier this year, wk W13): the parts and the whole of the numbers 2 to 5: the same facts, in a part-whole model"
     }
    ],
    "preBuild": [],
@@ -8270,7 +8292,7 @@
       "band": 10,
       "dir": "mixed"
      },
-     "why": "Y1.B1.S11 Fewer, more, same (taught earlier this year, wk W03): which of two groups has more, fewer or the same: the groups are ordered by count"
+     "why": "Y1.B1.S11 Fewer, more, same (taught earlier this year, wk W03): which of two groups has more, fewer or the same: the start of ordering groups by their counts"
     },
     {
      "key": "addition:add_5_pictures",
@@ -8442,7 +8464,7 @@
        2
       ]
      },
-     "why": "R.B6.S1 Identify and name shapes with 4 sides (Pre-K, lower grade): naming the square and the rectangle two triangles make"
+     "why": "R.B6.S1 Identify and name shapes with 4 sides (Pre-K, lower grade): finding every square and every rectangle among other shapes: two of the shapes the pieces make"
     },
     {
      "key": "shapes_early:name_2d_shapes",
@@ -8455,12 +8477,12 @@
        1
       ]
      },
-     "why": "R.B4.S1 Identify and name circles and triangles (Pre-K, lower grade): naming the triangles that are joined"
+     "why": "R.B4.S1 Identify and name circles and triangles (Pre-K, lower grade): finding every triangle and every circle among other shapes: triangles are pieces that are joined"
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Awsaj supplement lesson, W29-W30, K.G.B.6 (\"compose simple shapes to form larger shapes\"): compose_shapes joins two shapes and asks which shape they make (two triangles make a square, a rectangle or a larger triangle), compose_hexagon fills a hexagon with pattern blocks. Pre-skills are few: the composing steps R.B6.S2 and R.B15.S5 use the lesson's own two keys (compose_shapes, compose_hexagon), so they are not listed again; the Y1.B3 shape steps have no school week. No related: decompose_shapes (the inverse) is not built, and compose_rect_from_squares writes its rectangles as \"2 × 3\"."
+   "note": "Awsaj supplement lesson, W29-W30, K.G.B.6 (\"compose simple shapes to form larger shapes\"): compose_shapes joins two drawn pieces and asks which shape they make (two triangles make a square, two squares a rectangle, two small triangles a larger triangle, two trapezoids a hexagon), compose_hexagon fills a hexagon outline with pattern blocks. Pre-skills are few: the composing steps R.B6.S2 and R.B15.S5 use the lesson's own two keys (compose_shapes, compose_hexagon), so they are not listed again; the Y1.B3 shape steps have no school week. No related: decompose_shapes (the inverse) is not built, and compose_rect_from_squares writes its rectangles as \"2 × 3\"."
   },
   "K|-|3dshapescubecuboidsphereconecylinder": {
    "title": "3D shapes (cube, cuboid, sphere, cone, cylinder)",
@@ -8479,14 +8501,16 @@
     "block": null,
     "power": false
    },
-   "direct": [
+   "direct": [],
+   "partial": [
     {
      "key": "shapes_early:name_3d_shapes",
      "opts": {
       "forms": [
        0
       ]
-     }
+     },
+     "missing": "shows one drawn solid and the pupil picks its name from four (cube, cuboid as rectangular prism, sphere, cone or cylinder: all five are named); each solid is one fixed drawing, the same way up and the same size every time, never turned and never made bigger or smaller"
     },
     {
      "key": "shapes_early:name_3d_shapes",
@@ -8494,13 +8518,15 @@
       "forms": [
        1
       ]
-     }
+     },
+     "missing": "clicks every sphere, cylinder, cube or cone among four solid pictures (the rectangular prism and the pyramid are only drawn as distractors); each solid is one fixed picture with its name printed beside it, never turned and never made bigger or smaller"
     }
    ],
-   "partial": [],
-   "verdict": "full",
-   "missing": "",
-   "build": [],
+   "verdict": "partial",
+   "missing": "naming the five solids whatever way they are turned and whatever their size (a cone on its side, a small cube and a big cube): turning or resizing a solid does not change its name",
+   "build": [
+    "solids_turned"
+   ],
    "pre": [
     {
      "key": "shapes_early:name_2d_shapes",
@@ -8539,7 +8565,17 @@
    ],
    "preBuild": [],
    "related": [],
-   "note": "Support lesson from \"Building 9 and 10\" (Phase 7) = R.B12.S1 \"Recognise and name 3-D shapes\" under another title (full there on forms 1). name_3d_shapes forms 0 shows one drawn solid and the pupil picks its name (\"What 3D shape is this?\": cube, rectangular prism (the US name of the cuboid), sphere, cone or cylinder, all five named); forms 1 asks the pupil to click every sphere, cylinder, cube or cone among other solids. A name pick is the response compose_shapes uses at Reception in this file. The site tags 1.G.A.1 (defining attributes); the content is naming the five solids (K.G.A.2 / K.G.A.3), see FULL_AUDIT. No related: the other 3-D skills ask for vertices or match written names, above Reception."
+   "note": "Support lesson from \"Building 9 and 10\" (Phase 7) = R.B12.S1 \"Recognise and name 3-D shapes\" under another title (full there on forms 1). name_3d_shapes forms 0 shows one drawn solid and the pupil picks its name (\"What 3D shape is this?\": cube, rectangular prism (the US name of the cuboid), sphere, cone or cylinder, all five named); forms 1 asks the pupil to click every sphere, cylinder, cube or cone among other solids. Lessons r3 (critic r2 F11): partial, not full. Each solid is ONE fixed drawing (forms 0: one drawing per solid in 100 items; forms 1: one emoji per solid, labelled with its name), so a solid is never seen turned or at another size, the reason Explore 2D shapes is partial too. The site tags 1.G.A.1, whose non-defining attributes (orientation, overall size) are exactly what is missing; its build-and-draw part is Grade 1. No item tells a flat shape from a solid, and this file claims no standard the items do not deal. solids_turned is new: defining_attributes (the R lane's) turns and resizes 2-D shapes only. No related: the other 3-D skills ask for vertices or match written names, above Reception.",
+   "envision": [
+    {
+     "proposal": "solids_turned",
+     "name": "Name a Solid Any Way Up (option)",
+     "kind": "option on shapes_early:name_3d_shapes",
+     "teaches": "recognising and naming a cube, cuboid, sphere, cone and cylinder whatever its orientation and overall size, and saying that turning or resizing a solid does not change its name",
+     "closes": "naming the five solids whatever way they are turned and whatever their size (a cone on its side, a small cube and a big cube): turning or resizing a solid does not change its name",
+     "representation": "one boxed cell: one solid in black line, turned or resized, the five names in a word bank below it and one answer slot"
+    }
+   ]
   },
   "K|-|67and8countingandsubitising": {
    "title": "6, 7 and 8 - counting and subitising",
@@ -8589,7 +8625,7 @@
      "opts": {
       "band": 5
      },
-     "why": "R.B5.S3 Represent 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): building 4 and 5 on a ten frame: a full row of 5 is the start of 6, 7, 8"
+     "why": "R.B5.S3 Represent 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): building a number to 5 on a ten frame (4 and 5 among them): a full row of 5 is the start of 6, 7, 8"
     },
     {
      "key": "composing:number_bonds",
@@ -8617,7 +8653,7 @@
       "band": 10,
       "dir": "forward"
      },
-     "why": "the number after 5, 6 and 7 on a track: one more each time"
+     "why": "the number after a number on a track to 10 (after 6 comes 7): one more each time"
     }
    ],
    "note": "Support lesson from \"Growing 6, 7, 8\" (Phase 6) = R.B9.S1 \"Find 6, 7 and 8\" with R.B9.S10 \"Conceptual subitising\".",
@@ -8767,7 +8803,7 @@
      "opts": {
       "band": 10
      },
-     "missing": "add-more stories to 10 told in words (I have 3 balls. I get 2 more balls.), the two groups pictured in one row under the story; never three panels (first, then, now) and the pupil must read the story"
+     "missing": "add-more stories (I have 3 balls. I get 2 more balls.) and put-together stories (6 apples in a bag, 4 on a plate: how many in all?) to 10 told in words, the two groups pictured in one row under the story; never three panels (first, then, now) and the pupil must read the story"
     }
    ],
    "verdict": "partial",
@@ -8790,7 +8826,7 @@
       "band": 10,
       "dir": "forward"
      },
-     "why": "R.B11.S5 1 more (Pre-K, block R.B11, before this Support lesson's source phase): one more: adding 1 is the smallest \"then\""
+     "why": "R.B11.S5 1 more (Pre-K, block R.B11, before this Support lesson's source phase): one more: the number after a number on a track (adding 1 is the smallest \"then\")"
     },
     {
      "key": "composing:make_ten",
@@ -8804,7 +8840,7 @@
    "related": [
     {
      "key": "subtraction:sub_5_pictures",
-     "why": "the inverse: start with 5, take some away, how many are left"
+     "why": "the inverse: start with a pictured group to 5, take some away, how many are left"
     }
    ],
    "note": "Support lesson from \"First Then Now\" (Phase 9) = R.B14.S1 \"Add more\". vis_story_strip (VISUAL_BUILDS) is exactly the First / Then / Now strip.",
@@ -8941,7 +8977,7 @@
      "opts": {
       "band": 10
      },
-     "why": "R.B11.S3 Represent 9 and 10 (Pre-K, block R.B11, before this Support lesson's source phase): building 9 and 10 on a ten frame"
+     "why": "R.B11.S3 Represent 9 and 10 (Pre-K, block R.B11, before this Support lesson's source phase): building a number to 10 on a ten frame (9 and 10 among them)"
     },
     {
      "key": "counting:count_objects",
@@ -8968,7 +9004,7 @@
       "dir": "forward"
      },
      "maxNumber": 20,
-     "why": "the teen numbers in order on a number track, counting on past 10"
+     "why": "the numbers to 20 in order on a number track, some tracks running past 10 into the teens: counting on past 10"
     }
    ],
    "note": "Support lesson from \"To 20 and Beyond\" (Phase 8) = R.B13.S1 / S3 \"Build numbers beyond 10\". make_ten {band:20} (\"The frame shows 14. How many more make 20?\") completes 20 as two full frames, but asks for the missing part, never builds 20, and its key is already this lesson's pre (make_ten {band:10}), so it is not listed again (one key, one role).",
@@ -9116,14 +9152,14 @@
       "band": 10,
       "dir": "forward"
      },
-     "why": "R.B5.S4 1 more (Pre-K, block R.B5, before this Support lesson's source phase): one more: adding one object to a group"
+     "why": "R.B5.S4 1 more (Pre-K, block R.B5, before this Support lesson's source phase): one more: the number after a number on a track"
     },
     {
      "key": "composing:ten_frame_build",
      "opts": {
       "band": 5
      },
-     "why": "R.B5.S3 Represent 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): building 4 and 5 on a frame: one group of counters"
+     "why": "R.B5.S3 Represent 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): building a number to 5 on a frame: one group of counters"
     }
    ],
    "preBuild": [],
@@ -9516,7 +9552,7 @@
       "band": 10,
       "objects": "frame"
      },
-     "why": "R.B9.S1 Find 6, 7 and 8 (Pre-K, block R.B9, before this Support lesson's source phase): counting a group of 6, 7 or 8 and saying the number"
+     "why": "R.B9.S1 Find 6, 7 and 8 (Pre-K, block R.B9, before this Support lesson's source phase): counting the counters in a ten frame (1 to 10, 6, 7 and 8 among them) and saying the number"
     },
     {
      "key": "counting:count_sequence",
@@ -9602,7 +9638,7 @@
       "band": 5,
       "objects": "pictures"
      },
-     "why": "R.B5.S1 Find 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): counting a group of 4 or 5 and saying the number"
+     "why": "R.B5.S1 Find 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): counting a group of 1 to 5 pictures (4 and 5 among them) and saying the number"
     },
     {
      "key": "counting:count_objects",
@@ -9680,7 +9716,7 @@
       "tiles": 2,
       "objects": "pictures"
      },
-     "why": "R.B1.S4 Sort objects to a type (Pre-K, block R.B1, before this Support lesson's source phase): sorting a group into two kinds: the parts of a group"
+     "why": "R.B1.S4 Sort objects to a type (Pre-K, block R.B1, before this Support lesson's source phase): counting the objects of one kind in a group of two kinds: a group has parts"
     },
     {
      "key": "comparing:compare_groups",
@@ -9700,7 +9736,7 @@
      "opts": {
       "band": 5
      },
-     "why": "building a small number on a frame (Represent 1, 2 and 3)"
+     "why": "building a number to 5 on a frame (1, 2 and 3 among them)"
     }
    ],
    "note": "Support lesson from \"It's Me 1, 2, 3\" (Phase 3) = R.B3.S6 \"Composition of 1, 2 and 3\" (partial there with the same skill and build). Pre-skills are few: before this phase Reception teaches only R.B1-R.B2 (match, sort, compare, patterns, measure talk); two of them are building blocks.",
@@ -9752,7 +9788,7 @@
      "opts": {
       "band": 5
      },
-     "why": "R.B5.S3 Represent 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): building 4 and 5 on a frame"
+     "why": "R.B5.S3 Represent 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): building a number to 5 on a frame (4 and 5 among them)"
     },
     {
      "key": "counting:count_objects",
@@ -9760,7 +9796,7 @@
       "band": 5,
       "objects": "pictures"
      },
-     "why": "R.B5.S1 Find 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): finding groups of 4 and 5"
+     "why": "R.B5.S1 Find 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): counting groups of 1 to 5 pictures (4 and 5 among them)"
     },
     {
      "key": "counting:count_objects",
@@ -9768,7 +9804,7 @@
       "band": 5,
       "objects": "dice"
      },
-     "why": "R.B5.S2 Subitise 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): seeing 4 and 5 as dot patterns (2 and 2, 3 and 2)"
+     "why": "R.B5.S2 Subitise 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): seeing dice dot patterns to 5 (4 as 2 and 2)"
     }
    ],
    "preBuild": [],
@@ -9865,7 +9901,7 @@
      "opts": {
       "band": 10
      },
-     "why": "R.B11.S3 Represent 9 and 10 (Pre-K, block R.B11, before this Support lesson's source phase): building 9 and 10 on a ten frame"
+     "why": "R.B11.S3 Represent 9 and 10 (Pre-K, block R.B11, before this Support lesson's source phase): building a number to 10 on a ten frame (9 and 10 among them)"
     }
    ],
    "preBuild": [],
@@ -10150,11 +10186,19 @@
    "partial": [
     {
      "key": "subtraction:sub_5_pictures",
-     "missing": "takes away from a pictured group to 5 and asks how many are left; about 1 item in 10 takes every counter away, so the answer is 0 (start with 4, take away 4); never an empty set to count on its own and never 0 as a number to write or find on a track"
+     "missing": "takes away from a pictured group of 2 to 5 and asks how many are left; about 1 item in 10 takes every counter away, and the pupil writes 0 for the empty group that is left (start with 4, take away 4); never a group that is empty from the start"
+    },
+    {
+     "key": "counting:count_sequence",
+     "opts": {
+      "band": 10,
+      "dir": "back"
+     },
+     "missing": "the number before a number on a track to 10; about 1 item in 7 asks for the number before 1, and the pupil writes 0 (0 comes before 1); the other items ask for the number before 2 to 7, and the track shows numbers, not objects"
     }
    ],
    "verdict": "partial",
-   "missing": "zero as the count of an empty set (no counters left, an empty plate) and writing 0",
+   "missing": "zero as the count of a group that is empty from the start (an empty plate, an empty ten frame): seeing that there are none and writing 0 for it",
    "build": [
     "zero"
    ],
@@ -10165,14 +10209,14 @@
       "band": 5,
       "objects": "pictures"
      },
-     "why": "R.B5.S1 Find 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): counting a group to 5: zero is the count when there are none"
+     "why": "R.B5.S1 Find 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): counting a group of 1 to 5 pictures and saying how many: the counts that 0 comes before (every group has at least one object)"
     },
     {
      "key": "composing:ten_frame_build",
      "opts": {
       "band": 5
      },
-     "why": "R.B5.S3 Represent 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): building a number to 5 on a frame: an empty frame shows 0"
+     "why": "R.B5.S3 Represent 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): building a number from 1 to 5 on a ten frame, one counter in each box (the frame is never left empty)"
     },
     {
      "key": "comparing:compare_groups",
@@ -10182,19 +10226,19 @@
        1
       ]
      },
-     "why": "R.B1.S7 Compare amounts (Pre-K, block R.B1, before this Support lesson's source phase): fewer: none is the fewest of all"
+     "why": "R.B1.S7 Compare amounts (Pre-K, block R.B1, before this Support lesson's source phase): which of two pictured groups has fewer counters (groups of 1 to 5, never an empty group)"
     }
    ],
    "preBuild": [],
    "related": [],
-   "note": "Support lesson from \"Alive in 5!\" (Phase 5) = R.B7.S1 \"Introduce zero\" (a gap there with the same build). Lessons r2 (rule 5, missed live skill): sub_5_pictures, the round-1 related, deals 0 as the answer when every counter is taken away (10 of 100 items, the counters cell with n = m), so the lesson is partial on it here; the R lane's gap verdict for R.B7.S1 is frozen and is noted for its next round. No related: the count skills start at 1 and no live skill shows an empty set.",
+   "note": "Support lesson from \"Alive in 5!\" (Phase 5) = R.B7.S1 \"Introduce zero\" (a gap there with the same build). Lessons r2 (rule 5, missed live skill): sub_5_pictures, the round-1 related, deals 0 as the answer when every counter is taken away (10 of 100 items, the counters cell with n = m: the pupil writes 0), so the lesson is partial on it here. Lessons r3 (critic r2 F12, and the rule-5 sweep): count_sequence {band:10, dir:back} asks for the number before 1 in about 1 item in 7 (13 to 16 in 100 at four seeds), so 0 is written before 1 on a track; it is the second partial. What neither deals is a group that is EMPTY from the start, counted as 0; zero closes that. The R lane's gap verdict for R.B7.S1 is frozen and is noted for its next round (owner question 7). The pre whys say what their items deal: groups and frames of 1 to 5, never empty. No related: the count skills start at 1 and no live skill shows a group empty from the start.",
    "envision": [
     {
      "proposal": "zero",
      "name": "Zero Means None",
      "kind": "new skill counting:zero_none",
      "teaches": "zero as the count of an empty set, and writing 0",
-     "closes": "zero as the count of an empty set (no counters left, an empty plate) and writing 0",
+     "closes": "zero as the count of a group that is empty from the start (an empty plate, an empty ten frame): seeing that there are none and writing 0 for it",
      "representation": "pictures of plates/boxes with some or no objects"
     }
    ]
@@ -10360,7 +10404,7 @@
      "why": "joining a group and some more and saying how many in all"
     }
    ],
-   "note": "Support lesson from \"Light and Dark\" (Phase 4) = R.B3.S4 / S5 and R.B5.S4 / S5 \"1 more\" / \"1 less\" (partial there with the same skill and builds).",
+   "note": "Support lesson from \"Light and Dark\" (Phase 4) = R.B3.S4 / S5 and R.B5.S4 / S5 \"1 more\" / \"1 less\" (partial there with the same skill and builds). Rule 5 (lessons critic r2 n3): placevalue:more_less_10 {step:[1], band:20} asks the title's own words (\"1 more than 9 is ____.\", \"What is 1 less than 4?\"), but on numbers to 20 in a sentence frame with no objects (its smallest band is 20), so it closes neither missing part (within 5, with objects) and is not linked; the track skills already deal the number after and before.",
    "envision": [
     {
      "proposal": "more_less_pictures",
@@ -10399,7 +10443,7 @@
    "partial": [
     {
      "key": "shapes_early:shape_positions",
-     "missing": "says where one picture is from another: above, below, beside or between; never in front, behind, on, under or in"
+     "missing": "says where one picture is from another: above, below, beside or between; never in front, behind, on, under or in. Below is not under: below says one picture is lower on the page than another, apart from it; under (beneath an object and touching or covered by it, the cat under the table) is never asked"
     }
    ],
    "verdict": "partial",
@@ -10457,7 +10501,7 @@
    "pre": [],
    "preBuild": [],
    "related": [],
-   "note": "Support lesson from \"Getting to Know You\" (Phase 1). Pre-skills are few: the lesson's source phase (Getting to Know You, Phase 1) opens Reception, so no Reception step is taught before it and there is no lower grade; its building blocks are the pupil's own talk and play. No related: shape_positions is the only live position skill.",
+   "note": "Support lesson from \"Getting to Know You\" (Phase 1). Pre-skills are few: the lesson's source phase (Getting to Know You, Phase 1) opens Reception, so no Reception step is taught before it and there is no lower grade; its building blocks are the pupil's own talk and play. shape_positions forms 0 (above and below) is not linked (lessons critic r2 n4): below says one picture is lower on the page than another, apart from it, while under is beneath an object and touching or covered by it (the cat under the table); the title asks under, so forms 0 closes none of it. No related: shape_positions is the only live position skill.",
    "envision": [
     {
      "proposal": "position_map",
@@ -10649,7 +10693,7 @@
       "band": 6,
       "objects": "pictures"
      },
-     "missing": "counts one kind of picture in a mixed bag (by kind: apples, fish, balls), counts to 6; never sorts every object into groups, never by colour or size"
+     "missing": "counts one kind of picture in a mixed bag (by kind: apples, balls, fish, flowers), counts to 6; never sorts every object into groups, never by colour or size"
     }
    ],
    "verdict": "partial",
@@ -10722,7 +10766,7 @@
        2
       ]
      },
-     "why": "R.B6.S1 Identify and name shapes with 4 sides (Pre-K, block R.B6, before this Support lesson's source phase): finding every square and rectangle, whichever way it is drawn"
+     "why": "R.B6.S1 Identify and name shapes with 4 sides (Pre-K, block R.B6, before this Support lesson's source phase): finding every square and every rectangle among other shapes, each drawn one way up (a turned square appears only as the \"diamond\" distractor, not clicked as a square: the turning this lesson builds, shape_fit_turn, has to undo that)"
     },
     {
      "key": "shapes_early:name_2d_shapes",
@@ -10807,7 +10851,7 @@
        2
       ]
      },
-     "why": "R.B6.S1 Identify and name shapes with 4 sides (Pre-K, block R.B6, before this Support lesson's source phase): naming squares and rectangles, the shapes that are made and split"
+     "why": "R.B6.S1 Identify and name shapes with 4 sides (Pre-K, block R.B6, before this Support lesson's source phase): finding every square and every rectangle among other shapes: the shapes that are made and split"
     },
     {
      "key": "shapes_early:name_2d_shapes",
@@ -10820,7 +10864,7 @@
        1
       ]
      },
-     "why": "R.B4.S1 Identify and name circles and triangles (Pre-K, block R.B4, before this Support lesson's source phase): naming triangles, the parts of a square"
+     "why": "R.B4.S1 Identify and name circles and triangles (Pre-K, block R.B4, before this Support lesson's source phase): finding every triangle and every circle among other shapes: triangles are the pieces a larger shape splits into"
     }
    ],
    "preBuild": [],
@@ -10877,7 +10921,7 @@
        1
       ]
      },
-     "why": "R.B12.S1 Recognise and name 3-D shapes (Pre-K, block R.B12, before this Support lesson's source phase): naming the solids a model is built from"
+     "why": "R.B12.S1 Recognise and name 3-D shapes (Pre-K, block R.B12, before this Support lesson's source phase): finding every solid of one kind (sphere, cylinder, cube or cone): the solids a model is built from"
     },
     {
      "key": "shapes_early:shape_positions",
@@ -10959,7 +11003,7 @@
    "partial": [
     {
      "key": "subtraction:sub_5_pictures",
-     "missing": "takes away from 5 with pictures (start with 5, take away 2); never from 6 to 10"
+     "missing": "takes away from a pictured group of 2 to 5 (start with 5, take away 2); never from 6 to 10"
     },
     {
      "key": "subtraction:sub_wp_10",
@@ -10978,7 +11022,7 @@
       "band": 10,
       "dir": "back"
      },
-     "why": "R.B11.S6 1 less (Pre-K, block R.B11, before this Support lesson's source phase): one less: taking one away"
+     "why": "R.B11.S6 1 less (Pre-K, block R.B11, before this Support lesson's source phase): one less: the number before a number on a track"
     },
     {
      "key": "composing:number_bonds",
@@ -10993,7 +11037,7 @@
       "band": 10,
       "objects": "frame"
      },
-     "why": "R.B11.S1 Find 9 and 10 (Pre-K, block R.B11, before this Support lesson's source phase): counting the counters that are left"
+     "why": "R.B11.S1 Find 9 and 10 (Pre-K, block R.B11, before this Support lesson's source phase): counting the counters in a ten frame to 10, as the counters that are left are counted"
     }
    ],
    "preBuild": [],

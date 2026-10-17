@@ -40,7 +40,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Start with 2, take away 1. How many are left? → 1
   - Start with 5, take away 3. How many are left? → 2
   - Start with 5, take away 1. How many are left? → 4
-- **pre** `composing:number_bonds {"band":5}` — why: Y1.B2.S5 Number bonds within 10 (taught earlier this year, wk W13): the parts and the whole of every number to 5: the same facts, in a part-whole model
+- **pre** `composing:number_bonds {"band":5}` — why: Y1.B2.S5 Number bonds within 10 (taught earlier this year, wk W13): the parts and the whole of the numbers 2 to 5: the same facts, in a part-whole model
   - max 5; types: number bond
   - ? + 1 = 2 → 1
   - 1 + ? = 5 → 4
@@ -77,7 +77,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - How many circles are there? → 3
   - How many stars are there? → 8
   - How many circles are there? → 7
-- **pre** `comparing:compare_groups {"band":10,"dir":"mixed"}` — why: Y1.B1.S11 Fewer, more, same (taught earlier this year, wk W03): which of two groups has more, fewer or the same: the groups are ordered by count
+- **pre** `comparing:compare_groups {"band":10,"dir":"mixed"}` — why: Y1.B1.S11 Fewer, more, same (taught earlier this year, wk W03): which of two groups has more, fewer or the same: the start of ordering groups by their counts
   - max 0; types: text compare
   - Do the groups have the same number of counters? → not the same
   - Which group has more counters? → A
@@ -159,7 +159,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Fill the hexagon with pattern blocks. Drag each block into a slot. → Hexagon (triangles)
   - Fill the hexagon with pattern blocks. Drag each block into a slot. → Hexagon (trapezoids)
   - Fill the hexagon with pattern blocks. Drag each block into a slot. → Hexagon (triangles)
-- **pre** `shapes_early:name_2d_shapes {"forms":[1],"shapes":[2]}` — why: R.B6.S1 Identify and name shapes with 4 sides (Pre-K, lower grade): naming the square and the rectangle two triangles make
+- **pre** `shapes_early:name_2d_shapes {"forms":[1],"shapes":[2]}` — why: R.B6.S1 Identify and name shapes with 4 sides (Pre-K, lower grade): finding every square and every rectangle among other shapes: two of the shapes the pieces make
   - max 3; types: multi-select-check
   - Click ALL the rectangles. → ["opt3"] {⭐ star ; ⬢ hexagon ; ⬟ pentagon ; ▭ rectangle}
   - Click ALL the rectangles. → ["opt3"] {⬟ pentagon ; ⬢ hexagon ; ⭕ circle ; ▭ rectangle}
@@ -167,7 +167,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Click ALL the rectangles. → ["opt2"] {⭕ circle ; 🟦 square ; ▭ rectangle ; ⭐ star}
   - Click ALL the rectangles. → ["opt1","opt3"] {🟦 square ; ▭ rectangle ; ⭐ star ; ▭ rectangle}
   - Click ALL the squares. → ["opt2"] {⬟ pentagon ; 🔺 triangle ; 🟦 square ; ⭐ star}
-- **pre** `shapes_early:name_2d_shapes {"forms":[1],"shapes":[0,1]}` — why: R.B4.S1 Identify and name circles and triangles (Pre-K, lower grade): naming the triangles that are joined
+- **pre** `shapes_early:name_2d_shapes {"forms":[1],"shapes":[0,1]}` — why: R.B4.S1 Identify and name circles and triangles (Pre-K, lower grade): finding every triangle and every circle among other shapes: triangles are pieces that are joined
   - max 3; types: multi-select-check
   - Click ALL the circles. → ["opt2","opt3"] {🟦 square ; 🔷 diamond ; ⭕ circle ; ⭕ circle}
   - Click ALL the circles. → ["opt3"] {⭐ star ; 🟦 square ; ▭ rectangle ; ⭕ circle}
@@ -178,9 +178,9 @@ print path, the link's own opts). Format: `question → answer {options} [answer
 
 ## 3D shapes (cube, cuboid, sphere, cone, cylinder)
 
-`K|-|3dshapescubecuboidsphereconecylinder` · no week · enrich-native · full
+`K|-|3dshapescubecuboidsphereconecylinder` · no week · enrich-native · partial — missing: naming the five solids whatever way they are turned and whatever their size (a cone on its side, a small cube and a big cube): turning or resizing a solid does not change its name
 
-- **direct** `shapes_early:name_3d_shapes {"forms":[0]}` — 
+- **partial** `shapes_early:name_3d_shapes {"forms":[0]}` — clause: shows one drawn solid and the pupil picks its name from four (cube, cuboid as rectangular prism, sphere, cone or cylinder: all five are named); each solid is one fixed drawing, the same way up and the same size every time, never turned and never made bigger or smaller
   - max 3; types: multiple-choice
   - What 3D shape is this? → Cylinder {Cylinder ; Cone ; Sphere ; Rectangular Prism}
   - What 3D shape is this? → Cylinder {Sphere ; Cube ; Rectangular Prism ; Cylinder}
@@ -188,7 +188,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - What 3D shape is this? → Sphere {Rectangular Prism ; Cube ; Cylinder ; Sphere}
   - What 3D shape is this? → Rectangular Prism {Rectangular Prism ; Cube ; Cylinder ; Sphere}
   - What 3D shape is this? → Rectangular Prism {Cylinder ; Cube ; Rectangular Prism ; Sphere}
-- **direct** `shapes_early:name_3d_shapes {"forms":[1]}` — 
+- **partial** `shapes_early:name_3d_shapes {"forms":[1]}` — clause: clicks every sphere, cylinder, cube or cone among four solid pictures (the rectangular prism and the pyramid are only drawn as distractors); each solid is one fixed picture with its name printed beside it, never turned and never made bigger or smaller
   - max 3; types: multi-select-check
   - Click ALL the spheres. → ["opt2"] {🔋 cylinder ; 🧊 cube ; ⚪ sphere ; 🍦 cone}
   - Click ALL the cones. → ["opt1","opt2"] {⛰️ pyramid ; 🍦 cone ; 🍦 cone ; ⚪ sphere}
@@ -241,7 +241,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - How many dots are there? → 3
   - How many dots are there? → 8
   - How many dots are there? → 7
-- **pre** `composing:ten_frame_build {"band":5}` — why: R.B5.S3 Represent 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): building 4 and 5 on a ten frame: a full row of 5 is the start of 6, 7, 8
+- **pre** `composing:ten_frame_build {"band":5}` — why: R.B5.S3 Represent 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): building a number to 5 on a ten frame (4 and 5 among them): a full row of 5 is the start of 6, 7, 8
   - max 5; types: ten-frame-build tenframe
   - Build 1 on the ten frame. → 1
   - Build 4 on the ten frame. → 4
@@ -265,7 +265,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Which group has fewer counters? → B
   - Do the groups have the same number of counters? → not the same
   - Which group has fewer counters? → A
-- **related** `counting:count_sequence {"band":10,"dir":"forward"}` — why: the number after 5, 6 and 7 on a track: one more each time
+- **related** `counting:count_sequence {"band":10,"dir":"forward"}` — why: the number after a number on a track to 10 (after 6 comes 7): one more each time
   - max 10; types: number
   - What number comes after 4? → 5
   - What number comes after 7? → 8
@@ -339,7 +339,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - How many in all? 3 + 1 = ? → 4
   - How many in all? 2 + 3 = ? → 5
   - How many in all? 2 + 3 = ? → 5
-- **partial** `addition:add_wp_10 {"band":10}` — clause: add-more stories to 10 told in words (I have 3 balls. I get 2 more balls.), the two groups pictured in one row under the story; never three panels (first, then, now) and the pupil must read the story
+- **partial** `addition:add_wp_10 {"band":10}` — clause: add-more stories (I have 3 balls. I get 2 more balls.) and put-together stories (6 apples in a bag, 4 on a plate: how many in all?) to 10 told in words, the two groups pictured in one row under the story; never three panels (first, then, now) and the pupil must read the story
   - max 10; types: number word-work
   - There are 5 balls in a box. 5 more balls roll in. How many balls are there now? → 10
   - 3 apples are in a bag. 2 apples are on a plate. How many apples are there in all? → 5
@@ -355,7 +355,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - ? + 2 = 5 → 3
   - 1 + ? = 10 → 9
   - 2 + 8 = ? → 10
-- **pre** `counting:count_sequence {"band":10,"dir":"forward"}` — why: R.B11.S5 1 more (Pre-K, block R.B11, before this Support lesson's source phase): one more: adding 1 is the smallest "then"
+- **pre** `counting:count_sequence {"band":10,"dir":"forward"}` — why: R.B11.S5 1 more (Pre-K, block R.B11, before this Support lesson's source phase): one more: the number after a number on a track (adding 1 is the smallest "then")
   - max 10; types: number
   - What number comes after 4? → 5
   - What number comes after 7? → 8
@@ -371,7 +371,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - The frame shows 5. How many more make 10? → 5
   - The frame shows 6. How many more make 10? → 4
   - The frame shows 7. How many more make 10? → 3
-- **related** `subtraction:sub_5_pictures` — why: the inverse: start with 5, take some away, how many are left
+- **related** `subtraction:sub_5_pictures` — why: the inverse: start with a pictured group to 5, take some away, how many are left
   - max 5; types: number counters
   - Start with 5, take away 0. How many are left? → 5
   - Start with 5, take away 1. How many are left? → 4
@@ -453,7 +453,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - The frame shows 5. How many more make 10? → 5
   - The frame shows 6. How many more make 10? → 4
   - The frame shows 7. How many more make 10? → 3
-- **pre** `composing:ten_frame_build {"band":10}` — why: R.B11.S3 Represent 9 and 10 (Pre-K, block R.B11, before this Support lesson's source phase): building 9 and 10 on a ten frame
+- **pre** `composing:ten_frame_build {"band":10}` — why: R.B11.S3 Represent 9 and 10 (Pre-K, block R.B11, before this Support lesson's source phase): building a number to 10 on a ten frame (9 and 10 among them)
   - max 10; types: ten-frame-build tenframe
   - Build 4 on the ten frame. → 4
   - Build 8 on the ten frame. → 8
@@ -477,7 +477,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - ? + 2 = 5 → 3
   - 1 + ? = 10 → 9
   - 2 + 8 = ? → 10
-- **related** `counting:number_seq_fill {"step":1,"dir":"forward"} @20` — why: the teen numbers in order on a number track, counting on past 10
+- **related** `counting:number_seq_fill {"step":1,"dir":"forward"} @20` — why: the numbers to 20 in order on a number track, some tracks running past 10 into the teens: counting on past 10
   - max 19; types: text seqstrip, number seqstrip
   - Write the missing numbers in the number track. → 4, 5
   - Write the missing number in the number track. → 9
@@ -551,7 +551,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - ? + 1 = 3 → 2
   - 4 + ? = 5 → 1
   - 1 + 3 = ? → 4
-- **pre** `counting:count_sequence {"band":10,"dir":"forward"}` — why: R.B5.S4 1 more (Pre-K, block R.B5, before this Support lesson's source phase): one more: adding one object to a group
+- **pre** `counting:count_sequence {"band":10,"dir":"forward"}` — why: R.B5.S4 1 more (Pre-K, block R.B5, before this Support lesson's source phase): one more: the number after a number on a track
   - max 10; types: number
   - What number comes after 4? → 5
   - What number comes after 7? → 8
@@ -559,7 +559,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - What number comes after 4? → 5
   - What number comes after 8? → 9
   - What number comes after 4? → 5
-- **pre** `composing:ten_frame_build {"band":5}` — why: R.B5.S3 Represent 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): building 4 and 5 on a frame: one group of counters
+- **pre** `composing:ten_frame_build {"band":5}` — why: R.B5.S3 Represent 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): building a number to 5 on a frame: one group of counters
   - max 5; types: ten-frame-build tenframe
   - Build 1 on the ten frame. → 1
   - Build 4 on the ten frame. → 4
@@ -762,7 +762,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Which group has fewer counters? → B
   - Do the groups have the same number of counters? → not the same
   - Which group has fewer counters? → A
-- **pre** `counting:count_objects {"band":10,"objects":"frame"}` — why: R.B9.S1 Find 6, 7 and 8 (Pre-K, block R.B9, before this Support lesson's source phase): counting a group of 6, 7 or 8 and saying the number
+- **pre** `counting:count_objects {"band":10,"objects":"frame"}` — why: R.B9.S1 Find 6, 7 and 8 (Pre-K, block R.B9, before this Support lesson's source phase): counting the counters in a ten frame (1 to 10, 6, 7 and 8 among them) and saying the number
   - max 10; types: number counters
   - How many dots are there? → 9
   - How many dots are there? → 10
@@ -807,7 +807,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Which group has fewer counters? → B
   - Do the groups have the same number of counters? → not the same
   - Which group has fewer counters? → A
-- **pre** `counting:count_objects {"band":5,"objects":"pictures"}` — why: R.B5.S1 Find 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): counting a group of 4 or 5 and saying the number
+- **pre** `counting:count_objects {"band":5,"objects":"pictures"}` — why: R.B5.S1 Find 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): counting a group of 1 to 5 pictures (4 and 5 among them) and saying the number
   - max 5; types: number counters
   - How many balls are there? → 1
   - How many apples are there? → 4
@@ -852,7 +852,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - ? + 1 = 3 → 2
   - 4 + ? = 5 → 1
   - 1 + 3 = ? → 4
-- **pre** `comparing:classify_count {"band":3,"tiles":2,"objects":"pictures"}` — why: R.B1.S4 Sort objects to a type (Pre-K, block R.B1, before this Support lesson's source phase): sorting a group into two kinds: the parts of a group
+- **pre** `comparing:classify_count {"band":3,"tiles":2,"objects":"pictures"}` — why: R.B1.S4 Sort objects to a type (Pre-K, block R.B1, before this Support lesson's source phase): counting the objects of one kind in a group of two kinds: a group has parts
   - max 3; types: number counters
   - Count only the fish. → 1
   - Count only the balls. → 3
@@ -868,7 +868,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Which group has fewer counters? → B
   - Do the groups have the same number of counters? → not the same
   - Which group has fewer counters? → A
-- **related** `composing:ten_frame_build {"band":5}` — why: building a small number on a frame (Represent 1, 2 and 3)
+- **related** `composing:ten_frame_build {"band":5}` — why: building a number to 5 on a frame (1, 2 and 3 among them)
   - max 5; types: ten-frame-build tenframe
   - Build 1 on the ten frame. → 1
   - Build 4 on the ten frame. → 4
@@ -889,7 +889,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - ? + 1 = 3 → 2
   - 4 + ? = 5 → 1
   - 1 + 3 = ? → 4
-- **pre** `composing:ten_frame_build {"band":5}` — why: R.B5.S3 Represent 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): building 4 and 5 on a frame
+- **pre** `composing:ten_frame_build {"band":5}` — why: R.B5.S3 Represent 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): building a number to 5 on a frame (4 and 5 among them)
   - max 5; types: ten-frame-build tenframe
   - Build 1 on the ten frame. → 1
   - Build 4 on the ten frame. → 4
@@ -897,7 +897,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Build 5 on the ten frame. → 5
   - Build 2 on the ten frame. → 2
   - Build 1 on the ten frame. → 1
-- **pre** `counting:count_objects {"band":5,"objects":"pictures"}` — why: R.B5.S1 Find 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): finding groups of 4 and 5
+- **pre** `counting:count_objects {"band":5,"objects":"pictures"}` — why: R.B5.S1 Find 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): counting groups of 1 to 5 pictures (4 and 5 among them)
   - max 5; types: number counters
   - How many balls are there? → 1
   - How many apples are there? → 4
@@ -905,7 +905,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - How many balls are there? → 5
   - How many fish are there? → 2
   - How many balls are there? → 1
-- **pre** `counting:count_objects {"band":5,"objects":"dice"}` — why: R.B5.S2 Subitise 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): seeing 4 and 5 as dot patterns (2 and 2, 3 and 2)
+- **pre** `counting:count_objects {"band":5,"objects":"dice"}` — why: R.B5.S2 Subitise 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): seeing dice dot patterns to 5 (4 as 2 and 2)
   - max 5; types: number counters
   - How many dots are there? → 1
   - How many dots are there? → 4
@@ -958,7 +958,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - The frame shows 5. How many more make 10? → 5
   - The frame shows 6. How many more make 10? → 4
   - The frame shows 7. How many more make 10? → 3
-- **pre** `composing:ten_frame_build {"band":10}` — why: R.B11.S3 Represent 9 and 10 (Pre-K, block R.B11, before this Support lesson's source phase): building 9 and 10 on a ten frame
+- **pre** `composing:ten_frame_build {"band":10}` — why: R.B11.S3 Represent 9 and 10 (Pre-K, block R.B11, before this Support lesson's source phase): building a number to 10 on a ten frame (9 and 10 among them)
   - max 10; types: ten-frame-build tenframe
   - Build 4 on the ten frame. → 4
   - Build 8 on the ten frame. → 8
@@ -1096,9 +1096,9 @@ print path, the link's own opts). Format: `question → answer {options} [answer
 
 ## Introducing zero
 
-`K|-|introducingzero` · no week · enrich-native · partial — missing: zero as the count of an empty set (no counters left, an empty plate) and writing 0
+`K|-|introducingzero` · no week · enrich-native · partial — missing: zero as the count of a group that is empty from the start (an empty plate, an empty ten frame): seeing that there are none and writing 0 for it
 
-- **partial** `subtraction:sub_5_pictures` — clause: takes away from a pictured group to 5 and asks how many are left; about 1 item in 10 takes every counter away, so the answer is 0 (start with 4, take away 4); never an empty set to count on its own and never 0 as a number to write or find on a track
+- **partial** `subtraction:sub_5_pictures` — clause: takes away from a pictured group of 2 to 5 and asks how many are left; about 1 item in 10 takes every counter away, and the pupil writes 0 for the empty group that is left (start with 4, take away 4); never a group that is empty from the start
   - max 5; types: number counters
   - Start with 5, take away 0. How many are left? → 5
   - Start with 5, take away 1. How many are left? → 4
@@ -1106,7 +1106,15 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Start with 2, take away 1. How many are left? → 1
   - Start with 5, take away 3. How many are left? → 2
   - Start with 5, take away 1. How many are left? → 4
-- **pre** `counting:count_objects {"band":5,"objects":"pictures"}` — why: R.B5.S1 Find 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): counting a group to 5: zero is the count when there are none
+- **partial** `counting:count_sequence {"band":10,"dir":"back"}` — clause: the number before a number on a track to 10; about 1 item in 7 asks for the number before 1, and the pupil writes 0 (0 comes before 1); the other items ask for the number before 2 to 7, and the track shows numbers, not objects
+  - max 7; types: number
+  - What number comes before 2? → 1
+  - What number comes before 5? → 4
+  - What number comes before 4? → 3
+  - What number comes before 2? → 1
+  - What number comes before 6? → 5
+  - What number comes before 2? → 1
+- **pre** `counting:count_objects {"band":5,"objects":"pictures"}` — why: R.B5.S1 Find 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): counting a group of 1 to 5 pictures and saying how many: the counts that 0 comes before (every group has at least one object)
   - max 5; types: number counters
   - How many balls are there? → 1
   - How many apples are there? → 4
@@ -1114,7 +1122,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - How many balls are there? → 5
   - How many fish are there? → 2
   - How many balls are there? → 1
-- **pre** `composing:ten_frame_build {"band":5}` — why: R.B5.S3 Represent 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): building a number to 5 on a frame: an empty frame shows 0
+- **pre** `composing:ten_frame_build {"band":5}` — why: R.B5.S3 Represent 4 and 5 (Pre-K, block R.B5, before this Support lesson's source phase): building a number from 1 to 5 on a ten frame, one counter in each box (the frame is never left empty)
   - max 5; types: ten-frame-build tenframe
   - Build 1 on the ten frame. → 1
   - Build 4 on the ten frame. → 4
@@ -1122,7 +1130,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Build 5 on the ten frame. → 5
   - Build 2 on the ten frame. → 2
   - Build 1 on the ten frame. → 1
-- **pre** `comparing:compare_groups {"band":5,"level":[1]}` — why: R.B1.S7 Compare amounts (Pre-K, block R.B1, before this Support lesson's source phase): fewer: none is the fewest of all
+- **pre** `comparing:compare_groups {"band":5,"level":[1]}` — why: R.B1.S7 Compare amounts (Pre-K, block R.B1, before this Support lesson's source phase): which of two pictured groups has fewer counters (groups of 1 to 5, never an empty group)
   - max 0; types: text compare
   - Do the groups have the same number of counters? → not the same
   - Which group has more counters? → A
@@ -1233,7 +1241,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
 
 `K|-|positionallanguage` · no week · enrich-native · partial — missing: the positional words in front, behind, on top, under, in and next to, said about real objects
 
-- **partial** `shapes_early:shape_positions` — clause: says where one picture is from another: above, below, beside or between; never in front, behind, on, under or in
+- **partial** `shapes_early:shape_positions` — clause: says where one picture is from another: above, below, beside or between; never in front, behind, on, under or in. Below is not under: below says one picture is lower on the page than another, apart from it; under (beneath an object and touching or covered by it, the cat under the table) is never asked
   - max 0; types: multiple-choice
   - Where is the heart compared to the ball? → Above {Above ; Below ; Beside ; Between}
   - Where is the heart compared to the star? → Beside {Beside ; Below ; Between ; Above}
@@ -1349,7 +1357,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
 
 `K|-|sortobjectsbyoneattributecoloursizeshape` · no week · enrich-native · partial — missing: sorting objects into groups by one attribute (colour, size or shape) and saying the rule
 
-- **partial** `comparing:classify_count {"band":6,"objects":"pictures"}` — clause: counts one kind of picture in a mixed bag (by kind: apples, fish, balls), counts to 6; never sorts every object into groups, never by colour or size
+- **partial** `comparing:classify_count {"band":6,"objects":"pictures"}` — clause: counts one kind of picture in a mixed bag (by kind: apples, balls, fish, flowers), counts to 6; never sorts every object into groups, never by colour or size
   - max 6; types: number counters
   - Count only the fish. → 6
   - Count only the balls. → 6
@@ -1378,7 +1386,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - What shape do you make when you put these two shapes together? → Rectangle {Square ; Triangle ; Rectangle ; Hexagon}
   - What shape do you make when you put these two shapes together? → Hexagon {Hexagon ; Rectangle ; Square ; Triangle}
   - What shape do you make when you put these two shapes together? → Rectangle {Hexagon ; Rectangle ; Triangle ; Square}
-- **pre** `shapes_early:name_2d_shapes {"forms":[1],"shapes":[2]}` — why: R.B6.S1 Identify and name shapes with 4 sides (Pre-K, block R.B6, before this Support lesson's source phase): finding every square and rectangle, whichever way it is drawn
+- **pre** `shapes_early:name_2d_shapes {"forms":[1],"shapes":[2]}` — why: R.B6.S1 Identify and name shapes with 4 sides (Pre-K, block R.B6, before this Support lesson's source phase): finding every square and every rectangle among other shapes, each drawn one way up (a turned square appears only as the "diamond" distractor, not clicked as a square: the turning this lesson builds, shape_fit_turn, has to undo that)
   - max 3; types: multi-select-check
   - Click ALL the rectangles. → ["opt3"] {⭐ star ; ⬢ hexagon ; ⬟ pentagon ; ▭ rectangle}
   - Click ALL the rectangles. → ["opt3"] {⬟ pentagon ; ⬢ hexagon ; ⭕ circle ; ▭ rectangle}
@@ -1415,7 +1423,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - What shape do you make when you put these two shapes together? → Rectangle {Square ; Triangle ; Rectangle ; Hexagon}
   - What shape do you make when you put these two shapes together? → Hexagon {Hexagon ; Rectangle ; Square ; Triangle}
   - What shape do you make when you put these two shapes together? → Rectangle {Hexagon ; Rectangle ; Triangle ; Square}
-- **pre** `shapes_early:name_2d_shapes {"forms":[1],"shapes":[2]}` — why: R.B6.S1 Identify and name shapes with 4 sides (Pre-K, block R.B6, before this Support lesson's source phase): naming squares and rectangles, the shapes that are made and split
+- **pre** `shapes_early:name_2d_shapes {"forms":[1],"shapes":[2]}` — why: R.B6.S1 Identify and name shapes with 4 sides (Pre-K, block R.B6, before this Support lesson's source phase): finding every square and every rectangle among other shapes: the shapes that are made and split
   - max 3; types: multi-select-check
   - Click ALL the rectangles. → ["opt3"] {⭐ star ; ⬢ hexagon ; ⬟ pentagon ; ▭ rectangle}
   - Click ALL the rectangles. → ["opt3"] {⬟ pentagon ; ⬢ hexagon ; ⭕ circle ; ▭ rectangle}
@@ -1423,7 +1431,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Click ALL the rectangles. → ["opt2"] {⭕ circle ; 🟦 square ; ▭ rectangle ; ⭐ star}
   - Click ALL the rectangles. → ["opt1","opt3"] {🟦 square ; ▭ rectangle ; ⭐ star ; ▭ rectangle}
   - Click ALL the squares. → ["opt2"] {⬟ pentagon ; 🔺 triangle ; 🟦 square ; ⭐ star}
-- **pre** `shapes_early:name_2d_shapes {"forms":[1],"shapes":[0,1]}` — why: R.B4.S1 Identify and name circles and triangles (Pre-K, block R.B4, before this Support lesson's source phase): naming triangles, the parts of a square
+- **pre** `shapes_early:name_2d_shapes {"forms":[1],"shapes":[0,1]}` — why: R.B4.S1 Identify and name circles and triangles (Pre-K, block R.B4, before this Support lesson's source phase): finding every triangle and every circle among other shapes: triangles are the pieces a larger shape splits into
   - max 3; types: multi-select-check
   - Click ALL the circles. → ["opt2","opt3"] {🟦 square ; 🔷 diamond ; ⭕ circle ; ⭕ circle}
   - Click ALL the circles. → ["opt3"] {⭐ star ; 🟦 square ; ▭ rectangle ; ⭕ circle}
@@ -1444,7 +1452,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - What shape do you make when you put these two shapes together? → Rectangle {Square ; Triangle ; Rectangle ; Hexagon}
   - What shape do you make when you put these two shapes together? → Square {Hexagon ; Rectangle ; Square ; Triangle}
   - What shape do you make when you put these two shapes together? → Rectangle {Hexagon ; Rectangle ; Triangle ; Square}
-- **pre** `shapes_early:name_3d_shapes {"forms":[1]}` — why: R.B12.S1 Recognise and name 3-D shapes (Pre-K, block R.B12, before this Support lesson's source phase): naming the solids a model is built from
+- **pre** `shapes_early:name_3d_shapes {"forms":[1]}` — why: R.B12.S1 Recognise and name 3-D shapes (Pre-K, block R.B12, before this Support lesson's source phase): finding every solid of one kind (sphere, cylinder, cube or cone): the solids a model is built from
   - max 3; types: multi-select-check
   - Click ALL the spheres. → ["opt2"] {🔋 cylinder ; 🧊 cube ; ⚪ sphere ; 🍦 cone}
   - Click ALL the cones. → ["opt1","opt2"] {⛰️ pyramid ; 🍦 cone ; 🍦 cone ; ⚪ sphere}
@@ -1478,7 +1486,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
 
 `K|-|takingaway` · no week · enrich-native · partial — missing: taking away from 6 to 10 with pictures: cross out the objects taken away and say how many are left
 
-- **partial** `subtraction:sub_5_pictures` — clause: takes away from 5 with pictures (start with 5, take away 2); never from 6 to 10
+- **partial** `subtraction:sub_5_pictures` — clause: takes away from a pictured group of 2 to 5 (start with 5, take away 2); never from 6 to 10
   - max 5; types: number counters
   - Start with 5, take away 0. How many are left? → 5
   - Start with 5, take away 1. How many are left? → 4
@@ -1494,7 +1502,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - Tom has 3 marbles. Tom gives 2 marbles to Sam. How many marbles does Tom have left? → 1
   - There are 10 books in a box. Sam takes 5 books out. How many books are left in the box? → 5
   - Leo has 3 stickers. Leo gives 2 stickers to Mia. How many stickers does Leo have left? → 1
-- **pre** `counting:count_sequence {"band":10,"dir":"back"}` — why: R.B11.S6 1 less (Pre-K, block R.B11, before this Support lesson's source phase): one less: taking one away
+- **pre** `counting:count_sequence {"band":10,"dir":"back"}` — why: R.B11.S6 1 less (Pre-K, block R.B11, before this Support lesson's source phase): one less: the number before a number on a track
   - max 7; types: number
   - What number comes before 2? → 1
   - What number comes before 5? → 4
@@ -1510,7 +1518,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
   - ? + 2 = 5 → 3
   - 1 + ? = 10 → 9
   - 2 + 8 = ? → 10
-- **pre** `counting:count_objects {"band":10,"objects":"frame"}` — why: R.B11.S1 Find 9 and 10 (Pre-K, block R.B11, before this Support lesson's source phase): counting the counters that are left
+- **pre** `counting:count_objects {"band":10,"objects":"frame"}` — why: R.B11.S1 Find 9 and 10 (Pre-K, block R.B11, before this Support lesson's source phase): counting the counters in a ten frame to 10, as the counters that are left are counted
   - max 10; types: number counters
   - How many dots are there? → 9
   - How many dots are there? → 10

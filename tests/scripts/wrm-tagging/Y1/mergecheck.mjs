@@ -71,6 +71,15 @@ for (const d of docs) {
     for (const id of got) if (!want.includes(id)) problems.push(`${d0.year}: lessons section has ${id}, not a ${d0.year} entry of site-lessons.json`);
   }
 }
+// lessons critic r2 G7: a proposal id the first file shares with another file is the same proposal: kind, skill, name and teaches equal
+{
+  const d0 = docs[0];
+  for (const d of docs.slice(1)) for (const [pid, p] of Object.entries(d0.proposals || {})) {
+    const q = (d.proposals || {})[pid]; if (!q) continue;
+    for (const f of ['kind', 'skill', 'name', 'teaches']) if (JSON.stringify(p[f] ?? null) !== JSON.stringify(q[f] ?? null))
+      problems.push(`${d0.year}: proposal ${pid} differs from ${d.year}'s in ${f} (${JSON.stringify(p[f])} != ${JSON.stringify(q[f])})`);
+  }
+}
 console.log(problems.join('\n'));
 console.log(`mergecheck: ${docs.map(d => d.year).join(' + ')}: ${nWant} direct/partial tags, ${docs.reduce((a, d) => a + d.tagFixes.length, 0)} tagFixes; ${problems.length} problems`);
 console.log(problems.length ? 'mergecheck: FAIL' : 'mergecheck: OK');

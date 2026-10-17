@@ -9,11 +9,20 @@ is a difference and exits 1, and the semantic rules hold on what was written:
   closes[<lesson>] (or lessonCloses[<lesson>] beside a frozen string `closes`) is set and equals the envisioned closes; a lesson
   with one build closes exactly its `missing` (spec_lessons gives a clause only where two builds split it)
   no tagFix names a site lesson
-usage: python3 lessoncheck.py <Y1.json> [<lesson-snapshot.json>]      (exit 1 on any difference)"""
+Lessons critic r2 G7: the snapshot also holds EVERY field of every proposal a lesson uses (proposalsFull), and each written one must
+equal it field by field (teaches, kind, skill, name, option, representation ...). Independently of the snapshot, a proposal copied from
+another source must equal that source in every field but the lesson fields: one copied from R.json (source "R.json (passed lane ...)")
+equals R.json's proposal except closes / lessons / lessonCloses / source / steps / reused (and the R-only correction fields); one copied
+from the live lists (WRM_PROPOSALS, VISUAL_BUILDS, the build list; keys.json `props`) equals it except lessons / closes / lessonCloses /
+reused / source; a lesson-only new one (reused false) has every field the contract asks for.
+usage: python3 lessoncheck.py <Y1.json> [<lesson-snapshot.json> [<keys.json>]]      (exit 1 on any difference)"""
 import json, os, sys
 H = os.path.dirname(os.path.abspath(__file__))
 d = json.load(open(sys.argv[1]))
 snap = json.load(open(sys.argv[2])) if len(sys.argv) > 2 else None
+KEYS = json.load(open(sys.argv[3])) if len(sys.argv) > 3 else None
+R_ROOT = os.path.abspath(os.path.join(H, '..', '..', '..', '..'))
+RJ = json.load(open(os.path.join(R_ROOT, 'data/curriculum/links/R.json')))
 AUDIT = {k: v for k, v in json.load(open(os.path.join(H, 'full_audit.json'))).items() if not k.startswith('_')}
 L, P = d.get('lessons', {}), d['proposals']
 bad = []
@@ -70,6 +79,38 @@ if snap is not None:
             if cur[f] != sp[pid][f]: bad.append(f'proposal {pid}: {f} differs from the snapshot ({cur[f]!r} != {sp[pid][f]!r})')
     if sorted(snap.get('newIds', [])) != sorted(q for q, p in P.items() if p.get('reused') is False and not p.get('steps') and p.get('lessons')):
         bad.append('the lesson-only new proposals differ from the snapshot')
+# G7: the proposals a lesson uses, every field
+LESSON_F = {'lessons', 'lessonCloses', 'closes', 'source', 'steps', 'reused'}
+for pid, p in P.items():
+    if not p.get('lessons'): continue
+    src = str(p.get('source') or '')
+    if src.startswith('R.json'):
+        rp = RJ['proposals'].get(pid)
+        if rp is None: bad.append(f'proposal {pid}: says it is copied from R.json, which has no such id'); continue
+        skip = LESSON_F | {'corrected', 'correctionWhy'}
+        for f in sorted((set(p) | set(rp)) - skip):
+            if p.get(f) != rp.get(f): bad.append(f'proposal {pid}: field {f} differs from R.json ({p.get(f)!r} != {rp.get(f)!r})')
+        if p.get('steps') != [] or p.get('reused') is not True: bad.append(f'proposal {pid}: an R.json copy must have steps [] and reused true')
+    elif 'source' in p:   # a copy from the live lists (a frozen R/Y1 base proposal has no `source`; the frozen gate holds it)
+        if KEYS is None: continue
+        if pid not in KEYS.get('props', {}): bad.append(f'proposal {pid}: source {src!r}, but no live proposal has this id'); continue
+        kp = {k: v for k, v in KEYS['props'][pid].items() if k != '_src'}; kp.setdefault('steps', [])
+        for f in sorted((set(p) | set(kp)) - (LESSON_F - {'steps'})):
+            if p.get(f) != kp.get(f): bad.append(f'proposal {pid}: field {f} differs from its live source {KEYS["props"][pid].get("_src")} ({p.get(f)!r} != {kp.get(f)!r})')
+        if src != KEYS['props'][pid].get('_src'): bad.append(f'proposal {pid}: source {src!r} is not its live source {KEYS["props"][pid].get("_src")!r}')
+        if p.get('reused') is not True: bad.append(f'proposal {pid}: a live copy must have reused true')
+    elif p.get('reused') is False and not p.get('steps'):
+        for f in ('kind', 'skill', 'name', 'teaches', 'representation', 'family', 'ccss', 'why'):
+            if not p.get(f): bad.append(f'new lesson proposal {pid} has no {f}')
+if snap is not None:
+    spf = snap.get('proposalsFull')
+    if spf is None: bad.append('the snapshot has no proposalsFull (G7)')
+    else:
+        used_now = {q for q, p in P.items() if p.get('lessons')}
+        if used_now != set(spf): bad.append(f'the proposals lessons use differ from the snapshot: {sorted(used_now ^ set(spf))}')
+        for pid in sorted(used_now & set(spf)):
+            for f in sorted(set(P[pid]) | set(spf[pid])):
+                if P[pid].get(f) != spf[pid].get(f): bad.append(f'proposal {pid}: field {f} differs from the snapshot finish() returned (G7)')
 for b in bad: print(b)
 print(f'lessoncheck: {len(L)} lessons, {sum(1 for p in P.values() if p.get("lessons"))} lesson proposals checked on the written file; {len(bad)} differences')
 sys.exit(1 if bad else 0)

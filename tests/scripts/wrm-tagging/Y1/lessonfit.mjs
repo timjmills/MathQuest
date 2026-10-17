@@ -210,9 +210,39 @@ export function digitSymbolChecks(text, items) {
   return out;
 }
 const ASKED = [['cube', /\bcubes?\b/i, /\bcubes?\b/i], ['cuboid', /\bcuboids?\b|rectangular prisms?/i, /\bcuboids?\b|rectangular prisms?/i], ['sphere', /\bspheres?\b/i, /\bspheres?\b/i],
-  ['cone', /\bcones?\b/i, /\bcones?\b/i], ['cylinder', /\bcylinders?\b/i, /\bcylinders?\b/i]];
-const NOPIC = /\b(?:no|never|without)\b[^;.]{0,40}\bpictur/i;
+  ['cone', /\bcones?\b/i, /\bcones?\b/i], ['cylinder', /\bcylinders?\b/i, /\bcylinders?\b/i],
+  // lessons critic r2 G8: ANY solid or flat shape the text says is clicked / found / named, not only the five title solids
+  ['pyramid', /\bpyramids?\b/i, /\bpyramids?\b/i], ['prism', /(?<!rectangular )\bprisms?\b/i, /(?<!rectangular )\bprisms?\b/i], ['hemisphere', /\bhemispheres?\b/i, /\bhemispheres?\b/i],
+  ['circle', /\bcircles?\b/i, /\bcircles?\b/i], ['triangle', /\btriangles?\b/i, /\btriangles?\b/i], ['square', /\bsquares?\b/i, /\bsquares?\b/i],
+  ['rectangle', /\brectangles?\b/i, /\brectangles?\b/i], ['hexagon', /\bhexagons?\b/i, /\bhexagons?\b/i], ['pentagon', /\bpentagons?\b/i, /\bpentagons?\b/i],
+  ['diamond', /\bdiamonds?\b|\brhomb\w*/i, /\bdiamonds?\b|\brhomb\w*/i], ['oval', /\bovals?\b/i, /\bovals?\b/i]];
+// G2 / lessons critic r2 G8: "no pictures" in any wording ("words only", "without any drawing", "not pictured", "never a picture")
+const NOPIC = /\b(?:no|never|without)\b[^;.]{0,40}\bpictur|\b(?:no|never|without)\s+(?:any\s+|a\s+)?(?:drawings?|images?)\b|\bwithout any (?:drawing|picture)|\bnot (?:pictured|drawn)\b|\bwords only\b|\bin words alone\b|\bunpictured\b/i;
 const hasPic = i => /"pic":\s*[\[{"]/.test(i.pay || '');
+// a GENERAL "no pictures" claim (no / without any pictures, words only, not pictured) is held to every kind of picture; a narrower
+// negation ("never a pictured group with one more added") only to the story cell's pictured groups (payload.pic)
+const NOPIC_ALL = /\b(?:no|without)\s+(?:any\s+)?(?:pictures?|drawings?|images?)\b|\bnever a (?:picture|drawing)\b|\bwithout any (?:drawing|picture)|\bnot (?:pictured|drawn)\b|\bwords only\b|\bin words alone\b|\bunpictured\b/i;
+const noPicHits = (t, items) => items.filter(i => hasPic(i) || (NOPIC_ALL.test(t) && pictured(i))).length;
+// an item that shows the pupil a picture: a story cell (word-work) only through payload.pic (its markup has svg answer boxes, not
+// pictures); any other item through its picture payload (counters, a bag, a shape), an image, an svg drawing or emoji
+export const pictured = i => i.tpl === 'word-work' ? hasPic(i)
+  : /"kind":"(?:join|takeaway|count|sort|teen)"|"bag":|"shape":|<img|<svg/i.test(`${i.pay || ''} ${i.raw || ''}`) || /[\u{1F300}-\u{1FAFF}\u{2B1B}-\u{2B55}\u{25A0}-\u{25FF}]/u.test(`${i.x || ''} ${i.vis || ''}`);
+// lessons critic r2 F13 / G8 (orientation): a claim that shapes are seen turned or resized needs items that turn or resize them
+const ORIENT = /\bwhichever way\b|\bany way up\b|\bwhatever (?:way|its? (?:size|orientation)|their (?:size|orientation))|\bin any orientation\b|\bhowever (?:it is|they are) turned\b|\bturned (?:or|and) (?:resized|flipped|made (?:bigger|smaller))\b|\b(?:each|every) (?:shape|solid|piece) (?:is )?(?:turned|rotated)\b|\beach turned\b|\bturned a different way\b|\bturned shapes\b|\bat different sizes\b|\bof different sizes\b|\bwhatever way\b/i;
+const turnedItem = i => /rotate\(|transform="[^"]*rotate|"rot(?:ation)?":|"turn(?:ed)?":|\bturn(?:ed|s)?\b|\brotat|\bflip/i.test(`${i.text || ''} ${i.raw || ''} ${i.pay || ''}`);
+// lessons critic r2 F12 (zero): a positive zero claim needs an item that deals 0; a clause that says 0 is never written / found needs none
+const ZEROC = /\bzero\b|\bnone\b|\bempty (?:frame|set|group|plate|box)\b|\bshows 0\b|\bwrites? 0\b/i;
+const zeroItem = i => String(i.a).trim() === '0' || /(?<![\d.])0(?![\d.])/.test(`${i.text || ''} ${i.vis || ''}`);
+// builder r3 sweep class A: a why that says the items build / count / find "4 and 5" (the cited step's window) when they deal a wider
+// range must say "among them"; at least half the items must be those numbers otherwise
+const WINDOW = /\b(?:build\w*|count\w*|find\w*|see\w*|after|before)\s+(?:a group of |groups of |the numbers? )?(\d+)(?:\s*,\s*(\d+))?\s+(?:and|or)\s+(\d+)\b/gi;
+// builder r3 sweep class C: an object named as an example ("apples, fish, balls") must be an object the items show
+const OBJN = ['apple', 'fish', 'ball', 'flower', 'star', 'heart', 'cookie', 'button', 'crayon', 'bead', 'stamp', 'shell', 'balloon', 'truck', 'feather'];
+// builder r3 sweep class D (audit rows): a code the row reads as dealt must be dealt by the direct items
+export const STD_ITEM = {
+  'K.G.A.2': { why: 'shapes named whatever their orientation or size', ok: items => items.some(turnedItem) },
+  'K.G.A.3': { why: 'flat (2-D) told from solid (3-D)', ok: items => items.some(i => /\bflat\b|\bsolid\b|two-dimensional|three-dimensional|\b2-?D or 3-?D\b/i.test(i.text || '')) },
+  'K.CC.A.3': { why: 'a numeral written', ok: items => items.filter(i => /^(number|text)$/.test(i.at || '')).length >= items.length / 2 } };
 // G5 (lessons critic r1): a bound the text states ("wholes to 20", "numbers to 100") must be reached: a bound past 1.5 x the largest
 // number dealt (and past it + 2) is a false claim; a negated bound ("never past 10") is not a claim
 export function boundTooBig(text, items) {
@@ -247,10 +277,19 @@ function whyCheck(e, r) {
     if (!r.items.some(i => ire.test(i.text || '') || (ire.test(String(i.a || '')) && !/^\s*\[/.test(String(i.a || ''))))) out.push(`says the pupil is asked for the ${shp}, but no item asks for one (only drawn)`);
   }
   // G2: "no pictures" / "told in words, no pictures" is false when the story cell pictures the groups (payload.pic)
-  if (NOPIC.test(w0) && r.items.filter(hasPic).length > N / 3) out.push(`says no pictures, but ${r.items.filter(hasPic).length} of ${N} items picture the groups (payload pic)`);
+  if (NOPIC.test(w0) && noPicHits(w0, r.items) > N / 3) out.push(`says no pictures, but ${noPicHits(w0, r.items)} of ${N} items show a picture`);
   // G5: a bound the text names ("wholes to 20", "to 100") that the items never come near
   for (const f of boundTooBig(w, r.items)) out.push(f);
-  if (/\bpictures?\b|\bpictured\b/i.test(pos) && r.items.filter(i => /<svg|<img|emoji|counters|"shape"|"bag"|"objects"|"kind"/i.test(`${i.raw} ${i.pay}`) || /[\u{1F300}-\u{1FAFF}]/u.test(`${i.x} ${i.vis}`)).length < N / 2) out.push('why says pictured but most items have no picture');
+  // G8: a POSITIVE picture claim ("pictured", "pictures", "to cross out") needs pictured items; a story cell is pictured only by payload.pic
+  if (/\bpictures?\b|\bpictured\b|\bcross(?:es|ed|ing)? out\b/i.test(pos) && r.items.filter(pictured).length < N / 2) out.push(`why says pictured (or crossed out) but only ${r.items.filter(pictured).length} of ${N} items show a picture`);
+  if (ORIENT.test(pos) && !r.items.some(turnedItem)) out.push(`says the shapes are seen ${(pos.match(ORIENT) || [''])[0]}, but no item turns or resizes a shape (each is one fixed drawing)`);
+  if (ZEROC.test(pos) && !r.items.some(zeroItem)) out.push(`says "${(pos.match(ZEROC) || [''])[0]}", but no item deals 0 (no answer 0, no 0 shown)`);
+  for (const m of pos.matchAll(WINDOW)) { const S = new Set([m[1], m[2], m[3]].filter(Boolean)), rest = pos.slice(m.index, m.index + 80);
+    if (/\bamong\b/i.test(rest)) continue;
+    const hit = r.items.filter(i => S.has(String(i.a).trim())).length;
+    if (hit < N / 2) out.push(`says "${m[0]}", but only ${hit} of ${N} items are those numbers (say "among them" or the real range)`); }
+  for (const o of OBJN) if (new RegExp(`\\b${o}(?:e?s)?\\b`, 'i').test(pos) && !r.items.some(i => new RegExp(`\\b${o}(?:e?s)?\\b`, 'i').test(`${i.text} ${i.a} ${i.x} ${i.vis} ${i.pay}`))) out.push(`names "${o}" as an example, but no item shows one`);
+  if (/\badd-more stor(?:y|ies)\b/i.test(pos) && !/put-together|\bcombin/i.test(pos) && r.items.filter(i => /\bin all\?/i.test(i.text || '')).length >= N / 5) out.push(`says add-more stories, but ${r.items.filter(i => /\bin all\?/i.test(i.text || '')).length} of ${N} items are put-together stories (how many in all?)`);
   for (const tc of TR.tableClaims(pos)) { const hit = r.items.filter(i => tc.re.test(`${CL.itemWords(i)} ¦ ${i.pay || ''}`)).length;
     if (hit < tc.s * N) out.push(`why claims "${tc.word}" (${tc.n}) but only ${hit} of ${N} items deal it`); }
   for (const h of CL.claimHits(CL.claimText(w0, titles), r.items, { gateOnly: true })) if (!h.ok) out.push(`why claims "${h.word}" (${h.claim}) but only ${h.hit} of ${h.n} items show it`);
@@ -258,7 +297,8 @@ function whyCheck(e, r) {
   const KW = [[/\bheavier|\blighter\b/i, /heav|light/i], [/\blonger\b|\bshorter\b/i, /long|short/i], [/\btaller\b/i, /tall|short/i], [/\bodd\b|\beven\b/i, /\bodd\b|\beven\b/i],
     [/\bdoubles?\b/i, /doubl|\b(\d+) \+ \1\b/i], [/\bstor(?:y|ies)\b/i, /[a-z]\.\s+[A-Z][^?]*\?/], [/\bone more\b|\b1 more\b/i, /\bmore\b|\bafter\b|\bnext\b/i], [/\bone less\b|\b1 less\b/i, /\bless\b|\bbefore\b/i],
     [/\bsort(?:s|ing)?\b/i, /sort|count only|ring|group/i], [/\bsides\b/i, /\bsides?\b/i], [/\bcorners\b/i, /corner|vert/i],
-    [/\bshar(?:e|es|ed|ing)\b/i, /\bshare|\bshared|\bsharing|each (?:child|friend|plate|person|bag) gets?|\bhalf\b|\bhalve/i]];   // G2: sharing is not grouping
+    [/\bshar(?:e|es|ed|ing)\b|\bsplit\b[^;.]{0,30}\binto (?:\d+|two|three|four) equal (?:groups|parts|shares)\b|\binto (?:\d+|two|three|four) equal groups\b/i, /\bshare|\bshared|\bsharing|each (?:child|friend|plate|person|bag) gets?|\bhalf\b|\bhalve/i],   // G2 / G8: sharing (or splitting into N equal groups) is not grouping
+    [/\bin twos\b|\btwo by two\b|\bone above the other\b|\bfill(?:s|ing)? the frame\b/i, /\bpairs?\b|\btwos\b|\bodd\b|\beven\b|\bdoubl/i]];   // r1-9: a fill order or pairing claim
   for (const [c, i] of KW) if (c.test(pos) && r.items.filter(it => i.test(`${it.text} ${it.a} ${it.x} ${it.vis}`)).length < N / 5) out.push(`why says "${(pos.match(c) || [''])[0]}" but fewer than a fifth of the items do it`);
   return out;
 }
@@ -329,7 +369,7 @@ function missedOptions(s) {
 // lessons critic r1 G4: a FULL lesson is held to its title AND to every CCSS code the site tags it with, through the hand-audit row
 // of full_audit.json (read from items, one entry per code); the row must name exactly the lesson's direct links, and a lesson that is
 // not FULL has no row
-const AUDIT = JSON.parse(fs.readFileSync(new URL('full_audit.json', import.meta.url), 'utf8'));
+const AUDIT = JSON.parse(fs.readFileSync(process.env.WRM_FULL_AUDIT || new URL('full_audit.json', import.meta.url), 'utf8'));   // lessonmut.py may point it at a mutated copy
 const sigL = l => JSON.stringify(l.map(e => ({ key: e.key, opts: e.opts || {} })));
 export function fullAuditCheck(id, s) {
   const row = AUDIT[id], out = [];
@@ -339,6 +379,16 @@ export function fullAuditCheck(id, s) {
   if (String(row.title || '').length < 40) out.push('the audit row does not read the title');
   for (const c of s.site.ccss || []) if (String((row.ccss || {})[c] || '').length < 40) out.push(`the audit row does not read the site's ${c}`);
   for (const c of Object.keys(row.ccss || {})) if (!(s.site.ccss || []).includes(c)) out.push(`the audit row reads ${c}, which the site does not tag`);
+  // builder r3 (critic r2 F11 / n6): a code the row reads as DEALT (a sentence naming it with no not / never / no) must be dealt by
+  // the direct items; a group-size range the row states ("groups of 2 to 5") must hold for every item
+  const items = s.direct.flatMap(e => P(e).items);
+  const texts = [row.title || '', ...Object.values(row.ccss || {})].join(' . ');
+  for (const sent of texts.split(/[.;](?:\s|$)/)) for (const [code, t] of Object.entries(STD_ITEM)) {
+    if (!sent.includes(code) || /\bnot\b|\bnever\b|\bno\b|\bsite tag\b/i.test(sent)) continue;
+    if (!t.ok(items)) out.push(`the row reads ${code} as dealt (${t.why}), but the direct items never do it: "${sent.trim().slice(0, 120)}"`); }
+  for (const m of texts.matchAll(/\bgroups? of (\d+) to (\d+)\b/gi)) { const lo = +m[1], hi = +m[2];
+    const off = items.filter(i => { const p = (() => { try { return JSON.parse(i.pay || '{}'); } catch (er) { return {}; } })(); return ['a', 'b', 'n'].some(k => typeof p[k] === 'number' && (p[k] < lo || p[k] > hi)); });
+    if (off.length) out.push(`the row says "${m[0]}", but ${off.length} of ${items.length} items have a group outside it`); }
   return out;
 }
 for (const id of Object.keys(AUDIT)) if (!id.startsWith('_') && !(d.lessons || {})[id]) { console.log(`FULLAUDIT: a row for ${id}, not a lesson`); process.exitCode = 1; }
@@ -368,7 +418,11 @@ for (const [id, s] of Object.entries(d.lessons || {})) {
       for (const h of CL.claimHits(e.missing, r.items, { gateOnly: true })) if (!h.ok) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause claims "${h.word}" (${h.claim}) but only ${h.hit} of ${h.n} items show it`);
       for (const h of CL.negatedHits(e.missing, r.items)) if (!h.ok) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause says "${h.part}" is not dealt, but ${h.hit} of ${h.n} items do it (${h.claim})`);
       for (const f of digitSymbolChecks(e.missing, r.items)) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})}: ${f}`);
-      if (NOPIC.test(e.missing) && r.items.filter(hasPic).length > r.items.length / 3) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause says no pictures, but ${r.items.filter(hasPic).length} of ${r.items.length} items picture the groups (payload pic)`);
+      if (NOPIC.test(e.missing) && noPicHits(e.missing, r.items) > r.items.length / 3) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause says no pictures, but ${noPicHits(e.missing, r.items)} of ${r.items.length} items show a picture`);
+      // lessons critic r2 F12: "never 0 as a number to write / find / answer" is false when an item answers 0
+      for (const p of CL.negatedParts(e.missing)) if (/(?<![\d.])0(?![\d.])|\bzero\b/i.test(p) && /\bwrit|\banswer|\bfind|\bas a number\b/i.test(p)) {
+        const z = r.items.filter(i => String(i.a).trim() === '0').length;
+        if (z) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause says "never ${p}", but ${z} of ${r.items.length} items have the answer 0`); }
       for (const f of boundTooBig(e.missing, r.items)) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause: ${f}`);
       for (const f of whyCheck({ why: e.missing.replace(/\b(?:never|no|not|without)\b[^;.]*/gi, ' ') }, r)) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause: ${f}`);
     }
@@ -380,6 +434,8 @@ for (const [id, s] of Object.entries(d.lessons || {})) {
       if (ownSig.has(sg)) fails.push(`${role} ${e.key}${JSON.stringify(e.opts || {})}: deals the same items as the lesson's own ${ownSig.get(sg)} (class F)`);
       if (seen.has(sg)) fails.push(`${role} ${e.key}: duplicate of ${seen.get(sg)} (same items)`); else seen.set(sg, e.key); } }
   for (const f of missedOptions(s)) fails.push(`M: ${f}`);
+  // rule 10 (lessons critic r2: lessonfit missed it, lessons.py R10 caught it): one key is never both a pre and a related
+  for (const k of new Set(s.pre.map(e => e.key))) if (s.related.some(e => e.key === k)) fails.push(`R10: ${k} is both a pre and a related`);
   for (const f of fullAuditCheck(id, s)) fails.push(`FULLAUDIT: ${f}`);
   const one = { steps: {}, lessons: { [id]: s } };
   for (const x of TR.titleRepFinds(one, (k, o) => { const e = [...s.direct, ...s.partial].find(z => z.key === k && JSON.stringify(z.opts || {}) === JSON.stringify(o || {})); return probe(k, o || {}, e ? rangeOf(e) : 10000).items; }).finds) fails.push(`TITLEREP ${x.kind}: ${x.msg}`);

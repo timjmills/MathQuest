@@ -79,8 +79,47 @@ def _(d): L(d, 'compositionof4and5bonds')['related'].append({'key': 'addition:ad
 def _(d): L(d, 'bondsto10explorecombinationsthatmake10')['pre'][0]['why'] += ' (wholes to 20)'
 @m('G4 FULLAUDIT: lesson 26 made FULL (no hand-audit row against K.G.A.2)', r'FULLAUDIT: full, but no hand-audit row')
 def _(d): l = L(d, 'explore2dshapescircletrianglerectanglesquare'); l.update(verdict='full', missing='', build=[], envision=[], direct=[{'key': 'shapes_early:name_2d_shapes', 'opts': {'forms': [1], 'shapes': [0, 1, 2]}}], partial=[])
-@m('G4 FULLAUDIT: lesson 5 direct re-optioned away from its audit row', r"FULLAUDIT: the audit row's links")
-def _(d): L(d, '3dshapescubecuboidsphereconecylinder')['direct'] = [{'key': 'shapes_early:name_3d_shapes', 'opts': {'forms': [0]}}]
+@m('G4 FULLAUDIT: lesson 16 direct re-optioned away from its audit row', r"FULLAUDIT: the audit row's links")
+def _(d): L(d, 'comparemass1')['direct'] = [{'key': 'measurement:heavier_lighter_visual', 'opts': {'forms': [1]}}]
+# ── round 3 (critic r2 F11-F13, G8, n1, and the builder's root-cause sweep classes) ──
+@m('F12 re-inject: lesson 27 clause "never 0 as a number to write or find on a track" (1 item in 10 answers 0)', r'have the answer 0')
+def _(d): L(d, 'introducingzero')['partial'][0]['missing'] = 'takes away from a pictured group to 5 and asks how many are left; about 1 item in 10 takes every counter away, so the answer is 0 (start with 4, take away 4); never an empty set to count on its own and never 0 as a number to write or find on a track'
+@m('F13 re-inject: lesson 35 pre why "whichever way it is drawn" (fixed glyphs)', r'no item turns or resizes')
+def _(d): L(d, 'spatialreasoning1matchrotatemanipulate')['pre'][0]['why'] = L(d, 'spatialreasoning1matchrotatemanipulate')['pre'][0]['why'].split(':')[0] + ': finding every square and rectangle, whichever way it is drawn'
+@m('ORIENT: lesson 26 related compose_shapes "each turned a different way"', r'no item turns or resizes')
+def _(d): L(d, 'explore2dshapescircletrianglerectanglesquare')['related'][0]['why'] = 'two shapes put together, each turned a different way, make a new shape'
+@m('G8 NOPIC: lesson 8 add_wp_10 clause "written without any drawing"', r'says no pictures, but')
+def _(d): L(d, 'addingmorefirstthennowstories')['partial'][1]['missing'] = 'add-more stories to 10 written without any drawing; never three panels (first, then, now)'
+@m('G8 positive picture: lesson 39 sub_wp_10 clause "every counter pictured to cross out" (pic absent)', r'why says pictured')
+def _(d): L(d, 'takingaway')['partial'][1]['missing'] = 'take-away stories within 10 with every counter pictured to cross out; never from 6 to 10 without words'
+@m('G8 ASKED: lesson 24 forms 1 clause "clicks every ... cone or pyramid" (the pyramid is only drawn)', r'asked for the pyramid')
+def _(d): L(d, 'deepeningunderstandingconsolidate2d3dshapes')['partial'][1]['missing'] = 'clicks every sphere, cylinder, cube, cone or pyramid among other solids; never links a solid to its flat faces'
+@m('G8 split: lesson 25 related share_into_groups why "split into 2 equal groups" (the items group)', r'why says "split')
+def _(d): L(d, 'doublingupto55')['related'] = [{'key': 'division:share_into_groups', 'opts': {'band': 12}, 'why': 'a group split into 2 equal groups: the inverse of doubling'}]
+@m('r1-9 fill order: lesson 28 ten_frame_build why "counters fill the frame in twos"', r'in twos|fill')
+def _(d): L(d, 'makingpairs')['pre'][2]['why'] = L(d, 'makingpairs')['pre'][2]['why'].split(':')[0] + ': counters fill the frame in twos, one above the other'
+@m('R10: lesson 19 pre key repeated as a related', r'^R10: ')
+def _(d): L(d, 'comparingnumbersto10')['related'].append(copy.deepcopy(L(d, 'comparingnumbersto10')['pre'][0]) | {'why': 'counting groups to 10'})
+@m('sweep A window: lesson 22 pre ten_frame_build why "building 4 and 5 on a frame" (1 to 5 dealt)', r'among them')
+def _(d): L(d, 'compositionof4and5bonds')['pre'][0]['why'] = L(d, 'compositionof4and5bonds')['pre'][0]['why'].split(':')[0] + ': building 4 and 5 on a frame'
+@m('sweep B zero: lesson 27 pre ten_frame_build why "an empty frame shows 0" (never empty)', r'no item deals 0')
+def _(d): L(d, 'introducingzero')['pre'][1]['why'] = L(d, 'introducingzero')['pre'][1]['why'].split(':')[0] + ': building a number to 5 on a frame: an empty frame shows 0'
+@m('sweep C example: lesson 34 clause "(by kind: apples, cookies, balls)" (no cookie dealt)', r'names "cookie"')
+def _(d): L(d, 'sortobjectsbyoneattributecoloursizeshape')['partial'][0]['missing'] = L(d, 'sortobjectsbyoneattributecoloursizeshape')['partial'][0]['missing'].replace('apples, balls, fish, flowers', 'apples, cookies, balls')
+@m('n1 story kind: lesson 8 clause "add-more stories" only (a third are put-together)', r'put-together stories')
+def _(d): L(d, 'addingmorefirstthennowstories')['partial'][1]['missing'] = 'add-more stories to 10 told in words (I have 3 balls. I get 2 more balls.), the two groups pictured in one row under the story; never three panels (first, then, now) and the pupil must read the story'
+# audit-row mutations (run with WRM_FULL_AUDIT pointing at a mutated full_audit.json; data[lesson] is applied to the file)
+AUD = json.load(open(os.path.join(H, 'full_audit.json')))
+AM = []
+def _a5(d, a):   # F11 re-inject: lesson 5 back to FULL with its round-2 row
+    l = L(d, '3dshapescubecuboidsphereconecylinder'); l.update(verdict='full', missing='', build=[], envision=[], partial=[], direct=[{'key': 'shapes_early:name_3d_shapes', 'opts': {'forms': [0]}}, {'key': 'shapes_early:name_3d_shapes', 'opts': {'forms': [1]}}])
+    a[K + '3dshapescubecuboidsphereconecylinder'] = {'links': l['direct'], 'title': '3D shapes (cube, cuboid, sphere, cone, cylinder): forms 0 shows one drawn solid and the pupil picks its name, all five named; forms 1 asks the pupil to click every sphere, cylinder, cube or cone among other solids',
+        'ccss': {'1.G.A.1': "the lesson is the Reception step R.B12.S1. Naming the five solids is K.G.A.2 / K.G.A.3, which the two forms deal (owner question)"}}
+AM.append(('F11 re-inject: lesson 5 FULL, its row claiming K.G.A.2 / K.G.A.3 are dealt', r'reads K\.G\.A\.[23] as dealt', _a5))
+def _a32(d, a): a[K + 'representnumbersto5']['ccss']['2.NBT.A.1'] = "the content is K.CC.B.4 and K.CC.A.3 (a numeral and a set of objects), which the frame build deals"
+AM.append(('n6 re-inject: lesson 32 row reads K.CC.A.3 as dealt (the pupil never writes a numeral)', r'reads K\.CC\.A\.3 as dealt', _a32))
+def _a13(d, a): a[K + 'compareamountsmorefewersame']['title'] = 'Compare amounts (more, fewer, same): two pictured groups of 2 to 5, the pupil says which has more, which has fewer, or whether they are the same'
+AM.append(('audit row range: lesson 13 "groups of 2 to 5" (groups of 1 are dealt)', r'groups of 2 to 5', _a13))
 @m('RANGE full: 1-2-3 lesson made full on number_bonds band 5', r'RANGE: full')
 def _(d): l = L(d, 'compositionof123partsmakethewhole'); l.update(verdict='full', missing='', build=[], direct=[{'key': 'composing:number_bonds', 'opts': {'band': 5}}], partial=[])
 @m('RANGE partial: clause silent on numbers past the lesson', r'RANGE: \d+ items')
@@ -98,12 +137,21 @@ for name, target, f in M:
     ok = bool(hit) and r.returncode == 1
     missed += 0 if ok else 1
     print(f"{'CAUGHT' if ok else 'MISSED'} exit {r.returncode} | A {name}\n      {hit[0][:200] if hit else (lines[:1] or [''])[0][:200]}")
+for name, target, f in AM:
+    d = copy.deepcopy(base); a = copy.deepcopy(AUD); f(d, a); p = os.path.join(TMP, 'm.json'); json.dump(d, open(p, 'w'), ensure_ascii=False)
+    ap = os.path.join(TMP, 'audit.json'); json.dump(a, open(ap, 'w'), ensure_ascii=False)
+    r = subprocess.run(['node', os.path.join(H, 'lessonfit.mjs'), p], capture_output=True, text=True, env=dict(env, WRM_FULL_AUDIT=ap))
+    lines = [l.strip() for l in r.stdout.splitlines() if l.startswith('   ')]
+    hit = [l for l in lines if re.search(target, l)]
+    ok = bool(hit) and r.returncode == 1
+    missed += 0 if ok else 1
+    print(f"{'CAUGHT' if ok else 'MISSED'} exit {r.returncode} | A audit {name}\n      {hit[0][:200] if hit else (lines[:1] or [''])[0][:200]}")
 # ── B. lessons.py checks, through build.py --dry on a mutated spec ──
 SPEC = open(os.path.join(H, 'spec_lessons.py')).read()
 B = [('full with a build', "    direct=[('composing:make_ten', {'band': 10})],\n    verdict='full',", "    direct=[('composing:make_ten', {'band': 10})],\n    verdict='full', build=['number_focus'],", r'full but build'),
-     ('rule 15: 2 pre, no "Pre-skills are few"', "         ('comparing:compare_groups', {'band': 5, 'level': [1]}, 'R.B1.S7', 'fewer: none is the fewest of all')],", "         ],", r'rule 15'),
+     ('rule 15: 2 pre, no "Pre-skills are few"', "         ('comparing:compare_groups', {'band': 5, 'level': [1]}, 'R.B1.S7', 'which of two pictured groups has fewer counters (groups of 1 to 5, never an empty group)')],", "         ],", r'rule 15'),
      ('related cites a step (belongs in pre)', "related=[('addition:add_5_pictures', {}, 'the inverse: join two groups and say how many in all')]", "related=[('addition:add_5_pictures', {}, 'R.B9.S9 the inverse: join two groups and say how many in all')]", r'belongs in pre'),
-     ('class F key: a pre repeats the partial key', "    pre=[('counting:count_sequence', {'band': 10, 'dir': 'back'}, 'R.B11.S6', 'one less: taking one away'),", "    pre=[('subtraction:sub_5_pictures', {'objects': 'pictures'}, 'R.B11.S6', 'one less: taking one away'),", r'class F'),
+     ('class F key: a pre repeats the partial key', "    pre=[('counting:count_sequence', {'band': 10, 'dir': 'back'}, 'R.B11.S6', 'one less: the number before a number on a track'),", "    pre=[('subtraction:sub_5_pictures', {'objects': 'pictures'}, 'R.B11.S6', 'one less: taking one away'),", r'class F'),
      ('unknown skill key', "('composing:make_ten', {'band': 5}, 'how many more make 5: the missing part of a fact within 5')", "('composing:make_eleven', {'band': 5}, 'how many more make 5')", r'unknown or retired'),
      ('closes names a proposal outside the build', "    closes={'sort_groups': 'sorting every object", "    closes={'nl_20': 'x', 'sort_groups': 'sorting every object", r'not its build'),
      ('a lesson left out', "lesson(K_ + 'takingaway',", "(lambda *a, **k: None)(K_ + 'takingaway',", r'site lesson not tagged')]
@@ -147,9 +195,12 @@ print(f"{'CAUGHT' if ok else 'MISSED'} exit {r.returncode} | C mergecheck: a sit
 def _plf(p): return {'lessons': copy.deepcopy(p.get('lessons')), 'lessonCloses': copy.deepcopy(p.get('lessonCloses')),
                      'closes': {k: v for k, v in p['closes'].items() if '|-|' in k} if isinstance(p.get('closes'), dict) else None}
 SN = os.path.join(TMP, 'snap.json')
-json.dump({'lessons': base['lessons'], 'newIds': sorted(q for q, p in base['proposals'].items() if p.get('reused') is False and not p.get('steps') and p.get('lessons')),
-           'proposals': {q: _plf(p) for q, p in base['proposals'].items() if p.get('lessons') or p.get('lessonCloses') or (isinstance(p.get('closes'), dict) and any('|-|' in k for k in p['closes']))}},
-          open(SN, 'w'), ensure_ascii=False)
+SNAPD = {'lessons': base['lessons'], 'newIds': sorted(q for q, p in base['proposals'].items() if p.get('reused') is False and not p.get('steps') and p.get('lessons')),
+         'proposals': {q: _plf(p) for q, p in base['proposals'].items() if p.get('lessons') or p.get('lessonCloses') or (isinstance(p.get('closes'), dict) and any('|-|' in k for k in p['closes']))},
+         'proposalsFull': {q: p for q, p in base['proposals'].items() if p.get('lessons')}}
+json.dump(SNAPD, open(SN, 'w'), ensure_ascii=False)
+KJ = os.path.join(os.environ.get('WRM_TAG_DATA') or TMP, 'keys.json')
+if not os.path.exists(KJ): subprocess.run(['node', os.path.join(H, 'keys.mjs'), KJ], check=True)
 def _p7(d): L(d, 'bondsto10explorecombinationsthatmake10')['build'] = ['zero']
 def _p4(d):
     q = [x for x in d['proposals'] if (d['proposals'][x].get('lessons') or []) and d['proposals'][x].get('reused') is False and not d['proposals'][x].get('steps')][0]
@@ -163,15 +214,33 @@ D = [('p1 re-option of lesson 39 pre count_sequence to band 20', lambda d: L(d, 
      ('p8 lesson 39 pre why "wholes to 100"', lambda d: L(d, 'takingaway')['pre'][1].update(why=L(d, 'takingaway')['pre'][1]['why'] + ' (wholes to 100)')),
      ('a lesson note changed', lambda d: L(d, 'makingpairs').update(note='x')),
      ('an envision closes changed', lambda d: L(d, 'takingaway')['envision'][0].update(closes='y')),
-     ('a FULL lesson\'s audit row: lesson 1 back to partial with its row kept', lambda d: L(d, 'addandsubtractwithin5writtenverticallycolumnform').update(verdict='partial'))]
-r0 = subprocess.run([sys.executable, os.path.join(H, 'lessoncheck.py'), Y1, SN], capture_output=True, text=True)
+     ('a FULL lesson\'s audit row: lesson 1 back to partial with its row kept', lambda d: L(d, 'addandsubtractwithin5writtenverticallycolumnform').update(verdict='partial')),
+     # critic r2 G7 (p15, p16) and the source gates
+     ('p15 classify_count_all.teaches = "multiplying two-digit numbers"', lambda d: d['proposals']['classify_count_all'].update(teaches='multiplying two-digit numbers')),
+     ('p16 compare_shapes.kind = option, .skill = name_2d_shapes', lambda d: d['proposals']['compare_shapes'].update(kind='option', skill='shapes_early:name_2d_shapes')),
+     ('a live copy (shape_draw, WRM_PROPOSALS) teaches changed', lambda d: d['proposals']['shape_draw'].update(teaches='drawing')),
+     ('the new solids_turned.representation changed', lambda d: d['proposals']['solids_turned'].update(representation='a number line'))]
+r0 = subprocess.run([sys.executable, os.path.join(H, 'lessoncheck.py'), Y1, SN, KJ], capture_output=True, text=True)
 ok = r0.returncode == 0; missed += 0 if ok else 1
 print(f"{'OK    ' if ok else 'FAILED'} exit {r0.returncode} | D lessoncheck: the built file passes unmutated")
 for name, f in D:
     d = copy.deepcopy(base); f(d); json.dump(d, open(p, 'w'), ensure_ascii=False)
-    r = subprocess.run([sys.executable, os.path.join(H, 'lessoncheck.py'), p, SN], capture_output=True, text=True)
+    r = subprocess.run([sys.executable, os.path.join(H, 'lessoncheck.py'), p, SN, KJ], capture_output=True, text=True)
     ok = r.returncode == 1; missed += 0 if ok else 1
     print(f"{'CAUGHT' if ok else 'MISSED'} exit {r.returncode} | D lessoncheck: {name}\n      {r.stdout.strip().splitlines()[:1]}")
-n = len(M) + len(B) + 1 + 4 + 2 + 1 + len(D)
+# G7: a copied proposal edited in the file AND the snapshot alike is still caught by its source (R.json, the live lists)
+for name, pid, f in [('compare_shapes (R.json copy) teaches, snapshot edited too', 'compare_shapes', lambda p: p.update(teaches='x')),
+                     ('vis_story_strip (VISUAL_BUILDS copy) name, snapshot edited too', 'vis_story_strip', lambda p: p.update(name='x'))]:
+    d = copy.deepcopy(base); f(d['proposals'][pid]); json.dump(d, open(p, 'w'), ensure_ascii=False)
+    sn = copy.deepcopy(SNAPD); f(sn['proposalsFull'][pid]); sp = os.path.join(TMP, 'snap2.json'); json.dump(sn, open(sp, 'w'), ensure_ascii=False)
+    r = subprocess.run([sys.executable, os.path.join(H, 'lessoncheck.py'), p, sp, KJ], capture_output=True, text=True)
+    ok = r.returncode == 1 and 'differs from' in r.stdout; missed += 0 if ok else 1; D.append((name, None))
+    print(f"{'CAUGHT' if ok else 'MISSED'} exit {r.returncode} | D lessoncheck source gate: {name}\n      {r.stdout.strip().splitlines()[:1]}")
+# G7: mergecheck compares a proposal id Y1 shares with another lane (kind / skill / name / teaches)
+d = copy.deepcopy(base); d['proposals']['compare_shapes']['teaches'] = 'x'; json.dump(d, open(p, 'w'), ensure_ascii=False)
+r = subprocess.run(['node', os.path.join(H, 'mergecheck.mjs'), p, R + 'data/curriculum/links/R.json'], capture_output=True, text=True)
+ok = r.returncode == 1 and "differs from R's in teaches" in r.stdout; missed += 0 if ok else 1; D.append(('mergecheck shared proposal', None))
+print(f"{'CAUGHT' if ok else 'MISSED'} exit {r.returncode} | C mergecheck: a proposal shared with R.json differs in teaches")
+n = len(M) + len(AM) + len(B) + 1 + 4 + 2 + 1 + len(D)
 print(f'lessonmut: {n} mutations, {missed} missed')
 sys.exit(1 if missed else 0)

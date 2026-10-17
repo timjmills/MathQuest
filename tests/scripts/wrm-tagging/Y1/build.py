@@ -84,7 +84,10 @@ lessons, SPEC = ns['finish'](out['steps'], out['proposals'], out['tagFixes'], pr
 def _plf(p): return {'lessons': copy.deepcopy(p.get('lessons')), 'lessonCloses': copy.deepcopy(p.get('lessonCloses')),
                      'closes': {k: v for k, v in p['closes'].items() if '|-|' in k} if isinstance(p.get('closes'), dict) else None}
 SNAP = {'lessons': copy.deepcopy(lessons), 'newIds': sorted(ns['LNEW']),
-        'proposals': {pid: _plf(p) for pid, p in out['proposals'].items() if p.get('lessons') or p.get('lessonCloses') or (isinstance(p.get('closes'), dict) and any('|-|' in k for k in p['closes']))}}
+        'proposals': {pid: _plf(p) for pid, p in out['proposals'].items() if p.get('lessons') or p.get('lessonCloses') or (isinstance(p.get('closes'), dict) and any('|-|' in k for k in p['closes']))},
+        # lessons critic r2 G7: EVERY field of every proposal a lesson uses (teaches, kind, skill, name, option, representation ...), so a
+        # post-finish() edit of any of them is a difference; lessoncheck.py also holds the copied proposals to their sources
+        'proposalsFull': {pid: copy.deepcopy(p) for pid, p in out['proposals'].items() if p.get('lessons')}}
 out['lessons'] = lessons
 if errs:
     print('\n'.join(errs)); sys.exit(f'build: {len(errs)} errors')
@@ -103,7 +106,7 @@ def run(cmd, name):
         print(r.stdout[-6000:], r.stderr[-2000:]); fails += 1
 run([sys.executable, os.path.join(H, 'lessonspec.py'), OUT, spec_path], 'lessonspec')
 snap_path = os.path.join(DATA, 'lesson-snapshot.json'); json.dump(SNAP, open(snap_path, 'w'), ensure_ascii=False, indent=1)
-run([sys.executable, os.path.join(H, 'lessoncheck.py'), OUT, snap_path], 'lessoncheck')
+run([sys.executable, os.path.join(H, 'lessoncheck.py'), OUT, snap_path, os.path.join(DATA, 'keys.json')], 'lessoncheck')
 L = R + 'data/curriculum/links/'
 run(['node', os.path.join(H, 'mergecheck.mjs'), OUT], 'mergecheck Y1')
 for y in ('R', 'Y2', 'Y3', 'Y4', 'Y5', 'Y6'): run(['node', os.path.join(H, 'mergecheck.mjs'), OUT, L + f'{y}.json'], f'mergecheck Y1+{y}')

@@ -1,4 +1,4 @@
-# Wave 2 tagging: Year 1 (US Kindergarten) — site lessons (owner rule 2026-10-16), round 2
+# Wave 2 tagging: Year 1 (US Kindergarten) — site lessons (owner rule 2026-10-16), round 3
 
 Output: the top-level `lessons` section of `data/curriculum/links/Y1.json`, written by `tests/scripts/wrm-tagging/Y1/build.py`
 (spec `spec_lessons.py`; shape and checks `lessons.py`; gates `lessonfit.mjs`, `lessonspec.py`, `mergecheck.mjs`; mutations
@@ -13,6 +13,67 @@ cannot run `gen.py` without it, critic r1 D1), then `python3 tests/scripts/wrm-t
 which needs a new critic), then `python3 tests/scripts/wrm-tagging/Y1/build.py`. The lessons build strips what an earlier run of itself added, verifies the frozen
 sha, adds the lessons, writes, and runs every gate; running it twice gives the same bytes. Nothing of the R/Y1 lane's shared
 top-level files was moved or changed.
+
+## Round 3 (critic r2 FAIL: mean 7.92, min 7) — every row
+
+Builder escalated from Opus low to Opus medium (CLAUDE.md rule; recorded in `design/STATUS.md`): false whys / clauses and an
+overclaimed FULL survived rounds 1 and 2. Every row below was read on fresh items (seeds 30011 / 7101 / 9001 / 61001, 40-400 items a
+link) and is gated where a regex can see it.
+
+| Row | Lesson(s) | Change |
+|---|---|---|
+| F11 | 5 | **partial**, not full. `name_3d_shapes {forms:[0]}` and `{forms:[1]}` become partials: each solid is ONE fixed drawing (forms 0: 1 distinct drawing per solid in 100 items; forms 1: one emoji per solid, its name printed beside it), so a solid is never turned or resized, the reason lesson 26 is partial. Missing: "naming the five solids whatever way they are turned and whatever their size". Build: **`solids_turned`** (new: an option on `name_3d_shapes`; no existing proposal turns or resizes solids, `defining_attributes` is 2-D only). Its `full_audit.json` row is deleted (a partial lesson has none). No K.G.A.2 / K.G.A.3 claim remains in the lesson: the note says the site's 1.G.A.1 non-defining attributes (orientation, size) are what is missing, and no item tells flat from solid |
+| F12 | 27 | `sub_5_pictures` clause: "about 1 item in 10 takes every counter away, and the pupil writes 0 for the empty group that is left; never a group that is empty from the start" (100 / 1,000 items answer 0). The rule-5 sweep found a second live source: `count_sequence {band:10, dir:back}` asks the number before 1 in about 1 item in 7 (13-16 in 100 at four seeds), so 0 is written before 1 on a track: added as a partial (its clause says the track runs to 10). Missing and `zero.lessonCloses` now name only the remainder: "zero as the count of a group that is empty from the start (an empty plate, an empty ten frame): seeing that there are none and writing 0 for it". The three pre whys now say what their items deal (groups and frames of 1 to 5, never empty). Owner question 7 uses the corrected clause |
+| F13 | 35 | Pre `name_2d_shapes {forms:[1], shapes:[2]}` why: "finding every square and every rectangle among other shapes, each drawn one way up (a turned square appears only as the "diamond" distractor, not clicked as a square: the turning this lesson builds, shape_fit_turn, has to undo that)" |
+| G7 | build.py, lessoncheck.py, mergecheck.mjs | The snapshot now holds EVERY field of every proposal a lesson uses (`proposalsFull`); lessoncheck compares each written proposal with it field by field (p15, p16). Independently of the snapshot, lessoncheck holds a copied proposal to its source: an R.json copy equals R.json in every field but `closes` / `lessons` / `lessonCloses` / `source` / `steps` / `reused`; a live copy (WRM_PROPOSALS, VISUAL_BUILDS, keys.json `props`) equals it but for the lesson fields and `reused` / `source`; a new one has every contract field. mergecheck compares kind / skill / name / teaches of every proposal id the first file shares with another lane (0 differences with R, Y2-Y6) |
+| G8 | lessonfit.mjs | NOPIC takes "without any drawing", "never a picture", "words only", "not pictured"; a GENERAL "no pictures" claim is held to every picture (svg, emoji, counters), a narrow one ("never a pictured group") to the story cell's `payload.pic`. A POSITIVE picture claim ("pictured", "to cross out") needs pictured items, and a story cell (word-work) is pictured only by `payload.pic`. ASKED covers every solid and flat shape (pyramid, prism, hemisphere, circle, triangle, square, rectangle, hexagon, pentagon, diamond / rhombus, oval), not only the five title solids. "split into N equal groups / parts" is a sharing claim. Plus the critic's other misses: R10 (pre key = related key) and the fill-order / "in twos" claim |
+| n1 | 8 | `add_wp_10 {band:10}` clause: "add-more stories … and put-together stories (6 apples in a bag, 4 on a plate: how many in all?)"; gated (a clause that says add-more only, when a fifth of the items ask "in all?", fails) |
+| n2 | 12 (and the sweep) | `count_sequence` whys: "one more: the number after a number on a track" (lessons 8, 12); lesson 39 "one less: the number before a number on a track" |
+| n3 | 29 | Note: `placevalue:more_less_10 {step:[1], band:20}` read ("1 more than 9 is ____.", "What is 1 less than 4?": the title's words, numbers to 20, a sentence frame, no objects; smallest band 20): closes neither missing part, not linked |
+| n4 | 30, 31 | Lesson 30 clause: below is not under (below: lower on the page, apart; under: beneath and touching or covered, the cat under the table, never asked). Lesson 31 note: forms 0 (above / below) is not linked for the same reason |
+| n5 | 13 | Audit row: K.CC.C.6's "(groups with up to ten objects)" is the Kindergarten end; this Support lesson is judged at Reception Phase 2 (numbers to 5); groups to 10 are lesson 19 (partial). The row's "groups of 2 to 5" was false (groups of 1 are dealt, 18 in 100): now "1 to 5", gated |
+| n6 | 32 | Audit row: K.CC.A.3 is no longer claimed (the pupil never writes a numeral); the content is K.CC.B.4 and K.CC.B.5's "given a number, count out that many objects"; gated |
+| n7 | skills | Not this lane (skill defects): `name_2d_shapes` / `name_3d_shapes` forms 1 print the name beside the glyph; `name_3d_shapes` forms 0 draws in the legacy colours. Recorded here and in lesson 5's clause; a skill-catalogue fix is owed |
+| n8 | merge | Owner question 1 stands (15 `lessonCloses` to fold, 81 string / dict `closes` mixes) |
+
+### Root-cause sweep (all 39 lessons, every why / clause / missing / closes / audit row, fresh items)
+
+`sweep.mjs` (scratch) printed every link of every lesson with its why or clause beside 40 fresh items (seed 30011 / stride 47: the
+question, answer, options, cell template and payload, and the picture text); `dist.mjs` / `d2.mjs` / `d3.mjs` / `d4.mjs` counted the
+distributions a claim depends on (100-1,000 items). FULL lessons were read against their K CCSS descriptors (`ccss-math.json`).
+
+| # | Lesson | Finding (what the items do) | Fix | Class / gate |
+|---|---|---|---|---|
+| S1 | 1 | pre `number_bonds {band:5}` "every number to 5": wholes are 2-5 (never 0 or 1) | "the numbers 2 to 5" | A (range words) |
+| S2 | 2 | pre `compare_groups` "the groups are ordered by count": two groups are compared, never ordered | "the start of ordering groups by their counts" | hand |
+| S3 | 4 | pre whys "naming the square and the rectangle two triangles make" / "naming the triangles that are joined": compose_shapes makes a SQUARE from two triangles and a RECTANGLE from two squares (gen-geometry.js compositions); the links click squares / rectangles / triangles / circles | "finding every square and every rectangle … two of the shapes the pieces make"; "finding every triangle and every circle …" | ASKED (a named shape must be asked) |
+| S4 | 4 | note and audit row: "two triangles make a square, a rectangle or a larger triangle" and "compose_shapes asks exactly that join (two triangles make a rectangle)": false for the rectangle (two squares) and silent on the hexagon (two trapezoids, 31 in 100) | note and K.G.B.6 entry list the four joins; the square is the rectangle with equal sides | hand (audit row) |
+| S5 | 5 | F11 (above); forms 1 labels carry the names | partial, solids_turned | STD_ITEM: an audit row that reads K.G.A.2 / K.G.A.3 as dealt needs turned items / flat-solid items |
+| S6 | 6 | pre `ten_frame_build {band:5}` "building 4 and 5": builds 1-5; related `count_sequence` "the number after 5, 6 and 7": after 3-9 | "(4 and 5 among them)"; "the number after a number on a track to 10" | **WINDOW** (a why naming "4 and 5" must say "among them" or half the items must be those numbers) |
+| S7 | 8 | related `sub_5_pictures` "start with 5": starts 2-5 (5 in 56 of 100); n1 | "start with a pictured group to 5" | hand |
+| S8 | 10 | pre `ten_frame_build {band:10}` "building 9 and 10": builds 1-10; related `number_seq_fill @20` "the teen numbers in order": tracks also 0-4, 4-8 | "(9 and 10 among them)"; "the numbers to 20 … some tracks running past 10 into the teens" | WINDOW; hand |
+| S9 | 12 | n2; pre `ten_frame_build {band:5}` "building 4 and 5" | "building a number to 5 on a frame" | WINDOW |
+| S10 | 13 | audit row "groups of 2 to 5", "(33 more / fewer, 17 same? in 50)" | "groups of 1 to 5 counters", shares restated; n5 | **GROUPRANGE** (an audit row's "groups of A to B" holds for every item) |
+| S11 | 19, 20 | pre `count_objects` "counting a group of 6, 7 or 8" (1-10 dealt), "a group of 4 or 5" (1-5) | "(… among them)" | WINDOW |
+| S12 | 21 | pre `classify_count` "sorting a group into two kinds": the pupil counts one kind, never sorts; related `ten_frame_build` "(Represent 1, 2 and 3)": builds 1-5 | "counting the objects of one kind in a group of two kinds"; "(1, 2 and 3 among them)" | hand; WINDOW |
+| S13 | 22 | pre whys "building 4 and 5", "finding groups of 4 and 5", "4 and 5 as dot patterns (2 and 2, 3 and 2)": 1-5 dealt; a die shows 5 as 2, 1 and 2 | "(4 and 5 among them)"; "dice dot patterns to 5 (4 as 2 and 2)" | WINDOW |
+| S14 | 23 | pre `ten_frame_build` "building 9 and 10" | "(9 and 10 among them)" | WINDOW |
+| S15 | 27 | F12; the pre whys "zero is the count when there are none", "an empty frame shows 0", "none is the fewest of all": no item deals 0 or an empty group; rule 5: `count_sequence {dir:back}` writes 0 before 1 | partial + clause + whys (above) | **ZERO** (a positive zero / none / empty claim needs an item that deals 0); **NEVER0** (a clause that says 0 is never written fails when an item answers 0) |
+| S16 | 29 | n3 | note | hand |
+| S17 | 30, 31 | n4 | clause, note | hand |
+| S18 | 32 | n6 | audit row | STD_ITEM (K.CC.A.3 read as dealt needs a written answer) |
+| S19 | 35 | F13 | why | **ORIENT** (a "whichever way / turned / resized" claim needs items that turn or resize) |
+| S20 | 36, 37 | pre whys "naming squares and rectangles" / "naming triangles" / "naming the solids a model is built from": the items CLICK every shape of a kind ("Click ALL the …") | "finding every …" | hand (form word) |
+| S21 | 39 | clause `sub_5_pictures` "takes away from 5": starts 2-5; pre whys "one less: taking one away" (a track), "counting the counters that are left" (a frame count) | "a pictured group of 2 to 5"; "the number before a number on a track"; "counting the counters in a ten frame to 10" | hand |
+| — | 34 | I first read the clause's "(apples, fish, balls)" as false (no fish in the first lines printed); 200 items show fish in 514 bag places, so it was TRUE. Kept true and complete: "(apples, balls, fish, flowers)" | — | **OBJN** (an object named as an example must appear in the items); it proved the clause true |
+
+No finding in lessons 3, 7, 9, 11, 14-18, 24-26, 28, 33, 38 (every why and clause held on the 40 items). The eight FULL lessons were
+read against their K descriptors: 1 (K.OA.A.5), 4 (K.G.B.6), 9 (K.OA.A.4), 13 (K.CC.C.6 at Reception), 16 / 17 (K.MD.A.2, pictorial
+direct comparison, as R.B8.S1) and 32 (K.CC.B.4 / K.CC.B.5) hold; 5 does not (F11).
+
+**Classes made gates (lessonfit.mjs, all in the build):** WINDOW, ZERO, NEVER0, ORIENT, OBJN, add-more vs put-together stories,
+GROUPRANGE and STD_ITEM (audit rows), plus G8's NOPIC / positive picture / ASKED (every shape) / split = share / fill order / R10.
+Free-text classes S2, S4, S7, S8b, S12a, S16, S17, S20, S21 stay hand-read (no stable regex: they describe what the pupil does).
 
 ## Round 2 (critic r1 FAIL: mean 7.69, min 6) — every row
 
@@ -78,11 +139,11 @@ top-level files was moved or changed.
 
 | Verdict | Lessons |
 |---|---|
-| full | 8: Add and subtract within 5 written vertically (column form), Compose shapes from smaller shapes, 3D shapes (cube, cuboid, sphere, cone, cylinder), Bonds to 10 (explore combinations that make 10), Compare amounts (more, fewer, same), Compare mass (1), Compare mass (2), Represent numbers to 5 |
-| partial | 27 |
+| full | 7: Add and subtract within 5 written vertically (column form), Compose shapes from smaller shapes, Bonds to 10 (explore combinations that make 10), Compare amounts (more, fewer, same), Compare mass (1), Compare mass (2), Represent numbers to 5 |
+| partial | 28 (round 3: 3D shapes (cube, cuboid, sphere, cone, cylinder) moved here, F11) |
 | gap | 4: Compare capacity (1), Compare capacity (2), Spatial reasoning (3) - visualize, build, Spatial reasoning (4) - mapping, direction |
 
-Proposals used by lessons: **28 — 2 new, 26 reused**. Reused first from the R/Y1 lane: 15 of
+Proposals used by lessons: **29 — 3 new, 26 reused** (round 3 adds `solids_turned`, new). Reused first from the R/Y1 lane: 15 of
 Y1.json's own (sort_groups, match_same, zero, compare_small, subitise, add_10_pictures, sub_10_pictures, shapes_world,
 shape_3d_tasks, teen_structure, number_focus, systematic_bonds, capacity_early, scenes, position_map) and 9 of R.json's, copied
 verbatim with `"source": "R.json (passed lane; same id, same spec)"` (compare_shapes, compare_size, band_3, doubles_pictured,
@@ -108,7 +169,7 @@ say so ("Pre-skills are few"). A committee lesson cites a Reception step, or a Y
 | Sort into categories, count each group and find the total | committee | W21 | partial | `classify_count {"band":10,"objects":"pictures"}` | sort_groups, classify_count_all | 3 / 1 |
 | Build and draw shapes | committee | W29 | partial | `shape_attributes {"forms":[0],"band":4}` | shape_draw, shape_build_kit | 3 / 0 |
 | Compose shapes from smaller shapes | committee | W29 | full | `compose_shapes`, `compose_hexagon` | — | 2 / 0 |
-| 3D shapes (cube, cuboid, sphere, cone, cylinder) | enrich-native | Support (Reception) | full | `name_3d_shapes {"forms":[0]}`, `name_3d_shapes {"forms":[1]}` | — | 3 / 0 |
+| 3D shapes (cube, cuboid, sphere, cone, cylinder) | enrich-native | Support (Reception) | partial | `name_3d_shapes {"forms":[0]}`, `name_3d_shapes {"forms":[1]}` | solids_turned | 3 / 0 |
 | 6, 7 and 8 - counting and subitising | enrich-native | Support (Reception) | partial | `count_objects {"band":10,"objects":"frame"}`, `count_objects {"band":10,"objects":"dice"}` | number_focus, subitise | 3 / 1 |
 | 9 and 10 - count, represent, order | enrich-native | Support (Reception) | partial | `count_objects {"band":10,"objects":"frame"}`, `ten_frame_build {"band":10}` | number_focus, compare_small | 3 / 1 |
 | Adding more (First/Then/Now stories) | enrich-native | Support (Reception) | partial | `add_5_pictures`, `add_wp_10 {"band":10}` | add_10_pictures, vis_story_strip | 3 / 1 |
@@ -130,7 +191,7 @@ say so ("Pre-skills are few"). A committee lesson cites a Reception step, or a Y
 | Deepening understanding (consolidate 2D/3D shapes) | enrich-native | Support (Reception) | partial | `name_2d_shapes {"forms":[1],"shapes":[0,1,2]}`, `name_3d_shapes {"forms":[1]}` | shape_3d_tasks, shapes_world | 3 / 0 |
 | Doubling (up to 5+5) | enrich-native | Support (Reception) | partial | `doubles_near_doubles {"forms":[0]}`, `double {"band":20}` | doubles_pictured | 3 / 1 |
 | Explore 2D shapes (circle, triangle, rectangle, square) | enrich-native | Support (Reception) | partial | `name_2d_shapes {"forms":[1],"shapes":[0,1,2]}` | defining_attributes | 0 / 1 |
-| Introducing zero | enrich-native | Support (Reception) | partial | `sub_5_pictures` | zero | 3 / 0 |
+| Introducing zero | enrich-native | Support (Reception) | partial | `sub_5_pictures`, `count_sequence {"band":10,"dir":"back"}` | zero | 3 / 0 |
 | Making pairs | enrich-native | Support (Reception) | partial | `odd_even {"forms":[2],"range":10}` | odd_even_pairs | 3 / 1 |
 | One more and less within 5 | enrich-native | Support (Reception) | partial | `count_sequence {"band":10,"dir":"forward"}`, `count_sequence {"band":10,"dir":"back"}` | more_less_pictures, band_3 | 3 / 1 |
 | Positional language | enrich-native | Support (Reception) | partial | `shape_positions` | position_map | 0 / 0 |
@@ -158,15 +219,14 @@ with its reason (owner question 3).
 | Lesson | Title read from items | Site CCSS, each read |
 |---|---|---|
 | Add and subtract within 5 written vertically (column form) | Add and subtract within 5: add_facts deals + facts with sums 0 to 5 (0 + 4, 3 + 2) and sub_facts deals − facts from 5 or less (5 − 5, 3 − 2), every fact in reach; written vertically (column form): every item is in a column (add_facts: the fact cell with notation vertical; sub_facts: the column facts visual, facts-column-visual), the top number above the sign and the second number, a rule, one answer box; no carrying or borrowing row | **K.OA.A.5**: Fluently add and subtract within 5: both operations, every sum and every number taken from at most 5, as fact practice (one fact a cell, answer recalled); standards-audit.js already rules K.OA.A.5 FULL on these two skills at band 5 |
-| Compose shapes from smaller shapes | Compose shapes from smaller shapes: compose_shapes joins two drawn pieces and asks which shape they make (triangle, square, rectangle or hexagon); compose_hexagon fills a hexagon outline with pattern blocks | **K.G.B.6**: Compose simple shapes to form larger shapes (two triangles with full sides touching make a rectangle): compose_shapes asks exactly that join, compose_hexagon fills a larger shape with smaller ones |
-| 3D shapes (cube, cuboid, sphere, cone, cylinder) | 3D shapes (cube, cuboid, sphere, cone, cylinder): forms 0 shows one drawn solid and the pupil picks its name, all five named (the cuboid as Rectangular Prism, its US name: 14 of 60 items at seed 4111); forms 1 asks the pupil to click every sphere, cylinder, cube or cone among other solids | **1.G.A.1**: site tag: the Grade 1 standard (defining versus non-defining attributes; build and draw shapes) is not this lesson's content. The lesson is the Reception step R.B12.S1 'Recognise and name 3-D shapes' under another title (full there on forms 1); naming the five solids is K.G.A.2 / K.G.A.3, which the two forms deal (owner question) |
+| Compose shapes from smaller shapes | Compose shapes from smaller shapes: compose_shapes joins two drawn pieces and asks which shape they make (two triangles a square, two squares a rectangle, two small triangles a larger triangle, two trapezoids a hexagon); compose_hexagon fills a hexagon outline with pattern blocks (triangles, rhombi or trapezoids) | **K.G.B.6**: Compose simple shapes to form larger shapes (the standard's example: two triangles with full sides touching make a rectangle): compose_shapes joins two whole pieces side to side, two triangles making a square (a rectangle with equal sides) and two squares a rectangle, and asks for the larger shape; compose_hexagon fills a larger shape with smaller ones |
 | Bonds to 10 (explore combinations that make 10) | Bonds to 10, explore combinations that make 10: make_ten shows a ten frame with 1 to 9 counters and asks how many more make 10, every pair 1 + 9 to 9 + 1 dealt 5 to 7 times in 50 items | **K.OA.A.4**: For any number from 1 to 9, find the number that makes 10, with a drawing: each item draws the frame with the given number and the pupil records the missing part<br>**1.OA.C.6**: site tag: of the Grade 1 standard only its making-ten strategy is this lesson's content; adding and subtracting within 20 is not (the title bounds the lesson at 10, the Reception step R.B11.S8 'Bonds to 10 (2 parts)') |
-| Compare amounts (more, fewer, same) | Compare amounts (more, fewer, same): two pictured groups of 2 to 5, the pupil says which has more, which has fewer, or whether they are the same (33 more / fewer, 17 same? in 50) | **K.CC.C.6**: Identify whether one group is greater than, less than or equal to another by matching and counting: level 1 draws the two groups with no numbers, so the pupil matches or counts |
+| Compare amounts (more, fewer, same) | Compare amounts (more, fewer, same): two pictured groups of 1 to 5 counters, the pupil says which has more, which has fewer, or whether they are the same (about two items in three ask more or fewer, one in three "Do the groups have the same number of counters?") | **K.CC.C.6**: Identify whether one group is greater than, less than or equal to another by matching and counting: level 1 draws the two groups with no numbers, so the pupil matches or counts. The standard's "groups with up to ten objects" is the Kindergarten end; this Support lesson is judged at Reception Phase 2 (numbers to 5), and groups to 10 are lesson 19 (partial) |
 | Compare mass (1) | Compare mass (1): two or three pictured objects, which is heavier, which is lighter | **K.MD.A.2**: Directly compare two objects with a measurable attribute (mass) and describe which has more of it: the pupil picks the heavier or the lighter object and says heavier / lighter (the Say: frame) |
 | Compare mass (2) | Compare mass (2): the same content as Compare mass (1); the site gives the second session no other content (if it is the balance session R.B8.S2, it is partial with build balance: owner question) | **K.MD.A.2**: Directly compare two objects with a measurable attribute (mass) and describe which has more of it: the pupil picks the heavier or the lighter object and says heavier / lighter |
-| Represent numbers to 5 | Represent numbers to 5: the pupil builds each number 1 to 5 (10 of each in 50) with counters on a ten frame | **2.NBT.A.1**: site tag: the Grade 2 place-value standard is not this lesson's content; the content is K.CC.B.4 (connect a number to its quantity) and K.CC.A.3 (a numeral and a set of objects), which the frame build deals (owner question 3) |
+| Represent numbers to 5 | Represent numbers to 5: the pupil builds each number 1 to 5 (10 of each in 50) with counters on a ten frame | **2.NBT.A.1**: site tag (owner question 3). The content is K.CC.B.4 (connect a number to its quantity) and K.CC.B.5's "given a number, count out that many objects": the pupil reads the numeral and builds that many counters. The pupil never writes a numeral, so K.CC.A.3 is not claimed (critic r2 n6) |
 
-Judged not full on audit: **Explore 2D shapes** (name_2d_shapes draws each shape as one fixed picture, so K.G.A.2 "regardless
+Judged not full on audit: **3D shapes** (round 3, F11: each solid is one fixed drawing, never turned or resized, the same reason as lesson 26; no item tells flat from solid; partial, build solids_turned), **Explore 2D shapes** (name_2d_shapes draws each shape as one fixed picture, so K.G.A.2 "regardless
 of their orientations or overall size" is not dealt; partial, build defining_attributes), **Shapes with 4 sides** (shape_attributes
 counts the sides and vertices of a square and a rectangle, but nothing compares the two; partial, build compare_shapes).
 
@@ -206,7 +266,7 @@ p4, p5, p7, p8, plus a note, an envision closes and a full lesson flipped to par
    R.B7.S1, "Bonds to 10" = R.B11.S8, "Compare mass (1)/(2)" = R.B8.S1, "Taking away" = R.B14.S3; each lesson's note names the
    step). *Recommend the site use the WRM titles so they resolve to the steps; until then they are tagged here as lessons.*
 3. **Site CCSS tags that do not fit the content**: "Represent numbers to 5" is tagged 2.NBT.A.1 and "Comparing numbers to 5"
-   1.NBT.B.3; "3D shapes" 1.G.A.1; "Bonds to 10" also 1.OA.C.6 (full_audit.json reads each one). *Recommend K.CC.B.4 / K.CC.C.7 / K.G.A.2 on the site; the verdicts here judge the content.*
+   1.NBT.B.3; "3D shapes" 1.G.A.1 (round 3: its non-defining attributes, orientation and size, are that lesson's missing part; the lesson is partial); "Bonds to 10" also 1.OA.C.6 (full_audit.json reads each code of the FULL lessons). *Recommend K.CC.B.4 / K.CC.C.7 / K.G.A.2 on the site; the verdicts here judge the content.*
 4. **Kindergarten column form at W15**: answered in round 2 (F1). `add_facts` / `sub_facts {notation:[stacked], band:5}` write
    the within-5 facts in columns with no carrying row, so the lesson is full and `k_vertical_5` is withdrawn. A page with + and −
    mixed in one cell set is two sections of one sheet today; *build a mixed option only if the owner wants it.*
@@ -214,8 +274,10 @@ p4, p5, p7, p8, plus a note, an envision closes and a full lesson flipped to par
    few" note rather than citing play-based steps without a skill.*
 6. **Compare mass (1) and (2)** carry the same title and no other site content, so both are judged as R.B8.S1 (full). *If the
    school teaches (2) as the balance session (R.B8.S2 "Find a balance"), say so: it is then partial with build balance.*
-7. **Introducing zero is partial here, R.B7.S1 is a gap in R.json** (frozen): `sub_5_pictures` deals "0 left" in 1 item in 10.
-   *Recommend the R lane's next round re-judge R.B7.S1 the same way.*
+7. **Introducing zero is partial here, R.B7.S1 is a gap in R.json** (frozen): `sub_5_pictures` takes every counter away in about 1
+   item in 10 and the pupil writes 0 for the empty group left; `count_sequence {band:10, dir:back}` asks the number before 1 (0) in
+   about 1 in 7. Neither shows a group that is empty from the start. *Recommend the R lane's next round re-judge R.B7.S1 the same way
+   (partial on those two, build zero for the empty-from-the-start set).*
 
 ## The `lessons` JSON shape (the Y5 lane's contract)
 ```
