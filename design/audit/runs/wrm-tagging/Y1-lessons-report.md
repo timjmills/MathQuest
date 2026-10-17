@@ -125,7 +125,7 @@ picture, so K.G.A.2 "regardless of their orientations or overall size" is not de
 | lesson tagFixes | 0 |
 | ws-wrm-extract --check --site … | exit 0 |
 | ws-boot-smoke | OK |
-| two clean `git archive` builds | byte-identical (see the commit message) |
+| two clean `git archive` builds of the commit | byte-identical to each other and to the committed file (Y1.json sha256 45d6331da0b17965…) |
 
 **Mutations (`lessonmut.py`, 41, 0 missed).** A (lessonfit): SIZE; CONTENT flags (×), R_EQ (number line), squares before R.B6,
 rule 19 (counting in 2s at W21), week limit (numbers to 100 at W15), degenerate items; CITE: Support cites a Y1 step, Support
