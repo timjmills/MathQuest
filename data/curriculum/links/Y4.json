@@ -12706,7 +12706,7 @@
       ]
      },
      "maxNumber": 100,
-     "missing": "a story of a rectangular floor, patio or wall in feet whose area is the side lengths multiplied (8 ft by 5 ft: 40 square feet); never tiled"
+     "missing": "a story of a rectangular kitchen floor, room, patio, wall or garden bed in feet whose area is the side lengths multiplied (8 ft by 5 ft: 40 square feet); no picture, never a drawn grid"
     }
    ],
    "verdict": "partial",
@@ -13023,7 +13023,7 @@
        2
       ]
      },
-     "why": "Y2.B8.S10 Unit fractions (Grade 1, lower grade): picking the model that shows halves, quarters or eighths; some of the other models are in thirds, fifths or sixths"
+     "why": "Y2.B8.S10 Unit fractions (Grade 1, lower grade): picking the model that shows a fraction, most in halves, quarters or eighths (about 1 in 14 in thirds, fifths or sixths); some of the other models are in thirds, fifths or sixths"
     }
    ],
    "preBuild": [],

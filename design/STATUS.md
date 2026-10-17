@@ -239,6 +239,7 @@ Gate failures and load numbers measured before this fix (~12:30 UTC) are not tru
 - 2026-10-16 Wave 2 WRM tagging Y2-Y3 round 13: builder still at Opus medium (the ceiling) - critic r12 failed narrowly (Y2 steps 7.96: N12, `equiv_frac_visual {denoms:[2]}` deals off-family = / ≠ items the lane's denominator check could not see, because their fractions live only in the cell payload).
 - 2026-10-16 Wave 2 WRM tagging Y2-Y3 round 14: builder still at Opus medium (the ceiling) - critic r13 failed narrowly (Y3 steps 7.93: N13 Y3.B6.S10 full on circles, N14 Y3.B6.S9 built the wrong proposal); root-cause gate TITLEREP added.
 - 2026-10-16 Wave 2 WRM tagging Y2-Y3 round 15: builder still at Opus medium (the ceiling) - critic r14 failed narrowly (Y2 7.93 / Y3 7.96: N15 / N16 / N17, false FULL verdicts in a fresh sample for the 4th round running); class gates added (TITLEREP title verbs, clock precision, digital, solve problems; RANGECHECK rule 7) and every full step / lesson re-audited by hand: 12 fulls demoted (Y2 63->55, Y3 49->45), 5 kept full with a live option.
+- 2026-10-17 Wave 2 WRM tagging Y1 site lessons round 3: builder escalated from Opus low to Opus medium (the ceiling) - false whys / clauses and an overclaimed FULL survived builder rounds 1 and 2 (critic r2 FAIL 7.92: F11 lesson 5 full on K.G.A.2 / K.G.A.3, F12 lesson 27 "never 0 to write", F13 lesson 35 "whichever way it is drawn", the last in the file since round 1).
 
 - 2026-10-10 small fixes lane, item 7 (Opener count-row fit) fix round 6: builder escalated to Opus medium (the ceiling) - critic rounds 1-5 each failed the Opener's fit (D5, N3/N4, N8/N9, N12, N13) with Opus-low builders.
 
@@ -328,22 +329,50 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
   mult_properties form 0 redo, mult_chart task even + window options, function_table ftTrap/ftFactors (codec keys 5P-5U, lessons
   sub-range). Before deploy: `ws-stamp-assets` (new modules). Owner questions open: EE set for lessons 4/5 (repo M.EE.3.OA.8 vs owner
   list M.EE.3.OA.9); 1.OA.A.1 audit verdict should be partial.
+- 2026-10-17: DEPLOYED the detailed lesson maker (V22, "Lesson: detailed" beside "Lesson: standard") + the first 5 lessons (G2 numbers to 1,000; G1 bar-model word problems; G3 commutative; G3 multiplication-table patterns; G3 input-output rules; all critic PASS, every page >= 8). master 65babbb6; live serves sheet/roles/detailed-lesson.js. Deploy fixes: ws-teacher-shell role list gains detailed-lesson; mult_properties legacy forms print ×. Session session_01X3UTDSXAaEp5yiDxwukHaa archived. Y6 site lessons merged (critic r2 PASS).
+- 2026-10-17: Y1 site lessons merged (critic r3 PASS); mergeall 1,042 tags 0 problems. Started session_01Mp7KgtodxgpQGxJ2Vyxgrj
+  for owner lessons 6-10 (G4 10x / one tenth of a digit; G3 two-step word problems; G4 multiply/divide multiples of 10; G5 digit
+  values 10x / 1/10; G5 decimals to thousandths in words and expanded form; all overdue) on `claude/sweet-newton-c8wrv1-wip-detailed-lessons-2`.
+  Generator bug lane (equiv_frac_nv, denoms payload, percent_of_number 33%, simplify negatives, distributive_expr GCF) runs as a
+  local builder on `claude/sweet-newton-c8wrv1-wip-genbugs`.
+- 2026-10-17: Generator bug fixes merged into main (bf378b7b; seeded before/after, 0 bad on all five), NOT deployed yet.
+  Skip-count + White Rose page helper (session_01Vvb92mUXgnNYjRvuhtnZNM) PAUSED by the owner and archived: skip-count
+  `-wip-a79237e5c40225940` @ 37f3d627 (critic r4 FAIL on D12 only; fix r5 b19172b4 unreviewed, partly ungated); White Rose page
+  `-wip-wrm-page` @ 25b453e7 (critic r8 FAIL on M12 only; f075caa9 round 10 WIP unverified). Next for each: finish gates, critic, merge.
+  Lessons 6-10 helper reports an owner rule (skill coverage) and an audit of lessons 1-5 (`design/lesson-planner/lessons/SKILL-COVERAGE-AUDIT-1-5.md`).
+- 2026-10-17 ~09:40: **OWNER WIND-DOWN — all helpers paused and archived; nothing running.** Each lane branch carries its own
+  "HELPER PAUSED 2026-10-17" STATUS entry with exact next steps. Resume list:
+  1. Deploy main (generator fixes bf378b7b etc.): full gates + ws-stamp-assets + push master.
+  2. Y4 site lessons `-wip-wrm-lessons-y4` @ 9f81d54f: critic r4 FAIL 7.96 (lesson 7 area-story objects 3 vs 5); rewrite F6, merge main
+     (denoms payload fix changes lesson 10 identify {denoms:[2]} why), fill lessonfit gaps, critic r5, merge.
+  3. Lessons 6-10 `-wip-detailed-lessons-2` @ 2e1b7c11: lesson 6 fix r3 88f7d2d0 ungraded; lesson 7 built ungraded; 8-10 researched;
+     unapplied patches in `design/lesson-planner/wip-2026-10-17/` (coverage lanes for lessons 1-5, vocab letters).
+  4. Lane D `-wip-a3256e8dfc9684535` @ a31555a6 (r12d WIP, critic r9 not run) and fraction key `-wip-adbb61b8450078736` @ 4f510ce5
+     (critic r8 FAIL R8-1/R8-2, r9 WIP); both touch print-sheet.js + ws-print-lint.cjs (conflicts expected).
+     Owner question: G4 like-denominator keys show 2/8 = 1/4 (recommended).
+  5. Skip-count @ 37f3d627 (r5 unreviewed) and White Rose page `-wip-wrm-page` @ 25b453e7 (r10 WIP) — see their entries.
 - Held for after these land: Lane B answer boxes + regroup boxes (spec `design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md`),
   placevalue:identify write-value (spec `design/audit/runs/next-session/PV-IDENTIFY-WRITE-VALUE-SPEC.md`).
 
 ## HELPER PAUSED 2026-10-17 — WRM tagging helper session_01LVDoUbPMFjuTAdwUzzWVDL (owner wind-down)
 - PASSED and pushed: Y5 (bd2f4ff2, critic r8), Y2-Y3 (7ee69f33, critic r15), Y6 site lessons (6c920c45, lessons critic r2),
   Y1 site lessons (branch -wip-wrm-lessons-y1 d4994b4b, lessons critic r3). Y6 steps already on main.
-- OPEN: Y4 site lessons, branch `claude/sweet-newton-c8wrv1-wip-wrm-lessons-y4` (this commit). Critic r4 FAIL 7.96: only
-  lesson 7 at 7. Builder escalated to mq-opus-medium (r4).
-- NEXT STEPS (Y4 lessons, see Y4-lessons-critic-r4.md fix table, wordings measured):
-  1. F6 lesson 7: area {forms:[2]} clause -> "a story of a rectangular kitchen floor, room, patio, wall or garden bed in
-     feet whose area is the side lengths multiplied (8 ft by 5 ft: 40 square feet); never tiled".
-  2. M1: merge main (bf378b7b+, has generator fix 8fbe02c4: denoms reads the payload) and re-measure lesson 10's pre
-     fractions:identify {forms:[1], denoms:[2]} — its why becomes false on main (~1 in 10 off-family); re-option or reword.
-  3. G9 lessonfit: object/scale/range/count/hour lists, positive fraction families, half-unit claims; G2 bounds on the
-     fixed G6 probe. Optional n9 ruler wording.
-  4. Rebuild (Y4/build.py then Y4/lessons_build.py), all gates, then critic r5.
+- **Y4 site lessons FINAL (owner accepted r4 7.96 after F6 fix)**, branch `claude/sweet-newton-c8wrv1-wip-wrm-lessons-y4`.
+  No critic r5 (owner decision 2026-10-17). Builder on mq-opus-low.
+  - F6 lesson 7 `area {forms:[2]}` clause, measured (600 items, seeds 70913/11 x 300): kitchen floor 130, patio 129, wall 121,
+    room 112, garden bed 108; ft 600/600; areas 6-90; no visual on any item -> "a story of a rectangular kitchen floor, room,
+    patio, wall or garden bed in feet ... (8 ft by 5 ft: 40 square feet); no picture, never a drawn grid" ("never tiled" dropped:
+    the kitchen-floor story says "tiling").
+  - M1: merged origin/claude/sweet-newton-c8wrv1 (8fbe02c4). Lesson 10 pre `identify {forms:[1], denoms:[2]}` re-measured on
+    the merged tree (300 items, seed 71003000+i): target off the 2/4/8 family on 21/300, a 3/5/6 among the others on 38/300 ->
+    why now "picking the model that shows a fraction, most in halves, quarters or eighths (about 1 in 14 in thirds, fifths or
+    sixths); some of the other models are in thirds, fifths or sixths".
+  - NOT DONE (G9, too large for a final fix; new lessonfit rule classes): object/scale lists in a story clause, count and range
+    lists, direction / interval (hour) lists, positive fraction families, half-unit claims, and G2 bounds read on the fixed G6
+    probe instead of the sample. Optional n9 ruler wording. Every such string was hand-checked by critic r4.
+  - Step-lane scripts Y4/check.py, linkfit.mjs, build.py hard-code an old session's data dir (pass WRM_TAG_DATA / edit path);
+    optcheck reports 2 pre-existing problems on FROZEN steps (Y4.B1.S1 / S13 related `number_word_form` has no option "range").
 - OPEN OWNER QUESTIONS: Y4-lessons-report.md (FULL lessons with unnamed 3.OA clauses — critic agrees keep FULL; bar-models
   3.OA.D.8; "Pounds, tens, ones and pence" = money place value?); Y1-lessons-report.md 1-7; Y6-report.md site lessons;
   Y5-report.md; Y2/Y3 reports. Lead merge notes (lessonCloses, opts in step lists, lesson-only proposals) in HELPERS.md.
+- 2026-10-17 generator bug fixes (branch claude/sweet-newton-c8wrv1-wip-genbugs; seeded 1-600 before/after): (1) `equiv_frac_nv` yes/no: the distractor clamp could land on an equivalent pair keyed "no" (seed 206: 2/3 vs 2/3) - the denominator now moves until the cross products differ (2 -> 0 bad); (2) `itemDenominators` now reads `q.cell.payload` ({n,d} terms, "a/b" strings), so kit cells obey the denominators filter (`equiv_frac_visual {denoms:[2]}` 22 -> 0 items with no denominators seen); (3) `percent_of_number`: the 33% combos keyed one third (33% of 60 = 20) are now 30% with exact whole answers (53 -> 0); (4) `simplify`: distractor numerators are 1-3 off and never below 1 (no 0 or negative options; 23 -> 0); (5) `distributive_expr` factor-out: inner terms are coprime so the stated factor is the GCF (10x + 30 -> 10(x + 3), 126 -> 0).

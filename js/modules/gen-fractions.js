@@ -4381,9 +4381,9 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         const distractor = strategy.fn();
                         efnvNum2 = Math.max(1, Math.min(distractor.d - 1, distractor.n));
                         efnvDen2 = Math.max(2, distractor.d);
-                        if (efnvNum2 / efnvDen2 === efnvBaseNum / efnvBaseDen) {
-                            efnvNum2 = Math.max(1, Math.min(efnvDen2 - 1, efnvNum2 + 1));
-                        }
+                        // Clamping can land back on an equivalent pair (e.g. 1/2 vs 2/2 -> 1/2): move the
+                        // denominator until the cross products differ, so the key's "no" is true.
+                        while (efnvNum2 * efnvBaseDen === efnvBaseNum * efnvDen2) efnvDen2++;
                         // Correct answer is "no"; "yes" is the wrong pick — tag it.
                         if (typeof window !== 'undefined' && typeof window.tagDistractor === 'function') {
                             window.tagDistractor(q, "yes", strategy.msg);
@@ -5807,7 +5807,10 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 let simpAttempts = 0;
                 while (wrongs.size < 3 && simpAttempts < 30) {
                     simpAttempts++;
-                    const wrongSimp = simplifyFraction(rawNum + randInt(-3,3), rawDen);
+                    // A plausible slip: a numerator one to three off, never zero or negative.
+                    const wrongNum = rawNum + pick([-3, -2, -1, 1, 2, 3]);
+                    if (wrongNum < 1) continue;
+                    const wrongSimp = simplifyFraction(wrongNum, rawDen);
                     if (wrongSimp !== q.ans) wrongs.add(wrongSimp);
                 }
                 q.options = shuffle([q.ans, ...wrongs]);
@@ -6962,7 +6965,7 @@ export function generateConversionsQuestion(q, mappedSkill, helpers) {
                     { pct: 25, base: 40, ans: 10 }, { pct: 25, base: 80, ans: 20 }, { pct: 25, base: 120, ans: 30 },
                     { pct: 50, base: 36, ans: 18 }, { pct: 50, base: 48, ans: 24 }, { pct: 50, base: 90, ans: 45 },
                     { pct: 75, base: 40, ans: 30 }, { pct: 75, base: 80, ans: 60 }, { pct: 75, base: 120, ans: 90 },
-                    { pct: 33, base: 30, ans: 10 }, { pct: 33, base: 60, ans: 20 }, { pct: 33, base: 90, ans: 30 },
+                    { pct: 30, base: 30, ans: 9 }, { pct: 30, base: 60, ans: 18 }, { pct: 30, base: 90, ans: 27 },
                     { pct: 15, base: 60, ans: 9 }, { pct: 40, base: 50, ans: 20 }, { pct: 60, base: 50, ans: 30 }
                 ];
                 const combo = pick(combos);
