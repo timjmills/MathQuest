@@ -1,0 +1,9 @@
+head-S exit 1
+base-S exit 1
+head-M exit 1
+head-L exit 1
+base-L exit 1
+lane-M exit 0
+boot exit 0
+snapshot exit 0
+DONE

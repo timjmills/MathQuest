@@ -1,0 +1,112 @@
+ws-print-lint: source kit, 17 skill(s)
+  addition:add_facts#review: 2+1 pages, 0 finding(s)
+  addition:add_facts#review@s1: 2+1 pages, 0 finding(s)
+  addition:add_column_multi#review: 2+1 pages, 0 finding(s)
+  addition:add_column_multi#review@s1: 2+1 pages, 0 finding(s)
+  subtraction:sub_100_regroup#review: 2+1 pages, 0 finding(s)
+  subtraction:sub_100_regroup#review@s1: 2+1 pages, 0 finding(s)
+  multiplication:mult_facts#review: 2+1 pages, 0 finding(s)
+  multiplication:mult_facts#review@s1: 2+1 pages, 0 finding(s)
+  multiplication:dot_array_mult#review: 2+1 pages, 27 finding(s)
+  multiplication:dot_array_mult#review@s1: 2+1 pages, 27 finding(s)
+  division:div_facts#review: 2+1 pages, 0 finding(s)
+  division:div_facts#review@s1: 2+1 pages, 0 finding(s)
+  measurement:time_quarter#review: 2+1 pages, 0 finding(s)
+  measurement:time_quarter#review@s1: 2+1 pages, 0 finding(s)
+  placevalue:value#review: 2+1 pages, 0 finding(s)
+  placevalue:value#review@s1: 2+1 pages, 0 finding(s)
+  fractions:equiv_frac_visual#review: 2+1 pages, 0 finding(s)
+  fractions:equiv_frac_visual#review@s1: 2+1 pages, 0 finding(s)
+  fractions:identify_nv#review: 2+1 pages, 35 finding(s)
+  fractions:identify_nv#review@s1: 2+1 pages, 35 finding(s)
+  composing:number_bonds#review: 2+1 pages, 0 finding(s)
+  composing:number_bonds#review@s1: 2+1 pages, 0 finding(s)
+  counting:count_objects#review: 2+1 pages, 0 finding(s)
+  counting:count_objects#review@s1: 2+1 pages, 0 finding(s)
+  fraction_operations:add_fractions_like#review: 2+1 pages, 0 finding(s)
+  fraction_operations:add_fractions_like#review@s1: 2+1 pages, 0 finding(s)
+  fraction_operations:sub_fractions_like#review: 2+1 pages, 0 finding(s)
+  fraction_operations:sub_fractions_like#review@s1: 2+1 pages, 0 finding(s)
+  fraction_operations:add_frac_unlike#review: 2+1 pages, 0 finding(s)
+  fraction_operations:add_frac_unlike#review@s1: 2+1 pages, 0 finding(s)
+  fractions:fraction_of_set#review: 2+1 pages, 0 finding(s)
+  fractions:fraction_of_set#review@s1: 2+1 pages, 0 finding(s)
+  fractions:fraction_of_set_hard#review: 2+1 pages, 0 finding(s)
+  fractions:fraction_of_set_hard#review@s1: 2+1 pages, 0 finding(s)
+
+document                                            pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT  result
+addition:add_facts#review                             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+addition:add_facts#review@s1                          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+addition:add_column_multi#review                      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+addition:add_column_multi#review@s1                   2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+subtraction:sub_100_regroup#review                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+subtraction:sub_100_regroup#review@s1                 2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mult_facts#review                      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:mult_facts#review@s1                   2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+multiplication:dot_array_mult#review                  2+1k    .     .   14   12        .     .       .    1     .       .     .    .      .       .  FAIL
+multiplication:dot_array_mult#review@s1               2+1k    .     .   14   12        .     .       .    1     .       .     .    .      .       .  FAIL
+division:div_facts#review                             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+division:div_facts#review@s1                          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+measurement:time_quarter#review                       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+measurement:time_quarter#review@s1                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+placevalue:value#review                               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+placevalue:value#review@s1                            2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:equiv_frac_visual#review                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:equiv_frac_visual#review@s1                 2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:identify_nv#review                          2+1k    .     .   34    .        .     .       .    1     .       .     .    .      .       .  FAIL
+fractions:identify_nv#review@s1                       2+1k    .     .   34    .        .     .       .    1     .       .     .    .      .       .  FAIL
+composing:number_bonds#review                         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+composing:number_bonds#review@s1                      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting:count_objects#review                         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+counting:count_objects#review@s1                      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_fractions_like#review         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_fractions_like#review@s1      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:sub_fractions_like#review         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:sub_fractions_like#review@s1      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_frac_unlike#review            2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fraction_operations:add_frac_unlike#review@s1         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:fraction_of_set#review                      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:fraction_of_set#review@s1                   2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:fraction_of_set_hard#review                 2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+fractions:fraction_of_set_hard#review@s1              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .  ok
+TOTAL                                                         .     .   96   24        .     .       .    4     .       .     .    .      .       .
+
+multiplication:dot_array_mult#review (Dot Array Multiplication (B&W) (review))
+  [L-KEY AK-4 critical] (p2) key page 2 has 12 answer slots, pupil page 1 has 6 (AK-4)
+  [L-FONT TY-1 major] x12 (p1,2 cells 1,2,3,4,5,6,1,2...) font-family "Arial, sans-serif": every character of question content is Andika (TY-1)
+      e.g. <text> "5 rows × 4 columns" | <text> "9 rows × 8 columns"
+  [L-FONT TY-1 major] x2 (p1,2) printed page 1: 6 text run(s) embedded in "LiberationSans", not Andika (e.g. "5 rows × 4 columns") (TY-1, TY-3)
+  [L-SIZE TY-11 major] x2 (p1,2 cells 6,6) 7.3 pt text: nothing a pupil reads is under 8 pt (TY-11)
+      e.g. <text> "8 rows × 10 columns"
+  [L-SIZE TY-11 major] x10 (p1,2 cells 1,2,3,4,5,1,2,3...) 7.5 pt text: nothing a pupil reads is under 8 pt (TY-11)
+      e.g. <text> "5 rows × 4 columns" | <text> "9 rows × 8 columns"
+
+multiplication:dot_array_mult#review@s1 (Dot Array Multiplication (B&W) (review))
+  [L-KEY AK-4 critical] (p2) key page 2 has 12 answer slots, pupil page 1 has 6 (AK-4)
+  [L-FONT TY-1 major] x12 (p1,2 cells 1,2,3,4,5,6,1,2...) font-family "Arial, sans-serif": every character of question content is Andika (TY-1)
+      e.g. <text> "9 rows × 8 columns" | <text> "3 rows × 7 columns"
+  [L-FONT TY-1 major] x2 (p1,2) printed page 1: 6 text run(s) embedded in "LiberationSans", not Andika (e.g. "9 rows × 8 columns") (TY-1, TY-3)
+  [L-SIZE TY-11 major] x2 (p1,2 cells 5,5) 7.3 pt text: nothing a pupil reads is under 8 pt (TY-11)
+      e.g. <text> "8 rows × 10 columns"
+  [L-SIZE TY-11 major] x10 (p1,2 cells 1,2,3,4,6,1,2,3...) 7.5 pt text: nothing a pupil reads is under 8 pt (TY-11)
+      e.g. <text> "9 rows × 8 columns" | <text> "3 rows × 7 columns"
+
+fractions:identify_nv#review (Identify Fractions (No Visuals) (review))
+  [L-KEY AK-4 critical] (p2) key page 2 has 13 answer slots, pupil page 1 has 7 (AK-4)
+  [L-FONT TY-1 major] x24 (p1,2 cells 1,1,2,2,3,3,4,4...) font-family "Arial, Helvetica, sans-serif": every character of question content is Andika (TY-1)
+      e.g. <div> "A pizza is cut into 7 slices..." | <span> "Answer:"
+  [L-FONT TY-1 major] x2 (p1,2) printed page 1: 14 text run(s) embedded in "LiberationSans", not Andika (e.g. "A pizza is cut into 7 slices.") (TY-1, TY-3)
+  [L-FONT TY-1 major] x2 (p1,2) printed page 1: 6 text run(s) embedded in "LiberationSans-Bold", not Andika (e.g. "Answer:") (TY-1, TY-3)
+  [L-FONT TY-7 major] x6 (p2 cells 1,2,3,4,5,6) slash fraction "5/7": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)
+      e.g. <span.ws-legacy-value> "5/7" | <span.ws-legacy-value> "1/3"
+
+fractions:identify_nv#review@s1 (Identify Fractions (No Visuals) (review))
+  [L-KEY AK-4 critical] (p2) key page 2 has 13 answer slots, pupil page 1 has 7 (AK-4)
+  [L-FONT TY-1 major] x24 (p1,2 cells 1,1,2,2,3,3,4,4...) font-family "Arial, Helvetica, sans-serif": every character of question content is Andika (TY-1)
+      e.g. <div> "A cake is cut into 4 slices...." | <span> "Answer:"
+  [L-FONT TY-1 major] x2 (p1,2) printed page 1: 14 text run(s) embedded in "LiberationSans", not Andika (e.g. "A cake is cut into 4 slices.") (TY-1, TY-3)
+  [L-FONT TY-1 major] x2 (p1,2) printed page 1: 6 text run(s) embedded in "LiberationSans-Bold", not Andika (e.g. "Answer:") (TY-1, TY-3)
+  [L-FONT TY-7 major] x6 (p2 cells 1,2,3,4,5,6) slash fraction "3/4": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)
+      e.g. <span.ws-legacy-value> "3/4" | <span.ws-legacy-value> "7/12"
+
+ws-print-lint: FAIL - 34 document(s), source kit; 124 finding(s) in 4 document(s)

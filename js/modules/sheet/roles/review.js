@@ -17,7 +17,7 @@ import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, bestCols, planItem, gridPart, instructionKeyOf,
     instructionText, assemble, poolItems, topicOf, labelStyleOf, fitsAt, stripExtraMm,
 } from './compose.js';
-import { FILL_CAP, rowShape, groupByHeight, fillLimit } from '../layout.js';
+import { FILL_CAP, rowShape, groupByHeight, fillLimit, cellWidthMm } from '../layout.js';
 import { itemInstructionKey, neutralForKinds, itemKindSig, underSectionLine } from './practice.js';
 
 /** A row grows at most CONTENT_FILL x its content plus its pads (layout.fillLimit, one rule). */
@@ -143,6 +143,10 @@ function geometry(pools, input) {
     // under 45% (a disks Review of three full-width charts takes a mixed row of 2, not 3).
     const eOpts = [];
     for (let c = E.cols; c >= 1; c--) eOpts.push({ c, h: c === E.cols ? E.h : hMinAt(earlier, c, ctx) });
+    const wideEmpty = (items, c) => {
+        const w = cellWidthMm(c).inner;
+        return items.some((it) => { const m = it.measured && it.measured[c]; return !!m && Number.isFinite(m.slackMm) && m.slackMm > 0.3 * w; });
+    };
     const availOf = (kindBands) => m.body - 2 - (bands + kindBands - 1) * m.strip - wrap;
     // What mr rows of the skill's own problems ARE: the bands allocate() prints (one per item
     // kind, whole rows), each row grouped by height and as tall as what it holds (H13). Heights
@@ -189,6 +193,10 @@ function geometry(pools, input) {
                     // A mixed row of ONE problem that fits beside another is a lone problem in a
                     // full-width cell (H13: two thirds of it empty): never.
                     if (er >= 1 && eo.c === 1 && E.cols > 1) continue;
+                    // The mixed problems this row would print must fill its cells (H13 W, critic
+                    // fractions-key r8b: three short stacks a row left each cell 31% empty beside
+                    // the ink): measured side slack never over 30% of the cell's width.
+                    if (er >= 1 && wideEmpty(earlier.slice(0, er * eo.c), eo.c)) continue;
                     if (share > maxShare || (needE && (er < 1 || share < lo))) continue;
                     const d = Math.abs(share - 1 / 3);
                     const better = n > best.n || (n === best.n && (d < best.d - 1e-9 || (Math.abs(d - best.d) < 1e-9 && mr > best.mRows)));
