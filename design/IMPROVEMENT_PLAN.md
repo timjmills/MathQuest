@@ -1,4 +1,4 @@
-# Improvement plan — faster building, a simple teacher site, truly mixed pages (v20.2, 2026-10-23)
+# Improvement plan — faster building, a simple teacher site, truly mixed pages (v20.3, 2026-10-23)
 
 ## In short (for the owner)
 
@@ -19,7 +19,7 @@
    everywhere that area appears; areas taught in the same grade stay easy to tell apart for colour-blind teachers too, and
    every colour also carries the area's name and icon. To stay safe for colour-blind teachers, three of the eight are
    light rather than deep (mint, sky blue, lime), so their chips show by a thin outline; the one button you should press
-   is bold black; everything else is calm. Pupil pages stay black and white. You pick between two colour boards first.
+   is bold black; everything else is calm. Pupil pages stay black and white. You chose board B, the eight colours (Q-T6).
 4. **Three kinds of worksheet, with plain options** (owner decision): **Single skill · Sections · Mixed practice**. No
    other page types, no lettered A / B pages, no "I Can / Daily" look choice. Options: How many pages? · How often each
    skill comes up · Examples · Fade supports · Layout (fact rows, timed check, Today's Number) · Bring back earlier
@@ -41,7 +41,8 @@
    page easy to use, does it teach; you look at one sheet per family. Builders use Opus medium for the first skill of
    each new drawing, for the first build of each new engine, tool or screen (your decision, Q-S7), and for any rebuild
    after a failed review; Opus low for the copies.
-9. **Still to answer:** the questions in §4.3 not yet marked decided (each has a recommended answer).
+9. **Every question is answered** (your answers of 2026-10-23, §4.3), except two that belong to the later lesson wave
+   and are asked when it starts (Q-S5, Q-L1). §4.4 says how much faster this should make the work, and how we will know.
 
 Sections 1–3 hold the detail for builders; §4 shows how it fits the current plan and lists every open item.
 
@@ -58,7 +59,8 @@ and the three kinds of worksheet (v6–v18; rounds 6–18 FAIL); round 19 PASSED
 · G 8), and v19.1 applies its optional corrections — confirmed by a fresh check: PASS holds, 9 on every criterion.
 v20 records the owner's answers of 2026-10-23 (§4.3); v20.1 fixes the check of v20 and adds §1.7 (which effort,
 which kind of check), PASSED by critic r21 (A 8 · B 9 · C 8 · D 9 · E 9 · F 9 · G 8); v20.2 applies its optional
-corrections and records Q-S7. The current review state is in
+corrections and records Q-S7; v20.3 records the owner's answers to the remaining questions
+(Q-S2, Q-S3, Q-M2, Q-T1–Q-T6, Q-W3, Q-H2, Q-H3) and adds §4.4 (how much faster, and how we will know). The current review state is in
 `design/STATUS.md`.
 
 ---
@@ -925,7 +927,7 @@ light version, ≥ 7 : 1 on the dark tint (CC #E092E9, OA #A3A0D5, NBT #F4D984, 
 - **Neutral backgrounds** (white; #111318 dark), no pastel washes outside the group tints. Grades are numbered neutral
   pills.
 
-**At T1 the owner picks between two rendered boards** (Q-T6): **A** six areas (Measurement and Data share mint; Ratio /
+**The owner chose board B** (Q-T6, decided 2026-10-23); T1 renders both boards for the record: **A** six areas (Measurement and Data share mint; Ratio /
 Number system shares pink) and **B** eight areas with the strengths above. Board A uses six of the same colours and passes
 the same checks (closest colour-blind pair CC–OA 12.2).
 
@@ -967,14 +969,14 @@ the same checks (closest colour-blind pair CC–OA 12.2).
 
 | Phase | Work | Files | Done when |
 |---|---|---|---|
-| T1 | Clickable mock-up + the two palette boards (A six areas, B eight areas with ramps, each with its colour-blind simulation): Skills, tray, worksheet sheet, Quiz, Share, Lessons, Classes at 1366 and 390, light and dark; a live-vs-branch table of teacher files (STATUS §7) | `design/mockups/teacher-2/*.html`, `tests/scripts/ws-teacher-tokens.cjs` (palette part) | the owner approves the flows and picks board A or B (this is the signed spec card) |
+| T1 | Clickable mock-up + the two palette boards (A six areas, B eight areas with ramps, each with its colour-blind simulation): Skills, tray, worksheet sheet, Quiz, Share, Lessons, Classes at 1366 and 390, light and dark; a live-vs-branch table of teacher files (STATUS §7) | `design/mockups/teacher-2/*.html`, `tests/scripts/ws-teacher-tokens.cjs` (palette part) | the owner approves the flows on board B (chosen 2026-10-23, Q-T6; this is the signed spec card) |
 | T2 | Shell + tokens: four places, profile menu, the bottom bar below 820 px, tokens, `areaOf()` | `teacher-shell.js`, `teacher-ui.js`, `teacher-areas.js` (new), `css/teacher-brand.css`, `css/teacher.css`, `index.html` teacher markup, `tests/scripts/ws-teacher-tokens.cjs` | `ws-teacher-tokens` green; old screens reachable |
 | T3 | Skills gallery + Browse by + tray + chip options + worksheet sheet + Quiz + Share | `sheet/roles/test.js` (the Quiz layer), `teacher-library.js`, `teacher-skillpick.js`, `teacher-sets.js`, `teacher-print.js`, `teacher-preview.js`, `teacher-quiz-ui.js`, `quiz-builder.js` (save path only), `quiz-storage.js`, `teacher-map-tasks.js`, `teacher-standards.js` (Browse by › Standard), `print-sheet.js` (request normalising only), `css/teacher-library.css`, `css/teacher-quiz.css` | `ws-teacher-flows` green for every Skills flow |
 | T4 | Lessons: the 2026-10-17 layout restyled, opening where the teacher was last; Print lesson / Print practice / Share practice / Practise pre-skills; "Skills to be made" folded into each lesson and area | `teacher-wrm.js`, `lesson-tomake.js`, `teacher-todo.js` (its content moves onto lessons; the screen leaves the menu in T6), `css/teacher-wrm.css` | Lessons flows green |
 | T5 | Classes: board, results, MAP tests, progress | `teacher-map.js`, `dashboard.js` (wrapping only), board routing | each reachable in ≤ 2 actions |
 | T6 | Redirects and aliases (incl. `#todo/…` → the lesson or area), retire old entry points (the separate Skills to be made screen, `teacher-todo.js` entry), rewrite the teacher gates; independent critic at 1366 / 1280 / 820 / 390, every action clicked through to a printed PDF or a working code | as above | critic ≥ 8 on every screen; full gates; deploy |
 
-### 2.11 Teacher-site questions — see §4.3 (Q-T1 … Q-T6, Q-W2, Q-W3)
+### 2.11 Teacher-site questions — all decided 2026-10-23, see §4.3 (Q-T1 … Q-T6, Q-W2, Q-W3)
 
 ---
 
@@ -1119,7 +1121,7 @@ reproduced.
 | 1 | **Wave 0** (§1.4 S1–S9; §1.6 E1's tools and E5. Certifying — E2 — waits until M4 is merged, then the worksheet lane certifies Single skill and Sections, owning the files §1.6.5 lists) + review of the open PRs #11 (needs a critic on its round-3 fixes f0d4a489), #13 (re-pin codes VA–VD; becomes the shape-grid / solid-kit starting point), #14 (quiz "Click ALL"; it lands in the same deploy as #13, merged right after it, because #13's new Click-ALL skills need #14's answer tiles — HANDOVER-2026-10-17) | `tests/scripts/*` until Wave 0 is merged (after that each test script belongs to the lane that changes it: 2b takes `ws-catalogue.cjs`, `ws-content-audit.cjs`, `ws-coverage-matrix.cjs`), `design/status/`, `design/cards/`, `design/lanes/` | mixed-page engine M1–M4 (different files: Wave 0 builds tools and tests, M1–M4 edit the kit; no certificate is made until M4 is merged) |
 | 2 | **Mixed pages M1–M5** (the mixed packer and Mixed practice certified at M5, E2) | `print-sheet.js` (all of it until M4 is merged, including E1's move of its measuring and key path into a module of its own; then the mixed and request parts), `sheet/contract.js`, `sheet/instructions.js` (new), `kit-setup.js` (new), the one-line `kit-setup.js` import in `screen-cell.js` and the test harness, and `sheet/providers/*` (until M3 is merged, for `strings.cue` and the M3 cut), `sheet/layout.js`, `sheet/paginate.js`, `sheet/cell.js`, `sheet/frame.js`, `sheet/anchors.js`, `sheet/interleave.js` (new), `sheet/roles/mixed-practice.js`, `sheet/roles/review.js`, `sheet/roles/answer-key.js` and `sheet/roles/practice.js` (until M4 is merged; practice.js for the two examples modes and the section title), `skill-codes.js`, then `worksheet.js`, `quiz-take.js` (M5) | Wave 0 |
 | 2b | **The worksheet lane** (starts when M4 is merged): certify Single skill and Sections (E2), then the provider pass (E3) family by family, largest first | `sheet/roles/independent.js`, `practice.js`, `more-practice.js`, `fact-rows.js`, `fact-probe.js`, `todays-number.js`, `answer-key.js`, `key-short.js`, `sheet/supports.js`, `sheet/support-draw.js`, `sheet/providers/*` and `sheet/instructions.js` (after M3), `tests/scripts/ws-catalogue.cjs`, `ws-content-audit.cjs`, `ws-coverage-matrix.cjs` | Teacher site, M5 |
-| 3 | **Teacher site 2.0 T1–T6** (T1 needs the owner) | `teacher-*.js`, `css/teacher*.css`, `index.html` teacher markup | templates (step 4) |
+| 3 | **Teacher site 2.0 T1–T6** (T1 needs the owner's approval of the mock-up; Q-T1–Q-T6 decided 2026-10-23) | `teacher-*.js`, `css/teacher*.css`, `index.html` teacher markup | templates (step 4) |
 | 4 | **Templates by leverage** (§1.5) — **new skills start after the worksheet lane's provider pass (row 2b, E3)**: owner 2026-10-23, "every skill, every worksheet" first; the fixes below to existing skills and PR #13's shape drawings go ahead, as they land before E2 certifies; the paused lanes restart with precritic: Lane D print backlog, the fraction key (keys show 2/8 = 1/4, owner 2026-10-17; both touch `print-sheet.js`, so one after the other and after M2), Lane B answer + regroup boxes, place-value write-value, the decimals key fault (AK-4 on `add_decimal`, same fix pattern as `mult_properties`), the skip-count owner answers still to build (wide rows wrap and keep size; phone card opens at the first box), the number line 5.2 later steps (1) a time line in hours and minutes for `measurement:elapsed_*`, (2) D9 band tightness, (4)/(8) a unit-fraction line for `fraction_operations` when the teacher fixes one denominator, (9) the owner question on mixed pools losing a row, the `order_fdp` page that prints "Order from greatest to least" with no numbers (STATUS §7 item 7, conversions family) | `sheet/cells/<template>.js`, the generators | Teacher site 2.0 |
 | 5 | **Later wave, if needed (owner 2026-10-23): new lessons** — the short lesson (original maker) and the V22 detailed lesson: first the lesson compiler and shapes (§1.6 E4: lessons 1–5 recompiled and passed), then lessons 6 onward from signed cards, one lane per shape; the parked branch `claude/sweet-newton-c8wrv1-wip-detailed-lessons-2` (patches in `design/lesson-planner/wip-2026-10-17/`) waits for it | `js/modules/lessons/detailed/`, `data/curriculum/detailed-lessons.json` | any lane |
 
@@ -1141,7 +1143,7 @@ before the owner's go on its picture sheet (§1.6.3 step 6).
 | Wave 4.5 other page types leave the UI | §2.5: no page-kind chooser; old codes decode |
 | Practice pages A–J, versions on practice papers | replaced by §2.5 (owner 2026-10-23, decided) |
 | Today's print-screen page types (about 18) and the Look choice | the three kinds and their options (§2.5, owner 2026-10-23, decided); the roles stay in the code so old codes decode |
-| Wave 5 (redo existing skills), 5.2 number line (built), 5.3 same skill with different supports | §1.5; 5.3 needs a share-code decision (Q-H3) |
+| Wave 5 (redo existing skills), 5.2 number line (built), 5.3 same skill with different supports | §1.5; 5.3: the same skill twice with different supports is allowed (Q-H3, decided 2026-10-23); its share-code change keeps old codes decoding |
 | Wave 6 (new skills incl. MAP 6.2–6.4) | §1.5 template order |
 | Wave 7 (Seesaw / Classroom trial, game modes) | unchanged, after Waves 5–6 |
 | Wave 8 (lessons, owner list of 67) | moved to a later wave, if needed (owner 2026-10-23); §4.1 step 5, with the lesson compiler and lesson shapes (§1.6.5, E4) |
@@ -1165,7 +1167,7 @@ before the owner's go on its picture sheet (§1.6.3 step 6).
 | STATUS §7: teacher files live vs branch | §2.10 T1 |
 | STATUS §7: BACKLOG items with no wave owner | §1.5 item 4 |
 | STATUS §7: research logins missing | Q-H4 |
-| STATUS §7: 5.3 share-code decision | Q-H3 |
+| STATUS §7: 5.3 share-code decision | Q-H3, decided 2026-10-23: allowed |
 | STATUS §7: decimals AK-4 key fault | §4.1 step 4 |
 | STATUS §7: Wave 2 has no recorded baseline (`ws-wrm` today: 872 steps, 359 not fully covered — 149 partial, 210 gap — 162 proposals) | §1.4 S8: the metrics file records these numbers as the WRM baseline and adds the `ws-wrm --report-only` counts at every deploy |
 | STATUS §7: number line 5.2 later steps (1) time line in hours and minutes, (2) D9 band tightness, (4)/(8) unit-fraction line for `fraction_operations`, (9) owner question on mixed pools losing a row | §4.1 step 4, with the number line's own family; the (9) question goes on that family's spec card |
@@ -1182,8 +1184,8 @@ before the owner's go on its picture sheet (§1.6.3 step 6).
 | # | Question | Recommended |
 |---|---|---|
 | Q-S1 | Use the stronger, slower builder for the first skill of each new kind of drawing, and again for any copy that fails a review; keep the quicker builder for the other copies? (This changes the builder rule in CLAUDE.md.) | **Decided 2026-10-23: yes** — the stronger builder for the first skill of each new drawing and for any skill that fails a review |
-| Q-S2 | When a review fails only by a whisker (every failing mark is a 7, nothing lower), re-check just the failed pages, every changed page and a fresh 1 in 5 of the rest, instead of re-grading everything? Every page must still reach 8. | Yes |
-| Q-S3 | Let each work lane keep its own progress notes (joined into one status page automatically), so lanes stop clashing when their work is merged? | Yes |
+| Q-S2 | When a review fails only by a whisker (every failing mark is a 7, nothing lower), re-check just the failed pages, every changed page and a fresh 1 in 5 of the rest, instead of re-grading everything? Every page must still reach 8. | **Decided 2026-10-23: yes**, the quick re-check; every page still reaches 8 |
+| Q-S3 | Let each work lane keep its own progress notes (joined into one status page automatically), so lanes stop clashing when their work is merged? | **Decided 2026-10-23: yes**, notes per lane |
 | Q-S4 | Once a drawing has passed review on one kind of worksheet across all its sizes and options, may new skills on that drawing and kind be checked this way: the machine checks on every page; a reviewer reading every new skill for **ease of use and teaching** — including its worked-example pages and its faded page — two pages to a sheet with the measured sizes beside them, and its screens; and 1 in 5 pages graded in full on all four points? **Spacing and the workbook look come from the drawing's approval plus the machine checks.** Any new kind of page is graded in full, a page below 8 sends that skill to a full review, and a spot-audit at every update grades more pages in full and withdraws the approval if any falls below 8. Every page is still held to 8, but this changes how CLAUDE.md says a page counts as graded. | **Decided 2026-10-23: yes** — batch reading of every new skill, 1 in 5 pages graded in full, spot-audit at every update |
 | Q-S5 | (Asked when the later lesson wave starts.) Let lessons be drafted automatically from their skills — steps, examples, the mistakes table, practice and the exit slip — with the builder writing only the story, the hook and the teaching notes? Before each lesson is made you sign its **lesson card**: a short form saying which White Rose step and standards it teaches, which skills and settings each part uses, the number ranges, the edge cases and any ruling (such as "1,000 on the board only"). The five lessons already passed are rebuilt this way and compared page by page, and one more lesson is made as a test, before any new one. | Yes |
 | Q-L1 | (Asked when the later lesson wave starts.) The intervention library — a short lesson for every White Rose small step: build it with our standard lesson maker, or in your Atomised Lesson V20 format? | Decide then |
@@ -1193,20 +1195,47 @@ before the owner's go on its picture sheet (§1.6.3 step 6).
 | Q-Q2 | Do you want to see the work before a group of skills goes live? | **Decided 2026-10-23: one picture sheet per family** (about 10 minutes); it goes live when you say go (§1.6.3 step 6) |
 | Q-O1 | What is built first? | **Decided 2026-10-23: every skill, every worksheet** — the worked-example pass for the 454 skills before new skills from the build list (§4.1) |
 | Q-M1 | When a worksheet has 2 or more skills, make it Mixed practice by default? Practice printed from a lesson starts as Sections, because the lesson's skills are new. | **Decided 2026-10-23: Mixed practice by default**, except practice printed from a lesson, which starts as Sections; Sections always available, made one per skill, grouped by type, or as exam-style parts (§2.5) |
-| Q-M2 | If the skills you chose cannot all fit on one page at least twice each, should Print add pages (it tells you) rather than print some skills only once? | Yes, add pages |
-| Q-T1 | Replace today's home screen with: the site opens on Skills, ticked skills go to a tray with Print · Quiz · Share? | Yes |
-| Q-T2 | Make quizzes from the same tray (Quiz button) and retire the separate quiz builder? Pupils take quizzes exactly as today, and old quiz links keep working. | Yes |
-| Q-T3 | Keep "Skills to be made" on each lesson and maths area (folded away), and take its separate screen out of the menu? | Yes |
-| Q-T4 | Show grades as plain numbered labels, so colour only ever means the maths area? | Yes |
-| Q-T5 | Share gives one link: it **opens the practice straight away** (today's "Direct link"). The other kind — a link that **puts the skills as buttons on the pupil's start screen to choose from**, which you can lock (today's "Quick Start link") — moves under More options. Agree? | Yes |
-| Q-T6 | Colour board A (six maths-area colours) or board B (eight colours, each in four strengths)? Either way the main button is bold black. On both, areas taught in the same grade stay easy to tell apart for colour-blind teachers, and every colour also shows the area's name and icon. The cost: to stay colour-blind safe, three of the colours are light (mint, sky blue, lime) rather than deep, so their buttons show by a thin outline — you will see them on the board. | B |
+| Q-M2 | If the skills you chose cannot all fit on one page at least twice each, should Print add pages (it tells you) rather than print some skills only once? | **Decided 2026-10-23: add pages**, and the summary line says so |
+| Q-T1 | Replace today's home screen with: the site opens on Skills, ticked skills go to a tray with Print · Quiz · Share? | **Decided 2026-10-23: yes**, the site opens on Skills with the tray |
+| Q-T2 | Make quizzes from the same tray (Quiz button) and retire the separate quiz builder? Pupils take quizzes exactly as today, and old quiz links keep working. | **Decided 2026-10-23: yes**, quizzes from the tray; the separate builder retires, old links keep working |
+| Q-T3 | Keep "Skills to be made" on each lesson and maths area (folded away), and take its separate screen out of the menu? | **Decided 2026-10-23: yes**, folded in |
+| Q-T4 | Show grades as plain numbered labels, so colour only ever means the maths area? | **Decided 2026-10-23: yes**, plain labels |
+| Q-T5 | Share gives one link: it **opens the practice straight away** (today's "Direct link"). The other kind — a link that **puts the skills as buttons on the pupil's start screen to choose from**, which you can lock (today's "Quick Start link") — moves under More options. Agree? | **Decided 2026-10-23: yes**, one link; the Quick Start link under More options |
+| Q-T6 | Colour board A (six maths-area colours) or board B (eight colours, each in four strengths)? Either way the main button is bold black. On both, areas taught in the same grade stay easy to tell apart for colour-blind teachers, and every colour also shows the area's name and icon. The cost: to stay colour-blind safe, three of the colours are light (mint, sky blue, lime) rather than deep, so their buttons show by a thin outline — you will see them on the board. | **Decided 2026-10-23: board B** (eight colours, four strengths) |
 | Q-W1 | No lettered A–J pages; "How many pages?" for section, single-skill and mixed pages; **three kinds of worksheet only — Single skill, Sections, Mixed practice — each with its options; no other page types and no "I Can / Daily" look choice** | **Decided by the owner, 2026-10-23** |
 | Q-W2 | Offer "An example with each problem" again? It was dropped on 2026-09-26 because it made pages with only one problem. | **Decided 2026-10-23: yes, widened** — an example at the top of the page, the first time each kind of problem appears in a section or on a page, to start each group, or with each problem where it fits (§2.5) |
-| Q-W3 | For quizzes, "How many versions? 1–6" — each version with its own order and answer key, no letters? | Yes |
+| Q-W3 | For quizzes, "How many versions? 1–6" — each version with its own order and answer key, no letters? | **Decided 2026-10-23: yes**, 1–6 versions, no letters |
 | Q-W4 | You said the thinking pages (find the mistake, true or false, reason it, stretch) wait until after the lessons. Lessons are now in a later wave: should the thinking pages still wait for that wave, or join the worksheet types now? | **Decided 2026-10-23: still wait** for the lesson wave |
-| Q-H2 | Use the shape drawings already made (pull request #13) as the start of the shape pages, rather than building them again? | Yes |
-| Q-H3 | Allow the same skill twice in one set with different supports (for example once with the number line and once without)? Old codes keep working. | Yes |
+| Q-H2 | Use the shape drawings already made (pull request #13) as the start of the shape pages, rather than building them again? | **Decided 2026-10-23: yes**, reuse pull request #13 |
+| Q-H3 | Allow the same skill twice in one set with different supports (for example once with the number line and once without)? Old codes keep working. | **Decided 2026-10-23: yes**, allowed; old codes keep working |
 | Q-H4 | For research on MathWorksheets4Kids and IXL: add the logins to the cloud workspace's private settings, or research from their public pages once per kind of drawing? | **Decided 2026-10-23: add the logins** — the owner adds them to the cloud environment's settings (Network secrets, or environment variables `MW4K_USER`, `MW4K_PASS`, `IXL_USER`, `IXL_PASS`); read-only research |
+
+### 4.4 Will this make the work faster? (owner question, 2026-10-23)
+
+Yes. It should make the work several times faster once the new tools are in place, at the same bar of 8. It will be
+**slower at first**, because Wave 0, E1 and the mixed-page engine (M1–M4) have to be built before the speed-up starts.
+Where the time goes today, and what changes:
+
+| Where the time goes today (§1.1) | What changes | Expected effect |
+|---|---|---|
+| Review rounds: median ≈ 5 a lane, 1–2 hours each, mostly spent finding faults a machine could measure | the machine checks run first (S1–S2), every new fault class becomes a check (S8), the quick re-check after a near miss (Q-S2) | median rounds to PASS fall from 5 to 2 (the target in §1.4) |
+| The cheap first build of new, hard work cost 2–5 extra rounds (14 escalations) | Opus medium for every first drawing and engine, and for any rebuild after a failed review (Q-S1, Q-S7) | those extra rounds are not spent |
+| Every skill and every page graded one by one | each drawing is approved once on each kind of worksheet; the skills on it are made as data (the 114 presets took two builder runs this way) and read as a batch, 1 in 5 pages graded in full (Q-S4) | the review work grows with the number of drawings, not the number of skills: about a family per builder run |
+| Three lanes at once, clashing on shared files (152 merge commits, 10 conflict fixes) | lane manifests and notes per lane (Q-S3, E5); up to six lanes plus other sessions (Q-S6) | twice the lanes, with no merge clashes |
+| Deploy checks run one after another: ≈ 80 minutes; each builder reads ≈ 740 KB of rules (≈ 185 k tokens) | three deploy sessions in parallel (S5), only the rows a change reaches (§1.6.2); spec cards for builders | ≤ 30 minutes, with every check still run; builders read a signed spec card of ≈ 10 k tokens (S3), while critics keep the full rules |
+
+Together these aim at **five times today's pace or more** on the skill backlog (§1.6.7, "Expected effect"). From then on
+the limits are reviewer time and your sign-off time (spec cards, one picture sheet per family), not building time.
+
+**What keeps it from being instant.** The first certificate comes only after M4 is merged. Each drawing still needs one
+full review on each kind of worksheet. A change to shared engine code voids that drawing's approvals and sends its
+pages back for review (that is the safeguard, §1.6.4). Until M4 the deploy has no fast path for changed pages, so it
+runs the full ≈ 4-hour check.
+
+**How we will know** (S8). The metrics file records, for every lane: rounds to PASS, hours, findings by class and the
+builder profile used, measured against today's numbers in §1.1. They are reviewed after every drawing. The first real
+test is the first family made as data on an approved drawing (E3). If it is not well under today's ≈ 5 rounds and
+1–2 hours a round, the next audit says why, and the plan changes before the next family.
 
 ---
 
