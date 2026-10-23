@@ -47,7 +47,7 @@ import { TEACHER_CSS, RCDWS_CSS, teacherParts, numberWords, pageRepeats, factOf 
 const { tBand } = teacherParts;
 import { planItem as composePlanItem, operandsOf as composeOperandsOf, opOf as composeOpOf, opGlyphOf as composeGlyphOf, oralFrameOf as composeOralFrameOf, answerOf as composeAnswerOf, instructionKeyOf as composeInstrKeyOf, instructionText as composeInstrText } from './sheet/roles/compose.js';
 import {
-    normaliseAnchors, ANCHOR_ROLES, anchorEligible, anchorItem, anchorHeightMm, sideFit, easeScore, ineligibleNote,
+    normaliseAnchors, ANCHOR_ROLES, anchorEligible, anchorItem, anchorHeightMm, sideFit, SIDE_COLS, easeScore, ineligibleNote,
     blockPlan, sideItems, pickDistinct,
 } from './sheet/anchors.js';
 import {
@@ -1469,6 +1469,39 @@ function why(it, c, reason) {
     if (!it.measureWhy[c]) it.measureWhy[c] = String(reason).slice(0, 80);
 }
 
+/**
+ * SIDE BY SIDE: each [twin | problem] pair measured as it prints - a two-column grid with the
+ * content-sized columns of the side page (anchors.js SIDE_COLS) - so a twin's height is read at
+ * its REAL column width, not at an equal half (coordinator, anchors E2/E3 follow-up: measured at
+ * 92 mm, a wider printed twin was planned a third taller than it prints, and a page lost a row).
+ * Writes `twin.pairMm` (the tallest of its pairs, mm), read by anchors.js anchorHeightMm(a, 2).
+ */
+function measurePairs(pairs, { size, look }) {
+    if (typeof document === 'undefined' || !document.body || !pairs.length) return;
+    ensureEngineStyle(document);
+    const s = SIZES[size] || SIZES.L;
+    const host = document.createElement('div');
+    host.setAttribute('aria-hidden', 'true');
+    host.style.cssText = 'position:absolute;left:-10000px;top:0;width:220mm;visibility:hidden;pointer-events:none;contain:layout;';
+    host.innerHTML = `<div class="ws-sheet ws-${size} ws-${look} ws-tab${s.tabMm}" style="display:block;max-width:none;width:${LIVE_W_MM}mm;overflow:visible"></div>`;
+    document.body.appendChild(host);
+    const root = host.firstChild;
+    const PX_PER_MM = 96 / 25.4;
+    try {
+        for (const [twin, it] of pairs) {
+            const ctx = (lvl) => resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: lvl || 1, state: 'blank' });
+            let tb = '', pb = '';
+            try { tb = twin.render(ctx(twin.measureLevel), { cols: 2 }); } catch (e) { tb = ''; }
+            try { pb = it.render(ctx(it.measureLevel), { cols: 2 }); } catch (e) { pb = ''; }
+            root.innerHTML = `<div class="ws-grid fixed" style="grid-template-columns:${SIDE_COLS};grid-template-rows:auto;height:auto;align-items:start">`
+                + `<div class="ws-cell ${twin.cellCls || ''}" style="height:auto;min-height:0"><span class="ws-letter">m.</span>${tb}</div>`
+                + `<div class="ws-cell ${it.cellCls || ''}" style="height:auto;min-height:0"><span class="ws-letter">m.</span>${pb}</div></div>`;
+            const h = root.firstChild.firstChild.getBoundingClientRect().height / PX_PER_MM;
+            twin.pairMm = Math.max(twin.pairMm || 0, Math.ceil(h * 10) / 10);
+        }
+    } finally { host.remove(); }
+}
+
 function measureItems(items, { size, look, colsList }) {
     if (typeof document === 'undefined' || !document.body || !items.length) return;
     ensureEngineStyle(document);
@@ -1960,7 +1993,7 @@ function anchorSummary(mode, list, notes) {
     for (const a of list) {
         if (!a || !a.source || seen.has(a)) continue;
         seen.add(a);
-        examples.push({ section: a.section, pool: a.pool, variant: a.anchor, skill: a.skill, text: String(a.source.q.text || ''), ans: a.source.q.ans, sig: signature(a.source.q), measured: a.measured });
+        examples.push({ section: a.section, pool: a.pool, variant: a.anchor, skill: a.skill, text: String(a.source.q.text || ''), ans: a.source.q.ans, sig: signature(a.source.q), measured: a.measured, pairMm: a.pairMm });
     }
     return { mode, examples, notes: notes.slice() };
 }
@@ -2392,6 +2425,7 @@ async function buildSheetCore(req = {}) {
             if (anchorMode === 'side') {
                 const tw = set.take(hostItems, mine.length);
                 mine.forEach((it, i) => { it.twin = tw[i] || null; });
+                measurePairs(mine.filter((it) => it.twin).map((it) => [it.twin, it]), { size: n.size, look: n.look });
             } else {
                 // One example per block: enough for a sheet's blocks (a block holds 1-4 problems).
                 const perLetter = new Map();

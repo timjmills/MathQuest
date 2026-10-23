@@ -243,6 +243,7 @@ export function anchorHtml(it, c, { variant = 'band', twinCols = 2 } = {}) {
         const body = `<div class="mq-anchor-one mq-anchor-beside" style="flex-wrap:wrap">${st}${list}</div>`;
         // A side twin is centred in its cell at its own width (lead pilot E3, H13: never pinned to
         // one side of the pair's cell with an empty band beside it); a band keeps the full width.
+        // Horizontal only (owner ruling CL-4): the twin stays at the TOP of its cell, the room below.
         const centre = variant === 'side' ? ' style="width:auto;max-width:100%;align-self:center"' : '';
         return `<div class="mq-anchor mq-anchor-${variant}" data-ws-anchor="${variant}" data-ws-states="1"${centre}>${body}${sayHtml}</div>`;
     }
@@ -302,6 +303,9 @@ export function anchorPlanItem(a, cols = 1) {
 
 /** The measured height of an anchor item (mm) at `cols`, with a floor. */
 export function anchorHeightMm(a, cols = 1) {
+    // A side twin measured in its printed pair (print-sheet measurePairs: the real grid at its
+    // real column width, so no wrap margin is needed; anchors.check.cjs E2 holds it to the print).
+    if (cols === 2 && a && Number.isFinite(a.pairMm) && a.pairMm > 0) return a.pairMm;
     const m = a && a.measured && a.measured[cols];
     // + 6 mm: the anchor's step text wraps in narrow state columns, and a wrap measured in the
     // app page can fall one line short of the printed document's (a line is ~5 mm at L).
@@ -315,7 +319,8 @@ export function anchorHeightMm(a, cols = 1) {
  * content never overflows; the cell grows, and a page holds fewer pairs). A twin carries the same
  * +6 mm print margin as a band (anchorHeightMm).
  *
- * Two columns ([twin | problem] rows): rows as tall as the tallest twin. One column (a twin above
+ * Two columns ([twin | problem] rows): the most rows that hold the tallest pair (once the pairs
+ * are measured as they print, print-sheet measurePairs). One column (a twin above
  * its problem): whole pairs, each pair's twin row and problem row as tall as each needs
  * (`pairMm`, the grid's row template), so a twin taller than half a pair still fits.
  *
@@ -331,10 +336,13 @@ export function sideFit(L, items) {
     const hs = (items || []).filter((it) => it && !it.anchor && it.measured && it.measured[L.cols] && Number.isFinite(it.measured[L.cols].hMm)).map((it) => it.measured[L.cols].hMm + 1);
     const pr = hs.length ? Math.max(...hs) : Number(L.hMin) || 0;
     if (L.cols === 2) {
-        const need = Math.max(Number(L.hMin) || 0, tw);
-        if (!(need > L.cellH + 0.05)) return L;
-        const rows = Math.max(1, Math.min(L.rows, Math.floor(G / need)));
-        if (rows >= L.rows) return L;
+        // (L.hMin holds the twins at an equal half column; with the problems known, they decide)
+        const need = Math.max(hs.length ? pr : Number(L.hMin) || 0, tw);
+        // The densest rows that hold every pair: fewer when a twin is taller than its row, more
+        // when the practice ceiling left rows a third empty (E4, L-class wasted space).
+        const fit = Math.max(1, Math.floor(G / need));
+        const rows = need > L.cellH + 0.05 ? Math.min(L.rows, fit) : twins.every((a) => Number.isFinite(a.pairMm)) && hs.length ? fit : L.rows;
+        if (rows === L.rows) return L;
         return Object.assign({}, L, { rows, perPage: rows * 2, cellH: Math.floor((G / rows) * 1000) / 1000 });
     }
     if (!(tw > L.cellH + 0.05)) return L;
@@ -345,6 +353,12 @@ export function sideFit(L, items) {
     const pairMm = [Math.round(tw * k * 10) / 10, Math.round(pr * k * 10) / 10];
     return Object.assign({}, L, { rows, perPage: rows, cellH: Math.floor((G / rows) * 1000) / 1000, pairMm });
 }
+
+/** The columns of a two-column side-by-side grid (lead pilot E3, H13): sized to their content. */
+export const SIDE_COLS = 'auto auto';
+
+/** A side page's cells hold their content at the top, the room below (owner ruling CL-4). */
+export const SIDE_TOP = 'justify-content:flex-start';
 
 /* ============================================================ easy numbers first */
 
@@ -491,5 +505,5 @@ export const ANCHOR_CSS = `
 export default {
     ANCHOR_MODES, ANCHOR_ROLES, normaliseAnchors, wordCount, workedStepsOf, anchorEligible, ineligibleNote,
     stepLines, anchorGroups, sayLineOf, stepTemplateOf, unslot, stateSize, anchorHtml, anchorItem,
-    anchorPlanItem, anchorHeightMm, sideFit, easeScore, pickDistinct, sideItems, pupilCount, blockPlan, blockPages, ANCHOR_CSS,
+    anchorPlanItem, anchorHeightMm, sideFit, SIDE_COLS, SIDE_TOP, easeScore, pickDistinct, sideItems, pupilCount, blockPlan, blockPages, ANCHOR_CSS,
 };

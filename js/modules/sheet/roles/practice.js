@@ -31,7 +31,7 @@ import {
 import { paginate, labelStarts, scoreDenominator, placeSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
 import { deriveSeed } from '../rng.js';
-import { ANCHOR_CSS, anchorPlanItem, sideItems, pupilCount, blockPlan, blockPages, sideFit } from '../anchors.js';
+import { ANCHOR_CSS, anchorPlanItem, sideItems, pupilCount, blockPlan, blockPages, sideFit, SIDE_COLS, SIDE_TOP } from '../anchors.js';
 import { LESSON_CSS } from '../lesson-css.js';
 
 /* ======================================================================= engine stylesheet */
@@ -706,9 +706,6 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
     return { layouts, chunksBySection, pages };
 }
 
-/** The columns of a two-column side-by-side grid (lead pilot E3, H13): sized to their content. */
-const SIDE_COLS = 'auto auto';
-
 /** The anchor band height (mm) of section `si` in SECTIONS mode, else 0. */
 const anchorBandOf = (anchors, si) => (anchors && anchors.mode === 'sections' && anchors.bandMm && Number(anchors.bandMm[si]) > 0
     && anchors.bySection && (anchors.bySection[si] || []).length ? Number(anchors.bandMm[si]) : 0);
@@ -958,7 +955,11 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 // width shared, so a narrow stack is not an island in a half-page cell (H13).
                 ...(L.cols === 2 && its.some((it) => it.anchor) ? { colsTpl: SIDE_COLS } : {}),
                 rowGap: gap.gap || 0,
-                items: its.map((it) => planItem(it, level, L.cols)),
+                // SIDE BY SIDE (owner ruling CL-4): every twin and problem at the TOP of its cell,
+                // the writing room below - never centred down the cell.
+                items: its.some((it) => it.anchor)
+                    ? its.map((it) => { const p = planItem(it, level, L.cols); return Object.assign({}, p, { style: [p.style, SIDE_TOP].filter(Boolean).join(';') }); })
+                    : its.map((it) => planItem(it, level, L.cols)),
             });
         }
         // Wave 5.2: a page none of whose sections asked for the number line prints without it
