@@ -115,7 +115,7 @@
   }
   function areaModel(a, b) {
     const t = Math.floor(a / 10) * 10, o = a % 10;
-    return svg(240, 110, rect(40, 26, 120, 70) + rect(160, 26, 60, 70) + txt(100, 18, t, 20, 'middle') + txt(190, 18, o, 20, 'middle') + txt(24, 68, b, 20, 'middle') + box(84, 44, 34, 34) + box(174, 44, 34, 34));
+    return svg(240, 116, place(rect(40, 26, 120, 70) + rect(160, 26, 60, 70) + txt(100, 18, t, 20, 'middle') + txt(190, 18, o, 20, 'middle') + txt(24, 68, b, 20, 'middle') + box(84, 44, 34, 34) + box(174, 44, 34, 34), 0, 6));
   }
   function multChart(r) {
     let s = ''; const n = 5; const blank = [int(r, 1, 4), int(r, 1, 4)];
@@ -154,8 +154,8 @@
   }
   function pvChart(n, ask) {
     const d = String(n).padStart(3, '0').split(''); const heads = ['H', 'T', 'O']; let s = '';
-    heads.forEach((hd, i) => { s += rect(8 + i * 46, 6, 46, 26, GREY, 1.5) + txt(31 + i * 46, 26, hd, 18, 'middle', 700) + rect(8 + i * 46, 32, 46, 40); s += ask === i ? box(18 + i * 46, 38, 26, 28) : txt(31 + i * 46, 62, d[i], 26, 'middle'); });
-    return svg(156, 80, s);
+    heads.forEach((hd, i) => { s += rect(8 + i * 46, 4, 46, 32, GREY, 1.5) + txt(31 + i * 46, 26, hd, 18, 'middle', 700) + rect(8 + i * 46, 36, 46, 46); s += ask === i ? box(18 + i * 46, 44, 26, 30) : txt(31 + i * 46, 68, d[i], 24, 'middle'); });
+    return svg(156, 88, s);
   }
   function analogClock(h, m, x = 50, y = 50, rr = 44) {
     const ma = (m / 60) * 2 * Math.PI, ha = ((h % 12) / 12 + m / 720) * 2 * Math.PI; let t = '';
@@ -660,12 +660,12 @@
     'area-grid': (r) => { const w = int(r, 3, 6), h = int(r, 2, 4); return svg(220, 80, grid(w, h, 10, 10, 15) + `<rect x="10" y="10" width="${w * 15}" height="${h * 15}" fill="none" stroke="#000" stroke-width="2.5"/>` + txt(120, 40, 'squares', 15) + box(136, 46, 34, 28)); },
     'area-triangle': () => svg(220, 98, `<polygon points="10,76 120,76 70,10" fill="none" stroke="#000" stroke-width="2.5"/>` + ln(70, 10, 70, 76, 1.5, '4 3') + txt(74, 50, '6', 14) + txt(64, 92, '10', 14) + txt(140, 40, 'A =', 15) + box(140, 48, 36, 30)),
     'area-composite': () => svg(220, 90, `<polygon points="10,10 70,10 70,44 120,44 120,80 10,80" fill="none" stroke="#000" stroke-width="2.5"/>` + txt(140, 40, 'A =', 15) + box(140, 48, 36, 30)),
-    'volume': (r) => svg(220, 96, cube(10, 8, 70, 50, 26) + txt(36, 94, int(r, 2, 6) + ' cm', 13) + txt(130, 40, 'V =', 15) + box(130, 48, 40, 30)),
+    'volume': (r) => svg(220, 108, cube(10, 8, 70, 50, 26) + txt(36, 104, int(r, 2, 6) + ' cm', 13) + txt(130, 40, 'V =', 15) + box(130, 48, 40, 30)),
     'angle-name': () => svg(200, 80, ln(20, 66, 110, 66, 2.5) + ln(20, 66, 70, 14, 2.5) + `<path d="M44 66 A24 24 0 0 0 36 50" fill="none" stroke="#000" stroke-width="1.5"/>` + txt(120, 50, 'acute?', 15) + box(130, 54, 50, 24)),
     'angle-measure': () => { let s = `<path d="M10 80 A80 80 0 0 1 170 80" fill="none" stroke="#000" stroke-width="2"/>` + ln(10, 80, 170, 80); for (let i = 0; i <= 18; i++) { const a = Math.PI - i * Math.PI / 18; s += ln(90 + 80 * Math.cos(a), 80 - 80 * Math.sin(a), 90 + 72 * Math.cos(a), 80 - 72 * Math.sin(a), 1); } return svg(220, 90, s + ln(90, 80, 150, 30, 2.5) + box(176, 40, 40, 30)); },
     'angle-missing': (r) => { const a = int(r, 3, 6) * 10; return svg(220, 84, ln(10, 70, 200, 70, 2.5) + ln(100, 70, 40, 14, 2.5) + ln(100, 70, 160, 20, 2.5) + txt(124, 60, a + '°', 14) + txt(84, 52, 'x', 16) + txt(14, 26, 'x =', 15) + box(50, 6, 34, 28)); },
     'lines': () => svg(200, 80, ln(10, 20, 100, 20, 2.5) + ln(10, 50, 100, 50, 2.5) + txt(110, 40, 'parallel?', 15) + box(126, 46, 40, 26)),
-    'symmetry': () => svg(200, 90, `<polygon points="50,6 90,40 70,84 30,84 10,40" fill="none" stroke="#000" stroke-width="2.5"/>` + ln(50, 2, 50, 88, 2, '5 4') + txt(104, 40, 'line of', 14) + txt(104, 58, 'symmetry?', 14) + box(170, 38, 26, 26)),
+    'symmetry': () => svg(214, 90, `<polygon points="50,6 90,40 70,84 30,84 10,40" fill="none" stroke="#000" stroke-width="2.5"/>` + ln(50, 2, 50, 88, 2, '5 4') + txt(104, 40, 'line of', 14) + txt(104, 58, 'symmetry?', 14) + box(184, 38, 26, 26)),
     'coord-point': (r) => svg(200, 124, coordGrid([[int(r, 1, 7), int(r, 1, 5)]]) + txt(160, 50, '(', 18) + box(168, 30, 24, 26) + txt(160, 92, ', ', 18) + box(168, 72, 24, 26)),
     'coord-polygon': () => svg(200, 124, coordGrid([[1, 1], [5, 1], [5, 4], [1, 4]], true) + txt(160, 40, 'side', 14) + box(166, 48, 28, 26)),
     'transform-reflect': () => svg(200, 124, coordGrid([[1, 1], [3, 1], [1, 4]], true) + ln(84, 6, 84, 102, 2.5, '6 4') + txt(160, 56, 'reflect', 14)),
