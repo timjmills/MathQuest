@@ -403,7 +403,11 @@ against this row.
 
 | Date | Lane | Template / family | Builder profile | Round | Verdict | Rounds to PASS | Hours (first commit → PASS) | Findings by class (critic tags, RUBRIC §6) | Skills passed | Lane-weeks |
 |---|---|---|---|--:|---|--:|--:|---|--:|--:|
-| | | | | | | | | | | |
+| 2026-10-23 | W0-B process tools | tools (S3, S6, S7, S8, E5) | mq-opus-medium (tools), mq-opus-low (tally, rules) | 2 | PASS 8/8/8 | 2 | 1.0 | r1: gate did not check card body; tally rule ids | — | 0.03 |
+| 2026-10-23 | ws-precritic (S1) | tool | mq-opus-medium | 2 | PASS 8/8/8 | 2 | ≈ 4 (1.8 of it queued for a browser slot) | r1 defects D1–D6 (pin handling, crash = FAIL) | — | 0.1 |
+| 2026-10-23 | W0-defects | 4 screen defects | mq-opus-low → mq-opus-medium after r1 | 3 | PASS | 3 | 3.6 | VIEWPORT, contrast (dark), CLIP (nested box) — two were gate gaps | — | 0.1 |
+| 2026-10-23 | W0-A checks and gates | tools (S2, S4, S5, S9, E1) | mq-opus-medium | 5 | PASS 9/9/8 | 5 | ≈ 10 | one root cause (baseline invariants) failed r1–r3; integration miss r4 | — | 0.25 |
+| 2026-10-23 | Mixed pages M1 | engine (interleave, arrangement) | mq-opus-medium (r6 mq-opus-low) | 6 | PASS 16/16 pages | 6 | 8.0 | REPEATS, SIZE ladder (machine-measurable, checked from r4), CL-13 | — | 0.2 |
 
 - **Builder profile** is the profile **name** (`mq-opus-low` / `mq-opus-medium`): an agent cannot see its own effort.
 - **Findings by class** come from the critic's class tags (`design/audit/RUBRIC.md` §6): one count per class, e.g.
