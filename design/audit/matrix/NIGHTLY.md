@@ -78,7 +78,15 @@ The owner set the shape on 2026-10-23: one session a night, and each night check
        still covers each row within 28 nights.
    - **Every row that is RED or ERROR in the folded state** (`--red-from design/audit/matrix`). Such a row always runs.
      The cache never skips it.
-   - **The rotating slice** `--slice <days since 1970-01-01 mod 28 + 1>/28`.
+   - **The rotating slice: the one after the last slice that COMPLETED.** Owner rule (2026-10-23): *"if there is no
+     credit when it runs, save that day for the next possible time."* So the slice is not chosen by the date. It is
+     the slice after the `selection.slice` of the newest completed run file (a run file with `finished`, not dirty:
+     the same notion the fold uses), and 28 wraps to 1. With no such run yet it is slice 1 (a baseline night records
+     its slice too, so the first steady night follows the last baseline slice). A missed night, or several in a row,
+     is not skipped: the next night runs the slice that was due, so every row is re-checked within 28 completed
+     nights. The options pin runs the same slice. The affected range already catches up by itself, because `LAST` is
+     the commit of the last run that ran its affected rows. `tests/scripts/ws-matrix-nightly.sh --self-test` proves
+     both on fixtures (one and two missed nights, a dirty or unfinished run, the wrap, no run yet).
    - **`--pin-new`.** This pins rows that printed and have no baseline entry yet (skills appended since the baseline)
      into `baseline.added.json`. A row that already has an entry is never pinned again.
    - A row is skipped when it is already OK in `cache.json` for the same dependency hash and the same baseline entry.
