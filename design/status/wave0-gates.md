@@ -17,8 +17,19 @@ Builders run in their own git worktrees and the lead merges them here.
 | 1 | E1: `ws-envelope.mjs` (`--engine`, `--self-test`, `--diff`, `--envelope`) | mq-opus-medium | merged 94c97814 — Single skill 17 and stack 18 match the plan; Mixed practice walks 17, not 18 (`paginate.js` is reached only by the Single/Sections composer; the plan's list overstates it); self-test 320 checks 2.5 s; `--engine all` 1.1 s; voiding dry run: layout.js voids 126/126 pairs, a provider 0, `cells/clock.js` 3 (clock only) |
 | 1 | S5: `ws-deploy-gates.sh`; `ws-screen-slots` / `ws-chromebook-fit` `--category`, `--skills`, `--shard`, `--baseline`, `--bigboard`, `--dark` | mq-opus-medium | running |
 | 1 | S4: golden renders, manifest, diff, contact sheets; `ws-grade-render --template`, `--envelope` | mq-opus-medium | merged 42610832 — DOM content hash stable over 3 runs (pixel diffs were not: 23/30 untouched pages differed); a one-line cell edit flags exactly the 2 pages it changes; golden for `function-table` committed (manifest only, PNGs git-ignored); write 78 s, diff 62 s. Open: `--envelope` must read ws-envelope's `sample.print` / `sample.screen` rows (flat fields), not yet adapted |
-| 2 | S1: `ws-precritic.cjs`, `role-sample.json`, `ws-providers-unit --skill`, `ws-teacher-wrm --grade --lesson` | mq-opus-medium | queued |
+| 2 | S1: `ws-precritic.cjs`, `role-sample.json`, `ws-providers-unit --skill`, `ws-teacher-wrm --grade --lesson`, print-lint per-skill baseline | mq-opus-medium | running (brought forward, lead 11:02; a third browser-using builder for the overlap, slots still capped at two by the runner) |
 | 2 | E1: `ws-coverage-matrix.cjs`; `ws-print-lint` `--kind`, `--pages`, `--bring-back`, `--sections`, `--anchors top|first` docs | mq-opus-medium | queued |
 | 2 | S2 part 2: browser checks with real commit backtests (text ≠ generator, lone item, repeats, Chromebook viewport — ordered by the W0-B defect tally) | mq-opus-medium | running |
 | 2 | S9: `reading_ruler_hard` doubled answer area; print-lint per-skill baseline | mq-opus-low (fix) | queued |
 | 3 | Independent critic of the tools | mq-opus-medium | — |
+
+## Times (every builder run and critic round)
+
+| Run | Profile | Start (UTC) | End (UTC) | Minutes |
+|---|---|---|---|---|
+| E1 `ws-envelope` build | mq-opus-medium | 10:08 | 10:27 | 19 |
+| S4 golden renders build | mq-opus-medium | 10:08 | 10:37 | 29 |
+| S2 part 1 `ws-node-lint` build | mq-opus-medium | 10:08 | 10:39 | 31 |
+| S5 deploy gates build | mq-opus-medium | 10:08 | — | — |
+| S2 part 2 browser checks build | mq-opus-medium | 10:38 | — | — |
+| S1 `ws-precritic` build (brought forward by the lead, 11:02) | mq-opus-medium | 11:03 | — | — |
