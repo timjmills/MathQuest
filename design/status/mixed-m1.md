@@ -54,4 +54,6 @@ Open, for other lanes or the owner:
 |---|---|---|---|
 | E1 | TY-11: step numbers print at 7.0 pt (minimum 8 pt); also on `addition:add_10k_regroup` | `sheet/anchors.js` `lineHtml` | queued |
 | E2 | The anchor cell reserves no height for its step text, so longer worked steps overflow instead of growing the cell (content never overflows or shrinks); needs a machine check | `sheet/anchors.js` | queued |
-| E3 | L-DENSITY H13: columns forced to 2 with side anchors pin a narrow stack to one side of a 92 mm cell; also `addition:add_1k_regroup`, `subtraction:sub_1k_regroup` | anchors side layout | queued |
+| E3 | L-DENSITY H13: columns forced to 2 with side anchors pin a narrow stack to one side of a 92 mm cell; also `addition:add_1k_regroup`, `subtraction:sub_1k_regroup` | anchors side layout | E1–E3 fixed with `sheet/anchors.check.cjs` (5443377, 52886b2); fixing the add_10k side page that went 2 → 3 pages |
+| E4 | D8 (pilot su-c): Mixed-practice band heading picks the host skill, not the preset — proposed `.find((s) => first && first.q && s.skillId === (first.q.presetId \|\| first.q.skillId))` | `sheet/roles/mixed-practice.js:225` | queued after E1–E3 |
+| E5 | fact-rows ILLEGIBLE / PG-12: 5–6-digit non-division facts overflow; drop columns in `factRowsLayout` (also sub_100k_regroup, sub_1m_regroup) | `sheet/roles/fact-rows.js` | queued after E1–E3 |
