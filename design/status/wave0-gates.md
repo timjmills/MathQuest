@@ -34,4 +34,5 @@ Builders run in their own git worktrees and the lead merges them here.
 | S2 part 2 browser checks build | mq-opus-medium | 10:38 | 13:03 | 145 |
 | E1 `ws-coverage-matrix` build | mq-opus-medium | 13:05 | 13:41 | 36 |
 | S9 `reading_ruler_hard` fix | mq-opus-low | 13:16 | 13:29 | 13 |
+| Critic r1 (tools vs plan) | mq-opus-medium | 13:43 | — | — |
 | S1 `ws-precritic` build (brought forward by the lead, 11:02; stopped: moved to the lead's session) | mq-opus-medium | 11:03 | 12:51 | 108 |
