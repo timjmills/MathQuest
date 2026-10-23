@@ -139,3 +139,7 @@ content. Anchor pages follow it in the current rebuild (it supersedes the earlie
 anchor rebuild passes: the kit-wide change (additive CSS in the cell / stack drawing), pins re-taken for every changed page
 with the sibling comparison, and an independent critic on a sample at S and L (long division, a regroup stack, a
 no-regroup stack, facts, a visual cell). W0-A builds the print-lint check.
+
+Owner instruction via the lead, 2026-10-23 23:08: "stop after this work, don't try anything new". Finish only what is in
+flight: the anchor rebuild (with the 22:55 rulings), its critic, and the D8 / fact-rows patches; then report and stop.
+**The kit-wide CL-4b change is CANCELLED** until a later go. If the anchor critic fails: report and stop, no further round.
