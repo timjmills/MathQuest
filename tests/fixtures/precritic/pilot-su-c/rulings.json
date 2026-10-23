@@ -1,0 +1,183 @@
+{
+ "v": 1,
+ "about": "The pilot-su-c card's numeric rulings and its not-offered list in the rulings-block format of tests/scripts/ws-card-rulings.mjs, written for the backtest (design/cards/subtraction/subtraction.md at b3948d88 has no machine-readable block; the card itself is not edited). Sources are the card's sections; the 10% bound on zero cases is critic r1 D1's check (card 9.4: within 50 / 100 'never seeds' a zero case).",
+ "skills": [
+  "subtraction:sub_50_no_regroup",
+  "subtraction:sub_100_no_regroup",
+  "subtraction:sub_1k_no_regroup",
+  "subtraction:sub_10k_no_regroup",
+  "subtraction:sub_100k_no_regroup",
+  "subtraction:sub_1m_no_regroup",
+  "subtraction:sub_2d_1d"
+ ],
+ "rulings": [
+  {
+   "id": "R-BAND-50",
+   "source": "§9.2",
+   "skills": [
+    "subtraction:sub_50_no_regroup"
+   ],
+   "assert": "range",
+   "of": "a",
+   "min": 21,
+   "max": 50
+  },
+  {
+   "id": "R-BAND-100",
+   "source": "§9.2",
+   "skills": [
+    "subtraction:sub_100_no_regroup"
+   ],
+   "assert": "range",
+   "of": "a",
+   "min": 51,
+   "max": 99
+  },
+  {
+   "id": "R-BAND-1K",
+   "source": "§9.2",
+   "skills": [
+    "subtraction:sub_1k_no_regroup"
+   ],
+   "assert": "range",
+   "of": "a",
+   "min": 100,
+   "max": 999
+  },
+  {
+   "id": "R-BAND-10K",
+   "source": "§9.2",
+   "skills": [
+    "subtraction:sub_10k_no_regroup"
+   ],
+   "assert": "range",
+   "of": "a",
+   "min": 1000,
+   "max": 9999
+  },
+  {
+   "id": "R-BAND-100K",
+   "source": "§9.2",
+   "skills": [
+    "subtraction:sub_100k_no_regroup"
+   ],
+   "assert": "range",
+   "of": "a",
+   "min": 10000,
+   "max": 99999
+  },
+  {
+   "id": "R-BAND-1M",
+   "source": "§9.2",
+   "skills": [
+    "subtraction:sub_1m_no_regroup"
+   ],
+   "assert": "range",
+   "of": "a",
+   "min": 100000,
+   "max": 999999
+  },
+  {
+   "id": "R-BAND-2D1D",
+   "source": "§9.3 (2d − 1d)",
+   "skills": [
+    "subtraction:sub_2d_1d"
+   ],
+   "assert": "digits",
+   "of": "a",
+   "eq": 2
+  },
+  {
+   "id": "R-NO-REGROUP",
+   "source": "§1 (the name)",
+   "assert": "noRegroup",
+   "op": "-"
+  },
+  {
+   "id": "R-SAME-LENGTH",
+   "source": "§9.3 (lengths: same by default)",
+   "skills": [
+    "subtraction:sub_50_no_regroup",
+    "subtraction:sub_100_no_regroup",
+    "subtraction:sub_1k_no_regroup",
+    "subtraction:sub_10k_no_regroup",
+    "subtraction:sub_100k_no_regroup",
+    "subtraction:sub_1m_no_regroup"
+   ],
+   "assert": "digits",
+   "of": "b",
+   "eq": "a"
+  },
+  {
+   "id": "R-SHORTER-2D1D",
+   "source": "§9.3 (2d − 1d)",
+   "skills": [
+    "subtraction:sub_2d_1d"
+   ],
+   "assert": "digits",
+   "of": "b",
+   "eq": 1
+  },
+  {
+   "id": "R-ZERO-NOT-SEEDED",
+   "source": "§9.4 (zeros off: never seeded; critic r1 D1 bound)",
+   "assert": "maxShare",
+   "when": "zeroCase",
+   "max": 0.1
+  },
+  {
+   "id": "R-BOXES-2",
+   "source": "§3 (boxes = digits of the band's largest minuend)",
+   "skills": [
+    "subtraction:sub_50_no_regroup",
+    "subtraction:sub_100_no_regroup",
+    "subtraction:sub_2d_1d"
+   ],
+   "assert": "boxes",
+   "eq": 2
+  },
+  {
+   "id": "R-BOXES-3",
+   "source": "§3",
+   "skills": [
+    "subtraction:sub_1k_no_regroup"
+   ],
+   "assert": "boxes",
+   "eq": 3
+  },
+  {
+   "id": "R-BOXES-4",
+   "source": "§3",
+   "skills": [
+    "subtraction:sub_10k_no_regroup"
+   ],
+   "assert": "boxes",
+   "eq": 4
+  },
+  {
+   "id": "R-BOXES-5",
+   "source": "§3",
+   "skills": [
+    "subtraction:sub_100k_no_regroup"
+   ],
+   "assert": "boxes",
+   "eq": 5
+  },
+  {
+   "id": "R-BOXES-6",
+   "source": "§3",
+   "skills": [
+    "subtraction:sub_1m_no_regroup"
+   ],
+   "assert": "boxes",
+   "eq": 6
+  }
+ ],
+ "notOffered": [
+  {
+   "id": "N-BAND",
+   "source": "§7 (the six skills ARE the number-size ladder; critic r1 D6)",
+   "option": "band"
+  }
+ ]
+}
