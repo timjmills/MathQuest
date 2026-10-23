@@ -1,0 +1,29 @@
+report,round,defect_id,field,old,new,reason
+design/audit/runs/wrm-tagging/MAP-critic-r1.md,1,D5,class,UNTRUE_TEXT,DATA_SHAPE,proposal duplicates an existing skill it missed (critic D2 scan)
+design/audit/runs/wrm-tagging/MAP-critic-r1.md,1,D7,class,REPEAT,DATA_SHAPE,"duplicate or overlapping proposal / tagging data, not the same problem twice on a page (critic wave0-b r1 D2)"
+design/audit/runs/wrm-tagging/MAP-critic-r2.md,2,D-5,class,REPEAT,DATA_SHAPE,"duplicate or overlapping proposal / tagging data, not the same problem twice on a page (critic wave0-b r1 D2)"
+design/audit/runs/wrm-tagging/MAP-critic-r2.md,2,D-6,class,REPEAT,DATA_SHAPE,"duplicate or overlapping proposal / tagging data, not the same problem twice on a page (critic wave0-b r1 D2)"
+design/audit/runs/wrm-tagging/MAP-critic-r2.md,2,D-7,class,REPEAT,DATA_SHAPE,"duplicate or overlapping proposal / tagging data, not the same problem twice on a page (critic wave0-b r1 D2)"
+design/audit/runs/wrm-tagging/MAP-critic-r3.md,3,D-3,class,REPEAT,DATA_SHAPE,"duplicate or overlapping proposal / tagging data, not the same problem twice on a page (critic wave0-b r1 D2)"
+design/audit/runs/wrm-tagging/MAP-critic-r3.md,3,D-7,class,REPEAT,DATA_SHAPE,"duplicate or overlapping proposal / tagging data, not the same problem twice on a page (critic wave0-b r1 D2)"
+design/audit/runs/wrm-tagging/MAP-critic-r4.md,4,D-2,class,REPEAT,DATA_SHAPE,"duplicate or overlapping proposal / tagging data, not the same problem twice on a page (critic wave0-b r1 D2)"
+design/audit/runs/wrm-tagging/MAP-critic-r4.md,4,D-6,class,REPEAT,DATA_SHAPE,"duplicate or overlapping proposal / tagging data, not the same problem twice on a page (critic wave0-b r1 D2)"
+design/audit/runs/wrm-tagging/MAP-critic.md,5,D-1,class,REPEAT,DATA_SHAPE,"duplicate or overlapping proposal / tagging data, not the same problem twice on a page (critic wave0-b r1 D2)"
+design/audit/runs/wrm-tagging/R-Y1-critic.md,1,U39,class,REPEAT,TAG_LINK,related padded; same key in pre and related: the TAG_LINK definition (critic D2 scan)
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,2,U14,class,REPEAT,DATA_SHAPE,"proposal for what an existing value already deals (critic D2, same pattern as U44)"
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,2,U29,class,REPEAT,UNTRUE_TEXT,a wrong partial tag: written claim the code does not bear out (critic D2 scan)
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,2,U35,class,REPEAT,DATA_SHAPE,"proposal for what an existing value already deals (critic D2, same pattern as U44)"
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,2,U44,class,REPEAT,DATA_SHAPE,proposal for what an existing value already draws (critic D2 row 137)
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,3,U41,class,REPEAT,DATA_SHAPE,option ids that should fold into an existing option id: build-list data shape (critic D2 scan)
+design/audit/runs/wrm-tagging/Y1-lessons-critic-r3.md,3,n11,class,TAG_LINK,DATA_SHAPE,"duplicate proposal, not a pre/related link (critic D2 scan)"
+design/audit/runs/wrm-tagging/Y2-Y3-critic-r3.md,3,U4,class,UNTRUE_TEXT,DATA_SHAPE,a clause duplicated in the missing list: data duplicate (critic D2 scan)
+design/audit/runs/wrm-tagging/Y2-Y3-critic-r14.md,14,M18,class,REPEAT,TAG_LINK,"two pre links deal the same stories: a padded pre list, TAG_LINK (critic D2 scan)"
+design/audit/runs/wrm-tagging/Y5-critic.md,3,r3-3,class,OTHER,DATA_SHAPE,"duplicate proposal: DATA_SHAPE now exists, so not OTHER (critic D2 scan)"
+design/audit/runs/wrm-tagging/Y5-critic.md,1,r1-2,class,OTHER,DATA_SHAPE,"duplicate build-list entry: DATA_SHAPE now exists, so not OTHER (critic D2 scan)"
+design/audit/runs/wrm-tagging/Y5-critic-r4.md,4,U8,class,OTHER,DATA_SHAPE,"duplicate / overlapping proposals: DATA_SHAPE now exists, so not OTHER (critic D2 scan)"
+design/audit/runs/wrm-tagging/Y5-critic-local-r1.md,1,17,class,UNTRUE_TEXT,DATA_SHAPE,"proposal already partly built (critic D2 scan, same pattern as U44)"
+design/audit/runs/wrm-tagging/Y5-critic-r8.md,8,7,class,UNTRUE_TEXT,PLAIN_WORDS,"a typo is PLAIN_WORDS, not UNTRUE_TEXT (critic D2 row 795)"
+design/audit/runs/wrm-tagging/Y6-critic-r1.md,1,U1,class,OTHER,DATA_SHAPE,"duplicate proposal: DATA_SHAPE now exists, so not OTHER (critic D2 scan)"
+design/audit/runs/skip-count/critic-r1.md,1,D4,class,INSTRUCTION,PLAIN_WORDS,a misspelt title is a typo: PLAIN_WORDS (critic D2 scan)
+design/audit/runs/wave1-C2/critic.md,4,1,class,CLIP_OVERLAP,VIEWPORT,pinned / sticky element over an answer box is VIEWPORT (critic D2 row 1866)
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,2,U46,class,CLIP_OVERLAP,INTERACTION,a toast covering a control is INTERACTION by defect-classes.md (found in the D2 sticky scan)

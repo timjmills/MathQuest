@@ -266,7 +266,8 @@ One JSON object per skill, appended to the run's `grades.jsonl`:
       "defects": [
         { "criterion": "C3", "severity": "major", "where": "page 2",
           "what": "Page 2 holds 2 of 20 items; 80 % of the page is empty.",
-          "fix": "Rebalance the last page or print 18 items (3 full pages)." }
+          "fix": "Rebalance the last page or print 18 items (3 full pages).",
+          "class": "SPACE", "rule_ids": ["H5"] }
       ]
     }
   ],
@@ -285,7 +286,7 @@ Rules for the critic:
   is fixed. Every criterion below 10 also says what would raise it to 10. "Improve spacing" or "polish" is not
   a finding.
 - **Tag every finding (2026-10-23).** Each defect carries a `class` (an id from
-  `design/status/defect-classes.md`) and the `rule_ids` it cites (the same columns as `design/status/defect-findings.csv`), so the S8 tally stays current.
+  `design/status/defect-classes.md`) and the `rule_ids` it cites (the same columns as `design/status/defect-findings.csv`), so the S8 tally stays current. `rule_ids` are the rules this defect breaks, not every cap of the version: a cap goes in only when its condition is this defect (the example cites H5 because the defect is a wasted page).
 - **Severity:** `critical` (triggers a cap), `major` (costs ≥ 2 points), `minor` (costs 1).
 - **No praise, no hedging.** Report problems. "Looks fine" is not a finding.
 - **Grade what is rendered,** not what the generator intends. If the PNG shows it, it is real.

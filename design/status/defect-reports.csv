@@ -56,7 +56,7 @@ design/audit/runs/wrm-tagging/Y5-critic-r5.md,wrm-tagging/Y5,wrm-tagging,5,2026-
 design/audit/runs/wrm-tagging/Y5-critic-r6.md,wrm-tagging/Y5,wrm-tagging,6,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.94,9,"near miss; steps 7.94 with scan finds, lessons 7.95; tree 616981dd",G3
 design/audit/runs/wrm-tagging/Y5-critic-r7.md,wrm-tagging/Y5,wrm-tagging,7,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,8.00,10,"near miss; steps 8.00, lessons 8.00, two 7s; tree 7583ecd5",G3
 design/audit/runs/wrm-tagging/Y5-critic-r8.md,wrm-tagging/Y5,wrm-tagging,8,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,8.07,7,"steps 8.07, lessons 8.05; tree 29161105",G3
-design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,wrm-tagging,3,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,7,8.00,46,"file holds 3 rounds: r1 FAIL 7.43, r2 FAIL 7.75, r3 PASS 8.00 (old rules 1-13)",G3
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,wrm-tagging,3,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,7,8.00,12,"file holds 3 rounds: r1 FAIL 7.43, r2 FAIL 7.75, r3 PASS 8.00 (old rules 1-13)",G3
 design/audit/runs/wrm-tagging/Y6-critic-local-r1.md,wrm-tagging/Y6,wrm-tagging,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,7.02,20,rules 1-19; 8 systematic classes; tree f2dd7afc,G3
 design/audit/runs/wrm-tagging/Y6-critic-r1.md,wrm-tagging/Y6,wrm-tagging,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,7.47,17,tree 55aa51c2; report file missing,G3
 design/audit/runs/wrm-tagging/Y6-critic-r2.md,wrm-tagging/Y6,wrm-tagging,2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,5,7.50,17,fails on minimum rule (B9.S7 = 5),G3
@@ -187,7 +187,7 @@ design/audit/runs/wave1-C2/critic.md,wave1-C2,Wave 1 lane C2 (count-by rows),5,2
 design/audit/runs/wave1-C2/critic.md,wave1-C2,Wave 1 lane C2 (count-by rows),6,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.75,4,45d509b; all G6 files added in one commit,G6
 design/audit/runs/wave1-C2/critic.md,wave1-C2,Wave 1 lane C2 (count-by rows),7,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.75,5,f756b7a; all G6 files added in one commit,G6
 design/audit/runs/wave1-C2/critic.md,wave1-C2,Wave 1 lane C2 (count-by rows),8,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,8.5,4,a5c1834; all G6 files added in one commit,G6
-design/audit/runs/wave1-E/critic.md,wave1-E,"Wave 1 lane E (load, worksheet flag)",1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.5,11,9fb3af7; Sonnet PASS 8x4 then Opus re-grade FAIL (both counted round 1); all G6 files added in one commit,G6
+design/audit/runs/wave1-E/critic.md,wave1-E,"Wave 1 lane E (load, worksheet flag)",1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.5,5,9fb3af7; Sonnet PASS 8x4 then Opus re-grade FAIL (both counted round 1); all G6 files added in one commit,G6
 design/audit/runs/wave1-E/critic.md,wave1-E,"Wave 1 lane E (load, worksheet flag)",2,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,9,9.0,4,7205e19; all G6 files added in one commit,G6
 design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,teacher-site audit,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,1,,58,"20 surfaces, 0 pass; D1-D4 dims not C1-C4; all G6 files added in one commit",G6
 design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,teacher-site audit,2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,2,,46,"21 surfaces, 8 pass; all G6 files added in one commit",G6
@@ -216,3 +216,5 @@ design/audit/runs/regrade-2026-09-25/,regrade-2026-09-25,regrade,1,2026-10-17T12
 design/audit/runs/regrade2-2026-09-25/,regrade2-2026-09-25,regrade2,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,3,7.44,293,71/233 versions pass,G7
 design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25,regrade3,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,1,6.77,1155,246/1160 versions pass,G7
 design/audit/runs/regrade4-2026-09-25/,regrade4-2026-09-25,regrade4,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,1,6.9,282,SUMMARY: 0 of 26 skills pass; tree 9babcc0; 90/338 versions pass,G7
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,wrm-tagging,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,7.43,21,"round 1 of the 3-round file (seed 5510, 208/28); added for critic wave0-b r1 D3",G3
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,wrm-tagging,2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.75,13,"round 2 of the 3-round file (seed 2026, 217/28); added for critic wave0-b r1 D3",G3

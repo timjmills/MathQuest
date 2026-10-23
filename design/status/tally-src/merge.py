@@ -2,7 +2,12 @@
 """Merge the seven reader groups' CSVs into the S8 defect tally (run from the repo root:
 python3 design/status/tally-src/merge.py). Writes design/status/defect-findings.csv,
 defect-reports.csv and defect-tally.csv (class x report). Reconciliation rules are listed below
-and in metrics.md; the group files in tally-src/ are the readers' raw output, never edited."""
+and in metrics.md; the group files in tally-src/ are the readers' raw output, never edited.
+Corrections to a reader's row go in tally-src/overrides.csv (report,round,defect_id,field,old,new,reason;
+applied after the rules below, each must hit exactly one row whose field still holds `old`). Report rows a
+reader left out go in tally-src/reports-extra.csv (the reports columns plus group). n_open is recomputed
+from the merged findings; every (report, round) with findings must have a report row.
+findings-G7.csv is generated: python3 design/status/tally-src/g7/build.py."""
 import csv, glob, re, collections, os
 SRC = 'design/status/tally-src'
 OUT = 'design/status'
@@ -19,6 +24,8 @@ def rows(pat):
     return out
 
 F = rows('findings-G*.csv'); R = rows('reports-G*.csv')
+R += list(csv.DictReader(open(f'{SRC}/reports-extra.csv', newline='')))
+OV = list(csv.DictReader(open(f'{SRC}/overrides.csv', newline='')))
 log = collections.Counter()
 LINK_RULES = re.compile(r'WRM-rule-(3|10|14|15|18|19)\b')
 LINK_WORDS = re.compile(r'\b(pre|pres|pre-skill|pre-skills|prerequisite|related|building[- ]block|preBuild|lead pre)\b', re.I)
@@ -34,15 +41,32 @@ for r in F:
         by_word = bool(LINK_WORDS.search(r['summary'])) and r['class'] != 'UNTRUE_TEXT'
         if by_rule or by_word:
             log[f"{r['class']} -> TAG_LINK"] += 1; r['class'] = 'TAG_LINK'
+    keep.append(r)
+# Overrides (tally-src/overrides.csv): one row each, applied after the rules above.
+for o in OV:
+    hit = [r for r in keep if (r['report'], r['round'], r['defect_id']) == (o['report'], o['round'], o['defect_id'])]
+    assert len(hit) == 1, ('override must hit exactly one row', o, len(hit))
+    assert hit[0][o['field']] == o['old'], ('override old value does not match', o, hit[0][o['field']])
+    hit[0][o['field']] = o['new']; log[f"override {o['field']} {o['old']} -> {o['new']}"] += 1
+for r in keep:
     assert r['class'] in KIND, r
     r['kind'] = KIND[r['class']]
     r['source'] = 'grade-run' if r['group'] == 'G7' else 'critic-report'
-    keep.append(r)
 
-fcols = ['report','run','round','defect_id','class','kind','carried','severity','rule_ids','family','template','summary','source','group']
+fcols = ['report','run','round','defect_id','class','kind','carried','severity','rule_ids','family','template','summary','source','group','caps']
 with open(f'{OUT}/defect-findings.csv','w',newline='') as fh:
     w = csv.DictWriter(fh, fieldnames=fcols, extrasaction='ignore', lineterminator='\n'); w.writeheader()
     for r in keep: w.writerow(r)
+# n_open = the findings kept for that report round (after the drop rules), not the reader's own count.
+nkept = collections.Counter((r['report'], r['round']) for r in keep)
+for r in R:
+    n = str(nkept[(r['report'], r['round'])])
+    if r['n_open'] != n: log['n_open recomputed (reader count differed)'] += 1
+    r['n_open'] = n
+rkeys = collections.Counter((r['report'], r['round']) for r in R)
+assert all(v == 1 for v in rkeys.values()), [k for k, v in rkeys.items() if v > 1]
+missing = sorted(set(nkept) - set(rkeys))
+assert not missing, ('findings without a report row', missing)
 rcols = ['report','run','lane','round','date_added','commit_added','verdict','min_score','mean_score','n_open','notes','group']
 with open(f'{OUT}/defect-reports.csv','w',newline='') as fh:
     w = csv.DictWriter(fh, fieldnames=rcols, extrasaction='ignore', lineterminator='\n'); w.writeheader()
