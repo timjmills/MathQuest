@@ -220,8 +220,8 @@ const payloadOf = (it) => (it && it.q && it.q.cell && it.q.cell.payload) || {};
 /** A fact cell's digit tracks as it prints (the host gives every fact of a mixed page one count). */
 export const factTracksOf = (it) => { const p = payloadOf(it); return factDigitTracks(p.a, p.b, p.digits); };
 /** TY-31: the fill of the column of these facts at k across (the widest of them). */
-export function factFillAt(items, k) {
-    const n = Math.max(2, ...items.map(factTracksOf));
+export function factFillAt(items, k, tracks = 0) {
+    const n = tracks || Math.max(2, ...items.map(factTracksOf));
     return Math.max(0, ...items.map((it) => factWidthMm(k, n, payloadOf(it).b))) / (186 / k);
 }
 
@@ -253,10 +253,11 @@ export function factPick(poolsIn, ids, input, ctx) {
         if (!Number.isFinite(h) || h <= 0) return 0;
         return Math.max(1, Math.min(MAX_SHELVES[sz] || 5, Math.floor((m.budget - stripMmOf(input) - m.strip) / h)));
     };
-    const fill = (k) => factFillAt(all, k);
+    const tracks = Math.max(2, ...all.map(factTracksOf));
     const allowed = (sz) => Array.from({ length: lattice(sz) }, (_, i) => lattice(sz) - i)
         .filter((k) => FACT_LADDER[k] >= SIZES[sz].digitPt && fits(k));
-    const choose = (sz, must) => {
+    const choose = (sz, must, n) => {
+        const fill = (k) => factFillAt(all, k, n);
         const ok = allowed(sz);
         if (!ok.length) return null;
         const beat = ok.filter((k) => k * rowsAt(sz, k) > must);
@@ -270,19 +271,25 @@ export function factPick(poolsIn, ids, input, ctx) {
         }
         return { k, problems: k * rowsAt(sz, k), ladder: !!beat.length || must === 0 };
     };
-    // L first, then M, then S: each size must beat the one above it.
+    // L first, then M, then S: each size must beat the one above it. The page of a bigger size is
+    // dealt again, so its facts may be narrower than these (no 3-digit number): it is taken at the
+    // most problems it could print, over 2 tracks and these (critic M1 r4 check, weighted 1 : 3).
     const chain = [];
     for (let sz = ctx.size; sz; sz = SIZE_UP[sz]) chain.unshift(sz);
     let must = 0;
     let got = null;
     for (const sz of chain) {
-        got = choose(sz, must);
+        if (sz !== ctx.size) {
+            const opts = [...new Set([2, tracks])].map((n) => choose(sz, must, n)).filter(Boolean);
+            if (!opts.length) return null;
+            must = Math.max(...opts.map((o) => o.problems));
+            continue;
+        }
+        got = choose(sz, must, tracks);
         if (!got) return null;
-        must = got.problems;
     }
     const k = got.k;
-    const f = fill(k);
-    const tracks = Math.max(2, ...all.map(factTracksOf));
+    const f = factFillAt(all, k);
     return { k, fill: f, tracks, digitPt: FACT_LADDER[k], problems: got.problems, note: fillNote(tracks, k, f, got.ladder), ladder: got.ladder };
 }
 

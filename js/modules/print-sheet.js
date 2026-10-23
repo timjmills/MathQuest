@@ -2724,6 +2724,7 @@ async function buildRoleSheet(n, metaOf) {
     let mixDigits = 0;
     let mixedCheck = null;
     let mixedRepeats = null;
+    let mixedTracks = null;
     const dealNotes = [];
     /** The digit tracks a mixed page's facts print at: the widest number dealt (critic M1 r3 D4). */
     const widestTracks = (its) => Math.max(0, ...its.map((it) => {
@@ -2752,7 +2753,7 @@ async function buildRoleSheet(n, metaOf) {
         const out = [];
         let next = 0;
         // A Mixed practice page (critic M1 r1 D3 / r3 D1, L10; owner ruling 2026-10-23 "fill the
-        // page or not") deals on a LADDER of rungs, four passes a rung (eight on the last):
+        // page or not") deals on a LADDER of rungs, five passes a rung (ten on the last):
         //   unique    no fact twice, no turnaround, no fact family twice (8 x 10 / 80 / 10, 6 + 7 /
         //             13 - 6, 13 - 6 / 13 - 7), no answer twice in the share
         //   answers   an answer may come again
@@ -2767,8 +2768,8 @@ async function buildRoleSheet(n, metaOf) {
         const pageSeen = pageFam || new Set();
         const famSeen = pageFam || new Set();
         const rungs = ['unique', 'answers', ...(n.families === 'allow' ? ['related'] : []), ...(n.fill !== false ? ['turn', 'repeat'] : [])];
-        const passes = noRepeat ? rungs.length * 4 + 4 : 4;
-        const rungAt = (pass) => rungs.indexOf(rungs[Math.min(rungs.length - 1, Math.floor(pass / 4))]);
+        const passes = noRepeat ? rungs.length * 5 + 5 : 4;
+        const rungAt = (pass) => Math.min(rungs.length - 1, Math.floor(pass / 5));
         const R = (name) => { const i = rungs.indexOf(name); return i < 0 ? Infinity : i; };
         const counts = { unique: 0, related: 0, turn: 0, repeat: 0 };
         /** Offer one generated item to the share at a rung (`cap`): true when it is taken. */
@@ -2856,7 +2857,7 @@ async function buildRoleSheet(n, metaOf) {
                 }
             }
             const need = want - out.length;
-            const batch = pass === 0 ? need : need * 2 + 2;
+            const batch = pass === 0 ? need : noRepeat ? need * 3 + 6 : need * 2 + 2;
             const gen = generateRun(pool.skills, batch, base, { startIndex: next, seen: st.seen, kept: st.kept });
             next += batch;
             // (a mixed page sweeps the batch once a rung, up to this pass's rung: unique facts first,
@@ -2991,13 +2992,21 @@ async function buildRoleSheet(n, metaOf) {
         };
         input.mixK = mixedPickK(probe);
         items = dealMixed();
+        const tracksTried = [mixDigits];
         for (let round = 0; round < 3; round++) {
             const w = widestTracks(items);
             if (!w || w === mixDigits) break;
             if (round === 2 && w < mixDigits) break;
             repick(w);
+            tracksTried.push(w);
             items = dealMixed();
         }
+        // (no fixpoint - more places at the narrower count deal a 3-digit fact, fewer at the wider
+        // one do not: the page keeps the wider count's k and counts, and its facts print at the
+        // tracks they need - the same items, a narrower drawing in the same boxes)
+        const wEnd = widestTracks(items);
+        if (wEnd && wEnd < mixDigits) { mixDigits = wEnd; tracksTried.push(wEnd); items = dealMixed(); }
+        mixedTracks = { tried: tracksTried, final: mixDigits, k: input.mixK };
         // The page's machine check (critic M1 r3 D1, sheet/interleave.js pageRepeats; owner ruling
         // 2026-10-23): what the page's options do not allow - a repeat or a turnaround with `fill`
         // off, a related fact without `families: 'allow'` - never prints. The deal already keeps
@@ -3115,6 +3124,8 @@ async function buildRoleSheet(n, metaOf) {
         mixedCheck,
         // (a mixed page's own repeat check, sheet/interleave.js pageRepeats: exact / turnarounds always 0)
         mixedRepeats,
+        // (the digit tracks the deal tried and kept, and the host's k - critic M1 r3 D4)
+        mixedTracks,
         plan,
         extras: input.extras || [],
     };
