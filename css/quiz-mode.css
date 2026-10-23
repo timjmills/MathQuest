@@ -2301,3 +2301,10 @@
    ink (#1F1B33, about 7.5:1) instead of white (2.18:1). Light mode is unchanged. An answered dot
    keeps its own green ink. (W0-defects, critic 2026-10-23) */
 html.dark .qt-q-dot.current:not(.answered) { color: #1F1B33; }
+
+/* Dark mode: an answered dot's green ink (#059669) is 3.10:1 on its tinted cell (#163e40); the
+   lighter green #34D399 is about 6:1. A flagged dot keeps its orange ink. (W0-defects r3) */
+html.dark .qt-q-dot.answered:not(.flagged) { color: #34D399; }
+/* The current question stays visible once it is answered (the answered colours win over the purple
+   fill): a purple ring around it, in both modes. Other dot colours are unchanged. */
+.qt-q-dot.current.answered { box-shadow: 0 0 0 3px var(--accent-purple); border-color: var(--accent-purple); }

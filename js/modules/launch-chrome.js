@@ -175,13 +175,17 @@ function ensureBoard() {
     return gv;
 }
 
+function answerHtml() {
+    return `<span class="tvb-answer-l">Answer</span> <span class="tvb-answer-v">${esc(answerText(state.currentQ))}</span>`;
+}
+
 function reveal(on) {
     revealed = !!on;
     const box = document.getElementById('tvBoardAnswer');
     const btn = document.querySelector('[data-tvb="reveal"]');
     if (box) {
         box.hidden = !revealed;
-        box.innerHTML = revealed ? `<span class="tvb-answer-l">Answer</span> <span class="tvb-answer-v">${esc(answerText(state.currentQ))}</span>` : '';
+        box.innerHTML = revealed ? answerHtml() : '';
     }
     if (btn) { btn.textContent = revealed ? 'Hide answer' : 'Show answer'; btn.setAttribute('aria-expanded', String(revealed)); }
     if (boardOn) fitBoard();
@@ -216,30 +220,75 @@ function quietGameClocks() {
    question on a short board, e.g. 1366x768), the bar and the controls move to a side rail
    (#gameView.tvb-rail, css/play-teacher.css) so the card gets the board's whole height, and the
    zoom is fitted again; only then is the card's own scroll the fallback.
+   The layout is chosen with the revealed answer's room in mind: when the answer, once shown, would
+   push a stacked question onto the rail, and the rail draws the hidden question at least as big, the
+   rail is used from the start, so Show answer does not move the question while the class watches.
    Recomputed on every question render, on reveal, on resize and when the board starts. */
 function fitBoard() {
     const paper = document.getElementById('questionPaper');
     const card = document.getElementById('questionCard');
     if (!paper || !card) return;
     const gv = document.getElementById('gameView');
-    if (gv) gv.classList.remove('tvb-rail');
-    paper.classList.remove('tvb-fitted');
-    paper.style.removeProperty('--tvb-fit');
+    clearFit(paper, gv);
     if (!isBoard()) return;
     const cap = parseFloat(getComputedStyle(paper).zoom) || 1;
     if (cap <= 1) return;
-    if (fitZoom(paper, card, gv, cap) || !gv) return;
+    const stacked = fitZoom(paper, card, gv, cap);
+    if (!gv) return;
+    if (stacked) {
+        if (!answerWouldOverflow(paper, card, gv)) return;
+        const zStacked = parseFloat(getComputedStyle(paper).zoom) || 1;
+        clearFit(paper, gv);
+        gv.classList.add('tvb-rail');
+        if (fitZoom(paper, card, gv, cap) && (parseFloat(getComputedStyle(paper).zoom) || 1) >= zStacked) return;
+        clearFit(paper, gv);
+        fitZoom(paper, card, gv, cap);
+        return;
+    }
+    clearFit(paper, gv);
     gv.classList.add('tvb-rail');
+    fitZoom(paper, card, gv, cap);
+}
+
+function clearFit(paper, gv) {
+    if (gv) gv.classList.remove('tvb-rail');
     paper.classList.remove('tvb-fitted');
     paper.style.removeProperty('--tvb-fit');
-    fitZoom(paper, card, gv, cap);
+}
+
+/* No tolerance: 1 px of overflow still draws a scroll bar on a board with classic scroll bars.
+   The question must also be whole INSIDE the paper: a box nested in it that cuts or scrolls its own
+   content (a short-screen height cap, say) does not show on the card's scroll, so it is measured
+   too (nestedClip). */
+function boardFits(paper, card, gv) {
+    return card.scrollHeight <= card.clientHeight && card.scrollWidth <= card.clientWidth
+        && (!gv || (gv.scrollHeight <= gv.clientHeight && gv.scrollWidth <= gv.clientWidth))
+        && !nestedClip(paper);
+}
+
+/* While the answer is hidden: would the stacked board stop fitting at zoom 1 once it is shown?
+   The answer box is filled and measured for one layout, then emptied again (it sits outside the
+   paper, so the fit observer does not see it). */
+function answerWouldOverflow(paper, card, gv) {
+    const box = document.getElementById('tvBoardAnswer');
+    if (revealed || !box || !box.hidden || !state.currentQ) return false;
+    const fitted = paper.classList.contains('tvb-fitted');
+    const fit = paper.style.getPropertyValue('--tvb-fit');
+    box.innerHTML = answerHtml();
+    box.hidden = false;
+    paper.classList.add('tvb-fitted');
+    paper.style.setProperty('--tvb-fit', '1');
+    const over = !boardFits(paper, card, gv);
+    box.hidden = true;
+    box.innerHTML = '';
+    paper.classList.toggle('tvb-fitted', fitted);
+    if (fit) paper.style.setProperty('--tvb-fit', fit); else paper.style.removeProperty('--tvb-fit');
+    return over;
 }
 
 /* The largest zoom in [1, cap] at which the board does not scroll; returns whether it fits. */
 function fitZoom(paper, card, gv, cap) {
-    // No tolerance: 1 px of overflow still draws a scroll bar on a board with classic scroll bars.
-    const fits = () => card.scrollHeight <= card.clientHeight && card.scrollWidth <= card.clientWidth
-        && (!gv || (gv.scrollHeight <= gv.clientHeight && gv.scrollWidth <= gv.clientWidth));
+    const fits = () => boardFits(paper, card, gv);
     if (fits()) return true;
     // First guess from the overflow ratio, then step down until it fits.
     const cs = getComputedStyle(card);
@@ -255,6 +304,25 @@ function fitZoom(paper, card, gv, cap) {
         z = Math.max(1, Math.round((z - 0.05) * 100) / 100);
     }
     return fits();
+}
+
+/* Whether a box inside the paper hides part of its own content: an overflow that is not visible
+   (auto, scroll, hidden, clip) with more than NEST_TOL px past its edge. The tolerance absorbs the
+   3-11 px padding remainders some cells leave in a capped box without cutting anything drawn.
+   Excluded: a designed pan strip ([data-mq-scroll], the number lines' sideways scroller with its
+   own pan buttons) and screen-reader-only boxes (1 px clipped text). */
+const NEST_TOL = 12;
+function nestedClip(paper) {
+    for (const el of paper.querySelectorAll('*')) {
+        const ch = el.clientHeight, cw = el.clientWidth;
+        if (ch <= 2 || cw <= 2) continue;
+        const overY = el.scrollHeight - ch > NEST_TOL, overX = el.scrollWidth - cw > NEST_TOL;
+        if (!overY && !overX) continue;
+        if (el.closest('[data-mq-scroll]')) continue;
+        const cs = getComputedStyle(el);
+        if ((overY && cs.overflowY !== 'visible') || (overX && cs.overflowX !== 'visible')) return true;
+    }
+    return false;
 }
 
 let fitObs = null;
