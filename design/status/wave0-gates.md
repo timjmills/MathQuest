@@ -9,3 +9,16 @@ Scope: `design/IMPROVEMENT_PLAN.md` §1.4 S1, S2, S4, S5, S9 and the E1 tools bu
 - Chromium trusts the proxy CA (STATUS §8); the legacy print path needs `pip install pymupdf`.
 
 ## Progress
+Builders run in their own git worktrees and the lead merges them here.
+
+| Phase | Work | Builder | State |
+|---|---|---|---|
+| 1 | S2 part 1: `ws-node-lint.mjs`, seeded fixtures, `ws-backtest.mjs` + `backtests.json` | mq-opus-medium (first build) | running |
+| 1 | E1: `ws-envelope.mjs` (`--engine`, `--self-test`, `--diff`, `--envelope`) | mq-opus-medium | running |
+| 1 | S5: `ws-deploy-gates.sh`; `ws-screen-slots` / `ws-chromebook-fit` `--category`, `--skills`, `--shard`, `--baseline`, `--bigboard`, `--dark` | mq-opus-medium | running |
+| 1 | S4: golden renders, manifest, diff, contact sheets; `ws-grade-render --template`, `--envelope` | mq-opus-medium | running |
+| 2 | S1: `ws-precritic.cjs`, `role-sample.json`, `ws-providers-unit --skill`, `ws-teacher-wrm --grade --lesson` | mq-opus-medium | queued |
+| 2 | E1: `ws-coverage-matrix.cjs`; `ws-print-lint` `--kind`, `--pages`, `--bring-back`, `--sections`, `--anchors top|first` docs | mq-opus-medium | queued |
+| 2 | S2 part 2: browser checks with real commit backtests (lone item, text ≠ generator, Chromebook viewport, repeats) | mq-opus-medium | queued |
+| 2 | S9: `reading_ruler_hard` doubled answer area; print-lint per-skill baseline | mq-opus-low (fix) | queued |
+| 3 | Independent critic of the tools | mq-opus-medium | — |
