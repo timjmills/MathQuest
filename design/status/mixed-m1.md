@@ -98,3 +98,29 @@ Result: PASS at r6 (16 pages, all ≥ 8). Target was ≤ 2 rounds; it took 6 (r1
 | r4–r5 | Owner rulings arrived mid-round (fill, families, PG-15) and were applied mid-round | Process rule 0 (batch design decisions) — now in force |
 | r5 | One page changed after its pass and was not re-rendered, costing a follow-up spot-check | Plan-hash diff before each critic (above) |
 | r6 | Fixer edited note wording after its last full check; the lead re-ran the fill scenarios (≈ 50 min) | A fixer's last commit must be followed by the quick check; the report states the commit the check ran on |
+
+### Anchor engine fixes (pilot E1–E3) — critic round 1, 2026-10-23: FAIL
+
+Side pages of add_10k / add_1k 8 on every criterion (E1, E2, E3 fixed there); 6 of 16 pages ≤ 7, all defects pre-existing
+on anchor-mode pages. Rebuild at Opus medium (failed round).
+
+**Automatic checks**
+
+| Finding | Proposed check (backtest) | Existing check? |
+|---|---|---|
+| Sections-anchor problems centred down the cell (CL-4) | E5 top start and E3 bands in sections mode too | E5 existed but ran on side only — scoping gap |
+| A skill with no workedSteps changes the page in anchor mode (sub_1k: forced 2 columns, 4 columns for 6 items) | plan(anchors, no examples) == plan(off) | No — `anchors.check` skipped these pages (`if (!r.n) continue`) |
+| mult_chart_easy side pair overflows the page by 80–90 mm | Any overflow > 0.5 mm FAILS; no `KNOWN_E2_SIDE` allow-list | E2 existed but its allow-list downgraded it to WARN — allow-lists must not hold overflows |
+| The key's bold leaks onto the anchor (not a facsimile) | Computed weight / colour of `.mq-anchor` glyphs equal on pupil and key | No (L-ANCHOR checks markup, not computed style) |
+| Step lines wrap before "=" | No rendered step line starts with "=" (Range line boxes) | No |
+| Empty grid area in a section with fewer items than columns × rows | Grid-hole check | No |
+| Kit-wide: stack cells centre content vertically on every page type (CL-4, owner ruling) | A kit-wide top-start rule in `ws-print-lint` | No — raised with the lead (not this lane's to change) |
+
+**Speed-ups**
+
+| Cost | Smallest change |
+|---|---|
+| Only M rendered; S and L could not be graded (rubric grades S and L in full) | Render S, M and L in the same run, every time (now in the r2 brief) |
+| Scope proof by eye | Hand the critic a before/after pixel-diff box per page and the per-cell band numbers (`bands.py`) |
+| No anchors-off baseline to compare a no-example skill against | Render an anchors='off' baseline per skill |
+| The round-1 fixer built at low on an uncertified pair (anchors side layout) | Rule 0a: first builds on an uncertified pair run at medium |
