@@ -1,4 +1,4 @@
-# Improvement plan — faster building, a simple teacher site, truly mixed pages (v6, 2026-10-23)
+# Improvement plan — faster building, a simple teacher site, truly mixed pages (v6.1, 2026-10-23)
 
 ## In short (for the owner)
 
@@ -24,7 +24,9 @@
 5. **Truly mixed pages.** Today "mixed practice" prints one band per skill. We build the mixed-together page that the
    design rules already describe: problems from different skills side by side, never more than two of one skill in a
    row (unless one skill is most of the page), each problem with its own short instruction, the page full.
-6. **What you need to answer:** the questions in §4.3 (each has a recommended answer).
+6. **Owner decision (2026-10-23): every skill that is live makes every kind of worksheet first.** Making new lessons —
+   the short lesson (our original lesson maker) and the longer V22 lesson — moves to a later wave, if needed (§1.6.3).
+7. **What you need to answer:** the questions in §4.3 (each has a recommended answer).
 
 Sections 1–3 hold the detail for builders; §4 shows how it fits the current plan and lists every open item.
 
@@ -161,6 +163,11 @@ Expected effect, measured by S8: median rounds to PASS 5 → 2; deploy gates 80 
 Owner: "make sure the plan also covers increasing the speed of generating lessons, worksheet types, etc. … do this for
 all paper, lesson, worksheet types … figure out how to vastly improve the speed while keeping quality the same."
 
+**Owner ruling, 2026-10-23:** "Any skill that we have live should be able to make the different worksheets, although
+custom lessons — the short lesson (our original) and the longer V22 — can be made in a later wave if needed." So the
+worksheet types come first (§1.6.3, E2–E3), and the lesson parts of this section (the lesson compiler, lesson shapes,
+the intervention library, E4) are designed here but built only when that later wave starts.
+
 §1.1–§1.5 cut the number of critic rounds. This section changes **what** is graded, which is the bigger lever: today
 every skill, every page type and every lesson is graded page by page, so the work grows with the number of products.
 After this section it grows with the number of **engines**, and products made on a certified engine are data.
@@ -221,24 +228,44 @@ looks, every option value, every role it serves, the number ranges, the three sc
 
 - **Skills** — §1.5 as written, with the envelope: a template is certified once, then its ≈ 111 build-list entries,
   options and presets are data (the presets showed the pace).
-- **Worksheet types** —
-  1. **Certify each live role** on the role sample (`tests/fixtures/precritic/role-sample.json`, 20 families) × S / M / L
-     × both looks × its key: Independent, More Practice, Guided, Scripted Model, Opener, Pre-skill check, Review, Test,
-     Mixed (with §3), Word problems, Today's Number, fact rows, fact probe, answer key. A skill on a certified template
+- **Worksheet types — first, for every live skill (owner 2026-10-23).** "Every worksheet" means every choice a teacher
+  can make for a skill in the worksheet sheet and the Quiz (§2.4–§2.5), each with its answer key, at S / M / L, on paper
+  and on the three screen hosts:
+  - the Practice page at any page count, as One skill per page, In sections or Mixed together;
+  - Examples: None · An example to start each group · An example with each problem;
+  - Fade supports: Faded problems · Faded page · Faded packet;
+  - fact rows and the timed check (fact skills; any other skill is rerouted to the Computation grid or Equation drill
+    with a note, PT-CMP-2);
+  - Word problems (story skills; any other skill prints its own cell in the band, PAGE_TYPES §10);
+  - the Quiz paper (the Test role) with 1–6 versions; Review (Daily Spiral); Pre-skill check (Practise pre-skills);
+    Today's Number (place-value skills).
+
+  Today an example prints only for the 261 skills with real worked steps; the other 454 print "No worked example for
+  … yet" (`sheet/anchors.js` `ineligibleNote`). Steps 1 and 2 below close that gap.
+  1. **Certify each worksheet role** on the role sample (`tests/fixtures/precritic/role-sample.json`, 20 families) ×
+     S / M / L × both looks × its key: Independent, More Practice, Mixed (with §3), Review, Pre-skill check, Test, Word
+     problems, Today's Number, fact rows, fact probe, answer key, and the example and fade modes on them. The
+     lesson-packet roles (Opener, Scripted Model, Guided page, K one-page lesson, anchor chart, Steps card) are
+     certified with the later lesson wave. A skill on a certified template
      then gets every certified role without a per-role grade (machine `coverage()` for every skill × role × size, keys
      included, plus the contact sheet).
   2. **Provider pass, family by family:** the 454 skills on default adapters get real providers as data — `workedSteps`
      from the template's step grammar, `wrongAnswer` and `misconceptions` from the signed card's Misconceptions section
      (S3 card item 6), `strings` from the instruction library. `ws-providers-unit` checks each: the steps reach the key,
-     the wrong answer is a tagged misconception, no hint holds the answer. This makes the Model, Guided, Opener and
-     anchor-chart roles fully useful for every skill and is what the lesson compiler needs.
-  3. The thinking roles (Error analysis, True or False?, Reason It, Stretch) **stay paused until Wave 8 is done**
-     (owner 2026-10-09, MASTER_PLAN Wave 9). When they start, they follow step 1 and are cheap, because step 2 has
-     already given every skill its misconceptions and wrong answers.
+     the wrong answer is a tagged misconception, no hint holds the answer. This gives every live skill its worked
+     examples and fade steps, and is what the later lesson compiler and lesson roles need.
+  3. **Done when** every live skill (715 today) prints every worksheet above with its key at S / M / L and on the screen
+     hosts: machine `coverage()` for every skill × role × size × example / fade mode, plus the critic's family contact
+     sheets with the 20 % full-scale sample (§1.6.2).
+  4. The thinking roles (Error analysis, True or False?, Reason It, Stretch) stay paused (owner 2026-10-09: "for a wave
+     after the lessons are done", MASTER_PLAN Wave 9); with lessons now in a later wave, Q-W4 asks whether they still
+     wait. When they start, they follow step 1 and are cheap, because step 2 has already given every skill its
+     misconceptions and wrong answers.
 - **Papers** — the paper composer is certified once on an all-pairs sample of the §2.5 choices (pages 1 / 3,
   weights equal / unequal, the three arrangements, the examples choices, S / M / L) with the certified roles inside it.
   Quiz becomes Practice + a scoring layer (T3), so it is certified by certifying the scoring layer, not a second engine.
-- **Lessons** —
+- **Lessons — a later wave, if needed (owner 2026-10-23).** Nothing below is built until that wave starts; the five
+  passed detailed lessons and the standard lesson maker stay live as they are. When it starts:
   1. **Lesson shapes.** Classify the owner's 67 lessons (and, later, the intervention steps) into shapes; the first two
      lessons of a new shape get a full critic on every page (this certifies the shape).
   2. **The lesson compiler** (`compileLesson(card)`, `js/modules/lessons/compile.js`, new): from the signed lesson card
@@ -292,9 +319,9 @@ looks, every option value, every role it serves, the number ranges, the three sc
 | Step | Work | Files | Done when |
 |---|---|---|---|
 | E1 | Envelopes, all-pairs sampling, certificates | `tests/scripts/ws-envelope.mjs` (new), `ws-grade-render.cjs` (`--envelope <engine>`, new flag), `design/audit/certified/` | the `stack` template and the Independent role certified from their existing passed renders; the certificate lists every page and score source |
-| E2 | Certify the live roles on the role sample | `sheet/roles/*` (fixes only), `role-sample.json` | each listed role certified; `coverage()` green for every skill × role × size |
-| E3 | Provider pass by family (454 skills) | `js/modules/sheet/providers/*`, the cards | `real` providers 715 / 715; `ws-providers-unit` green |
-| E4 | Lesson shapes, compiler, lesson precritic, generated lesson registry; recompile lessons 1–5 | `js/modules/lessons/compile.js` (new), `js/modules/lessons/shapes/*.js` (new), `tests/scripts/ws-detailed-lesson.cjs` | lessons 1–5 recompiled, `--check` green, full critic ≥ 8; then lesson 6 onward from cards |
+| E2 | Certify the worksheet roles on the role sample (§1.6.3 Worksheet types item 1) | `sheet/roles/*` (fixes only), `role-sample.json` | each listed role certified; `coverage()` green for every skill × role × size |
+| E3 | Provider pass by family (454 skills) | `js/modules/sheet/providers/*`, the cards | `real` providers 715 / 715; `ws-providers-unit` green; every live skill prints every worksheet type with its key (§1.6.3 item 3) |
+| E4 (later lesson wave, if needed) | Lesson shapes, compiler, lesson precritic, generated lesson registry; recompile lessons 1–5 | `js/modules/lessons/compile.js` (new), `js/modules/lessons/shapes/*.js` (new), `tests/scripts/ws-detailed-lesson.cjs` | lessons 1–5 recompiled, `--check` green, full critic ≥ 8; then lesson 6 onward from cards |
 | E5 | Lane manifests + integrator; one lane per session | `design/lanes/`, `tests/scripts/ws-integrate.mjs` (new) | a week of six lanes with no shared-file conflict |
 | E6 | Inheritance audit each wave | `design/audit/certified/audit-<wave>.md` | the first audit run and recorded |
 
@@ -338,7 +365,7 @@ several times today's throughput (≥ 5× on the backlog of skills and lessons);
 | Place | Holds | Replaces |
 |---|---|---|
 | **Skills** (opens here) | one gallery: a big search box; **Browse by** Maths area · White Rose step · Standard (CCSS / EE, each marked covered / not yet — today's Standards coverage view, owner 2026-09-25, `teacher-standards.js`) · MAP strand ("Practise by task" / "By representation", the MAP strand picker) · My sets; Grade chips; Big 3 / Medium 4 / Small 5 thumbnails or a list (60 per page, filtered by grade by default); ticking puts skills in the tray | Home, Skills library, Send a skill set, Print worksheets, the quiz builder's picker, MAP "Practise by task / By representation" |
-| **Lessons** | White Rose + detailed lessons in the 2026-10-17 layout (Grade → maths area → lessons in order → the lesson panel on the side); **opens where the teacher was last** (last grade, area and lesson, the next lesson marked "Next"), with a search box for a lesson by name or code; the lesson panel buttons: **Print lesson** (primary) · Print practice · Share practice · **Practise pre-skills** (MASTER_PLAN 3.4); the lesson's planned "Skills to be made" stay on the lesson and the maths-area summary (owner 2026-10-17), collapsed | White Rose lessons, the detailed-lesson card in Print, the Skills to be made screen |
+| **Lessons** | White Rose + detailed lessons in the 2026-10-17 layout (Grade → maths area → lessons in order → the lesson panel on the side); **opens where the teacher was last** (last grade, area and lesson, the next lesson marked "Next"), with a search box for a lesson by name or code; the lesson panel buttons: **Print lesson** (primary, for the lessons already made — the standard lesson maker and the five detailed lessons; new lessons wait for the later lesson wave) · Print practice · Share practice · **Practise pre-skills** (MASTER_PLAN 3.4); the lesson's planned "Skills to be made" stay on the lesson and the maths-area summary (owner 2026-10-17), collapsed | White Rose lessons, the detailed-lesson card in Print, the Skills to be made screen |
 | **Classes** | Run on the board, quiz results, MAP tests (running and results), progress | Run practice, Quizzes list, MAP tests, Progress |
 | **(profile menu)** | Settings, Switch to pupil view, Teacher help | the nav footer |
 
@@ -688,7 +715,7 @@ reproduced.
 | 2 | **Mixed pages M1–M5**, then the provider pass (§1.6 E3) family by family | `print-sheet.js`, `sheet/*` | Wave 0 |
 | 3 | **Teacher site 2.0 T1–T6** (T1 needs the owner) | `teacher-*.js`, `css/teacher*.css`, `index.html` teacher markup | templates (step 4) |
 | 4 | **Templates by leverage** (§1.5); the paused lanes restart with precritic: Lane D print backlog, the fraction key (keys show 2/8 = 1/4, owner 2026-10-17; both touch `print-sheet.js`, so one after the other and after M2), Lane B answer + regroup boxes, place-value write-value, the decimals key fault (AK-4 on `add_decimal`, same fix pattern as `mult_properties`), the skip-count owner answers still to build (wide rows wrap and keep size; phone card opens at the first box), the number line 5.2 later steps (1) a time line in hours and minutes for `measurement:elapsed_*`, (2) D9 band tightness, (4)/(8) a unit-fraction line for `fraction_operations` when the teacher fixes one denominator, (9) the owner question on mixed pools losing a row, the `order_fdp` page that prints "Order from greatest to least" with no numbers (STATUS §7 item 7, conversions family) | `sheet/cells/<template>.js`, the generators | Teacher site 2.0 |
-| 5 | **Lessons 6–10 and the rest of the owner's list** (Wave 8) — first the lesson compiler and shapes (§1.6 E4: lessons 1–5 recompiled and passed), then lessons 6 onward from signed cards, one lane per shape; resume `claude/sweet-newton-c8wrv1-wip-detailed-lessons-2` (patches in `design/lesson-planner/wip-2026-10-17/`) | `js/modules/lessons/detailed/`, `data/curriculum/detailed-lessons.json` | any lane |
+| 5 | **Later wave, if needed (owner 2026-10-23): new lessons** — the short lesson (original maker) and the V22 detailed lesson: first the lesson compiler and shapes (§1.6 E4: lessons 1–5 recompiled and passed), then lessons 6 onward from signed cards, one lane per shape; the parked branch `claude/sweet-newton-c8wrv1-wip-detailed-lessons-2` (patches in `design/lesson-planner/wip-2026-10-17/`) waits for it | `js/modules/lessons/detailed/`, `data/curriculum/detailed-lessons.json` | any lane |
 
 At most three lanes at once until §1.6 E5 (manifests + integrator) lands; then up to six, one cloud session each
 (Q-S6). Each lane owns its files; deploys use the S5 runner. The inheritance audit (E6) runs once per wave.
@@ -709,8 +736,9 @@ At most three lanes at once until §1.6 E5 (manifests + integrator) lands; then 
 | Wave 5 (redo existing skills), 5.2 number line (built), 5.3 same skill with different supports | §1.5; 5.3 needs a share-code decision (Q-H3) |
 | Wave 6 (new skills incl. MAP 6.2–6.4) | §1.5 template order |
 | Wave 7 (Seesaw / Classroom trial, game modes) | unchanged, after Waves 5–6 |
-| Wave 8 (lessons, owner list of 67) | §4.1 step 5; built with the lesson compiler and lesson shapes (§1.6.3, E4) |
-| Wave 8 intervention library (a lesson for every WRM small step) | §1.6.3 Lessons item 6 (compiled by family after the provider pass) |
+| Wave 8 (lessons, owner list of 67) | moved to a later wave, if needed (owner 2026-10-23); §4.1 step 5, with the lesson compiler and lesson shapes (§1.6.3, E4) |
+| Wave 8 intervention library (a lesson for every WRM small step) | the same later wave; §1.6.3 Lessons item 6 |
+| Owner 2026-10-23: every live skill makes every worksheet | §1.6.3 Worksheet types, E2–E3 (§4.1 steps 1–4) |
 | Wave 9 (stretch / thinking pages) | unchanged, after Wave 8; then certified as roles (§1.6.3 Worksheet types item 3), cheap because E3 gives every skill its misconceptions |
 | PAGE_TYPES §10 PT-CMP-1…5 (any skill on any role, every role with a key, `coverage()`) | §1.6.3 Worksheet types (roles certified; `coverage()` over every skill × role × size) and E3 (454 skills off default adapters) |
 | LESSON_LIBRARY_PLAN §8e three papers | §1.6.3 Papers (one composer certified; Quiz = Practice + scoring) |
@@ -750,7 +778,7 @@ At most three lanes at once until §1.6 E5 (manifests + integrator) lands; then 
 | Q-S2 | When a review fails only by a whisker (every failing mark is a 7, nothing lower), re-check just the failed pages, every changed page and a fresh 1 in 5 of the rest, instead of re-grading everything? Every page must still reach 8. | Yes |
 | Q-S3 | Let each work lane keep its own progress notes (joined into one status page automatically), so lanes stop clashing when their work is merged? | Yes |
 | Q-S4 | Once a kind of drawing, page type, paper or lesson pattern has passed review across all its sizes and options, may new skills and lessons that use it be checked this way: the machine checks on every page, a reviewer reading every new skill or lesson on a sheet of small pages, and 1 in 5 pages graded at full size (any new kind of page always in full)? A spot-audit each wave grades more pages at full size and withdraws the approval if any falls below 8. (This changes how CLAUDE.md says a page counts as graded.) | Yes |
-| Q-S5 | Let lessons be drafted automatically from their skills — steps, examples, the mistakes table, practice and the exit slip — with the builder writing only the story, the hook and the teaching notes? You still sign each lesson's card first, and the five lessons already passed are rebuilt this way and re-checked before any new one. | Yes |
+| Q-S5 | (Asked when the later lesson wave starts.) Let lessons be drafted automatically from their skills — steps, examples, the mistakes table, practice and the exit slip — with the builder writing only the story, the hook and the teaching notes? You still sign each lesson's card first, and the five lessons already passed are rebuilt this way and re-checked before any new one. | Yes |
 | Q-S6 | Run up to six work lanes at once, each in its own cloud session, once the merge tool is in place? | Yes |
 | Q-M1 | When a worksheet has 2 or more skills, mix the problems together by default? Practice printed from a lesson stays in sections, because the lesson's skills are new. | Yes |
 | Q-M2 | If the skills you chose cannot all fit on one page at least twice each, should Print add pages (it tells you) rather than print some skills only once? | Yes, add pages |
@@ -763,6 +791,7 @@ At most three lanes at once until §1.6 E5 (manifests + integrator) lands; then 
 | Q-W1 | No lettered A–J pages; "How many pages?" for section, single-skill and mixed pages | **Decided by the owner, 2026-10-23** |
 | Q-W2 | Offer "An example with each problem" again? It was dropped on 2026-09-26 because it made pages with only one problem. | Yes, but only when at least 2 example-and-problem pairs fit the page at the chosen size (otherwise the choice is greyed out with the reason), and never on mixed pages |
 | Q-W3 | For quizzes, "How many versions? 1–6" — each version with its own order and answer key, no letters? | Yes |
+| Q-W4 | You said the thinking pages (find the mistake, true or false, reason it, stretch) wait until after the lessons. Lessons are now in a later wave: should the thinking pages still wait for that wave, or join the worksheet types now? | Still wait (your 2026-10-09 ruling stands) |
 | Q-H2 | Use the shape drawings already made (pull request #13) as the start of the shape pages, rather than building them again? | Yes |
 | Q-H3 | Allow the same skill twice in one set with different supports (for example once with the number line and once without)? Old codes keep working. | Yes |
 | Q-H4 | For research on MathWorksheets4Kids and IXL: add the logins to the cloud workspace's private settings, or research from their public pages once per kind of drawing? | Add the logins |

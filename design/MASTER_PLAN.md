@@ -1,6 +1,6 @@
 # MathQuest master plan — waves (owner, 2026-10-02)
 
-> **2026-10-23 — read `design/IMPROVEMENT_PLAN.md` first (v6: adds §1.6, faster building for every product — skills, worksheet types, papers and lessons).** It adds **Wave 0 (faster building at the
+> **2026-10-23 — read `design/IMPROVEMENT_PLAN.md` first (v6.1: adds §1.6, faster building for every product; owner 2026-10-23 — every live skill makes every worksheet first, new lessons in a later wave).** It adds **Wave 0 (faster building at the
 > same quality: precritic checks proved by backtests, signed spec cards, golden renders + batch critics under quality
 > safeguards, sharded deploy gates, per-lane status files)**, rebuilds Wave 3 as **Teacher site 2.0** (four places —
 > Skills, Lessons, Classes, profile; a tray with Print · Quiz · Share; ≤ 4 steps per job; bold maths-area colours used on
@@ -167,6 +167,10 @@ stay at the bottom of the student home.
 | 7.2 | Car race and boss battle made more interesting | emoji hero vs dinosaur on a timer; two-lane race vs a timed computer car (`boss-race.js`, 116 lines) |
 
 ## Wave 8 — Lessons
+
+> **Owner 2026-10-23:** "Any skill that we have live should be able to make the different worksheets, although custom
+> lessons — the short lesson (our original) and the longer V22 — can be made in a later wave if needed." New lessons
+> move to a later wave; every live skill making every worksheet type comes first (`design/IMPROVEMENT_PLAN.md` §1.6.3).
 
 **Owner plan 2026-10-16 (detailed lesson maker):** the Atomisation Lesson Planner (V21 while in review; **V22** once passed — `design/lesson-planner/Atomisation_Lesson_Planner_V22.md`) is iterated
 until an independent critic scores >= 8 on every teacher and pupil page of its sample packs (the site is the gold standard).

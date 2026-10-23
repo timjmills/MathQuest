@@ -1,5 +1,10 @@
 # Lesson library — architecture and scale-up plan (2026-09-26)
 
+> **Owner 2026-10-23:** "Any skill that we have live should be able to make the different worksheets, although custom
+> lessons — the short lesson (our original) and the longer V22 — can be made in a later wave if needed." New lessons and
+> the intervention library wait for that later wave; when it starts, they are built with the lesson compiler and lesson
+> shapes of `design/IMPROVEMENT_PLAN.md` §1.6.3. The lessons already made stay live.
+
 Owner goal: use the three passing sample lessons (`design/lesson-samples/`, critic lessons-r4: 48/48 pages ≥ 8) as the
 model, and build **intervention lessons in the same format** for every WRM small step, every skill, every CCSS standard,
 lettered part and EE, housed in a **lesson library**, each tagged WRM / CCSS / EE, each **tied to a skill that practises it
