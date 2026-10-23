@@ -316,6 +316,9 @@ async function runFlow(browser, base, f, w) {
   fs.mkdirSync(SHOTS, { recursive: true });
   const { server, base } = await startServer();
   const browser = await chromium.launch({ executablePath: EXE });
+  // fix round 5: pages run the app in a hidden frame to draw thumbnails live, so a big tray's preview keeps the network
+  // busy for a while; every page gets a 120 s budget instead of 30 s
+  { const np = browser.newPage.bind(browser); browser.newPage = async (o) => { const p = await np(o); p.setDefaultTimeout(120000); p.setDefaultNavigationTimeout(120000); return p; }; }
   let failed = 0, checked = 0; const shots = [];
   try {
     for (const b of ['a', 'b']) if (args.includes('--boards') || !fs.existsSync(path.join(DIR, `board-${b}.png`))) {
