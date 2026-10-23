@@ -19,7 +19,7 @@
    everywhere that area appears; areas taught in the same grade stay easy to tell apart for colour-blind teachers too, and
    every colour also carries the area's name and icon. To stay safe for colour-blind teachers, three of the eight are
    light rather than deep (mint, sky blue, lime), so their chips show by a thin outline; the one button you should press
-   is bold black; everything else is calm. Pupil pages stay black and white. You chose board B, the eight colours (Q-T6).
+   is bold black; everything else is calm. Pupil pages stay black and white. You chose the warm, earthy colour style of the school's Awsaj maths site (board C, Q-T6); colour marks the maths area, and the grade is shown by its own badge, not a colour.
 4. **Three kinds of worksheet, with plain options** (owner decision): **Single skill · Sections · Mixed practice**. No
    other page types, no lettered A / B pages, no "I Can / Daily" look choice. Options: How many pages? · How often each
    skill comes up · Examples · Fade supports · Layout (fact rows, timed check, Today's Number) · Bring back earlier
@@ -728,6 +728,8 @@ full screen above both. One column; the preview never comes first.
 
 ### 2.4 The tray
 
+**Owner 2026-10-23 (confirmed): the tray is built for 40–100 skills** ("we might practice problems from a whole grade level"). Up to about 8 skills it shows chips; above that it collapses to one summary bar ("Grade 3 · 64 skills · 6 areas", one segment per maths area) that opens a tray sheet grouped by area, with search, one-tap remove per area and per skill, and a height cap. Skills gains **Add whole area** and **Add whole grade**; Lessons gains **Add this unit**. "How often" is set per area first, per skill only when opened. Print summary and preview work at 100 skills (each skill at least once if the pages allow, otherwise sampled, and the summary says so); Single skill with many skills warns. Share needs a **compact whole-grade / whole-area set code** so the link stays short — a `skill-codes.js` change (after M1 releases that file; append-only, `ws-code-snapshot` green). Quiz builds from a whole grade or unit.
+
 - Fixed at the bottom of Skills and **always visible, even when empty**: then Quiz opens "Build from" (a standard, a White
   Rose unit or step, a lesson), and Print and Share are greyed with "Tick skills first". With skills, it shows them as
   chips in their maths-area colours; drag to reorder.
@@ -925,10 +927,10 @@ light version, ≥ 7 : 1 on the dark tint (CC #E092E9, OA #A3A0D5, NBT #F4D984, 
   band, so a one-area list still shows four strengths of its colour, not one hue on black and white.
 - **Never colour alone:** every colour comes with its area name and an area icon (black-and-white printers, colour-blind
   teachers).
-- **Neutral backgrounds** (white; #111318 dark), no pastel washes outside the group tints. Grades are numbered neutral
+- **Neutral backgrounds** — **owner 2026-10-23 (confirmed): warm stone page #EFECE8, white cards #FFFFFF, surface-2 #E5E1DB** (cream only as text on dark fills; #111318 dark unchanged; contrast gates measured against the stone page), no pastel washes outside the group tints. Grades are numbered neutral
   pills.
 
-**The owner chose board B** (Q-T6, decided 2026-10-23); T1 renders board B, with board A kept as a static reference image: **A** six areas (Measurement and Data share mint; Ratio /
+**The owner chose board C** (Q-T6, 2026-10-23: the Awsaj maths site's warm cream and earthy colours; colour marks the maths area and the grade gets its own non-colour badge); T1 renders board C, with boards A and B kept as static reference images. For the record: **A** six areas (Measurement and Data share mint; Ratio /
 Number system shares pink) and **B** eight areas with the strengths above. Board A uses six of the same colours and passes
 the same checks (closest colour-blind pair CC–OA 12.2).
 
@@ -970,7 +972,7 @@ the same checks (closest colour-blind pair CC–OA 12.2).
 
 | Phase | Work | Files | Done when |
 |---|---|---|---|
-| T1 | Clickable mock-up on palette board B (eight areas with ramps, with its colour-blind simulation; board A as a static reference image): Skills, tray, worksheet sheet, Quiz, Share, Lessons, Classes at 1366 and 390, light and dark; a live-vs-branch table of teacher files (STATUS §7) | `design/mockups/teacher-2/*.html`, `tests/scripts/ws-teacher-tokens.cjs` (palette part) | the owner approves the flows on board B (chosen 2026-10-23, Q-T6; this is the signed spec card) |
+| T1 | Clickable mock-up on palette board C (the Awsaj style: eight areas with ramps on cream, with its colour-blind simulation, and a non-colour grade badge; boards A and B as static reference images): Skills, tray, worksheet sheet, Quiz, Share, Lessons, Classes at 1366 and 390, light and dark; a live-vs-branch table of teacher files (STATUS §7) | `design/mockups/teacher-2/*.html`, `tests/scripts/ws-teacher-tokens.cjs` (palette part) | the owner approves the flows on board C (chosen 2026-10-23, Q-T6; this is the signed spec card) |
 | T2 | Shell + tokens: four places, profile menu, the bottom bar below 820 px, tokens, `areaOf()` | `teacher-shell.js`, `teacher-ui.js`, `teacher-areas.js` (new), `css/teacher-brand.css`, `css/teacher.css`, `index.html` teacher markup, `tests/scripts/ws-teacher-tokens.cjs` | `ws-teacher-tokens` green; old screens reachable |
 | T3 | Skills gallery + Browse by + tray + chip options + worksheet sheet + Quiz + Share | `sheet/roles/test.js` (the Quiz layer), `teacher-library.js`, `teacher-skillpick.js`, `teacher-sets.js`, `teacher-print.js`, `teacher-preview.js`, `teacher-quiz-ui.js`, `quiz-builder.js` (save path only), `quiz-storage.js`, `teacher-map-tasks.js`, `teacher-standards.js` (Browse by › Standard), `print-sheet.js` (request normalising only), `css/teacher-library.css`, `css/teacher-quiz.css` | `ws-teacher-flows` green for every Skills flow |
 | T4 | Lessons: the 2026-10-17 layout restyled, opening where the teacher was last; Print lesson / Print practice / Share practice / Practise pre-skills; "Skills to be made" folded into each lesson and area | `teacher-wrm.js`, `lesson-tomake.js`, `teacher-todo.js` (its content moves onto lessons; the screen leaves the menu in T6), `css/teacher-wrm.css` | Lessons flows green |
@@ -1202,7 +1204,7 @@ before the owner's go on its picture sheet (§1.6.3 step 6).
 | Q-T3 | Keep "Skills to be made" on each lesson and maths area (folded away), and take its separate screen out of the menu? | **Decided 2026-10-23: yes**, folded in |
 | Q-T4 | Show grades as plain numbered labels, so colour only ever means the maths area? | **Decided 2026-10-23: yes**, plain labels |
 | Q-T5 | Share gives one link: it **opens the practice straight away** (today's "Direct link"). The other kind — a link that **puts the skills as buttons on the pupil's start screen to choose from**, which you can lock (today's "Quick Start link") — moves under More options. Agree? | **Decided 2026-10-23: yes**, one link; the Quick Start link under More options |
-| Q-T6 | Colour board A (six maths-area colours) or board B (eight colours, each in four strengths)? Either way the main button is bold black. On both, areas taught in the same grade stay easy to tell apart for colour-blind teachers, and every colour also shows the area's name and icon. The cost: to stay colour-blind safe, three of the colours are light (mint, sky blue, lime) rather than deep, so their buttons show by a thin outline — you will see them on the board. | **Decided 2026-10-23: board B** (eight colours, four strengths) |
+| Q-T6 | Colour board A (six maths-area colours) or board B (eight colours, each in four strengths)? Either way the main button is bold black. On both, areas taught in the same grade stay easy to tell apart for colour-blind teachers, and every colour also shows the area's name and icon. The cost: to stay colour-blind safe, three of the colours are light (mint, sky blue, lime) rather than deep, so their buttons show by a thin outline — you will see them on the board. | **Decided 2026-10-23: board C, the Awsaj style** (owner, after first choosing B the same day: "I like these colors style more", then confirmed: "keep color for math area BUT grade level also needs to somehow be differentiated"). Warm cream page, near-black ink, gold hero, muted earthy area colours. Colour = maths area. **Grade must also be told apart without colour**: a distinct grade marker (a numbered grade badge with its own shape and position, and grade grouping/filters), never a second colour code. The §2.7 rules and gates stay, contrast measured against cream; boards A and B kept as reference images |
 | Q-W1 | No lettered A–J pages; "How many pages?" for section, single-skill and mixed pages; **three kinds of worksheet only — Single skill, Sections, Mixed practice — each with its options; no other page types and no "I Can / Daily" look choice** | **Decided by the owner, 2026-10-23** |
 | Q-W2 | Offer "An example with each problem" again? It was dropped on 2026-09-26 because it made pages with only one problem. | **Decided 2026-10-23: yes, widened** — an example at the top of the page, the first time each kind of problem appears in a section or on a page, to start each group, or with each problem where it fits (§2.5) |
 | Q-W3 | For quizzes, "How many versions? 1–6" — each version with its own order and answer key, no letters? | **Decided 2026-10-23: yes**, 1–6 versions, no letters |

@@ -443,6 +443,17 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
         }
     }
 
+    // PAGE NUMBER LINE (group 'nline', skill-options.js numberLineOptions): one line drawn under the
+    // title on the page, its key and the screen. It never changes the items, so every value is a
+    // render-time try (the items must stay the same, the printed sheet must differ). The six controls
+    // that shape the line only apply while it is on (appliesTo nlOn), so they are tried against a
+    // base with the line on — with it off they do nothing by design.
+    for (const t of tries) {
+        if (t.def.group !== 'nline') continue;
+        t.renderOnly = true;
+        if (t.def.id !== 'nlOn') t.base = Object.assign({}, t.base || {}, { nlOn: true });
+    }
+
     // ---------- static (definition) checks ----------
     const statics = [];
     const { OPTION_KEYS } = await import('/js/modules/skill-option-codec.js');
@@ -714,6 +725,10 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
                 const marks = (ps.pupilMarks || 0);
                 if (same) {
                     if (def.id === 'cover' || def.id === 'mix') warn('print', 'printed sheet identical to the default spread (every item already qualified / no clash dealt)');
+                    // A line control whose value is the one Auto already chose for this page (step 5,
+                    // every tick labelled, fifths) draws the same line. Whether the line is drawn at
+                    // all is checked by the nlOn try, which has no base.
+                    else if (def.group === 'nline' && def.id !== 'nlOn') warn('print', 'printed sheet identical to the line with this control on Auto, which already chose this value for the page');
                     else fail('print', 'the support is not drawn: printed sheet identical to the default');
                 }
                 if (def.id === 'support' && !marks) fail('print', 'no support drawn on the pupil page ([data-ws-support-on] / touch dots)');

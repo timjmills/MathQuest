@@ -1,0 +1,37 @@
+# command (run from the repo root, 2026-10-23): python3 design/status/tally-src/hours.py <full clone>
+# <full clone> = git clone --no-single-branch https://github.com/timjmills/MathQuest <dir>  (HEAD below; not shallow)
+clone HEAD 60c4fa538f0b6abbb2a9eef55a506f4b2c81464a; commits 2148; times UTC (author dates)
+
+## Hours per lane
+| Lane | First commit -> PASS commit (UTC) | Elapsed h | Active h (pauses > 24 h removed) | Critic-round commits to PASS | Median gap between them (h) |
+|---|---|--:|--:|--:|--:|
+| Wave 1 lane A | 10-02 12:40 -> 10-02 15:18 | 2.6 | same | 3 | 1.0 |
+| Wave 1 lane A2 | 10-02 17:34 -> 10-02 21:44 | 4.2 | same | 4 | 0.7 |
+| Wave 1 lane A3 | 10-03 06:14 -> 10-03 08:24 | 2.2 | same | 3 | 0.2 |
+| Wave 1 lane C | 10-02 11:49 -> 10-02 16:39 | 4.8 | same | 5 | 0.3 |
+| Wave 1 lane C2 | 10-02 17:53 -> 10-03 03:21 | 9.5 | same | 6 | 1.1 |
+| div_facts forms | 10-09 02:52 -> 10-09 09:05 | 6.2 | same | 4 | 1.6 |
+| Chromebook fit | 10-09 09:58 -> 10-09 13:00 | 3.0 | same | 3 | 0.8 |
+| Search terms | 10-09 02:02 -> 10-09 21:18 | 19.3 | same | 6 | 1.8 |
+| MAP audit | 10-10 09:17 -> 10-10 10:31 | 1.2 | same | 5 | 0.2 |
+| WRM tagging R + Y1 | 10-10 09:18 -> 10-10 13:51 | 4.6 | same | 12 | 0.3 |
+| WRM tagging Y4 | 10-10 10:00 -> 10-10 13:31 | 3.5 | same | 11 | 0.3 |
+| WRM tagging Y2-Y3 | 10-10 09:26 -> 10-17 00:12 | 158.8 | 12.3 | 14 | 0.5 |
+| WRM tagging Y5 | 10-10 09:21 -> 10-16 21:11 | 155.8 | 9.3 | 21 | 0.2 |
+| WRM tagging Y6 | 10-10 09:20 -> 10-16 17:43 | 152.4 | 5.9 | 9 | 0.2 |
+| WRM Y6 site lessons | 10-17 00:46 -> 10-17 01:43 | 1.0 | same | 2 | 0.6 |
+| Lesson planner V21 | 10-16 17:56 -> 10-16 19:52 | 1.9 | same | 9 | 0.1 |
+| Detailed lessons 1-5 (one helper) | 10-16 18:51 -> 10-17 03:25 | 8.6 | same | 16 | 0.3 |
+| Answer-key options 4.4 | 10-03 07:38 -> 10-10 10:48 | 171.2 | 62.3 | 5 | 8.5 |
+| Touch numerals | 10-03 05:36 -> 10-10 07:03 | 169.4 | 60.6 | 4 | 6.3 |
+| Small fixes | 10-09 20:47 -> 10-16 20:05 | 167.3 | 20.8 | 7 | 1.4 |
+| Number line 5.2 | 10-03 08:10 -> 10-16 19:34 | 323.4 | 68.0 | 7 | 6.8 |
+
+lanes with no pause in the span: 14; elapsed median 3.8 h, range 1.0-19.3 h
+lanes with 2+ critic commits: 21; median of their median gaps 0.6 h, range 0.1-8.5 h
+owner pauses (gaps > 24 h with no commit, 2026-09-23 on): 09-27 00:42 -> 10-02 10:17 (130 h); 10-04 12:33 -> 10-05 13:12 (25 h); 10-05 13:25 -> 10-09 01:38 (84 h); 10-10 14:19 -> 10-16 16:50 (147 h); 10-17 21:51 -> 10-23 02:05 (124 h)
+
+## Lane-weeks (2026-09-23 .. 2026-10-18)
+lower: distinct (branch, day) 113 / 7 = 16.1
+upper: distinct (branch, ISO week) 81 (week 39: 10, week 40: 26, week 41: 22, week 42: 23)
+commit days 2026-09-23 .. 10-17 (UTC): 12; first 2026-09-24, last 2026-10-17
