@@ -299,3 +299,7 @@ length 40/300, zero case 44.3 %, band offered) — real, the pilot's to fix (rul
 top-default cells FAIL when the problem starts > 3 mm below the top pad; write-above cells (regrouping items, long-division
 brackets, judged from content) FAIL when not centred within 2 mm. REPORTING-ONLY until the mixed lane's kit change lands
 (the kit centres every stack today), then a gate. Backtest: today's tip FAILs on any no-regroup stack page; fact pages pass.
+
+**Owner instruction (via lead, 23:07): "stop after this work, don't try anything new".** The queued 11-check package and
+check 12 (CL-4b) are CANCELLED for now — recorded above for later, not started. The lane finishes critic r7 on the
+pilot-lesson checks, reports and stops; if r7 fails, no further round without the lead's go.
