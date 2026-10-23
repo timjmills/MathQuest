@@ -3,9 +3,12 @@
 // survived two critic rounds becomes a machine check). Builds real Mixed practice pages through
 // buildSheet in Chromium and holds every one to:
 //
-//   repeats    sheet/interleave.js pageRepeats over the page's facts in print order: 0 exact
-//              repeats, 0 turnarounds; a fact family twice only where the notes say the skills ran
-//              short of different facts (D1)
+//   repeats    sheet/interleave.js pageRepeats over the page's facts in print order, under the
+//              owner's fill ruling (2026-10-23): with `fill` on (the default) the page is full, and
+//              its turnarounds and exact repeats are exactly the ones the deal took on its turnaround
+//              and repeat rungs (after the unique facts gave out), with a note; with `fill` off 0
+//              repeats and 0 turnarounds, and a note when the page ends early; related facts
+//              (8 x 10 / 80 / 10, 6 + 7 / 13 - 6, 13 - 6 / 13 - 7) only with `families: 'allow'` (D1)
 //   digits     every fact prints at its ladder size (TY-30), at least the size's working digits
 //              (16 / 22 / 28 pt at S / M / L, tokens.SIZES) (D2)
 //   ladder     for each look, seed and skill set: problems S > M > L (L1) (D2 / D3)
@@ -17,7 +20,7 @@
 // 2-skill add_facts + subtract set and add_facts : mult_facts weighted 1 : 3; 20 seeds x S / M / L
 // x Daily / I Can. Every page is also one page whose shelves hold exactly the problems dealt.
 //
-//   node js/modules/sheet/mixed-page.check.cjs [--seeds 20] [--table]
+//   node js/modules/sheet/mixed-page.check.cjs [--seeds 20] [--table] [--only 0,1,...]
 // Prints `mixed-page check: OK` / `FAIL` and exits non-zero on a failure. Needs the preinstalled
 // Chromium (/opt/pw-browsers, through tests/lib/ws-harness.cjs); never installs one.
 const path = require('path');
@@ -39,7 +42,19 @@ const SETS = {
     add_sub2: ['addition:add_facts', 'subtraction:subtract'],
     // (the 1 : 3 weighted page: its re-picked k once printed 30 problems on 25 places, 2 pages)
     weighted13: ['addition:add_facts#1', 'multiplication:mult_facts#3'],
+    // (a small pool: 13 "+ 2" facts and 13 "x 2" facts, so a page runs out of unique facts)
+    small2: ['addition:add_facts@{"constant":[2]}', 'multiplication:mult_facts@{"constant":[2]}'],
 };
+// The owner's fill ruling (2026-10-23): `fill` on (default) fills a short share with turnarounds,
+// then repeats; off prints unique facts only. `families: 'allow'` alone lets related facts in.
+const SCENARIOS = [
+    { set: 'critic4', opts: {}, seeds: SEEDS, ladder: true },
+    { set: 'add_sub2', opts: {}, seeds: SEEDS, ladder: true },
+    { set: 'weighted13', opts: {}, seeds: SEEDS, ladder: true },
+    { set: 'small2', opts: {}, seeds: Math.min(SEEDS, 5), ladder: true },
+    { set: 'small2', opts: { fill: false }, seeds: Math.min(SEEDS, 5), ladder: false },
+    { set: 'add_sub2', opts: { families: 'allow' }, seeds: Math.min(SEEDS, 3), ladder: true },
+];
 const SIZES_ = ['S', 'M', 'L'];
 const LOOKS_ = ['daily', 'ican'];
 const FILL_TOL = 0.005;   // a measured box is a fraction of a mm off the drawn formula
@@ -53,8 +68,14 @@ async function main() {
     let pages = 0;
     let famPages = 0;
     try {
-        for (const [setName, set] of Object.entries(SETS)) {
-            for (let s = 1; s <= SEEDS; s++) {
+        // (--only 0,3: run some scenarios, by index - the full run takes about an hour, so it can be split)
+        const only = arg('only', '') ? String(arg('only', '')).split(',').map(Number) : null;
+        for (const sc of SCENARIOS.filter((_, i) => !only || only.includes(i))) {
+            const set = SETS[sc.set];
+            const fillOn = sc.opts.fill !== false;
+            const famOn = sc.opts.families === 'allow';
+            const setName = `${sc.set}${fillOn ? '' : ' fill-off'}${famOn ? ' families' : ''}`;
+            for (let s = 1; s <= sc.seeds; s++) {
                 const seed = s * 101;
                 for (const look of LOOKS_) {
                     const per = {};
@@ -102,21 +123,31 @@ async function main() {
                                 arr: o.arrangement, notes: o.notes || [], facts, pts: [...pts], cellPts: [...cellPts], fillMax, fillMin, tracks, tabs: [...tabs],
                                 k: (meta.fits && meta.fits[0] && meta.fits[0].cols) || 0, rows: (meta.fits && meta.fits[0] && meta.fits[0].rows) || 0,
                                 n: o.items.length, longest: meta.interleave ? meta.interleave.longest : null, pages: o.pageCount,
+                                dealt: o.items.map((x) => x.dealtAs || 'unique'), mr: o.mixedRepeats,
                             };
-                        }, { role: 'mixed-practice', sections: [{ skills: set.map(sk) }], size, look, key: false, seed });
+                        }, Object.assign({ role: 'mixed-practice', sections: [{ skills: set.map(sk) }], size, look, key: false, seed }, sc.opts));
                         pages++;
                         const id = `${setName} ${look} ${size} seed ${seed}`;
                         const fail = (why) => fails.push(`${id}: ${why}`);
                         if (r.arr !== 'mixed') { fail(`arranged ${r.arr}`); continue; }
                         // the shelves hold exactly the problems dealt, on one page (no spill)
                         if (r.pages !== 1) fail(`${r.pages} pages`);
-                        if (r.n !== r.k * r.rows) fail(`${r.n} problems on ${r.rows} shelves of ${r.k}`);
-                        // D1: repeats
+                        const full = r.n === r.k * r.rows;
+                        if (fillOn && !full) fail(`fill on, but ${r.n} problems on ${r.rows} shelves of ${r.k}`);
+                        // D1 + the fill ruling: what the options allow, and only in its turn
                         const rep = pageRepeats(r.facts);
-                        if (rep.exact.length) fail(`${rep.exact.length} exact repeat(s): ${rep.exact.map((x) => x.key).join(', ')}`);
-                        if (rep.turnarounds.length) fail(`${rep.turnarounds.length} turnaround(s): ${rep.turnarounds.map((x) => x.key).join(', ')}`);
-                        const famNote = r.notes.some((t) => /fact family/.test(t));
-                        if (rep.families.length && !famNote) fail(`${rep.families.length} fact famil${rep.families.length > 1 ? 'ies' : 'y'} twice with no note: ${rep.families.map((x) => x.key).join(', ')}`);
+                        const dealt = { unique: 0, related: 0, turn: 0, repeat: 0 };
+                        for (const d of r.dealt) dealt[d]++;
+                        if (!fillOn && rep.exact.length) fail(`fill off, ${rep.exact.length} exact repeat(s): ${rep.exact.map((x) => x.key).join(', ')}`);
+                        if (!fillOn && rep.turnarounds.length) fail(`fill off, ${rep.turnarounds.length} turnaround(s): ${rep.turnarounds.map((x) => x.key).join(', ')}`);
+                        if (!famOn && rep.families.length) fail(`${rep.families.length} related fact(s) with families off: ${rep.families.map((x) => x.key).join(', ')}`);
+                        // every repeat / turnaround on the page is one the deal took at that rung (after
+                        // the rungs before it gave out), never one that slipped past a rule
+                        if (rep.exact.length !== dealt.repeat) fail(`${rep.exact.length} exact repeats on the page, ${dealt.repeat} dealt as repeats`);
+                        if (rep.turnarounds.length !== dealt.turn) fail(`${rep.turnarounds.length} turnarounds on the page, ${dealt.turn} dealt as turnarounds`);
+                        // a share with repeats used its turnarounds first: the pool has dealt some, or has none to deal
+                        if (!fillOn && !full && !r.notes.some((t) => /run out at \d+/.test(t))) fail('fill off, the page ends early with no note');
+                        if ((dealt.turn || dealt.repeat) && !r.notes.some((t) => /so the page is filled with/.test(t))) fail('turnarounds / repeats with no note');
                         if (rep.families.length) famPages++;
                         // D2: digits at the ladder size, never under the working digits
                         const floor = SIZES[size].digitPt;
@@ -138,7 +169,7 @@ async function main() {
                         rows.push({ set: setName, look, size, seed, k: r.k, rows: r.rows, n: r.n, pt, fill: r.fillMax, tracks: r.tracks, longest: r.longest, exact: rep.exact.length, turn: rep.turnarounds.length, fam: rep.families.length, pages: r.pages, note: fillNote });
                     }
                     // D2 / D3: the size ladder
-                    if (!(per.S > per.M && per.M > per.L)) fails.push(`${setName} ${look} seed ${seed}: problems S ${per.S} / M ${per.M} / L ${per.L} (S > M > L)`);
+                    if (sc.ladder && !(per.S > per.M && per.M > per.L)) fails.push(`${setName} ${look} seed ${seed}: problems S ${per.S} / M ${per.M} / L ${per.L} (S > M > L)`);
                 }
             }
         }
@@ -153,16 +184,16 @@ async function main() {
     // A summary per set x look x size: the across counts, problems and digit sizes seen.
     const groups = {};
     for (const x of rows) {
-        const g = groups[`${x.set} ${x.look} ${x.size}`] = groups[`${x.set} ${x.look} ${x.size}`] || { k: new Set(), n: [], pt: new Set(), fill: [], tr: new Set(), fam: 0, notes: 0 };
-        g.k.add(x.k); g.n.push(x.n); g.pt.add(x.pt); g.fill.push(x.fill); g.tr.add(x.tracks); g.fam += x.fam; g.notes += x.note ? 1 : 0;
+        const g = groups[`${x.set} ${x.look} ${x.size}`] = groups[`${x.set} ${x.look} ${x.size}`] || { k: new Set(), n: [], pt: new Set(), fill: [], tr: new Set(), fam: 0, ex: 0, turn: 0, notes: 0 };
+        g.k.add(x.k); g.n.push(x.n); g.pt.add(x.pt); g.fill.push(x.fill); g.tr.add(x.tracks); g.fam += x.fam; g.ex += x.exact; g.turn += x.turn; g.notes += x.note ? 1 : 0;
     }
     for (const [k, g] of Object.entries(groups)) {
-        console.log(`  ${k.padEnd(20)} across ${[...g.k].join('/')}  problems ${Math.min(...g.n)}-${Math.max(...g.n)}  digits ${[...g.pt].join('/')} pt  fill ${Math.min(...g.fill).toFixed(2)}-${Math.max(...g.fill).toFixed(2)} (${g.notes} noted)  tracks ${[...g.tr].join('/')}  families twice ${g.fam}`);
+        console.log(`  ${k.padEnd(20)} across ${[...g.k].join('/')}  problems ${Math.min(...g.n)}-${Math.max(...g.n)}  digits ${[...g.pt].join('/')} pt  fill ${Math.min(...g.fill).toFixed(2)}-${Math.max(...g.fill).toFixed(2)} (${g.notes} noted)  tracks ${[...g.tr].join('/')}  repeats/turnarounds/related ${g.ex}/${g.turn}/${g.fam}`);
     }
     for (const f of fails.slice(0, 40)) console.log(`  FAIL ${f}`);
     const exact = rows.reduce((a, x) => a + x.exact, 0);
     const turn = rows.reduce((a, x) => a + x.turn, 0);
-    console.log(`mixed-page check: ${fails.length ? 'FAIL' : 'OK'} (${pages} pages, ${SEEDS} seeds x S/M/L x Daily/I Can x ${Object.keys(SETS).length} sets; ${exact} exact repeats, ${turn} turnarounds, ${famPages} page(s) with a family twice (each noted); ${fails.length} failure(s))`);
+    console.log(`mixed-page check: ${fails.length ? 'FAIL' : 'OK'} (${pages} pages, ${SCENARIOS.length} scenarios x S/M/L x Daily/I Can, up to ${SEEDS} seeds; ${exact} exact repeats and ${turn} turnarounds, all on fill-on pages after the unique facts ran out; ${famPages} page(s) with related facts, all with families allowed; ${fails.length} failure(s))`);
     process.exit(fails.length ? 1 : 0);
 }
 

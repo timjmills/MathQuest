@@ -85,6 +85,21 @@ export function normaliseArrangement(v) {
     return '';
 }
 
+/**
+ * A Mixed practice page's `fill` (owner ruling 2026-10-23, "fill the page or not"): true (the
+ * default) fills a share the unique facts cannot fill with turnarounds, then repeats; false prints
+ * unique facts only and lets the page end early.
+ */
+export function normaliseFill(v) {
+    if (v === false || v === 0) return false;
+    return !/^(off|false|no|0|unique)$/i.test(String(v === undefined || v === null ? '' : v).trim());
+}
+
+/** A Mixed practice page's `families`: 'allow' lets related facts share a page (8 x 10 / 80 / 10); else 'off'. */
+export function normaliseFamilies(v) {
+    return v === true || /^(allow|on|true|yes|1)$/i.test(String(v === undefined || v === null ? '' : v).trim()) ? 'allow' : 'off';
+}
+
 function normaliseRequest(req = {}) {
     const asked = ROLE_ALIASES[req.role] || req.role;
     const role = ROLES.has(asked) ? asked : 'independent';
@@ -155,6 +170,9 @@ function normaliseRequest(req = {}) {
     }
     return {
         role, size: onePage ? 'S' : size, look, paper, seed, sections, arrangement, arrangementNotes,
+        // Mixed practice (owner ruling 2026-10-23): fill the page (default) or stop when the
+        // unique facts run out; related facts only when allowed (off by default).
+        fill: normaliseFill(req.fill), families: normaliseFamilies(req.families),
         form: req.role === 'test-b' || String(req.form || 'A').toUpperCase() === 'B' ? 'B' : 'A',
         key: req.key !== false,
         header: Object.assign({}, req.header || {}),
@@ -2733,74 +2751,130 @@ async function buildRoleSheet(n, metaOf) {
         const flags = flagsFor(want);
         const out = [];
         let next = 0;
-        // A Mixed practice page (critic M1 r1 D3 / r3 D1, L10) deals on a RELAXATION LADDER, four
-        // passes a rung (eight on the last): rung 0 keeps every rule - in the share no answer twice (ans:), no related
-        // fact (rel:), and on the page no fact family twice; rung 1 lets an answer come again;
-        // rung 2 a related fact; rung 3 a fact family. NO rung lets the same fact or its
-        // turnaround (7 + 3 / 3 + 7) come twice on the page: a share the pool cannot fill without
-        // one is printed short, and `out.short` says how short. Grouped pages keep their four
-        // passes and no such rule.
+        // A Mixed practice page (critic M1 r1 D3 / r3 D1, L10; owner ruling 2026-10-23 "fill the
+        // page or not") deals on a LADDER of rungs, four passes a rung (eight on the last):
+        //   unique    no fact twice, no turnaround, no fact family twice (8 x 10 / 80 / 10, 6 + 7 /
+        //             13 - 6, 13 - 6 / 13 - 7), no answer twice in the share
+        //   answers   an answer may come again
+        //   related   (`families: 'allow'` only) a fact of a family already on the page
+        //   turn      (`fill` on, the default) the turnaround of a fact on the page (4 + 1 -> 1 + 4)
+        //   repeat    (`fill` on) the same fact again - only once turnarounds have run out too
+        // With `fill` off a share the unique facts cannot fill prints short (`out.short`), and the
+        // host notes it. Related facts are never used to fill unless `families` allows them. Each
+        // item records its rung (`out.counts`). Grouped pages keep their four passes and no rule.
         const noRepeat = keepPrompts;
         const shareSeen = new Set();
         const pageSeen = pageFam || new Set();
-        const passes = noRepeat ? 20 : 4;
-        const rungOf = (pass) => Math.min(3, Math.floor(pass / 4));
-        let rungMax = 0;
+        const famSeen = pageFam || new Set();
+        const rungs = ['unique', 'answers', ...(n.families === 'allow' ? ['related'] : []), ...(n.fill !== false ? ['turn', 'repeat'] : [])];
+        const passes = noRepeat ? rungs.length * 4 + 4 : 4;
+        const rungAt = (pass) => rungs.indexOf(rungs[Math.min(rungs.length - 1, Math.floor(pass / 4))]);
+        const R = (name) => { const i = rungs.indexOf(name); return i < 0 ? Infinity : i; };
+        const counts = { unique: 0, related: 0, turn: 0, repeat: 0 };
+        /** Offer one generated item to the share at a rung (`cap`): true when it is taken. */
+        const offer = (g0, pass, cap) => {
+            // A Mixed practice page of fact cells (critic M1 r1 D2): every fact on the page takes
+            // the page's widest answer zone, so the rules and the ones columns line up across a shelf.
+            // (A + fact keeps its fact drawing: a 3-track + band would otherwise draw the carry stack.)
+            // (critic M1 r3 D4: the page's count, up OR down - a band's 3-track answer zone on a
+            // page whose numbers are all 1- and 2-digit prints 2 tracks)
+            const pl = mixDigits && g0.q && g0.q.cell && g0.q.cell.template === 'fact' && g0.q.cell.payload;
+            const g = pl && Number(pl.digits) !== mixDigits
+                ? Object.assign({}, g0, { q: Object.assign({}, g0.q, { cell: Object.assign({}, g0.q.cell, { payload: Object.assign({}, pl, { digits: mixDigits }, pl.regroup === undefined ? { regroup: false } : {}) }) }) })
+                : g0;
+            const it = settlePrompts([hostItem(g, 0, n.size, { mix: { key: pi, count: pools.length, sheet: n.mix } })], metaOf(g.skill).instructionKey)[0];
+            if (keepPrompts) it.stripPrompt = false;
+            // Error analysis never falls back to an "Answer:" line under the cell: the shown work
+            // must sit in the cell's own slot, or the pupil sees two answer places (C1).
+            if (needsShow && (pass < 3 || strictShow) && !it.canShow()) return false;
+            const rk = noRepeat ? repeatKeys(g.q) : null;
+            const xk = noRepeat ? exactKeys(g.q) : null;
+            const rung = cap;
+            const fk = noRepeat ? familyKey(g.q) : '';
+            let kind = 'unique';
+            if (noRepeat) {
+                // what the candidate would be on this page: a repeat, a turnaround, a related fact
+                const isExact = !!xk.length && pageSeen.has(xk[0]);
+                const isTurn = !isExact && xk.slice(1).some((x) => pageSeen.has(x));
+                const isRel = !isExact && !isTurn && ((fk && famSeen.has(fk)) || rk.some((x) => x.startsWith('rel:') && shareSeen.has(x)));
+                kind = isExact ? 'repeat' : isTurn ? 'turn' : isRel ? 'related' : 'unique';
+                if (kind !== 'unique' && rung < R(kind)) return false;
+                if (kind === 'unique' && rung < R('answers') && rk.some((x) => x.startsWith('ans:') && shareSeen.has(x))) return false;
+            }
+            const k = out.length;
+            const prepared = typeof mod.prepare === 'function'
+                ? mod.prepare(it, { index: k, seed: n.seed, wrong: !!flags[k], size: n.size, look: n.look })
+                : it;
+            if (!prepared) return false;
+            prepared.pool = pool.id;
+            // A role that draws Model / Guided cells measures them at their tallest level.
+            if (mod.MEASURE_LEVEL) prepared.measureLevel = typeof mod.MEASURE_LEVEL === 'function' ? mod.MEASURE_LEVEL(pool.id) : mod.MEASURE_LEVEL;
+            // Item 7: a role whose Model cell is narrower than the line (Opener, Scripted Model) marks the item it draws there,
+            // so a template that can wrap (count-row) wraps to that cell, measured and drawn alike; every other item is untouched.
+            if (typeof mod.WRAP_TO_CELL === 'function' && mod.WRAP_TO_CELL(k, pool.id)) {
+                prepared.wrapToCell = true;
+                // a wrapped count row redraws its arrows to the narrower pitch and takes more lines on purpose (digits keep their size)
+                if (prepared.template === 'count-row') { prepared.scalesWithCols = true; prepared.colsLayout = true; }
+            }
+            // critic r2 N4: a role whose cells are sized to their content (the Opener) drops the one-page sheet's air round a row
+            if (mod.TIGHT_ROWS && prepared.template === 'count-row') prepared.tightRows = true;
+            prepared.section = 0;
+            if (rk) for (const x of rk) shareSeen.add(x);
+            if (xk) for (const x of xk) { shareSeen.add(x); pageSeen.add(x); }
+            if (fk) famSeen.add(fk);
+            if (noRepeat) { counts[kind]++; prepared.dealtAs = kind; }
+            if (noRepeat) prepared.dealtG = g;
+            out.push(prepared);
+            return true;
+        };
+        /**
+         * The turnaround of a + or x item (4 + 1 -> 1 + 4): the same question with its two numbers
+         * swapped, for a share whose generator does not deal turnarounds itself (the owner's fill
+         * ruling: turnarounds before any repeat). null for any other item.
+         */
+        const turnedOf = (g) => {
+            const q = g && g.q;
+            const c = q && q.cell;
+            const pl = c && c.template === 'fact' && c.payload;
+            if (!pl || !['+', '*', 'x', '\u00d7'].includes(String(pl.op)) || String(pl.a) === String(pl.b)) return null;
+            const re = new RegExp(`\\b${pl.a}(\\s*[+\u00d7x*]\\s*)${pl.b}\\b`);
+            const swap = (t) => (typeof t === 'string' ? t.replace(re, `${pl.b}$1${pl.a}`) : t);
+            const q2 = Object.assign({}, q, { text: swap(q.text), cell: Object.assign({}, c, { payload: Object.assign({}, pl, { a: pl.b, b: pl.a }) }) },
+                q.a !== undefined && q.b !== undefined ? { a: q.b, b: q.a } : {});
+            return Object.assign({}, g, { q: q2 });
+        };
+        let turnsMade = false;
         for (let pass = 0; pass < passes && out.length < want; pass++) {
+            // (fill on: when the deal reaches the repeat rung, the share's own facts turned round
+            // go first - only then may a fact come again)
+            if (noRepeat && !turnsMade && rungs[rungAt(pass)] === 'repeat') {
+                turnsMade = true;
+                for (const it0 of out.slice()) {
+                    if (out.length >= want) break;
+                    const t = turnedOf(it0.dealtG);
+                    if (t) offer(t, pass, R('turn'));
+                }
+            }
             const need = want - out.length;
             const batch = pass === 0 ? need : need * 2 + 2;
             const gen = generateRun(pool.skills, batch, base, { startIndex: next, seen: st.seen, kept: st.kept });
             next += batch;
-            for (const g0 of gen) {
+            // (a mixed page sweeps the batch once a rung, up to this pass's rung: unique facts first,
+            // then - only for places still open - what the next rung allows)
+            const caps = noRepeat ? Array.from({ length: rungAt(pass) + 1 }, (_, i) => i) : [0];
+            const taken = new Set();
+            for (const cap of caps) for (const [gi, g0] of gen.entries()) {
+                if (taken.has(gi)) continue;
                 if (out.length >= want) break;
-                // A Mixed practice page of fact cells (critic M1 r1 D2): every fact on the page takes
-                // the page's widest answer zone, so the rules and the ones columns line up across a shelf.
-                // (A + fact keeps its fact drawing: a 3-track + band would otherwise draw the carry stack.)
-                // (critic M1 r3 D4: the page's count, up OR down - a band's 3-track answer zone on a
-                // page whose numbers are all 1- and 2-digit prints 2 tracks)
-                const pl = mixDigits && g0.q && g0.q.cell && g0.q.cell.template === 'fact' && g0.q.cell.payload;
-                const g = pl && Number(pl.digits) !== mixDigits
-                    ? Object.assign({}, g0, { q: Object.assign({}, g0.q, { cell: Object.assign({}, g0.q.cell, { payload: Object.assign({}, pl, { digits: mixDigits }, pl.regroup === undefined ? { regroup: false } : {}) }) }) })
-                    : g0;
-                const it = settlePrompts([hostItem(g, 0, n.size, { mix: { key: pi, count: pools.length, sheet: n.mix } })], metaOf(g.skill).instructionKey)[0];
-                if (keepPrompts) it.stripPrompt = false;
-                // Error analysis never falls back to an "Answer:" line under the cell: the shown work
-                // must sit in the cell's own slot, or the pupil sees two answer places (C1).
-                if (needsShow && (pass < 3 || strictShow) && !it.canShow()) continue;
-                const rk = noRepeat ? repeatKeys(g.q) : null;
-                const xk = noRepeat ? exactKeys(g.q) : null;
-                const rung = rungOf(pass);
-                if (xk && xk.some((x) => pageSeen.has(x) || shareSeen.has(x))) continue;
-                if (rk && rk.some((x) => shareSeen.has(x) && !(rung >= 1 && x.startsWith('ans:')) && !(rung >= 2 && x.startsWith('rel:')))) continue;
-                // critic M1 r2: a fact family another skill already put on the page (8 x 10 / 80 / 10)
-                const fk = pageFam ? familyKey(g.q) : '';
-                if (fk && rung < 3 && pageFam.has(fk)) continue;
-                const k = out.length;
-                const prepared = typeof mod.prepare === 'function'
-                    ? mod.prepare(it, { index: k, seed: n.seed, wrong: !!flags[k], size: n.size, look: n.look })
-                    : it;
-                if (!prepared) continue;
-                prepared.pool = pool.id;
-                // A role that draws Model / Guided cells measures them at their tallest level.
-                if (mod.MEASURE_LEVEL) prepared.measureLevel = typeof mod.MEASURE_LEVEL === 'function' ? mod.MEASURE_LEVEL(pool.id) : mod.MEASURE_LEVEL;
-                // Item 7: a role whose Model cell is narrower than the line (Opener, Scripted Model) marks the item it draws there,
-                // so a template that can wrap (count-row) wraps to that cell, measured and drawn alike; every other item is untouched.
-                if (typeof mod.WRAP_TO_CELL === 'function' && mod.WRAP_TO_CELL(k, pool.id)) {
-                    prepared.wrapToCell = true;
-                    // a wrapped count row redraws its arrows to the narrower pitch and takes more lines on purpose (digits keep their size)
-                    if (prepared.template === 'count-row') { prepared.scalesWithCols = true; prepared.colsLayout = true; }
-                }
-                // critic r2 N4: a role whose cells are sized to their content (the Opener) drops the one-page sheet's air round a row
-                if (mod.TIGHT_ROWS && prepared.template === 'count-row') prepared.tightRows = true;
-                prepared.section = 0;
-                if (rk) for (const x of rk) shareSeen.add(x);
-                if (xk) for (const x of xk) { shareSeen.add(x); pageSeen.add(x); }
-                if (fk) pageFam.add(fk);
-                if (noRepeat) rungMax = Math.max(rungMax, rung);
-                out.push(prepared);
+                if (offer(g0, pass, cap)) taken.add(gi);
             }
         }
-        if (noRepeat) { out.rung = rungMax; out.short = Math.max(0, want - out.length); }
+        // (fill on, the generator still short: the share's facts come again, in their order)
+        if (noRepeat && n.fill !== false && out.length < want && out.length) {
+            const base0 = out.slice();
+            for (let i = 0; out.length < want && i < want * 2; i++) offer(base0[i % base0.length].dealtG, passes, R('repeat'));
+        }
+        if (noRepeat) { out.counts = counts; out.short = Math.max(0, want - out.length); }
         return out;
     };
     const measure = (items) => measureItems(items, { size: n.size, look: n.look, colsList });
@@ -2924,20 +2998,44 @@ async function buildRoleSheet(n, metaOf) {
             repick(w);
             items = dealMixed();
         }
-        // The page's machine check (critic M1 r3 D1, sheet/interleave.js pageRepeats): a mixed page
-        // never prints the same fact twice or a fact and its turnaround. The deal already keeps
-        // them apart; should one slip through, the later one is dropped and the notes say so.
-        const rep = pageRepeats(items);
-        if (rep.bad) {
-            const drop = new Set([...rep.exact, ...rep.turnarounds].map((x) => x.j));
+        // The page's machine check (critic M1 r3 D1, sheet/interleave.js pageRepeats; owner ruling
+        // 2026-10-23): what the page's options do not allow - a repeat or a turnaround with `fill`
+        // off, a related fact without `families: 'allow'` - never prints. The deal already keeps
+        // to them; should one slip through, it is dropped and the notes say so.
+        const fillOn = n.fill !== false;
+        const famOn = n.families === 'allow';
+        const rep0 = pageRepeats(items);
+        const drop = new Set([...(fillOn ? [] : [...rep0.exact, ...rep0.turnarounds]), ...(famOn ? [] : rep0.families)].map((x) => x.j));
+        if (drop.size) {
             items = items.filter((_, i) => !drop.has(i));
-            dealNotes.push(`Mixed practice: ${drop.size} repeated fact${drop.size > 1 ? 's were' : ' was'} left off the page.`);
+            dealNotes.push(`Mixed practice: ${drop.size} fact${drop.size > 1 ? 's' : ''} the page's settings do not allow ${drop.size > 1 ? 'were' : 'was'} left off.`);
         }
-        const fams = pageRepeats(items).families.length;
-        const short = pools.map((p, pi) => ({ p, its: items.filter((it) => it.pool === p.id), w: Math.floor(Number(want[p.id]) || 0) })).filter((x) => x.its.length < x.w);
-        for (const x of short) dealNotes.push(`Mixed practice: ${metaOf(x.p.skills[0]).label} has only ${x.its.length} different facts for this page, so it prints ${x.its.length} of the ${x.w} it had room for.`);
-        if (fams) dealNotes.push(`Mixed practice: the skills have too few different facts for ${items.length} problems, so ${fams} fact${fams > 1 ? 's share a fact family' : ' shares a fact family'} with another fact on the page (such as 6 + 7 and 13 \u2212 6).`);
-        mixedRepeats = { exact: pageRepeats(items).exact.length, turnarounds: pageRepeats(items).turnarounds.length, families: fams };
+        const rep = pageRepeats(items);
+        const total = items.length;
+        const per = pools.map((p) => {
+            const its = items.filter((it) => it.pool === p.id);
+            const c = { unique: 0, related: 0, turn: 0, repeat: 0 };
+            for (const it of its) c[it.dealtAs || 'unique']++;
+            return { p, its, c, w: Math.floor(Number(want[p.id]) || 0), label: metaOf(p.skills[0]).label };
+        });
+        for (const x of per) {
+            const uniq = x.c.unique + x.c.related;
+            if (x.its.length < x.w) {
+                dealNotes.push(fillOn
+                    ? `Mixed practice: ${x.label} could not fill its ${x.w} places, so the page has ${total} problems.`
+                    : `Mixed practice: ${x.label} run out at ${uniq}, so the page has ${total} problems.`);
+            }
+            if (x.c.turn || x.c.repeat) {
+                const parts = [x.c.turn ? `${x.c.turn} turnaround${x.c.turn > 1 ? 's' : ''} (4 + 1 and 1 + 4)` : '', x.c.repeat ? `${x.c.repeat} repeated fact${x.c.repeat > 1 ? 's' : ''}` : ''].filter(Boolean);
+                dealNotes.push(`Mixed practice: ${x.label} has ${uniq} different facts, so the page is filled with ${parts.join(' and ')}.`);
+            }
+        }
+        if (rep.families.length) dealNotes.push(`Mixed practice: ${rep.families.length} related fact${rep.families.length > 1 ? 's' : ''} (such as 6 + 7 and 13 \u2212 6) on the page, as the settings allow.`);
+        mixedRepeats = {
+            fill: fillOn, families: famOn ? 'allow' : 'off',
+            exact: rep.exact.length, turnarounds: rep.turnarounds.length, related: rep.families.length,
+            pools: per.map((x) => Object.assign({ id: x.p.id, want: x.w, got: x.its.length }, x.c)),
+        };
     } else pools.forEach((p, pi) => {
         const w = Math.max(0, Math.min(MAX_ITEMS, Math.floor(Number(want[p.id]) || 0)));
         let its = w <= probe[p.id].length && !mod.wrongFlags && !(pageLr6 && pi > 0) ? coverSlice(p, probe[p.id], w) : null;
@@ -3001,7 +3099,7 @@ async function buildRoleSheet(n, metaOf) {
         items: items.map((it) => ({
             skill: it.skill, section: 0, pool: it.pool, template: it.template,
             kind: (it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.kind) || undefined,
-            text: String((it.q && it.q.text) || ''), ans: it.q && it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy,
+            text: String((it.q && it.q.text) || ''), ans: it.q && it.q.ans, fclass: it.fclass, dealtAs: it.dealtAs, measured: it.measured, measureWhy: it.measureWhy,
             thinking: it.thinking ? { isWrong: !!it.thinking.isWrong, shown: it.thinking.shown } : undefined,
         })),
         gaps: out.gaps,
