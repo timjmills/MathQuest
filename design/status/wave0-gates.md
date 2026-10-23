@@ -258,3 +258,10 @@ grow to ≈ 28 min (predicted by `--budget`) once the matrix renders its ≤ 500
 - CLAUDE.md "Checks to run": the lead writes it from the draft after merge.
 - "Needs owners" defects go to each family's redo: per-skill pointer lines appended to design/audit/SKILL_UPGRADE_LIST.md.
 - Merged claude/sweet-newton-c8wrv1 (incl. 0b79cea1, the W0-defects viewport fix); ws-viewport-check re-run pending.
+- Rulings block (merged 471af9c2): ws-spec-card writes `<!-- rulings {json} -->` into every card from `card.json` "rulings"
+  (each entry cites its card section) with a `todo` list of prose rulings not yet machine-checked; `--rulings-only` adds the
+  block without touching signed text (the block is excluded from the signed-body compare but covered by bodySha, so a hand
+  edit is caught). Subtraction card: 16 rulings + N-BAND; today `ws-card-rulings` FAILs sub_100_no_regroup on R-BAND-100
+  (118/300), R-SAME-LENGTH (40/300), R-ZERO-NOT-SEEDED (44.3 % vs ≤ 10 %) and N-BAND (band offered) — the pilot's own fixes
+  are not merged yet. Stack card regenerated (unsigned). **For the lead:** the subtraction card's signature already fails
+  `--check-signed` because DN-34's excerpt changed upstream after signing — it needs `--resign` + your re-sign after the pilot.
