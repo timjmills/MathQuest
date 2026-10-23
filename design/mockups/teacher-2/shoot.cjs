@@ -82,6 +82,11 @@ const SCREENS = [
   ['print-grade-sections', 'Print a whole grade on Sections: one section per area', 'app.html?tray=grade3&kind=sections#print', true, false],
   ['quiz-grade', 'Quiz from a whole grade: 20 questions, a sample', 'app.html?tray=grade3#quiz', true, false],
   ['share-grade', 'Share a whole grade: the short grade code', 'app.html?tray=grade3#share', true, false],
+  ['tray-view-list', 'The tray popup, List view (the default)', 'app.html?tray=grade3&open=NF&tview=list#tray', true, false],
+  ['tray-view-chips', 'The tray popup, Chips view', 'app.html?tray=grade3&open=NF&tview=chips#tray', true, false],
+  ['tray-view-thumbs', 'The tray popup, Thumbnails view', 'app.html?tray=grade3&open=NF&tview=thumbs#tray', true, false],
+  ['skills-tray-chips', 'Skills, 3 skills, the tray bar in Chips view', 'app.html?tray=demo3&tview=chips#skills', true, false],
+  ['skills-tray-thumbs', 'Skills, 3 skills, the tray bar in Thumbnails view', 'app.html?tray=demo3&tview=thumbs#skills', true, false],
 ];
 
 async function screenReport(page, w) {
@@ -184,7 +189,10 @@ async function screenReport(page, w) {
     //     carries exactly one, first in its content box (the fixed slot), whole, >= 12 px and >= 4.5 : 1, never an area colour
     const rgbOf = (c) => (c.match(/[\d.]+/g) || []).slice(0, 4).map(Number);
     const L = (c) => { const [r, g, b] = rgbOf(c).map(v => v / 255).map(v => v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
-    const hosts = [...document.querySelectorAll('[data-domain].card[data-act="tick"], [data-domain].chip, [data-domain].lesson, [data-grade-host]')];
+    // fix round 3 (critic r3 A2): a badge on every skill card and chip; on a lesson row only in a list across grades (a
+    // search), because a one-grade list says the grade once in its header and the step number is what is scanned for
+    const hosts = [...document.querySelectorAll('[data-domain].card[data-act="tick"], [data-domain].chip, .lesson-hits [data-domain].lesson, [data-grade-host]')];
+    for (const l of document.querySelectorAll('.lesson-list:not(.lesson-hits) .lesson')) if (l.querySelector('.gbadge')) say('grade badge', `“${txt(l)}”: a badge on a row of a one-grade list`);
     for (const h of hosts) {
       if (!shown(h) && !h.matches('.card')) continue; if (!h.getBoundingClientRect().width) continue;
       if (!h.hasAttribute('data-grade-host')) { say('grade badge', `“${txt(h)}” is not a grade host`); continue; }

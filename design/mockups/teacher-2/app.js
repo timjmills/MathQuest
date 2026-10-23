@@ -107,7 +107,9 @@
   if (qs.get('built')) { S.quiz.built = true; S.quiz.from = 'standard'; S.quiz.std = qs.get('built'); }
   if (qs.get('ctab')) S.classes = qs.get('ctab') === 'results' ? 'quizzes' : qs.get('ctab');
   if (qs.get('lw')) S.lessons.panelOpen = false;
-  try { S.detailed = localStorage.getItem('mq_t2_detailed') === '1'; } catch (e) { /* private window: off */ }
+  try { S.detailed = localStorage.getItem('mq_t2_detailed') === '1'; S.tview = localStorage.getItem('mq_t2_tview') || 'list'; } catch (e) { /* private window: off */ }
+  if (!['list', 'chips', 'thumbs'].includes(S.tview)) S.tview = 'list';
+  if (qs.get('tview')) S.tview = qs.get('tview');
   if (qs.get('detailed')) S.detailed = qs.get('detailed') === '1';
 
   function readHash() {
@@ -399,7 +401,10 @@
     const legend = `<span class="tray-key">${areas.map(x => `<span data-domain="${x.a}">${icon(AREAS[x.a].icon)}${AREAS[x.a].short}</span>`).join('')}</span>`;
     let mid;
     if (!n) mid = `<div class="tray-empty">Tick skills to put them here. Quiz can also start from a standard, a White Rose step or a lesson.</div>`;
-    else if (!big()) mid = `<div class="tray-chips">${S.tray.map(k => chipHTML(k, { legend: true, dot: true })).join('')}<button class="btn tray-more" data-act="trayopen" hidden>+0 more</button></div>`;
+    // the bar follows the tray's view (owner 2026-10-23): List = one line of names, Chips = chips, Thumbnails = mini pictures
+    else if (!big()) mid = `<div class="tray-chips tray-v-${S.tview}">${S.tray.map(k => S.tview === 'chips' ? chipHTML(k, { legend: true, dot: true })
+      : S.tview === 'thumbs' ? `<button class="tray-mini" data-domain="${SK[k].a}" data-grade-host data-act="chip" data-arg="${esc(k)}" title="${esc(SK[k].l)}">${gbadge(SK[k].g)}<span class="tray-mini-pic">${T.draw(SK[k], 1, S.skillOpts[k])}</span><span class="sr">${esc(short(SK[k].l))}</span></button>`
+      : `<button class="tray-li" data-domain="${SK[k].a}" data-act="chip" data-arg="${esc(k)}">${icon(AREAS[SK[k].a].icon)}${esc(short(SK[k].l))}</button>`).join('')}<button class="btn tray-more" data-act="trayopen" hidden>+0 more</button></div>`;
     else mid = `<div class="tray-summary"><div class="tray-segs">${areas.map(x => `<button class="tray-seg" data-domain="${x.a}" data-act="trayarea" data-arg="${x.a}" title="${esc(AREAS[x.a].name)}: open in the tray">${icon(AREAS[x.a].icon)}<span class="seg-long">${AREAS[x.a].short}</span><span class="seg-abbr">${ABBR[x.a]}</span><b>${x.ks.length}</b></button>`).join('')}<button class="btn tray-more" data-act="trayopen" hidden>+0</button></div></div>`;
     const gs = gradesOf(S.tray).map(x => x.g);
     return `<div class="tray ${big() ? 'tray-big' : ''}" role="region" aria-label="Tray">` +
@@ -454,12 +459,15 @@
     const isCollapsed = (a) => !q && (a in S.collapsed ? S.collapsed[a] : collapsedDefault);
     const sumOf = (ks) => ks.reduce((t, k) => t + (p.pct[k] || 0), 0);
     const nOf = (ks) => ks.reduce((t, k) => t + (p.byKey[k] || 0), 0);
+    // one skill in the chosen view (List · Chips · Thumbnails); selecting, weighting and removing are the same in each
     const row = (k) => {
       const s = SK[k], w = wOf(k), changed = S.skillOpts[k] && Object.keys(S.skillOpts[k]).length, locked = S.lock['k:' + k] !== undefined;
-      return `<div class="tp-row ${w === 0 ? 'out' : ''}" data-domain="${s.a}">${selBox('k:' + k, s.l)}<button class="tp-name" data-act="chip" data-arg="${esc(k)}">${esc(short(s.l))}</button>` +
-        `<span class="tp-tags">${changed ? '<span class="tag">changed</span>' : ''}${w !== 2 || locked ? `<span class="tag tag-w">${locked ? Math.round(S.lock['k:' + k]) + ' %' : wWord(w)}</span>` : ''}</span>` +
-        (det ? `<span class="tp-det"><span class="stepper stepper-sm"><button data-act="wstep" data-arg="${esc(k)}|-1" aria-label="Less weight" ${w <= 0 ? 'disabled' : ''}>−</button><output>${w}</output><button data-act="wstep" data-arg="${esc(k)}|1" aria-label="More weight" ${w >= 10 ? 'disabled' : ''}>+</button></span>${pctCtl('k:' + k, p.pct[k] || 0)}<span class="tp-share">≈ ${p.byKey[k] || 0} of ${p.total}</span></span>` : '') +
-        `<button class="btn icon-btn" data-act="tpremove" data-arg="k:${esc(k)}" aria-label="Take ${esc(short(s.l))} out of the tray">${icon('close')}</button></div>`;
+      const tags = `<span class="tp-tags">${changed ? '<span class="tag">changed</span>' : ''}${w !== 2 || locked ? `<span class="tag tag-w">${locked ? Math.round(S.lock['k:' + k]) + ' %' : wWord(w)}</span>` : ''}</span>`;
+      const detail = det ? `<span class="tp-det"><span class="stepper stepper-sm"><button data-act="wstep" data-arg="${esc(k)}|-1" aria-label="Less weight" ${w <= 0 ? 'disabled' : ''}>−</button><output>${w}</output><button data-act="wstep" data-arg="${esc(k)}|1" aria-label="More weight" ${w >= 10 ? 'disabled' : ''}>+</button></span>${pctCtl('k:' + k, p.pct[k] || 0)}<span class="tp-share">≈ ${p.byKey[k] || 0} of ${p.total}</span></span>` : '';
+      const x = `<button class="btn icon-btn" data-act="tpremove" data-arg="k:${esc(k)}" aria-label="Take ${esc(short(s.l))} out of the tray">${icon('close')}</button>`;
+      if (S.tview === 'chips') return `<div class="tp-item tp-chipitem ${w === 0 ? 'out' : ''}">${selBox('k:' + k, s.l)}${chipHTML(k)}${tags}${detail}${x}</div>`;
+      if (S.tview === 'thumbs') return `<div class="tp-item tp-thumb ${w === 0 ? 'out' : ''}" data-domain="${s.a}"><div class="tp-thumb-top" data-grade-host>${gbadge(s.g)}<button class="tp-name" data-act="chip" data-arg="${esc(k)}">${esc(short(s.l))}</button></div><div class="thumb">${T.draw(s, 1, S.skillOpts[k])}</div><div class="tp-thumb-foot">${selBox('k:' + k, s.l)}${tags}${x}</div>${detail}</div>`;
+      return `<div class="tp-row ${w === 0 ? 'out' : ''}" data-domain="${s.a}" data-grade-host>${gbadge(s.g)}${selBox('k:' + k, s.l)}<span class="tp-icon">${icon(AREAS[s.a].icon)}</span><button class="tp-name" data-act="chip" data-arg="${esc(k)}">${esc(s.l)}</button>${tags}${detail}${x}</div>`;
     };
     const body = areas.map(({ a, ks }) => {
       const vis = ks.filter(match); if (!vis.length) return '';
@@ -470,7 +478,7 @@
         (col ? '' : gs.map(({ g, ks: gk }) => { const gv = gk.filter(match); if (!gv.length) return ''; const sc = 'g:' + a + '|' + g;
           return `<div class="tp-grade"><div class="tp-ghead" data-grade-host>${gbadge(g)}${selBox(sc, gradeShort(g))}<b>${esc(gradeShort(g))}</b><span class="count">${plural(gk.length, 'skill')} · ≈ ${nOf(gk)} of ${p.total}</span>` +
             `<span class="tp-ctl">${howOften(sc)}${det ? pctCtl(sc, sumOf(gk)) + `<button class="btn btn-text" data-act="reseteq" data-arg="${esc(sc)}">Reset to equal</button>` : `<span class="tp-p">${Math.round(sumOf(gk))} %</span>`}<button class="btn btn-text" data-act="tpremove" data-arg="${esc(sc)}">Remove grade</button></span></div>` +
-            gv.map(row).join('') + '</div>'; }).join('')) + '</section>';
+            `<div class="tp-items tp-v-${S.tview}">${gv.map(row).join('')}</div></div>`; }).join('')) + '</section>';
     }).join('');
     const grades = gradesOf(S.tray);
     const nSel = S.sel.length;
@@ -480,6 +488,7 @@
     const sm = summaryText(false);
     const head = `<div class="tp-tools"><label class="search search-small">${icon('search')}<span class="sr">Find a skill in the tray</span><input id="tsearch" type="search" placeholder="Find a skill in the tray" value="${esc(S.tq)}" data-act="tsearch"></label>` +
       `<button class="toggle" data-act="detailed" ${pressed(det)}><i></i>Detailed weights</button>` +
+      `<div class="seg wrap tp-view" role="group" aria-label="View">${[['list', 'List'], ['chips', 'Chips'], ['thumbs', 'Thumbnails']].map(([v, l]) => `<button data-act="tview" data-arg="${v}" ${pressed(S.tview === v)}>${l}</button>`).join('')}</div>` +
       `<button class="btn btn-text" data-act="tpall" data-arg="${areas.some(x => isCollapsed(x.a)) ? 'open' : 'close'}">${areas.some(x => isCollapsed(x.a)) ? 'Expand all' : 'Collapse all'}</button>` +
       `<button class="btn btn-text" data-act="trayclear">Clear tray</button></div>` +
       (det ? `<div class="tp-rest"><span class="row-label">When you set a %, the rest</span>${seg('The rest', [['even', 'Split evenly'], ['prop', 'Keep proportions']], S.rest, 'rest')}<button class="btn btn-text" data-act="reseteq" data-arg="all">Reset all to equal</button><span class="note">Weight 0 leaves a skill out for now; Less · Equal · More = 1 · 2 · 3.</span></div>` : '') +
@@ -911,6 +920,7 @@
       case 'tpall': areasOf(S.tray).forEach(x => { S.collapsed[x.a] = arg !== 'open'; }); break;
       case 'detailed': S.detailed = !S.detailed; try { localStorage.setItem('mq_t2_detailed', S.detailed ? '1' : '0'); } catch (e2) { /* not kept */ } break;
       case 'rest': S.rest = arg; break;
+      case 'tview': S.tview = arg; try { localStorage.setItem('mq_t2_tview', arg); } catch (e2) { /* not kept */ } break;
       case 'sel': { const ks = scopeKeys(arg); const all = ks.every(k => S.sel.includes(k)); S.sel = all ? S.sel.filter(k => !ks.includes(k)) : [...new Set(S.sel.concat(ks))]; break; }
       case 'selnone': S.sel = []; break;
       case 'hw': { const [sc, v] = arg.split(/\|(?=\d+$)/); scopeKeys(sc).forEach(k => { S.w[k] = Number(v); delete S.lock['k:' + k]; }); delete S.lock[sc]; break; }

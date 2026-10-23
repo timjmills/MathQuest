@@ -23,7 +23,7 @@
   <div id="light"></div>
 
   <h2>Board C, dark mode</h2>
-  <p class="note">Page #0F0E0C. Tint = 18 % of the bold over the page (raised 1 % at a time until it is ≥ 1.2 : 1 from the page, so every group shows) and soft = 40 % with cream text; the fourth strength is a light version (bold mixed with cream), ≥ 7 : 1 on the dark tint. Chip outlines are #E8DFD2.</p>
+  <p class="note">Page #0F0E0C. Tint = 18 % of the bold over the page (raised 1 % at a time until it is ≥ 1.25 : 1 from the page, so every group shows; the gate's floor is 1.2) and soft = 40 % with cream text; the fourth strength is a light version (bold mixed with cream), ≥ 7 : 1 on the dark tint. Chip outlines are #E8DFD2.</p>
   <div id="dark" class="dark-panel"></div>
 
   <h2>Chips: one rule for every state</h2>
@@ -45,8 +45,13 @@
   <div id="moved"></div>
   <h3>Fix round 2 (2026-10-23): Operations lifted off the ink</h3>
   <p class="note">Critic round 2 found the round-1 Operations #2E2B71 only 1.45 : 1 from the warm ink of the primary button, so a tray of Operations chips read as four black buttons, and in dark mode its tint (1.05 : 1) and bold (1.56 : 1) vanished on the page. The gate now holds every bold to <b>≥ 20 ΔE from ink and from the dark-mode cream primary, ≥ 2.0 : 1 against ink, ≥ 3 : 1 against the dark page</b>, and every dark tint to <b>≥ 1.2 : 1</b> against the page. No mid-value indigo passes beside the round-1 Data blue (they fall within 12 of each other under deuteranopia), so the search moved five colours together, by the least total ΔE: Operations <b>#2E2B71 → #555BAE</b> (mid indigo, L* 42, ΔE 16.3, now 2.99 : 1 from ink and 3.21 : 1 on the dark page; it moved back toward the site’s own violet #8579B6), Data #486E9C → <b>#4B8FCC</b> (ΔE 13.1, toward the site’s dusty blue #7A9AC2), Fractions #7F3E63 → <b>#865273</b> (5.9), Geometry #278E8D → <b>#399993</b> (4.3), Counting #CD9CC3 → <b>#CEA4C5</b> (2.6), and the stone #57534E → <b>#706C6A</b> (9.4). Gold, sage and peach did not move. Every margin widened except bold vs bold (20.7 → 20.6, OA–NF): the closest colour-blind pair sharing a grade is now 12.9 (CC–DATA, protanopia; was OA–NF 12.3), and ink on Geometry is 5.3 : 1 (was 4.57).</p>
+  <h3>Fix round 3 (2026-10-23): margins widened</h3>
+  <p class="note">Critic round 3 found three checks on the line. <b>Operations</b> #555BAE → <b>#5155BC</b> (moved 3.1 ΔE): Operations–Fractions 20.6 → 21.9. <b>Stone</b> (Mixed, Words, No standard) #706C6A → <b>#736E64</b>, a warmer stone (moved 4.4 ΔE): stone–Fractions under deuteranopia 8.8 → 13.0, and stone is ≥ 13 from every area in all three views. Dark tints are now built to <b>≥ 1.25 : 1</b> on the dark page (the gate's floor stays 1.2): Operations, Fractions, Data, Geometry and stone tints moved one step. Slate <b>cards</b> are now dashed too, like their bands and chips.</p>
   <h3>Margins to watch</h3>
-  <p class="note">Bold vs bold with normal vision is 20.6 (OA–NF; needs 20); Operations is 2.99 : 1 from ink and Fractions 3.19 : 1 on the dark page (need 2.0 and 3). Any change to these shades must be re-checked with <code>node tests/scripts/ws-teacher-tokens.cjs</code> before it is shown.</p>
+  <p class="note">The closest pairs are in the table above (Place value–Ratio 20.7 with normal vision; Measurement–Ratio 8.9 under deuteranopia, a pair that never shares a grade). Any change to these shades must be re-checked with <code>node tests/scripts/ws-teacher-tokens.cjs</code> before it is shown.</p>
+  <h2>Side menu options (owner choice pending; the ink rail stays)</h2>
+  <p class="note">The side menu's colours are one set of tokens in <code>tokens.css</code>: <code>--rail</code>, <code>--rail-text</code>, <code>--rail-text-2</code> and <code>--rail-active</code> (the outline and bar of the current place), so changing the rail is one edit. The mock-up keeps the warm ink rail. Each option below shows its text colours and its CIEDE2000 distance from every area bold (normal vision); <b>bold</b> numbers are under 20, where the rail could be mistaken for an area.</p>
+  <div id="rails"></div>
   <h2>Boards B and A (reference pictures only)</h2>
   <p class="note">Board B (saturated, on white) was chosen on 2026-10-23 and replaced the same day by board C; board A (six areas) was not chosen. Both are kept as static pictures so the choice can be revisited; the mock-up uses board C only.</p>
   <img class="board" src="board-b.png" alt="Board B: eight saturated maths-area colours in four strengths, for reference">
@@ -56,9 +61,9 @@
 <script>
 (function () {
   const C = window.MQColour;
-  const A = [['CC', 'Counting & cardinality', '#CEA4C5'], ['OA', 'Operations & algebra', '#555BAE'], ['NBT', 'Place value & base ten', '#E7CF69'], ['NF', 'Fractions & decimals', '#865273'],
+  const A = [['CC', 'Counting & cardinality', '#CEA4C5'], ['OA', 'Operations & algebra', '#5155BC'], ['NBT', 'Place value & base ten', '#E7CF69'], ['NF', 'Fractions & decimals', '#865273'],
     ['MEAS', 'Measurement', '#A9CFAA'], ['DATA', 'Data', '#4B8FCC'], ['G', 'Geometry', '#399993'], ['RPNS', 'Ratio & number system', '#D8A480']];
-  const SLATE = ['SLATE', 'Stone: Mixed · Words · No standard', '#706C6A'];
+  const SLATE = ['SLATE', 'Stone: Mixed · Words · No standard', '#736E64'];
   const FROM = { CC: ['mauve', '#C291B8'], OA: ['violet', '#8579B6'], NBT: ['gold', '#F6C96A'], NF: ['plum', '#8E5480'], MEAS: ['sage', '#9AB88B'], DATA: ['dusty blue', '#7A9AC2'], G: ['teal', '#00838F'], RPNS: ['peach', '#F2C8A0'] };
   const GR = { K: ['CC', 'OA', 'NBT', 'MEAS', 'DATA', 'G'], 'Grades 1–2': ['OA', 'NBT', 'MEAS', 'DATA', 'G'], 'Grades 3–5': ['OA', 'NBT', 'NF', 'MEAS', 'DATA', 'G'], 'Grade 6': ['RPNS', 'OA', 'DATA', 'G'] };
   const f = (x) => x.toFixed(1);
@@ -108,6 +113,11 @@
   const sl = A.map(a => [Math.min(C.de00(SLATE[2], a[2], 'deut'), C.de00(SLATE[2], a[2], 'prot'), C.de00(SLATE[2], a[2])), a[0]]).sort((x, y) => x[0] - y[0])[0];
   const st = A.flatMap(a => ['normal', 'deut', 'prot'].flatMap(m => [[C.de00(a[2], C.ERR, m), a[0] + '–error red'], [C.de00(a[2], C.KEY, m), a[0] + '–key orange']])).sort((x, y) => x[0] - y[0])[0];
   document.getElementById('moved').innerHTML = '<div class="scroll"><table><thead><tr><th>Area</th><th>From the site</th><th>Board C</th><th>Moved (ΔE)</th></tr></thead><tbody>' + A.map(([k, n, b]) => `<tr><td>${n}</td><td><span style="display:inline-block;width:24px;height:24px;vertical-align:middle;background:${FROM[k][1]}"></span> ${FROM[k][0]} ${FROM[k][1]}</td><td><span style="display:inline-block;width:24px;height:24px;vertical-align:middle;background:${b}"></span> ${b}</td><td>${f(C.de00(FROM[k][1], b))}</td></tr>`).join('') + '</tbody></table></div><p class="note">Coral (#E86A5C) could not be an area colour: it is only 18.7 from error red and 14.1 from the answer-key orange (both need ≥ 20), so error and key keep their meaning and coral is left out. The search is <code>palette/board-c-search.py</code>.</p>';
+  // side menu options: ink (now), stone, white, taupe, deep purple (the school site)
+  const RAILS = [['Warm ink (now, chosen)', '#1A1614', '#FBF7EF', '#CFC5B8'], ['Stone', '#E5E1DB', '#1A1614', '#4A423B'], ['White', '#FFFFFF', '#1A1614', '#4A423B'], ['Taupe', '#8B7D70', '#FBF7EF', '#F1EAE0'], ['Deep purple #592B88 (school site)', '#592B88', '#FBF7EF', '#D9C9EC']];
+  document.getElementById('rails').innerHTML = '<div class="scroll"><table><thead><tr><th>Side menu</th><th>Text / second text</th>' + A.concat([SLATE]).map(a => `<th>${a[0] === 'SLATE' ? 'Stone' : a[0]}</th>`).join('') + '</tr></thead><tbody>' +
+    RAILS.map(([n, bg, t1, t2]) => `<tr><td><span class="rail-sw" style="background:${bg};color:${t1}"><b>Skills</b><span style="color:${t2}">Lessons</span></span> ${n}</td><td>${f(C.cr(bg, t1))} : 1 / ${f(C.cr(bg, t2))} : 1</td>` +
+      A.concat([SLATE]).map(a => { const d = C.de00(bg, a[2]); return `<td class="n">${d < 20 ? `<b>${f(d)}</b>` : f(d)}</td>`; }).join('') + '</tr>').join('') + '</tbody></table></div>';
   document.getElementById('numbers').innerHTML = `<h3>The closest pairs (ΔE CIEDE2000)</h3><div class="scroll"><table><thead><tr><th>Check</th><th>Closest</th><th>Pair</th><th>Needs</th></tr></thead><tbody>` +
     [['Bold vs bold, normal vision', n1, '≥ 20'], ['Colour-blind, areas sharing a grade', n2, '≥ 12'], ['Colour-blind, any pair', n3, '≥ 8'], ['Slate vs every area, all views', sl, '≥ 8'], ['Bold vs error red / key orange, all views', st, '≥ 20']]
       .map(([l, [v, p], need]) => `<tr><td>${l}</td><td class="ok">${f(v)}</td><td>${p}</td><td>${need}</td></tr>`).join('') + '</tbody></table></div>';

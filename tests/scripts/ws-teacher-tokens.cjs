@@ -97,8 +97,10 @@ function de00(a, b, mode = 'normal') {
 const textFor = (h) => { const w = cr(h, CREAM), i = cr(h, INK); return (w >= 4.5 && w >= i) ? CREAM : (i >= 4.5 ? INK : (w >= 4.5 ? CREAM : null)); };
 function deep(b) { let t = 0.75; while (cr(mix(b, '#000000', t), STONE) < 7) t -= 0.01; return mix(b, '#000000', t); }
 function light(b, under) { let t = 0.5; while (cr(mix(b, CREAM, t), under) < 7) t -= 0.01; return mix(b, CREAM, t); }
-// dark tint: 18 % of the bold over the dark page, raised 1 % at a time until it is >= 1.2 : 1 from the page (fix round 2)
-function darkTint(b) { let t = 0.18, x = mix(b, DARK, t); while (cr(x, DARK) < 1.2) { t = Math.round((t + 0.01) * 100) / 100; x = mix(b, DARK, t); } return x; }
+// dark tint: 18 % of the bold over the dark page, raised 1 % at a time until it is >= 1.25 : 1 from the page (fix round 2 set
+// 1.2; fix round 3 builds to 1.25 so the gate's 1.2 floor has a margin, critic r3 D1)
+const DARK_TINT_MIN = 1.25;
+function darkTint(b) { let t = 0.18, x = mix(b, DARK, t); while (cr(x, DARK) < DARK_TINT_MIN) { t = Math.round((t + 0.01) * 100) / 100; x = mix(b, DARK, t); } return x; }
 function ramp(b) { const dTint = darkTint(b); return { tint: mix(b, CREAM, 0.10), soft: mix(b, CREAM, 0.30), bold: b, on: textFor(b), deep: deep(b), dTint, dSoft: mix(b, DARK, 0.40), dLight: light(b, dTint) }; }
 
 // ---------------------------------------------------------------- board C (owner 2026-10-23; supersedes board B of §2.7)
@@ -106,15 +108,16 @@ function ramp(b) { const dTint = darkTint(b); return { tint: mix(b, CREAM, 0.10)
 // (design/mockups/teacher-2/palette/board-c-search.py). [key, css prefix, name, tint, soft, bold, deep, dark light version, dark tint]
 const PLAN = [
   ['CC', 'cc', 'Counting & cardinality (mauve)', '#F6EFEB', '#EDDEE2', '#CEA4C5', '#5B4857', '#E4CEDA', '#31292D'],
-  ['OA', 'oa', 'Operations & algebraic thinking (mid indigo; fix round 2 lifted it from ink-indigo #2E2B71, which read as ink)', '#EAE7E8', '#C9C8DB', '#555BAE', '#404482', '#A8A9CE', '#1F2031'],
+  ['OA', 'oa', 'Operations & algebraic thinking (mid indigo; fix round 2 lifted it from ink-indigo #2E2B71, which read as ink; fix round 3 moved #555BAE 3.1 to widen OA–NF from 20.6)', '#EAE7EA', '#C8C6E0', '#5155BC', '#3D408D', '#ABABD7', '#21223D'],
   ['NBT', 'nbt', 'Number & operations in base ten (gold)', '#F9F3E2', '#F5EBC7', '#E7CF69', '#554D27', '#F1E3AC', '#36311D'],
-  ['NF', 'nf', 'Fractions & decimals (plum)', '#EFE6E3', '#D8C5CA', '#865273', '#653E56', '#C0A4B1', '#2A1E24'],
+  ['NF', 'nf', 'Fractions & decimals (plum)', '#EFE6E3', '#D8C5CA', '#865273', '#653E56', '#C4A9B5', '#302129'],
   ['MEAS', 'meas', 'Measurement (sage)', '#F3F3E8', '#E2EBDA', '#A9CFAA', '#425142', '#D2E3CC', '#2B3128'],
-  ['DATA', 'data', 'Data (blue)', '#E9EDEC', '#C6D8E4', '#4B8FCC', '#2A5072', '#A3C3DE', '#1A252F'],
-  ['G', 'g', 'Geometry (sea teal)', '#E8EEE6', '#C1DBD3', '#399993', '#205652', '#9AC8C1', '#172724'],
+  ['DATA', 'data', 'Data (blue)', '#E9EDEC', '#C6D8E4', '#4B8FCC', '#2A5072', '#A3C3DE', '#1A2730'],
+  ['G', 'g', 'Geometry (sea teal)', '#E8EEE6', '#C1DBD3', '#399993', '#205652', '#9AC8C1', '#172826'],
   ['RPNS', 'rpns', 'Ratio & number system (peach)', '#F8EFE4', '#F0DECE', '#D8A480', '#5F4838', '#EACEB8', '#332921'],
 ];
-const SLATE = '#706C6A';   // warm stone (fix round 2: lifted from #57534E, which was 19.7 from ink and 2.5 : 1 on the dark page)
+const SLATE = '#736E64';   // warm stone (fix round 2: lifted from #57534E, which was 19.7 from ink and 2.5 : 1 on the dark page;
+                           // fix round 3: #706C6A → #736E64, a warmer stone, so slate–NF under deuteranopia is 13.0, not 8.8)
 const PLAN_GRADES = { K: ['CC', 'OA', 'NBT', 'MEAS', 'DATA', 'G'], '1': ['OA', 'NBT', 'MEAS', 'DATA', 'G'], '2': ['OA', 'NBT', 'MEAS', 'DATA', 'G'],
   '3': ['OA', 'NBT', 'NF', 'MEAS', 'DATA', 'G'], '4': ['OA', 'NBT', 'NF', 'MEAS', 'DATA', 'G'], '5': ['OA', 'NBT', 'NF', 'MEAS', 'DATA', 'G'], '6': ['RPNS', 'OA', 'DATA', 'G'] };
 // Neutrals of the token file (§2.7 rank 4, §2.8): [token, light, dark]

@@ -4,7 +4,7 @@ Open `index.html` (served: `python3 -m http.server` from the repo root, then `/d
 
 | File | What |
 |---|---|
-| `app.html` + `app.js`, `app.css`, `thumbs.js` | The clickable mock-up. `?theme=dark|light`, `?tray=demo1|demo3|demo3x|lesson|<cat:skill,...>`, `?ctab=board|quizzes|map|progress`, `?confirm=<set>`, `#skills #lessons #classes #print #quiz #buildfrom #share #quizshare #chip/<cat:skill> #board #lessonprint #lessonpanel #profile #trayopen`, `?walk=<flow id>` |
+| `app.html` + `app.js`, `app.css`, `thumbs.js` | The clickable mock-up. `?theme=dark|light`, `?tray=demo1|demo3|demo3x|lesson|demo10|demo40|demo64|grade3|grades2-3|<cat:skill,...>` (gradeN = a whole grade, gradesA-B = several), `?tview=list|chips|thumbs`, `?detailed=1`, `?open=all|<AREA>`, `?sel=<scope>`, `?lockp=<scope>:<pct>`, `?tq=<search>`, `#tray` (the tray popup), `?ctab=board|quizzes|map|progress`, `?confirm=<set>`, `#skills #lessons #classes #print #quiz #buildfrom #share #quizshare #chip/<cat:skill> #board #lessonprint #lessonpanel #profile #trayopen`, `?walk=<flow id>` |
 | `thumbs.js`, `thumbs-check.cjs`, `thumbs.html` | The skill thumbnails, picked by category + skill id; `node thumbs-check.cjs` holds all 715 live skills to their names (fix round 1); `thumbs.html` shows them all |
 | `tokens.css` | The only raw values: type, spacing, radii, shadows, neutrals and board C (checked by `tests/scripts/ws-teacher-tokens.cjs`) |
 | `flows.js` | The §2.6 flows as click lists (flows page, walk-through, shoot) |
@@ -27,3 +27,48 @@ Quick runs while fixing: `node shoot.cjs --only skills-tray,chip --widths 820,10
   area's skills by grade.
 - **Warm stone (owner):** the light page is #EFECE8 with white surfaces; cream stays only as text on dark fills. Area
   groups are white cards with the tint inside, so every tint shows.
+
+**Fix round 3 (2026-10-23).** Stop rule (§1.7): the decoy picture (r2 #6, r3 #2) and tray height were made machine checks
+first, committed failing, then fixed.
+
+- **The tray never grows** (owner: trays of 40–100+ skills, a whole grade). Up to 8 skills it is one row (+N more); past 8 it
+  is one summary bar: "Tray · Grade 3 · 110 skills · 6 areas ▸" and one outlined segment per maths area in the fixed area
+  order (short names, then abbreviations, then "+N areas" when the row is full); on a phone "110 skills ▸". `shoot.cjs`
+  measures it with 1, 3, 6, 8, 10, 40 and 100 skills at all five widths: ≤ 96 px from 1100 px up, ≤ 120 px below, ≤ 15 %
+  of the screen.
+- **The tray popup** (`#tray`) is the ONE place skills in the tray are found, selected, weighted and removed: maths area →
+  grade → skill, in three views (List, the default · Chips · Thumbnails, remembered; the tray bar follows the view);
+  search; Expand / Collapse all (areas start open with ≤ 3 areas); select boxes on every row, grade and area (a dash when
+  part is selected) with a bulk bar (How often, Set weight, Options… for the settings the selected skills share, Remove);
+  How often on every area and grade ("Mixed" when they differ); Remove area / grade / a whole grade; Clear tray (with Undo).
+- **Detailed weights** (a switch, remembered): a weight 0–10 per skill (Less · Equal · More = 1 · 2 · 3; 0 = left out for
+  now), its share and "≈ n of N" problems, and a target % with a lock on any skill, grade or area. The rest share what is
+  left ("split evenly" resets their weights to Equal; "keep proportions" keeps them); locks over 100 % are refused with a
+  message. Counts are rounded area → grade → skill by largest remainder, so one skill at 50 % of 40 problems gets 20 and
+  the rest 0 or 1 each (shoot checks this case, and 5 skills → 20 · 5 · 5 · 5 · 5).
+- **Bulk add**: Skills › "Add whole grade" (one of each skill of the grade: no Mixed pools, no Maths words cards, no
+  "(No Pictures)" twin), "Add whole area" on each area band, Lessons › "Add this unit" on each White Rose block,
+  Standard › "Add all N" on each standard; each says what it added, with Undo.
+- **Worksheet sheet with a big tray**: the summary covers the set ("14 pages · 112 problems · 6 areas · every skill at least
+  once", or "a sample of 40 of 64 skills, New numbers re-deals the sample"); pages start at one per 8 skills; Single skill
+  warns "110 skills = 110 pages or more"; Sections offers one section per area; How often is per area and grade, read from
+  the tray, with "Fine-tune in the tray ▸". The preview deals from `plan()` (`perPage`), so its counts equal the summary at
+  every weight (shoot checks 15 settings). Quiz with a big tray asks How many questions (20) and says it samples.
+- **Share a whole grade**: the code box shows "G3-ALL · 6 characters" for a whole grade ("G3-NF-ALL" for one area,
+  "G2-3-ALL" for two grades). **This is a proposal**: `js/modules/skill-codes.js` does not decode such tokens yet, and the
+  mock-up only shows them. A hand-picked big set shows its real code length and asks for the link instead.
+- **Pictures drawn from the problem** (`withPicture()`): two groups for a + b (the added group grey), crossed-out counters for
+  take-away, rows to compare, groups, arrays, labelled bar models for big numbers, n of d bars, pizzas for Visual Pizza, a
+  tenths number line for rounding, units for conversions, or no added picture (tape diagrams already are one). Each carries
+  `data-pic` / `data-vals`; `thumbs-check.cjs` reads them back against the problem's numbers and counts what is drawn, and
+  in a browser checks every thumbnail of all 715 skills (5 seeds) stays inside its paper with no text under a box.
+- **Grade badge rule**: on every skill card, chip, tray row and chip-options header; on a lesson row only in a list across
+  grades (a search); the lesson panel puts it in its eyebrow; a one-grade list says the grade once in its header.
+- **Area words**: decided per container: if any chip in a stack would lose its area word, every chip there drops it and the
+  stack shows one legend.
+- **Colour**: Operations #555BAE → #5155BC (OA–NF 20.6 → 21.9), stone #706C6A → #736E64 (stone–NF deuteranopia 8.8 →
+  13.0), dark tints built to ≥ 1.25 : 1 (gate floor 1.2); slate cards dashed. Side menu: four tokens (`--rail`,
+  `--rail-text`, `--rail-text-2`, `--rail-active`); `palette.html` › Side menu options compares ink (kept), stone, white,
+  taupe and deep purple #592B88 with each one's ΔE from every area.
+- New flows: a whole grade on paper, share a whole grade, remove one grade, one grade more often, Fractions 40 %, one skill
+  50 % (all ≤ 4 actions).

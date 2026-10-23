@@ -65,7 +65,7 @@ button { cursor: pointer; }
   font-size: var(--fs-16); font-weight: var(--fw-700); color: var(--rail-text-2); width: 100%;
 }
 .place:hover { border-color: var(--rail-text-2); }
-.place[aria-current="page"] { color: var(--rail-text); border-color: var(--rail-text); box-shadow: inset var(--sp-4) 0 0 var(--rail-text); }
+.place[aria-current="page"] { color: var(--rail-text); border-color: var(--rail-active); box-shadow: inset var(--sp-4) 0 0 var(--rail-active); }
 .rail-foot { margin-top: auto; position: relative; }
 .profile-btn { justify-content: flex-start; width: 100%; border-color: var(--rail-text-2); background: transparent; color: var(--rail-text); }
 .profile-btn:hover { border-color: var(--rail-text); }
@@ -761,3 +761,28 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; a
 .tray-line { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8) var(--sp-16); }
 .tray-segs[hidden] { display: none !important; }
 @media (max-width: 819px) { .tray .tray-label, .tray .tray-chips { display: none; } }
+/* the tray's three views (owner 2026-10-23): List (default) · Chips · Thumbnails, in the popup and the one-row bar */
+.tp-view { margin-left: auto; }
+.tp-row .gbadge { flex: none; }
+.tp-icon { display: inline-grid; place-items: center; color: var(--a-deep); }
+.tp-icon .icon { width: var(--fs-16); height: var(--fs-16); }
+.tp-items { display: grid; }
+.tp-items.tp-v-chips { display: flex; flex-wrap: wrap; gap: var(--sp-8); padding: var(--sp-8) 0; }
+.tp-item.tp-chipitem { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--sp-4); max-width: 100%; padding: var(--sp-4); border-radius: var(--r-8); background: var(--surface); }
+.tp-item.out .chip, .tp-thumb.out .thumb { opacity: 0.5; }
+.tp-items.tp-v-thumbs { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--sp-8); padding: var(--sp-8) 0; }
+.tp-thumb { display: grid; gap: var(--sp-4); padding: var(--sp-8); background: var(--surface); border: var(--line-1) solid var(--a-deep); border-left: var(--sp-4) solid var(--a-bold); border-radius: var(--r-8); min-width: 0; }
+.tp-thumb-top { display: flex; align-items: center; gap: var(--sp-8); min-width: 0; }
+.tp-thumb .tp-name { flex: 1 1 auto; font-size: var(--fs-14); line-height: var(--lh-tight); }
+.tp-thumb .thumb { height: 80px; }
+.tp-thumb-foot { display: flex; align-items: center; gap: var(--sp-4); }
+.tp-thumb-foot .icon-btn { margin-left: auto; }
+.tray-li { display: inline-flex; align-items: center; gap: var(--sp-4); flex: none; min-height: var(--control); padding: 0 var(--sp-8); border: 0; border-bottom: var(--line-2) solid var(--a-bold); background: none; color: var(--text); font-size: var(--fs-14); font-weight: var(--fw-700); white-space: nowrap; cursor: pointer; }
+.tray-li .icon { width: var(--fs-16); height: var(--fs-16); color: var(--a-deep); }
+.tray-mini { flex: none; display: inline-flex; align-items: center; gap: var(--sp-4); min-height: var(--control); height: var(--control); padding: 0 var(--sp-4); border: var(--line-2) solid var(--a-deep); border-radius: var(--r-8); background: var(--surface); cursor: pointer; }
+.tray-mini-pic { display: grid; place-items: center; width: 72px; height: 36px; background: var(--paper); border-radius: var(--r-8); overflow: hidden; }
+.tray-mini-pic svg { width: 100%; height: 100%; }
+/* critic r3 D2: a slate card (Mixed / Words / No standard) is dashed too, not only its band and chips */
+.card[data-domain="MIXED"], .card[data-domain="WORDS"], .card[data-domain="NOSTD"] { border-style: dashed; }
+/* critic r3 A4: in dark mode the lesson panel header is the dark tint with a bold edge, so it never outshines the primary */
+:root[data-theme="dark"] .panel-band { background: var(--a-tint); color: var(--text); border-left: var(--sp-8) solid var(--a-bold); border-bottom: var(--line-2) solid var(--a-bold); }
