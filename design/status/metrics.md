@@ -37,12 +37,13 @@ grade runs, `design/audit/runs/<run>/grades.jsonl` (5,832 findings; `findings-G7
 
 | Rule | Effect |
 |---|---|
-| TAG_LINK remap: in WRM-tagging reports, a PEDAGOGY / MISSING / OTHER / UNTRUE_TEXT finding that cites WRM-rule-3, -10, -14, -15, -18 or -19, or (except UNTRUE_TEXT) names a pre / related / building-block link, becomes TAG_LINK | 246 rows moved: PEDAGOGY → TAG_LINK 128, UNTRUE_TEXT → TAG_LINK 71, MISSING → TAG_LINK 35, OTHER → TAG_LINK 12 |
+| TAG_LINK remap: in WRM-tagging reports, a PEDAGOGY / MISSING / OTHER / UNTRUE_TEXT finding that cites WRM-rule-3, -10, -14, -15, -18 or -19, or (except UNTRUE_TEXT) names a pre / related / building-block link, becomes TAG_LINK | 246 rows moved: PEDAGOGY → TAG_LINK 128, UNTRUE_TEXT → TAG_LINK 71, MISSING → TAG_LINK 35, OTHER → TAG_LINK 12. The rule is unchanged; the 69 UNTRUE_TEXT link-fit rows it skips by words are moved one by one in `overrides.csv` (critic r2 D3) |
 | wave1-E round 1: the superseded first grade (Sonnet, ids 1–6) is dropped; the Opus re-grade that replaced it (D1–D5) is kept | 6 rows dropped |
 | `OPTIONS-CRITIC-R2.md` is counted as its 24 numbered fixes, not its ≈ 900 per-skill lines | 24 rows |
 | G7 (grade runs) counts a defect once per skill × defect text in a run, not once per graded version | applied by `g7/build.py` |
 | G7 `rule_ids` = the ids the defect itself writes (`what`, `fix`, `where`, its own `cap`; quoted page text and "H0.32" measurements are not citations), plus a version cap only when its condition is this defect (`CAP_FITS` in `g7/build.py`: the cap's class and its condition named). Every cap of the graded version is kept in the new `caps` column (G7 only) | 1,870 of 5,832 G7 rows changed `rule_ids` (critic D1). H4 on a non-INK_FONT row: 362 → 5 (each cites H4 itself); H13 rows 704 → 380; H0 4 → 0. `python3 design/status/tally-src/g7/build.py --old-rule-ids --out <dir>` rebuilds the first tally byte for byte, for comparison |
-| `tally-src/overrides.csv`: one row per correction (report, round, defect_id, field, old, new, reason), applied after the rules above; each must hit one row still holding `old` | 28 class corrections (critic D2 and its scan): REPEAT → DATA_SHAPE 13, OTHER → DATA_SHAPE 4, UNTRUE_TEXT → DATA_SHAPE 3, TAG_LINK → DATA_SHAPE 1 (duplicate or overlapping proposals and tagging data); REPEAT → TAG_LINK 2 (padded pre / related); REPEAT → UNTRUE_TEXT 1 (a wrong tag); UNTRUE_TEXT → PLAIN_WORDS 1 and INSTRUCTION → PLAIN_WORDS 1 (typos); CLIP_OVERLAP → VIEWPORT 1 (pinned step tab over an answer box); CLIP_OVERLAP → INTERACTION 1 (a toast over a control) |
+| `tally-src/overrides.csv`: one row per correction (report, round, defect_id, field, old, new, reason), applied after the rules above; each must hit one row still holding `old` | 97 class corrections. Critic r2 D3 (69): UNTRUE_TEXT → TAG_LINK for WRM-tagging findings about a pre / related link's fit (padded, noise, weak, too big, a later step or week, not a building block, a building block missing); a why-line that is merely false about a link stays UNTRUE_TEXT. Critic r1 D2 and its scan (28): REPEAT → DATA_SHAPE 13, OTHER → DATA_SHAPE 4, UNTRUE_TEXT → DATA_SHAPE 3, TAG_LINK → DATA_SHAPE 1 (duplicate or overlapping proposals and tagging data); REPEAT → TAG_LINK 2 (padded pre / related); REPEAT → UNTRUE_TEXT 1 (a wrong tag); UNTRUE_TEXT → PLAIN_WORDS 1 and INSTRUCTION → PLAIN_WORDS 1 (typos); CLIP_OVERLAP → VIEWPORT 1 (pinned step tab over an answer box); CLIP_OVERLAP → INTERACTION 1 (a toast over a control) |
+| G7 one class per defect (critic r2 D4): within a run and skill, rows whose normalised text (lower case, whitespace collapsed, host / size prefix such as "card 1280:" or "S:" stripped, punctuation dropped, compared as a word bag) is the same, plus the reworded groups a reader listed in `g7/same.txt`, take the majority of their reviewed classes; a tie takes the class written in `same.txt` | Exact-text duplicates were already merged by `classify_all`, so the normalised key alone found 1 inconsistent group (place_value_10x "underline detached" / "detached underline"); `same.txt` adds 4 reworded groups. 4 groups inconsistent before (the auto group sits inside a hand group), 5 rows re-classed: arrays_groups "'Solve.' + broken frame" (r3, 4 hosts) → CLARITY (2 of 4), place_value_10x "equation outside cell" → SCREEN_PARITY (2 of 3); ties: sub_5_pictures "tight to top rule" → VISUAL_DESIGN (nothing overlaps), share_into_groups "5-gap spacing" (r2) → VISUAL_DESIGN (a drawing fault, the content is right). CLARITY 242 → 243, SCREEN_PARITY 331 → 332, VISUAL_DESIGN 344 → 345, INSTRUCTION 321 → 320, CLIP_OVERLAP 388 → 387, NAME_CONTENT 235 → 234 |
 | `tally-src/reports-extra.csv`: report rows a reader left out | 2: `wrm-tagging/Y5-critic.md` rounds 1 (FAIL 7.43) and 2 (FAIL 7.75); the file holds 3 rounds (critic D3) |
 | `n_open` of every report row is recomputed from the merged findings (after the drop rules), and every (report, round) with findings must have a report row (assertion) | 4 rows changed: Y5-critic r1 21, r2 13, r3 46 → 12; wave1-E r1 11 → 5 |
 | A defect a later report lists again as open is counted again, `carried=yes`; fixed items are not counted; nits are `severity=minor` | `defect-classes.md` "How a finding is counted" |
@@ -72,17 +73,17 @@ critic reports (G1–G6); Grade runs = `grades.jsonl` (G7).
 | SIZE | machine | 616 | 377 | 25 | 591 | 48 | none (S2 builds L1) |
 | PEDAGOGY | judgment | 569 | 355 | 77 | 492 | 64 | — (critic) |
 | SLOT | machine | 441 | 307 | 16 | 425 | 37 | `ws-print-lint` L-ANSAREA |
-| CLIP_OVERLAP | machine | 388 | 301 | 66 | 322 | 65 | `ws-print-lint` L-OVERFLOW, L-SIZE |
-| UNTRUE_TEXT | machine | 509 | 295 | 509 | 0 | 100 | TITLEREP / RANGECHECK (WRM tagging only); none in general (S2 builds text ≠ generator) |
-| SCREEN_PARITY | machine | 331 | 282 | 11 | 320 | 23 | `ws-screen-slots`, `ws-screen-answer` |
+| CLIP_OVERLAP | machine | 387 | 301 | 66 | 321 | 65 | `ws-print-lint` L-OVERFLOW, L-SIZE |
+| SCREEN_PARITY | machine | 332 | 283 | 11 | 321 | 23 | `ws-screen-slots`, `ws-screen-answer` |
+| TAG_LINK | machine | 316 | 251 | 316 | 0 | 54 | linkfit / lessonfit (WRM tagging lane only) |
+| UNTRUE_TEXT | machine | 440 | 242 | 440 | 0 | 100 | TITLEREP / RANGECHECK (WRM tagging only); none in general (S2 builds text ≠ generator) |
 | INK_FONT | machine | 279 | 218 | 49 | 230 | 43 | `ws-print-lint` L-INK, L-FONT, L-EMOJI; `ws-ink-unit` |
-| VISUAL_DESIGN | judgment | 344 | 202 | 50 | 294 | 55 | — (critic) |
-| TAG_LINK | machine | 247 | 198 | 247 | 0 | 51 | linkfit / lessonfit (WRM tagging lane only) |
-| INSTRUCTION | machine | 321 | 193 | 67 | 254 | 60 | none (S2 builds L6) |
-| NAME_CONTENT | machine | 235 | 191 | 59 | 176 | 60 | `ws-content-audit` (≈ 310 skills), `ws-options-verify` |
+| VISUAL_DESIGN | judgment | 345 | 202 | 50 | 295 | 55 | — (critic) |
+| INSTRUCTION | machine | 320 | 192 | 67 | 253 | 60 | none (S2 builds L6) |
+| NAME_CONTENT | machine | 234 | 190 | 59 | 175 | 60 | `ws-content-audit` (≈ 310 skills), `ws-options-verify` |
 | KEY | machine | 210 | 158 | 42 | 168 | 46 | `ws-print-lint` L-KEY (subset) |
 | VIEWPORT | machine | 208 | 149 | 80 | 128 | 60 | `ws-chromebook-fit`, `ws-screen-slots` (partly) |
-| CLARITY | judgment | 242 | 143 | 55 | 187 | 47 | — (critic) |
+| CLARITY | judgment | 243 | 144 | 55 | 188 | 47 | — (critic) |
 | GIVEAWAY | machine | 178 | 131 | 25 | 153 | 44 | none (S2 builds L3) |
 | REPEAT | machine | 206 | 105 | 37 | 169 | 47 | none (S2 builds it) |
 | PATTERN | machine | 167 | 90 | 15 | 152 | 34 | none (S2 builds L10) |
@@ -103,24 +104,24 @@ DATA_SHAPE (tagging / build-list data duplicates, added 2026-10-23 for critic D2
 
 | Set | Findings | Machine | Share |
 |---|--:|--:|--:|
-| All findings | 7,878 | 6,510 | **82.6 %** |
+| All findings | 7,878 | 6,508 | **82.6 %** |
 | Narrative critic reports only (G1–G6) | 2,046 | 1,651 | **80.7 %** |
-| Blocking findings, all | 5,405 | 4,635 | 85.8 % |
+| Blocking findings, all | 5,405 | 4,634 | 85.7 % |
 | Blocking findings, narrative reports only | 1,000 | 855 | 85.5 % |
 
 So about four in five things a critic has found could have been found by a machine. The rest is judgment
-(PEDAGOGY, CLARITY, VISUAL_DESIGN, OTHER: 1,180) and process (PROCESS: 188).
+(PEDAGOGY, CLARITY, VISUAL_DESIGN, OTHER: 1,182) and process (PROCESS: 188).
 
 ### 1.3 Rankings
 
-**By blocking count:** SPACE 1,067 · MISSING 402 · SIZE 377 · PEDAGOGY 355 · SLOT 307 · CLIP_OVERLAP 302 ·
-UNTRUE_TEXT 295 · SCREEN_PARITY 282.
+**By blocking count:** SPACE 1,067 · MISSING 402 · SIZE 377 · PEDAGOGY 355 · SLOT 307 · CLIP_OVERLAP 301 ·
+SCREEN_PARITY 283 · TAG_LINK 251.
 
 **By spread (report rounds it appears in, of 219):** PROCESS 107 · UNTRUE_TEXT 100 · CLIP_OVERLAP 65 · SPACE 64 ·
 PEDAGOGY 64 · MISSING 62 · INTERACTION 61 · INSTRUCTION 60 · NAME_CONTENT 60 · VIEWPORT 60.
 
 The two rankings differ because the grade runs (G7) count many skills per run, so page-layout classes (SPACE,
-SIZE, SLOT, SCREEN_PARITY) pile up there. The narrative reports are led by UNTRUE_TEXT (509), TAG_LINK (247),
+SIZE, SLOT, SCREEN_PARITY) pile up there. The narrative reports are led by UNTRUE_TEXT (440), TAG_LINK (316),
 PROCESS (188) and INTERACTION (129): text that the code does not bear out, and builder reports that were wrong.
 
 ### 1.4 Top 8 machine classes with NO gate today — lane W0-A builds these first
@@ -131,9 +132,9 @@ count, then spread.
 | # | Class | Blocking | Total | Rounds | Gate today |
 |--:|---|--:|--:|--:|---|
 | 1 | SIZE | 377 | 616 | 48 | none (S2 builds L1) |
-| 2 | UNTRUE_TEXT | 295 | 509 | 100 | WRM tagging only; none in general |
-| 3 | TAG_LINK | 198 | 247 | 51 | linkfit / lessonfit, inside the WRM tagging lane only |
-| 4 | INSTRUCTION | 193 | 321 | 60 | none (S2 builds L6) |
+| 2 | TAG_LINK | 251 | 316 | 54 | linkfit / lessonfit, inside the WRM tagging lane only |
+| 3 | UNTRUE_TEXT | 242 | 440 | 100 | WRM tagging only; none in general |
+| 4 | INSTRUCTION | 192 | 320 | 60 | none (S2 builds L6) |
 | 5 | GIVEAWAY | 131 | 178 | 44 | none (S2 builds L3) |
 | 6 | REPEAT | 105 | 206 | 47 | none |
 | 7 | PATTERN | 90 | 167 | 34 | none (S2 builds L10) |

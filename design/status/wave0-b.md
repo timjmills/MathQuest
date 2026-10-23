@@ -10,7 +10,7 @@ Critic rounds: 2, PASS
 
 ## Now
 - Critic r2 PASS 8 / 8 / 8 (`design/audit/runs/wave0-b/critic-r2.md`); S3, S6, S7, S8, E5 built; ready for the lead to merge.
-- Open minor (r2): D1 card ids without excerpts, D2 TY-10a/SL-3a under "also applies", D3 ~20 tagging rows still UNTRUE_TEXT, D4 grade-run class differs by host; D5 fixed (README EE id).
+- r2 minor D1–D5 all fixed (D1/D2 card excerpts and not-applying groups; D3 69 tagging link rows → TAG_LINK; D4 one class per grade-run defect; D5 README EE id).
 - Waits on a week of lanes: S6 (`ws-status-index --conflicts --since 2026-10-23`) and E5 (six lanes, no shared-file conflict).
 
 ## Owner go
@@ -32,6 +32,7 @@ Times: builder S8 tally readers G1-G7 (7 agents), start 2026-10-23T10:07Z, end 2
 Times: builder S7 process rules, start 2026-10-23T10:09Z, end 2026-10-23T10:10Z, profile mq-opus-low
 
 ## Log
+- 2026-10-23: critic r2 minors D1–D4 fixed at mq-opus-low (later changes to passed tools).
 - 2026-10-23: critic r2 PASS 8/8/8; lead requests done (Times lines, median + mean rounds to PASS); r2 D5 fixed.
 - 2026-10-23: critic r1 FAIL (7 / 7 / 8); fix round 1 at mq-opus-medium (tally fixer, tools fixer).
 - 2026-10-23: S3, S7, S8 and E5 built and committed (S3/E5 by mq-opus-medium first builds; S7 and tally readers by mq-opus-low).

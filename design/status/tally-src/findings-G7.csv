@@ -4314,7 +4314,7 @@ design/audit/runs/regrade2-2026-09-25/,regrade2-2026-09-25/division:share_into_g
 design/audit/runs/regrade2-2026-09-25/,regrade2-2026-09-25/division:share_into_groups,1,U211,SCREEN_PARITY,machine,no,blocking,,division,,'Answer:' frame differs from paper 'groups of N'.,
 design/audit/runs/regrade2-2026-09-25/,regrade2-2026-09-25/division:share_into_groups,1,U212,VISUAL_DESIGN,judgment,no,blocking,,division,,"Groups of 4 asked, spacing in 5s.",
 design/audit/runs/regrade2-2026-09-25/,regrade2-2026-09-25/division:share_into_groups,1,U213,VISUAL_DESIGN,judgment,no,blocking,,division,,Rows 6/6/3 with a gap after 5.,
-design/audit/runs/regrade2-2026-09-25/,regrade2-2026-09-25/division:share_into_groups,1,U214,NAME_CONTENT,machine,no,blocking,,division,,5-gap spacing contradicts groups of 3/6/7.,
+design/audit/runs/regrade2-2026-09-25/,regrade2-2026-09-25/division:share_into_groups,1,U214,VISUAL_DESIGN,judgment,no,blocking,,division,,5-gap spacing contradicts groups of 3/6/7.,
 design/audit/runs/regrade2-2026-09-25/,regrade2-2026-09-25/division:share_into_groups,1,U215,SIZE,machine,no,blocking,,division,,'Tap counters…' ~11 px; answer box small.,
 design/audit/runs/regrade2-2026-09-25/,regrade2-2026-09-25/division:share_into_groups,1,U216,VISUAL_DESIGN,judgment,no,blocking,,division,,5-gap spacing vs groups of 3.,
 design/audit/runs/regrade2-2026-09-25/,regrade2-2026-09-25/multiplication:area_model_mult,1,U217,PEDAGOGY,judgment,no,minor,,multiplication,,Partial-product boxes are equal width whatever the place value (100 and 9 same size); every item is 1-digit x 2/3-dig...,
@@ -4681,7 +4681,7 @@ design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/placevalue:place_valu
 design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/placevalue:place_value_10x,1,U285,SCREEN_PARITY,machine,no,blocking,,placevalue,,Equation outside cell; underline detached.,
 design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/placevalue:place_value_10x,1,U286,SIZE,machine,no,blocking,,placevalue,,Equation 18 px above an empty box with an underline; no grid; digits far below 29 px.,
 design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/placevalue:place_value_10x,1,U287,SCREEN_PARITY,machine,no,blocking,,placevalue,,Not the paper cell.,
-design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/placevalue:place_value_10x,1,U288,CLARITY,judgment,no,blocking,,placevalue,,Equation outside cell; detached underline.,
+design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/placevalue:place_value_10x,1,U288,SCREEN_PARITY,machine,no,blocking,,placevalue,,Equation outside cell; detached underline.,
 design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/counting:number_seq_fill,1,U289,CLIP_OVERLAP,machine,no,minor,,counting,,'100' fills its circle edge to edge.,
 design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/counting:number_seq_fill,1,U290,SPACE,machine,no,minor,,counting,,Track sits in the top half with ~50% empty band; left third empty.,
 design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/counting:number_seq_fill,1,U291,PEDAGOGY,judgment,no,minor,,counting,,"Descending, step-1, step-2, step-5 and step-10 all mixed in guided practice.",
@@ -4899,12 +4899,12 @@ design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/multiplication:arrays
 design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/multiplication:arrays_groups,1,U503,NAME_CONTENT,machine,no,blocking,,multiplication,,3x7 and 6x4 exceed 5x5.,H5
 design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/multiplication:arrays_groups,1,U504,SIZE,machine,no,minor,,multiplication,,Caption ~8 pt.,
 design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/multiplication:arrays_groups,1,U505,INK_FONT,machine,no,blocking,H4,multiplication,,Cell has a purple/indigo 2-3 px border (focus outline) - colour on the question cell.,H4
-design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/multiplication:arrays_groups,1,U506,INSTRUCTION,machine,no,blocking,,multiplication,,Instruction is just 'Solve.'; the sentence frame breaks as '[ ] rows of [ ] . [ ] in all' with a floating full stop.,H4
+design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/multiplication:arrays_groups,1,U506,CLARITY,judgment,no,blocking,,multiplication,,Instruction is just 'Solve.'; the sentence frame breaks as '[ ] rows of [ ] . [ ] in all' with a floating full stop.,H4
 design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/multiplication:arrays_groups,1,U507,SCREEN_PARITY,machine,no,minor,,multiplication,,Frame above the picture; paper puts the picture first.,H4
 design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/multiplication:arrays_groups,1,U508,INK_FONT,machine,no,blocking,H4,multiplication,,Purple cell border.,H4
 design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/multiplication:arrays_groups,1,U509,CLARITY,judgment,no,blocking,,multiplication,,'Solve.' + broken sentence frame.,H4
 design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/multiplication:arrays_groups,1,U510,VISUAL_DESIGN,judgment,no,blocking,,multiplication,,Frame wraps: '[ ] . [ ] in all' starts a line with a stray full stop.,H4
-design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/multiplication:arrays_groups,1,U511,VISUAL_DESIGN,judgment,no,blocking,,multiplication,,'Solve.' and a sentence frame that wraps with a stray '.' starting line 2.,
+design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/multiplication:arrays_groups,1,U511,CLARITY,judgment,no,blocking,,multiplication,,'Solve.' and a sentence frame that wraps with a stray '.' starting line 2.,
 design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/multiplication:arrays_groups,1,U512,SPACE,machine,no,blocking,,multiplication,,"Picture and frame float at different heights; card 5 dots ~14 px, crowded.",
 design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/multiplication:arrays_groups,1,U513,CLARITY,judgment,no,blocking,,multiplication,,'Solve.' and stray '.' in frame.,
 design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/number_sense:estimate_quotient,1,U514,KEY,machine,no,blocking,,number_sense,,Instruction says 'Round each number. Then estimate.' but the key uses compatible numbers (33÷5→35÷5=7; rounding gives...,
@@ -5304,7 +5304,7 @@ design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/subtraction:sub_5_pic
 design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/subtraction:sub_5_pictures,1,U908,GIVEAWAY,machine,no,blocking,,subtraction,,"Printed unit label is singular ('triangle', 'star') only when the answer is 1 — gives the answer away; work space is...",
 design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/subtraction:sub_5_pictures,1,U909,SLOT,machine,no,blocking,,subtraction,,Answer box x-position differs per cell.,
 design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/subtraction:sub_5_pictures,1,U910,GIVEAWAY,machine,no,blocking,,subtraction,,Same giveaway.,
-design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/subtraction:sub_5_pictures,1,U911,CLIP_OVERLAP,machine,no,minor,,subtraction,,Pictures tight to top.,
+design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/subtraction:sub_5_pictures,1,U911,VISUAL_DESIGN,judgment,no,minor,,subtraction,,Pictures tight to top.,
 design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/subtraction:sub_5_pictures,1,U912,SIZE,machine,no,minor,,subtraction,,Stars small (~40 px).,
 design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/subtraction:sub_5_pictures,1,U913,VISUAL_DESIGN,judgment,no,minor,,subtraction,,Wraps to 2 lines.,
 design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25/subtraction:sub_5_pictures,1,U914,PEDAGOGY,judgment,no,blocking,,subtraction,,Three of six items are 'take away 0'.,

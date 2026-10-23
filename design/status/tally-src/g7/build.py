@@ -11,6 +11,7 @@ Pipeline (deterministic; nothing random, no network):
   2. classify.py  rule-based class per defect, deduped per (run, skill, defect text); DROP = not a defect
   3. ov_r4.txt    hand classes for the 406 regrade4 rows (index into that list)
   4. ov.txt       hand classes for the combined list (index = position in classify output + regrade4 rows)
+  4b. same.txt  one class per (run, skill, normalised defect text) across hosts: majority, ties per same.txt (critic r2 D4)
   5. one CSV row per kept defect; reports-G7.csv one row per run (verdict from the versions' `pass`)
 
 rule_ids (fixed 2026-10-23, critic wave0-b r1 D1): the rule ids the defect itself writes in its
@@ -42,6 +43,38 @@ for i,x in enumerate(o):
   if i in ov and ov[i]!=x['cls']: nchg+=1; x['final']=ov[i]
   else: x['final']=x['cls']
 print('overrides changing class',nchg,'of',len(o))
+# D4 (critic wave0-b r2): one defect gets one class per (run, skill, normalised text) across hosts and sizes.
+# Normalised = lower case, whitespace collapsed, a host/size prefix ("card 1280:", "S:") stripped, punctuation
+# dropped, compared as a word bag; same.txt adds the groups worded differently. The group takes the majority of
+# its rows' reviewed classes (every row's class has been through the ov.txt review); ties use same.txt's '=' class.
+def dnorm(t):
+  t=re.sub(r'\s+',' ',(t or '').lower()).strip()
+  t=re.sub(r'^(?:(?:card|worksheet|quiz|ws|print|screen|paper)[ -]?\d*\s*(?:px)?|[sml]|size [sml])\s*:\s*','',t)
+  return ' '.join(sorted(set(re.sub(r'[^\w ]',' ',t).split())))
+grp={}
+for i,x in enumerate(o):
+  if x['final']!='DROP': grp.setdefault((x['run'],x['skill'],dnorm(x['what'])),[]).append(i)
+auto=[v for v in grp.values() if len(v)>1]
+groups=[]
+for l in open(os.path.join(HERE,'same.txt')):
+  l=l.split('#')[0].strip()
+  if not l: continue
+  ids,_,tie=l.partition('=')
+  ids=[int(t) for t in ids.split()]
+  assert len({(o[i]['run'],o[i]['skill']) for i in ids})==1, ('same.txt group spans runs or skills', ids)
+  groups.append((ids,tie.split()[0] if tie.strip() else None))
+hand=set(i for g,_ in groups for i in g)
+groups+=[(v,None) for v in auto if not set(v)<=hand]
+ninc=nmov=0
+for ids,tie in groups:
+  c=collections.Counter(o[i]['final'] for i in ids)
+  if len(c)<2: continue
+  ninc+=1; top=c.most_common()
+  win=top[0][0] if top[0][1]>top[1][1] else tie
+  assert win in [k for k,n in top if n==top[0][1]], ('tie needs a same.txt class among the tied ones', ids, top, tie)
+  for i in ids:
+    if o[i]['final']!=win: o[i]['final']=win; nmov+=1
+print('D4 inconsistent groups',ninc,'rows re-classed',nmov)
 RULE=re.compile(r'\b(H\d{1,2}|L\d{1,2}|OC\d{1,2}|PT-[A-Z]{2,4}-\d+|AK-\d+|SP-\d+|SL-\d+[a-z]?|TY-\d+[a-z]?|DN-\d+[a-z]?|VA-\d+|RP-\d+|INK-\d+|AX-\d+|SC-\d+|P-\d+|PG-\d+|CL-\d+[a-z]?|BD-\d+|SCC-\d+|R2|S[1-9])\b')
 # A version cap is copied onto a defect only when the cap's condition (RUBRIC.md §5 H1-H13,
 # OPTIONS-RUBRIC.md OC1-OC15) is exactly this defect: (classes the cap belongs to, text the defect must name).

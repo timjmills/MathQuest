@@ -1,0 +1,8 @@
+# One defect seen on several screen hosts, worded differently (critic wave0-b r2 D4). Read by build.py.
+# Format: <index> <index> ... [= TIEBREAK_CLASS  reason]   (index = position in the combined list, as in ov.txt)
+# Rows whose normalised text is the same word bag are grouped automatically; this file lists the groups only a reader can see.
+# The group takes the majority of its rows' reviewed classes; a tie takes the class after '='.
+5153 5156 5158 5160
+4930 4931 4934
+5556 5561 = VISUAL_DESIGN  pictures sit tight to the top rule; nothing overlaps, so not CLIP_OVERLAP
+4564 4566 = VISUAL_DESIGN  the drawing's 5-gap spacing misgroups the dots; the content dealt is right, so not NAME_CONTENT
