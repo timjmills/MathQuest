@@ -65,7 +65,8 @@
   --slate-tint: #EDE9E1; --slate-soft: #D2CEC5; --slate-bold: #736E64; --slate-on: #FBF7EF; --slate-deep: #524E47;
 }
 
-/* dark mode: explicit choice, or the system setting unless light was chosen */
+/* parked: owner 2026-10-23 ("for now do not make a dark mode"). These dark tokens are kept untouched but UNUSED: every
+   page sets data-theme="light" and ignores ?theme=. Do not tune them until the owner un-parks dark mode. */
 :root[data-theme="dark"] {
   --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.50);
   --shadow-2: 0 16px 40px rgba(0, 0, 0, 0.70);

@@ -55,6 +55,10 @@ const CSS_FILE = argCss > 0 ? path.resolve(process.argv[argCss + 1]) : path.join
 // Owner 2026-10-23 (fix round 2): the light page is WARM STONE #EFECE8 with white #FFFFFF surfaces; cream #FBF7EF stays only
 // as TEXT on dark fills (the primary, the rail, cream-on-bold) and as the base the tints and soft fills are mixed over.
 const STONE = '#EFECE8';
+// Owner 2026-10-23: "I don't like the dark mode so for now do not make a dark mode." The dark-mode checks (dark contrast
+// pairs, dark tints / bolds on the dark page, the dark primary, the dark token values) are PARKED: kept here, skipped, and
+// the run prints one line saying so. Set to false to bring them back when the owner un-parks dark mode.
+const DARK_PARKED = true;
 const INK = '#1A1614', WHITE = '#FFFFFF', CREAM = '#FBF7EF', DARK = '#0F0E0C', KEY = '#C2410C', ERR = '#B91C1C', DARK_TEXT = '#FBF7EF';
 const MODES = ['normal', 'deut', 'prot'];
 const M = {
@@ -227,7 +231,7 @@ function parseBlocks(css) {
   const st = minOf(A.flatMap(a => MODES.flatMap(m => [[a, ERR, m, 'error red'], [a, KEY, m, 'key orange']])), ([a, c, m]) => de00(a.r.bold, c, m));
   row('bold vs error red / key orange, all views', r1(st.v), '>= 20', `${st.p[0].k}–${st.p[3]} (${st.p[2]})`, st.v >= 20);
 
-  // 6. contrast
+  // 6. contrast (light only while dark mode is parked: the dark pairs are kept below, skipped)
   const SL = Object.assign(ramp(SLATE), {}); const all = A.concat([{ k: 'slate', r: SL }]);
   const con = [];
   for (const a of all) {
@@ -242,9 +246,11 @@ function parseBlocks(css) {
   }
   con.push(['primary button, light', cr(NEUTRALS['primary-bg'][0], NEUTRALS['primary-fg'][0]), 4.5], ['primary button, dark', cr(NEUTRALS['primary-bg'][1], NEUTRALS['primary-fg'][1]), 4.5],
     ['chip outline #E8DFD2 / dark page', cr('#E8DFD2', DARK), 7], ['ring ink / stone page', cr(INK, STONE), 7], ['ring ink / white surface', cr(INK, WHITE), 7], ['ring cream / dark page', cr(DARK_TEXT, DARK), 7]);
+  // dark mode PARKED (owner 2026-10-23, "for now do not make a dark mode"): the dark pairs are not checked (kept, not deleted)
+  if (DARK_PARKED) for (let i = con.length - 1; i >= 0; i--) if (/dark/.test(con[i][0])) con.splice(i, 1);
   const worst = con.filter(c => c[1] < c[2]);
   const low = con.reduce((b, c) => (c[1] / c[2] < b[1] / b[2] ? c : b));
-  row(`text contrast (${con.length} pairs, light and dark)`, worst.length ? worst.map(w => `${w[0]} ${w[1].toFixed(2)}`).join('; ') : `closest ${low[0]} ${low[1].toFixed(2)}`, '>= 4.5 / 7', '', !worst.length);
+  row(`text contrast (${con.length} pairs, ${DARK_PARKED ? 'light' : 'light and dark'})`, worst.length ? worst.map(w => `${w[0]} ${w[1].toFixed(2)}`).join('; ') : `closest ${low[0]} ${low[1].toFixed(2)}`, '>= 4.5 / 7', '', !worst.length);
 
   // 10. distinct from the action (fix round 2; critic r2 A3/D1, stop rule §1.7). The one primary action is solid ink in
   //     light mode and solid cream in dark mode; an area bold that sits near either reads as a second primary (OA #2E2B71
@@ -257,7 +263,7 @@ function parseBlocks(css) {
   const inkRows = all.map(a => ({ k: a.k, b: a.plan ? a.plan.bold : SLATE }));
   const dInk = minOf(inkRows, (a) => de00(a.b, INK)), dCream = minOf(inkRows, (a) => de00(a.b, DARK_TEXT)), cInk = minOf(inkRows, (a) => cr(a.b, INK));
   row('CIEDE2000 bold vs the ink primary #1A1614', r1(dInk.v), '>= 20', dInk.p.k, dInk.v >= INKMIN.de);
-  row('CIEDE2000 bold vs the dark-mode primary #FBF7EF', r1(dCream.v), '>= 20', dCream.p.k, dCream.v >= INKMIN.de);
+  if (!DARK_PARKED) row('CIEDE2000 bold vs the dark-mode primary #FBF7EF', r1(dCream.v), '>= 20', dCream.p.k, dCream.v >= INKMIN.de);
   row('WCAG bold vs ink (an area never reads as ink)', cInk.v.toFixed(2), '>= 2.0', cInk.p.k, cInk.v >= INKMIN.cr);
   // 11. dark mode keeps every group visibly coloured (critic r2 D1: the OA tint was 1.05 : 1 on the page, so the OA group
   //     panel vanished). Measured on the values actually in the board table / token file, not on the rule:
@@ -265,8 +271,10 @@ function parseBlocks(css) {
   //       every bold >= 3 : 1 against the dark page (WCAG 1.4.11 for the card edge, band rule and band icon that carry the area).
   const darkRows = all.map(a => ({ k: a.k, t: a.plan ? a.plan.dTint || a.r.dTint : a.r.dTint, b: a.plan ? a.plan.bold : SLATE }));
   const dt = minOf(darkRows, (a) => cr(a.t, DARK)), db = minOf(darkRows, (a) => cr(a.b, DARK));
-  row('dark tint vs the dark page (the group shows)', dt.v.toFixed(2), '>= 1.2', `${dt.p.k} ${dt.p.t}`, dt.v >= 1.2);
-  row('bold vs the dark page (edge, band, icon)', db.v.toFixed(2), '>= 3', db.p.k, db.v >= 3);
+  if (!DARK_PARKED) {
+    row('dark tint vs the dark page (the group shows)', dt.v.toFixed(2), '>= 1.2', `${dt.p.k} ${dt.p.t}`, dt.v >= 1.2);
+    row('bold vs the dark page (edge, band, icon)', db.v.toFixed(2), '>= 3', db.p.k, db.v >= 3);
+  }
 
   // 12. light mode: every group is visibly coloured on the warm stone page (owner 2026-10-23). A WCAG ratio is not enough
   //     (the tints sit within 1.0-1.06 : 1 of the page), so CIEDE2000 >= 3. The tints stay as they are (the owner's choice);
@@ -293,9 +301,9 @@ function parseBlocks(css) {
       if (/^\s*\.gbadge\s*$/.test(m[1])) { const c = m[2].match(/(?:^|;)\s*color:\s*var\(--([\w-]+)\)/), b = m[2].match(/background:\s*var\(--([\w-]+)\)/); if (c) fg = c[1]; if (b) bg = b[1]; }
     }
     if (!fg || !bg || !NEUTRALS[fg] || !NEUTRALS[bg]) badgeBad.push(`.gbadge colour ${fg} on ${bg} is not a neutral token pair`);
-    else { badgeCr = Math.min(cr(NEUTRALS[fg][0], NEUTRALS[bg][0]), cr(NEUTRALS[fg][1], NEUTRALS[bg][1])); if (badgeCr < 4.5) badgeBad.push(`contrast ${badgeCr.toFixed(2)}`); }
+    else { badgeCr = DARK_PARKED ? cr(NEUTRALS[fg][0], NEUTRALS[bg][0]) : Math.min(cr(NEUTRALS[fg][0], NEUTRALS[bg][0]), cr(NEUTRALS[fg][1], NEUTRALS[bg][1])); if (badgeCr < 4.5) badgeBad.push(`contrast ${badgeCr.toFixed(2)}`); }
   }
-  row('grade badge: neutral tokens only, text >= 4.5 light + dark', badgeBad.length ? badgeBad.length + ' found' : `${badgeCr.toFixed(2)} : 1`, 'neutral', badgeBad.slice(0, 3).join('; '), !badgeBad.length);
+  row(`grade badge: neutral tokens only, text >= 4.5 ${DARK_PARKED ? 'light' : 'light + dark'}`, badgeBad.length ? badgeBad.length + ' found' : `${badgeCr.toFixed(2)} : 1`, 'neutral', badgeBad.slice(0, 3).join('; '), !badgeBad.length);
 
   // 7. tokens.css
   let tokBad = [];
@@ -304,21 +312,21 @@ function parseBlocks(css) {
   if (!tokBad.length) {
     blocks = parseBlocks(fs.readFileSync(CSS_FILE, 'utf8'));
     const L = blocks[':root'] || {}, Dk = blocks[':root[data-theme="dark"]'] || {};
-    if (!blocks[':root']) tokBad.push('no :root block'); if (!blocks[':root[data-theme="dark"]']) tokBad.push('no :root[data-theme="dark"] block');
+    if (!blocks[':root']) tokBad.push('no :root block'); if (!DARK_PARKED && !blocks[':root[data-theme="dark"]']) tokBad.push('no :root[data-theme="dark"] block');
     const want = (blk, name, v, label) => { const got = (blk[name] || '').toUpperCase(); if (got !== v.toUpperCase()) tokBad.push(`${label} ${name} = ${blk[name] || '(missing)'}, want ${v}`); };
     for (const a of all) {
       const p = a.css || 'slate';
       want(L, `--${p}-tint`, a.r.tint, 'light'); want(L, `--${p}-soft`, a.r.soft, 'light'); want(L, `--${p}-bold`, a.r.bold, 'light'); want(L, `--${p}-on`, a.r.on, 'light'); want(L, `--${p}-deep`, a.r.deep, 'light');
-      want(Dk, `--${p}-tint`, a.r.dTint, 'dark'); want(Dk, `--${p}-soft`, a.r.dSoft, 'dark'); want(Dk, `--${p}-deep`, a.r.dLight, 'dark');
-      if (Dk[`--${p}-bold`] && Dk[`--${p}-bold`].toUpperCase() !== a.r.bold) tokBad.push(`dark --${p}-bold must stay the bold`);
+      if (!DARK_PARKED) { want(Dk, `--${p}-tint`, a.r.dTint, 'dark'); want(Dk, `--${p}-soft`, a.r.dSoft, 'dark'); want(Dk, `--${p}-deep`, a.r.dLight, 'dark'); }
+      if (!DARK_PARKED && Dk[`--${p}-bold`] && Dk[`--${p}-bold`].toUpperCase() !== a.r.bold) tokBad.push(`dark --${p}-bold must stay the bold`);
     }
-    for (const [t, [l, d]] of Object.entries(NEUTRALS)) { want(L, '--' + t, l, 'light'); if (d) want(Dk, '--' + t, d, 'dark'); }
+    for (const [t, [l, d]] of Object.entries(NEUTRALS)) { want(L, '--' + t, l, 'light'); if (d && !DARK_PARKED) want(Dk, '--' + t, d, 'dark'); }
     const scale = (prefix, wantList) => { const got = Object.keys(L).filter(k => k.startsWith(prefix)).map(k => L[k].replace(/px$/, '')).sort((x, y) => x - y).join(' '); if (got !== wantList) tokBad.push(`${prefix}* = ${got || '(none)'}, want ${wantList}`); };
     scale('--fs-', '12 14 16 20 28 36'); scale('--fw-', '500 700'); scale('--sp-', '4 8 16 24 32 48'); scale('--r-', '8 16');
     const sh = Object.keys(L).filter(k => k.startsWith('--shadow-')); if (sh.length !== 2) tokBad.push(`${sh.length} shadows, want 2`);
     if ((L['--control'] || '') !== '44px') tokBad.push(`--control = ${L['--control']}, want 44px`);
   }
-  row('token CSS = these values (both themes) + §2.8 scales', tokBad.length ? tokBad.length + ' differ' : path.relative(ROOT, CSS_FILE), 'exact', tokBad.slice(0, 6).join('; '), !tokBad.length);
+  row('token CSS = these values (light; dark parked) + §2.8 scales', tokBad.length ? tokBad.length + ' differ' : path.relative(ROOT, CSS_FILE), 'exact', tokBad.slice(0, 6).join('; '), !tokBad.length);
 
   // 8. the mock-up's own CSS uses tokens only
   const appCss = path.join(path.dirname(CSS_FILE), 'app.css'); const raw = [];
@@ -363,6 +371,7 @@ function parseBlocks(css) {
     const val = String(r[1]); const where = String(r[3]);
     console.log(r[0].padEnd(w[0]) + (val.length > w[1] - 1 ? val.slice(0, w[1] - 2) + '…' : val).padEnd(w[1]) + r[2].padEnd(w[2]) + (where.length > w[3] - 1 ? where.slice(0, w[3] - 2) + '…' : where).padEnd(w[3]) + r[4]);
   }
+  if (DARK_PARKED) console.log('\ndark mode parked (owner 2026-10-23): the dark-mode checks are skipped, not deleted (DARK_PARKED)');
   if (fails.length) { console.log('\nws-teacher-tokens: FAIL'); for (const f of fails) console.log('  ' + f); process.exit(1); }
   console.log('\nws-teacher-tokens: OK');
 })();

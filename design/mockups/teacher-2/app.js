@@ -1,7 +1,7 @@
 // Teacher site 2.0 — the clickable mock-up (T1). Static. Data from data.js (make-data.mjs); thumbnails are drawn live by
 // the app itself (thumbs.js → live.mjs: the app's buildSheet in a hidden frame running index.html); search is the app's own finder, js/modules/skill-finder.js, imported read-only
 // (served over http; on file:// the module cannot load and a plain fallback matcher stands in).
-// URL: app.html?theme=dark&tray=demo3#print   (theme light|dark; tray demo1|demo3|lesson|<cat:skill,...>; hash = screen)
+// URL: app.html?tray=demo3#print   (light only: dark mode parked by the owner 2026-10-23, ?theme= ignored; tray demo1|demo3|lesson|<cat:skill,...>; hash = screen)
 // Screens: #skills #lessons #classes; sheets on top: #print #quiz #buildfrom #share #quizshare #chip/<cat:skill> #board
 // #lessonprint #profile #trayopen. ?walk=<flow id> runs a walk-through from flows.js.
 (function () {
@@ -105,8 +105,8 @@
   // even after the tray changes; only what no longer applies is reset (kindDefaults recomputes the untouched ones)
   S.touched = new Set();
   function defaultOpts() { return { pages: 1, each: 'new', examples: 'none', sections: 'per-skill', fade: 'none', layout: 'standard', review: false, size: 'M', prereq: false, header: true, key: 'end', keyStyle: 'answers', nline: false, cols: 'auto' }; }
-  const theme = qs.get('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-  document.documentElement.setAttribute('data-theme', theme);
+  // dark mode is parked (owner 2026-10-23): light always, ?theme= ignored, no theme switch in the menu
+  document.documentElement.setAttribute('data-theme', 'light');
   // a WHOLE GRADE (or area) = every skill of that grade, one of each: no Mixed pools, no Maths words cards, and no
   // "(No Pictures)" / "(No Visuals)" twin of a skill that is already in
   function wholeSet(g, a) { return D.skills.filter(s => s.g === g && !s.p && s.a !== 'WORDS' && (!a || s.a === a) && !/\((no pictures|no visuals)\)/i.test(s.l)).map(id); }
@@ -934,7 +934,7 @@
   // ---------------- shell ----------------
   const PLACES = [['skills', 'Skills', 'skills'], ['lessons', 'Lessons', 'lessons'], ['classes', 'Classes', 'classes']];
   function profileMenu() {
-    return `<div class="menu" role="menu"><p class="menu-label">Ms Rivera · Grade 2</p><button class="btn" data-act="noop">Settings</button><button class="btn" data-act="noop">Switch to pupil view</button><button class="btn" data-act="noop">Teacher help</button><hr><p class="menu-label">Theme</p><button class="btn" data-act="theme">${theme === 'dark' ? 'Use light' : 'Use dark'}</button></div>`;
+    return `<div class="menu" role="menu"><p class="menu-label">Ms Rivera · Grade 2</p><button class="btn" data-act="noop">Settings</button><button class="btn" data-act="noop">Switch to pupil view</button><button class="btn" data-act="noop">Teacher help</button></div>`;
   }
   function render() {
     const scr = S.screen === 'lessons' ? lessonsScreen() : S.screen === 'classes' ? classesScreen() : skillsScreen();
@@ -1002,7 +1002,6 @@
     switch (act) {
       case 'go': S.screen = arg; S.sheet = null; S.profile = false; L.panelOpen = false; break;
       case 'profile': S.profile = !S.profile; break;
-      case 'theme': { const u = new URLSearchParams(location.search); u.set('theme', theme === 'dark' ? 'light' : 'dark'); location.search = u.toString(); return; }
       case 'browse': S.browse = arg; S.q = ''; break;
       case 'grade': S.grade = arg; S.pop = null; if (S.q) { S.q = ''; } break;
       case 'view': S.view = arg; S.pop = null; break;

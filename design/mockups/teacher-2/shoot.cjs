@@ -45,7 +45,7 @@ const args = process.argv.slice(2); const NO_SHOTS = args.includes('--no-shots')
 // quick runs while fixing: --only a,b (screen names) --widths 820,1024 --themes light --no-flows (no PNGs, no index then)
 const argv = (k) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1].split(',') : null; };
 const FLOWS_ONLY = args.includes('--flows-only');   // quick: only click the flows (no screens, no files written)
-const ONLY = FLOWS_ONLY ? ['none'] : argv('--only'), WIDTHS = (argv('--widths') || ['1366', '1280', '1024', '820', '390']).map(Number), THEMES = argv('--themes') || ['light', 'dark'];
+const ONLY = FLOWS_ONLY ? ['none'] : argv('--only'), WIDTHS = (argv('--widths') || ['1366', '1280', '1024', '820', '390']).map(Number), THEMES = argv('--themes') || ['light'];   // dark mode parked (owner 2026-10-23): light only
 const QUICK = !!(ONLY || argv('--widths') || argv('--themes') || args.includes('--no-flows'));
 const EXE = fs.existsSync('/opt/pw-browsers/chromium') ? '/opt/pw-browsers/chromium' : undefined;
 const SIZES = { 1366: { width: 1366, height: 768 }, 1280: { width: 1280, height: 800 }, 1024: { width: 1024, height: 768 }, 820: { width: 820, height: 1180 }, 390: { width: 390, height: 844 } };
@@ -654,7 +654,7 @@ function writeIndex(shots, results) {
   const tiles = shots.map(s => `<a class="shot ${s.w === 390 ? 'narrow' : ''}" data-w="${s.w}" data-theme="${s.theme}" href="shots/${s.fullFile || s.file}"><img loading="lazy" src="shots/${s.file}" alt="${s.label}, ${s.w} px, ${s.theme}"><span><b>${s.label}</b><br>${s.w} px · ${s.theme}${s.fullFile ? ' · opens the full page' : ''}</span></a>`).join('');
   const html = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Teacher Site 2.0</title>
-<script>(function(){var t=new URLSearchParams(location.search).get('theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+<script>document.documentElement.setAttribute('data-theme','light');/* dark mode parked: owner 2026-10-23 */</script>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Fraunces:ital,opsz,wght@1,9..144,500&family=Inter:wght@500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="docs.css"></head>
 <body><div class="doc">
 <p class="eyebrow">Maths Quest · Teacher site 2.0 · T1 · ${new Date().toISOString().slice(0, 10)}</p>
@@ -663,7 +663,7 @@ function writeIndex(shots, results) {
 <p class="lead">Every job in 3 or 4 steps. Colour means the maths area (board C, the look of the school’s maths site); the one main action on each screen is solid warm ink.</p>
 <div class="top"><a class="btn btn-primary" href="app.html">Open the mock-up</a></div>
 <div class="tiles">
-  <a class="tile" href="app.html"><b>The mock-up</b><span>Skills (opens here) with the tray, the worksheet sheet, Quiz, Share, Lessons, Classes and the profile menu. Works at any width; Theme is in the profile menu, or add ?theme=dark.</span></a>
+  <a class="tile" href="app.html"><b>The mock-up</b><span>Skills (opens here) with the tray, the worksheet sheet, Quiz, Share, Lessons, Classes and the profile menu. Works at any width. Light only: dark mode is parked by the owner (2026-10-23).</span></a>
   <a class="tile" href="flows.html"><b>The flows</b><span>Each job with its steps and clicks, today’s count beside it, and a “Walk it” button that shows each click in the mock-up.</span></a>
   <a class="tile" href="palette.html"><b>Colour: board C</b><span>Eight maths areas in four strengths, light and dark, the colour-blind check, where each colour moved from the site, and boards B and A as reference pictures.</span></a>
   <a class="tile" href="thumbs.html"><b>Every skill’s thumbnail</b><span>All 715 live skills, each drawn LIVE by the app as you scroll (<code>live.mjs</code>: the app’s own <code>buildSheet</code>); <code>thumbs-check.cjs</code> holds each thumbnail to the booted app’s own cell for the same skill and seed.</span></a>
@@ -673,8 +673,8 @@ function writeIndex(shots, results) {
 <div class="scroll"><table><thead><tr><th>Task</th><th>Steps</th><th>Clicked 1366 / 390</th><th>Plan</th><th>Today</th><th></th></tr></thead><tbody>${flowRows}</tbody></table></div>
 <p class="note">Clicked = actions counted by shoot.cjs in this mock-up (clicks, typed searches and any scroll it needed).</p>
 <h2>Every screen</h2>
-<p class="note">${groups.length} screens × 1366 and 390 px × light and dark, plus the screens whose layout changes at 1280, 1024 and 820 px. Every screen is also checked at all five widths (no sideways scroll, nothing clipped, nothing hidden in a sideways strip). Each picture opens full size; the screens that scroll open the full page.</p>
-<div class="filter" role="group" aria-label="Show"><button data-f="all" aria-pressed="true">All</button><button data-f="1366" aria-pressed="false">1366 px</button><button data-f="1280" aria-pressed="false">1280</button><button data-f="1024" aria-pressed="false">1024</button><button data-f="820" aria-pressed="false">820</button><button data-f="390" aria-pressed="false">390 px</button><button data-f="light" aria-pressed="false">Light</button><button data-f="dark" aria-pressed="false">Dark</button></div>
+<p class="note">${groups.length} screens × 1366 and 390 px × light (dark mode is parked by the owner, 2026-10-23), plus the screens whose layout changes at 1280, 1024 and 820 px. Every screen is also checked at all five widths (no sideways scroll, nothing clipped, nothing hidden in a sideways strip). Each picture opens full size; the screens that scroll open the full page.</p>
+<div class="filter" role="group" aria-label="Show"><button data-f="all" aria-pressed="true">All</button><button data-f="1366" aria-pressed="false">1366 px</button><button data-f="1280" aria-pressed="false">1280</button><button data-f="1024" aria-pressed="false">1024</button><button data-f="820" aria-pressed="false">820</button><button data-f="390" aria-pressed="false">390 px</button></div>
 <div class="shots" id="shots">${tiles}</div>
 </div>
 <script>
