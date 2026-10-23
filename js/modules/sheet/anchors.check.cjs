@@ -116,7 +116,11 @@ const MEASURE = () => {
                         return { pupil: window.sheetDocument(o.pupilHtml, 'p'), key: window.sheetDocument(o.keyHtml, 'k'), n: (o.anchors && o.anchors.examples || []).length };
                     }, req);
                 } catch (e) { console.log(`ERR ${key} ${mode} ${size}: ${e.message.split('\n')[0]}`); fail++; continue; }
-                if (!r.n) continue;
+                if (!r.n) {
+                    // (subtraction:sub_1k_regroup has no workedSteps provider: it prints no anchor)
+                    if (PILOT.includes(key) && mode === 'side' && size === 'S') console.log(`NOTE ${key}: no anchor (no workedSteps) - nothing to check`);
+                    continue;
+                }
                 for (const [part, html] of [['pupil', r.pupil], ['key', r.key]]) {
                     await doc.setContent(html, { waitUntil: 'load', timeout: 60000 });
                     await doc.evaluate(() => document.fonts && document.fonts.ready);
