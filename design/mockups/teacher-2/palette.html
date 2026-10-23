@@ -37,6 +37,10 @@
 
   <h2>Where board C moved from the site’s colours</h2>
   <div id="moved"></div>
+  <h3>Fix round 1 (2026-10-23): Operations muted</h3>
+  <p class="note">Critic round 1 found the Operations violet #5B1FAB the one saturated colour on a muted board, and Operations leads every grade 1–5 list, so the first screen opened on violet. It is now a dusty ink-indigo, <b>#2E2B71</b> (CIELAB chroma 46, was 83). It was the least saturated colour the §2.8 thresholds allow there: a lighter or greyer violet falls within 12 of Fractions plum or Data blue under protanopia or deuteranopia, or within 20 of them with normal vision. Its closest pairs: OA–NF 12.3 under protanopia (needs 12) and 21.7 with normal vision (needs 20); OA–DATA 22.3. Text on it is cream, 11.6 : 1.</p>
+  <h3>Margins to watch</h3>
+  <p class="note">Two text-on-bold pairs pass with little room: warm ink on Geometry teal #278E8D is <b>4.57 : 1</b> and cream on Data blue #486E9C is <b>4.93 : 1</b> (both need 4.5). Any change to either shade must be re-checked with <code>node tests/scripts/ws-teacher-tokens.cjs</code> before it is shown. The colour-blind pairs closest to their lines are DATA–G under deuteranopia (12.8) and OA–NF under protanopia (12.3).</p>
   <h2>Boards B and A (reference pictures only)</h2>
   <p class="note">Board B (saturated, on white) was chosen on 2026-10-23 and replaced the same day by board C; board A (six areas) was not chosen. Both are kept as static pictures so the choice can be revisited; the mock-up uses board C only.</p>
   <img class="board" src="board-b.png" alt="Board B: eight saturated maths-area colours in four strengths, for reference">

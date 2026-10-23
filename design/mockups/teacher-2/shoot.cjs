@@ -15,7 +15,11 @@ const FLOWS = require('./flows.js');
 const DIR = __dirname; const SHOTS = path.join(DIR, 'shots');
 const args = process.argv.slice(2); const NO_SHOTS = args.includes('--no-shots');
 const EXE = fs.existsSync('/opt/pw-browsers/chromium') ? '/opt/pw-browsers/chromium' : undefined;
-const SIZES = { 1366: { width: 1366, height: 768 }, 390: { width: 390, height: 844 } };
+const SIZES = { 1366: { width: 1366, height: 768 }, 1280: { width: 1280, height: 800 }, 1024: { width: 1024, height: 768 }, 820: { width: 820, height: 1180 }, 390: { width: 390, height: 844 } };
+// Every screen is CHECKED at all five widths (§2.9: no sideways scroll at 1366 / 1280 / 1024 / 820 / 390, nothing clipped
+// inside a panel, nothing hidden in a sideways strip). PNGs: the full set at 1366 and 390, light and dark; the middle
+// widths in light for the screens whose layout changes there (MID_SHOTS).
+const MID_SHOTS = new Set(['skills-tray', 'lessons', 'lesson-panel', 'print-mixed', 'quiz', 'classes-progress', 'classes-quizzes', 'chip']);
 
 // name, label, url (relative to teacher-2/), primary at 1366?, full page too?, only these widths/themes?
 const SCREENS = [
@@ -40,13 +44,15 @@ const SCREENS = [
   ['quiz-share', 'Quiz: Share with pupils', 'app.html?tray=demo3#quizshare', true, false],
   ['share', 'Share: code and link at once', 'app.html?tray=demo3#share', true, false],
   ['share-more', 'Share: More options (Quick Start link)', 'app.html?tray=demo3&more=1#share', true, false],
-  ['chip', 'A chip’s own options', 'app.html?tray=demo3#chip/addition:add_word_problems', true, false],
+  ['chip', 'A chip’s own options (the skill’s real options)', 'app.html?tray=demo3#chip/addition:add_word_problems', true, false],
+  ['chip-preset', 'A preset skill’s options (values already set)', 'app.html?tray=multiplication:mult_2by2_standard,measurement:time_hour#chip/multiplication:mult_2by2_standard', true, false],
+  ['set-confirm', 'Opening a set when the tray has skills: use it or add it', 'app.html?tray=demo3&browse=sets&confirm=0#skills', true, false],
   ['board', 'Show on the board', 'app.html?tray=demo3#board', true, false],
   ['lessons', 'Lessons (opens where you were last)', 'app.html#lessons', true, true],
   ['lesson-panel', 'Lessons: the lesson panel (phone opens it full screen)', 'app.html#lessonpanel', true, false],
   ['lesson-print', 'Print lesson', 'app.html#lessonprint', true, false],
   ['classes', 'Classes: Run on the board', 'app.html#classes', true, true],
-  ['classes-results', 'Classes: Quiz results (this device only)', 'app.html?ctab=results#classes', false, false],
+  ['classes-quizzes', 'Classes: Quizzes (my saved quizzes, results on this device)', 'app.html?ctab=quizzes#classes', false, true],
   ['classes-map', 'Classes: MAP tests', 'app.html?ctab=map#classes', true, false],
   ['classes-progress', 'Classes: Progress', 'app.html?ctab=progress#classes', false, false],
   ['profile', 'Profile menu', 'app.html#profile', false, false],
@@ -58,6 +64,15 @@ async function screenReport(page, w) {
     const vw = innerWidth, vh = innerHeight;
     if (document.documentElement.scrollWidth > vw + 1) out.problems.push(`sideways scroll: ${document.documentElement.scrollWidth}px wide`);
     const hit = (el) => { const r = el.getBoundingClientRect(); if (!r.width || !r.height) return false; const x = r.left + r.width / 2, y = r.top + r.height / 2; if (x < 0 || y < 0 || x > vw || y > vh) return false; const t = document.elementFromPoint(x, y); return !!t && (t === el || el.contains(t)); };
+    // clipped inside a panel (overflow hidden) or hidden in a sideways strip (overflow auto/scroll), as the critic's probe
+    for (const el of document.querySelectorAll('button, .btn, td, th')) {
+      const r = el.getBoundingClientRect(); if (!r.width || el.closest('.page, .thumb, [hidden]')) continue;
+      for (let e = el.parentElement; e; e = e.parentElement) {
+        const cs = getComputedStyle(e); if (!/(hidden|auto|scroll|clip)/.test(cs.overflowX)) continue;
+        const c = e.getBoundingClientRect(); if (r.right > c.right + 1 || r.left < c.left - 1) out.problems.push(`${/(auto|scroll)/.test(cs.overflowX) ? 'hidden in a sideways strip' : 'clipped'}: “${el.textContent.trim().slice(0, 24)}” by ${Math.round(Math.max(r.right - c.right, c.left - r.left))}px in .${String(e.className).split(' ')[0]}`);
+        break;
+      }
+    }
     const prim = [...document.querySelectorAll('.btn-primary')].filter(hit);
     out.primaries = prim.length; out.primaryBottom = prim.length ? Math.round(prim[0].getBoundingClientRect().bottom) : null; out.primaryText = prim.map(p => p.textContent.trim()).join(' | ');
     if (prim.length > 1) out.problems.push(`${prim.length} primary buttons visible: ${out.primaryText}`);
@@ -116,7 +131,7 @@ async function runFlow(browser, base, f, w) {
   fs.mkdirSync(SHOTS, { recursive: true });
   const { server, base } = await startServer();
   const browser = await chromium.launch({ executablePath: EXE });
-  let failed = 0; const shots = [];
+  let failed = 0, checked = 0; const shots = [];
   try {
     for (const b of ['a', 'b']) if (args.includes('--boards') || !fs.existsSync(path.join(DIR, `board-${b}.png`))) {
       const p = await browser.newPage({ viewport: { width: 1024, height: 700 } });
@@ -125,7 +140,7 @@ async function runFlow(browser, base, f, w) {
       console.log(`board-${b}.png drawn`);
     }
     for (const [name, label, url, primary, full] of SCREENS) {
-      for (const w of [1366, 390]) for (const theme of ['light', 'dark']) {
+      for (const w of [1366, 1280, 1024, 820, 390]) for (const theme of (w === 1366 || w === 390 ? ['light', 'dark'] : ['light'])) {
         const page = await browser.newPage({ viewport: SIZES[w] });
         const errors = []; page.on('pageerror', e => errors.push(e.message)); page.on('console', m => { if (m.type() === 'error' && !/favicon|404/.test(m.text())) errors.push(m.text()); });
         const u = url.includes('?') ? url.replace('?', `?theme=${theme}&`) : url.replace('app.html', `app.html?theme=${theme}`);
@@ -135,10 +150,12 @@ async function runFlow(browser, base, f, w) {
         if (errors.length) rep.problems.push('console: ' + errors.join('; '));
         if (w === 1366 && primary && (rep.primaries !== 1 || rep.primaryBottom > 768)) rep.problems.push(`primary action not above the fold at 1366x768 (${rep.primaries} visible, bottom ${rep.primaryBottom})`);
         const file = `${name}-${w}-${theme}.png`;
-        if (!NO_SHOTS) await page.screenshot({ path: path.join(SHOTS, file) });
+        const keep = w === 1366 || w === 390 || MID_SHOTS.has(name);
+        if (!NO_SHOTS && keep) await page.screenshot({ path: path.join(SHOTS, file) });
         let fullFile = null;
-        if (full && rep.height > SIZES[w].height + 40 && !NO_SHOTS) { fullFile = `${name}-${w}-${theme}-full.png`; await page.screenshot({ path: path.join(SHOTS, fullFile), fullPage: true }); }
-        shots.push({ name, label, w, theme, file, fullFile, primary: rep.primaryText, problems: rep.problems });
+        if (full && keep && (w === 1366 || w === 390) && rep.height > SIZES[w].height + 40 && !NO_SHOTS) { fullFile = `${name}-${w}-${theme}-full.png`; await page.screenshot({ path: path.join(SHOTS, fullFile), fullPage: true }); }
+        if (keep) shots.push({ name, label, w, theme, file, fullFile, primary: rep.primaryText, problems: rep.problems });
+        else checked++;
         const tag = rep.problems.length ? 'FAIL' : 'ok  ';
         if (rep.problems.length) failed++;
         console.log(`${tag} ${file.padEnd(36)} primary: ${(rep.primaryText || '—').padEnd(22)} ${rep.problems.join(' · ')}${rep.small.length ? ' (small: ' + rep.small.join(', ') + ')' : ''}`);
@@ -156,7 +173,7 @@ async function runFlow(browser, base, f, w) {
     fs.writeFileSync(path.join(DIR, 'flows-check.js'), `// GENERATED by shoot.cjs: the flows as clicked in the mock-up.\nwindow.MQ_FLOW_CHECK = ${JSON.stringify({ when: new Date().toISOString().slice(0, 10), results }, null, 1)};\n`);
     if (!NO_SHOTS) writeIndex(shots, results);
   } finally { await browser.close(); server.close(); }
-  console.log(failed ? `\nshoot: FAIL (${failed})` : `\nshoot: OK (${shots.length} screens, ${FLOWS.length * 2} flow runs)`);
+  console.log(failed ? `\nshoot: FAIL (${failed})` : `\nshoot: OK (${shots.length} pictures + ${checked} more checks at 1280 / 1024 / 820, ${FLOWS.length * 2} flow runs)`);
   process.exit(failed ? 1 : 0);
 })();
 
@@ -178,14 +195,15 @@ function writeIndex(shots, results) {
   <a class="tile" href="app.html"><b>The mock-up</b><span>Skills (opens here) with the tray, the worksheet sheet, Quiz, Share, Lessons, Classes and the profile menu. Works at any width; Theme is in the profile menu, or add ?theme=dark.</span></a>
   <a class="tile" href="flows.html"><b>The flows</b><span>Each job with its steps and clicks, today’s count beside it, and a “Walk it” button that shows each click in the mock-up.</span></a>
   <a class="tile" href="palette.html"><b>Colour: board C</b><span>Eight maths areas in four strengths, light and dark, the colour-blind check, where each colour moved from the site, and boards B and A as reference pictures.</span></a>
+  <a class="tile" href="thumbs.html"><b>Every skill’s thumbnail</b><span>All 715 live skills with the drawing their card shows, picked by category and skill id; <code>thumbs-check.cjs</code> holds each to its name.</span></a>
   <a class="tile" href="files.html"><b>Teacher files: live and branches</b><span>Which teacher files are live, which are only on a branch, and what T2–T6 does with each (STATUS §7).</span></a>
 </div>
 <h2>The flows at a glance</h2>
 <div class="scroll"><table><thead><tr><th>Task</th><th>Steps</th><th>Clicked 1366 / 390</th><th>Plan</th><th>Today</th><th></th></tr></thead><tbody>${flowRows}</tbody></table></div>
 <p class="note">Clicked = actions counted by shoot.cjs in this mock-up (clicks, typed searches and any scroll it needed).</p>
 <h2>Every screen</h2>
-<p class="note">${groups.length} screens × 1366 and 390 px × light and dark. Each picture opens full size; the screens that scroll open the full page.</p>
-<div class="filter" role="group" aria-label="Show"><button data-f="all" aria-pressed="true">All</button><button data-f="1366" aria-pressed="false">1366 px</button><button data-f="390" aria-pressed="false">390 px</button><button data-f="light" aria-pressed="false">Light</button><button data-f="dark" aria-pressed="false">Dark</button></div>
+<p class="note">${groups.length} screens × 1366 and 390 px × light and dark, plus the screens whose layout changes at 1280, 1024 and 820 px. Every screen is also checked at all five widths (no sideways scroll, nothing clipped, nothing hidden in a sideways strip). Each picture opens full size; the screens that scroll open the full page.</p>
+<div class="filter" role="group" aria-label="Show"><button data-f="all" aria-pressed="true">All</button><button data-f="1366" aria-pressed="false">1366 px</button><button data-f="1280" aria-pressed="false">1280</button><button data-f="1024" aria-pressed="false">1024</button><button data-f="820" aria-pressed="false">820</button><button data-f="390" aria-pressed="false">390 px</button><button data-f="light" aria-pressed="false">Light</button><button data-f="dark" aria-pressed="false">Dark</button></div>
 <div class="shots" id="shots">${tiles}</div>
 </div>
 <script>

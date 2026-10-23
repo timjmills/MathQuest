@@ -27,7 +27,8 @@
  *                the dark light-version >= 7 on the dark tint; the neutrals and the primary button too;
  *   7. tokens    the token CSS uses exactly these values (colours, both themes) and exactly the §2.8 scales
  *                (type 12 14 16 20 28 36, weights 500 700, spacing 4 8 16 24 32 48, radii 8 16, two shadows, 44 px controls);
- *   8. mock-up   the mock-up's own CSS (app.css beside the token file) uses no raw colour, font size, weight, radius or shadow.
+ *   8. mock-up   the mock-up's own CSS (app.css beside the token file) uses no raw colour, font size, weight, radius or shadow;
+ *   9. script    the mock-up's app.js writes no inline style (no style="…", no element.style; the body scroll lock excepted).
  * The other §2.8 rules (one ink fill per screen, area colours only under data-domain, chips outlined and ringed, ...) are
  * screen checks: they join this gate in T2 with the real screens.
  */
@@ -260,6 +261,19 @@ function parseBlocks(css) {
     });
   }
   row('mock-up CSS: no raw colour, size, weight, radius or shadow', raw.length ? raw.length + ' found' : 'app.css clean', '0', raw.slice(0, 6).join('; '), !raw.length);
+
+  // 9. the mock-up's script writes no inline styles (critic r1 D3: app.js injected raw heights, widths and a scale that
+  //    check 8 could not see). Every style="…" attribute and every element.style assignment in app.js is a failure,
+  //    except document.body.style.overflow (the scroll lock while a sheet is open, a behaviour, not a look).
+  const appJs = path.join(path.dirname(CSS_FILE), 'app.js'); const inl = [];
+  if (fs.existsSync(appJs)) {
+    fs.readFileSync(appJs, 'utf8').split('\n').forEach((line, i) => {
+      const at = `app.js:${i + 1}`;
+      for (const m of line.matchAll(/style\s*=\s*["'`\\]/g)) inl.push(`${at} style attribute`);
+      for (const m of line.matchAll(/\.style\.([\w-]+)\s*=|\.style\.setProperty|\.style\.cssText/g)) if (!/document\.body\.style\.overflow\s*=/.test(line)) inl.push(`${at} .style.${m[1] || 'set'}`);
+    });
+  }
+  row('mock-up script: no inline styles in app.js', inl.length ? inl.length + ' found' : 'app.js clean', '0', inl.slice(0, 6).join('; '), !inl.length);
 
   // ---------------------------------------------------------------- print
   console.log('ws-teacher-tokens — board C palette (the Awsaj look, owner 2026-10-23) under the IMPROVEMENT_PLAN §2.7 / §2.8 rules');

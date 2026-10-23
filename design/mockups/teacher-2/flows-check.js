@@ -24,8 +24,8 @@ window.MQ_FLOW_CHECK = {
    "error": ""
   },
   "mixed-3@390": {
-   "actions": 6,
-   "scrolls": 1,
+   "actions": 5,
+   "scrolls": 0,
    "steps": 3,
    "ok": true,
    "error": ""
@@ -52,8 +52,22 @@ window.MQ_FLOW_CHECK = {
    "error": ""
   },
   "set-3@390": {
-   "actions": 6,
-   "scrolls": 1,
+   "actions": 5,
+   "scrolls": 0,
+   "steps": 3,
+   "ok": true,
+   "error": ""
+  },
+  "mixed-3-search@1366": {
+   "actions": 8,
+   "scrolls": 0,
+   "steps": 3,
+   "ok": true,
+   "error": ""
+  },
+  "mixed-3-search@390": {
+   "actions": 8,
+   "scrolls": 0,
    "steps": 3,
    "ok": true,
    "error": ""
@@ -66,8 +80,8 @@ window.MQ_FLOW_CHECK = {
    "error": ""
   },
   "board@390": {
-   "actions": 4,
-   "scrolls": 1,
+   "actions": 3,
+   "scrolls": 0,
    "steps": 3,
    "ok": true,
    "error": ""
@@ -80,8 +94,8 @@ window.MQ_FLOW_CHECK = {
    "error": ""
   },
   "quiz-paper@390": {
-   "actions": 4,
-   "scrolls": 1,
+   "actions": 3,
+   "scrolls": 0,
    "steps": 3,
    "ok": true,
    "error": ""
@@ -108,8 +122,8 @@ window.MQ_FLOW_CHECK = {
    "error": ""
   },
   "quiz-online@390": {
-   "actions": 5,
-   "scrolls": 1,
+   "actions": 4,
+   "scrolls": 0,
    "steps": 4,
    "ok": true,
    "error": ""
@@ -125,6 +139,34 @@ window.MQ_FLOW_CHECK = {
    "actions": 4,
    "scrolls": 0,
    "steps": 4,
+   "ok": true,
+   "error": ""
+  },
+  "lesson-other@1366": {
+   "actions": 6,
+   "scrolls": 0,
+   "steps": 4,
+   "ok": true,
+   "error": ""
+  },
+  "lesson-other@390": {
+   "actions": 6,
+   "scrolls": 0,
+   "steps": 4,
+   "ok": true,
+   "error": ""
+  },
+  "my-quizzes@1366": {
+   "actions": 4,
+   "scrolls": 0,
+   "steps": 3,
+   "ok": true,
+   "error": ""
+  },
+  "my-quizzes@390": {
+   "actions": 4,
+   "scrolls": 0,
+   "steps": 3,
    "ok": true,
    "error": ""
   },
