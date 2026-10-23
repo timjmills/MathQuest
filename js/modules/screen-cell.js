@@ -122,7 +122,8 @@ export function cellKindFor(q) {
         const T = Math.max(A.length, B.length) + 1;
         if (ANS.length <= T) {
             const noRegroup = q.regroup === false || pay.regroup === false || pay.regroup === 'none';
-            return { kind: 'stack', T, ...p, ...(noRegroup ? { regroup: false } : {}) };
+            const strip = Number(pay.ansDigits) > 0 && pay.regroup === false && p.op === '-' ? Math.max(Number(pay.ansDigits), ANS.length) : 0;
+            return { kind: 'stack', T, ...p, ...(noRegroup ? { regroup: false } : {}), ...(pay.commas ? { commas: true } : {}), ...(strip ? { strip } : {}) };
         }
     }
     // div_facts' Long-division form (divForm 'long'): the kit bracket on every screen host, so it
@@ -350,9 +351,20 @@ export function stackHTML(k, { idPrefix = '', regroup = true, answerClass = 'col
     const T = Math.max(k.T || 0, strip + 1, d + 1);
     const seg = (i, n) => (n <= 1 ? 'only' : i === 0 ? 'first' : i === n - 1 ? 'last' : 'mid');
     const tracks = (str) => [...String(str).padStart(T, ' ')];
+    // TY-24: thousands commas (k.commas, from 5 digits) in their own 0.3 em track, as on paper
+    // (sheet/cells/stack.js stackSeps): one separator cell in every track row, the answer strip
+    // broken there into two outlines.
+    const seps = k.commas ? Array.from({ length: T }, (_, i) => i).filter((i) => i >= 1 && [3, 6].includes(T - 1 - i)) : [];
+    const sepAfter = (i) => seps.includes(i);
+    const segAt = (i, first) => {
+        if (!seps.length) return seg(i - first, T - first);
+        let gs = first, ge = T - 1;
+        for (const sp of seps) { if (sp < i && sp + 1 > gs) gs = sp + 1; if (sp >= i && sp < ge) ge = sp; }
+        return seg(i - gs, ge - gs + 1);
+    };
     const cells = [];
     if (heads && T >= 3) {
-        for (let i = 0; i < T; i++) cells.push(`<span class="head">${i === 0 ? '' : ['O', 'T', 'H', 'Th', 'TTh', 'HTh'][T - 1 - i] || ''}</span>`);
+        for (let i = 0; i < T; i++) { cells.push(`<span class="head">${i === 0 ? '' : ['O', 'T', 'H', 'Th', 'TTh', 'HTh'][T - 1 - i] || ''}</span>`); if (sepAfter(i)) cells.push('<span class="head"></span>'); }
         cells.push('<span class="headcap"></span>');
     }
     // Regroup strip (VA-10): above every column except the ones for an addition (and never the
@@ -384,21 +396,23 @@ export function stackHTML(k, { idPrefix = '', regroup = true, answerClass = 'col
         tracks(num).forEach((ch, i) => {
             if (i === 0 && last) cells.push(`<span class="op">${opGlyph(k.op)}</span>`);
             else cells.push((tdRows && tdRows[r][i] && touchDigit(ch, true, to)) || `<span>${ch === ' ' ? '' : ch}</span>`);
+            if (sepAfter(i)) cells.push(`<span class="sep">${/[0-9]/.test(ch) ? ',' : ''}</span>`);
         });
         if (!last) cells.push('<span class="gap"></span>');
     });
     cells.push('<span class="rule"></span>');
     for (let i = 0; i < T; i++) {
         const at = i - (T - strip);
-        if (at < 0) { cells.push('<span class="ab mq-ab-empty"></span>'); continue; }
+        if (at < 0) { cells.push('<span class="ab mq-ab-empty"></span>'); if (sepAfter(i)) cells.push('<span class="ab sep"></span>'); continue; }
         const place = PLACES[T - 1 - i] || `place ${T - i}`;
-        cells.push(`<span class="ab" data-ws-seg="${seg(at, strip)}"><input type="text" class="${answerClass} mq-digit" data-slot="ans-${T - 1 - i}" data-ws-slot="ans-${T - 1 - i}" data-ws-shape="box"`
+        cells.push(`<span class="ab" data-ws-seg="${seps.length ? segAt(i, T - strip) : seg(at, strip)}"><input type="text" class="${answerClass} mq-digit" data-slot="ans-${T - 1 - i}" data-ws-slot="ans-${T - 1 - i}" data-ws-shape="box"`
             + ` inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" spellcheck="false"`
             + ` aria-label="answer, ${place} digit" data-_col-adv-attached="1"${idPrefix ? ` data-mq-stack="${attr(idPrefix)}"` : ''}></span>`);
+        if (sepAfter(i)) cells.push('<span class="ab sep"></span>');
     }
     const label = operands.join(` ${spokenOp(k.op)} `);
     return `<div class="ws-sheet mq-kit" role="group" aria-label="${attr(label)}">`
-        + `<div class="ws-stack${rg ? ' wide' : ''}${operands.length > 2 ? ' mq-multi' : ''}" style="--t:${T}" data-ws-slot="answer" data-ws-shape="open">${cells.join('')}</div></div>`;
+        + `<div class="ws-stack${rg ? ' wide' : ''}${operands.length > 2 ? ' mq-multi' : ''}" style="--t:${T}${seps.length ? `;grid-template-columns:${Array.from({ length: T }, (_, i) => `var(--ws-track)${sepAfter(i) ? ' 0.3em' : ''}`).join(' ')}` : ''}" data-ws-slot="answer" data-ws-shape="open">${cells.join('')}</div></div>`;
 }
 
 /**

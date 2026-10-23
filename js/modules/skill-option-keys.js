@@ -181,6 +181,9 @@ export const MULTI_KEYS = Object.freeze({
     ftTrap: '5T',        // function tables (lesson 5, 2026-10-16): row 1 fits a + and a × rule
     ftFactors: '5U',     // function tables (lesson 5 r2): the × / ÷ numbers a rule may use (any | 2, 5 and 10)
     // NEXT FREE IN BLOCK 3: 3C.
+    // Sub-range 3N-3Z (build lane operations): SU-C pilot, 2026-10-23.
+    zeros: '3N',         // sub_*_no_regroup from within 1,000: zero cases off / on (a section of them)
+    // NEXT FREE IN 3N-3Z: 3P.
 
     // Block 4 — SUPPORTS (S2: `cover` and `mix` are live; `touch` is unused - touch dots are
     // values of the unified `support` set; `anchors` is the sheet-level S6 request field)
@@ -342,7 +345,8 @@ export const VALUE_TOKENS = Object.freeze({
     blank: Object.freeze({ column: 'C', row: 'R' }),
     line: Object.freeze({ plotted: 'P', mark: 'M', ends: 'E' }),
     closeness: Object.freeze({ far: 'F', close: 'C', some: 'S' }),
-    lengths: Object.freeze({ equal: 'E', mixed: 'M' }),
+    lengths: Object.freeze({ equal: 'E', mixed: 'M', same: 'S', shorter: 'H' }),   // same / shorter: sub_*_no_regroup (2026-10-23)
+    zeros: Object.freeze({ off: 'F', on: 'N' }),
     source: Object.freeze({ word: 'W', expanded: 'E', numeral: 'N' }),
     rename: Object.freeze({ standard: 'S', more: 'M' }),
     // block 2 (2026-09-25)

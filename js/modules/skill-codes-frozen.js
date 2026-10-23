@@ -359,6 +359,9 @@ export const FROZEN_SKILL_CODES = {
     "measurement:order_notes": "X3", "measurement:money_amount_in_words": "X4", "number_theory:sort_prime_composite": "YV",
     "number_theory:list_multiples": "YW", "number_theory:missing_multiples": "YX", "number_theory:common_factors": "YY",
     "number_theory:common_multiples": "YZ",
+    // ---- 2026-10-23 SU-C pilot preset (2-digit − 1-digit, no regrouping). Pinned at Y6, the first free code after
+    // Y5, NOT the auto assigner's VH (a dropped draft keeps VH unused). APPEND ONLY. ----
+    "subtraction:sub_2d_1d": "Y6",
 };
 
 // Per-category positional order (index = the number used by settings codes, MX- codes and

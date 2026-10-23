@@ -18,7 +18,7 @@ Critic rounds: 0, none
 
 ## Times
 Times: gate step 1 ws-spec-card --check-signed, start 2026-10-23T16:43Z, end 2026-10-23T16:44Z, profile — (OK)
-Times: builder step 2 (one run, all six + sub_2d_1d), start 2026-10-23T16:46Z, end —, profile mq-opus-low
+Times: builder step 2 (one run, all six + sub_2d_1d), start 2026-10-23T16:46Z, end 2026-10-23T18:28Z, profile mq-opus-low, tokens 320k, 139 tool uses (102 min, of which ws-precritic ≈ 30 min)
 Times: merge W0-A wave0-gates (coverage-matrix baseline), start 2026-10-23T16:44Z, end 2026-10-23T16:45Z, profile —
 
 ## Log

@@ -995,6 +995,25 @@ const _opsBar = () => ({
     help: 'A part-part-whole bar drawn under every story, the unknown part left empty. None is the fade.',
 });
 
+const _subLengths = () => ({
+    id: 'lengths', label: 'Number lengths', type: 'enum', default: 'same', group: 'difficulty',
+    values: [
+        { v: 'same', l: 'Same length (86 − 42)' },
+        { v: 'shorter', l: 'Bottom number one digit shorter (86 − 4, 486 − 52)' },
+    ],
+    help: 'Shorter puts a number with one digit fewer under the top number, lined up under the ones. '
+        + 'Make it its own section: teach shorter first, then same length.',
+});
+const _subZeros = () => ({
+    id: 'zeros', label: 'Zeros', type: 'enum', default: 'off', group: 'difficulty',
+    values: [
+        { v: 'off', l: 'No zero cases' },
+        { v: 'on', l: 'Zero cases (405 − 203, 58 − 30, 47 − 47, 486 − 452)' },
+    ],
+    help: 'On makes every problem a zero case: a 0 in the top number, taking away 0, a column that '
+        + 'leaves 0, or an answer with fewer digits. Give it its own section.',
+});
+
 const P11_OPS_OPTIONS = {
     // --- fact drills: the band and a fading picture cue sit beside the fact set -----------------
     'addition:add_facts': [constantOption(13, 'Add'), notationOption('+'), _opsFactBand(), ..._opsAddCue()],
@@ -1132,6 +1151,11 @@ for (const op of ['add', 'sub']) {
                     });
                 }
             }
+            // Column subtraction without regrouping (spec card subtraction.md §9.3 / §9.4): two plain
+            // options, each its own section. `lengths` from within 100 (within 100: 2-digit − 1-digit,
+            // the sub_2d_1d preset), `zeros` from within 1,000 (3 digits up; never seeded below).
+            if (op === 'sub' && rg === 'no_regroup' && max >= 100) opts.push({ ..._subLengths(), appliesTo: cur => !(Number(cur.band) <= 50) });
+            if (op === 'sub' && rg === 'no_regroup' && max >= 1000) opts.push({ ..._subZeros(), appliesTo: cur => !(Number(cur.band) <= 100) });
             P11_OPS_OPTIONS[`${cat}:${id}`] = opts;
         }
     }
@@ -3613,7 +3637,8 @@ const _NL_SKILLS = {
  * name declares (the line's default end); `fraction` / `decimal` = the kind of line it needs.
  */
 export function numberLineSkillHints(categoryId, skillId) {
-    const id = String(skillId);
+    const pre = presetOf(categoryId, skillId);
+    const id = String(pre ? pre.skillId : skillId);
     const out = { skip: false, step: 0, within: 0, fraction: numberLineIsFraction(categoryId, skillId), decimal: categoryId === 'decimals' || /^(f_to_d|d_to_f|order_fdp)$/.test(id) };
     // count_sequence counts in ones ("what comes after 8?"): a plain line, not a skip line (critic nl-r2 D1).
     if (/^(seq_\d+|count_by_|skip_count|number_seq_fill|number_patterns_rule|nl_mult$|nl_div$)/.test(id)) out.skip = true;
@@ -3630,8 +3655,11 @@ export function numberLineSkillHints(categoryId, skillId) {
 }
 /** Does a number line at the top of the page help this skill? (judgement per family; see above) */
 export function numberLineFits(categoryId, skillId) {
+    // A preset offers its host's controls, so it draws the line exactly when its host does.
+    const pre = presetOf(categoryId, skillId);
+    const id = pre ? pre.skillId : skillId;
     const re = _NL_SKILLS[categoryId];
-    return !!(re && re.test(String(skillId)));
+    return !!(re && re.test(String(id)));
 }
 /** A fraction skill's line counts in fractions even when every number on the page is whole. */
 export const numberLineIsFraction = (categoryId, skillId) => categoryId === 'fractions' || categoryId === 'fraction_operations' || /fraction|frac/.test(String(skillId));

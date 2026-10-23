@@ -411,7 +411,7 @@ function fitAt(info, cols, { size, look, availableWidthMm, auto }) {
     const staticW = !fp.measure && Number.isFinite(fp.wMm);
     if (staticW && fp.tracks && !fp.factLike) {
         // 12.3's digit-aware clamp for stacked work (VA-6).
-        if (cols > stackMaxColumns(fp.tracks, size, look, { regroup: !!fp.regroup, W: availableWidthMm })) return { fits: false, why: 'digits', hMin };
+        if (cols > stackMaxColumns(fp.tracks, size, look, { regroup: !!fp.regroup, separators: fp.separators || 0, W: availableWidthMm })) return { fits: false, why: 'digits', hMin };
     }
     if (staticW) {
         if (fp.wMm > inner - SAFETY_W_MM) return { fits: false, why: 'width', hMin };

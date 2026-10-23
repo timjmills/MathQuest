@@ -7,7 +7,7 @@
 // Pure module (SCC-01). A template draws inner HTML only (SCC-T5) and never chooses a type
 // size, a line weight or a grey (SCC-T3).
 
-import { opGlyph, trackMm, SIZES, factTab, stripPos } from '../tokens.js';
+import { opGlyph, trackMm, SIZES, factTab, stripPos, SEPARATOR_EM } from '../tokens.js';
 import { blank, esc } from '../cell.js';
 import { register } from '../registry.js';
 import { stepMarks, placeDigits, regroupMarks, PLACE_OFFSET } from '../steps.js';
@@ -39,7 +39,7 @@ const PLACE_NAMES = ['O', 'T', 'H', 'Th', 'TTh', 'HTh'];
  * @param {'trace'|'solid'|null} [opts.boxInk]  with `answer: 'boxes'` and `ans`, the digits are
  *        drawn INSIDE the boxes, so a key laid over a Guided page lines up exactly (SCC-T10).
  */
-export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'open', grey = false, ans = null, unknown = null, slots = null, unknownSlot = null, regroupSlots = null, boxInk = null, ansTracks = 0, trackInk = null, touch = null, strikes = null, rings = null } = {}) {
+export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'open', grey = false, ans = null, unknown = null, slots = null, unknownSlot = null, regroupSlots = null, boxInk = null, ansTracks = 0, trackInk = null, touch = null, strikes = null, rings = null, seps = null } = {}) {
     // `a` may be an ARRAY of the rows above the operator row (three or four addends, CM-5/CM-6):
     // every one of them sits on the digit tracks with an empty operator track (VA-2).
     const tops = (Array.isArray(a) ? a : [a]).map(String);
@@ -51,6 +51,18 @@ export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'o
     const nAns = ansTracks > 0 ? Math.min(ansTracks, t) : t;
     const firstAns = t - nAns;
     const pad = (s) => [...s.padStart(t, ' ')];
+    // TY-24 / VA-40: thousands commas (5 digits and up) take their own 0.3 em separator track,
+    // after each track index in `seps`. Every track row gets the separator cell, so the columns
+    // stay aligned; the answer strip breaks there into two outlines (a narrow fixed gap, never a box).
+    const sepSet = Array.isArray(seps) && seps.length ? new Set(seps) : null;
+    const J = (cells, sep) => (sepSet ? cells.map((c, i) => (sepSet.has(i) ? c + (sep ? sep(i) : '<span></span>') : c)).join('') : cells.join(''));
+    const segOf = (i, first) => {
+        if (!sepSet) return stripPos(i - first, t - first);
+        let gs = first, ge = t - 1;
+        for (const sp of sepSet) { if (sp < i && sp + 1 > gs) gs = sp + 1; if (sp >= i && sp < ge) ge = sp; }
+        return stripPos(i - gs, ge - gs + 1);
+    };
+    const isDigit = (ch) => typeof ch === 'string' && /[0-9]/.test(ch);
     // LS-8: one digit of the stack is unknown -> a short-dash digit box in its own track.
     const hole = (rowId, i) => unknown && unknown.row === rowId && unknown.index === i;
     const glyph = (ch, rowId, i) => (hole(rowId, i)
@@ -58,7 +70,7 @@ export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'o
         : ch === ' ' ? '' : ch);
     // S2: `touch` = {rows: [one boolean per track, per operand row], o}: touch dots on those digits,
     // column by column (support-draw.js touchColumns). The overlay takes no space.
-    const row = (chars, first = '', rowId = '', tRow = null) => chars.map((ch, i) => {
+    const row = (chars, first = '', rowId = '', tRow = null) => J(chars.map((ch, i) => {
         if (i === 0 && first) return `<span class="op">${first}</span>`;
         const td = tRow && tRow[i] && !hole(rowId, i) ? touchDigit(ch, true, touch.o) : null;
         // VA-23: a Model cell crosses out a regrouped top digit with a solid diagonal - 0.75 pt
@@ -79,7 +91,7 @@ export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'o
                 + `stroke-width="${grey ? '1pt' : '0.75pt'}" vector-effect="non-scaling-stroke"/></svg></span>`;
         }
         return td || `<span>${glyph(ch, rowId, i)}</span>`;
-    }).join('');
+    }), (i) => `<span class="sep">${isDigit(chars[i]) ? ',' : ''}</span>`);
     const tr = (k) => (touch && Array.isArray(touch.rows) ? touch.rows[k] : null);
     const g = grey ? ' ws-grey' : '';
     // On screen the carry box is a real (ungraded) input in the same track; on paper it is the
@@ -87,7 +99,7 @@ export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'o
     const rgBox = (i) => (regroupSlots ? (regroupSlots[i] || '<i></i>') : '<i></i>');
     let html = '';
     if (heads) {
-        html += Array.from({ length: t }, (_, i) => `<span class="head">${i === 0 ? '' : PLACE_NAMES[t - 1 - i] || ''}</span>`).join('') + `<span class="headcap"></span>`;
+        html += J(Array.from({ length: t }, (_, i) => `<span class="head">${i === 0 ? '' : PLACE_NAMES[t - 1 - i] || ''}</span>`), () => '<span class="head"></span>') + `<span class="headcap"></span>`;
     }
     // VA-10: one carry box above EVERY column except the ones, whether or not that column
     // regroups, so the boxes reveal nothing. VA-22: subtraction boxes come from the top
@@ -114,33 +126,35 @@ export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'o
         // `trackInk` (a step state, steps.js): one {ch, ink} per track, so the newest digits are
         // grey and the earlier ones black in the SAME boxes (P-LC-9).
         const fill = boxInk && ans !== null ? pad(String(ans)) : null;
-        html += Array.from({ length: t }, (_, i) => {
+        html += J(Array.from({ length: t }, (_, i) => {
             if (i < firstAns) return `<span class="ab${g}"></span>`;
             const tk = trackInk ? trackInk[i] : null;
             const ch = tk ? tk.ch : trackInk ? '' : fill && fill[i] !== ' ' ? fill[i] : '';
             const inkName = tk ? tk.ink : boxInk;
             const ink = ch ? ` class="${inkName === 'trace' ? 'ws-trace' : ''}" data-ws-ink="${inkName}" style="display:flex;align-items:center;justify-content:center"` : '';
-            return `<span class="ab${g}" data-ws-seg="${stripPos(i - firstAns, nAns)}"><i${ink}>${ch}</i></span>`;
-        }).join('');
+            return `<span class="ab${g}" data-ws-seg="${segOf(i, firstAns)}"><i${ink}>${ch}</i></span>`;
+        }), (i) => `<span class="ab${g} sep">${fill && isDigit(fill[i]) ? ',' : ''}</span>`);
     }
-    if (answer === 'steps' && trackInk) html += trackInk.map((tk) => (tk ? `<span class="${tk.ink === 'trace' ? 'ws-trace' : ''}" data-ws-ink="${tk.ink}">${tk.ch}</span>` : '<span></span>')).join('');
+    if (answer === 'steps' && trackInk) html += J(trackInk.map((tk) => (tk ? `<span class="${tk.ink === 'trace' ? 'ws-trace' : ''}" data-ws-ink="${tk.ink}">${tk.ch}</span>` : '<span></span>')));
     // Lessons r2 (VA-4, AK-1): the open answer zone is a REAL row, as tall as the answer strip
     // (12 mm at L, 10 mm at M), so the pupil page and its key - whose answer digits fill that
     // row - share one geometry: the key never redraws the problem higher or its Check lower.
     if (answer === 'open') html += `<span class="ansrow" aria-hidden="true"></span>`;
-    if (answer === 'traced' && ans !== null) html += pad(String(ans)).map((ch) => `<span class="ws-trace an">${ch === ' ' ? '' : ch}</span>`).join('');
-    if (answer === 'solid' && ans !== null) html += pad(String(ans)).map((ch) => `<span class="an" data-ws-ink="solid" style="font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums">${ch === ' ' ? '' : ch}</span>`).join('');
+    if (answer === 'traced' && ans !== null) { const pa = pad(String(ans)); html += J(pa.map((ch) => `<span class="ws-trace an">${ch === ' ' ? '' : ch}</span>`), (i) => `<span class="ws-trace an sep">${isDigit(pa[i]) ? ',' : ''}</span>`); }
+    if (answer === 'solid' && ans !== null) { const pa = pad(String(ans)); html += J(pa.map((ch) => `<span class="an" data-ws-ink="solid" style="font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums">${ch === ' ' ? '' : ch}</span>`), (i) => `<span class="an sep" data-ws-ink="solid">${isDigit(pa[i]) ? ',' : ''}</span>`); }
     if (answer === 'slots' && slots) {
         // A null slot is a track with no box (the operator track, SL-12): the strip skips it.
         const live = slots.filter((s) => s !== null && s !== undefined).length;
+        const firstLive = slots.findIndex((s) => s !== null && s !== undefined);
         let k = 0;
-        html += slots.map((s) => (s === null || s === undefined ? `<span class="ab"></span>`
-            : `<span class="ab" data-ws-seg="${stripPos(k++, live)}">${s}</span>`)).join('');
+        html += J(slots.map((s, i) => (s === null || s === undefined ? `<span class="ab"></span>`
+            : `<span class="ab" data-ws-seg="${sepSet ? segOf(i, firstLive) : stripPos(k++, live)}">${s}</span>`)), () => '<span class="ab sep"></span>');
     }
     // TY-21: any regroup scaffold forces 0.95 em tracks in both looks (the 'wide' class).
     // TY-2: a box is drawn with <i>, which the browser italicises; nothing in a stack is italic.
     html = html.replace(/(<i\b[^>]*?style=")/g, '$1font-style:normal;').replace(/<i(?=[ >])(?![^>]*style=)/g, '<i style="font-style:normal"');
-    return `<div class="ws-stack${regroup ? ' wide' : ''}" style="--t:${t}" data-ws-slot="answer" data-ws-shape="open">${html}</div>`;
+    const cols = sepSet ? `;grid-template-columns:${Array.from({ length: t }, (_, i) => `var(--ws-track)${sepSet.has(i) ? ` ${SEPARATOR_EM}em` : ''}`).join(' ')}` : '';
+    return `<div class="ws-stack${regroup ? ' wide' : ''}" style="--t:${t}${cols}" data-ws-slot="answer" data-ws-shape="open">${html}</div>`;
 }
 
 /* ------------------------------------------------------------------ registry template */
@@ -252,6 +266,18 @@ function checkRowHtml(p, ctx, key) {
     return `<div class="ws-checkrow"><b>Check:</b><span class="ws-checkeq">${blank(checkSlot('check-ans', d), ctx, key)}<span>+</span><span class="ws-checkn">${esc(B)}</span><span>=</span>${blank(checkSlot('check-sum', d), ctx, key)}</span></div>`;
 }
 
+/**
+ * TY-24: the thousands separators of a stack whose payload asks for commas (`commas: true`, from
+ * 5 digits up): the track indices a 0.3 em separator track follows (after the thousands place,
+ * and after the millions place). Track 0 is the operator track and never takes one.
+ */
+export function stackSeps(p, t) {
+    if (!p || !p.commas) return null;
+    const out = [];
+    for (let i = 1; i < t; i++) { const place = t - 1 - i; if (place === 3 || place === 6) out.push(i); }
+    return out.length ? out : null;
+}
+
 /** The scaffold the ladder asks for, resolved once (SCC-Q10: the ctx decides, not the generator). */
 function scaffoldOf(p, ctx) {
     const level = ctx && ctx.scaffoldLevel !== undefined ? ctx.scaffoldLevel : 1;
@@ -300,6 +326,10 @@ register('stack', {
             const ink = ctx.state === 'traced' ? 'trace' : 'solid';
             if (answer === 'boxes') boxInk = ink;
             else answer = ink === 'trace' ? 'traced' : 'solid';
+        } else if (p.traceAns && answer === 'boxes') {
+            // Support level 3 (a worked item): the answer digits printed grey IN the boxes, so the
+            // traced item keeps the boxes' geometry (SCC-T10) instead of switching to an open row.
+            boxInk = 'trace';
         }
         // SCC-T15 parity: a slot the pupil writes on paper is TYPED on screen. The printed
         // open answer zone becomes one digit input per track, in the same geometry (VA-11), the
@@ -341,7 +371,7 @@ register('stack', {
         const tm = touchMode(p);
         const rowsTd = tm ? touchColumns([...(Array.isArray(a) ? a : [a]), b], t, p.op, tm) : null;
         const drawn = stack(a, b, p.op, {
-            T: t, heads, regroup, answer, slots, regroupSlots, unknownSlot, boxInk, ansTracks: nAns, strikes,
+            T: t, heads, regroup, answer, slots, regroupSlots, unknownSlot, boxInk, ansTracks: nAns, strikes, seps: stackSeps(p, t),
             touch: rowsTd ? { rows: rowsTd, o: touchOpts(ctx.metrics ? ctx.metrics.digitPt : 28, ctx.mode === 'screen' ? 'px' : 'pt', 'solid', ctx.photocopySafe) } : null,
             grey: level === 2 && ctx.state === 'blank',
             ans: shown === undefined ? null : shown,
@@ -393,10 +423,13 @@ register('stack', {
             + (regroup ? (p.op === '-' ? s.headroomMm : s.regroupMm) : 0)
             + digitH * (p.operands ? Math.max(2, p.operands.length) : 2) + 3 + s.answerMm
             + (p.check && isSub(p) ? (ctx.metrics.textPt / 72) * 25.4 * 1.6 + 4 : 0);
+        // TY-24: each thousands separator is a 0.3 em track (commas from 5 digits up).
+        const nSep = (stackSeps(p, t) || []).length;
+        const sepMm = nSep * SEPARATOR_EM * (ctx.metrics.digitPt / 72) * 25.4;
         return {
             // A Check line is text and slots: the host measures it (lessons r1).
-            wMm: Math.ceil(t * track + 6), hMm: Math.ceil(hMm), measure: !!(p.check && isSub(p)),
-            factLike: false, maxCols: 3, tracks: t,
+            wMm: Math.ceil(t * track + sepMm + 6), hMm: Math.ceil(hMm), measure: !!(p.check && isSub(p)),
+            factLike: false, maxCols: 3, tracks: t, ...(nSep ? { separators: nSep } : {}),
         };
     },
     /**
@@ -462,7 +495,7 @@ register('stack', {
         return stack(a, b, p.op, {
             // A Guided cell (level 2) greys its boxes like every other Guided cell (SF-10, VA-10).
             grey: level === 2 && (!ctx || !ctx.state || ctx.state === 'blank'),
-            T: t, heads, regroup, answer, trackInk, ansTracks: nAns, strikes: strikes.length ? strikes : null, rings: rings.length ? rings : null,
+            T: t, heads, regroup, answer, trackInk, ansTracks: nAns, strikes: strikes.length ? strikes : null, rings: rings.length ? rings : null, seps: stackSeps(p, t),
             regroupSlots: regroup ? Array.from({ length: t }, (_, i) => regroupSlots[i] || '<i></i>') : null,
             unknown: p.unknown || null,
         });

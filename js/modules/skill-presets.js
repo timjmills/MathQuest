@@ -64,6 +64,8 @@ export const SKILL_PRESETS = Object.freeze({
     'division:div_grouping_word_problems': { skill: 'div_word_problems', opts: { forms: [1] } },
     'subtraction:sub_wp_compare': { skill: 'sub_word_problems', opts: { forms: [1] } },
     'subtraction:sub_wp_start_unknown': { skill: 'sub_word_problems', opts: { forms: [2] } },
+    // 2026-10-23 (SU-C pilot, catalogue C3): 2-digit − 1-digit without regrouping = within 100, shorter bottom number.
+    'subtraction:sub_2d_1d': { skill: 'sub_100_no_regroup', opts: { lengths: 'shorter' } },
     'integers:add_negative': { skill: 'add_int', opts: { forms: [1] } },
     'integers:sub_negative': { skill: 'sub_int', opts: { forms: [1] } },
     'fractions:identify_fraction_nl': { skill: 'identify', opts: { model: ['line'], forms: [0] } },

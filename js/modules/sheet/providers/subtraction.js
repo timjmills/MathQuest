@@ -6,7 +6,7 @@
 // basic-facts sheet. Regrouping belongs to the sub_*_regroup ladder, not here.
 
 import { registerSkill } from '../contract.js';
-import { obj, operands, countList, chooseWrong, strings, step } from './util.js';
+import { obj, operands, countList, chooseWrong, strings, step, clampSteps, fmt } from './util.js';
 import { storiesFor } from './stories.js';
 import { lineSteps } from './addition.js';
 
@@ -246,8 +246,6 @@ const COLUMN_SUB_STEPS = [
 for (const [id, iCan] of [
     ['sub_50_regroup', 'I Can subtract within 50 (with regrouping)'],
     ['sub_100_regroup', 'I Can subtract within 100 (with regrouping)'],
-    ['sub_50_no_regroup', 'I Can subtract within 50 (no regrouping)'],
-    ['sub_100_no_regroup', 'I Can subtract within 100 (no regrouping)'],
     ['sub_50_mixed', 'I Can subtract within 50'],
     ['sub_100_mixed', 'I Can subtract within 100'],
 ]) {
@@ -274,6 +272,115 @@ for (const [id, iCan] of [
                 c.regroup ? { value: c.forgotTen, misconception: 'forgot-ten', explain: 'Regrouped the ones but did not take the ten from the tens.' } : null,
                 { value: a + b, misconception: 'added', explain: 'Added instead of subtracting.' },
             ]);
+        },
+        stories: storiesFor('-'),
+    });
+}
+
+/* ========================================= column subtraction WITHOUT regrouping (SU-C) */
+// sub_{50,100,1k,10k,100k,1m}_no_regroup on the kit `stack` (spec card
+// design/cards/subtraction/subtraction.md, owner-signed 2026-10-23): line the places up,
+// subtract the ones first, then each place to the left. Nothing regroups, so SU-M1 (smaller from
+// larger) cannot show here; the wrong answers are SU-M7 (added), M-ALIGN (the shorter number
+// lined up on the left) and M-ZERO (n − 0 written as 0; a 0 inside the answer dropped).
+
+const NR_PLACES = ['ones', 'tens', 'hundreds', 'thousands', 'ten thousands', 'hundred thousands'];
+const NR_TITLE = (k) => NR_PLACES[k].charAt(0).toUpperCase() + NR_PLACES[k].slice(1);
+
+/** One place of a no-regrouping column subtraction: its digits and what is written. */
+function nrColumns(a, b) {
+    const A = String(a), B = String(b), d = A.length;
+    const diff = a - b, D = String(diff);
+    const cols = [];
+    for (let k = 0; k < d; k++) {
+        const top = Number(A[d - 1 - k]);
+        const bot = k < B.length ? Number(B[B.length - 1 - k]) : null;
+        const res = top - (bot === null ? 0 : bot);
+        // A leading 0 is never written (AK-1): the place left of the answer's own digits.
+        const lead = k >= D.length;
+        cols.push({ k, top, bot, res, lead });
+    }
+    return cols;
+}
+
+/** Worked steps: ones first, then each place to the left (5 places at most, then grouped). */
+export function columnSubNoRegroup(a, b) {
+    const cols = nrColumns(a, b);
+    const line = (c) => {
+        const mark = [{ slot: `ring:${NR_PLACES[c.k]}`, value: '' }];
+        if (!c.lead) mark.push({ slot: NR_PLACES[c.k], value: String(c.res) });
+        if (c.bot === null) return { text: `${NR_TITLE(c.k)}: nothing to take away. Write ${c.top}.`, mark };
+        if (c.lead) return { text: `${NR_TITLE(c.k)}: ${c.top} − ${c.bot} = 0. Leave the box empty.`, mark };
+        return { text: `${NR_TITLE(c.k)}: ${c.top} − ${c.bot} = ${c.res}. Write ${c.res}.`, mark };
+    };
+    const out = [];
+    const each = cols.length <= 5 ? cols : cols.slice(0, 4);
+    for (const c of each) { const l = line(c); out.push(step(l.text, l.mark)); }
+    if (cols.length > 5) {
+        const rest = cols.slice(4).map(line);
+        out.push(step(rest.map((l) => l.text).join(' '), rest.flatMap((l) => l.mark.filter((m) => !/^ring:/.test(m.slot)))));
+    }
+    if (out.length < 5) out.push(step(`Check: ${fmt(a - b)} + ${fmt(b)} = ${fmt(a)}.`));
+    else out.push(step(`The answer is ${fmt(a - b)}.`, [{ slot: 'answer', value: String(a - b) }]));
+    return clampSteps(out);
+}
+
+/** The three misconceptions that SHOW on a no-regrouping item, as wrong answers. */
+export function noRegroupWrongs(a, b) {
+    const A = String(a), B = String(b), diff = a - b, D = String(diff);
+    const out = [{ value: a + b, misconception: 'added', explain: 'Added instead of subtracting.' }];
+    // M-ALIGN: a shorter bottom number lined up on the LEFT (86 − 4 worked as 86 − 40).
+    if (B.length < A.length) {
+        const left = a - b * 10 ** (A.length - B.length);
+        if (left >= 0) out.push({ value: left, misconception: 'misaligned', explain: 'Lined the shorter number up on the left, not under the ones.' });
+    }
+    // M-ZERO1: n − 0 written as 0 (58 − 30 = 20).
+    const cols = nrColumns(a, b);
+    const z = cols.filter((c) => c.bot === 0 && c.top > 0);
+    if (z.length) {
+        const digits = D.padStart(A.length, '0').split('');
+        for (const c of z) digits[A.length - 1 - c.k] = '0';
+        const v = Number(digits.join(''));
+        if (v !== diff) out.push({ value: v, misconception: 'zero-as-zero', explain: 'Wrote 0 for a place where 0 is taken away.' });
+    }
+    // M-ZERO2: a 0 inside the answer dropped (2206 written 226).
+    if (D.length >= 2 && D.slice(1).includes('0')) {
+        const v = Number(D.replace(/0/g, '')) || null;
+        if (v && v !== diff) out.push({ value: v, misconception: 'dropped-zero', explain: 'Left out a 0 inside the answer.' });
+    }
+    return out;
+}
+
+const NR_STEPS = [
+    'Line up the places: ones under ones.',
+    'Subtract the ones. Write the answer in the ones box.',
+    'Subtract each place to the left.',
+    'Check: add the answer and the bottom number.',
+];
+for (const [id, within] of [
+    ['sub_50_no_regroup', '50'], ['sub_100_no_regroup', '100'], ['sub_1k_no_regroup', '1,000'],
+    ['sub_10k_no_regroup', '10,000'], ['sub_100k_no_regroup', '100,000'], ['sub_1m_no_regroup', '1,000,000'],
+    // the preset (host sub_100_no_regroup, lengths: shorter) gets its own I Can, the same work
+    ['sub_2d_1d', null],
+]) {
+    registerSkill(`subtraction:${id}`, {
+        strings: strings({
+            iCan: within ? `I Can subtract within ${within} (no regrouping)` : 'I Can subtract a 1-digit number from a 2-digit number',
+            instructionKey: 'subtract',
+            steps: NR_STEPS,
+            say: '__ minus __ equals __.',
+            vocabulary: ['ones', 'tens', 'line up', 'place value'],
+        }),
+        misconceptions: ['added', 'misaligned', 'zero-as-zero', 'dropped-zero'],
+        workedSteps: (q) => {
+            const [a, b] = operands(q);
+            if (!Number.isInteger(a) || !Number.isInteger(b) || a < b || b < 0) return [];
+            return columnSubNoRegroup(a, b);
+        },
+        wrongAnswer: (q) => {
+            const [a, b] = operands(q);
+            if (!Number.isInteger(a) || !Number.isInteger(b) || a < b) return null;
+            return chooseWrong(q, noRegroupWrongs(a, b));
         },
         stories: storiesFor('-'),
     });
