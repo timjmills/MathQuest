@@ -325,7 +325,7 @@ eq(ROLE_IDS.includes('independent') && ROLE_IDS.includes('more-practice'), true,
     ok(r.pupilPages[1].includes('class="mq-cont"'), 'HD-20: pages 2+ carry the continuation header');
     ok(!/ws-field date/.test(r.pupilPages[1]) && !/ws-title/.test(r.pupilPages[1]), 'HD-20: no Date and no title on a continuation page');
     ok(/data-ws-instruction="add">Add\.<\/div>/.test(r.pupilPages[3]), 'PG-22: the instruction repeats on every page');
-    ok(r.keyPages[0].includes('data-ws-key="name">Answer Key') && r.keyPages[0].includes('<span>Answer Key</span>'), 'AK-3: the key is marked on the Name rule and in the tab');
+    ok(r.keyPages[0].includes('data-ws-key="name">Answer Key') && !r.keyPages[0].includes('class="ws-tabbox'), 'AK-3: the key is marked on the Name rule (no strand tab, owner ruling 2026-10-23)');
     ok(/Key · Form A · seed 42/.test(r.keyPages[0]), 'AK-3: the key footer');
     // (a short page spends its spare height as row gaps, each row keeping the cell height)
     ok(/height:151\.33\dmm/.test(r.pupilPages[2]) || (r.pupilPages[2].match(/ws-gridrow" style="[^"]*height:75\.6[67]\d*mm/g) || []).length === 2, 'PT-ENG-6: a rebalanced page keeps the section\'s cell height (2 x 75.67 mm)');

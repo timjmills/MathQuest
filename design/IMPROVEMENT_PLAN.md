@@ -856,6 +856,11 @@ every row and asserts its action count, including the 6-action case for Lessons.
 
 ### 2.7 Colour on purpose (owner 2026-10-23)
 
+**Owner 2026-10-23: no dark mode on the teacher site for now** ("I don't like the dark mode so for now do not make a dark mode"). The
+teacher site (T1–T6, its mock-up and `ws-teacher-flows` / `ws-teacher-tokens`) is light only; dark tokens are parked unused and
+the dark gate checks skip with a note. Wherever this section or §2.8 / §2.10 says "light and dark" for teacher screens, read
+"light". **The pupil app keeps its dark mode** (and its dark contrast checks).
+
 **Strength shows rank:**
 
 | Rank | Marks | Drawn as |

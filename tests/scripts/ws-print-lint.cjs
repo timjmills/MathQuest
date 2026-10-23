@@ -962,7 +962,7 @@ function wsLintPage(cfg) {
         }
         // (not on the pack: its Daily-look panels, BD-6, set their instructions in page-local markup)
         const titled = ri.el.querySelector('.ws-title, .sheet-title, .worksheet-title');
-        const chart = /^Anchor chart$/.test(([...ri.el.querySelectorAll('.ws-tabbox span')].pop() || {}).textContent || '');
+        const chart = /^Anchor chart$/.test(([...ri.el.querySelectorAll('.ws-tabbox span')].pop() || {}).textContent || (ri.el.getAttribute('data-ws-tab') || '').split('|').pop());
         if (cfg.mode !== 'pack' && ri.cells.length && !list.length && !ri.key && !chart && titled && titled.textContent.trim()) F('L-VERBS', 'BD-10', 'minor', ri.el, `no instruction line above the cells: the task sentence is not a section instruction (BD-10: one instruction per section, never inside a cell)`, 'no instruction line');
         const HEAD_SEL = '.section-num, .worksheet-section-header, .ws-strip > b, h2, h3';
         for (const h of ri.el.querySelectorAll(HEAD_SEL)) {
@@ -1133,7 +1133,9 @@ function wsLintPage(cfg) {
             const pr = pg.getBoundingClientRect();
             tagOf(pg);
             const cs = getComputedStyle(pg);
-            const tab = [...pg.querySelectorAll('.ws-tabbox span')].map(s => s.textContent.trim());
+            const tabSpans = [...pg.querySelectorAll('.ws-tabbox span')].map(s => s.textContent.trim());
+            // no printed tab since the owner ruling of 2026-10-23: the lines travel as data-ws-tab
+            const tab = tabSpans.length ? tabSpans : (pg.getAttribute('data-ws-tab') || '').split('|').filter(Boolean);
             const bands = [...pg.querySelectorAll('.ws-strip > b')].map(b => b.textContent.trim());
             const foot = pg.querySelector('[data-ws-teacher], .ws-foot');
             const footParts = foot ? [...foot.children].map(c => c.textContent.trim()) : [];
@@ -2165,11 +2167,11 @@ const SELF_TESTS = [
         g.style.gridTemplateRows = 'repeat(4, 1fr)';
     } },
     { name: 'list answer key', expect: ['L-KEY', 'AK-1'], fn: () => {
-        const k = [...document.querySelectorAll('.ws-page')].find(p => /Answer Key/.test(p.querySelector('.ws-tabbox')?.textContent || ''));
+        const k = [...document.querySelectorAll('.ws-page')].find(p => /Answer Key/.test(p.querySelector('.ws-tabbox, [data-ws-key="name"]')?.textContent || ''));
         k.querySelector('.ws-grid').outerHTML = '<ol class="p11-list"><li>365</li><li>583</li><li>455</li><li>765</li><li>360</li><li>810</li></ol>';
     } },
     { name: 'unanswered key slot', expect: ['L-KEY', 'AK-2'], fn: () => {
-        const k = [...document.querySelectorAll('.ws-page')].find(p => /Answer Key/.test(p.querySelector('.ws-tabbox')?.textContent || ''));
+        const k = [...document.querySelectorAll('.ws-page')].find(p => /Answer Key/.test(p.querySelector('.ws-tabbox, [data-ws-key="name"]')?.textContent || ''));
         k.querySelector('[data-ws-cell] [data-ws-slot]').querySelectorAll('.p11-key').forEach(e => e.remove());
     } },
     { name: 'screen verb on paper', expect: ['L-VERBS', 'BD-12'], fn: () => { document.querySelector('.ws-page .ws-instrline').textContent = 'Click the right answer.'; } },
