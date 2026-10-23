@@ -143,3 +143,8 @@ no-regroup stack, facts, a visual cell). W0-A builds the print-lint check.
 Owner instruction via the lead, 2026-10-23 23:08: "stop after this work, don't try anything new". Finish only what is in
 flight: the anchor rebuild (with the 22:55 rulings), its critic, and the D8 / fact-rows patches; then report and stop.
 **The kit-wide CL-4b change is CANCELLED** until a later go. If the anchor critic fails: report and stop, no further round.
+
+Lead, 2026-10-23 23:40: owner ruling CL-11a (9e614e21): item labels are only the black number tab; letters are gone (this
+supersedes M1's "numbered tabs past 26 on I Can" switch — merge in favour of CL-11a). CL-4b (including facts) is now done
+kit-wide by a builder on the lead's branch and is OUT of this lane entirely: the anchor rebuild drops its top-alignment
+work. HD-5a (6e94116f, strand-tab box removed), 9e614e21 and the CL-4b commit are merged here before the anchor critic.
