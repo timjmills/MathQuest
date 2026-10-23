@@ -240,6 +240,12 @@ async function runFlow(browser, base, f, w) {
       await (await p.$('#b')).screenshot({ path: path.join(DIR, `board-${b}.png`) }); await p.close();
       console.log(`board-${b}.png drawn`);
     }
+    // the doc pages never scroll sideways either (critic r2: thumbs.html was 419 px wide at 390)
+    if (!ONLY) for (const doc of ['index.html', 'flows.html', 'palette.html', 'thumbs.html', 'files.html']) for (const w of [390, 1366]) {
+      const page = await browser.newPage({ viewport: SIZES[w] }); await page.goto(`${base}/design/mockups/teacher-2/${doc}`, { waitUntil: 'networkidle' }); await page.waitForTimeout(300);
+      const sw = await page.evaluate(() => document.documentElement.scrollWidth); await page.close();
+      if (sw > SIZES[w].width + 1) { failed++; console.log(`FAIL ${doc} @${w}: sideways scroll ${sw}px`); } else console.log(`ok   ${doc} @${w}`);
+    }
     for (const [name, label, url, primary, full] of SCREENS) {
       if (ONLY && !ONLY.includes(name)) continue;
       for (const w of WIDTHS) for (const theme of THEMES) {

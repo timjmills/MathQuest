@@ -770,11 +770,38 @@
     sized.slice(0, 2).forEach(p => { body += `<g transform="translate(0 ${y}) scale(${scale})">${p.body}</g>`; y += p.h * scale + 4; W = Math.max(W, p.w * scale); });
     return svg(Math.ceil(W), Math.ceil(y), body);
   }
-  function draw(s, seed) {
+  // ---- variants (fix round 2, critic r2 C2): a "(Visual)" / "with Pictures" skill and a word problem with Pictures on show a
+  //      picture; its "(No Pictures)" / "(No Visuals)" twin, or Pictures off on the chip, is text and numbers only.
+  const PLAIN = /no pictures|no visuals/i, PICT = /\(visual|with pictures|visual pizza/i;
+  function picCount(svgStr) {   // how much of the drawing is a picture (shapes and filled parts, not text, answer boxes or rules)
+    return (svgStr.match(/<(circle|ellipse|polygon|path|polyline)\b/g) || []).length + (svgStr.match(/<rect[^>]*fill="(?!none)[^"]*"/g) || []).length + ([...svgStr.matchAll(/<line x1="([\d.-]+)" y1="([\d.-]+)" x2="([\d.-]+)" y2="([\d.-]+)"/g)].filter(m => !(m[2] === m[4] && Math.abs(m[3] - m[1]) < 60)).length >= 2 ? 1 : 0);   // fraction bars are not pictures
+  }
+  function counters(n) { let b = ''; for (let i = 0; i < n; i++) b += circ(9 + (i % 5) * 15, 9 + Math.floor(i / 5) * 15, 6, i % 2 ? '#fff' : GREY); return { w: 5 * 15 + 4, h: Math.ceil(n / 5) * 15 + 4, b }; }
+  function fracPic(n, d) { let b = ''; const w = 120 / d; for (let i = 0; i < d; i++) b += rect(2 + i * w, 6, w, 30, i < n ? GREY : '#fff'); return { w: 126, h: 42, b }; }
+  function ruler() { let b = `<polyline points="2,8 122,8 122,38 2,38 2,8" fill="none" stroke="#000" stroke-width="2"/>`; for (let i = 0; i <= 12; i++) b += ln(2 + i * 10, 8, 2 + i * 10, i % 4 ? 16 : 22, 1.5); return { w: 126, h: 42, b }; }
+  function withPicture(out, s, kind) {
+    const m = out.match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/); if (!m) return out; const W = Number(m[1]), H = Number(m[2]);
+    const nums = (out.replace(/<[^>]+>/g, ' ').match(/\d+/g) || []).map(Number).filter(x => x > 0);
+    const p = /frac|^story-frac|^dec-/.test(kind) || s.c === 'fractions' || s.c === 'fraction_operations' ? fracPic(3, 4)
+      : /angle|convert/.test(kind) ? ruler() : counters(Math.min(10, Math.max(3, nums[0] || 5)));
+    const h = Math.max(H, p.h); const body = out.replace(/<svg[^>]*>|<\/svg>$/g, '');
+    return svg(Math.ceil(W + 16 + p.w), Math.ceil(h), `<g transform="translate(0 ${(h - H) / 2})">${body}</g><g transform="translate(${W + 16} ${(h - p.h) / 2})">${p.b}</g>`);
+  }
+  const PLAIN_DRAW = {
+    'frac-bar': (r) => { const d = int(r, 3, 8), n = int(r, 1, d - 1); return svg(250, 84, txt(6, 30, `${n} of ${d} equal parts`, 18) + txt(6, 58, 'are shaded:', 18) + fracBox(150, 44)); },
+    'frac-set': (r) => { const d = int(r, 4, 9), n = int(r, 1, d - 1); return svg(260, 84, txt(6, 30, `${n} of ${d} cats are black.`, 18) + txt(6, 60, 'What fraction?', 18) + fracBox(200, 44)); },
+    'frac-equiv': (r) => { const a = int(r, 1, 3), b = a + int(r, 1, 3), k = int(r, 2, 4); return svg(200, 84, frac(30, 40, a, b) + txt(60, 48, '=', 24) + box(84, 6, 34, 28) + ln(80, 40, 122, 40) + txt(101, 70, b * k, 22, 'middle')); },
+  };
+  function draw(s, seed, opts) {
     const kind = kindOf(s); const r = rng(s.c + ':' + s.v + ':' + (seed === undefined ? '' : seed));
     if (kind.startsWith('pool-')) return poolDraw(kind, s, r);
     const f = D[kind]; if (!f) return '';            // no drawing rather than a wrong one
-    return f(r, s);
+    let out = f(r, s);
+    const off = PLAIN.test(s.l) || (opts && opts.pictures === false);
+    if (off) { if (picCount(out) && PLAIN_DRAW[kind]) out = PLAIN_DRAW[kind](rng(s.c + ':' + s.v + ':' + (seed === undefined ? '' : seed)), s); return out; }
+    const wantsPic = PICT.test(s.l) || /^story-/.test(kind) || kind === 'tape';
+    if (wantsPic && (picCount(out) === 0 || /^story-|^tape$/.test(kind))) out = withPicture(out, s, kind);
+    return out;
   }
-  root.MQThumbs = { draw, kindOf, rng, int, KINDS: Object.keys(D), POOLS: Object.keys(POOL) };
+  root.MQThumbs = { draw, kindOf, rng, int, picCount, KINDS: Object.keys(D), POOLS: Object.keys(POOL) };
 })(typeof window !== 'undefined' ? window : globalThis);

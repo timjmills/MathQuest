@@ -13,10 +13,12 @@
   <p class="eyebrow">Teacher site 2.0 · T1 · colour</p>
   <h1>Colour: board C</h1>
   <p class="serif">Muted, painted colours from the school’s maths site.</p>
-  <p class="lead">Eight maths areas, each in four strengths. Colour only ever means the maths area; the one main action is solid warm ink; everything else is calm cream and ink. The rules are IMPROVEMENT_PLAN §2.7; the colours are board C, taken from the school’s Awsaj maths site (owner, 2026-10-23: “I like these colors style more”) and moved only as far as the colour-blind and contrast rules need.</p>
-  <p class="note">Every swatch below is computed in this page from the bold colour with the plan’s ramp rules on the cream page (<code>colour.js</code>, a port of <code>colour.py</code>), and <code>node tests/scripts/ws-teacher-tokens.cjs</code> checks the same numbers and the mock-up’s <code>tokens.css</code>. Contrast figures are WCAG ratios; ΔE is CIEDE2000.</p>
+  <p class="lead">Eight maths areas, each in four strengths. Colour only ever means the maths area; the one main action is solid warm ink; everything else is a calm warm stone page, white surfaces and ink. The rules are IMPROVEMENT_PLAN §2.7; the colours are board C, taken from the school’s Awsaj maths site (owner, 2026-10-23: “I like these colors style more”) and moved only as far as the colour-blind and contrast rules need.</p>
+  <p class="note">Every swatch below is computed in this page from the bold colour with the plan’s ramp rules (tints and soft fills mixed over cream, deep ≥ 7 : 1 on the warm stone page; <code>colour.js</code>, a port of <code>colour.py</code>), and <code>node tests/scripts/ws-teacher-tokens.cjs</code> checks the same numbers and the mock-up’s <code>tokens.css</code>. Contrast figures are WCAG ratios; ΔE is CIEDE2000.</p>
 
-  <h2>Board C, light mode (cream page #FBF7EF)</h2>
+  <h2>Board C, light mode (warm stone page #EFECE8)</h2>
+  <p class="note">Owner, 2026-10-23: the light page is <b>warm stone</b> #EFECE8 with white #FFFFFF surfaces (cards, sheets, the tray) and #E5E1DB / #D6D0C8 for the second surface and lines. Cream #FBF7EF stays only as text on dark fills (the primary button, the rail, cream on a bold). The tints are kept as they are; because a few sit within 3 CIEDE2000 of the stone page (slate 1.6, Counting 2.1, Operations 2.9), every area group is a white card with its tint inside (every tint is ≥ 4.4 from white). Reference only:
+    <span class="ref-sw" style="background:#FBF7EF">cream #FBF7EF (the old page)</span> <span class="ref-sw" style="background:#C9C8DB">soft-tint group background (the “more colour” version, not chosen)</span></p>
   <p class="note">Tint (10 %) is a group’s background · soft (30 %) a filter chip at rest · <b>bold</b> the card edge, header band, tray chip and selected chip · deep the area’s own text and outline. Tint and soft always take warm ink text (#1A1614).</p>
   <div id="light"></div>
 
@@ -27,6 +29,10 @@
   <h2>Chips: one rule for every state</h2>
   <p class="note">Every chip has a 1 px outline (deep in light mode, #E8DFD2 in dark). Selected = the bold fill + ✓ + a 2 px ring. Slate (Mixed, Words, No standard) always has a dashed outline and its label.</p>
   <div id="chips"></div>
+
+  <h2>Grade: a badge, not a colour</h2>
+  <p class="note">Owner, 2026-10-23: colour means the maths area only. The <b>grade</b> is a numbered circle in ink on white (dark mode: cream on the dark surface), never an area colour, always the <b>first thing</b> in its skill card, chip, lesson row, lesson panel and chip-options header, so a teacher reads the grade in the same place everywhere. Its rules use neutral tokens only (ws-teacher-tokens check 13; text 16.8 : 1 light and dark); shoot.cjs checks one badge per card, chip or row, in the start slot, whole, ≥ 12 px, ≥ 4.5 : 1. In a search across grades and under Mixed levels each area’s skills are also grouped by grade.</p>
+  <div class="badge-legend" aria-label="Grade badges"><span class="gb" title="Kindergarten">K</span><span class="gb" title="Grade 1">1</span><span class="gb" title="Grade 2">2</span><span class="gb" title="Grade 3">3</span><span class="gb" title="Grade 4">4</span><span class="gb" title="Grade 5">5</span><span class="gb" title="Grade 6">6</span><span class="note">K, then grades 1 to 6</span></div>
 
   <h2>Colour-blind check</h2>
   <p class="note">The bold colours as seen with normal vision, deuteranopia and protanopia (Machado 2009 matrices, severity 1.0), and the closest pairs. Areas that share a single-grade list must be ≥ 12 apart under both simulations; any other pair ≥ 8 (in lists across grades the grade pill, the area name and the icon tell them apart).</p>
@@ -62,7 +68,7 @@
   for (const [k, n, b] of A.concat([SLATE])) {
     const r = C.ramp(b); const dash = k === 'SLATE' ? 'dashed' : '';
     L += `<div class="sw-name">${n}</div>` + sw(r.tint, C.INK, r.tint, 'ink ' + f(C.cr(r.tint, C.INK))) + sw(r.soft, C.INK, r.soft, 'ink ' + f(C.cr(r.soft, C.INK))) +
-      sw(r.bold, r.on, r.bold, (r.on === C.CREAM ? 'cream ' : 'ink ') + f(C.cr(r.bold, r.on)), dash) + sw(C.CREAM, r.deep, r.deep, `on cream ${f(C.cr(r.deep, C.CREAM))} · on tint ${f(C.cr(r.deep, r.tint))}`);
+      sw(r.bold, r.on, r.bold, (r.on === C.CREAM ? 'cream ' : 'ink ') + f(C.cr(r.bold, r.on)), dash) + sw(C.STONE, r.deep, r.deep, `on stone ${f(C.cr(r.deep, C.STONE))} · on tint ${f(C.cr(r.deep, r.tint))}`);
     Dk += `<div class="sw-name" style="color:#FBF7EF">${n}</div>` + sw(r.dTint, C.CREAM, r.dTint, 'cream ' + f(C.cr(r.dTint, C.CREAM))) + sw(r.dSoft, C.CREAM, r.dSoft, 'cream ' + f(C.cr(r.dSoft, C.CREAM))) +
       sw(r.bold, r.on, r.bold, 'on page ' + f(C.cr(r.bold, C.DARK)), dash) + sw(r.dTint, r.dLight, r.dLight, 'on dark tint ' + f(C.cr(r.dLight, r.dTint)));
   }
@@ -76,7 +82,7 @@
   };
   let ch = '';
   for (const dark of [false, true]) {
-    ch += `<div style="background:${dark ? C.DARK : C.CREAM};padding:16px;border-radius:16px;display:flex;flex-wrap:wrap;gap:12px;margin-bottom:8px;border:1px solid #CFC5B8">`;
+    ch += `<div style="background:${dark ? C.DARK : C.STONE};padding:16px;border-radius:16px;display:flex;flex-wrap:wrap;gap:12px;margin-bottom:8px;border:1px solid #CFC5B8">`;
     for (const [k, n, b] of A.slice(0, 4).concat([['MEAS', 'Measurement', '#A9CFAA'], SLATE])) { const r = C.ramp(b); const nm = k === 'SLATE' ? 'Mixed' : n.split(' ')[0]; ch += chip(r, nm, 'soft', dark) + chip(r, nm, 'bold', dark) + chip(r, nm, 'selected', dark); }
     ch += '</div>';
   }

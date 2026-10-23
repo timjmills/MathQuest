@@ -40,6 +40,18 @@ for (const s of D.skills) {
   if (/^count_by_|^seq_\d/.test(v) && k !== 'skip-count') fail(s, k, 'a count-by skill must draw the count');
   if (s.c === 'vocabulary') { if (svgs[out]) fail(s, k, `the same picture as ${svgs[out]}`); svgs[out] = v; }
 }
+// fix round 2 (critic r2 C2): variants show their variant. A "(Visual)" / "with Pictures" skill draws a picture; a
+// "(No Pictures)" / "(No Visuals)" twin draws none where its pictured twin does, and the two never draw the same thing.
+const byId = Object.fromEntries(D.skills.map(s => [s.c + ':' + s.v, s]));
+for (const s of D.skills) {
+  const out = T.draw(s, 1);
+  if (/\(visual|with pictures|visual pizza/i.test(s.l) && !T.picCount(out)) fail(s, T.kindOf(s), 'a Visual skill with no picture');
+  if (/no pictures|no visuals/i.test(s.l)) {
+    const twin = byId[s.c + ':' + s.v.replace(/_plain$|_nv$/, '')] || byId[s.c + ':' + s.v.replace(/_nv$/, '_visual')];
+    if (twin) { const t = T.draw(twin, 1); if (t === out) fail(s, T.kindOf(s), `draws the same as its pictured twin ${twin.v}`); if (T.picCount(t) <= T.picCount(out)) fail(s, T.kindOf(s), `has as much picture as its pictured twin ${twin.v}`); }
+  }
+  if (/^story-/.test(T.kindOf(s)) && !/no pictures/i.test(s.l) && T.draw(s, 1, { pictures: false }) === out) fail(s, T.kindOf(s), 'Pictures off draws the same as Pictures on');
+}
 // the same skill must draw the same kind with every seed, and a different item with a different seed
 for (const s of D.skills.slice(0, 120)) if (T.draw(s, 1) === T.draw(s, 2) && T.draw(s, 2) === T.draw(s, 3) && !/words|shape|solid|compose|lines|symmetry|net|pie|box-plot|stat|spinner|attributes|classify|area-|positions|balance|jug|thermo|ruler|frac-|story-frac|story-convert|convert-|fdp|am-pm|digital|money-words|clock-parts|clock-fives|clock-order|length|nonstandard|oop-compare|div-sort|double-nl|inequality|transform|coord-polygon|volume|partition|pv-words|stat-question/.test(T.kindOf(s))) fails.push(`${s.c}:${s.v} draws the same item for every seed (New numbers would not change it)`);
 

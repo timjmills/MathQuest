@@ -60,7 +60,7 @@ for (const r of rows) {
     if (d.values) o.v = d.values.map(x => [x.v, short(x.l)]);
     if (d.type === 'int') { o.min = d.min ?? 0; o.max = d.max ?? 20; }
     if (d.allLabel) o.all = short(d.allLabel);
-    const h = short(d.helpShort || d.help); if (h) o.h = h.length > 120 ? h.slice(0, 117).replace(/\s+\S*$/, '') + '…' : h;
+    const h = short(d.helpShort || d.help); if (h) o.h = h;   // whole: never cut with … (critic r2 C3)
     list.push(o);
   }
   const key = JSON.stringify(list);
