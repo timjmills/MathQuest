@@ -195,6 +195,16 @@ export const CASE_TESTS = Object.freeze({
     endsFive: (it) => roundRest(it) === 5,
     // Lessons r3: a one-place take-away from a number with 0 ones (70 - 8), and the 90s -> 100.
     takeAwayZero: (it) => { const o = operandsOf((it && it.q) || {}); return o.length >= 2 && Number(o[0]) % 10 === 0 && Number(o[1]) < 10; },
+    // SU-C (critic r1 D4): a no-regrouping column subtraction that is NOT a zero case - no 0 in the
+    // top number, no n − 0, no column that leaves 0, an answer as long as the top number.
+    subNoZero: (it) => {
+        const o = operandsOf((it && it.q) || {}).map(Number);
+        if (o.length < 2 || !(o[0] > o[1]) || o[1] < 1) return false;
+        const A = String(o[0]), B = String(o[1]).padStart(A.length, 'x');
+        if (/0/.test(A) || String(o[0] - o[1]).length !== A.length) return false;
+        for (let i = 0; i < A.length; i++) if (B[i] !== 'x' && (B[i] === '0' || Number(B[i]) >= Number(A[i]))) return false;
+        return true;
+    },
     toHundred: (it) => {
         const c = it && it.q && it.q.cell;
         const n = c && c.payload ? Number(c.payload.n) : NaN;

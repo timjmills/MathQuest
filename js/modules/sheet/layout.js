@@ -411,7 +411,7 @@ function fitAt(info, cols, { size, look, availableWidthMm, auto }) {
     const staticW = !fp.measure && Number.isFinite(fp.wMm);
     if (staticW && fp.tracks && !fp.factLike) {
         // 12.3's digit-aware clamp for stacked work (VA-6).
-        if (cols > stackMaxColumns(fp.tracks, size, look, { regroup: !!fp.regroup, separators: fp.separators || 0, W: availableWidthMm })) return { fits: false, why: 'digits', hMin };
+        if (cols > stackMaxColumns(fp.tracks, size, look, { regroup: !!fp.regroup || !!fp.wide, separators: fp.separators || 0, W: availableWidthMm })) return { fits: false, why: 'digits', hMin };
     }
     if (staticW) {
         if (fp.wMm > inner - SAFETY_W_MM) return { fits: false, why: 'width', hMin };
@@ -753,7 +753,7 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
     const anyFact = infos.some((i) => i.fp.factLike);
     const anyStack = infos.some((i) => i.fp.tracks && !i.fp.factLike);
     const digitPt = anyFact && !anyStack ? Math.min(s.digitPt, FACT_LADDER[cols] || s.digitPt) : s.digitPt;
-    const regroup = infos.some((i) => !!i.fp.regroup);
+    const regroup = infos.some((i) => !!i.fp.regroup || !!i.fp.wide);
     const trackMm = anyStack ? tokenTrackMm(digitPt, size, look, regroup) : null;
 
     const note = [reason, ...notes].filter(Boolean).join(' ');

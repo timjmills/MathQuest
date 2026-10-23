@@ -955,15 +955,20 @@ export function subNoRegroupDigits(maxVal) {
 /**
  * One no-regrouping pair [a, b]: every digit of b is at most the digit above it (aligned right).
  *   lengths 'same'     b has as many digits as a;  'shorter'  b has one digit fewer (ragged).
- *   zeros   'off'      from 3 digits up the plain page seeds no zero case: no 0 digit in a, no
- *                      n − 0, no column leaving 0, no shorter answer.  Within 50 / 100 the digits
- *                      fall as they fall (a 0 ones digit may appear naturally, never seeded).
+ *   zeros   'off'      the plain page seeds no zero case: no n − 0, no column leaving 0, no
+ *                      shorter answer, and from 3 digits up no 0 digit in a.  Within 50 / 100 a
+ *                      0 ones digit comes only under a top 0 (40 − 20), in about 1 item in 10
+ *                      (card §9.4; critic SU-C r1 D1).
  *           'on'       from 3 digits up every item is ONE zero case, dealt by the rng: a 0 in the
  *                      top number (0 − 0), n − 0, a column leaving 0, or an answer with fewer digits.
+ * Two digits deal the BOTTOM digit first (1-8, uniform) and the top digit over it, so no bottom
+ * digit dominates (2d − 1d: b = 1 on 1 item in 8, not 1 in 3; critic r1 D8). The 2d − 1d preset
+ * (within 100, lengths 'shorter') runs its minuend over every 2-digit number from 21 (D8).
  */
 function _subNoRegroupPair(maxVal, rng, { lengths = 'same', zeros = 'off' } = {}) {
-    const [lo, hi] = _SUB_NR_BAND[maxVal];
+    const [lo0, hi] = _SUB_NR_BAND[maxVal];
     const d = String(hi).length;
+    const lo = d === 2 && lengths === 'shorter' ? Math.min(lo0, 21) : lo0;
     const lenB = lengths === 'shorter' ? Math.max(1, d - 1) : d;
     const big = d >= 3;
     const zeroCase = big && zeros === 'on';
@@ -982,13 +987,16 @@ function _subNoRegroupPair(maxVal, rng, { lengths = 'same', zeros = 'off' } = {}
                 if (k < lenB) { if (v < 2) { ok = false; break; } B[k] = rng(1, v - 1); }
             }
         } else {
-            for (let k = 0; k < lenB; k++) {
-                const v = at(k);
-                const lead = k === lenB - 1;
-                if (lead && v < 1) { ok = false; break; }
-                // 1 .. v: a 0 under a digit is not seeded; it comes only under a top 0 (40 − 20).
-                B[k] = rng(Math.min(1, v), v);
-            }
+            // Two digits: build the pair column by column, the bottom digit first.
+            const tlo = Math.floor(lo / 10), thi = Math.floor(hi / 10);
+            // 1 item in 10 at most: a top 0 over a 0 (40 − 20). On a page (itemIndex set) it is
+            // item 8 of every ten, so no page clusters them; outside a page the rng decides.
+            const zeroOnes = Number.isFinite(state.itemIndex) ? state.itemIndex % 10 === 7 && t === 0 : rng(0, 9) === 0;
+            // (a bottom 1 is the trivial take-away: half of the 1s are dealt again, so b = 1 on about 1 item in 14)
+            if (zeroOnes) { A[1] = 0; B[0] = 0; } else { B[0] = rng(1, 8); if (B[0] === 1 && rng(0, 1)) B[0] = rng(1, 8); A[1] = rng(B[0] + 1, 9); }
+            if (lenB === 2) { A[0] = rng(Math.max(2, tlo), thi); B[1] = rng(1, A[0] - 1); }
+            else A[0] = rng(Math.max(1, tlo), thi);
+            if (zeroOnes && lenB === 1) ok = false;          // 2d − 1d: a 1-digit 0 is no item
         }
         if (!ok) continue;
         if (zeroCase) {
@@ -2966,9 +2974,13 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     // The kit `stack` (spec card §9.1): no regroup row, no headroom, answer boxes
                     // as many as the band's largest minuend has digits (never this answer's length),
                     // place heads from the support level, commas from 5 digits (TY-24).
+                    // Heads are structural (WDS VA-30 / VA-32): ON at the default level 1, gone
+                    // only at level 0, their own fade step (card §2 step 3; critic r1 D2).
+                    // `wideTracks`: 0.95 em tracks, so every answer box is 4.4 mm or more (TY-21)
+                    // and 5-6 place heads have room (critic r1 D3, D7).
                     const lvl = supportLevelFor(1);
                     const digits = subNoRegroupDigits(maxVal);
-                    const payload = { operands: [a, b], op: '-', ans, regroup: false, answer: 'boxes', heads: lvl >= 2, ansDigits: digits };
+                    const payload = { operands: [a, b], op: '-', ans, regroup: false, answer: 'boxes', heads: lvl >= 1, ansDigits: digits, wideTracks: true };
                     if (digits >= 5) payload.commas = true;
                     if (lvl >= 3) payload.traceAns = true;
                     q.cell = { template: 'stack', v: 1, payload };
