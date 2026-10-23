@@ -14,7 +14,7 @@ Builders run in their own git worktrees and the lead merges them here.
 | Phase | Work | Builder | State |
 |---|---|---|---|
 | 1 | S2 part 1: `ws-node-lint.mjs`, seeded fixtures, `ws-backtest.mjs` + `backtests.json` | mq-opus-medium (first build) | running |
-| 1 | E1: `ws-envelope.mjs` (`--engine`, `--self-test`, `--diff`, `--envelope`) | mq-opus-medium | running |
+| 1 | E1: `ws-envelope.mjs` (`--engine`, `--self-test`, `--diff`, `--envelope`) | mq-opus-medium | merged 94c97814 — Single skill 17 and stack 18 match the plan; Mixed practice walks 17, not 18 (`paginate.js` is reached only by the Single/Sections composer; the plan's list overstates it); self-test 320 checks 2.5 s; `--engine all` 1.1 s; voiding dry run: layout.js voids 126/126 pairs, a provider 0, `cells/clock.js` 3 (clock only) |
 | 1 | S5: `ws-deploy-gates.sh`; `ws-screen-slots` / `ws-chromebook-fit` `--category`, `--skills`, `--shard`, `--baseline`, `--bigboard`, `--dark` | mq-opus-medium | running |
 | 1 | S4: golden renders, manifest, diff, contact sheets; `ws-grade-render --template`, `--envelope` | mq-opus-medium | running |
 | 2 | S1: `ws-precritic.cjs`, `role-sample.json`, `ws-providers-unit --skill`, `ws-teacher-wrm --grade --lesson` | mq-opus-medium | queued |
