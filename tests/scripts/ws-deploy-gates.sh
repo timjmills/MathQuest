@@ -5,31 +5,62 @@
 #   bash tests/scripts/ws-deploy-gates.sh --list            # print the gate list (session, kind, command, present?)
 #   bash tests/scripts/ws-deploy-gates.sh --session 1       # node gates + the browser gates that are not screen sweeps
 #   bash tests/scripts/ws-deploy-gates.sh --session 2       # ws-screen-slots + ws-chromebook-fit, sharded over the two
-#                                                           # browser slots, + the big-board and dark-mode sweeps
-#   bash tests/scripts/ws-deploy-gates.sh --session 3       # coverage matrix (affected rows), digests hook, owner go
+#                                                           # browser slots, + viewport, S9 and the board / dark sweeps
+#   bash tests/scripts/ws-deploy-gates.sh --session 3       # coverage matrix (budgeted), digests hook, owner go
 #   bash tests/scripts/ws-deploy-gates.sh --all             # sessions 1, 2, 3 in sequence
+#   bash tests/scripts/ws-deploy-gates.sh --session 3 --accept-notyet digests
+#                                                           # the lead accepts a named NOT YET gate (logged)
 #   bash tests/scripts/ws-deploy-gates.sh --deploy-check [--lanes-dir design/lanes] [--status-dir design/status]
 #                                                           # refuse a deploy that makes a family live with no
 #                                                           # "Owner go: <family>, <date>" line (§1.6.3 step 6)
-#   bash tests/scripts/ws-deploy-gates.sh --self-test       # the owner-go check on its fixtures (must refuse / pass)
-#                                                           # and the flake rule on a synthetic gate (FLAKE, BLOCKED)
+#   bash tests/scripts/ws-deploy-gates.sh --self-test       # owner go, the flake rule, the final verdict
+#                                                           # (INCOMPLETE / accepted / FAIL) and the matrix budget +
+#                                                           # nightly rule, on fixtures (no browser)
+#
+# THE VERDICT (critic r1 D2: "same gates, nothing skipped"). The last line is one of
+#   ws-deploy-gates: OK           every gate ran and passed (OK; FLAKE = passed alone, logged; ACCEPTED = a NOT YET
+#                                 gate the lead accepted by name with --accept-notyet) - exit 0
+#   ws-deploy-gates: INCOMPLETE   nothing failed, but a gate did not run: SKIPPED (its tool is not in the tree),
+#                                 NOT YET (needs a later M-step) or NEEDS-SHARDED-RUN (the matrix is over its budget,
+#                                 see session 3); each is listed with what to do - exit 2. A deploy waits.
+#   ws-deploy-gates: FAIL         a gate failed (FAIL, or BLOCKED = a second flake) - exit 1
+# BEFORE M4 (record / replay) the digests hook is NOT YET, so every run of session 3 is INCOMPLETE until the lead
+# accepts that one item by name: `--accept-notyet digests`. The acceptance is per run, never a blanket flag: it is
+# printed in the table (ACCEPTED), in the verdict, and in the session's line of deploy-gate-timings.jsonl
+# ("acceptedNotYet"). Only NOT YET gates can be accepted; an unknown name is an error. SKIPPED is never acceptable.
 #
 # Session 1  every node gate (in parallel with the browser gates; 4 cores = 2 browsers + 2 node workers):
 #            ws-code-snapshot, ws-codec-registry, ws-standards, ws-search-terms, ws-providers-unit, ws-layout-unit,
-#            ws-panes-unit, ws-supports-unit, ws-ink-unit, ws-plain-words --check, ws-node-lint and
-#            ws-envelope --self-test (SKIPPED (tool not built) until they exist); and the browser gates, two at a
-#            time: ws-presets-unit, ws-anchors-unit, ws-boot-smoke, ws-content-audit, ws-print-lint --source kit
-#            (--baseline design/audit/baselines/print-lint.json when it exists; else the accepted limit
-#            MQ_PRINT_LINT_LIMIT, default 461 findings / 33 documents), ws-screen-answer, ws-share-options,
-#            ws-teacher-shell, -library, -preview, -quiz, ws-teacher-wrm and ws-teacher-wrm --fallback.
+#            ws-panes-unit, ws-supports-unit, ws-ink-unit, ws-plain-words --check, ws-node-lint, ws-envelope
+#            --self-test, ws-text-vs-gen (claims vs the generator), ws-backtest --kind fixture (the S2 checks still
+#            catch their fixtures) and ws-options-pin --check when tests/scripts/ws-options-pin.cjs is in the tree;
+#            and the browser gates, two at a time: ws-presets-unit, ws-anchors-unit, ws-boot-smoke, ws-content-audit,
+#            ws-print-lint --source kit (--baseline design/audit/baselines/print-lint.json when it exists; else the
+#            accepted limit MQ_PRINT_LINT_LIMIT, default 461 findings / 33 documents), ws-screen-answer,
+#            ws-share-options, ws-teacher-shell, -library, -preview, -quiz, ws-teacher-wrm, ws-teacher-wrm --fallback,
+#            and ws-detailed-lesson --lesson <id> --repeats for every lesson in js/modules/lessons/detailed/.
 # Session 2  ws-screen-slots in MQ_SLOTS_SHARDS parts (default 4) with --baseline design/audit/baselines/screen-slots.json,
-#            ws-chromebook-fit in MQ_FIT_SHARDS parts (default 2), and the sweeps on the pinned sample
+#            ws-chromebook-fit in MQ_FIT_SHARDS parts (default 2), ws-viewport-check --baseline
+#            design/audit/baselines/viewport-check.json (a real session's scroll: the R7-D1 class chromebook-fit
+#            cannot see), the S9 regression (ws-screen-slots on measurement:reading_ruler_hard, card host, seeds 1-40,
+#            --need-ans 1/4,1/2,3/4: readings under an inch show one answer area), and the sweeps on the pinned sample
 #            (tests/fixtures/precritic/sweep-sample.json): ws-screen-slots --dark / --bigboard, ws-chromebook-fit
-#            --dark / --bigboard (chromebook-fit's standing sweep failures are pinned in the sample file).
-# Session 3  ws-coverage-matrix (MQ_COVERAGE_ARGS, default `--all --affected <MQ_DEPLOY_BASE>..HEAD --baseline
-#            design/audit/matrix/baseline.json --slots 2 --batch 9`: the matrix runs two print-lint processes, one per
-#            slot, batching rows to amortise the browser start; measured 0.31-0.38 documents/s on two slots) when the tool exists, else SKIPPED (tool not built) - never OK; the digests
-#            hook (M4 record/replay) prints NOT YET; the owner-go check.
+#            --dark / --bigboard (chromebook-fit's standing failures are pinned per skill and host in the sample file).
+# Session 3  ws-coverage-matrix on the affected rows with a DOCUMENT BUDGET (§1.6.2): MQ_COVERAGE_ARGS, default
+#            `--all --affected <base>..HEAD --baseline design/audit/matrix/baseline.json --slots 2 --batch 9`, plus
+#            `--max-docs MQ_MATRIX_BUDGET` (default 500). <base> is MQ_DEPLOY_BASE, else the merge base with
+#            origin/master; when origin/master is not fetched the gate FAILS and says so (never a silent HEAD~1).
+#            Within the budget the rows run inline (OK / FAIL). Over it (the matrix exits 3, `OVER-BUDGET`; a tree
+#            whose matrix lacks --max-docs is measured with --list instead) the gate reads the newest nightly,
+#            design/audit/matrix/<date>[.shard-i-of-n].json (all shards of the newest date):
+#              FAIL               there is none; or it finished more than 24 h ago (its `finished`, else the file's
+#                                 git commit time, else its date at 00:00 UTC); or a row of a live skill
+#                                 (data.js SKILLS, tombstones out) is RED or ERROR in any shard
+#              OK                 it is complete (every shard i of n) and ran on a commit the tip differs from only
+#                                 in design/audit/matrix/ (the nightly's own commit): the sharded run has covered HEAD
+#              NEEDS-SHARDED-RUN  otherwise: fresh and green but not on this tip. The deploy waits; the gate prints
+#                                 the sharded run to fire (design/audit/matrix/NIGHTLY.md) and to re-run session 3.
+#            Then the digests hook (M4 record/replay) prints NOT YET, and the owner-go check.
 # Prerequisites, checked before any session runs: PyMuPDF (python3 -c "import fitz"; fix: pip install pymupdf),
 # puppeteer, flock. A missing one fails at once with its fix.
 #
@@ -42,9 +73,9 @@
 # goes to design/audit/baselines/flakes.jsonl (gate, item when the log names one, commit, date) and the gate
 # shows FLAKE; if the same gate + item already had a flake line, the gate shows BLOCKED and the deploy fails.
 #
-# Results: OK, FAIL, FLAKE (passed alone, logged), BLOCKED (second flake), SKIPPED (tool not built), NOT YET.
-# Exit 1 on any FAIL or BLOCKED; 0 otherwise. Logs: $MQ_GATES_LOGDIR (default /tmp/mq-deploy-gates/<stamp>).
-# Last line: `ws-deploy-gates: OK` or `ws-deploy-gates: FAIL`.
+# Results: OK, FAIL, FLAKE (passed alone, logged), BLOCKED (second flake), SKIPPED (tool not built), NOT YET,
+# ACCEPTED (a NOT YET the lead accepted by name), NEEDS-SHARDED-RUN. Logs: $MQ_GATES_LOGDIR (default
+# /tmp/mq-deploy-gates/<stamp>). Last line: `ws-deploy-gates: OK`, `INCOMPLETE` (exit 2) or `FAIL` (exit 1).
 set -u
 
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
@@ -56,6 +87,7 @@ declare -A SES_WALL
 SLOTS_BASE=design/audit/baselines/screen-slots.json
 PRINT_BASE=design/audit/baselines/print-lint.json
 SAMPLE=tests/fixtures/precritic/sweep-sample.json
+VIEWPORT_BASE=design/audit/baselines/viewport-check.json
 SLOTS_SHARDS=${MQ_SLOTS_SHARDS:-4}
 FIT_SHARDS=${MQ_FIT_SHARDS:-2}
 MATRIX_SHARDS=${MQ_MATRIX_SHARDS:-2}
@@ -65,7 +97,10 @@ PRINT_LINT_LIMIT=${MQ_PRINT_LINT_LIMIT:-461/33}
 COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo unknown)
 [ -n "$(git status --porcelain 2>/dev/null | grep -v '^??' | head -n 1)" ] && COMMIT="$COMMIT+dirty"
 
-usage() { sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,32p' "$0" | sed 's/^# \{0,1\}//'; }
+MATRIX_DIR=${MQ_MATRIX_DIR:-design/audit/matrix}
+MATRIX_BUDGET=${MQ_MATRIX_BUDGET:-500}
+ACCEPT_NOTYET=()
 
 # ---------------------------------------------------------------------------------------------- the owner-go check
 # A lane manifest (design/lanes/<lane>/manifest.json, §1.6.6) lists what the deploy makes live:
@@ -106,6 +141,157 @@ process.exit(refused ? 1 : 0);
 EOF
 }
 
+# ---------------------------------------------------------------------------------------------- the matrix budget
+# The newest nightly (§1.6.2): nightly_check <matrix dir> <check-dirty 1|0>. Exit 1 = refuse (none, older than 24 h,
+# a RED / ERROR row of a live skill), 0 = covered (complete, on a commit the tip differs from only in the matrix
+# dir), 3 = NEEDS-SHARDED-RUN. MQ_NOW (ISO time) replaces the clock (fixtures).
+nightly_check() {
+  node - "$1" "$2" "$ROOT" <<'EOF'
+const fs = require('fs'); const path = require('path'); const { execFileSync } = require('child_process');
+const [dir, checkDirty, root] = process.argv.slice(2);
+const git = (...a) => execFileSync('git', ['-C', root, ...a], { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
+const now = process.env.MQ_NOW ? Date.parse(process.env.MQ_NOW) : Date.now();
+const H24 = 24 * 3600 * 1000;
+const RE = /^(\d{4}-\d{2}-\d{2})(?:\.shard-(\d+)-of-(\d+))?\.json$/;
+const files = (fs.existsSync(dir) ? fs.readdirSync(dir) : []).filter((f) => RE.test(f)).sort();
+const refuse = (why) => { console.log(`nightly: REFUSED - ${why}`); console.log('nightly: FAIL'); process.exit(1); };
+if (!files.length) refuse(`no nightly run file (${dir}/<YYYY-MM-DD>[.shard-i-of-n].json): the affected rows are over the budget and nothing has run them`);
+const date = RE.exec(files[files.length - 1])[1];
+const night = files.filter((f) => RE.exec(f)[1] === date);
+const runs = [];
+for (const f of night) {
+  const full = path.join(dir, f);
+  let j; try { j = JSON.parse(fs.readFileSync(full, 'utf8')); } catch (e) { refuse(`${full} is not valid JSON (${e.message})`); }
+  let when = j.finished ? Date.parse(j.finished) : NaN, src = 'finished';
+  if (!Number.isFinite(when)) { try { const c = git('log', '-1', '--format=%cI', '--', full); if (c) { when = Date.parse(c); src = 'git commit time'; } } catch (e) { /* not committed */ } }
+  if (!Number.isFinite(when)) { when = Date.parse(`${j.date || date}T00:00:00Z`); src = 'date 00:00 UTC'; }
+  const m = RE.exec(f);
+  runs.push({ f: full, j, when, src, shard: m[2] ? { i: +m[2], n: +m[3] } : null });
+}
+// live skills: data.js SKILLS, tombstones and retired labels out (as ws-coverage-matrix / ws-print-lint select them)
+(async () => {
+  globalThis.localStorage = globalThis.localStorage || { getItem: () => null, setItem() {}, removeItem() {} };
+  if (!globalThis.window) globalThis.window = globalThis;
+  const q = console.log; console.log = console.warn = () => {};
+  let SKILLS;
+  try { ({ SKILLS } = await import(require('url').pathToFileURL(path.join(root, 'js', 'modules', 'data.js')).href)); } finally { console.log = q; }
+  const live = new Set();
+  for (const [cat, list] of Object.entries(SKILLS)) if (Array.isArray(list)) for (const s of list) {
+    if (!s || !s.v || s.retired || /^_?tomb|retired/i.test(s.v) || /\(retired\)/i.test(s.l || '')) continue;
+    live.add(`${cat}:${s.v}`);
+  }
+  const oldest = Math.min(...runs.map((r) => r.when));
+  const age = (now - oldest) / 3600000;
+  for (const r of runs) console.log(`nightly: ${r.f} commit ${String(r.j.commit || '?').slice(0, 10)}${r.j.dirty ? ' (dirty)' : ''}, finished ${new Date(r.when).toISOString()} (${r.src}), ${(r.j.rows || []).length} row(s)`);
+  if (now - oldest > H24) refuse(`the newest nightly (${date}) finished ${age.toFixed(1)} h ago, more than 24 h`);
+  const red = [];
+  for (const r of runs) for (const row of r.j.rows || []) {
+    if (!/^(RED|ERROR)$/.test(String(row.status))) continue;
+    const key = String(row.id || '').split('|')[0] || (row.skills || [])[0];
+    if (live.has(key)) red.push(`${row.id} ${row.status}${row.rises && row.rises.length ? ` (${JSON.stringify(row.rises[0]).slice(0, 80)})` : ''}`);
+    else console.log(`nightly: ${row.id} is ${row.status} but ${key} is not a live skill (ignored)`);
+  }
+  if (red.length) refuse(`the newest nightly (${date}) has ${red.length} RED row(s) of live skills: ${red.slice(0, 10).join('; ')}${red.length > 10 ? ' ...' : ''}`);
+  console.log(`nightly: ${date} is ${age.toFixed(1)} h old and has no RED row of a live skill`);
+  // does it cover this tip? every shard of the night present, one commit, the tip differing from it only in the matrix dir
+  const why = [];
+  const sh = runs.filter((r) => r.shard);
+  if (sh.length) { const n = sh[0].shard.n; const have = new Set(sh.map((r) => r.shard.i)); const miss = []; for (let i = 1; i <= n; i++) if (!have.has(i)) miss.push(`${i}/${n}`); if (miss.length) why.push(`shard(s) ${miss.join(', ')} of ${date} are missing`); }
+  const commits = [...new Set(runs.map((r) => r.j.commit))];
+  if (commits.length !== 1) why.push(`its shards ran on ${commits.length} commits`);
+  if (runs.some((r) => r.j.dirty)) why.push('it ran on a dirty tree');
+  let head = '?';
+  try { head = git('rev-parse', 'HEAD'); } catch (e) { why.push('no HEAD'); }
+  if (!why.length) {
+    let c = null; try { c = git('rev-parse', '--verify', `${commits[0]}^{commit}`); } catch (e) { why.push(`its commit ${commits[0]} is not in this repository`); }
+    if (c) {
+      let anc = true; try { execFileSync('git', ['-C', root, 'merge-base', '--is-ancestor', c, 'HEAD'], { stdio: 'ignore' }); } catch (e) { anc = false; }
+      if (!anc) why.push(`its commit ${c.slice(0, 10)} is not an ancestor of HEAD ${head.slice(0, 10)}`);
+      else {
+        const diff = git('diff', '--name-only', c, 'HEAD').split('\n').filter(Boolean).filter((f) => !f.startsWith('design/audit/matrix/'));
+        if (diff.length) why.push(`HEAD ${head.slice(0, 10)} changes ${diff.length} file(s) since it (${diff.slice(0, 3).join(', ')}${diff.length > 3 ? ' ...' : ''})`);
+      }
+    }
+    if (checkDirty === '1') {
+      const dirty = git('status', '--porcelain', '--untracked-files=no').split('\n').filter(Boolean).map((l) => l.slice(3)).filter((f) => !/^design\/audit\/(matrix|baselines)\//.test(f));
+      if (dirty.length) why.push(`the working tree has ${dirty.length} uncommitted change(s) (${dirty.slice(0, 3).join(', ')})`);
+    }
+  }
+  if (!why.length) { console.log(`nightly: the sharded run of ${date} covers HEAD ${head.slice(0, 10)} (it differs only in ${dir}/)`); console.log('nightly: OK'); process.exit(0); }
+  console.log(`nightly: it does not cover this tip: ${why.join('; ')}`);
+  console.log('nightly: NEEDS-SHARDED-RUN');
+  process.exit(3);
+})().catch((e) => { console.log(`nightly: FAIL - ${e.message}`); process.exit(1); });
+EOF
+}
+
+# What the lead fires when the affected rows are over the budget (design/audit/matrix/NIGHTLY.md).
+sharded_run_help() {
+  cat <<EOF
+NEEDS-SHARDED-RUN: the affected rows are over the ${MATRIX_BUDGET}-document budget, the newest nightly is fresh and has no
+RED row of a live skill, but no complete nightly has run on this tip ($(git rev-parse --short HEAD 2>/dev/null)). The deploy waits.
+To finish this gate:
+  1. Push this tip to the integration branch claude/sweet-newton-c8wrv1 (the nightly runs only on its fetched tip).
+  2. Fire the sharded nightly on it: the eight scheduled tasks "MathQuest matrix nightly SHARD=i/8" (i = 1..8) with
+     the prompt in design/audit/matrix/NIGHTLY.md, each running
+         SHARD=<i>/8 tests/scripts/ws-matrix-nightly.sh
+     (about 3.7 h each before M4). Each commits design/audit/matrix/<date>.shard-<i>-of-8.json to the branch.
+  3. When all eight are pushed: git pull, then  bash tests/scripts/ws-deploy-gates.sh --session 3
+     The gate is OK when that night is complete, on a commit this tip differs from only in design/audit/matrix/,
+     and has no RED row of a live skill.
+EOF
+}
+
+# Session 3's matrix gate: the affected rows within the document budget, else the nightly rule.
+# MQ_MATRIX_CMD replaces `node <ws-coverage-matrix>` (self-test stubs).
+matrix_gate() {
+  local cm=$1 cargs base rc out n
+  local cmd=${MQ_MATRIX_CMD:-node $cm}
+  if [ -n "${MQ_COVERAGE_ARGS:-}" ]; then cargs=$MQ_COVERAGE_ARGS
+  else
+    base=$(deploy_base) || return 1
+    cargs="--all --affected $base..HEAD --baseline design/audit/matrix/baseline.json --slots 2 --batch 9"
+  fi
+  echo "matrix: budget $MATRIX_BUDGET documents; $cmd $cargs"
+  if [ -z "${MQ_MATRIX_CMD:-}" ] && ! grep -q 'max-docs' "$cm"; then
+    # this tree's matrix has no --max-docs: measure the selection with --list and apply the budget here
+    # shellcheck disable=SC2086
+    out=$($cmd $cargs --list 2>&1); rc=$?
+    printf '%s\n' "$out" | tail -n 5
+    [ $rc = 0 ] || { echo "matrix: --list failed (exit $rc)"; return 1; }
+    n=$(printf '%s\n' "$out" | grep -oE 'documents to run [0-9]+' | tail -n 1 | grep -oE '[0-9]+$')
+    [ -n "$n" ] || { echo 'matrix: --list printed no "documents to run" count'; return 1; }
+    if [ "$n" -gt "$MATRIX_BUDGET" ]; then echo "ws-coverage-matrix: OVER-BUDGET $n documents (budget $MATRIX_BUDGET) [measured with --list: this tree's matrix has no --max-docs]"; rc=3
+    else
+      # shellcheck disable=SC2086
+      $cmd $cargs; rc=$?
+    fi
+  else
+    # shellcheck disable=SC2086
+    case " $cargs " in *" --max-docs "*) $cmd $cargs ;; *) $cmd $cargs --max-docs "$MATRIX_BUDGET" ;; esac; rc=$?
+  fi
+  [ $rc = 3 ] || return $rc
+  echo "matrix: over the budget; the newest nightly decides (§1.6.2)"
+  nightly_check "$MATRIX_DIR" "${MQ_NIGHTLY_DIRTY_CHECK:-1}"; rc=$?
+  [ $rc = 3 ] && sharded_run_help
+  return $rc
+}
+
+# The deployed tip to diff against: MQ_DEPLOY_BASE, else the merge base with origin/master; never a guess.
+deploy_base() {
+  local b
+  if [ -n "${MQ_DEPLOY_BASE:-}" ]; then
+    b=$(git rev-parse --verify -q "${MQ_DEPLOY_BASE}^{commit}") || { echo "matrix: MQ_DEPLOY_BASE=$MQ_DEPLOY_BASE is not a commit here" >&2; return 1; }
+    echo "$b"; return 0
+  fi
+  git rev-parse --verify -q origin/master >/dev/null || {
+    echo 'matrix: origin/master is not fetched, so the deployed tip is unknown and the affected rows cannot be computed.' >&2
+    echo 'matrix: fix: git fetch origin master   (or set MQ_DEPLOY_BASE=<the deployed commit>)' >&2
+    return 1; }
+  b=$(git merge-base origin/master HEAD) || { echo 'matrix: no merge base between origin/master and HEAD; set MQ_DEPLOY_BASE' >&2; return 1; }
+  echo "$b"
+}
+
 self_test() {
   local fx=tests/fixtures/precritic/deploy bad=0
   echo "-- fixture with every go line (must pass)"
@@ -126,16 +312,81 @@ self_test() {
   local lines; lines=$(wc -l < "$FLAKES")
   if [ "$r1" = FLAKE ] && [ "$r2" = BLOCKED ] && [ "$lines" = 2 ] && grep -q '"item":"addition:add_facts"' "$FLAKES"; then echo "  ok   FLAKE then BLOCKED, 2 flake lines with the item"
   else echo "  FAIL first $r1, second $r2, $lines flake line(s)"; bad=1; fi
+
+  # the final verdict (critic r1 D2): only all-OK prints OK; a gate that did not run is INCOMPLETE (exit 2)
+  echo "-- the final verdict"
+  local v rc last
+  vcase() {   # name, want rc, want last line, then result rows "res[:name]"...
+    local name=$1 want=$2 wantl=$3 r i=0; shift 3
+    : > "$tmp/res"
+    for r in "$@"; do printf 'T\t%s\t%s\t1.0\t0\t/dev/null\t%s\n' "${r#*:}" "${r%%:*}" "$i" >> "$tmp/res"; i=$((i + 1)); done
+    v=$(verdict "$tmp/res"); rc=$?; last=$(printf '%s\n' "$v" | tail -n 1)
+    if [ "$rc" = "$want" ] && [ "${last%% (*}" = "$wantl" ]; then echo "  ok   $name: exit $rc, \"$last\""
+    else echo "  FAIL $name: exit $rc (want $want), last line \"$last\" (want \"$wantl\")"; printf '%s\n' "$v" | sed 's/^/       /'; bad=1; fi
+  }
+  vcase "all OK" 0 'ws-deploy-gates: OK' "OK:a" "OK:b"
+  vcase "OK + FLAKE (logged)" 0 'ws-deploy-gates: OK' "OK:a" "FLAKE:b"
+  vcase "OK + SKIPPED (a renamed tool)" 2 'ws-deploy-gates: INCOMPLETE' "OK:a" "SKIPPED:ws-node-lint"
+  vcase "OK + NOT YET (digests, not accepted)" 2 'ws-deploy-gates: INCOMPLETE' "OK:a" "NOT YET:digests hook (M4 record/replay)"
+  vcase "OK + ACCEPTED (digests, --accept-notyet)" 0 'ws-deploy-gates: OK' "OK:a" "ACCEPTED:digests hook (M4 record/replay)"
+  vcase "OK + NEEDS-SHARDED-RUN" 2 'ws-deploy-gates: INCOMPLETE' "OK:a" "NEEDS-SHARDED-RUN:ws-coverage-matrix"
+  vcase "FAIL + NOT YET" 1 'ws-deploy-gates: FAIL' "FAIL:a" "NOT YET:digests"
+  vcase "BLOCKED" 1 'ws-deploy-gates: FAIL' "OK:a" "BLOCKED:b"
+  vcase "no gate ran at all" 2 'ws-deploy-gates: INCOMPLETE'
+  # the acceptance: only a NOT YET gate, by its name; logged in the timings line
+  G_SES=(T T); G_KIND=(node notyet); G_NAME=("ok gate" "digests hook (M4 record/replay)"); G_CMD=("true" "the tip's digests need M4"); G_KEY=("" digests)
+  ACCEPT_NOTYET=(digests); : > "$RES"; run_session T 2>/dev/null
+  if cut -f3 "$RES" | grep -qx ACCEPTED && grep -q '"acceptedNotYet":\["digests"\]' "$TIMINGS"; then echo "  ok   --accept-notyet digests: the gate shows ACCEPTED and the timings line logs it"
+  else echo "  FAIL --accept-notyet digests: $(cut -f3 "$RES" | tr '\n' ' ')"; bad=1; fi
+  ACCEPT_NOTYET=(nosuch)
+  if check_accept 2>/dev/null; then echo "  FAIL --accept-notyet nosuch was taken"; bad=1; else echo "  ok   --accept-notyet nosuch is refused (no NOT YET gate of that name)"; fi
+  ACCEPT_NOTYET=(); G_KEY=()
+
+  # session 3: the matrix budget and the newest nightly (critic r1 D1), on fixture nightly dirs and a stub matrix
+  echo "-- the matrix budget and the nightly rule (MQ_NOW=2026-10-23T12:00:00Z)"
+  local nx=$fx/nightly
+  ncase() {   # name, nightly dir, want rc (0 OK, 1 FAIL, 3 NEEDS-SHARDED-RUN), stub exit
+    local name=$1 d=$2 want=$3 got
+    MQ_GATES_LOGDIR=$tmp/lg MQ_NOW=2026-10-23T12:00:00Z MQ_MATRIX_DIR=$d MQ_MATRIX_CMD="bash $fx/matrix-stub.sh ${4:-3}" MQ_COVERAGE_ARGS="--all --affected X..HEAD" MQ_NIGHTLY_DIRTY_CHECK=0 \
+      bash -c 'source "$0" --source-only; matrix_gate tests/scripts/ws-coverage-matrix.cjs' "$0" > "$tmp/m.log" 2>&1; got=$?
+    if [ "$got" = "$want" ]; then echo "  ok   $name: exit $got ($(grep -E '^nightly: (REFUSED|OK|NEEDS)|^ws-coverage-matrix: (OK|FAIL)' "$tmp/m.log" | head -n 1 | cut -c1-150))"
+    else echo "  FAIL $name: exit $got, want $want"; sed 's/^/       /' "$tmp/m.log" | tail -n 12; bad=1; fi
+  }
+  ncase "within the budget: the rows run inline (stub OK)" "$nx/fresh" 0 0
+  ncase "within the budget: a red row fails inline (stub FAIL)" "$nx/fresh" 1 1
+  ncase "over the budget, no nightly at all: refused" "$nx/none" 1
+  ncase "over the budget, newest nightly 31 h old: refused" "$nx/stale" 1
+  ncase "over the budget, a RED row of a live skill (shard 2 of 2): refused" "$nx/red" 1
+  ncase "over the budget, RED only on a skill that is not live: not refused, NEEDS-SHARDED-RUN" "$nx/red-dead" 3
+  ncase "over the budget, fresh and green on another commit: NEEDS-SHARDED-RUN" "$nx/fresh" 3
+  ncase "over the budget, a shard of the night missing: NEEDS-SHARDED-RUN" "$nx/missing-shard" 3
+  ncase "over the budget, a complete green night on HEAD: OK" "$nx/covered" 0
+  if grep -q 'SHARD=<i>/8 tests/scripts/ws-matrix-nightly.sh' < <(MQ_GATES_LOGDIR=$tmp/lg MQ_NOW=2026-10-23T12:00:00Z MQ_MATRIX_DIR=$nx/fresh MQ_MATRIX_CMD="bash $fx/matrix-stub.sh 3" MQ_COVERAGE_ARGS=x MQ_NIGHTLY_DIRTY_CHECK=0 bash -c 'source "$0" --source-only; matrix_gate x' "$0" 2>&1); then
+    echo "  ok   NEEDS-SHARDED-RUN prints the sharded run to fire"; else echo "  FAIL NEEDS-SHARDED-RUN does not print the sharded run"; bad=1; fi
+  # a tree whose matrix has no --max-docs: the budget is measured with --list (32766 documents > 500)
+  local got
+  MQ_GATES_LOGDIR=$tmp/lg MQ_NOW=2026-10-23T12:00:00Z MQ_MATRIX_DIR=$nx/stale MQ_COVERAGE_ARGS="--all" MQ_NIGHTLY_DIRTY_CHECK=0 \
+    bash -c 'source "$0" --source-only; matrix_gate "$1"' "$0" "$fx/matrix-stub-old.cjs" > "$tmp/m.log" 2>&1; got=$?
+  if [ "$got" = 1 ] && grep -q 'OVER-BUDGET 32766 documents (budget 500) \[measured with --list' "$tmp/m.log"; then echo "  ok   no --max-docs in the tree: measured with --list, over budget, then the nightly rule (stale: refused)"
+  else echo "  FAIL no --max-docs fallback: exit $got"; tail -n 8 "$tmp/m.log" | sed 's/^/       /'; bad=1; fi
+  # N6: no origin/master, no MQ_DEPLOY_BASE: the gate fails and says to fetch (never a silent HEAD~1)
+  local repo=$tmp/repo
+  git init -q "$repo" && git -C "$repo" -c user.email=t@t -c user.name=t commit -q --allow-empty -m one
+  if ( cd "$repo" && unset MQ_DEPLOY_BASE && deploy_base ) > "$tmp/b.log" 2>&1; then echo "  FAIL deploy_base without origin/master returned $(cat "$tmp/b.log")"; bad=1
+  elif grep -q 'origin/master is not fetched' "$tmp/b.log"; then echo "  ok   no origin/master: FAIL with \"$(head -n 1 "$tmp/b.log" | cut -c1-70)...\""
+  else echo "  FAIL no origin/master: wrong message $(cat "$tmp/b.log")"; bad=1; fi
+  if ( MQ_DEPLOY_BASE=nosuchref deploy_base ) > "$tmp/b.log" 2>&1; then echo "  FAIL MQ_DEPLOY_BASE=nosuchref was taken"; bad=1; else echo "  ok   MQ_DEPLOY_BASE=nosuchref: FAIL ($(cat "$tmp/b.log"))"; fi
   rm -rf "$tmp"
   [ $bad = 0 ] && echo 'ws-deploy-gates --self-test: OK' || echo 'ws-deploy-gates --self-test: FAIL'
   return $bad
 }
 
 # ---------------------------------------------------------------------------------------------- the gate list
-# G_SES / G_KIND / G_NAME / G_CMD: kind node (plain), browser (through the runner), fn (a function here),
-# skip (SKIPPED (tool not built)), notyet (NOT YET).
-G_SES=(); G_KIND=(); G_NAME=(); G_CMD=()
-add() { G_SES+=("$1"); G_KIND+=("$2"); G_NAME+=("$3"); G_CMD+=("$4"); }
+# G_SES / G_KIND / G_NAME / G_CMD / G_KEY: kind node (plain), browser (through the runner), fn (a function here, on a
+# browser worker), nfn (a function here, on a node worker), skip (SKIPPED (tool not built)), notyet (NOT YET; G_KEY is
+# the name --accept-notyet takes).
+G_SES=(); G_KIND=(); G_NAME=(); G_CMD=(); G_KEY=()
+add() { G_SES+=("$1"); G_KIND+=("$2"); G_NAME+=("$3"); G_CMD+=("$4"); G_KEY+=("${5:-}"); }
 node_gate() {   # session name file [args]: a node gate, or SKIPPED when the file is not there
   local s=$1 n=$2 f=$3; shift 3
   if [ -f "tests/scripts/$f" ]; then add "$s" node "$n" "node tests/scripts/$f $*"; else add "$s" skip "$n" "tests/scripts/$f"; fi
@@ -159,6 +410,12 @@ build_list() {
   browser_gate 1 ws-teacher-preview ws-teacher-preview.cjs
   browser_gate 1 ws-teacher-quiz ws-teacher-quiz.cjs
   browser_gate 1 ws-share-options ws-share-options.cjs
+  # the S2 repeats check, per detailed lesson (each lesson file in js/modules/lessons/detailed/, index.js out)
+  local lf lid
+  for lf in js/modules/lessons/detailed/*.js; do
+    lid=$(basename "$lf" .js); [ "$lid" = index ] && continue
+    browser_gate 1 "ws-detailed-lesson --repeats $lid" ws-detailed-lesson.cjs --lesson "$lid" --repeats
+  done
   browser_gate 1 ws-presets-unit ws-presets-unit.mjs
   browser_gate 1 ws-anchors-unit ws-anchors-unit.mjs
   browser_gate 1 ws-boot-smoke ws-boot-smoke.cjs
@@ -174,27 +431,44 @@ build_list() {
   node_gate 1 "ws-plain-words --check" ws-plain-words.mjs --check
   node_gate 1 ws-node-lint "$(first_of ws-node-lint.mjs ws-node-lint.cjs)"
   node_gate 1 "ws-envelope --self-test" "$(first_of ws-envelope.mjs ws-envelope.cjs)" --self-test
-  # session 2: the long screen sweeps, sharded, then the two sweep modes on the pinned sample
+  node_gate 1 ws-text-vs-gen ws-text-vs-gen.mjs
+  node_gate 1 "ws-backtest --kind fixture" ws-backtest.mjs --kind fixture
+  # the options-verify pin (another builder's tool): on the list as soon as it is in the tree
+  if [ -f tests/scripts/ws-options-pin.cjs ]; then node_gate 1 "ws-options-pin --check" ws-options-pin.cjs --check; fi
+  # session 2: the long screen sweeps, sharded, then the viewport and S9 checks and the two sweep modes on the sample
   local i
   for i in $(seq 1 "$SLOTS_SHARDS"); do browser_gate 2 "ws-screen-slots --shard $i/$SLOTS_SHARDS" ws-screen-slots.cjs --shard "$i/$SLOTS_SHARDS" --baseline "$SLOTS_BASE"; done
   for i in $(seq 1 "$FIT_SHARDS"); do browser_gate 2 "ws-chromebook-fit --shard $i/$FIT_SHARDS" ws-chromebook-fit.cjs --shard "$i/$FIT_SHARDS" --baseline "$SAMPLE"; done
+  browser_gate 2 "ws-viewport-check --baseline" ws-viewport-check.cjs --baseline "$VIEWPORT_BASE"
+  # S9 (critic N8): a quarter-inch ruler read under an inch ("3/4") draws its own boxes; the card must not add a typed field
+  browser_gate 2 "ws-screen-slots S9 ruler seeds 1-40" ws-screen-slots.cjs --skills measurement:reading_ruler_hard --hosts card --seeds 1-40 --need-ans 1/4,1/2,3/4
   browser_gate 2 "ws-chromebook-fit --dark" ws-chromebook-fit.cjs --dark --baseline "$SAMPLE"
   browser_gate 2 "ws-chromebook-fit --bigboard" ws-chromebook-fit.cjs --bigboard --baseline "$SAMPLE"
   browser_gate 2 "ws-screen-slots --dark" ws-screen-slots.cjs --dark --baseline "$SLOTS_BASE"
   browser_gate 2 "ws-screen-slots --bigboard" ws-screen-slots.cjs --bigboard --baseline "$SLOTS_BASE"
   # session 3
   local cm; cm=$(first_of ws-coverage-matrix.cjs ws-coverage-matrix.mjs)
-  # the matrix rows are print-lint kit documents (≈ 5.4 s each, lead speed audit 2026-10-23): split over both slots
-  # The matrix takes its own browser slots (--slots 2: one print-lint process per slot through mq-browser-run.sh), so it
-  # runs as a node gate: wrapping it in browser_gate would hold a slot while its children wait for one. Affected rows are
-  # those a change since the deployed tip reaches (MQ_DEPLOY_BASE, default the merge base with origin/master).
-  local base; base=${MQ_DEPLOY_BASE:-$(git merge-base origin/master HEAD 2>/dev/null || echo HEAD~1)}
-  local cargs=${MQ_COVERAGE_ARGS:-"--all --affected $base..HEAD --baseline design/audit/matrix/baseline.json --slots 2 --batch 9"}
-  # shellcheck disable=SC2086
-  node_gate 3 "ws-coverage-matrix $cargs" "$cm" $cargs
-  add 3 notyet "digests hook (M4 record/replay)" "the tip's digests (§1.6.2, ≈ 8 min) need M4 record/replay, which is not built"
+  # The matrix rows are print-lint kit documents (≈ 5.4 s each, lead speed audit 2026-10-23). The matrix takes its own
+  # browser slots (--slots 2: one print-lint process per slot through mq-browser-run.sh), so it runs on a node worker:
+  # wrapping it in the runner would hold a slot while its children wait for one. The rows are those a change since the
+  # deployed tip reaches, capped at MQ_MATRIX_BUDGET documents; over it the newest nightly decides (matrix_gate).
+  if [ -f "tests/scripts/$cm" ]; then add 3 nfn "ws-coverage-matrix --affected (budget $MATRIX_BUDGET)" "matrix_gate tests/scripts/$cm"
+  else add 3 skip "ws-coverage-matrix --affected" "tests/scripts/$cm"; fi
+  add 3 notyet "digests hook (M4 record/replay)" "the tip's digests (§1.6.2, ≈ 8 min) need M4 record/replay, which is not built; before M4 the lead accepts this one item by name: --accept-notyet digests" digests
   add 3 fn "owner go (lane manifests)" "deploy_check design/lanes design/status"
 }
+
+# --accept-notyet: every name must be the key of a NOT YET gate on the list
+check_accept() {
+  local a i ok names=""
+  for i in "${!G_KEY[@]}"; do [ "${G_KIND[$i]}" = notyet ] && names="$names ${G_KEY[$i]}"; done
+  for a in "${ACCEPT_NOTYET[@]}"; do
+    ok=0
+    for i in "${!G_KEY[@]}"; do [ "${G_KIND[$i]}" = notyet ] && [ "${G_KEY[$i]}" = "$a" ] && ok=1; done
+    [ $ok = 1 ] || { echo "ws-deploy-gates: --accept-notyet $a: no NOT YET gate has that name (NOT YET gates:${names:- none})" >&2; return 1; }
+  done
+}
+accepted() { local a; for a in "${ACCEPT_NOTYET[@]}"; do [ "$a" = "$1" ] && return 0; done; return 1; }
 
 # The print-lint gate before its per-skill baseline is pinned: the accepted standing limit (STATUS: 458-461 / 33).
 print_lint_limit() {
@@ -221,13 +495,16 @@ run_gate() {   # index [retry]
   t0=$(now_ms)
   case "$kind" in
     skip)   echo "SKIPPED (tool not built): $cmd" > "$log"; res="SKIPPED"; rc=0 ;;
-    notyet) echo "NOT YET: $cmd" > "$log"; res="NOT YET"; rc=0 ;;
+    notyet) if accepted "${G_KEY[$i]}"; then echo "ACCEPTED NOT YET (--accept-notyet ${G_KEY[$i]}, $(date -u +%FT%TZ)): $cmd" > "$log"; res="ACCEPTED"
+            else echo "NOT YET: $cmd" > "$log"; res="NOT YET"; fi; rc=0 ;;
     node)   ( eval "$cmd" ) > "$log" 2>&1; rc=$? ;;
     browser) eval "MQ_BROWSER_WAIT_LOG=1 \"\$RUNNER\" $cmd" > "$log" 2>&1; rc=$? ;;
-    fn)     ( eval "$cmd" ) > "$log" 2>&1; rc=$? ;;
+    fn|nfn) ( eval "$cmd" ) > "$log" 2>&1; rc=$? ;;
   esac
   t1=$(now_ms)
-  [ "$kind" = skip ] || [ "$kind" = notyet ] || { [ $rc = 0 ] && res=OK || res=FAIL; }
+  # exit 3 from the matrix gate: over the budget, fresh green nightly, not yet run on this tip
+  if [ "$kind" = nfn ] && [ "$rc" = 3 ]; then res=NEEDS-SHARDED-RUN
+  else [ "$kind" = skip ] || [ "$kind" = notyet ] || { [ $rc = 0 ] && res=OK || res=FAIL; }; fi
   wait=$(grep -oE 'mq-browser-run: slot [0-9]+ after [0-9]+s' "$log" | grep -oE '[0-9]+s$' | tr -d s | awk '{s+=$1} END {print s+0}')
   printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "${G_SES[$i]}" "$name" "$res" "$(awk -v a="$t0" -v b="$t1" 'BEGIN{printf "%.1f", (b-a)/1000}')" "$wait" "$log" "$i" >> "$RES$tag"
   echo "  [s${G_SES[$i]}] $res  $name  ($(awk -v a="$t0" -v b="$t1" 'BEGIN{printf "%.0f", (b-a)/1000}') s${wait:+, slot wait ${wait} s})" >&2
@@ -251,7 +528,7 @@ run_session() {
   : > "$qb"; : > "$qn"
   for i in "${!G_SES[@]}"; do
     [ "${G_SES[$i]}" = "$s" ] || continue
-    case "${G_KIND[$i]}" in browser|fn) echo "$i" >> "$qb" ;; *) echo "$i" >> "$qn" ;; esac
+    case "${G_KIND[$i]}" in browser|fn) echo "$i" >> "$qb" ;; *) echo "$i" >> "$qn" ;; esac   # nfn, node, skip, notyet
   done
   echo "== session $s ($(wc -l < "$qb") browser / fn, $(wc -l < "$qn") node / other; logs $LOGDIR)" >&2
   t0=$(now_ms)
@@ -278,23 +555,47 @@ run_session() {
   done < "$RES"
   t1=$(now_ms)
   SES_WALL[$s]=$(awk -v a="$t0" -v b="$t1" 'BEGIN{printf "%.1f", (b-a)/1000}')
-  # one JSON line per session run
-  node -e '
+  # one JSON line per session run (with the NOT YET items the lead accepted by name, if any)
+  ACC="${ACCEPT_NOTYET[*]}" node -e '
     const fs = require("fs"); const [res, s, commit, wall, out] = process.argv.slice(1);
     const gates = fs.readFileSync(res, "utf8").split("\n").filter(Boolean).map((l) => l.split("\t")).filter((r) => r[0] === s)
       .map((r) => ({ gate: r[1], result: r[2], seconds: Number(r[3]), slotWait: Number(r[4]) }));
     fs.mkdirSync(require("path").dirname(out), { recursive: true });
+    const acc = gates.filter((g) => g.result === "ACCEPTED").map((g) => g.gate);
     fs.appendFileSync(out, JSON.stringify({ date: new Date().toISOString(), commit, session: Number(s), wallSeconds: Number(wall),
-      browserWorkers: Number(process.env.BW), nodeWorkers: Number(process.env.NW), gates }) + "\n");
+      browserWorkers: Number(process.env.BW), nodeWorkers: Number(process.env.NW), gates,
+      ...(acc.length ? { acceptedNotYet: (process.env.ACC || "").split(" ").filter(Boolean), acceptedGates: acc } : {}) }) + "\n");
   ' "$RES" "$s" "$COMMIT" "${SES_WALL[$s]}" "$TIMINGS"
+}
+
+# The final verdict over a results file (critic r1 D2): OK only when every gate passed; INCOMPLETE (2) when nothing
+# failed but a gate did not run; FAIL (1) otherwise. Prints the gates that need action, then the verdict line.
+verdict() {
+  local res=$1 bad inc acc fl
+  bad=$(awk -F'\t' '$3=="FAIL"||$3=="BLOCKED"' "$res" | wc -l)
+  inc=$(awk -F'\t' '$3=="SKIPPED"||$3=="NOT YET"||$3=="NEEDS-SHARDED-RUN"' "$res" | wc -l)
+  acc=$(awk -F'\t' '$3=="ACCEPTED" {printf "%s%s", (n++ ? "; " : ""), $2}' "$res")
+  fl=$(awk -F'\t' '$3=="FLAKE"' "$res" | wc -l)
+  awk -F'\t' '$3=="FAIL"||$3=="BLOCKED" {print "  " $3 ": " $2 " (log " $6 ")"}' "$res"
+  awk -F'\t' '$3=="SKIPPED" {print "  DID NOT RUN, SKIPPED: " $2 " (its tool is not in this tree; a gate is never skipped: restore it or take it off the list with a STATUS note)"}
+              $3=="NOT YET" {print "  DID NOT RUN, NOT YET: " $2 " (needs a later M-step; the lead may accept it by name, see the header)"}
+              $3=="NEEDS-SHARDED-RUN" {print "  DID NOT RUN, NEEDS-SHARDED-RUN: " $2 " (fire the sharded matrix run printed in " $6 ", then re-run session 3)"}' "$res"
+  [ -n "$acc" ] && echo "  ACCEPTED NOT YET (logged in $TIMINGS): $acc"
+  local extra=""
+  [ "$fl" -gt 0 ] && extra="$fl FLAKE logged"
+  [ -n "$acc" ] && extra="${extra:+$extra; }accepted not yet: $acc"
+  if [ "$bad" -gt 0 ]; then echo "ws-deploy-gates: FAIL ($bad failed$([ "$inc" -gt 0 ] && echo ", $inc did not run"))"; return 1; fi
+  if [ ! -s "$res" ]; then echo "ws-deploy-gates: INCOMPLETE (no gate ran)"; return 2; fi
+  if [ "$inc" -gt 0 ]; then echo "ws-deploy-gates: INCOMPLETE ($inc gate(s) did not run; nothing failed)"; return 2; fi
+  echo "ws-deploy-gates: OK${extra:+ ($extra)}"; return 0
 }
 
 print_table() {
   local s total=0
-  printf '\n%-8s %-46s %-8s %9s %10s\n' session gate result seconds "slot wait"
-  printf '%-8s %-46s %-8s %9s %10s\n' ------- ---------------------------------------------- -------- --------- ----------
+  printf '\n%-8s %-50s %-17s %9s %10s\n' session gate result seconds "slot wait"
+  printf '%-8s %-50s %-17s %9s %10s\n' ------- -------------------------------------------------- ----------------- --------- ----------
   sort -t$'\t' -k1,1n -s "$RES" | while IFS=$'\t' read -r ses name res secs wt log idx; do
-    printf '%-8s %-46s %-8s %9s %10s\n' "$ses" "$name" "$res" "$secs" "$wt"
+    printf '%-8s %-50s %-17s %9s %10s\n' "$ses" "$name" "$res" "$secs" "$wt"
   done
   echo
   for s in "${!SES_WALL[@]}"; do
@@ -305,10 +606,13 @@ print_table() {
 }
 
 # ---------------------------------------------------------------------------------------------- main
+# `source ws-deploy-gates.sh --source-only` defines the functions and stops here (the self-test's sub-shells)
+[ "${1:-}" = --source-only ] && return 0
 SESSIONS=(); MODE=run; LANES_DIR=design/lanes; STATUS_DIR=
 while [ $# -gt 0 ]; do
   case "$1" in
     --session) SESSIONS+=("$2"); shift ;;
+    --accept-notyet) IFS=', ' read -r -a _acc <<< "$2"; ACCEPT_NOTYET+=("${_acc[@]}"); shift ;;
     --all) SESSIONS=(1 2 3) ;;
     --list) MODE=list ;;
     --deploy-check) MODE=deploy ;;
@@ -316,7 +620,7 @@ while [ $# -gt 0 ]; do
     --status-dir) STATUS_DIR=$2; shift ;;
     --self-test) MODE=selftest ;;
     -h|--help) usage; exit 0 ;;
-    *) echo "unknown argument: $1"; usage; exit 2 ;;
+    *) echo "unknown argument: $1"; usage; exit 64 ;;
   esac
   shift
 done
@@ -328,20 +632,22 @@ case "$MODE" in
 esac
 
 build_list
+check_accept || exit 64
 if [ "$MODE" = list ]; then
-  printf '%-8s %-8s %-46s %s\n' session kind gate command
+  printf '%-8s %-8s %-50s %s\n' session kind gate command
   for i in "${!G_SES[@]}"; do
     k=${G_KIND[$i]}; c=${G_CMD[$i]}
-    [ "$k" = skip ] && c="SKIPPED (tool not built): $c"; [ "$k" = notyet ] && c="NOT YET: $c"
+    [ "$k" = skip ] && c="SKIPPED (tool not built; the run is INCOMPLETE): $c"; [ "$k" = notyet ] && c="NOT YET [--accept-notyet ${G_KEY[$i]}]: $c"
     [ "$k" = browser ] && c="$RUNNER $c"
-    printf '%-8s %-8s %-46s %s\n' "${G_SES[$i]}" "$k" "${G_NAME[$i]}" "$c"
+    printf '%-8s %-8s %-50s %s\n' "${G_SES[$i]}" "$k" "${G_NAME[$i]}" "$c"
   done
+  echo "(matrix: budget $MATRIX_BUDGET documents; base MQ_DEPLOY_BASE, else merge-base origin/master: $(deploy_base 2>&1 | tail -n 1))"
   exit 0
 fi
-[ ${#SESSIONS[@]} -gt 0 ] || { usage; exit 2; }
+[ ${#SESSIONS[@]} -gt 0 ] || { usage; exit 64; }
 if [ ! -x "$RUNNER" ]; then
   if [ -f tests/scripts/mq-browser-run.sh ]; then cp tests/scripts/mq-browser-run.sh "$RUNNER" && chmod +x "$RUNNER"
-  else echo "ws-deploy-gates: $RUNNER is missing and tests/scripts/mq-browser-run.sh is not in this tree"; echo 'ws-deploy-gates: FAIL'; exit 2; fi
+  else echo "ws-deploy-gates: $RUNNER is missing and tests/scripts/mq-browser-run.sh is not in this tree"; echo 'ws-deploy-gates: FAIL'; exit 1; fi
 fi
 # Prerequisites, checked before every session (a missing one would show as gate FAILs much later)
 prereq_bad=0
@@ -350,12 +656,9 @@ if ! python3 -c 'import pymupdf' >/dev/null 2>&1 && ! python3 -c 'import fitz' >
 fi
 node -e 'require("puppeteer")' >/dev/null 2>&1 || { echo 'ws-deploy-gates: prerequisite missing: puppeteer (node -e "require(\"puppeteer\")" fails). Fix: npm install'; prereq_bad=1; }
 command -v flock >/dev/null 2>&1 || { echo 'ws-deploy-gates: prerequisite missing: flock (util-linux), needed by the browser runner'; prereq_bad=1; }
-[ $prereq_bad = 0 ] || { echo 'ws-deploy-gates: FAIL'; exit 2; }
+[ $prereq_bad = 0 ] || { echo 'ws-deploy-gates: FAIL'; exit 1; }
 export BW=$BROWSER_WORKERS NW=$NODE_WORKERS
 for s in "${SESSIONS[@]}"; do run_session "$s"; done
 print_table
-if cut -f3 "$RES" | grep -qxE 'FAIL|BLOCKED'; then
-  echo; cut -f2,3,6 "$RES" | awk -F'\t' '$2=="FAIL"||$2=="BLOCKED" {print "  " $2 ": " $1 " (log " $3 ")"}'
-  echo 'ws-deploy-gates: FAIL'; exit 1
-fi
-echo 'ws-deploy-gates: OK'
+echo
+verdict "$RES"; exit $?

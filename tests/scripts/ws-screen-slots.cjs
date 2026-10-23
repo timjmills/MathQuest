@@ -39,6 +39,20 @@
 // Finding kinds (the baseline's "host:kind"): doubled, paper, contrast; in a sweep the host is prefixed with the
 // mode and role ("dark-teacher:worksheet:contrast").
 //
+// Seeded card (critic r1 N8; the S9 regression check, ws-deploy-gates session 2):
+//   --seeds a-b                the card host deals generateQuestionFor({category, skill, seed}) for every seed a..b
+//                              instead of one unseeded generateQuestion(), so which items a run sees no longer depends
+//                              on the shard or what ran before; every seed is a render (a finding names its seed)
+//   --need-ans x,y,...         with --seeds: FAIL unless the seeded card items dealt every one of these answers (the
+//                              check proves it saw the case it guards, e.g. --skills measurement:reading_ruler_hard
+//                              --hosts card --seeds 1-40 --need-ans 1/4,1/2,3/4: readings under an inch, which once
+//                              showed the cell's own fraction boxes AND a typed fraction field)
+//
+// An empty run is a FAIL, never OK (critic r1 D3): an unknown --skills key, a retired skill, an unknown --category,
+// a sweep sample that names a skill that is not live, a selection of 0 skills, or a run of 0 host renders each
+// FAIL and name what was wrong.
+//   node tests/scripts/ws-screen-slots.cjs --self-test         # the selection rules on a fixture list (no browser)
+//
 // Prints one line per doubled skill x host, a count, then `ws-screen-slots: OK` or `FAIL`.
 const fs = require('fs');
 const path = require('path');
@@ -68,6 +82,75 @@ const OPTS = arg('opts', null) ? JSON.parse(arg('opts', '{}')) : null;
 const FROM = parseInt(arg('from', '0'), 10);
 const TO = parseInt(arg('to', '100000'), 10);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const fail = (why) => { console.log(`ws-screen-slots: ${why}`); console.log('ws-screen-slots: FAIL'); process.exit(2); };
+const SEEDS = (() => {
+    const s = arg('seeds', '');
+    if (!s) return null;
+    const m = /^(\d+)-(\d+)$/.exec(s);
+    if (!m || +m[1] > +m[2]) fail(`bad --seeds ${s} (want a-b, a <= b)`);
+    return Array.from({ length: +m[2] - +m[1] + 1 }, (_, i) => +m[1] + i);
+})();
+const NEED_ANS = (arg('need-ans', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
+if (NEED_ANS.length && !SEEDS) fail('--need-ans needs --seeds (the answers of seeded card items)');
+if (SEEDS && !HOSTS.includes('card')) fail('--seeds seeds the card host; add card to --hosts');
+
+const isLive = (s) => !!s.skillId && !/retired|tombstone/i.test(s.label || '') && !/^_?tomb|retired/i.test(s.skillId);
+/**
+ * The skills a run checks, and why a selection is wrong (critic r1 D3: an empty or misspelt selection is never OK).
+ * all: every SKILLS entry [{categoryId, skillId, label}]; returns {skills, errors}.
+ */
+function selectSkills(all, { only = [], categories = [], sample = null, from = 0, to = 100000, shard = null } = {}) {
+    const errors = [];
+    const live = all.filter(isLive);
+    const key = (s) => `${s.categoryId}:${s.skillId}`;
+    const liveKeys = new Set(live.map(key));
+    const allKeys = new Set(all.map(key));
+    for (const k of only) {
+        if (!allKeys.has(k)) errors.push(`--skills ${k}: no such skill (want category:skill as in data.js SKILLS)`);
+        else if (!liveKeys.has(k)) errors.push(`--skills ${k}: a retired skill (tombstone), not a live one`);
+    }
+    const cats = new Set(live.map((s) => s.categoryId));
+    for (const c of categories) if (!cats.has(c)) errors.push(`--category ${c}: no such category with a live skill`);
+    let skills = live;
+    if (sample) {
+        for (const k of sample) if (!liveKeys.has(k)) errors.push(`the sweep sample names ${k}, which is not a live skill (regenerate it: --write-sample)`);
+        skills = sample.map((k) => live.find((s) => key(s) === k)).filter(Boolean);
+    }
+    if (only.length) skills = skills.filter((s) => only.includes(key(s)));
+    if (categories.length) skills = skills.filter((s) => categories.includes(s.categoryId));
+    skills = skills.slice(from, to);
+    if (shard) skills = skills.filter((_, i) => i % shard.n === shard.i - 1);
+    if (!errors.length && !skills.length) errors.push('the selection has 0 skills (filters, --from/--to or --shard left nothing to check)');
+    return { skills, errors };
+}
+
+if (has('self-test')) {
+    const L = [
+        { categoryId: 'measurement', skillId: 'time_5min', label: 'Time' }, { categoryId: 'measurement', skillId: 'reading_ruler_hard', label: 'Ruler' },
+        { categoryId: 'addition', skillId: 'add_facts', label: 'Facts' }, { categoryId: 'addition', skillId: 'old_one', label: 'Old (retired)' },
+        { categoryId: 'graveyard', skillId: '_tomb_1', label: 'tombstone' },
+    ];
+    const cases = [
+        ['--category measurment (a typo)', { categories: ['measurment'] }, /--category measurment: no such category/],
+        ['--skills nosuch:skill', { only: ['nosuch:skill'] }, /--skills nosuch:skill: no such skill/],
+        ['--skills of a retired skill', { only: ['addition:old_one'] }, /retired skill/],
+        ['--category of only tombstones', { categories: ['graveyard'] }, /--category graveyard: no such category/],
+        ['a sample naming a gone skill', { sample: ['addition:add_facts', 'addition:gone'] }, /sweep sample names addition:gone/],
+        ['--from past the end', { from: 50 }, /0 skills/],
+        ["--shard 2/2 of 1 skill", { only: ['measurement:time_5min'], shard: { i: 2, n: 2 } }, /0 skills/],
+        ['--skills measurement:time_5min (valid)', { only: ['measurement:time_5min'] }, null],
+        ['--category measurement (valid)', { categories: ['measurement'] }, null],
+    ];
+    let bad = 0;
+    for (const [name, o, want] of cases) {
+        const r = selectSkills(L, o);
+        const ok = want ? r.errors.some((e) => want.test(e)) : (!r.errors.length && r.skills.length > 0);
+        if (!ok) bad++;
+        console.log(`  ${ok ? 'ok  ' : 'FAIL'} ${name}: ${r.errors.length ? r.errors.join('; ') : `${r.skills.length} skill(s)`}`);
+    }
+    console.log(bad ? 'ws-screen-slots --self-test: FAIL' : 'ws-screen-slots --self-test: OK');
+    process.exit(bad ? 1 : 0);
+}
 
 // In the page: does this cell draw answer places, and is a separate host field visible?
 function DETECT(cellSel, hostSel, textSel) {
@@ -249,16 +332,14 @@ async function prep(page, role) {
 (async () => {
     const app = await open({ seed: 1, viewport: { width: BIGBOARD ? 1366 : 1280, height: BIGBOARD ? 768 : 900, deviceScaleFactor: 1 } });
     const { page } = app;
-    let skills = await listSkills(page);
-    skills = skills.filter((s) => !/retired|tombstone/i.test(s.label || ''));
-    if (arg('write-sample', null)) { await writeSample(page, skills, arg('write-sample')); await app.close(); console.log('ws-screen-slots: OK'); return; }
+    const allSkills = await listSkills(page);
+    if (arg('write-sample', null)) { await writeSample(page, allSkills.filter(isLive), arg('write-sample')); await app.close(); console.log('ws-screen-slots: OK'); return; }
     // a sweep runs on the pinned sample (one skill per kit template) unless --skills names the skills
     const SAMPLE = SWEEP && !ONLY.length ? readSample() : null;
-    if (SAMPLE) skills = SAMPLE.map((key) => skills.find((s) => `${s.categoryId}:${s.skillId}` === key)).filter(Boolean);
-    if (ONLY.length) skills = skills.filter((s) => ONLY.includes(`${s.categoryId}:${s.skillId}`));
-    if (CATEGORIES.length) skills = skills.filter((s) => CATEGORIES.includes(s.categoryId));
-    skills = skills.slice(FROM, TO);
-    if (SHARD) skills = skills.filter((_, i) => i % SHARD.n === SHARD.i - 1);
+    const sel = selectSkills(allSkills, { only: ONLY, categories: CATEGORIES, sample: SAMPLE, from: FROM, to: TO, shard: SHARD });
+    if (sel.errors.length) { await app.close(); sel.errors.forEach((e) => console.log(e)); fail(`${sel.errors.length} selection error(s); nothing checked`); }
+    const skills = sel.skills;
+    const seen = new Map();   // --need-ans: answer -> first "skill seed n"
     if (DARK) await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'dark' }]);
     const doubled = [];
     const suspects = [];
@@ -287,28 +368,40 @@ async function prep(page, role) {
                 checked++;
                 const h = tagOf(host);
                 if (r && r.paper && r.paper.length) { const l = `${key.padEnd(44)} ${h.padEnd(10)} paper verb on screen: "${r.paper[0]}"`; paperVerbs.push(l); findings.push({ key, id: `${h}:paper`, line: l }); }
-                if (r && r.doubled) { const l = `${key.padEnd(44)} ${h.padEnd(10)} host field + ${r.drawn} drawn place(s), ${r.under} underscore blank(s), ${r.inputs} cell input(s)`; doubled.push(l); findings.push({ key, id: `${h}:doubled`, line: l }); }
+                if (r && r.doubled) { const l = `${key.padEnd(44)} ${h.padEnd(10)} host field + ${r.drawn} drawn place(s), ${r.under} underscore blank(s), ${r.inputs} cell input(s)${r.seedNote || ''}`; doubled.push(l); findings.push({ key, id: `${h}:doubled`, line: l }); }
                 else if (r && r.suspect) suspects.push(`${key.padEnd(44)} ${h.padEnd(10)} host field + ${r.suspects} empty drawn box(es) (check by eye)`);
                 if (leg && leg.low && leg.low.length) { const l = `${key.padEnd(44)} ${h.padEnd(10)} ${leg.low.length} low-contrast text(s), e.g. ${leg.low[0]}`; contrast.push(l); findings.push({ key, id: `${h}:contrast`, line: l }); }
             };
             const legible = (sel) => (SWEEP ? page.evaluate(LEGIBLE, sel, DARK ? { on: 'html', cls: 'dark' } : { on: 'body', cls: 'tv-bigboard' }) : null);
             try {
-                if (pass.includes('card')) {
-                    const ok = await page.evaluate((c, k, board) => {
+                if (pass.includes('card')) for (const seed of SEEDS || [null]) {
+                    const ok = await page.evaluate((c, k, board, seed) => {
                         try {
                             const st = window.state; st.quizMode = false; st.category = c; st.skill = k; st.gameMode = 'practice'; st.isMixedMode = false; st.hasAnswered = false;
                             window.showView('gameView');
                             // the teacher's Board display (teacher-shell.js startPractice, run.mode 'board')
                             if (board) document.body.classList.add('tv-bigboard');
-                            st.currentQ = window.generateQuestion(); window.renderQuestion();
+                            // --seeds: the seeded item (generateQuestionFor runs the same generateQuestion, practice mode)
+                            st.currentQ = seed == null ? window.generateQuestion() : window.generateQuestionFor({ category: c, skill: k, seed });
+                            if (!st.currentQ) return 'none';
+                            window.renderQuestion();
                             if (board) document.body.classList.add('tv-bigboard');
                             // the board must really be on: the teacher's full-screen frame (css/play-teacher.css)
                             if (board && getComputedStyle(document.getElementById('gameView')).position !== 'fixed') return 'board';
-                            return true;
+                            return { ans: String(st.currentQ.ans), type: st.currentQ.answerType || '' };
                         } catch (e) { return false; }
-                    }, c, k, BIGBOARD);
+                    }, c, k, BIGBOARD, seed);
                     if (ok === 'board') throw new Error('the Board display did not engage (#gameView is not the fixed board frame)');
-                    if (ok) { await sleep(350); note('card', await page.evaluate(DETECT, '#visualAid', '#answerInputArea', '#questionPaper'), await legible('#questionCard')); }
+                    if (ok === 'none') throw new Error(`card: the generator dealt no item${seed == null ? '' : ` for seed ${seed}`}`);
+                    if (ok) {
+                        await sleep(350);
+                        const r = await page.evaluate(DETECT, '#visualAid', '#answerInputArea', '#questionPaper');
+                        if (seed != null) {
+                            if (!seen.has(ok.ans)) seen.set(ok.ans, `${key} seed ${seed}`);
+                            if (r && r.doubled) r.seedNote = ` [seed ${seed}, answer ${ok.ans}, answerType ${ok.type}]`;
+                        }
+                        note('card', r, await legible('#questionCard'));
+                    }
                 }
                 if (pass.includes('map')) {
                     // MAP borrows the practice card with the paper wrapper off (the owner's time card)
@@ -400,8 +493,16 @@ async function prep(page, role) {
         console.log(`baseline ${arg('baseline')}: ${findings.length - failing.length} pinned finding(s) seen, ${failing.length} NEW${fixed.length ? `, ${fixed.length} pinned but not seen (fixed or intermittent: ${fixed.join('; ')})` : ''}`);
         failing.forEach((f) => console.log(`NEW ${f.line}`));
     }
-    // a sweep that could not render a host has not checked it
-    if (SWEEP && errors.length) console.log(`${errors.length} sweep render error(s): the sweep did not check those hosts`);
-    if ((failing.length || (SWEEP && errors.length)) && !has('report-only')) { console.log('ws-screen-slots: FAIL'); process.exit(1); }
+    // a sweep (or a seeded run) that could not render a host has not checked it
+    const errFail = (SWEEP || SEEDS) && errors.length > 0;
+    if (errFail) console.log(`${errors.length} render error(s): the run did not check those hosts`);
+    // nothing checked is never OK (critic r1 D3)
+    const empty = checked === 0;
+    if (empty) console.log(`0 host renders: ${skills.length} skill(s) selected on hosts ${HOSTS.join(', ')}, but no host rendered, so nothing was checked`);
+    // --need-ans: the seeded items must have dealt the case the run guards
+    const missing = NEED_ANS.filter((a) => !seen.has(a));
+    if (SEEDS) console.log(`seeded card answers: ${seen.size} distinct (${Array.from(seen.keys()).slice(0, 20).join(', ')}${seen.size > 20 ? ' ...' : ''})${NEED_ANS.length ? `; needed ${NEED_ANS.join(', ')}: ${missing.length ? `MISSING ${missing.join(', ')} (widen --seeds: the check did not see the case it guards)` : NEED_ANS.map((a) => `${a} at ${seen.get(a).split(' ').slice(1).join(' ')}`).join(', ')}` : ''}`);
+    if (empty || missing.length) { console.log('ws-screen-slots: FAIL'); process.exit(1); }
+    if ((failing.length || errFail) && !has('report-only')) { console.log('ws-screen-slots: FAIL'); process.exit(1); }
     console.log('ws-screen-slots: OK');
 })().catch((e) => { console.error(e); console.log('ws-screen-slots: FAIL'); process.exit(1); });

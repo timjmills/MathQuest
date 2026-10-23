@@ -23,8 +23,19 @@ task has been created.** The lane lead creates it (one task, or eight with `SHAR
   (about 1,560 rows = 4,700 documents, about 4.2 h on two slots).
 - Output: `design/audit/matrix/<UTC date>.json` (`<date>.shard-i-of-n.json` per shard): the commit, the selection,
   every row with its per-size counts, status (OK / CACHED / RED / PENDING(step) / N/A) and dependency hash, and the
-  timing. The deploy gate (S5 session 3) refuses a deploy when the newest nightly is older than 24 hours or a row of
-  a live skill is RED.
+  timing.
+- **The deploy gate** (S5 session 3, `matrix_gate` in `tests/scripts/ws-deploy-gates.sh`) runs
+  `ws-coverage-matrix --all --affected <base>..HEAD --baseline baseline.json --slots 2 --batch 9 --max-docs 500`
+  (`MQ_MATRIX_BUDGET` changes the 500; `<base>` is `MQ_DEPLOY_BASE`, else the merge base with `origin/master`, and the
+  gate FAILS when `origin/master` is not fetched). Within the budget the affected rows run inline and the gate is OK
+  or FAIL. Over it (the matrix exits 3, `OVER-BUDGET`) the gate reads every run file of the newest date here
+  (`<date>.json` or all its `<date>.shard-i-of-n.json`) and: **refuses the deploy (FAIL)** when there is none, when it
+  finished more than 24 hours ago (its `finished` time, else the file's git commit time, else its date at 00:00 UTC),
+  or when any row of a live skill (data.js `SKILLS`, tombstones out) is RED or ERROR; is **OK** when that night is
+  complete (every shard i of n), ran on one clean commit, and HEAD differs from that commit only in
+  `design/audit/matrix/` (the night covered this tip); and is otherwise **NEEDS-SHARDED-RUN**, which is not a pass:
+  the run ends INCOMPLETE and prints what to fire, namely the eight shard tasks (`SHARD=i/8
+  tests/scripts/ws-matrix-nightly.sh`) on this tip of `claude/sweet-newton-c8wrv1`, then session 3 again.
 
 ## The scheduled task's prompt (exact text)
 
