@@ -21,3 +21,4 @@ Owns: `design/mockups/teacher-2/`, `tests/scripts/ws-teacher-tokens.cjs`, this f
 | 2026-10-23 | Owner via lead: grade badge (neutral numbered circle, fixed slot) + grade grouping. Owner: warm stone page #EFECE8, current tints | lead | — |
 | 2026-10-23 | Fix round 2: checks first (cea2d872 failing), then fixes b66395f5, fdbe3486, 5a74f98a, b9473ab7; OA → #555BAE, Data → #4B8FCC; all gates OK | mq-opus-medium | done |
 | 2026-10-23 | Critic round 3 (fresh critic) | mq-opus-medium | running |
+| 2026-10-23 | Owner: tray must handle 40–100 skills (a whole grade). Plan: chips ≤ ~8, then a summary bar (count + per-area segments) → tray sheet grouped by area; Add whole area / grade / unit; weights per area; summary and preview, Share code size, Quiz from grade. Lead told (§2.4 + code-length question). Owner also shown side-menu options (stone / white / taupe), answer pending | lead | next fix round |
