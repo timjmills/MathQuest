@@ -10,11 +10,11 @@ function area(code,g){ const m=code.match(/^(K|\d)\.([A-Z]+)(?:\.([A-Z]))?/); if
  if(d==='RP'||d==='NS'){ if(g!=='6'&&g!=='M'){ if(d==='NS'&&cl==='C') return 'G'; if(d==='NS'&&cl==='B') return 'OA'; } return 'RPNS'; }
  return 'OTHER'; }
 const rows=[]; const catVotes={};
-for(const [cat,list] of Object.entries(SKILLS)) for(const s of list){ if(!s||!s.v) continue;
+for(const [cat,list] of Object.entries(SKILLS)) for(const s of list){ if(!s||!s.v||s.retired) continue;
   const g=String(getSkillGrade(s.v,cat)??'?'); const st=SKILL_STANDARDS[cat+':'+s.v]; const code=st&&st.ccss&&st.ccss[0];
   const a=code?area(code,g):null; rows.push({cat,v:s.v,g,a}); if(a){(catVotes[cat]=catVotes[cat]||{})[a]=(catVotes[cat][a]||0)+1;} }
 const CATMAP={probability:'DATA'};
-const maj=c=>{if(CATMAP[c]) return CATMAP[c]; const v=catVotes[c]; if(!v) return null; return Object.entries(v).sort((x,y)=>y[1]-x[1])[0][0];};
+const maj=c=>{if(CATMAP[c]) return CATMAP[c]; const v=catVotes[c]; if(!v) return null; const tot=Object.values(v).reduce((x,y)=>x+y,0); const [top,n]=Object.entries(v).sort((x,y)=>y[1]-x[1])[0]; return n*2>tot?top:null;}; // a clear majority (more than half), else Mixed
 const counts={}, sets={}, how={tagged:0,category:0,words:0,mixedgrey:0};
 for(const r of rows){ let a=r.a;
   if(r.cat==='vocabulary'){a='WORDS';how.words++;}

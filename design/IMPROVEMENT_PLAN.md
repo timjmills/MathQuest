@@ -1,4 +1,4 @@
-# Improvement plan — faster building, a simple teacher site, truly mixed pages (v5, 2026-10-23)
+# Improvement plan — faster building, a simple teacher site, truly mixed pages (v5.1, 2026-10-23)
 
 ## In short (for the owner)
 
@@ -31,7 +31,7 @@ organisation; no lettered A/B pages — plain options, with "how many pages" for
 no full preview on the website, but a small preview of the first page (or the first 2–3 pages when they differ).
 
 Built from three audits on 2026-10-23 (the build history and gate timings; the teacher site driven in a browser at 1366
-and 390 px; the print engine with a test render) and graded by an independent critic (rounds 1–4 FAIL → this v5).
+and 390 px; the print engine with a test render) and graded by an independent critic (rounds 1–4 FAIL; round 5 PASS on v5 — A 8 · B 9 · C 9 · D 8 · E 8 · F 9 · G 9; v5.1 applies that round's remaining fixes).
 
 ---
 
@@ -223,7 +223,7 @@ key, no letters — Q-W3); Share shows the code and link at once with **Copy**
 | **How many pages?** | 1 · 2 · 3 · 4 · 5 …, for every arrangement (owner: section pages, single-skill pages and mixed pages alike); every page has new numbers; the key follows. Mixed together: each page is a full mixed page with the weights kept. In sections: the sections flow across the pages by weight; a section never splits mid-row. One skill per page: pages shared out by weight (6 pages, 3 equal skills → 2 each); the page count starts at the number of skills (the menu offers nothing lower) | 1 (One skill per page: one per skill) |
 | **How often does each skill come up?** | per skill: Less · Equal · More (1 : 2 : 3; a number in the chip's options) | Equal |
 | **How are the problems arranged?** (2+ skills) | **Mixed together** · **In sections** · **One skill per page** | Mixed together; In sections when the paper comes from a lesson's "Print practice" |
-| **Examples?** | None · **An example to start each group** (a worked example, then 3–4 problems like it, repeated down the page — today's block layout, the owner's 2026-09-26 ruling "one example on top of each block", LESSON_LIBRARY_PLAN §8f) · **An example with each problem** (Q-W2) · on Mixed together pages only: None or **One example of each skill, in a strip at the top** (§3.3) | None; practice printed from a lesson: An example to start each group (its skills are new) |
+| **Examples?** | None · **An example to start each group** (a worked example, then 3–4 problems like it, repeated down the page — today's block layout, the owner's 2026-09-26 ruling "one example on top of each block", LESSON_LIBRARY_PLAN §8f) · **An example with each problem** (Q-W2) · on Mixed together pages only: None or **One example of each skill at the top** — a short example band per skill on each page (§3.3) | None; practice printed from a lesson: An example to start each group (its skills are new) |
 | **Size** | S · M · L | M |
 
 - Under the choices: a **one-line summary** ("2 pages · 16 problems · Addition 6, Time 5, Fractions 5 · answer key at the
@@ -238,8 +238,8 @@ key, no letters — Q-W3); Share shows the code and link at once with **Copy**
   Mixed together → `arrangement: 'mixed'` (§3); In sections → today's sections; One skill per page → one section per
   skill with page breaks; "An example to start each group" → `anchors: 'sections'` (an example band, then the block's
 3–4 problems, `blockPlan` in `sheet/anchors.js`; the mixed-practice default today, `anchors.js:16`); "An example with
-each problem" → `anchors: 'side'`; None → `anchors: 'off'` (`ANCHOR_MODES`, `anchors.js:25`); the strip on
-mixed-together pages is new (M4). A single example at the very top of a page is not offered: the owner's ruling puts one
+each problem" → `anchors: 'side'`; None → `anchors: 'off'` (`ANCHOR_MODES`, `anchors.js:25`); on
+mixed-together pages the engine's existing compact example bands are reused and measured per page (M4). A single example at the very top of a page is not offered: the owner's ruling puts one
 on each block. Old share codes and saved
   sets with letters A–J decode to the same number of pages (`ws-code-snapshot`).
 
@@ -305,7 +305,8 @@ light version, ≥ 7 : 1 on the dark tint (CC #E092E9, OA #A3A0D5, NBT #F4D984, 
   - **Normal vision:** every pair of bold colours ≥ 20.4 apart (closest: Measurement–Ratio, which never share a grade).
   - **Colour-blind, areas that share a grade** — K: CC OA NBT Measurement Data G · 1–2: OA NBT Measurement Data G ·
     3–5: OA NBT NF Measurement Data G · 6: Ratio OA Data G (these sets come from the data under the rules in "Where the
-    area comes from" below; the gate re-derives them on every run) — ≥ 12.2 apart under both simulations (closest: CC–OA).
+    area comes from" below; the gate re-derives them on every run) — ≥ 12.2 apart under both simulations (closest: CC–OA,
+    just above the line, so any change to either colour at T1 is re-checked before it is shown).
     Place value and Fractions, the pair critic r3 found at 8.0 in v3, are now gold and pink: 35.7 / 47.9.
   - **Colour-blind, areas from different grades:** ≥ 8.7 (Place value–Ratio). They never share a single-grade list (the
     default view); in a list across grades (a search, the "Mixed levels" filter, a tray with two grades) the grade pill,
@@ -327,20 +328,22 @@ light version, ≥ 7 : 1 on the dark tint (CC #E092E9, OA #A3A0D5, NBT #F4D984, 
 - **One meaning per colour:** a hue is a maths area or error, never both; actions, places and grades are ink and neutrals.
 - **Where the area comes from** (one function, `areaOf(category, skill)` in `js/modules/teacher-areas.js`, new in T2,
   used by every screen and by the gate):
-  1. The skill's primary CCSS code in `SKILL_STANDARDS` (first code; MD split by cluster as in the table) — 606 of the 723
-     skills today.
+  1. The skill's primary CCSS code in `SKILL_STANDARDS` (first code; MD split by cluster as in the table) — 606 of the 715 live
+     skills today (retired tombstones are skipped).
   2. A code from a domain the skill's own grade does not have takes that grade's area for the same content (a two-line
      map): 6.NS.B (factors, multiples) → OA, as in 4.OA.B; 6.NS.C (the coordinate plane) → G, as in 5.G.A. This moves the
      six grade-5 skills tagged 6.NS (`coord_distance_q1`, `geo_reflect`, `reflect_x_axis`, `reflect_y_axis` → G;
      `common_factors`, `common_multiples` → OA), so no grade-5 list shows the Ratio colour.
-  3. An untagged skill or a pool inside one category (`mixed_addition`, `number_families_add_med`, `mult_chart_medium`,
-     `geo_rotate` …) takes the area most tagged skills in its category have, and a pool shows the "mixed" icon — 42 skills
-     (probability, with no tagged skill yet, maps to Data).
-  4. Pools across categories (`all_mixed`, `*_mixed` families such as `frac_dec_mixed:fdp_all`) are slate, labelled
-     **Mixed** with the mixed icon — 25 skills. Vocabulary skills are slate, labelled **Words** with a book icon — 50
+  3. An untagged skill or a pool inside one category (`mixed_addition`, `mixed_fractions`, `geo_rotate`,
+     `geo_translate` …) takes the area of a clear majority (more than half) of the tagged skills in its category — 33
+     skills (probability, with no tagged skill yet, maps to Data). A pool shows its area's icon with a small "mixed" badge.
+     With no clear majority the skill goes to Mixed (rule 4): `comparing:mixed_comparing`, whose category has one tagged
+     skill each in CC, Measurement and Data.
+  4. Pools across categories (`all_mixed`, `*_mixed` families such as `frac_dec_mixed:fdp_all`) and pools without a clear
+     majority are slate, labelled **Mixed** with the mixed icon — 26 skills. Vocabulary skills are slate, labelled **Words** with a book icon — 50
      skills. Extra lessons and anything else are slate **No standard**, with the dashed outline.
   5. A lesson takes the area of its own CCSS. The 6 app DOMAINS are not used for colour.
-  Counts from the data on 2026-10-23 (tagged 606 · by category 42 · Mixed 25 · Words 50 = 723);
+  Counts from the data on 2026-10-23, live skills only (tagged 606 · by category 33 · Mixed 26 · Words 50 = 715);
   `node design/audit/palette-2026-10-23/areas.mjs` reproduces them and the per-grade area sets, and the gate prints them.
 - **Organise by colour:** skill and lesson lists are grouped by maths area, each group on its tint under its bold header
   band, so a one-area list still shows four strengths of its colour, not one hue on black and white.
@@ -360,7 +363,8 @@ the same checks (closest colour-blind pair CC–OA 12.2).
 - **`ws-teacher-tokens`** (new): only token values are used (sizes, spacing, radii, shadows, colours); at most one rank-1
   ink fill per screen; area colours only on elements carrying a `data-domain`; **CIEDE2000 between bold area colours ≥ 20
   for every pair with normal vision, ≥ 12 under deuteranopia and protanopia (Machado 2009, severity 1.0) for every pair
-  of areas that share a single-grade list, ≥ 8 for any other pair**, where the shared pairs are derived on every run
+  of the eight area colours that share a single-grade list, ≥ 8 for any other pair; slate (No standard / Mixed / Words,
+  which appears in every grade) is held to ≥ 8 from every area plus its dashed outline and its label**, where the shared pairs are derived on every run
   from the data (every live skill's grade × `areaOf()`; the "Mixed levels" filter counts as a list across grades);
   every chip and card carries the area name and icon, and in lists across grades also the grade pill (the ≥ 8 pairs
   rely on it); every bold ≥ 20 from error red and key orange in all three
@@ -455,7 +459,7 @@ reproduced.
   2 × 1 or larger, or one block of small boxes; the run rule counts turns, not numbers (facts block, clock, facts block,
   clock passes; two facts blocks in a row fail).
 - **Page units:** a page holds N × rows units — N columns (PT-MIX-2) times the SHUFFLED rows at the size (PAGE_TYPES 5.2:
-  S 9, M 7, L 5) — minus the rows the examples strip and the word-problem band take (each at least one row).
+  S 9, M 7, L 5) — minus the rows the examples bands and the word-problem band take on that page (each at least one row).
 - **How many skills fit a page is a capacity sum, not a count:** Σ over the page's skills of 2 × (span area in units)
   ≤ the page units (each skill at least 2 problems on any page it appears on; the word-problem band is outside the sum
   and exempt from the 2-problem rule, as in the PAGE_TYPES 5.2 worked example of 4 skills at L with one word problem:
@@ -473,10 +477,12 @@ reproduced.
   used, and the lint lists every skill still on that fallback.
 - **Examples on a mixed-together page:** None, or **one worked example of each skill at the top** — the engine's existing
   mixed-practice example, one full-width compact band per skill (SUPPORTS.md "Compact band" and "Mixed practice"), each
-  measured by `anchorHeightMm`. Their measured height comes off the page before the capacity sum (rounded up to whole
-  rows). When the bands would leave fewer rows than every skill needs for two problems (three skills with bands at L do
-  not fit one page, SUPPORTS.md), the choice is greyed with the reason ("Examples for 3 skills need 2 pages — add a page
-  or fewer skills"). This is not the PT-MIX "cue key strip". "An example with each problem" is not offered on
+  measured by `anchorHeightMm`. **Each page shows the bands of the skills on that page**, at its top; their measured
+  height comes off that page before its capacity sum (rounded up to whole rows), and the check is per page. When on some
+  page the bands would leave fewer rows than its skills need for two problems each (three skills with bands at L do not
+  fit one page, SUPPORTS.md), the packer first spreads the skills over the pages chosen (fewer skills per page, fewer
+  bands); only if that cannot work is the choice greyed with the reason ("Examples for these 3 skills need 2 pages —
+  add a page or choose fewer skills"). This is not the PT-MIX "cue key strip". "An example with each problem" is not offered on
   mixed-together pages.
 - **Frame and key:** title "Mixed practice" with the skills named under it in plain words (up to four, then "and N
   more"); tab "Level a–b · Mixed n"; footer: skill names + CCSS codes; numbering by strip, then block, then inside the
