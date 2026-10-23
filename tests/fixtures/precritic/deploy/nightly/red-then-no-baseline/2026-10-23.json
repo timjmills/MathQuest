@@ -1,0 +1,29 @@
+{
+ "tool": "ws-coverage-matrix",
+ "note": "Self-test fixture for ws-deploy-gates.sh --self-test (read with MQ_NOW=2026-10-23T12:00:00Z). \"HEAD\" as the commit resolves to the tree under test.",
+ "dirty": false,
+ "date": "2026-10-23",
+ "commit": "HEAD",
+ "finished": "2026-10-23T05:00:00Z",
+ "rows": [
+  {
+   "id": "addition:add_100_regroup|single/defaults",
+   "kind": "single",
+   "skills": [
+    "addition:add_100_regroup"
+   ],
+   "status": "OK"
+  },
+  {
+   "id": "addition:add_20_regroup|single/ex-each",
+   "kind": "single",
+   "skills": [
+    "addition:add_20_regroup"
+   ],
+   "status": "PENDING",
+   "step": "no-baseline",
+   "reason": "no per-row baseline entry yet"
+  }
+ ],
+ "red": []
+}

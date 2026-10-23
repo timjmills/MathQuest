@@ -4,6 +4,7 @@
 # contract of ws-coverage-matrix --max-docs).
 # With `--out <file>` it writes a run file there, as the real matrix does: exit 1 lists
 # addition:add_100_regroup|single/defaults RED; exit 0 lists the ids in MQ_STUB_OK_ROWS (comma-separated) OK.
+# With exit 3 and MQ_STUB_OVER_LIST it writes <out>.over-budget.json (N4).
 # With `--rows <ids>` (the gate's flake re-run of the red rows only, N7) it exits MQ_STUB_RETRY_RC when that is set.
 rc=$1; shift
 echo "matrix-stub: args $*"
@@ -19,6 +20,16 @@ case "$rc" in
   2) echo 'ws-coverage-matrix: INCOMPLETE - rows selected, none checkable (all PENDING / N/A)' ;;
   3) echo 'ws-coverage-matrix: OVER-BUDGET 32766 documents (budget 500)' ;;
 esac
+# N4: with exit 3 and MQ_STUB_OVER_LIST=<with>;<none> (comma-separated ids each side), write <out>.over-budget.json as the
+# real matrix does: which affected rows have a baseline entry (unchecked at this deploy) and which have none
+if [ -n "$out" ] && [ "$rc" = 3 ] && [ -n "${MQ_STUB_OVER_LIST:-}" ]; then
+  node -e '
+    const [out, list] = process.argv.slice(1);
+    const [w, n] = list.split(";");
+    const ids = (s) => (s || "").split(",").filter(Boolean);
+    require("fs").writeFileSync(out.replace(/\.json$/, "") + ".over-budget.json", JSON.stringify({ tool: "matrix-stub", kind: "over-budget", withBaseline: ids(w), noBaseline: ids(n) }));
+  ' "$out" "$MQ_STUB_OVER_LIST"
+fi
 if [ -n "$out" ] && [ "$rc" != 3 ]; then
   node -e '
     const [out, rc, ok] = process.argv.slice(1);

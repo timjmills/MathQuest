@@ -155,7 +155,7 @@ EOF
 
 # ---------------------------------------------------------------------------------------------- the matrix budget
 # The nightly rule (§1.6.2, critic r2 D1, owner 2026-10-23):
-#   nightly_check <matrix dir> <check-dirty 1|0> [fresh|full] [inline run file]
+#   nightly_check <matrix dir> <check-dirty 1|0> [fresh|full] [inline run file (fresh) | over-budget list (full)]
 # It reads EVERY run file in <matrix dir> (ws-coverage-matrix foldRuns), oldest first, then the inline run file, into
 # each row's last-known state: a row's state is its status in the most recent run that ran it, so a RED / ERROR row
 # stays red until a later run lists it OK. Then, on every session-3 run:
@@ -168,6 +168,13 @@ EOF
 #     commit the tip differs from only in the matrix dir, else NEEDS-SHARDED-RUN (3); before it, WARNING (4): the
 #     affected rows are PENDING(no-baseline) or covered by the lanes' precritic, and the deploy is not held (owner).
 #   - mode fresh (within the budget, the inline run stands in for "covers HEAD"): OK (0) or WARNING (4).
+#   - (I4) the merged baseline pins a row in two files with different contents: REFUSED, naming both files;
+#   - (N1) a red id that is no longer a row of its live skill: MAPPED to the row of the same kind and flags (refused
+#     until that row runs OK later), else RETIRED-ROW: a WARNING that says how to clear it (--retire), never a refusal;
+#   - (N5) every .json in the dir with commit + finished + rows is folded whatever its name, the rest is listed;
+#     the age / cover rules read the nightly's own names (<date>[T<HHMM>][.shard-i-of-n].json) only;
+#   - (N4) over the budget before the full baseline, the WARNING names how many affected rows HAVE a baseline entry
+#     (unchecked at this deploy) and how many have none, from the matrix's <inline>.over-budget.json.
 # MQ_NOW (ISO time) replaces the clock (fixtures).
 nightly_check() {
   node - "$1" "$2" "$ROOT" "${3:-full}" "${4:-}" <<'EOF'
@@ -176,21 +183,33 @@ const [dir, checkDirty, root, mode, extra] = process.argv.slice(2);
 const git = (...a) => execFileSync('git', ['-C', root, ...a], { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
 const now = process.env.MQ_NOW ? Date.parse(process.env.MQ_NOW) : Date.now();
 const H24 = 24 * 3600 * 1000;
-const { foldRuns, baselineComplete } = require(path.join(root, 'tests', 'scripts', 'ws-coverage-matrix.cjs'));
+const { foldRuns, baselineComplete, loadBaseline, baselineConflictError, resolveRed, rowIndexFor, foldSkipNote } = require(path.join(root, 'tests', 'scripts', 'ws-coverage-matrix.cjs'));
 const refuse = (why) => { console.log(`nightly: REFUSED - ${why}`); console.log('nightly: FAIL'); process.exit(1); };
 const warnings = [];
 const warn = (w) => { warnings.push(w); console.log(`nightly: WARNING - ${w}`); };
 const full = baselineComplete(dir);
 console.log(`nightly: first full baseline: ${full.complete ? 'COMPLETE' : 'NOT complete'} (${full.how})`);
+// I4: the merged baseline must not pin one row in two files with different contents
+const merged = loadBaseline(path.join(dir, 'baseline.json'));
+const conflict = baselineConflictError(merged);
+if (conflict) refuse(conflict);
+for (const d of merged.duplicates) warn(`(I4) ${d.id} is pinned in both ${path.basename(d.files[0])} and ${path.basename(d.files[1])} with the same contents; delete one copy`);
+// mode full: the 4th argument is the matrix's over-budget list (N4), never a run file
+let overList = null;
+if (mode === 'full' && extra) { try { overList = JSON.parse(fs.readFileSync(extra, 'utf8')); } catch (e) { overList = null; } }
 let extras = [];
-if (extra && fs.existsSync(extra)) {
+if (mode !== 'full' && extra && fs.existsSync(extra)) {
   let ej = {}; try { ej = JSON.parse(fs.readFileSync(extra, 'utf8')); } catch (e) { /* reported by the fold */ }
   if (ej.dirty && checkDirty === '1') console.log(`nightly: the inline run ${extra} ran on a dirty tree: not folded (it cannot clear a red row)`);
   else extras = [extra];
 }
 const fold = foldRuns(dir, extras);
 if (fold.bad.length) refuse(`unreadable run file(s): ${fold.bad.map((b) => `${b.file} (${b.error})`).join('; ')}`);
-const nightFiles = fold.files.filter((f) => !f.extra);
+// N5: every .json that is a run is folded whatever its name; the rest is listed with why
+for (const l of foldSkipNote(fold)) console.log(`nightly:${l.replace(/^ +/, ' ')}`);
+// the AGE and the COVER of the newest nightly are judged on the nightly's own names only (a lane's run under another
+// name is folded for its rows, but it is not "the newest nightly")
+const nightFiles = fold.files.filter((f) => !f.extra && f.named !== false);
 const run = (f) => {   // when one run file finished: `finished`, else its git commit time, else its date at 00:00 UTC
   let when = f.j.finished ? Date.parse(f.j.finished) : NaN, src = 'finished';
   if (!Number.isFinite(when)) { try { const c = git('log', '-1', '--format=%cI', '--', f.file); if (c) { when = Date.parse(c); src = 'git commit time'; } } catch (e) { /* not committed */ } }
@@ -228,14 +247,32 @@ if (!nightFiles.length) {
   }
   // D1.1: every RED / ERROR row of the FOLDED state (not only the newest run's own rows)
   const red = [];
-  for (const id of fold.red) {
+  const descOf = (id) => {
     const st = fold.rows.get(id);
-    const key = id.split('|')[0] || st.skill;
-    const desc = `${id} ${st.status} since run ${st.stamp === 'inline' ? 'inline (this deploy)' : st.stamp}${st.rises && st.rises.length ? ` (${String(st.rises[0]).slice(0, 80)})` : ''}`;
-    if (live.has(key)) red.push(desc);
-    else console.log(`nightly: ${desc}, but ${key} is not a live skill (ignored)`);
+    const tail = st.lastSeenAs ? `; printed since in run ${st.lastSeen} with no baseline entry, which does not clear it (I5): pin it with ws-coverage-matrix --repin '${id}' --reason "<why>"` : '';
+    return `${id} ${st.status} since run ${st.stamp === 'inline' ? 'inline (this deploy)' : st.stamp}${st.rises && st.rises.length ? ` (${String(st.rises[0]).slice(0, 80)})` : ''}${tail}`;
+  };
+  const liveRed = [];
+  for (const id of fold.red) {
+    const key = id.split('|')[0] || fold.rows.get(id).skill;
+    if (live.has(key)) liveRed.push(id);
+    else console.log(`nightly: ${descOf(id)}, but ${key} is not a live skill (ignored)`);
   }
-  const folded = `the folded state of ${nightFiles.length} run file(s)${extras.length ? ' + the inline run' : ''} (${fold.rows.size} row(s) known)`;
+  // N1: a red id that is no longer a row of its (live) skill: MAPPED to the row of the same kind and flags (its red
+  // state carries there, cleared only when that row runs OK later), else RETIRED-ROW (a warning, never a refusal)
+  if (liveRed.length) {
+    const index = await rowIndexFor([...new Set(liveRed.map((id) => id.split('|')[0]))]);
+    const res = resolveRed(liveRed, fold, index);
+    for (const id of res.current) red.push(descOf(id));
+    for (const m of res.mapped) {
+      const from = fold.rows.get(m.from), to = fold.rows.get(m.to);
+      if (to && to.seq > from.seq && to.status === 'OK') console.log(`nightly: ${m.from} (RED since run ${from.stamp}) is now the row ${m.to} (same kind and flags), which run ${to.stamp} lists OK: cleared`);
+      else red.push(`${descOf(m.from)}; the row is now ${m.to} (same kind and flags)${to ? `, ${to.status} in run ${to.stamp}` : ', not run since'}`);
+    }
+    for (const x of res.retired) warn(`RETIRED-ROW ${descOf(x.id)}: ${x.why}. It no longer exists, so it does not hold the deploy. Clear it: node tests/scripts/ws-coverage-matrix.cjs --retire '${x.id}' --reason "<why it is gone>" (writes a run file listing it RETIRED; commit it)`);
+  }
+  const foldedN = fold.files.filter((f) => !f.extra).length;
+  const folded = `the folded state of ${foldedN} run file(s)${foldedN !== nightFiles.length ? ` (${foldedN - nightFiles.length} under another name)` : ''}${extras.length ? ' + the inline run' : ''} (${fold.rows.size} row(s) known)`;
   if (red.length) refuse(`${red.length} row(s) of live skills are RED / ERROR in ${folded}, and no later run lists them OK: ${red.slice(0, 10).join('; ')}${red.length > 10 ? ' ...' : ''}`);
   console.log(`nightly: no RED / ERROR row of a live skill in ${folded}`);
   // N10: what the newest run actually ran
@@ -255,7 +292,13 @@ if (!nightFiles.length) {
   const done = (code, line) => { console.log(line); console.log(code === 4 ? 'nightly: WARNING' : 'nightly: OK'); process.exit(code); };
   if (mode === 'fresh') done(warnings.length ? 4 : 0, `nightly: ${ran}; the inline run covers this deploy's affected rows${warnings.length ? ` (${warnings.length} warning(s))` : ''}`);
   if (!full.complete) {
-    warn(`the affected rows are over the budget and the first full baseline is not complete (${full.how}): they are PENDING(no-baseline), covered by the lanes' precritic, and the deploy is not held (owner 2026-10-23)`);
+    // N4: say exactly which affected rows have a baseline entry (they go UNCHECKED at this deploy) and which have none
+    let detail;
+    if (overList && Array.isArray(overList.withBaseline) && Array.isArray(overList.noBaseline)) {
+      const w = overList.withBaseline, nb = overList.noBaseline;
+      detail = `${w.length + nb.length} affected row(s): ${w.length} HAVE a baseline entry and are NOT checked at this deploy${w.length ? ` (${w.slice(0, 4).join(', ')}${w.length > 4 ? ` and ${w.length - 4} more` : ''})` : ''}; ${nb.length} have no entry (PENDING(no-baseline), nothing to compare yet). The full list: ${extra}`;
+    } else detail = `the matrix wrote no list of them${extra ? ` (${extra} missing)` : ''}, so it is unknown which are baselined: any affected row that has a baseline entry is NOT checked at this deploy`;
+    warn(`the affected rows are over the budget and the first full baseline is not complete (${full.how}): ${detail}. The deploy is not held (owner 2026-10-23); the lanes' precritic covers their own skills`);
     done(4, `nightly: ${ran}; not a cover of this tip`);
   }
   // does the newest run cover this tip? every shard present, one commit, the tip differing from it only in the matrix dir
@@ -343,7 +386,7 @@ matrix_gate() {
       case "$prev" in nightly-*) rc=3 ;; freshnightly-[0-9]) rc=${prev#freshnightly-} ;; inline-[0-9]) rc=${prev#inline-} ;; *) rc=0 ;; esac
     fi
   else
-    rm -f "$inline"
+    rm -f "$inline" "${inline%.json}.over-budget.json"
     case " $cargs " in *" --out "*) ;; *) cargs="$cargs --out $inline" ;; esac
     echo "matrix: budget $MATRIX_BUDGET documents; $cmd $cargs"
     if [ -z "${MQ_MATRIX_CMD:-}" ] && ! grep -q 'max-docs' "$cm"; then
@@ -366,7 +409,7 @@ matrix_gate() {
   fi
   if [ "$rc" = 3 ]; then
     echo "matrix: over the budget; the nightly rule decides (§1.6.2)"
-    nightly_check "$MATRIX_DIR" "${MQ_NIGHTLY_DIRTY_CHECK:-1}" full; nrc=$?
+    nightly_check "$MATRIX_DIR" "${MQ_NIGHTLY_DIRTY_CHECK:-1}" full "${inline%.json}.over-budget.json"; nrc=$?
     [ $nrc = 3 ] && sharded_run_help
     echo "nightly-$nrc" > "$state"
     return $nrc
@@ -488,6 +531,26 @@ self_test() {
   MQ_NOW=2026-10-23T12:00:00Z bash -c 'source "$0" --source-only; nightly_check "$1" 0' "$0" "$nx/reproduce" > "$tmp/m.log" 2>&1; got=$?
   if [ "$got" = 1 ] && grep -q 'addition:add_20_regroup|single/ex-each RED since run 2026-10-22' "$tmp/m.log"; then echo "  ok   critic r2 command: nightly_check reproduce 0 refuses, naming the row and the run it went red in"
   else echo "  FAIL critic r2 command: exit $got"; sed 's/^/       /' "$tmp/m.log" | tail -n 8; bad=1; fi
+  # fix round 3 (critic r3): the BASELINE INVARIANTS at deploy (I4, I5) and the nits N1, N4, N5
+  echo "   critic r3: baseline invariants and nits at deploy"
+  gcase() {   # name, nightly dir, want rc, stub exit, a pattern the log must hold [, a pattern it must NOT hold]
+    local name=$1 d=$2 want=$3 st=$4 pat=$5 nopat=${6:-} got
+    MQ_GATES_LOGDIR=$tmp/lg MQ_NOW=2026-10-23T12:00:00Z MQ_MATRIX_DIR=$d MQ_MATRIX_CMD="bash $fx/matrix-stub.sh $st" MQ_COVERAGE_ARGS="--all --affected X..HEAD" MQ_NIGHTLY_DIRTY_CHECK=0 \
+      bash -c 'source "$0" --source-only; matrix_gate tests/scripts/ws-coverage-matrix.cjs' "$0" > "$tmp/m.log" 2>&1; got=$?
+    if [ "$got" = "$want" ] && grep -qE -- "$pat" "$tmp/m.log" && { [ -z "$nopat" ] || ! grep -qE -- "$nopat" "$tmp/m.log"; }; then echo "  ok   $name: exit $got ($(grep -oE -- "$pat" "$tmp/m.log" | head -n 1 | cut -c1-170))"
+    else echo "  FAIL $name: exit $got, want $want, pattern /$pat/${nopat:+, not /$nopat/}"; sed 's/^/       /' "$tmp/m.log" | tail -n 14; bad=1; fi
+  }
+  gcase "I4: a row pinned in two baseline files with different contents: refused naming both" "$nx/conflict" 1 0 'REFUSED - the merged baseline pins 1 row\(s\) in two files .*addition:add_20_regroup\|single/ex-each in baseline\.json and baseline\.slice-3-of-28\.json'
+  gcase "I5: RED on 10-22, printed with no baseline entry on 10-23: still refused (not a fix)" "$nx/red-then-no-baseline" 1 0 'addition:add_20_regroup\|single/ex-each RED since run 2026-10-22 .*printed since in run 2026-10-23 with no baseline entry, which does not clear it'
+  gcase "N1: red ids that are no longer rows and match no current row: RETIRED-ROW warnings, not refused" "$nx/retired-row" 4 0 'WARNING - RETIRED-ROW addition:add_20_regroup\|single/more-oldname RED .*--retire' 'REFUSED'
+  gcase "N1: the critic's ghost row (red-list only, no flags recorded): RETIRED-ROW, not refused" "$nx/retired-row" 4 0 'RETIRED-ROW addition:add_20_regroup\|single/more-gone RED .*cannot be matched' 'REFUSED'
+  gcase "N1: a red id renamed (same kind and flags as ex-each): mapped, refused until that row runs OK" "$nx/mapped-row" 1 0 'single/ex-beside RED since run 2026-10-23 .*the row is now addition:add_20_regroup\|single/ex-each'
+  gcase "N1: the mapped row ran OK later: cleared" "$nx/mapped-cleared" 0 0 'ex-beside \(RED since run 2026-10-23\) is now the row addition:add_20_regroup\|single/ex-each \(same kind and flags\), which run 2026-10-23T0900 lists OK: cleared'
+  gcase "N5: a .json without finished is listed as skipped, with why" "$nx/other-name" 1 0 'WARNING skipped e1-check-2026-10-23\.json: not a run file: no finished'
+  gcase "N5: a run file under another name is folded, and its red row is the refusal" "$nx/other-name" 1 0 'REFUSED - 1 row\(s\) of live skills are RED .*addition:add_20_regroup\|single/ex-each RED since run 2026-10-23T0600'
+  MQ_STUB_OVER_LIST='addition:add_100_regroup|single/defaults,addition:add_20_regroup|single/ex-each;addition:add_20_regroup|single/ex-top' \
+    gcase "N4: over the budget before the full baseline: the WARNING names the baselined rows as NOT checked" "$nx/none" 4 3 '3 affected row\(s\): 2 HAVE a baseline entry and are NOT checked at this deploy \(addition:add_100_regroup\|single/defaults, addition:add_20_regroup\|single/ex-each\); 1 have no entry' 'they are PENDING\(no-baseline\), covered'
+  gcase "N4: without the matrix's list the WARNING says it is unknown which are baselined (never claims coverage)" "$nx/none" 4 3 'unknown which are baselined: any affected row that has a baseline entry is NOT checked'
   vcase "OK + NOTHING RUN" 2 'ws-deploy-gates: INCOMPLETE' "OK:a" "NOTHING RUN:ws-coverage-matrix"
   vcase "OK + WARNING (the matrix gate passed with a warning)" 0 'ws-deploy-gates: OK' "OK:a" "WARNING:ws-coverage-matrix"
   if grep -q 'SHARD=<i>/8 tests/scripts/ws-matrix-nightly.sh' < <(MQ_GATES_LOGDIR=$tmp/lg MQ_NOW=2026-10-23T12:00:00Z MQ_MATRIX_DIR=$nx/fresh MQ_MATRIX_CMD="bash $fx/matrix-stub.sh 3" MQ_COVERAGE_ARGS=x MQ_NIGHTLY_DIRTY_CHECK=0 bash -c 'source "$0" --source-only; matrix_gate x' "$0" 2>&1); then

@@ -14,10 +14,13 @@
 #   2. FIRST BASELINE PHASE (the first full baseline is not complete: ws-coverage-matrix baselineComplete, i.e. not
 #      every design/audit/matrix/baseline.slice-i-of-28.json is there and baseline.json does not say complete: true):
 #      slice i/28 of every row (--all --slice i/28, i = the lowest slice with no baseline file yet, so a failed night
-#      is retried the next night) with --write-baseline, which writes baseline.slice-i-of-28.json. Only rows that
-#      PRINTED are pinned (a render error stays ERROR and is listed as NOT pinned). The rows RED / ERROR in the
-#      folded state of the run files run too (--slice implies --red-from). About 390 rows = 1,170 documents a night,
-#      about 1 h on two slots at 0.31 documents/s; 28 nights pin every row;
+#      is retried the next night) with --write-baseline, which writes baseline.slice-i-of-28.json. It pins ONLY rows
+#      that printed and have NO entry in the merged baseline (ws-coverage-matrix BASELINE INVARIANTS I1): a pilot row
+#      already in baseline.json, or a row pinned by an earlier slice, is judged against its entry and never re-pinned,
+#      so a regression on it is RED in the run file, not absorbed. A render error stays ERROR and is listed as NOT
+#      pinned. The rows RED / ERROR in the folded state of the run files run too (--slice implies --red-from) and are
+#      never pinned (I2); every status is judged before the pins are written (I3). About 816-883 rows = 1,134-1,272
+#      documents a night, about 1 h on two slots at 0.31 documents/s; 28 nights pin every row;
 #   3. STEADY PHASE (the first full baseline is complete): the rows the commits since the last affected run reach
 #      (--affected <LAST>..HEAD, capped at MQ_NIGHTLY_AFFECTED_CAP documents, default 1200: above the cap they are
 #      dropped tonight and the run file says so) + the folded RED / ERROR rows (--red-from, critic r2 D1.2) + the
@@ -37,6 +40,9 @@
 #      (one batch of ≈ 25 skills, ≈ 7 min a night; the whole pin is ≈ 1.9 h on two slots); OPTIONS_PIN=0 skips it.
 # It never edits anything outside design/audit/matrix/. Exit 0 with red rows (--report-only): the deploy gate reads
 # the red rows from the run files (folded); a crash exits non-zero.
+# It NEVER re-pins an existing entry and never retires a row: it takes no --repin / --retire (unknown arguments are
+# refused below), and ws-coverage-matrix refuses those two with --slice / --affected / --red-from. A re-pin or a
+# retirement is the lead's named, per-row action (NIGHTLY.md "Clearing a red row").
 set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/../.." && pwd)
 cd "$ROOT"

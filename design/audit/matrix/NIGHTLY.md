@@ -44,9 +44,14 @@ The owner set the shape on 2026-10-23: one session a night, and each night check
    - Each night runs `--all --slice i/28 --write-baseline`. Slice `i` is the lowest slice that has no baseline file
      yet, so a night that fails is tried again the next night. The run writes `baseline.slice-i-of-28.json`.
    - Every reader merges `baseline.json` with every `baseline.<part>.json` file beside it.
-   - Only rows that **printed** are pinned. For each size they pin the lint counts and the finding keys (N1). A row
-     that could not print stays **ERROR** and is listed under "NOT pinned".
+   - Only rows that **printed** and have **no entry in the merged baseline** are pinned (I1, below). For each size
+     they pin the lint counts and the finding keys (N1). A row that already has an entry (one of the 127 pilot rows in
+     `baseline.json`, or a row pinned by an earlier night) is judged against that entry and is never pinned again, so
+     a regression on it is **RED** in the run file. A row that could not print stays **ERROR** and is listed under
+     "NOT pinned".
+   - The slice file is written even when it pins nothing new, so the night counts as done.
    - The rows that are RED or ERROR in the folded state (below) also run, because `--slice` implies `--red-from`.
+     They are **never pinned** (I2).
 3. **Every later night**, once the first full baseline is complete, runs these rows:
    - **The affected rows.** These are the rows that the commits since the last affected run reach
      (`--affected <LAST>..HEAD`).
@@ -71,26 +76,84 @@ The owner set the shape on 2026-10-23: one session a night, and each night check
 `DRY=1 tests/scripts/ws-matrix-nightly.sh` prints the selection and runs nothing. On 2026-10-23 it gave "first
 baseline: slice 1/28", 802 rows and 1,134 documents. `--slice i/28` runs that slice in place of the night's slice.
 
+## Baseline invariants (critic r3 D1)
+
+Round 3 found that each baseline night re-pinned rows that already had an entry, and rows re-selected as red, so a
+real regression was written into the baseline and reported OK. The root cause was that "write the baseline" meant
+"pin whatever this run printed". These five rules now hold. Each is written down in the `ws-coverage-matrix` header
+("BASELINE INVARIANTS"), tested case by case in its `--self-test` (#15), and checked as a property after every night
+of 300 generated sequences of runs, pins, regressions, swapped findings, crashes and re-pins on synthetic rows
+(#16: 3,600 nights, 25,200 row-night checks, 0 violations on 2026-10-23). Undoing any one of them makes the self-test
+FAIL.
+
+| | Rule |
+|---|---|
+| **I1** | A pin is written only for a row with **no entry in the merged baseline**. `--write-baseline` and `--pin-new` are both pin-new-only; they differ only in the file they write. An existing entry changes only through `--repin <ids> --reason "<why>"`: a named, per-row action that logs the date, the commit, the reason and the old pin in the entry's `repinned` list. No nightly passes it. |
+| **I2** | A row selected by `--red-from` is never pinned, even when it has no entry. |
+| **I3** | The run file records the verdict judged **before** any pin. Every row is judged against the merged baseline as it was loaded; then the pins are written; no row is judged again. A newly pinned row keeps its status (PENDING(no-baseline) or OK) with `pinned: true`. |
+| **I4** | The merged baseline **refuses** a row pinned in two files with different contents. The matrix and the deploy gate both FAIL, naming both files. An identical duplicate is a WARNING. File-name order never decides. A re-pin rewrites only the file that owns the entry. |
+| **I5** | Nothing a night does turns a RED or ERROR row non-red. In the fold, a red row leaves the red set only when: a later run lists it OK, judged against its existing entry; it is re-pinned (`--repin`, REPINNED); it is retired (`--retire`, RETIRED); or a code change makes it uncheckable (PENDING(step) or N/A, recorded as `cleared`). A row printed with no entry, PENDING(no-baseline), does **not** clear it. |
+
+The backtest row `baseline-night-keeps-red` (`tests/fixtures/precritic/backtests.json`) runs the critic's two
+reproduce cases through the real tool, node only, with a stub print-lint. It FAILs on `53f46e10`, the tree the critic
+graded, and passes on the fix.
+
 ## Row statuses
 
 A row's status is one of these:
 - **RED:** a lint count, or (N1) a finding key, is above the row's own baseline entry.
 - **ERROR:** the row did not print. Either it has a render error (`L-SPLIT RENDER`, a `buildSheet` throw or a
   crashed batch), or print-lint refused its flags. No baseline forgives an ERROR row.
+  - **N6: an ERROR row holds every deploy from the first slice night on**, before the full baseline as after it. This
+    follows round 1's D4: no baseline forgives a render error. Owner decision (b) relaxes only rows with *findings*
+    and no entry, not rows that do not print. So the first slice night that meets a render crash in any live skill
+    holds all deploys until the crash is fixed. The lead should expect this during the 28 nights.
+  - How a lane clears one is under "Clearing a red row" below.
 - **PENDING(no-baseline):** the row has findings but no baseline entry of its own (owner 2026-10-23). This status is
   **never red**. The row printed; there is nothing yet to compare it with. The first full baseline or `--pin-new`
-  pins it.
+  pins it. It does **not** clear a row that is already red (I5).
 - **PENDING(step):** the row needs a later build step.
 - **N/A:** the row does not apply to its skill.
+- In a `--repin` run, a re-pinned row keeps the status it was judged with (RED, I3) and carries `repinned`. The fold
+  reads it as **REPINNED**, which is not red. A `--retire` run lists the gone row as **RETIRED**.
+
+## The pilot baseline: 127 rows without finding keys (N2)
+
+`design/audit/matrix/baseline.json` holds the 127 rows pinned on 2026-10-23 by the pilot run. They were pinned before
+finding keys (N1) existed, so **none of them carries `keys`**.
+- They are compared **by counts** only. A new finding that replaces a fixed one of the same rule at the same size is
+  not caught on these rows.
+- The first-baseline nights do not re-pin them (I1), so they stay count-only.
+- They gain keys only when the lead re-pins them, row by row, with `--repin <ids> --reason "add finding keys (N1)"`
+  and a STATUS note. That is a deliberate choice, made after a look at each row's current findings. It is not done
+  in this round, and the rows are not re-run here.
+
+## Clearing a red row
+
+| The row is | What clears it |
+|---|---|
+| RED (a rise over its entry) | Fix the skill and merge it to the integration branch. The next night re-selects the row (`--red-from`) and lists it OK. A lane can also run the row itself on a clean tree: `node tests/scripts/ws-coverage-matrix.cjs --skills <cat:skill> --rows '<id>' --red-from design/audit/matrix --baseline design/audit/matrix/baseline.json --out auto`. Then commit the run file; `auto` never overwrites a night's file. |
+| RED, and the change was deliberate (the page is meant to look different now) | The lead re-pins it: `node tests/scripts/ws-coverage-matrix.cjs --repin '<id>[,<id>...]' --reason "<why>"`. Commit the baseline file it rewrote, the run file it wrote, and a STATUS note. |
+| ERROR (it did not print) (N6) | Fix the render error. The next night, or the lane's own run above, prints it. If it then prints with **no findings**, it is OK and cleared. If it prints **with findings and no entry**, it stays red, because unjudged findings are not a fix (I5), and nothing pins a re-selected red row (I2). The lane looks at those findings and asks the lead for `--repin '<id>' --reason "first pin after the render fix"`. |
+| Its id no longer exists (an option renamed or removed) (N1) | If the skill is live and a current row has the same kind and the same flags, the red state **maps** to that row. That row is re-run under its new id and judged against the old entry, and the old id clears once it runs OK. Otherwise the deploy gate and `--red-from` print **RETIRED-ROW**: a warning, never a refusal. To clear the warning, run `node tests/scripts/ws-coverage-matrix.cjs --retire '<id>' --reason "<why it is gone>"` and commit the run file it writes. `--retire` refuses an id that is a row today, or that maps to one. |
+| Of a skill that is not live | It is ignored (already the rule). |
 
 ## The folded state (critic r2 D1)
 
 A night does not run every row. So no single run file says which rows are red. Instead, the deploy and the night's
 `--red-from` read **every** run file in `design/audit/matrix/`, oldest first, and fold them.
+- **N5: a run file is any `.json` there that carries `commit`, `finished` and `rows`**, whatever its name. A file
+  named as a nightly (`<date>[T<HHMM>][.shard-i-of-n].json`) is always folded. A file under another name is folded too,
+  ordered by its `finished` time: `pilot-baseline-2026-10-23.json` is one. Every other `.json` is **listed** with
+  why it was skipped. Baseline, cache and options-pin files are listed in one line. Any other skipped file, such as
+  `e1-check-2026-10-23.json`, which has no `finished`, gets its own WARNING line.
+- The age of the newest nightly, and whether it covers the tip, are judged on the nightly's own names only. A lane's
+  run under another name changes the state of its rows, but it is not "the newest nightly".
 - **A row's state is its status in the most recent run that ran it.** A run ran a row when it lists the row in `rows`
   or in `red`.
-- A RED or ERROR row therefore stays red through every later run that did not select it. It stops being red only when
-  a later run lists it with another status (OK, or PENDING / N/A when the row can no longer be checked).
+- A RED or ERROR row therefore stays red through every later run that did not select it. It stops being red only
+  under I5: a later run lists it OK, it is REPINNED or RETIRED, or it became PENDING(step) or N/A, which means a code
+  change made it uncheckable. PENDING(no-baseline) does not clear it.
 - `--red-from` re-selects every red row every night, so a fixed row turns OK on the next night.
 - The deploy's own inline run is folded in last, so a deploy that re-ran a red row OK clears that row.
 - `ws-coverage-matrix --self-test` tests the fold (`foldRuns`).
@@ -113,7 +176,13 @@ SHARD=<i>/8 tests/scripts/ws-matrix-nightly.sh --full     # i = 1 … 8, one ses
 - The run is complete when all eight files of one stamp, all on one commit, carry `finished`.
 
 Before the first full baseline exists, a deploy over the budget is **not held** (owner 2026-10-23). It gets a WARNING
-only: the affected rows are PENDING(no-baseline), and the lanes' precritic covers them.
+only, and the WARNING does not claim coverage it does not have (N4).
+- The matrix writes `<logdir>/matrix-inline.over-budget.json`. It lists which affected rows **have** a baseline
+  entry; these include the 127 pilot rows. It also lists which have none.
+- The WARNING gives both counts and names the first rows. A baselined row is **NOT checked at this deploy**: nothing
+  checks it until the full baseline exists, or until a change fits in the 500-document budget.
+- A row with no entry is PENDING(no-baseline).
+- The lanes' precritic covers their own skills.
 
 ## The run file (read by the deploy)
 
@@ -151,7 +220,11 @@ The deploy gate is `matrix_gate` in `tests/scripts/ws-deploy-gates.sh` (session 
    - Within the budget the rows run inline, red rows included. Over the budget the matrix runs nothing and exits 3.
 2. **On every deploy, within the budget or not** (critic r2 D1.3), the nightly rule folds every run file plus the
    inline run, then:
-   - **FAIL:** a row of a live skill is RED or ERROR in the folded state, or the inline run fails.
+   - **FAIL:** a row of a live skill is RED or ERROR in the folded state, or the inline run fails. A red id renamed
+     to a current row of the same kind and flags still fails, named under its new id, until that row runs OK (N1).
+   - **FAIL (I4):** the merged baseline pins a row in two files with different contents.
+   - **WARNING (N1):** a red id of a live skill that is no longer a row and maps to none is RETIRED-ROW. It never
+     refuses, and the warning says how to `--retire` it.
    - **FAIL, once the first full baseline exists:** there is no run file, or the newest run finished more than 24
      hours ago. Before the full baseline exists, these two cases give a **WARNING**: the gate passes and the lead
      reads it.
