@@ -1246,7 +1246,7 @@
   }
  },
  "tool": "ws-coverage-matrix",
- "note": "Per-row baseline (IMPROVEMENT_PLAN §1.6.2): every finding count per (row, size, lint rule) at the commit below. A red row is any count above it. Changed only with a STATUS note.",
- "commit": "1f2174eb9ca389ad9cdc1c116d4608264a635258",
+ "note": "Per-row baseline (IMPROVEMENT_PLAN §1.6.2): every finding count per (row, size, lint rule) at the commit below, for rows that printed. A red row is any count above it; a row that cannot print (L-SPLIT RENDER) is never pinned. Changed only with a STATUS note.",
+ "commit": "4bd91e89263d0c21d1a715fc14dacf26677d5608",
  "date": "2026-10-23"
 }
