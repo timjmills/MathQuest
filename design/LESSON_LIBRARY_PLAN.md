@@ -239,8 +239,8 @@ This supersedes the 17-card page-type menu (and the stand-alone mapping in §8c,
   (3) the Lesson paper gains the "parts" option.
 
 > **2026-10-23:** the Practice paper's options are now the five plain choices of `design/IMPROVEMENT_PLAN.md` §2.5 (owner: no
-> lettered A / B pages; How many pages? for section, single-skill and mixed pages). Mixed pages gain a true "Mixed together"
-> arrangement (§3 there).
+> lettered A / B pages; How many pages? for section, single-skill and mixed pages). Owner 2026-10-23: three kinds of
+> worksheet only — Single skill, Sections, Mixed practice — each with options; Mixed practice is truly mixed (§3 there).
 
 ## 8f. Owner ruling: worked examples on Practice papers — one example on top only (2026-09-26)
 

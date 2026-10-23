@@ -5,8 +5,9 @@
 > safeguards, sharded deploy gates, per-lane status files)**, rebuilds Wave 3 as **Teacher site 2.0** (four places —
 > Skills, Lessons, Classes, profile; a tray with Print · Quiz · Share; ≤ 4 steps per job; bold maths-area colours used on
 > purpose, eight areas in four strengths, checked for colour-blind teachers), builds **truly mixed pages** for Wave 4.2 (PT-MIX shuffled, never built until now), replaces the lettered A–J
-> practice pages with plain choices (How many pages? · How often each skill comes up · Mixed together / In sections / One
-> skill per page · Examples · Size; small preview, the PDF is the full view), and re-orders Waves 5–6 by template leverage
+> practice pages with **three kinds of worksheet — Single skill · Sections · Mixed practice — each with plain options**
+> (How many pages? · How often each skill comes up · Examples · Fade supports · Layout · Bring back earlier skills · Size;
+> no other page types, no look choice; small preview, the PDF is the full view; owner 2026-10-23), and re-orders Waves 5–6 by template leverage
 > (9 templates are named by ≈ 40 % of the build list). Its §4.1 is the order of work; §4.3 the owner questions.
 
 
@@ -89,6 +90,9 @@ https://timjmills.github.io/awsajacademymath/. It is the source for grades → u
 | 3.5 | Critic teacher-r1 at 1280 / 820 / 390, every action clicked. |
 
 ## Wave 4 — Three worksheets: skill, mixed, quiz
+
+> **Owner 2026-10-23:** the worksheet kinds are **Single skill · Sections · Mixed practice**, each with options; the quiz
+> is the Quiz button on the same three kinds (`design/IMPROVEMENT_PLAN.md` §2.5).
 
 | # | Item | Today |
 |---|---|---|

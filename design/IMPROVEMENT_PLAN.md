@@ -1,4 +1,4 @@
-# Improvement plan — faster building, a simple teacher site, truly mixed pages (v6.1, 2026-10-23)
+# Improvement plan — faster building, a simple teacher site, truly mixed pages (v6.2, 2026-10-23)
 
 ## In short (for the owner)
 
@@ -19,9 +19,11 @@
    every colour also carries the area's name and icon. To stay safe for colour-blind teachers, three of the eight are
    light rather than deep (mint, sky blue, lime), so their chips show by a thin outline; the one button you should press
    is bold black; everything else is calm. Pupil pages stay black and white. You pick between two colour boards first.
-4. **Worksheet choices in plain words** — no A / B pages: How many pages? · How often each skill comes up · Mixed
-   together / In sections / One skill per page · Examples · Size. A small preview, and the PDF is the full view.
-5. **Truly mixed pages.** Today "mixed practice" prints one band per skill. We build the mixed-together page that the
+4. **Three kinds of worksheet, with plain options** (owner decision): **Single skill · Sections · Mixed practice**. No
+   other page types, no lettered A / B pages, no "I Can / Daily" look choice. Options: How many pages? · How often each
+   skill comes up · Examples · Fade supports · Layout (fact rows, timed check, Today's Number) · Bring back earlier
+   skills · Size. A small preview, and the PDF is the full view.
+5. **Truly mixed pages.** Today "mixed practice" prints one band per skill. We build the Mixed practice page that the
    design rules already describe: problems from different skills side by side, never more than two of one skill in a
    row (unless one skill is most of the page), each problem with its own short instruction, the page full.
 6. **Owner decision (2026-10-23): every skill that is live makes every kind of worksheet first.** Making new lessons —
@@ -231,20 +233,18 @@ looks, every option value, every role it serves, the number ranges, the three sc
 - **Worksheet types — first, for every live skill (owner 2026-10-23).** "Every worksheet" means every choice a teacher
   can make for a skill in the worksheet sheet and the Quiz (§2.4–§2.5), each with its answer key, at S / M / L, on paper
   and on the three screen hosts:
-  - the Practice page at any page count, as One skill per page, In sections or Mixed together;
-  - Examples: None · An example to start each group · An example with each problem;
-  - Fade supports: Faded problems · Faded page · Faded packet;
-  - fact rows and the timed check (fact skills; any other skill is rerouted to the Computation grid or Equation drill
-    with a note, PT-CMP-2);
-  - Word problems (story skills; any other skill prints its own cell in the band, PAGE_TYPES §10);
-  - the Quiz paper (the Test role) with 1–6 versions; Review (Daily Spiral); Pre-skill check (Practise pre-skills);
-    Today's Number (place-value skills).
+  - the three kinds — **Single skill, Sections, Mixed practice** — at any page count, with every option §2.5 gives that
+    kind: Examples (None · An example to start each group · An example with each problem; on Mixed practice, One
+    example of each skill at the top), Fade supports, Layout (fact rows and the timed check for fact skills — any other
+    skill keeps the Standard layout, PT-CMP-2 — and Today's Number for place-value skills), Bring back earlier skills;
+  - the Quiz paper on the same three kinds, with scoring and 1–6 versions.
 
   Today an example prints only for the 261 skills with real worked steps; the other 454 print "No worked example for
   … yet" (`sheet/anchors.js` `ineligibleNote`). Steps 1 and 2 below close that gap.
-  1. **Certify each worksheet role** on the role sample (`tests/fixtures/precritic/role-sample.json`, 20 families) ×
-     S / M / L × both looks × its key: Independent, More Practice, Mixed (with §3), Review, Pre-skill check, Test, Word
-     problems, Today's Number, fact rows, fact probe, answer key, and the example and fade modes on them. The
+  1. **Certify each kind** on the role sample (`tests/fixtures/precritic/role-sample.json`, 20 families) × S / M / L ×
+     its key, across its options (all-pairs, §1.6.2): Single skill (the Independent role with its layouts, example and
+     fade modes), Sections, Mixed practice (with §3 and Bring back earlier skills), and the Quiz scoring layer on all
+     three. The
      lesson-packet roles (Opener, Scripted Model, Guided page, K one-page lesson, anchor chart, Steps card) are
      certified with the later lesson wave. A skill on a certified template
      then gets every certified role without a per-role grade (machine `coverage()` for every skill × role × size, keys
@@ -261,8 +261,8 @@ looks, every option value, every role it serves, the number ranges, the three sc
      after the lessons are done", MASTER_PLAN Wave 9); with lessons now in a later wave, Q-W4 asks whether they still
      wait. When they start, they follow step 1 and are cheap, because step 2 has already given every skill its
      misconceptions and wrong answers.
-- **Papers** — the paper composer is certified once on an all-pairs sample of the §2.5 choices (pages 1 / 3,
-  weights equal / unequal, the three arrangements, the examples choices, S / M / L) with the certified roles inside it.
+- **Papers** — the paper composer is certified once on an all-pairs sample of the §2.5 choices (the three kinds, pages
+  1 / 3, weights equal / unequal, each kind's options, S / M / L).
   Quiz becomes Practice + a scoring layer (T3), so it is certified by certifying the scoring layer, not a second engine.
 - **Lessons — a later wave, if needed (owner 2026-10-23).** Nothing below is built until that wave starts; the five
   passed detailed lessons and the standard lesson maker stay live as they are. When it starts:
@@ -319,7 +319,7 @@ looks, every option value, every role it serves, the number ranges, the three sc
 | Step | Work | Files | Done when |
 |---|---|---|---|
 | E1 | Envelopes, all-pairs sampling, certificates | `tests/scripts/ws-envelope.mjs` (new), `ws-grade-render.cjs` (`--envelope <engine>`, new flag), `design/audit/certified/` | the `stack` template and the Independent role certified from their existing passed renders; the certificate lists every page and score source |
-| E2 | Certify the worksheet roles on the role sample (§1.6.3 Worksheet types item 1) | `sheet/roles/*` (fixes only), `role-sample.json` | each listed role certified; `coverage()` green for every skill × role × size |
+| E2 | Certify the three kinds of worksheet and the Quiz layer on the role sample (§1.6.3 Worksheet types item 1) | `sheet/roles/*` (fixes only), `role-sample.json` | each listed role certified; `coverage()` green for every skill × role × size |
 | E3 | Provider pass by family (454 skills) | `js/modules/sheet/providers/*`, the cards | `real` providers 715 / 715; `ws-providers-unit` green; every live skill prints every worksheet type with its key (§1.6.3 item 3) |
 | E4 (later lesson wave, if needed) | Lesson shapes, compiler, lesson precritic, generated lesson registry; recompile lessons 1–5 | `js/modules/lessons/compile.js` (new), `js/modules/lessons/shapes/*.js` (new), `tests/scripts/ws-detailed-lesson.cjs` | lessons 1–5 recompiled, `--check` green, full critic ≥ 8; then lesson 6 onward from cards |
 | E5 | Lane manifests + integrator; one lane per session | `design/lanes/`, `tests/scripts/ws-integrate.mjs` (new) | a week of six lanes with no shared-file conflict |
@@ -394,32 +394,65 @@ key, no letters — Q-W3); Share shows the code and link at once with **Copy**
   (the board, a shared Chromebook) and says so; collecting results from many devices is not part of this plan.
 - The tray IS the set: it saves itself (`mq_teacher_sets`) and appears under Browse by › My sets.
 
-### 2.5 The worksheet sheet — plain choices, no A / B pages (owner 2026-10-23)
+### 2.5 The worksheet sheet — three kinds of worksheet, plain options (owner 2026-10-23)
 
-| Choice | Values | Default |
+Owner, 2026-10-23: "reduce the types of worksheets to 3 general — mixed practice (with options), single skill (with
+options), or sections with options", and "no different practice and then I Can etc." So the sheet offers **three kinds
+of worksheet and nothing else**; every other page type of today's print screen becomes an option of one of them, or
+happens on its own; there is no Look choice (Auto / I Can / Daily) and no lettered A / B pages (decided earlier the same
+day).
+
+| Kind of worksheet | What it is | Default when |
 |---|---|---|
-| **How many pages?** | 1 · 2 · 3 · 4 · 5 …, for every arrangement (owner: section pages, single-skill pages and mixed pages alike); every page has new numbers; the key follows. Mixed together: each page is a full mixed page with the weights kept. In sections: the sections flow across the pages by weight; a section never splits mid-row. One skill per page: pages shared out by weight (6 pages, 3 equal skills → 2 each); the page count starts at the number of skills (the menu offers nothing lower) | 1 (One skill per page: one per skill) |
-| **How often does each skill come up?** | per skill: Less · Equal · More (1 : 2 : 3; a number in the chip's options) | Equal |
-| **How are the problems arranged?** (2+ skills) | **Mixed together** · **In sections** · **One skill per page** | Mixed together; In sections when the paper comes from a lesson's "Print practice" |
-| **Examples?** | None · **An example to start each group** (a worked example, then 3–4 problems like it, repeated down the page — today's block layout, the owner's 2026-09-26 ruling "one example on top of each block", LESSON_LIBRARY_PLAN §8f) · **An example with each problem** (Q-W2) · on Mixed together pages only: None or **One example of each skill at the top** — a short example band for each skill on that page (§3.3) | None; practice printed from a lesson: An example to start each group (its skills are new) |
-| **Size** | S · M · L | M |
+| **Single skill** | one skill on the page (with several skills ticked, each skill gets its own pages, shared out by weight) | one skill is in the tray |
+| **Sections** | several skills on one page, each in its own section with its own instruction | the paper comes from a lesson ("Print practice", "Practise pre-skills") |
+| **Mixed practice** | several skills mixed together on the page (§3) | two or more skills are in the tray |
 
-- Under the choices: a **one-line summary** ("2 pages · 16 problems · Addition 6, Time 5, Fractions 5 · answer key at the
-  end") and a **small preview** — a thumbnail of the first page when every page holds the same kind of problems, or of
-  the first 2–3 pages when they differ. **Print** makes the PDF, which is the full view. **New numbers** re-deals every
-  page (it replaces "version B" on practice papers).
-- **More options:** Fade supports (Faded problems / Faded page / **Faded packet = across the pages chosen above**), Fact
-  layout (5–10 across) and Timed check (the old fact rows and probe, LESSON_LIBRARY_PLAN §8e), Mix in prerequisite
-  skills, header fields, answer-key placement and style, number line at the top, columns. There is no page-kind chooser:
-  tests are the Quiz button, lessons are in Lessons, thinking pages stay paused (MASTER_PLAN 4.5, Wave 9).
-- Engine mapping (no new renderer): pages → the Practice role's page count; weights → the per-skill `weight` option;
-  Mixed together → `arrangement: 'mixed'` (§3); In sections → today's sections; One skill per page → one section per
-  skill with page breaks; "An example to start each group" → `anchors: 'sections'` (an example band, then the block's
-3–4 problems, `blockPlan` in `sheet/anchors.js`; the mixed-practice default today, `anchors.js:16`); "An example with
-each problem" → `anchors: 'side'`; None → `anchors: 'off'` (`ANCHOR_MODES`, `anchors.js:25`); on
-mixed-together pages the engine's existing compact example bands are reused and measured per page (M4). A single example at the very top of a page is not offered: the owner's ruling puts one
-on each block. Old share codes and saved
-  sets with letters A–J decode to the same number of pages (`ws-code-snapshot`).
+**Options — each kind shows only its own:**
+
+| Option | Single skill | Sections | Mixed practice |
+|---|---|---|---|
+| **How many pages?** (1 · 2 · 3 …; every page new numbers; the key follows) | ✓ — with several skills, pages shared by weight; the count starts at the number of skills | ✓ — sections flow across the pages by weight; a section never splits mid-row | ✓ — each page a full mixed page with the weights kept |
+| **How often does each skill come up?** (per skill: Less · Equal · More = 1 : 2 : 3; a number in the chip's options) | with several skills | ✓ | ✓ |
+| **Examples** | None · **An example to start each group** · **An example with each problem** (Q-W2) | None · An example to start each group (in each section) · An example with each problem (Q-W2) | None · **One example of each skill at the top** (§3.3) |
+| **Fade supports** | Faded problems · Faded page · Faded packet (across the pages chosen) | Faded problems | — |
+| **Layout** (shown only for skills that have one) | Standard · Fact rows (5–10 across) · Timed check (fact skills) · Today's Number (place-value skills) | Standard | Standard |
+| **Bring back earlier skills** (spaced review) | — | ✓ | ✓ |
+| **Size** | S · M · L | S · M · L | S · M · L |
+
+Defaults: How many pages 1 (Single skill with several skills: one page per skill); Equal; Examples None, or "An example
+to start each group" when the paper comes from a lesson (its skills are new); no fading; Standard layout; no earlier
+skills; Size M.
+
+- **Today's page types become options or go** (`teacher-print.js` `PAGE_GROUPS` today: Independent, More Practice,
+  Mixed practice, Word problems, Lesson standard / detailed, Lesson opener, Scripted model, Guided, Pre-skill check, Check
+  it, Review, Test A / B, Fact rows, Fact probe, True or False?, Reason It, Stretch):
+  - Independent → Single skill; More Practice → How many pages?; Mixed practice → Mixed practice;
+  - Scripted model → Examples; Guided → Fade supports; Fact rows and Fact probe → Layout; Today's Number → Layout; Review,
+    Daily spiral and Daily 4 → Bring back earlier skills;
+  - Word problems → word-problem skills, which go on any kind (LESSON_LIBRARY_PLAN §8e: word problems are skills);
+  - Pre-skill check → Lessons › Practise pre-skills, which puts the pre-skills in the tray (Sections);
+  - Test A / B → the Quiz button (§2.4), which offers the same three kinds with scoring and 1–6 versions;
+  - the lessons and the lesson opener → Lessons (new lessons in a later wave, §1.6.3);
+  - Check it, True or False?, Reason It, Stretch → paused thinking pages (MASTER_PLAN Wave 9; Q-W4).
+- **The page title is automatic:** Single skill prints the "I Can" title (the goal of the one skill); Sections and Mixed
+  practice print the everyday header with the skills named under it (§3.3). No Look choice.
+- Under the options: a **one-line summary** ("2 pages · 16 problems · Addition 6, Time 5, Fractions 5 · answer key at
+  the end") and a **small preview** — a thumbnail of the first page when every page holds the same kind of problems, or
+  of the first 2–3 pages when they differ. **Print** makes the PDF, which is the full view. **New numbers** re-deals
+  every page (it replaces "version B" on practice papers).
+- **More options** (rarely needed): Mix in prerequisite skills, header fields, answer-key placement and style, number
+  line at the top, columns.
+- Engine mapping (no new renderer): Single skill → the Independent role with its page count, the layouts (`fact-rows`,
+  `fact-probe`, `todays-number` roles) and the fade modes; Sections → today's sections; Mixed practice →
+  `arrangement: 'mixed'` (§3), with Bring back earlier skills drawing on the Review / Daily spiral selection; pages →
+  the role's page count; weights → the per-skill `weight` option; "An example to start each group" → `anchors:
+  'sections'` (an example band, then the block's 3–4 problems, `blockPlan` in `sheet/anchors.js`; the mixed-practice
+  default today, `anchors.js:16`); "An example with each problem" → `anchors: 'side'`; None → `anchors: 'off'`
+  (`ANCHOR_MODES`, `anchors.js:25`); on Mixed practice pages the engine's existing compact example bands are reused and
+  measured per page (M4). A single example at the very top of a page is not offered: the owner's ruling puts one on each
+  block. The other roles stay in the code (nothing is deleted), so old share codes, saved sets and links — including
+  letters A–J and a `look` value — decode to the same pages (`ws-code-snapshot`); they are no longer offered on screen.
 
 ### 2.6 The flows
 
@@ -430,7 +463,7 @@ every row and asserts its action count, including the 6-action case for Lessons.
 | Task | New flow | Steps | Actions new / today |
 |---|---|---|---|
 | One skill on paper with its key | search → tick → Print → Print | 3 | 4 / 6 |
-| A mixed page of 3 skills | tick 3 (search each, or from one maths-area list) → Print (Mixed together by default) → Print | 3 | 5–8 / 13 |
+| A mixed page of 3 skills | tick 3 (search each, or from one maths-area list) → Print (Mixed practice by default) → Print | 3 | 5–8 / 13 |
 | A code for one skill | search → tick → Share → Copy | 3 | 4 / 5 |
 | A set of 3 skills to pupils | tick 3 → Share → Copy | 3 | 5–8 / ≈ 11 |
 | Practice on the board | tick → Share → Show on the board | 3 | 3–4 / ≈ 5 |
@@ -558,7 +591,8 @@ the same checks (closest colour-blind pair CC–OA 12.2).
 - **Retire from the teacher chrome** (code kept, old links redirect): the legacy quiz-builder pane (Q-T2), the classic
   print stub, auto-layout worksheet, the six-tile home (Q-T1), the separate Skills to be made screen (its content stays on
   lessons, Q-T3), the "Quick Start vs Direct" choice (one link; the other mode in More options, Q-T5), Google Forms export
-  (More options of Share).
+  (More options of Share), the page-type picker (`PAGE_GROUPS` / `PAGE_TYPES` in `teacher-print.js`, about 18 types) and
+  the Look control (Auto / I Can / Daily) — replaced by the three kinds and their options (§2.5, owner 2026-10-23).
 - **Never break:** `?code=` / `?c=` share codes (same parser and skill indices), `?quiz=` links and IndexedDB quizzes (CSS
   additive), `#wrm/…`, `#map/…`, `#todo/…` hashes (redirect), `mq_teacher_screen` keys (map), `mq_teacher_sets` (carry
   over), `window.tvGo(key)` / `tvOpenPrintWith` (aliases), `?board=1`.
@@ -610,9 +644,9 @@ reproduced.
 
 ### 3.3 The design
 
-- **Terms:** the teacher sees **Mixed together · In sections · One skill per page** (§2.5); the engine field is
+- **Terms:** the teacher sees the three kinds **Single skill · Sections · Mixed practice** (§2.5); the engine field is
   `arrangement: 'mixed' | 'sections' | 'per-page'` (an appended code flag; old codes decode as sections). "Grouped" is
-  the engine's old name for "In sections".
+  the engine's old name for "Sections"; `per-page` is Single skill with several skills.
 - **Order — `interleave(items, weights, seed)`** (pure, in the kit): weighted round-robin, counts within 1 of the weights,
   at most 2 of one skill in a row, every skill seen in the first third of the page, order from the seed. Single-skill
   pages keep `dealSkills` (DN-34 holds there).
@@ -653,7 +687,7 @@ reproduced.
   instruction library ("Add.", "Write the time.", "Shade 2/8.") — printed beside the problem number; the sheet line is
   "Solve."; plain computation cells may omit it. Until a skill has its cue, the library instruction shortened by rule is
   used, and the lint lists every skill still on that fallback.
-- **Examples on a mixed-together page:** None, or **one worked example of each skill at the top** — the engine's existing
+- **Examples on a Mixed practice page:** None, or **one worked example of each skill at the top** — the engine's existing
   mixed-practice example, one full-width compact band per skill (SUPPORTS.md "Compact band" and "Mixed practice"), each
   measured by `anchorHeightMm`. **Each page shows the bands of the skills on that page**, at its top; their measured
   height comes off that page before its capacity sum (rounded up to whole rows), and the check is per page. When on some
@@ -661,7 +695,7 @@ reproduced.
   fit one page, SUPPORTS.md), the packer first spreads the skills over the pages chosen (fewer skills per page, fewer
   bands); only if that cannot work is the choice greyed with the reason ("Examples for these 3 skills need 2 pages —
   add a page or choose fewer skills"). This is not the PT-MIX "cue key strip". "An example with each problem" is not offered on
-  mixed-together pages.
+  Mixed practice pages.
 - **Frame and key:** title "Mixed practice" with the skills named under it in plain words (up to four, then "and N
   more"); tab "Level a–b · Mixed n"; footer: skill names + CCSS codes; numbering by strip, then block, then inside the
   block (PT-MIX-7); no skill letters in cells; the key adds a legend by skill, listing problem numbers
@@ -669,14 +703,14 @@ reproduced.
 - **PT-MIX-8 (achieved vs requested share, cells across per skill)** is replaced by the summary line, which states the
   achieved count of each skill and says when it differs from what was asked ("Time 5 of the 6 asked: its boxes are
   bigger"); the cells-across detail moves to More options › Details.
-- **Screen parity:** the online worksheet and quiz use the same `interleave()` when the arrangement is Mixed together;
+- **Screen parity:** the online worksheet and quiz use the same `interleave()` when the arrangement is Mixed practice;
   the quiz's shuffle switch maps to it.
-- **When mixing is used:** Mixed together is the default for 2+ skills, except practice printed from a lesson (In
-  sections, because the lesson's skills are new); the teacher can change it in one tap. If the owner agrees (Q-M1), the
+- **When mixing is used:** Mixed practice is the default for 2+ skills, except practice printed from a lesson (Sections,
+  because the lesson's skills are new); the teacher can change it in one tap. If the owner agrees (Q-M1), the
   same change edits three places that say otherwise today: PAGE_TYPES 5.2 ("Look … Default arrangement GROUPED",
   line 1440) → "Default arrangement SHUFFLED for 2+ skills, GROUPED from a lesson"; WORKSHEET_DESIGN_STANDARD DN-34 gains a
-  note that a page the teacher set to Mixed together is a deliberate mix (it is shown in the summary line), so it is not
-  "silent"; `sheet/anchors.js:16` ("Mixed practice defaults to sections") → mixed-together pages default to no examples,
+  note that a page the teacher set to Mixed practice is a deliberate mix (it is shown in the summary line), so it is not
+  "silent"; `sheet/anchors.js:16` ("Mixed practice defaults to sections") → Mixed practice pages default to no examples,
   grouped pages keep sections.
 
 ### 3.4 Gates that prove it
@@ -697,10 +731,10 @@ reproduced.
 
 | Phase | Work | Files | Done when |
 |---|---|---|---|
-| M1 | `interleave()` + self-test (with the weights-win case); the `arrangement` field and code flag; Mixed together for skills of the same size class inside today's packer; the Q-M1 edits to PAGE_TYPES 5.2, DN-34 and `anchors.js` | `sheet/interleave.js` (new), `print-sheet.js`, `skill-codes.js`, `sheet/anchors.js`, `design/PAGE_TYPES.md`, `WORKSHEET_DESIGN_STANDARD.md` | self-test green; `ws-code-snapshot` green; a 4-skill same-size page renders mixed with no run > 2 |
+| M1 | `interleave()` + self-test (with the weights-win case); the `arrangement` field and code flag; Mixed practice for skills of the same size class inside today's packer; the Q-M1 edits to PAGE_TYPES 5.2, DN-34 and `anchors.js` | `sheet/interleave.js` (new), `print-sheet.js`, `skill-codes.js`, `sheet/anchors.js`, `design/PAGE_TYPES.md`, `WORKSHEET_DESIGN_STANDARD.md` | self-test green; `ws-code-snapshot` green; a 4-skill same-size page renders mixed with no run > 2 |
 | M2 | Size classes (incl. measured legacy cells) + the 2 × 2 block packer (small boxes of different skills share blocks; runs counted in turns) + numbering + rebalanced last page + page units, the capacity sum, two-of-each and rotation across pages | `sheet/roles/mixed-practice.js`, `sheet/layout.js`, `sheet/paginate.js` | print-lint mixed rules green on the critic set at S / M / L |
 | M3 | `strings.cue` (fallback rule first, then real cues family by family) + the in-cell cue + lint | `sheet/contract.js`, `sheet/providers/*`, `sheet/cell.js` | every skill has a cue or is listed on the fallback; lint green |
-| M4 | Frame subtitle, readable footer, key legend by skill, the measured examples bands with their greyed fallback, the arrangement and examples choices in the worksheet sheet, the summary line (replacing PT-MIX-8) | `sheet/frame.js`, `sheet/roles/answer-key.js`, `sheet/anchors.js` (compact bands on mixed-together pages), `teacher-print.js` (with T3) | screens and keys match §3.3 |
+| M4 | Frame subtitle, readable footer, key legend by skill, the measured examples bands with their greyed fallback, the arrangement and examples choices in the worksheet sheet, the summary line (replacing PT-MIX-8) | `sheet/frame.js`, `sheet/roles/answer-key.js`, `sheet/anchors.js` (compact bands on Mixed practice pages), `teacher-print.js` (with T3) | screens and keys match §3.3 |
 | M5 | Online worksheet and quiz parity; independent critic | `worksheet.js`, `quiz-take.js` | critic ≥ 8 on every page, size and host |
 
 ---
@@ -733,6 +767,7 @@ At most three lanes at once until §1.6 E5 (manifests + integrator) lands; then 
 | Wave 4.4 answer-key options | built; in More options |
 | Wave 4.5 other page types leave the UI | §2.5: no page-kind chooser; old codes decode |
 | Practice pages A–J, versions on practice papers | replaced by §2.5 (owner 2026-10-23, decided) |
+| Today's print-screen page types (about 18) and the Look choice | the three kinds and their options (§2.5, owner 2026-10-23, decided); the roles stay in the code so old codes decode |
 | Wave 5 (redo existing skills), 5.2 number line (built), 5.3 same skill with different supports | §1.5; 5.3 needs a share-code decision (Q-H3) |
 | Wave 6 (new skills incl. MAP 6.2–6.4) | §1.5 template order |
 | Wave 7 (Seesaw / Classroom trial, game modes) | unchanged, after Waves 5–6 |
@@ -780,7 +815,7 @@ At most three lanes at once until §1.6 E5 (manifests + integrator) lands; then 
 | Q-S4 | Once a kind of drawing, page type, paper or lesson pattern has passed review across all its sizes and options, may new skills and lessons that use it be checked this way: the machine checks on every page, a reviewer reading every new skill or lesson on a sheet of small pages, and 1 in 5 pages graded at full size (any new kind of page always in full)? A spot-audit each wave grades more pages at full size and withdraws the approval if any falls below 8. (This changes how CLAUDE.md says a page counts as graded.) | Yes |
 | Q-S5 | (Asked when the later lesson wave starts.) Let lessons be drafted automatically from their skills — steps, examples, the mistakes table, practice and the exit slip — with the builder writing only the story, the hook and the teaching notes? You still sign each lesson's card first, and the five lessons already passed are rebuilt this way and re-checked before any new one. | Yes |
 | Q-S6 | Run up to six work lanes at once, each in its own cloud session, once the merge tool is in place? | Yes |
-| Q-M1 | When a worksheet has 2 or more skills, mix the problems together by default? Practice printed from a lesson stays in sections, because the lesson's skills are new. | Yes |
+| Q-M1 | When a worksheet has 2 or more skills, make it Mixed practice by default? Practice printed from a lesson starts as Sections, because the lesson's skills are new. | Yes |
 | Q-M2 | If the skills you chose cannot all fit on one page at least twice each, should Print add pages (it tells you) rather than print some skills only once? | Yes, add pages |
 | Q-T1 | Replace today's home screen with: the site opens on Skills, ticked skills go to a tray with Print · Quiz · Share? | Yes |
 | Q-T2 | Make quizzes from the same tray (Quiz button) and retire the separate quiz builder? Pupils take quizzes exactly as today, and old quiz links keep working. | Yes |
@@ -788,7 +823,7 @@ At most three lanes at once until §1.6 E5 (manifests + integrator) lands; then 
 | Q-T4 | Show grades as plain numbered labels, so colour only ever means the maths area? | Yes |
 | Q-T5 | Share gives one link: it **opens the practice straight away** (today's "Direct link"). The other kind — a link that **puts the skills as buttons on the pupil's start screen to choose from**, which you can lock (today's "Quick Start link") — moves under More options. Agree? | Yes |
 | Q-T6 | Colour board A (six maths-area colours) or board B (eight colours, each in four strengths)? Either way the main button is bold black. On both, areas taught in the same grade stay easy to tell apart for colour-blind teachers, and every colour also shows the area's name and icon. The cost: to stay colour-blind safe, three of the colours are light (mint, sky blue, lime) rather than deep, so their buttons show by a thin outline — you will see them on the board. | B |
-| Q-W1 | No lettered A–J pages; "How many pages?" for section, single-skill and mixed pages | **Decided by the owner, 2026-10-23** |
+| Q-W1 | No lettered A–J pages; "How many pages?" for section, single-skill and mixed pages; **three kinds of worksheet only — Single skill, Sections, Mixed practice — each with its options; no other page types and no "I Can / Daily" look choice** | **Decided by the owner, 2026-10-23** |
 | Q-W2 | Offer "An example with each problem" again? It was dropped on 2026-09-26 because it made pages with only one problem. | Yes, but only when at least 2 example-and-problem pairs fit the page at the chosen size (otherwise the choice is greyed out with the reason), and never on mixed pages |
 | Q-W3 | For quizzes, "How many versions? 1–6" — each version with its own order and answer key, no letters? | Yes |
 | Q-W4 | You said the thinking pages (find the mistake, true or false, reason it, stretch) wait until after the lessons. Lessons are now in a later wave: should the thinking pages still wait for that wave, or join the worksheet types now? | Still wait (your 2026-10-09 ruling stands) |

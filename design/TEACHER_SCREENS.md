@@ -4,7 +4,10 @@
 > tray (Print · Quiz · Share) + the worksheet sheet, ≤ 4 steps per job, the bold colour system and its rules). The rulings below stay in force where §2 does not
 > change them; §4.3 lists the changes for the owner to confirm (Q-T1 replaces the six-tile home). **Owner 2026-10-23 (decided):**
 > the lettered A / B / C pages go — the worksheet choices are How many pages? (for section, single-skill and mixed pages alike) ·
-> How often each skill comes up · How the problems are arranged · Examples · Size, plus a New numbers button (§2.5).
+> How often each skill comes up · Examples · Size, plus a New numbers button (§2.5). **Owner 2026-10-23 (decided):** three
+> kinds of worksheet only — **Single skill · Sections · Mixed practice**, each with its options (Examples, Fade supports,
+> Layout: fact rows / timed check / Today's Number, Bring back earlier skills); no other page types and no "I Can / Daily"
+> look choice (the title follows the kind).
 > **Owner 2026-10-23 (decided):** no full page preview on the website — a one-line summary plus a SMALL preview (the first page when every page has the same kind of problems; the first 2–3 pages when they differ); the PDF made by Print is the full view.
 
 
