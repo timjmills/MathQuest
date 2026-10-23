@@ -169,9 +169,10 @@
   function notes(r, n = 3) { let s = ''; for (let i = 0; i < n; i++) { const v = pickOf(r, [1, 5, 10, 20]); s += rect(8 + i * 62, 14, 56, 30) + txt(36 + i * 62, 35, '$' + v, 16, 'middle', 700); } return s; }
   function shape(kind, cx, cy, sz = 26, fill = 'none') {
     if (kind === 'tri') return `<polygon points="${cx},${cy - sz} ${cx + sz},${cy + sz * 0.8} ${cx - sz},${cy + sz * 0.8}" fill="${fill}" stroke="#000" stroke-width="2.5"/>`;
-    if (kind === 'sq') return `<rect x="${cx - sz * 0.85}" y="${cy - sz * 0.85}" width="${sz * 1.7}" height="${sz * 1.7}" fill="${fill}" stroke="#000" stroke-width="2.5"/>`;
+    const poly = (w, h) => `<polygon points="${cx - w},${cy - h} ${cx + w},${cy - h} ${cx + w},${cy + h} ${cx - w},${cy + h}" fill="${fill}" stroke="#000" stroke-width="2.5"/>`;
+    if (kind === 'sq') return poly(sz * 0.85, sz * 0.85);
     if (kind === 'circ') return `<circle cx="${cx}" cy="${cy}" r="${sz * 0.9}" fill="${fill}" stroke="#000" stroke-width="2.5"/>`;
-    if (kind === 'rect') return `<rect x="${cx - sz * 1.2}" y="${cy - sz * 0.7}" width="${sz * 2.4}" height="${sz * 1.4}" fill="${fill}" stroke="#000" stroke-width="2.5"/>`;
+    if (kind === 'rect') return poly(sz * 1.2, sz * 0.7);
     const pts = []; for (let i = 0; i < 6; i++) { const a = Math.PI / 6 + i * Math.PI / 3; pts.push(`${cx + sz * Math.cos(a)},${cy + sz * Math.sin(a)}`); }
     return `<polygon points="${pts.join(' ')}" fill="${fill}" stroke="#000" stroke-width="2.5"/>`;
   }
@@ -511,6 +512,7 @@
         if (/base10_build_hundreds/.test(v)) return 'flats';
         if (/base10/.test(v)) return 'rods';
         if (/odd_even/.test(v)) return 'odd-even';
+        if (/even_odd/.test(v)) return 'odd-even-select';
         if (/word_form|in_words/.test(v)) return 'number-words';
         if (/fraction_number_line/.test(v)) return 'frac-nl';
         if (/whole_as_fraction|compose_whole/.test(v)) return 'frac-whole';
@@ -746,6 +748,7 @@
     'ten-frame': (r) => svg(190, 70, tenFrame(int(r, 3, 9)) + box(146, 16, 36, 34)),
     'rods': (r) => rods(int(r, 2, 4), int(r, 1, 6)),
     'flats': (r) => rods(int(r, 1, 3), int(r, 1, 4), int(r, 1, 2)),
+    'odd-even-select': (r) => { const ns = Array.from({ length: 5 }, () => int(r, 11, 59)); return svg(250, 70, txt(6, 20, 'Ring the even numbers.', 15) + ns.map((n, i) => txt(26 + i * 48, 56, n, 24, 'middle')).join('')); },
     'odd-even': (r) => svg(240, 60, txt(8, 42, `${int(r, 11, 49)}`, 30) + `<rect x="64" y="16" width="64" height="34" rx="17" fill="none" stroke="#000" stroke-width="2"/>` + txt(96, 39, 'odd', 18, 'middle') + `<rect x="138" y="16" width="70" height="34" rx="17" fill="none" stroke="#000" stroke-width="2"/>` + txt(173, 39, 'even', 18, 'middle')),
     'number-words': (r) => svg(240, 64, txt(6, 40, `${int(r, 21, 99)} =`, 26) + ln(76, 44, 230, 44)),
     'words': (r, s) => wordCard(s),
@@ -803,7 +806,7 @@
     // a bar model: parts [{label, w, dashed}], the whole's label above
     bar(type, vals, parts, whole) { const W = 150; const tot = parts.reduce((t, x) => t + x.w, 0); let x = 1, o = ''; for (const q of parts) { const w = W * q.w / tot; o += q.dashed ? `<rect x="${x}" y="22" width="${w}" height="26" fill="none" stroke="#000" stroke-width="1.6" stroke-dasharray="4 3"/>` : pp(x, 22, w, 26, q.on); o += txt(x + w / 2, 41, q.label, 14, 'middle'); x += w; } o += `<path d="M1 18 v-5 h${W} v5" fill="none" stroke="#000" stroke-width="1.5"/>` + txt(W / 2 + 1, 11, whole, 13, 'middle'); return pic(type, vals, { cells: parts.filter(q => !q.dashed).length }, W + 3, 52, o); },
     // fraction bars: rows of d parts, the first `shade` parts grey across the bars
-    bars(type, vals, nBars, d, shade, extra = {}, label) { const W = 100, h = 12, per = nBars > 4 ? Math.ceil(nBars / 2) : nBars, top = label ? 16 : 0; let o = '', left = shade; for (let k = 0; k < nBars; k++) { const bx = Math.floor(k / per) * (W + 10), by = top + (k % per) * (h + 4); for (let i = 0; i < d; i++) o += pp(bx + 1 + i * W / d, by + 1, W / d, h, left-- > 0); } if (label) o += `<path d="M1 13 v-4 h${W} v4" fill="none" stroke="#000" stroke-width="1.5"/>` + txt(W / 2, 8, label, 12, 'middle'); return pic(type, vals, Object.assign({ cells: nBars * d, shaded: Math.max(0, shade) }, extra), nBars > 4 ? 2 * W + 13 : W + 3, top + per * (h + 4), o); },
+    bars(type, vals, nBars, d, shade, extra = {}, label, W = 100) { const h = 12, per = nBars > 4 ? Math.ceil(nBars / 2) : nBars, top = label ? 16 : 0; let o = '', left = shade; for (let k = 0; k < nBars; k++) { const bx = Math.floor(k / per) * (W + 10), by = top + (k % per) * (h + 4); for (let i = 0; i < d; i++) o += pp(bx + 1 + i * W / d, by + 1, W / d, h, left-- > 0); } if (label) o += `<path d="M1 13 v-4 h${W} v4" fill="none" stroke="#000" stroke-width="1.5"/>` + txt(W / 2, 8, label, 12, 'middle'); return pic(type, vals, Object.assign({ cells: nBars * d, shaded: Math.max(0, shade) }, extra), nBars > 4 ? 2 * W + 13 : W + 3, top + per * (h + 4), o); },
     // pizzas: circles of d slices, `shade` slices grey across them
     pizzas(type, vals, n, d, shade) { const R = 20; let o = '', left = shade; for (let k = 0; k < n; k++) { const cx = 22 + k * 46, cy = 22; for (let i = 0; i < d; i++) { const a0 = -Math.PI / 2 + i * 2 * Math.PI / d, a1 = a0 + 2 * Math.PI / d; const p0 = [cx + R * Math.cos(a0), cy + R * Math.sin(a0)], p1 = [cx + R * Math.cos(a1), cy + R * Math.sin(a1)]; o += `<path class="pp" d="M${cx} ${cy}L${p0[0].toFixed(1)} ${p0[1].toFixed(1)}A${R} ${R} 0 0 1 ${p1[0].toFixed(1)} ${p1[1].toFixed(1)}Z" fill="${left-- > 0 ? GREY : '#fff'}" stroke="#000" stroke-width="1.5"/>`; } } return pic(type, vals, { cells: n * d, shaded: Math.max(0, shade) }, n * 46, 46, o); },
   };
@@ -842,7 +845,7 @@
     'dec-round': (v, s, out) => { const m = out.replace(/<[^>]+>/g, ' ').match(/\d+\.\d+/); if (!m) return null; const at = Number(m[0]); const from = Math.floor(at * 10 + 1e-9) / 10, to = Math.round((from + 0.1) * 10) / 10; const x = 10 + (at - from) / 0.1 * 120; let o = ln(10, 26, 130, 26, 2); for (let i = 0; i <= 10; i++) o += ln(10 + i * 12, i % 5 ? 21 : 18, 10 + i * 12, i % 5 ? 31 : 34, 1.5); o += txt(10, 52, from.toFixed(1), 13, 'middle') + txt(130, 52, to.toFixed(1), 13, 'middle') + `<path d="M${x.toFixed(1)} 6 l-5 -6 h10 z" fill="#000"/>` + ln(x, 6, x, 24, 2); return pic('numline', [m[0]], { at: m[0], from: from.toFixed(1), to: to.toFixed(1) }, 142, 56, o); },
     'convert': ([a], s, out) => { const u = (out.replace(/<[^>]+>/g, ' ').match(/\d+ ([a-zA-Z]+) =/) || [])[1] || ''; let o = ''; for (let i = 0; i < a; i++) o += pp(1 + i * 24, 4, 24, 22, false) + txt(13 + i * 24, 20, u, 11, 'middle'); return pic('units', [a], { cells: a }, a * 24 + 3, 30, o); },
   };
-  function mixedPair(v) { const groups = []; for (let i = 0; i + 2 < v.length && groups.length < 2; i += 3) groups.push(v.slice(i, i + 3)); let o = '', x = 0, H = 0; for (const [w, n, d] of groups) { const k = w + 1; const g = P.bars('frac-mixed', [w, n, d], k, d, w * d + n); g.w = 60; let body = g.b.replace(/width="([\d.]+)"/g, (m0, ww) => `width="${(Number(ww) * 0.55).toFixed(2)}"`).replace(/ x="([\d.]+)"/g, (m0, xx) => ` x="${(Number(xx) * 0.55).toFixed(2)}"`); o += `<g transform="translate(${x} 0)">${body}</g>`; x += 66; H = Math.max(H, k * 16); } return { w: x, h: H, b: o }; }
+  function mixedPair(v) { const groups = []; for (let i = 0; i + 2 < v.length && groups.length < 2; i += 3) groups.push(v.slice(i, i + 3)); let o = '', x = 0, H = 0; for (const [w, n, d] of groups) { const g = P.bars('frac-mixed', [w, n, d], w + 1, d, w * d + n, {}, null, 56); o += `<g transform="translate(${x} 0)">${g.b}</g>`; x += g.w + 8; H = Math.max(H, g.h); } return { w: x, h: H, b: o }; }
   function copies(k, n, d) { const W = 72, h = 11, per = k > 4 ? Math.ceil(k / 2) : k; let o = ''; for (let b = 0; b < k; b++) { const bx = Math.floor(b / per) * (W + 8), by = (b % per) * (h + 4); for (let i = 0; i < d; i++) o += pp(bx + 1 + i * W / d, by + 1, W / d, h, i < n); } return pic('frac-copies', [k, n, d], { cells: k * d, shaded: k * n }, (k > 4 ? 2 * W + 10 : W + 3), per * (h + 4)); }
   function withPicture(out, s, kind) {
     const m = out.match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/); const make = PICS[kind]; if (!m || !make) return out;
@@ -851,22 +854,27 @@
     return svg(Math.ceil(W + 16 + p.w), Math.ceil(h), `<g transform="translate(0 ${(h - H) / 2})">${body}</g><g transform="translate(${W + 16} ${(h - p.h) / 2})">${p.b}</g>`);
   }
   const PLAIN_DRAW = {
-    'frac-bar': (r) => { const d = int(r, 3, 8), n = int(r, 1, d - 1); return svg(250, 84, txt(6, 30, `${n} of ${d} equal parts`, 18) + txt(6, 58, 'are shaded:', 18) + fracBox(150, 44)); },
+    'frac-bar': (r) => { const d = int(r, 3, 8), n = int(r, 1, d - 1); return svg(250, 84, txt(6, 30, `${n} of ${d} equal parts`, 18) + txt(6, 58, 'are shaded:', 18) + fracBox(222, 44)); },
     'frac-set': (r) => { const d = int(r, 4, 9), n = int(r, 1, d - 1); return svg(260, 84, txt(6, 30, `${n} of ${d} cats are black.`, 18) + txt(6, 60, 'What fraction?', 18) + fracBox(200, 44)); },
     'frac-equiv': (r) => { const a = int(r, 1, 3), b = a + int(r, 1, 3), k = int(r, 2, 4); return svg(200, 84, frac(30, 40, a, b) + txt(60, 48, '=', 24) + box(84, 6, 34, 28) + ln(80, 40, 122, 40) + txt(101, 70, b * k, 22, 'middle')); },
   };
-  function draw(s, seed, opts) {
+  // the bare drawing: the problem as text and numbers (a "(No Pictures)" twin or Pictures off drops its pictures)
+  function bare(s, seed, opts) {
     const kind = kindOf(s); const r = rng(s.c + ':' + s.v + ':' + (seed === undefined ? '' : seed));
-    if (kind.startsWith('pool-')) return poolDraw(kind, s, r);
-    const f = D[kind]; if (!f) return '';            // no drawing rather than a wrong one
+    if (kind.startsWith('pool-')) return { kind, out: poolDraw(kind, s, r), off: true };
+    const f = D[kind]; if (!f) return { kind, out: '', off: true };            // no drawing rather than a wrong one
     let out = f(r, s);
     const off = PLAIN.test(s.l) || (opts && opts.pictures === false);
-    if (off) { if (picCount(out) && PLAIN_DRAW[kind]) out = PLAIN_DRAW[kind](rng(s.c + ':' + s.v + ':' + (seed === undefined ? '' : seed)), s); return out; }
-    const wantsPic = PICT.test(s.l) || /^story-/.test(kind) || kind === 'tape';
-    if (wantsPic && (picCount(out) === 0 || /^story-|^tape$/.test(kind))) out = withPicture(out, s, kind);
-    return out;
+    if (off && picCount(out) && PLAIN_DRAW[kind]) out = PLAIN_DRAW[kind](rng(s.c + ':' + s.v + ':' + (seed === undefined ? '' : seed)), s);
+    return { kind, out, off };
+  }
+  function draw(s, seed, opts) {
+    const { kind, out, off } = bare(s, seed, opts); if (off) return out;
+    // a Visual skill or a word problem with Pictures on gets a picture drawn from its own numbers (PICS), never a stand-in
+    const wantsPic = PICT.test(s.l) || /^story-/.test(kind);
+    return wantsPic && (picCount(out) === 0 || /^story-/.test(kind)) ? withPicture(out, s, kind) : out;
   }
   // the bare drawing, before any picture is added (thumbs-check compares the two: an added picture must carry its data)
-  function base(s, seed) { const kind = kindOf(s); const r = rng(s.c + ':' + s.v + ':' + (seed === undefined ? '' : seed)); if (kind.startsWith('pool-')) return poolDraw(kind, s, r); const f = D[kind]; return f ? f(r, s) : ''; }
+  function base(s, seed, opts) { return bare(s, seed, opts).out; }
   root.MQThumbs = { draw, base, kindOf, rng, int, picCount, KINDS: Object.keys(D), POOLS: Object.keys(POOL) };
 })(typeof window !== 'undefined' ? window : globalThis);
