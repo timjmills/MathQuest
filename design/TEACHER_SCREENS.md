@@ -1,7 +1,7 @@
 # Teacher screens — owner rulings (2026-09-26)
 
 > **2026-10-23:** the teacher side is being redesigned as **Teacher site 2.0** — `design/IMPROVEMENT_PLAN.md` §2 (four places, the
-> tray + Make sheet, ≤ 4 steps per job, the bold colour system and its rules). The rulings below stay in force where §2 does not
+> tray (Print · Quiz · Share) + the worksheet sheet, ≤ 4 steps per job, the bold colour system and its rules). The rulings below stay in force where §2 does not
 > change them; §4.3 lists the changes for the owner to confirm (Q-T1 replaces the six-tile home). **Owner 2026-10-23 (decided):**
 > the lettered A / B / C pages go — the worksheet choices are How many pages? (for section, single-skill and mixed pages alike) ·
 > How often each skill comes up · How the problems are arranged · Examples · Size, plus a New numbers button (§2.5).
@@ -25,7 +25,7 @@ The home screen shows **six large, visual actions** and nothing else competing w
 |---|---|---|
 | **Make skill sheet** | the Practice paper | one skill (→ "I Can" title), versions 1, size M |
 | **Make mixed review** | the same Practice paper | several skills, **equal weights** (each skill's weight is still editable), "Mix in prerequisite skills" available |
-| **Make quiz** | the Quiz paper | scored, versions A / B |
+| **Make quiz** | the Quiz paper | scored, versions A / B (2026-10-23: "How many versions? 1–6", no letters — IMPROVEMENT_PLAN Q-W3) |
 | **Make lesson** | the Lesson paper (the lesson library) | all parts; choose parts to print; "New numbers" per part |
 | **Send practice code** | the share-code / send screen | — |
 | **Practice map** | the pupil practice map | — |

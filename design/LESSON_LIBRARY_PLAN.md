@@ -247,7 +247,7 @@ way as the problems**, prints its steps at ≥ 11 pt at every size, and the bloc
 anchor-r1 defects (commit 7146df5 on `critic-anchor-r1`) are the fix list.
 
 > **2026-10-23:** the owner asked for "an example problem with each problem" as a choice again — open question Q-W2 in
-> `design/IMPROVEMENT_PLAN.md` §4.3 Q-W2 (recommended: allowed only where ≥ 2 pairs fit a page at the chosen size).
+> `design/IMPROVEMENT_PLAN.md` §4.3 (recommended: allowed only where ≥ 2 pairs fit a page at the chosen size).
 
 ## 9. Risks
 
