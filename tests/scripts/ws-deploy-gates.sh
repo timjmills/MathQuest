@@ -26,9 +26,9 @@
 #            ws-chromebook-fit in MQ_FIT_SHARDS parts (default 2), and the sweeps on the pinned sample
 #            (tests/fixtures/precritic/sweep-sample.json): ws-screen-slots --dark / --bigboard, ws-chromebook-fit
 #            --dark / --bigboard (chromebook-fit's standing sweep failures are pinned in the sample file).
-# Session 3  ws-coverage-matrix (MQ_COVERAGE_ARGS, default --affected) in MQ_MATRIX_SHARDS parts (default 2, one per
-#            slot: the rows are print-lint kit documents at ≈ 5.4 s each, so 500 rows are ≈ 45 min on one slot; the
-#            tool must take --shard i/n) when the tool exists, else SKIPPED (tool not built) - never OK; the digests
+# Session 3  ws-coverage-matrix (MQ_COVERAGE_ARGS, default `--all --affected <MQ_DEPLOY_BASE>..HEAD --baseline
+#            design/audit/matrix/baseline.json --slots 2 --batch 9`: the matrix runs two print-lint processes, one per
+#            slot, batching rows to amortise the browser start; measured 0.31-0.38 documents/s on two slots) when the tool exists, else SKIPPED (tool not built) - never OK; the digests
 #            hook (M4 record/replay) prints NOT YET; the owner-go check.
 # Prerequisites, checked before any session runs: PyMuPDF (python3 -c "import fitz"; fix: pip install pymupdf),
 # puppeteer, flock. A missing one fails at once with its fix.
@@ -185,7 +185,13 @@ build_list() {
   # session 3
   local cm; cm=$(first_of ws-coverage-matrix.cjs ws-coverage-matrix.mjs)
   # the matrix rows are print-lint kit documents (≈ 5.4 s each, lead speed audit 2026-10-23): split over both slots
-  for i in $(seq 1 "$MATRIX_SHARDS"); do browser_gate 3 "ws-coverage-matrix ${MQ_COVERAGE_ARGS:---affected} --shard $i/$MATRIX_SHARDS" "$cm" ${MQ_COVERAGE_ARGS:---affected} --shard "$i/$MATRIX_SHARDS"; done
+  # The matrix takes its own browser slots (--slots 2: one print-lint process per slot through mq-browser-run.sh), so it
+  # runs as a node gate: wrapping it in browser_gate would hold a slot while its children wait for one. Affected rows are
+  # those a change since the deployed tip reaches (MQ_DEPLOY_BASE, default the merge base with origin/master).
+  local base; base=${MQ_DEPLOY_BASE:-$(git merge-base origin/master HEAD 2>/dev/null || echo HEAD~1)}
+  local cargs=${MQ_COVERAGE_ARGS:-"--all --affected $base..HEAD --baseline design/audit/matrix/baseline.json --slots 2 --batch 9"}
+  # shellcheck disable=SC2086
+  node_gate 3 "ws-coverage-matrix $cargs" "$cm" $cargs
   add 3 notyet "digests hook (M4 record/replay)" "the tip's digests (§1.6.2, ≈ 8 min) need M4 record/replay, which is not built"
   add 3 fn "owner go (lane manifests)" "deploy_check design/lanes design/status"
 }
