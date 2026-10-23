@@ -283,14 +283,14 @@ window.MQ_FLOW_CHECK = {
    "error": ""
   },
   "grade-more@1366": {
-   "actions": 3,
+   "actions": 2,
    "scrolls": 0,
    "steps": 2,
    "ok": true,
    "error": ""
   },
   "grade-more@390": {
-   "actions": 3,
+   "actions": 2,
    "scrolls": 0,
    "steps": 2,
    "ok": true,
