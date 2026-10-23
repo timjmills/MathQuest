@@ -132,3 +132,10 @@ Owner rulings via the lead, 2026-10-23 22:55 (anchors; the lead asked for them i
 - model step text ≈ 9.2 pt at M is accepted for read-only model text; TY-11's 11 pt applies to text the pupil acts on;
 - S5 grey vs black: the standard wins (grey if S5 says so; else black and logged).
 - Kit-wide top alignment (CL-4) still pending: the owner wants an example first; anchor pages only meanwhile.
+
+Owner ruling CL-4b (lead, 2026-10-23 23:07; WORKSHEET_DESIGN_STANDARD.md, 12ed112f): top of the box by default on every page
+type; centred down the cell where the pupil writes ABOVE the problem (long division, regrouping), decided per cell from
+content. Anchor pages follow it in the current rebuild (it supersedes the earlier "always top" note). Queued after the
+anchor rebuild passes: the kit-wide change (additive CSS in the cell / stack drawing), pins re-taken for every changed page
+with the sibling comparison, and an independent critic on a sample at S and L (long division, a regroup stack, a
+no-regroup stack, facts, a visual cell). W0-A builds the print-lint check.
