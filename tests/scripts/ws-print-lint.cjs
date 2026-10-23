@@ -80,7 +80,9 @@
 //              the teacher footer / date line sits at the foot of its page, never mid-page.
 //   L-DENSITY  12.1 items per page within the ceiling for the page role and size (Independent / More
 //              Practice 6, or 16 for one-symbol answers); no page but the last of a sheet under half
-//              used (area, or items against the sheet's fullest page); PG-23 short last page rebalanced.
+//              used (area, or items against the sheet's fullest page); PG-23 short last page rebalanced;
+//              LONE ("L-LONE", H5) no page of a multi-page sheet holds one cell (item or model state) alone
+//              when a rebalance or fewer pages could avoid it (see lintLone).
 //   L-KEY      AK-1..AK-4 the key exists, is a facsimile (same page count, same cells within 0.5 mm,
 //              same slot count) and not a list; every slot answered; answers weight 700.
 //   L-VERBS    BD-12 / BD-17 no screen verbs on paper (click, tap, drag, select, press, highlight, hover,
@@ -1365,6 +1367,29 @@ async function lintDocument(page, { id, mode, printBackground = false, notes = [
 }
 
 // ---- kit / pack pages: every [data-ws-page] / .ws-page is one printed A4 sheet
+/**
+ * L-DENSITY LONE ("L-LONE", IMPROVEMENT_PLAN §1.4 S2 / §1.6.3 H5; skip-count critic r4 D12: a Model with step 25,000 +
+ * one page printed 1 + 2 + 1 states on A4). A page of a multi-page sheet that holds ONE cell (an item or a model state)
+ * alone, when the sheet could have been dealt without it: either another page of the same sheet holds 3 or more cells
+ * (a rebalance gives every page 2), or the cells fit on fewer pages at the fullest page's count. Pupil pages only (the
+ * key is a facsimile and inherits the pupil plan). Cells are every boxed cell of the page, item or model state.
+ */
+function lintLone(parts, F) {
+    for (const pt of parts) {
+        if (pt.key || pt.pages.length < 2) continue;
+        const n = pt.pages.map(p => p.cells.length);
+        const total = n.reduce((a, b) => a + b, 0);
+        const max = Math.max(...n);
+        if (max < 2) continue;
+        const fewer = Math.ceil(total / max) < pt.pages.length;
+        pt.pages.forEach((p, j) => {
+            if (n[j] !== 1 || !(max >= 3 || fewer)) return;
+            const why = max >= 3 ? `another page of the sheet holds ${max}: rebalance so no page holds one alone` : `the ${total} cells fit on ${Math.ceil(total / max)} page(s) of ${max}`;
+            F('L-DENSITY', 'LONE', 'major', { page: p.idx }, `page ${p.idx} holds one cell alone (sheet pages ${n.join(' + ')}): ${why} (H5, PG-23; L-LONE)`, 'lone cell on a page');
+        });
+    }
+}
+
 function lintKitGeometry(dom, pdf, info, F) {
     const pages = dom.pages;
     info.pages = pages.length;
@@ -1442,6 +1467,7 @@ function lintKitGeometry(dom, pdf, info, F) {
             }
         });
     }
+    lintLone(parts, F);
     // key
     const pupilParts = parts.filter(p => !p.key), keyParts = parts.filter(p => p.key);
     if (info.mode === 'kit') {
@@ -1896,6 +1922,23 @@ const SELF_TESTS = [
         p1.after(p2);
         p1.querySelector('.ws-foot b').textContent = '1/2'; p2.querySelector('.ws-foot b').textContent = '2/2';
         [...p1.querySelectorAll('[data-ws-cell]')].slice(2).forEach(c => c.remove());
+    } },
+    // L-LONE (H5; skip-count critic r4 D12): the second page of a two-page sheet holds one cell alone
+    { name: 'lone cell on the last page (L-LONE)', expect: ['L-DENSITY', 'LONE'], fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        const p2 = p1.cloneNode(true);
+        p1.after(p2);
+        p1.querySelector('.ws-foot b').textContent = '1/2'; p2.querySelector('.ws-foot b').textContent = '2/2';
+        [...p2.querySelectorAll('[data-ws-cell]')].slice(1).forEach(c => c.remove());
+    } },
+    // control: 2 + 1 cannot be dealt without a lone cell on two pages, so L-LONE stays quiet
+    { name: 'two + one cells (no rebalance possible)', expect: [], absent: ['L-DENSITY', 'LONE'], fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        const p2 = p1.cloneNode(true);
+        p1.after(p2);
+        p1.querySelector('.ws-foot b').textContent = '1/2'; p2.querySelector('.ws-foot b').textContent = '2/2';
+        [...p1.querySelectorAll('[data-ws-cell]')].slice(2).forEach(c => c.remove());
+        [...p2.querySelectorAll('[data-ws-cell]')].slice(1).forEach(c => c.remove());
     } },
     { name: 'empty band under a cell drawing (H13)', expect: ['L-DENSITY', 'H13'], fn: () => {
         const c = document.querySelector('.ws-page [data-ws-cell]');

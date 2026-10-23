@@ -1,5 +1,5 @@
 {
- "about": "The backtest table of IMPROVEMENT_PLAN §1.4 S2 as data. Each new check must FAIL on the state a critic failed and PASS on the fix. kind 'fixture': {fixture} is replaced by the variant's file. kind 'commit-pair': the runner checks out each commit in a temporary git worktree, {root} is replaced by its path (and MQ_ROOT is set to it), and the check script is always the CURRENT tree's. browser: true rows run through /tmp/mq-browser-run.sh. pending: true rows have no command yet (the part-2 builder adds the browser checks) and report PENDING, never OK. Run: node tests/scripts/ws-backtest.mjs",
+ "about": "The backtest table of IMPROVEMENT_PLAN §1.4 S2 as data. Each new check must FAIL on the state a critic failed and PASS on the fix. kind 'fixture': {fixture} is replaced by the variant's file. kind 'commit-pair': the runner checks out each commit in a temporary git worktree, {root} is replaced by its path (and MQ_ROOT is set to it), and the check script is always the CURRENT tree's. browser: true rows run through /tmp/mq-browser-run.sh. pending: true rows have no command yet and report PENDING, never OK. Run: node tests/scripts/ws-backtest.mjs",
  "rows": [
   {
    "id": "notation",
@@ -55,55 +55,55 @@
    "id": "lone-item",
    "check": "Lone item / lone state on a page",
    "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY LONE (L-LONE)",
    "browser": true,
-   "pending": true,
    "fail": { "commit": "359802c5", "state": "skip-count, critic r4 D12" },
    "pass": { "commit": "b19172b4", "state": "fixed" },
-   "command": null,
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills multiplication:count_by_tables --roles scripted-model --opts '{\"rows\":[{\"step\":25000}],\"onePage\":true}' --lints L-DENSITY",
    "expect": { "fail": "FAIL", "pass": "OK" }
   },
   {
    "id": "text-generator-wrm-page",
    "check": "Text ≠ generator (claims of counts, kinds, ranges vs 300 seeded items): WRM page",
    "kind": "commit-pair",
-   "browser": true,
-   "pending": true,
+   "rule": "ws-text-vs-gen --looks (RESPONSE, DRAWING)",
+   "browser": false,
    "fail": { "commit": "848d7d3f", "state": "WRM page, critic r8 M12" },
    "pass": { "commit": "d515aa05", "state": "fixed" },
-   "command": null,
+   "command": "node tests/scripts/ws-text-vs-gen.mjs --looks --root {root}",
    "expect": { "fail": "FAIL", "pass": "OK" }
   },
   {
    "id": "text-generator-wrm-tagging",
    "check": "Text ≠ generator: WRM tagging Y2–Y3",
    "kind": "commit-pair",
-   "browser": true,
-   "pending": true,
+   "rule": "ws-text-vs-gen --wrm (REP, RANGE)",
+   "browser": false,
    "fail": { "commit": "c3d08a69", "state": "graded by critic r13 in 5aa0ffce, N13: Y3.B6.S10 marked full on circles" },
    "pass": { "commit": "89f30a64", "state": "the TITLEREP gate, round 14" },
-   "command": null,
+   "command": "node tests/scripts/ws-text-vs-gen.mjs --wrm --root {root}",
    "expect": { "fail": "FAIL", "pass": "OK" }
   },
   {
    "id": "chromebook-viewport",
    "check": "Chromebook viewport (answer box + Check reachable at 1366 × 768, nothing under a sticky header)",
    "kind": "commit-pair",
+   "rule": "ws-viewport-check UNDER-HEADER / BOX-OUT / CHECK-OUT",
    "browser": true,
-   "pending": true,
    "fail": { "commit": "e189119f", "state": "number line, critic r7 R7-D1: timed band under the sticky bar at 1280" },
    "pass": { "commit": "789f23f7", "state": "fixed" },
-   "command": null,
+   "command": "node tests/scripts/ws-viewport-check.cjs --skills subtraction:sub_100_regroup,multiplication:nl_mult --opts '{\"nlOn\":true}' --sizes 1280x600,1366x650",
    "expect": { "fail": "FAIL", "pass": "OK" }
   },
   {
    "id": "repeats-lesson",
    "check": "Repeats (a problem or a line twice on a page or packet; chart example returning on the exit slip)",
    "kind": "commit-pair",
+   "rule": "ws-detailed-lesson --repeats (R-ANSWER, R-TURN, R-CELL)",
    "browser": true,
-   "pending": true,
    "fail": { "commit": "c2a6d8b4", "state": "detailed lesson 6, graded by its critic r1 in 712592e2, D2: Guided 1 returns on the exit slip" },
    "pass": { "commit": "f0990693", "state": "fixed" },
-   "command": null,
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g4-nbt1-ten-times-value --repeats",
    "expect": { "fail": "FAIL", "pass": "OK" }
   }
  ]
