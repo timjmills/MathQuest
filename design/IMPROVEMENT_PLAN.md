@@ -43,7 +43,7 @@ Built from three audits on 2026-10-23 (the build history and gate timings; the t
 and 390 px; the print engine with a test render) and graded by an independent critic: rounds 1–4 FAIL; round 5
 PASS on v5 (A 8 · B 9 · C 9 · D 8 · E 8 · F 9 · G 9), confirmed on v5.1. The owner's further requests then added §1.6
 and the three kinds of worksheet (v6–v18; rounds 6–18 FAIL); round 19 PASSED v19 (A 8 · B 9 · C 9 · D 9 · E 9 · F 9
-· G 8), and v19.1 applies its optional corrections. The current review state is in
+· G 8), and v19.1 applies its optional corrections — confirmed by a fresh check: PASS holds, 9 on every criterion. The current review state is in
 `design/STATUS.md`.
 
 ---
