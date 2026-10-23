@@ -234,3 +234,41 @@ browser slots):**
 
 **Verdict change:** the tools already timed are fast enough. `ws-precritic` comes in at about a third of its time budget per
 skill. Skill making is still **not yet measurable**; the pilot starts once A and B are fixed.
+
+## Round 1c — the two pilot blockers fixed (owner request, 2026-10-23 ~14:40–16:30 UTC)
+
+The owner asked the auditor to fix both blockers. Branch `claude/sweet-newton-c8wrv1-wip-speed-audit` now carries
+`-wip-wave0-precritic` 5f632ba (which already merges `-wip-wave0-gates`) + the main line + the fix below, so it merges in one step.
+
+- **Blocker A (screen-slots baseline format): fixed by the lead's lane before I started.** 0392cc7 merged the gates
+  branch into the precritic branch and kept the S5 file. Both readers use `skills{"cat:skill": ["host:kind"]}`, and the S1
+  file's only pin (`reading_ruler_hard card:doubled`) was fixed by S9 (d62a9dde). Nothing more was needed. `ws-precritic.cjs`
+  was left alone at the lead's request (its round-2 fixer owns it).
+- **Blocker B (options-verify red on the pilot skills): fixed at the cause** in `tests/scripts/ws-options-verify.cjs`
+  (+15 lines). The page number line's seven controls (group `nline`) were tested as generation options, and the six that
+  shape the line were tried with the line off. They are now render-time tries (items unchanged, printed sheet must differ),
+  the six run with `{nlOn: true}`, and a value equal to what Auto chose for that page is a warning. `nlOn` still fails if no
+  line is drawn. Results: the six SU-C skills pass **181 / 181** (was 108 failing). The same fix clears the 36 nl* pins on
+  each of the 7 role-sample skills that carried them (196 values, all pass). Every nl* pin is now gone from
+  `design/audit/baselines/options-verify.json`.
+
+**`ws-precritic` on the six SU-C skills (b4114cdc + the fix): 12 of 13 gates PASS, wall 2,343 s (6.5 min a skill).**
+`ws-options-verify` PASS (181 checked, 0 pinned). Node-lint, content-audit, print-lint at S/M/L, screen-slots,
+screen-answer, chromebook-fit, code-snapshot and boot-smoke PASS; providers-unit N/A.
+
+**One new red gate, not a pilot fault: `ws-coverage-matrix`** (W0-A's E1 tool, in fix round 1 after its critic FAIL).
+- 201 rows, 93 run, 48 RED, 2,335 s (8.4 s a document; 673 s of it waiting for the other browser slot).
+- It is red because these rows (Sections, Mixed, fact-rows layout, more-practice options) are being run **for the first
+  time and have no per-row baseline**, so every finding counts as new (e.g. `L-OVERFLOW PG-12: 0 -> 8`, `L-SIZE TY-11: 0 -> 20`).
+- The Sections rows show the **same counts on all six skills** (`sections/defaults` 10 / 10 / 17 at S / M / L), which points at
+  the Sections composer (engine), not the subtraction family.
+- So the pilot would start red on rows it cannot fix as a data copy. The plan already says the matrix's first run writes
+  its per-row baseline (§1.6.7 E1). **Recommended:** W0-A pins the matrix baseline for the live skills (or at least these
+  six) and gives the Sections / Mixed findings to the mixed-pages lane; then the pilot starts.
+- Speed: the matrix alone is ≈ 6.5 min a skill here. It is the only gate over the ≈ 5–6 min target, and the S5 deploy
+  budget has to allow for 8.4 s a document (intervention 2 of round 1).
+
+**Also found:** `ws-options-verify` needs more than its default 60 s per skill for `add_facts`, `sub_facts` and `f_to_d` in a
+cloud container (timeouts with the old and new script alike; 210 s for the three with `--deadline 600000`). ws-precritic
+calls it with the default, so a lane touching those skills gets a false FAIL. For W0-A: pass a larger `--deadline` from
+precritic.
