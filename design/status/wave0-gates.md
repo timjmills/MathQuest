@@ -282,3 +282,16 @@ and L (precritic: touched skills); 8 print-lint H13 on lesson roles (precritic -
 9 presets-unit item check (instruction key + declared band); 10 providers-unit wrongAnswer fits its slot; 11 print-lint:
 no wrapped line ends in an operator. Backtests from the pilot: 27577cf fails, ff471fd passes, pilot tip fails N1–N4.
 Plan: 3 parallel builders at mq-opus-medium (node checks / print-lint rules / options-verify render), then one critic.
+
+## Fix r6 merged (da55b299, e7f3a7ee) — 23:05
+D1 sibling-compare compares every printed row with findings (RED, OK, PENDING(no-baseline)); N1 paired siblings by default
+(reproduces all 124 + 16 of the lead's above-sibling counts that are really above; the other 112 in sibling-compare.txt were
+siblings at their pin read as 0); D2 phone-card finds the ones box structurally, A14 "siblings clean" self-check on 4
+approved skills; D3 partial rulings scope → INCOMPLETE (exit 2); N2 slot-clip extra pages (test, more-practice, supports on)
+catch pilot D7 (64 overlapping heads) — **engine finding: approved sub_1m_regroup overlaps the same way at support level 3, S
+(24 pairs, 0.67 mm)**; N4 temp cleanup, slot-clip 229 s (was 1161 s); N5 probes report measured / N/A per template. 8 pilot
+backtests PASS (two sibling rows scoped to H13, the defect they were built for; the D7 row's pass state is a seeded stand-in
+patch). Lead-side integration fix: the cards README's example block was read as a card (scanner now reads card sub-folders only).
+**Precritic on HEAD now FAILs `subtraction:sub_100_no_regroup`** on 3 counts above its paired siblings (mixed/defaults S
+PG-12 2 vs 0; sections/ex-each L H13 6 vs 4; single/ex-group S TY-11 16 vs 8) and on card rulings (band 118/300, same
+length 40/300, zero case 44.3 %, band offered) — real, the pilot's to fix (rule 0b), not a tool defect.

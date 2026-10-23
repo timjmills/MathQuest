@@ -104,7 +104,9 @@ function cardBlocks(root) {
         for (const n of readdirSync(d)) {
             const p = join(d, n);
             if (statSync(p).isDirectory()) walk(p);
-            else if (/\.md$/.test(n)) { const b = parseRulings(readFileSync(p, 'utf8'), relative(root, p)); if (b) out.push(b); }
+            // cards live in design/cards/<template or family>/; the top-level README / RULE_INDEX document the format
+            // (their example block is not a card), so only files in a sub-folder are read
+            else if (/\.md$/.test(n) && d !== dir) { const b = parseRulings(readFileSync(p, 'utf8'), relative(root, p)); if (b) out.push(b); }
         }
     };
     walk(dir);
