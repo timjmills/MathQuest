@@ -1382,7 +1382,10 @@ export function renderQuestion() {
     _renderQuestionImpl();
     try { _applyScreenCell(); } catch (e) { console.error('screen cell:', e); }
     _syncRefLine();
-    if (document.getElementById('mqRefLine')) _guardRefLine();
+    _guardRefLine();
+    // the page may already sit scrolled from the last item (no scroll event follows): check once now
+    _clearRefLineOfHeader();
+    requestAnimationFrame(() => { if (Date.now() < _nlGuardUntil) _clearRefLineOfHeader(); });
     // Widget hosts mount after a dynamic import; the chrome Check follows them.
     setTimeout(_syncChromeCheck, 0);
     setTimeout(_syncChromeCheck, 260);
@@ -1417,23 +1420,42 @@ function _guardRefLine() {
     window.addEventListener('scroll', () => { if (Date.now() < _nlGuardUntil) _clearRefLineOfHeader(); }, { passive: true });
 }
 
-// With the number line on: when the band sits under the sticky play bar, scroll back so its top
-// clears the bar's bottom, but only while the answer box and Check still fit in the window after
-// that scroll (a problem too tall to fit keeps the box in view, as before). No band: never runs.
+// When the question's top sits under the sticky play bar (the answer box's focus scrolled the page),
+// scroll back so it clears the bar's bottom, but only while the answer box and Check still fit in the
+// window after that scroll (a problem too tall to fit keeps the box in view, as before). The question's
+// top is the number-line band when there is one (critic nl-r8 D1), else the first drawn of
+// #questionPaper / #visualAid / #questionText (W0 viewport check: word problems, long division).
+function _shown(el) {
+    if (!el) return false;
+    const cs = getComputedStyle(el);
+    if (cs.display === 'none' || cs.visibility === 'hidden') return false;
+    const r = el.getBoundingClientRect();
+    return r.height > 0 && r.width > 0;
+}
 function _clearRefLineOfHeader() {
     try {
-        const band = document.getElementById('mqRefLine');
-        if (!band || !window.scrollY) return;
+        if (!window.scrollY) return;
+        const band = ['mqRefLine', 'questionPaper', 'visualAid', 'questionText'].map((id) => document.getElementById(id)).find(_shown);
+        if (!band) return;
+        // the header: every sticky / fixed bar pinned to the top of the window, outside the card
+        // (toasts, modals and pop-ups are not bars)
         let hdr = 0;
-        const bars = document.querySelectorAll('.nav-bar > .nav-logo, #gameView > *, #myStatsBar, .mq-play-menu-btn');
-        for (const el of bars) {
-            if (el === band || getComputedStyle(el).position !== 'sticky') continue;
+        for (const el of document.querySelectorAll('body *')) {
+            const cs = getComputedStyle(el);
+            if (cs.position !== 'sticky' && cs.position !== 'fixed') continue;
+            if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity === 0) continue;
+            if (el === band || el.closest('#questionCard')) continue;
             const r = el.getBoundingClientRect();
-            if (r.height > 0 && r.top < 20 && r.bottom < innerHeight / 2) hdr = Math.max(hdr, r.bottom);
+            if (!(r.height > 0 && r.width > 100 && r.left < innerWidth - 20 && r.right > 20 && r.top < 20 && r.bottom > 0 && r.bottom < innerHeight / 2)) continue;
+            let overlay = false;
+            for (let p = el; p && p !== document.body; p = p.parentElement) {
+                const c = `${typeof p.className === 'string' ? p.className : ''} ${p.id}`;
+                if (/toast|modal|popup|overlay|confetti|celebrat|tooltip/i.test(c)) { overlay = true; break; }
+            }
+            if (!overlay) hdr = Math.max(hdr, r.bottom);
         }
         const top = band.getBoundingClientRect().top;
         if (top >= hdr) return;
-        const d = Math.min(window.scrollY, Math.ceil(hdr + 4 - top));
         // the active box: the focused input in the card (a stacked skill's digit cell), else #answerInput
         const ae = document.activeElement;
         const card = document.getElementById('questionCard');
@@ -1449,12 +1471,14 @@ function _clearRefLineOfHeader() {
             const r = bar.getBoundingClientRect();
             if (r.height > 0 && r.bottom >= innerHeight - 2 && r.top < innerHeight) low = Math.min(low, r.top);
         }
-        for (const [el, lim] of [[box, low], [document.getElementById('qcCheckBtn'), innerHeight]]) {
-            if (!el) continue;
+        const fits = (d) => [[box, low], [document.getElementById('qcCheckBtn'), innerHeight]].every(([el, lim]) => {
+            if (!el) return true;
             const r = el.getBoundingClientRect();
-            if (r.height > 0 && r.bottom + d > lim) return;
-        }
-        window.scrollBy(0, -d);
+            return !(r.height > 0 && r.bottom + d > lim);
+        });
+        // a 4 px gap under the bar when there is room for it, else just clear of the bar
+        const d = [Math.ceil(hdr + 4 - top), Math.ceil(hdr - top)].map((x) => Math.min(window.scrollY, x)).find(fits);
+        if (d > 0) window.scrollBy(0, -d);
     } catch (e) { /* the line is a hint */ }
 }
 
