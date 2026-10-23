@@ -16,7 +16,8 @@ Open for other lanes / the owner:
 - `subtraction:sub_facts` still draws with the legacy template (`gen-operations.js`), so it cannot join a mixed page.
 - CL-4: in the kit `fact` cell the problem ends at 61–63 % of the cell height, not in the top half (owner ruling).
 
-Owner ruling 2026-10-23 (repeats): "Repeated facts should be allowed as an option, or inverse facts to fill the page."
-→ Default: when a skill's facts run short, the page fills with inverse / related facts (13−6 beside 13−7, 8×10 beside
-80÷10); exact repeats and turnarounds stay out. A teacher option (request field `repeats: 'allow'`, appended code token,
-absent = off) lets exact repeats fill the page once unique and inverse facts are used up. The T3 lane adds the control.
+Owner ruling 2026-10-23 (repeats), as clarified: "inverse facts" means TURNAROUNDS (4+1 / 1+4, 3×7 / 7×3), not × with ÷.
+→ Fill ladder when a skill's unique facts run short: (1) default — turnarounds fill the page; (2) option `families`
+(off by default) — related facts across the inverse operation (8×10 / 80÷10) and within − or ÷ (13−6 / 13−7);
+(3) option `repeats` (off by default) — exact repeats, only once the earlier rungs are used up. Both options are
+appended share-code tokens (absent = off). Short of all that, the share shrinks with a note. The T3 lane adds the controls.
