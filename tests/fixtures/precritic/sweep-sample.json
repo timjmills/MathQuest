@@ -205,65 +205,8 @@
     }
   ],
   "chromebookFit": {
-    "note": "Standing failures of the ws-chromebook-fit sweeps on this sample, pinned 2026-10-23 at 60c4fa53 so the deploy gate fails only on NEW ones (--baseline). They are real defects with no owner yet: (1) the Board display (css/play-teacher.css: #questionPaper zoom 1.6) makes the board scroll for tall items, 17 of 39 sample skills at 1366x768 and 3 at 1920x1080; (2) a page error when the number-family practice card is followed by the online worksheet / quiz in one page (also in light mode: ws-chromebook-fit --skills addition:add_sub_fact_family --hosts card,worksheet,quiz). Remove a line when its defect is fixed.",
-    "problems": [
-      "Cannot read properties of null (reading 'numberFamilyData')"
-    ],
-    "skills": {
-      "comparing:compare_groups": [
-        "bigboard-teacher:card:1366x768:scroll-y"
-      ],
-      "composing:number_bonds": [
-        "bigboard-teacher:card:1366x768:scroll-y"
-      ],
-      "composing:base10_build": [
-        "bigboard-teacher:card:1366x768:scroll-y"
-      ],
-      "addition:add_word_problems": [
-        "bigboard-teacher:card:1366x768:scroll-y",
-        "bigboard-teacher:card:1920x1080:scroll-y"
-      ],
-      "addition:add_sub_fact_family": [
-        "bigboard-teacher:card:1366x768:scroll-y",
-        "bigboard-teacher:card:1920x1080:scroll-y"
-      ],
-      "addition:add_three": [
-        "bigboard-teacher:card:1366x768:scroll-y"
-      ],
-      "addition:nl_add": [
-        "bigboard-teacher:card:1366x768:scroll-y"
-      ],
-      "multiplication:arrays_groups": [
-        "bigboard-teacher:card:1366x768:scroll-y",
-        "bigboard-teacher:card:1920x1080:scroll-y"
-      ],
-      "multiplication:area_model_mult": [
-        "bigboard-teacher:card:1366x768:scroll-y"
-      ],
-      "multiplication:mult_chart": [
-        "bigboard-teacher:card:1366x768:scroll-y"
-      ],
-      "multiplication:nl_mult": [
-        "bigboard-teacher:card:1366x768:scroll-y"
-      ],
-      "division:long_div_2digit": [
-        "bigboard-teacher:card:1366x768:scroll-y"
-      ],
-      "area_perimeter:perimeter_intro": [
-        "bigboard-teacher:card:1366x768:scroll-y"
-      ],
-      "measurement:time_hour": [
-        "bigboard-teacher:card:1366x768:scroll-y"
-      ],
-      "measurement:elapsed_30min": [
-        "bigboard-teacher:card:1366x768:scroll-y"
-      ],
-      "measurement:temperature": [
-        "bigboard-teacher:card:1366x768:scroll-y"
-      ],
-      "algebra:function_table_easy": [
-        "bigboard-teacher:card:1366x768:scroll-y"
-      ]
-    }
+    "note": "Standing failures of the ws-chromebook-fit sweeps on this sample, pinned 2026-10-23 at 60c4fa53 so the deploy gate fails only on NEW ones (--baseline). (1) The Board display: the measured fit (launch-chrome.js fitBoard) fixed 15 of 17 skills at 1366x768 and all 3 at 1920x1080; the last 2 (add_word_problems, add_sub_fact_family at 1366x768) were fixed by the short-board frame and the side rail (W0-defects lane 2026-10-23), so no Board pin is left; (2) the number-family page error (null numberFamilyData after the card) was fixed in the W0-defects lane and its line removed. Remove a line when its defect is fixed.",
+    "problems": [],
+    "skills": {}
   }
 }

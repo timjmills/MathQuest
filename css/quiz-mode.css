@@ -2296,3 +2296,28 @@
     .qm-topbar, .qm-toggle-bar, .qm-footer { display: none; }
     .qm-dashboard { min-height: auto; }
 }
+
+/* Dark mode: the current-question dot sits on the light accent (#B5A5F4), so its number takes dark
+   ink (#1F1B33, about 7.5:1) instead of white (2.18:1). Light mode is unchanged. An answered dot
+   keeps its own green ink. (W0-defects, critic 2026-10-23) */
+html.dark .qt-q-dot.current:not(.answered) { color: #1F1B33; }
+
+/* Dark mode: an answered dot's green ink (#059669) is 3.10:1 on its tinted cell (#163e40); the
+   lighter green #34D399 is about 6:1. A flagged dot keeps its orange ink. (W0-defects r3) */
+html.dark .qt-q-dot.answered:not(.flagged) { color: #34D399; }
+/* The current question stays visible once it is answered (the answered colours win over the purple
+   fill): a purple ring around it, in both modes. Other dot colours are unchanged. */
+.qt-q-dot.current.answered { box-shadow: 0 0 0 3px var(--accent-purple); border-color: var(--accent-purple); }
+
+/* Light mode: darker question dots (owner decision 2026-10-23, "use darker dots"). Every state's
+   number reaches at least 4.5:1, and the states differ by more than hue: answered = tinted fill with
+   a solid border; flagged = dashed border; current = purple fill, or a purple ring once answered.
+   Dark mode is unchanged. (W0-defects) */
+html:not(.dark) .qt-q-dot { color: #2E2A45; border-color: #8b879f; }
+html:not(.dark) .qt-q-dot.answered { background: #C9F2E6; border-color: #047857; border-style: solid; color: #064E3B; }
+html:not(.dark) .qt-q-dot.flagged { border-color: #C2410C; border-style: dashed; color: #7C2D12; }
+html:not(.dark) .qt-q-dot.flagged.answered { background: #FFE4CC; border-color: #C2410C; border-style: dashed; color: #7C2D12; }
+html:not(.dark) .qt-q-dot.current:not(.answered) { background: #5B3FD6; border-color: #5B3FD6; color: #FFFFFF; }
+html:not(.dark) .qt-q-dot.current.flagged:not(.answered) { border-color: #FDBA74; border-style: dashed; }
+html:not(.dark) .qt-q-dot.current.answered { box-shadow: 0 0 0 3px #5B3FD6; }
+html:not(.dark) .qt-q-dot:hover { border-color: #5B3FD6; }
