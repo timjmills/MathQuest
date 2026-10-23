@@ -17,5 +17,8 @@
    ],
    "status": "RED"
   }
+ ],
+ "red": [
+  "addition:add_100_regroup|single/defaults"
  ]
 }

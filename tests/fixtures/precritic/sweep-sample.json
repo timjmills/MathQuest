@@ -6,7 +6,7 @@
     "quiz"
   ],
   "derived": "2026-10-23",
-  "liveSkills": 723,
+  "liveSkills": 715,
   "skills": [
     {
       "template": "counters",
@@ -16,7 +16,7 @@
     {
       "template": "legacy",
       "key": "counting:count_sequence",
-      "skillsOnTemplate": 430
+      "skillsOnTemplate": 424
     },
     {
       "template": "seqstrip",
@@ -101,7 +101,7 @@
     {
       "template": "mult-grid",
       "key": "multiplication:mult_chart",
-      "skillsOnTemplate": 8
+      "skillsOnTemplate": 6
     },
     {
       "template": "hop-line",

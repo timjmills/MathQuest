@@ -26,5 +26,8 @@
    ],
    "status": "RED"
   }
+ ],
+ "red": [
+  "addition:zz_not_a_live_skill|single/defaults"
  ]
 }

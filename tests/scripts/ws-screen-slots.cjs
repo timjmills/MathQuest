@@ -94,7 +94,7 @@ const NEED_ANS = (arg('need-ans', '') || '').split(',').map((s) => s.trim()).fil
 if (NEED_ANS.length && !SEEDS) fail('--need-ans needs --seeds (the answers of seeded card items)');
 if (SEEDS && !HOSTS.includes('card')) fail('--seeds seeds the card host; add card to --hosts');
 
-const isLive = (s) => !!s.skillId && !/retired|tombstone/i.test(s.label || '') && !/^_?tomb|retired/i.test(s.skillId);
+const isLive = (s) => !!s.skillId && !s.retired && !/retired|tombstone/i.test(s.label || '') && !/^_?tomb|retired/i.test(s.skillId);   // N11: s.retired (ws-harness listSkills) as ws-node-lint counts live
 /**
  * The skills a run checks, and why a selection is wrong (critic r1 D3: an empty or misspelt selection is never OK).
  * all: every SKILLS entry [{categoryId, skillId, label}]; returns {skills, errors}.
@@ -128,9 +128,10 @@ if (has('self-test')) {
     const L = [
         { categoryId: 'measurement', skillId: 'time_5min', label: 'Time' }, { categoryId: 'measurement', skillId: 'reading_ruler_hard', label: 'Ruler' },
         { categoryId: 'addition', skillId: 'add_facts', label: 'Facts' }, { categoryId: 'addition', skillId: 'old_one', label: 'Old (retired)' },
-        { categoryId: 'graveyard', skillId: '_tomb_1', label: 'tombstone' },
+        { categoryId: 'graveyard', skillId: '_tomb_1', label: 'tombstone' }, { categoryId: 'addition', skillId: 'flagged', label: 'Flagged', retired: true },
     ];
     const cases = [
+        ['--skills of a skill flagged retired: true', { only: ['addition:flagged'] }, /retired skill/],
         ['--category measurment (a typo)', { categories: ['measurment'] }, /--category measurment: no such category/],
         ['--skills nosuch:skill', { only: ['nosuch:skill'] }, /--skills nosuch:skill: no such skill/],
         ['--skills of a retired skill', { only: ['addition:old_one'] }, /retired skill/],
