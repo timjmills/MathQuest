@@ -35,5 +35,5 @@ Builders run in their own git worktrees and the lead merges them here.
 | E1 `ws-coverage-matrix` build | mq-opus-medium | 13:05 | 13:41 | 36 |
 | S9 `reading_ruler_hard` fix | mq-opus-low | 13:16 | 13:29 | 13 |
 | Options-verify pin for every live skill (`ws-options-pin.cjs`, lead request 13:57) | mq-opus-medium | 13:59 | — | — |
-| Critic r1 (tools vs plan) | mq-opus-medium | 13:43 | — | — |
+| Critic r1 (tools vs plan): FAIL 6 / 8 / 6, D1–D8 | mq-opus-medium | 13:43 | 14:3x | ~55 |
 | S1 `ws-precritic` build (brought forward by the lead, 11:02; stopped: moved to the lead's session) | mq-opus-medium | 11:03 | 12:51 | 108 |
