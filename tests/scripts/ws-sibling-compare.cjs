@@ -249,7 +249,7 @@ function main() {
     else keys = [...new Set(oursRows.map((r) => r.skill))];
     if (onlyRows.length) oursRows = oursRows.filter((r) => onlyRows.includes(`${r.kind}/${r.row}`) || onlyRows.includes(r.id));
     // ---- siblings
-    const S = loadSiblings({ keys, onlyRows, pinFile, tmp, explicit: argAll('siblings'), paired: has('paired'), runSiblings: has('run-siblings'), siblingRuns: argAll('sibling-run'), siblingsFile: arg('siblings-file', 'tests/fixtures/precritic/siblings.json') });
+    const S = loadSiblings({ keys, onlyRows, pinFile, tmp, explicit: argAll('siblings'), paired: has('paired'), runSiblings: has('run-siblings') && (has('all-rows') || oursRows.some((r) => r.status === 'RED')), siblingRuns: argAll('sibling-run'), siblingsFile: arg('siblings-file', 'tests/fixtures/precritic/siblings.json') });
     const { sibOf, tpl, sources, allSibs, noTpl, sf } = S;
     const sibSecs = S.sibSecs;
     const table = sibTable(sources);

@@ -277,7 +277,7 @@ async function main() {
     });
     const SC = require('./ws-sibling-compare.cjs');
     const pinFile = path.resolve(ROOT, arg('matrix-baseline', 'design/audit/matrix/baseline.json'));
-    const S = SC.loadSiblings({ keys, onlyRows, pinFile, tmp, paired: has('paired'), runSiblings: has('run-siblings'), siblingRuns: argAll('sibling-run'), siblingsFile: arg('siblings-file', 'tests/fixtures/precritic/siblings.json') });
+    const S = SC.loadSiblings({ keys, onlyRows, pinFile, tmp, paired: has('paired'), runSiblings: has('run-siblings') && asRows.some((r) => Object.values(r.sizes).some((v) => Object.values(v.counts).some((n) => n > 0))), siblingRuns: argAll('sibling-run'), siblingsFile: arg('siblings-file', 'tests/fixtures/precritic/siblings.json') });
     const cmp = SC.compare(asRows, (k) => S.sibOf[k] || [], SC.sibTable(S.sources), { allRows: true });
     // ---- report per row and size
     const fails = [];
