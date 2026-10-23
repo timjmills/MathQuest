@@ -3,12 +3,13 @@ Title: Pilot — SU-C column subtraction without regrouping, six skills onto `st
 Session: session_01G5ktGS4kteYMuLFxnxGEgU
 Branch: claude/sweet-newton-c8wrv1-wip-pilot-su-c
 Owner of files: subtraction no-regroup generator branch (gen-operations.js ranged sub), subtraction provider, skill-options / skill-presets / standards / wrm / search-terms entries for the six + `sub_2d_1d`
-State: critic
+State: paused
 Updated: 2026-10-23
 Builder profile: mq-opus-low
-Critic rounds: 1, FAIL
+Critic rounds: 2, FAIL
 
 ## Now
+- PILOT RESULT: FAIL against the §4.4 bar (2 critic rounds, both FAIL; 1 builder run + 1 fix run; 5 h 37 m wall). Waiting for the lead: fix round 2 (N1-N8) or stop here.
 - Step 2: one builder run (mq-opus-low) for all six skills from the signed card.
 
 ## Owner go
@@ -17,7 +18,7 @@ Critic rounds: 1, FAIL
 - none
 
 ## Times
-Times: critic round 2, start 2026-10-23T21:48Z, end —, profile mq-opus-medium
+Times: critic round 2, start 2026-10-23T21:48Z, end 2026-10-23T22:20Z, profile mq-opus-medium, tokens 361k — FAIL (min C1 4, C2 7, C3 6, C4 7)
 Times: precritic pass 4 (after the 38-row re-pin), start 2026-10-23T21:26Z, end 2026-10-23T21:47Z, profile — — OK: 13 PASS (coverage-matrix PASS on the baseline, 0 RED), 1 N/A; rule 0b met
 Times: re-pin 38 rows (--repin, lead ruling), start 2026-10-23T21:20Z, end 2026-10-23T21:26Z, profile —
 Times: precritic pass 3 (after fix r1 + base merge), start 2026-10-23T20:56Z, end 2026-10-23T21:17Z, profile — — 12 PASS, 1 N/A, coverage-matrix 38 RED rows (all in the 38 engine-class counts below)
@@ -72,6 +73,28 @@ Measured 21:20Z with `ws-print-lint --json` (findings of the rule) and `buildShe
 5. **Browser-slot waits**: precritic 22 min a pass, of which the coverage matrix is 21 min; three passes ran. Fix: precritic `--rows-from <red list>` to re-run only the red rows after a fix. Owner: W0-A.
 6. **check-signed fails after a correct build** (card §7 lists live options). Owner: W0-process (routed by the lead).
 
+### pilot-su-c · critic r2 (2026-10-23, FAIL)
+
+**Automatic checks:**
+
+| Finding | Class | Rule | Proposed check | Backtest | Existing check that should have caught it |
+|---|---|---|---|---|---|
+| N1 2-digit dealer skewed (top ones 9 on 39/120; 49 ×4 on one page; the zero item always at index 7) | PATTERN | L10, P-10 | ws-content-audit: per-digit and per-value frequency within ±2σ of uniform over the valid set; no value > 2 a page; position of a seeded case not periodic | pilot tip FAILs | ws-content-audit's repeat/cycle rule SHOULD have (it checks answers repeating, not digit skew or a fixed position) |
+| N2 lesson Warm-up fact cell 43-59 % empty | SPACE | H13 | print-lint H13 applied to lesson Warm-up cells | pilot tip FAILs; sub_100_regroup 38 % passes | print-lint H13 SHOULD have (does not reach lesson Warm-up cells) |
+| N3 option panel help false (level 2 named, not offered) | UNTRUE_TEXT | P-31 | ws-options-verify: every level / value named in a help string is offered, and its described effect is visible (heads on/off) | pilot tip FAILs | none |
+| N4 "Across" breaks the page (equation wraps, key digits over the subtrahend) | CLIP_OVERLAP | H2 | ws-options-verify renders every offered appearance value through print-lint (not only the promise) | pilot tip FAILs | ws-options-verify SHOULD have (checks the promise, not the render) |
+| N5 side anchors at L, empty band 32 % (D12 class moved) | SPACE | H13 | already caught: the matrix single/ex-each L row; it was pinned as class (a) | — | the coverage matrix DID catch it; the pin (my class (a) at L) was wrong: (a) is confirmed at S only |
+| N6 "line up" vocab picture wraps with a dangling minus | VISUAL_DESIGN | TY rules | print-lint: a line that ends in an operator glyph | fixture | none |
+| N7 a line break inside an equation in step 3 | STEPS_LAYOUT | C1 | print-lint: a wrapped line ending in "−"/"+"/"=" inside a step | fixture | none |
+| N8 HTh / TTh heads 0.74 mm apart at S | CLIP_OVERLAP | H2 | print-lint L-OVERLAP with a 1 mm minimum gap between head labels | fixture | none |
+
+**Speed-ups:**
+
+1. **Fix round 1 added new surfaces (lesson data, wide tracks, heads on screen) and nothing checked them before the critic.** N2, N4 and N6 came from fix-r1 changes or surfaces it newly exposed. Smallest change: precritic `--role lesson` plus every offered option value at S and L on the touched skills, run in the fix round's own report.
+2. **One wrong pin**: class (a) was pinned at L, where the siblings show 0 (N5). The rate table measured S only. Smallest change: the rate table measures every size it pins.
+3. **The dealer was rewritten in the fix round without a distribution check** (N1). Smallest change: the content-audit predicate above, run by the builder.
+4. **Critic wall time 32 min, ≈ 360k tokens a round**: fine. The cost is the round count. Two rounds of the same family each found 4+ card-level gaps (the across appearance, the option help, lesson Warm-up form), so the card is the cause: the card needs a section listing every option and appearance the panel offers, inherited ones included (`_ap4*` patches), with the decision for each.
+
 ## Log
 - 2026-10-23 18:40: precritic pass 1 triage. OURS, fixed: fact-probe 1 row a page for 6-digit stacks (fact-probe.js bestCols vs digit clamp with separators); side-anchor overflow and ILLEGIBLE at 4-6 digits (worked steps 5-6 lines -> 4). ENGINE classes, reproduced on approved stack skills: H13 stack pinned in a forced 2-column cell (add_1k_regroup, sub_1k_regroup); TY-11 7 pt step numbers in sheet/anchors.js (add_10k_regroup); fact-rows ILLEGIBLE / PG-12 (sub_100k_regroup, sub_1m_regroup). Mixed-pages lane: sections/*, mixed/defaults. Gap: anchors.js does not reserve the anchor cell's height for its step text. Card tool gap: --check-signed fails after the build because §7 lists live options.
 - 2026-10-23: pilot started 16:43Z; card gate OK; merged origin/claude/sweet-newton-c8wrv1-wip-wave0-gates (bda2b0c), matrix baseline has rows for the six.
@@ -81,3 +104,4 @@ Measured 21:20Z with `ws-print-lint --json` (findings of the rule) and `buildShe
 - 2026-10-23 19:45: CRITIC R1 FAIL (design/audit/runs/pilot-su-c/critic-r1.md). Lowest scores C1 4 / C2 4 / C3 6 / C4 5. The defects that cost points: D1 zero cases flood the 2-digit pages (generator); D2 heads off by default; D3 answer boxes 4.06 mm (< TY-21 4.4); D4 no lesson data, so the fallback lesson runs (H3); D5 screens from 4 digits (binaryParts rejects commas: focus, clipping on the 390 card); D6 legacy `band` option offered (H4/H3); D7 heads collide at 5-6 digits (H2); D8 sub_2d_1d narrow set; D9-D12 minor. Engine rulings: (a) confirmed except D12; (b), (c), (d) confirmed; new (e) binaryParts comma (also on sub_10k_regroup, add_10k_regroup). Caught by no machine check: D1, D2, D3, D4, D7. Should have been caught: D5 (screen-slots / chromebook-fit), D6 (options-verify). CAUSE ATTRIBUTION: mostly the CARD (it is silent on heads-on-by-default vs the support level, lesson data, the band option, the screen comma path), then MISSING MACHINE CHECKS (zero-case rate, box width, head collision), then the builder (D1 contradicts card §9.4).
 - 2026-10-23 20:01: lead: new process rules 0a (uncertified pair builds run on mq-opus-medium) and 0b (before the critic: precritic green against the pins AND every red matrix row at or below the approved siblings; re-run sibling-compare). 0b applies before critic r2.
 - 2026-10-23 20:56: FIX R1 merged (ff471fd). D1-D12 fixed except D8's Mixed-practice heading: off-limits `sheet/roles/mixed-practice.js:225`, proposed patch `.find((s) => first && first.q && s.skillId === (first.q.presetId || first.q.skillId)) || ... ` (lead / mixed-pages lane). ORCHESTRATOR ERROR CORRECTED: sibling-compare.cjs read the sibling LOG, which prints at most 6 count lines a row, so unseen classes counted as 0; the true pre-fix figure was 124 ABOVE, not 236 (sibling-compare2.cjs reads absolute counts from the matrix --out JSON). After fix r1: 84 above the paired sibling, 38 above ANY named approved stack skill (above-any-after-fix1.txt): TY-11 anchors.js (16), H13 forced 2 cols / side anchors at M (17, every cell flagged on both, we fit 4 rows to their 3), fact-rows (2; proposed fact-rows.js patch), sections PAGEFILL (1), sections ex-each L H13 (3). Lead asked to rule (per-cell equivalence, or land the anchors.js / fact-rows.js fixes first). Proposed machine checks from fix r1: print-lint L-OVERLAP (neighbouring .ws-stack .head boxes), L-ANSAREA (answer segment < 4.4 mm). Also seen: addition:add_three stacked has the same 0.72 em answer-box defect (not changed); fact-probe.js ~136 chunks 9/9/2 instead of 7/7/6 (sub_1m_regroup too).
+- 2026-10-23 22:20: CRITIC R2 FAIL (critic-r2.md). D1-D11 fixed; D12 fixed on sub_1m but the class recurs on sub_50 / sub_100k (N5). New: N1 2-digit dealer skew + fixed zero position (C2 7); N2 lesson Warm-up fact cell 43-59 % empty (H13, C3 6); N3 option-panel help false (C1/C2 7); N4 Across option breaks the page (H2, C1 4); N5 side anchors at L (H13); N6-N8 minor. Engine rulings: (a) confirmed at S, REJECTED at L (my pin at L was wrong, = N5); (b), (c) (same rate per full-length item), (d), fact-probe confirmed. Default Practice pages and every screen host pass from 3 digits up (9/8/8/9).

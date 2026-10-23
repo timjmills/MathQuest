@@ -300,3 +300,25 @@ precritic.
 4. **Builder strength**: low effort on an uncertified pair (stack × single had no certificate). Fix: rule 0a, now written. Owner: done.
 5. **Browser-slot waits**: precritic 22 min a pass, of which the coverage matrix is 21 min; three passes ran. Fix: precritic `--rows-from <red list>` to re-run only the red rows after a fix. Owner: W0-A.
 6. **check-signed fails after a correct build** (card §7 lists live options). Owner: W0-process (routed by the lead).
+
+### pilot-su-c · critic r2 (2026-10-23, FAIL)
+
+**Automatic checks:**
+
+| Finding | Class | Rule | Proposed check | Backtest | Existing check that should have caught it |
+|---|---|---|---|---|---|
+| N1 2-digit dealer skewed (top ones 9 on 39/120; 49 ×4 on one page; the zero item always at index 7) | PATTERN | L10, P-10 | ws-content-audit: per-digit and per-value frequency within ±2σ of uniform over the valid set; no value > 2 a page; position of a seeded case not periodic | pilot tip FAILs | ws-content-audit's repeat/cycle rule SHOULD have (it checks answers repeating, not digit skew or a fixed position) |
+| N2 lesson Warm-up fact cell 43-59 % empty | SPACE | H13 | print-lint H13 applied to lesson Warm-up cells | pilot tip FAILs; sub_100_regroup 38 % passes | print-lint H13 SHOULD have (does not reach lesson Warm-up cells) |
+| N3 option panel help false (level 2 named, not offered) | UNTRUE_TEXT | P-31 | ws-options-verify: every level / value named in a help string is offered, and its described effect is visible (heads on/off) | pilot tip FAILs | none |
+| N4 "Across" breaks the page (equation wraps, key digits over the subtrahend) | CLIP_OVERLAP | H2 | ws-options-verify renders every offered appearance value through print-lint (not only the promise) | pilot tip FAILs | ws-options-verify SHOULD have (checks the promise, not the render) |
+| N5 side anchors at L, empty band 32 % (D12 class moved) | SPACE | H13 | already caught: the matrix single/ex-each L row; it was pinned as class (a) | — | the coverage matrix DID catch it; the pin (my class (a) at L) was wrong: (a) is confirmed at S only |
+| N6 "line up" vocab picture wraps with a dangling minus | VISUAL_DESIGN | TY rules | print-lint: a line that ends in an operator glyph | fixture | none |
+| N7 a line break inside an equation in step 3 | STEPS_LAYOUT | C1 | print-lint: a wrapped line ending in "−"/"+"/"=" inside a step | fixture | none |
+| N8 HTh / TTh heads 0.74 mm apart at S | CLIP_OVERLAP | H2 | print-lint L-OVERLAP with a 1 mm minimum gap between head labels | fixture | none |
+
+**Speed-ups:**
+
+1. **Fix round 1 added new surfaces (lesson data, wide tracks, heads on screen) and nothing checked them before the critic.** N2, N4 and N6 came from fix-r1 changes or surfaces it newly exposed. Smallest change: precritic `--role lesson` plus every offered option value at S and L on the touched skills, run in the fix round's own report.
+2. **One wrong pin**: class (a) was pinned at L, where the siblings show 0 (N5). The rate table measured S only. Smallest change: the rate table measures every size it pins.
+3. **The dealer was rewritten in the fix round without a distribution check** (N1). Smallest change: the content-audit predicate above, run by the builder.
+4. **Critic wall time 32 min, ≈ 360k tokens a round**: fine. The cost is the round count. Two rounds of the same family each found 4+ card-level gaps (the across appearance, the option help, lesson Warm-up form), so the card is the cause: the card needs a section listing every option and appearance the panel offers, inherited ones included (`_ap4*` patches), with the decision for each.
