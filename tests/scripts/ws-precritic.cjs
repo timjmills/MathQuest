@@ -44,8 +44,8 @@
 //   design/audit/baselines/print-lint.json    ws-print-lint --json of `--source kit` (independent, size L) per skill:
 //                                             print-lint's own --baseline ratchet on (document, lint, rule)
 //   design/audit/baselines/screen-slots.json  {skills: {"cat:skill": ["host:kind", ...]}} (ws-screen-slots --baseline)
-//   design/audit/baselines/print-lint.S.json, print-lint.M.json   the same at sizes S and M (pinned for the role
-//                                             sample + subtraction:sub_100_no_regroup; a skill missing from a size's
+//   design/audit/baselines/print-lint.S.json, print-lint.M.json   the same at sizes S and M (pinned for the 20
+//                                             role-sample skills + the six pilot skills; a skill missing from a size's
 //                                             pin runs unpinned at that size, so any finding there is FAIL)
 //   design/audit/baselines/options-verify.json {skills: {"cat:skill": ["option=<json value>" | "static:<msg>", ...]}}
 //   design/audit/baselines/node-lint.json     ws-node-lint's own baseline (it reads it itself)
@@ -274,7 +274,8 @@ function judge(g, run, p) {
     const v = lastVerdict(run.out, g.script);
     const ex = `exit ${run.code == null ? run.signal : run.code}`;
     let findings;
-    if (run.signal || (v && v[1] === 'OK')) findings = `${ex} (timed out?/killed)`;
+    if (run.signal) findings = `${ex} (timed out?/killed)`;
+    else if (v && v[1] === 'OK') findings = `${ex} after an OK verdict (crashed after reporting?)`;
     else if (v) findings = `${ex} (${v[0].slice(0, 120)}; not accounted for by the parsed findings)`;
     else findings = `${ex} (no verdict line)`;
     if (p.result === 'FAIL' && p.findings && p.findings !== '-' && !/: OK\b/.test(p.findings)) findings = /^unparsed output/.test(p.findings) ? `${p.findings}; ${findings}` : `${findings}; ${p.findings}`;
@@ -359,7 +360,9 @@ const PARSE = {
         const found = fails(inScope);
         const otherFails = fails(others).length;
         // the tool exits 1 when any value (or static check) fails, in scope or not
-        const explainsExit = code === 0 || found.length + otherFails > 0;
+        // only exit 1 with the tool's own FAIL verdict is explained by failing values; a crash (2, 127, a signal ...) is not
+        const ov = lastVerdict(out, 'ws-options-verify');
+        const explainsExit = code === 0 || (code === 1 && !!ov && ov[1] === 'FAIL' && found.length + otherFails > 0);
         const errNote = pe ? `page errors during the run: ${pe[1]}` : '';
         if (!inScope.length) {
             if (pe) return { result: 'FAIL', findings: `no options offered; ${errNote}`, detail: [pe[0]], explainsExit };
@@ -743,6 +746,8 @@ function checkArgs(argv) {
     num('node-jobs', (x) => Number.isInteger(x) && x >= 1, 'give a whole number >= 1');
     num('browser-jobs', (x) => Number.isInteger(x) && x >= 1, 'give a whole number >= 1');
     if ((seen.has('grade') || seen.has('lesson')) && !seen.has('teacher')) errs.push('--grade / --lesson go with --teacher');
+    // an explicit pin that does not exist would silently run unpinned: refuse it
+    for (const f of [...seen].filter((x) => x.endsWith('-baseline'))) { const v = arg(f, ''); if (v && !fs.existsSync(path.resolve(ROOT, v))) errs.push(`--${f} ${v}: no such file`); }
     return errs;
 }
 

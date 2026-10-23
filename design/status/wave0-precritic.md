@@ -25,62 +25,55 @@ Branch `claude/sweet-newton-c8wrv1-wip-wave0-precritic` (no PR). Spec: `design/I
   - **The --role print-lint row** says how many of the role pages are not pinned. Print-lint names a role page
     `cat:skill#role`, and the pin holds only independent pages, so an unpinned role page must be clean.
 
-## Gate map (§1.4 → this tool)
-| §1.4 gate | Row | State |
-|---|---|---|
-| ws-node-lint | `node-lint` | runs (its own baseline) |
-| ws-providers-unit --skill | `providers` | runs; N/A when the test has no item maker for the skill |
-| ws-content-audit --skill | `content-audit` | runs; N/A outside the audited families |
-| ws-options-verify --skill | `options-verify` | runs, compared with the pin |
-| ws-presets-unit | `presets` | runs only when a skill is a preset or a preset's host |
-| ws-coverage-matrix --skills | `coverage-matrix` | **SKIPPED-NOT-BUILT** (E1 queued). Until it lands, print-lint at S/M/L stands in for it (independent role only, not every kind × option) |
-| ws-screen-slots --skills --baseline | `screen-slots` | runs. `--baseline` is not in the script yet (S5), so precritic compares its doubled-area and paper-verb lines with the pin itself and says so in the row |
-| ws-screen-answer --skills | `screen-answer` | runs |
-| ws-chromebook-fit --skills | `chromebook-fit` | runs |
-| ws-code-snapshot, ws-boot-smoke | | run |
-| --template: ws-panes-unit, the template's unit test, fixtures, ws-grade-render --template --contact-sheet | | planned (dry run checked on `function-table`, 4 skills) |
-| --role: ws-grade-render --roles + ws-print-lint --roles on the role sample | | planned; the role pages are not pinned yet (see open items) |
-| --teacher: shell, library, preview, quiz, wrm --grade --lesson, flows, tokens, plain-words | | flows and tokens are **SKIPPED-NOT-BUILT** |
+## Current state (critic round 2 PASS at 4e7884a; later fixes D1, D5, D6)
+Sections above describe round 1. This is the state now.
 
-The browser gates go through `/tmp/mq-browser-run.sh`. If that file is missing (a fresh container), precritic installs
-it from `tests/scripts/mq-browser-run.sh` and checks Chromium, puppeteer, the proxy CA and PyMuPDF first (`pip install
-pymupdf` is the fix it prints).
+### Gate map (§1.4 → this tool)
+| §1.4 gate | State |
+|---|---|
+| ws-node-lint | runs (its own baseline) |
+| ws-providers-unit --skill | runs; N/A when the test has no item maker for the skill (the pilot skills have none) |
+| ws-content-audit --skill | runs (`--category` when the scope is one category); N/A outside the audited families |
+| ws-options-verify --skill | runs, compared with `options-verify.json`. A crash or an unexplained exit code is FAIL even when every failing value is pinned (D1) |
+| ws-presets-unit | runs when a skill is a preset or a preset's host |
+| ws-coverage-matrix --skills | **runs**, as a node gate with `--slots 2` (it takes its own slots), against `design/audit/matrix/baseline.json` |
+| ws-print-lint --source kit at L / S / M | runs; duplicates the matrix's single/defaults row and is cheap |
+| ws-screen-slots --skills --baseline | runs with the native `--baseline` (S5's `host:kind` format) |
+| ws-screen-answer, ws-chromebook-fit --skills | run. chromebook-fit gets `--baseline` once `baselines/chromebook-fit.json` exists (S5) |
+| ws-code-snapshot, ws-boot-smoke | run |
+| --template | the `--skill` gates for every skill that draws the template on any seeded item; ws-panes-unit; a unit-test row and a fixtures row that always print (SKIPPED-NOT-BUILT or N/A, with the reason); ws-grade-render --template --contact-sheet |
+| --role | ws-grade-render --roles and ws-print-lint --roles on the 20-skill role sample; the role is checked against sheet/roles |
+| --teacher | shell, library, preview, quiz, wrm (`--grade` / `--lesson`), plain-words. flows and tokens are **SKIPPED-NOT-BUILT** |
 
-## Baseline provenance (all pinned 2026-10-23)
-| File | Scope | Content | How |
-|---|---|---|---|
-| `print-lint.json` (W0-A) | 721 documents, size L, independent | 6614 findings in 384 documents | its `how` field |
-| `print-lint.S.json` | the 20 role-sample skills + sub_100_no_regroup | 107 findings in 10 documents | `ws-print-lint --source kit --size S --skills <21> --report-only --json`, trimmed |
-| `print-lint.M.json` | same 21 | 98 findings in 9 documents | the same with `--size M` |
-| `options-verify.json` | same 21 | 292 failing (option, value) pairs | `ws-options-verify --skill <ids> --json` (via node, so values match `JSON.stringify`) |
-| `screen-slots.json` | every live skill (723 skills, 2892 host renders) | 1 doubled answer area: `measurement:reading_ruler_hard` card (S9's known fix) | `ws-screen-slots --report-only` |
+The verdict counts every result type: `OK: 12 PASS (2 on the baseline), 1 N/A, 0 SKIPPED-NOT-BUILT of 13`. A crash,
+a timeout (the gate's whole process tree is killed), a gate that checked 0 or too few items, and output the tool
+cannot read are all FAIL.
 
-## Verification
-- `node tests/scripts/ws-precritic.cjs --skill subtraction:sub_100_no_regroup` → exit 0, verdict `OK on 12 of 13
-  gates; 1 SKIPPED-NOT-BUILT (not run, not passed): coverage-matrix; 1 N/A (ran, nothing to check): providers`.
-- **Seeded failure.** Red ink (`style="color:#c00"`) on the operator sign in `sheet/cells/stack.js`, reverted
-  afterwards. The run exits 1: the print-lint rows at L, S and M each FAIL with `L-INK INK-1: 0 -> 18 / 40 / 24`.
-- A seeded emoji in the skill's label is not caught: the kit sheet does not print the label, so this is not a gap.
-- `node --check tests/scripts/ws-precritic.cjs` and `node --input-type=module --check < tests/scripts/ws-providers-unit.mjs`
-  both pass. `ws-providers-unit` without `--skill` is unchanged (OK, 105383 checks).
+### Baselines (all pinned 2026-10-23)
+| File | Scope |
+|---|---|
+| `print-lint.json` (W0-A) | every live skill, size L, independent (721 documents) |
+| `print-lint.S.json`, `print-lint.M.json` | the 20 role-sample skills + the six pilot skills (26 documents) |
+| `options-verify.json` | the 20 role-sample skills + the six pilot skills |
+| `screen-slots.json` | S5's pin from the full sweep (723 skills) and the dark / big-board sweeps |
+| `design/audit/matrix/baseline.json` | 34 addition rows (E1) + 93 rows for the six pilot skills |
 
-## Times
-Times: precritic --skill subtraction:sub_100_no_regroup, final run — wall 171 s (2 min 51 s). Per gate: chromebook-fit 134 s, options-verify 35, screen-answer 17, screen-slots 9, print-lint L 7 / S 8 / M 8, content-audit 4, boot-smoke 4, node-lint 1, code-snapshot 1, providers 0. Two browser slots, no slot wait. The target was about 5–6 min; this run is under it.
-Times: seeded-failure run (red ink in stack.js) — wall 170 s, exit 1.
-Times: first run, before the S/M and options pins — wall 170 s, exit 1 (options-verify red, unpinned).
-Times: pinning — screen-slots full sweep 22 min (12:57–13:19, one slot); options-verify on 21 skills 7 min 20 s; print-lint S and M on 21 skills about 3 min each.
+A skill outside a pin FAILs on any finding there: the print-lint rule (an unpinned document must be clean). The row
+prints the command that pins it, and a pin needs a STATUS note.
 
-## Open items (not silently passed; each shows in the table)
-- `coverage-matrix` is SKIPPED-NOT-BUILT until E1 lands. When it lands it replaces the S/M/L print-lint rows, which only
-  cover the independent page with default options.
-- The S and M pins and the options-verify pin cover 21 skills. A lane whose skill is outside them gets a FAIL for any
-  pre-existing finding at S or M, or in its options, until that skill is pinned with a STATUS note. Two fixes are
-  possible: a full S and M sweep (about 1 h of slot time each, judging by L) and a full options-verify sweep, or the
-  coverage matrix.
-- The `--role` print-lint pages (`cat:skill#role`) are not pinned, so a `--role` run is red on any pre-existing finding
-  on a role page.
-- When S5 adds `ws-screen-slots --baseline`, precritic passes it the same pin and reads that flag's output. The parser
-  for the flag's output was written before the flag existed, so check its regex when S5 lands.
+### Verification at 4e7884a (critic round 2)
+- `--skill subtraction:sub_100_no_regroup`: exit 0, 256 s (the matrix 255 s on 2 slots, chromebook-fit 146 s).
+- A seeded no-regroup break in gen-operations.js: exit 1, content-audit and coverage-matrix FAIL.
+- Seeded red ink in stack.js (round 1): exit 1, print-lint L/S/M FAIL.
+- `--timeout 0.3`: the slow gates FAIL "timed out", and no process is left behind.
+- 23 input-validation probes all exit 2.
+
+### Open items
+- Full S/M print-lint and options-verify sweeps (nightly), so skills outside the pins don't start red.
+- The role pages (`cat:skill#role`) are not pinned, so a `--role` run is red on any pre-existing role-page finding.
+- Critic r2 low items not fixed:
+  - D2: screen-answer and chromebook-fit rows only check that each skill is named. S5 could print "checked N of M".
+  - D3: content-audit trusts its own audited count.
 
 ## Round 2 (after critic round 1: FAIL, fidelity 6 / honesty 5 / usability 7)
 - Critic r1 (mq-opus-medium) found 13 defect classes. The worst: a crash or timeout could show PASS; the timeout did not
@@ -108,3 +101,5 @@ Times: critic r1 18 min (13:35–13:53). Fixer r2 53 min.
 Times: precritic --skill sub_100_no_regroup with the matrix on --slots 1: wall 440 s (the matrix 439 s; options-verify waited 244 s for a slot held by another session).
 Times: precritic --skill <six pilot skills> with the matrix on --slots 1: wall 1593 s (the matrix 1592 s for 288 documents).
 Times: coverage-matrix pin for the six on --slots 2: 757 s (93 rows × S/M/L).
+Times: critic r2 11 min, PASS (fidelity 8, honesty 8, usability 8). precritic --skill sub_100_no_regroup with the matrix on --slots 2: wall 256 s (target 5–6 min: met).
+Times: after D1/D5/D6, precritic --skill sub_100_no_regroup: wall 256 s, exit 0 (OK: 12 PASS (2 on the baseline), 1 N/A, 0 SKIPPED-NOT-BUILT of 13).
