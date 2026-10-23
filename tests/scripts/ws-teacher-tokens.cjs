@@ -29,6 +29,10 @@
  *                (type 12 14 16 20 28 36, weights 500 700, spacing 4 8 16 24 32 48, radii 8 16, two shadows, 44 px controls);
  *   8. mock-up   the mock-up's own CSS (app.css beside the token file) uses no raw colour, font size, weight, radius or shadow;
  *   9. script    the mock-up's app.js writes no inline style (no style="…", no element.style; the body scroll lock excepted).
+ *  10. action    (fix round 2) every bold, slate too, is clearly not the primary: CIEDE2000 >= 20 from ink #1A1614 and from
+ *                the dark-mode primary #FBF7EF, and WCAG >= 2.0 : 1 against ink;
+ *  11. dark      (fix round 2) every dark tint >= 1.2 : 1 against the dark page #0F0E0C and every bold >= 3 : 1 against it,
+ *                so each group, band and card edge stays visibly coloured in dark mode.
  * The other §2.8 rules (one ink fill per screen, area colours only under data-domain, chips outlined and ringed, ...) are
  * screen checks: they join this gate in T2 with the real screens.
  */
@@ -91,16 +95,16 @@ function ramp(b) { const dTint = mix(b, DARK, 0.18); return { tint: mix(b, CREAM
 
 // ---------------------------------------------------------------- board C (owner 2026-10-23; supersedes board B of §2.7)
 // The colours sampled from the school's Awsaj maths site, moved only as far as the §2.7 rules need
-// (design/mockups/teacher-2/palette/board-c-search.py). [key, css prefix, name, tint, soft, bold, deep, dark light version]
+// (design/mockups/teacher-2/palette/board-c-search.py). [key, css prefix, name, tint, soft, bold, deep, dark light version, dark tint]
 const PLAN = [
-  ['CC', 'cc', 'Counting & cardinality (mauve)', '#F6EEEB', '#EDDCE2', '#CD9CC3', '#644C60', '#E4CAD9'],
-  ['OA', 'oa', 'Operations & algebraic thinking (dusty ink-indigo; fix round 1 muted it from violet #5B1FAB)', '#E6E3E2', '#BDBAC9', '#2E2B71', '#222055', '#A19DB8'],
-  ['NBT', 'nbt', 'Number & operations in base ten (gold)', '#F9F3E2', '#F5EBC7', '#E7CF69', '#5C532A', '#F1E3AC'],
-  ['NF', 'nf', 'Fractions & decimals (plum)', '#EFE4E1', '#D6C0C5', '#7F3E63', '#5F2E4A', '#BE9CAA'],
-  ['MEAS', 'meas', 'Measurement (sage)', '#F3F3E8', '#E2EBDA', '#A9CFAA', '#475747', '#D2E3CC'],
-  ['DATA', 'data', 'Data (dusty blue)', '#E9E9E7', '#C5CED6', '#486E9C', '#365275', '#A2B2C6'],
-  ['G', 'g', 'Geometry (sea teal)', '#E6ECE5', '#BBD7D2', '#278E8D', '#1A5E5D', '#91C2BE'],
-  ['RPNS', 'rpns', 'Ratio & number system (peach)', '#F8EFE4', '#F0DECE', '#D8A480', '#684F3D', '#EACEB8'],
+  ['CC', 'cc', 'Counting & cardinality (mauve)', '#F6EEEB', '#EDDCE2', '#CD9CC3', '#644C60', '#E4CAD9', '#31282D'],
+  ['OA', 'oa', 'Operations & algebraic thinking (dusty ink-indigo; fix round 1 muted it from violet #5B1FAB)', '#E6E3E2', '#BDBAC9', '#2E2B71', '#222055', '#A19DB8', '#15131E'],
+  ['NBT', 'nbt', 'Number & operations in base ten (gold)', '#F9F3E2', '#F5EBC7', '#E7CF69', '#5C532A', '#F1E3AC', '#36311D'],
+  ['NF', 'nf', 'Fractions & decimals (plum)', '#EFE4E1', '#D6C0C5', '#7F3E63', '#5F2E4A', '#BE9CAA', '#23171C'],
+  ['MEAS', 'meas', 'Measurement (sage)', '#F3F3E8', '#E2EBDA', '#A9CFAA', '#475747', '#D2E3CC', '#2B3128'],
+  ['DATA', 'data', 'Data (dusty blue)', '#E9E9E7', '#C5CED6', '#486E9C', '#365275', '#A2B2C6', '#191F26'],
+  ['G', 'g', 'Geometry (sea teal)', '#E6ECE5', '#BBD7D2', '#278E8D', '#1A5E5D', '#91C2BE', '#132523'],
+  ['RPNS', 'rpns', 'Ratio & number system (peach)', '#F8EFE4', '#F0DECE', '#D8A480', '#684F3D', '#EACEB8', '#332921'],
 ];
 const SLATE = '#57534E';   // warm stone
 const PLAN_GRADES = { K: ['CC', 'OA', 'NBT', 'MEAS', 'DATA', 'G'], '1': ['OA', 'NBT', 'MEAS', 'DATA', 'G'], '2': ['OA', 'NBT', 'MEAS', 'DATA', 'G'],
@@ -171,11 +175,11 @@ function parseBlocks(css) {
   const fails = []; const rows = [];
   const row = (check, value, need, where, ok) => { rows.push([check, value, need, where, ok ? 'ok' : 'FAIL']); if (!ok) fails.push(`${check}: ${value} (needs ${need}) ${where}`); };
   const r1 = (x) => (Math.round(x * 10) / 10).toFixed(1);
-  const A = PLAN.map(p => ({ k: p[0], css: p[1], name: p[2], plan: { tint: p[3], soft: p[4], bold: p[5], deep: p[6], dLight: p[7] }, r: ramp(p[5]) }));
+  const A = PLAN.map(p => ({ k: p[0], css: p[1], name: p[2], plan: { tint: p[3], soft: p[4], bold: p[5], deep: p[6], dLight: p[7], dTint: p[8] }, r: ramp(p[5]) }));
 
   // 1. ramps
   let rampBad = [];
-  for (const a of A) for (const f of ['tint', 'soft', 'deep', 'dLight']) if (a.plan[f] !== a.r[f]) rampBad.push(`${a.k} ${f} plan ${a.plan[f]} rule ${a.r[f]}`);
+  for (const a of A) for (const f of ['tint', 'soft', 'deep', 'dLight', 'dTint']) if (a.plan[f] !== a.r[f]) rampBad.push(`${a.k} ${f} plan ${a.plan[f]} rule ${a.r[f]}`);
   row('ramps follow the rules = board C table', rampBad.length ? rampBad.length + ' differ' : '8 areas x 4 strengths x 2 modes', 'equal', rampBad.join('; '), !rampBad.length);
 
   // 2. normal vision
@@ -222,6 +226,28 @@ function parseBlocks(css) {
   const worst = con.filter(c => c[1] < c[2]);
   const low = con.reduce((b, c) => (c[1] / c[2] < b[1] / b[2] ? c : b));
   row(`text contrast (${con.length} pairs, light and dark)`, worst.length ? worst.map(w => `${w[0]} ${w[1].toFixed(2)}`).join('; ') : `closest ${low[0]} ${low[1].toFixed(2)}`, '>= 4.5 / 7', '', !worst.length);
+
+  // 10. distinct from the action (fix round 2; critic r2 A3/D1, stop rule §1.7). The one primary action is solid ink in
+  //     light mode and solid cream in dark mode; an area bold that sits near either reads as a second primary (OA #2E2B71
+  //     was 1.45 : 1 from ink, so a tray of three OA chips looked like four black buttons). Thresholds:
+  //       CIEDE2000 >= 20 from ink #1A1614 and from the dark-mode primary #FBF7EF (the same >= 20 the bolds keep from each
+  //       other), AND WCAG >= 2.0 : 1 against ink. The brief's floor was 1.5; OA at 1.45 read as ink to the critic and NF
+  //       plum at 2.37 did not, so the line sits at 2.0, between the two. Slate is held to the same rule (its tray chips are
+  //       solid too).
+  const INKMIN = { de: 20, cr: 2.0 };
+  const inkRows = all.map(a => ({ k: a.k, b: a.plan ? a.plan.bold : SLATE }));
+  const dInk = minOf(inkRows, (a) => de00(a.b, INK)), dCream = minOf(inkRows, (a) => de00(a.b, DARK_TEXT)), cInk = minOf(inkRows, (a) => cr(a.b, INK));
+  row('CIEDE2000 bold vs the ink primary #1A1614', r1(dInk.v), '>= 20', dInk.p.k, dInk.v >= INKMIN.de);
+  row('CIEDE2000 bold vs the dark-mode primary #FBF7EF', r1(dCream.v), '>= 20', dCream.p.k, dCream.v >= INKMIN.de);
+  row('WCAG bold vs ink (an area never reads as ink)', cInk.v.toFixed(2), '>= 2.0', cInk.p.k, cInk.v >= INKMIN.cr);
+  // 11. dark mode keeps every group visibly coloured (critic r2 D1: the OA tint was 1.05 : 1 on the page, so the OA group
+  //     panel vanished). Measured on the values actually in the board table / token file, not on the rule:
+  //       every dark tint >= 1.2 : 1 against the dark page #0F0E0C (the group panel shows), and
+  //       every bold >= 3 : 1 against the dark page (WCAG 1.4.11 for the card edge, band rule and band icon that carry the area).
+  const darkRows = all.map(a => ({ k: a.k, t: a.plan ? a.plan.dTint || a.r.dTint : a.r.dTint, b: a.plan ? a.plan.bold : SLATE }));
+  const dt = minOf(darkRows, (a) => cr(a.t, DARK)), db = minOf(darkRows, (a) => cr(a.b, DARK));
+  row('dark tint vs the dark page (the group shows)', dt.v.toFixed(2), '>= 1.2', `${dt.p.k} ${dt.p.t}`, dt.v >= 1.2);
+  row('bold vs the dark page (edge, band, icon)', db.v.toFixed(2), '>= 3', db.p.k, db.v >= 3);
 
   // 7. tokens.css
   let tokBad = [];

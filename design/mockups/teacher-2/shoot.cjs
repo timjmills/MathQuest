@@ -5,6 +5,11 @@
 //   node design/mockups/teacher-2/shoot.cjs --no-shots only the checks and the flows (no PNGs written)
 // Checks on every shot: no console error, no sideways scroll, at most one solid ink (primary) button you can see, the
 // primary above the fold at 1366x768 where the screen has one, no two controls overlapping. Exit 1 on any failure.
+// Fix round 2 (critic r2, stop rule §1.7) adds, at all five widths in light AND dark: no text clipped by its own box or a
+// clipping ancestor (ellipsis included; a search box must show its placeholder's first words); every chip's skill name
+// >= ~8 characters wide and never ellipsized while its row has room to give it a line; nothing spilling past its chip,
+// card or box; no card / box / band title broken inside a word; every control >= 44 px tall (§2.8); the tick box never on
+// a thumbnail's drawing; Skills from 820 px up with a search box >= 320 px, medium cards >= 200 px, first card by y 420.
 const fs = require('fs');
 const path = require('path');
 let chromium;
@@ -19,12 +24,13 @@ const SIZES = { 1366: { width: 1366, height: 768 }, 1280: { width: 1280, height:
 // Every screen is CHECKED at all five widths (§2.9: no sideways scroll at 1366 / 1280 / 1024 / 820 / 390, nothing clipped
 // inside a panel, nothing hidden in a sideways strip). PNGs: the full set at 1366 and 390, light and dark; the middle
 // widths in light for the screens whose layout changes there (MID_SHOTS).
-const MID_SHOTS = new Set(['skills-tray', 'lessons', 'lesson-panel', 'print-mixed', 'quiz', 'classes-progress', 'classes-quizzes', 'chip']);
+const MID_SHOTS = new Set(['skills-tray', 'skills-tray6', 'lessons', 'lesson-panel', 'print-mixed', 'quiz', 'classes-progress', 'classes-quizzes', 'chip']);
 
 // name, label, url (relative to teacher-2/), primary at 1366?, full page too?, only these widths/themes?
 const SCREENS = [
   ['skills-empty', 'Skills, tray empty (opens here)', 'app.html#skills', false, true],
   ['skills-tray', 'Skills, 3 skills in the tray', 'app.html?tray=demo3#skills', true, true],
+  ['skills-tray6', 'Skills, 6 skills in the tray', 'app.html?tray=addition:add_facts,measurement:time_hour,fractions:shade_fraction,subtraction:sub_facts,multiplication:arrays_groups,placevalue:expand#skills', true, false],
   ['tray-open', 'Tray opened (phone: “3 skills ▸”)', 'app.html?tray=demo3#trayopen', true, false],
   ['skills-search', 'Skills, a search across grades', 'app.html?tray=demo1&q=addition%20facts#skills', true, false],
   ['skills-list', 'Skills, List view', 'app.html?tray=demo3&view=list#skills', true, false],
@@ -85,6 +91,76 @@ async function screenReport(page, w) {
       const ox = Math.min(p.right, q.right) - Math.max(p.left, q.left), oy = Math.min(p.bottom, q.bottom) - Math.max(p.top, q.top);
       if (ox > 1 && oy > 1) out.problems.push(`overlap: “${a.textContent.trim().slice(0, 30)}” and “${b.textContent.trim().slice(0, 30)}”`);
     }
+    // ---- fix round 2 (critic r2 A1/A2/A4/A5, stop rule §1.7): the checks that would have caught the tray and 820 defects ----
+    const shown = (el) => { if (el.closest('.sr, [hidden], .page, .thumb, svg')) return false; const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none'; };
+    const say = (key, msg) => { (out.k = out.k || {}); (out.k[key] = out.k[key] || []).push(msg); };
+    const txt = (el) => (el.innerText || el.textContent || el.getAttribute('aria-label') || '').replace(/\s+/g, ' ').trim().slice(0, 28);
+    // (1) text clipped: an element (or an ancestor that clips) cuts off its own text, or ellipsizes it
+    for (const el of document.querySelectorAll('body *')) {
+      if (!shown(el)) continue;
+      const own = [...el.childNodes].some(n => n.nodeType === 3 && n.data.trim());
+      if (!own && !el.matches('input')) continue;
+      const cs = getComputedStyle(el);
+      const clipsX = /(hidden|clip)/.test(cs.overflowX) || cs.textOverflow === 'ellipsis', clipsY = /(hidden|clip)/.test(cs.overflowY);
+      if (el.matches('input') && el.placeholder && !el.value) {
+        // a search box that shows only part of its own placeholder: measure the placeholder text with the input's font
+        const c = document.createElement('canvas').getContext('2d'); c.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+        const need = c.measureText(el.placeholder.split(/[:,(“]/)[0].trim()).width, room = el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        if (need > room + 1) say('text clipped', `placeholder “${el.placeholder.split(/[:,(“]/)[0].trim()}” in a ${Math.round(el.getBoundingClientRect().width)}px box`);
+        continue;
+      }
+      if ((clipsX && el.scrollWidth > el.clientWidth + 1) || (clipsY && el.scrollHeight > el.clientHeight + 1)) { say('text clipped', `“${txt(el)}” (.${String(el.className).split(' ')[0] || el.tagName.toLowerCase()} ${el.scrollWidth}/${el.clientWidth})`); continue; }
+      // an ancestor that clips cuts the text off
+      const rg = document.createRange(); rg.selectNodeContents(el); const tr = rg.getBoundingClientRect();
+      for (let a = el.parentElement; a && a !== document.body; a = a.parentElement) {
+        const ac = getComputedStyle(a); const hx = /(hidden|clip)/.test(ac.overflowX), hy = /(hidden|clip)/.test(ac.overflowY);
+        if (!hx && !hy) continue; const ar = a.getBoundingClientRect();
+        if ((hx && (tr.right > ar.right + 1 || tr.left < ar.left - 1)) || (hy && (tr.bottom > ar.bottom + 1 || tr.top < ar.top - 1))) { say('text clipped', `“${txt(el)}” cut by .${String(a.className).split(' ')[0]}`); break; }
+      }
+    }
+    // (2) a chip's skill NAME: never narrower than ~8 characters, never ellipsized while its row could give it a line of its own
+    for (const nm of document.querySelectorAll('.chip .name')) {
+      if (!shown(nm)) continue; const chip = nm.closest('.chip'); const fs = parseFloat(getComputedStyle(nm).fontSize);
+      if (nm.clientWidth < 4 * fs) say('chip name too narrow', `“${nm.textContent.slice(0, 24)}” ${nm.clientWidth}px (< 8 characters)`);
+      else if (nm.scrollWidth > nm.clientWidth + 1) { const par = chip.parentElement, pcs = getComputedStyle(par); const room = par.clientWidth - parseFloat(pcs.paddingLeft) - parseFloat(pcs.paddingRight); if (chip.getBoundingClientRect().width < room - 2) say('chip name ellipsized', `“${nm.textContent.slice(0, 24)}” (row has ${Math.round(room)}px)`); }
+    }
+    // (3) nothing spills past its chip, card or box
+    for (const box of document.querySelectorAll('.chip, .card, .box, .sect-box, .weight-row, .tray-chips')) {
+      if (!shown(box) && !box.matches('.card')) continue; const b = box.getBoundingClientRect(); if (!b.width) continue;
+      for (const d of box.querySelectorAll('*')) {
+        if (d.closest('.thumb, svg, .sr') || !d.getBoundingClientRect().width) continue; const r = d.getBoundingClientRect();
+        if (r.right > b.right + 1 || r.left < b.left - 1 || r.bottom > b.bottom + 1 || r.top < b.top - 1) { say('spills out of its box', `“${txt(d)}” out of .${String(box.className).split(' ')[0]} by ${Math.round(Math.max(r.right - b.right, b.left - r.left, r.bottom - b.bottom, b.top - r.top))}px`); break; }
+      }
+    }
+    // (4) a card or box title never breaks inside a word (a break after a hyphen is a normal line break)
+    for (const el of document.querySelectorAll('.card-name, .box h3, .band, .panel-band h2, .sheet-head h2, .kind b')) {
+      if (!el.getBoundingClientRect().width || el.closest('[hidden]')) continue;
+      const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); let n, bad = null;
+      while (!bad && (n = w.nextNode())) { const re = /[^\s\-‐‑]{2,}/g; let m; while ((m = re.exec(n.data))) { const rg = document.createRange(); rg.setStart(n, m.index); rg.setEnd(n, m.index + m[0].length); const tops = new Set([...rg.getClientRects()].filter(x => x.width > 0).map(x => Math.round(x.top))); if (tops.size > 1) { bad = m[0]; break; } } }
+      if (bad) say('word broken across lines', `“${bad}” in “${txt(el)}”`);
+    }
+    // (5) controls >= 44 px tall (§2.8)
+    for (const el of document.querySelectorAll('button, a.btn, input:not([type=hidden]), select, summary, [role=tab]')) {
+      if (!shown(el)) continue; const r = el.getBoundingClientRect();
+      if (r.height < 43.5) say('control under 44px', `“${txt(el)}” ${Math.round(r.height)}px`);
+    }
+    // (6) the tick box never sits on the thumbnail's drawing
+    for (const c of document.querySelectorAll('.card')) {
+      const t = c.querySelector('.tick span'), th = c.querySelector('.thumb'); if (!t || !th || !th.getBoundingClientRect().width) continue; const tr = t.getBoundingClientRect();
+      for (const e of th.querySelectorAll('svg *, span, div, b, i')) {
+        if (e.children.length && e.tagName !== 'text') continue; const er = e.getBoundingClientRect(); if (er.width < 2 || er.height < 2) continue;
+        const ox = Math.min(tr.right, er.right) - Math.max(tr.left, er.left), oy = Math.min(tr.bottom, er.bottom) - Math.max(tr.top, er.top);
+        if (ox > 2 && oy > 2) { say('tick on the drawing', `“${txt(c.querySelector('.card-name'))}”`); break; }
+      }
+    }
+    // (7) Skills from 820 up: the search box is usable, cards are at least 200 px, the first card is high on the page
+    if (vw >= 820 && document.querySelector('.head-skills') && !document.querySelector('.sheet, .board')) {
+      const s = document.querySelector('.head-skills .search input'); if (s && s.getBoundingClientRect().width < 320) say('skills layout', `search box ${Math.round(s.getBoundingClientRect().width)}px wide`);
+      const cards = [...document.querySelectorAll('.grid[data-view="medium"] .card, .grid[data-view="big"] .card')].filter(c => c.getBoundingClientRect().width);
+      const thin = cards.filter(c => c.getBoundingClientRect().width < 200); if (thin.length) say('skills layout', `${thin.length} cards under 200px (${Math.round(thin[0].getBoundingClientRect().width)}px)`);
+      const first = document.querySelector('#skill-list .card'); if (first && first.getBoundingClientRect().top + scrollY > 420) say('skills layout', `first card at y ${Math.round(first.getBoundingClientRect().top + scrollY)}`);
+    }
+    for (const [k, list] of Object.entries(out.k || {})) out.problems.push(`${k} ×${list.length}: ${list.slice(0, 3).join('; ')}`);
     out.small = ctl.filter(el => { const r = el.getBoundingClientRect(); return el.matches('button:not(.card):not(.tick), .btn') && (r.height < 36 || r.width < 36) && !el.closest('.page'); }).map(el => el.textContent.trim().slice(0, 20));
     out.height = document.documentElement.scrollHeight;
     return out;
@@ -140,7 +216,7 @@ async function runFlow(browser, base, f, w) {
       console.log(`board-${b}.png drawn`);
     }
     for (const [name, label, url, primary, full] of SCREENS) {
-      for (const w of [1366, 1280, 1024, 820, 390]) for (const theme of (w === 1366 || w === 390 ? ['light', 'dark'] : ['light'])) {
+      for (const w of [1366, 1280, 1024, 820, 390]) for (const theme of ['light', 'dark']) {
         const page = await browser.newPage({ viewport: SIZES[w] });
         const errors = []; page.on('pageerror', e => errors.push(e.message)); page.on('console', m => { if (m.type() === 'error' && !/favicon|404/.test(m.text())) errors.push(m.text()); });
         const u = url.includes('?') ? url.replace('?', `?theme=${theme}&`) : url.replace('app.html', `app.html?theme=${theme}`);
@@ -150,7 +226,7 @@ async function runFlow(browser, base, f, w) {
         if (errors.length) rep.problems.push('console: ' + errors.join('; '));
         if (w === 1366 && primary && (rep.primaries !== 1 || rep.primaryBottom > 768)) rep.problems.push(`primary action not above the fold at 1366x768 (${rep.primaries} visible, bottom ${rep.primaryBottom})`);
         const file = `${name}-${w}-${theme}.png`;
-        const keep = w === 1366 || w === 390 || MID_SHOTS.has(name);
+        const keep = w === 1366 || w === 390 || (MID_SHOTS.has(name) && theme === 'light');
         if (!NO_SHOTS && keep) await page.screenshot({ path: path.join(SHOTS, file) });
         let fullFile = null;
         if (full && keep && (w === 1366 || w === 390) && rep.height > SIZES[w].height + 40 && !NO_SHOTS) { fullFile = `${name}-${w}-${theme}-full.png`; await page.screenshot({ path: path.join(SHOTS, fullFile), fullPage: true }); }
