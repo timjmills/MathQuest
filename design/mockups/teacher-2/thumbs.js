@@ -211,7 +211,7 @@
     else if (pic === 'angle') p = ln(px, 62, px + 60, 62, 2.5) + ln(px, 62, px, 12, 2.5) + rect(px, 50, 12, 12, 'none', 1.5);
     else if (pic === 'cube') p = cube(px, 8, 44, 34, 16) + circ(px + 16, 8, 4, '#000');
     else if (pic === 'tally') p = tallyMarks(6, px, 20).s;
-    else if (pic === 'bars') p = `<g transform="translate(${px - 14} -4) scale(0.55)">${bars(rng(word))}</g>`;
+    else if (pic === 'bars') p = place(bars(rng(word)), px - 14, -4, 0.55);
     else if (pic === 'plot') p = ln(px, 56, px + 70, 56) + txt(px + 14, 46, '×', 16, 'middle') + txt(px + 14, 34, '×', 16, 'middle') + txt(px + 40, 46, '×', 16, 'middle');
     else if (pic === 'pt') p = grid(5, 4, px, 12, 12) + circ(px + 36, 36, 4, '#000');
     else if (pic === 'list') p = txt(px, 46, '2 5 7 8 9', 16) + `<circle cx="${px + 30}" cy="41" r="10" fill="none" stroke="#000" stroke-width="2"/>`;
@@ -764,13 +764,39 @@
     'pool-all_mixed': ['eq-add', 'frac-bar', 'clock'], 'pool-algebra_mixed': ['skip-count', 'solve-eq', 'pv-expanded'], 'pool-frac_dec_mixed': ['frac-add', 'dec-add', 'convert-f_to_p'], 'pool-geo_mixed': ['shapes-name', 'area-rect', 'clock'],
     'pool-data_mixed': ['bar-graph', 'data-list'], 'pool-counting_mixed': ['count-objects', 'ten-frame'], 'pool-number_ops_mixed': ['eq-add', 'eq-sub', 'eq-mult', 'eq-div'],
   };
+  // place(body, dx, dy, k): move (and scale) a drawing by rewriting its coordinates, not with a transform, so every
+  // element's own box is where it is drawn (the critic's probe reads getBBox without transforms; fix round 3)
+  function place(body, dx, dy, k = 1) {
+    const f = (v) => +(v * k).toFixed(2);
+    const X = (v) => +(Number(v) * k + dx).toFixed(2), Y = (v) => +(Number(v) * k + dy).toFixed(2);
+    body = body.replace(/ (x|cx|x1|x2)="([-\d.]+)"/g, (m, a, v) => ` ${a}="${X(v)}"`).replace(/ (y|cy|y1|y2)="([-\d.]+)"/g, (m, a, v) => ` ${a}="${Y(v)}"`);
+    if (k !== 1) body = body.replace(/ (width|height|r|rx|font-size)="([\d.]+)"/g, (m, a, v) => ` ${a}="${f(Number(v))}"`);
+    body = body.replace(/ points="([^"]+)"/g, (m, pts) => ` points="${pts.trim().split(/\s+/).map(pr => { const [a, b] = pr.split(','); return X(a) + ',' + Y(b); }).join(' ')}"`);
+    body = body.replace(/ d="([^"]+)"/g, (m, d) => {
+      const toks = d.match(/[a-zA-Z]|-?[\d.]+(?:e-?\d+)?/g); let out = [], cmd = '', i = 0, n = 0;
+      const ARGS = { M: 2, L: 2, T: 2, H: 1, V: 1, C: 6, S: 4, Q: 4, A: 7, Z: 0 };
+      while (i < toks.length) {
+        const t = toks[i];
+        if (/[a-zA-Z]/.test(t)) { cmd = t; out.push(t); i++; n = 0; if (/z/i.test(t)) continue; continue; }
+        const C = cmd.toUpperCase(), abs = cmd === C, v = Number(t); const pos = n % ARGS[C];
+        let r;
+        if (C === 'A') r = pos < 2 ? f(v) : pos < 5 ? v : abs ? (pos === 5 ? X(v) : Y(v)) : f(v);
+        else if (C === 'H') r = abs ? X(v) : f(v);
+        else if (C === 'V') r = abs ? Y(v) : f(v);
+        else r = abs ? (pos % 2 ? Y(v) : X(v)) : f(v);
+        out.push(r); i++; n++;
+      }
+      return ` d="${out.join(' ')}"`;
+    });
+    return body;
+  }
   function poolDraw(kind, s, r) {
     const parts = (POOL[kind] || ['eq-add', 'eq-sub']).slice(0, 3);
     // stack two small drawings with a "mixed" label: each drawn at its own size inside one svg
     const inner = parts.map(k => (D[k] || D['eq-add'])(r, Object.assign({}, s, { v: '', l: '' })));
     const sized = inner.map(x => { const m = x.match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/); return { w: Number(m[1]), h: Number(m[2]), body: x.replace(/<svg[^>]*>|<\/svg>$/g, '') }; });
     const scale = 0.62; let y = 0, body = '', W = 0;
-    sized.slice(0, 2).forEach(p => { body += `<g transform="translate(0 ${y}) scale(${scale})">${p.body}</g>`; y += p.h * scale + 4; W = Math.max(W, p.w * scale); });
+    sized.slice(0, 2).forEach(p => { body += place(p.body, 0, y, scale); y += p.h * scale + 4; W = Math.max(W, p.w * scale); });
     return svg(Math.ceil(W), Math.ceil(y), body);
   }
   // ---- variants (fix round 2, critic r2 C2): a "(Visual)" / "with Pictures" skill and a word problem with Pictures on show a
@@ -822,7 +848,7 @@
     'story-div-group': ([t, b]) => P.bar('bar', [t, b], [{ label: fmt(b), w: b }, { label: fmt(b), w: b }, { label: '…', w: Math.max(b, t - 2 * b), dashed: true }], fmt(t)),
     'story-remainder': ([t, b]) => P.bar('bar', [t, b], [{ label: fmt(b), w: b }, { label: fmt(b), w: b }, { label: '…', w: Math.max(b, t - 2 * b), dashed: true }], fmt(t)),
     'story-mixed': ([a, b, c]) => { let o = ''; for (let i = 0; i < b; i++) o += pp(1 + i * 34, 4, 30, 30, false) + txt(16 + i * 34, 25, a, 15, 'middle'); o += txt(b * 34 + 6, 25, `− ${c}`, 16); return pic('boxes', [a, b, c], { cells: b }, b * 34 + 40, 38, o); },
-    'story-frac': ([n1, d1, n2, d2]) => { const A = P.pizzas('frac', [n1, d1], 1, d1, n1), B = P.pizzas('frac', [n2, d2], 1, d2, n2); return { w: A.w + B.w, h: 46, b: A.b + `<g transform="translate(${A.w} 0)">${B.b}</g>` }; },
+    'story-frac': ([n1, d1, n2, d2]) => { const A = P.pizzas('frac', [n1, d1], 1, d1, n1), B = P.pizzas('frac', [n2, d2], 1, d2, n2); return { w: A.w + B.w, h: 46, b: A.b + place(B.b, A.w, 0) }; },
     'story-frac-mult': ([n, d]) => P.bars('frac', [n, d], 1, d, n),
     'story-frac-div': ([a, b]) => P.pizzas('wholes', [a, b], a, b, 0),
     'story-convert': ([a], s, out) => { const u = (out.match(/(\d+) (yards?|feet|foot|inch(?:es)?|miles?|metres?|meters?|km|cm|m)\b/) || [])[2] || 'unit'; let o = ''; for (let i = 0; i < a; i++) o += pp(1 + i * 40, 4, 40, 22, false) + txt(21 + i * 40, 20, u.replace(/s$/, '').replace('yard', 'yd'), 12, 'middle'); return pic('units', [a], { cells: a }, a * 40 + 3, 30, o); },
@@ -845,13 +871,13 @@
     'dec-round': (v, s, out) => { const m = out.replace(/<[^>]+>/g, ' ').match(/\d+\.\d+/); if (!m) return null; const at = Number(m[0]); const from = Math.floor(at * 10 + 1e-9) / 10, to = Math.round((from + 0.1) * 10) / 10; const x = 10 + (at - from) / 0.1 * 120; let o = ln(10, 26, 130, 26, 2); for (let i = 0; i <= 10; i++) o += ln(10 + i * 12, i % 5 ? 21 : 18, 10 + i * 12, i % 5 ? 31 : 34, 1.5); o += txt(10, 52, from.toFixed(1), 13, 'middle') + txt(130, 52, to.toFixed(1), 13, 'middle') + `<path d="M${x.toFixed(1)} 6 l-5 -6 h10 z" fill="#000"/>` + ln(x, 6, x, 24, 2); return pic('numline', [m[0]], { at: m[0], from: from.toFixed(1), to: to.toFixed(1) }, 142, 56, o); },
     'convert': ([a], s, out) => { const u = (out.replace(/<[^>]+>/g, ' ').match(/\d+ ([a-zA-Z]+) =/) || [])[1] || ''; let o = ''; for (let i = 0; i < a; i++) o += pp(1 + i * 24, 4, 24, 22, false) + txt(13 + i * 24, 20, u, 11, 'middle'); return pic('units', [a], { cells: a }, a * 24 + 3, 30, o); },
   };
-  function mixedPair(v) { const groups = []; for (let i = 0; i + 2 < v.length && groups.length < 2; i += 3) groups.push(v.slice(i, i + 3)); let o = '', x = 0, H = 0; for (const [w, n, d] of groups) { const g = P.bars('frac-mixed', [w, n, d], w + 1, d, w * d + n, {}, null, 56); o += `<g transform="translate(${x} 0)">${g.b}</g>`; x += g.w + 8; H = Math.max(H, g.h); } return { w: x, h: H, b: o }; }
+  function mixedPair(v) { const groups = []; for (let i = 0; i + 2 < v.length && groups.length < 2; i += 3) groups.push(v.slice(i, i + 3)); let o = '', x = 0, H = 0; for (const [w, n, d] of groups) { const g = P.bars('frac-mixed', [w, n, d], w + 1, d, w * d + n, {}, null, 56); o += place(g.b, x, 0); x += g.w + 8; H = Math.max(H, g.h); } return { w: x, h: H, b: o }; }
   function copies(k, n, d) { const W = 72, h = 11, per = k > 4 ? Math.ceil(k / 2) : k; let o = ''; for (let b = 0; b < k; b++) { const bx = Math.floor(b / per) * (W + 8), by = (b % per) * (h + 4); for (let i = 0; i < d; i++) o += pp(bx + 1 + i * W / d, by + 1, W / d, h, i < n); } return pic('frac-copies', [k, n, d], { cells: k * d, shaded: k * n }, (k > 4 ? 2 * W + 10 : W + 3), per * (h + 4), o); }
   function withPicture(out, s, kind) {
     const m = out.match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/); const make = PICS[kind]; if (!m || !make) return out;
     const p = make(numsIn(out), s, out); if (!p) return out;
     const W = Number(m[1]), H = Number(m[2]); const h = Math.max(H, p.h); const body = out.replace(/<svg[^>]*>|<\/svg>$/g, '');
-    return svg(Math.ceil(W + 16 + p.w), Math.ceil(h), `<g transform="translate(0 ${(h - H) / 2})">${body}</g><g transform="translate(${W + 16} ${(h - p.h) / 2})">${p.b}</g>`);
+    return svg(Math.ceil(W + 16 + p.w), Math.ceil(h), place(body, 0, (h - H) / 2) + place(p.b, W + 16, (h - p.h) / 2));
   }
   const PLAIN_DRAW = {
     'tape': (r) => { const a = int(r, 3, 9), b = int(r, 3, 9); return lines([[`${a} + `, null, ` = ${a + b}`], ['? =', null]]); },
