@@ -59,28 +59,8 @@ const SIZES_ = ['S', 'M', 'L'];
 const LOOKS_ = ['daily', 'ican'];
 const FILL_TOL = 0.005;   // a measured box is a fraction of a mm off the drawn formula
 
-async function main() {
-    const { pageRepeats } = await import(pathToFileURL(path.join(__dirname, 'interleave.js')).href);
-    const { SIZES, TAB_LADDER, factTab } = await import(pathToFileURL(path.join(__dirname, 'tokens.js')).href);
-    const app = await open({ seed: 12345 });
-    const fails = [];
-    const rows = [];
-    let pages = 0;
-    let famPages = 0;
-    try {
-        // (--only 0,3: run some scenarios, by index - the full run takes about an hour, so it can be split)
-        const only = arg('only', '') ? String(arg('only', '')).split(',').map(Number) : null;
-        for (const sc of SCENARIOS.filter((_, i) => !only || only.includes(i))) {
-            const set = SETS[sc.set];
-            const fillOn = sc.opts.fill !== false;
-            const famOn = sc.opts.families === 'allow';
-            const setName = `${sc.set}${fillOn ? '' : ' fill-off'}${famOn ? ' families' : ''}`;
-            for (let s = 1; s <= sc.seeds; s++) {
-                const seed = s * 101;
-                for (const look of LOOKS_) {
-                    const per = {};
-                    for (const size of SIZES_) {
-                        const r = await app.page.evaluate(async (req) => {
+// The page built and measured in the app (run in the browser).
+const PAGE_FN = async (req) => {
                             const o = await window.buildSheet(req);
                             const facts = [];
                             for (const pg of o.plan.pages || []) for (const sec of pg.sections || []) {
@@ -117,15 +97,43 @@ async function main() {
                                 const t = c.querySelector('.ws-tab');
                                 if (t) tabs.add(Math.round((t.getBoundingClientRect().height / mm) * 10) / 10);
                             }
+                            // no box without a problem; the shelf (row) height
+                            const empty = [...host.querySelectorAll('.ws-band .ws-cell')].filter((c) => c.classList.contains('blankrun') || !c.textContent.trim()).length;
+                            const c0 = host.querySelector('.ws-band .ws-grid .ws-cell');
+                            const rowH = c0 ? c0.getBoundingClientRect().height / mm : 0;
                             host.remove();
                             const meta = o.plan.meta || {};
                             return {
                                 arr: o.arrangement, notes: o.notes || [], facts, pts: [...pts], cellPts: [...cellPts], fillMax, fillMin, tracks, tabs: [...tabs],
                                 k: (meta.fits && meta.fits[0] && meta.fits[0].cols) || 0, rows: (meta.fits && meta.fits[0] && meta.fits[0].rows) || 0,
                                 n: o.items.length, longest: meta.interleave ? meta.interleave.longest : null, pages: o.pageCount,
-                                dealt: o.items.map((x) => x.dealtAs || 'unique'), mr: o.mixedRepeats,
+                                dealt: o.items.map((x) => x.dealtAs || 'unique'), mr: o.mixedRepeats, empty, rowH,
                             };
-                        }, Object.assign({ role: 'mixed-practice', sections: [{ skills: set.map(sk) }], size, look, key: false, seed }, sc.opts));
+                        };
+
+async function main() {
+    const { pageRepeats } = await import(pathToFileURL(path.join(__dirname, 'interleave.js')).href);
+    const { SIZES, TAB_LADDER, factTab } = await import(pathToFileURL(path.join(__dirname, 'tokens.js')).href);
+    const app = await open({ seed: 12345 });
+    const fails = [];
+    const rows = [];
+    let pages = 0;
+    let famPages = 0;
+    try {
+        // (--only 0,3: run some scenarios, by index - the full run takes about an hour, so it can be split)
+        const only = arg('only', '') ? String(arg('only', '')).split(',').map(Number) : null;
+        for (const sc of SCENARIOS.filter((_, i) => !only || only.includes(i))) {
+            const set = SETS[sc.set];
+            const fillOn = sc.opts.fill !== false;
+            const famOn = sc.opts.families === 'allow';
+            const setName = `${sc.set}${fillOn ? '' : ' fill-off'}${famOn ? ' families' : ''}`;
+            for (let s = 1; s <= sc.seeds; s++) {
+                const seed = s * 101;
+                for (const look of LOOKS_) {
+                    const per = {};
+                    for (const size of SIZES_) {
+                        const req = Object.assign({ role: 'mixed-practice', sections: [{ skills: set.map(sk) }], size, look, key: false, seed }, sc.opts);
+                        const r = await app.page.evaluate(PAGE_FN, req);
                         pages++;
                         const id = `${setName} ${look} ${size} seed ${seed}`;
                         const fail = (why) => fails.push(`${id}: ${why}`);
@@ -148,6 +156,24 @@ async function main() {
                         // a share with repeats used its turnarounds first: the pool has dealt some, or has none to deal
                         if (!fillOn && !full && !r.notes.some((t) => /run out at \d+/.test(t))) fail('fill off, the page ends early with no note');
                         if ((dealt.turn || dealt.repeat) && !r.notes.some((t) => /so the page is filled with/.test(t))) fail('turnarounds / repeats with no note');
+                        // critic M1 r4: repeats spread evenly - per skill, each fact (a fact and its
+                        // turnaround counted as one) appears within 1 of every other's count; no
+                        // identical fact twice on one shelf
+                        const pk = (f) => (f.op === '+' || f.op === '*' || f.op === '\u00d7' ? `${f.op}:${[Number(f.a), Number(f.b)].sort((x, y) => x - y)}` : `${f.op}:${f.a},${f.b}`);
+                        const per2 = {};
+                        r.facts.forEach((f) => { const m = per2[f.op] = per2[f.op] || {}; m[pk(f)] = (m[pk(f)] || 0) + 1; });
+                        for (const [op, m] of Object.entries(per2)) {
+                            const c = Object.values(m);
+                            if (Math.max(...c) - Math.min(...c) > 1) fail(`${op} facts appear ${Math.min(...c)} to ${Math.max(...c)} times (uneven repeats)`);
+                        }
+                        const shelfDup = r.facts.filter((f, i) => r.facts.some((g, h) => h < i && Math.floor(h / r.k) === Math.floor(i / r.k) && g.op === f.op && String(g.a) === String(f.a) && String(g.b) === String(f.b))).length;
+                        if (shelfDup) fail(`${shelfDup} identical fact(s) twice on one shelf`);
+                        // critic M1 r4: no empty box; a short page keeps the full page's row height
+                        if (r.empty) fail(`${r.empty} box(es) without a problem`);
+                        if (!fillOn) {
+                            const twin = await app.page.evaluate(PAGE_FN, Object.assign({}, req, { fill: true }));
+                            if (Math.abs(twin.rowH - r.rowH) > 0.3) fail(`row height ${r.rowH.toFixed(1)} mm, ${twin.rowH.toFixed(1)} mm with fill on`);
+                        }
                         if (rep.families.length) famPages++;
                         // D2: digits at the ladder size, never under the working digits
                         const floor = SIZES[size].digitPt;

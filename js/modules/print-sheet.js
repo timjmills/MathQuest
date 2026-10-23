@@ -43,7 +43,7 @@ import { tagLine as lessonTagLine, CASE_TESTS as LESSON_CASE_TESTS } from './she
 import { lessonFor, skillRef } from './lessons/prereqs.js';
 import { detailedLessonFor, validateDescription, fillPlaceholders } from './lessons/detailed/index.js';
 import { teacherBands, paginateTeacher, renderTeacherPage, measureShell, wordProblemPlan, exitSlipPlan, numberSensePlan, DETAILED_PUPIL_CSS, LIFT_MAX_CHARS, TEACHER_BODY_MM } from './sheet/roles/detailed-lesson.js';
-import { TEACHER_CSS, RCDWS_CSS, teacherParts, numberWords, pageRepeats } from './sheet/index.js';
+import { TEACHER_CSS, RCDWS_CSS, teacherParts, numberWords, pageRepeats, factOf } from './sheet/index.js';
 const { tBand } = teacherParts;
 import { planItem as composePlanItem, operandsOf as composeOperandsOf, opOf as composeOpOf, opGlyphOf as composeGlyphOf, oralFrameOf as composeOralFrameOf, answerOf as composeAnswerOf, instructionKeyOf as composeInstrKeyOf, instructionText as composeInstrText } from './sheet/roles/compose.js';
 import {
@@ -2768,12 +2768,16 @@ async function buildRoleSheet(n, metaOf) {
         const pageSeen = pageFam || new Set();
         const famSeen = pageFam || new Set();
         const rungs = ['unique', 'answers', ...(n.families === 'allow' ? ['related'] : []), ...(n.fill !== false ? ['turn', 'repeat'] : [])];
-        const passes = noRepeat ? rungs.length * 5 + 5 : 4;
-        const rungAt = (pass) => Math.min(rungs.length - 1, Math.floor(pass / 5));
+        // (the generator deals up to the turnaround rung; a repeat is never taken from it - a
+        // random batch repeats whatever it happens to draw, critic M1 r4: "2 + 4" three times while
+        // other facts came once. Repeats come only from the even cycle below.)
+        const genRungs = rungs.filter((r) => r !== 'repeat');
+        const passes = noRepeat ? genRungs.length * 5 + 5 : 4;
+        const rungAt = (pass) => Math.min(genRungs.length - 1, Math.floor(pass / 5));
         const R = (name) => { const i = rungs.indexOf(name); return i < 0 ? Infinity : i; };
         const counts = { unique: 0, related: 0, turn: 0, repeat: 0 };
         /** Offer one generated item to the share at a rung (`cap`): true when it is taken. */
-        const offer = (g0, pass, cap) => {
+        const offer = (g0, pass, cap, cycled = false) => {
             // A Mixed practice page of fact cells (critic M1 r1 D2): every fact on the page takes
             // the page's widest answer zone, so the rules and the ones columns line up across a shelf.
             // (A + fact keeps its fact drawing: a 3-track + band would otherwise draw the carry stack.)
@@ -2800,6 +2804,7 @@ async function buildRoleSheet(n, metaOf) {
                 const isRel = !isExact && !isTurn && ((fk && famSeen.has(fk)) || rk.some((x) => x.startsWith('rel:') && shareSeen.has(x)));
                 kind = isExact ? 'repeat' : isTurn ? 'turn' : isRel ? 'related' : 'unique';
                 if (kind !== 'unique' && rung < R(kind)) return false;
+                if (kind === 'repeat' && !cycled) return false;
                 if (kind === 'unique' && rung < R('answers') && rk.some((x) => x.startsWith('ans:') && shareSeen.has(x))) return false;
             }
             const k = out.length;
@@ -2844,18 +2849,7 @@ async function buildRoleSheet(n, metaOf) {
                 q.a !== undefined && q.b !== undefined ? { a: q.b, b: q.a } : {});
             return Object.assign({}, g, { q: q2 });
         };
-        let turnsMade = false;
         for (let pass = 0; pass < passes && out.length < want; pass++) {
-            // (fill on: when the deal reaches the repeat rung, the share's own facts turned round
-            // go first - only then may a fact come again)
-            if (noRepeat && !turnsMade && rungs[rungAt(pass)] === 'repeat') {
-                turnsMade = true;
-                for (const it0 of out.slice()) {
-                    if (out.length >= want) break;
-                    const t = turnedOf(it0.dealtG);
-                    if (t) offer(t, pass, R('turn'));
-                }
-            }
             const need = want - out.length;
             const batch = pass === 0 ? need : noRepeat ? need * 3 + 6 : need * 2 + 2;
             const gen = generateRun(pool.skills, batch, base, { startIndex: next, seen: st.seen, kept: st.kept });
@@ -2870,10 +2864,30 @@ async function buildRoleSheet(n, metaOf) {
                 if (offer(g0, pass, cap)) taken.add(gi);
             }
         }
-        // (fill on, the generator still short: the share's facts come again, in their order)
         if (noRepeat && n.fill !== false && out.length < want && out.length) {
-            const base0 = out.slice();
-            for (let i = 0; out.length < want && i < want * 2; i++) offer(base0[i % base0.length].dealtG, passes, R('repeat'));
+            // (fill on: the share's own facts turned round, for a generator that deals none itself)
+            for (const it0 of out.slice()) {
+                if (out.length >= want) break;
+                const t = turnedOf(it0.dealtG);
+                if (t) offer(t, passes, R('turn'));
+            }
+            // (then the EVEN CYCLE: each fact - a fact and its turnaround counted as one - comes once
+            // more, in the order the facts first came, before any fact comes a third time)
+            const pairs = [];
+            const byKey = new Map();
+            for (const it0 of out) {
+                const f = factOf(it0.dealtG && it0.dealtG.q);
+                const key = f ? `${f.op}:${f.op === '+' || f.op === '*' ? [f.a, f.b].sort((x, y) => x - y).join(',') : `${f.a},${f.b}`}` : `t:${it0.q && it0.q.text}`;
+                if (!byKey.has(key)) { const e = { members: [], count: 0 }; byKey.set(key, e); pairs.push(e); }
+                const e = byKey.get(key);
+                e.members.push(it0.dealtG);
+                e.count++;
+            }
+            for (let guard = 0; out.length < want && pairs.length && guard < want * 4; guard++) {
+                const low = pairs.reduce((m, e) => (e.count < m.count ? e : m), pairs[0]);
+                offer(low.members[low.count % low.members.length], passes, R('repeat'), true);
+                low.count++;
+            }
         }
         if (noRepeat) { out.counts = counts; out.short = Math.max(0, want - out.length); }
         return out;
@@ -3035,7 +3049,12 @@ async function buildRoleSheet(n, metaOf) {
                     : `Mixed practice: ${x.label} run out at ${uniq}, so the page has ${total} problems.`);
             }
             if (x.c.turn || x.c.repeat) {
-                const parts = [x.c.turn ? `${x.c.turn} turnaround${x.c.turn > 1 ? 's' : ''} (4 + 1 and 1 + 4)` : '', x.c.repeat ? `${x.c.repeat} repeated fact${x.c.repeat > 1 ? 's' : ''}` : ''].filter(Boolean);
+                // (the example is the pool's own: a turnaround it dealt, in its own sign)
+                const tItem = x.its.find((it) => it.dealtAs === 'turn');
+                const tf = tItem ? factOf(tItem.q) : null;
+                const sign = tf ? ({ '+': '+', '*': '\u00d7' }[tf.op] || tf.op) : '';
+                const eg = tf ? ` (${tf.b} ${sign} ${tf.a} and ${tf.a} ${sign} ${tf.b})` : '';
+                const parts = [x.c.turn ? `${x.c.turn} turnaround${x.c.turn > 1 ? 's' : ''}${eg}` : '', x.c.repeat ? `${x.c.repeat} repeated fact${x.c.repeat > 1 ? 's' : ''}, each fact once more before any comes again` : ''].filter(Boolean);
                 dealNotes.push(`Mixed practice: ${x.label} has ${uniq} different facts, so the page is filled with ${parts.join(' and ')}.`);
             }
         }
