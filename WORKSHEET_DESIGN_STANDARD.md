@@ -1060,7 +1060,7 @@ Multiply by 2-digit at 3 columns: 12 / 9 / 9. Regroup scaffolds on at 3 columns:
 - **DN-31** Mixed practice packs by units: each skill declares a footprint in grid units per look and size (`design/SKILL_CELL_CONTRACT.md`); grouped is the default, shuffled is an option; a Daily L 3-digit stack spans 2 units at 4 columns.
 - **DN-32** Daily spiral: fixed panel positions every day; two-page spread by default; compact one-page form only at S and M; never offered at L. Panel titles per BD-6.
 - **DN-33** Today's Number: its own two-sided daily sheet; number ranges to 20 / 120 / 1,000 / 10,000 and over; versions A-D per range; identical layout every day, only the number changes; side 2 holds the chart task for ranges to 120.
-- **DN-34** Problem mix per section is teacher-selectable: **one problem type + one notation**, or **deliberately mixed** (ratio chips). A single-type section never silently mixes notations, orientations or unknown positions.
+- **DN-34** Problem mix per section is teacher-selectable: **one problem type + one notation**, or **deliberately mixed** (ratio chips). A single-type section never silently mixes notations, orientations or unknown positions. A page the teacher set to **Mixed practice** (the default for 2+ skills, `arrangement: 'mixed'`; IMPROVEMENT_PLAN §3.3, Q-M1) is a deliberate mix: it is chosen on the worksheet sheet and stated in the summary line, so it is not "silent"; Single skill and Sections pages keep one type per run.
 
 ---
 

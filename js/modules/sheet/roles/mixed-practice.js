@@ -19,14 +19,26 @@
 //              problems cannot sit two to a shelf takes the band instead). Anchors are unscored,
 //              unlabelled and carry the Model tab; the numbering counts pupil problems only.
 //
-// SHUFFLED packing (2 x 2 blocks) is not built yet. Pure module (SCC-01).
+// MIXED arrangement (`input.arrangement === 'mixed'`, IMPROVEMENT_PLAN 3.3, phase M1): for skills
+// of ONE SIZE CLASS (`mixedClass`: the same cells across k on the lattice, cell heights within
+// MIX_H_RATIO of each other, and every skill's cells say their own task - the sign of a
+// computation, or an instruction kept in the cell), the page is shelves of k cells filled from
+// the interleaved queue (sheet/interleave.js: counts by `dealCounts`, two of each; order by
+// `interleave`, no run over 2). One band strip heads the page with the sheet instruction "Solve."
+// and no band title; each cell keeps its own instruction (the host does not strip it, B3). A
+// shelf is as tall as the tallest cell it holds; content never shrinks; whole shelves paginate;
+// numbering row-major. Skills of different size classes fall back to GROUPED, with the reason in
+// the notes. The 2 x 2 block packer for mixed size classes is M2's (PT-MIX-5).
+//
+// Pure module (SCC-01).
 
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, planItem, gridPart, instructionKeyOf,
-    instructionText, assemble, poolItems, labelStyleOf, STRAND_BY_CATEGORY,
+    instructionText, assemble, poolItems, labelStyleOf, STRAND_BY_CATEGORY, deriveSeed,
 } from './compose.js';
 import { skillWords } from './practice.js';
 import { anchorPlanItem, anchorHeightMm } from '../anchors.js';
+import { interleave, dealCounts } from '../interleave.js';
 
 export const ROLE_ID = 'mixed-practice';
 export const DEFAULT_LOOK = 'daily';
@@ -151,7 +163,137 @@ function packing(poolsIn, input) {
     return { ctx, m, mCont, N, ids, shelf, used, pages: basePages };
 }
 
+/* ============================================================ the MIXED arrangement (M1) */
+
+/** A shelf's shorter cell keeps at least this share of the tallest's height (H13: < 30 % empty). */
+export const MIX_H_RATIO = 0.75;
+/** Instructions a computation cell's own sign already says: such a cell needs no cue on "Solve.". */
+const SIGN_KEYS = new Set(['add', 'subtract', 'multiply', 'divide', 'mixed-sign', 'mixed-ops', 'default-solve', 'default-write']);
+
+const latticeOf = (input, ctx) => ([4, 6, 8, 10].includes(Number(input.latticeN)) ? Number(input.latticeN) : AUTO_N[ctx.look][ctx.size]);
+
+/** The plain words for a pool's skill (the notes): its strand or label. */
+function poolName(input, its) {
+    const it0 = its[0] || {};
+    const q = it0.q || {};
+    const skill = (input.skills || []).find((s) => `${s.categoryId}:${s.skillId}` === it0.skill)
+        || (input.skills || []).find((s) => s.skillId === q.skillId && (!q.categoryId || s.categoryId === q.categoryId)) || {};
+    return skill.label || STRAND_BY_CATEGORY[skill.categoryId] || skillWords(skill).strand || q.skillId || 'This skill';
+}
+
+/**
+ * Do the page's skills share one size class (M1's test)? Each pool's k is the largest divisor of
+ * the lattice N (at most 6) whose cell width every one of its measured cells fits (DN-10), and its
+ * h the tallest of its cells at k. They share a class when every pool has the same k, the
+ * shortest h is at least MIX_H_RATIO of the tallest, and each pool's cells say their own task.
+ * -> {ok, k, h, N, why}
+ */
+export function mixedClass(poolsIn, input = {}) {
+    const ctx = ctxOf(input, DEFAULT_LOOK);
+    const N = latticeOf(input, ctx);
+    const ids = Object.keys(poolsIn).filter((id) => (poolsIn[id] || []).length);
+    if (ids.length < 2) return { ok: false, N, why: '' };
+    const per = ids.map((id) => {
+        const its = poolsIn[id];
+        const k = divisorsDesc(N).find((d) => d <= 6 && fitsAt(its, d, ctx)) || 1;
+        const h = hMinAt(its, k, ctx);
+        const key = instructionKeyOf(its, input.skills);
+        const own = SIGN_KEYS.has(key) || its.every((it) => !!it.cellPrompt);
+        return { id, k, h: Number.isFinite(h) ? h : Infinity, own, name: poolName(input, its) };
+    });
+    const ks = [...new Set(per.map((x) => x.k))];
+    if (ks.length > 1) {
+        return { ok: false, N, per, why: `Mixed practice: ${per.map((x) => `${x.name} fits ${x.k} across`).join(', ')}, so the page prints in sections until boxes of different sizes can share a page.` };
+    }
+    const hs = per.map((x) => x.h);
+    const hMax = Math.max(...hs);
+    const hMin = Math.min(...hs);
+    if (!Number.isFinite(hMax) || hMin / hMax < MIX_H_RATIO) {
+        const tall = per.find((x) => x.h === hMax);
+        return { ok: false, N, per, why: `Mixed practice: ${tall.name} needs much taller boxes than the other skills, so the page prints in sections until boxes of different sizes can share a page.` };
+    }
+    const silent = per.filter((x) => !x.own);
+    if (silent.length) {
+        return { ok: false, N, per, why: `Mixed practice: ${silent.map((x) => x.name).join(', ')} needs its own short instruction in each box, so the page prints in sections for now.` };
+    }
+    return { ok: true, k: ks[0], h: hMax, N, per, why: '' };
+}
+
+/** The mixed page's capacity: shelves of k under one "Solve." strip, counts dealt by weight. */
+function mixedPacking(poolsIn, input) {
+    const ctx = ctxOf(input, DEFAULT_LOOK);
+    const frame = frameOf({ skills: input.skills || [], input, tabId: 'Mixed 1', title: 'Mixed practice', twoLine: true, score: 1 });
+    const m0 = bandMetrics(ctx, layoutHeader(frame.header));
+    const m = Object.assign({}, m0, { budget: m0.budget - stripMmOf(input) });
+    const cls = mixedClass(poolsIn, input);
+    const ids = Object.keys(poolsIn).filter((id) => (poolsIn[id] || []).length);
+    const maxShelves = { S: 9, M: 7, L: 5 }[ctx.size] || 5;
+    const shelves = Math.max(1, Math.min(maxShelves, Math.floor((m.budget - m.strip) / cls.h)));
+    const total = shelves * cls.k;
+    const weights = Object.fromEntries((input.pools || []).filter((p) => ids.includes(p.id)).map((p) => [p.id, p.weight || 1]));
+    for (const id of ids) if (!(id in weights)) weights[id] = 1;
+    const deal = dealCounts(weights, total, { min: 2 });
+    return { ctx, m, cls, ids, shelves, total, weights, deal, N: cls.N };
+}
+
+function planMixed(input, pools) {
+    const p = mixedPacking(pools, input);
+    const { ctx, m, cls } = p;
+    const k = cls.k;
+    const labels = labelStyleOf(ctx.look, input.labels);
+    const names = Object.fromEntries(p.ids.map((id) => [id, { name: poolName(input, pools[id]) }]));
+    const items = p.ids.flatMap((id) => pools[id].map((it) => ({ key: id, it })));
+    const mix = interleave(items, p.weights, deriveSeed('mixed-practice', input.seed || 0), { labels: names });
+    const queue = mix.order.map((e) => e.it);
+    const shelves = [];
+    for (let s = 0; s < queue.length; s += k) {
+        const chunk = queue.slice(s, s + k);
+        const own = hMinAt(chunk, k, ctx);
+        const h = Number.isFinite(own) && own > 0 ? Math.min(cls.h, own) : cls.h;
+        // H13: the shortest skill's cells on the shelf keep its drawing at least 70 % of the
+        // shelf's height, so the spare height shared in below never opens a 30 % empty band.
+        const short = Math.min(...[...new Set(chunk.map((it) => it.pool))].map((id) => hMinAt(chunk.filter((it) => it.pool === id), k, ctx)).filter((x) => Number.isFinite(x) && x > 0), h);
+        shelves.push({ items: chunk, h, room: Math.max(0, short / 0.7 - h) });
+    }
+    const n = queue.length;
+    const frame = frameOf({ skills: input.skills || [], input, tabId: 'Mixed 1', title: 'Mixed practice', twoLine: true, score: n });
+    const instr = instructionText('default-solve');
+    const pages = [];
+    let cur = null;
+    let start = 1;
+    const used = m.strip + shelves.reduce((a, sh) => a + sh.h, 0);
+    const spare = Math.max(0, m.budget - used);
+    const grow = (sh) => (shelves.length ? Math.max(0, Math.min(12, sh.h * 0.1, sh.room, spare / shelves.length)) : 0);
+    for (const sh of shelves) {
+        const budget = pages.length > 1 ? bandMetrics(ctx, layoutHeader(frame.header), { cont: true }).budget : m.budget;
+        const h = sh.h + grow(sh);
+        if (!cur || cur.used + h > budget) {
+            // PG-22: a page the mix continues on repeats the band's instruction.
+            cur = { sections: [], used: m.strip };
+            if (pages.length === 0 && input.stepStrip) cur.sections.push({ kind: 'html', html: input.stepStrip });
+            cur.band = { kind: 'band', label: '', instr, contents: [] };
+            cur.sections.push(cur.band);
+            pages.push(cur);
+        }
+        cur.band.contents.push(gridPart(sh.items.map((it) => planItem(it, { cols: Math.min(k, 6) })), { cols: k, rows: 1, cellH: h, labels, start }));
+        start += sh.items.length;
+        cur.used += h;
+    }
+    const achieved = {};
+    for (const it of queue) achieved[it.pool] = (achieved[it.pool] || 0) + 1;
+    const notes = [...new Set([...p.deal.notes, ...mix.notes])];
+    return assemble(ROLE_ID, input, frame, pages.map((pg) => ({ sections: pg.sections })), {
+        defaultLook: DEFAULT_LOOK,
+        meta: {
+            items: n, scoreOutOf: n, units: p.N, achieved, arrangement: 'mixed', notes,
+            interleave: { keys: mix.order.map((e) => e.key), counts: mix.counts, cap: mix.cap, maxRun: mix.maxRun, longest: mix.longest, firstThird: mix.firstThird, relaxed: mix.relaxed, notes: mix.notes, deal: p.deal.counts },
+            fits: [{ cols: k, rows: shelves.length, line: `Fits: ${shelves.length} shelves of ${k} on a ${p.N}-unit lattice, ${n} problems mixed, ${pages.length} page${pages.length > 1 ? 's' : ''}.` }],
+        },
+    });
+}
+
 export function counts(pools, input) {
+    if (input.arrangement === 'mixed') return Object.assign({}, mixedPacking(pools, input).deal.counts);
     const p = packing(pools, input);
     const out = {};
     for (const id of p.ids) out[id] = p.shelf[id].n * p.shelf[id].per;
@@ -161,6 +303,7 @@ export function counts(pools, input) {
 export function plan(input = {}) {
     const poolIds = [...new Set((input.items || []).map((it) => it.pool))];
     const pools = Object.fromEntries(poolIds.map((id) => [id, poolItems(input, id)]));
+    if (input.arrangement === 'mixed') return planMixed(input, pools);
     const p = packing(pools, input);
     const { ctx, m } = p;
     const labels = labelStyleOf(ctx.look, input.labels);
@@ -255,9 +398,9 @@ export function plan(input = {}) {
     for (const sh of shelves) achieved[sh.id] = (achieved[sh.id] || 0) + sh.items.filter((it) => !it.anchor).length;
     return assemble(ROLE_ID, input, frame, pages.map((pg) => ({ sections: pg.sections })), {
         defaultLook: DEFAULT_LOOK,
-        meta: { items: n, scoreOutOf: n, units: p.N, achieved,
+        meta: { items: n, scoreOutOf: n, units: p.N, achieved, arrangement: 'sections',
             fits: [{ cols: p.N, rows: shelves.length, line: `Fits: ${shelves.length} shelves on a ${p.N}-unit lattice, ${n} problems, ${pages.length} page${pages.length > 1 ? 's' : ''}.` }] },
     });
 }
 
-export default { ROLE_ID, DEFAULT_LOOK, sources, measureCols, counts, plan };
+export default { ROLE_ID, DEFAULT_LOOK, sources, measureCols, counts, plan, mixedClass, MIX_H_RATIO };

@@ -76,6 +76,15 @@ const SHEET_STYLESHEETS = Object.freeze([
 
 const clampInt = (v, lo, hi, d) => { const n = Math.floor(Number(v)); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d; };
 
+/** 'mixed' | 'sections' | 'per-page' from a request's `arrangement` ('' when none was asked). */
+export function normaliseArrangement(v) {
+    const t = String(v === undefined || v === null ? '' : v).toLowerCase().replace(/[^a-z]/g, '');
+    if (t === 'mixed' || t === 'shuffled' || t === 'mix') return 'mixed';
+    if (t === 'sections' || t === 'section' || t === 'grouped') return 'sections';
+    if (t === 'perpage' || t === 'single' || t === 'singleskill') return 'per-page';
+    return '';
+}
+
 function normaliseRequest(req = {}) {
     const asked = ROLE_ALIASES[req.role] || req.role;
     const role = ROLES.has(asked) ? asked : 'independent';
@@ -125,8 +134,27 @@ function normaliseRequest(req = {}) {
             sec.count = rowCount; sec.pages = 1; sec.columns = 1; onePage = true;
         }
     }
+    // IMPROVEMENT_PLAN 3.3 (Q-M1, owner 2026-10-23): how a sheet of several skills is arranged -
+    // 'mixed' (Mixed practice: the skills interleaved on the page), 'sections' (one section per
+    // skill, the engine's GROUPED) or 'per-page' (Single skill with several skills: each skill on
+    // its own pages). The default is 'mixed' on a Mixed practice page of 2+ skills, EXCEPT practice
+    // printed from a lesson (`leadHalf`, the lesson packet's and the detailed lesson's Mixed page:
+    // the lesson's skills are new), which stays 'sections'; every other page keeps 'sections'
+    // (Independent and More practice already print a section per skill). In M1 only the Mixed
+    // practice role reads it; a Mixed practice page asked for examples (anchors 'sections' /
+    // 'side') prints in sections until the examples modes for mixed pages come (M4), and 'on'
+    // means none there (anchors.js).
+    const skillKeys = new Set(sections.flatMap((sec) => sec.skills.map((k) => `${k.categoryId}:${k.skillId}`)));
+    const arrAsked = normaliseArrangement(req.arrangement);
+    let arrangement = arrAsked || (role === 'mixed-practice' && skillKeys.size >= 2 && !req.leadHalf ? 'mixed' : 'sections');
+    const anchors = ANCHOR_ROLES.includes(role) ? normaliseAnchors(req.anchors, { role, arrangement }) : 'off';
+    const arrangementNotes = [];
+    if (arrangement === 'mixed' && role === 'mixed-practice' && anchors !== 'off') {
+        arrangement = 'sections';
+        arrangementNotes.push('Mixed practice with examples prints in sections for now.');
+    }
     return {
-        role, size: onePage ? 'S' : size, look, paper, seed, sections,
+        role, size: onePage ? 'S' : size, look, paper, seed, sections, arrangement, arrangementNotes,
         form: req.role === 'test-b' || String(req.form || 'A').toUpperCase() === 'B' ? 'B' : 'A',
         key: req.key !== false,
         header: Object.assign({}, req.header || {}),
@@ -136,7 +164,7 @@ function normaliseRequest(req = {}) {
         photocopySafe: !!req.photocopySafe,
         // S6: step-by-step anchor problems - 'off' | 'side' | 'sections' (only the practice roles
         // and Mixed practice take them; 'on' means the role's default, sections).
-        anchors: ANCHOR_ROLES.includes(role) ? normaliseAnchors(req.anchors) : 'off',
+        anchors,
         // S2: how the supports each skill carries are spread over the sheet. null = each skill's
         // own `cover` / `mix` option (the default: every problem, clashing supports by section).
         coverage: req.coverage ? normCoverage(req.coverage) : null,
@@ -2617,7 +2645,14 @@ async function buildRoleSheet(n, metaOf) {
         // The detailed lesson's Prerequisite Check: items per question (absent otherwise).
         perQuestion: n.perQuestion || undefined,
         growLast: !!n.growLast || undefined,
+        // IMPROVEMENT_PLAN 3.3: 'mixed' only once the probe shows the skills share a size class.
+        arrangement: 'sections',
     };
+    // A Mixed practice page arranged 'mixed' keeps each cell's own instruction (B3): the page's
+    // line is "Solve.", so a cell's "Add." / "Write the time." is not said twice.
+    let keepPrompts = false;
+    let mixedCheck = null;
+    const arrangementNotes = (n.arrangementNotes || []).slice();
 
     /**
      * `want` usable items for one pool. A pool of one skill is deterministic item by item (seed
@@ -2641,6 +2676,7 @@ async function buildRoleSheet(n, metaOf) {
             for (const g of gen) {
                 if (out.length >= want) break;
                 const it = settlePrompts([hostItem(g, 0, n.size, { mix: { key: pi, count: pools.length, sheet: n.mix } })], metaOf(g.skill).instructionKey)[0];
+                if (keepPrompts) it.stripPrompt = false;
                 // Error analysis never falls back to an "Answer:" line under the cell: the shown work
                 // must sit in the cell's own slot, or the pupil sees two answer places (C1).
                 if (needsShow && (pass < 3 || strictShow) && !it.canShow()) continue;
@@ -2677,6 +2713,30 @@ async function buildRoleSheet(n, metaOf) {
         measure(probe[p.id]);
         input.floors[p.id] = floorOf(probe[p.id]);
     });
+
+    // IMPROVEMENT_PLAN 3.3, M1: Mixed practice interleaves the skills when they share one size
+    // class (roles/mixed-practice.js `mixedClass`); the probe is dealt again with each cell's own
+    // instruction kept and measured, and checked again. Otherwise the page prints in sections and
+    // the notes say why.
+    if (n.role === 'mixed-practice' && n.arrangement === 'mixed' && pools.length >= 2 && typeof mod.mixedClass === 'function') {
+        const first = mod.mixedClass(probe, input);
+        let ok = first.ok;
+        let why = first.why;
+        if (ok) {
+            keepPrompts = true;
+            const kept = {};
+            pools.forEach((p, pi) => { kept[p.id] = dealPool(p, pi, PROBE); measure(kept[p.id]); });
+            const again = mod.mixedClass(kept, input);
+            ok = again.ok;
+            why = again.why;
+            if (ok) {
+                for (const p of pools) { probe[p.id] = kept[p.id]; input.floors[p.id] = floorOf(kept[p.id]); }
+            } else keepPrompts = false;
+        }
+        if (ok) input.arrangement = 'mixed';
+        else if (why) arrangementNotes.push(why);
+        mixedCheck = { ok, per: (first.per || []).map((x) => ({ id: x.id, name: x.name, k: x.k, h: Math.round(x.h * 10) / 10, own: x.own })) };
+    }
 
     // S6: Mixed practice's worked examples, one skill per pool, generated and measured before the
     // shelves are packed (sections: one anchor band per skill; side: a twin per problem).
@@ -2769,7 +2829,7 @@ async function buildRoleSheet(n, metaOf) {
     const out = renderPlan(plan, { key: n.key });
     const fitsList = (plan.meta && plan.meta.fits) || [];
     const f0 = fitsList[0] || {};
-    const notes = [...new Set((plan.meta && plan.meta.notes) || []), ...anchorNotes];
+    const notes = [...new Set((plan.meta && plan.meta.notes) || []), ...anchorNotes, ...arrangementNotes.filter((t) => !((plan.meta && plan.meta.notes) || []).includes(t))];
     if (numberLine && numberLine.warn) notes.push(numberLine.warn);
     // SF-34: touch numerals never print under 24 pt, so on an S / M page the stacked touch cells
     // are raised to L; the fit line says so instead of the page's own digit size alone.
@@ -2795,6 +2855,10 @@ async function buildRoleSheet(n, metaOf) {
         role: n.role,
         title: plan.meta && plan.meta.title,
         notes,
+        // IMPROVEMENT_PLAN 3.3: how the skills were arranged ('mixed' | 'sections'), and the mixed order's record.
+        arrangement: (plan.meta && plan.meta.arrangement) || n.arrangement,
+        interleave: (plan.meta && plan.meta.interleave) || null,
+        mixedCheck,
         plan,
         extras: input.extras || [],
     };
@@ -2979,6 +3043,8 @@ async function buildLesson(n, metaOf) {
             // Lessons r2: the lesson's own skill fills at least half the page (its weight is the
             // partners' together), the earlier skills the rest.
             role: 'mixed-practice', look: n.lookAsked === 'daily' ? 'daily' : 'ican',
+            // (practice printed from a lesson stays in sections - Q-M1: the lesson's skills are new)
+            arrangement: 'sections',
             // Lessons r3: never a problem the Practice page printed; the lesson skill at least
             // half the placed items (`leadHalf`, enforced after packing).
             sections: [{ skills: [Object.assign({}, practiceSk, { weight: Math.max(1, withSkills.length) + 0.5, avoidTexts: practiceTexts }, packNums ? { avoidKeys: packNums.slice(), edgeLast: undefined } : {}), ...withSkills] }], latticeN: n.mixedLattice || 6, leadHalf: true, leadDrop: !!(packNums && n.mixedLeadDrop), growLast: !!packNums,

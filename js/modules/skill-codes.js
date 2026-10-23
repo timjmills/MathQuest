@@ -891,8 +891,24 @@ export function generateEnhancedSkillCode() {
         else if (hm === 'none') tokens.push('H0');
     }
 
+    // Worksheet arrangement (IMPROVEMENT_PLAN 3.3, appended 2026-10-23): Wm Mixed practice, Wp one
+    // skill per page. Sections is what every older code means, so it writes nothing and an old
+    // code decodes exactly as before. Set by updateShareSettings('arrangement', ...).
+    const arrTok = ARRANGEMENT_TOKENS[ss.arrangement];
+    if (arrTok) tokens.push('W' + arrTok);
+
     if (tokens.length === 0) return skillsPart;
     return skillsPart + '|' + tokens.join('-');
+}
+
+/** The appended `W` settings token: arrangement -> letter (sections is the absent default). */
+const ARRANGEMENT_TOKENS = Object.freeze({ mixed: 'm', 'per-page': 'p' });
+const ARRANGEMENT_OF_TOKEN = Object.freeze({ m: 'mixed', s: 'sections', p: 'per-page' });
+
+/** A decoded code's worksheet arrangement: 'mixed' | 'sections' | 'per-page' (no W token: sections). */
+export function arrangementOfSettings(settings) {
+    const a = settings && settings.arrangement;
+    return a === 'mixed' || a === 'per-page' ? a : 'sections';
 }
 
 export function parseEnhancedSkillCode(code) {
@@ -940,6 +956,10 @@ export function parseEnhancedSkillCode(code) {
                 case 'H':
                     // help after a wrong answer (support-ladder.js)
                     result.settings.help = val === '1' ? 'worked' : val === '0' ? 'none' : 'ladder';
+                    break;
+                case 'W':
+                    // worksheet arrangement (IMPROVEMENT_PLAN 3.3); an unknown letter reads as sections
+                    result.settings.arrangement = ARRANGEMENT_OF_TOKEN[val] || 'sections';
                     break;
             }
         }
