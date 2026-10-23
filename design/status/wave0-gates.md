@@ -36,4 +36,13 @@ Builders run in their own git worktrees and the lead merges them here.
 | S9 `reading_ruler_hard` fix | mq-opus-low | 13:16 | 13:29 | 13 |
 | Options-verify pin for every live skill (`ws-options-pin.cjs`, lead request 13:57) | mq-opus-medium | 13:59 | — | — |
 | Critic r1 (tools vs plan): FAIL 6 / 8 / 6, D1–D8 | mq-opus-medium | 13:43 | 14:11 | 28 |
+| Fix r1 A: deploy runner + screen gates (D1 runner, D2, D3 screen, D6, N5, N6, N8) | mq-opus-medium (rebuild after a failed round) | 14:13 | — | — |
+| Fix r1 B: matrix + envelope critic sample (D1 matrix, D3 matrix, D4, D8, N1, N3, N10, N11) | mq-opus-medium (rebuild after a failed round) | 14:13 | — | — |
 | S1 `ws-precritic` build (brought forward by the lead, 11:02; stopped: moved to the lead's session) | mq-opus-medium | 11:03 | 12:51 | 108 |
+
+## Critic r1 (2026-10-23, `design/audit/runs/wave0-gates/critic-r1.md`): FAIL — plan 6, backtests 8, usable 6
+All 10 backtests verified real by hand. Blocking: D1 deploy session 3 has no 500-document budget / nightly-age refusal;
+D2 SKIPPED counts as pass; D3 four gates print OK on 0 checked; D4 matrix baseline pins render errors; D5 node-lint
+count baseline hides new findings; D6 global page-error pin; D7 H8 multiple-choice check for every family not built;
+D8 envelope sample is not a critic sample. Fix round 1 at Opus medium (failed-round rule): A = D1 runner, D2, D3 screen,
+D6; B = D1 matrix, D3 matrix, D4, D8; C = D5, D7 (+ N2, N9, N12) starts when a browser slot frees (two-slot rule).
