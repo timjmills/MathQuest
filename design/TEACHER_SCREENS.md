@@ -7,7 +7,7 @@
 > How often each skill comes up · Examples · Size, plus a New numbers button (§2.5). **Owner 2026-10-23 (decided):** three
 > kinds of worksheet only — **Single skill · Sections · Mixed practice**, each with its options (Examples, Fade supports,
 > Layout: fact rows / timed check / Today's Number, Bring back earlier skills); no other page types and no "I Can / Daily"
-> look choice (the title follows the kind).
+> look choice (the title follows the kind). **Owner 2026-10-23 (decided):** Mixed practice is the default for 2+ skills; Sections can be made one per skill, grouped by type (named sections) or as exam-style parts; Examples can be at the top of the page, the first time a problem appears in a section or on a page (beside it on mixed pages), every few problems, or with each problem.
 > **Owner 2026-10-23 (decided):** no full page preview on the website — a one-line summary plus a SMALL preview (the first page when every page has the same kind of problems; the first 2–3 pages when they differ); the PDF made by Print is the full view.
 
 
