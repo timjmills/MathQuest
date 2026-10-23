@@ -1,0 +1,977 @@
+{
+ "note": "Pinned ws-print-lint --source kit findings per skill at size S (IMPROVEMENT_PLAN §1.4 S1: the --skill row lints at S / M / L; LESSONS_LEARNED L1). Same format and rules as print-lint.json (size L): ws-precritic passes --baseline only when every skill in scope is pinned here; a skill not listed runs unpinned at S, so any finding fails. Lower a count when fixed; never raise one without a STATUS note.",
+ "how": "ws-print-lint --source kit --size S --skills <the 20 role-sample skills + subtraction:sub_100_no_regroup> --report-only --json; trimmed (lint, rule, sev, page, msg). Extend with the same command for more skills and merge the documents.",
+ "pinned": {
+  "date": "2026-10-23",
+  "commit": "b1c50244"
+ },
+ "size": "S",
+ "totals": {
+  "documents": 21,
+  "findings": 107,
+  "documentsWithFindings": 10
+ },
+ "documents": [
+  {
+   "id": "composing:number_bonds",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {},
+   "findings": []
+  },
+  {
+   "id": "addition:add_facts",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {},
+   "findings": []
+  },
+  {
+   "id": "subtraction:sub_facts",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {},
+   "findings": []
+  },
+  {
+   "id": "multiplication:mult_facts",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {},
+   "findings": []
+  },
+  {
+   "id": "division:div_facts",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {},
+   "findings": []
+  },
+  {
+   "id": "fractions:identify",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {},
+   "findings": []
+  },
+  {
+   "id": "fraction_operations:add_fractions_like",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-FONT": 20,
+    "L-KEY": 2
+   },
+   "findings": [
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "slash fraction \"2/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "slash fraction \"2/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "slash fraction \"3/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "slash fraction \"3/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "slash fraction \"3/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "slash fraction \"1/6\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "slash fraction \"1/6\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "slash fraction \"1/6\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "slash fraction \"2/6\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "slash fraction \"2/6\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"2/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"2/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"3/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"3/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"3/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"1/6\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"1/6\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"1/6\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"2/6\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"2/6\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-2",
+     "sev": "critical",
+     "page": 2,
+     "msg": "key page 2: 4 of 21 answer slot(s) carry no answer (AK-2, AK-4)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 2,
+     "msg": "key page 2 has 21 answer slots, pupil page 1 has 19 (AK-4)"
+    }
+   ]
+  },
+  {
+   "id": "decimals:add_decimal",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-KEY": 1
+   },
+   "findings": [
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 2,
+     "msg": "key page 2 has 12 answer slots, pupil page 1 has 0 (AK-4)"
+    }
+   ]
+  },
+  {
+   "id": "conversions:f_to_d",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-FONT": 22,
+    "L-OVERFLOW": 1,
+    "L-DENSITY": 4,
+    "L-KEY": 1
+   },
+   "findings": [
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 1,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 1,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 1,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 1,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "slash fraction \"25/100\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "slash fraction \"1/2\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "slash fraction \"3/12\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "slash fraction \"3/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "slash fraction \"6/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "slash fraction \"3/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"25/100\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"1/2\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"3/12\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"3/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"6/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"3/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-OVERFLOW",
+     "rule": "PG-12",
+     "sev": "major",
+     "page": 2,
+     "msg": "sticks out of its cell by 105.9 mm (cell 61.5 x 183.5 mm) (PG-12, CL-1)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 1,
+     "msg": "one empty band 66.1 mm tall in a 183.5 mm cell (36%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 1,
+     "msg": "one empty band 66.1 mm tall in a 183.5 mm cell (36%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 2,
+     "msg": "one empty band 66.1 mm tall in a 183.5 mm cell (36%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 2,
+     "msg": "one empty band 66.1 mm tall in a 183.5 mm cell (36%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 2,
+     "msg": "key page 2 has 1 answer slots, pupil page 1 has 0 (AK-4)"
+    }
+   ]
+  },
+  {
+   "id": "shapes_early:name_2d_shapes",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-INK": 1,
+    "L-EMOJI": 12,
+    "L-FONT": 2,
+    "L-DENSITY": 4,
+    "L-KEY": 1
+   },
+   "findings": [
+    {
+     "lint": "L-INK",
+     "rule": "INK-1",
+     "sev": "major",
+     "page": 1,
+     "msg": "printed page 1: 45.7 mm2 of coloured ink on the rendered page (raster or effect colour the vector check cannot name) (INK-1)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "emoji / pictographic \"⭐\" U+2B50 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "emoji / pictographic \"⭕\" U+2B55 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "emoji / pictographic \"🔷\" U+1F537 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "emoji / pictographic \"⭐\" U+2B50 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "emoji / pictographic \"🔺\" U+1F53A in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "emoji / pictographic \"🔺\" U+1F53A in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "emoji / pictographic \"⭐\" U+2B50 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "emoji / pictographic \"⭕\" U+2B55 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "emoji / pictographic \"🔷\" U+1F537 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "emoji / pictographic \"⭐\" U+2B50 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "emoji / pictographic \"🔺\" U+1F53A in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "emoji / pictographic \"🔺\" U+1F53A in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 1,
+     "msg": "printed page 1: 2 text run(s) embedded in \"DejaVuSans\", not Andika (e.g. \"▭\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "printed page 2: 2 text run(s) embedded in \"DejaVuSans\", not Andika (e.g. \"▭\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 1,
+     "msg": "one empty band 40.4 mm tall in a 113.4 mm cell (36%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 1,
+     "msg": "one empty band 43 mm tall in a 113.4 mm cell (38%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 2,
+     "msg": "one empty band 40.4 mm tall in a 113.4 mm cell (36%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 2,
+     "msg": "one empty band 43 mm tall in a 113.4 mm cell (38%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 2,
+     "msg": "key page 2 has 2 answer slots, pupil page 1 has 0 (AK-4)"
+    }
+   ]
+  },
+  {
+   "id": "area_perimeter:perimeter_intro",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {},
+   "findings": []
+  },
+  {
+   "id": "coordinates:coordinate_q1",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-KEY": 1
+   },
+   "findings": [
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 2,
+     "msg": "key page 2 has 2 answer slots, pupil page 1 has 0 (AK-4)"
+    }
+   ]
+  },
+  {
+   "id": "measurement:time_hour",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {},
+   "findings": []
+  },
+  {
+   "id": "patterns:seq_2",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-DENSITY": 6,
+    "L-KEY": 1,
+    "L-VERBS": 4
+   },
+   "findings": [
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 1,
+     "msg": "one empty band 23.2 mm tall in a 63.5 mm cell (37%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 1,
+     "msg": "one empty band 23.2 mm tall in a 63.5 mm cell (37%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 1,
+     "msg": "one empty band 23.2 mm tall in a 63.5 mm cell (37%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 2,
+     "msg": "one empty band 23.2 mm tall in a 63.5 mm cell (37%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 2,
+     "msg": "one empty band 23.2 mm tall in a 63.5 mm cell (37%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 2,
+     "msg": "one empty band 23.2 mm tall in a 63.5 mm cell (37%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 2,
+     "msg": "key page 2 has 5 answer slots, pupil page 1 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-VERBS",
+     "rule": "BD-12",
+     "sev": "major",
+     "page": 1,
+     "msg": "screen verb \"Drag\" on paper: \"Drag the numbers in reverse counting order. (counting down b\" (BD-11, BD-12, BD-17)"
+    },
+    {
+     "lint": "L-VERBS",
+     "rule": "BD-12",
+     "sev": "major",
+     "page": 1,
+     "msg": "screen verb \"Drag\" on paper: \"Drag the numbers in counting order. (counting up by 2s)\" (BD-11, BD-12, BD-17)"
+    },
+    {
+     "lint": "L-VERBS",
+     "rule": "BD-12",
+     "sev": "major",
+     "page": 2,
+     "msg": "screen verb \"Drag\" on paper: \"Drag the numbers in reverse counting order. (counting down b\" (BD-11, BD-12, BD-17)"
+    },
+    {
+     "lint": "L-VERBS",
+     "rule": "BD-12",
+     "sev": "major",
+     "page": 2,
+     "msg": "screen verb \"Drag\" on paper: \"Drag the numbers in counting order. (counting up by 2s)\" (BD-11, BD-12, BD-17)"
+    }
+   ]
+  },
+  {
+   "id": "algebra:tape_diagram",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {},
+   "findings": []
+  },
+  {
+   "id": "order_of_operations:oop_easy",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-FONT": 14,
+    "L-DENSITY": 2,
+    "L-KEY": 1
+   },
+   "findings": [
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 1,
+     "msg": "printed page 1: 6 text run(s) embedded in \"LiberationSans-Bold\", not Andika (e.g. \"4 + 2 × 2\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 1,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 1,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 1,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 1,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 1,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 1,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "printed page 2: 6 text run(s) embedded in \"LiberationSans-Bold\", not Andika (e.g. \"4 + 2 × 2\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 1,
+     "msg": "one empty band 40.4 mm tall in a 113.3 mm cell (36%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 2,
+     "msg": "one empty band 40.4 mm tall in a 113.3 mm cell (36%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 2,
+     "msg": "key page 2 has 4 answer slots, pupil page 1 has 0 (AK-4)"
+    }
+   ]
+  },
+  {
+   "id": "placevalue:more_less_10",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-DENSITY": 1
+   },
+   "findings": [
+    {
+     "lint": "L-DENSITY",
+     "rule": "PAGEFILL",
+     "sev": "major",
+     "page": 1,
+     "msg": "page 1: an empty strip 74 mm tall under the problems (28% of the page): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)"
+    }
+   ]
+  },
+  {
+   "id": "number_sense:rounding_visual",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {},
+   "findings": []
+  },
+  {
+   "id": "number_theory:prime_composite",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-OVERFLOW": 1,
+    "L-DENSITY": 2,
+    "L-KEY": 1
+   },
+   "findings": [
+    {
+     "lint": "L-OVERFLOW",
+     "rule": "PG-12",
+     "sev": "major",
+     "page": 2,
+     "msg": "sticks out of its cell by 52.3 mm (cell 92.3 x 113.3 mm) (PG-12, CL-1)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 1,
+     "msg": "one empty band 39.6 mm tall in a 113.4 mm cell (35%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 2,
+     "msg": "one empty band 39.6 mm tall in a 113.4 mm cell (35%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 2,
+     "msg": "key page 2 has 4 answer slots, pupil page 1 has 0 (AK-4)"
+    }
+   ]
+  },
+  {
+   "id": "vocabulary:vocab_grade_K",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-DENSITY": 2
+   },
+   "findings": [
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 1,
+     "msg": "one empty band 80.9 mm tall in a 206.1 mm cell (39%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 2,
+     "msg": "one empty band 80.9 mm tall in a 206.1 mm cell (39%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    }
+   ]
+  },
+  {
+   "id": "subtraction:sub_100_no_regroup",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {},
+   "findings": []
+  }
+ ]
+}

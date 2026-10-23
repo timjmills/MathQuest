@@ -1,0 +1,8 @@
+{
+ "note": "Pinned ws-screen-slots findings per skill (IMPROVEMENT_PLAN §1.4 S1; read by ws-precritic, and by ws-screen-slots --baseline once S5 lands that flag). Each entry is \"<host>:doubled\" (the host's answer field visible beside the cell's own answer places) or \"<host>:paper\" (a paper verb on screen) or \"render:error\". A skill not listed must be clean on every host. Remove an entry when its defect is fixed; never add one to make a new finding pass without a STATUS note. Suspects (\"check by eye\") are not failures and are not pinned.",
+ "how": "node tests/scripts/ws-screen-slots.cjs --report-only (every live skill, hosts card,map,worksheet,quiz) through /tmp/mq-browser-run.sh: 723 skills, 2892 host renders, 1 doubled answer area, 0 paper verbs; 22 min of one slot.",
+ "pinned": { "date": "2026-10-23", "commit": "b1c502445e" },
+ "skills": {
+  "measurement:reading_ruler_hard": ["card:doubled"]
+ }
+}

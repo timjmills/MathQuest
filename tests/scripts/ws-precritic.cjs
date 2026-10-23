@@ -18,11 +18,11 @@
 //
 // Flags may be combined (`--skill x --role guided --teacher`); a gate two scopes share runs once over the union.
 //
-// THE GATES (the plan's table; a gate whose tool or flag is not in this tree prints NOT BUILT, never OK)
+// THE GATES (the plan's table; a gate whose tool or flag is not in this tree prints SKIPPED-NOT-BUILT, never PASS)
 //   --skill   ws-node-lint --skill (its own baseline), ws-providers-unit --skill, ws-content-audit --skill,
-//             ws-options-verify --skill, ws-presets-unit (only when a skill is a preset or hosts one),
-//             ws-coverage-matrix --skills (every kind × options at S / M / L; NOT BUILT until it lands), and until it
-//             lands ws-print-lint --source kit --skills --baseline (independent, size L: the pinned baseline's scope),
+//             ws-options-verify --skill (against its pin), ws-presets-unit (only when a skill is a preset or hosts one),
+//             ws-coverage-matrix --skills (every kind × options at S / M / L; SKIPPED-NOT-BUILT until it lands), and until it
+//             lands ws-print-lint --source kit --skills --baseline (independent) at sizes L, S and M, each against its own pin,
 //             ws-screen-slots --skills (--baseline when the script has the flag; else this tool compares its findings
 //             with the same pinned file), ws-screen-answer --skills, ws-chromebook-fit --skills, ws-code-snapshot,
 //             ws-boot-smoke
@@ -34,14 +34,19 @@
 //   --role <role>     ws-grade-render --roles <role> --skills <the role sample> + ws-print-lint --source kit
 //             --roles <role> --skills <the role sample> --baseline. The sample is tests/fixtures/precritic/role-sample.json
 //   --teacher         ws-teacher-shell, -library, -preview, -quiz, -wrm (--grade / --lesson passed on), ws-teacher-flows,
-//             ws-teacher-tokens (NOT BUILT until they land), ws-plain-words --check
+//             ws-teacher-tokens (SKIPPED-NOT-BUILT until they land), ws-plain-words --check
 //
 // BASELINES (pinned; changed only with a STATUS note)
 //   design/audit/baselines/print-lint.json    ws-print-lint --json of `--source kit` (independent, size L) per skill:
 //                                             print-lint's own --baseline ratchet on (document, lint, rule)
 //   design/audit/baselines/screen-slots.json  {skills: {"cat:skill": ["host:kind", ...]}} (ws-screen-slots --baseline)
+//   design/audit/baselines/print-lint.S.json, print-lint.M.json   the same at sizes S and M (pinned for the role
+//                                             sample + subtraction:sub_100_no_regroup; a skill missing from a size's
+//                                             pin runs unpinned at that size, so any finding there is FAIL)
+//   design/audit/baselines/options-verify.json {skills: {"cat:skill": ["option=<json value>" | "static:<msg>", ...]}}
 //   design/audit/baselines/node-lint.json     ws-node-lint's own baseline (it reads it itself)
-//   --print-lint-baseline <file> / --screen-slots-baseline <file> point a run at another pin.
+//   --print-lint-baseline <file> / --screen-slots-baseline <file> / --options-verify-baseline <file> point a run at
+//   another pin (the S / M pins sit beside the print-lint one: <name>.S.json, <name>.M.json).
 //
 // OTHER OPTIONS
 //   --json <file>        the rows, the commit and the timings as JSON
@@ -49,8 +54,10 @@
 //   --browser-jobs N     own browser gates at once (default 2; the runner caps the container at two anyway)
 //   --node-jobs N        node gates at once (default 3)
 //   --timeout <min>      per gate (default 90)
-//   --allow-not-built    a run whose only non-green rows are NOT BUILT ends `ws-precritic: OK (...)` (exit 0)
-//                        instead of `ws-precritic: FAIL (incomplete ...)` (exit 3)
+//   --strict             a run whose only non-green rows are SKIPPED-NOT-BUILT ends `ws-precritic: FAIL (incomplete ...)`
+//                        (exit 3). Without it such a run ends `ws-precritic: OK on N of M gates; K SKIPPED-NOT-BUILT ...`
+//                        (exit 0): the skipped gates are named in the table AND in the verdict line, never counted as passed.
+//                        (--allow-not-built, the old opt-in, is accepted and now the default.)
 //   --report-only        print everything, exit 0
 //
 // PREREQUISITES (checked first when a browser gate is planned; the run stops with the fix when one is missing)
@@ -58,7 +65,7 @@
 //   (STATUS §8), PyMuPDF (`python3 -c "import fitz"`; ws-print-lint and the PDF renders need it).
 //
 // Last line `ws-precritic: OK` or `ws-precritic: FAIL ...`; exit 0 OK, 1 a gate failed, 2 prerequisites or usage,
-// 3 incomplete (only NOT BUILT rows are not green).
+// 3 incomplete under --strict (only SKIPPED-NOT-BUILT rows are not green).
 'use strict';
 const path = require('path');
 const fs = require('fs');
@@ -75,6 +82,9 @@ const RUNNER = '/tmp/mq-browser-run.sh';
 const RUNNER_SRC = path.join(ROOT, 'tests', 'scripts', 'mq-browser-run.sh');
 const ROLE_SAMPLE = path.join(ROOT, 'tests', 'fixtures', 'precritic', 'role-sample.json');
 const PRINT_BASE = path.resolve(ROOT, arg('print-lint-baseline', 'design/audit/baselines/print-lint.json'));
+const sizeBase = (sz) => PRINT_BASE.replace(/\.json$/, `.${sz}.json`);
+const pinnedIds = (file) => { try { return new Set(JSON.parse(fs.readFileSync(file, 'utf8')).documents.map((d) => d.id)); } catch (e) { return new Set(); } };
+const OV_BASE = path.resolve(ROOT, arg('options-verify-baseline', 'design/audit/baselines/options-verify.json'));
 const SLOTS_BASE = path.resolve(ROOT, arg('screen-slots-baseline', 'design/audit/baselines/screen-slots.json'));
 const SCRIPTS = path.join(ROOT, 'tests', 'scripts');
 const rel = (p) => path.relative(ROOT, p) || '.';
@@ -192,7 +202,7 @@ function gate(id, name, scope, kind, script, args, extra = {}) {
     let missing = null;
     if (!file) missing = `${script} is not in this tree`;
     else for (const f of extra.needFlags || []) if (!srcHas(file, f)) { missing = `${script} has no --${f} flag`; break; }
-    return { id, name, scope, kind, script, file, args, missing, parse: extra.parse || null, note: extra.note || '', jsonOut: extra.jsonOut || null };
+    return { id, name, scope, kind, script, file, args, missing, parse: extra.parse || null, note: extra.note || '', jsonOut: extra.jsonOut || null, keys: extra.keys || null };
 }
 
 /* ============================================================== output parsers */
@@ -229,6 +239,25 @@ const PARSE = {
     },
     optionsVerify(g, out, code) {
         const r = generic(g, out, code);
+        // Compare the failing (option, value) pairs of the skills in scope (the script matches ids in every category,
+        // so others are dropped) with the pin design/audit/baselines/options-verify.json {skills: {key: ["opt=json", ...]}}.
+        let j = null; try { j = JSON.parse(fs.readFileSync(g.jsonOut, 'utf8')); } catch (e) { /* crashed before writing */ }
+        if (j && !/page errors during the run/.test(out)) {
+            const inScope = (j.results || []).filter((x) => !g.keys || g.keys.includes(x.key));
+            if (!inScope.length) { return { result: 'N/A', findings: 'no options offered', detail: [] }; }
+            let pin = null; try { pin = JSON.parse(fs.readFileSync(OV_BASE, 'utf8')).skills || {}; } catch (e) { pin = null; }
+            const found = [];
+            for (const x of inScope) {
+                for (const v of x.results || []) if ((v.fails || []).length) found.push({ key: x.key, id: `${v.option}=${JSON.stringify(v.value)}`, msg: v.fails[0] });
+                for (const m of x.statics || []) found.push({ key: x.key, id: `static:${m}`, msg: m });
+            }
+            const fresh = found.filter((f) => !(pin && (pin[f.key] || []).includes(f.id)));
+            const nVals = inScope.reduce((n, x) => n + (x.results || []).length, 0);
+            r.result = fresh.length ? 'FAIL' : found.length ? 'PASS (baseline)' : 'PASS';
+            r.findings = `${nVals} value(s) checked; ${found.length} failing, ${found.length - fresh.length} pinned, ${fresh.length} new${pin ? '' : ` (no pin: ${rel(OV_BASE)} missing)`}`;
+            r.detail = fresh.slice(0, 10).map((f) => `NEW ${f.key} ${f.id}: ${String(f.msg).slice(0, 140)}`);
+            return r;
+        }
         const m = /skills: (\d+) with options \((\d+) with none\)[^\n]*skills passing (\d+)\/(\d+)/.exec(out);
         if (m && r.result === 'PASS' && +m[1] === 0) { r.result = 'N/A'; r.findings = 'no options offered'; }
         else if (m) r.findings = `${m[3]}/${m[4]} skills with options pass`;
@@ -249,6 +278,11 @@ const PARSE = {
             r.detail = out.split('\n').filter((l) => /^\s+- /.test(l)).slice(0, 10);
         } else if (sum) {
             r.findings = `${f} found in ${fd} of ${docs} doc(s)${g.args.includes('--baseline') ? '' : ' (no pinned baseline)'}`;
+        }
+        if (g.note && r.result === 'FAIL') {
+            r.findings += `; ${g.note}`;
+            const sz = g.args.indexOf('--size'), ro = g.args.indexOf('--roles');
+            r.detail = [`pin (STATUS note required): ws-print-lint --source kit ${sz >= 0 ? g.args.slice(sz, sz + 2).join(' ') + ' ' : ''}${ro >= 0 ? g.args.slice(ro, ro + 2).join(' ') + ' ' : ''}--skills <skills> --report-only --json <out>, then merge its documents into the pin`, ...r.detail];
         }
         return r;
     },
@@ -302,13 +336,25 @@ function buildPlan(ctx) {
         add(gate('node-lint', 'ws-node-lint', scope, 'node', 'ws-node-lint', ['--skill', keys.join(','), '--json', nodeLintJson], { parse: PARSE.nodeLint, jsonOut: nodeLintJson }));
         add(gate('providers', 'ws-providers-unit --skill', scope, 'node', 'ws-providers-unit', ['--skill', keys.join(',')], { parse: PARSE.providers, needFlags: ['skill'] }));
         add(gate('content-audit', 'ws-content-audit --skill', scope, 'browser', 'ws-content-audit', ['--skill', ids.join(',')], { parse: PARSE.contentAudit }));
-        add(gate('options-verify', 'ws-options-verify --skill', scope, 'browser', 'ws-options-verify', ['--skill', ids.join(',')], { parse: PARSE.optionsVerify }));
+        const ovJson = path.join(ctx.logs, 'options-verify.json');
+        add(gate('options-verify', 'ws-options-verify --skill', scope, 'browser', 'ws-options-verify', ['--skill', ids.join(','), '--json', ovJson], { parse: PARSE.optionsVerify, jsonOut: ovJson, keys }));
         const presetTouch = skills.filter((s) => s.preset || s.hosts);
         if (presetTouch.length) add(gate('presets', 'ws-presets-unit', `${presetTouch.length} preset / host skill(s)`, 'browser', 'ws-presets-unit', []));
         add(gate('coverage-matrix', 'ws-coverage-matrix --skills', `${scope} × kinds × S/M/L`, 'browser', 'ws-coverage-matrix', ['--skills', keys.join(','), '--baseline', rel(PRINT_BASE)], { needFlags: ['skills'] }));
         const pl = ['--source', 'kit', '--skills', keys.join(',')];
         if (fs.existsSync(PRINT_BASE)) pl.push('--baseline', rel(PRINT_BASE));
-        add(gate('print-lint-kit', 'ws-print-lint --source kit (independent, L; until the coverage matrix)', scope, 'browser', 'ws-print-lint', pl, { parse: PARSE.printLint }));
+        add(gate('print-lint-kit', 'ws-print-lint --source kit --size L (independent; until the coverage matrix)', scope, 'browser', 'ws-print-lint', pl, { parse: PARSE.printLint }));
+        // S and M (LESSONS_LEARNED L1: "Size S ignored"): their own pins, print-lint.<S|M>.json. A skill missing from a
+        // size's pin runs without --baseline, so any finding there is red (print-lint's rule: an unpinned document
+        // must be clean) and the row says how to pin it.
+        for (const sz of ['S', 'M']) {
+            const file = sizeBase(sz);
+            const pinned = pinnedIds(file);
+            const all = keys.every((k) => pinned.has(k));
+            const a = ['--source', 'kit', '--size', sz, '--skills', keys.join(',')];
+            if (all) a.push('--baseline', rel(file));
+            add(gate(`print-lint-kit-${sz}`, `ws-print-lint --source kit --size ${sz}`, scope, 'browser', 'ws-print-lint', a, { parse: PARSE.printLint, note: all ? '' : `not pinned at ${sz}: ${keys.filter((k) => !pinned.has(k)).join(', ')} (${rel(file)})` }));
+        }
         const ssFile = scriptPath('ws-screen-slots');
         const ss = ['--skills', keys.join(',')];
         if (ssFile && srcHas(ssFile, 'baseline') && fs.existsSync(SLOTS_BASE)) ss.push('--baseline', rel(SLOTS_BASE));
@@ -333,7 +379,10 @@ function buildPlan(ctx) {
         add(gate(`grade-render-role-${ctx.role}`, `ws-grade-render --roles ${ctx.role}`, sc, 'browser', 'ws-grade-render', ['--roles', ctx.role, '--skills', sample.join(','), '--out', path.join(ctx.logs, `grade-render-${ctx.role}`)], { needFlags: ['roles'] }));
         const pl = ['--source', 'kit', '--roles', ctx.role, '--skills', sample.join(',')];
         if (fs.existsSync(PRINT_BASE)) pl.push('--baseline', rel(PRINT_BASE));
-        add(gate(`print-lint-role-${ctx.role}`, `ws-print-lint --source kit --roles ${ctx.role}`, sc, 'browser', 'ws-print-lint', pl, { parse: PARSE.printLint }));
+        // print-lint names a role page "cat:skill#role" (independent: plain "cat:skill"); the pin lists those it holds.
+        const pinnedR = pinnedIds(PRINT_BASE);
+        const unpinned = sample.filter((k) => !pinnedR.has(ctx.role === 'independent' ? k : `${k}#${ctx.role}`));
+        add(gate(`print-lint-role-${ctx.role}`, `ws-print-lint --source kit --roles ${ctx.role}`, sc, 'browser', 'ws-print-lint', pl, { parse: PARSE.printLint, note: unpinned.length ? `${unpinned.length} of ${sample.length} role pages not pinned in ${rel(PRINT_BASE)} (an unpinned page must be clean)` : '' }));
     }
     if (ctx.teacher) {
         for (const n of ['shell', 'library', 'preview', 'quiz']) add(gate(`teacher-${n}`, `ws-teacher-${n}`, 'teacher site', 'browser', `ws-teacher-${n}`, []));
@@ -382,6 +431,10 @@ async function pool(items, n, fn) {
     const started = new Date().toISOString().replace(/\.\d+Z$/, 'Z');
     const stamp = started.replace(/[-:]/g, '').replace('T', '-').replace('Z', '');
 
+    if (has('help') || has('h') || ARGV.includes('-h')) {
+        say(fs.readFileSync(__filename, 'utf8').split('\n').slice(1).filter((l) => l.startsWith('//')).map((l) => l.replace(/^\/\/ ?/, '')).join('\n'));
+        return;
+    }
     if (has('list-live')) { say(JSON.stringify(appSkills('live').live.map((s) => s.key))); return; }
     if (has('write-role-sample')) {
         const live = new Set(appSkills('live').live.map((s) => s.key));
@@ -450,7 +503,7 @@ async function pool(items, n, fn) {
 
     if (has('dry-run')) {
         say(`${TOOL} plan: ${scopeLine} on ${commit}${dirty ? '+dirty' : ''}`);
-        for (const g of rows) say(`  [${g.kind}] ${g.name} — ${g.missing ? `NOT BUILT (${g.missing})` : `${g.kind === 'browser' ? RUNNER + ' ' : ''}node ${rel(g.file || '')} ${g.args.join(' ')}`.slice(0, 300)}`);
+        for (const g of rows) say(`  [${g.kind}] ${g.name} — ${g.missing ? `SKIPPED-NOT-BUILT (${g.missing})` : `${g.kind === 'browser' ? RUNNER + ' ' : ''}node ${rel(g.file || '')} ${g.args.join(' ')}`.slice(0, 300)}`);
         say(`${TOOL}: OK (dry run, nothing ran)`);
         return;
     }
@@ -502,28 +555,31 @@ async function pool(items, n, fn) {
     for (const g of rows) {
         const r = results.get(g.id);
         const row = g.missing
-            ? { gate: g.name, scope: g.scope, result: 'NOT BUILT', findings: g.missing, seconds: null, wait: 0, cmd: null, exit: null, detail: [], log: null }
-            : { gate: g.name, scope: g.scope, result: r.result, findings: r.findings, seconds: Math.round(r.ms / 1000), wait: r.wait, cmd: r.cmd, exit: r.code, detail: r.detail || [], log: r.logFile };
+            ? { id: g.id, gate: g.name, scope: g.scope, result: 'SKIPPED-NOT-BUILT', findings: g.missing, seconds: null, wait: 0, cmd: null, exit: null, detail: [], log: null }
+            : { id: g.id, gate: g.name, scope: g.scope, result: r.result, findings: r.findings, seconds: Math.round(r.ms / 1000), wait: r.wait, cmd: r.cmd, exit: r.code, detail: r.detail || [], log: r.logFile };
         outRows.push(row);
         const secs = row.seconds == null ? '-' : `${row.seconds}${row.wait ? ` (${row.wait} waiting)` : ''}`;
         const esc = (s) => String(s).replace(/\|/g, '\\|').replace(/\n/g, ' ');
         table.push(`| ${esc(row.gate)} | ${esc(row.scope)} | ${row.result} | ${esc(row.findings)} | ${secs} |`);
     }
     const failed = outRows.filter((r) => r.result === 'FAIL');
-    const notBuilt = outRows.filter((r) => r.result === 'NOT BUILT');
+    const notBuilt = outRows.filter((r) => r.result === 'SKIPPED-NOT-BUILT');
     if (failed.length) {
         table.push('');
         table.push('Failing rows (first lines; the full output is in the log):');
         for (const r of failed) {
-            table.push(`- **${r.gate}** (exit ${r.exit}, \`${r.log}\`)`);
+            table.push(`- **${r.gate}** (exit ${r.exit}, \`${r.log}\`); rerun alone: \`${r.cmd}\``);
             for (const d of r.detail.slice(0, 10)) table.push(`  - \`${String(d).trim().slice(0, 220).replace(/`/g, "'")}\``);
         }
     }
+    const ids = (list) => list.map((r) => r.id).join(', ');
+    const na = outRows.filter((r) => r.result === 'N/A');
+    const naNote = na.length ? `; ${na.length} N/A (ran, nothing to check): ${ids(na)}` : '';
     let verdict, exit;
-    if (failed.length) { verdict = `FAIL (${failed.length} gate(s): ${failed.map((r) => r.gate.split(' ')[0]).join(', ')}${notBuilt.length ? `; NOT BUILT: ${notBuilt.map((r) => r.gate.split(' ')[0]).join(', ')}` : ''})`; exit = 1; }
-    else if (notBuilt.length && !has('allow-not-built')) { verdict = `FAIL (incomplete: every built gate is green; NOT BUILT: ${notBuilt.map((r) => r.gate.split(' ')[0]).join(', ')})`; exit = 3; }
-    else if (notBuilt.length) { verdict = `OK (--allow-not-built; NOT BUILT: ${notBuilt.map((r) => r.gate.split(' ')[0]).join(', ')})`; exit = 0; }
-    else { verdict = 'OK'; exit = 0; }
+    if (failed.length) { verdict = `FAIL (${failed.length} gate(s): ${ids(failed)}${notBuilt.length ? `; SKIPPED-NOT-BUILT: ${ids(notBuilt)}` : ''})`; exit = 1; }
+    else if (notBuilt.length && has('strict')) { verdict = `FAIL (incomplete, --strict: every built gate is green; ${notBuilt.length} SKIPPED-NOT-BUILT: ${ids(notBuilt)})`; exit = 3; }
+    else if (notBuilt.length) { verdict = `OK on ${outRows.length - notBuilt.length} of ${outRows.length} gates; ${notBuilt.length} SKIPPED-NOT-BUILT (not run, not passed): ${ids(notBuilt)}${naNote}`; exit = 0; }
+    else { verdict = `OK${naNote ? ` (${naNote.slice(2)})` : ''}`; exit = 0; }
     table.push('');
     table.push(`${TOOL}: ${verdict}`);
     say('\n' + table.join('\n'));
