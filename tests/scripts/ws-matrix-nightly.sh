@@ -15,10 +15,14 @@
 #      documents, search-terms.js or the index.html stamp changed) PLUS the rotating seventh of all rows (--seventh
 #      <UTC day of week mod 7>), so every row runs at least weekly; rows already OK in design/audit/matrix/cache.json
 #      for the same dependency hash are skipped; red = above the per-row baseline;
-#   4. writes design/audit/matrix/<UTC date>.json (with SHARD: <date>.shard-i-of-n.json) and the cache, and prints
-#      the commit message for the session to commit with (the session adds its own attribution lines).
-# It never edits anything outside design/audit/matrix/. Exit 0 with red rows (--report-only): the deploy gate reads
-# the red rows from the JSON; a crash exits non-zero.
+#   4. writes design/audit/matrix/<UTC date>.json (with SHARD: <date>.shard-i-of-n.json) and the cache;
+#   5. the options pin: tests/scripts/ws-options-pin.cjs --check (every live skill's ws-options-verify run against
+#      design/audit/baselines/options-verify.json; with SHARD its share of the batches) into
+#      design/audit/matrix/options-pin-<date>.json; on the FIRST RUN, unsharded, --write re-pins every live skill
+#      instead (OPTIONS_PIN=0 skips it);
+#   6. prints the commit message for the session to commit with (the session adds its own attribution lines).
+# It never edits anything outside design/audit/matrix/, except the options pin file on a first-run --write. Exit 0
+# with red rows (--report-only): the deploy gate reads the red rows from the JSON; a crash exits non-zero.
 set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/../.." && pwd)
 cd "$ROOT"
@@ -70,7 +74,26 @@ fi
 node tests/scripts/ws-coverage-matrix.cjs "${ARGS[@]}" | tee "/tmp/ws-matrix-nightly-$DATE$SUFFIX.log"
 
 TALLY=$(grep -E '^ws-coverage-matrix: OK [0-9]' "/tmp/ws-matrix-nightly-$DATE$SUFFIX.log" | tail -1 | sed 's/^ws-coverage-matrix: //')
+
+# Options pin (ws-options-pin.cjs): ws-options-verify on every live skill against design/audit/baselines/options-verify.json.
+# First night (no nightly run file yet, as for the matrix) and not sharded: --write re-pins every live skill. Otherwise
+# --check (with SHARD, this shard's batches): new failing pairs are listed in $DIR/options-pin-<date>.json and do not
+# stop the night. A crash keeps the per-batch JSON in /tmp/mq-options-pin/<date>; running this script again the same
+# day continues it (--resume). OPTIONS_PIN=0 skips the step.
+OPIN_FILES=""
+OPIN_TALLY="skipped"
+if [ "${OPTIONS_PIN:-1}" != 0 ]; then
+  OPIN_ARGS=(--resume --slots "$SLOTS" --out "$DIR/options-pin-$DATE$SUFFIX.json" --report-only "${SHARD_ARGS[@]}")
+  if [ -z "$LAST" ] && [ -z "${SHARD:-}" ]; then OPIN_ARGS+=(--write); OPIN_MODE="write"; else OPIN_ARGS+=(--check); OPIN_MODE="check"; fi
+  if node tests/scripts/ws-options-pin.cjs "${OPIN_ARGS[@]}" | tee "/tmp/ws-options-pin-$DATE$SUFFIX.log"; then
+    OPIN_TALLY="$OPIN_MODE, $(grep -E '^against ' "/tmp/ws-options-pin-$DATE$SUFFIX.log" | tail -1 | sed -E 's/^against [^:]*: //')"
+  else
+    OPIN_TALLY="$OPIN_MODE CRASHED (run the script again today to resume)"
+  fi
+  OPIN_FILES=$(git status --porcelain -- design/audit/baselines/options-verify.json | awk '{print $2}')
+fi
+
 echo
 echo "ws-matrix-nightly: commit message:"
-echo "Matrix nightly $DATE${SHARD:+ shard $SHARD} on ${HEAD:0:8}: $TALLY ($MODE)"
-echo "ws-matrix-nightly: files to commit: $(git status --porcelain -- "$DIR" | awk '{print $2}' | tr '\n' ' ')"
+echo "Matrix nightly $DATE${SHARD:+ shard $SHARD} on ${HEAD:0:8}: $TALLY ($MODE); options pin: $OPIN_TALLY"
+echo "ws-matrix-nightly: files to commit: $(git status --porcelain -- "$DIR" | awk '{print $2}' | tr '\n' ' ')$OPIN_FILES"
