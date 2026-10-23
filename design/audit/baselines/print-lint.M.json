@@ -1,13 +1,13 @@
 {
  "note": "Pinned ws-print-lint --source kit findings per skill at size M (IMPROVEMENT_PLAN §1.4 S1: the --skill row lints at S / M / L; LESSONS_LEARNED L1). Same format and rules as print-lint.json (size L): ws-precritic passes --baseline only when every skill in scope is pinned here; a skill not listed runs unpinned at M, so any finding fails. Lower a count when fixed; never raise one without a STATUS note.",
- "how": "ws-print-lint --source kit --size M --skills <the 20 role-sample skills + subtraction:sub_100_no_regroup> --report-only --json; trimmed (lint, rule, sev, page, msg). Extend with the same command for more skills and merge the documents.",
+ "how": "ws-print-lint --source kit --size M --skills <the 20 role-sample skills + subtraction:sub_100_no_regroup> --report-only --json; trimmed (lint, rule, sev, page, msg). Extend with the same command for more skills and merge the documents. 2026-10-23: + the six pilot skills (subtraction sub_50/100/1k/10k/100k/1m _no_regroup; 0 findings).",
  "pinned": {
   "date": "2026-10-23",
   "commit": "b1c50244"
  },
  "size": "M",
  "totals": {
-  "documents": 21,
+  "documents": 26,
   "findings": 98,
   "documentsWithFindings": 9
  },
@@ -902,6 +902,46 @@
   },
   {
    "id": "subtraction:sub_100_no_regroup",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {},
+   "findings": []
+  },
+  {
+   "id": "subtraction:sub_50_no_regroup",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {},
+   "findings": []
+  },
+  {
+   "id": "subtraction:sub_1k_no_regroup",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {},
+   "findings": []
+  },
+  {
+   "id": "subtraction:sub_10k_no_regroup",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {},
+   "findings": []
+  },
+  {
+   "id": "subtraction:sub_100k_no_regroup",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {},
+   "findings": []
+  },
+  {
+   "id": "subtraction:sub_1m_no_regroup",
    "pages": 2,
    "keyPages": 1,
    "error": null,
