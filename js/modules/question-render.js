@@ -2507,13 +2507,18 @@ function _renderQuestionImpl() {
         // `blur` (focus loss) so completion is detected reliably even when
         // the user pastes, uses autofill, or defocuses the last cell without
         // typing a final keystroke that fires `input`.
+        // The listeners belong to THIS question: once the card has moved on (a new item, or the view
+        // left for a worksheet / quiz, which resets state.currentQ to null), a late change / blur from
+        // the old card's focused box must not judge the next question (or read null).
+        const nfQ = state.currentQ;
+        const nfCheck = () => { if (nfQ && state.currentQ === nfQ) checkNumberFamilyAnswer(); };
         const attachNFListeners = () => {
             const nfInputs = visualAid.querySelectorAll('.number-family-input, .fact-family-input');
             nfInputs.forEach((input, idx) => {
                 if (input.dataset._nfListenerAttached === '1') return;
                 input.dataset._nfListenerAttached = '1';
-                input.addEventListener('change', () => checkNumberFamilyAnswer());
-                input.addEventListener('blur', () => checkNumberFamilyAnswer());
+                input.addEventListener('change', () => nfCheck());
+                input.addEventListener('blur', () => nfCheck());
                 // On every keystroke: if this cell now matches its data-answer,
                 // advance focus to the next empty input. Always run the global
                 // completion check too so the green/red borders update live.
@@ -2527,7 +2532,7 @@ function _renderQuestionImpl() {
                             .find(el => !(el.value || '').trim());
                         if (nextEmpty) nextEmpty.focus();
                     }
-                    checkNumberFamilyAnswer();
+                    nfCheck();
                 });
             });
         };
