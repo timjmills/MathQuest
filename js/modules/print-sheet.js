@@ -247,10 +247,33 @@ function repeatKeys(q) {
     if (!q) return [];
     const keys = [`ans:${typeof q.ans === 'object' ? JSON.stringify(q.ans) : String(q.ans)}`];
     const p = (q.cell && q.cell.payload) || {};
-    const op = String(p.op || q.op || '').replace('×', '*').replace('x', '*');
+    const op = opKeyOf(p.op || q.op);
     const ops = refOperands(q);
     if ((op === '+' || op === '*') && ops.length === 2) keys.push(`turn:${op}:${ops.slice().sort((a, b) => a - b).join(',')}`);
+    // critic M1 r2: the related facts of - and / (13 - 6 / 13 - 7, 12 / 3 / 12 / 4) in one share
+    const fam = familyKey(q);
+    if (fam && (op === '-' || op === '/')) keys.push(`rel:${fam}`);
     return keys;
+}
+
+const opKeyOf = (o) => ({ '+': '+', '-': '-', '\u2212': '-', '*': '*', 'x': '*', '\u00d7': '*', '/': '/', '\u00f7': '/' }[String(o || '')] || String(o || ''));
+
+/**
+ * The fact family of a two-number + - x / item, the same for every fact of the family
+ * (8 x 10, 10 x 8, 80 / 10, 80 / 8 -> "x:8,10"; 6 + 7, 13 - 6, 13 - 7 -> "+:13:6,7"), or '' when
+ * the item is not such a fact. A Mixed practice page holds each family once (critic M1 r2).
+ */
+function familyKey(q) {
+    const p = (q && q.cell && q.cell.payload) || {};
+    const op = opKeyOf(p.op || (q && q.op));
+    const [a, b] = refOperands(q);
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return '';
+    const pair = (x, y) => [x, y].sort((m, n) => m - n).join(',');
+    if (op === '+') return `+:${a + b}:${pair(a, b)}`;
+    if (op === '-') return `+:${a}:${pair(b, a - b)}`;
+    if (op === '*') return `x:${pair(a, b)}`;
+    if (op === '/' && b !== 0 && a % b === 0) return `x:${pair(b, a / b)}`;
+    return '';
 }
 
 /** The numeric operands of a generated item (its cell payload's, else its own a / b). */
@@ -2677,7 +2700,7 @@ async function buildRoleSheet(n, metaOf) {
      * its value on an answer line under the cell.
      */
     const flagsFor = (count) => (typeof mod.wrongFlags === 'function' ? mod.wrongFlags(count, n.seed) : []);
-    const dealPool = (pool, pi, want, seen0 = null) => {
+    const dealPool = (pool, pi, want, seen0 = null, pageFam = null) => {
         const base = (n.seed + pi * 100003) >>> 0;
         const st = { seen: new Set(seen0 || []), kept: new Map() };
         const flags = flagsFor(want);
@@ -2710,6 +2733,9 @@ async function buildRoleSheet(n, metaOf) {
                 if (needsShow && (pass < 3 || strictShow) && !it.canShow()) continue;
                 const rk = noRepeat ? repeatKeys(g.q) : null;
                 if (rk && pass < passes - 1 && rk.some((x) => shareSeen.has(x))) continue;
+                // critic M1 r2: a fact family another skill already put on the page (8 x 10 / 80 / 10)
+                const fk = pageFam ? familyKey(g.q) : '';
+                if (fk && pass < passes - 1 && pageFam.has(fk)) continue;
                 const k = out.length;
                 const prepared = typeof mod.prepare === 'function'
                     ? mod.prepare(it, { index: k, seed: n.seed, wrong: !!flags[k], size: n.size, look: n.look })
@@ -2729,6 +2755,7 @@ async function buildRoleSheet(n, metaOf) {
                 if (mod.TIGHT_ROWS && prepared.template === 'count-row') prepared.tightRows = true;
                 prepared.section = 0;
                 if (rk) for (const x of rk) shareSeen.add(x);
+                if (fk) pageFam.add(fk);
                 out.push(prepared);
             }
         }
@@ -2822,10 +2849,31 @@ async function buildRoleSheet(n, metaOf) {
     // `avoidKeys`; lesson 2 r4, critic r2 D2: no answer twice, no near twins, no story name or unit
     // word twice on the page. Each later skill is dealt against the items already placed.)
     const pageLr6 = n.role === 'mixed-practice' && pools.some((p) => p.skills.some((s) => s.lr6)) ? new Set() : null;
-    pools.forEach((p, pi) => {
+    // A Mixed practice page (critic M1 r2) is dealt pool after pool against the fact families
+    // already on the page, and its answer zones follow the widest fact DEALT: should a dealt item
+    // be wider than the probe's, the page is dealt again at that width (seeded, so the same items).
+    const dealMixed = () => {
+        const fam = new Set();
+        let out = [];
+        pools.forEach((p, pi) => {
+            const w = Math.max(0, Math.min(MAX_ITEMS, Math.floor(Number(want[p.id]) || 0)));
+            const its = dealPool(p, pi, w, null, fam);
+            measureMixed(its);
+            out = out.concat(its);
+        });
+        return out;
+    };
+    if (input.arrangement === 'mixed') {
+        items = dealMixed();
+        const widest = Math.max(0, ...items.map((it) => {
+            const c = it.q && it.q.cell;
+            return c && c.template === 'fact' && c.payload ? Number(c.payload.digits) || 0 : 0;
+        }));
+        if (widest > mixDigits) { mixDigits = widest; items = dealMixed(); }
+    } else pools.forEach((p, pi) => {
         const w = Math.max(0, Math.min(MAX_ITEMS, Math.floor(Number(want[p.id]) || 0)));
         let its = w <= probe[p.id].length && !mod.wrongFlags && !(pageLr6 && pi > 0) ? coverSlice(p, probe[p.id], w) : null;
-        if (!its) { its = dealPool(p, pi, w, pageLr6 && pi > 0 ? pageLr6 : null); (input.arrangement === 'mixed' ? measureMixed : measure)(its); }
+        if (!its) { its = dealPool(p, pi, w, pageLr6 && pi > 0 ? pageLr6 : null); measure(its); }
         if (pageLr6) for (const it of its) { lr6Record(it.q, `pool:${pi}`, pageLr6); pageLr6.add(`ansAll:${dlAns(it.q).replace(/[^0-9a-z<>=]/gi, '')}`); }
         items = items.concat(its);
     });

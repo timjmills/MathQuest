@@ -185,7 +185,9 @@ function kCandidates(poolsIn, ids, N) {
 }
 
 /** fitsAt, and above 6 across only where the cell was really measured there (no measure, no fit). */
-const fitsMeasured = (its, d, ctx) => fitsAt(its, d, ctx) && (d <= 6 || its.every((it) => it.measured && it.measured[d] && it.measured[d].fits !== false));
+const fitsMeasured = (its, d, ctx) => fitsAt(its, d, ctx) && (d <= 6 || its.every((it) => it.measured && it.measured[d] && it.measured[d].fits !== false))
+    // (and a grid the layout really builds at this size: hMinAt is Infinity where it will not)
+    && Number.isFinite(hAtK(its, d, ctx));
 
 /** The tallest cell at k: the layout's own minimum up to 6, the measured height above it. */
 function hAtK(its, k, ctx) {
@@ -286,7 +288,7 @@ function planMixed(input, pools) {
     const p = mixedPacking(pools, input);
     const { ctx, m, cls } = p;
     const k = cls.k;
-    const labels = labelStyleOf(ctx.look, input.labels);
+    const labels0 = labelStyleOf(ctx.look, input.labels);
     // The notes name a skill by its strand ("Time", "Multiplying"), or by its label when two skills share one.
     const strandOf = (id) => {
         const it0 = pools[id][0] || {};
@@ -312,14 +314,19 @@ function planMixed(input, pools) {
         shelves.push({ items: chunk, h, room: Math.max(0, short / 0.7 - h) });
     }
     const n = queue.length;
+    // CL-13: quiet letters never double (aa.). An I Can mixed page of more than 26 problems numbers
+    // every problem with the standard black tab instead (CL-21 "every fact numbered"; critic M1 r2).
+    const labels = labels0 === 'letter' && n > 26 ? 'tab' : labels0;
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Mixed 1', title: 'Mixed practice', twoLine: true, score: n });
     const instr = instructionText('default-solve');
     const pages = [];
     let cur = null;
     let start = 1;
     const used = m.strip + shelves.reduce((a, sh) => a + sh.h, 0);
-    const spare = Math.max(0, m.budget - used);
-    const grow = (sh) => (shelves.length ? Math.max(0, Math.min(12, sh.h * 0.1, sh.room, spare / shelves.length)) : 0);
+    // (1.5 mm kept back: shares that sum to the whole budget must not spill a shelf on rounding)
+    const spare = Math.max(0, m.budget - used - 1.5);
+    // (critic M1 r2: the whole spare is shared, within 12 mm a shelf and the H13 room of its shortest skill)
+    const grow = (sh) => (shelves.length ? Math.max(0, Math.min(12, sh.room, spare / shelves.length)) : 0);
     for (const sh of shelves) {
         const budget = pages.length > 1 ? bandMetrics(ctx, layoutHeader(frame.header), { cont: true }).budget : m.budget;
         const h = sh.h + grow(sh);
