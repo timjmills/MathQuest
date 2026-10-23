@@ -520,10 +520,14 @@ Extensive SVG generation functions across 5 modules:
 ## Agents — model and effort (owner rule, 2026-10-02, latest revision)
 
 - **Builders and fixers** run on **Opus 5.5 at LOW effort** (profile `mq-opus-low`, `model: "opus"`).
+- **Except (owner, 2026-10-23; `design/IMPROVEMENT_PLAN.md` §1.7, Q-S1 and Q-S7):** the first skill of each new drawing
+  (template), the first build of each new engine, tool or screen, and the rebuild of any work that failed a critic round
+  run on **Opus 5.5 at MEDIUM effort** (`mq-opus-medium`). Copies on an approved drawing and later changes go back to low.
 - **Critics / auditors / reviewers** run on **Opus 5.5 at MEDIUM effort** (profile `mq-opus-medium`, `model: "opus"`).
 - Explorers and small one-off checks: Opus low.
 
-Escalate a builder only when a problem persists: Opus low → Opus medium (the ceiling; never higher).
+Otherwise escalate a builder only when a problem persists: Opus low → Opus medium (the ceiling; never higher). If the same
+defect survives two rounds at medium, stop the loop: find the root cause, make it a machine check, and re-brief a fresh builder (§1.7).
 
 How to call them:
 - Pass `subagent_type` with the profile above and `model: "opus"` on every Agent call.
