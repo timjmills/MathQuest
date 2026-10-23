@@ -27,5 +27,20 @@
    "status": "PENDING"
   }
  ],
- "red": []
+ "red": [],
+ "selection": {
+  "skills": "all",
+  "affected": {
+   "from": "60c4fa538f0b6abbb2a9eef55a506f4b2c81464a",
+   "to": "HEAD",
+   "reached": 2,
+   "run": 2
+  },
+  "slice": "5/28",
+  "shard": "1/2",
+  "redFrom": {
+   "dir": "design/audit/matrix",
+   "reselected": []
+  }
+ }
 }

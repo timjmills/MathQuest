@@ -51,18 +51,26 @@
 #            `--all --affected <base>..HEAD --baseline design/audit/matrix/baseline.json --slots 2 --batch 9`, plus
 #            `--max-docs MQ_MATRIX_BUDGET` (default 500). <base> is MQ_DEPLOY_BASE, else the merge base with
 #            origin/master; when origin/master is not fetched the gate FAILS and says so (never a silent HEAD~1).
-#            Within the budget the rows run inline (OK / FAIL; the matrix's exit 2, rows selected but none checkable,
-#            is NOTHING RUN). Over it (the matrix exits 3, `OVER-BUDGET`; a tree whose matrix lacks --max-docs is
-#            measured with --list instead) the gate reads the newest run, design/audit/matrix/<date>[T<HHMM>]
-#            [.shard-i-of-n].json (every shard file of the newest stamp; T<HHMM> is a fired run):
-#              FAIL               there is none; or its oldest shard finished more than 24 h ago (`finished`, else
-#                                 the file's git commit time, else its date at 00:00 UTC); or a row of a live skill
-#                                 (data.js SKILLS, tombstones out) is RED or ERROR, or listed in `red`, in any shard
-#              OK                 it is complete (every shard i of n, each with `finished`), on one clean commit, and
-#                                 the tip differs from that commit only in design/audit/matrix/ (the run's own
-#                                 commits): the sharded run has covered HEAD
-#              NEEDS-SHARDED-RUN  otherwise: fresh and green but not on this tip. The deploy waits; the gate prints
+#            With the default args it adds `--red-from design/audit/matrix` (the rows red in the folded run state
+#            run inline too) and `--out <logdir>/matrix-inline.json`. THEN, ON EVERY RUN (critic r2 D1.3), the nightly
+#            rule reads EVERY run file design/audit/matrix/<date>[T<HHMM>][.shard-i-of-n].json, oldest first, plus the
+#            inline run, into each row's last-known state (a row's state = its status in the most recent run that ran
+#            it; RED / ERROR persists across runs that did not select it, until a later run lists it OK):
+#              FAIL               a row of a live skill (data.js SKILLS, tombstones out) is RED or ERROR in the folded
+#                                 state (a row with no baseline entry is PENDING(no-baseline), never RED); or the
+#                                 inline run FAILS; or, ONCE THE FIRST FULL BASELINE EXISTS (baseline.json
+#                                 `complete: true`, or all 28 baseline.slice-i-of-28.json), there is no run file or the
+#                                 newest run finished more than 24 h ago (`finished`, else its commit time, else date)
+#              WARNING            (passes; owner 2026-10-23) the same age / no-run conditions BEFORE the first full
+#                                 baseline exists; and, before it, affected rows over the budget (they are
+#                                 PENDING(no-baseline), covered by the lanes' precritic; the deploy is not held)
+#              OK                 within the budget: the inline run passed and the rule above found nothing. Over the
+#                                 budget, with the full baseline: the newest run is complete (every shard i of n, each
+#                                 with `finished`), on one clean commit the tip differs from only in design/audit/matrix/
+#              NEEDS-SHARDED-RUN  over the budget, with the full baseline, otherwise. The deploy waits; the gate prints
 #                                 the sharded run to fire (design/audit/matrix/NIGHTLY.md) and to re-run session 3.
+#            The matrix's exit 2 within the budget (rows selected, none checkable) is NOTHING RUN.
+#            Flake re-run (N7): only the rows the first inline run found red (--rows), never the whole budget.
 #            Then the digests hook (M4 record/replay) prints NOT YET, and the owner-go check.
 # Prerequisites, checked before any session runs: PyMuPDF (python3 -c "import fitz"; fix: pip install pymupdf),
 # puppeteer, flock. A missing one fails at once with its fix.
@@ -77,7 +85,8 @@
 # shows FLAKE; if the same gate + item already had a flake line, the gate shows BLOCKED and the deploy fails.
 #
 # Results: OK, FAIL, FLAKE (passed alone, logged), BLOCKED (second flake), SKIPPED (tool not built), NOT YET,
-# ACCEPTED (a NOT YET the lead accepted by name), NEEDS-SHARDED-RUN, NOTHING RUN. Logs: $MQ_GATES_LOGDIR (default
+# ACCEPTED (a NOT YET the lead accepted by name), NEEDS-SHARDED-RUN, NOTHING RUN, WARNING (the matrix gate passed with
+# a warning the lead reads: listed above the verdict, counted in it, never a failure). Logs: $MQ_GATES_LOGDIR (default
 # /tmp/mq-deploy-gates/<stamp>). Last line: `ws-deploy-gates: OK`, `INCOMPLETE` (exit 2) or `FAIL` (exit 1).
 set -u
 
@@ -145,33 +154,65 @@ EOF
 }
 
 # ---------------------------------------------------------------------------------------------- the matrix budget
-# The newest nightly (§1.6.2): nightly_check <matrix dir> <check-dirty 1|0>. Exit 1 = refuse (none, older than 24 h,
-# a RED / ERROR row of a live skill), 0 = covered (complete, on a commit the tip differs from only in the matrix
-# dir), 3 = NEEDS-SHARDED-RUN. MQ_NOW (ISO time) replaces the clock (fixtures).
+# The nightly rule (§1.6.2, critic r2 D1, owner 2026-10-23):
+#   nightly_check <matrix dir> <check-dirty 1|0> [fresh|full] [inline run file]
+# It reads EVERY run file in <matrix dir> (ws-coverage-matrix foldRuns), oldest first, then the inline run file, into
+# each row's last-known state: a row's state is its status in the most recent run that ran it, so a RED / ERROR row
+# stays red until a later run lists it OK. Then, on every session-3 run:
+#   - any row of a live skill RED or ERROR in the folded state: REFUSED (exit 1). A row with no baseline entry is
+#     PENDING(no-baseline) in its run file, never RED, so it never refuses;
+#   - no run file, or the newest run finished more than 24 h ago: REFUSED once the first full baseline exists
+#     (ws-coverage-matrix baselineComplete: baseline.json `complete: true`, or every baseline.slice-i-of-n.json);
+#     until then a WARNING (exit 4), never a refusal;
+#   - mode full (over the budget): with the full baseline, OK (0) only when the newest run is complete, on one clean
+#     commit the tip differs from only in the matrix dir, else NEEDS-SHARDED-RUN (3); before it, WARNING (4): the
+#     affected rows are PENDING(no-baseline) or covered by the lanes' precritic, and the deploy is not held (owner).
+#   - mode fresh (within the budget, the inline run stands in for "covers HEAD"): OK (0) or WARNING (4).
+# MQ_NOW (ISO time) replaces the clock (fixtures).
 nightly_check() {
-  node - "$1" "$2" "$ROOT" <<'EOF'
+  node - "$1" "$2" "$ROOT" "${3:-full}" "${4:-}" <<'EOF'
 const fs = require('fs'); const path = require('path'); const { execFileSync } = require('child_process');
-const [dir, checkDirty, root] = process.argv.slice(2);
+const [dir, checkDirty, root, mode, extra] = process.argv.slice(2);
 const git = (...a) => execFileSync('git', ['-C', root, ...a], { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
 const now = process.env.MQ_NOW ? Date.parse(process.env.MQ_NOW) : Date.now();
 const H24 = 24 * 3600 * 1000;
-// a run file: <date>[T<HHMM>][.shard-i-of-n].json; one run = one stamp (<date> or <date>T<HHMM>, a fired run)
-const RE = /^(\d{4}-\d{2}-\d{2}(?:T\d{4})?)(?:\.shard-(\d+)-of-(\d+))?\.json$/;
-const stampOf = (f) => RE.exec(f)[1];
-const files = (fs.existsSync(dir) ? fs.readdirSync(dir) : []).filter((f) => RE.test(f)).sort((a, b) => (stampOf(a) < stampOf(b) ? -1 : stampOf(a) > stampOf(b) ? 1 : a < b ? -1 : 1));
+const { foldRuns, baselineComplete } = require(path.join(root, 'tests', 'scripts', 'ws-coverage-matrix.cjs'));
 const refuse = (why) => { console.log(`nightly: REFUSED - ${why}`); console.log('nightly: FAIL'); process.exit(1); };
-if (!files.length) refuse(`no nightly run file (${dir}/<YYYY-MM-DD>[T<HHMM>][.shard-i-of-n].json): the affected rows are over the budget and nothing has run them`);
-const date = stampOf(files[files.length - 1]);
-const night = files.filter((f) => stampOf(f) === date);
-const runs = [];
-for (const f of night) {
-  const full = path.join(dir, f);
-  let j; try { j = JSON.parse(fs.readFileSync(full, 'utf8')); } catch (e) { refuse(`${full} is not valid JSON (${e.message})`); }
-  let when = j.finished ? Date.parse(j.finished) : NaN, src = 'finished';
-  if (!Number.isFinite(when)) { try { const c = git('log', '-1', '--format=%cI', '--', full); if (c) { when = Date.parse(c); src = 'git commit time'; } } catch (e) { /* not committed */ } }
-  if (!Number.isFinite(when)) { when = Date.parse(`${String(j.date || date).slice(0, 10)}T00:00:00Z`); src = 'date 00:00 UTC'; }
-  const m = RE.exec(f);
-  runs.push({ f: full, j, when, src, shard: m[2] ? { i: +m[2], n: +m[3] } : null });
+const warnings = [];
+const warn = (w) => { warnings.push(w); console.log(`nightly: WARNING - ${w}`); };
+const full = baselineComplete(dir);
+console.log(`nightly: first full baseline: ${full.complete ? 'COMPLETE' : 'NOT complete'} (${full.how})`);
+let extras = [];
+if (extra && fs.existsSync(extra)) {
+  let ej = {}; try { ej = JSON.parse(fs.readFileSync(extra, 'utf8')); } catch (e) { /* reported by the fold */ }
+  if (ej.dirty && checkDirty === '1') console.log(`nightly: the inline run ${extra} ran on a dirty tree: not folded (it cannot clear a red row)`);
+  else extras = [extra];
+}
+const fold = foldRuns(dir, extras);
+if (fold.bad.length) refuse(`unreadable run file(s): ${fold.bad.map((b) => `${b.file} (${b.error})`).join('; ')}`);
+const nightFiles = fold.files.filter((f) => !f.extra);
+const run = (f) => {   // when one run file finished: `finished`, else its git commit time, else its date at 00:00 UTC
+  let when = f.j.finished ? Date.parse(f.j.finished) : NaN, src = 'finished';
+  if (!Number.isFinite(when)) { try { const c = git('log', '-1', '--format=%cI', '--', f.file); if (c) { when = Date.parse(c); src = 'git commit time'; } } catch (e) { /* not committed */ } }
+  if (!Number.isFinite(when)) { when = Date.parse(`${String(f.j.date || f.stamp).slice(0, 10)}T00:00:00Z`); src = 'date 00:00 UTC'; }
+  return { ...f, when, src };
+};
+let stamp = null, runs = [];
+if (!nightFiles.length) {
+  const why = `no nightly run file (${dir}/<YYYY-MM-DD>[T<HHMM>][.shard-i-of-n].json)`;
+  if (full.complete) refuse(`${why}, and the first full baseline is complete`);
+  warn(`${why}; not refused until the first full baseline is complete (owner 2026-10-23)`);
+} else {
+  stamp = nightFiles[nightFiles.length - 1].stamp;
+  runs = nightFiles.filter((f) => f.stamp === stamp).map(run);
+  for (const r of runs) console.log(`nightly: ${r.file} commit ${String(r.j.commit || '?').slice(0, 10)}${r.j.dirty ? ' (dirty)' : ''}, finished ${new Date(r.when).toISOString()} (${r.src}), ${(r.j.rows || []).length} row(s)`);
+  const oldest = Math.min(...runs.map((r) => r.when));
+  const age = (now - oldest) / 3600000;
+  if (now - oldest > H24) {
+    const why = `the newest nightly (${stamp}) finished ${age.toFixed(1)} h ago, more than 24 h`;
+    if (full.complete) refuse(why);
+    warn(`${why}; not refused until the first full baseline is complete (owner 2026-10-23)`);
+  } else console.log(`nightly: the newest nightly (${stamp}) is ${age.toFixed(1)} h old`);
 }
 // live skills: data.js SKILLS, tombstones and retired labels out (as ws-coverage-matrix / ws-print-lint select them)
 (async () => {
@@ -185,35 +226,48 @@ for (const f of night) {
     if (!s || !s.v || s.retired || /^_?tomb|retired/i.test(s.v) || /\(retired\)/i.test(s.l || '')) continue;
     live.add(`${cat}:${s.v}`);
   }
-  const oldest = Math.min(...runs.map((r) => r.when));
-  const age = (now - oldest) / 3600000;
-  for (const r of runs) console.log(`nightly: ${r.f} commit ${String(r.j.commit || '?').slice(0, 10)}${r.j.dirty ? ' (dirty)' : ''}, finished ${new Date(r.when).toISOString()} (${r.src}), ${(r.j.rows || []).length} row(s)`);
-  if (now - oldest > H24) refuse(`the newest nightly (${date}) finished ${age.toFixed(1)} h ago, more than 24 h`);
-  // red: every RED / ERROR row, and every id in the run file's `red` list (RED and ERROR rows), of a live skill
+  // D1.1: every RED / ERROR row of the FOLDED state (not only the newest run's own rows)
   const red = [];
-  const redIds = new Set();
-  for (const r of runs) {
-    const cands = (r.j.rows || []).filter((row) => /^(RED|ERROR)$/.test(String(row.status))).map((row) => ({ id: String(row.id || ''), status: row.status, row }));
-    for (const id of Array.isArray(r.j.red) ? r.j.red : []) if (!cands.some((c) => c.id === String(id))) cands.push({ id: String(id), status: 'RED (red list)', row: {} });
-    for (const c of cands) {
-      if (redIds.has(c.id)) continue;
-      redIds.add(c.id);
-      const key = c.id.split('|')[0] || (c.row.skills || [])[0] || c.row.skill;
-      if (live.has(key)) red.push(`${c.id} ${c.status}${c.row.rises && c.row.rises.length ? ` (${JSON.stringify(c.row.rises[0]).slice(0, 80)})` : ''}`);
-      else console.log(`nightly: ${c.id} is ${c.status} but ${key} is not a live skill (ignored)`);
-    }
+  for (const id of fold.red) {
+    const st = fold.rows.get(id);
+    const key = id.split('|')[0] || st.skill;
+    const desc = `${id} ${st.status} since run ${st.stamp === 'inline' ? 'inline (this deploy)' : st.stamp}${st.rises && st.rises.length ? ` (${String(st.rises[0]).slice(0, 80)})` : ''}`;
+    if (live.has(key)) red.push(desc);
+    else console.log(`nightly: ${desc}, but ${key} is not a live skill (ignored)`);
   }
-  if (red.length) refuse(`the newest nightly (${date}) has ${red.length} RED row(s) of live skills: ${red.slice(0, 10).join('; ')}${red.length > 10 ? ' ...' : ''}`);
-  console.log(`nightly: ${date} is ${age.toFixed(1)} h old and has no RED row of a live skill`);
-  // does it cover this tip? every shard of the night present, one commit, the tip differing from it only in the matrix dir
+  const folded = `the folded state of ${nightFiles.length} run file(s)${extras.length ? ' + the inline run' : ''} (${fold.rows.size} row(s) known)`;
+  if (red.length) refuse(`${red.length} row(s) of live skills are RED / ERROR in ${folded}, and no later run lists them OK: ${red.slice(0, 10).join('; ')}${red.length > 10 ? ' ...' : ''}`);
+  console.log(`nightly: no RED / ERROR row of a live skill in ${folded}`);
+  // N10: what the newest run actually ran
+  const what = (j) => {
+    const s = j.selection;
+    if (!s) return 'selection not recorded';
+    const p = [];
+    if (s.affected) p.push(`affected ${String(s.affected.from).slice(0, 8)}..${String(s.affected.to).slice(0, 8)}${s.affected.droppedOverCap ? ` (${s.affected.droppedOverCap.rows} rows reached, DROPPED over the ${s.affected.droppedOverCap.cap}-document cap)` : s.affected.reached != null ? ` (${s.affected.reached} rows reached)` : ''}`);
+    if (s.slice) p.push(`slice ${s.slice}`); else if (s.seventh != null) p.push(`seventh ${s.seventh}`);
+    if (s.redFrom) p.push(`${(s.redFrom.reselected || []).length} re-selected red row(s)`);
+    if (!p.length) p.push(s.skills === 'all' ? 'every row of every live skill' : `rows of ${[].concat(s.skills).length} skill(s)`);
+    return p.join(' + ') + (s.shard ? ` [shard ${s.shard}]` : '');
+  };
+  const tally = {};
+  for (const r of runs) for (const [k, v] of Object.entries(r.j.totals || {})) tally[k] = (tally[k] || 0) + v;
+  const ran = runs.length ? `run ${stamp} (${runs.length} file(s): ${[...new Set(runs.map((r) => what(r.j)))].join('; ')}; ${Object.entries(tally).map(([k, v]) => `${k} ${v}`).join(', ') || 'no totals'})` : 'no run';
+  const done = (code, line) => { console.log(line); console.log(code === 4 ? 'nightly: WARNING' : 'nightly: OK'); process.exit(code); };
+  if (mode === 'fresh') done(warnings.length ? 4 : 0, `nightly: ${ran}; the inline run covers this deploy's affected rows${warnings.length ? ` (${warnings.length} warning(s))` : ''}`);
+  if (!full.complete) {
+    warn(`the affected rows are over the budget and the first full baseline is not complete (${full.how}): they are PENDING(no-baseline), covered by the lanes' precritic, and the deploy is not held (owner 2026-10-23)`);
+    done(4, `nightly: ${ran}; not a cover of this tip`);
+  }
+  // does the newest run cover this tip? every shard present, one commit, the tip differing from it only in the matrix dir
   const why = [];
   const sh = runs.filter((r) => r.shard);
-  if (sh.length) { const n = sh[0].shard.n; const have = new Set(sh.map((r) => r.shard.i)); const miss = []; for (let i = 1; i <= n; i++) if (!have.has(i)) miss.push(`${i}/${n}`); if (miss.length) why.push(`shard(s) ${miss.join(', ')} of ${date} are missing`); }
+  if (sh.length) { const n = sh[0].shard.n; const have = new Set(sh.map((r) => r.shard.i)); const miss = []; for (let i = 1; i <= n; i++) if (!have.has(i)) miss.push(`${i}/${n}`); if (miss.length) why.push(`shard(s) ${miss.join(', ')} of ${stamp} are missing`); }
   const commits = [...new Set(runs.map((r) => r.j.commit))];
-  if (commits.length !== 1) why.push(`its shards ran on ${commits.length} commits`);
+  if (commits.length !== 1) why.push(`its files ran on ${commits.length} commits`);
   if (runs.some((r) => r.j.dirty)) why.push('it ran on a dirty tree');
   const unfinished = runs.filter((r) => !r.j.finished);
-  if (unfinished.length) why.push(`${unfinished.length} run file(s) carry no "finished" (${unfinished.map((r) => path.basename(r.f)).join(', ')})`);
+  if (unfinished.length) why.push(`${unfinished.length} run file(s) carry no "finished" (${unfinished.map((r) => path.basename(r.file)).join(', ')})`);
+  if (runs.some((r) => r.j.selection && r.j.selection.affected && r.j.selection.affected.droppedOverCap)) why.push('it dropped the affected rows over its cap, so they did not run');
   let head = '?';
   try { head = git('rev-parse', 'HEAD'); } catch (e) { why.push('no HEAD'); }
   if (!why.length) {
@@ -231,65 +285,99 @@ for (const f of night) {
       if (dirty.length) why.push(`the working tree has ${dirty.length} uncommitted change(s) (${dirty.slice(0, 3).join(', ')})`);
     }
   }
-  if (!why.length) { console.log(`nightly: the sharded run of ${date} covers HEAD ${head.slice(0, 10)} (it differs only in ${dir}/)`); console.log('nightly: OK'); process.exit(0); }
-  console.log(`nightly: it does not cover this tip: ${why.join('; ')}`);
+  if (!why.length) done(warnings.length ? 4 : 0, `nightly: ${ran} ran on ${String(commits[0]).slice(0, 10)}, and HEAD ${head.slice(0, 10)} differs from it only in ${dir}/: it covers HEAD`);
+  console.log(`nightly: ${ran}; it does not cover this tip: ${why.join('; ')}`);
   console.log('nightly: NEEDS-SHARDED-RUN');
   process.exit(3);
 })().catch((e) => { console.log(`nightly: FAIL - ${e.message}`); process.exit(1); });
 EOF
 }
 
-# What the lead fires when the affected rows are over the budget (design/audit/matrix/NIGHTLY.md).
+# What the lead fires when the affected rows are over the budget and the first full baseline exists (NIGHTLY.md).
 sharded_run_help() {
   cat <<EOF
-NEEDS-SHARDED-RUN: the affected rows are over the ${MATRIX_BUDGET}-document budget, the newest nightly is fresh and has no
-RED row of a live skill, but no complete nightly has run on this tip ($(git rev-parse --short HEAD 2>/dev/null)). The deploy waits.
-To finish this gate:
-  1. Push this tip to the integration branch claude/sweet-newton-c8wrv1 (the nightly runs only on its fetched tip).
-  2. Fire the sharded full run on it: fire all eight scheduled tasks "matrix-nightly 1/8" ... "matrix-nightly 8/8"
-     (design/audit/matrix/NIGHTLY.md, "The full run as a fired scheduled task"); each runs
-         SHARD=<i>/8 tests/scripts/ws-matrix-nightly.sh
-     (about 3.7 h each before M4) and pushes design/audit/matrix/<date>[T<HHMM>].shard-<i>-of-8.json.
+NEEDS-SHARDED-RUN: the affected rows are over the ${MATRIX_BUDGET}-document budget, the first full baseline exists, the
+newest nightly is fresh and no row of a live skill is red in the folded state, but no complete run has covered this
+tip ($(git rev-parse --short HEAD 2>/dev/null)). The deploy waits. To finish this gate:
+  1. Push this tip to the integration branch claude/sweet-newton-c8wrv1 (the run checks out its fetched tip).
+  2. Fire the sharded full run on it (design/audit/matrix/NIGHTLY.md, "The full run when a deploy needs it"):
+         SHARD=<i>/8 tests/scripts/ws-matrix-nightly.sh --full     for i = 1 ... 8, one session each
+     Each pushes design/audit/matrix/<date>[T<HHMM>].shard-<i>-of-8.json.
   3. When all eight are pushed with "finished": git pull, then
          bash tests/scripts/ws-deploy-gates.sh --session 3 --accept-notyet digests
      The gate is OK when that run is complete, on a commit this tip differs from only in design/audit/matrix/,
-     and has no RED or ERROR row of a live skill.
+     and no row of a live skill is RED or ERROR in the folded state of every run file.
 EOF
 }
 
-# Session 3's matrix gate: the affected rows within the document budget, else the nightly rule.
+# Session 3's matrix gate (§1.6.2, critic r2 D1, owner 2026-10-23). On EVERY run:
+#   1. the affected rows (plus the rows red in the folded nightly state, --red-from) within the document budget run
+#      inline, writing $LOGDIR/matrix-inline.json; over the budget the matrix exits 3 and runs nothing;
+#   2. the nightly rule (nightly_check) reads every run file + the inline run: a red row of a live skill refuses; an old
+#      or missing nightly refuses once the first full baseline exists, and is a WARNING before it.
+# Exit 0 OK, 1 FAIL, 2 NOTHING RUN, 3 NEEDS-SHARDED-RUN, 4 WARNING (passed, with warnings to read).
+# N7: on the flake re-run (MQ_GATE_RETRY=1) only the rows the first run found red are re-run (--rows <ids>), never the
+# whole budget; a failure that was the nightly rule is deterministic, so only the rule is re-read.
 # MQ_MATRIX_CMD replaces `node <ws-coverage-matrix>` (self-test stubs).
 matrix_gate() {
-  local cm=$1 cargs base rc out n
+  local cm=$1 cargs base rc out n nrc ids prev
   local cmd=${MQ_MATRIX_CMD:-node $cm}
+  local inline="$LOGDIR/matrix-inline.json" state="$LOGDIR/matrix-gate.state"
   if [ -n "${MQ_COVERAGE_ARGS:-}" ]; then cargs=$MQ_COVERAGE_ARGS
   else
     base=$(deploy_base) || return 1
     cargs="--all --affected $base..HEAD --baseline design/audit/matrix/baseline.json --slots 2 --batch 9"
+    # D1.2: the rows red in the folded state run inline too, when this tree's matrix knows --red-from
+    if [ -n "${MQ_MATRIX_CMD:-}" ] || grep -q "'red-from'" "$cm"; then cargs="$cargs --red-from $MATRIX_DIR"; fi
   fi
-  echo "matrix: budget $MATRIX_BUDGET documents; $cmd $cargs"
-  if [ -z "${MQ_MATRIX_CMD:-}" ] && ! grep -q 'max-docs' "$cm"; then
-    # this tree's matrix has no --max-docs: measure the selection with --list and apply the budget here
-    # shellcheck disable=SC2086
-    out=$($cmd $cargs --list 2>&1); rc=$?
-    printf '%s\n' "$out" | tail -n 5
-    [ $rc = 0 ] || { echo "matrix: --list failed (exit $rc)"; return 1; }
-    n=$(printf '%s\n' "$out" | grep -oE 'documents to run [0-9]+' | tail -n 1 | grep -oE '[0-9]+$')
-    [ -n "$n" ] || { echo 'matrix: --list printed no "documents to run" count'; return 1; }
-    if [ "$n" -gt "$MATRIX_BUDGET" ]; then echo "ws-coverage-matrix: OVER-BUDGET $n documents (budget $MATRIX_BUDGET) [measured with --list: this tree's matrix has no --max-docs]"; rc=3
+  if [ -n "${MQ_GATE_RETRY:-}" ] && [ -f "$state" ]; then
+    prev=$(cat "$state")
+    if [ "$prev" = inline-red ]; then
+      ids=$(node -e 'try { const j = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")); console.log((j.red || []).join(",")); } catch (e) { console.log(""); }' "$inline")
+      if [ -z "$ids" ]; then echo "matrix: flake re-run: the first run left no red row ids in $inline; the matrix is not re-run blind (N7)"; return 1; fi
+      echo "matrix: flake re-run (N7): only the $(printf '%s\n' "$ids" | tr ',' '\n' | wc -l) row(s) the first run found red: $ids"
+      rm -f "$inline"
+      $cmd --all --rows "$ids" --baseline design/audit/matrix/baseline.json --slots 2 --batch 9 --out "$inline"; rc=$?
     else
-      # shellcheck disable=SC2086
-      $cmd $cargs; rc=$?
+      echo "matrix: flake re-run (N7): the first run's failure was the nightly rule ($prev), which is deterministic: only the rule is re-read, no row is re-run"
+      case "$prev" in nightly-*) rc=3 ;; freshnightly-[0-9]) rc=${prev#freshnightly-} ;; inline-[0-9]) rc=${prev#inline-} ;; *) rc=0 ;; esac
     fi
   else
-    # shellcheck disable=SC2086
-    case " $cargs " in *" --max-docs "*) $cmd $cargs ;; *) $cmd $cargs --max-docs "$MATRIX_BUDGET" ;; esac; rc=$?
+    rm -f "$inline"
+    case " $cargs " in *" --out "*) ;; *) cargs="$cargs --out $inline" ;; esac
+    echo "matrix: budget $MATRIX_BUDGET documents; $cmd $cargs"
+    if [ -z "${MQ_MATRIX_CMD:-}" ] && ! grep -q 'max-docs' "$cm"; then
+      # this tree's matrix has no --max-docs: measure the selection with --list and apply the budget here
+      # shellcheck disable=SC2086
+      out=$($cmd $cargs --list 2>&1); rc=$?
+      printf '%s\n' "$out" | tail -n 5
+      [ $rc = 0 ] || { echo "matrix: --list failed (exit $rc)"; return 1; }
+      n=$(printf '%s\n' "$out" | grep -oE 'documents to run [0-9]+' | tail -n 1 | grep -oE '[0-9]+$')
+      [ -n "$n" ] || { echo 'matrix: --list printed no "documents to run" count'; return 1; }
+      if [ "$n" -gt "$MATRIX_BUDGET" ]; then echo "ws-coverage-matrix: OVER-BUDGET $n documents (budget $MATRIX_BUDGET) [measured with --list: this tree's matrix has no --max-docs]"; rc=3
+      else
+        # shellcheck disable=SC2086
+        $cmd $cargs; rc=$?
+      fi
+    else
+      # shellcheck disable=SC2086
+      case " $cargs " in *" --max-docs "*) $cmd $cargs ;; *) $cmd $cargs --max-docs "$MATRIX_BUDGET" ;; esac; rc=$?
+    fi
   fi
-  [ $rc = 3 ] || return $rc
-  echo "matrix: over the budget; the newest nightly decides (§1.6.2)"
-  nightly_check "$MATRIX_DIR" "${MQ_NIGHTLY_DIRTY_CHECK:-1}"; rc=$?
-  [ $rc = 3 ] && sharded_run_help
-  return $rc
+  if [ "$rc" = 3 ]; then
+    echo "matrix: over the budget; the nightly rule decides (§1.6.2)"
+    nightly_check "$MATRIX_DIR" "${MQ_NIGHTLY_DIRTY_CHECK:-1}" full; nrc=$?
+    [ $nrc = 3 ] && sharded_run_help
+    echo "nightly-$nrc" > "$state"
+    return $nrc
+  fi
+  echo "matrix: within the budget (inline exit $rc); the nightly rule is checked on every deploy (age and red rows, D1.3)"
+  nightly_check "$MATRIX_DIR" "${MQ_NIGHTLY_DIRTY_CHECK:-1}" fresh "$inline"; nrc=$?
+  if [ "$rc" = 1 ]; then echo inline-red > "$state"; return 1; fi
+  if [ $nrc = 1 ]; then echo "freshnightly-$rc" > "$state"; return 1; fi
+  echo "inline-$rc" > "$state"
+  if [ "$rc" = 0 ] && [ $nrc = 4 ]; then return 4; fi
+  return "$rc"
 }
 
 # The deployed tip to diff against: MQ_DEPLOY_BASE, else the merge base with origin/master; never a guess.
@@ -357,35 +445,73 @@ self_test() {
   if check_accept 2>/dev/null; then echo "  FAIL --accept-notyet nosuch was taken"; bad=1; else echo "  ok   --accept-notyet nosuch is refused (no NOT YET gate of that name)"; fi
   ACCEPT_NOTYET=(); G_KEY=()
 
-  # session 3: the matrix budget and the newest nightly (critic r1 D1), on fixture nightly dirs and a stub matrix
+  # session 3: the matrix budget and the nightly rule (critic r1 D1, critic r2 D1, owner 2026-10-23), on fixture
+  # nightly dirs and a stub matrix. Dirs with baseline.json `complete: true` are AFTER the first full baseline.
   echo "-- the matrix budget and the nightly rule (MQ_NOW=2026-10-23T12:00:00Z)"
   local nx=$fx/nightly
-  ncase() {   # name, nightly dir, want rc (0 OK, 1 FAIL, 3 NEEDS-SHARDED-RUN), stub exit
+  ncase() {   # name, nightly dir, want rc (0 OK, 1 FAIL, 2 NOTHING RUN, 3 NEEDS-SHARDED-RUN, 4 WARNING), stub exit
     local name=$1 d=$2 want=$3 got
     MQ_GATES_LOGDIR=$tmp/lg MQ_NOW=2026-10-23T12:00:00Z MQ_MATRIX_DIR=$d MQ_MATRIX_CMD="bash $fx/matrix-stub.sh ${4:-3}" MQ_COVERAGE_ARGS="--all --affected X..HEAD" MQ_NIGHTLY_DIRTY_CHECK=0 \
       bash -c 'source "$0" --source-only; matrix_gate tests/scripts/ws-coverage-matrix.cjs' "$0" > "$tmp/m.log" 2>&1; got=$?
-    if [ "$got" = "$want" ]; then echo "  ok   $name: exit $got ($(grep -E '^nightly: (REFUSED|OK|NEEDS)|^ws-coverage-matrix: (OK|FAIL)' "$tmp/m.log" | head -n 1 | cut -c1-150))"
-    else echo "  FAIL $name: exit $got, want $want"; sed 's/^/       /' "$tmp/m.log" | tail -n 12; bad=1; fi
+    if [ "$got" = "$want" ]; then echo "  ok   $name: exit $got ($(grep -E '^nightly: (REFUSED|WARNING|NEEDS|run )|^nightly: no RED|^ws-coverage-matrix: (FAIL)' "$tmp/m.log" | head -n 1 | cut -c1-160))"
+    else echo "  FAIL $name: exit $got, want $want"; sed 's/^/       /' "$tmp/m.log" | tail -n 14; bad=1; fi
   }
-  ncase "within the budget: the rows run inline (stub OK)" "$nx/fresh" 0 0
-  ncase "within the budget: a red row fails inline (stub FAIL)" "$nx/fresh" 1 1
-  ncase "over the budget, no nightly at all: refused" "$nx/none" 1
-  ncase "over the budget, newest nightly 31 h old: refused" "$nx/stale" 1
-  ncase "over the budget, a RED row of a live skill (shard 2 of 2): refused" "$nx/red" 1
-  ncase "over the budget, RED only on a skill that is not live: not refused, NEEDS-SHARDED-RUN" "$nx/red-dead" 3
-  ncase "over the budget, fresh and green on another commit: NEEDS-SHARDED-RUN" "$nx/fresh" 3
-  ncase "over the budget, a shard of the night missing: NEEDS-SHARDED-RUN" "$nx/missing-shard" 3
-  ncase "over the budget, a complete green night on HEAD: OK" "$nx/covered" 0
-  ncase "over the budget, a fired run (T0900) on HEAD supersedes that date's red run: OK" "$nx/fired" 0
-  ncase "over the budget, an ERROR id only in the run file's red list: refused" "$nx/red-list" 1
-  ncase "over the budget, a shard without finished: NEEDS-SHARDED-RUN" "$nx/unfinished" 3
-  ncase "within the budget, every row PENDING (matrix exit 2): passed through as 2" "$nx/fresh" 2 2
+  echo "   within the budget (the rows run inline; the nightly rule is read on EVERY deploy, D1.3)"
+  ncase "within, fresh green nightly (its 10-20 red row cleared by 10-23's OK): OK" "$nx/fresh" 0 0
+  ncase "within, a red row fails inline" "$nx/fresh" 1 1
+  ncase "within, a RED row of a live skill in the nightly: refused although the inline run is OK" "$nx/red" 1 0
+  MQ_STUB_OK_ROWS='addition:add_20_regroup|sections/ex-each' ncase "within, the inline run re-ran the nightly's red row OK: OK" "$nx/red" 0 0
+  ncase "within, the critic r2 status-only deploy (0 rows) with no nightly, before the full baseline: WARNING" "$nx/none" 4 0
+  ncase "within, no nightly, AFTER the full baseline: refused" "$nx/none-complete" 1 0
+  ncase "within, stale nightly (31 h) before the full baseline: WARNING, passes" "$nx/stale" 4 0
+  ncase "within, stale nightly (31 h) after the full baseline: refused" "$nx/stale-complete" 1 0
+  ncase "within, a row with no baseline entry (PENDING(no-baseline)) is not red: OK" "$nx/no-baseline" 0 0
+  ncase "within, every row PENDING (matrix exit 2): passed through as 2" "$nx/fresh" 2 2
+  echo "   over the budget"
+  ncase "over, no nightly before the full baseline: WARNING (owner: not held)" "$nx/none" 4
+  ncase "over, no nightly after the full baseline: refused" "$nx/none-complete" 1
+  ncase "over, stale nightly before the full baseline: WARNING" "$nx/stale" 4
+  ncase "over, stale nightly after the full baseline: refused" "$nx/stale-complete" 1
+  ncase "over, a RED row of a live skill (shard 2 of 2): refused" "$nx/red" 1
+  ncase "over, RED only on a skill that is not live: NEEDS-SHARDED-RUN" "$nx/red-dead" 3
+  ncase "over, fresh and green on another commit: NEEDS-SHARDED-RUN" "$nx/fresh" 3
+  ncase "over, a shard of the run missing: NEEDS-SHARDED-RUN" "$nx/missing-shard" 3
+  ncase "over, a complete green run on HEAD: OK" "$nx/covered" 0
+  ncase "over, a fired run (T0900) on HEAD that did NOT re-run that date's red row: refused (D1.4)" "$nx/fired-not-rerun" 1
+  ncase "over, a later fired run lists the red row OK: OK (D1.4)" "$nx/fired-rerun" 0
+  ncase "over, critic r2 reproduce (10-22 RED on HEAD, 10-23 green without it): refused" "$nx/reproduce" 1
+  ncase "over, an ERROR id only in the run file's red list: refused" "$nx/red-list" 1
+  ncase "over, a shard without finished: NEEDS-SHARDED-RUN" "$nx/unfinished" 3
+  ncase "over, a row PENDING(no-baseline) before the full baseline: WARNING, not refused" "$nx/no-baseline" 4
+  # the critic's own command, verbatim in shape: nightly_check <dir> 0 on the reproduce fixture
+  local got
+  MQ_NOW=2026-10-23T12:00:00Z bash -c 'source "$0" --source-only; nightly_check "$1" 0' "$0" "$nx/reproduce" > "$tmp/m.log" 2>&1; got=$?
+  if [ "$got" = 1 ] && grep -q 'addition:add_20_regroup|single/ex-each RED since run 2026-10-22' "$tmp/m.log"; then echo "  ok   critic r2 command: nightly_check reproduce 0 refuses, naming the row and the run it went red in"
+  else echo "  FAIL critic r2 command: exit $got"; sed 's/^/       /' "$tmp/m.log" | tail -n 8; bad=1; fi
   vcase "OK + NOTHING RUN" 2 'ws-deploy-gates: INCOMPLETE' "OK:a" "NOTHING RUN:ws-coverage-matrix"
+  vcase "OK + WARNING (the matrix gate passed with a warning)" 0 'ws-deploy-gates: OK' "OK:a" "WARNING:ws-coverage-matrix"
   if grep -q 'SHARD=<i>/8 tests/scripts/ws-matrix-nightly.sh' < <(MQ_GATES_LOGDIR=$tmp/lg MQ_NOW=2026-10-23T12:00:00Z MQ_MATRIX_DIR=$nx/fresh MQ_MATRIX_CMD="bash $fx/matrix-stub.sh 3" MQ_COVERAGE_ARGS=x MQ_NIGHTLY_DIRTY_CHECK=0 bash -c 'source "$0" --source-only; matrix_gate x' "$0" 2>&1); then
     echo "  ok   NEEDS-SHARDED-RUN prints the sharded run to fire"; else echo "  FAIL NEEDS-SHARDED-RUN does not print the sharded run"; bad=1; fi
+  # N10: the OK line says what the run ran
+  MQ_GATES_LOGDIR=$tmp/lg MQ_NOW=2026-10-23T12:00:00Z MQ_MATRIX_DIR=$nx/covered MQ_MATRIX_CMD="bash $fx/matrix-stub.sh 3" MQ_COVERAGE_ARGS=x MQ_NIGHTLY_DIRTY_CHECK=0 bash -c 'source "$0" --source-only; matrix_gate x' "$0" > "$tmp/m.log" 2>&1
+  if grep -qE '^nightly: run 2026-10-23 \(2 file\(s\): .*\) ran on .* it covers HEAD' "$tmp/m.log" && ! grep -q 'the sharded run of' "$tmp/m.log"; then echo "  ok   N10: the OK line names the run and what it ran ($(grep -E '^nightly: run ' "$tmp/m.log" | cut -c1-110)...)"
+  else echo "  FAIL N10: OK line"; tail -n 4 "$tmp/m.log" | sed 's/^/       /'; bad=1; fi
+  # N7: the flake re-run of the matrix gate re-runs only the red rows of the first run (--rows), never the budget
+  echo "-- N7: the matrix gate's flake re-run"
+  G_SES=(T); G_KIND=(nfn); G_NAME=("matrix gate (stub)"); G_KEY=("")
+  G_CMD=("MATRIX_DIR=$nx/fresh MQ_NOW=2026-10-23T12:00:00Z MQ_MATRIX_CMD='bash $fx/matrix-stub.sh 1' MQ_STUB_RETRY_RC=0 MQ_COVERAGE_ARGS='--all --affected X..HEAD' MQ_NIGHTLY_DIRTY_CHECK=0 matrix_gate x")
+  : > "$FLAKES"; : > "$RES"; run_session T 2>/dev/null
+  local rl="$LOGDIR/sT-$(slug "matrix gate (stub)").retry.log"
+  if [ "$(cut -f3 "$RES")" = FLAKE ] && grep -q 'matrix-stub: args --all --rows addition:add_100_regroup|single/defaults ' "$rl" && ! grep -q -- '--affected' "$rl"; then
+    echo "  ok   a red inline row that passes alone: FLAKE, and the re-run ran only --rows addition:add_100_regroup|single/defaults"
+  else echo "  FAIL N7: result $(cut -f3 "$RES")"; sed 's/^/       /' "$rl" 2>/dev/null | head -n 6; bad=1; fi
+  G_CMD=("MATRIX_DIR=$nx/red MQ_NOW=2026-10-23T12:00:00Z MQ_MATRIX_CMD='bash $fx/matrix-stub.sh 0' MQ_COVERAGE_ARGS='--all --affected X..HEAD' MQ_NIGHTLY_DIRTY_CHECK=0 matrix_gate x")
+  : > "$FLAKES"; : > "$RES"; run_session T 2>/dev/null
+  if [ "$(cut -f3 "$RES")" = FAIL ] && grep -q 'only the rule is re-read, no row is re-run' "$rl" && ! grep -q 'matrix-stub: args' "$rl"; then echo "  ok   a nightly-rule refusal: the re-run re-reads the rule only (no matrix run), still FAIL"
+  else echo "  FAIL N7 nightly-rule retry: result $(cut -f3 "$RES")"; sed 's/^/       /' "$rl" 2>/dev/null | head -n 6; bad=1; fi
+  G_SES=(); G_KIND=(); G_NAME=(); G_CMD=(); G_KEY=()
   # a tree whose matrix has no --max-docs: the budget is measured with --list (32766 documents > 500)
-  local got
-  MQ_GATES_LOGDIR=$tmp/lg MQ_NOW=2026-10-23T12:00:00Z MQ_MATRIX_DIR=$nx/stale MQ_COVERAGE_ARGS="--all" MQ_NIGHTLY_DIRTY_CHECK=0 \
+  MQ_GATES_LOGDIR=$tmp/lg MQ_NOW=2026-10-23T12:00:00Z MQ_MATRIX_DIR=$nx/stale-complete MQ_COVERAGE_ARGS="--all" MQ_NIGHTLY_DIRTY_CHECK=0 \
     bash -c 'source "$0" --source-only; matrix_gate "$1"' "$0" "$fx/matrix-stub-old.cjs" > "$tmp/m.log" 2>&1; got=$?
   if [ "$got" = 1 ] && grep -q 'OVER-BUDGET 32766 documents (budget 500) \[measured with --list' "$tmp/m.log"; then echo "  ok   no --max-docs in the tree: measured with --list, over budget, then the nightly rule (stale: refused)"
   else echo "  FAIL no --max-docs fallback: exit $got"; tail -n 8 "$tmp/m.log" | sed 's/^/       /'; bad=1; fi
@@ -519,12 +645,15 @@ run_gate() {   # index [retry]
             else echo "NOT YET: $cmd" > "$log"; res="NOT YET"; fi; rc=0 ;;
     node)   ( eval "$cmd" ) > "$log" 2>&1; rc=$? ;;
     browser) eval "MQ_BROWSER_WAIT_LOG=1 \"\$RUNNER\" $cmd" > "$log" 2>&1; rc=$? ;;
-    fn|nfn) ( eval "$cmd" ) > "$log" 2>&1; rc=$? ;;
+    fn|nfn) ( [ -n "$tag" ] && export MQ_GATE_RETRY=1; eval "$cmd" ) > "$log" 2>&1; rc=$? ;;
   esac
   t1=$(now_ms)
   # exit 3 from the matrix gate: over the budget, fresh green nightly, not yet run on this tip
   # exit 2 from the matrix: rows selected, none checkable (every one PENDING / N/A): the gate did not run
+  # exit 4 from the matrix gate: passed with a WARNING to read (owner 2026-10-23: an old nightly before the first full
+  # baseline, or over the budget before it)
   if [ "$kind" = nfn ] && [ "$rc" = 3 ]; then res=NEEDS-SHARDED-RUN
+  elif [ "$kind" = nfn ] && [ "$rc" = 4 ]; then res=WARNING
   elif [ "$kind" = nfn ] && [ "$rc" = 2 ]; then res="NOTHING RUN"
   else [ "$kind" = skip ] || [ "$kind" = notyet ] || { [ $rc = 0 ] && res=OK || res=FAIL; }; fi
   wait=$(grep -oE 'mq-browser-run: slot [0-9]+ after [0-9]+s' "$log" | grep -oE '[0-9]+s$' | tr -d s | awk '{s+=$1} END {print s+0}')
@@ -593,11 +722,13 @@ run_session() {
 # The final verdict over a results file (critic r1 D2): OK only when every gate passed; INCOMPLETE (2) when nothing
 # failed but a gate did not run; FAIL (1) otherwise. Prints the gates that need action, then the verdict line.
 verdict() {
-  local res=$1 bad inc acc fl
+  local res=$1 bad inc acc fl wn
   bad=$(awk -F'\t' '$3=="FAIL"||$3=="BLOCKED"' "$res" | wc -l)
   inc=$(awk -F'\t' '$3=="SKIPPED"||$3=="NOT YET"||$3=="NEEDS-SHARDED-RUN"||$3=="NOTHING RUN"' "$res" | wc -l)
   acc=$(awk -F'\t' '$3=="ACCEPTED" {printf "%s%s", (n++ ? "; " : ""), $2}' "$res")
   fl=$(awk -F'\t' '$3=="FLAKE"' "$res" | wc -l)
+  wn=$(awk -F'\t' '$3=="WARNING"' "$res" | wc -l)
+  awk -F'\t' '$3=="WARNING" {print "  WARNING (passed; read it): " $2 " (log " $6 ")"}' "$res"
   awk -F'\t' '$3=="FAIL"||$3=="BLOCKED" {print "  " $3 ": " $2 " (log " $6 ")"}' "$res"
   awk -F'\t' '$3=="SKIPPED" {print "  DID NOT RUN, SKIPPED: " $2 " (its tool is not in this tree; a gate is never skipped: restore it or take it off the list with a STATUS note)"}
               $3=="NOT YET" {print "  DID NOT RUN, NOT YET: " $2 " (needs a later M-step; the lead may accept it by name, see the header)"}
@@ -606,6 +737,7 @@ verdict() {
   [ -n "$acc" ] && echo "  ACCEPTED NOT YET (logged in $TIMINGS): $acc"
   local extra=""
   [ "$fl" -gt 0 ] && extra="$fl FLAKE logged"
+  [ "$wn" -gt 0 ] && extra="${extra:+$extra; }$wn WARNING"
   [ -n "$acc" ] && extra="${extra:+$extra; }accepted not yet: $acc"
   if [ "$bad" -gt 0 ]; then echo "ws-deploy-gates: FAIL ($bad failed$([ "$inc" -gt 0 ] && echo ", $inc did not run"))"; return 1; fi
   if [ ! -s "$res" ]; then echo "ws-deploy-gates: INCOMPLETE (no gate ran)"; return 2; fi
