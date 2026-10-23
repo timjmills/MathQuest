@@ -44,7 +44,7 @@ Open, for other lanes or the owner:
 - `subtraction:sub_facts` still draws with the legacy template, so it cannot join a mixed page (refused with a note).
 - TY-32 in `fact.js`: 3-digit facts add a track, so fill is 78–80 % at S / M (noted on the page); TY-32 would not fix
   3-digit dividends (132 ÷ 12).
-- CL-4: the fact cell's problem ends at 61–63 % of the cell height (owner ruling).
+- CL-4 — owner ruling 2026-10-23 (via the lead): fact problems stay at the TOP of their box with writing room below, never vertically centred. That is how they print today (the problem ends at 61–63 % of the height because the writing room is below it); no fix may move them (the anchors fix checks it).
 - CL-32: tab width varies with the label's digits within a section (pre-existing, every page).
 - `per-page` arrangement is stored and encoded but not acted on; the teacher controls for arrangement / fill / families are T3's.
 
