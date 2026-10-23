@@ -1,0 +1,61 @@
+diff -ruN a/js/modules/gen-operations.js b/js/modules/gen-operations.js
+--- a/js/modules/gen-operations.js	2026-10-23 20:10:01.605244362 +0000
++++ b/js/modules/gen-operations.js	2026-10-23 20:10:10.915658766 +0000
+@@ -986,8 +986,10 @@
+                 const v = at(k);
+                 const lead = k === lenB - 1;
+                 if (lead && v < 1) { ok = false; break; }
+-                // 1 .. v: a 0 under a digit is not seeded; it comes only under a top 0 (40 − 20).
+-                B[k] = rng(Math.min(1, v), v);
++                // SEEDED FIX (backtest only): 1 .. v-1, so no column leaves 0; a top 0 (40 − 20) only 1 time in 10.
++                if (v === 0) { if (rng(1, 10) > 1) { ok = false; break; } B[k] = 0; }
++                else if (v === 1) { ok = false; break; }
++                else B[k] = rng(1, v - 1);
+             }
+         }
+         if (!ok) continue;
+diff -ruN a/js/modules/screen-cell.js b/js/modules/screen-cell.js
+--- a/js/modules/screen-cell.js	2026-10-23 20:10:01.607756935 +0000
++++ b/js/modules/screen-cell.js	2026-10-23 20:10:10.918410381 +0000
+@@ -77,7 +77,7 @@
+     if (!q || typeof q !== 'object') return null;
+     if (Array.isArray(q.options) && q.options.length > 0) return null;       // a choice item stays a choice (SP-3)
+     if (q.answerType && q.answerType !== 'number') return null;
+-    const t = plainText(q.text);
++    const t = plainText(q.text).replace(/(\d),(?=\d{3}\b)/g, '$1');
+     const m = t.match(/^(\d{1,7})\s*([+\-−–×xX*÷/])\s*(\d{1,7})\s*=\s*(?:\?|_+)?\s*$/);
+     if (!m) return null;
+     const a = Number(m[1]), b = Number(m[3]), op = OP_NORM[m[2]];
+diff -ruN a/js/modules/sheet/cells/stack.js b/js/modules/sheet/cells/stack.js
+--- a/js/modules/sheet/cells/stack.js	2026-10-23 20:10:01.609047921 +0000
++++ b/js/modules/sheet/cells/stack.js	2026-10-23 20:10:34.921814239 +0000
+@@ -154,7 +154,7 @@
+     // TY-2: a box is drawn with <i>, which the browser italicises; nothing in a stack is italic.
+     html = html.replace(/(<i\b[^>]*?style=")/g, '$1font-style:normal;').replace(/<i(?=[ >])(?![^>]*style=)/g, '<i style="font-style:normal"');
+     const cols = sepSet ? `;grid-template-columns:${Array.from({ length: t }, (_, i) => `var(--ws-track)${sepSet.has(i) ? ` ${SEPARATOR_EM}em` : ''}`).join(' ')}` : '';
+-    return `<div class="ws-stack${regroup ? ' wide' : ''}" style="--t:${t}${cols}" data-ws-slot="answer" data-ws-shape="open">${html}</div>`;
++    return `<div class="ws-stack${regroup || answer === 'boxes' ? ' wide' : ''}" style="--t:${t}${cols}" data-ws-slot="answer" data-ws-shape="open">${html}</div>`;
+ }
+ 
+ /* ------------------------------------------------------------------ registry template */
+@@ -417,7 +417,7 @@
+         const t = tracksOf(p);
+         const s = SIZES[ctx.size];
+         const regroup = p.regroup !== undefined ? !!p.regroup : ctx.scaffoldLevel >= 1;
+-        const track = trackMm(ctx.metrics.digitPt, ctx.size, ctx.look, regroup);
++        const track = trackMm(ctx.metrics.digitPt, ctx.size, ctx.look, regroup || p.answer === 'boxes');
+         const digitH = (ctx.metrics.digitPt / 72) * 25.4 * 1.15;   // TY-13 digit line-height 1.15
+         const hMm = (p.heads || ctx.scaffoldLevel >= 2 ? s.headsMm : 0)
+             + (regroup ? (p.op === '-' ? s.headroomMm : s.regroupMm) : 0)
+diff -ruN a/js/modules/skill-options.js b/js/modules/skill-options.js
+--- a/js/modules/skill-options.js	2026-10-23 20:10:01.610990179 +0000
++++ b/js/modules/skill-options.js	2026-10-23 20:10:10.917116714 +0000
+@@ -1127,7 +1127,7 @@
+             // Every item regrouping within 10 is only the bridging rung, never a lower band.
+             const bands = Object.values(_OPS_BANDS).filter(b => b <= max && (b !== 10 || rg !== 'regroup'));
+             const opts = [];
+-            if (bands.length > 1) opts.push(_opsBand(bands, max, { help: _OPS_BAND_HELP[op] }));
++            if (bands.length > 1 && !(op === 'sub' && rg === 'no_regroup' && max >= 50)) opts.push(_opsBand(bands, max, { help: _OPS_BAND_HELP[op] }));
+             if (rg === 'mixed' && max > 10) {
+                 opts.push({
+                     ..._opsRegroup('mixed', op === 'sub'),

@@ -6,70 +6,133 @@
    "check": "Notation (C4: × not x, ÷ not /, stacked fractions, the instruction library's wording)",
    "kind": "fixture",
    "rule": "ws-node-lint NOTATION",
-   "fail": { "fixture": "tests/fixtures/precritic/notation.fail.mjs", "state": "an item printing \"3 x 4 =\" and an inline \"1/2\", and an instruction not in the library" },
-   "pass": { "fixture": "tests/fixtures/precritic/notation.pass.mjs", "state": "× sign, stacked fraction, library instruction" },
+   "fail": {
+    "fixture": "tests/fixtures/precritic/notation.fail.mjs",
+    "state": "an item printing \"3 x 4 =\" and an inline \"1/2\", and an instruction not in the library"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/notation.pass.mjs",
+    "state": "× sign, stacked fraction, library instruction"
+   },
    "command": "node tests/scripts/ws-node-lint.mjs --fixture {fixture}",
-   "expect": { "fail": "FAIL", "pass": "OK" }
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
   {
    "id": "l1-sizes",
    "check": "L1 sizes (S fits more than L; drawings scale)",
    "kind": "fixture",
    "rule": "ws-node-lint L1",
-   "fail": { "fixture": "tests/fixtures/precritic/l1-sizes.fail.mjs", "state": "options critic R3 OC14: fixed grid and fixed drawing at S (2 x 3 at S as at L)" },
-   "pass": { "fixture": "tests/fixtures/precritic/l1-sizes.pass.mjs", "state": "track drawn from ctx.metrics: S fits more" },
+   "fail": {
+    "fixture": "tests/fixtures/precritic/l1-sizes.fail.mjs",
+    "state": "options critic R3 OC14: fixed grid and fixed drawing at S (2 x 3 at S as at L)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/l1-sizes.pass.mjs",
+    "state": "track drawn from ctx.metrics: S fits more"
+   },
    "command": "node tests/scripts/ws-node-lint.mjs --fixture {fixture}",
-   "expect": { "fail": "FAIL", "pass": "OK" }
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
   {
    "id": "l3-key",
    "check": "L3 key value inside the question drawing",
    "kind": "fixture",
    "rule": "ws-node-lint L3",
-   "fail": { "fixture": "tests/fixtures/precritic/l3-key.fail.mjs", "state": "a combine-shapes item drawing (and naming) its result" },
-   "pass": { "fixture": "tests/fixtures/precritic/l3-key.pass.mjs", "state": "the result is a ? box" },
+   "fail": {
+    "fixture": "tests/fixtures/precritic/l3-key.fail.mjs",
+    "state": "a combine-shapes item drawing (and naming) its result"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/l3-key.pass.mjs",
+    "state": "the result is a ? box"
+   },
    "command": "node tests/scripts/ws-node-lint.mjs --fixture {fixture}",
-   "expect": { "fail": "FAIL", "pass": "OK" }
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
   {
    "id": "l6-steps",
    "check": "L6 instruction / steps / Say line mention only the item's own numbers and task",
    "kind": "fixture",
    "rule": "ws-node-lint L6",
-   "fail": { "fixture": "tests/fixtures/precritic/l6-steps.fail.mjs", "state": "guided steps for other numbers (26 + 15 on every item)" },
-   "pass": { "fixture": "tests/fixtures/precritic/l6-steps.pass.mjs", "state": "steps derived from the item" },
+   "fail": {
+    "fixture": "tests/fixtures/precritic/l6-steps.fail.mjs",
+    "state": "guided steps for other numbers (26 + 15 on every item)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/l6-steps.pass.mjs",
+    "state": "steps derived from the item"
+   },
    "command": "node tests/scripts/ws-node-lint.mjs --fixture {fixture}",
-   "expect": { "fail": "FAIL", "pass": "OK" }
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
   {
    "id": "l10-cycle",
    "check": "L10 answer position / value cycle over 30 items",
    "kind": "fixture",
    "rule": "ws-node-lint L10",
-   "fail": { "fixture": "tests/fixtures/precritic/l10-cycle.fail.mjs", "state": "A/B alternation from itemIndex % 2" },
-   "pass": { "fixture": "tests/fixtures/precritic/l10-cycle.pass.mjs", "state": "position dealt from the seeded rng" },
+   "fail": {
+    "fixture": "tests/fixtures/precritic/l10-cycle.fail.mjs",
+    "state": "A/B alternation from itemIndex % 2"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/l10-cycle.pass.mjs",
+    "state": "position dealt from the seeded rng"
+   },
    "command": "node tests/scripts/ws-node-lint.mjs --fixture {fixture}",
-   "expect": { "fail": "FAIL", "pass": "OK" }
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
   {
    "id": "node-lint-keys",
    "check": "ws-node-lint baseline pins finding KEYS, not counts (critic r1 D5): a fixed finding replaced by a new one in the same skill and rule fails",
    "kind": "fixture",
    "rule": "ws-node-lint keyed baseline (rule|kind|#item|signature)",
-   "fail": { "fixture": "tests/fixtures/precritic/node-lint-keys.swap.mjs", "state": "the pinned \"3 x 4\" on item 2 fixed, a new \"6 x 7\" on item 5: the count per (skill, rule) is still 1" },
-   "pass": { "fixture": "tests/fixtures/precritic/node-lint-keys.pin.mjs", "state": "the pinned finding, unchanged" },
+   "fail": {
+    "fixture": "tests/fixtures/precritic/node-lint-keys.swap.mjs",
+    "state": "the pinned \"3 x 4\" on item 2 fixed, a new \"6 x 7\" on item 5: the count per (skill, rule) is still 1"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/node-lint-keys.pin.mjs",
+    "state": "the pinned finding, unchanged"
+   },
    "command": "node tests/scripts/ws-node-lint.mjs --fixture {fixture} --baseline tests/fixtures/precritic/node-lint-keys.baseline.json",
-   "expect": { "fail": "FAIL", "pass": "OK" }
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
   {
    "id": "mc-production",
    "check": "H8: a production item (written on paper) is never offered as buttons on screen, every family (P-29, RM-P-01)",
    "kind": "fixture",
    "rule": "ws-content-audit MC-ALL mc-production",
-   "fail": { "fixture": "tests/fixtures/precritic/mc-production.fail.cjs", "state": "seeded \"what fraction is shaded?\" items: the paper cell has a fraction slot and no choices, the screen deals four fraction options (buttons)" },
-   "pass": { "fixture": "tests/fixtures/precritic/mc-production.pass.cjs", "state": "the same items typed (no option row); and a circle-one variant whose paper cell prints the same four choices" },
+   "fail": {
+    "fixture": "tests/fixtures/precritic/mc-production.fail.cjs",
+    "state": "seeded \"what fraction is shaded?\" items: the paper cell has a fraction slot and no choices, the screen deals four fraction options (buttons)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/mc-production.pass.cjs",
+    "state": "the same items typed (no option row); and a circle-one variant whose paper cell prints the same four choices"
+   },
    "command": "node tests/scripts/ws-content-audit.cjs --mc-fixture {fixture}",
-   "expect": { "fail": "FAIL", "pass": "OK" }
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
   {
    "id": "baseline-night-keeps-red",
@@ -77,10 +140,19 @@
    "kind": "commit-pair",
    "rule": "ws-coverage-matrix --write-baseline pin-new-only (I1), never a --red-from row (I2), verdict before the pin (I3); the fold (I5)",
    "browser": false,
-   "fail": { "commit": "53f46e10", "state": "graded by critic r3: a slice night re-pins a regressed pilot row and reports it OK; a later slice file pins a re-selected red row and the re-run lists it OK" },
-   "pass": { "commit": "a5297660", "state": "fix round 3: both keep the row RED in the run file and the fold" },
+   "fail": {
+    "commit": "53f46e10",
+    "state": "graded by critic r3: a slice night re-pins a regressed pilot row and reports it OK; a later slice file pins a re-selected red row and the re-run lists it OK"
+   },
+   "pass": {
+    "commit": "a5297660",
+    "state": "fix round 3: both keep the row RED in the run file and the fold"
+   },
    "command": "node tests/fixtures/precritic/baseline-night.cjs --root {root}",
-   "expect": { "fail": "FAIL", "pass": "OK" }
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
   {
    "id": "lone-item",
@@ -88,10 +160,19 @@
    "kind": "commit-pair",
    "rule": "ws-print-lint L-DENSITY LONE (L-LONE)",
    "browser": true,
-   "fail": { "commit": "359802c5", "state": "skip-count, critic r4 D12" },
-   "pass": { "commit": "b19172b4", "state": "fixed" },
+   "fail": {
+    "commit": "359802c5",
+    "state": "skip-count, critic r4 D12"
+   },
+   "pass": {
+    "commit": "b19172b4",
+    "state": "fixed"
+   },
    "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills multiplication:count_by_tables --roles scripted-model --opts '{\"rows\":[{\"step\":25000}],\"onePage\":true}' --lints L-DENSITY",
-   "expect": { "fail": "FAIL", "pass": "OK" }
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
   {
    "id": "text-generator-wrm-page",
@@ -99,10 +180,19 @@
    "kind": "commit-pair",
    "rule": "ws-text-vs-gen --looks (RESPONSE, DRAWING)",
    "browser": false,
-   "fail": { "commit": "848d7d3f", "state": "WRM page, critic r8 M12" },
-   "pass": { "commit": "d515aa05", "state": "fixed" },
+   "fail": {
+    "commit": "848d7d3f",
+    "state": "WRM page, critic r8 M12"
+   },
+   "pass": {
+    "commit": "d515aa05",
+    "state": "fixed"
+   },
    "command": "node tests/scripts/ws-text-vs-gen.mjs --looks --root {root}",
-   "expect": { "fail": "FAIL", "pass": "OK" }
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
   {
    "id": "text-generator-wrm-tagging",
@@ -110,10 +200,19 @@
    "kind": "commit-pair",
    "rule": "ws-text-vs-gen --wrm (REP, RANGE)",
    "browser": false,
-   "fail": { "commit": "c3d08a69", "state": "graded by critic r13 in 5aa0ffce, N13: Y3.B6.S10 marked full on circles" },
-   "pass": { "commit": "89f30a64", "state": "the TITLEREP gate, round 14" },
+   "fail": {
+    "commit": "c3d08a69",
+    "state": "graded by critic r13 in 5aa0ffce, N13: Y3.B6.S10 marked full on circles"
+   },
+   "pass": {
+    "commit": "89f30a64",
+    "state": "the TITLEREP gate, round 14"
+   },
    "command": "node tests/scripts/ws-text-vs-gen.mjs --wrm --root {root}",
-   "expect": { "fail": "FAIL", "pass": "OK" }
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
   {
    "id": "chromebook-viewport",
@@ -121,10 +220,19 @@
    "kind": "commit-pair",
    "rule": "ws-viewport-check UNDER-HEADER / BOX-OUT / CHECK-OUT",
    "browser": true,
-   "fail": { "commit": "e189119f", "state": "number line, critic r7 R7-D1: timed band under the sticky bar at 1280" },
-   "pass": { "commit": "789f23f7", "state": "fixed" },
+   "fail": {
+    "commit": "e189119f",
+    "state": "number line, critic r7 R7-D1: timed band under the sticky bar at 1280"
+   },
+   "pass": {
+    "commit": "789f23f7",
+    "state": "fixed"
+   },
    "command": "node tests/scripts/ws-viewport-check.cjs --skills subtraction:sub_100_regroup,multiplication:nl_mult --opts '{\"nlOn\":true}' --sizes 1280x600,1366x650",
-   "expect": { "fail": "FAIL", "pass": "OK" }
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
   {
    "id": "repeats-lesson",
@@ -132,10 +240,114 @@
    "kind": "commit-pair",
    "rule": "ws-detailed-lesson --repeats (R-ANSWER, R-TURN, R-CELL)",
    "browser": true,
-   "fail": { "commit": "c2a6d8b4", "state": "detailed lesson 6, graded by its critic r1 in 712592e2, D2: Guided 1 returns on the exit slip" },
-   "pass": { "commit": "f0990693", "state": "fixed" },
+   "fail": {
+    "commit": "c2a6d8b4",
+    "state": "detailed lesson 6, graded by its critic r1 in 712592e2, D2: Guided 1 returns on the exit slip"
+   },
+   "pass": {
+    "commit": "f0990693",
+    "state": "fixed"
+   },
    "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g4-nbt1-ten-times-value --repeats",
-   "expect": { "fail": "FAIL", "pass": "OK" }
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "sibling-compare-pilot",
+   "check": "Process rule 0b: a red matrix row above the APPROVED siblings' counts (same row, same size) is the lane's own, never 'engine red' (pilot-su-c: 60 red rows triaged as engine, 236 counts above the siblings, critic r1 min 4)",
+   "kind": "fixture",
+   "rule": "ws-sibling-compare ABOVE (siblings from tests/fixtures/precritic/siblings.json, measured on the same tree with --run-siblings)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/pilot-su-c/bad.state.json",
+    "state": "b3948d88, the tree pilot-su-c critic r1 graded (critic-r1.md: 'at b3948d8'): single/ex-group at S holds H13 x16, every approved stack sibling 0"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/pilot-su-c/good.state.json",
+    "state": "b3948d88 + tests/fixtures/precritic/pilot-su-c/good.patch, a SEEDED minimal fix never committed (the pilot branch had no fix commit on 2026-10-23 20:10): D3 (0.95 em answer-box tracks) takes the H13 empty bands away at S; TY-11 12 is at or below the siblings' 14"
+   },
+   "command": "node tests/fixtures/precritic/state-run.cjs --state {fixture} -- node tests/scripts/ws-sibling-compare.cjs --root {root} --skills subtraction:sub_100_no_regroup --rows single/ex-group --sizes S --run-siblings",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "slot-clip-pilot",
+   "check": "SLOT / CLIP on every matrix row at S / M / L, with the answer-box width probe (TY-21: a segment >= 4.4 mm; critic r1 D3 measured 4.06 mm at S)",
+   "kind": "fixture",
+   "rule": "ws-slot-clip SLOT-W (+ print-lint L-ANSAREA / L-OVERFLOW per row vs the siblings, HEADS)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/pilot-su-c/bad.state.json",
+    "state": "b3948d88, the tree pilot-su-c critic r1 graded (critic-r1.md: 'at b3948d8'): 100 of 100 answer-box segments 4.06 mm at S"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/pilot-su-c/good.state.json",
+    "state": "b3948d88 + tests/fixtures/precritic/pilot-su-c/good.patch, a SEEDED minimal fix never committed (the pilot branch had no fix commit on 2026-10-23 20:10): D3, the answer strip on 0.95 em tracks"
+   },
+   "command": "node tests/fixtures/precritic/state-run.cjs --state {fixture} -- node tests/scripts/ws-slot-clip.cjs --root {root} --skills subtraction:sub_100_no_regroup --rows single/defaults",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "phone-card-pilot",
+   "check": "The practice card at 390 px: nothing cut off sideways, the ones box focused first (critic r1 D5)",
+   "kind": "fixture",
+   "rule": "ws-phone-card CLIP-X / FOCUS / INVIEW",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/pilot-su-c/bad.state.json",
+    "state": "b3948d88, the tree pilot-su-c critic r1 graded (critic-r1.md: 'at b3948d8'): from 4 digits the legacy twin focuses the leftmost box; the 6-digit stack is cut by 13-17 px"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/pilot-su-c/good.state.json",
+    "state": "b3948d88 + tests/fixtures/precritic/pilot-su-c/good.patch, a SEEDED minimal fix never committed (the pilot branch had no fix commit on 2026-10-23 20:10): D5, binaryParts reads comma-formatted items, so the kit stack draws them on screen"
+   },
+   "command": "node tests/fixtures/precritic/state-run.cjs --state {fixture} -- /tmp/mq-browser-run.sh node tests/scripts/ws-phone-card.cjs --skills subtraction:sub_100_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_1m_no_regroup --items 2",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "card-rulings-pilot",
+   "check": "Each generator obeys the spec card's numeric rulings (300 seeded items a skill; critic r1 D1: zero cases on 55% of sub_50 items where card 9.4 says never seeded)",
+   "kind": "fixture",
+   "rule": "ws-card-rulings --check rulings (the pilot's rulings in the rulings-block format: tests/fixtures/precritic/pilot-su-c/rulings.json)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/pilot-su-c/bad.state.json",
+    "state": "b3948d88, the tree pilot-su-c critic r1 graded (critic-r1.md: 'at b3948d8'): R-ZERO-NOT-SEEDED broken on sub_50, sub_100 and sub_2d_1d"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/pilot-su-c/good.state.json",
+    "state": "b3948d88 + tests/fixtures/precritic/pilot-su-c/good.patch, a SEEDED minimal fix never committed (the pilot branch had no fix commit on 2026-10-23 20:10): D1, each bottom digit 1 .. v-1 in the 2-digit branch"
+   },
+   "command": "node tests/fixtures/precritic/state-run.cjs --state {fixture} -- node tests/scripts/ws-card-rulings.mjs --root {root} --rulings tests/fixtures/precritic/pilot-su-c/rulings.json --check rulings",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "card-not-offered-pilot",
+   "check": "The option panel offers nothing the card lists as not offered (critic r1 D6: the legacy band option on the six-skill ladder)",
+   "kind": "fixture",
+   "rule": "ws-card-rulings --check offered (offeredOptionsFor vs the block's notOffered)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/pilot-su-c/bad.state.json",
+    "state": "b3948d88, the tree pilot-su-c critic r1 graded (critic-r1.md: 'at b3948d8'): band offered on all seven skills"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/pilot-su-c/good.state.json",
+    "state": "b3948d88 + tests/fixtures/precritic/pilot-su-c/good.patch, a SEEDED minimal fix never committed (the pilot branch had no fix commit on 2026-10-23 20:10): D6, no band control on the no-regroup subtraction ladder"
+   },
+   "command": "node tests/fixtures/precritic/state-run.cjs --state {fixture} -- node tests/scripts/ws-card-rulings.mjs --root {root} --rulings tests/fixtures/precritic/pilot-su-c/rulings.json --check offered",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

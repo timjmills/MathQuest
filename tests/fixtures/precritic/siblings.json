@@ -1,0 +1,21 @@
+{
+ "about": "ws-sibling-compare: the APPROVED skills of each kit template (process rule 0b: a lane's red matrix row is engine debt only at or below these skills' counts on the same row and size). A skill is listed here when it passed its critic on that template; changed only with a STATUS note. `pairs` (optional) gives a lane skill the siblings of its own size band, as the pilot-su-c lead's comparison did (design/audit/runs/pilot-su-c/sibling-compare.cjs); without a pair every approved sibling of the template is used.",
+ "templates": {
+  "stack": {
+   "approved": [
+    "addition:add_100_regroup", "subtraction:sub_100_regroup", "addition:add_1k_regroup", "subtraction:sub_1k_regroup",
+    "addition:add_10k_regroup", "subtraction:sub_10k_regroup", "subtraction:sub_100k_regroup", "subtraction:sub_1m_regroup"
+   ],
+   "source": "the siblings the pilot-su-c lead and critic r1 compared against (critic-r1.md engine rulings; pilot status 2026-10-23 19:40)",
+   "pairs": {
+    "subtraction:sub_50_no_regroup": ["addition:add_100_regroup", "subtraction:sub_100_regroup"],
+    "subtraction:sub_100_no_regroup": ["addition:add_100_regroup", "subtraction:sub_100_regroup"],
+    "subtraction:sub_2d_1d": ["addition:add_100_regroup", "subtraction:sub_100_regroup"],
+    "subtraction:sub_1k_no_regroup": ["addition:add_1k_regroup", "subtraction:sub_1k_regroup"],
+    "subtraction:sub_10k_no_regroup": ["addition:add_10k_regroup", "subtraction:sub_10k_regroup"],
+    "subtraction:sub_100k_no_regroup": ["subtraction:sub_100k_regroup"],
+    "subtraction:sub_1m_no_regroup": ["subtraction:sub_1m_regroup"]
+   }
+  }
+ }
+}
