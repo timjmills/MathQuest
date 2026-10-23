@@ -23,12 +23,13 @@
 (function () {
   const D = window.MQ_DATA, T = window.MQThumbs;
   const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
-  function render(q) {
+  let render = function (q) {
     q = (q || '').toLowerCase(); const by = {};
     D.skills.forEach(s => { if (!q || (s.c + ' ' + s.v + ' ' + s.l).toLowerCase().includes(q)) (by[s.c] = by[s.c] || []).push(s); });
     document.getElementById('out').innerHTML = Object.entries(by).map(([c, list]) => `<h2>${esc(c)} <span class="note">${list.length}</span></h2><div class="grid" data-view="medium">` +
       list.map(s => { const sm = T.sample(s, 1); return `<div class="card thumb-card" data-domain="${s.a}" data-key="${esc(s.c + ':' + s.v)}"><div class="thumb">${T.draw(s, 1)}</div><div class="card-name">${esc(s.l)}</div><div class="note">${esc(s.v)} · ${sm ? `real item ${sm.i + 1} of ${T.sampleCount(s)}` : 'hand-drawn fallback'}</div></div>`; }).join('') + '</div>').join('');
   }
+  const _render = render; render = (q) => { _render(q); T.fit(document); };
   document.getElementById('f').addEventListener('input', (e) => render(e.target.value));
   render(new URLSearchParams(location.search).get('q'));
 })();

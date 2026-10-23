@@ -104,7 +104,7 @@
   // the print / quiz settings the teacher has set by hand: kept when the sheet is closed and opened again (critic r4 B3),
   // even after the tray changes; only what no longer applies is reset (kindDefaults recomputes the untouched ones)
   S.touched = new Set();
-  function defaultOpts() { return { pages: 1, examples: 'none', sections: 'per-skill', fade: 'none', layout: 'standard', review: false, size: 'M', prereq: false, header: true, key: 'end', keyStyle: 'answers', nline: false, cols: 'auto' }; }
+  function defaultOpts() { return { pages: 1, each: 'new', examples: 'none', sections: 'per-skill', fade: 'none', layout: 'standard', review: false, size: 'M', prereq: false, header: true, key: 'end', keyStyle: 'answers', nline: false, cols: 'auto' }; }
   const theme = qs.get('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   document.documentElement.setAttribute('data-theme', theme);
   // a WHOLE GRADE (or area) = every skill of that grade, one of each: no Mixed pools, no Maths words cards, and no
@@ -237,12 +237,25 @@
     const items = []; S.tray.forEach(x => { for (let i = 0; i < (counts[x] || 0); i++) items.push(x); });
     if (k === 'mixed') { const r = T.rng('deal' + S.seed); for (let i = items.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [items[i], items[j]] = [items[j], items[i]]; } }
     if (k === 'sections' && big()) items.sort((x, y) => ORDER.indexOf(SK[x].a) - ORDER.indexOf(SK[y].a) || GORDER.indexOf(SK[x].g) - GORDER.indexOf(SK[y].g));
-    const pageItems = []; for (let i = 0; i < items.length; i += per) pageItems.push(items.slice(i, i + per));
+    let pageItems = []; for (let i = 0; i < items.length; i += per) pageItems.push(items.slice(i, i + per));
+    // Each page (owner 2026-10-23): "Same problems, new numbers" / "Same page again" repeat page 1's plan (its skills, order,
+    // counts and layout; weights apply to it) on every page. Single skill repeats each skill's first page through its pages.
+    const each = eachMode(isQuiz);
+    if (each !== 'new' && pages > 1 && !(isQuiz && big())) {
+      if (k === 'single') pageItems = pageItems.map(pg => pageItems.find(q => q[0] === pg[0]).slice());
+      else {
+        const save = S.opts.pages; S.opts.pages = 1; const unit = plan(isQuiz).pageItems; S.opts.pages = save;
+        pageItems = []; for (let i = 0; i < pages; i++) pageItems.push(unit[i % unit.length].slice());
+      }
+      counts = {}; pageItems.flat().forEach(x => { counts[x] = (counts[x] || 0) + 1; }); total = pageItems.flat().length;
+    }
     const perPage = pageItems.map(pg => { const o = {}; pg.forEach(x => { o[x] = (o[x] || 0) + 1; }); return o; });
     const countsArr = S.tray.map(x => counts[x] || 0);
     const shown = act.filter(x => counts[x] > 0).length;
     return { k, pages: Math.max(pages, pageItems.length), added, total, counts: countsArr, byKey: counts, perPage, pageItems, shown, active: act.length, left: n - act.length, pct: sh.pct, errs: sh.errs };
   }
+  // the Each page choice that applies: only with more than one page; a quiz never prints identical copies (versions do that)
+  function eachMode(isQuiz) { const e = S.opts.each || 'new'; if (S.opts.pages <= 1) return 'new'; return isQuiz && e === 'copy' ? 'same' : e; }
   function areasOf(list) { const by = {}; list.forEach(k => (by[SK[k].a] = by[SK[k].a] || []).push(k)); return ORDER.concat(['NOSTD']).filter(a => by[a]).map(a => ({ a, ks: by[a] })); }
   function gradesOf(list) { const by = {}; list.forEach(k => (by[SK[k].g] = by[SK[k].g] || []).push(k)); return GORDER.filter(g => by[g]).map(g => ({ g, ks: by[g] })); }
   function trayTitle() {
@@ -264,6 +277,9 @@
         more: areas.map(x => `${AREAS[x.a].short} ${x.ks.reduce((t, k) => t + (p.byKey[k] || 0), 0)}`).join(', ') + ' · answer key at the end' };
     }
     const names = S.tray.map((s, i) => `${short(SK[s].l)} ${wOf(s) ? (anyLock() || S.detailed ? '≈ ' : '') + p.counts[i] : '(left out)'}`).join(', ');
+    const each = eachMode(isQuiz), onPage = p.pageItems[0] ? p.pageItems[0].length : 0;
+    if (each === 'same') return { line: `${pg} · the same ${onPage} ${isQuiz ? 'questions' : 'problems'} on each, new numbers · ${p.total} in all${pts} · answer key at the end${left}${ver}`, more: (S.tray.length > 1 ? names : short(SK[S.tray[0]].l)) + ' · New numbers re-deals every page' };
+    if (each === 'copy') return { line: `${p.pages} copies of the same page · ${onPage} problems on each · ${p.total} problems in all · one key: “Key for all ${p.pages} copies”${left}`, more: (S.tray.length > 1 ? names : short(SK[S.tray[0]].l)) + ' · New numbers re-deals the page' };
     return {
       line: `${pg} · ${p.total} ${isQuiz ? 'questions' : 'problems'}${pts} · answer key at the end${left}${ver}`,
       more: (S.tray.length > 1 ? names : short(SK[S.tray[0]].l)) + (p.added ? ` · pages added so every skill comes up at least twice` : ''),
@@ -585,7 +601,11 @@
     const k = kind(), o = S.opts, n = S.tray.length; let h = '';
     if (k === 'single' && big()) h += `<p class="warn">⚠ ${plural(n, 'skill')} on Single skill = ${n} pages or more, one skill on each. Mixed practice puts them all on fewer pages.</p>`;
     if (isQuiz && big()) h += opt('How many questions?', `The quiz takes a sample of the ${n} skills; New numbers re-deals it`, stepper('qn', S.quiz.n || 20, 5, 60));
-    else h += opt('How many pages?', k === 'single' && n > 1 ? 'Shared by how often each skill comes up; starts at one page per skill' : big() ? `${plan(isQuiz).total} problems; fewer pages take a sample of the skills` : 'Every page has new numbers; the key follows', stepper('pages', o.pages, 1, 30));
+    else {
+      h += opt('How many pages?', k === 'single' && n > 1 ? 'Shared by how often each skill comes up; starts at one page per skill' : big() ? `${plan(isQuiz).total} problems; fewer pages take a sample of the skills` : 'The key follows', `<div class="pages-ctl">${stepper('pages', o.pages, 1, 30)}<div class="seg seg-sm" role="group" aria-label="Pages">${['2', '3', '5'].map(v => `<button data-act="pagesto" data-arg="${v}" ${pressed(String(o.pages) === v)}>${v}</button>`).join('')}</div></div>`);
+      // owner 2026-10-23: "we might want multiple pages of the same set of problems as well"
+      if (o.pages > 1 && !big()) h += opt('Each page', isQuiz ? 'Versions already give identical papers' : 'Repeated practice, or a pre / post check', radios([['new', 'New problems'], ['same', 'Same problems, new numbers'], ...(isQuiz ? [] : [['copy', 'Same page again']])], eachMode(isQuiz), 'each'));
+    }
     if (n > 1 && !big()) h += opt('How often does each skill come up?', 'Less · Equal · More = 1 : 2 : 3', `<div class="weights">${S.tray.map(s => `<div class="weight-row w">${chipHTML(s)}${wSeg(s)}</div>`).join('')}</div>`);
     if (big()) h += opt('How often does each area come up?', 'Set in the tray: one place for every skill’s How often', `<div class="opt-stack"><div class="area-weights">${areaWeightList()}</div><button class="btn" data-act="trayopen">Fine-tune in the tray ▸</button></div>`);
     const ex = k === 'single'
@@ -646,7 +666,8 @@
       // the cells are the skill's REAL captured items (samples.js), dealt 1st, 2nd, 3rd … so none repeats on a page; New
       // numbers turns which comes first. Past the captured items a cell says so instead of repeating one (the PDF deals all)
       const dealt = {};
-      const cell = (sk, i, cls) => { const n = dealt[sk] = (dealt[sk] ?? -1) + 1; const pic = T.drawItem(SK[sk], n, S.seed + ':' + pi);
+      const pgSeed = eachMode(isQuiz) === 'copy' ? S.seed + ':0' : S.seed + ':' + pi;   // copies: page 1's items again
+      const cell = (sk, i, cls) => { const n = dealt[sk] = (dealt[sk] ?? -1) + 1; const pic = T.drawItem(SK[sk], n, pgSeed);
         if (!pic) return `<div class="page-cell ${cls} page-more" data-skill="${esc(sk)}"><span>another ${esc(short(SK[sk].l))} problem</span></div>`;
         return `<div class="page-cell ${cls}" data-skill="${esc(sk)}">${(o.examples === 'first' && k === 'mixed' && items.indexOf(sk) === i) ? '<b class="ex-tag">Example&nbsp;</b>' : ''}${pic}</div>`; };
       const exDraw = (sk, n) => T.draw(SK[sk], 'ex' + S.seed + ':' + n);
@@ -663,7 +684,7 @@
           body += `<div class="page-grid">${sec.list.map(([sk, i]) => cell(sk, i, 's')).join('')}</div>`;
         });
       } else body += `<div class="page-grid ${cols}">${items.map((sk, i) => cell(sk, i, cellCls)).join('')}</div>`;
-      body += `<div class="page-key">page ${pi + 1} of ${p.pages}</div>`;
+      body += `<div class="page-key">${eachMode(isQuiz) === 'copy' ? `copy ${pi + 1} of ${p.pages}` : `page ${pi + 1} of ${p.pages}`}</div>`;
       pages.push(`<div class="page p${nPages}"><div class="page-in">${body}</div></div>`);
     }
     return `<div class="previews">${pages.join('')}</div><p class="note center">${nPages > 1 ? `First ${nPages} pages` : 'First page'} · real items from the app, up to ${T.sampleCount(SK[S.tray[0]]) || 3} of each skill · the PDF is the full view</p>`;
@@ -922,7 +943,7 @@
     if (S.profile && innerWidth < 820) layer.innerHTML = `<div class="scrim" data-act="close"></div><div class="sheet narrow" role="dialog" aria-label="Me"><div class="sheet-head"><h2>Ms Rivera</h2><button class="btn close" data-act="close" aria-label="Close">${icon('close')}</button></div><div class="share-pad">${profileMenu().replace('class="menu"', 'class="menu menu-static"')}</div></div>`;
     document.body.style.overflow = S.sheet || (S.profile && innerWidth < 820) ? 'hidden' : '';
     const t = document.getElementById('toast'); t.hidden = !S.toast; t.innerHTML = esc(S.toast) + (S.toast && S.undo ? ' <button class="btn btn-undo" data-act="undo">Undo</button>' : '');
-    fitChips(); fitTray(); setHash();
+    fitChips(); fitTray(); T.fit(document); setHash();
     if (S.scrollTo) { const el = document.getElementById(S.scrollTo); if (el) el.scrollIntoView({ block: 'start' }); S.scrollTo = null; }
     window.dispatchEvent(new Event('mq:render'));
   }
@@ -1016,6 +1037,8 @@
       case 'close': if (S.sheet === 'board' && S.prevSheet) { S.sheet = S.prevSheet; S.prevSheet = null; break; } S.sheet = null; S.profile = false; L.panelOpen = false; break;
       case 'kind': S.kind = arg; S.opts = kindDefaults(S.opts); break;
       case 'pages': S.opts.pages = Math.max(1, Math.min(30, S.opts.pages + Number(arg))); S.touched.add('pages'); break;
+      case 'pagesto': S.opts.pages = Number(arg); S.touched.add('pages'); break;
+      case 'each': S.opts.each = arg; S.touched.add('each'); break;
       case 'qn': S.quiz.n = Math.max(5, Math.min(60, (S.quiz.n || 20) + 5 * Number(arg))); S.touched.add('qn'); break;
       case 'versions': S.quiz.versions = Math.max(1, Math.min(6, S.quiz.versions + Number(arg))); break;
       case 'examples': case 'sections': case 'fade': case 'layout': case 'size': case 'key': case 'keyStyle': case 'cols': S.opts[act] = arg; S.touched.add(act); break;
@@ -1080,7 +1103,7 @@
   if (qs.get('lockp')) { const m = qs.get('lockp').match(/^(.*):(\d+)$/); if (m) setLock(m[1], Number(m[2])); }
   if (S.tray.length) S.opts = kindDefaults(S.opts);
   readHash();
-  if (S.sheet === 'print' || S.sheet === 'quiz') { const k = S.kind; S.opts = kindDefaults(S.opts); S.kind = k; S.opts = kindDefaults(S.opts); if (qs.get('examples')) S.opts.examples = qs.get('examples'); if (qs.get('pages')) S.opts.pages = Number(qs.get('pages'));
+  if (S.sheet === 'print' || S.sheet === 'quiz') { const k = S.kind; S.opts = kindDefaults(S.opts); S.kind = k; S.opts = kindDefaults(S.opts); if (qs.get('examples')) S.opts.examples = qs.get('examples'); if (qs.get('pages')) S.opts.pages = Number(qs.get('pages')); if (qs.get('each')) S.opts.each = qs.get('each');
     // a deep link to the quiz sheet sets How many questions exactly as the click path does (critic r4 C3: stepper ≠ summary)
     if (!S.quiz.n) S.quiz.n = big() ? 20 : 0; }
   if (S.sheet === 'quiz' && !S.tray.length) S.quiz.from = 'standard';

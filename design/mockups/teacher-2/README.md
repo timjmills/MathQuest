@@ -104,3 +104,17 @@ above). `thumbs-check.cjs` was rewritten first and committed failing.
   "type the code" when there is no code to type.
 - **Watched colour pairs:** Counting–Data 12.9 (protanopia) and Fractions–Geometry 13.0 (deuteranopia) share grades 3–5
   and sit within 1 of the floor of 12; they must stay ≥ 12.5 (`palette.html`, Margins to watch).
+- **Readable thumbnails (lead, 2026-10-23):** a thumbnail sets the item's opening sentences as live Andika text and shows
+  the KEY part (the drawing and the problem line) in a window; `MQThumbs.fit()` never lets text fall below the place's
+  minimum (`--smp-min`: Big 12 px, Medium and the tray's Thumbnails 11, Small 9, the board 20): it crops to the key part
+  and fades what does not fit instead of shrinking the cell. Page previews and the tray bar's mini picture show the whole
+  item as printed. `thumbs-check.cjs` measures the smallest text every skill's thumbnail shows at the Big, Medium and Small
+  card sizes; `shoot.cjs` measures it on every screen.
+- **Each page (owner, 2026-10-23: "we might want multiple pages of the same set of problems as well"):** with more than
+  one page the worksheet sheet (Single, Mixed, Sections) and the Quiz sheet offer *New problems* (default), *Same
+  problems, new numbers* (every page repeats page 1's plan: skills, order, counts, layout; weights apply to page 1), and
+  *Same page again* (identical copies, one key "Key for all N copies"; not on Quiz, where versions do this). The summary
+  says which, the preview shows the pages side by side, New numbers re-deals them all. Quick counts 2 · 3 · 5 sit beside
+  the stepper, so "3 copies of the same mixed page" is 4 actions. **Engine mapping (T3+):** *Same problems* is the role's
+  page count with a fixed per-page plan: the plan of page 1 repeated, re-seeded per page (`seed + page`); *Same page
+  again* is one page with a copies count (the PDF repeats the page N times; the key prints once).

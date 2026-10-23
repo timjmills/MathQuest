@@ -59,6 +59,10 @@
     { id: 'skill-50', task: 'One skill 50 %, the rest split evenly', plan: { steps: 2, actions: '≤ 4', today: 'not possible' }, start: 'tray=demo64&pages=5',
       check: '(() => { const p = MQ.plan(); const k = "addition:add_wp_1k"; const r = MQ.S.tray.filter(x => x !== k).map(x => p.byKey[x] || 0); return MQ.S.lock["k:" + k] === 50 && p.byKey[k] === Math.round(p.total / 2) && Math.max(...r) - Math.min(...r) <= 1; })()',
       actions: [{ click: '.tray-label-btn, .tray-count', step: 1, say: 'Open the tray' }, { click: '[data-act="detailed"]', step: 1, say: 'Detailed weights' }, { type: '#tsearch', text: 'add 1000 story', step: 2, say: 'Find the skill (the app’s own search)' }, { type: 'input.pct[data-scope="k:addition:add_wp_1k"]', text: '50', enter: true, step: 2, say: '50 %: it is held, the rest share 50 % evenly' }] },
+    // owner 2026-10-23: "multiple pages of the same set of problems"
+    { id: 'copies-3', task: 'Three copies of the same mixed page', plan: { steps: 3, actions: '≤ 4', today: 'print the page 3 times' }, start: 'tray=' + OA3.join(','), done: 'print', expectKind: 'mixed',
+      check: 'MQ.S.opts.pages === 3 && MQ.S.opts.each === "copy"',
+      actions: [{ click: '[data-act="tray-print"]', step: 1, say: 'Print in the tray (a Mixed page of the 3 skills)' }, { click: '[data-act="pagesto"][data-arg="3"]', step: 2, say: 'How many pages: 3' }, { click: '[data-act="each"][data-arg="copy"]', step: 2, say: 'Each page: Same page again' }, { click: '[data-act="sheet-print"]', step: 3, say: 'Print (one key, “Key for all 3 copies”)' }] },
   ];
   // on a phone the grades row of the tray popup is under "View and more"
   // on a phone a whole grade's Remove is under its "⋯" (its How often stays in sight)

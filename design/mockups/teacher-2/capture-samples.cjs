@@ -233,6 +233,10 @@ function serialiseInPage(opts) {
     '@font-face{font-family:"MQ Andika";font-weight:700;font-display:block;src:url("../../../css/fonts/Andika-Bold.woff2") format("woff2")}' +
     '.smp-fo{overflow:visible}.smp,.smp *{box-sizing:border-box;max-width:none;max-height:none;min-width:0;min-height:0;cursor:inherit}' +
     '.smp table{width:auto}.smp p{margin:0}.smp svg{overflow:visible}' +
+    // a page's own type and table rules never reach a sample: inherited values come from the sample's root (as captured),
+    // and table cells start from the browser's defaults
+    '.smp *{font:inherit;color:inherit;letter-spacing:inherit;word-spacing:inherit;text-transform:inherit;white-space:inherit;text-align:inherit;border-collapse:inherit}' +
+    '.smp th,.smp td{padding:1px;border:0 none;vertical-align:middle}' +
     atoms.map(([decl, k]) => decl ? `.smp ._${k.toString(36)}{${decl}}` : '').join('');
   // the crop, measured where the sample is SHOWN: each sample is rendered on its own in a clean page with only this CSS
   // (no app stylesheet), and the crop is the union of what is drawn there (the item letter left out), so a thumbnail
@@ -250,32 +254,59 @@ function serialiseInPage(opts) {
         res[k] = [];
         for (const x of xs) {
           const host = document.createElement('div'); host.className = 'smp'; host.style.cssText = 'position:absolute;left:0;top:0'; host.innerHTML = x; document.body.appendChild(host);
-          const root = host.firstElementChild; const R = root.getBoundingClientRect(); let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
-          const add = (r) => { if (!r || (r.width < 0.5 && r.height < 0.5)) return; x0 = Math.min(x0, r.left); y0 = Math.min(y0, r.top); x1 = Math.max(x1, r.right); y1 = Math.max(y1, r.bottom); };
+          const root = host.firstElementChild; const R = root.getBoundingClientRect();
           const letter = root.firstElementChild && /^[a-z]\.$/.test((root.firstElementChild.textContent || '').trim()) ? root.firstElementChild : null;
-          // pass 1: what is written and drawn; pass 2: ruled or filled boxes that start within it (answer boxes beside the
-          // problem stay; the empty writing room under the last line does not, so a small thumbnail shows the problem)
-          const boxes = [];
+          // what the cell shows, sorted: text (with its rendered size), drawings, ruled or filled boxes
+          const texts = [], draws = [], boxes = [];
           const tw = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
           for (let nd = tw.nextNode(); nd; nd = tw.nextNode()) {
             if (letter && (nd === letter || letter.contains(nd))) continue;
-            if (nd.nodeType === 3) { if (!nd.nodeValue.trim()) continue; const rg = document.createRange(); rg.selectNodeContents(nd); for (const r of rg.getClientRects()) add(r); continue; }
-            if (nd.namespaceURI === 'http://www.w3.org/2000/svg') { if (nd.tagName.toLowerCase() === 'svg' && !nd.ownerSVGElement) add(nd.getBoundingClientRect()); continue; }
+            if (nd.nodeType === 3) {
+              const t = nd.nodeValue.replace(/\s+/g, ' ').trim(); if (!t) continue; const pe = nd.parentElement; const rg = document.createRange(); rg.selectNodeContents(nd);
+              const rects = [...rg.getClientRects()].filter(r => r.width > 0.5); if (!rects.length) continue;
+              const pcs = getComputedStyle(pe); if (pcs.visibility === 'hidden') continue;
+              const inSvg = pe.namespaceURI === 'http://www.w3.org/2000/svg'; const ctm = inSvg && pe.getScreenCTM ? pe.getScreenCTM() : null;
+              const size = parseFloat(pcs.fontSize) * (ctm ? Math.hypot(ctm.a, ctm.b) : 1);
+              texts.push({ t, rects, size, inSvg, el: pe }); continue;
+            }
+            if (nd.namespaceURI === 'http://www.w3.org/2000/svg') { if (nd.tagName.toLowerCase() === 'svg' && !nd.ownerSVGElement) draws.push(nd.getBoundingClientRect()); continue; }
             const cs = getComputedStyle(nd); if (cs.display === 'none' || cs.visibility === 'hidden') continue;
             const bordered = ['top', 'right', 'bottom', 'left'].some(sd => parseFloat(cs.getPropertyValue('border-' + sd + '-width')) > 0 && cs.getPropertyValue('border-' + sd + '-style') !== 'none');
             const filled = !/rgba\(0, 0, 0, 0\)|transparent|rgb\(255, 255, 255\)/.test(cs.backgroundColor);
             if (bordered || filled) boxes.push(nd.getBoundingClientRect());
           }
-          if (x1 < x0) boxes.forEach(add);                       // nothing written: the boxes are the item
-          else { const yEnd = y1; for (const r of boxes) if (r.top < yEnd + 4) add({ left: r.left, right: r.right, top: r.top, bottom: Math.min(r.bottom, Math.max(yEnd, r.top + 40)), width: r.width, height: 1 }); }
-          const P = 10;
-          res[k].push(x1 > x0 ? [Math.floor(Math.max(-40, x0 - R.left - P)), Math.floor(Math.max(-40, y0 - R.top - P)), 0, 0].map((v, i, a) => i === 2 ? Math.ceil(x1 - R.left + P) - a[0] : i === 3 ? Math.ceil(y1 - R.top + P) - a[1] : v) : null);
+          // PROSE: the sentences that open the item (3 words or more, above everything else). A thumbnail sets them as
+          // live text at a readable size and fades what does not fit; the drawing below is the KEY part
+          const isProse = (x) => !x.inSvg && x.t.split(' ').length >= 3 && x.t.length >= 10 && /[a-z]{2}/i.test(x.t);
+          const others = texts.filter(x => !isProse(x)).map(x => x.rects[0].top).concat(draws.map(r => r.top));
+          const firstOther = others.length ? Math.min(...others) : 1e9;
+          const prose = texts.filter(x => isProse(x) && x.rects.every(r => (r.top + r.bottom) / 2 < firstOther));   // line middles above the rest
+          const proseSet = new Set(prose);
+          const crop = (useProse) => {
+            let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+            const add = (r) => { if (!r || (r.width < 0.5 && r.height < 0.5)) return; x0 = Math.min(x0, r.left); y0 = Math.min(y0, r.top); x1 = Math.max(x1, r.right); y1 = Math.max(y1, r.bottom); };
+            texts.forEach(x => { if (useProse || !proseSet.has(x)) x.rects.forEach(add); }); draws.forEach(add);
+            const proseBottom = prose.length && !useProse ? Math.max(...prose.flatMap(x => x.rects.map(r => r.bottom))) : -1e9;
+            // boxes that start within what is written stay (answer boxes); the empty writing room under the last line goes
+            if (x1 < x0) boxes.filter(r => r.top >= proseBottom - 2).forEach(add);
+            else { const yEnd = y1; for (const r of boxes) if (r.top < yEnd + 4 && r.top >= proseBottom - 2) add({ left: r.left, right: r.right, top: r.top, bottom: Math.min(r.bottom, Math.max(yEnd, r.top + 40)), width: r.width, height: 1 }); }
+            if (!(x1 > x0)) return null; const P = 10;
+            const cx = Math.floor(Math.max(-40, x0 - R.left - P)), cy = Math.floor(Math.max(-40, y0 - R.top - P));
+            return [cx, cy, Math.ceil(x1 - R.left + P) - cx, Math.ceil(y1 - R.top + P) - cy];
+          };
+          let key = crop(false);
+          if (key && prose.length) { const pb = Math.ceil(Math.max(...prose.flatMap(x => x.rects.map(r => r.bottom))) - R.top + 1); if (key[1] < pb && key[1] + key[3] > pb + 10) { key[3] -= pb - key[1]; key[1] = pb; } }   // the window starts under the opening sentences
+          const kTexts = texts.filter(x => !proseSet.has(x));
+          const f = kTexts.length ? Math.round(Math.min(...kTexts.map(x => x.size)) * 10) / 10 : null;
+          // prose lines grouped by their block, in reading order
+          const blocks = []; for (const x of prose) { const blk = x.el.closest('div, p, li, td') || x.el; const last = blocks[blocks.length - 1]; if (last && last.blk === blk) last.t += ' ' + x.t; else blocks.push({ blk, t: x.t }); }
+          res[k].push({ c: crop(true), k: key, f, p: blocks.map(b => b.t.replace(/\s+([.,?!:;])/g, '$1')).join('\n') });
           host.remove();
         }
       }
       return res;
     }, batch);
-    for (const [k, list] of Object.entries(crops)) list.forEach((c, j) => { if (c) out.s[k][j].c = c; });
+    for (const [k, list] of Object.entries(crops)) list.forEach((m, j) => { const it = out.s[k][j]; if (m.c) it.c = m.c; if (m.p) it.p = m.p; it.k = m.k || null; it.f = m.f; });
   }
   await app.close();
   const js = '// GENERATED by `node capture-samples.cjs` from the real app (buildSheet → generateQuestionFor, seed ' + SEED + '). Do not edit.\n' +

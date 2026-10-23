@@ -889,3 +889,24 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; a
 .tray-chips:has(> .fit-wrap) { align-items: flex-start; }
 .tray-chips > .chip.fit-wrap { min-width: 9rem; height: auto; }
 .tray-chips > .chip.fit-wrap .name { white-space: normal; overflow: visible; text-overflow: clip; }
+/* ---- fix round 4 (lead, 2026-10-23): a real item at a readable size ----
+   A thumbnail is the item's opening sentences as live Andika text, then its key part (the drawing and the problem
+   line) in a window that never shrinks text below the place's minimum (--smp-min: Big 12 px, Medium 11, Small 9; read
+   by MQThumbs.fit); what does not fit fades out. Page previews and the bar's mini picture show the whole item (0). */
+.smp-thumb { --smp-min: 11; display: flex; flex-direction: column; gap: var(--sp-4); width: 100%; height: 100%; min-width: 0; min-height: 0; overflow: hidden; background: var(--paper); color: var(--paper-ink); font-family: var(--font-pupil); text-align: left; }
+.smp-prose { flex: 0 1 auto; min-height: 0; max-height: 60%; overflow: hidden; font-size: var(--fs-12); line-height: var(--lh-tight); font-weight: var(--fw-500); }
+.prose-only .smp-prose { max-height: 100%; }
+.smp-thumb > .smp-svg { flex: 1 1 0; min-height: 0; width: 100%; height: auto; display: block; }
+.prose-only > .smp-svg, .smp-thumb.full > .smp-prose { display: none; }
+.smp-thumb.full > .smp-svg { display: block; }
+.smp-thumb.cut > .smp-svg { -webkit-mask-image: linear-gradient(to bottom, var(--paper-ink) 78%, transparent); mask-image: linear-gradient(to bottom, var(--paper-ink) 78%, transparent); }
+.smp-thumb.prose-cut > .smp-prose { -webkit-mask-image: linear-gradient(to bottom, var(--paper-ink) 65%, transparent); mask-image: linear-gradient(to bottom, var(--paper-ink) 65%, transparent); }
+.grid[data-view="big"] .smp-thumb, .thumb-lg .smp-thumb { --smp-min: 12; }
+.grid[data-view="big"] .smp-prose, .thumb-lg .smp-prose, .board-card .smp-prose { font-size: var(--fs-14); }
+.grid[data-view="small"] .smp-thumb { --smp-min: 9; }
+.board-card .smp-thumb { --smp-min: 20; padding: var(--sp-24); }
+.board-card .smp-prose { font-size: var(--fs-28); }
+.page-cell .smp-thumb, .tray-mini-pic .smp-thumb { --smp-min: 0; }
+.board-card > .smp-thumb { width: 100%; height: 100%; }
+/* How many pages: the stepper and three quick counts; Each page shows once there is more than one page */
+.pages-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8); }

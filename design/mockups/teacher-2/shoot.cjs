@@ -17,7 +17,8 @@
 // shows >= 6 skill rows on its first 390 × 844 screen (rows <= 56 px, ✕ on the name's line, headers <= 64 px); the print
 // sheet keeps 3 pages and Examples after close → tick a skill → Print; Grade 2 (all areas) · More reaches every grade-2
 // skill; and the two search boxes answer "2.NBT.5", "2.NBT.B.5", "within 1000", "time", "clocks", "add within 20",
-// "fractoins" and (tray) "3.NF.1" through the app's own finder.
+// "fractoins" and (tray) "3.NF.1" through the app's own finder; every thumbnail shown keeps its text >= its place's minimum
+// (Big 12, Medium 11, Small 9 px); and Each page (same problems / same page again) repeats page 1's plan.
 const fs = require('fs');
 const path = require('path');
 let chromium;
@@ -94,6 +95,9 @@ const SCREENS = [
   ['tray-view-thumbs', 'The tray popup, Thumbnails view', 'app.html?tray=grade3&open=NF&tview=thumbs#tray', true, false],
   ['skills-tray-chips', 'Skills, 3 skills, the tray bar in Chips view', 'app.html?tray=demo3&tview=chips#skills', true, false],
   ['skills-tray-thumbs', 'Skills, 3 skills, the tray bar in Thumbnails view', 'app.html?tray=demo3&tview=thumbs#skills', true, false],
+  // owner 2026-10-23: several pages of the same set
+  ['print-same', 'Print: 3 pages, the same problems with new numbers', 'app.html?tray=demo3&pages=3&each=same#print', true, false],
+  ['print-copies', 'Print: 3 copies of the same page (one key)', 'app.html?tray=demo3&pages=3&each=copy#print', true, false],
 ];
 
 async function screenReport(page, w) {
@@ -178,6 +182,28 @@ async function screenReport(page, w) {
       if (r.height < 43.5) say('control under 44px', `“${txt(el)}” ${Math.round(r.height)}px`);
       else if (r.width < 43.5 && !el.matches('input[type=checkbox], input[type=radio]')) say('control under 44px wide', `“${txt(el) || el.className}” ${Math.round(r.width)}px`);
     }
+    // (10) lead 2026-10-23: a real item in a thumbnail is readable. The smallest text each shown thumbnail SHOWS is at least
+    //      its place's minimum (--smp-min: Big 12 px, Medium and the tray's Thumbnails 11, Small 9); page previews and
+    //      the bar's mini picture (0) are miniatures of a printed page and are not held to it
+    for (const t of document.querySelectorAll('.smp-thumb')) {
+      const min = parseFloat(getComputedStyle(t).getPropertyValue('--smp-min')) || 0; const vis = t.getBoundingClientRect();
+      if (!min || vis.width < 4 || vis.bottom < 0 || vis.top > vh) continue;
+      const outer = t.querySelector('.smp-svg'); const prose = ((t.querySelector('.smp-prose') || {}).textContent || '').replace(/\s+/g, '');
+      let low = 1e9, lowT = '';
+      const tw = document.createTreeWalker(t, NodeFilter.SHOW_TEXT);
+      for (let nd = tw.nextNode(); nd; nd = tw.nextNode()) {
+        const tx = nd.nodeValue.trim(); if (!tx || /^[a-z]\.$/.test(tx)) continue;
+        const holder = nd.parentElement.closest('.smp-prose, .smp-svg'); if (!holder || getComputedStyle(holder).display === 'none') continue;
+        if (holder === outer && prose.includes(tx.replace(/\s+/g, ''))) continue;
+        const rg = document.createRange(); rg.selectNodeContents(nd); const hb = holder.getBoundingClientRect();
+        if (![...rg.getClientRects()].some(r => r.width > 0.5 && r.bottom > Math.max(vis.top, hb.top) + 1 && r.top < Math.min(vis.bottom, hb.bottom) - 1 && r.right > Math.max(vis.left, hb.left) + 1 && r.left < Math.min(vis.right, hb.right) - 1)) continue;
+        const pe = nd.parentElement; let e = parseFloat(getComputedStyle(pe).fontSize); const inner = pe.namespaceURI === 'http://www.w3.org/2000/svg' ? pe.closest('svg') : null;
+        if (inner && inner !== outer && inner.viewBox && inner.viewBox.baseVal && inner.viewBox.baseVal.width) e *= inner.getBoundingClientRect().width / inner.viewBox.baseVal.width;
+        else if (outer && outer.contains(pe)) e *= outer.getBoundingClientRect().width / outer.viewBox.baseVal.width;
+        if (e < low) { low = e; lowT = tx.slice(0, 14); }
+      }
+      if (low < min - 0.05) say('thumbnail text too small', `${t.getAttribute('data-smp')}: ${low.toFixed(1)}px “${lowT}” (min ${min})`);
+    }
     // (9) fix round 4 (critic r4 C3): a quiz sheet's How many questions equals the questions its summary line counts
     const qn = document.querySelector('[data-act="qn"]');
     if (qn && shown(qn)) { const n = Number(qn.closest('.stepper').querySelector('output').textContent); const line = (document.querySelector('[data-summary]') || {}).textContent || '';
@@ -186,7 +212,9 @@ async function screenReport(page, w) {
     for (const c of document.querySelectorAll('.card')) {
       const t = c.querySelector('.tick span'), th = c.querySelector('.thumb'); if (!t || !th || !th.getBoundingClientRect().width) continue; const tr = t.getBoundingClientRect();
       for (const e of th.querySelectorAll('svg *, span, div, b, i')) {
-        if (e.children.length && e.tagName !== 'text') continue; const er = e.getBoundingClientRect(); if (er.width < 2 || er.height < 2) continue;
+        if (e.children.length && e.tagName !== 'text') continue; const er0 = e.getBoundingClientRect(), thr = th.getBoundingClientRect();
+        // only the part of the drawing that is SHOWN (a sample's cell runs on past its window, out of sight)
+        const er = { left: Math.max(er0.left, thr.left), top: Math.max(er0.top, thr.top), right: Math.min(er0.right, thr.right), bottom: Math.min(er0.bottom, thr.bottom) }; er.width = er.right - er.left; er.height = er.bottom - er.top; if (er.width < 2 || er.height < 2) continue;
         const ox = Math.min(tr.right, er.right) - Math.max(tr.left, er.left), oy = Math.min(tr.bottom, er.bottom) - Math.max(tr.top, er.top);
         if (ox > 2 && oy > 2) { say('tick on the drawing', `“${txt(c.querySelector('.card-name'))}”`); break; }
       }
@@ -380,7 +408,7 @@ async function runFlow(browser, base, f, w) {
             const want = p.perPage[i] || {}; for (const k of new Set([...Object.keys(want), ...Object.keys(got)])) if ((want[k] || 0) !== (got[k] || 0)) bad.push(`page ${i + 1}: preview ${got[k] || 0} × ${k}, plan ${want[k] || 0}`);
             const seen = new Set(); for (const c of cells) { if (c.classList.contains('page-more')) continue; const h = c.innerHTML; if (seen.has(h)) { bad.push(`page ${i + 1}: the same item twice`); break; } seen.add(h); }
             // every drawn cell is a REAL captured item of its own skill (fix round 4, critic r4 C1)
-            for (const c of cells) { if (c.classList.contains('page-more')) continue; const sv = c.querySelector('svg'); if (!sv || (sv.getAttribute('data-smp') !== c.getAttribute('data-skill') && !sv.hasAttribute('data-fallback'))) { bad.push(`page ${i + 1}: a cell of ${c.getAttribute('data-skill')} shows ${sv ? sv.getAttribute('data-smp') : 'nothing'}`); break; } }
+            for (const c of cells) { if (c.classList.contains('page-more')) continue; const sv = c.querySelector('.smp-thumb, svg[data-fallback]'); if (!sv || (sv.getAttribute('data-smp') !== c.getAttribute('data-skill') && !sv.hasAttribute('data-fallback'))) { bad.push(`page ${i + 1}: a cell of ${c.getAttribute('data-skill')} shows ${sv ? sv.getAttribute('data-smp') : 'nothing'}`); break; } }
           });
           const line = document.querySelector('[data-summary]'); const txt = line ? line.textContent : '';
           if (!txt.includes(`${p.total} ${M.S.sheet === 'quiz' ? 'questions' : 'problems'}`)) bad.push(`summary “${txt.slice(0, 60)}” does not say ${p.total}`);
@@ -388,6 +416,25 @@ async function runFlow(browser, base, f, w) {
         }, set);
         if (r.bad.length) failed++;
         console.log(`${r.bad.length ? 'FAIL' : 'ok  '} preview = summary: ${label.padEnd(36)} ${r.bad.slice(0, 3).join('; ')}${r.bad.length > 3 ? ` (+${r.bad.length - 3})` : ''}`);
+      }
+      // owner 2026-10-23, Each page: "Same problems, new numbers" repeats page 1's skills, order and counts with other items;
+      // "Same page again" repeats page 1 exactly (Single, Mixed and Sections; the quiz has no identical copies)
+      for (const [label, url, mode] of [['mixed, same problems', 'app.html?tray=demo3&pages=3&each=same#print', 'same'], ['mixed, same page again', 'app.html?tray=demo3&pages=3&each=copy#print', 'copy'], ['single, same problems', 'app.html?tray=demo1&pages=3&each=same#print', 'same'], ['sections, same page again', 'app.html?tray=demo3x&kind=sections&pages=2&each=copy#print', 'copy'], ['quiz, same problems', 'app.html?tray=demo3&pages=2&each=same#quiz', 'same']]) {
+        await page.goto(`${base}/design/mockups/teacher-2/${url}`, { waitUntil: 'networkidle' });
+        const r = await page.evaluate(() => { const pg = [...document.querySelectorAll('.previews .page')].slice(0, 2).map(p => [...p.querySelectorAll('.page-cell')]); const p = window.MQ.plan(window.MQ.S.sheet === 'quiz');
+          return { n: pg.length, sk: pg.map(c => c.map(x => x.getAttribute('data-skill')).join(',')), h: pg.map(c => c.map(x => { const t = x.querySelector('.smp-thumb'); return t ? t.getAttribute('data-h') : 'more'; }).join(',')), plan: p.perPage.slice(0, 2).map(o => JSON.stringify(o)), line: document.querySelector('[data-summary]').textContent.slice(0, 80), copyOpt: !!document.querySelector('[data-act="each"][data-arg="copy"]') }; });
+        const bad = [];
+        if (r.n < 2) bad.push('fewer than 2 pages in the preview');
+        else {
+          if (r.sk[0] !== r.sk[1] || r.plan[0] !== r.plan[1]) bad.push('page 2 is not page 1’s plan');
+          if (mode === 'same' && r.h[0] === r.h[1]) bad.push('page 2 has the same numbers');
+          if (mode === 'copy' && r.h[0] !== r.h[1]) bad.push('page 2 is not a copy');
+        }
+        if (/quiz/.test(label) && r.copyOpt) bad.push('the quiz offers Same page again');
+        if (mode === 'same' && !/the same \d+ (problems|questions) on each, new numbers/.test(r.line)) bad.push(`summary “${r.line}”`);
+        if (mode === 'copy' && !/copies of the same page/.test(r.line)) bad.push(`summary “${r.line}”`);
+        if (bad.length) failed++;
+        console.log(`${bad.length ? 'FAIL' : 'ok  '} each page: ${label.padEnd(26)} ${bad.join('; ') || r.line}`);
       }
       // the owner's case (2026-10-23): "I choose 1 problem type to be 50 % and the rest are evenly split with the remaining".
       // 64 skills, one held at 50 % on a 40-problem page set → 20, the other 20 as even as rounding allows (each 0 or 1);

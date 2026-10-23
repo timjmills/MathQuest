@@ -11,9 +11,10 @@
 //                 data-smp is the skill's key, its data-h is hash(key:captureSeed:item) of the item the seed picks, and
 //                 its markup is that sample's markup, byte for byte;
 //   3. the critic's named contradictions (r4 C1, 35 skills) are spot-tested by CONTENT: what the captured item shows;
-//   4. in a browser (thumbs.html, every skill, 3 seeds): each card's picture carries its own card's skill, nothing written
-//      falls outside the thumbnail's picture, and the hand-drawn fallbacks keep their old bounds and overlap rules;
-//      app.html's Skills cards and tray thumbnails carry their own skill too;
+//   4. in a browser (thumbs.html, every skill, 2 seeds, at the Big, Medium and Small card sizes the mock-up uses): each card's
+//      picture carries its own card's skill; the smallest text a thumbnail SHOWS is >= 12 / 11 / 9 px (lead, 2026-10-23:
+//      a long story shows its first lines and fades, the drawing is windowed, never shrunk below that); where the whole
+//      item fits, no written word falls outside the picture; app.html's Skills cards and tray thumbnails carry their own skill;
 //   5. the size budget: samples.js under 6 MB.
 'use strict';
 const fs = require('fs');
@@ -56,7 +57,7 @@ else {
       if (typeof T.sample !== 'function') break;
       nDraws++;
       const out = T.draw(s, seed); const j = T.sampleIndex(seed, list.length); const it = list[j];
-      const m = out.match(/^<svg class="smp-svg" data-smp="([^"]+)" data-h="([^"]+)" data-i="(\d+)"/);
+      const m = out.match(/^<div class="smp-thumb[^"]*" data-smp="([^"]+)" data-h="([^"]+)" data-i="(\d+)"/);
       if (!m) { say(key, `seed ${seed}: the thumbnail is not a captured sample (${out.slice(0, 60)})`); continue; }
       if (m[1].replace(/&amp;/g, '&') !== key) say(key, `seed ${seed}: draws the sample of ${m[1]}`);
       if (Number(m[3]) !== j || m[2] !== it.h) say(key, `seed ${seed}: shows item ${m[3]} (${m[2]}), the seed picks item ${j} (${it.h})`);
@@ -120,52 +121,79 @@ for (const [k, rule, why] of SPOT) {
   const { startServer } = require('../../../tests/lib/ws-harness.cjs');
   const { server, base } = await startServer();
   const browser = await chromium.launch({ executablePath: fs.existsSync('/opt/pw-browsers/chromium') ? '/opt/pw-browsers/chromium' : undefined });
-  let geo = [], app = [];
+  let geo = [], app = []; let fontStats = {};
   try {
     const page = await browser.newPage({ viewport: { width: 1200, height: 900 } });
     await page.goto(`${base}/design/mockups/teacher-2/thumbs.html`, { waitUntil: 'networkidle' });
     await page.evaluate(() => document.fonts.ready);
-    geo = await page.evaluate(() => {
+    // the card thumbnail sizes the mock-up really uses, Big / Medium / Small, at 1366
+    const sizes = {};
+    for (const view of ['big', 'medium', 'small']) {
+      await page.goto(`${base}/design/mockups/teacher-2/app.html?view=${view}#skills`, { waitUntil: 'networkidle' });
+      sizes[view] = await page.evaluate(() => { const t = document.querySelector('#skill-list .card .thumb'); const r = t.getBoundingClientRect(), cs = getComputedStyle(t); return [Math.round(r.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)), Math.round(r.height - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom))]; });
+    }
+    await page.goto(`${base}/design/mockups/teacher-2/thumbs.html`, { waitUntil: 'networkidle' });
+    await page.evaluate(async () => { await document.fonts.load('400 20px "MQ Andika"'); await document.fonts.load('700 20px "MQ Andika"'); await document.fonts.ready; });
+    geo = await page.evaluate(async (sizes) => {
       const out = [];
       // every card on the page draws its own skill
       for (const c of document.querySelectorAll('.thumb-card[data-key]')) {
-        const svg = c.querySelector('.thumb > svg'); const k = c.getAttribute('data-key');
-        if (!svg) { out.push(`${k}: thumbs.html card has no picture`); continue; }
-        if (svg.getAttribute('data-smp') !== k && !svg.hasAttribute('data-fallback')) out.push(`${k}: thumbs.html card shows ${svg.getAttribute('data-smp')}`);
+        const t = c.querySelector('.thumb > .smp-thumb, .thumb > svg'); const k = c.getAttribute('data-key');
+        if (!t) { out.push(`${k}: thumbs.html card has no picture`); continue; }
+        if (t.getAttribute('data-smp') !== k && !t.hasAttribute('data-fallback')) out.push(`${k}: thumbs.html card shows ${t.getAttribute('data-smp')}`);
       }
-      const host = document.createElement('div'); host.className = 'thumb'; host.style.cssText = 'position:absolute;left:0;top:0;width:300px;height:200px'; document.body.appendChild(host);
-      for (const s of MQ_DATA.skills) for (const seed of [undefined, 2, 'b']) {
-        host.innerHTML = MQThumbs.draw(s, seed); const svg = host.querySelector('svg'); if (!svg) { out.push(`${s.c}:${s.v}: no picture`); continue; }
-        const R = svg.getBoundingClientRect(); const probs = [];
-        if (svg.classList.contains('smp-svg')) {
-          // the crop keeps every written word and number inside the picture (a sample is never cut off)
-          const fo = svg.querySelector('foreignObject'); const tw = document.createTreeWalker(fo, NodeFilter.SHOW_TEXT);
-          for (let n = tw.nextNode(); n; n = tw.nextNode()) {
-            if (!n.nodeValue.trim()) continue; const rg = document.createRange(); rg.selectNodeContents(n);
-            for (const b of rg.getClientRects()) { if (b.width < 0.5) continue; const tol = 1.5;
-              // the item letter (a., b.) sits outside the crop on purpose
-              if (/^[a-z]\.$/.test(n.nodeValue.trim())) continue;
-              if (b.left < R.left - tol || b.right > R.right + tol || b.top < R.top - tol || b.bottom > R.bottom + tol) { probs.push(`“${n.nodeValue.trim().slice(0, 16)}” outside the picture`); break; } }
-            if (probs.length) break;
+      // the smallest text a thumbnail shows, in screen px (lead 2026-10-23): Big >= 12, Medium >= 11, Small >= 9, every
+      // skill, the first item and another; text cut away by the window is not shown and is not counted
+      const MIN = { big: 12, medium: 11, small: 9 };
+      const SVGNS = 'http://www.w3.org/2000/svg';
+      const eff = (node, outer) => {
+        const pe = node.parentElement; const fs = parseFloat(getComputedStyle(pe).fontSize);
+        const inner = pe.namespaceURI === SVGNS ? pe.closest('svg') : null;
+        if (inner && inner !== outer && inner.viewBox && inner.viewBox.baseVal && inner.viewBox.baseVal.width) return fs * inner.getBoundingClientRect().width / inner.viewBox.baseVal.width;
+        if (outer && outer.contains(pe)) return fs * outer.getBoundingClientRect().width / outer.viewBox.baseVal.width;
+        return fs;
+      };
+      const stats = {};
+      for (const view of ['big', 'medium', 'small']) {
+        const grid = document.createElement('div'); grid.className = 'grid'; grid.setAttribute('data-view', view); grid.style.cssText = 'position:absolute;left:0;top:0;display:block';
+        const host = document.createElement('div'); host.className = 'thumb'; host.style.cssText = `width:${sizes[view][0] + 16}px;height:${sizes[view][1] + 16}px;box-sizing:border-box`;
+        grid.appendChild(host); document.body.appendChild(grid); let low = 1e9, lowK = '', n = 0;
+        for (const s of MQ_DATA.skills) for (const seed of [undefined, 2]) {
+          host.innerHTML = MQThumbs.draw(s, seed); MQThumbs.fit(host); const t = host.firstElementChild; if (!t || !t.classList.contains('smp-thumb')) continue;
+          const outer = t.querySelector('.smp-svg'); const vis = t.getBoundingClientRect(); const probs = []; let min = 1e9, minT = '';
+          const tw = document.createTreeWalker(t, NodeFilter.SHOW_TEXT);
+          for (let nd = tw.nextNode(); nd; nd = tw.nextNode()) {
+            const txt = nd.nodeValue.trim(); if (!txt || /^[a-z]\.$/.test(txt)) continue;
+            const holder = nd.parentElement.closest('.smp-prose, .smp-svg'); if (!holder || getComputedStyle(holder).display === 'none') continue;
+            const rg = document.createRange(); rg.selectNodeContents(nd); const rr = [...rg.getClientRects()].filter(r => r.width > 0.5);
+            const hb = holder.getBoundingClientRect();
+            const shown = rr.filter(r => r.bottom > Math.max(vis.top, hb.top) + 1 && r.top < Math.min(vis.bottom, hb.bottom) - 1 && r.right > Math.max(vis.left, hb.left) + 1 && r.left < Math.min(vis.right, hb.right) - 1);
+            if (!shown.length) continue;
+            // the opening sentences are set as live text above; their copy inside the cell sits outside the window
+            const squash = (x) => String(x).replace(/\s+/g, '');
+            if (holder === outer && squash((t.querySelector('.smp-prose') || {}).textContent).includes(squash(txt))) continue;
+            const e = eff(nd, outer); if (e < min) { min = e; minT = txt.slice(0, 16); }
+            // the whole item fits (not cut): every word inside the picture
+            const proseTxt = (t.querySelector('.smp-prose') || {}).textContent || '';
+            if (!t.classList.contains('cut') && holder === outer && !proseTxt.includes(txt) && rr.some(r => r.left < hb.left - 1.5 || r.right > hb.right + 1.5 || r.top < hb.top - 1.5 || r.bottom > hb.bottom + 1.5)) probs.push(`“${txt.slice(0, 16)}” outside the picture`);
           }
-          if (fo.getBoundingClientRect().width < 4) probs.push('the sample did not render');
-        } else {
-          const leaves = [...svg.querySelectorAll('text, rect, circle, ellipse, line, path, polygon, polyline')];
-          for (const el of leaves) {
-            const b = el.getBoundingClientRect(); if (!b.width && !b.height) continue; const sw = el.tagName === 'text' ? 0 : 1.5;
-            if (b.left < R.left - sw - 1 || b.top < R.top - sw - 1 || b.right > R.right + sw + 1 || b.bottom > R.bottom + sw + 1) { probs.push(`${el.tagName} past the edge`); break; }
-          }
+          n++; if (min < low) { low = min; lowK = s.c + ':' + s.v; }
+          if (min < MIN[view] - 0.05) probs.push(`${view}: text at ${min.toFixed(1)} px (“${minT}”), the minimum is ${MIN[view]}`);
+          if (probs.length) out.push(`${s.c}:${s.v} seed ${seed}: ${[...new Set(probs)].join('; ')}`);
         }
-        if (probs.length) out.push(`${s.c}:${s.v} seed ${seed}: ${probs.join('; ')}`);
+        stats[view] = `${view} ${sizes[view].join('×')} px: ${n} thumbnails, smallest text ${low.toFixed(1)} px (${lowK})`;
+        grid.remove();
       }
-      host.remove(); return out;
-    });
+      out.stats = stats;
+      return { out, stats };
+    }, sizes);
+    fontStats = geo.stats; geo = geo.out;
     // the mock-up itself: every Skills card and every tray thumbnail shows its own skill's sample
     await page.goto(`${base}/design/mockups/teacher-2/app.html?tray=demo10&tview=thumbs#skills`, { waitUntil: 'networkidle' });
     app = await page.evaluate(() => {
       const out = []; let n = 0;
       for (const c of document.querySelectorAll('[data-skill]')) {
-        const svg = c.querySelector('svg.smp-svg, svg[data-fallback]'); if (!svg) continue; n++;
+        const svg = c.querySelector('.smp-thumb, svg[data-fallback]'); if (!svg) continue; n++;
         if (svg.getAttribute('data-smp') !== c.getAttribute('data-skill') && !svg.hasAttribute('data-fallback')) out.push(`app.html: ${c.getAttribute('data-skill')} shows ${svg.getAttribute('data-smp')}`);
       }
       if (n < 10) out.push(`app.html: only ${n} thumbnails carry their skill (data-skill)`);
@@ -180,6 +208,7 @@ for (const [k, rule, why] of SPOT) {
 
   const listed = Object.keys(LISTED_FALLBACKS);
   console.log(`${D.skills.length} live skills · ${S && S.s ? Object.keys(S.s).length : 0} with captured items (${nSamples} items, capture seed ${S && S.seed}) · ${listed.length} listed fallbacks${listed.length ? ': ' + listed.join(', ') : ''}`);
+  for (const v of Object.values(fontStats)) console.log('readable: ' + v);
   console.log(`${nDraws} thumbnails checked against their own captured item · ${spotN} critic-named skills spot-tested by content · samples.js ${mb.toFixed(2)} MB`);
   const once = [...new Set(fails)];
   if (once.length) { console.log(`\nthumbs-check: FAIL (${once.length})`); once.slice(0, 150).forEach(f => console.log('  ' + f)); if (once.length > 150) console.log(`  … ${once.length - 150} more`); process.exit(1); }

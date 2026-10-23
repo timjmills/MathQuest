@@ -911,11 +911,40 @@
   function samplesOf(s) { const S = root.MQ_SAMPLES; return S && S.s ? S.s[s.c + ':' + s.v] || null : null; }
   // seed → which captured item: none (a card) is the first item; any other seed picks by its hash (New numbers re-deals)
   function sampleIndex(seed, n) { return seed === undefined || seed === null || seed === 1 ? 0 : hashStr('pick:' + seed) % n; }
+  // A sample in a thumbnail: its opening sentences (prose) as live text, then the KEY part (the drawing and the problem
+  // line) as the captured cell in an <svg viewBox> window. fit() sizes the window so nothing is smaller than the place's
+  // minimum (Big 12 px, Medium 11, Small 9, read from --smp-min), cropping and fading rather than shrinking; a place with
+  // --smp-min 0 (a page preview, the tray bar's mini picture) shows the whole item as printed.
+  const escT = (x) => String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;');
   function sampleSvg(key, it, j) {
-    const vb = it.c || [0, 0, it.w, it.ht];
-    return `<svg class="smp-svg" data-smp="${escA(key)}" data-h="${it.h}" data-i="${j}" viewBox="${vb.join(' ')}" width="${vb[2]}" height="${vb[3]}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${escA(it.v || it.t || '')}">` +
+    const c = it.c || [0, 0, it.w, it.ht], k = it.k === undefined ? c : it.k;
+    const prose = it.p ? `<div class="smp-prose">${it.p.split('\n').map(escT).join('<br>')}</div>` : '';
+    const box = k || c;
+    const pic = `<svg class="smp-svg" data-c="${c.join(' ')}" data-k="${k ? k.join(' ') : ''}" data-f="${it.f || ''}" viewBox="${box.join(' ')}" width="${box[2]}" height="${box[3]}" preserveAspectRatio="xMidYMin meet" aria-hidden="true">` +
       `<foreignObject x="0" y="0" width="${it.w}" height="${it.ht}" class="smp-fo"><div xmlns="http://www.w3.org/1999/xhtml" class="smp">${it.x}</div></foreignObject></svg>`;
+    return `<div class="smp-thumb${prose ? ' has-prose' : ''}${k ? '' : ' prose-only'}" data-smp="${escA(key)}" data-h="${it.h}" data-i="${j}" role="img" aria-label="${escA(it.v || it.t || '')}">${prose}${pic}</div>`;
   }
+  function fitOne(t) {
+    const svg = t.querySelector('.smp-svg'); if (!svg) return;
+    const cs = getComputedStyle(t); const min = parseFloat(cs.getPropertyValue('--smp-min')) || 0;
+    const c = svg.dataset.c.split(' ').map(Number), k = svg.dataset.k ? svg.dataset.k.split(' ').map(Number) : null, f = Number(svg.dataset.f) || 0;
+    t.classList.toggle('full', !min);
+    if (!min || !k) {                                   // the whole item as printed (page previews, the bar) or prose only
+      svg.setAttribute('viewBox', (min ? c : c).join(' ')); t.classList.remove('cut');
+      const pr = t.querySelector('.smp-prose'); if (pr) t.classList.toggle('prose-cut', min > 0 && pr.scrollHeight > pr.clientHeight + 1);
+      return;
+    }
+    const pr = t.querySelector('.smp-prose'); if (pr) t.classList.toggle('prose-cut', pr.scrollHeight > pr.clientHeight + 1);
+    const r = svg.getBoundingClientRect(); const W = r.width, H = r.height; if (W < 4 || H < 4) return;
+    const meet = Math.min(W / k[2], H / k[3]); let sc = meet;
+    if (f && f * meet < min) sc = min / f;
+    if (sc === meet) { svg.setAttribute('viewBox', k.join(' ')); t.classList.remove('cut'); return; }
+    const w = W / sc, h = H / sc; const x = k[0] + Math.max(0, (k[2] - w) / 2);
+    svg.setAttribute('viewBox', [x, k[1], w, h].map(v => Math.round(v * 10) / 10).join(' '));
+    t.classList.toggle('cut', w < k[2] - 1 || h < k[3] - 1);
+  }
+  function fit(root) { if (typeof document === 'undefined') return; (root || document).querySelectorAll('.smp-thumb').forEach(fitOne); }
+  if (typeof window !== 'undefined' && window.addEventListener) { let tm = 0; window.addEventListener('resize', () => { clearTimeout(tm); tm = setTimeout(() => fit(document), 80); }); }
   function draw(s, seed, opts) {
     const list = samplesOf(s);
     if (!list || !list.length) return drawHand(s, seed, opts).replace(/^<svg /, '<svg data-fallback="1" ');
@@ -935,5 +964,5 @@
   if (typeof document !== 'undefined' && root.MQ_SAMPLES && root.MQ_SAMPLES.css && !document.getElementById('mq-samples-css')) {
     const st = document.createElement('style'); st.id = 'mq-samples-css'; st.textContent = root.MQ_SAMPLES.css; (document.head || document.documentElement).appendChild(st);
   }
-  root.MQThumbs = { draw, drawItem, drawHand, sample, sampleCount, sampleIndex, hashStr, base, kindOf, rng, int, picCount, KINDS: Object.keys(D), POOLS: Object.keys(POOL) };
+  root.MQThumbs = { draw, drawItem, fit, drawHand, sample, sampleCount, sampleIndex, hashStr, base, kindOf, rng, int, picCount, KINDS: Object.keys(D), POOLS: Object.keys(POOL) };
 })(typeof window !== 'undefined' ? window : globalThis);
