@@ -1,0 +1,883 @@
+{
+ "about": "ws-node-lint pinned findings per skill per rule (IMPROVEMENT_PLAN §1.4 S2). A run fails only on counts above these. Re-pin with node tests/scripts/ws-node-lint.mjs --write-baseline after a fix lowers a count; never raise a count by hand.",
+ "generated": "2026-10-23",
+ "n": 30,
+ "page": 12,
+ "rules": [
+  "NOTATION",
+  "L1",
+  "L3",
+  "L6",
+  "L10",
+  "REPEATS"
+ ],
+ "totals": {
+  "NOTATION": 2919,
+  "L1": 90,
+  "L3": 87,
+  "L6": 111,
+  "L10": 10,
+  "REPEATS": 211
+ },
+ "counts": {
+  "addition:add_5_pictures": {
+   "REPEATS": 5
+  },
+  "addition:comparison_word": {
+   "L1": 1
+  },
+  "algebra:build_expr_addsub": {
+   "NOTATION": 13,
+   "L3": 1
+  },
+  "algebra:evaluate_expression_hard": {
+   "NOTATION": 5
+  },
+  "algebra:inequalities": {
+   "NOTATION": 9
+  },
+  "algebra:mixed_algebra": {
+   "NOTATION": 3
+  },
+  "algebra_mixed:number_sense_all": {
+   "NOTATION": 1
+  },
+  "algebra_mixed:order_ops_all": {
+   "NOTATION": 4
+  },
+  "all_mixed:all_domains_mixed": {
+   "NOTATION": 4
+  },
+  "all_mixed:custom_mixed": {
+   "NOTATION": 5
+  },
+  "all_mixed:grade_2_mixed": {
+   "NOTATION": 1
+  },
+  "all_mixed:grade_3_mixed": {
+   "NOTATION": 3
+  },
+  "all_mixed:grade_4_mixed": {
+   "NOTATION": 8
+  },
+  "all_mixed:grade_5_mixed": {
+   "NOTATION": 6
+  },
+  "all_mixed:grade_6_mixed": {
+   "NOTATION": 10
+  },
+  "angles_lines:additive_angles": {
+   "L1": 1
+  },
+  "angles_lines:angles_around_point": {
+   "L1": 1
+  },
+  "angles_lines:angles_in_right_angle": {
+   "L1": 1
+  },
+  "angles_lines:angles_on_straight_line": {
+   "L1": 1
+  },
+  "angles_lines:measure_angles": {
+   "L1": 1,
+   "REPEATS": 4
+  },
+  "angles_lines:place_symmetry_lines": {
+   "L1": 1
+  },
+  "area_perimeter:area_distributive_visual": {
+   "L1": 1
+  },
+  "area_perimeter:area_polygon_decompose": {
+   "L1": 1
+  },
+  "area_perimeter:area_triangle": {
+   "L1": 1,
+   "L3": 6
+  },
+  "area_perimeter:area_unit_squares": {
+   "L1": 1
+  },
+  "area_perimeter:composite_area_perimeter": {
+   "L1": 1
+  },
+  "area_perimeter:composite_shapes": {
+   "L1": 1
+  },
+  "area_perimeter:perimeter_grid": {
+   "L1": 1
+  },
+  "area_perimeter:volume_composite": {
+   "L1": 1
+  },
+  "comparing:compare_objects": {
+   "L1": 1
+  },
+  "composing:compose_whole": {
+   "NOTATION": 30,
+   "L3": 30,
+   "L10": 1,
+   "REPEATS": 6
+  },
+  "composing:fraction_number_line": {
+   "NOTATION": 16
+  },
+  "composing:make_ten": {
+   "L1": 1,
+   "REPEATS": 3
+  },
+  "composing:mixed_composing": {
+   "NOTATION": 1,
+   "L3": 2
+  },
+  "composing:odd_even": {
+   "L3": 6
+  },
+  "composing:ten_frame_build": {
+   "REPEATS": 2
+  },
+  "composing:ten_frame_build_teen": {
+   "REPEATS": 3
+  },
+  "composing:tens_foundation_visual": {
+   "REPEATS": 3
+  },
+  "composing:whole_as_fraction": {
+   "L1": 1
+  },
+  "conversions:d_to_f": {
+   "NOTATION": 18
+  },
+  "conversions:double_num_line": {
+   "L1": 1
+  },
+  "conversions:f_to_d": {
+   "NOTATION": 30
+  },
+  "conversions:f_to_p": {
+   "NOTATION": 30
+  },
+  "conversions:mixed_conversions": {
+   "NOTATION": 2
+  },
+  "conversions:p_to_f": {
+   "NOTATION": 24
+  },
+  "conversions:percent_of_number": {
+   "NOTATION": 10
+  },
+  "conversions:percent_visual": {
+   "L1": 1
+  },
+  "conversions:ratio_tables": {
+   "L3": 3
+  },
+  "coordinates:coord_distance_q1": {
+   "L1": 1
+  },
+  "coordinates:coord_polygon": {
+   "L1": 1
+  },
+  "coordinates:coordinate_all": {
+   "NOTATION": 30,
+   "L1": 1
+  },
+  "coordinates:coordinate_graph": {
+   "NOTATION": 14,
+   "L1": 1
+  },
+  "coordinates:coordinate_q1": {
+   "L1": 1
+  },
+  "coordinates:coordinates_plot_all": {
+   "NOTATION": 30,
+   "L1": 1
+  },
+  "coordinates:coordinates_plot_q1": {
+   "L1": 1
+  },
+  "coordinates:coordinates_read_all": {
+   "NOTATION": 30,
+   "L1": 1
+  },
+  "coordinates:coordinates_read_q1": {
+   "L1": 1
+  },
+  "coordinates:geo_reflect": {
+   "L1": 1,
+   "REPEATS": 4
+  },
+  "coordinates:geo_rotate": {
+   "L1": 1,
+   "REPEATS": 1
+  },
+  "coordinates:geo_translate": {
+   "L1": 1
+  },
+  "coordinates:mixed_coordinates": {
+   "NOTATION": 2,
+   "L1": 1
+  },
+  "coordinates:net_surface_area": {
+   "L1": 1,
+   "REPEATS": 4
+  },
+  "coordinates:reflect_x_axis": {
+   "L1": 1,
+   "REPEATS": 8
+  },
+  "coordinates:reflect_y_axis": {
+   "L1": 1,
+   "REPEATS": 8
+  },
+  "coordinates:rotate_half_turn": {
+   "L1": 1,
+   "REPEATS": 8
+  },
+  "coordinates:rotate_quarter_turn": {
+   "L1": 1,
+   "REPEATS": 8
+  },
+  "coordinates:rotate_three_quarter_turn": {
+   "L1": 1,
+   "REPEATS": 8
+  },
+  "coordinates:translate_left_down": {
+   "L1": 1
+  },
+  "coordinates:translate_left_up": {
+   "L1": 1
+  },
+  "coordinates:translate_right_down": {
+   "L1": 1
+  },
+  "coordinates:translate_right_up": {
+   "L1": 1
+  },
+  "counting:count_sequence": {
+   "L1": 1
+  },
+  "counting_mixed:counting_all": {
+   "NOTATION": 1,
+   "L3": 1
+  },
+  "data_analysis:box_plot_intro": {
+   "L1": 1
+  },
+  "data_analysis:box_plot_quartiles": {
+   "L1": 1
+  },
+  "data_analysis:histogram_read": {
+   "L1": 1
+  },
+  "data_analysis:statistical_question": {
+   "REPEATS": 5
+  },
+  "data_mixed:data_stats_all": {
+   "NOTATION": 3,
+   "L3": 1
+  },
+  "decimals:mixed_decimals": {
+   "NOTATION": 3
+  },
+  "decimals:sub_decimal": {
+   "NOTATION": 30
+  },
+  "division:area_model_div_3by1": {
+   "L3": 1
+  },
+  "division:div_equation_parts": {
+   "L1": 1
+  },
+  "division:share_into_groups": {
+   "REPEATS": 2
+  },
+  "frac_dec_mixed:conversions_all": {
+   "NOTATION": 8
+  },
+  "frac_dec_mixed:decimals_all": {
+   "NOTATION": 3
+  },
+  "frac_dec_mixed:fdp_all": {
+   "NOTATION": 20
+  },
+  "frac_dec_mixed:fractions_all": {
+   "NOTATION": 23
+  },
+  "fraction_operations:add_frac_like_nv": {
+   "NOTATION": 30
+  },
+  "fraction_operations:add_frac_unlike": {
+   "NOTATION": 30
+  },
+  "fraction_operations:add_frac_unlike_nv": {
+   "NOTATION": 30
+  },
+  "fraction_operations:add_fractions_like": {
+   "NOTATION": 30
+  },
+  "fraction_operations:add_mixed_like": {
+   "NOTATION": 30
+  },
+  "fraction_operations:add_mixed_like_nv": {
+   "NOTATION": 30
+  },
+  "fraction_operations:add_mixed_unlike": {
+   "NOTATION": 30
+  },
+  "fraction_operations:add_mixed_unlike_nv": {
+   "NOTATION": 30
+  },
+  "fraction_operations:decompose_frac_nv": {
+   "NOTATION": 30
+  },
+  "fraction_operations:decompose_fractions": {
+   "NOTATION": 30
+  },
+  "fraction_operations:div_unit_frac_nv": {
+   "NOTATION": 30
+  },
+  "fraction_operations:div_unit_fraction": {
+   "NOTATION": 30
+  },
+  "fraction_operations:estimate_frac_ops": {
+   "NOTATION": 50
+  },
+  "fraction_operations:frac_10_100": {
+   "NOTATION": 30
+  },
+  "fraction_operations:frac_10_100_nv": {
+   "NOTATION": 30
+  },
+  "fraction_operations:frac_as_div_nv": {
+   "NOTATION": 13
+  },
+  "fraction_operations:frac_as_division": {
+   "NOTATION": 5
+  },
+  "fraction_operations:frac_mult_word": {
+   "NOTATION": 30,
+   "L1": 1
+  },
+  "fraction_operations:frac_mult_word_plain": {
+   "NOTATION": 30
+  },
+  "fraction_operations:frac_word_mixed": {
+   "NOTATION": 30,
+   "L1": 1
+  },
+  "fraction_operations:frac_word_mixed_plain": {
+   "NOTATION": 30
+  },
+  "fraction_operations:frac_word_problems": {
+   "NOTATION": 30,
+   "L1": 1
+  },
+  "fraction_operations:frac_word_problems_plain": {
+   "NOTATION": 30
+  },
+  "fraction_operations:mixed_fraction_ops": {
+   "NOTATION": 29
+  },
+  "fraction_operations:mult_frac_frac": {
+   "NOTATION": 30
+  },
+  "fraction_operations:mult_frac_frac_nv": {
+   "NOTATION": 30
+  },
+  "fraction_operations:mult_frac_whole": {
+   "NOTATION": 34
+  },
+  "fraction_operations:mult_frac_whole_nv": {
+   "NOTATION": 31
+  },
+  "fraction_operations:mult_scaling": {
+   "NOTATION": 30
+  },
+  "fraction_operations:mult_scaling_nv": {
+   "NOTATION": 30
+  },
+  "fraction_operations:sub_frac_like_nv": {
+   "NOTATION": 33
+  },
+  "fraction_operations:sub_frac_unlike": {
+   "NOTATION": 38
+  },
+  "fraction_operations:sub_frac_unlike_nv": {
+   "NOTATION": 34
+  },
+  "fraction_operations:sub_fractions_like": {
+   "NOTATION": 38
+  },
+  "fraction_operations:sub_mixed_like": {
+   "NOTATION": 36
+  },
+  "fraction_operations:sub_mixed_like_nv": {
+   "NOTATION": 30
+  },
+  "fraction_operations:sub_mixed_unlike": {
+   "NOTATION": 37
+  },
+  "fraction_operations:sub_mixed_unlike_nv": {
+   "NOTATION": 30
+  },
+  "fraction_operations:unit_frac_div_whole": {
+   "NOTATION": 30
+  },
+  "fraction_operations:whole_div_unit_frac": {
+   "NOTATION": 30
+  },
+  "fractions:benchmark_fractions": {
+   "NOTATION": 30
+  },
+  "fractions:compare": {
+   "NOTATION": 30,
+   "REPEATS": 1
+  },
+  "fractions:compare_frac_lcd": {
+   "NOTATION": 30
+  },
+  "fractions:compare_fractions_nl": {
+   "NOTATION": 30
+  },
+  "fractions:compare_to_half": {
+   "NOTATION": 30
+  },
+  "fractions:compose_target_frac": {
+   "NOTATION": 30
+  },
+  "fractions:equiv_frac_nv": {
+   "NOTATION": 30
+  },
+  "fractions:equiv_frac_visual": {
+   "NOTATION": 21
+  },
+  "fractions:equivalent": {
+   "NOTATION": 25
+  },
+  "fractions:equivalent_or_not": {
+   "NOTATION": 30
+  },
+  "fractions:fraction_bar_ops": {
+   "NOTATION": 30,
+   "L1": 1
+  },
+  "fractions:fraction_nl_drag": {
+   "NOTATION": 19
+  },
+  "fractions:fraction_of_set": {
+   "NOTATION": 23
+  },
+  "fractions:fraction_of_set_hard": {
+   "NOTATION": 23
+  },
+  "fractions:fraction_of_set_hard_nv": {
+   "NOTATION": 30
+  },
+  "fractions:fraction_of_set_nv": {
+   "NOTATION": 30
+  },
+  "fractions:graph_fractions": {
+   "NOTATION": 30
+  },
+  "fractions:identify": {
+   "NOTATION": 20
+  },
+  "fractions:improper_mixed": {
+   "NOTATION": 9
+  },
+  "fractions:mixed_fractions": {
+   "NOTATION": 21
+  },
+  "fractions:mixed_improper_visual": {
+   "L1": 1
+  },
+  "fractions:order_frac_numline": {
+   "NOTATION": 30
+  },
+  "fractions:order_fractions": {
+   "NOTATION": 7
+  },
+  "fractions:round_fractions": {
+   "NOTATION": 30
+  },
+  "fractions:select_equiv_frac": {
+   "NOTATION": 30
+  },
+  "fractions:shade_fraction": {
+   "NOTATION": 30,
+   "REPEATS": 4
+  },
+  "fractions:simplify": {
+   "NOTATION": 22
+  },
+  "fractions:simplify_with_gcf": {
+   "NOTATION": 30,
+   "REPEATS": 1
+  },
+  "geo_mixed:geometry_all": {
+   "NOTATION": 2,
+   "L1": 1
+  },
+  "graphs:build_bar_graph": {
+   "L10": 1
+  },
+  "graphs:build_pictograph": {
+   "L10": 1
+  },
+  "graphs:line_plot": {
+   "NOTATION": 30,
+   "L1": 1
+  },
+  "graphs:line_plot_fractions": {
+   "NOTATION": 30,
+   "L1": 1
+  },
+  "graphs:line_plot_g2": {
+   "L1": 1
+  },
+  "graphs:mixed_graphs": {
+   "NOTATION": 5
+  },
+  "graphs:pictograph_how_many_more": {
+   "L3": 8
+  },
+  "graphs:pie_chart": {
+   "L1": 1
+  },
+  "integers:abs_value": {
+   "NOTATION": 6
+  },
+  "integers:add_int": {
+   "NOTATION": 24
+  },
+  "integers:add_negative": {
+   "NOTATION": 30
+  },
+  "integers:compare_int": {
+   "NOTATION": 22
+  },
+  "integers:mixed_integers": {
+   "NOTATION": 14
+  },
+  "integers:number_line_int": {
+   "NOTATION": 30
+  },
+  "integers:opposite_numbers": {
+   "NOTATION": 14
+  },
+  "integers:ordering_rationals": {
+   "NOTATION": 56
+  },
+  "integers:sub_int": {
+   "NOTATION": 23
+  },
+  "integers:sub_negative": {
+   "NOTATION": 30
+  },
+  "measurement:capacity": {
+   "L6": 6
+  },
+  "measurement:coin_value": {
+   "L3": 1
+  },
+  "measurement:convert_cm_to_mm": {
+   "REPEATS": 2
+  },
+  "measurement:convert_feet_to_inches": {
+   "REPEATS": 1
+  },
+  "measurement:convert_km_to_m": {
+   "REPEATS": 1
+  },
+  "measurement:convert_m_to_cm": {
+   "REPEATS": 1
+  },
+  "measurement:convert_m_to_mm": {
+   "REPEATS": 1
+  },
+  "measurement:convert_miles_to_feet": {
+   "REPEATS": 1
+  },
+  "measurement:convert_yards_to_feet": {
+   "REPEATS": 1
+  },
+  "measurement:convert_yards_to_inches": {
+   "REPEATS": 1
+  },
+  "measurement:heavier_lighter_visual": {
+   "REPEATS": 2
+  },
+  "measurement:make_change_least_coins": {
+   "REPEATS": 1
+  },
+  "measurement:minutes_by_fives_all": {
+   "L10": 1,
+   "REPEATS": 11
+  },
+  "measurement:money_amount_in_words": {
+   "REPEATS": 1
+  },
+  "measurement:money_count": {
+   "L3": 5,
+   "REPEATS": 1
+  },
+  "measurement:money_notation": {
+   "REPEATS": 1
+  },
+  "measurement:pictograph_intro": {
+   "L3": 3
+  },
+  "measurement:reading_ruler": {
+   "REPEATS": 6
+  },
+  "measurement:time_fives_ring": {
+   "L6": 10
+  },
+  "measurement:time_half_hour": {
+   "REPEATS": 1
+  },
+  "measurement:time_hour": {
+   "REPEATS": 1
+  },
+  "measurement:unit_conversions": {
+   "L3": 1
+  },
+  "multiplication:dot_array_mult": {
+   "L1": 1
+  },
+  "multiplication:equal_or_unequal_groups": {
+   "L1": 1,
+   "L3": 15
+  },
+  "multiplication:mixed_multiplication": {
+   "L3": 2
+  },
+  "multiplication:mult_by_hundred": {
+   "REPEATS": 4
+  },
+  "multiplication:mult_by_ten": {
+   "REPEATS": 4
+  },
+  "multiplication:mult_placeholder_zero": {
+   "L10": 1
+  },
+  "multiplication:mult_properties": {
+   "NOTATION": 15
+  },
+  "multiplication:repeated_add_to_mult": {
+   "L1": 1
+  },
+  "number_sense:compensation": {
+   "NOTATION": 15
+  },
+  "number_sense:reasonable_quotients": {
+   "L10": 2
+  },
+  "number_theory:divisibility_sort": {
+   "L6": 16
+  },
+  "number_theory:factor_links_easy": {
+   "REPEATS": 3
+  },
+  "number_theory:factor_links_medium": {
+   "REPEATS": 3
+  },
+  "number_theory:factor_tchart_easy": {
+   "REPEATS": 2
+  },
+  "number_theory:factor_tchart_medium": {
+   "REPEATS": 3
+  },
+  "order_of_operations:mixed_order_ops": {
+   "NOTATION": 5
+  },
+  "order_of_operations:paren_multi": {
+   "NOTATION": 4
+  },
+  "order_of_operations:paren_simple": {
+   "NOTATION": 13
+  },
+  "order_of_operations:three_ops_no_paren": {
+   "NOTATION": 16
+  },
+  "order_of_operations:two_ops_no_paren": {
+   "NOTATION": 15
+  },
+  "patterns:halve": {
+   "L3": 1
+  },
+  "patterns:shape_pattern": {
+   "L1": 1
+  },
+  "placevalue:digit_value_notation": {
+   "L6": 27
+  },
+  "placevalue:digit_value_unit_form": {
+   "L6": 27
+  },
+  "placevalue:value": {
+   "L6": 25
+  },
+  "probability:mixed_probability": {
+   "NOTATION": 7
+  },
+  "probability:probability_basic": {
+   "NOTATION": 9
+  },
+  "shapes_classify:cross_section_3d": {
+   "L1": 1,
+   "REPEATS": 2
+  },
+  "shapes_classify:hotspot_quads": {
+   "L1": 1,
+   "REPEATS": 6
+  },
+  "shapes_classify:mixed_shapes": {
+   "L1": 1
+  },
+  "shapes_classify:net_identify": {
+   "L1": 1
+  },
+  "shapes_early:compose_from_attributes": {
+   "L1": 1
+  },
+  "shapes_early:compose_hexagon": {
+   "REPEATS": 9
+  },
+  "shapes_early:compose_rect_from_squares": {
+   "L10": 1,
+   "REPEATS": 11
+  },
+  "shapes_early:compose_shapes": {
+   "L1": 1,
+   "REPEATS": 8
+  },
+  "shapes_early:count_edges_faces_vertices": {
+   "L1": 1
+  },
+  "shapes_early:count_sides_vertices_2d": {
+   "L1": 1
+  },
+  "shapes_early:measure_nonstandard": {
+   "L1": 1
+  },
+  "shapes_early:partition_shapes": {
+   "L1": 1,
+   "REPEATS": 3
+  },
+  "shapes_early:shape_attributes": {
+   "L1": 1
+  },
+  "shapes_early:shape_corners_count": {
+   "L1": 1,
+   "REPEATS": 6
+  },
+  "shapes_early:shape_name_match_2d": {
+   "L10": 1,
+   "REPEATS": 11
+  },
+  "shapes_early:shape_name_match_3d": {
+   "L10": 1,
+   "REPEATS": 11
+  },
+  "shapes_early:shape_positions": {
+   "L1": 1
+  },
+  "subtraction:sub_5_pictures": {
+   "REPEATS": 3
+  },
+  "vocabulary:vocab_grade_1": {
+   "NOTATION": 3
+  },
+  "vocabulary:vocab_grade_1_geometry": {
+   "L1": 1
+  },
+  "vocabulary:vocab_grade_1_measurement": {
+   "L1": 1
+  },
+  "vocabulary:vocab_grade_1_operations": {
+   "NOTATION": 11
+  },
+  "vocabulary:vocab_grade_2": {
+   "NOTATION": 2
+  },
+  "vocabulary:vocab_grade_2_algebra": {
+   "NOTATION": 2,
+   "L1": 1
+  },
+  "vocabulary:vocab_grade_2_fractions": {
+   "L1": 1
+  },
+  "vocabulary:vocab_grade_2_geometry": {
+   "L1": 1
+  },
+  "vocabulary:vocab_grade_2_operations": {
+   "NOTATION": 3
+  },
+  "vocabulary:vocab_grade_3": {
+   "NOTATION": 1
+  },
+  "vocabulary:vocab_grade_3_algebra": {
+   "L1": 1
+  },
+  "vocabulary:vocab_grade_3_fractions": {
+   "NOTATION": 17,
+   "L1": 1
+  },
+  "vocabulary:vocab_grade_3_geometry": {
+   "L1": 1
+  },
+  "vocabulary:vocab_grade_4": {
+   "NOTATION": 6
+  },
+  "vocabulary:vocab_grade_4_data": {
+   "NOTATION": 4
+  },
+  "vocabulary:vocab_grade_4_fractions": {
+   "NOTATION": 18
+  },
+  "vocabulary:vocab_grade_4_operations": {
+   "L1": 1
+  },
+  "vocabulary:vocab_grade_5": {
+   "NOTATION": 3
+  },
+  "vocabulary:vocab_grade_5_data": {
+   "NOTATION": 1
+  },
+  "vocabulary:vocab_grade_5_fractions": {
+   "NOTATION": 15,
+   "L1": 1
+  },
+  "vocabulary:vocab_grade_5_geometry": {
+   "L1": 1
+  },
+  "vocabulary:vocab_grade_6": {
+   "NOTATION": 7
+  },
+  "vocabulary:vocab_grade_6_algebra": {
+   "NOTATION": 4,
+   "L1": 1
+  },
+  "vocabulary:vocab_grade_6_fractions": {
+   "NOTATION": 16
+  },
+  "vocabulary:vocab_grade_6_geometry": {
+   "NOTATION": 5,
+   "L1": 1
+  },
+  "vocabulary:vocab_grade_6_operations": {
+   "NOTATION": 24
+  },
+  "vocabulary:vocab_grade_K_algebra": {
+   "L1": 1
+  },
+  "vocabulary:vocab_grade_K_geometry": {
+   "L1": 1
+  },
+  "vocabulary:vocab_grade_K_operations": {
+   "NOTATION": 14
+  }
+ }
+}
