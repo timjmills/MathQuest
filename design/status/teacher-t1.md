@@ -30,3 +30,12 @@ Owns: `design/mockups/teacher-2/`, `tests/scripts/ws-teacher-tokens.cjs`, this f
 | 2026-10-23 | Critic round 4 (fresh critic) | mq-opus-medium | running |
 | 2026-10-23 | Critic r4: A 7 · B 8 · C 6 · D 8 — FAIL (`critic-r4.md`). Thumbnails contradict names for a 3rd round → stop rule: root cause is hand-drawn stand-ins; fix = draw every thumbnail from the real seeded generator (`generateQuestionFor`) captured into data.js. Search must use `skill-finder.js` (CLAUDE.md) | lead | FAIL |
 | 2026-10-23 | Fix round 4 (fresh builder) | mq-opus-medium | running |
+
+## Owner design list (batch rule, owner via lead 2026-10-23)
+
+New owner design ideas are recorded here and NOT folded into a running fix round. After the current round's critic PASS the owner sees the whole overview once, then gives one batch (this list + new changes) → one build round → one critic round. Exception: anything blocking approval (broken flow, unreadable).
+
+| Date | Owner's words | Status |
+|---|---|---|
+| 2026-10-23 | "we might want multiple pages of the same set of problems as well" | already in fix round 4 (sent before the batch rule): "Each page: New problems · Same problems, new numbers · Same page again" |
+| 2026-10-23 | side menu "deep purple like in this screenshot" → "actually let's keep it as it is for now … if it's a problem I will change later" | parked; purple #592B88 shown as a reference on palette.html |
