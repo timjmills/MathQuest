@@ -215,3 +215,15 @@ measurement, since removed). The SLOT-W / HEADS probe lives in ws-slot-clip, not
 **Queue of automatic checks this lane owns** (owner rule: the main owner of new checks; other lanes' "Automatic checks"
 items join here in priority order): A8 deploy-list time budget; A1 shared "checked nothing" helper; A3 key-based baseline
 test for every baselined tool; A10–A12; then other lanes' items as they are listed in speed-audit.md "Per-round findings".
+
+### Critic r6 (`design/audit/runs/wave0-gates/critic-r6.md`): FAIL 6 / 8 / 7 — the five pilot-lesson checks
+All five BAD states fail for the r1 defect's own reason (D1, D3, D5, D6 of pilot r1) and `good.patch` is a fair stand-in.
+Blocking: D1 sibling-compare only compares RED rows, but unpinned rows are PENDING(no-baseline), so a new skill (e.g. the
+pilot's `sub_2d_1d`, 38 counts above siblings) is never compared; D2 ws-phone-card picks the wrong "ones" box on legacy
+column cells (3–4 px raised active box) and false-FAILs approved 4–6-digit regroup skills; D3 ws-card-rulings prints OK when
+only part of the scope has rulings. Lead decision on N1: compare with the paired same-size siblings by default (as the lead's
+own comparison did). Fix r6 at Opus medium.
+
+| Round | Result | (1) Automatic checks the findings point to | (2) Speed-ups |
+|---|---|---|---|
+| r6 | FAIL 6 / 8 / 7 | **A13** every rule-0b tool must judge unpinned rows too (a "status filter" test: a fixture with only PENDING(no-baseline) rows must still be compared); **A14** every new screen probe is run on the approved siblings before it gates (a "siblings clean" self-check: an approved skill failing a new probe means the probe is wrong, not the skill); **A15** partial-scope = INCOMPLETE for any scoped check. | Run a new check on approved siblings in the builder's own loop (would have caught D2 before the critic); slot-clip costs ≈ 19 min of a precritic — batch its print-lint jobs with the matrix's own render (one render, two lints). |
