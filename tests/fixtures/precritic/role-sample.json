@@ -1,0 +1,130 @@
+{
+ "note": "Pinned role sample for ws-precritic --role (IMPROVEMENT_PLAN §1.4 S1). Changed only with a STATUS note.",
+ "how": "node tests/scripts/ws-precritic.cjs --write-role-sample: the 20 largest families (categories) by the skill counts of the \"By category\" table of design/SKILL_CATALOGUE.md (ties keep catalogue order), listed in catalogue order; for each, the first row of its \"Every skill\" section that is a live skill (not retired) in js/modules/data.js.",
+ "catalogue": "b8f82f52 2026-10-17",
+ "pinned": "2026-10-23",
+ "skills": [
+  "composing:number_bonds",
+  "addition:add_facts",
+  "subtraction:sub_facts",
+  "multiplication:mult_facts",
+  "division:div_facts",
+  "fractions:identify",
+  "fraction_operations:add_fractions_like",
+  "decimals:add_decimal",
+  "conversions:f_to_d",
+  "shapes_early:name_2d_shapes",
+  "area_perimeter:perimeter_intro",
+  "coordinates:coordinate_q1",
+  "measurement:time_hour",
+  "patterns:seq_2",
+  "algebra:tape_diagram",
+  "order_of_operations:oop_easy",
+  "placevalue:more_less_10",
+  "number_sense:rounding_visual",
+  "number_theory:prime_composite",
+  "vocabulary:vocab_grade_K"
+ ],
+ "families": [
+  {
+   "skill": "composing:number_bonds",
+   "family": "composing",
+   "familySize": 19
+  },
+  {
+   "skill": "addition:add_facts",
+   "family": "addition",
+   "familySize": 61
+  },
+  {
+   "skill": "subtraction:sub_facts",
+   "family": "subtraction",
+   "familySize": 56
+  },
+  {
+   "skill": "multiplication:mult_facts",
+   "family": "multiplication",
+   "familySize": 52
+  },
+  {
+   "skill": "division:div_facts",
+   "family": "division",
+   "familySize": 28
+  },
+  {
+   "skill": "fractions:identify",
+   "family": "fractions",
+   "familySize": 33
+  },
+  {
+   "skill": "fraction_operations:add_fractions_like",
+   "family": "fraction_operations",
+   "familySize": 41
+  },
+  {
+   "skill": "decimals:add_decimal",
+   "family": "decimals",
+   "familySize": 15
+  },
+  {
+   "skill": "conversions:f_to_d",
+   "family": "conversions",
+   "familySize": 19
+  },
+  {
+   "skill": "shapes_early:name_2d_shapes",
+   "family": "shapes_early",
+   "familySize": 17
+  },
+  {
+   "skill": "area_perimeter:perimeter_intro",
+   "family": "area_perimeter",
+   "familySize": 17
+  },
+  {
+   "skill": "coordinates:coordinate_q1",
+   "family": "coordinates",
+   "familySize": 23
+  },
+  {
+   "skill": "measurement:time_hour",
+   "family": "measurement",
+   "familySize": 61
+  },
+  {
+   "skill": "patterns:seq_2",
+   "family": "patterns",
+   "familySize": 16
+  },
+  {
+   "skill": "algebra:tape_diagram",
+   "family": "algebra",
+   "familySize": 35
+  },
+  {
+   "skill": "order_of_operations:oop_easy",
+   "family": "order_of_operations",
+   "familySize": 14
+  },
+  {
+   "skill": "placevalue:more_less_10",
+   "family": "placevalue",
+   "familySize": 20
+  },
+  {
+   "skill": "number_sense:rounding_visual",
+   "family": "number_sense",
+   "familySize": 32
+  },
+  {
+   "skill": "number_theory:prime_composite",
+   "family": "number_theory",
+   "familySize": 19
+  },
+  {
+   "skill": "vocabulary:vocab_grade_K",
+   "family": "vocabulary",
+   "familySize": 50
+  }
+ ]
+}

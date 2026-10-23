@@ -1,0 +1,31 @@
+report,run,lane,round,date_added,commit_added,verdict,min_score,mean_score,n_open,notes
+design/audit/OPTIONS-CRITIC-R2.md,options-panel,options-panel,2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,,,24,65/596 skills pass; rows = 24 numbered fixes of s5 (s7 per-skill lines are instances of them)
+design/audit/runs/answer-key-options/critic.md,answer-key-options,wave1-answer-key-options,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,,10,
+design/audit/runs/answer-key-options/critic-r2.md,answer-key-options,wave1-answer-key-options,2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,,7,
+design/audit/runs/answer-key-options/critic-r3.md,answer-key-options,wave1-answer-key-options,3,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,,7,
+design/audit/runs/answer-key-options/critic-r4.md,answer-key-options,wave1-answer-key-options,4,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,,5,one small blocker
+design/audit/runs/answer-key-options/critic-r5.md,answer-key-options,wave1-answer-key-options,5,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,,6,
+design/audit/runs/chromebook-fit/CRITIC-R1.md,chromebook-fit,chromebook-fit,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,,10,
+design/audit/runs/chromebook-fit/CRITIC-R2.md,chromebook-fit,chromebook-fit,2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,,10,quiz row 7s only
+design/audit/runs/chromebook-fit/CRITIC-R3.md,chromebook-fit,chromebook-fit,3,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,,12,
+design/audit/runs/countby-arrows/critic.md,countby-arrows,wave1-C2-countby,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,,12,
+design/audit/runs/countby-arrows/critic-r2.md,countby-arrows,wave1-C2-countby,2,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,3,,12,lane scope PASS; min 3 is pre-existing opener/model/anchor row
+design/audit/runs/div-facts-forms/CRITIC-R1.md,div-facts-forms,div_facts-divForm,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,5,,14,
+design/audit/runs/div-facts-forms/CRITIC-R2.md,div-facts-forms,div_facts-divForm,2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,,12,info roles down to 5 (Mix Guided S)
+design/audit/runs/div-facts-forms/CRITIC-R3.md,div-facts-forms,div_facts-divForm,3,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,,11,
+design/audit/runs/div-facts-forms/CRITIC-R4.md,div-facts-forms,div_facts-divForm,4,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,,11,info roles 6-7 not in verdict
+design/audit/runs/landing-many/critic.md,landing-many,landing-modal,1,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,,7,pre-existing major defect on same screen
+design/audit/runs/ldiv-hug/CRITIC-R1.md,ldiv-hug,ldiv-hug,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,,6,
+design/audit/runs/ldiv-hug/CRITIC-R2.md,ldiv-hug,ldiv-hug,2,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,,6,
+design/audit/runs/nf-order/critic.md,nf-order,number-families-order,1,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,,12,
+design/audit/runs/number-line/critic-r2.md,number-line,support-numberline,2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,,9,
+design/audit/runs/number-line/critic-r3.md,number-line,support-numberline,3,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,,7,close
+design/audit/runs/number-line/critic-r4.md,number-line,support-numberline,4,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,5,,6,cap H5 abs_value S
+design/audit/runs/number-line/critic-r5.md,number-line,support-numberline,5,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,,4,
+design/audit/runs/number-line/critic-r6.md,number-line,support-numberline,6,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,,3,
+design/audit/runs/number-line/critic-r7.md,number-line,support-numberline,7,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,,3,
+design/audit/runs/number-line/critic-r8.md,number-line,support-numberline,8,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,,5,
+design/audit/runs/number-line/critic-r9.md,number-line,support-numberline,9,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,,4,
+design/audit/runs/placevalue-phones/critic.md,placevalue-phones,wave1-pv-phones,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,5,,7,
+design/audit/runs/placevalue-phones/critic-r2.md,placevalue-phones,wave1-pv-phones,2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,,4,
+design/audit/runs/placevalue-phones/critic-r3.md,placevalue-phones,wave1-pv-phones,3,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,,6,

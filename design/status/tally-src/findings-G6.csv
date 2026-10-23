@@ -1,0 +1,490 @@
+report,run,round,defect_id,class,kind,carried,severity,rule_ids,family,template,summary
+design/audit/runs/pulse-fix/critic.md,pulse-fix,1,D1,INTERACTION,machine,no,blocking,,answer-box,,MutationObserver re-triggers itself every frame: endless rAF loop while a box is active
+design/audit/runs/pulse-fix/critic.md,pulse-fix,1,D2,INTERACTION,machine,no,blocking,SP-20,answer-box,stack,Pulse picks tens box first in stacks against ones-first entry
+design/audit/runs/pulse-fix/critic.md,pulse-fix,1,D3,INTERACTION,machine,no,blocking,,answer-box,word-work,Optional word-work regroup boxes pulse as the next box
+design/audit/runs/pulse-fix/critic.md,pulse-fix,1,D4,CLIP_OVERLAP,machine,no,blocking,,answer-box,,Glow ring overpainted by neighbour box or clipped by its row
+design/audit/runs/pulse-fix/critic.md,pulse-fix,1,D5,VISUAL_DESIGN,judgment,no,minor,,answer-box,,Worksheet shows two pulsing things (card pulse plus box pulse); owner ruling
+design/audit/runs/pulse-fix/critic.md,pulse-fix,2,D6,INTERACTION,machine,no,blocking,,answer-box,word-work,Pulse lands on a word-work operand box that must stay empty (24 of 46 skills)
+design/audit/runs/pulse-fix/critic.md,pulse-fix,2,D5,VISUAL_DESIGN,judgment,yes,minor,,answer-box,,Worksheet card still pulses beside the box; owner ruling pending
+design/audit/runs/pulse-fix/critic.md,pulse-fix,3,D5,VISUAL_DESIGN,judgment,yes,minor,SP-30,answer-box,,Worksheet card pulses beside the box; yellow inside B&W cell awaits owner ruling
+design/audit/runs/pulse-fix/critic.md,pulse-fix,4,R4-1,INTERACTION,machine,no,blocking,,answer-box,,Tapping ordering tiles or rounding dots throws focus into a typing box and scrolls
+design/audit/runs/pulse-fix/critic.md,pulse-fix,4,R4-2,INTERACTION,machine,no,blocking,,answer-box,,Blank tap after scrolling up jumps the page back down to the box
+design/audit/runs/pulse-fix/critic.md,pulse-fix,4,R4-3,INTERACTION,machine,no,blocking,,answer-box,stack,Missing digit no longer marked red at Check; wave1-a3-wrongdigits gate fails
+design/audit/runs/pulse-fix/critic.md,pulse-fix,4,R4-4,INTERACTION,machine,no,minor,,answer-box,,After Hint/Read closes focus stays on button so first keystrokes are lost
+design/audit/runs/pulse-fix/critic.md,pulse-fix,4,D5,VISUAL_DESIGN,judgment,yes,minor,,answer-box,,Worksheet card pulses beside the box; owner ruling pending
+design/audit/runs/pulse-fix/critic.md,pulse-fix,5,R5-1,INTERACTION,machine,no,blocking,,answer-box,,Space on a focused button hijacked into the box; keyboard/switch users cannot press Hint/Check
+design/audit/runs/pulse-fix/critic.md,pulse-fix,5,D5,VISUAL_DESIGN,judgment,yes,minor,,answer-box,,Worksheet card pulses beside the box; owner ruling pending
+design/audit/runs/pulse-fix/critic.md,pulse-fix,6,N1,INTERACTION,machine,no,minor,,answer-box,,Worked box with steps but no Say line has no Listen button
+design/audit/runs/pulse-fix/critic.md,pulse-fix,6,N2,INTERACTION,machine,no,minor,,answer-box,,Listen speaks the ellipsis literally instead of "and so on"
+design/audit/runs/pulse-fix/critic.md,pulse-fix,6,N3,INTERACTION,machine,no,minor,,worksheet,,Page error answerType undefined: pending advance timer outlives initWorksheet
+design/audit/runs/pulse-fix/critic.md,pulse-fix,6,D5,VISUAL_DESIGN,judgment,yes,minor,SP-30,answer-box,,Worksheet card pulse and yellow in B&W cell still await owner ruling
+design/audit/runs/search-terms/critic.md,search-terms,1,P1,SEARCH,machine,no,blocking,,search,,"Regex on label word 'multiples' gives mult_zeros skip-count and number-theory concepts"
+design/audit/runs/search-terms/critic.md,search-terms,1,P2,SEARCH,machine,no,blocking,,search,,column subtraction query leads with Addition skills (shared column concept)
+design/audit/runs/search-terms/critic.md,search-terms,1,P3,SEARCH,machine,no,blocking,,search,,"Seven queries rank a wrong skill first (divide by 2, nearest hundred, number bonds to 20, less ...)"
+design/audit/runs/search-terms/critic.md,search-terms,1,C1,SEARCH,machine,no,blocking,,search,,Column/short/standard-algorithm multiplication has no search words
+design/audit/runs/search-terms/critic.md,search-terms,1,C2,SEARCH,machine,no,blocking,,search,,subitizing returns 0 results
+design/audit/runs/search-terms/critic.md,search-terms,1,C3,SEARCH,machine,no,blocking,,search,,* not normalised to times; returns 0
+design/audit/runs/search-terms/critic.md,search-terms,1,C4,SEARCH,machine,no,blocking,,search,,composite_shapes matches no concept rule
+design/audit/runs/search-terms/critic.md,search-terms,1,C5,SEARCH,machine,no,minor,,search,,"making change, decimals, percentages lead with a non-introductory skill"
+design/audit/runs/search-terms/critic.md,search-terms,1,R1,SEARCH,machine,no,blocking,,search,,Unlisted misspellings rank by catalogue order; short typos never fuzzed
+design/audit/runs/search-terms/critic.md,search-terms,1,R2,SEARCH,machine,no,blocking,,search,,Ties fall back to catalogue order so Addition wins every tie
+design/audit/runs/search-terms/critic.md,search-terms,1,N1,OTHER,judgment,no,minor,,search,,Code hygiene: unused imports of search helpers in six modules
+design/audit/runs/search-terms/critic.md,search-terms,1,N2,SEARCH,machine,no,minor,,search,,Teacher screens never refresh results after standards/WRM terms load
+design/audit/runs/search-terms/critic.md,search-terms,1,N3,SEARCH,machine,no,minor,,search,,MISSPELLINGS has self-mappings and a junk key
+design/audit/runs/search-terms/critic.md,search-terms,1,N4,PROCESS,process,no,minor,,search,,Gate claims grouped DOM reorder is tested but only groupByRank is
+design/audit/runs/search-terms/critic-r2.md,search-terms,2,P-A,SEARCH,machine,no,blocking,,search,,Silent typo rewrite changes correct words (tile->time; compass->compare) with no notice
+design/audit/runs/search-terms/critic-r2.md,search-terms,2,P-B,SEARCH,machine,no,blocking,,search,,divide by 2 fixed by a pin; divided by 2 and ÷2 still lead with 2-digit division
+design/audit/runs/search-terms/critic-r2.md,search-terms,2,P-C,SEARCH,machine,no,minor,,search,,column_mult concept reaches the area/grid model
+design/audit/runs/search-terms/critic-r2.md,search-terms,2,C-A,SEARCH,machine,no,blocking,,search,,UK spelling analogue misses Analog and Digital Time
+design/audit/runs/search-terms/critic-r2.md,search-terms,2,C-B,SEARCH,machine,no,blocking,,search,,tile/tiling terms missing for area skills
+design/audit/runs/search-terms/critic-r2.md,search-terms,2,C-C,SEARCH,machine,no,minor,,search,,position and direction / compass directions / aera return 0
+design/audit/runs/search-terms/critic-r2.md,search-terms,2,R-A,SEARCH,machine,no,minor,,search,,part whole model ranks tape diagram above number bonds
+design/audit/runs/search-terms/critic-r2.md,search-terms,2,R-B,SEARCH,machine,no,minor,,search,,Grade/kindergarten queries put a vocabulary skill first
+design/audit/runs/search-terms/critic-r3.md,search-terms,3,P-D,SEARCH,machine,no,blocking,,search,,divide-by-N rule excludes division skills; six skills not found by their own label
+design/audit/runs/search-terms/critic-r3.md,search-terms,3,R-C,SEARCH,machine,yes,blocking,,search,,"divide by 2: grouped pickers put place_value_10x second, not Division Facts (r2 P-B partly fixed)"
+design/audit/runs/search-terms/critic-r3.md,search-terms,3,U-A,INTERACTION,machine,no,blocking,,search,,Correction notice becomes a flex item and shifts filter rows on every typo
+design/audit/runs/search-terms/critic-r3.md,search-terms,3,C-C,SEARCH,machine,yes,minor,,search,,compass directions still returns 0 results
+design/audit/runs/search-terms/critic-r3.md,search-terms,3,C-D,SEARCH,machine,no,minor,,search,,(No Pictures)/(No Visuals) variants not findable by their suffix
+design/audit/runs/search-terms/critic-r3.md,search-terms,3,C-E,SEARCH,machine,no,minor,,search,,"Small gaps: vertex, input output, clockwise, midnight, numicon, bonds to 100 ..."
+design/audit/runs/search-terms/critic-r3.md,search-terms,3,U1,SEARCH,machine,no,minor,,search,,"Correction rewrites a few real words (lost->lots, tie->time); add to REAL_WORDS"
+design/audit/runs/search-terms/critic-r4.md,search-terms,4,U-B,CLIP_OVERLAP,machine,no,blocking,,search,,Student results dropdown (z 1000) covers the correction notice; gate reads textContent only
+design/audit/runs/search-terms/critic-r4.md,search-terms,4,U-C,CLIP_OVERLAP,machine,no,blocking,,search,,Sets picker notice covers the Level filter label
+design/audit/runs/search-terms/critic-r4.md,search-terms,4,U1,CLIP_OVERLAP,machine,no,minor,,search,,Print picker notice overlaps top 4 px of results border
+design/audit/runs/search-terms/critic-r4.md,search-terms,4,U2,INTERACTION,machine,no,minor,,search,,View-change hide handler runs before the view changes so does nothing
+design/audit/runs/search-terms/critic-r4.md,search-terms,4,U3,SEARCH,machine,yes,minor,,search,,bonds to 100 still only add_sub_10s
+design/audit/runs/search-terms/critic-r4.md,search-terms,4,R-D,SEARCH,machine,no,minor,,search,,corner ranks Count Sides & Vertices above Count Corners
+design/audit/runs/search-terms/critic-r4.md,search-terms,4,C-F,SEARCH,machine,no,minor,,search,,commutative property returns 0 though Multiplication Properties exists
+design/audit/runs/search-terms/critic-r4.md,search-terms,4,R-E,SEARCH,machine,no,minor,,search,,decimals to fractions puts Fraction->Decimal first
+design/audit/runs/search-terms/critic-r5.md,search-terms,5,U-F,CLIP_OVERLAP,machine,no,blocking,,search,,Navigator correction notice truncated with ellipsis at Chromebook sizes
+design/audit/runs/search-terms/critic-r5.md,search-terms,5,U-D,INTERACTION,machine,no,blocking,,search,,Student box loses its notice when the list rebuilds after + or refocus
+design/audit/runs/search-terms/critic-r5.md,search-terms,5,U-E,INTERACTION,machine,no,minor,,search,,Sets Level row jumps 24 px when a correction notice appears
+design/audit/runs/search-terms/critic-r5.md,search-terms,5,U1,CLIP_OVERLAP,machine,yes,minor,,search,,Print picker notice still sits on the results list border
+design/audit/runs/search-terms/critic-r5.md,search-terms,5,P-E,SEARCH,machine,no,minor,,search,,associative leads to Multiplication Properties which never deals associative
+design/audit/runs/search-terms/critic-r5.md,search-terms,5,R-F,SEARCH,machine,no,minor,,search,,distributive property ranks Multiplication Properties above the label-matching skill
+design/audit/runs/search-terms/critic-r5.md,search-terms,5,C-G,SEARCH,machine,no,minor,,search,,zero/identity property return 0; identity corrected to identify
+design/audit/runs/search-terms/critic-r5.md,search-terms,5,R-G,SEARCH,machine,no,minor,,search,,multi digit multiplication puts Find the Missing Digit first
+design/audit/runs/search-terms/critic-r5.md,search-terms,5,U2,SEARCH,machine,yes,minor,,search,,bonds to 100 still has no matching skill
+design/audit/runs/search-terms/critic-r6.md,search-terms,6,U-G,CLIP_OVERLAP,machine,no,minor,,search,,Two-line correction notice covers Sets Level caption at 1366 wide
+design/audit/runs/search-terms/critic-r6.md,search-terms,6,P-H,SEARCH,machine,no,minor,,search,,zero/identity property of addition and grouping property land on a multiplication-only skill
+design/audit/runs/search-terms/critic-r6.md,search-terms,6,R-H,SEARCH,machine,no,minor,,search,,comparing numbers puts Add Three Numbers first (tie)
+design/audit/runs/search-terms/critic-r6.md,search-terms,6,U1,SEARCH,machine,no,minor,,search,,money word problems finds only Remainder Contexts
+design/audit/runs/search-terms/critic-r6.md,search-terms,6,U2,SEARCH,machine,no,minor,,search,,count backwards misses Number Patterns Count Back skill in top 3
+design/audit/runs/skip-count/critic-r1.md,skip-count,1,D1,VIEWPORT,machine,no,blocking,,skip-count,count-row,Card and quiz wrap a row that already fits (4+2); number line numbers leave their ticks
+design/audit/runs/skip-count/critic-r1.md,skip-count,1,D2,SPACE,machine,no,blocking,H13,skip-count,count-row,Worksheet wrap leaves 150-200 px empty band and a stray clipped jump arrow
+design/audit/runs/skip-count/critic-r1.md,skip-count,1,D3,VIEWPORT,machine,no,blocking,,skip-count,count-row,Resize in either direction leaves the row broken (hidden boxes or a sliver)
+design/audit/runs/skip-count/critic-r1.md,skip-count,1,D4,INSTRUCTION,machine,no,blocking,,skip-count,count-row,Review/test titles misspelt 'skiping count' (verb-doubling rule)
+design/audit/runs/skip-count/critic-r1.md,skip-count,1,D5,INSTRUCTION,machine,no,blocking,H5,skip-count,count-row,"Scripted model steps say Write 25 but box empty; at L step 4 alone on page 2"
+design/audit/runs/skip-count/critic-r1.md,skip-count,1,D6,CLIP_OVERLAP,machine,no,blocking,H2;H7;H4;L11,lessons,count-row,"Lesson packet: anchor/guided rows overflow cells; wrong step; paper drag verb; purple icons"
+design/audit/runs/skip-count/critic-r1.md,skip-count,1,N1,SEARCH,machine,no,minor,,skip-count,,count by 5 number line returns 0; skip count by 5 misses skip_count_line
+design/audit/runs/skip-count/critic-r1.md,skip-count,1,N2,PROCESS,process,no,minor,,skip-count,,Stale generator comment still describes hop arcs on the grid
+design/audit/runs/skip-count/critic-r1.md,skip-count,1,N3,SEARCH,machine,no,minor,,skip-count,,skip_count_grid tagged hundreds chart though it draws a count row
+design/audit/runs/skip-count/critic-r2.md,skip-count,2,D7,VIEWPORT,machine,no,blocking,,skip-count,count-row,"Card number line 683-1279 px: false swipe cue, cut last number, shrunk digits (regression)"
+design/audit/runs/skip-count/critic-r2.md,skip-count,2,D8,SPACE,machine,yes,blocking,H5,skip-count,count-row,Model with times:each / jumps:15 / 7-digit rows puts step 4 alone on page 2
+design/audit/runs/skip-count/critic-r2.md,skip-count,2,D9,VIEWPORT,machine,no,blocking,,skip-count,count-row,Card 390 swipe window cuts the 4th number of the line (lead-in offset ignored)
+design/audit/runs/skip-count/critic-r2.md,skip-count,2,N1,VIEWPORT,machine,no,minor,H6,skip-count,count-row,At 683 inputs are 42x44 inside a 46 px tile; floor measured on tile not input
+design/audit/runs/skip-count/critic-r2.md,skip-count,2,N2,INSTRUCTION,machine,no,minor,,skip-count,count-row,Model step 3 lacks Write 10 though panel traces it
+design/audit/runs/skip-count/critic-r2.md,skip-count,2,N4,SEARCH,machine,no,minor,,skip-count,,counting by 25 returns 0 results
+design/audit/runs/skip-count/critic-r2.md,skip-count,2,N5,INTERACTION,machine,no,minor,,skip-count,count-row,wireSwipeRows leaks window resize listeners for disconnected rows
+design/audit/runs/skip-count/critic-r2.md,skip-count,2,N6,CLIP_OVERLAP,machine,yes,minor,H2,lessons,count-row,Lesson packet D6 findings stand (out of scope this round)
+design/audit/runs/skip-count/critic-r2.md,skip-count,2,U1,PROCESS,process,no,minor,,skip-count,,wave1-c2-onepage fails on base key attribute change; gate needs re-pin
+design/audit/runs/skip-count/critic-r2.md,skip-count,2,U2,PROCESS,process,no,minor,,skip-count,,content-audit does not cover skip skills (count-row reader yields NaN)
+design/audit/runs/skip-count/critic-r3.md,skip-count,3,D10,PEDAGOGY,judgment,no,blocking,P-1,skip-count,scripted-model,Model step-merge leaks to 35 other skills joining two different actions in one state
+design/audit/runs/skip-count/critic-r3.md,skip-count,3,D9,VIEWPORT,machine,yes,blocking,,skip-count,count-row,Card 390 number-line window still clipped 12 px by .visual-aid; answer box loses its edge
+design/audit/runs/skip-count/critic-r3.md,skip-count,3,D11,SLOT,machine,no,blocking,H9,skip-count,count-row,Count-row boxes stay 16 mm for 6-7 digit answers; digits drop to 12 pt; traces overflow
+design/audit/runs/skip-count/critic-r3.md,skip-count,3,N7,SPACE,machine,no,minor,H5,skip-count,scripted-model,Model jumps:15 at L splits 2+2 with 28-30% bottom strips
+design/audit/runs/skip-count/critic-r3.md,skip-count,3,N8,PROCESS,process,no,minor,,skip-count,,cbwrap 390 check reseeds card with __wsReseed which does not fix the question
+design/audit/runs/skip-count/critic-r3.md,skip-count,3,N6,CLIP_OVERLAP,machine,yes,minor,H2,lessons,count-row,Lesson packet D6 still open (out of scope)
+design/audit/runs/skip-count/critic-r4.md,skip-count,4,D12,SPACE,machine,no,blocking,H5,skip-count,scripted-model,Model with step 25000 + one page prints 3 (A4) / 4 (Letter) pages with lone states; regression from D11
+design/audit/runs/skip-count/critic-r4.md,skip-count,4,N9,PROCESS,process,no,minor,,skip-count,scripted-model,small-fixes-model-pages baseline must be updated after lane's intended model changes
+design/audit/runs/skip-count/critic-r4.md,skip-count,4,N10,SIZE,machine,no,minor,,skip-count,count-row,S pages give 6-7 digit numbers at 10.2 pt under the 11 pt floor
+design/audit/runs/skip-count/critic-r4.md,skip-count,4,N11,VIEWPORT,machine,no,minor,SP-11a;TY-10b,skip-count,count-row,390 card first view shows no answer box on 17/30 line questions; two lines read as one
+design/audit/runs/skip-count/critic-r4.md,skip-count,4,N12,PROCESS,process,no,minor,,skip-count,,Main moved (providers/countby.js); lane must re-merge and re-run all-skills model diff
+design/audit/runs/skip-count/critic-r4.md,skip-count,4,N13,NAME_CONTENT,machine,no,minor,,skip-count,,ws-options-verify fails nl* options for count_by_tables and skip_count_line (pre-existing)
+design/audit/runs/skip-count/critic-r4.md,skip-count,4,U1,STEPS_LAYOUT,machine,no,minor,L11,skip-count,scripted-model,Model S merged step text wraps to 2 lines crowding the drawing
+design/audit/runs/small-fixes/critic-r1.md,small-fixes,1,D1,INTERACTION,machine,no,blocking,C2,small-fixes,count-row,Count-row caret hand-on uses box's own answer length: long numbers split and caret leaks answer length
+design/audit/runs/small-fixes/critic-r1.md,small-fixes,1,D2,VIEWPORT,machine,no,blocking,,small-fixes,,Word hint placed under whole visual on non-story word skills; pinned Check bar covers hint
+design/audit/runs/small-fixes/critic-r1.md,small-fixes,1,D3,SLOT,machine,no,blocking,,small-fixes,,New numerator/denominator inputs 40x44 px with 16 px digits
+design/audit/runs/small-fixes/critic-r1.md,small-fixes,1,D4,INTERACTION,machine,no,blocking,,small-fixes,word-work,Quiz back restores only the answer row; sign and working boxes wiped
+design/audit/runs/small-fixes/critic-r1.md,small-fixes,1,D5,CLIP_OVERLAP,machine,no,blocking,,small-fixes,count-row,Opener with All rows on one page: model row runs over Steps and off the page
+design/audit/runs/small-fixes/critic-r1.md,small-fixes,1,D6,INTERACTION,machine,no,minor,,small-fixes,,Mixed-play toast not covered by the new watcher; can show over first question
+design/audit/runs/small-fixes/critic-r2.md,small-fixes,2,N1,INTERACTION,machine,yes,blocking,C2,small-fixes,count-row,Slow typist's too-long number splits and shifts later boxes; pause rule leaks answer length (D1)
+design/audit/runs/small-fixes/critic-r2.md,small-fixes,2,N2,INTERACTION,machine,no,blocking,,small-fixes,count-row,Quiz: fluent typing joins numbers in one box and silently drops digits; comma does nothing
+design/audit/runs/small-fixes/critic-r2.md,small-fixes,2,N3,SPACE,machine,no,blocking,H5;H13,small-fixes,scripted-model,Scripted model now wraps row in half cell: 1-page sheets become 2-4 pages with lone states
+design/audit/runs/small-fixes/critic-r2.md,small-fixes,2,N4,SPACE,machine,no,blocking,H13,small-fixes,count-row,Opener one-page: Guided/Independent cells mostly empty and bottom third blank
+design/audit/runs/small-fixes/critic-r2.md,small-fixes,2,N5,SIZE,machine,no,minor,TY-10a,small-fixes,count-row,Half-width model cell: 25000 row wraps to lines of 2 and shrinks to ~10 pt
+design/audit/runs/small-fixes/critic-r2.md,small-fixes,2,N6,INK_FONT,machine,no,minor,,small-fixes,,Inline hint Listen button is a speaker emoji inside the B&W cell
+design/audit/runs/small-fixes/critic-r2.md,small-fixes,2,O1,GIVEAWAY,machine,no,minor,,quiz,word-work,Quiz live-marks right sign/unit/working boxes green during a test (out of lane)
+design/audit/runs/small-fixes/critic-r3.md,small-fixes,3,N7,INTERACTION,machine,no,blocking,,small-fixes,count-row,Card/worksheet: Enter or Tab after a right number skips a box; later numbers land one off
+design/audit/runs/small-fixes/critic-r3.md,small-fixes,3,N8,SPACE,machine,no,blocking,,small-fixes,count-row,Opener Lines M Letter draws an empty bordered Independent cell with no task
+design/audit/runs/small-fixes/critic-r3.md,small-fixes,3,N9,SPACE,machine,no,blocking,H13;PT-ENG-3,small-fixes,count-row,Opener Lines rows at S/M float in cells with 30-39% empty band
+design/audit/runs/small-fixes/critic-r3.md,small-fixes,3,N10,INTERACTION,machine,no,minor,,small-fixes,count-row,Digit past row width in the last box is dropped silently
+design/audit/runs/small-fixes/critic-r3.md,small-fixes,3,N11,INTERACTION,machine,no,minor,,small-fixes,count-row,Space from a box into a green locked box sends caret back; content overwritten
+design/audit/runs/small-fixes/critic-r3.md,small-fixes,3,O1,GIVEAWAY,machine,yes,minor,,quiz,word-work,Quiz live green marks on working (out of lane)
+design/audit/runs/small-fixes/critic-r3.md,small-fixes,3,O2,SLOT,machine,no,minor,,small-fixes,count-row,Opener guided 100000 row: ~9 pt numbers and 14 mm box for 9-character answer (pre-existing)
+design/audit/runs/small-fixes/critic-r4.md,small-fixes,4,N12,SPACE,machine,no,blocking,PT-OPN-7;PT-ENG-3,small-fixes,count-row,Opener Lines at M drops Independent rows that fit; Letter has none; 71-86 mm blank (regression)
+design/audit/runs/small-fixes/critic-r4.md,small-fixes,4,U1,CLIP_OVERLAP,machine,no,minor,,small-fixes,count-row,Problem letters a./b. touch the step tab on Opener Lines + one page
+design/audit/runs/small-fixes/critic-r4.md,small-fixes,4,O1,GIVEAWAY,machine,yes,minor,,quiz,word-work,Quiz live green marks on working (out of lane)
+design/audit/runs/small-fixes/critic-r4.md,small-fixes,4,O2,SLOT,machine,yes,minor,,small-fixes,count-row,Opener guided 100000 row small numbers and narrow box (out of lane)
+design/audit/runs/small-fixes/critic-r4.md,small-fixes,4,O3,CLIP_OVERLAP,machine,no,minor,,number_ops_mixed,,div-check-judge work box covered by #answerInput at 1366x650
+design/audit/runs/small-fixes/critic-r5.md,small-fixes,5,N13a,SPACE,machine,no,blocking,PT-OPN-6,small-fixes,count-row,Opener 100000 row at L A4 drops a second Guided row that fits; 43 mm blank (regression)
+design/audit/runs/small-fixes/critic-r5.md,small-fixes,5,N13b,SPACE,machine,no,blocking,PT-OPN-6,small-fixes,count-row,Opener by 25 + Lines + one page on Letter drops second Guided row; 41 mm blank (regression)
+design/audit/runs/small-fixes/critic-r5.md,small-fixes,5,N14,CLIP_OVERLAP,machine,yes,minor,,small-fixes,count-row,One-page Opener: letters a./b. still touch the step tab corner
+design/audit/runs/small-fixes/critic-r5.md,small-fixes,5,O1,GIVEAWAY,machine,yes,minor,,quiz,word-work,Quiz live green marks on working (out of lane)
+design/audit/runs/small-fixes/critic-r5.md,small-fixes,5,O2,SLOT,machine,yes,minor,,small-fixes,count-row,Opener guided 100000 row small numbers and narrow box (out of lane)
+design/audit/runs/small-fixes/critic-r5.md,small-fixes,5,O3,CLIP_OVERLAP,machine,yes,minor,,number_ops_mixed,,div-check-judge work box covered by #answerInput (hint e2e flake source)
+design/audit/runs/small-fixes/critic-r6.md,small-fixes,6,N15,SLOT,machine,yes,blocking,H9;L1,small-fixes,count-row,Opener practice rows at 100000/25000: 16-19 mm boxes for 7-9 char answers and 9-11 pt givens (O2 promoted)
+design/audit/runs/small-fixes/critic-r6.md,small-fixes,6,N16,PROCESS,process,no,minor,,small-fixes,,Gate missing-row check falls back to grown cell height when plan lacks rowMm
+design/audit/runs/small-fixes/critic-r6.md,small-fixes,6,U1,SLOT,machine,no,minor,,small-fixes,count-row,"1,000 from 14,000 rows give ~2.9 mm per character: tight"
+design/audit/runs/small-fixes/critic-r6.md,small-fixes,6,O1,GIVEAWAY,machine,yes,minor,,quiz,word-work,Quiz live green marks on working (out of lane)
+design/audit/runs/small-fixes/critic-r6.md,small-fixes,6,O3,CLIP_OVERLAP,machine,yes,minor,,number_ops_mixed,,div-check-judge work box covered by #answerInput (out of lane)
+design/audit/runs/small-fixes/critic-r6.md,small-fixes,6,O5,INTERACTION,machine,no,minor,,small-fixes,count-row,Unreproduced worksheet caret double-move under CPU load (two numbers in one box)
+design/audit/runs/small-fixes/critic-r6.md,small-fixes,6,O6,SPACE,machine,no,minor,,worksheet,count-row,Worksheet touch 1280: grid row stretch leaves ~140 px blank above card 2's row
+design/audit/runs/small-fixes/critic-r7.md,small-fixes,7,N17,VISUAL_DESIGN,judgment,no,minor,,small-fixes,count-row,In-row jump arrows 2.2 mm beside 4 mm entry arrows on wide Opener rows
+design/audit/runs/small-fixes/critic-r7.md,small-fixes,7,N18,CLIP_OVERLAP,machine,no,minor,,small-fixes,count-row,Letter-to-step-tab gap fell to 0.54-0.85 mm on some Opener sheets
+design/audit/runs/small-fixes/critic-r7.md,small-fixes,7,O1,GIVEAWAY,machine,yes,minor,,quiz,word-work,Quiz live green marks on working (out of lane)
+design/audit/runs/small-fixes/critic-r7.md,small-fixes,7,O3,CLIP_OVERLAP,machine,yes,minor,,number_ops_mixed,,div-check-judge work box covered by #answerInput (out of lane)
+design/audit/runs/small-fixes/critic-r7.md,small-fixes,7,O9,SIZE,machine,no,minor,TY-10a,worksheet,count-row,Worksheet 100000 row: ~11 px givens and 52 px boxes for 9-char answers; swipe cue at desktop
+design/audit/runs/steps-box-r1/critic.md,steps-box-r1,1,D1,INSTRUCTION,machine,no,blocking,L6,word-problems,word-work,Worksheet hint says Use addition then Subtract: ... (skill-id sentence contradicts item hint)
+design/audit/runs/steps-box-r1/critic.md,steps-box-r1,1,D2,GIVEAWAY,machine,no,blocking,L3;C2,word-problems,word-work,Multi-step hint prints the Step 1 answer in Step 2; run-on lower-case line
+design/audit/runs/steps-box-r1/critic.md,steps-box-r1,1,D3,CLIP_OVERLAP,machine,no,blocking,C1,word-problems,word-work,Worksheet hint popup covers the story lines it hints about
+design/audit/runs/steps-box-r1/critic.md,steps-box-r1,1,D4,UNTRUE_TEXT,machine,no,blocking,,word-problems,,Navigator desc note omits start-unknown subtracting stories; straight quotes
+design/audit/runs/steps-box-r1/critic.md,steps-box-r1,1,D5,INK_FONT,machine,no,minor,,skills-navigator,,Navigator desc note low contrast (3.5:1) in light theme
+design/audit/runs/steps-box-r1/critic.md,steps-box-r1,1,O1,SPACE,machine,no,minor,H5,lessons,word-work,Lesson practice Steps strip almost never prints; page 2 holds 2 of 6 cells
+design/audit/runs/steps-box-r1/critic.md,steps-box-r1,1,O2,GIVEAWAY,machine,no,minor,L3,word-problems,word-work,Carry-box count (2 vs 3) gives away the sign
+design/audit/runs/steps-box-r1/critic.md,steps-box-r1,1,O3,SCREEN_PARITY,machine,no,minor,SP-2,skills-navigator,word-work,Dark-theme navigator preview draws the cell in black on dark popup; not paper-white
+design/audit/runs/steps-box-r1/critic.md,steps-box-r1,1,O4,NAME_CONTENT,machine,no,minor,,addition,word-work,add_word_problems at Max Number 100 deals sums past 100
+design/audit/runs/steps-box-r1/critic.md,steps-box-r1,1,O5,INSTRUCTION,machine,no,minor,,algebra,word-work,Multi-step ladder worked steps clamp at 6; Step 2 never appears
+design/audit/runs/steps-box-r2/critic.md,steps-box-r2,2,D6,UNTRUE_TEXT,machine,yes,blocking,,word-problems,word-work,add_word_problems deals take-away retellings the desc note does not cover (13 of 80)
+design/audit/runs/steps-box-r2/critic.md,steps-box-r2,2,N1,INTERACTION,machine,no,minor,,word-problems,,Hint Listen runs the two steps together with no pause
+design/audit/runs/steps-box-r2/critic.md,steps-box-r2,2,N2,INTERACTION,machine,no,minor,,worksheet,,Opening a worksheet hint makes neighbour cards in the row taller (jump)
+design/audit/runs/steps-box-r2/critic.md,steps-box-r2,2,N3,INTERACTION,machine,no,minor,,worksheet,,Green tick badge hides while a hint is open
+design/audit/runs/steps-box-r2/critic.md,steps-box-r2,2,N4,GIVEAWAY,machine,no,minor,L3,algebra,,workHint leaks Step 1 answer when Step 2 operand equals it
+design/audit/runs/steps-box-r2/critic.md,steps-box-r2,2,N5,INK_FONT,machine,no,minor,,worksheet,,Two-step worksheet hint shows the bulb emoji twice
+design/audit/runs/steps-box-r3/critic.md,steps-box-r3,3,N2,INTERACTION,machine,yes,minor,,worksheet,,Neighbour cards still grow when a hint opens
+design/audit/runs/steps-box-r3/critic.md,steps-box-r3,3,N6,PEDAGOGY,judgment,no,minor,,word-problems,word-work,Compare-more story with two-word unit retold as a join
+design/audit/runs/steps-box-r3/critic.md,steps-box-r3,3,N7,PEDAGOGY,judgment,no,minor,,word-problems,word-work,Change-unknown join (Y gave X some more) retold as start-unknown
+design/audit/runs/steps-box-r3/critic.md,steps-box-r3,3,N8,NOTATION,machine,no,minor,,word-problems,word-work,Compare-fewer second number printed without thousands comma
+design/audit/runs/steps-box-r3/critic.md,steps-box-r3,3,U1,GIVEAWAY,machine,yes,minor,L3,word-problems,word-work,+ layout shows 2 carry boxes vs 3 for − (r1 O2) still holds C2 at 8
+design/audit/runs/steps-box-r3/critic.md,steps-box-r3,3,O-A,NAME_CONTENT,machine,no,minor,,word-problems,,Four generator story types never deal (string variant compared to number)
+design/audit/runs/steps-box-r3/critic.md,steps-box-r3,3,O-B,UNTRUE_TEXT,machine,no,minor,,word-problems,,What is missing option labels do not match the stories dealt
+design/audit/runs/steps-box-r3/critic.md,steps-box-r3,3,O-C,VISUAL_DESIGN,judgment,no,minor,,word-problems,word-work,Active pulsing box sometimes renders as two yellow halves in − layout
+design/audit/runs/support-numberline/critic.md,support-numberline,1,D1,INTERACTION,machine,no,blocking,,support-numberline,refline,Online worksheet never shows the top number line when set via the option panel; gate writes state directly
+design/audit/runs/support-numberline/critic.md,support-numberline,1,D2,NAME_CONTENT,machine,no,blocking,,support-numberline,refline,"Auto line falls back to 0-20 when numbers not found yet reports covers:true; comma lists read as thousands"
+design/audit/runs/support-numberline/critic.md,support-numberline,1,D3,GIVEAWAY,machine,no,blocking,L3,support-numberline,refline,Auto step ignores skip count (2s on a 5s line); count by 5/10 lines label every answer
+design/audit/runs/support-numberline/critic.md,support-numberline,1,D4,VISUAL_DESIGN,judgment,no,blocking,,support-numberline,refline,Mixed denominators get twelfths that cannot place fifths/eighths; fraction labels off-grid
+design/audit/runs/support-numberline/critic.md,support-numberline,1,D5,VISUAL_DESIGN,judgment,no,blocking,,support-numberline,refline,"Decimal skills get one long hundredths line; mixed label formats (0.50 next to 1)"
+design/audit/runs/support-numberline/critic.md,support-numberline,1,D6,VISUAL_DESIGN,judgment,no,minor,,support-numberline,refline,Same skill gets different line scales on different pages and on the card
+design/audit/runs/support-numberline/critic.md,support-numberline,1,D7,CLARITY,judgment,no,blocking,C1,support-numberline,,Two option controls both named Number line with different meanings; summary says Auto to Auto
+design/audit/runs/support-numberline/critic.md,support-numberline,1,D8,VISUAL_DESIGN,judgment,no,blocking,,support-numberline,refline,On a mixed page the first skill decides the line; no warning; band on pages that did not ask
+design/audit/runs/support-numberline/critic.md,support-numberline,1,D9,SPACE,machine,no,minor,,support-numberline,refline,Band takes whole rows (9 to 6 items) leaving empty strips; new PAGEFILL
+design/audit/runs/support-numberline/critic.md,support-numberline,1,D10,VISUAL_DESIGN,judgment,no,minor,,support-numberline,refline,Grid label next to an end is dropped so last label gap is irregular
+design/audit/runs/support-numberline/critic.md,support-numberline,1,D11,MISSING,machine,no,blocking,,support-numberline,refline,Skill list misses whole families the spec names (fraction ops; nl_mult; elapsed time ...)
+design/audit/runs/support-numberline/critic.md,support-numberline,1,D12,PROCESS,process,no,minor,,support-numberline,refline,Contract docs (PAGE_TYPES/WDS/SUPPORTS) do not describe the new band
+design/audit/runs/support-numberline/critic.md,support-numberline,1,D13,MISSING,machine,no,minor,P-SC-5,support-numberline,refline,Hints-on-tests flag has no teacher control so line is hard-coded off tests
+design/audit/runs/wave1-A/critic.md,wave1-A,1,U1,INTERACTION,machine,no,blocking,,pupil-play,,Per-card Skip always visible instead of after N wrong tries (owner 1.3)
+design/audit/runs/wave1-A/critic.md,wave1-A,1,U2,PROCESS,process,no,blocking,,pupil-play,,calculator/skipAfter universal options never verified in panel or ws-options-verify
+design/audit/runs/wave1-A/critic.md,wave1-A,1,U3,PROCESS,process,no,blocking,,pupil-play,,Evidence missing: skip-after-5 screenshot shows no Skip button
+design/audit/runs/wave1-A/critic.md,wave1-A,1,U4,INTERACTION,machine,no,blocking,,answer-box,,Pulse/yellow applies to every focused input incl. quiz/MAP
+design/audit/runs/wave1-A/critic.md,wave1-A,1,U5,PROCESS,process,no,minor,,pupil-play,,MAP/quiz Skip paths (stale #skipBtn id) not retested
+design/audit/runs/wave1-A/critic.md,wave1-A,1,U6,VIEWPORT,machine,no,minor,,student-home,,Start buttons sit ~1500 px below the fold at 390
+design/audit/runs/wave1-A/critic.md,wave1-A,1,U7,OTHER,judgment,no,minor,,pupil-play,,Dead code: lastActionWasSkip reset after totalSkipsEver change
+design/audit/runs/wave1-A/critic.md,wave1-A,2,R2-1,PROCESS,process,no,minor,,pupil-play,,MAP skip test clicks a hidden button and reports PASS; no isSkipAvailable guard
+design/audit/runs/wave1-A/critic.md,wave1-A,2,R2-2,PROCESS,process,no,minor,,answer-box,,Evidence PNG at 1280 does not show the pulse it is named for
+design/audit/runs/wave1-A/critic.md,wave1-A,2,R2-3,OTHER,judgment,no,minor,,pupil-play,,Empty if-block and false comment left in game-control.js
+design/audit/runs/wave1-A/critic.md,wave1-A,2,R2-4,CLARITY,judgment,no,minor,,student-home,,Start buttons above 'Customize below' line; pupil may start default skill unknowingly
+design/audit/runs/wave1-A/critic.md,wave1-A,2,R2-5,INSTRUCTION,machine,no,minor,,practice-card,,Header reads Mixed Mode (All Categories) for a one-skill run (outside lane)
+design/audit/runs/wave1-A/critic.md,wave1-A,3,R3-1,CLARITY,judgment,no,minor,,skill-options,,Pupil play disclosure chevron is the same open and closed
+design/audit/runs/wave1-A/critic.md,wave1-A,3,R3-2,INTERACTION,machine,no,minor,,skill-options,,_playOpen is one global so opening on one skill opens it everywhere
+design/audit/runs/wave1-A/critic.md,wave1-A,3,R3-3,INTERACTION,machine,no,minor,,skill-options,,Async ontoggle: same-task edit redraws with stale open state
+design/audit/runs/wave1-A/critic.md,wave1-A,3,R3-4,PROCESS,process,no,minor,,skill-options,,Closed-state evidence PNG does not show the disclosure
+design/audit/runs/wave1-A/critic.md,wave1-A,3,R3-5,VIEWPORT,machine,no,minor,,print-dialog,,Add Skills modal clipped at left edge at 390 (outside lane)
+design/audit/runs/wave1-A-fix/critic.md,wave1-A-fix,1,D1,INK_FONT,machine,no,blocking,H2,student-home,,Dark theme Start tile labels near-white on pastel tiles: illegible
+design/audit/runs/wave1-A-fix/critic.md,wave1-A-fix,1,D2,INK_FONT,machine,no,minor,,student-home,,Focus ring is the browser default 1 px instead of project 3 px ring
+design/audit/runs/wave1-A-fix/critic.md,wave1-A-fix,1,D3,VISUAL_DESIGN,judgment,no,minor,,student-home,,At 390 icons in a row are 12 px out of line when labels wrap
+design/audit/runs/wave1-A-fix/critic.md,wave1-A-fix,1,D4,VISUAL_DESIGN,judgment,no,minor,,student-home,,Your skill line leaves a lone word at 390
+design/audit/runs/wave1-A-fix/critic.md,wave1-A-fix,1,D5,PROCESS,process,no,minor,,student-home,,Probe never tests dark theme; exempts practice; teacher check only swaps classes
+design/audit/runs/wave1-A-fix/critic.md,wave1-A-fix,1,U1,INK_FONT,machine,no,minor,,student-home,,Penguin bubble light text on white bubble in dark theme (pre-existing)
+design/audit/runs/wave1-A-fix/critic.md,wave1-A-fix,2,R2-D1,INK_FONT,machine,no,minor,,student-home,,Dark-theme focus ring 2.1:1 against dark section (needs 3:1)
+design/audit/runs/wave1-A-fix/critic.md,wave1-A-fix,2,R2-D2,VISUAL_DESIGN,judgment,no,minor,,student-home,,Race-car emoji sits ~10 px low in its tile
+design/audit/runs/wave1-A-fix/critic.md,wave1-A-fix,2,R2-D3,PROCESS,process,no,minor,,student-home,,Probe teacher assertion proves nothing; rgba stops read as opaque
+design/audit/runs/wave1-A-fix/critic.md,wave1-A-fix,2,U1,INK_FONT,machine,no,minor,,student-home,,Light-theme MAP labels under 4.5:1 contrast (pre-existing)
+design/audit/runs/wave1-A-fix/critic.md,wave1-A-fix,2,U2,PROCESS,process,no,minor,,student-home,,test-wrong-retry-skip stale on branch (flaky regex)
+design/audit/runs/wave1-A2/critic.md,wave1-A2,1,1,INTERACTION,machine,no,minor,C1,answer-box,,Unfinished entry turns red when pupil taps Read or Hint (blur judged final)
+design/audit/runs/wave1-A2/critic.md,wave1-A2,1,2,INTERACTION,machine,no,minor,C1,answer-box,,Leading zero (0 toward 07) goes red at once though checker accepts 07
+design/audit/runs/wave1-A2/critic.md,wave1-A2,1,3,INTERACTION,machine,no,minor,C2,answer-box,,Pupil can cycle digits until green then get first-try XP (no assisted flag)
+design/audit/runs/wave1-A2/critic.md,wave1-A2,1,4,INTERACTION,machine,no,minor,,worksheet,,Green box with tick but caption still says Not yet: try again
+design/audit/runs/wave1-A2/critic.md,wave1-A2,1,5,INK_FONT,machine,no,minor,INK-6,answer-box,,13 px tick/cross is the only colour-blind cue at 390; fills similar lightness
+design/audit/runs/wave1-A2/critic.md,wave1-A2,2,1,INTERACTION,machine,no,blocking,C1,answer-box,,Make-your-own table: correct box goes red while another box is half typed; item loses XP
+design/audit/runs/wave1-A2/critic.md,wave1-A2,2,2,CLIP_OVERLAP,machine,no,blocking,,answer-box,,Corner tick/cross mark sits on the digits in narrow boxes
+design/audit/runs/wave1-A2/critic.md,wave1-A2,2,3,CLARITY,judgment,no,minor,,answer-box,,Red order box shows two × glyphs (clear button and wrong mark)
+design/audit/runs/wave1-A2/critic.md,wave1-A2,2,4,INK_FONT,machine,no,minor,,answer-box,stack,Wrong stack digit keeps solid red edge (no dashed shape cue)
+design/audit/runs/wave1-A2/critic.md,wave1-A2,2,5,INTERACTION,machine,no,minor,,worksheet,,Worksheet q._helped set but never read; multi-box checkers never mark it
+design/audit/runs/wave1-A2/critic.md,wave1-A2,2,U1,PROCESS,process,no,minor,,answer-box,,ws-screen-answer has no filler for several widgets (pre-existing harness gap)
+design/audit/runs/wave1-A2/critic.md,wave1-A2,2,U2,NAME_CONTENT,machine,no,minor,,algebra,,Make-your-own subtraction rule with small In gives negative Out that can never be right
+design/audit/runs/wave1-A2/critic.md,wave1-A2,3,1,CLIP_OVERLAP,machine,no,blocking,,answer-box,,Fixed-position tick/cross badge paints over settings panel and hint overlays
+design/audit/runs/wave1-A2/critic.md,wave1-A2,3,2,INTERACTION,machine,yes,minor,,worksheet,,Helped multi-box worksheet items never counted as helped
+design/audit/runs/wave1-A2/critic.md,wave1-A2,3,3,CLIP_OVERLAP,machine,no,minor,,answer-box,,"Badge lands on neighbouring ink (box edge, arc, sum bar, label)"
+design/audit/runs/wave1-A2/critic.md,wave1-A2,3,4,CLIP_OVERLAP,machine,no,minor,,count-by,count-row,Phone card count_by_tables clips its bottom row (pre-existing)
+design/audit/runs/wave1-A2/critic.md,wave1-A2,3,5,INTERACTION,machine,no,minor,,answer-box,,_badgeTick runs getComputedStyle/measureText every frame for whole session
+design/audit/runs/wave1-A2/critic.md,wave1-A2,4,1,INTERACTION,machine,no,blocking,,worksheet,,Retyping answers that Check all revealed earns clean progress hits
+design/audit/runs/wave1-A2/critic.md,wave1-A2,4,2,INTERACTION,machine,no,minor,,answer-box,stack,Possible flake: add_100_regroup worksheet graded 2/3 once
+design/audit/runs/wave1-A2/critic.md,wave1-A2,4,3,CLIP_OVERLAP,machine,no,minor,,answer-box,,Badge not clipped by inner scrolling row; hangs at row edge (latent)
+design/audit/runs/wave1-A2/critic.md,wave1-A2,4,4,INTERACTION,machine,no,minor,,answer-box,,_obstacles walk runs getComputedStyle on every element per placement
+design/audit/runs/wave1-A2/critic.md,wave1-A2,5,1,CLIP_OVERLAP,machine,yes,minor,,count-by,count-row,Phone card count_by_tables shrinks while typing; bottom row cut; arcs overprint boxes (pre-existing)
+design/audit/runs/wave1-A2/critic.md,wave1-A2,5,2,PEDAGOGY,judgment,no,minor,,worksheet,,Wrong item closed after first Check all even when answer not revealed; self-correction earns nothing
+design/audit/runs/wave1-A2/critic.md,wave1-A2,5,3,OTHER,judgment,no,minor,,worksheet,,Dead code: wsPre().stale and the input listener that clears data-mq-revealed
+design/audit/runs/wave1-A2/critic.md,wave1-A2,5,4,INTERACTION,machine,yes,minor,,answer-box,,"_obstacles walk per placement (efficiency, carried)"
+design/audit/runs/wave1-A3/critic.md,wave1-A3,1,1,INK_FONT,machine,no,blocking,C1,answer-box,stack,Red wrong digit on the browser selection blue is 1.26:1 and nearly invisible
+design/audit/runs/wave1-A3/critic.md,wave1-A3,1,2,INTERACTION,machine,no,blocking,C1,answer-box,,Ghost entry: mirror shows 14 while value is empty; Backspace/Check trap after ladder spent
+design/audit/runs/wave1-A3/critic.md,wave1-A3,1,3,INTERACTION,machine,no,minor,,answer-box,count-row,Tab through a red box erases it
+design/audit/runs/wave1-A3/critic.md,wave1-A3,1,4,INK_FONT,machine,no,minor,AX-2;INK-6,answer-box,,Which digit is wrong shown by colour alone (3.21:1 red vs black)
+design/audit/runs/wave1-A3/critic.md,wave1-A3,1,5,PROCESS,process,no,minor,P-ON-11;SP-32;AX-9,answer-box,,Standards still say the opposite of the owner-ruled feature
+design/audit/runs/wave1-A3/critic.md,wave1-A3,1,6,INTERACTION,machine,no,minor,AX-9,answer-box,stack,One-digit box blinks as a whole including its structural edge
+design/audit/runs/wave1-A3/critic.md,wave1-A3,1,7,MISSING,machine,no,minor,,answer-box,,Fractions/decimals/negatives get no wrong-digit marks
+design/audit/runs/wave1-A3/critic.md,wave1-A3,1,U1,INTERACTION,machine,no,minor,,worksheet,stack,Worksheet auto-advance steals focus 750 ms later and swallows a typed digit (pre-existing race)
+design/audit/runs/wave1-A3/critic.md,wave1-A3,2,R2-1,MISSING,machine,yes,minor,,answer-box,,Mixed/improper fraction boxes still get no digit marks (no expected value passed)
+design/audit/runs/wave1-A3/critic.md,wave1-A3,2,R2-2,INK_FONT,machine,no,minor,,answer-box,stack,Promised 3 px bar under one-digit wrong box never renders (overridden)
+design/audit/runs/wave1-C/critic.md,wave1-C,1,1,REPEAT,machine,no,blocking,,count-by,count-row,S page table climb breaks after six rows; 2 and 7 printed twice
+design/audit/runs/wave1-C/critic.md,wave1-C,1,2,INSTRUCTION,machine,no,blocking,,count-by,count-row,Title I Can count by 1 to 15 is wrong (tables still 1-12; only row length 15)
+design/audit/runs/wave1-C/critic.md,wave1-C,1,3,NAME_CONTENT,machine,no,blocking,,hundreds-chart,chartwindow,gaps=row/column runs touch the grid edge though the option help says they never do
+design/audit/runs/wave1-C/critic.md,wave1-C,1,4,REPEAT,machine,no,blocking,,hundreds-chart,chartwindow,gaps=pattern whole chart deals only 2 distinct items; worksheet repeats them
+design/audit/runs/wave1-C/critic.md,wave1-C,1,5,SIZE,machine,no,blocking,L1;L2,hundreds-chart,chartwindow,Whole chart at S: 4 mm digits and ~150 px empty above and below in a one-item cell
+design/audit/runs/wave1-C/critic.md,wave1-C,1,6,VIEWPORT,machine,no,blocking,,hundreds-chart,chartwindow,390 card stacks columns 1-5 above 6-10 breaking rows of ten
+design/audit/runs/wave1-C/critic.md,wave1-C,1,7,VISUAL_DESIGN,judgment,no,minor,,hundreds-chart,chartwindow,Baseline jitter 3-6 px for numbers next to empty squares
+design/audit/runs/wave1-C/critic.md,wave1-C,1,8,PEDAGOGY,judgment,no,minor,,count-by,count-row,Live play now always deals 2..12 in order (predictable) instead of shuffled
+design/audit/runs/wave1-C/critic.md,wave1-C,1,9,NAME_CONTENT,machine,no,minor,,hundreds-chart,chartwindow,gaps=row can deal a run of one box (same as scatter)
+design/audit/runs/wave1-C/critic.md,wave1-C,1,10,PROCESS,process,no,minor,,tooling,,ws-content-audit --skill does not accept a comma list
+design/audit/runs/wave1-C/critic.md,wave1-C,1,U1,PROCESS,process,no,minor,,hundreds-chart,,Content audit samples default options only; new options never audited
+design/audit/runs/wave1-C/critic.md,wave1-C,2,A,CLIP_OVERLAP,machine,no,blocking,,hundreds-chart,chartwindow,Screen chart slot overlay spills into next square and cuts its number (|43)
+design/audit/runs/wave1-C/critic.md,wave1-C,2,B,VIEWPORT,machine,no,minor,SP-10;PT-SCR-3,hundreds-chart,chartwindow,390 chart squares ~32 px wide below SP-10's 34.5 px exception
+design/audit/runs/wave1-C/critic.md,wave1-C,2,C,VISUAL_DESIGN,judgment,no,minor,,hundreds-chart,chartwindow,Paper whole chart empty squares step 1-2 px off the grid lines
+design/audit/runs/wave1-C/critic.md,wave1-C,2,U1,KEY,machine,no,minor,AK-4,review,,Review role key page 2 has 9 slots vs 8 on pupil page (pre-existing; not this lane)
+design/audit/runs/wave1-C/critic.md,wave1-C,2,U2,INK_FONT,machine,no,minor,TY-2,review,,Italic instruction on a fraction item pulled into review (pre-existing)
+design/audit/runs/wave1-C/critic.md,wave1-C,2,U3,NOTATION,machine,no,minor,TY-7,review,,Slash fractions 1/2 and 1/4 on tiles (pre-existing)
+design/audit/runs/wave1-C/critic.md,wave1-C,3,D,SIZE,machine,no,blocking,TY-10,hundreds-chart,chartwindow,Online worksheet shrinks ten-column chart digits to ~16 px; numbers run together
+design/audit/runs/wave1-C/critic.md,wave1-C,3,E,SPACE,machine,no,minor,,hundreds-chart,chartwindow,At 390 an empty ~10 px strip above and below the chart table
+design/audit/runs/wave1-C/critic.md,wave1-C,4,F,SIZE,machine,yes,blocking,TY-10,hundreds-chart,chartwindow,Ten-column chart still shrinks to ~15 px digits on desktop after fit pass
+design/audit/runs/wave1-C/critic.md,wave1-C,4,U1,PROCESS,process,no,minor,,hundreds-chart,,Builder reported 33.4 px digits measured before the fit pass; not what renders
+design/audit/runs/wave1-C/critic.md,wave1-C,4,G,CLARITY,judgment,no,minor,,print-dialog,,UI does not show onePage overrides size/count/jumps/tables/order
+design/audit/runs/wave1-C/critic.md,wave1-C,4,H,SLOT,machine,no,minor,,count-by,count-row,One-page sheet boxes ~11 mm for three-digit answers; ~30 mm unused
+design/audit/runs/wave1-C/critic.md,wave1-C,4,U2,VISUAL_DESIGN,judgment,no,minor,SP-11a,hundreds-chart,chartwindow,Swipe cue arrow reads medium not the large arrow the rule names
+design/audit/runs/wave1-C/critic.md,wave1-C,5,I,VIEWPORT,machine,no,minor,H6,hundreds-chart,chartwindow,Worksheet rows-window squares 43.6 px and input 42 px under 44 px target
+design/audit/runs/wave1-C/critic.md,wave1-C,5,J,CLARITY,judgment,no,minor,,print-dialog,,Disabled locked controls hard to tell from enabled ones
+design/audit/runs/wave1-C/critic.md,wave1-C,5,K,SPACE,machine,no,minor,,count-by,count-row,One-page print has ~15 mm unused on A4
+design/audit/runs/wave1-C/critic.md,wave1-C,6,I-2,VIEWPORT,machine,no,minor,,hundreds-chart,chartwindow,Regression: rows window now swipes at 820 on card and quiz
+design/audit/runs/wave1-C/critic.md,wave1-C,6,I-3,SIZE,machine,no,minor,,hundreds-chart,chartwindow,Worksheet 1280 rows chart small (483 px) in 1100 px card
+design/audit/runs/wave1-C/critic.md,wave1-C,6,L-1,PROCESS,process,no,minor,,tooling,,Lint label N+Mk misread as pupil+key pages
+design/audit/runs/wave1-C/critic.md,wave1-C,6,H,SLOT,machine,yes,minor,,count-by,count-row,Key three-digit answers still tight in one-page boxes
+design/audit/runs/wave1-C2/critic-phone29.md,wave1-C2/phone29,1,1,VIEWPORT,machine,no,blocking,TY-10b,count-by,count-row,390 worksheet and quiz window shows 2 columns (gap scaled to 32 px); 108 px blank
+design/audit/runs/wave1-C2/critic-phone29.md,wave1-C2/phone29,1,2,PROCESS,process,no,minor,,count-by,count-row,Loosened phone gate accepts hidden first box without proving it is out of reach
+design/audit/runs/wave1-C2/critic-phone29.md,wave1-C2/phone29,1,3,UNTRUE_TEXT,machine,no,minor,TY-10b,count-by,count-row,WDS TY-10b says box ~58 px tall; it measures 53 px
+design/audit/runs/wave1-C2/critic-phone29.md,wave1-C2/phone29,1,4,PROCESS,process,no,blocking,,count-by,,ws-stamp-assets --check fails: screen-cell.js changed without re-stamp (deploy blocker)
+design/audit/runs/wave1-C2/critic.md,wave1-C2,1,1,NAME_CONTENT,machine,no,blocking,H13,count-by,count-row,H13 grouping breaks the teacher's row order; rows repeat before others appear; I Can order wrong
+design/audit/runs/wave1-C2/critic.md,wave1-C2,1,2,SPACE,machine,no,blocking,H13,count-by,count-row,3-number row in a two-line-high cell (~60% empty); same item dealt twice
+design/audit/runs/wave1-C2/critic.md,wave1-C2,1,3,PEDAGOGY,judgment,no,blocking,C2,count-by,count-row,Typed start giving only 3 numbers and 1-2 blanks kept; not practice
+design/audit/runs/wave1-C2/critic.md,wave1-C2,1,4,SPACE,machine,no,blocking,H5,count-by,count-row,S pages print 4-6 short rows leaving 40-65% blank
+design/audit/runs/wave1-C2/critic.md,wave1-C2,1,5,VIEWPORT,machine,no,blocking,,count-by,count-row,390 card wraps big-number rows into orphan pairs with no arcs or turn arrows between lines
+design/audit/runs/wave1-C2/critic.md,wave1-C2,1,6,UNTRUE_TEXT,machine,no,minor,,count-by,,Times-label help says jump number times step; label is the factor
+design/audit/runs/wave1-C2/critic.md,wave1-C2,1,7,INSTRUCTION,machine,no,minor,L6,count-by,count-row,Step 'last number is the last jump' false for typed/zero start or down rows
+design/audit/runs/wave1-C2/critic.md,wave1-C2,1,8,PATTERN,machine,no,minor,L10,count-by,count-row,Test items share near-identical blank patterns (all open 7 14 21 [ ])
+design/audit/runs/wave1-C2/critic.md,wave1-C2,1,9,VIEWPORT,machine,no,minor,,skill-options,,Panel rows take two lines each; 4 rows push list past the fold at 390
+design/audit/runs/wave1-C2/critic.md,wave1-C2,1,U1,PROCESS,process,no,minor,,count-by,,ws-options-verify blind to this skill's key (answers drawn in boxes)
+design/audit/runs/wave1-C2/critic.md,wave1-C2,2,1,INSTRUCTION,machine,no,blocking,L6,count-by,count-row,I Can says count back by 5 from 30 but rows start at 55 (raised start)
+design/audit/runs/wave1-C2/critic.md,wave1-C2,2,2,PATTERN,machine,yes,minor,L10,count-by,count-row,Test items still share first-line blank patterns in pairs
+design/audit/runs/wave1-C2/critic.md,wave1-C2,2,3,INTERACTION,machine,no,blocking,,count-by,count-row,Worksheet Tab walk at 390 never lands in a count-row box (trap or probe fault)
+design/audit/runs/wave1-C2/critic.md,wave1-C2,2,4,CLIP_OVERLAP,machine,no,minor,,skill-options,,Start dropdown cut to 'Num' at 390
+design/audit/runs/wave1-C2/critic.md,wave1-C2,2,5,CLIP_OVERLAP,machine,no,minor,,count-by,,Glossary popover and focus outline overlap the card instruction
+design/audit/runs/wave1-C2/critic.md,wave1-C2,2,U1,PROCESS,process,no,minor,,count-by,,Grade rests on uncommitted work; committed card-390.png evidence stale
+design/audit/runs/wave1-C2/critic.md,wave1-C2,3,1,SPACE,machine,no,blocking,H5,count-by,count-row,All rows on one page prints 2 pages on Letter with one orphan row (fill-to-twelve)
+design/audit/runs/wave1-C2/critic.md,wave1-C2,3,2,REPEAT,machine,no,blocking,,count-by,count-row,One-page sheet repeats chosen rows unasked and out of order; I Can 'and 5 more'
+design/audit/runs/wave1-C2/critic.md,wave1-C2,3,3,VIEWPORT,machine,no,minor,,count-by,count-row,Phone row scrolls on focus so the step tab goes off screen
+design/audit/runs/wave1-C2/critic.md,wave1-C2,3,4,PROCESS,process,no,minor,,count-by,,dupes gate checks only page 1 line 1 and tolerates one repeat
+design/audit/runs/wave1-C2/critic.md,wave1-C2,3,5,OTHER,judgment,no,minor,,count-by,,cbPage duplicates downStart inline (drift risk)
+design/audit/runs/wave1-C2/critic.md,wave1-C2,4,1,CLIP_OVERLAP,machine,yes,blocking,,count-by,count-row,Pinned step tab covers row start and half an answer box on 390 card
+design/audit/runs/wave1-C2/critic.md,wave1-C2,4,2,SPACE,machine,no,blocking,,count-by,count-row,One-page cap drops rows that fit (~50 mm blank); panel 'N of M fit' is false
+design/audit/runs/wave1-C2/critic.md,wave1-C2,4,3,UNTRUE_TEXT,machine,no,minor,,count-by,,Help says a short list spreads its rows; it fills only the top third
+design/audit/runs/wave1-C2/critic.md,wave1-C2,4,4,SIZE,machine,no,minor,,count-by,count-row,One-page step-tab text shrinks to ~9 pt beside 17 pt tabs
+design/audit/runs/wave1-C2/critic.md,wave1-C2,4,U1,PROCESS,process,no,minor,,count-by,,ws-stamp-assets --check fails on merged tree; must re-stamp
+design/audit/runs/wave1-C2/critic.md,wave1-C2,5,1,VIEWPORT,machine,yes,blocking,,count-by,count-row,390 card first focus scrolls past the row start hiding given numbers; gate check masked
+design/audit/runs/wave1-C2/critic.md,wave1-C2,5,2,CLIP_OVERLAP,machine,no,minor,,count-by,count-row,Finger swipe does not snap; 7-digit numbers cut at the left edge
+design/audit/runs/wave1-C2/critic.md,wave1-C2,5,3,OTHER,judgment,no,minor,,count-by,,Duplicated trailing comment in gen-mult-patterns.js
+design/audit/runs/wave1-C2/critic.md,wave1-C2,5,4,UNTRUE_TEXT,machine,no,minor,,count-by,,Guided role ignores All rows on one page though help implies all pages
+design/audit/runs/wave1-C2/critic.md,wave1-C2,6,1,VIEWPORT,machine,yes,blocking,,count-by,count-row,390 card still opens 1-2 columns in; start of count hidden in 4 of 6 cases
+design/audit/runs/wave1-C2/critic.md,wave1-C2,6,2,SPACE,machine,no,minor,,count-by,count-row,Back and forward cues stack 142-166 px taller than the rows they serve
+design/audit/runs/wave1-C2/critic.md,wave1-C2,6,3,PROCESS,process,no,minor,,count-by,,Gate back-cue check passes vacuously when row settles at 0
+design/audit/runs/wave1-C2/critic.md,wave1-C2,6,4,SIZE,machine,no,minor,,count-by,count-row,Owner question: count-row screen boxes 44 px/22 px digits vs C1 48 px/40 px rule
+design/audit/runs/wave1-C2/critic.md,wave1-C2,7,1,VIEWPORT,machine,yes,blocking,,count-by,count-row,With Missing 20% card opens at scrollLeft 172 hiding the start; fix (iv) not done
+design/audit/runs/wave1-C2/critic.md,wave1-C2,7,2,VIEWPORT,machine,no,minor,,count-by,count-row,1280 quiz shows false swipe cue and cuts the turn arrows for 1000000 x15
+design/audit/runs/wave1-C2/critic.md,wave1-C2,7,3,PROCESS,process,no,minor,,count-by,,Committed 1280 evidence PNGs stale (stray in-arrows)
+design/audit/runs/wave1-C2/critic.md,wave1-C2,7,4,SPACE,machine,no,minor,,count-by,count-row,Cue strip wraps to two lines at 390 when both cues show
+design/audit/runs/wave1-C2/critic.md,wave1-C2,7,5,SIZE,machine,yes,minor,,count-by,count-row,Owner question carried: 44 px boxes / 22 px digits
+design/audit/runs/wave1-C2/critic.md,wave1-C2,8,1,SPACE,machine,no,minor,,count-by,count-row,Worksheet 390 window 237 px (3 cols) in ~330 px cell; 45 px white each side
+design/audit/runs/wave1-C2/critic.md,wave1-C2,8,2,INTERACTION,machine,no,minor,,count-by,count-row,With focus withheld a hardware-keyboard pupil's typing goes nowhere
+design/audit/runs/wave1-C2/critic.md,wave1-C2,8,3,SIZE,machine,yes,minor,,count-by,count-row,Owner question carried: 44 px boxes / 22 px digits
+design/audit/runs/wave1-C2/critic.md,wave1-C2,8,4,PEDAGOGY,judgment,no,minor,,count-by,,No oral Say frame in the card hint
+design/audit/runs/wave1-E/critic.md,wave1-E,1,1,INTERACTION,machine,no,minor,,worksheet,,Laid-out flag set at 900 ms timer regardless of late widget mounts (Sonnet grade)
+design/audit/runs/wave1-E/critic.md,wave1-E,1,2,INTERACTION,machine,no,minor,,worksheet,,Resize relayout leaves laid-out flag at 1 while cards move (Sonnet grade)
+design/audit/runs/wave1-E/critic.md,wave1-E,1,3,PROCESS,process,no,minor,,tooling,,ws-screen-answer 30 s timeouts give a generic error (Sonnet grade)
+design/audit/runs/wave1-E/critic.md,wave1-E,1,4,PROCESS,process,no,minor,,load-check,,LOAD_CHECK slow-CDN figures not reproducible; fail path untested (Sonnet grade)
+design/audit/runs/wave1-E/critic.md,wave1-E,1,5,PROCESS,process,no,minor,,load-check,,Commit trailer attribution wrong for the rule then in force (Sonnet grade)
+design/audit/runs/wave1-E/critic.md,wave1-E,1,6,PROCESS,process,no,minor,,load-check,,Builder's 15/15 stressed passes claim reproduced only 3/3 (Sonnet grade)
+design/audit/runs/wave1-E/critic.md,wave1-E,1,D1,PROCESS,process,no,blocking,,load-check,,ws-load-check blind to pending external requests; load/play split by arrival order (Opus re-grade)
+design/audit/runs/wave1-E/critic.md,wave1-E,1,D2,PROCESS,process,no,blocking,,load-check,,Gate comment claims answers typed in but no answer path runs; coverage claim false (Opus re-grade)
+design/audit/runs/wave1-E/critic.md,wave1-E,1,D3,PROCESS,process,no,blocking,,load-check,,LOAD_CHECK.md slow-CDN timings not reproducible by any script (Opus re-grade)
+design/audit/runs/wave1-E/critic.md,wave1-E,1,D4,INTERACTION,machine,no,minor,,worksheet,,data-mq-laid-out flag semantics overstated; resize never resets it (Opus re-grade)
+design/audit/runs/wave1-E/critic.md,wave1-E,1,D5,PROCESS,process,no,minor,,tooling,,ws-screen-answer timeout error does not name skill or wait (Opus re-grade)
+design/audit/runs/wave1-E/critic.md,wave1-E,2,R1,INTERACTION,machine,no,minor,,worksheet,,Resize at ~850 ms then 900 ms timer sets flag 1 while relayout still pending
+design/audit/runs/wave1-E/critic.md,wave1-E,2,R2,PROCESS,process,no,minor,,load-check,,Self-test fetch probe makes a real outbound call
+design/audit/runs/wave1-E/critic.md,wave1-E,2,R3,PROCESS,process,no,minor,,load-check,,Slow-CDN numbers reproduced only by builder
+design/audit/runs/wave1-E/critic.md,wave1-E,2,R4,PROCESS,process,no,minor,,load-check,,Stress log recorded on uncommitted tree not the graded commit
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,G1,INTERACTION,machine,no,blocking,,teacher-site,,Keyboard Tab leaves teacher app into hidden off-screen legacy settings panel controls
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,G2,VIEWPORT,machine,no,blocking,H6,teacher-site,,"Small targets across new shell: 36 px buttons/chips, 22x32 letter chips, 19 px links, 40 px inputs"
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,G3,INTERACTION,machine,no,blocking,,teacher-site,,Legacy modal scrims do not cover the teacher sidebar; teacher can navigate away
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,G4,INK_FONT,machine,no,blocking,,teacher-site,,"Pupil game chrome leaks into teacher surfaces: emoji, rainbow palette, Nunito, 3-D buttons"
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,G5,MISSING,machine,no,blocking,,teacher-site,,No skill or practice-type previews in any new-shell picker
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U1,INTERACTION,machine,no,blocking,,teacher-site,,Quiz Monitor crashes (missing #quizMonitorView); button does nothing
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U2,INTERACTION,machine,no,minor,,teacher-site,,openSimplePrintDialog throws (no teacher entry point)
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U3,INTERACTION,machine,no,minor,,teacher-site,,openGoogleExportModal with no arguments throws
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U4,INK_FONT,machine,no,blocking,,teacher-site,,Skills library: 9-tile rainbow emoji action grid; emoji chips; coloured grade dots
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U5,CLARITY,judgment,no,blocking,,teacher-site,,Skills library: wall of ~600 pills and nine competing actions; no primary action
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U6,INTERACTION,machine,no,blocking,,teacher-site,,Skills library Share is a dead end; Code only toasts; Print jumps context
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U7,UNTRUE_TEXT,machine,no,blocking,,teacher-site,,Grade filter shows 7 in a K-6 app (Library and Quiz builder)
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U8,INK_FONT,machine,no,blocking,,teacher-site,,All domain chip white on white in light mode (Library and Quiz builder)
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U9,CLIP_OVERLAP,machine,no,blocking,,teacher-site,,Library queue labels truncated; gear options panel clipped with Done half hidden
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U10,MISSING,machine,no,blocking,,teacher-site,,Library/Quiz builder preview is hover-only desktop; none at 820 or touch; off-style
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U11,INK_FONT,machine,no,blocking,,teacher-site,,Classic print dialog: teal/purple chrome and Style defaults to Color against B&W contract
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U12,CLARITY,judgment,no,blocking,,teacher-site,,"Classic print duplicates new Print with different vocabulary; cryptic labels Pg, #, GROUP"
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U13,VIEWPORT,machine,no,blocking,H6,teacher-site,,Classic print Options pills 26 px; drag is the only reorder method
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U14,MISSING,machine,no,blocking,,teacher-site,,Classic print has no preview or layout thumbnails until generate
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U15,INK_FONT,machine,no,blocking,,teacher-site,,"Quiz builder: rainbow footer buttons, emoji chips, teal cards, monospace heading"
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U16,CLARITY,judgment,no,blocking,,teacher-site,,Quiz builder: three panels plus filters plus five footer actions; Save competes with footer
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U17,VIEWPORT,machine,no,blocking,,teacher-site,,Quiz builder preview column disappears at 820; pills truncated; 26 px card buttons
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U18,INK_FONT,machine,no,blocking,,teacher-site,,MAP selector: gradient cards with 3-D bases; emoji; orange start; dark-mode gradients
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U19,PLAIN_WORDS,machine,no,blocking,,teacher-site,,MAP setup RIT jargon unexplained; first screen has no explanation
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U20,CLARITY,judgment,no,blocking,,teacher-site,,MAP ← Home duplicates sidebar and is mislabelled; item-count slider has no numeric entry
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U21,MISSING,machine,no,blocking,,teacher-site,,MAP has no sample item for a band or domain
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U22,INK_FONT,machine,no,blocking,,worksheet,,Teacher-launched worksheet: emoji buttons; orange Check all; dark mode white page with navy cell headers
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U23,CLARITY,judgment,no,blocking,,worksheet,,Hint and Skip repeated on all 20 cells; noisy page
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U24,CLARITY,judgment,no,blocking,,worksheet,,Build 66 item shows only a blank line so expected answer unclear; toast overlaps cells
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U25,INK_FONT,machine,no,blocking,,practice-card,,Board game view: emoji throughout; orange buttons; cyan boss banner
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U26,INSTRUCTION,machine,no,blocking,L6,practice-card,,Header says Mixed Mode (All Categories) for 3 skills; L3 badge contradicts Level K; NR jargon
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U27,INSTRUCTION,machine,no,blocking,L6,practice-card,,Show me how opens over Q1 and says line up by place value for 4 + 5
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U28,INK_FONT,machine,no,blocking,,teacher-site,,Quiz results: orange/Google-blue/3-D buttons; lavender gradient header
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U29,CLARITY,judgment,no,blocking,,teacher-site,,Quiz results: four equal-weight buttons; Back at far right; empty state has no action
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U30,INK_FONT,machine,no,blocking,,teacher-site,,Library gear options panel green chrome; dense 11-12 px grey helper text
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U31,VIEWPORT,machine,no,blocking,H6,teacher-site,,Google Forms modal: ~14 px close; double scrim over classic dialog; ghost primary; teal tracker
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U32,INK_FONT,machine,no,blocking,,teacher-site,,Quiz settings modal: orange Done; teal-filled selects
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U33,CLARITY,judgment,no,blocking,,teacher-site,,Quiz settings: Print Versions disabled with no reason; two shuffle checkboxes sound the same
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U34,INK_FONT,machine,no,blocking,,teacher-site,,Board-code overlay built from inline styles; no dark mode or identity
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U35,CLARITY,judgment,no,blocking,,teacher-site,,Board code shows 24-char enhanced code with pipe (also Home code column); wraps at 820
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U36,INTERACTION,machine,no,blocking,,teacher-site,,Board-code Close small with no focus management
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U37,INK_FONT,machine,no,blocking,,teacher-site,,Skill options popover uses purple #6d28d9 not tv accent; lilac selected row
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U38,PLAIN_WORDS,machine,no,blocking,,teacher-site,,Popover header says Default options while editing; developer jargon in empty case
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U39,VIEWPORT,machine,no,blocking,,teacher-site,,Skill options popover clipped off right at 820 (Done hidden); opens away from anchor in Print
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U40,MISSING,machine,no,blocking,,teacher-site,,Skill options popover has no live sample of what an option does
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U41,CLARITY,judgment,no,minor,,teacher-site,,Options button shown for skills that have no options
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U42,CLIP_OVERLAP,machine,no,blocking,,teacher-site,,Progress table: Skill column collapses to '(' at 1280; headers overlap and columns cut at 820
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U43,INK_FONT,machine,no,blocking,,teacher-site,,Progress rows italic; emoji in Mode and Result cells
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U44,SPACE,machine,no,minor,,teacher-site,,Progress table uses ~55% of width; side card holds header text
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U45,VIEWPORT,machine,no,blocking,,teacher-site,,Print screen sheet preview sits below both columns; not visible while editing
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U46,CLARITY,judgment,no,blocking,,teacher-site,,Print page-type select lists 14 disabled coming-soon options; Classic print link as equal
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U47,UNTRUE_TEXT,machine,no,minor,,teacher-site,,Print preview header shows Score ___ /1 on a 4-skill sheet (verify)
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U48,VIEWPORT,machine,no,blocking,,teacher-site,,Send screen step 3 and Create link below the fold at 1280; result off-screen
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U49,CLARITY,judgment,no,blocking,,teacher-site,,Send: set name auto-fills 'X + 2 more'; Clear all 12 px link beside count
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U50,CLARITY,judgment,no,blocking,,teacher-site,,Run practice carries an unrelated second job (pupil start screen cards)
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U51,VISUAL_DESIGN,judgment,no,minor,,teacher-site,,Quizzes list: ghost Monitor/Results next to bordered Edit; inconsistent hierarchy
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U52,INTERACTION,machine,no,blocking,,teacher-site,,Settings Appearance segment stays Light when theme changes by another route
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,1,U53,INTERACTION,machine,no,minor,,teacher-site,,Reset adaptive difficulty is destructive; confirmation unverified
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U1,INTERACTION,machine,no,blocking,,teacher-site,,Quiz row More menu never opens (detached target closes it); quiz cannot be deleted anywhere
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U2,INK_FONT,machine,yes,blocking,,teacher-site,,MAP session keeps legacy pupil chrome: emoji; red/blue/orange/green buttons; Nunito
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U3,CLIP_OVERLAP,machine,no,blocking,,teacher-site,,MAP session mode badge under fixed Audio button (PRAC at 1280; hidden at 820)
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U4,PLAIN_WORDS,machine,no,blocking,,teacher-site,,MAP session header reads 'Now: NO'
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U5,INSTRUCTION,machine,yes,blocking,L6,practice-card,,Show me how still auto-opens and gives column-addition script for 6 + 2
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U6,PLAIN_WORDS,machine,yes,blocking,,practice-card,,Badge 'M · Add ≤20 NR': NR jargon and M on a Level 1 skill
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U7,UNTRUE_TEXT,machine,no,blocking,,practice-card,,Board display identical to Practice though Run screen and its preview promise a large whole-class question
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U8,INK_FONT,machine,yes,blocking,,practice-card,,Game view emoji throughout and orange 3-D CHECK
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U9,INK_FONT,machine,yes,blocking,,worksheet,,Online worksheet: 60 coloured emoji Hint/Skip/Read buttons; orange Check all; against B&W contract
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U10,INTERACTION,machine,no,blocking,,teacher-site,,Google Forms modal: no focus trap (Tab reaches page behind) and Esc does not close
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U11,PLAIN_WORDS,machine,no,blocking,,teacher-site,,"Google Forms: title defaults to 'Quiz'; '1 of 1 problems' plural; 'Render' jargon"
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U12,INK_FONT,machine,no,blocking,,teacher-site,,Quiz monitor ON switches render as solid black 52x44 block
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U13,VIEWPORT,machine,no,blocking,,teacher-site,,Print: 16 page-type cards push skills and Add a skill ~1000 px below the fold
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U14,VIEWPORT,machine,no,blocking,,teacher-site,,Print at 820: preview starts at y=1440 of 3522 px page
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U15,PLAIN_WORDS,machine,no,blocking,,teacher-site,,Print Fits caption is a repeating paragraph of engine output with developer terms
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U16,UNTRUE_TEXT,machine,no,blocking,,teacher-site,,Anchor problems caption promises an example beside each problem; preview shows one
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U17,CLARITY,judgment,no,blocking,,teacher-site,,Anchor control gives no sign when no worked steps; shown on page types it does not affect
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U18,UNTRUE_TEXT,machine,yes,minor,,teacher-site,,Print header Score ___ /8 on a page with 6 items (denominator counts both pages)
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U19,INSTRUCTION,machine,no,minor,,teacher-site,,More Practice with 3 skills titled Mixed practice
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U20,NOTATION,machine,no,minor,,teacher-site,,Inconsistent operator spacing in one printed row (+ 5 vs +7)
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U21,VIEWPORT,machine,no,blocking,,teacher-site,,Options popover sample sits at bottom of 876 px panel; off-screen while editing; dense panel
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U22,INK_FONT,machine,no,minor,,teacher-site,,Options popover uses native selects not tv-select
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U23,NAME_CONTENT,machine,no,minor,,teacher-site,,Options offer Regrouping Always on a No Regrouping skill (contradicts name)
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U24,CLARITY,judgment,no,blocking,,teacher-site,,"Quiz builder: three filter mechanisms; fourth picker vocabulary; '3 Qs 2-col' jargon"
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U25,VIEWPORT,machine,no,blocking,,teacher-site,,Quiz builder at 820 Questions column drops below; teacher sees only a toast
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U26,CLIP_OVERLAP,machine,no,blocking,,teacher-site,,Legacy green toast and tv toast overlap after Save quiz
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U27,VIEWPORT,machine,no,blocking,H6,teacher-site,,List/Thumbnails segment 116x36 (Library and Send)
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U28,INTERACTION,machine,no,blocking,,teacher-site,,Sidebar Skills library re-opens Standards coverage instead of the list
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U29,CLIP_OVERLAP,machine,no,blocking,,teacher-site,,Library thumbnails illegible: number list run together '3546221971' with coloured words; hairline tables
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U30,UNTRUE_TEXT,machine,no,blocking,,standards,,Standards coverage shows two counts side by side (238 vs 177)
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U31,CLARITY,judgment,no,blocking,,standards,,Related skills run together inline with ragged wrap
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U32,VIEWPORT,machine,no,blocking,H6,standards,,Coverage Range links 40x44 under target
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U33,UNTRUE_TEXT,machine,no,minor,,standards,,K.CC.3 shows Not covered; mapping needs confirming
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U34,VIEWPORT,machine,no,blocking,H6,teacher-site,,MAP setup Adaptive Change link 52x24
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U35,INTERACTION,machine,no,minor,,teacher-site,,MAP Adaptive Change navigates away to Settings to flip one switch
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U36,NAME_CONTENT,machine,no,minor,,teacher-site,,MAP RIT 181-190 sample 3 × 3 reads too easy for the band
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U37,CLARITY,judgment,yes,blocking,,teacher-site,,Run practice still carries the unrelated Pupil start screen job
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U38,CLIP_OVERLAP,machine,no,minor,,teacher-site,,Run mode hover preview covers the primary Open on this screen button
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U39,VIEWPORT,machine,no,minor,H6,teacher-site,,Send 'Also use this set: Print' link 28x44; Clear all still small text
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U40,SIZE,machine,no,minor,,teacher-site,,Send helper lines 12 px grey
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U41,MISSING,machine,no,minor,,teacher-site,,Board-code overlay has no QR code for tablets
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U42,UNTRUE_TEXT,machine,no,minor,,teacher-site,,Auto-layout overlay header says Score /21 for 20 problems
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U43,PROCESS,process,no,minor,,teacher-site,,Quiz results populated view not re-graded (empty state only)
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U44,NOTATION,machine,no,minor,,teacher-site,,Stray space before full stop in 'open Quizzes .'
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U45,PLAIN_WORDS,machine,no,minor,,teacher-site,,Reset adaptive difficulty uses native confirm with shouty legacy copy
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,2,U46,CLIP_OVERLAP,machine,no,minor,,teacher-site,,Toast sits over the sticky bar on Send
+design/audit/runs/touchdots/critic.md,touchdots,1,1,CLIP_OVERLAP,machine,no,blocking,,supports,touchdots,Double's centre dot invisible inside the stroke; hairline ring reads as halo (S1 gate fails)
+design/audit/runs/touchdots/critic.md,touchdots,1,2,INK_FONT,machine,no,blocking,INK-23,supports,touchdots,After a photocopy every double blobs into a single (gap-white 0-26% vs 50%)
+design/audit/runs/touchdots/critic.md,touchdots,1,3,CLIP_OVERLAP,machine,no,blocking,,supports,touchdots,Single dots closer than gate allows (60 merge failures)
+design/audit/runs/touchdots/critic.md,touchdots,1,4,INSTRUCTION,machine,no,blocking,L6,supports,touchdots,Ladder message 'Use the touch dots' does not say how (say the larger number and count on)
+design/audit/runs/touchdots/critic.md,touchdots,1,5,SIZE,machine,no,blocking,,supports,touchdots,Worksheet problem changes size twice as the ladder climbs (29 -> 40 -> 29 px)
+design/audit/runs/touchdots/critic.md,touchdots,1,6,INK_FONT,machine,no,blocking,LS-2,supports,touchdots,Photocopy variant never used; its white fills cut strokes and dashed outline breaks LS-2
+design/audit/runs/touchdots/critic.md,touchdots,1,7,UNTRUE_TEXT,machine,no,minor,,supports,touchdots,S page fit line says Digits 16 pt while touch cells print at 28 pt
+design/audit/runs/touchdots/critic.md,touchdots,1,8,PROCESS,process,no,minor,,supports,touchdots,SUPPORTS.md and WDS SF-34 contradict the code (sizes; keylines)
+design/audit/runs/touchdots/critic.md,touchdots,1,9,VIEWPORT,machine,no,minor,,supports,touchdots,÷ tally dots ~7 px at 14 px pitch on 390 card
+design/audit/runs/touchdots/critic.md,touchdots,1,U1,VISUAL_DESIGN,judgment,no,minor,,supports,touchdots,6's first double on arc apex not at the stroke start
+design/audit/runs/touchdots/critic.md,touchdots,1,U2,PEDAGOGY,judgment,no,minor,,supports,touchdots,Count-all item with two-digit operand silently becomes count-on
+design/audit/runs/touchdots/critic.md,touchdots,1,U3,MISSING,machine,no,minor,,supports,touchdots,Quiz host never shows teacher-on touch numerals
+design/audit/runs/touchdots/critic.md,touchdots,1,U4,PROCESS,process,no,blocking,,supports,touchdots,Builder did not report the failing S1 gate (116/2289)
+design/audit/runs/touchdots/critic.md,touchdots,2,R2-1,MISSING,machine,yes,blocking,,supports,touchdots,Teacher touch option never reaches the quiz though SUPPORTS.md says it does
+design/audit/runs/touchdots/critic.md,touchdots,2,R2-2,PEDAGOGY,judgment,no,minor,,supports,touchdots,× ladder ignores the teacher's fact set (dots the 3; says count by 9s on a 3s set)
+design/audit/runs/touchdots/critic.md,touchdots,2,R2-3,UNTRUE_TEXT,machine,yes,minor,,supports,touchdots,S fit line still says Digits 16 pt (practice roles return early)
+design/audit/runs/touchdots/critic.md,touchdots,2,R2-4,CLIP_OVERLAP,machine,no,minor,,supports,touchdots,At DPR 1 single-dot keylines break up the 4 and 5 into dots
+design/audit/runs/touchdots/critic.md,touchdots,2,R2-5,SIZE,machine,yes,minor,,supports,touchdots,First wrong answer still enlarges the worksheet cell once (29 -> 40 px)
+design/audit/runs/touchdots/critic.md,touchdots,3,R3-1,INTERACTION,machine,no,blocking,,supports,touch-tap,Keyboard counting on a numeral taken over by active-box after ~1 s
+design/audit/runs/touchdots/critic.md,touchdots,3,R3-2,INTERACTION,machine,no,blocking,,supports,touch-tap,Tap on a number moves caret out of the answer box; next digit lost at Chromebook height
+design/audit/runs/touchdots/critic.md,touchdots,3,R3-3,SIZE,machine,yes,blocking,,supports,touchdots,Worksheet touch floor attribute on wrong element/card; cell still grows mid-ladder
+design/audit/runs/touchdots/critic.md,touchdots,3,R3-4,VIEWPORT,machine,no,blocking,,supports,touch-tap,Count line appears on first tap pushing Check/Next down and growing the worksheet row
+design/audit/runs/touchdots/critic.md,touchdots,3,R3-5,INTERACTION,machine,no,minor,,supports,touch-tap,Count line goes stale after a ladder redraw
+design/audit/runs/touchdots/critic.md,touchdots,3,R3-6,PEDAGOGY,judgment,no,blocking,,supports,touchdots,Ladder first rung swaps teacher count-all for harder count-on (takes support away)
+design/audit/runs/touchdots/critic.md,touchdots,3,R3-7,NOTATION,machine,no,minor,,supports,touch-tap,Per-digit stack targets undocumented; label '1 touch dots' ungrammatical
+design/audit/runs/touchdots/critic.md,touchdots,3,R3-8,PROCESS,process,no,minor,,supports,touch-tap,ws-touch-tap gate uses a synthetic host outside the real hosts
+design/audit/runs/touchdots/critic.md,touchdots,3,U1,VISUAL_DESIGN,judgment,no,minor,,supports,touchdots,÷ tally of 12 drawn 5/5/2 rather than 6/6
+design/audit/runs/touchdots/critic.md,touchdots,3,U2,GIVEAWAY,machine,no,minor,L3,supports,touch-tap,× running total 'Touched 5 · 30' and count-all 'Touched 9' show the answer
+design/audit/runs/touchdots/critic.md,touchdots,3,U3,PROCESS,process,no,minor,,supports,,Merge into main not clean (screen-cell.css conflict; binary PNG)
+design/audit/runs/touchdots/critic.md,touchdots,3,U4,VIEWPORT,machine,no,minor,,practice-card,,Card answer box and Check below the fold at 1366x650 (pre-existing)
+design/audit/runs/touchdots/critic.md,touchdots,3,U5,CLIP_OVERLAP,machine,no,minor,H2;H4,lessons,,Lesson anchor chart model cell overflows; purple step icons (out of lane)
+design/audit/runs/touchdots/critic.md,touchdots,4,R4-1,PEDAGOGY,judgment,yes,blocking,,supports,touchdots,On − and column stacks a wrong answer removes the teacher's touch dots
+design/audit/runs/touchdots/critic.md,touchdots,4,R4-2,CLIP_OVERLAP,machine,no,blocking,,supports,stack,Stack answer row overflows cell and covers Touched N and Start again
+design/audit/runs/touchdots/critic.md,touchdots,4,R4-3,INSTRUCTION,machine,no,blocking,L6,supports,stack,Column touch rung message uses whole-sum operands; count adds all columns; target on 0
+design/audit/runs/touchdots/critic.md,touchdots,4,R4-4,MISSING,machine,no,minor,,supports,touch-tap,Quiz never shows Touched N after a count-all item is answered (ruling c)
+design/audit/runs/touchdots/critic.md,touchdots,4,R4-5,VIEWPORT,machine,no,minor,,supports,touch-tap,Wrong answer adds the count line too; Check/Next move 100 px
+design/audit/runs/touchdots/critic.md,touchdots,4,R4-6,PROCESS,process,no,minor,,supports,touch-tap,ws-touch-tap passes with R4-1/R4-2/R4-4 present
+design/audit/runs/touchdots/critic.md,touchdots,4,U1,NOTATION,machine,no,minor,,supports,touch-tap,Singular by stripping s gives 'How much is 1 sixe?'
+design/audit/runs/touchdots/critic.md,touchdots,4,U2,PLAIN_WORDS,machine,no,minor,,supports,touch-tap,'How much is 7 70s?' reads poorly for ELL
+design/audit/runs/touchdots/critic.md,touchdots,4,U3,SPACE,machine,no,minor,,worksheet,touch-tap,9 × 100 count-by line may need 3 lines beyond reserved 44 px
+design/audit/runs/touchdots/critic.md,touchdots,4,U4,VISUAL_DESIGN,judgment,no,minor,,supports,touch-tap,Start again wraps to two lines inside its button on a 336 px card
+design/audit/runs/touchdots/critic.md,touchdots,4,U5,PROCESS,process,no,minor,,supports,,Merge not clean (screen-cell.css; binary PNG)
+design/audit/runs/touchdots/critic.md,touchdots,5,Q5-1,INTERACTION,machine,no,blocking,,quiz,,Instant-feedback quiz: first touch tap on Next after typing is swallowed (live on main)
+design/audit/runs/touchdots/critic.md,touchdots,5,Q5-2,VIEWPORT,machine,no,minor,,supports,stack,Stack count line and Start again start under the pinned Check/Next bar
+design/audit/runs/touchdots/critic.md,touchdots,5,U1,GIVEAWAY,machine,no,minor,,quiz,,Quiz reveals the answer once the ladder is spent (pre-existing)
+design/audit/runs/touchdots/critic.md,touchdots,6,Q6-1,VIEWPORT,machine,no,minor,,practice-card,stack,Card stack ladder message under pinned Hint/Check bar after wrong Check (pre-existing)
+design/audit/runs/touchdots/critic.md,touchdots,6,Q6-2,VIEWPORT,machine,no,minor,,supports,stack,clearOfPinnedBar ignores pinned top header; arrow scrolled under it at 1280x600
