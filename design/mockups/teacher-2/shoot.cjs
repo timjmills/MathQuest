@@ -25,6 +25,17 @@ let chromium;
 try { ({ chromium } = require('playwright')); } catch (e) { ({ chromium } = require('/opt/node-tools/node_modules/playwright')); }
 const { startServer } = require('../../../tests/lib/ws-harness.cjs');
 const FLOWS = require('./flows.js');
+// fix round 5: the thumbnails on screen are drawn live by the app (live.mjs); wait until those in or near view are drawn
+async function waitThumbs(page) {
+  await page.evaluate(async () => {
+    for (let t = 0; t < 100 && !window.MQLive; t++) await new Promise(r => setTimeout(r, 50)); if (!window.MQLive) return;
+    for (let t = 0; t < 1200; t++) {
+      const pending = [...document.querySelectorAll('.live-thumb')].filter(h => { const r = h.getBoundingClientRect(); return (h.dataset.state === 'wait' || h.dataset.state === 'busy') && r.width > 0 && r.bottom > -300 && r.top < innerHeight + 300; });
+      if (!pending.length) break; await new Promise(r => setTimeout(r, 50));
+    }
+    await new Promise(r => requestAnimationFrame(() => r()));
+  });
+}
 
 const DIR = __dirname; const SHOTS = path.join(DIR, 'shots');
 const args = process.argv.slice(2); const NO_SHOTS = args.includes('--no-shots');
@@ -185,24 +196,27 @@ async function screenReport(page, w) {
     // (10) lead 2026-10-23: a real item in a thumbnail is readable. The smallest text each shown thumbnail SHOWS is at least
     //      its place's minimum (--smp-min: Big 12 px, Medium and the tray's Thumbnails 11, Small 9); page previews and
     //      the bar's mini picture (0) are miniatures of a printed page and are not held to it
-    for (const t of document.querySelectorAll('.smp-thumb')) {
+    // fix round 5: thumbnails are drawn live by the app (live.mjs); each drawn one carries its measures (__mq), scale and
+    // window, so what it SHOWS is read exactly as thumbs-check.cjs reads it
+    for (const t of document.querySelectorAll('.live-thumb')) {
       const min = parseFloat(getComputedStyle(t).getPropertyValue('--smp-min')) || 0; const vis = t.getBoundingClientRect();
-      if (!min || vis.width < 4 || vis.bottom < 0 || vis.top > vh) continue;
-      const outer = t.querySelector('.smp-svg'); const prose = ((t.querySelector('.smp-prose') || {}).textContent || '').replace(/\s+/g, '');
-      let low = 1e9, lowT = '';
-      const tw = document.createTreeWalker(t, NodeFilter.SHOW_TEXT);
-      for (let nd = tw.nextNode(); nd; nd = tw.nextNode()) {
-        const tx = nd.nodeValue.trim(); if (!tx || /^[a-z]\.$/.test(tx)) continue;
-        const holder = nd.parentElement.closest('.smp-prose, .smp-svg'); if (!holder || getComputedStyle(holder).display === 'none') continue;
-        if (holder === outer && prose.includes(tx.replace(/\s+/g, ''))) continue;
-        const rg = document.createRange(); rg.selectNodeContents(nd); const hb = holder.getBoundingClientRect();
-        if (![...rg.getClientRects()].some(r => r.width > 0.5 && r.bottom > Math.max(vis.top, hb.top) + 1 && r.top < Math.min(vis.bottom, hb.bottom) - 1 && r.right > Math.max(vis.left, hb.left) + 1 && r.left < Math.min(vis.right, hb.right) - 1)) continue;
-        const pe = nd.parentElement; let e = parseFloat(getComputedStyle(pe).fontSize); const inner = pe.namespaceURI === 'http://www.w3.org/2000/svg' ? pe.closest('svg') : null;
-        if (inner && inner !== outer && inner.viewBox && inner.viewBox.baseVal && inner.viewBox.baseVal.width) e *= inner.getBoundingClientRect().width / inner.viewBox.baseVal.width;
-        else if (outer && outer.contains(pe)) e *= outer.getBoundingClientRect().width / outer.viewBox.baseVal.width;
-        if (e < low) { low = e; lowT = tx.slice(0, 14); }
-      }
-      if (low < min - 0.05) say('thumbnail text too small', `${t.getAttribute('data-smp')}: ${low.toFixed(1)}px “${lowT}” (min ${min})`);
+      if (vis.width < 4 || vis.bottom < 0 || vis.top > vh) continue;
+      if (t.dataset.state === 'error' || t.dataset.state === 'none') { say('thumbnail not drawn', `${t.dataset.k}: ${t.dataset.state} ${t.dataset.err || ''}`); continue; }
+      if (!min || t.dataset.state !== 'done' || !t.__mq) continue;
+      const sc = Number(t.dataset.scale), win = t.dataset.win.split(' ').map(Number); let low = 1e9, lowT = '';
+      for (const x of t.__mq.texts) { const [X, Y, W, H] = x.r; if (X < win[0] + win[2] && X + W > win[0] && Y < win[1] + win[3] && Y + H > win[1] && x.fs * sc < low) { low = x.fs * sc; lowT = x.t.slice(0, 14); }
+        if (x.lefts.some(L => L < win[0] - 0.5 && L + 1 < win[0] + win[2]) && Y < win[1] + win[3]) say('thumbnail line cut at its start', `${t.dataset.k}: “${x.t.slice(0, 16)}”`); }
+      if (low < min - 0.05) say('thumbnail text too small', `${t.dataset.k}: ${low.toFixed(1)}px “${lowT}” (min ${min})`);
+    }
+    // fix round 5 (critic r5 D2, §2.7 "selected = fill + ✓ + ring"): every selected segmented option and pill shows a ✓ and
+    // a fill, not only a thicker ring
+    for (const b of document.querySelectorAll('.seg button[aria-pressed="true"], .pill[aria-pressed="true"]')) {
+      if (!shown(b)) continue;
+      const tick = /✓/.test(getComputedStyle(b, '::before').content) || !!b.querySelector('svg.icon, .icon');
+      const sib = [...b.parentElement.children].find(x => x !== b && x.getAttribute('aria-pressed') === 'false');
+      const bg = getComputedStyle(b).backgroundColor, bg0 = sib ? getComputedStyle(sib).backgroundColor : getComputedStyle(b.parentElement).backgroundColor;
+      if (!tick) say('selected without ✓', `“${b.textContent.trim().slice(0, 20)}”`);
+      if (bg === bg0) say('selected without a fill', `“${b.textContent.trim().slice(0, 20)}”`);
     }
     // (9) fix round 4 (critic r4 C3): a quiz sheet's How many questions equals the questions its summary line counts
     const qn = document.querySelector('[data-act="qn"]');
@@ -317,7 +331,7 @@ async function runFlow(browser, base, f, w) {
         const errors = []; page.on('pageerror', e => errors.push(e.message)); page.on('console', m => { if (m.type() === 'error' && !/favicon|404/.test(m.text())) errors.push(m.text()); });
         const u = url.includes('?') ? url.replace('?', `?theme=${theme}&`) : url.replace('app.html', `app.html?theme=${theme}`);
         await page.goto(`${base}/design/mockups/teacher-2/${u}`, { waitUntil: 'networkidle' });
-        await page.evaluate(() => document.fonts.ready); await page.waitForTimeout(150);
+        await page.evaluate(() => document.fonts.ready); await waitThumbs(page); await page.waitForTimeout(150);
         const rep = await screenReport(page, w);
         if (errors.length) rep.problems.push('console: ' + errors.join('; '));
         if (w === 1366 && primary && (rep.primaries !== 1 || rep.primaryBottom > 768)) rep.problems.push(`primary action not above the fold at 1366x768 (${rep.primaries} visible, bottom ${rep.primaryBottom})`);
@@ -353,14 +367,23 @@ async function runFlow(browser, base, f, w) {
           const chips = [...t.querySelectorAll('.tray-chips > *')].filter(c => c.getBoundingClientRect().width && getComputedStyle(c).visibility !== 'hidden');
           const rows = new Set(chips.map(c => Math.round(c.getBoundingClientRect().top))).size;
           const summary = [...t.querySelectorAll('.tray-summary')].some(x => x.getBoundingClientRect().width > 0);
-          return { h: Math.round(tr.height), rows, chips: chips.length, summary };
+          // critic r5 A2: never "+N" alone. Every shown "+N" has a NAMED item before it (a chip / name, or an area segment
+          // with its icon, a short name and its count), and from 820 px up a big tray's bar shows at least one named area
+          const shown = (e) => e && e.getBoundingClientRect().width > 0 && getComputedStyle(e).display !== 'none' && !e.closest('[hidden]');
+          const named = [...t.querySelectorAll('.tray-seg')].filter(g => shown(g) && [...g.querySelectorAll('.seg-long, .seg-abbr')].some(x => shown(x) && x.textContent.trim()) && shown(g.querySelector('b')) && shown(g.querySelector('.icon, svg'))
+            && g.getBoundingClientRect().right <= g.parentElement.getBoundingClientRect().right + 1);
+          const plusAlone = [...t.querySelectorAll('.tray-more')].filter(shown).some(m => ![...m.parentElement.children].some(c => c !== m && shown(c)));
+          const segRow = [...t.querySelectorAll('.tray-segs')].some(shown);
+          return { h: Math.round(tr.height), rows, chips: chips.length, summary, named: named.length, plusAlone, segRow };
         }, [n, view]);
         const lim = Math.min(w >= 1100 ? 96 : 120, SIZES[w].height * 0.15); const bad = [];
         if (r.h > lim) bad.push(`tray ${r.h}px > ${Math.round(lim)}px`);
         if (n <= 8 && w >= 820 && r.rows > 1) bad.push(`${r.rows} rows of chips (one row only)`);
         if (n > 8 && !r.summary) bad.push('no summary bar past 8 skills');
+        if (r.plusAlone) bad.push('“+N” with nothing named before it');
+        if (n > 8 && w >= 820 && r.named < 1) bad.push(`no named area segment in the bar${r.segRow ? '' : ' (the area row is gone)'}`);
         if (bad.length) failed++;
-        console.log(`${bad.length ? 'FAIL' : 'ok  '} tray-height @${w} ${view.padEnd(6)} ${String(n).padStart(3)} skills: ${r.h}px, ${r.chips} chips in ${r.rows} row(s)${r.summary ? ', summary bar' : ''}${bad.length ? '  ' + bad.join('; ') : ''}`);
+        console.log(`${bad.length ? 'FAIL' : 'ok  '} tray-height @${w} ${view.padEnd(6)} ${String(n).padStart(3)} skills: ${r.h}px, ${r.chips} chips in ${r.rows} row(s)${r.summary ? `, summary bar, ${r.named} named area(s)` : ''}${bad.length ? '  ' + bad.join('; ') : ''}`);
       }
       await page.close();
     }
@@ -407,8 +430,8 @@ async function runFlow(browser, base, f, w) {
             for (const c of cells) { const k = c.getAttribute('data-skill'); if (!k) { bad.push('a preview cell without data-skill'); break; } got[k] = (got[k] || 0) + 1; }
             const want = p.perPage[i] || {}; for (const k of new Set([...Object.keys(want), ...Object.keys(got)])) if ((want[k] || 0) !== (got[k] || 0)) bad.push(`page ${i + 1}: preview ${got[k] || 0} × ${k}, plan ${want[k] || 0}`);
             const seen = new Set(); for (const c of cells) { if (c.classList.contains('page-more')) continue; const h = c.innerHTML; if (seen.has(h)) { bad.push(`page ${i + 1}: the same item twice`); break; } seen.add(h); }
-            // every drawn cell is a REAL captured item of its own skill (fix round 4, critic r4 C1)
-            for (const c of cells) { if (c.classList.contains('page-more')) continue; const sv = c.querySelector('.smp-thumb, svg[data-fallback]'); if (!sv || (sv.getAttribute('data-smp') !== c.getAttribute('data-skill') && !sv.hasAttribute('data-fallback'))) { bad.push(`page ${i + 1}: a cell of ${c.getAttribute('data-skill')} shows ${sv ? sv.getAttribute('data-smp') : 'nothing'}`); break; } }
+            // every cell is drawn live by the app from its own skill (fix round 5)
+            for (const c of cells) { const sv = c.querySelector('.live-thumb'); if (!sv || sv.dataset.k !== c.getAttribute('data-skill')) { bad.push(`page ${i + 1}: a cell of ${c.getAttribute('data-skill')} shows ${sv ? sv.dataset.k : 'nothing'}`); break; } }
           });
           const line = document.querySelector('[data-summary]'); const txt = line ? line.textContent : '';
           if (!txt.includes(`${p.total} ${M.S.sheet === 'quiz' ? 'questions' : 'problems'}`)) bad.push(`summary “${txt.slice(0, 60)}” does not say ${p.total}`);
@@ -422,7 +445,7 @@ async function runFlow(browser, base, f, w) {
       for (const [label, url, mode] of [['mixed, same problems', 'app.html?tray=demo3&pages=3&each=same#print', 'same'], ['mixed, same page again', 'app.html?tray=demo3&pages=3&each=copy#print', 'copy'], ['single, same problems', 'app.html?tray=demo1&pages=3&each=same#print', 'same'], ['sections, same page again', 'app.html?tray=demo3x&kind=sections&pages=2&each=copy#print', 'copy'], ['quiz, same problems', 'app.html?tray=demo3&pages=2&each=same#quiz', 'same']]) {
         await page.goto(`${base}/design/mockups/teacher-2/${url}`, { waitUntil: 'networkidle' });
         const r = await page.evaluate(() => { const pg = [...document.querySelectorAll('.previews .page')].slice(0, 2).map(p => [...p.querySelectorAll('.page-cell')]); const p = window.MQ.plan(window.MQ.S.sheet === 'quiz');
-          return { n: pg.length, sk: pg.map(c => c.map(x => x.getAttribute('data-skill')).join(',')), h: pg.map(c => c.map(x => { const t = x.querySelector('.smp-thumb'); return t ? t.getAttribute('data-h') : 'more'; }).join(',')), plan: p.perPage.slice(0, 2).map(o => JSON.stringify(o)), line: document.querySelector('[data-summary]').textContent.slice(0, 80), copyOpt: !!document.querySelector('[data-act="each"][data-arg="copy"]') }; });
+          return { n: pg.length, sk: pg.map(c => c.map(x => x.getAttribute('data-skill')).join(',')), h: pg.map(c => c.map(x => { const t = x.querySelector('.live-thumb'); return t ? t.dataset.k + '|' + t.dataset.seed + '|' + t.dataset.n : 'none'; }).join(',')), plan: p.perPage.slice(0, 2).map(o => JSON.stringify(o)), line: document.querySelector('[data-summary]').textContent.slice(0, 80), copyOpt: !!document.querySelector('[data-act="each"][data-arg="copy"]') }; });
         const bad = [];
         if (r.n < 2) bad.push('fewer than 2 pages in the preview');
         else {
@@ -471,6 +494,86 @@ async function runFlow(browser, base, f, w) {
         if (bad.length) failed++;
         console.log(`${bad.length ? 'FAIL' : 'ok  '} phone popup @390 ${theme}, ${label}: ${r.vis} rows on the first screen of ${r.rows}${bad.length ? '  ' + bad.join('; ') : ''}`);
       }
+      await page.close();
+    }
+    // ---- fix round 5 (critic r5 A3 / A4): the tray popup with Detailed weights.
+    //  (a) every popup state, at every width: no text sits under a control and no two controls overlap (the r5 phone
+    //      defect laid Less · Equal · More over "Grade 2 (all areas)"); the ⋯ menus are opened too;
+    //  (b) rows per screen in Detailed weights: with the first skill row brought to the top of the popup, >= 8 skill rows
+    //      are whole on the 1366 × 768 screen (each <= 56 px: name, weight, %, lock, ≈ n and ✕ on one line) and >= 6 on
+    //      the 390 × 844 screen.
+    if (!ONLY || ONLY.includes('pop-overlap')) for (const w of WIDTHS) for (const theme of THEMES) {
+      const page = await browser.newPage({ viewport: SIZES[w] });
+      const states = [['areas closed', 'app.html?tray=grades2-3#tray'], ['every area open', 'app.html?tray=grades2-3&open=all#tray'], ['a selection', 'app.html?tray=grade3&open=NF&sel=g:NF|3#tray'],
+        ['detailed, one grade', 'app.html?tray=grade3&open=NF&detailed=1&lockp=a:NF:40#tray'], ['detailed, two grades', 'app.html?tray=grades2-3&detailed=1#tray'], ['detailed, two grades, all open', 'app.html?tray=grades2-3&detailed=1&open=all#tray'],
+        ['detailed, a skill at 50 %', 'app.html?tray=demo64&pages=5&detailed=1&tq=add%201000%20story&lockp=k:addition:add_wp_1k:50#tray'],
+        ['chips', 'app.html?tray=grade3&open=NF&tview=chips#tray'], ['thumbnails', 'app.html?tray=grade3&open=NF&tview=thumbs#tray'], ['detailed chips', 'app.html?tray=grades2-3&open=NF&tview=chips&detailed=1#tray'], ['detailed thumbnails', 'app.html?tray=grades2-3&open=NF&tview=thumbs&detailed=1#tray']];
+      for (const [label, url] of states) {
+        await page.goto(`${base}/design/mockups/teacher-2/${url.replace('?', `?theme=${theme}&`)}`, { waitUntil: 'networkidle' }); await page.evaluate(() => document.fonts.ready);
+        // the closed state, then each ⋯ opened in turn (a phone's header controls)
+        const nDots = await page.evaluate(() => document.querySelectorAll('.traypop .tp-dots').length);
+        const bad = [];
+        for (let d = -1; d < Math.min(nDots, 4); d++) {
+          if (d >= 0) { await page.evaluate((d) => { const b = [...document.querySelectorAll('.traypop .tp-dots')].filter(x => x.getBoundingClientRect().width)[d]; if (b) b.click(); }, d); await page.waitForTimeout(30); }
+          const r = await page.evaluate(() => {
+            const out = []; const sheet = document.querySelector('.traypop'); if (!sheet) return ['no popup'];
+            const vis = (el) => { const r = el.getBoundingClientRect(); if (r.width < 1 || r.height < 1) return false; for (let e = el; e; e = e.parentElement) { const cs = getComputedStyle(e); if (cs.display === 'none' || cs.visibility === 'hidden') return false; } return true; };
+            const CTL = 'button, a, input, select, summary, [role="checkbox"], .stepper output';
+            // only what the teacher can SEE: a control or a text whose middle is not covered (a sticky foot is not an overlap)
+            const top = (x, y) => (x >= 0 && y >= 0 && x < innerWidth && y < innerHeight) ? document.elementFromPoint(x, y) : null;
+            const ctls = [...sheet.querySelectorAll(CTL)].filter(vis).filter(c => !c.parentElement.closest(CTL)).filter(c => { const r = c.getBoundingClientRect(); const t = top(r.left + r.width / 2, r.top + r.height / 2); return t && c.contains(t); });
+            const clipR = (el) => { const r = el.getBoundingClientRect(); const o = { left: r.left, top: r.top, right: r.right, bottom: r.bottom }; for (let e = el.parentElement; e && e !== document.body; e = e.parentElement) { const cs = getComputedStyle(e); if (/(auto|scroll|hidden|clip)/.test(cs.overflowX + cs.overflowY)) { const c = e.getBoundingClientRect(); o.left = Math.max(o.left, c.left); o.top = Math.max(o.top, c.top); o.right = Math.min(o.right, c.right); o.bottom = Math.min(o.bottom, c.bottom); } } return o; };
+            const inClip = (el, x, y) => { for (let e = el.parentElement; e && e !== document.body; e = e.parentElement) { const cs = getComputedStyle(e); if (/(auto|scroll|hidden|clip)/.test(cs.overflowX + cs.overflowY)) { const c = e.getBoundingClientRect(); if (x < c.left || x > c.right || y < c.top || y > c.bottom) return false; } } return true; };
+            // a control in a pinned part (the sticky foot) over rows scrolled under it is not laid over them
+            const pinned = (c, pe) => { for (let e = c; e && e !== sheet; e = e.parentElement) { if (/sticky|fixed/.test(getComputedStyle(e).position)) return !e.contains(pe); } return false; };
+            const meet = (p, q) => Math.min(p.right, q.right) - Math.max(p.left, q.left) > 2 && Math.min(p.bottom, q.bottom) - Math.max(p.top, q.top) > 2;
+            for (let i = 0; i < ctls.length; i++) for (let j = i + 1; j < ctls.length; j++) if (meet(clipR(ctls[i]), clipR(ctls[j])) && !pinned(ctls[i], ctls[j]) && !pinned(ctls[j], ctls[i])) out.push(`controls overlap: “${ctls[i].textContent.trim().slice(0, 18)}” / “${ctls[j].textContent.trim().slice(0, 18)}”`);
+            const tw = document.createTreeWalker(sheet, NodeFilter.SHOW_TEXT);
+            for (let nd = tw.nextNode(); nd; nd = tw.nextNode()) {
+              const tx = nd.nodeValue.trim(); if (!tx) continue; const pe = nd.parentElement; if (!pe || pe.closest(CTL) || pe.closest('.sr, .live-thumb') || !vis(pe)) continue;
+              const rg = document.createRange(); rg.selectNodeContents(nd);
+              for (const rr of rg.getClientRects()) {
+                if (rr.width < 2 || rr.height < 2) continue;
+                // a control laid over the words: what is on top at the text's middle (or its first letter) is a control
+                for (const [x, y] of [[rr.left + rr.width / 2, rr.top + rr.height / 2], [rr.left + 3, rr.top + rr.height / 2]]) {
+                  if (!inClip(pe, x, y)) continue;      // scrolled out of its own box: not shown, so not under anything
+                  const t = top(x, y); const c = t && t.closest(CTL);
+                  if (c && !c.contains(pe) && sheet.contains(c) && !pinned(c, pe)) { out.push(`text under a control: “${tx.slice(0, 24)}” under “${c.textContent.trim().slice(0, 16) || c.getAttribute('aria-label') || c.tagName}”`); break; }
+                }
+              }
+            }
+            return [...new Set(out)];
+          });
+          for (const x of r) bad.push((d >= 0 ? `⋯ ${d + 1} open: ` : '') + x);
+        }
+        if (bad.length) failed++;
+        console.log(`${bad.length ? 'FAIL' : 'ok  '} popup overlap @${w} ${theme} ${label.padEnd(30)} ${bad.slice(0, 3).join('; ')}${bad.length > 3 ? ` (+${bad.length - 3})` : ''}`);
+      }
+      await page.close();
+    }
+    if (!ONLY || ONLY.includes('detailed-rows')) for (const w of [1366, 1280, 1024, 820, 390].filter(x => WIDTHS.includes(x))) {
+      const page = await browser.newPage({ viewport: SIZES[w] });
+      await page.goto(`${base}/design/mockups/teacher-2/app.html?theme=light&tray=grade3&open=NF&detailed=1#tray`, { waitUntil: 'networkidle' }); await page.evaluate(() => document.fonts.ready);
+      const r = await page.evaluate(() => {
+        const rows = [...document.querySelectorAll('.traypop .tp-row')]; if (!rows.length) return { err: 'no skill rows' };
+        rows[0].scrollIntoView({ block: 'start' });
+        // what covers the top of the scrolling part (a sticky head) is not screen the rows can use
+        const covered = (row) => { const b = row.getBoundingClientRect(); for (const y of [b.top + 2, b.top + b.height / 2, b.bottom - 2]) { const t = document.elementFromPoint(b.left + Math.min(40, b.width / 2), y); if (!t || !row.contains(t)) return true; } return false; };
+        const body = document.querySelector('.traypop .tp-body'); const sc = getComputedStyle(body).overflowY === 'auto' ? body : document.querySelector('.traypop');
+        // bring the first row to the top of what the teacher sees, below any sticky part
+        for (let i = 0; i < 6 && covered(rows[0]); i++) sc.scrollTop -= 8;
+        const whole = rows.filter(row => { const b = row.getBoundingClientRect(); return b.top >= 0 && b.bottom <= innerHeight && !covered(row); });
+        const hs = rows.slice(0, 12).map(row => Math.round(row.getBoundingClientRect().height));
+        return { whole: whole.length, max: Math.max(...hs), hs };
+      });
+      const bad = []; const need = w === 390 ? 6 : w === 1366 ? 8 : 0;
+      if (r.err) bad.push(r.err);
+      else {
+        if (r.whole < need) bad.push(`${r.whole} skill rows whole on the screen (want >= ${need})`);
+        if (w >= 820 && r.max > 56.5) bad.push(`rows up to ${r.max} px (want <= 56: one line)`);
+      }
+      if (bad.length) failed++;
+      console.log(`${bad.length ? 'FAIL' : 'ok  '} detailed weights @${w}: ${r.whole} rows per screen, rows ${r.hs ? r.hs.slice(0, 6).join(' / ') : ''} px${bad.length ? '  ' + bad.join('; ') : ''}`);
       await page.close();
     }
     // ---- fix round 4 (critic r4 B3): the worksheet sheet keeps what the teacher set. Set 3 pages and Examples at the top,
