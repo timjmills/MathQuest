@@ -14,28 +14,35 @@
 //
 // OURS (the lane's rows): --run <file> (a ws-coverage-matrix --out run file; repeatable), else this tool runs
 //   `ws-coverage-matrix --skills <skills> [--rows ...] --baseline <matrix pin> --slots N --out <tmp>` (a node process
-//   that takes its own browser slots through /tmp/mq-browser-run.sh). Only RED rows are compared (a row above its own
-//   pin; --all-rows compares every printed row). An ERROR row is never engine debt: FAIL.
+//   that takes its own browser slots through /tmp/mq-browser-run.sh). EVERY ROW THAT PRINTED AND HAS FINDINGS is
+//   compared: RED, OK and PENDING(no-baseline) alike (critic r6 D1: a skill without a matrix pin has no RED rows, only
+//   PENDING(no-baseline) ones, and those are exactly a new skill's rows; an OK row may sit on a pin the lane wrote
+//   itself). --red-only restores the old RED-only comparison (--all-rows is accepted and is now the default).
+//   PENDING(step) and N/A rows did not print: nothing to compare. An ERROR row is never engine debt: FAIL.
 // SIBLINGS: tests/fixtures/precritic/siblings.json (--siblings-file): per kit template the APPROVED skills, and
-//   optionally `pairs` (a lane skill -> the siblings of its own size band, used with --paired). By default every
-//   approved sibling of the template counts (the max over all of them, as critic r1's engine rulings compared). The lane skill's template is read from its generator in node (the kit cell of 8 seeded items,
-//   as ws-precritic --template does). --siblings a:b,c:d overrides both. A sibling's counts come from, newest first:
+//   optionally `pairs` (a lane skill -> the siblings of its own size band). N1 (lead decision, critic r6): the PAIRED
+//   siblings are the default, as the lead's own pilot comparison (design/audit/runs/pilot-su-c/sibling-compare.txt)
+//   used; a skill with no pair is compared with every approved sibling of its template; --all-siblings compares every
+//   skill with every approved sibling (the lenient max over all of them; --paired is accepted, the default). The lane
+//   skill's template is read from its generator in node (the kit cell of 8 seeded items, as ws-precritic --template
+//   does). --siblings a:b,c:d overrides both. A sibling's counts come from, newest first:
 //     --sibling-run <file>   ws-coverage-matrix run files of the siblings (repeatable)
 //     --run-siblings         run the matrix on the siblings now (no baseline; cached by the print-input hash in
 //                            $MQ_SIBLING_CACHE, default <os tmp>/mq-sibling-cache, so a second run on the same tree
 //                            is free)
 //     the pins               the merged matrix baseline of the tree (design/audit/matrix/baseline.json and every
 //                            baseline.*.json beside it; --matrix-baseline <file> for another)
-// THE RULE, per (red row, size, lint rule): ours n; for each sibling with that row id suffix (kind/row) measured at
+// THE RULE, per (compared row, size, lint rule): ours n; for each sibling with that row id suffix (kind/row) measured at
 //   that size, its count (0 when the rule is absent). n > the siblings' max: ABOVE (FAIL). n <= max: ENGINE (non-
 //   blocking, listed). No sibling measured that row at that size: NO-SIBLING (FAIL: unproven; run --run-siblings or
 //   pin a sibling). Rows of other kinds of finding keys (the per-finding `<lint> <rule>|p<page>|...` keys) are ignored:
 //   counts are compared, as the pilot's comparison did.
 //
-// Other options: --sizes S,M (compare only these sizes; default all three), --root <tree> (default MQ_ROOT, else this repository), --slots N (default 2), --json <out>,
+// Other options: --sizes S,M (compare only these sizes; default all three), --rules H13,TY-11 (compare only these lint
+// rules: a rule id or the full "L-DENSITY H13" key; a backtest scoped to the one defect it was built for), --root <tree> (default MQ_ROOT, else this repository), --slots N (default 2), --json <out>,
 // --report-only, --verbose (every ENGINE line too).
 // Last line `ws-sibling-compare: OK (...)` or `ws-sibling-compare: FAIL - ...`; exit 1 on FAIL, 2 on a usage or setup
-// error, 4 `NO-RED` never: zero red rows is OK ("nothing red to compare").
+// error. No printed row with findings is OK ("nothing to compare"); the summary counts the compared rows by status.
 'use strict';
 const fs = require('fs');
 const os = require('os');
@@ -66,18 +73,28 @@ function sibTable(sources) {
     for (const s of sources) for (const [id, sizes] of Object.entries(s.rows)) t.set(id, { sizes, src: s.name });
     return t;
 }
-function compare(oursRows, sibsOf, table, { allRows = false, sizes = null } = {}) {
-    const out = { above: [], engine: [], noSibling: [], errors: [], rowsCompared: 0, rowsAbove: new Set() };
+/**
+ * A row that printed: RED, OK, or PENDING(no-baseline) (it printed and only had no pin to compare with; critic r6 D1:
+ * those are exactly a NEW skill's rows, so they are compared too). PENDING(step) / N/A rows did not print.
+ */
+const printed = (r) => r.status === 'RED' || r.status === 'OK' || r.status === 'CACHED' || (r.status === 'PENDING' && (r.noBaseline || /no-baseline/.test(`${r.step || ''} ${r.reason || ''}`)));
+/** --rules H13,TY-11 (or the full key "L-DENSITY H13"): compare only these rules. */
+const ruleOn = (rules, key) => !rules || rules.some((x) => key === x || key.endsWith(` ${x}`) || key.startsWith(`${x} `));
+const hasFindings = (r, sizes, rules) => Object.entries(r.sizes || {}).some(([z, v]) => (!sizes || sizes.includes(z)) && v && ruleKeys(v.counts).some(([k, n]) => n > 0 && ruleOn(rules, k)));
+function compare(oursRows, sibsOf, table, { redOnly = false, sizes = null, rules = null } = {}) {
+    const out = { above: [], engine: [], noSibling: [], errors: [], rowsCompared: 0, rowsAbove: new Set(), byStatus: {} };
     for (const r of oursRows) {
         if (r.status === 'ERROR') { out.errors.push({ id: r.id, msg: (r.errors || []).join('; ') || 'did not print' }); continue; }
-        if (!(r.status === 'RED' || (allRows && r.status === 'OK')) || !r.sizes) continue;
+        if (!r.sizes || !(redOnly ? r.status === 'RED' : printed(r)) || !hasFindings(r, sizes, rules)) continue;
         out.rowsCompared++;
+        const st = r.status === 'PENDING' ? 'PENDING(no-baseline)' : r.status;
+        out.byStatus[st] = (out.byStatus[st] || 0) + 1;
         const suf = `${r.kind}/${r.row}`;
         const sibs = sibsOf(r.skill);
         for (const [size, v] of Object.entries(r.sizes)) {
             if (!v || !v.counts || (sizes && !sizes.includes(size))) continue;
             for (const [rule, n] of ruleKeys(v.counts)) {
-                if (!(n > 0)) continue;
+                if (!(n > 0) || !ruleOn(rules, rule)) continue;
                 const seen = [];
                 for (const s of sibs) {
                     const e = table.get(`${s}|${suf}`);
@@ -108,15 +125,31 @@ function selfTest() {
     const c = compare(ours, () => ['addition:add_100_regroup'], table);
     t(c.above.length === 1 && c.above[0].rule === 'L-DENSITY H13' && c.above[0].max === 0, 'H13 16 above sibling 0');
     t(c.engine.length === 1 && c.engine[0].rule === 'L-SIZE TY-11', 'TY-11 8 at sibling 8 is engine');
-    t(c.noSibling.length === 1 && c.noSibling[0].id.endsWith('single/defaults'), 'no sibling row -> unproven');
+    t(c.noSibling.length === 2 && c.noSibling[0].id.endsWith('single/defaults') && c.noSibling[1].id.endsWith('single/pages-3'), 'no sibling row -> unproven (the OK row with findings too)');
     t(c.errors.length === 1, 'ERROR row is never engine');
-    t(c.rowsCompared === 2, 'OK rows skipped without --all-rows');
-    t(compare(ours, () => ['addition:add_100_regroup'], table, { allRows: true }).rowsCompared === 3, '--all-rows');
+    t(c.rowsCompared === 3, 'every printed row with findings is compared (RED and OK alike)');
+    t(compare(ours, () => ['addition:add_100_regroup'], table, { redOnly: true }).rowsCompared === 2, '--red-only: only RED rows');
+    // critic r6 D1: a run file whose rows are all PENDING(no-baseline) (a new skill, no pin) is still compared
+    const fresh = [
+        { id: 'subtraction:n|single/ex-group', skill: 'subtraction:n', kind: 'single', row: 'ex-group', status: 'PENDING', step: 'no-baseline', noBaseline: true, sizes: { S: { counts: { 'L-DENSITY H13': 16 } } } },
+        { id: 'subtraction:n|single/pages-3', skill: 'subtraction:n', kind: 'single', row: 'pages-3', status: 'PENDING', step: 'M2', sizes: { S: { counts: { 'L-DENSITY H13': 9 } } } },
+        { id: 'subtraction:n|single/defaults', skill: 'subtraction:n', kind: 'single', row: 'defaults', status: 'PENDING', step: 'no-baseline', noBaseline: true, sizes: { S: { counts: {} } } },
+    ];
+    const cf = compare(fresh, () => ['addition:add_100_regroup'], sibTable([{ name: 'pin', rows: { 'addition:add_100_regroup|single/ex-group': { S: { 'L-DENSITY H13': 0 } } } }]));
+    t(cf.rowsCompared === 1 && cf.above.length === 1 && cf.above[0].n === 16 && cf.byStatus['PENDING(no-baseline)'] === 1, `PENDING(no-baseline) rows only: compared, H13 16 above 0 (${JSON.stringify({ n: cf.rowsCompared, above: cf.above.length })})`);
+    t(!cf.above.some((x) => /pages-3/.test(x.id)), 'a PENDING(step) row did not print: not compared');
+    // N1: the paired siblings are the default; --all-siblings takes every approved sibling (the lenient max)
+    const cfg = { templates: { stack: { approved: ['a:p', 'a:q', 'a:far'], pairs: { 's:x': ['a:p', 'a:q'] } } } };
+    const so = siblingsOf(cfg, { 's:x': 'stack', 's:y': 'stack' }, ['s:x', 's:y'], {});
+    t(so['s:x'].join() === 'a:p,a:q' && so['s:y'].join() === 'a:p,a:q,a:far', `paired by default, all approved without a pair (${JSON.stringify(so)})`);
+    t(siblingsOf(cfg, { 's:x': 'stack' }, ['s:x'], { allSiblings: true })['s:x'].length === 3, '--all-siblings: every approved sibling');
+    const cr = compare([ours[0]], () => ['addition:add_100_regroup'], table, { rules: ['H13'] });
+    t(cr.above.length === 1 && cr.engine.length === 0 && cr.above[0].rule === 'L-DENSITY H13', '--rules H13 compares H13 only');
     const t2 = sibTable([{ name: 'pin', rows: { 'a:b|single/ex-group': { S: { 'L-DENSITY H13': 20 } } } }, { name: 'run', rows: { 'a:b|single/ex-group': { S: { counts: { 'L-DENSITY H13': 0 } } } } }]);
     t(compare([ours[0]], () => ['a:b'], t2).above.length === 2, 'a fresher sibling run replaces its pin');
     t(suffixOf('a:b|sections/ex-each') === 'sections/ex-each', 'suffix');
     for (const f of fails) say(`  self-test FAIL: ${f}`);
-    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 8 cases)`);
+    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 13 cases)`);
     process.exit(fails.length ? 1 : 0);
 }
 
@@ -180,19 +213,30 @@ out('\\n' + JSON.stringify(res) + '\\n'); process.exit(0);`;
  * The siblings of each lane skill and the sources of their counts (pins, a fresh or cached sibling matrix run, given
  * run files). Shared with ws-slot-clip, which uses the same cache.
  */
-function loadSiblings({ keys, onlyRows = [], pinFile, tmp, explicit = [], paired = false, runSiblings = false, siblingRuns = [], siblingsFile }) {
+/**
+ * The siblings of each lane skill (pure; self-tested). N1 (lead, 2026-10-23): the PAIRED siblings of the skill's own
+ * size band (the template's `pairs`) by default, as the lead's own sibling-compare.txt compared; a skill with no pair
+ * gets every approved sibling of its template; allSiblings (--all-siblings) takes every approved sibling (the lenient
+ * max over all of them).
+ */
+function siblingsOf(cfg, tpl, keys, { allSiblings = false } = {}) {
+    const sibOf = {};
+    for (const k of keys) {
+        const t = cfg.templates && cfg.templates[tpl[k]];
+        const pairs = !allSiblings && t && t.pairs && t.pairs[k];
+        sibOf[k] = (pairs || (t && t.approved) || []).filter((s) => s !== k && !keys.includes(s));
+    }
+    return sibOf;
+}
+function loadSiblings({ keys, onlyRows = [], pinFile, tmp, explicit = [], allSiblings = false, runSiblings = false, siblingRuns = [], siblingsFile }) {
     const sf = path.resolve(HERE, siblingsFile || 'tests/fixtures/precritic/siblings.json');
     const cfg = fs.existsSync(sf) ? JSON.parse(fs.readFileSync(sf, 'utf8')) : { templates: {} };
     let tpl = {};
-    const sibOf = {};
+    let sibOf = {};
     if (explicit.length) for (const k of keys) sibOf[k] = explicit.filter((s) => s !== k);
     else {
         tpl = templatesOf(keys);
-        for (const k of keys) {
-            const t = cfg.templates && cfg.templates[tpl[k]];
-            const pairs = paired && t && t.pairs && t.pairs[k];
-            sibOf[k] = (pairs || (t && t.approved) || []).filter((s) => s !== k && !keys.includes(s));
-        }
+        sibOf = siblingsOf(cfg, tpl, keys, { allSiblings });
     }
     const noTpl = keys.filter((k) => !sibOf[k].length);
     const allSibs = [...new Set(Object.values(sibOf).flat())];
@@ -223,8 +267,8 @@ function loadSiblings({ keys, onlyRows = [], pinFile, tmp, explicit = [], paired
 /* ---------------------------------------------------------------- main */
 function main() {
     if (has('self-test')) return selfTest();
-    const VALUE = new Set(['skills', 'run', 'rows', 'siblings', 'siblings-file', 'sibling-run', 'matrix-baseline', 'root', 'slots', 'json', 'sizes']);
-    const BOOL = new Set(['run-siblings', 'all-rows', 'report-only', 'verbose', 'self-test', 'paired']);
+    const VALUE = new Set(['skills', 'run', 'rows', 'siblings', 'siblings-file', 'sibling-run', 'matrix-baseline', 'root', 'slots', 'json', 'sizes', 'rules']);
+    const BOOL = new Set(['run-siblings', 'all-rows', 'red-only', 'report-only', 'verbose', 'self-test', 'paired', 'all-siblings']);
     for (let i = 0; i < argv.length; i++) {
         const m = /^--([a-z-]+)$/.exec(argv[i]);
         if (!m || (!VALUE.has(m[1]) && !BOOL.has(m[1]))) { say(`${TOOL}: unknown argument ${argv[i]}`); say(`${TOOL}: FAIL - usage`); process.exit(2); }
@@ -233,6 +277,7 @@ function main() {
     const T0 = Date.now();
     const pinFile = path.resolve(ROOT, arg('matrix-baseline', 'design/audit/matrix/baseline.json'));
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'mq-sibling-'));
+    process.on('exit', () => { try { fs.rmSync(tmp, { recursive: true, force: true }); } catch (e) { /* gone */ } });
     // ---- ours
     let runs = argAll('run').map((f) => runRows(path.resolve(f)));
     let keys = argAll('skills');
@@ -249,17 +294,20 @@ function main() {
     else keys = [...new Set(oursRows.map((r) => r.skill))];
     if (onlyRows.length) oursRows = oursRows.filter((r) => onlyRows.includes(`${r.kind}/${r.row}`) || onlyRows.includes(r.id));
     // ---- siblings
-    const S = loadSiblings({ keys, onlyRows, pinFile, tmp, explicit: argAll('siblings'), paired: has('paired'), runSiblings: has('run-siblings') && (has('all-rows') || oursRows.some((r) => r.status === 'RED')), siblingRuns: argAll('sibling-run'), siblingsFile: arg('siblings-file', 'tests/fixtures/precritic/siblings.json') });
+    const sizes = argAll('sizes');
+    if (sizes.some((z) => !['S', 'M', 'L'].includes(z))) { say(`${TOOL}: --sizes takes S,M,L`); say(`${TOOL}: FAIL - usage`); process.exit(2); }
+    const cmpOpts = { redOnly: has('red-only'), sizes: sizes.length ? sizes : null, rules: argAll('rules').length ? argAll('rules') : null };
+    const toCompare = oursRows.filter((r) => r.status !== 'ERROR' && compare([r], () => [], new Map(), cmpOpts).rowsCompared);
+    const S = loadSiblings({ keys, onlyRows, pinFile, tmp, explicit: argAll('siblings'), allSiblings: has('all-siblings'), runSiblings: has('run-siblings') && toCompare.length > 0, siblingRuns: argAll('sibling-run'), siblingsFile: arg('siblings-file', 'tests/fixtures/precritic/siblings.json') });
     const { sibOf, tpl, sources, allSibs, noTpl, sf } = S;
     const sibSecs = S.sibSecs;
     const table = sibTable(sources);
-    const sizes = argAll('sizes');
-    if (sizes.some((z) => !['S', 'M', 'L'].includes(z))) { say(`${TOOL}: --sizes takes S,M,L`); say(`${TOOL}: FAIL - usage`); process.exit(2); }
-    const c = compare(oursRows, (k) => sibOf[k] || [], table, { allRows: has('all-rows'), sizes: sizes.length ? sizes : null });
+    const c = compare(oursRows, (k) => sibOf[k] || [], table, cmpOpts);
     // ---- report
     const red = oursRows.filter((r) => r.status === 'RED').length;
+    const noBase = oursRows.filter((r) => r.status === 'PENDING' && printed(r)).length;
     const fmtSibs = (x) => x.sibs.map((s) => `${s.s.split(':')[1]} ${s.n}`).join(', ');
-    say(`${TOOL}: ${keys.length} lane skill(s) on ${ROOT === HERE ? 'this tree' : ROOT}; ${oursRows.length} row(s), ${red} RED, ${c.errors.length} ERROR`);
+    say(`${TOOL}: ${keys.length} lane skill(s) on ${ROOT === HERE ? 'this tree' : ROOT}; ${oursRows.length} row(s), ${red} RED, ${noBase} PENDING(no-baseline), ${c.errors.length} ERROR; comparing ${has('red-only') ? 'RED rows only (--red-only)' : 'every printed row with findings (RED, OK, PENDING(no-baseline))'} with ${argAll('siblings').length ? 'the given siblings' : has('all-siblings') ? 'every approved sibling (--all-siblings)' : 'the paired siblings (all approved where the skill has no pair)'}`);
     for (const k of keys) say(`  ${k}: template ${tpl[k] || '(given)'}; siblings ${sibOf[k].length ? sibOf[k].join(', ') : 'NONE (no approved sibling on this template in ' + path.relative(HERE, sf) + ')'}`);
     say(`  sibling counts from: ${sources.map((s) => `${s.name}: ${Object.keys(s.rows).filter((id) => allSibs.includes(id.split('|')[0])).length} sibling row(s)`).join('; ')}`);
     for (const e of c.errors) say(`ERROR      ${e.id}: ${e.msg} (a row that cannot print is never engine debt)`);
@@ -267,13 +315,12 @@ function main() {
     for (const x of c.noSibling) say(`NO-SIBLING ${x.id} ${x.size} ${x.rule}: ours ${x.n}, no approved sibling measured ${suffixOf(x.id)} at ${x.size}`);
     if (has('verbose')) for (const x of c.engine) say(`engine     ${x.id} ${x.size} ${x.rule}: ours ${x.n} <= siblings max ${x.max} (${fmtSibs(x)})`);
     const secs = ((Date.now() - T0) / 1000).toFixed(1);
-    const summary = `${c.rowsCompared} red row(s) compared; ${c.engine.length} count(s) at or below the siblings (engine red, non-blocking), ${c.above.length} above, ${c.noSibling.length} with no sibling measured, ${c.errors.length} ERROR row(s); ${secs} s (lane matrix ${oursSecs} s, sibling matrix ${sibSecs} s)`;
-    if (has('json')) fs.writeFileSync(path.resolve(arg('json')), JSON.stringify({ tool: TOOL, root: ROOT, skills: keys, siblings: sibOf, templates: tpl, sources: sources.map((s) => s.name), rowsCompared: c.rowsCompared, red, above: c.above, noSibling: c.noSibling, engine: c.engine, errors: c.errors, rowsAboveSiblings: [...c.rowsAbove], seconds: +secs }, null, 1) + '\n');
-    fs.rmSync(tmp, { recursive: true, force: true });
+    const summary = `${c.rowsCompared} row(s) with findings compared (${Object.entries(c.byStatus).map(([k, v]) => `${k} ${v}`).join(', ') || 'none'}); ${c.engine.length} count(s) at or below the siblings (engine red, non-blocking), ${c.above.length} above, ${c.noSibling.length} with no sibling measured, ${c.errors.length} ERROR row(s); ${secs} s (lane matrix ${oursSecs} s, sibling matrix ${sibSecs} s)`;
+    if (has('json')) fs.writeFileSync(path.resolve(arg('json')), JSON.stringify({ tool: TOOL, root: ROOT, skills: keys, siblings: sibOf, templates: tpl, sources: sources.map((s) => s.name), rowsCompared: c.rowsCompared, byStatus: c.byStatus, red, noBaseline: noBase, above: c.above, noSibling: c.noSibling, engine: c.engine, errors: c.errors, rowsAboveSiblings: [...c.rowsAbove], seconds: +secs }, null, 1) + '\n');
     const bad = c.above.length + c.noSibling.length + c.errors.length;
-    if (noTpl.length && red) say(`  no approved siblings for ${noTpl.join(', ')}: every red count of theirs is unproven`);
+    if (noTpl.length && c.rowsCompared) say(`  no approved siblings for ${noTpl.join(', ')}: every red count of theirs is unproven`);
     say(bad ? `${TOOL}: FAIL - worse than siblings: ${c.above.length} count(s) above the approved siblings in ${new Set(c.above.map((x) => x.id)).size} row(s), ${c.noSibling.length} unproven (no sibling), ${c.errors.length} ERROR (${summary})` : `${TOOL}: OK (${summary})`);
     process.exit(bad && !has('report-only') ? 1 : 0);
 }
-module.exports = { compare, sibTable, suffixOf, loadSiblings, runMatrix, runRows, readPins };
+module.exports = { compare, printed, sibTable, suffixOf, siblingsOf, loadSiblings, runMatrix, runRows, readPins };
 if (require.main === module) { try { main(); } catch (e) { say(`${TOOL}: ${e && e.stack || e}`); say(`${TOOL}: FAIL - error`); process.exit(2); } }
