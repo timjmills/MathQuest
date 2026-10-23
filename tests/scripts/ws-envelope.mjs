@@ -853,13 +853,16 @@ export const pairKey = (n1, v1, n2, v2) => {
  * `shared` (optional Set of pairKey) holds pairs already covered elsewhere — another skill with the
  * same option — which are not covered again; the pairs this call covers are added to it.
  */
-export function allPairs(dims, seed = 1, shared = null) {
+export function allPairs(dims, seed = 1, shared = null, valid = null, defaults = {}) {
     const names = Object.keys(dims).filter((k) => dims[k].length);
     const vals = names.map((k) => dims[k]);
     const uncovered = new Set();
     const gk = (a, i, b, j) => pairKey(names[a], vals[a][i], names[b], vals[b][j]);
+    // N5: `valid(rowObject)` (optional) - a pair it rejects is never required, and a value it rejects is never dealt
+    const objOf = (row) => Object.fromEntries(names.map((k, d) => [k, row[d], d]).filter(([, i]) => i >= 0).map(([k, i, d]) => [k, vals[d][i]]));
     for (let a = 0; a < names.length; a++) for (let b = a + 1; b < names.length; b++)
         for (let i = 0; i < vals[a].length; i++) for (let j = 0; j < vals[b].length; j++) {
+            if (valid && !valid({ [names[a]]: vals[a][i], [names[b]]: vals[b][j] })) continue;
             if (!shared || !shared.has(gk(a, i, b, j))) uncovered.add(`${a}:${i}|${b}:${j}`);
         }
     if (names.length === 1) return vals[0].map((v) => ({ [names[0]]: v }));
@@ -875,8 +878,12 @@ export function allPairs(dims, seed = 1, shared = null) {
             const row = new Array(names.length).fill(-1); row[a] = i; row[b] = j;
             const order = names.map((_, d) => d).filter((d) => row[d] < 0).sort(() => rand() - 0.5);
             for (const d of order) {
-                let bv = 0; let bg = -1;
+                // the fallback when no value is valid: the dimension's default (a conditional option at its default is always valid)
+                // (a nullable option whose default, Auto, is not one of its values is left out of the row instead)
+                const di = vals[d].findIndex((x) => JSON.stringify(x) === JSON.stringify(defaults[names[d]]));
+                let bv = valid ? di : 0; let bg = -1;
                 for (let v = 0; v < vals[d].length; v++) {
+                    if (valid) { const probe = row.slice(); probe[d] = v; if (!valid(objOf(probe))) continue; }
                     let g = 0;
                     for (let e = 0; e < names.length; e++) {
                         if (e === d || row[e] < 0) continue;
@@ -888,14 +895,16 @@ export function allPairs(dims, seed = 1, shared = null) {
                 row[d] = bv;
             }
             let gain = 0;
-            for (let x = 0; x < names.length; x++) for (let y = x + 1; y < names.length; y++) if (uncovered.has(`${x}:${row[x]}|${y}:${row[y]}`)) gain++;
+            for (let x = 0; x < names.length; x++) for (let y = x + 1; y < names.length; y++) if (row[x] >= 0 && row[y] >= 0 && uncovered.has(`${x}:${row[x]}|${y}:${row[y]}`)) gain++;
             if (gain > bestGain) { bestGain = gain; best = row; }
         }
         for (let x = 0; x < names.length; x++) for (let y = x + 1; y < names.length; y++) {
+            if (best[x] < 0 || best[y] < 0) continue;
             uncovered.delete(`${x}:${best[x]}|${y}:${best[y]}`);
             if (shared) shared.add(gk(x, best[x], y, best[y]));
         }
-        rows.push(Object.fromEntries(names.map((k, d) => [k, vals[d][best[d]]])));
+        if (bestGain <= 0 && valid) break;   // only pairs no valid row can hold are left (none: they were never required)
+        rows.push(Object.fromEntries(names.map((k, d) => [k, best[d]]).filter(([, i]) => i >= 0).map(([k, i]) => [k, vals[names.indexOf(k)][i]])));
     }
     return rows;
 }
@@ -937,11 +946,51 @@ const rowPages = (r) => Math.max(1, Number(r.pages) || 1);
 /** The rows the kit cannot print: Faded packet on one page (ws-print-lint: --fade packet needs --pages >= 2). */
 export const criticValid = (r) => !(r.fade === 'packet' && r.pages !== undefined && Number(r.pages) < 2);
 
+/**
+ * N5 (critic r2): a row of option values the app could never hold together is never dealt or required.
+ * `sk` = {defaults: {id: v}, applies: {id: appliesTo fn}, all: {id: [values]}} (the skill's option defs).
+ *  - a CONDITIONAL option (its def has `appliesTo`) at a value other than its default is impossible when appliesTo
+ *    is false for the row's choices (the defaults filled in): e.g. nlStep 5 with nlOn off. At its default it is fine
+ *    (the row simply does not set it);
+ *  - a RANGE: <x>From / <x>To, <x>Min / <x>Max, both numbers, needs From < To (nlFrom 1,000,000 with nlTo -1,000,000
+ *    is a degenerate page, not a test).
+ * Rows without opt: keys, or a skill without defs, are valid.
+ */
+export function optionRowValid(row, sk) {
+    if (!row) return true;
+    const ids = Object.keys(row).filter((k) => k.startsWith('opt:')).map((k) => k.slice(4));
+    if (!ids.length) return true;
+    const defaults = (sk && sk.defaults) || {};
+    const unwrap = (id, v) => (v && typeof v === 'object' && !Array.isArray(v) && 'set' in v ? (Array.isArray(v.set) ? v.set : v.set === 'all' ? ((sk && sk.all && sk.all[id]) || defaults[id]) : defaults[id]) : v);
+    const cur = { ...defaults };
+    for (const id of ids) cur[id] = unwrap(id, row['opt:' + id]);
+    const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+    for (const id of ids) {
+        const fn = sk && sk.applies && sk.applies[id];
+        if (typeof fn !== 'function' || same(cur[id], defaults[id])) continue;
+        let ok = true;
+        try { ok = !!fn(cur); } catch (e) { ok = true; }
+        if (!ok) return false;
+    }
+    for (const id of Object.keys(cur)) {
+        const m = /^(.*?)(From|Min)$/.exec(id);
+        if (!m) continue;
+        const a = cur[id], b = cur[m[1] + (m[2] === 'From' ? 'To' : 'Max')];
+        if (typeof a === 'number' && typeof b === 'number' && !(a < b)) return false;
+    }
+    return true;
+}
+/** The critic's validity with the skills' option rules (N5): the kind rule above AND optionRowValid on the row's skill. */
+export const criticValidFor = (skills) => {
+    const by = new Map(skills.map((s) => [s.skill, s]));
+    return (r) => criticValid(r) && optionRowValid(r, by.get(r.skill));
+};
+
 /** The pairs a critic set must cover: Map(pairKey -> {group}) over kind dims and every skill's options. */
 export function criticPairs(kdims, skills, valid = criticValid, optionKinds = null) {
     const need = new Map();
-    const put = (n1, v1, n2, v2) => {
-        if (!valid({ [n1]: v1, [n2]: v2 })) return;
+    const put = (n1, v1, n2, v2, skill) => {
+        if (!valid(skill ? { skill, [n1]: v1, [n2]: v2 } : { [n1]: v1, [n2]: v2 })) return;
         const k = pairKey(n1, v1, n2, v2);
         if (!need.has(k)) need.set(k, { group: [n1, n2].sort().join(' x ') });
     };
@@ -949,8 +998,8 @@ export function criticPairs(kdims, skills, valid = criticValid, optionKinds = nu
     for (let a = 0; a < kn.length; a++) for (let b = a + 1; b < kn.length; b++) for (const x of kdims[kn[a]]) for (const y of kdims[kn[b]]) put(kn[a], x, kn[b], y);
     for (const s of skills) {
         const on = Object.keys(s.options).filter((o) => s.options[o].length);
-        for (const o of on) for (const v of s.options[o]) for (const k of kn) if (!optionKinds || optionKinds.includes(k)) for (const x of kdims[k]) put(k, x, 'opt:' + o, v);
-        for (let a = 0; a < on.length; a++) for (let b = a + 1; b < on.length; b++) for (const x of s.options[on[a]]) for (const y of s.options[on[b]]) put('opt:' + on[a], x, 'opt:' + on[b], y);
+        for (const o of on) for (const v of s.options[o]) for (const k of kn) if (!optionKinds || optionKinds.includes(k)) for (const x of kdims[k]) put(k, x, 'opt:' + o, v, s.skill);
+        for (let a = 0; a < on.length; a++) for (let b = a + 1; b < on.length; b++) for (const x of s.options[on[a]]) for (const y of s.options[on[b]]) put('opt:' + on[a], x, 'opt:' + on[b], y, s.skill);
     }
     return need;
 }
@@ -986,15 +1035,17 @@ export function criticAllPairs(kdims, skills, seed = 29, valid = criticValid, op
             const dimsOf = [...kn.map((k) => [k, kdims[k]]), ...Object.entries(sk.options).filter(([, v]) => v.length).map(([o, v]) => ['opt:' + o, v])];
             const order = dimsOf.filter(([n]) => !(n in row)).sort(() => rand() - 0.5);
             for (const [n, vals] of order) {
-                let bv = vals[0]; let bg = -1;
+                // fallback when no value is valid: the option's default (N5), else the first value
+                const dflt = n.startsWith('opt:') && sk.defaults ? vals.find((x) => JSON.stringify(x) === JSON.stringify(sk.defaults[n.slice(4)])) : undefined;
+                let bv = dflt !== undefined ? dflt : undefined; let bg = -1;
                 for (const v of vals) {
-                    if (!valid({ ...row, [n]: v })) continue;
+                    if (!valid({ skill: sk.skill, ...row, [n]: v })) continue;
                     let g = 0;
                     for (const [e, ev] of Object.entries(row)) if (uncovered.has(pairKey(e, ev, n, v))) g++;
                     // a tie on `pages` keeps the fewer pages (critic time); any other tie is a coin
                     if (g > bg || (g === bg && (n === 'pages' ? Number(v) < Number(bv) : rand() < 0.3))) { bg = g; bv = v; }
                 }
-                row[n] = bv;
+                if (bv !== undefined) row[n] = bv;   // N5: no valid value and no default among them: left out (the page prints the default)
             }
             const gain = rowPairKeys(row).filter((k) => uncovered.has(k)).length;
             // fewer pages win a tie: a 1-page row costs less critic time than a 3-page one
@@ -1058,6 +1109,13 @@ export function criticRandom(kdims, skills, { seed = 31, share = CRITIC_RANDOM_S
         const row = { skill: sk.skill };
         for (const [k, v] of Object.entries(kdims)) if (v.length) row[k] = pick(v);
         for (const [o, v] of Object.entries(sk.options)) if (v.length) row['opt:' + o] = pick(v);
+        // N5: an option the row's other choices make meaningless goes back to its default (nlStep with nlOn off)
+        if (sk.applies && sk.defaults) for (const o of Object.keys(sk.options)) {
+            if (!(('opt:' + o) in row) || !(o in sk.applies)) continue;
+            if (optionRowValid({ ['opt:' + o]: row['opt:' + o], ...Object.fromEntries(Object.entries(row).filter(([k]) => k.startsWith('opt:') && !/(From|To|Min|Max)$/.test(k))) }, sk)) continue;
+            const d = (sk.options[o] || []).find((x) => JSON.stringify(x) === JSON.stringify(sk.defaults[o]));
+            if (d !== undefined) row['opt:' + o] = d; else delete row['opt:' + o];
+        }
         if (!valid(row)) continue;
         const id = JSON.stringify(Object.entries(row).sort());
         if (seen.has(id)) continue;
@@ -1103,10 +1161,11 @@ export function boundOptions(skills, max = 4) {
 export function criticSample(kdims, skills, { pair = '', hosts = [], envelopeSize = Infinity } = {}) {
     const seedOf = (t) => { let h = 2166136261; for (const c of pair + t) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
     if (!skills.length) return null;
-    const { rows, need } = criticAllPairs(kdims, skills, seedOf(':pairs'));
+    const valid = criticValidFor(skills);
+    const { rows, need } = criticAllPairs(kdims, skills, seedOf(':pairs'), valid);
     const pairsPages = rows.reduce((n, r) => n + rowPages(r), 0);
     const dom = criticDominance(need, skills);
-    const rnd = criticRandom(kdims, skills, { seed: seedOf(':random'), envelopeSize, taken: rows });
+    const rnd = criticRandom(kdims, skills, { seed: seedOf(':random'), envelopeSize, taken: rows, valid });
     // screen: every host x size pair on the skills the print rows use most (the hosts take no print size,
     // so one render a (skill, host); a few skills, not all of them)
     const used = [...new Set(rows.map((r) => r.skill))].slice(0, 5);
@@ -1131,7 +1190,7 @@ export function criticSample(kdims, skills, { pair = '', hosts = [], envelopeSiz
             { id: 'boundary-size', rule: 'boundary classes as above; every skill; option values paired with size only (kind options still pair with each other)', skills: boundOptions(skills, 3), optionKinds: ['size'] },
             { id: 'representatives', rule: `boundary classes; only ${reps.length} representative skills that between them offer every option id (${reps.map((r) => r.skill).join(', ')}); option values paired with size and with each other; kind options all-pairs. The other skills' values are instance data: the per-skill machine sample (sample.print) and the matrix rows print them`, skills: boundOptions(reps, 3), optionKinds: ['size'] },
         ].map((v, i) => {
-            const b = criticAllPairs(kdims, v.skills, seedOf(':bounded' + i), criticValid, v.optionKinds);
+            const b = criticAllPairs(kdims, v.skills, seedOf(':bounded' + i), criticValidFor(v.skills), v.optionKinds);
             const d = criticDominance(b.need, v.skills);
             return { ...v, skills: undefined, rows: b.rows.length, pages: b.rows.reduce((n, r) => n + rowPages(r), 0), lowerBound: d.lowerBound, groupBound: d.groupBound, exclusiveBound: d.exclusiveBound, dominant: d.groups.slice(0, 3), sample: b.rows };
         });
@@ -1179,6 +1238,16 @@ function kindDimensions(kind, reader) {
 }
 
 /** The values of one skill option the envelope samples. */
+/** A skill's option rules for optionRowValid (N5): defaults, appliesTo functions, every value of a set option. */
+function skillRules(s) {
+    const defs = s.defs || [];
+    return {
+        defaults: Object.fromEntries(defs.map((d) => [d.id, d.default])),
+        applies: Object.fromEntries(defs.filter((d) => typeof d.appliesTo === 'function').map((d) => [d.id, d.appliesTo])),
+        all: Object.fromEntries(defs.filter((d) => d.type === 'set').map((d) => [d.id, (d.values || []).map((v) => v.v)])),
+    };
+}
+
 function optionValues(def) {
     // hidden (folded) options and the online-play group (calculator, skip after …) change no drawing
     if (def.hidden || def.group === 'play') return null;
@@ -1267,11 +1336,13 @@ export async function buildEnvelope(pairId, reader, { only = null, items = 6 } =
         for (const d of s.defs) { const v = optionValues(d); if (v && v.length > 1) od['opt:' + d.id] = v; }
         return od;
     };
+    const rulesBy = new Map(skills.map((s) => [s.skill, skillRules(s)]));
     const order = skills.map((s, i) => [i, Object.keys(optDims(s)).length]).sort((a, b) => b[1] - a[1] || a[0] - b[0]).map(([i]) => i);
     const rowsBySkill = new Map();
     for (const i of order) {
         const s = skills[i]; const od = optDims(s);
-        rowsBySkill.set(i, Object.keys(od).length ? allPairs({ size: dims.size, ...od }, 17, shared) : []);
+        const info = rulesBy.get(s.skill);
+        rowsBySkill.set(i, Object.keys(od).length ? allPairs({ size: dims.size, ...od }, 17, shared, (r) => optionRowValid(r, info), Object.fromEntries(Object.entries(info.defaults).map(([k, v]) => ['opt:' + k, v]))) : []);
     }
     for (let i = 0; i < skills.length; i++) {
         const s = skills[i]; const od = optDims(s);
@@ -1289,13 +1360,13 @@ export async function buildEnvelope(pairId, reader, { only = null, items = 6 } =
         const d = { size: dims.size, ...Object.fromEntries(Object.entries(p.options).map(([k, v]) => ['opt:' + k, v])) };
         const ks = Object.keys(d);
         for (let a = 0; a < ks.length && !perSkillGap; a++) for (let b = a + 1; b < ks.length && !perSkillGap; b++)
-            for (const x of d[ks[a]]) for (const y of d[ks[b]]) if (!perSkillGap && !coveredKeys.has(pairKey(ks[a], x, ks[b], y))) perSkillGap = `${p.skill}: ${pairKey(ks[a], x, ks[b], y)}`;
+            for (const x of d[ks[a]]) for (const y of d[ks[b]]) if (!perSkillGap && optionRowValid({ [ks[a]]: x, [ks[b]]: y }, rulesBy.get(p.skill)) && !coveredKeys.has(pairKey(ks[a], x, ks[b], y))) perSkillGap = `${p.skill}: ${pairKey(ks[a], x, ks[b], y)}`;
     }
     const printRows = [...base, ...perSkill.flatMap((p) => p.rows)];
     const screenDims = { host: hosts, size: dims.size, skill: skills.map((s) => s.skill) };
     const screenRows = skills.length ? allPairs(screenDims, 23) : [];
     // the CRITIC sample (§1.6.2): the pair's option values as one deduped set, plus the random part
-    const criticSkills = perSkill.map((p, i) => ({ skill: p.skill, options: p.options, defaults: Object.fromEntries(skills[i].defs.map((d) => [d.id, d.default])) }));
+    const criticSkills = perSkill.map((p, i) => ({ skill: p.skill, options: p.options, defaults: Object.fromEntries(skills[i].defs.map((d) => [d.id, d.default])), applies: rulesBy.get(p.skill).applies, all: rulesBy.get(p.skill).all }));
     const critic = criticSample(dims, criticSkills, { pair: `${template}--${kind}`, hosts, envelopeSize: envelopeTotal });
     return {
         pair: `${template}--${kind}`, template, kind, kindLabel: KINDS[kind].label,
@@ -1313,7 +1384,7 @@ export async function buildEnvelope(pairId, reader, { only = null, items = 6 } =
                 screenCoversAllPairs: skills.length ? coversAllPairs(screenDims, screenRows) === null : null,
                 perSkillCoversAllPairs: perSkillGap === null,
                 ...(perSkillGap ? { perSkillFirstGap: perSkillGap } : {}),
-                criticCoversAllPairs: critic ? criticCovers(dims, criticSkills, critic.print.filter((r) => r.part === 'pairs')) === null : null,
+                criticCoversAllPairs: critic ? criticCovers(dims, criticSkills, critic.print.filter((r) => r.part === 'pairs'), criticValidFor(criticSkills)) === null : null,
                 criticRandomWithinCap: critic ? critic.pages.random <= CRITIC_RANDOM_CAP_PAGES : null,
             },
         },
@@ -1589,6 +1660,22 @@ async function selfTest() {
     ok(cs.overBudget && cs.lowerBound >= 140 && cs.dominant[0].group === 'opt:labels x opt:step', `a 20 x 7 option pair is over budget and named (lower bound ${cs.lowerBound}, ${cs.dominant[0].group})`);
     ok(cs.proposal && cs.proposal.variants.length === 3 && cs.bounded.length < cs.rows.pairs, 'over budget: the bounds are measured and the smallest is written');
     ok(boundOptions([wide])[0].options.step.join() === '1,5,20', 'boundary classes: first, default, last');
+    // N5 (critic r2): impossible option rows are never required or dealt
+    const nlSk = { skill: 'n:1', options: { nlOn: [false, true], nlStep: ['auto', 5, 10], nlFrom: [-1000000, 1000000], nlTo: [-1000000, 1000000] },
+        defaults: { nlOn: false, nlStep: 'auto', nlFrom: null, nlTo: null },
+        applies: { nlStep: (o) => !!o.nlOn, nlFrom: (o) => !!o.nlOn, nlTo: (o) => !!o.nlOn } };
+    ok(!optionRowValid({ 'opt:nlOn': false, 'opt:nlStep': 5 }, nlSk), 'N5: nlStep 5 with nlOn off is impossible');
+    ok(optionRowValid({ 'opt:nlOn': false, 'opt:nlStep': 'auto' }, nlSk), 'N5: nlStep at its default with nlOn off is fine');
+    ok(!optionRowValid({ 'opt:nlOn': true, 'opt:nlFrom': 1000000, 'opt:nlTo': -1000000 }, nlSk), 'N5: nlFrom above nlTo is impossible');
+    ok(optionRowValid({ 'opt:nlOn': true, 'opt:nlFrom': -1000000, 'opt:nlTo': 1000000 }, nlSk), 'N5: nlFrom below nlTo is fine');
+    const nlRows = criticAllPairs({ size: ['S', 'M'] }, [nlSk], 5, criticValidFor([nlSk])).rows;
+    const bad5 = (r) => (r['opt:nlOn'] === false && ['opt:nlStep', 'opt:nlFrom', 'opt:nlTo'].some((k) => k in r && JSON.stringify(r[k]) !== JSON.stringify(nlSk.defaults[k.slice(4)]))) || (typeof r['opt:nlFrom'] === 'number' && typeof r['opt:nlTo'] === 'number' && r['opt:nlFrom'] >= r['opt:nlTo']);
+    ok(nlRows.length && !nlRows.some(bad5), `N5: the critic all-pairs deals no impossible row (${nlRows.filter(bad5).length} of ${nlRows.length})`);
+    ok(criticCovers({ size: ['S', 'M'] }, [nlSk], nlRows, criticValidFor([nlSk])) === null, 'N5: and still covers every possible pair');
+    const rnd5 = criticRandom({ size: ['S', 'M'] }, [nlSk], { seed: 3, envelopeSize: 200, capPages: 40, valid: criticValidFor([nlSk]) }).rows;
+    ok(rnd5.length && !rnd5.some(bad5), `N5: the random part deals no impossible row (${rnd5.filter(bad5).length} of ${rnd5.length})`);
+    const ap5 = allPairs({ size: ['S', 'M'], 'opt:nlOn': [false, true], 'opt:nlStep': ['auto', 5], 'opt:nlFrom': [-1000000, 1000000], 'opt:nlTo': [-1000000, 1000000] }, 17, null, (r) => optionRowValid(r, nlSk), { 'opt:nlOn': false, 'opt:nlStep': 'auto' });
+    ok(!ap5.some(bad5), `N5: the per-skill machine sample deals no impossible row (${ap5.filter(bad5).length} of ${ap5.length})`);
 
     // 6. voiding, on the tree with one file changed in memory: layout.js voids stack x Single skill;
     //    a provider and a template the pair does not reach void nothing
