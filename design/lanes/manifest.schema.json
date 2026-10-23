@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "design/lanes/manifest.schema.json",
+  "title": "MathQuest lane manifest, version 1",
+  "description": "What one lane adds to the shared registries. Applied by tests/scripts/ws-integrate.mjs in merge order; every operation is an insertion of whole lines (design/lanes/README.md). There is no field that removes, renames, moves or edits anything.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "lane", "mergeOrder"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "const": 1, "description": "The manifest format version. The integrator refuses any other." },
+    "lane": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$", "description": "The lane name; also the key in the ledger (design/lanes/applied.json)." },
+    "mergeOrder": { "type": "integer", "description": "Lanes apply in ascending mergeOrder (ties: lane name). The lead sets it when the lane's branch merges; a later lane gets a larger number." },
+    "description": { "type": "string" },
+    "skills": {
+      "type": "array",
+      "description": "New skills, in the order they are appended. Once applied, this list may only grow at its end (the ledger refuses a removal or a reorder).",
+      "items": { "$ref": "#/$defs/skill" }
+    },
+    "providers": {
+      "type": "array",
+      "description": "Provider modules this lane adds; each becomes `import './x.js';` at the end of the import list of js/modules/sheet/providers/index.js. The module file itself is lane code.",
+      "items": { "type": "string", "pattern": "^\\./[\\w.-]+\\.js$" }
+    },
+    "lessons": {
+      "type": "array",
+      "description": "Detailed-lesson descriptions this lane adds; each becomes an import line and a DETAILED_LESSONS entry in js/modules/lessons/detailed/index.js. The lesson file itself is lane code.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["binding", "module"],
+        "properties": {
+          "binding": { "type": "string", "pattern": "^[A-Za-z_$][\\w$]*$" },
+          "module": { "type": "string", "pattern": "^\\./[\\w.-]+\\.js$" }
+        }
+      }
+    },
+    "layout": {
+      "type": "array",
+      "description": "Optional, written by --extract: the exact text of each block, so re-applying reproduces existing files byte for byte. Every entry in a block must be the same data as the skills section (checked). Lanes normally leave this out and the integrator renders one line per entry at the end of the registry.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["registry", "after", "text"],
+        "properties": {
+          "registry": { "enum": ["skills", "grades", "timeCategory", "printSize", "mixedPoolExclude", "codes", "presets", "standards", "wrm", "terms", "primary", "concepts", "dispatch", "providers", "lessonImports", "lessonEntries"] },
+          "category": { "type": "string", "description": "For registry `skills`: the SKILLS category." },
+          "after": { "type": ["string", "null"], "description": "The key of the entry the block follows; null = the start of the registry; \"$end\" = after its last entry. For `skills` it must be the last entry of the category (append only)." },
+          "text": { "type": "string", "pattern": "\\n$", "description": "Whole lines, ending in a newline." }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "skill": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "entry", "code"],
+      "properties": {
+        "key": { "type": "string", "pattern": "^[a-z0-9_]+:[A-Za-z0-9_]+$", "description": "'category:skill'. The category must already exist." },
+        "entry": {
+          "type": "object",
+          "description": "The SKILLS row (data.js SKILLS[category]), appended at the end of its category: {v, l, ...} with v = the skill id; presetOf for a preset.",
+          "required": ["v", "l"],
+          "properties": { "v": { "type": "string" }, "l": { "type": "string" }, "presetOf": { "type": "string" } }
+        },
+        "code": { "type": "string", "pattern": "^[A-HJ-NP-Z2-9]{2}$", "description": "The pinned share code (skill-codes-frozen.js FROZEN_SKILL_CODES). Required: a new skill is pinned the moment it is added. Must not already be pinned; the apply is refused if any existing code or position would move." },
+        "grade": { "type": ["integer", "string"], "description": "data.js SKILL_GRADES (K, 1-6, or 'M')." },
+        "timeCategory": { "type": "string", "description": "data.js SKILL_TIME_CATEGORY (quick / standard / extended ...)." },
+        "printSize": { "type": "string", "description": "data.js SKILL_PRINT_SIZE (legacy print path; still needed by a real new skill, not by a preset)." },
+        "mixedPoolExclude": { "type": "array", "items": { "type": "string" }, "description": "Mixed pools (their bare skill ids) this skill is kept out of: a NEW data.js MIXED_POOL_EXCLUDE entry per pool. Adding to an existing pool entry is an edit and is refused." },
+        "generatorCategory": { "type": "string", "description": "generate-question.js skillCategoryOverride: the generator that deals this skill when it is not its UI category's." },
+        "preset": {
+          "type": "object", "required": ["skill", "opts"], "additionalProperties": false,
+          "properties": { "skill": { "type": "string" }, "opts": { "type": "object" } },
+          "description": "skill-presets.js SKILL_PRESETS: the host skill and the option values. The host must be live (or in this manifest)."
+        },
+        "standards": {
+          "type": "object", "required": ["ccss", "ee"],
+          "properties": { "ccss": { "type": "array", "items": { "type": "string" } }, "ee": { "type": "array", "items": { "type": "string" } }, "approx": { "type": "boolean" }, "note": { "type": "string" }, "reason": { "type": "string" } },
+          "description": "standards.js SKILL_STANDARDS (primary CCSS first)."
+        },
+        "wrm": { "type": "array", "description": "wrm.js SKILL_WRM: step ids, or {step, partial|note}." },
+        "terms": { "type": "array", "items": { "type": "string" }, "description": "search-terms.js SKILL_TERMS." },
+        "primaryTerms": { "type": "array", "items": { "type": "string" }, "description": "search-terms.js PRIMARY_SKILLS: phrases that must rank this skill first." },
+        "concepts": { "type": "array", "items": { "type": "string" }, "description": "search-terms.js CONCEPT_RULES: concepts this skill joins; rendered as one exact-id rule. A rule may never match another lane's or the base's skills." },
+        "keys": {
+          "type": "object", "additionalProperties": { "type": "string" },
+          "description": "Key form overrides for the bare-keyed registries (grades, timeCategory, printSize, dispatch): the value is the full 'category:skill' key, for a skill id another category also uses."
+        }
+      }
+    }
+  }
+}
