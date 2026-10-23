@@ -1,0 +1,393 @@
+report,run,round,defect_id,class,kind,carried,severity,rule_ids,family,template,summary
+design/audit/runs/wrm-page/critic-r1.md,wrm-page,1,B1,UNTRUE_TEXT,machine,no,blocking,,wrm-page,,"17 lessons mapped to wrong WRM step (title map collision, Pre-K block match, silent cross-year fallback)"
+design/audit/runs/wrm-page/critic-r1.md,wrm-page,1,B2,NAME_CONTENT,machine,no,blocking,,wrm-page,,Curated opts dropped from pre/related links; pupil gets wrong number range
+design/audit/runs/wrm-page/critic-r1.md,wrm-page,1,B3,INTERACTION,machine,no,blocking,,wrm-page,,MAP By representation renders previous strand's groups (stale render)
+design/audit/runs/wrm-page/critic-r1.md,wrm-page,1,B4,INTERACTION,machine,no,blocking,,wrm-page,,"""Gap it fills: [object Object]"" on Skills to be made and its printout"
+design/audit/runs/wrm-page/critic-r1.md,wrm-page,1,B5,VIEWPORT,machine,no,blocking,,wrm-page,,No skill in first viewport at 1366; sticky bar covers Tick buttons at 1280x720
+design/audit/runs/wrm-page/critic-r1.md,wrm-page,1,M1,PLAIN_WORDS,machine,no,blocking,,wrm-page,,Curated why lines show raw step ids and lane jargon to teachers
+design/audit/runs/wrm-page/critic-r1.md,wrm-page,1,M2,INTERACTION,machine,no,blocking,,wrm-page,,"Toast ""Practice link copied"" covers the link field"
+design/audit/runs/wrm-page/critic-r1.md,wrm-page,1,M3,INTERACTION,machine,no,blocking,,wrm-page,,Link note says copied even when copy failed
+design/audit/runs/wrm-page/critic-r1.md,wrm-page,1,M4,INTERACTION,machine,no,blocking,,wrm-page,,MAP practise-by-task state not in URL; Back leaves the page
+design/audit/runs/wrm-page/critic-r1.md,wrm-page,1,M5,OTHER,judgment,no,minor,,wrm-page,,Load speed: all 7 year files (2.1 MB JSON) fetched before first lesson shows
+design/audit/runs/wrm-page/critic-r1.md,wrm-page,1,M6,PLAIN_WORDS,machine,no,blocking,,wrm-page,,"Lesson rows show ""S P I"" column letters instead of pacing-guide words and week dates"
+design/audit/runs/wrm-page/critic-r1.md,wrm-page,1,N1,PROCESS,process,no,minor,,wrm-page,,teacher-wrm.css link lacks ?v= cache stamp
+design/audit/runs/wrm-page/critic-r1.md,wrm-page,1,N2,CLARITY,judgment,no,minor,,wrm-page,,Copied-in lesson Open button should say which grade's files
+design/audit/runs/wrm-page/critic-r1.md,wrm-page,1,N3,SEARCH,machine,no,minor,,wrm-page,,"Search hit shows first CCSS code, not the code that matched"
+design/audit/runs/wrm-page/critic-r1.md,wrm-page,1,N4,SPACE,machine,no,minor,,wrm-page,,Thumbnails grid leaves right half empty with 2 cards
+design/audit/runs/wrm-page/critic-r1.md,wrm-page,1,N6,PROCESS,process,no,minor,,wrm-page,,ws-wrm-sequence --check reports STALE without scratch --preview file
+design/audit/runs/wrm-page/critic-r2.md,wrm-page,2,B6,VIEWPORT,machine,no,blocking,,wrm-page,,Phone 390: crumb button does not wrap; page scrolls sideways 232 px (B5 regression)
+design/audit/runs/wrm-page/critic-r2.md,wrm-page,2,M1,PLAIN_WORDS,machine,yes,blocking,WRM-rule-18,wrm-page,,"~400 curated why lines still show jargon: Y5/Gr.4, wk W11, raw ids, [rule 18] JSON"
+design/audit/runs/wrm-page/critic-r2.md,wrm-page,2,m1,INTERACTION,machine,yes,minor,,wrm-page,,Phone: toast covers practice-link note (fixed bottom offset)
+design/audit/runs/wrm-page/critic-r2.md,wrm-page,2,m2,VIEWPORT,machine,no,minor,,wrm-page,,Phone: Skills to be made badges overflow 24 px
+design/audit/runs/wrm-page/critic-r2.md,wrm-page,2,m3,SEARCH,machine,no,minor,,wrm-page,,"No way to find a lesson by week (""week 5"" finds nothing)"
+design/audit/runs/wrm-page/critic-r2.md,wrm-page,2,N7,INTERACTION,machine,no,minor,,wrm-page,,Bar keeps last link after ticks cleared
+design/audit/runs/wrm-page/critic-r2.md,wrm-page,2,N8,SEARCH,machine,no,minor,,wrm-page,,CCSS code search ranks other grades' copies first
+design/audit/runs/wrm-page/critic-r2.md,wrm-page,2,N9,CLARITY,judgment,no,minor,,wrm-page,,Stray dash before parenthesis in closes text
+design/audit/runs/wrm-page/critic-r2.md,wrm-page,2,N10,PLAIN_WORDS,machine,no,minor,,wrm-page,,"MAP task labels ""Ready (being checked)"" / ""(option)"" unclear to teachers"
+design/audit/runs/wrm-page/critic-r2.md,wrm-page,2,N11,VIEWPORT,machine,no,minor,,wrm-page,,Thumbnails toggle at 1280 leaves no thumbnail in first viewport
+design/audit/runs/wrm-page/critic-r3.md,wrm-page,3,B7,STEPS_LAYOUT,machine,no,blocking,H6,wrm-page,,"Phone 390: skill rows collapse to 30 px name column, one word per line; buttons 38x44; bar button overflows"
+design/audit/runs/wrm-page/critic-r3.md,wrm-page,3,M1,PLAIN_WORDS,machine,yes,blocking,WRM-rule-18,wrm-page,,"plainWhy leaves ""} for this pupil]"" and Gr.K; jargon gate regex cannot see it"
+design/audit/runs/wrm-page/critic-r3.md,wrm-page,3,M2,INTERACTION,machine,yes,blocking,,wrm-page,,820 short page: toast covers link input and Copy (fixed bar-height offset)
+design/audit/runs/wrm-page/critic-r3.md,wrm-page,3,m4,PLAIN_WORDS,machine,no,minor,,wrm-page,,Unit caption shows raw week codes W01-W09
+design/audit/runs/wrm-page/critic-r3.md,wrm-page,3,m5,INTERACTION,machine,no,minor,,wrm-page,,"MAP tab remembered, against owner ruling to open on Practise by task"
+design/audit/runs/wrm-page/critic-r3.md,wrm-page,3,m6,INTERACTION,machine,no,minor,,wrm-page,,"Strand change keeps a band the new strand lacks; empty list, no band pressed"
+design/audit/runs/wrm-page/critic-r3.md,wrm-page,3,m7,PLAIN_WORDS,machine,no,minor,,wrm-page,,Skills to be made shows skill ids and code to teachers
+design/audit/runs/wrm-page/critic-r3.md,wrm-page,3,N12,OTHER,judgment,no,minor,,wrm-page,,weekForDate hard-codes 2026/2027 school year (date logic)
+design/audit/runs/wrm-page/critic-r3.md,wrm-page,3,N13,MISSING,machine,no,minor,,wrm-page,,Grade filter lacks 6+ and Not set chips
+design/audit/runs/wrm-page/critic-r3.md,wrm-page,3,N14,CLARITY,judgment,no,minor,,wrm-page,,"""Grade 2: part-whole model"" reads as a step name"
+design/audit/runs/wrm-page/critic-r3.md,wrm-page,3,N15,PLAIN_WORDS,machine,no,minor,,wrm-page,,"""taught the same school week, W13"" phrasing"
+design/audit/runs/wrm-page/critic-r3.md,wrm-page,3,N16,REPEAT,machine,no,minor,,wrm-page,,Gap it fills repeats the step (closes and missing lines both shown)
+design/audit/runs/wrm-page/critic-r4.md,wrm-page,4,B8,PROCESS,process,no,blocking,,wrm-page,,Merged index.json lists no years so real curated files hidden; lane gates fail/abort on merged tree
+design/audit/runs/wrm-page/critic-r4.md,wrm-page,4,M3,PLAIN_WORDS,machine,yes,blocking,,wrm-page,,"plainWhy misses real-file forms: ""band 5"" option ids, shorthand ""/ S6"" chains, ""and :"" leftovers"
+design/audit/runs/wrm-page/critic-r4.md,wrm-page,4,M4,PLAIN_WORDS,machine,yes,blocking,,wrm-page,,"Skills to be made: "": ..."" gap lines (N14 regression), repeated steps, build spec in How it looks"
+design/audit/runs/wrm-page/critic-r4.md,wrm-page,4,m7,PLAIN_WORDS,machine,yes,minor,,wrm-page,,"How it looks and kind line show build spec and option ids (fallback, 31 entries)"
+design/audit/runs/wrm-page/critic-r4.md,wrm-page,4,m8,INTERACTION,machine,no,minor,,wrm-page,,"Toast lingers across screen change, covering next screen's controls"
+design/audit/runs/wrm-page/critic-r4.md,wrm-page,4,m9,INTERACTION,machine,no,minor,,wrm-page,,Old MAP task bookmarks (e1) silently drop the task once MAP.json is on
+design/audit/runs/wrm-page/critic-r4.md,wrm-page,4,N17,INTERACTION,machine,yes,minor,,wrm-page,,Within a session MAP reopens on the test tab
+design/audit/runs/wrm-page/critic-r4.md,wrm-page,4,N18,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Y6.json tags mixed_* pools on 6 Grade 5 lessons; row counts differ from file
+design/audit/runs/wrm-page/critic-r4.md,wrm-page,4,N19,PLAIN_WORDS,machine,no,minor,,wrm-page,,"Kind line shows lower-case id words (""New skill · match same"")"
+design/audit/runs/wrm-page/critic-r4.md,wrm-page,4,N20,PLAIN_WORDS,machine,no,minor,,wrm-page,,"""Copied in from G2"" should say Grade 2"
+design/audit/runs/wrm-page/critic-r4.md,wrm-page,4,N21,PLAIN_WORDS,machine,no,minor,,wrm-page,,"Grade ""M"" on multi-grade entries unexplained"
+design/audit/runs/wrm-page/critic-r4.md,wrm-page,4,N22,CLARITY,judgment,no,minor,,wrm-page,,Phone rows with long why lines 152-166 px; suggest two-line clamp
+design/audit/runs/wrm-page/critic-r4.md,wrm-page,4,N23,PLAIN_WORDS,machine,no,minor,,wrm-page,,Prior-learning line keeps quotes and run-on parenthesis
+design/audit/runs/wrm-page/critic-r5.md,wrm-page,5,M5,PLAIN_WORDS,machine,yes,blocking,,wrm-page,,"Real lesson notes show code names (ftRules, itemIndex), bare ""band"", orphaned ""( "", mangled step range"
+design/audit/runs/wrm-page/critic-r5.md,wrm-page,5,M6,PLAIN_WORDS,machine,yes,blocking,,wrm-page,,"Skills to be made: How it looks starts mid-bracket, ""band"" notes, build words, option rewrite mangles text"
+design/audit/runs/wrm-page/critic-r5.md,wrm-page,5,M7,PLAIN_WORDS,machine,no,blocking,,wrm-page,,"MAP notes: DEV filter drops whole sentence (""today it deals column addition.""); lower-case ids as subjects"
+design/audit/runs/wrm-page/critic-r5.md,wrm-page,5,GATE,PROCESS,process,no,blocking,,wrm-page,,wrm-jargon gate reports 0 hits but its pattern misses every M5-M7 form
+design/audit/runs/wrm-page/critic-r5.md,wrm-page,5,m10,UNTRUE_TEXT,machine,no,minor,,wrm-page,,6+ filter count (47) disagrees with Grade 6 and above heading (17)
+design/audit/runs/wrm-page/critic-r5.md,wrm-page,5,N18,UNTRUE_TEXT,machine,yes,minor,,wrm-tagging,,Y6 tags mixed_* pools on 12 Grade 5 lessons; row counts differ from file
+design/audit/runs/wrm-page/critic-r5.md,wrm-page,5,N24,VIEWPORT,machine,no,minor,H6,wrm-page,,"Why-line ""more"" target 38 px tall at 390, cue only a trailing ellipsis"
+design/audit/runs/wrm-page/critic-r5.md,wrm-page,5,N25,PLAIN_WORDS,machine,no,minor,,wrm-page,,"""Reception"" still appears in 6 places; write Pre-K"
+design/audit/runs/wrm-page/critic-r5.md,wrm-page,5,N26,CLARITY,judgment,no,minor,,wrm-page,,Entries list two Pre-K steps sharing a title; add unit to tell apart
+design/audit/runs/wrm-page/critic-r6.md,wrm-page,6,M8,UNTRUE_TEXT,machine,no,blocking,,wrm-page,,"Composed Do-first lines say ""Later in the same block""; support-block week attached to the wrong grade"
+design/audit/runs/wrm-page/critic-r6.md,wrm-page,6,M9,REPEAT,machine,no,blocking,,wrm-page,,"""Still to be built"" said up to 3 times per lesson; ungrammatical ""the part ... will add""; identical rows"
+design/audit/runs/wrm-page/critic-r6.md,wrm-page,6,M10,UNTRUE_TEXT,machine,no,blocking,,wrm-page,,21 site lessons (20 K) filed under wrong unit from wrong site domain field
+design/audit/runs/wrm-page/critic-r6.md,wrm-page,6,m11,INTERACTION,machine,no,minor,,wrm-page,,Back from a lesson opened on Skills to be made does not return to the list
+design/audit/runs/wrm-page/critic-r6.md,wrm-page,6,m12,CLARITY,judgment,no,minor,,wrm-page,,"How it looks is one generic sentence on 211 of 436 entries; ""None."" gap lines"
+design/audit/runs/wrm-page/critic-r6.md,wrm-page,6,m13,CLARITY,judgment,no,minor,,wrm-page,,Merged rows show workbook week and site week unnamed; week search misses site week
+design/audit/runs/wrm-page/critic-r6.md,wrm-page,6,m14,INTERACTION,machine,no,minor,,wrm-page,,"""All teaching skills"" button live on lessons with no teaching skills"
+design/audit/runs/wrm-page/critic-r6.md,wrm-page,6,N18,UNTRUE_TEXT,machine,yes,minor,,wrm-tagging,,15 lessons tag mixed_* pools (Y5 and Y6); row counts differ from file
+design/audit/runs/wrm-page/critic-r6.md,wrm-page,6,N27,INTERACTION,machine,no,minor,,wrm-page,,Site bookmark on a Student-view device lands in Student view
+design/audit/runs/wrm-page/critic-r6.md,wrm-page,6,N28,PLAIN_WORDS,machine,no,minor,,wrm-page,,"Plain-words hand list holds build words; ""live skill(s)"" shows on 6 lines"
+design/audit/runs/wrm-page/critic-r6.md,wrm-page,6,N29,CLARITY,judgment,no,minor,,wrm-page,,"Grades listed out of order in ""Taught before, in Grade 3 and Grade 2"""
+design/audit/runs/wrm-page/critic-r6.md,wrm-page,6,N30,REPEAT,machine,no,minor,,wrm-page,,"""Taught before, in ..."" lead repeated in consecutive sentences"
+design/audit/runs/wrm-page/critic-r6.md,wrm-page,6,N31,UNTRUE_TEXT,machine,no,minor,,wrm-page,,"Some MAP notes give general teaching line, not the MAP clause the task asks"
+design/audit/runs/wrm-page/critic-r6.md,wrm-page,6,N32,NOTATION,machine,no,minor,,wrm-page,,"""Not yet:"" lines ending in "")"" lack a full stop"
+design/audit/runs/wrm-page/critic-r7.md,wrm-page,7,M11,PLAIN_WORDS,machine,no,blocking,,wrm-page,,"How it looks shows kit template ids (""Mult-grid, count-row.""); vis_* placeholder names; option keys in Kind"
+design/audit/runs/wrm-page/critic-r7.md,wrm-page,7,m15,REPEAT,machine,no,minor,,wrm-page,,"Same ""Taught before"" sentence twice in 82 lessons (support clause stripped, compare misses)"
+design/audit/runs/wrm-page/critic-r7.md,wrm-page,7,m16,UNTRUE_TEXT,machine,no,minor,,wrm-page,,"Grade leads taken from step's year: 8 lines name wrong grade, 2 untrue"
+design/audit/runs/wrm-page/critic-r7.md,wrm-page,7,m17,REPEAT,machine,no,minor,,wrm-page,,"""no skill teaches all of it yet"" repeated on gap lists; support grades out of order"
+design/audit/runs/wrm-page/critic-r7.md,wrm-page,7,N18,UNTRUE_TEXT,machine,yes,minor,,wrm-tagging,,16 lessons tag mixed_* pools; row counts differ from file
+design/audit/runs/wrm-page/critic-r7.md,wrm-page,7,N27,INTERACTION,machine,yes,minor,,wrm-page,,Site bookmark lands in Student view (owner ruling)
+design/audit/runs/wrm-page/critic-r7.md,wrm-page,7,N33,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,count_by_tables tagged with old option shape that normalises to all tables
+design/audit/runs/wrm-page/critic-r7.md,wrm-page,7,N34,INTERACTION,machine,no,minor,,wrm-page,,Print -> Back -> Forward leaves lesson on screen with empty hash
+design/audit/runs/wrm-page/critic-r7.md,wrm-page,7,N35,NOTATION,machine,no,minor,,wrm-page,,"Rules-path ""Taught before"" lines lack full stop and differ in form from composed lines"
+design/audit/runs/wrm-page/critic-r7.md,wrm-page,7,N36,CLARITY,judgment,no,minor,,wrm-page,,"""and 1 more"" reads like a step title; weeks list includes an unnamed fourth step"
+design/audit/runs/wrm-page/critic-r7.md,wrm-page,7,N37,PLAIN_WORDS,machine,no,minor,,wrm-page,,"MAP note keeps ""live multi-step skills""; ""incl.""; subjectless ""Adds writing"""
+design/audit/runs/wrm-page/critic-r7.md,wrm-page,7,N38,CLARITY,judgment,no,minor,,wrm-page,,"One-word notes (""Order."", ""Inverse."") pass whole"
+design/audit/runs/wrm-page/critic-r8.md,wrm-page,8,M12,UNTRUE_TEXT,machine,no,blocking,,wrm-page,,"How it looks composed from keywords states wrong response or drawings (shapes, coins) the entry lacks"
+design/audit/runs/wrm-page/critic-r8.md,wrm-page,8,m18,REPEAT,machine,no,minor,,wrm-page,,Same lesson label several times in one gap list (14 entries)
+design/audit/runs/wrm-page/critic-r8.md,wrm-page,8,m19,INTERACTION,machine,no,minor,,wrm-page,,"Make it uses random seed; detailed pack fails or hangs ~3 min, with wrong advice"
+design/audit/runs/wrm-page/critic-r8.md,wrm-page,8,m20,UNTRUE_TEXT,machine,no,minor,,wrm-page,,Detailed card names skills while list below says none are tagged
+design/audit/runs/wrm-page/critic-r8.md,wrm-page,8,n39,REPEAT,machine,yes,minor,,wrm-page,,One Do-first line sits inside the next in 5 lessons
+design/audit/runs/wrm-page/critic-r8.md,wrm-page,8,n40,REPEAT,machine,no,minor,,wrm-page,,"vis_* entries say their name three times; ""(low)"" priority marker in names"
+design/audit/runs/wrm-page/critic-r8.md,wrm-page,8,n41,PLAIN_WORDS,machine,no,minor,,wrm-page,,"Fallback vis_more_less_table still named ""A new picture in ..."""
+design/audit/runs/wrm-page/critic-r8.md,wrm-page,8,n42,INSTRUCTION,machine,no,minor,,wrm-page,,Detailed card title and Print-screen lesson title disagree
+design/audit/runs/wrm-page/critic-r8.md,wrm-page,8,n43,MISSING,machine,no,minor,,wrm-page,,Card hides Still to make item instead of naming the entry
+design/audit/runs/wrm-page/critic-r8.md,wrm-page,8,n44,NOTATION,machine,no,minor,,wrm-page,,Gap leads use two forms; one line lacks full stop
+design/audit/runs/wrm-page/critic-r8.md,wrm-page,8,N18,UNTRUE_TEXT,machine,yes,minor,,wrm-tagging,,16 lessons tag mixed_* pools; row counts differ
+design/audit/runs/wrm-page/critic-r8.md,wrm-page,8,N27,INTERACTION,machine,yes,minor,,wrm-page,,Site bookmark lands in Student view (owner ruling)
+design/audit/runs/wrm-page/critic-r8.md,wrm-page,8,N33,UNTRUE_TEXT,machine,yes,minor,,wrm-tagging,,count_by_tables old option shape constant:[n]
+design/lesson-planner/critic-r1.md,lesson-planner,1,R1-1,SPACE,machine,no,blocking,H13,lessons,stack,Lesson-sheet Guided/Independent cells leave 41-44% empty band
+design/lesson-planner/critic-r1.md,lesson-planner,1,R1-2,SPACE,machine,no,blocking,H13;H5;CL-9,lessons,stack,Exit-slip half holds one lone fact in a 58-69% empty cell
+design/lesson-planner/critic-r1.md,lesson-planner,1,R1-3,PEDAGOGY,judgment,no,blocking,,lessons,stack,Exit item 5+1 does not test the critical atom (big number second)
+design/lesson-planner/critic-r1.md,lesson-planner,1,R1-4,PEDAGOGY,judgment,no,blocking,,lessons,,"T2 atomisation table breaks own spec: 4 atoms, wrong types, no Pre-requisite tag; star has two meanings"
+design/lesson-planner/critic-r1.md,lesson-planner,1,R1-5,MISSING,machine,no,blocking,,lessons,,Pupil-page thumbnails missing on T3 and T5 delivery pages
+design/lesson-planner/critic-r1.md,lesson-planner,1,R1-6,MISSING,machine,no,blocking,,lessons,,Fade labels missing on teacher pages T3-T5 and T6
+design/lesson-planner/critic-r1.md,lesson-planner,1,R1-7,PROCESS,process,no,blocking,,lessons,,"Stale V20 bodies (TRY THIS, SHOW WORK, in red, pre-filled steps) contradict V21 Parts 8-10"
+design/lesson-planner/critic-r1.md,lesson-planner,1,R1-8,SPACE,machine,no,blocking,H13,lessons,,V21 work-zone exception makes the empty-band rule unenforceable; E11 passes 44% bands
+design/lesson-planner/critic-r1.md,lesson-planner,1,R1-9,STEPS_LAYOUT,machine,no,blocking,P-WP-14,lessons,,"RCDWS panel cramped: a step wraps to 4 lines, two actions share one check box"
+design/lesson-planner/critic-r1.md,lesson-planner,1,R1-10,SPACE,machine,no,blocking,,lessons,,T2b reference page 41% empty
+design/lesson-planner/critic-r1.md,lesson-planner,1,R1-11,REPEAT,machine,no,blocking,,lessons,,Turn-around rule ambiguous; 13 turned-round pairs in the packet
+design/lesson-planner/critic-r1.md,lesson-planner,1,R1-12,PEDAGOGY,judgment,no,blocking,LR-4,lessons,stack,Every Guided cell is the same case (big number second)
+design/lesson-planner/critic-r1.md,lesson-planner,1,R1-13,INK_FONT,machine,no,blocking,,lessons,,Anchor chart other examples labelled Model: and final answers drawn grey
+design/lesson-planner/critic-r1.md,lesson-planner,1,R1-14,KEY,machine,no,minor,,lessons,,Anchor chart has no answer key page
+design/lesson-planner/critic-r1.md,lesson-planner,1,R1-15,INSTRUCTION,machine,no,blocking,R5,lessons,,Mixed page title rule contradicts one-title rule R5/E19
+design/lesson-planner/critic-r1.md,lesson-planner,1,R1-16,SIZE,machine,no,blocking,PG-5;PT-FPR-9,lessons,,Landscape live area 271x184 (should be 186); exit half width loose (126 vs 132.5 mm)
+design/lesson-planner/critic-r1.md,lesson-planner,1,R1-17.1,VISUAL_DESIGN,judgment,no,minor,,lessons,,"""Total 60"" misaligned on T1"
+design/lesson-planner/critic-r1.md,lesson-planner,1,R1-17.2,STEPS_LAYOUT,machine,no,minor,,lessons,,"T-LOOP label ""Fewer than half:"" wraps in 30 mm column"
+design/lesson-planner/critic-r1.md,lesson-planner,1,R1-17.3,SLOT,machine,no,minor,SL-6,lessons,,Underscore blank in a teacher Say: script line
+design/lesson-planner/critic-r1.md,lesson-planner,1,R1-17.4,INK_FONT,machine,no,minor,,lessons,,Double rule at the header on teacher pages
+design/lesson-planner/critic-r1.md,lesson-planner,1,R1-18,STEPS_LAYOUT,machine,no,minor,,lessons,,P1 instruction wraps leaving one word; box order against spoken order
+design/lesson-planner/critic-r1.md,lesson-planner,1,R1-19,PROCESS,process,no,blocking,,lessons,,"Sample does not exercise hard recipes; no subtraction-regroup columnStack, wrong topic/folder"
+design/lesson-planner/critic-r1.md,lesson-planner,1,G1,MISSING,machine,no,minor,,lessons,,No scheme or source for prerequisite lesson ids
+design/lesson-planner/critic-r1.md,lesson-planner,1,G2,MISSING,machine,no,minor,DN-22;CL-2,lessons,,No grid rule for one-symbol horizontal compare items
+design/lesson-planner/critic-r1.md,lesson-planner,1,G3,MISSING,machine,no,minor,,lessons,,No recipe for drawing a new step icon
+design/lesson-planner/critic-r1.md,lesson-planner,1,G4,MISSING,machine,no,minor,,lessons,,No Score rule when Guided and Vocabulary are unscored
+design/lesson-planner/critic-r1.md,lesson-planner,1,G5,MISSING,machine,no,minor,,lessons,,No 2D shape recipe and missing WDS 11.2 minimum rows
+design/lesson-planner/critic-r1.md,lesson-planner,1,G6,MISSING,machine,no,minor,,lessons,,No instruction strings for partition / equal-parts items
+design/lesson-planner/critic-r1.md,lesson-planner,1,G7,MISSING,machine,no,minor,,lessons,,No key rule for items with many correct answers
+design/lesson-planner/critic-r1.md,lesson-planner,1,G8,MISSING,machine,no,minor,,lessons,,"Slot table rows missing from 8.10 (number+label, mixed number, money, missing digit)"
+design/lesson-planner/critic-r1.md,lesson-planner,1,G9,MISSING,machine,no,minor,,lessons,,Andika release and hash not stated for cv04 verification
+design/lesson-planner/critic-r1.md,lesson-planner,1,G10,PROCESS,process,no,minor,,lessons,,Reference self-check uses machine-specific paths
+design/lesson-planner/critic-r1.md,lesson-planner,1,U1,SPACE,machine,no,minor,,lessons,,P0 cell c 34 mm with 33% top and bottom bands
+design/lesson-planner/critic-r1.md,lesson-planner,1,U2,PEDAGOGY,judgment,no,minor,,lessons,,P0 item d (number bonds) not a T2 Pre-requisite atom
+design/lesson-planner/critic-r1.md,lesson-planner,1,U3,SLOT,machine,no,minor,SF-50,lessons,,P5 answer-with-unit line missing inside the story box
+design/lesson-planner/critic-r1.md,lesson-planner,1,U4,VISUAL_DESIGN,judgment,no,minor,,lessons,stack,Operator track narrower than the site's stack
+design/lesson-planner/critic-r1.md,lesson-planner,1,U5,MISSING,machine,no,minor,,lessons,,T6 lacks an Accepted answers block for every page
+design/lesson-planner/critic-r2.md,lesson-planner,2,R2-1,PEDAGOGY,judgment,yes,blocking,,lessons,stack,Pack A anchor chart hides other examples' answers (no ink state); key shows them as slots
+design/lesson-planner/critic-r2.md,lesson-planner,2,R2-2,VISUAL_DESIGN,judgment,no,blocking,,lessons,stack,Pack B anchor chart panels 1 and 5 lack the grey ring and carry marks the site chart has
+design/lesson-planner/critic-r2.md,lesson-planner,2,R2-3,SPACE,machine,no,blocking,H13,lessons,,Pack B Prerequisite Check cells b and c leave 30-31% empty bands
+design/lesson-planner/critic-r2.md,lesson-planner,2,R2-4,PEDAGOGY,judgment,yes,blocking,,lessons,stack,Pack B Practice last row not the edge cases despite star-3 labels; twin answers 28 on P4b
+design/lesson-planner/critic-r2.md,lesson-planner,2,R2-5,PROCESS,process,yes,blocking,,lessons,,"Self-checks E11 (padding box), E24 (fails open without pool.json), E17 (counts chart slots) mis-measure"
+design/lesson-planner/critic-r2.md,lesson-planner,2,R2-6,CLARITY,judgment,no,blocking,,lessons,,Chunked-flow trigger ambiguous (atoms vs steps); pack B applies it against its wording
+design/lesson-planner/critic-r2.md,lesson-planner,2,R2-7,MISSING,machine,no,blocking,,lessons,,shape() cannot draw unequal partitions or shading; guide dots give halving line away without fade
+design/lesson-planner/critic-r2.md,lesson-planner,2,R2-8,PROCESS,process,no,minor,,lessons,,Appendix I cites ws-lesson-check.cjs gate not on this branch
+design/lesson-planner/critic-r2.md,lesson-planner,2,R2-9.1,STEPS_LAYOUT,machine,no,minor,,lessons,,"Pack B P5 story question wraps leaving ""now?"" alone"
+design/lesson-planner/critic-r2.md,lesson-planner,2,R2-9.2,KEY,machine,no,minor,,lessons,,"Pack B P5 key drawing shows only the answer, not 42 with 17 crossed out"
+design/lesson-planner/critic-r2.md,lesson-planner,2,R2-9.3,STEPS_LAYOUT,machine,no,minor,,lessons,,T1 Materials line wraps under its check box
+design/lesson-planner/critic-r2.md,lesson-planner,2,R2-9.4,CLARITY,judgment,no,minor,CL-7,lessons,,Pack B P0 cell c holds two items under one letter
+design/lesson-planner/critic-r2.md,lesson-planner,2,U1,REPEAT,machine,yes,minor,,lessons,,Pack A exit slip repeats 4 Practice items while 2 were avoidable
+design/lesson-planner/critic-r2.md,lesson-planner,2,U2,MISSING,machine,no,minor,,lessons,,No rule that two side-by-side pictures wider than a column become full-width rows
+design/lesson-planner/critic-r2.md,lesson-planner,2,U3,MISSING,machine,no,minor,,lessons,,No rule for level-appropriate halving shapes or a half/equal-parts vocabulary diagram
+design/lesson-planner/critic-r3.md,lesson-planner,3,R3-1,REPEAT,machine,yes,blocking,LR-5,lessons,,Add exit slip repeats 4 Practice items exactly; pool test allows it against LR-5
+design/lesson-planner/critic-r3.md,lesson-planner,3,R3-2,PATTERN,machine,no,blocking,LR-6,lessons,stack,Subtract P4b takes 38 away twice; near-twin rule not restated in V21
+design/lesson-planner/critic-r3.md,lesson-planner,3,R3-3,VISUAL_DESIGN,judgment,no,blocking,,lessons,counters,"Add P0 item a draws 8 triangles in one row, no 5-group"
+design/lesson-planner/critic-r3.md,lesson-planner,3,R3-4,VISUAL_DESIGN,judgment,no,minor,,lessons,stack,"Sum rule overhangs 2.5 mm to beat the band measure, unlike WDS/site stack"
+design/lesson-planner/critic-r3.md,lesson-planner,3,R3-5,KEY,machine,yes,minor,,lessons,,"Subtract P5 key quick-draw drawn in black, not key colour"
+design/lesson-planner/critic-r3.md,lesson-planner,3,R3-6,SIZE,machine,no,minor,,lessons,,"shape() guide dots 1.2 mm, barely visible"
+design/lesson-planner/critic-r3.md,lesson-planner,3,R3-7,MISSING,machine,no,minor,,lessons,,clock() cannot draw hands in key or grey state
+design/lesson-planner/critic-r3.md,lesson-planner,3,U1,GIVEAWAY,machine,no,minor,,lessons,,Judge-section shapes drawn at different outline weights hint at the answer
+design/lesson-planner/critic-r3.md,lesson-planner,3,U2,MISSING,machine,no,minor,,lessons,,No rule on time answer form (digital slot vs half past)
+design/lesson-planner/critic-r3.md,lesson-planner,3,U3,PATTERN,machine,no,minor,LR-6,lessons,stack,"Add P4a row 4+1, 4+2, 4+3 reads as a drill sequence"
+design/lesson-planner/critic-r3.md,lesson-planner,3,U4,PROCESS,process,no,minor,,lessons,,"E24 checks items against a builder-written pool, not one computed from the pool rule"
+design/lesson-planner/critic-r4.md,lesson-planner,4,R4-1,SPACE,machine,no,blocking,PT-ENG-5;PG-14;PT-ENG-3;PG-15;CL-3;PG-11;AX-4,lessons,fact,Add Practice 2 fills spare height with Remember/Say/Rule bands; cells taller than Practice 1
+design/lesson-planner/critic-r4.md,lesson-planner,4,R4-2,MISSING,machine,no,blocking,LR-5,lessons,,No pool rule for skills whose pool is smaller than one Practice page
+design/lesson-planner/critic-r4.md,lesson-planner,4,R4-3,PROCESS,process,no,minor,,lessons,,Pool rule stored as a JS function string; E24 must eval pack code
+design/lesson-planner/critic-r4.md,lesson-planner,4,U1,MISSING,machine,no,minor,,lessons,,No timeSlot() recipe for the time answer slot
+design/lesson-planner/critic-r4.md,lesson-planner,4,U2,MISSING,machine,no,minor,,lessons,,"Half-past edge cases (12:30, 6:30) not listed in 9.3 cases"
+design/lesson-planner/critic-r4.md,lesson-planner,4,U3,MISSING,machine,no,minor,,lessons,,"Oral frame ""__ and __ make 10."" missing from C.3"
+design/lesson-planner/critic-r5.md,lesson-planner,5,R5-1,PROCESS,process,no,blocking,,lessons,,E24 pool grammar covers only + and -; correct make-10 and time packs fail; ignores representation rule
+design/lesson-planner/critic-r5.md,lesson-planner,5,R5-2.1,SLOT,machine,no,minor,,lessons,,timeSlot() colon gap 4 mm vs 5 mm in 8.10 / WDS 6
+design/lesson-planner/critic-r5.md,lesson-planner,5,R5-2.2,UNTRUE_TEXT,machine,no,minor,LR-5,lessons,,Make-10 worked example usable count wrong (ignores chart turn-arounds)
+design/lesson-planner/critic-r5.md,lesson-planner,5,U1,INSTRUCTION,machine,no,minor,,lessons,,Exit slip Say: frame carries the item letter
+design/lesson-planner/critic-r6.md,lesson-planner,6,R6-1,REPEAT,machine,no,blocking,LR-5,lessons,,"Small-pool rule, make-10 example and E24 let a chart example return in another representation"
+design/lesson-planner/critic-r6.md,lesson-planner,6,U1,MISSING,machine,no,minor,,lessons,,data-rep values not a closed list
+design/lesson-planner/critic-r6.md,lesson-planner,6,U2,CLARITY,judgment,no,minor,,lessons,,Text does not say small-pool places may exceed usable pool only via cross-representation repeats
+design/lesson-planner/critic-r7.md,lesson-planner,7,N1,UNTRUE_TEXT,machine,no,minor,,lessons,,"9.5 says exit slip takes items not on Practice, but example uses Practice facts in another representation"
+design/lesson-planner/critic-r7.md,lesson-planner,7,N2,MISSING,machine,yes,minor,,lessons,,data-rep closed list still not given
+design/lesson-planner/critic-r7.md,lesson-planner,7,N3,CLARITY,judgment,yes,minor,,lessons,,Small-pool exceed-pool condition still stated only in code
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r1.md,g1-oa1-bar-model-wp-20,1,D1,SLOT,machine,no,blocking,SL-4;RP-70,detailed-lesson,word-work,"Bar label boxes 7 mm tall, ~7-11 mm wide; Critical Atom written in smallest boxes; lint misses them"
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r1.md,g1-oa1-bar-model-wp-20,1,D2a,PEDAGOGY,judgment,no,blocking,,detailed-lesson,word-work,"Numbers easier than research: chart 5+10, check 4+5, P5 1+4; few crossing-ten items; part of 1 four times"
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r1.md,g1-oa1-bar-model-wp-20,1,D2b,PEDAGOGY,judgment,no,blocking,,detailed-lesson,word-work,"Star-3 row is not the edge cases (near twins 4+11, 5+11); equal parts never dealt"
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r1.md,g1-oa1-bar-model-wp-20,1,D2c,PEDAGOGY,judgment,no,blocking,,detailed-lesson,,Count-slip mistake caught by no item; exit d 2+10 needs no counting on
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r1.md,g1-oa1-bar-model-wp-20,1,D3,PEDAGOGY,judgment,no,blocking,P-1,detailed-lesson,,"""Add to"" story type never modelled before Guided"
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r1.md,g1-oa1-bar-model-wp-20,1,D4,UNTRUE_TEXT,machine,no,blocking,,detailed-lesson,,T2b scores P3 Independent cells that do not exist; T6 prints empty P3 Independent row
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r1.md,g1-oa1-bar-model-wp-20,1,D5,INSTRUCTION,machine,no,blocking,,detailed-lesson,,T3 spaced retrieval quotes expected answers but not the questions
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r1.md,g1-oa1-bar-model-wp-20,1,D6,INSTRUCTION,machine,no,blocking,,detailed-lesson,,T4 Watch says model the error once but no row says when or what
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r1.md,g1-oa1-bar-model-wp-20,1,D7,INSTRUCTION,machine,no,blocking,,detailed-lesson,,Step 4 asks pupils to write a label that is pre-printed; T2b/T6 accept nonexistent label responses
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r1.md,g1-oa1-bar-model-wp-20,1,D8a,PEDAGOGY,judgment,no,blocking,,detailed-lesson,word-work,P5 story 1+4=5 too easy and reuses check question frame
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r1.md,g1-oa1-bar-model-wp-20,1,D8b,GIVEAWAY,machine,no,blocking,,detailed-lesson,equation,"P5 equation frame pre-prints the + sign, giving away step 3; answer written three times"
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r1.md,g1-oa1-bar-model-wp-20,1,D8c,KEY,machine,no,blocking,,detailed-lesson,,T5 section 9 quotes no expected answer for P5
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r1.md,g1-oa1-bar-model-wp-20,1,D9,VISUAL_DESIGN,judgment,no,blocking,,detailed-lesson,,Vocabulary part/whole/bar pictures differ only by outline weight
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r1.md,g1-oa1-bar-model-wp-20,1,D10,INSTRUCTION,machine,no,blocking,,detailed-lesson,,"Strand tab on P4-1 and key reads Addition, others Operations"
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r1.md,g1-oa1-bar-model-wp-20,1,D11,STEPS_LAYOUT,machine,no,blocking,SF-50;AX-3,detailed-lesson,word-work,Exit-slip story runs 5 lines breaking a sentence; label touches text; cell cramped
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r1.md,g1-oa1-bar-model-wp-20,1,R1,VISUAL_DESIGN,judgment,no,minor,RP-72;L-LEAK,detailed-lesson,word-work,Bars neither schematic nor to scale: 14 mm clamp makes different splits identical
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r1.md,g1-oa1-bar-model-wp-20,1,n1,VISUAL_DESIGN,judgment,no,minor,,detailed-lesson,,T1 vocabulary pictures have the same faint mark issue
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r1.md,g1-oa1-bar-model-wp-20,1,n2,INSTRUCTION,machine,no,minor,,detailed-lesson,,T3 Band A script skips item 3
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r1.md,g1-oa1-bar-model-wp-20,1,n4,KEY,machine,no,minor,,detailed-lesson,word-work,Bar label slots not graded though step 2 is the Critical Atom
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r1.md,g1-oa1-bar-model-wp-20,1,n5,PEDAGOGY,judgment,no,minor,,detailed-lesson,,P0 c and d both near-trivial bonds
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r1.md,g1-oa1-bar-model-wp-20,1,n6,REPEAT,machine,no,minor,,detailed-lesson,,Story names and nouns repeat in a tight loop across pages
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r1.md,g1-oa1-bar-model-wp-20,1,n7,PROCESS,process,no,minor,,detailed-lesson,,"Gate E24b treats bigSecond as edge case, so passes a non-edge last row"
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r2.md,g1-oa1-bar-model-wp-20,2,D1,INSTRUCTION,machine,yes,blocking,P-1;E29,detailed-lesson,,I Do script describes a put-together chart but chart is add-to; put-together never modelled
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r2.md,g1-oa1-bar-model-wp-20,2,D2,PATTERN,machine,yes,blocking,LR-6,detailed-lesson,,"Practice 1, Mixed 1, exit slip break LR-6 (repeated first addends, near twins, twin answer); E24b passes"
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r2.md,g1-oa1-bar-model-wp-20,2,D3,MISSING,machine,no,blocking,,detailed-lesson,,Mixed 1: lesson skill only 2 of 14 items (needs at least half); leadHalf cannot drop a partner
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r2.md,g1-oa1-bar-model-wp-20,2,D4,STEPS_LAYOUT,machine,yes,blocking,AX-3;SF-50,detailed-lesson,word-work,"Exit stories run 5 lines splitting sentences; all three items add-to, put-together unassessed"
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r2.md,g1-oa1-bar-model-wp-20,2,D5,UNTRUE_TEXT,machine,no,blocking,,detailed-lesson,,T2b hard-codes exit slip score /4 a half; slip prints /3
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r2.md,g1-oa1-bar-model-wp-20,2,n1,INSTRUCTION,machine,no,minor,,detailed-lesson,,Mixed 1 not scripted on T5
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r2.md,g1-oa1-bar-model-wp-20,2,n2,GIVEAWAY,machine,no,minor,LR-5,detailed-lesson,,"Vocabulary pictures use 6/7 -> 13, pre-showing the chart example answer"
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r2.md,g1-oa1-bar-model-wp-20,2,n3,SLOT,machine,yes,minor,SF-50,detailed-lesson,,"P5 asks for the whole three times (story blank, equation, Say blank)"
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r2.md,g1-oa1-bar-model-wp-20,2,n4,INSTRUCTION,machine,no,minor,,detailed-lesson,,T2 Common mistakes Caught by cell quotes the wrong item's form
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r2.md,g1-oa1-bar-model-wp-20,2,n5,PEDAGOGY,judgment,yes,minor,,detailed-lesson,,P0 c/d bonds both have a part of 1; pass by saying next number
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r2.md,g1-oa1-bar-model-wp-20,2,n6,REPEAT,machine,yes,minor,,detailed-lesson,,Names and story frames repeat across pages
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r2.md,g1-oa1-bar-model-wp-20,2,n7,INSTRUCTION,machine,no,minor,,detailed-lesson,,T6 fade labels on P5 and exit slip contradict T2b meanings
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r2.md,g1-oa1-bar-model-wp-20,2,n8,INSTRUCTION,machine,no,minor,,detailed-lesson,,T6 wrong-answer next step says In all for a now story
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r2.md,g1-oa1-bar-model-wp-20,2,n9,KEY,machine,yes,minor,,detailed-lesson,word-work,Bar parts still ungraded (data-ws-graded=0)
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r3.md,g1-oa1-bar-model-wp-20,3,D1,REPEAT,machine,no,blocking,LR-5,detailed-lesson,word-work,Chart and board examples return turned round on P4-1 c and P5; E24 port dropped turn() test
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r3.md,g1-oa1-bar-model-wp-20,3,D2,INSTRUCTION,machine,no,blocking,E29;E35,detailed-lesson,,T5 says Steps are at the top of the page but Practice 1 has no Steps band
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r3.md,g1-oa1-bar-model-wp-20,3,D3,PEDAGOGY,judgment,no,blocking,,detailed-lesson,word-work,Exit b 4+8 cannot separate wrong sign from story-number answer; exit a is a Practice item turned round
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r3.md,g1-oa1-bar-model-wp-20,3,m1,REPEAT,machine,no,minor,LR-6,detailed-lesson,,Mixed c is P3 Guided turned round; Mixed a/d near twin in either order
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r3.md,g1-oa1-bar-model-wp-20,3,m2,PEDAGOGY,judgment,yes,minor,LR-6,detailed-lesson,,"P0 bonds share part 2, d tiny; T3 retrieval bond 1+7 has a part of 1"
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r3.md,g1-oa1-bar-model-wp-20,3,m3,REPEAT,machine,yes,minor,,detailed-lesson,,Same name and number twice on P4-1; same put-together pair three times
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r3.md,g1-oa1-bar-model-wp-20,3,m4,PEDAGOGY,judgment,no,minor,,detailed-lesson,,Third example 7+7 placed on P2 in pool but printed nowhere; equal-parts row unmodelled
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r3.md,g1-oa1-bar-model-wp-20,3,m5,CLIP_OVERLAP,machine,no,minor,,detailed-lesson,,Exit story starts ~1 mm under the item label
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r3.md,g1-oa1-bar-model-wp-20,3,m6,REPEAT,machine,no,minor,,detailed-lesson,,Vocabulary picture 5/9 -> 14 is P0 g turned round
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r3.md,g1-oa1-bar-model-wp-20,3,m7,PROCESS,process,no,minor,,detailed-lesson,,"Pool is a list of dealt items, so usable = places by construction; E24 measures nothing"
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r4.md,g1-oa1-bar-model-wp-20,4,n1,REPEAT,machine,no,minor,LR-6,detailed-lesson,word-work,"P4-1 c/d share row, frame and unit word; near twins turned round"
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r4.md,g1-oa1-bar-model-wp-20,4,n2,REPEAT,machine,yes,minor,,detailed-lesson,,Name pairs repeat across pages; P5 reads like a copy of P4-1 e
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r4.md,g1-oa1-bar-model-wp-20,4,n3,INSTRUCTION,machine,no,minor,,detailed-lesson,,Story-number mistake given two different fixes on T2 and T6
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r4.md,g1-oa1-bar-model-wp-20,4,n4,CLIP_OVERLAP,machine,yes,minor,,detailed-lesson,,Exit story starts ~2.5 mm under item label vs 10 mm on Practice
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r4.md,g1-oa1-bar-model-wp-20,4,n5,PROCESS,process,no,minor,E35,detailed-lesson,,E35 Steps check matches only a literal phrase on P4-1
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r4.md,g1-oa1-bar-model-wp-20,4,n6,UNTRUE_TEXT,machine,no,minor,,detailed-lesson,,"T2b legend lists Mixed Review, no longer printed"
+design/lesson-planner/lessons/g1-oa1-bar-model-wp-20/critic-r4.md,g1-oa1-bar-model-wp-20,4,n7,PEDAGOGY,judgment,no,minor,,detailed-lesson,,Star-3 5+15 (two-digit part) modelled nowhere in I Do
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,D1,PEDAGOGY,judgment,no,blocking,P-1,detailed-lesson,,"Lesson promises words, numerals and expanded form but models only numeral to expanded; words untaught"
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,D2,NAME_CONTENT,machine,no,blocking,,detailed-lesson,,"1,000 never dealt although title says to 1,000; E24b lists category not values"
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,D3,UNTRUE_TEXT,machine,no,blocking,,detailed-lesson,,T1 says Flow: Chunked but delivery has one I Do / We Do cycle; count missing
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,D4,REPEAT,machine,no,minor,,detailed-lesson,,"T2 row 5 duplicates ""Critical Atom. The Critical Atom."""
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,D5,SPACE,machine,no,blocking,,detailed-lesson,,"T2 split onto continuation: T2 25% empty, T2-2 45% empty"
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,D6,PEDAGOGY,judgment,no,minor,,detailed-lesson,,Routine step 1 wrongly tagged Pre-requisite; order differs from teaching order
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,D7,PEDAGOGY,judgment,no,blocking,,detailed-lesson,,"Common mistakes misnamed (""Gives the 0 its place""), mis-mapped, 2 of 5 unlinked to a check"
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,D8,CLARITY,judgment,no,minor,,detailed-lesson,,"Orphan ""Board: teacher models here"" line gives nothing to act on"
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,D9,SPACE,machine,no,minor,,detailed-lesson,,T2b columns end 14% above foot (85% used)
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,D10,KEY,machine,no,blocking,H1,detailed-lesson,,T3 expected answers belong to other items; T6 routing letters do not match P0 items
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,D11,PEDAGOGY,judgment,no,blocking,,detailed-lesson,,P1 Number sense practises the new skill before it is taught; not five bank types
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,D12,SPACE,machine,no,blocking,,detailed-lesson,,"T4 59% used, T4-2 holds one step alone and is 45% empty; 470 panel unscripted"
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,D13,UNTRUE_TEXT,machine,no,blocking,,detailed-lesson,,T5 Watch claims last row has the 0 places; it does not on Practice 1
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,D14,PEDAGOGY,judgment,no,blocking,,detailed-lesson,,Exit slip all words->numeral; expanded form untested; no-zero case is a teen repeat
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,D15,SPACE,machine,no,blocking,,detailed-lesson,,"P0 ends at 71% of body, 27% blank band; decade words near-identical, no teen"
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,D16,SLOT,machine,no,blocking,,detailed-lesson,,Words->numeral uses bare 45 mm line with no H T O boxes; no Steps band on P4-2
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,D17,PEDAGOGY,judgment,no,blocking,,detailed-lesson,,Only numeral->words item (626) unmodelled and under a Number Sense label
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,D18a,INSTRUCTION,machine,no,minor,,detailed-lesson,,P4m-1 strand tab lacks Place Value line
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,D18b,INSTRUCTION,machine,no,minor,,detailed-lesson,,Page-top Steps band on Mixed applies to only 2 of 5 items
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,D18c,SPACE,machine,no,minor,,detailed-lesson,,P4m-1 15% blank band below item e
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,D19,PEDAGOGY,judgment,no,minor,,detailed-lesson,,P5 never asks for the number in words; RCDWS icons filled not outline
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,D20,KEY,machine,no,minor,INK-31,detailed-lesson,,"P1, P5, P6 keys print answers in black, not key colour; P5 Say blank empty"
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,D21,KEY,machine,no,minor,,detailed-lesson,,P6 key right half header reads Name ___ with answers filled
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,D22,UNTRUE_TEXT,machine,no,minor,,detailed-lesson,,T6 routes to lesson ids that exist nowhere in the site library
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,N1,PATTERN,machine,no,minor,LR-6,detailed-lesson,,405 and 406 near twins on one page
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,N2,INSTRUCTION,machine,no,minor,,detailed-lesson,,Every footer names the pack after one of its three skills
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,N3,REPEAT,machine,no,minor,,detailed-lesson,,"Spaced retrieval has 2 items, forty-one duplicates P0 task"
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,N4,INSTRUCTION,machine,no,minor,,detailed-lesson,,T5 script speaks the answer as a teacher statement instead of asking
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,N5,CLIP_OVERLAP,machine,no,minor,,detailed-lesson,,T2b Pupil Steps icons wrap onto two lines
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r1.md,g2-nbt3-read-write-1000,1,N6,PROCESS,process,no,minor,,detailed-lesson,,Gate logs requestfailed for Andika fonts that exist; could mask a font failure
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r2.md,g2-nbt3-read-write-1000,2,R1,PEDAGOGY,judgment,yes,blocking,P-1,detailed-lesson,,"Writing the number name is dealt (P4m d, P5) but never modelled in writing"
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r2.md,g2-nbt3-read-write-1000,2,R2,PEDAGOGY,judgment,yes,blocking,,detailed-lesson,,"1,000 dealt in a 4-box slot but untaught; chart rule says three boxes"
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r2.md,g2-nbt3-read-write-1000,2,R3,PEDAGOGY,judgment,no,blocking,,detailed-lesson,,Critical Atom (zero tens) missing from lesson sheet 2 despite its Remember band
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r2.md,g2-nbt3-read-write-1000,2,R4,PEDAGOGY,judgment,yes,blocking,,detailed-lesson,,Exit slip drops numeral->expanded; item d 100+3 drops the 0 part against the rule
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r2.md,g2-nbt3-read-write-1000,2,R5,SPACE,machine,yes,blocking,,detailed-lesson,,T2 78% used; How to teach band pushed to continuation although it fits
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r2.md,g2-nbt3-read-write-1000,2,R6,SPACE,machine,yes,minor,,detailed-lesson,,"T4-2 66% used, 34% blank band"
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r2.md,g2-nbt3-read-write-1000,2,R7,PEDAGOGY,judgment,yes,minor,,detailed-lesson,,P0 a-d have no teen or forty though T2 atom 1 routes them there; empty strip below h-i
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r2.md,g2-nbt3-read-write-1000,2,R8,SPACE,machine,yes,blocking,,detailed-lesson,,P4m-1 and key 22% blank band below item e
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r2.md,g2-nbt3-read-write-1000,2,R9,KEY,machine,no,minor,INK-31,detailed-lesson,,P3b key prints the Guided prompt in key colour
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r2.md,g2-nbt3-read-write-1000,2,R10,KEY,machine,yes,minor,,detailed-lesson,,P5 and P6 keys leave Say blanks empty
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r2.md,g2-nbt3-read-write-1000,2,U1,PATTERN,machine,no,minor,LR-6,detailed-lesson,,P1 items 4 and 5 both answer 29; E24b checks only Practice
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r2.md,g2-nbt3-read-write-1000,2,U2,CLIP_OVERLAP,machine,no,minor,,detailed-lesson,,"P1 item-10 badge crowds ""Write"""
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r2.md,g2-nbt3-read-write-1000,2,U3,VISUAL_DESIGN,judgment,no,minor,,detailed-lesson,,"P2 509 panel grey newest mark on the 9, not the 0 taught"
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r2.md,g2-nbt3-read-write-1000,2,U4,PEDAGOGY,judgment,no,minor,,detailed-lesson,,P2b model 556 repeats a digit so word-to-digit mapping is unclear
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r2.md,g2-nbt3-read-write-1000,2,U5,PATTERN,machine,yes,minor,LR-6,detailed-lesson,,405 and 406 still on P4-1 (N1)
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r2.md,g2-nbt3-read-write-1000,2,U6,REPEAT,machine,yes,minor,,detailed-lesson,,"Spaced retrieval still 2 items, forty-one repeats P0 (N3)"
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r2.md,g2-nbt3-read-write-1000,2,U7,CLIP_OVERLAP,machine,yes,minor,,detailed-lesson,,T2b Pupil Steps icon row still wraps (N5)
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r2.md,g2-nbt3-read-write-1000,2,U8,INK_FONT,machine,yes,minor,,detailed-lesson,,"P5 RCDWS icons solid, not outline"
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r2.md,g2-nbt3-read-write-1000,2,U9,MISSING,machine,no,minor,,detailed-lesson,,"T1 has no vocabulary card for ""number name"""
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r2.md,g2-nbt3-read-write-1000,2,U10,KEY,machine,no,minor,,detailed-lesson,,"T6 glance row for P5 omits ""five hundred three"""
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r3.md,g2-nbt3-read-write-1000,3,S1,NAME_CONTENT,machine,yes,blocking,,detailed-lesson,,"1,000 still dealt on Practice 2 against ruling, script and chart rule; maxNum bound bypassed; gate passes"
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r3.md,g2-nbt3-read-write-1000,3,S2,SPACE,machine,yes,blocking,H5,detailed-lesson,,T2-2 only 33% used; teacher stub page
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r3.md,g2-nbt3-read-write-1000,3,S3,UNTRUE_TEXT,machine,no,minor,,detailed-lesson,,Concatenation error examples wrong (300407 for three hundred seven; 3047)
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r3.md,g2-nbt3-read-write-1000,3,E9,PROCESS,process,no,blocking,H5,detailed-lesson,,E9 teacher-continuation exemption added to let a 33% page pass
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r3.md,g2-nbt3-read-write-1000,3,U1,SPACE,machine,yes,minor,PG-15,detailed-lesson,,P0 and P4m-1 bordered unlettered strip under the last row
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r3.md,g2-nbt3-read-write-1000,3,U2,PEDAGOGY,judgment,yes,minor,,detailed-lesson,,Teens dealt but never checked on P0
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r3.md,g2-nbt3-read-write-1000,3,U3,PATTERN,machine,yes,minor,LR-6,detailed-lesson,,405 and 406 again on P4-1
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r3.md,g2-nbt3-read-write-1000,3,U4,CLIP_OVERLAP,machine,yes,minor,,detailed-lesson,,P1 item-10 badge crowds Write
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r3.md,g2-nbt3-read-write-1000,3,U5,INK_FONT,machine,yes,minor,,detailed-lesson,,P5 RCDWS icons solid
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r3.md,g2-nbt3-read-write-1000,3,U6,INSTRUCTION,machine,no,minor,,detailed-lesson,,Mixed 1 unscripted on T1/T5
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r3.md,g2-nbt3-read-write-1000,3,U7,SPACE,machine,no,minor,,detailed-lesson,,T4 80% and T4-2 81% below 92% teacher fill
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r3.md,g2-nbt3-read-write-1000,3,U8,PEDAGOGY,judgment,no,minor,,detailed-lesson,,"Mistake ""Digits, not values"" mapped to the wrong routine step"
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r3.md,g2-nbt3-read-write-1000,3,U9,NOTATION,machine,no,minor,,detailed-lesson,,"T5 option prints 4,000 with comma, board writes 1000"
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r4.md,g2-nbt3-read-write-1000,4,m1,KEY,machine,no,minor,,detailed-lesson,,T6 Accepted answers accept 400 + 6 against the Critical Atom; stale hyphen row for words
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r4.md,g2-nbt3-read-write-1000,4,m2,PEDAGOGY,judgment,no,minor,,detailed-lesson,,"Expanded form to numeral assessed (P4m-1 b, P6 c) but never modelled"
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r4.md,g2-nbt3-read-write-1000,4,m3,INSTRUCTION,machine,no,minor,,detailed-lesson,,T1 lists Mixed 1 in-lesson while T5 scripts it as homework
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r4.md,g2-nbt3-read-write-1000,4,n1,PEDAGOGY,judgment,yes,minor,,detailed-lesson,,P0 still checks no teen word though teens are dealt
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r4.md,g2-nbt3-read-write-1000,4,n2,CLIP_OVERLAP,machine,yes,minor,,detailed-lesson,,P1 item-10 badge touches Write; P5 icons mix solid and outline
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r4.md,g2-nbt3-read-write-1000,4,n3,INSTRUCTION,machine,no,minor,,detailed-lesson,,T3 says write numbers three ways; pupils write two
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r4.md,g2-nbt3-read-write-1000,4,n4,NOTATION,machine,yes,minor,,detailed-lesson,,"4,000 with comma vs board 1000"
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r4.md,g2-nbt3-read-write-1000,4,n5,NOTATION,machine,no,minor,,detailed-lesson,,P2b straight quotes where others use curly
+design/lesson-planner/lessons/g2-nbt3-read-write-1000/critic-r4.md,g2-nbt3-read-write-1000,4,n6,PATTERN,machine,no,minor,LR-6,detailed-lesson,,"Near-variety: 270/278, three 4-hundreds, four 2-hundreds"
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r1.md,g3-oa5-mult-properties,1,D1,PEDAGOGY,judgment,no,blocking,P-1,detailed-lesson,array,Half of Practice 1 are squares that cannot show a turn; a square in row 1; gate edge test misses it
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r1.md,g3-oa5-mult-properties,1,D2,PEDAGOGY,judgment,no,blocking,P-1,detailed-lesson,,P3 to P4-1 changes two things: factor order written and trace dropped; never modelled
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r1.md,g3-oa5-mult-properties,1,D3,INSTRUCTION,machine,no,blocking,,detailed-lesson,,Critical Atom step 5 (same product check) missing from chart and Steps panel
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r1.md,g3-oa5-mult-properties,1,D4,GIVEAWAY,machine,no,blocking,,detailed-lesson,array,"Exit slip cannot measure the property: square item, drawn turned array, Say states b's relation"
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r1.md,g3-oa5-mult-properties,1,D5,NAME_CONTENT,machine,no,blocking,,detailed-lesson,,Word problem does not use the property; 6x7 needs unchecked 7s; 42 objects breaks rows of <=5
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r1.md,g3-oa5-mult-properties,1,D6,REPEAT,machine,no,blocking,LR-5,detailed-lesson,,Prerequisite items return on Practice 2; pool keys x vs multiplication sign never collide
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r1.md,g3-oa5-mult-properties,1,D7,UNTRUE_TEXT,machine,no,blocking,,detailed-lesson,,T2/T6 prerequisite atoms do not match the items that check them; wrong reteach routing
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r1.md,g3-oa5-mult-properties,1,n1,INSTRUCTION,machine,no,minor,,detailed-lesson,,"P0 instruction says groups, cell says rows of"
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r1.md,g3-oa5-mult-properties,1,n2,PATTERN,machine,no,minor,,detailed-lesson,,Every I Do and We Do example starts with 4
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r1.md,g3-oa5-mult-properties,1,n3,PEDAGOGY,judgment,no,minor,,detailed-lesson,,T5 option A called Recounts on a board fact with no dots
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r1.md,g3-oa5-mult-properties,1,n4,INSTRUCTION,machine,no,minor,,detailed-lesson,,"T6 ""rows 1-1"" reads oddly"
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r1.md,g3-oa5-mult-properties,1,n5,INSTRUCTION,machine,no,minor,,detailed-lesson,,"""Turn the array."" when the turn is already drawn"
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r1.md,g3-oa5-mult-properties,1,n6,PEDAGOGY,judgment,no,minor,,detailed-lesson,,P1 Number sense is Grade 1-2 level for a Grade 3 lesson
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r1.md,g3-oa5-mult-properties,1,n7,PEDAGOGY,judgment,no,minor,,detailed-lesson,,"T6 product-as-factor error row improbable, not diagnostic"
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r2.md,g3-oa5-mult-properties,2,D1,VISUAL_DESIGN,judgment,no,blocking,,detailed-lesson,,"Anchor chart step-5 band breaks the panel grid: unequal panels, missing and double-weight rules"
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r2.md,g3-oa5-mult-properties,2,m1,PATTERN,machine,no,minor,LR-6,detailed-lesson,,x near twins not checked though SELF-CHECK claims so; first factor repeats in a row
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r2.md,g3-oa5-mult-properties,2,m2,PEDAGOGY,judgment,no,minor,,detailed-lesson,,"P4-2 uses factors to 9, past this term's facts"
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r2.md,g3-oa5-mult-properties,2,m3,PROCESS,process,yes,minor,,detailed-lesson,,Square-only-on-last-row gate requested in r1 not added
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r2.md,g3-oa5-mult-properties,2,m4,VISUAL_DESIGN,judgment,no,minor,,detailed-lesson,,P5 rows of 6 exceed rows-of-5 counter rule
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r2.md,g3-oa5-mult-properties,2,m5,REPEAT,machine,no,minor,,detailed-lesson,,"P3 vocabulary pictures reuse the chart's {2,3}"
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r2.md,g3-oa5-mult-properties,2,m6,UNTRUE_TEXT,machine,no,minor,,detailed-lesson,,T1 Materials says 12 counters; Guided needs 20
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r2.md,g3-oa5-mult-properties,2,m7,KEY,machine,no,minor,,detailed-lesson,,T6 glance row for P5 omits the asked answer 5
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r3.md,g3-oa5-mult-properties,3,n1,STEPS_LAYOUT,machine,no,minor,,detailed-lesson,,Chart panel 4 title wraps so captions do not share a baseline
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r3.md,g3-oa5-mult-properties,3,n2,CLIP_OVERLAP,machine,no,minor,,detailed-lesson,,"P1 item-10 number tag touches ""Write"""
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r3.md,g3-oa5-mult-properties,3,n3,PATTERN,machine,no,minor,LR-6,detailed-lesson,,"First factor 8 on b, f and g, two running across a row break"
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r3.md,g3-oa5-mult-properties,3,m4,VISUAL_DESIGN,judgment,yes,minor,,detailed-lesson,,"P5 still 5 rows of 6, past rows-of-5 counter rule"
+design/lesson-planner/lessons/g3-oa5-mult-properties/critic-r3.md,g3-oa5-mult-properties,3,U1,PROCESS,process,no,minor,,detailed-lesson,,Stale comments in lesson file (one Practice page; square in every place)
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r1.md,g3-oa9-input-output-rule,1,D1,REPEAT,machine,no,blocking,LR-5;LR-6;E36,detailed-lesson,function-table,"Practice and exit tables repeat earlier tables, rows and rules; exit not fresh; gate keys numbers only"
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r1.md,g3-oa9-input-output-rule,1,D2,PEDAGOGY,judgment,no,blocking,P-3,detailed-lesson,function-table,Practice 1 has no x table so Critical Atom never practised; trap rows do not trap
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r1.md,g3-oa9-input-output-rule,1,D3,PEDAGOGY,judgment,no,blocking,P-1,detailed-lesson,function-table,Practice 2 shuffles In order and jumps past 20 at once; neither modelled
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r1.md,g3-oa9-input-output-rule,1,D4,PEDAGOGY,judgment,no,blocking,P-1;AX-4,detailed-lesson,function-table,Word problem asks a different task (apply rule) in a new response frame; implausible story
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r1.md,g3-oa9-input-output-rule,1,D5,INSTRUCTION,machine,no,blocking,,detailed-lesson,,T2 prints raw template placeholder {pre.0.letters}
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r1.md,g3-oa9-input-output-rule,1,D6,PEDAGOGY,judgment,no,blocking,,detailed-lesson,function-table,"Exit Say band asks for the rule from one pair, against the Critical Atom"
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r1.md,g3-oa9-input-output-rule,1,n1,INSTRUCTION,machine,no,minor,,detailed-lesson,,Chart panel 1 says read row 1 but boxes rows 1 and 2
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r1.md,g3-oa9-input-output-rule,1,n2,PLAIN_WORDS,machine,no,minor,,detailed-lesson,,Chart Say uses input/output; pupil vocabulary is In/Out
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r1.md,g3-oa9-input-output-rule,1,n3,UNTRUE_TEXT,machine,no,minor,,detailed-lesson,,T2b says Guided step 1 traced; nothing is traced
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r1.md,g3-oa9-input-output-rule,1,n4,CLARITY,judgment,no,minor,,detailed-lesson,,T2b slot list shows slots not on this lesson's pages
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r1.md,g3-oa9-input-output-rule,1,n5,INSTRUCTION,machine,no,minor,,detailed-lesson,,"Fade labels: exit slip all star-3, P4-2 row 1 star-2 holds a trap"
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r1.md,g3-oa9-input-output-rule,1,n6,NAME_CONTENT,machine,no,minor,,detailed-lesson,,P0 2x11 outside the facts checked; footer seed 4343 differs
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r1.md,g3-oa9-input-output-rule,1,n7,PEDAGOGY,judgment,no,minor,,detailed-lesson,,Check Question option B a weak distractor
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r2.md,g3-oa9-input-output-rule,2,D7,KEY,machine,yes,blocking,E29,detailed-lesson,,T6 glance prints 38 + 5 = 43 for a question the word problem no longer asks
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r2.md,g3-oa9-input-output-rule,2,D8,INSTRUCTION,machine,no,blocking,,detailed-lesson,,"T4 script names chart panels by example number, sending teacher to wrong panels"
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r2.md,g3-oa9-input-output-rule,2,n8,REPEAT,machine,yes,minor,,detailed-lesson,function-table,Every exit rule used on another pupil table; + and - had unused rules
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r2.md,g3-oa9-input-output-rule,2,n9,UNTRUE_TEXT,machine,no,minor,,detailed-lesson,,"Check Question rule x2 on three tables, note says one other; E37 ignores board tables"
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r2.md,g3-oa9-input-output-rule,2,n10,INSTRUCTION,machine,no,minor,,detailed-lesson,,T2 step wording differs from pupil Steps band; Out of 0 atom not scripted
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r2.md,g3-oa9-input-output-rule,2,n11,INSTRUCTION,machine,no,minor,,detailed-lesson,,T2 Caught by names Practice 1 without the item letters
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r2.md,g3-oa9-input-output-rule,2,n12,PEDAGOGY,judgment,no,minor,,detailed-lesson,,"Prerequisite Check tests facts to 20, not bridging ten"
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r2.md,g3-oa9-input-output-rule,2,n13,CLARITY,judgment,no,minor,,detailed-lesson,function-table,"P5 table headed In/Out, not Ben/Ann; story duplicated by table"
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r2.md,g3-oa9-input-output-rule,2,n14,PATTERN,machine,no,minor,,detailed-lesson,function-table,"Exit a has consecutive Ins, making row 3 test near-trivial"
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r2.md,g3-oa9-input-output-rule,2,n4,CLARITY,judgment,yes,minor,,detailed-lesson,,T2b slot list still shows slots not on pupil pages
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r2.md,g3-oa9-input-output-rule,2,n5,INSTRUCTION,machine,yes,minor,,detailed-lesson,,Exit slip still labelled star-3 as a whole
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r3.md,g3-oa9-input-output-rule,3,n15,PEDAGOGY,judgment,yes,minor,,detailed-lesson,,Out-of-0 atom told not shown; script step order asks after pairs already did it
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r3.md,g3-oa9-input-output-rule,3,n16,PEDAGOGY,judgment,no,minor,,detailed-lesson,,P0 x band tests x2 and x5 only with 10; three of four are x10 facts
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r3.md,g3-oa9-input-output-rule,3,n17,NAME_CONTENT,machine,no,minor,,detailed-lesson,function-table,P4-1 c 13 -> 39 product past the facts
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r3.md,g3-oa9-input-output-rule,3,n18,UNTRUE_TEXT,machine,no,minor,,detailed-lesson,,"ftFactors comment and help text still name only 2, 5 and 10"
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r3.md,g3-oa9-input-output-rule,3,n4,CLARITY,judgment,yes,minor,,detailed-lesson,,T2b generic slot rows still listed
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r3.md,g3-oa9-input-output-rule,3,n5,INSTRUCTION,machine,yes,minor,,detailed-lesson,,Exit slip still labelled star-3 as a whole
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r3.md,g3-oa9-input-output-rule,3,n11,INSTRUCTION,machine,yes,minor,,detailed-lesson,,Caught by names pages not item letters
+design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r3.md,g3-oa9-input-output-rule,3,n13,CLARITY,judgment,yes,minor,,detailed-lesson,function-table,"P5 table still headed In/Out, not Ben/Ann"
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r1.md,g3-oa9-mult-table-patterns,1,D1,GIVEAWAY,machine,no,blocking,L3,detailed-lesson,,P5 Say band prints the product 28 the pupil must find
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r1.md,g3-oa9-mult-table-patterns,1,D2,GIVEAWAY,machine,no,blocking,L3,detailed-lesson,,"Exit Say frame names item b, its even column and the box to shade"
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r1.md,g3-oa9-mult-table-patterns,1,D3,REPEAT,machine,no,blocking,E31;P-1,detailed-lesson,chartwindow,Exit b and c share boxes; 11/12 headers never modelled; Check Question boxes not fresh
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r1.md,g3-oa9-mult-table-patterns,1,D4,SPACE,machine,no,blocking,,detailed-lesson,,Exit slip leaves an empty bordered quadrant on each half
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r1.md,g3-oa9-mult-table-patterns,1,D5,REPEAT,machine,no,blocking,LR-5;LR-6,detailed-lesson,chartwindow,Practice 1 copies P3 rows and overlaps itself; star-3 last row is not an edge row
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r1.md,g3-oa9-mult-table-patterns,1,D6,PEDAGOGY,judgment,no,blocking,P-LC-7,detailed-lesson,chartwindow,"Guided cells carry no hint or trace, so no fade from Guided to Independent"
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r1.md,g3-oa9-mult-table-patterns,1,D7,PEDAGOGY,judgment,no,blocking,,detailed-lesson,,Check Question distractor B is no-one's answer; not the misconception named
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r1.md,g3-oa9-mult-table-patterns,1,D8,INSTRUCTION,machine,no,blocking,,detailed-lesson,,"Cube demonstration disagrees across T1, T2, T4, T5; cube counts not listed"
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r1.md,g3-oa9-mult-table-patterns,1,n1,INSTRUCTION,machine,no,minor,,detailed-lesson,,Chart panel 3 caption repeats its heading; panel 1 says rows for one row
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r1.md,g3-oa9-mult-table-patterns,1,n2,INSTRUCTION,machine,no,minor,,detailed-lesson,,T2 mistake example quotes chart numbers but says caught by exit a
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r1.md,g3-oa9-mult-table-patterns,1,n3,KEY,machine,no,minor,,detailed-lesson,,T6 glance for P5 omits even; Accepted answers mention a bar P5 lacks
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r1.md,g3-oa9-mult-table-patterns,1,n4,INSTRUCTION,machine,no,minor,,detailed-lesson,,T6 wrong-answer row omits the shaded 2 column
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r2.md,g3-oa9-mult-table-patterns,2,D9,SPACE,machine,no,blocking,H5,detailed-lesson,chartwindow,P0 and key: empty bordered half-cell beside lone item f; gates E20/E11 miss it
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r2.md,g3-oa9-mult-table-patterns,2,n1,INSTRUCTION,machine,yes,minor,,detailed-lesson,,Chart panel 1 still says rows for one row
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r2.md,g3-oa9-mult-table-patterns,2,n3,KEY,machine,yes,minor,,detailed-lesson,,T6 P5 glance row still lacks even
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r2.md,g3-oa9-mult-table-patterns,2,n6,UNTRUE_TEXT,machine,yes,minor,,detailed-lesson,,T2 atom 7 still says last Practice row only
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r2.md,g3-oa9-mult-table-patterns,2,n7,INSTRUCTION,machine,yes,minor,,detailed-lesson,,T2 Common mistakes quote chart numbers for rows caught elsewhere
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r2.md,g3-oa9-mult-table-patterns,2,n8,INSTRUCTION,machine,no,minor,,detailed-lesson,,T5 Watch lists shaded products with an odd parenthesis instead of naming traps
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r2.md,g3-oa9-mult-table-patterns,2,n9,PEDAGOGY,judgment,no,minor,,detailed-lesson,,Guided 1 is both first We Do cell and first 11/12 headers
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r2.md,g3-oa9-mult-table-patterns,2,n10,GIVEAWAY,machine,no,minor,,detailed-lesson,,"P5 Say frame fits only an even item, leaning to the word even"
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r2.md,g3-oa9-mult-table-patterns,2,n11,REPEAT,machine,no,minor,,detailed-lesson,chartwindow,Exit a holds 3 of 6 boxes from the anchor chart incl. the I Do example
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r2.md,g3-oa9-mult-table-patterns,2,U1,REPEAT,machine,no,minor,,detailed-lesson,chartwindow,Practice windows revisit earlier ground heavily; three same-orientation sub-blocks
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r3.md,g3-oa9-mult-table-patterns,3,n7,INSTRUCTION,machine,yes,minor,,detailed-lesson,,"T2 Tens-digit mistake Caught by names Practice 1, but 30 is on exit a"
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r3.md,g3-oa9-mult-table-patterns,3,n12,INSTRUCTION,machine,no,minor,,detailed-lesson,,T5 section 9 note misquotes the P5 Say line
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r3.md,g3-oa9-mult-table-patterns,3,n13,REPEAT,machine,no,minor,,detailed-lesson,chartwindow,P0 g shares 4 of 6 boxes same orientation with Practice b and d
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r3.md,g3-oa9-mult-table-patterns,3,U1,REPEAT,machine,yes,minor,,detailed-lesson,chartwindow,Practice d still a same-orientation half-revisit of Independent a
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r3.md,g3-oa9-mult-table-patterns,3,n1,INSTRUCTION,machine,yes,minor,,detailed-lesson,,Chart panel 1 still says rows for one row
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r3.md,g3-oa9-mult-table-patterns,3,n3,KEY,machine,yes,minor,,detailed-lesson,,T6 P5 glance row still lacks even
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r3.md,g3-oa9-mult-table-patterns,3,n9,PEDAGOGY,judgment,yes,minor,,detailed-lesson,,Guided 1 still first 11/12 cell
+design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r3.md,g3-oa9-mult-table-patterns,3,n11,REPEAT,machine,yes,minor,,detailed-lesson,chartwindow,Exit a still holds the I Do example 5x6
