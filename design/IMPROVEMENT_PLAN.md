@@ -41,8 +41,8 @@ no full preview on the website, but a small preview of the first page (or the fi
 
 Built from three audits on 2026-10-23 (the build history and gate timings; the teacher site driven in a browser at 1366
 and 390 px; the print engine with a test render) and graded by an independent critic: rounds 1–4 FAIL; round 5 PASS on v5 (A 8 · B 9 · C 9 · D 8 · E 8 · F 9 · G 9), confirmed on v5.1;
-then the owner's further requests added §1.6 and the three kinds of worksheet (v6–v8; rounds 6–8 FAIL); this v10 answers
-rounds 8 and 9. The current review state is in `design/STATUS.md`.
+then the owner's further requests added §1.6 and the three kinds of worksheet (v6–v9; rounds 6–9 FAIL); this v10 answers
+round 9. The current review state is in `design/STATUS.md`.
 
 ---
 
