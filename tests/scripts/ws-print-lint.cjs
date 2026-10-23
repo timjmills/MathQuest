@@ -80,7 +80,9 @@
 //              the teacher footer / date line sits at the foot of its page, never mid-page.
 //   L-DENSITY  12.1 items per page within the ceiling for the page role and size (Independent / More
 //              Practice 6, or 16 for one-symbol answers); no page but the last of a sheet under half
-//              used (area, or items against the sheet's fullest page); PG-23 short last page rebalanced.
+//              used (area, or items against the sheet's fullest page); PG-23 short last page rebalanced;
+//              LONE ("L-LONE", H5) no page of a multi-page sheet holds one cell (item or model state) alone
+//              when a rebalance or fewer pages could avoid it (see lintLone).
 //   L-KEY      AK-1..AK-4 the key exists, is a facsimile (same page count, same cells within 0.5 mm,
 //              same slot count) and not a list; every slot answered; answers weight 700.
 //   L-VERBS    BD-12 / BD-17 no screen verbs on paper (click, tap, drag, select, press, highlight, hover,
