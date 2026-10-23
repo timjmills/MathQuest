@@ -26,7 +26,19 @@
 //   --size S|M|L              kit: the print size of every sheet (default L; LESSONS_LEARNED L1/L2 run S and L)
 //   --count auto|N            kit practice roles: the problem count (default auto, as the print screen);
 //                             auto also turns on L-DENSITY PAGEFILL (an empty strip over 20% of a page)
-//   --anchors side|sections   kit: print with step-by-step anchor problems (S6); adds L-ANCHOR
+//   --anchors side|sections   kit: print with step-by-step anchor problems (S6); adds L-ANCHOR.
+//                             top|first (at the top of each page / the first time) are M4's modes:
+//                             refused with "needs M4" until sheet/anchors.js ANCHOR_MODES has them
+//   --kind single|sections|mixed  kit: one skill a document (default) / all --skills as sections of
+//                             one document / all --skills on one Mixed practice document (E1)
+//   --pages N  --columns N    kit: req.sections[i].pages / .columns (E1)
+//   --sections per-skill|grouped|parts  kit, --kind sections: grouped / parts need M4 (section titles)
+//   --bring-back              kit, sections / mixed: no buildSheet field yet (fails, naming it)
+//   --fade problems|page|packet  kit: Faded page = --cover fade; packet = fade + --pages N; problems
+//                             has no engine field yet (fails). See KIT REQUEST FLAGS below.
+//   --capabilities [--json]   what this tree's buildSheet takes for the flags above (no browser)
+//   --jobs jobs.json          kit: several documents in one browser start (ws-coverage-matrix)
+//   --check-jobs jobs.json    each job's flags against this tree, no browser: [{id, ok | pending, reason}]
 //   --supports all|id,id      kit: print every skill with supports on (S2): `all` ticks every
 //                             render-time support its Support control offers; adds L-SUPPORT
 //   --cover whole|needed|fade kit, with --supports: the sheet's coverage (default whole)
@@ -118,10 +130,136 @@ const puppeteer = require('puppeteer');
 const { ROOT, chromePath, startServer, open, waitFor, listSkills, renderPrint, hideOverlays } = require('../lib/ws-harness.cjs');
 
 const argv = process.argv.slice(2);
-const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 && argv[i + 1] !== undefined ? argv[i + 1] : d; };
-const has = k => argv.includes('--' + k);
-// --size S|M|L: the kit preset size (default L; LESSONS_LEARNED L1 asks for S and L).
-const KIT_SIZE = ['S', 'M', 'L'].includes(arg('size', 'L')) ? arg('size', 'L') : 'L';
+// --jobs: while one job of a jobs file runs, its flags are read in place of the command line's
+// (E1, ws-coverage-matrix: several matrix rows per browser start). Everything reads flags through
+// arg() / has(), so a job is exactly the command line it stands for.
+let JOB_ARGV = null;
+const curArgv = () => JOB_ARGV || argv;
+const arg = (k, d) => { const a = curArgv(); const i = a.indexOf('--' + k); return i > -1 && a[i + 1] !== undefined ? a[i + 1] : d; };
+const has = k => curArgv().includes('--' + k);
+// --size S|M|L: the kit preset size (default L; LESSONS_LEARNED L1 asks for S and L). Read per
+// document, so a job can set its own.
+const kitSize = () => (['S', 'M', 'L'].includes(arg('size', 'L')) ? arg('size', 'L') : 'L');
+
+// =============================================================================================
+// KIT REQUEST FLAGS (E1, IMPROVEMENT_PLAN §1.6.2 "The coverage matrix")
+// =============================================================================================
+// What buildSheet(req) (js/modules/print-sheet.js) can be asked for TODAY is read from the tree
+// under test (MQ_ROOT), never assumed: a flag whose engine field does not exist yet fails with the
+// step that builds it, instead of printing the default page under the flag's name.
+//
+//   --kind single     one document per skill per role (req.sections = [{skills: [one]}]); the default
+//   --kind sections   ONE document of every --skills skill, each its own sub-section with its own
+//                     instruction: req = {role: independent, sections: [{skills: [all]}]} - buildSheet
+//                     groups a several-skill section one sub-section per skill (DN-31 / DN-34), which is
+//                     what the print screen sends today (teacher-print.js requestFor)
+//   --kind mixed      ONE document: role mixed-practice, its pools one per skill (mixed-practice.js
+//                     sources), shelves on the unit lattice (the GROUPED packing; M1/M2 add interleaving)
+//   --pages N         req.sections[i].pages (1-10): Single skill and Sections; the Independent role prints
+//                     N pages, More Practice N letters. Mixed practice: buildRoleSheet reads no page count
+//                     (rotation across pages is M2) -> fails "needs M2"
+//   --bring-back      Bring back earlier skills (spaced review, §2.5 on Sections and Mixed practice): no
+//                     request field exists (buildSheet has none; the Review role's `earlierSkills` is a
+//                     role, not an option) -> fails "needs a req.bringBack field", until normaliseRequest
+//                     reads one
+//   --sections per-skill|grouped|parts   Sections only. per-skill = today's grouped sub-sections (above).
+//                     grouped / parts need each section's title (`req.sections[i].title`, M4); today
+//                     normaliseRequest drops a section's title -> fails "needs M4"
+//   --anchors off|side|sections|top|first   passed through as req.anchors. `top` (an example at the top
+//                     of each page) and `first` (the first time each kind appears) are M4's: today
+//                     sheet/anchors.js normaliseAnchors() turns any mode outside ANCHOR_MODES into 'off',
+//                     so buildSheet would SILENTLY print no examples. This flag therefore checks the mode
+//                     against ANCHOR_MODES in the tree and fails "needs M4" until the mode is there; then
+//                     it passes through unchanged
+//   --fade problems|page|packet   the Fade supports choice (§2.5; MASTER_PLAN 4.1); implies --supports all
+//                     when no --supports is given. The engine fields:
+//                       Faded page   = coverage 'fade' (req.coverage; supports.js allocateSupports runs
+//                                      fadeLevel(j, n) with n = the skill's items over the WHOLE sheet)
+//                       Faded packet = the same coverage 'fade' with req.sections[i].pages = N (so the fade
+//                                      runs across the N pages, More Practice letters likewise); needs --pages >= 2
+//                       Faded problems (a support removed every N problems) = NO engine field: supports.js
+//                                      COVERAGES is whole|needed|fade, and fadeRung() fades ticked LEVELS in
+//                                      equal blocks of the count, not every N -> fails "needs a coverage value
+//                                      'problems' (+ N) in sheet/supports.js COVERAGES"
+//   --columns N|auto  req.sections[i].columns (the More option "columns")
+//   --capabilities    print what this tree's buildSheet takes for each flag above and exit (node only, no
+//                     browser; --json for ws-coverage-matrix)
+//   --jobs jobs.json  run several documents in one browser start: [{id, args: [...flags]}], each job's
+//                     flags replacing the command line's (--source, --json, --verbose stay global). A job
+//                     whose flag needs a later step is recorded as `pending` in --json, a role the skill
+//                     cannot take as `na`
+const KIT_CAP_FILES = { anchors: 'js/modules/sheet/anchors.js', sheet: 'js/modules/print-sheet.js', supports: 'js/modules/sheet/supports.js', mixed: 'js/modules/sheet/roles/mixed-practice.js' };
+let kitCapsMemo = null;
+function kitCapabilities() {
+    if (kitCapsMemo) return kitCapsMemo;
+    const read = (f) => { try { return fs.readFileSync(path.join(ROOT, f), 'utf8'); } catch (e) { return ''; } };
+    const listOf = (src, name) => { const m = new RegExp(`(?:const|let)\\s+${name}\\s*=\\s*(?:Object\\.freeze\\()?\\[([^\\]]*)\\]`).exec(src); return m ? [...m[1].matchAll(/(['"])([\w-]+)\1/g)].map(q => q[2]) : []; };
+    const sheet = read(KIT_CAP_FILES.sheet);
+    const norm = (/function normaliseRequest\([\s\S]*?\n}\n/.exec(sheet) || [''])[0];
+    const sectionMap = (/const sections = \(Array\.isArray\(req\.sections\)[\s\S]*?\.filter\(\(s\) => s\.skills\.length\)/.exec(norm) || [''])[0];
+    const roleSheet = (/async function buildRoleSheet\([\s\S]*?\n}\n/.exec(sheet) || [''])[0];
+    kitCapsMemo = {
+        root: ROOT,
+        anchorModes: listOf(read(KIT_CAP_FILES.anchors), 'ANCHOR_MODES'),
+        coverages: listOf(read(KIT_CAP_FILES.supports), 'COVERAGES'),
+        sectionTitle: /\btitle\b/.test(sectionMap),
+        sectionPages: /\bpages:/.test(sectionMap),
+        sectionColumns: /\bcolumns:/.test(sectionMap),
+        bringBack: /\breq\.bringBack\b/.test(norm),
+        mixedPages: /\bpages\b/.test((/const input = \{[\s\S]*?\n {4}\};/.exec(roleSheet) || [''])[0]) || /\binput\.pages\b/.test(read(KIT_CAP_FILES.mixed)),
+    };
+    return kitCapsMemo;
+}
+class NeedsStep extends Error { constructor(step, msg) { super(`needs ${step}: ${msg}`); this.step = step; } }
+/**
+ * The kit request fields for the current flags (job or command line), or a NeedsStep error naming
+ * the step that builds a missing engine field. Pure node; called before any document is built.
+ */
+function kitRequestFlags() {
+    const caps = kitCapabilities();
+    const kind = arg('kind', 'single');
+    if (!['single', 'sections', 'mixed'].includes(kind)) throw new Error(`unknown --kind ${kind} (single, sections, mixed)`);
+    const out = { kind, pages: null, columns: null, anchors: arg('anchors', 'off'), coverage: arg('cover', null), supports: arg('supports', null), sectionsMode: null };
+    const a = String(out.anchors).toLowerCase();
+    if (!['off', 'on', 'side', 'sections'].includes(a) && !caps.anchorModes.includes(a)) {
+        throw new NeedsStep('M4', `--anchors ${out.anchors}: sheet/anchors.js ANCHOR_MODES is ${caps.anchorModes.join('|') || '(not found)'}; normaliseAnchors() turns '${out.anchors}' into 'off', so the page would print with no examples`);
+    }
+    if (arg('pages', null) !== null) {
+        const n = parseInt(arg('pages', ''), 10);
+        if (!(n >= 1 && n <= 10)) throw new Error(`--pages ${arg('pages', '')}: a whole number 1-10`);
+        if (kind === 'mixed' && n > 1 && !caps.mixedPages) throw new NeedsStep('M2', `--kind mixed --pages ${n}: buildRoleSheet passes no page count to the mixed-practice role (rotation across pages is M2's)`);
+        if (!caps.sectionPages) throw new Error('--pages: this tree\'s normaliseRequest keeps no req.sections[i].pages');
+        out.pages = n;
+    }
+    if (arg('columns', null) !== null && arg('columns', null) !== 'auto') {
+        const n = parseInt(arg('columns', ''), 10);
+        if (!(n >= 1 && n <= 10)) throw new Error(`--columns ${arg('columns', '')}: auto or a whole number 1-10`);
+        out.columns = n;
+    }
+    if (has('bring-back')) {
+        if (kind === 'single') throw new Error('--bring-back is a Sections / Mixed practice option (§2.5); use --kind sections or mixed');
+        if (!caps.bringBack) throw new NeedsStep('a req.bringBack field', 'Bring back earlier skills has no buildSheet field yet (§2.5 draws it from the Review / Daily spiral selection; no M-step names the field - the row-2 lane adds it to normaliseRequest)');
+        out.bringBack = true;
+    }
+    const sm = arg('sections', null);
+    if (sm !== null) {
+        if (kind !== 'sections') throw new Error('--sections is a Sections option; use --kind sections');
+        if (!['per-skill', 'grouped', 'parts'].includes(sm)) throw new Error(`unknown --sections ${sm} (per-skill, grouped, parts)`);
+        if (sm !== 'per-skill' && !caps.sectionTitle) throw new NeedsStep('M4', `--sections ${sm}: each section prints its title (req.sections[i].title, M4); this tree's normaliseRequest drops a section's title`);
+        out.sectionsMode = sm;
+    }
+    const fade = arg('fade', null);
+    if (fade !== null) {
+        if (!['problems', 'page', 'packet'].includes(fade)) throw new Error(`unknown --fade ${fade} (problems, page, packet)`);
+        if (fade === 'problems' && !caps.coverages.includes('problems')) throw new NeedsStep('a coverage value', `--fade problems (Faded problems: a support removed every N problems) has no engine field: sheet/supports.js COVERAGES is ${caps.coverages.join('|')}; it needs a coverage 'problems' with its N (row 2b, the owner of sheet/supports.js; Wave 4.1)`);
+        if (fade === 'packet' && !(out.pages >= 2)) throw new Error('--fade packet fades across the pages chosen: give --pages 2 or more');
+        if (fade !== 'problems') out.coverage = 'fade';
+        else out.coverage = 'problems';
+        if (!out.supports) out.supports = 'all';
+    }
+    if (out.coverage && !caps.coverages.includes(out.coverage)) throw new Error(`--cover ${out.coverage}: sheet/supports.js COVERAGES is ${caps.coverages.join('|')}`);
+    return out;
+}
 
 const TOOL = 'ws-print-lint';
 // INK-31: the answer-key ink (WORKSHEET_DESIGN_STANDARD.md INK-31).
@@ -1708,28 +1846,19 @@ async function lintHtmlInSheetPage(app, html, id, mode) {
     } finally { await sheet.close(); }
 }
 
-async function runApp(source) {
-    const app = await open({ seed: 1 });
-    const results = [];
-    try {
+async function runAppDocs(app, source, skills, flags, results, jobId) {
         const { page } = app;
-        await page.evaluate(() => { try { window.setUserRole('teacher'); } catch (e) {} });
-        const skills = selectSkills(await listSkills(page));
-        if (!skills.length) throw new Error('no skills selected');
-        if (source === 'kit') {
-            const ok = await page.evaluate(() => typeof window.buildSheet === 'function' && typeof window.sheetDocument === 'function');
-            if (!ok) throw new Error('--source kit needs window.buildSheet(req) and window.sheetDocument(html, title) (js/modules/print-sheet.js), and this tree does not put them on window. Lint the legacy print path with --source legacy, or run on a tree that has the kit renderer.');
-        }
         // Kit practice roles print what the teacher's print screen prints: the count on Auto (the
         // page capacity, teacher-print.js) unless --count N fixes it. Legacy keeps its 20.
         const COUNT = parseInt(arg('count', '20'), 10);
-        console.log(`${TOOL}: source ${source}, ${skills.length} skill(s)${source === 'legacy' ? `, ${COUNT} items per section` : ''}`);
+        if (!jobId) console.log(`${TOOL}: source ${source}, ${skills.length} skill(s)${source === 'legacy' ? `, ${COUNT} items per section` : flags.kind !== 'single' ? `, kind ${flags.kind}` : ''}`);
         // --roles (kit only): every page role buildSheet composes, per skill. A role the skill
         // cannot take (a fact layout for a non-fact skill) is reported as n/a, not linted.
-        const kitRoles = source === 'kit' ? (arg('roles', 'independent') || 'independent').split(',').map(r => r.trim()).filter(Boolean) : [null];
-        for (const s of skills) for (const role of kitRoles) {
-            const id = `${s.categoryId}:${s.skillId}${role && role !== 'independent' ? '#' + role : ''}`;
-            const seed = hash(`${s.categoryId}__${s.skillId}:print`);
+        const docs = source === 'kit' ? kitDocList(skills, flags, jobId)
+            : skills.map(s => ({ id: `${s.categoryId}:${s.skillId}`, skills: [s], role: null, seed: hash(`${s.categoryId}__${s.skillId}:print`), label: s.label }));
+        for (const d of docs) {
+            const { id, seed, role } = d;
+            const s = d.skills[0];
             let r;
             let kitHalves = null;
             try {
@@ -1739,31 +1868,51 @@ async function runApp(source) {
                     await renderPrint(page, s, { problemCount: COUNT, includeAnswerKey: true });
                     html = await legacyDocumentHtml(page);
                 } else {
-                    html = await page.evaluate(async ({ s, seed, COUNT, role, ANCHORS, SUPPORTS, COVER, MIX, OPTS, KIT_SIZE, KEY_OPTS }) => {
+                    html = await page.evaluate(async ({ S, seed, COUNT, role, ANCHORS, SUPPORTS, COVER, MIX, OPTS, KIT_SIZE, KEY_OPTS, PAGES, COLUMNS, SECTIONS, LABEL }) => {
                         // js/modules/print-sheet.js buildSheet(req): sections carry the skills; the result has
                         // pupilHtml and keyHtml (the facsimile key, same plan).
                         const practice = role === 'independent' || role === 'more-practice';
                         // S2: --supports ticks the skill's supports (all = every render-time value offered).
                         // --opts (O6, 2026-09-25): option values every skill carries (normalizeOptions
                         // drops what a skill does not declare, so one --opts serves a mixed list).
-                        let opts = OPTS ? { ...OPTS } : undefined;
-                        if (SUPPORTS) {
-                            const def = window.offeredOptionsFor(s.categoryId, s.skillId).find((d) => d.id === 'support' && d.supportsModel);
-                            if (def) {
-                                const want = SUPPORTS === 'all' ? def.render : SUPPORTS.split(',').filter((v) => def.render.includes(v));
-                                opts = { ...(opts || {}), support: [...new Set([...(def.default || []), ...want])] };
+                        const optsOf = (s) => {
+                            let opts = OPTS ? { ...OPTS } : undefined;
+                            if (SUPPORTS) {
+                                const def = window.offeredOptionsFor(s.categoryId, s.skillId).find((d) => d.id === 'support' && d.supportsModel);
+                                if (def) {
+                                    const want = SUPPORTS === 'all' ? def.render : SUPPORTS.split(',').filter((v) => def.render.includes(v));
+                                    opts = { ...(opts || {}), support: [...new Set([...(def.default || []), ...want])] };
+                                }
                             }
-                        }
-                        const req = { role, sections: [{ skills: [{ categoryId: s.categoryId, skillId: s.skillId, opts }], count: practice ? COUNT : undefined }], size: KIT_SIZE, look: practice ? 'ican' : 'auto', key: KEY_OPTS || true, seed, anchors: ANCHORS, coverage: COVER || undefined, mix: MIX || undefined };
+                            return opts;
+                        };
+                        // --kind (E1): single = one skill a document; sections = every skill its own
+                        // sub-section of one section (buildSheet DN-31); mixed = the mixed-practice role.
+                        const skillsOf = (list) => list.map((s) => ({ categoryId: s.categoryId, skillId: s.skillId, opts: optsOf(s) }));
+                        // --sections grouped | parts (M4 hook: reached only once normaliseRequest keeps
+                        // req.sections[i].title): grouped = the skills two to a titled section ("Group 1",
+                        // "Group 2" - the teacher's names stand in), parts = one titled part per skill.
+                        const groups = SECTIONS === 'grouped' ? S.reduce((g, s, i) => { if (i % 2 === 0) g.push([]); g[g.length - 1].push(s); return g; }, [])
+                            : SECTIONS === 'parts' ? S.map((s) => [s]) : [S];
+                        const sections = groups.map((list, gi) => {
+                            const section = { skills: skillsOf(list), count: practice ? COUNT : undefined };
+                            if (SECTIONS === 'grouped') section.title = `Group ${gi + 1}`;
+                            if (SECTIONS === 'parts') section.title = `Part ${'ABCDEFGHIJ'[gi]}`;
+                            if (PAGES) section.pages = PAGES;
+                            if (COLUMNS) section.columns = COLUMNS;
+                            return section;
+                        });
+                        const req = { role, sections, size: KIT_SIZE, look: practice ? 'ican' : 'auto', key: KEY_OPTS || true, seed, anchors: ANCHORS, coverage: COVER || undefined, mix: MIX || undefined };
                         let out;
                         try { out = await window.buildSheet(req); } catch (e) { if (e && e.unsupported) return { unsupported: e.message }; throw e; }
                         const body = out.docHtml || [out.pupilHtml, out.keyHtml].filter(Boolean).join('\n');
-                        return { doc: window.sheetDocument(body, s.label), pupilHtml: out.pupilHtml, keyHtml: out.keyHtml };
-                    }, { s, seed, COUNT: arg('count', 'auto') === 'auto' ? undefined : parseInt(arg('count', '6'), 10), role, ANCHORS: arg('anchors', 'off'), SUPPORTS: arg('supports', null), COVER: arg('cover', null), MIX: arg('mix', null), OPTS: arg('opts', null) ? JSON.parse(arg('opts', '{}')) : null, KIT_SIZE, KEY_OPTS: arg('key-place', null) || arg('key-style', null) ? { on: true, placement: arg('key-place', 'end'), style: arg('key-style', 'copy') } : null });
+                        return { doc: window.sheetDocument(body, LABEL), pupilHtml: out.pupilHtml, keyHtml: out.keyHtml };
+                    }, { S: d.skills.map(k => ({ categoryId: k.categoryId, skillId: k.skillId })), seed, COUNT: arg('count', 'auto') === 'auto' ? undefined : parseInt(arg('count', '6'), 10), role, ANCHORS: flags.anchors, SUPPORTS: flags.supports, COVER: flags.coverage, MIX: arg('mix', null), OPTS: arg('opts', null) ? JSON.parse(arg('opts', '{}')) : null, KIT_SIZE: kitSize(), KEY_OPTS: arg('key-place', null) || arg('key-style', null) ? { on: true, placement: arg('key-place', 'end'), style: arg('key-style', 'copy') } : null, PAGES: flags.pages, COLUMNS: flags.columns, SECTIONS: flags.sectionsMode, LABEL: d.skills.length === 1 ? s.label : d.label });
                     if (html && html.doc) { kitHalves = html; html = html.doc; }
                 }
                 if (html && html.unsupported) {
                     process.stdout.write(`  ${id}: n/a (${html.unsupported})\n`);
+                    if (jobId) NA_DOCS.push({ id, reason: html.unsupported });
                     continue;
                 }
                 r = await lintHtmlInSheetPage(app, html, id, source === 'legacy' ? 'legacy' : 'kit');
@@ -1771,10 +1920,64 @@ async function runApp(source) {
             } catch (e) {
                 r = { info: { id, mode: source, error: e.message }, findings: [{ lint: 'L-SPLIT', rule: 'RENDER', sev: 'critical', msg: `the sheet did not render: ${e.message}`, key: 'render error' }] };
             }
-            r.info.label = s.label + (role && role !== 'independent' ? ` (${role})` : '');
+            r.info.label = d.label;
             results.push(r);
             process.stdout.write(`  ${id}: ${r.info.pages ?? '?'}+${r.info.keyPages ?? '?'} pages, ${r.findings.length} finding(s)\n`);
             await hideOverlays(page);
+        }
+}
+
+// Documents recorded by --jobs runs that were not linted: a flag that needs a later step
+// (`pending`), or a role the skill cannot take (`na`). Written to --json beside `documents`.
+const PENDING_DOCS = [];
+const NA_DOCS = [];
+
+/** The kit documents the current flags ask for: one per skill per role, or one of all skills. */
+function kitDocList(skills, flags, jobId) {
+    const kitRoles = (arg('roles', 'independent') || 'independent').split(',').map(r => r.trim()).filter(Boolean);
+    const ids = skills.map(s => `${s.categoryId}:${s.skillId}`);
+    if (flags.kind === 'single') {
+        const out = [];
+        for (const s of skills) for (const role of kitRoles) out.push({ id: `${s.categoryId}:${s.skillId}${role !== 'independent' ? '#' + role : ''}`, skills: [s], role, seed: hash(`${s.categoryId}__${s.skillId}:print`), label: s.label + (role !== 'independent' ? ` (${role})` : '') });
+        if (jobId) { if (out.length !== 1) throw new Error(`job ${jobId}: a job is one document (got ${out.length})`); out[0].id = jobId; }
+        return out;
+    }
+    if (skills.length < 2) throw new Error(`--kind ${flags.kind} needs two or more --skills (the skill and its partners)`);
+    const role = flags.kind === 'mixed' ? 'mixed-practice' : kitRoles[0];
+    if (flags.kind === 'sections' && !['independent', 'more-practice'].includes(role)) throw new Error(`--kind sections prints on a practice role (independent, more-practice), not ${role}`);
+    return [{ id: jobId || `${flags.kind}:${ids.join('+')}`, skills, role, seed: hash(`${flags.kind}:${ids.join(',')}:print`), label: `${skills.length} skills as ${flags.kind === 'mixed' ? 'Mixed practice' : 'sections'}` }];
+}
+
+async function runApp(source) {
+    const app = await open({ seed: 1 });
+    const results = [];
+    try {
+        const { page } = app;
+        await page.evaluate(() => { try { window.setUserRole('teacher'); } catch (e) {} });
+        const allSkills = await listSkills(page);
+        if (source === 'kit') {
+            const ok = await page.evaluate(() => typeof window.buildSheet === 'function' && typeof window.sheetDocument === 'function');
+            if (!ok) throw new Error('--source kit needs window.buildSheet(req) and window.sheetDocument(html, title) (js/modules/print-sheet.js), and this tree does not put them on window. Lint the legacy print path with --source legacy, or run on a tree that has the kit renderer.');
+        }
+        const JOBS = arg('jobs', null);
+        if (JOBS && source !== 'kit') throw new Error('--jobs is for --source kit');
+        const jobs = JOBS ? JSON.parse(fs.readFileSync(path.resolve(process.cwd(), JOBS), 'utf8')) : [null];
+        if (JOBS) console.log(`${TOOL}: ${jobs.length} job(s) from ${JOBS}`);
+        let skills = [];
+        for (const job of jobs) {
+            JOB_ARGV = job ? [...job.args, '--source', source] : null;
+            try {
+                skills = selectSkills(allSkills);
+                if (!skills.length) throw new Error('no skills selected');
+                let flags = null;
+                if (source === 'kit') {
+                    try { flags = kitRequestFlags(); } catch (e) {
+                        if (job && e instanceof NeedsStep) { PENDING_DOCS.push({ id: job.id, step: e.step, reason: e.message }); process.stdout.write(`  ${job.id}: PENDING (${e.message})\n`); continue; }
+                        throw e;
+                    }
+                }
+                await runAppDocs(app, source, skills, flags, results, job ? job.id : null);
+            } finally { JOB_ARGV = null; }
         }
         if (source === 'legacy' && skills.length > 1 && !has('no-combined')) {
             const id = 'combined:' + skills.length + '-sections';
@@ -1859,6 +2062,9 @@ function writeJson(results, source, file) {
             notes: r.info.notes || [],
         })),
     };
+    // --jobs (E1): documents not linted, so the coverage matrix can mark their rows PENDING / N/A
+    if (PENDING_DOCS.length) out.pending = PENDING_DOCS;
+    if (NA_DOCS.length) out.na = NA_DOCS;
     fs.writeFileSync(path.resolve(process.cwd(), file), JSON.stringify(out, null, 1));
     console.log(`wrote ${file}`);
 }
@@ -2132,8 +2338,36 @@ async function selfTest() {
 module.exports = { wsLintPage, wsPageBox, lintDocument, lintHtmlInSheetPage, analysePdf, CEILINGS, PACK_WAIVERS };
 if (require.main === module) (async () => {
     if (has('self-test')) return selfTest();
+    if (has('capabilities')) {
+        const caps = kitCapabilities();
+        if (has('json')) { process.stdout.write(JSON.stringify(caps, null, 1) + '\n'); return; }
+        console.log(`${TOOL}: what buildSheet takes in ${caps.root}`);
+        console.log(`  --anchors    ANCHOR_MODES ${caps.anchorModes.join('|')} (top / first: ${['top', 'first'].every(m => caps.anchorModes.includes(m)) ? 'built' : 'need M4'})`);
+        console.log(`  --pages      req.sections[i].pages ${caps.sectionPages ? 'yes' : 'NO'}; on Mixed practice ${caps.mixedPages ? 'yes' : 'needs M2'}`);
+        console.log(`  --columns    req.sections[i].columns ${caps.sectionColumns ? 'yes' : 'NO'}`);
+        console.log(`  --sections   grouped / parts (req.sections[i].title) ${caps.sectionTitle ? 'yes' : 'need M4'}`);
+        console.log(`  --bring-back req.bringBack ${caps.bringBack ? 'yes' : 'no field yet'}`);
+        console.log(`  --fade       coverages ${caps.coverages.join('|')}: page = coverage fade; packet = fade + --pages N; problems ${caps.coverages.includes('problems') ? 'yes' : 'no engine field'}`);
+        console.log(`${TOOL}: OK (capabilities)`);
+        return;
+    }
+    // --check-jobs jobs.json: each job's flags against this tree, no browser (ws-coverage-matrix
+    // --list marks a row PENDING from this, so the step a flag waits for is decided in one place).
+    if (arg('check-jobs', null)) {
+        const jobs = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), arg('check-jobs', null)), 'utf8'));
+        const out = jobs.map((job) => {
+            JOB_ARGV = [...job.args, '--source', 'kit'];
+            try { const f = kitRequestFlags(); return { id: job.id, ok: true, kind: f.kind }; } catch (e) {
+                return e instanceof NeedsStep ? { id: job.id, pending: e.step, reason: e.message } : { id: job.id, error: e.message };
+            } finally { JOB_ARGV = null; }
+        });
+        process.stdout.write(JSON.stringify(out) + '\n');
+        return;
+    }
     const source = arg('source', 'legacy');
     if (!['pack', 'legacy', 'kit'].includes(source)) throw new Error(`unknown --source ${source} (pack, legacy, kit)`);
+    // a kit flag that needs a later step fails here, before a browser starts (E1)
+    if (source === 'kit' && !arg('jobs', null)) kitRequestFlags();
     let results;
     if (source === 'pack') {
         const only = (arg('files', '') || '').split(',').map(s => s.trim()).filter(Boolean);

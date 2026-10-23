@@ -85,8 +85,13 @@
 //                   the foot), and one screen sheet per skill (1280 / 820 / 390 / 1366 x 768,
 //                   worksheet, quiz); <out>/contact/index.md lists them.
 // --envelope <template>--<kind>  renders the all-pairs sample `node tests/scripts/ws-envelope.mjs
-//                   --envelope <pair> --json` prints, or the file given with --sample <file.json>.
-//                   Expected JSON: an array, or {sample: [...]} / {pages: [...]}, of entries
+//                   --envelope <pair> --out <file>` writes, or the file given with --sample <file.json>.
+//                   ws-envelope's shape {sample: {print: [...], screen: [...]}} is mapped by
+//                   loadEnvelopeSample (print row -> role from its layout, opts from opt:*, size, and
+//                   examples / pages / fade / key as the unit's request; screen row -> that host only;
+//                   a fade 'problems' row is skipped: no engine field yet). Print and screen units are
+//                   interleaved, so --limit N renders both.
+//                   The older JSON: an array, or {sample: [...]} / {pages: [...]}, of entries
 //                   {"skill": "cat:skill", "opts": {...}, "size": "S|M|L", "role": "independent"}
 //                   ("kind": "single|sections|mixed" stands in for role; size defaults to M, role
 //                   to the pair's kind). Each entry is one unit; its pages carry an opts key.
@@ -478,18 +483,20 @@ async function printDoc(page, html, pdfPath) {
     } finally { await sheet.close(); }
 }
 
-async function renderRole(page, skill, role, dir, { size = ROLE_SIZE, unitOpts = null, prefix = role } = {}) {
+async function renderRole(page, skill, role, dir, { size = ROLE_SIZE, unitOpts = null, prefix = role, unitReq = null } = {}) {
     await viewport(page, 1280, 900);
     await applyRange(page);
     const seed = hash(slug(skill) + ':' + role) % 1000000;
     const set = skill.set || [{ categoryId: skill.categoryId, skillId: skill.skillId }];
-    const supOpts = (await page.evaluate(supportOptsInPage, { list: set.map((k) => [k.categoryId, k.skillId]), SUPPORTS, COVER: null, MIX: null })).map((o) => withOpts(o, unitOpts));
-    const built = await page.evaluate(async ({ skill, set, role, seed, count, size, look, paper, anchors, supOpts, COVER, MIX, columns, LESSON }) => {
+    // an envelope unit's kind options (examples, pages, fade, key; loadEnvelopeSample) override the command line's
+    const U = unitReq || {};
+    const supOpts = (await page.evaluate(supportOptsInPage, { list: set.map((k) => [k.categoryId, k.skillId]), SUPPORTS: U.supports || SUPPORTS, COVER: null, MIX: null })).map((o) => withOpts(o, unitOpts));
+    const built = await page.evaluate(async ({ skill, set, role, seed, count, size, look, paper, anchors, supOpts, COVER, MIX, columns, LESSON, pages, key }) => {
         try {
             const skills = set.map((k, i) => (supOpts[i] ? Object.assign({}, k, { opts: supOpts[i] }) : k));
             const r = await window.buildSheet({
-                role, sections: [{ skills, count, columns }],
-                size, look, paper, seed, form: 'A', key: true, anchors,
+                role, sections: [{ skills, count, columns, ...(pages ? { pages } : {}) }],
+                size, look, paper, seed, form: 'A', key: key || true, anchors,
                 coverage: COVER || undefined, mix: MIX || undefined,
                 ...(role === 'lesson' ? LESSON : {}),
             });
@@ -502,7 +509,7 @@ async function renderRole(page, skill, role, dir, { size = ROLE_SIZE, unitOpts =
                 items: r.items.map(it => ({ template: it.template, fclass: it.fclass, text: it.text.slice(0, 80), ans: typeof it.ans === 'object' ? JSON.stringify(it.ans) : String(it.ans), letter: it.letter, measured: it.measured })),
             };
         } catch (e) { return e && e.unsupported ? { unsupported: e.message } : { error: (e && e.stack) || String(e) }; }
-    }, { skill, set, role, seed, count: ROLE_COUNT, size, look: ROLE_LOOK, paper: ROLE_PAPER, anchors: ROLE_ANCHORS, supOpts, COVER, MIX, columns: ROLE_COLUMNS, LESSON });
+    }, { skill, set, role, seed, count: U.pages ? undefined : ROLE_COUNT, size, look: ROLE_LOOK, paper: ROLE_PAPER, anchors: U.anchors || ROLE_ANCHORS, supOpts, COVER: U.coverage || COVER, MIX, columns: ROLE_COLUMNS, LESSON, pages: U.pages || null, key: U.key || null });
     if (built.error) return { error: built.error };
     if (built.unsupported) return { unsupported: built.unsupported };
     const pdfP = path.join(dir, `${prefix}.pdf`);
@@ -540,26 +547,96 @@ async function templatesOf(page, skills) {
 }
 
 const KIND_ROLE = { single: 'independent', sections: 'independent', mixed: 'mixed-practice' };
-/** The envelope's all-pairs sample: ws-envelope's JSON when it exists, else --sample <file.json>. */
+// ws-envelope's Layout values -> the page role that prints them (§2.5: Layout is a Single skill option)
+const LAYOUT_ROLE = { standard: null, 'fact-rows': 'fact-rows', timed: 'fact-probe', 'todays-number': 'todays-number' };
+/**
+ * The envelope's all-pairs sample: ws-envelope's file when the tool exists, else --sample <file.json>.
+ * Two shapes are read:
+ *   ws-envelope --envelope <pair> (written to a file; its stdout is a summary, not JSON):
+ *     {sample: {print: [{skill, size, pages?, examples?, fade?, layout?, key?, 'opt:<id>': value}],
+ *               screen: [{host, size, skill}]}}
+ *     print row -> one unit: role from the layout (else the kind's role), opts from the opt:* values
+ *     ({set: [...]} -> that list; {set: 'all'} -> every value, resolved in the page; {set: 'default'} ->
+ *     left out), the size, and its kind options as the unit's request: examples -> anchors, pages ->
+ *     sections[0].pages, fade page|packet -> supports all + coverage fade (a packet over >= 2 pages),
+ *     key 'style/placement' -> key {on, style, placement}. fade 'problems' has no engine field yet
+ *     (ws-print-lint --capabilities): such a row is skipped and counted, never printed as the default.
+ *     screen row -> one unit that renders that host only (practice-card = the card at every width,
+ *     online-worksheet, quiz); the hosts take no print size, so a screen row's size is recorded only.
+ *   the older list: an array, or {sample: [...]} / {pages: [...]}, of {skill, opts, size, role|kind}.
+ */
 function loadEnvelopeSample() {
     let json = null, from = null;
     if (SAMPLE_FILE) { json = JSON.parse(fs.readFileSync(path.resolve(G.REPO, SAMPLE_FILE), 'utf8')); from = SAMPLE_FILE; }
     else {
         const tool = path.join(G.REPO, 'tests', 'scripts', 'ws-envelope.mjs');
         if (!fs.existsSync(tool)) throw new Error(`--envelope ${ENVELOPE}: tests/scripts/ws-envelope.mjs is not in this tree; pass --sample <file.json> (format in the header)`);
-        json = JSON.parse(execFileSync('node', [tool, '--envelope', ENVELOPE, '--json'], { encoding: 'utf8', cwd: G.REPO, maxBuffer: 64 << 20 }));
-        from = `ws-envelope --envelope ${ENVELOPE} --json`;
+        const tmp = path.join(require('os').tmpdir(), `ws-grade-envelope-${process.pid}.json`);
+        execFileSync('node', [tool, '--envelope', ENVELOPE, '--out', tmp], { encoding: 'utf8', cwd: G.REPO, maxBuffer: 64 << 20, stdio: ['ignore', 'ignore', 'inherit'] });
+        json = JSON.parse(fs.readFileSync(tmp, 'utf8'));
+        fs.unlinkSync(tmp);
+        from = `ws-envelope --envelope ${ENVELOPE}`;
     }
-    const list = Array.isArray(json) ? json : (json.sample || json.pages || (json.pairs && json.pairs.flatMap((p) => p.sample || [])) || []);
-    const kindOfPair = ENVELOPE ? ENVELOPE.split('--')[1] : null;
-    const units = list.map((e, i) => {
+    const kindOfPair = ENVELOPE ? ENVELOPE.split('--')[1] : (json.kind || null);
+    const skillOf = (e, i) => {
         const key = e.skill || `${e.categoryId}:${e.skillId}`;
         const [categoryId, skillId] = String(key).split(':');
         if (!categoryId || !skillId) throw new Error(`sample entry ${i}: no skill ("cat:skill")`);
+        return { categoryId, skillId };
+    };
+    const skipped = [];
+    if (json.sample && !Array.isArray(json.sample) && (json.sample.print || json.sample.screen)) {
+        const print = (json.sample.print || []).map((e, i) => {
+            const { categoryId, skillId } = skillOf(e, i);
+            const opts = {};
+            for (const [k, v] of Object.entries(e)) {
+                if (!k.startsWith('opt:')) continue;
+                if (v && typeof v === 'object' && 'set' in v) { if (v.set === 'default') continue; opts[k.slice(4)] = v.set === 'all' ? { allOf: true } : v.set; }
+                else if (v && typeof v === 'object' && 'value' in v) continue;   // an option kept at its default
+                else opts[k.slice(4)] = v;
+            }
+            const req = {};
+            if (e.examples && e.examples !== 'off') req.anchors = e.examples;
+            if (e.pages > 1) req.pages = e.pages;
+            if (e.fade === 'page' || e.fade === 'packet') { req.supports = 'all'; req.coverage = 'fade'; if (e.fade === 'packet') req.pages = Math.max(2, req.pages || 0); }
+            if (e.key) { const [style, placement] = String(e.key).split('/'); req.key = { on: true, style, placement }; }
+            const role = (e.layout && LAYOUT_ROLE[e.layout]) || KIND_ROLE[e.kind || kindOfPair] || 'independent';
+            if (e.fade === 'problems') { skipped.push(`print ${i} (${categoryId}:${skillId}): fade problems has no engine field yet`); return null; }
+            return { categoryId, skillId, role, size: e.size || 'M', opts: Object.keys(opts).length ? opts : null, req: Object.keys(req).length ? req : null, hosts: null, index: i };
+        }).filter(Boolean);
+        const seenHost = new Set();
+        const screen = (json.sample.screen || []).map((e, i) => {
+            const { categoryId, skillId } = skillOf(e, i);
+            const k = `${categoryId}:${skillId}|${e.host}`;
+            if (seenHost.has(k)) return null;            // the hosts take no size: one render a (skill, host)
+            seenHost.add(k);
+            return { categoryId, skillId, role: null, size: e.size || 'M', opts: null, req: null, hosts: [e.host], index: `s${i}` };
+        }).filter(Boolean);
+        // interleaved, so a small --limit still renders both print and screen units
+        const units = [];
+        for (let i = 0; i < Math.max(print.length, screen.length); i++) { if (print[i]) units.push(print[i]); if (screen[i]) units.push(screen[i]); }
+        if (skipped.length) console.log(`ws-grade-render: ${skipped.length} sample row(s) skipped (pending engine field), first: ${skipped[0]}`);
+        return { units, from, skipped };
+    }
+    const list = Array.isArray(json) ? json : (json.sample || json.pages || (json.pairs && json.pairs.flatMap((p) => p.sample || [])) || []);
+    const units = list.map((e, i) => {
+        const { categoryId, skillId } = skillOf(e, i);
         const role = e.role || KIND_ROLE[e.kind || kindOfPair] || 'independent';
-        return { categoryId, skillId, role, size: e.size || 'M', opts: e.opts && Object.keys(e.opts).length ? e.opts : null, index: i };
+        return { categoryId, skillId, role, size: e.size || 'M', opts: e.opts && Object.keys(e.opts).length ? e.opts : null, req: null, hosts: null, index: i };
     });
-    return { units, from };
+    return { units, from, skipped };
+}
+/** {allOf: true} option values (ws-envelope's {set: 'all'}) become the option's every value. */
+async function resolveAllOf(page, units) {
+    for (const u of units) {
+        if (!u.opts || !Object.values(u.opts).some((v) => v && v.allOf)) continue;
+        u.opts = await page.evaluate(({ c, s, opts }) => {
+            const defs = (window.optionsFor && window.optionsFor(c, s)) || [];
+            const out = {};
+            for (const [k, v] of Object.entries(opts)) { if (v && v.allOf) { const d = defs.find((x) => x.id === k); if (d) out[k] = (d.values || []).map((x) => x.v); } else out[k] = v; }
+            return out;
+        }, { c: u.categoryId, s: u.skillId, opts: u.opts });
+    }
 }
 
 // ---------------------------------------------------------------- S4: page records
@@ -888,16 +965,19 @@ td{padding:3px 0;word-break:break-word}`;
     let sampleFrom = null;
     if (ENVELOPE || SAMPLE_FILE) {
         const { units: entries, from } = loadEnvelopeSample();
+        await resolveAllOf(page, entries);
         sampleFrom = from;
+        const hasScreenRows = entries.some((e) => e.hosts);
         const byKey = new Map(skills.map((s) => [`${s.categoryId}:${s.skillId}`, s]));
         const screened = new Set();
         units = entries.map((e) => {
             const s = byKey.get(`${e.categoryId}:${e.skillId}`) || { categoryId: e.categoryId, skillId: e.skillId, label: e.skillId };
             const ok = optsKeyOf(e.opts);
             const sk = `${e.categoryId}:${e.skillId}|${ok || ''}`;
-            const screens = !screened.has(sk);
-            screened.add(sk);
-            return { skill: s, roles: [e.role], sizes: [e.size], opts: e.opts, screens, dirName: `${slug(s)}__e${e.index}${ok ? '-o' + ok : ''}` };
+            // ws-envelope's own screen rows name their hosts; the older list renders the hosts once a skill
+            const screens = e.hosts ? true : !hasScreenRows && !screened.has(sk);
+            if (!e.hosts) screened.add(sk);
+            return { skill: s, roles: e.role ? [e.role] : [], sizes: [e.size], opts: e.opts, req: e.req, hosts: e.hosts, screens, dirName: `${slug(s)}__e${e.index}${ok ? '-o' + ok : ''}` };
         });
     } else {
         units = skills.map((s) => ({ skill: s, roles: ROLES, sizes: ROLE_SIZES, opts: null, screens: true, dirName: slug(s) }));
@@ -929,7 +1009,7 @@ td{padding:3px 0;word-break:break-word}`;
             for (const role of unit.roles) {
                 for (const size of unit.sizes) {
                     const key = roleKey(role, size);
-                    try { meta.roles[key] = await renderRole(page, s, role, dir, { size, unitOpts: unit.opts, prefix: key }); } catch (e) { meta.roles[key] = { error: e.message }; }
+                    try { meta.roles[key] = await renderRole(page, s, role, dir, { size, unitOpts: unit.opts, prefix: key, unitReq: unit.req || null }); } catch (e) { meta.roles[key] = { error: e.message }; }
                 }
             }
         }
@@ -937,12 +1017,14 @@ td{padding:3px 0;word-break:break-word}`;
         if (!NO_SCREEN && !s.set && unit.screens) {
             meta.screen = {};
             await storeSupports(page, s, unit.opts);
-            for (const [w, h, fit] of HOSTS) {
+            const wants = (h) => !unit.hosts || unit.hosts.includes(h);   // an envelope screen row: its host only
+            if (unit.req) meta.req = unit.req;
+            if (wants('practice-card')) for (const [w, h, fit] of HOSTS) {
                 const k = fit ? `card-${w}x${h}` : `card-${w}`;
                 try { meta.screen[k] = await renderCard(page, s, w, h, path.join(dir, `${k}.png`), !!fit); } catch (e) { meta.screen[k] = { error: e.message }; }
             }
-            try { meta.screen['worksheet-1280'] = await renderWorksheet(page, s, path.join(dir, 'worksheet-1280.png')); } catch (e) { meta.screen['worksheet-1280'] = { error: e.message }; }
-            try { meta.screen['quiz-1280'] = await renderQuiz(page, s, path.join(dir, 'quiz-1280.png')); } catch (e) { meta.screen['quiz-1280'] = { error: e.message }; }
+            if (wants('online-worksheet')) try { meta.screen['worksheet-1280'] = await renderWorksheet(page, s, path.join(dir, 'worksheet-1280.png')); } catch (e) { meta.screen['worksheet-1280'] = { error: e.message }; }
+            if (wants('quiz')) try { meta.screen['quiz-1280'] = await renderQuiz(page, s, path.join(dir, 'quiz-1280.png')); } catch (e) { meta.screen['quiz-1280'] = { error: e.message }; }
         }
         meta.consoleErrors = problems.slice(errorsBefore).map(p => p.text).slice(0, 10);
         fs.writeFileSync(path.join(dir, 'meta.json'), JSON.stringify(meta, null, 2));
