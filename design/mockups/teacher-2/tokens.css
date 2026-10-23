@@ -1,79 +1,90 @@
-/* Teacher site 2.0 — design tokens (IMPROVEMENT_PLAN §2.7 board B, §2.8). The ONLY place raw values live.
-   tests/scripts/ws-teacher-tokens.cjs parses this file and checks every colour against the palette rules.
-   Area ramps: tint = 10 % of bold over white, soft = 30 %, deep = bold darkened to >= 7 : 1 on white;
-   dark mode: tint = 18 % of bold over #111318, soft = 40 %, the fourth strength = a light version >= 7 : 1 on the dark tint.
-   Slate (Mixed / Words / No standard) uses the same ramp rules; it always carries a dashed outline and its label. */
+/* Teacher site 2.0 — design tokens, BOARD C (owner 2026-10-23: "I like these colors style more" — the look of the
+   school's Awsaj maths site: warm cream page, warm ink, heavy grotesque headings, one italic serif line, small uppercase
+   mono labels, muted "painted" area colours). The ONLY place raw values live.
+   tests/scripts/ws-teacher-tokens.cjs parses this file and checks every colour against the palette rules (§2.7 rules,
+   board C values). Area ramps: tint = 10 % of bold over cream #FBF7EF, soft = 30 %, deep = bold darkened to >= 7 : 1 on
+   cream; dark mode: tint = 18 % of bold over #0F0E0C, soft = 40 %, the fourth strength = a light version (bold mixed
+   with cream) >= 7 : 1 on the dark tint. Slate (warm stone: Mixed / Words / No standard) uses the same rules and always
+   carries a dashed outline and its label. Board C was found by palette/board-c-search.py. */
 
 :root {
   /* type: chrome only (Andika is for pupil content) */
   --font-ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Archivo Black", "Inter", system-ui, sans-serif;
+  --font-serif: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, monospace;
   --font-pupil: "Andika", "Andika New Basic", sans-serif;
   --fs-12: 12px; --fs-14: 14px; --fs-16: 16px; --fs-20: 20px; --fs-28: 28px; --fs-36: 36px;
   --fw-500: 500; --fw-700: 700;
-  --lh-tight: 1.2; --lh-body: 1.5;
+  --lh-tight: 1.15; --lh-body: 1.5;
+  --ls-mono: 0.15em;
 
   /* spacing, radii, shadows, control size */
   --sp-4: 4px; --sp-8: 8px; --sp-16: 16px; --sp-24: 24px; --sp-32: 32px; --sp-48: 48px;
   --r-8: 8px; --r-16: 16px;
-  --shadow-1: 0 1px 3px rgba(17, 24, 39, 0.12);
-  --shadow-2: 0 12px 32px rgba(17, 24, 39, 0.24);
+  --shadow-1: 0 1px 2px rgba(26, 22, 20, 0.10);
+  --shadow-2: 0 16px 40px rgba(26, 22, 20, 0.22);
   --control: 44px;
   --line-1: 1px; --line-2: 2px;
 
-  /* neutrals, light */
-  --page: #FFFFFF;
-  --surface: #FFFFFF;
-  --surface-2: #F9FAFB;
-  --text: #111827;
-  --text-2: #374151;
-  --text-3: #4B5563;
-  --line: #D1D5DB;
-  --chip-edge-dark: #E5E7EB;
-  --ring: #111827;
-  --primary-bg: #111827;
-  --primary-fg: #FFFFFF;
-  --scrim: rgba(17, 24, 39, 0.48);
+  /* neutrals, light: warm cream and warm ink */
+  --page: #FBF7EF;
+  --surface: #FFFCF6;
+  --surface-2: #F3ECDF;
+  --text: #1A1614;
+  --text-2: #4A423B;
+  --text-3: #6B6158;
+  --line: #DDD3C3;
+  --chip-edge-dark: #E8DFD2;
+  --ring: #1A1614;
+  --primary-bg: #1A1614;
+  --primary-fg: #FBF7EF;
+  --rail: #1A1614;
+  --rail-text: #FBF7EF;
+  --rail-text-2: #CFC5B8;
+  --scrim: rgba(15, 14, 12, 0.56);
   --error: #B91C1C;
   --key: #C2410C;
   --paper: #FFFFFF;
   --paper-ink: #000000;
   --paper-grey: #949494;
 
-  /* board B: eight maths areas x four strengths (+ the text colour on bold) */
-  --cc-tint: #F9E9FB;   --cc-soft: #ECBEF2;   --cc-bold: #C026D3;   --cc-on: #FFFFFF;   --cc-deep: #901C9E;
-  --oa-tint: #EBEAF6;   --oa-soft: #C3C1E3;   --oa-bold: #3730A3;   --oa-on: #FFFFFF;   --oa-deep: #29247A;
-  --nbt-tint: #FDF7E6;  --nbt-soft: #F9E8B5;  --nbt-bold: #EAB308;  --nbt-on: #111827;  --nbt-deep: #6E5404;
-  --nf-tint: #FEF1F8;   --nf-soft: #FCD5E9;   --nf-bold: #F472B6;   --nf-on: #111827;   --nf-deep: #894066;
-  --meas-tint: #F0FDF8; --meas-soft: #D3F8E9; --meas-bold: #6EE7B7; --meas-on: #111827; --meas-deep: #2E614D;
-  --data-tint: #F4F9FF; --data-soft: #DFEEFE; --data-bold: #93C5FD; --data-on: #111827; --data-deep: #445B74;
-  --g-tint: #E7F1F0;    --g-soft: #B7D6D3;    --g-bold: #0F766E;    --g-on: #FFFFFF;    --g-deep: #0B5852;
-  --rpns-tint: #F8FEF0; --rpns-soft: #EBFBD0; --rpns-bold: #BEF264; --rpns-on: #111827; --rpns-deep: #4A5E27;
-  --slate-tint: #EDEEF0; --slate-soft: #C8CCD2; --slate-bold: #475569; --slate-on: #FFFFFF; --slate-deep: #35404F;
+  /* board C: eight maths areas x four strengths (+ the text colour on bold) */
+  --cc-tint: #F6EEEB; --cc-soft: #EDDCE2; --cc-bold: #CD9CC3; --cc-on: #1A1614; --cc-deep: #644C60;
+  --oa-tint: #EBE1E8; --oa-soft: #CBB6DB; --oa-bold: #5B1FAB; --oa-on: #FBF7EF; --oa-deep: #441780;
+  --nbt-tint: #F9F3E2; --nbt-soft: #F5EBC7; --nbt-bold: #E7CF69; --nbt-on: #1A1614; --nbt-deep: #5C532A;
+  --nf-tint: #EFE4E1; --nf-soft: #D6C0C5; --nf-bold: #7F3E63; --nf-on: #FBF7EF; --nf-deep: #5F2E4A;
+  --meas-tint: #F3F3E8; --meas-soft: #E2EBDA; --meas-bold: #A9CFAA; --meas-on: #1A1614; --meas-deep: #475747;
+  --data-tint: #E9E9E7; --data-soft: #C5CED6; --data-bold: #486E9C; --data-on: #FBF7EF; --data-deep: #365275;
+  --g-tint: #E6ECE5; --g-soft: #BBD7D2; --g-bold: #278E8D; --g-on: #1A1614; --g-deep: #1A5E5D;
+  --rpns-tint: #F8EFE4; --rpns-soft: #F0DECE; --rpns-bold: #D8A480; --rpns-on: #1A1614; --rpns-deep: #684F3D;
+  --slate-tint: #EBE7DF; --slate-soft: #CAC6BF; --slate-bold: #57534E; --slate-on: #FBF7EF; --slate-deep: #413E3B;
 }
 
 /* dark mode: explicit choice, or the system setting unless light was chosen */
 :root[data-theme="dark"] {
-  --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.48);
-  --shadow-2: 0 12px 32px rgba(0, 0, 0, 0.64);
-  --page: #111318;
-  --surface: #111318;
-  --surface-2: #1A1D23;
-  --text: #F3F4F6;
-  --text-2: #D1D5DB;
-  --text-3: #9CA3AF;
-  --line: #374151;
-  --ring: #F3F4F6;
-  --primary-bg: #F3F4F6;
-  --primary-fg: #111827;
-  --scrim: rgba(0, 0, 0, 0.64);
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.50);
+  --shadow-2: 0 16px 40px rgba(0, 0, 0, 0.70);
+  --page: #0F0E0C;
+  --surface: #1A1614;
+  --surface-2: #221D1A;
+  --text: #FBF7EF;
+  --text-2: #D9CFC2;
+  --text-3: #A89D90;
+  --line: #3A332D;
+  --ring: #FBF7EF;
+  --primary-bg: #FBF7EF;
+  --primary-fg: #1A1614;
+  --rail: #1A1614;
+  --scrim: rgba(0, 0, 0, 0.70);
 
-  --cc-tint: #30163A;   --cc-soft: #571B63;   --cc-deep: #E092E9;
-  --oa-tint: #181831;   --oa-soft: #201F50;   --oa-deep: #A3A0D5;
-  --nbt-tint: #383015;  --nbt-soft: #685312;  --nbt-deep: #F4D984;
-  --nf-tint: #3A2434;   --nf-soft: #6C3957;   --nf-deep: #FAB8DB;
-  --meas-tint: #223935; --meas-soft: #366858; --meas-deep: #B6F3DB;
-  --data-tint: #283341; --data-soft: #455A74; --data-deep: #C9E2FE;
-  --g-tint: #112527;    --g-soft: #103B3A;    --g-deep: #87BBB6;
-  --rpns-tint: #303B26; --rpns-soft: #566C36; --rpns-deep: #DEF8B2;
-  --slate-tint: #1B1F27; --slate-soft: #272D38; --slate-deep: #A3AAB4;
+  --cc-tint: #31282D; --cc-soft: #5B4755; --cc-deep: #E4CAD9;
+  --oa-tint: #1D1129; --oa-soft: #2D154C; --oa-deep: #B396D0;
+  --nbt-tint: #36311D; --nbt-soft: #655B31; --nbt-deep: #F1E3AC;
+  --nf-tint: #23171C; --nf-soft: #3C212F; --nf-deep: #BE9CAA;
+  --meas-tint: #2B3128; --meas-soft: #4D5B4B; --meas-deep: #D2E3CC;
+  --data-tint: #191F26; --data-soft: #263446; --data-deep: #A2B2C6;
+  --g-tint: #132523; --g-soft: #194140; --g-deep: #91C2BE;
+  --rpns-tint: #332921; --rpns-soft: #5F4A3A; --rpns-deep: #EACEB8;
+  --slate-tint: #1C1A18; --slate-soft: #2C2A26; --slate-deep: #A9A59E;
 }

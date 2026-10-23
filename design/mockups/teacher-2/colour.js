@@ -1,9 +1,10 @@
 // Colour maths for the Teacher site 2.0 palette page: a straight port of design/audit/palette-2026-10-23/colour.py
-// (WCAG contrast, CIELAB, CIEDE2000, Machado 2009 CVD simulation at severity 1.0) plus the ramp rules of ramps.py.
+// (WCAG contrast, CIELAB, CIEDE2000, Machado 2009 CVD simulation at severity 1.0) plus the ramp rules of ramps.py, re-based for board C on the cream page (tint/soft over cream, deep >= 7 : 1 on cream).
 // Works in the browser (window.MQColour) and in Node (module.exports). tests/scripts/ws-teacher-tokens.cjs holds
 // its own copy so the gate has no dependency on the mock-up.
 (function (root) {
-  const INK = '#111827', WHITE = '#FFFFFF', DARK = '#111318', KEY = '#C2410C', ERR = '#B91C1C';
+  // Board C (owner 2026-10-23, the Awsaj look): cream page, warm ink, warm near-black dark page; text on a bold is cream or ink.
+  const INK = '#1A1614', WHITE = '#FFFFFF', CREAM = '#FBF7EF', DARK = '#0F0E0C', KEY = '#C2410C', ERR = '#B91C1C';
   const M = {
     deut: [[0.367322, 0.860646, -0.227968], [0.280085, 0.672501, 0.047413], [-0.011820, 0.042940, 0.968881]],
     prot: [[0.152286, 1.052583, -0.204868], [0.114503, 0.786281, 0.099216], [-0.003882, -0.048116, 1.051998]],
@@ -47,13 +48,13 @@
     return Math.sqrt((dL / SL) ** 2 + (dC / SC) ** 2 + (dH / SH) ** 2 + RT * (dC / SC) * (dH / SH));
   }
   function mix(a, b, t) { const ra = rgb(a), rb = rgb(b); return '#' + [0, 1, 2].map(i => hex2(pyRound(255 * (ra[i] * t + rb[i] * (1 - t))))).join(''); }
-  function textFor(h) { const w = cr(h, WHITE), i = cr(h, INK); return (w >= 4.5 && w >= i) ? 'white' : (i >= 4.5 ? 'ink' : (w >= 4.5 ? 'white' : null)); }
-  function deep(b) { let t = 0.75; while (cr(mix(b, '#000000', t), WHITE) < 7) t -= 0.01; return mix(b, '#000000', t); }
-  function light(b, under) { let t = 0.5; while (cr(mix(b, WHITE, t), under) < 7) t -= 0.01; return mix(b, WHITE, t); }
+  function textFor(h) { const w = cr(h, CREAM), i = cr(h, INK); return (w >= 4.5 && w >= i) ? 'cream' : (i >= 4.5 ? 'ink' : (w >= 4.5 ? 'cream' : null)); }
+  function deep(b) { let t = 0.75; while (cr(mix(b, '#000000', t), CREAM) < 7) t -= 0.01; return mix(b, '#000000', t); }
+  function light(b, under) { let t = 0.5; while (cr(mix(b, CREAM, t), under) < 7) t -= 0.01; return mix(b, CREAM, t); }
   function ramp(b) {
-    const tint = mix(b, WHITE, 0.10), soft = mix(b, WHITE, 0.30), dTint = mix(b, DARK, 0.18), dSoft = mix(b, DARK, 0.40);
-    return { bold: b, on: textFor(b) === 'white' ? WHITE : INK, tint, soft, deep: deep(b), dTint, dSoft, dLight: light(b, dTint) };
+    const tint = mix(b, CREAM, 0.10), soft = mix(b, CREAM, 0.30), dTint = mix(b, DARK, 0.18), dSoft = mix(b, DARK, 0.40);
+    return { bold: b, on: textFor(b) === 'cream' ? CREAM : INK, tint, soft, deep: deep(b), dTint, dSoft, dLight: light(b, dTint) };
   }
-  const api = { INK, WHITE, DARK, KEY, ERR, rgb, lum, cr, lab, de00, mix, textFor, deep, light, ramp, simulate };
+  const api = { INK, WHITE, CREAM, DARK, KEY, ERR, rgb, lum, cr, lab, de00, mix, textFor, deep, light, ramp, simulate };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.MQColour = api;
 })(typeof window !== 'undefined' ? window : globalThis);

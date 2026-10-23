@@ -1,7 +1,7 @@
 // Teacher site 2.0 T1: screenshots, screen checks and the flow click-through for the clickable mock-up.
 //   node design/mockups/teacher-2/shoot.cjs            every screen at 1366x768 and 390x844, light and dark -> shots/*.png,
 //                                                      every §2.6 flow clicked -> flows-check.js, then index.html
-//   node design/mockups/teacher-2/shoot.cjs --board-a  also (re)draw board-a.png from board-a-source.html (done once)
+//   node design/mockups/teacher-2/shoot.cjs --boards   also (re)draw the static reference pictures board-a.png and board-b.png
 //   node design/mockups/teacher-2/shoot.cjs --no-shots only the checks and the flows (no PNGs written)
 // Checks on every shot: no console error, no sideways scroll, at most one solid ink (primary) button you can see, the
 // primary above the fold at 1366x768 where the screen has one, no two controls overlapping. Exit 1 on any failure.
@@ -118,11 +118,11 @@ async function runFlow(browser, base, f, w) {
   const browser = await chromium.launch({ executablePath: EXE });
   let failed = 0; const shots = [];
   try {
-    if (args.includes('--board-a') || !fs.existsSync(path.join(DIR, 'board-a.png'))) {
-      const p = await browser.newPage({ viewport: { width: 1024, height: 400 } });
-      await p.goto(`${base}/design/mockups/teacher-2/board-a-source.html`, { waitUntil: 'networkidle' });
-      await (await p.$('#b')).screenshot({ path: path.join(DIR, 'board-a.png') }); await p.close();
-      console.log('board-a.png drawn');
+    for (const b of ['a', 'b']) if (args.includes('--boards') || !fs.existsSync(path.join(DIR, `board-${b}.png`))) {
+      const p = await browser.newPage({ viewport: { width: 1024, height: 700 } });
+      await p.goto(`${base}/design/mockups/teacher-2/board-${b}-source.html`, { waitUntil: 'networkidle' });
+      await (await p.$('#b')).screenshot({ path: path.join(DIR, `board-${b}.png`) }); await p.close();
+      console.log(`board-${b}.png drawn`);
     }
     for (const [name, label, url, primary, full] of SCREENS) {
       for (const w of [1366, 390]) for (const theme of ['light', 'dark']) {
@@ -167,15 +167,17 @@ function writeIndex(shots, results) {
   const html = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Teacher Site 2.0</title>
 <script>(function(){var t=new URLSearchParams(location.search).get('theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);})();</script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="docs.css"></head>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Fraunces:ital,opsz,wght@1,9..144,500&family=Inter:wght@500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="docs.css"></head>
 <body><div class="doc">
-<h1>Teacher site 2.0 — the clickable mock-up (T1)</h1>
-<p class="lead">Find skills, tick them into the tray, then Print, Quiz or Share — every job in 3 or 4 steps. Colour means the maths area (board B); the one main action on each screen is solid ink.</p>
+<p class="eyebrow">Maths Quest · Teacher site 2.0 · T1 · ${new Date().toISOString().slice(0, 10)}</p>
+<h1>The clickable mock-up</h1>
+<p class="serif">Find skills, tick them, then Print, Quiz or Share.</p>
+<p class="lead">Every job in 3 or 4 steps. Colour means the maths area (board C, the look of the school’s maths site); the one main action on each screen is solid warm ink.</p>
 <div class="top"><a class="btn btn-primary" href="app.html">Open the mock-up</a></div>
 <div class="tiles">
   <a class="tile" href="app.html"><b>The mock-up</b><span>Skills (opens here) with the tray, the worksheet sheet, Quiz, Share, Lessons, Classes and the profile menu. Works at any width; Theme is in the profile menu, or add ?theme=dark.</span></a>
   <a class="tile" href="flows.html"><b>The flows</b><span>Each job with its steps and clicks, today’s count beside it, and a “Walk it” button that shows each click in the mock-up.</span></a>
-  <a class="tile" href="palette.html"><b>Colour: board B</b><span>Eight maths areas in four strengths, light and dark, the colour-blind check, and board A as a reference picture.</span></a>
+  <a class="tile" href="palette.html"><b>Colour: board C</b><span>Eight maths areas in four strengths, light and dark, the colour-blind check, where each colour moved from the site, and boards B and A as reference pictures.</span></a>
   <a class="tile" href="files.html"><b>Teacher files: live and branches</b><span>Which teacher files are live, which are only on a branch, and what T2–T6 does with each (STATUS §7).</span></a>
 </div>
 <h2>The flows at a glance</h2>

@@ -2,6 +2,10 @@
 /*
  * ws-teacher-tokens — the Teacher site 2.0 token gate, PALETTE PART (IMPROVEMENT_PLAN §2.7, §2.8; built in T1).
  *
+ * Palette: BOARD C (owner 2026-10-23, after T1's first cut: the school's Awsaj maths site look — cream page, warm ink,
+ * muted painted area colours). The §2.7 RULES are unchanged; only the values moved from board B to board C, and
+ * contrast is measured against cream #FBF7EF (light) and #0F0E0C (dark).
+ *
  *   node tests/scripts/ws-teacher-tokens.cjs            # GATE: prints a table, then ws-teacher-tokens: OK / FAIL
  *   node tests/scripts/ws-teacher-tokens.cjs --css <f>  # check another token file (default design/mockups/teacher-2/tokens.css)
  *
@@ -11,7 +15,7 @@
  *
  * Checks (any failure exits 1):
  *   1. ramps     every area's tint / soft / deep and dark tint / soft / light version follow the ramp rules and equal
- *                the §2.7 table;
+ *                the board C table;
  *   2. normal    CIEDE2000 between bold colours >= 20 for every pair (normal vision);
  *   3. cvd       under deuteranopia AND protanopia: >= 12 for every pair of areas that share a single-grade list,
  *                >= 8 for any other pair. The shared-grade sets are derived from the live skills (every live skill's
@@ -19,7 +23,7 @@
  *                the §2.7 sets, and it says so;
  *   4. slate     slate (Mixed / Words / No standard) >= 8 from every area in all three views;
  *   5. status    every bold >= 20 from error red #B91C1C and key orange #C2410C in all three views;
- *   6. contrast  text >= 4.5 : 1 on every strength with its stated text colour, light and dark; deep >= 7 on white;
+ *   6. contrast  text >= 4.5 : 1 on every strength with its stated text colour, light and dark; deep >= 7 on the cream page;
  *                the dark light-version >= 7 on the dark tint; the neutrals and the primary button too;
  *   7. tokens    the token CSS uses exactly these values (colours, both themes) and exactly the §2.8 scales
  *                (type 12 14 16 20 28 36, weights 500 700, spacing 4 8 16 24 32 48, radii 8 16, two shadows, 44 px controls);
@@ -37,7 +41,8 @@ const argCss = process.argv.indexOf('--css');
 const CSS_FILE = argCss > 0 ? path.resolve(process.argv[argCss + 1]) : path.join(ROOT, 'design/mockups/teacher-2/tokens.css');
 
 // ---------------------------------------------------------------- colour maths (port of colour.py)
-const INK = '#111827', WHITE = '#FFFFFF', DARK = '#111318', KEY = '#C2410C', ERR = '#B91C1C', DARK_TEXT = '#F3F4F6';
+// Board C (owner 2026-10-23, the Awsaj look): warm ink on cream; dark page #0F0E0C with cream text.
+const INK = '#1A1614', WHITE = '#FFFFFF', CREAM = '#FBF7EF', DARK = '#0F0E0C', KEY = '#C2410C', ERR = '#B91C1C', DARK_TEXT = '#FBF7EF';
 const MODES = ['normal', 'deut', 'prot'];
 const M = {
   deut: [[0.367322, 0.860646, -0.227968], [0.280085, 0.672501, 0.047413], [-0.011820, 0.042940, 0.968881]],
@@ -78,31 +83,33 @@ function de00(a, b, mode = 'normal') {
   const RT = -Math.sin(rad(2 * dth)) * RC;
   return Math.sqrt((dL / SL) ** 2 + (dC / SC) ** 2 + (dH / SH) ** 2 + RT * (dC / SC) * (dH / SH));
 }
-const textFor = (h) => { const w = cr(h, WHITE), i = cr(h, INK); return (w >= 4.5 && w >= i) ? WHITE : (i >= 4.5 ? INK : (w >= 4.5 ? WHITE : null)); };
-function deep(b) { let t = 0.75; while (cr(mix(b, '#000000', t), WHITE) < 7) t -= 0.01; return mix(b, '#000000', t); }
-function light(b, under) { let t = 0.5; while (cr(mix(b, WHITE, t), under) < 7) t -= 0.01; return mix(b, WHITE, t); }
-function ramp(b) { const dTint = mix(b, DARK, 0.18); return { tint: mix(b, WHITE, 0.10), soft: mix(b, WHITE, 0.30), bold: b, on: textFor(b), deep: deep(b), dTint, dSoft: mix(b, DARK, 0.40), dLight: light(b, dTint) }; }
+const textFor = (h) => { const w = cr(h, CREAM), i = cr(h, INK); return (w >= 4.5 && w >= i) ? CREAM : (i >= 4.5 ? INK : (w >= 4.5 ? CREAM : null)); };
+function deep(b) { let t = 0.75; while (cr(mix(b, '#000000', t), CREAM) < 7) t -= 0.01; return mix(b, '#000000', t); }
+function light(b, under) { let t = 0.5; while (cr(mix(b, CREAM, t), under) < 7) t -= 0.01; return mix(b, CREAM, t); }
+function ramp(b) { const dTint = mix(b, DARK, 0.18); return { tint: mix(b, CREAM, 0.10), soft: mix(b, CREAM, 0.30), bold: b, on: textFor(b), deep: deep(b), dTint, dSoft: mix(b, DARK, 0.40), dLight: light(b, dTint) }; }
 
-// ---------------------------------------------------------------- board B as written in IMPROVEMENT_PLAN §2.7
-// [key, css prefix, name, tint, soft, bold, deep, dark light version]
+// ---------------------------------------------------------------- board C (owner 2026-10-23; supersedes board B of §2.7)
+// The colours sampled from the school's Awsaj maths site, moved only as far as the §2.7 rules need
+// (design/mockups/teacher-2/palette/board-c-search.py). [key, css prefix, name, tint, soft, bold, deep, dark light version]
 const PLAN = [
-  ['CC', 'cc', 'Counting & cardinality', '#F9E9FB', '#ECBEF2', '#C026D3', '#901C9E', '#E092E9'],
-  ['OA', 'oa', 'Operations & algebraic thinking', '#EBEAF6', '#C3C1E3', '#3730A3', '#29247A', '#A3A0D5'],
-  ['NBT', 'nbt', 'Number & operations in base ten', '#FDF7E6', '#F9E8B5', '#EAB308', '#6E5404', '#F4D984'],
-  ['NF', 'nf', 'Fractions & decimals', '#FEF1F8', '#FCD5E9', '#F472B6', '#894066', '#FAB8DB'],
-  ['MEAS', 'meas', 'Measurement', '#F0FDF8', '#D3F8E9', '#6EE7B7', '#2E614D', '#B6F3DB'],
-  ['DATA', 'data', 'Data', '#F4F9FF', '#DFEEFE', '#93C5FD', '#445B74', '#C9E2FE'],
-  ['G', 'g', 'Geometry', '#E7F1F0', '#B7D6D3', '#0F766E', '#0B5852', '#87BBB6'],
-  ['RPNS', 'rpns', 'Ratio & number system', '#F8FEF0', '#EBFBD0', '#BEF264', '#4A5E27', '#DEF8B2'],
+  ['CC', 'cc', 'Counting & cardinality (mauve)', '#F6EEEB', '#EDDCE2', '#CD9CC3', '#644C60', '#E4CAD9'],
+  ['OA', 'oa', 'Operations & algebraic thinking (deep violet)', '#EBE1E8', '#CBB6DB', '#5B1FAB', '#441780', '#B396D0'],
+  ['NBT', 'nbt', 'Number & operations in base ten (gold)', '#F9F3E2', '#F5EBC7', '#E7CF69', '#5C532A', '#F1E3AC'],
+  ['NF', 'nf', 'Fractions & decimals (plum)', '#EFE4E1', '#D6C0C5', '#7F3E63', '#5F2E4A', '#BE9CAA'],
+  ['MEAS', 'meas', 'Measurement (sage)', '#F3F3E8', '#E2EBDA', '#A9CFAA', '#475747', '#D2E3CC'],
+  ['DATA', 'data', 'Data (dusty blue)', '#E9E9E7', '#C5CED6', '#486E9C', '#365275', '#A2B2C6'],
+  ['G', 'g', 'Geometry (sea teal)', '#E6ECE5', '#BBD7D2', '#278E8D', '#1A5E5D', '#91C2BE'],
+  ['RPNS', 'rpns', 'Ratio & number system (peach)', '#F8EFE4', '#F0DECE', '#D8A480', '#684F3D', '#EACEB8'],
 ];
-const SLATE = '#475569';
+const SLATE = '#57534E';   // warm stone
 const PLAN_GRADES = { K: ['CC', 'OA', 'NBT', 'MEAS', 'DATA', 'G'], '1': ['OA', 'NBT', 'MEAS', 'DATA', 'G'], '2': ['OA', 'NBT', 'MEAS', 'DATA', 'G'],
   '3': ['OA', 'NBT', 'NF', 'MEAS', 'DATA', 'G'], '4': ['OA', 'NBT', 'NF', 'MEAS', 'DATA', 'G'], '5': ['OA', 'NBT', 'NF', 'MEAS', 'DATA', 'G'], '6': ['RPNS', 'OA', 'DATA', 'G'] };
 // Neutrals of the token file (§2.7 rank 4, §2.8): [token, light, dark]
 const NEUTRALS = {
-  page: ['#FFFFFF', '#111318'], 'surface-2': ['#F9FAFB', '#1A1D23'], text: ['#111827', '#F3F4F6'], 'text-2': ['#374151', '#D1D5DB'],
-  'text-3': ['#4B5563', '#9CA3AF'], ring: ['#111827', '#F3F4F6'], 'primary-bg': ['#111827', '#F3F4F6'], 'primary-fg': ['#FFFFFF', '#111827'],
-  'chip-edge-dark': ['#E5E7EB', null], error: ['#B91C1C', null], key: ['#C2410C', null],
+  page: ['#FBF7EF', '#0F0E0C'], surface: ['#FFFCF6', '#1A1614'], 'surface-2': ['#F3ECDF', '#221D1A'], text: ['#1A1614', '#FBF7EF'], 'text-2': ['#4A423B', '#D9CFC2'],
+  'text-3': ['#6B6158', '#A89D90'], ring: ['#1A1614', '#FBF7EF'], 'primary-bg': ['#1A1614', '#FBF7EF'], 'primary-fg': ['#FBF7EF', '#1A1614'],
+  rail: ['#1A1614', '#1A1614'], 'rail-text': ['#FBF7EF', null], 'rail-text-2': ['#CFC5B8', null],
+  'chip-edge-dark': ['#E8DFD2', null], error: ['#B91C1C', null], key: ['#C2410C', null],
 };
 
 // ---------------------------------------------------------------- the shared-grade sets, from the live skills
@@ -168,7 +175,7 @@ function parseBlocks(css) {
   // 1. ramps
   let rampBad = [];
   for (const a of A) for (const f of ['tint', 'soft', 'deep', 'dLight']) if (a.plan[f] !== a.r[f]) rampBad.push(`${a.k} ${f} plan ${a.plan[f]} rule ${a.r[f]}`);
-  row('ramps follow the rules = §2.7 table', rampBad.length ? rampBad.length + ' differ' : '8 areas x 4 strengths x 2 modes', 'equal', rampBad.join('; '), !rampBad.length);
+  row('ramps follow the rules = board C table', rampBad.length ? rampBad.length + ' differ' : '8 areas x 4 strengths x 2 modes', 'equal', rampBad.join('; '), !rampBad.length);
 
   // 2. normal vision
   const pairs = []; for (let i = 0; i < A.length; i++) for (let j = i + 1; j < A.length; j++) pairs.push([A[i], A[j]]);
@@ -202,14 +209,15 @@ function parseBlocks(css) {
   for (const a of all) {
     const r = a.r;
     con.push([`${a.k} light tint / ink`, cr(r.tint, INK), 4.5], [`${a.k} light soft / ink`, cr(r.soft, INK), 4.5], [`${a.k} bold / its text`, r.on ? cr(r.bold, r.on) : 0, 4.5],
-      [`${a.k} deep / white`, cr(r.deep, WHITE), 7], [`${a.k} deep / tint`, cr(r.deep, r.tint), 4.5],
-      [`${a.k} dark tint / #F3F4F6`, cr(r.dTint, DARK_TEXT), 4.5], [`${a.k} dark soft / #F3F4F6`, cr(r.dSoft, DARK_TEXT), 4.5], [`${a.k} dark light-version / dark tint`, cr(r.dLight, r.dTint), 7]);
+      [`${a.k} deep / cream page`, cr(r.deep, CREAM), 7], [`${a.k} deep / surface`, cr(r.deep, NEUTRALS.surface[0]), 7], [`${a.k} deep / tint`, cr(r.deep, r.tint), 4.5],
+      [`${a.k} dark tint / cream`, cr(r.dTint, DARK_TEXT), 4.5], [`${a.k} dark soft / cream`, cr(r.dSoft, DARK_TEXT), 4.5], [`${a.k} dark light-version / dark tint`, cr(r.dLight, r.dTint), 7]);
   }
   for (const [t, [l, d]] of Object.entries(NEUTRALS)) {
-    if (['text', 'text-2', 'text-3'].includes(t)) { con.push([`${t} on page, light`, cr(l, WHITE), 4.5], [`${t} on surface-2, light`, cr(l, NEUTRALS['surface-2'][0]), 4.5], [`${t} on page, dark`, cr(d, DARK), 4.5], [`${t} on surface-2, dark`, cr(d, NEUTRALS['surface-2'][1]), 4.5]); }
+    if (['text', 'text-2', 'text-3'].includes(t)) { for (const bg of ['page', 'surface', 'surface-2']) con.push([`${t} on ${bg}, light`, cr(l, NEUTRALS[bg][0]), 4.5], [`${t} on ${bg}, dark`, cr(d, NEUTRALS[bg][1]), 4.5]); }
+    if (['rail-text', 'rail-text-2'].includes(t)) con.push([`${t} on the rail`, cr(l, NEUTRALS.rail[0]), 4.5]);
   }
   con.push(['primary button, light', cr(NEUTRALS['primary-bg'][0], NEUTRALS['primary-fg'][0]), 4.5], ['primary button, dark', cr(NEUTRALS['primary-bg'][1], NEUTRALS['primary-fg'][1]), 4.5],
-    ['chip outline #E5E7EB / dark page', cr('#E5E7EB', DARK), 7], ['ring ink / white', cr(INK, WHITE), 7], ['ring #F3F4F6 / dark page', cr(DARK_TEXT, DARK), 7]);
+    ['chip outline #E8DFD2 / dark page', cr('#E8DFD2', DARK), 7], ['ring ink / cream', cr(INK, CREAM), 7], ['ring cream / dark page', cr(DARK_TEXT, DARK), 7]);
   const worst = con.filter(c => c[1] < c[2]);
   const low = con.reduce((b, c) => (c[1] / c[2] < b[1] / b[2] ? c : b));
   row(`text contrast (${con.length} pairs, light and dark)`, worst.length ? worst.map(w => `${w[0]} ${w[1].toFixed(2)}`).join('; ') : `closest ${low[0]} ${low[1].toFixed(2)}`, '>= 4.5 / 7', '', !worst.length);
@@ -254,7 +262,7 @@ function parseBlocks(css) {
   row('mock-up CSS: no raw colour, size, weight, radius or shadow', raw.length ? raw.length + ' found' : 'app.css clean', '0', raw.slice(0, 6).join('; '), !raw.length);
 
   // ---------------------------------------------------------------- print
-  console.log('ws-teacher-tokens — board B palette (IMPROVEMENT_PLAN §2.7, §2.8)');
+  console.log('ws-teacher-tokens — board C palette (the Awsaj look, owner 2026-10-23) under the IMPROVEMENT_PLAN §2.7 / §2.8 rules');
   console.log(`shared-grade sets from ${source}:`);
   for (const [g, l] of Object.entries(sets)) console.log(`  ${g === 'K' ? 'K' : 'Grade ' + g}: ${l.join(' ')}`);
   console.log('');

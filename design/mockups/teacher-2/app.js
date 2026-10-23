@@ -171,8 +171,10 @@
   function skillsScreen() {
     const browse = [['area', 'Maths area'], ['wrm', 'White Rose step'], ['std', 'Standard'], ['map', 'MAP strand'], ['sets', 'My sets']];
     const views = [['big', 'Big'], ['medium', 'Medium'], ['small', 'Small'], ['list', 'List']];
-    return `<div class="head"><h1 class="title">Skills</h1><label class="search">${icon('search')}<span class="sr">Find a skill</span>` +
+    const n = D.skills.filter(s => s.g === S.grade).length;
+    return `<div class="head"><div class="head-text"><p class="eyebrow">Maths Quest · Teacher · ${esc(gradeName(S.grade))} · ${n} skills</p><h1 class="title">Skills</h1></div><label class="search">${icon('search')}<span class="sr">Find a skill</span>` +
       `<input id="search" type="search" placeholder="Find a skill: “add within 20”, “2.NBT.5”, “clocks”" value="${esc(S.q)}" autocomplete="off" data-act="search"></label></div>` +
+      `<p class="serif">Tick what you need; it waits in the tray below.</p>` +
       `<div class="row"><span class="row-label">Browse by</span><div class="seg seg-big scroll-x" role="group" aria-label="Browse by">${browse.map(([k, l]) => `<button data-act="browse" data-arg="${k}" ${pressed(S.browse === k)}>${l}</button>`).join('')}</div>` +
       `<span class="spacer"></span><div class="seg" role="group" aria-label="View">${views.map(([k, l]) => `<button data-act="view" data-arg="${k}" ${pressed(S.view === k)}>${l}</button>`).join('')}</div></div>` +
       `<div class="row"><div class="pills scroll-x" role="group" aria-label="Grade">${GRADES.map(([g, l]) => `<button class="pill" data-act="grade" data-arg="${g}" ${pressed(S.grade === g)}>${S.grade === g ? icon('check') : ''}${l}</button>`).join('')}</div>` +
@@ -214,7 +216,7 @@
     const by = {}; list.forEach(s => { const a = (s.k[0] && SK[s.k[0]] && SK[s.k[0]].a) || codeArea(s.c); (by[a] = by[a] || []).push(s); });
     return `<div class="row"><div class="seg" role="group" aria-label="Standards"><button aria-pressed="true">Common Core</button><button aria-pressed="false">Essential Elements</button></div><span class="note">${list.filter(s => s.k.length).length} of ${list.length} ${gradeName(g)} standards have skills.</span></div>` +
       ORDER.filter(a => by[a]).map(a => `<section class="group" data-domain="${a}"><h2 class="band">${icon(AREAS[a].icon)}${AREAS[a].long}<span class="count">${by[a].length} standards</span></h2>` +
-        by[a].slice(0, S.open['s' + a] ? 99 : 4).map(s => `<div class="weight-row" style="margin-bottom: var(--sp-8)"><b>${esc(s.c)}</b><span class="badge ${s.k.length ? '' : 'quiet'}">${s.k.length ? '✓ Covered' : 'Not yet'}</span></div><p class="note" style="margin-bottom: var(--sp-8)">${esc(s.t)}</p>` +
+        by[a].slice(0, S.open['s' + a] ? 99 : 4).map(s => `<div class="weight-row" style="margin-bottom: var(--sp-8)"><span class="gpill">${esc(s.c)}</span><span class="badge ${s.k.length ? '' : 'quiet'}">${s.k.length ? '✓ Covered' : 'Not yet'}</span></div><p class="note" style="margin-bottom: var(--sp-8)">${esc(s.t)}</p>` +
           (s.k.length ? `<div class="grid" data-view="${S.view}" style="margin-bottom: var(--sp-16)">${s.k.slice(0, 4).map(k => card(SK[k])).join('')}</div>` : '')).join('') +
         (by[a].length > 4 && !S.open['s' + a] ? `<button class="btn" data-act="showall" data-arg="s${a}">Show all ${by[a].length}</button>` : '') + '</section>').join('');
   }
@@ -373,7 +375,8 @@
       ready ? `<div class="summary">${esc(sm.line)}</div><button class="btn" data-act="quiz-share">${icon('share')}Share</button><button class="btn btn-primary" data-act="quiz-print">${icon('print')}Print</button>` : `<div class="summary">Pick what the quiz is built from</div>`);
   }
   function sheetFrame(title, opts, side, foot) {
-    return `<div class="scrim" data-act="close"></div><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="sheet-head"><h2>${esc(title)}</h2><button class="btn close" data-act="close" aria-label="Close">${icon('close')}</button></div>` +
+    const eb = S.sheet === 'lessonprint' ? 'Lesson · ' + esc(findStep(S.lessons.lesson).s.id) : `${S.sheet === 'quiz' ? 'Quiz' : 'Print'} · ${S.tray.length} skill${S.tray.length === 1 ? '' : 's'}`;
+    return `<div class="scrim" data-act="close"></div><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="sheet-head"><div class="head-text"><p class="eyebrow">${eb}</p><h2>${esc(title)}</h2></div><button class="btn close" data-act="close" aria-label="Close">${icon('close')}</button></div>` +
       `<div class="sheet-body"><div class="sheet-opts">${opts}</div><aside class="sheet-side">${side}</aside></div><div class="sheet-foot">${foot}</div></div>`;
   }
   function code() { const ids = S.tray.map(k => k.split(':')[1]).join(''); let h = 7; for (const c of ids) h = (h * 31 + c.charCodeAt(0)) % 46656; const b = (n) => n.toString(36).toUpperCase().padStart(3, '0'); return S.tray.length ? `${b(h)}-${b((h * 7) % 46656)}${S.tray.length > 1 ? '-' + b((h * 13) % 46656) : ''}` : '---'; }
@@ -433,8 +436,8 @@
       list = `<div class="lesson-list" data-domain="${cur.a}"><h2 class="band">${icon(AREAS[cur.a].icon)}${AREAS[cur.a].name} · ${gradeName(L.grade)}<span class="count">${cur.blocks.reduce((n, b) => n + b.steps.length, 0)} lessons</span></h2>` +
         cur.blocks.map(b => `<p class="block-name">${esc(b.term)} block ${b.n}: ${esc(b.name)}</p>${b.steps.map(s => lessonRow(s, b, y, next)).join('')}`).join('') + '</div>';
     }
-    return `<div class="head"><h1 class="title">Lessons</h1><label class="search">${icon('search')}<span class="sr">Find a lesson</span><input id="lsearch" type="search" placeholder="Find a lesson by name or code, e.g. “Hundreds” or “Y3.B1.S4”" value="${esc(L.q)}" data-act="lsearch"></label></div>` +
-      `<p class="last-note">Opened where you were last: ${gradeName(L.grade)} · ${AREAS[cur.a].name} · ${esc(findStep(L.last).s.t)}. The next lesson is marked Next.</p>` +
+    return `<div class="head"><div class="head-text"><p class="eyebrow">White Rose · ${esc(y.name)} · ${esc(gradeName(L.grade))}</p><h1 class="title">Lessons</h1></div><label class="search">${icon('search')}<span class="sr">Find a lesson</span><input id="lsearch" type="search" placeholder="Find a lesson by name or code, e.g. “Hundreds” or “Y3.B1.S4”" value="${esc(L.q)}" data-act="lsearch"></label></div>` +
+      `<p class="serif">Pick up where you left off.</p><p class="last-note">Opened where you were last: ${gradeName(L.grade)} · ${AREAS[cur.a].name} · ${esc(findStep(L.last).s.t)}. The next lesson is marked Next.</p>` +
       `<div class="lessons"><div><p class="col-title">Grade</p><div class="pills scroll-x" style="flex-wrap: wrap; margin-bottom: var(--sp-24)">${GRADES.filter(g => g[0] !== 'M' && g[0] !== '6').map(([g, l]) => `<button class="pill" data-act="lgrade" data-arg="${g}" ${pressed(L.grade === g)}>${L.grade === g ? icon('check') : ''}${l}</button>`).join('')}</div>` +
       `<p class="col-title">Maths area</p><div class="area-list">${areas.map(a => `<button class="area-row" data-domain="${a.a}" data-act="larea" data-arg="${a.a}" ${pressed(a.a === L.area)}>${icon(AREAS[a.a].icon)}${AREAS[a.a].name}<span class="n">${a.blocks.reduce((n, b) => n + b.steps.length, 0)}</span></button>`).join('')}</div></div>` +
       `<div>${list}</div>${lessonPanel()}</div>`;
@@ -479,7 +482,7 @@
       body = `<div class="scroll-x"><table class="t"><thead><tr><th>Skill</th><th>Practised</th><th>Correct</th></tr></thead><tbody>` +
         ['addition:add_facts', 'measurement:time_hour', 'composing:base10_build', 'subtraction:sub_word_problems'].map((k, i) => `<tr><td>${chipHTML(k, { act: 'noop' })}</td><td>${[42, 18, 25, 9][i]} times</td><td><div class="bar" style="width: 120px"><i style="width:${[88, 61, 74, 40][i]}%"></i></div></td></tr>`).join('') + '</tbody></table></div>';
     }
-    return `<div class="head"><h1 class="title">Classes</h1></div><div class="tabs scroll-x" role="group" aria-label="Classes">${tabs.map(([k, l]) => `<button data-act="ctab" data-arg="${k}" ${pressed(S.classes === k)}>${l}</button>`).join('')}</div>${body}`;
+    return `<div class="head"><div class="head-text"><p class="eyebrow">This device · Ms Rivera · Grade 2</p><h1 class="title">Classes</h1></div></div><p class="serif">Everything that happens in the room.</p><div class="tabs scroll-x" role="group" aria-label="Classes">${tabs.map(([k, l]) => `<button data-act="ctab" data-arg="${k}" ${pressed(S.classes === k)}>${l}</button>`).join('')}</div>${body}`;
   }
 
   // ---------------- shell ----------------
