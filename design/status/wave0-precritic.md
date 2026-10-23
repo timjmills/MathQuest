@@ -81,3 +81,30 @@ Times: pinning — screen-slots full sweep 22 min (12:57–13:19, one slot); opt
   on a role page.
 - When S5 adds `ws-screen-slots --baseline`, precritic passes it the same pin and reads that flag's output. The parser
   for the flag's output was written before the flag existed, so check its regex when S5 lands.
+
+## Round 2 (after critic round 1: FAIL, fidelity 6 / honesty 5 / usability 7)
+- Critic r1 (mq-opus-medium) found 13 defect classes. The worst: a crash or timeout could show PASS; the timeout did not
+  stop browser gates; a gate that checked 0 documents showed PASS; --template dropped skills silently.
+- Fixer r2 (mq-opus-medium, a rebuild after a failed round) fixed all 12 code defects in 1f2174e:
+  - A shared `judge()` makes any non-zero exit the parsed findings don't explain, or any timeout, a FAIL.
+  - Timeouts kill the whole process group and its descendants.
+  - Every gate's checked-count is compared with its scope.
+  - Input is validated; `--role` is read from sheet/roles.
+  - `--template` always prints its unit-test and fixtures rows.
+  - The coverage matrix now exists (merged from wave0-gates, 0392cc7) and runs as a node gate with `--slots 2`.
+  - ws-screen-slots' native `--baseline` is used, in S5's pin format (`host:kind`).
+- **Pilot pins (lead's request; STATUS note).** All for the six pilot skills, subtraction sub_50 / 100 / 1k / 10k /
+  100k / 1m _no_regroup:
+  - options-verify: 36 inert nl* values each on sub_50, sub_100 and sub_1k (5f632ba; the speed-audit lane is fixing
+    them in ws-options-verify, and these entries go when it lands).
+  - print-lint S and M: clean.
+  - chromebook-fit and screen-slots: clean.
+  - **Coverage matrix:** `ws-coverage-matrix --skills <six> --baseline design/audit/matrix/baseline.json
+    --write-baseline --slots 2` pins 93 rows run (201 listed: 84 PENDING, 24 N/A). Its red rows are pre-existing
+    findings on these skills, mostly PG-12 overflow at S on the sections and mixed kinds, and H13 density. The pilot
+    lanes inherit them as their starting line; any rise is FAIL.
+
+Times: critic r1 18 min (13:35–13:53). Fixer r2 53 min.
+Times: precritic --skill sub_100_no_regroup with the matrix on --slots 1: wall 440 s (the matrix 439 s; options-verify waited 244 s for a slot held by another session).
+Times: precritic --skill <six pilot skills> with the matrix on --slots 1: wall 1593 s (the matrix 1592 s for 288 documents).
+Times: coverage-matrix pin for the six on --slots 2: 757 s (93 rows × S/M/L).
