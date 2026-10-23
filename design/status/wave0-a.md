@@ -18,5 +18,7 @@ Critic rounds: 0, none
 ## Open questions
 - none
 
+## Times
+
 ## Log
 - 2026-10-23: lane file created by wave0-b (S6); state planned, as recorded in STATUS.md (Wave 0 approved, not yet started for S1/S2/S4/S5/S9).

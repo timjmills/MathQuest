@@ -78,7 +78,7 @@ Generated files are never in a manifest: the integrator regenerates them (`--reg
     "code": "Z9",
     "grade": 1,
     "preset": { "skill": "add", "opts": { "range": 20 } },
-    "standards": { "ccss": ["1.OA.C.6"], "ee": ["M.EE.1.OA.6"] },
+    "standards": { "ccss": ["1.OA.C.6"], "ee": ["M.EE.2.NBT.7"] },
     "wrm": ["Y1.B2.S1"],
     "terms": ["add within 20", "sums to 20", "plus within 20", "adding to 20", "addition to 20"],
     "concepts": ["addition"]

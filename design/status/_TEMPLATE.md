@@ -20,6 +20,11 @@ Critic rounds: <n>, <last verdict, or none>
 ## Open questions
 - none
 
+## Times
+<!-- One line per builder run and critic round, newest first, so audits read times directly (lead request 2026-10-23):
+     "Times: <builder|critic|fix> <step or round>, start <YYYY-MM-DDTHH:MM>Z, end <YYYY-MM-DDTHH:MM>Z, profile <mq-opus-low|mq-opus-medium>"
+     Times are UTC. A run still going has "end —". -->
+
 ## Log
 <!-- Dated entries, newest first: "- YYYY-MM-DD: ..." -->
 - 

@@ -214,7 +214,18 @@ Where a report is missing, the outcome comes from STATUS or git, as noted.
 count includes small one-screen lanes (landing, number families order: 1 round each) and UI fix lanes. The
 skill, page and tagging lanes alone (WRM tagging, White Rose page, lessons, number line, skip-count, Wave 1 C /
 C2, small fixes) sit at 5–15. The 15 lanes that never passed are not in the median; counting them as "at least
-their last round" would raise it. The baseline we compare against is **median 4–5, range 1–15**.
+their last round" would raise it.
+
+**Baseline, reported as both median and mean (lead, 2026-10-23).** Every later cut is measured against both numbers,
+never against the plan's "≈ 5":
+
+| Count | Passed | Median | Mean | Range | Source |
+|---|--:|--:|--:|---|---|
+| Per lane (this file: re-opened runs and a lane's split folders are one lane) | 36 | **4** | **4.8** | 1–15 | `python3 design/status/tally-src/metrics.py` |
+| Per run (the lead's speed audit, `design/status/speed-audit.md` on `claude/sweet-newton-c8wrv1-wip-speed-audit`) | 36 | **3** | **4.4** | 1–15 | that audit, from this tally |
+
+The two counts differ in how a lane that was re-opened or split over folders is counted; both are kept, and a
+later lane's rounds are compared with the matching count.
 
 ---
 
