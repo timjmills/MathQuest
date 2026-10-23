@@ -1,0 +1,2374 @@
+{
+ "tool": "ws-coverage-matrix",
+ "date": "2026-10-23",
+ "commit": "3db219b4f4e0676dd130449d96b41d571f9d36c4",
+ "dirty": true,
+ "partners": "tests/fixtures/precritic/matrix-partners.json",
+ "printInputsHash": "c4eb3565a287111b39aadb2e012577659307cd6facce6829f55ba0815e545ce9",
+ "selection": {
+  "skills": [
+   "addition:add_100_regroup",
+   "addition:add_20_regroup"
+  ],
+  "affected": null,
+  "seventh": null,
+  "shard": null,
+  "kinds": null,
+  "rows": null
+ },
+ "replay": "M4 replay: not built",
+ "timing": {
+  "slots": 2,
+  "batch": 9,
+  "documents": 102,
+  "seconds": 326.7,
+  "docsPerSec": 0.3122,
+  "batches": [
+   {
+    "chunk": 0,
+    "jobs": 9,
+    "ms": 48610
+   },
+   {
+    "chunk": 1,
+    "jobs": 9,
+    "ms": 97918
+   },
+   {
+    "chunk": 2,
+    "jobs": 9,
+    "ms": 62293
+   },
+   {
+    "chunk": 3,
+    "jobs": 9,
+    "ms": 48410
+   },
+   {
+    "chunk": 4,
+    "jobs": 9,
+    "ms": 49773
+   },
+   {
+    "chunk": 5,
+    "jobs": 9,
+    "ms": 54508
+   },
+   {
+    "chunk": 6,
+    "jobs": 9,
+    "ms": 56397
+   },
+   {
+    "chunk": 7,
+    "jobs": 9,
+    "ms": 43224
+   },
+   {
+    "chunk": 8,
+    "jobs": 9,
+    "ms": 62776
+   },
+   {
+    "chunk": 9,
+    "jobs": 9,
+    "ms": 43651
+   },
+   {
+    "chunk": 11,
+    "jobs": 3,
+    "ms": 21363
+   },
+   {
+    "chunk": 10,
+    "jobs": 9,
+    "ms": 46826
+   }
+  ]
+ },
+ "totals": {
+  "OK": 34,
+  "CACHED": 0,
+  "RED": 0,
+  "PENDING": 30,
+  "N/A": 4,
+  "ERROR": 0,
+  "RUN": 0
+ },
+ "rows": [
+  {
+   "id": "addition:add_100_regroup|mixed/bring-back",
+   "kind": "mixed",
+   "row": "bring-back",
+   "skills": [
+    "addition:add_100_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "mixed",
+    "--bring-back"
+   ],
+   "pairs": [
+    "fact--mixed",
+    "legacy--mixed",
+    "perimeter-shape--mixed",
+    "stack--mixed"
+   ],
+   "depHash": "55f673b2cd155ef8d83981e285475e404701f973899841f5bf19df88acd2058c",
+   "status": "PENDING",
+   "step": "a req.bringBack field",
+   "reason": "needs a req.bringBack field: Bring back earlier skills has no buildSheet field yet (§2.5 draws it from the Review / Daily spiral selection; no M-step names the field - the row-2 lane adds it to normaliseRequest)"
+  },
+  {
+   "id": "addition:add_100_regroup|mixed/defaults",
+   "kind": "mixed",
+   "row": "defaults",
+   "skills": [
+    "addition:add_100_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "mixed"
+   ],
+   "pairs": [
+    "fact--mixed",
+    "legacy--mixed",
+    "perimeter-shape--mixed",
+    "stack--mixed"
+   ],
+   "depHash": "a5b85c2676a9e4bce55fdbbc5067dc2fe593a6ae7be661e8541c14f792c460c3",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {},
+     "error": null
+    },
+    "M": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {},
+     "error": null
+    },
+    "L": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_100_regroup|mixed/ex-first",
+   "kind": "mixed",
+   "row": "ex-first",
+   "skills": [
+    "addition:add_100_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "mixed",
+    "--anchors",
+    "first"
+   ],
+   "pairs": [
+    "fact--mixed",
+    "legacy--mixed",
+    "perimeter-shape--mixed",
+    "stack--mixed"
+   ],
+   "depHash": "4f6200937b7e93a3b468853b03d2181c74fa47538a6e06aec88bcdb890462045",
+   "status": "PENDING",
+   "step": "M4",
+   "reason": "needs M4: --anchors first: sheet/anchors.js ANCHOR_MODES is off|side|sections; normaliseAnchors() turns 'first' into 'off', so the page would print with no examples"
+  },
+  {
+   "id": "addition:add_100_regroup|mixed/ex-top",
+   "kind": "mixed",
+   "row": "ex-top",
+   "skills": [
+    "addition:add_100_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "mixed",
+    "--anchors",
+    "top"
+   ],
+   "pairs": [
+    "fact--mixed",
+    "legacy--mixed",
+    "perimeter-shape--mixed",
+    "stack--mixed"
+   ],
+   "depHash": "b467faf26a647953a0086982a2ff447b216f0da3d2960327d56b2bdef02668f7",
+   "status": "PENDING",
+   "step": "M4",
+   "reason": "needs M4: --anchors top: sheet/anchors.js ANCHOR_MODES is off|side|sections; normaliseAnchors() turns 'top' into 'off', so the page would print with no examples"
+  },
+  {
+   "id": "addition:add_100_regroup|mixed/pages-3",
+   "kind": "mixed",
+   "row": "pages-3",
+   "skills": [
+    "addition:add_100_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "mixed",
+    "--pages",
+    "3"
+   ],
+   "pairs": [
+    "fact--mixed",
+    "legacy--mixed",
+    "perimeter-shape--mixed",
+    "stack--mixed"
+   ],
+   "depHash": "b3cd70987896cf988898b202f0df6e3ea08eacc92836ca9691b6d35afb23ec10",
+   "status": "PENDING",
+   "step": "M2",
+   "reason": "needs M2: --kind mixed --pages 3: buildRoleSheet passes no page count to the mixed-practice role (rotation across pages is M2's)"
+  },
+  {
+   "id": "addition:add_100_regroup|quiz/quiz-mixed",
+   "kind": "quiz",
+   "row": "quiz-mixed",
+   "skills": [
+    "addition:add_100_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [],
+   "pairs": [],
+   "depHash": "06c46cec16cdf03cc63f8d1a007088a5a66c81ed547cd15e0b94665d8f95fe94",
+   "status": "PENDING",
+   "step": "T3",
+   "reason": "the Quiz layer (scoring, versions 1-6) on the three kinds lands with T3 / T6; buildSheet has no quiz request yet"
+  },
+  {
+   "id": "addition:add_100_regroup|quiz/quiz-sections",
+   "kind": "quiz",
+   "row": "quiz-sections",
+   "skills": [
+    "addition:add_100_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [],
+   "pairs": [],
+   "depHash": "06c46cec16cdf03cc63f8d1a007088a5a66c81ed547cd15e0b94665d8f95fe94",
+   "status": "PENDING",
+   "step": "T3",
+   "reason": "the Quiz layer (scoring, versions 1-6) on the three kinds lands with T3 / T6; buildSheet has no quiz request yet"
+  },
+  {
+   "id": "addition:add_100_regroup|quiz/quiz-single",
+   "kind": "quiz",
+   "row": "quiz-single",
+   "skills": [
+    "addition:add_100_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [],
+   "pairs": [],
+   "depHash": "06c46cec16cdf03cc63f8d1a007088a5a66c81ed547cd15e0b94665d8f95fe94",
+   "status": "PENDING",
+   "step": "T3",
+   "reason": "the Quiz layer (scoring, versions 1-6) on the three kinds lands with T3 / T6; buildSheet has no quiz request yet"
+  },
+  {
+   "id": "addition:add_100_regroup|sections/bring-back",
+   "kind": "sections",
+   "row": "bring-back",
+   "skills": [
+    "addition:add_100_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--bring-back"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections",
+    "stack--sections"
+   ],
+   "depHash": "c9a32734f77b4d5452513a984a16a29e77311027875add3c45cf8c0b94ffd7d9",
+   "status": "PENDING",
+   "step": "a req.bringBack field",
+   "reason": "needs a req.bringBack field: Bring back earlier skills has no buildSheet field yet (§2.5 draws it from the Review / Daily spiral selection; no M-step names the field - the row-2 lane adds it to normaliseRequest)"
+  },
+  {
+   "id": "addition:add_100_regroup|sections/defaults",
+   "kind": "sections",
+   "row": "defaults",
+   "skills": [
+    "addition:add_100_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections",
+    "stack--sections"
+   ],
+   "depHash": "31952892f7c1c3781eab0a603c450a424f8e4046da02c0cacde375f7029c61e1",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY PG-23": 2
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY PG-23": 2
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-INK ILLEGIBLE": 8,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY PAGEFILL": 1
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_100_regroup|sections/ex-each",
+   "kind": "sections",
+   "row": "ex-each",
+   "skills": [
+    "addition:add_100_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--anchors",
+    "side"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections",
+    "stack--sections"
+   ],
+   "depHash": "340e9094628f040551b290fc994ab4cfa7674c6b557d5205e86aaceb90f2d3b0",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-SIZE TY-11": 18,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PG-23": 2
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-INK ILLEGIBLE": 8,
+      "L-SIZE TY-11": 18,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY DN-2": 2,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PAGEFILL": 1
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PAGEFILL": 2,
+      "L-DENSITY PG-23": 2
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_100_regroup|sections/ex-first",
+   "kind": "sections",
+   "row": "ex-first",
+   "skills": [
+    "addition:add_100_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--anchors",
+    "first"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections",
+    "stack--sections"
+   ],
+   "depHash": "1d83abdd7132552354bd3bd081d1fa32b64efae093688ccdf66d05d1f52843b9",
+   "status": "PENDING",
+   "step": "M4",
+   "reason": "needs M4: --anchors first: sheet/anchors.js ANCHOR_MODES is off|side|sections; normaliseAnchors() turns 'first' into 'off', so the page would print with no examples"
+  },
+  {
+   "id": "addition:add_100_regroup|sections/ex-group",
+   "kind": "sections",
+   "row": "ex-group",
+   "skills": [
+    "addition:add_100_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--anchors",
+    "sections"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections",
+    "stack--sections"
+   ],
+   "depHash": "c383c06bbae0cb13c2e326627124c2421b6442cf588a993f280ad8fb9bd3598d",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-SIZE TY-11": 18,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY PAGEFILL": 1,
+      "L-DENSITY PG-23": 2
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-SIZE TY-11": 18,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY PAGEFILL": 1,
+      "L-DENSITY PG-23": 2
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PAGEFILL": 1
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_100_regroup|sections/ex-top",
+   "kind": "sections",
+   "row": "ex-top",
+   "skills": [
+    "addition:add_100_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--anchors",
+    "top"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections",
+    "stack--sections"
+   ],
+   "depHash": "f1becd56e70544e44693c0ed3cc8b4a46b18ffcd389d2d651e9ee579dfdb7952",
+   "status": "PENDING",
+   "step": "M4",
+   "reason": "needs M4: --anchors top: sheet/anchors.js ANCHOR_MODES is off|side|sections; normaliseAnchors() turns 'top' into 'off', so the page would print with no examples"
+  },
+  {
+   "id": "addition:add_100_regroup|sections/fade-problems",
+   "kind": "sections",
+   "row": "fade-problems",
+   "skills": [
+    "addition:add_100_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--fade",
+    "problems"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections",
+    "stack--sections"
+   ],
+   "depHash": "3d2083b8c172a07472e026a634860d27104be5083ba7a5b3a855614d71cc5bde",
+   "status": "N/A",
+   "reason": "the skill offers no supports (no support option with supportsModel)"
+  },
+  {
+   "id": "addition:add_100_regroup|sections/grouped",
+   "kind": "sections",
+   "row": "grouped",
+   "skills": [
+    "addition:add_100_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--sections",
+    "grouped"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections",
+    "stack--sections"
+   ],
+   "depHash": "ea6c81fed8a040eb8ba6c35e524d52d7c3ab53defb717ee28493c0a57068ff88",
+   "status": "PENDING",
+   "step": "M4",
+   "reason": "needs M4: --sections grouped: each section prints its title (req.sections[i].title, M4); this tree's normaliseRequest drops a section's title"
+  },
+  {
+   "id": "addition:add_100_regroup|sections/pages-2",
+   "kind": "sections",
+   "row": "pages-2",
+   "skills": [
+    "addition:add_100_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--pages",
+    "2"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections",
+    "stack--sections"
+   ],
+   "depHash": "1d12b3ca0c2d8466ad8c4d8629a94059bee28678b40dab3021b3894205b89ce2",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 10,
+     "keyPages": 5,
+     "counts": {
+      "L-INK ILLEGIBLE": 8,
+      "L-OVERFLOW PG-12": 16,
+      "L-DENSITY H13": 10,
+      "L-DENSITY PAGEFILL": 3,
+      "L-DENSITY PG-23": 2
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 10,
+     "keyPages": 5,
+     "counts": {
+      "L-INK ILLEGIBLE": 8,
+      "L-OVERFLOW PG-12": 16,
+      "L-DENSITY H13": 8,
+      "L-DENSITY PAGEFILL": 2,
+      "L-DENSITY PG-23": 2
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 10,
+     "keyPages": 5,
+     "counts": {
+      "L-INK ILLEGIBLE": 8,
+      "L-OVERFLOW PG-12": 16,
+      "L-DENSITY DN-2": 2,
+      "L-DENSITY H13": 6,
+      "L-DENSITY PAGEFILL": 2,
+      "L-DENSITY PG-23": 2
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_100_regroup|sections/parts",
+   "kind": "sections",
+   "row": "parts",
+   "skills": [
+    "addition:add_100_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--sections",
+    "parts"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections",
+    "stack--sections"
+   ],
+   "depHash": "dfa427e4b0d57681c65d464515453d02c6a9a9819b3b77bab40f0122dcade905",
+   "status": "PENDING",
+   "step": "M4",
+   "reason": "needs M4: --sections parts: each section prints its title (req.sections[i].title, M4); this tree's normaliseRequest drops a section's title"
+  },
+  {
+   "id": "addition:add_100_regroup|single/defaults",
+   "kind": "single",
+   "row": "defaults",
+   "skills": [
+    "addition:add_100_regroup"
+   ],
+   "args": [],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "00b52d6e60a3ad82038cef32caec31f353cffdd70ea8a3e439e63c4c054353e1",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_100_regroup|single/ex-each",
+   "kind": "single",
+   "row": "ex-each",
+   "skills": [
+    "addition:add_100_regroup"
+   ],
+   "args": [
+    "--anchors",
+    "side"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "1bc45a2613896db468a5fac828d4994af1aab52f9d63eb4bc1c82269754503f4",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 14,
+      "L-DENSITY H13": 6
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 14,
+      "L-DENSITY H13": 6
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_100_regroup|single/ex-group",
+   "kind": "single",
+   "row": "ex-group",
+   "skills": [
+    "addition:add_100_regroup"
+   ],
+   "args": [
+    "--anchors",
+    "sections"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "ef0d069c07e7a7c458968f2c1e3633ba7c383988d0a01ec0784f36e1dbf33d44",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 8
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 4,
+      "L-DENSITY PAGEFILL": 1
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_100_regroup|single/ex-top",
+   "kind": "single",
+   "row": "ex-top",
+   "skills": [
+    "addition:add_100_regroup"
+   ],
+   "args": [
+    "--anchors",
+    "top"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "ac237e863a297c42e1e9959a4ed7cf15853bd362019e8e45795ba9050decd92a",
+   "status": "PENDING",
+   "step": "M4",
+   "reason": "needs M4: --anchors top: sheet/anchors.js ANCHOR_MODES is off|side|sections; normaliseAnchors() turns 'top' into 'off', so the page would print with no examples"
+  },
+  {
+   "id": "addition:add_100_regroup|single/fade-packet",
+   "kind": "single",
+   "row": "fade-packet",
+   "skills": [
+    "addition:add_100_regroup"
+   ],
+   "args": [
+    "--fade",
+    "packet",
+    "--pages",
+    "3"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "da65f2e8e3ac354ef549ba46c5da6687e1612decd9d1d7ce40fd2816700ebe30",
+   "status": "N/A",
+   "reason": "the skill offers no supports (no support option with supportsModel)"
+  },
+  {
+   "id": "addition:add_100_regroup|single/fade-page",
+   "kind": "single",
+   "row": "fade-page",
+   "skills": [
+    "addition:add_100_regroup"
+   ],
+   "args": [
+    "--fade",
+    "page"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "cdcf9b2b96d2bee2d465aecfad53292ff39ed82941fdf43abae69777e4ede8f6",
+   "status": "N/A",
+   "reason": "the skill offers no supports (no support option with supportsModel)"
+  },
+  {
+   "id": "addition:add_100_regroup|single/fade-problems",
+   "kind": "single",
+   "row": "fade-problems",
+   "skills": [
+    "addition:add_100_regroup"
+   ],
+   "args": [
+    "--fade",
+    "problems"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "d544d7ff452872550772b086e318f5a69dd9d30fee3cdcc888a9ec1c7ac28d54",
+   "status": "N/A",
+   "reason": "the skill offers no supports (no support option with supportsModel)"
+  },
+  {
+   "id": "addition:add_100_regroup|single/layout-fact-rows",
+   "kind": "single",
+   "row": "layout-fact-rows",
+   "skills": [
+    "addition:add_100_regroup"
+   ],
+   "args": [
+    "--roles",
+    "fact-rows"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "aacd1b60ef2fb178e795deb92a139993e5def571a84b6f5dcbd9388d6c1c3993",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_100_regroup|single/layout-timed",
+   "kind": "single",
+   "row": "layout-timed",
+   "skills": [
+    "addition:add_100_regroup"
+   ],
+   "args": [
+    "--roles",
+    "fact-probe"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "172dc2c4b3d60424f9dad9bca9a485ce5412a58cd00a6a73a4bf0f30fd72052c",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "M": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {},
+     "error": null
+    },
+    "L": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-DENSITY PG-23": 2
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_100_regroup|single/layout-todays-number",
+   "kind": "single",
+   "row": "layout-todays-number",
+   "skills": [
+    "addition:add_100_regroup"
+   ],
+   "args": [
+    "--roles",
+    "todays-number"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "6c54bee78c82cc69c478be5a6f6254f35d2f047ed0ab93257274bbb33d2eb52b",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_100_regroup|single/more-cols2+nline+afterpage",
+   "kind": "single",
+   "row": "more-cols2+nline+afterpage",
+   "skills": [
+    "addition:add_100_regroup"
+   ],
+   "args": [
+    "--columns",
+    "2",
+    "--key-place",
+    "after-page",
+    "--opts",
+    "{\"nlOn\":true}"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "a70744d0315519c1f69c54f8737f5eb28a70b0dd1d627bc001d5fc2977938680",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 16
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 12
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_100_regroup|single/more-cols2+nline+short",
+   "kind": "single",
+   "row": "more-cols2+nline+short",
+   "skills": [
+    "addition:add_100_regroup"
+   ],
+   "args": [
+    "--columns",
+    "2",
+    "--key-style",
+    "short",
+    "--opts",
+    "{\"nlOn\":true}"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "bfe143b1d7c73c87c58cf1d22c20d0edd2ac6d118480b3ebaed1c152892471e6",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 8
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 6
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_100_regroup|single/more-cols2+short+afterpage",
+   "kind": "single",
+   "row": "more-cols2+short+afterpage",
+   "skills": [
+    "addition:add_100_regroup"
+   ],
+   "args": [
+    "--columns",
+    "2",
+    "--key-style",
+    "short",
+    "--key-place",
+    "after-page"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "366d641427520f7e6fcc872af7bba750cb395f073c28e45164be455cc67832a2",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 8
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 6
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_100_regroup|single/more-nline+short+afterpage",
+   "kind": "single",
+   "row": "more-nline+short+afterpage",
+   "skills": [
+    "addition:add_100_regroup"
+   ],
+   "args": [
+    "--key-style",
+    "short",
+    "--key-place",
+    "after-page",
+    "--opts",
+    "{\"nlOn\":true}"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "246a403063dce6d6bc30645e38421fc2d02ec6f08ca7a79b9d551547160016c6",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_100_regroup|single/more-prereq",
+   "kind": "single",
+   "row": "more-prereq",
+   "skills": [
+    "addition:add_100_regroup"
+   ],
+   "args": [],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "00b52d6e60a3ad82038cef32caec31f353cffdd70ea8a3e439e63c4c054353e1",
+   "status": "PENDING",
+   "step": "a req field",
+   "reason": "Mix in prerequisite skills (§2.5 More options) has no buildSheet field; the Review role's earlierSkills is a role, not an option"
+  },
+  {
+   "id": "addition:add_100_regroup|single/pages-3",
+   "kind": "single",
+   "row": "pages-3",
+   "skills": [
+    "addition:add_100_regroup"
+   ],
+   "args": [
+    "--pages",
+    "3"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "e774127eaf0d8f006839e0fec09911816d85f0c87bc33832cb97e2d59acc8350",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {},
+     "error": null
+    },
+    "M": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {},
+     "error": null
+    },
+    "L": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_20_regroup|mixed/bring-back",
+   "kind": "mixed",
+   "row": "bring-back",
+   "skills": [
+    "addition:add_20_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "mixed",
+    "--bring-back"
+   ],
+   "pairs": [
+    "fact--mixed",
+    "legacy--mixed",
+    "perimeter-shape--mixed"
+   ],
+   "depHash": "9ddcbf699d7cb655f15c68b0d1bcf99c5b71ceaf3b24b489cc65f027f886b994",
+   "status": "PENDING",
+   "step": "a req.bringBack field",
+   "reason": "needs a req.bringBack field: Bring back earlier skills has no buildSheet field yet (§2.5 draws it from the Review / Daily spiral selection; no M-step names the field - the row-2 lane adds it to normaliseRequest)"
+  },
+  {
+   "id": "addition:add_20_regroup|mixed/defaults",
+   "kind": "mixed",
+   "row": "defaults",
+   "skills": [
+    "addition:add_20_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "mixed"
+   ],
+   "pairs": [
+    "fact--mixed",
+    "legacy--mixed",
+    "perimeter-shape--mixed"
+   ],
+   "depHash": "1d7947571a68c15b56028053e02e0a145e4496850bd3d43a0fd14e7d0a437a55",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {},
+     "error": null
+    },
+    "M": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {},
+     "error": null
+    },
+    "L": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_20_regroup|mixed/ex-first",
+   "kind": "mixed",
+   "row": "ex-first",
+   "skills": [
+    "addition:add_20_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "mixed",
+    "--anchors",
+    "first"
+   ],
+   "pairs": [
+    "fact--mixed",
+    "legacy--mixed",
+    "perimeter-shape--mixed"
+   ],
+   "depHash": "c2dfe71c1752cf6b02f046972bb7d3ca272fa611f85c1805de25bb2c59e40e4c",
+   "status": "PENDING",
+   "step": "M4",
+   "reason": "needs M4: --anchors first: sheet/anchors.js ANCHOR_MODES is off|side|sections; normaliseAnchors() turns 'first' into 'off', so the page would print with no examples"
+  },
+  {
+   "id": "addition:add_20_regroup|mixed/ex-top",
+   "kind": "mixed",
+   "row": "ex-top",
+   "skills": [
+    "addition:add_20_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "mixed",
+    "--anchors",
+    "top"
+   ],
+   "pairs": [
+    "fact--mixed",
+    "legacy--mixed",
+    "perimeter-shape--mixed"
+   ],
+   "depHash": "092a06782397603bc65e3099445e3e027109807d42236174a48ee33779ac86ed",
+   "status": "PENDING",
+   "step": "M4",
+   "reason": "needs M4: --anchors top: sheet/anchors.js ANCHOR_MODES is off|side|sections; normaliseAnchors() turns 'top' into 'off', so the page would print with no examples"
+  },
+  {
+   "id": "addition:add_20_regroup|mixed/pages-3",
+   "kind": "mixed",
+   "row": "pages-3",
+   "skills": [
+    "addition:add_20_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "mixed",
+    "--pages",
+    "3"
+   ],
+   "pairs": [
+    "fact--mixed",
+    "legacy--mixed",
+    "perimeter-shape--mixed"
+   ],
+   "depHash": "dd2f752828f2157baa6c80022920a23e69fa09013a038427d3a00c14d66f149a",
+   "status": "PENDING",
+   "step": "M2",
+   "reason": "needs M2: --kind mixed --pages 3: buildRoleSheet passes no page count to the mixed-practice role (rotation across pages is M2's)"
+  },
+  {
+   "id": "addition:add_20_regroup|quiz/quiz-mixed",
+   "kind": "quiz",
+   "row": "quiz-mixed",
+   "skills": [
+    "addition:add_20_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [],
+   "pairs": [],
+   "depHash": "9a0cc696ca6e9a5baf24ac8da29e5bd81d58b4ab337b8dc5608f9c72c37fb1f6",
+   "status": "PENDING",
+   "step": "T3",
+   "reason": "the Quiz layer (scoring, versions 1-6) on the three kinds lands with T3 / T6; buildSheet has no quiz request yet"
+  },
+  {
+   "id": "addition:add_20_regroup|quiz/quiz-sections",
+   "kind": "quiz",
+   "row": "quiz-sections",
+   "skills": [
+    "addition:add_20_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [],
+   "pairs": [],
+   "depHash": "9a0cc696ca6e9a5baf24ac8da29e5bd81d58b4ab337b8dc5608f9c72c37fb1f6",
+   "status": "PENDING",
+   "step": "T3",
+   "reason": "the Quiz layer (scoring, versions 1-6) on the three kinds lands with T3 / T6; buildSheet has no quiz request yet"
+  },
+  {
+   "id": "addition:add_20_regroup|quiz/quiz-single",
+   "kind": "quiz",
+   "row": "quiz-single",
+   "skills": [
+    "addition:add_20_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [],
+   "pairs": [],
+   "depHash": "9a0cc696ca6e9a5baf24ac8da29e5bd81d58b4ab337b8dc5608f9c72c37fb1f6",
+   "status": "PENDING",
+   "step": "T3",
+   "reason": "the Quiz layer (scoring, versions 1-6) on the three kinds lands with T3 / T6; buildSheet has no quiz request yet"
+  },
+  {
+   "id": "addition:add_20_regroup|sections/bring-back",
+   "kind": "sections",
+   "row": "bring-back",
+   "skills": [
+    "addition:add_20_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--bring-back"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections"
+   ],
+   "depHash": "781e9c1bc97c00c1738bbee79fcbc568ebc96b8b8d8e1fedcd56ec1a4817d52c",
+   "status": "PENDING",
+   "step": "a req.bringBack field",
+   "reason": "needs a req.bringBack field: Bring back earlier skills has no buildSheet field yet (§2.5 draws it from the Review / Daily spiral selection; no M-step names the field - the row-2 lane adds it to normaliseRequest)"
+  },
+  {
+   "id": "addition:add_20_regroup|sections/defaults",
+   "kind": "sections",
+   "row": "defaults",
+   "skills": [
+    "addition:add_20_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections"
+   ],
+   "depHash": "4c6a1ad5c3fdcd0230e634f88c4dd317c2a7ab03740455acf4bc0d45d5db2d63",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY PG-23": 2
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY PG-23": 2
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-INK ILLEGIBLE": 8,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY PAGEFILL": 1
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_20_regroup|sections/ex-each",
+   "kind": "sections",
+   "row": "ex-each",
+   "skills": [
+    "addition:add_20_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--anchors",
+    "side"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections"
+   ],
+   "depHash": "abe9ceb9b7d3ed61592c0b6c6f52553410f3f4a52d2b57402a38a770f684199c",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-SIZE TY-11": 12,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 2,
+      "L-DENSITY PG-23": 2
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-SIZE TY-11": 12,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 2,
+      "L-DENSITY PG-23": 2
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-INK ILLEGIBLE": 8,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 2,
+      "L-DENSITY PAGEFILL": 1
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_20_regroup|sections/ex-first",
+   "kind": "sections",
+   "row": "ex-first",
+   "skills": [
+    "addition:add_20_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--anchors",
+    "first"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections"
+   ],
+   "depHash": "cb71f9b41c5d2a91234b77c6926710da989d6d9080234afc8fcd281ea6b32719",
+   "status": "PENDING",
+   "step": "M4",
+   "reason": "needs M4: --anchors first: sheet/anchors.js ANCHOR_MODES is off|side|sections; normaliseAnchors() turns 'first' into 'off', so the page would print with no examples"
+  },
+  {
+   "id": "addition:add_20_regroup|sections/ex-group",
+   "kind": "sections",
+   "row": "ex-group",
+   "skills": [
+    "addition:add_20_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--anchors",
+    "sections"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections"
+   ],
+   "depHash": "249b353b5ef4365faf9728f0b6c29be7ca1972f83054be4d56ef62bb5d3ca1e5",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-SIZE TY-11": 12,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY DN-2": 2,
+      "L-DENSITY PAGEFILL": 2,
+      "L-DENSITY PG-23": 2
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-SIZE TY-11": 12,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY PAGEFILL": 2,
+      "L-DENSITY PG-23": 2
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PAGEFILL": 2
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_20_regroup|sections/ex-top",
+   "kind": "sections",
+   "row": "ex-top",
+   "skills": [
+    "addition:add_20_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--anchors",
+    "top"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections"
+   ],
+   "depHash": "42fa12836638685b0e49cd538216147f4c086e462aa81a892a1e32d990322e7a",
+   "status": "PENDING",
+   "step": "M4",
+   "reason": "needs M4: --anchors top: sheet/anchors.js ANCHOR_MODES is off|side|sections; normaliseAnchors() turns 'top' into 'off', so the page would print with no examples"
+  },
+  {
+   "id": "addition:add_20_regroup|sections/fade-problems",
+   "kind": "sections",
+   "row": "fade-problems",
+   "skills": [
+    "addition:add_20_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--fade",
+    "problems"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections"
+   ],
+   "depHash": "91f95f7c7f2322abcde1eca494e56bd0701d2ad5084753637d9c1b720abf8d5b",
+   "status": "PENDING",
+   "step": "a coverage value",
+   "reason": "needs a coverage value: --fade problems (Faded problems: a support removed every N problems) has no engine field: sheet/supports.js COVERAGES is whole|needed|fade; it needs a coverage 'problems' with its N (row 2b, the owner of sheet/supports.js; Wave 4.1)"
+  },
+  {
+   "id": "addition:add_20_regroup|sections/grouped",
+   "kind": "sections",
+   "row": "grouped",
+   "skills": [
+    "addition:add_20_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--sections",
+    "grouped"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections"
+   ],
+   "depHash": "b4e9f8eceae85a9cbe54d0c5ec005f7804546e9f388c390167db740a42b54030",
+   "status": "PENDING",
+   "step": "M4",
+   "reason": "needs M4: --sections grouped: each section prints its title (req.sections[i].title, M4); this tree's normaliseRequest drops a section's title"
+  },
+  {
+   "id": "addition:add_20_regroup|sections/pages-2",
+   "kind": "sections",
+   "row": "pages-2",
+   "skills": [
+    "addition:add_20_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--pages",
+    "2"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections"
+   ],
+   "depHash": "017e8a8b8ab9824910d3ea1a77a3eeec57996ecf5a1a6c035b6f4f89ee219f78",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 10,
+     "keyPages": 5,
+     "counts": {
+      "L-INK ILLEGIBLE": 8,
+      "L-OVERFLOW PG-12": 16,
+      "L-DENSITY H13": 10,
+      "L-DENSITY PAGEFILL": 3,
+      "L-DENSITY PG-23": 2
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 10,
+     "keyPages": 5,
+     "counts": {
+      "L-INK ILLEGIBLE": 8,
+      "L-OVERFLOW PG-12": 16,
+      "L-DENSITY H13": 8,
+      "L-DENSITY PAGEFILL": 2,
+      "L-DENSITY PG-23": 2
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 10,
+     "keyPages": 5,
+     "counts": {
+      "L-INK ILLEGIBLE": 8,
+      "L-OVERFLOW PG-12": 16,
+      "L-DENSITY H13": 8,
+      "L-DENSITY PAGEFILL": 2,
+      "L-DENSITY PG-23": 2
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_20_regroup|sections/parts",
+   "kind": "sections",
+   "row": "parts",
+   "skills": [
+    "addition:add_20_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--sections",
+    "parts"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections"
+   ],
+   "depHash": "3d262a38fb38c6ec2b69ff2de6759d198dcc00a51de5dd3879ad530832225a7f",
+   "status": "PENDING",
+   "step": "M4",
+   "reason": "needs M4: --sections parts: each section prints its title (req.sections[i].title, M4); this tree's normaliseRequest drops a section's title"
+  },
+  {
+   "id": "addition:add_20_regroup|single/defaults",
+   "kind": "single",
+   "row": "defaults",
+   "skills": [
+    "addition:add_20_regroup"
+   ],
+   "args": [],
+   "pairs": [
+    "legacy--single"
+   ],
+   "depHash": "ae73feeb3c3571c0fb19d2d52cf6aa46bcdf48dd7f22d22ed87c37eea4092133",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_20_regroup|single/ex-each",
+   "kind": "single",
+   "row": "ex-each",
+   "skills": [
+    "addition:add_20_regroup"
+   ],
+   "args": [
+    "--anchors",
+    "side"
+   ],
+   "pairs": [
+    "legacy--single"
+   ],
+   "depHash": "85d98e30764d6a84fc3216d050d8c55d195dba02cef78845e1fbc4ef3b2cc646",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_20_regroup|single/ex-group",
+   "kind": "single",
+   "row": "ex-group",
+   "skills": [
+    "addition:add_20_regroup"
+   ],
+   "args": [
+    "--anchors",
+    "sections"
+   ],
+   "pairs": [
+    "legacy--single"
+   ],
+   "depHash": "21a9bf26718ba2efc10b296b3f66bcd523af2b00f17aa3c7a13304b8db60db62",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_20_regroup|single/ex-top",
+   "kind": "single",
+   "row": "ex-top",
+   "skills": [
+    "addition:add_20_regroup"
+   ],
+   "args": [
+    "--anchors",
+    "top"
+   ],
+   "pairs": [
+    "legacy--single"
+   ],
+   "depHash": "cf199515f0ca19bdfa20776d942e36e2c9d7910c3ec54ac8b3edb2d32ed9da5f",
+   "status": "PENDING",
+   "step": "M4",
+   "reason": "needs M4: --anchors top: sheet/anchors.js ANCHOR_MODES is off|side|sections; normaliseAnchors() turns 'top' into 'off', so the page would print with no examples"
+  },
+  {
+   "id": "addition:add_20_regroup|single/fade-packet",
+   "kind": "single",
+   "row": "fade-packet",
+   "skills": [
+    "addition:add_20_regroup"
+   ],
+   "args": [
+    "--fade",
+    "packet",
+    "--pages",
+    "3"
+   ],
+   "pairs": [
+    "legacy--single"
+   ],
+   "depHash": "8685940224934fce0b33bf1917f31ec996c7cff4257128c3ff1f14b617871ac7",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {},
+     "error": null
+    },
+    "M": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {},
+     "error": null
+    },
+    "L": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_20_regroup|single/fade-page",
+   "kind": "single",
+   "row": "fade-page",
+   "skills": [
+    "addition:add_20_regroup"
+   ],
+   "args": [
+    "--fade",
+    "page"
+   ],
+   "pairs": [
+    "legacy--single"
+   ],
+   "depHash": "0c31c9096dd3bf456e24723e2ba9ee1dfeb967941ec71c9ecf7c1c61b1550a87",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_20_regroup|single/fade-problems",
+   "kind": "single",
+   "row": "fade-problems",
+   "skills": [
+    "addition:add_20_regroup"
+   ],
+   "args": [
+    "--fade",
+    "problems"
+   ],
+   "pairs": [
+    "legacy--single"
+   ],
+   "depHash": "983fe83718ecd40a7db9a780d29a6ae3b1d124ded02cc3666ebae5206da31828",
+   "status": "PENDING",
+   "step": "a coverage value",
+   "reason": "needs a coverage value: --fade problems (Faded problems: a support removed every N problems) has no engine field: sheet/supports.js COVERAGES is whole|needed|fade; it needs a coverage 'problems' with its N (row 2b, the owner of sheet/supports.js; Wave 4.1)"
+  },
+  {
+   "id": "addition:add_20_regroup|single/layout-fact-rows",
+   "kind": "single",
+   "row": "layout-fact-rows",
+   "skills": [
+    "addition:add_20_regroup"
+   ],
+   "args": [
+    "--roles",
+    "fact-rows"
+   ],
+   "pairs": [
+    "legacy--single"
+   ],
+   "depHash": "b5b9eca50458f910aa957c81b049a89568f32a5d79e57bb1afc944dde1c89eaf",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-OVERFLOW PG-12": 180
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-OVERFLOW PG-12": 36
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-OVERFLOW PG-12": 25
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_20_regroup|single/layout-timed",
+   "kind": "single",
+   "row": "layout-timed",
+   "skills": [
+    "addition:add_20_regroup"
+   ],
+   "args": [
+    "--roles",
+    "fact-probe"
+   ],
+   "pairs": [
+    "legacy--single"
+   ],
+   "depHash": "d2780b9464c87cbca3752fcb62cd7728bbc044346f3a8030c15a0be2b4a75d6d",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_20_regroup|single/layout-todays-number",
+   "kind": "single",
+   "row": "layout-todays-number",
+   "skills": [
+    "addition:add_20_regroup"
+   ],
+   "args": [
+    "--roles",
+    "todays-number"
+   ],
+   "pairs": [
+    "legacy--single"
+   ],
+   "depHash": "b75aa77e69ee1cef7f3ea392789dfbdc85d6596fb336cbe6e6de463665d1a804",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_20_regroup|single/more-cols2+nline+afterpage",
+   "kind": "single",
+   "row": "more-cols2+nline+afterpage",
+   "skills": [
+    "addition:add_20_regroup"
+   ],
+   "args": [
+    "--columns",
+    "2",
+    "--key-place",
+    "after-page",
+    "--opts",
+    "{\"nlOn\":true}"
+   ],
+   "pairs": [
+    "legacy--single"
+   ],
+   "depHash": "4269cec193d868742b667ed4b5ceb187c8a4ff2fbeb678a20d2203100f9a8af3",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_20_regroup|single/more-cols2+nline+short",
+   "kind": "single",
+   "row": "more-cols2+nline+short",
+   "skills": [
+    "addition:add_20_regroup"
+   ],
+   "args": [
+    "--columns",
+    "2",
+    "--key-style",
+    "short",
+    "--opts",
+    "{\"nlOn\":true}"
+   ],
+   "pairs": [
+    "legacy--single"
+   ],
+   "depHash": "d3119b276afca5f115b8b0e2e37a720da4a303ab7adace887b078fc1ee24317c",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_20_regroup|single/more-cols2+short+afterpage",
+   "kind": "single",
+   "row": "more-cols2+short+afterpage",
+   "skills": [
+    "addition:add_20_regroup"
+   ],
+   "args": [
+    "--columns",
+    "2",
+    "--key-style",
+    "short",
+    "--key-place",
+    "after-page"
+   ],
+   "pairs": [
+    "legacy--single"
+   ],
+   "depHash": "d9f6285cf165d32bf731b1f94fa186f20889a6d687e4f3157b7daad9f2856624",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_20_regroup|single/more-nline+short+afterpage",
+   "kind": "single",
+   "row": "more-nline+short+afterpage",
+   "skills": [
+    "addition:add_20_regroup"
+   ],
+   "args": [
+    "--key-style",
+    "short",
+    "--key-place",
+    "after-page",
+    "--opts",
+    "{\"nlOn\":true}"
+   ],
+   "pairs": [
+    "legacy--single"
+   ],
+   "depHash": "60f4999e5df216a7ec37adba4808804c9900f3e231abcc60e90803b718f85bd5",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "addition:add_20_regroup|single/more-prereq",
+   "kind": "single",
+   "row": "more-prereq",
+   "skills": [
+    "addition:add_20_regroup"
+   ],
+   "args": [],
+   "pairs": [
+    "legacy--single"
+   ],
+   "depHash": "ae73feeb3c3571c0fb19d2d52cf6aa46bcdf48dd7f22d22ed87c37eea4092133",
+   "status": "PENDING",
+   "step": "a req field",
+   "reason": "Mix in prerequisite skills (§2.5 More options) has no buildSheet field; the Review role's earlierSkills is a role, not an option"
+  },
+  {
+   "id": "addition:add_20_regroup|single/pages-3",
+   "kind": "single",
+   "row": "pages-3",
+   "skills": [
+    "addition:add_20_regroup"
+   ],
+   "args": [
+    "--pages",
+    "3"
+   ],
+   "pairs": [
+    "legacy--single"
+   ],
+   "depHash": "bdba399d972908e78f488ec1fd0acebc93923a1d212f65e0ea7a29b356f4bf6c",
+   "status": "OK",
+   "sizes": {
+    "S": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {},
+     "error": null
+    },
+    "M": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {},
+     "error": null
+    },
+    "L": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {},
+     "error": null
+    }
+   }
+  }
+ ]
+}

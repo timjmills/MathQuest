@@ -1,0 +1,2 @@
+# golden PNGs and contact sheets are re-rendered on demand; only manifest.json is committed
+*/renders/
