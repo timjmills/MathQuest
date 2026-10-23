@@ -41,6 +41,34 @@ Measured 21:20Z with `ws-print-lint --json` (findings of the rule) and `buildShe
 | (d) sections / mixed composer | sections/*, mixed/defaults | partner algebra:tape_diagram legacy cell | same partner on sub_1k_regroup | critic r1 confirmed |
 | fact-probe chunking | layout-timed L PG-23 ×2 (sub_10k) | fact-probe.js ~136 chunks 9/9/2 | sub_1m_regroup the same | same engine path |
 
+## Per-round findings
+
+### pilot-su-c · critic r1 (2026-10-23, FAIL)
+
+**Automatic checks** (critic r1 findings a machine could measure):
+
+| Finding | Class | Rule | Proposed check | Backtest | Existing check that should have caught it |
+|---|---|---|---|---|---|
+| D1 zero cases flood 2-digit pages (66/120 on sub_50) | CONTENT | card §9.4, P-1 | ws-content-audit: per-skill rate of zero-case items (a column leaving 0, n − 0, answer shorter than minuend) ≤ a declared cap unless `zeros:on` | pilot commit 27577cf FAILs, ff471fd passes | none |
+| D2 place heads off at the default level | SCAFFOLD | WDS VA-30/32 | print-lint L-SUPPORT: a stack whose skill declares `heads` structural must print `.head` at the default level | 27577cf FAIL / ff471fd pass | none |
+| D3 answer box 4.06 mm (< 4.4 mm) | SIZE | TY-21 | print-lint L-ANSAREA: every answer-strip segment ≥ 4.4 mm wide | 27577cf FAIL / ff471fd pass; also flags addition:add_three stacked (a true positive) | none |
+| D4 lesson uses the fallback (regroup warm-up, steps ≠ items) | LESSON | H3, L6 | ws-node-lint: every skill reachable as a Lesson has a prereqs.js entry, or the lesson role is refused for it | 27577cf FAIL / ff471fd pass | none |
+| D5 screen focus not on the ones box, 390 card clips (comma text) | SCREEN | SP-20, H6 | ws-screen-slots: first focused slot is the ones slot on every stack item; ws-chromebook-fit at 390 on 5-6 digit stacks | 27577cf FAIL / ff471fd pass | ws-screen-slots / ws-chromebook-fit SHOULD have (they passed: the 390 card is not in their sample, focus order not checked) |
+| D6 legacy `band` option offered (routes to the legacy cell) | OPTIONS | H4, H3 | ws-options-verify: every option value of a kit skill renders a kit cell (no legacy fallback) and stays in the skill's band | 27577cf FAIL / ff471fd pass | ws-options-verify SHOULD have (checks the promise, not the cell kind) |
+| D7 heads collide at 5-6 digits | INK | H2 | print-lint L-OVERLAP: bounding boxes of neighbouring `.ws-stack .head` text never intersect | 27577cf FAIL / ff471fd pass | none |
+| D8 preset instruction / narrow band | CONTENT | P-29 | ws-presets-unit: a preset's items carry the preset's instruction key; its operands span the preset's declared band | 27577cf FAIL / ff471fd pass | ws-presets-unit SHOULD have (it checks opening, not the dealt items) |
+| D9 wrong answer longer than the strip | KEY | AK-1 | ws-providers-unit: wrongAnswer fits the item's answer slot | unit fixture | none |
+| D11 option label promises items never dealt | OPTIONS | P-31 | ws-options-verify: the label's example items are dealt within N seeds | fixture | none |
+
+**Speed-ups** (what cost time in r1, and the smallest change):
+
+1. **The critic started before the pins were checked** (orchestrator error; the lead ruled r1 a failed round). Fix: rule 0b, now written. Owner: done.
+2. **My first sibling comparison was wrong** (236 vs a true 124): the matrix LOG prints at most 6 counts a row. Fix: the matrix gets a documented `--out` run file as the only comparison input, plus a `ws-coverage-matrix --compare-with <skills>` mode that does the sibling comparison itself. Owner: W0-A (checks).
+3. **The card was silent** on heads-on-by-default vs the support level, lesson data (prereqs.js), the legacy `band` option, and the screen comma path. Most r1 points were lost here. Fix: the spec-card generator adds a "Hosts and roles" section (lesson data present? options inherited from a legacy P11 loop? screen path for comma text?) from the repo. Owner: W0-process (card tool).
+4. **Builder strength**: low effort on an uncertified pair (stack × single had no certificate). Fix: rule 0a, now written. Owner: done.
+5. **Browser-slot waits**: precritic 22 min a pass, of which the coverage matrix is 21 min; three passes ran. Fix: precritic `--rows-from <red list>` to re-run only the red rows after a fix. Owner: W0-A.
+6. **check-signed fails after a correct build** (card §7 lists live options). Owner: W0-process (routed by the lead).
+
 ## Log
 - 2026-10-23 18:40: precritic pass 1 triage. OURS, fixed: fact-probe 1 row a page for 6-digit stacks (fact-probe.js bestCols vs digit clamp with separators); side-anchor overflow and ILLEGIBLE at 4-6 digits (worked steps 5-6 lines -> 4). ENGINE classes, reproduced on approved stack skills: H13 stack pinned in a forced 2-column cell (add_1k_regroup, sub_1k_regroup); TY-11 7 pt step numbers in sheet/anchors.js (add_10k_regroup); fact-rows ILLEGIBLE / PG-12 (sub_100k_regroup, sub_1m_regroup). Mixed-pages lane: sections/*, mixed/defaults. Gap: anchors.js does not reserve the anchor cell's height for its step text. Card tool gap: --check-signed fails after the build because §7 lists live options.
 - 2026-10-23: pilot started 16:43Z; card gate OK; merged origin/claude/sweet-newton-c8wrv1-wip-wave0-gates (bda2b0c), matrix baseline has rows for the six.
