@@ -31,6 +31,13 @@ lane had self-graded 8. The failures fall into a small number of RECURRING class
 
 These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The plan has the reasons; this is the short form.
 
+0. **Batch design decisions (owner, 2026-10-23).** A new design idea from the owner while a build or fix round is running
+   goes on the lane's "Owner design list" (status file, date + the owner's words) and the owner is told it is queued; it
+   is not folded into the running round. When the round passes its critic, the owner sees the whole thing once and
+   approves it or gives ONE batch of changes (with the queued list), built in one round and reviewed in one critic
+   round. Exception: something that blocks the approval itself (a broken flow, something unreadable).
+   *Why:* on 2026-10-23 four mid-build design changes cost the teacher mock-up a round each.
+
 1. **Template first.** Build in this order (§1.5): signed spec card → one model skill at Opus medium → full critic on
    every kind of worksheet, size (S / M / L) and screen host → golden renders saved → the template's other entries and
    presets as data at Opus low → batch critic (§1.3) → owner picture sheet → deploy.
