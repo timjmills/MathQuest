@@ -271,3 +271,4 @@ grow to ≈ 28 min (predicted by `--budget`) once the matrix renders its ≤ 500
   **For the lead:** keep the cap (125 pairs left to the machine sample) or allow ≈ 76 pages for this pair.
 - SKILL_UPGRADE_LIST.md: 346 pointer lines appended (292 skills), a "Wave 0 pinned defects (2026-10-23)" block under each
   family: 26 MC-on-screen, 115 option-verify, 205 node-lint lines.
+- ws-viewport-check re-run after merging the W0-defects fix (0b79cea1): 64 sessions, 0 findings, OK (665 s); its baseline is already empty — add_word_problems and long_div_2digit leave "needs owners".
