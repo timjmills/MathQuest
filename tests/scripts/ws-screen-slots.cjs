@@ -34,8 +34,9 @@
 //                              1-3, its most frequent q.cell.template, 'legacy' when none; the first skill of each
 //                              template in SKILLS order) and write it; no gate runs
 // A sweep adds one check to the doubled-area and paper-verb checks: LEGIBLE, any visible text or answer input in
-// the host card whose contrast against its own background is below 3 : 1 in the mode but not without it (the
-// dark page bleeding into the cell; the board's dark frame). Contrast that is low in both is not this gate's.
+// the whole host view (#gameView, #worksheetView, #quizTakeView incl. every state of the quiz's question dots)
+// whose contrast against its own background is below the WCAG AA bar (4.5 : 1, large text 3 : 1) in the mode
+// but not without it (the dark page bleeding into the cell; the board's dark frame). Contrast that is low in both is not this gate's.
 // Finding kinds (the baseline's "host:kind"): doubled, paper, contrast; in a sweep the host is prefixed with the
 // mode and role ("dark-teacher:worksheet:contrast").
 //
@@ -229,7 +230,16 @@ function DETECT(cellSel, hostSel, textSel) {
 // own shapes) and text over an image or a gradient are not judged.
 function LEGIBLE(rootSel, toggle) {
     const root = document.querySelector(rootSel);
-    if (!root) return { error: 'no host card' };
+    if (!root) return { error: 'no host view' };
+    // the quiz's question dots: every state the pupil meets (plain, answered, flagged, answered + flagged,
+    // current + answered) is probed with a temporary copy of a real dot, under the real CSS
+    const probes = [];
+    const dot = root.querySelector('.qt-q-dot');
+    if (dot) for (const st of ['', 'answered', 'flagged', 'answered flagged', 'current answered']) {
+        const d = dot.cloneNode(true);
+        d.className = `qt-q-dot ${st}`.trim(); d.removeAttribute('onclick'); d.style.transition = 'none';
+        dot.parentNode.appendChild(d); probes.push(d);
+    }
     const parse = (c) => {
         const m = /rgba?\(([^)]+)\)/.exec(c || '');
         if (!m) return null;
@@ -256,12 +266,14 @@ function LEGIBLE(rootSel, toggle) {
         return { r: 255, g: 255, b: 255, a: 1 };
     };
     const over = (fg, bg) => ({ r: fg.r * fg.a + bg.r * (1 - fg.a), g: fg.g * fg.a + bg.g * (1 - fg.a), b: fg.b * fg.a + bg.b * (1 - fg.a) });
+    // WCAG AA: 3 : 1 for large text (24 px, or 18.66 px bold), 4.5 : 1 for the rest
+    const barOf = (el) => { const cs = getComputedStyle(el); const fs = parseFloat(cs.fontSize) || 16; return fs >= 24 || (fs >= 18.66 && Number(cs.fontWeight) >= 700) ? 3 : 4.5; };
     const contrastOf = (el) => {
         if (!vis(el)) return null;
         const bg = bgOf(el);
         const fg = parse(getComputedStyle(el).color);
         if (!bg || !fg) return null;
-        return { r: ratio(over(fg, bg), bg), fg: getComputedStyle(el).color, bg: `rgb(${[bg.r, bg.g, bg.b].map(Math.round).join(', ')})` };
+        return { r: ratio(over(fg, bg), bg), bar: barOf(el), fg: getComputedStyle(el).color, bg: `rgb(${[bg.r, bg.g, bg.b].map(Math.round).join(', ')})` };
     };
     const items = [];
     const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
@@ -270,20 +282,28 @@ function LEGIBLE(rootSel, toggle) {
         const txt = (t.nodeValue || '').trim();
         const el = t.parentElement;
         if (!txt || !el || el.closest('svg, script, style') || items.some((x) => x.el === el)) continue;
-        items.push({ el, sample: txt });
+        items.push({ el, sample: txt, state: probes.includes(el) ? el.className.replace('qt-q-dot', '').trim() : (el.classList.contains('qt-q-dot') ? el.className.replace('qt-q-dot', '').trim() : undefined) });
     }
     for (const i of root.querySelectorAll('input:not([type=hidden]):not([type=checkbox]):not([type=radio]), textarea')) items.push({ el: i, sample: `input ${i.id || i.className || ''}`.trim() });
-    const flagged = items.map((x) => Object.assign(x, { c: contrastOf(x.el) })).filter((x) => x.c && x.c.r < 3);
+    const flagged = items.map((x) => Object.assign(x, { c: contrastOf(x.el) })).filter((x) => x.c && x.c.r < x.c.bar);
     // only what the mode itself made illegible: the same element with the mode's class taken off
     // (html.dark, body.tv-bigboard) is at least 3 : 1 or not shown
     if (toggle && flagged.length) {
         const host = toggle.on === 'html' ? document.documentElement : document.body;
+        // transitions off while the class is away: a 0.2 s colour transition (the quiz dots) would otherwise
+        // report the mode's own colours as the "without" colours and hide the finding
+        const still = document.createElement('style');
+        still.textContent = '*, *::before, *::after { transition: none !important; }';
+        document.head.appendChild(still);
         host.classList.remove(toggle.cls);
         for (const x of flagged) x.off = contrastOf(x.el);
         host.classList.add(toggle.cls);
+        void document.body.offsetHeight;
+        still.remove();
     }
-    const low = flagged.filter((x) => !(x.off && x.off.r < 3))
-        .map((x) => `"${x.sample.slice(0, 24)}" ${x.c.r.toFixed(2)}:1 (${x.c.fg} on ${x.c.bg}${x.off ? `; ${x.off.r.toFixed(2)}:1 without ${toggle.cls}` : ''})`);
+    probes.forEach((d) => d.remove());
+    const low = flagged.filter((x) => !(x.off && x.off.r < x.c.bar))
+        .map((x) => `"${x.sample.slice(0, 24)}"${x.state != null ? ` (dot${x.state ? ' ' + x.state : ''})` : ''} ${x.c.r.toFixed(2)}:1 (${x.c.fg} on ${x.c.bg}${x.off ? `; ${x.off.r.toFixed(2)}:1 without ${toggle.cls}` : ''})`);
     return { low, sameWithout: flagged.length - low.length };
 }
 
@@ -401,7 +421,7 @@ async function prep(page, role) {
                             if (!seen.has(ok.ans)) seen.set(ok.ans, `${key} seed ${seed}`);
                             if (r && r.doubled) r.seedNote = ` [seed ${seed}, answer ${ok.ans}, answerType ${ok.type}]`;
                         }
-                        note('card', r, await legible('#questionCard'));
+                        note('card', r, await legible('#gameView'));
                     }
                 }
                 if (pass.includes('map')) {
@@ -419,7 +439,7 @@ async function prep(page, role) {
                         } catch (e) { return false; }
                     }, c, k);
                     mapOn = ok;
-                    if (ok) { await sleep(350); note('map', await page.evaluate(DETECT, '#visualAid', '#answerInputArea', '#questionCard'), await legible('#questionCard')); }
+                    if (ok) { await sleep(350); note('map', await page.evaluate(DETECT, '#visualAid', '#answerInputArea', '#questionCard'), await legible('#gameView')); }
                 }
                 if (pass.includes('worksheet')) {
                     const ok = await page.evaluate((c, k) => {
@@ -435,7 +455,7 @@ async function prep(page, role) {
                         let leg = null;
                         for (let i = 0; i < nq; i++) {
                             const r = await page.evaluate(DETECT, `#ws_card_${i} .mq-wspaper`, `#ws_card_${i} .mq-answerrow`);
-                            if (SWEEP && !(leg && leg.low && leg.low.length)) leg = await legible(`#ws_card_${i}`);
+                            if (SWEEP && !leg) leg = await legible('#worksheetView');
                             if (r && r.doubled) { worst = r; break; }
                             worst = worst || r;
                         }
@@ -454,7 +474,7 @@ async function prep(page, role) {
                             window.startQuizTest(); return true;
                         } catch (e) { return false; }
                     }, c, k);
-                    if (ok) { await sleep(400); note('quiz', await page.evaluate(DETECT, '#quizTakeView .mq-qtpaper', '#quizTakeView .qt-answer-area'), await legible('#quizTakeView .qt-question-card')); }
+                    if (ok) { await sleep(400); note('quiz', await page.evaluate(DETECT, '#quizTakeView .mq-qtpaper', '#quizTakeView .qt-answer-area'), await legible('#quizTakeView')); }
                     await page.evaluate(() => { try { window.state.quizMode = false; } catch (e) { /* ignore */ } });
                 }
             } catch (e) {

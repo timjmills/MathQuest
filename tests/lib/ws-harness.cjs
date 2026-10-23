@@ -40,8 +40,10 @@ function chromePath() {
   const root = '/opt/pw-browsers';
   try {
     for (const d of fs.readdirSync(root).filter(n => /^chromium-\d+$/.test(n)).sort().reverse()) {
-      const exe = path.join(root, d, 'chrome-linux', 'chrome');
-      if (fs.existsSync(exe)) return exe;
+      for (const sub of ['chrome-linux64', 'chrome-linux']) {
+        const exe = path.join(root, d, sub, 'chrome');
+        if (fs.existsSync(exe)) return exe;
+      }
     }
   } catch (e) { /* no preinstalled browser: let puppeteer find its own */ }
   return undefined;
