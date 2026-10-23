@@ -31,6 +31,10 @@
 #   5. writes design/audit/matrix/<UTC date>[.shard-i-of-n].json (a second run on one date gets <date>T<HHMM>: no run
 #      file is overwritten) and the cache, and prints the commit message and the files to commit. Every run file
 #      carries `commit`, `finished`, `selection` and each row's `status` (ws-coverage-matrix header, THE RUN FILE).
+#   6. the options pin (ws-options-pin.cjs --check, report-only) on the same 1/28 share of its batches as tonight's
+#      slice (with SHARD on a --full run: that shard's batches), into design/audit/matrix/options-pin-<date>.json, so
+#      every live skill's options are re-checked against design/audit/baselines/options-verify.json within 28 nights
+#      (one batch of ≈ 25 skills, ≈ 7 min a night; the whole pin is ≈ 1.9 h on two slots); OPTIONS_PIN=0 skips it.
 # It never edits anything outside design/audit/matrix/. Exit 0 with red rows (--report-only): the deploy gate reads
 # the red rows from the run files (folded); a crash exits non-zero.
 set -euo pipefail
@@ -129,7 +133,23 @@ fi
 node tests/scripts/ws-coverage-matrix.cjs "${ARGS[@]}" | tee "/tmp/ws-matrix-nightly-$DATE$SUFFIX.log"
 
 TALLY=$(grep -E '^ws-coverage-matrix: OK [0-9]' "/tmp/ws-matrix-nightly-$DATE$SUFFIX.log" | tail -1 | sed 's/^ws-coverage-matrix: //')
+
+# Options pin (ws-options-pin.cjs): ws-options-verify against design/audit/baselines/options-verify.json (pinned for every
+# live skill 2026-10-23). Each night checks the same 1/28 share of its batches as the matrix slice (owner: small jobs that
+# never hold up current work); with SHARD (a --full run) that shard's batches. New failing pairs are listed in
+# $DIR/options-pin-<date>.json and do not stop the night; a crash keeps the per-batch JSON (re-run today: --resume).
+OPIN_TALLY="skipped"
+if [ "${OPTIONS_PIN:-1}" != 0 ]; then
+  if [ -n "${SHARD:-}" ]; then OPIN_SHARD=("${SHARD_ARGS[@]}"); else OPIN_SHARD=(--shard "${S:-$ROT/$SLICES}"); fi
+  OPIN_ARGS=(--check --resume --slots "$SLOTS" --out "$DIR/options-pin-$DATE$SUFFIX.json" --report-only "${OPIN_SHARD[@]}")
+  if node tests/scripts/ws-options-pin.cjs "${OPIN_ARGS[@]}" | tee "/tmp/ws-options-pin-$DATE$SUFFIX.log"; then
+    OPIN_TALLY="check ${OPIN_SHARD[*]}, $(grep -E '^against ' "/tmp/ws-options-pin-$DATE$SUFFIX.log" | tail -1 | sed -E 's/^against [^:]*: //')"
+  else
+    OPIN_TALLY="check CRASHED (run the script again today to resume)"
+  fi
+fi
+
 echo
 echo "ws-matrix-nightly: commit message:"
-echo "Repeated check $DATE${SHARD:+ shard $SHARD} on ${HEAD:0:8}: $TALLY ($MODE)"
+echo "Repeated check $DATE${SHARD:+ shard $SHARD} on ${HEAD:0:8}: $TALLY ($MODE); options pin: $OPIN_TALLY"
 echo "ws-matrix-nightly: files to commit: $(git status --porcelain --untracked-files=all -- "$DIR" | awk '{print $2}' | tr '\n' ' ')"

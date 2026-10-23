@@ -12,6 +12,14 @@ The owner set the shape on 2026-10-23: one session a night, and each night check
   - one rotating slice of the rows.
 
   So every row is checked again at least once every four weeks.
+- **Options pin** (after the matrix): `tests/scripts/ws-options-pin.cjs --check --shard <tonight's slice>/28` runs
+  `ws-options-verify` on 1/28 of the batches of 25 live skills (one batch, ≈ 7 min on two slots) against
+  `design/audit/baselines/options-verify.json` (every live skill pinned 2026-10-23: 714 skills, 115 with 335 failing
+  pairs) and writes `design/audit/matrix/options-pin-<date>.json` (new failing pairs, fixed pairs, timings), so every
+  skill's options are re-checked within 28 nights. New pairs do not stop the night; the commit message carries the
+  tally. The whole pin, measured 2026-10-23 (29 batches, `--deadline 600000`): ≈ 1 h 52 min wall on two shared slots,
+  ≈ 16.8 s of slot time a skill. The night never re-writes that baseline; a lane re-pins its own skills with
+  `ws-options-pin --write --skills ...`. `OPTIONS_PIN=0` skips the step.
 
 ## The rows in a slice
 
@@ -186,7 +194,8 @@ sessions are one-off sessions the lead starts when a deploy asks for them ("Repe
 >    - the documents/s line;
 >    - on a baseline night, the count of rows NOT pinned;
 >    - whether the affected rows were dropped over the cap;
->    - the ids of the first 20 RED or ERROR rows, each with its first rise or error.
+>    - the ids of the first 20 RED or ERROR rows, each with its first rise or error;
+>    - the options pin's `against ...` line and its first 20 NEW pairs.
 >
 >    If the script failed, reply with its last 30 lines instead and commit nothing.
 >
