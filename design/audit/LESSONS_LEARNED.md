@@ -27,6 +27,48 @@ lane had self-graded 8. The failures fall into a small number of RECURRING class
 > lone item / lone state, repeats, text ≠ generator and the Chromebook viewport are built in Wave 0 (`design/IMPROVEMENT_PLAN.md`
 > §1.4 S2), each proved by a backtest on a failed commit or a seeded fixture; `ws-precritic` then runs them before every critic round.
 
+## Process rules (owner, 2026-10-23)
+
+These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The plan has the reasons; this is the short form.
+
+1. **Template first.** Build in this order (§1.5): signed spec card → one model skill at Opus medium → full critic on
+   every kind of worksheet, size (S / M / L) and screen host → golden renders saved → the template's other entries and
+   presets as data at Opus low → batch critic (§1.3) → owner picture sheet → deploy.
+   *Check:* the lane brief names the step it is on; nothing is copied onto a template before its model has passed.
+2. **One approved model per (template, kind of worksheet) pair.** A pass on one pair says nothing about another. There is
+   no inheritance across pairs (§1.6.2, §1.6.4).
+   *Check:* a page counts as graded only as RUBRIC "How a page counts as graded" says.
+3. **The spec card is signed before the build starts.** `node tests/scripts/ws-spec-card.mjs` writes
+   `design/cards/<template>/<id>.md` with nine sections: 1 what it teaches · 2 problem types and progression ·
+   3 the drawing · 4 rules that apply (by rule id) · 5 owner rulings · 6 misconceptions · 7 options and presets ·
+   8 gates · 9 open questions. It ends with `Signed: owner, <date>` (§1.4 S3). Builders read the card; critics keep
+   reading the full standards and RUBRIC.
+   *Check:* `ws-spec-card --check-signed` passes before any build. `--check-coverage` (every rule id a critic has cited
+   for the family is on the card) runs again at each build start, so a rule added after signing is caught.
+4. **The order of checks is fixed** (§1.7):
+   1. machine checks in node;
+   2. machine checks in the browser;
+   3. the builder's own look — catches plain faults, **never counts as a grade** (L9);
+   4. critic reading (C1 and C2);
+   5. full grade on all four criteria;
+   6. the owner's look.
+
+   A critic never sees a page whose machine checks are red. The builder's report is the `ws-precritic` table.
+   *Check:* the orchestrator refuses a report without that table, and refuses it if any gate is red except where the
+   pinned baseline is red.
+5. **Flakes are defects.** A FAIL that passes when re-run alone is logged as a defect, with an owner, and counted in the
+   S8 tally (`design/status/defect-tally.csv`) (§1.3).
+   *Check:* the same item flaking twice blocks the deploy until it is fixed.
+6. **Every critic finding is tallied by class** (classes in `design/status/defect-classes.md`, tally in S8).
+   *Check:* a rising class that a machine can measure becomes the next machine check, proved by a backtest (§1.4 S2).
+7. **Two rounds at medium, then stop.** If the same defect survives two rounds at Opus medium, stop the loop: find the
+   root cause, make it a machine check, brief a fresh builder. Which profile builds what is in CLAUDE.md "Agents" (§1.7).
+8. **Lane hygiene** (§1.4 S6, §1.6.6). A lane writes only `design/status/<lane>.md`, never `design/STATUS.md`. Its
+   changes are listed in `design/lanes/<lane>/manifest.json`, applied by `ws-integrate` (once E5 lands). A lane never
+   runs `ws-stamp-assets`. The owner's go for a family is the line `Owner go: <family>, <YYYY-MM-DD>` in the lane file
+   (§1.6.3 step 6).
+   *Check:* the deploy is refused for a family with no go line.
+
 ## PRE-FLIGHT checklist (every lane, before reporting)
 1. Rendered at **S and L** (and M if the grid differs): independent, guided, test, error-analysis + keys; card at
    1280/820/390, worksheet, quiz. Looked at every PNG.
@@ -41,3 +83,4 @@ lane had self-graded 8. The failures fall into a small number of RECURRING class
    reason), all verified.
 8. Gates green: the lane's usual list + `ws-screen-slots` + `ws-story-lint` (word skills).
 9. Self-grade with numbers, and list which caps (H1–H13, OC1–OC15) you checked and why each does not apply.
+10. Paste the `ws-precritic` table in the report (once S1 lands; until then, the lane's gate list with each result).

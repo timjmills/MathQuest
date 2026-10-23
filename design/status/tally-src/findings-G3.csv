@@ -1,0 +1,420 @@
+report,run,round,defect_id,class,kind,carried,severity,rule_ids,family,template,summary
+design/audit/runs/wrm-tagging/Y4-critic.md,wrm-tagging/Y4,2,S1,PEDAGOGY,judgment,no,minor,,wrm-tagging,,About 10 noise pre-skills that are not building blocks (e.g. placevalue:compare on area)
+design/audit/runs/wrm-tagging/Y4-critic.md,wrm-tagging/Y4,2,S2,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"Tagged opts missing or illegal (coordinate_q1 forms, nearest_10 band, compare_decimal decimals, more_less_10 step)"
+design/audit/runs/wrm-tagging/Y4-critic.md,wrm-tagging/Y4,2,S3,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"Systematic: 13 steps claim full but skill does not deal it, or proposal already built"
+design/audit/runs/wrm-tagging/Y4-critic.md,wrm-tagging/Y4,2,S4,PEDAGOGY,judgment,no,minor,,wrm-tagging,,Some related skills weak (line_plot on line graphs)
+design/audit/runs/wrm-tagging/Y4-critic.md,wrm-tagging/Y4,2,R10,OTHER,judgment,no,blocking,WRM-rule-10,wrm-tagging,,Systematic: same key in pre and related on 16 steps (data-rule violation)
+design/audit/runs/wrm-tagging/Y4-critic.md,wrm-tagging/Y4,2,R7,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Tagged skill range wider/narrower than step (nearest_10 2-digit; sub_across_zeros 3-digit)
+design/audit/runs/wrm-tagging/Y4-critic.md,wrm-tagging/Y4,2,U1,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B1.S10 marked gap though place_on_number_line partially covers it
+design/audit/runs/wrm-tagging/Y4-critic.md,wrm-tagging/Y4,2,U2,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B7.S4 fraction_number_line tagged full but deals mostly 0-1 lines
+design/audit/runs/wrm-tagging/Y4-critic.md,wrm-tagging/Y4,2,U3,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B9.S5 missing clause false: compare_decimal can be held to 2 dp
+design/audit/runs/wrm-tagging/Y4-critic.md,wrm-tagging/Y4,2,U4,GIVEAWAY,machine,no,blocking,,wrm-tagging,numberline,"B8.S4 ticks:'one' labels every tick but the answer, giving it away"
+design/audit/runs/wrm-tagging/Y4-critic.md,wrm-tagging/Y4,2,U5,PROCESS,process,no,blocking,,wrm-tagging,,"Owner rulings not applied: roman numerals single skill, improper_mixed direction, exchange count all bands"
+design/audit/runs/wrm-tagging/Y4-critic.md,wrm-tagging/Y4,2,U6,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Tag fix #58 gives a false reason (decimals option already holds dp)
+design/audit/runs/wrm-tagging/Y4-critic.md,wrm-tagging/Y4,2,U7,PROCESS,process,no,minor,,wrm-tagging,,Tag-fix action words used loosely (add/partial misused)
+design/audit/runs/wrm-tagging/Y4-critic.md,wrm-tagging/Y4,2,U8,PROCESS,process,no,blocking,,wrm-tagging,,Report Hardest calls and Caveats sections still describe round 1
+design/audit/runs/wrm-tagging/Y4-critic.md,wrm-tagging/Y4,2,U9,PEDAGOGY,judgment,no,minor,,wrm-tagging,,div10_small_numbers proposal should add tenths/hundredths columns to shift chart
+design/audit/runs/wrm-tagging/Y4-critic-r3.md,wrm-tagging/Y4,3,S1,PEDAGOGY,judgment,no,minor,,wrm-tagging,,"About 7 noise pre-skills (symmetry for angles, time_hour for Roman numerals)"
+design/audit/runs/wrm-tagging/Y4-critic-r3.md,wrm-tagging/Y4,3,S2,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,d_to_f missing denoms opts; coordinate_q1 items reach 18-20 with no band
+design/audit/runs/wrm-tagging/Y4-critic-r3.md,wrm-tagging/Y4,3,S3,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B7.S4 mixed_nl_drag tagged full but never reads a mixed number at a point
+design/audit/runs/wrm-tagging/Y4-critic-r3.md,wrm-tagging/Y4,3,U1,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Full-step sweep: whole_as_fraction deals n/1; sub_fractions_like asks to simplify
+design/audit/runs/wrm-tagging/Y4-critic-r3.md,wrm-tagging/Y4,3,S4,PEDAGOGY,judgment,no,minor,,wrm-tagging,,Related padded: order_least_to_greatest on B12.S3
+design/audit/runs/wrm-tagging/Y4-critic-r3.md,wrm-tagging/Y4,3,S6,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,About 7 pre why labels false (later block called earlier; wrong opts; test-row week)
+design/audit/runs/wrm-tagging/Y4-critic-r3.md,wrm-tagging/Y4,3,S7,PEDAGOGY,judgment,no,minor,,wrm-tagging,,B7.S5 second build frac_beyond_1 closes nothing mixed_nl_drag lacks
+design/audit/runs/wrm-tagging/Y4-critic-r3.md,wrm-tagging/Y4,3,R7,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,sub_across_zeros also deals 2-digit (100-29) though clause says 3-digit
+design/audit/runs/wrm-tagging/Y4-critic-r3.md,wrm-tagging/Y4,3,14,PEDAGOGY,judgment,no,minor,WRM-rule-14,wrm-tagging,,Earlier-step building blocks left only in related (composite_shapes B6.S9; no decimal pre on B9.S4)
+design/audit/runs/wrm-tagging/Y4-critic-r3.md,wrm-tagging/Y4,3,U2,NAME_CONTENT,machine,no,minor,,wrm-tagging,,coordinate_q1 forms filter ignored on print path (half read half plot)
+design/audit/runs/wrm-tagging/Y4-critic-r3.md,wrm-tagging/Y4,3,U3,NAME_CONTENT,machine,no,minor,,wrm-tagging,,"count_by_powers_of_10 step filter regex fails on 1,000,000s (9/12 pass)"
+design/audit/runs/wrm-tagging/Y4-critic-r3.md,wrm-tagging/Y4,3,U4,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,B9.S4 pre has no decimal skill; equiv_frac_visual is noise
+design/audit/runs/wrm-tagging/Y4-critic-r3.md,wrm-tagging/Y4,3,U5,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,"B12.S3 pre noise (symmetry, compose_shapes); turns missing"
+design/audit/runs/wrm-tagging/Y4-critic-r3.md,wrm-tagging/Y4,3,U6,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,B1.S13 pre time_hour forced mapping for Roman numerals
+design/audit/runs/wrm-tagging/Y4-critic-r4.md,wrm-tagging/Y4,4,18-A,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,"7 coordinate_q1 links with no Max Number deal points to (19,18) on a to-10 step"
+design/audit/runs/wrm-tagging/Y4-critic-r4.md,wrm-tagging/Y4,4,18-B,PEDAGOGY,judgment,no,blocking,WRM-rule-18;WRM-rule-9,wrm-tagging,,count_by_step_up cited as count in 3s/50s counts in 3s and 4s from 4-digit numbers
+design/audit/runs/wrm-tagging/Y4-critic-r4.md,wrm-tagging/Y4,4,18-C,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,area_model_mult {} cited as 2-digit x 1-digit deals 3-digit with exchanges (5 links)
+design/audit/runs/wrm-tagging/Y4-critic-r4.md,wrm-tagging/Y4,4,18-D,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,missing_mult_div {} as same facts deals 24 x 12 and 384 ÷ ? (4 links)
+design/audit/runs/wrm-tagging/Y4-critic-r4.md,wrm-tagging/Y4,4,18-E,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,"halve {} on a 2-digit step deals half of 9,222"
+design/audit/runs/wrm-tagging/Y4-critic-r4.md,wrm-tagging/Y4,4,18-F,UNTRUE_TEXT,machine,no,blocking,WRM-rule-18,wrm-tagging,,round_decimals precision 0 labelled nearest whole but deals nearest tenth (2 links)
+design/audit/runs/wrm-tagging/Y4-critic-r4.md,wrm-tagging/Y4,4,U1,PROCESS,process,no,blocking,,wrm-tagging,,Report claims every coordinate_q1 link carries Max 10; true of partials only
+design/audit/runs/wrm-tagging/Y4-critic-r4.md,wrm-tagging/Y4,4,U2,PROCESS,process,no,blocking,WRM-rule-18,wrm-tagging,,linkfit.mjs uses one year-wide ceiling; not step-relative so rule 18 unchecked
+design/audit/runs/wrm-tagging/Y4-critic-r4.md,wrm-tagging/Y4,4,S4,PEDAGOGY,judgment,no,minor,,wrm-tagging,,B9.S6 related money_compare padding (compares coin sets never orders prices)
+design/audit/runs/wrm-tagging/Y4-critic-r4.md,wrm-tagging/Y4,4,S6,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,5 pre why labels false (f_to_d cites B8.S8; mult_facts labelled 12 table; Count in 50s)
+design/audit/runs/wrm-tagging/Y4-critic-r4.md,wrm-tagging/Y4,4,S7,PEDAGOGY,judgment,yes,minor,,wrm-tagging,,B7.S5 second build frac_beyond_1 still closes what mixed_nl_drag shows
+design/audit/runs/wrm-tagging/Y4-critic-r4.md,wrm-tagging/Y4,4,U3,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Stale notes on B1.S8 and B8.S5 contradict their own clauses
+design/audit/runs/wrm-tagging/Y4-critic-r4.md,wrm-tagging/Y4,4,U4,NAME_CONTENT,machine,yes,minor,,wrm-tagging,,coordinate_q1 forms filter still ignored on print path (coord_forms_fix bug)
+design/audit/runs/wrm-tagging/Y4-critic-r4.md,wrm-tagging/Y4,4,U5,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B7.S13 clause omits that half the items are less-than-1/2 sorts
+design/audit/runs/wrm-tagging/Y4-critic-r5.md,wrm-tagging/Y4,5,9,PEDAGOGY,judgment,yes,blocking,WRM-rule-18,wrm-tagging,,missing_mult_div @100 'same facts' deals untaught tables at W01-W02 (B4.S2 B4.S4 B4.S7)
+design/audit/runs/wrm-tagging/Y4-critic-r5.md,wrm-tagging/Y4,5,15,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,"B5.S4 pre seq_10 with no Max counts in 10s from 5,925"
+design/audit/runs/wrm-tagging/Y4-critic-r5.md,wrm-tagging/Y4,5,18,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,div_check_by_multiplying {} deals 3-digit dividends on W06 2-digit steps
+design/audit/runs/wrm-tagging/Y4-critic-r5.md,wrm-tagging/Y4,5,20,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,B5.S13 related div_zero_in_quotient deals 4-digit (Y5) dividends
+design/audit/runs/wrm-tagging/Y4-critic-r5.md,wrm-tagging/Y4,5,23,UNTRUE_TEXT,machine,no,blocking,WRM-rule-18,wrm-tagging,,B6.S2 pre multiply tiles:31 labelled 2-digit x 1 deals 3-digit x 1
+design/audit/runs/wrm-tagging/Y4-critic-r5.md,wrm-tagging/Y4,5,26,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,B6.S2 related double_num_line never km/m; 6.RP rate reasoning
+design/audit/runs/wrm-tagging/Y4-critic-r5.md,wrm-tagging/Y4,5,C1,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,4 related coordinate_graph links deal four-quadrant (Grade 6) points
+design/audit/runs/wrm-tagging/Y4-critic-r5.md,wrm-tagging/Y4,5,C2,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,7 coord_polygon/coord_distance links deal coordinates past 10
+design/audit/runs/wrm-tagging/Y4-critic-r5.md,wrm-tagging/Y4,5,C3,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,10 links deal customary units (lb oz ft) and triangles on metric/time/perimeter steps
+design/audit/runs/wrm-tagging/Y4-critic-r5.md,wrm-tagging/Y4,5,C4,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,7 links deal decimals weeks before the school teaches decimals
+design/audit/runs/wrm-tagging/Y4-critic-r5.md,wrm-tagging/Y4,5,C5,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,4 links deal unlike-denominator compares at Grade 3
+design/audit/runs/wrm-tagging/Y4-critic-r5.md,wrm-tagging/Y4,5,C6,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,B1.S11 related algebra:inequalities deals Grade-6 x<=11 and negatives
+design/audit/runs/wrm-tagging/Y4-critic-r5.md,wrm-tagging/Y4,5,U1,PROCESS,process,no,blocking,WRM-rule-18,wrm-tagging,,"linkfit ceiling too loose (block ceiling, cross-strand earlier week); 0-of-873 proves little"
+design/audit/runs/wrm-tagging/Y4-critic-r5.md,wrm-tagging/Y4,5,S6,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,21 pre why labels say earlier step/block for steps the school teaches later
+design/audit/runs/wrm-tagging/Y4-critic-r5.md,wrm-tagging/Y4,5,U2,PROCESS,process,no,minor,,wrm-tagging,,Report says seq_10 is capped; B5.S4 link has no Max Number
+design/audit/runs/wrm-tagging/Y4-critic-r5.md,wrm-tagging/Y4,5,U3,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,"Labels on B6.S2 expand (cites Y3 to 1,000) and B9.S5 compare (later block) wrong"
+design/audit/runs/wrm-tagging/Y4-critic-r6.md,wrm-tagging/Y4,6,U1,PROCESS,process,no,blocking,WRM-rule-18,wrm-tagging,,"Rewritten linkfit has 6 blind spots G1-G6 (answer/visual unread, °F regex, cent exemption, no concept checks)"
+design/audit/runs/wrm-tagging/Y4-critic-r6.md,wrm-tagging/Y4,6,U2,PROCESS,process,no,minor,,wrm-tagging,,Round 5 claimed area forms:[0] fix removed triangles; it never did (unverified fix)
+design/audit/runs/wrm-tagging/Y4-critic-r6.md,wrm-tagging/Y4,6,A1,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,"B6.S3/S4 related area_perimeter {} deals 2-digit x 2-digit areas to 1,521"
+design/audit/runs/wrm-tagging/Y4-critic-r6.md,wrm-tagging/Y4,6,A2,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,B13.S3 related temperature deals °F items
+design/audit/runs/wrm-tagging/Y4-critic-r6.md,wrm-tagging/Y4,6,A3,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,B9.S6 related order_fdp orders unlike fractions and percents
+design/audit/runs/wrm-tagging/Y4-critic-r6.md,wrm-tagging/Y4,6,A4,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,B7.S15 related estimate_frac_ops deals unlike denominators with negative decimal key
+design/audit/runs/wrm-tagging/Y4-critic-r6.md,wrm-tagging/Y4,6,A5,PEDAGOGY,judgment,no,minor,WRM-rule-18,wrm-tagging,,estimate_sums_diffs place:1000 deals 5-digit sums on B1.S16/S17/B2.S3
+design/audit/runs/wrm-tagging/Y4-critic-r6.md,wrm-tagging/Y4,6,B1,PEDAGOGY,judgment,yes,blocking,WRM-rule-18,wrm-tagging,,area {forms:[0]} links still deal triangle area with decimal key (4 links)
+design/audit/runs/wrm-tagging/Y4-critic-r6.md,wrm-tagging/Y4,6,B2,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,percent_visual related on 4 decimal steps (percent is 6.RP)
+design/audit/runs/wrm-tagging/Y4-critic-r6.md,wrm-tagging/Y4,6,B3,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,B7.S10 related simplify deals GCF (6.NS)
+design/audit/runs/wrm-tagging/Y4-critic-r6.md,wrm-tagging/Y4,6,B4,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,B7.S10 related ratio_tables (6.RP)
+design/audit/runs/wrm-tagging/Y4-critic-r6.md,wrm-tagging/Y4,6,B5,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,B5.S3 related mult_placeholder_zero is 2-digit x 2-digit long multiplication 20 weeks early
+design/audit/runs/wrm-tagging/Y4-critic-r6.md,wrm-tagging/Y4,6,B6,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,B12.S7/S8 related geo_reflect reflects over axes not yet met
+design/audit/runs/wrm-tagging/Y4-critic-r6.md,wrm-tagging/Y4,6,B7,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,B9.S3/S4 related add_decimal 2dp across the whole is Y5 work
+design/audit/runs/wrm-tagging/Y4-critic-r6.md,wrm-tagging/Y4,6,B8,PEDAGOGY,judgment,no,minor,WRM-rule-18,wrm-tagging,,B5.S1 related prime_composite is a Grade 4 idea
+design/audit/runs/wrm-tagging/Y4-critic-r6.md,wrm-tagging/Y4,6,C1,UNTRUE_TEXT,machine,no,blocking,WRM-rule-18,wrm-tagging,,mult_chart fill labelled 'the 6/9/7 row' deals a random window with 11s and 12s
+design/audit/runs/wrm-tagging/Y4-critic-r6.md,wrm-tagging/Y4,6,C2,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,mult_chart_easy full 12x12 chart at W02 on B4.S3/S5
+design/audit/runs/wrm-tagging/Y4-critic-r6.md,wrm-tagging/Y4,6,C3,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B4.S11 mult_chart labelled 'the 0 and 1 rows' never deals them
+design/audit/runs/wrm-tagging/Y4-critic-r6.md,wrm-tagging/Y4,6,D1,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,B9.S8 pre equiv_frac_visual deals fifths/thirds on a halves-and-quarters step
+design/audit/runs/wrm-tagging/Y4-critic-r6.md,wrm-tagging/Y4,6,U3,NAME_CONTENT,machine,no,minor,,wrm-tagging,,Generator: equiv_frac_visual ignores denoms option
+design/audit/runs/wrm-tagging/Y4-critic-r6.md,wrm-tagging/Y4,6,U4,MISSING,machine,no,minor,,wrm-tagging,,Generator: area_perimeter:area has no rectangle-only option
+design/audit/runs/wrm-tagging/Y4-critic-r6.md,wrm-tagging/Y4,6,U5,NAME_CONTENT,machine,no,minor,,wrm-tagging,,Generator: estimate_sums_diffs ignores range option
+design/audit/runs/wrm-tagging/Y4-critic-r6.md,wrm-tagging/Y4,6,U6,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,"B13.S4 should cite B14.S1 taught same week, not later B14.S2"
+design/audit/runs/wrm-tagging/Y4-critic-r7.md,wrm-tagging/Y4,7,U1,PROCESS,process,no,blocking,WRM-rule-18,wrm-tagging,,linkfit gaps G7-G9: options/tiles/bins unread; ?/n and stacked denominators; no unlike-sum or decimal +/- guards
+design/audit/runs/wrm-tagging/Y4-critic-r7.md,wrm-tagging/Y4,7,C,PEDAGOGY,judgment,no,blocking,WRM-rule-18;WRM-rule-19,wrm-tagging,,"12 f_to_d/d_to_f pre links deal percent tiles, quarters before W33 and fifths"
+design/audit/runs/wrm-tagging/Y4-critic-r7.md,wrm-tagging/Y4,7,F,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,"7 equivalence links (select_equiv_frac, equiv_frac_nv, equivalent) deal denominators past Grade 3"
+design/audit/runs/wrm-tagging/Y4-critic-r7.md,wrm-tagging/Y4,7,U2,PROCESS,process,no,blocking,,wrm-tagging,,Report claim equivalent form 0 deals halves and quarters only is false (deals 16ths)
+design/audit/runs/wrm-tagging/Y4-critic-r7.md,wrm-tagging/Y4,7,D,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,B9.S2 related sub_decimal deals 2dp subtraction with exchange (Y5); no 1-n item
+design/audit/runs/wrm-tagging/Y4-critic-r7.md,wrm-tagging/Y4,7,U,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,B7.S11 related fraction_bar_ops deals unlike-denominator sums (WRM Y5)
+design/audit/runs/wrm-tagging/Y4-critic-r7.md,wrm-tagging/Y4,7,N1,PEDAGOGY,judgment,no,minor,WRM-rule-18,wrm-tagging,,"add_decimal 1dp links deal general addition with exchange, not make-a-whole"
+design/audit/runs/wrm-tagging/Y4-critic-r7.md,wrm-tagging/Y4,7,N2,PEDAGOGY,judgment,no,minor,WRM-rule-18,wrm-tagging,,frac_10_100 links deal 0.25 quarters before W33 and 25/1000 decoy
+design/audit/runs/wrm-tagging/Y4-critic-r7.md,wrm-tagging/Y4,7,N3,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,mult_word_problems up to 150; B4.S2 label 'groups of 6' overclaims
+design/audit/runs/wrm-tagging/Y4-critic-r7.md,wrm-tagging/Y4,7,N4,PEDAGOGY,judgment,no,minor,WRM-rule-19,wrm-tagging,,mult_chart window still shows 11s and 12s before W03
+design/audit/runs/wrm-tagging/Y4-critic-r7.md,wrm-tagging/Y4,7,U3,UNTRUE_TEXT,machine,no,blocking,WRM-rule-15,wrm-tagging,,B12.S6 has 2 pre; note claims no other met building block (shape_corners_count exists)
+design/audit/runs/wrm-tagging/Y4-critic-r7.md,wrm-tagging/Y4,7,U4,NAME_CONTENT,machine,no,minor,,wrm-tagging,,Generator: f_to_d bin branch ignores denoms; select_equiv_frac decoys and equivalent form 0 ignore denoms
+design/audit/runs/wrm-tagging/Y4-critic-r8.md,wrm-tagging/Y4,8,R,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,"7 improper_mixed links: rare Click-ALL branch deals 15ths-24ths, sometimes as the answer"
+design/audit/runs/wrm-tagging/Y4-critic-r8.md,wrm-tagging/Y4,8,U1,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,B12.S5 related mixed_shapes deals nets and cross-sections (6.G/7.G)
+design/audit/runs/wrm-tagging/Y4-critic-r8.md,wrm-tagging/Y4,8,U2,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,B5.S14 related probability_basic deals 7.SP probability in W06; why false
+design/audit/runs/wrm-tagging/Y4-critic-r8.md,wrm-tagging/Y4,8,U3,PROCESS,process,no,blocking,WRM-rule-18,wrm-tagging,,"linkfit gaps G10-G12: too few items for rare branches, concept list short, why text never checked"
+design/audit/runs/wrm-tagging/Y4-critic-r8.md,wrm-tagging/Y4,8,W1,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B7.S10 fraction_nl_drag why claims 2/4 and 4/8 on one line; never
+design/audit/runs/wrm-tagging/Y4-critic-r8.md,wrm-tagging/Y4,8,W2,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B7.S9 graph_fractions why claims equivalence on one line; deals thirds and sixths
+design/audit/runs/wrm-tagging/Y4-critic-r8.md,wrm-tagging/Y4,8,W3,UNTRUE_TEXT,machine,yes,minor,,wrm-tagging,,B4.S7 why '7 in a group' overclaim (r7 N3 not fixed here)
+design/audit/runs/wrm-tagging/Y4-critic-r8.md,wrm-tagging/Y4,8,W4,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,"B6.S1/S2 why 'distances in metres' but bare numbers, no units"
+design/audit/runs/wrm-tagging/Y4-critic-r8.md,wrm-tagging/Y4,8,W5,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B9.S8 compose_whole 'understand the whole' deals thirds and sixths on halves step
+design/audit/runs/wrm-tagging/Y4-critic-r8.md,wrm-tagging/Y4,8,U4,NAME_CONTENT,machine,no,minor,,wrm-tagging,,Generator: improper_mixed scaled options exceed 12 and ignore denoms; mixed_shapes cannot exclude nets
+design/audit/runs/wrm-tagging/Y4-critic-r8.md,wrm-tagging/Y4,8,U5,PEDAGOGY,judgment,no,minor,WRM-rule-14,wrm-tagging,,12 steps' Y4 pre tiers not nearest-week-first (harmless)
+design/audit/runs/wrm-tagging/Y4-critic-r9.md,wrm-tagging/Y4,9,T,PEDAGOGY,judgment,no,blocking,WRM-rule-18;WRM-rule-19,wrm-tagging,,"8 links (fact_family, multiples, nl_mult) deal 11 and 12 tables at W02 before they are taught"
+design/audit/runs/wrm-tagging/Y4-critic-r9.md,wrm-tagging/Y4,9,S,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,6 story/remainder links at defaults divide by 13-20 or multiply by 13-15
+design/audit/runs/wrm-tagging/Y4-critic-r9.md,wrm-tagging/Y4,9,U1,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,"B9.S7 related round_sort_tenths rounds hundredths to tenths (5.NBT.A.4), ruled out by step"
+design/audit/runs/wrm-tagging/Y4-critic-r9.md,wrm-tagging/Y4,9,W,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"6 why texts name one table (jumps of 9, multiples of 11, common multiples) on all-tables skills"
+design/audit/runs/wrm-tagging/Y4-critic-r9.md,wrm-tagging/Y4,9,U2,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B9.S8 partition_shapes why cites Recognise a half; every item is fourths
+design/audit/runs/wrm-tagging/Y4-critic-r9.md,wrm-tagging/Y4,9,U3,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,"B1.S8 place_on_number_line why claims jumps of 1,000; items are tap a number"
+design/audit/runs/wrm-tagging/Y4-critic-r9.md,wrm-tagging/Y4,9,U4,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,money_notation {} defaults to plain but whys name dollars and cents
+design/audit/runs/wrm-tagging/Y4-critic-r9.md,wrm-tagging/Y4,9,U5,PROCESS,process,no,blocking,WRM-rule-18,wrm-tagging,,linkfit gaps G13-G15: fact family/multiples/hop tables unread; no 2-digit divisor guard; G12 regex narrow
+design/audit/runs/wrm-tagging/Y4-critic-r9.md,wrm-tagging/Y4,9,U6,PROCESS,process,no,minor,,wrm-tagging,,{range:100} story fix applied on B5.S11 but not carried to same skill elsewhere
+design/audit/runs/wrm-tagging/Y4-critic-r9.md,wrm-tagging/Y4,9,U7,MISSING,machine,no,minor,,wrm-tagging,,Generator: fact_family and multiples have no table option; story skills deal >12 at default
+design/audit/runs/wrm-tagging/Y4-critic-r10.md,wrm-tagging/Y4,10,D,PEDAGOGY,judgment,no,blocking,WRM-rule-18;WRM-rule-19,wrm-tagging,,3 composite_shapes pre links label half-unit sides (2.5) at W20-W21 before decimals
+design/audit/runs/wrm-tagging/Y4-critic-r10.md,wrm-tagging/Y4,10,T',PEDAGOGY,judgment,no,blocking,WRM-rule-18;WRM-rule-19,wrm-tagging,,dot_array_mult and story links deal untaught 7s and 9s at W01 (3 links)
+design/audit/runs/wrm-tagging/Y4-critic-r10.md,wrm-tagging/Y4,10,C,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,11 whys cite a prior step the skill never deals (Horizontal and vertical on parallel skill)
+design/audit/runs/wrm-tagging/Y4-critic-r10.md,wrm-tagging/Y4,10,I1,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,B2.S10 related div_check_by_multiplying deals 3-digit ÷ 1-digit at W16 (Grade 4)
+design/audit/runs/wrm-tagging/Y4-critic-r10.md,wrm-tagging/Y4,10,I2,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,B5.S8 related area_distributive_visual deals 2-digit x 2-digit
+design/audit/runs/wrm-tagging/Y4-critic-r10.md,wrm-tagging/Y4,10,I3,PEDAGOGY,judgment,no,blocking,WRM-rule-18;WRM-rule-19,wrm-tagging,,B6.S8 related classify_triangles deals angle classes at W21 before W27
+design/audit/runs/wrm-tagging/Y4-critic-r10.md,wrm-tagging/Y4,10,W1,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"B1.S8 why 'where 1,000 more lands' false on a 1,000-wide line (r9 wording)"
+design/audit/runs/wrm-tagging/Y4-critic-r10.md,wrm-tagging/Y4,10,W2,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B5.S9 why 'stories with 2-digit x 1-digit' but 119/150 are table facts
+design/audit/runs/wrm-tagging/Y4-critic-r10.md,wrm-tagging/Y4,10,U1,PROCESS,process,no,blocking,WRM-rule-18,wrm-tagging,,"linkfit gaps G16-G18: rows x columns, area-model labels, SVG decimals, cited-step tag check"
+design/audit/runs/wrm-tagging/Y4-critic-r10.md,wrm-tagging/Y4,10,U2,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,"'0-10,000 line' span wording on B1.S9 B6.S1 B6.S2 B1.S3 overclaims"
+design/audit/runs/wrm-tagging/Y4-critic-r10.md,wrm-tagging/Y4,10,U3,UNTRUE_TEXT,machine,yes,minor,,wrm-tagging,,money_notation whys name dimes shown in a quarter of items
+design/audit/runs/wrm-tagging/Y4-critic-r10.md,wrm-tagging/Y4,10,U4,PEDAGOGY,judgment,no,minor,WRM-rule-18,wrm-tagging,,div_check and remainder_too_big reach dividends 100-116 at @100
+design/audit/runs/wrm-tagging/Y4-critic-r10.md,wrm-tagging/Y4,10,U5,NAME_CONTENT,machine,no,minor,,wrm-tagging,,Generator: composite_shapes T-shapes deal half units; B6.S5 full verdict rests on it
+design/audit/runs/wrm-tagging/Y4-critic-r10.md,wrm-tagging/Y4,10,U6,MISSING,machine,no,minor,,wrm-tagging,,"Generator: no Grade-3 hold options on div_check, area_distributive, classify_triangles, mult_word_problems"
+design/audit/runs/wrm-tagging/Y4-critic-r11.md,wrm-tagging/Y4,11,C',UNTRUE_TEXT,machine,no,blocking,G18,wrm-tagging,,"build.py auto re-cite ignores options: 4 pre cite titles the options never deal (Count in 3s, 4-digit)"
+design/audit/runs/wrm-tagging/Y4-critic-r11.md,wrm-tagging/Y4,11,P,UNTRUE_TEXT,machine,no,blocking,WRM-rule-5,wrm-tagging,,perimeter_grid misread as grid-only on 3 steps; it deals written sides and L-shapes (B6.S5 missing clause false)
+design/audit/runs/wrm-tagging/Y4-critic-r11.md,wrm-tagging/Y4,11,W1,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B5.S8 repeated_add_to_mult why cites 23 x 4; items are facts to 6 x 6
+design/audit/runs/wrm-tagging/Y4-critic-r11.md,wrm-tagging/Y4,11,W2,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B1.S4 why 'in 10s along a line'; items count in 2s 5s 10s with no line
+design/audit/runs/wrm-tagging/Y4-critic-r11.md,wrm-tagging/Y4,11,U1,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,composite_whole_sides spec: closes/teaches off the step clause (missing side never asked)
+design/audit/runs/wrm-tagging/Y4-critic-r11.md,wrm-tagging/Y4,11,U2,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,"Minor cite ranges: number line to 50 (lines to 100), place_value_disks band 99 cites to 1,000, hundreds_chart"
+design/audit/runs/wrm-tagging/Y4-critic-r12.md,wrm-tagging/Y4,12,N,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"build.py reads {step,note} as partial: 10 partial covers stay full in SKILL_WRM; changed clauses never emitted"
+design/audit/runs/wrm-tagging/Y4-critic-r12.md,wrm-tagging/Y4,12,B,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,f_to_d partial clauses on 3 steps omit the drag-bin branch with percent and quarter decimals
+design/audit/runs/wrm-tagging/Y4-critic-r12.md,wrm-tagging/Y4,12,R,UNTRUE_TEXT,machine,no,blocking,WRM-rule-7,wrm-tagging,,"B2.S9 estimate_sums_diffs full but deals 5-digit sums and decoys to 174,380"
+design/audit/runs/wrm-tagging/Y4-critic-r12.md,wrm-tagging/Y4,12,I1,UNTRUE_TEXT,machine,no,blocking,WRM-rule-9;WRM-rule-7,wrm-tagging,,B1.S3 hand tagFix tags count_by_step_up step 0 FULL to Y2.B1.S15; counts from any number
+design/audit/runs/wrm-tagging/Y4-critic-r12.md,wrm-tagging/Y4,12,I2,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B1.S8 why names W33-W34 steps as met by W11
+design/audit/runs/wrm-tagging/Y4-critic-r12.md,wrm-tagging/Y4,12,I3,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B5.S2 mult_facts constant 10 cites Multiply by 1 and 0; mostly 10 table
+design/audit/runs/wrm-tagging/Y4-critic-r12.md,wrm-tagging/Y4,12,I4,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B6.S1 place_value_10x x1000 cites Multiply by 100
+design/audit/runs/wrm-tagging/Y4-critic-r12.md,wrm-tagging/Y4,12,U1,PROCESS,process,no,minor,,wrm-tagging,,build.py not reproducible: re-cite tie-break by set hash order flips two labels
+design/audit/runs/wrm-tagging/Y4-critic-r12.md,wrm-tagging/Y4,12,U2,OTHER,judgment,no,minor,,wrm-tagging,,B6.S3 pre repeats the step's own direct key with a wider option set (key reuse rule)
+design/audit/runs/wrm-tagging/Y4-critic-r12.md,wrm-tagging/Y4,12,U3,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,perimeter_grid related whys say counting but 52/150 written; hundreds_chart and seq_10/seq_5 label wording
+design/audit/runs/wrm-tagging/Y4-critic-r13.md,wrm-tagging/Y4,13,U1,PROCESS,process,no,minor,,wrm-tagging,,build.py internal merge check shares the derivation model; not independent (mergecheck.mjs is the guard)
+design/audit/runs/wrm-tagging/Y4-critic-r13.md,wrm-tagging/Y4,13,U2,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,"Partial clauses quote seed-specific counts (49 of 150, 56 of 150) that vary by seed"
+design/audit/runs/wrm-tagging/Y4-critic-r13.md,wrm-tagging/Y4,13,U3,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B8.S5 tagFix why omits the full-with-note before-state (cosmetic)
+design/audit/runs/wrm-tagging/Y4-critic-r13.md,wrm-tagging/Y4,13,U4,OTHER,judgment,yes,minor,,wrm-tagging,,"Related links reuse a direct key with other options on 6 steps (key reuse, allowed)"
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r1.md,wrm-tagging/Y4-lessons,1,F1,PEDAGOGY,judgment,no,blocking,WRM-rule-18;WRM-rule-19,wrm-lessons,,Lesson 4 pre div_word_problems without range divides by 13-15; word_problems_mixed clause hides times-as-many
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r1.md,wrm-tagging/Y4-lessons,1,F2,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-lessons,,Lesson 8 related composite_shapes at default band deals areas to 195 vs lesson's 30
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r1.md,wrm-tagging/Y4-lessons,1,F3,UNTRUE_TEXT,machine,no,blocking,,wrm-lessons,,Lesson 10 pre identify why falsely says other models are thirds/fifths/sixths
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r1.md,wrm-tagging/Y4-lessons,1,G1,PROCESS,process,no,blocking,WRM-rule-18;WRM-rule-19,wrm-lessons,,lessonfit SIZE uses Grade-3 ceiling and reads tables only in text; story steps unread
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r1.md,wrm-tagging/Y4-lessons,1,G2,PROCESS,process,no,blocking,,wrm-lessons,,lessonfit does not fail stated bounds the items exceed or go below
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r1.md,wrm-tagging/Y4-lessons,1,G3,PROCESS,process,no,blocking,,wrm-lessons,,lessonfit does not gate positive/negative claims outside fraction and unit families
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r1.md,wrm-tagging/Y4-lessons,1,n1,UNTRUE_TEXT,machine,no,minor,,wrm-lessons,,Lesson 7 clause says areas 6 to 48; area 4 dealt (sweep made it false)
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r1.md,wrm-tagging/Y4-lessons,1,n2,UNTRUE_TEXT,machine,no,minor,WRM-rule-5,wrm-lessons,,estimate_mass_volume overlaps Y5 capacity_estimate unnamed in rule-5 record
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r1.md,wrm-tagging/Y4-lessons,1,n3,PEDAGOGY,judgment,no,minor,WRM-rule-4,wrm-lessons,,Lesson 13 related time_sense weak fit; compare_durations closes adds 'by how much'
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r1.md,wrm-tagging/Y4-lessons,1,n4,UNTRUE_TEXT,machine,no,minor,,wrm-lessons,,Lesson 15 audit row says totals to 100 dollars; $100.46 dealt
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r1.md,wrm-tagging/Y4-lessons,1,n5,UNTRUE_TEXT,machine,no,minor,WRM-rule-5,wrm-lessons,,money_place_value does not name overlapping vis_coin_options and money_convert
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r1.md,wrm-tagging/Y4-lessons,1,n6,PEDAGOGY,judgment,no,minor,,wrm-lessons,,Lesson 23 double band 20 pre deals doubles past 10 at Reception (optional)
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r1.md,wrm-tagging/Y4-lessons,1,U1,PROCESS,process,no,minor,,wrm-lessons,,lessonfit CITE reads the step id not the why text week
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r2.md,wrm-tagging/Y4-lessons,2,F4,UNTRUE_TEXT,machine,no,blocking,,wrm-lessons,,Lesson 8 related composite_shapes why says every side length given; 2 of 6/8 sides unlabelled
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r2.md,wrm-tagging/Y4-lessons,2,G4,PROCESS,process,no,blocking,,wrm-lessons,,"lessonfit misses layout claims, incomplete number lists, coin denials, 'all the other models show'"
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r2.md,wrm-tagging/Y4-lessons,2,G5,PROCESS,process,no,blocking,WRM-rule-19,wrm-lessons,,lessonfit SUPPORT check does not read tables beyond the source year
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r2.md,wrm-tagging/Y4-lessons,2,n7,PROCESS,process,no,minor,,wrm-lessons,,lessonfit does not read free-text weeks ('week 9') in a why
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r3.md,wrm-tagging/Y4-lessons,3,F5,UNTRUE_TEXT,machine,yes,blocking,,wrm-lessons,,"Lesson 8 why 'two side lengths not labelled' false for T-shape (4 unlabelled, 41/120 items)"
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r3.md,wrm-tagging/Y4-lessons,3,G7,PROCESS,process,no,blocking,,wrm-lessons,,lessonfit does not read count claims of unlabelled sides against geometry
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r3.md,wrm-tagging/Y4-lessons,3,G8,PROCESS,process,no,blocking,WRM-rule-19,wrm-lessons,,"lessonfit misses ranges/word lists, nested coin payloads, table skills with no table option at Support"
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r3.md,wrm-tagging/Y4-lessons,3,G6,PROCESS,process,no,blocking,,wrm-lessons,,lessonfit SIZE bound seed-unstable; committed file fails at other seeds
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r3.md,wrm-tagging/Y4-lessons,3,n7b,PROCESS,process,no,minor,,wrm-lessons,,lessonfit does not read '(W09)' without wk/week
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r3.md,wrm-tagging/Y4-lessons,3,n8,UNTRUE_TEXT,machine,no,minor,,wrm-lessons,,Lesson 4 multi_step_word clause 'numbers to about 120'; max 145
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r4.md,wrm-tagging/Y4-lessons,4,F6,UNTRUE_TEXT,machine,no,blocking,,wrm-lessons,,"Lesson 7 area forms 2 clause names floor, patio or wall; 1 in 5 items is a garden bed"
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r4.md,wrm-tagging/Y4-lessons,4,M1,UNTRUE_TEXT,machine,no,blocking,,wrm-lessons,,Merge hazard: main generator fix makes lesson 10 identify why false on 1 item in 10
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r4.md,wrm-tagging/Y4-lessons,4,G9,PROCESS,process,no,blocking,,wrm-lessons,,"lessonfit misses object lists, ranges, interval lists, fraction families, half-units; bounds on sample"
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r4.md,wrm-tagging/Y4-lessons,4,n9,UNTRUE_TEXT,machine,no,minor,,wrm-lessons,,Lesson 10 'ruler marked in halves or quarters'; every ruler drawn to quarters
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r4.md,wrm-tagging/Y4-lessons,4,U1,PROCESS,process,no,minor,,wrm-lessons,,Critic r3 described garden stories yet passed the clause (critic miss)
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,3,r3-1,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"B3.S8 mult_zeros tagged full but has no x1,000 and only 1-digit numbers"
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,3,r3-2,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B8.S2 missing clause false: dual_pa form labels only 4 sides so pupils already find missing sides
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,3,r3-3,OTHER,judgment,no,blocking,,wrm-tagging,,"B7.S5 two proposals (fd_place_band, thousandths_pv) claim the same clause (duplicate proposal)"
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,3,r3-4,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B7.S8 dec_dp_match named add/subtract but carries the compare/order option
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,3,r3-5,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,B7.S8 pre compare_thousandths is harder than the step
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,3,r3-6,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B3.S3 pre mult_properties why says divide by 1 and itself; deals other properties
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,3,r3-7,PEDAGOGY,judgment,no,minor,,wrm-tagging,,B6.S4 preBuild mult_mixed_int is not a prerequisite
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,3,r3-8,PEDAGOGY,judgment,no,minor,WRM-rule-14,wrm-tagging,,B6.S2 decompose_fractions is the real stepping stone but sits in related
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,3,r3-9,OTHER,judgment,no,minor,,wrm-tagging,,coord_missing_vertex proposal omits Y4.B14.S3 (cross-year proposal reuse)
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,3,r3-10,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B3.S1 multiples only to x9; WRM multiples of 25/50/15 gap unrecorded
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,3,r3-11,PEDAGOGY,judgment,no,minor,,wrm-tagging,,Thin related lists on 4 steps
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,3,r3-U1,NAME_CONTENT,machine,no,minor,,wrm-tagging,,Generator: mass_volume_liquid reads mass in kg with answer 0 on some seeds
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,2,r2-1,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B1.S13 nearest_1000 opts {} deals 4-digit; rounding_table misplaced in pre/related
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,2,r2-2,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,B1.S2 pre-skills are the 4 direct skills again with no lower band
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,2,r2-3,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,B1.S11 pre repeats direct compare and order with no lower band
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,2,r2-4,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B4.S5/S4 improper_mixed full but deals both directions; pre thin
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,2,r2-5,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B5.S9 remainder_too_big check task listed as direct
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,2,r2-6,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,B6.S3 mult_mixed_int proposal placeholder text with no B&W cell; related copies pre
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,2,r2-7,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,B8.S5 composite_shapes in both direct and pre; add a weak pre
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,2,r2-8,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,B11.S5 pre is the direct skill symmetry again
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,2,r2-9,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,B12.S4 pre skips the block's own earlier steps; compare_decimal related why wrong
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,2,r2-10,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B13.S5 partial sub_int needs opts forms 1
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,2,r2-11,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B14.S3 missing clause smaller-to-larger not closed by named builds
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,2,r2-12,OTHER,judgment,no,blocking,,wrm-tagging,,Systemic: 49 steps repeat direct as pre without easier opts; 77 repeat pre in related
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,2,r2-U1,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B4.S1 tagFix text mentions opts forms 0 but partial entry has no opts
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,1,r1-1,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B2.S3 sub_across_zeros direct with add tagFix deals 3-4 digit items
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,1,r1-2,OTHER,judgment,no,blocking,WRM-rule-5,wrm-tagging,,B2.S6 multi_step_big duplicates existing build-list multi_step_four_ops
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,1,r1-3,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B3.S10 divisibility_sort weak partial; mult_zeros untagged; mult_multiples self-contradictory
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,1,r1-4,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B4.S14 full though no skill subtracts from a whole or improper fraction
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,1,r1-5,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"B5.S4 previous-step pre is wrong skill, duplicated; tagFix upgrade note wrong"
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,1,r1-6,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B5.S9 div_remainders (Y3) as direct; divide in both direct and pre
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,1,r1-7,PEDAGOGY,judgment,no,blocking,WRM-rule-14,wrm-tagging,,B6.S1 pre not nearest-first; full tag not demoted by tagFix
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,1,r1-8,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,B7.S7 pre padded from W13 list; place-value chart missing
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,1,r1-9,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B7.S8 full but order_decimals mixes dp and compare differs in whole part
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,1,r1-10,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B8.S2 full tag not demoted; preBuild lists own build (circular)
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,1,r1-11,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"Invalid variant-style option keys (composite_shapes, area, perimeter) file-wide"
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,1,r1-12,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B10.S9 name_2d_shapes could be a partial for naming clause
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,1,r1-13,OTHER,judgment,no,blocking,,wrm-tagging,,B11.S3 translate_grid overlaps vis_migrate_coordinates unflagged; pre thin
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,1,r1-14,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,B12.S3 decimal_models build lacks across-1 control; decimal_whole missing from pre
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,1,r1-15,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B12.S5 sub_decimal in direct while verdict partial; no demotion tagFix
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,1,r1-16,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B12.S7 existing full tag not demoted; pre misses exchange skills
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,1,r1-17,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,"B12.S12 pre copied from unrelated W36 list (bar graphs, mass)"
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,1,r1-18,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B14.S2 no tagFix for length_metric; capacity why wrong; reading_ruler label inches
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,1,r1-19,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B14.S3 unit_conversions direct {} deals customary units
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,1,r1-20a,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,Systemic: pre-skills copied from an unrelated week's prior list
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,1,r1-20b,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Systemic: full tags demoted to partial with no tagFix (lost at merge)
+design/audit/runs/wrm-tagging/Y5-critic-r4.md,wrm-tagging/Y5,4,A,UNTRUE_TEXT,machine,no,blocking,WRM-rule-18,wrm-tagging,,denoms ignored by click-all/sort forms: unrelated denominators in 13 links and 10 directs; B4.S13/S17 overstated FULL
+design/audit/runs/wrm-tagging/Y5-critic-r4.md,wrm-tagging/Y5,4,B,UNTRUE_TEXT,machine,yes,blocking,,wrm-tagging,,Notes used as opts on B14 metric partials: 50-80% customary items at W31; also B7.S2 B12.S5/S6 B8.S1
+design/audit/runs/wrm-tagging/Y5-critic-r4.md,wrm-tagging/Y5,4,C,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,"linkfit size rule drops true building blocks (multiply tiles 21, mult_facts) using deficient partial ceiling"
+design/audit/runs/wrm-tagging/Y5-critic-r4.md,wrm-tagging/Y5,4,D,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,148 re-optioned links keep old why; ~20 name a range 10x what the link deals
+design/audit/runs/wrm-tagging/Y5-critic-r4.md,wrm-tagging/Y5,4,E,OTHER,judgment,no,blocking,WRM-rule-15,wrm-tagging,,"Duplicate pre links hide <3 pre (B15.S3, B3.S1) and identical-item links (B12.S4)"
+design/audit/runs/wrm-tagging/Y5-critic-r4.md,wrm-tagging/Y5,4,U1,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B2.S7 pre equal_sign cited as compare number sentences; all items a+b=?
+design/audit/runs/wrm-tagging/Y5-critic-r4.md,wrm-tagging/Y5,4,U2,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,B10.S7 related pie_chart deals percents not angles; pre subtract filler
+design/audit/runs/wrm-tagging/Y5-critic-r4.md,wrm-tagging/Y5,4,U3,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,B12.S3 related compare_decimal does not share 'crossing the whole'
+design/audit/runs/wrm-tagging/Y5-critic-r4.md,wrm-tagging/Y5,4,U4,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,B13.S5 related add_int formal 7.NS notation (later grade)
+design/audit/runs/wrm-tagging/Y5-critic-r4.md,wrm-tagging/Y5,4,U5,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,remainder_interpret stories divide by 12-17 (5.NBT.B.6) on B5.S6/S11; clause silent
+design/audit/runs/wrm-tagging/Y5-critic-r4.md,wrm-tagging/Y5,4,U6,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"B14.S5/B14.S1 pre multiply {} why says x60/x1,000 but deals 804 x 6"
+design/audit/runs/wrm-tagging/Y5-critic-r4.md,wrm-tagging/Y5,4,U7,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"B3.S10 multiples why 'of 5 and 10' deals 2,6,8,9; more_less_100 why count in 1,000s"
+design/audit/runs/wrm-tagging/Y5-critic-r4.md,wrm-tagging/Y5,4,U8,OTHER,judgment,no,minor,,wrm-tagging,,"dec_compare_same duplicates Y4 dec_same_whole; estimate_big_place, kg_g_convert overlap other lanes"
+design/audit/runs/wrm-tagging/Y5-critic-r4.md,wrm-tagging/Y5,4,U9,PEDAGOGY,judgment,no,minor,WRM-rule-18,wrm-tagging,,B6.S1 related mult_scaling 5.NF.B.5; B7.S4 percent tiles a week early
+design/audit/runs/wrm-tagging/Y5-critic-r4.md,wrm-tagging/Y5,4,U10,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B11.S2 clause 'points on a line' not taught by coord_polygon_draw
+design/audit/runs/wrm-tagging/Y5-critic-r4.md,wrm-tagging/Y5,4,U11,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,"B1.S11 related number_word_names why says compare; B1.S9 pre why to 10,000 deals 3-digit"
+design/audit/runs/wrm-tagging/Y5-critic-r4.md,wrm-tagging/Y5,4,U12,NAME_CONTENT,machine,no,minor,,wrm-tagging,,mass_volume_liquid '0 kg' item still dealt in B14.S1 pre
+design/audit/runs/wrm-tagging/Y5-critic-local-r1.md,wrm-tagging/Y5,1,1,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,863 of 894 pre/related links carry no opts; defaults deal what the pupil has not met
+design/audit/runs/wrm-tagging/Y5-critic-local-r1.md,wrm-tagging/Y5,1,2,PEDAGOGY,judgment,no,blocking,WRM-rule-18;WRM-rule-19,wrm-tagging,,"80 links deal content before the school week teaches it (customary, percent, negatives ...)"
+design/audit/runs/wrm-tagging/Y5-critic-local-r1.md,wrm-tagging/Y5,1,3,UNTRUE_TEXT,machine,no,blocking,WRM-rule-19,wrm-tagging,,14 pre cite a step the school teaches later
+design/audit/runs/wrm-tagging/Y5-critic-local-r1.md,wrm-tagging/Y5,1,4,PEDAGOGY,judgment,no,blocking,WRM-rule-7;WRM-rule-18,wrm-tagging,,72 links range beyond the step (max > 2x per-step limit)
+design/audit/runs/wrm-tagging/Y5-critic-local-r1.md,wrm-tagging/Y5,1,5,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,"24 links deal later-grade content (decimal x decimal, triangle area, fraction x fraction)"
+design/audit/runs/wrm-tagging/Y5-critic-local-r1.md,wrm-tagging/Y5,1,6,UNTRUE_TEXT,machine,no,blocking,WRM-rule-4;WRM-rule-18,wrm-tagging,,"62 false or stale whys (names a table, band or family the items do not deal)"
+design/audit/runs/wrm-tagging/Y5-critic-local-r1.md,wrm-tagging/Y5,1,7,UNTRUE_TEXT,machine,no,blocking,WRM-rule-1;WRM-rule-7,wrm-tagging,,"Overstated FULL: B4.S11, B3.S1, B8.S4 (triangles), B7.S3 doubtful"
+design/audit/runs/wrm-tagging/Y5-critic-local-r1.md,wrm-tagging/Y5,1,8,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"tagFix derivation: 23 partials merge FULL, 48 clauses differ, 2 redundant adds"
+design/audit/runs/wrm-tagging/Y5-critic-local-r1.md,wrm-tagging/Y5,1,9,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,7 partial steps list full direct skills
+design/audit/runs/wrm-tagging/Y5-critic-local-r1.md,wrm-tagging/Y5,1,10,UNTRUE_TEXT,machine,no,blocking,WRM-rule-2,wrm-tagging,,Notes used as opts: clause names forms/denoms but opts empty (9 steps)
+design/audit/runs/wrm-tagging/Y5-critic-local-r1.md,wrm-tagging/Y5,1,11,OTHER,judgment,no,blocking,WRM-rule-3,wrm-tagging,,Own build listed in preBuild on 14 steps (data-rule)
+design/audit/runs/wrm-tagging/Y5-critic-local-r1.md,wrm-tagging/Y5,1,12,PEDAGOGY,judgment,no,blocking,WRM-rule-15,wrm-tagging,,10 steps have fewer than 3 pre with no note
+design/audit/runs/wrm-tagging/Y5-critic-local-r1.md,wrm-tagging/Y5,1,13,UNTRUE_TEXT,machine,no,blocking,WRM-rule-14,wrm-tagging,,9 pre cite a step the skill is not tagged to
+design/audit/runs/wrm-tagging/Y5-critic-local-r1.md,wrm-tagging/Y5,1,14,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,4 degenerate links with fewer than 3 distinct items in 100
+design/audit/runs/wrm-tagging/Y5-critic-local-r1.md,wrm-tagging/Y5,1,15,MISSING,machine,no,blocking,WRM-rule-13;WRM-rule-16,wrm-tagging,,84 of 84 proposals have no closes field
+design/audit/runs/wrm-tagging/Y5-critic-local-r1.md,wrm-tagging/Y5,1,16,PROCESS,process,no,blocking,,wrm-tagging,,Proposals conflict with owner rulings (roman_12 separate skill; options on non-existent skills)
+design/audit/runs/wrm-tagging/Y5-critic-local-r1.md,wrm-tagging/Y5,1,17,UNTRUE_TEXT,machine,no,blocking,WRM-rule-5;WRM-rule-17,wrm-tagging,,time_convert proposal already partly built (unit_conversion_word units 0)
+design/audit/runs/wrm-tagging/Y5-critic-local-r1.md,wrm-tagging/Y5,1,18,PEDAGOGY,judgment,no,blocking,WRM-rule-19,wrm-tagging,,Division bracket links before short division W11 (2)
+design/audit/runs/wrm-tagging/Y5-critic-local-r1.md,wrm-tagging/Y5,1,19,PEDAGOGY,judgment,no,minor,WRM-rule-14,wrm-tagging,,Earlier building block listed as related not pre (combine on B1.S1)
+design/audit/runs/wrm-tagging/Y5-critic-local-r1.md,wrm-tagging/Y5,1,U1,PROCESS,process,no,blocking,,wrm-tagging,,No generator script committed; Y5.json hand-written; helper critic graded under old rules 1-13
+design/audit/runs/wrm-tagging/Y5-critic-r5.md,wrm-tagging/Y5,5,G,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"B12.S11 overstated FULL: divide by 10/100/1,000 never deals a decimal dividend"
+design/audit/runs/wrm-tagging/Y5-critic-r5.md,wrm-tagging/Y5,5,F,OTHER,judgment,no,blocking,WRM-rule-15,wrm-tagging,,"Pre link repeats the step's own direct/partial key+opts (7 links), leaving <3 real pre"
+design/audit/runs/wrm-tagging/Y5-critic-r5.md,wrm-tagging/Y5,5,H,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-lessons,,"Support lesson pre judged at W38: unlike-fraction compares and customary units harder than lesson, false whys"
+design/audit/runs/wrm-tagging/Y5-critic-r5.md,wrm-tagging/Y5,5,X1,OTHER,judgment,no,minor,,wrm-tagging,,Extractor: 4 site titles in neither file; review entries numbering; out-of-grade Support matches silent
+design/audit/runs/wrm-tagging/Y5-critic-r5.md,wrm-tagging/Y5,5,U1,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B5.S11 remainder_interpret clause says 12-17; items include 19
+design/audit/runs/wrm-tagging/Y5-critic-r5.md,wrm-tagging/Y5,5,U2,PEDAGOGY,judgment,no,minor,,wrm-tagging,,B3.S7 pre exponents_simple deals 56 squared for a squares building block
+design/audit/runs/wrm-tagging/Y5-critic-r5.md,wrm-tagging/Y5,5,U3,UNTRUE_TEXT,machine,no,minor,,wrm-lessons,,"Lessons 2/6/7 div_facts why 'divide by 9' deals every table; lessons 10,14,19 whys loose"
+design/audit/runs/wrm-tagging/Y5-critic-r5.md,wrm-tagging/Y5,5,U4,OTHER,judgment,no,minor,,wrm-tagging,,12 lesson-only proposals have steps []; WRM_PROPOSALS merge keyed on steps would drop them
+design/audit/runs/wrm-tagging/Y5-critic-r6.md,wrm-tagging/Y5,6,K,UNTRUE_TEXT,machine,no,blocking,WRM-rule-18,wrm-tagging,,Customary links on metric steps B15.S1/S3/S4 (units:[1] customary under 'metric' why); check scoped to lessons
+design/audit/runs/wrm-tagging/Y5-critic-r6.md,wrm-tagging/Y5,6,L,UNTRUE_TEXT,machine,no,blocking,,wrm-lessons,,Lesson 7 related tape_diagram why 'times-as-many bar'; every item additive
+design/audit/runs/wrm-tagging/Y5-critic-r6.md,wrm-tagging/Y5,6,M,UNTRUE_TEXT,machine,no,blocking,WRM-rule-5,wrm-lessons,,Lesson 10 says no skill adds tenths and hundredths; frac_10_100_nv forms 2 already does
+design/audit/runs/wrm-tagging/Y5-critic-r6.md,wrm-tagging/Y5,6,H',PROCESS,process,no,minor,,wrm-tagging,,linkfit gate holes: unlikeCompare reads text only; why-unit cuts cited title at '('
+design/audit/runs/wrm-tagging/Y5-critic-r6.md,wrm-tagging/Y5,6,Doc,PROCESS,process,no,minor,,wrm-tagging,,Report note about Y4 Measure in grams lesson is inaccurate
+design/audit/runs/wrm-tagging/Y5-critic-r6.md,wrm-tagging/Y5,6,U1,NAME_CONTENT,machine,no,minor,,wrm-tagging,,Generator: frac_10_100_nv forms:[2] does not filter on print path
+design/audit/runs/wrm-tagging/Y5-critic-r6.md,wrm-tagging/Y5,6,U2,PEDAGOGY,judgment,no,minor,,wrm-tagging,,B5.S11 related tape_diagram additive bars; B2.S6 related repeats own partial's twin
+design/audit/runs/wrm-tagging/Y5-critic-r6.md,wrm-tagging/Y5,6,U3,UNTRUE_TEXT,machine,yes,minor,,wrm-tagging,,Carried: B3.S3 mult_properties; lesson 10 add_decimal 0.3+0.04; lesson 14 mass_volume capacity; lesson 3 count in 3s
+design/audit/runs/wrm-tagging/Y5-critic-r6.md,wrm-tagging/Y5,6,U4,PEDAGOGY,judgment,no,minor,,wrm-tagging,,B7.S15 order_fdp includes thirds; B10.S3 add turns_and_angles to preBuild
+design/audit/runs/wrm-tagging/Y5-critic-r7.md,wrm-tagging/Y5,7,N,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"linkfit --fit re-options links without re-checking non-rule why words: B15.S2, lesson 2 whys false"
+design/audit/runs/wrm-tagging/Y5-critic-r7.md,wrm-tagging/Y5,7,N',PROCESS,process,no,minor,,wrm-tagging,,Claim rule satisfied by option text ('Milk jug' counted as a scale)
+design/audit/runs/wrm-tagging/Y5-critic-r7.md,wrm-tagging/Y5,7,M',PROCESS,process,no,blocking,WRM-rule-5,wrm-tagging,,M gate excuses skills named as ordinary words; reads only some option ids (misses rename)
+design/audit/runs/wrm-tagging/Y5-critic-r7.md,wrm-tagging/Y5,7,U1,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B14.S4 related capacity why 'sort containers' after fit moved to convert
+design/audit/runs/wrm-tagging/Y5-critic-r7.md,wrm-tagging/Y5,7,U2,UNTRUE_TEXT,machine,no,minor,,wrm-lessons,,Lesson 1 unit_form why '3 thousands = 30 hundreds'; items never renamed
+design/audit/runs/wrm-tagging/Y5-critic-r7.md,wrm-tagging/Y5,7,U3,PEDAGOGY,judgment,no,minor,WRM-rule-18,wrm-tagging,,frac_mult_word denoms 5 related: 40% whole ÷ unit fraction (5.NF.B.7c)
+design/audit/runs/wrm-tagging/Y5-critic-r7.md,wrm-tagging/Y5,7,U4,PEDAGOGY,judgment,no,minor,WRM-rule-3,wrm-tagging,,B5.S5 pre make_ten unfiltered week-list entry
+design/audit/runs/wrm-tagging/Y5-critic-r7.md,wrm-tagging/Y5,7,U5,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B4.S4 whole_as_fraction why '1 = 4/4' deals n/1; B10.S9 hotspot_quads why 'sort'
+design/audit/runs/wrm-tagging/Y5-critic-r7.md,wrm-tagging/Y5,7,U6,UNTRUE_TEXT,machine,yes,minor,,wrm-lessons,,Lesson 3 count_by_step_up 'Count in 3s' deals 4s half the time; lesson 14 capacity pre
+design/audit/runs/wrm-tagging/Y5-critic-r7.md,wrm-tagging/Y5,7,U7,PEDAGOGY,judgment,no,minor,,wrm-tagging,,frac_10_100 click-all shows thousandths distractors before thousandths taught
+design/audit/runs/wrm-tagging/Y5-critic-r8.md,wrm-tagging/Y5,8,1,PROCESS,process,no,minor,,wrm-tagging,,Gate: array representation claim satisfied by word-work template markup (no live why affected)
+design/audit/runs/wrm-tagging/Y5-critic-r8.md,wrm-tagging/Y5,8,2,PROCESS,process,no,minor,,wrm-tagging,,Gate: missedOptions cuts clause at '(' so 'never a story' not read against labelled value
+design/audit/runs/wrm-tagging/Y5-critic-r8.md,wrm-tagging/Y5,8,3,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B7.S10 related round_decimals 'to a tenth' mostly hundredths; round_fractions deals halves
+design/audit/runs/wrm-tagging/Y5-critic-r8.md,wrm-tagging/Y5,8,4,UNTRUE_TEXT,machine,no,minor,,wrm-lessons,,Lesson 6 pre multiply range 100 cites 2-digit x 1-digit; deals facts
+design/audit/runs/wrm-tagging/Y5-critic-r8.md,wrm-tagging/Y5,8,5,UNTRUE_TEXT,machine,no,minor,,wrm-lessons,,Lesson 8 pre word_problems_mixed: two thirds +/- stories under x/÷ cite
+design/audit/runs/wrm-tagging/Y5-critic-r8.md,wrm-tagging/Y5,8,6,UNTRUE_TEXT,machine,no,minor,,wrm-lessons,,Lesson 20 related compare_decimal 'comparing hundredths' mostly tenths
+design/audit/runs/wrm-tagging/Y5-critic-r8.md,wrm-tagging/Y5,8,7,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B14.S4 related why typo 'one a cell'
+design/audit/runs/wrm-tagging/Y6-critic.md,wrm-tagging/Y6,3,U1,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"B2.S7 mult_placeholder_zero missing clause wrong (always 2x2, pupil writes only the 0)"
+design/audit/runs/wrm-tagging/Y6-critic.md,wrm-tagging/Y6,3,U2,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,B2.S7 reused long_mult bundles multiplication and division under one id (two new things)
+design/audit/runs/wrm-tagging/Y6-critic.md,wrm-tagging/Y6,3,U3,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,B2.S7 pre omits the W03 Y5 multiply lessons; no long_mult preBuild
+design/audit/runs/wrm-tagging/Y6-critic.md,wrm-tagging/Y6,3,U4,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B5.S1 full rests on mass_volume_liquid whose kg scale items answer 0
+design/audit/runs/wrm-tagging/Y6-critic.md,wrm-tagging/Y6,3,U5,NAME_CONTENT,machine,no,blocking,,wrm-tagging,,"Generator: mass_volume_liquid kg scale item empty dial, answer 0"
+design/audit/runs/wrm-tagging/Y6-critic.md,wrm-tagging/Y6,3,U6,UNTRUE_TEXT,machine,no,blocking,WRM-rule-2,wrm-tagging,,B4.S7 partial fraction_of_set_hard_nv missing forms 1 opts; frac_find_whole bar on No-Visuals skill
+design/audit/runs/wrm-tagging/Y6-critic.md,wrm-tagging/Y6,3,U7,UNTRUE_TEXT,machine,no,blocking,WRM-rule-2,wrm-tagging,,B5.S5 imperial partials carry no units opts and deal metric; metric_imperial fact box within-system
+design/audit/runs/wrm-tagging/Y6-critic.md,wrm-tagging/Y6,3,U8,UNTRUE_TEXT,machine,no,blocking,WRM-rule-2,wrm-tagging,,"B1.S3 pv_digit_drag no source opts; duplicate 9,999,999 band; vis_pv_bands_millions teaches copies representation"
+design/audit/runs/wrm-tagging/Y6-critic.md,wrm-tagging/Y6,3,U9,PEDAGOGY,judgment,no,blocking,WRM-rule-19,wrm-tagging,,B7.S3 pre leads with a skill the school teaches the week after
+design/audit/runs/wrm-tagging/Y6-critic.md,wrm-tagging/Y6,3,U10,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B7.S3 missing 'no algebraic convention' partly false (3n recognised in click form)
+design/audit/runs/wrm-tagging/Y6-critic.md,wrm-tagging/Y6,3,U11,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,B12.S5 pre identify_lines not a prerequisite for triangle angle cases
+design/audit/runs/wrm-tagging/Y6-critic.md,wrm-tagging/Y6,3,U12,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B1.S8 pre whys overclaim: count_by_step_down never crosses 0; temperature never below 0
+design/audit/runs/wrm-tagging/Y6-critic.md,wrm-tagging/Y6,3,U13,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B10.S6 pre whys cite wk W23/W25; list is W24
+design/audit/runs/wrm-tagging/Y6-critic.md,wrm-tagging/Y6,3,U14,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B2.S15 note omits three_ops_no_paren negative answers at Max 100
+design/audit/runs/wrm-tagging/Y6-critic.md,wrm-tagging/Y6,3,U15,PEDAGOGY,judgment,no,minor,,wrm-tagging,,B6.S6 reused scale proposal spans S5-S7; options must split
+design/audit/runs/wrm-tagging/Y6-critic-r1.md,wrm-tagging/Y6,1,F1,PROCESS,process,no,blocking,,wrm-tagging,,Output contract breached: Y6-report.md missing
+design/audit/runs/wrm-tagging/Y6-critic-r1.md,wrm-tagging/Y6,1,F2,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"36 tag differences vs SKILL_WRM not recorded as tagFixes (downgrades, lifts, adds)"
+design/audit/runs/wrm-tagging/Y6-critic-r1.md,wrm-tagging/Y6,1,F3,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"Notes misread the xlsx: W09, W14, W29 claimed test week/no list"
+design/audit/runs/wrm-tagging/Y6-critic-r1.md,wrm-tagging/Y6,1,U1,OTHER,judgment,no,blocking,WRM-rule-5,wrm-tagging,,B1.S5 new nl_millions duplicates existing nl_20 proposal
+design/audit/runs/wrm-tagging/Y6-critic-r1.md,wrm-tagging/Y6,1,U2,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B2.S4 missing clause false: divisibility_sort prints the rule card
+design/audit/runs/wrm-tagging/Y6-critic-r1.md,wrm-tagging/Y6,1,U3,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,B2.S13 wp_multidigit option spans two skills
+design/audit/runs/wrm-tagging/Y6-critic-r1.md,wrm-tagging/Y6,1,U4,PEDAGOGY,judgment,no,blocking,WRM-rule-3,wrm-tagging,,B4.S1 preBuild lists own build; note says direct but partial; pre noise
+design/audit/runs/wrm-tagging/Y6-critic-r1.md,wrm-tagging/Y6,1,U5,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,"B6.S1 pre copied from shared week, not prerequisites"
+design/audit/runs/wrm-tagging/Y6-critic-r1.md,wrm-tagging/Y6,1,U6,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B10.S2 full though no skill compares same perimeter different areas (3.MD.D.8)
+design/audit/runs/wrm-tagging/Y6-critic-r1.md,wrm-tagging/Y6,1,U7,OTHER,judgment,no,blocking,WRM-rule-10,wrm-tagging,,B12.S3/S4 related mirrors pre copy-paste; classify_triangles not a prerequisite
+design/audit/runs/wrm-tagging/Y6-critic-r1.md,wrm-tagging/Y6,1,U8,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,B12.S9 pre generic facts; d = 2r and ruler skills missing
+design/audit/runs/wrm-tagging/Y6-critic-r1.md,wrm-tagging/Y6,1,U9,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B13.S4 reused translate_grid is first-quadrant; misses vis_migrate_coordinates; pre misses coordinate_all
+design/audit/runs/wrm-tagging/Y6-critic-r1.md,wrm-tagging/Y6,1,U10,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B2.S1 full contradicts B1.S6 ruling on 7-digit band (inconsistent verdict)
+design/audit/runs/wrm-tagging/Y6-critic-r1.md,wrm-tagging/Y6,1,U11,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B7.S2 direct opts omit ftTask; +/- first rules missing; function_machine proposal not reused
+design/audit/runs/wrm-tagging/Y6-critic-r1.md,wrm-tagging/Y6,1,U12,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,B4.S7 pre thin; tape_diagram additive only
+design/audit/runs/wrm-tagging/Y6-critic-r1.md,wrm-tagging/Y6,1,U13,PEDAGOGY,judgment,no,minor,,wrm-tagging,,"Proposal representations vague (frac_nl_equiv, miles_km) without B&W cell"
+design/audit/runs/wrm-tagging/Y6-critic-r1.md,wrm-tagging/Y6,1,U14,PEDAGOGY,judgment,no,minor,,wrm-tagging,,"Weak pres (place_value_10x B1.S2, number_bonds B9.S8, sub_check B6.S9); count_by_powers_of_10 unconsidered"
+design/audit/runs/wrm-tagging/Y6-critic-r2.md,wrm-tagging/Y6,2,U1,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"B9.S7 dishonest full: percent pool mixes multi-step percents, no 1%"
+design/audit/runs/wrm-tagging/Y6-critic-r2.md,wrm-tagging/Y6,2,U2,NAME_CONTENT,machine,no,blocking,,wrm-tagging,,Generator: percent_of_number 33% items have wrong answers (33% of 60 = 20)
+design/audit/runs/wrm-tagging/Y6-critic-r2.md,wrm-tagging/Y6,2,U3,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B7.S4 full though substitution never deals two letters; note says 'rare'
+design/audit/runs/wrm-tagging/Y6-critic-r2.md,wrm-tagging/Y6,2,U4,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B13.S1 coordinate_graph direct on first quadrant deals all four quadrants
+design/audit/runs/wrm-tagging/Y6-critic-r2.md,wrm-tagging/Y6,2,U5,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,"B2.S15 pre 2 items, oop_easy duplicates direct; W11 list unused"
+design/audit/runs/wrm-tagging/Y6-critic-r2.md,wrm-tagging/Y6,2,U6,GIVEAWAY,machine,no,blocking,,wrm-tagging,,"B4.S5 mixed_frac_qs prints operation sign large, giving away the choice; analysis muddled"
+design/audit/runs/wrm-tagging/Y6-critic-r2.md,wrm-tagging/Y6,2,U7,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"B9.S4 full generous: f_to_p lacks 25ths/50ths, simplify-first, eighths"
+design/audit/runs/wrm-tagging/Y6-critic-r2.md,wrm-tagging/Y6,2,U8,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B6.S6 mult_scaling partial teaches none of scale factors (should be gap)
+design/audit/runs/wrm-tagging/Y6-critic-r2.md,wrm-tagging/Y6,2,U9,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,B5.S1 estimate_length {} deals customary on metric step; pre thin
+design/audit/runs/wrm-tagging/Y6-critic-r2.md,wrm-tagging/Y6,2,U10,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B5.S3 metric_decimal_convert why false: capacity already deals decimal mL/L
+design/audit/runs/wrm-tagging/Y6-critic-r2.md,wrm-tagging/Y6,2,U11,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B10.S1 area_perimeter thin partial; missing leans on S2's clause
+design/audit/runs/wrm-tagging/Y6-critic-r2.md,wrm-tagging/Y6,2,U12,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B12.S4/S7 related whys claim angle sums for classify skills
+design/audit/runs/wrm-tagging/Y6-critic-r2.md,wrm-tagging/Y6,2,U13,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,B12.S6/S7 pre copied from S4; preBuild angle_rules missing
+design/audit/runs/wrm-tagging/Y6-critic-r2.md,wrm-tagging/Y6,2,U14,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B2.S6 missing omits size (exponents_simple deals 45 squared); mult_three unused
+design/audit/runs/wrm-tagging/Y6-critic-r2.md,wrm-tagging/Y6,2,U15,PEDAGOGY,judgment,no,minor,,wrm-tagging,,"Proposal cells incomplete: mental_estimate, percent_multi missing-percentage cell"
+design/audit/runs/wrm-tagging/Y6-critic-r2.md,wrm-tagging/Y6,2,U16,OTHER,judgment,no,minor,,wrm-tagging,,B13.S4 vis_migrate_coordinates and translate_grid double-booked for one clause
+design/audit/runs/wrm-tagging/Y6-critic-r2.md,wrm-tagging/Y6,2,U17,PEDAGOGY,judgment,no,minor,,wrm-tagging,,B2.S4 pre omits odd/even and multiples of 5 and 10 from W10
+design/audit/runs/wrm-tagging/Y6-critic-local-r1.md,wrm-tagging/Y6,1,M1,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Partial steps B1.S6 and B9.S5 list FULL direct skills after merge
+design/audit/runs/wrm-tagging/Y6-critic-local-r1.md,wrm-tagging/Y6,1,M2,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,14 stale clauses survive merge: no partial tagFix carries the new clause
+design/audit/runs/wrm-tagging/Y6-critic-local-r1.md,wrm-tagging/Y6,1,A,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,844 of 845 links carry no opts
+design/audit/runs/wrm-tagging/Y6-critic-local-r1.md,wrm-tagging/Y6,1,B,UNTRUE_TEXT,machine,no,blocking,WRM-rule-18,wrm-tagging,,"25 false or stale size/content whys (parallelogram 0 of 80, 'to 1,000,000' deals 3-digit)"
+design/audit/runs/wrm-tagging/Y6-critic-local-r1.md,wrm-tagging/Y6,1,C,UNTRUE_TEXT,machine,no,blocking,WRM-rule-2;WRM-rule-7;WRM-rule-17,wrm-tagging,,11 direct/partial entries lack the opts their clause relies on
+design/audit/runs/wrm-tagging/Y6-critic-local-r1.md,wrm-tagging/Y6,1,D,PEDAGOGY,judgment,no,blocking,WRM-rule-19,wrm-tagging,,13 pre links cite later-taught steps or deal later content
+design/audit/runs/wrm-tagging/Y6-critic-local-r1.md,wrm-tagging/Y6,1,E,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,"21 related links far ahead of school week or beyond Grade 5 (negatives, ratio, percent)"
+design/audit/runs/wrm-tagging/Y6-critic-local-r1.md,wrm-tagging/Y6,1,F,PEDAGOGY,judgment,no,blocking,WRM-rule-14,wrm-tagging,,8 earlier-learning links listed only as related
+design/audit/runs/wrm-tagging/Y6-critic-local-r1.md,wrm-tagging/Y6,1,G,OTHER,judgment,no,blocking,WRM-rule-3,wrm-tagging,,Own build listed in preBuild on 11 steps (data-rule)
+design/audit/runs/wrm-tagging/Y6-critic-local-r1.md,wrm-tagging/Y6,1,H,UNTRUE_TEXT,machine,no,blocking,WRM-rule-14,wrm-tagging,,26 links cite a step the skill is not tagged to
+design/audit/runs/wrm-tagging/Y6-critic-local-r1.md,wrm-tagging/Y6,1,I,PEDAGOGY,judgment,no,blocking,WRM-rule-15,wrm-tagging,,2 steps have fewer than 3 pre and no note
+design/audit/runs/wrm-tagging/Y6-critic-local-r1.md,wrm-tagging/Y6,1,J,PEDAGOGY,judgment,no,blocking,WRM-rule-14,wrm-tagging,,Main building block missing from pre on 5 of 25 graded steps
+design/audit/runs/wrm-tagging/Y6-critic-local-r1.md,wrm-tagging/Y6,1,K,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B7.S4 clause quotes per-seed proportion 'half' (3 of 25 on fresh seeds)
+design/audit/runs/wrm-tagging/Y6-critic-local-r1.md,wrm-tagging/Y6,1,L,UNTRUE_TEXT,machine,no,blocking,WRM-rule-7,wrm-tagging,,"count_by_powers_of_10 reaches 15,000,000 with no band; B1.S1 full never deals 1,000,000"
+design/audit/runs/wrm-tagging/Y6-critic-local-r1.md,wrm-tagging/Y6,1,M,PROCESS,process,no,blocking,,wrm-tagging,,"tagFix format: no structured partial field, clause buried in why"
+design/audit/runs/wrm-tagging/Y6-critic-local-r1.md,wrm-tagging/Y6,1,U1,PROCESS,process,no,blocking,,wrm-tagging,,No generator script committed; helper critic passed under old rules 1-13
+design/audit/runs/wrm-tagging/Y6-critic-local-r1.md,wrm-tagging/Y6,1,U2,NAME_CONTENT,machine,no,minor,,wrm-tagging,,Generator: div_unit_frac_nv form labels swapped; click item ignores forms
+design/audit/runs/wrm-tagging/Y6-critic-local-r1.md,wrm-tagging/Y6,1,U3,NAME_CONTENT,machine,no,minor,,wrm-tagging,,"Generator: order-of-operations skills and estimate_frac_ops, exponents_simple give negative answers"
+design/audit/runs/wrm-tagging/Y6-critic-local-r1.md,wrm-tagging/Y6,1,U4,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B2.S15 full though direct items include negative answers/operands; no range opts
+design/audit/runs/wrm-tagging/Y6-critic-local-r1.md,wrm-tagging/Y6,1,U5,INTERACTION,machine,no,minor,,wrm-tagging,,Tooling: mixed_number_theory generator hangs after others in one process (state leak)
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,4,R,PROCESS,process,no,blocking,,wrm-tagging,,Build not reproducible from clean checkout: reads lane files from /home/user/ref outside branch
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,4,1,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B2.S6 pre mult_facts why 'n x n facts' deals non-square facts
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,4,2,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B9.S9 related fraction_of_set_hard why 'find the whole'; 0 of 80 such items
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,4,3,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B9.S9 related ratio_tables why 'percent as a ratio to 100'; no percents
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,4,4,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B6.S5 related double_num_line why 'drawing length on two scales'; pages/minutes items
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,4,5,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-tagging,,B6.S5 and B12.S9 pre reading_ruler inches on a cm step
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,4,6,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B6.S6 pre perimeter why 'on squared paper'; no grid
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,4,7,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,"B1.S8 pre count_by_step_down why 'within 100 to 0'; reaches 194, steps of 4 and 5"
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,4,8,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B12.S2/S6 pre missing_add_sub why 'missing part of 90/180/360'; items within 20
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,4,9,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B4.S3 related frac_mult_word why 'fraction ÷ whole stories'; 0 of 80
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,4,10,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B11.S4 related p_to_f why 'fraction of the circle'; no circle
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,4,11,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B8.S2 compare_thousandths clause claims integer parts; 0 of 150
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,4,12,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B4.S7 clause omits forward click-all items (forms ignored)
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,4,13,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B7.S5 evaluate_expression_hard clause omits negative substitutions and squared brackets
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,4,14,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,B2.S6 stale note: claims both are preBuild; preBuild is mult_three
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,4,15,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B9.S5 stale note: d_to_p/p_to_d 'direct' but partial
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,4,16,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B10.S7 stale note: volume_cubes 'both build and pre'
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,4,17,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B11.S1 stale note: line_graph 'also preBuild'
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,4,18,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B12.S7 stale note: angle_rules 'also preBuild'
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,4,19,NAME_CONTENT,machine,yes,minor,,wrm-tagging,,B5.S2/S5 related mass_volume_liquid {} deals the kg-dial answer-0 bug (avoidable)
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,4,20,UNTRUE_TEXT,machine,no,minor,WRM-rule-13,wrm-tagging,,B13.S4/S5 envisioned translate_grid/reflect_grid teaches do not close four-quadrant clause
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,4,H,UNTRUE_TEXT,machine,yes,minor,WRM-rule-14,wrm-tagging,,9 pre whys are not step ids so the cite check never runs
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,4,U1,PROCESS,process,no,minor,,wrm-tagging,,linkfit WHY check reads fixed keyword list; no known-bug list; no note/data contradiction check
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,4,U2,NAME_CONTENT,machine,no,minor,,wrm-tagging,,Generators: fraction_of_set_hard_nv click ignores forms; count_by_step_down and missing_add_sub ignore range
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,4,U3,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Outside sample: B9.S7 double_num_line percent why; B10.S7/S8 mult_facts 'single-digit'
+design/audit/runs/wrm-tagging/Y6-critic-r5.md,wrm-tagging/Y6,5,1,PEDAGOGY,judgment,no,minor,WRM-rule-18,wrm-tagging,,B10.S8/B12.S11 related net_surface_area (Grade 6) and cross_section_3d (Grade 7)
+design/audit/runs/wrm-tagging/Y6-critic-r5.md,wrm-tagging/Y6,5,2,PEDAGOGY,judgment,no,minor,WRM-rule-18,wrm-tagging,,B12.S10/B12.S4 related mixed_shapes deals cross-sections and nets weeks ahead
+design/audit/runs/wrm-tagging/Y6-critic-r5.md,wrm-tagging/Y6,5,3,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B4.S2 related div_unit_fraction why under-describes: two thirds whole ÷ unit fraction
+design/audit/runs/wrm-tagging/Y6-critic-r5.md,wrm-tagging/Y6,5,4,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,B1.S7 full 'round any integer' never rounds 7-digit to nearest 10 or 100
+design/audit/runs/wrm-tagging/Y6-critic-r5.md,wrm-tagging/Y6,5,5,PROCESS,process,no,minor,WRM-rule-18,wrm-tagging,,linkfit FIRST table lacks nets; BEYOND list lacks surface area and cross-sections
+design/audit/runs/wrm-tagging/Y6-critic-r5.md,wrm-tagging/Y6,5,6,PEDAGOGY,judgment,no,minor,,wrm-tagging,,Advisories: B9.S5 order_fdp pre deals eighths; B12.S9 pie_chart cite; B8.S5 mult_facts cite
+design/audit/runs/wrm-tagging/Y6-critic-r5.md,wrm-tagging/Y6,5,U1,KEY,machine,no,minor,,wrm-tagging,,benchmark_fractions drag-order key looks wrong (needs checking)
+design/audit/runs/wrm-tagging/Y6-critic-r5.md,wrm-tagging/Y6,5,U2,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Two whys only partly describe items (B6.S8 find the whole; B12.S4 measure three angles)
+design/audit/runs/wrm-tagging/Y6-lessons-critic-r1.md,wrm-tagging/Y6-lessons,1,F1,UNTRUE_TEXT,machine,no,blocking,,wrm-lessons,,Lesson 21 clause 'never a 2-digit number' false; 2-digit dividends dealt about 1 in 10
+design/audit/runs/wrm-tagging/Y6-lessons-critic-r1.md,wrm-tagging/Y6-lessons,1,F2,PEDAGOGY,judgment,no,blocking,WRM-rule-18,wrm-lessons,,Lesson 24 Support related compare_decimal deals thousandths above source year
+design/audit/runs/wrm-tagging/Y6-lessons-critic-r1.md,wrm-tagging/Y6-lessons,1,F3,PROCESS,process,no,blocking,,wrm-lessons,,lessonfit Support rule has no thousandths row; misses pre-Grade-5 content
+design/audit/runs/wrm-tagging/Y6-lessons-critic-r1.md,wrm-tagging/Y6-lessons,1,F4,PROCESS,process,no,blocking,,wrm-lessons,,lessonfit CLAUSE does not read digit-count or symbol claims
+design/audit/runs/wrm-tagging/Y6-lessons-critic-r1.md,wrm-tagging/Y6-lessons,1,F5,PROCESS,process,no,blocking,,wrm-lessons,,Spec gate compares inside finish() only; silent re-option after finish ships (class N)
+design/audit/runs/wrm-tagging/Y6-lessons-critic-r1.md,wrm-tagging/Y6-lessons,1,F6,PROCESS,process,no,minor,,wrm-lessons,,TITLEREP FULL vocabulary lacks Y6 title claims (latent)
+design/audit/runs/wrm-tagging/Y6-lessons-critic-r1.md,wrm-tagging/Y6-lessons,1,M1,UNTRUE_TEXT,machine,no,minor,,wrm-lessons,,Lesson 15 pre div_unit_frac_nv why; 8 of 40 whole ÷ unit fraction
+design/audit/runs/wrm-tagging/Y6-lessons-critic-r1.md,wrm-tagging/Y6-lessons,1,M2,UNTRUE_TEXT,machine,no,minor,WRM-rule-10,wrm-lessons,,Lesson 17 related paren_multi reason is a placeholder CCSS
+design/audit/runs/wrm-tagging/Y6-lessons-critic-r1.md,wrm-tagging/Y6-lessons,1,M3,NAME_CONTENT,machine,yes,minor,,wrm-lessons,,Generator: percent_of_number 33% wrong keys; mean rounds silently
+design/audit/runs/wrm-tagging/Y6-lessons-critic-r1.md,wrm-tagging/Y6-lessons,1,M4,UNTRUE_TEXT,machine,no,minor,,wrm-lessons,,Lesson 13 related unit_conversions could be a partial (missed cover)
+design/audit/runs/wrm-tagging/Y6-lessons-critic-r1.md,wrm-tagging/Y6-lessons,1,M5,PEDAGOGY,judgment,no,minor,WRM-rule-14,wrm-lessons,,Lesson 4 main building block div_decimal forms 0 not a pre
+design/audit/runs/wrm-tagging/Y6-lessons-critic-r1.md,wrm-tagging/Y6-lessons,1,M6,UNTRUE_TEXT,machine,no,minor,,wrm-lessons,,Lesson 5 decimal_models option text says decimal x whole; closes asks decimal x decimal
+design/audit/runs/wrm-tagging/Y6-lessons-critic-r1.md,wrm-tagging/Y6-lessons,1,M7,UNTRUE_TEXT,machine,no,minor,,wrm-lessons,,Lesson 12 ribbon stories dealt by related; could be partial
+design/audit/runs/wrm-tagging/Y6-lessons-critic-r1.md,wrm-tagging/Y6-lessons,1,M8,UNTRUE_TEXT,machine,no,minor,,wrm-lessons,,Lesson 19 pre mult_decimal why 'in context'; items bare
+design/audit/runs/wrm-tagging/Y6-lessons-critic-r1.md,wrm-tagging/Y6-lessons,1,M9,NAME_CONTENT,machine,no,minor,,wrm-lessons,,Generator: distributive_expr factors out wrong GCF (4 not 12)
+design/audit/runs/wrm-tagging/Y6-lessons-critic-r2.md,wrm-tagging/Y6-lessons,2,G1,PROCESS,process,no,minor,,wrm-lessons,,lessonfit F4 does not read spelled-out digit counts ('two-digit')
+design/audit/runs/wrm-tagging/Y6-lessons-critic-r2.md,wrm-tagging/Y6-lessons,2,G2,PROCESS,process,no,minor,,wrm-lessons,,lessonfit exponent detector misses <sup> in q.text and squares of other bases
+design/audit/runs/wrm-tagging/Y6-lessons-critic-r2.md,wrm-tagging/Y6-lessons,2,G3,PROCESS,process,no,minor,,wrm-lessons,,lessonfit 'never an N-digit number' ignores decimal whole parts
+design/audit/runs/wrm-tagging/Y6-lessons-critic-r2.md,wrm-tagging/Y6-lessons,2,G4,PROCESS,process,no,minor,,wrm-lessons,,"TITLEREP holds a FULL lesson to title claims only, not CCSS clauses (latent)"
+design/audit/runs/wrm-tagging/Y6-lessons-critic-r2.md,wrm-tagging/Y6-lessons,2,G5,PROCESS,process,no,minor,,wrm-lessons,,lessonfit flaps at threshold on hedged 'some' claims at other seeds
+design/audit/runs/wrm-tagging/Y6-lessons-critic-r2.md,wrm-tagging/Y6-lessons,2,n1,UNTRUE_TEXT,machine,no,minor,,wrm-lessons,,Lesson 18 pre mult_decimal why 'costing several of one item' on bare items
+design/audit/runs/wrm-tagging/Y6-lessons-critic-r2.md,wrm-tagging/Y6-lessons,2,n2,UNTRUE_TEXT,machine,no,minor,,wrm-lessons,,Lesson 5 pre area_model_mult_hard why '2-digit x 2-digit'; 35/100 are 2x3
+design/audit/runs/wrm-tagging/Y6-lessons-critic-r2.md,wrm-tagging/Y6-lessons,2,n3,UNTRUE_TEXT,machine,no,minor,,wrm-lessons,,Lesson 21 clause 'about 1 in 10'; measured about 1 in 14

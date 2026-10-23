@@ -1,0 +1,253 @@
+report,run,round,defect_id,class,kind,carried,severity,rule_ids,family,template,summary
+design/audit/OPTIONS-CRITIC-R2.md,options-panel,2,1,NAME_CONTENT,machine,no,blocking,,options-panel,,"+/- band values run to 1,000,000 on skills named within 10/20/50; title unchanged (67 skills)"
+design/audit/OPTIONS-CRITIC-R2.md,options-panel,2,2,NAME_CONTENT,machine,no,blocking,,options-panel,,Regrouping control offers the opposite of the regroup/no_regroup skill id (32 skills)
+design/audit/OPTIONS-CRITIC-R2.md,options-panel,2,3,NAME_CONTENT,machine,no,blocking,,options-panel,,Across zeros control is dead when Regrouping = Never
+design/audit/OPTIONS-CRITIC-R2.md,options-panel,2,4,MISSING,machine,no,blocking,,options-panel,,No support control on 436 of 589 panels (O3 fails on most skills)
+design/audit/OPTIONS-CRITIC-R2.md,options-panel,2,5,MISSING,machine,no,blocking,,options-panel,,What the items ask is the only control on 104 skills; no size ladder
+design/audit/OPTIONS-CRITIC-R2.md,options-panel,2,6,CLARITY,judgment,no,blocking,,options-panel,,money_count has 7 controls and two contradicting size controls
+design/audit/OPTIONS-CRITIC-R2.md,options-panel,2,7,CLARITY,judgment,no,blocking,,options-panel,,Function tables have 9 controls (limit 5)
+design/audit/OPTIONS-CRITIC-R2.md,options-panel,2,8,CLARITY,judgment,no,blocking,,options-panel,,multiply/divide show Digits x digits and Max Number side by side
+design/audit/OPTIONS-CRITIC-R2.md,options-panel,2,9,UNTRUE_TEXT,machine,no,blocking,,options-panel,,Decimals default label says whole numbers while every item is a decimal
+design/audit/OPTIONS-CRITIC-R2.md,options-panel,2,10,NAME_CONTENT,machine,no,blocking,,options-panel,,number_bonds offers Bonds to 20 on a skill named within 10
+design/audit/OPTIONS-CRITIC-R2.md,options-panel,2,11,MISSING,machine,no,blocking,,options-panel,,make_ten/teen_compose: Support level is the only control; no easier/harder
+design/audit/OPTIONS-CRITIC-R2.md,options-panel,2,12,NAME_CONTENT,machine,no,blocking,OC4,options-panel,,Measured Up to N bounds operands not the answer on 52 skills (68 values)
+design/audit/OPTIONS-CRITIC-R2.md,options-panel,2,13,MISSING,machine,no,blocking,,options-panel,,39 measured-only panels lack an own size/complexity option
+design/audit/OPTIONS-CRITIC-R2.md,options-panel,2,14,CLARITY,judgment,no,minor,,options-panel,,Measured Decimal places offered on K-5 mix and algebra skills where irrelevant
+design/audit/OPTIONS-CRITIC-R2.md,options-panel,2,15,INSTRUCTION,machine,yes,blocking,P-31,options-panel,,"Sheet title ignores the chosen fact set (124 values, 14 skills); open since round 1"
+design/audit/OPTIONS-CRITIC-R2.md,options-panel,2,16,NAME_CONTENT,machine,no,blocking,OC4,options-panel,,money_count notes kinds deal 2-40 in Plain and 12 x $100 in US print; still says count coins
+design/audit/OPTIONS-CRITIC-R2.md,options-panel,2,17,NAME_CONTENT,machine,no,blocking,,options-panel,,multiply Up to 100 deals 12 x 11; range not read on this path
+design/audit/OPTIONS-CRITIC-R2.md,options-panel,2,18,NAME_CONTENT,machine,no,blocking,OC4,options-panel,,sub_across_zeros Up to 100 deals 408 - 89
+design/audit/OPTIONS-CRITIC-R2.md,options-panel,2,19,PLAIN_WORDS,machine,no,blocking,,options-panel,,"Pool option labels are raw category ids (Number ops mixed, Placevalue)"
+design/audit/OPTIONS-CRITIC-R2.md,options-panel,2,20,MISSING,machine,no,blocking,,options-panel,,Every pool (56 skills) offers only Which skills; no pool size or support
+design/audit/OPTIONS-CRITIC-R2.md,options-panel,2,21,VIEWPORT,machine,no,minor,,options-panel,,Function-table Support select clipped at 420 px
+design/audit/OPTIONS-CRITIC-R2.md,options-panel,2,22,CLARITY,judgment,no,minor,,options-panel,,Generic band help names all four operations on single-operation skills
+design/audit/OPTIONS-CRITIC-R2.md,options-panel,2,23,CLIP_OVERLAP,machine,no,minor,,options-panel,,Sample frame overflows on placevalue:expand; add_decimal sample stack drawn upside-down
+design/audit/OPTIONS-CRITIC-R2.md,options-panel,2,24,PROCESS,process,no,blocking,,options-panel,,"ws-options-verify passes values it never checked (unseeded generators, warnings not failures, no combos)"
+design/audit/runs/answer-key-options/critic.md,answer-key-options,1,B1,KEY,machine,no,blocking,INK-31,answer-key,,"Copy key paints given claims (TF claim, Sam wrote) in answer orange"
+design/audit/runs/answer-key-options/critic.md,answer-key-options,1,B2,KEY,machine,no,blocking,,answer-key,,"Short key empty/incomplete on Stretch, True or False, Error Analysis; shade gives no whole"
+design/audit/runs/answer-key-options/critic.md,answer-key-options,1,B3,KEY,machine,no,blocking,,answer-key,,Short-key groups headed Page 1/2 instead of Practice A/B
+design/audit/runs/answer-key-options/critic.md,answer-key-options,1,B4,KEY,machine,no,blocking,,answer-key,,Multi-section short keys each restart at Page 1 with no section name
+design/audit/runs/answer-key-options/critic.md,answer-key-options,1,D5,PROCESS,process,no,minor,INK-31,answer-key,,Lint INK-31 allowance accepts orange on any solid ink; blind to B1
+design/audit/runs/answer-key-options/critic.md,answer-key-options,1,D6,PROCESS,process,no,minor,,answer-key,,Lane did not merge main first; gates ran without latest code
+design/audit/runs/answer-key-options/critic.md,answer-key-options,1,D7,MISSING,machine,no,minor,,answer-key,,Key placement/style not saved as teacher print defaults
+design/audit/runs/answer-key-options/critic.md,answer-key-options,1,D8,MISSING,machine,no,minor,,answer-key,,Preview Answer keys tab shows only the first key page
+design/audit/runs/answer-key-options/critic.md,answer-key-options,1,D9,KEY,machine,no,minor,INK-31,answer-key,,Copy key leaves the regroup carry box empty
+design/audit/runs/answer-key-options/critic.md,answer-key-options,1,D10,SPACE,machine,no,minor,,answer-key,,After each page + short key uses a whole sheet for 6-12 answers
+design/audit/runs/answer-key-options/critic-r2.md,answer-key-options,2,R2-1,KEY,machine,no,blocking,INK-31,answer-key,,"Drawn answers (counters, blocks, ticks, rings, jumps) print black on ~50 skills; 13 keys all black"
+design/audit/runs/answer-key-options/critic-r2.md,answer-key-options,2,R2-2,KEY,machine,no,blocking,,answer-key,,Short key omits Guided Practice answers on Opener and Lesson pages
+design/audit/runs/answer-key-options/critic-r2.md,answer-key-options,2,R2-3,KEY,machine,no,minor,,answer-key,,Stretch short key says I found 7 but lists 6 pairs
+design/audit/runs/answer-key-options/critic-r2.md,answer-key-options,2,R2-4,PROCESS,process,no,minor,INK-1,answer-key,,L-INK trusts data-ws-key-ans tag; a mistagged given would pass
+design/audit/runs/answer-key-options/critic-r2.md,answer-key-options,2,R2-5,VIEWPORT,machine,no,minor,,answer-key,,After each page label overflows its 99 px pill at 1366x768
+design/audit/runs/answer-key-options/critic-r2.md,answer-key-options,2,R2-6,KEY,machine,no,minor,,answer-key,,"Number-line answer dot half orange, hop start dot black"
+design/audit/runs/answer-key-options/critic-r2.md,answer-key-options,2,D8,MISSING,machine,yes,minor,,answer-key,,Preview Answer keys tab still shows one key page
+design/audit/runs/answer-key-options/critic-r3.md,answer-key-options,3,R3-1,KEY,machine,no,blocking,INK-31,answer-key,,Given lines and box borders print orange on 215 of 576 skills (twin alignment side effect)
+design/audit/runs/answer-key-options/critic-r3.md,answer-key-options,3,R3-2,KEY,machine,yes,blocking,INK-31,answer-key,,identify and number_word_names keys still entirely black (rings untagged)
+design/audit/runs/answer-key-options/critic-r3.md,answer-key-options,3,R3-3,CLIP_OVERLAP,machine,no,blocking,,answer-key,,Inherited SVG stroke smears pv_disks numerals and number-line labels illegible
+design/audit/runs/answer-key-options/critic-r3.md,answer-key-options,3,N-1,KEY,machine,no,minor,,answer-key,,Model cell given answer Answer: 20 printed in key orange on Opener area
+design/audit/runs/answer-key-options/critic-r3.md,answer-key-options,3,N-2,CLARITY,judgment,no,minor,,answer-key,,Print button says 2 pupil pages + key while run is 8 faces with new-sheet on
+design/audit/runs/answer-key-options/critic-r3.md,answer-key-options,3,N-3,OTHER,judgment,no,minor,,answer-key,,"Multi-section fallback section not padded, could start on a back (duplex order guard)"
+design/audit/runs/answer-key-options/critic-r3.md,answer-key-options,3,N-4,CLIP_OVERLAP,machine,no,minor,,answer-key,numberline,Lesson nl_add Guided number line runs past cell edge into Steps panel
+design/audit/runs/answer-key-options/critic-r4.md,answer-key-options,4,R4-1,VIEWPORT,machine,no,blocking,,answer-key,,Print button label clipped both sides at 1366x768 with new-sheet on
+design/audit/runs/answer-key-options/critic-r4.md,answer-key-options,4,N-5,CLIP_OVERLAP,machine,yes,minor,,answer-key,numberline,Lesson nl_add anchor number line overflows and labels overlap
+design/audit/runs/answer-key-options/critic-r4.md,answer-key-options,4,N-5,INSTRUCTION,machine,no,minor,,answer-key,,Lesson nl_add Say frame reads 10 plus 10 equals 10 while steps say 20
+design/audit/runs/answer-key-options/critic-r4.md,answer-key-options,4,N-6,KEY,machine,no,minor,,answer-key,,"Scripted Model key page is a plain pupil copy: Name header, no Answer Key marker"
+design/audit/runs/answer-key-options/critic-r4.md,answer-key-options,4,N-7,KEY,machine,no,minor,,answer-key,legacy,"Legacy word-problem key stamps small Answer: text under the line, not on it"
+design/audit/runs/answer-key-options/critic-r5.md,answer-key-options,5,U-1,VIEWPORT,machine,no,minor,,answer-key,,Print button always wraps to two lines at 1366
+design/audit/runs/answer-key-options/critic-r5.md,answer-key-options,5,E-1,PROCESS,process,no,minor,,answer-key,,Merge into current main conflicts in print-sheet.js and STATUS.md
+design/audit/runs/answer-key-options/critic-r5.md,answer-key-options,5,U1,VIEWPORT,machine,no,minor,,answer-key,,"Page scrolls sideways at 1024x768 with two sections (pre-existing, also main)"
+design/audit/runs/answer-key-options/critic-r5.md,answer-key-options,5,N-5,CLIP_OVERLAP,machine,yes,minor,,answer-key,numberline,Lesson nl_add anchor overflow + Say error recorded open (other lane)
+design/audit/runs/answer-key-options/critic-r5.md,answer-key-options,5,N-6,KEY,machine,yes,minor,,answer-key,,Scripted Model key looks like a pupil page (recorded open)
+design/audit/runs/answer-key-options/critic-r5.md,answer-key-options,5,N-7,KEY,machine,yes,minor,,answer-key,legacy,Legacy word-problem key stamp placement (recorded open)
+design/audit/runs/chromebook-fit/CRITIC-R1.md,chromebook-fit,1,D1,VIEWPORT,machine,no,blocking,H6,screen-chrome,,Boss/race arena scrolls away on tall items for the whole session
+design/audit/runs/chromebook-fit/CRITIC-R1.md,chromebook-fit,1,D2,VIEWPORT,machine,no,blocking,H6,screen-chrome,,Worksheet at 1366x650: two chrome rows cost the second row of cards
+design/audit/runs/chromebook-fit/CRITIC-R1.md,chromebook-fit,1,D3,INTERACTION,machine,no,blocking,,screen-chrome,,Quiz: focus drops to body after Next; typing goes nowhere
+design/audit/runs/chromebook-fit/CRITIC-R1.md,chromebook-fit,1,D4,VIEWPORT,machine,no,blocking,H6,screen-chrome,,Quiz 1280x600: duplicate Q-header row puts typical boxes under the nav bar
+design/audit/runs/chromebook-fit/CRITIC-R1.md,chromebook-fit,1,D5,VIEWPORT,machine,no,blocking,H6,screen-chrome,bar-graph,Quiz bar_graph cannot show bars and answer box together
+design/audit/runs/chromebook-fit/CRITIC-R1.md,chromebook-fit,1,D6,VIEWPORT,machine,no,blocking,H6,screen-chrome,,Practice card 1280x600: typical items open under the pinned Check bar
+design/audit/runs/chromebook-fit/CRITIC-R1.md,chromebook-fit,1,D7,INTERACTION,machine,no,minor,,screen-chrome,,Start toast covers the pinned Check bar at 1280x600
+design/audit/runs/chromebook-fit/CRITIC-R1.md,chromebook-fit,1,D8,INTERACTION,machine,no,minor,,screen-chrome,,Menu sub-popovers stay open after Escape and stack over each other
+design/audit/runs/chromebook-fit/CRITIC-R1.md,chromebook-fit,1,D9,INTERACTION,machine,no,minor,,screen-chrome,,Compact header Tab order does not match visual order
+design/audit/runs/chromebook-fit/CRITIC-R1.md,chromebook-fit,1,D10,INK_FONT,machine,no,minor,,screen-chrome,,Dark-mode Menu button text contrast about 3:1
+design/audit/runs/chromebook-fit/CRITIC-R2.md,chromebook-fit,2,1,INTERACTION,machine,yes,blocking,,screen-chrome,,Quiz: first Next after typing swallowed (onchange re-render); Tab drops focus
+design/audit/runs/chromebook-fit/CRITIC-R2.md,chromebook-fit,2,2,VIEWPORT,machine,yes,blocking,H6,screen-chrome,bar-graph,Quiz bar_graph still cannot show bars and box together; worksheet chart empty band
+design/audit/runs/chromebook-fit/CRITIC-R2.md,chromebook-fit,2,3,VIEWPORT,machine,yes,blocking,H6,screen-chrome,,Quiz 1280x600 per-question header still a separate 60 px row
+design/audit/runs/chromebook-fit/CRITIC-R2.md,chromebook-fit,2,4,INTERACTION,machine,yes,minor,,screen-chrome,,Lifted toast now covers feedback line and cell content
+design/audit/runs/chromebook-fit/CRITIC-R2.md,chromebook-fit,2,5,INTERACTION,machine,no,minor,,screen-chrome,,Correct-answer mascot cheer covers the new question for ~1 s
+design/audit/runs/chromebook-fit/CRITIC-R2.md,chromebook-fit,2,6,INTERACTION,machine,yes,minor,,screen-chrome,,Tab order still puts Exit and box last
+design/audit/runs/chromebook-fit/CRITIC-R2.md,chromebook-fit,2,7,INTERACTION,machine,no,minor,,screen-chrome,,Worksheet first box not focused; wrong answer drops focus
+design/audit/runs/chromebook-fit/CRITIC-R2.md,chromebook-fit,2,8,VIEWPORT,machine,no,minor,,screen-chrome,,700-760 px short screen clips the score to 0 C
+design/audit/runs/chromebook-fit/CRITIC-R2.md,chromebook-fit,2,9,INK_FONT,machine,no,minor,,screen-chrome,,Dark-mode race cars small and red car low contrast
+design/audit/runs/chromebook-fit/CRITIC-R2.md,chromebook-fit,2,G1,PROCESS,process,no,minor,,screen-chrome,,"ws-chromebook-fit holes: tall cutoff, seen check ignores sticky bar, unfocused boxes pass, no typing"
+design/audit/runs/chromebook-fit/CRITIC-R3.md,chromebook-fit,3,1,VIEWPORT,machine,yes,minor,H6,screen-chrome,bar-graph,Quiz bar_graph stacks chart above question; bar tops cut when box in view (template follow-up)
+design/audit/runs/chromebook-fit/CRITIC-R3.md,chromebook-fit,3,2,INTERACTION,machine,yes,minor,,screen-chrome,,+5 XP burst drawn over next question digits for 1.5 s
+design/audit/runs/chromebook-fit/CRITIC-R3.md,chromebook-fit,3,3,INTERACTION,machine,yes,minor,,screen-chrome,,Tab order still puts Exit and box last
+design/audit/runs/chromebook-fit/CRITIC-R3.md,chromebook-fit,3,4,INTERACTION,machine,yes,minor,,screen-chrome,,Worksheet wrong answer drops focus to body
+design/audit/runs/chromebook-fit/CRITIC-R3.md,chromebook-fit,3,5,INTERACTION,machine,no,minor,,screen-chrome,,Top-right toasts cover the Q-dot progress row
+design/audit/runs/chromebook-fit/CRITIC-R3.md,chromebook-fit,3,6,INTERACTION,machine,no,minor,,screen-chrome,,Quiz: focus lands on body after Previous
+design/audit/runs/chromebook-fit/CRITIC-R3.md,chromebook-fit,3,7,VIEWPORT,machine,yes,minor,,screen-chrome,,700 px short screen still clips score
+design/audit/runs/chromebook-fit/CRITIC-R3.md,chromebook-fit,3,8,INK_FONT,machine,yes,minor,,screen-chrome,,"Dark-mode race cars small, red car low contrast"
+design/audit/runs/chromebook-fit/CRITIC-R3.md,chromebook-fit,3,9,PROCESS,process,no,minor,,screen-chrome,,Gate: paper-kind responses escape seen-on-load; stale timer chip between hosts
+design/audit/runs/chromebook-fit/CRITIC-R3.md,chromebook-fit,3,10,PROCESS,process,no,minor,,screen-chrome,,Commit b04a7c7 overwrote 87 screenshots in other lanes run folders
+design/audit/runs/chromebook-fit/CRITIC-R3.md,chromebook-fit,3,U1,MISSING,machine,no,minor,,screen-chrome,,Quiz coordinate_q1 shows no grid (interactive visual dropped)
+design/audit/runs/chromebook-fit/CRITIC-R3.md,chromebook-fit,3,U2,MISSING,machine,no,minor,,screen-chrome,,Quiz prime_composite shows no numbers to click
+design/audit/runs/countby-arrows/critic.md,countby-arrows,1,D1,CLIP_OVERLAP,machine,no,blocking,,multiplication,count-row,Lines mode: widened screen input and tints cover the jump arrows (8-10 overlaps per row)
+design/audit/runs/countby-arrows/critic.md,countby-arrows,1,D2,VIEWPORT,machine,no,blocking,,multiplication,count-row,"Lines mode on Chromebook keeps 12 on a line: quiz swipe, card row at the fold"
+design/audit/runs/countby-arrows/critic.md,countby-arrows,1,D3,SIZE,machine,no,blocking,L1;TY-10a,multiplication,count-row,Lines at M/L shrink 3-digit rows and step tab to ~10 pt; Size L not large
+design/audit/runs/countby-arrows/critic.md,countby-arrows,1,D4,PROCESS,process,no,blocking,,multiplication,count-row,wave1-c2-onepage gate fails (not re-pinned); 3-digit rows moved 16 to 14.7 pt
+design/audit/runs/countby-arrows/critic.md,countby-arrows,1,D5,VISUAL_DESIGN,judgment,no,minor,,multiplication,count-row,One-page Boxes columns no longer line up row to row; reads ragged
+design/audit/runs/countby-arrows/critic.md,countby-arrows,1,D6,CLIP_OVERLAP,machine,no,minor,,multiplication,count-row,Options panel sample row runs off its frame
+design/audit/runs/countby-arrows/critic.md,countby-arrows,1,D7,PROCESS,process,no,minor,SL-3a,multiplication,count-row,"SL-3a says 0.4 mm, code 1.0 mm; STATUS lacks phone deferral entry"
+design/audit/runs/countby-arrows/critic.md,countby-arrows,1,U1,CLIP_OVERLAP,machine,no,minor,,multiplication,count-row,Lesson anchor chart count rows overflow quadrants (pre-existing)
+design/audit/runs/countby-arrows/critic.md,countby-arrows,1,U2,VIEWPORT,machine,no,minor,,multiplication,count-row,Practice card Check below fold at 1366x650 (pre-existing)
+design/audit/runs/countby-arrows/critic.md,countby-arrows,1,U3,INTERACTION,machine,no,minor,,multiplication,count-row,Quiz count rows never move caret; two answers join in one box (pre-existing)
+design/audit/runs/countby-arrows/critic.md,countby-arrows,1,U4,INSTRUCTION,machine,no,minor,,multiplication,count-row,Scripted model step 2 says Write 8 before row shows 8 (pre-existing)
+design/audit/runs/countby-arrows/critic.md,countby-arrows,1,U5,SIZE,machine,no,minor,,multiplication,count-row,Count rows at S print about 10.2 pt on Independent (pre-existing)
+design/audit/runs/countby-arrows/critic-r2.md,countby-arrows,2,N1,VISUAL_DESIGN,judgment,no,minor,SL-1;H13,multiplication,count-row,Lines at M mixes 1-line rows (8 mm write-on lines) and 2-line rows on one page
+design/audit/runs/countby-arrows/critic-r2.md,countby-arrows,2,N2,PROCESS,process,no,minor,SL-1;SL-3a,multiplication,count-row,ws-print-lint does not know the SL-3a exception; Lines docs raise SL-1 flood
+design/audit/runs/countby-arrows/critic-r2.md,countby-arrows,2,N3,UNTRUE_TEXT,machine,no,minor,,multiplication,count-row,"Option help says 12 on one line, now true only at Size S paper"
+design/audit/runs/countby-arrows/critic-r2.md,countby-arrows,2,N4,VIEWPORT,machine,no,minor,,multiplication,count-row,Card Lines wide numbers: step tab line ends below the 650 fold
+design/audit/runs/countby-arrows/critic-r2.md,countby-arrows,2,N5,PROCESS,process,no,minor,,multiplication,count-row,Onepage Lines invariant asserts uniform size but no floor or shape
+design/audit/runs/countby-arrows/critic-r2.md,countby-arrows,2,P1,CLIP_OVERLAP,machine,no,blocking,PG-12,multiplication,count-row,Opener Model count row sticks out of its half-width cell over Steps text
+design/audit/runs/countby-arrows/critic-r2.md,countby-arrows,2,P2,CLIP_OVERLAP,machine,yes,blocking,PG-12,multiplication,count-row,Lesson anchor rows overflow quadrants; 8 illegible overlaps
+design/audit/runs/countby-arrows/critic-r2.md,countby-arrows,2,P3,CLIP_OVERLAP,machine,no,blocking,PG-12,multiplication,count-row,Scripted model cell 1 overflows
+design/audit/runs/countby-arrows/critic-r2.md,countby-arrows,2,P3,KEY,machine,no,blocking,AK-2,multiplication,count-row,Scripted model key leaves 15 model-step slots blank
+design/audit/runs/countby-arrows/critic-r2.md,countby-arrows,2,P4,INTERACTION,machine,yes,minor,,multiplication,count-row,Quiz count rows never hand caret on; digits join in one box
+design/audit/runs/countby-arrows/critic-r2.md,countby-arrows,2,U1,VIEWPORT,machine,yes,minor,,multiplication,count-row,Card Check button below fold at 1366x650
+design/audit/runs/countby-arrows/critic-r2.md,countby-arrows,2,U2,VIEWPORT,machine,no,minor,,multiplication,count-row,Online worksheet 3-column grid makes count row swipe at 1366/1280
+design/audit/runs/div-facts-forms/CRITIC-R1.md,div-facts-forms,1,D1,GIVEAWAY,machine,no,blocking,L3,division,equation,Fraction and Mix across slots sized from the item answer; 2-digit answers get wider lines
+design/audit/runs/div-facts-forms/CRITIC-R1.md,div-facts-forms,1,D2,SIZE,machine,no,blocking,AK-2,division,equation,"Fraction-form key answers, traces and claims drawn at a third of working size"
+design/audit/runs/div-facts-forms/CRITIC-R1.md,div-facts-forms,1,D3,INK_FONT,machine,no,blocking,L5,division,equation,Paper fraction puts = on denominator baseline; bar 0.75 pt not 1.5 pt; screen differs
+design/audit/runs/div-facts-forms/CRITIC-R1.md,div-facts-forms,1,D4,SPACE,machine,no,blocking,H13;L1;DN-1a,division,equation,Standard across facts in oversized cells (42-49% band); S prints the L page
+design/audit/runs/div-facts-forms/CRITIC-R1.md,div-facts-forms,1,D5,MISSING,machine,no,blocking,PT-FRW-5;PT-FRW-6,division,equation,"Fact rows silently fall back to across for Long, Fraction and Mix"
+design/audit/runs/div-facts-forms/CRITIC-R1.md,div-facts-forms,1,D6,SPACE,machine,no,blocking,PT-FPR-6;PG-14;VA-66,division,long-division,Long/Mix probes run to 2 pages at L; S probe 37% blank
+design/audit/runs/div-facts-forms/CRITIC-R1.md,div-facts-forms,1,D7,PEDAGOGY,judgment,no,blocking,P-1,division,equation,Mix lessons model only one of the three forms
+design/audit/runs/div-facts-forms/CRITIC-R1.md,div-facts-forms,1,D8,SPACE,machine,no,blocking,,division,equation,Long and Fraction lesson pages leave a third or more blank
+design/audit/runs/div-facts-forms/CRITIC-R1.md,div-facts-forms,1,D9,SCREEN_PARITY,machine,no,blocking,L5,division,long-division,Screen Long form restates the problem across (= ?) instead of Divide.
+design/audit/runs/div-facts-forms/CRITIC-R1.md,div-facts-forms,1,D10,SIZE,machine,no,blocking,,division,long-division,Worksheet bracket cells drawn at 48 px digits vs 29 px elsewhere
+design/audit/runs/div-facts-forms/CRITIC-R1.md,div-facts-forms,1,D11,OTHER,judgment,no,blocking,,division,equation,Item labels restart after z on S pages (duplicate a.)
+design/audit/runs/div-facts-forms/CRITIC-R1.md,div-facts-forms,1,D12,INSTRUCTION,machine,no,minor,L6,division,equation,Steps do not follow model item; inline expressions wrap; times hint dropped in Long/Fraction
+design/audit/runs/div-facts-forms/CRITIC-R1.md,div-facts-forms,1,D13,SLOT,machine,no,minor,VA-61,division,long-division,Quotient digit boxes on Independent/Test; boxes 4.5 mm at S
+design/audit/runs/div-facts-forms/CRITIC-R1.md,div-facts-forms,1,D14,SPACE,machine,no,blocking,H13,division,equation,Mix at L uses 2 columns and stops short; uneven rows
+design/audit/runs/div-facts-forms/CRITIC-R2.md,div-facts-forms,2,D-A,SPACE,machine,yes,blocking,H13;L2,division,equation,"Mix at L still 2 columns; bracket/fraction cells two-thirds empty, uneven rows"
+design/audit/runs/div-facts-forms/CRITIC-R2.md,div-facts-forms,2,D-B,SPACE,machine,no,blocking,PG-14,division,equation,"Standard Test under-filled: S 18 of 20 41% blank, L 10 of 12 32% blank"
+design/audit/runs/div-facts-forms/CRITIC-R2.md,div-facts-forms,2,D-C,SPACE,machine,no,blocking,H13;L2;VA-61,division,fact-rows,"Mix fact rows/probe: across facts in tall rows, 15 px digits, bracket digits spread"
+design/audit/runs/div-facts-forms/CRITIC-R2.md,div-facts-forms,2,D-D,PEDAGOGY,judgment,no,minor,,division,equation,Mix stand-alone Guided deals no Standard item (2 models not 3)
+design/audit/runs/div-facts-forms/CRITIC-R2.md,div-facts-forms,2,D-D,CLIP_OVERLAP,machine,no,minor,,division,equation,Mix Guided S puts two problems in one box
+design/audit/runs/div-facts-forms/CRITIC-R2.md,div-facts-forms,2,R-1,CLIP_OVERLAP,machine,no,blocking,,division,equation,div_remainders lesson p2 at L overflows 4.5 mm (regression)
+design/audit/runs/div-facts-forms/CRITIC-R2.md,div-facts-forms,2,R-2,SPACE,machine,no,blocking,,division,equation,divide lesson warm-up drops to 2 items; page 44-48% blank
+design/audit/runs/div-facts-forms/CRITIC-R2.md,div-facts-forms,2,R-2,VISUAL_DESIGN,judgment,no,blocking,AX-4,division,equation,Two across looks (equation cell vs fact template) on one page
+design/audit/runs/div-facts-forms/CRITIC-R2.md,div-facts-forms,2,U1,INK_FONT,machine,no,minor,,division,long-division,1-px seam in the vinculum at a track join
+design/audit/runs/div-facts-forms/CRITIC-R2.md,div-facts-forms,2,U2,SPACE,machine,no,minor,,division,long-division,Lesson Long Guided quotient boxes 4 mm under the frame top
+design/audit/runs/div-facts-forms/CRITIC-R2.md,div-facts-forms,2,U3,CLIP_OVERLAP,machine,no,minor,,division,long-division,Fact rows Long 12)108 within 2 mm of cell sides at S
+design/audit/runs/div-facts-forms/CRITIC-R2.md,div-facts-forms,2,U4,INSTRUCTION,machine,no,minor,,division,equation,divide lesson p2 has an empty Steps: box (pre-existing)
+design/audit/runs/div-facts-forms/CRITIC-R3.md,div-facts-forms,3,N-1,VISUAL_DESIGN,judgment,no,blocking,VA-61,division,long-division,Mix one-digit dividend padded two tracks from bracket (2 )   2); differs from Long form
+design/audit/runs/div-facts-forms/CRITIC-R3.md,div-facts-forms,3,N-2,VISUAL_DESIGN,judgment,no,blocking,AX-4,division,equation,Standard Lesson L puts across answer line beside and under on one page
+design/audit/runs/div-facts-forms/CRITIC-R3.md,div-facts-forms,3,N-3,SPACE,machine,no,blocking,L1;L2,division,equation,Standard Lesson p2 at S 41% blank
+design/audit/runs/div-facts-forms/CRITIC-R3.md,div-facts-forms,3,R-3,VISUAL_DESIGN,judgment,no,blocking,AX-4,division,equation,div_remainders warm-up at S mixes two digit sizes and slot places
+design/audit/runs/div-facts-forms/CRITIC-R3.md,div-facts-forms,3,R-3,CLIP_OVERLAP,machine,no,blocking,CL-40,division,equation,div_remainders warm-up labels c/d touch the first digit
+design/audit/runs/div-facts-forms/CRITIC-R3.md,div-facts-forms,3,U1,SPACE,machine,no,minor,,division,equation,Mix Guided S about 43% blank (info role)
+design/audit/runs/div-facts-forms/CRITIC-R3.md,div-facts-forms,3,U2,SPACE,machine,no,minor,,division,equation,"Reason It L 2 items, bands up to 0.35 (info role)"
+design/audit/runs/div-facts-forms/CRITIC-R3.md,div-facts-forms,3,U3,SCREEN_PARITY,machine,no,minor,,division,equation,"Screen across spacing 0.7 em vs paper 0.29; Mix slot beside on screen, under on paper"
+design/audit/runs/div-facts-forms/CRITIC-R3.md,div-facts-forms,3,U4,SPACE,machine,no,minor,PG-14,division,equation,Fraction S probe/Test cell bands 0.35-0.38
+design/audit/runs/div-facts-forms/CRITIC-R3.md,div-facts-forms,3,U5,SPACE,machine,no,minor,,division,equation,Empty ruled 21st cell on 3 x 7 probes
+design/audit/runs/div-facts-forms/CRITIC-R3.md,div-facts-forms,3,U6,INK_FONT,machine,yes,minor,,division,long-division,Vinculum seams at track joins
+design/audit/runs/div-facts-forms/CRITIC-R4.md,div-facts-forms,4,R-4,CLIP_OVERLAP,machine,no,minor,CL-8,division,equation,divide lesson p2 121 / 11 line ends 0.8 mm from cell border
+design/audit/runs/div-facts-forms/CRITIC-R4.md,div-facts-forms,4,O-1,SIZE,machine,no,minor,DN-1a,division,equation,Lesson p3 practice page prints the L count at S (role-wide)
+design/audit/runs/div-facts-forms/CRITIC-R4.md,div-facts-forms,4,O-1,SPACE,machine,no,minor,,division,equation,Standard anchor chart p1 about 50% blank
+design/audit/runs/div-facts-forms/CRITIC-R4.md,div-facts-forms,4,a,SPACE,machine,yes,minor,,division,equation,Empty ruled 21st cell on 3 x 7 probes
+design/audit/runs/div-facts-forms/CRITIC-R4.md,div-facts-forms,4,b,SPACE,machine,yes,minor,PG-14,division,equation,Fraction S probe/Test cell bands 0.35-0.38
+design/audit/runs/div-facts-forms/CRITIC-R4.md,div-facts-forms,4,c,SCREEN_PARITY,machine,no,minor,,division,long-division,Screen worksheet bracket gap from 64 px quotient-slot floor (7)  28)
+design/audit/runs/div-facts-forms/CRITIC-R4.md,div-facts-forms,4,U1,PEDAGOGY,judgment,no,minor,,division,equation,Mix lesson Guided row has no bracket item
+design/audit/runs/div-facts-forms/CRITIC-R4.md,div-facts-forms,4,U2,SPACE,machine,no,minor,,division,equation,Vertical L Test strip 0.21
+design/audit/runs/div-facts-forms/CRITIC-R4.md,div-facts-forms,4,U3,INSTRUCTION,machine,no,minor,L6,division,equation,"Lesson Steps band names the anchor example, not a Guided item"
+design/audit/runs/div-facts-forms/CRITIC-R4.md,div-facts-forms,4,U4,SPACE,machine,yes,minor,,division,equation,Mix Guided S about 43% blank (info role)
+design/audit/runs/div-facts-forms/CRITIC-R4.md,div-facts-forms,4,U5,SPACE,machine,yes,minor,,division,equation,Reason It L bands up to 0.35 (info role)
+design/audit/runs/landing-many/critic.md,landing-many,1,U1,INTERACTION,machine,no,blocking,,landing,,startFromLanding removes overlay before reading dropdowns; pupil choices ignored (pre-existing)
+design/audit/runs/landing-many/critic.md,landing-many,1,U2,VIEWPORT,machine,no,minor,,landing,,740x360 with dropdowns: Start clipped 16 px
+design/audit/runs/landing-many/critic.md,landing-many,1,U3,VIEWPORT,machine,no,minor,,landing,,"See the N skills tap target about 35 px, under 44"
+design/audit/runs/landing-many/critic.md,landing-many,1,U4,VIEWPORT,machine,no,minor,,landing,,340x640 opened: nested scroll puts Start below fold
+design/audit/runs/landing-many/critic.md,landing-many,1,U5,OTHER,judgment,no,minor,,landing,,Dead CSS: landing-skills-scroll margin overridden by inline style
+design/audit/runs/landing-many/critic.md,landing-many,1,U6,PROCESS,process,no,minor,,landing,,"Builder probe bypasses ?c=, ignores modal clip, litters PNGs in tests/scripts"
+design/audit/runs/landing-many/critic.md,landing-many,1,U7,INK_FONT,machine,no,minor,,landing,,Dark-mode skill pills low contrast
+design/audit/runs/ldiv-hug/CRITIC-R1.md,ldiv-hug,1,D-1,SCREEN_PARITY,machine,no,blocking,,division,long-division,Remainder bracket does not hug dividend and its vinculum is broken; differs from paper
+design/audit/runs/ldiv-hug/CRITIC-R1.md,ldiv-hug,1,D-2,PROCESS,process,no,blocking,,division,long-division,ws-ldiv-hug measured zero remainder brackets and reported OK
+design/audit/runs/ldiv-hug/CRITIC-R1.md,ldiv-hug,1,G-1,PROCESS,process,no,minor,,division,long-division,Gate fact-bracket ceiling far looser than achieved
+design/audit/runs/ldiv-hug/CRITIC-R1.md,ldiv-hug,1,G-2,PROCESS,process,no,minor,,division,long-division,Gate has no assertion on box position; BOX_MIN 40 not 44
+design/audit/runs/ldiv-hug/CRITIC-R1.md,ldiv-hug,1,N-1,SCREEN_PARITY,machine,no,minor,,division,long-division,Screen fact bracket gap 0.33 em vs paper 0.53
+design/audit/runs/ldiv-hug/CRITIC-R1.md,ldiv-hug,1,O-1,SCREEN_PARITY,machine,no,minor,,division,long-division,Rounded input corners inside the cell (contract says square)
+design/audit/runs/ldiv-hug/CRITIC-R2.md,ldiv-hug,2,G-3,PROCESS,process,no,minor,,division,long-division,Gate has no assertion on R label clearance
+design/audit/runs/ldiv-hug/CRITIC-R2.md,ldiv-hug,2,G-4,PROCESS,process,no,minor,,division,long-division,Gate quiz host measures only its first question
+design/audit/runs/ldiv-hug/CRITIC-R2.md,ldiv-hug,2,N-1,SCREEN_PARITY,machine,yes,minor,,division,long-division,Screen one-line brackets tighter than paper (0.33/0.38 vs 0.53)
+design/audit/runs/ldiv-hug/CRITIC-R2.md,ldiv-hug,2,O-1,SCREEN_PARITY,machine,yes,minor,,division,long-division,Rounded input corners inside the cell
+design/audit/runs/ldiv-hug/CRITIC-R2.md,ldiv-hug,2,O-2,SIZE,machine,no,minor,,division,long-division,"390 card ring-twin cell digits 37 px, below 40 px phone size"
+design/audit/runs/ldiv-hug/CRITIC-R2.md,ldiv-hug,2,O-3,INSTRUCTION,machine,no,minor,,division,long-division,divide bracket item says Make groups of 8 with no counters
+design/audit/runs/nf-order/critic.md,nf-order,1,D1,INTERACTION,machine,no,minor,,number-families,legacy,"Duplicate fact marks row by index, not the row finished first"
+design/audit/runs/nf-order/critic.md,nf-order,1,D2,INTERACTION,machine,no,minor,,number-families,legacy,Medium level: forced row marked red instead of the row the pupil chose
+design/audit/runs/nf-order/critic.md,nf-order,1,D3,PROCESS,process,no,minor,,number-families,legacy,ws-stamp-assets --check FAIL: new module not cache-busted
+design/audit/runs/nf-order/critic.md,nf-order,1,D4,SIZE,machine,no,minor,,number-families,legacy,Possible 40/29 px digit mix on mixed worksheets (unverified)
+design/audit/runs/nf-order/critic.md,nf-order,1,D5,PROCESS,process,no,minor,,number-families,legacy,Commit and CSS comment cite SF-34 instead of SUPPORTS S1.6
+design/audit/runs/nf-order/critic.md,nf-order,1,D6,PROCESS,process,no,minor,,number-families,legacy,Lane probe counts hasAnswered as right; quiz check bypasses recorded result
+design/audit/runs/nf-order/critic.md,nf-order,1,P-1,INK_FONT,machine,no,minor,H4,number-families,legacy,"Number-family drawing is the legacy colour card, non-Andika numerals"
+design/audit/runs/nf-order/critic.md,nf-order,1,P-2,INTERACTION,machine,no,minor,,number-families,legacy,Old saved quizzes grade any family with right first box as correct
+design/audit/runs/nf-order/critic.md,nf-order,1,P-3,INTERACTION,machine,no,minor,,number-families,legacy,Wrong worksheet family red tint cleared immediately
+design/audit/runs/nf-order/critic.md,nf-order,1,P-4,INTERACTION,machine,no,minor,,number-families,legacy,box-wrong painted on first digit of a two-digit answer while typing
+design/audit/runs/nf-order/critic.md,nf-order,1,P-5,MISSING,machine,no,minor,,number-families,legacy,Touch-dot tap targets (S1.8) not wired on any screen host
+design/audit/runs/nf-order/critic.md,nf-order,1,P-6,MISSING,machine,no,minor,,number-families,legacy,Quiz draws no touch dots even when support option is on
+design/audit/runs/number-line/critic-r2.md,number-line,2,R2-D1,VISUAL_DESIGN,judgment,yes,blocking,,number-line,refline,Skip-count family Auto lines count in the wrong step with ends-only labels
+design/audit/runs/number-line/critic-r2.md,number-line,2,R2-D2,VISUAL_DESIGN,judgment,no,blocking,,number-line,refline,seq_2 line has 45 unlabelled ticks; no landmarks
+design/audit/runs/number-line/critic-r2.md,number-line,2,R2-D3,VISUAL_DESIGN,judgment,no,blocking,,number-line,refline,fraction_operations get a halves line that cannot show unit-fraction jumps
+design/audit/runs/number-line/critic-r2.md,number-line,2,R2-D4,NAME_CONTENT,machine,no,blocking,,number-line,refline,order_fdp percents read as whole numbers; line 0..90 for values in 0..1
+design/audit/runs/number-line/critic-r2.md,number-line,2,R2-D5,VISUAL_DESIGN,judgment,no,minor,,number-line,refline,mixed_integers line in twelfths; equivalence lines run 0..20
+design/audit/runs/number-line/critic-r2.md,number-line,2,R2-D6,MISSING,machine,no,blocking,PT-FRM-11,number-line,refline,One-skill sheet page 2 and key print a blank strip instead of the line
+design/audit/runs/number-line/critic-r2.md,number-line,2,R2-D7,SPACE,machine,yes,minor,,number-line,refline,Band costs whole rows on 55 of 298 builds (deferred)
+design/audit/runs/number-line/critic-r2.md,number-line,2,R2-D8,VISUAL_DESIGN,judgment,no,minor,RP-55,number-line,refline,add_decimal line drops tenth ticks and ends at 19
+design/audit/runs/number-line/critic-r2.md,number-line,2,R2-D9,PROCESS,process,no,minor,,number-line,refline,Lane 49 commits behind main; merge conflict
+design/audit/runs/number-line/critic-r3.md,number-line,3,R3-D1,VISUAL_DESIGN,judgment,no,blocking,,number-line,refline,"mixed_addition/subtraction pools get a 0..700,000 line no item can use"
+design/audit/runs/number-line/critic-r3.md,number-line,3,R3-D2,VISUAL_DESIGN,judgment,yes,blocking,,number-line,refline,number_patterns_rule line 0..500: 5 of 34 numbers on a tick; doubling rows unshowable
+design/audit/runs/number-line/critic-r3.md,number-line,3,R3-D3,NOTATION,machine,no,minor,,number-line,refline,ordering_rationals labels unsimplified twelfths
+design/audit/runs/number-line/critic-r3.md,number-line,3,R3-D4,VISUAL_DESIGN,judgment,no,minor,,number-line,refline,"Skip-count line range changes with seed (one skill, one line broken)"
+design/audit/runs/number-line/critic-r3.md,number-line,3,R3-D5,SPACE,machine,yes,blocking,H13,number-line,refline,16 builds lose a third of the page to the band; 27-48 mm blank strip
+design/audit/runs/number-line/critic-r3.md,number-line,3,U1,VIEWPORT,machine,no,minor,H6,number-line,refline,Check below fold at 1366x650 from ~420 px chrome (not lane)
+design/audit/runs/number-line/critic-r3.md,number-line,3,U2,MISSING,machine,no,minor,,number-line,refline,order_fdp kit page draws no numbers to order
+design/audit/runs/number-line/critic-r4.md,number-line,4,R4-D1,SPACE,machine,no,blocking,H5,number-line,refline,Band squeeze splits abs_value S onto 2 pages with 120 mm blank (regression)
+design/audit/runs/number-line/critic-r4.md,number-line,4,R4-D2,SPACE,machine,no,blocking,,number-line,refline,Band-only blank foot strips of 23-42 mm at M and L never swept
+design/audit/runs/number-line/critic-r4.md,number-line,4,R4-D3,SCREEN_PARITY,machine,yes,blocking,,number-line,refline,Mixed pools still draw a line on screen without ends; paper draws none
+design/audit/runs/number-line/critic-r4.md,number-line,4,R4-D4,VISUAL_DESIGN,judgment,yes,minor,,number-line,refline,"number_patterns_rule tens start: 0..280 by 2s, 16 of 42 on a tick"
+design/audit/runs/number-line/critic-r4.md,number-line,4,U1,VIEWPORT,machine,no,minor,,number-line,refline,add_decimal card active box stays under fold (active-box fault)
+design/audit/runs/number-line/critic-r4.md,number-line,4,U2,MISSING,machine,yes,minor,,number-line,refline,order_fdp kit page still draws no numbers to order
+design/audit/runs/number-line/critic-r5.md,number-line,5,R5-D1,SCREEN_PARITY,machine,no,blocking,,number-line,refline,"Pupil paths (link, queue, Start) play custom_mixed with no categoryId; screen draws no line"
+design/audit/runs/number-line/critic-r5.md,number-line,5,R5-D2,PROCESS,process,no,minor,,number-line,refline,Gate never runs page-trim last resort; real-flow check bypasses playSelectedSkills
+design/audit/runs/number-line/critic-r5.md,number-line,5,U1,NAME_CONTENT,machine,no,minor,,number-line,refline,"buildSheet with string places option draws 0..10,000 line"
+design/audit/runs/number-line/critic-r5.md,number-line,5,U2,VIEWPORT,machine,no,minor,,number-line,refline,390 card Check under fold after active-box (phone pass)
+design/audit/runs/number-line/critic-r6.md,number-line,6,R6-D1,CLIP_OVERLAP,machine,no,blocking,,number-line,refline,"Question-dots row drawn over the band, hiding tick labels where answers land"
+design/audit/runs/number-line/critic-r6.md,number-line,6,R6-D2,SPACE,machine,no,minor,,number-line,refline,Line adds a page on Scripted Model nl_mult S and Guided mixed_addition M
+design/audit/runs/number-line/critic-r6.md,number-line,6,R6-N1,PROCESS,process,yes,minor,,number-line,refline,Trim fixture calls trimToPages directly; buildSheet call unguarded
+design/audit/runs/number-line/critic-r7.md,number-line,7,R7-D1,VIEWPORT,machine,no,blocking,H6,number-line,refline,Timed session 1280x600: band scrolls under the sticky header though page fits
+design/audit/runs/number-line/critic-r7.md,number-line,7,N1,INTERACTION,machine,no,minor,,number-line,refline,Loaded toast covers the band right ticks for 3 s
+design/audit/runs/number-line/critic-r7.md,number-line,7,N2,VIEWPORT,machine,no,minor,,number-line,refline,N50 session dots row scrolls under sticky header (also main)
+design/audit/runs/number-line/critic-r8.md,number-line,8,R8-D1,INTERACTION,machine,no,minor,,number-line,refline,Band cleared ~300 ms late: visible 60 px drop and 15 px bounce
+design/audit/runs/number-line/critic-r8.md,number-line,8,N1,INTERACTION,machine,yes,minor,,number-line,refline,Start toast covers band right ticks for 3 s
+design/audit/runs/number-line/critic-r8.md,number-line,8,N2,PROCESS,process,no,minor,,number-line,refline,Gate finds box by #answerInput only; stacked skills check Check alone
+design/audit/runs/number-line/critic-r8.md,number-line,8,N3,INTERACTION,machine,no,minor,,number-line,refline,Mixed pool q2/q3 renders flicker scroll 0 to 27-80 (pre-existing)
+design/audit/runs/number-line/critic-r8.md,number-line,8,U1,PROCESS,process,no,minor,,number-line,refline,No gate exercises testHints: true
+design/audit/runs/number-line/critic-r9.md,number-line,9,R9-D1,INTERACTION,machine,yes,minor,,number-line,refline,Mixed pool short screens: line magnifies fitCellDigits scroll flicker to 77 px
+design/audit/runs/number-line/critic-r9.md,number-line,9,N1,INTERACTION,machine,yes,minor,,number-line,refline,Start toast covers band ticks; on phone swallows first tap
+design/audit/runs/number-line/critic-r9.md,number-line,9,N2,INTERACTION,machine,no,minor,,number-line,refline,Scroll guard cuts back pupil PageDown from inside a box for 1.5 s
+design/audit/runs/number-line/critic-r9.md,number-line,9,N3,PROCESS,process,no,minor,,number-line,refline,"timedHeaderCases mouse only, 2 skills; ignores single-frame flips"
+design/audit/runs/placevalue-phones/critic.md,placevalue-phones,1,1,INTERACTION,machine,no,blocking,,place_value,pv,"Quiz unit_form: digits typed straight through join box 1, extra digit dropped"
+design/audit/runs/placevalue-phones/critic.md,placevalue-phones,1,2,INSTRUCTION,machine,no,blocking,L6,place_value,pv,Quiz count task shows the read instruction (pv field dropped)
+design/audit/runs/placevalue-phones/critic.md,placevalue-phones,1,3,SIZE,machine,no,minor,,place_value,pv,hundreds disks: frame words drawn at two sizes
+design/audit/runs/placevalue-phones/critic.md,placevalue-phones,1,4,VIEWPORT,machine,no,minor,SP-11a,place_value,pv,Four-zone thousands mat swipes at 390
+design/audit/runs/placevalue-phones/critic.md,placevalue-phones,1,5,CLARITY,judgment,no,minor,,place_value,pv,Rename form breaks line before = at 390
+design/audit/runs/placevalue-phones/critic.md,placevalue-phones,1,6,NOTATION,machine,no,minor,,place_value,pv,unit_form answer string says 1 ones
+design/audit/runs/placevalue-phones/critic.md,placevalue-phones,1,7,OTHER,judgment,no,minor,,place_value,pv,wireDiskSwipe adds a window resize listener per render (leak)
+design/audit/runs/placevalue-phones/critic-r2.md,placevalue-phones,2,N1,INTERACTION,machine,no,blocking,,place_value,word-work,Quiz partial rule counts right word-problem answers as unanswered (regression)
+design/audit/runs/placevalue-phones/critic-r2.md,placevalue-phones,2,N2,INTERACTION,machine,yes,blocking,,place_value,pv,Card unit_form box takes 4 digits; wrong digit swallows the next ones
+design/audit/runs/placevalue-phones/critic-r2.md,placevalue-phones,2,N3,CLARITY,judgment,yes,minor,,place_value,pv,Second rename form breaks before = and splits number from unit
+design/audit/runs/placevalue-phones/critic-r2.md,placevalue-phones,2,U1,MISSING,machine,no,minor,,place_value,pv,equivalent_fractions card has no answer control (pre-existing)
+design/audit/runs/placevalue-phones/critic-r3.md,placevalue-phones,3,M1,INTERACTION,machine,no,minor,,place_value,word-work,"Quiz row-partial rule never fires (groups by digit slot, not row)"
+design/audit/runs/placevalue-phones/critic-r3.md,placevalue-phones,3,P1,CLIP_OVERLAP,machine,no,minor,,place_value,pv,390 quiz: tens rename of 4-digit number clipped at both edges
+design/audit/runs/placevalue-phones/critic-r3.md,placevalue-phones,3,U1,PROCESS,process,no,minor,,place_value,pv,Lane adds duplicate Phone pass section to STATUS.md
+design/audit/runs/placevalue-phones/critic-r3.md,placevalue-phones,3,A1,VIEWPORT,machine,no,minor,H6,place_value,pv,Card and quiz answer box and Check below fold at 1366x650 (app-wide)
+design/audit/runs/placevalue-phones/critic-r3.md,placevalue-phones,3,A2,INTERACTION,machine,no,minor,,place_value,pv,Quiz restores word-problem answer as one piece in first box
+design/audit/runs/placevalue-phones/critic-r3.md,placevalue-phones,3,A3,INTERACTION,machine,no,minor,,place_value,pv,estimate error-analysis fails to render (commas shadowed)
