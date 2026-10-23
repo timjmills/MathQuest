@@ -164,11 +164,11 @@ window.MQ_FLOW_CHECK = {
    "error": ""
   },
   "map-task@390": {
-   "actions": 5,
-   "scrolls": 1,
+   "actions": 4,
+   "scrolls": 0,
    "steps": 4,
-   "ok": false,
-   "error": "5 actions > plan 4"
+   "ok": true,
+   "error": ""
   },
   "saved-set@1366": {
    "actions": 4,
@@ -178,11 +178,11 @@ window.MQ_FLOW_CHECK = {
    "error": ""
   },
   "saved-set@390": {
-   "actions": 5,
-   "scrolls": 1,
+   "actions": 4,
+   "scrolls": 0,
    "steps": 3,
-   "ok": false,
-   "error": "5 actions > plan 3–4"
+   "ok": true,
+   "error": ""
   },
   "chip-options@1366": {
    "actions": 1,
@@ -195,8 +195,8 @@ window.MQ_FLOW_CHECK = {
    "actions": 2,
    "scrolls": 0,
    "steps": 1,
-   "ok": false,
-   "error": "2 actions > plan 1"
+   "ok": true,
+   "error": ""
   }
  }
 };

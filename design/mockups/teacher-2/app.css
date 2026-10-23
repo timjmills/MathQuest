@@ -290,6 +290,7 @@ details.more[open] > summary::before { content: "▾"; }
 .narrow-foot .btn-primary { flex: 1; }
 
 /* lessons */
+.lessons > * { min-width: 0; }
 .lessons { display: grid; grid-template-columns: 220px minmax(0, 1fr) 400px; gap: var(--sp-24); align-items: start; }
 .col-title { font-size: var(--fs-14); font-weight: var(--fw-700); color: var(--text-2); margin-bottom: var(--sp-8); }
 .area-list { display: grid; gap: var(--sp-8); }
