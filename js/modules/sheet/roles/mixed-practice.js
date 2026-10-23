@@ -222,10 +222,24 @@ export const factTracksOf = (it) => { const p = payloadOf(it); return factDigitT
 /** TY-31: the fill of the column of these facts at k across (the widest of them). */
 /** TY-31: the gap between neighbouring facts' rules is never below 6 mm. */
 export const FACT_RULE_GAP_MM = 6;
-/** The gap (mm) between the rules of neighbouring facts at k across: the cell less the widest fact. */
-export function factRuleGapAt(items, k, tracks = 0) {
+/**
+ * The drawn grid of a fact band (critic M1 r5: ONE source for the fill and the rule gap, measured
+ * against the drawn rule). The band's 186 mm loses its two heavy sides (1.5 pt); its k cells share
+ * the rest with k - 1 gaps of the look's cell line (Daily 1.5 pt, I Can 0.75 pt). The pitch is
+ * cell + gap; the drawn rule is the fact's grid (factWidthMm), within 0.05 mm of the printed one.
+ */
+const PT_MM = 25.4 / 72;
+const BAND_SIDE_MM = 1.5 * PT_MM;
+const cellGapMm = (look) => (look === 'ican' ? 0.75 : 1.5) * PT_MM;
+export const factPitchMm = (k, look = 'daily') => (186 - 2 * BAND_SIDE_MM + cellGapMm(look)) / k;
+export const factCellWMm = (k, look = 'daily') => factPitchMm(k, look) - cellGapMm(look);
+const widestFactMm = (items, k, tracks) => {
     const n = tracks || Math.max(2, ...items.map(factTracksOf));
-    return 186 / k - Math.max(0, ...items.map((it) => factWidthMm(k, n, payloadOf(it).b)));
+    return Math.max(0, ...items.map((it) => factWidthMm(k, n, payloadOf(it).b)));
+};
+/** The gap (mm) between the drawn rules of neighbouring facts at k across: the pitch less the widest rule. */
+export function factRuleGapAt(items, k, tracks = 0, look = 'daily') {
+    return factPitchMm(k, look) - widestFactMm(items, k, tracks);
 }
 /** What makes a page's facts 3 digits wide, in words ("a 3-digit answer", "2 3-digit dividends"). */
 function wideWords(items) {
@@ -246,9 +260,8 @@ function wideWords(items) {
     const w = (c, one, many) => (c ? (c === 1 ? `a 3-digit ${one}` : `${NUM[c] || c} 3-digit ${many}`) : '');
     return [w(ans, 'answer', 'answers'), w(div, 'dividend', 'dividends'), w(other, 'number', 'numbers')].filter(Boolean).join(' and ');
 }
-export function factFillAt(items, k, tracks = 0) {
-    const n = tracks || Math.max(2, ...items.map(factTracksOf));
-    return Math.max(0, ...items.map((it) => factWidthMm(k, n, payloadOf(it).b))) / (186 / k);
+export function factFillAt(items, k, tracks = 0, look = 'daily') {
+    return widestFactMm(items, k, tracks) / factCellWMm(k, look);
 }
 
 /**
@@ -283,7 +296,7 @@ export function factPick(poolsIn, ids, input, ctx) {
     const allowed = (sz) => Array.from({ length: lattice(sz) }, (_, i) => lattice(sz) - i)
         .filter((k) => FACT_LADDER[k] >= SIZES[sz].digitPt && fits(k));
     const choose = (sz, must, n) => {
-        const fill = (k) => factFillAt(all, k, n);
+        const fill = (k) => factFillAt(all, k, n, ctx.look);
         const ok = allowed(sz);
         if (!ok.length) return null;
         const beat = ok.filter((k) => k * rowsAt(sz, k) > must);
@@ -294,7 +307,7 @@ export function factPick(poolsIn, ids, input, ctx) {
         else {
             // TY-31's hard limit (critic M1 r4): the widest k whose neighbouring rules stay at least
             // 6 mm apart; only when none does, the least overfilled.
-            const gapOk = cands.filter((x) => factRuleGapAt(all, x, n) >= FACT_RULE_GAP_MM - 1e-9);
+            const gapOk = cands.filter((x) => factRuleGapAt(all, x, n, ctx.look) >= FACT_RULE_GAP_MM - 1e-9);
             const over = cands.filter((x) => fill(x) > FACT_FILL.hi);
             k = gapOk.length ? gapOk[0] : over.length ? over.slice().sort((a, b) => fill(a) - fill(b) || b - a)[0] : cands[0];
         }
@@ -318,7 +331,7 @@ export function factPick(poolsIn, ids, input, ctx) {
         if (!got) return null;
     }
     const k = got.k;
-    const f = factFillAt(all, k);
+    const f = factFillAt(all, k, 0, ctx.look);
     return { k, fill: f, tracks, digitPt: FACT_LADDER[k], problems: got.problems, note: fillNote(tracks, k, f, got.ladder, wideWords(all)), ladder: got.ladder, wide: wideWords(all) };
 }
 
@@ -421,7 +434,7 @@ function mixedPacking(poolsIn, input) {
         const h = Math.max(...ids.map((id) => hAtK(poolsIn[id], kHost, ctx)));
         if (Number.isFinite(h) && h > 0) {
             const all = ids.flatMap((id) => poolsIn[id]);
-            cls = Object.assign({}, cls, { k: kHost, h, N: kHost, pick: Object.assign({}, cls.pick, { k: kHost, fill: factFillAt(all, kHost), digitPt: FACT_LADDER[kHost], note: fillNote(cls.pick.tracks, kHost, factFillAt(all, kHost), cls.pick.ladder, cls.pick.wide) }) });
+            cls = Object.assign({}, cls, { k: kHost, h, N: kHost, pick: Object.assign({}, cls.pick, { k: kHost, fill: factFillAt(all, kHost, 0, ctx.look), digitPt: FACT_LADDER[kHost], note: fillNote(cls.pick.tracks, kHost, factFillAt(all, kHost, 0, ctx.look), cls.pick.ladder, cls.pick.wide) }) });
         }
     }
     const maxShelves = { S: 9, M: 7, L: 5 }[ctx.size] || 5;
@@ -548,17 +561,11 @@ function planMixed(input, pools) {
             pages.push(cur);
         }
         const cells = sh.items.map((it) => planItem(pick ? atColumns(it, k) : it, { cols: k }));
-        if (sh.items.length < k) {
-            // A last shelf of fewer than k problems: its cells keep the width of k across, and the
-            // places it does not use are plain paper - never an empty box (critic M1 r4, PT-ENG-7).
-            // It sits under the band, outside its frame, so the frame ends with the last full shelf and
-            // the open places are plain paper.
-            const m2 = sh.items.length;
-            cur.sections.push({ kind: 'row', widths: [`${m2}fr`, `${k - m2}fr`], parts: [
-                gridPart(cells, { cols: m2, rows: 1, cellH: h, labels, start, cls: tabCls }),
-                { kind: 'html', html: '' },
-            ] });
-        } else cur.band.contents.push(gridPart(cells, { cols: k, rows: 1, cellH: h, labels, start, cls: tabCls }));
+        // A last shelf of fewer than k problems keeps the full grid (PG-15 / PT-ENG-7, owner
+        // 2026-10-23): the frame stays a closed rectangle at the full width, and the places it does
+        // not use are ONE unruled blank area inside it (grid.js blankRun) - no cell borders, no
+        // labels, never an empty box - at the full shelf height.
+        cur.band.contents.push(gridPart(cells, { cols: k, rows: 1, cellH: h, labels, start, cls: tabCls }));
         start += sh.items.length;
         cur.used += h;
     }

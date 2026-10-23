@@ -1711,6 +1711,28 @@ function spanGrades(sk) {
 }
 
 /**
+ * The words a Mixed practice note names a pool by (critic M1 r5): the option the skill's chosen
+ * values deal, not the host label - "Addition Facts, + 2 only", never "Addition Facts (within 20)".
+ * Without a ticked fact set the skill's own label stands.
+ */
+function mixedNoteLabel(sk, label, its) {
+    let set = '';
+    let def = null;
+    try {
+        set = factSetTitle(sk.categoryId, sk.skillId, sk.opts || {});
+        def = optionsFor(sk.categoryId, sk.skillId).find((d) => d.id === 'constant') || null;
+    } catch (e) { set = ''; }
+    if (!set) return label;
+    const base = String(label).replace(/\s*\([^)]*\)\s*$/, '');
+    const verb = def ? String(def.titleVerb || def.label || '') : '';
+    const f = (its || []).map((it) => factOf(it.q)).find(Boolean);
+    const sign = f ? ({ '+': '+', '-': '\u2212', '*': '\u00d7', '/': '\u00f7' }[f.op] || f.op) : '';
+    const rest = verb && set.startsWith(verb) && !(def && def.zeroTitle && /,/.test(set)) ? set.slice(verb.length).trim() : '';
+    const what = sign && rest ? `${sign} ${rest}` : `${set.charAt(0).toLowerCase()}${set.slice(1)}`;
+    return `${base}, ${what} only`;
+}
+
+/**
  * The "I Can" title a fact drill's OPTIONS give it (P-31, OPTIONS-CRITIC-R2 §5 #15), or '' to
  * keep the skill's own. A ticked fact set names the page ("I Can add 6"), and a fact band other
  * than the default is said too ("I Can add 6 (facts to 10)", "I Can add facts to 10").
@@ -3039,14 +3061,14 @@ async function buildRoleSheet(n, metaOf) {
             const its = items.filter((it) => it.pool === p.id);
             const c = { unique: 0, related: 0, turn: 0, repeat: 0 };
             for (const it of its) c[it.dealtAs || 'unique']++;
-            return { p, its, c, w: Math.floor(Number(want[p.id]) || 0), label: metaOf(p.skills[0]).label };
+            return { p, its, c, w: Math.floor(Number(want[p.id]) || 0), label: mixedNoteLabel(p.skills[0], metaOf(p.skills[0]).label, its) };
         });
         for (const x of per) {
             const uniq = x.c.unique + x.c.related;
             if (x.its.length < x.w) {
                 dealNotes.push(fillOn
                     ? `Mixed practice: ${x.label} could not fill its ${x.w} places, so the page has ${total} problems.`
-                    : `Mixed practice: ${x.label} run out at ${uniq}, so the page has ${total} problems.`);
+                    : `Mixed practice: ${x.label}, has only ${uniq} different facts, so the page has ${total} problems.`);
             }
             if (x.c.turn || x.c.repeat) {
                 // (the example is the pool's own: a turnaround it dealt, in its own sign)
@@ -3054,8 +3076,10 @@ async function buildRoleSheet(n, metaOf) {
                 const tf = tItem ? factOf(tItem.q) : null;
                 const sign = tf ? ({ '+': '+', '*': '\u00d7' }[tf.op] || tf.op) : '';
                 const eg = tf ? ` (${tf.b} ${sign} ${tf.a} and ${tf.a} ${sign} ${tf.b})` : '';
-                const parts = [x.c.turn ? `${x.c.turn} turnaround${x.c.turn > 1 ? 's' : ''}${eg}` : '', x.c.repeat ? `${x.c.repeat} repeated fact${x.c.repeat > 1 ? 's' : ''}, each fact once more before any comes again` : ''].filter(Boolean);
-                dealNotes.push(`Mixed practice: ${x.label} has ${uniq} different facts, so the page is filled with ${parts.join(' and ')}.`);
+                const parts = [x.c.turn ? `${x.c.turn} turnaround${x.c.turn > 1 ? 's' : ''}${eg}` : '', x.c.repeat ? `${x.c.repeat} repeated fact${x.c.repeat > 1 ? 's' : ''}` : ''].filter(Boolean);
+                // (literally true when a double, 2 + 2, is its own turnaround: critic M1 r5)
+                const tail = x.c.repeat ? ', kept even: no fact (with its turnaround) comes back twice before every fact has come back once' : '';
+                dealNotes.push(`Mixed practice: ${x.label}, has only ${uniq} different facts, so the page is filled with ${parts.join(' and ')}${tail}.`);
             }
         }
         if (rep.families.length) dealNotes.push(`Mixed practice: ${rep.families.length} related fact${rep.families.length > 1 ? 's' : ''} (such as 6 + 7 and 13 \u2212 6) on the page, as the settings allow.`);

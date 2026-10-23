@@ -98,7 +98,30 @@ const PAGE_FN = async (req) => {
                                 if (t) tabs.add(Math.round((t.getBoundingClientRect().height / mm) * 10) / 10);
                             }
                             // no box without a problem; the shelf (row) height
-                            const empty = [...host.querySelectorAll('.ws-band .ws-cell')].filter((c) => c.classList.contains('blankrun') || !c.textContent.trim()).length;
+                            // (PG-15 / PT-ENG-7, owner 2026-10-23: every bordered cell holds a problem; a
+                            // short last shelf ends in ONE unruled trailing area inside a rectangular frame)
+                            const empty = [...host.querySelectorAll('.ws-band .ws-cell:not(.blankrun)')].filter((c) => !c.textContent.trim()).length;
+                            const shape = [];
+                            for (const band of host.querySelectorAll('.ws-band')) {
+                                const bb = band.getBoundingClientRect();
+                                const bs = getComputedStyle(band);
+                                if (['Left', 'Right', 'Bottom'].some((e) => !(parseFloat(bs[`border${e}Width`]) > 0))) shape.push('a band side without its frame line');
+                                if (band.parentElement && band.parentElement.querySelector(':scope > .mq-row .ws-grid')) shape.push('a grid outside the band frame');
+                                const grids = [...band.querySelectorAll(':scope > .ws-grid')];
+                                for (const g of grids) {
+                                    const gb = g.getBoundingClientRect();
+                                    if (Math.abs(gb.left - bb.left) > 2 || Math.abs(gb.right - bb.right) > 2) shape.push(`a shelf ${((bb.width - gb.width) / mm).toFixed(2)} mm narrower than the frame`);
+                                }
+                                const runs = [...band.querySelectorAll('.ws-cell.blankrun')];
+                                if (runs.length > 1) shape.push(`${runs.length} trailing areas`);
+                                for (const b of runs) {
+                                    if (b.parentElement !== grids[grids.length - 1]) shape.push('a trailing area before the last shelf');
+                                    if (b.querySelector('.ws-cell, .ws-tab, .ws-label') || b.textContent.trim()) shape.push('a trailing area with a label or a line');
+                                    const cs = getComputedStyle(b);
+                                    if (['Left', 'Right', 'Top', 'Bottom'].some((e) => parseFloat(cs[`border${e}Width`]) > 0)) shape.push('a trailing area with inner borders');
+                                    if (getComputedStyle(b).gridColumnEnd !== '-1') shape.push('a trailing area that does not run to the frame');
+                                }
+                            }
                             const c0 = host.querySelector('.ws-band .ws-grid .ws-cell');
                             const rowH = c0 ? c0.getBoundingClientRect().height / mm : 0;
                             host.remove();
@@ -107,7 +130,7 @@ const PAGE_FN = async (req) => {
                                 arr: o.arrangement, notes: o.notes || [], facts, pts: [...pts], cellPts: [...cellPts], fillMax, fillMin, tracks, tabs: [...tabs],
                                 k: (meta.fits && meta.fits[0] && meta.fits[0].cols) || 0, rows: (meta.fits && meta.fits[0] && meta.fits[0].rows) || 0,
                                 n: o.items.length, longest: meta.interleave ? meta.interleave.longest : null, pages: o.pageCount,
-                                dealt: o.items.map((x) => x.dealtAs || 'unique'), mr: o.mixedRepeats, empty, rowH,
+                                dealt: o.items.map((x) => x.dealtAs || 'unique'), mr: o.mixedRepeats, empty, rowH, shape: [...new Set(shape)],
                             };
                         };
 
@@ -154,7 +177,7 @@ async function main() {
                         if (rep.exact.length !== dealt.repeat) fail(`${rep.exact.length} exact repeats on the page, ${dealt.repeat} dealt as repeats`);
                         if (rep.turnarounds.length !== dealt.turn) fail(`${rep.turnarounds.length} turnarounds on the page, ${dealt.turn} dealt as turnarounds`);
                         // a share with repeats used its turnarounds first: the pool has dealt some, or has none to deal
-                        if (!fillOn && !full && !r.notes.some((t) => /run out at \d+/.test(t))) fail('fill off, the page ends early with no note');
+                        if (!fillOn && !full && !r.notes.some((t) => /has only \d+ different facts, so the page has \d+ problems/.test(t))) fail('fill off, the page ends early with no note');
                         if ((dealt.turn || dealt.repeat) && !r.notes.some((t) => /so the page is filled with/.test(t))) fail('turnarounds / repeats with no note');
                         // critic M1 r4: repeats spread evenly - per skill, each fact (a fact and its
                         // turnaround counted as one) appears within 1 of every other's count; no
@@ -170,6 +193,7 @@ async function main() {
                         if (shelfDup) fail(`${shelfDup} identical fact(s) twice on one shelf`);
                         // critic M1 r4: no empty box; a short page keeps the full page's row height
                         if (r.empty) fail(`${r.empty} box(es) without a problem`);
+                        for (const t of r.shape) fail(t);
                         if (!fillOn) {
                             const twin = await app.page.evaluate(PAGE_FN, Object.assign({}, req, { fill: true }));
                             if (Math.abs(twin.rowH - r.rowH) > 0.3) fail(`row height ${r.rowH.toFixed(1)} mm, ${twin.rowH.toFixed(1)} mm with fill on`);
