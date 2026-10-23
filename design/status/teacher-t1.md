@@ -28,3 +28,5 @@ Owns: `design/mockups/teacher-2/`, `tests/scripts/ws-teacher-tokens.cjs`, this f
 | 2026-10-23 | Owner: purple rail tried then kept as ink ("keep it as it is for now"); big-tray popup area → grade; select + weight there; detailed weights with % lock (one skill 50 %, rest even); tray views List (default) · Chips · Thumbnails | lead | — |
 | 2026-10-23 | Fix round 3: checks first (a5c99e4b failing), tray capped (≤ 81 px) with summary bar + popup, bulk add, detailed weights, pictures from the problem, preview = summary; all gates OK | mq-opus-medium | done |
 | 2026-10-23 | Critic round 4 (fresh critic) | mq-opus-medium | running |
+| 2026-10-23 | Critic r4: A 7 · B 8 · C 6 · D 8 — FAIL (`critic-r4.md`). Thumbnails contradict names for a 3rd round → stop rule: root cause is hand-drawn stand-ins; fix = draw every thumbnail from the real seeded generator (`generateQuestionFor`) captured into data.js. Search must use `skill-finder.js` (CLAUDE.md) | lead | FAIL |
+| 2026-10-23 | Fix round 4 (fresh builder) | mq-opus-medium | running |
