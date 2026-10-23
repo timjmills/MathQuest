@@ -215,7 +215,10 @@ run_gate() {   # index [retry]
 pop() {   # queue file: print and remove its first line; fail when empty
   ( flock 9; l=$(head -n 1 "$1"); [ -n "$l" ] || exit 1; sed -i '1d' "$1"; printf '%s\n' "$l" ) 9>"$1.lock"
 }
-worker() { local q=$1 i; while i=$(pop "$q"); do run_gate "$i"; done; }
+# The slot runner polls once a second and is not first-come-first-served: a worker that took its next gate at
+# once would win the slot it just freed every time and starve the other worker's waiting gate (seen 2026-10-23:
+# a shard waited 90 min). So a worker pauses 3 s between gates, letting a waiting runner take the slot.
+worker() { local q=$1 i; while i=$(pop "$q"); do run_gate "$i"; sleep 3; done; }
 
 # The item a FAIL names, when its log names one (the first "category:skill" on a finding line).
 item_of() {
