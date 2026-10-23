@@ -13,7 +13,7 @@
 // every skill card / chip / lesson row / lesson panel / chip-options header has exactly one grade badge, first in its
 // content box, whole, >= 12 px, >= 4.5 : 1 (owner 2026-10-23).
 // Fix round 4 (critic r4) adds: every control >= 44 px WIDE too (close buttons squeezed by long titles); a quiz sheet's
-// How many questions equals its summary; preview cells are real captured items of their own skill; the phone tray popup
+// How many questions equals its summary; preview cells are drawn live from their own skill; the phone tray popup
 // shows >= 6 skill rows on its first 390 × 844 screen (rows <= 56 px, ✕ on the name's line, headers <= 64 px); the print
 // sheet keeps 3 pages and Examples after close → tick a skill → Print; Grade 2 (all areas) · More reaches every grade-2
 // skill; and the two search boxes answer "2.NBT.5", "2.NBT.B.5", "within 1000", "time", "clocks", "add within 20",
@@ -250,6 +250,9 @@ async function screenReport(page, w) {
     for (const l of document.querySelectorAll('.lesson-list:not(.lesson-hits) .lesson')) if (l.querySelector('.gbadge')) say('grade badge', `“${txt(l)}”: a badge on a row of a one-grade list`);
     for (const h of hosts) {
       if (!shown(h) && !h.matches('.card')) continue; if (!h.getBoundingClientRect().width) continue;
+      // fix round 5 (critic r5 A5): in a ONE-grade tray the popup says the grade once on its grade header, so its chips
+      // carry none (as its List rows) — allowed only under a grade header that shows the badge
+      if (h.hasAttribute('data-grade-said')) { const g = h.closest('.tp-grade'); if (!g || !g.querySelector('.tp-ghead .gbadge')) say('grade badge', `“${txt(h)}” has no badge and no grade header says its grade`); continue; }
       if (!h.hasAttribute('data-grade-host')) { say('grade badge', `“${txt(h)}” is not a grade host`); continue; }
       const own = [...h.querySelectorAll('.gbadge')].filter(b => b.closest('[data-grade-host]') === h);
       if (own.length !== 1) { say('grade badge', `“${txt(h)}” has ${own.length} badges`); continue; }
@@ -660,7 +663,7 @@ function writeIndex(shots, results) {
   <a class="tile" href="app.html"><b>The mock-up</b><span>Skills (opens here) with the tray, the worksheet sheet, Quiz, Share, Lessons, Classes and the profile menu. Works at any width; Theme is in the profile menu, or add ?theme=dark.</span></a>
   <a class="tile" href="flows.html"><b>The flows</b><span>Each job with its steps and clicks, today’s count beside it, and a “Walk it” button that shows each click in the mock-up.</span></a>
   <a class="tile" href="palette.html"><b>Colour: board C</b><span>Eight maths areas in four strengths, light and dark, the colour-blind check, where each colour moved from the site, and boards B and A as reference pictures.</span></a>
-  <a class="tile" href="thumbs.html"><b>Every skill’s thumbnail</b><span>All 715 live skills, each showing a REAL item captured from the app (<code>capture-samples.cjs</code>); <code>thumbs-check.cjs</code> holds each thumbnail to its own skill’s item.</span></a>
+  <a class="tile" href="thumbs.html"><b>Every skill’s thumbnail</b><span>All 715 live skills, each drawn LIVE by the app as you scroll (<code>live.mjs</code>: the app’s own <code>buildSheet</code>); <code>thumbs-check.cjs</code> holds each thumbnail to the booted app’s own cell for the same skill and seed.</span></a>
   <a class="tile" href="files.html"><b>Teacher files: live and branches</b><span>Which teacher files are live, which are only on a branch, and what T2–T6 does with each (STATUS §7).</span></a>
 </div>
 <h2>The flows at a glance</h2>

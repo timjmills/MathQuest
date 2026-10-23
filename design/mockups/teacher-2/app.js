@@ -1,5 +1,5 @@
-// Teacher site 2.0 — the clickable mock-up (T1). Static. Data from data.js (make-data.mjs); thumbnails are the real app's
-// items (samples.js, capture-samples.cjs); search is the app's own finder, js/modules/skill-finder.js, imported read-only
+// Teacher site 2.0 — the clickable mock-up (T1). Static. Data from data.js (make-data.mjs); thumbnails are drawn live by
+// the app itself (thumbs.js → live.mjs: the app's buildSheet in a hidden frame running index.html); search is the app's own finder, js/modules/skill-finder.js, imported read-only
 // (served over http; on file:// the module cannot load and a plain fallback matcher stands in).
 // URL: app.html?theme=dark&tray=demo3#print   (theme light|dark; tray demo1|demo3|lesson|<cat:skill,...>; hash = screen)
 // Screens: #skills #lessons #classes; sheets on top: #print #quiz #buildfrom #share #quizshare #chip/<cat:skill> #board
@@ -298,8 +298,8 @@
   function chipHTML(k, opts = {}) {
     const s = SK[k]; const a = s.a; const tag = opts.tag || 'button';
     const attrs = tag === 'button' ? `data-act="${opts.act || 'chip'}" data-arg="${esc(k)}" ${opts.pressed ? pressed(true) : ''}` : '';
-    return `<${tag} class="chip" data-domain="${a}" data-grade-host ${attrs} title="${esc(s.l)} · ${areaName(a)} · ${gradeShort(s.g)}">` +
-      `${gbadge(s.g)}${opts.legend && !opts.dot ? '' : `<span class="chip-dot">${icon(AREAS[a].icon)}</span>`}<span class="name">${esc(short(s.l))}</span>${opts.legend ? '' : `<span class="chip-area">${AREAS[a].short}</span>`}${opts.pressed ? icon('check') : ''}</${tag}>`;
+    return `<${tag} class="chip" data-domain="${a}"${opts.noBadge ? ' data-grade-said' : ' data-grade-host'} ${attrs} title="${esc(s.l)} · ${areaName(a)} · ${gradeShort(s.g)}">` +
+      `${opts.noBadge ? '' : gbadge(s.g)}${opts.legend && !opts.dot ? '' : `<span class="chip-dot">${icon(AREAS[a].icon)}</span>`}<span class="name">${esc(short(s.l))}</span>${opts.legend ? '' : `<span class="chip-area">${AREAS[a].short}</span>`}${opts.pressed ? icon('check') : ''}</${tag}>`;
   }
   // drop the area word on any chip whose name (or word) would otherwise be cut; called after every render
   // Critic r3 A3 / D3: the area word is decided per CONTAINER. If any chip in a stack would lose its word, every chip in
@@ -325,11 +325,13 @@
     }
   }
   function areaTag(a, pool) { return `<span class="area-tag">${icon(AREAS[a].icon)}${areaName(a)}</span>${pool ? '<span class="mixed-badge">mixed</span>' : ''}`; }
-  function card(s, crossGrade) {
+  // inArea: the card sits under its area's band, which names the area, so the card does not repeat it (critic r5 A5);
+  // a Mixed pool keeps its "mixed" badge
+  function card(s, crossGrade, inArea) {
     const k = id(s), on = S.tray.includes(k);
     return `<button class="card" data-domain="${s.a}" data-grade-host data-act="tick" data-skill="${esc(k)}" ${pressed(on)}>` +
       `<div class="card-title">${gbadge(s.g)}<div class="card-name">${esc(s.l).replace(/\//g, '/<wbr>')}</div></div><div class="thumb">${T.draw(s, undefined, S.skillOpts[k])}</div>` +
-      `<div class="card-meta">${areaTag(s.a, s.p)}</div>` +
+      (inArea ? (s.p ? `<div class="card-meta"><span class="mixed-badge">mixed</span></div>` : '') : `<div class="card-meta">${areaTag(s.a, s.p)}</div>`) +
       `<span class="tick" aria-hidden="true"><span>${on ? '✓' : ''}</span></span><span class="sr">${on ? 'In the tray' : 'Tick to add'}</span></button>`;
   }
   function group(a, list, opts = {}) {
@@ -338,8 +340,8 @@
     if (opts.cross && new Set(shown.map(s => s.g)).size > 1) {
       // across grades (a search, Mixed levels): the area's skills sub-grouped by grade, each under its badge
       const gs = []; shown.forEach(s => { let g = gs.find(x => x.g === s.g); if (!g) gs.push(g = { g: s.g, l: [] }); g.l.push(s); });
-      body = gs.map(g => `<h3 class="grade-head">${gbadge(g.g)}${esc(gradeName(g.g))}<span class="count">${plural(g.l.length, 'skill')}</span></h3><div class="grid mb-16" data-view="${S.view}">${g.l.map(s => card(s, true)).join('')}</div>`).join('');
-    } else body = `<div class="grid" data-view="${S.view}">${shown.map(s => card(s, opts.cross)).join('')}</div>`;
+      body = gs.map(g => `<h3 class="grade-head">${gbadge(g.g)}${esc(gradeName(g.g))}<span class="count">${plural(g.l.length, 'skill')}</span></h3><div class="grid mb-16" data-view="${S.view}">${g.l.map(s => card(s, true, !opts.title)).join('')}</div>`).join('');
+    } else body = `<div class="grid" data-view="${S.view}">${shown.map(s => card(s, opts.cross, !opts.title)).join('')}</div>`;
     const addA = opts.addArea ? `<button class="btn btn-add" data-act="addarea" data-arg="${a}">+ Add whole area (${wholeSet(S.grade, a).length})</button>` : '';
     return `<section class="group" data-domain="${a}" data-group="${key}"><div class="band-row"><h2 class="band">${icon(AREAS[a].icon)}${esc(opts.title || AREAS[a].long)}<span class="count">${opts.count || plural(list.length, 'skill')}</span></h2>${addA}</div>` + body +
       (list.length > lim ? `<button class="btn more-btn" data-act="showall" data-arg="${esc(key)}">Show all ${list.length}</button>` : '') + '</section>';
@@ -477,8 +479,13 @@
         more.textContent = `+${hid} more`; more.hidden = hid === 0; more.setAttribute('aria-label', `${hid} more: open the tray`);
         if (row.scrollWidth > row.clientWidth + 1) more.textContent = `+${hid}`;     // the short form, never the name's room
       }
-      // not even the "+N" fits (a narrow tablet): the area row goes, the count button beside it still opens the tray
-      if (row.scrollWidth > row.clientWidth + 1 && row.classList.contains('tray-segs')) row.hidden = true;
+      // a big tray's area row: never "+N areas" alone (critic r5 A2). The first area stays, named (icon, short name,
+      // count); "+N" only when it fits beside it, else the label button ("6 areas ▸") is the way to the rest
+      if (row.classList.contains('tray-segs') && items.length && items.every(c => c.hidden)) {
+        items[0].hidden = false; hid = items.length - 1;
+        more.textContent = `+${hid}`; more.hidden = hid === 0; more.setAttribute('aria-label', `${hid} more areas: open the tray`);
+        if (row.scrollWidth > row.clientWidth + 1) more.hidden = true;
+      }
     }
   }
   // ---- the tray popup: area → grade → skill (owner 2026-10-23)
@@ -523,10 +530,11 @@
     const row = (k) => {
       const s = SK[k], w = wOf(k), changed = S.skillOpts[k] && Object.keys(S.skillOpts[k]).length, locked = S.lock['k:' + k] !== undefined;
       const tags = `<span class="tp-tags">${changed ? '<span class="tag">changed</span>' : ''}${w !== 2 || locked ? `<span class="tag tag-w">${locked ? Math.round(S.lock['k:' + k]) + ' %' : wWord(w)}</span>` : ''}</span>`;
-      const detail = det ? `<span class="tp-det"><span class="stepper stepper-sm"><button data-act="wstep" data-arg="${esc(k)}|-1" aria-label="Less weight" ${w <= 0 ? 'disabled' : ''}>−</button><output>${w}</output><button data-act="wstep" data-arg="${esc(k)}|1" aria-label="More weight" ${w >= 10 ? 'disabled' : ''}>+</button></span>${pctCtl('k:' + k, p.pct[k] || 0)}<span class="tp-share">≈ ${p.byKey[k] || 0} of ${p.total}</span></span>` : '';
+      const detail = det ? `<span class="tp-det"><span class="stepper stepper-sm"><button data-act="wstep" data-arg="${esc(k)}|-1" aria-label="Less weight" ${w <= 0 ? 'disabled' : ''}>−</button><output>${w}</output><button data-act="wstep" data-arg="${esc(k)}|1" aria-label="More weight" ${w >= 10 ? 'disabled' : ''}>+</button></span>${pctCtl('k:' + k, p.pct[k] || 0)}<span class="tp-share">≈ ${p.byKey[k] || 0}<span class="l-of"> of ${p.total}</span></span></span>` : '';
       const x = `<button class="btn icon-btn" data-act="tpremove" data-arg="k:${esc(k)}" aria-label="Take ${esc(short(s.l))} out of the tray">${icon('close')}</button>`;
-      if (S.tview === 'chips') return `<div class="tp-item tp-chipitem ${w === 0 ? 'out' : ''}">${selBox('k:' + k, s.l)}${chipHTML(k, { legend: true, dot: true })}${x}${tags}${detail}</div>`;
-      if (S.tview === 'thumbs') return `<div class="tp-item tp-thumb ${w === 0 ? 'out' : ''}" data-domain="${s.a}" data-skill="${esc(k)}"><div class="tp-thumb-top" data-grade-host>${gbadge(s.g)}<button class="tp-name" data-act="chip" data-arg="${esc(k)}">${esc(short(s.l))}</button></div><div class="thumb">${T.draw(s, 1, S.skillOpts[k])}</div><div class="tp-thumb-foot">${selBox('k:' + k, s.l)}${tags}${x}</div>${detail}</div>`;
+      // one grade in the tray: its grade header says the grade, so Chips and Thumbnails drop the badge as List does (critic r5 A5)
+      if (S.tview === 'chips') return `<div class="tp-item tp-chipitem ${w === 0 ? 'out' : ''}">${selBox('k:' + k, s.l)}${chipHTML(k, { legend: true, dot: true, noBadge: oneGrade })}${x}${tags}${detail}</div>`;
+      if (S.tview === 'thumbs') return `<div class="tp-item tp-thumb ${w === 0 ? 'out' : ''}" data-domain="${s.a}" data-skill="${esc(k)}"><div class="tp-thumb-top"${oneGrade ? '' : ' data-grade-host'}>${oneGrade ? '' : gbadge(s.g)}<button class="tp-name" data-act="chip" data-arg="${esc(k)}">${esc(short(s.l))}</button></div><div class="thumb">${T.draw(s, 1, S.skillOpts[k])}</div><div class="tp-thumb-foot">${selBox('k:' + k, s.l)}${tags}${x}</div>${detail}</div>`;
       // one grade in the tray: the grade is said once, in the grade header, not on every row (critic r4 A5)
       return `<div class="tp-row ${w === 0 ? 'out' : ''}" data-domain="${s.a}"${oneGrade ? '' : ' data-grade-host'}>${oneGrade ? '' : gbadge(s.g)}${selBox('k:' + k, s.l)}<span class="tp-icon">${icon(AREAS[s.a].icon)}</span><button class="tp-name" data-act="chip" data-arg="${esc(k)}">${esc(s.l)}</button>${tags}${x}${detail}</div>`;
     };
@@ -663,8 +671,8 @@
     for (let pi = 0; pi < nPages; pi++) {
       const items = p.pageItems[pi]; let body = '';
       // each cell is drawn from ITS skill with its own seed; an item never repeats on a page (re-dealt until new)
-      // the cells are the skill's REAL captured items (samples.js), dealt 1st, 2nd, 3rd … so none repeats on a page; New
-      // numbers turns which comes first. Past the captured items a cell says so instead of repeating one (the PDF deals all)
+      // the cells are the skill's items drawn LIVE by the app (live.mjs): page p deals the sheet printed at its own seed,
+      // 1st, 2nd, 3rd …, so none repeats on a page and Same problems, new numbers gives each page new numbers
       const dealt = {};
       const pgSeed = eachMode(isQuiz) === 'copy' ? S.seed + ':0' : S.seed + ':' + pi;   // copies: page 1's items again
       const cell = (sk, i, cls) => { const n = dealt[sk] = (dealt[sk] ?? -1) + 1; const pic = T.drawItem(SK[sk], n, pgSeed);
@@ -687,7 +695,7 @@
       body += `<div class="page-key">${eachMode(isQuiz) === 'copy' ? `copy ${pi + 1} of ${p.pages}` : `page ${pi + 1} of ${p.pages}`}</div>`;
       pages.push(`<div class="page p${nPages}"><div class="page-in">${body}</div></div>`);
     }
-    return `<div class="previews">${pages.join('')}</div><p class="note center">${nPages > 1 ? `First ${nPages} pages` : 'First page'} · real items from the app, up to ${T.sampleCount(SK[S.tray[0]]) || 3} of each skill · the PDF is the full view</p>`;
+    return `<div class="previews">${pages.join('')}</div><p class="note center">${nPages > 1 ? `First ${nPages} pages` : 'First page'} · every item drawn live by the app · the PDF is the full view</p>`;
   }
   // the I Can title is the skill's GOAL ("I can add within 20"), from its name; when a name cannot be read as a goal the
   // page says the skill's name plainly, without "I can" (critic r3 C4)
@@ -818,7 +826,7 @@
     const pre = s.pre ? `<div class="preset"><b>${icon('check')}A preset of ${esc(s.pre.hl)}</b><span class="note">This skill opens ${esc(s.pre.hl)} with ${s.pre.vals.map(([l, v]) => `<b>${esc(l)}: ${esc(v)}</b>`).join(', ')} already set. You can change them below.</span></div>` : '';
     const body = `<div class="share-pad"><div class="band band-flat" data-domain="${s.a}">${icon(AREAS[s.a].icon)}${areaName(s.a)}<span class="count">${s.s ? esc(s.s) : ''}</span></div>` +
       `<div class="thumb thumb-lg">${T.draw(s, S.seed, S.skillOpts[S.chip])}</div>` +
-      (T.sample(s, S.seed) ? `<p class="note">A real item from the app${S.skillOpts[S.chip] && Object.keys(S.skillOpts[S.chip]).length ? ', dealt at the skill’s default settings; your changed options apply when it prints' : ''}.</p>` : '') + pre +
+      `<p class="note">An item drawn live by the app${S.skillOpts[S.chip] && Object.keys(S.skillOpts[S.chip]).length ? ', at the skill’s default settings; your changed options apply when it prints' : ''}.</p>` + pre +
       (own.length ? `<p class="col-title">This skill’s options</p>` + own.map(row).join('') : '<p class="note">This skill has no options of its own.</p>') +
       (nl.length ? nl.map(row).join('') : '') +
       `<p class="col-title">On screen</p>` + play.map(row).join('') +

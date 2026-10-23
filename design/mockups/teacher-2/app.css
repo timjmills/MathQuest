@@ -889,29 +889,53 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; a
 .tray-chips:has(> .fit-wrap) { align-items: flex-start; }
 .tray-chips > .chip.fit-wrap { min-width: 9rem; height: auto; }
 .tray-chips > .chip.fit-wrap .name { white-space: normal; overflow: visible; text-overflow: clip; }
-/* ---- fix round 4 (lead, 2026-10-23): a real item at a readable size ----
-   A thumbnail is the item's opening sentences as live Andika text, then its key part (the drawing and the problem
-   line) in a window that never shrinks text below the place's minimum (--smp-min: Big 12 px, Medium 11, Small 9; read
-   by MQThumbs.fit); what does not fit fades out. Page previews and the bar's mini picture show the whole item (0). */
-.smp-thumb { --smp-min: 11; display: flex; flex-direction: column; gap: var(--sp-4); width: 100%; height: 100%; min-width: 0; min-height: 0; overflow: hidden; background: var(--paper); color: var(--paper-ink); font-family: var(--font-pupil); text-align: left; }
-.smp-prose { flex: 0 1 auto; min-height: 0; max-height: 60%; overflow: hidden; font-size: var(--fs-12); line-height: var(--lh-tight); font-weight: var(--fw-500); }
-.prose-only .smp-prose { max-height: 100%; }
-.smp-thumb > .smp-svg { flex: 1 1 0; min-height: 0; width: 100%; height: auto; display: block; }
-.prose-only > .smp-svg, .smp-thumb.full > .smp-prose { display: none; }
-.smp-thumb.full > .smp-svg { display: block; }
-.smp-thumb.cut > .smp-svg { -webkit-mask-image: linear-gradient(to bottom, var(--paper-ink) 78%, transparent); mask-image: linear-gradient(to bottom, var(--paper-ink) 78%, transparent); }
-.smp-thumb.prose-cut > .smp-prose { -webkit-mask-image: linear-gradient(to bottom, var(--paper-ink) 65%, transparent); mask-image: linear-gradient(to bottom, var(--paper-ink) 65%, transparent); }
-.grid[data-view="big"] .smp-thumb, .thumb-lg .smp-thumb { --smp-min: 12; }
-.grid[data-view="big"] .smp-prose, .thumb-lg .smp-prose, .board-card .smp-prose { font-size: var(--fs-14); }
-.grid[data-view="small"] .smp-thumb { --smp-min: 9; }
-.board-card .smp-thumb { --smp-min: 20; padding: var(--sp-24); }
-.board-card .smp-prose { font-size: var(--fs-28); }
-.page-cell .smp-thumb, .tray-mini-pic .smp-thumb { --smp-min: 0; }
-.board-card > .smp-thumb { width: 100%; height: 100%; }
+/* ---- fix round 5 (critic r5 A1 / C1 / C2): the thumbnail is drawn LIVE by the app (live.mjs) ----
+   The host holds the app's own cell in a shadow root, anchored at the left / top of what the cell draws; the place's
+   minimum text (--smp-min: Big 12 px, Medium 11, Small 9, the board 20) is met by cropping, and a cut edge fades.
+   Page previews and the bar's mini picture show the whole cell (0), never above print size (--smp-cap). */
+.live-thumb { --smp-min: 11; --smp-cap: 1; position: relative; display: block; width: 100%; height: 100%; min-width: 0; min-height: 0; overflow: hidden; background: var(--paper); color: var(--paper-ink); font-family: var(--font-pupil); justify-self: stretch; align-self: stretch; }
+.live-wait { display: grid; place-items: center; height: 100%; font-size: var(--fs-12); color: var(--paper-ink); opacity: 0.6; }
+.live-thumb.cut-r { -webkit-mask-image: linear-gradient(to right, var(--paper-ink) 84%, transparent); mask-image: linear-gradient(to right, var(--paper-ink) 84%, transparent); }
+.live-thumb.cut-b { -webkit-mask-image: linear-gradient(to bottom, var(--paper-ink) 80%, transparent); mask-image: linear-gradient(to bottom, var(--paper-ink) 80%, transparent); }
+.live-thumb.cut-r.cut-b { -webkit-mask-image: linear-gradient(to right, var(--paper-ink) 84%, transparent), linear-gradient(to bottom, var(--paper-ink) 80%, transparent); -webkit-mask-composite: source-in; mask-image: linear-gradient(to right, var(--paper-ink) 84%, transparent), linear-gradient(to bottom, var(--paper-ink) 80%, transparent); mask-composite: intersect; }
+.grid[data-view="big"] .live-thumb, .thumb-lg .live-thumb { --smp-min: 12; }
+.grid[data-view="small"] .live-thumb { --smp-min: 9; }
+.board-card .live-thumb { --smp-min: 20; --smp-cap: 3; }
+.page-cell .live-thumb, .tray-mini-pic .live-thumb, .page .live-thumb { --smp-min: 0; }
+.board-card > .live-thumb { width: 100%; height: 100%; }
 /* How many pages: the stepper and three quick counts; Each page shows once there is more than one page */
 .pages-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8); }
 @media (max-width: 819px) { .l-long { display: none; } }
-/* on the board the item is shown whole: its sentences are never cut */
-.board-card .smp-prose { max-height: none; flex: none; overflow: visible; }
-/* a page preview (worksheet, quiz, lesson) is a miniature of the printed page: the whole item, as printed */
-.page .smp-thumb { --smp-min: 0; }
+/* ---- fix round 5 (critic r5 D2, §2.7 "selected = fill + ✓ + ring"): every selected segmented option and pill is filled
+   and ticked, not only ringed. The ✓ sits in the button's own left padding, so selecting never moves the columns. */
+.seg button { position: relative; }
+.seg.seg-sm button { padding: 0 var(--sp-8) 0 var(--sp-16); }
+.seg button[aria-pressed="true"] { background: var(--surface-2); color: var(--text); border-color: var(--ring); box-shadow: inset 0 0 0 var(--line-2) var(--ring); }
+.seg button[aria-pressed="true"]::before { content: "✓"; position: absolute; left: var(--sp-4); top: 50%; transform: translateY(-50%); font-size: var(--fs-12); line-height: 1; }
+.pill[aria-pressed="true"] { background: var(--surface-2); }
+/* ---- fix round 5 (critic r5 A4): Detailed weights from 820 px up: one compact line per skill — name · weight · % · lock ·
+   ≈ n · ✕ — so a screen holds 8 or more skills */
+@media (min-width: 820px) {
+  .traypop.det .tp-row { grid-template-columns: auto auto minmax(0, 1fr) auto auto auto; padding-top: var(--sp-4); padding-bottom: var(--sp-4); }
+  .traypop.det .tp-row[data-grade-host] { grid-template-columns: auto auto auto minmax(0, 1fr) auto auto auto; }
+  .traypop.det .tp-row > .tp-det { grid-column: auto; order: 1; padding: 0; flex-wrap: nowrap; }
+  .traypop.det .tp-row > .icon-btn { order: 2; }
+  .traypop.det .tp-row .tp-share { display: inline-block; min-width: 6.5rem; }
+  .traypop.det .tp-row .tp-name { font-size: var(--fs-14); }
+  .traypop.det .tp-rest .note { display: none; }
+}
+/* ---- fix round 5 (critic r5 A3): a whole grade on a phone with Detailed weights: its name keeps its own line and the
+   controls go on the line under it (they had been laid over "Grade 2 (all areas)") */
+@media (max-width: 819px) {
+  .traypop.det .tp-rgrade, .traypop.det .tp-rgrade:not(.ctl-open) { flex-wrap: wrap; }
+  .traypop.det .tp-rgrade > .tp-hname { flex: 1 1 0; min-width: 0; }
+  .traypop.det .tp-rgrade > .tp-ctl, .traypop.det .tp-rgrade:not(.ctl-open) > .tp-ctl { flex-basis: 100%; margin-left: 0; flex-wrap: wrap; padding: 0 0 var(--sp-8); }
+  .traypop.det .tp-row .tp-det { gap: var(--sp-4); }
+}
+@media (min-width: 820px) and (max-width: 1099px) {
+  /* a tablet: the row keeps its one line by saying "≈ 3" (the total is in the foot's summary) */
+  .traypop.det .tp-row .tp-share { min-width: 2.5rem; }
+  .traypop.det .tp-row .l-of { display: none; }
+}
+/* the card's picture takes the room the card has (a card in a row of longer names, or one without an area line) */
+.grid:not([data-view="list"]) .card > .thumb { flex: 1 0 auto; }

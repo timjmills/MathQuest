@@ -34,6 +34,8 @@
  *  13. badge     (owner 2026-10-23) the grade badge's rules use neutral tokens only; its text >= 4.5 : 1, light and dark;
  *  12. tints     (fix round 2) every area tint >= 3 CIEDE2000 from what it sits on: the stone page, or the white frame
  *                the groups carry in light mode (the "group-frame" rule in app.css);
+ *  14. watched   (fix round 5) the shared-grade pairs within 1.5 of the colour-blind floor are listed as "watched" (they
+ *                must stay >= 12.5: CC–DATA protanopia, NF–G deuteranopia today); falling under 12.5 fails;
  *  11. dark      (fix round 2) every dark tint >= 1.2 : 1 against the dark page #0F0E0C and every bold >= 3 : 1 against it,
  *                so each group, band and card edge stays visibly coloured in dark mode.
  * The other §2.8 rules (one ink fill per screen, area colours only under data-domain, chips outlined and ringed, ...) are
@@ -209,6 +211,12 @@ function parseBlocks(css) {
     row(`CIEDE2000 bold, ${label}, areas sharing a grade`, r1(s.v), '>= 12', `${s.p[0].k}–${s.p[1].k}`, s.v >= 12);
     const o = minOf(pairs, ([a, b]) => de00(a.r.bold, b.r.bold, mode));
     row(`CIEDE2000 bold, ${label}, any pair`, r1(o.v), '>= 8', `${o.p[0].k}–${o.p[1].k}`, o.v >= 8);
+  }
+  // fix round 5 (critic r5 D1): the pairs that share a grade and sit within 1.5 of the floor of 12 are WATCHED — they pass,
+  // but any change to either colour must keep them >= 12.5 (palette.html, Margins to watch). Listed, never a failure.
+  for (const mode of ['deut', 'prot']) {
+    const label = mode === 'deut' ? 'deuteranopia' : 'protanopia';
+    for (const [a, b] of pairs.filter(isShared)) { const v = de00(a.r.bold, b.r.bold, mode); if (v < 13.5) rows.push([`watched pair, ${label}, sharing a grade`, r1(v), '>= 12.5', `${a.k}–${b.k}`, v >= 12.5 ? 'watched' : 'FAIL']); if (v < 12.5) fails.push(`watched pair ${a.k}–${b.k} (${label}) fell to ${r1(v)} (keep >= 12.5)`); }
   }
   // 4. slate
   for (const mode of MODES) {
