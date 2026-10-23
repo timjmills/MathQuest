@@ -48,6 +48,7 @@ Builders run in their own git worktrees and the lead merges them here.
 | Timed deploy runs: three cloud sessions (gate sessions 1, 2, 3 in parallel; each repeats its session 3×) on eee32b89 | timing runners (session_01HZreUmm66xVrS2AYyY32uD, session_016eCsVCbtn3q8SkotuDG1Xp, session_01FLRx8vV9wbkgLuukh57VyK) | 18:09 | — | — |
 | Critic r4: FAIL 7 / 8 / 8 (D1 deploy session 1 ran the whole options pin; D2 fold order by name) | mq-opus-medium | 19:05 | 19:19 | — |
 | Fix r4: read-only options gate at deploy, fold every run file by finish time + nits — merged b261abf0 | mq-opus-medium (rebuild after a failed round) | 19:19 | — | — |
+| Critic r5: **PASS 9 / 9 / 8**, no blocking defects | mq-opus-medium | 20:00 | 19:56 | — |
 | S1 `ws-precritic` build (brought forward by the lead, 11:02; stopped: moved to the lead's session) | mq-opus-medium | 11:03 | 12:51 | 108 |
 
 ## Critic r1 (2026-10-23, `design/audit/runs/wave0-gates/critic-r1.md`): FAIL — plan 6, backtests 8, usable 6
@@ -167,3 +168,11 @@ mutant fails it). Lanes must commit before a clearing run (a dirty run never cle
 | 1 (node gates, content-audit, print-lint kit, teacher-*, screen-answer, share-options, lesson repeats) | FAIL 27.9 min | FAIL 28.4 min | OK (1 FLAKE) 26.4 min | 0 s slot waits; print-lint ≈ 1,000 s and teacher-wrm ≈ 870 s set the length. The only non-OK gate: `ws-teacher-shell`, aborted Andika .woff2 loads (`net::ERR_ABORTED`) counted as console errors — a harness defect, fixed (`tests/lib/ws-harness.cjs` ignores aborted font loads only; 3/3 solo runs OK after) |
 | 2 (screen-slots + chromebook-fit sharded, big-board and dark sweeps, viewport, S9 check) | (still running) | | | |
 | 3 (coverage matrix affected rows, digests hook, owner go) | OK (1 WARNING) 9.0 s | OK 8.6 s | OK 8.8 s | over budget (32,766 docs) with no nightly and no full baseline → the owner's WARNING; nothing rendered, so this times the verdict, not a render |
+
+## Critic r5 (`design/audit/runs/wave0-gates/critic-r5.md`): **PASS** — plan 9, backtests 9, usable 8
+r4 D1/D2 fixed; clearing rules hold against hand-made run files; five fresh mutations each fail their self-test; real-browser
+options-pin check + gate end to end. Open nits (not blocking): N1 a run file with a future `finished` wins the fold; N2 a
+legacy run file without `baseline` still clears red with a WARNING; N3 options-pin `--resume` tmp keyed by date not commit;
+N4 a crashed options-pin slice is not re-run before the full baseline (gate stays WARNING); N5 mc-production backtest feeds
+the judge directly, and CLAUDE.md "Checks to run" does not name ws-deploy-gates.sh / ws-backtest (lead's file); N6 renamed
+rows re-map nightly and never settle.
