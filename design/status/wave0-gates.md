@@ -49,6 +49,7 @@ Builders run in their own git worktrees and the lead merges them here.
 | Critic r4: FAIL 7 / 8 / 8 (D1 deploy session 1 ran the whole options pin; D2 fold order by name) | mq-opus-medium | 19:05 | 19:19 | — |
 | Fix r4: read-only options gate at deploy, fold every run file by finish time + nits — merged b261abf0 | mq-opus-medium (rebuild after a failed round) | 19:19 | — | — |
 | Critic r5: **PASS 9 / 9 / 8**, no blocking defects | mq-opus-medium | 20:00 | 19:56 | — |
+| Precritic additions from the pilot's critic r1 (sibling compare, SLOT/CLIP on every matrix row, 390 px card, card rulings, not-offered options), lead request 20:00 | mq-opus-medium (first build) | 20:01 | — | — |
 | S1 `ws-precritic` build (brought forward by the lead, 11:02; stopped: moved to the lead's session) | mq-opus-medium | 11:03 | 12:51 | 108 |
 
 ## Critic r1 (2026-10-23, `design/audit/runs/wave0-gates/critic-r1.md`): FAIL — plan 6, backtests 8, usable 6
