@@ -152,28 +152,45 @@
 
   // ---------------- render helpers ----------------
   const pressed = (b) => `aria-pressed="${b ? 'true' : 'false'}"`;
-  // A chip shows its area's short name and icon (never colour alone); in a tray that spans grades it shows the grade too.
-  const trayGrades = () => new Set(S.tray.map(k => SK[k] && SK[k].g)).size > 1;
+  // The GRADE badge (owner 2026-10-23): a numbered ink circle, never an area colour, always the first thing in its card,
+  // chip or row (the fixed slot), so grade and area are told apart without a second colour code.
+  const gradeMark = (g) => g === 'K' ? 'K' : g === 'M' ? 'M' : g === 'PK' ? 'P' : String(g);
+  const gbadge = (g) => `<span class="gbadge" title="${esc(gradeShort(g))}" aria-label="${esc(gradeShort(g))}">${gradeMark(g)}</span>`;
+  // A chip: grade badge, area icon, the skill NAME (it has priority), then the area's short word. The word drops (the chip
+  // goes compact, fitChips) before the name would be cut; on the tray the area word is the group's legend instead.
   function chipHTML(k, opts = {}) {
-    const s = SK[k]; const a = s.a; const tag = opts.tag || 'button'; const grade = opts.grade !== undefined ? opts.grade : trayGrades();
+    const s = SK[k]; const a = s.a; const tag = opts.tag || 'button';
     const attrs = tag === 'button' ? `data-act="${opts.act || 'chip'}" data-arg="${esc(k)}" ${opts.pressed ? pressed(true) : ''}` : '';
-    return `<${tag} class="chip" data-domain="${a}" ${attrs} title="${esc(s.l)} · ${areaName(a)} · ${gradeShort(s.g)}">` +
-      `<span class="chip-dot">${icon(AREAS[a].icon)}</span><span class="name">${esc(short(s.l))}</span><span class="chip-area">${AREAS[a].short}${grade ? ' · ' + (s.g === 'K' ? 'K' : s.g === 'M' ? 'Mixed' : 'G' + s.g) : ''}</span>${opts.pressed ? icon('check') : ''}</${tag}>`;
+    return `<${tag} class="chip" data-domain="${a}" data-grade-host ${attrs} title="${esc(s.l)} · ${areaName(a)} · ${gradeShort(s.g)}">` +
+      `${gbadge(s.g)}${opts.legend ? '' : `<span class="chip-dot">${icon(AREAS[a].icon)}</span>`}<span class="name">${esc(short(s.l))}</span>${opts.legend ? '' : `<span class="chip-area">${AREAS[a].short}</span>`}${opts.pressed ? icon('check') : ''}</${tag}>`;
+  }
+  // drop the area word on any chip whose name (or word) would otherwise be cut; called after every render
+  function fitChips(root) {
+    for (const c of (root || document).querySelectorAll('.chip')) {
+      c.classList.remove('compact'); const a = c.querySelector('.chip-area'), n = c.querySelector('.name'); if (!a) continue;
+      if (a.scrollWidth > a.clientWidth + 1 || (n && n.scrollWidth > n.clientWidth + 1)) c.classList.add('compact');
+    }
   }
   function areaTag(a, pool) { return `<span class="area-tag">${icon(AREAS[a].icon)}${areaName(a)}</span>${pool ? '<span class="mixed-badge">mixed</span>' : ''}`; }
   function card(s, crossGrade) {
     const k = id(s), on = S.tray.includes(k);
-    return `<button class="card" data-domain="${s.a}" data-act="tick" data-skill="${esc(k)}" ${pressed(on)}>` +
-      `<div class="thumb">${T.draw(s)}</div><div class="card-name">${esc(s.l)}</div>` +
-      `<div class="card-meta">${areaTag(s.a, s.p)}<span class="gpill">${gradeShort(s.g)}</span></div>` +
+    return `<button class="card" data-domain="${s.a}" data-grade-host data-act="tick" data-skill="${esc(k)}" ${pressed(on)}>` +
+      `<div class="card-title">${gbadge(s.g)}<div class="card-name">${esc(s.l)}</div></div><div class="thumb">${T.draw(s, undefined, S.skillOpts[k])}</div>` +
+      `<div class="card-meta">${areaTag(s.a, s.p)}</div>` +
       `<span class="tick" aria-hidden="true"><span>${on ? '✓' : ''}</span></span><span class="sr">${on ? 'In the tray' : 'Tick to add'}</span></button>`;
   }
   function group(a, list, opts = {}) {
     const key = opts.key || a; const lim = S.open[key] ? list.length : (opts.limit || 8);
-    return `<section class="group" data-domain="${a}" data-group="${key}"><h2 class="band">${icon(AREAS[a].icon)}${esc(opts.title || AREAS[a].long)}<span class="count">${opts.count || plural(list.length, 'skill')}</span></h2>` +
-      `<div class="grid" data-view="${S.view}">${list.slice(0, lim).map(s => card(s, opts.cross)).join('')}</div>` +
+    const shown = list.slice(0, lim); let body;
+    if (opts.cross && new Set(shown.map(s => s.g)).size > 1) {
+      // across grades (a search, Mixed levels): the area's skills sub-grouped by grade, each under its badge
+      const gs = []; shown.forEach(s => { let g = gs.find(x => x.g === s.g); if (!g) gs.push(g = { g: s.g, l: [] }); g.l.push(s); });
+      body = gs.map(g => `<h3 class="grade-head">${gbadge(g.g)}${esc(gradeName(g.g))}<span class="count">${plural(g.l.length, 'skill')}</span></h3><div class="grid mb-16" data-view="${S.view}">${g.l.map(s => card(s, true)).join('')}</div>`).join('');
+    } else body = `<div class="grid" data-view="${S.view}">${shown.map(s => card(s, opts.cross)).join('')}</div>`;
+    return `<section class="group" data-domain="${a}" data-group="${key}"><h2 class="band">${icon(AREAS[a].icon)}${esc(opts.title || AREAS[a].long)}<span class="count">${opts.count || plural(list.length, 'skill')}</span></h2>` + body +
       (list.length > lim ? `<button class="btn more-btn" data-act="showall" data-arg="${esc(key)}">Show all ${list.length}</button>` : '') + '</section>';
   }
+  const GORDER = ['PK', 'K', '1', '2', '3', '4', '5', '6', 'M'];
   const stdSort = (x, y) => (x.s || 'zz').localeCompare(y.s || 'zz', 'en', { numeric: true }) || x.l.localeCompare(y.l);
 
   // ---------------- Skills ----------------
@@ -184,30 +201,31 @@
     const gradePills = GRADES.map(([g, l]) => `<button class="pill" data-act="grade" data-arg="${g}" ${pressed(S.grade === g && !searching)}>${S.grade === g && !searching ? icon('check') : ''}${l}</button>`).join('');
     const viewSeg = `<div class="seg wrap" role="group" aria-label="View">${views.map(([k, l]) => `<button data-act="view" data-arg="${k}" ${pressed(S.view === k)}>${l}</button>`).join('')}</div>`;
     const gradeName2 = searching ? 'All grades' : gradeName(S.grade);
-    return `<div class="head head-skills"><div class="head-text"><p class="eyebrow wide-only">Maths Quest · Teacher · ${esc(gradeName(S.grade))} · ${plural(n, 'skill')}</p><h1 class="title">Skills</h1></div><label class="search">${icon('search')}<span class="sr">Find a skill</span>` +
+    const hitN = searching ? skillHits().length : 0;
+    return `<div class="head head-skills"><div class="head-text"><p class="eyebrow wide-only">Maths Quest · Teacher · ${searching ? `All grades · ${plural(hitN, 'skill')} ${hitN === 1 ? 'matches' : 'match'}` : `${esc(gradeName(S.grade))} · ${plural(n, 'skill')}`}</p><h1 class="title">Skills</h1></div><label class="search">${icon('search')}<span class="sr">Find a skill</span>` +
       `<input id="search" type="search" placeholder="Find a skill: “add within 20”, “2.NBT.5”, “clocks”" value="${esc(S.q)}" autocomplete="off" data-act="search"></label></div>` +
-      `<p class="serif wide-only">Tick what you need; it waits in the tray below.</p>` +
-      `<div class="row"><span class="row-label wide-only">Browse by</span><div class="seg seg-big wrap" role="group" aria-label="Browse by">${browse.map(([k, l, sh]) => `<button data-act="browse" data-arg="${k}" ${pressed(S.browse === k)}><span class="wide-only">${l}</span><span class="narrow-only">${sh}</span></button>`).join('')}</div>` +
-      `<span class="spacer wide-only"></span><div class="wide-only">${viewSeg}</div></div>` +
-      `<div class="row wide-only"><div class="pills wrap" role="group" aria-label="Grade">${gradePills}</div>${searching ? '<span class="note">Searching all grades</span>' : ''}</div>` +
-      `<div class="row narrow-only compact"><button class="btn pop-btn" data-act="pop" data-arg="grade" aria-expanded="${S.pop === 'grade'}">${gradeName2} ▾</button><button class="btn pop-btn" data-act="pop" data-arg="view" aria-expanded="${S.pop === 'view'}">${views.find(v => v[0] === S.view)[1]} cards ▾</button></div>` +
-      (S.pop === 'grade' ? `<div class="pop narrow-only" role="group" aria-label="Grade"><div class="pills wrap">${gradePills}</div></div>` : '') +
-      (S.pop === 'view' ? `<div class="pop narrow-only">${viewSeg}</div>` : '') +
+      `<p class="serif roomy-only">Tick what you need; it waits in the tray below.</p>` +
+      `<div class="row"><span class="row-label wide-only">Browse by</span><div class="seg seg-big wrap" role="group" aria-label="Browse by">${browse.map(([k, l, sh]) => `<button data-act="browse" data-arg="${k}" ${pressed(S.browse === k)}><span class="roomy-only">${l}</span><span class="compact-only">${sh}</span></button>`).join('')}</div>` +
+      `<span class="spacer roomy-only"></span><div class="roomy-only">${viewSeg}</div></div>` +
+      `<div class="row roomy-only"><div class="pills wrap" role="group" aria-label="Grade">${gradePills}</div>${searching ? '<span class="note">Searching all grades</span>' : ''}</div>` +
+      `<div class="row compact-only compact"><button class="btn pop-btn" data-act="pop" data-arg="grade" aria-expanded="${S.pop === 'grade'}">${gradeName2} ▾</button><button class="btn pop-btn" data-act="pop" data-arg="view" aria-expanded="${S.pop === 'view'}">${views.find(v => v[0] === S.view)[1]} cards ▾</button></div>` +
+      (S.pop === 'grade' ? `<div class="pop compact-only" role="group" aria-label="Grade"><div class="pills wrap">${gradePills}</div></div>` : '') +
+      (S.pop === 'view' ? `<div class="pop compact-only">${viewSeg}</div>` : '') +
       `<div id="skill-list">${skillList()}</div>`;
   }
+  function skillHits() { const words = S.q.trim().toLowerCase().split(/\s+/); return D.skills.filter(s => words.every(w => (s.l + ' ' + s.v + ' ' + s.c + ' ' + s.s + ' ' + areaName(s.a)).toLowerCase().includes(w))); }
   function skillList() {
     const q = S.q.trim().toLowerCase();
     if (q) {
-      const words = q.split(/\s+/);
-      const hits = D.skills.filter(s => words.every(w => (s.l + ' ' + s.v + ' ' + s.c + ' ' + s.s + ' ' + areaName(s.a)).toLowerCase().includes(w)));
+      const hits = skillHits();
       if (!hits.length) return `<p class="note">No skill matches “${esc(S.q)}”. Try fewer words.</p>`;
       const by = {}; hits.forEach(s => (by[s.a] = by[s.a] || []).push(s));
       return `<p class="note mb-16">${hits.length === 1 ? '1 skill matches' : hits.length + ' skills match'} “${esc(S.q)}” across all grades — each shows its grade.</p>` +
-        ORDER.filter(a => by[a]).map(a => group(a, by[a].sort((x, y) => (x.g === S.grade ? -1 : 0) - (y.g === S.grade ? -1 : 0) || stdSort(x, y)), { key: 'q-' + a, cross: true })).join('');
+        ORDER.filter(a => by[a]).map(a => group(a, by[a].sort((x, y) => (x.g === S.grade ? -1 : 0) - (y.g === S.grade ? -1 : 0) || GORDER.indexOf(x.g) - GORDER.indexOf(y.g) || stdSort(x, y)), { key: 'q-' + a, cross: true })).join('');
     }
     if (S.browse === 'area') {
       const list = D.skills.filter(s => s.g === S.grade); const by = {}; list.forEach(s => (by[s.a] = by[s.a] || []).push(s));
-      return ORDER.filter(a => by[a]).map(a => group(a, by[a].sort(stdSort))).join('');
+      return ORDER.filter(a => by[a]).map(a => group(a, by[a].sort((x, y) => S.grade === 'M' ? GORDER.indexOf(x.g) - GORDER.indexOf(y.g) || stdSort(x, y) : stdSort(x, y)), { cross: S.grade === 'M' })).join('');
     }
     if (S.browse === 'wrm') return wrmBrowse();
     if (S.browse === 'std') return stdBrowse();
@@ -247,16 +265,18 @@
   }
   function setsBrowse() {
     return `<p class="note mb-16">Your tray saves itself as a set. Open a set to put its skills in the tray. Saved quizzes are in Classes › Quizzes.</p><div class="cards2">` +
-      S.sets.map((st, i) => `<button class="box box-btn" data-act="openset" data-arg="${i}"><h3>${esc(st.name)}</h3><div class="panel-chips">${st.skills.map(k => chipHTML(k, { tag: 'span', grade: false })).join('')}</div><span class="note">${plural(st.skills.length, 'skill')} · open to print, quiz or share</span></button>`).join('') + '</div>';
+      S.sets.map((st, i) => `<button class="box box-btn" data-act="openset" data-arg="${i}"><h3>${esc(st.name)}</h3><div class="panel-chips">${st.skills.map(k => chipHTML(k, { tag: 'span' })).join('')}</div><span class="note">${plural(st.skills.length, 'skill')} · open to print, quiz or share</span></button>`).join('') + '</div>';
   }
 
   // ---------------- tray ----------------
+  // the tray groups its chips by maths area under one legend each (the area word stays visible, the names get the room)
+  function trayGroups() { const gs = []; S.tray.forEach(k => { const a = SK[k].a; let g = gs.find(x => x.a === a); if (!g) gs.push(g = { a, ks: [] }); g.ks.push(k); }); return gs; }
   function tray() {
     const n = S.tray.length; const dis = n ? '' : 'disabled aria-disabled="true"';
     const label = n ? `${n} skill${n > 1 ? 's' : ''}` : 'Empty';
     return `<div class="tray" role="region" aria-label="Tray">` +
       `<div class="tray-label"><b>Tray</b>${label}</div>` +
-      (n ? `<div class="tray-chips">${S.tray.map(k => chipHTML(k)).join('')}</div>` : `<div class="tray-empty">Tick skills to put them here. Quiz can also start from a standard, a White Rose step or a lesson.</div>`) +
+      (n ? `<div class="tray-chips">${trayGroups().map(g => `<div class="tray-group" data-domain="${g.a}"><span class="tray-lead"><span class="tray-legend">${icon(AREAS[g.a].icon)}${AREAS[g.a].short}</span>${chipHTML(g.ks[0], { legend: true })}</span>${g.ks.slice(1).map(k => chipHTML(k, { legend: true })).join('')}</div>`).join('')}</div>` : `<div class="tray-empty">Tick skills to put them here. Quiz can also start from a standard, a White Rose step or a lesson.</div>`) +
       `<button class="btn tray-count" data-act="trayopen">${n ? `${label} ▸` : 'Tray empty'}</button>` +
       `<div class="tray-actions">${n ? '' : '<span class="tray-hint">Tick skills first</span>'}` +
       `<button class="btn" data-act="tray-quiz">${icon('quiz')}Quiz</button>` +
@@ -274,7 +294,7 @@
   function kindOptions(isQuiz) {
     const k = kind(), o = S.opts, n = S.tray.length; let h = '';
     h += opt('How many pages?', k === 'single' && n > 1 ? 'Shared by how often each skill comes up; starts at one page per skill' : 'Every page has new numbers; the key follows', stepper('pages', o.pages, 1, 6));
-    if (n > 1) h += opt('How often does each skill come up?', 'Less · Equal · More = 1 : 2 : 3', `<div class="weights">${S.tray.map(s => `<div class="weight-row">${chipHTML(s)}${seg('How often', [['less', 'Less'], ['equal', 'Equal'], ['more', 'More']], S.weights[s] || 'equal', 'weight:' + s)}</div>`).join('')}</div>`);
+    if (n > 1) h += opt('How often does each skill come up?', 'Less · Equal · More = 1 : 2 : 3', `<div class="weights">${S.tray.map(s => `<div class="weight-row w">${chipHTML(s)}${seg('How often', [['less', 'Less'], ['equal', 'Equal'], ['more', 'More']], S.weights[s] || 'equal', 'weight:' + s)}</div>`).join('')}</div>`);
     const ex = k === 'single'
       ? [['none', 'None'], ['top', 'An example at the top of each page'], ['group', 'An example to start each group'], ['each', 'An example with each problem (where it fits)']]
       : k === 'sections'
@@ -395,7 +415,7 @@
       `<div class="side-actions"><button class="btn btn-primary btn-wide" data-act="quiz-print">${icon('print')}Print</button><div class="two"><button class="btn" data-act="quiz-share">${icon('share')}Share with pupils</button><button class="btn" data-act="quiz-save">Save</button></div><span class="note">Save keeps it in Classes › Quizzes. Pupils take it exactly as today.</span></div>`
       : `<div class="summary">Pick what the quiz is built from</div><p class="note">A standard, an Essential Element, a White Rose unit or step, or a lesson. Its skills make the quiz; you can change any of them after.</p><div class="side-actions"><button class="btn btn-wide" ${dis}>${icon('print')}Print</button></div>`;
     return sheetFrame('Make a quiz', buildFrom(), side,
-      ready ? `<div class="summary">${esc(sm.line)}</div><div class="foot-two"><button class="btn" data-act="quiz-save">Save</button><button class="btn" data-act="quiz-share">${icon('share')}Share</button></div><button class="btn btn-primary" data-act="quiz-print">${icon('print')}Print</button>` : `<div class="summary">Pick what the quiz is built from</div>`);
+      ready ? `<div class="summary">${esc(sm.line)}</div><div class="foot-two"><button class="btn" data-act="quiz-save">Save</button><button class="btn" data-act="quiz-share">${icon('share')}Share with pupils</button></div><button class="btn btn-primary" data-act="quiz-print">${icon('print')}Print</button>` : `<div class="summary">Pick what the quiz is built from</div>`);
   }
   function sheetFrame(title, opts, side, foot) {
     const eb = S.sheet === 'lessonprint' ? 'Lesson · ' + esc(findStep(S.lessons.lesson).s.id) : `${S.sheet === 'quiz' ? 'Quiz' : 'Print'} · ${S.tray.length} skill${S.tray.length === 1 ? '' : 's'}`;
@@ -447,14 +467,14 @@
     const row = (o) => opt(esc(o.l) + (!same(optVal(S.chip, o), o.d) ? ' <span class="changed">changed</span>' : ''), o.h ? esc(o.h) : '', optControl(S.chip, o));
     const pre = s.pre ? `<div class="preset"><b>${icon('check')}A preset of ${esc(s.pre.hl)}</b><span class="note">This skill opens ${esc(s.pre.hl)} with ${s.pre.vals.map(([l, v]) => `<b>${esc(l)}: ${esc(v)}</b>`).join(', ')} already set. You can change them below.</span></div>` : '';
     const body = `<div class="share-pad"><div class="band band-flat" data-domain="${s.a}">${icon(AREAS[s.a].icon)}${areaName(s.a)}<span class="count">${gradeShort(s.g)}${s.s ? ' · ' + esc(s.s) : ''}</span></div>` +
-      `<div class="thumb thumb-lg">${T.draw(s, S.seed)}</div>` + pre +
+      `<div class="thumb thumb-lg">${T.draw(s, S.seed, S.skillOpts[S.chip])}</div>` + pre +
       (own.length ? `<p class="col-title">This skill’s options</p>` + own.map(row).join('') : '<p class="note">This skill has no options of its own.</p>') +
       (nl.length ? nl.map(row).join('') : '') +
       `<p class="col-title">On screen</p>` + play.map(row).join('') +
       `<p class="col-title">On pages with other skills</p>` +
       opt('How often it comes up', 'Less · Equal · More = 1 : 2 : 3', seg('How often', [['less', 'Less'], ['equal', 'Equal'], ['more', 'More']], w, 'weight:' + S.chip)) +
       `</div><div class="narrow-foot"><button class="btn" data-act="remove" data-arg="${esc(S.chip)}">Take out of the tray</button><button class="btn btn-primary" data-act="close">Done</button></div>`;
-    return `<div class="scrim" data-act="close"></div><div class="sheet narrow" role="dialog" aria-modal="true" aria-label="Skill options"><div class="sheet-head"><div class="head-text"><p class="eyebrow">Options · ${esc(AREAS[s.a].short)} · ${esc(gradeShort(s.g))}</p><h2>${esc(s.l)}</h2></div><button class="btn close" data-act="close" aria-label="Close">${icon('close')}</button></div>${body}</div>`;
+    return `<div class="scrim" data-act="close"></div><div class="sheet narrow" role="dialog" aria-modal="true" aria-label="Skill options"><div class="sheet-head" data-grade-host>${gbadge(s.g)}<div class="head-text"><p class="eyebrow">Options · ${esc(AREAS[s.a].short)} · ${esc(gradeShort(s.g))}</p><h2>${esc(s.l)}</h2></div><button class="btn close" data-act="close" aria-label="Close">${icon('close')}</button></div>${body}</div>`;
   }
   function setConfirm() {
     const st = S.sets[S.confirm];
@@ -502,17 +522,17 @@
   }
   function lessonRow(s, b, y, next) {
     const a = stepArea(s, b);
-    return `<button class="lesson" data-domain="${a}" data-act="lesson" data-lesson="${esc(s.id)}" ${pressed(S.lessons.lesson === s.id)}><span class="num">${s.n}</span><span class="lesson-t">${esc(s.t)}${a !== b.a ? `<span class="area-tag">${icon(AREAS[a].icon)}${AREAS[a].short}</span>` : ''}</span>` +
+    return `<button class="lesson" data-domain="${a}" data-grade-host data-act="lesson" data-lesson="${esc(s.id)}" ${pressed(S.lessons.lesson === s.id)}>${gbadge(y.grade)}<span class="num">${s.n}</span><span class="lesson-t">${esc(s.t)}${a !== b.a ? `<span class="area-tag">${icon(AREAS[a].icon)}${AREAS[a].short}</span>` : ''}</span>` +
       (s.id === next ? '<span class="badge">Next</span>' : s.id === S.lessons.last ? '<span class="badge quiet">Last opened</span>' : (!s.k.length ? '<span class="badge quiet">No practice yet</span>' : '')) + '</button>';
   }
   function lessonPanel() {
     const f = findStep(S.lessons.lesson); const s = f.s; const a = stepArea(s, f.b); const pre = preSkills(s.id);
     const has = s.k.filter(k => SK[k]).length > 0; const dis = has ? '' : 'disabled aria-disabled="true"';
-    return `<aside class="panel ${S.lessons.panelOpen ? 'open' : ''}" data-domain="${a}" aria-label="Lesson"><div class="panel-band"><p>${gradeName(f.y.grade)} · White Rose ${esc(f.y.name)} · ${esc(f.b.name)} · step ${s.n}</p><h2>${esc(s.t)}</h2><p>${icon(AREAS[a].icon)} ${areaName(a)}${s.s ? ' · ' + esc(s.s) : ''}</p></div>` +
+    return `<aside class="panel ${S.lessons.panelOpen ? 'open' : ''}" data-domain="${a}" aria-label="Lesson"><div class="panel-band" data-grade-host>${gbadge(f.y.grade)}<p>${gradeName(f.y.grade)} · White Rose ${esc(f.y.name)} · ${esc(f.b.name)} · step ${s.n}</p><h2>${esc(s.t)}</h2><p>${icon(AREAS[a].icon)} ${areaName(a)}${s.s ? ' · ' + esc(s.s) : ''}</p></div>` +
       `<div class="panel-body"><button class="btn btn-primary btn-wide" data-act="lesson-print">${icon('print')}Print lesson</button>` +
       `<div class="two"><button class="btn" data-act="lesson-practice" ${dis}>${icon('print')}Print practice</button><button class="btn" data-act="lesson-share" ${dis}>${icon('share')}Share practice</button></div>` +
       `<button class="btn btn-wide" data-act="lesson-pre" ${pre.length ? '' : 'disabled aria-disabled="true"'}>Practise pre-skills${pre.length ? ` (${pre.length})` : ''}</button>` +
-      `<div><p class="col-title">Skills in this lesson</p><div class="panel-chips">${has ? s.k.filter(k => SK[k]).map(k => chipHTML(k, { act: 'tick-chip', grade: false })).join('') : '<span class="note">No practice skill yet — see Skills to be made.</span>'}</div></div>` +
+      `<div><p class="col-title">Skills in this lesson</p><div class="panel-chips">${has ? s.k.filter(k => SK[k]).map(k => chipHTML(k, { act: 'tick-chip' })).join('') : '<span class="note">No practice skill yet — see Skills to be made.</span>'}</div></div>` +
       `<details class="more"><summary>Skills to be made (${s.m.length})</summary>${s.m.length ? `<ul class="note">${s.m.map(m => `<li>${esc(m)}</li>`).join('')}</ul>` : '<p class="note">None: every part of this lesson has a skill.</p>'}</details>` +
       `<button class="btn btn-text lesson-close" data-act="panelclose">Back to the lessons</button></div></aside>`;
   }
@@ -531,10 +551,10 @@
     const tabs = [['board', 'Run on the board'], ['quizzes', 'Quizzes'], ['map', 'MAP tests'], ['progress', 'Progress']];
     let body = '';
     if (S.classes === 'board') {
-      body = `<div class="cards2">${S.sets.map((st, i) => `<div class="box"><h3>${esc(st.name)}</h3><div class="panel-chips">${st.skills.map(k => chipHTML(k, { tag: 'span', grade: false })).join('')}</div><button class="btn ${i === 0 ? 'btn-primary' : ''}" data-act="runboard" data-arg="${i}">${icon('board')}Start on the board</button></div>`).join('')}</div>`;
+      body = `<div class="cards2">${S.sets.map((st, i) => `<div class="box"><h3>${esc(st.name)}</h3><div class="panel-chips">${st.skills.map(k => chipHTML(k, { tag: 'span' })).join('')}</div><button class="btn ${i === 0 ? 'btn-primary' : ''}" data-act="runboard" data-arg="${i}">${icon('board')}Start on the board</button></div>`).join('')}</div>`;
     } else if (S.classes === 'quizzes') {
       body = `<h2 class="sub-title">My quizzes</h2><p class="note mb-16">Quizzes you saved from Quiz › Save. Print one again, share it with pupils, or change it.</p>` +
-        (S.quizzes.length ? `<div class="cards2 mb-24">${S.quizzes.map((qz, i) => `<div class="box quiz-box" data-quiz="${i}"><h3>${esc(qz.name)}</h3><p class="note">${plural(qz.n, 'question')} · ${qz.versions > 1 ? qz.versions + ' versions' : '1 version'} · saved ${esc(qz.when)}</p><div class="panel-chips">${qz.skills.filter(k => SK[k]).map(k => chipHTML(k, { tag: 'span', grade: false })).join('')}</div>` +
+        (S.quizzes.length ? `<div class="cards2 mb-24">${S.quizzes.map((qz, i) => `<div class="box quiz-box" data-quiz="${i}"><h3>${esc(qz.name)}</h3><p class="note">${plural(qz.n, 'question')} · ${qz.versions > 1 ? qz.versions + ' versions' : '1 version'} · saved ${esc(qz.when)}</p><div class="panel-chips">${qz.skills.filter(k => SK[k]).map(k => chipHTML(k, { tag: 'span' })).join('')}</div>` +
           `<div class="box-actions"><button class="btn" data-act="quizopen" data-arg="${i}">${icon('print')}Print</button><button class="btn" data-act="quizshareopen" data-arg="${i}">${icon('share')}Share</button><button class="btn" data-act="quizopen" data-arg="${i}">Change</button></div></div>`).join('')}</div>` : '<p class="note mb-24">No saved quizzes yet. Make one with Quiz in the Skills tray, then Save.</p>') +
         `<h2 class="sub-title">Results on this device</h2><p class="warn mb-16">⚠ These are the quizzes taken on this device (the board, a shared Chromebook). Results stay on each pupil’s device.</p>` +
         `<table class="t t-stack"><thead><tr><th>Quiz</th><th>Pupil</th><th>Score</th><th>Taken</th></tr></thead><tbody>` +
@@ -543,7 +563,7 @@
       body = `<div class="cards2"><div class="box"><h3>Start a MAP test</h3><p class="note">Pick the level and the strands, then start here or share the link.</p>${seg('Level', [['k2', 'Grades K–2'], ['35', 'Grades 3–5']], 'k2', 'noop')}<button class="btn btn-primary" data-act="noop">Start the MAP test</button></div><div class="box"><h3>Last results</h3><p class="note">Grade 2 · 12 pupils · on this device</p><p class="note">Number & place value</p>${bar10(64)}<p class="note">Measurement</p>${bar10(48)}</div></div>`;
     } else {
       body = `<table class="t t-stack"><thead><tr><th>Skill</th><th>Practised</th><th>Correct</th></tr></thead><tbody>` +
-        ['addition:add_facts', 'measurement:time_hour', 'composing:base10_build', 'subtraction:sub_word_problems'].map((k, i) => `<tr><td data-label="Skill">${chipHTML(k, { tag: 'span', grade: false })}</td><td data-label="Practised">${[42, 18, 25, 9][i]} times</td><td data-label="Correct">${bar10([88, 61, 74, 40][i])}</td></tr>`).join('') + '</tbody></table>';
+        ['addition:add_facts', 'measurement:time_hour', 'composing:base10_build', 'subtraction:sub_word_problems'].map((k, i) => `<tr><td data-label="Skill">${chipHTML(k, { tag: 'span' })}</td><td data-label="Practised">${[42, 18, 25, 9][i]} times</td><td data-label="Correct">${bar10([88, 61, 74, 40][i])}</td></tr>`).join('') + '</tbody></table>';
     }
     return `<div class="head"><div class="head-text"><p class="eyebrow">This device · Ms Rivera · Grade 2</p><h1 class="title">Classes</h1></div></div><p class="serif">Everything that happens in the room.</p><div class="tabs" role="group" aria-label="Classes">${tabs.map(([k, l]) => `<button data-act="ctab" data-arg="${k}" ${pressed(S.classes === k)}>${S.classes === k ? icon('check') : ''}${l}</button>`).join('')}</div>${body}`;
   }
@@ -560,8 +580,7 @@
       `<div class="shell"><nav class="rail" aria-label="Places"><div class="brand"><span class="brand-mark">MQ</span>Maths Quest</div>` +
       PLACES.map(([k, l, ic]) => `<button class="place" data-act="go" data-arg="${k}" ${S.screen === k ? 'aria-current="page"' : ''}>${icon(ic)}${l}</button>`).join('') +
       `<div class="rail-foot">${S.profile ? profileMenu() : ''}<button class="btn profile-btn" data-act="profile"><span class="avatar">MR</span>Ms Rivera</button></div></nav>` +
-      `<main class="main ${withTray ? '' : 'no-tray'}" id="main">${scr}</main></div>` +
-      (withTray ? tray() : '') +
+      `<main class="main ${withTray ? 'has-tray' : 'no-tray'}" id="main">${scr}${withTray ? tray() : ''}</main></div>` +
       `<nav class="bottombar" aria-label="Places">${PLACES.map(([k, l, ic]) => `<button data-act="go" data-arg="${k}" ${S.screen === k && !S.profile ? 'aria-current="page"' : ''}>${icon(ic)}${l}</button>`).join('')}<button data-act="profile" ${S.profile ? 'aria-current="page"' : ''}>${icon('me')}Me</button></nav>`;
     const layer = document.getElementById('layer');
     layer.innerHTML = S.sheet === 'print' ? printSheet() : S.sheet === 'quiz' ? quizSheet() : S.sheet === 'share' ? shareSheet(false) : S.sheet === 'quizshare' ? shareSheet(true)
@@ -569,7 +588,7 @@
     if (S.profile && innerWidth < 820) layer.innerHTML = `<div class="scrim" data-act="close"></div><div class="sheet narrow" role="dialog" aria-label="Me"><div class="sheet-head"><h2>Ms Rivera</h2><button class="btn close" data-act="close" aria-label="Close">${icon('close')}</button></div><div class="share-pad">${profileMenu().replace('class="menu"', 'class="menu menu-static"')}</div></div>`;
     document.body.style.overflow = S.sheet || (S.profile && innerWidth < 820) ? 'hidden' : '';
     const t = document.getElementById('toast'); t.hidden = !S.toast; t.textContent = S.toast;
-    setHash(); window.dispatchEvent(new Event('mq:render'));
+    fitChips(); setHash(); window.dispatchEvent(new Event('mq:render'));
   }
   function toast(msg) { S.toast = msg; render(); clearTimeout(toast.t); toast.t = setTimeout(() => { S.toast = ''; document.getElementById('toast').hidden = true; }, 4000); }
   function openSheet(name) { S.sheet = name; S.copied = false; S.profile = false; S.trayOpen = false; if (name === 'print' || name === 'quiz') { S.kind = null; S.opts = kindDefaults(Object.assign(defaultOpts(), { size: S.opts.size })); } }
@@ -650,7 +669,7 @@
     render();
   });
   document.addEventListener('input', (e) => {
-    if (e.target.id === 'search') { S.q = e.target.value; document.getElementById('skill-list').innerHTML = skillList(); window.dispatchEvent(new Event('mq:render')); }
+    if (e.target.id === 'search') { S.q = e.target.value; document.getElementById('skill-list').innerHTML = skillList(); const eb = document.querySelector('.head-skills .eyebrow'); if (eb) { const h = S.q.trim() ? skillHits().length : 0; eb.textContent = S.q.trim() ? `Maths Quest · Teacher · All grades · ${plural(h, 'skill')} ${h === 1 ? 'matches' : 'match'}` : `Maths Quest · Teacher · ${gradeName(S.grade)} · ${plural(D.skills.filter(s => s.g === S.grade).length, 'skill')}`; } fitChips(); window.dispatchEvent(new Event('mq:render')); }
     if (e.target.id === 'lsearch') { S.lessons.q = e.target.value; const pos = e.target.selectionStart; render(); const i = document.getElementById('lsearch'); i.focus(); i.setSelectionRange(pos, pos); }
   });
   document.addEventListener('toggle', (e) => { if (e.target.matches && e.target.matches('details.more')) S.moreOpen = e.target.open; }, true);

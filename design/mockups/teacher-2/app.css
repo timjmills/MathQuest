@@ -102,13 +102,13 @@ button { cursor: pointer; }
 .spacer { flex: 1; }
 
 /* segmented controls and neutral pills (grades, choices) */
-.seg { display: inline-flex; border: var(--line-1) solid var(--line); border-radius: var(--r-8); background: var(--surface); padding: var(--sp-4); gap: var(--sp-4); flex-wrap: nowrap; }
+.seg { display: inline-flex; gap: var(--sp-4); flex-wrap: nowrap; }
 .seg button {
-  min-height: 36px; padding: 0 var(--sp-16); border: var(--line-1) solid transparent; border-radius: var(--r-8);
-  background: transparent; font-size: var(--fs-14); font-weight: var(--fw-700); color: var(--text-2); white-space: nowrap;
+  min-height: var(--control); padding: 0 var(--sp-16); border: var(--line-1) solid var(--line); border-radius: var(--r-8);
+  background: var(--surface); font-size: var(--fs-14); font-weight: var(--fw-700); color: var(--text-2); white-space: nowrap;
 }
 .seg button[aria-pressed="true"] { color: var(--text); border-color: var(--ring); box-shadow: inset 0 0 0 var(--line-1) var(--ring); }
-.seg-big button { min-height: 36px; font-size: var(--fs-16); }
+.seg-big button { min-height: var(--control); font-size: var(--fs-16); }
 .scroll-x { overflow-x: auto; max-width: 100%; scrollbar-width: none; }
 .scroll-x::-webkit-scrollbar { display: none; }
 .pill {
@@ -151,12 +151,12 @@ button { cursor: pointer; }
 .grid[data-view="small"] .card .thumb { height: 80px; }
 .grid[data-view="list"] .card { flex-direction: row; align-items: center; padding: var(--sp-8) var(--sp-8) var(--sp-8) var(--sp-16); min-height: 56px; }
 .grid[data-view="list"] .card .thumb { display: none; }
-.card-name { font-size: var(--fs-16); font-weight: var(--fw-700); line-height: var(--lh-tight); overflow-wrap: anywhere; }
+.card-name { font-size: var(--fs-16); font-weight: var(--fw-700); line-height: var(--lh-tight); overflow-wrap: break-word; min-width: 0; }
 .grid[data-view="list"] .card-name { padding-right: var(--sp-48); }
 .grid[data-view="small"] .card-name { font-size: var(--fs-14); }
 .card-meta { display: flex; align-items: center; gap: var(--sp-8); font-size: var(--fs-12); color: var(--text-2); flex-wrap: wrap; }
 .grid[data-view="list"] .card-meta { margin-left: auto; padding-right: var(--sp-48); flex-wrap: nowrap; }
-.area-tag { white-space: nowrap; display: inline-flex; align-items: center; gap: var(--sp-4); font-weight: var(--fw-700); color: var(--a-deep); }
+.area-tag { white-space: normal; min-width: 0; display: inline-flex; align-items: center; gap: var(--sp-4); font-weight: var(--fw-700); color: var(--a-deep); }
 .area-tag .icon { width: var(--fs-16); height: var(--fs-16); }
 .mixed-badge { font-size: var(--fs-12); border: var(--line-1) dashed var(--a-deep); border-radius: var(--r-8); padding: 0 var(--sp-4); color: var(--a-deep); }
 .tick {
@@ -188,7 +188,7 @@ button { cursor: pointer; }
 .tray-label b { font-size: var(--fs-20); color: var(--text); }
 /* chips take the room there is and shrink (ellipsis) only when the tray is full; then they wrap to a second row */
 .tray-chips { flex: 1; display: flex; flex-wrap: wrap; gap: var(--sp-8); min-width: 0; padding: var(--sp-4); }
-.tray-chips .chip { flex: 1 1 120px; min-width: 0; max-width: max-content; }
+.tray-chips .chip { flex: 0 1 auto; min-width: 0; max-width: 100%; }
 .tray-empty { flex: 1; color: var(--text-2); font-size: var(--fs-16); }
 .tray-actions { display: flex; align-items: center; gap: var(--sp-8); }
 .tray-hint { font-size: var(--fs-12); color: var(--text-3); text-align: right; }
@@ -201,8 +201,9 @@ button { cursor: pointer; }
   border-radius: var(--r-8); border: var(--line-1) solid var(--a-deep); background: var(--a-bold); color: var(--a-on);
   font-size: var(--fs-14); font-weight: var(--fw-700); white-space: nowrap; max-width: 100%; min-width: 0;
 }
-.chip .name { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-.chip-area { flex: none; font-family: var(--font-mono); font-size: var(--fs-12); font-weight: var(--fw-500); text-transform: uppercase; letter-spacing: 0.04em; padding-left: var(--sp-8); border-left: var(--line-1) solid currentColor; }
+.chip { overflow: hidden; }
+.chip .name { overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 0 1 auto; }
+.chip-area { flex: 0 1000 auto; min-width: 0; overflow: hidden; font-family: var(--font-mono); font-size: var(--fs-12); font-weight: var(--fw-500); text-transform: uppercase; letter-spacing: 0.04em; padding-left: var(--sp-8); border-left: var(--line-1) solid currentColor; }
 .chip.soft { background: var(--a-soft); color: var(--text); }
 .chip.tint { background: var(--a-tint); color: var(--text); }
 .chip.dashed, [data-domain="MIXED"].chip, [data-domain="WORDS"].chip, [data-domain="NOSTD"].chip { border-style: dashed; border-width: var(--line-2); }
@@ -554,3 +555,72 @@ table.t th { color: var(--text-2); font-size: var(--fs-12); }
   .grade-pills .pill { flex: 1; justify-content: center; min-width: var(--control); padding: 0 var(--sp-4); }
   .area-row .n { display: none; }
 }
+
+/* ---------------- fix round 2 (critic r2; stop rule §1.7) ---------------- */
+/* the GRADE badge (owner 2026-10-23): a numbered circle in ink on the surface, never an area colour, always first in its
+   card, chip or row. Its colours are neutral tokens only (ws-teacher-tokens checks this rule block). */
+.gbadge {
+  flex: none; display: inline-grid; place-items: center; width: var(--sp-24); height: var(--sp-24); border-radius: var(--r-16);
+  border: var(--line-2) solid var(--text); background: var(--surface); color: var(--text);
+  font-family: var(--font-mono); font-size: var(--fs-12); font-weight: var(--fw-700); line-height: var(--lh-tight); white-space: nowrap;
+}
+.chip.compact .chip-area { display: none; }
+.card-title { display: flex; align-items: flex-start; gap: var(--sp-8); padding-right: calc(var(--sp-32) + var(--sp-8)); min-width: 0; min-height: var(--sp-32); }
+.card-title .gbadge { margin-top: calc(-1 * var(--line-2)); }
+.grid[data-view="list"] .card-title { padding-right: 0; flex: 1; align-items: center; }
+.grid[data-view="list"] .card-name { padding-right: 0; }
+/* the tick box sits beside the name now, never on the paper: the thumbnail keeps all of its width */
+.card .tick { top: var(--sp-4); right: var(--sp-4); }
+.grade-head { display: flex; align-items: center; gap: var(--sp-8); font-size: var(--fs-16); font-weight: var(--fw-700); margin: var(--sp-8) 0; }
+.grade-head .count { font-size: var(--fs-12); font-weight: var(--fw-500); font-family: var(--font-mono); color: var(--text-2); text-transform: uppercase; margin-left: var(--sp-8); }
+.panel-band { grid-template-columns: minmax(0, 1fr); }
+.panel-band .gbadge { border-color: currentColor; }
+.sheet-head .gbadge { width: var(--sp-32); height: var(--sp-32); font-size: var(--fs-14); }
+
+/* the tray lives at the foot of the Skills column (sticky), so it can grow to more rows instead of squeezing names */
+@media (min-width: 820px) {
+  .main.has-tray { display: flex; flex-direction: column; min-height: 100vh; padding-bottom: 0; }
+  .main.has-tray > #skill-list, .main.has-tray > * { flex: none; }
+  .main.has-tray > .tray { margin: auto calc(-1 * var(--sp-32)) 0; }
+  #skill-list { margin-bottom: var(--sp-32); }
+  .tray { position: sticky; left: auto; right: auto; bottom: 0; flex-wrap: wrap; gap: var(--sp-8) var(--sp-16); }
+  .tray-label { flex: none; }
+  .tray-chips { flex: 1 1 360px; align-items: center; }
+  .tray-actions { flex: none; margin-left: auto; }
+}
+.tray-group { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8); min-width: 0; max-width: 100%; }
+.tray-legend { display: inline-flex; align-items: center; gap: var(--sp-4); font-family: var(--font-mono); font-size: var(--fs-12); font-weight: var(--fw-700); text-transform: uppercase; letter-spacing: 0.04em; color: var(--a-deep); white-space: nowrap; }
+.tray-legend .icon { width: var(--fs-16); height: var(--fs-16); }
+@media (max-width: 819px) { .tray { position: fixed; margin: 0; } }
+
+/* the weights rows: every row the same two columns; when the options column is narrow, every Less/Equal/More goes under */
+.weights { container-type: inline-size; }
+.weight-row.w { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--sp-8); align-items: center; }
+.weight-row.w .chip { justify-self: start; }
+@container (max-width: 520px) { .weight-row.w { grid-template-columns: minmax(0, 1fr); } }
+
+/* Skills below 1100 px (tablet, small laptop): the search gets its own full row, grade and card size become two
+   dropdowns, cards are at least 200 px (2-3 columns) */
+.compact-only { display: none; }
+@media (max-width: 1099px) {
+  .roomy-only { display: none !important; }
+  .compact-only { display: inline; }
+  .row.compact-only, .pop.compact-only { display: flex; }
+  .compact .pop-btn { flex: 1; min-height: var(--control); font-size: var(--fs-14); }
+  .pop { padding: var(--sp-8); margin-bottom: var(--sp-8); border: var(--line-1) solid var(--line); border-radius: var(--r-8); background: var(--surface); }
+}
+@media (max-width: 1099px) and (min-width: 820px) {
+  .head-skills { flex-wrap: wrap; gap: var(--sp-8); }
+  .head-skills .search { flex-basis: 100%; max-width: none; }
+  .grid[data-view="medium"] { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+  .grid[data-view="big"] { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+  .grid[data-view="small"] { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .compact .pop-btn { flex: 0 1 240px; }
+}
+.tray-group { display: contents; }
+@media (max-width: 1279px) and (min-width: 820px) {
+  .tray-chips { flex: 1 1 100%; order: -1; }
+  .tray-label { display: flex; align-items: baseline; gap: var(--sp-8); }
+}
+.tray-lead { display: inline-flex; align-items: center; gap: var(--sp-8); min-width: 0; max-width: 100%; }
+.tray-lead .chip { min-width: 0; }
