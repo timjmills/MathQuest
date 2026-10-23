@@ -1096,8 +1096,10 @@ function generateResolvedQuestion() {
         && state.gameMode !== 'worksheet'
         && state.quizMode !== true
         // a kit fraction cell (frac-model.js) draws its own numerator / denominator boxes; a number
-        // placed on a line (nl-place.js) is answered on the line, never typed
-        && !(q.cell && (q.cell.template === 'frac-model' || q.cell.template === 'nl-place'))
+        // placed on a line (nl-place.js) is answered on the line, never typed; a ruler read to a
+        // half or quarter inch (figures.js) draws its own whole / numerator / denominator boxes,
+        // so "3/4" there is never a second, typed field (S9)
+        && !(q.cell && (q.cell.template === 'frac-model' || q.cell.template === 'nl-place' || q.cell.template === 'ruler'))
         // a legacy drawing that draws its own numerator / denominator boxes (data-mq-join="/")
         && !(typeof q.visual === 'string' && q.visual.includes('data-mq-join="/"'))) {
         q.answerType = 'fraction-input';

@@ -1,0 +1,15 @@
+{
+ "note": "Fallback partners for ws-coverage-matrix's multi-skill kinds (Sections, Mixed practice): IMPROVEMENT_PLAN §1.6.2 'the skill is dealt with fixed partners from the role sample (one 1 x 1, one 2 x 1, one 2 x 2 skill)'. Used only while tests/fixtures/precritic/role-sample.json has no `partners` field. Changed only with a STATUS note: a change re-runs every multi-skill row.",
+ "how": "Picked from the pinned role sample's skills (ws-precritic --write-role-sample, 2026-10-23) by their cell: a one-symbol fact (1 x 1), a wide short bar (2 x 1), a drawn shape (2 x 2). The size class is read from the cell, not measured: M2's size classes (sheet/roles/mixed-practice.js) replace this reading when they land.",
+ "pinned": "2026-10-23",
+ "partners": [
+  { "skill": "addition:add_facts", "sizeClass": "1x1", "template": "fact" },
+  { "skill": "algebra:tape_diagram", "sizeClass": "2x1", "template": "legacy (tape-diagram)" },
+  { "skill": "area_perimeter:perimeter_intro", "sizeClass": "2x2", "template": "perimeter-shape" }
+ ],
+ "spare": [
+  { "skill": "composing:number_bonds", "sizeClass": "1x1", "template": "bond", "use": "replaces a partner that IS the skill under test, same size class first" },
+  { "skill": "patterns:seq_2", "sizeClass": "2x1", "template": "legacy (dnd-generic)" },
+  { "skill": "measurement:time_hour", "sizeClass": "2x2", "template": "clock" }
+ ]
+}
