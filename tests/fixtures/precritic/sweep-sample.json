@@ -1,0 +1,269 @@
+{
+  "note": "Pinned sweep sample for ws-screen-slots / ws-chromebook-fit --dark and --bigboard (IMPROVEMENT_PLAN §1.4 S5, §1.6.2): every screen host (practice card, online worksheet, quiz) x one skill per kit template. The template of a skill is the most frequent q.cell.template over generateQuestionFor seeds 1-3 ('legacy' = no kit cell yet); the skill is the first live skill of that template in SKILLS order. Regenerate with `node tests/scripts/ws-screen-slots.cjs --write-sample tests/fixtures/precritic/sweep-sample.json` and change it only with a STATUS note.",
+  "hosts": [
+    "card",
+    "worksheet",
+    "quiz"
+  ],
+  "derived": "2026-10-23",
+  "liveSkills": 723,
+  "skills": [
+    {
+      "template": "counters",
+      "key": "counting:count_objects",
+      "skillsOnTemplate": 9
+    },
+    {
+      "template": "legacy",
+      "key": "counting:count_sequence",
+      "skillsOnTemplate": 430
+    },
+    {
+      "template": "seqstrip",
+      "key": "counting:number_seq_fill",
+      "skillsOnTemplate": 2
+    },
+    {
+      "template": "compare",
+      "key": "comparing:compare_groups",
+      "skillsOnTemplate": 1
+    },
+    {
+      "template": "bond",
+      "key": "composing:number_bonds",
+      "skillsOnTemplate": 1
+    },
+    {
+      "template": "chartwindow",
+      "key": "composing:hundreds_chart_fill",
+      "skillsOnTemplate": 2
+    },
+    {
+      "template": "tenframe",
+      "key": "composing:ten_frame_build",
+      "skillsOnTemplate": 1
+    },
+    {
+      "template": "base10",
+      "key": "composing:base10_build",
+      "skillsOnTemplate": 1
+    },
+    {
+      "template": "words",
+      "key": "composing:number_word_form",
+      "skillsOnTemplate": 2
+    },
+    {
+      "template": "fact",
+      "key": "addition:add_facts",
+      "skillsOnTemplate": 4
+    },
+    {
+      "template": "word-work",
+      "key": "addition:add_word_problems",
+      "skillsOnTemplate": 55
+    },
+    {
+      "template": "fact-family",
+      "key": "addition:add_sub_fact_family",
+      "skillsOnTemplate": 1
+    },
+    {
+      "template": "add-three",
+      "key": "addition:add_three",
+      "skillsOnTemplate": 1
+    },
+    {
+      "template": "stack",
+      "key": "addition:add_50_no_regroup",
+      "skillsOnTemplate": 42
+    },
+    {
+      "template": "number-line",
+      "key": "addition:nl_add",
+      "skillsOnTemplate": 8
+    },
+    {
+      "template": "cloze-bank",
+      "key": "addition:cloze_addition",
+      "skillsOnTemplate": 1
+    },
+    {
+      "template": "arrays",
+      "key": "multiplication:arrays_groups",
+      "skillsOnTemplate": 3
+    },
+    {
+      "template": "area-model",
+      "key": "multiplication:area_model_mult",
+      "skillsOnTemplate": 3
+    },
+    {
+      "template": "mult-grid",
+      "key": "multiplication:mult_chart",
+      "skillsOnTemplate": 8
+    },
+    {
+      "template": "hop-line",
+      "key": "multiplication:nl_mult",
+      "skillsOnTemplate": 2
+    },
+    {
+      "template": "count-row",
+      "key": "multiplication:count_by_tables",
+      "skillsOnTemplate": 15
+    },
+    {
+      "template": "equation",
+      "key": "division:div_facts",
+      "skillsOnTemplate": 3
+    },
+    {
+      "template": "remainder",
+      "key": "division:div_remainders",
+      "skillsOnTemplate": 1
+    },
+    {
+      "template": "division",
+      "key": "division:long_div_2digit",
+      "skillsOnTemplate": 5
+    },
+    {
+      "template": "nl-place",
+      "key": "integers:integer_nl_drag",
+      "skillsOnTemplate": 4
+    },
+    {
+      "template": "frac-model",
+      "key": "fractions:identify",
+      "skillsOnTemplate": 9
+    },
+    {
+      "template": "perimeter-shape",
+      "key": "area_perimeter:perimeter_intro",
+      "skillsOnTemplate": 1
+    },
+    {
+      "template": "clock",
+      "key": "measurement:time_hour",
+      "skillsOnTemplate": 17
+    },
+    {
+      "template": "timeline",
+      "key": "measurement:elapsed_30min",
+      "skillsOnTemplate": 12
+    },
+    {
+      "template": "pictograph",
+      "key": "measurement:pictograph_intro",
+      "skillsOnTemplate": 3
+    },
+    {
+      "template": "bar-graph",
+      "key": "measurement:bar_graph_intro",
+      "skillsOnTemplate": 3
+    },
+    {
+      "template": "ruler",
+      "key": "measurement:reading_ruler",
+      "skillsOnTemplate": 2
+    },
+    {
+      "template": "coins",
+      "key": "measurement:money_count",
+      "skillsOnTemplate": 12
+    },
+    {
+      "template": "money-columns",
+      "key": "measurement:money",
+      "skillsOnTemplate": 2
+    },
+    {
+      "template": "thermometer",
+      "key": "measurement:temperature",
+      "skillsOnTemplate": 1
+    },
+    {
+      "template": "tally-chart",
+      "key": "graphs:tally_chart",
+      "skillsOnTemplate": 2
+    },
+    {
+      "template": "function-table",
+      "key": "algebra:function_table_easy",
+      "skillsOnTemplate": 4
+    },
+    {
+      "template": "pv",
+      "key": "placevalue:more_less_10",
+      "skillsOnTemplate": 49
+    },
+    {
+      "template": "pv-support",
+      "key": "placevalue:place_value_10x",
+      "skillsOnTemplate": 1
+    }
+  ],
+  "chromebookFit": {
+    "note": "Standing failures of the ws-chromebook-fit sweeps on this sample, pinned 2026-10-23 at 60c4fa53 so the deploy gate fails only on NEW ones (--baseline). They are real defects with no owner yet: (1) the Board display (css/play-teacher.css: #questionPaper zoom 1.6) makes the board scroll for tall items, 17 of 39 sample skills at 1366x768 and 3 at 1920x1080; (2) a page error when the number-family practice card is followed by the online worksheet / quiz in one page (also in light mode: ws-chromebook-fit --skills addition:add_sub_fact_family --hosts card,worksheet,quiz). Remove a line when its defect is fixed.",
+    "problems": [
+      "Cannot read properties of null (reading 'numberFamilyData')"
+    ],
+    "skills": {
+      "comparing:compare_groups": [
+        "bigboard-teacher:card:1366x768:scroll-y"
+      ],
+      "composing:number_bonds": [
+        "bigboard-teacher:card:1366x768:scroll-y"
+      ],
+      "composing:base10_build": [
+        "bigboard-teacher:card:1366x768:scroll-y"
+      ],
+      "addition:add_word_problems": [
+        "bigboard-teacher:card:1366x768:scroll-y",
+        "bigboard-teacher:card:1920x1080:scroll-y"
+      ],
+      "addition:add_sub_fact_family": [
+        "bigboard-teacher:card:1366x768:scroll-y",
+        "bigboard-teacher:card:1920x1080:scroll-y"
+      ],
+      "addition:add_three": [
+        "bigboard-teacher:card:1366x768:scroll-y"
+      ],
+      "addition:nl_add": [
+        "bigboard-teacher:card:1366x768:scroll-y"
+      ],
+      "multiplication:arrays_groups": [
+        "bigboard-teacher:card:1366x768:scroll-y",
+        "bigboard-teacher:card:1920x1080:scroll-y"
+      ],
+      "multiplication:area_model_mult": [
+        "bigboard-teacher:card:1366x768:scroll-y"
+      ],
+      "multiplication:mult_chart": [
+        "bigboard-teacher:card:1366x768:scroll-y"
+      ],
+      "multiplication:nl_mult": [
+        "bigboard-teacher:card:1366x768:scroll-y"
+      ],
+      "division:long_div_2digit": [
+        "bigboard-teacher:card:1366x768:scroll-y"
+      ],
+      "area_perimeter:perimeter_intro": [
+        "bigboard-teacher:card:1366x768:scroll-y"
+      ],
+      "measurement:time_hour": [
+        "bigboard-teacher:card:1366x768:scroll-y"
+      ],
+      "measurement:elapsed_30min": [
+        "bigboard-teacher:card:1366x768:scroll-y"
+      ],
+      "measurement:temperature": [
+        "bigboard-teacher:card:1366x768:scroll-y"
+      ],
+      "algebra:function_table_easy": [
+        "bigboard-teacher:card:1366x768:scroll-y"
+      ]
+    }
+  }
+}
