@@ -44,13 +44,13 @@
 #            ws-share-options, ws-teacher-shell, -library, -preview, -quiz, ws-teacher-wrm, ws-teacher-wrm --fallback,
 #            and ws-detailed-lesson --lesson <id> --repeats for every lesson in js/modules/lessons/detailed/.
 # Session 2  ws-screen-slots in MQ_SLOTS_SHARDS parts (default 4) with --baseline design/audit/baselines/screen-slots.json,
-#            ws-chromebook-fit in MQ_FIT_SHARDS parts (default 2), ws-viewport-check --baseline
-#            design/audit/baselines/viewport-check.json (a real session's scroll: the R7-D1 class chromebook-fit
-#            cannot see), the S9 regression (ws-screen-slots on measurement:reading_ruler_hard, card host, seeds 1-40,
+#            ws-chromebook-fit in MQ_FIT_SHARDS parts (default 2), the S9 regression (ws-screen-slots on measurement:reading_ruler_hard, card host, seeds 1-40,
 #            --need-ans 1/4,1/2,3/4: readings under an inch show one answer area), and the sweeps on the pinned sample
 #            (tests/fixtures/precritic/sweep-sample.json): ws-screen-slots --dark / --bigboard, ws-chromebook-fit
 #            --dark / --bigboard (chromebook-fit's standing failures are pinned per skill and host in the sample file).
-# Session 3  ws-coverage-matrix on the affected rows with a DOCUMENT BUDGET (§1.6.2): MQ_COVERAGE_ARGS, default
+# Session 3  ws-viewport-check --baseline design/audit/baselines/viewport-check.json (a real session's scroll: the
+#            R7-D1 class chromebook-fit cannot see; moved here from session 2 for time, MQ_VIEWPORT_SESSION=2 moves it
+#            back), and ws-coverage-matrix on the affected rows with a DOCUMENT BUDGET (§1.6.2): MQ_COVERAGE_ARGS, default
 #            `--all --affected <base>..HEAD --baseline design/audit/matrix/baseline.json --slots 2 --batch 9`, plus
 #            `--max-docs MQ_MATRIX_BUDGET` (default 500). <base> is MQ_DEPLOY_BASE, else the merge base with
 #            origin/master; when origin/master is not fetched the gate FAILS and says so (never a silent HEAD~1).
@@ -700,7 +700,11 @@ build_list() {
   local i
   for i in $(seq 1 "$SLOTS_SHARDS"); do browser_gate 2 "ws-screen-slots --shard $i/$SLOTS_SHARDS" ws-screen-slots.cjs --shard "$i/$SLOTS_SHARDS" --baseline "$SLOTS_BASE"; done
   for i in $(seq 1 "$FIT_SHARDS"); do browser_gate 2 "ws-chromebook-fit --shard $i/$FIT_SHARDS" ws-chromebook-fit.cjs --shard "$i/$FIT_SHARDS" --baseline "$SAMPLE"; done
-  browser_gate 2 "ws-viewport-check --baseline" ws-viewport-check.cjs --baseline "$VIEWPORT_BASE"
+  # ws-viewport-check (≈ 690 s) runs in session 3 (MQ_VIEWPORT_SESSION, default 3): with it, session 2's browser work was
+  # 4,027 s = 33.6 min on its two slots in all three timed runs (2026-10-23); without it ≈ 27.8 min. Session 3's matrix
+  # renders ≤ MQ_MATRIX_BUDGET documents (≈ 22 min at the measured 0.38 documents/s on two slots), so the two together
+  # stay ≈ 28 min.
+  browser_gate "${MQ_VIEWPORT_SESSION:-3}" "ws-viewport-check --baseline" ws-viewport-check.cjs --baseline "$VIEWPORT_BASE"
   # S9 (critic N8): a quarter-inch ruler read under an inch ("3/4") draws its own boxes; the card must not add a typed field
   browser_gate 2 "ws-screen-slots S9 ruler seeds 1-40" ws-screen-slots.cjs --skills measurement:reading_ruler_hard --hosts card --seeds 1-40 --need-ans 1/4,1/2,3/4
   browser_gate 2 "ws-chromebook-fit --dark" ws-chromebook-fit.cjs --dark --baseline "$SAMPLE"

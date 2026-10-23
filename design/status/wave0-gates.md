@@ -167,7 +167,7 @@ mutant fails it). Lanes must commit before a clearing run (a dirty run never cle
 | Gate session | Run 1 | Run 2 | Run 3 | Notes |
 |---|---|---|---|---|
 | 1 (node gates, content-audit, print-lint kit, teacher-*, screen-answer, share-options, lesson repeats) | FAIL 27.9 min | FAIL 28.4 min | OK (1 FLAKE) 26.4 min | 0 s slot waits; print-lint ≈ 1,000 s and teacher-wrm ≈ 870 s set the length. The only non-OK gate: `ws-teacher-shell`, aborted Andika .woff2 loads (`net::ERR_ABORTED`) counted as console errors — a harness defect, fixed (`tests/lib/ws-harness.cjs` ignores aborted font loads only; 3/3 solo runs OK after) |
-| 2 (screen-slots + chromebook-fit sharded, big-board and dark sweeps, viewport, S9 check) | (still running) | | | |
+| 2 (screen-slots + chromebook-fit sharded, big-board and dark sweeps, viewport, S9 check) | OK 34.1 min | OK 34.3 min | OK 34.3 min | every gate OK, 0 s slot waits; browser work 4,027 s = 33.6 min floor on two slots, so it cannot meet 30 min as listed. Rebalanced: `ws-viewport-check` (≈ 690 s) moved to session 3 (`MQ_VIEWPORT_SESSION`), session 2 ≈ 27.8 min computed from the measured gate times, session 3 ≈ 22 min matrix budget + the viewport check on its free slot ≈ 28 min; confirmation runs below |
 | 3 (coverage matrix affected rows, digests hook, owner go) | OK (1 WARNING) 9.0 s | OK 8.6 s | OK 8.8 s | over budget (32,766 docs) with no nightly and no full baseline → the owner's WARNING; nothing rendered, so this times the verdict, not a render |
 
 ## Critic r5 (`design/audit/runs/wave0-gates/critic-r5.md`): **PASS** — plan 9, backtests 9, usable 8
