@@ -265,3 +265,9 @@ grow to ≈ 28 min (predicted by `--budget`) once the matrix renders its ≤ 500
   (118/300), R-SAME-LENGTH (40/300), R-ZERO-NOT-SEEDED (44.3 % vs ≤ 10 %) and N-BAND (band offered) — the pilot's own fixes
   are not merged yet. Stack card regenerated (unsigned). **For the lead:** the subtraction card's signature already fails
   `--check-signed` because DN-34's excerpt changed upstream after signing — it needs `--resign` + your re-sign after the pilot.
+- D8 applied (merged 8aabacc0): `sample.critic` = bounded all-pairs (representatives) + 20 % random, total ≤ 40 pages a pair.
+  On stack × Single skill the bounded all-pairs alone fills the cap: 21 rows / 40 pages kept, 0 random, 36 all-pairs rows
+  cut → 531 of 656 bounded pairs covered (125 uncovered; uncapped it would be ≈ 76 pages). The page states the cut.
+  **For the lead:** keep the cap (125 pairs left to the machine sample) or allow ≈ 76 pages for this pair.
+- SKILL_UPGRADE_LIST.md: 346 pointer lines appended (292 skills), a "Wave 0 pinned defects (2026-10-23)" block under each
+  family: 26 MC-on-screen, 115 option-verify, 205 node-lint lines.
