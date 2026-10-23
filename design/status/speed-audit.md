@@ -272,3 +272,97 @@ screen-answer, chromebook-fit, code-snapshot and boot-smoke PASS; providers-unit
 cloud container (timeouts with the old and new script alike; 210 s for the three with `--deadline 600000`). ws-precritic
 calls it with the default, so a lane touching those skills gets a false FAIL. For W0-A: pass a larger `--deadline` from
 precritic.
+
+---
+
+# Reflections (process rule 00), 2026-10-23
+
+One dated section per closed lane: measure → causes → fixes (each with an owner) → record. Times come from each lane's
+`Times:` lines and critic reports; hours are wall time from the lane's first build to its PASS, on 2026-10-23. Targets
+(§4.4): ≤ 2 critic rounds, 1 builder run per family or tool, and the time budget. Baseline (`metrics.md`): rounds to PASS
+median 3 per run / 4 per lane (mean 4.4 / 4.8), ≈ 1.5 h a round on skill and screen lanes.
+
+## 2026-10-23 · Summary table
+
+| Lane | Kind | Wall time | Builder runs (profile) | Critic rounds | Min score at PASS | Against target |
+|---|---|---|---|---|---|---|
+| W0-B process tools (S3, S6, S7, S8, E5) | tools | **1 h** (10:04–11:03) | 8 parallel builders (medium for new tools, low for the tally readers and rules) + 2 fixers | **2** | 8 / 8 / 8 | **met** |
+| `ws-precritic` (S1) | tool | ≈ 4 h (11:03 – about 15:00; 1 h 48 min of it queued for a browser slot) | 1 builder + 1 fixer (medium) | **2** | 8 / 8 / 8 | **met** on rounds; tool speed met (256 s a skill without the six-skill matrix) |
+| W0-defects (4 real defects found by the new checks) | fixes | **3 h 35 min** (13:18–16:53) | 6 (A–C low, D–E medium after a failed round, F low) | **3** | ≥ 8 | over by 1 round |
+| W0-A checks and gates (S2, S4, S5, S9, E1) | tools | **≈ 10 h** (10:08–19:56) | 9 first builds (medium) + 1 low fix + 6 fix rounds (medium) | **5** | 9 / 9 / 8 | **over by 3 rounds** |
+| Mixed pages M1 (interleave, arrangement) | engine | **8 h** (10:27–18:28) | 1 first build + 5 fix rounds (medium; r6 low), 1 escalation to a fresh builder | **6** | ≥ 8 on 16/16 pages | **over by 4 rounds** |
+| SU-C pilot (six skills + one preset) | skills as data | open (16:41 –) | 2 so far (low, then medium) | 1 so far, FAIL | — | **trigger fired** (> 1 builder run); section below when it ends |
+| T1 teacher mock-up | screen | open | — | — | — | reflection when it closes |
+
+**Reading:** the two lanes whose work was a list of independent tools with a clear spec (W0-B, precritic) met the 2-round
+target on the first day of the new rules. The three lanes that lost rounds lost them the same way: **one defect that survived
+several rounds before anyone turned it into a machine check or named its root cause** (W0-A baseline invariants, M1 repeats and
+size ladder), or **gate gaps the critic found by hand** (W0-defects). No lane lost a round to a wrong builder strength except the
+pilot.
+
+## 2026-10-23 · W0-B process tools — PASS in 2 rounds, 1 h
+
+- **Measure.** 10:04 start; eight builders in parallel 10:07–10:33 (S6 6 min, S7 1 min, S3 14 min, E5 20 min, tally readers
+  ×7 16 min, metrics 6 min); critic r1 10:33–10:42 FAIL 7/7/8 (D1–D9); two fixers 10:43–10:54; critic r2 10:55–11:03 PASS
+  8/8/8. Cost ≈ $55 (the highest of the morning) for the least wall time.
+- **Causes.** r1's defects were in the tally's rule-id reading and the `--check-signed` gate (a gate that did not check the
+  card body) — both caught by the critic, neither by a test the builder ran.
+- **Fixes.** `--check-signed` now checks date, body sha, coverage and regeneration (done, f0eca7b9). Rule for tool lanes: each
+  tool ships a `--self-test` with a seeded failure case (W0-B's tools all have one now). **Owner: done.**
+- **Lesson worth copying:** split a tool lane into small independent builders run in parallel, each with its own self-test.
+
+## 2026-10-23 · `ws-precritic` — PASS in 2 rounds, ≈ 4 h
+
+- **Measure.** Built in W0-A 11:03–12:51 (108 min) while **queued 1 h 48 min for a browser slot** behind S5 and S2 part 2;
+  moved to its own session (the auditor's intervention); critic r1 13:35–13:53 FAIL; fixer 53 min; critic r2 11 min PASS 8/8/8.
+  Tool speed: 256 s for one skill with the matrix on two slots (target 5–6 min: met); 1,593 s for the six pilot skills with the
+  matrix on one slot (4.4 min a skill).
+- **Causes.** The wait, not the build: three browser-using builders shared two slots in one container, and the slot queue was
+  unfair (one shard starved 90 min; fixed in bfdbd901).
+- **Fixes.** (1) A lane runs at most two browser-using builders at once; a third browser job goes to its own session (its own
+  container and two slots). **Owner: lead — add to LESSONS_LEARNED process rules, before the next tool wave.** (2) Fair slot
+  queue (done, bfdbd901). (3) ws-precritic passes a longer `--deadline` to ws-options-verify (three skills need > 60 s in a cloud
+  container). **Owner: W0-A, next change to ws-precritic.**
+
+## 2026-10-23 · W0-defects — PASS in 3 rounds, 3 h 35 min
+
+- **Measure.** Four real defects found by the new checks (sticky header over the question, dark-mode contrast, big-board zoom
+  scrolling, a null page error). Builders A–C (low) 13:18–14:32; critic r1 14:33–15:06 passed defects 1, 2, 4 and failed 3
+  (board, C3 7); builder D (medium, rebuild after failure) 15:07–15:28; critic r2 15:28–15:52 found the 1280×720 nested clip and a
+  dark answered dot; builder E (medium) 15:54–16:22; critic r3 16:23–16:53 PASS; builder F (low, owner ruling) 4 min.
+- **Causes.** Rounds 2 and 3 were spent on things the gates did not measure: the dark scan read only `.qt-question-card`, and
+  `--bigboard` covered neither 1280×720 nor clipping inside nested scroll boxes. The critic's own probe script found them.
+- **Fixes.** Both gaps closed in the gates (W0-A "sweep gaps", 17:09–18:08: board 1280×720 + nested clip, dark scan of the whole
+  host). **Owner: done.** Rule: when a critic writes a probe script to find a defect, that script becomes the check (or is merged
+  into the gate) in the same fix round. **Owner: lead — add to LESSONS_LEARNED.**
+
+## 2026-10-23 · W0-A checks and gates — PASS in 5 rounds, ≈ 10 h
+
+- **Measure.** Nine first builds on medium, 10:08–13:41 (envelope 19 min, golden renders 29, node-lint 31, coverage matrix 36,
+  S2 part 2 145, **S5 deploy runner 185**). Critic r1 13:43–14:11 FAIL 6/8/6 (D1–D8); three fixers; r2 15:47–17:07 FAIL 7/8/8 (one
+  blocking); r3 18:09–18:44 FAIL 7/8/8 (one blocking); r4 19:05–19:19 FAIL 7/8/8; **r5 ≈ 19:56 PASS 9/9/8**.
+- **Causes.** (1) **One root cause failed three rounds**: the matrix baseline's invariants (r1 D4 → r2 D1 → r3 D1: nightly red rows
+  could vanish). The §1.7 stop rule ("same defect survives two rounds at medium → stop, root-cause, machine check") was applied
+  only at r3, one round late. (2) r4 failed on an integration miss: deploy session 1 ran the whole options pin (≈ 1 h 52 min)
+  because a branch was merged without its read-only mode. (3) The S5 builder took 3 h, including 90 min starved of a browser slot.
+  (4) Deploy speed is **not yet proven**: session 1 takes 26–28 min, session 2 had no clean timed run at the time of writing,
+  and session 3 took 9 s because it rendered nothing (no nightly yet).
+- **Fixes.** (a) The stop rule is counted per **defect id across rounds**, not per round: the lead checks each FAIL's blocking
+  defect against the previous round's list and stops the loop on the second repeat. **Owner: lead — LESSONS_LEARNED, now.**
+  (b) Baseline invariants now have a self-test (25,200 row-night checks) and a backtest. **Done.** (c) A merge into a gate lane
+  runs `ws-deploy-gates.sh --self-test` before the critic. **Owner: W0-A.** (d) The ≤ 30 min deploy target stays open until three
+  timed runs of all three sessions, with session 3 rendering a real affected-row set. **Owner: W0-A; the auditor re-times it.**
+
+## 2026-10-23 · Mixed pages M1 — PASS in 6 rounds, 8 h
+
+- **Measure.** First build of `interleave()` and the mixed arrangement (medium); critic r1 FAIL (S page = L page, legacy sub_facts
+  misaligned, repeats in a share); r2 FAIL (I Can doubled letters); r3 FAIL (exact repeats on the 2-skill S page, M = S on the size
+  ladder); **escalation**: loop stopped, root causes named, machine check `sheet/mixed-page.check.cjs`, fresh builder; r4 14 / 16
+  pages; r5 the three changed pages pass; r6 (low) **PASS on all 16 pages**. Four owner rulings landed mid-lane (13:58–15:00).
+- **Causes.** (1) Repeats and the size ladder were judgement-found in r1–r3 although both are measurable; the machine check came
+  at round 4. (2) Owner design rulings arrived during fix rounds and were folded in, so rounds 4–5 also re-built behaviour.
+- **Fixes.** (a) `mixed-page.check.cjs` (repeats, size ladder, fill) is in the lane; it should become a `ws-precritic --role
+  mixed-practice` gate so any later lane gets it. **Owner: W0-A, with the mixed-pages lane, before M2.** (b) Owner ideas during a
+  build go on the lane's design list and are built in one batch after PASS — **done: process rule 0**. (c) First builds of an
+  engine should ship with their own page check from the start (repeats, size ladder, fill), not after round 3. **Owner: lead —
+  brief template for M2–M5.**
