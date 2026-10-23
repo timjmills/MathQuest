@@ -20,5 +20,6 @@
  ],
  "red": [
   "addition:add_100_regroup|single/defaults"
- ]
+ ],
+ "baseline": null
 }

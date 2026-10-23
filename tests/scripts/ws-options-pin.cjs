@@ -8,9 +8,11 @@
 //   node tests/scripts/ws-options-pin.cjs --check                        # every live skill: FAIL on a failure not pinned
 //   node tests/scripts/ws-options-pin.cjs --write --skills cat:skill,... # re-pin a subset (merged into the file)
 //   node tests/scripts/ws-options-pin.cjs --write --category addition    # re-pin one category (merged)
-//   node tests/scripts/ws-options-pin.cjs --check --shard 2/4            # every 4th batch from the 2nd (merged on --write)
+//   node tests/scripts/ws-options-pin.cjs --check --shard 2/28           # the skills of slice 2 of 28 (by hash, below)
 //   node tests/scripts/ws-options-pin.cjs --check --resume               # skip batches whose tmp JSON already exists
 //   node tests/scripts/ws-options-pin.cjs --list                         # the batches, run nothing (one browser start)
+//   node tests/scripts/ws-options-pin.cjs --gate design/audit/matrix     # THE DEPLOY GATE: node only, no browser, seconds
+//   node tests/scripts/ws-options-pin.cjs --self-test                    # node only: the hash batching and the gate's fold
 //
 //   --batch N        skills per ws-options-verify process (default 25; one browser start per batch)
 //   --slots N        batches at once (default 2), each through /tmp/mq-browser-run.sh (it queues behind other sessions)
@@ -20,14 +22,20 @@
 //   --n N            items per check, passed to ws-options-verify (default: its own, 12 - the precritic's value)
 //   --deadline MS    ws-options-verify's per-skill deadline (default 600000: its own 60 s default times out on
 //                    add_facts, sub_facts, f_to_d and the mixed pools in a cloud container with shared slots)
-//   --out f.json     also write the run: per-skill failures, new / fixed against the pin, timings, page errors
+//   --out f.json     also write the run (THE RUN FILE, below)
 //   --baseline f     the pin file (default design/audit/baselines/options-verify.json)
 //   --report-only    exit 0 even when --check finds new failures (a crash still exits non-zero)
 //   --keep-tmp       keep the tmp directory after a complete run (it is kept anyway when a batch failed)
 //
+// BATCHES AND SLICES (critic r4 N8). A skill's slice of n is a hash of its skill id: (SHA-256 of "options-pin:<id>",
+// first 32 bits) mod n, + 1. It depends on the id only, so appending a skill never moves another skill to another
+// slice (a split by position in SKILLS did, so a 28-night cycle could skip or repeat skills). --shard i/n runs slice i
+// of n: about 714 / 28 = 25.5 skills, one or two balanced batches of at most --batch. Skills that share an id stay in
+// one batch, because ws-options-verify --skill matches an id in every category. A full run orders the skills by the
+// same hash and cuts balanced batches of at most --batch (29 batches of about 25 for 714 skills).
+//
 // How a batch runs: `node tests/scripts/ws-options-verify.cjs --skill <ids> --json <tmp>/b<i>-<hash>.json --report-only`.
-// ws-options-verify matches an id in EVERY category, so the skills sharing an id are kept in one batch and results
-// outside the selection are dropped. A failing pair is written exactly as ws-precritic forms it:
+// Results outside the selection are dropped. A failing pair is written exactly as ws-precritic forms it:
 // `${option}=${JSON.stringify(value)}` for a value, `static:${message}` for a static check. A skill whose verifier timed
 // out or crashed in its batch (`*="*"`) is run once more on its own at --deadline, so one slow moment under a shared
 // slot does not become a pin. If it times out again it is run with --deadline <--long-deadline, default 1800000 ms>
@@ -37,6 +45,31 @@
 // --check: NEW = a failing pair of a skill in the selection that the pin does not list (a skill missing from the pin
 // counts every pair as new); FIXED = a pinned pair that no longer fails (listed, not a failure: re-pin with --write
 // --skills to drop it). Prints `ws-options-pin: OK` / `ws-options-pin: FAIL` last; exit 1 on FAIL (unless --report-only).
+//
+// THE RUN FILE (--out; the nightly's design/audit/matrix/options-pin-<date>[T<HHMM>][.shard-i-of-n].json):
+//   { tool: "ws-options-pin", kind: "options-pin", date, started, finished (ISO), commit, dirty, mode, batching: "hash-v1",
+//     shard: "i/n" | null, slice: {i, n} | null, subset (true when --skills / --category narrowed it), complete (no
+//     crashed batch, no skill without a result), pin {file, sha256, pinned}, selected, run, noOptions, wallMs, slotMs,
+//     perSkillMs, batches, pageErrors, crashed, missing, reruns, optionCounts,
+//     failing {"cat:skill": [every failing pair of that skill in this run; [] = it ran and every value passed]},
+//     new [{key, id, msg, unpinned}] (judged against the pin named above), fixed [{key, id}] }
+//   It carries no `rows`, so ws-coverage-matrix's fold lists it as "an options-pin report" and never folds it.
+//
+// --gate <dir> (critic r4 D1: the deploy reads the nightly results instead of running the pin, ≈ 1 h 52 min on two
+// slots). Node only: no browser slot, a few seconds. It folds every <dir>/options-pin-*.json, ordered by `finished`
+// (ISO time; a file without one by the date in its name at 00:00 UTC), ties broken by file name, into each skill's
+// NEWEST result (the last file whose `failing` lists the skill; a crashed batch's skills are not listed, so they keep
+// their older result). A file with `dirty: true` can add a failure but never clears one. Then:
+//   FAIL     a live skill (data.js SKILLS, retired and custom_mixed out) whose newest result has a failing pair the
+//            CURRENT pin (--baseline) does not list: a NEW pair that no later check fixed (a skill missing from the
+//            pin counts every pair); or an unreadable options-pin file; or, ONCE ALL 28 SLICES HAVE BEEN CHECKED, the
+//            newest file finished more than 24 h ago
+//   WARNING  (passes) no options-pin file yet; fewer than the 28 slices checked (a complete, clean run file of slice
+//            i/28, "hash-v1" batching, or a complete clean full run, which counts as all 28); or the newest file is
+//            more than 24 h old before all 28 are checked (the matrix's rule before its first full baseline)
+//   OK       otherwise
+// Exit 0 OK, 1 FAIL, 4 WARNING (ws-deploy-gates.sh reads 4 as WARNING). The last line is `ws-options-pin --gate: OK`,
+// `WARNING` or `FAIL`. MQ_NOW (ISO time) replaces the clock (fixtures: tests/fixtures/precritic/deploy/options-pin/).
 'use strict';
 const fs = require('fs');
 const path = require('path');
@@ -51,6 +84,237 @@ const VERIFY = path.join(__dirname, 'ws-options-verify.cjs');
 const RUNNER = '/tmp/mq-browser-run.sh';
 const BASE = path.resolve(ROOT, arg('baseline', 'design/audit/baselines/options-verify.json'));
 const rel = (p) => { const r = path.relative(ROOT, p); return !r ? p : r.startsWith('..') ? p : r; };
+
+/* ============================================================================ batches by hash (N8), pure */
+
+const h32 = (s) => parseInt(crypto.createHash('sha256').update(String(s)).digest('hex').slice(0, 8), 16);
+/** A skill id's slice of n (1-based): a hash of the id only, so appending skills never moves another skill. */
+const sliceOf = (skillId, n) => (h32('options-pin:' + skillId) % n) + 1;
+/**
+ * The batches of a selection: `skills` = [{key, categoryId, skillId, ...}] (the skills with options). Skills sharing
+ * an id form one group (ws-options-verify --skill matches an id in every category). With `shard` {i, n} only the groups
+ * of slice i of n are kept. The groups are ordered by their hash and cut into balanced batches of at most `batch`
+ * skills (one group larger than `batch` is a batch of its own). Returns [{i, skills, keys, ids}].
+ */
+function planBatches(skills, { batch, shard = null }) {
+    const byId = new Map();
+    for (const s of skills) { if (!byId.has(s.skillId)) byId.set(s.skillId, []); byId.get(s.skillId).push(s); }
+    let groups = [...byId.entries()].map(([id, list]) => ({ id, list, h: h32('options-pin:' + id) }));
+    if (shard) groups = groups.filter((g) => g.h % shard.n === shard.i - 1);
+    groups.sort((a, b) => a.h - b.h || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+    const total = groups.reduce((n, g) => n + g.list.length, 0);
+    const target = total ? Math.ceil(total / Math.max(1, Math.ceil(total / batch))) : batch;
+    const out = [];
+    let cur = [];
+    for (const g of groups) {
+        if (cur.length && cur.length + g.list.length > target) { out.push(cur); cur = []; }
+        cur.push(...g.list);
+    }
+    if (cur.length) out.push(cur);
+    return out.map((list, i) => ({ i, skills: list, keys: list.map((s) => s.key), ids: [...new Set(list.map((s) => s.skillId))] }));
+}
+
+/* ============================================================================ the deploy gate (D1), node only */
+
+const OPIN_RE = /^options-pin-.*\.json$/;
+const nameTime = (f) => { const m = /(\d{4}-\d{2}-\d{2})(?:T(\d{2})(\d{2}))?/.exec(f); return m ? Date.parse(`${m[1]}T${m[2] || '00'}:${m[3] || '00'}:00Z`) : NaN; };
+/**
+ * Fold every <dir>/options-pin-*.json into each skill's newest result. `pin` = the current pin ({skills}). Files are
+ * ordered by `finished` (else the date in the name), ties by name. A dirty file can add NEW pairs but never clears.
+ * Returns { files: [{file, when, j}], bad: [{file, error}], skills: Map(key -> {pairs, newPairs, file, when}),
+ *           slices: Set(i of 28 checked), full: bool (all 28, or a complete clean full run), newest: ms | null,
+ *           dirtyIgnored: [{key, file}] }.
+ */
+function foldOptionPins(dir, pin) {
+    const names = (fs.existsSync(dir) ? fs.readdirSync(dir) : []).filter((f) => OPIN_RE.test(f));
+    const files = [], bad = [];
+    for (const f of names) {
+        const file = path.join(dir, f);
+        let j;
+        try { j = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { bad.push({ file, error: e.message.slice(0, 120) }); continue; }
+        if (!j || typeof j !== 'object' || !j.failing || typeof j.failing !== 'object') { bad.push({ file, error: 'no "failing" map (not an options-pin run file)' }); continue; }
+        const fin = Date.parse(j.finished);
+        files.push({ file, name: f, when: Number.isFinite(fin) ? fin : nameTime(f), src: Number.isFinite(fin) ? 'finished' : 'name', j });
+    }
+    files.sort((a, b) => (a.when - b.when) || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+    const pinned = (pin && pin.skills) || {};
+    const skills = new Map(), slices = new Set(), dirtyIgnored = [];
+    let full = false, newest = null;
+    for (const e of files) {
+        const j = e.j;
+        for (const [key, pairs] of Object.entries(j.failing)) {
+            const list = Array.isArray(pairs) ? pairs.map(String) : [];
+            const p = pinned[key];
+            const newPairs = list.filter((x) => !p || !p.includes(x));
+            // N3 analogue: a run on a dirty tree can add a failure, never clear one
+            if (j.dirty && !newPairs.length) { if (skills.has(key) && skills.get(key).newPairs.length) dirtyIgnored.push({ key, file: e.file }); continue; }
+            skills.set(key, { pairs: list, newPairs, file: e.file, when: e.when });
+        }
+        if (j.dirty) continue;
+        if (Number.isFinite(e.when) && (newest === null || e.when > newest)) newest = e.when;
+        const complete = j.complete === true;
+        if (!complete || j.batching !== 'hash-v1' || j.subset) continue;
+        const sl = j.slice || (typeof j.shard === 'string' && /^(\d+)\/(\d+)$/.test(j.shard) ? { i: +j.shard.split('/')[0], n: +j.shard.split('/')[1] } : null);
+        if (!sl) full = true;
+        else if (sl.n === 28) slices.add(sl.i);
+    }
+    if (slices.size === 28) full = true;
+    return { files, bad, skills, slices, full, newest, dirtyIgnored };
+}
+
+/** Live skills from data.js in node (as the in-browser listing: SKILLS minus `retired` and custom_mixed). */
+async function liveKeysNode(root) {
+    globalThis.localStorage = globalThis.localStorage || { getItem: () => null, setItem() {}, removeItem() {} };
+    if (!globalThis.window) globalThis.window = globalThis;
+    const q = [console.log, console.warn]; console.log = console.warn = () => {};
+    let SKILLS;
+    try { ({ SKILLS } = await import(require('url').pathToFileURL(path.join(root, 'js', 'modules', 'data.js')).href)); } finally { [console.log, console.warn] = q; }
+    const live = new Set();
+    for (const [cat, list] of Object.entries(SKILLS)) if (Array.isArray(list)) for (const s of list) if (s && s.v && !s.retired && s.v !== 'custom_mixed') live.add(`${cat}:${s.v}`);
+    return live;
+}
+
+/** The gate's verdict: { code 0 | 1 | 4, lines, fold }. `live` = Set of live skill keys. */
+function gateVerdict({ dir, pinFile, live, now }) {
+    const lines = [], warnings = [], refusals = [];
+    const say = (l) => lines.push(`options gate: ${l}`);
+    let pin = null;
+    try { pin = JSON.parse(fs.readFileSync(pinFile, 'utf8')); } catch (e) { refusals.push(`the pin ${rel(pinFile)} is unreadable (${e.message.slice(0, 80)})`); }
+    const fo = foldOptionPins(dir, pin);
+    say(`${fo.files.length} options-pin run file(s) in ${rel(dir)}, folded by finished time; ${fo.skills.size} skill(s) with a result; pin ${rel(pinFile)}${pin && pin.pinned ? ` (pinned ${pin.pinned})` : ''}`);
+    for (const b of fo.bad) refusals.push(`unreadable options-pin file ${rel(b.file)}: ${b.error}`);
+    say(fo.full ? 'every slice checked (all 28 slices, or a complete full run)' : `${fo.slices.size} of 28 slices checked${fo.slices.size ? ` (${[...fo.slices].sort((a, b) => a - b).join(', ')})` : ''}`);
+    // NEW pairs of live skills: the newest result per skill, judged against the CURRENT pin
+    const news = [];
+    for (const [key, r] of fo.skills) {
+        if (!r.newPairs.length) continue;
+        if (!live.has(key)) { say(`${key} has NEW pair(s) in ${path.basename(r.file)}, but it is not a live skill (ignored)`); continue; }
+        news.push(`${key}: ${r.newPairs.slice(0, 3).join(', ')}${r.newPairs.length > 3 ? ` and ${r.newPairs.length - 3} more` : ''} (newest result: ${path.basename(r.file)}${pin && pin.skills && !pin.skills[key] ? '; the skill is not in the pin' : ''})`);
+    }
+    for (const d of fo.dirtyIgnored) say(`${d.key}: ${path.basename(d.file)} ran on a dirty tree and lists no new pair; it does not clear the earlier NEW pair (N3)`);
+    if (news.length) refusals.push(`${news.length} live skill(s) have a failing pair the pin does not list, and no later check fixed it: ${news.slice(0, 10).join('; ')}${news.length > 10 ? ' ...' : ''}. Fix the option (a later nightly, or ws-options-pin --check --skills <cat:skill> --out ${rel(dir)}/options-pin-<date>T<HHMM>.json on a clean tree, that no longer fails clears it), or re-pin it on purpose with a STATUS note: node tests/scripts/ws-options-pin.cjs --write --skills <cat:skill>`);
+    // age and coverage (the matrix's rule: a warning until the whole set has been checked once)
+    if (fo.newest === null) {
+        const why = `no options-pin run file in ${rel(dir)} (the nightly writes options-pin-<date>.json)`;
+        if (fo.full) refusals.push(why); else warnings.push(`${why}; not refused until all 28 slices have been checked`);
+    } else {
+        const age = (now - fo.newest) / 3600000;
+        if (age > 24) {
+            const why = `the newest options-pin file finished ${age.toFixed(1)} h ago, more than 24 h`;
+            if (fo.full) refusals.push(why); else warnings.push(`${why}; not refused until all 28 slices have been checked`);
+        } else say(`the newest options-pin file finished ${age.toFixed(1)} h ago`);
+        if (!fo.full) warnings.push(`only ${fo.slices.size} of 28 slices have been checked: the options of the skills in the other slices are not checked at this deploy (the nightly checks one slice a night)`);
+    }
+    for (const w of warnings) say(`WARNING - ${w}`);
+    for (const r of refusals) say(`REFUSED - ${r}`);
+    if (!news.length && !fo.bad.length) say('no NEW failing pair of a live skill in the newest results');
+    const code = refusals.length ? 1 : warnings.length ? 4 : 0;
+    lines.push(`ws-options-pin --gate: ${code === 1 ? 'FAIL' : code === 4 ? 'WARNING' : 'OK'}`);
+    return { code, lines, fold: fo };
+}
+
+/** --self-test (node only): the hash batching (N8) and the gate's fold (D1) on generated directories. */
+function selfTest() {
+    const bad = []; let n = 0;
+    const ok = (c, m) => { n++; if (!c) bad.push(m); };
+    const os = require('os');
+    // batching: 714 skills over 9 categories, a few ids shared across categories
+    const mk = (count, from = 0) => Array.from({ length: count }, (_, k) => { const i = k + from; const skillId = i % 50 === 7 && i > 7 ? `shared${i % 4}` : `skill${i}`; return { categoryId: `cat${i % 9}`, skillId, key: `cat${i % 9}:${skillId}` }; });
+    const all = mk(714).filter((s, i, a) => a.findIndex((x) => x.key === s.key) === i);
+    const where = new Map(); let total = 0; const sizes = [];
+    for (let i = 1; i <= 28; i++) {
+        let inShard = 0;
+        for (const b of planBatches(all, { batch: 25, shard: { i, n: 28 } })) {
+            total += b.keys.length; inShard += b.keys.length;
+            for (const k of b.keys) where.set(k, (where.get(k) || []).concat(i));
+            ok(b.keys.length <= 25 || b.ids.length === 1, `batches: slice ${i} has a batch of ${b.keys.length} > 25`);
+        }
+        sizes.push(inShard);
+    }
+    ok(total === all.length && where.size === all.length && [...where.values()].every((v) => v.length === 1), `N8: the 28 slices partition the skills (${total} placed, ${where.size} distinct of ${all.length})`);
+    ok(Math.max(...sizes) <= 2 * Math.ceil(all.length / 28) + 6, `N8: no slice is far above ${Math.ceil(all.length / 28)} skills (largest ${Math.max(...sizes)})`);
+    const grown = [...all, ...mk(60, 5000)];
+    ok(all.every((s) => planBatches(grown, { batch: 25, shard: { i: where.get(s.key)[0], n: 28 } }).some((b) => b.keys.includes(s.key))), 'N8: appending 60 skills never moves an existing skill to another slice');
+    ok(all.every((s) => sliceOf(s.skillId, 28) === where.get(s.key)[0]), 'N8: sliceOf names the slice planBatches puts a skill in');
+    const shared = all.filter((s) => s.skillId.startsWith('shared'));
+    ok(shared.length > 4 && planBatches(all, { batch: 25 }).every((b) => shared.filter((s) => b.ids.includes(s.skillId)).every((s) => b.keys.includes(s.key))), 'batches: skills sharing an id stay in one batch');
+    const fullB = planBatches(all, { batch: 25 });
+    ok(fullB.every((b) => b.keys.length <= 25 || b.ids.length === 1) && fullB.reduce((a, b) => a + b.keys.length, 0) === all.length && fullB.length === Math.ceil(all.length / 25), `batches: a full run is ${Math.ceil(all.length / 25)} balanced batches of at most 25 (${fullB.length}: ${fullB.map((b) => b.keys.length).join(',')})`);
+    // the gate's fold, on generated directories
+    const live = new Set(['a:x', 'a:y', 'b:z']);
+    const pin = { skills: { 'a:x': ['o="1"'], 'a:y': [], 'b:z': [] } };
+    const now = Date.parse('2026-10-23T12:00:00Z');
+    const dir = () => fs.mkdtempSync(path.join(os.tmpdir(), 'mq-opin-'));
+    const put = (d, f, o) => fs.writeFileSync(path.join(d, f), JSON.stringify({ tool: 'ws-options-pin', batching: 'hash-v1', complete: true, dirty: false, ...o }));
+    const run = (d) => { const pf = path.join(d, 'pin.json'); fs.writeFileSync(pf, JSON.stringify(pin)); return gateVerdict({ dir: d, pinFile: pf, live, now }); };
+    let d = dir();
+    let v = run(d);
+    ok(v.code === 4 && v.lines.some((l) => /WARNING - no options-pin run file/.test(l)), `D1: no options-pin file is a WARNING (${v.code})`);
+    put(d, 'options-pin-2026-10-23.json', { finished: '2026-10-23T02:00:00Z', shard: '3/28', slice: { i: 3, n: 28 }, failing: { 'a:x': ['o="1"', 'o="2"'] } });
+    v = run(d);
+    ok(v.code === 1 && v.lines.some((l) => /REFUSED - 1 live skill\(s\) .*a:x: o="2"/.test(l)), `D1: a NEW pair of a live skill refuses (${v.code})`);
+    put(d, 'options-pin-2026-10-23T0900.json', { finished: '2026-10-23T09:00:00Z', shard: null, failing: { 'a:x': ['o="1"'], 'a:y': [], 'b:z': [] } });
+    v = run(d);
+    ok(v.code === 0, `D1: NEW then fixed by a later (complete, full) check is OK (${v.code}: ${v.lines.slice(-3).join(' | ')})`);
+    put(d, 'options-pin-2026-10-23T1000.json', { finished: '2026-10-23T10:00:00Z', shard: '4/28', slice: { i: 4, n: 28 }, dirty: true, failing: { 'a:x': ['o="1"', 'o="9"'] } });
+    ok(run(d).code === 1, 'D1/N3: a dirty run can add a NEW pair');
+    fs.rmSync(d, { recursive: true, force: true });
+    // ordered by finished, not by name (the D2 class): a lane file that finished BEFORE the nightly does not override it
+    d = dir();
+    put(d, 'options-pin-lane-check.json', { finished: '2026-10-23T00:30:00Z', shard: null, failing: { 'a:x': ['o="1"'] } });
+    put(d, 'options-pin-2026-10-23.json', { finished: '2026-10-23T02:10:00Z', shard: '5/28', slice: { i: 5, n: 28 }, failing: { 'a:x': ['o="1"', 'o="3"'] } });
+    v = run(d);
+    ok(v.code === 1 && /newest result: options-pin-2026-10-23\.json/.test(v.lines.join('\n')), `D1/D2: ordered by finished: the nightly's NEW pair (02:10) is newer than the lane's clean result (00:30) (${v.code})`);
+    fs.rmSync(d, { recursive: true, force: true });
+    // a dirty clean result does not clear
+    d = dir();
+    put(d, 'options-pin-2026-10-22.json', { finished: '2026-10-22T02:00:00Z', shard: null, failing: { 'a:x': ['o="1"', 'o="2"'] } });
+    put(d, 'options-pin-2026-10-23.json', { finished: '2026-10-23T02:00:00Z', shard: null, dirty: true, failing: { 'a:x': ['o="1"'] } });
+    v = run(d);
+    ok(v.code === 1 && v.lines.some((l) => /dirty tree .* does not clear/.test(l)), `N3: a dirty run file never clears a NEW pair (${v.code})`);
+    fs.rmSync(d, { recursive: true, force: true });
+    // stale: a warning before all 28 slices, a refusal after
+    d = dir();
+    put(d, 'options-pin-2026-10-21.json', { finished: '2026-10-21T02:00:00Z', shard: '1/28', slice: { i: 1, n: 28 }, failing: { 'a:y': [] } });
+    v = run(d);
+    ok(v.code === 4 && v.lines.some((l) => /WARNING - the newest options-pin file finished 58\.0 h ago/.test(l)), `D1: stale before all 28 slices is a WARNING (${v.code})`);
+    for (let i = 2; i <= 28; i++) put(d, `options-pin-2026-10-21T01${String(i).padStart(2, '0')}.json`, { finished: '2026-10-21T02:00:00Z', shard: `${i}/28`, slice: { i, n: 28 }, failing: {} });
+    v = run(d);
+    ok(v.code === 1 && v.fold.full && v.lines.some((l) => /REFUSED - the newest options-pin file finished 58\.0 h ago/.test(l)), `D1: stale after all 28 slices is refused (${v.code}, full ${v.fold.full})`);
+    fs.rmSync(d, { recursive: true, force: true });
+    // an incomplete run, a --skills subset and a position-batched shard are not checked slices
+    d = dir();
+    put(d, 'options-pin-2026-10-23.json', { finished: '2026-10-23T02:00:00Z', shard: null, complete: false, failing: {} });
+    put(d, 'options-pin-2026-10-23T0300.json', { finished: '2026-10-23T03:00:00Z', shard: null, subset: true, failing: {} });
+    put(d, 'options-pin-2026-10-23T0400.json', { finished: '2026-10-23T04:00:00Z', shard: '2/28', batching: undefined, failing: {} });
+    v = run(d);
+    ok(v.code === 4 && !v.fold.full && v.fold.slices.size === 0, `D1: an incomplete run, a --skills subset and a position-batched shard are not checked slices (${v.fold.slices.size})`);
+    fs.writeFileSync(path.join(d, 'options-pin-broken.json'), '{oops');
+    ok(run(d).code === 1, 'D1: an unreadable options-pin file refuses');
+    fs.rmSync(d, { recursive: true, force: true });
+    // a NEW pair of a skill that is not live is ignored
+    d = dir();
+    put(d, 'options-pin-2026-10-23.json', { finished: '2026-10-23T02:00:00Z', shard: null, failing: { 'gone:skill': ['o="1"'] } });
+    v = run(d);
+    ok(v.code === 0 && v.lines.some((l) => /gone:skill .* not a live skill \(ignored\)/.test(l)), `D1: a skill that is not live is ignored (${v.code})`);
+    fs.rmSync(d, { recursive: true, force: true });
+    if (bad.length) { console.log(`ws-options-pin --self-test: FAIL - ${bad.length} of ${n}`); bad.forEach((b) => console.log('  - ' + b)); process.exit(1); }
+    console.log(`ws-options-pin --self-test: OK (${n} assertions)`);
+}
+
+module.exports = { planBatches, sliceOf, foldOptionPins, gateVerdict };
+
+if (require.main === module && has('self-test')) { selfTest(); return; }
+if (require.main === module && has('gate')) {
+    const gdir = path.resolve(ROOT, arg('gate', 'design/audit/matrix') || 'design/audit/matrix');
+    liveKeysNode(ROOT).then((live) => {
+        const v = gateVerdict({ dir: gdir, pinFile: BASE, live, now: process.env.MQ_NOW ? Date.parse(process.env.MQ_NOW) : Date.now() });
+        v.lines.forEach((l) => console.log(l));
+        process.exit(v.code);
+    }).catch((e) => { console.log(`options gate: crash ${e && e.message}`); console.log('ws-options-pin --gate: FAIL'); process.exit(1); });
+    return;
+}
+if (require.main !== module) return;
 
 /* ============================================================================ in-browser listing */
 
@@ -149,19 +413,9 @@ const fmtS = (ms) => `${(ms / 1000).toFixed(1)} s`;
     const withOpts = sel.filter((s) => s.nOffered > 0);
     const noOpts = sel.filter((s) => !s.nOffered);
 
-    // ---- 2. batches: skills sharing an id stay together (ws-options-verify --skill matches ids in every category)
-    const byId = new Map();
-    for (const s of withOpts) { if (!byId.has(s.skillId)) byId.set(s.skillId, []); byId.get(s.skillId).push(s); }
-    const groups = [...byId.values()];
-    let batches = [];
-    let cur = [];
-    for (const g of groups) {
-        if (cur.length && cur.length + g.length > BATCH) { batches.push(cur); cur = []; }
-        cur.push(...g);
-    }
-    if (cur.length) batches.push(cur);
-    batches = batches.map((skills, i) => ({ i, skills, keys: skills.map((s) => s.key), ids: [...new Set(skills.map((s) => s.skillId))] }));
-    if (shard) batches = batches.filter((b) => b.i % shard.n === shard.i - 1);
+    // ---- 2. batches (N8): by a hash of the skill id, so a slice never depends on the skills' positions; skills sharing
+    // an id stay together (ws-options-verify --skill matches ids in every category)
+    const batches = planBatches(withOpts, { batch: BATCH, shard });
     const runKeys = new Set(batches.flatMap((b) => b.keys));
     console.log(`ws-options-pin: ${sel.length} live skill(s) selected (${withOpts.length} with options, ${noOpts.length} with none); ${batches.length} batch(es) of up to ${BATCH}${shard ? ` (shard ${shard.i}/${shard.n}: ${runKeys.size} skill(s))` : ''}, ${SLOTS} at a time; tmp ${TMP}`);
     if (has('list')) {
@@ -280,12 +534,22 @@ const fmtS = (ms) => `${(ms / 1000).toFixed(1)} s`;
     if (fixed.length) { console.log('FIXED (pinned, no longer failing):'); show(fixed, (f) => `${f.key} ${f.id}`, has('verbose') ? 1e9 : 40); }
 
     if (arg('out', null)) {
-        fs.writeFileSync(path.resolve(arg('out')), JSON.stringify({
-            date, commit: gitHead(), mode: WRITE ? 'write' : 'check', shard: SHARD, selected: sel.length, run: fresh.size, noOptions: noOpts.map((s) => s.key),
+        // THE RUN FILE (header): what --gate folds at deploy (D1). `failing` holds every skill that ran (an empty list =
+        // it ran and passed); a crashed batch's skills are absent, so they keep their older result in the fold.
+        const outF = path.resolve(arg('out'));
+        let pinSha = null; try { pinSha = crypto.createHash('sha256').update(fs.readFileSync(BASE)).digest('hex'); } catch (e) { /* no pin */ }
+        fs.mkdirSync(path.dirname(outF), { recursive: true });
+        const tmpF = `${outF}.tmp-${process.pid}`;
+        fs.writeFileSync(tmpF, JSON.stringify({
+            tool: 'ws-options-pin', kind: 'options-pin', date, started: new Date(T0).toISOString(), finished: new Date().toISOString(), commit: gitHead(), dirty: gitDirty(),
+            mode: WRITE ? 'write' : 'check', batching: 'hash-v1', shard: SHARD, slice: shard, subset: !!(ONLY || CAT), complete: !(crashed.length || missing.length),
+            pin: { file: rel(BASE), sha256: pinSha, pinned: pin ? pin.pinned : null },
+            selected: sel.length, run: fresh.size, noOptions: noOpts.map((s) => s.key),
             wallMs, slotMs: runMs, perSkillMs: runSkills ? Math.round(runMs / runSkills) : null, batches: timings, pageErrors, crashed, missing, reruns,
             optionCounts: optCount, new: newF, fixed, failing: Object.fromEntries([...fresh].map(([k, v]) => [k, v.pairs.map((f) => f.id)])),
         }, null, 1) + '\n');
-        console.log(`run written to ${rel(path.resolve(arg('out')))}`);
+        fs.renameSync(tmpF, outF);
+        console.log(`run written to ${rel(outF)}`);
     }
 
     const incomplete = crashed.length || missing.length;
@@ -341,4 +605,11 @@ const fmtS = (ms) => `${(ms / 1000).toFixed(1)} s`;
 
 function gitHead() {
     try { return require('child_process').execFileSync('git', ['-C', ROOT, 'rev-parse', 'HEAD'], { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch (e) { return null; }
+}
+/** Tracked files with local edits outside design/audit/ (the run file and the matrix files themselves do not count). */
+function gitDirty() {
+    try {
+        return require('child_process').execFileSync('git', ['-C', ROOT, 'status', '--porcelain', '--untracked-files=no'], { stdio: ['ignore', 'pipe', 'ignore'] }).toString()
+            .split('\n').filter(Boolean).map((l) => l.slice(3)).some((f) => !/^design\/audit\/(matrix|baselines)\//.test(f));
+    } catch (e) { return null; }
 }

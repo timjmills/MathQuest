@@ -32,5 +32,6 @@
  "red": [
   "addition:add_20_regroup|single/more-oldname",
   "addition:add_20_regroup|single/more-gone"
- ]
+ ],
+ "baseline": null
 }

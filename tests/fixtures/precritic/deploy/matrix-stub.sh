@@ -3,7 +3,8 @@
 # 0 = the affected rows ran within the budget and were OK, 1 = a red row, 2 = nothing checkable, 3 = OVER-BUDGET (the
 # contract of ws-coverage-matrix --max-docs).
 # With `--out <file>` it writes a run file there, as the real matrix does: exit 1 lists
-# addition:add_100_regroup|single/defaults RED; exit 0 lists the ids in MQ_STUB_OK_ROWS (comma-separated) OK.
+# addition:add_100_regroup|single/defaults RED; exit 0 lists the ids in MQ_STUB_OK_ROWS (comma-separated) OK. The run
+# file says `baseline: null` (critic r4 N2: judged with no baseline, so an OK row had no findings at all and may clear).
 # With exit 3 and MQ_STUB_OVER_LIST it writes <out>.over-budget.json (N4).
 # With `--rows <ids>` (the gate's flake re-run of the red rows only, N7) it exits MQ_STUB_RETRY_RC when that is set.
 rc=$1; shift
@@ -36,7 +37,7 @@ if [ -n "$out" ] && [ "$rc" != 3 ]; then
     const red = rc === "1" ? ["addition:add_100_regroup|single/defaults"] : [];
     const rows = red.map((id) => ({ id, status: "RED", rises: ["S L-DENSITY DN-1: 0 -> 1"] }))
       .concat((rc === "0" ? (ok || "").split(",").filter(Boolean) : []).map((id) => ({ id, status: "OK" })));
-    require("fs").writeFileSync(out, JSON.stringify({ tool: "matrix-stub", commit: "HEAD", dirty: false, finished: new Date().toISOString(), rows, red }));
+    require("fs").writeFileSync(out, JSON.stringify({ tool: "matrix-stub", commit: "HEAD", dirty: false, finished: new Date().toISOString(), baseline: null, rows, red }));
   ' "$out" "$rc" "${MQ_STUB_OK_ROWS:-}"
 fi
 exit "$rc"

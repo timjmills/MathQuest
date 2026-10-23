@@ -34,7 +34,10 @@
 #            ws-code-snapshot, ws-codec-registry, ws-standards, ws-search-terms, ws-providers-unit, ws-layout-unit,
 #            ws-panes-unit, ws-supports-unit, ws-ink-unit, ws-plain-words --check, ws-node-lint, ws-envelope
 #            --self-test, ws-text-vs-gen (claims vs the generator), ws-backtest --kind fixture (the S2 checks still
-#            catch their fixtures) and ws-options-pin --check when tests/scripts/ws-options-pin.cjs is in the tree;
+#            catch their fixtures) and ws-options-pin --gate design/audit/matrix (critic r4 D1: READ-ONLY, node only,
+#            no browser slot, seconds: it folds the nightly's options-pin-*.json by `finished`, newest result per skill;
+#            FAIL on a NEW failing pair of a live skill that no later check fixed, WARNING while fewer than 28 slices
+#            are checked or the newest is over 24 h old, FAIL on that age once all 28 are; it never runs the pin);
 #            and the browser gates, two at a time: ws-presets-unit, ws-anchors-unit, ws-boot-smoke, ws-content-audit,
 #            ws-print-lint --source kit (--baseline design/audit/baselines/print-lint.json when it exists; else the
 #            accepted limit MQ_PRINT_LINT_LIMIT, default 461 findings / 33 documents), ws-screen-answer,
@@ -53,7 +56,7 @@
 #            origin/master; when origin/master is not fetched the gate FAILS and says so (never a silent HEAD~1).
 #            With the default args it adds `--red-from design/audit/matrix` (the rows red in the folded run state
 #            run inline too) and `--out <logdir>/matrix-inline.json`. THEN, ON EVERY RUN (critic r2 D1.3), the nightly
-#            rule reads EVERY run file design/audit/matrix/<date>[T<HHMM>][.shard-i-of-n].json, oldest first, plus the
+#            rule reads EVERY run file in design/audit/matrix/, in the order they FINISHED (critic r4 D2), plus the
 #            inline run, into each row's last-known state (a row's state = its status in the most recent run that ran
 #            it; RED / ERROR persists across runs that did not select it, until a later run lists it OK):
 #              FAIL               a row of a live skill (data.js SKILLS, tombstones out) is RED or ERROR in the folded
@@ -175,6 +178,10 @@ EOF
 #     the age / cover rules read the nightly's own names (<date>[T<HHMM>][.shard-i-of-n].json) only;
 #   - (N4) over the budget before the full baseline, the WARNING names how many affected rows HAVE a baseline entry
 #     (unchecked at this deploy) and how many have none, from the matrix's <inline>.over-budget.json.
+#   - (critic r4 D2) every run file is folded in the order it FINISHED (`finished`), whatever its name, ties by name;
+#   - (critic r4 N2 / N3 / N9, ws-coverage-matrix foldRuns) an OK judged against another directory's baseline or a stale
+#     entry, an OK from a dirty run, and PENDING(step) / N/A never clear a red row; each such OK is a WARNING, as is a
+#     run file written before N2 that cleared a row unchecked, and a row with a baseline entry that turned N/A.
 # MQ_NOW (ISO time) replaces the clock (fixtures).
 nightly_check() {
   node - "$1" "$2" "$ROOT" "${3:-full}" "${4:-}" <<'EOF'
@@ -183,7 +190,7 @@ const [dir, checkDirty, root, mode, extra] = process.argv.slice(2);
 const git = (...a) => execFileSync('git', ['-C', root, ...a], { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
 const now = process.env.MQ_NOW ? Date.parse(process.env.MQ_NOW) : Date.now();
 const H24 = 24 * 3600 * 1000;
-const { foldRuns, baselineComplete, loadBaseline, baselineConflictError, resolveRed, rowIndexFor, foldSkipNote } = require(path.join(root, 'tests', 'scripts', 'ws-coverage-matrix.cjs'));
+const { foldRuns, baselineComplete, loadBaseline, baselineConflictError, resolveRed, rowIndexFor, foldSkipNote, foldWarnings } = require(path.join(root, 'tests', 'scripts', 'ws-coverage-matrix.cjs'));
 const refuse = (why) => { console.log(`nightly: REFUSED - ${why}`); console.log('nightly: FAIL'); process.exit(1); };
 const warnings = [];
 const warn = (w) => { warnings.push(w); console.log(`nightly: WARNING - ${w}`); };
@@ -207,6 +214,9 @@ const fold = foldRuns(dir, extras);
 if (fold.bad.length) refuse(`unreadable run file(s): ${fold.bad.map((b) => `${b.file} (${b.error})`).join('; ')}`);
 // N5: every .json that is a run is folded whatever its name; the rest is listed with why
 for (const l of foldSkipNote(fold)) console.log(`nightly:${l.replace(/^ +/, ' ')}`);
+// critic r4 N2 / N3 / N9: OK rows that may not clear (another baseline, a stale entry, a dirty run), pre-N2 run files
+// that cleared rows unchecked, and pinned rows that turned N/A: each a WARNING (the rows stay red where they were red)
+for (const w of foldWarnings(fold)) warn(w);
 // the AGE and the COVER of the newest nightly are judged on the nightly's own names only (a lane's run under another
 // name is folded for its rows, but it is not "the newest nightly")
 const nightFiles = fold.files.filter((f) => !f.extra && f.named !== false);
@@ -249,7 +259,10 @@ if (!nightFiles.length) {
   const red = [];
   const descOf = (id) => {
     const st = fold.rows.get(id);
-    const tail = st.lastSeenAs ? `; printed since in run ${st.lastSeen} with no baseline entry, which does not clear it (I5): pin it with ws-coverage-matrix --repin '${id}' --reason "<why>"` : '';
+    const tail = !st.lastSeenAs ? ''
+      : st.lastSeenAs === 'PENDING(no-baseline)' ? `; printed since in run ${st.lastSeen} with no baseline entry, which does not clear it (I5): pin it with ws-coverage-matrix --repin '${id}' --reason "<why>"`
+      : st.notRerun ? `; not re-run (now ${st.lastSeenAs}) in run ${st.lastSeen}, which does not clear it (N9): it stays red until a run lists it OK; if the row is gone for good: ws-coverage-matrix --retire '${id}' --reason "<why>"`
+      : `; listed ${st.lastSeenAs} in run ${st.lastSeen}, which does not clear it`;
     return `${id} ${st.status} since run ${st.stamp === 'inline' ? 'inline (this deploy)' : st.stamp}${st.rises && st.rises.length ? ` (${String(st.rises[0]).slice(0, 80)})` : ''}${tail}`;
   };
   const liveRed = [];
@@ -266,7 +279,7 @@ if (!nightFiles.length) {
     for (const id of res.current) red.push(descOf(id));
     for (const m of res.mapped) {
       const from = fold.rows.get(m.from), to = fold.rows.get(m.to);
-      if (to && to.seq > from.seq && to.status === 'OK') console.log(`nightly: ${m.from} (RED since run ${from.stamp}) is now the row ${m.to} (same kind and flags), which run ${to.stamp} lists OK: cleared`);
+      if (to && to.seq > from.seq && to.status === 'OK' && to.valid !== false) console.log(`nightly: ${m.from} (RED since run ${from.stamp}) is now the row ${m.to} (same kind and flags), which run ${to.stamp} lists OK: cleared`);
       else red.push(`${descOf(m.from)}; the row is now ${m.to} (same kind and flags)${to ? `, ${to.status} in run ${to.stamp}` : ', not run since'}`);
     }
     for (const x of res.retired) warn(`RETIRED-ROW ${descOf(x.id)}: ${x.why}. It no longer exists, so it does not hold the deploy. Clear it: node tests/scripts/ws-coverage-matrix.cjs --retire '${x.id}' --reason "<why it is gone>" (writes a run file listing it RETIRED; commit it)`);
@@ -551,6 +564,16 @@ self_test() {
   MQ_STUB_OVER_LIST='addition:add_100_regroup|single/defaults,addition:add_20_regroup|single/ex-each;addition:add_20_regroup|single/ex-top' \
     gcase "N4: over the budget before the full baseline: the WARNING names the baselined rows as NOT checked" "$nx/none" 4 3 '3 affected row\(s\): 2 HAVE a baseline entry and are NOT checked at this deploy \(addition:add_100_regroup\|single/defaults, addition:add_20_regroup\|single/ex-each\); 1 have no entry' 'they are PENDING\(no-baseline\), covered'
   gcase "N4: without the matrix's list the WARNING says it is unknown which are baselined (never claims coverage)" "$nx/none" 4 3 'unknown which are baselined: any affected row that has a baseline entry is NOT checked'
+  echo "   critic r4: fold order (D2), the baseline a clearing run was judged against (N2), dirty runs (N3), N/A (N9)"
+  gcase "D2: lane-check.json (finished 00:30, OK) is older than 2026-10-23.json (02:10, RED): refused" "$nx/fold-order" 1 0 'addition:add_20_regroup\|single/ex-each RED since run 2026-10-23 '
+  gcase "D2 reverse: an earlier lane RED (00:30), a later nightly OK (02:10): OK, no false refusal" "$nx/fold-order-reverse" 0 0 'no RED / ERROR row of a live skill'
+  MQ_NOW=2026-10-23T03:00:00Z bash -c 'source "$0" --source-only; nightly_check "$1" 0 fresh' "$0" "$nx/fold-order" > "$tmp/m.log" 2>&1; got=$?
+  if [ "$got" = 1 ] && grep -q 'REFUSED - 1 row(s) of live skills are RED' "$tmp/m.log"; then echo "  ok   critic r4 D2 command: MQ_NOW=2026-10-23T03:00:00Z nightly_check <fold-order> 0 fresh refuses"
+  else echo "  FAIL critic r4 D2 command: exit $got"; sed 's/^/       /' "$tmp/m.log" | tail -n 8; bad=1; fi
+  gcase "N2: RED, then OK judged against another directory's baseline: refused, the OK warned and ignored" "$nx/foreign-ok" 1 0 "WARNING - 2026-10-23\.json lists 1 red row\(s\) OK that it may not clear, so they stay red: judged against design/elsewhere/baseline\.json, not this directory's baseline"
+  gcase "N3: RED, then a DIRTY run lists it OK: refused, the OK warned and ignored" "$nx/dirty-ok" 1 0 'WARNING - 2026-10-23\.json lists 1 red row\(s\) OK .*dirty: true.*never clears'
+  gcase "N9: RED, then N/A: stays red (not re-run), refused" "$nx/turned-na" 1 0 'single/ex-each RED since run 2026-10-22 .*; not re-run \(now N/A\) in run 2026-10-23'
+  gcase "N9: a pinned row that turned N/A is a WARNING" "$nx/pinned-na" 4 0 'WARNING - 1 row\(s\) with a baseline entry are N/A now'
   vcase "OK + NOTHING RUN" 2 'ws-deploy-gates: INCOMPLETE' "OK:a" "NOTHING RUN:ws-coverage-matrix"
   vcase "OK + WARNING (the matrix gate passed with a warning)" 0 'ws-deploy-gates: OK' "OK:a" "WARNING:ws-coverage-matrix"
   if grep -q 'SHARD=<i>/8 tests/scripts/ws-matrix-nightly.sh' < <(MQ_GATES_LOGDIR=$tmp/lg MQ_NOW=2026-10-23T12:00:00Z MQ_MATRIX_DIR=$nx/fresh MQ_MATRIX_CMD="bash $fx/matrix-stub.sh 3" MQ_COVERAGE_ARGS=x MQ_NIGHTLY_DIRTY_CHECK=0 bash -c 'source "$0" --source-only; matrix_gate x' "$0" 2>&1); then
@@ -572,6 +595,32 @@ self_test() {
   : > "$FLAKES"; : > "$RES"; run_session T 2>/dev/null
   if [ "$(cut -f3 "$RES")" = FAIL ] && grep -q 'only the rule is re-read, no row is re-run' "$rl" && ! grep -q 'matrix-stub: args' "$rl"; then echo "  ok   a nightly-rule refusal: the re-run re-reads the rule only (no matrix run), still FAIL"
   else echo "  FAIL N7 nightly-rule retry: result $(cut -f3 "$RES")"; sed 's/^/       /' "$rl" 2>/dev/null | head -n 6; bad=1; fi
+  G_SES=(); G_KIND=(); G_NAME=(); G_CMD=(); G_KEY=()
+  # critic r4 D1: the options gate reads the nightly's options-pin results (node only, no browser, no pin run)
+  echo "-- critic r4 D1: the options gate (ws-options-pin --gate) on fixture dirs (MQ_NOW=2026-10-23T12:00:00Z)"
+  local ox=$fx/options-pin
+  ocase() {   # name, fixture case, want rc (0 OK, 1 FAIL, 4 WARNING), a pattern the output must hold
+    local name=$1 c=$2 want=$3 pat=$4 got
+    MQ_NOW=2026-10-23T12:00:00Z node tests/scripts/ws-options-pin.cjs --gate "$ox/$c" --baseline "$ox/$c/pin.json" > "$tmp/o.log" 2>&1; got=$?
+    if [ "$got" = "$want" ] && grep -qE -- "$pat" "$tmp/o.log"; then echo "  ok   $name: exit $got ($(grep -oE -- "$pat" "$tmp/o.log" | head -n 1 | cut -c1-150))"
+    else echo "  FAIL $name: exit $got, want $want, pattern /$pat/"; sed 's/^/       /' "$tmp/o.log" | tail -n 8; bad=1; fi
+  }
+  ocase "no options-pin file: WARNING" none 4 'WARNING - no options-pin run file'
+  ocase "a NEW pair of a live skill: refused" new-pair 1 'REFUSED - 1 live skill\(s\) .*composing:number_word_form: zeroPlace="always"'
+  ocase "NEW on 10-22, fixed by the 10-23 check: OK" new-then-fixed 0 '^ws-options-pin --gate: OK'
+  ocase "stale (57.9 h), fewer than 28 slices checked: WARNING" stale 4 'WARNING - the newest options-pin file finished 57\.9 h ago'
+  ocase "stale (57.9 h) after a complete full run (all 28 slices): refused" stale-covered 1 'REFUSED - the newest options-pin file finished 57\.9 h ago'
+  ocase "NEW on 10-22, a DIRTY clean check on 10-23 does not clear it: refused" dirty-clear 1 'dirty tree and lists no new pair; it does not clear'
+  ocase "D2 class: a lane file (00:30, clean) does not override the later nightly (02:10, NEW): refused" order 1 'newest result: options-pin-2026-10-23\.json'
+  # the gate as the deploy lists it: an nfn gate whose exit 4 shows as WARNING (passes), with no browser slot
+  G_SES=(T); G_KIND=(nfn); G_NAME=("ws-options-pin --gate (read-only: nightly results)"); G_KEY=("")
+  G_CMD=("MQ_NOW=2026-10-23T12:00:00Z node tests/scripts/ws-options-pin.cjs --gate $ox/stale --baseline $ox/stale/pin.json")
+  : > "$RES"; run_session T 2>/dev/null
+  if [ "$(cut -f3 "$RES")" = WARNING ] && [ "$(cut -f5 "$RES")" = 0 ]; then echo "  ok   on the gate list (nfn): exit 4 shows as WARNING, slot wait 0 s, $(cut -f4 "$RES") s"
+  else echo "  FAIL the options gate on the list: $(cut -f3-5 "$RES" | tr '\t' ' ')"; bad=1; fi
+  if build_list && for i in "${!G_NAME[@]}"; do [ "${G_SES[$i]}" = 1 ] && [ "${G_KIND[$i]}" = nfn ] && [[ "${G_CMD[$i]}" == *"ws-options-pin.cjs --gate"* ]] && echo yes; done | grep -q yes \
+     && ! printf '%s\n' "${G_CMD[@]}" | grep -q 'ws-options-pin.cjs --check'; then echo "  ok   session 1 lists the read-only options gate (nfn, --gate) and never ws-options-pin --check"
+  else echo "  FAIL session 1's options gate is not the read-only --gate"; bad=1; fi
   G_SES=(); G_KIND=(); G_NAME=(); G_CMD=(); G_KEY=()
   # a tree whose matrix has no --max-docs: the budget is measured with --list (32766 documents > 500)
   MQ_GATES_LOGDIR=$tmp/lg MQ_NOW=2026-10-23T12:00:00Z MQ_MATRIX_DIR=$nx/stale-complete MQ_COVERAGE_ARGS="--all" MQ_NIGHTLY_DIRTY_CHECK=0 \
@@ -642,8 +691,11 @@ build_list() {
   node_gate 1 "ws-envelope --self-test" "$(first_of ws-envelope.mjs ws-envelope.cjs)" --self-test
   node_gate 1 ws-text-vs-gen ws-text-vs-gen.mjs
   node_gate 1 "ws-backtest --kind fixture" ws-backtest.mjs --kind fixture
-  # the options-verify pin (another builder's tool): on the list as soon as it is in the tree
-  if [ -f tests/scripts/ws-options-pin.cjs ]; then node_gate 1 "ws-options-pin --check" ws-options-pin.cjs --check; fi
+  # the options-verify pin (critic r4 D1): the deploy READS the nightly's options-pin results (read-only, node only, no
+  # browser slot, seconds); it never runs the pin itself (the whole pin is ≈ 1 h 52 min on the two slots). On a node
+  # worker as nfn, so its exit 4 shows as WARNING.
+  if [ -f tests/scripts/ws-options-pin.cjs ]; then add 1 nfn "ws-options-pin --gate (read-only: nightly results)" "node tests/scripts/ws-options-pin.cjs --gate $MATRIX_DIR"
+  else add 1 skip "ws-options-pin --gate" "tests/scripts/ws-options-pin.cjs"; fi
   # session 2: the long screen sweeps, sharded, then the viewport and S9 checks and the two sweep modes on the sample
   local i
   for i in $(seq 1 "$SLOTS_SHARDS"); do browser_gate 2 "ws-screen-slots --shard $i/$SLOTS_SHARDS" ws-screen-slots.cjs --shard "$i/$SLOTS_SHARDS" --baseline "$SLOTS_BASE"; done

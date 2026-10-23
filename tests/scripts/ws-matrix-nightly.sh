@@ -34,10 +34,12 @@
 #   5. writes design/audit/matrix/<UTC date>[.shard-i-of-n].json (a second run on one date gets <date>T<HHMM>: no run
 #      file is overwritten) and the cache, and prints the commit message and the files to commit. Every run file
 #      carries `commit`, `finished`, `selection` and each row's `status` (ws-coverage-matrix header, THE RUN FILE).
-#   6. the options pin (ws-options-pin.cjs --check, report-only) on the same 1/28 share of its batches as tonight's
-#      slice (with SHARD on a --full run: that shard's batches), into design/audit/matrix/options-pin-<date>.json, so
-#      every live skill's options are re-checked against design/audit/baselines/options-verify.json within 28 nights
-#      (one batch of ≈ 25 skills, ≈ 7 min a night; the whole pin is ≈ 1.9 h on two slots); OPTIONS_PIN=0 skips it.
+#   6. the options pin (ws-options-pin.cjs --check, report-only) on tonight's slice i/28 of the live skills (a hash of
+#      the skill id, critic r4 N8; with SHARD on a --full run: that shard), into
+#      design/audit/matrix/options-pin-<date>[T<HHMM>].json (never overwritten), so every live skill's options are
+#      re-checked against design/audit/baselines/options-verify.json within 28 nights (≈ 25 skills, one or two batches,
+#      ≈ 7 min a night; the whole pin is ≈ 1.9 h on two slots). The deploy never runs the pin: its options gate
+#      (ws-options-pin --gate) folds these files (critic r4 D1). DRY=1 prints this step's command. OPTIONS_PIN=0 skips it.
 # It never edits anything outside design/audit/matrix/. Exit 0 with red rows (--report-only): the deploy gate reads
 # the red rows from the run files (folded); a crash exits non-zero.
 # It NEVER re-pins an existing entry and never retires a row: it takes no --repin / --retire (unknown arguments are
@@ -88,14 +90,14 @@ const { baselineComplete, RUN_RE } = require(path.resolve("tests/scripts/ws-cove
 const bc = baselineComplete(dir);
 const missing = bc.complete ? [] : (bc.n === Number(slices) && bc.missing ? bc.missing : Array.from({ length: Number(slices) }, (_, i) => i + 1));
 const mine = (f) => (suffix ? f.endsWith(suffix + ".json") : !/\.shard-/.test(f));
-const runs = (fs.existsSync(dir) ? fs.readdirSync(dir) : []).filter((f) => RUN_RE.test(f) && mine(f)).sort();
+// critic r4 D2: the newest run is the one that FINISHED last (`finished`), whatever its name; ties by name
+const runs = (fs.existsSync(dir) ? fs.readdirSync(dir) : []).filter((f) => RUN_RE.test(f) && mine(f))
+  .map((f) => { let j = null; try { j = JSON.parse(fs.readFileSync(path.join(dir, f), "utf8")); } catch (e) { /* unreadable: the deploy reports it */ } return { f, j, t: j && Number.isFinite(Date.parse(j.finished)) ? Date.parse(j.finished) : 0 }; })
+  .sort((a, b) => (a.t - b.t) || (a.f < b.f ? -1 : a.f > b.f ? 1 : 0));
 let last = "";
-for (const f of runs.reverse()) {
-  try {
-    const j = JSON.parse(fs.readFileSync(path.join(dir, f), "utf8"));
-    const a = j.selection && j.selection.affected;
-    if (j.commit && !j.dirty && a && !a.droppedOverCap) { last = j.commit; break; }
-  } catch (e) { /* unreadable: the deploy reports it */ }
+for (const { j } of runs.reverse()) {
+  const a = j && j.selection && j.selection.affected;
+  if (j && j.commit && !j.dirty && a && !a.droppedOverCap) { last = j.commit; break; }
 }
 if (!last) {   // no affected run yet: every change since the oldest slice baseline
   const sl = (fs.existsSync(dir) ? fs.readdirSync(dir) : []).filter((f) => /^baseline\.slice-\d+-of-\d+\.json$/.test(f))
@@ -132,22 +134,30 @@ else
 fi
 echo "ws-matrix-nightly: $DATE on ${HEAD:0:10} ($MODE)${SHARD:+, shard $SHARD}"
 
+# Options pin (ws-options-pin.cjs): ws-options-verify against design/audit/baselines/options-verify.json (pinned for every
+# live skill 2026-10-23). Each night checks the same slice i/28 as the matrix (owner: small jobs that never hold up
+# current work): the skills whose id hashes to slice i (critic r4 N8: by hash, so appending skills never moves one),
+# ≈ 25 skills, one or two batches; with SHARD (a --full run) that shard. New failing pairs are listed in
+# $DIR/options-pin-<date>[T<HHMM>].json (never overwritten) and do not stop the night; the deploy's options gate
+# (ws-options-pin --gate) folds those files. A crash keeps the per-batch JSON (re-run today: --resume).
+if [ -n "${SHARD:-}" ]; then OPIN_SHARD=("${SHARD_ARGS[@]}"); else OPIN_SHARD=(--shard "${S:-$ROT/$SLICES}"); fi
+OPIN_OUT="$DIR/options-pin-$DATE$SUFFIX.json"
+[ -e "$OPIN_OUT" ] && OPIN_OUT="$DIR/options-pin-${DATE}T$(date -u +%H%M)$SUFFIX.json"
+OPIN_ARGS=(--check --resume --slots "$SLOTS" --out "$OPIN_OUT" --report-only "${OPIN_SHARD[@]}")
+
 if [ -n "${DRY:-}" ]; then
   node tests/scripts/ws-coverage-matrix.cjs "${ARGS[@]}" --list
+  # N8: the dry run shows the options-pin step too (its command; --list would start a browser, so it is not run)
+  if [ "${OPTIONS_PIN:-1}" != 0 ]; then echo "ws-matrix-nightly: then the options pin: node tests/scripts/ws-options-pin.cjs ${OPIN_ARGS[*]}"
+  else echo "ws-matrix-nightly: then the options pin: skipped (OPTIONS_PIN=0)"; fi
   exit 0
 fi
 node tests/scripts/ws-coverage-matrix.cjs "${ARGS[@]}" | tee "/tmp/ws-matrix-nightly-$DATE$SUFFIX.log"
 
 TALLY=$(grep -E '^ws-coverage-matrix: OK [0-9]' "/tmp/ws-matrix-nightly-$DATE$SUFFIX.log" | tail -1 | sed 's/^ws-coverage-matrix: //')
 
-# Options pin (ws-options-pin.cjs): ws-options-verify against design/audit/baselines/options-verify.json (pinned for every
-# live skill 2026-10-23). Each night checks the same 1/28 share of its batches as the matrix slice (owner: small jobs that
-# never hold up current work); with SHARD (a --full run) that shard's batches. New failing pairs are listed in
-# $DIR/options-pin-<date>.json and do not stop the night; a crash keeps the per-batch JSON (re-run today: --resume).
 OPIN_TALLY="skipped"
 if [ "${OPTIONS_PIN:-1}" != 0 ]; then
-  if [ -n "${SHARD:-}" ]; then OPIN_SHARD=("${SHARD_ARGS[@]}"); else OPIN_SHARD=(--shard "${S:-$ROT/$SLICES}"); fi
-  OPIN_ARGS=(--check --resume --slots "$SLOTS" --out "$DIR/options-pin-$DATE$SUFFIX.json" --report-only "${OPIN_SHARD[@]}")
   if node tests/scripts/ws-options-pin.cjs "${OPIN_ARGS[@]}" | tee "/tmp/ws-options-pin-$DATE$SUFFIX.log"; then
     OPIN_TALLY="check ${OPIN_SHARD[*]}, $(grep -E '^against ' "/tmp/ws-options-pin-$DATE$SUFFIX.log" | tail -1 | sed -E 's/^against [^:]*: //')"
   else

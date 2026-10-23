@@ -37,10 +37,14 @@
 //                            night until a run lists it OK (I5). --slice / --seventh imply --red-from design/audit/matrix
 //                            (--no-red-from turns that off). A re-selected red row ignores the cache and is never
 //                            pinned (I2). N5: the fold reads EVERY .json in dir that carries commit + finished + rows,
-//                            whatever its name (other names are ordered by `finished`), and lists each .json it
-//                            skipped and why. N1: a red id that is no longer a row of its live skill is MAPPED to the
-//                            current row of the same kind and flags (re-run under the new id, judged against the old
-//                            id's entry), else reported RETIRED-ROW (a warning; clear it with --retire)
+//                            whatever its name, and lists each .json it skipped and why. Critic r4 D2: EVERY run file
+//                            is ordered by `finished` (a nightly-named file without one by its name's time), ties by
+//                            name, never by the name alone. N1: a red id that is no longer a row of its live skill is
+//                            MAPPED to the current row of the same kind and flags (re-run under the new id, judged
+//                            against the old id's entry), else reported RETIRED-ROW (a warning; clear it with --retire).
+//                            Critic r4 N6: with --kind / --rows / --shard, only the red rows they keep are run; the log
+//                            and `selection.redFrom.reselected` name exactly those, and the log names the others
+//                            (NOT run, they stay red)
 //   --affected-cap N         (the nightly) when --affected's rows are over N documents, drop them tonight (the slice
 //                            and the red rows still run); the run file records `affected.droppedOverCap`
 //   --affected A..B          the rows a commit range reaches (below); with --list, prints the reach and stops
@@ -53,14 +57,20 @@
 // RUNNING
 //   --slots N                print-lint processes at once (default 1), each through /tmp/mq-browser-run.sh
 //   --batch N                documents per print-lint process (default 9 = 3 rows x S/M/L): one browser start
-//                            serves the whole batch (`ws-print-lint --jobs`)
+//                            serves the whole batch (`ws-print-lint --jobs`). Critic r4 N1: the documents of a batch
+//                            that crashed (no result: print-lint or the runner died; a buildSheet throw is a result)
+//                            are run ONCE more before any row is judged, so one transient crash makes no row ERROR
 //   --baseline f.json        RED = any (row, size, lint rule) count above the per-row baseline, or a render error
 //                            (shards' baseline.shard-*.json files beside it are merged in); without it any
 //                            finding is red
 //   --write-baseline         pin the rows that printed and have NO entry in the merged baseline (I1, below) into
 //                            --baseline (default design/audit/matrix/baseline.json), or with --slice into
-//                            baseline.slice-i-of-n.json (written even when it pins nothing: the slice night is done),
-//                            with --shard into baseline.shard-i-of-n.json. Every reader merges baseline.json with every
+//                            baseline.slice-i-of-n.json (written even when it pins nothing: the slice night is done;
+//                            critic r4 N4: a --slice run narrowed by --skills / --kind / --rows / --shard writes
+//                            baseline.slice-i-of-n.partial.json instead, merged by readers but never counted as the
+//                            slice done), with --shard into baseline.shard-i-of-n.json. Critic r4 N5: the pins are
+//                            written AFTER the run file, each file atomically (temp + rename), so a crash never leaves a
+//                            slice file without the run that judged its rows. Every reader merges baseline.json with every
 //                            baseline.<part>.json beside it. Each pinned size holds the counts per lint rule AND (N1)
 //                            the finding keys `<lint> <rule>|p<page>|<print-lint key, digits as #>`: a new finding that
 //                            replaces a fixed one of the same rule is a rise. Entries pinned before N1 (counts only: the
@@ -73,11 +83,15 @@
 //                            --slice / --seventh / --shard / --affected / --red-from / --write-baseline / --pin-new /
 //                            --max-docs: it is a lead's named action, never part of a nightly or a deploy. Writes a run
 //                            file (--out, default auto) whose rows keep the status judged BEFORE the re-pin (I3) and
-//                            carry `repinned`; the fold reads that as REPINNED (not red). Commit the baseline file and
-//                            the run file with a STATUS note
+//                            carry `repinned` (with `key`, the entry it wrote); the fold reads that as REPINNED (not red)
+//                            while that entry is the row's current one (N2). Critic r4 N2: refused when --baseline is not
+//                            in the --out directory (a re-pin of another directory's entry would clear a red row here
+//                            whose entry never changed). Commit the baseline file and the run file with a STATUS note
 //   --retire <ids> --reason "<why>"   N1: a red row id that is no longer a row (an option renamed or removed) and maps to
 //                            no current row: writes a run file (--out, default auto) listing it RETIRED, which clears it
-//                            from the fold. Refused for an id that is a row today or maps to one (same kind and flags)
+//                            from the fold. Refused for an id that is a row today or maps to one (same kind and flags),
+//                            except (critic r4 N9) a row that is red and was last seen N/A or PENDING(step): nothing
+//                            else clears it. Refused on a dirty tree (N3)
 // BASELINE INVARIANTS (critic r3 D1; each has self-test cases (#15) AND is a property checked after every night of
 // 300 generated sequences of runs, pins, regressions, swaps, crashes and re-pins on synthetic rows (#16); the backtest
 // row baseline-night-keeps-red runs the critic's two reproduce cases on the real tool):
@@ -90,10 +104,16 @@
 //       PENDING(no-baseline) (or OK) with `pinned: true`; a re-pinned one keeps its RED with `repinned`.
 //   I4  The merged baseline refuses (FAIL, naming both files) a row pinned in two files with different contents; an
 //       identical duplicate is a WARNING. Never resolved by file-name order. A re-pin writes the owner file only.
-//   I5  Nothing a nightly does turns a RED / ERROR row non-red: in the fold (foldRuns) a red row leaves the red set
-//       only through a later run that lists it OK (judged against its existing entry), a --repin (REPINNED), a
-//       --retire (RETIRED), or PENDING(step) / N/A (a code change made the row uncheckable: recorded as `cleared`).
-//       Printed with no entry (PENDING(no-baseline)) does NOT clear it; --repin does.
+//   I5  Nothing a nightly does turns a RED / ERROR row non-red: in the fold (foldRuns, ordered by `finished`, D2) a
+//       red row leaves the red set only through a later run that lists it OK (judged against its existing entry), a
+//       --repin (REPINNED), or a --retire (RETIRED). Printed with no entry (PENDING(no-baseline)) does NOT clear it;
+//       --repin does. Critic r4: PENDING(step) / N/A do NOT clear it either (N9: "not re-run (now N/A)", until a real
+//       OK or --retire); a run with `dirty: true` never clears (N3); an OK / REPINNED clears only when it was judged
+//       against the folded directory's own baseline and the row's current entry there (N2: the run file's `baseline`
+//       record and the row's `baselineKey`; a stale key clears only when the row's recorded findings, re-judged against
+//       the current entry, do not rise). An OK that may not clear is listed (a WARNING at deploy). A row with a
+//       baseline entry whose newest state is N/A is flagged (N9). Run files written before N2 (no `baseline` field)
+//       clear as before and are listed.
 //   NO BASELINE ENTRY (owner 2026-10-23): with --baseline, a printed row with findings and no entry of its own is
 //   PENDING(no-baseline), never RED (nothing to rise above yet); it counts as printed for the verdict. A render
 //   error is ERROR all the same. Without --baseline (a builder's check) every finding is red.
@@ -125,12 +145,15 @@
 //
 // THE RUN FILE (--out; the nightly's design/audit/matrix/<YYYY-MM-DD>[.shard-i-of-n].json, read by the deploy):
 //   { tool, date, started, finished (ISO times), commit (full sha), dirty (bool), partners, printInputsHash,
-//     selection {skills, affected {from, to, files}, seventh, shard, kinds, rows}, replay, timing {...},
+//     baseline (N2): {file, dir (relative to the repo root), files, entries, hash} of the merged baseline the rows were
+//       judged against, or null (no --baseline: any finding was red),
+//     selection {skills, affected {from, to, files}, seventh, shard, kinds, rows, redFrom {dir, reselected}}, replay, timing {...},
 //     totals {OK, CACHED, RED, PENDING, N/A, ERROR}, red: [ids of RED and ERROR rows, re-pinned ones out], liveSkills,
 //     baselineWrite? {mode, target, pinned: [ids], kept, redNotPinned: [ids], reason?}, repinned?: [ids],
 //     mapped?: [{from, to}],
 //     rows: [{ id, skill, kind, row, skills, args, pairs, depHash, status, cached?, step?, reason?, rises?,
-//              errors?, pinned?, repinned? {date, reason, file},
+//              errors?, pinned?, repinned? {date, reason, file, key}, baselineKey (N2: the key of the entry it was
+//              judged against), judgedAgainst? (a renamed row: the old id whose entry judged it),
 //              sizes {S, M, L: {pages, keyPages, counts, error} | {pending, reason} | {na}} }] }
 //   A row's `status` is one of OK / RED / PENDING / N/A / ERROR (a cached row is OK with `cached: <date>`), judged
 //   before any pin of the run (I3). A --retire run file lists rows with status RETIRED.
@@ -650,6 +673,16 @@ async function runRows(rows, { slots, batch, verbose }) {
         }
     };
     await Promise.all(Array.from({ length: Math.max(1, slots) }, worker));
+    // critic r4 N1: a batch that crashed (print-lint exited without a result for some documents: a browser or runner
+    // failure, not a buildSheet throw, which print-lint reports as a document) is run ONCE more, those documents only,
+    // so one transient crash does not make its rows ERROR (and hold every deploy until the lead re-pins them)
+    if (crashed.size) {
+        const again = jobs.filter((j) => crashed.has(j.id));
+        process.stdout.write(`  ${again.length} document(s) had no result (print-lint crashed); running them once more\n`);
+        for (const j of again) crashed.delete(j.id);
+        for (let i = 0; i < again.length; i += batch) chunks.push(again.slice(i, i + batch));
+        await Promise.all(Array.from({ length: Math.max(1, slots) }, worker));
+    }
     const wallMs = Date.now() - t0;
     if (!has('keep-tmp')) fs.rmSync(tmp, { recursive: true, force: true });
     for (const r of rows) {
@@ -746,9 +779,15 @@ function judgeAndPin(rows, base, pin) {
  *                     ENTRY (so no row is ever pinned in two files, I4), the old pin and the reason logged in the
  *                     entry's `repinned` list; a row that did not print is refused
  * `redIds` (I2): never pinned. A merged baseline with conflicting duplicates (I4) refuses the whole write.
- * Returns { target, pinned, pinnedIds, refused, kept, redSkipped, repinned }.
+ * N4 (critic r4): `partial` (a --slice --write-baseline run narrowed by --skills / --kind / --rows / --shard) writes
+ * baseline.slice-i-of-n.partial.json, which every reader merges but which never counts as the slice done
+ * (baselineComplete reads baseline.slice-i-of-n.json only), so the slice's full night still runs.
+ * N5 (critic r4): NOTHING is written here. The writes are returned in `writes` and done by `flush()` (each file atomic:
+ * temp + rename), which the caller calls AFTER it wrote the run file: a crash in between leaves the run file and no
+ * pin (the slice is not done, the night is retried), never a slice file without the run that judged its rows.
+ * Returns { target, pinned, pinnedIds, refused, kept, redSkipped, repinned, writes, flush }.
  */
-function writePins({ rows, mode, bf, slice = null, shard = null, redIds = null, repinIds = null, reason = '', commit = '?', dirty = false, now = new Date() }) {
+function writePins({ rows, mode, bf, slice = null, shard = null, redIds = null, repinIds = null, reason = '', commit = '?', dirty = false, now = new Date(), partial = null }) {
     const merged = loadBaseline(bf);
     const conflict = baselineConflictError(merged);
     if (conflict) throw new UsageError(conflict);
@@ -771,19 +810,16 @@ function writePins({ rows, mode, bf, slice = null, shard = null, redIds = null, 
             const before = old ? Object.fromEntries(SIZES.map((sz) => [sz, old[sz] || {}])) : null;
             entry.repinned = [...((old && old.repinned) || []), { date, commit: stampCommit, reason, before, status: r.status === 'PENDING' ? `PENDING(${r.step})` : r.status, rises: (r.rises || []).slice(0, 6) }];
             cur.rows[id] = entry;
-            r.repinned = { date, reason, file: path.basename(owner) };
+            // N2: the key of the entry this re-pin writes; the fold reads REPINNED only while it is the row's current entry
+            r.repinned = { date, reason, file: path.basename(owner), key: sha(canon(entry)).slice(0, 16) };
             repinned.push(id);
         }
-        for (const [f, cur] of byFile) {
-            cur.rows = sortRows(cur.rows);
-            fs.mkdirSync(path.dirname(f), { recursive: true });
-            fs.writeFileSync(f, JSON.stringify(cur, null, 1) + '\n');
-        }
-        return { target: [...byFile.keys()], pinned: repinned.length, pinnedIds: repinned, refused, kept: [], redSkipped: [], repinned };
+        const writes = [...byFile].map(([f, cur]) => { cur.rows = sortRows(cur.rows); return { file: f, text: JSON.stringify(cur, null, 1) + '\n' }; });
+        return { target: [...byFile.keys()], pinned: repinned.length, pinnedIds: repinned, refused, kept: [], redSkipped: [], repinned, writes, flush: () => writes.forEach((w) => writeAtomic(w.file, w.text)) };
     }
     const target = mode === 'pin-new'
         ? path.join(dir, `baseline.added${shard ? `.shard-${shard.i}-of-${shard.n}` : ''}.json`)
-        : slice ? path.join(dir, `baseline.slice-${slice.i}-of-${slice.n}.json`) : shard ? path.join(dir, `baseline.shard-${shard.i}-of-${shard.n}.json`) : path.resolve(bf);
+        : slice ? path.join(dir, `baseline.slice-${slice.i}-of-${slice.n}${partial ? '.partial' : ''}.json`) : shard ? path.join(dir, `baseline.shard-${shard.i}-of-${shard.n}.json`) : path.resolve(bf);
     const cur = readJson(target, { rows: {} });
     cur.rows = cur.rows || {};
     const res = pinRows(cur, rows, { merged, redIds });
@@ -795,15 +831,34 @@ function writePins({ rows, mode, bf, slice = null, shard = null, redIds = null, 
             : 'Per-row baseline (IMPROVEMENT_PLAN §1.6.2): every finding count per (row, size, lint rule) at the commit below, for rows that printed and had NO entry in the merged baseline (I1: pin-new-only; a row re-selected as red is never pinned, I2). A red row is any count above it; a row that cannot print (L-SPLIT RENDER) is never pinned. Re-pinned only with --repin <ids> --reason, logged in the entry.';
         cur.commit = stampCommit; cur.date = date;
         if (slice && mode === 'write-baseline') { cur.slice = `${slice.i}/${slice.n}`; cur.finished = now.toISOString(); }
+        if (partial) cur.partial = { ...partial, note: 'a --slice run narrowed by --skills / --kind / --rows / --shard: merged by every reader, never counted as the slice done (N4)' };
         cur.rows = sortRows(cur.rows);
-        fs.mkdirSync(path.dirname(target), { recursive: true });
-        fs.writeFileSync(target, JSON.stringify(cur, null, 1) + '\n');
+        const writes = [{ file: target, text: JSON.stringify(cur, null, 1) + '\n' }];
+        return { target, ...res, repinned: [], writes, flush: () => writes.forEach((w) => writeAtomic(w.file, w.text)) };
     }
-    return { target, ...res, repinned: [] };
+    return { target, ...res, repinned: [], writes: [], flush: () => {} };
 }
 
-/** The cache key's baseline part (N10): the row's own merged baseline entry, or 'none' without --baseline. */
-const baselineKey = (base, id) => (base ? sha(JSON.stringify((base.rows && base.rows[id]) || {})).slice(0, 16) : 'none');
+/**
+ * The row's baseline key (N10, critic r4 N2): a hash of the row's own merged baseline entry (canonical JSON, so key order
+ * never matters), or 'none' without --baseline. The cache keys on it, every run file records it per row, and the fold
+ * accepts an OK only when it matches the folded directory's current entry (or the row's findings, re-judged against
+ * that entry, do not rise).
+ */
+const baselineKey = (base, id) => (base ? sha(canon((base.rows && base.rows[id]) || {})).slice(0, 16) : 'none');
+/** The run file's `baseline` record (N2): which merged baseline the rows were judged against. */
+function baselineRecord(bf, base) {
+    if (!bf || !base) return null;
+    const relR = (p) => path.relative(ROOT, p) || '.';
+    return { file: relR(path.resolve(bf)), dir: relR(path.dirname(path.resolve(bf))), files: (base.files || []).map((f) => path.basename(f)), entries: Object.keys(base.rows || {}).length, hash: sha(canon(base.rows || {})).slice(0, 16) };
+}
+/** N5: write a file whole or not at all (temp file + rename), so a crash never leaves half a JSON file. */
+function writeAtomic(file, text) {
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    const tmp = `${file}.tmp-${process.pid}`;
+    fs.writeFileSync(tmp, text);
+    fs.renameSync(tmp, file);
+}
 
 /* ============================================================================ selection */
 
@@ -840,16 +895,35 @@ function selectRows(all, { kinds, names, shard, seventh, slice, affectedIds, ext
 const RUN_RE = /^(\d{4}-\d{2}-\d{2}(?:T\d{4})?)(?:\.shard-(\d+)-of-(\d+))?\.json$/;
 const RED_STATES = new Set(['RED', 'ERROR']);
 
+/** When a file name's stamp says the run happened: <date> = 00:00 UTC, <date>T<HHMM> = that time (the START, autoOut). */
+const stampTime = (stamp) => { const m = /^(\d{4}-\d{2}-\d{2})(?:T(\d{2})(\d{2}))?$/.exec(String(stamp)); return m ? Date.parse(`${m[1]}T${m[2] || '00'}:${m[3] || '00'}:00Z`) : NaN; };
+
 /**
- * Fold every run file in `dir`, oldest stamp first, then the `extra` run files (the deploy's own inline run), into
- * each row's last-known state: a row's state is its status in the MOST RECENT run that ran it (listed it in `rows`,
- * or in `red`). A RED / ERROR row therefore stays red across runs that did not select it, until a later run lists
- * it with another status (OK, or PENDING / N/A when the row can no longer be checked). An id in a file's `red` list
- * is RED in that run even when its row says otherwise.
- * Returns { files: [{file, stamp, shard, j}], bad: [{file, error}], rows: Map(id -> {status, stamp, file, commit}),
- *           red: [ids RED / ERROR in the fold] }.
+ * Fold every run file in `dir`, ordered by when it FINISHED (critic r4 D2), then the `extra` run files (the deploy's own
+ * inline run), into each row's last-known state: a row's state is its status in the MOST RECENT run that ran it (listed
+ * it in `rows`, or in `red`). A RED / ERROR row therefore stays red across runs that did not select it, until a later
+ * run clears it (I5, below). An id in a file's `red` list is RED in that run even when its row says otherwise.
+ * ORDER (D2): every run file, whatever its name, by `finished` (ISO time); a file with no valid `finished` (only a
+ * nightly-named one can be folded without it) by its name's stamp (<date> = 00:00 UTC, <date>T<HHMM> = that time);
+ * ties by file name. Never by the name alone: a lane's run that finished at 00:30 is OLDER than the nightly that
+ * finished at 02:10 the same day, whatever their names.
+ * CLEARING A RED ROW (I5, critic r4 N2 / N3 / N9). A later run's non-red status clears a red row only when:
+ *   - the run is not dirty (N3: a run on a tree with local edits can make a row red, never clear one);
+ *   - OK / REPINNED was judged against THIS directory's baseline (N2): the run file's `baseline` record names this
+ *     dir, and the row's recorded `baselineKey` (for REPINNED: `repinned.key`, the entry it wrote) is the key of the row's
+ *     CURRENT entry in this dir's merged baseline (`opts.base`, default loadBaseline(<dir>/baseline.json)); an OK row
+ *     whose key differs still clears when its recorded findings, re-judged against the current entry, do not rise.
+ *     `baseline: null` (a run with no --baseline: any finding was red, so OK = no findings at all) clears. A run file
+ *     with no `baseline` field at all was written before N2: it clears as before, and the fold lists it (`legacyClears`);
+ *   - RETIRED (--retire) clears;
+ *   - PENDING(no-baseline), PENDING(step) and N/A never clear (N9): the row stays red with `lastSeenAs` ("not re-run
+ *     (now N/A)") until a run lists it OK, or the lead retires it (--retire takes a red row last seen N/A / PENDING).
+ * An OK / REPINNED that does not clear is listed in `ignored` with why (a warning at deploy).
+ * Returns { files: [{file, stamp, order, shard, named, j}], bad, skipped, rows: Map(id -> {status, stamp, file, commit,
+ *           valid?, ...}), red: [ids RED / ERROR in the fold], ignored: [{id, file, status, why}], legacyClears:
+ *           [{id, file}], pinnedNA: [ids with a baseline entry whose newest state is N/A] }.
  */
-function foldRuns(dir, extra = []) {
+function foldRuns(dir, extra = [], opts = {}) {
     const all = (dir && fs.existsSync(dir) ? fs.readdirSync(dir) : []).filter((f) => /\.json$/i.test(f)).sort();
     const files = [], bad = [], skipped = [];
     const list = [];
@@ -858,27 +932,50 @@ function foldRuns(dir, extra = []) {
         const m = RUN_RE.exec(f);
         let j = null, err = null;
         try { j = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { err = e.message; }
+        const fin = j && Date.parse(j.finished);
         if (m) {   // the nightly's own names: always folded (an unreadable one is reported, never skipped)
             if (err) { bad.push({ file, error: err }); continue; }
-            list.push({ file, stamp: m[1], shard: m[2] ? { i: +m[2], n: +m[3] } : null, named: true, j });
+            list.push({ file, stamp: m[1], order: Number.isFinite(fin) ? fin : stampTime(m[1]), shard: m[2] ? { i: +m[2], n: +m[3] } : null, named: true, j });
             continue;
         }
         // N5: any other .json that IS a run (commit + finished + rows) is folded whatever its name; the rest is listed
         if (err) { skipped.push({ file, why: `not JSON (${err.slice(0, 60)})` }); continue; }
         const run = j && j.commit && j.finished && Array.isArray(j.rows);
-        if (run && Number.isFinite(Date.parse(j.finished))) {
-            const iso = new Date(Date.parse(j.finished)).toISOString();
-            list.push({ file, stamp: `${iso.slice(0, 10)}T${iso.slice(11, 13)}${iso.slice(14, 16)}`, shard: null, named: false, j });
+        if (run && Number.isFinite(fin)) {
+            const iso = new Date(fin).toISOString();
+            list.push({ file, stamp: `${iso.slice(0, 10)}T${iso.slice(11, 13)}${iso.slice(14, 16)}`, order: fin, shard: null, named: false, j });
             continue;
         }
         const known = /^baseline(\.|$)/.test(f) ? 'a baseline file' : /^cache/.test(f) ? 'the cache' : /^options-pin-/.test(f) ? 'an options-pin report' : null;
         const missing = ['commit', 'finished', 'rows'].filter((k) => !(j && (k === 'rows' ? Array.isArray(j.rows) : j[k] && (k !== 'finished' || Number.isFinite(Date.parse(j[k]))))));
         skipped.push({ file, known: !!known, why: `${known ? `${known}, ` : ''}not a run file: no ${missing.join(', ')}${j && j.tool ? ` (tool ${j.tool})` : ''}` });
     }
-    list.sort((a, b) => (a.stamp < b.stamp ? -1 : a.stamp > b.stamp ? 1 : a.file < b.file ? -1 : a.file > b.file ? 1 : 0));
+    // D2: by finish time, whatever the name; ties by file name
+    list.sort((a, b) => ((a.order - b.order) || (path.basename(a.file) < path.basename(b.file) ? -1 : path.basename(a.file) > path.basename(b.file) ? 1 : 0)));
     for (const f of extra.filter((x) => x && fs.existsSync(x))) {
-        try { list.push({ file: f, stamp: 'inline', shard: null, extra: true, j: JSON.parse(fs.readFileSync(f, 'utf8')) }); } catch (e) { bad.push({ file: f, error: e.message }); }
+        try { list.push({ file: f, stamp: 'inline', order: Infinity, shard: null, extra: true, j: JSON.parse(fs.readFileSync(f, 'utf8')) }); } catch (e) { bad.push({ file: f, error: e.message }); }
     }
+    // N2: the baseline every clearing OK must have been judged against: this directory's merged baseline
+    let base = opts.base;
+    if (base === undefined) { try { base = dir && fs.existsSync(dir) ? loadBaseline(path.join(dir, 'baseline.json')) : null; } catch (e) { base = null; } }
+    const here = dir ? path.resolve(dir) : null;
+    const ignored = [], legacyClears = [];
+    /** Would this run's non-red record clear a red row? {ok, why?, legacy?} */
+    const clears = (e, r, id, status) => {
+        const j = e.j;
+        if (j.dirty) return { ok: false, why: 'the run was on a tree with local edits (dirty: true); a dirty run never clears a red row (N3)' };
+        if (status === 'RETIRED') return { ok: true };
+        if (!('baseline' in j)) return { ok: true, legacy: true };
+        const rec = j.baseline;
+        if (rec === null) return status === 'OK' ? { ok: true } : { ok: false, why: 'REPINNED by a run that records no baseline' };
+        if (!rec || typeof rec !== 'object' || rec.dir == null || path.resolve(ROOT, rec.dir) !== here) return { ok: false, why: `judged against ${rec && (rec.file || rec.dir) || 'an unnamed baseline'}, not this directory's baseline (N2)` };
+        const entryId = r.judgedAgainst || id;
+        const cur = baselineKey(base || { rows: {} }, entryId);
+        if (status === 'REPINNED') return r.repinned && r.repinned.key === cur ? { ok: true } : { ok: false, why: `the entry this re-pin wrote (${(r.repinned && r.repinned.key) || 'no key recorded'}) is not the row's current entry (${cur}) (N2)` };
+        if (r.baselineKey && r.baselineKey === cur) return { ok: true };
+        if (r.sizes && SIZES.every((sz) => r.sizes[sz] && !renderError(r.sizes[sz])) && !risesOf({ id: entryId, sizes: r.sizes }, base || { rows: {} }).length) return { ok: true, rejudged: true };
+        return { ok: false, why: `judged against another entry of the row (${r.baselineKey || 'no key recorded'}; current ${cur}), and its findings rise above the current entry (N2)` };
+    };
     const rows = new Map();
     let seq = 0;
     for (const e of list) {
@@ -887,13 +984,21 @@ function foldRuns(dir, extra = []) {
         files.push(e);
         const redList = new Set((Array.isArray(j.red) ? j.red : []).map(String));
         const seen = new Set();
-        const put = (id, rec) => {
+        const put = (id, rec, r) => {
             const prev = rows.get(id);
             const wasRed = prev && RED_STATES.has(prev.status);
-            // I5: a red row leaves the red set only through OK (judged against its existing entry), an explicit
-            // re-pin, an explicit retirement, or a status that says it can no longer be checked (PENDING(step) / N/A:
-            // a code change, never a night). Printed with NO entry (PENDING(no-baseline)) is not a fix: it stays red.
+            if (rec.status === 'OK' || rec.status === 'REPINNED') {
+                const c = clears(e, r || {}, id, rec.status);
+                rec.valid = c.ok;
+                if (!c.ok && wasRed) { ignored.push({ id, file: e.file, status: rec.status, why: c.why }); rows.set(id, { ...prev, lastSeen: e.stamp, lastSeenAs: `${rec.status} (ignored: ${c.why})`, lastFile: e.file, seq }); return; }
+                if (c.ok && c.legacy && wasRed) legacyClears.push({ id, file: e.file });
+            } else if (rec.status === 'RETIRED' && wasRed && j.dirty) {
+                ignored.push({ id, file: e.file, status: rec.status, why: 'retired by a run on a dirty tree (N3)' });
+                rows.set(id, { ...prev, lastSeen: e.stamp, lastSeenAs: 'RETIRED (ignored: dirty)', lastFile: e.file, seq }); return;
+            }
+            // I5 / N9: printed with no entry, PENDING(step) and N/A never clear a red row: it was not judged OK
             if (wasRed && rec.status === 'PENDING' && rec.step === 'no-baseline') { rows.set(id, { ...prev, lastSeen: e.stamp, lastSeenAs: 'PENDING(no-baseline)', lastFile: e.file, seq }); return; }
+            if (wasRed && (rec.status === 'N/A' || rec.status === 'PENDING')) { rows.set(id, { ...prev, lastSeen: e.stamp, lastSeenAs: rec.status === 'N/A' ? 'N/A' : `PENDING(${rec.step || '?'})`, notRerun: true, lastFile: e.file, seq }); return; }
             if (wasRed && !RED_STATES.has(rec.status)) rec.cleared = { from: prev.status, since: prev.stamp, by: rec.status };
             rows.set(id, rec);
         };
@@ -903,12 +1008,27 @@ function foldRuns(dir, extra = []) {
             seen.add(id);
             let status = redList.has(id) && !RED_STATES.has(String(r.status)) ? 'RED' : String(r.status);
             if (r.repinned && status !== 'ERROR') status = 'REPINNED';
-            put(id, { status, step: r.step, stamp: e.stamp, file: e.file, commit: j.commit, seq, rises: r.rises, errors: r.errors, reason: r.reason, repinned: r.repinned, skill: r.skill || (r.skills || [])[0], kind: r.kind, row: r.row, args: r.args });
+            put(id, { status, step: r.step, stamp: e.stamp, file: e.file, commit: j.commit, seq, rises: r.rises, errors: r.errors, reason: r.reason, repinned: r.repinned, skill: r.skill || (r.skills || [])[0], kind: r.kind, row: r.row, args: r.args }, r);
         }
         for (const id of redList) if (!seen.has(id)) put(id, { status: 'RED', stamp: e.stamp, file: e.file, commit: j.commit, seq, listOnly: true });
     }
     const red = [...rows.entries()].filter(([, v]) => RED_STATES.has(v.status)).map(([id]) => id).sort();
-    return { files, bad, skipped, rows, red };
+    // N9: a row pinned as printable whose newest state is N/A (or red, last seen N/A): its entry checks nothing now
+    const pinnedNA = [...rows.entries()].filter(([id, v]) => (v.status === 'N/A' || v.lastSeenAs === 'N/A') && base && base.rows && base.rows[id]).map(([id]) => id).sort();
+    return { files, bad, skipped, rows, red, ignored, legacyClears, pinnedNA };
+}
+
+/** The fold's warnings (critic r4 N2 / N3 / N9), one line each: printed by --red-from and WARNINGs at deploy. */
+function foldWarnings(fold) {
+    const out = [];
+    const byFile = new Map();
+    for (const x of fold.ignored || []) { if (!byFile.has(x.file)) byFile.set(x.file, []); byFile.get(x.file).push(x); }
+    for (const [f, xs] of byFile) out.push(`${path.basename(f)} lists ${xs.length} red row(s) ${[...new Set(xs.map((x) => x.status))].join(' / ')} that it may not clear, so they stay red: ${xs[0].why}; ${xs.slice(0, 4).map((x) => x.id).join(', ')}${xs.length > 4 ? ' ...' : ''}`);
+    const legacy = new Map();
+    for (const x of fold.legacyClears || []) { if (!legacy.has(x.file)) legacy.set(x.file, []); legacy.get(x.file).push(x.id); }
+    for (const [f, ids] of legacy) out.push(`${path.basename(f)} records no baseline (written before N2): its OK cleared ${ids.length} red row(s) unchecked (${ids.slice(0, 4).join(', ')}${ids.length > 4 ? ' ...' : ''})`);
+    if ((fold.pinnedNA || []).length) out.push(`${fold.pinnedNA.length} row(s) with a baseline entry are N/A now, so their entry checks nothing (N9): ${fold.pinnedNA.slice(0, 5).join(', ')}${fold.pinnedNA.length > 5 ? ' ...' : ''}; if the row is gone for good, --retire it`);
+    return out;
 }
 
 /**
@@ -1120,7 +1240,7 @@ function selfTest() {
     // 16. BASELINE INVARIANTS as properties over generated sequences of nights (runs / pins / regressions / re-pins)
     const prop = propertyTest({ sequences: 300, nights: 12, seed: 20261023 });
     n += prop.n; bad.push(...prop.bad);
-    console.log(`  property test: ${prop.sequences} sequences, ${prop.nights} nights, ${prop.rowChecks} row-night checks (${prop.modes}); I1 ${prop.c.I1} / I2 ${prop.c.I2} / I3 ${prop.c.I3} / I4 ${prop.c.I4} / I5 ${prop.c.I5} / truth ${prop.c.truth} cases checked, ${prop.violations} violation(s)`);
+    console.log(`  property test: ${prop.sequences} sequences, ${prop.nights} nights, ${prop.rowChecks} row-night checks (${prop.modes}); I1 ${prop.c.I1} / I2 ${prop.c.I2} / I3 ${prop.c.I3} / I4 ${prop.c.I4} / I5 ${prop.c.I5} / truth ${prop.c.truth} / D2 ${prop.c.D2} (a run under another name, then a nightly-named run the same date) / N2 ${prop.c.N2} / N3 ${prop.c.N3} cases checked, ${prop.violations} violation(s)`);
     if (bad.length) { console.error(`${TOOL}: FAIL - ${bad.length} self-test(s)`); bad.forEach((b) => console.error('  - ' + b)); process.exit(1); }
     console.log(`${TOOL}: OK (self-test, ${n} assertions)`);
 }
@@ -1139,9 +1259,11 @@ const deep = (o) => JSON.parse(JSON.stringify(o));
  * One simulated night, through the SAME functions the main path runs (selectRows, foldRuns, loadBaseline, verdict,
  * writePins, runFile): `mode` write-baseline (a first-baseline slice night) | pin-new (a steady night) | plain (a
  * deploy / builder run with --baseline, no pin) | repin (the lead's --repin ids --reason). Every mode but repin
- * re-selects the fold's red rows (--red-from). Writes <dir>/<stamp>.json. Returns what the properties need.
+ * re-selects the fold's red rows (--red-from). Writes <dir>/<file> (default <stamp>.json; critic r4 D2: any name, with
+ * `finished` = `finished` or the stamp's time), the run file BEFORE the pins (N5). `dirty` marks the run file dirty (N3);
+ * `foreignBf` judges a plain run against another directory's baseline (N2). Returns what the properties need.
  */
-function simNight(dir, { ids, truth, mode, slice, repinIds = null, stamp, rowsOnly = null }) {
+function simNight(dir, { ids, truth, mode, slice, repinIds = null, stamp, rowsOnly = null, file = null, finished = null, dirty = false, foreignBf = null }) {
     const bf = path.join(dir, 'baseline.json');
     const all = ids.map(simRow);
     const fold = foldRuns(dir);
@@ -1152,13 +1274,15 @@ function simNight(dir, { ids, truth, mode, slice, repinIds = null, stamp, rowsOn
         sel = rowsOnly ? all.filter((r) => rowsOnly.includes(r.id) || redIds.has(r.id)) : selectRows(all, { slice, extraIds: redIds });
     }
     for (const r of sel) r.sizes = simSizes(truth[r.id]);
-    const base = loadBaseline(bf);
+    const judgeBf = foreignBf && mode === 'plain' ? foreignBf : bf;
+    const base = loadBaseline(judgeBf);
     const pinMode = mode === 'plain' ? null : mode;
     const reason = 'simulated re-pin, named per row';
     const pinRes = judgeAndPin(sel, base, pinMode ? { rows: sel, mode: pinMode, bf, slice: mode === 'write-baseline' ? slice : null, redIds, repinIds, reason, commit: 'sim' } : null);
-    const now = new Date(`${stamp.slice(0, 10)}T${stamp.length > 10 ? `${stamp.slice(11, 13)}:${stamp.slice(13, 15)}` : '01:13'}:00Z`);
-    const rf = runFile(sel, { started: now.toISOString(), commit: 'sim', dirty: false, P: { source: 'sim' }, printHash: 'sim', ONLY: ['sim'], aff: null, slice: mode === 'write-baseline' || mode === 'pin-new' ? slice : null, shard: null, kinds: null, names: null, timing: null, live: [], refused: pinRes ? pinRes.refused : [], redFrom: redIds ? dir : null, redIds, affReached: null, pinMode, pinRes, reason, now });
-    fs.writeFileSync(path.join(dir, `${stamp}.json`), JSON.stringify(rf));
+    const now = finished ? new Date(finished) : new Date(`${stamp.slice(0, 10)}T${stamp.length > 10 ? `${stamp.slice(11, 13)}:${stamp.slice(13, 15)}` : '01:13'}:00Z`);
+    const rf = runFile(sel, { started: now.toISOString(), commit: 'sim', dirty, P: { source: 'sim' }, printHash: 'sim', ONLY: ['sim'], aff: null, slice: mode === 'write-baseline' || mode === 'pin-new' ? slice : null, shard: null, kinds: null, names: null, timing: null, live: [], refused: pinRes ? pinRes.refused : [], redFrom: redIds ? dir : null, redIds, affReached: null, pinMode, pinRes, reason, now, base, baseRecord: baselineRecord(judgeBf, base) });
+    writeAtomic(path.join(dir, file || `${stamp}.json`), JSON.stringify(rf));
+    if (pinRes) pinRes.flush();   // N5: the pins after the run file
     return { sel, redIds, rf };
 }
 
@@ -1240,12 +1364,12 @@ function invariantCases() {
     wrf('2026-10-20.json', [['p', 'RED'], ['q', 'ERROR'], ['s', 'RED']]);
     wrf('2026-10-21.json', [['p', 'PENDING', 'no-baseline'], ['q', 'PENDING', 'no-baseline'], ['s', 'N/A']]);
     let fo = foldRuns(d);
-    ok(fo.red.join() === 'p,q' && fo.rows.get('p').lastSeenAs === 'PENDING(no-baseline)', `I5: a red row printed later with no entry stays red (${fo.red.join()})`);
-    ok(fo.rows.get('s').cleared && fo.rows.get('s').cleared.by === 'N/A', 'I5 exception: a row that can no longer be checked (N/A) leaves the red set, recorded as cleared');
-    // N1: retire
-    fs.writeFileSync(path.join(d, 'retire.json'), JSON.stringify({ tool: TOOL, kind: 'retire', commit: 'c', finished: '2026-10-22T03:00:00Z', rows: [{ id: 'p', status: 'RETIRED', reason: 'option removed' }], red: [] }));
+    ok(fo.red.join() === 'p,q,s' && fo.rows.get('p').lastSeenAs === 'PENDING(no-baseline)', `I5: a red row printed later with no entry stays red (${fo.red.join()})`);
+    ok(fo.rows.get('s').status === 'RED' && fo.rows.get('s').lastSeenAs === 'N/A' && fo.rows.get('s').notRerun, `N9 (critic r4): a red row that turns N/A stays red, "not re-run (now N/A)" (${JSON.stringify(fo.rows.get('s'))})`);
+    // N1: retire (and N9: a red row last seen N/A is retired the same way)
+    fs.writeFileSync(path.join(d, 'retire.json'), JSON.stringify({ tool: TOOL, kind: 'retire', commit: 'c', finished: '2026-10-22T03:00:00Z', rows: [{ id: 'p', status: 'RETIRED', reason: 'option removed' }, { id: 's', status: 'RETIRED', reason: 'layout gone' }], red: [] }));
     fo = foldRuns(d);
-    ok(fo.red.join() === 'q' && fo.rows.get('p').status === 'RETIRED', `N1: a RETIRED record (a run file under any name, N5) clears the gone row (${fo.red.join()})`);
+    ok(fo.red.join() === 'q' && fo.rows.get('p').status === 'RETIRED' && fo.rows.get('s').status === 'RETIRED', `N1: a RETIRED record (a run file under any name, N5) clears the gone row (${fo.red.join()})`);
     // N5: what is folded and what is skipped, by content not name
     fs.writeFileSync(path.join(d, 'e1-check.json'), JSON.stringify({ tool: TOOL, commit: 'c', rows: [{ id: 'q', status: 'OK' }] }));
     fs.writeFileSync(path.join(d, 'baseline.json'), JSON.stringify({ rows: {} }));
@@ -1256,6 +1380,87 @@ function invariantCases() {
     ok(sk['e1-check.json'] && /no finished/.test(sk['e1-check.json'].why) && !sk['e1-check.json'].known && sk['baseline.json'] && sk['baseline.json'].known && sk['notes.json'] && /not JSON/.test(sk['notes.json'].why), `N5: skipped files are listed with why (${fo.skipped.map((x) => `${path.basename(x.file)}: ${x.why}`).join('; ')})`);
     ok(foldSkipNote(fo).some((l) => /WARNING skipped e1-check\.json/.test(l)) && foldSkipNote(fo).some((l) => /folded 1 run file\(s\) not named/.test(l)), 'N5: the note warns of each unknown skipped file and names the run files folded under other names');
     ok(fo.red.join() === 'q', 'N5: a file without finished cannot clear a red row');
+    fs.rmSync(d, { recursive: true, force: true });
+    // critic r4 D2: EVERY run file is ordered by `finished`, whatever its name (the critic's reproduce, node only)
+    d = mk();
+    const wrun = (f, fin, list, extra = {}) => fs.writeFileSync(path.join(d, f), JSON.stringify({ commit: 'c', ...(fin ? { finished: fin } : {}), baseline: null, rows: list.map(([id, status]) => ({ id, status })), red: list.filter(([, s]) => RED_STATES.has(s)).map(([id]) => id), ...extra }));
+    wrun('2026-10-22.json', '2026-10-22T02:00:00Z', [[R, 'OK']]);
+    wrun('lane-check.json', '2026-10-23T00:30:00Z', [[R, 'OK']]);
+    wrun('2026-10-23.json', '2026-10-23T02:10:00Z', [[R, 'RED']]);
+    fo = foldRuns(d);
+    ok(fo.red.includes(R) && fo.files.map((f) => path.basename(f.file)).join() === '2026-10-22.json,lane-check.json,2026-10-23.json', `D2: lane-check.json (finished 00:30, OK) is older than 2026-10-23.json (02:10, RED): the row stays RED (order ${fo.files.map((f) => path.basename(f.file)).join(' -> ')}, red ${fo.red.join()})`);
+    wrun('2026-10-24.json', null, [[R, 'OK']]);
+    ok(!foldRuns(d).red.includes(R) && path.basename(foldRuns(d).files.slice(-1)[0].file) === '2026-10-24.json', 'D2: a nightly-named file with no finished is ordered by its name (00:00 UTC of its date)');
+    fs.rmSync(d, { recursive: true, force: true });
+    d = mk();
+    wrun('lane-check.json', '2026-10-23T00:30:00Z', [[R, 'RED']]);
+    wrun('2026-10-23.json', '2026-10-23T02:10:00Z', [[R, 'OK']]);
+    wrun('2026-10-23T0100.json', '2026-10-23T03:00:00Z', [['other', 'OK']]);
+    ok(!foldRuns(d).red.includes(R), 'D2 (reverse): an earlier lane RED and a later nightly OK is cleared (no false refusal)');
+    fs.rmSync(d, { recursive: true, force: true });
+    // critic r4 N2: an OK judged against ANOTHER baseline does not clear a red row (scenario B, through simNight)
+    d = mk();
+    const other = mk();
+    fs.writeFileSync(path.join(d, 'baseline.json'), JSON.stringify({ rows: { [R]: zero } }));
+    fs.writeFileSync(path.join(other, 'baseline.json'), JSON.stringify({ rows: { [R]: { S: { [RULE]: 9 }, M: {}, L: {} } } }));
+    truth = truth0(); truth[R] = { n: 2, k: 'dense', err: false };
+    simNight(d, { ids, truth, mode: 'plain', rowsOnly: [R], stamp: '2026-10-23' });
+    ok(foldRuns(d).red.includes(R), 'N2: the row is RED against its entry of 0');
+    night = simNight(d, { ids, truth, mode: 'plain', rowsOnly: [R], stamp: '2026-10-24', foreignBf: path.join(other, 'baseline.json') });
+    fo = foldRuns(d);
+    ok(night.rf.rows.find((x) => x.id === R).status === 'OK' && night.rf.baseline && night.rf.baseline.dir === path.relative(ROOT, other), `N2: the run judged against the other baseline (9) lists it OK and records that baseline (${JSON.stringify(night.rf.baseline)})`);
+    ok(fo.red.includes(R) && fo.ignored.some((x) => x.id === R && /not this directory's baseline/.test(x.why)) && foldWarnings(fo).some((l) => /2026-10-24\.json lists 1 red row/.test(l)), `N2: that OK does not clear the red row; the fold warns and ignores it (${fo.red.join()}; ${foldWarnings(fo).join(' | ')})`);
+    // the same directory, the row's entry key matches: clears
+    truth[R] = { n: 0, k: 'dense', err: false };
+    night = simNight(d, { ids, truth, mode: 'plain', rowsOnly: [R], stamp: '2026-10-25' });
+    ok(!foldRuns(d).red.includes(R) && night.rf.rows.find((x) => x.id === R).baselineKey === baselineKey(loadBaseline(path.join(d, 'baseline.json')), R), 'N2: an OK judged against this directory\'s current entry (recorded key = current key) clears');
+    // a hand-made OK in this dir whose key is stale: clears only when its findings, re-judged, do not rise
+    const recHere = { file: path.relative(ROOT, path.join(d, 'baseline.json')), dir: path.relative(ROOT, d) };
+    wrun('2026-10-26.json', '2026-10-26T02:00:00Z', [[R, 'RED']], { baseline: recHere });
+    fs.writeFileSync(path.join(d, '2026-10-27.json'), JSON.stringify({ commit: 'c', finished: '2026-10-27T02:00:00Z', baseline: recHere, red: [], rows: [{ id: R, status: 'OK', baselineKey: 'stale0000000000', sizes: simSizes({ n: 2, k: 'dense' }) }] }));
+    ok(foldRuns(d).red.includes(R), 'N2: a stale key whose findings rise above the current entry does not clear');
+    fs.writeFileSync(path.join(d, '2026-10-28.json'), JSON.stringify({ commit: 'c', finished: '2026-10-28T02:00:00Z', baseline: recHere, red: [], rows: [{ id: R, status: 'OK', baselineKey: 'stale0000000000', sizes: simSizes({ n: 0, k: 'dense' }) }] }));
+    ok(!foldRuns(d).red.includes(R), 'N2: a stale key whose findings do not rise (re-judged against the current entry) clears');
+    // REPINNED with a key that is not the current entry's does not clear; legacy (no baseline field) clears and is listed
+    wrun('2026-10-29.json', '2026-10-29T02:00:00Z', [[R, 'RED']], { baseline: recHere });
+    fs.writeFileSync(path.join(d, '2026-10-30.json'), JSON.stringify({ commit: 'c', finished: '2026-10-30T02:00:00Z', baseline: recHere, red: [], rows: [{ id: R, status: 'RED', repinned: { date: '2026-10-30', reason: 'x', key: 'notthecurrent00' } }] }));
+    fo = foldRuns(d);
+    ok(fo.red.includes(R) && fo.ignored.some((x) => x.status === 'REPINNED'), 'N2: a REPINNED record whose entry is not the current one does not clear (scenario C)');
+    fs.writeFileSync(path.join(d, '2026-10-31.json'), JSON.stringify({ commit: 'c', finished: '2026-10-31T02:00:00Z', red: [], rows: [{ id: R, status: 'OK' }] }));
+    fo = foldRuns(d);
+    ok(!fo.red.includes(R) && fo.legacyClears.some((x) => x.id === R) && foldWarnings(fo).some((l) => /records no baseline \(written before N2\)/.test(l)), 'N2: a run file written before N2 (no baseline field) clears as before, and the fold lists it');
+    fs.rmSync(other, { recursive: true, force: true });
+    // critic r4 N3: a dirty run file never clears a red row (it can still make one red)
+    truth[R] = { n: 3, k: 'dense', err: false };
+    simNight(d, { ids, truth, mode: 'plain', rowsOnly: [R], stamp: '2026-11-01' });
+    truth[R] = { n: 0, k: 'dense', err: false };
+    night = simNight(d, { ids, truth, mode: 'plain', rowsOnly: [R], stamp: '2026-11-02', dirty: true });
+    fo = foldRuns(d);
+    ok(night.rf.dirty && fo.red.includes(R) && fo.ignored.some((x) => /dirty/.test(x.why)), 'N3: a dirty run listing the row OK does not clear it');
+    simNight(d, { ids, truth, mode: 'plain', rowsOnly: [R], stamp: '2026-11-03' });
+    ok(!foldRuns(d).red.includes(R), 'N3: the next clean run OK clears it');
+    truth[R] = { n: 4, k: 'dense', err: false };
+    simNight(d, { ids, truth, mode: 'plain', rowsOnly: [R], stamp: '2026-11-04', dirty: true });
+    ok(foldRuns(d).red.includes(R), 'N3: a dirty run can make a row red');
+    // critic r4 N9: a row with a baseline entry whose newest state is N/A is flagged
+    fs.writeFileSync(path.join(d, '2026-11-05.json'), JSON.stringify({ commit: 'c', finished: '2026-11-05T02:00:00Z', baseline: recHere, red: [], rows: [{ id: R, status: 'N/A', reason: 'no layout' }] }));
+    fo = foldRuns(d);
+    ok(fo.red.includes(R) && fo.rows.get(R).lastSeenAs === 'N/A' && fo.pinnedNA.includes(R) && foldWarnings(fo).some((l) => /with a baseline entry are N\/A now/.test(l)), `N9: a red pinned row that turns N/A stays red and is flagged (${foldWarnings(fo).join(' | ')})`);
+    fs.rmSync(d, { recursive: true, force: true });
+    // critic r4 N4: a narrowed --slice --write-baseline writes the .partial file, which never marks the slice done
+    d = mk();
+    const bfN = path.join(d, 'baseline.json');
+    for (let i = 1; i <= 28; i++) if (i !== 3) fs.writeFileSync(path.join(d, `baseline.slice-${i}-of-28.json`), '{"rows":{}}');
+    const prow = { id: R, status: 'OK', noBaseline: false, sizes: simSizes({ n: 0, k: 'a' }) };
+    let wp = writePins({ rows: [prow], mode: 'write-baseline', bf: bfN, slice: { i: 3, n: 28 }, partial: { skills: [R.split('|')[0]], kinds: null, rows: [R], shard: null } });
+    // critic r4 N5: nothing is written before flush() (the caller writes the run file first)
+    ok(!fs.existsSync(path.join(d, 'baseline.slice-3-of-28.partial.json')) && wp.writes.length === 1, 'N5: writePins writes nothing until flush() (the run file goes first)');
+    wp.flush();
+    ok(fs.existsSync(path.join(d, 'baseline.slice-3-of-28.partial.json')) && !fs.existsSync(path.join(d, 'baseline.slice-3-of-28.json')) && !baselineComplete(d).complete && loadBaseline(bfN).rows[R], `N4: the narrowed slice run writes baseline.slice-3-of-28.partial.json (merged by readers, slice 3 still missing: ${baselineComplete(d).how})`);
+    wp = writePins({ rows: [{ ...prow, id: 'a:x|single/defaults' }], mode: 'write-baseline', bf: bfN, slice: { i: 3, n: 28 } });
+    wp.flush();
+    ok(baselineComplete(d).complete && !readJson(path.join(d, 'baseline.slice-3-of-28.json'), {}).partial, 'N4: the full slice night then writes baseline.slice-3-of-28.json and completes the baseline');
+    ok(fs.readdirSync(d).every((f) => !/\.tmp-/.test(f)), 'N5: the writes are atomic (no temp file left)');
     fs.rmSync(d, { recursive: true, force: true });
     // N1: resolveRed - current, mapped (same kind + flags), retired, dead, outside
     const idx = { live: new Set(['a:x', 'b:y']), skills: new Set(['a:x']), rows: new Map([['a:x|single/more-cols2+short', { kind: 'single', args: ['--columns', '2', '--key-style', 'short'] }], ['a:x|single/defaults', { kind: 'single', args: [] }]]) };
@@ -1276,7 +1481,7 @@ function rng32(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >
  */
 function propertyTest({ sequences, nights, seed }) {
     const bad = []; let n = 0;
-    const c = { I1: 0, I2: 0, I3: 0, I4: 0, I5: 0, truth: 0 };
+    const c = { I1: 0, I2: 0, I3: 0, I4: 0, I5: 0, truth: 0, D2: 0, N2: 0, N3: 0 };
     const modes = {};
     let rowChecks = 0, totalNights = 0, violations = 0;
     const fail = (m) => { violations++; if (bad.length < 12) bad.push(m); };
@@ -1296,6 +1501,12 @@ function propertyTest({ sequences, nights, seed }) {
         let nextSlice = 1;
         const firstEntry = {};   // the entry each row was pinned with (changed only by --repin): the ground truth
         for (const [id, e] of Object.entries(loadBaseline(bf).rows)) firstEntry[id] = deep(e);
+        // critic r4 N2: another directory's baseline, which some plain runs are judged against (scenario B)
+        const fd = fs.mkdtempSync(path.join(os.tmpdir(), 'mq-prop-other-'));
+        fs.writeFileSync(path.join(fd, 'baseline.json'), JSON.stringify({ rows: Object.fromEntries(ids.filter(() => rnd() < 0.7).map((id) => [id, { S: { [RULE]: Math.floor(rnd() * 5) }, M: {}, L: {} }])) }));
+        // critic r4 D2: run files under many names, finishing at times that interleave with the nightly's own names
+        let clock = Date.parse('2026-11-01T00:10:00Z');
+        let prevName = null;
         for (let t = 0; t < nights; t++) {
             // the day's changes
             for (const id of ids) {
@@ -1313,9 +1524,31 @@ function propertyTest({ sequences, nights, seed }) {
             modes[mode] = (modes[mode] || 0) + 1;
             const before = deep({ rows: loadBaseline(bf).rows });
             const foldBefore = foldRuns(d);
-            const stamp = `2026-11-${String(t + 1).padStart(2, '0')}`;
+            // when this run finishes (always after the last one: files are written as runs finish) and its file name:
+            // a nightly name (<date>.json, or <date>T<HHMM>.json with the START time when that exists) or another name
+            clock += (rnd() < 0.6 ? 20 + rnd() * 460 : 480 + rnd() * 1320) * 60000;
+            const fin = new Date(clock).toISOString();
+            const date = fin.slice(0, 10);
+            let file;
+            if (rnd() < 0.55) {
+                file = `${date}.json`;
+                let start = Math.max(clock - Math.floor(rnd() * 90) * 60000, Date.parse(`${date}T00:00:00Z`));
+                while (fs.existsSync(path.join(d, file)) && start >= Date.parse(`${date}T00:00:00Z`)) {
+                    const s = new Date(start).toISOString();
+                    file = `${date}T${s.slice(11, 13)}${s.slice(14, 16)}.json`;
+                    start -= 60000;
+                }
+                if (fs.existsSync(path.join(d, file))) file = `zz-${t}.json`;
+            } else file = pick([`lane-check-${t}.json`, `e1-check-${date}-${t}.json`, `pilot-baseline-${t}.json`, `aa-${t}.json`, `zz-${t}.json`]);
+            const named = RUN_RE.test(file);
+            if (named && prevName && !RUN_RE.test(prevName.file) && prevName.date === date) c.D2++;   // a lane file then a nightly the same day
+            prevName = { file, date };
+            const stamp = date;
+            // N3 / N2: some plain runs are on a dirty tree, some judged against the other directory's baseline
+            const r2 = mode === 'plain' ? rnd() : 1;
+            const dirty = r2 < 0.3, foreign = r2 >= 0.3 && r2 < 0.6;
             let res;
-            try { res = simNight(d, { ids, truth, mode, slice, repinIds, stamp }); } catch (e) { fail(`seq ${q} night ${t} (${mode}): threw ${e.message}`); break; }
+            try { res = simNight(d, { ids, truth, mode, slice, repinIds, stamp, file, finished: fin, dirty, foreignBf: foreign ? path.join(fd, 'baseline.json') : null }); } catch (e) { fail(`seq ${q} night ${t} (${mode}): threw ${e.message}`); break; }
             totalNights++;
             const after = loadBaseline(bf);
             const foldAfter = foldRuns(d);
@@ -1335,25 +1568,31 @@ function propertyTest({ sequences, nights, seed }) {
                 if (!was && now && !firstEntry[id]) firstEntry[id] = deep(now);
                 // I2: a red-from row gets no pin
                 if (res.redIds && res.redIds.has(id)) { c.I2++; if (canon(was || null) !== canon(now || null) || (rr && rr.pinned)) fail(`I2 seq ${q} night ${t} (${mode}): ${id} was re-selected as red and was pinned`); }
-                if (rr) {
+                // the verdict against THIS directory's merged baseline as it was before the night
+                const probe = { id, sizes: simSizes(truth[id]) };
+                verdict(probe, before);
+                if (rr && !foreign) {
                     // I3: the run file's status is the verdict against the merged baseline BEFORE the night
                     c.I3++;
-                    const probe = { id, sizes: simSizes(truth[id]) };
-                    verdict(probe, before);
                     if (probe.status !== rr.status) fail(`I3 seq ${q} night ${t} (${mode}): ${id} recorded ${rr.status}, judged before the pin ${probe.status}`);
                 }
-                // I5: red -> not red only by OK against an existing entry (or no findings at all), or a re-pin
+                // I5: red -> not red only by OK against THIS directory's existing entry (or no findings at all), or a
+                // re-pin; N3: never by a dirty run; N2: never by an OK judged against another baseline that is not OK
+                // against this one
                 const wasRed = foldBefore.red.includes(id), nowRed = foldAfter.red.includes(id);
                 if (wasRed) {
                     c.I5++;
                     if (!rr && !nowRed) fail(`I5 seq ${q} night ${t} (${mode}): ${id} was red, did not run, and is no longer red`);
-                    if (rr && !nowRed && !(rr.repinned || (rr.status === 'OK' && (was || !truth[id].n)))) fail(`I5 seq ${q} night ${t} (${mode}): ${id} left the red set as ${rr.status} with${was ? '' : 'out'} an entry`);
+                    if (rr && !nowRed && !(rr.repinned || (probe.status === 'OK' && (was || !truth[id].n)))) fail(`I5 seq ${q} night ${t} (${mode}${foreign ? ', judged against another baseline' : ''}): ${id} left the red set as ${rr.status} (OK against this directory's entry: ${probe.status})`);
+                    if (dirty) { c.N3++; if (!nowRed) fail(`N3 seq ${q} night ${t}: ${id} was red and a DIRTY run cleared it`); }
+                    if (foreign && rr) c.N2++;
                 }
                 // ground truth: a row that ran tonight, printed, and has more findings (or another finding) than the
                 // entry it was pinned with is red in the fold, unless it was re-pinned tonight; a row that did not
-                // print is red
+                // print is red. (A run judged against another directory's baseline is outside this: it judged nothing
+                // here, and its OK clears nothing, checked above.)
                 const fe = firstEntry[id];
-                if (rr && was && fe && !truth[id].err && !repinned.has(id)) {
+                if (rr && was && fe && !truth[id].err && !repinned.has(id) && !foreign) {
                     const pinnedN = (fe.S || {})[RULE] || 0;
                     const keyed = fe.keys && fe.keys.S;
                     const rise = truth[id].n > pinnedN || (keyed && truth[id].n > (keyed[`${RULE}|p1|${truth[id].k}`] || 0));
@@ -1366,6 +1605,7 @@ function propertyTest({ sequences, nights, seed }) {
             if (after.conflicts.length || after.duplicates.length) fail(`I4 seq ${q} night ${t} (${mode}): ${after.conflicts.length} conflict(s), ${after.duplicates.length} duplicate(s)`);
         }
         fs.rmSync(d, { recursive: true, force: true });
+        fs.rmSync(fd, { recursive: true, force: true });
     }
     for (const k of Object.keys(c)) { n++; if (!c[k]) bad.push(`property test: no ${k} case was generated`); }
     n++;
@@ -1431,7 +1671,7 @@ function sizeCell(s) {
 }
 class UsageError extends Error {}
 
-module.exports = { foldRuns, baselineComplete, loadBaseline, baselineConflictError, resolveRed, rowIndexFor, foldSkipNote, RUN_RE, RED_STATES, inSlice, inShard, findingKey };
+module.exports = { foldRuns, foldWarnings, baselineComplete, loadBaseline, baselineConflictError, baselineKey, resolveRed, rowIndexFor, foldSkipNote, RUN_RE, RED_STATES, inSlice, inShard, findingKey };
 if (require.main === module) (async () => {
     if (has('self-test')) return selfTest();
     const t0 = Date.now();
@@ -1529,13 +1769,17 @@ if (require.main === module) (async () => {
         const rdir = path.dirname(outFile);
         const rfold = foldRuns(rdir);
         const res = resolveRed(retireIds, rfold, index);
-        const live_ = res.current.map((id) => `${id} is a row today (fix it, or --repin it)`);
+        // N9: a row of today that is red in the fold but was last seen N/A or PENDING(step) (a code change made it
+        // uncheckable) can be retired: nothing else clears it, since it never runs OK again
+        const stuck = (id) => { const st = rfold.rows.get(id); return st && RED_STATES.has(st.status) && st.notRerun ? st : null; };
+        const live_ = res.current.filter((id) => !stuck(id)).map((id) => `${id} is a row today (fix it, or --repin it)`);
         const mapped = res.mapped.map((m) => `${m.from} maps to the current row ${m.to} (same kind and flags): its red state carries there, nothing to retire`);
         if (live_.length || mapped.length) throw new UsageError(`--retire refused: ${[...live_, ...mapped].join('; ')}`);
+        if (dirty) throw new UsageError('--retire on a tree with local edits: a dirty run never clears a red row (N3); commit or stash first');
         const date = new Date().toISOString();
-        const recs = res.retired.map((x) => ({ id: x.id, skill: x.id.split('|')[0], status: 'RETIRED', reason: reasonArg, retired: { date: date.slice(0, 10), reason: reasonArg, why: x.why, wasRed: (rfold.rows.get(x.id) || {}).status || 'not red in the fold' } }));
-        fs.mkdirSync(rdir, { recursive: true });
-        fs.writeFileSync(outFile, JSON.stringify({ tool: TOOL, kind: 'retire', date: date.slice(0, 10), started, finished: new Date().toISOString(), commit, dirty, selection: { retire: retireIds }, totals: { RETIRED: recs.length }, red: [], rows: recs }, null, 1) + '\n');
+        const gone = [...res.retired, ...res.current.map((id) => ({ id, why: `red since run ${stuck(id).stamp}, last seen ${stuck(id).lastSeenAs} (not re-run, N9)` }))];
+        const recs = gone.map((x) => ({ id: x.id, skill: x.id.split('|')[0], status: 'RETIRED', reason: reasonArg, retired: { date: date.slice(0, 10), reason: reasonArg, why: x.why, wasRed: (rfold.rows.get(x.id) || {}).status || 'not red in the fold' } }));
+        writeAtomic(outFile, JSON.stringify({ tool: TOOL, kind: 'retire', date: date.slice(0, 10), started, finished: new Date().toISOString(), commit, dirty, baseline: null, selection: { retire: retireIds }, totals: { RETIRED: recs.length }, red: [], rows: recs }, null, 1) + '\n');
         for (const r of recs) console.log(`  RETIRED ${r.id} (${r.retired.wasRed}): ${r.retired.why}`);
         console.log(`wrote ${path.relative(process.cwd(), outFile)}`);
         console.log(`${TOOL}: OK (retired ${recs.length} row(s) that no longer exist: "${reasonArg}")`);
@@ -1550,11 +1794,12 @@ if (require.main === module) (async () => {
         // N1: a renamed row (same skill, kind and flags) carries the red state: re-run under its new id, judged against
         // the old id's entry (aliased below once the baseline is loaded)
         for (const m of res.mapped) { redIds.add(m.to); aliases.set(m.to, m.from); }
-        console.log(`${TOOL}: --red-from ${path.relative(process.cwd(), path.resolve(redFrom)) || '.'}: ${fold.red.length} RED / ERROR row(s) in the folded state of ${fold.files.length} run file(s); ${redIds.size} re-selected${res.mapped.length ? ` (${res.mapped.length} under a new name)` : ''}${res.outside.length ? `, ${res.outside.length} outside the selected skills` : ''}${res.dead.length ? `, ${res.dead.length} of skills that are not live (ignored)` : ''}${res.retired.length ? `, ${res.retired.length} RETIRED-ROW` : ''}`);
+        console.log(`${TOOL}: --red-from ${path.relative(process.cwd(), path.resolve(redFrom)) || '.'}: ${fold.red.length} RED / ERROR row(s) in the folded state of ${fold.files.length} run file(s); ${redIds.size} of them are rows of the selected skills${res.mapped.length ? ` (${res.mapped.length} under a new name)` : ''}${res.outside.length ? `, ${res.outside.length} outside the selected skills` : ''}${res.dead.length ? `, ${res.dead.length} of skills that are not live (ignored)` : ''}${res.retired.length ? `, ${res.retired.length} RETIRED-ROW` : ''}`);
         for (const m of res.mapped) console.log(`  MAPPED ${m.from} -> ${m.to} (the same kind and flags under a new name)`);
         for (const x of res.retired) console.log(`  RETIRED-ROW (warning) ${x.id}: ${x.why}. It holds nothing at deploy; clear it with: node tests/scripts/ws-coverage-matrix.cjs --retire '${x.id}' --reason "<why it is gone>"`);
         for (const b of fold.bad) console.log(`  unreadable run file ${b.file}: ${b.error}`);
         foldSkipNote(fold).forEach((l) => console.log(l));
+        foldWarnings(fold).forEach((l) => console.log(`  WARNING ${l}`));
     }
     // --affected-cap (the nightly): affected rows above the cap are dropped from tonight's selection (the slice and the
     // red rows still run); the run file records it, and the deploy still decides from its own budget
@@ -1569,6 +1814,9 @@ if (require.main === module) (async () => {
     const selErr = selectionError({ all, kinds, names, rows, reach });
     if (selErr) throw new UsageError(selErr);
     settleStatic(rows);
+    // N6: the red rows actually re-run are those --kind / --rows / --shard kept; the others are NOT run (they stay red)
+    const redRun = redIds ? new Set([...redIds].filter((id) => rows.some((r) => r.id === id))) : null;
+    if (redIds) console.log(`  --red-from: ${redRun.size} red row(s) re-selected and run${redIds.size > redRun.size ? `; ${redIds.size - redRun.size} outside --kind / --rows / --shard are NOT run by this run (they stay red): ${[...redIds].filter((id) => !redRun.has(id)).slice(0, 4).join(', ')}${redIds.size - redRun.size > 4 ? ' ...' : ''}` : ''}`);
 
     // dependency hash (before M4: the print inputs whole + pair fingerprints + the row)
     const tree = fsTree();
@@ -1594,6 +1842,11 @@ if (require.main === module) (async () => {
     const conflictErr = baselineConflictError(base);
     if (conflictErr) throw new UsageError(conflictErr);
     for (const d of (base && base.duplicates) || []) console.log(`  WARNING (I4) ${d.id} is pinned in both ${path.basename(d.files[0])} and ${path.basename(d.files[1])} with the same contents; delete one copy`);
+    // N2: a re-pin rewrites the entries of --baseline's directory; its run file must go to that same directory, whose fold
+    // reads it (a REPINNED record in another directory would clear a red row whose entry never changed)
+    if (repinIds && outFile && path.dirname(path.resolve(BASE)) !== path.dirname(outFile)) throw new UsageError(`--repin rewrites the baseline in ${path.relative(process.cwd(), path.dirname(path.resolve(BASE))) || '.'} but --out writes the run file to ${path.relative(process.cwd(), path.dirname(outFile)) || '.'}: give a --baseline and an --out in the same directory (the matrix folder's baseline set, default design/audit/matrix)`);
+    // N2: which merged baseline the rows are judged against (recorded in the run file; the fold checks it)
+    const baseRecord = baselineRecord(BASE, base);
     // N1: a renamed row is judged against the entry of the id it replaced (in memory only; never written under the new id)
     for (const [to, from] of aliases) if (base && !base.rows[to] && base.rows[from]) { base.rows[to] = base.rows[from]; console.log(`  ${to} is judged against the baseline entry of ${from} (renamed row)`); }
     const CACHE = arg('cache', null);
@@ -1647,12 +1900,15 @@ if (require.main === module) (async () => {
     }
     // the baseline writes (BASELINE INVARIANTS): AFTER every row was judged (I3: no row is judged again), only rows with
     // no entry in the merged baseline (I1), never a row re-selected as red (I2); --repin is the only re-pin
-    const pinRes = judgeAndPin(toRun, base, pinMode ? { rows: toRun, mode: pinMode, bf: BASE, slice, shard, redIds, repinIds, reason: reasonArg || '', commit, dirty } : null);
+    // N4: a slice night narrowed by --skills / --kind / --rows / --shard pins into baseline.slice-i-of-n.partial.json,
+    // never into the slice file that marks the slice done for every skill
+    const partial = slice && pinMode === 'write-baseline' && (ONLY.length || kinds || names || shard) ? { skills: ONLY.length ? ONLY : 'all', kinds, rows: names, shard: shard ? `${shard.i}/${shard.n}` : null } : null;
+    const pinRes = judgeAndPin(toRun, base, pinMode ? { rows: toRun, mode: pinMode, bf: BASE, slice, shard, redIds, repinIds, reason: reasonArg || '', commit, dirty, partial } : null);
     if (pinMode) {
         refused = pinRes.refused;
         const tgt = [].concat(pinRes.target).map((t) => path.relative(process.cwd(), t)).join(', ');
         if (pinMode === 'repin') console.log(`--repin: ${pinRes.repinned.length} row(s) re-pinned in ${tgt || 'no file'} ("${reasonArg}"); each entry logs the date, the reason and the pin it replaced`);
-        else console.log(`${pinMode === 'pin-new' ? '--pin-new' : 'wrote the per-row baseline'} ${path.relative(process.cwd(), pinRes.target)}: ${pinRes.pinned} new row(s) pinned (I1: only rows with no entry); ${pinRes.kept.length} already had an entry and were judged against it, not re-pinned; ${pinRes.redSkipped.length} re-selected as red, never pinned (I2)`);
+        else console.log(`${pinMode === 'pin-new' ? '--pin-new' : 'the per-row baseline'} ${path.relative(process.cwd(), pinRes.target)}: ${pinRes.pinned} new row(s) pinned (I1: only rows with no entry); ${pinRes.kept.length} already had an entry and were judged against it, not re-pinned; ${pinRes.redSkipped.length} re-selected as red, never pinned (I2)${partial ? `; N4: this --slice run is narrowed (${[ONLY.length && '--skills', kinds && '--kind', names && '--rows', shard && '--shard'].filter(Boolean).join(', ')}), so it writes the .partial file, which never marks slice ${slice.i}/${slice.n} done` : ''}`);
         if (refused.length) {
             console.log(`  NOT pinned (cannot print or not checked; they stay red): ${refused.length} row(s)`);
             for (const x of refused.slice(0, 40)) console.log(`    ${x.id}: ${String(x.why).slice(0, 160)}`);
@@ -1677,16 +1933,20 @@ if (require.main === module) (async () => {
     // it is never the last line, which is always the verdict (finalVerdict)
     console.log(`\n${TOOL}: ${TALLY.map((s) => `${s} ${byStatus(s).length}`).join(" · ")}`);
 
-    // write: cache, run file
+    // write (N5): the run file FIRST (atomic), then the pins (each atomic), then the cache. A crash after the run file
+    // leaves no pin: the slice is not done and the night is retried; never a slice file without its run's verdicts
+    if (outFile) {
+        writeAtomic(outFile, JSON.stringify(runFile(rows, { started, commit, dirty, P, printHash, ONLY, aff, seventh, slice, shard, kinds, names, timing, slots, batch, live, refused, redFrom, redIds: redRun, affectedDropped, affectedCap, affReached, pinMode, pinRes, reason: reasonArg, aliases, base, baseRecord }), null, 1) + '\n');
+        console.log(`wrote ${path.relative(process.cwd(), outFile)}`);
+    }
+    if (pinRes) {
+        pinRes.flush();
+        for (const w of pinRes.writes) console.log(`wrote ${path.relative(process.cwd(), w.file)}`);
+    }
     if (CACHE) {
         // a row is cached under the entry it was JUDGED against (I3): a row pinned by this run is not cached as OK
         for (const r of toRun) if (r.status === 'OK' && !r.pinned && !r.repinned) cache.rows[r.id] = { depHash: r.depHash, baseline: baselineKey(base, r.id), status: 'OK', date: new Date().toISOString().slice(0, 10) };
-        fs.writeFileSync(CACHE, JSON.stringify(cache, null, 1) + '\n');
-    }
-    if (outFile) {
-        fs.mkdirSync(path.dirname(outFile), { recursive: true });
-        fs.writeFileSync(outFile, JSON.stringify(runFile(rows, { started, commit, dirty, P, printHash, ONLY, aff, seventh, slice, shard, kinds, names, timing, slots, batch, live, refused, redFrom, redIds, affectedDropped, affectedCap, affReached, pinMode, pinRes, reason: reasonArg, aliases }), null, 1) + '\n');
-        console.log(`wrote ${path.relative(process.cwd(), outFile)}`);
+        writeAtomic(CACHE, JSON.stringify(cache, null, 1) + '\n');
     }
     const summary = `${rows.length} row(s), ${toRun.length} run, ${byStatus('CACHED').length} cached, ${(((Date.now() - t0) / 1000)).toFixed(0)} s`;
     if (pinMode === 'repin' && refused.length) {
@@ -1700,10 +1960,14 @@ if (require.main === module) (async () => {
 })().catch((e) => { console.error(`${TOOL}: FAIL - ${has('verbose') ? (e && e.stack) || e : (e && e.message) || e}`); process.exit(1); });
 
 /** The run file (header "THE RUN FILE"): per-row status OK / RED / PENDING / N/A / ERROR; cached rows are OK + cached. */
-function runFile(rows, { started, commit, dirty, P, printHash, ONLY, aff, seventh = null, slice, shard, kinds, names, timing, slots, batch, live, refused, redFrom, redIds, affectedDropped = null, affectedCap, affReached, pinMode = null, pinRes = null, reason = null, aliases = null, now = new Date() }) {
+function runFile(rows, { started, commit, dirty, P, printHash, ONLY, aff, seventh = null, slice, shard, kinds, names, timing, slots, batch, live, refused, redFrom, redIds, affectedDropped = null, affectedCap, affReached, pinMode = null, pinRes = null, reason = null, aliases = null, now = new Date(), base = null, baseRecord = null }) {
     const st = (s) => rows.filter((r) => r.status === s).length;
+    // N2: per row, the key of the entry it was judged against (a renamed row: the old id's entry, `judgedAgainst`)
+    const keyOf = (r) => (r.sizes || r.status === 'CACHED' ? baselineKey(base, (aliases && aliases.get(r.id)) || r.id) : undefined);
     return {
         tool: TOOL, date: now.toISOString().slice(0, 10), started, finished: now.toISOString(), commit, dirty, partners: P.source, printInputsHash: printHash,
+        // N2: the merged baseline the rows were judged against (null: no --baseline, so any finding was red)
+        baseline: baseRecord,
         selection: { skills: ONLY.length ? ONLY : 'all', affected: aff ? { from: aff.A, to: aff.B, files: aff.files, reached: affReached, run: affectedDropped !== null ? 0 : affReached, droppedOverCap: affectedDropped !== null ? { rows: affectedDropped, cap: affectedCap } : undefined } : null,
             seventh, slice: slice ? `${slice.i}/${slice.n}` : (seventh !== null ? `${seventh + 1}/7` : null), shard: shard ? `${shard.i}/${shard.n}` : null, kinds, rows: names,
             redFrom: redFrom ? { dir: path.relative(ROOT, path.resolve(redFrom)), reselected: redIds ? [...redIds].sort() : [] } : null },
@@ -1723,6 +1987,7 @@ function runFile(rows, { started, commit, dirty, P, printHash, ONLY, aff, sevent
             step: r.step || undefined, reason: r.status === 'OK' || r.status === 'CACHED' ? undefined : r.reason,
             rises: r.rises && r.rises.length ? r.rises : undefined, errors: r.errors || undefined,
             pinned: r.pinned || undefined, repinned: r.repinned || undefined,
+            baselineKey: keyOf(r), judgedAgainst: (aliases && aliases.get(r.id)) || undefined,
             sizes: r.sizes ? Object.fromEntries(SIZES.map((s) => [s, { ...r.sizes[s], groups: undefined }])) : undefined,
         })),
     };
