@@ -74,10 +74,12 @@ const spot = (keys, rule, why) => { for (const k of keys) SPOT.push([k, rule, wh
 // unlike denominators: the item's fractions have two different denominators
 spot(['add_frac_unlike', 'sub_frac_unlike', 'add_mixed_unlike', 'sub_mixed_unlike', 'add_frac_unlike_nv', 'sub_frac_unlike_nv', 'add_mixed_unlike_nv', 'sub_mixed_unlike_nv'].map(v => 'fraction_operations:' + v),
   (it) => { const d = dens(it); return d.length >= 2 && new Set(d).size >= 2; }, 'two different denominators');
-// rounding place: the item's numbers are of the place's size, and it names / shows that place
-const PLACE = { '100': [100, /hundred|\bH\b|100/], '1000': [1000, /thousand|\bTh\b|1,?000/], '10000': [10000, /ten thousand|10,?000/], '100000': [100000, /hundred thousand|100,?000/], million: [1000000, /million|1,?000,?000/], tenths: [0, /tenth/], hundredths: [0, /hundredth/] };
-for (const [suf, [size, word]] of Object.entries(PLACE)) {
-  spot(['number_sense:round_sort_' + suf], (it) => (size ? nums(it.v).some(n => n >= size) : /\d\.\d/.test(it.v)) && word.test(it.v), `a nearest-${suf} sort (numbers of that size, the place named)`);
+// rounding sorts: the two bins say "rounds to X" and "rounds to Y", one place apart (500 and 600 for the nearest 100,
+// 0.4 and 0.5 for the nearest tenth), and the numbers to sort lie between them
+const PLACE = { '100': 100, '1000': 1000, '10000': 10000, '100000': 100000, million: 1000000, tenths: 0.1, hundredths: 0.01 };
+for (const [suf, size] of Object.entries(PLACE)) {
+  spot(['number_sense:round_sort_' + suf], (it) => { const m = [...it.v.replace(/(\d),(?=\d{3})/g, '$1').matchAll(/rounds to (\d+(?:\.\d+)?)/g)].map(x => Number(x[1])); return m.length >= 2 && Math.abs(Math.abs(m[1] - m[0]) - size) < size / 1000 && m.every(x => Math.abs(x / size - Math.round(x / size)) < 1e-6); },
+    `a nearest-${suf} sort (bins one ${size} apart)`);
 }
 for (const [id, size] of [['nearest_10', 10], ['nearest_100', 100], ['nearest_1000', 1000], ['nearest_10000', 10000], ['nearest_100000', 100000], ['nearest_million', 1000000]]) {
   spot(['number_sense:' + id], (it) => nums(it.v + ' ' + it.t).some(n => n > size) && !(size > 10 && /nearest 10\b/i.test(it.v)), `rounding to the nearest ${size} (a number past ${size}, never "nearest 10")`);
@@ -98,7 +100,7 @@ spot(['multiplication:nl_mult'], (it) => /<svg/.test(it.x) && /jump|×|groups? o
 function dens(it) {
   const t = it.v.replace(/\s+/g, ' ');
   const side = t.split(/=|Answer/)[0];
-  const parts = side.split(/[+−–-]/).map(p => nums(p)).filter(p => p.length >= 2);
+  const parts = side.split(/[+−–-]/).map(p => nums(p.replace(/\?/g, ' 0 '))).filter(p => p.length >= 2);
   const fromStack = parts.map(p => p[p.length - 1]);
   const slash = [...t.matchAll(/(\d+)\s*\/\s*(\d+)/g)].map(m => +m[2]);
   return fromStack.length >= 2 ? fromStack : slash;
@@ -162,11 +164,11 @@ for (const [k, rule, why] of SPOT) {
     await page.goto(`${base}/design/mockups/teacher-2/app.html?tray=demo10&tview=thumbs#skills`, { waitUntil: 'networkidle' });
     app = await page.evaluate(() => {
       const out = []; let n = 0;
-      for (const c of document.querySelectorAll('[data-skill-key]')) {
+      for (const c of document.querySelectorAll('[data-skill]')) {
         const svg = c.querySelector('svg.smp-svg, svg[data-fallback]'); if (!svg) continue; n++;
-        if (svg.getAttribute('data-smp') !== c.getAttribute('data-skill-key') && !svg.hasAttribute('data-fallback')) out.push(`app.html: ${c.getAttribute('data-skill-key')} shows ${svg.getAttribute('data-smp')}`);
+        if (svg.getAttribute('data-smp') !== c.getAttribute('data-skill') && !svg.hasAttribute('data-fallback')) out.push(`app.html: ${c.getAttribute('data-skill')} shows ${svg.getAttribute('data-smp')}`);
       }
-      if (n < 10) out.push(`app.html: only ${n} thumbnails carry their skill (data-skill-key)`);
+      if (n < 10) out.push(`app.html: only ${n} thumbnails carry their skill (data-skill)`);
       return out;
     });
   } finally { await browser.close(); server.close(); }

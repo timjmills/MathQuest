@@ -895,7 +895,7 @@
     if (off && picCount(out) && PLAIN_DRAW[kind]) out = PLAIN_DRAW[kind](rng(s.c + ':' + s.v + ':' + (seed === undefined ? '' : seed)), s);
     return { kind, out, off };
   }
-  function draw(s, seed, opts) {
+  function drawHand(s, seed, opts) {
     const { kind, out, off } = bare(s, seed, opts); if (off) return out;
     // a Visual skill or a word problem with Pictures on gets a picture drawn from its own numbers (PICS), never a stand-in
     const wantsPic = PICT.test(s.l) || /^story-/.test(kind);
@@ -903,5 +903,37 @@
   }
   // the bare drawing, before any picture is added (thumbs-check compares the two: an added picture must carry its data)
   function base(s, seed, opts) { return bare(s, seed, opts).out; }
-  root.MQThumbs = { draw, base, kindOf, rng, int, picCount, KINDS: Object.keys(D), POOLS: Object.keys(POOL) };
+  // ---- fix round 4 (critic r4 C1, stop rule §1.7): the thumbnail IS the real app's item. samples.js (capture-samples.cjs)
+  // holds each live skill's first seeded cells exactly as the real sheet kit prints them, sanitised; a seed picks one of
+  // them. The hand drawing above is only the fallback for a skill whose generation threw (MQ_SAMPLES.fail).
+  function hashStr(str) { let h = 2166136261; for (const ch of String(str)) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+  const escA = (x) => String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  function samplesOf(s) { const S = root.MQ_SAMPLES; return S && S.s ? S.s[s.c + ':' + s.v] || null : null; }
+  // seed → which captured item: none (a card) is the first item; any other seed picks by its hash (New numbers re-deals)
+  function sampleIndex(seed, n) { return seed === undefined || seed === null || seed === 1 ? 0 : hashStr('pick:' + seed) % n; }
+  function sampleSvg(key, it, j) {
+    const vb = it.c || [0, 0, it.w, it.ht];
+    return `<svg class="smp-svg" data-smp="${escA(key)}" data-h="${it.h}" data-i="${j}" viewBox="${vb.join(' ')}" width="${vb[2]}" height="${vb[3]}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${escA(it.v || it.t || '')}">` +
+      `<foreignObject x="0" y="0" width="${it.w}" height="${it.ht}" class="smp-fo"><div xmlns="http://www.w3.org/1999/xhtml" class="smp">${it.x}</div></foreignObject></svg>`;
+  }
+  function draw(s, seed, opts) {
+    const list = samplesOf(s);
+    if (!list || !list.length) return drawHand(s, seed, opts).replace(/^<svg /, '<svg data-fallback="1" ');
+    const j = sampleIndex(seed, list.length);
+    return sampleSvg(s.c + ':' + s.v, list[j], j);
+  }
+  // the n-th distinct item of a skill (previews deal 0, 1, 2 … so an item never repeats on a page); null past the last
+  function drawItem(s, n, offset) {
+    const list = samplesOf(s); if (!list || !list.length) return n === 0 ? draw(s, offset) : null;
+    if (n >= list.length) return null; const j = (n + (offset ? hashStr('pick:' + offset) : 0)) % list.length;
+    return sampleSvg(s.c + ':' + s.v, list[j], j);
+  }
+  // the sample a seed shows (text, answer, visible text) — previews, the board and the checks read it
+  function sample(s, seed) { const list = samplesOf(s); if (!list || !list.length) return null; const j = sampleIndex(seed, list.length); return Object.assign({ i: j }, list[j]); }
+  function sampleCount(s) { const list = samplesOf(s); return list ? list.length : 0; }
+  // the samples' own stylesheet (atoms + a reset that keeps the page's rules out), added once
+  if (typeof document !== 'undefined' && root.MQ_SAMPLES && root.MQ_SAMPLES.css && !document.getElementById('mq-samples-css')) {
+    const st = document.createElement('style'); st.id = 'mq-samples-css'; st.textContent = root.MQ_SAMPLES.css; (document.head || document.documentElement).appendChild(st);
+  }
+  root.MQThumbs = { draw, drawItem, drawHand, sample, sampleCount, sampleIndex, hashStr, base, kindOf, rng, int, picCount, KINDS: Object.keys(D), POOLS: Object.keys(POOL) };
 })(typeof window !== 'undefined' ? window : globalThis);
