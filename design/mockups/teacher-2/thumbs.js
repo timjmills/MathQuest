@@ -776,15 +776,78 @@
   function picCount(svgStr) {   // how much of the drawing is a picture (shapes and filled parts, not text, answer boxes or rules)
     return (svgStr.match(/<(circle|ellipse|polygon|path|polyline)\b/g) || []).length + (svgStr.match(/<rect[^>]*fill="(?!none)[^"]*"/g) || []).length + ([...svgStr.matchAll(/<line x1="([\d.-]+)" y1="([\d.-]+)" x2="([\d.-]+)" y2="([\d.-]+)"/g)].filter(m => !(m[2] === m[4] && Math.abs(m[3] - m[1]) < 60)).length >= 2 ? 1 : 0);   // fraction bars are not pictures
   }
-  function counters(n) { let b = ''; for (let i = 0; i < n; i++) b += circ(9 + (i % 5) * 15, 9 + Math.floor(i / 5) * 15, 6, i % 2 ? '#fff' : GREY); return { w: 5 * 15 + 4, h: Math.ceil(n / 5) * 15 + 4, b }; }
-  function fracPic(n, d) { let b = ''; const w = 120 / d; for (let i = 0; i < d; i++) b += rect(2 + i * w, 6, w, 30, i < n ? GREY : '#fff'); return { w: 126, h: 42, b }; }
-  function ruler() { let b = `<polyline points="2,8 122,8 122,38 2,38 2,8" fill="none" stroke="#000" stroke-width="2"/>`; for (let i = 0; i <= 12; i++) b += ln(2 + i * 10, 8, 2 + i * 10, i % 4 ? 16 : 22, 1.5); return { w: 126, h: 42, b }; }
+  // ---- fix round 3 (critic r3 C1): an added picture is drawn FROM the problem — the numbers in the problem's own text,
+  //      in order — or not at all. Each is a <g data-pic="type" data-vals="…"> group that thumbs-check reads back: its
+  //      values must be the problem's numbers, and the counters (class ctr), crossed-out counters (class x), parts
+  //      (class pp) and grey parts it draws must be the counts it declares. Grey means one thing: the part that is
+  //      counted (the added group, the shaded fraction).
+  const numsIn = (svgStr) => (svgStr.replace(/<[^>]+>/g, ' ').replace(/(\d),(?=\d{3})/g, '$1').match(/\d+(?:\.\d+)?/g) || []).map(Number);
+  const pic = (type, vals, extra, w, h, b) => ({ w, h, b: `<g data-pic="${type}" data-vals="${vals.join(',')}"${Object.entries(extra || {}).map(([k, v]) => ` data-${k}="${v}"`).join('')}>${b}</g>` });
+  const ctr = (x, y, fill = '#fff', r = 5.5) => `<circle class="ctr" cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="#000" stroke-width="1.8"/>`;
+  const xOut = (x, y) => `<path class="x" d="M${x - 6} ${y - 6}L${x + 6} ${y + 6}M${x + 6} ${y - 6}L${x - 6} ${y + 6}" stroke="#000" stroke-width="2"/>`;
+  const pp = (x, y, w, h, on) => `<rect class="pp" x="${x}" y="${y}" width="${w}" height="${h}" fill="${on ? GREY : '#fff'}" stroke="#000" stroke-width="1.6"/>`;
+  function ctrRows(n, x0, y0, fill, per = 5, step = 14) { let b = ''; for (let i = 0; i < n; i++) b += ctr(x0 + (i % per) * step + 7, y0 + Math.floor(i / per) * step + 7, typeof fill === 'function' ? fill(i) : fill); return b; }
+  const P = {
+    // a + b: two groups, the added group grey
+    add(a, b) { const rows = Math.max(Math.ceil(a / 5), Math.ceil(b / 5)); return pic('counters-add', [a, b], { count: a + b }, 2 * 70 + 10, rows * 14 + 2, ctrRows(a, 0, 1, '#fff') + ctrRows(b, 80, 1, GREY)); },
+    // a, b of them crossed out (take away)
+    take(a, b) { let x = ''; for (let i = a - b; i < a; i++) x += xOut((i % 5) * 14 + 7, Math.floor(i / 5) * 14 + 8); return pic('counters-take', [a, b], { count: a, x: b }, 72, Math.ceil(a / 5) * 14 + 2, ctrRows(a, 0, 1, '#fff') + x); },
+    // two rows lined up to compare
+    compare(a, b) { const per = Math.max(a, b) > 10 ? 10 : Math.max(a, b); const w = per * 12; const row = (n, y) => { let o = ''; for (let i = 0; i < n; i++) o += ctr((i % per) * 12 + 6, y + Math.floor(i / per) * 12, '#fff', 4.8); return o; }; const ra = Math.ceil(a / per), rb = Math.ceil(b / per); return pic('counters-compare', [a, b], { count: a + b }, w + 2, (ra + rb) * 12 + 8, row(a, 7) + row(b, ra * 12 + 13)); },
+    // a groups of b
+    groups(a, b) { let o = ''; const gw = Math.min(b, 3) * 11 + 8, gh = Math.ceil(b / 3) * 11 + 8; for (let g = 0; g < a; g++) { const gx = (g % 3) * (gw + 6), gy = Math.floor(g / 3) * (gh + 6); o += `<rect x="${gx + 1}" y="${gy + 1}" width="${gw}" height="${gh}" rx="6" fill="none" stroke="#000" stroke-width="1.5"/>`; for (let i = 0; i < b; i++) o += ctr(gx + 9 + (i % 3) * 11, gy + 9 + Math.floor(i / 3) * 11, '#fff', 4.2); } return pic('groups', [a, b], { count: a * b }, 3 * (gw + 6), Math.ceil(a / 3) * (gh + 6), o); },
+    // rows × columns of squares
+    array(r, c) { const k = Math.min(12, Math.floor(84 / Math.max(r, c))); let o = ''; for (let i = 0; i < r; i++) for (let j = 0; j < c; j++) o += pp(1 + j * k, 1 + i * k, k, k, false); return pic('array', [r, c], { cells: r * c }, c * k + 3, r * k + 3, o); },
+    // N counters in columns of b (equal groups, the last one short)
+    columnsOf(n, b) { let o = ''; for (let i = 0; i < n; i++) o += ctr(Math.floor(i / b) * 12 + 6, (i % b) * 12 + 6, '#fff', 4.6); return pic('rows-of', [n, b], { count: n }, Math.ceil(n / b) * 12 + 2, b * 12 + 2, o); },
+    // a bar model: parts [{label, w, dashed}], the whole's label above
+    bar(type, vals, parts, whole) { const W = 150; const tot = parts.reduce((t, x) => t + x.w, 0); let x = 1, o = ''; for (const q of parts) { const w = W * q.w / tot; o += q.dashed ? `<rect x="${x}" y="22" width="${w}" height="26" fill="none" stroke="#000" stroke-width="1.6" stroke-dasharray="4 3"/>` : pp(x, 22, w, 26, q.on); o += txt(x + w / 2, 41, q.label, 14, 'middle'); x += w; } o += `<path d="M1 18 v-5 h${W} v5" fill="none" stroke="#000" stroke-width="1.5"/>` + txt(W / 2 + 1, 11, whole, 13, 'middle'); return pic(type, vals, { cells: parts.filter(q => !q.dashed).length }, W + 3, 52, o); },
+    // fraction bars: rows of d parts, the first `shade` parts grey across the bars
+    bars(type, vals, nBars, d, shade, extra = {}, label) { const W = 100, h = 12, per = nBars > 4 ? Math.ceil(nBars / 2) : nBars, top = label ? 16 : 0; let o = '', left = shade; for (let k = 0; k < nBars; k++) { const bx = Math.floor(k / per) * (W + 10), by = top + (k % per) * (h + 4); for (let i = 0; i < d; i++) o += pp(bx + 1 + i * W / d, by + 1, W / d, h, left-- > 0); } if (label) o += `<path d="M1 13 v-4 h${W} v4" fill="none" stroke="#000" stroke-width="1.5"/>` + txt(W / 2, 8, label, 12, 'middle'); return pic(type, vals, Object.assign({ cells: nBars * d, shaded: Math.max(0, shade) }, extra), nBars > 4 ? 2 * W + 13 : W + 3, top + per * (h + 4), o); },
+    // pizzas: circles of d slices, `shade` slices grey across them
+    pizzas(type, vals, n, d, shade) { const R = 20; let o = '', left = shade; for (let k = 0; k < n; k++) { const cx = 22 + k * 46, cy = 22; for (let i = 0; i < d; i++) { const a0 = -Math.PI / 2 + i * 2 * Math.PI / d, a1 = a0 + 2 * Math.PI / d; const p0 = [cx + R * Math.cos(a0), cy + R * Math.sin(a0)], p1 = [cx + R * Math.cos(a1), cy + R * Math.sin(a1)]; o += `<path class="pp" d="M${cx} ${cy}L${p0[0].toFixed(1)} ${p0[1].toFixed(1)}A${R} ${R} 0 0 1 ${p1[0].toFixed(1)} ${p1[1].toFixed(1)}Z" fill="${left-- > 0 ? GREY : '#fff'}" stroke="#000" stroke-width="1.5"/>`; } } return pic(type, vals, { cells: n * d, shaded: Math.max(0, shade) }, n * 46, 46, o); },
+  };
+  // the picture for each kind, from the problem's numbers (nums: the numbers of the problem's text, in order); null = none
+  const PICS = {
+    'story-add': ([a, b]) => a + b <= 20 ? P.add(a, b) : P.bar('bar', [a, b], [{ label: fmt(a), w: a }, { label: fmt(b), w: b }], '?'),
+    'story-sub': ([a, b]) => a <= 20 ? P.take(a, b) : P.bar('bar', [a, b], [{ label: fmt(b), w: b }, { label: '?', w: a - b }], fmt(a)),
+    'story-sub-start': ([b, c]) => P.bar('bar', [b, c], [{ label: fmt(b), w: b }, { label: fmt(c), w: c }], '?'),
+    'story-compare': ([a, b]) => P.compare(a, b),
+    'story-mult': ([a, b]) => a * b <= 30 ? P.groups(a, b) : P.bar('bar', [a, b], Array.from({ length: a }, () => ({ label: fmt(b), w: 1 })), '?'),
+    'story-mult-compare': ([b, a]) => P.bar('bar', [b, a], Array.from({ length: a }, () => ({ label: fmt(b), w: 1 })), '?'),
+    'story-div': ([t, b]) => P.bar('bar', [t, b], Array.from({ length: b }, () => ({ label: '?', w: 1 })), fmt(t)),
+    'story-div-group': ([t, b]) => P.bar('bar', [t, b], [{ label: fmt(b), w: b }, { label: fmt(b), w: b }, { label: '…', w: Math.max(b, t - 2 * b), dashed: true }], fmt(t)),
+    'story-remainder': ([t, b]) => P.bar('bar', [t, b], [{ label: fmt(b), w: b }, { label: fmt(b), w: b }, { label: '…', w: Math.max(b, t - 2 * b), dashed: true }], fmt(t)),
+    'story-mixed': ([a, b, c]) => { let o = ''; for (let i = 0; i < b; i++) o += pp(1 + i * 34, 4, 30, 30, false) + txt(16 + i * 34, 25, a, 15, 'middle'); o += txt(b * 34 + 6, 25, `− ${c}`, 16); return pic('boxes', [a, b, c], { cells: b }, b * 34 + 40, 38, o); },
+    'story-frac': ([n1, d1, n2, d2]) => { const A = P.pizzas('frac', [n1, d1], 1, d1, n1), B = P.pizzas('frac', [n2, d2], 1, d2, n2); return { w: A.w + B.w, h: 46, b: A.b + `<g transform="translate(${A.w} 0)">${B.b}</g>` }; },
+    'story-frac-mult': ([n, d]) => P.bars('frac', [n, d], 1, d, n),
+    'story-frac-div': ([a, b]) => P.pizzas('wholes', [a, b], a, b, 0),
+    'story-convert': ([a], s, out) => { const u = (out.match(/(\d+) (yards?|feet|foot|inch(?:es)?|miles?|metres?|meters?|km|cm|m)\b/) || [])[2] || 'unit'; let o = ''; for (let i = 0; i < a; i++) o += pp(1 + i * 40, 4, 40, 22, false) + txt(21 + i * 40, 20, u.replace(/s$/, '').replace('yard', 'yd'), 12, 'middle'); return pic('units', [a], { cells: a }, a * 40 + 3, 30, o); },
+    'story-algebra': ([n, m]) => P.bar('bar', [n, m], [{ label: '?', w: Math.max(1, m - n) }, { label: fmt(n), w: n }], fmt(m)),
+    'count-next': ([a, b]) => { let o = ''; [a, b, ''].forEach((v, i) => { o += pp(1 + i * 34, 2, 34, 30, false) + (v !== '' ? txt(18 + i * 34, 23, v, 15, 'middle') : ''); }); return pic('track', [a, b], { cells: 3 }, 106, 36, o); },
+    'odd-even': ([n]) => { const t = Math.floor(n / 10), u = n % 10; let o = ''; for (let i = 0; i < t; i++) o += `<rect class="rod" x="${1 + i * 12}" y="1" width="9" height="60" fill="#fff" stroke="#000" stroke-width="1.6"/>`; for (let i = 0; i < u; i++) o += ctr(t * 12 + 10 + (i % 2) * 13, 7 + Math.floor(i / 2) * 13, '#fff', 5); return pic('pairs', [n], { count: u }, t * 12 + 34, 64, o); },
+    'true-false': ([a, b]) => P.add(a, b),
+    'mult-properties': ([a, b]) => P.array(a, b),
+    'div-remainder': ([n, b]) => P.columnsOf(n, b),
+    'missing-div': ([b, q]) => P.array(b, q),
+    'frac-mixed-number': ([n, d]) => P.pizzas('frac-improper', [n, d], Math.ceil(n / d), d, n),
+    'frac-add-mixed': (v) => mixedPair(v), 'frac-sub-mixed': (v) => mixedPair(v),
+    'frac-times-whole': ([k, n, d]) => copies(k, n, d),
+    'frac-times-frac': ([n1, d1, n2, d2]) => { const c = 14; let o = ''; for (let i = 0; i < d1; i++) for (let j = 0; j < d2; j++) o += pp(1 + j * c, 1 + i * c, c, c, i < n1 && j < n2); return pic('frac-area', [n1, d1, n2, d2], { cells: d1 * d2, shaded: n1 * n2 }, d2 * c + 3, d1 * c + 3, o); },
+    'frac-div': ([a, , d]) => P.bars('wholes', [a, d], a, d, 0),
+    'frac-as-div': ([a, b]) => P.bars('wholes', [a, b], a, b, 0),
+    'frac-scaling': ([n, d, t]) => P.bars('frac-of-amount', [n, d, t], 1, d, n, {}, String(t)),
+    'frac-decompose': ([n, d]) => P.bars('frac', [n, d], 1, d, n),
+    'frac-tenths': ([n, d]) => P.bars('frac', [n, d], 1, d, n),
+    'dec-round': (v, s, out) => { const m = out.replace(/<[^>]+>/g, ' ').match(/\d+\.\d+/); if (!m) return null; const at = Number(m[0]); const from = Math.floor(at * 10 + 1e-9) / 10, to = Math.round((from + 0.1) * 10) / 10; const x = 10 + (at - from) / 0.1 * 120; let o = ln(10, 26, 130, 26, 2); for (let i = 0; i <= 10; i++) o += ln(10 + i * 12, i % 5 ? 21 : 18, 10 + i * 12, i % 5 ? 31 : 34, 1.5); o += txt(10, 52, from.toFixed(1), 13, 'middle') + txt(130, 52, to.toFixed(1), 13, 'middle') + `<path d="M${x.toFixed(1)} 6 l-5 -6 h10 z" fill="#000"/>` + ln(x, 6, x, 24, 2); return pic('numline', [m[0]], { at: m[0], from: from.toFixed(1), to: to.toFixed(1) }, 142, 56, o); },
+    'convert': ([a], s, out) => { const u = (out.replace(/<[^>]+>/g, ' ').match(/\d+ ([a-zA-Z]+) =/) || [])[1] || ''; let o = ''; for (let i = 0; i < a; i++) o += pp(1 + i * 24, 4, 24, 22, false) + txt(13 + i * 24, 20, u, 11, 'middle'); return pic('units', [a], { cells: a }, a * 24 + 3, 30, o); },
+  };
+  function mixedPair(v) { const groups = []; for (let i = 0; i + 2 < v.length && groups.length < 2; i += 3) groups.push(v.slice(i, i + 3)); let o = '', x = 0, H = 0; for (const [w, n, d] of groups) { const k = w + 1; const g = P.bars('frac-mixed', [w, n, d], k, d, w * d + n); g.w = 60; let body = g.b.replace(/width="([\d.]+)"/g, (m0, ww) => `width="${(Number(ww) * 0.55).toFixed(2)}"`).replace(/ x="([\d.]+)"/g, (m0, xx) => ` x="${(Number(xx) * 0.55).toFixed(2)}"`); o += `<g transform="translate(${x} 0)">${body}</g>`; x += 66; H = Math.max(H, k * 16); } return { w: x, h: H, b: o }; }
+  function copies(k, n, d) { const W = 72, h = 11, per = k > 4 ? Math.ceil(k / 2) : k; let o = ''; for (let b = 0; b < k; b++) { const bx = Math.floor(b / per) * (W + 8), by = (b % per) * (h + 4); for (let i = 0; i < d; i++) o += pp(bx + 1 + i * W / d, by + 1, W / d, h, i < n); } return pic('frac-copies', [k, n, d], { cells: k * d, shaded: k * n }, (k > 4 ? 2 * W + 10 : W + 3), per * (h + 4)); }
   function withPicture(out, s, kind) {
-    const m = out.match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/); if (!m) return out; const W = Number(m[1]), H = Number(m[2]);
-    const nums = (out.replace(/<[^>]+>/g, ' ').match(/\d+/g) || []).map(Number).filter(x => x > 0);
-    const p = /frac|^story-frac|^dec-/.test(kind) || s.c === 'fractions' || s.c === 'fraction_operations' ? fracPic(3, 4)
-      : /angle|convert/.test(kind) ? ruler() : counters(Math.min(10, Math.max(3, nums[0] || 5)));
-    const h = Math.max(H, p.h); const body = out.replace(/<svg[^>]*>|<\/svg>$/g, '');
+    const m = out.match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/); const make = PICS[kind]; if (!m || !make) return out;
+    const p = make(numsIn(out), s, out); if (!p) return out;
+    const W = Number(m[1]), H = Number(m[2]); const h = Math.max(H, p.h); const body = out.replace(/<svg[^>]*>|<\/svg>$/g, '');
     return svg(Math.ceil(W + 16 + p.w), Math.ceil(h), `<g transform="translate(0 ${(h - H) / 2})">${body}</g><g transform="translate(${W + 16} ${(h - p.h) / 2})">${p.b}</g>`);
   }
   const PLAIN_DRAW = {
