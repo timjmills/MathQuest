@@ -18,3 +18,6 @@ Owns: `design/mockups/teacher-2/`, `tests/scripts/ws-teacher-tokens.cjs`, this f
 | 2026-10-23 | Critic round 2 (fresh critic) | mq-opus-medium | running |
 | 2026-10-23 | Critic r2: A 6 · B 9 · C 8 · D 8 — FAIL (`critic-r2.md`). Chip-name truncation (r1 #9) and the Operations colour (r1 #8) survived two medium rounds → §1.7 stop rule: root causes made machine checks first (text clipped inside elements / chip name min width; bold vs ink and dark-tint vs page separation), then a fresh builder | lead | FAIL |
 | 2026-10-23 | Fix round 2: fresh builder, checks first | mq-opus-medium | running |
+| 2026-10-23 | Owner via lead: grade badge (neutral numbered circle, fixed slot) + grade grouping. Owner: warm stone page #EFECE8, current tints | lead | — |
+| 2026-10-23 | Fix round 2: checks first (cea2d872 failing), then fixes b66395f5, fdbe3486, 5a74f98a, b9473ab7; OA → #555BAE, Data → #4B8FCC; all gates OK | mq-opus-medium | done |
+| 2026-10-23 | Critic round 3 (fresh critic) | mq-opus-medium | running |
