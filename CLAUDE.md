@@ -62,7 +62,8 @@ outrank any general design advice or skill:
 - **The speed reflection cycle runs after EVERY lane, family, pilot or tool build (owner, 2026-10-23: "always perform it so
   that we get better and better, faster and faster")**: an independent auditor measures it against the targets, finds the
   causes of every lost round or hour, turns each into a check, rule or tool fix before the next lane, and records it in
-  `design/status/speed-audit.md` + `metrics.md` (LESSONS_LEARNED "Process rules" 00).
+  `design/status/speed-audit.md` + `metrics.md` (LESSONS_LEARNED "Process rules" 00) After EVERY critic round, pass or fail, the lane
+  records the automatic checks that would have caught each finding and the speed-ups the round revealed.
 - **Process rules (owner, 2026-10-23)** live in `design/audit/LESSONS_LEARNED.md` "Process rules" and `design/audit/RUBRIC.md`
   "How a page counts as graded". Lanes write `design/status/<lane>.md`, never `design/STATUS.md`.
 - **8 or better, everywhere.** A redone skill is done only when it scores ≥ 8 on all four criteria
