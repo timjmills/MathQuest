@@ -16,3 +16,5 @@ Owns: `design/mockups/teacher-2/`, `tests/scripts/ws-teacher-tokens.cjs`, this f
 | 2026-10-23 | Fix round 1 (failed a critic round → medium, Q-S7) | mq-opus-medium | running |
 | 2026-10-23 | Fix round 1: all 13 r1 defects fixed (3d3c350f, 879f42e8, d4a9b668); checks at 1366/1280/1024/820/390; OA → #2E2B71 | mq-opus-medium | done |
 | 2026-10-23 | Critic round 2 (fresh critic) | mq-opus-medium | running |
+| 2026-10-23 | Critic r2: A 6 · B 9 · C 8 · D 8 — FAIL (`critic-r2.md`). Chip-name truncation (r1 #9) and the Operations colour (r1 #8) survived two medium rounds → §1.7 stop rule: root causes made machine checks first (text clipped inside elements / chip name min width; bold vs ink and dark-tint vs page separation), then a fresh builder | lead | FAIL |
+| 2026-10-23 | Fix round 2: fresh builder, checks first | mq-opus-medium | running |
