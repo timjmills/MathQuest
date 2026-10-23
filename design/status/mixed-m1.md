@@ -21,3 +21,12 @@ Owner ruling 2026-10-23 (repeats), final: "the big idea is to fill the page or n
 always full. OFF: unique facts only; the page may end early, with a note. Related facts (8×10 / 80÷10, 13−6 / 13−7) are a
 separate option `families` (default OFF) and never used to fill when off. Both are appended share-code tokens (absent =
 default). The T3 lane adds the controls.
+
+## Owner design list (batched per LESSONS_LEARNED "Process rules" 0 from now on)
+
+| Date | Owner's words | State |
+|---|---|---|
+| 2026-10-23 | "Repeated facts- should be allowed as an option or inverse facts to fill page" … "inverse facts for multiplication or addition 4+1 1+4 … not for multiplication then division. Although this could be a separate option" … "the big idea is to fill page or not" | built in r4 (`fill`, `families`; codes `F0`, `X1`) — given before the batching rule |
+| 2026-10-23 | "do as you think best" (fill-off remainder: follow PG-15 / PT-ENG-7, closed rectangle, blank trailing area, no staircase) | in the r6 fixer |
+
+Critic r4: 14 / 16 pages pass. Critic r5: the 3 changed pages pass (all ≥ 8). Open: spot-check of the weighted 1 : 3 M page (moved to 6 across) and the PG-15 trailing area.
