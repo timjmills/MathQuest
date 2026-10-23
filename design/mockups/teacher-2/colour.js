@@ -51,8 +51,10 @@
   function textFor(h) { const w = cr(h, CREAM), i = cr(h, INK); return (w >= 4.5 && w >= i) ? 'cream' : (i >= 4.5 ? 'ink' : (w >= 4.5 ? 'cream' : null)); }
   function deep(b) { let t = 0.75; while (cr(mix(b, '#000000', t), CREAM) < 7) t -= 0.01; return mix(b, '#000000', t); }
   function light(b, under) { let t = 0.5; while (cr(mix(b, CREAM, t), under) < 7) t -= 0.01; return mix(b, CREAM, t); }
+  // dark tint: 18 % of the bold over the dark page, raised 1 % at a time until >= 1.2 : 1 from the page (fix round 2)
+  function darkTint(b) { let t = 0.18, x = mix(b, DARK, t); while (cr(x, DARK) < 1.2) { t = Math.round((t + 0.01) * 100) / 100; x = mix(b, DARK, t); } return x; }
   function ramp(b) {
-    const tint = mix(b, CREAM, 0.10), soft = mix(b, CREAM, 0.30), dTint = mix(b, DARK, 0.18), dSoft = mix(b, DARK, 0.40);
+    const tint = mix(b, CREAM, 0.10), soft = mix(b, CREAM, 0.30), dTint = darkTint(b), dSoft = mix(b, DARK, 0.40);
     return { bold: b, on: textFor(b) === 'cream' ? CREAM : INK, tint, soft, deep: deep(b), dTint, dSoft, dLight: light(b, dTint) };
   }
   const api = { INK, WHITE, CREAM, DARK, KEY, ERR, rgb, lum, cr, lab, de00, mix, textFor, deep, light, ramp, simulate };

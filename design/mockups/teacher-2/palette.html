@@ -21,7 +21,7 @@
   <div id="light"></div>
 
   <h2>Board C, dark mode</h2>
-  <p class="note">Page #0F0E0C. Tint = 18 % and soft = 40 % of the bold over the page with cream text; the fourth strength is a light version (bold mixed with cream), ≥ 7 : 1 on the dark tint. Chip outlines are #E8DFD2.</p>
+  <p class="note">Page #0F0E0C. Tint = 18 % of the bold over the page (raised 1 % at a time until it is ≥ 1.2 : 1 from the page, so every group shows) and soft = 40 % with cream text; the fourth strength is a light version (bold mixed with cream), ≥ 7 : 1 on the dark tint. Chip outlines are #E8DFD2.</p>
   <div id="dark" class="dark-panel"></div>
 
   <h2>Chips: one rule for every state</h2>
@@ -37,10 +37,10 @@
 
   <h2>Where board C moved from the site’s colours</h2>
   <div id="moved"></div>
-  <h3>Fix round 1 (2026-10-23): Operations muted</h3>
-  <p class="note">Critic round 1 found the Operations violet #5B1FAB the one saturated colour on a muted board, and Operations leads every grade 1–5 list, so the first screen opened on violet. It is now a dusty ink-indigo, <b>#2E2B71</b> (CIELAB chroma 46, was 83). It was the least saturated colour the §2.8 thresholds allow there: a lighter or greyer violet falls within 12 of Fractions plum or Data blue under protanopia or deuteranopia, or within 20 of them with normal vision. Its closest pairs: OA–NF 12.3 under protanopia (needs 12) and 21.7 with normal vision (needs 20); OA–DATA 22.3. Text on it is cream, 11.6 : 1.</p>
+  <h3>Fix round 2 (2026-10-23): Operations lifted off the ink</h3>
+  <p class="note">Critic round 2 found the round-1 Operations #2E2B71 only 1.45 : 1 from the warm ink of the primary button, so a tray of Operations chips read as four black buttons, and in dark mode its tint (1.05 : 1) and bold (1.56 : 1) vanished on the page. The gate now holds every bold to <b>≥ 20 ΔE from ink and from the dark-mode cream primary, ≥ 2.0 : 1 against ink, ≥ 3 : 1 against the dark page</b>, and every dark tint to <b>≥ 1.2 : 1</b> against the page. No mid-value indigo passes beside the round-1 Data blue (they fall within 12 of each other under deuteranopia), so the search moved five colours together, by the least total ΔE: Operations <b>#2E2B71 → #555BAE</b> (mid indigo, L* 42, ΔE 16.3, now 2.99 : 1 from ink and 3.21 : 1 on the dark page; it moved back toward the site’s own violet #8579B6), Data #486E9C → <b>#4B8FCC</b> (ΔE 13.1, toward the site’s dusty blue #7A9AC2), Fractions #7F3E63 → <b>#865273</b> (5.9), Geometry #278E8D → <b>#399993</b> (4.3), Counting #CD9CC3 → <b>#CEA4C5</b> (2.6), and the stone #57534E → <b>#706C6A</b> (9.4). Gold, sage and peach did not move. Every margin widened except bold vs bold (20.7 → 20.6, OA–NF): the closest colour-blind pair sharing a grade is now 12.9 (CC–DATA, protanopia; was OA–NF 12.3), and ink on Geometry is 5.3 : 1 (was 4.57).</p>
   <h3>Margins to watch</h3>
-  <p class="note">Two text-on-bold pairs pass with little room: warm ink on Geometry teal #278E8D is <b>4.57 : 1</b> and cream on Data blue #486E9C is <b>4.93 : 1</b> (both need 4.5). Any change to either shade must be re-checked with <code>node tests/scripts/ws-teacher-tokens.cjs</code> before it is shown. The colour-blind pairs closest to their lines are DATA–G under deuteranopia (12.8) and OA–NF under protanopia (12.3).</p>
+  <p class="note">Bold vs bold with normal vision is 20.6 (OA–NF; needs 20); Operations is 2.99 : 1 from ink and Fractions 3.19 : 1 on the dark page (need 2.0 and 3). Any change to these shades must be re-checked with <code>node tests/scripts/ws-teacher-tokens.cjs</code> before it is shown.</p>
   <h2>Boards B and A (reference pictures only)</h2>
   <p class="note">Board B (saturated, on white) was chosen on 2026-10-23 and replaced the same day by board C; board A (six areas) was not chosen. Both are kept as static pictures so the choice can be revisited; the mock-up uses board C only.</p>
   <img class="board" src="board-b.png" alt="Board B: eight saturated maths-area colours in four strengths, for reference">
@@ -50,10 +50,10 @@
 <script>
 (function () {
   const C = window.MQColour;
-  const A = [['CC', 'Counting & cardinality', '#CD9CC3'], ['OA', 'Operations & algebra', '#2E2B71'], ['NBT', 'Place value & base ten', '#E7CF69'], ['NF', 'Fractions & decimals', '#7F3E63'],
-    ['MEAS', 'Measurement', '#A9CFAA'], ['DATA', 'Data', '#486E9C'], ['G', 'Geometry', '#278E8D'], ['RPNS', 'Ratio & number system', '#D8A480']];
-  const SLATE = ['SLATE', 'Stone: Mixed · Words · No standard', '#57534E'];
-  const FROM = { CC: ['mauve', '#C291B8'], OA: ['deep violet', '#6A1B9A'], NBT: ['gold', '#F6C96A'], NF: ['plum', '#8E5480'], MEAS: ['sage', '#9AB88B'], DATA: ['blue', '#3D6491'], G: ['teal', '#00838F'], RPNS: ['peach', '#F2C8A0'] };
+  const A = [['CC', 'Counting & cardinality', '#CEA4C5'], ['OA', 'Operations & algebra', '#555BAE'], ['NBT', 'Place value & base ten', '#E7CF69'], ['NF', 'Fractions & decimals', '#865273'],
+    ['MEAS', 'Measurement', '#A9CFAA'], ['DATA', 'Data', '#4B8FCC'], ['G', 'Geometry', '#399993'], ['RPNS', 'Ratio & number system', '#D8A480']];
+  const SLATE = ['SLATE', 'Stone: Mixed · Words · No standard', '#706C6A'];
+  const FROM = { CC: ['mauve', '#C291B8'], OA: ['violet', '#8579B6'], NBT: ['gold', '#F6C96A'], NF: ['plum', '#8E5480'], MEAS: ['sage', '#9AB88B'], DATA: ['dusty blue', '#7A9AC2'], G: ['teal', '#00838F'], RPNS: ['peach', '#F2C8A0'] };
   const GR = { K: ['CC', 'OA', 'NBT', 'MEAS', 'DATA', 'G'], 'Grades 1–2': ['OA', 'NBT', 'MEAS', 'DATA', 'G'], 'Grades 3–5': ['OA', 'NBT', 'NF', 'MEAS', 'DATA', 'G'], 'Grade 6': ['RPNS', 'OA', 'DATA', 'G'] };
   const f = (x) => x.toFixed(1);
   const sw = (bg, fg, top, bottom, extra = '') => `<div class="sw ${extra}" style="background:${bg};color:${fg}"><b>${top}</b><span>${bottom}</span></div>`;

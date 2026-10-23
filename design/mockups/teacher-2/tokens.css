@@ -3,7 +3,7 @@
    mono labels, muted "painted" area colours). The ONLY place raw values live.
    tests/scripts/ws-teacher-tokens.cjs parses this file and checks every colour against the palette rules (§2.7 rules,
    board C values). Area ramps: tint = 10 % of bold over cream #FBF7EF, soft = 30 %, deep = bold darkened to >= 7 : 1 on
-   cream; dark mode: tint = 18 % of bold over #0F0E0C, soft = 40 %, the fourth strength = a light version (bold mixed
+   cream; dark mode: tint = 18 % of bold over #0F0E0C (raised 1 % at a time until >= 1.2 : 1 from the page, fix round 2), soft = 40 %, the fourth strength = a light version (bold mixed
    with cream) >= 7 : 1 on the dark tint. Slate (warm stone: Mixed / Words / No standard) uses the same rules and always
    carries a dashed outline and its label. Board C was found by palette/board-c-search.py. */
 
@@ -50,15 +50,15 @@
   --paper-grey: #949494;
 
   /* board C: eight maths areas x four strengths (+ the text colour on bold) */
-  --cc-tint: #F6EEEB; --cc-soft: #EDDCE2; --cc-bold: #CD9CC3; --cc-on: #1A1614; --cc-deep: #644C60;
-  --oa-tint: #E6E3E2; --oa-soft: #BDBAC9; --oa-bold: #2E2B71; --oa-on: #FBF7EF; --oa-deep: #222055;
+  --cc-tint: #F6EFEB; --cc-soft: #EDDEE2; --cc-bold: #CEA4C5; --cc-on: #1A1614; --cc-deep: #614D5D;
+  --oa-tint: #EAE7E8; --oa-soft: #C9C8DB; --oa-bold: #555BAE; --oa-on: #FBF7EF; --oa-deep: #404482;
   --nbt-tint: #F9F3E2; --nbt-soft: #F5EBC7; --nbt-bold: #E7CF69; --nbt-on: #1A1614; --nbt-deep: #5C532A;
-  --nf-tint: #EFE4E1; --nf-soft: #D6C0C5; --nf-bold: #7F3E63; --nf-on: #FBF7EF; --nf-deep: #5F2E4A;
+  --nf-tint: #EFE6E3; --nf-soft: #D8C5CA; --nf-bold: #865273; --nf-on: #FBF7EF; --nf-deep: #653E56;
   --meas-tint: #F3F3E8; --meas-soft: #E2EBDA; --meas-bold: #A9CFAA; --meas-on: #1A1614; --meas-deep: #475747;
-  --data-tint: #E9E9E7; --data-soft: #C5CED6; --data-bold: #486E9C; --data-on: #FBF7EF; --data-deep: #365275;
-  --g-tint: #E6ECE5; --g-soft: #BBD7D2; --g-bold: #278E8D; --g-on: #1A1614; --g-deep: #1A5E5D;
+  --data-tint: #E9EDEC; --data-soft: #C6D8E4; --data-bold: #4B8FCC; --data-on: #1A1614; --data-deep: #2E577C;
+  --g-tint: #E8EEE6; --g-soft: #C1DBD3; --g-bold: #399993; --g-on: #1A1614; --g-deep: #235D5A;
   --rpns-tint: #F8EFE4; --rpns-soft: #F0DECE; --rpns-bold: #D8A480; --rpns-on: #1A1614; --rpns-deep: #684F3D;
-  --slate-tint: #EBE7DF; --slate-soft: #CAC6BF; --slate-bold: #57534E; --slate-on: #FBF7EF; --slate-deep: #413E3B;
+  --slate-tint: #EDE9E2; --slate-soft: #D1CDC7; --slate-bold: #706C6A; --slate-on: #FBF7EF; --slate-deep: #545150;
 }
 
 /* dark mode: explicit choice, or the system setting unless light was chosen */
@@ -78,13 +78,13 @@
   --rail: #1A1614;
   --scrim: rgba(0, 0, 0, 0.70);
 
-  --cc-tint: #31282D; --cc-soft: #5B4755; --cc-deep: #E4CAD9;
-  --oa-tint: #15131E; --oa-soft: #1B1A34; --oa-deep: #A19DB8;
+  --cc-tint: #31292D; --cc-soft: #5B4A56; --cc-deep: #E4CEDA;
+  --oa-tint: #1F2031; --oa-soft: #2B2D4D; --oa-deep: #A8A9CE;
   --nbt-tint: #36311D; --nbt-soft: #655B31; --nbt-deep: #F1E3AC;
-  --nf-tint: #23171C; --nf-soft: #3C212F; --nf-deep: #BE9CAA;
+  --nf-tint: #2A1E24; --nf-soft: #3F2935; --nf-deep: #C0A4B1;
   --meas-tint: #2B3128; --meas-soft: #4D5B4B; --meas-deep: #D2E3CC;
-  --data-tint: #191F26; --data-soft: #263446; --data-deep: #A2B2C6;
-  --g-tint: #132523; --g-soft: #194140; --g-deep: #91C2BE;
+  --data-tint: #1A252F; --data-soft: #274259; --data-deep: #A3C3DE;
+  --g-tint: #172724; --g-soft: #204642; --g-deep: #9AC8C1;
   --rpns-tint: #332921; --rpns-soft: #5F4A3A; --rpns-deep: #EACEB8;
-  --slate-tint: #1C1A18; --slate-soft: #2C2A26; --slate-deep: #A9A59E;
+  --slate-tint: #232220; --slate-soft: #363432; --slate-deep: #B5B2AC;
 }

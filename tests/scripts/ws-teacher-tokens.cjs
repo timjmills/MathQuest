@@ -91,22 +91,24 @@ function de00(a, b, mode = 'normal') {
 const textFor = (h) => { const w = cr(h, CREAM), i = cr(h, INK); return (w >= 4.5 && w >= i) ? CREAM : (i >= 4.5 ? INK : (w >= 4.5 ? CREAM : null)); };
 function deep(b) { let t = 0.75; while (cr(mix(b, '#000000', t), CREAM) < 7) t -= 0.01; return mix(b, '#000000', t); }
 function light(b, under) { let t = 0.5; while (cr(mix(b, CREAM, t), under) < 7) t -= 0.01; return mix(b, CREAM, t); }
-function ramp(b) { const dTint = mix(b, DARK, 0.18); return { tint: mix(b, CREAM, 0.10), soft: mix(b, CREAM, 0.30), bold: b, on: textFor(b), deep: deep(b), dTint, dSoft: mix(b, DARK, 0.40), dLight: light(b, dTint) }; }
+// dark tint: 18 % of the bold over the dark page, raised 1 % at a time until it is >= 1.2 : 1 from the page (fix round 2)
+function darkTint(b) { let t = 0.18, x = mix(b, DARK, t); while (cr(x, DARK) < 1.2) { t = Math.round((t + 0.01) * 100) / 100; x = mix(b, DARK, t); } return x; }
+function ramp(b) { const dTint = darkTint(b); return { tint: mix(b, CREAM, 0.10), soft: mix(b, CREAM, 0.30), bold: b, on: textFor(b), deep: deep(b), dTint, dSoft: mix(b, DARK, 0.40), dLight: light(b, dTint) }; }
 
 // ---------------------------------------------------------------- board C (owner 2026-10-23; supersedes board B of §2.7)
 // The colours sampled from the school's Awsaj maths site, moved only as far as the §2.7 rules need
 // (design/mockups/teacher-2/palette/board-c-search.py). [key, css prefix, name, tint, soft, bold, deep, dark light version, dark tint]
 const PLAN = [
-  ['CC', 'cc', 'Counting & cardinality (mauve)', '#F6EEEB', '#EDDCE2', '#CD9CC3', '#644C60', '#E4CAD9', '#31282D'],
-  ['OA', 'oa', 'Operations & algebraic thinking (dusty ink-indigo; fix round 1 muted it from violet #5B1FAB)', '#E6E3E2', '#BDBAC9', '#2E2B71', '#222055', '#A19DB8', '#15131E'],
+  ['CC', 'cc', 'Counting & cardinality (mauve)', '#F6EFEB', '#EDDEE2', '#CEA4C5', '#614D5D', '#E4CEDA', '#31292D'],
+  ['OA', 'oa', 'Operations & algebraic thinking (mid indigo; fix round 2 lifted it from ink-indigo #2E2B71, which read as ink)', '#EAE7E8', '#C9C8DB', '#555BAE', '#404482', '#A8A9CE', '#1F2031'],
   ['NBT', 'nbt', 'Number & operations in base ten (gold)', '#F9F3E2', '#F5EBC7', '#E7CF69', '#5C532A', '#F1E3AC', '#36311D'],
-  ['NF', 'nf', 'Fractions & decimals (plum)', '#EFE4E1', '#D6C0C5', '#7F3E63', '#5F2E4A', '#BE9CAA', '#23171C'],
+  ['NF', 'nf', 'Fractions & decimals (plum)', '#EFE6E3', '#D8C5CA', '#865273', '#653E56', '#C0A4B1', '#2A1E24'],
   ['MEAS', 'meas', 'Measurement (sage)', '#F3F3E8', '#E2EBDA', '#A9CFAA', '#475747', '#D2E3CC', '#2B3128'],
-  ['DATA', 'data', 'Data (dusty blue)', '#E9E9E7', '#C5CED6', '#486E9C', '#365275', '#A2B2C6', '#191F26'],
-  ['G', 'g', 'Geometry (sea teal)', '#E6ECE5', '#BBD7D2', '#278E8D', '#1A5E5D', '#91C2BE', '#132523'],
+  ['DATA', 'data', 'Data (blue)', '#E9EDEC', '#C6D8E4', '#4B8FCC', '#2E577C', '#A3C3DE', '#1A252F'],
+  ['G', 'g', 'Geometry (sea teal)', '#E8EEE6', '#C1DBD3', '#399993', '#235D5A', '#9AC8C1', '#172724'],
   ['RPNS', 'rpns', 'Ratio & number system (peach)', '#F8EFE4', '#F0DECE', '#D8A480', '#684F3D', '#EACEB8', '#332921'],
 ];
-const SLATE = '#57534E';   // warm stone
+const SLATE = '#706C6A';   // warm stone (fix round 2: lifted from #57534E, which was 19.7 from ink and 2.5 : 1 on the dark page)
 const PLAN_GRADES = { K: ['CC', 'OA', 'NBT', 'MEAS', 'DATA', 'G'], '1': ['OA', 'NBT', 'MEAS', 'DATA', 'G'], '2': ['OA', 'NBT', 'MEAS', 'DATA', 'G'],
   '3': ['OA', 'NBT', 'NF', 'MEAS', 'DATA', 'G'], '4': ['OA', 'NBT', 'NF', 'MEAS', 'DATA', 'G'], '5': ['OA', 'NBT', 'NF', 'MEAS', 'DATA', 'G'], '6': ['RPNS', 'OA', 'DATA', 'G'] };
 // Neutrals of the token file (§2.7 rank 4, §2.8): [token, light, dark]
