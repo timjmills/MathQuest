@@ -3,7 +3,7 @@ Title: Pilot — SU-C column subtraction without regrouping, six skills onto `st
 Session: session_01G5ktGS4kteYMuLFxnxGEgU
 Branch: claude/sweet-newton-c8wrv1-wip-pilot-su-c
 Owner of files: subtraction no-regroup generator branch (gen-operations.js ranged sub), subtraction provider, skill-options / skill-presets / standards / wrm / search-terms entries for the six + `sub_2d_1d`
-State: fix
+State: critic
 Updated: 2026-10-23
 Builder profile: mq-opus-low
 Critic rounds: 1, FAIL
@@ -17,6 +17,9 @@ Critic rounds: 1, FAIL
 - none
 
 ## Times
+Times: critic round 2, start 2026-10-23T21:48Z, end —, profile mq-opus-medium
+Times: precritic pass 4 (after the 38-row re-pin), start 2026-10-23T21:26Z, end 2026-10-23T21:47Z, profile — — OK: 13 PASS (coverage-matrix PASS on the baseline, 0 RED), 1 N/A; rule 0b met
+Times: re-pin 38 rows (--repin, lead ruling), start 2026-10-23T21:20Z, end 2026-10-23T21:26Z, profile —
 Times: precritic pass 3 (after fix r1 + base merge), start 2026-10-23T20:56Z, end 2026-10-23T21:17Z, profile — — 12 PASS, 1 N/A, coverage-matrix 38 RED rows (all in the 38 engine-class counts below)
 Times: fix round 1 (machine deltas + critic r1 D1-D12), start 2026-10-23T19:44Z, end 2026-10-23T20:55Z, profile mq-opus-medium, tokens 406k, 198 tool uses
 Times: critic round 1 (all pages graded directly: stack x single has no certificate; S and L full, M spot), start 2026-10-23T19:06Z, end 2026-10-23T19:41Z, profile mq-opus-medium, tokens 350k — FAIL (min C1 4, C2 4, C3 6, C4 5); also FAILED by the lead's ruling (sibling comparison)
