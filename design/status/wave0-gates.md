@@ -16,9 +16,9 @@ Builders run in their own git worktrees and the lead merges them here.
 | 1 | S2 part 1: `ws-node-lint.mjs`, seeded fixtures, `ws-backtest.mjs` + `backtests.json` | mq-opus-medium (first build) | running |
 | 1 | E1: `ws-envelope.mjs` (`--engine`, `--self-test`, `--diff`, `--envelope`) | mq-opus-medium | merged 94c97814 — Single skill 17 and stack 18 match the plan; Mixed practice walks 17, not 18 (`paginate.js` is reached only by the Single/Sections composer; the plan's list overstates it); self-test 320 checks 2.5 s; `--engine all` 1.1 s; voiding dry run: layout.js voids 126/126 pairs, a provider 0, `cells/clock.js` 3 (clock only) |
 | 1 | S5: `ws-deploy-gates.sh`; `ws-screen-slots` / `ws-chromebook-fit` `--category`, `--skills`, `--shard`, `--baseline`, `--bigboard`, `--dark` | mq-opus-medium | running |
-| 1 | S4: golden renders, manifest, diff, contact sheets; `ws-grade-render --template`, `--envelope` | mq-opus-medium | running |
+| 1 | S4: golden renders, manifest, diff, contact sheets; `ws-grade-render --template`, `--envelope` | mq-opus-medium | merged 42610832 — DOM content hash stable over 3 runs (pixel diffs were not: 23/30 untouched pages differed); a one-line cell edit flags exactly the 2 pages it changes; golden for `function-table` committed (manifest only, PNGs git-ignored); write 78 s, diff 62 s. Open: `--envelope` must read ws-envelope's `sample.print` / `sample.screen` rows (flat fields), not yet adapted |
 | 2 | S1: `ws-precritic.cjs`, `role-sample.json`, `ws-providers-unit --skill`, `ws-teacher-wrm --grade --lesson` | mq-opus-medium | queued |
 | 2 | E1: `ws-coverage-matrix.cjs`; `ws-print-lint` `--kind`, `--pages`, `--bring-back`, `--sections`, `--anchors top|first` docs | mq-opus-medium | queued |
-| 2 | S2 part 2: browser checks with real commit backtests (lone item, text ≠ generator, Chromebook viewport, repeats) | mq-opus-medium | queued |
+| 2 | S2 part 2: browser checks with real commit backtests (text ≠ generator, lone item, repeats, Chromebook viewport — ordered by the W0-B defect tally) | mq-opus-medium | running |
 | 2 | S9: `reading_ruler_hard` doubled answer area; print-lint per-skill baseline | mq-opus-low (fix) | queued |
 | 3 | Independent critic of the tools | mq-opus-medium | — |
