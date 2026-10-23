@@ -177,3 +177,9 @@ legacy run file without `baseline` still clears red with a WARNING; N3 options-p
 N4 a crashed options-pin slice is not re-run before the full baseline (gate stays WARNING); N5 mc-production backtest feeds
 the judge directly, and CLAUDE.md "Checks to run" does not name ws-deploy-gates.sh / ws-backtest (lead's file); N6 renamed
 rows re-map nightly and never settle.
+
+Owner rule for the Repeated check ("if there is no credit when it runs, save that day for the next possible time"), merged
+d4771778: the steady-phase slice is the one after the last COMPLETED slice (newest finished, not-dirty run file), not the
+date's; the affected range already diffs from the last successful run. `ws-matrix-nightly.sh --self-test` (10 cases: one and
+two missed nights resume at the next slice and cover both nights' changes; dirty / unfinished runs don't count; 28 wraps to 1).
+Known behaviour: a forced `--slice k/28` re-run that completes resets the rotation to k+1 (use it only for the missed slice).
