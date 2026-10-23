@@ -242,13 +242,13 @@ const PARSE = {
         const rose = /ratchet: (\d+) count\(s\) rose/.exec(out);
         if (code === 0 && ratchetOk) {
             r.result = f ? 'PASS (baseline)' : 'PASS';
-            r.findings = `${f} found in ${fd}/${docs} docs, all pinned, 0 new`;
+            r.findings = f ? `${f} found in ${fd} of ${docs} doc(s), all pinned, 0 new` : `0 found (${docs} doc(s))`;
         } else if (rose) {
             r.result = 'FAIL';
-            r.findings = `${f != null ? `${f} found in ${fd}/${docs} docs; ` : ''}${rose[1]} (document, lint, rule) count(s) above the pin`;
+            r.findings = `${f != null ? `${f} found in ${fd} of ${docs} doc(s); ` : ''}${rose[1]} (document, lint, rule) count(s) above the pin`;
             r.detail = out.split('\n').filter((l) => /^\s+- /.test(l)).slice(0, 10);
         } else if (sum) {
-            r.findings = `${f} found in ${fd}/${docs} docs${g.args.includes('--baseline') ? '' : ' (no pinned baseline)'}`;
+            r.findings = `${f} found in ${fd} of ${docs} doc(s)${g.args.includes('--baseline') ? '' : ' (no pinned baseline)'}`;
         }
         return r;
     },
