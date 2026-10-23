@@ -253,6 +253,9 @@ function serialiseInPage(opts) {
           const root = host.firstElementChild; const R = root.getBoundingClientRect(); let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
           const add = (r) => { if (!r || (r.width < 0.5 && r.height < 0.5)) return; x0 = Math.min(x0, r.left); y0 = Math.min(y0, r.top); x1 = Math.max(x1, r.right); y1 = Math.max(y1, r.bottom); };
           const letter = root.firstElementChild && /^[a-z]\.$/.test((root.firstElementChild.textContent || '').trim()) ? root.firstElementChild : null;
+          // pass 1: what is written and drawn; pass 2: ruled or filled boxes that start within it (answer boxes beside the
+          // problem stay; the empty writing room under the last line does not, so a small thumbnail shows the problem)
+          const boxes = [];
           const tw = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
           for (let nd = tw.nextNode(); nd; nd = tw.nextNode()) {
             if (letter && (nd === letter || letter.contains(nd))) continue;
@@ -261,8 +264,10 @@ function serialiseInPage(opts) {
             const cs = getComputedStyle(nd); if (cs.display === 'none' || cs.visibility === 'hidden') continue;
             const bordered = ['top', 'right', 'bottom', 'left'].some(sd => parseFloat(cs.getPropertyValue('border-' + sd + '-width')) > 0 && cs.getPropertyValue('border-' + sd + '-style') !== 'none');
             const filled = !/rgba\(0, 0, 0, 0\)|transparent|rgb\(255, 255, 255\)/.test(cs.backgroundColor);
-            if (bordered || filled) add(nd.getBoundingClientRect());
+            if (bordered || filled) boxes.push(nd.getBoundingClientRect());
           }
+          if (x1 < x0) boxes.forEach(add);                       // nothing written: the boxes are the item
+          else { const yEnd = y1; for (const r of boxes) if (r.top < yEnd + 4) add({ left: r.left, right: r.right, top: r.top, bottom: Math.min(r.bottom, Math.max(yEnd, r.top + 40)), width: r.width, height: 1 }); }
           const P = 10;
           res[k].push(x1 > x0 ? [Math.floor(Math.max(-40, x0 - R.left - P)), Math.floor(Math.max(-40, y0 - R.top - P)), 0, 0].map((v, i, a) => i === 2 ? Math.ceil(x1 - R.left + P) - a[0] : i === 3 ? Math.ceil(y1 - R.top + P) - a[1] : v) : null);
           host.remove();
