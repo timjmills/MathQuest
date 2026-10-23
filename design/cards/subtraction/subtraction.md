@@ -1,5 +1,5 @@
 <!-- spec-card
-{"card":"subtraction","kind":"family","template":"stack","families":[],"match":{"templates":["stack"]},"config":"design/cards/subtraction/card.json","indexSha":"ed32bdf58a41e14cceffd96fefef3a0bc6156109","bodySha":"a60542aee0ff9a4a"}
+{"card":"subtraction","kind":"family","template":"stack","families":[],"match":{"templates":["stack"]},"config":"design/cards/subtraction/card.json","indexSha":"ed32bdf58a41e14cceffd96fefef3a0bc6156109","bodySha":"a167022cda7f3e07"}
 {"cited":"AX-9 C1 CL-9 DN-1a H2 H4 H5 H6 H7 H8 H9 H10 H11 H13 L1 L6 LR-4 LR-6 P-1 PT-FRM-6 PT-GDP-1 RP-1 SP-20 VA-10","rules":"VA-1 12d322 2 26885a 4 b05d12 7 13eea3 VA-10@WDS 9d9099 VA-11@WDS a5ab88 VA-12@WDS 60049e VA-13@WDS 05d8bb VA-13a c2dfad 20 ef38e6 22 045140 23 04bd6f AK-2 d4709f TY-21 53ed7d SP-23 fe1461 VA-3 770d75 5 1337f5 6 45cb76 21 8802ac 30 5b42ae 31 2f0077 32 898868 LS-8 59531d SL-12 3cbafa TY-20 8964d2 23 e741c0 24 e73e2c 26 cc6cf2 VA-40 914c3a 41 1325cb 42 1b3a08 50 905c89 51 ca8fb1 52 992853 SL-1 e3b064 2 f404d5 11 183e7a CL-6 102a92 9 accb97 PG-12 8e75fd 14 64a88e PT-CGR-5 3f7489 PT-EQD-2 ed82db DN-34 d5b0e7 AK-1 a0cc12 4 8d027b INK-31 d7ece8 BD-7 81d3da PT-GDP-1 a0e2cc P-SC-7 65e105 SF-34@WDS.1 00e2f6 SP-1 87c2cc 2 1f2df0 3 7b7bfb 4 51a802 10 6ffb0a 12 1309f9 SCC-T3 359377 4 e83741 10 084029 14 b8671c 15 fc9373 17 c36547 SCC-P5 6387d4 6 d362fd BD-10 8d473f 11 29d891 12 36b79c PT-FRM-6 daac17 P-1 5a3076 29 89eb8e Q-10 50b907 P-10 256ad3 35 4b32c0 31 28b15c BD-4 b3947b PT-SCR-1 25f6f5 CL-1 277ec4 AX-4 2eb6c1 INK-5 631a6d TY-7 e3e1e1 RP-1 d529bd AX-9 74e9a4 DN-1a 4fcc05 PT-GDP-2 386bb5 SL-3 468d78 SP-20 cfb11a PT-REV-3 d5e0d9 C1 66f8a9 2 32e3b2 3 3d5192 4 e59efd H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H4@RUBRIC 9ce1f3 H5@RUBRIC b3892d H6 0722fd 7 3d3d38 8 44c23b 9 fd82d1 10 fbd802 11 bef034 12 2de4f7 13 36f579 OC3 bb8551 4 00a5e1 7 81bde7 8 089b5e 10 ad6428 11 c55e70 14 18b2a5 L1 799b66 2 fecb99 3 901e56 4 6538d6 5 4d48a8 6 6e19d8 9 f4b4c0 10 d2ca35 11 9ebe19 CL-31 383ae0 INK-3 b9f1f1 4 fe5b27 P-LC-9 bc47bd SCC-01 8aa70b SF-10 f1a0d9 SL-10 9fe607 TY-2 510243 13 3d0f88 22 7e9b75 25 b0a223"}
 -->
 # Spec card: Column subtraction without regrouping, within 50 to within 1,000,000 (pilot: six SU-C skills)
@@ -226,7 +226,7 @@ For answer keys, `wrongAnswer`, error analysis, True or False? and Reason It (P-
 
 Each runs as `node tests/scripts/<script> …`.
 
-- `ws-precritic.cjs --template stack` — PLANNED (not in the repo yet) — the one table every builder report pastes (IMPROVEMENT_PLAN §1.4 S1, being built by another lane)
+- `ws-precritic.cjs --template stack` — the one table every builder report pastes (IMPROVEMENT_PLAN §1.4 S1, being built by another lane)
 - `ws-spec-card.mjs --check-signed design/cards/subtraction/subtraction.md` — build-start gate
 - `ws-spec-card.mjs --check-coverage design/cards/subtraction/subtraction.md` — card-coverage test; runs again at build start
 - `ws-content-audit.cjs --category subtraction` — "Subtract within N (No Regrouping)" may deal no regrouping item and no minuend over N
@@ -253,4 +253,4 @@ Each runs as `node tests/scripts/<script> …`.
 7. **SU-M1 (smaller from larger) is invisible on a no-regroup page. Seed regroup non-examples here (P-10)?** Recommended: No: the skill's name promises no regrouping and `ws-content-audit` holds it to that. The non-examples and the decide page live on the `_mixed` skills (SU-R R2). Here the key's `wrongAnswer` is built from SU-M7 (adds), M-ALIGN (left-lined) and M-ZERO, which do show on these items.
 8. **MW4K / IXL research is pending logins (Q-H4). Sign now?** Recommended: Yes, sign now; add the research to section 2 when the logins work, and re-sign only if the problem types or progression change.
 
-Signed: owner, 2026-10-23
+Signed: (not yet signed)
