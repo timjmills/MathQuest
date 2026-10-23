@@ -332,11 +332,11 @@ window.MQ_FLOW_CHECK = {
    "error": ""
   },
   "copies-3@390": {
-   "actions": 5,
-   "scrolls": 1,
+   "actions": 4,
+   "scrolls": 0,
    "steps": 3,
-   "ok": false,
-   "error": "5 actions > plan ≤ 4"
+   "ok": true,
+   "error": ""
   }
  }
 };
