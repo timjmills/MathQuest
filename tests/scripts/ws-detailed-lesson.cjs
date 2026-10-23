@@ -6,6 +6,9 @@
 //   node tests/scripts/ws-detailed-lesson.cjs --lesson <id> --seed 4242 --out <dir>      # elsewhere
 //   node tests/scripts/ws-detailed-lesson.cjs --lesson <id> --check                      # GATE
 //   node tests/scripts/ws-detailed-lesson.cjs --lesson <id> --check --copy               # + copy for the owner
+//   node tests/scripts/ws-detailed-lesson.cjs --lesson <id> --repeats                    # GATE: repeats only (S2), no PDF
+//     (R-ANSWER / R-TURN / R-CELL, see repeatsCheck; prints `ws-detailed-lesson --repeats: OK` / `FAIL (n)`;
+//      with --check as well, the repeats join the self-check's verdict)
 //
 // Writes pack.html, pack.pdf, page-NN.png (PyMuPDF raster, like ws-lesson-samples) and, with
 // --check, SELF-CHECK.md (the table format of design/lesson-planner/sample-v22/SELF-CHECK.md) to
@@ -269,6 +272,56 @@ function poolCheck(POOL) {
         for (const x of xs) if (x.item !== x.id && xs.some((y) => y.item === x.id)) turns.push(`${x.item} on ${pg}`); }
     return { ok: ruleOk && !bad.length && !noRep.length && !rep.length && !chartBack.length && !turns.length && (small || all.length <= usable),
         msg: `${all.length} places (${first.size} numbers), usable pool ${usable} (pool ${inPool.size} keys, ${ids.size} facts, recomputed from its ${d.kind || '?'} rule: ${ruleOk ? 'matches' : 'MISMATCH'}; forbidden ${forb.size ? [...forb].join(', ') : 0}); repeats ${rep.length ? rep.join(', ') : 0}; chart examples or their turn-arounds returning ${chartBack.length ? chartBack.join(', ') : 0}; same-page turn-arounds ${turns.length ? turns.join(', ') : 0}; outside the pool / forbidden ${bad.length ? bad.join(', ') : 0}; items without a rep ${noRep.length}` };
+}
+
+/* --------------------------------------------------------------- --repeats (S2, pure) */
+// IMPROVEMENT_PLAN §1.4 S2 "Repeats" (lesson 6 critic r1 D2: Guided 1 returned on the exit slip, the chart's second example
+// returned on Practice 2 and the exit, and a turn-around pair sat on one page, while E24 passed: E24 keys an item on the
+// number it is DEALT (613, 63, 195 ...), but the pupil repeats what he WRITES). This check keys every place on its ANSWER:
+// the values the key prints (thousands commas dropped) with the relation words left over ("10 times", "one tenth of").
+//   R-ANSWER   two places, anywhere in the pack, write the same values with the same relation (two or more values)
+//   R-TURN     the same values turned round (the same set, another order or relation) on one page, or a chart (P2)
+//              example's turn-around anywhere (V22 "a chart example never returns, in any representation, nor its turn-around")
+//   R-CELL     the same printed problem twice on a pupil page (cell text with its numbers; cells without a digit are skipped)
+// A place with one value is left to E24 (one-number answers repeat honestly: 7 is the answer of many facts).
+const ansSig = (ans) => {
+    const t = String(ans == null ? '' : ans).toLowerCase().replace(/(\d),(?=\d{3}\b)/g, '$1');
+    const vals = [];
+    const rel = t.replace(/\b\d+(?:\.\d+)?\b(?!\s*times\b)/g, (n) => { vals.push(n); return ' '; })
+        .replace(/[(),;:]|\band\b/g, ' ').replace(/\s+/g, ' ').trim();
+    return { vals, rel, set: [...vals].sort().join('|'), ordered: vals.join('|') };
+};
+function repeatsCheck(POOL, pupilCells) {
+    const out = [];
+    const pageOf = (p) => String(p).replace(/-key$/, '');
+    const places = ((POOL && POOL.places) || []).filter((x) => !x.copy).map((x) => ({ ...x, pg: pageOf(x.page), s: ansSig(x.ans) })).filter((x) => x.s.vals.length >= 2);
+    for (let i = 0; i < places.length; i++) for (let j = i + 1; j < places.length; j++) {
+        const a = places[i], b = places[j];
+        if (a.s.set !== b.s.set) continue;
+        if (/^P2\b/.test(a.pg) && /^P2\b/.test(b.pg) && a.s.ordered !== b.s.ordered) continue;   // the chart shows both directions
+        const where = `${a.item} on ${a.pg} ("${a.ans}") and ${b.item} on ${b.pg} ("${b.ans}")`;
+        if (a.s.rel === b.s.rel && a.s.ordered === b.s.ordered) out.push({ rule: 'R-ANSWER', msg: `the same answer twice: ${where}` });
+        else if (a.pg === b.pg || /^P2\b/.test(a.pg) || /^P2\b/.test(b.pg)) out.push({ rule: 'R-TURN', msg: `a turn-around ${a.pg === b.pg ? 'on one page' : 'of a chart example'}: ${where}` });
+        else if (a.s.rel === b.s.rel) out.push({ rule: 'R-ANSWER', msg: `the same values and relation twice: ${where}` });
+    }
+    for (const { page, cells } of pupilCells || []) {
+        // a page printed as two copies to cut apart (the exit slip, the pool's `copy` places) is one problem set
+        const half = cells.length / 2;
+        if (cells.length >= 2 && Number.isInteger(half) && cells.slice(0, half).every((t, k) => t === cells[half + k])) continue;
+        const seen = new Map();
+        cells.forEach((t, k) => {
+            if (!/\d/.test(t)) return;
+            if (seen.has(t)) out.push({ rule: 'R-CELL', msg: `${page}: cells ${seen.get(t) + 1} and ${k + 1} print the same problem "${t.slice(0, 60)}"` });
+            else seen.set(t, k);
+        });
+    }
+    return out;
+}
+/** In the page: every pupil page's cell texts (normalised), for R-CELL. */
+function repeatsMeasure() {
+    const norm = (s) => String(s).replace(/\s+/g, ' ').trim();
+    return [...document.querySelectorAll('body > section.ws-page')].filter((pg) => (pg.dataset.dlKind || 'pupil') === 'pupil')
+        .map((pg) => ({ page: pg.dataset.dlPage || '?', cells: [...pg.querySelectorAll('.ws-cell')].filter((c) => !c.parentElement.closest('.ws-cell')).map((c) => norm(c.textContent)) }));
 }
 
 // mult-grid windows (lesson 4): a pool key "grid r0-r1 x c0-c1:task", its cells as unordered boxes (a turned box is the same
@@ -649,6 +702,21 @@ function selfCheckMd(rows, pages, info) {
         await sheet.evaluate(() => document.fonts && document.fonts.ready);
         await sheet.emulateMediaType('print');
         const R = has('check') ? await sheet.evaluate(measure, [...LIB, ...built.kitLib]) : null;
+        if (has('repeats')) {
+            const pool = await sheet.evaluate(() => { const pj = document.getElementById('v21-pool'); return pj ? JSON.parse(pj.textContent) : null; });
+            const reps = repeatsCheck(pool, await sheet.evaluate(repeatsMeasure));
+            const n = ((pool && pool.places) || []).filter((x) => !x.copy).length;
+            console.log(`${LESSON} repeats: ${n} places read, ${reps.length} finding(s)`);
+            for (const r of reps) console.log(`  ${r.rule.padEnd(9)} ${r.msg}`);
+            if (!pool) console.log('  (no pool JSON in this pack: R-ANSWER / R-TURN not read)');
+            if (!has('check')) {
+                await sheet.close();
+                console.log(`ws-detailed-lesson --repeats: ${reps.length ? `FAIL (${reps.length})` : 'OK'}`);
+                await app.close();
+                process.exit(reps.length ? 1 : 0);
+            }
+            if (reps.length) failed = true;
+        }
         const pdf = path.join(OUT, 'pack.pdf');
         await sheet.pdf({ path: pdf, printBackground: true, preferCSSPageSize: true });
         await sheet.close();
