@@ -46,6 +46,8 @@ Builders run in their own git worktrees and the lead merges them here.
 | Critic r3 (fresh critic): FAIL 7 / 8 / 8, one blocking defect | mq-opus-medium | 18:09 | 18:44 | — |
 | Fix r3: baseline invariants (root cause of r1 D4, r2 D1, r3 D1) — merged 8d0a7a5a | mq-opus-medium (rebuild after a failed round) | 18:41 | — | — |
 | Timed deploy runs: three cloud sessions (gate sessions 1, 2, 3 in parallel; each repeats its session 3×) on eee32b89 | timing runners (session_01HZreUmm66xVrS2AYyY32uD, session_016eCsVCbtn3q8SkotuDG1Xp, session_01FLRx8vV9wbkgLuukh57VyK) | 18:09 | — | — |
+| Critic r4: FAIL 7 / 8 / 8 (D1 deploy session 1 ran the whole options pin; D2 fold order by name) | mq-opus-medium | 19:05 | 19:19 | — |
+| Fix r4: read-only options gate at deploy, fold every run file by finish time + nits | mq-opus-medium (rebuild after a failed round) | 19:19 | — | — |
 | S1 `ws-precritic` build (brought forward by the lead, 11:02; stopped: moved to the lead's session) | mq-opus-medium | 11:03 | 12:51 | 108 |
 
 ## Critic r1 (2026-10-23, `design/audit/runs/wave0-gates/critic-r1.md`): FAIL — plan 6, backtests 8, usable 6
@@ -141,3 +143,11 @@ only by `--repin <ids> --reason`, logged per entry. Both critic r3 reproduce cas
 print-lint. Backtest `baseline-night-keeps-red` FAILs on 53f46e10, passes on the fix. Renamed rows map to their new id;
 rows that no longer exist are a RETIRED-ROW warning cleared with `--retire`. Over-budget warnings name which affected rows
 have a baseline (unchecked) and which have none.
+
+## Critic r4 (`design/audit/runs/wave0-gates/critic-r4.md`): FAIL — plan 7, backtests 8, usable 8
+r3 D1 verified fixed at the root (r3 reproduce cases RED/refuse; five mutations of the invariants each fail the self-test).
+Blocking: D1 — the fix-r1 rule "add ws-options-pin --check to session 1 once the tool exists" switched on when the pin
+merged, so deploy session 1 would run the whole pin (≈ 1 h 52 min): a lead integration miss; at deploy the gate must read
+the Repeated check's results instead. D2 — the fold sorted nightly files by date name and other run files by finish time,
+so an earlier OK could fold after a later RED. The three timed runs (on eee32b89) predate the pin merge, so they are not
+affected by D1.
