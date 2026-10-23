@@ -729,6 +729,16 @@ full screen above both. One column; the preview never comes first.
 
 ### 2.4 The tray
 
+**Owner 2026-10-23: multi-lesson practice sets, highly customizable.** In Lessons, each lesson lists its skills with
+tick boxes; **Add to tray** makes a tray **group named after the lesson**, and a **Next lesson** arrow moves on (the
+teacher does this for 5–6 lessons). **Print** then offers, all as options (owner: "both could be options — I want it highly
+customizable"): **one worksheet per lesson** (pages per lesson, e.g. 2, each with its own key), **one worksheet for all**
+(laid out as **Mixed practice** or **one section per lesson**, 1–2 pages or more), or **both**; every Single skill /
+Sections / Mixed practice option of §2.5 still applies per worksheet. **Print all** gives one PDF in lesson order, each part
+with its key — only the lessons the teacher added, and only the skills ticked in each (owner: "for only selected lessons"). **Save as set** keeps the groups (reprint later with new numbers); **Share** gives one short code for the whole
+set. Engine: a batch of `buildSheet` requests (one per lesson group, plus the combined one), concatenated into one document;
+the set code extends the compact set code (§2.4). Built with the owner's next batch of design changes (process rule 0).
+
 **Owner 2026-10-23 (confirmed): the tray is built for 40–100 skills** ("we might practice problems from a whole grade level"). Up to about 8 skills it shows chips; above that it collapses to one summary bar ("Grade 3 · 64 skills · 6 areas", one segment per maths area) that opens a tray sheet grouped by area, with search, one-tap remove per area and per skill, and a height cap. Skills gains **Add whole area** and **Add whole grade**; Lessons gains **Add this unit**. "How often" is set per area first, per skill only when opened. Print summary and preview work at 100 skills (each skill at least once if the pages allow, otherwise sampled, and the summary says so); Single skill with many skills warns. Share needs a **compact whole-grade / whole-area set code** so the link stays short — a `skill-codes.js` change (after M1 releases that file; append-only, `ws-code-snapshot` green). Quiz builds from a whole grade or unit.
 
 - Fixed at the bottom of Skills and **always visible, even when empty**: then Quiz opens "Build from" (a standard, a White
@@ -845,6 +855,11 @@ every row and asserts its action count, including the 6-action case for Lessons.
 | Change one skill's options | tap its chip in the tray | 1 | 1 / buried per screen |
 
 ### 2.7 Colour on purpose (owner 2026-10-23)
+
+**Owner 2026-10-23: no dark mode on the teacher site for now** ("I don't like the dark mode so for now do not make a dark mode"). The
+teacher site (T1–T6, its mock-up and `ws-teacher-flows` / `ws-teacher-tokens`) is light only; dark tokens are parked unused and
+the dark gate checks skip with a note. Wherever this section or §2.8 / §2.10 says "light and dark" for teacher screens, read
+"light". **The pupil app keeps its dark mode** (and its dark contrast checks).
 
 **Strength shows rank:**
 
@@ -1192,7 +1207,8 @@ before the owner's go on its picture sheet (§1.6.3 step 6).
 | Q-S3 | Let each work lane keep its own progress notes (joined into one status page automatically), so lanes stop clashing when their work is merged? | **Decided 2026-10-23: yes**, notes per lane |
 | Q-S4 | Once a drawing has passed review on one kind of worksheet across all its sizes and options, may new skills on that drawing and kind be checked this way: the machine checks on every page; a reviewer reading every new skill for **ease of use and teaching** — including its worked-example pages and its faded page — two pages to a sheet with the measured sizes beside them, and its screens; and 1 in 5 pages graded in full on all four points? **Spacing and the workbook look come from the drawing's approval plus the machine checks.** Any new kind of page is graded in full, a page below 8 sends that skill to a full review, and a spot-audit at every update grades more pages in full and withdraws the approval if any falls below 8. Every page is still held to 8, but this changes how CLAUDE.md says a page counts as graded. | **Decided 2026-10-23: yes** — batch reading of every new skill, 1 in 5 pages graded in full, spot-audit at every update |
 | Q-S5 | (Asked when the later lesson wave starts.) Let lessons be drafted automatically from their skills — steps, examples, the mistakes table, practice and the exit slip — with the builder writing only the story, the hook and the teaching notes? Before each lesson is made you sign its **lesson card**: a short form saying which White Rose step and standards it teaches, which skills and settings each part uses, the number ranges, the edge cases and any ruling (such as "1,000 on the board only"). The five lessons already passed are rebuilt this way and compared page by page, and one more lesson is made as a test, before any new one. | Yes |
-| Q-L1 | (Asked when the later lesson wave starts.) The intervention library — a short lesson for every White Rose small step: build it with our standard lesson maker, or in your Atomised Lesson V20 format? | Decide then |
+| Q-L1 | (Asked when the later lesson wave starts.) The intervention library — a short lesson for every White Rose small step: build it with our standard lesson maker, or in your Atomised Lesson V20 format? | **Decided 2026-10-23: both** — the owner: "we have two different lesson types that we will eventually build for all skills, WRM lessons, etc.: the short lesson (our original design) and the V22 atom-based lesson (longer)". Every skill, every WRM small step, and every CCSS K–6 standard (and lettered part) not already covered by those, eventually gets both a short lesson and a V22 lesson (owner: "all CCSS if not already covered will be covered by lessons as well"); coverage is checked against `data/standards/ccss-math.json`, built in the later lesson wave from the lesson compiler and shapes (§1.6.5, E4), each practice item a live skill (Q-L2) |
+| Q-L2 | Must everything a lesson teaches or practises be a real skill, findable in Skills, search and the tray, not only in Lessons? | **Decided 2026-10-23: yes** ("Everything in a lesson should have a corresponding skill engine"). Planned skills show as "Skills to be made" until built; a machine check fails any lesson practice item that does not resolve to a live skill id — run on the 5 detailed lessons now and every future lesson |
 | Q-S6 | Run up to six work lanes at once, each in its own cloud session, once the merge tool is in place? | **Decided 2026-10-23: up to six lanes**, plus other sessions as needed to speed things up |
 | Q-S7 | Use the stronger builder also for the first build of each new engine, tool or screen — the mixed-page packer, the check that replays the worksheet maker, the merge tool, the new teacher-site shell and tray — since one fault there reaches every page? Later work on them goes back to the quicker builder. (This also changes the builder rule in CLAUDE.md.) | **Decided 2026-10-23: yes** ("use opus medium for new engines too"); later work that fails a review goes back to the stronger builder, as under Q-S1 |
 | Q-Q1 | Which pages are the quality benchmark every skill must match? | **Decided 2026-10-23: the pages already passed** — the work STATUS records as passed at 8 or better (the five detailed lessons, the custom number line, the small fixes, the answer-key options), then the pages that certify each drawing on each kind; the reviewer reads every new skill beside a benchmark page of the same kind (§1.6.3) |

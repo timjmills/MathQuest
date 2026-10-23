@@ -62,11 +62,14 @@ outrank any general design advice or skill:
 - **The speed reflection cycle runs after EVERY lane, family, pilot or tool build (owner, 2026-10-23: "always perform it so
   that we get better and better, faster and faster")**: an independent auditor measures it against the targets, finds the
   causes of every lost round or hour, turns each into a check, rule or tool fix before the next lane, and records it in
-  `design/status/speed-audit.md` + `metrics.md` (LESSONS_LEARNED "Process rules" 00).
+  `design/status/speed-audit.md` + `metrics.md` (LESSONS_LEARNED "Process rules" 00) After EVERY critic round, pass or fail, the lane
+  records the automatic checks that would have caught each finding and the speed-ups the round revealed.
 - **Process rules (owner, 2026-10-23)** live in `design/audit/LESSONS_LEARNED.md` "Process rules" and `design/audit/RUBRIC.md`
   "How a page counts as graded". Lanes write `design/status/<lane>.md`, never `design/STATUS.md`.
 - **8 or better, everywhere.** A redone skill is done only when it scores ≥ 8 on all four criteria
   of `design/audit/RUBRIC.md` on every page type and every screen host, graded by an independent critic.
+  The same bar holds for EVERYTHING that passes (owner, 2026-10-23): tools, engines, screens and mock-ups, lessons,
+  cards and plans each pass only at ≥ 8 on every criterion of their critic brief, graded by an independent critic.
 - Use `generateQuestionFor({category, skill, range, decimals, opts, seed})` for any generation
   outside live play. It carries the skill's options, restores state in `finally`, and its seed makes
   a page reproducible.
@@ -145,6 +148,16 @@ and delete the entry. Lanes in `FROZEN_LANES` keep their order: new entries for 
 `node tests/scripts/ws-wrm.cjs` is the WRM gate. It **fails until every small step has a skill** (by
 design); run it with `--report-only` meanwhile, and do not add it to an all-gates-must-pass list yet. A
 new skill that teaches a WRM step gets a `SKILL_WRM` entry, and its step comes off `WRM_PROPOSALS`.
+
+**Every new skill is linked in the same change (owner rule, 2026-10-23, "make sure and continue to tag all new skills"):**
+1. **White Rose lessons** — its `SKILL_WRM` tag(s) (`{step, partial}` when it covers part), and the curated year record in
+   `data/curriculum/links/<YEAR>.json` lists it as `direct` for that step (and for any school-site lesson it teaches);
+2. **Prerequisite skills** — it appears in the `pre` list of the steps / lessons it prepares for, and its own step's
+   `pre` names the skills a pupil needs first;
+3. **Related skills** — it appears in the `related` list of steps that share its CCSS code or sit next to it in the unit.
+A preset skill (an option recorded as a skill) is linked the same way. `node tests/scripts/ws-wrm-page-unit.mjs` and
+`ws-wrm.cjs --report-only` must stay green; a new skill with no WRM, prerequisite or related link is a defect the lane fixes
+before its critic.
 
 ## Researching Skills Before Implementation
 
