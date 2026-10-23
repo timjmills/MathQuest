@@ -1,0 +1,30 @@
+{
+ "about": "ws-node-lint pinned FINDING KEYS per skill (IMPROVEMENT_PLAN §1.4 S2; critic r1 D5). A key is rule|kind|#item|signature: the dealt item (seeded by hashSeed(category:skill) + index, so stable) and the normalised offending text. A run FAILS on any key not listed here, even when a pinned finding of the same skill and rule was fixed in the same change, and lists the pinned keys it no longer finds. Re-pin with node tests/scripts/ws-node-lint.mjs --write-baseline (a --skill / --category / --rules run merges into this file); never add a key by hand.",
+ "format": "keys-v2",
+ "key": "rule|kind|#item|signature",
+ "generated": "2026-10-23",
+ "n": 30,
+ "page": 12,
+ "rules": [
+  "NOTATION",
+  "L1",
+  "L3",
+  "L6",
+  "L10",
+  "REPEATS"
+ ],
+ "skills": 1,
+ "totals": {
+  "NOTATION": 1,
+  "L1": 0,
+  "L3": 0,
+  "L6": 0,
+  "L10": 0,
+  "REPEATS": 0
+ },
+ "keys": {
+  "fixture:node_lint_keys": [
+   "NOTATION|times|#2|3 x"
+  ]
+ }
+}
