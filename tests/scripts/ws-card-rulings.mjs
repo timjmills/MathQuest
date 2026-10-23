@@ -45,8 +45,11 @@
 //   the option id (no "values"), or must not carry any of the listed values.
 //
 // Last line `ws-card-rulings: OK (...)` or `ws-card-rulings: FAIL - ...`; exit 1 on FAIL (0 with --report-only), 2 on a
-// usage / setup error. A skill in --skill scope that no card rules on prints `ws-card-rulings: NO-RULINGS (...)`, exit 4:
-// nothing was checked, which ws-precritic reports as SKIPPED, never PASS.
+// usage / setup error. A --skill scope that no card rules on prints `ws-card-rulings: NO-RULINGS (...)`, exit 4:
+// nothing was checked, which ws-precritic reports as SKIPPED, never PASS. A scope where only SOME skills have a check of
+// the kind run (a skill no block lists, or a listed skill no ruling / notOffered entry applies to) prints
+// `ws-card-rulings: INCOMPLETE - not checked: <skills> (...)`, exit 2 (critic r6 D3), which ws-precritic reports as
+// INCOMPLETE, never PASS; a broken ruling is still FAIL (exit 1), naming the unchecked skills too.
 import { pathToFileURL } from 'node:url';
 import { join, resolve, dirname, relative } from 'node:path';
 import { readFileSync, readdirSync, existsSync, writeFileSync, statSync } from 'node:fs';
@@ -179,8 +182,19 @@ function selfTest() {
     t(parseRulings('no block', 'x.md') === null, 'no block -> null');
     let threw = false; try { parseRulings('<!-- rulings\n{"skills":["a:b"],"rulings":[{"assert":"bogus"}]}\n-->', 'y.md'); } catch (e) { threw = true; }
     t(threw, 'unknown assert throws');
+    // D3 (critic r6): a partial scope is INCOMPLETE (exit 2, the unchecked skills named), never OK
+    const okR = (key, kind = 'ruling') => ({ ok: true, key, kind, id: 'R1' });
+    const part = finalVerdict({ results: [okR('s:a')], keys: ['s:a', 'add:b'], unruled: ['add:b'], check: 'rulings' });
+    t(part.code === 2 && /^ws-card-rulings: INCOMPLETE - not checked: add:b /.test(part.line), `partial scope (one skill without rulings) is INCOMPLETE, exit 2 (${part.line})`);
+    const noOff = finalVerdict({ results: [okR('s:a'), okR('s:p')], keys: ['s:a', 's:p'], check: 'offered' });
+    t(noOff.code === 4, 'offered: no notOffered results at all is NO-RULINGS');
+    const half = finalVerdict({ results: [okR('s:a', 'offered'), okR('s:p', 'ruling')], keys: ['s:a', 's:p'], check: 'offered' });
+    t(half.code === 2 && half.unchecked.join() === 's:p', 'a skill in the block with no entry of the kind checked is not checked');
+    const both = finalVerdict({ results: [okR('s:a'), Object.assign(okR('s:a'), { ok: false })], keys: ['s:a', 'add:b'], unruled: ['add:b'], check: 'rulings' });
+    t(both.code === 1 && /not checked: add:b/.test(both.line), 'a broken ruling is FAIL and still names the unchecked skill');
+    t(finalVerdict({ results: [okR('s:a'), okR('add:b')], keys: ['s:a', 'add:b'], check: 'rulings' }).code === 0, 'every skill checked is OK');
     for (const f of fails) say(`  self-test FAIL: ${f}`);
-    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 17 cases)`);
+    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 22 cases)`);
     process.exit(fails.length ? 1 : 0);
 }
 
@@ -295,15 +309,31 @@ async function main() {
     const pad = (s, w) => String(s).padEnd(w);
     say(`${TOOL}: ${blocks.map((b) => b.file).join(', ')} on ${ROOT === HERE ? 'this tree' : ROOT}; ${keys.length} skill(s), ${N} items per ruling`);
     for (const r of results) say(`  ${r.ok ? 'ok  ' : 'FAIL'} ${pad(r.key, 36)} ${pad(r.id, 18)} ${r.source ? `(${r.source}) ` : ''}${r.msg}`);
-    const bad = results.filter((r) => !r.ok);
-    const nR = results.filter((r) => r.kind === 'ruling').length, nO = results.filter((r) => r.kind === 'offered').length;
     if (unruled.length) say(`  no rulings for: ${unruled.join(', ')} (not checked)`);
     for (const l of proseTodoLines(blocks)) say(l);
     const secs = ((Date.now() - T0) / 1000).toFixed(1);
-    if (has('--json')) writeFileSync(resolve(arg('--json')), JSON.stringify({ tool: TOOL, root: ROOT, blocks: blocks.map((b) => b.file), skills: keys, unruled, n: N, results, seconds: +secs }, null, 1) + '\n');
-    if (!results.length) { say(`${TOOL}: NO-RULINGS (the blocks hold no ${CHECK === 'offered' ? 'notOffered entries' : CHECK === 'rulings' ? 'rulings' : 'rulings or notOffered entries'} for the skills in scope; nothing checked)`); process.exit(4); }
-    const tail = `${nR} ruling check(s), ${nO} not-offered check(s), ${keys.length - unruled.length} skill(s)${unruled.length ? `, ${unruled.length} without rulings` : ''}; ${secs} s`;
-    say(bad.length ? `${TOOL}: FAIL - ${bad.length} broken: ${[...new Set(bad.map((r) => `${r.id} ${r.key.split(':')[1]}`))].slice(0, 6).join('; ')} (${tail})` : `${TOOL}: OK (${tail})`);
-    process.exit(bad.length && !has('--report-only') ? 1 : 0);
+    const v = finalVerdict({ results, keys, unruled, check: CHECK, secs });
+    for (const k of v.unchecked.filter((k) => !unruled.includes(k))) say(`  no ${CHECK === 'offered' ? 'notOffered entry' : CHECK === 'rulings' ? 'ruling' : 'ruling or notOffered entry'} applies to ${k} (not checked)`);
+    if (has('--json')) writeFileSync(resolve(arg('--json')), JSON.stringify({ tool: TOOL, root: ROOT, blocks: blocks.map((b) => b.file), skills: keys, unruled, unchecked: v.unchecked, n: N, results, verdict: v.line, seconds: +secs }, null, 1) + '\n');
+    say(v.line);
+    process.exit(has('--report-only') && v.code !== 4 ? 0 : v.code);
+}
+
+/**
+ * The last line and exit code (pure; self-tested). Every skill in scope must have at least one check of the kind run
+ * (--check rulings: a ruling; offered: a notOffered entry; all: either): a skill without one was NOT checked, so a run
+ * that is otherwise clean is INCOMPLETE (exit 2, the skills named), never OK (critic r6 D3: a block that forgot the
+ * preset read OK). A broken ruling is FAIL whatever else is unchecked. No check at all is NO-RULINGS (exit 4).
+ */
+export function finalVerdict({ results, keys, unruled = [], check = 'all', secs = '0.0' }) {
+    const kind = check === 'offered' ? ['offered'] : check === 'rulings' ? ['ruling'] : ['ruling', 'offered'];
+    const unchecked = keys.filter((k) => !results.some((r) => r.key === k && kind.includes(r.kind)));
+    if (!results.some((r) => kind.includes(r.kind))) return { code: 4, unchecked, line: `${TOOL}: NO-RULINGS (the blocks hold no ${check === 'offered' ? 'notOffered entries' : check === 'rulings' ? 'rulings' : 'rulings or notOffered entries'} for the skills in scope; nothing checked)` };
+    const bad = results.filter((r) => !r.ok);
+    const nR = results.filter((r) => r.kind === 'ruling').length, nO = results.filter((r) => r.kind === 'offered').length;
+    const tail = `${nR} ruling check(s), ${nO} not-offered check(s), ${keys.length - unchecked.length} of ${keys.length} skill(s) checked${unchecked.length ? `, ${unchecked.length} NOT checked (${unruled.filter((k) => unchecked.includes(k)).length} without a rulings block)` : ''}; ${secs} s`;
+    if (bad.length) return { code: 1, unchecked, line: `${TOOL}: FAIL - ${bad.length} broken: ${[...new Set(bad.map((r) => `${r.id} ${r.key.split(':')[1]}`))].slice(0, 6).join('; ')}${unchecked.length ? `; not checked: ${unchecked.join(', ')}` : ''} (${tail})` };
+    if (unchecked.length) return { code: 2, unchecked, line: `${TOOL}: INCOMPLETE - not checked: ${unchecked.join(', ')} (${tail})` };
+    return { code: 0, unchecked, line: `${TOOL}: OK (${tail})` };
 }
 main().catch((e) => { say(`${TOOL}: ${e && e.stack || e}`); say(`${TOOL}: FAIL - error`); process.exit(2); });

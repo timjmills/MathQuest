@@ -28,7 +28,8 @@
 //             ws-screen-slots --skills (--baseline when the script has the flag; else this tool compares its findings
 //             with the same pinned file), ws-screen-answer --skills, ws-chromebook-fit --skills, ws-code-snapshot,
 //             ws-boot-smoke, and the five checks from the pilot-su-c critic r1 lessons (2026-10-23):
-//             ws-sibling-compare --run <the matrix's run file> --run-siblings (process rule 0b: every RED matrix row's
+//             ws-sibling-compare --run <the matrix's run file> --run-siblings (process rule 0b: every printed matrix row
+//               with findings - RED, OK and PENDING(no-baseline) alike, critic r6 D1 - against its PAIRED siblings (N1);
 //               counts against the APPROVED siblings on the same template, tests/fixtures/precritic/siblings.json; it
 //               runs after the matrix. A count above the siblings' max is FAIL "worse than siblings"; when every red
 //               count is at or below them, the coverage-matrix row reads PASS (baseline) "engine red", non-blocking),
@@ -40,6 +41,7 @@
 //             ws-card-rulings --check rulings (the spec card's numeric rulings against 300 seeded items a skill) and
 //             ws-card-rulings --check offered (the option panel offers nothing the card lists as not offered). A skill
 //               whose card has no machine-readable rulings block makes these two rows SKIPPED (no rulings): not run,
+//               and a scope where only SOME skills have rulings makes them INCOMPLETE (partial rulings; critic r6 D3),
 //               not passed, and an incomplete run under --strict
 //   --template <id>   the --skill gates for every live skill whose kit cell template is <id> on ANY of its 8 seeded
 //             items (a "template skill scan" row names the skills that draw it, and FAILS naming any skill whose
@@ -524,13 +526,14 @@ const PARSE = {
         const missing = (g.keys || []).filter((k) => !(j.skills || []).includes(k));
         if (missing.length) return { result: 'FAIL', findings: `${missing.length} skill(s) in scope absent from the comparison: ${listShort(missing)}`, detail: tailLines(out), explainsExit: false };
         const sib = Object.entries(j.siblings || {}).map(([k, s]) => `${k.split(':')[1]}: ${s.length}`).join(', ');
+        const byS = Object.entries(j.byStatus || {}).map(([k, n]) => `${k} ${n}`).join(', ') || 'none';
         const meta = { red: j.red, above: j.above.length, noSibling: j.noSibling.length, errors: j.errors.length, engine: j.engine.length };
         if (v[1] !== 'OK') {
             const detail = out.split('\n').filter((l) => /^(ABOVE|NO-SIBLING|ERROR) /.test(l)).slice(0, 10);
-            return { result: 'FAIL', findings: `worse than siblings: ${j.above.length} count(s) above the approved siblings in ${new Set(j.above.map((x) => x.id)).size} row(s), ${j.noSibling.length} with no sibling measured, ${j.errors.length} ERROR row(s); ${j.engine.length} at or below (engine) of ${j.rowsCompared} red row(s) (siblings per skill: ${sib})`, detail, explainsExit: code === 1, meta };
+            return { result: 'FAIL', findings: `worse than siblings: ${j.above.length} count(s) above the approved siblings in ${new Set(j.above.map((x) => x.id)).size} row(s), ${j.noSibling.length} with no sibling measured, ${j.errors.length} ERROR row(s); ${j.engine.length} at or below (engine) in ${j.rowsCompared} printed row(s) with findings (${byS}; siblings per skill: ${sib})`, detail, explainsExit: code === 1, meta };
         }
-        if (!j.rowsCompared) return { result: 'PASS', findings: `no red matrix row to compare (siblings per skill: ${sib})`, detail: [], explainsExit: false, meta };
-        return { result: 'PASS (baseline)', findings: `${j.rowsCompared} red row(s): all ${j.engine.length} count(s) at or below the approved siblings (engine red, non-blocking; siblings per skill: ${sib})`, detail: [], explainsExit: false, meta };
+        if (!j.rowsCompared) return { result: 'PASS', findings: `no printed matrix row with findings to compare (siblings per skill: ${sib})`, detail: [], explainsExit: false, meta };
+        return { result: 'PASS (baseline)', findings: `${j.rowsCompared} printed row(s) with findings (${byS}): all ${j.engine.length} count(s) at or below the paired approved siblings (engine debt, non-blocking; siblings per skill: ${sib})`, detail: [], explainsExit: false, meta };
     },
     /** ws-slot-clip --json: per matrix row and size. */
     slotClip(g, out, code) {
@@ -544,7 +547,9 @@ const PARSE = {
         if (none.length) return { result: 'FAIL', findings: `checked nothing for ${none.length} of ${(g.keys || []).length} skill(s): ${listShort(none)}`, detail: tailLines(out), explainsExit: false };
         const bad = checked.filter((r) => r.status !== 'ok');
         const ids = new Set(checked.map((r) => r.id));
-        const base = `${ids.size} matrix row(s) × ${(j.sizes || []).join('/')}: ${checked.length} document(s), SLOT ${checked.reduce((a, r) => a + (r.slot || 0), 0)} / CLIP ${checked.reduce((a, r) => a + (r.clip || 0), 0)} finding(s), ${checked.reduce((a, r) => a + (r.segs || 0), 0)} box segment(s) and ${checked.reduce((a, r) => a + (r.heads || 0), 0)} head(s) probed`;
+        const nEx = new Set(checked.filter((r) => /\|extra\//.test(r.id)).map((r) => r.id)).size;
+        const naW = checked.filter((r) => r.slotW === 'N/A').length, naH = checked.filter((r) => r.headsProbe === 'N/A').length;
+        const base = `${ids.size - nEx} matrix row(s) × ${(j.sizes || []).join('/')} + ${nEx} extra document(s) (test, more-practice, supports on): ${checked.length} document(s), SLOT ${checked.reduce((a, r) => a + (r.slot || 0), 0)} / CLIP ${checked.reduce((a, r) => a + (r.clip || 0), 0)} finding(s), ${checked.reduce((a, r) => a + (r.segs || 0), 0)} box segment(s) and ${checked.reduce((a, r) => a + (r.heads || 0), 0)} head(s) probed (SLOT-W N/A on ${naW}, HEADS N/A on ${naH} document(s): no digit strip / no heads)`;
         if (v[1] !== 'OK') return { result: 'FAIL', findings: `${bad.length} row×size(s) failing; ${base}`, detail: bad.slice(0, 8).map((r) => `${r.id} ${r.size}: ${(r.findings || [r.status]).join('; ').slice(0, 180)}`), explainsExit: code === 1 };
         return { result: checked.some((r) => (r.slot || 0) + (r.clip || 0) > 0) ? 'PASS (baseline)' : 'PASS', findings: `${base}; every SLOT / CLIP count at or below the approved siblings`, detail: [], explainsExit: false };
     },
@@ -554,6 +559,9 @@ const PARSE = {
             const m = /^ws-card-rulings: no card under (\S+) has a rulings block for (.*)$/m.exec(out);
             return { result: 'SKIPPED (no rulings)', findings: `no machine-readable rulings block (<!-- rulings {json} -->, tests/scripts/ws-card-rulings.mjs) in the spec card${m ? ` for ${listShort(m[2].split(', '), 4)}` : ''}: not checked`, detail: [], explainsExit: true };
         }
+        // critic r6 D3: a scope where only some skills have rulings is INCOMPLETE (exit 2), never PASS
+        const inc = /^ws-card-rulings: INCOMPLETE - not checked: (.*?) \((.*)\)\s*$/m.exec(out);
+        if (inc && code === 2) return { result: 'INCOMPLETE (partial rulings)', findings: `not checked (no rulings block entry): ${listShort(inc[1].split(', '), 4)}; ${inc[2]}`, detail: [], explainsExit: true };
         const r = generic(g, out, code);
         const m = /^ws-card-rulings: (?:OK|FAIL - [^(]*)\((.*)\)\s*$/m.exec(out);
         if (r.result === 'PASS') r.findings = m ? m[1] : r.findings;
@@ -629,12 +637,12 @@ function buildPlan(ctx) {
         // matrix's run file, so they run after it (a node gate each: both take their own browser slots); the slot / clip
         // row runs after the comparison, so the siblings' matrix run is measured once and read from its cache.
         const scJson = path.join(ctx.logs, 'sibling-compare.json');
-        const sc = gate('sibling-compare', 'ws-sibling-compare (rule 0b: red rows vs the approved siblings)', `${scope}: red matrix rows`, 'node', 'ws-sibling-compare', ['--run', cmJson, '--skills', keys.join(','), '--run-siblings', '--json', scJson], { parse: PARSE.siblingCompare, jsonOut: scJson, keys, missingMsg: 'ws-sibling-compare is not in this tree' });
+        const sc = gate('sibling-compare', 'ws-sibling-compare (rule 0b: every printed row with findings vs the paired approved siblings)', `${scope}: matrix rows with findings`, 'node', 'ws-sibling-compare', ['--run', cmJson, '--skills', keys.join(','), '--run-siblings', '--json', scJson], { parse: PARSE.siblingCompare, jsonOut: scJson, keys, missingMsg: 'ws-sibling-compare is not in this tree' });
         sc.after = 'coverage-matrix';
         if (matrix.missing && !sc.missing) sc.missing = `needs the coverage matrix's run file (${matrix.missing})`;
         add(sc);
         const clJson = path.join(ctx.logs, 'slot-clip.json');
-        const cl = gate('slot-clip', 'ws-slot-clip (SLOT L-ANSAREA + CLIP L-OVERFLOW on every matrix row, box width, head overlap)', `${scope} × matrix rows × S/M/L`, 'node', 'ws-slot-clip', ['--run', cmJson, '--skills', keys.join(','), '--run-siblings', '--slots', '2', '--json', clJson], { parse: PARSE.slotClip, jsonOut: clJson, keys });
+        const cl = gate('slot-clip', 'ws-slot-clip (SLOT L-ANSAREA + CLIP L-OVERFLOW on every matrix row + test / more-practice / supports-on pages, box width, head overlap)', `${scope} × matrix rows × S/M/L + extras at S`, 'node', 'ws-slot-clip', ['--run', cmJson, '--skills', keys.join(','), '--run-siblings', '--slots', '2', '--json', clJson], { parse: PARSE.slotClip, jsonOut: clJson, keys });
         cl.after = 'sibling-compare';
         if (matrix.missing && !cl.missing) cl.missing = `needs the coverage matrix's run file (${matrix.missing})`;
         add(cl);
@@ -1017,7 +1025,7 @@ async function main() {
     }
     const failed = outRows.filter((r) => r.result === 'FAIL');
     const notBuilt = outRows.filter((r) => r.result === 'SKIPPED-NOT-BUILT');
-    const noData = outRows.filter((r) => r.result === 'SKIPPED (no rulings)');
+    const noData = outRows.filter((r) => r.result === 'SKIPPED (no rulings)' || r.result.startsWith('INCOMPLETE'));
     const na = outRows.filter((r) => r.result === 'N/A');
     const passed = outRows.filter((r) => r.result.startsWith('PASS'));
     const onBase = outRows.filter((r) => r.result === 'PASS (baseline)');
@@ -1030,8 +1038,8 @@ async function main() {
         }
     }
     const ids = (list) => list.map((r) => r.id).join(', ');
-    const counts = `${failed.length ? `${failed.length} FAIL, ` : ''}${passed.length} PASS${onBase.length ? ` (${onBase.length} on the baseline)` : ''}, ${na.length} N/A, ${notBuilt.length} SKIPPED-NOT-BUILT${noData.length ? `, ${noData.length} SKIPPED (no rulings)` : ''} of ${outRows.length}`;
-    const named = [failed.length && `FAIL: ${ids(failed)}`, na.length && `N/A (ran, nothing to check): ${ids(na)}`, notBuilt.length && `SKIPPED-NOT-BUILT (not run, not passed): ${ids(notBuilt)}`, noData.length && `SKIPPED (no rulings: nothing checked, not passed): ${ids(noData)}`].filter(Boolean).join('; ');
+    const counts = `${failed.length ? `${failed.length} FAIL, ` : ''}${passed.length} PASS${onBase.length ? ` (${onBase.length} on the baseline)` : ''}, ${na.length} N/A, ${notBuilt.length} SKIPPED-NOT-BUILT${noData.length ? `, ${noData.length} SKIPPED / INCOMPLETE (no or partial rulings)` : ''} of ${outRows.length}`;
+    const named = [failed.length && `FAIL: ${ids(failed)}`, na.length && `N/A (ran, nothing to check): ${ids(na)}`, notBuilt.length && `SKIPPED-NOT-BUILT (not run, not passed): ${ids(notBuilt)}`, noData.length && `SKIPPED / INCOMPLETE (no or partial rulings: not all checked, not passed): ${ids(noData)}`].filter(Boolean).join('; ');
     let verdict, exit;
     if (failed.length) { verdict = `FAIL: ${counts} (${named})`; exit = 1; }
     else if ((notBuilt.length || noData.length) && has('strict')) { verdict = `FAIL (incomplete, --strict): ${counts} (${named})`; exit = 3; }
