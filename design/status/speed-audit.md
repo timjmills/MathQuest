@@ -428,3 +428,15 @@ the checks, W0-B2 for the card, lead for rules). The count is re-taken at each r
 
 **Next test:** the next family runs with F1, F2, rules 0a/0b and F3 in place. Its bar is unchanged: ≤ 2 critic rounds, 1 builder run,
 ≤ 4 h for six or seven skills.
+
+**Routing (lead, 22:23 UTC):** F1 "W0-B2 card hosts and roles" runs in the pilot session after critic r3 (mq-opus-medium; the owner
+caps sessions), folding in W0-B's held 02c5308e. F2 (nine checks + two extras) goes to W0-A after its r7, as three parallel
+medium builders with the pilot's backtests and one critic. **The next family does not start until F1 and F2 are merged and the
+SU-C card is re-signed under the new gate.** Its bar: ≤ 2 rounds, ≤ 4 h for 6–7 skills; if missed, F7 (certify `stack` × Single
+skill) is next.
+
+### Acted-on count (per-round findings → real checks / speed-ups)
+
+| Date | Listed (checks / speed-ups) | Built with backtest | Built (rule / tool, no backtest needed) | Assigned with owner | Dropped |
+|---|--:|--:|--:|--:|--:|
+| 2026-10-23 22:25 | 18 / 10 (pilot r1 + r2) | 0 | 3 (rules 0a, 0b, per-round findings rule) | 25 (W0-A: checks + F3–F5; pilot session: F1) | 0 |
