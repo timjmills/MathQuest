@@ -43,7 +43,8 @@ Builders run in their own git worktrees and the lead merges them here.
 | Fix r2: nightly red-row rule (critic r2 D1) + nits + owner decisions (Repeated check in 28 slices; no-baseline rows PENDING) — merged dea73ab7 | mq-opus-medium (rebuild after a failed round) | 17:05 | 17:37 | — |
 | Sweep gaps from the W0-defects lane (board 1280×720 + nested clip, dark scan whole host, board animation, chrome-linux64) | mq-opus-low (change to built tools) | 17:09 | 18:08 | — |
 | Pilot six-skill matrix baseline (lead run) | — | 16:17 | 17:12 | 55 |
-| Critic r3 (fresh critic) | mq-opus-medium | 18:09 | — | — |
+| Critic r3 (fresh critic): FAIL 7 / 8 / 8, one blocking defect | mq-opus-medium | 18:09 | 18:44 | — |
+| Fix r3: baseline invariants (root cause of r1 D4, r2 D1, r3 D1) | mq-opus-medium (rebuild after a failed round) | 18:41 | — | — |
 | Timed deploy runs: three cloud sessions (gate sessions 1, 2, 3 in parallel; each repeats its session 3×) on eee32b89 | timing runners (session_01HZreUmm66xVrS2AYyY32uD, session_016eCsVCbtn3q8SkotuDG1Xp, session_01FLRx8vV9wbkgLuukh57VyK) | 18:09 | — | — |
 | S1 `ws-precritic` build (brought forward by the lead, 11:02; stopped: moved to the lead's session) | mq-opus-medium | 11:03 | 12:51 | 108 |
 
@@ -114,3 +115,21 @@ quiz-dot states, WCAG AA, blended translucent fills, transitions off for the lig
 worse, so the 3.10:1 answered dot on `0bb50b2~1` (low in light mode too then) is not flagged — a light-mode contrast scan
 would be a separate gate. The board waits for animations before measuring (6/6 repeats clean); `chromePath()` finds
 `chrome-linux64/` or `chrome-linux/`.
+
+Options pin merged (ws-options-pin.cjs, 714 skills pinned: 115 skills / 335 failing pairs; 5,165 inert nl* pins gone with the
+speed audit's options-verify fix). Real option defects it lists, need owners: (1) behaviour options change dealt items
+(calculator / skipAfter on number_seq_fill, mixed_counting, compare_groups, number_bonds, fraction_of_set, …; nl* controls
+change items on number_seq_fill / mixed_counting); (2) values outside the teacher's choice (compare_to_half denoms=[3] deals
+8, 2, 5, 10; place_value_10x band=1000 reaches 10000; coordinates_plot_q1 band=5 reaches 8; cube_numbers step=[1];
+number_word_form zeroPlace=always); (3) practice ignores skipAfter on 11 mixed pools, calculator on algebraic_all, onePage
+on count_by_*; Skip at the wrong count on number_families_* and factor_links_*; (4) notation "across" ignored on
+mult_2by1_column, mult_3by1_column, mult_2by2_standard and the long-division skills; (5) nlOn=true draws no line on 21
+skills. The Repeated check runs the options pin as one 1/28 batch slice a night (≈ 7 min), the whole pin ≈ 1 h 52 min.
+
+## Critic r3 (`design/audit/runs/wave0-gates/critic-r3.md`): FAIL — plan 7, backtests 8, usable 8
+r2 D1 fixed and both owner decisions implemented as ruled; sweep-gap fixes and backtests re-verified against the pre-fix
+trees. Blocking D1: a first-baseline night `--write-baseline` re-pins rows that already had a baseline (and rows
+re-selected as red), so a real regression reads OK. Same area as r1 D4 and r2 D1 (three rounds, three different defects in
+the baseline state), so fix r3 is briefed on the root cause: five written invariants (pin new rows only; never pin a
+re-selected red row; verdict before any pin; refuse conflicting duplicate pins; only an OK re-run or an explicit, logged
+re-pin clears a red row), each property-tested, plus a backtest.
