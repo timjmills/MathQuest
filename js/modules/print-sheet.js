@@ -239,6 +239,20 @@ function dealSkills(skills, count) {
  * reprints the same page); a duplicate retries under `baseSeed + i + 7919 * k`. `itemIndex`
  * counts only the items of that skill that were KEPT (generateQuestionFor's contract).
  */
+/**
+ * What one skill's share of a Mixed practice page must not repeat (critic M1 r1 D3): the answer,
+ * and for + and x the fact turned round (3 + 7 after 7 + 3). Keys, never shown.
+ */
+function repeatKeys(q) {
+    if (!q) return [];
+    const keys = [`ans:${typeof q.ans === 'object' ? JSON.stringify(q.ans) : String(q.ans)}`];
+    const p = (q.cell && q.cell.payload) || {};
+    const op = String(p.op || q.op || '').replace('×', '*').replace('x', '*');
+    const ops = refOperands(q);
+    if ((op === '+' || op === '*') && ops.length === 2) keys.push(`turn:${op}:${ops.slice().sort((a, b) => a - b).join(',')}`);
+    return keys;
+}
+
 /** The numeric operands of a generated item (its cell payload's, else its own a / b). */
 function refOperands(q) {
     const p = (q && q.cell && q.cell.payload) || {};
@@ -2651,6 +2665,7 @@ async function buildRoleSheet(n, metaOf) {
     // A Mixed practice page arranged 'mixed' keeps each cell's own instruction (B3): the page's
     // line is "Solve.", so a cell's "Add." / "Write the time." is not said twice.
     let keepPrompts = false;
+    let mixDigits = 0;
     let mixedCheck = null;
     const arrangementNotes = (n.arrangementNotes || []).slice();
 
@@ -2668,18 +2683,33 @@ async function buildRoleSheet(n, metaOf) {
         const flags = flagsFor(want);
         const out = [];
         let next = 0;
-        for (let pass = 0; pass < 4 && out.length < want; pass++) {
+        // A Mixed practice page (critic M1 r1 D3, L10): within one skill's share no answer comes
+        // twice and no fact comes with its turnaround (7 + 3 / 3 + 7), while the passes allow; the
+        // last pass takes what is left. Grouped pages keep their four passes and no such rule.
+        const noRepeat = keepPrompts;
+        const shareSeen = new Set();
+        const passes = noRepeat ? 8 : 4;
+        for (let pass = 0; pass < passes && out.length < want; pass++) {
             const need = want - out.length;
             const batch = pass === 0 ? need : need * 2 + 2;
             const gen = generateRun(pool.skills, batch, base, { startIndex: next, seen: st.seen, kept: st.kept });
             next += batch;
-            for (const g of gen) {
+            for (const g0 of gen) {
                 if (out.length >= want) break;
+                // A Mixed practice page of fact cells (critic M1 r1 D2): every fact on the page takes
+                // the page's widest answer zone, so the rules and the ones columns line up across a shelf.
+                // (A + fact keeps its fact drawing: a 3-track + band would otherwise draw the carry stack.)
+                const pl = mixDigits && g0.q && g0.q.cell && g0.q.cell.template === 'fact' && g0.q.cell.payload;
+                const g = pl && Number(pl.digits) < mixDigits
+                    ? Object.assign({}, g0, { q: Object.assign({}, g0.q, { cell: Object.assign({}, g0.q.cell, { payload: Object.assign({}, pl, { digits: mixDigits }, pl.regroup === undefined ? { regroup: false } : {}) }) }) })
+                    : g0;
                 const it = settlePrompts([hostItem(g, 0, n.size, { mix: { key: pi, count: pools.length, sheet: n.mix } })], metaOf(g.skill).instructionKey)[0];
                 if (keepPrompts) it.stripPrompt = false;
                 // Error analysis never falls back to an "Answer:" line under the cell: the shown work
                 // must sit in the cell's own slot, or the pupil sees two answer places (C1).
                 if (needsShow && (pass < 3 || strictShow) && !it.canShow()) continue;
+                const rk = noRepeat ? repeatKeys(g.q) : null;
+                if (rk && pass < passes - 1 && rk.some((x) => shareSeen.has(x))) continue;
                 const k = out.length;
                 const prepared = typeof mod.prepare === 'function'
                     ? mod.prepare(it, { index: k, seed: n.seed, wrong: !!flags[k], size: n.size, look: n.look })
@@ -2698,12 +2728,16 @@ async function buildRoleSheet(n, metaOf) {
                 // critic r2 N4: a role whose cells are sized to their content (the Opener) drops the one-page sheet's air round a row
                 if (mod.TIGHT_ROWS && prepared.template === 'count-row') prepared.tightRows = true;
                 prepared.section = 0;
+                if (rk) for (const x of rk) shareSeen.add(x);
                 out.push(prepared);
             }
         }
         return out;
     };
     const measure = (items) => measureItems(items, { size: n.size, look: n.look, colsList });
+    // A mixed page of 1 x 1 fact cells may run the whole lattice across (8 Daily / 10 I Can at S,
+    // the TY-30 fact ladder; critic M1 r1 D1), so its cells are measured at 8 and 10 too.
+    const measureMixed = (items) => measureItems(items, { size: n.size, look: n.look, colsList: [...new Set([...colsList, 7, 8, 9, 10])] });
 
     // 1. The probe: enough items to measure the skill (PT-ENG-9), per pool.
     const PROBE = mod.PROBE || { 'scripted-model': 1, stretch: 2, 'word-problems': 4, 'reason-it': 4, 'fact-probe': 20 }[n.role] || 8;
@@ -2720,22 +2754,28 @@ async function buildRoleSheet(n, metaOf) {
     // the notes say why.
     if (n.role === 'mixed-practice' && n.arrangement === 'mixed' && pools.length >= 2 && typeof mod.mixedClass === 'function') {
         const first = mod.mixedClass(probe, input);
+        let last = first;
         let ok = first.ok;
         let why = first.why;
         if (ok) {
             keepPrompts = true;
+            mixDigits = Math.max(0, ...pools.flatMap((p) => probe[p.id].map((it) => {
+                const c = it.q && it.q.cell;
+                return c && c.template === 'fact' && c.payload ? Number(c.payload.digits) || 0 : 0;
+            })));
             const kept = {};
-            pools.forEach((p, pi) => { kept[p.id] = dealPool(p, pi, PROBE); measure(kept[p.id]); });
+            pools.forEach((p, pi) => { kept[p.id] = dealPool(p, pi, PROBE); measureMixed(kept[p.id]); });
             const again = mod.mixedClass(kept, input);
             ok = again.ok;
             why = again.why;
+            last = again;
             if (ok) {
                 for (const p of pools) { probe[p.id] = kept[p.id]; input.floors[p.id] = floorOf(kept[p.id]); }
-            } else keepPrompts = false;
+            } else { keepPrompts = false; mixDigits = 0; }
         }
         if (ok) input.arrangement = 'mixed';
         else if (why) arrangementNotes.push(why);
-        mixedCheck = { ok, per: (first.per || []).map((x) => ({ id: x.id, name: x.name, k: x.k, h: Math.round(x.h * 10) / 10, own: x.own })) };
+        mixedCheck = { ok, per: (last.per || []).map((x) => ({ id: x.id, name: x.name, k: x.k, h: Math.round(x.h * 10) / 10, own: x.own })) };
     }
 
     // S6: Mixed practice's worked examples, one skill per pool, generated and measured before the
@@ -2785,7 +2825,7 @@ async function buildRoleSheet(n, metaOf) {
     pools.forEach((p, pi) => {
         const w = Math.max(0, Math.min(MAX_ITEMS, Math.floor(Number(want[p.id]) || 0)));
         let its = w <= probe[p.id].length && !mod.wrongFlags && !(pageLr6 && pi > 0) ? coverSlice(p, probe[p.id], w) : null;
-        if (!its) { its = dealPool(p, pi, w, pageLr6 && pi > 0 ? pageLr6 : null); measure(its); }
+        if (!its) { its = dealPool(p, pi, w, pageLr6 && pi > 0 ? pageLr6 : null); (input.arrangement === 'mixed' ? measureMixed : measure)(its); }
         if (pageLr6) for (const it of its) { lr6Record(it.q, `pool:${pi}`, pageLr6); pageLr6.add(`ansAll:${dlAns(it.q).replace(/[^0-9a-z<>=]/gi, '')}`); }
         items = items.concat(its);
     });

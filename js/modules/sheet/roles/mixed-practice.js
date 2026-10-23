@@ -170,6 +170,30 @@ export const MIX_H_RATIO = 0.75;
 /** Instructions a computation cell's own sign already says: such a cell needs no cue on "Solve.". */
 const SIGN_KEYS = new Set(['add', 'subtract', 'multiply', 'divide', 'mixed-sign', 'mixed-ops', 'default-solve', 'default-write']);
 
+/**
+ * The shelf widths a mixed page may try, widest first. Grouped shelves (and any page with a cell
+ * other than the 1 x 1 fact cell) keep the divisors of the lattice up to 6. A page whose cells are
+ * ALL fact cells may also run 7 to N across (N = 8 Daily / 10 I Can at S): the TY-30 fact ladder
+ * sets the digits by the count across (20 / 18 / 16 pt at 7 / 8 / 10), so S prints more problems
+ * than M (critic M1 r1 D1). Every shelf of a page takes the same k, so its vertical rules still
+ * line up; the page's lattice is then k itself.
+ */
+function kCandidates(poolsIn, ids, N) {
+    const allFact = ids.every((id) => poolsIn[id].every((it) => it.template === 'fact'));
+    const wide = allFact ? Array.from({ length: Math.max(0, N - 6) }, (_, i) => N - i).filter((d) => d >= 7 && d <= 10) : [];
+    return [...wide, ...divisorsDesc(N).filter((d) => d <= 6)];
+}
+
+/** fitsAt, and above 6 across only where the cell was really measured there (no measure, no fit). */
+const fitsMeasured = (its, d, ctx) => fitsAt(its, d, ctx) && (d <= 6 || its.every((it) => it.measured && it.measured[d] && it.measured[d].fits !== false));
+
+/** The tallest cell at k: the layout's own minimum up to 6, the measured height above it. */
+function hAtK(its, k, ctx) {
+    if (k <= 6) return hMinAt(its, k, ctx);
+    const hs = its.map((it) => it.measured && it.measured[k] && it.measured[k].hMm);
+    return hs.every((h) => Number.isFinite(h)) ? Math.max(...hs) + 1 : Infinity;
+}
+
 const latticeOf = (input, ctx) => ([4, 6, 8, 10].includes(Number(input.latticeN)) ? Number(input.latticeN) : AUTO_N[ctx.look][ctx.size]);
 
 /** The plain words for a pool's skill (the notes): its strand or label. */
@@ -193,10 +217,21 @@ export function mixedClass(poolsIn, input = {}) {
     const N = latticeOf(input, ctx);
     const ids = Object.keys(poolsIn).filter((id) => (poolsIn[id] || []).length);
     if (ids.length < 2) return { ok: false, N, why: '' };
+    // M1 mixes kit cells only: a legacy cell (old print HTML) draws its own rule, column and sign
+    // spacing, so it would not line up with the kit cells it shares a shelf with (critic r1 D2).
+    const legacy = ids.filter((id) => poolsIn[id].some((it) => !it.template || it.template === 'legacy'));
+    if (legacy.length) {
+        return { ok: false, N, why: `Mixed practice: ${legacy.map((id) => poolName(input, poolsIn[id])).join(', ')} still uses the old drawing, so the page prints in sections for now.` };
+    }
+    const cands = kCandidates(poolsIn, ids, N);
+    // All fact cells: one drawing, so the page takes the widest k EVERY skill fits (a fact that fits
+    // 8 across fits 7; the ladder sizes the digits for the k chosen). Otherwise each skill's own k.
+    const allFact = ids.every((id) => poolsIn[id].every((it) => it.template === 'fact'));
+    const kAll = allFact ? cands.find((d) => ids.every((id) => fitsMeasured(poolsIn[id], d, ctx))) : 0;
     const per = ids.map((id) => {
         const its = poolsIn[id];
-        const k = divisorsDesc(N).find((d) => d <= 6 && fitsAt(its, d, ctx)) || 1;
-        const h = hMinAt(its, k, ctx);
+        const k = kAll || cands.find((d) => fitsMeasured(its, d, ctx)) || 1;
+        const h = hAtK(its, k, ctx);
         const key = instructionKeyOf(its, input.skills);
         const own = SIGN_KEYS.has(key) || its.every((it) => !!it.cellPrompt);
         return { id, k, h: Number.isFinite(h) ? h : Infinity, own, name: poolName(input, its) };
@@ -231,9 +266,10 @@ function mixedPacking(poolsIn, input) {
         // The host checked the probe; should the final items differ (a taller item dealt), the
         // page stays mixed on the narrowest k every skill fits, as tall as its tallest cell.
         const N = cls.N || latticeOf(input, ctx);
-        const kOf = (its) => divisorsDesc(N).find((d) => d <= 6 && fitsAt(its, d, ctx)) || 1;
+        const cands = kCandidates(poolsIn, ids, N);
+        const kOf = (its) => cands.find((d) => fitsMeasured(its, d, ctx)) || 1;
         const k = Math.min(...ids.map((id) => kOf(poolsIn[id])));
-        const h = Math.max(...ids.map((id) => hMinAt(poolsIn[id], k, ctx)).map((x) => (Number.isFinite(x) ? x : 60)));
+        const h = Math.max(...ids.map((id) => hAtK(poolsIn[id], k, ctx)).map((x) => (Number.isFinite(x) ? x : 60)));
         cls = { ok: false, k, h: h > 0 ? h : 60, N, why: cls.why };
     }
     const maxShelves = { S: 9, M: 7, L: 5 }[ctx.size] || 5;
@@ -242,7 +278,8 @@ function mixedPacking(poolsIn, input) {
     const weights = Object.fromEntries((input.pools || []).filter((p) => ids.includes(p.id)).map((p) => [p.id, p.weight || 1]));
     for (const id of ids) if (!(id in weights)) weights[id] = 1;
     const deal = dealCounts(weights, total, { min: 2 });
-    return { ctx, m, cls, ids, shelves, total, weights, deal, N: cls.N };
+    // (a shelf wider than 6 is the page's own lattice: every shelf takes the same k)
+    return { ctx, m, cls, ids, shelves, total, weights, deal, N: cls.k > 6 ? cls.k : cls.N };
 }
 
 function planMixed(input, pools) {
@@ -267,11 +304,11 @@ function planMixed(input, pools) {
     const shelves = [];
     for (let s = 0; s < queue.length; s += k) {
         const chunk = queue.slice(s, s + k);
-        const own = hMinAt(chunk, k, ctx);
+        const own = hAtK(chunk, k, ctx);
         const h = Number.isFinite(own) && own > 0 ? Math.min(cls.h, own) : cls.h;
         // H13: the shortest skill's cells on the shelf keep its drawing at least 70 % of the
         // shelf's height, so the spare height shared in below never opens a 30 % empty band.
-        const short = Math.min(...[...new Set(chunk.map((it) => it.pool))].map((id) => hMinAt(chunk.filter((it) => it.pool === id), k, ctx)).filter((x) => Number.isFinite(x) && x > 0), h);
+        const short = Math.min(...[...new Set(chunk.map((it) => it.pool))].map((id) => hAtK(chunk.filter((it) => it.pool === id), k, ctx)).filter((x) => Number.isFinite(x) && x > 0), h);
         shelves.push({ items: chunk, h, room: Math.max(0, short / 0.7 - h) });
     }
     const n = queue.length;
@@ -294,7 +331,7 @@ function planMixed(input, pools) {
             cur.sections.push(cur.band);
             pages.push(cur);
         }
-        cur.band.contents.push(gridPart(sh.items.map((it) => planItem(it, { cols: Math.min(k, 6) })), { cols: k, rows: 1, cellH: h, labels, start }));
+        cur.band.contents.push(gridPart(sh.items.map((it) => planItem(it, { cols: k })), { cols: k, rows: 1, cellH: h, labels, start }));
         start += sh.items.length;
         cur.used += h;
     }
