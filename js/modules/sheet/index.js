@@ -55,6 +55,9 @@ export {
 /* ----------------------------------------------------------------------------- rng */
 export { rng, int, pick, shuffle, deriveSeed } from './rng.js';
 
+/* ---------------------------------------------------------------------- the mixed order */
+export { interleave, dealCounts, turnsOf, runsOf, capsOf } from './interleave.js';
+
 /* ------------------------------------------------------------------------ contract */
 // The Skill Cell Contract: the provider registry, the controlled instruction library and the
 // coverage judgement. Importing this barrel also loads `adapters.js`, which installs the six
