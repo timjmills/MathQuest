@@ -77,10 +77,14 @@ export function binaryParts(q) {
     if (!q || typeof q !== 'object') return null;
     if (Array.isArray(q.options) && q.options.length > 0) return null;       // a choice item stays a choice (SP-3)
     if (q.answerType && q.answerType !== 'number') return null;
+    // Thousands commas ("4,367 − 2,244 = ?", toLocaleString) are read as the number they write
+    // (critic SU-C r1 D5: comma text fell through to the generic twin, which restated the sum in
+    // place of the instruction, focused the leftmost box and clipped a 6-digit stack at 390 px).
     const t = plainText(q.text);
-    const m = t.match(/^(\d{1,7})\s*([+\-−–×xX*÷/])\s*(\d{1,7})\s*=\s*(?:\?|_+)?\s*$/);
+    const N = '(\\d{1,3}(?:,\\d{3})+|\\d{1,7})';
+    const m = t.match(new RegExp(`^${N}\\s*([+\\-−–×xX*÷/])\\s*${N}\\s*=\\s*(?:\\?|_+)?\\s*$`));
     if (!m) return null;
-    const a = Number(m[1]), b = Number(m[3]), op = OP_NORM[m[2]];
+    const a = Number(m[1].replace(/,/g, '')), b = Number(m[3].replace(/,/g, '')), op = OP_NORM[m[2]];
     if (!op || !Number.isFinite(a) || !Number.isFinite(b)) return null;
     const ans = Number(String(q.ans).replace(/,/g, ''));
     if (!Number.isInteger(ans) || ans < 0) return null;
@@ -123,7 +127,10 @@ export function cellKindFor(q) {
         if (ANS.length <= T) {
             const noRegroup = q.regroup === false || pay.regroup === false || pay.regroup === 'none';
             const strip = Number(pay.ansDigits) > 0 && pay.regroup === false && p.op === '-' ? Math.max(Number(pay.ansDigits), ANS.length) : 0;
-            return { kind: 'stack', T, ...p, ...(noRegroup ? { regroup: false } : {}), ...(pay.commas ? { commas: true } : {}), ...(strip ? { strip } : {}) };
+            // The no-regrouping ladder prints its place heads at the default level (critic SU-C r1 D2):
+            // the screen draws them too (SP parity). Scoped by the payload's `wideTracks` opt-in.
+            const heads = pay.wideTracks === true && pay.heads === true;
+            return { kind: 'stack', T, ...p, ...(noRegroup ? { regroup: false } : {}), ...(pay.commas ? { commas: true } : {}), ...(strip ? { strip } : {}), ...(heads ? { heads: true } : {}) };
         }
     }
     // div_facts' Long-division form (divForm 'long'): the kit bracket on every screen host, so it
@@ -442,7 +449,7 @@ export function kindHTML(k, { slotHtml = '', idPrefix = '', regroup = true, answ
     if (kk.kind === 'eq') html = equationHTML(kk, slotHtml);
     else if (kk.kind === 'fact') html = factHTML(kk, slotHtml);
     else if (kk.kind === 'division') html = divisionHTML(kk, slotHtml);
-    else if (kk.kind === 'stack') html = stackHTML(kk, { idPrefix, regroup, answerClass });
+    else if (kk.kind === 'stack') html = stackHTML(kk, { idPrefix, regroup, answerClass, heads: kk.heads === true });
     if (!html || kk === k) return html;
     const p = { a: k.a, b: k.b, op: k.op, operands: k.operands, supports: { ...supports, reserve: [] } };
     return withSupports(html, p, SCREEN_TEMPLATE[k.kind] || 'fact', { mode: 'screen', size: 'L', metrics: { digitPt: 28 } }, { problemWMm: 60, problemHMm: 40 });

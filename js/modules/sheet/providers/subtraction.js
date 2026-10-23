@@ -320,15 +320,17 @@ export function columnSubNoRegroup(a, b) {
     const each = cols.length <= 3 ? cols : cols.slice(0, 2);
     for (const c of each) { const l = line(c); out.push(step(l.text, l.mark)); }
     if (cols.length > 3) {
+        // From 4 digits the places left of the tens are one step (the anchor holds four lines),
+        // but the step still states every column's sum and rings those columns (critic r1 D10).
         const rest = cols.slice(2);
-        // up to two more places print their sums; past that the line names the move only, so
-        // the step stays one short line beside a six-digit stack
-        const sums = rest.length <= 2 ? `: ${rest.map((c) => (c.bot === null ? `${c.top}` : `${c.top} − ${c.bot} = ${c.res}`)).join(', ')}` : '';
-        const lead = rest.some((c) => c.lead) ? ' A 0 at the front is not written: leave that box empty.' : '';
-        out.push(step(`${NR_TITLE(2)} to ${NR_PLACES[rest[rest.length - 1].k]}, the same way${sums}.${lead}`,
-            rest.flatMap((c) => (c.lead ? [] : [{ slot: NR_PLACES[c.k], value: String(c.res) }]))));
+        const sums = rest.map((c) => (c.bot === null ? `${c.top}` : `${c.top} − ${c.bot} = ${c.res}`)).join(', ');
+        const lead = rest.some((c) => c.lead) ? ' Leave a 0 at the front out.' : '';
+        out.push(step(`${NR_TITLE(2)} to ${NR_PLACES[rest[rest.length - 1].k]}: ${sums}.${lead}`,
+            rest.flatMap((c) => [{ slot: `ring:${NR_PLACES[c.k]}`, value: '' }, ...(c.lead ? [] : [{ slot: NR_PLACES[c.k], value: String(c.res) }])])));
         out.push(step(`The answer is ${fmt(a - b)}.`, [{ slot: 'answer', value: String(a - b) }]));
     } else {
+        // Two digits: ones, tens, the answer, the check - four steps like every other size.
+        if (cols.length === 2) out.push(step(`The answer is ${fmt(a - b)}.`, [{ slot: 'answer', value: String(a - b) }]));
         out.push(step(`Check: ${fmt(a - b)} + ${fmt(b)} = ${fmt(a)}.`));
     }
     return clampSteps(out);
@@ -337,7 +339,10 @@ export function columnSubNoRegroup(a, b) {
 /** The three misconceptions that SHOW on a no-regrouping item, as wrong answers. */
 export function noRegroupWrongs(a, b) {
     const A = String(a), B = String(b), diff = a - b, D = String(diff);
-    const out = [{ value: a + b, misconception: 'added', explain: 'Added instead of subtracting.' }];
+    const out = [];
+    // SU-M7: added. Only when the sum fits the answer strip (as many boxes as the top number has
+    // digits): 9752 − 6231 "= 15983" cannot be written in four boxes (critic r1 D9).
+    if (String(a + b).length <= A.length) out.push({ value: a + b, misconception: 'added', explain: 'Added instead of subtracting.' });
     // M-ALIGN: a shorter bottom number lined up on the LEFT (86 − 4 worked as 86 − 40).
     if (B.length < A.length) {
         const left = a - b * 10 ** (A.length - B.length);
@@ -352,8 +357,17 @@ export function noRegroupWrongs(a, b) {
         const v = Number(digits.join(''));
         if (v !== diff) out.push({ value: v, misconception: 'zero-as-zero', explain: 'Wrote 0 for a place where 0 is taken away.' });
     }
-    // M-ZERO2: a 0 inside the answer dropped (2206 written 226).
-    if (D.length >= 2 && D.slice(1).includes('0')) {
+    // A skipped column (the tens top digit copied down, not subtracted): the slip that remains
+    // when nothing regroups, and the one wrong answer every item has (critic r1 D9 left a 4-digit
+    // item whose sum overflows the strip with no other candidate).
+    if (A.length >= 2 && B.length >= 2) {
+        const digits = D.padStart(A.length, '0').split('');
+        digits[A.length - 2] = A[A.length - 2];
+        const v = Number(digits.join(''));
+        if (v !== diff) out.push({ value: v, misconception: 'skipped-place', explain: 'Did not subtract the tens: copied the top digit down.' });
+    }
+    // M-ZERO2: a 0 INSIDE the answer dropped (2206 written 226); a trailing 0 is not inside (r1 D9).
+    if (D.length >= 3 && D.slice(1, -1).includes('0')) {
         const v = Number(D.replace(/0/g, '')) || null;
         if (v && v !== diff) out.push({ value: v, misconception: 'dropped-zero', explain: 'Left out a 0 inside the answer.' });
     }
@@ -380,7 +394,7 @@ for (const [id, within] of [
             say: '__ minus __ equals __.',
             vocabulary: ['ones', 'tens', 'line up', 'place value'],
         }),
-        misconceptions: ['added', 'misaligned', 'zero-as-zero', 'dropped-zero'],
+        misconceptions: ['added', 'misaligned', 'zero-as-zero', 'skipped-place', 'dropped-zero'],
         workedSteps: (q) => {
             const [a, b] = operands(q);
             if (!Number.isInteger(a) || !Number.isInteger(b) || a < b || b < 0) return [];

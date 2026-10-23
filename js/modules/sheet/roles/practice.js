@@ -856,7 +856,11 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
         const pupil = sheetItems[si].filter((it) => !it.anchor);
         const hostKeys = pupil.map((it) => {
             const q = it.q || {};
-            const s = skills.find((k) => k.skillId === q.skillId && (!q.categoryId || k.categoryId === q.categoryId));
+            // A preset skill's items carry their HOST's id as skillId and the preset's as presetId
+            // (generate-question.js), so the preset is matched by presetId first (critic SU-C r1 D8:
+            // sub_2d_1d matched no listed skill and printed "Solve. Write the answer.").
+            const own = (id) => skills.find((k) => k.skillId === id && (!q.categoryId || k.categoryId === q.categoryId));
+            const s = (q.presetId && own(q.presetId)) || own(q.skillId);
             return (it.instructionKey) || (s ? skillWords(s).instructionKey : '');
         });
         // Critic guided-r1: a mixed pool's items are stamped with the pool's one line ("Solve.

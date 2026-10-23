@@ -34,6 +34,94 @@
 /** The action icons a step may use (drawn by sheet/lesson-icons.js). */
 export const STEP_ICONS = Object.freeze(['look', 'start', 'count', 'write', 'regroup', 'subtract', 'subOnes', 'subTens', 'ends', 'decide', 'check', 'say']);
 
+/* -------------------------------------------- the no-regrouping column subtraction lessons */
+const NR_VOCAB_2 = [
+    { word: 'ones', meaning: 'the right-hand place', picture: { kind: 'blocks', tens: 0, ones: 4 } },
+    { word: 'tens', meaning: 'groups of ten', picture: { kind: 'blocks', tens: 3, ones: 0 } },
+    { word: 'line up', meaning: 'ones under ones', picture: { kind: 'text', text: '47 − 23' } },
+];
+const NR_VOCAB_BIG = (n) => [
+    { word: 'place', meaning: 'ones, tens, hundreds ...', picture: { kind: 'text', text: 'H T O' } },
+    { word: 'line up', meaning: 'ones under ones', picture: { kind: 'text', text: n } },
+    { word: 'take away', meaning: 'subtract: the − sign', picture: { kind: 'glyph', text: '−' } },
+];
+const NR_CONCEPTS = [
+    { id: 'line-up', text: 'Line up the places: ones under ones.' },
+    { id: 'ones-first', text: 'Subtract the ones first, then each place to the left.' },
+    { id: 'top-bigger', text: 'Every top digit is bigger: nothing regroups.' },
+];
+const NR_STEPS_2 = (tens = 'Subtract the tens.') => [
+    { icon: 'subOnes', text: 'Subtract the ones.' },
+    { icon: 'subTens', text: tens },
+    { icon: 'write', text: 'Read the answer.' },
+    { icon: 'check', text: 'Check: add back.' },
+];
+const NR_STEPS_3 = [
+    { icon: 'subOnes', text: 'Subtract the ones.' },
+    { icon: 'subTens', text: 'Subtract the tens.' },
+    { icon: 'subtract', text: 'Subtract the hundreds.' },
+    { icon: 'check', text: 'Check: add back.' },
+];
+const NR_STEPS_BIG = [
+    { icon: 'subOnes', text: 'Subtract the ones.' },
+    { icon: 'subTens', text: 'Subtract the tens.' },
+    { icon: 'subtract', text: 'Each place to the left.' },
+    { icon: 'write', text: 'Read the answer.' },
+];
+function subNoRegroupLessons() {
+    const FORMAT = {
+        kind: 'numbered steps with icons',
+        why: 'The move is the same in every column, ones first; four short steps said in order are what pupils need. No decision to cue, so no chant.',
+    };
+    const base = (o) => Object.assign({
+        concepts: NR_CONCEPTS, chant: '', format: FORMAT,
+        example: { match: 'Ones:', test: 'subNoZero' },
+        words: [{ from: '^Check:\\s*', to: '' }],
+        distinctFirst: true, distinctAnswer: true,
+    }, o);
+    // (across: a one-line fact fills its Warm-up cell; a vertical 9 − 3 sat in a third of it, H13)
+    const facts10 = { key: 'subtraction:subtract', opts: { band: 10, notation: ['across'] }, why: 'Each column is a take-away fact within 10.' };
+    const pv = { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] }, why: 'Name the tens digit and the ones digit.' };
+    const rung = (key, why) => ({ key, why });
+    return {
+        'subtraction:sub_50_no_regroup': base({
+            skills: [facts10, pv], vocab: NR_VOCAB_2, steps: NR_STEPS_2(), checkRow: true, maxSmall: 1,
+            mixWith: [{ key: 'addition:add_50_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }],
+        }),
+        'subtraction:sub_100_no_regroup': base({
+            skills: [rung('subtraction:sub_50_no_regroup', 'The same column steps with smaller numbers.'), facts10],
+            vocab: NR_VOCAB_2, steps: NR_STEPS_2(), checkRow: true, maxSmall: 1,
+            mixWith: [{ key: 'addition:add_100_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }],
+        }),
+        // The preset (host sub_100_no_regroup, lengths: shorter): every bottom number is one digit,
+        // so `maxSmall` (one one-place take-away a page) does not apply; its tens step writes the tens.
+        'subtraction:sub_2d_1d': base({
+            skills: [facts10, pv], vocab: NR_VOCAB_2, steps: NR_STEPS_2('Write the tens.'), checkRow: true,
+            mixWith: [{ key: 'addition:add_100_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }],
+        }),
+        'subtraction:sub_1k_no_regroup': base({
+            skills: [rung('subtraction:sub_100_no_regroup', 'The same column steps with two places.'), facts10],
+            vocab: NR_VOCAB_BIG('486 − 52'), steps: NR_STEPS_3, checkRow: true, maxSmall: 1,
+            mixWith: [{ key: 'addition:add_1k_no_regroup' }],
+        }),
+        'subtraction:sub_10k_no_regroup': base({
+            skills: [rung('subtraction:sub_1k_no_regroup', 'The same column steps with three places.'), facts10],
+            vocab: NR_VOCAB_BIG('4,867 − 352'), steps: NR_STEPS_BIG, maxSmall: 1,
+            mixWith: [{ key: 'addition:add_10k_no_regroup' }],
+        }),
+        'subtraction:sub_100k_no_regroup': base({
+            skills: [rung('subtraction:sub_10k_no_regroup', 'The same column steps with four places.'), facts10],
+            vocab: NR_VOCAB_BIG('48,675 − 3,524'), steps: NR_STEPS_BIG, maxSmall: 1,
+            mixWith: [{ key: 'addition:add_100k_no_regroup' }],
+        }),
+        'subtraction:sub_1m_no_regroup': base({
+            skills: [rung('subtraction:sub_100k_no_regroup', 'The same column steps with five places.'), facts10],
+            vocab: NR_VOCAB_BIG('486,759 − 35,247'), steps: NR_STEPS_BIG, maxSmall: 1,
+            mixWith: [{ key: 'addition:add_1m_no_regroup' }],
+        }),
+    };
+}
+
 export const LESSONS = Object.freeze({
     // ---------------------------------------------------------------- Add within 10 (K-1)
     // The skill is addition:add_facts with its band option at 10 ("Within N" bounds the sum).
@@ -126,6 +214,14 @@ export const LESSONS = Object.freeze({
         // Lessons r2: the partner is 2-digit addition (never 2 + 8 in a carry scaffold).
         mixWith: [{ key: 'addition:add_100_regroup', minOperand: 10 }],
     },
+
+    // ------------------------------- Column subtraction WITHOUT regrouping (SU-C, 2 to 6)
+    // Spec card design/cards/subtraction/subtraction.md (critic SU-C r1 D4): the Warm-up deals the
+    // rung below on the same no-regrouping ladder (never a regrouping item), the steps match the
+    // provider's four worked steps (sheet/providers/subtraction.js columnSubNoRegroup), the
+    // chart's example is never a zero case (`subNoZero`), and Mixed practice pairs the lesson with
+    // other strands (addition, place value), never a second Subtraction section.
+    ...subNoRegroupLessons(),
 
     // ------------------------------------------------- Round to the nearest 10 / 100 (3)
     'number_sense:nearest_10': {

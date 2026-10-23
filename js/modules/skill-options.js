@@ -1008,11 +1008,17 @@ const _subZeros = () => ({
     id: 'zeros', label: 'Zeros', type: 'enum', default: 'off', group: 'difficulty',
     values: [
         { v: 'off', l: 'No zero cases' },
-        { v: 'on', l: 'Zero cases (405 − 203, 58 − 30, 47 − 47, 486 − 452)' },
+        { v: 'on', l: 'Zero cases (405 − 203, 586 − 230, 586 − 236, 486 − 452)' },
     ],
     help: 'On makes every problem a zero case: a 0 in the top number, taking away 0, a column that '
-        + 'leaves 0, or an answer with fewer digits. Give it its own section.',
+        + 'leaves 0, or an answer with fewer digits. From 3 digits up. Give it its own section.',
 });
+// The no-regrouping column ladder's support level (critic SU-C r1 D2): the place heads are a
+// structural scaffold (WDS VA-30 / VA-32), so they print at the default level 1 and leave only on
+// their own fade step, level 0. Level 2 would print what level 1 prints, so it is not offered.
+const _subNrLevel = () => levelSubset([3, 1, 0], 1,
+    'Level 3 writes each answer in grey to trace (a worked example), level 1 prints the place-value '
+    + 'heads over the columns and the answer boxes, level 0 takes the heads away (the boxes stay).');
 
 const P11_OPS_OPTIONS = {
     // --- fact drills: the band and a fading picture cue sit beside the fact set -----------------
@@ -1127,7 +1133,11 @@ for (const op of ['add', 'sub']) {
             // Every item regrouping within 10 is only the bridging rung, never a lower band.
             const bands = Object.values(_OPS_BANDS).filter(b => b <= max && (b !== 10 || rg !== 'regroup'));
             const opts = [];
-            if (bands.length > 1) opts.push(_opsBand(bands, max, { help: _OPS_BAND_HELP[op] }));
+            // The six no-regrouping column subtractions ARE the number-size ladder (card §7), so a
+            // smaller band is the rung below, never an option here (critic SU-C r1 D6: band 10 / 20
+            // routed to the legacy cell, band 100 dealt 2-digit items under "within 1,000,000").
+            const subNrKit = op === 'sub' && rg === 'no_regroup' && max >= 50;
+            if (bands.length > 1 && !subNrKit) opts.push(_opsBand(bands, max, { help: _OPS_BAND_HELP[op] }));
             if (rg === 'mixed' && max > 10) {
                 opts.push({
                     ..._opsRegroup('mixed', op === 'sub'),
@@ -1143,7 +1153,7 @@ for (const op of ['add', 'sub']) {
                 if (!bridging) opts.push(...opts.pop());
             } else {
                 // The column support level draws on column work only (a band of 50 or more).
-                opts.push({ ..._opsColumnLevel(), appliesTo: cur => !(Number(cur.band) <= 20) });
+                opts.push(subNrKit ? _subNrLevel() : { ..._opsColumnLevel(), appliesTo: cur => !(Number(cur.band) <= 20) });
                 if (op === 'sub' && max >= 1000 && rg !== 'no_regroup') {
                     opts.push({
                         ..._opsAcrossZeros(rg === 'regroup'),
@@ -1154,8 +1164,8 @@ for (const op of ['add', 'sub']) {
             // Column subtraction without regrouping (spec card subtraction.md §9.3 / §9.4): two plain
             // options, each its own section. `lengths` from within 100 (within 100: 2-digit − 1-digit,
             // the sub_2d_1d preset), `zeros` from within 1,000 (3 digits up; never seeded below).
-            if (op === 'sub' && rg === 'no_regroup' && max >= 100) opts.push({ ..._subLengths(), appliesTo: cur => !(Number(cur.band) <= 50) });
-            if (op === 'sub' && rg === 'no_regroup' && max >= 1000) opts.push({ ..._subZeros(), appliesTo: cur => !(Number(cur.band) <= 100) });
+            if (subNrKit && max >= 100) opts.push(_subLengths());
+            if (subNrKit && max >= 1000) opts.push(_subZeros());
             P11_OPS_OPTIONS[`${cat}:${id}`] = opts;
         }
     }
