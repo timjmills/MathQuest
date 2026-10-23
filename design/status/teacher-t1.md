@@ -42,6 +42,7 @@ New owner design ideas are recorded here and NOT folded into a running fix round
 | 2026-10-23 | "I also want these to be in the general skills not just lessons (when they are built). Everything in a lesson should have a corresponding skill engine." | recorded in the plan as Q-L2 (lead); already reflected in the mock-up, no change needed |
 | 2026-10-23 | (via lead; full text IMPROVEMENT_PLAN §2.4 on claude/sweet-newton-c8wrv1) Multi-lesson practice sets, highly customizable: tick skills per lesson → "Add to tray" as a group named after the lesson, "Next lesson" arrow, 5–6 lessons; Print = one worksheet per lesson (own pages and key) / one for all (Mixed or a section per lesson) / both; Print all = one PDF in lesson order; Save as set + Share one short code | queued for the next batch; show as a mock-up flow at the approval sitting |
 | 2026-10-23 | "on a print a worksheet or share with pupils if it is above 5 skills do not use chip but instead show a list organized by grade and domain. use instead list. with popup preview." → in the Print (worksheet) and Share sheets, > 5 skills = a list grouped by grade and maths area (no chips), each row opening a popup preview of that skill | queued for the next batch |
+| 2026-10-23 | "chip should also give popup preview" → every skill chip (tray, sheets) opens a preview of that skill too; reconcile with "tap a chip → its options sheet" (§2.4), e.g. the options sheet leads with the live preview, or hover/long-press previews | queued for the next batch |
 
 | Date | Step | Who (profile) | Result |
 |---|---|---|---|
