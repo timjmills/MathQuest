@@ -140,6 +140,9 @@ first and committed failing: it compares each thumbnail with the booted app's ow
   grade's controls go on the line under its name.
 - **Selected = fill + ✓ + ring** on every segmented option and pill. One-grade Chips / Thumbnails drop the repeated grade
   badge; cards under an area band drop the repeated area name.
+- **Header (owner ruling HD-5a):** a worksheet's header is Name, Date, Score and the I Can title; no strand-tab box. The
+  live thumbnails show one cell of the app's sheet with the rest of the page (its header and tab box included) hidden, and
+  the mock-up's page previews draw their own header, so the box never shows; `shoot.cjs` checks no thumbnail shows it.
 - **Gate:** `ws-teacher-tokens` lists the shared-grade colour pairs within 1.5 of the floor as "watched" (must stay ≥ 12.5).
 - New `shoot.cjs` checks: a named area in the big-tray bar at every width from 820; no text under a control and no two
   controls overlapping in 11 popup states at all widths with each ⋯ opened; Detailed weights rows per screen (≥ 8 at 1366,

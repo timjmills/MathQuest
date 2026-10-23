@@ -205,6 +205,8 @@ async function screenReport(page, w) {
       const min = parseFloat(getComputedStyle(t).getPropertyValue('--smp-min')) || 0; const vis = t.getBoundingClientRect();
       if (vis.width < 4 || vis.bottom < 0 || vis.top > vh) continue;
       if (t.dataset.state === 'error' || t.dataset.state === 'none') { say('thumbnail not drawn', `${t.dataset.k}: ${t.dataset.state} ${t.dataset.err || ''}`); continue; }
+      // owner ruling HD-5a: no strand-tab box (Level / strand / lesson) on any worksheet, so none in a thumbnail or preview
+      if (t.shadowRoot && [...t.shadowRoot.querySelectorAll('.ws-tabbox, [data-ws-label="tab"]')].some(e => getComputedStyle(e).visibility !== 'hidden' && e.getBoundingClientRect().width > 0)) say('strand tab shown', t.dataset.k);
       if (!min || t.dataset.state !== 'done' || !t.__mq) continue;
       const sc = Number(t.dataset.scale), win = t.dataset.win.split(' ').map(Number); let low = 1e9, lowT = '';
       for (const x of t.__mq.texts) { const [X, Y, W, H] = x.r; if (X < win[0] + win[2] && X + W > win[0] && Y < win[1] + win[3] && Y + H > win[1] && x.fs * sc < low) { low = x.fs * sc; lowT = x.t.slice(0, 14); }

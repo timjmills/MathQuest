@@ -680,7 +680,8 @@
         return `<div class="page-cell ${cls}" data-skill="${esc(sk)}">${(o.examples === 'first' && k === 'mixed' && items.indexOf(sk) === i) ? '<b class="ex-tag">Example&nbsp;</b>' : ''}${pic}</div>`; };
       const exDraw = (sk, n) => T.draw(SK[sk], 'ex' + S.seed + ':' + n);
       const title = isQuiz ? (S.quiz.std ? `Quiz: ${S.quiz.std}` : 'Quiz') : k === 'single' ? icanTitle(SK[items[0]]) : k === 'mixed' ? 'Mixed practice' : 'Practice';
-      body += `<div class="page-head"><span>Name ________________</span><span>Date ________</span></div><div class="page-title">${esc(title)}</div>`;
+      // the page header (owner ruling HD-5a): Name, Date, Score and the I Can title; no strand-tab box
+      body += `<div class="page-head"><span>Name ________________</span><span>Date ________</span><span>Score ____</span></div><div class="page-title">${esc(title)}</div>`;
       const onPage = [...new Set(items)];
       if (k !== 'single') body += `<div class="page-names">${onPage.length > 4 ? `${plural(onPage.length, 'skill')} from ${areasOf(onPage).map(x => AREAS[x.a].short).join(', ')}` : onPage.map(x => esc(short(SK[x].l))).join(' · ')}</div>`;
       if (o.examples === 'top') body += `<div class="page-ex"><b>Example</b>${exDraw(items[0], 99)}</div>`;
@@ -902,7 +903,7 @@
   function lessonPrintSheet() {
     const f = findStep(S.lessons.lesson); const k0 = f.s.k.find(k => SK[k]);
     const side = `<div class="summary">Lesson · ${esc(f.s.t)}<small>Teacher pages, pupil pages and the answer key</small></div>` +
-      `<div class="previews"><div class="page p2"><div class="page-in"><div class="page-head"><span>Name ________________</span><span>Date ________</span></div><div class="page-title">${esc(lessonGoal(f.s.t))}</div>${k0 ? `<div class="page-ex"><b>Let’s learn</b>${T.drawItem(SK[k0], 0)}</div><div class="page-grid c2">${[1, 2].map(i => T.drawItem(SK[k0], i)).filter(Boolean).map(pic => `<div class="page-cell">${pic}</div>`).join('')}</div>` : '<p class="page-names">This lesson’s pupil pages come with the later lesson wave.</p>'}</div></div></div>` +
+      `<div class="previews"><div class="page p2"><div class="page-in"><div class="page-head"><span>Name ________________</span><span>Date ________</span><span>Score ____</span></div><div class="page-title">${esc(lessonGoal(f.s.t))}</div>${k0 ? `<div class="page-ex"><b>Let’s learn</b>${T.drawItem(SK[k0], 0)}</div><div class="page-grid c2">${[1, 2].map(i => T.drawItem(SK[k0], i)).filter(Boolean).map(pic => `<div class="page-cell">${pic}</div>`).join('')}</div>` : '<p class="page-names">This lesson’s pupil pages come with the later lesson wave.</p>'}</div></div></div>` +
       `<div class="side-actions"><button class="btn btn-primary btn-wide" data-act="sheet-print">${icon('print')}Print</button></div>`;
     const opts = opt('What to print', '', seg('Pages', [['both', 'Teacher and pupil pages'], ['pupil', 'Pupil pages'], ['teacher', 'Teacher pages']], 'both', 'noop')) + opt('Size', '', seg('Size', [['S', 'S'], ['M', 'M'], ['L', 'L']], S.opts.size, 'size'));
     return sheetFrame('Print lesson', opts, side, `<div class="summary">Lesson · ${esc(f.s.t)}</div><button class="btn btn-primary span-all" data-act="sheet-print">${icon('print')}Print</button>`);
