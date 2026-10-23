@@ -122,11 +122,11 @@ window.MQ_FLOW_CHECK = {
    "error": ""
   },
   "lesson-practice@390": {
-   "actions": 5,
-   "scrolls": 1,
+   "actions": 4,
+   "scrolls": 0,
    "steps": 4,
-   "ok": false,
-   "error": "5 actions > plan 4"
+   "ok": true,
+   "error": ""
   },
   "lesson-pre@1366": {
    "actions": 4,
@@ -136,11 +136,11 @@ window.MQ_FLOW_CHECK = {
    "error": ""
   },
   "lesson-pre@390": {
-   "actions": 5,
-   "scrolls": 1,
+   "actions": 4,
+   "scrolls": 0,
    "steps": 4,
-   "ok": false,
-   "error": "5 actions > plan 4"
+   "ok": true,
+   "error": ""
   },
   "lesson-print@1366": {
    "actions": 4,
@@ -150,11 +150,11 @@ window.MQ_FLOW_CHECK = {
    "error": ""
   },
   "lesson-print@390": {
-   "actions": 5,
-   "scrolls": 1,
+   "actions": 4,
+   "scrolls": 0,
    "steps": 4,
-   "ok": false,
-   "error": "5 actions > plan 4"
+   "ok": true,
+   "error": ""
   },
   "map-task@1366": {
    "actions": 4,
