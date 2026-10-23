@@ -294,7 +294,7 @@ backtests PASS (two sibling rows scoped to H13, the defect they were built for; 
 patch). Lead-side integration fix: the cards README's example block was read as a card (scanner now reads card sub-folders only).
 **Precritic on HEAD now FAILs `subtraction:sub_100_no_regroup`** on 3 counts above its paired siblings (mixed/defaults S
 PG-12 2 vs 0; sections/ex-each L H13 6 vs 4; single/ex-group S TY-11 16 vs 8) and on card rulings (band 118/300, same
-length 40/300, zero case 44.3 %, band offered) — real, the pilot's to fix (rule 0b), not a tool defect.
+length 40/300, zero case 44.3 %, band offered) — the card-rulings FAILs and single/ex-group S TY-11 16 vs 8 are real, the pilot's to fix (rule 0b); **correction (critic r7 D1): the mixed/defaults S PG-12 2 vs 0 count is algebra:tape_diagram's partner cell, not the pilot's** (multi-skill rows are compared with counts not tied to a skill).
 12 (lead 23:07, owner ruling CL-4b, WORKSHEET_DESIGN_STANDARD 12ed112f): print-lint reads each cell's first printed row —
 top-default cells FAIL when the problem starts > 3 mm below the top pad; write-above cells (regrouping items, long-division
 brackets, judged from content) FAIL when not centred within 2 mm. REPORTING-ONLY until the mixed lane's kit change lands
@@ -303,3 +303,17 @@ brackets, judged from content) FAIL when not centred within 2 mm. REPORTING-ONLY
 **Owner instruction (via lead, 23:07): "stop after this work, don't try anything new".** The queued 11-check package and
 check 12 (CL-4b) are CANCELLED for now — recorded above for later, not started. The lane finishes critic r7 on the
 pilot-lesson checks, reports and stops; if r7 fails, no further round without the lead's go.
+
+## Critic r7 (`design/audit/runs/wave0-gates/critic-r7.md`): FAIL — asked 7, backtests 9, usable 7
+r6 D1–D3 verified fixed; 8/8 pilot backtests PASS and honest (H13 scoping, D7 stand-in, partial fixture). Blocking:
+D1 sibling-compare / slot-clip compare multi-skill rows (mixed, sections) by counts not tied to a skill, so a partner's
+cell (tape_diagram's legacy story) fails the lane or could hide a lane defect; D2 `ws-spec-card --rulings-only` refreshes
+bodySha and the signed-body compare strips the block, so a ruling can be weakened on a signed card unnoticed (and
+precritic never runs `--check-signed`). Nits: INCOMPLETE/SKIPPED still end precritic OK without `--strict` (make `--strict`
+part of rule 0b); `--report-only` exit on INCOMPLETE undocumented; approved sub_1m_regroup head overlap at level 3 S needs an
+owner; a clean sibling PASS should count rows. **Stopped here per the owner ("stop after this work"): no fix round 8 without
+the lead's go.**
+
+| Round | Result | (1) Automatic checks the findings point to | (2) Speed-ups |
+|---|---|---|---|
+| r7 | FAIL 7 / 9 / 7 (D1, D2) | **A16** multi-skill rows: a finding is attributed to the skill whose cell carries it (`data-ws-cell` + page/cell), partner findings never block a lane; **A17** a signed card's rulings are hashed under its signature (weakening a ruling or emptying `notOffered` voids the signature), checked by precritic. | Brief rule 0b tools with the multi-skill case up front (partners seeded per row differ by skill); have precritic run `ws-spec-card --check-signed` on the lane's cards. |
