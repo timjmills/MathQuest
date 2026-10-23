@@ -366,3 +366,65 @@ pilot.
   build go on the lane's design list and are built in one batch after PASS — **done: process rule 0**. (c) First builds of an
   engine should ship with their own page check from the start (repeats, size ladder, fill), not after round 3. **Owner: lead —
   brief template for M2–M5.**
+
+## 2026-10-23 · SU-C pilot — interim verdict after critic r2: FAIL against §4.4 (r3 to come)
+
+**Measure** (`design/status/pilot-su-c.md`, `design/audit/runs/pilot-su-c/critic-r1.md`, `critic-r2.md`):
+
+| Step | Time (UTC) | Minutes | Profile | Result |
+|---|---|--:|---|---|
+| Card gate (`--check-signed`) | 16:43–16:44 | 1 | — | OK (card re-signed by the owner) |
+| Builder run 1, six skills + `sub_2d_1d` preset | 16:46–18:28 | 102 | mq-opus-low | 320 k tokens, 139 tool uses; its own precritic pass 1 FAIL (matrix 62 RED) |
+| Orchestrator fix pass | 18:28–18:37 | 9 | — | fact-probe column choice, worked steps ≤ 4 |
+| Precritic pass 2 | 18:38–19:01 | 23 | — | 12 PASS, matrix 60 RED |
+| Critic r1 (started before the pins were checked) | 19:06–19:41 | 35 | mq-opus-medium | **FAIL min 4 / 4 / 6 / 5**, D1–D12; also failed by the lead's ruling |
+| Fix run 1 | 19:44–20:55 | 71 | mq-opus-medium | 406 k tokens, 198 tool uses; D1–D11 fixed |
+| Precritic pass 3, re-pin 38 rows (lead ruling), pass 4 | 20:56–21:47 | 51 | — | pass 4 GREEN: 13 PASS, matrix 0 RED (rule 0b met) |
+| Critic r2 | 21:48–22:20 | 32 | mq-opus-medium | **FAIL min 4 / 7 / 6 / 7**: N4 Across option (H2), N2 lesson Warm-up H13, N3 untrue option help, N1 dealer skew; N5–N8 minor |
+| **Total so far** | 16:41–22:20 | **337 (5 h 37 m)** | | 2 rounds, both FAIL; ≈ 1.44 M agent tokens |
+
+**Against target:** rounds 2 (both FAIL, a third coming) vs ≤ 2 to PASS → **missed**; builder runs 2 (+ an orchestrator pass) vs 1
+→ **missed**; time 5 h 37 m vs 4 h → **missed**. Time per skill so far 0.8 h; projected 1.0–1.1 h if r3 passes. Fair baseline:
+the five single-skill CCSS lanes of 2026-10-17, ≈ 0.6–2.4 h of critic span each (median ≈ 1.3 h), 3–4 rounds each. So the
+per-skill gain is ≈ 1.2–2×, almost entirely from batching seven skills into one lane and one critic read; **rounds to PASS did
+not improve** (3 if r3 passes = the old median per run). The ≥ 5× claim is not shown.
+
+**Deviations recorded:**
+- **The auditor's own error.** My pilot plan (§3, step 2) put the build on `mq-opus-low` as "copies on an existing drawing".
+  §1.7 allows low only on a *certified* pair, and `stack` × Single skill has no certificate. Critic r1's minimum of 4 is the
+  §1.1 pattern of low-effort first builds. Now rule 0a.
+- **The critic started before the gates were clean** (r1 at 19:06, pins unconfirmed). The lead ruled r1 counts only if the
+  sibling comparison confirms engine debt; it did not. Now rule 0b.
+- **A miscount in the sibling comparison**: the first script read a log that prints at most 6 counts a row; the true pre-fix
+  figure was **124** counts above the approved siblings, not the 236 first reported (also by me, 20:00). After fix r1: 84 above the
+  paired sibling, 38 above any approved stack skill, re-pinned by the lead's ruling.
+- **One wrong pin**: class (a) was pinned at size L where the siblings show 0 (r2 N5); the rate table measured S only.
+
+**Causes, in order of cost:**
+1. **The card was silent on what the critic graded.** r1: heads by default, lesson data, the legacy band option, the comma
+   screen path. r2: the inherited Across appearance, the option help text, the lesson Warm-up form. A builder cannot decide what
+   the card does not list.
+2. **Precritic did not reach those surfaces.** About 8 of 12 r1 defects and 6 of 8 r2 defects were machine-measurable; the gates ran
+   on Independent pages with default options, not on every offered option value, the lesson roles or the 390 card.
+3. **Wrong builder strength on an uncertified pair** (rule 0a now).
+4. **Fix r1 opened new surfaces** (lesson data, wide tracks, heads on screen) that nothing checked before r2.
+5. **Engine debt the plan assumed was already pinned** (≈ 1 h of sibling comparisons and pins), which the next family should not pay.
+
+**Fixes (owner, state):**
+
+| # | Fix | Owner | State |
+|---|---|---|---|
+| F1 | Card section generated from the repo: every offered option value (inherited too), every role with its data source, every screen host — each needs a decision; `--check-signed` fails while any is undecided | new tool lane "W0-B2" (W0-B archived), mq-opus-medium | **assigned; must exist before the next family** |
+| F2 | Nine checks from the pilot's lists, all generic except head overlap (stack / pv): zero-case rate as card-ruling predicates; digit skew and fixed position; L-ANSAREA ≥ 4.4 mm; L-OVERLAP ≥ 1 mm; lesson-data presence; option-help truth (named values are offered); options-verify render check (every offered appearance through print-lint at S/L); H13 on lesson roles; presets-unit item check. Plus wrongAnswer fits its slot, and an operator at a wrapped line end | W0-A, mq-opus-medium, three parallel builders (≈ 2.5 h wall); backtests from the pilot's commits (27577cf fail / ff471fd pass; the pilot tip for N1–N4) | **assigned; must exist before the next family** |
+| F3 | Precritic `--rows-from <red list>` (re-run only red rows after a fix) and `ws-coverage-matrix --compare-with <skills>` (the sibling comparison as a mode, reading the run file, not the log) | W0-A | assigned |
+| F4 | Precritic on a fix round runs `--role lesson` and every offered option value of the touched skills | W0-A (precritic) | assigned |
+| F5 | Rate tables measure every size they pin | W0-A (matrix) | assigned |
+| F6 | Rules 0a (low only on certified pairs) and 0b (clean, incl. sibling comparison, before the critic) | lead | **done** (LESSONS_LEARNED) |
+| F7 | If the next family also misses: certify `stack` × Single skill before any further family on it | lead | conditional |
+
+**Per-round findings audit (owner rule):** pilot r1 + r2 listed **18 automatic checks and 10 speed-ups**. Built so far: **3**
+(rules 0a, 0b and the per-round findings rule). Real checks built with a backtest: **0**. Every other item has an owner (W0-A for
+the checks, W0-B2 for the card, lead for rules). The count is re-taken at each reflection.
+
+**Next test:** the next family runs with F1, F2, rules 0a/0b and F3 in place. Its bar is unchanged: ≤ 2 critic rounds, 1 builder run,
+≤ 4 h for six or seven skills.
