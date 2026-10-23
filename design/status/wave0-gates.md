@@ -36,7 +36,7 @@ Builders run in their own git worktrees and the lead merges them here.
 | S9 `reading_ruler_hard` fix | mq-opus-low | 13:16 | 13:29 | 13 |
 | Options-verify pin for every live skill (`ws-options-pin.cjs`, lead request 13:57) | mq-opus-medium | 13:59 | — | — |
 | Critic r1 (tools vs plan): FAIL 6 / 8 / 6, D1–D8 | mq-opus-medium | 13:43 | 14:11 | 28 |
-| Fix r1 A: deploy runner + screen gates (D1 runner, D2, D3 screen, D6, N5, N6, N8) | mq-opus-medium (rebuild after a failed round) | 14:13 | — | — |
+| Fix r1 A: deploy runner + screen gates (D1 runner, D2, D3 screen, D6, N5, N6, N8, N11) — merged e11450ab | mq-opus-medium (rebuild after a failed round) | 14:13 | 15:17 | — |
 | Fix r1 B: matrix + envelope critic sample (D1 matrix, D3 matrix, D4, D8, N1, N3, N10, N11) — merged 24aa7410 | mq-opus-medium (rebuild after a failed round) | 14:13 | 15:05 | 52 |
 | Fix r1 C: node-lint per-finding baseline, H8 multiple choice for every family (D5, D7, N2, N9, N12) | mq-opus-medium (rebuild after a failed round) | 15:04 | — | — |
 | S1 `ws-precritic` build (brought forward by the lead, 11:02; stopped: moved to the lead's session) | mq-opus-medium | 11:03 | 12:51 | 108 |
@@ -56,3 +56,12 @@ all-pairs set is 369 rows / 503 pages (lower bound 165 rows: nlLabels × nlStep 
 values on every skill 207 pages; with values paired only with size 126; on 6 representative skills 85 (`sample.criticBounded`).
 Proposed for the plan: boundary values + representative skills + values paired with size only; the rest to the machine sample
 and the matrix. Until ruled, `sample.critic` stays the strict set.
+
+Fix r1 A results: deploy verdict is OK / INCOMPLETE (exit 2: a gate SKIPPED, NOT YET, NEEDS-SHARDED-RUN or NOTHING RUN) /
+FAIL; the M4 digests hook is accepted only by name per run (`--accept-notyet digests`, logged). Session 3: matrix with
+`--max-docs 500`; over budget it reads the newest nightly (FAIL if none, > 24 h old, or a RED/ERROR row of a live skill;
+OK if complete on HEAD-equivalent; else NEEDS-SHARDED-RUN with the 8 shard tasks to fire) — real run today: FAIL, no
+nightly yet (17 s). Unknown / empty selections FAIL in screen-slots and chromebook-fit; page errors pinned per skill,
+size and host; deterministic S9 regression (`--seeds 1-40 --need-ans 1/4,1/2,3/4`: 0 doubled now, 6 on the pre-fix tree);
+no silent HEAD~1 base. New deploy-list gates: ws-text-vs-gen, ws-backtest --kind fixture, ws-detailed-lesson --repeats
+(5 lessons), ws-viewport-check.
