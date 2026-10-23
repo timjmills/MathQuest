@@ -45,3 +45,6 @@ New owner design ideas are recorded here and NOT folded into a running fix round
 | 2026-10-23 | Fix round 4: thumbnails captured from the real app (715/715, 0 fallbacks, samples.js 5.81 MiB), readable crops (Big 12 / Medium 11 / Small 9 px), real skill-finder search, phone popup ≥ 6 rows, whole-grade How often, "Each page", kept print settings; all gates OK, 24 flows in plan | mq-opus-medium | done |
 | 2026-10-23 | App defect seen in capture (not this lane's to fix): Add/Subtract Fractions (Unlike Denom) (No Visuals) prints "1/3 + ? 10 = 5/6" (no fraction bar under "?") | — | reported to lead |
 | 2026-10-23 | Critic round 5 (fresh critic) | mq-opus-medium | running |
+| 2026-10-23 | Critic r5: A 6 · B 9 · C 6 · D 8 — FAIL (`critic-r5.md`): ~120 captured thumbnails garbled (capture CSS reset broke SVG font sizes), crop cuts line starts, 820 tray bar "+6 areas" only, detailed-weight rows dense | mq-opus-medium | FAIL |
+| 2026-10-23 | Stop rule (thumbnail fidelity, 4th round): root cause = copying the app's drawing into a mock-up format. Fix = render thumbnails LIVE with the app's own modules (read-only import), lazily; check compares each thumbnail to the app's buildSheet cell for the same seed | lead | — |
+| 2026-10-23 | Fix round 5 (fresh builder) | mq-opus-medium | running |
