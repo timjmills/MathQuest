@@ -38,7 +38,7 @@ Builders run in their own git worktrees and the lead merges them here.
 | Critic r1 (tools vs plan): FAIL 6 / 8 / 6, D1–D8 | mq-opus-medium | 13:43 | 14:11 | 28 |
 | Fix r1 A: deploy runner + screen gates (D1 runner, D2, D3 screen, D6, N5, N6, N8, N11) — merged e11450ab | mq-opus-medium (rebuild after a failed round) | 14:13 | 15:17 | — |
 | Fix r1 B: matrix + envelope critic sample (D1 matrix, D3 matrix, D4, D8, N1, N3, N10, N11) — merged 24aa7410 | mq-opus-medium (rebuild after a failed round) | 14:13 | 15:05 | 52 |
-| Fix r1 C: node-lint per-finding baseline, H8 multiple choice for every family (D5, D7, N2, N9, N12) | mq-opus-medium (rebuild after a failed round) | 15:04 | — | — |
+| Fix r1 C: node-lint per-finding baseline, H8 multiple choice for every family (D5, D7, N2, N9, N12) | mq-opus-medium (rebuild after a failed round) | 15:04 | 15:47 | — |
 | S1 `ws-precritic` build (brought forward by the lead, 11:02; stopped: moved to the lead's session) | mq-opus-medium | 11:03 | 12:51 | 108 |
 
 ## Critic r1 (2026-10-23, `design/audit/runs/wave0-gates/critic-r1.md`): FAIL — plan 6, backtests 8, usable 6
@@ -65,3 +65,12 @@ nightly yet (17 s). Unknown / empty selections FAIL in screen-slots and chromebo
 size and host; deterministic S9 regression (`--seeds 1-40 --need-ans 1/4,1/2,3/4`: 0 doubled now, 6 on the pre-fix tree);
 no silent HEAD~1 base. New deploy-list gates: ws-text-vs-gen, ws-backtest --kind fixture, ws-detailed-lesson --repeats
 (5 lessons), ws-viewport-check.
+
+Fix r1 C results: node-lint baseline is per finding key (`rule|kind|#item|signature`, 6,835 keys; a swapped finding now
+FAILs — backtest row `node-lint-keys`); L3 false positives 95 % → the whole population is 5 findings, 2 real + 3 borderline.
+H8 (D7): `ws-content-audit` MC-ALL samples all 715 skills (60 items) — **26 skills offer production items as buttons**, pinned
+in `design/audit/baselines/content-audit-mc.json`, need owners: fractions simplify / improper_mixed / mixed_fractions /
+estimate_frac_ops (60/60); conversions d_to_f, f_to_p, p_to_f, mixed_conversions (+ 3 pools); partition_shapes (+ 2 pools);
+angles measure_angles (60/60, + 2 pools); measurement estimate_length (+ pool); integers ordering_rationals (60/60, + 2 pools);
+number_sense make_a_ten (+ 2 pools). Backtest row `mc-production` (fixture). Default content-audit output unchanged for the
+≈310 family skills apart from the inserted MC-ALL block. Golden rule-set hash ignores dated status notes (N9).
