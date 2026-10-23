@@ -44,8 +44,8 @@
 //   design/audit/baselines/print-lint.json    ws-print-lint --json of `--source kit` (independent, size L) per skill:
 //                                             print-lint's own --baseline ratchet on (document, lint, rule)
 //   design/audit/baselines/screen-slots.json  {skills: {"cat:skill": ["host:kind", ...]}} (ws-screen-slots --baseline)
-//   design/audit/baselines/print-lint.S.json, print-lint.M.json   the same at sizes S and M (pinned for the 20
-//                                             role-sample skills + the six pilot skills; a skill missing from a size's
+//   design/audit/baselines/print-lint.S.json, print-lint.M.json   the same at sizes S and M (every live skill,
+//                                             full sweep 2026-10-23; a skill missing from a size's
 //                                             pin runs unpinned at that size, so any finding there is FAIL)
 //   design/audit/baselines/options-verify.json {skills: {"cat:skill": ["option=<json value>" | "static:<msg>", ...]}}
 //   design/audit/baselines/node-lint.json     ws-node-lint's own baseline (it reads it itself)
