@@ -114,3 +114,51 @@ It warns about cited ids that are not in the index (typos in reports; known ones
 defined outside the indexed standards (the lesson rules `LR-1`–`LR-18` of `design/LESSON_RULES.md`, not on this branch;
 `KNOWN_EXTERNAL` in the tool, listed in `RULE_INDEX.md`), and lists ids cited since the card was generated.
 It reads the standards fresh every time (never the committed index), so it is run again when each build starts.
+
+## The rulings block (machine-readable rulings)
+
+Every generated card carries a second HTML comment right after the spec-card comment:
+
+```
+<!-- rulings
+{"v": 1, "card": "subtraction",
+"skills": ["subtraction:sub_100_no_regroup", ...],
+"rulings": [
+ {"id":"R-BAND-100","source":"§9.2; §5.1 (...)","skills":["subtraction:sub_100_no_regroup"],"assert":"range","of":"a","min":51,"max":99},
+ ...
+],
+"notOffered": [
+ {"id":"N-BAND","source":"§7 (...)","option":"band"}
+],
+"todo": [
+ {"id":"T-5.2","source":"§5.2","text":"Pupil-facing text says \"regroup\", never \"borrow\" ..."},
+ ...
+]
+}
+-->
+```
+
+The format (assert kinds `range`, `digits`, `noRegroup`, `boxes`, `maxShare`, `minShare`; predicates `zeroCase`,
+`columnZero`, `ansShorter`, `{"eq": [field, value]}`; `notOffered` with an optional `values` list) is defined in the
+header of `tests/scripts/ws-card-rulings.mjs`, the tool that checks it.
+
+- **`skills`** — derived: the card's skills (section 1), plus any skill an authored ruling names (e.g. a proposed
+  preset such as `sub_2d_1d`).
+- **`rulings` / `notOffered`** — copied from `card.json` `"rulings": {"rulings": [...], "notOffered": [...]}`. Every
+  entry's `source` cites the card section it encodes: `§5.n` = owner ruling n, `§9.n` = open question n (its recommended
+  answer), `§1` / `§3` / `§7` for the name, drawing and options.
+- **`todo`** — derived: every owner ruling (`§5.n`) and open question (`§9.n`) that no entry's `source` cites. These
+  rulings exist only as prose; they are listed so the gap is visible, never checked and never counted as a pass.
+
+**Adding a ruling:** write the entry into `card.json` `rulings` with an id, the `§` source it encodes and its assert, then
+write the block with `node tests/scripts/ws-spec-card.mjs --family <id> --rulings-only` (or `--template`). Its `§`
+citation takes that ruling off `todo`. `--rulings-only` writes only the block into the existing card: every other byte
+and the Signed line stay as they are, and bodySha is refreshed (it covers the block, so a hand edit of the block is still
+caught by `--check-signed`). The block is not signed text: it encodes sections 1–9, so a full regeneration that changes
+only the block keeps a signature. A ruling whose meaning changes is a change to section 5 or 9 and is re-signed as usual.
+
+**How precritic uses it:** `ws-precritic` runs `ws-card-rulings --skill <key> --check rulings` and `--check offered`. The
+tool samples 300 seeded items per ruling through `generateQuestionFor` and reads `offeredOptionsFor`; a broken ruling is
+FAIL. It also prints `<card>: rulings block present, N prose ruling(s) not machine-checked (§…)` for every block in scope.
+A skill whose blocks hold no entry of the kind checked ends `NO-RULINGS` (exit 4), which precritic reports as SKIPPED,
+never PASS.

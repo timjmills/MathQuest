@@ -1,6 +1,44 @@
 <!-- spec-card
-{"card":"subtraction","kind":"family","template":"stack","families":[],"match":{"templates":["stack"]},"config":"design/cards/subtraction/card.json","indexSha":"ed32bdf58a41e14cceffd96fefef3a0bc6156109","bodySha":"a167022cda7f3e07"}
+{"card":"subtraction","kind":"family","template":"stack","families":[],"match":{"templates":["stack"]},"config":"design/cards/subtraction/card.json","indexSha":"ed32bdf58a41e14cceffd96fefef3a0bc6156109","bodySha":"57220325dd80b991"}
 {"cited":"AX-9 C1 CL-9 DN-1a H2 H4 H5 H6 H7 H8 H9 H10 H11 H13 L1 L6 LR-4 LR-6 P-1 PT-FRM-6 PT-GDP-1 RP-1 SP-20 VA-10","rules":"VA-1 12d322 2 26885a 4 b05d12 7 13eea3 VA-10@WDS 9d9099 VA-11@WDS a5ab88 VA-12@WDS 60049e VA-13@WDS 05d8bb VA-13a c2dfad 20 ef38e6 22 045140 23 04bd6f AK-2 d4709f TY-21 53ed7d SP-23 fe1461 VA-3 770d75 5 1337f5 6 45cb76 21 8802ac 30 5b42ae 31 2f0077 32 898868 LS-8 59531d SL-12 3cbafa TY-20 8964d2 23 e741c0 24 e73e2c 26 cc6cf2 VA-40 914c3a 41 1325cb 42 1b3a08 50 905c89 51 ca8fb1 52 992853 SL-1 e3b064 2 f404d5 11 183e7a CL-6 102a92 9 accb97 PG-12 8e75fd 14 64a88e PT-CGR-5 3f7489 PT-EQD-2 ed82db DN-34 d5b0e7 AK-1 a0cc12 4 8d027b INK-31 d7ece8 BD-7 81d3da PT-GDP-1 a0e2cc P-SC-7 65e105 SF-34@WDS.1 00e2f6 SP-1 87c2cc 2 1f2df0 3 7b7bfb 4 51a802 10 6ffb0a 12 1309f9 SCC-T3 359377 4 e83741 10 084029 14 b8671c 15 fc9373 17 c36547 SCC-P5 6387d4 6 d362fd BD-10 8d473f 11 29d891 12 36b79c PT-FRM-6 daac17 P-1 5a3076 29 89eb8e Q-10 50b907 P-10 256ad3 35 4b32c0 31 28b15c BD-4 b3947b PT-SCR-1 25f6f5 CL-1 277ec4 AX-4 2eb6c1 INK-5 631a6d TY-7 e3e1e1 RP-1 d529bd AX-9 74e9a4 DN-1a 4fcc05 PT-GDP-2 386bb5 SL-3 468d78 SP-20 cfb11a PT-REV-3 d5e0d9 C1 66f8a9 2 32e3b2 3 3d5192 4 e59efd H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H4@RUBRIC 9ce1f3 H5@RUBRIC b3892d H6 0722fd 7 3d3d38 8 44c23b 9 fd82d1 10 fbd802 11 bef034 12 2de4f7 13 36f579 OC3 bb8551 4 00a5e1 7 81bde7 8 089b5e 10 ad6428 11 c55e70 14 18b2a5 L1 799b66 2 fecb99 3 901e56 4 6538d6 5 4d48a8 6 6e19d8 9 f4b4c0 10 d2ca35 11 9ebe19 CL-31 383ae0 INK-3 b9f1f1 4 fe5b27 P-LC-9 bc47bd SCC-01 8aa70b SF-10 f1a0d9 SL-10 9fe607 TY-2 510243 13 3d0f88 22 7e9b75 25 b0a223"}
+-->
+<!-- rulings
+{"v": 1, "card": "subtraction",
+"skills": ["subtraction:sub_100_no_regroup","subtraction:sub_100k_no_regroup","subtraction:sub_10k_no_regroup","subtraction:sub_1k_no_regroup","subtraction:sub_1m_no_regroup","subtraction:sub_2d_1d","subtraction:sub_50_no_regroup"],
+"rulings": [
+ {"id":"R-BAND-50","source":"§9.2; §5.1 (within N bounds the minuend)","skills":["subtraction:sub_50_no_regroup"],"assert":"range","of":"a","min":21,"max":50},
+ {"id":"R-BAND-100","source":"§9.2; §5.1 (within N bounds the minuend)","skills":["subtraction:sub_100_no_regroup"],"assert":"range","of":"a","min":51,"max":99},
+ {"id":"R-BAND-1K","source":"§9.2; §5.1 (within N bounds the minuend)","skills":["subtraction:sub_1k_no_regroup"],"assert":"range","of":"a","min":100,"max":999},
+ {"id":"R-BAND-10K","source":"§9.2; §5.1 (within N bounds the minuend)","skills":["subtraction:sub_10k_no_regroup"],"assert":"range","of":"a","min":1000,"max":9999},
+ {"id":"R-BAND-100K","source":"§9.2; §5.1 (within N bounds the minuend)","skills":["subtraction:sub_100k_no_regroup"],"assert":"range","of":"a","min":10000,"max":99999},
+ {"id":"R-BAND-1M","source":"§9.2; §5.1 (within N bounds the minuend)","skills":["subtraction:sub_1m_no_regroup"],"assert":"range","of":"a","min":100000,"max":999999},
+ {"id":"R-BAND-2D1D","source":"§9.3 (2d − 1d is the sub_2d_1d preset)","skills":["subtraction:sub_2d_1d"],"assert":"digits","of":"a","eq":2},
+ {"id":"R-NO-REGROUP","source":"§1 (the name: no regrouping)","assert":"noRegroup","op":"-"},
+ {"id":"R-SAME-LENGTH","source":"§9.3 (lengths: same by default)","skills":["subtraction:sub_50_no_regroup","subtraction:sub_100_no_regroup","subtraction:sub_1k_no_regroup","subtraction:sub_10k_no_regroup","subtraction:sub_100k_no_regroup","subtraction:sub_1m_no_regroup"],"assert":"digits","of":"b","eq":"a"},
+ {"id":"R-SHORTER-2D1D","source":"§9.3 (2d − 1d)","skills":["subtraction:sub_2d_1d"],"assert":"digits","of":"b","eq":1},
+ {"id":"R-ZERO-NOT-SEEDED","source":"§9.4 (zeros off: never seeded; critic r1 D1 bound 10%)","assert":"maxShare","when":"zeroCase","max":0.1},
+ {"id":"R-BOXES-2","source":"§9.5 (boxes = digits of the band largest minuend, same on every item)","skills":["subtraction:sub_50_no_regroup","subtraction:sub_100_no_regroup","subtraction:sub_2d_1d"],"assert":"boxes","eq":2},
+ {"id":"R-BOXES-3","source":"§9.5 (boxes = digits of the band largest minuend, same on every item)","skills":["subtraction:sub_1k_no_regroup"],"assert":"boxes","eq":3},
+ {"id":"R-BOXES-4","source":"§9.5 (boxes = digits of the band largest minuend, same on every item)","skills":["subtraction:sub_10k_no_regroup"],"assert":"boxes","eq":4},
+ {"id":"R-BOXES-5","source":"§9.5 (boxes = digits of the band largest minuend, same on every item)","skills":["subtraction:sub_100k_no_regroup"],"assert":"boxes","eq":5},
+ {"id":"R-BOXES-6","source":"§9.5 (boxes = digits of the band largest minuend, same on every item)","skills":["subtraction:sub_1m_no_regroup"],"assert":"boxes","eq":6}
+],
+"notOffered": [
+ {"id":"N-BAND","source":"§7 (O2 number size = the six skills themselves; critic r1 D6)","option":"band"}
+],
+"todo": [
+ {"id":"T-5.2","source":"§5.2","text":"Pupil-facing text says \"regroup\", never \"borrow\" (P-32); the legacy column caption \"Use..."},
+ {"id":"T-5.3","source":"§5.3","text":"Writing boxes are slightly rounded (SL-11); a row of digit boxes is ONE outline with di..."},
+ {"id":"T-5.4","source":"§5.4","text":"Key answers print reddish orange, keys only (INK-31)."},
+ {"id":"T-5.5","source":"§5.5","text":"SPEC, NOT BUILT: on screen the regroup boxes an item NEEDS are required and marked. A n..."},
+ {"id":"T-5.6","source":"§5.6","text":"SPEC, NOT BUILT: `carry: top | bottom` is addition and × only; subtraction stays at the..."},
+ {"id":"T-5.7","source":"§5.7","text":"A distinct option (new size class, new task kind) is also a findable preset skill; smal..."},
+ {"id":"T-9.1","source":"§9.1","text":"Shared defects D1, D2, D5 (legacy pink / orange column visual, \"borrowing\" caption, pla..."},
+ {"id":"T-9.6","source":"§9.6","text":"D6 (six digits at 2 columns is tight): shrink, or fewer columns?"},
+ {"id":"T-9.7","source":"§9.7","text":"SU-M1 (smaller from larger) is invisible on a no-regroup page. Seed regroup non-example..."},
+ {"id":"T-9.8","source":"§9.8","text":"MW4K / IXL research is pending logins (Q-H4). Sign now?"}
+]
+}
 -->
 # Spec card: Column subtraction without regrouping, within 50 to within 1,000,000 (pilot: six SU-C skills)
 

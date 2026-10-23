@@ -84,6 +84,14 @@ export function parseRulings(text, file = '') {
     return j;
 }
 
+/**
+ * The block's "todo" list (written by ws-spec-card): the card's prose rulings that no entry encodes. Reported, never
+ * checked and never counted as a pass: a block with only todo entries still ends NO-RULINGS (SKIPPED in precritic).
+ */
+export function proseTodoLines(blocks) {
+    return blocks.filter((b) => Array.isArray(b.todo)).map((b) => `  ${b.file}: rulings block present, ${b.todo.length} prose ruling(s) not machine-checked${b.todo.length ? ` (${b.todo.map((x) => x.source || x.id).join(', ')})` : ''}`);
+}
+
 /** Every rulings block under design/cards of the tree. */
 function cardBlocks(root) {
     const dir = join(root, 'design', 'cards');
@@ -290,6 +298,7 @@ async function main() {
     const bad = results.filter((r) => !r.ok);
     const nR = results.filter((r) => r.kind === 'ruling').length, nO = results.filter((r) => r.kind === 'offered').length;
     if (unruled.length) say(`  no rulings for: ${unruled.join(', ')} (not checked)`);
+    for (const l of proseTodoLines(blocks)) say(l);
     const secs = ((Date.now() - T0) / 1000).toFixed(1);
     if (has('--json')) writeFileSync(resolve(arg('--json')), JSON.stringify({ tool: TOOL, root: ROOT, blocks: blocks.map((b) => b.file), skills: keys, unruled, n: N, results, seconds: +secs }, null, 1) + '\n');
     if (!results.length) { say(`${TOOL}: NO-RULINGS (the blocks hold no ${CHECK === 'offered' ? 'notOffered entries' : CHECK === 'rulings' ? 'rulings' : 'rulings or notOffered entries'} for the skills in scope; nothing checked)`); process.exit(4); }
