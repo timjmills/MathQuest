@@ -39,7 +39,7 @@ New owner design ideas are recorded here and NOT folded into a running fix round
 |---|---|---|
 | 2026-10-23 | "we might want multiple pages of the same set of problems as well" | already in fix round 4 (sent before the batch rule): "Each page: New problems · Same problems, new numbers · Same page again" |
 | 2026-10-23 | side menu "deep purple like in this screenshot" → "actually let's keep it as it is for now … if it's a problem I will change later" | parked; purple #592B88 shown as a reference on palette.html |
-| 2026-10-23 | "I also want these to be in the general skills not just lessons (when they are built). Everything in a lesson should have a corresponding skill engine." | queued for the approval sitting. Mock-up already lists every built skill in Skills; the rule (every lesson item ↔ a skill in Skills) passed to the lead for the plan |
+| 2026-10-23 | "I also want these to be in the general skills not just lessons (when they are built). Everything in a lesson should have a corresponding skill engine." | recorded in the plan as Q-L2 (lead); already reflected in the mock-up, no change needed |
 
 | Date | Step | Who (profile) | Result |
 |---|---|---|---|
