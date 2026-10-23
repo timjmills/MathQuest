@@ -1,0 +1,276 @@
+report,run,round,defect_id,class,kind,carried,severity,rule_ids,family,template,summary
+design/audit/runs/wrm-tagging/MAP-critic-r1.md,wrm-tagging/MAP,1,D1,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Rows 45/63 find-the-rule marked missing though algebra:function_table_hard deals it
+design/audit/runs/wrm-tagging/MAP-critic-r1.md,wrm-tagging/MAP,1,D2,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Row 103 estimate marked missing (live skills exist) and map_mult_estimate collides with a live skill id
+design/audit/runs/wrm-tagging/MAP-critic-r1.md,wrm-tagging/MAP,1,D3,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Rows 33/34 and 104/207 contradict each other on status of the same task/skill
+design/audit/runs/wrm-tagging/MAP-critic-r1.md,wrm-tagging/MAP,1,D4,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Rows 58/88/144 story-equation marked missing though build_expr_* deal it; three proposals for one task
+design/audit/runs/wrm-tagging/MAP-critic-r1.md,wrm-tagging/MAP,1,D5,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Rows 20/61 missed composing:number_word_form; proposal duplicates its direction
+design/audit/runs/wrm-tagging/MAP-critic-r1.md,wrm-tagging/MAP,1,D6,OTHER,judgment,no,blocking,,wrm-tagging,,Data shape: map_regrade_* re-grades recorded as option proposals that would put non-builds on the build list
+design/audit/runs/wrm-tagging/MAP-critic-r1.md,wrm-tagging/MAP,1,D7,REPEAT,machine,no,blocking,,wrm-tagging,,Duplicate proposal: map_minutes_to_hours duplicates WRM time_convert; share rows split over two proposals
+design/audit/runs/wrm-tagging/MAP-critic-r1.md,wrm-tagging/MAP,1,D8,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Four rows (84/145/74/157) point at the wrong proposal
+design/audit/runs/wrm-tagging/MAP-critic-r1.md,wrm-tagging/MAP,1,D9,MISSING,machine,no,blocking,,wrm-tagging,,"Five MAP K-5 task types missing from the audit (multi-step 4 ops, angle as turn, fractional area ...)"
+design/audit/runs/wrm-tagging/MAP-critic-r1.md,wrm-tagging/MAP,1,D10,MISSING,machine,no,blocking,,wrm-tagging,,6.4 pair audit incomplete per strand; row 2 cites evidence of a different task
+design/audit/runs/wrm-tagging/MAP-critic-r1.md,wrm-tagging/MAP,1,D11,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Report owner Q6 wrongly says zero as a count is not CCSS (it is K.CC.A.3)
+design/audit/runs/wrm-tagging/MAP-critic-r2.md,wrm-tagging/MAP,2,D-1,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Three missing rows (35/37/80) are partly dealt by add_word_problems / share_into_groups
+design/audit/runs/wrm-tagging/MAP-critic-r2.md,wrm-tagging/MAP,2,D-2,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Rows 165 and 177 same content and skill but partial vs missing
+design/audit/runs/wrm-tagging/MAP-critic-r2.md,wrm-tagging/MAP,2,D-3,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Rows 61 and 246 graded exists-ok on a form MAP does not use
+design/audit/runs/wrm-tagging/MAP-critic-r2.md,wrm-tagging/MAP,2,D-4,NAME_CONTENT,machine,no,blocking,,wrm-tagging,,Three options would make a skill deal what its own name forbids (build_expr_addsub widened to x/÷ etc.)
+design/audit/runs/wrm-tagging/MAP-critic-r2.md,wrm-tagging/MAP,2,D-5,REPEAT,machine,no,blocking,,wrm-tagging,,Duplicate rows 185/243 and 251/231; row 185 points at unrelated mass_scales
+design/audit/runs/wrm-tagging/MAP-critic-r2.md,wrm-tagging/MAP,2,D-6,REPEAT,machine,no,blocking,,wrm-tagging,,Four duplicate or overlapping proposals (fraction choose-all; associative x three times; bonds_in_order)
+design/audit/runs/wrm-tagging/MAP-critic-r2.md,wrm-tagging/MAP,2,D-7,REPEAT,machine,no,blocking,,wrm-tagging,,map_measure_story_equation is a second option on build_expr_addsub for the same task
+design/audit/runs/wrm-tagging/MAP-critic-r2.md,wrm-tagging/MAP,2,D-8,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Row 129 closes claims thousandths but reused decimal_pv teaches tenths/hundredths only
+design/audit/runs/wrm-tagging/MAP-critic-r2.md,wrm-tagging/MAP,2,D-9,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Misapplied evidence citations; teach.mapnwea cited though header says not cited; row 157 wrong band
+design/audit/runs/wrm-tagging/MAP-critic-r2.md,wrm-tagging/MAP,2,D-10,MISSING,machine,no,blocking,,wrm-tagging,,Two MAP 2-5 task types absent (composite volume; decimal word/expanded form)
+design/audit/runs/wrm-tagging/MAP-critic-r2.md,wrm-tagging/MAP,2,D-11,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Report kind counts sum to 99 of 101; triangle sum cited as 7.G.B.5 not 8.G.A.5
+design/audit/runs/wrm-tagging/MAP-critic-r3.md,wrm-tagging/MAP,3,D-1,PROCESS,process,no,blocking,,wrm-tagging,,Live options missed because skills were sampled only at default options (nl_mult sentence; place_value_10x decimals)
+design/audit/runs/wrm-tagging/MAP-critic-r3.md,wrm-tagging/MAP,3,D-2,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Four rows wrong status or contradicting a twin (74/144; 241/252; 197)
+design/audit/runs/wrm-tagging/MAP-critic-r3.md,wrm-tagging/MAP,3,D-3,REPEAT,machine,no,blocking,,wrm-tagging,,Decimal place-value proposals duplicate existing WRM thousandths_pv / dec_pv_within1
+design/audit/runs/wrm-tagging/MAP-critic-r3.md,wrm-tagging/MAP,3,D-4,NAME_CONTENT,machine,no,blocking,,wrm-tagging,,Two options would make host contradict its name (perimeter on area_unit_squares; mixed on whole_as_fraction)
+design/audit/runs/wrm-tagging/MAP-critic-r3.md,wrm-tagging/MAP,3,D-5,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Row 108 missed live fractions:compose_target_frac; map_frac_unit_build partly rebuilds it
+design/audit/runs/wrm-tagging/MAP-critic-r3.md,wrm-tagging/MAP,3,D-6,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Incomplete skill lists make closes wrong on rows 94 and 72
+design/audit/runs/wrm-tagging/MAP-critic-r3.md,wrm-tagging/MAP,3,D-7,REPEAT,machine,no,blocking,,wrm-tagging,,map_story_equation_addsub fractions context overlaps map_story_equation_frac
+design/audit/runs/wrm-tagging/MAP-critic-r3.md,wrm-tagging/MAP,3,D-8,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Stale or wrong notes: removed proposal named; wrong row refs; family swapped; id names opposite content
+design/audit/runs/wrm-tagging/MAP-critic-r3.md,wrm-tagging/MAP,3,D-9,MISSING,machine,no,minor,,wrm-tagging,,Completeness nits: no row for 2.MD.A.2 two-unit measuring or 1.G.A.2 composing 3-D shapes
+design/audit/runs/wrm-tagging/MAP-critic-r3.md,wrm-tagging/MAP,3,D-10,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Evidence: row 170 cites the opposite-direction item; 202 and 227 cite generic statements
+design/audit/runs/wrm-tagging/MAP-critic-r4.md,wrm-tagging/MAP,4,D-1,UNTRUE_TEXT,machine,yes,blocking,,wrm-tagging,,map_frac_unit_build rebuilds live decompose_fractions model->sum; why is false; rows 108/159 graded too low
+design/audit/runs/wrm-tagging/MAP-critic-r4.md,wrm-tagging/MAP,4,D-2,REPEAT,machine,no,blocking,,wrm-tagging,,map_tally_build and map_decimal_grid duplicate existing build-list entries (collect_data; vis_hundred_square)
+design/audit/runs/wrm-tagging/MAP-critic-r4.md,wrm-tagging/MAP,4,D-3,NAME_CONTENT,machine,no,blocking,,wrm-tagging,,Four proposals put content on a host whose name does not cover it (read on Place; 2 addends on Three; eighths)
+design/audit/runs/wrm-tagging/MAP-critic-r4.md,wrm-tagging/MAP,4,D-4,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Row 214 closes claims cutting and equal-vs-unequal that its proposal hands elsewhere
+design/audit/runs/wrm-tagging/MAP-critic-r4.md,wrm-tagging/MAP,4,D-5,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Row 117 borderline: mixed_improper_visual already writes improper fraction from a model past 1
+design/audit/runs/wrm-tagging/MAP-critic-r4.md,wrm-tagging/MAP,4,D-6,REPEAT,machine,no,minor,,wrm-tagging,,Proposal nits: fewest coins already live; compare_pick L1-L2 duplicate band; graph_sentence not declared on pictograph
+design/audit/runs/wrm-tagging/MAP-critic-r4.md,wrm-tagging/MAP,4,D-7,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Stale text: notes and why name deleted proposals; compose_shapes said to have no options
+design/audit/runs/wrm-tagging/MAP-critic-r4.md,wrm-tagging/MAP,4,D-8,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Evidence statements on rows 129/160/174/178/79 do not show the row's task
+design/audit/runs/wrm-tagging/MAP-critic.md,wrm-tagging/MAP,5,D-1,REPEAT,machine,no,blocking,,wrm-tagging,,map_heavier_lighter_bw duplicates vis_migrate_measures and makes B&W an opt-in look; why contradicts option
+design/audit/runs/wrm-tagging/MAP-critic.md,wrm-tagging/MAP,5,D-2,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,map_graph_sentence_picto copied without adapting (grey bars; key 1 not on pictograph)
+design/audit/runs/wrm-tagging/MAP-critic.md,wrm-tagging/MAP,5,D-3,UNTRUE_TEXT,machine,yes,minor,,wrm-tagging,,Round-4 D-4 residue: partition_pick representation still describes a cut form
+design/audit/runs/wrm-tagging/MAP-critic.md,wrm-tagging/MAP,5,D-4,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Exists-ok rows 207 and 42 claim more than the skill deals (parallelogram area; properties)
+design/audit/runs/wrm-tagging/MAP-critic.md,wrm-tagging/MAP,5,D-5,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Reused time_convert has a stale why claiming choose-all
+design/audit/runs/wrm-tagging/MAP-critic.md,wrm-tagging/MAP,5,D-6,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Stale text: report cites deleted map_volume_two_prisms; row 35 closes contradicts its also
+design/audit/runs/wrm-tagging/MAP-critic.md,wrm-tagging/MAP,5,D-7,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Proposal nits: div_tens L1 one-digit divisor; missing after links; example breaks same-whole rule
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U1,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"R.B5.S7 pre-skill is 1 less, not a building block; no pictured parts noted"
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U2,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,R.B8.S3/S4 preBuild carries unrelated balance proposal
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U3,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,R.B9.S5 full but number_bonds band 10 deals wholes outside 6-8; pre only 1 less
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U4,MISSING,machine,no,blocking,,wrm-tagging,,R.B10.S3 pre and related are empty
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U5,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,R.B12.S6 full but shape_pattern types names and never copies; unrelated pre/preBuild
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U6,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,R.B13.S3 full though teen_compose never deals 20 (note admits it)
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U7,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,R.B15.S2 compare_shapes build does not teach a turned shape is the same; 3-D pre
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U8,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"R.B15.S6 proposal scenes teaches copying, not decomposing shapes"
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U9,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,R.B16.S3 tagged gap though share_into_groups deals make groups of 3
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U10,MISSING,machine,no,blocking,,wrm-tagging,,R.B17.S1 pre is empty
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U11,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,R.B3.S1 full though count_objects band 5 deals 5 of 8 items above 3
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U12,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"R.B3.S4 1 more: count_sequence deals 7 of 8 outside 1-3, no objects"
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U13,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"R.B2.S5 shape_pattern typed names, no copying; unrelated pre and preBuild"
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U14,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"R.B13.S6 seq_10 deals 1,11,21 and past 100; not Reception counting patterns"
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U15,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,R.B14.S1 pre-skills come later in idea; reading load of add_wp_10 not noted
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U16,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B1.S1 pre from unrelated week list; partial skill of prior sorting steps dropped
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U17,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Y1.B1.S6 pre seq_10 is noise
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U18,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B2.S7 number_bonds deals 4 of 8 items that are not bonds to 10
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U19,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B2.S8 full but add_10_mixed is a column layout; add_5_pictures stops at 5
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U20,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B2.S15 full but column subtraction and unpictured stories
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U21,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"Y1.B4.S5 teen_compose deals all teens, never isolating 17-19"
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U22,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B5.S2 wrong skills (bridging ten is Y2); missed add_20_no_regroup; same for B5.S6
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U23,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B5.S3 pre inherits the wrong bridging skills
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U24,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B5.S10 full but skills stay within 10 in a within-20 block
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U25,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B9.S4 equal_or_unequal_groups asks write multiply/add up to 24: not K language
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U26,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"Y1.B10.S8 quarter of a quantity: fraction_of_set deals fifths, sixths"
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U27,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B11.S4 existing option forms:[0] (above and below) not set
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U28,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B12.S2 seq_10 deals off-multiples
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U29,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B13.S1 unitising tagged coin_value; tens_foundation_visual missed
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U30,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B9.S1 count in 2s full but seq_2 deals odd starts and past 100
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U31,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B9.S2 count in 10s: seq_10 and tag-fix number_seq_fill step 10 deal no multiples of ten
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U32,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"Y1.B9.S3 count in 5s: seq_5 and tag-fix add deal 1,6,11 not multiples of five"
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U33,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B13.S2 pre seq_10 and number_seq_fill are noise
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U34,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B14.S5 pre share_into_groups/compose_shapes from week list; clock_parts missing
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U35,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B10.S2 half of shape: shade_fraction deals 1 half in 8; parts opts unset on S1/S5
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U36,PROCESS,process,no,blocking,WRM-rule-S3;WRM-rule-1,wrm-tagging,,"Full verdicts inherited from old SKILL_WRM tags, not generated (50/50 R, 67/69 Y1)"
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U37,UNTRUE_TEXT,machine,no,blocking,WRM-rule-S2;WRM-rule-2,wrm-tagging,,Existing options written as notes or unset; links record no Max Number range
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U38,UNTRUE_TEXT,machine,no,blocking,WRM-rule-S1;WRM-rule-3,wrm-tagging,,Pre-skills mechanical: 130 cross-domain Y1 entries; R block fallback; unrelated preBuild
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U39,REPEAT,machine,no,blocking,WRM-rule-S4;WRM-rule-4,wrm-tagging,,Related padded by same block/CCSS; 89/119 R and 87/116 Y1 steps repeat keys in pre and related
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U40,PEDAGOGY,judgment,no,blocking,,wrm-tagging,,"Response mode for 4-5 year olds not judged (typed names, column layouts, write multiply)"
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U41,NAME_CONTENT,machine,no,blocking,P-1,wrm-tagging,,"pictures_change_unknown bundles two changes and lifts Within-5 skills to 10, breaking their names"
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U42,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1 B13.S3 coin_value marked partial for wrong reason; notes are live via options
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U43,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,R report counts R.B16.S6 twice (six plus a seventh)
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U44,MISSING,machine,no,blocking,,wrm-tagging,,Count-to-3 band_3 and multiples-only start-at-0 proposals needed for R.B3 and Y1.B9 steps
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,1,U45,OTHER,judgment,no,minor,,wrm-tagging,,"R report owner Q4 suggested answer would leave R.B18 with no build, against the keep-every-step ruling"
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U1,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,R.B3.S5 related more_less_10 {} has no opts and deals to 100
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U2,UNTRUE_TEXT,machine,no,blocking,WRM-rule-R7,wrm-tagging,,"R.B5.S1 full but count_objects band 5 deals 5 of 8 items 1-3, not 4 and 5"
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U3,MISSING,machine,no,blocking,,wrm-tagging,,R.B5.S6 pre is only count_objects {} default; earlier bond and ten-frame pre missing
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U4,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,R.B11.S5 related more_less_10 {} deals to 100
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U5,UNTRUE_TEXT,machine,no,blocking,WRM-rule-R7,wrm-tagging,,R.B13.S4 full but count_sequence/number_seq_fill deal mostly below 14; S2 partial with same skills
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U6,PEDAGOGY,judgment,yes,blocking,WRM-rule-R8,wrm-tagging,,R.B14.S1 add_wp_10 word-work cell with +-x÷ bank is not a Reception response; pre lack opts
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U7,MISSING,machine,no,blocking,WRM-rule-15,wrm-tagging,,R.B17.S7 pre is empty though position and shape-name steps come earlier
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U8,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,R.B3.S6 pre count_objects and ten_frame_build carry no opts (band 20 / 10)
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U9,UNTRUE_TEXT,machine,no,blocking,WRM-rule-R7,wrm-tagging,,R.B7.S7 full but number_bonds band 5 never deals wholes 1-2 or a zero part
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U10,PEDAGOGY,judgment,no,blocking,WRM-rule-R7;WRM-rule-R8;WRM-rule-S6,wrm-tagging,,R.B9.S9 add_wp_10 totals past 8 with x÷ bank; building blocks sit in related not pre
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U11,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B1.S13 related order_least_to_greatest {} orders 3-digit numbers; S12 pre missing
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U12,UNTRUE_TEXT,machine,yes,blocking,,wrm-tagging,,Y1.B2.S8 related add_10_mixed {} labelled across but draws column addition
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U13,UNTRUE_TEXT,machine,no,blocking,WRM-rule-S6,wrm-tagging,,Y1.B4.S8 pre compare {band:99} not a building block; number_line_add only in related
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U14,REPEAT,machine,no,blocking,WRM-rule-5,wrm-tagging,,Y1.B5.S7 existing Max 20 value missed; nl_20 proposed though nl_sub draws 0-20; count back not pre
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U15,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B6.S2 tens_foundation_visual answers 1-5 tens; pupil never names 20-50
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U16,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B6.S8 pre from week list (compare); the count-to-50 step is missing
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U17,MISSING,machine,no,blocking,WRM-rule-15,wrm-tagging,,Y1.B8.S2 measure_nonstandard only related; preBuild capacity_early not a building block
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U18,MISSING,machine,yes,blocking,,wrm-tagging,,Y1.B9.S1 pre lacks doubles and number_seq_fill; related tens rods not same idea
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U19,MISSING,machine,yes,blocking,WRM-rule-15,wrm-tagging,,Y1.B9.S3 pre lacks the count-in-2s and count-in-10s skills
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U20,NAME_CONTENT,machine,no,blocking,WRM-rule-17,wrm-tagging,,Y1.B10.S3 fraction_of_set denoms:[2] ignored in missing-numerator form; leak not noted
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U21,NAME_CONTENT,machine,no,blocking,WRM-rule-17,wrm-tagging,,Y1.B10.S7 same fraction_of_set denoms leak as S3
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U22,MISSING,machine,yes,blocking,WRM-rule-15,wrm-tagging,,Y1.B13.S1 pre opts-less defaults to 99; counting in 5s and 10s missing
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U23,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B14.S3 related time_hour is not the same idea
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U24,MISSING,machine,no,blocking,,wrm-tagging,,Y1.B14.S6 one pre; half of a shape and clock_parts missing
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U25,MISSING,machine,yes,blocking,,wrm-tagging,,Y1.B9.S2 skip_count_line has no single-count value; pre tens and hundreds chart missing
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U26,MISSING,machine,no,blocking,WRM-rule-15,wrm-tagging,,Y1.B13.S4 pre lacks counting in 5s and 10s
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U27,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B1.S7 related more_less_10 {} deals 10 more than 90
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U28,MISSING,machine,no,blocking,,wrm-tagging,,Y1.B11.S2 pre is empty though R position steps come earlier
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U29,REPEAT,machine,no,blocking,WRM-rule-5,wrm-tagging,,Y1.B5.S1 number_line_add tagged range 10 partial though range 20 draws 0-20 line
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U30,UNTRUE_TEXT,machine,yes,blocking,,wrm-tagging,,R.B16.S3 still 7: one weak pre
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U31,UNTRUE_TEXT,machine,yes,blocking,,wrm-tagging,,R.B3.S1 still 7: one pre
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U32,UNTRUE_TEXT,machine,yes,blocking,,wrm-tagging,,R.B3.S4 still 7: related more_less_10 {} to 100
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U33,UNTRUE_TEXT,machine,yes,blocking,,wrm-tagging,,Y1.B2.S15 still 7: related sub_10_mixed {} draws columns
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U34,UNTRUE_TEXT,machine,yes,blocking,WRM-rule-R7,wrm-tagging,,R.B5.S7 still full though note says wholes 3-5; 1 and 2 never appear
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U35,REPEAT,machine,yes,blocking,WRM-rule-5,wrm-tagging,,Y1.B5.S10 missing_20 proposed though Max 20 already deals it; missing text wrong
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U36,UNTRUE_TEXT,machine,yes,blocking,WRM-rule-R7,wrm-tagging,,Y1.B12.S2 tens to 100 full at band 90; 100 as ten tens never dealt
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U37,MISSING,machine,yes,blocking,,wrm-tagging,,Y1.B13.S2 pre still only tens rods
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U38,UNTRUE_TEXT,machine,no,blocking,WRM-rule-R7,wrm-tagging,,Y1.B2.S4 addition fact families full but both skills deal subtraction facts
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U39,UNTRUE_TEXT,machine,no,blocking,WRM-rule-R7,wrm-tagging,,Y1.B12.S1 count 50-100 full but 6 of 8 items below 50
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U40,UNTRUE_TEXT,machine,no,blocking,WRM-rule-R7,wrm-tagging,,Y1.B6.S1 count 20-50 full but 5 of 8 items below 20
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U41,UNTRUE_TEXT,machine,no,blocking,WRM-rule-R7,wrm-tagging,,"R7 range across files: B5.S3, B11.S1, B11.S3 full with most items outside the step"
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U42,PEDAGOGY,judgment,no,blocking,WRM-rule-R8,wrm-tagging,,R8 response: R.B14.S3 word-work; R.B12.S1 drag written names; Y1.B2.S13 write yes/no
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U43,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Systematic: 51 opts-less pre/related links whose defaults deal 2-3 digit numbers or columns
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U44,REPEAT,machine,no,blocking,WRM-rule-5,wrm-tagging,,Y1.B4.S9 nl_20 proposed though range 20 already draws a 0-20 line
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U45,MISSING,machine,no,blocking,WRM-rule-14;WRM-rule-S6,wrm-tagging,,"About 26 building-block skills listed only as related, not pre"
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U46,MISSING,machine,no,blocking,WRM-rule-15;WRM-rule-S7,wrm-tagging,,125 steps have fewer than 3 pre with no reason given
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U47,NAME_CONTENT,machine,no,blocking,WRM-rule-17,wrm-tagging,,"number_word_form to_number at Max 10 deals only ""ten"" in 20 of 20 seeds; not flagged"
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U48,PATTERN,machine,no,blocking,WRM-rule-17,wrm-tagging,,shape_positions forms:[0] answers Below in 7 of 8 items (gives the answer away); not flagged
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,2,U49,MISSING,machine,no,blocking,,wrm-tagging,,"band_3 under-scoped (wholes 1-2, zero, 4-5 and 9-10 focus); multiples_from_0 needs band 100"
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U1,MISSING,machine,no,minor,,wrm-tagging,,R.B1.S6 note names R.B1.S1 gap but its build match_same is not in preBuild
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U2,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"R.B3.S3 note says no earlier live skill, yet count_objects pictures and classify_count band 3 are live"
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U3,UNTRUE_TEXT,machine,no,blocking,WRM-rule-18,wrm-tagging,,"R.B4.S1 3 of 4 related links misfit PK (parallel sides, octagon vertices, written-name drag)"
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U4,UNTRUE_TEXT,machine,no,blocking,WRM-rule-18,wrm-tagging,,R.B6.S4 related clock-reading skills are not the same idea and a Y1 response
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U5,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"R.B11.S2 partial placevalue:compare band 99 deals no item within 10, with symbols"
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U6,MISSING,machine,no,blocking,,wrm-tagging,,R.B11.S7 two pre; ten_frame_build and count_objects band 10 building blocks missing; false note
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U7,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,R.B11.S12 doubles pre are bond skills and abstract add_three; equal-groups blocks missing
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U8,UNTRUE_TEXT,machine,no,blocking,WRM-rule-8;WRM-rule-18,wrm-tagging,,R.B12.S1 pre shape_attributes is 2-D; related name-match is a Y1 response yet still linked
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U9,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,R.B13.S1 related hundreds chart band 30 on a 10-13 step; pre count back not a block
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U10,UNTRUE_TEXT,machine,no,blocking,WRM-rule-18,wrm-tagging,,R.B15.S2 pre shape_attributes deals right angles and parallel sides; related octagons and name drag
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U11,UNTRUE_TEXT,machine,no,blocking,WRM-rule-18,wrm-tagging,,R.B15.S4 pre shape_attributes and related name drag misfit
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U12,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,R.B18.S2 partial shape_pattern typed response not named in missing; pre doubles to 18
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U13,MISSING,machine,no,blocking,,wrm-tagging,,R.B11.S8 ten_frame_build full-frame building block missing from pre; false note
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U14,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,R.B14.S2 pre add_three abstract; counting on building block missing
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U15,UNTRUE_TEXT,machine,no,blocking,WRM-rule-14,wrm-tagging,,Y1.B1.S6 none of the pre is a building block of counting on
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U16,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"Y1.B1.S13 partial placevalue:compare band 99 deals only 2-digit symbols, none within 10"
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U17,PEDAGOGY,judgment,no,blocking,WRM-rule-8;WRM-rule-18,wrm-tagging,,"Y1.B2.S10 word-work cell column stack, +-x÷ row and label bank is not a K layout"
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U18,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B3.S2 pre shape_attributes 2-D not a 3-D block; related 2-D name match not same idea
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U19,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B3.S3 pre shape_attributes {} deals parallel sides and right angles
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U20,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Y1.B7.S2 pre heavier_lighter_visual weak; count_objects missing
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U21,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B8.S4 pre reading_ruler cm is not a building block of full and empty
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U22,MISSING,machine,no,blocking,WRM-rule-14,wrm-tagging,,Y1.B8.S6 measure_nonstandard building block missing from capacity pre
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U23,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B11.S2 false partial: shape_positions never deals left or right; should be gap
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U24,UNTRUE_TEXT,machine,no,blocking,WRM-rule-14,wrm-tagging,,Y1.B12.S1 main building blocks ranked 6th and 7th behind R items
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U25,MISSING,machine,yes,blocking,WRM-rule-14,wrm-tagging,,Y1.B12.S2 pre lacks count in 10s and tens-to-50 rung
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U26,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B12.S5 pre placevalue:compare band 99 not a building block of 1 more
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U27,PEDAGOGY,judgment,no,blocking,WRM-rule-8;WRM-rule-18,wrm-tagging,,Y1.B2.S9 add_wp_10 same K layout defect; count-on pre missing
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U28,MISSING,machine,no,blocking,WRM-rule-14,wrm-tagging,,Y1.B6.S1 pre ranks R items first; counting on to 20 missing
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U29,UNTRUE_TEXT,machine,yes,blocking,,wrm-tagging,,Y1.B9.S2 missing text silent that skip_count_line deals 10s in only 2 of 30 items
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U30,UNTRUE_TEXT,machine,yes,blocking,,wrm-tagging,,R.B3.S1 still one pre; note false since classify_count band 3 is live
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U31,MISSING,machine,yes,blocking,,wrm-tagging,,R.B7.S7 builds do not close 5 = 5 + 0; no zero part at band 5
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U32,MISSING,machine,yes,blocking,,wrm-tagging,,Y1.B5.S1 count-on pre still missing
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U33,MISSING,machine,yes,blocking,,wrm-tagging,,Y1.B5.S8 compare_groups building block still not a pre
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U34,UNTRUE_TEXT,machine,yes,blocking,,wrm-tagging,,Y1.B14.S3 related time_match_clock still not the same idea as months
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U35,UNTRUE_TEXT,machine,no,blocking,WRM-rule-18,wrm-tagging,,Systematic: spec.FIT exempts shape links from rule 18; 37 misfit shape links and 3 partials
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U36,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"R.B15.S1 false partial: shape_attributes claims roll/stack, 0 of 40 items do"
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U37,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B4.S11 2-digit symbol compare tagged partial on a within-20 step
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U38,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,"Pre why texts name a later step (11 promoted entries, 2 hand-written)"
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U39,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"Template notes: gen.py writes none/every-other-form sentences unchecked; false on R.B11.S13, B7.S7, B16.S2, B16.S4"
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U40,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,maxdealt reads tens_foundation_visual as 9 not 90; six teen/tens links misfit
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,3,U41,REPEAT,machine,no,minor,,wrm-tagging,,teen_bands and count_start_at should fold into the focus option id; teen split serves no step
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U1,MISSING,machine,yes,minor,,wrm-tagging,,R.B1.S6 preBuild still lacks match_same though its note points there
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U2,UNTRUE_TEXT,machine,no,minor,WRM-rule-18,wrm-tagging,,Y1.B3.S4 partial forms:[1] still deals right angles and parallel sides to K (named)
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U3,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,R.B5.S4 related nl_add deals sums to 10 on a within-5 step under false one-jump why
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U4,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,R.B7.S5 related nl_add as R.B5.S4
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U5,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,R.B9.S9 pre doubles to 20 on a to-8 step; related number_line_add is a Y1 equation
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U6,UNTRUE_TEXT,machine,no,blocking,WRM-rule-17,wrm-tagging,,R.B11.S3 related number_word_form deals only ten; written word for PK4
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U7,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,R.B11.S10 all three related links are symbol-only equations
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U8,MISSING,machine,no,blocking,,wrm-tagging,,R.B16.S6 doubles to 20 unnamed; count and same-groups pre missing; halve band 20 related
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U9,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"R.B15.S2 partial name_2d_shapes deals hexagons and pentagons, unnamed in missing"
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U10,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,R.B11.S12 pre near-doubles to 20; related halve band 20 when band 10 exists
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U11,UNTRUE_TEXT,machine,no,blocking,WRM-rule-14,wrm-tagging,,"R.B14.S4 pre are doubles, not take-away blocks; counting back missing"
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U12,MISSING,machine,no,blocking,,wrm-tagging,,R.B9.S10 dice building block missing from pre; related number_word_form deals only ten
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U13,UNTRUE_TEXT,machine,no,blocking,WRM-rule-19,wrm-tagging,,Y1.B6.S6 pre number-line +/- sentences at W08; partial leak of 51-100 not named
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U14,MISSING,machine,no,blocking,,wrm-tagging,,Y1.B12.S7 pre lack 2-digit tens-and-ones building blocks; preBuild does not fit
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U15,UNTRUE_TEXT,machine,no,blocking,WRM-rule-19,wrm-tagging,,Y1.B12.S2 first pre skip_count_line deals 2s and 5s taught at W33
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U16,UNTRUE_TEXT,machine,no,blocking,WRM-rule-19,wrm-tagging,,Y1.B13.S4 pre count in 5s is a W33 skill at W11
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U17,UNTRUE_TEXT,machine,no,blocking,WRM-rule-19,wrm-tagging,,Y1.B9.S4 pre skip_count_line 2s/5s is W33
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U18,UNTRUE_TEXT,machine,no,blocking,WRM-rule-19,wrm-tagging,,Y1.B4.S9 full but directs deal +/- sentences at W06; source of 12 rule-19 links
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U19,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,D1 systematic: 25 R related links are symbol equations/number lines; 11 carry false one-jump why
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U20,UNTRUE_TEXT,machine,no,blocking,WRM-rule-19,wrm-tagging,,D2 systematic: content_weeks.json lumps 2s/5s with 10s and lacks a sentences week; 18 links
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U21,UNTRUE_TEXT,machine,no,blocking,WRM-rule-17,wrm-tagging,,D3 systematic: number_word_form range 10 deals only ten yet linked 11 times
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U22,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,R doubles size: halve band 20 related and doubles-to-20 pre on to-8/to-10 steps
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U23,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,"Y1 why of hundreds_chart_fill gaps column claims tens column, blanks are any cell"
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U24,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Note reason size/content/school week is a disjunction (51 times); name the one that applies
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U25,MISSING,machine,no,minor,,wrm-tagging,,Y1.B9.S9 omits halve band 10 (sharing between two) from related/pre
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,4,U26,PROCESS,process,no,minor,,wrm-tagging,,Critic's own round-3 ceiling rule had a loophole letting range partials lift their ceiling
+design/audit/runs/wrm-tagging/R-Y1-critic-r5.md,wrm-tagging/R-Y1,5,N1,UNTRUE_TEXT,machine,no,blocking,WRM-rule-4;WRM-rule-10,wrm-tagging,,28 related links labelled a later step on this idea are a different idea (gen.py same-family fallback)
+design/audit/runs/wrm-tagging/R-Y1-critic-r5.md,wrm-tagging/R-Y1,5,N2,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,pictograph_intro {} why says which has more on 14 links; it deals how-many-more differences
+design/audit/runs/wrm-tagging/R-Y1-critic-r5.md,wrm-tagging/R-Y1,5,N3,UNTRUE_TEXT,machine,no,blocking,WRM-rule-8;WRM-rule-18,wrm-tagging,,"Reception related links to written K responses (time, arrays); contradicts R.B6.S4 note"
+design/audit/runs/wrm-tagging/R-Y1-critic-r5.md,wrm-tagging/R-Y1,5,M1,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,nl_sub default mixed unknowns deal start/change unknown on K full directs and 8 links
+design/audit/runs/wrm-tagging/R-Y1-critic-r5.md,wrm-tagging/R-Y1,5,M2,UNTRUE_TEXT,machine,no,minor,WRM-rule-3,wrm-tagging,,"Teen steps padded with count-to-100 pre (10 links, 5 steps); not a building block"
+design/audit/runs/wrm-tagging/R-Y1-critic-r5.md,wrm-tagging/R-Y1,5,M3,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,partition_shapes full on K half/quarter steps but half of items need typed fraction notation
+design/audit/runs/wrm-tagging/R-Y1-critic-r5.md,wrm-tagging/R-Y1,5,M4,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,add_three three-addend pre on K bond steps is not a building block
+design/audit/runs/wrm-tagging/R-Y1-critic-r5.md,wrm-tagging/R-Y1,5,U1,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,R.B13.S1 related whys cite Y1.B6.S1 20-50 but links deal 1-10
+design/audit/runs/wrm-tagging/R-Y1-critic-r5.md,wrm-tagging/R-Y1,5,U2,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Y1.B14.S3 note has two contradicting Related clauses
+design/audit/runs/wrm-tagging/R-Y1-critic-r5.md,wrm-tagging/R-Y1,5,U3,PLAIN_WORDS,machine,no,minor,,wrm-tagging,,R.B1 notes say past this step (0); reads oddly
+design/audit/runs/wrm-tagging/R-Y1-critic-r5.md,wrm-tagging/R-Y1,5,U4,MISSING,machine,no,blocking,,wrm-tagging,,Y1.B12.S4 pre thin and from Reception; track and chart to 100 missing
+design/audit/runs/wrm-tagging/R-Y1-critic-r6.md,wrm-tagging/R-Y1,6,N1r,UNTRUE_TEXT,machine,yes,blocking,WRM-rule-4;WRM-rule-10,wrm-tagging,,"10 R related links still claim same idea for a different idea (topic2 default count, coarse shape2d)"
+design/audit/runs/wrm-tagging/R-Y1-critic-r6.md,wrm-tagging/R-Y1,6,U1,PROCESS,process,no,blocking,,wrm-tagging,,R report says R.B9.S10/R.B11.S4 number_seq_fill links were dropped; they were not
+design/audit/runs/wrm-tagging/R-Y1-critic-r6.md,wrm-tagging/R-Y1,6,N4,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"Refit why ""at this step's size"" false in 9 of 13 uses (compose_shapes squares; band-10 tracks on 10-13)"
+design/audit/runs/wrm-tagging/R-Y1-critic-r6.md,wrm-tagging/R-Y1,6,M1r,UNTRUE_TEXT,machine,yes,blocking,,wrm-tagging,,nl_add mixed unknowns on 8 K related links; report claims every link got unknown answer
+design/audit/runs/wrm-tagging/R-Y1-critic-r6.md,wrm-tagging/R-Y1,6,D1,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,"Whys contradicted by items: equal_sign true/false, compare_groups how many more, 5s and 10s"
+design/audit/runs/wrm-tagging/R-Y1-critic-r6.md,wrm-tagging/R-Y1,6,D2,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,11 notes say see preBuild but preBuild lacks the build; capacity steps cited on mass/length
+design/audit/runs/wrm-tagging/R-Y1-critic-r6.md,wrm-tagging/R-Y1,6,D3,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,"False exclusion reason: < > symbols on more_less_10 (lt regex matches ""less than"")"
+design/audit/runs/wrm-tagging/R-Y1-critic-r6.md,wrm-tagging/R-Y1,6,D4,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,"Y1.B2.S8/S14 ceiling taken from a partial's short range (5), contradicting missing; hides links"
+design/audit/runs/wrm-tagging/R-Y1-critic-r6.md,wrm-tagging/R-Y1,6,D5,UNTRUE_TEXT,machine,no,minor,WRM-rule-13,wrm-tagging,,halves_quarters_only does not close the equal/not-equal no-notation clause it claims
+design/audit/runs/wrm-tagging/R-Y1-critic-r6.md,wrm-tagging/R-Y1,6,D6,MISSING,machine,no,minor,WRM-rule-14,wrm-tagging,,Y1.B12.S6 lacks the tens-and-ones building block pre
+design/audit/runs/wrm-tagging/R-Y1-critic-r6.md,wrm-tagging/R-Y1,6,D7,OTHER,judgment,no,minor,,wrm-tagging,,Structure: R.B11.S2 partial but its only skill is listed under direct
+design/audit/runs/wrm-tagging/R-Y1-critic-r6.md,wrm-tagging/R-Y1,6,U2,MISSING,machine,no,blocking,,wrm-tagging,,Y1.B5.S8 missed related pictograph_intro forms:[1]; note says compare_groups is the only form
+design/audit/runs/wrm-tagging/R-Y1-critic-r6.md,wrm-tagging/R-Y1,6,U3,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B6.S3 base10_build exclusion reason false (spec.py scan workaround); related link hidden
+design/audit/runs/wrm-tagging/R-Y1-critic-r6.md,wrm-tagging/R-Y1,6,U4,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,"Y1.B9.S3 why ""two 5s make each ten"" overstates tens_foundation_visual"
+design/audit/runs/wrm-tagging/R-Y1-critic-r7.md,wrm-tagging/R-Y1,7,N5,UNTRUE_TEXT,machine,no,blocking,WRM-rule-3;WRM-rule-15,wrm-tagging,,"Pre why ""(earlier, same idea: X)"" false in 156 of 281 uses; notes list other-idea steps"
+design/audit/runs/wrm-tagging/R-Y1-critic-r7.md,wrm-tagging/R-Y1,7,N6,UNTRUE_TEXT,machine,no,blocking,WRM-rule-19,wrm-tagging,,Content-week table puts sentences at W14 vs sheet W11/W12; diff regex flags make_ten; hides 6 links
+design/audit/runs/wrm-tagging/R-Y1-critic-r7.md,wrm-tagging/R-Y1,7,D2r,UNTRUE_TEXT,machine,yes,minor,,wrm-tagging,,12 notes say see preBuild while preBuild is empty; should say see build
+design/audit/runs/wrm-tagging/R-Y1-critic-r7.md,wrm-tagging/R-Y1,7,D8,NOTATION,machine,no,minor,,wrm-tagging,,halves_quarters_only keeps the 1/2 symbol in shade_fraction prompts (64 of 64)
+design/audit/runs/wrm-tagging/R-Y1-critic-r7.md,wrm-tagging/R-Y1,7,D9,UNTRUE_TEXT,machine,no,blocking,WRM-rule-18,wrm-tagging,,R halve band 10 related at R.B9/B11 before halving is met as sharing at R.B16
+design/audit/runs/wrm-tagging/R-Y1-critic-r7.md,wrm-tagging/R-Y1,7,D10,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,compose_shapes whys say arrange shapes to make a picture/place; skill asks what two shapes make
+design/audit/runs/wrm-tagging/R-Y1-critic-r7.md,wrm-tagging/R-Y1,7,D11,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Y1.B2.S12 full on missing_add_sub though 7 of 64 items ask for the whole (start-unknown)
+design/audit/runs/wrm-tagging/R-Y1-critic-r7.md,wrm-tagging/R-Y1,7,D12,MISSING,machine,no,blocking,WRM-rule-14,wrm-tagging,,Y1.B1.S15 number line lacks number-track pre building block
+design/audit/runs/wrm-tagging/R-Y1-critic-r7.md,wrm-tagging/R-Y1,7,U1,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Report Counts tables stale for R and Y1
+design/audit/runs/wrm-tagging/R-Y1-critic-r7.md,wrm-tagging/R-Y1,7,U2,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,R.B13.S2 related hundreds_chart band 10 why should say it stops at 10
+design/audit/runs/wrm-tagging/R-Y1-critic-r8.md,wrm-tagging/R-Y1,8,N5r,UNTRUE_TEXT,machine,yes,blocking,WRM-rule-14,wrm-tagging,,"Promoted pre why ""(an earlier step; the same idea)"" false in 11 of 11 uses; path unchecked"
+design/audit/runs/wrm-tagging/R-Y1-critic-r8.md,wrm-tagging/R-Y1,8,N7,UNTRUE_TEXT,machine,no,blocking,WRM-rule-15,wrm-tagging,,"FORM_LABEL ""(X: a building block)"" unjudged: 27 uses not a block, 6 misdescribe the skill"
+design/audit/runs/wrm-tagging/R-Y1-critic-r8.md,wrm-tagging/R-Y1,8,D14,UNTRUE_TEXT,machine,no,blocking,WRM-rule-18,wrm-tagging,,select_even_odd range 10 deals 11-20 (generator floor 20) on 3 R related links; scans miss options
+design/audit/runs/wrm-tagging/R-Y1-critic-r8.md,wrm-tagging/R-Y1,8,D15,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,Y1.B2.S11 related missing_add_sub opts ask for the whole in 1 item in 4; why says find a part
+design/audit/runs/wrm-tagging/R-Y1-critic-r8.md,wrm-tagging/R-Y1,8,M1,UNTRUE_TEXT,machine,no,minor,WRM-rule-19,wrm-tagging,,SENT classes by key prefix; number_families_add deals subtraction a week early on Y1.B2.S1/S2
+design/audit/runs/wrm-tagging/R-Y1-critic-r8.md,wrm-tagging/R-Y1,8,M2,PROCESS,process,no,minor,,wrm-tagging,,"maxdealt.mjs does not read q.options labels, so the D14 class escapes the generator check"
+design/audit/runs/wrm-tagging/R-Y1-critic-r8.md,wrm-tagging/R-Y1,8,U1,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,"Raw skill labels printed as whys (cloze_addition, order_objects_length)"
+design/audit/runs/wrm-tagging/R-Y1-critic-r9.md,wrm-tagging/R-Y1,9,S1,MISSING,machine,no,blocking,WRM-rule-14;WRM-rule-15,wrm-tagging,,Short-pre steps miss real building blocks (9 steps): key de-dup and narrow BLOCKS table; notes claim complete
+design/audit/runs/wrm-tagging/R-Y1-critic-r9.md,wrm-tagging/R-Y1,9,D16,UNTRUE_TEXT,machine,no,blocking,WRM-rule-3,wrm-tagging,,R.B17.S9 maps step classed find by SUBS; counting pre under false same idea
+design/audit/runs/wrm-tagging/R-Y1-critic-r9.md,wrm-tagging/R-Y1,9,D17,UNTRUE_TEXT,machine,no,blocking,,wrm-tagging,,"R.B15.S3 Manipulate shapes full on compose_shapes; no item turns, flips or fits"
+design/audit/runs/wrm-tagging/R-Y1-critic-r9.md,wrm-tagging/R-Y1,9,U1,UNTRUE_TEXT,machine,yes,minor,,wrm-tagging,,"N7 residual: 3 building-block labels still false (count back, compose_shapes, track back)"
+design/audit/runs/wrm-tagging/R-Y1-critic-r9.md,wrm-tagging/R-Y1,9,M3,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,pictograph_intro forms:[0] why says count two rows; items ask about one row
+design/audit/runs/wrm-tagging/R-Y1-critic-r9.md,wrm-tagging/R-Y1,9,M4,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,"R.B12.S2-S4 name_2d_shapes shapes:[2] should be [0,1,2] for 3-D faces"
+design/audit/runs/wrm-tagging/R-Y1-critic-r10.md,wrm-tagging/R-Y1,10,D19,UNTRUE_TEXT,machine,no,blocking,WRM-rule-7,wrm-tagging,,R.B5.S6 full but number_bonds band 5 deals wholes 2-3 in many items; note and 4 other texts false
+design/audit/runs/wrm-tagging/R-Y1-critic-r10.md,wrm-tagging/R-Y1,10,S1r,MISSING,machine,yes,blocking,WRM-rule-14;WRM-rule-15,wrm-tagging,,Y1.B3.S4 Sort 2-D shapes misses classify_count sort building block; note reads complete
+design/audit/runs/wrm-tagging/R-Y1-critic-r10.md,wrm-tagging/R-Y1,10,D18,MISSING,machine,no,minor,WRM-rule-14,wrm-tagging,,Regression: second count_objects rung fills block tier and pushes out compare_groups on 4 steps
+design/audit/runs/wrm-tagging/R-Y1-critic-r10.md,wrm-tagging/R-Y1,10,M6,MISSING,machine,no,minor,WRM-rule-12,wrm-tagging,,Y1.B9.S5/S8/S9 hand links crowd out school prior entry Make pairs from the xlsx loop
+design/audit/runs/wrm-tagging/R-Y1-critic-r10.md,wrm-tagging/R-Y1,10,M7,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Y1.B9.S8/S9 count_objects band 10 why says count the total to 20
+design/audit/runs/wrm-tagging/R-Y1-critic-r10.md,wrm-tagging/R-Y1,10,M8,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Notes blame the step's own skill where the earlier rung is left out for its response mode
+design/audit/runs/wrm-tagging/R-Y1-critic-r10.md,wrm-tagging/R-Y1,10,M9,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,R.B6.S2 full on compose_shapes shapes:[1] dealing only 2 distinct items; note silent
+design/audit/runs/wrm-tagging/R-Y1-critic-r11.md,wrm-tagging/R-Y1,11,D20,UNTRUE_TEXT,machine,no,blocking,WRM-rule-7,wrm-tagging,,"Y1.B1.S9 1 less full though count_sequence back never asks 1 less than 8, 9 or 10"
+design/audit/runs/wrm-tagging/R-Y1-critic-r11.md,wrm-tagging/R-Y1,11,N7r,UNTRUE_TEXT,machine,yes,minor,,wrm-tagging,,Regression: distinct-key block tier re-admits judged-false building-block claims on 4 Y1 steps
+design/audit/runs/wrm-tagging/R-Y1-critic-r11.md,wrm-tagging/R-Y1,11,M10,UNTRUE_TEXT,machine,yes,minor,,wrm-tagging,,Stale wholes facts in band_3 why and R.B11.S8 tag fix; wholes claims not added to notefacts
+design/audit/runs/wrm-tagging/R-Y1-critic-r11.md,wrm-tagging/R-Y1,11,M11,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,"Y1.B14.S6 count_sequence why says 1 to 12, items go to 20"
+design/audit/runs/wrm-tagging/R-Y1-critic-r11.md,wrm-tagging/R-Y1,11,M12,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,"Added-link whys: double justified by halving; share_into_groups items group, not share"
+design/audit/runs/wrm-tagging/R-Y1-critic-r11.md,wrm-tagging/R-Y1,11,M13,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,Y1.B10.S6 halve pre pushed out by additions and not named in the note
+design/audit/runs/wrm-tagging/R-Y1-critic-r11.md,wrm-tagging/R-Y1,11,M14,UNTRUE_TEXT,machine,no,minor,WRM-rule-18,wrm-tagging,,R.B1.S4/S5 partial classify_count deals squares etc.; should use pictures opts
+design/audit/runs/wrm-tagging/R-Y1-critic-r11.md,wrm-tagging/R-Y1,11,U1,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,"Y1.B1.S7 note should say 1 more than 0, 1, 2 are not dealt (window)"
+design/audit/runs/wrm-tagging/R-Y1-critic-r12.md,wrm-tagging/R-Y1,12,N12-1,UNTRUE_TEXT,machine,yes,minor,,wrm-tagging,,R.B3.S6 clause says band 5 deals wholes 4 and 5 only; it also deals 2 and 3 (wholes check misreads)
+design/audit/runs/wrm-tagging/R-Y1-critic-r12.md,wrm-tagging/R-Y1,12,N12-2,UNTRUE_TEXT,machine,yes,minor,,wrm-tagging,,Y1.B10.S8 share_into_groups why says share; items group
+design/audit/runs/wrm-tagging/R-Y1-critic-r12.md,wrm-tagging/R-Y1,12,N12-3,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,R.B5.S1/S2 reject classify_count as not a block; true reason is size (band 3)
+design/audit/runs/wrm-tagging/R-Y1-critic-r12.md,wrm-tagging/R-Y1,12,N12-4,UNTRUE_TEXT,machine,no,minor,,wrm-tagging,,R.B1.S6 pre classify_count cited to R.B1.S4 but has R.B1.S5's opts

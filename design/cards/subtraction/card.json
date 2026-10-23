@@ -1,0 +1,445 @@
+{
+ "id": "subtraction",
+ "kind": "family",
+ "title": "Column subtraction without regrouping, within 50 to within 1,000,000 (pilot: six SU-C skills)",
+ "template": {
+  "id": "stack",
+  "source": "js/modules/sheet/cells/stack.js",
+  "also": "Today these six skills have NO `q.cell`: the range-skill branch of `gen-operations.js` (~:2870-2885) prints the legacy `column-sub` cell (`buildColumnVisual` on screen, `print-generate.js:5796-5853` on paper). The build moves them onto `stack` with `regroup: false`; `screen-cell.js` then draws the same cell on the practice card, online worksheet and quiz"
+ },
+ "families": [],
+ "findingsMatch": {
+  "templates": [
+   "stack"
+  ]
+ },
+ "skills": {
+  "include": [
+   "subtraction:sub_50_no_regroup",
+   "subtraction:sub_100_no_regroup",
+   "subtraction:sub_1k_no_regroup",
+   "subtraction:sub_10k_no_regroup",
+   "subtraction:sub_100k_no_regroup",
+   "subtraction:sub_1m_no_regroup"
+  ]
+ },
+ "excerptChars": 140,
+ "summary": "Pilot family card, scoped to six skills: the no-regrouping rungs of the SU-C ladder (design/catalogue/subtraction.md C4, C6-C9), one stacked problem per boxed cell on the `stack` template with no regroup row. The six differ ONLY in the size of the minuend (within 50, 100, 1,000, 10,000, 100,000, 1,000,000); every other thing that changes is its own step.",
+ "teaches": "Subtract with the column (standard) algorithm when no column needs regrouping: line the places up, subtract the ones first, then each place to the left. Grades 2-5 (CCSS 2.NBT.B.5, 2.NBT.B.7, 3.NBT.A.2, 4.NBT.B.4; WRM Y2-Y4 column subtraction without exchange). \"Within N\" bounds the MINUEND (the largest number on the page and the answer's ceiling), never the subtrahend alone.",
+ "research": "From repo sources (PEDAGOGY_STANDARD L-3, design/catalogue/subtraction.md SU-C ladder and rows 145-160, design/PROBLEM_TYPES.md AS rows, the `stack` card); MW4K/IXL research pending logins (Q-H4).",
+ "problemTypes": [
+  "AS-05 vertical subtract with labelled columns (place heads, answer boxes below the rule, no regroup row) — the core item",
+  "AS-11 rewrite a horizontal problem in the grid (alignment, \"Do not solve.\") — the `sub-setup` page these skills already list",
+  "ragged lengths: a shorter subtrahend lined up under the ones (2d − 1d, 3d − 2d, …) as its own section, never mixed at random with equal lengths",
+  "zero cases as their own section: a 0 digit in the top number (`n − 0`, `0 − 0`), a column that leaves 0 (`n − n`), an answer with fewer digits than the minuend",
+  "AS-15 check a subtraction by adding (`check` line under the stack) — a later step, same drawing"
+ ],
+ "progression": [
+  "within 50 (`sub_50_no_regroup`): 2-digit − 2-digit, minuend ≤ 50, T O heads, answer boxes, no regroup row (L-3 1-4; SU-C C4)",
+  "within 100 (`sub_100_no_regroup`): the same item, minuend ≤ 99 — ONLY the minuend range changes (C4, second half)",
+  "the T O heads fade on a dedicated step; the grid and boxes stay (L-3 7)",
+  "within 1,000 (`sub_1k_no_regroup`): 3-digit minuend, H T O heads back on; 3d − 2d (ragged) first, then 3d − 3d (C6; catalogue row 151)",
+  "zero cases at 3 digits: a 0 in the top number, a column that leaves 0, an answer with fewer digits (one section, not seeded at random into the plain page)",
+  "within 10,000 (`sub_10k_no_regroup`): 4 digits, TH H T O heads (C7)",
+  "within 100,000 (`sub_100k_no_regroup`): 5 digits, TTh heads, comma in numbers and answer (C8)",
+  "within 1,000,000 (`sub_1m_no_regroup`): 6 digits, HTh heads (C9); then check by adding (AS-15) on any size"
+ ],
+ "drawing": {
+  "sizes": "digits 16 / 22 / 28 pt; writing height Hw 6 / 8 / 10 mm; answer row 8 / 10 / 12 mm; heads row 4 / 5 / 6 mm; regroup row 6 / 7 / 8 mm; carry box 5 / 6 / 7 mm; subtraction headroom 8 / 10 / 12 mm (`js/modules/sheet/tokens.js` SIZES). Tracks 0.72 em plain, 0.95 em with any regroup scaffold (TY-20, TY-21); default size L. The answer row has as many boxes as the minuend has digits (the widest answer the section can reach, never the item's own answer length).",
+  "notes": [
+   "Payload (`q.cell = {template: 'stack', v: 1, payload}`): `operands: [a, b]`, `op: '-'`, `ans`, `regroup: false`, `heads` (from the support level), `answer: 'boxes'`, `ansDigits` = digits of the band's largest minuend. The scaffold ladder decides heads and answer boxes, never the generator (SCC-Q10).",
+   "No regroup row and no subtraction headroom on these skills: the name promises no regrouping, so the strip would be an empty prompt (catalogue: the legacy cell already hides it on `_no_regroup`).",
+   "States blank / traced / answered / wrong share one geometry (SCC-T10). Key: answer digits only, leading answer boxes left blank (AK-1, INK-31).",
+   "Screen: one input per answer box in the printed geometry, ones box focused first, typing right to left (SCC-T15)."
+  ],
+  "capacity": [
+   {
+    "file": "WORKSHEET_DESIGN_STANDARD.md",
+    "label": "Stacked arithmetic: maximum columns"
+   },
+   {
+    "file": "WORKSHEET_DESIGN_STANDARD.md",
+    "label": "Stacked arithmetic: rows and items"
+   }
+  ]
+ },
+ "ruleGroups": [
+  {
+   "title": "The stack (WORKSHEET_DESIGN_STANDARD §10.1-10.3, quoted in full)",
+   "core": true,
+   "full": true,
+   "rules": [
+    "VA-1",
+    "VA-2",
+    "VA-4",
+    "VA-7",
+    "VA-10@WDS",
+    "VA-11@WDS",
+    "VA-12@WDS",
+    "VA-13@WDS",
+    "VA-13a",
+    "VA-20",
+    "VA-22",
+    "VA-23"
+   ]
+  },
+  {
+   "title": "Key, tracks and screen regroup boxes (quoted in full)",
+   "core": true,
+   "full": true,
+   "rules": [
+    "AK-2",
+    "TY-21",
+    "SP-23"
+   ]
+  },
+  {
+   "title": "Stack geometry, tracks, slots and separators",
+   "chars": 120,
+   "rules": [
+    "VA-3",
+    "VA-5",
+    "VA-6",
+    "VA-21",
+    "VA-30",
+    "VA-31",
+    "VA-32",
+    "LS-8",
+    "SL-12",
+    "TY-20",
+    "TY-21",
+    "TY-23",
+    "TY-24",
+    "TY-26",
+    "VA-40",
+    "VA-41",
+    "VA-42",
+    "VA-50",
+    "VA-51",
+    "VA-52",
+    "SL-1",
+    "SL-2",
+    "SL-11",
+    "CL-6",
+    "CL-9",
+    "PG-12",
+    "PG-14",
+    "PT-CGR-5",
+    "PT-EQD-2",
+    "DN-34"
+   ]
+  },
+  {
+   "title": "Keys, scaffolds, screen and wording",
+   "chars": 100,
+   "rules": [
+    "AK-1",
+    "AK-2",
+    "AK-4",
+    "INK-31",
+    "BD-7",
+    "PT-GDP-1",
+    "P-SC-7",
+    "SF-34@WDS.1",
+    "SP-1",
+    "SP-2",
+    "SP-3",
+    "SP-4",
+    "SP-10",
+    "SP-12",
+    "SP-23",
+    "SCC-T3",
+    "SCC-T4",
+    "SCC-T10",
+    "SCC-T14",
+    "SCC-T15",
+    "SCC-T17",
+    "SCC-P5",
+    "SCC-P6",
+    "BD-10",
+    "BD-11",
+    "BD-12",
+    "PT-FRM-6",
+    "P-1",
+    "P-29",
+    "Q-10",
+    "P-10",
+    "P-35",
+    "P-31",
+    "BD-4",
+    "PT-SCR-1"
+   ]
+  },
+  {
+   "title": "Page and look rules critics cite on these families",
+   "chars": 90,
+   "rules": [
+    "CL-1",
+    "AX-4",
+    "INK-5",
+    "TY-7",
+    "RP-1",
+    "AX-9",
+    "DN-1a",
+    "PT-GDP-2",
+    "SL-3",
+    "SP-20",
+    "PT-REV-3"
+   ]
+  },
+  {
+   "title": "Hard caps and criteria (RUBRIC; every page)",
+   "chars": 60,
+   "rules": [
+    "C1",
+    "C2",
+    "C3",
+    "C4",
+    "H1@RUBRIC",
+    "H2@RUBRIC",
+    "H3@RUBRIC",
+    "H4@RUBRIC",
+    "H5@RUBRIC",
+    "H6",
+    "H7",
+    "H8",
+    "H9",
+    "H10",
+    "H11",
+    "H12",
+    "H13"
+   ]
+  },
+  {
+   "title": "Options rubric caps",
+   "chars": 60,
+   "rules": [
+    "OC3",
+    "OC4",
+    "OC7",
+    "OC8",
+    "OC10",
+    "OC11",
+    "OC14"
+   ]
+  },
+  {
+   "title": "Lessons learned (pre-flight)",
+   "chars": 60,
+   "rules": [
+    "L1",
+    "L2",
+    "L3",
+    "L4",
+    "L5",
+    "L6",
+    "L9",
+    "L10",
+    "L11"
+   ]
+  }
+ ],
+ "ownerRulings": [
+  {
+   "date": "2026-09-19",
+   "ruling": "\"Within N\" bounds the ANSWER (for subtraction: the minuend), never the operands.",
+   "source": "CLAUDE.md; design/catalogue/addition.md"
+  },
+  {
+   "date": "2026-09-19",
+   "ruling": "Pupil-facing text says \"regroup\", never \"borrow\" (P-32); the legacy column caption \"Use top row for borrowing\" goes.",
+   "source": "design/catalogue/subtraction.md summary 6"
+  },
+  {
+   "date": "2026-09-25",
+   "ruling": "Writing boxes are slightly rounded (SL-11); a row of digit boxes is ONE outline with dividers (SL-12).",
+   "source": "WORKSHEET_DESIGN_STANDARD.md"
+  },
+  {
+   "date": "2026-10-02",
+   "ruling": "Key answers print reddish orange, keys only (INK-31).",
+   "source": "WORKSHEET_DESIGN_STANDARD.md"
+  },
+  {
+   "date": "2026-10-10",
+   "ruling": "SPEC, NOT BUILT: on screen the regroup boxes an item NEEDS are required and marked. A no-regroup item needs none, so these six skills show no regroup boxes on any host; paper unchanged.",
+   "source": "design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md; design/STATUS.md:47"
+  },
+  {
+   "date": "2026-10-17",
+   "ruling": "SPEC, NOT BUILT: `carry: top | bottom` is addition and × only; subtraction stays at the top. It does not apply to these skills.",
+   "source": "design/audit/runs/next-session/CARRY-BELOW-SPEC.md; design/STATUS.md:574"
+  },
+  {
+   "date": "2026-10-17",
+   "ruling": "A distinct option (new size class, new task kind) is also a findable preset skill; small tweaks stay plain options.",
+   "source": "CLAUDE.md"
+  }
+ ],
+ "misconceptions": [
+  {
+   "id": "D1",
+   "error": "SHARED DEFECT (catalogue subtraction.md:145, 148, 151, 154, 157, 160): \"wording and colour\" — pink / orange legacy column visual and \"borrowing\" caption on every item",
+   "wrong": "`buildColumnVisual` (gen-operations.js:504-523)"
+  },
+  {
+   "id": "D2",
+   "error": "SHARED DEFECT (:145, :148): no place-value letters below grade 3 (`print-generate.js:5815`) although L-3 asks for them",
+   "wrong": "within 50 / 100 print with no T O heads"
+  },
+  {
+   "id": "D3",
+   "error": "SHARED DEFECT (:145): `minVal = maxVal/10`, so the small-number and ragged cases never appear; (:148) 2d − 1d ragged items arrive by accident, not as a step",
+   "wrong": "within 50: every number ≥ 5"
+  },
+  {
+   "id": "D4",
+   "error": "SHARED DEFECT (:151): 3d − 2d and 3d − 3d mixed at random (research: ragged comes first); misconception \"lines the numbers up on the left\"",
+   "wrong": "one page, two lengths at random"
+  },
+  {
+   "id": "D5",
+   "error": "SHARED DEFECT (:154, :157): no place-value letters above 3 digits; 5-digit numbers, no grid option",
+   "wrong": "within 10,000 / 100,000 print bare digits"
+  },
+  {
+   "id": "D6",
+   "error": "SHARED DEFECT (:160): six digits at 2 columns is tight in print",
+   "wrong": "within 1,000,000 cells crowd the column"
+  },
+  {
+   "id": "D7",
+   "error": "SHARED FIX on every row (:145-160): \"W\" — `workedSteps` must be authored; misconceptions SU-M1, SU-M6; Say: \"___ minus ___ equals ___.\"; vocab: ones, tens, line up (then hundreds, place value)",
+   "wrong": "worked text today: \"Line up digits by place value. Subtract each column from the ones.\" plus a hint restatement"
+  },
+  {
+   "id": "SU-M1",
+   "error": "takes the smaller digit from the larger in each column (invisible on a no-regroup page: it gives the right answer; it first shows on a regroup item)",
+   "wrong": "52 − 38 = 26"
+  },
+  {
+   "id": "SU-M7",
+   "error": "adds instead of subtracting (does not look at the sign)",
+   "wrong": "47 − 23 = 70"
+  },
+  {
+   "id": "SU-M6",
+   "error": "reverses the numbers when rewriting an across problem in the grid (smaller number on top)",
+   "wrong": "68 − 25 set up as 25 over 68"
+  },
+  {
+   "id": "M-ALIGN",
+   "error": "misaligned places: lines a shorter number up on the left",
+   "wrong": "86 − 4 = 46"
+  },
+  {
+   "id": "M-ZERO1",
+   "error": "zero handling: writes n − 0 as 0",
+   "wrong": "58 − 30 = 20"
+  },
+  {
+   "id": "M-ZERO2",
+   "error": "zero handling: drops a 0 inside the answer, or writes a leading 0",
+   "wrong": "4508 − 2302 = 226 (or 0246 for 4567 − 4321)"
+  },
+  {
+   "id": "M-COMMA",
+   "error": "5-6 digits: misplaces the comma or reads the place wrongly",
+   "wrong": "45,678 − 23,456 = 222,22"
+  }
+ ],
+ "options": [
+  "Declared today: none. `_sub()` (the notation option) covers `sub_10/20_*` only; these six have no SKILL_OPTIONS entry and no preset.",
+  "The ladder in O-rubric terms: O2 number size = the six skills themselves (within N, minuend-bounded); O3 support = place heads (hint, fades on its step), answer boxes and grid (structural, stay); O6 stacked / across (across belongs to the `sub-setup` rewrite page).",
+  "Proposed (section 9): `lengths: same | shorter` (ragged as its own section), `zeros: on | off` (zero-case section), `heads: on | off` via the support level. Each is a plain option, not a preset skill, except where section 9 says a new skill (`sub_2d_1d`, catalogue C3)."
+ ],
+ "gates": [
+  {
+   "cmd": "node tests/scripts/ws-precritic.cjs --template stack",
+   "note": "the one table every builder report pastes (IMPROVEMENT_PLAN §1.4 S1, being built by another lane)"
+  },
+  {
+   "cmd": "node tests/scripts/ws-spec-card.mjs --check-signed design/cards/subtraction/subtraction.md",
+   "note": "build-start gate"
+  },
+  {
+   "cmd": "node tests/scripts/ws-spec-card.mjs --check-coverage design/cards/subtraction/subtraction.md",
+   "note": "card-coverage test; runs again at build start"
+  },
+  {
+   "cmd": "node tests/scripts/ws-content-audit.cjs --category subtraction",
+   "note": "\"Subtract within N (No Regrouping)\" may deal no regrouping item and no minuend over N"
+  },
+  {
+   "cmd": "node tests/scripts/ws-options-verify.cjs --category subtraction"
+  },
+  {
+   "cmd": "node tests/scripts/ws-providers-unit.mjs"
+  },
+  {
+   "cmd": "node tests/scripts/ws-print-lint.cjs --source kit --skills <the six skills>"
+  },
+  {
+   "cmd": "node tests/scripts/ws-screen-slots.cjs --skills <the six skills>"
+  },
+  {
+   "cmd": "node tests/scripts/ws-screen-answer.cjs --skills <the six skills>"
+  },
+  {
+   "cmd": "node tests/scripts/ws-chromebook-fit.cjs --skills <the six skills>"
+  },
+  {
+   "cmd": "node tests/scripts/ws-grade-render.cjs --skills <the six skills>",
+   "note": "the renders the independent critic grades"
+  },
+  {
+   "cmd": "node tests/scripts/ws-search-terms.cjs",
+   "note": "any new preset skill"
+  },
+  {
+   "cmd": "node tests/scripts/ws-standards.cjs",
+   "note": "any new preset skill"
+  },
+  {
+   "cmd": "node tests/scripts/ws-code-snapshot.mjs"
+  },
+  {
+   "cmd": "node tests/scripts/ws-boot-smoke.cjs"
+  }
+ ],
+ "openQuestions": [
+  {
+   "q": "Shared defects D1, D2, D5 (legacy pink / orange column visual, \"borrowing\" caption, place heads missing below grade 3 and above 3 digits): patch the legacy `column-sub` cell or move the six onto `stack`?",
+   "recommended": "Move all six onto `stack` (`q.cell`, `regroup: false`) in one change and stop emitting `buildColumnVisual` for them; heads then come from the support level at every size (T O … HTh), which closes D1, D2 and D5 together. No new legacy handler (CLAUDE.md: do not extend the legacy path)."
+  },
+  {
+   "q": "D3 (`minVal = maxVal/10`): what number band does each size deal, given \"within N\" bounds the minuend?",
+   "recommended": "The minuend runs over the size's own digit count up to N (within 50: 21-50; within 100: 51-99, since 100 − n always regroups; within 1,000: 100-999; and so on to 999,999), the subtrahend is any number whose every digit is ≤ the digit above it, and the answer may be small (47 − 42 = 5). Sizes below a band belong to the skill below, so each rung adds one thing: a longer minuend."
+  },
+  {
+   "q": "D3 / D4 (ragged lengths arrive at random): how do shorter subtrahends enter?",
+   "recommended": "As their own section, never at random: a plain option `lengths: same | shorter` (default `same`); at 3 digits and up the Lesson/Guided order is `shorter` first, then `same` (catalogue row 151 research). 2d − 1d is a distinct skill, the NEW `sub_2d_1d` preset (catalogue C3), so it is not an option on `sub_50_no_regroup`."
+  },
+  {
+   "q": "Zero handling (`n − 0`, `0 − 0`, `n − n` = 0, an answer with fewer digits): seed it into every page or give it its own section?",
+   "recommended": "Its own section from 3 digits up (plain option `zeros: on | off`, default off on the plain page; P-1 one new thing). Within 50 / 100 may deal a 0 ones digit naturally (40 − 20) but never seeds it. The key leaves leading answer boxes blank; the pupil is never asked to write a leading 0."
+  },
+  {
+   "q": "Answer slot shape: how many boxes, and does the box count leak the answer length?",
+   "recommended": "One outline with dividers (SL-12), as many boxes as the band's largest minuend has digits, the same on every item of the section; never the item's own answer length (that would give away \"the answer has 1 digit\"). Commas print in the minuend and subtrahend from 5 digits up and sit in a narrow fixed gap in the answer row, not in a box."
+  },
+  {
+   "q": "D6 (six digits at 2 columns is tight): shrink, or fewer columns?",
+   "recommended": "Never shrink (SCC-T4): the capacity rows decide. At L, 5- and 6-digit items take 1 column if the two-column cell is narrower than the stack plus gutter; at S / M they keep 2. The capacity check is a gate number, not a judgement."
+  },
+  {
+   "q": "SU-M1 (smaller from larger) is invisible on a no-regroup page. Seed regroup non-examples here (P-10)?",
+   "recommended": "No: the skill's name promises no regrouping and `ws-content-audit` holds it to that. The non-examples and the decide page live on the `_mixed` skills (SU-R R2). Here the key's `wrongAnswer` is built from SU-M7 (adds), M-ALIGN (left-lined) and M-ZERO, which do show on these items."
+  },
+  {
+   "q": "MW4K / IXL research is pending logins (Q-H4). Sign now?",
+   "recommended": "Yes, sign now; add the research to section 2 when the logins work, and re-sign only if the problem types or progression change."
+  }
+ ],
+ "sourceChars": 90
+}

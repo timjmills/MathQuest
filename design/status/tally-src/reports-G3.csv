@@ -1,0 +1,32 @@
+report,run,lane,round,date_added,commit_added,verdict,min_score,mean_score,n_open,notes
+design/audit/runs/wrm-tagging/Y4-critic-r10.md,wrm-tagging/Y4,wrm-tagging,10,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,8.89,14,touched mean; random 15 mean 8.60; tree 294037a9
+design/audit/runs/wrm-tagging/Y4-critic-r11.md,wrm-tagging/Y4,wrm-tagging,11,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,8.87,6,touched mean; tree 05eda937
+design/audit/runs/wrm-tagging/Y4-critic-r12.md,wrm-tagging/Y4,wrm-tagging,12,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,8.82,10,touched mean; random 15 mean 8.73; tree 80e1d968
+design/audit/runs/wrm-tagging/Y4-critic-r13.md,wrm-tagging/Y4,wrm-tagging,13,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,9,9.00,4,all graded steps 9; tree 6471c269
+design/audit/runs/wrm-tagging/Y4-critic-r3.md,wrm-tagging/Y4,wrm-tagging,3,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,7.98,14,near miss 7.98; no systematic class; tree 9904ef79
+design/audit/runs/wrm-tagging/Y4-critic-r4.md,wrm-tagging/Y4,wrm-tagging,4,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,8,8.06,14,mean passes; fails on systematic rule-18 link class; tree 81cba70e
+design/audit/runs/wrm-tagging/Y4-critic-r5.md,wrm-tagging/Y4,wrm-tagging,5,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.70,16,rule 18 links; mean over 37 touched steps; tree 87b5911e
+design/audit/runs/wrm-tagging/Y4-critic-r6.md,wrm-tagging/Y4,wrm-tagging,6,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.80,23,rule 18 links; 25 touched steps; tree 6b77c216
+design/audit/runs/wrm-tagging/Y4-critic-r7.md,wrm-tagging/Y4,wrm-tagging,7,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.17,12,rules 18-19 links; 18 touched steps; tree c0a7ee88
+design/audit/runs/wrm-tagging/Y4-critic-r8.md,wrm-tagging/Y4,wrm-tagging,8,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,8.77,11,touched-step mean; fresh seeds found rare-branch misfits; tree f9835408
+design/audit/runs/wrm-tagging/Y4-critic-r9.md,wrm-tagging/Y4,wrm-tagging,9,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,8.59,10,touched-step mean; random 15 mean 8.80; tree e768514b
+design/audit/runs/wrm-tagging/Y4-critic.md,wrm-tagging/Y4,wrm-tagging,2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,5,7.57,15,round 2 per file; 35 steps; tree f6015c72
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r1.md,wrm-tagging/Y4-lessons,wrm-lessons,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.87,13,23 site lessons; tree a46bb4fb
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r2.md,wrm-tagging/Y4-lessons,wrm-lessons,2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.96,4,near miss; one false why; tree 49b89304
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r3.md,wrm-tagging/Y4-lessons,wrm-lessons,3,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.96,6,near miss; critic r2 wording carried; tree f094088f
+design/audit/runs/wrm-tagging/Y4-lessons-critic-r4.md,wrm-tagging/Y4-lessons,wrm-lessons,4,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.96,5,near miss; plus merge hazard M1; tree 17c92d49
+design/audit/runs/wrm-tagging/Y5-critic-local-r1.md,wrm-tagging/Y5,wrm-tagging,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,5,6.30,20,random 20; with hardest 5 mean 6.08; merge sim 80 problems; tree a181f8a4
+design/audit/runs/wrm-tagging/Y5-critic-r4.md,wrm-tagging/Y5,wrm-tagging,4,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,5,7.58,17,50 steps; tree f2bf0c31
+design/audit/runs/wrm-tagging/Y5-critic-r5.md,wrm-tagging/Y5,wrm-tagging,5,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,8.03,8,"steps 8.03, lessons 7.82 (min 6); tree caf2a242"
+design/audit/runs/wrm-tagging/Y5-critic-r6.md,wrm-tagging/Y5,wrm-tagging,6,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.94,9,"near miss; steps 7.94 with scan finds, lessons 7.95; tree 616981dd"
+design/audit/runs/wrm-tagging/Y5-critic-r7.md,wrm-tagging/Y5,wrm-tagging,7,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,8.00,10,"near miss; steps 8.00, lessons 8.00, two 7s; tree 7583ecd5"
+design/audit/runs/wrm-tagging/Y5-critic-r8.md,wrm-tagging/Y5,wrm-tagging,8,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,8.07,7,"steps 8.07, lessons 8.05; tree 29161105"
+design/audit/runs/wrm-tagging/Y5-critic.md,wrm-tagging/Y5,wrm-tagging,3,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,7,8.00,46,"file holds 3 rounds: r1 FAIL 7.43, r2 FAIL 7.75, r3 PASS 8.00 (old rules 1-13)"
+design/audit/runs/wrm-tagging/Y6-critic-local-r1.md,wrm-tagging/Y6,wrm-tagging,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,7.02,20,rules 1-19; 8 systematic classes; tree f2dd7afc
+design/audit/runs/wrm-tagging/Y6-critic-r1.md,wrm-tagging/Y6,wrm-tagging,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,7.47,17,tree 55aa51c2; report file missing
+design/audit/runs/wrm-tagging/Y6-critic-r2.md,wrm-tagging/Y6,wrm-tagging,2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,5,7.50,17,fails on minimum rule (B9.S7 = 5)
+design/audit/runs/wrm-tagging/Y6-critic-r4.md,wrm-tagging/Y6,wrm-tagging,4,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,8.58,25,mean passes; three 7s and non-reproducible build; tree 263cfe7
+design/audit/runs/wrm-tagging/Y6-critic-r5.md,wrm-tagging/Y6,wrm-tagging,5,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,8.91,8,43 steps; tree 3f2302d5
+design/audit/runs/wrm-tagging/Y6-critic.md,wrm-tagging/Y6,wrm-tagging,3,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,7,8.09,15,round 3 under old rules 1-13; lead follow-up applied after grade
+design/audit/runs/wrm-tagging/Y6-lessons-critic-r1.md,wrm-tagging/Y6-lessons,wrm-lessons,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.96,15,near miss 7.96; 24 lessons; tree 55f83a98
+design/audit/runs/wrm-tagging/Y6-lessons-critic-r2.md,wrm-tagging/Y6-lessons,wrm-lessons,2,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,8.04,8,tree 07fde265
