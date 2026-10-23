@@ -3,7 +3,7 @@ Title: Pilot — SU-C column subtraction without regrouping, six skills onto `st
 Session: session_01G5ktGS4kteYMuLFxnxGEgU
 Branch: claude/sweet-newton-c8wrv1-wip-pilot-su-c
 Owner of files: subtraction no-regroup generator branch (gen-operations.js ranged sub), subtraction provider, skill-options / skill-presets / standards / wrm / search-terms entries for the six + `sub_2d_1d`
-State: precritic
+State: critic
 Updated: 2026-10-23
 Builder profile: mq-opus-low
 Critic rounds: 0, none
@@ -17,7 +17,9 @@ Critic rounds: 0, none
 - none
 
 ## Times
-Times: precritic step 3 pass 2 (after fixes, base merged), start 2026-10-23T18:38Z, end —, profile —
+Times: critic round 1 (batch read + 1 in 5 full, S and L full, M spot), start 2026-10-23T19:06Z, end —, profile mq-opus-medium
+Times: sibling matrix run (approved stack skills, for the pin comparison), start 2026-10-23T19:05Z, end —, profile —
+Times: precritic step 3 pass 2 (after fixes, base merged), start 2026-10-23T18:38Z, end 2026-10-23T19:01Z, profile — — 12 PASS, 1 N/A, coverage-matrix FAIL: 60 RED (11 rows not in pin), all in classes (a)-(d); 98 PENDING are rows needing M2/M4/T3 (not built), not budget
 Times: precritic step 3 fixes by orchestrator (fact-probe column choice; worked steps capped at 4), start 2026-10-23T18:28Z, end 2026-10-23T18:37Z, profile — (orchestrator)
 Times: precritic step 3 pass 1 (run by the builder), start 2026-10-23T17:55Z, end 2026-10-23T18:25Z, profile mq-opus-low — FAIL: coverage-matrix 62 RED (11 rows not in pin), 98 PENDING
 Times: gate step 1 ws-spec-card --check-signed, start 2026-10-23T16:43Z, end 2026-10-23T16:44Z, profile — (OK)
