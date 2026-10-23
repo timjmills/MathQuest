@@ -1,152 +1,197 @@
-# The coverage matrix nightly (IMPROVEMENT_PLAN §1.6.2, §1.6.7 E1)
+# Repeated check: the coverage matrix every night (IMPROVEMENT_PLAN §1.6.2, §1.6.7 E1)
 
-The nightly is a set of scheduled tasks. Each one is its own cloud session on the tip of the integration branch
-`claude/sweet-newton-c8wrv1`, and each runs `tests/scripts/ws-matrix-nightly.sh`. **This file only defines them; no
-scheduled task has been created yet.** The lane lead creates them.
+The **Repeated check** is one scheduled task. Each night it starts its own cloud session on the tip of the
+integration branch `claude/sweet-newton-c8wrv1` and runs `tests/scripts/ws-matrix-nightly.sh`. **This file only
+defines the task; no scheduled task has been created yet.** The lane lead creates it after the merge.
 
-Before M4, every night that follows a print-input change is the full matrix, which is more than one night on two
-slots (below). So the nightly is **eight shard tasks**, `matrix-nightly 1/8` … `matrix-nightly 8/8`. Each task runs the
-script with `SHARD=i/8` in its environment, which gives sixteen slots between them.
+The owner set the shape on 2026-10-23: one session a night, and each night checks one twenty-eighth of all rows.
+- For the first 28 nights it builds the first full baseline, one slice a night.
+- After that, each night runs:
+  - the rows the day's changes reach;
+  - every row that is still red;
+  - one rotating slice of the rows.
+
+  So every row is checked again at least once every four weeks.
+
+## The rows in a slice
+
+`ws-coverage-matrix --slice i/28` selects slice `i` of 28. A row belongs to slice `i` when a hash of the row's id gives
+`i − 1` (mod 28). The hash is the first 32 bits of SHA-256.
+- The slice depends only on the row's id. Appending a skill never moves an existing row to another slice; a split by
+  position would move rows.
+- FNV is not used: its low bits are poorly mixed. With FNV, slice 2/28 crossed with shard 1/2 held 0 rows.
+- A slice is 816 to 883 rows, or 1,134 to 1,272 documents. That was measured with `--list` on 2026-10-23 for slices
+  1, 2, 3 and 28. At 0.31 documents/s on two slots, one slice takes about 1 hour.
+- `--seventh d` is kept as an alias of `--slice <d+1>/7`. No nightly ever ran with the old FNV seventh, so no run
+  file depends on its rows.
 
 ## What a night runs (what `ws-matrix-nightly.sh` does)
 
 1. **It refuses unless HEAD is the fetched tip** of `origin/claude/sweet-newton-c8wrv1`, because the run file records
-   that commit (`ALLOW_NOT_TIP=1` is for testing only).
-2. **First run.** This is the case when `design/audit/matrix/` holds no run file of **this shard** with a commit yet
-   (`<date>[T<HHMM>].shard-i-of-8.json`). The check is per shard, so a shard that starts after another shard of the
-   first night has pushed still pins its own baseline.
-   - It runs `ws-coverage-matrix --all --write-baseline --baseline design/audit/matrix/baseline.json --report-only`,
-     so every row of every live skill (715 on 2026-10-23) runs.
-   - Each shard writes its own baseline file, `baseline.shard-i-of-8.json`. Every reader merges `baseline.json` with
-     all the shard files beside it.
-   - Only rows that **printed** are pinned: their lint counts per size, with render keys stripped.
-   - A row that could not print stays **ERROR** and is listed under "NOT pinned (cannot print or not checked; they
-     stay red)" and in the run file's `notPinned`. Such a row has a render error (`L-SPLIT RENDER`, a `buildSheet`
-     throw or a crashed batch). The baseline never forgives it, so it stays red until it prints (H11, §1.6.3).
-   - A PENDING or N/A row is never pinned.
-   - The rows already in `baseline.json` are re-pinned at the nightly's commit if they printed. These are
-     `addition:add_100_regroup` and `addition:add_20_regroup`, from the E1 builder check of 2026-10-23.
-   - The lane lead writes the STATUS note with the counts: pinned, NOT pinned, and the tally line. The session does
-     not edit `design/STATUS.md`.
-3. **Every later run.**
-   - It runs the rows that the commits since the last run reach: `--affected <last run's commit>..HEAD`. The last
-     run's commit comes from the shard's newest run file that is not `dirty`.
-   - It adds the rotating seventh of all rows (`--seventh <UTC weekday mod 7>`), so every row runs at least once a
-     week.
-   - A row is skipped when it is already OK in `cache[.shard-i-of-8].json` **for the same dependency hash and the same
-     baseline entry**. The cache key includes the row's own pinned counts, so a row cached under one baseline is
-     re-run under another.
-   - **RED** means a lint count above the per-row baseline. **ERROR** means the row did not print, or print-lint
-     refused its flags.
-   - Before M4 (no record / replay) a change to any print input reaches every print row, so such a night is the full
-     matrix. On 2026-10-23 that was 10,922 printable rows = 32,766 documents
-     (`ws-coverage-matrix --all --affected 60c4fa53..HEAD --list`). That is about 4,100 documents a shard, about
-     3.7 h a shard on two slots at 0.31 documents/s.
-   - A night whose commits touch only planning files, tests, generated documents, `search-terms.js` or the
-     `index.html` stamp runs only its seventh: about 1,560 rows = 4,700 documents in all, about 590 a shard.
-4. **It writes the run file** `design/audit/matrix/<UTC date>.shard-i-of-8.json` and the cache, and prints the commit
-   message and the files to commit. If a run file for that date and shard already exists (a fired run, below), it
-   writes `<UTC date>T<HHMM>.shard-i-of-8.json` beside it. No run file is ever overwritten.
+   that commit. `ALLOW_NOT_TIP=1` is for testing only.
+2. **The first baseline: nights 1 to 28.** This phase lasts until the first full baseline is complete.
+   - The baseline is complete when `design/audit/matrix/baseline.json` says `"complete": true`, or when all 28 slice
+     files `baseline.slice-i-of-28.json` are present. `ws-coverage-matrix` `baselineComplete` checks this, and the
+     deploy reads the same check.
+   - Each night runs `--all --slice i/28 --write-baseline`. Slice `i` is the lowest slice that has no baseline file
+     yet, so a night that fails is tried again the next night. The run writes `baseline.slice-i-of-28.json`.
+   - Every reader merges `baseline.json` with every `baseline.<part>.json` file beside it.
+   - Only rows that **printed** are pinned. For each size they pin the lint counts and the finding keys (N1). A row
+     that could not print stays **ERROR** and is listed under "NOT pinned".
+   - The rows that are RED or ERROR in the folded state (below) also run, because `--slice` implies `--red-from`.
+3. **Every later night**, once the first full baseline is complete, runs these rows:
+   - **The affected rows.** These are the rows that the commits since the last affected run reach
+     (`--affected <LAST>..HEAD`).
+     - `LAST` is the commit of the newest run file that ran its affected rows: not dirty, and not dropped over the cap.
+       When there is no such file, `LAST` is the commit of the oldest slice baseline.
+     - The rows are **capped** at `MQ_NIGHTLY_AFFECTED_CAP` documents (default 1,200, about 1 hour).
+     - Above the cap, the affected rows are dropped for that night. The run file records
+       `selection.affected.droppedOverCap`, and the next night tries again from the same `LAST`.
+     - Before M4, a change to any print input reaches every row, so most such nights are over the cap. The slice
+       still covers each row within 28 nights.
+   - **Every row that is RED or ERROR in the folded state** (`--red-from design/audit/matrix`). Such a row always runs.
+     The cache never skips it.
+   - **The rotating slice** `--slice <days since 1970-01-01 mod 28 + 1>/28`.
+   - **`--pin-new`.** This pins rows that printed and have no baseline entry yet (skills appended since the baseline)
+     into `baseline.added.json`. A row that already has an entry is never pinned again.
+   - A row is skipped when it is already OK in `cache.json` for the same dependency hash and the same baseline entry.
+4. **It writes the run file** `design/audit/matrix/<UTC date>.json` and the cache. It prints the commit message and the
+   files to commit. A second run on the same date writes `<UTC date>T<HHMM>.json`. No run file is ever overwritten.
 5. **It exits 0 even with red rows** (`--report-only`), because the deploy reads the red rows from the run files. A
    crash exits non-zero, and the session then commits nothing.
 
-## The full run as a fired scheduled task
+`DRY=1 tests/scripts/ws-matrix-nightly.sh` prints the selection and runs nothing. On 2026-10-23 it gave "first
+baseline: slice 1/28", 802 rows and 1,134 documents. `--slice i/28` runs that slice in place of the night's slice.
 
-Each of the eight shard tasks runs on its own schedule. Any of them can also be **fired** on demand outside the
-schedule; the scheduled-task tool calls this "fire". Firing all eight runs the sharded full run without waiting for
-the night. The fired session does exactly what the scheduled one does (same prompt, same script):
-- it runs the rows affected since the newest run file's commit, plus that day's seventh;
-- it skips the rows already OK in the cache for the same hash;
-- it writes `<date>T<HHMM>.shard-i-of-8.json`, because that date already has a run file.
+## Row statuses
 
-So "the full run" before M4 is eight fired shard tasks on a tip whose print inputs changed. It is complete when all
-eight shard files of one run (same date and time stamp, same `commit`) carry `finished`.
+A row's status is one of these:
+- **RED:** a lint count, or (N1) a finding key, is above the row's own baseline entry.
+- **ERROR:** the row did not print. Either it has a render error (`L-SPLIT RENDER`, a `buildSheet` throw or a
+  crashed batch), or print-lint refused its flags. No baseline forgives an ERROR row.
+- **PENDING(no-baseline):** the row has findings but no baseline entry of its own (owner 2026-10-23). This status is
+  **never red**. The row printed; there is nothing yet to compare it with. The first full baseline or `--pin-new`
+  pins it.
+- **PENDING(step):** the row needs a later build step.
+- **N/A:** the row does not apply to its skill.
+
+## The folded state (critic r2 D1)
+
+A night does not run every row. So no single run file says which rows are red. Instead, the deploy and the night's
+`--red-from` read **every** run file in `design/audit/matrix/`, oldest first, and fold them.
+- **A row's state is its status in the most recent run that ran it.** A run ran a row when it lists the row in `rows`
+  or in `red`.
+- A RED or ERROR row therefore stays red through every later run that did not select it. It stops being red only when
+  a later run lists it with another status (OK, or PENDING / N/A when the row can no longer be checked).
+- `--red-from` re-selects every red row every night, so a fixed row turns OK on the next night.
+- The deploy's own inline run is folded in last, so a deploy that re-ran a red row OK clears that row.
+- `ws-coverage-matrix --self-test` tests the fold (`foldRuns`).
+- `ws-deploy-gates.sh --self-test` tests it on fixture directories. It includes the critic's reproduce case: a row
+  RED on 10-22 and absent from 10-23 stays red.
+
+## The full run when a deploy needs it
+
+Once the first full baseline exists, a deploy can still find its affected rows over the 500-document budget, with no
+complete run on its tip. The gate then says **NEEDS-SHARDED-RUN**. The lead fires eight one-off sessions:
+
+```
+SHARD=<i>/8 tests/scripts/ws-matrix-nightly.sh --full     # i = 1 … 8, one session each ("Repeated check 3/8" …)
+```
+
+- Each session runs `--affected <LAST>..HEAD` with no cap, plus the red rows, plus `--pin-new`, for its shard.
+- Shards split the rows by a separately salted SHA-256 hash of the row id, so the eight sessions partition the rows
+  whatever each one selects.
+- Each writes `<date>[T<HHMM>].shard-i-of-8.json`.
+- The run is complete when all eight files of one stamp, all on one commit, carry `finished`.
+
+Before the first full baseline exists, a deploy over the budget is **not held** (owner 2026-10-23). It gets a WARNING
+only: the affected rows are PENDING(no-baseline), and the lanes' precritic covers them.
 
 ## The run file (read by the deploy)
 
-`ws-coverage-matrix` writes it (`--out`), and its header documents the shape under "THE RUN FILE". The fields a reader
-needs are:
-- top level:
-  - `commit`: the full sha the rows ran on;
-  - `dirty`: true when the tree had local edits;
-  - `started` and `finished`: ISO times;
-  - `totals`: the count of `OK`, `CACHED`, `RED`, `PENDING`, `N/A` and `ERROR` rows;
-  - `red`: the ids of every RED **and** ERROR row;
-  - `notPinned`: on a baseline run, the rows that could not be pinned;
-  - `liveSkills`: the number of live skills;
-  - `selection`, including the `--affected` range and its files;
-  - `timing`.
-- per row:
-  - `id`: `cat:skill|kind/row`;
-  - `skill`;
-  - `status`: one of `OK`, `RED`, `PENDING`, `N/A` or `ERROR`. A cached row is `OK` with `cached: <date>`;
-  - `rises`, `errors`, `step` and `reason`;
-  - the S / M / L counts.
+`ws-coverage-matrix` writes the run file (`--out`); its header documents the shape under "THE RUN FILE".
 
-A row of a live skill is red when its status is `RED` or `ERROR`.
+**Top-level fields:**
+- `commit`: the full sha the rows ran on.
+- `dirty`: true when the tree had local edits.
+- `started` and `finished`: ISO times.
+- `totals`: the counts of `OK`, `CACHED`, `RED`, `PENDING`, `N/A` and `ERROR` rows.
+- `red`: the ids of every RED and ERROR row.
+- `notPinned`: on a baseline run, the rows that could not be pinned.
+- `liveSkills`: the number of live skills.
+- `selection`, which says what ran: `affected` {`from`, `to`, `files`, `reached`, `run`, `droppedOverCap`}, `slice`,
+  `seventh`, `shard`, `redFrom` {`dir`, `reselected`}.
+- `timing`.
+
+**Per-row fields:**
+- `id`: `cat:skill|kind/row`.
+- `skill`.
+- `status`: OK, RED, PENDING, N/A or ERROR. A cached row is OK with `cached: <date>`. `step` holds `no-baseline` for
+  a PENDING(no-baseline) row.
+- `rises`, `errors` and `reason`.
+- The S / M / L counts and finding keys.
 
 ## At deploy (S5 session 3)
 
-The deploy gate is `matrix_gate` in `tests/scripts/ws-deploy-gates.sh` (session 3). It runs
-`ws-coverage-matrix --all --affected <base>..HEAD --baseline design/audit/matrix/baseline.json --slots 2 --batch 9
---max-docs 500`. `MQ_MATRIX_BUDGET` changes the 500. `<base>` is `MQ_DEPLOY_BASE`, else the merge base with
-`origin/master`; when `origin/master` is not fetched the gate FAILS and says so (it never guesses `HEAD~1`).
-- Matrix exit 0 → the gate is **OK**; exit 1 → **FAIL**; exit 2 → **NOTHING RUN** (not a pass: the deploy run ends
-  INCOMPLETE).
-- Matrix exit 3 (over the budget) → the gate reads the **newest run**: every run file of the newest stamp here
-  (`<date>` or `<date>T<HHMM>`, plain or `.shard-i-of-n`). Then:
-  - **FAIL (the deploy is refused)** when there is no run file; when the oldest file of that run finished more than
-    24 hours ago (`finished`, else the file's git commit time, else its date at 00:00 UTC); or when any row of a live
-    skill (data.js `SKILLS`, tombstones out) is `RED` or `ERROR`, or is listed in a file's `red`.
-  - **OK** when the run is complete (all shards i of n present, each with `finished`), ran on one commit with
-    `dirty: false`, and HEAD differs from that commit only in `design/audit/matrix/` (the run's own commits). The
-    sharded run has then covered this tip.
-  - **NEEDS-SHARDED-RUN** otherwise (fresh and green, but not a complete run on this tip). This is not a pass: the
-    deploy run ends INCOMPLETE, and the gate prints what the lead fires: the eight shard tasks
-    (`SHARD=i/8 tests/scripts/ws-matrix-nightly.sh`, "The full run as a fired scheduled task" above) on this tip of
-    `claude/sweet-newton-c8wrv1`, then session 3 again.
-- `bash tests/scripts/ws-deploy-gates.sh --self-test` proves each case on fixture runs in
-  `tests/fixtures/precritic/deploy/nightly/` with a stub matrix.
+The deploy gate is `matrix_gate` in `tests/scripts/ws-deploy-gates.sh` (session 3).
 
-The matrix side is as follows:
-- `ws-coverage-matrix --all --affected <base>..HEAD --max-docs 500 --baseline design/audit/matrix/baseline.json
-  --slots 2` counts the documents the affected, non-cached rows would print.
-- Above 500 it runs nothing, prints `ws-coverage-matrix: OVER-BUDGET <n> documents (budget 500)` and exits **3**. The
-  caller then reads the newest run files above.
-- Within the budget it runs the rows. It exits 0 on `OK`, 1 on `FAIL` (any RED or ERROR row) and 2 on `INCOMPLETE`
-  (rows selected, none checkable).
-- An affected range that reaches no row prints `OK (nothing reached …)`.
-- Measured on 2026-10-23: `--all --affected 60c4fa53..HEAD --max-docs 500` gave `OVER-BUDGET 32766 documents (budget
-  500)`, exit 3, in 6.3 s of node. A status-file-only range (`36561f62..dad0f3a5`) gave `OK (nothing reached …)`, exit
-  0.
+1. **It runs the inline matrix:** `ws-coverage-matrix --all --affected <base>..HEAD --red-from design/audit/matrix
+   --baseline design/audit/matrix/baseline.json --slots 2 --batch 9 --max-docs 500 --out <logdir>/matrix-inline.json`.
+   - `MQ_MATRIX_BUDGET` changes the 500.
+   - `<base>` is `MQ_DEPLOY_BASE`, else the merge base with `origin/master`. Without that the gate FAILS (it never
+     guesses).
+   - Within the budget the rows run inline, red rows included. Over the budget the matrix runs nothing and exits 3.
+2. **On every deploy, within the budget or not** (critic r2 D1.3), the nightly rule folds every run file plus the
+   inline run, then:
+   - **FAIL:** a row of a live skill is RED or ERROR in the folded state, or the inline run fails.
+   - **FAIL, once the first full baseline exists:** there is no run file, or the newest run finished more than 24
+     hours ago. Before the full baseline exists, these two cases give a **WARNING**: the gate passes and the lead
+     reads it.
+   - **Within the budget:** the inline run stands in for "covers HEAD". The gate is OK, or WARNING.
+   - **Over the budget, before the full baseline:** WARNING, and the deploy is not held.
+   - **Over the budget, after the full baseline:** OK when the newest run is complete, on one clean commit that the
+     tip differs from only in `design/audit/matrix/`, and did not drop its affected rows. Otherwise the gate gives
+     **NEEDS-SHARDED-RUN** (INCOMPLETE): the lead fires the eight `--full` sessions above.
+   - The OK line names the run and what it ran: the affected range and how many rows it reached, the slice, the number
+     of red rows re-selected, the shard, and the tallies (N10).
+3. **The flake re-run (N7)** re-runs only the rows that the first inline run found red (`--rows <ids>`), never the
+   whole budget. When the failure came from the nightly rule, which is deterministic, the re-run reads only the rule
+   again.
 
-## The scheduled task's prompt (exact text; one task a shard, `<i>` = 1 … 8)
+`bash tests/scripts/ws-deploy-gates.sh --self-test` proves each case on fixture runs in
+`tests/fixtures/precritic/deploy/nightly/` with a stub matrix. A directory holding `baseline.json` with
+`complete: true` stands for the state after the full baseline.
 
-> You are the MathQuest coverage-matrix nightly, shard <i> of 8. Work only in a fresh clone of the repository. Steps:
-> 1. `git fetch origin claude/sweet-newton-c8wrv1 && git checkout -B matrix-nightly origin/claude/sweet-newton-c8wrv1`.
+## The scheduled task (exact text): "Repeated check"
+
+One task, named **Repeated check**. Schedule: daily at 01:13 UTC (`CRON_TZ=UTC 13 1 * * *`). The eight `--full`
+sessions are one-off sessions the lead starts when a deploy asks for them ("Repeated check 1/8" … "Repeated check
+8/8"). They are not scheduled.
+
+> You are the MathQuest Repeated check (the coverage matrix's nightly run). Work only in a fresh clone of the
+> repository. Steps:
+> 1. `git fetch origin claude/sweet-newton-c8wrv1 && git checkout -B repeated-check origin/claude/sweet-newton-c8wrv1`.
 > 2. If `/tmp/mq-browser-run.sh` is missing: `cp tests/scripts/mq-browser-run.sh /tmp/ && chmod +x /tmp/mq-browser-run.sh`.
->    Install nothing beyond what the repository's setup provides; if Chromium or PyMuPDF is missing, stop and report it.
-> 3. Run `SHARD=<i>/8 tests/scripts/ws-matrix-nightly.sh`. Do not pass any other flags and do not edit any file yourself.
-> 4. It prints a commit message and the files to commit (all under `design/audit/matrix/`). Commit exactly those files
->    with that message, ending the message with the attribution lines your session instructions give.
->    Then `git pull --rebase origin claude/sweet-newton-c8wrv1` and `git push origin HEAD:claude/sweet-newton-c8wrv1`;
->    if the push is refused because the tip moved, rebase and push again (at most three times). Never force-push.
+>    Install nothing beyond what the repository's setup provides. If Chromium or PyMuPDF is missing, stop and report it.
+> 3. Run `tests/scripts/ws-matrix-nightly.sh`. Do not pass any flags and do not edit any file yourself.
+> 4. The script prints a commit message and the files to commit, all under `design/audit/matrix/`. Commit exactly
+>    those files with that message, and end the message with the attribution lines your session instructions give.
+>    Then run `git pull --rebase origin claude/sweet-newton-c8wrv1` and `git push origin HEAD:claude/sweet-newton-c8wrv1`.
+>    If the push is refused because the tip moved, rebase and push again, at most three times. Never force-push.
 > 5. Reply with:
 >    - the date;
 >    - the commit the matrix ran on;
->    - the mode line;
+>    - the mode line (first baseline: slice i/28, or affected + red rows + slice);
 >    - the tally line (OK / CACHED / RED / PENDING / N/A / ERROR);
 >    - the documents/s line;
->    - on a first run, the count of rows NOT pinned;
+>    - on a baseline night, the count of rows NOT pinned;
+>    - whether the affected rows were dropped over the cap;
 >    - the ids of the first 20 RED or ERROR rows, each with its first rise or error.
 >
 >    If the script failed, reply with its last 30 lines instead and commit nothing.
 >
-> Never change the baseline after the first run, never delete or overwrite a run file, and never touch files outside
-> `design/audit/matrix/`.
-
-Schedule: daily at 01:13 UTC (`CRON_TZ=UTC 13 1 * * *`), one task a shard. The shards of one run share the date (and
-the time stamp when fired), so a reader takes every `<date>[T<HHMM>].shard-*.json` of the newest run.
+> Never edit a baseline file yourself; the script writes them. Never delete or overwrite a run file, and never touch
+> files outside `design/audit/matrix/`.
 
 ## Measured cost (2026-10-23, this container, two shared browser slots)
 

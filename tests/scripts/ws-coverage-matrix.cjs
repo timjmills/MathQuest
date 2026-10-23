@@ -12,7 +12,9 @@
 //   node tests/scripts/ws-coverage-matrix.cjs --skills cat:skill --baseline design/audit/matrix/baseline.json
 //   node tests/scripts/ws-coverage-matrix.cjs --skills cat:skill --write-baseline     # pin today's findings
 //   node tests/scripts/ws-coverage-matrix.cjs --all --affected <commitA>..<commitB> --list
-//   node tests/scripts/ws-coverage-matrix.cjs --all --affected A..B --seventh 3 --out auto   # the nightly (ws-matrix-nightly.sh)
+//   node tests/scripts/ws-coverage-matrix.cjs --all --slice 5/28 --write-baseline --out auto  # the first baseline, night 5 of 28
+//   node tests/scripts/ws-coverage-matrix.cjs --all --affected A..B --slice 5/28 --red-from design/audit/matrix --pin-new --out auto
+//                                                                                     # a later night (ws-matrix-nightly.sh)
 //   node tests/scripts/ws-coverage-matrix.cjs --all --affected A..B --max-docs 500 --baseline design/audit/matrix/baseline.json --slots 2
 //                                                                                     # the deploy (S5 session 3)
 //   node tests/scripts/ws-coverage-matrix.cjs --self-test                             # node only, no browser
@@ -20,8 +22,18 @@
 // SELECTING ROWS
 //   --skills cat:skill,...   these skills' rows        --all   every live skill's rows (data.js SKILLS)
 //   --kind single|sections|mixed|quiz                  --rows single/defaults,sections/pages-2,... (row names or full ids)
-//   --shard i/n              every n-th row from the i-th (1-based), rows sorted by id
-//   --seventh d              the rotating seventh (d = 0..6): rows whose id hashes to d mod 7 (added to --affected's rows)
+//   --shard i/n              shard i of n: the rows whose id hashes (salted FNV-1a) to i-1 mod n, so a row's shard never
+//                            depends on what else is selected
+//   --slice i/n              slice i of n (owner 2026-10-23: n = 28, one slice a night): rows whose id hashes (FNV-1a)
+//                            to i-1 mod n. Stable as skills are appended (a hash of the id, not a position). Added to
+//                            --affected's rows and the --red-from rows
+//   --seventh d              KEPT AS AN ALIAS of --slice <d+1>/7 (the same hash, so the same rows as before)
+//   --red-from dir           (critic r2 D1.2) add every row RED / ERROR in the FOLDED state of dir's run files: a row's
+//                            state is its status in the most recent run that ran it, so a red row is re-run every
+//                            night until a run lists it OK. --slice / --seventh imply --red-from design/audit/matrix
+//                            (--no-red-from turns that off). A re-selected red row ignores the cache
+//   --affected-cap N         (the nightly) when --affected's rows are over N documents, drop them tonight (the slice
+//                            and the red rows still run); the run file records `affected.droppedOverCap`
 //   --affected A..B          the rows a commit range reaches (below); with --list, prints the reach and stops
 //   --list                   print the rows (RUN / PENDING(step) / N/A) without running anything; ends with
 //                            `ws-coverage-matrix: LIST (...)`, never with a verdict
@@ -37,8 +49,19 @@
 //                            (shards' baseline.shard-*.json files beside it are merged in); without it any
 //                            finding is red
 //   --write-baseline         write this run's counts as the per-row baseline (into --baseline, default
-//                            design/audit/matrix/baseline.json; merged with the rows already there; with --shard,
-//                            baseline.shard-i-of-n.json)
+//                            design/audit/matrix/baseline.json; merged with the rows already there; with --slice,
+//                            baseline.slice-i-of-n.json; with --shard, baseline.shard-i-of-n.json). Every reader merges
+//                            baseline.json with every baseline.<part>.json beside it. Each pinned size holds the counts
+//                            per lint rule AND (N1) the finding keys `<lint> <rule>|p<page>|<print-lint key, digits
+//                            as #>`: a new finding that replaces a fixed one of the same rule is a rise. Entries pinned
+//                            before N1 (counts only) are compared by counts
+//   --pin-new                pin only the rows that printed and have NO entry yet (skills appended after the first
+//                            baseline) into baseline.added[.shard-i-of-n].json; never re-pins a row
+//   NO BASELINE ENTRY (owner 2026-10-23): with --baseline, a printed row with findings and no entry of its own is
+//   PENDING(no-baseline), never RED (nothing to rise above yet); it counts as printed for the verdict. A render
+//   error is ERROR all the same. Without --baseline (a builder's check) every finding is red.
+//   THE FIRST FULL BASELINE: complete when baseline.json says `complete: true` or every baseline.slice-i-of-n.json
+//   (i = 1..n) is present (`baselineComplete`, read by ws-deploy-gates.sh)
 //   --cache f.json           skip a row already OK for the same dependency hash AND the same baseline entry
 //                            (the row's pinned counts under --baseline, or "none": a row cached OK under one
 //                            baseline is re-run under another); record OK rows after the run
@@ -429,18 +452,60 @@ function affected(range) {
 const RENDER_KEYS = new Set(['L-SPLIT RENDER']);
 const renderError = (s) => !!(s && !s.na && !s.pending && (s.error || Object.keys(s.counts || {}).some((k) => RENDER_KEYS.has(k))));
 const countsOf = (doc) => { const m = {}; for (const f of doc.findings || []) if (!f.waived) { const k = `${f.lint} ${f.rule}`; m[k] = (m[k] || 0) + 1; } return m; };
+/**
+ * N1 (critic r2): the finding-level key of one print-lint finding, `<lint> <rule>|p<page>|<key>` with every digit
+ * run of print-lint's short key (`f.key`; its --json drops that field today, so in practice the MESSAGE) normalised
+ * to `#`, cut to 120 characters. The message names what is wrong (the colour, the shape, the cell), so a new finding
+ * that replaces a
+ * fixed one of the same rule on the same row is a different key, so it is caught even when the count stays the
+ * same (the D5 class of ws-node-lint, at the matrix's grain). Numbers are normalised so a measurement that moves
+ * by a millimetre is not a new finding; the page is kept, so the same defect moving to another page is new.
+ */
+const findingKey = (f) => `${f.lint} ${f.rule}|p${f.page != null ? f.page : ''}|${String(f.key || f.msg || '').replace(/\d+(?:\.\d+)?/g, '#').slice(0, 120)}`;
+const keysOf = (doc) => { const m = {}; for (const f of doc.findings || []) if (!f.waived && !RENDER_KEYS.has(`${f.lint} ${f.rule}`)) { const k = findingKey(f); m[k] = (m[k] || 0) + 1; } return m; };
 
+/**
+ * The per-row baseline: `file` merged with every other `baseline.<part>.json` beside it (the shard files
+ * baseline.shard-i-of-n.json, the slice files baseline.slice-i-of-n.json of the 28-night first baseline, and
+ * baseline.added[.shard-i-of-n].json, the rows --pin-new pinned after it).
+ */
 function loadBaseline(file) {
     if (!file) return null;
     const out = { rows: {} };
     const dir = path.dirname(path.resolve(file));
     const files = [path.resolve(file)];
-    try { for (const f of fs.readdirSync(dir)) if (/^baseline\.shard-\d+-of-\d+\.json$/.test(f) && path.join(dir, f) !== path.resolve(file)) files.push(path.join(dir, f)); } catch (e) { /* none */ }
+    try { for (const f of fs.readdirSync(dir).sort()) if (/^baseline\.[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)?\.json$/.test(f) && path.join(dir, f) !== path.resolve(file)) files.push(path.join(dir, f)); } catch (e) { /* none */ }
     for (const f of files) { try { Object.assign(out.rows, JSON.parse(fs.readFileSync(f, 'utf8')).rows || {}); } catch (e) { /* missing */ } }
     return out;
 }
 
-/** The rises of one row against its baseline entry (absent entry = zero everywhere). */
+/**
+ * Is the first full baseline there (owner 2026-10-23)? It is when `baseline.json` says `complete: true`, or when
+ * the slice files baseline.slice-i-of-n.json of one n are all present (i = 1 … n), each written by a --write-baseline
+ * run of its slice. Until then the deploy WARNS on an old nightly instead of refusing.
+ */
+function baselineComplete(dir) {
+    let names = [];
+    try { names = fs.readdirSync(dir); } catch (e) { return { complete: false, how: `no ${dir}` }; }
+    try { const b = JSON.parse(fs.readFileSync(path.join(dir, 'baseline.json'), 'utf8')); if (b && b.complete === true) return { complete: true, how: 'baseline.json says complete: true' }; } catch (e) { /* none */ }
+    const by = new Map();
+    for (const f of names) { const m = /^baseline\.slice-(\d+)-of-(\d+)\.json$/.exec(f); if (m) { const n = +m[2]; if (!by.has(n)) by.set(n, new Set()); by.get(n).add(+m[1]); } }
+    let best = null;
+    for (const [n, have] of by) {
+        const missing = []; for (let i = 1; i <= n; i++) if (!have.has(i)) missing.push(i);
+        if (!missing.length) return { complete: true, how: `all ${n} slice baselines (baseline.slice-1..${n}-of-${n}.json)`, n, have: n };
+        if (!best || have.size > best.have) best = { n, have: have.size, missing };
+    }
+    return best ? { complete: false, how: `${best.have} of ${best.n} slice baselines pinned (missing ${best.missing.slice(0, 8).join(', ')}${best.missing.length > 8 ? ' ...' : ''})`, n: best.n, have: best.have, missing: best.missing }
+        : { complete: false, how: 'no slice baseline pinned yet and baseline.json does not say complete: true', have: 0 };
+}
+
+/**
+ * The rises of one row against its baseline entry (absent entry = zero everywhere). A size whose pinned entry
+ * carries finding keys (`keys`, N1) is compared key by key: a finding whose key is not pinned (or is pinned fewer
+ * times) is a rise even when its rule's count did not grow. An entry with counts only (pinned before N1) is compared
+ * by counts.
+ */
 function risesOf(row, base) {
     const b = (base && base.rows[row.id]) || {};
     const out = [];
@@ -451,9 +516,19 @@ function risesOf(row, base) {
             const pinned = RENDER_KEYS.has(k) ? 0 : ((b[sz] || {})[k] || 0);
             if (n > pinned) out.push(`${sz} ${k}: ${pinned} -> ${n}`);
         }
+        const pk = b.keys && b.keys[sz];
+        if (pk && s.keys) {
+            for (const [k, n] of Object.entries(s.keys)) {
+                const pinned = pk[k] || 0;
+                const rule = k.split('|')[0];
+                if (n > pinned && !out.some((x) => x.startsWith(`${sz} ${rule}:`))) out.push(`${sz} ${rule}: new finding "${k.split('|').slice(1).join(' ')}" (${pinned} -> ${n}; the rule's count did not rise: it replaced a fixed one)`);
+            }
+        }
     }
     return out;
 }
+/** Does the row have a baseline entry to be judged against? (owner 2026-10-23: no entry = PENDING(no-baseline)) */
+const hasBaselineEntry = (row, base) => !!(base && base.rows && base.rows[row.id]);
 
 /* ============================================================================ running */
 
@@ -510,7 +585,7 @@ async function runRows(rows, { slots, batch, verbose }) {
         for (const sz of SIZES) {
             const id = `${r.id}@${sz}`;
             const d = docs.get(id);
-            if (d) r.sizes[sz] = { pages: d.pages, keyPages: d.keyPages, counts: countsOf(d), error: d.error || null, groups: verbose ? [...new Set((d.findings || []).map((f) => `${f.lint} ${f.rule}: ${f.msg}`))].slice(0, 12) : undefined };
+            if (d) r.sizes[sz] = { pages: d.pages, keyPages: d.keyPages, counts: countsOf(d), keys: keysOf(d), error: d.error || null, groups: verbose ? [...new Set((d.findings || []).map((f) => `${f.lint} ${f.rule}: ${f.msg}`))].slice(0, 12) : undefined };
             else if (pend.has(id)) r.sizes[sz] = { pending: pend.get(id).step, reason: pend.get(id).reason };
             else if (na.has(id)) r.sizes[sz] = { na: na.get(id).reason };
             else r.sizes[sz] = { error: crashed.get(id) || 'no result', counts: { 'L-SPLIT RENDER': 1 } };
@@ -534,21 +609,36 @@ function verdict(row, base) {
         row.reason = `could not print at ${bad.join(', ')}`;
         return;
     }
+    // owner 2026-10-23: a row with findings but no baseline entry of its own is PENDING(no-baseline), never RED:
+    // there is nothing to rise above yet (the 28-night first baseline, or --pin-new, pins it). Without --baseline
+    // at all (a builder's own check) every finding is still red.
+    if (row.rises.length && base && !hasBaselineEntry(row, base)) {
+        row.status = 'PENDING'; row.step = 'no-baseline'; row.noBaseline = true;
+        row.reason = `no per-row baseline entry yet (${row.rises.length} finding group(s) not judged; pinned by the first full baseline or --pin-new)`;
+        return;
+    }
+    row.noBaseline = false;
     row.status = row.rises.length ? 'RED' : 'OK';
 }
 
 /**
  * --write-baseline (D4): pin the lint counts of the rows that PRINTED (status OK or RED after verdict()).
  * A row that could not print (ERROR: a render error at any size), a PENDING or N/A row is never pinned; render
- * keys are stripped even from a pinned row. Returns the ids refused, with why.
+ * keys are stripped even from a pinned row. Returns the ids refused, with why. `onlyNew` (--pin-new) never re-pins a
+ * row that already has an entry in `cur`.
  */
-function pinRows(cur, rows) {
+function pinRows(cur, rows, { onlyNew = false } = {}) {
     const refused = [];
     let pinned = 0;
     for (const r of rows) {
         if (!r.sizes) continue;
-        if (r.status !== 'OK' && r.status !== 'RED') { refused.push({ id: r.id, why: r.status === 'ERROR' ? (r.errors || []).join('; ') : r.status }); continue; }
-        cur.rows[r.id] = Object.fromEntries(SIZES.map((sz) => [sz, Object.fromEntries(Object.entries((r.sizes[sz] && r.sizes[sz].counts) || {}).filter(([k]) => !RENDER_KEYS.has(k)))]));
+        // a row that printed: OK, RED, or PENDING(no-baseline) (it printed, it only had no entry to compare with)
+        if (r.status !== 'OK' && r.status !== 'RED' && !r.noBaseline) { refused.push({ id: r.id, why: r.status === 'ERROR' ? (r.errors || []).join('; ') : r.status }); continue; }
+        if (onlyNew && cur.rows[r.id]) continue;
+        const entry = Object.fromEntries(SIZES.map((sz) => [sz, Object.fromEntries(Object.entries((r.sizes[sz] && r.sizes[sz].counts) || {}).filter(([k]) => !RENDER_KEYS.has(k)))]));
+        // N1: the finding keys too, so a swapped finding of one rule is caught (an entry without keys compares counts)
+        entry.keys = Object.fromEntries(SIZES.map((sz) => [sz, (r.sizes[sz] && r.sizes[sz].keys) || {}]));
+        cur.rows[r.id] = entry;
         pinned++;
     }
     return { pinned, refused };
@@ -559,14 +649,72 @@ const baselineKey = (base, id) => (base ? sha(JSON.stringify((base.rows && base.
 
 /* ============================================================================ selection */
 
-function selectRows(all, { kinds, names, shard, seventh, affectedIds }) {
+/**
+ * The slice of a row (owner 2026-10-23): slice i of n holds the rows whose id hashes to i - 1 mod n. It depends on
+ * the row's id only, so appending a skill never moves an existing row to another slice (a position-based split
+ * would). The hash is SHA-256 (32 bits of it): FNV-1a's low bits are poorly mixed, so FNV mod 28 and a salted FNV
+ * mod 2 were correlated (slice 2/28 x shard 1/2 held 0 rows). `--seventh d` is kept as an alias of `--slice <d+1>/7`
+ * (no nightly ran with the old FNV seventh, so no run file depends on its rows).
+ */
+const h32 = (s) => parseInt(sha(s).slice(0, 8), 16);
+const inSlice = (id, sl) => h32('slice:' + id) % sl.n === sl.i - 1;
+/** Shards split by an independently salted hash of the id, for the same reason: a shard's rows never depend on what else is selected. */
+const inShard = (id, sh) => h32('shard:' + id) % sh.n === sh.i - 1;
+
+/**
+ * Rows: the --kind / --rows filters, then the REACH (the union of --affected's rows, the --slice / --seventh rows
+ * and `extraIds`, the RED / ERROR rows of the folded run state that --red-from re-selects), then the shard.
+ */
+function selectRows(all, { kinds, names, shard, seventh, slice, affectedIds, extraIds }) {
     let rows = all;
     if (kinds) rows = rows.filter((r) => kinds.includes(r.kind));
     if (names) rows = rows.filter((r) => names.includes(r.id) || names.includes(`${r.kind}/${r.name}`));
-    if (affectedIds || seventh !== null) rows = rows.filter((r) => (affectedIds && affectedIds.has(r.id)) || (seventh !== null && fnv(r.id) % 7 === seventh));
+    const sl = slice || (seventh !== null && seventh !== undefined ? { i: seventh + 1, n: 7 } : null);
+    if (affectedIds || sl || extraIds) rows = rows.filter((r) => (affectedIds && affectedIds.has(r.id)) || (sl && inSlice(r.id, sl)) || (extraIds && extraIds.has(r.id)));
     rows = rows.slice().sort((a, b) => a.id.localeCompare(b.id));
-    if (shard) rows = rows.filter((_, i) => i % shard.n === shard.i - 1);
+    if (shard) rows = rows.filter((r) => inShard(r.id, shard));
     return rows;
+}
+
+/* ============================================================================ the folded run state (critic r2 D1) */
+
+/** A run file: <date>[T<HHMM>][.shard-i-of-n].json; one run = one stamp (<date>, or <date>T<HHMM> for a fired run). */
+const RUN_RE = /^(\d{4}-\d{2}-\d{2}(?:T\d{4})?)(?:\.shard-(\d+)-of-(\d+))?\.json$/;
+const RED_STATES = new Set(['RED', 'ERROR']);
+
+/**
+ * Fold every run file in `dir`, oldest stamp first, then the `extra` run files (the deploy's own inline run), into
+ * each row's last-known state: a row's state is its status in the MOST RECENT run that ran it (listed it in `rows`,
+ * or in `red`). A RED / ERROR row therefore stays red across runs that did not select it, until a later run lists
+ * it with another status (OK, or PENDING / N/A when the row can no longer be checked). An id in a file's `red` list
+ * is RED in that run even when its row says otherwise.
+ * Returns { files: [{file, stamp, shard, j}], bad: [{file, error}], rows: Map(id -> {status, stamp, file, commit}),
+ *           red: [ids RED / ERROR in the fold] }.
+ */
+function foldRuns(dir, extra = []) {
+    const names = (dir && fs.existsSync(dir) ? fs.readdirSync(dir) : []).filter((f) => RUN_RE.test(f));
+    const stampOf = (f) => RUN_RE.exec(f)[1];
+    names.sort((a, b) => (stampOf(a) < stampOf(b) ? -1 : stampOf(a) > stampOf(b) ? 1 : a < b ? -1 : a > b ? 1 : 0));
+    const list = names.map((f) => ({ file: path.join(dir, f), stamp: stampOf(f), shard: RUN_RE.exec(f)[2] ? { i: +RUN_RE.exec(f)[2], n: +RUN_RE.exec(f)[3] } : null }))
+        .concat(extra.filter((f) => f && fs.existsSync(f)).map((f) => ({ file: f, stamp: 'inline', shard: null, extra: true })));
+    const files = [], bad = [];
+    const rows = new Map();
+    for (const e of list) {
+        let j;
+        try { j = JSON.parse(fs.readFileSync(e.file, 'utf8')); } catch (err) { bad.push({ file: e.file, error: err.message }); continue; }
+        files.push({ ...e, j });
+        const redList = new Set((Array.isArray(j.red) ? j.red : []).map(String));
+        const seen = new Set();
+        for (const r of Array.isArray(j.rows) ? j.rows : []) {
+            if (!r || !r.id) continue;
+            const id = String(r.id);
+            seen.add(id);
+            rows.set(id, { status: redList.has(id) && !RED_STATES.has(String(r.status)) ? 'RED' : String(r.status), stamp: e.stamp, file: e.file, commit: j.commit, rises: r.rises, errors: r.errors, skill: r.skill || (r.skills || [])[0] });
+        }
+        for (const id of redList) if (!seen.has(id)) rows.set(id, { status: 'RED', stamp: e.stamp, file: e.file, commit: j.commit, listOnly: true });
+    }
+    const red = [...rows.entries()].filter(([, v]) => RED_STATES.has(v.status)).map(([id]) => id).sort();
+    return { files, bad, rows, red };
 }
 
 /* ============================================================================ self-test (node only) */
@@ -632,7 +780,10 @@ function selfTest() {
     const pend = { id: 'q', sizes: { S: { pending: 'M4', reason: 'needs M4' }, M: { counts: {} }, L: { counts: {} } } };
     const forgiving = { rows: { e: { S: { 'L-SPLIT RENDER': 1 } }, c: { S: { 'L-SPLIT RENDER': 1 } } } };
     for (const r of [printed, split, crashed, pend]) verdict(r, forgiving);
-    ok(printed.status === 'RED', 'D4: a lint finding on a row that printed is RED before pinning');
+    ok(printed.status === 'PENDING' && printed.step === 'no-baseline', `owner 2026-10-23: a finding on a printed row with no baseline entry is PENDING(no-baseline), not RED (${printed.status})`);
+    const printedNoBase = { id: 'p', sizes: printed.sizes };
+    verdict(printedNoBase, null);
+    ok(printedNoBase.status === 'RED', 'without --baseline at all (a builder check) a finding is still RED');
     ok(split.status === 'ERROR' && crashed.status === 'ERROR', `D4: a render error is ERROR even when a baseline pins L-SPLIT RENDER (${split.status}, ${crashed.status})`);
     ok(pend.status === 'PENDING', 'D4: a size that needs a later step makes the row PENDING');
     const cur = { rows: {} };
@@ -661,6 +812,71 @@ function selfTest() {
     ok(finalVerdict([{ id: 'x', status: 'RED' }], { reportOnly: true }).code === 0 && /WOULD FAIL/.test(finalVerdict([{ id: 'x', status: 'RED' }], { reportOnly: true }).line), '--report-only: a red row exits 0 and never prints OK');
     ok(finalVerdict([], { reach: true }).code === 0, 'an --affected reach of 0 rows is OK (nothing reached)');
     // 10. N10: the cache key changes with the row's baseline entry
+    // 11. the slice (owner 2026-10-23): a partition, stable as rows are appended; --seventh d = --slice <d+1>/7
+    const sl = (list, i, n) => selectRows(list, { slice: { i, n } }).map((r) => r.id);
+    let sliced = 0; const where = new Map();
+    for (let i = 1; i <= 28; i++) for (const id of sl(many, i, 28)) { sliced++; where.set(id, i); }
+    ok(sliced === 50 && where.size === 50, 'slices: every row in exactly one of 28 slices');
+    const grown = [...many, ...Array.from({ length: 30 }, (_, i) => ({ id: 'new' + i, kind: 'single', name: 'x' }))];
+    ok(many.every((r) => sl(grown, where.get(r.id), 28).includes(r.id)), 'slices: appending rows never moves an existing row to another slice');
+    // slices x shards are independent: every (slice, shard) cell of a large set holds rows (FNV's low bits were not)
+    const big = Array.from({ length: 4000 }, (_, i) => ({ id: `cat:skill${i}|single/row${i % 16}`, kind: 'single', name: 'x' }));
+    let emptyCells = 0;
+    for (let i = 1; i <= 28; i++) for (let j = 1; j <= 2; j++) if (!selectRows(big, { slice: { i, n: 28 }, shard: { i: j, n: 2 } }).length) emptyCells++;
+    ok(emptyCells === 0, `slices x shards: no empty (slice, shard) cell over 4000 rows (${emptyCells} empty)`);
+    ok(JSON.stringify(selectRows(many, { seventh: 2 })) === JSON.stringify(selectRows(many, { slice: { i: 3, n: 7 } })), '--seventh 2 is --slice 3/7');
+    const shardOf = new Map(); for (let i = 1; i <= 4; i++) for (const r of selectRows(many, { shard: { i, n: 4 } })) shardOf.set(r.id, i);
+    ok([1, 2, 3, 4].every((i) => selectRows(grown, { shard: { i, n: 4 } }).filter((r) => shardOf.has(r.id)).every((r) => shardOf.get(r.id) === i)), 'shards: a row\'s shard does not depend on the other rows selected');
+    ok(JSON.stringify(selectRows(many, { slice: { i: 1, n: 28 }, extraIds: new Set(['row7']) }).map((r) => r.id)) === JSON.stringify([...new Set([...sl(many, 1, 28), 'row7'])].sort()), 'D1.2: --red-from ids are added to the slice selection');
+    ok(selectRows(many, { extraIds: new Set(['row3', 'nosuch']) }).map((r) => r.id).join() === 'row3', 'D1.2: red ids alone select only those rows');
+    // 12. D1.1: the folded state - a row stays red until a later run lists it OK
+    const fdir = fs.mkdtempSync(path.join(os.tmpdir(), 'mq-fold-'));
+    const wr = (f, rowsList, red) => fs.writeFileSync(path.join(fdir, f), JSON.stringify({ commit: 'c', finished: '2026-10-23T00:00:00Z', rows: rowsList.map(([id, status]) => ({ id, status })), red: red || rowsList.filter(([, st]) => RED_STATES.has(st)).map(([id]) => id) }));
+    wr('2026-10-21.json', [['a', 'RED'], ['b', 'OK'], ['c', 'ERROR']]);
+    wr('2026-10-22.json', [['b', 'OK']]);
+    wr('2026-10-22T0900.shard-1-of-2.json', [['c', 'OK']]);
+    wr('2026-10-22T0900.shard-2-of-2.json', [['d', 'OK']], ['e']);
+    let fo = foldRuns(fdir);
+    ok(fo.red.join() === 'a,e', `D1.1: RED persists across runs that did not select it; ERROR cleared by a later OK; a red-list-only id is red (${fo.red.join()})`);
+    ok(fo.rows.get('a').stamp === '2026-10-21', 'D1.1: a row\'s state names the run it went red in');
+    wr('2026-10-23.json', [['a', 'OK'], ['e', 'OK']]);
+    fo = foldRuns(fdir);
+    ok(fo.red.length === 0, `D1.1: a later run that lists the row OK clears it (${fo.red.join()})`);
+    const extraF = path.join(fdir, 'inline.json');
+    fs.writeFileSync(extraF, JSON.stringify({ rows: [{ id: 'b', status: 'RED' }], red: ['b'] }));
+    ok(foldRuns(fdir, [extraF]).red.join() === 'b', 'D1.1: an extra (inline) run file is folded last');
+    fs.writeFileSync(path.join(fdir, '2026-10-24.json'), '{not json');
+    ok(foldRuns(fdir).bad.length === 1, 'D1.1: an unreadable run file is reported, not skipped silently');
+    fs.rmSync(fdir, { recursive: true, force: true });
+    // 13. the first-baseline marker (owner 2026-10-23)
+    const bdir = fs.mkdtempSync(path.join(os.tmpdir(), 'mq-bc-'));
+    ok(!baselineComplete(bdir).complete, 'baseline: an empty directory is not complete');
+    for (let i = 1; i <= 27; i++) fs.writeFileSync(path.join(bdir, `baseline.slice-${i}-of-28.json`), '{"rows":{}}');
+    ok(!baselineComplete(bdir).complete && /27 of 28/.test(baselineComplete(bdir).how), `baseline: 27 of 28 slices is not complete (${baselineComplete(bdir).how})`);
+    fs.writeFileSync(path.join(bdir, 'baseline.slice-28-of-28.json'), '{"rows":{"x":{"S":{}}}}');
+    ok(baselineComplete(bdir).complete, 'baseline: all 28 slices is complete');
+    ok(loadBaseline(path.join(bdir, 'baseline.json')).rows.x, 'baseline: slice files are merged by readers');
+    fs.rmSync(bdir, { recursive: true, force: true });
+    const cdir = fs.mkdtempSync(path.join(os.tmpdir(), 'mq-bc-'));
+    fs.writeFileSync(path.join(cdir, 'baseline.json'), '{"complete":true,"rows":{}}');
+    ok(baselineComplete(cdir).complete, 'baseline: baseline.json complete: true is complete');
+    fs.rmSync(cdir, { recursive: true, force: true });
+    // 14. N1: finding keys - a new finding of the same rule on the same row replacing a fixed one is caught
+    const fA = { lint: 'L-INK', rule: 'INK-1', page: 2, key: 'pdf text #ff0000', msg: 'x' };
+    const fB = { lint: 'L-INK', rule: 'INK-1', page: 2, key: 'pdf fill #00ff00', msg: 'y' };
+    const kOf = (fs_) => { const m = {}; for (const f of fs_) { const k = findingKey(f); m[k] = (m[k] || 0) + 1; } return m; };
+    const pinnedRow = { id: 's', status: 'OK', noBaseline: false, sizes: { S: { counts: { 'L-INK INK-1': 1 }, keys: kOf([fA]) }, M: { counts: {}, keys: {} }, L: { counts: {}, keys: {} } } };
+    const nb = { rows: {} }; pinRows(nb, [pinnedRow]);
+    const swapped = { id: 's', sizes: { S: { counts: { 'L-INK INK-1': 1 }, keys: kOf([fB]) }, M: { counts: {}, keys: {} }, L: { counts: {}, keys: {} } } };
+    verdict(swapped, nb);
+    ok(swapped.status === 'RED' && /new finding/.test(swapped.rises.join()), `N1: a swapped finding of the same rule on the same row is RED (${swapped.status} ${swapped.rises})`);
+    const same = { id: 's', sizes: { S: { counts: { 'L-INK INK-1': 1 }, keys: kOf([{ ...fA, msg: 'moved 3 mm' }]) }, M: { counts: {}, keys: {} }, L: { counts: {}, keys: {} } } };
+    verdict(same, nb);
+    ok(same.status === 'OK', 'N1: the same finding (its message changed) stays OK');
+    const legacy = { rows: { s: { S: { 'L-INK INK-1': 1 } } } };
+    const swapped2 = { id: 's', sizes: swapped.sizes }; verdict(swapped2, legacy);
+    ok(swapped2.status === 'OK', 'N1: an entry pinned before N1 (counts only) is still compared by counts');
+    ok(findingKey({ lint: 'L-INK', rule: 'INK-5', page: 1, key: 'solid 12.5 mm' }) === findingKey({ lint: 'L-INK', rule: 'INK-5', page: 1, key: 'solid 13 mm' }), 'N1: numbers in a key are normalised');
     ok(baselineKey(null, 'r') === 'none' && baselineKey({ rows: {} }, 'r') !== 'none' && baselineKey({ rows: { r: { S: { a: 1 } } } }, 'r') !== baselineKey({ rows: {} }, 'r'), 'N10: the cache key differs with and without --baseline and with the row\'s pinned counts');
     if (bad.length) { console.error(`${TOOL}: FAIL - ${bad.length} self-test(s)`); bad.forEach((b) => console.error('  - ' + b)); process.exit(1); }
     console.log(`${TOOL}: OK (self-test, ${n} assertions)`);
@@ -695,8 +911,12 @@ function finalVerdict(rows, { reportOnly = false, summary = '', reach = false } 
         const ids = [...st('ERROR'), ...st('RED')].slice(0, 5).map((r) => `${r.id} ${r.status}`).join('; ');
         return reportOnly ? { line: `${TOOL}: WOULD FAIL - ${red} red row(s) (${ids}) [report-only, exit 0]; ${summary}`, code: 0 } : { line: `${TOOL}: FAIL - ${red} red row(s) (${ids}); ${summary}`, code: 1 };
     }
-    if (!rows.length) return { line: `${TOOL}: OK (nothing reached: ${reach ? 'the --affected / --seventh selection reaches no row' : 'no rows'}; ${summary})`, code: 0 };
-    const checked = st('OK').length + st('CACHED').length;
+    if (!rows.length) return { line: `${TOOL}: OK (nothing reached: ${reach ? 'the --affected / --slice / --red-from selection reaches no row' : 'no rows'}; ${summary})`, code: 0 };
+    // a PENDING(no-baseline) row printed (no render error) and only lacks an entry to compare with: it counts as
+    // checked for the verdict (owner 2026-10-23: rows with no baseline never hold the deploy), and is named
+    const noBase = rows.filter((r) => r.status === 'PENDING' && r.step === 'no-baseline').length;
+    const checked = st('OK').length + st('CACHED').length + noBase;
+    if (noBase) summary = `${summary}; ${noBase} row(s) PENDING(no-baseline): printed, not judged`;
     if (!checked) {
         const why = {};
         for (const r of rows) { const k = r.status === 'PENDING' ? `PENDING(${r.step})` : r.status; why[k] = (why[k] || 0) + 1; }
@@ -717,7 +937,8 @@ function sizeCell(s) {
 }
 class UsageError extends Error {}
 
-(async () => {
+module.exports = { foldRuns, baselineComplete, RUN_RE, inSlice, inShard, findingKey };
+if (require.main === module) (async () => {
     if (has('self-test')) return selfTest();
     const t0 = Date.now();
     const started = new Date().toISOString();
@@ -732,6 +953,20 @@ class UsageError extends Error {}
     if (shardArg !== null && !shardM) throw new UsageError(`--shard ${shardArg}: i/n, e.g. 3/8`);
     const shard = shardM ? { i: Number(shardM[1]), n: Number(shardM[2]) } : null;
     if (shard && !(shard.i >= 1 && shard.i <= shard.n)) throw new UsageError('--shard i/n with 1 <= i <= n');
+    const sliceArg = arg('slice', null);
+    const sliceM = sliceArg === null ? null : /^(\d+)\/(\d+)$/.exec(sliceArg);
+    if (sliceArg !== null && !sliceM) throw new UsageError(`--slice ${sliceArg}: i/n, e.g. 3/28`);
+    const slice = sliceM ? { i: Number(sliceM[1]), n: Number(sliceM[2]) } : null;
+    if (slice && !(slice.i >= 1 && slice.i <= slice.n)) throw new UsageError('--slice i/n with 1 <= i <= n');
+    if (slice && seventh !== null) throw new UsageError('--slice and --seventh together: --seventh d is --slice <d+1>/7; give one');
+    const capArg = arg('affected-cap', null);
+    if (capArg !== null && !/^\d+$/.test(capArg)) throw new UsageError(`--affected-cap ${capArg}: a whole number of documents`);
+    const affectedCap = capArg === null ? null : Number(capArg);
+    // D1.2: the rows RED / ERROR in the folded state of the run files are re-selected; --seventh / --slice (the
+    // nightly's rotation) imply --red-from design/audit/matrix unless --red-from names another directory
+    const redFrom = arg('red-from', null) || ((seventh !== null || slice) && !has('no-red-from') ? MATRIX_DIR : null);
+    if (redFrom && !fs.existsSync(redFrom) && arg('red-from', null)) throw new UsageError(`--red-from ${redFrom}: no such directory`);
+    if (has('pin-new') && has('write-baseline')) throw new UsageError('--pin-new and --write-baseline together: --write-baseline pins every printed row; --pin-new only rows with no entry');
     const maxDocsArg = arg('max-docs', null);
     if (maxDocsArg !== null && !/^\d+$/.test(maxDocsArg)) throw new UsageError(`--max-docs ${maxDocsArg}: a whole number of documents`);
     const maxDocs = maxDocsArg === null ? null : Number(maxDocsArg);
@@ -765,8 +1000,26 @@ class UsageError extends Error {}
         console.log(`  rows reached: ${affectedIds.size} of ${all.filter((r) => r.kind !== 'quiz').length} print rows (${universe.length} skill(s))`);
         console.log('  M4 replay: not built (instance-data files reach every row until buildSheet record / replay narrows them by output)');
     }
-    const reach = affectedIds !== null || seventh !== null;
-    const rows = selectRows(all, { kinds, names, shard, seventh, affectedIds });
+    const affReached = affectedIds ? affectedIds.size : null;
+    let redIds = null, fold = null;
+    if (redFrom) {
+        fold = foldRuns(redFrom);
+        const known = new Set(all.map((r) => r.id));
+        redIds = new Set(fold.red.filter((id) => known.has(id)));
+        const other = fold.red.filter((id) => !known.has(id));
+        console.log(`${TOOL}: --red-from ${path.relative(process.cwd(), path.resolve(redFrom)) || '.'}: ${fold.red.length} RED / ERROR row(s) in the folded state of ${fold.files.length} run file(s); ${redIds.size} re-selected${other.length ? `, ${other.length} outside the selected skills or no longer a row (${other.slice(0, 3).join(', ')}${other.length > 3 ? ' ...' : ''})` : ''}`);
+        for (const b of fold.bad) console.log(`  unreadable run file ${b.file}: ${b.error}`);
+    }
+    // --affected-cap (the nightly): affected rows above the cap are dropped from tonight's selection (the slice and the
+    // red rows still run); the run file records it, and the deploy still decides from its own budget
+    let affectedDropped = null;
+    if (affectedIds && affectedCap !== null && affectedIds.size * 3 > affectedCap) {
+        affectedDropped = affectedIds.size;
+        console.log(`  --affected-cap ${affectedCap}: the ${affectedIds.size} affected row(s) (${affectedIds.size * 3} documents) are over the cap and are NOT run tonight; the slice${redIds ? ' and the red rows' : ''} run`);
+        affectedIds = null;
+    }
+    const reach = affectedIds !== null || seventh !== null || !!slice || redIds !== null || affectedDropped !== null;
+    const rows = selectRows(all, { kinds, names, shard, seventh, slice, affectedIds, extraIds: redIds });
     const selErr = selectionError({ all, kinds, names, rows, reach });
     if (selErr) throw new UsageError(selErr);
     settleStatic(rows);
@@ -792,7 +1045,8 @@ class UsageError extends Error {}
     const toRun = [];
     for (const r of byStatus('RUN')) {
         const c = cache.rows[r.id];
-        if (CACHE && c && c.status === 'OK' && c.depHash === r.depHash && c.baseline === baselineKey(base, r.id)) { r.status = 'CACHED'; r.cachedAt = c.date; } else toRun.push(r);
+        // a re-selected red row always runs: it is red until a run lists it OK
+        if (CACHE && c && c.status === 'OK' && c.depHash === r.depHash && c.baseline === baselineKey(base, r.id) && !(redIds && redIds.has(r.id))) { r.status = 'CACHED'; r.cachedAt = c.date; } else toRun.push(r);
     }
     if (CACHE) console.log(`  cache ${path.relative(process.cwd(), path.resolve(CACHE))}: ${byStatus('CACHED').length} row(s) already OK for this dependency hash and baseline entry`);
 
@@ -824,13 +1078,14 @@ class UsageError extends Error {}
         // --write-baseline: pin the counts of the rows that printed (D4), then judge every row against it
         if (has('write-baseline')) {
             const bf = BASE || path.join(MATRIX_DIR, 'baseline.json');
-            const target = shard ? path.join(path.dirname(bf), `baseline.shard-${shard.i}-of-${shard.n}.json`) : bf;
+            const target = slice ? path.join(path.dirname(bf), `baseline.slice-${slice.i}-of-${slice.n}.json`) : shard ? path.join(path.dirname(bf), `baseline.shard-${shard.i}-of-${shard.n}.json`) : bf;
             let cur = { rows: {} };
             try { cur = JSON.parse(fs.readFileSync(target, 'utf8')); } catch (e) { /* new */ }
             const res = pinRows(cur, toRun);
             refused = res.refused;
             cur.tool = TOOL; cur.note = 'Per-row baseline (IMPROVEMENT_PLAN §1.6.2): every finding count per (row, size, lint rule) at the commit below, for rows that printed. A red row is any count above it; a row that cannot print (L-SPLIT RENDER) is never pinned. Changed only with a STATUS note.';
             cur.commit = commit + (dirty ? ' (dirty)' : ''); cur.date = new Date().toISOString().slice(0, 10);
+            if (slice) { cur.slice = `${slice.i}/${slice.n}`; cur.finished = new Date().toISOString(); }
             cur.rows = Object.fromEntries(Object.entries(cur.rows).sort(([a], [b]) => a.localeCompare(b)));
             fs.mkdirSync(path.dirname(target), { recursive: true });
             fs.writeFileSync(target, JSON.stringify(cur, null, 1) + '\n');
@@ -842,6 +1097,26 @@ class UsageError extends Error {}
                 for (const x of refused.slice(0, 40)) console.log(`    ${x.id}: ${String(x.why).slice(0, 160)}`);
             }
             console.log(`  red now: ${toRun.filter((r) => r.status === 'RED').length} RED, ${toRun.filter((r) => r.status === 'ERROR').length} ERROR`);
+        }
+        // --pin-new (the nightly after the first full baseline): pin the rows that printed and have NO entry yet (a
+        // skill appended since); a row that already has an entry is never re-pinned
+        if (has('pin-new')) {
+            const bf = BASE || path.join(MATRIX_DIR, 'baseline.json');
+            const target = path.join(path.dirname(bf), `baseline.added${shard ? `.shard-${shard.i}-of-${shard.n}` : ''}.json`);
+            let cur = { rows: {} };
+            try { cur = JSON.parse(fs.readFileSync(target, 'utf8')); } catch (e) { /* new */ }
+            const fresh = toRun.filter((r) => !hasBaselineEntry(r, base));
+            const res = pinRows(cur, fresh, { onlyNew: true });
+            refused = res.refused;
+            if (res.pinned) {
+                cur.tool = TOOL; cur.note = 'Rows pinned by --pin-new: rows that printed and had no per-row baseline entry (skills appended after the first full baseline). Merged by every reader of baseline.json.';
+                cur.commit = commit + (dirty ? ' (dirty)' : ''); cur.date = new Date().toISOString().slice(0, 10);
+                cur.rows = Object.fromEntries(Object.entries(cur.rows).sort(([a], [b]) => a.localeCompare(b)));
+                fs.writeFileSync(target, JSON.stringify(cur, null, 1) + '\n');
+                const after = loadBaseline(bf);
+                for (const r of fresh) if (r.noBaseline || r.status === 'OK' || r.status === 'RED') verdict(r, after);
+            }
+            console.log(`  --pin-new: ${res.pinned} row(s) with no baseline entry pinned into ${path.relative(process.cwd(), target)}${res.refused.length ? `; ${res.refused.length} not pinned (cannot print)` : ''}`);
         }
     }
 
@@ -872,7 +1147,7 @@ class UsageError extends Error {}
     if (OUT) {
         const file = OUT === 'auto' ? path.join(MATRIX_DIR, `${new Date().toISOString().slice(0, 10)}${shard ? `.shard-${shard.i}-of-${shard.n}` : ''}.json`) : path.resolve(OUT);
         fs.mkdirSync(path.dirname(file), { recursive: true });
-        fs.writeFileSync(file, JSON.stringify(runFile(rows, { started, commit, dirty, P, printHash, ONLY, aff, seventh, shard, kinds, names, timing, slots, batch, live, refused }), null, 1) + '\n');
+        fs.writeFileSync(file, JSON.stringify(runFile(rows, { started, commit, dirty, P, printHash, ONLY, aff, seventh, slice, shard, kinds, names, timing, slots, batch, live, refused, redFrom, redIds, affectedDropped, affectedCap, affReached }), null, 1) + '\n');
         console.log(`wrote ${path.relative(process.cwd(), file)}`);
     }
     const summary = `${rows.length} row(s), ${toRun.length} run, ${byStatus('CACHED').length} cached, ${(((Date.now() - t0) / 1000)).toFixed(0)} s`;
@@ -882,11 +1157,13 @@ class UsageError extends Error {}
 })().catch((e) => { console.error(`${TOOL}: FAIL - ${has('verbose') ? (e && e.stack) || e : (e && e.message) || e}`); process.exit(1); });
 
 /** The run file (header "THE RUN FILE"): per-row status OK / RED / PENDING / N/A / ERROR; cached rows are OK + cached. */
-function runFile(rows, { started, commit, dirty, P, printHash, ONLY, aff, seventh, shard, kinds, names, timing, slots, batch, live, refused }) {
+function runFile(rows, { started, commit, dirty, P, printHash, ONLY, aff, seventh, slice, shard, kinds, names, timing, slots, batch, live, refused, redFrom, redIds, affectedDropped, affectedCap, affReached }) {
     const st = (s) => rows.filter((r) => r.status === s).length;
     return {
         tool: TOOL, date: new Date().toISOString().slice(0, 10), started, finished: new Date().toISOString(), commit, dirty, partners: P.source, printInputsHash: printHash,
-        selection: { skills: ONLY.length ? ONLY : 'all', affected: aff ? { from: aff.A, to: aff.B, files: aff.files } : null, seventh, shard: shard ? `${shard.i}/${shard.n}` : null, kinds, rows: names },
+        selection: { skills: ONLY.length ? ONLY : 'all', affected: aff ? { from: aff.A, to: aff.B, files: aff.files, reached: affReached, run: affectedDropped !== null ? 0 : affReached, droppedOverCap: affectedDropped !== null ? { rows: affectedDropped, cap: affectedCap } : undefined } : null,
+            seventh, slice: slice ? `${slice.i}/${slice.n}` : (seventh !== null ? `${seventh + 1}/7` : null), shard: shard ? `${shard.i}/${shard.n}` : null, kinds, rows: names,
+            redFrom: redFrom ? { dir: path.relative(ROOT, path.resolve(redFrom)), reselected: redIds ? [...redIds].sort() : [] } : null },
         replay: 'M4 replay: not built',
         liveSkills: live.length,
         timing: timing ? { slots, batch, documents: timing.linted, seconds: +(timing.wallMs / 1000).toFixed(1), slotWaitSeconds: +(timing.waitMs / 1000).toFixed(0), docsPerSec: +timing.docsPerSec.toFixed(4), batches: timing.chunkTimes } : null,

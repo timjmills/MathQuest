@@ -2369,6 +2369,14 @@ if (require.main === module) (async () => {
     }
     const source = arg('source', 'legacy');
     if (!['pack', 'legacy', 'kit'].includes(source)) throw new Error(`unknown --source ${source} (pack, legacy, kit)`);
+    // N6 (critic r2): --anchors is checked before anything runs, in every source. An unknown mode fails; a known mode
+    // outside --source kit fails too, because the legacy and pack sources would ignore it and lint without anchors.
+    if (arg('anchors', null) !== null && source !== 'kit') {
+        const a = String(arg('anchors', '')).toLowerCase();
+        const known = ['off', 'on', 'side', 'sections', 'top', 'first'];
+        if (!known.includes(a)) throw new Error(`unknown anchors mode --anchors ${arg('anchors', '')} (${known.join(', ')})`);
+        throw new Error(`--anchors ${arg('anchors', '')} applies only to --source kit; --source ${source} would ignore it and lint with no anchors`);
+    }
     // a kit flag that needs a later step fails here, before a browser starts (E1)
     if (source === 'kit' && !arg('jobs', null)) kitRequestFlags();
     let results;
