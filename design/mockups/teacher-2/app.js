@@ -405,7 +405,7 @@
     return `<div class="tray ${big() ? 'tray-big' : ''}" role="region" aria-label="Tray">` +
       (big() ? `<button class="tray-label tray-label-btn" data-act="trayopen"><b>Tray</b><span>${esc(gs.length === 1 ? gradeName(gs[0]) : gs.length === 2 ? `Grades ${gs[0]}–${gs[1]}` : plural(gs.length, 'grade'))}</span><span>${label} · ${plural(areas.length, 'area')} ▸</span></button>`
         : `<div class="tray-label"><b>Tray</b><span>${label}</span>${n ? legend : ''}</div>`) + mid +
-      `<button class="btn tray-count ${big() ? 'tray-summary' : ''}" data-act="trayopen">${n ? `${label}${big() ? ` · ${plural(areas.length, 'area')}` : ''} ▸` : 'Tray empty'}</button>` +
+      `<button class="btn tray-count ${big() ? 'tray-summary' : ''}" data-act="trayopen">${n ? `${label} ▸` : 'Tray empty'}</button>` +
       `<div class="tray-actions">${n ? '' : '<span class="tray-hint">Tick skills first</span>'}` +
       `<button class="btn" data-act="tray-quiz">${icon('quiz')}Quiz</button>` +
       `<button class="btn" data-act="tray-share" ${dis}>${icon('share')}Share</button>` +
@@ -415,12 +415,15 @@
   function fitTray() {
     const t = document.querySelector('.tray'); if (!t) return;
     for (const row of t.querySelectorAll('.tray-chips, .tray-segs')) {
+      row.hidden = false;
       const more = row.querySelector('.tray-more'); const items = [...row.children].filter(c => c !== more);
       items.forEach(c => { c.hidden = false; }); more.hidden = true; row.classList.remove('abbr');
       if (row.scrollWidth <= row.clientWidth + 1) continue;
       if (row.classList.contains('tray-segs')) { row.classList.add('abbr'); if (row.scrollWidth <= row.clientWidth + 1) continue; }
       more.hidden = false; let hid = 0;
       for (let i = items.length - 1; i >= 0 && row.scrollWidth > row.clientWidth + 1; i--) { items[i].hidden = true; hid++; more.textContent = row.classList.contains('tray-segs') ? `+${hid} area${hid > 1 ? 's' : ''}` : `+${hid} more`; }
+      // not even the "+N" fits (a narrow tablet): the area row goes, the count button beside it still opens the tray
+      if (row.scrollWidth > row.clientWidth + 1 && row.classList.contains('tray-segs')) row.hidden = true;
     }
   }
   // ---- the tray popup: area → grade → skill (owner 2026-10-23)

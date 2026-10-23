@@ -759,3 +759,5 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; a
   .traypop .tp-head .note { display: none; }
 }
 .tray-line { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8) var(--sp-16); }
+.tray-segs[hidden] { display: none !important; }
+@media (max-width: 819px) { .tray .tray-label, .tray .tray-chips { display: none; } }
