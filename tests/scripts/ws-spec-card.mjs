@@ -78,6 +78,8 @@ const UNSIGNED = 'Signed: (not yet signed)';
 const SIGNED_RE = /^Signed: owner, (\d{4}-\d{2}-\d{2})\s*$/;
 const SHA_LEN = 6;    // a card stores 6 hex digits of each rule's excerpt sha: enough to see a change (1 in 16 M misses)
 const BODY_SHA_LEN = 16;
+const CAPS_BYTES = 1536;   // section 4a+, the hard caps quoted in full beside the core, is at most 1.5 KB
+const B4_CHARS = 100;      // a 4b excerpt: the rule's first sentence, cut at about this many characters at a word boundary
 const CORE_BYTES = 5120;   // section 4 (a), the rules quoted for the builder, is at most 5 KB (IMPROVEMENT_PLAN §1.2 row 8)
 
 /**
@@ -518,7 +520,7 @@ async function deriveFromRepo(root, cfg, idx) {
         const opt = new Map();
         for (const k of d.skills) for (const o of SO.SKILL_OPTIONS[k] || []) {
             const key = `${o.id}|${o.label}`;
-            if (!opt.has(key)) opt.set(key, { id: o.id, label: o.label, values: (o.values || []).map((v) => (v && typeof v === 'object' ? (v.v === null || v.v === undefined ? `(${v.l || 'default'})` : String(v.v)) : String(v))), skills: 0 });
+            if (!opt.has(key)) opt.set(key, { id: o.id, label: o.label, values: (o.values || []).map((v) => (v && typeof v === 'object' ? (v.v === null || v.v === undefined ? `(${v.l || 'default'})` : (v.l && String(v.l) !== String(v.v) ? `${String(v.l).replace(/\s+/g, " ")} (${v.v})` : String(v.v))) : String(v))), skills: 0 });
             opt.get(key).skills++;
         }
         d.options = [...opt.values()].sort((a, b) => b.skills - a.skills || (a.id < b.id ? -1 : 1));
@@ -693,21 +695,31 @@ function bodyShaOf(text) {
  * CORE_BYTES (card.json "coreBytes" may lower it); (b) every other rule that applies, as ids grouped under the heading
  * of the standard that defines them. Coverage counts the ids of both parts.
  */
-export function renderCard(cfg, d, idx, { signedLine = UNSIGNED, cited = [] } = {}) {
+/** A one-line 4b excerpt: the rule's first sentence, cut near `limit` characters at a word boundary. */
+function lineExcerpt(r, limit = B4_CHARS) {
+    let t = cardExcerpt(r, true, 0);
+    const m = /^(.+?[.!?])(?=\s+[A-Z*`(|]|$)/.exec(t);
+    if (m && m[1].length >= 12) t = m[1];
+    if (t.length <= limit) return t;
+    return `${t.slice(0, limit + 1).replace(/\s+\S*$/, '').replace(/\s*[-–—:,;(]$/, '').trim()} …`;
+}
+
+export function renderCard(cfg, d, idx, { signedLine = UNSIGNED, cited = [], generated = localToday() } = {}) {
     const limit = cfg.excerptChars || 240;
     const fullSet = new Set(cfg.fullRules || []);
     // section 4: the card's rules = the configured ones + the ids the template source cites
     const refs = [];
     const seen = new Set();
     const groups = [];
-    const addGroup = (title, ids, chars = limit, full = false, core = false) => {
-        const g = { title, refs: [], chars, full, core };
+    const addGroup = (title, ids, chars = limit, full = false, core = false, caps = false, applies = true, reason = '') => {
+        const g = { title, refs: [], chars, full, core, caps, applies, reason };
         for (const ref of ids) { if (seen.has(ref)) continue; seen.add(ref); refs.push(ref); g.refs.push(ref); }
         if (g.refs.length) groups.push(g);
     };
-    // core groups first, so a rule named in a core group and again later is quoted, not listed
-    const cfgGroups = (cfg.ruleGroups || []).map((g, i) => ({ g, i })).sort((x, y) => (!!y.g.core - !!x.g.core) || x.i - y.i).map((x) => x.g);
-    for (const g of cfgGroups) addGroup(g.title, g.rules || [], g.chars || limit, !!g.full, !!g.core);
+    // core groups first, then the quoted caps (4a+), so a rule named there and again later is quoted, not listed
+    const rank = (g) => (g.core ? 0 : g.caps ? 1 : 2);
+    const cfgGroups = (cfg.ruleGroups || []).map((g, i) => ({ g, i })).sort((x, y) => rank(x.g) - rank(y.g) || x.i - y.i).map((x) => x.g);
+    for (const g of cfgGroups) addGroup(g.title, g.rules || [], g.chars || limit, !!g.full, !!g.core, !g.core && !!g.caps, g.applies !== false, g.reason || '');
     // ids the template source cites: skipped when the card already names that id (bare or ID@SRC); an id defined in
     // two standards is taken from the first source in SOURCES order (the design standard before PROBLEM_TYPES)
     const onCardIds = new Set(refs.map(refId));
@@ -725,7 +737,7 @@ export function renderCard(cfg, d, idx, { signedLine = UNSIGNED, cited = [] } = 
     const match = cardMatch(cfg);
     const meta = {
         card: cfg.id, kind: cfg.kind, template: tplId, families: cfg.families || [], match: { templates: match.templates },
-        config: `${CARDS_REL}/${cfg.id}/card.json`, indexSha: idx.indexSha, bodySha: '',
+        config: `${CARDS_REL}/${cfg.id}/card.json`, generated, indexSha: idx.indexSha, bodySha: '',
         cited, rules: metaRules,
     };
     const L = [];
@@ -774,47 +786,79 @@ export function renderCard(cfg, d, idx, { signedLine = UNSIGNED, cited = [] } = 
     L.push('## 4. Rules that apply', '');
     L.push(`From the rule-id index (\`${INDEX_REL}\`, sha \`${idx.indexSha.slice(0, 12)}\`). An id written \`ID@SRC\` is defined in more than one standard.`, '');
     const core = groups.filter((g) => g.core);
-    const rest = groups.filter((g) => !g.core);
-    const coreLines = [];
-    for (const g of core) {
-        coreLines.push(`**${g.title}**`, '');
-        for (const ref of g.refs) {
-            const es = resolveRef(idx, ref);
-            if (!es.length) { coreLines.push(`- **${ref}** — NOT IN THE INDEX (fix card.json)`); continue; }
-            for (const e of es) {
-                const full = g.full || fullSet.has(ref) || fullSet.has(e.key);
-                coreLines.push(`- **${es.length > 1 ? e.key : ref}**${full ? ' ✱' : ''} (${e.src}) ${cardExcerpt(e, full, g.chars)}`);
+    const caps = groups.filter((g) => g.caps);
+    const rest = groups.filter((g) => !g.core && !g.caps && g.applies);
+    const notApplying = groups.filter((g) => !g.core && !g.caps && !g.applies);
+    const quoted = (gs) => {
+        const out = [];
+        for (const g of gs) {
+            out.push(`**${g.title}**`, '');
+            for (const ref of g.refs) {
+                const es = resolveRef(idx, ref);
+                if (!es.length) { out.push(`- **${ref}** — NOT IN THE INDEX (fix card.json)`); continue; }
+                for (const e of es) {
+                    const full = g.full || fullSet.has(ref) || fullSet.has(e.key);
+                    out.push(`- **${es.length > 1 ? e.key : ref}**${full ? ' ✱' : ''} (${e.src}) ${cardExcerpt(e, full, g.chars)}`);
+                }
             }
+            out.push('');
         }
-        coreLines.push('');
-    }
+        return out;
+    };
+    const coreLines = quoted(core);
     const coreBytes = Buffer.byteLength(coreLines.join('\n'));
     const nCore = core.reduce((n, g) => n + g.refs.length, 0);
     L.push(`### 4a. Core rules — apply every one (${nCore} rules; ✱ = quoted in full, the rest cut at a sentence)`, '');
     L.push(...coreLines);
-    const listed = new Map();
-    let nRest = 0;
-    for (const g of rest) {
-        for (const ref of g.refs) {
-            const es = resolveRef(idx, ref);
-            nRest++;
-            if (!es.length) { const k = 'NOT IN THE INDEX (fix card.json)'; if (!listed.has(k)) listed.set(k, []); listed.get(k).push(ref); continue; }
-            for (const e of es) {
-                const k = `${e.src} · ${shortHeading(e.heading)}`;
-                if (!listed.has(k)) listed.set(k, []);
-                const shown = es.length > 1 ? e.key : ref;
-                if (!listed.get(k).includes(shown)) listed.get(k).push(shown);
+    let capsBytes = 0;
+    if (caps.length) {
+        const capLines = quoted(caps);
+        capsBytes = Buffer.byteLength(capLines.join('\n'));
+        L.push(`### 4a+. Caps — the hard caps critics cite most on this card, quoted in full (${caps.reduce((n, g) => n + g.refs.length, 0)} rules)`, '');
+        L.push(...capLines);
+    }
+    // one line per id with its first sentence; grouped under the heading of the standard that defines it
+    const idLines = (gs) => {
+        const listed = new Map();
+        let n = 0;
+        for (const g of gs) {
+            for (const ref of g.refs) {
+                const es = resolveRef(idx, ref);
+                n++;
+                if (!es.length) { const k = 'NOT IN THE INDEX (fix card.json)'; if (!listed.has(k)) listed.set(k, new Map()); listed.get(k).set(ref, ''); continue; }
+                for (const e of es) {
+                    const k = `${e.src} · ${shortHeading(e.heading)}`;
+                    if (!listed.has(k)) listed.set(k, new Map());
+                    const shown = es.length > 1 ? e.key : ref;
+                    if (!listed.get(k).has(shown)) listed.get(k).set(shown, lineExcerpt(e));
+                }
             }
         }
-    }
-    L.push(`### 4b. Also applies — ids only (${nRest} rules)`, '');
-    L.push(`Each id's full text is in \`${INDEX_REL}\` (look it up by id) and in the standard it names; open it when the rule is in play. Grouped by the heading that defines them:`, '');
-    if (!listed.size) L.push('- (none)');
-    const srcOrder = (k) => { const i = SOURCES.findIndex((x) => k.startsWith(`${x.key} · `)); return i < 0 ? SOURCES.length : i; };
-    const secNum = (k) => (/· (\d+(?:\.\d+)*)/.exec(k) || [, '999'])[1];
-    const sorted = [...listed].sort((a, b) => srcOrder(a[0]) - srcOrder(b[0]) || idCompare(secNum(a[0]), secNum(b[0])) || (a[0] < b[0] ? -1 : 1));
-    for (const [k, ids] of sorted) L.push(`- ${k} — ${ids.sort(idCompare).map((x) => `\`${x}\``).join(' ')}`);
+        const srcOrder = (k) => { const i = SOURCES.findIndex((x) => k.startsWith(`${x.key} · `)); return i < 0 ? SOURCES.length : i; };
+        const secNum = (k) => (/· (\d+(?:\.\d+)*)/.exec(k) || [, '999'])[1];
+        const sorted = [...listed].sort((a, b) => srcOrder(a[0]) - srcOrder(b[0]) || idCompare(secNum(a[0]), secNum(b[0])) || (a[0] < b[0] ? -1 : 1));
+        const out = [];
+        for (const [k, m] of sorted) {
+            out.push(`- ${k}`);
+            for (const id of [...m.keys()].sort(idCompare)) out.push(`  - \`${id}\`${m.get(id) ? ` ${m.get(id)}` : ''}`);
+        }
+        return { out, n };
+    };
+    const b4 = idLines(rest);
+    L.push(`### 4b. Also applies — one line each (${b4.n} rules)`, '');
+    L.push(`Each line is the rule's first sentence; its full text is in \`${INDEX_REL}\` (look it up by id) and in the standard it names. Open it when the rule is in play. Grouped by the heading that defines them:`, '');
+    if (!b4.out.length) L.push('- (none)');
+    L.push(...b4.out);
     L.push('');
+    if (notApplying.length) {
+        const nNa = notApplying.reduce((n, g) => n + g.refs.length, 0);
+        L.push(`### 4c. Cited by critics on this family, but not applying to this template (${nNa} rules)`, '');
+        L.push('Listed so the card-coverage test sees them. Do not apply them to this template.', '');
+        for (const g of notApplying) {
+            L.push(`**${g.title}** — ${g.reason || 'no reason given (add "reason" in card.json)'}`, '');
+            L.push(...idLines([g]).out, '');
+        }
+    }
 
     // 5
     L.push('## 5. Owner rulings', '');
@@ -857,7 +901,7 @@ export function renderCard(cfg, d, idx, { signedLine = UNSIGNED, cited = [] } = 
     let text = L.join('\n');
     meta.bodySha = bodyShaOf(text);
     text = text.replace('"bodySha":""', `"bodySha":"${meta.bodySha}"`);
-    return { text, meta, missingRules, coreBytes };
+    return { text, meta, missingRules, coreBytes, capsBytes };
 }
 
 /** Parse a card file: its machine block, its skills (section 1), its section-4 rule refs and its Signed line. */
@@ -880,10 +924,7 @@ export function readCard(text) {
     if (s4) {
         for (const mm of s4[1].matchAll(/^- \*\*([^*\s]+)\*\*/gm)) onCard.add(mm[1]);
         const b4 = /### 4b\.[^\n]*\n([\s\S]*)$/.exec(s4[1]);
-        if (b4) for (const ln of b4[1].split('\n')) {
-            if (!/^- /.test(ln) || ln.lastIndexOf(' — ') < 0) continue;
-            for (const t of ln.slice(ln.lastIndexOf(' — ') + 3).matchAll(/`([^`\s]+)`/g)) onCard.add(t[1]);
-        }
+        if (b4) for (const mm of b4[1].matchAll(/^ {2}- `([^`\s]+)`/gm)) onCard.add(mm[1]);
     }
     const skills = [];
     const s1 = /## 1\. What it teaches\n([\s\S]*?)\n## 2\./.exec(text);
@@ -897,7 +938,7 @@ export function readCard(text) {
 function cardBody(text) {
     return text.split('\n').filter((l) => !/^Signed: /.test(l)).join('\n')
         .replace(/"indexSha":"[0-9a-f]+"/, '"indexSha":""').replace(/"bodySha":"[0-9a-f]*"/, '"bodySha":""')
-        .replace(/"cited":"[^"]*"/, '"cited":""').replace(/sha `[0-9a-f]{12}`/, 'sha ``');
+        .replace(/"cited":"[^"]*"/, '"cited":""').replace(/"generated":"[^"]*"/, '"generated":""').replace(/sha `[0-9a-f]{12}`/, 'sha ``');
 }
 
 /** Section byte sizes of a card: machine block, header, sections 1-9 (4 split into 4a / 4b). */
@@ -906,8 +947,8 @@ export function sectionSizes(text) {
     const end = text.indexOf('\n-->') + 4;
     out.push(['machine block', Buffer.byteLength(text.slice(0, end + 1))]);
     const rest = text.slice(end + 1);
-    for (const part of rest.split(/\n(?=## \d\. |### 4[ab]\. )/)) {
-        const h = /^(## (\d)\.|### (4[ab])\.)/.exec(part);
+    for (const part of rest.split(/\n(?=## \d\. |### 4(?:a\+|[abc])\. )/)) {
+        const h = /^(## (\d)\.|### (4(?:a\+|[abc]))\.)/.exec(part);
         out.push([h ? (h[2] ? `§${h[2]}` : `§${h[3]}`) : 'title', Buffer.byteLength(part) + 1]);
     }
     out.push(['total', Buffer.byteLength(text)]);
@@ -918,7 +959,7 @@ export function sectionSizes(text) {
  * Build a card's text in memory from its card.json and the repo, the way --template / --family would write it
  * (unsigned). Returns {ok, msg} or {ok: true, cfg, text, coreBytes, paths}.
  */
-async function buildCard(root, id, kind, { sources = SOURCES, derive = deriveFromRepo, findingsPath = null } = {}) {
+async function buildCard(root, id, kind, { sources = SOURCES, derive = deriveFromRepo, findingsPath = null, today = localToday(), generated = null } = {}) {
     const p = cardPaths(root, id);
     if (!fs.existsSync(p.cfg)) return { ok: false, msg: `no config ${rel(root, p.cfg)}` };
     const cfg = JSON.parse(fs.readFileSync(p.cfg, 'utf8'));
@@ -928,10 +969,11 @@ async function buildCard(root, id, kind, { sources = SOURCES, derive = deriveFro
     const d = await derive(root, cfg, idx);
     const f = readFindings(root, findingsPath);
     const cited = f.rows ? citedIds(findingsFor(f.rows, { ...cardMatch(cfg), skills: d.skills })) : [];
-    const r = renderCard(cfg, d, idx, { signedLine: UNSIGNED, cited });
+    const r = renderCard(cfg, d, idx, { signedLine: UNSIGNED, cited, generated: generated || today });
     if (r.missingRules.length) return { ok: false, msg: `card.json names rules not in the index: ${r.missingRules.join(', ')}` };
     const cap = cfg.coreBytes || CORE_BYTES;
     if (r.coreBytes > cap) return { ok: false, msg: `section 4a (core rules) is ${r.coreBytes} bytes, over its ${cap}-byte cap: move rules out of the "core" groups of card.json (they stay on the card as ids in 4b), or lower their "chars"` };
+    if (r.capsBytes > CAPS_BYTES) return { ok: false, msg: `section 4a+ (quoted caps) is ${r.capsBytes} bytes, over its ${CAPS_BYTES}-byte cap: move rules out of the "caps" groups of card.json (they stay on the card in 4b)` };
     return { ok: true, cfg, d, idx, cited, text: r.text, coreBytes: r.coreBytes, paths: p };
 }
 const withSigned = (text, line) => text.replace(new RegExp(`^${UNSIGNED.replace(/[()]/g, '\\$&')}$`, 'm'), line);
@@ -941,11 +983,16 @@ const withSigned = (text, line) => text.replace(new RegExp(`^${UNSIGNED.replace(
  * A signed card whose content would change is refused unless resign; then it is written unsigned.
  */
 export async function generateCard(root, id, kind, { resign = false, ...opts } = {}) {
-    const b = await buildCard(root, id, kind, opts);
+    let b = await buildCard(root, id, kind, opts);
     if (!b.ok) return b;
     const p = b.paths;
     const old = fs.existsSync(p.md) ? fs.readFileSync(p.md, 'utf8') : null;
     const oldCard = old ? readCard(old) : null;
+    // an unchanged card keeps its generation date, so a re-run on a later day is byte-identical and a signature stays valid
+    if (oldCard && oldCard.meta.generated && cardBody(old) === cardBody(b.text) && readCard(b.text).meta.generated !== oldCard.meta.generated) {
+        b = await buildCard(root, id, kind, { ...opts, generated: oldCard.meta.generated });
+        if (!b.ok) return b;
+    }
     const wasSigned = !!(oldCard && oldCard.isSigned);
     let text = b.text;
     let note = '';
@@ -1055,6 +1102,8 @@ export async function checkSigned(root, cardFile, { today = localToday(), source
     else if (!card.isSigned) fail(`not signed (${card.signed}) — the build may not start`, 'the owner answers section 9 and replaces the last line with `Signed: owner, YYYY-MM-DD`');
     else if (!validDate(card.signedDate)) fail(`"${card.signed}": ${card.signedDate} is not a real calendar date`, 'the owner writes the real date');
     else if (card.signedDate > today) fail(`"${card.signed}": ${card.signedDate} is in the future (today is ${today})`, 'the owner writes the date of signing');
+    else if (!card.meta.generated) fail('the machine block has no generation date (generated by an older tool)', FIX(id, kind));
+    else if (card.signedDate < card.meta.generated) fail(`"${card.signed}": ${card.signedDate} is before the card was generated (${card.meta.generated})`, 'the owner writes the date of signing');
     // (b)
     if (!card.meta.bodySha) fail('the machine block has no bodySha (generated by an older tool)', FIX(id, kind));
     else if (bodyShaOf(text) !== card.meta.bodySha) fail('the card was edited by hand after generation (its body no longer matches the bodySha in the machine block)', FIX(id, kind));
@@ -1118,7 +1167,7 @@ async function selfTest() {
         // 2. a card, a findings file, coverage
         const cfg = {
             id: 'mini', kind: 'template', title: 'Mini stack', template: { id: 'stack', source: 'none.js' }, families: ['addition'],
-            ruleGroups: [{ title: 'Core', core: true, rules: ['VA-1', 'P-6'] }, { title: 'Caps', rules: ['H1'] }], fullRules: ['VA-1'],
+            ruleGroups: [{ title: 'Core', core: true, rules: ['VA-1', 'P-6'] }, { title: 'Caps', rules: ['H1'] }, { title: 'Quoted caps', caps: true, full: true, rules: ['H5'] }], fullRules: ['VA-1'],
             openQuestions: [{ q: 'Carry under the line?', recommended: 'no, top by default' }],
         };
         const cdir = path.join(root, CARDS_REL, 'mini');
@@ -1136,7 +1185,7 @@ async function selfTest() {
         ].join('\n');
         fs.writeFileSync(path.join(root, 'findings.csv'), csv);
         const noDerive = async (r, c, idx) => ({ skills: ['addition:add'], labels: {}, standards: { ccss: ['2.NBT.B.5'], ee: [] }, wrm: [], buildEntries: [], options: [], presets: [], sourceRules: [], capacity: [], gates: [{ cmd: 'node tests/scripts/ws-precritic.cjs --template stack', exists: false }] });
-        const opts = { sources: SRC, derive: noDerive, findingsPath: 'findings.csv' };
+        const opts = { sources: SRC, derive: noDerive, findingsPath: 'findings.csv', today: '2026-10-19' };
         const g1 = await generateCard(root, 'mini', 'template', opts);
         const md = path.join(cdir, 'mini.md');
         const c1 = fs.readFileSync(md, 'utf8');
@@ -1152,11 +1201,27 @@ async function selfTest() {
         t('N4: an external lesson-rule id (LR-4) is a NOTE, not an unknown id', !cov1.lines.some((l) => /^WARN .*LR-4/.test(l)) && cov1.lines.some((l) => /^NOTE .*LR-4 — design\/LESSON_RULES\.md/.test(l)));
         t('D7: section 4 has the core part (quoted) and the ids-only part', /### 4a\. Core rules[\s\S]*- \*\*VA-1\*\* ✱[\s\S]*### 4b\. Also applies[\s\S]*`H1`/.test(c1) && !/- \*\*H1\*\*/.test(c1));
         t('D7: ids listed in 4b count as on the card', readCard(c1).onCard.includes('H1') && readCard(c1).onCard.includes('VA-1'));
+        t('r2 D1: every 4b line carries its excerpt after the id', /^ {2}- `H1` Key wrong — C2 ≤ 3$/m.test(c1));
+        t('r2 D1: a "caps" group is quoted in full in 4a+ and counts as on the card', /### 4a\+\. Caps[\s\S]*- \*\*H5\*\* ✱ \(RUB\) Page wasted — C3 ≤ 5[\s\S]*### 4b\./.test(c1) && readCard(c1).onCard.includes('H5'));
+        t('r2 nit: the machine block records the generation date', readCard(c1).meta.generated === '2026-10-19');
         cfg.ruleGroups[1].rules.push('VA-2', 'BD-11');
         fs.writeFileSync(path.join(cdir, 'card.json'), JSON.stringify(cfg, null, 1));
         await generateCard(root, 'mini', 'template', opts);
         const cov2 = checkCoverage(root, md, { sources: SRC, findingsPath: 'findings.csv' });
         t('coverage PASSES once the cited id is added', cov2.ok);
+        // r2 D2: a group flagged "applies": false prints under its own heading and still counts for coverage
+        const naCfg = JSON.parse(JSON.stringify(cfg));
+        naCfg.ruleGroups[1].rules = naCfg.ruleGroups[1].rules.filter((x) => x !== 'BD-11');
+        naCfg.ruleGroups.push({ title: 'Owner exception', applies: false, reason: 'count rows only', rules: ['BD-11'] });
+        fs.writeFileSync(path.join(cdir, 'card.json'), JSON.stringify(naCfg, null, 1));
+        await generateCard(root, 'mini', 'template', opts);
+        const cNa = fs.readFileSync(md, 'utf8');
+        const b4Part = (/### 4b\.([\s\S]*?)### 4c\./.exec(cNa) || [, ''])[1];
+        t('r2 D2: an "applies": false group prints under 4c with its reason, not in 4b',
+            /### 4c\. Cited by critics on this family, but not applying to this template \(1 rules\)[\s\S]*\*\*Owner exception\*\* — count rows only[\s\S]*- `BD-11` Verbs/.test(cNa) && !/`BD-11`/.test(b4Part));
+        t('r2 D2: its ids still satisfy coverage', checkCoverage(root, md, { sources: SRC, findingsPath: 'findings.csv' }).ok);
+        fs.writeFileSync(path.join(cdir, 'card.json'), JSON.stringify(cfg, null, 1));
+        await generateCard(root, 'mini', 'template', opts);
         // 3. a changed excerpt is caught
         fs.writeFileSync(path.join(root, 'std.md'), std.replace('the leftmost track.', 'the leftmost track, never boxed.'));
         const cov3 = checkCoverage(root, md, { sources: SRC, findingsPath: 'findings.csv' });
@@ -1183,6 +1248,12 @@ async function selfTest() {
         t('check-signed FAILS an impossible date (2026-99-99)', !cs2b.ok && cs2b.lines.some((l) => /not a real calendar date/.test(l)));
         const cs3 = await signAs('Signed: owner, 2026-10-24');
         t('check-signed FAILS a future date', !cs3.ok && cs3.lines.some((l) => /in the future/.test(l)));
+        const cs3b = await signAs('Signed: owner, 2026-10-18');
+        t('r2 nit: check-signed FAILS a date before the card was generated', !cs3b.ok && cs3b.lines.some((l) => /before the card was generated \(2026-10-19\)/.test(l)));
+        const cs3c = await signAs('Signed: owner, 2026-10-19');
+        t('check-signed accepts a sign date equal to the generation date', cs3c.ok);
+        const g1c = await generateCard(root, 'mini', 'template', { ...opts, today: '2026-10-22' });
+        t('an unchanged card regenerated on a later day keeps its generation date and bytes', g1c.ok && fs.readFileSync(md, 'utf8') === unsignedText.replace(UNSIGNED, 'Signed: owner, 2026-10-19'));
         fs.writeFileSync(md, signedText.replace(/^- \*\*P-6\*\*.*\n/m, ''));
         const cs4 = await checkSigned(root, md, sOpts);
         t('check-signed FAILS a signed card with a rule hand-deleted (body sha), naming the fix', !cs4.ok && cs4.lines.some((l) => /edited by hand.*--resign/.test(l)));

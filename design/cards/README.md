@@ -43,7 +43,12 @@ Re-run `--index` after any edit to the sources; the index carries no timestamp, 
    - `ruleGroups`: `{title, rules, core, chars, full}` — rule ids or `ID@SRC` keys. Groups with `core: true` are
      section **4a**, the rules the builder must apply, quoted (`full: true` whole, otherwise cut at a sentence near
      `chars`); 4a may not exceed 5 KB (`coreBytes` in card.json may lower the cap; generation refuses a card over it).
-     Every other group goes to **4b** as ids only, grouped under the heading of the standard that defines them;
+     A group with `caps: true` is section **4a+**, quoted beside the core (at most 1.5 KB): the hard caps critics cite
+     most on the card. Every other group goes to **4b**, one line per id (the id, then its first sentence cut at about
+     100 characters), grouped under the heading of the standard that defines them. A group with `"applies": false` and a
+     `reason` (a rule critics cited on the family that does not apply to this template) prints under its own heading,
+     **4c** "Cited by critics on this family, but not applying to this template", with the reason; its ids still count
+     for coverage;
    - `ownerRulings` `{date, ruling, source}`, `misconceptions` `{id, error, wrong}`, `options` (notes), `gates` `{cmd, note}`,
      `openQuestions` `{q, recommended}`; `findingsMatch` `{templates, families}` for the coverage test (families
      here are extra: the categories of the card's own skills are always matched).
@@ -60,9 +65,11 @@ Re-run `--index` after any edit to the sources; the index carries no timestamp, 
 
 The card has nine sections — 1 What it teaches · 2 Problem types and progression · 3 The drawing · 4 Rules that apply ·
 5 Owner rulings · 6 Misconceptions · 7 Options and presets · 8 Gates · 9 Open questions with recommended answers — and
-ends with `Signed: (not yet signed)`. Section 4 has two parts: **4a Core rules** (quoted, at most 5 KB) and **4b Also
-applies** (every other rule that applies, as ids grouped by heading; the full text is in `rule-index.json`). Both
-parts count as "on the card" for coverage. A machine block at the top (an HTML comment) records the card id, the
+ends with `Signed: (not yet signed)`. Section 4 has up to four parts: **4a Core rules** (quoted, at most 5 KB), **4a+ Caps** (quoted in full,
+at most 1.5 KB), **4b Also applies** (every other rule that applies, one line per id with its first sentence, grouped by
+heading; the full text is in `rule-index.json`) and **4c** (cited on the family, not applying, with the reason). All
+parts count as "on the card" for coverage. The machine block also records the `generated` date (kept while the card's
+content is unchanged); `--check-signed` refuses a signing date before it. A machine block at the top (an HTML comment) records the card id, the
 rule-index sha, the **bodySha** (sha of the generated card without its Signed line), the ids critics had cited at
 generation (`cited`) and the 6-hex sha of every rule on the card (`rules`: `REF SHA …`, a ref that shares the
 previous ref's prefix written as its number only: `VA-1 12d322 2 26885a` = VA-1, VA-2).

@@ -1,6 +1,6 @@
 <!-- spec-card
-{"card":"stack","kind":"template","template":"stack","families":["addition","subtraction"],"match":{"templates":["stack"]},"config":"design/cards/stack/card.json","indexSha":"ed32bdf58a41e14cceffd96fefef3a0bc6156109","bodySha":"adf4cf889914b858"}
-{"cited":"AK-2 AX-4 AX-9 BD-4 BD-7 BD-11 C1 CL-9 DN-1a H1 H2 H3 H4 H5 H6 H7 H8 H9 H10 H11 H12 H13 L1 L6 LR-4 LR-6 OC4 P-1 PG-12 PT-FRM-6 PT-GDP-1 PT-GDP-2 PT-REV-3 PT-SCR-1 RP-1 RP-20 SL-1 SL-2 SL-3 SL-3a SP-20 TY-10a VA-10","rules":"VA-1 12d322 2 26885a 4 b05d12 7 13eea3 VA-10@WDS 9d9099 VA-11@WDS a5ab88 VA-12@WDS 60049e VA-13@WDS 05d8bb VA-13a c2dfad 20 ef38e6 22 045140 23 04bd6f AK-2 d4709f TY-21 53ed7d SP-23 fe1461 VA-3 770d75 5 1337f5 6 45cb76 21 8802ac 30 5b42ae 31 2f0077 32 898868 LS-8 59531d SL-12 3cbafa TY-20 8964d2 23 e741c0 24 e73e2c 26 cc6cf2 VA-40 914c3a 41 1325cb 42 1b3a08 50 905c89 51 ca8fb1 52 992853 SL-1 e3b064 2 f404d5 11 183e7a CL-6 102a92 9 accb97 PG-12 8e75fd 14 64a88e PT-CGR-5 3f7489 PT-EQD-2 ed82db DN-34 d5b0e7 AK-1 a0cc12 4 8d027b INK-31 d7ece8 BD-7 81d3da PT-GDP-1 a0e2cc P-SC-7 65e105 SF-34@WDS.1 00e2f6 SP-1 87c2cc 2 1f2df0 3 7b7bfb 4 51a802 10 6ffb0a 12 1309f9 SCC-T3 359377 4 e83741 10 084029 14 b8671c 15 fc9373 17 c36547 SCC-P5 6387d4 6 d362fd BD-10 8d473f 11 29d891 12 36b79c PT-FRM-6 daac17 P-1 5a3076 29 89eb8e Q-10 50b907 P-10 256ad3 35 4b32c0 31 28b15c BD-4 b3947b PT-SCR-1 25f6f5 CL-1 277ec4 AX-4 2eb6c1 INK-5 631a6d TY-7 e3e1e1 RP-1 d529bd AX-9 74e9a4 DN-1a 4fcc05 PT-GDP-2 386bb5 SL-3 468d78 SP-20 cfb11a PT-REV-3 d5e0d9 TY-10a 5e59f3 SL-3a d38939 RP-20 8888b0 21 ad2ba4 C1 66f8a9 2 32e3b2 3 3d5192 4 e59efd H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H4@RUBRIC 9ce1f3 H5@RUBRIC b3892d H6 0722fd 7 3d3d38 8 44c23b 9 fd82d1 10 fbd802 11 bef034 12 2de4f7 13 36f579 OC3 bb8551 4 00a5e1 7 81bde7 8 089b5e 10 ad6428 11 c55e70 14 18b2a5 L1 799b66 2 fecb99 3 901e56 4 6538d6 5 4d48a8 6 6e19d8 9 f4b4c0 10 d2ca35 11 9ebe19 CL-31 383ae0 INK-3 b9f1f1 4 fe5b27 P-LC-9 bc47bd SCC-01 8aa70b SF-10 f1a0d9 SL-10 9fe607 TY-2 510243 13 3d0f88 22 7e9b75 25 b0a223"}
+{"card":"stack","kind":"template","template":"stack","families":["addition","subtraction"],"match":{"templates":["stack"]},"config":"design/cards/stack/card.json","generated":"2026-10-23","indexSha":"ed32bdf58a41e14cceffd96fefef3a0bc6156109","bodySha":"bfb31c823932834b"}
+{"cited":"AK-2 AX-4 AX-9 BD-4 BD-7 BD-11 C1 CL-9 DN-1a H1 H2 H3 H4 H5 H6 H7 H8 H9 H10 H11 H12 H13 L1 L6 LR-4 LR-6 OC4 P-1 PG-12 PT-FRM-6 PT-GDP-1 PT-GDP-2 PT-REV-3 PT-SCR-1 RP-1 RP-20 SL-1 SL-2 SL-3 SL-3a SP-20 TY-10a VA-10","rules":"VA-1 12d322 2 26885a 4 b05d12 7 13eea3 VA-10@WDS 9d9099 VA-11@WDS a5ab88 VA-12@WDS 60049e VA-13@WDS 05d8bb VA-13a c2dfad 20 ef38e6 22 045140 23 04bd6f AK-2 d4709f TY-21 53ed7d SP-23 fe1461 H2@RUBRIC f5bba0 H4@RUBRIC 9ce1f3 H5@RUBRIC b3892d H6 0722fd 8 44c23b 13 36f579 L1 799b66 VA-3 770d75 5 1337f5 6 45cb76 21 8802ac 30 5b42ae 31 2f0077 32 898868 LS-8 59531d SL-12 3cbafa TY-20 8964d2 23 e741c0 24 e73e2c 26 cc6cf2 VA-40 914c3a 41 1325cb 42 1b3a08 50 905c89 51 ca8fb1 52 992853 SL-1 e3b064 2 f404d5 11 183e7a CL-6 102a92 9 accb97 PG-12 8e75fd 14 64a88e PT-CGR-5 3f7489 PT-EQD-2 ed82db DN-34 d5b0e7 AK-1 a0cc12 4 8d027b INK-31 d7ece8 BD-7 81d3da PT-GDP-1 a0e2cc P-SC-7 65e105 SF-34@WDS.1 00e2f6 SP-1 87c2cc 2 1f2df0 3 7b7bfb 4 51a802 10 6ffb0a 12 1309f9 SCC-T3 359377 4 e83741 10 084029 14 b8671c 15 fc9373 17 c36547 SCC-P5 6387d4 6 d362fd BD-10 8d473f 11 29d891 12 36b79c PT-FRM-6 daac17 P-1 5a3076 29 89eb8e Q-10 50b907 P-10 256ad3 35 4b32c0 31 28b15c BD-4 b3947b PT-SCR-1 25f6f5 CL-1 277ec4 AX-4 2eb6c1 INK-5 631a6d TY-7 e3e1e1 RP-1 d529bd AX-9 74e9a4 DN-1a 4fcc05 PT-GDP-2 386bb5 SL-3 468d78 SP-20 cfb11a PT-REV-3 d5e0d9 TY-10a 5e59f3 SL-3a d38939 RP-20 8888b0 21 ad2ba4 C1 66f8a9 2 32e3b2 3 3d5192 4 e59efd H1@RUBRIC bf4b29 H3@RUBRIC d7f21f H7 3d3d38 9 fd82d1 10 fbd802 11 bef034 12 2de4f7 OC3 bb8551 4 00a5e1 7 81bde7 8 089b5e 10 ad6428 11 c55e70 14 18b2a5 L2 fecb99 3 901e56 4 6538d6 5 4d48a8 6 6e19d8 9 f4b4c0 10 d2ca35 11 9ebe19 CL-31 383ae0 INK-3 b9f1f1 4 fe5b27 P-LC-9 bc47bd SCC-01 8aa70b SF-10 f1a0d9 SL-10 9fe607 TY-2 510243 13 3d0f88 22 7e9b75 25 b0a223"}
 -->
 # Spec card: Stacked arithmetic (the `stack` template)
 
@@ -133,58 +133,193 @@ From the rule-id index (`design/cards/rule-index.json`, sha `ed32bdf58a41`). An 
 - **TY-21** ✱ (WDS) Any regroup scaffold (carry boxes, Tens / Ones boxes, subtraction headroom) forces **0.95 em** tracks in both looks, because a pupil cannot write in a box narrower than about 4.4 mm.
 - **SP-23** ✱ (WDS) Regroup boxes are reachable by tap or the Up arrow, are never auto-focused, never block submission, and are **never marked** right or wrong.
 
-### 4b. Also applies — ids only (121 rules)
+### 4a+. Caps — the hard caps critics cite most on this card, quoted in full (7 rules)
 
-Each id's full text is in `design/cards/rule-index.json` (look it up by id) and in the standard it names; open it when the rule is in play. Grouped by the heading that defines them:
+**Hard caps critics cite most on these cards (RUBRIC §4, LESSONS_LEARNED)**
 
-- WDS · 2.3 Grid sizing — `PG-12` `PG-14`
-- WDS · 3.1 Family — `TY-2` `TY-7`
-- WDS · 3.2 Size table — `TY-10a` `TY-13`
-- WDS · 3.3 em and track tables — `TY-20` `TY-22` `TY-23` `TY-24` `TY-25` `TY-26`
-- WDS · 4.1 Ink — `INK-3` `INK-4` `INK-5` `INK-31`
-- WDS · 5. Line-style and corner semantics — `LS-8`
-- WDS · 6.1 Blank width function — `SL-1` `SL-2` `SL-3` `SL-3a` `SL-10` `SL-11` `SL-12`
-- WDS · 7.1 Cell construction — `CL-1` `CL-6` `CL-9`
-- WDS · 7.3 Black number tab — `CL-31`
-- WDS · 9.1 Bands — `BD-4` `BD-7`
-- WDS · 9.2 Instruction line — `BD-10` `BD-11` `BD-12`
-- WDS · 10.1 The stack — `VA-3` `VA-5` `VA-6`
-- WDS · 10.3 Subtraction: Tens / Ones … — `VA-21`
-- WDS · 10.4 Place-value heads — `VA-30` `VA-31` `VA-32`
-- WDS · 10.5 Decimals and separators — `VA-40` `VA-41` `VA-42`
-- WDS · 10.6 Multiplication with partial … — `VA-50` `VA-51` `VA-52`
-- WDS · 11.1 Rules for every drawing — `RP-1`
-- WDS · 11.4 Counters and counting pictures — `RP-20` `RP-21`
-- WDS · 12.1 Ceilings by page role — `DN-1a`
-- WDS · 12.4 Page types with their own … — `DN-34`
-- WDS · 13.2 Trace and model marks — `SF-10`
-- WDS · 13.3 Fact strategy cue and its … — `SF-34@WDS.1`
-- WDS · 14. Answer key = facsimile — `AK-1` `AK-4`
-- WDS · 15.1 What must match — `SP-1` `SP-2` `SP-3` `SP-4`
-- WDS · 15.2 What may differ — `SP-10` `SP-12`
-- WDS · 15.3 Entry and keyboard — `SP-20`
-- WDS · 16. Accessibility — `AX-4` `AX-9`
-- PED · 2.1 The Opener: bands in fixed order — `P-LC-9`
-- PED · 4.3 Scaffold levels 3 to 0 — `P-SC-7`
-- PED · 12. Content-quality rubric — `Q-10`
-- PED · Options and governance — `P-29` `P-31`
-- PED · Sequencing — `P-1` `P-10` `P-35`
-- PAGE · 1.1 Page frame — `PT-FRM-6`
-- PAGE · 1.10 Screen conventions shared by … — `PT-SCR-1`
-- PAGE · 2.3 Guided page — `PT-GDP-1` `PT-GDP-2`
-- PAGE · 2.8 Review — `PT-REV-3`
-- PAGE · 3.1 Computation grid — `PT-CGR-5`
-- PAGE · 3.2 Equation drill — `PT-EQD-2`
-- SCC · 0.4 Module map and layers — `SCC-01`
-- SCC · 2.2 ctx — `SCC-T3` `SCC-T4`
-- SCC · 2.4 States — `SCC-T10`
-- SCC · 2.6 Slots — `SCC-T14` `SCC-T15`
-- SCC · 2.7 answerKey — `SCC-T17`
-- SCC · 3.3 renderCell, workedSteps, … — `SCC-P5` `SCC-P6`
-- RUBRIC · 2. The four criteria — `C1` `C2` `C3` `C4`
-- RUBRIC · 4. Hard caps — `H1@RUBRIC` `H2@RUBRIC` `H3@RUBRIC` `H4@RUBRIC` `H5@RUBRIC` `H6` `H7` `H8` `H9` `H10` `H11` `H12` `H13`
-- ORUBRIC · 3. Hard caps — `OC3` `OC4` `OC7` `OC8` `OC10` `OC11` `OC14`
-- LL · The recurring failure classes — `L1` `L2` `L3` `L4` `L5` `L6` `L9` `L10` `L11`
+- **H2@RUBRIC** ✱ (RUBRIC) Information needed to answer is hidden or illegible (black on black, clipped, overlapped, below 8 pt) — C1 ≤ 4
+- **H4@RUBRIC** ✱ (RUBRIC) Colour, gradient, shadow, emoji or a non-Andika face inside a printed sheet or the on-screen cell — C4 ≤ 5
+- **H5@RUBRIC** ✱ (RUBRIC) A page wasted: a page < 50 % used while its role expects more, a lone item on a page, a split cell, a mid-page footer — C3 ≤ 5
+- **H6** ✱ (RUBRIC) Screen: horizontal page scroll, an input off-screen, a touch target < 44 px on tablet/phone — C1 ≤ 5
+- **H8** ✱ (RUBRIC) A production item turned into multiple choice on screen (SP-3), or a doubled answer slot — C4 ≤ 6
+- **H13** ✱ (RUBRIC) Wasted space inside cells (owner ruling 2026-09-25): a cell whose content leaves an empty band of ≥ 30 % of the cell's height (or width), or a row/section of a mixed sheet sized for a taller item than it holds. Measure it; do not eyeball it past. — C3 ≤ 6
+- **L1** ✱ (LL) **Size S ignored** — same grid and drawing at S as at L (options R3: 87 skills) — Every drawing sizes from `ctx.metrics` (never fixed mm/px); decide the S/M/L grids on paper before coding — `ws-columns` + NEW `--sizes` check: S must fit more items or more columns than L, drawings must scale
+
+### 4b. Also applies — one line each (112 rules)
+
+Each line is the rule's first sentence; its full text is in `design/cards/rule-index.json` (look it up by id) and in the standard it names. Open it when the rule is in play. Grouped by the heading that defines them:
+
+- WDS · 2.3 Grid sizing
+  - `PG-12` Safety: fixed heights on a page total no more than gridH - 1 mm.
+  - `PG-14` All spare height in a cell goes to the answer zone (below the sum rule, below the visual, or into …
+- WDS · 3.1 Family
+  - `TY-2` Only weights 400 and 700 exist.
+  - `TY-7` Fractions are always stacked over a bar, including inside story text.
+- WDS · 3.2 Size table
+  - `TY-13` Digit line-height is 1.15.
+- WDS · 3.3 em and track tables
+  - `TY-20` Stacked arithmetic is a CSS grid with one fixed track per digit plus one operator track.
+  - `TY-22` Vertical facts (single-digit and to-12 facts in fact layouts) always use 0.72 em tracks and T = 3 in …
+  - `TY-23` Track floor for multi-digit stacked arithmetic: a track is never narrower than 0.7 x Hw, i.e. 4.2 / …
+  - `TY-24` A decimal point or a thousands comma takes its own 0.3 em separator track, aligned down every row of …
+  - `TY-25` Horizontal equations keep natural digit spacing with 1 em slots for each operator and for `=`.
+  - `TY-26` Every cell in a section uses the T of the section's widest problem, so ones digits align down the …
+- WDS · 4.1 Ink
+  - `INK-3` Grey is used for exactly three things: (a) the fill of shaded parts (fraction parts, decimal grid …
+  - `INK-4` Grey strokes are 1 pt, never thinner, so they survive copying.
+  - `INK-5` Solid black fill is allowed only where the smaller dimension of the filled shape is 7 mm or less …
+  - `INK-31` *Answer keys only* (owner ruling 2026-09-27; colour changed to reddish orange 2026-10-02; BUILT …
+- WDS · 5. Line-style and corner semantics
+  - `LS-8` **Dashed box = the unknown digit** (owner ruling 2026-09-19).
+- WDS · 6.1 Blank width function
+  - `SL-1` No answer line or stand-alone box is narrower than 14 mm.
+  - `SL-2` One width per section: every blank in a section uses B for the section's longest answer, so blank …
+  - `SL-3` An answer after `=` is a **line**.
+  - `SL-10` A missing-digit box is dashed and every regroup, carry and headroom box is solid, so the two are …
+  - `SL-11` **Slot radius** (owner ruling 2026-09-25: "the square boxes should be slightly rounded").
+  - `SL-12` **Digit strip** (owner ruling 2026-09-25: "they could be one box actually with dividers between …
+- WDS · 7.1 Cell construction
+  - `CL-1` A page body is one outer frame (1.5 pt) containing cells that share borders like a table.
+  - `CL-6` The response slot sits in the same position in every cell of a section: under the sum rule for …
+  - `CL-9` In a 1-column stacked-arithmetic layout the stack is centred in the leftmost 62 mm of the cell …
+- WDS · 7.3 Black number tab
+  - `CL-31` Tab size follows the **effective digit size** of the section (after the ladder), not the preset: | …
+- WDS · 9.1 Bands
+  - `BD-4` The Steps band sits to the right of the Model cell (Steps width 40-45% of the band), not above it …
+  - `BD-7` Model content prints black.
+- WDS · 9.2 Instruction line
+  - `BD-10` One instruction per section: **at most 12 words in one to three short imperative sentences** …
+  - `BD-11` Each sentence starts with a verb from the print verb list in `PEDAGOGY_STANDARD.md` section 10.2 …
+  - `BD-12` Words that may never start or appear in a printed instruction: tap, click, type, drag, select …
+- WDS · 10.1 The stack
+  - `VA-3` **Rule line**: 1.5 pt, from the left edge of the operator track to the right edge of the ones track …
+  - `VA-5` The stack is anchored to the top of the cell at label + 2 mm and centred horizontally (CL-9 for 1 …
+  - `VA-6` Minimum cell width = `T x track + separators x 0.3 em + 2 x sidePad` + shared borders; minimum cell …
+- WDS · 10.3 Subtraction: Tens / Ones …
+  - `VA-21` At L, in Model and Guided cells, the headroom row holds boxes above **every** digit of the top …
+- WDS · 10.4 Place-value heads
+  - `VA-30` Default: **bold letters H T O (Th, TTh)** at zone-label size in a heads row of 4 / 5 / 6 mm, each …
+  - `VA-31` The full words (Hundreds, Tens, Ones) are printed **once**: in the first Model cell beside the stack …
+  - `VA-32` Dialog option per section: **words / letters / none**. "Words" is honoured only where every track …
+- WDS · 10.5 Decimals and separators
+  - `VA-40` The decimal point has its own 0.3 em track, aligned on every row and in the answer row.
+  - `VA-41` Ragged decimals in Guided cells show grey trailing zeros.
+  - `VA-42` Commas are printed for numbers of 5 or more digits and optional (dialog) for 4 digits; each takes a …
+- WDS · 10.6 Multiplication with partial …
+  - `VA-50` Each partial product gets a full row across all T tracks at 6 / 8 / 10 mm.
+  - `VA-51` Model and Guided cells rule the partial rows with 0.75 pt track boxes; Independent cells keep the …
+  - `VA-52` A carry row above the top factor (6 / 7 / 8 mm) follows VA-10 and VA-12.
+- WDS · 11.1 Rules for every drawing
+  - `RP-1` **Never draw the answer.** A visual shows the given information and the workspace, nothing that …
+- WDS · 11.4 Counters and counting pictures
+  - `RP-20` Two object sets; the teacher picks one per section in the dialog ("Objects: counters / pictures"): …
+  - `RP-21` One kind of object per cell, in tidy rows of at most 5, left-aligned, equal pitch (item + 3 mm) …
+- WDS · 12.1 Ceilings by page role
+  - `DN-1a` (2026-09-25, `design/audit/LESSONS_LEARNED.md` L1) A kit Independent / More Practice page packed to …
+- WDS · 12.4 Page types with their own …
+  - `DN-34` Problem mix per section is teacher-selectable: **one problem type + one notation**, or …
+- WDS · 13.2 Trace and model marks
+  - `SF-10` Trace digits use the working digit face and size in flat grey (dotted-outline in photocopy-safe …
+- WDS · 13.3 Fact strategy cue and its …
+  - `SF-34@WDS.1` **Touch numerals** (owner report 2026-10-03; `js/modules/sheet/touchdots.js`; geometry per …
+- WDS · 14. Answer key = facsimile
+  - `AK-1` Every generated page has an answer key, and the key is a **facsimile**: the same page, same paper …
+  - `AK-4` The key is generated from the same seed and the same layout result as the pupil page.
+- WDS · 15.1 What must match
+  - `SP-1` The on-screen question region is the same cell: same template, same SVG builders, same Andika, same …
+  - `SP-2` Inside `.ws-cell` everything is `--ws-ink` on `--ws-paper` with square corners, **in light and dark …
+  - `SP-3` Parity of task: the screen never converts a production item into multiple choice unless the paper …
+  - `SP-4` The instruction string is the print string with only its action wording swapped per the fixed map …
+- WDS · 15.2 What may differ
+  - `SP-10` Minimum touch target 44 x 44 px for every input, option, check box, part-to-shade and box-to-tap …
+  - `SP-12` Layout widths: card paper width 327 / 640 / 720 px (capped) at 375 / 768 / 1440.
+- WDS · 15.3 Entry and keyboard
+  - `SP-20` Entry order follows the algorithm: add / subtract / multiply fill right to left (initial focus on …
+- WDS · 16. Accessibility
+  - `AX-4` Predictable routine: Name top-left, Score top-right of the field row, label top-left of the cell …
+  - `AX-9` Reduced motion: feedback badges and hints appear without animation when `prefers-reduced-motion` is …
+- PED · 2.1 The Opener: bands in fixed order
+  - `P-LC-9` Algorithms with 3 or more steps also get a **scripted Model page**: one problem redrawn once per …
+- PED · 4.3 Scaffold levels 3 to 0
+  - `P-SC-7` Place-value labels default to bold letters (H T O, and Th) above the columns.
+- PED · 12. Content-quality rubric
+  - `Q-10` Duplicates — At most 10% duplicate items in a set of 20 where the item space allows; never two …
+- PED · Options and governance
+  - `P-29` **Print and screen are the same item.** The on-screen card is the printed cell with inputs in place …
+  - `P-31` **Options, not policy.** These are remembered teacher check boxes, with these defaults: | Option | …
+- PED · Sequencing
+  - `P-1` **One new thing per step.** Compared with the same page role of the previous step, exactly one of …
+  - `P-10` **Seed edge cases and non-examples.** Every Independent, Review and Test set of 6 or more items …
+  - `P-35` **"Within N" bounds the answer, not the operands** (owner ruling 2026-09-19; numbered at the end of …
+- PAGE · 1.1 Page frame
+  - `PT-FRM-6` The title is one centred bold line in the form "I Can <verb> <object> (<constraint>)": "I Can" …
+- PAGE · 1.10 Screen conventions shared by …
+  - `PT-SCR-1` The question card and every skill visual render the same black-and-white cell as print (same DOM …
+- PAGE · 2.3 Guided page
+  - `PT-GDP-1` The fade inside the page is monotone: cell 1 is level 3, the rest of row 1 is level 2, every later …
+  - `PT-GDP-2` The Steps strip is two text columns, 3 lines at most; longer step lists move to a Scripted Model …
+- PAGE · 2.8 Review
+  - `PT-REV-3` Earlier-step items make up 25 to 35% of the labelled cells; the lint checks the ratio.
+- PAGE · 3.1 Computation grid
+  - `PT-CGR-5` The operator never moves next to a shorter operand.
+- PAGE · 3.2 Equation drill
+  - `PT-EQD-2` In a single-type section operands are right-aligned in fixed tracks so signs and blanks align down …
+- SCC · 0.4 Module map and layers
+  - `SCC-01` The kit (`js/modules/sheet/**`) is pure ES modules.
+- SCC · 2.2 ctx
+  - `SCC-T3` A template MUST NOT choose a font size, a line weight or a grey.
+  - `SCC-T4` Content never shrinks.
+- SCC · 2.4 States
+  - `SCC-T10` Geometry is identical across states.
+- SCC · 2.6 Slots
+  - `SCC-T14` Digit entry order follows the algorithm, not the DOM: right to left for add, subtract and multiply …
+  - `SCC-T15` Parity: a slot the pupil writes on paper is typed on screen.
+- SCC · 2.7 answerKey
+  - `SCC-T17` Regroup boxes, scratch space and think boxes are always `graded: false`.
+- SCC · 3.3 renderCell, workedSteps, …
+  - `SCC-P5` Step text uses "regroup", never "carry" or "borrow".
+  - `SCC-P6` `wrongAnswer(q).value` differs from `q.ans`, has the same type and magnitude, and comes from a real …
+- RUBRIC · 2. The four criteria
+  - `C1` Ease of use — can the pupil do it alone?
+  - `C2` Educational value — does it teach the named skill well? - The items do what the **name** says, all …
+  - `C3` Spacing and layout — is the page (or screen) well spaced?
+  - `C4` Standard fidelity — does it look like the owner's workbooks?
+- RUBRIC · 4. Hard caps
+  - `H1@RUBRIC` Any item's answer key is wrong, missing, or does not match the pupil's slots — C2 ≤ 3
+  - `H3@RUBRIC` An item contradicts the skill's name — C2 ≤ 4
+  - `H7` A screen verb on paper or a paper verb on screen — C1 ≤ 6
+  - `H9` No room to write or draw the answer — C1 ≤ 5
+  - `H10` Answer key is a list rather than a facsimile of the page — C4 ≤ 6
+  - `H11` A page type the skill must support cannot be produced — all four = 1 for that version
+  - `H12` The task does not make sense on paper: the space to draw or build the model is smaller than the …
+- ORUBRIC · 3. Hard caps
+  - `OC3` A value works on screen but not in print, or in print but not on screen — O4 ≤ 5
+  - `OC4` A value breaks its own promise (a fact outside the ticked constant; a number over "Numbers to" …
+  - `OC7` One control moves two things at once (number size and support) — P-1 — O2 ≤ 6
+  - `OC8` A support level removes a **structural** scaffold, or a hint scaffold cannot be faded at all — O3 ≤ …
+  - `OC10` No option is shown at all and the skill has both a number size and a hint scaffold — O1 ≤ 3, O2 ≤ 3 …
+  - `OC11` Two controls duplicate each other, or a value label repeats — O5 ≤ 6
+  - `OC14` The skill ignores Size or Columns (same layout at S and L, or stays 1 column when 2 fit) — O6 ≤ 5
+- LL · The recurring failure classes
+  - `L2` **Wasted space** — empty bands in cells, 1–3 items per page, blank page strips (R3, R4, options …
+  - `L3` **Answer given away** — result drawn (combine shapes), slot width = answer length, regroup boxes …
+  - `L4` **Wrong or incoherent content** — unshaded "shaded" circles, axis 0, 1.8, 3.7…, carries on 1-digit …
+  - `L5` **Paper ≠ screen** — doubled answer areas, paper verbs on screen, MC on screen but writing on paper …
+  - `L6` **Instructions / steps / titles don't follow the item** — guided steps for other numbers, "Write the …
+  - `L9` **Self-grades too generous** — lanes report 8, critics find 5–6 — Grade your own renders against the …
+  - `L10` **Answers follow a pattern or never vary** — correct choice alternates A/B or cycles every 3–5 …
+  - `L11` **Steps squeezed beside the drawing** — a model / anchor cell's step list set in a strip one word …
+
+### 4c. Cited by critics on this family, but not applying to this template (2 rules)
+
+Listed so the card-coverage test sees them. Do not apply them to this template.
+
+**Owner exceptions cited on the multiplication family** — they govern count rows (TY-10a, SL-3a), which the stack never draws; listed only because critics cited them on this family
+
+- WDS · 3.2 Size table
+  - `TY-10a` (2026-10-02, OWNER EXCEPTION to "content never shrinks", **count-by rows only** …
+- WDS · 6.1 Blank width function
+  - `SL-3a` (2026-10-03, OWNER EXCEPTION, **count rows only**: the `count-row` cell …
 
 ## 5. Owner rulings
 
@@ -220,20 +355,20 @@ For answer keys, `wrongAnswer`, error analysis, True or False? and Reason It (P-
 **Options declared today** (`js/modules/skill-options.js`; id, label, values, skills that declare it):
 
 - `band` Numbers to: 10 / 20 (42)
-- `level` Support level: 3 / 2 / 1 (38)
-- `notation` How it is written: stacked / across (19)
-- `cover` Which problems get it: whole / needed / fade (13)
-- `mix` Supports that clash: section / problem (13)
-- `support` Support: touch / touchall / startarrow / boxsign (13)
-- `regroup` Regrouping (carrying): none / mixed / always (8)
-- `regroup` Regrouping (borrowing): none / mixed / always (8)
-- `zeroPlace` Across zeros (5,003 − 2,847): some / always (8)
-- `unknown` What is missing: answer / first / second / mixed (2)
-- `band` Start numbers to: 500 / 1000 / 10000 (1)
-- `task` Operation: 0 / 1 (1)
-- `tiles` Numbers to add: (Dealt across the page (3 and 4)) / 3 / 4 (1)
-- `tiles` Top number: 21 / 31 (1)
-- `tiles` Digits × digits: (Tables facts to 12 × 12 (follows Max Number)) / 11 / 21 / 31 / 22 (1)
+- `level` Support level: 3 — worked example, traced (3) / 2 — hints shown (2) / 1 — structure only (1) (38)
+- `notation` How it is written: Stacked (8 above + 7, with a rule under it) (stacked) / Across (8 + 7 = __) (across) (19)
+- `cover` Which problems get it: Every problem (whole) / Only the problems that need it (needed) / Fade down the page (all, then less, then none) (fade) (13)
+- `mix` Supports that clash: Section by section (section) / Problem by problem (problem) (13)
+- `support` Support: Touch dots: count on (on the smaller number) (touch) / Touch dots: count all (touchall) / Start arrow over the ones column (startarrow) / The sign in a box, named (boxsign) (13)
+- `regroup` Regrouping (carrying): Never (none) / Some items (mixed) / Every item (always) (8)
+- `regroup` Regrouping (borrowing): Never (none) / Some items (mixed) / Every item (always) (8)
+- `zeroPlace` Across zeros (5,003 − 2,847): Now and then (some) / Every item (always) (8)
+- `unknown` What is missing: The answer (8 + 7 = __) (answer) / The first number (__ + 7 = 15) (first) / The second number (8 + __ = 15) (second) / Mixed (mixed) (2)
+- `band` Start numbers to: 500 (304 − 126) (500) / 1,000 (905 − 367) (1000) / 10,000 (5,003 − 2,847) (10000) (1)
+- `task` Operation: Adding (0) / Subtracting (1) (1)
+- `tiles` Numbers to add: (Dealt across the page (3 and 4)) / 3 numbers (3) / 4 numbers (4) (1)
+- `tiles` Top number: 2 digits (47 × 6) (21) / 3 digits (215 × 6) (31) (1)
+- `tiles` Digits × digits: (Tables facts to 12 × 12 (follows Max Number)) / 1-digit × 1-digit (7 × 8) (11) / 2-digit × 1-digit (34 × 6) (21) / 3-digit × 1-digit (215 × 4) (31) / 2-digit × 2-digit (34 × 26) (22) (1)
 
 **Preset skills on these hosts** (`js/modules/skill-presets.js`): `multiplication:mult_2by1_column` → `multiplication:multiply` {"tiles":21}; `multiplication:mult_2by2_standard` → `multiplication:multiply` {"tiles":22}; `multiplication:mult_3by1_column` → `multiplication:multiply` {"tiles":31}
 

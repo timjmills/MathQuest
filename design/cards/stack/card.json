@@ -103,6 +103,20 @@
    ]
   },
   {
+   "title": "Hard caps critics cite most on these cards (RUBRIC §4, LESSONS_LEARNED)",
+   "caps": true,
+   "full": true,
+   "rules": [
+    "H2@RUBRIC",
+    "H4@RUBRIC",
+    "H5@RUBRIC",
+    "H6",
+    "H8",
+    "H13",
+    "L1"
+   ]
+  },
+  {
    "title": "Stack geometry, tracks, slots and separators",
    "chars": 120,
    "rules": [
@@ -197,12 +211,14 @@
    ]
   },
   {
-   "title": "Owner exceptions cited on the multiplication family (count rows only; they do not apply to the stack)",
+   "title": "Owner exceptions cited on the multiplication family",
    "chars": 90,
    "rules": [
     "TY-10a",
     "SL-3a"
-   ]
+   ],
+   "applies": false,
+   "reason": "they govern count rows (TY-10a, SL-3a), which the stack never draws; listed only because critics cited them on this family"
   },
   {
    "title": "Base-10 picture beside the stack (`stack_base10_support`)",

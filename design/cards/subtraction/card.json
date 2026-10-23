@@ -94,6 +94,20 @@
    ]
   },
   {
+   "title": "Hard caps critics cite most on these cards (RUBRIC §4, LESSONS_LEARNED)",
+   "caps": true,
+   "full": true,
+   "rules": [
+    "H2@RUBRIC",
+    "H4@RUBRIC",
+    "H5@RUBRIC",
+    "H6",
+    "H8",
+    "H13",
+    "L1"
+   ]
+  },
+  {
    "title": "Stack geometry, tracks, slots and separators",
    "chars": 120,
    "rules": [
