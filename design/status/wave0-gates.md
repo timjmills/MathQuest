@@ -236,3 +236,12 @@ session 1 FAIL 139 min; today's list 27.3 / 28.1 / 27.8 min. The 2026-10-23 time
 from the child sessions' reports — they were never committed there) are now in `design/audit/baselines/deploy-gate-timings.jsonl`.
 A10 future-dated run files clear nothing; A11 run files without `baseline` after 2026-10-23T19:46Z clear nothing; A12
 options-pin `--resume` keyed by commit. Self-tests: deploy 91, matrix 171 (A10/A11 mutations each fail it), options-pin 67.
+
+## Timed deploy-gate runs, confirmation (on ab511284, viewport-check moved to session 3)
+| Gate session | Runs | Wall clock | Verdict |
+|---|---|---|---|
+| 1 | 1 | 26.1 min | OK (1 FLAKE: ws-teacher-shell, an aborted `css/fonts/andika.css` load — the harness exemption covered only .woff files; widened to css/fonts/, 3/3 solo runs OK) |
+| 2 | 3 | 28.4 / 28.4 / 28.4 min | OK, every gate OK, 0 s slot waits |
+| 3 | 3 | 10.8 / 10.8 / 10.8 min | OK (matrix WARNING per the owner ruling: no nightly / full baseline yet; viewport-check ≈ 648 s) |
+With the earlier session 1 runs (27.9 / 28.4 / 26.4 min), every session has three timed runs ≤ 30 min. Session 3 will
+grow to ≈ 28 min (predicted by `--budget`) once the matrix renders its ≤ 500 documents after the full baseline.
