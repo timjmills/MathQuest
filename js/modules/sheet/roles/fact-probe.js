@@ -125,7 +125,10 @@ export function plan(input = {}) {
         // digits never shrink to fit (PG-20), so the probe takes the widest column count every
         // fact fits (measured, DN-10), as many rows as their height allows, and runs on to a
         // second page when 20 facts need it - the probe stays 20 facts in the chosen form.
-        const cols = bestCols(items, [4, 3, 2], ctx);
+        // The widest count the host's measurement AND the layout's digit clamp (12.3, with the
+        // thousands separators) both accept: a measured fit the clamp refuses gives hMinAt no
+        // layout (Infinity), which printed one row a page (SU-C pilot, 6-digit stacks at S).
+        const cols = [4, 3, 2].find((c) => fitsAt(items, c, ctx) && Number.isFinite(hMinAt(items, c, ctx))) || bestCols(items, [4, 3, 2], ctx);
         const h = hMinAt(items, cols, ctx);
         const rowsFit = Math.max(1, Math.floor(G / (Number.isFinite(h) ? h : G)));
         // the pages share the facts evenly (a rebalanced last page, PG-21), never a short tail

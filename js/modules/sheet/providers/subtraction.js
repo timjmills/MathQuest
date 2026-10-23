@@ -313,15 +313,24 @@ export function columnSubNoRegroup(a, b) {
         if (c.lead) return { text: `${NR_TITLE(c.k)}: ${c.top} − ${c.bot} = 0. Leave the box empty.`, mark };
         return { text: `${NR_TITLE(c.k)}: ${c.top} − ${c.bot} = ${c.res}. Write ${c.res}.`, mark };
     };
+    // Four steps at every size: a worked-example anchor holds four lines beside the stack, and a
+    // fifth overflowed the anchor cell at 4 digits and up (SU-C pilot precritic). From 4 digits
+    // the places left of the tens are one step: the same move, place by place.
     const out = [];
-    const each = cols.length <= 5 ? cols : cols.slice(0, 4);
+    const each = cols.length <= 3 ? cols : cols.slice(0, 2);
     for (const c of each) { const l = line(c); out.push(step(l.text, l.mark)); }
-    if (cols.length > 5) {
-        const rest = cols.slice(4).map(line);
-        out.push(step(rest.map((l) => l.text).join(' '), rest.flatMap((l) => l.mark.filter((m) => !/^ring:/.test(m.slot)))));
+    if (cols.length > 3) {
+        const rest = cols.slice(2);
+        // up to two more places print their sums; past that the line names the move only, so
+        // the step stays one short line beside a six-digit stack
+        const sums = rest.length <= 2 ? `: ${rest.map((c) => (c.bot === null ? `${c.top}` : `${c.top} − ${c.bot} = ${c.res}`)).join(', ')}` : '';
+        const lead = rest.some((c) => c.lead) ? ' A 0 at the front is not written: leave that box empty.' : '';
+        out.push(step(`${NR_TITLE(2)} to ${NR_PLACES[rest[rest.length - 1].k]}, the same way${sums}.${lead}`,
+            rest.flatMap((c) => (c.lead ? [] : [{ slot: NR_PLACES[c.k], value: String(c.res) }]))));
+        out.push(step(`The answer is ${fmt(a - b)}.`, [{ slot: 'answer', value: String(a - b) }]));
+    } else {
+        out.push(step(`Check: ${fmt(a - b)} + ${fmt(b)} = ${fmt(a)}.`));
     }
-    if (out.length < 5) out.push(step(`Check: ${fmt(a - b)} + ${fmt(b)} = ${fmt(a)}.`));
-    else out.push(step(`The answer is ${fmt(a - b)}.`, [{ slot: 'answer', value: String(a - b) }]));
     return clampSteps(out);
 }
 
