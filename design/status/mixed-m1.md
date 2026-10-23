@@ -124,3 +124,11 @@ on anchor-mode pages. Rebuild at Opus medium (failed round).
 | Scope proof by eye | Hand the critic a before/after pixel-diff box per page and the per-cell band numbers (`bands.py`) |
 | No anchors-off baseline to compare a no-example skill against | Render an anchors='off' baseline per skill |
 | The round-1 fixer built at low on an uncertified pair (anchors side layout) | Rule 0a: first builds on an uncertified pair run at medium |
+
+Owner rulings via the lead, 2026-10-23 22:55 (anchors; the lead asked for them in the current medium rebuild):
+- the six low-fill skills on side-anchor pages (add, add_50_no_regroup, sub_50_no_regroup, shade_fraction, money_count,
+  place_value_10x) get a four-column [twin | problem | twin | problem] side layout;
+- a twin matches the pupil's problem exactly (no place headings or boxed answer row the pupil's stack lacks);
+- model step text ≈ 9.2 pt at M is accepted for read-only model text; TY-11's 11 pt applies to text the pupil acts on;
+- S5 grey vs black: the standard wins (grey if S5 says so; else black and logged).
+- Kit-wide top alignment (CL-4) still pending: the owner wants an example first; anchor pages only meanwhile.
