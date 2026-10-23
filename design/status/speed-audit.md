@@ -17,7 +17,7 @@ Scripts and raw logs: `tests/audit-runs/speed/` (git-ignored folder; the timing 
 | Worksheet checking (`ws-print-lint --source kit`) | **Same as before (no tool change yet)** | full `redone` sweep, 225 documents: **20.1 min, 5.4 s a document** (plan says 3–4 s); 458 findings in 33 documents once 17 rows that failed for a missing `pymupdf` are removed, which is exactly the pinned baseline | E1 `--affected` and the coverage matrix are not built yet |
 | Deploy gates | **Not yet measurable** | baseline ≈ 80 min one after another (§1.1); `ws-screen-slots` alone 23.1 min here (22 in the log); target ≤ 30 min | `ws-deploy-gates.sh` and the `--category` / `--shard` flags are still being built (W0-A, running) |
 | The lanes themselves | **On plan so far** | 4 lanes, 10–60 min old; every builder and critic call so far on `mq-opus-medium` (Q-S7 met); W0-B has built 5 of its 5 tools in ≈ 25 min and is in critic r1 | too early for rounds; see "Lanes" |
-| New tools already built | **Fast, as the plan asks** | `ws-envelope --self-test` 2.4 s, `--engine all` 1.4 s; `ws-spec-card` checks 0.06–0.6 s; `ws-status-index --self-test` 0.8 s; `ws-integrate --self-test` 10.2 s; stack spec card 39 KB (≈ 10 k tokens) vs ≈ 600 KB of standards | the brief-size target (≈ 185 k → ≈ 10 k tokens) is met by the one card that exists |
+| New tools already built | **Fast, as the plan asks** | `ws-node-lint` 0.4 s for one skill, 46 s for every live skill (target: seconds — met); `ws-backtest` 3.9 s (5 PASS, 5 PENDING); `ws-envelope --self-test` 2.4 s, `--engine all` 1.4 s; `ws-spec-card` checks 0.06–0.6 s; `ws-status-index --self-test` 0.8 s; `ws-integrate --self-test` 10.2 s; stack spec card 39 KB (≈ 10 k tokens) vs ≈ 600 KB of standards | the brief-size target (≈ 185 k → ≈ 10 k tokens) is met by the one card that exists |
 
 **Plainly:** nothing has yet gone through the new process, so there is no measured speed-up in skill making and no measured
 slowdown. The plan's own trigger (§4.4) cannot fire until the first family made as data runs; the pilot below is how to get
@@ -123,9 +123,29 @@ medium cost money, not wall time. Not an intervention, a note for the next tally
 
 ## 3. Pilot plan (for the lead to start; I do not build it)
 
-**When:** as soon as W0-A merges `ws-precritic` (S1) and `ws-node-lint` (S2 part 1). The spec-card tool exists already
-(W0-B). Do not wait for M4 or E1's certificate: the pilot measures the *process* (card → one builder run → precritic →
-one critic), which is what the §4.4 trigger is about.
+**When — the exact readiness condition** (all five true on the W0 branches; checked by the commands given):
+
+1. **`ws-precritic` exists and runs on a pilot skill.** `tests/scripts/ws-precritic.cjs` is committed on
+   `claude/sweet-newton-c8wrv1-wip-wave0-gates`, and `node tests/scripts/ws-precritic.cjs --skill subtraction:sub_100_no_regroup`
+   prints its PASS / FAIL table and exits 0 on that tip. Its `--skill` row runs at least `ws-node-lint`,
+   `ws-providers-unit --skill`, `ws-content-audit --skill`, `ws-print-lint --source kit --baseline` at S / M / L, `ws-screen-slots
+   --baseline`, `ws-chromebook-fit --skills`, `ws-code-snapshot` and `ws-boot-smoke`, with the pinned baselines
+   (`design/audit/baselines/print-lint.json`, `screen-slots.json`) committed. (`ws-coverage-matrix` rows are not required:
+   E1 is not a pilot dependency.)
+2. **Every S2 check is proved.** `node tests/scripts/ws-backtest.mjs` prints `OK` with **0 PENDING** — all 10 rows of
+   `tests/fixtures/precritic/backtests.json`, including the five browser commit-pair rows (lone item, text ≠ generator × 2,
+   Chromebook viewport, repeats). At 11:05 UTC today: 5 PASS (the node fixtures), 0 FAIL, 5 PENDING.
+3. **A signed SU-C card.** `node tests/scripts/ws-spec-card.mjs --family subtraction` (scoped to the six skills) writes the
+   card on `claude/sweet-newton-c8wrv1-wip-wave0-process`; `--check-coverage <card>` OK and `--check-signed <card>` OK
+   (the owner has signed it).
+4. **One base.** The pilot branches from a merge of both W0 branches into `claude/sweet-newton-c8wrv1`, so precritic and the
+   card run against the same tree.
+5. **No open S9 red** on the pilot's own skills: `ws-screen-slots --skills <the six>` is green (the standing red,
+   `reading_ruler_hard`, is not in the family, so this should already hold).
+
+Not required: S4 golden renders, S5 deploy runner, E1 coverage matrix, M4, or a critic PASS on the W0 tools (a false green in
+precritic is what condition 2 guards against). The pilot measures the *process* (card → one builder run → precritic → one
+critic), which is what the §4.4 trigger is about.
 
 **Family: SU-C, column subtraction without regrouping, six skills on the `stack` template** —
 `subtraction:sub_50_no_regroup`, `sub_100_no_regroup`, `sub_1k_no_regroup`, `sub_10k_no_regroup`, `sub_100k_no_regroup`,
