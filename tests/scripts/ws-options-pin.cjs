@@ -18,6 +18,8 @@
 //                    reuses it, so a crashed nightly continues where it stopped; a batch's file name carries a hash
 //                    of its skills, so a changed selection never reuses a stale file
 //   --n N            items per check, passed to ws-options-verify (default: its own, 12 - the precritic's value)
+//   --deadline MS    ws-options-verify's per-skill deadline (default 600000: its own 60 s default times out on
+//                    add_facts, sub_facts, f_to_d and the mixed pools in a cloud container with shared slots)
 //   --out f.json     also write the run: per-skill failures, new / fixed against the pin, timings, page errors
 //   --baseline f     the pin file (default design/audit/baselines/options-verify.json)
 //   --report-only    exit 0 even when --check finds new failures (a crash still exits non-zero)
@@ -27,9 +29,9 @@
 // ws-options-verify matches an id in EVERY category, so the skills sharing an id are kept in one batch and results
 // outside the selection are dropped. A failing pair is written exactly as ws-precritic forms it:
 // `${option}=${JSON.stringify(value)}` for a value, `static:${message}` for a static check. A skill whose verifier timed
-// out or crashed in its batch (`*="*"`) is run once more on its own at the default deadline (ws-precritic's), so one
-// slow moment under a shared slot does not become a pin. If it times out again it is run with --deadline
-// <--long-deadline, default 300000 ms> and pinned as `*="*"` PLUS the pairs that long run finds: a precritic run that
+// out or crashed in its batch (`*="*"`) is run once more on its own at --deadline, so one slow moment under a shared
+// slot does not become a pin. If it times out again it is run with --deadline <--long-deadline, default 1800000 ms>
+// and pinned as `*="*"` PLUS the pairs that long run finds: a precritic run that
 // times out stays green, one that finishes still fails on a new pair. A batch that exits without its JSON is retried once.
 //
 // --check: NEW = a failing pair of a skill in the selection that the pin does not list (a skill missing from the pin
@@ -109,7 +111,8 @@ const fmtS = (ms) => `${(ms / 1000).toFixed(1)} s`;
     const BATCH = Math.max(1, parseInt(arg('batch', '25'), 10));
     const SLOTS = Math.max(1, parseInt(arg('slots', '2'), 10));
     const N = arg('n', null);
-    const LONG_DEADLINE = parseInt(arg('long-deadline', '300000'), 10);
+    const DEADLINE = parseInt(arg('deadline', '600000'), 10);
+    const LONG_DEADLINE = parseInt(arg('long-deadline', '1800000'), 10);
     const SHARD = arg('shard', null);
     const ONLY = arg('skills', null);
     const CAT = arg('category', null);
@@ -169,7 +172,7 @@ const fmtS = (ms) => `${(ms / 1000).toFixed(1)} s`;
 
     // ---- 3. run the batches, two at a time through the runner
     const fileOf = (b, tag = '') => path.join(TMP, `b${String(b.i).padStart(3, '0')}${tag}-${hash(b.ids.join(','))}.json`);
-    const verifyArgs = (ids, jf, extra = []) => ['node', VERIFY, '--skill', ids.join(','), '--json', jf, '--report-only', ...(N ? ['--n', N] : []), ...extra];
+    const verifyArgs = (ids, jf, extra = []) => ['node', VERIFY, '--skill', ids.join(','), '--json', jf, '--report-only', ...(N ? ['--n', N] : []), ...(extra.includes('--deadline') ? [] : ['--deadline', String(DEADLINE)]), ...extra];
     const timings = [];
     const pageErrors = [];
     const crashed = [];
@@ -216,9 +219,9 @@ const fmtS = (ms) => `${(ms / 1000).toFixed(1)} s`;
     };
     for (const b of batches) collect(fileOf(b), b.keys);
     const reruns = [...fresh].filter(([, v]) => v.verifierFail).map(([k]) => k);
-    // Pass 1: on its own at the default deadline (what ws-precritic runs). Pass 2, for a skill that still times out:
-    // with a long deadline, so its real failing pairs are known; it is then pinned with `*="*"` (it does time out at
-    // the default deadline, twice) PLUS those pairs, so a precritic run that does finish still sees a new failure.
+    // Pass 1: on its own at --deadline. Pass 2, for a skill that still times out: with --long-deadline, so its real
+    // failing pairs are known; it is then pinned with `*="*"` (it does time out at --deadline, twice) PLUS those
+    // pairs, so a run that does finish still sees a new failure.
     const pool = async (keys, fn) => { let i = 0; await Promise.all(Array.from({ length: Math.min(SLOTS, keys.length) }, async () => { while (i < keys.length) await fn(keys[i++]); })); };
     const solo = async (k, prefix, extra, label) => {
         const s = live.find((x) => x.key === k);
@@ -233,12 +236,12 @@ const fmtS = (ms) => `${(ms / 1000).toFixed(1)} s`;
     };
     const slow = [];
     await pool(reruns, async (k) => {
-        const r = await solo(k, 'rerun', [], 'rerun on its own at the default deadline:');
+        const r = await solo(k, 'rerun', [], `rerun on its own at --deadline ${DEADLINE}:`);
         if (r && !isVerifierFail(r)) fresh.set(k, { pairs: pairsOf(r), verifierFail: false, recovered: true });
         else slow.push(k);
     });
     await pool(slow, async (k) => {
-        const r = await solo(k, 'long', ['--deadline', String(LONG_DEADLINE)], `times out twice at the default deadline; rerun with --deadline ${LONG_DEADLINE}:`);
+        const r = await solo(k, 'long', ['--deadline', String(LONG_DEADLINE)], `times out twice at --deadline ${DEADLINE}; rerun with --deadline ${LONG_DEADLINE}:`);
         const timeout = fresh.get(k).pairs.find((p) => p.id === '*="*"');
         fresh.set(k, { pairs: [timeout, ...(r && !isVerifierFail(r) ? pairsOf(r) : [])], verifierFail: true, slow: true, longOk: !!(r && !isVerifierFail(r)) });
     });
@@ -302,7 +305,7 @@ const fmtS = (ms) => `${(ms / 1000).toFixed(1)} s`;
         for (const s of live) if (skills[s.key]) ordered[s.key] = skills[s.key];
         const doc = {
             note: old.note || 'Pinned ws-options-verify failures per skill (IMPROVEMENT_PLAN §1.4 S1: red gates compare with a pinned baseline). Each entry is option=<JSON value> (as ws-options-verify prints it) or static:<message>. ws-precritic fails on any failing pair not listed here, and on any failure of a skill not listed. Remove a pair when its defect is fixed; never add one to make a new failure pass without a STATUS note.',
-            how: 'node tests/scripts/ws-options-pin.cjs --write (every live skill: ws-options-verify --skill <batch ids> --json per batch of 25, two batches at a time through /tmp/mq-browser-run.sh; a verifier timeout is re-run on its own); --write --skills cat:skill,... re-pins a subset; --check compares a fresh run with this pin.',
+            how: `node tests/scripts/ws-options-pin.cjs --write (every live skill: ws-options-verify --skill <batch ids> --deadline ${DEADLINE} --json per batch of ${BATCH}, two batches at a time through /tmp/mq-browser-run.sh; a verifier timeout is re-run on its own); --write --skills cat:skill,... re-pins a subset; --check compares a fresh run with this pin. The skills that need more than ws-options-verify's 60 s default deadline time out under a plain run: pass --deadline 600000.`,
             pinned: date,
             scope,
             noOptions,

@@ -21,6 +21,15 @@ task has been created.** The lane lead creates it (one task, or eight with `SHAR
   sharded over eight sessions (`SHARD=1/8` ... `SHARD=8/8`, about 3.7 h each). A night whose commits touch only
   planning files, tests, generated documents, `search-terms.js` or the `index.html` stamp runs only its seventh
   (about 1,560 rows = 4,700 documents, about 4.2 h on two slots).
+- **Options pin** (after the matrix): `tests/scripts/ws-options-pin.cjs --check` runs `ws-options-verify` on every
+  live skill (batches of 25, two at a time) against `design/audit/baselines/options-verify.json` and writes
+  `design/audit/matrix/options-pin-<date>.json` (new failing pairs, fixed pairs, timings). On the first run, unsharded,
+  it is `--write` instead and re-pins every live skill into that baseline file (the one file the night may commit
+  outside this folder); with `SHARD`, each shard checks its share of the batches. New pairs do not stop the night;
+  the commit message carries the tally. Measured 2026-10-23 (714 live skills, 29 batches, `--deadline 600000`,
+  two slots shared with other sessions): about 1 h 52 min wall, about 16.8 s of slot time a skill (browser start
+  included, slot waits excluded; 8 to 35 s a skill by batch, the mixed pools and count_by_* slowest), 21 min of it
+  waiting for a slot. The matrix and the pin share the two slots, so a night runs both one after the other.
 - Output: `design/audit/matrix/<UTC date>.json` (`<date>.shard-i-of-n.json` per shard): the commit, the selection,
   every row with its per-size counts, status (OK / CACHED / RED / PENDING(step) / N/A) and dependency hash, and the
   timing. The deploy gate (S5 session 3) refuses a deploy when the newest nightly is older than 24 hours or a row of
@@ -39,10 +48,12 @@ task has been created.** The lane lead creates it (one task, or eight with `SHAR
 >    Then `git pull --rebase origin claude/sweet-newton-c8wrv1` and `git push origin HEAD:claude/sweet-newton-c8wrv1`;
 >    if the push is refused because the tip moved, rebase and push again (at most three times). Never force-push.
 > 5. Reply with: the date, the commit the matrix ran on, the mode line, the tally line (OK / CACHED / RED / PENDING /
->    N/A / ERROR), the documents/s line, and the ids of the first 20 RED rows with their first rise. If the script
+>    N/A / ERROR), the documents/s line, the ids of the first 20 RED rows with their first rise, and the options pin's
+>    `against ...` line with its first 20 NEW pairs. If the script
 >    failed, reply with its last 30 lines instead and commit nothing.
 > Never change the baseline after the first run, never delete a run file, and never touch files outside
-> `design/audit/matrix/`.
+> `design/audit/matrix/` (the script's first-run options pin `design/audit/baselines/options-verify.json` is the one
+> exception, and it is in the files it prints).
 
 Schedule: daily at 01:13 UTC (`CRON_TZ=UTC 13 1 * * *`), one session per shard; shards share the date, so the
 deploy gate reads all `<date>.shard-*.json` of the newest date.
