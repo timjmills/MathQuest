@@ -39,3 +39,9 @@ New owner design ideas are recorded here and NOT folded into a running fix round
 |---|---|---|
 | 2026-10-23 | "we might want multiple pages of the same set of problems as well" | already in fix round 4 (sent before the batch rule): "Each page: New problems · Same problems, new numbers · Same page again" |
 | 2026-10-23 | side menu "deep purple like in this screenshot" → "actually let's keep it as it is for now … if it's a problem I will change later" | parked; purple #592B88 shown as a reference on palette.html |
+
+| Date | Step | Who (profile) | Result |
+|---|---|---|---|
+| 2026-10-23 | Fix round 4: thumbnails captured from the real app (715/715, 0 fallbacks, samples.js 5.81 MiB), readable crops (Big 12 / Medium 11 / Small 9 px), real skill-finder search, phone popup ≥ 6 rows, whole-grade How often, "Each page", kept print settings; all gates OK, 24 flows in plan | mq-opus-medium | done |
+| 2026-10-23 | App defect seen in capture (not this lane's to fix): Add/Subtract Fractions (Unlike Denom) (No Visuals) prints "1/3 + ? 10 = 5/6" (no fraction bar under "?") | — | reported to lead |
+| 2026-10-23 | Critic round 5 (fresh critic) | mq-opus-medium | running |
