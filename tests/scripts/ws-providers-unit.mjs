@@ -2,6 +2,10 @@
 // section 3). Pure node: no browser, no app state.
 //
 //   node tests/scripts/ws-providers-unit.mjs
+//   node tests/scripts/ws-providers-unit.mjs --skill addition:add_20_regroup   # only these skills' provider checks
+//   node tests/scripts/ws-providers-unit.mjs --skill a:b,c:d --skill e:f        # repeatable / comma list; a bare id matches
+//        With --skill, the per-skill checks run for the named skills only (the library / contract seam checks that name
+//        no skill still run); a named skill this test has no item maker for is listed as "not covered", never failed.
 //
 // For each of the 24 skills the independent critics re-graded on 2026-09-25 (and the sibling
 // ladder ids registered beside them), 20 seeded items are built in the SAME SHAPE the generator
@@ -39,6 +43,11 @@ const NO_HINT = [];
 
 const failures = [];
 let checks = 0;
+// --skill (ws-precritic, IMPROVEMENT_PLAN §1.4 S1): restrict checkSkill to the named skills.
+const ARGV = process.argv.slice(2);
+const ONLY_SKILLS = ARGV.flatMap((a, i) => (a === '--skill' && i + 1 < ARGV.length ? String(ARGV[i + 1]).split(',') : [])).map((s) => s.trim()).filter(Boolean);
+const onlyHit = (key) => ONLY_SKILLS.find((o) => o === key || (!o.includes(':') && key.split(':')[1] === o));
+const CHECKED_ONLY = new Set();
 const ok = (cond, msg) => { checks++; if (!cond) failures.push(msg); return !!cond; };
 
 /* ============================================================== item shapes, seeded */
@@ -449,6 +458,7 @@ const wordsOf = (s) => String(s).replace(/[.?!]/g, '').trim().split(/\s+/).filte
 const pluralNouns = new Set(STORY_NOUNS.map((n) => n.many));
 
 function checkSkill(key, { requireStories = false } = {}) {
+    if (ONLY_SKILLS.length) { const o = onlyHit(key); if (!o) return; CHECKED_ONLY.add(o); }
     const [cat, skill] = key.split(':');
     const maker = ITEM_MAKERS[key];
     if (!ok(registered.has(key), `${key}: no provider registered`)) return;
@@ -776,6 +786,8 @@ for (const band of ['10', '20', '50', '100', '1k', '10k', '100k', '1m']) {
     ok(n > 50, `D4: titles checked for ${n} providers`);
 }
 
+const notCovered = ONLY_SKILLS.filter((o) => !CHECKED_ONLY.has(o));
+if (ONLY_SKILLS.length) console.log(`  --skill: ${CHECKED_ONLY.size} of ${ONLY_SKILLS.length} skill(s) checked${notCovered.length ? `; not covered (no item maker in this test): ${notCovered.join(', ')}` : ''}`);
 if (failures.length) {
     for (const f of failures.slice(0, 60)) console.log('  FAIL', f);
     if (failures.length > 60) console.log(`  ... and ${failures.length - 60} more`);

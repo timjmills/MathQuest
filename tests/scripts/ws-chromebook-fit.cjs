@@ -28,6 +28,24 @@
 //        worksheet, quiz; boss and race run on a fixed sample in a full run, on every --skills skill)
 //   node tests/scripts/ws-chromebook-fit.cjs --shots <dir>     # a screenshot per skill, host and size
 //
+// Deploy gates (IMPROVEMENT_PLAN §1.4 S5; tests/scripts/ws-deploy-gates.sh):
+//   --category c1,c2     only the sample's skills in these categories
+//   --shard i/n          the i-th of n deterministic parts of the skill list (skill n goes to part n mod n), so
+//                        two browser slots share one sweep. The checks that are not per skill (the header
+//                        checks, the question dots, the touch taps on quiz Next) run in part 1 only
+//   --dark               SWEEP: dark mode (prefers-color-scheme: dark, so html.dark as the app sets it), as a
+//                        pupil (--roles; the fit verdicts are the pupil contract: a teacher-launched play view carries teacher chrome they do not read, and teacher dark colours are ws-screen-slots --dark), on the fixed sample (one skill per kit template,
+//                        tests/fixtures/precritic/sweep-sample.json), hosts card, worksheet, quiz, size 1366x650;
+//                        the same fit verdicts as the default run
+//   --bigboard           SWEEP: the teacher's Board display (body.teacher-mode.tv-bigboard: css/teacher.css:96,
+//                        css/play-teacher.css), host card (the board shows the practice card only), sizes
+//                        1366x768 and 1920x1080. FAILS when the question does not fit the board: the board card
+//                        or frame scrolls sideways or down, or the teacher's board controls are off screen
+//   --sample <file>      the sweep sample; --skills overrides it; --roles student,teacher the sweep roles
+//   --baseline <file>    fail only on a per-skill failure the file does not pin (see findingId below); the
+//                        sweeps' standing failures are pinned in tests/fixtures/precritic/sweep-sample.json
+// The sweeps skip the checks that are not per skill (they have no mode of their own).
+//
 // Prints one line per skill, size and host, then `ws-chromebook-fit: OK` or `FAIL` (exit 1).
 const fs = require('fs');
 const path = require('path');
@@ -35,9 +53,27 @@ const { open } = require('../lib/ws-harness.cjs');
 const { dotsBandCases } = require('../lib/refline-dots.cjs');
 
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 ? process.argv[i + 1] : d; };
+const has = (k) => process.argv.includes('--' + k);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-const SIZES = (arg('sizes', '1366x650,1280x600')).split(',').map(s => { const [w, h] = s.split('x').map(Number); return { w, h }; });
-const HOSTS = (arg('hosts', 'card,boss,race,worksheet,quiz')).split(',');
+const DARK = has('dark');
+const BIGBOARD = has('bigboard');
+const SWEEP = DARK || BIGBOARD;
+if (DARK && BIGBOARD) { console.log('ws-chromebook-fit: --dark and --bigboard are separate sweeps; run one at a time'); console.log('ws-chromebook-fit: FAIL'); process.exit(2); }
+const MODE = DARK ? 'dark' : BIGBOARD ? 'bigboard' : '';
+const ROLES = SWEEP ? (arg('roles', DARK ? 'student' : 'teacher')).split(',').map(s => s.trim()).filter(Boolean) : [''];
+const CATEGORIES = (arg('category', '') || '').split(',').map(s => s.trim()).filter(Boolean);
+const SHARD = (() => {
+    const s = arg('shard', '');
+    if (!s) return null;
+    const m = /^(\d+)\/(\d+)$/.exec(s);
+    if (!m || +m[1] < 1 || +m[1] > +m[2]) { console.log(`ws-chromebook-fit: bad --shard ${s} (want i/n, 1 <= i <= n)`); console.log('ws-chromebook-fit: FAIL'); process.exit(2); }
+    return { i: +m[1], n: +m[2] };
+})();
+// the checks that are not per skill run once: not in a sweep, and in shard 1 only
+const GLOBALS = !SWEEP && (!SHARD || SHARD.i === 1);
+const SAMPLE_FILE = arg('sample', path.join(__dirname, '..', 'fixtures', 'precritic', 'sweep-sample.json'));
+const SIZES = (arg('sizes', BIGBOARD ? '1366x768,1920x1080' : DARK ? '1366x650' : '1366x650,1280x600')).split(',').map(s => { const [w, h] = s.split('x').map(Number); return { w, h }; });
+const HOSTS = (arg('hosts', BIGBOARD ? 'card' : DARK ? 'card,worksheet,quiz' : 'card,boss,race,worksheet,quiz')).split(',');
 // boss and race are the card plus an arena / a track: in a full run they are sampled on these
 const ARENA_SAMPLE = ['addition:add_facts', 'addition:add', 'addition:add_column_multi', 'counting:count_objects', 'addition:add_wp_10', 'graphs:bar_graph', 'division:long_div_2digit'];
 const SHOTS = arg('shots', null);
@@ -102,6 +138,42 @@ function MEASURE(host) {
     };
 }
 
+// --baseline <file>: a per-skill failure line "cat:skill WxH host: why" as {key, id: "host:WxH:kind"}, the
+// form the pin lists ({skills: {"cat:skill": [id, ...]}}, or under a "chromebookFit" key, as
+// tests/fixtures/precritic/sweep-sample.json pins the sweeps' standing findings). Lines that are not per
+// skill (header, dots, touch, console errors) are never pinned.
+function findingId(line) {
+    const m = /^([a-z0-9_]+:[a-z0-9_]+) (\d+x\d+) (\S+): (.*)$/.exec(line);
+    if (!m) return null;
+    const why = m[4];
+    const kind = /scrolls down/.test(why) ? 'scroll-y' : /scrolls sideways/.test(why) ? 'scroll-x' : /board controls/.test(why) ? 'controls'
+        : /no Check \/ Next/.test(why) ? 'no-go' : /Check \/ Next off screen/.test(why) ? 'go' : /answer box bottom/.test(why) ? 'box'
+            : /not brought into view/.test(why) ? 'tall-load' : /does not have the focus/.test(why) ? 'focus' : /did not move/.test(why) ? 'next'
+                : /arena|track/.test(why) ? 'arena' : 'error';
+    return { key: m[1], id: `${m[3]}:${m[2]}:${kind}` };
+}
+
+// In the page (--bigboard): does the question fit the teacher's Board display?
+function BOARD() {
+    const H = innerHeight, W = innerWidth;
+    const gv = document.getElementById('gameView');
+    const card = document.getElementById('questionCard');
+    const paper = document.getElementById('questionPaper');
+    if (!gv || !card || !paper) return { error: 'no board host' };
+    if (!document.body.classList.contains('tv-bigboard') || getComputedStyle(gv).position !== 'fixed') return { error: 'the Board display did not engage (#gameView is not the fixed board frame)' };
+    const vis = el => { if (!el) return false; const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none'; };
+    const pR = paper.getBoundingClientRect();
+    const ctl = document.getElementById('tvBoardCtl');
+    const cR = ctl && vis(ctl) ? ctl.getBoundingClientRect() : null;
+    return {
+        H, W,
+        paper: { w: Math.round(pR.width), h: Math.round(pR.height), right: Math.round(pR.right), bottom: Math.round(pR.bottom) },
+        overX: Math.max(card.scrollWidth - card.clientWidth, gv.scrollWidth - gv.clientWidth),
+        overY: Math.max(card.scrollHeight - card.clientHeight, gv.scrollHeight - gv.clientHeight),
+        ctl: cR ? { bottom: Math.round(cR.bottom), right: Math.round(cR.right) } : null,
+    };
+}
+
 async function settle(page) {
     await sleep(900);
     try { await page.waitForFunction(() => document.fonts.status === 'loaded', { timeout: 8000 }); } catch (e) { /* measured anyway */ }
@@ -124,6 +196,8 @@ async function startHost(page, host, c, k, seed) {
         if (host === 'worksheet') {
             try { await page.waitForFunction(() => { const g = document.getElementById('worksheetGrid'); return !!g && g.dataset.mqLaidOut === '1'; }, { timeout: 20000 }); } catch (e) { /* measured anyway */ }
         }
+        // the teacher's Board display: teacher-shell.js startPractice plays 'practice', then sets the class
+        if (host === 'card' && BIGBOARD) await page.evaluate(() => document.body.classList.add('tv-bigboard'));
     } else {
         await page.evaluate((c, k, seed) => {
             const questions = [];
@@ -151,6 +225,8 @@ async function startHost(page, host, c, k, seed) {
 
     // ---- the sample ----
     let LIST = (arg('skills', '') || '').split(',').map(s => s.trim()).filter(Boolean);
+    // a sweep runs on the pinned sample: one skill per kit template
+    if (!LIST.length && SWEEP) LIST = (JSON.parse(fs.readFileSync(SAMPLE_FILE, 'utf8')).skills || []).map(r => r.key);
     if (!LIST.length) {
         const per = await page.evaluate(() => {
             const out = [];
@@ -165,6 +241,10 @@ async function startHost(page, host, c, k, seed) {
         const known = await page.evaluate(() => { const s = new Set(); for (const [c, a] of Object.entries(window.SKILLS)) if (Array.isArray(a)) a.forEach(x => x && s.add(`${c}:${x.v}`)); return Array.from(s); });
         LIST = LIST.filter(s => known.includes(s));
     }
+    if (CATEGORIES.length) LIST = LIST.filter(s => CATEGORIES.includes(s.split(':')[0]));
+    if (SHARD) LIST = LIST.filter((_, i) => i % SHARD.n === SHARD.i - 1);
+    if (DARK) await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'dark' }]);
+    if (SWEEP || SHARD || CATEGORIES.length) console.log(`${MODE ? `${MODE} sweep (${ROLES.join(', ')}), ` : ''}${SHARD ? `shard ${SHARD.i}/${SHARD.n}, ` : ''}${LIST.length} skill(s)${GLOBALS ? '' : '; header, dots and touch checks not in this run'}`);
 
     // ---- unchanged elsewhere: the home screen, and a tall screen in play ----
     const chromeCheck = async (label, w, h, setup) => {
@@ -182,26 +262,50 @@ async function startHost(page, host, c, k, seed) {
         console.log(`${label.padEnd(44)} ${ok ? 'ok' : 'CHANGED'} (nav ${m.navDisplay}, controls ${m.stats}, menu button ${m.menuShown ? 'shown' : 'hidden'})`);
         if (!ok) fails.push(`${label}: the full app header changed (${JSON.stringify(m)})`);
     };
-    await chromeCheck('home screen 1366x650 (full header)', 1366, 650, null);
-    await chromeCheck('play at 1366x960 (tall screen, full header)', 1366, 960, () => startHost(page, 'card', 'addition', 'add', 7));
+    if (GLOBALS) {
+        await chromeCheck('home screen 1366x650 (full header)', 1366, 650, null);
+        await chromeCheck('play at 1366x960 (tall screen, full header)', 1366, 960, () => startHost(page, 'card', 'addition', 'add', 7));
+    }
 
     // ---- the question dots and the number line (critic nl-r6 D1) ----
     // A counted session (queue count / link N10, N20) pulls the dots into the card's top line; with
     // the number line on they must not lie on it, and without it they stay where they were.
-    if (HOSTS.includes('card')) {
+    if (GLOBALS && HOSTS.includes('card')) {
         const dotFails = await dotsBandCases(page, { sizes: SIZES, log: (l) => console.log(l.trim()), shots: SHOTS });
         fails.push(...dotFails);
     }
 
-    for (const size of SIZES) {
+    for (const role of ROLES) for (const size of SIZES) {
         await page.setViewport({ width: size.w, height: size.h, deviceScaleFactor: 1 });
         for (const s of LIST) {
             const [c, k] = s.split(':');
             await page.reload({ waitUntil: 'networkidle2' });
             await page.waitForFunction(() => typeof window.generateQuestion === 'function' && !!window.SKILLS, { timeout: 30000 });
+            if (role) await page.evaluate((role) => window.setUserRole && window.setUserRole(role, { persist: false }), role);
             const line = [];
             for (const host of HOSTS) {
                 if ((host === 'boss' || host === 'race') && !arg('skills', '') && !ARENA_SAMPLE.includes(s)) continue;
+                const hostTag = MODE ? `${MODE}${role ? '-' + role : ''}:${host}` : host;
+                if (BIGBOARD) {
+                    // the Board display: the whole question on the board, no scrolling, the controls on screen
+                    const tag = `${s} ${size.w}x${size.h} ${hostTag}`;
+                    let b;
+                    try {
+                        await startHost(page, host, c, k, hash(`${s}:${host}`));
+                        b = await page.evaluate(BOARD);
+                        if (b.error) throw new Error(b.error);
+                    } catch (e) { line.push(`${hostTag} ERR ${e.message}`); fails.push(`${tag}: ${e.message}`); continue; }
+                    if (SHOTS) { fs.mkdirSync(SHOTS, { recursive: true }); await page.screenshot({ path: path.join(SHOTS, `${size.w}x${size.h}-bigboard-${c}-${k}.png`) }); }
+                    const why = [];
+                    if (b.overX > 1) why.push(`the board scrolls sideways by ${b.overX} px (paper ${b.paper.w} px wide, right ${b.paper.right} of ${b.W})`);
+                    if (b.overY > 1) why.push(`the board scrolls down by ${b.overY} px (paper ${b.paper.h} px tall, bottom ${b.paper.bottom} of ${b.H})`);
+                    if (!b.ctl) why.push('the board controls are not shown');
+                    else if (b.ctl.bottom > b.H + 0.5 || b.ctl.right > b.W + 0.5) why.push(`the board controls are off screen (bottom ${b.ctl.bottom}, right ${b.ctl.right})`);
+                    why.forEach(w => fails.push(`${tag}: ${w}`));
+                    rows.push({ skill: s, size: `${size.w}x${size.h}`, host: hostTag, ...b, verdict: why.length ? 'FAIL' : 'ok' });
+                    line.push(`${hostTag} ${why.length ? 'FAIL' : 'ok'} paper ${b.paper.w}x${b.paper.h} over ${b.overX}/${b.overY}`);
+                    continue;
+                }
                 let m;
                 try {
                     await startHost(page, host, c, k, hash(`${s}:${host}`));
@@ -214,12 +318,12 @@ async function startHost(page, host, c, k, seed) {
                     m = await page.evaluate(MEASURE, host);
                     if (m.error) throw new Error(m.error);
                     m.load = load;
-                } catch (e) { line.push(`${host} ERR ${e.message}`); fails.push(`${s} ${size.w}x${size.h} ${host}: ${e.message}`); continue; }
+                } catch (e) { line.push(`${hostTag} ERR ${e.message}`); fails.push(`${s} ${size.w}x${size.h} ${hostTag}: ${e.message}`); continue; }
                 if (SHOTS) {
                     fs.mkdirSync(SHOTS, { recursive: true });
                     await page.screenshot({ path: path.join(SHOTS, `${size.w}x${size.h}-${host}-${c}-${k}.png`) });
                 }
-                const tag = `${s} ${size.w}x${size.h} ${host}`;
+                const tag = `${s} ${size.w}x${size.h} ${hostTag}`;
                 // a widget's own Submit inside the cell (a legacy coordinate plot) is part of the problem
                 const problem = m.box != null ? Math.max(m.box, m.goInPaper && m.go != null ? m.go : 0) - m.paperTop : 0;
                 // boss and race add their arena / track to the chrome: the game itself, not header
@@ -257,15 +361,15 @@ async function startHost(page, host, c, k, seed) {
                         else if (f.typing && !f.focused) { verdict = 'FAIL'; fails.push(`${tag}: after Next the pulsing box does not have the focus`); }
                     }
                 }
-                rows.push({ skill: s, size: `${size.w}x${size.h}`, host, ...m, load: undefined, verdict });
-                line.push(`${host} ${verdict} box ${m.box ?? '-'}${m.boxKind === 'none' || m.boxKind === 'paper' ? `(${m.boxKind})` : ''}/${m.fold} go ${m.go ?? '-'}${host === 'worksheet' ? ` cards ${m.cardsFull}` : ''}`);
+                rows.push({ skill: s, size: `${size.w}x${size.h}`, host: hostTag, ...m, load: undefined, verdict });
+                line.push(`${hostTag} ${verdict} box ${m.box ?? '-'}${m.boxKind === 'none' || m.boxKind === 'paper' ? `(${m.boxKind})` : ''}/${m.fold} go ${m.go ?? '-'}${host === 'worksheet' ? ` cards ${m.cardsFull}` : ''}`);
             }
             console.log(`${(s + ' ' + size.w + 'x' + size.h).padEnd(44)} ${line.join(' | ')}`);
         }
     }
     // Touch (critic r5 Q5-1): instant feedback, a typed one-box answer, then ONE real touch tap on Next
     // moves on (the feedback must not be drawn under the tap and move Next away from it).
-    if (HOSTS.includes('quiz')) {
+    if (GLOBALS && HOSTS.includes('quiz')) {
         for (const size of SIZES) {
             const t = await open({ seed: 17, viewport: { width: size.w, height: size.h, deviceScaleFactor: 1, hasTouch: true } });
             try {
@@ -304,6 +408,23 @@ async function startHost(page, host, c, k, seed) {
     if (tall.length) console.log(`\nGenuinely tall items (may scroll; active-box brings the box into view):\n  ${tall.join('\n  ')}`);
     if (app.problems.length) fails.push(...app.problems.slice(0, 8).map(p => `[${p.type}] ${p.text}`));
     await app.close();
+    if (arg('baseline', null)) {
+        // a pinned per-skill failure ("cat:skill WxH host: why") is reported, not failed; anything else fails
+        const base = JSON.parse(fs.readFileSync(arg('baseline'), 'utf8'));
+        const pinned = (base.chromebookFit || base).skills || {};
+        // a known app error the run triggers (pinned by its message), e.g. one a host switch raises
+        const problems = (base.chromebookFit || base).problems || [];
+        const seen = [];
+        const left = fails.filter(f => {
+            const id = findingId(f);
+            if (id && (pinned[id.key] || []).includes(id.id)) { seen.push(`${id.key} ${id.id}`); return false; }
+            if (/^\[(pageerror|console\.error)\] /.test(f) && problems.some(p => f.includes(p))) { seen.push(f); return false; }
+            return true;
+        });
+        console.log(`\nbaseline ${arg('baseline')}: ${seen.length} pinned failure(s) seen (${seen.join('; ') || 'none'}), ${left.length} NEW`);
+        fails.length = 0;
+        fails.push(...left);
+    }
     if (fails.length) { console.log('\n' + fails.join('\n')); console.log('ws-chromebook-fit: FAIL'); process.exit(1); }
     console.log('ws-chromebook-fit: OK');
 })().catch(e => { console.error(e); console.log('ws-chromebook-fit: FAIL'); process.exit(1); });
