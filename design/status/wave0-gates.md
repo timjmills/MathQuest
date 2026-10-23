@@ -272,3 +272,13 @@ grow to ≈ 28 min (predicted by `--budget`) once the matrix renders its ≤ 500
 - SKILL_UPGRADE_LIST.md: 346 pointer lines appended (292 skills), a "Wave 0 pinned defects (2026-10-23)" block under each
   family: 26 MC-on-screen, 115 option-verify, 205 node-lint lines.
 - ws-viewport-check re-run after merging the W0-defects fix (0b79cea1): 64 sessions, 0 findings, OK (665 s); its baseline is already empty — add_word_problems and long_div_2digit leave "needs owners".
+
+## Queued (lead 22:23): the pilot verdict's 11 generic checks — starts after critic r7 passes and the lead merges
+1 zero-case caps as card rulings → content-audit predicates (per family); 2 dealer uniformity (±2σ over 120 seeded items,
+≤ 2 of one value a page, no periodic seeded position); 3 L-ANSAREA box ≥ 4.4 mm (true positive addition:add_three);
+4 L-OVERLAP heads + ≥ 1 mm gap (stack, pv); 5 node-lint lesson-data presence (prereqs.js or the role is refused);
+6 option-help truth (every level/value a help string names is offered); 7 options-verify render through print-lint at S
+and L (precritic: touched skills); 8 print-lint H13 on lesson roles (precritic --role lesson on touched skills);
+9 presets-unit item check (instruction key + declared band); 10 providers-unit wrongAnswer fits its slot; 11 print-lint:
+no wrapped line ends in an operator. Backtests from the pilot: 27577cf fails, ff471fd passes, pilot tip fails N1–N4.
+Plan: 3 parallel builders at mq-opus-medium (node checks / print-lint rules / options-verify render), then one critic.
