@@ -245,3 +245,16 @@ options-pin `--resume` keyed by commit. Self-tests: deploy 91, matrix 171 (A10/A
 | 3 | 3 | 10.8 / 10.8 / 10.8 min | OK (matrix WARNING per the owner ruling: no nightly / full baseline yet; viewport-check ≈ 648 s) |
 With the earlier session 1 runs (27.9 / 28.4 / 26.4 min), every session has three timed runs ≤ 30 min. Session 3 will
 grow to ≈ 28 min (predicted by `--budget`) once the matrix renders its ≤ 500 documents after the full baseline.
+
+## Lead decisions 2026-10-23 22:05
+- "Repeated check" scheduled task created by the lead (daily 01:13 UTC, prompt from NIGHTLY.md).
+- D8: the critic sample is the bounded all-pairs set + 20 %, capped at 40 pages a pair (builder at low effort).
+- Approved siblings confirmed (`tests/fixtures/precritic/siblings.json`), template `stack`: add_100_regroup,
+  sub_100_regroup, add_1k_regroup, sub_1k_regroup, add_10k_regroup, sub_10k_regroup, sub_100k_regroup, sub_1m_regroup.
+  Pairs (same size band): sub_50_no_regroup, sub_100_no_regroup, sub_2d_1d → add_100_regroup + sub_100_regroup;
+  sub_1k_no_regroup → add_1k_regroup + sub_1k_regroup; sub_10k_no_regroup → add_10k_regroup + sub_10k_regroup;
+  sub_100k_no_regroup → sub_100k_regroup; sub_1m_no_regroup → sub_1m_regroup.
+- Spec-card rulings block: this lane's (ws-spec-card + README; stack and subtraction cards regenerated layout-only).
+- CLAUDE.md "Checks to run": the lead writes it from the draft after merge.
+- "Needs owners" defects go to each family's redo: per-skill pointer lines appended to design/audit/SKILL_UPGRADE_LIST.md.
+- Merged claude/sweet-newton-c8wrv1 (incl. 0b79cea1, the W0-defects viewport fix); ws-viewport-check re-run pending.
