@@ -31,7 +31,7 @@ organisation; no lettered A/B pages — plain options, with "how many pages" for
 no full preview on the website, but a small preview of the first page (or the first 2–3 pages when they differ).
 
 Built from three audits on 2026-10-23 (the build history and gate timings; the teacher site driven in a browser at 1366
-and 390 px; the print engine with a test render) and graded by an independent critic (rounds 1–4 FAIL; round 5 PASS on v5 — A 8 · B 9 · C 9 · D 8 · E 8 · F 9 · G 9; v5.1 applies that round's remaining fixes).
+and 390 px; the print engine with a test render) and graded by an independent critic (rounds 1–4 FAIL; round 5 PASS on v5 — A 8 · B 9 · C 9 · D 8 · E 8 · F 9 · G 9; v5.1 applies that round's remaining fixes, confirmed by a fresh check: PASS holds, A 8 · B 9 · C 9 · D 9 · E 9 · F 9 · G 9).
 
 ---
 
@@ -223,7 +223,7 @@ key, no letters — Q-W3); Share shows the code and link at once with **Copy**
 | **How many pages?** | 1 · 2 · 3 · 4 · 5 …, for every arrangement (owner: section pages, single-skill pages and mixed pages alike); every page has new numbers; the key follows. Mixed together: each page is a full mixed page with the weights kept. In sections: the sections flow across the pages by weight; a section never splits mid-row. One skill per page: pages shared out by weight (6 pages, 3 equal skills → 2 each); the page count starts at the number of skills (the menu offers nothing lower) | 1 (One skill per page: one per skill) |
 | **How often does each skill come up?** | per skill: Less · Equal · More (1 : 2 : 3; a number in the chip's options) | Equal |
 | **How are the problems arranged?** (2+ skills) | **Mixed together** · **In sections** · **One skill per page** | Mixed together; In sections when the paper comes from a lesson's "Print practice" |
-| **Examples?** | None · **An example to start each group** (a worked example, then 3–4 problems like it, repeated down the page — today's block layout, the owner's 2026-09-26 ruling "one example on top of each block", LESSON_LIBRARY_PLAN §8f) · **An example with each problem** (Q-W2) · on Mixed together pages only: None or **One example of each skill at the top** — a short example band per skill on each page (§3.3) | None; practice printed from a lesson: An example to start each group (its skills are new) |
+| **Examples?** | None · **An example to start each group** (a worked example, then 3–4 problems like it, repeated down the page — today's block layout, the owner's 2026-09-26 ruling "one example on top of each block", LESSON_LIBRARY_PLAN §8f) · **An example with each problem** (Q-W2) · on Mixed together pages only: None or **One example of each skill at the top** — a short example band for each skill on that page (§3.3) | None; practice printed from a lesson: An example to start each group (its skills are new) |
 | **Size** | S · M · L | M |
 
 - Under the choices: a **one-line summary** ("2 pages · 16 problems · Addition 6, Time 5, Fractions 5 · answer key at the
