@@ -9,3 +9,6 @@ Owns: `design/mockups/teacher-2/`, `tests/scripts/ws-teacher-tokens.cjs`, this f
 |---|---|---|---|
 | 2026-10-23 | Lane opened; brief from IMPROVEMENT_PLAN §2, §4.3 | lead | — |
 | 2026-10-23 | First build (new screen design → medium, Q-S7) | mq-opus-medium | running |
+| 2026-10-23 | Owner: "I like these colors style more" (Awsaj site) → restyle to board C, same §2.7 rules; lead told | lead | — |
+| 2026-10-23 | First build + board C restyle: 31 screens, 124 shots, 14 flows ≤ §2.6 counts, `ws-teacher-tokens: OK` | mq-opus-medium | done (b1047708, 69c2fd4e, 39faf99e) |
+| 2026-10-23 | Critic round 1 | mq-opus-medium (independent) | running |
