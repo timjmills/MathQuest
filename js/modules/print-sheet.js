@@ -47,7 +47,7 @@ import { TEACHER_CSS, RCDWS_CSS, teacherParts, numberWords, pageRepeats, factOf 
 const { tBand } = teacherParts;
 import { planItem as composePlanItem, operandsOf as composeOperandsOf, opOf as composeOpOf, opGlyphOf as composeGlyphOf, oralFrameOf as composeOralFrameOf, answerOf as composeAnswerOf, instructionKeyOf as composeInstrKeyOf, instructionText as composeInstrText } from './sheet/roles/compose.js';
 import {
-    normaliseAnchors, ANCHOR_ROLES, anchorEligible, anchorItem, anchorHeightMm, easeScore, ineligibleNote,
+    normaliseAnchors, ANCHOR_ROLES, anchorEligible, anchorItem, anchorHeightMm, sideFit, easeScore, ineligibleNote,
     blockPlan, sideItems, pickDistinct,
 } from './sheet/anchors.js';
 import {
@@ -2166,7 +2166,7 @@ async function buildSheetCore(req = {}) {
             const body = sec.gridH ? sec.gridH + instrMm : bodyHeightMm(paper, layoutHeader);
             return blockPlan({ cols: L.cols, hMin: L.hMin, cellH: L.cellH, bodyMm: body, instrMm, anchorMm: sec.anchorMm }).perPage;
         }
-        if (anchorMode === 'side' && anchorSets[si] && anchorSets[si].items.length) return Math.max(1, Math.floor((L.cols === 1 ? Math.max(2, L.rows - (L.rows % 2)) : L.perPage) / 2));
+        if (anchorMode === 'side' && anchorSets[si] && anchorSets[si].items.length) return Math.max(1, Math.floor((L.cols === 1 ? sideFit(Object.assign({}, L, { rows: Math.max(2, L.rows - (L.rows % 2)) }), anchorSets[si].items).rows : sideFit(L, anchorSets[si].items).perPage) / 2));
         return L.perPage;
     };
     const floorWith = (si, items) => floorOf(anchorMode === 'side' && anchorSets[si] ? items.concat(anchorSets[si].items) : items, n);

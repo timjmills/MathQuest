@@ -180,11 +180,21 @@ export function stateSize(pageSize, n) {
     return 'S';
 }
 
+/** The narrowest column a step list keeps beside its state (mm): about five words at the zone size. */
+const BESIDE_MIN_MM = 30;
+
 /** The inner width of a full-width anchor cell at one column (mm). */
 const BAND_W_MM = 178;
 
-const lineHtml = (text, n) => `<li${n ? '' : ' class="mq-anchor-cont"'}>${n ? `<em>${n}</em>` : '<em></em>'}<span>${esc(text)}</span></li>`;
-const stepsList = (steps, idx) => `<ol class="mq-anchor-steps">${idx.map((i) => stepLines(steps[i].text).map((t, j) => lineHtml(t, j === 0 ? i + 1 : 0)).join('')).join('')}</ol>`;
+/**
+ * TY-11: a step number is pupil-facing type, never under the minimum (the quiet letter at S, the
+ * size table's smallest pupil type). The list's 0.85 em ran 7.0 pt at S and 7.8 pt at M (lead
+ * pilot E1); the floor rides on the number itself, so pages without anchors are untouched.
+ */
+const TY11_MIN_PT = Math.min(...Object.values(SIZES).map((s) => s.letterPt));
+const NUM_STYLE = ` style="font-size:max(0.85em,${TY11_MIN_PT}pt)"`;
+const lineHtml = (text, n) => `<li${n ? '' : ' class="mq-anchor-cont"'}>${n ? `<em${NUM_STYLE}>${n}</em>` : '<em></em>'}<span>${esc(text)}</span></li>`;
+const stepsList = (steps, idx, style = '') => `<ol class="mq-anchor-steps"${style}>${idx.map((i) => stepLines(steps[i].text).map((t, j) => lineHtml(t, j === 0 ? i + 1 : 0)).join('')).join('')}</ol>`;
 
 /**
  * The anchor's drawing.
@@ -224,11 +234,17 @@ export function anchorHtml(it, c, { variant = 'band', twinCols = 2 } = {}) {
         const k = merged.length - 1;
         const size = stateSize(c.size, variant === 'band' ? 2 : 1);
         const st = `<div class="mq-anchor-cell ws-${size}">${stateHtml(it, merged, k, c, twinCols, whole, size)}</div>`;
-        const list = stepsList(steps, steps.map((_, i) => i));
+        // The steps keep a readable column (BESIDE_MIN_MM): beside a state too wide to leave it,
+        // they wrap UNDER the state and the cell grows (DN-10; lead pilot E2: a list squeezed to
+        // no width beside a wide bar graph ran its lines out of the cell).
+        const list = stepsList(steps, steps.map((_, i) => i), ` style="flex:1 1 ${BESIDE_MIN_MM}mm"`);
         // The state and its numbered steps side by side (the twin keeps its height close to the
         // pupil's problem beside it); the Say line closes it.
-        const body = `<div class="mq-anchor-one mq-anchor-beside">${st}${list}</div>`;
-        return `<div class="mq-anchor mq-anchor-${variant}" data-ws-anchor="${variant}" data-ws-states="1">${body}${sayHtml}</div>`;
+        const body = `<div class="mq-anchor-one mq-anchor-beside" style="flex-wrap:wrap">${st}${list}</div>`;
+        // A side twin is centred in its cell at its own width (lead pilot E3, H13: never pinned to
+        // one side of the pair's cell with an empty band beside it); a band keeps the full width.
+        const centre = variant === 'side' ? ' style="width:auto;max-width:100%;align-self:center"' : '';
+        return `<div class="mq-anchor mq-anchor-${variant}" data-ws-anchor="${variant}" data-ws-states="1"${centre}>${body}${sayHtml}</div>`;
     }
     const n = groups.length;
     const size = stateSize(c.size, n);
@@ -290,6 +306,44 @@ export function anchorHeightMm(a, cols = 1) {
     // + 6 mm: the anchor's step text wraps in narrow state columns, and a wrap measured in the
     // app page can fall one line short of the printed document's (a line is ~5 mm at L).
     return m && Number.isFinite(m.hMm) ? m.hMm + 6 : 0;
+}
+
+/**
+ * SIDE BY SIDE: the rows a page holds so every cell is at least as tall as what it holds (lead
+ * pilot E2). A twin's step text is part of its measured height; a layout that kept the practice
+ * ceiling's rows printed cells shorter than the twin, and its steps ran out of the cell (DN-10:
+ * content never overflows; the cell grows, and a page holds fewer pairs). A twin carries the same
+ * +6 mm print margin as a band (anchorHeightMm).
+ *
+ * Two columns ([twin | problem] rows): rows as tall as the tallest twin. One column (a twin above
+ * its problem): whole pairs, each pair's twin row and problem row as tall as each needs
+ * (`pairMm`, the grid's row template), so a twin taller than half a pair still fits.
+ *
+ * @param {Object} L       the section layout (cols, rows, cellH, hMin, gridH)
+ * @param {Object[]} items the section's items: twins (`anchor`) and, when known, the problems
+ * @returns {Object} L, or a copy with fewer rows (and `pairMm: [twin, problem]` at one column)
+ */
+export function sideFit(L, items) {
+    const twins = (items || []).filter((it) => it && it.anchor);
+    if (!L || (L.cols !== 1 && L.cols !== 2) || !twins.length) return L;
+    const G = Number(L.gridH) > 0 ? Number(L.gridH) : L.rows * L.cellH;
+    const tw = Math.max(0, ...twins.map((a) => anchorHeightMm(a, L.cols)));
+    const hs = (items || []).filter((it) => it && !it.anchor && it.measured && it.measured[L.cols] && Number.isFinite(it.measured[L.cols].hMm)).map((it) => it.measured[L.cols].hMm + 1);
+    const pr = hs.length ? Math.max(...hs) : Number(L.hMin) || 0;
+    if (L.cols === 2) {
+        const need = Math.max(Number(L.hMin) || 0, tw);
+        if (!(need > L.cellH + 0.05)) return L;
+        const rows = Math.max(1, Math.min(L.rows, Math.floor(G / need)));
+        if (rows >= L.rows) return L;
+        return Object.assign({}, L, { rows, perPage: rows * 2, cellH: Math.floor((G / rows) * 1000) / 1000 });
+    }
+    if (!(tw > L.cellH + 0.05)) return L;
+    const pairs = Math.max(1, Math.min(L.rows / 2, Math.floor(G / (tw + pr))));
+    const rows = pairs * 2;
+    // The spare height shared by the pair's two rows in proportion (never under what each holds).
+    const k = G / pairs / (tw + pr);
+    const pairMm = [Math.round(tw * k * 10) / 10, Math.round(pr * k * 10) / 10];
+    return Object.assign({}, L, { rows, perPage: rows, cellH: Math.floor((G / rows) * 1000) / 1000, pairMm });
 }
 
 /* ============================================================ easy numbers first */
@@ -437,5 +491,5 @@ export const ANCHOR_CSS = `
 export default {
     ANCHOR_MODES, ANCHOR_ROLES, normaliseAnchors, wordCount, workedStepsOf, anchorEligible, ineligibleNote,
     stepLines, anchorGroups, sayLineOf, stepTemplateOf, unslot, stateSize, anchorHtml, anchorItem,
-    anchorPlanItem, anchorHeightMm, easeScore, pickDistinct, sideItems, pupilCount, blockPlan, blockPages, ANCHOR_CSS,
+    anchorPlanItem, anchorHeightMm, sideFit, easeScore, pickDistinct, sideItems, pupilCount, blockPlan, blockPages, ANCHOR_CSS,
 };

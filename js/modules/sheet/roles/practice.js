@@ -31,7 +31,7 @@ import {
 import { paginate, labelStarts, scoreDenominator, placeSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
 import { deriveSeed } from '../rng.js';
-import { ANCHOR_CSS, anchorPlanItem, sideItems, pupilCount, blockPlan, blockPages } from '../anchors.js';
+import { ANCHOR_CSS, anchorPlanItem, sideItems, pupilCount, blockPlan, blockPages, sideFit } from '../anchors.js';
 import { LESSON_CSS } from '../lesson-css.js';
 
 /* ======================================================================= engine stylesheet */
@@ -657,7 +657,11 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
         // at the foot of a page with its problem overleaf).
         if (anchors && anchors.mode === 'side' && L.cols === 1 && itemsBySection[si].some((it) => it.anchor)) {
             const rows = Math.max(2, L.rows - (L.rows % 2));
-            return Object.assign({}, L, { rows, perPage: rows, pairs: true });
+            return sideFit(Object.assign({}, L, { rows, perPage: rows, pairs: true }), itemsBySection[si]);
+        }
+        // SIDE BY SIDE in two columns: rows as tall as the tallest twin (its steps included).
+        if (anchors && anchors.mode === 'side' && L.cols === 2) {
+            if (itemsBySection[si].some((it) => it.anchor)) return sideFit(L, itemsBySection[si]);
         }
         if (!aMm) return L;
         const bp = blockPlan({ cols: L.cols, hMin: L.hMin, cellH: L.cellH, bodyMm: sec.gridH ? sec.gridH + instr : body, instrMm: instr, anchorMm: aMm });
@@ -701,6 +705,9 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
     );
     return { layouts, chunksBySection, pages };
 }
+
+/** The columns of a two-column side-by-side grid (lead pilot E3, H13): sized to their content. */
+const SIDE_COLS = 'auto auto';
 
 /** The anchor band height (mm) of section `si` in SECTIONS mode, else 0. */
 const anchorBandOf = (anchors, si) => (anchors && anchors.mode === 'sections' && anchors.bandMm && Number(anchors.bandMm[si]) > 0
@@ -944,7 +951,12 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 start,
                 cls: fillByFlex && !shape ? '' : 'fixed',
                 height: gap.gap ? `${gap.heightMm}mm` : shape ? `${shape.heightMm}mm` : fillByFlex ? '' : `${Math.round(part.chunk.rows * L.cellH * 1000) / 1000}mm`,
-                rowsTpl: shape ? shape.rowsTpl : '',
+                // SIDE BY SIDE in one column: each pair's twin row and problem row as tall as each
+                // needs (anchors.js sideFit), so a tall twin never runs out of its row.
+                rowsTpl: shape ? shape.rowsTpl : L.pairMm && L.pairs ? Array.from({ length: part.chunk.rows }, (_, r) => `${L.pairMm[r % 2]}fr`).join(' ') : '',
+                // SIDE BY SIDE (two columns): each column as wide as what it holds, the spare
+                // width shared, so a narrow stack is not an island in a half-page cell (H13).
+                ...(L.cols === 2 && its.some((it) => it.anchor) ? { colsTpl: SIDE_COLS } : {}),
                 rowGap: gap.gap || 0,
                 items: its.map((it) => planItem(it, level, L.cols)),
             });
