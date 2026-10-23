@@ -199,3 +199,19 @@ commit yet). `ws-backtest --row …-pilot`: 5/5 PASS (283 s).
 Precritic on HEAD for subtraction:sub_100_no_regroup: OK, 15 PASS (2 baseline), 1 N/A, 2 SKIPPED (no rulings block on the
 card — the card owners need to add one; `--strict` makes that INCOMPLETE), 1581 s wall (1048 s of it a needless sibling
 measurement, since removed). The SLOT-W / HEADS probe lives in ws-slot-clip, not ws-print-lint yet.
+
+## Per-round findings (LESSONS_LEARNED rule 00)
+
+### Wave 0 part A (gates lane) — critic rounds r1–r5 (2026-10-23)
+
+| Round | Result | (1) Automatic checks the findings point to | (2) Speed-ups |
+|---|---|---|---|
+| r1 | FAIL 6 / 8 / 6 (D1–D8) | **A1 "checked nothing" self-check in every gate**: unknown `--skills` / `--category` / `--rows` and 0 checked items must FAIL (D3, four gates printed OK on nothing) — a shared helper in `tests/lib` so new tools get it free. **A2 verdict lint for runners**: SKIPPED / NOT YET never ends a run OK (D2). **A3 baseline-grain check**: a baseline pins findings by key, never a count (D5); a test that a swapped finding fails, for every tool with a baseline. **A4 per-skill pins only** (D6). **A5 plan-flag coverage**: grep the plan's named flags (§1.4, §1.6.7) against each tool's usage text (D7 missed: H8 multiple choice). | Brief every new tool with the cross-cutting contract up front (exit codes 0/1/2/3, INCOMPLETE, unknown-id FAIL, key-based baselines, run-file fields): r1–r4 found the same contract gaps tool by tool. Give interface contracts between tools in the brief (matrix ↔ deploy runner) — done from r1 on, it removed merge rework. |
+| r2 | FAIL 7 / 8 / 8 (D1) | **A6 state-fold property test** for any tool that reads run history (newest-only reads let red rows vanish). | A defect in shared state logic needs the invariants written first; fixing symptoms took r2→r4 (three rounds, one area). Rule: on the 2nd defect in the same area, brief the root cause and a property test (done at r3). |
+| r3 | FAIL 7 / 8 / 8 (D1) | **A7 baseline invariants I1–I5 as a reusable property test** (pin-new-only, verdict before pin, no re-pin by a nightly) — applies to node-lint, options-pin and matrix baselines alike. | Same as r2: escalate to "root cause + invariants" one round earlier. |
+| r4 | FAIL 7 / 8 / 8 (D1, D2) | **A8 deploy-list time budget**: `ws-deploy-gates --list` sums each gate's last measured seconds per session and FAILS when a session exceeds 30 min (would have caught the options pin auto-joining session 1, and session 2's 33.6-min floor). **A9 fold-order mutation in the property test** (sort by name vs `finished`). | Lead integration rule: a "switch on when the tool exists" line must be reviewed at merge (D1 was the lead's merge). Time each gate once and keep the table in the runner so rebalancing is arithmetic, not a 90-min timed run. |
+| r5 | **PASS 9 / 9 / 8** | Nits → checks: **A10** reject run files with a future `finished` (clock skew); **A11** legacy run files (no `baseline` field) clear nothing after a cut-off; **A12** options-pin `--resume` keyed by commit. | Run critics on the narrowest scope (r5 scoped to "r4 defects + regressions" took 10 min vs 29 min for r1). Timed deploy runs in parallel child sessions: three sessions × 3 runs in ≈ 1.5 h wall instead of ≈ 4.5 h serial. |
+
+**Queue of automatic checks this lane owns** (owner rule: the main owner of new checks; other lanes' "Automatic checks"
+items join here in priority order): A8 deploy-list time budget; A1 shared "checked nothing" helper; A3 key-based baseline
+test for every baselined tool; A10–A12; then other lanes' items as they are listed in speed-audit.md "Per-round findings".
