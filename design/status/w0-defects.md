@@ -17,6 +17,12 @@ Base: `claude/sweet-newton-c8wrv1-wip-wave0-gates` @ bfdbd90.
 | Builder A: defects 1 + 4 | mq-opus-low | 13:18 | 14:32 | 74 |
 | Builder B: defect 2 | mq-opus-low | 13:19 | 13:26 | 8 |
 | Builder C: defect 3 | mq-opus-low | 13:19 | 14:05 | 46 |
+| Builder D: defect 3 rebuild (critic C3 = 7 on the 2 pinned skills) + quiz dark dot | mq-opus-medium (escalated: failed a critic round) | 15:07 | 15:28 | 21 |
+
+## Defect 3 rebuild (after the critic, mq-opus-medium)
+- Critic: the Board display still scrolled at 1366x768 for `add_sub_fact_family` (+81 px measured, really +162: the centred card also cut the instruction line above its top) and `add_word_problems` (+33, really +65). C3 = 7.
+- Fix (space from the frame, never the question; zoom stays >= 1): `css/play-teacher.css` (additive) `justify-content/align-items: safe center` on the board card; at `max-height: 800px` the frame padding 12/16, gaps 8, card padding 12/16; `#gameView.tvb-rail` puts the chips at the top and the controls (and the revealed answer) at the foot of a 216 px right rail. `fitBoard()` (`js/modules/launch-chrome.js`) adds the rail only when zoom 1 does not fit with the bar above and the controls below, then fits the zoom again; the fit has no 1 px tolerance. 1366x768: word problem fits stacked at 1.02 (rail at 1.16 when the answer is shown), fact family fits on the rail at 1.0. Both pins removed: `--bigboard` 78/78 ok, 0 NEW.
+- Quiz dark dot: `html.dark .qt-q-dot.current:not(.answered) { color: #1F1B33 }` (css/quiz-mode.css end): 2.18:1 -> 7.64:1; light unchanged (4.64:1).
 
 ## Environment note
 - `ws-harness.cjs` looks for `chrome-linux/chrome`; this container has `/opt/pw-browsers/chromium-1243/chrome-linux64/chrome`. Set `PUPPETEER_EXECUTABLE_PATH` to it (tests file not changed by this lane).

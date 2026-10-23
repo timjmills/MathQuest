@@ -2296,3 +2296,8 @@
     .qm-topbar, .qm-toggle-bar, .qm-footer { display: none; }
     .qm-dashboard { min-height: auto; }
 }
+
+/* Dark mode: the current-question dot sits on the light accent (#B5A5F4), so its number takes dark
+   ink (#1F1B33, about 7.5:1) instead of white (2.18:1). Light mode is unchanged. An answered dot
+   keeps its own green ink. (W0-defects, critic 2026-10-23) */
+html.dark .qt-q-dot.current:not(.answered) { color: #1F1B33; }
