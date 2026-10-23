@@ -6,7 +6,7 @@
     "quiz"
   ],
   "derived": "2026-10-23",
-  "liveSkills": 723,
+  "liveSkills": 715,
   "skills": [
     {
       "template": "counters",
@@ -16,7 +16,7 @@
     {
       "template": "legacy",
       "key": "counting:count_sequence",
-      "skillsOnTemplate": 430
+      "skillsOnTemplate": 424
     },
     {
       "template": "seqstrip",
@@ -101,7 +101,7 @@
     {
       "template": "mult-grid",
       "key": "multiplication:mult_chart",
-      "skillsOnTemplate": 8
+      "skillsOnTemplate": 6
     },
     {
       "template": "hop-line",
@@ -205,8 +205,7 @@
     }
   ],
   "chromebookFit": {
-    "note": "Standing failures of the ws-chromebook-fit sweeps on this sample, pinned 2026-10-23 at 60c4fa53 so the deploy gate fails only on NEW ones (--baseline). (1) The Board display: the measured fit (launch-chrome.js fitBoard) fixed 15 of 17 skills at 1366x768 and all 3 at 1920x1080; the last 2 (add_word_problems, add_sub_fact_family at 1366x768) were fixed by the short-board frame and the side rail (W0-defects lane 2026-10-23), so no Board pin is left; (2) the number-family page error (null numberFamilyData after the card) was fixed in the W0-defects lane and its line removed. Remove a line when its defect is fixed.",
-    "problems": [],
+    "note": "Standing failures of the ws-chromebook-fit sweeps on this sample, pinned 2026-10-23 at 60c4fa53 so the deploy gate fails only on NEW ones (--baseline). (1) The Board display: the measured fit (launch-chrome.js fitBoard) fixed 15 of 17 skills at 1366x768 and all 3 at 1920x1080; the last 2 (add_word_problems, add_sub_fact_family at 1366x768) were fixed by the short-board frame and the side rail (W0-defects lane 2026-10-23), so no Board pin is left; a page error is pinned per skill, host and size as <host>:<WxH>:pageerror:<message> (critic r1 D6), none is waived globally; (2) the number-family page error (null numberFamilyData after the card) was fixed in the W0-defects lane and its line removed. Remove a line when its defect is fixed.",
     "skills": {}
   }
 }

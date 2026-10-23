@@ -2387,20 +2387,27 @@ function mcCompare(pinned, rows) {
 function mcReport(rows, n, { writeBaseline = false, baselineFile = MC_BASELINE, label = 'ws-content-audit --mc-all' } = {}) {
     const fails = rows.filter(r => r.mc.some(f => f.cls === 'mc-production'));
     const notes = rows.filter(r => r.mc.some(f => f.cls === 'mc-label'));
-    console.log(`\nMC-ALL (P-29 / RM-P-01, every live skill): ${rows.length} skills, ${n} items each`);
-    for (const r of fails) {
-        console.log(`FAIL ${r.categoryId}/${r.skillId}  "${r.label}"`);
-        for (const f of r.mc.filter(x => x.cls === 'mc-production')) {
-            const ex = f.example;
-            console.log(`       - [mc-production] [${f.kind}] ${f.n} of ${f.live} items offer a written answer as buttons (${ex.labels.join(' | ')}); the paper cell prints no such choices${ex.declared ? ' although the item declares keepChoices' : ''} (P-29, RM-P-01): "${ex.printText}"`);
-        }
-    }
-    if (has('mc-verbose')) for (const r of notes) for (const f of r.mc.filter(x => x.cls === 'mc-label')) console.log(`note ${r.categoryId}/${r.skillId} [mc-label] [${f.kind}] ${f.n} of ${f.live}: (${f.example.labels.join(' | ')}) "${f.example.printText}"`);
-    if (notes.length) console.log(`note mc-label: ${notes.length} skill(s) answer on screen by picking a word the paper cell does not draw as a bank (allowed as chips, RM-22; the paper must draw the bank): ${notes.map(r => `${r.categoryId}/${r.skillId}`).join(', ')}`);
     let pinned = {};
     const useBase = !writeBaseline && baselineFile && fs.existsSync(baselineFile);
     if (useBase) pinned = (JSON.parse(fs.readFileSync(baselineFile, 'utf8')).keys) || {};
     const { added, gone } = mcCompare(pinned, rows);
+    console.log(`\nMC-ALL (P-29 / RM-P-01, every live skill): ${rows.length} skills, ${n} items each`);
+    // N4 (critic r2): a skill whose every production kind is in the baseline prints PINNED (a known defect, the verdict
+    // stays OK); FAIL is kept for a skill with a (skill, kind) pair the baseline does not hold. With --mc-write-baseline
+    // every line is PINNED (it is being pinned).
+    const newPairs = new Set(added.map(a => `${a.skill}|${a.kind}`));
+    for (const r of fails) {
+        const key = `${r.categoryId}:${r.skillId}`;
+        const prod = r.mc.filter(x => x.cls === 'mc-production');
+        const isNew = (f) => !writeBaseline && newPairs.has(`${key}|${f.kind}`);
+        console.log(`${prod.some(isNew) ? 'FAIL' : 'PINNED'} ${r.categoryId}/${r.skillId}  "${r.label}"`);
+        for (const f of prod) {
+            const ex = f.example;
+            console.log(`       - ${isNew(f) ? 'NEW ' : 'pinned '}[mc-production] [${f.kind}] ${f.n} of ${f.live} items offer a written answer as buttons (${ex.labels.join(' | ')}); the paper cell prints no such choices${ex.declared ? ' although the item declares keepChoices' : ''} (P-29, RM-P-01): "${ex.printText}"`);
+        }
+    }
+    if (has('mc-verbose')) for (const r of notes) for (const f of r.mc.filter(x => x.cls === 'mc-label')) console.log(`note ${r.categoryId}/${r.skillId} [mc-label] [${f.kind}] ${f.n} of ${f.live}: (${f.example.labels.join(' | ')}) "${f.example.printText}"`);
+    if (notes.length) console.log(`note mc-label: ${notes.length} skill(s) answer on screen by picking a word the paper cell does not draw as a bank (allowed as chips, RM-22; the paper must draw the bank): ${notes.map(r => `${r.categoryId}/${r.skillId}`).join(', ')}`);
     if (writeBaseline) {
         let prev = {};
         if (fs.existsSync(baselineFile)) { try { prev = JSON.parse(fs.readFileSync(baselineFile, 'utf8')).keys || {}; } catch (e) { prev = {}; } }

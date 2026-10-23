@@ -327,18 +327,31 @@ export function itemNumbers(q, depth = 0, out = []) {
  * scale, a coin, a divisor, a partial value, a table entry (L3, critic r1 N12). An allow-list on purpose: a field such as
  * `whole`, `total` or `result` may be the very unknown the pupil is asked for, so a number there never counts as given.
  */
-const GIVEN_KEYS = /^(a|b|base|height|width|length|side|sides|w|h|l|radius|diameter|scale|coins|notes|value|values|divisor|dividend|factor|factors|multiplier|rate|start|step|operands|addends|minuend|subtrahend|dimensions|price|cost|each|groups|perGroup|size|target)$/i;
-/** Numbers the item's data gives under a GIVEN_KEYS key (an array takes its key; an object inside it is walked). */
+const GIVEN_KEYS = /^(a|b|base|height|width|length|side|sides|w|h|l|radius|diameter|scale|coins|notes|divisor|dividend|factor|factors|multiplier|rate|operands|addends|minuend|subtrahend|dimensions|price|cost|groups|perGroup)$/i;
+/**
+ * N2 (critic r2): common data keys - `value`, `values`, `size`, `start`, `step`, `each`, `target` - name a given only
+ * as ONE ENTRY OF A LIST of several (a bar's parts [{value: 4}, {value: 8}], a data set's values [3, 5, 9], a table's
+ * rows). A single `value` / `size` / `start` ... at the top of a cell's payload is what the cell draws, and it may be
+ * the very answer ("What number do the blocks show?" with payload.value = the answer), so it never counts as given:
+ * a cell that captions its own answer under such a key is still caught.
+ */
+const LIST_GIVEN_KEYS = /^(value|values|size|start|step|each|target)$/i;
+/** Numbers the item's data gives under a GIVEN_KEYS key, or a LIST_GIVEN_KEYS key inside a list of 2 or more. */
 export function givenNumbers(q) {
     const out = new Set();
-    const walk = (v, d, given) => {
+    const walk = (v, d, given, inList) => {
         if (v === null || v === undefined || d > 6) return;
         if (typeof v === 'number') { if (given && Number.isFinite(v)) out.add(String(v)); return; }
         if (typeof v === 'string') { if (given && /^-?\d+(\.\d+)?$/.test(v.trim())) out.add(String(Number(v))); return; }
-        if (Array.isArray(v)) { for (const x of v) walk(x, d + 1, given); return; }
-        if (typeof v === 'object') for (const [k, x] of Object.entries(v)) { if (!SKIP_KEYS.has(k) && k !== 'skillOptions') walk(x, d + 1, GIVEN_KEYS.test(k)); }
+        if (Array.isArray(v)) { for (const x of v) walk(x, d + 1, given, inList || v.length >= 2); return; }
+        if (typeof v === 'object') for (const [k, x] of Object.entries(v)) {
+            if (SKIP_KEYS.has(k) || k === 'skillOptions') continue;
+            const listKey = LIST_GIVEN_KEYS.test(k);
+            // a list-only key: given inside a list, or when it holds a list of 2 or more itself (`values: [3, 5, 9]`)
+            walk(x, d + 1, GIVEN_KEYS.test(k) || (listKey && (inList || (Array.isArray(x) && x.length >= 2))), listKey ? inList : false);
+        }
     };
-    walk(q, 0, false);
+    walk(q, 0, false, false);
     return out;
 }
 
@@ -462,6 +475,13 @@ function selfTest() {
     eq([...givenNumbers({ triangleData: { base: 2, height: 10, area: 10 } })], ['2', '10'], 'a triangle side is given, its area is not');
     eq([...givenNumbers({ cell: { payload: { scale: 1, answer: 1, total: 9 } } })], ['1'], 'a pictograph key scale is given');
     eq([...givenNumbers({ bar: { parts: [{ value: 4 }, { value: 8 }], whole: 12 } })], ['4', '8'], 'a whole is never given (it may be the unknown)');
+    // N2 (critic r2): a single value / size / start / step / each / target is what the cell draws, not a given
+    eq([...givenNumbers({ cell: { payload: { value: 347 } } })], [], 'N2: a single payload.value is not given (it may be the answer)');
+    eq([...givenNumbers({ cell: { payload: { size: 6, start: 3, step: 2, each: 4, target: 10 } } })], [], 'N2: single size / start / step / each / target are not given');
+    eq([...givenNumbers({ cell: { payload: { values: [3, 5, 9] } } })], ['3', '5', '9'], 'N2: a data set (values, 2 or more) is given');
+    eq([...givenNumbers({ cell: { payload: { rows: [{ value: 2 }, { value: 7 }] } } })], ['2', '7'], 'N2: value inside a list of rows is given');
+    eq([...givenNumbers({ cell: { payload: { rows: [{ value: 2 }] } } })], [], 'N2: value inside a one-entry list is not');
+    eq([...givenNumbers({ cell: { payload: { groups: 3, perGroup: 4 } } })], ['3', '4'], 'N2: groups / perGroup stay given');
     if (fails.length) {
         for (const f of fails) console.log('  ' + f);
         console.log(`ws-node-lint --self-test: FAIL (${fails.length})`);

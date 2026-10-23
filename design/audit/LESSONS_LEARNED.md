@@ -31,6 +31,29 @@ lane had self-graded 8. The failures fall into a small number of RECURRING class
 
 These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The plan has the reasons; this is the short form.
 
+00. **The speed reflection cycle — always (owner, 2026-10-23: "always perform it so that we get better and better, faster
+   and faster").** Every lane, family, pilot or tool build ends with a reflection, before the next one starts:
+   1. **Measure** — an independent auditor (`mq-opus-medium`, never the lane itself) reads the lane's `Times:` lines and
+      critic reports: wall time per step, builder runs, critic rounds, tokens, time waiting for browser slots, and the
+      result against the target (§4.4: ≤ 2 rounds, 1 builder run, and the time budget) and against the running baseline
+      in `design/status/metrics.md`.
+   2. **Find the causes** — for every round lost and every hour over budget: which defect classes the critic found that a
+      machine could have measured, which card gaps, which wrong builder strength, which waits.
+   3. **Change something** — each cause becomes the smallest fix: a new machine check with a backtest, a card or
+      template rule, a process rule here, a tool speed-up, or a change to how lanes are run. Fixes are made or assigned
+      before the next lane of the same kind starts; nothing is "noted for later" without an owner and a date.
+   4. **Record** — the result, causes and fixes go into `design/status/speed-audit.md` (one dated section per
+      reflection) and the numbers into `design/status/metrics.md`, so the trend (rounds, hours, skills per lane-week)
+      is visible over time. The owner gets a short plain-words summary.
+   A lane is not closed until its reflection is written. *Why:* the 2026-10-23 pilot reflection found the wrong builder
+   strength and five missing machine checks within the hour; each is now a rule or a check.
+0a. **Low effort only on a certified pair (pilot, 2026-10-23).** Opus low builds only copies on a (template, kind) pair that
+   has its certificate (`design/audit/certified/`). Every build on an uncertified pair — including redos and "copies" — runs
+   on Opus medium. *Why:* the SU-C pilot built at low on `stack` × Single skill before certification; critic r1 scored a
+   minimum of 4 and the family needed a second builder run.
+0b. **Clean before the critic.** The critic starts only when precritic is green against the pinned baselines AND every red
+   matrix row is at or below the approved siblings' counts (the sibling comparison). A critic round started earlier counts
+   only if that comparison later confirms it.
 0. **Batch design decisions (owner, 2026-10-23).** A new design idea from the owner while a build or fix round is running
    goes on the lane's "Owner design list" (status file, date + the owner's words) and the owner is told it is queued; it
    is not folded into the running round. When the round passes its critic, the owner sees the whole thing once and
