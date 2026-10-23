@@ -47,7 +47,7 @@ Builders run in their own git worktrees and the lead merges them here.
 | Fix r3: baseline invariants (root cause of r1 D4, r2 D1, r3 D1) — merged 8d0a7a5a | mq-opus-medium (rebuild after a failed round) | 18:41 | — | — |
 | Timed deploy runs: three cloud sessions (gate sessions 1, 2, 3 in parallel; each repeats its session 3×) on eee32b89 | timing runners (session_01HZreUmm66xVrS2AYyY32uD, session_016eCsVCbtn3q8SkotuDG1Xp, session_01FLRx8vV9wbkgLuukh57VyK) | 18:09 | — | — |
 | Critic r4: FAIL 7 / 8 / 8 (D1 deploy session 1 ran the whole options pin; D2 fold order by name) | mq-opus-medium | 19:05 | 19:19 | — |
-| Fix r4: read-only options gate at deploy, fold every run file by finish time + nits | mq-opus-medium (rebuild after a failed round) | 19:19 | — | — |
+| Fix r4: read-only options gate at deploy, fold every run file by finish time + nits — merged b261abf0 | mq-opus-medium (rebuild after a failed round) | 19:19 | — | — |
 | S1 `ws-precritic` build (brought forward by the lead, 11:02; stopped: moved to the lead's session) | mq-opus-medium | 11:03 | 12:51 | 108 |
 
 ## Critic r1 (2026-10-23, `design/audit/runs/wave0-gates/critic-r1.md`): FAIL — plan 6, backtests 8, usable 6
@@ -151,3 +151,12 @@ merged, so deploy session 1 would run the whole pin (≈ 1 h 52 min): a lead int
 the Repeated check's results instead. D2 — the fold sorted nightly files by date name and other run files by finish time,
 so an earlier OK could fold after a later RED. The three timed runs (on eee32b89) predate the pin merge, so they are not
 affected by D1.
+
+Fix r4 results: deploy session 1's options gate is read-only (`ws-options-pin --gate design/audit/matrix`, 0.06 s, no slot):
+folds every options-pin-*.json by finish time against the current pin; refuses a NEW pair of a live skill; WARNING before
+all 28 slices are checked (a stale file refuses only after, as for the matrix). The matrix fold orders every run file by
+`finished`; run files record the baseline they were judged against (an OK against another baseline, or from a dirty tree,
+never clears red); narrowed slice runs write `.partial` slice files that never count as complete; run file written before
+pins (atomic); red rows that turn N/A stay red; options-pin slices cut by a hash of the skill id; a crashed print-lint batch
+is retried once. Matrix self-test 161 assertions (property test incl. 526 interleaved-name cases, 0 violations; the r4 sort
+mutant fails it). Lanes must commit before a clearing run (a dirty run never clears red) — in NIGHTLY.md.
