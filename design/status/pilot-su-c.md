@@ -17,7 +17,7 @@ Critic rounds: 1, FAIL
 - none
 
 ## Times
-Times: precritic pass 3 (after fix r1 + base merge), start 2026-10-23T20:56Z, end —, profile —
+Times: precritic pass 3 (after fix r1 + base merge), start 2026-10-23T20:56Z, end 2026-10-23T21:17Z, profile — — 12 PASS, 1 N/A, coverage-matrix 38 RED rows (all in the 38 engine-class counts below)
 Times: fix round 1 (machine deltas + critic r1 D1-D12), start 2026-10-23T19:44Z, end 2026-10-23T20:55Z, profile mq-opus-medium, tokens 406k, 198 tool uses
 Times: critic round 1 (all pages graded directly: stack x single has no certificate; S and L full, M spot), start 2026-10-23T19:06Z, end 2026-10-23T19:41Z, profile mq-opus-medium, tokens 350k — FAIL (min C1 4, C2 4, C3 6, C4 5); also FAILED by the lead's ruling (sibling comparison)
 Times: sibling matrix run (approved stack skills, for the pin comparison), start 2026-10-23T19:05Z, end 2026-10-23T19:37Z, profile —
@@ -27,6 +27,19 @@ Times: precritic step 3 pass 1 (run by the builder), start 2026-10-23T17:55Z, en
 Times: gate step 1 ws-spec-card --check-signed, start 2026-10-23T16:43Z, end 2026-10-23T16:44Z, profile — (OK)
 Times: builder step 2 (one run, all six + sub_2d_1d), start 2026-10-23T16:46Z, end 2026-10-23T18:28Z, profile mq-opus-low, tokens 320k, 139 tool uses (102 min, of which ws-precritic ≈ 30 min)
 Times: merge W0-A wave0-gates (coverage-matrix baseline), start 2026-10-23T16:44Z, end 2026-10-23T16:45Z, profile —
+
+## Engine-class rates (lead ruling (1), 2026-10-23 21:00: per-cell-rate equivalence; critic r2 checks this table)
+
+Measured 21:20Z with `ws-print-lint --json` (findings of the rule) and `buildSheet` (cells, `data-ws-cell`, pupil + key), same request; script design/audit/runs/pilot-su-c/rate.cjs.
+
+| Class | Row, size | Ours: flagged / cells | Approved siblings: flagged / cells | Same rate? |
+|---|---|---|---|---|
+| (a) H13, forced 2 columns | more-cols2+short, M | sub_50 8/16 = 0.50; sub_1k 8/16 = 0.50 | sub_100_regroup 6/12 = 0.50; sub_1k_regroup 6/12 = 0.50; add_1k_regroup 0/12 | yes (every stack cell in a 2-col page; we hold 16 cells to their 12: no regroup row) |
+| (a) H13, side anchors | ex-each (side), S | sub_50 8/16 = 0.50; sub_2d_1d 8/16 = 0.50 | add_100_regroup 6/12 = 0.50; add_1k_regroup 6/12 = 0.50 | yes |
+| (b) TY-11, 7 pt step numbers (anchors.js lineHtml) | ex-group (sections), M | sub_1k 16 findings in 4 anchor cells (4 steps each, every step number); sub_50 the same | add_1k_regroup 6 in 2 anchors (3 each); add_10k_regroup 8 in 2 (4 each) | yes per step number (100 % on both); ours has more anchors / steps |
+| (c) fact-rows ILLEGIBLE | layout-fact-rows, S | sub_100k 128/128 cells = 1.00 (272 findings) | sub_100k_regroup 92/128 = 0.72 (198); sub_1m_regroup 112/128 = 0.88 (224) | NO by cell: ours always deals full-length operands (the band 10,000-99,999), the regroup sibling's band starts lower. Per full-length item the overflow is the same (fix r1, per-cell measurement). Fix owned by the mixed-pages lane (fact-rows.js factRowsLayout patch) |
+| (d) sections / mixed composer | sections/*, mixed/defaults | partner algebra:tape_diagram legacy cell | same partner on sub_1k_regroup | critic r1 confirmed |
+| fact-probe chunking | layout-timed L PG-23 ×2 (sub_10k) | fact-probe.js ~136 chunks 9/9/2 | sub_1m_regroup the same | same engine path |
 
 ## Log
 - 2026-10-23 18:40: precritic pass 1 triage. OURS, fixed: fact-probe 1 row a page for 6-digit stacks (fact-probe.js bestCols vs digit clamp with separators); side-anchor overflow and ILLEGIBLE at 4-6 digits (worked steps 5-6 lines -> 4). ENGINE classes, reproduced on approved stack skills: H13 stack pinned in a forced 2-column cell (add_1k_regroup, sub_1k_regroup); TY-11 7 pt step numbers in sheet/anchors.js (add_10k_regroup); fact-rows ILLEGIBLE / PG-12 (sub_100k_regroup, sub_1m_regroup). Mixed-pages lane: sections/*, mixed/defaults. Gap: anchors.js does not reserve the anchor cell's height for its step text. Card tool gap: --check-signed fails after the build because §7 lists live options.
