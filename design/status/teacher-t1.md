@@ -92,3 +92,4 @@ New owner design ideas are recorded here and NOT folded into a running fix round
 | all | Builders ran 1-2 h per round; critics re-wrote their own probes each time | Keep the critic's probe scripts in the lane folder (`design/mockups/teacher-2/critic-tools/`) so each builder runs them before reporting |
 
 | 2026-10-23 | Owner pre-approved the teacher-site build ("I approve the teacher site when its ready to build. I have seen enough"; STATUS 619a0521). No approval sitting. Exit = independent critic ≥ 8 on all four, then the build brief below in this file, then report to the lead | lead | — |
+| 2026-10-23 | Owner via lead: "stop after this work, don't try anything new". Finish fix round 5 + its critic. PASS → write the build brief, report, stop (do NOT start the build). FAIL → report and stop; no further round without the lead's go | lead | — |
