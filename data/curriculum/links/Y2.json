@@ -1823,7 +1823,7 @@
     },
     {
      "key": "subtraction:sub_2d_1d",
-     "missing": "the subtracting half only (34 − 3); adding ones (34 + 3) is not dealt",
+     "missing": "adding ones (34 + 3): it deals only the subtracting half (34 − 3)",
      "opts": {}
     }
    ],

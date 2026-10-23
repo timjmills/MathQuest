@@ -1566,7 +1566,7 @@ whatever happens to the WRM gaps.
   Vocabulary: ten, hundred, bond to 100  
 - **Y2.B2.S5** Add and subtract 1s — covered. _1.OA.C.5, 1.OA.C.6, M.EE.1.OA.5_  
   Skills: Number Line Addition (B&W) (`addition:number_line_add`); Number Line Subtraction (B&W) (`subtraction:number_line_sub`)  
-  Partial: Subtract a 1-Digit Number from a 2-Digit Number (No Regrouping) (`subtraction:sub_2d_1d`), missing the subtracting half only (34 − 3); adding ones is not dealt  
+  Partial: Subtract a 1-Digit Number from a 2-Digit Number (No Regrouping) (`subtraction:sub_2d_1d`), missing adding ones (34 + 3): it deals only the subtracting half (34 − 3)  
   Vocabulary: ones, tens, 1 more, 1 less  
 - **Y2.B2.S6** Add by making 10 — covered. _1.OA.B.3, 1.OA.C.6_  
   Skills: Add — Bridging Ten (sums 11–18) (`addition:add_10_regroup`); Make a Ten Strategy (`number_sense:make_a_ten`)  
