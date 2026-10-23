@@ -1,0 +1,432 @@
+{
+ "id": "stack",
+ "kind": "template",
+ "title": "Stacked arithmetic (the `stack` template)",
+ "template": {
+  "id": "stack",
+  "source": "js/modules/sheet/cells/stack.js",
+  "also": "`fact.js` delegates to it for stacked + facts with a regroup row on paper (`drawsStack`); `screen-cell.js` draws the same cell on the practice card, online worksheet and quiz"
+ },
+ "families": [
+  "addition",
+  "subtraction"
+ ],
+ "findingsMatch": {
+  "templates": [
+   "stack"
+  ]
+ },
+ "skills": {
+  "printFormats": "^(column-add|column-sub|column-add-multi|column-mult)$",
+  "include": [
+   "addition:add",
+   "subtraction:subtract",
+   "multiplication:multiply"
+  ],
+  "excludeCategories": [
+   "all_mixed",
+   "number_ops_mixed"
+  ]
+ },
+ "excerptChars": 140,
+ "summary": "One stacked problem per boxed cell: digit tracks right-aligned under place-value heads, the operator in its own track, a 1.5 pt rule, an answer zone below it, regroup / carry boxes above the top number when the scaffold is on. Paper, key and the three screen hosts are one drawing.",
+ "teaches": "The column (standard) algorithm for addition and subtraction of whole numbers, with and without regrouping, from two-digit numbers to four-digit numbers (three and four addends; across zeros), plus a missing digit in a stacked sum, difference or 1-digit product, and multiplying a multi-digit number by a 1-digit number in the column. Grades 1-4 (CCSS 1.NBT.C.4, 2.NBT.B.5-7, 3.NBT.A.2, 4.NBT.B.4-5; WRM Y2-Y5 column methods).",
+ "research": "From repo sources (PEDAGOGY_STANDARD L-3 to L-5Z, design/PROBLEM_TYPES.md AS / MU rows, design/catalogue/addition.md and subtraction.md); MW4K/IXL research pending logins (Q-H4).",
+ "problemTypes": [
+  "AS-05 vertical add / subtract with labelled columns (H T O letters, regroup boxes above, answer zone below) — the core item",
+  "AS-10 mixed regroup / no-regroup set (P-10 non-examples) and AS-14 mixed-sign set (ring the sign first)",
+  "AS-07 column sum of three or four addends, ragged lengths (`add_column_multi`)",
+  "AS-16 / MU-15 missing digit in a stacked + − × (one dashed digit box, LS-8)",
+  "AS-09 regroup notation only (cross out, write one less, write the new ones); then across zeros (L-5Z)",
+  "AS-11 / MU-11 rewrite a horizontal problem in the grid (alignment), then solve",
+  "AS-15 check a subtraction by adding (`check` line under the stack)",
+  "MU-09 multi-digit × 1-digit in the grid with a carry row (2 × 2 digits and up belong to `long-multiplication`)"
+ ],
+ "progression": [
+  "2-digit + and − with no regrouping, T O letters, answer boxes (L-3 1-4)",
+  "the T O letters fade; the grid stays (L-3 7); add or subtract a 1-digit number, ones under ones (L-3 8)",
+  "decide: does this one regroup? (check box, no computing) (L-4 2, L-5 2)",
+  "regroup notation only: the ten into the box / cross out and write one less (L-4 3, L-5 4)",
+  "2-digit with regrouping, boxes on every item, no-regroup items mixed in (L-4 4, L-5 5)",
+  "3-digit: regroup the ones, then the tens, then twice; the answer that needs a new place (L-4 7-10, L-5 10-12)",
+  "4-digit with a comma in the answer; three and four addends (L-4 11-12, L-5 13)",
+  "the regroup boxes fade on a dedicated step only (L-4 13, L-5 6)",
+  "subtracting across zeros, one change per step: whole ten, hundred, thousand, one zero, two zeros, zeros in the middle (L-5Z Z1-Z7)",
+  "missing digit (one, then two), check by the inverse, and × 1-digit with a carry row"
+ ],
+ "drawing": {
+  "sizes": "digits 16 / 22 / 28 pt; writing height Hw 6 / 8 / 10 mm; answer row 8 / 10 / 12 mm; heads row 4 / 5 / 6 mm; regroup row 6 / 7 / 8 mm; carry box 5 / 6 / 7 mm; subtraction headroom 8 / 10 / 12 mm (`js/modules/sheet/tokens.js` SIZES). Tracks 0.72 em plain, 0.95 em with any regroup scaffold (TY-20, TY-21); default size L.",
+  "notes": [
+   "Payload (`q.cell = {template: 'stack', v: 1, payload}`): `operands` (2 to 4 rows), `op`, `ans`, `regroup` ('add' | 'sub' | false), `heads`, `answer`, `unknown` {row, index}, `ansDigits`, `check`, `supports`. The scaffold ladder (level 3-0) decides heads, regroup and answer boxes, never the generator (SCC-Q10).",
+   "States blank / traced / answered / wrong share one geometry (SCC-T10). On a key and a traced Model the regroup boxes hold the working and the regrouped top digits are crossed (AK-2 over VA-13).",
+   "Screen: one input per answer track in the printed geometry, regroup boxes as ungraded inputs, the missing digit as an input (SCC-T15, SP-23)."
+  ],
+  "capacity": [
+   {
+    "file": "WORKSHEET_DESIGN_STANDARD.md",
+    "label": "Stacked arithmetic: maximum columns"
+   },
+   {
+    "file": "WORKSHEET_DESIGN_STANDARD.md",
+    "label": "Stacked arithmetic: rows and items"
+   }
+  ]
+ },
+ "ruleGroups": [
+  {
+   "title": "The stack (WORKSHEET_DESIGN_STANDARD §10.1-10.3, quoted in full)",
+   "core": true,
+   "full": true,
+   "rules": [
+    "VA-1",
+    "VA-2",
+    "VA-4",
+    "VA-7",
+    "VA-10@WDS",
+    "VA-11@WDS",
+    "VA-12@WDS",
+    "VA-13@WDS",
+    "VA-13a",
+    "VA-20",
+    "VA-22",
+    "VA-23"
+   ]
+  },
+  {
+   "title": "Key, tracks and screen regroup boxes (quoted in full)",
+   "core": true,
+   "full": true,
+   "rules": [
+    "AK-2",
+    "TY-21",
+    "SP-23"
+   ]
+  },
+  {
+   "title": "Stack geometry, tracks, slots and separators",
+   "chars": 120,
+   "rules": [
+    "VA-3",
+    "VA-5",
+    "VA-6",
+    "VA-21",
+    "VA-30",
+    "VA-31",
+    "VA-32",
+    "LS-8",
+    "SL-12",
+    "TY-20",
+    "TY-21",
+    "TY-23",
+    "TY-24",
+    "TY-26",
+    "VA-40",
+    "VA-41",
+    "VA-42",
+    "VA-50",
+    "VA-51",
+    "VA-52",
+    "SL-1",
+    "SL-2",
+    "SL-11",
+    "CL-6",
+    "CL-9",
+    "PG-12",
+    "PG-14",
+    "PT-CGR-5",
+    "PT-EQD-2",
+    "DN-34"
+   ]
+  },
+  {
+   "title": "Keys, scaffolds, screen and wording",
+   "chars": 100,
+   "rules": [
+    "AK-1",
+    "AK-2",
+    "AK-4",
+    "INK-31",
+    "BD-7",
+    "PT-GDP-1",
+    "P-SC-7",
+    "SF-34@WDS.1",
+    "SP-1",
+    "SP-2",
+    "SP-3",
+    "SP-4",
+    "SP-10",
+    "SP-12",
+    "SP-23",
+    "SCC-T3",
+    "SCC-T4",
+    "SCC-T10",
+    "SCC-T14",
+    "SCC-T15",
+    "SCC-T17",
+    "SCC-P5",
+    "SCC-P6",
+    "BD-10",
+    "BD-11",
+    "BD-12",
+    "PT-FRM-6",
+    "P-1",
+    "P-29",
+    "Q-10",
+    "P-10",
+    "P-35",
+    "P-31",
+    "BD-4",
+    "PT-SCR-1"
+   ]
+  },
+  {
+   "title": "Page and look rules critics cite on these families",
+   "chars": 90,
+   "rules": [
+    "CL-1",
+    "AX-4",
+    "INK-5",
+    "TY-7",
+    "RP-1",
+    "AX-9",
+    "DN-1a",
+    "PT-GDP-2",
+    "SL-3",
+    "SP-20",
+    "PT-REV-3"
+   ]
+  },
+  {
+   "title": "Owner exceptions cited on the multiplication family (count rows only; they do not apply to the stack)",
+   "chars": 90,
+   "rules": [
+    "TY-10a",
+    "SL-3a"
+   ]
+  },
+  {
+   "title": "Base-10 picture beside the stack (`stack_base10_support`)",
+   "chars": 90,
+   "rules": [
+    "RP-20",
+    "RP-21"
+   ]
+  },
+  {
+   "title": "Hard caps and criteria (RUBRIC; every page)",
+   "chars": 60,
+   "rules": [
+    "C1",
+    "C2",
+    "C3",
+    "C4",
+    "H1@RUBRIC",
+    "H2@RUBRIC",
+    "H3@RUBRIC",
+    "H4@RUBRIC",
+    "H5@RUBRIC",
+    "H6",
+    "H7",
+    "H8",
+    "H9",
+    "H10",
+    "H11",
+    "H12",
+    "H13"
+   ]
+  },
+  {
+   "title": "Options rubric caps",
+   "chars": 60,
+   "rules": [
+    "OC3",
+    "OC4",
+    "OC7",
+    "OC8",
+    "OC10",
+    "OC11",
+    "OC14"
+   ]
+  },
+  {
+   "title": "Lessons learned (pre-flight)",
+   "chars": 60,
+   "rules": [
+    "L1",
+    "L2",
+    "L3",
+    "L4",
+    "L5",
+    "L6",
+    "L9",
+    "L10",
+    "L11"
+   ]
+  }
+ ],
+ "ownerRulings": [
+  {
+   "date": "2026-09-19",
+   "ruling": "\"Within N\" bounds the ANSWER (the sum, the minuend), never the operands.",
+   "source": "design/catalogue/addition.md"
+  },
+  {
+   "date": "2026-09-19",
+   "ruling": "Dashed box = the unknown digit in a missing-digit stack; regroup boxes stay solid (LS-8).",
+   "source": "WORKSHEET_DESIGN_STANDARD.md"
+  },
+  {
+   "date": "2026-09-19",
+   "ruling": "General regrouping is secure before any zero is regrouped across; L-5Z changes only the zeros, one step at a time.",
+   "source": "PEDAGOGY_STANDARD.md"
+  },
+  {
+   "date": "2026-09-25",
+   "ruling": "Writing boxes are slightly rounded (SL-11); a row of digit boxes is ONE outline with dividers (SL-12).",
+   "source": "WORKSHEET_DESIGN_STANDARD.md"
+  },
+  {
+   "date": "2026-09-25",
+   "ruling": "Every key (practice, mixed, independent) fills the regroup / carry boxes with the full working and crosses the old digit (AK-2 over VA-13).",
+   "source": "WORKSHEET_DESIGN_STANDARD.md"
+  },
+  {
+   "date": "2026-10-02",
+   "ruling": "Key answers print reddish orange, keys only (INK-31).",
+   "source": "WORKSHEET_DESIGN_STANDARD.md"
+  },
+  {
+   "date": "2026-10-10",
+   "ruling": "Touch-dot column stacks keep the greys of earlier columns; \"Touched N\" stays on × stacks.",
+   "source": "design/STATUS.md"
+  },
+  {
+   "date": "2026-10-10",
+   "ruling": "SPEC, NOT BUILT (held for Lane B): on screen the regroup boxes an item needs are required and marked; a right subtraction regroup number crosses the old digit live; option marked (default) / unmarked / optional; paper unchanged. This changes VA-13, SCC-T17 and SP-23 for screen hosts.",
+   "source": "design/audit/runs/wave1-B/REGROUP-BOXES-SPEC.md"
+  },
+  {
+   "date": "2026-10-17",
+   "ruling": "SPEC, NOT BUILT: option `carry: top | bottom` — carries UNDER the answer line, one column left, in a box about two-thirds of a digit box; addition (incl. 3-4 addends) and × only; subtraction stays at the top; off by default; a layout preference, not a preset skill (build list `vis_carry_below`).",
+   "source": "design/audit/runs/next-session/CARRY-BELOW-SPEC.md"
+  }
+ ],
+ "misconceptions": [
+  {
+   "id": "M1",
+   "error": "forgets the regrouped ten",
+   "wrong": "47 + 38 = 75"
+  },
+  {
+   "id": "M2",
+   "error": "writes the whole column total, no regroup",
+   "wrong": "47 + 38 = 715"
+  },
+  {
+   "id": "M3",
+   "error": "takes the smaller digit from the larger in each column",
+   "wrong": "52 − 38 = 26"
+  },
+  {
+   "id": "M4",
+   "error": "regroups the ones but does not make the tens one less",
+   "wrong": "52 − 38 = 24"
+  },
+  {
+   "id": "M5",
+   "error": "across zeros: regroups the hundreds but leaves the tens at ten",
+   "wrong": "400 − 157 = 353"
+  },
+  {
+   "id": "M6",
+   "error": "ragged lengths: lines the 1-digit number up under the tens",
+   "wrong": "34 + 5 = 84"
+  },
+  {
+   "id": "M7",
+   "error": "× 1-digit: adds the carry before multiplying",
+   "wrong": "23 × 4 = 122"
+  },
+  {
+   "id": "M8",
+   "error": "missing digit: ignores the regrouped ten (answer off by one)",
+   "wrong": "3? + 46 = 82 → 5"
+  }
+ ],
+ "options": [
+  "Declared today per skill (below). The ladder in O-rubric terms: O2 number size by digits / within N (answer-bounded) and regroup never / some / every; O3 support = heads, regroup boxes, touch dots, start arrow (hints fade, the grid stays); O6 stacked / across.",
+  "Pending options from owner rulings: `carry: top | bottom` (vis_carry_below), regroup boxes marked / unmarked / optional on screen (REGROUP-BOXES-SPEC), decimal-point track `dp` and the expanded form (vis_stack_layouts). Each is a plain option, not a preset skill, unless it teaches a new size class (CLAUDE.md distinct-option rule)."
+ ],
+ "gates": [
+  {
+   "cmd": "node tests/scripts/ws-precritic.cjs --template stack",
+   "note": "the one table every builder report pastes (IMPROVEMENT_PLAN §1.4 S1, being built by another lane)"
+  },
+  {
+   "cmd": "node tests/scripts/ws-spec-card.mjs --check-signed design/cards/stack/stack.md",
+   "note": "build-start gate"
+  },
+  {
+   "cmd": "node tests/scripts/ws-spec-card.mjs --check-coverage design/cards/stack/stack.md",
+   "note": "card-coverage test; runs again at build start"
+  },
+  {
+   "cmd": "node tests/scripts/ws-content-audit.cjs --category addition (and --category subtraction)"
+  },
+  {
+   "cmd": "node tests/scripts/ws-options-verify.cjs --category addition (and subtraction)"
+  },
+  {
+   "cmd": "node tests/scripts/ws-providers-unit.mjs"
+  },
+  {
+   "cmd": "node tests/scripts/ws-print-lint.cjs --source kit --skills <the skills touched>"
+  },
+  {
+   "cmd": "node tests/scripts/ws-screen-slots.cjs --skills <the skills touched>"
+  },
+  {
+   "cmd": "node tests/scripts/ws-screen-answer.cjs --skills <the skills touched>"
+  },
+  {
+   "cmd": "node tests/scripts/ws-chromebook-fit.cjs --skills <the skills touched>"
+  },
+  {
+   "cmd": "node tests/scripts/ws-grade-render.cjs --skills <the skills touched>",
+   "note": "the renders the independent critic grades"
+  },
+  {
+   "cmd": "node tests/scripts/ws-code-snapshot.mjs"
+  },
+  {
+   "cmd": "node tests/scripts/ws-boot-smoke.cjs"
+  }
+ ],
+ "openQuestions": [
+  {
+   "q": "Does this card also cover × 1-digit (`multiply`, `mult_missing_digit`) and the column-mult presets, or do they wait for the `long-multiplication` card?",
+   "recommended": "This card covers × by 1 digit in the stack (MU-09, MU-15); 2-digit multipliers and partial-product rows go on the `long-multiplication` card."
+  },
+  {
+   "q": "Under-the-line carry box size (CARRY-BELOW-SPEC: about two-thirds of a digit box): what is the floor at S?",
+   "recommended": "Two-thirds of the answer row (5.3 / 6.7 / 8 mm) and one track wide, never under the 4.4 mm regroup-segment floor; the row adds to the cell height and capacity is re-checked (content never shrinks, SCC-T4)."
+  },
+  {
+   "q": "When the screen regroup boxes become required (REGROUP-BOXES-SPEC), VA-13, SCC-T17 and SP-23 say the opposite. Rewrite them in the same change?",
+   "recommended": "Yes: rewrite the three rules for screen hosts only (paper unchanged) in the same commit; this card then fails its coverage test until regenerated with --resign and signed again."
+  },
+  {
+   "q": "Are regroup boxes a structural scaffold (stay at every level) or a hint (fade)?",
+   "recommended": "Structural: they stay at every level and are removed only on the dedicated fade step (L-4 step 13, L-5 step 6), chosen by the support option, never by the scaffold level."
+  },
+  {
+   "q": "Decimal column add / subtract (`add_decimal`, `sub_decimal`, legacy `decimal-column-*`) move onto the stack with a decimal-point track (vis_stack_layouts): this card or a decimals card?",
+   "recommended": "This card, as option `dp: 1..3` (VA-40 to VA-42 already listed); the decimals family card only names it."
+  },
+  {
+   "q": "MW4K / IXL research is pending logins (Q-H4). Sign now?",
+   "recommended": "Yes, sign now; add the research to section 2 when the logins work, and re-sign only if the problem types or progression change."
+  }
+ ],
+ "sourceChars": 90
+}

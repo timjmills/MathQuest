@@ -1,0 +1,26 @@
+report,run,lane,round,date_added,commit_added,verdict,min_score,mean_score,n_open,notes
+design/audit/runs/anchor-r1/,anchor-r1,anchor,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,1,6.13,99,0/50 versions pass; graded tree 527093b
+design/audit/runs/anchor-r2/,anchor-r2,anchor,2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,2,7.23,86,20/90 versions pass; graded tree 162bb13
+design/audit/runs/anchor-r3/,anchor-r3,anchor,3,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,4,7.88,34,21/53 versions pass; graded tree 8efc257
+design/audit/runs/baseline-2026-09-24/,baseline-2026-09-24,baseline,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,1,2.15,552,0/437 versions pass
+design/audit/runs/ea-r5/,ea-r5,ea,5,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,3,7.44,81,SUMMARY: 3/27 skills pass; tree 99d2f50; 37/114 versions pass
+design/audit/runs/figures-r7/,figures-r7,figures,7,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,1,7.55,99,66/140 versions pass; graded tree 413f54a
+design/audit/runs/figures-r8/,figures-r8,figures,8,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,3,7.74,117,75/130 versions pass
+design/audit/runs/fractions-r1/,fractions-r1,fractions,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,3,8.75,299,SUMMARY: 0/26 skills pass; tree 4914ea1; 66/268 versions pass
+design/audit/runs/geometry-r1/,geometry-r1,geometry,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,2,6.91,272,48/280 versions pass
+design/audit/runs/geometry-r2/,geometry-r2,geometry,2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,1,7.59,488,113/320 versions pass
+design/audit/runs/guided-r1/,guided-r1,guided,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,3,7.39,136,24/105 versions pass
+design/audit/runs/k2-r2/,k2-r2,k2,2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,1,7.63,187,124/292 versions pass
+design/audit/runs/k2-r3/,k2-r3,k2,3,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,5,7.92,89,138/180 versions pass
+design/audit/runs/lessons-r1/,lessons-r1,lessons,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,3,6.97,55,SUMMARY: 4/48 pages pass; tree 933773b; 4/48 versions pass
+design/audit/runs/lessons-r2/,lessons-r2,lessons,2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,8.15,33,SUMMARY: 22/48 pages pass; tree 67ccdc9; 22/48 versions pass
+design/audit/runs/lessons-r3/,lessons-r3,lessons,3,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,8.26,40,SUMMARY: 38/48 pages pass; tree 56eb699; 38/48 versions pass
+design/audit/runs/lessons-r4/,lessons-r4,lessons,4,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,7,8.34,44,SUMMARY: 48/48 pages pass at seed 4242 (PASS); robustness line fails at seed 1001; 48/49 versions pass
+design/audit/runs/options-r3/,options-r3,options,3,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,2,6.74,347,SUMMARY: 3/123 panels pass; O-criteria rubric; tree 9babcc0; 3/123 versions pass
+design/audit/runs/pv-r1/,pv-r1,pv,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,3,7.54,168,SUMMARY: 0/13 skills pass; tree f8220ad; 40/157 versions pass
+design/audit/runs/pv-r2/,pv-r2,pv,2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,3,7.73,185,32/168 versions pass
+design/audit/runs/pv-r3/,pv-r3,pv,3,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,4,8.22,205,72/123 versions pass
+design/audit/runs/regrade-2026-09-25/,regrade-2026-09-25,regrade,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,1,6.02,486,9/246 versions pass
+design/audit/runs/regrade2-2026-09-25/,regrade2-2026-09-25,regrade2,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,3,7.44,293,71/233 versions pass
+design/audit/runs/regrade3-2026-09-25/,regrade3-2026-09-25,regrade3,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,1,6.77,1155,246/1160 versions pass
+design/audit/runs/regrade4-2026-09-25/,regrade4-2026-09-25,regrade4,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,1,6.9,282,SUMMARY: 0 of 26 skills pass; tree 9babcc0; 90/338 versions pass

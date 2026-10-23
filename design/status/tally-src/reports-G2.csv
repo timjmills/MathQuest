@@ -1,0 +1,19 @@
+report,run,lane,round,date_added,commit_added,verdict,min_score,mean_score,n_open,notes
+design/audit/runs/wrm-tagging/Y1-lessons-critic-r1.md,wrm-tagging/Y1-lessons,wrm-tagging,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,7.69,22,"39 lessons; 10 at 7, 1 at 6"
+design/audit/runs/wrm-tagging/Y1-lessons-critic-r2.md,wrm-tagging/Y1-lessons,wrm-tagging,2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.92,14,3 lessons at 7
+design/audit/runs/wrm-tagging/Y1-lessons-critic-r3.md,wrm-tagging/Y1-lessons,wrm-tagging,3,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,8.00,8,all 39 at 8; minors only
+design/audit/runs/wrm-tagging/Y2-Y3-critic.md,wrm-tagging/Y2-Y3,wrm-tagging,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,4,6.65,11,means Y2 6.65 / Y3 6.73; per-step rows folded into S1-S5; mean_score is lower year mean
+design/audit/runs/wrm-tagging/Y2-Y3-critic-r2.md,wrm-tagging/Y2-Y3,wrm-tagging,2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,5,7.45,19,means Y2 7.53 / Y3 7.45; mean_score is lower year mean
+design/audit/runs/wrm-tagging/Y2-Y3-critic-r3.md,wrm-tagging/Y2-Y3,wrm-tagging,3,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,7.55,22,means Y2 7.55 / Y3 7.60; mean_score is lower year mean
+design/audit/runs/wrm-tagging/Y2-Y3-critic-r4.md,wrm-tagging/Y2-Y3,wrm-tagging,4,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,7.53,8,means Y2 7.64 / Y3 7.53; mean_score is lower year mean
+design/audit/runs/wrm-tagging/Y2-Y3-critic-r5.md,wrm-tagging/Y2-Y3,wrm-tagging,5,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,7.44,16,means Y2 7.70 / Y3 7.44; mean_score is lower year mean
+design/audit/runs/wrm-tagging/Y2-Y3-critic-r6.md,wrm-tagging/Y2-Y3,wrm-tagging,6,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,7.53,12,means Y2 7.73 / Y3 7.53; mean_score is lower year mean
+design/audit/runs/wrm-tagging/Y2-Y3-critic-r7.md,wrm-tagging/Y2-Y3,wrm-tagging,7,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.74,14,means Y2 7.88 / Y3 7.74; mean_score is lower year mean
+design/audit/runs/wrm-tagging/Y2-Y3-critic-r8.md,wrm-tagging/Y2-Y3,wrm-tagging,8,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.79,11,means Y2 7.79 / Y3 7.81; mean_score is lower year mean
+design/audit/runs/wrm-tagging/Y2-Y3-critic-r9.md,wrm-tagging/Y2-Y3,wrm-tagging,9,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.78,14,means Y2 7.81 / Y3 7.78; mean_score is lower year mean
+design/audit/runs/wrm-tagging/Y2-Y3-critic-r10.md,wrm-tagging/Y2-Y3,wrm-tagging,10,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.94,7,means Y2 7.94 / Y3 7.97; merge conflict; mean_score is lower year mean
+design/audit/runs/wrm-tagging/Y2-Y3-critic-r11.md,wrm-tagging/Y2-Y3,wrm-tagging,11,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.96,6,means 7.96 / 7.96; near miss; mean_score is lower year mean
+design/audit/runs/wrm-tagging/Y2-Y3-critic-r12.md,wrm-tagging/Y2-Y3,wrm-tagging,12,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.96,12,"Y2 steps 7.96, rest 8.00; one seven; mean_score is lower year mean"
+design/audit/runs/wrm-tagging/Y2-Y3-critic-r13.md,wrm-tagging/Y2-Y3,wrm-tagging,13,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.93,7,"Y3 steps 7.93, rest 8.00; mean_score is lower year mean"
+design/audit/runs/wrm-tagging/Y2-Y3-critic-r14.md,wrm-tagging/Y2-Y3,wrm-tagging,14,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.93,13,means Y2 7.93 / Y3 7.96; mean_score is lower year mean
+design/audit/runs/wrm-tagging/Y2-Y3-critic-r15.md,wrm-tagging/Y2-Y3,wrm-tagging,15,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,8.00,9,all 82 entries at 8; minors only; mean_score is lower year mean

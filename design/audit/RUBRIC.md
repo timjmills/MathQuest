@@ -4,7 +4,7 @@
 
 > **Scope (owner ruling 2026-09-26, three kinds of paper):** a skill passes on **Practice** (single skill and mixed, S and L, with keys), **Quiz** (with key), its **Lesson** where it has one, the three screen hosts and its option panel. Stand-alone Guided, Worked example, Review, Opener, Pre-skill check, Find the mistake, True or False?, Reason It and Stretch are not graded as separate pages. See `design/LESSON_LIBRARY_PLAN.md` §8e.
 
-**Version 1 · 2026-09-24 · owner-approved rules:** every criterion must score **8 or more** on
+**Version 1 · 2026-09-24 · owner-approved rules** (2026-10-23 additions: how a page counts as graded, batch critic, near-miss re-check, the benchmark, finding classes — the bar is unchanged)**:** every criterion must score **8 or more** on
 **every** graded version of a skill, on paper and on screen. One criterion at 7 anywhere is a fail,
 and the skill goes back for redesign until it passes.
 
@@ -195,6 +195,59 @@ A cap sets the **maximum** for the criterion named, whatever else is right.
 
 ---
 
+## How a page counts as graded (owner Q-S4, 2026-10-23)
+
+The bar does not change: 8 or more on all four criteria, on every page and every screen host. One 7 is a fail.
+What changes is how a page reaches that bar (`design/IMPROVEMENT_PLAN.md` §1.3, §1.6.3, §1.6.4). A page counts as
+graded in one of two ways:
+
+1. **Graded directly** by an independent critic.
+2. **Inherited** from a certified (template, kind of worksheet) pair. Then all of these must hold:
+   - a critic has read the page's instance in full for C1 and C2, beside a benchmark page of the same kind
+     (batch reading, §1.6.3 step 3);
+   - 1 in 5 of the instance's pages is graded in full on all four criteria;
+   - every machine gate for the instance is green.
+
+Limits:
+- There is no inheritance across pairs. A pair nobody certified gives nothing.
+- The **envelope check** sends any page outside what the pair certified to a full grade. Any new kind of page is
+  graded in full.
+- A page below 8 **fails the batch**. That instance is graded in full on every page. If the cause is in the engine,
+  the pair's certificate is withdrawn and its other instances are re-graded.
+- **Inheritance audit at every deploy** (§1.6.4): a fresh critic grades in full at least one inherited page of every
+  pair the deploy touches, plus a random 5 % (at least 10 pages) of all inherited pages. Any page below 8 withdraws that
+  pair's certificate.
+- The final PASS lists **every page and where its score came from**: graded directly, or inherited from which certificate.
+
+## Batch critic (contact sheet)
+
+For copies of an approved template only (§1.3). It is allowed only when:
+- `ws-precritic` passes for **every kind of worksheet (with its options) × S / M / L × the three screen hosts**
+  (practice card, online worksheet, quiz);
+- the critic also opens a random **20 %** of the (role, size, host) pages at full scale;
+- any role whose code path differs from the approved model gets a **full grade**.
+
+## Near-miss re-check (Q-S2)
+
+Allowed only when **every failed score in the round is a 7 and no score in the sample is below 7**. The bar is the
+minimum, not the average. The re-check grades:
+- the failed items;
+- every changed page;
+- a fresh 20 % sample.
+
+Unchanged pages keep their score through the golden manifest (`design/audit/golden/<template>/manifest.json`). It stores
+the renders (pages and screen hosts), a content hash, the rule-set version (RUBRIC, standards, LESSONS_LEARNED) and the
+per-criterion scores. A rule change, or a score older than 2 rounds, forces a re-grade.
+
+## The benchmark (Q-Q1)
+
+The critic reads every new skill beside a benchmark page of the same kind. The benchmark is:
+1. the pages STATUS records as passed at 8 or better: the five detailed lessons, the custom number line (r9), the small
+   fixes (r7) and the answer-key options (r5);
+2. then each (template, kind) pair's certifying pages, as each pair is certified.
+
+---
+
 ## 6. What the critic returns
 
 One JSON object per skill, appended to the run's `grades.jsonl`:
@@ -213,7 +266,8 @@ One JSON object per skill, appended to the run's `grades.jsonl`:
       "defects": [
         { "criterion": "C3", "severity": "major", "where": "page 2",
           "what": "Page 2 holds 2 of 20 items; 80 % of the page is empty.",
-          "fix": "Rebalance the last page or print 18 items (3 full pages)." }
+          "fix": "Rebalance the last page or print 18 items (3 full pages).",
+          "class": "SPACE", "rule_ids": ["H5"] }
       ]
     }
   ],
@@ -231,6 +285,8 @@ Rules for the critic:
   points, the exact fix (what to change, to what value, in which file / function) and the check that proves it
   is fixed. Every criterion below 10 also says what would raise it to 10. "Improve spacing" or "polish" is not
   a finding.
+- **Tag every finding (2026-10-23).** Each defect carries a `class` (an id from
+  `design/status/defect-classes.md`) and the `rule_ids` it cites (the same columns as `design/status/defect-findings.csv`), so the S8 tally stays current. `rule_ids` are the rules this defect breaks, not every cap of the version: a cap goes in only when its condition is this defect (the example cites H5 because the defect is a wasted page).
 - **Severity:** `critical` (triggers a cap), `major` (costs ≥ 2 points), `minor` (costs 1).
 - **No praise, no hedging.** Report problems. "Looks fine" is not a finding.
 - **Grade what is rendered,** not what the generator intends. If the PNG shows it, it is real.

@@ -1,0 +1,65 @@
+report,run,lane,round,date_added,commit_added,verdict,min_score,mean_score,n_open,notes
+design/audit/runs/pulse-fix/critic.md,pulse-fix,wave1-A pulse (active box),1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,7.33,5,R1 at 572a96b; D1 rAF loop; all G6 files added in one commit
+design/audit/runs/pulse-fix/critic.md,pulse-fix,wave1-A pulse (active box),2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.83,2,R2 at c4d5d68; all G6 files added in one commit
+design/audit/runs/pulse-fix/critic.md,pulse-fix,wave1-A pulse (active box),3,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,8.75,1,R3 at 1c60eda; all G6 files added in one commit
+design/audit/runs/pulse-fix/critic.md,pulse-fix,wave1-A pulse (active box),4,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,7.56,5,R4 auto-select; wave1-a3 gate failed; all G6 files added in one commit
+design/audit/runs/pulse-fix/critic.md,pulse-fix,wave1-A pulse (active box),5,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,8.25,2,R5; all G6 files added in one commit
+design/audit/runs/pulse-fix/critic.md,pulse-fix,wave1-A pulse (active box),6,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,8.75,4,R6 at bdf53f6; nits only; all G6 files added in one commit
+design/audit/runs/search-terms/critic.md,search-terms,search-terms (a21ec3ef),1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,7.0,14,head bff19e2; brief criteria not rubric; all G6 files added in one commit
+design/audit/runs/search-terms/critic-r2.md,search-terms,search-terms (a21ec3ef),2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,8.0,8,head 45013b3; all G6 files added in one commit
+design/audit/runs/search-terms/critic-r3.md,search-terms,search-terms (a21ec3ef),3,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,6.75,7,head fd7eeab; fix regressed; all G6 files added in one commit
+design/audit/runs/search-terms/critic-r4.md,search-terms,search-terms (a21ec3ef),4,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,8.5,8,head abd70a4; gate read textContent; all G6 files added in one commit
+design/audit/runs/search-terms/critic-r5.md,search-terms,search-terms (a21ec3ef),5,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,8.25,9,head 05e4a30; all G6 files added in one commit
+design/audit/runs/search-terms/critic-r6.md,search-terms,search-terms (a21ec3ef),6,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,8.5,5,head 50a1bf84; minors only; all G6 files added in one commit
+design/audit/runs/skip-count/critic-r1.md,skip-count,skip-count (a79237e5),1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,4,,9,graded 8c43b006; per-version table; all G6 files added in one commit
+design/audit/runs/skip-count/critic-r2.md,skip-count,skip-count (a79237e5),2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,5,,10,graded 2015274a; D7 regression; all G6 files added in one commit
+design/audit/runs/skip-count/critic-r3.md,skip-count,skip-count (a79237e5),3,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,5,,6,graded 198efa97; scope bleed D10; all G6 files added in one commit
+design/audit/runs/skip-count/critic-r4.md,skip-count,skip-count (a79237e5),4,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,5,,7,graded 359802c5; D12 caused by D11 fix; all G6 files added in one commit
+design/audit/runs/small-fixes/critic-r1.md,small-fixes,small-fixes,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,3,,6,ca2daf6; opener onePage C3 3; all G6 files added in one commit
+design/audit/runs/small-fixes/critic-r2.md,small-fixes,small-fixes,2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,4,,7,68ab08b; scripted-model regression; all G6 files added in one commit
+design/audit/runs/small-fixes/critic-r3.md,small-fixes,small-fixes,3,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,5,,7,27015cf; all G6 files added in one commit
+design/audit/runs/small-fixes/critic-r4.md,small-fixes,small-fixes,4,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,5,,5,e0d6499; N12 regression; all G6 files added in one commit
+design/audit/runs/small-fixes/critic-r5.md,small-fixes,small-fixes,5,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,,6,ce62a62; N13 regression; all G6 files added in one commit
+design/audit/runs/small-fixes/critic-r6.md,small-fixes,small-fixes,6,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,5,,7,ca347e23; O2 promoted to N15 (H9); all G6 files added in one commit
+design/audit/runs/small-fixes/critic-r7.md,small-fixes,small-fixes,7,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,,5,c8299e9d; nits + 3 owner questions; all G6 files added in one commit
+design/audit/runs/steps-box-r1/critic.md,steps-box-r1,steps-box (aea16a31),1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,5,,10,4afb093; all G6 files added in one commit
+design/audit/runs/steps-box-r2/critic.md,steps-box-r2,steps-box (aea16a31),2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,,6,270aa3c; near miss on navigator note; all G6 files added in one commit
+design/audit/runs/steps-box-r3/critic.md,steps-box-r3,steps-box (aea16a31),3,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,,8,53dced8a; all G6 files added in one commit
+design/audit/runs/support-numberline/critic.md,support-numberline,MASTER_PLAN 5.2 support number line,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,5,6.0,13,tree f60ef13; JSON defect block; all G6 files added in one commit
+design/audit/runs/touchdots/critic.md,touchdots,touch numerals (supports S1),1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,5,,13,5ea98c4; S1 gate failed unreported; all G6 files added in one commit
+design/audit/runs/touchdots/critic.md,touchdots,touch numerals (supports S1),2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,,5,4725684; quiz host only; all G6 files added in one commit
+design/audit/runs/touchdots/critic.md,touchdots,touch numerals (supports S1),3,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,,13,e9f6516; touch-tap layer; all G6 files added in one commit
+design/audit/runs/touchdots/critic.md,touchdots,touch numerals (supports S1),4,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,,11,614178a; all G6 files added in one commit
+design/audit/runs/touchdots/critic.md,touchdots,touch numerals (supports S1),5,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,,3,aaa2b2dd; quiz host only; all G6 files added in one commit
+design/audit/runs/touchdots/critic.md,touchdots,touch numerals (supports S1),6,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,,2,97177665; focused re-check; all G6 files added in one commit
+design/audit/runs/wave1-A-fix/critic.md,wave1-A-fix,Wave 1 lane A (Start buttons fix),1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,4,6.75,6,243236e+ceae77b; H2 cap dark theme; all G6 files added in one commit
+design/audit/runs/wave1-A-fix/critic.md,wave1-A-fix,Wave 1 lane A (Start buttons fix),2,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,9,9.0,5,head da1fb2c; all G6 files added in one commit
+design/audit/runs/wave1-A/critic.md,wave1-A,Wave 1 lane A,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,7.0,7,Sonnet low static review; all G6 files added in one commit
+design/audit/runs/wave1-A/critic.md,wave1-A,Wave 1 lane A,2,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,8.0,5,503f3d9 Opus low; all G6 files added in one commit
+design/audit/runs/wave1-A/critic.md,wave1-A,Wave 1 lane A,3,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,8.25,5,ce092db Pupil play disclosure; all G6 files added in one commit
+design/audit/runs/wave1-A2/critic.md,wave1-A2,Wave 1 lane A2 (per-box marks),1,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,8.25,5,11541d7; all G6 files added in one commit
+design/audit/runs/wave1-A2/critic.md,wave1-A2,Wave 1 lane A2 (per-box marks),2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.5,7,41cb2af; all G6 files added in one commit
+design/audit/runs/wave1-A2/critic.md,wave1-A2,Wave 1 lane A2 (per-box marks),3,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.75,5,b04b792; all G6 files added in one commit
+design/audit/runs/wave1-A2/critic.md,wave1-A2,Wave 1 lane A2 (per-box marks),4,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.75,4,a38d3d2; all G6 files added in one commit
+design/audit/runs/wave1-A2/critic.md,wave1-A2,Wave 1 lane A2 (per-box marks),5,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,8.0,4,d815bc3 merge decision; all G6 files added in one commit
+design/audit/runs/wave1-A3/critic.md,wave1-A3,Wave 1 lane A3 (wrong digits),1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,,8,6a20c00+d557048; all G6 files added in one commit
+design/audit/runs/wave1-A3/critic.md,wave1-A3,Wave 1 lane A3 (wrong digits),2,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,,2,a9e1535; all G6 files added in one commit
+design/audit/runs/wave1-C/critic.md,wave1-C,"Wave 1 lane C (charts, count-by)",1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.25,11,d46663a+d7d4059; all G6 files added in one commit
+design/audit/runs/wave1-C/critic.md,wave1-C,"Wave 1 lane C (charts, count-by)",2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.5,6,7629238; screen regression; all G6 files added in one commit
+design/audit/runs/wave1-C/critic.md,wave1-C,"Wave 1 lane C (charts, count-by)",3,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.5,2,8ea9d8d; all G6 files added in one commit
+design/audit/runs/wave1-C/critic.md,wave1-C,"Wave 1 lane C (charts, count-by)",4,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,7.0,5,697e562; builder figures wrong; all G6 files added in one commit
+design/audit/runs/wave1-C/critic.md,wave1-C,"Wave 1 lane C (charts, count-by)",5,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,8.25,3,43086c7; all G6 files added in one commit
+design/audit/runs/wave1-C/critic.md,wave1-C,"Wave 1 lane C (charts, count-by)",6,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,8.25,4,98757f9 follow-ups I/J/K; all G6 files added in one commit
+design/audit/runs/wave1-C2/critic-phone29.md,wave1-C2/phone29,Wave 1 lane C2 (phone 29 px),1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,,4,4eb7dbd; follow-up; deploy blocker; all G6 files added in one commit
+design/audit/runs/wave1-C2/critic.md,wave1-C2,Wave 1 lane C2 (count-by rows),1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,5,6.75,10,5bf1aac; all G6 files added in one commit
+design/audit/runs/wave1-C2/critic.md,wave1-C2,Wave 1 lane C2 (count-by rows),2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.75,6,debc9c6; uncommitted work; all G6 files added in one commit
+design/audit/runs/wave1-C2/critic.md,wave1-C2,Wave 1 lane C2 (count-by rows),3,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.5,5,419d355; all G6 files added in one commit
+design/audit/runs/wave1-C2/critic.md,wave1-C2,Wave 1 lane C2 (count-by rows),4,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.5,5,7bd1ecf; all G6 files added in one commit
+design/audit/runs/wave1-C2/critic.md,wave1-C2,Wave 1 lane C2 (count-by rows),5,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,8.0,4,409d746; all G6 files added in one commit
+design/audit/runs/wave1-C2/critic.md,wave1-C2,Wave 1 lane C2 (count-by rows),6,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.75,4,45d509b; all G6 files added in one commit
+design/audit/runs/wave1-C2/critic.md,wave1-C2,Wave 1 lane C2 (count-by rows),7,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.75,5,f756b7a; all G6 files added in one commit
+design/audit/runs/wave1-C2/critic.md,wave1-C2,Wave 1 lane C2 (count-by rows),8,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,8.5,4,a5c1834; all G6 files added in one commit
+design/audit/runs/wave1-E/critic.md,wave1-E,"Wave 1 lane E (load, worksheet flag)",1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,7.5,11,9fb3af7; Sonnet PASS 8x4 then Opus re-grade FAIL (both counted round 1); all G6 files added in one commit
+design/audit/runs/wave1-E/critic.md,wave1-E,"Wave 1 lane E (load, worksheet flag)",2,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,9,9.0,4,7205e19; all G6 files added in one commit
+design/audit/TEACHER-SCREENS-AUDIT.md,teacher-screens,teacher-site audit,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,1,,58,"20 surfaces, 0 pass; D1-D4 dims not C1-C4; all G6 files added in one commit"
+design/audit/TEACHER-SCREENS-AUDIT-R2.md,teacher-screens,teacher-site audit,2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,2,,46,"21 surfaces, 8 pass; all G6 files added in one commit"
