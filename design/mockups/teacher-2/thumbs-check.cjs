@@ -1,216 +1,251 @@
-// Teacher site 2.0 T1: every live skill's thumbnail must BE that skill. A machine check, not a look:
-//   node design/mockups/teacher-2/thumbs-check.cjs          exit 1 on any failure
+// Teacher site 2.0 T1: every thumbnail must be what the APP draws for that skill and seed. A machine check, not a look:
+//   node design/mockups/teacher-2/thumbs-check.cjs            the deterministic sample (>= 200 skills, every category,
+//                                                              the critic's named ones), exit 1 on any failure
+//   node design/mockups/teacher-2/thumbs-check.cjs --all      every live skill
+//   node design/mockups/teacher-2/thumbs-check.cjs --only cat:skill,cat:skill
 //
-// Fix round 4 (critic r4 C1; stop rule §1.7, the defect class survived r2 #6, r3 C1 and r4 C1). The root cause was that
-// thumbs.js hand-drew stand-ins guessed from the id and label. Now every thumbnail is a real item: capture-samples.cjs
-// prints a seeded sheet of each skill through the real app (buildSheet → generateQuestionFor) and stores its first cells
-// in samples.js. This check holds:
-//   1. coverage   every live skill has captured samples, or is a LISTED fallback (its generation threw); the list here
-//                 must equal samples.js's own `fail` list, so a new failure, or a stale entry, fails;
-//   2. provenance every thumbnail T.draw(skill, seed) returns, for 8 seeds, is the captured sample of THAT skill: its
-//                 data-smp is the skill's key, its data-h is hash(key:captureSeed:item) of the item the seed picks, and
-//                 its markup is that sample's markup, byte for byte;
-//   3. the critic's named contradictions (r4 C1, 35 skills) are spot-tested by CONTENT: what the captured item shows;
-//   4. in a browser (thumbs.html, every skill, 2 seeds, at the Big, Medium and Small card sizes the mock-up uses): each card's
-//      picture carries its own card's skill; the smallest text a thumbnail SHOWS is >= 12 / 11 / 9 px (lead, 2026-10-23:
-//      a long story shows its first lines and fades, the drawing is windowed, never shrunk below that); where the whole
-//      item fits, no written word falls outside the picture; app.html's Skills cards and tray thumbnails carry their own skill;
-//   5. the size budget: samples.js under 6 MB.
+// Fix round 5 (critic r5 A1 / C1 / C2; stop rule §1.7: the thumbnail class survived r2, r3, r4 and r5). Its root cause was
+// COPYING the app's drawing into a mock-up format (hand drawings, then a sanitised DOM capture whose CSS reset blew SVG
+// text up 2–4×). The old check passed because it only asked that text be at least the minimum and inside the box. This one
+// compares the mock-up with the app itself:
+//   A. the APP: index.html is booted (globals.js, init), and for each sampled skill and seed the app's own
+//      window.buildSheet prints the same request the thumbnail prints; the cell is rendered in the app's sheet document
+//      and measured: every text line (words, effective font size, box) and every drawing (svg, img, ruled / filled box);
+//   B. the MOCK-UP: thumbs.html draws the same skill and seed with the mock-up's thumbnail (MQThumbs.draw / drawItem) at
+//      the Big, Medium and Small card sizes, the tray's Thumbnails view, the chip sheet and a page preview cell;
+//   C. they must agree: the same words; every text's font size within ±10 %; every text and drawing box within
+//      2 px + 4 % of the app's; the same number of drawings; and on the screen:
+//      - the smallest text SHOWN is >= the place's minimum (Big 12, Medium 11, Small 9 px; previews and the bar 0);
+//      - no text line is cut at its START (the window is anchored at the left / top of what the cell draws);
+//      - the thumbnail is drawn (not waiting, not an error) and its picture stays inside its box;
+//   D. the pages: app.html loads no samples.js; "Same problems, new numbers" pages 2 and 3 deal different items; a cold
+//      load of app.html#skills is measured and reported.
 'use strict';
 const fs = require('fs');
 const path = require('path');
+let chromium;
+try { ({ chromium } = require('playwright')); } catch (e) { ({ chromium } = require('/opt/node-tools/node_modules/playwright')); }
+const { startServer } = require('../../../tests/lib/ws-harness.cjs');
 global.window = global;
 require(path.join(__dirname, 'data.js'));
-const SAMPLES_FILE = path.join(__dirname, 'samples.js');
-if (fs.existsSync(SAMPLES_FILE)) require(SAMPLES_FILE);
-require(path.join(__dirname, 'thumbs.js'));
-const D = window.MQ_DATA, T = window.MQThumbs, S = window.MQ_SAMPLES;
+const D = window.MQ_DATA;
+const EXE = fs.existsSync('/opt/pw-browsers/chromium') ? '/opt/pw-browsers/chromium' : undefined;
+const args = process.argv.slice(2);
+const argv = (k) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : null; };
+const ALL = args.includes('--all');
+const ONLY = argv('--only') ? argv('--only').split(',') : null;
 const fails = [];
-const say = (k, why) => fails.push(`${k}: ${why}`);
+const say = (k, why) => { fails.push(`${k}: ${why}`); };
 
-// skills whose real generation throws or deals no cell keep the hand drawing; each is listed here by name (none today)
-const LISTED_FALLBACKS = {};
-
-function hash(str) { let h = 2166136261; for (const ch of String(str)) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36); }
-const SEEDS = [undefined, 1, 2, 3, 'a', 'b', 'ex7', '42:0:3'];
-let nSamples = 0, nDraws = 0;
-
-// ---- 1 + 2: coverage and provenance
-if (!S || !S.s) say('samples.js', 'missing: run node capture-samples.cjs');
+// ---- the sample: the critic's named skills, then every third live skill, then at least two of every category
+const NAMED = [
+  'measurement:time_hour', 'measurement:time_half_hour', 'measurement:time_quarter', 'measurement:time_1min', 'measurement:order_clocks_analog_asc',
+  'measurement:elapsed_visual_easy', 'measurement:clock_parts', 'multiplication:nl_mult', 'addition:nl_add', 'integers:number_line_int',
+  'graphs:bar_graph', 'graphs:pictograph', 'graphs:line_plot', 'graphs:line_plot_g2', 'coordinates:coordinates_read_all', 'coordinates:coordinate_q1',
+  'vocabulary:vocab_grade_1', 'vocabulary:vocab_grade_3_geometry', 'vocabulary:vocab_grade_K_counting', 'order_of_operations:cube_numbers',
+  'multiplication:count_by_9s', 'angles_lines:angles_on_straight_line', 'angles_lines:angles_around_point', 'algebra:solve_eq_twostep',
+  'number_theory:factor_links_hard', 'fraction_operations:frac_word_mixed', 'addition:add_sub_fact_family',
+];
+const live = D.skills.map(s => s.c + ':' + s.v);
+let keys;
+if (ONLY) keys = ONLY;
+else if (ALL) keys = live.slice();
 else {
-  if (typeof T.sample !== 'function' || typeof T.sampleIndex !== 'function') say('thumbs.js', 'has no sample(): thumbnails are not drawn from the captured items');
-  const failed = Object.keys(S.fail || {}).sort(), listed = Object.keys(LISTED_FALLBACKS).sort();
-  for (const k of failed) if (!LISTED_FALLBACKS[k]) say(k, `generation failed in the capture (${S.fail[k]}) and the skill is not a listed fallback`);
-  for (const k of listed) if (!failed.includes(k)) say(k, 'listed as a fallback, but samples.js has its items now: take it off the list');
-  for (const s of D.skills) {
-    const key = s.c + ':' + s.v, list = S.s[key];
-    if (!list || !list.length) { if (!LISTED_FALLBACKS[key]) say(key, 'no captured sample'); continue; }
-    nSamples += list.length;
-    list.forEach((it, j) => {
-      if (it.h !== hash(`${key}:${S.seed}:${j}`)) say(key, `sample ${j} hash ${it.h} is not hash(${key}:${S.seed}:${j})`);
-      if (!it.x || !/<(svg|div|span)/.test(it.x)) say(key, `sample ${j} has no markup`);
-      if (!(it.v || '').trim() && !/<svg/.test(it.x)) say(key, `sample ${j} shows nothing (no text, no drawing)`);
-      if (/<script|\son[a-z]+=|javascript:/i.test(it.x)) say(key, `sample ${j} is not sanitised (script or handler)`);
-      if (/\b(?:id|for)="(?!q[0-9a-z]+-\d+-)/.test(it.x)) say(key, `sample ${j} keeps an app id`);
-    });
-    for (const seed of SEEDS) {
-      if (typeof T.sample !== 'function') break;
-      nDraws++;
-      const out = T.draw(s, seed); const j = T.sampleIndex(seed, list.length); const it = list[j];
-      const m = out.match(/^<div class="smp-thumb[^"]*" data-smp="([^"]+)" data-h="([^"]+)" data-i="(\d+)"/);
-      if (!m) { say(key, `seed ${seed}: the thumbnail is not a captured sample (${out.slice(0, 60)})`); continue; }
-      if (m[1].replace(/&amp;/g, '&') !== key) say(key, `seed ${seed}: draws the sample of ${m[1]}`);
-      if (Number(m[3]) !== j || m[2] !== it.h) say(key, `seed ${seed}: shows item ${m[3]} (${m[2]}), the seed picks item ${j} (${it.h})`);
-      if (!out.includes(it.x)) say(key, `seed ${seed}: the markup is not the captured item's markup`);
-    }
-  }
+  const set = new Set(NAMED.filter(k => live.includes(k)));
+  live.forEach((k, i) => { if (i % 3 === 0) set.add(k); });
+  const byCat = {}; for (const k of set) { const c = k.split(':')[0]; byCat[c] = (byCat[c] || 0) + 1; }
+  for (const k of live) { const c = k.split(':')[0]; if ((byCat[c] || 0) < 2) { set.add(k); byCat[c] = (byCat[c] || 0) + 1; } }
+  keys = [...set];
+}
+for (const k of NAMED) if (!ONLY && !live.includes(k)) say(k, 'a named skill is not live in data.js');
+// each skill at the card seed (item 1); every other one also at a "New numbers" seed (item 2), as a page preview deals it
+const cases = [];
+keys.forEach((k, i) => {
+  cases.push({ k, seed: null, n: 0, place: ['big', 'medium', 'small', 'tray'][i % 4] });
+  if (i % 2 === 0) cases.push({ k, seed: 'chk' + i + ':1', n: 1, place: i % 4 === 0 ? 'preview' : 'chip' });
+});
+const cats = new Set(keys.map(k => k.split(':')[0]));
+const allCats = new Set(live.map(k => k.split(':')[0]));
+if (!ONLY) {
+  if (keys.length < 200 && !ALL) say('sample', `${keys.length} skills (need >= 200)`);
+  for (const c of allCats) if (!cats.has(c)) say('sample', `category ${c} not sampled`);
 }
 
-// ---- 3: the critic's r4 C1 list, by content. v = what the item shows as text (the cell's innerText), x = its markup
-const byKey = Object.fromEntries(D.skills.map(s => [s.c + ':' + s.v, s]));
-const shown = (k) => (S && S.s && S.s[k] || []).map(it => ({ v: String(it.v || ''), x: String(it.x || ''), t: String(it.t || ''), a: String(it.a || '') }));
-const nums = (str) => (String(str).replace(/(\d),(?=\d{3})/g, '$1').match(/\d+(?:\.\d+)?/g) || []).map(Number);
-const SPOT = [];
-const spot = (keys, rule, why) => { for (const k of keys) SPOT.push([k, rule, why]); };
-// unlike denominators: the item's fractions have two different denominators
-spot(['add_frac_unlike', 'sub_frac_unlike', 'add_mixed_unlike', 'sub_mixed_unlike', 'add_frac_unlike_nv', 'sub_frac_unlike_nv', 'add_mixed_unlike_nv', 'sub_mixed_unlike_nv'].map(v => 'fraction_operations:' + v),
-  (it) => { const d = dens(it); return d.length >= 2 && new Set(d).size >= 2; }, 'two different denominators');
-// rounding sorts: the two bins say "rounds to X" and "rounds to Y", one place apart (500 and 600 for the nearest 100,
-// 0.4 and 0.5 for the nearest tenth), and the numbers to sort lie between them
-const PLACE = { '100': 100, '1000': 1000, '10000': 10000, '100000': 100000, million: 1000000, tenths: 0.1, hundredths: 0.01 };
-for (const [suf, size] of Object.entries(PLACE)) {
-  spot(['number_sense:round_sort_' + suf], (it) => { const m = [...it.v.replace(/(\d),(?=\d{3})/g, '$1').matchAll(/rounds to (\d+(?:\.\d+)?)/g)].map(x => Number(x[1])); return m.length >= 2 && Math.abs(Math.abs(m[1] - m[0]) - size) < size / 1000 && m.every(x => Math.abs(x / size - Math.round(x / size)) < 1e-6); },
-    `a nearest-${suf} sort (bins one ${size} apart)`);
-}
-for (const [id, size] of [['nearest_10', 10], ['nearest_100', 100], ['nearest_1000', 1000], ['nearest_10000', 10000], ['nearest_100000', 100000], ['nearest_million', 1000000]]) {
-  spot(['number_sense:' + id], (it) => nums(it.v + ' ' + it.t).some(n => n > size) && !(size > 10 && /nearest 10\b/i.test(it.v)), `rounding to the nearest ${size} (a number past ${size}, never "nearest 10")`);
-}
-spot(['decimals:round_to_tenth'], (it) => /\d\.\d{2}/.test(it.v + ' ' + it.t), 'a number with hundredths, to round to the tenth');
-spot(['decimals:round_to_hundredth'], (it) => /\d\.\d{3}/.test(it.v + ' ' + it.t), 'a number with thousandths, to round to the hundredth');
-spot(['number_sense:estimate_products'], (it) => /×|x\s*\d/.test(it.v), 'an estimate with ×');
-spot(['number_sense:estimate_quotient', 'number_sense:reasonable_quotients'], (it) => /÷|\)|divid|quotient/i.test(it.v), 'a quotient (÷ or a division)');
-spot(['number_sense:estimate_diff'], (it) => /[−–-]/.test(it.v), 'an estimate with −');
-spot(['data_analysis:mode'], (it) => { const n = nums(it.v.split(/count each/i)[0]); return n.length > 2 && new Set(n).size < n.length; }, 'a list with a repeated value');
-spot(['angles_lines:angles_around_point'], (it) => /360/.test(it.v), 'a full turn (360°)');
-spot(['angles_lines:angles_in_right_angle'], (it) => /90/.test(it.v), 'a right angle (90°)');
-spot(['multiplication:area_model_mult_hard'], (it) => { const m = it.v.match(/(\d+)\s*[×x]\s*(\d+)/); return !!m && +m[1] >= 10 && +m[2] >= 10; }, 'a 2-digit by 2- or 3-digit area model');
-spot(['multiplication:equal_or_unequal_groups'], (it) => /equal|groups?/i.test(it.v), 'an equal / not equal groups question');
-spot(['multiplication:nl_mult'], (it) => /<svg/.test(it.x) && /jump|×|groups? of|number line/i.test(it.v + ' ' + it.t), 'a multiplication number line');
-// denominators of an item: the cell's own text lists a stacked fraction as "n d" and a mixed number as "w n d"; read the
-// pairs around + / − (a mixed number's whole is the lone number before its fraction)
-function dens(it) {
-  const t = it.v.replace(/\s+/g, ' ');
-  const side = t.split(/=|Answer/)[0];
-  const parts = side.split(/[+−–-]/).map(p => nums(p.replace(/\?/g, ' 0 '))).filter(p => p.length >= 2);
-  const fromStack = parts.map(p => p[p.length - 1]);
-  const slash = [...t.matchAll(/(\d+)\s*\/\s*(\d+)/g)].map(m => +m[2]);
-  return fromStack.length >= 2 ? fromStack : slash;
-}
-let spotN = 0;
-for (const [k, rule, why] of SPOT) {
-  if (!byKey[k]) { say(k, 'is named by the spot test but is not a live skill'); continue; }
-  const items = shown(k); spotN++;
-  if (!items.length) { say(k, `spot test: no captured item (wants ${why})`); continue; }
-  if (!rule(items[0])) say(k, `spot test: the first item does not show ${why} — it shows “${items[0].v.slice(0, 90)}”`);
-  const bad = items.filter(it => !rule(it)).length; if (bad > 1) say(k, `spot test: ${bad} of ${items.length} items do not show ${why}`);
+const near = (a, b, tol) => Math.abs(a - b) <= tol;
+function compare(id, app, mock) {
+  const bad = [];
+  if (app.text !== mock.text) bad.push(`words differ: app “${app.text.slice(0, 80)}” vs mock-up “${mock.text.slice(0, 80)}”`);
+  if (app.texts.length !== mock.texts.length) bad.push(`${mock.texts.length} text runs (app ${app.texts.length})`);
+  else app.texts.forEach((a, i) => {
+    const m = mock.texts[i];
+    if (Math.abs(m.fs / a.fs - 1) > 0.10) bad.push(`“${a.t.slice(0, 20)}” at ${m.fs.toFixed(1)} px (app ${a.fs.toFixed(1)} px)`);
+    const tol = (v) => 2 + 0.04 * Math.abs(v);
+    if (!near(m.r[0], a.r[0], tol(a.r[2])) || !near(m.r[1], a.r[1], tol(a.r[3])) || !near(m.r[2], a.r[2], tol(a.r[2])) || !near(m.r[3], a.r[3], tol(a.r[3]))) bad.push(`“${a.t.slice(0, 20)}” box ${m.r.join(',')} (app ${a.r.join(',')})`);
+  });
+  if (app.draws.length !== mock.draws.length) bad.push(`${mock.draws.length} drawings (app ${app.draws.length})`);
+  else app.draws.forEach((a, i) => {
+    const m = mock.draws[i]; const tol = (v) => 2 + 0.04 * Math.abs(v);
+    if (m.tag !== a.tag || !a.r.every((v, j) => near(m.r[j], v, tol(j < 2 ? a.r[j + 2] : v)))) bad.push(`drawing ${i} ${m.tag} ${m.r.join(',')} (app ${a.tag} ${a.r.join(',')})`);
+  });
+  if (Math.abs(mock.box[2] - app.box[2]) > 2 + 0.04 * app.box[2] || Math.abs(mock.box[3] - app.box[3]) > 2 + 0.04 * app.box[3]) bad.push(`drawn area ${mock.box.slice(2).map(Math.round).join('×')} (app ${app.box.slice(2).map(Math.round).join('×')})`);
+  if (bad.length) say(id, bad.slice(0, 4).join('; ') + (bad.length > 4 ? ` … +${bad.length - 4}` : ''));
 }
 
-// ---- 4: in a browser
 (async () => {
-  let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chromium } = require('/opt/node-tools/node_modules/playwright')); }
-  const { startServer } = require('../../../tests/lib/ws-harness.cjs');
+  const t0 = Date.now();
   const { server, base } = await startServer();
-  const browser = await chromium.launch({ executablePath: fs.existsSync('/opt/pw-browsers/chromium') ? '/opt/pw-browsers/chromium' : undefined });
-  let geo = [], app = []; let fontStats = {};
-  try {
-    const page = await browser.newPage({ viewport: { width: 1200, height: 900 } });
-    await page.goto(`${base}/design/mockups/teacher-2/thumbs.html`, { waitUntil: 'networkidle' });
-    await page.evaluate(() => document.fonts.ready);
-    // the card thumbnail sizes the mock-up really uses, Big / Medium / Small, at 1366
-    const sizes = {};
-    for (const view of ['big', 'medium', 'small']) {
-      await page.goto(`${base}/design/mockups/teacher-2/app.html?view=${view}#skills`, { waitUntil: 'networkidle' });
-      sizes[view] = await page.evaluate(() => { const t = document.querySelector('#skill-list .card .thumb'); const r = t.getBoundingClientRect(), cs = getComputedStyle(t); return [Math.round(r.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)), Math.round(r.height - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom))]; });
-    }
-    await page.goto(`${base}/design/mockups/teacher-2/thumbs.html`, { waitUntil: 'networkidle' });
-    await page.evaluate(async () => { await document.fonts.load('400 20px "MQ Andika"'); await document.fonts.load('700 20px "MQ Andika"'); await document.fonts.ready; });
-    geo = await page.evaluate(async (sizes) => {
-      const out = [];
-      // every card on the page draws its own skill
-      for (const c of document.querySelectorAll('.thumb-card[data-key]')) {
-        const t = c.querySelector('.thumb > .smp-thumb, .thumb > svg'); const k = c.getAttribute('data-key');
-        if (!t) { out.push(`${k}: thumbs.html card has no picture`); continue; }
-        if (t.getAttribute('data-smp') !== k && !t.hasAttribute('data-fallback')) out.push(`${k}: thumbs.html card shows ${t.getAttribute('data-smp')}`);
+  const browser = await chromium.launch({ executablePath: EXE, args: ['--font-render-hinting=none'] });
+  const ctx = await browser.newContext({ viewport: { width: 1366, height: 900 }, deviceScaleFactor: 1 });
+  const errs = [];
+  // ---------------------------------------------------------------- A. the app
+  const app = await ctx.newPage(); app.setDefaultTimeout(180000);
+  app.on('pageerror', e => errs.push('app: ' + e.message));
+  await app.goto(base + '/index.html', { waitUntil: 'load' });
+  await app.waitForFunction(() => typeof window.buildSheet === 'function' && typeof window.sheetDocument === 'function');
+  await app.evaluate(async (u) => { window.__live = await import(u); }, base + '/design/mockups/teacher-2/live.mjs');
+  const appRec = {};
+  for (let b = 0; b < cases.length; b += 20) {
+    const batch = cases.slice(b, b + 20);
+    const got = await app.evaluate(async (batch) => {
+      const L = window.__live; const out = {};
+      for (const c of batch) {
+        const id = c.k + '|' + c.seed + '|' + c.n;
+        try {
+          const r = await window.buildSheet(L.sheetRequest(c.k, c.seed === null ? undefined : c.seed, L.countFor(c.n)));
+          const f = document.createElement('iframe'); f.style.cssText = 'position:fixed;left:0;top:0;width:900px;height:1400px;border:0;visibility:hidden';
+          document.body.appendChild(f);
+          await new Promise((ok) => { f.onload = ok; f.srcdoc = window.sheetDocument(r.pupilHtml, 'check'); setTimeout(ok, 15000); });
+          const d = f.contentDocument;
+          for (let t = 0; t < 200 && d.documentElement.getAttribute('data-ws-fonts') !== 'ready'; t++) await new Promise(ok => setTimeout(ok, 25));
+          await d.fonts.ready;
+          const cells = [...d.querySelectorAll('.ws-page .ws-cell:not(.blankrun)')].filter(x => x.getBoundingClientRect().width > 4);
+          out[id] = cells[c.n] ? L.measureCell(cells[c.n]) : { none: true };
+          f.remove();
+        } catch (e) { out[id] = { err: String(e.message || e).slice(0, 160) }; }
       }
-      // the smallest text a thumbnail shows, in screen px (lead 2026-10-23): Big >= 12, Medium >= 11, Small >= 9, every
-      // skill, the first item and another; text cut away by the window is not shown and is not counted
-      const MIN = { big: 12, medium: 11, small: 9 };
-      const SVGNS = 'http://www.w3.org/2000/svg';
-      const eff = (node, outer) => {
-        const pe = node.parentElement; const fs = parseFloat(getComputedStyle(pe).fontSize);
-        const inner = pe.namespaceURI === SVGNS ? pe.closest('svg') : null;
-        if (inner && inner !== outer && inner.viewBox && inner.viewBox.baseVal && inner.viewBox.baseVal.width) return fs * inner.getBoundingClientRect().width / inner.viewBox.baseVal.width;
-        if (outer && outer.contains(pe)) return fs * outer.getBoundingClientRect().width / outer.viewBox.baseVal.width;
-        return fs;
-      };
-      const stats = {};
-      for (const view of ['big', 'medium', 'small']) {
-        const grid = document.createElement('div'); grid.className = 'grid'; grid.setAttribute('data-view', view); grid.style.cssText = 'position:absolute;left:0;top:0;display:block';
-        const host = document.createElement('div'); host.className = 'thumb'; host.style.cssText = `width:${sizes[view][0] + 16}px;height:${sizes[view][1] + 16}px;box-sizing:border-box`;
-        grid.appendChild(host); document.body.appendChild(grid); let low = 1e9, lowK = '', n = 0;
-        for (const s of MQ_DATA.skills) for (const seed of [undefined, 2]) {
-          host.innerHTML = MQThumbs.draw(s, seed); MQThumbs.fit(host); const t = host.firstElementChild; if (!t || !t.classList.contains('smp-thumb')) continue;
-          const outer = t.querySelector('.smp-svg'); const vis = t.getBoundingClientRect(); const probs = []; let min = 1e9, minT = '';
-          const tw = document.createTreeWalker(t, NodeFilter.SHOW_TEXT);
-          for (let nd = tw.nextNode(); nd; nd = tw.nextNode()) {
-            const txt = nd.nodeValue.trim(); if (!txt || /^[a-z]\.$/.test(txt)) continue;
-            const holder = nd.parentElement.closest('.smp-prose, .smp-svg'); if (!holder || getComputedStyle(holder).display === 'none') continue;
-            const rg = document.createRange(); rg.selectNodeContents(nd); const rr = [...rg.getClientRects()].filter(r => r.width > 0.5);
-            const hb = holder.getBoundingClientRect();
-            const shown = rr.filter(r => r.bottom > Math.max(vis.top, hb.top) + 1 && r.top < Math.min(vis.bottom, hb.bottom) - 1 && r.right > Math.max(vis.left, hb.left) + 1 && r.left < Math.min(vis.right, hb.right) - 1);
-            if (!shown.length) continue;
-            // the opening sentences are set as live text above; their copy inside the cell sits outside the window
-            const squash = (x) => String(x).replace(/\s+/g, '');
-            if (holder === outer && squash((t.querySelector('.smp-prose') || {}).textContent).includes(squash(txt))) continue;
-            const e = eff(nd, outer); if (e < min) { min = e; minT = txt.slice(0, 16); }
-            // the whole item fits (not cut): every word inside the picture
-            const proseTxt = (t.querySelector('.smp-prose') || {}).textContent || '';
-            if (!t.classList.contains('cut') && holder === outer && !proseTxt.includes(txt) && rr.some(r => r.left < hb.left - 1.5 || r.right > hb.right + 1.5 || r.top < hb.top - 1.5 || r.bottom > hb.bottom + 1.5)) probs.push(`“${txt.slice(0, 16)}” outside the picture`);
-          }
-          n++; if (min < low) { low = min; lowK = s.c + ':' + s.v; }
-          if (min < MIN[view] - 0.05) probs.push(`${view}: text at ${min.toFixed(1)} px (“${minT}”), the minimum is ${MIN[view]}`);
-          if (probs.length) out.push(`${s.c}:${s.v} seed ${seed}: ${[...new Set(probs)].join('; ')}`);
-        }
-        stats[view] = `${view} ${sizes[view].join('×')} px: ${n} thumbnails, smallest text ${low.toFixed(1)} px (${lowK})`;
-        grid.remove();
-      }
-      out.stats = stats;
-      return { out, stats };
-    }, sizes);
-    fontStats = geo.stats; geo = geo.out;
-    // the mock-up itself: every Skills card and every tray thumbnail shows its own skill's sample
-    await page.goto(`${base}/design/mockups/teacher-2/app.html?tray=demo10&tview=thumbs#skills`, { waitUntil: 'networkidle' });
-    app = await page.evaluate(() => {
-      const out = []; let n = 0;
-      for (const c of document.querySelectorAll('[data-skill]')) {
-        const svg = c.querySelector('.smp-thumb, svg[data-fallback]'); if (!svg) continue; n++;
-        if (svg.getAttribute('data-smp') !== c.getAttribute('data-skill') && !svg.hasAttribute('data-fallback')) out.push(`app.html: ${c.getAttribute('data-skill')} shows ${svg.getAttribute('data-smp')}`);
-      }
-      if (n < 10) out.push(`app.html: only ${n} thumbnails carry their skill (data-skill)`);
       return out;
-    });
-  } finally { await browser.close(); server.close(); }
-  geo.forEach(x => fails.push(x)); app.forEach(x => fails.push(x));
-
-  // ---- 5: size
-  const mb = fs.existsSync(SAMPLES_FILE) ? fs.statSync(SAMPLES_FILE).size / 1048576 : 0;
-  if (mb > 6) say('samples.js', `${mb.toFixed(2)} MB, over the 6 MB budget`);
-
-  const listed = Object.keys(LISTED_FALLBACKS);
-  console.log(`${D.skills.length} live skills · ${S && S.s ? Object.keys(S.s).length : 0} with captured items (${nSamples} items, capture seed ${S && S.seed}) · ${listed.length} listed fallbacks${listed.length ? ': ' + listed.join(', ') : ''}`);
-  for (const v of Object.values(fontStats)) console.log('readable: ' + v);
-  console.log(`${nDraws} thumbnails checked against their own captured item · ${spotN} critic-named skills spot-tested by content · samples.js ${mb.toFixed(2)} MB`);
-  const once = [...new Set(fails)];
-  if (once.length) { console.log(`\nthumbs-check: FAIL (${once.length})`); once.slice(0, 150).forEach(f => console.log('  ' + f)); if (once.length > 150) console.log(`  … ${once.length - 150} more`); process.exit(1); }
+    }, batch);
+    Object.assign(appRec, got);
+    process.stderr.write(`  app ${Math.min(b + 20, cases.length)}/${cases.length} ${Math.round((Date.now() - t0) / 1000)} s\n`);
+  }
+  // ---------------------------------------------------------------- B. the mock-up
+  const mk = await ctx.newPage(); mk.setDefaultTimeout(180000);
+  mk.on('pageerror', e => errs.push('thumbs.html: ' + e.message));
+  await mk.goto(base + '/design/mockups/teacher-2/thumbs.html?q=__none__', { waitUntil: 'load' });
+  const hasLive = await mk.evaluate(async () => { for (let t = 0; t < 100 && !window.MQLive; t++) await new Promise(ok => setTimeout(ok, 50)); return !!window.MQLive; });
+  if (!hasLive) say('thumbs.html', 'the live renderer (MQLive) did not load: thumbnails are not drawn by the app');
+  const mockRec = {};
+  for (let b = 0; b < cases.length && hasLive; b += 24) {
+    const batch = cases.slice(b, b + 24);
+    const got = await mk.evaluate(async (batch) => {
+      const T = window.MQThumbs, D = window.MQ_DATA; const SK = {}; D.skills.forEach(s => { SK[s.c + ':' + s.v] = s; });
+      const out = document.getElementById('out'); out.innerHTML = '';
+      // each place as the mock-up builds it (the same classes as app.html)
+      const wrap = {
+        big: (h) => `<div class="grid" data-view="big"><div class="card"><div class="thumb">${h}</div></div></div>`,
+        medium: (h) => `<div class="grid" data-view="medium"><div class="card"><div class="thumb">${h}</div></div></div>`,
+        small: (h) => `<div class="grid" data-view="small"><div class="card"><div class="thumb">${h}</div></div></div>`,
+        tray: (h) => `<div class="tp-list"><div class="tp-item tp-thumb"><div class="thumb">${h}</div></div></div>`,
+        chip: (h) => `<div style="width:420px"><div class="thumb thumb-lg">${h}</div></div>`,
+        preview: (h) => `<div class="previews"><div class="page p3"><div class="page-in"><div class="page-grid c2"><div class="page-cell">${h}</div></div></div></div></div>`,
+      };
+      const ids = [];
+      for (const c of batch) {
+        const s = SK[c.k]; const id = c.k + '|' + c.seed + '|' + c.n;
+        const h = c.n === 0 && c.seed === null ? T.draw(s) : T.drawItem(s, c.n, c.seed);
+        const d = document.createElement('div'); d.className = 'chk'; d.dataset.id = id; d.dataset.place = c.place; d.style.cssText = 'width:300px;display:inline-block;vertical-align:top;margin:6px';
+        if (c.place === 'big') d.style.width = '300px'; if (c.place === 'small') d.style.width = '220px'; if (c.place === 'chip') d.style.width = '420px'; if (c.place === 'preview') d.style.width = '520px';
+        d.innerHTML = wrap[c.place](h || ''); out.appendChild(d); ids.push(id);
+      }
+      if (window.MQLive) await window.MQLive.drawAll(out);
+      const res = {};
+      for (const d of out.querySelectorAll('.chk')) {
+        const id = d.dataset.id; const host = d.querySelector('.live-thumb');
+        if (!host) { res[id] = { nolive: true, html: d.innerHTML.slice(0, 80) }; continue; }
+        if (host.dataset.state !== 'done') { res[id] = { state: host.dataset.state, err: host.dataset.err || '' }; continue; }
+        const f = host.querySelector('iframe.live-frame'); const cell = f.contentDocument.querySelector('[data-live-on]');
+        const m = window.MQLive.measureCell(cell);
+        const s = Number(host.dataset.scale); const win = host.dataset.win.split(' ').map(Number);
+        const min = parseFloat(getComputedStyle(host).getPropertyValue('--smp-min')) || 0;
+        const hr = host.getBoundingClientRect(), fr = f.getBoundingClientRect();
+        const realScale = fr.width / f.offsetWidth;
+        // what is SHOWN: text lines whose box meets the window
+        const box = m.box; const ox = win[0] - box[0], oy = win[1] - box[1];   // window in cell-relative coordinates
+        let low = Infinity, lowT = '', cutStart = [];
+        for (const t of m.texts) {
+          const [x, y, w, hh] = t.r; const shown = x < ox + win[2] && x + w > ox && y < oy + win[3] && y + hh > oy;
+          if (!shown) continue;
+          if (t.fs * s < low) { low = t.fs * s; lowT = t.t; }
+          for (const L of t.lefts) if (L < ox - 0.5 && L + 1 < ox + win[2]) cutStart.push(t.t.slice(0, 20));
+        }
+        res[id] = { m, s, realScale, min, low: Number.isFinite(low) ? low : 0, lowT, cutStart, place: d.dataset.place,
+          inside: fr.left >= hr.left - 0.5 && fr.top >= hr.top - 0.5 && Math.min(fr.right, hr.right) <= hr.right + 0.5,
+          clip: getComputedStyle(host).overflow, hostW: hr.width, hostH: hr.height };
+      }
+      return res;
+    }, batch);
+    Object.assign(mockRec, got);
+    process.stderr.write(`  mock-up ${Math.min(b + 24, cases.length)}/${cases.length} ${Math.round((Date.now() - t0) / 1000)} s\n`);
+  }
+  // ---------------------------------------------------------------- C. compare
+  let nCmp = 0;
+  for (const c of cases) {
+    const id = c.k + '|' + c.seed + '|' + c.n; const a = appRec[id], m = mockRec[id];
+    if (!a || a.err) { say(id, 'the app could not print it: ' + (a ? a.err : 'no record')); continue; }
+    if (a.none) { say(id, 'the app printed no cell ' + (c.n + 1)); continue; }
+    if (!m) { if (hasLive) say(id, 'not drawn in the mock-up'); continue; }
+    if (m.nolive) { say(id, `${c.place}: not a live thumbnail (${m.html.replace(/\s+/g, ' ').slice(0, 60)})`); continue; }
+    if (m.state) { say(id, `${c.place}: thumbnail ${m.state} ${m.err}`); continue; }
+    nCmp++;
+    compare(`${id} [${c.place}]`, a, m.m);
+    if (Math.abs(m.realScale - m.s) > 0.01) say(id, `${c.place}: drawn at ${m.realScale.toFixed(3)}×, says ${m.s}`);
+    if (m.min > 0 && m.low + 0.05 < m.min) say(id, `${c.place}: smallest text shown ${m.low.toFixed(1)} px “${m.lowT.slice(0, 20)}” (min ${m.min})`);
+    if (m.cutStart.length) say(id, `${c.place}: line cut at its start: “${m.cutStart[0]}”`);
+    if (!m.inside || m.clip !== 'hidden') say(id, `${c.place}: the picture is not held inside its box`);
+  }
+  // ---------------------------------------------------------------- D. the pages
+  const pg = await ctx.newPage();
+  const bytes = { total: 0, samples: 0, n: 0 };
+  pg.on('response', async (r) => { try { const b = await r.body(); bytes.total += b.length; bytes.n++; if (/samples\.js/.test(r.url())) bytes.samples += b.length; } catch (e) { /* */ } });
+  pg.on('pageerror', e => errs.push('app.html: ' + e.message));
+  await pg.goto(base + '/design/mockups/teacher-2/app.html?theme=light#skills', { waitUntil: 'load' });
+  await pg.evaluate(async () => { for (let t = 0; t < 100 && !window.MQLive; t++) await new Promise(ok => setTimeout(ok, 50)); if (window.MQLive) await window.MQLive.settled(document); });
+  await pg.waitForTimeout(500);
+  const cards = await pg.evaluate(() => ({ live: document.querySelectorAll('.card .live-thumb').length, done: document.querySelectorAll('.card .live-thumb[data-state="done"]').length, other: document.querySelectorAll('.card .smp-thumb, .card svg[data-fallback]').length }));
+  if (bytes.samples) say('app.html', `loads samples.js (${(bytes.samples / 1e6).toFixed(2)} MB)`);
+  if (!cards.live || cards.other) say('app.html#skills', `cards: ${cards.live} live thumbnails, ${cards.other} copied pictures`);
+  if (cards.live && !cards.done) say('app.html#skills', 'no card thumbnail was drawn on screen');
+  // "Same problems, new numbers": three pages of three skills; pages 2 and 3 must deal other items than page 1
+  const tray = 'addition:add_within_10,measurement:time_hour,fractions:' + (D.skills.find(s => s.c === 'fractions').v);
+  await pg.goto(base + `/design/mockups/teacher-2/app.html?theme=light&tray=${tray}&pages=3&each=same#print`, { waitUntil: 'load' });
+  await pg.waitForTimeout(400);
+  const each = await pg.evaluate(async () => {
+    for (let t = 0; t < 100 && !window.MQLive; t++) await new Promise(ok => setTimeout(ok, 50));
+    if (window.MQLive) await window.MQLive.drawAll(document);
+    const pages = [...document.querySelectorAll('.previews .page')].map(p => [...p.querySelectorAll('.page-cell')].map(c => { const h = c.querySelector('.live-thumb'); return h ? (h.dataset.k + '=' + (h.dataset.text || '')) : 'none'; }));
+    return { q: true, s: /new numbers/i.test((document.querySelector('[data-summary]') || {}).textContent || ''), pages };
+  });
+  if (!each.q || !each.s) say('Each page', 'the summary does not say Same problems, new numbers (?pages=3&each=same)');
+  else if (each.pages.length < 3) say('Each page', `${each.pages.length} preview pages`);
+  else {
+    const same = (a, b) => a.join('|') === b.join('|');
+    if (same(each.pages[0], each.pages[1]) || same(each.pages[1], each.pages[2]) || same(each.pages[0], each.pages[2])) say('Each page', 'Same problems, new numbers: two preview pages deal the same items');
+    const sk = (p) => p.map(x => x.split('=')[0]).join(',');
+    if (sk(each.pages[0]) !== sk(each.pages[1])) say('Each page', 'Same problems, new numbers: page 2 does not repeat page 1’s skills');
+    if (each.pages.flat().some(x => x === 'none' || /=$/.test(x))) say('Each page', 'a preview cell is not a drawn live thumbnail');
+  }
+  // cold load, nothing cached: the bytes a first visit to Skills transfers
+  const cold = await browser.newContext({ viewport: { width: 1366, height: 768 } }); const cp = await cold.newPage();
+  const cb = { total: 0, n: 0 }; cp.on('response', async (r) => { try { cb.total += (await r.body()).length; cb.n++; } catch (e) { /* */ } });
+  const tc = Date.now(); await cp.goto(base + '/design/mockups/teacher-2/app.html?theme=light#skills', { waitUntil: 'load' });
+  const tLoad = Date.now() - tc;
+  await cp.evaluate(async () => { for (let t = 0; t < 100 && !window.MQLive; t++) await new Promise(ok => setTimeout(ok, 50)); if (window.MQLive) await window.MQLive.settled(document); });
+  const tDrawn = Date.now() - tc; await cold.close();
+  for (const e of errs) say('console', e);
+  await browser.close(); server.close();
+  const nSk = keys.length;
+  console.log(`thumbs-check: ${nSk} skills in ${cats.size} categories, ${cases.length} thumbnails, ${nCmp} compared with the app's own sheet`);
+  console.log(`  cold load app.html#skills: ${(cb.total / 1e6).toFixed(2)} MB in ${cb.n} files (uncompressed), page ${tLoad} ms, first screen of thumbnails ${tDrawn} ms`);
+  if (fails.length) { console.log(fails.slice(0, 80).map(f => '  ✗ ' + f).join('\n') + (fails.length > 80 ? `\n  … ${fails.length - 80} more` : '')); console.log(`thumbs-check: FAIL (${fails.length})`); process.exit(1); }
   console.log('thumbs-check: OK');
-})();
+})().catch((e) => { console.error(e); console.log('thumbs-check: FAIL (crashed)'); process.exit(1); });
