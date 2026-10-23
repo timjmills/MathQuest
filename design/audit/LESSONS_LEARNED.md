@@ -25,7 +25,7 @@ lane had self-graded 8. The failures fall into a small number of RECURRING class
 
 > **2026-10-23:** the checks marked NEW above (L1 sizes, L3 key-in-drawing, L6 instruction-follows-item, L10 answer cycles) plus
 > lone item / lone state, repeats, text ≠ generator and the Chromebook viewport are built in Wave 0 (`design/IMPROVEMENT_PLAN.md`
-> §1.3 S2), each proved by a backtest on the commit a critic failed; `ws-precritic` then runs them before every critic round.
+> §1.4 S2), each proved by a backtest on the commit a critic failed; `ws-precritic` then runs them before every critic round.
 
 ## PRE-FLIGHT checklist (every lane, before reporting)
 1. Rendered at **S and L** (and M if the grid differs): independent, guided, test, error-analysis + keys; card at
