@@ -40,7 +40,7 @@ Builders run in their own git worktrees and the lead merges them here.
 | Fix r1 B: matrix + envelope critic sample (D1 matrix, D3 matrix, D4, D8, N1, N3, N10, N11) — merged 24aa7410 | mq-opus-medium (rebuild after a failed round) | 14:13 | 15:05 | 52 |
 | Fix r1 C: node-lint per-finding baseline, H8 multiple choice for every family (D5, D7, N2, N9, N12) | mq-opus-medium (rebuild after a failed round) | 15:04 | 15:47 | — |
 | Critic r2 (fresh critic): FAIL 7 / 8 / 8, one blocking defect | mq-opus-medium | 15:47 | 17:07 | — |
-| Fix r2: nightly red-row rule (critic r2 D1) + nits | mq-opus-medium (rebuild after a failed round) | 17:2x | — | — |
+| Fix r2: nightly red-row rule (critic r2 D1) + nits + owner decisions (Repeated check in 28 slices; no-baseline rows PENDING) — merged dea73ab7 | mq-opus-medium (rebuild after a failed round) | 17:05 | 17:37 | — |
 | Sweep gaps from the W0-defects lane (board 1280×720 + nested clip, dark scan whole host, board animation, chrome-linux64) | mq-opus-low (change to built tools) | 17:09 | — | — |
 | Pilot six-skill matrix baseline (lead run) | — | 16:17 | 17:12 | 55 |
 | S1 `ws-precritic` build (brought forward by the lead, 11:02; stopped: moved to the lead's session) | mq-opus-medium | 11:03 | 12:51 | 108 |
@@ -96,3 +96,11 @@ data keys, mc-production backtest skips the in-page sampler, N9 the timed runs s
   10 / 10 / 17 findings at S / M / L — L-OVERFLOW PG-12 ×8 at every size, L-DENSITY PG-23 ×2 at S and M, L-INK ILLEGIBLE ×8 and
   L-DENSITY PAGEFILL ×1 at L. They come from the Sections composer with the fixed partner `algebra:tape_diagram` (its legacy
   story cell overhangs its 46 mm cell by ≈ 19.9 mm), so they are composer / partner findings, identical across the six skills.
+
+Fix r2 results: every run file is folded (a row's state = its last run; RED/ERROR persists until a later run lists it OK);
+`--red-from` re-selects red rows (nightly and deploy); session 3 checks the nightly on every run. Owner decisions: the
+"Repeated check" runs `--slice i/28` (stable SHA-256 of the row id; 816–883 rows ≈ 1,134–1,272 docs ≈ 1 h a night), first
+baseline over 28 nights into `baseline.slice-i-of-28.json`, then affected + red + a rotating slice; a row with no baseline is
+PENDING(no-baseline), never RED; before the full baseline a stale or missing nightly is a WARNING (deploy still OK, shown).
+Envelope samples drop impossible option rows (strict critic set 543 → 297 pages; bounded 57 rows). L3 no longer blind on
+common data keys; MC-ALL prints PINNED for pinned skills; matrix pins carry finding keys.
