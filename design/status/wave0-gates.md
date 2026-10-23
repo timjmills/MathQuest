@@ -44,7 +44,7 @@ Builders run in their own git worktrees and the lead merges them here.
 | Sweep gaps from the W0-defects lane (board 1280×720 + nested clip, dark scan whole host, board animation, chrome-linux64) | mq-opus-low (change to built tools) | 17:09 | 18:08 | — |
 | Pilot six-skill matrix baseline (lead run) | — | 16:17 | 17:12 | 55 |
 | Critic r3 (fresh critic): FAIL 7 / 8 / 8, one blocking defect | mq-opus-medium | 18:09 | 18:44 | — |
-| Fix r3: baseline invariants (root cause of r1 D4, r2 D1, r3 D1) | mq-opus-medium (rebuild after a failed round) | 18:41 | — | — |
+| Fix r3: baseline invariants (root cause of r1 D4, r2 D1, r3 D1) — merged 8d0a7a5a | mq-opus-medium (rebuild after a failed round) | 18:41 | — | — |
 | Timed deploy runs: three cloud sessions (gate sessions 1, 2, 3 in parallel; each repeats its session 3×) on eee32b89 | timing runners (session_01HZreUmm66xVrS2AYyY32uD, session_016eCsVCbtn3q8SkotuDG1Xp, session_01FLRx8vV9wbkgLuukh57VyK) | 18:09 | — | — |
 | S1 `ws-precritic` build (brought forward by the lead, 11:02; stopped: moved to the lead's session) | mq-opus-medium | 11:03 | 12:51 | 108 |
 
@@ -133,3 +133,11 @@ re-selected as red), so a real regression reads OK. Same area as r1 D4 and r2 D1
 the baseline state), so fix r3 is briefed on the root cause: five written invariants (pin new rows only; never pin a
 re-selected red row; verdict before any pin; refuse conflicting duplicate pins; only an OK re-run or an explicit, logged
 re-pin clears a red row), each property-tested, plus a backtest.
+
+Fix r3 results: judging and pinning are one step (`judgeAndPin`: judge against the baseline as loaded, then pin only rows
+with no entry, never re-judge). Invariants I1–I5 in the ws-coverage-matrix header, each property-tested (300 random
+sequences × 12 nights × 7 rows = 25,200 row-night checks, 0 violations; undoing any rule makes the self-test FAIL). Re-pin
+only by `--repin <ids> --reason`, logged per entry. Both critic r3 reproduce cases keep the row RED / refuse with the real
+print-lint. Backtest `baseline-night-keeps-red` FAILs on 53f46e10, passes on the fix. Renamed rows map to their new id;
+rows that no longer exist are a RETIRED-ROW warning cleared with `--retire`. Over-budget warnings name which affected rows
+have a baseline (unchecked) and which have none.
