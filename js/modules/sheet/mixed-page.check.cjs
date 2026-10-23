@@ -13,8 +13,9 @@
 //   tracks     the facts' digit tracks are the widest number on the page, no more (D4)
 //   tabs       a numbered tab is the CL-31 side for the page's effective digit size (D6)
 //
-// Sets: the critic's 4-skill set (add_facts, subtract, mult_facts, div_facts vertical) and the
-// 2-skill add_facts + subtract set; 20 seeds x S / M / L x Daily / I Can.
+// Sets: the critic's 4-skill set (add_facts, subtract, mult_facts, div_facts vertical), the
+// 2-skill add_facts + subtract set and add_facts : mult_facts weighted 1 : 3; 20 seeds x S / M / L
+// x Daily / I Can. Every page is also one page whose shelves hold exactly the problems dealt.
 //
 //   node js/modules/sheet/mixed-page.check.cjs [--seeds 20] [--table]
 // Prints `mixed-page check: OK` / `FAIL` and exits non-zero on a failure. Needs the preinstalled
@@ -31,10 +32,13 @@ const { open } = require(path.join(ROOT, 'tests/lib/ws-harness.cjs'));
 const arg = (k, d) => { const i = process.argv.indexOf(`--${k}`); return i > -1 ? process.argv[i + 1] : d; };
 const SEEDS = Math.max(1, Number(arg('seeds', 20)) || 20);
 const TABLE = process.argv.includes('--table');
-const sk = (id) => { const [base, o] = id.split('@'); const [categoryId, skillId] = base.split(':'); return { categoryId, skillId, opts: o ? JSON.parse(o) : {} }; };
+// 'c:s', 'c:s@{opts}', 'c:s#w' (a weight)
+const sk = (id) => { const [id0, w] = id.split('#'); const [base, o] = id0.split('@'); const [categoryId, skillId] = base.split(':'); return Object.assign({ categoryId, skillId, opts: o ? JSON.parse(o) : {} }, w ? { weight: Number(w) } : {}); };
 const SETS = {
     critic4: ['addition:add_facts', 'subtraction:subtract', 'multiplication:mult_facts', 'division:div_facts@{"divForm":"vertical"}'],
     add_sub2: ['addition:add_facts', 'subtraction:subtract'],
+    // (the 1 : 3 weighted page: its re-picked k once printed 30 problems on 25 places, 2 pages)
+    weighted13: ['addition:add_facts#1', 'multiplication:mult_facts#3'],
 };
 const SIZES_ = ['S', 'M', 'L'];
 const LOOKS_ = ['daily', 'ican'];
@@ -104,6 +108,9 @@ async function main() {
                         const id = `${setName} ${look} ${size} seed ${seed}`;
                         const fail = (why) => fails.push(`${id}: ${why}`);
                         if (r.arr !== 'mixed') { fail(`arranged ${r.arr}`); continue; }
+                        // the shelves hold exactly the problems dealt, on one page (no spill)
+                        if (r.pages !== 1) fail(`${r.pages} pages`);
+                        if (r.n !== r.k * r.rows) fail(`${r.n} problems on ${r.rows} shelves of ${r.k}`);
                         // D1: repeats
                         const rep = pageRepeats(r.facts);
                         if (rep.exact.length) fail(`${rep.exact.length} exact repeat(s): ${rep.exact.map((x) => x.key).join(', ')}`);

@@ -2911,8 +2911,9 @@ async function buildRoleSheet(n, metaOf) {
         const repick = (tracks) => {
             mixDigits = tracks;
             pools.forEach((p, pi) => { probe[p.id] = dealPool(p, pi, PROBE); measureMixed(probe[p.id]); input.floors[p.id] = floorOf(probe[p.id]); });
-            want = mod.counts(probe, input) || {};
+            // (the k first: the counts are the shelves of THAT k)
             input.mixK = mixedPickK(probe);
+            want = mod.counts(probe, input) || {};
         };
         input.mixK = mixedPickK(probe);
         items = dealMixed();
