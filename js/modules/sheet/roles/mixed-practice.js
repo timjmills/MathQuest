@@ -225,8 +225,17 @@ function mixedPacking(poolsIn, input) {
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Mixed 1', title: 'Mixed practice', twoLine: true, score: 1 });
     const m0 = bandMetrics(ctx, layoutHeader(frame.header));
     const m = Object.assign({}, m0, { budget: m0.budget - stripMmOf(input) });
-    const cls = mixedClass(poolsIn, input);
     const ids = Object.keys(poolsIn).filter((id) => (poolsIn[id] || []).length);
+    let cls = mixedClass(poolsIn, input);
+    if (!cls.ok) {
+        // The host checked the probe; should the final items differ (a taller item dealt), the
+        // page stays mixed on the narrowest k every skill fits, as tall as its tallest cell.
+        const N = cls.N || latticeOf(input, ctx);
+        const kOf = (its) => divisorsDesc(N).find((d) => d <= 6 && fitsAt(its, d, ctx)) || 1;
+        const k = Math.min(...ids.map((id) => kOf(poolsIn[id])));
+        const h = Math.max(...ids.map((id) => hMinAt(poolsIn[id], k, ctx)).map((x) => (Number.isFinite(x) ? x : 60)));
+        cls = { ok: false, k, h: h > 0 ? h : 60, N, why: cls.why };
+    }
     const maxShelves = { S: 9, M: 7, L: 5 }[ctx.size] || 5;
     const shelves = Math.max(1, Math.min(maxShelves, Math.floor((m.budget - m.strip) / cls.h)));
     const total = shelves * cls.k;
@@ -241,7 +250,17 @@ function planMixed(input, pools) {
     const { ctx, m, cls } = p;
     const k = cls.k;
     const labels = labelStyleOf(ctx.look, input.labels);
-    const names = Object.fromEntries(p.ids.map((id) => [id, { name: poolName(input, pools[id]) }]));
+    // The notes name a skill by its strand ("Time", "Multiplying"), or by its label when two skills share one.
+    const strandOf = (id) => {
+        const it0 = pools[id][0] || {};
+        const cat = String(it0.skill || '').split(':')[0] || (it0.q && it0.q.categoryId) || '';
+        return STRAND_BY_CATEGORY[cat] || '';
+    };
+    const strands = p.ids.map(strandOf);
+    const names = Object.fromEntries(p.ids.map((id, i) => {
+        const name = strands[i] && strands.filter((x) => x === strands[i]).length === 1 ? strands[i] : poolName(input, pools[id]);
+        return [id, { name, noun: `${name.toLowerCase()} problems` }];
+    }));
     const items = p.ids.flatMap((id) => pools[id].map((it) => ({ key: id, it })));
     const mix = interleave(items, p.weights, deriveSeed('mixed-practice', input.seed || 0), { labels: names });
     const queue = mix.order.map((e) => e.it);
