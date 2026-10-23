@@ -12,6 +12,7 @@
 #                                                           # refuse a deploy that makes a family live with no
 #                                                           # "Owner go: <family>, <date>" line (§1.6.3 step 6)
 #   bash tests/scripts/ws-deploy-gates.sh --self-test       # the owner-go check on its fixtures (must refuse / pass)
+#                                                           # and the flake rule on a synthetic gate (FLAKE, BLOCKED)
 #
 # Session 1  every node gate (in parallel with the browser gates; 4 cores = 2 browsers + 2 node workers):
 #            ws-code-snapshot, ws-codec-registry, ws-standards, ws-search-terms, ws-providers-unit, ws-layout-unit,
@@ -51,6 +52,7 @@ cd "$ROOT" || exit 2
 RUNNER=/tmp/mq-browser-run.sh
 TIMINGS=design/audit/baselines/deploy-gate-timings.jsonl
 FLAKES=design/audit/baselines/flakes.jsonl
+declare -A SES_WALL
 SLOTS_BASE=design/audit/baselines/screen-slots.json
 PRINT_BASE=design/audit/baselines/print-lint.json
 SAMPLE=tests/fixtures/precritic/sweep-sample.json
@@ -112,6 +114,19 @@ self_test() {
   if deploy_check "$fx/no-go/lanes" "$fx/no-go/status"; then echo "  FAIL let a family go live with no go line"; bad=1; else echo "  ok   refused"; fi
   echo "-- no manifests (must pass: nothing made live by a lane)"
   if deploy_check "$fx/none/lanes" "$fx/none/status"; then echo "  ok   passes"; else echo "  FAIL"; bad=1; fi
+  # the flake rule (§1.3) on a synthetic gate that fails once, then passes alone; flakes and timings go to temp files
+  echo "-- flake rule: a gate that fails, then passes alone (FLAKE, logged); the same again (BLOCKED)"
+  local tmp; tmp=$(mktemp -d)
+  FLAKES="$tmp/flakes.jsonl"; TIMINGS="$tmp/timings.jsonl"
+  G_SES=(T); G_KIND=(node); G_NAME=("synthetic flaky gate")
+  G_CMD=("if [ -f $tmp/m ]; then rm $tmp/m; echo 'addition:add_facts ok'; else touch $tmp/m; echo 'addition:add_facts card doubled'; exit 1; fi")
+  local r1 r2
+  : > "$RES"; run_session T 2>/dev/null; r1=$(cut -f3 "$RES")
+  : > "$RES"; run_session T 2>/dev/null; r2=$(cut -f3 "$RES")
+  local lines; lines=$(wc -l < "$FLAKES")
+  if [ "$r1" = FLAKE ] && [ "$r2" = BLOCKED ] && [ "$lines" = 2 ] && grep -q '"item":"addition:add_facts"' "$FLAKES"; then echo "  ok   FLAKE then BLOCKED, 2 flake lines with the item"
+  else echo "  FAIL first $r1, second $r2, $lines flake line(s)"; bad=1; fi
+  rm -rf "$tmp"
   [ $bad = 0 ] && echo 'ws-deploy-gates --self-test: OK' || echo 'ws-deploy-gates --self-test: FAIL'
   return $bad
 }
@@ -201,9 +216,9 @@ run_gate() {   # index [retry]
   case "$kind" in
     skip)   echo "SKIPPED (tool not built): $cmd" > "$log"; res="SKIPPED"; rc=0 ;;
     notyet) echo "NOT YET: $cmd" > "$log"; res="NOT YET"; rc=0 ;;
-    node)   eval "$cmd" > "$log" 2>&1; rc=$? ;;
+    node)   ( eval "$cmd" ) > "$log" 2>&1; rc=$? ;;
     browser) eval "MQ_BROWSER_WAIT_LOG=1 \"\$RUNNER\" $cmd" > "$log" 2>&1; rc=$? ;;
-    fn)     eval "$cmd" > "$log" 2>&1; rc=$? ;;
+    fn)     ( eval "$cmd" ) > "$log" 2>&1; rc=$? ;;
   esac
   t1=$(now_ms)
   [ "$kind" = skip ] || [ "$kind" = notyet ] || { [ $rc = 0 ] && res=OK || res=FAIL; }
@@ -330,7 +345,6 @@ fi
 node -e 'require("puppeteer")' >/dev/null 2>&1 || { echo 'ws-deploy-gates: prerequisite missing: puppeteer (node -e "require(\"puppeteer\")" fails). Fix: npm install'; prereq_bad=1; }
 command -v flock >/dev/null 2>&1 || { echo 'ws-deploy-gates: prerequisite missing: flock (util-linux), needed by the browser runner'; prereq_bad=1; }
 [ $prereq_bad = 0 ] || { echo 'ws-deploy-gates: FAIL'; exit 2; }
-declare -A SES_WALL
 export BW=$BROWSER_WORKERS NW=$NODE_WORKERS
 for s in "${SESSIONS[@]}"; do run_session "$s"; done
 print_table
