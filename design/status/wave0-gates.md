@@ -43,6 +43,8 @@ Builders run in their own git worktrees and the lead merges them here.
 | Fix r2: nightly red-row rule (critic r2 D1) + nits + owner decisions (Repeated check in 28 slices; no-baseline rows PENDING) — merged dea73ab7 | mq-opus-medium (rebuild after a failed round) | 17:05 | 17:37 | — |
 | Sweep gaps from the W0-defects lane (board 1280×720 + nested clip, dark scan whole host, board animation, chrome-linux64) | mq-opus-low (change to built tools) | 17:09 | 18:08 | — |
 | Pilot six-skill matrix baseline (lead run) | — | 16:17 | 17:12 | 55 |
+| Critic r3 (fresh critic) | mq-opus-medium | 18:09 | — | — |
+| Timed deploy runs: three cloud sessions (gate sessions 1, 2, 3 in parallel; each repeats its session 3×) on eee32b89 | timing runners (session_01HZreUmm66xVrS2AYyY32uD, session_016eCsVCbtn3q8SkotuDG1Xp, session_01FLRx8vV9wbkgLuukh57VyK) | 18:09 | — | — |
 | S1 `ws-precritic` build (brought forward by the lead, 11:02; stopped: moved to the lead's session) | mq-opus-medium | 11:03 | 12:51 | 108 |
 
 ## Critic r1 (2026-10-23, `design/audit/runs/wave0-gates/critic-r1.md`): FAIL — plan 6, backtests 8, usable 6
