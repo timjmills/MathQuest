@@ -729,6 +729,16 @@ full screen above both. One column; the preview never comes first.
 
 ### 2.4 The tray
 
+**Owner 2026-10-23: multi-lesson practice sets, highly customizable.** In Lessons, each lesson lists its skills with
+tick boxes; **Add to tray** makes a tray **group named after the lesson**, and a **Next lesson** arrow moves on (the
+teacher does this for 5–6 lessons). **Print** then offers, all as options (owner: "both could be options — I want it highly
+customizable"): **one worksheet per lesson** (pages per lesson, e.g. 2, each with its own key), **one worksheet for all**
+(laid out as **Mixed practice** or **one section per lesson**, 1–2 pages or more), or **both**; every Single skill /
+Sections / Mixed practice option of §2.5 still applies per worksheet. **Print all** gives one PDF in lesson order, each part
+with its key. **Save as set** keeps the groups (reprint later with new numbers); **Share** gives one short code for the whole
+set. Engine: a batch of `buildSheet` requests (one per lesson group, plus the combined one), concatenated into one document;
+the set code extends the compact set code (§2.4). Built with the owner's next batch of design changes (process rule 0).
+
 **Owner 2026-10-23 (confirmed): the tray is built for 40–100 skills** ("we might practice problems from a whole grade level"). Up to about 8 skills it shows chips; above that it collapses to one summary bar ("Grade 3 · 64 skills · 6 areas", one segment per maths area) that opens a tray sheet grouped by area, with search, one-tap remove per area and per skill, and a height cap. Skills gains **Add whole area** and **Add whole grade**; Lessons gains **Add this unit**. "How often" is set per area first, per skill only when opened. Print summary and preview work at 100 skills (each skill at least once if the pages allow, otherwise sampled, and the summary says so); Single skill with many skills warns. Share needs a **compact whole-grade / whole-area set code** so the link stays short — a `skill-codes.js` change (after M1 releases that file; append-only, `ws-code-snapshot` green). Quiz builds from a whole grade or unit.
 
 - Fixed at the bottom of Skills and **always visible, even when empty**: then Quiz opens "Build from" (a standard, a White
