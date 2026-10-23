@@ -224,7 +224,7 @@ for (const key of JSON.parse(process.env.SC_KEYS)) { const [c, k] = key.split(':
   if (vals.length) { const top = Math.max(...vals); opts[lvl.id] = lvl.type === 'set' ? [top] : top; what.push(lvl.id + ' ' + top); }
   for (const d of o) if (d && d.type === 'bool' && /head/i.test((d.id || '') + ' ' + (d.label || ''))) { opts[d.id] = true; what.push(d.id + ' on'); }
   res[key] = { opts: what.length ? opts : null, what: what.join(', ') }; }
-out('\n' + JSON.stringify(res) + '\n'); process.exit(0);`;
+out('\\n' + JSON.stringify(res) + '\\n'); process.exit(0);`;
     const r = spawnSync(process.execPath, ['--input-type=module', '-e', code], { cwd: HERE, env: Object.assign({}, process.env, { SC_ROOT: ROOT, SC_KEYS: JSON.stringify(keys) }), encoding: 'utf8', maxBuffer: 64 << 20 });
     try { return JSON.parse(String(r.stdout || '').trim().split('\n').pop()); } catch (e) { throw new Error(`cannot read the skills' options in node: ${String(r.stderr || '').slice(0, 400)}`); }
 }

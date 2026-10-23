@@ -86,11 +86,15 @@ function PROBE() {
     // `.column-answer-input.mq-active-box` sits 3-4 px above its row, so a 2 px row tolerance picked the tens box):
     //   1. its place attribute: data-ws-slot / data-slot "ans-<place>" (the kit stack and its screen twin), place 0;
     //   2. the legacy column's data-col "<id>-ans-<i>": boxes are numbered left to right, so place = (largest i) - i;
-    //   3. else DOM order: the bottom answer row is the last row of a column cell and its rightmost box comes last, so
-    //      place = the number of answer boxes after it in the same cell.
+    //   3. else the row by DOM structure: an answer box's row is its nearest ancestor holding another answer box;
+    //      the bottom answer row is the row of the LAST answer box in DOM order; place = the
+    //      number of boxes in its row lying to its right (left / right is safe: only the vertical lift misleads).
+    //      (The r1 legacy twin's `input.mq-cellslot` boxes carry no place, no data-col, and no digit class.)
     const q = window.state && window.state.currentQ;
     const columnItem = !!q && ((q.cell && q.cell.template === 'stack') || /^column-/.test(String(q.printFormat || '')));
-    const cellOf = (el) => el.closest('.ws-stack, .column-problem, [data-mq-cell]') || el.parentElement;
+    // an answer box's row: its nearest ancestor that holds another graded box (the r1 twin wraps each box in <i> in
+    // <span class="ab">, the legacy column puts the boxes side by side in one div)
+    const rowOf = (g) => { let a = g.parentElement; while (a && a !== card && !graded.some((o) => o !== g && a.contains(o))) a = a.parentElement; return a; };
     const placeOf = (el) => {
         const sl = /^ans-(\d+)$/.exec(el.getAttribute('data-ws-slot') || el.getAttribute('data-slot') || '');
         if (sl) return { place: +sl[1], how: 'its place attribute' };
@@ -99,13 +103,18 @@ function PROBE() {
             const idx = graded.map((g) => /^(.*)-ans-(\d+)$/.exec(g.getAttribute('data-col') || '')).filter((m) => m && m[1] === dc[1]).map((m) => +m[2]);
             return { place: Math.max(...idx) - +dc[2], how: 'its data-col column index' };
         }
-        const same = graded.filter((g) => g.matches(DIGIT) && cellOf(g) === cellOf(el));
-        const at = same.indexOf(el);
-        return at < 0 ? null : { place: same.length - 1 - at, how: 'DOM order in its cell' };
+        const row = graded.filter((g) => rowOf(g) === rowOf(el));
+        const r = el.getBoundingClientRect().right;
+        return { place: row.filter((g) => g.getBoundingClientRect().right > r + 0.5).length, how: 'its row in the DOM and its left-to-right position' };
     };
     let onesHow = '';
     if (columnItem && graded.length > 1) {
-        const ones = graded.find((el) => { const p = placeOf(el); return p && p.place === 0; });
+        // the bottom answer row is the row of the last graded box in DOM order; its place-0 box (or, with place
+        // attributes, any place-0 box) is the ones box
+        const withAttr = (el) => /^ans-\d+$/.test(el.getAttribute('data-ws-slot') || el.getAttribute('data-slot') || '') || /-ans-\d+$/.test(el.getAttribute('data-col') || '');
+        const last = graded[graded.length - 1];
+        const lastRow = (el) => rowOf(el) === rowOf(last);
+        const ones = graded.find((el) => { const p = placeOf(el); return p && p.place === 0 && (withAttr(el) || lastRow(el)); });
         if (ones) { onesHow = placeOf(ones).how; graded = [ones, ...graded.filter((el) => el !== ones)]; }
     }
     const findings = [];
@@ -174,6 +183,12 @@ const FIXTURE = (variant) => `<!doctype html><meta charset="utf-8"><style>body{m
 <script>document.querySelectorAll('input.mq-digit')[${variant === 'focus' ? 0 : 3}].focus()</script>`;
 // critic r6 D2: the legacy column twin (add_10k_regroup, sub_1m_regroup): data-col "<id>-ans-<i>" boxes left to right,
 // the focused one lifted 4 px by .mq-active-box. 'lifted' focuses the ones box (ok); 'lifted-tens' the tens box (FAIL).
+// pilot r1 D5: the r1 screen twin's boxes (input.mq-cellslot) carry no place, no data-col and no digit class; the
+// leftmost focused must FAIL, the rightmost pass ('bare-left' / 'bare-right').
+const BARE = (variant) => `<!doctype html><meta charset="utf-8"><style>body{margin:0;font:16px sans-serif}#questionCard{width:370px;margin:0 10px}
+input{width:40px;height:40px}</style><div id="questionCard"><div id="questionText">Subtract.</div><div id="questionPaper"><div><span>4,367</span><span>- 2,244</span></div>
+<div><input class="mq-cellslot"><input class="mq-cellslot"><input class="mq-cellslot"><input class="mq-cellslot"></div></div><button id="qcCheckBtn">Check</button></div>
+<script>window.state = { currentQ: { printFormat: 'column-sub', cell: { template: 'stack' } } }; (() => { const b = document.querySelectorAll('input.mq-cellslot')[${variant === 'bare-right' ? 3 : 0}]; b.classList.add('mq-active-box'); b.focus(); })();</script>`;
 const LEGACY = (variant) => `<!doctype html><meta charset="utf-8"><style>body{margin:0;font:16px sans-serif}#questionCard{width:370px;margin:0 10px}
 .column-answer-input{width:24px;height:24px}.mq-active-box{position:relative;top:-4px}</style>
 <div id="questionCard"><div id="questionText">Add.</div><div id="questionPaper"><div class="column-problem"><div>4 3 6 7</div><div>+ 1 2 2 1</div>
@@ -202,9 +217,15 @@ async function selfTest() {
         const tens = await runL('lifted-tens');
         const tf = tens.findings.find((x) => x.rule === 'FOCUS');
         if (!tf || !/place 1,/.test(tf.msg) || !/place 0/.test(tf.msg)) fails.push(`legacy tens box focused: a FOCUS finding naming place 1 and the ones box (place 0) (${JSON.stringify(tens.findings)})`);
+        const runB = async (v) => { await page.setContent(BARE(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(() => document.querySelector('.mq-active-box').focus()); return page.evaluate(PROBE); };
+        const bl = await runB('bare-left');
+        const bf = bl.findings.find((x) => x.rule === 'FOCUS');
+        if (!bf || !/place 3,/.test(bf.msg)) fails.push(`r1 twin, leftmost box focused: a FOCUS finding at place 3 (${JSON.stringify(bl.findings)})`);
+        const br = await runB('bare-right');
+        if (br.focus !== 'ok') fails.push(`r1 twin, ones box focused: must be ok (${JSON.stringify(br.findings)})`);
     } finally { await browser.close(); }
     for (const f of fails) say(`  self-test FAIL: ${f}`);
-    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 5 fixture pages)`);
+    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 7 fixture pages)`);
     process.exit(fails.length ? 1 : 0);
 }
 
