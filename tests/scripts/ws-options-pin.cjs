@@ -27,8 +27,10 @@
 // ws-options-verify matches an id in EVERY category, so the skills sharing an id are kept in one batch and results
 // outside the selection are dropped. A failing pair is written exactly as ws-precritic forms it:
 // `${option}=${JSON.stringify(value)}` for a value, `static:${message}` for a static check. A skill whose verifier timed
-// out or crashed (`*="*"`) is run once more on its own before it is pinned or reported, so one slow moment under a
-// shared slot does not become a pin. A batch that exits without its JSON is retried once.
+// out or crashed in its batch (`*="*"`) is run once more on its own at the default deadline (ws-precritic's), so one
+// slow moment under a shared slot does not become a pin. If it times out again it is run with --deadline
+// <--long-deadline, default 300000 ms> and pinned as `*="*"` PLUS the pairs that long run finds: a precritic run that
+// times out stays green, one that finishes still fails on a new pair. A batch that exits without its JSON is retried once.
 //
 // --check: NEW = a failing pair of a skill in the selection that the pin does not list (a skill missing from the pin
 // counts every pair as new); FIXED = a pinned pair that no longer fails (listed, not a failure: re-pin with --write
@@ -107,6 +109,7 @@ const fmtS = (ms) => `${(ms / 1000).toFixed(1)} s`;
     const BATCH = Math.max(1, parseInt(arg('batch', '25'), 10));
     const SLOTS = Math.max(1, parseInt(arg('slots', '2'), 10));
     const N = arg('n', null);
+    const LONG_DEADLINE = parseInt(arg('long-deadline', '300000'), 10);
     const SHARD = arg('shard', null);
     const ONLY = arg('skills', null);
     const CAT = arg('category', null);
@@ -172,12 +175,12 @@ const fmtS = (ms) => `${(ms / 1000).toFixed(1)} s`;
     const crashed = [];
     let next = 0;
     let done = 0;
-    const runBatch = async (b, jf, tag) => {
+    const runBatch = async (b, jf, tag, extra = []) => {
         const lf = jf.replace(/\.json$/, '.log');
         for (let attempt = 1; attempt <= 2; attempt++) {
             if (fs.existsSync(jf)) fs.rmSync(jf);
             const c0 = Date.now();
-            const rc = await runLogged(verifyArgs(b.ids, jf), lf);
+            const rc = await runLogged(verifyArgs(b.ids, jf, extra), lf);
             const ms = Date.now() - c0;
             const waitMs = slotWait(lf);
             const log = fs.readFileSync(lf, 'utf8');
@@ -213,18 +216,32 @@ const fmtS = (ms) => `${(ms / 1000).toFixed(1)} s`;
     };
     for (const b of batches) collect(fileOf(b), b.keys);
     const reruns = [...fresh].filter(([, v]) => v.verifierFail).map(([k]) => k);
-    for (const k of reruns) {
+    // Pass 1: on its own at the default deadline (what ws-precritic runs). Pass 2, for a skill that still times out:
+    // with a long deadline, so its real failing pairs are known; it is then pinned with `*="*"` (it does time out at
+    // the default deadline, twice) PLUS those pairs, so a precritic run that does finish still sees a new failure.
+    const pool = async (keys, fn) => { let i = 0; await Promise.all(Array.from({ length: Math.min(SLOTS, keys.length) }, async () => { while (i < keys.length) await fn(keys[i++]); })); };
+    const solo = async (k, prefix, extra, label) => {
         const s = live.find((x) => x.key === k);
-        const b = { i: `r-${s.skillId}`, skills: [s], keys: [k], ids: [s.skillId] };
-        const jf = path.join(TMP, `rerun-${s.categoryId}-${s.skillId}.json`);
+        const b = { i: `${prefix}-${s.skillId}`, skills: [s], keys: [k], ids: [s.skillId] };
+        const jf = path.join(TMP, `${prefix}-${s.categoryId}-${s.skillId}.json`);
         if (!(has('resume') && fs.existsSync(jf))) {
-            const t = await runBatch(b, jf, `rerun ${k}`);
-            process.stdout.write(`  rerun ${k} on its own: ${t ? fmtS(t.ms) : 'CRASHED'}\n`);
+            const t = await runBatch(b, jf, `${prefix} ${k}`, extra);
+            process.stdout.write(`  ${label} ${k}: ${t ? fmtS(t.ms) : 'CRASHED'}  [${fmtS(Date.now() - T0)}]\n`);
         }
-        const before = fresh.get(k);
-        collect(jf, [k]);
-        fresh.get(k).rerunFrom = before.pairs.map((p) => p.msg);
-    }
+        let j = null; try { j = JSON.parse(fs.readFileSync(jf, 'utf8')); } catch (e) { return null; }
+        return (j.results || []).find((r) => r.key === k) || null;
+    };
+    const slow = [];
+    await pool(reruns, async (k) => {
+        const r = await solo(k, 'rerun', [], 'rerun on its own at the default deadline:');
+        if (r && !isVerifierFail(r)) fresh.set(k, { pairs: pairsOf(r), verifierFail: false, recovered: true });
+        else slow.push(k);
+    });
+    await pool(slow, async (k) => {
+        const r = await solo(k, 'long', ['--deadline', String(LONG_DEADLINE)], `times out twice at the default deadline; rerun with --deadline ${LONG_DEADLINE}:`);
+        const timeout = fresh.get(k).pairs.find((p) => p.id === '*="*"');
+        fresh.set(k, { pairs: [timeout, ...(r && !isVerifierFail(r) ? pairsOf(r) : [])], verifierFail: true, slow: true, longOk: !!(r && !isVerifierFail(r)) });
+    });
     const missing = [...runKeys].filter((k) => !fresh.has(k));
     const wallMs = Date.now() - T0;
 
@@ -238,7 +255,7 @@ const fmtS = (ms) => `${(ms / 1000).toFixed(1)} s`;
         for (const f of v.pairs) if (!p || !p.includes(f.id)) newF.push({ key: k, ...f, unpinned: !p });
         for (const id of p || []) if (!v.pairs.some((f) => f.id === id)) fixed.push({ key: k, id });
     }
-    const verifierStill = [...fresh].filter(([, v]) => v.pairs.some((f) => f.id === '*="*"')).map(([k, v]) => `${k}: ${v.pairs[0].msg}`);
+    const verifierStill = [...fresh].filter(([, v]) => v.slow).map(([k, v]) => `${k}${v.longOk ? ` (${v.pairs.length - 1} pair(s) at --deadline ${LONG_DEADLINE})` : ` (also at --deadline ${LONG_DEADLINE})`}`);
 
     // ---- 6. report
     const nFail = [...fresh.values()].filter((v) => v.pairs.length).length;
@@ -250,7 +267,7 @@ const fmtS = (ms) => `${(ms / 1000).toFixed(1)} s`;
     console.log(`skills run: ${fresh.size} with options (${noOpts.length} with none); ${nFail} with at least one failing pair, ${[...fresh.values()].reduce((n, v) => n + v.pairs.length, 0)} failing pair(s)`);
     console.log(`time: wall ${fmtS(wallMs)}; ${timings.length} process(es) ran ${runSkills} skill(s) in ${fmtS(runMs)} of slot time (${runSkills ? fmtS(runMs / runSkills) : '-'} a skill, browser start included), ${fmtS(timings.reduce((n, t) => n + t.waitMs, 0))} waiting for a slot`);
     console.log(`failing pairs by option: ${Object.entries(optCount).sort((a, b) => b[1] - a[1]).slice(0, 15).map(([o, n]) => `${o} ${n}`).join(', ') || 'none'}`);
-    if (reruns.length) console.log(`verifier timeout / crash, rerun on its own: ${reruns.join(', ')}${verifierStill.length ? `; still failing: ${verifierStill.join(' ; ')}` : '; all recovered'}`);
+    if (reruns.length) console.log(`verifier timeout / crash in a batch, rerun on its own: ${reruns.length} (${reruns.length - verifierStill.length} recovered)${verifierStill.length ? `; timed out again, pinned as *="*" plus the long-deadline pairs: ${verifierStill.join(', ')}` : ''}`);
     if (pageErrors.length) console.log(`page errors (ws-precritic reads such a run as a crash): ${pageErrors.map((p) => `batch ${p.batch}: ${p.n} (${p.first})`).join(' ; ')}`);
     if (crashed.length) console.log(`CRASHED batches (no JSON after a retry): ${crashed.map((c) => `#${c.batch} [${c.keys.join(' ')}]: ${c.tail.slice(0, 200)}`).join(' ; ')}`);
     if (missing.length) console.log(`no result for: ${missing.join(', ')}`);
