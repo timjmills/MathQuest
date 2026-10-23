@@ -40,6 +40,9 @@ Builders run in their own git worktrees and the lead merges them here.
 | Fix r1 B: matrix + envelope critic sample (D1 matrix, D3 matrix, D4, D8, N1, N3, N10, N11) — merged 24aa7410 | mq-opus-medium (rebuild after a failed round) | 14:13 | 15:05 | 52 |
 | Fix r1 C: node-lint per-finding baseline, H8 multiple choice for every family (D5, D7, N2, N9, N12) | mq-opus-medium (rebuild after a failed round) | 15:04 | 15:47 | — |
 | Critic r2 (fresh critic): FAIL 7 / 8 / 8, one blocking defect | mq-opus-medium | 15:47 | 17:07 | — |
+| Fix r2: nightly red-row rule (critic r2 D1) + nits | mq-opus-medium (rebuild after a failed round) | 17:2x | — | — |
+| Sweep gaps from the W0-defects lane (board 1280×720 + nested clip, dark scan whole host, board animation, chrome-linux64) | mq-opus-low (change to built tools) | 17:09 | — | — |
+| Pilot six-skill matrix baseline (lead run) | — | 16:17 | 17:12 | 55 |
 | S1 `ws-precritic` build (brought forward by the lead, 11:02; stopped: moved to the lead's session) | mq-opus-medium | 11:03 | 12:51 | 108 |
 
 ## Critic r1 (2026-10-23, `design/audit/runs/wave0-gates/critic-r1.md`): FAIL — plan 6, backtests 8, usable 6
