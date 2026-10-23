@@ -323,6 +323,20 @@ window.MQ_FLOW_CHECK = {
    "steps": 2,
    "ok": true,
    "error": ""
+  },
+  "copies-3@1366": {
+   "actions": 4,
+   "scrolls": 0,
+   "steps": 3,
+   "ok": true,
+   "error": ""
+  },
+  "copies-3@390": {
+   "actions": 5,
+   "scrolls": 1,
+   "steps": 3,
+   "ok": false,
+   "error": "5 actions > plan ≤ 4"
   }
  }
 };

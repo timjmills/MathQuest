@@ -910,3 +910,8 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; a
 .board-card > .smp-thumb { width: 100%; height: 100%; }
 /* How many pages: the stepper and three quick counts; Each page shows once there is more than one page */
 .pages-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8); }
+@media (max-width: 819px) { .l-long { display: none; } }
+/* on the board the item is shown whole: its sentences are never cut */
+.board-card .smp-prose { max-height: none; flex: none; overflow: visible; }
+/* a page preview (worksheet, quiz, lesson) is a miniature of the printed page: the whole item, as printed */
+.page .smp-thumb { --smp-min: 0; }

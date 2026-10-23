@@ -940,7 +940,7 @@
     if (f && f * meet < min) sc = min / f;
     if (sc === meet) { svg.setAttribute('viewBox', k.join(' ')); t.classList.remove('cut'); return; }
     const w = W / sc, h = H / sc; const x = k[0] + Math.max(0, (k[2] - w) / 2);
-    svg.setAttribute('viewBox', [x, k[1], w, h].map(v => Math.round(v * 10) / 10).join(' '));
+    svg.setAttribute('viewBox', [Math.round(x * 10) / 10, k[1], Math.floor(w * 10) / 10, Math.floor(h * 10) / 10].join(' '));   // never round the scale down
     t.classList.toggle('cut', w < k[2] - 1 || h < k[3] - 1);
   }
   function fit(root) { if (typeof document === 'undefined') return; (root || document).querySelectorAll('.smp-thumb').forEach(fitOne); }
