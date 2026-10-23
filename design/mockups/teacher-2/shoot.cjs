@@ -30,7 +30,10 @@ async function waitThumbs(page) {
   await page.evaluate(async () => {
     for (let t = 0; t < 100 && !window.MQLive; t++) await new Promise(r => setTimeout(r, 50)); if (!window.MQLive) return;
     for (let t = 0; t < 1200; t++) {
-      const pending = [...document.querySelectorAll('.live-thumb')].filter(h => { const r = h.getBoundingClientRect(); return (h.dataset.state === 'wait' || h.dataset.state === 'busy') && r.width > 0 && r.bottom > -300 && r.top < innerHeight + 300; });
+      // what the renderer will draw: in the viewport (with its 300 px margin) AND inside every box that clips it (a
+      // thumbnail scrolled out of the popup's list is not drawn until it scrolls in, so it is not waited for)
+      const inClips = (h, r) => { for (let e = h.parentElement; e && e !== document.body; e = e.parentElement) { const cs = getComputedStyle(e); if (/(auto|scroll|hidden|clip)/.test(cs.overflowX + cs.overflowY)) { const c = e.getBoundingClientRect(); if (r.bottom < c.top || r.top > c.bottom || r.right < c.left || r.left > c.right) return false; } } return true; };
+      const pending = [...document.querySelectorAll('.live-thumb')].filter(h => { const r = h.getBoundingClientRect(); return (h.dataset.state === 'wait' || h.dataset.state === 'busy') && r.width > 0 && r.bottom > -300 && r.top < innerHeight + 300 && (h.dataset.state === 'busy' || inClips(h, r)); });
       if (!pending.length) break; await new Promise(r => setTimeout(r, 50));
     }
     await new Promise(r => requestAnimationFrame(() => r()));
