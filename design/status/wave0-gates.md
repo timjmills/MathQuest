@@ -160,3 +160,10 @@ never clears red); narrowed slice runs write `.partial` slice files that never c
 pins (atomic); red rows that turn N/A stay red; options-pin slices cut by a hash of the skill id; a crashed print-lint batch
 is retried once. Matrix self-test 161 assertions (property test incl. 526 interleaved-name cases, 0 violations; the r4 sort
 mutant fails it). Lanes must commit before a clearing run (a dirty run never clears red) — in NIGHTLY.md.
+
+## Timed deploy-gate runs (S5), three cloud sessions in parallel on 0be0e63 (= eee32b89 + status)
+| Gate session | Run 1 | Run 2 | Run 3 | Notes |
+|---|---|---|---|---|
+| 1 (node gates, content-audit, print-lint kit, teacher-*, screen-answer, share-options, lesson repeats) | FAIL 27.9 min | FAIL 28.4 min | OK (1 FLAKE) 26.4 min | 0 s slot waits; print-lint ≈ 1,000 s and teacher-wrm ≈ 870 s set the length. The only non-OK gate: `ws-teacher-shell`, aborted Andika .woff2 loads (`net::ERR_ABORTED`) counted as console errors — a harness defect, fixed (`tests/lib/ws-harness.cjs` ignores aborted font loads only; 3/3 solo runs OK after) |
+| 2 (screen-slots + chromebook-fit sharded, big-board and dark sweeps, viewport, S9 check) | (still running) | | | |
+| 3 (coverage matrix affected rows, digests hook, owner go) | OK (1 WARNING) 9.0 s | OK 8.6 s | OK 8.8 s | over budget (32,766 docs) with no nightly and no full baseline → the owner's WARNING; nothing rendered, so this times the verdict, not a render |
