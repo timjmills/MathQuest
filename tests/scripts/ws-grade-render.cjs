@@ -86,6 +86,10 @@
 //                   worksheet, quiz); <out>/contact/index.md lists them.
 // --envelope <template>--<kind>  renders the all-pairs sample `node tests/scripts/ws-envelope.mjs
 //                   --envelope <pair> --out <file>` writes, or the file given with --sample <file.json>.
+//                   By default the CRITIC sample (sample.critic: all pairs of option values deduped
+//                   across skills + a seeded random 20 % capped at 40 pages, §1.6.2); --full-sample the
+//                   machine sample (sample.print / sample.screen, every skill); --bounded-sample the bound
+//                   ws-envelope proposes when the strict critic set is over budget (sample.criticBounded).
 //                   ws-envelope's shape {sample: {print: [...], screen: [...]}} is mapped by
 //                   loadEnvelopeSample (print row -> role from its layout, opts from opt:*, size, and
 //                   examples / pages / fade / key as the unit's request; screen row -> that host only;
@@ -585,8 +589,21 @@ function loadEnvelopeSample() {
         return { categoryId, skillId };
     };
     const skipped = [];
-    if (json.sample && !Array.isArray(json.sample) && (json.sample.print || json.sample.screen)) {
-        const print = (json.sample.print || []).map((e, i) => {
+    // which part of ws-envelope's sample: the CRITIC sample by default (§1.6.2: all pairs of option values
+    // deduped across skills + the random 20 % capped at 40 pages); --bounded-sample the bound proposed when
+    // the strict set is over budget (sample.criticBounded); --full-sample the machine sample (every skill)
+    let part = null;
+    if (json.sample && !Array.isArray(json.sample) && (json.sample.print || json.sample.screen || json.sample.critic)) {
+        const want = has('full-sample') ? 'full' : has('bounded-sample') ? 'criticBounded' : 'critic';
+        if (want === 'full' || !json.sample.critic) part = { name: want === 'full' ? 'full (sample.print / sample.screen)' : 'full (this file has no sample.critic: an older ws-envelope)', print: json.sample.print, screen: json.sample.screen };
+        else if (want === 'criticBounded') {
+            if (!json.sample.criticBounded) throw new Error('--bounded-sample: this envelope has no sample.criticBounded (its strict critic sample is within budget)');
+            part = { name: `criticBounded (${json.sample.criticBounded.variant})`, print: json.sample.criticBounded.print, screen: json.sample.criticBounded.screen };
+        } else part = { name: `critic (${json.sample.critic.rows.pairs} all-pairs + ${json.sample.critic.rows.random} random rows, ${json.sample.critic.pages.total} pages${json.sample.critic.overBudget ? '; OVER the plan budget: see sample.critic.proposal' : ''})`, print: json.sample.critic.print, screen: json.sample.critic.screen };
+        console.log(`ws-grade-render: envelope sample part: ${part.name}`);
+    }
+    if (part) {
+        const print = (part.print || []).map((e, i) => {
             const { categoryId, skillId } = skillOf(e, i);
             const opts = {};
             for (const [k, v] of Object.entries(e)) {
@@ -605,7 +622,7 @@ function loadEnvelopeSample() {
             return { categoryId, skillId, role, size: e.size || 'M', opts: Object.keys(opts).length ? opts : null, req: Object.keys(req).length ? req : null, hosts: null, index: i };
         }).filter(Boolean);
         const seenHost = new Set();
-        const screen = (json.sample.screen || []).map((e, i) => {
+        const screen = (part.screen || []).map((e, i) => {
             const { categoryId, skillId } = skillOf(e, i);
             const k = `${categoryId}:${skillId}|${e.host}`;
             if (seenHost.has(k)) return null;            // the hosts take no size: one render a (skill, host)
@@ -616,7 +633,7 @@ function loadEnvelopeSample() {
         const units = [];
         for (let i = 0; i < Math.max(print.length, screen.length); i++) { if (print[i]) units.push(print[i]); if (screen[i]) units.push(screen[i]); }
         if (skipped.length) console.log(`ws-grade-render: ${skipped.length} sample row(s) skipped (pending engine field), first: ${skipped[0]}`);
-        return { units, from, skipped };
+        return { units, from: `${from} [${part.name}]`, skipped };
     }
     const list = Array.isArray(json) ? json : (json.sample || json.pages || (json.pairs && json.pairs.flatMap((p) => p.sample || [])) || []);
     const units = list.map((e, i) => {

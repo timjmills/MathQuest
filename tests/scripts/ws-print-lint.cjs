@@ -221,6 +221,9 @@ function kitRequestFlags() {
     if (!['single', 'sections', 'mixed'].includes(kind)) throw new Error(`unknown --kind ${kind} (single, sections, mixed)`);
     const out = { kind, pages: null, columns: null, anchors: arg('anchors', 'off'), coverage: arg('cover', null), supports: arg('supports', null), sectionsMode: null };
     const a = String(out.anchors).toLowerCase();
+    // a typo is unknown, not "needs M4": only the two modes M4 builds (top, first) wait for a step
+    const ANCHOR_KNOWN = ['off', 'on', 'side', 'sections', 'top', 'first'];
+    if (!ANCHOR_KNOWN.includes(a) && !caps.anchorModes.includes(a)) throw new Error(`unknown anchors mode --anchors ${out.anchors} (${ANCHOR_KNOWN.join(', ')})`);
     if (!['off', 'on', 'side', 'sections'].includes(a) && !caps.anchorModes.includes(a)) {
         throw new NeedsStep('M4', `--anchors ${out.anchors}: sheet/anchors.js ANCHOR_MODES is ${caps.anchorModes.join('|') || '(not found)'}; normaliseAnchors() turns '${out.anchors}' into 'off', so the page would print with no examples`);
     }
@@ -1774,7 +1777,7 @@ function applyPackWaivers(file, r) {
 function selectSkills(all) {
     const ONLY = (arg('skills', '') || '').split(',').map(s => s.trim()).filter(Boolean);
     const FAMILY = arg('family', ONLY.length ? null : 'redone');
-    let skills = all.filter(s => !/^_?tomb|retired/i.test(s.skillId) && !/\(retired\)/i.test(s.label || ''));
+    let skills = all.filter(s => !s.retired && !/^_?tomb|retired/i.test(s.skillId) && !/\(retired\)/i.test(s.label || ''));
     if (FAMILY) {
         if (!FAMILIES[FAMILY]) throw new Error(`unknown --family ${FAMILY} (${Object.keys(FAMILIES).join(', ')})`);
         skills = skills.filter(s => FAMILIES[FAMILY].includes(s.categoryId));

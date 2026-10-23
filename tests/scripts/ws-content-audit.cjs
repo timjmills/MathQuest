@@ -13,6 +13,17 @@
 //   node tests/scripts/ws-content-audit.cjs --skill add_20_regroup # one skill
 //   node tests/scripts/ws-content-audit.cjs --n 600 --json out.json
 //   node tests/scripts/ws-content-audit.cjs --report-only          # print, always exit 0
+//   node tests/scripts/ws-content-audit.cjs --mc-all               # ONLY the MC-ALL section: P-29 on every live skill
+//   node tests/scripts/ws-content-audit.cjs --mc-all --category fractions --mc-n 120
+//   node tests/scripts/ws-content-audit.cjs --mc-write-baseline    # re-pin design/audit/baselines/content-audit-mc.json
+//   node tests/scripts/ws-content-audit.cjs --mc-fixture tests/fixtures/precritic/mc-production.fail.json   # no browser
+//   node tests/scripts/ws-content-audit.cjs --no-mc                # the family sections only (the gate before H8)
+//
+// MC-ALL (IMPROVEMENT_PLAN §1.6.3 H8): the default run ends with a section that samples EVERY live
+// skill (--mc-n items, default 60, same seeds) and fails a written answer offered as buttons on
+// screen while its paper cell prints no choices (P-29, RM-P-01), against the pinned baseline. It has
+// its own verdict line (`ws-content-audit --mc-all: OK`); the family sections and their summary line
+// are unchanged by it. A --family run leaves it out. See "MC-ALL" below.
 //
 // TWO FAMILIES, ONE GATE. It was written for + - x /, whose core checks assume an operation, two
 // operands and an answer. P6 added the K-2 number-sense family, which mostly has none of those:
@@ -2221,6 +2232,213 @@ function audit(skill, items) {
 }
 
 // ---------------------------------------------------------------------------
+// ===========================================================================
+// MC-ALL: P-29 / RM-P-01 on EVERY live skill (IMPROVEMENT_PLAN §1.6.3 H8; wave 0 critic r1 D7)
+// ===========================================================================
+// The family rules above hold the operations and K-2 families to P-29 ("a written-answer item is
+// never converted to multiple choice"). This section holds every other live skill to it as well,
+// because the families above sample only their own ≈310 skills.
+//
+// Which items are production items: PROBLEM_TYPES.md §2 (print ↔ screen). An item is a choice on
+// paper only when the paper cell itself draws the choices (RM-07 circle-one, RM-22 label bank) or
+// the answer is a sign (RM-05: a sign circle whose screen twin is a 3- or 4-button strip). So the
+// response mode is read off the two sides of the same seeded item:
+//   screen   the item reaches the app's default answer row with options (question-render.js:
+//            `useMultipleChoice = q.options.length > 0` for the plain answer types; widget types
+//            such as multi-select-check, clock-choice or dnd-generic draw their own response)
+//   paper    the pupil cell the print path draws for it (the kit template from kitCellSpec, else the
+//            legacy cell), as visible text: does it print every option?
+// Verdicts, per item:
+//   mc-production  FAIL  the options are numbers (whole, decimal, fraction, mixed, money, time,
+//                        percent, a number with a unit, a coordinate, "q r r") and the paper cell
+//                        prints none of them as choices: on paper the pupil WRITES the number, on
+//                        screen it is a row of buttons (RM-P-01)
+//   mc-label       note  the options are words (a bank label) and the paper cell does not draw the
+//                        bank: allowed on screen as chips (RM-22), but the paper must draw the bank
+//   (allowed)            the paper cell prints the choices, the options are signs, or the item is a
+//                        widget type with its own response
+// The finding is pinned per skill and item kind (print format or kit template / answerType) in
+// design/audit/baselines/content-audit-mc.json; a run FAILS on a (skill, kind) not pinned there.
+const MC_BUTTON_TYPES = new Set(['multiple-choice', 'choice', 'text', 'number', 'symbol', '']);
+const MC_SIGN = /^[<>=≤≥≠+−×÷*\/x-]$/;
+const MC_UNIT = /\b(?:cm|mm|km|m|in|inch(?:es)?|ft|feet|foot|yd|yards?|mi|miles?|g|kg|mg|ml|mL|l|L|lb|lbs|oz|units?|sq|square|cubic|cups?|pints?|quarts?|gallons?|hours?|hrs?|minutes?|mins?|h|seconds?|secs?|s|days?|weeks?|months?|years?|degrees?|cents?|dollars?|pence|p|am|pm|a\.m\.|p\.m\.)\b/gi;
+function mcLabel(o) {
+    return String(o && typeof o === 'object' ? (o.label !== undefined ? o.label : o.text !== undefined ? o.text : o.value !== undefined ? o.value : '') : o).replace(/\s+/g, ' ').trim();
+}
+/** Is one option label a number the pupil would write (RM-01 / RM-03 / RM-04), or a list of them in
+ *  order ("-0.5, 1/3, 3/4": RM-14 order) or an expression of them ("7 + 3 + 3": RM-27 / RM-28)? */
+function mcNumberLike(label) {
+    const t = String(label).trim();
+    const list = /^\(.*\)$/.test(t) ? [t] : t.split(/\s*,\s+/);   // a coordinate pair is one number
+    if (list.length >= 2) return list.every(mcNumberOne);
+    const expr = t.split(/\s+[+−×÷x*\/-]\s+/);
+    if (expr.length >= 2) return expr.every(mcNumberOne);
+    return mcNumberOne(t);
+}
+function mcNumberOne(label) {
+    const s = String(label).replace(/[$£€¢%°]/g, ' ').replace(MC_UNIT, ' ').replace(/(\d),(?=\d{3}\b)/g, '$1').replace(/\s+/g, ' ').trim();
+    if (!s) return false;
+    return /^[−-]?\d+(?:\.\d+)?$/.test(s)                              // 12, 0.5, −3
+        || /^[−-]?(?:\d+\s+)?\d+\s*[\/⁄]\s*\d+$/.test(s)                 // 3/4, 1 1/2
+        || /^\d{1,2}:\d{2}$/.test(s)                                     // 3:45
+        || /^\(\s*[−-]?\d+(?:\.\d+)?\s*,\s*[−-]?\d+(?:\.\d+)?\s*\)$/.test(s)   // (2, 3)
+        || /^\d+\s*[rR]\s*\d+$/.test(s);                                 // 7 r 2
+}
+/** 'sign' | 'number' | 'label' for a list of option labels. */
+function mcOptionClass(labels) {
+    if (labels.length && labels.every(l => MC_SIGN.test(l))) return 'sign';
+    if (labels.length && labels.every(mcNumberLike)) return 'number';
+    return 'label';
+}
+const mcNums = s => (String(s).replace(/(\d),(?=\d{3}\b)/g, '$1').match(/\d+(?:\.\d+)?/g) || []);
+/** Does the printed pupil cell show this option? A number label by its digits in order (a stacked
+ *  fraction prints "3" over "4", so its text is "3 4"); a word label as a whole word. */
+function mcPrinted(label, printed) {
+    const ns = mcNums(label);
+    if (ns.length) {
+        const have = mcNums(printed);
+        for (let i = 0; i + ns.length <= have.length; i++) if (ns.every((v, k) => have[i + k] === v)) return true;
+        return false;
+    }
+    const esc = label.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp(`(^|[^a-z])${esc}([^a-z]|$)`).test(String(printed).toLowerCase());
+}
+/** The verdict on one sampled item: {verdict: 'fail' | 'note' | 'ok', kind, cls, labels}. */
+function mcJudge(it) {
+    const labels = (it.labels || []).filter(l => l !== '');
+    const kind = `${it.printFormat || it.template || '-'}/${it.answerType || '-'}`;
+    if (labels.length < 2) return { verdict: 'ok', kind, why: 'no choice row' };
+    if (!MC_BUTTON_TYPES.has(it.answerType || '')) return { verdict: 'ok', kind, why: 'widget draws its own response' };
+    const cls = mcOptionClass(labels);
+    if (cls === 'sign') return { verdict: 'ok', kind, cls, why: 'sign circle (RM-05)' };
+    const shown = labels.filter(l => mcPrinted(l, it.printText || ''));
+    if (shown.length === labels.length) return { verdict: 'ok', kind, cls, why: 'the paper cell prints the choices (RM-07 / RM-22)' };
+    return { verdict: cls === 'number' ? 'fail' : 'note', kind, cls, labels, shown: shown.length };
+}
+/** Roll the item verdicts of one skill into its findings: [{cls, kind, n, live, example}]. */
+function mcSkillFindings(items) {
+    const live = items.filter(it => it && !it.error && !it.empty);
+    const by = new Map();
+    for (const it of live) {
+        const v = mcJudge(it);
+        if (v.verdict === 'ok') continue;
+        const cls = v.verdict === 'fail' ? 'mc-production' : 'mc-label';
+        const k = `${cls}|${v.kind}`;
+        if (!by.has(k)) by.set(k, { cls, kind: v.kind, n: 0, live: live.length, example: { labels: v.labels.slice(0, 4), printText: String(it.printText || '').slice(0, 80), declared: !!it.keepChoices } });
+        by.get(k).n++;
+    }
+    return [...by.values()];
+}
+
+// In the page: deal n seeded items and, for every item that shows a choice row, draw the pupil cell
+// the print path draws (kit template, else the legacy cell) and keep its visible text.
+async function mcSampleInPage({ categoryId, skillId, n, baseSeed, buttonTypes }) {
+    const BUTTONS = new Set(buttonTypes);
+    let pg = null, kit = null, ctx = null;
+    const decode = (() => { const ta = document.createElement('textarea'); return s => { ta.innerHTML = s; return ta.value; }; })();
+    const visible = html => decode(String(html || '')
+        .replace(/<div class="ws-legacy-answer" data-ws-stamp="1"[^>]*>[\s\S]*?<\/span><\/div>/g, ' ')
+        .replace(/<(style|script|title|desc)\b[\s\S]*?<\/\1>/gi, ' ')
+        .replace(/<!--[\s\S]*?-->/g, ' ')
+        .replace(/<[^>]*>/g, ' ')).replace(/\s+/g, ' ').trim();
+    const out = [];
+    for (let i = 0; i < n; i++) {
+        let q;
+        try { q = window.generateQuestionFor({ category: categoryId, skill: skillId, range: 100, decimals: 0, seed: baseSeed + i, itemIndex: i }); } catch (e) { out.push({ error: String(e && e.message || e) }); continue; }
+        if (!q) { out.push({ empty: true }); continue; }
+        const opts = Array.isArray(q.options) ? q.options : [];
+        const it = { i, answerType: q.answerType || '', printFormat: q.printFormat || '', template: q.cell && q.cell.template || '', keepChoices: !!q.keepChoices };
+        if (opts.length >= 2 && BUTTONS.has(it.answerType)) {
+            it.labels = opts.map(o => String(o && typeof o === 'object' ? (o.label !== undefined ? o.label : o.text !== undefined ? o.text : o.value !== undefined ? o.value : '') : o).replace(/\s+/g, ' ').trim());
+            try {
+                if (!kit) {
+                    pg = await import('/js/modules/print-generate.js');
+                    kit = await import('/js/modules/sheet/index.js');
+                    ctx = kit.resolveCtx({ mode: 'print', size: 'M', look: 'ican', state: 'blank' });
+                }
+                let spec = null;
+                try { spec = pg.kitCellSpec(q); } catch (e) { spec = null; }
+                const cq = spec ? Object.assign({}, q, { cell: { template: spec.template, payload: spec.payload, v: 1 } })
+                    : q.cell && q.cell.template && kit.hasCell(q.cell.template) ? q
+                        : Object.assign({}, q, { cell: { template: 'legacy', v: 1 } });
+                it.template = cq.cell.template;
+                it.printText = visible(kit.renderCell(cq, ctx));
+            } catch (e) { it.printText = ''; it.renderError = String(e && e.message || e); }
+        }
+        out.push(it);
+    }
+    return out;
+}
+
+const MC_BASELINE = path.join(ROOT, 'design', 'audit', 'baselines', 'content-audit-mc.json');
+/** Compare a run's failing (skill, kind) pairs with the pinned ones over the skills the run sampled. */
+function mcCompare(pinned, rows) {
+    const added = [], gone = [];
+    for (const r of rows) {
+        const key = `${r.categoryId}:${r.skillId}`;
+        const have = new Set(r.mc.filter(f => f.cls === 'mc-production').map(f => f.kind));
+        const was = new Set((pinned[key] || []));
+        for (const k of have) if (!was.has(k)) added.push({ skill: key, kind: k });
+        for (const k of was) if (!have.has(k)) gone.push({ skill: key, kind: k });
+    }
+    return { added, gone };
+}
+/** Print the MC-ALL section; returns the number of findings beyond the baseline. */
+function mcReport(rows, n, { writeBaseline = false, baselineFile = MC_BASELINE, label = 'ws-content-audit --mc-all' } = {}) {
+    const fails = rows.filter(r => r.mc.some(f => f.cls === 'mc-production'));
+    const notes = rows.filter(r => r.mc.some(f => f.cls === 'mc-label'));
+    console.log(`\nMC-ALL (P-29 / RM-P-01, every live skill): ${rows.length} skills, ${n} items each`);
+    for (const r of fails) {
+        console.log(`FAIL ${r.categoryId}/${r.skillId}  "${r.label}"`);
+        for (const f of r.mc.filter(x => x.cls === 'mc-production')) {
+            const ex = f.example;
+            console.log(`       - [mc-production] [${f.kind}] ${f.n} of ${f.live} items offer a written answer as buttons (${ex.labels.join(' | ')}); the paper cell prints no such choices${ex.declared ? ' although the item declares keepChoices' : ''} (P-29, RM-P-01): "${ex.printText}"`);
+        }
+    }
+    if (has('mc-verbose')) for (const r of notes) for (const f of r.mc.filter(x => x.cls === 'mc-label')) console.log(`note ${r.categoryId}/${r.skillId} [mc-label] [${f.kind}] ${f.n} of ${f.live}: (${f.example.labels.join(' | ')}) "${f.example.printText}"`);
+    if (notes.length) console.log(`note mc-label: ${notes.length} skill(s) answer on screen by picking a word the paper cell does not draw as a bank (allowed as chips, RM-22; the paper must draw the bank): ${notes.map(r => `${r.categoryId}/${r.skillId}`).join(', ')}`);
+    let pinned = {};
+    const useBase = !writeBaseline && baselineFile && fs.existsSync(baselineFile);
+    if (useBase) pinned = (JSON.parse(fs.readFileSync(baselineFile, 'utf8')).keys) || {};
+    const { added, gone } = mcCompare(pinned, rows);
+    if (writeBaseline) {
+        let prev = {};
+        if (fs.existsSync(baselineFile)) { try { prev = JSON.parse(fs.readFileSync(baselineFile, 'utf8')).keys || {}; } catch (e) { prev = {}; } }
+        const merged = Object.assign({}, prev);
+        for (const r of rows) {
+            const key = `${r.categoryId}:${r.skillId}`;
+            const kinds = [...new Set(r.mc.filter(f => f.cls === 'mc-production').map(f => f.kind))].sort();
+            if (kinds.length) merged[key] = kinds; else delete merged[key];
+        }
+        const keys = Object.fromEntries(Object.keys(merged).sort().map(k => [k, merged[k]]));
+        fs.writeFileSync(baselineFile, JSON.stringify({
+            about: 'ws-content-audit MC-ALL pinned findings (IMPROVEMENT_PLAN §1.6.3 H8; P-29 / RM-P-01): per skill, the item kinds (print format or kit template / answerType) whose WRITTEN answer is offered as a row of buttons on screen while the paper cell prints no choices. Each entry is a real defect to fix, not an exemption. A run FAILS on any (skill, kind) not listed here; a fixed one is listed as gone. Re-pin with node tests/scripts/ws-content-audit.cjs --mc-all --mc-write-baseline (a --category / --skill run merges); never add an entry by hand.',
+            generated: new Date().toISOString().slice(0, 10), n, skills: Object.keys(keys).length, keys,
+        }, null, 1) + '\n');
+        console.log(`wrote ${path.relative(ROOT, baselineFile)} (${Object.values(keys).reduce((a, k) => a + k.length, 0)} pinned (skill, kind) pairs, ${Object.keys(keys).length} skills)`);
+        console.log(`${label}: OK (baseline written)`);
+        return 0;
+    }
+    if (useBase) {
+        const pinnedN = Object.values(pinned).reduce((a, k) => a + k.length, 0);
+        console.log(`baseline: ${path.relative(ROOT, baselineFile)} (${pinnedN} pinned (skill, kind) pairs)`);
+        if (gone.length) console.log(`fixed: ${gone.length} pinned pair(s) no longer found (re-pin with --mc-write-baseline): ${gone.map(g => `${g.skill} [${g.kind}]`).join(', ')}`);
+    }
+    if (added.length) console.log(`NEW beyond the baseline: ${added.map(a => `${a.skill} [${a.kind}]`).join(', ')}`);
+    const summary = `${rows.length} skills, ${n} items each: ${fails.length} with production items as buttons (${fails.length - new Set(added.map(a => a.skill)).size} pinned), ${added.length} new, ${notes.length} label-bank notes`;
+    console.log(added.length ? `${label}: FAIL - ${added.length} new (${summary})` : `${label}: OK (${summary})`);
+    return added.length;
+}
+/** --mc-fixture <file.json|.cjs>: the same judgement on hand-made items (the H8 backtest), no browser. */
+function mcFixture(file) {
+    const abs = path.isAbsolute(file) ? file : path.resolve(process.cwd(), file);
+    if (!fs.existsSync(abs)) { console.log(`ws-content-audit --mc-all: FAIL - no fixture ${abs}`); process.exit(2); }
+    const fx = /\.json$/i.test(abs) ? JSON.parse(fs.readFileSync(abs, 'utf8')) : require(abs);
+    const rows = (fx.skills || []).map(s => ({ categoryId: s.categoryId, skillId: s.skillId, label: s.label || s.skillId, mc: mcSkillFindings(s.items || []) }));
+    const bad = mcReport(rows, Math.max(0, ...(fx.skills || []).map(s => (s.items || []).length)), { baselineFile: fx.baseline ? path.resolve(path.dirname(abs), fx.baseline) : null });
+    process.exit(bad ? 1 : 0);
+}
+
 // --self-test: the gate now READS NAMES, so a slipped regex would quietly change every verdict
 // without failing anything. These run in a second, with no browser.
 // ---------------------------------------------------------------------------
@@ -2388,6 +2606,24 @@ function selfTest() {
     eq('pv round: tenths, halfway up', pvRound(0.25, 0.1), '0.3');
     eq('pv round: hundredths', pvRound(0.444, 0.01), '0.44');
     eq('pv family of number_sense', familyOf('number_sense'), 'pv');
+    // MC-ALL (H8): which option rows are written answers, and does the paper print them?
+    eq('mc class: fractions are numbers', mcOptionClass(['1/4', '2/4', '3/4']), 'number');
+    eq('mc class: money, time, units, mixed', ['$1.25', '45¢', '3:45', '12 cm', '1 1/2', '25%', '(2, 3)', '7 r 2', '1,200'].every(mcNumberLike), true);
+    eq('mc class: an order of numbers is written (RM-14)', mcOptionClass(['-0.5, -0.2, 0.25, 1/2', '1/2, -0.2, 0.25, -0.5']), 'number');
+    eq('mc class: an expression of numbers is written', mcOptionClass(['7 + 4 + 2', '7 + 3 + 3']), 'number');
+    eq('mc class: a thousands comma is one number', mcNumberLike('1,200'), true);
+    eq('mc class: words are labels', mcOptionClass(['even', 'odd']), 'label');
+    eq('mc class: a rule in words is a label', mcOptionClass(['Add 11', 'Multiply by 10']), 'label');
+    eq('mc class: a place-value phrase is a label', mcOptionClass(['4 tens', '40 ones']), 'label');
+    eq('mc class: signs', mcOptionClass(['<', '>', '=']), 'sign');
+    eq('mc printed: a stacked fraction prints its digits in order', mcPrinted('3/4', 'Which is bigger? 1 2 3 4'), true);
+    eq('mc printed: digits out of order are not the label', mcPrinted('3/4', '4 3'), false);
+    eq('mc printed: a word as a whole word', [mcPrinted('odd', 'Circle: odd even'), mcPrinted('odd', 'oddly')].join(), 'true,false');
+    eq('mc judge: written fraction as buttons', mcJudge({ answerType: 'multiple-choice', labels: ['1/4', '2/4', '3/4'], printText: 'What fraction is shaded? ____' }).verdict, 'fail');
+    eq('mc judge: the paper circles the same choices', mcJudge({ answerType: 'multiple-choice', labels: ['1/4', '2/4', '3/4'], printText: 'Circle: 1 4 2 4 3 4' }).verdict, 'ok');
+    eq('mc judge: a sign strip', mcJudge({ answerType: 'symbol', labels: ['<', '>', '='], printText: '4 ○ 7' }).verdict, 'ok');
+    eq('mc judge: a widget', mcJudge({ answerType: 'multi-select-check', labels: ['1', '2'], printText: '' }).verdict, 'ok');
+    eq('mc judge: a word bank not drawn on paper', mcJudge({ answerType: 'multiple-choice', labels: ['acute', 'obtuse'], printText: 'Name the angle. ____' }).verdict, 'note');
 
     if (bad.length) { console.error(`ws-content-audit: FAIL - ${bad.length} self-test(s)`); bad.forEach(b => console.error('  - ' + b)); process.exit(1); }
     console.log(`ws-content-audit: OK (self-test, ${TESTS} name-reading assertions)`);
@@ -2396,12 +2632,38 @@ function selfTest() {
 // ---------------------------------------------------------------------------
 (async () => {
     if (has('self-test')) return selfTest();
+    if (arg('mc-fixture', null)) return mcFixture(arg('mc-fixture', null));
     if (ONLY_FAMILY && !FAMILY_CATS[ONLY_FAMILY]) {
         console.error(`ws-content-audit: FAIL - unknown --family ${ONLY_FAMILY} (expected ${Object.keys(FAMILY_CATS).join(' or ')})`);
         process.exit(1);
     }
     const app = await open({ seed: 4242 });
     await hideOverlays(app.page);
+
+    // MC-ALL over every live skill (--category / --skill narrow it; a --family run leaves it out).
+    const MC_ONLY = has('mc-all') || has('mc-write-baseline');
+    const RUN_MC = MC_ONLY || (!has('no-mc') && !ONLY_FAMILY);
+    const MC_N = parseInt(arg('mc-n', '60'), 10);
+    const mcSweep = async () => {
+        let all = (await listSkills(app.page)).filter(s => !s.retired && s.skillId);
+        if (ONLY_CAT) all = all.filter(s => s.categoryId === ONLY_CAT);
+        if (ONLY_SKILLS) all = all.filter(s => ONLY_SKILLS.includes(s.skillId));
+        const rows = [];
+        for (const s of all) {
+            const items = await app.page.evaluate(mcSampleInPage, { categoryId: s.categoryId, skillId: s.skillId, n: MC_N, baseSeed: seedFor(`${s.categoryId}:${s.skillId}`), buttonTypes: [...MC_BUTTON_TYPES] });
+            rows.push({ ...s, mc: mcSkillFindings(items), renderErrors: items.filter(it => it.renderError).length });
+        }
+        return rows;
+    };
+    if (MC_ONLY) {
+        const rows = await mcSweep();
+        await app.close();
+        if (!rows.length) { console.log(`ws-content-audit --mc-all: FAIL - no live skill matched ${[ONLY_CAT, ONLY_SKILL].filter(Boolean).join(' ')}`); process.exit(1); }
+        const renderErr = rows.reduce((a, r) => a + r.renderErrors, 0);
+        if (renderErr) console.log(`(the print cell did not render for ${renderErr} choice item(s); judged as printing no choices)`);
+        const bad = mcReport(rows, MC_N, { writeBaseline: has('mc-write-baseline') });
+        process.exit(bad && !has('report-only') ? 1 : 0);
+    }
     let skills = (await listSkills(app.page)).filter(s => (CATS.includes(s.categoryId) || EXTRA_SKILLS.has(`${s.categoryId}:${s.skillId}`))
         && (!TM_CATS.includes(s.categoryId) || TM_IDS.has(s.skillId))
         && !(PV_FAMILY_CATS.includes(s.categoryId) && PV_EXCLUDED.has(s.skillId))
@@ -2590,6 +2852,7 @@ function selfTest() {
         }
         out.push({ ...skill, ...res });
     }
+    const mcRows = RUN_MC ? await mcSweep() : null;
     await app.close();
 
     for (const s of out) {
@@ -2645,13 +2908,17 @@ function selfTest() {
     const badMixed = bad.filter(s => s.pool).length;
     const summary = `${out.length} ${scope} skills, ${N} items each, Max Number 100${out.some(s => s.family === 'pv') ? ' (a pv skill with a place floor also at its floor)' : ''}`;
     const split = `${bad.length - badMixed} contradict their own name, ${badMixed} of ${mixed.length} mixed pools deal outside their pool`;
-    if (bad.length && !has('report-only')) {
-        console.error(`\nws-content-audit: FAIL - ${bad.length} of ${summary} (${split}; ${noteCount} notes)`);
+    // MC-ALL is its own section with its own verdict line; the family summary line below is unchanged.
+    const mcBad = mcRows ? mcReport(mcRows, MC_N) : 0;
+    const mcFailLine = `mc-all: ${mcBad} new (skill, kind) pair(s) offer a written answer as buttons (P-29), not in ${path.relative(ROOT, MC_BASELINE)}`;
+    if ((bad.length || mcBad) && !has('report-only')) {
+        console.error(bad.length ? `\nws-content-audit: FAIL - ${bad.length} of ${summary} (${split}; ${noteCount} notes)` : `\nws-content-audit: FAIL - ${mcFailLine}`);
         process.exit(1);
     }
     // --report-only still exits 0, but it never says OK when something failed: a line the owner
     // can misread as a pass is worse than no line at all.
     console.log(bad.length
         ? `\nws-content-audit: WOULD FAIL - ${bad.length} of ${summary} (${split}; ${noteCount} notes) [report-only, exit 0]`
-        : `\nws-content-audit: OK (${summary}, 0 failing, ${mixed.length} mixed pools held to their pool union, ${noteCount} notes)${has('report-only') ? ' [report-only]' : ''}`);
+        : mcBad ? `\nws-content-audit: WOULD FAIL - ${mcFailLine} [report-only, exit 0]`
+            : `\nws-content-audit: OK (${summary}, 0 failing, ${mixed.length} mixed pools held to their pool union, ${noteCount} notes)${has('report-only') ? ' [report-only]' : ''}`);
 })().catch(e => { console.error('ws-content-audit: FAIL -', e && e.stack || e); process.exit(1); });

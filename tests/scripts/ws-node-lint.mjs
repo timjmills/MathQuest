@@ -34,9 +34,16 @@
 //                   base + i, a duplicate retried 12 times under base + i + 7919k — hold no problem twice (the same
 //                   signature, or the same printed text with numbers and the same answer).
 //
-// Baseline: design/audit/baselines/node-lint.json pins today's counts per skill per rule. A run FAILS only on findings
-// beyond it (a new skill with findings, or a raised count). --baseline <file> picks another file, --no-baseline
-// ignores it. A fixture run (--fixture) never uses the baseline: any finding FAILS.
+// Baseline: design/audit/baselines/node-lint.json pins today's FINDING KEYS per skill (critic r1 D5), not counts. A key
+// is rule|kind|#item|signature: the dealt item (seed hashSeed(category:skill) + index, so stable) and the normalised
+// offending text (the notation characters, the answer token, the stray numbers, the repeated text). A run FAILS on any
+// key not in the baseline, so a new finding that replaces a fixed one in the same skill and rule still fails, and it
+// lists the pinned keys it no longer finds (fixed: re-pin). Keys compare only at the pinned --n / --page (a different
+// value is refused). --write-baseline re-pins; a --skill / --category / --rules run merges into the file by subset.
+// --baseline <file> picks another file, --no-baseline ignores it. A fixture run (--fixture) uses no baseline unless
+// --baseline names one: any finding FAILS.
+//
+// Snippets in the detail lines are cut at word boundaries ("…" marks a cut).
 //
 // Fixture modules (tests/fixtures/precritic/*.mjs) export default
 //   { name, skill: 'fixture:id', rules: [...], setup({kit}), items: [q...] | generate({i, seed, rng}) -> q }
@@ -108,7 +115,28 @@ const NOTATION_PATTERNS = [
     { kind: 'minus', cite: 'TY-6', re: /(?:\d\s+-\s+(?=\d))|(?:(?:^|[\s(=,:])-(?=\d))/g },
 ];
 
-/** NOTATION hits in one plain text: [{kind, cite, match}]. */
+/**
+ * The text round t[start, end) with about `pad` characters of context each side, cut at word boundaries (N2: a snippet
+ * never ends mid-word). A cut side is marked with "…".
+ */
+export function around(text, start, end, pad = 8) {
+    const t = String(text || '');
+    let lo = Math.max(0, start - pad), hi = Math.min(t.length, end + pad);
+    if (lo > 0 && !/\s/.test(t[lo - 1])) { const sp = t.slice(lo, start).search(/\s/); lo = sp >= 0 ? lo + sp + 1 : start; }
+    if (hi < t.length && !/\s/.test(t[hi])) { const back = t.slice(end, hi).search(/\s\S*$/); hi = back >= 0 ? end + back : end; }
+    const body = t.slice(lo, hi).trim();
+    return (lo > 0 ? '…' : '') + body + (hi < t.length ? '…' : '');
+}
+/** A text clipped to at most `max` characters at a word boundary, "…" when cut (N2). */
+export function clip(text, max) {
+    const t = String(text || '').replace(/\s+/g, ' ').trim();
+    if (t.length <= max) return t;
+    const cut = t.slice(0, max + 1);
+    const sp = cut.lastIndexOf(' ');
+    return (sp > max / 3 ? cut.slice(0, sp) : t.slice(0, max)).trim() + '…';
+}
+
+/** NOTATION hits in one plain text: [{kind, cite, match, core}] (core: the offending characters alone). */
 export function notationHits(text) {
     const t = String(text || '');
     const out = [];
@@ -116,11 +144,53 @@ export function notationHits(text) {
         p.re.lastIndex = 0;
         let m;
         while ((m = p.re.exec(t))) {
-            out.push({ kind: p.kind, cite: p.cite, match: t.slice(Math.max(0, m.index - 8), m.index + m[0].length + 8).trim() });
+            out.push({ kind: p.kind, cite: p.cite, match: around(t, m.index, m.index + m[0].length), core: m[0].replace(/\s+/g, ' ').trim() });
             if (m[0].length === 0) p.re.lastIndex++;
         }
     }
     return out;
+}
+
+/* ------------------------------------------------------------- finding keys (D5: the baseline pins keys, not counts) */
+
+/** A finding's signature, normalised: whitespace collapsed, a long text shortened with a hash so the key stays readable. */
+export function normSig(sig) {
+    const s = String(sig === undefined || sig === null ? '' : sig).replace(/\s+/g, ' ').trim();
+    if (s.length <= 48) return s;
+    return `${s.slice(0, 32)}~${hashSeed(s).toString(16).padStart(8, '0')}`;
+}
+/** The stable key of one finding inside its skill: rule | kind | #item | signature. Items are dealt by seed, so the
+ *  same tree gives the same keys; a fixed finding loses its key and a new one brings another. */
+export const findingKey = (f) => `${f.rule}|${f.kind}|#${f.item + 1}|${normSig(f.sig)}`;
+/** Keys per skill from a finding list (each finding gets its .key); a key that repeats inside a skill gets "~2", "~3". */
+export function keysBySkill(list) {
+    const out = {};
+    for (const f of list) {
+        const ks = (out[f.skill] = out[f.skill] || []);
+        const k = findingKey(f);
+        let n = 1;
+        while (ks.includes(n === 1 ? k : `${k}~${n}`)) n++;
+        const key = n === 1 ? k : `${k}~${n}`;
+        ks.push(key);
+        f.key = key;
+    }
+    for (const s of Object.keys(out)) out[s].sort();
+    return out;
+}
+/**
+ * Compare a run's keys with the pinned keys over the skills and rules the run covered: `added` keys are new findings
+ * (FAIL), `gone` keys were pinned and are no longer found (fixed: re-pin with --write-baseline).
+ */
+export function compareKeys(baseKeys, curKeys, skills, rules) {
+    const inRun = (k) => rules.includes(k.split('|')[0]);
+    const added = [], gone = [];
+    for (const s of skills) {
+        const b = new Set((baseKeys[s] || []).filter(inRun));
+        const c = new Set((curKeys[s] || []).filter(inRun));
+        for (const k of c) if (!b.has(k)) added.push({ skill: s, key: k });
+        for (const k of b) if (!c.has(k)) gone.push({ skill: s, key: k });
+    }
+    return { added, gone };
 }
 
 /** Numbers written in a text ("1,000" is one number; "3:45" is 3 and 45). */
@@ -252,6 +322,26 @@ export function itemNumbers(q, depth = 0, out = []) {
     return out;
 }
 
+/**
+ * Keys under which an item's data holds a GIVEN quantity, one the question prints for the pupil to work from: a side, a
+ * scale, a coin, a divisor, a partial value, a table entry (L3, critic r1 N12). An allow-list on purpose: a field such as
+ * `whole`, `total` or `result` may be the very unknown the pupil is asked for, so a number there never counts as given.
+ */
+const GIVEN_KEYS = /^(a|b|base|height|width|length|side|sides|w|h|l|radius|diameter|scale|coins|notes|value|values|divisor|dividend|factor|factors|multiplier|rate|start|step|operands|addends|minuend|subtrahend|dimensions|price|cost|each|groups|perGroup|size|target)$/i;
+/** Numbers the item's data gives under a GIVEN_KEYS key (an array takes its key; an object inside it is walked). */
+export function givenNumbers(q) {
+    const out = new Set();
+    const walk = (v, d, given) => {
+        if (v === null || v === undefined || d > 6) return;
+        if (typeof v === 'number') { if (given && Number.isFinite(v)) out.add(String(v)); return; }
+        if (typeof v === 'string') { if (given && /^-?\d+(\.\d+)?$/.test(v.trim())) out.add(String(Number(v))); return; }
+        if (Array.isArray(v)) { for (const x of v) walk(x, d + 1, given); return; }
+        if (typeof v === 'object') for (const [k, x] of Object.entries(v)) { if (!SKIP_KEYS.has(k) && k !== 'skillOptions') walk(x, d + 1, GIVEN_KEYS.test(k)); }
+    };
+    walk(q, 0, false);
+    return out;
+}
+
 /** FNV-1a, so a skill's seed is the same in a full sweep and in a --skill run. */
 export function hashSeed(s) {
     let h = 0x811c9dc5;
@@ -349,6 +439,29 @@ function selfTest() {
     const lib = libraryMatcher({ a: 'Count by {n}. Write the missing numbers.', b: 'Add.' });
     eq([lib('Count by 5. Write the missing numbers.'), lib('Add.'), lib('Work out the sum.')], ['a', 'b', ''], 'library matcher');
     eq(hashSeed('addition:add') === hashSeed('addition:add'), true, 'seed stable');
+    // N2: snippets cut at word boundaries
+    const sn = notationHits('The model shows 2/3. Write the fraction it shows.')[0].match;
+    eq(sn, '…shows 2/3. Write…', 'notation snippet cut at word boundaries');
+    eq(notationHits('3 x 4 =')[0].match, '3 x 4 =', 'a short text is printed whole');
+    eq(notationHits('The baking uses 2/4 of a litre of milk')[0].match, '…uses 2/4 of a…', 'snippet does not start or end mid-word');
+    eq(clip('Write the fractions that add up to one whole thing', 24), 'Write the fractions that…', 'clip at a word boundary');
+    eq(clip('short', 24), 'short', 'clip leaves a short text');
+    // D5: keys, not counts. A finding fixed and a new one in the same skill and rule (the count stays 1) is a FAIL.
+    const pinned = keysBySkill([{ skill: 'x:s', rule: 'NOTATION', kind: 'fraction', item: 2, sig: '1/2' }]);
+    const swapped = keysBySkill([{ skill: 'x:s', rule: 'NOTATION', kind: 'fraction', item: 6, sig: '3/4' }]);
+    eq(pinned, { 'x:s': ['NOTATION|fraction|#3|1/2'] }, 'finding key format');
+    const cmp = compareKeys(pinned, swapped, ['x:s'], ['NOTATION']);
+    eq([cmp.added.map((a) => a.key), cmp.gone.map((a) => a.key)], [['NOTATION|fraction|#7|3/4'], ['NOTATION|fraction|#3|1/2']], 'a fixed finding replaced by a new one: 1 new (FAIL), 1 gone');
+    const kindSwap = compareKeys(pinned, keysBySkill([{ skill: 'x:s', rule: 'NOTATION', kind: 'times', item: 2, sig: '3 x' }]), ['x:s'], ['NOTATION']);
+    eq(kindSwap.added.length, 1, 'a new kind under a pinned rule is new');
+    eq(compareKeys(pinned, pinned, ['x:s'], ['NOTATION']).added.length, 0, 'the pinned finding again: no new key');
+    eq(compareKeys(pinned, {}, ['x:s'], ['L3']), { added: [], gone: [] }, 'rules outside the run are not compared');
+    eq(keysBySkill([{ skill: 'a:b', rule: 'L10', kind: 'k', item: 0, sig: 's' }, { skill: 'a:b', rule: 'L10', kind: 'k', item: 0, sig: 's' }]), { 'a:b': ['L10|k|#1|s', 'L10|k|#1|s~2'] }, 'a repeated key is kept');
+    eq(normSig('x'.repeat(60)).length, 41, 'a long signature is shortened with a hash');
+    // N12: L3 given numbers (allow-listed roles only)
+    eq([...givenNumbers({ triangleData: { base: 2, height: 10, area: 10 } })], ['2', '10'], 'a triangle side is given, its area is not');
+    eq([...givenNumbers({ cell: { payload: { scale: 1, answer: 1, total: 9 } } })], ['1'], 'a pictograph key scale is given');
+    eq([...givenNumbers({ bar: { parts: [{ value: 4 }, { value: 8 }], whole: 12 } })], ['4', '8'], 'a whole is never given (it may be the unknown)');
     if (fails.length) {
         for (const f of fails) console.log('  ' + f);
         console.log(`ws-node-lint --self-test: FAIL (${fails.length})`);
@@ -501,7 +614,7 @@ const skipped = {};           // rule -> reason -> count (skills or items, as na
 const checked = {};           // rule -> {skills, items}
 const skip = (rule, reason, n = 1) => { skipped[rule] = skipped[rule] || {}; skipped[rule][reason] = (skipped[rule][reason] || 0) + n; };
 const tick = (rule, items) => { checked[rule] = checked[rule] || { skills: 0, items: 0 }; checked[rule].skills++; checked[rule].items += items; };
-const find = (skill, rule, item, kind, detail) => findings.push({ skill, rule, item, kind, detail });
+const find = (skill, rule, item, kind, detail, sig) => findings.push({ skill, rule, item, kind, detail, sig: sig === undefined ? kind : sig });
 
 function ruleNotation(key, cells) {
     let n = 0;
@@ -510,15 +623,15 @@ function ruleNotation(key, cells) {
         const seen = new Set();
         for (const [where, t] of texts) {
             for (const h of notationHits(t)) {
-                const id = `${h.kind}`;
+                const id = `${h.kind}|${h.core}`;
                 if (seen.has(id)) continue;
                 seen.add(id);
-                find(key, 'NOTATION', i, h.kind, `${h.cite} ${where}: "${h.match}"`);
+                find(key, 'NOTATION', i, h.kind, `${h.cite} ${where}: "${h.match}"`, h.core);
             }
         }
         // P-14: the item's own instruction key is a library key.
         if (typeof q.instructionKey === 'string' && q.instructionKey && !kit.INSTRUCTION_LIBRARY[q.instructionKey]) {
-            find(key, 'NOTATION', i, 'instruction', `P-14 item instructionKey "${q.instructionKey}" is not in INSTRUCTION_LIBRARY`);
+            find(key, 'NOTATION', i, 'instruction', `P-14 item instructionKey "${q.instructionKey}" is not in INSTRUCTION_LIBRARY`, `key:${q.instructionKey}`);
         }
         n++;
     });
@@ -541,7 +654,7 @@ function ruleInstructionWording(key, cat, skill, cells) {
         if (typeof ins !== 'string' || !ins.trim()) return;
         if (inLibrary(ins) || seen.has(ins)) return;
         seen.add(ins);
-        find(key, 'NOTATION', i, 'instruction', `P-14 instruction "${ins}" is not a library string`);
+        find(key, 'NOTATION', i, 'instruction', `P-14 instruction "${ins}" is not a library string`, ins);
     });
 }
 
@@ -556,7 +669,7 @@ function ruleL1(key, cells) {
         const hS = legacy.map((q) => pupilHtml(q, 'S')), hL = legacy.map((q) => pupilHtml(q, 'L'));
         const fixedPic = (h) => /<svg[^>]*\b(?:width|height)="\d+(?:\.\d+)?(?:px)?"|<svg[^>]*style="[^"]*(?:width|height):\s*\d+(?:\.\d+)?px|<img[^>]*\b(?:width|height)="\d+/.test(h);
         const idx = hS.map((h, i) => (h && h === hL[i] && fixedPic(h) ? i : -1)).filter((i) => i >= 0);
-        if (idx.length && idx.length === legacy.length) find(key, 'L1', 0, 'scale', `legacy cell: the picture is drawn at a fixed size, the same at S and at L (${(/<svg[^>]*>/.exec(hS[idx[0]]) || [''])[0].slice(0, 90)})`);
+        if (idx.length && idx.length === legacy.length) find(key, 'L1', 0, 'scale', `legacy cell: the picture is drawn at a fixed size, the same at S and at L (${clip((/<svg[^>]*>/.exec(hS[idx[0]]) || [''])[0], 90)})`, 'legacy-fixed-picture');
         return;
     }
     const sample = kitCells.slice(0, 12).map((c) => c.q);
@@ -571,11 +684,11 @@ function ruleL1(key, cells) {
     if (fps.some((f) => f.S.measure || f.L.measure)) {
         skip('L1', 'measured footprint: grid check needs the browser (drawing-scale check run)');
         tick('L1', Math.min(4, sample.length));
-        if (fixedDrawing) find(key, 'L1', 0, 'scale', `template ${kitCells[0].template}: the pupil cell is drawn the same at S and at L (fixed sizes, no ctx.metrics)`);
+        if (fixedDrawing) find(key, 'L1', 0, 'scale', `template ${kitCells[0].template}: the pupil cell is drawn the same at S and at L (fixed sizes, no ctx.metrics)`, 'fixed-markup');
         return;
     }
     tick('L1', sample.length);
-    if (fixedDrawing) find(key, 'L1', 0, 'scale', `template ${kitCells[0].template}: the pupil cell is drawn the same at S and at L (fixed sizes, no ctx.metrics)`);
+    if (fixedDrawing) find(key, 'L1', 0, 'scale', `template ${kitCells[0].template}: the pupil cell is drawn the same at S and at L (fixed sizes, no ctx.metrics)`, 'fixed-markup');
     const lay = (size) => {
         try {
             return layout.resolveSectionLayout({ role: 'independent', columns: 'auto', count: 30, dense: true }, sample.map((q) => ({ q })), 'A4', layout.LIVE_W_MM,
@@ -585,10 +698,10 @@ function ruleL1(key, cells) {
     const S = lay('S'), L = lay('L');
     if (!S || !L) { find(key, 'L1', 0, 'layout', 'resolveSectionLayout threw'); return; }
     if (!(S.perPage > L.perPage || S.cols > L.cols)) {
-        find(key, 'L1', 0, 'grid', `S fits ${S.cols} x ${S.rows} = ${S.perPage}, L fits ${L.cols} x ${L.rows} = ${L.perPage}: S must fit more items or more columns`);
+        find(key, 'L1', 0, 'grid', `S fits ${S.cols} x ${S.rows} = ${S.perPage}, L fits ${L.cols} x ${L.rows} = ${L.perPage}: S must fit more items or more columns`, 'S-not-more');
     }
     const same = fps.every((f) => f.S.wMm === f.L.wMm && f.S.hMm === f.L.hMm && Number.isFinite(f.S.wMm));
-    if (same) find(key, 'L1', 0, 'scale', `footprint ${fps[0].S.wMm} x ${fps[0].S.hMm} mm at S and at L: the drawing does not scale with ctx.metrics`);
+    if (same) find(key, 'L1', 0, 'scale', `footprint ${fps[0].S.wMm} x ${fps[0].S.hMm} mm at S and at L: the drawing does not scale with ctx.metrics`, 'footprint');
 }
 
 const JUDGE_WORDS = /^(yes|no|true|false|correct|not correct|fix it|always|sometimes|never|same|not the same|more|fewer|less|reasonable|not reasonable|even|odd|enough|not enough|a\.m\.|p\.m\.|am|pm)$/i;
@@ -633,27 +746,44 @@ function allowance(q, tok) {
 }
 /** Templates that draw a number one digit per track (a one-digit answer meets the operands' own digits there). */
 const TRACK_TEMPLATES = new Set(['stack', 'fact', 'pv', 'pv-support', 'count-row', 'mult-grid', 'chartwindow', 'seqstrip', 'division', 'area-model', 'add-three', 'remainder', 'money-columns', 'mult-chart', 'long-division']);
+/** A selection item: the question asks the pupil to pick from what is printed ("Which number is odd?"). */
+const SELECTION_RE = /^\s*(?:which\b|circle\b|choose\b|select\b|tick\b|pick\b|find the (?:odd|even)\b)/i;
 function ruleL3(key, cells) {
     let n = 0;
-    cells.forEach(({ q, html, template }, i) => {
+    // A number printed in (almost) every cell of the skill while the answers vary is the skill's own scaffold
+    // ("Split the bar into 2 equal parts", "Key: = 1"), not the key.
+    const tokOf = cells.map(({ q }) => answerToken(q).token);
+    const texts = cells.map(({ html }) => visibleText(html));
+    const scaffoldConstant = (tok) => {
+        const others = cells.map((c, j) => j).filter((j) => tokOf[j] !== undefined && tokOf[j] !== tok);
+        return others.length >= 5 && others.filter((j) => tokenCount(texts[j], tok) > 0).length >= 0.75 * others.length;
+    };
+    cells.forEach(({ q, template }, i) => {
         const at = answerToken(q);
         if (at.skip) { skip('L3', at.skip + ' (items)'); return; }
         const tok = at.token;
         if (q.target !== undefined && String(q.target) === tok) { skip('L3', 'answer is the given target (a build task) (items)'); return; }
-        // An answer equal to a number the question gives (1 × 12 = 12, a + 5 = 10) is printed because the question is.
+        // An answer equal to a number the question gives (1 × 12 = 12, a + 5 = 10, a triangle of height 10 and area 10,
+        // a pictograph key of 1) is printed because the question is.
         const given = [...numbersIn(plainText(q.text)), ...[q.a, q.b].filter((v) => typeof v === 'number'), ...(Array.isArray(q.operands) ? q.operands : [])].map(String);
         if (given.includes(tok.replace(/,/g, ''))) { skip('L3', 'answer equals a number the question gives (items)'); return; }
+        if (/^-?\d[\d,]*(\.\d+)?$/.test(tok) && givenNumbers(q).has(String(Number(tok.replace(/,/g, ''))))) { skip('L3', "answer equals a number the item's data gives (items)"); return; }
+        // A question that itself states the answer word ("Write multiply if the groups are equal", "make 1 whole")
+        // gives it as a bank or a target; a drawing that repeats it gives nothing away.
+        if (!/^-?\d[\d,]*(\.\d+)?$/.test(tok) && tokenCount(plainText(q.text), tok) > 0) { skip('L3', 'the question text states the answer word (a bank or a target) (items)'); return; }
+        if (SELECTION_RE.test(plainText(q.text))) { skip('L3', 'selection item: the answer is one of the printed choices (items)'); return; }
         n++;
-        const text = visibleText(html);
+        const text = texts[i];
         const shown = tokenCount(text, tok);
         if (!shown) return;
+        if (scaffoldConstant(tok)) { skip('L3', 'answer is a number every cell of the skill prints (a scaffold) (items)'); return; }
         const num = Number(tok.replace(/,/g, ''));
         if (/^\d$/.test(tok) && TRACK_TEMPLATES.has(template)) { skip('L3', 'one-digit answer in a digit-track cell (items)'); return; }
         if (/^-?\d[\d,]*(\.\d+)?$/.test(tok) && Number.isFinite(num) && onScale(num, numbersIn(text.replace(/−/g, '-')).concat(numbersIn(text).map((x) => -x)))) return;
         const tm = /^(\d{1,2}):(\d{2})$/.exec(tok);
         if (tm && onScale(Number(tm[1]) * 60 + Number(tm[2]), timesIn(text))) return;
         const allowed = allowance(q, tok);
-        if (shown > allowed) find(key, 'L3', i, 'key-shown', `answer "${tok}" visible ${shown}x in the pupil cell (${allowed}x printed by the question): "${text.slice(0, 120)}"`);
+        if (shown > allowed) find(key, 'L3', i, 'key-shown', `answer "${tok}" visible ${shown}x in the pupil cell (${allowed}x printed by the question): "${clip(text, 120)}"`, tok);
     });
     tick('L3', n);
 }
@@ -703,8 +833,8 @@ function ruleL6(key, cat, skill, cells) {
     for (const { i, q, stray } of per) {
         const fixed = stray.filter((x) => freq.get(x.v) >= fixedAt);
         const other = stray.filter((x) => !fixed.includes(x) && givenOf.some((g, j) => j !== i && g.has(x.v)));
-        if (fixed.length) find(key, 'L6', i, 'other-numbers', `item "${plainText(q.text).slice(0, 50)}" ans ${JSON.stringify(q.ans)}; on ${freq.get(fixed[0].v)} items: ${fixed.slice(0, 3).map((x) => `${x.v} (${x.where}: "${x.t.slice(0, 60)}")`).join('; ')}`);
-        else if (other.length >= 2 || (other.length === 1 && stray.length === 1)) find(key, 'L6', i, 'neighbour-numbers', `item "${plainText(q.text).slice(0, 50)}" ans ${JSON.stringify(q.ans)}; another item's numbers: ${other.slice(0, 3).map((x) => `${x.v} (${x.where}: "${x.t.slice(0, 60)}")`).join('; ')}`);
+        if (fixed.length) find(key, 'L6', i, 'other-numbers', `item "${clip(plainText(q.text), 50)}" ans ${JSON.stringify(q.ans)}; on ${freq.get(fixed[0].v)} items: ${fixed.slice(0, 3).map((x) => `${x.v} (${x.where}: "${clip(x.t, 60)}")`).join('; ')}`, [...new Set(fixed.map((x) => x.v))].sort((a, b) => a - b).join(','));
+        else if (other.length >= 2 || (other.length === 1 && stray.length === 1)) find(key, 'L6', i, 'neighbour-numbers', `item "${clip(plainText(q.text), 50)}" ans ${JSON.stringify(q.ans)}; another item's numbers: ${other.slice(0, 3).map((x) => `${x.v} (${x.where}: "${clip(x.t, 60)}")`).join('; ')}`, [...new Set(other.map((x) => x.v))].sort((a, b) => a - b).join(','));
     }
     // A step written with numbers, word for word the same on several different items, is an example baked into the
     // string: flagged on every item that does not itself print the number (a fact such as 90 degrees is let through).
@@ -724,7 +854,7 @@ function ruleL6(key, cat, skill, cells) {
         if (findings.some((f) => f.skill === key && f.rule === 'L6' && f.item === i)) continue;
         const own = atomsOf(itemNumbers(q));
         const hit = texts.find(([, t]) => { const e = textFreq.get(t); return e && e.n >= halfAt && e.items.size >= halfAt && exampleNumbers(t).some((v) => !own.has(v)); });
-        if (hit) find(key, 'L6', i, 'fixed-example', `item "${plainText(q.text).slice(0, 50)}" ans ${JSON.stringify(q.ans)}; the same ${hit[0]} on ${textFreq.get(hit[1]).n} items: "${hit[1].slice(0, 80)}"`);
+        if (hit) find(key, 'L6', i, 'fixed-example', `item "${clip(plainText(q.text), 50)}" ans ${JSON.stringify(q.ans)}; the same ${hit[0]} on ${textFreq.get(hit[1]).n} items: "${clip(hit[1], 80)}"`, hit[1]);
     }
     // the operation the instruction names is the item's own (an "Add." over a subtraction)
     const OPS = { add: '+', subtract: '−', multiply: '×', divide: '÷' };
@@ -734,7 +864,7 @@ function ruleL6(key, cat, skill, cells) {
         if (!OPS[k]) return;
         const t = plainText(q.text).replace(/(\d)\s*-\s*(?=\d)/g, '$1 − ').replace(/(\d)\s*[x*]\s*(?=\d)/g, '$1 × ');
         const ops = new Set((t.match(/[+−×÷]/g) || []));
-        if (ops.size === 1 && !ops.has(OPS[k])) find(key, 'L6', i, 'other-operation', `instruction "${s.instruction}" on "${t.slice(0, 50)}"`);
+        if (ops.size === 1 && !ops.has(OPS[k])) find(key, 'L6', i, 'other-operation', `instruction "${s.instruction}" on "${clip(t, 50)}"`, `${k} on ${[...ops].join('')}`);
     });
     if (!n) skip('L6', 'provider gives no steps, instruction or Say line');
     else tick('L6', n);
@@ -745,15 +875,15 @@ function ruleL10(key, cells) {
     if (items.length < 10) { skip('L10', `fewer than 10 items dealt`); return; }
     tick('L10', items.length);
     const vals = items.map((q) => (typeof q.ans === 'object' ? JSON.stringify(q.ans) : String(q.ans)));
-    if (isConstant(vals)) find(key, 'L10', 0, 'constant-answer', `the answer is "${vals[0]}" on all ${vals.length} items`);
+    if (isConstant(vals)) find(key, 'L10', 0, 'constant-answer', `the answer is "${vals[0]}" on all ${vals.length} items`, vals[0]);
     const pv = cyclePeriod(vals);
-    if (pv) find(key, 'L10', 0, 'answer-cycle', `the answer repeats every ${pv} items: ${vals.slice(0, 2 * pv).join(', ')} ...`);
+    if (pv) find(key, 'L10', 0, 'answer-cycle', `the answer repeats every ${pv} items: ${vals.slice(0, 2 * pv).join(', ')} ...`, `${pv}:${vals.slice(0, pv).join(',')}`);
     const pos = items.map((q) => (Array.isArray(q.options) && q.options.length >= 2 ? q.options.map(String).indexOf(String(q.ans)) : -1));
     const choice = pos.filter((x) => x >= 0);
     if (choice.length >= 10) {
-        if (isConstant(choice)) find(key, 'L10', 0, 'constant-position', `the right choice is always option ${'ABCDEFGH'[choice[0]]} (${choice.length} choice items)`);
+        if (isConstant(choice)) find(key, 'L10', 0, 'constant-position', `the right choice is always option ${'ABCDEFGH'[choice[0]]} (${choice.length} choice items)`, 'ABCDEFGH'[choice[0]]);
         const pp = cyclePeriod(choice);
-        if (pp) find(key, 'L10', 0, 'position-cycle', `the right choice cycles every ${pp} items: ${choice.slice(0, 2 * pp).map((x) => 'ABCDEFGH'[x]).join(' ')} ...`);
+        if (pp) find(key, 'L10', 0, 'position-cycle', `the right choice cycles every ${pp} items: ${choice.slice(0, 2 * pp).map((x) => 'ABCDEFGH'[x]).join(' ')} ...`, choice.slice(0, pp).map((x) => 'ABCDEFGH'[x]).join(''));
     }
 }
 
@@ -764,8 +894,8 @@ function ruleRepeats(key, cells) {
     const sigs = new Map(), vis = new Map();
     page.forEach((q, i) => {
         const s = signature(q), v = visibleKey(q);
-        if (sigs.has(s)) find(key, 'REPEATS', i, 'same-item', `item ${i + 1} repeats item ${sigs.get(s) + 1}: "${plainText(q.text).slice(0, 60)}"`);
-        else if (v && vis.has(v)) find(key, 'REPEATS', i, 'same-problem', `item ${i + 1} prints the same problem as item ${vis.get(v) + 1}: "${plainText(q.text).slice(0, 60)}"`);
+        if (sigs.has(s)) find(key, 'REPEATS', i, 'same-item', `item ${i + 1} repeats item ${sigs.get(s) + 1}: "${clip(plainText(q.text), 60)}"`, `of #${sigs.get(s) + 1} ${plainText(q.text)}`);
+        else if (v && vis.has(v)) find(key, 'REPEATS', i, 'same-problem', `item ${i + 1} prints the same problem as item ${vis.get(v) + 1}: "${clip(plainText(q.text), 60)}"`, `of #${vis.get(v) + 1} ${plainText(q.text)}`);
         if (!sigs.has(s)) sigs.set(s, i);
         if (v && !vis.has(v)) vis.set(v, i);
     });
@@ -793,29 +923,26 @@ const RUN_MS = Date.now() - T1;
 
 const counts = {};
 for (const f of findings) { counts[f.skill] = counts[f.skill] || {}; counts[f.skill][f.rule] = (counts[f.skill][f.rule] || 0) + 1; }
+const curKeys = keysBySkill(findings);
 
 const BASELINE_DEFAULT = join(SCRIPT_ROOT, 'design', 'audit', 'baselines', 'node-lint.json');
-const baselineFile = arg('--baseline', BASELINE_DEFAULT);
-const useBaseline = !fixtures.length && !has('--no-baseline') && !has('--write-baseline') && existsSync(baselineFile);
+const explicitBaseline = args.includes('--baseline');
+const baselineFile = resolve(arg('--baseline', BASELINE_DEFAULT));
+// A fixture run never reads the project baseline; it reads one only when --baseline names it (the keyed-baseline
+// backtest pins a fixture's own findings that way).
+const useBaseline = (!fixtures.length || explicitBaseline) && !has('--no-baseline') && !has('--write-baseline') && existsSync(baselineFile);
 let base = null;
 if (useBaseline) {
     try { base = JSON.parse(readFileSync(baselineFile, 'utf8')); } catch (e) { say(`ws-node-lint: unreadable baseline ${baselineFile}: ${e.message}`); process.exit(2); }
-}
-
-const newFindings = [];      // {skill, rule, count, base}
-const improved = [];
-if (base) {
-    const bc = base.counts || {};
-    const keys = new Set([...Object.keys(counts), ...subjects.map((s) => s.key)]);
-    for (const k of keys) {
-        for (const r of rules) {
-            const got = (counts[k] && counts[k][r]) || 0;
-            const was = (bc[k] && bc[k][r]) || 0;
-            if (got > was) newFindings.push({ skill: k, rule: r, count: got, base: was });
-            else if (got < was) improved.push({ skill: k, rule: r, count: got, base: was });
-        }
+    if (!base.keys) { say(`ws-node-lint: ${baselineFile} is the old per-count format; re-pin it with --write-baseline (D5: the baseline pins finding keys)`); process.exit(2); }
+    if (base.n !== N || base.page !== PAGE) {
+        say(`ws-node-lint: the baseline was pinned at n=${base.n}, page=${base.page}; this run uses n=${N}, page=${PAGE}. Finding keys name dealt items, so they only compare at the same n and page: run with --n ${base.n} --page ${base.page}, or --no-baseline`);
+        process.exit(2);
     }
 }
+
+let added = [], gone = [];
+if (base) ({ added, gone } = compareKeys(base.keys, curKeys, subjects.map((s) => s.key), rules));
 
 /* ============================================================================ report */
 
@@ -841,17 +968,24 @@ const show = (list, max) => {
 };
 let failCount = 0;
 if (base) {
-    say(`baseline: ${baselineFile.replace(SCRIPT_ROOT + '/', '')} (pinned at n=${base.n}, page=${base.page})`);
-    if (base.n !== N || base.page !== PAGE) say(`  note: this run uses n=${N}, page=${PAGE}; counts are compared as they stand`);
-    if (newFindings.length) {
-        say(`NEW beyond the baseline (${newFindings.length} skill/rule pairs):`);
-        for (const nf of newFindings) {
-            say(`  ${nf.rule} ${nf.skill}: ${nf.count} (baseline ${nf.base})`);
-            show(findings.filter((f) => f.skill === nf.skill && f.rule === nf.rule), 4);
+    const pinnedN = Object.values(base.keys).reduce((a, ks) => a + ks.length, 0);
+    say(`baseline: ${baselineFile.replace(SCRIPT_ROOT + '/', '')} (${pinnedN} finding keys pinned at n=${base.n}, page=${base.page})`);
+    if (added.length) {
+        say(`NEW findings not in the baseline (${added.length}; key = rule|kind|#item|signature):`);
+        const shownMax = has('--verbose') ? 1e9 : 60;
+        for (const a of added.slice(0, shownMax)) {
+            const f = findings.find((x) => x.skill === a.skill && x.key === a.key);
+            say(`  ${a.skill} ${a.key}`);
+            if (f) say(`      ${f.detail}`);
         }
+        if (added.length > shownMax) say(`  ... ${added.length - shownMax} more (--verbose or --json for all)`);
     } else say('no finding beyond the baseline');
-    if (improved.length) say(`improved below the baseline (${improved.length}; re-pin with --write-baseline): ${improved.slice(0, 12).map((x) => `${x.rule} ${x.skill} ${x.base}->${x.count}`).join(', ')}${improved.length > 12 ? ' ...' : ''}`);
-    failCount = newFindings.reduce((a, x) => a + (x.count - x.base), 0);
+    if (gone.length) {
+        say(`fixed: ${gone.length} pinned key(s) no longer found (re-pin with --write-baseline):`);
+        for (const g of gone.slice(0, has('--verbose') ? 1e9 : 20)) say(`  ${g.skill} ${g.key}`);
+        if (gone.length > 20 && !has('--verbose')) say(`  ... ${gone.length - 20} more`);
+    }
+    failCount = added.length;
 } else {
     if (findings.length) { say('findings:'); show(findings, has('--verbose') ? 1e9 : 40); }
     failCount = findings.length;
@@ -860,32 +994,40 @@ if (base) {
 if (has('--verbose') && base) { say('all findings:'); show(findings, 1e9); }
 
 if (has('--write-baseline')) {
-    let prev = { counts: {} };
+    if (fixtures.length && !explicitBaseline) { say('ws-node-lint: --write-baseline on a fixture run needs an explicit --baseline <file> (it never writes the project baseline)'); process.exit(2); }
+    // Merge by subset: a run over some skills or some rules replaces only those skills' keys of those rules.
+    let prev = { keys: {} };
     if (existsSync(baselineFile) && (argAll('--skill').length || argAll('--category').length || wantRules.length)) {
-        try { prev = JSON.parse(readFileSync(baselineFile, 'utf8')); } catch (e) { prev = { counts: {} }; }
+        try { prev = JSON.parse(readFileSync(baselineFile, 'utf8')); } catch (e) { prev = { keys: {} }; }
+        if (!prev.keys) { say(`ws-node-lint: ${baselineFile} is the old per-count format; a subset cannot be merged into it. Re-pin with a full run first.`); process.exit(2); }
+        if (prev.n !== N || prev.page !== PAGE) { say(`ws-node-lint: the baseline was pinned at n=${prev.n}, page=${prev.page}; a subset re-pin must use the same n and page`); process.exit(2); }
     }
-    const merged = Object.assign({}, prev.counts || {});
+    const merged = Object.assign({}, prev.keys || {});
     for (const s of subjects) {
-        const cur = Object.assign({}, merged[s.key] || {});
-        for (const r of rules) { const v = (counts[s.key] && counts[s.key][r]) || 0; if (v) cur[r] = v; else delete cur[r]; }
-        if (Object.keys(cur).length) merged[s.key] = cur; else delete merged[s.key];
+        const keep = (merged[s.key] || []).filter((k) => !rules.includes(k.split('|')[0]));
+        const cur = keep.concat(curKeys[s.key] || []).sort();
+        if (cur.length) merged[s.key] = cur; else delete merged[s.key];
     }
     const sorted = Object.fromEntries(Object.keys(merged).sort().map((k) => [k, merged[k]]));
+    const all = Object.values(sorted).flat();
     const out = {
-        about: 'ws-node-lint pinned findings per skill per rule (IMPROVEMENT_PLAN §1.4 S2). A run fails only on counts above these. Re-pin with node tests/scripts/ws-node-lint.mjs --write-baseline after a fix lowers a count; never raise a count by hand.',
+        about: 'ws-node-lint pinned FINDING KEYS per skill (IMPROVEMENT_PLAN §1.4 S2; critic r1 D5). A key is rule|kind|#item|signature: the dealt item (seeded by hashSeed(category:skill) + index, so stable) and the normalised offending text. A run FAILS on any key not listed here, even when a pinned finding of the same skill and rule was fixed in the same change, and lists the pinned keys it no longer finds. Re-pin with node tests/scripts/ws-node-lint.mjs --write-baseline (a --skill / --category / --rules run merges into this file); never add a key by hand.',
+        format: 'keys-v2',
+        key: 'rule|kind|#item|signature',
         generated: new Date().toISOString().slice(0, 10), n: N, page: PAGE, rules: ALL_RULES,
-        totals: Object.fromEntries(ALL_RULES.map((r) => [r, Object.values(sorted).reduce((a, c) => a + (c[r] || 0), 0)])),
-        counts: sorted,
+        skills: prev.skills && (argAll('--skill').length || argAll('--category').length || wantRules.length) ? prev.skills : subjects.length,   // skills the full sweep covered
+        totals: Object.fromEntries(ALL_RULES.map((r) => [r, all.filter((k) => k.split('|')[0] === r).length])),
+        keys: sorted,
     };
     mkdirSync(dirname(baselineFile), { recursive: true });
     writeFileSync(baselineFile, JSON.stringify(out, null, 1) + '\n');
-    say(`wrote ${baselineFile} (${Object.keys(sorted).length} skills with findings)`);
+    say(`wrote ${baselineFile} (${all.length} finding keys, ${Object.keys(sorted).length} skills with findings)`);
     failCount = 0;
 }
 
 const jsonOut = arg('--json', null);
 if (jsonOut) {
-    writeFileSync(jsonOut, JSON.stringify({ root: ROOT, n: N, page: PAGE, rules, subjects: subjects.map((s) => s.key), checked, skipped, counts, findings, newFindings, improved, ms: { load: LOAD_MS, run: RUN_MS } }, null, 1));
+    writeFileSync(jsonOut, JSON.stringify({ root: ROOT, n: N, page: PAGE, rules, subjects: subjects.map((s) => s.key), checked, skipped, counts, findings, added, gone, ms: { load: LOAD_MS, run: RUN_MS } }, null, 1));
     say(`json: ${jsonOut}`);
 }
 say(`time: load ${(LOAD_MS / 1000).toFixed(1)} s, lint ${(RUN_MS / 1000).toFixed(1)} s, total ${((Date.now() - T0) / 1000).toFixed(1)} s`);

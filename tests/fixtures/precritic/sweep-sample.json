@@ -6,7 +6,7 @@
     "quiz"
   ],
   "derived": "2026-10-23",
-  "liveSkills": 723,
+  "liveSkills": 715,
   "skills": [
     {
       "template": "counters",
@@ -16,7 +16,7 @@
     {
       "template": "legacy",
       "key": "counting:count_sequence",
-      "skillsOnTemplate": 430
+      "skillsOnTemplate": 424
     },
     {
       "template": "seqstrip",
@@ -101,7 +101,7 @@
     {
       "template": "mult-grid",
       "key": "multiplication:mult_chart",
-      "skillsOnTemplate": 8
+      "skillsOnTemplate": 6
     },
     {
       "template": "hop-line",
@@ -205,10 +205,7 @@
     }
   ],
   "chromebookFit": {
-    "note": "Standing failures of the ws-chromebook-fit sweeps on this sample, pinned 2026-10-23 at 60c4fa53 so the deploy gate fails only on NEW ones (--baseline). They are real defects with no owner yet: (1) the Board display (css/play-teacher.css: #questionPaper zoom 1.6) makes the board scroll for tall items, 17 of 39 sample skills at 1366x768 and 3 at 1920x1080; (2) a page error when the number-family practice card is followed by the online worksheet / quiz in one page (also in light mode: ws-chromebook-fit --skills addition:add_sub_fact_family --hosts card,worksheet,quiz). Remove a line when its defect is fixed.",
-    "problems": [
-      "Cannot read properties of null (reading 'numberFamilyData')"
-    ],
+    "note": "Standing failures of the ws-chromebook-fit sweeps on this sample, pinned 2026-10-23 at 60c4fa53 so the deploy gate fails only on NEW ones (--baseline). They are real defects with no owner yet: (1) the Board display (css/play-teacher.css: #questionPaper zoom 1.6) makes the board scroll for tall items, 17 of 39 sample skills at 1366x768 and 3 at 1920x1080; (2) a page error when the number-family practice card is followed by the online worksheet in one page (also in light mode: ws-chromebook-fit --skills addition:add_sub_fact_family --hosts card,worksheet,quiz), pinned for that skill, host and size only (critic r1 D6; seen 2026-10-23 on dark-student:worksheet at 1366x650 by ws-chromebook-fit --dark --skills addition:add_sub_fact_family). A page error is pinned as <host>:<WxH>:pageerror:<message>; no message is waived globally. Remove a line when its defect is fixed.",
     "skills": {
       "comparing:compare_groups": [
         "bigboard-teacher:card:1366x768:scroll-y"
@@ -225,7 +222,8 @@
       ],
       "addition:add_sub_fact_family": [
         "bigboard-teacher:card:1366x768:scroll-y",
-        "bigboard-teacher:card:1920x1080:scroll-y"
+        "bigboard-teacher:card:1920x1080:scroll-y",
+        "dark-student:worksheet:1366x650:pageerror:Cannot read properties of null (reading 'numberFamilyData')"
       ],
       "addition:add_three": [
         "bigboard-teacher:card:1366x768:scroll-y"

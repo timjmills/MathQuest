@@ -1,51 +1,152 @@
 # The coverage matrix nightly (IMPROVEMENT_PLAN §1.6.2, §1.6.7 E1)
 
-The nightly is a scheduled task: its own cloud session, on the tip of the integration branch
-`claude/sweet-newton-c8wrv1`, running `tests/scripts/ws-matrix-nightly.sh`. **This file only defines it; no scheduled
-task has been created.** The lane lead creates it (one task, or eight with `SHARD=i/8` when the rows exceed a night).
+The nightly is a set of scheduled tasks. Each one is its own cloud session on the tip of the integration branch
+`claude/sweet-newton-c8wrv1`, and each runs `tests/scripts/ws-matrix-nightly.sh`. **This file only defines them; no
+scheduled task has been created yet.** The lane lead creates them.
 
-## What a night runs
+Before M4, every night that follows a print-input change is the full matrix, which is more than one night on two
+slots (below). So the nightly is **eight shard tasks**, `matrix-nightly 1/8` … `matrix-nightly 8/8`. Each task runs the
+script with `SHARD=i/8` in its environment, which gives sixteen slots between them.
 
-- **First run** (no nightly run file `<date>.json` here yet): every row of every live skill, writing the per-row
-  baseline into `baseline.json` (with shards, `baseline.shard-i-of-n.json`; every reader merges them). The rows
-  already in `baseline.json` (the E1 builder check pinned `addition:add_100_regroup` and `addition:add_20_regroup`
-  on 2026-10-23) are re-pinned at the nightly's commit. Add a STATUS note with the
-  counts (the lane lead writes it; the session does not edit `design/STATUS.md`).
-- **Every later night**: the rows the commits since the last nightly reach (`--affected <last>..HEAD`) plus the
-  rotating seventh of all rows (`--seventh <UTC weekday mod 7>`), so every row runs at least weekly. Rows already OK
-  in `cache.json` for the same dependency hash are skipped. A **red row** is any count above the per-row baseline,
-  or a render error.
-- **Before M4** (no record / replay) a change to any print input reaches every print row, so such a night is the
-  full matrix: 10,922 printable rows = 32,766 documents on 2026-10-23 (`ws-coverage-matrix --all --list`), about
-  29 h on two slots at the 0.31 documents/s measured on a real mixed run (below) - more than one night, so it is
-  sharded over eight sessions (`SHARD=1/8` ... `SHARD=8/8`, about 3.7 h each). A night whose commits touch only
-  planning files, tests, generated documents, `search-terms.js` or the `index.html` stamp runs only its seventh
-  (about 1,560 rows = 4,700 documents, about 4.2 h on two slots).
-- Output: `design/audit/matrix/<UTC date>.json` (`<date>.shard-i-of-n.json` per shard): the commit, the selection,
-  every row with its per-size counts, status (OK / CACHED / RED / PENDING(step) / N/A) and dependency hash, and the
-  timing. The deploy gate (S5 session 3) refuses a deploy when the newest nightly is older than 24 hours or a row of
-  a live skill is RED.
+## What a night runs (what `ws-matrix-nightly.sh` does)
 
-## The scheduled task's prompt (exact text)
+1. **It refuses unless HEAD is the fetched tip** of `origin/claude/sweet-newton-c8wrv1`, because the run file records
+   that commit (`ALLOW_NOT_TIP=1` is for testing only).
+2. **First run.** This is the case when `design/audit/matrix/` holds no run file of **this shard** with a commit yet
+   (`<date>[T<HHMM>].shard-i-of-8.json`). The check is per shard, so a shard that starts after another shard of the
+   first night has pushed still pins its own baseline.
+   - It runs `ws-coverage-matrix --all --write-baseline --baseline design/audit/matrix/baseline.json --report-only`,
+     so every row of every live skill (715 on 2026-10-23) runs.
+   - Each shard writes its own baseline file, `baseline.shard-i-of-8.json`. Every reader merges `baseline.json` with
+     all the shard files beside it.
+   - Only rows that **printed** are pinned: their lint counts per size, with render keys stripped.
+   - A row that could not print stays **ERROR** and is listed under "NOT pinned (cannot print or not checked; they
+     stay red)" and in the run file's `notPinned`. Such a row has a render error (`L-SPLIT RENDER`, a `buildSheet`
+     throw or a crashed batch). The baseline never forgives it, so it stays red until it prints (H11, §1.6.3).
+   - A PENDING or N/A row is never pinned.
+   - The rows already in `baseline.json` are re-pinned at the nightly's commit if they printed. These are
+     `addition:add_100_regroup` and `addition:add_20_regroup`, from the E1 builder check of 2026-10-23.
+   - The lane lead writes the STATUS note with the counts: pinned, NOT pinned, and the tally line. The session does
+     not edit `design/STATUS.md`.
+3. **Every later run.**
+   - It runs the rows that the commits since the last run reach: `--affected <last run's commit>..HEAD`. The last
+     run's commit comes from the shard's newest run file that is not `dirty`.
+   - It adds the rotating seventh of all rows (`--seventh <UTC weekday mod 7>`), so every row runs at least once a
+     week.
+   - A row is skipped when it is already OK in `cache[.shard-i-of-8].json` **for the same dependency hash and the same
+     baseline entry**. The cache key includes the row's own pinned counts, so a row cached under one baseline is
+     re-run under another.
+   - **RED** means a lint count above the per-row baseline. **ERROR** means the row did not print, or print-lint
+     refused its flags.
+   - Before M4 (no record / replay) a change to any print input reaches every print row, so such a night is the full
+     matrix. On 2026-10-23 that was 10,922 printable rows = 32,766 documents
+     (`ws-coverage-matrix --all --affected 60c4fa53..HEAD --list`). That is about 4,100 documents a shard, about
+     3.7 h a shard on two slots at 0.31 documents/s.
+   - A night whose commits touch only planning files, tests, generated documents, `search-terms.js` or the
+     `index.html` stamp runs only its seventh: about 1,560 rows = 4,700 documents in all, about 590 a shard.
+4. **It writes the run file** `design/audit/matrix/<UTC date>.shard-i-of-8.json` and the cache, and prints the commit
+   message and the files to commit. If a run file for that date and shard already exists (a fired run, below), it
+   writes `<UTC date>T<HHMM>.shard-i-of-8.json` beside it. No run file is ever overwritten.
+5. **It exits 0 even with red rows** (`--report-only`), because the deploy reads the red rows from the run files. A
+   crash exits non-zero, and the session then commits nothing.
 
-> You are the MathQuest coverage-matrix nightly. Work only in a fresh clone of the repository. Steps:
+## The full run as a fired scheduled task
+
+Each of the eight shard tasks runs on its own schedule. Any of them can also be **fired** on demand outside the
+schedule; the scheduled-task tool calls this "fire". Firing all eight runs the sharded full run without waiting for
+the night. The fired session does exactly what the scheduled one does (same prompt, same script):
+- it runs the rows affected since the newest run file's commit, plus that day's seventh;
+- it skips the rows already OK in the cache for the same hash;
+- it writes `<date>T<HHMM>.shard-i-of-8.json`, because that date already has a run file.
+
+So "the full run" before M4 is eight fired shard tasks on a tip whose print inputs changed. It is complete when all
+eight shard files of one run (same date and time stamp, same `commit`) carry `finished`.
+
+## The run file (read by the deploy)
+
+`ws-coverage-matrix` writes it (`--out`), and its header documents the shape under "THE RUN FILE". The fields a reader
+needs are:
+- top level:
+  - `commit`: the full sha the rows ran on;
+  - `dirty`: true when the tree had local edits;
+  - `started` and `finished`: ISO times;
+  - `totals`: the count of `OK`, `CACHED`, `RED`, `PENDING`, `N/A` and `ERROR` rows;
+  - `red`: the ids of every RED **and** ERROR row;
+  - `notPinned`: on a baseline run, the rows that could not be pinned;
+  - `liveSkills`: the number of live skills;
+  - `selection`, including the `--affected` range and its files;
+  - `timing`.
+- per row:
+  - `id`: `cat:skill|kind/row`;
+  - `skill`;
+  - `status`: one of `OK`, `RED`, `PENDING`, `N/A` or `ERROR`. A cached row is `OK` with `cached: <date>`;
+  - `rises`, `errors`, `step` and `reason`;
+  - the S / M / L counts.
+
+A row of a live skill is red when its status is `RED` or `ERROR`.
+
+## At deploy (S5 session 3)
+
+The deploy gate is `matrix_gate` in `tests/scripts/ws-deploy-gates.sh` (session 3). It runs
+`ws-coverage-matrix --all --affected <base>..HEAD --baseline design/audit/matrix/baseline.json --slots 2 --batch 9
+--max-docs 500`. `MQ_MATRIX_BUDGET` changes the 500. `<base>` is `MQ_DEPLOY_BASE`, else the merge base with
+`origin/master`; when `origin/master` is not fetched the gate FAILS and says so (it never guesses `HEAD~1`).
+- Matrix exit 0 → the gate is **OK**; exit 1 → **FAIL**; exit 2 → **NOTHING RUN** (not a pass: the deploy run ends
+  INCOMPLETE).
+- Matrix exit 3 (over the budget) → the gate reads the **newest run**: every run file of the newest stamp here
+  (`<date>` or `<date>T<HHMM>`, plain or `.shard-i-of-n`). Then:
+  - **FAIL (the deploy is refused)** when there is no run file; when the oldest file of that run finished more than
+    24 hours ago (`finished`, else the file's git commit time, else its date at 00:00 UTC); or when any row of a live
+    skill (data.js `SKILLS`, tombstones out) is `RED` or `ERROR`, or is listed in a file's `red`.
+  - **OK** when the run is complete (all shards i of n present, each with `finished`), ran on one commit with
+    `dirty: false`, and HEAD differs from that commit only in `design/audit/matrix/` (the run's own commits). The
+    sharded run has then covered this tip.
+  - **NEEDS-SHARDED-RUN** otherwise (fresh and green, but not a complete run on this tip). This is not a pass: the
+    deploy run ends INCOMPLETE, and the gate prints what the lead fires: the eight shard tasks
+    (`SHARD=i/8 tests/scripts/ws-matrix-nightly.sh`, "The full run as a fired scheduled task" above) on this tip of
+    `claude/sweet-newton-c8wrv1`, then session 3 again.
+- `bash tests/scripts/ws-deploy-gates.sh --self-test` proves each case on fixture runs in
+  `tests/fixtures/precritic/deploy/nightly/` with a stub matrix.
+
+The matrix side is as follows:
+- `ws-coverage-matrix --all --affected <base>..HEAD --max-docs 500 --baseline design/audit/matrix/baseline.json
+  --slots 2` counts the documents the affected, non-cached rows would print.
+- Above 500 it runs nothing, prints `ws-coverage-matrix: OVER-BUDGET <n> documents (budget 500)` and exits **3**. The
+  caller then reads the newest run files above.
+- Within the budget it runs the rows. It exits 0 on `OK`, 1 on `FAIL` (any RED or ERROR row) and 2 on `INCOMPLETE`
+  (rows selected, none checkable).
+- An affected range that reaches no row prints `OK (nothing reached …)`.
+- Measured on 2026-10-23: `--all --affected 60c4fa53..HEAD --max-docs 500` gave `OVER-BUDGET 32766 documents (budget
+  500)`, exit 3, in 6.3 s of node. A status-file-only range (`36561f62..dad0f3a5`) gave `OK (nothing reached …)`, exit
+  0.
+
+## The scheduled task's prompt (exact text; one task a shard, `<i>` = 1 … 8)
+
+> You are the MathQuest coverage-matrix nightly, shard <i> of 8. Work only in a fresh clone of the repository. Steps:
 > 1. `git fetch origin claude/sweet-newton-c8wrv1 && git checkout -B matrix-nightly origin/claude/sweet-newton-c8wrv1`.
 > 2. If `/tmp/mq-browser-run.sh` is missing: `cp tests/scripts/mq-browser-run.sh /tmp/ && chmod +x /tmp/mq-browser-run.sh`.
 >    Install nothing beyond what the repository's setup provides; if Chromium or PyMuPDF is missing, stop and report it.
-> 3. Run `tests/scripts/ws-matrix-nightly.sh` (with `SHARD=<i>/<n>` in the environment if this task is a shard; the
->    task's name says which). Do not pass any other flags and do not edit any file yourself.
+> 3. Run `SHARD=<i>/8 tests/scripts/ws-matrix-nightly.sh`. Do not pass any other flags and do not edit any file yourself.
 > 4. It prints a commit message and the files to commit (all under `design/audit/matrix/`). Commit exactly those files
 >    with that message, ending the message with the attribution lines your session instructions give.
 >    Then `git pull --rebase origin claude/sweet-newton-c8wrv1` and `git push origin HEAD:claude/sweet-newton-c8wrv1`;
 >    if the push is refused because the tip moved, rebase and push again (at most three times). Never force-push.
-> 5. Reply with: the date, the commit the matrix ran on, the mode line, the tally line (OK / CACHED / RED / PENDING /
->    N/A / ERROR), the documents/s line, and the ids of the first 20 RED rows with their first rise. If the script
->    failed, reply with its last 30 lines instead and commit nothing.
-> Never change the baseline after the first run, never delete a run file, and never touch files outside
+> 5. Reply with:
+>    - the date;
+>    - the commit the matrix ran on;
+>    - the mode line;
+>    - the tally line (OK / CACHED / RED / PENDING / N/A / ERROR);
+>    - the documents/s line;
+>    - on a first run, the count of rows NOT pinned;
+>    - the ids of the first 20 RED or ERROR rows, each with its first rise or error.
+>
+>    If the script failed, reply with its last 30 lines instead and commit nothing.
+>
+> Never change the baseline after the first run, never delete or overwrite a run file, and never touch files outside
 > `design/audit/matrix/`.
 
-Schedule: daily at 01:13 UTC (`CRON_TZ=UTC 13 1 * * *`), one session per shard; shards share the date, so the
-deploy gate reads all `<date>.shard-*.json` of the newest date.
+Schedule: daily at 01:13 UTC (`CRON_TZ=UTC 13 1 * * *`), one task a shard. The shards of one run share the date (and
+the time stamp when fired), so a reader takes every `<date>[T<HHMM>].shard-*.json` of the newest run.
 
 ## Measured cost (2026-10-23, this container, two shared browser slots)
 
@@ -56,7 +157,9 @@ deploy gate reads all `<date>.shard-*.json` of the newest date.
 | the same, `--slots 2 --batch 1` | 12 | 48.1 s | 0.249 |
 | the same, `--slots 2 --batch 6` | 12 | 31.4 s | 0.382 |
 | every printable row of `addition:add_100_regroup` and `addition:add_20_regroup` (34 rows, Sections pages up to 10 + 5 key pages), `--slots 2 --batch 9` | 102 | 326.7 s | 0.312 |
+| fix round 1: `addition:add_100_regroup` rows `single/defaults` + `single/ex-each`, `--slots 1 --batch 6`, against the baseline (OK 2) | 6 | 175.8 s, of which 149 s was waiting for a slot another session held | 0.034 wall (≈ 0.22 without the wait) |
+| the same again with the same `--cache` | 0 | 1 s (CACHED 2) | — |
 
-Batching saves about 2.9 s a document (one browser start and app boot); two slots add about 1.7x. No time in these
-four comparison runs was spent waiting for a slot another session held (the runner's wait log); the 102-document run
-predates the wait accounting, and one of its batches took 97.9 s against about 50 s for the others.
+Batching saves about 2.9 s a document (one browser start and app boot), and two slots add about 1.7×. The first four
+comparison runs spent no time waiting for a slot that another session held (the runner's wait log). The 102-document
+run predates the wait accounting, and one of its batches took 97.9 s against about 50 s for the others.

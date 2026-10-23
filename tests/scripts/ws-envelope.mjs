@@ -15,7 +15,8 @@
 //   node tests/scripts/ws-envelope.mjs --envelope <template>--<kind> [--out f.json]
 //        [--skills cat:skill,...] [--items N]
 //        the envelope (sizes, the kind's options, the template's skills and their option values,
-//        keys, screen hosts) and a greedy all-pairs sample over it, written as JSON
+//        keys, screen hosts), the machine all-pairs sample (sample.print / .screen) and the CRITIC
+//        sample (sample.critic: all pairs of option values deduped across skills + a random 20 % capped at 40 pages)
 //   node tests/scripts/ws-envelope.mjs --self-test [--declare-leaf <file>]
 //        the walker on fixture module graphs, the leaf rule on fixture leaves, and every declared
 //        data leaf of the tree; --declare-leaf adds a file to the declared leaves for that run
@@ -75,7 +76,7 @@
 //     `--digest`) are NOT part of this tool: the structural fingerprint here decides inheritance
 //     and voiding only; the content hash and the replay digests belong to S4 / ws-coverage-matrix.
 //   - `ws-grade-render --envelope <template>--<kind>` and the critic sample read the JSON that
-//     `--envelope` writes (`sample.print`, `sample.screen`).
+//     `--envelope` writes: `sample.critic` by default, `sample.print` / `sample.screen` with --full-sample.
 import { readFileSync, writeFileSync, existsSync, readdirSync, statSync, mkdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -910,6 +911,243 @@ export function coversAllPairs(dims, rows) {
     return null;
 }
 
+/* ------------------------------------------------------------------ the CRITIC sample (§1.6.2) */
+// "A critic sample that covers every pair of option values at least once (all-pairs sampling: tens of
+// pages per pair, not thousands), plus a random 20 % of the remaining envelope at full scale, capped at
+// 40 pages a pair." The machine sample above (`sample.print`) crosses every skill with the kind options
+// and then gives each skill its own pairs: that is what the instance gates and the matrix prove, and it
+// is hundreds of rows. The critic sample instead treats the pair's option values as ONE set:
+//   - dimensions: the kind's options (size, pages, examples, fade, layout, key ...) and one dimension a
+//     distinct skill option id (its values: the union over the skills that offer it);
+//   - pairs to cover: kind value x kind value; kind value x option value; option value x option value
+//     of two options one skill offers together. A pair of option values shared by several skills is
+//     ONE pair (deduped across skills): covering it on any skill that offers both values covers it;
+//   - rows: greedy covering, each row one skill (an option value is printed only on a skill offering
+//     it), filled dimension by dimension with the value that covers most uncovered pairs; fewer rows win;
+//   - a row's pages = its `pages` value (pupil pages; the key follows). Faded packet needs pages >= 2,
+//     so the pair (fade packet, pages 1) is not required and never dealt.
+// The lower bound of any such set is its largest pair group (dimension A x dimension B): each row covers
+// one pair of a group at most. When the strict set exceeds CRITIC_PAGE_BUDGET pages the run says so,
+// names the dominant groups, and computes the bounded set the plan could rule for instead
+// (`sample.criticBounded`: the smallest of the measured bounds - boundary classes, size-only pairing, representative skills).
+export const CRITIC_PAGE_BUDGET = 60;
+export const CRITIC_RANDOM_SHARE = 0.2;
+export const CRITIC_RANDOM_CAP_PAGES = 40;
+const rowPages = (r) => Math.max(1, Number(r.pages) || 1);
+/** The rows the kit cannot print: Faded packet on one page (ws-print-lint: --fade packet needs --pages >= 2). */
+export const criticValid = (r) => !(r.fade === 'packet' && r.pages !== undefined && Number(r.pages) < 2);
+
+/** The pairs a critic set must cover: Map(pairKey -> {group}) over kind dims and every skill's options. */
+export function criticPairs(kdims, skills, valid = criticValid, optionKinds = null) {
+    const need = new Map();
+    const put = (n1, v1, n2, v2) => {
+        if (!valid({ [n1]: v1, [n2]: v2 })) return;
+        const k = pairKey(n1, v1, n2, v2);
+        if (!need.has(k)) need.set(k, { group: [n1, n2].sort().join(' x ') });
+    };
+    const kn = Object.keys(kdims).filter((k) => kdims[k].length);
+    for (let a = 0; a < kn.length; a++) for (let b = a + 1; b < kn.length; b++) for (const x of kdims[kn[a]]) for (const y of kdims[kn[b]]) put(kn[a], x, kn[b], y);
+    for (const s of skills) {
+        const on = Object.keys(s.options).filter((o) => s.options[o].length);
+        for (const o of on) for (const v of s.options[o]) for (const k of kn) if (!optionKinds || optionKinds.includes(k)) for (const x of kdims[k]) put(k, x, 'opt:' + o, v);
+        for (let a = 0; a < on.length; a++) for (let b = a + 1; b < on.length; b++) for (const x of s.options[on[a]]) for (const y of s.options[on[b]]) put('opt:' + on[a], x, 'opt:' + on[b], y);
+    }
+    return need;
+}
+
+/** The pairs one row covers (its skill's options only; `skill` and `part` are not dimensions). */
+function rowPairKeys(row) {
+    const ks = Object.keys(row).filter((k) => k !== 'skill' && k !== 'part');
+    const out = [];
+    for (let a = 0; a < ks.length; a++) for (let b = a + 1; b < ks.length; b++) out.push(pairKey(ks[a], row[ks[a]], ks[b], row[ks[b]]));
+    return out;
+}
+
+/** Greedy covering of criticPairs, deduped across skills. Deterministic for a seed. */
+export function criticAllPairs(kdims, skills, seed = 29, valid = criticValid, optionKinds = null) {
+    const need = criticPairs(kdims, skills, valid, optionKinds);
+    const uncovered = new Set(need.keys());
+    const kn = Object.keys(kdims).filter((k) => kdims[k].length);
+    let s = seed >>> 0;
+    const rand = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+    const parse = (key) => key.split('|').map((half) => { const i = half.indexOf('='); return [half.slice(0, i), JSON.parse(half.slice(i + 1))]; });
+    const offers = (sk, n, v) => !n.startsWith('opt:') ? true : (sk.options[n.slice(4)] || []).some((x) => JSON.stringify(x) === JSON.stringify(v));
+    const rows = [];
+    while (uncovered.size) {
+        const list = [...uncovered];
+        let best = null; let bestGain = -1;
+        for (let attempt = 0; attempt < 48; attempt++) {
+            // one uncovered pair, on one of the skills offering both values (every skill for kind pairs)
+            const [[n1, v1], [n2, v2]] = parse(list[Math.floor(rand() * list.length)]);
+            const cands = skills.filter((sk) => offers(sk, n1, v1) && offers(sk, n2, v2));
+            if (!cands.length) continue;
+            const sk = cands[Math.floor(rand() * cands.length)];
+            const row = { [n1]: v1, [n2]: v2 };
+            const dimsOf = [...kn.map((k) => [k, kdims[k]]), ...Object.entries(sk.options).filter(([, v]) => v.length).map(([o, v]) => ['opt:' + o, v])];
+            const order = dimsOf.filter(([n]) => !(n in row)).sort(() => rand() - 0.5);
+            for (const [n, vals] of order) {
+                let bv = vals[0]; let bg = -1;
+                for (const v of vals) {
+                    if (!valid({ ...row, [n]: v })) continue;
+                    let g = 0;
+                    for (const [e, ev] of Object.entries(row)) if (uncovered.has(pairKey(e, ev, n, v))) g++;
+                    // a tie on `pages` keeps the fewer pages (critic time); any other tie is a coin
+                    if (g > bg || (g === bg && (n === 'pages' ? Number(v) < Number(bv) : rand() < 0.3))) { bg = g; bv = v; }
+                }
+                row[n] = bv;
+            }
+            const gain = rowPairKeys(row).filter((k) => uncovered.has(k)).length;
+            // fewer pages win a tie: a 1-page row costs less critic time than a 3-page one
+            if (gain > bestGain || (gain === bestGain && best && rowPages(row) < rowPages(best.row))) { bestGain = gain; best = { row, skill: sk.skill }; }
+        }
+        if (!best || bestGain <= 0) throw new Error(`criticAllPairs: ${uncovered.size} pair(s) no skill can print, first ${[...uncovered][0]}`);
+        for (const k of rowPairKeys(best.row)) uncovered.delete(k);
+        rows.push({ skill: best.skill, ...best.row });
+    }
+    return { rows, need };
+}
+
+/** Null when every required pair is in some row, else the first one missing (the self-test's check). */
+export function criticCovers(kdims, skills, rows, valid = criticValid, optionKinds = null) {
+    const got = new Set(rows.flatMap(rowPairKeys));
+    for (const k of criticPairs(kdims, skills, valid, optionKinds).keys()) if (!got.has(k)) return k;
+    return null;
+}
+
+/**
+ * Lower bounds and the dominant groups. A row covers at most one pair of each (dimension x dimension)
+ * group, so the largest group is one bound (`groupBound`). A pair only ONE skill can print (a value no
+ * other skill offers) needs a row of that skill, so the sum over skills of each skill's largest group of
+ * such exclusive pairs is another (`exclusiveBound`). `lowerBound` is the larger.
+ */
+export function criticDominance(need, skills = []) {
+    const by = new Map();
+    for (const { group } of need.values()) by.set(group, (by.get(group) || 0) + 1);
+    const groups = [...by.entries()].sort((a, b) => b[1] - a[1]).map(([group, pairs]) => ({ group, pairs }));
+    const groupBound = groups.length ? groups[0].pairs : 0;
+    const has = (sk, n, v) => !n.startsWith('opt:') || (sk.options[n.slice(4)] || []).some((x) => JSON.stringify(x) === JSON.stringify(v));
+    const excl = new Map();
+    for (const [key, { group }] of need) {
+        const [[n1, v1], [n2, v2]] = key.split('|').map((h) => { const i = h.indexOf('='); return [h.slice(0, i), JSON.parse(h.slice(i + 1))]; });
+        if (!n1.startsWith('opt:') && !n2.startsWith('opt:')) continue;
+        const owners = skills.filter((sk) => has(sk, n1, v1) && has(sk, n2, v2));
+        if (owners.length !== 1) continue;
+        const m = excl.get(owners[0].skill) || new Map();
+        m.set(group, (m.get(group) || 0) + 1);
+        excl.set(owners[0].skill, m);
+    }
+    const perSkill = [...excl.entries()].map(([skill, m]) => ({ skill, rows: Math.max(...m.values()) })).sort((a, b) => b.rows - a.rows);
+    const exclusiveBound = perSkill.reduce((n, x) => n + x.rows, 0);
+    return { lowerBound: Math.max(groupBound, exclusiveBound), groupBound, exclusiveBound, exclusiveSkills: perSkill.length, groups: groups.slice(0, 5) };
+}
+
+/**
+ * The random part: a seeded `share` of the envelope left after the all-pairs rows, each row a uniform draw
+ * (a skill, then every kind dimension and that skill's every option), never a row already dealt, until the
+ * share is reached or the next row would pass `capPages`.
+ */
+export function criticRandom(kdims, skills, { seed = 31, share = CRITIC_RANDOM_SHARE, capPages = CRITIC_RANDOM_CAP_PAGES, envelopeSize = Infinity, taken = [], valid = criticValid } = {}) {
+    let s = seed >>> 0;
+    const rand = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+    const pick = (a) => a[Math.floor(rand() * a.length)];
+    const seen = new Set(taken.map((r) => JSON.stringify(Object.entries(r).filter(([k]) => k !== 'part').sort())));
+    const want = Math.ceil(Math.max(0, envelopeSize - taken.length) * share);
+    const rows = []; let pages = 0;
+    for (let tries = 0; rows.length < want && tries < 20000; tries++) {
+        const sk = pick(skills);
+        const row = { skill: sk.skill };
+        for (const [k, v] of Object.entries(kdims)) if (v.length) row[k] = pick(v);
+        for (const [o, v] of Object.entries(sk.options)) if (v.length) row['opt:' + o] = pick(v);
+        if (!valid(row)) continue;
+        const id = JSON.stringify(Object.entries(row).sort());
+        if (seen.has(id)) continue;
+        if (pages + rowPages(row) > capPages) break;
+        seen.add(id); rows.push(row); pages += rowPages(row);
+    }
+    return { rows, pages, want };
+}
+
+/**
+ * A few skills that between them offer every option id of the pair (greedy set cover: the skill offering
+ * most uncovered ids first, ties to the one with more values, then SKILLS order).
+ */
+export function representativeSkills(skills) {
+    const left = new Set(skills.flatMap((s) => Object.keys(s.options)));
+    const out = [];
+    while (left.size) {
+        let best = null; let bg = 0; let bv = -1;
+        for (const s of skills) {
+            if (out.includes(s)) continue;
+            const ids = Object.keys(s.options).filter((o) => left.has(o));
+            const vals = ids.reduce((n, o) => n + s.options[o].length, 0);
+            if (ids.length > bg || (ids.length === bg && ids.length && vals > bv)) { best = s; bg = ids.length; bv = vals; }
+        }
+        if (!best) break;
+        out.push(best);
+        for (const o of Object.keys(best.options)) left.delete(o);
+    }
+    return out.length ? out : skills.slice(0, 1);
+}
+
+/** Options with more than `max` values cut to their first, default and last (the bound proposed to the plan). */
+export function boundOptions(skills, max = 4) {
+    return skills.map((sk) => ({ ...sk, options: Object.fromEntries(Object.entries(sk.options).map(([o, v]) => {
+        if (v.length <= max) return [o, v];
+        const def = sk.defaults && o in sk.defaults ? sk.defaults[o] : undefined;
+        const mid = v.find((x) => JSON.stringify(x) === JSON.stringify(def)) ?? v[Math.floor(v.length / 2)];
+        return [o, [...new Map([v[0], mid, v[v.length - 1]].map((x) => [JSON.stringify(x), x])).values()]];
+    })) }));
+}
+
+/** The whole critic sample of a pair (all-pairs + random part, the bounded variant when over budget). */
+export function criticSample(kdims, skills, { pair = '', hosts = [], envelopeSize = Infinity } = {}) {
+    const seedOf = (t) => { let h = 2166136261; for (const c of pair + t) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+    if (!skills.length) return null;
+    const { rows, need } = criticAllPairs(kdims, skills, seedOf(':pairs'));
+    const pairsPages = rows.reduce((n, r) => n + rowPages(r), 0);
+    const dom = criticDominance(need, skills);
+    const rnd = criticRandom(kdims, skills, { seed: seedOf(':random'), envelopeSize, taken: rows });
+    // screen: every host x size pair on the skills the print rows use most (the hosts take no print size,
+    // so one render a (skill, host); a few skills, not all of them)
+    const used = [...new Set(rows.map((r) => r.skill))].slice(0, 5);
+    const screen = used.length && hosts.length ? allPairs({ host: hosts, size: kdims.size || ['M'], skill: used }, seedOf(':screen')) : [];
+    const out = {
+        rule: '§1.6.2: every pair of option values at least once (kind options and skill options as one deduped set), plus a seeded random 20 % of the remaining envelope capped at 40 pages',
+        print: [...rows.map((r) => ({ ...r, part: 'pairs' })), ...rnd.rows.map((r) => ({ ...r, part: 'random' }))],
+        screen,
+        pages: { pairs: pairsPages, random: rnd.pages, total: pairsPages + rnd.pages, budget: CRITIC_PAGE_BUDGET, randomCap: CRITIC_RANDOM_CAP_PAGES },
+        rows: { pairs: rows.length, random: rnd.rows.length, randomWanted: Number.isFinite(rnd.want) ? rnd.want : null, screen: screen.length },
+        requiredPairs: need.size,
+        lowerBound: dom.lowerBound, groupBound: dom.groupBound, exclusiveBound: dom.exclusiveBound, exclusiveSkills: dom.exclusiveSkills,
+        dominant: dom.groups,
+        overBudget: pairsPages > CRITIC_PAGE_BUDGET,
+    };
+    if (out.overBudget) {
+        // the bounds the plan could rule for, each measured the same way (greedy rows, pupil pages, lower bound)
+        const many = [...new Set(skills.flatMap((sk) => Object.entries(sk.options).filter(([, v]) => v.length > 3).map(([o]) => o)))];
+        const reps = representativeSkills(skills);
+        const variants = [
+            { id: 'boundary', rule: 'every option with more than 3 values cut to its first, default and last value (boundary classes); every skill; option values paired with every kind option', skills: boundOptions(skills, 3), optionKinds: null },
+            { id: 'boundary-size', rule: 'boundary classes as above; every skill; option values paired with size only (kind options still pair with each other)', skills: boundOptions(skills, 3), optionKinds: ['size'] },
+            { id: 'representatives', rule: `boundary classes; only ${reps.length} representative skills that between them offer every option id (${reps.map((r) => r.skill).join(', ')}); option values paired with size and with each other; kind options all-pairs. The other skills' values are instance data: the per-skill machine sample (sample.print) and the matrix rows print them`, skills: boundOptions(reps, 3), optionKinds: ['size'] },
+        ].map((v, i) => {
+            const b = criticAllPairs(kdims, v.skills, seedOf(':bounded' + i), criticValid, v.optionKinds);
+            const d = criticDominance(b.need, v.skills);
+            return { ...v, skills: undefined, rows: b.rows.length, pages: b.rows.reduce((n, r) => n + rowPages(r), 0), lowerBound: d.lowerBound, groupBound: d.groupBound, exclusiveBound: d.exclusiveBound, dominant: d.groups.slice(0, 3), sample: b.rows };
+        });
+        const pick = variants.slice().sort((a, b) => a.pages - b.pages)[0];
+        out.proposal = {
+            why: `the strict set is ${pairsPages} pages: at least ${dom.lowerBound} rows, because ${dom.exclusiveBound >= dom.groupBound ? `${dom.exclusiveSkills} skills offer values no other skill offers, so each needs rows of its own (${dom.exclusiveBound} rows between them)` : `the largest pair group ${dom.groups[0].group} has ${dom.groupBound} pairs`}; the options with many values: ${many.map((o) => `${o} ${new Set(skills.flatMap((sk) => (sk.options[o] || []).map((x) => JSON.stringify(x)))).size}`).join(', ')}`,
+            options: many,
+            variants: variants.map(({ sample, ...v }) => v),
+            chosen: pick.id,
+        };
+        out.bounded = pick.sample.map((r) => ({ ...r, part: 'pairs-bounded' }));
+        out.boundedRule = pick.rule;
+    }
+    return out;
+}
+
 /** The anchors modes the tree has today (ANCHOR_MODES in sheet/anchors.js). */
 function anchorModes(reader) {
     const src = reader.read(full('sheet/anchors.js')).toString('utf8');
@@ -1056,18 +1294,27 @@ export async function buildEnvelope(pairId, reader, { only = null, items = 6 } =
     const printRows = [...base, ...perSkill.flatMap((p) => p.rows)];
     const screenDims = { host: hosts, size: dims.size, skill: skills.map((s) => s.skill) };
     const screenRows = skills.length ? allPairs(screenDims, 23) : [];
+    // the CRITIC sample (§1.6.2): the pair's option values as one deduped set, plus the random part
+    const criticSkills = perSkill.map((p, i) => ({ skill: p.skill, options: p.options, defaults: Object.fromEntries(skills[i].defs.map((d) => [d.id, d.default])) }));
+    const critic = criticSample(dims, criticSkills, { pair: `${template}--${kind}`, hosts, envelopeSize: envelopeTotal });
     return {
         pair: `${template}--${kind}`, template, kind, kindLabel: KINDS[kind].label,
         generated: new Date().toISOString().slice(0, 10),
         skillsSource: only ? 'given (--skills), confirmed by generating items' : `generated in node: every live skill, ${items} seeded items at the defaults and at each option value one at a time`,
         envelope: { dimensions: dims, pendingValues: pending, skills: perSkill.map(({ rows, ...p }) => p), screenHosts: hosts, size: envelopeTotal },
         sample: {
+            // print / screen: the MACHINE sample (every skill, each with its own pairs) for the instance gates;
+            // critic: what an independent critic grades (ws-grade-render --envelope reads it by default)
+            critic: critic ? { ...critic, bounded: undefined } : null,
+            ...(critic && critic.bounded ? { criticBounded: { rule: critic.boundedRule, variant: critic.proposal.chosen, print: critic.bounded, screen: critic.screen } } : {}),
             print: printRows, screen: screenRows,
             checks: {
                 printBaseCoversAllPairs: skills.length ? coversAllPairs(printDims, base) === null : null,
                 screenCoversAllPairs: skills.length ? coversAllPairs(screenDims, screenRows) === null : null,
                 perSkillCoversAllPairs: perSkillGap === null,
                 ...(perSkillGap ? { perSkillFirstGap: perSkillGap } : {}),
+                criticCoversAllPairs: critic ? criticCovers(dims, criticSkills, critic.print.filter((r) => r.part === 'pairs')) === null : null,
+                criticRandomWithinCap: critic ? critic.pages.random <= CRITIC_RANDOM_CAP_PAGES : null,
             },
         },
     };
@@ -1207,14 +1454,25 @@ async function main() {
         console.log(`  screen hosts       ${s.screenHosts.join(', ')}`);
         console.log(`  full envelope      ${s.size.toLocaleString('en-US')} combinations (kind options x each skill's options)`);
         const optRows = env.sample.print.filter((r) => Object.keys(r).some((k) => k.startsWith('opt:'))).length;
-        console.log(`  all-pairs sample   print ${env.sample.print.length} rows (kind options x skill ${env.sample.print.length - optRows} + each skill's own options x size ${optRows}), screen ${env.sample.screen.length} rows`);
+        console.log(`  machine sample     print ${env.sample.print.length} rows (kind options x skill ${env.sample.print.length - optRows} + each skill's own options x size ${optRows}), screen ${env.sample.screen.length} rows (sample.print / sample.screen: the instance gates)`);
+        const c = env.sample.critic;
+        if (c) {
+            console.log(`  CRITIC sample      sample.critic: all-pairs ${c.rows.pairs} rows = ${c.pages.pairs} pages (${c.requiredPairs} pairs of values, deduped across skills; lower bound ${c.lowerBound} rows: largest pair group ${c.groupBound}, skill-exclusive values ${c.exclusiveBound} over ${c.exclusiveSkills} skills) + random ${c.rows.random} rows = ${c.pages.random} pages (20 % of the rest of the envelope = ${c.rows.randomWanted === null ? '?' : c.rows.randomWanted.toLocaleString('en-US')} rows, capped at ${c.pages.randomCap} pages) + screen ${c.rows.screen} rows: ${c.pages.total} print pages`);
+            console.log(`  dominant pairs     ${c.dominant.map((g) => `${g.group} ${g.pairs}`).join(' · ')}`);
+            if (c.overBudget) {
+                const p = c.proposal;
+                console.log(`  OVER BUDGET        above the plan's "tens of pages a pair" (budget ${c.pages.budget}): ${p.why}`);
+                for (const v of p.variants) console.log(`  bound ${pad(v.id, 16)} ${v.rows} rows = ${v.pages} pages (lower bound ${v.lowerBound}: group ${v.groupBound}, exclusive ${v.exclusiveBound})${v.id === p.chosen ? '  <- sample.criticBounded' : ''}: ${v.rule}`);
+                console.log('  ruling needed      sample.critic stays the strict set the plan names; the plan (§1.6.2) has to rule for a bound before sample.criticBounded replaces it');
+            }
+        }
         console.log(`  pairwise checks    ${JSON.stringify(env.sample.checks)}`);
         console.log(`  written            ${relative(ROOT, file)}`);
         for (const [k, v] of Object.entries(env.sample.checks)) if (v === false) fail(`${k} is false`);
         if (!s.skills.length) fail(`no skill draws template '${env.template}'`);
         console.error(`ws-envelope: --envelope computed in ${ms().toFixed(0)} ms`);
     } else {
-        console.log(readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').filter((l) => l.startsWith('//')).slice(0, 26).map((l) => l.slice(3)).join('\n'));
+        console.log(readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').filter((l) => l.startsWith('//')).slice(0, 27).map((l) => l.slice(3)).join('\n'));
         return;
     }
     if (printed) {
@@ -1303,6 +1561,34 @@ async function selfTest() {
     const r3 = allPairs({ size: ['S', 'M'], band: [10, 20], pictures: [false, true] }, 5, shared);
     ok(r1.length === 4 && r2.length === 0, `a pair covered by one skill is not covered again (${r1.length}, ${r2.length})`);
     ok(r3.length >= 2 && r3.length <= 4 && r3.every((r) => 'pictures' in r), `a new option adds only the rows its pairs need (${r3.length})`);
+
+    // 5b. the CRITIC sample (D8): one deduped set of option values, the 20 % / 40-page random part
+    const kd = { size: ['S', 'M', 'L'], pages: [1, 2, 3], fade: ['none', 'packet'] };
+    const A = { skill: 'a:1', options: { x: [1, 2, 3], y: ['a', 'b'] } };
+    const B = { skill: 'b:1', options: { x: [1, 2, 3, 4], z: [true, false] } };
+    const cr = criticAllPairs(kd, [A, B], 7);
+    ok(criticCovers(kd, [A, B], cr.rows) === null, `critic all-pairs covers every required pair (missing ${criticCovers(kd, [A, B], cr.rows)})`);
+    ok(criticCovers(kd, [A, B], cr.rows.slice(1)) !== null, 'the coverage check sees a missing row (greedy rows each cover a new pair)');
+    ok(cr.rows.every((r) => criticValid(r)),'critic rows never deal Faded packet on one page');
+    ok(!cr.need.has(pairKey('fade', 'packet', 'pages', 1)), 'the pair (fade packet, pages 1) is not required');
+    ok(cr.rows.every((r) => Object.keys(r).filter((k) => k.startsWith('opt:')).every((k) => ([A, B].find((s) => s.skill === r.skill).options[k.slice(4)] || []).includes(r[k]))), 'a critic row prints only option values its skill offers');
+    ok(cr.rows.some((r) => 'opt:x' in r && r['opt:x'] === 4 && r.skill === 'b:1'), 'a value one skill offers is dealt on that skill');
+    const A2 = { skill: 'a:2', options: A.options };
+    ok(criticPairs(kd, [A, A2]).size === criticPairs(kd, [A]).size, 'a pair of values two skills share is one pair (deduped across skills)');
+    ok(JSON.stringify(criticAllPairs(kd, [A, B], 7).rows) === JSON.stringify(cr.rows), 'the critic all-pairs set is the same for the same seed');
+    const dom = criticDominance(cr.need, [A, B]);
+    ok(dom.lowerBound <= cr.rows.length && dom.lowerBound >= 9, `lower bound ${dom.lowerBound} <= rows ${cr.rows.length} (size x pages alone needs 9)`);
+    const rnd = criticRandom(kd, [A, B], { seed: 3, envelopeSize: 20, taken: cr.rows.slice(0, 5) });
+    ok(rnd.want === 3 && rnd.rows.length === 3, `the random part is 20 % of the rest (want ${rnd.want}, got ${rnd.rows.length})`);
+    const big = criticRandom(kd, [A, B], { seed: 3, envelopeSize: 1e9, taken: cr.rows });
+    ok(big.pages <= CRITIC_RANDOM_CAP_PAGES && big.pages >= CRITIC_RANDOM_CAP_PAGES - 2, `the random part is capped at ${CRITIC_RANDOM_CAP_PAGES} pages (${big.pages})`);
+    const takenIds = new Set(cr.rows.map((r) => JSON.stringify(Object.entries(r).sort())));
+    ok(big.rows.every((r) => !takenIds.has(JSON.stringify(Object.entries(r).sort()))) && new Set(big.rows.map((r) => JSON.stringify(r))).size === big.rows.length, 'the random part repeats no row');
+    const wide = { skill: 'w:1', options: { step: Array.from({ length: 20 }, (_, i) => i + 1), labels: ['a', 'b', 'c', 'd', 'e', 'f', 'g'] }, defaults: { step: 5 } };
+    const cs = criticSample(kd, [wide, A], { pair: 'fx--single', hosts: ['card'], envelopeSize: 1e9 });
+    ok(cs.overBudget && cs.lowerBound >= 140 && cs.dominant[0].group === 'opt:labels x opt:step', `a 20 x 7 option pair is over budget and named (lower bound ${cs.lowerBound}, ${cs.dominant[0].group})`);
+    ok(cs.proposal && cs.proposal.variants.length === 3 && cs.bounded.length < cs.rows.pairs, 'over budget: the bounds are measured and the smallest is written');
+    ok(boundOptions([wide])[0].options.step.join() === '1,5,20', 'boundary classes: first, default, last');
 
     // 6. voiding, on the tree with one file changed in memory: layout.js voids stack x Single skill;
     //    a provider and a template the pair does not reach void nothing

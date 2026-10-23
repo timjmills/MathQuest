@@ -35,5 +35,43 @@ Builders run in their own git worktrees and the lead merges them here.
 | E1 `ws-coverage-matrix` build | mq-opus-medium | 13:05 | 13:41 | 36 |
 | S9 `reading_ruler_hard` fix | mq-opus-low | 13:16 | 13:29 | 13 |
 | Options-verify pin for every live skill (`ws-options-pin.cjs`, lead request 13:57) | mq-opus-medium | 13:59 | — | — |
-| Critic r1 (tools vs plan) | mq-opus-medium | 13:43 | — | — |
+| Critic r1 (tools vs plan): FAIL 6 / 8 / 6, D1–D8 | mq-opus-medium | 13:43 | 14:11 | 28 |
+| Fix r1 A: deploy runner + screen gates (D1 runner, D2, D3 screen, D6, N5, N6, N8, N11) — merged e11450ab | mq-opus-medium (rebuild after a failed round) | 14:13 | 15:17 | — |
+| Fix r1 B: matrix + envelope critic sample (D1 matrix, D3 matrix, D4, D8, N1, N3, N10, N11) — merged 24aa7410 | mq-opus-medium (rebuild after a failed round) | 14:13 | 15:05 | 52 |
+| Fix r1 C: node-lint per-finding baseline, H8 multiple choice for every family (D5, D7, N2, N9, N12) | mq-opus-medium (rebuild after a failed round) | 15:04 | 15:47 | — |
+| Critic r2 (fresh critic) | mq-opus-medium | 15:47 | — | — |
 | S1 `ws-precritic` build (brought forward by the lead, 11:02; stopped: moved to the lead's session) | mq-opus-medium | 11:03 | 12:51 | 108 |
+
+## Critic r1 (2026-10-23, `design/audit/runs/wave0-gates/critic-r1.md`): FAIL — plan 6, backtests 8, usable 6
+All 10 backtests verified real by hand. Blocking: D1 deploy session 3 has no 500-document budget / nightly-age refusal;
+D2 SKIPPED counts as pass; D3 four gates print OK on 0 checked; D4 matrix baseline pins render errors; D5 node-lint
+count baseline hides new findings; D6 global page-error pin; D7 H8 multiple-choice check for every family not built;
+D8 envelope sample is not a critic sample. Fix round 1 at Opus medium (failed-round rule): A = D1 runner, D2, D3 screen,
+D6; B = D1 matrix, D3 matrix, D4, D8; C = D5, D7 (+ N2, N9, N12) starts when a browser slot frees (two-slot rule).
+
+Fix r1 B results: `--max-docs N` → OVER-BUDGET exit 3 (60c4fa53..HEAD = 32,766 docs refused in 6 s); unknown rows / kinds / skills
+and 0-row selections FAIL, all-pending runs are INCOMPLETE (exit 2); `--write-baseline` never pins a row that cannot print;
+the cache key includes the row's baseline entry; 715 live skills is right (8 retired entries kept for share codes).
+**Plan question (D8):** no set covering every pair of option values reaches "tens of pages": `stack` × Single skill's strict
+all-pairs set is 369 rows / 503 pages (lower bound 165 rows: nlLabels × nlStep alone is 140 pairs). Measured bounds: boundary
+values on every skill 207 pages; with values paired only with size 126; on 6 representative skills 85 (`sample.criticBounded`).
+Proposed for the plan: boundary values + representative skills + values paired with size only; the rest to the machine sample
+and the matrix. Until ruled, `sample.critic` stays the strict set.
+
+Fix r1 A results: deploy verdict is OK / INCOMPLETE (exit 2: a gate SKIPPED, NOT YET, NEEDS-SHARDED-RUN or NOTHING RUN) /
+FAIL; the M4 digests hook is accepted only by name per run (`--accept-notyet digests`, logged). Session 3: matrix with
+`--max-docs 500`; over budget it reads the newest nightly (FAIL if none, > 24 h old, or a RED/ERROR row of a live skill;
+OK if complete on HEAD-equivalent; else NEEDS-SHARDED-RUN with the 8 shard tasks to fire) — real run today: FAIL, no
+nightly yet (17 s). Unknown / empty selections FAIL in screen-slots and chromebook-fit; page errors pinned per skill,
+size and host; deterministic S9 regression (`--seeds 1-40 --need-ans 1/4,1/2,3/4`: 0 doubled now, 6 on the pre-fix tree);
+no silent HEAD~1 base. New deploy-list gates: ws-text-vs-gen, ws-backtest --kind fixture, ws-detailed-lesson --repeats
+(5 lessons), ws-viewport-check.
+
+Fix r1 C results: node-lint baseline is per finding key (`rule|kind|#item|signature`, 6,835 keys; a swapped finding now
+FAILs — backtest row `node-lint-keys`); L3 false positives 95 % → the whole population is 5 findings, 2 real + 3 borderline.
+H8 (D7): `ws-content-audit` MC-ALL samples all 715 skills (60 items) — **26 skills offer production items as buttons**, pinned
+in `design/audit/baselines/content-audit-mc.json`, need owners: fractions simplify / improper_mixed / mixed_fractions /
+estimate_frac_ops (60/60); conversions d_to_f, f_to_p, p_to_f, mixed_conversions (+ 3 pools); partition_shapes (+ 2 pools);
+angles measure_angles (60/60, + 2 pools); measurement estimate_length (+ pool); integers ordering_rationals (60/60, + 2 pools);
+number_sense make_a_ten (+ 2 pools). Backtest row `mc-production` (fixture). Default content-audit output unchanged for the
+≈310 family skills apart from the inserted MC-ALL block. Golden rule-set hash ignores dated status notes (N9).
