@@ -423,7 +423,7 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
     row('E17b', 'The anchor chart and its key carry no answer marks', chartP.map((p) => `${p.id}: ${p.kaCount}`).join(', '), chartP.length >= 2 && chartP.length % 2 === 0 && chartP.every((p) => p.kaCount === 0));
     const pairs = pupil.map((p) => [p, keys.find((k) => k.id === `${p.id}-key`)]);
     row('E17', 'Each key has the same slots as its page', pairs.map(([p, k]) => `${p.id} ${p.slots}/${k ? k.slots : '—'}`).join(', '), pairs.every(([p, k]) => k && p.slots === k.slots));
-    row('E18', '© line and strand tab on every page', `© ${pages.filter((p) => p.copy).length}/${pages.length}; tab ${pages.filter((p) => p.tabs > 0).length}/${pages.length}`, pages.every((p) => p.copy && p.tabs > 0));
+    row('E18', '© line on every page and no strand tab (owner ruling 2026-10-23)', `© ${pages.filter((p) => p.copy).length}/${pages.length}; tab ${pages.filter((p) => p.tabs > 0).length}/${pages.length}`, pages.every((p) => p.copy && p.tabs === 0));
     const titles = [...new Set(pages.flatMap((p) => p.titles))];
     row('E19', 'One identical I Can title on every page', titles.join(' | '), titles.length === 1);
     const lone = pupil.filter((p) => !/^P(2[a-z]?|5)$/.test(p.id) && p.graded < 2);

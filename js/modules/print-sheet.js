@@ -2532,7 +2532,9 @@ export function arrangeKey(res, ko, req = {}) {
         // printout of several sections, the section ("Section 2 · Add within 20").
         const nameOf = (h) => {
             const tabBox = /<div class="ws-tabbox">([\s\S]*?)<\/div>/.exec(h || '');
-            const spans = tabBox ? [...tabBox[1].matchAll(/<span>([^<]*)<\/span>/g)].map((m) => m[1].trim()).filter(Boolean) : [];
+            const meta = /\sdata-ws-tab="([^"]*)"/.exec(h || '');
+            const spans = tabBox ? [...tabBox[1].matchAll(/<span>([^<]*)<\/span>/g)].map((m) => m[1].trim()).filter(Boolean)
+                : meta ? meta[1].split('|').map((t) => t.trim()).filter(Boolean) : [];
             const foot = /<footer class="ws-foot"[^>]*>[\s\S]*?<b>([^<]*)<\/b>/.exec(h || '');
             const nn = foot && /^(\d+)\/(\d+)$/.exec(foot[1].trim());
             const name = spans.length ? spans[spans.length - 1] : '';
