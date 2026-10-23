@@ -728,6 +728,8 @@ full screen above both. One column; the preview never comes first.
 
 ### 2.4 The tray
 
+**Owner 2026-10-23 (confirmed): the tray is built for 40–100 skills** ("we might practice problems from a whole grade level"). Up to about 8 skills it shows chips; above that it collapses to one summary bar ("Grade 3 · 64 skills · 6 areas", one segment per maths area) that opens a tray sheet grouped by area, with search, one-tap remove per area and per skill, and a height cap. Skills gains **Add whole area** and **Add whole grade**; Lessons gains **Add this unit**. "How often" is set per area first, per skill only when opened. Print summary and preview work at 100 skills (each skill at least once if the pages allow, otherwise sampled, and the summary says so); Single skill with many skills warns. Share needs a **compact whole-grade / whole-area set code** so the link stays short — a `skill-codes.js` change (after M1 releases that file; append-only, `ws-code-snapshot` green). Quiz builds from a whole grade or unit.
+
 - Fixed at the bottom of Skills and **always visible, even when empty**: then Quiz opens "Build from" (a standard, a White
   Rose unit or step, a lesson), and Print and Share are greyed with "Tick skills first". With skills, it shows them as
   chips in their maths-area colours; drag to reorder.
@@ -925,7 +927,7 @@ light version, ≥ 7 : 1 on the dark tint (CC #E092E9, OA #A3A0D5, NBT #F4D984, 
   band, so a one-area list still shows four strengths of its colour, not one hue on black and white.
 - **Never colour alone:** every colour comes with its area name and an area icon (black-and-white printers, colour-blind
   teachers).
-- **Neutral backgrounds** (white; #111318 dark), no pastel washes outside the group tints. Grades are numbered neutral
+- **Neutral backgrounds** — **owner 2026-10-23 (confirmed): warm stone page #EFECE8, white cards #FFFFFF, surface-2 #E5E1DB** (cream only as text on dark fills; #111318 dark unchanged; contrast gates measured against the stone page), no pastel washes outside the group tints. Grades are numbered neutral
   pills.
 
 **The owner chose board C** (Q-T6, 2026-10-23: the Awsaj maths site's warm cream and earthy colours; colour marks the maths area and the grade gets its own non-colour badge); T1 renders board C, with boards A and B kept as static reference images. For the record: **A** six areas (Measurement and Data share mint; Ratio /
