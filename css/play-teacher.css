@@ -202,6 +202,23 @@ body.teacher-mode.tv-bigboard #gameView.tvb-rail .tvb-row { flex-direction: colu
 body.teacher-mode.tv-bigboard #gameView.tvb-rail .tvb-row .tvb-grow { display: none; }
 body.teacher-mode.tv-bigboard #gameView.tvb-rail .tvb-answer { flex-direction: column; gap: 4px; padding: 12px 16px; }
 body.teacher-mode.tv-bigboard #gameView.tvb-rail .tvb-answer-v { overflow-wrap: anywhere; }
+/* Short boards (W0-defects r3, 1280x720): the older short-screen rule (ui-components.css, max-height
+   760) caps the visual at 46vh and scrolls it inside the cell, and caps its drawing at 38vh. The board
+   sizes the question itself (fitBoard), so here the cell keeps its full height, as on the pupil card
+   (play-compact.css), and the drawing keeps the 50vh cap it has on every taller screen. */
+@media (max-height: 760px) {
+    body.teacher-mode.tv-bigboard #gameView .visual-aid,
+    body.teacher-mode.tv-bigboard #gameView #visualAid { max-height: none; overflow: visible; }
+    body.teacher-mode.tv-bigboard #gameView #visualAid > div > svg,
+    body.teacher-mode.tv-bigboard #gameView #visualAid > svg { max-height: 50vh !important; }
+}
+/* The rail on a 720 px board (1280x720): the frame gives up its vertical padding, so a tall question
+   (the fact family's four rows) fits at its normal size. The question itself is never shrunk. */
+@media (max-height: 720px) and (min-width: 601px) {
+    body.teacher-mode.tv-bigboard #gameView.active.tvb-rail { padding-top: 4px; padding-bottom: 4px; }
+    body.teacher-mode.tv-bigboard #gameView.tvb-rail #questionCard { padding-top: 4px; padding-bottom: 4px; }
+    body.teacher-mode.tv-bigboard #gameView.tvb-rail #questionCard.mq-card #questionPaper.mq-qpaper { margin-top: 0; }
+}
 
 /* ---------------------------------------------------------------- the worked example ("Show me how") */
 .mq-worked-preview-overlay.mq-how-teacher {
