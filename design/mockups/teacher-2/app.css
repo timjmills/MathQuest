@@ -624,3 +624,27 @@ table.t th { color: var(--text-2); font-size: var(--fs-12); }
 }
 .tray-lead { display: inline-flex; align-items: center; gap: var(--sp-8); min-width: 0; max-width: 100%; }
 .tray-lead .chip { min-width: 0; }
+/* group-frame: on the warm stone page (owner 2026-10-23) a light tint can sit within 3 CIEDE2000 of the page, so in light
+   mode every area group is a white surface card with its tint inside (ws-teacher-tokens check 12 reads this rule) */
+:root:not([data-theme="dark"]) .group, :root:not([data-theme="dark"]) .lesson-list { border: var(--sp-8) solid var(--surface); box-shadow: var(--shadow-1); }
+/* a chip never cuts its name: one line when it fits, else the area word drops (compact), else the name wraps */
+.chip .name { white-space: normal; overflow-wrap: break-word; text-overflow: clip; line-height: var(--lh-tight); padding: var(--sp-4) 0; }
+.chip.measure .name { white-space: nowrap; }
+.sect-box input { min-height: var(--control); }
+@media (max-width: 1099px) and (min-width: 820px) { .head .search { flex-basis: 100%; max-width: none; } .head { flex-wrap: wrap; gap: var(--sp-8); } }
+@media (max-width: 819px) {
+  .card-title { flex-wrap: wrap; padding-right: 0; row-gap: var(--sp-8); }
+  .card-title .card-name { flex-basis: 100%; }
+  .card .tick { top: 0; right: 0; }
+}
+@media (max-width: 819px) {
+  .sheet-foot .foot-two { grid-column: 1 / -1; }
+  .sheet-foot .foot-two .btn { flex: 1 1 0; }
+  .sheet-foot .foot-two + .btn-primary { grid-column: 1 / -1; }
+}
+@media (max-width: 819px) {
+  .lesson { gap: var(--sp-8); flex-wrap: wrap; }
+  .lesson-t { flex: 1 1 160px; min-width: 0; }
+}
+.share-pad { grid-template-columns: minmax(0, 1fr); }
+.share-pad > *, .sheet-opts > *, .panel-body > * { min-width: 0; }

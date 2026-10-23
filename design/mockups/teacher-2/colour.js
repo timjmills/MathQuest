@@ -4,6 +4,7 @@
 // its own copy so the gate has no dependency on the mock-up.
 (function (root) {
   // Board C (owner 2026-10-23, the Awsaj look): cream page, warm ink, warm near-black dark page; text on a bold is cream or ink.
+  const STONE = '#EFECE8';   // the light page (owner, fix round 2): deep is >= 7 : 1 on it
   const INK = '#1A1614', WHITE = '#FFFFFF', CREAM = '#FBF7EF', DARK = '#0F0E0C', KEY = '#C2410C', ERR = '#B91C1C';
   const M = {
     deut: [[0.367322, 0.860646, -0.227968], [0.280085, 0.672501, 0.047413], [-0.011820, 0.042940, 0.968881]],
@@ -49,7 +50,7 @@
   }
   function mix(a, b, t) { const ra = rgb(a), rb = rgb(b); return '#' + [0, 1, 2].map(i => hex2(pyRound(255 * (ra[i] * t + rb[i] * (1 - t))))).join(''); }
   function textFor(h) { const w = cr(h, CREAM), i = cr(h, INK); return (w >= 4.5 && w >= i) ? 'cream' : (i >= 4.5 ? 'ink' : (w >= 4.5 ? 'cream' : null)); }
-  function deep(b) { let t = 0.75; while (cr(mix(b, '#000000', t), CREAM) < 7) t -= 0.01; return mix(b, '#000000', t); }
+  function deep(b) { let t = 0.75; while (cr(mix(b, '#000000', t), STONE) < 7) t -= 0.01; return mix(b, '#000000', t); }
   function light(b, under) { let t = 0.5; while (cr(mix(b, CREAM, t), under) < 7) t -= 0.01; return mix(b, CREAM, t); }
   // dark tint: 18 % of the bold over the dark page, raised 1 % at a time until >= 1.2 : 1 from the page (fix round 2)
   function darkTint(b) { let t = 0.18, x = mix(b, DARK, t); while (cr(x, DARK) < 1.2) { t = Math.round((t + 0.01) * 100) / 100; x = mix(b, DARK, t); } return x; }
@@ -57,6 +58,6 @@
     const tint = mix(b, CREAM, 0.10), soft = mix(b, CREAM, 0.30), dTint = darkTint(b), dSoft = mix(b, DARK, 0.40);
     return { bold: b, on: textFor(b) === 'cream' ? CREAM : INK, tint, soft, deep: deep(b), dTint, dSoft, dLight: light(b, dTint) };
   }
-  const api = { INK, WHITE, CREAM, DARK, KEY, ERR, rgb, lum, cr, lab, de00, mix, textFor, deep, light, ramp, simulate };
+  const api = { STONE, INK, WHITE, CREAM, DARK, KEY, ERR, rgb, lum, cr, lab, de00, mix, textFor, deep, light, ramp, simulate };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.MQColour = api;
 })(typeof window !== 'undefined' ? window : globalThis);

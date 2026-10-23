@@ -9,7 +9,9 @@
 // clipping ancestor (ellipsis included; a search box must show its placeholder's first words); every chip's skill name
 // >= ~8 characters wide and never ellipsized while its row has room to give it a line; nothing spilling past its chip,
 // card or box; no card / box / band title broken inside a word; every control >= 44 px tall (§2.8); the tick box never on
-// a thumbnail's drawing; Skills from 820 px up with a search box >= 320 px, medium cards >= 200 px, first card by y 420.
+// a thumbnail's drawing; Skills from 820 px up with a search box >= 320 px, medium cards >= 200 px, first card by y 420;
+// every skill card / chip / lesson row / lesson panel / chip-options header has exactly one grade badge, first in its
+// content box, whole, >= 12 px, >= 4.5 : 1 (owner 2026-10-23).
 const fs = require('fs');
 const path = require('path');
 let chromium;
@@ -96,7 +98,7 @@ async function screenReport(page, w) {
       if (ox > 1 && oy > 1) out.problems.push(`overlap: “${a.textContent.trim().slice(0, 30)}” and “${b.textContent.trim().slice(0, 30)}”`);
     }
     // ---- fix round 2 (critic r2 A1/A2/A4/A5, stop rule §1.7): the checks that would have caught the tray and 820 defects ----
-    const shown = (el) => { if (el.closest('.sr, [hidden], .page, .thumb, svg')) return false; const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none'; };
+    const shown = (el) => { if (el.closest('.sr, [hidden], .page, .thumb, svg, details:not([open]) > :not(summary)')) return false; const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none'; };
     const say = (key, msg) => { (out.k = out.k || {}); (out.k[key] = out.k[key] || []).push(msg); };
     const txt = (el) => (el.innerText || el.textContent || el.getAttribute('aria-label') || '').replace(/\s+/g, ' ').trim().slice(0, 28);
     // (1) text clipped: an element (or an ancestor that clips) cuts off its own text, or ellipsizes it
@@ -136,11 +138,11 @@ async function screenReport(page, w) {
         if (r.right > b.right + 1 || r.left < b.left - 1 || r.bottom > b.bottom + 1 || r.top < b.top - 1) { say('spills out of its box', `“${txt(d)}” out of .${String(box.className).split(' ')[0]} by ${Math.round(Math.max(r.right - b.right, b.left - r.left, r.bottom - b.bottom, b.top - r.top))}px`); break; }
       }
     }
-    // (4) a card or box title never breaks inside a word (a break after a hyphen is a normal line break)
+    // (4) a card or box title never breaks inside a word (a break after a hyphen or a slash is a normal line break)
     for (const el of document.querySelectorAll('.card-name, .box h3, .band, .panel-band h2, .sheet-head h2, .kind b')) {
       if (!el.getBoundingClientRect().width || el.closest('[hidden]')) continue;
       const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); let n, bad = null;
-      while (!bad && (n = w.nextNode())) { const re = /[^\s\-‐‑]{2,}/g; let m; while ((m = re.exec(n.data))) { const rg = document.createRange(); rg.setStart(n, m.index); rg.setEnd(n, m.index + m[0].length); const tops = new Set([...rg.getClientRects()].filter(x => x.width > 0).map(x => Math.round(x.top))); if (tops.size > 1) { bad = m[0]; break; } } }
+      while (!bad && (n = w.nextNode())) { const re = /[^\s\-‐‑/]{2,}/g; let m; while ((m = re.exec(n.data))) { const rg = document.createRange(); rg.setStart(n, m.index); rg.setEnd(n, m.index + m[0].length); const tops = new Set([...rg.getClientRects()].filter(x => x.width > 0).map(x => Math.round(x.top))); if (tops.size > 1) { bad = m[0]; break; } } }
       if (bad) say('word broken across lines', `“${bad}” in “${txt(el)}”`);
     }
     // (5) controls >= 44 px tall (§2.8)
@@ -162,7 +164,26 @@ async function screenReport(page, w) {
       const s = document.querySelector('.head-skills .search input'); if (s && s.getBoundingClientRect().width < 320) say('skills layout', `search box ${Math.round(s.getBoundingClientRect().width)}px wide`);
       const cards = [...document.querySelectorAll('.grid[data-view="medium"] .card, .grid[data-view="big"] .card')].filter(c => c.getBoundingClientRect().width);
       const thin = cards.filter(c => c.getBoundingClientRect().width < 200); if (thin.length) say('skills layout', `${thin.length} cards under 200px (${Math.round(thin[0].getBoundingClientRect().width)}px)`);
-      const first = document.querySelector('#skill-list .card'); if (first && first.getBoundingClientRect().top + scrollY > 420) say('skills layout', `first card at y ${Math.round(first.getBoundingClientRect().top + scrollY)}`);
+      const first = window.MQ && window.MQ.S.browse === 'area' && !window.MQ.S.q.trim() ? document.querySelector('#skill-list .card') : null;   // the default view if (first && first.getBoundingClientRect().top + scrollY > 420) say('skills layout', `first card at y ${Math.round(first.getBoundingClientRect().top + scrollY)}`);
+    }
+    // (8) the GRADE badge (owner 2026-10-23): every skill card, chip, lesson row, lesson panel and chip-options header
+    //     carries exactly one, first in its content box (the fixed slot), whole, >= 12 px and >= 4.5 : 1, never an area colour
+    const rgbOf = (c) => (c.match(/[\d.]+/g) || []).slice(0, 4).map(Number);
+    const L = (c) => { const [r, g, b] = rgbOf(c).map(v => v / 255).map(v => v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
+    const hosts = [...document.querySelectorAll('[data-domain].card[data-act="tick"], [data-domain].chip, [data-domain].lesson, [data-grade-host]')];
+    for (const h of hosts) {
+      if (!shown(h) && !h.matches('.card')) continue; if (!h.getBoundingClientRect().width) continue;
+      if (!h.hasAttribute('data-grade-host')) { say('grade badge', `“${txt(h)}” is not a grade host`); continue; }
+      const own = [...h.querySelectorAll('.gbadge')].filter(b => b.closest('[data-grade-host]') === h);
+      if (own.length !== 1) { say('grade badge', `“${txt(h)}” has ${own.length} badges`); continue; }
+      const b = own[0], br = b.getBoundingClientRect(), hr = h.getBoundingClientRect(), cs = getComputedStyle(h), bs = getComputedStyle(b);
+      const left = hr.left + parseFloat(cs.borderLeftWidth) + parseFloat(cs.paddingLeft);
+      if (Math.abs(br.left - left) > 2) say('grade badge', `“${txt(h)}”: badge ${Math.round(br.left - left)}px from the start slot`);
+      if (b.scrollWidth > b.clientWidth + 1 || br.right > hr.right + 1 || br.bottom > hr.bottom + 1 || !br.width) say('grade badge', `“${txt(h)}”: badge clipped`);
+      if (parseFloat(bs.fontSize) < 12) say('grade badge', `“${txt(h)}”: ${bs.fontSize} type`);
+      const fgL = L(bs.color), bgc = rgbOf(bs.backgroundColor); const bgL = bgc.length === 4 && bgc[3] === 0 ? 1 : L(bs.backgroundColor);
+      const ratio = (Math.max(fgL, bgL) + 0.05) / (Math.min(fgL, bgL) + 0.05); if (ratio < 4.5) say('grade badge', `“${txt(h)}”: ${ratio.toFixed(2)} : 1`);
+      if (!b.textContent.trim()) say('grade badge', `“${txt(h)}”: empty badge`);
     }
     for (const [k, list] of Object.entries(out.k || {})) out.problems.push(`${k} ×${list.length}: ${list.slice(0, 3).join('; ')}`);
     out.small = ctl.filter(el => { const r = el.getBoundingClientRect(); return el.matches('button:not(.card):not(.tick), .btn') && (r.height < 36 || r.width < 36) && !el.closest('.page'); }).map(el => el.textContent.trim().slice(0, 20));

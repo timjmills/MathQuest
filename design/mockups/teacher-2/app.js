@@ -168,14 +168,16 @@
   function fitChips(root) {
     for (const c of (root || document).querySelectorAll('.chip')) {
       c.classList.remove('compact'); const a = c.querySelector('.chip-area'), n = c.querySelector('.name'); if (!a) continue;
+      c.classList.add('measure');     // measured on one line: if the name or the word would not fit, the word goes first
       if (a.scrollWidth > a.clientWidth + 1 || (n && n.scrollWidth > n.clientWidth + 1)) c.classList.add('compact');
+      c.classList.remove('measure');  // a name still too long for its whole row then wraps to a second line, never ellipsized
     }
   }
   function areaTag(a, pool) { return `<span class="area-tag">${icon(AREAS[a].icon)}${areaName(a)}</span>${pool ? '<span class="mixed-badge">mixed</span>' : ''}`; }
   function card(s, crossGrade) {
     const k = id(s), on = S.tray.includes(k);
     return `<button class="card" data-domain="${s.a}" data-grade-host data-act="tick" data-skill="${esc(k)}" ${pressed(on)}>` +
-      `<div class="card-title">${gbadge(s.g)}<div class="card-name">${esc(s.l)}</div></div><div class="thumb">${T.draw(s, undefined, S.skillOpts[k])}</div>` +
+      `<div class="card-title">${gbadge(s.g)}<div class="card-name">${esc(s.l).replace(/\//g, '/<wbr>')}</div></div><div class="thumb">${T.draw(s, undefined, S.skillOpts[k])}</div>` +
       `<div class="card-meta">${areaTag(s.a, s.p)}</div>` +
       `<span class="tick" aria-hidden="true"><span>${on ? '✓' : ''}</span></span><span class="sr">${on ? 'In the tray' : 'Tick to add'}</span></button>`;
   }
@@ -677,6 +679,7 @@
   window.addEventListener('hashchange', () => { readHash(); render(); });
   window.addEventListener('resize', () => { clearTimeout(window.__rz); window.__rz = setTimeout(render, 150); });
 
+  if (document.fonts) { document.fonts.ready.then(() => fitChips()); document.fonts.addEventListener('loadingdone', () => fitChips()); }
   readHash();
   if (S.sheet === 'print' || S.sheet === 'quiz') { const k = S.kind; S.opts = kindDefaults(S.opts); S.kind = k; S.opts = kindDefaults(S.opts); if (qs.get('examples')) S.opts.examples = qs.get('examples'); if (qs.get('pages')) S.opts.pages = Number(qs.get('pages')); }
   if (S.sheet === 'quiz' && !S.tray.length) S.quiz.from = 'standard';

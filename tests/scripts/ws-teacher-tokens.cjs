@@ -4,7 +4,7 @@
  *
  * Palette: BOARD C (owner 2026-10-23, after T1's first cut: the school's Awsaj maths site look — cream page, warm ink,
  * muted painted area colours). The §2.7 RULES are unchanged; only the values moved from board B to board C, and
- * contrast is measured against cream #FBF7EF (light) and #0F0E0C (dark).
+ * contrast is measured against the warm stone page #EFECE8 and the white surface (light; owner, fix round 2) and #0F0E0C (dark).
  *
  *   node tests/scripts/ws-teacher-tokens.cjs            # GATE: prints a table, then ws-teacher-tokens: OK / FAIL
  *   node tests/scripts/ws-teacher-tokens.cjs --css <f>  # check another token file (default design/mockups/teacher-2/tokens.css)
@@ -31,6 +31,9 @@
  *   9. script    the mock-up's app.js writes no inline style (no style="…", no element.style; the body scroll lock excepted).
  *  10. action    (fix round 2) every bold, slate too, is clearly not the primary: CIEDE2000 >= 20 from ink #1A1614 and from
  *                the dark-mode primary #FBF7EF, and WCAG >= 2.0 : 1 against ink;
+ *  13. badge     (owner 2026-10-23) the grade badge's rules use neutral tokens only; its text >= 4.5 : 1, light and dark;
+ *  12. tints     (fix round 2) every area tint >= 3 CIEDE2000 from what it sits on: the stone page, or the white frame
+ *                the groups carry in light mode (the "group-frame" rule in app.css);
  *  11. dark      (fix round 2) every dark tint >= 1.2 : 1 against the dark page #0F0E0C and every bold >= 3 : 1 against it,
  *                so each group, band and card edge stays visibly coloured in dark mode.
  * The other §2.8 rules (one ink fill per screen, area colours only under data-domain, chips outlined and ringed, ...) are
@@ -47,6 +50,9 @@ const CSS_FILE = argCss > 0 ? path.resolve(process.argv[argCss + 1]) : path.join
 
 // ---------------------------------------------------------------- colour maths (port of colour.py)
 // Board C (owner 2026-10-23, the Awsaj look): warm ink on cream; dark page #0F0E0C with cream text.
+// Owner 2026-10-23 (fix round 2): the light page is WARM STONE #EFECE8 with white #FFFFFF surfaces; cream #FBF7EF stays only
+// as TEXT on dark fills (the primary, the rail, cream-on-bold) and as the base the tints and soft fills are mixed over.
+const STONE = '#EFECE8';
 const INK = '#1A1614', WHITE = '#FFFFFF', CREAM = '#FBF7EF', DARK = '#0F0E0C', KEY = '#C2410C', ERR = '#B91C1C', DARK_TEXT = '#FBF7EF';
 const MODES = ['normal', 'deut', 'prot'];
 const M = {
@@ -89,7 +95,7 @@ function de00(a, b, mode = 'normal') {
   return Math.sqrt((dL / SL) ** 2 + (dC / SC) ** 2 + (dH / SH) ** 2 + RT * (dC / SC) * (dH / SH));
 }
 const textFor = (h) => { const w = cr(h, CREAM), i = cr(h, INK); return (w >= 4.5 && w >= i) ? CREAM : (i >= 4.5 ? INK : (w >= 4.5 ? CREAM : null)); };
-function deep(b) { let t = 0.75; while (cr(mix(b, '#000000', t), CREAM) < 7) t -= 0.01; return mix(b, '#000000', t); }
+function deep(b) { let t = 0.75; while (cr(mix(b, '#000000', t), STONE) < 7) t -= 0.01; return mix(b, '#000000', t); }
 function light(b, under) { let t = 0.5; while (cr(mix(b, CREAM, t), under) < 7) t -= 0.01; return mix(b, CREAM, t); }
 // dark tint: 18 % of the bold over the dark page, raised 1 % at a time until it is >= 1.2 : 1 from the page (fix round 2)
 function darkTint(b) { let t = 0.18, x = mix(b, DARK, t); while (cr(x, DARK) < 1.2) { t = Math.round((t + 0.01) * 100) / 100; x = mix(b, DARK, t); } return x; }
@@ -99,21 +105,21 @@ function ramp(b) { const dTint = darkTint(b); return { tint: mix(b, CREAM, 0.10)
 // The colours sampled from the school's Awsaj maths site, moved only as far as the §2.7 rules need
 // (design/mockups/teacher-2/palette/board-c-search.py). [key, css prefix, name, tint, soft, bold, deep, dark light version, dark tint]
 const PLAN = [
-  ['CC', 'cc', 'Counting & cardinality (mauve)', '#F6EFEB', '#EDDEE2', '#CEA4C5', '#614D5D', '#E4CEDA', '#31292D'],
+  ['CC', 'cc', 'Counting & cardinality (mauve)', '#F6EFEB', '#EDDEE2', '#CEA4C5', '#5B4857', '#E4CEDA', '#31292D'],
   ['OA', 'oa', 'Operations & algebraic thinking (mid indigo; fix round 2 lifted it from ink-indigo #2E2B71, which read as ink)', '#EAE7E8', '#C9C8DB', '#555BAE', '#404482', '#A8A9CE', '#1F2031'],
-  ['NBT', 'nbt', 'Number & operations in base ten (gold)', '#F9F3E2', '#F5EBC7', '#E7CF69', '#5C532A', '#F1E3AC', '#36311D'],
+  ['NBT', 'nbt', 'Number & operations in base ten (gold)', '#F9F3E2', '#F5EBC7', '#E7CF69', '#554D27', '#F1E3AC', '#36311D'],
   ['NF', 'nf', 'Fractions & decimals (plum)', '#EFE6E3', '#D8C5CA', '#865273', '#653E56', '#C0A4B1', '#2A1E24'],
-  ['MEAS', 'meas', 'Measurement (sage)', '#F3F3E8', '#E2EBDA', '#A9CFAA', '#475747', '#D2E3CC', '#2B3128'],
-  ['DATA', 'data', 'Data (blue)', '#E9EDEC', '#C6D8E4', '#4B8FCC', '#2E577C', '#A3C3DE', '#1A252F'],
-  ['G', 'g', 'Geometry (sea teal)', '#E8EEE6', '#C1DBD3', '#399993', '#235D5A', '#9AC8C1', '#172724'],
-  ['RPNS', 'rpns', 'Ratio & number system (peach)', '#F8EFE4', '#F0DECE', '#D8A480', '#684F3D', '#EACEB8', '#332921'],
+  ['MEAS', 'meas', 'Measurement (sage)', '#F3F3E8', '#E2EBDA', '#A9CFAA', '#425142', '#D2E3CC', '#2B3128'],
+  ['DATA', 'data', 'Data (blue)', '#E9EDEC', '#C6D8E4', '#4B8FCC', '#2A5072', '#A3C3DE', '#1A252F'],
+  ['G', 'g', 'Geometry (sea teal)', '#E8EEE6', '#C1DBD3', '#399993', '#205652', '#9AC8C1', '#172724'],
+  ['RPNS', 'rpns', 'Ratio & number system (peach)', '#F8EFE4', '#F0DECE', '#D8A480', '#5F4838', '#EACEB8', '#332921'],
 ];
 const SLATE = '#706C6A';   // warm stone (fix round 2: lifted from #57534E, which was 19.7 from ink and 2.5 : 1 on the dark page)
 const PLAN_GRADES = { K: ['CC', 'OA', 'NBT', 'MEAS', 'DATA', 'G'], '1': ['OA', 'NBT', 'MEAS', 'DATA', 'G'], '2': ['OA', 'NBT', 'MEAS', 'DATA', 'G'],
   '3': ['OA', 'NBT', 'NF', 'MEAS', 'DATA', 'G'], '4': ['OA', 'NBT', 'NF', 'MEAS', 'DATA', 'G'], '5': ['OA', 'NBT', 'NF', 'MEAS', 'DATA', 'G'], '6': ['RPNS', 'OA', 'DATA', 'G'] };
 // Neutrals of the token file (§2.7 rank 4, §2.8): [token, light, dark]
 const NEUTRALS = {
-  page: ['#FBF7EF', '#0F0E0C'], surface: ['#FFFCF6', '#1A1614'], 'surface-2': ['#F3ECDF', '#221D1A'], text: ['#1A1614', '#FBF7EF'], 'text-2': ['#4A423B', '#D9CFC2'],
+  page: ['#EFECE8', '#0F0E0C'], surface: ['#FFFFFF', '#1A1614'], 'surface-2': ['#E5E1DB', '#221D1A'], line: ['#D6D0C8', '#3A332D'], text: ['#1A1614', '#FBF7EF'], 'text-2': ['#4A423B', '#D9CFC2'],
   'text-3': ['#6B6158', '#A89D90'], ring: ['#1A1614', '#FBF7EF'], 'primary-bg': ['#1A1614', '#FBF7EF'], 'primary-fg': ['#FBF7EF', '#1A1614'],
   rail: ['#1A1614', '#1A1614'], 'rail-text': ['#FBF7EF', null], 'rail-text-2': ['#CFC5B8', null],
   'chip-edge-dark': ['#E8DFD2', null], error: ['#B91C1C', null], key: ['#C2410C', null],
@@ -216,7 +222,7 @@ function parseBlocks(css) {
   for (const a of all) {
     const r = a.r;
     con.push([`${a.k} light tint / ink`, cr(r.tint, INK), 4.5], [`${a.k} light soft / ink`, cr(r.soft, INK), 4.5], [`${a.k} bold / its text`, r.on ? cr(r.bold, r.on) : 0, 4.5],
-      [`${a.k} deep / cream page`, cr(r.deep, CREAM), 7], [`${a.k} deep / surface`, cr(r.deep, NEUTRALS.surface[0]), 7], [`${a.k} deep / tint`, cr(r.deep, r.tint), 4.5],
+      [`${a.k} deep / stone page`, cr(r.deep, STONE), 7], [`${a.k} deep / surface`, cr(r.deep, NEUTRALS.surface[0]), 7], [`${a.k} deep / tint`, cr(r.deep, r.tint), 4.5],
       [`${a.k} dark tint / cream`, cr(r.dTint, DARK_TEXT), 4.5], [`${a.k} dark soft / cream`, cr(r.dSoft, DARK_TEXT), 4.5], [`${a.k} dark light-version / dark tint`, cr(r.dLight, r.dTint), 7]);
   }
   for (const [t, [l, d]] of Object.entries(NEUTRALS)) {
@@ -224,7 +230,7 @@ function parseBlocks(css) {
     if (['rail-text', 'rail-text-2'].includes(t)) con.push([`${t} on the rail`, cr(l, NEUTRALS.rail[0]), 4.5]);
   }
   con.push(['primary button, light', cr(NEUTRALS['primary-bg'][0], NEUTRALS['primary-fg'][0]), 4.5], ['primary button, dark', cr(NEUTRALS['primary-bg'][1], NEUTRALS['primary-fg'][1]), 4.5],
-    ['chip outline #E8DFD2 / dark page', cr('#E8DFD2', DARK), 7], ['ring ink / cream', cr(INK, CREAM), 7], ['ring cream / dark page', cr(DARK_TEXT, DARK), 7]);
+    ['chip outline #E8DFD2 / dark page', cr('#E8DFD2', DARK), 7], ['ring ink / stone page', cr(INK, STONE), 7], ['ring ink / white surface', cr(INK, WHITE), 7], ['ring cream / dark page', cr(DARK_TEXT, DARK), 7]);
   const worst = con.filter(c => c[1] < c[2]);
   const low = con.reduce((b, c) => (c[1] / c[2] < b[1] / b[2] ? c : b));
   row(`text contrast (${con.length} pairs, light and dark)`, worst.length ? worst.map(w => `${w[0]} ${w[1].toFixed(2)}`).join('; ') : `closest ${low[0]} ${low[1].toFixed(2)}`, '>= 4.5 / 7', '', !worst.length);
@@ -250,6 +256,35 @@ function parseBlocks(css) {
   const dt = minOf(darkRows, (a) => cr(a.t, DARK)), db = minOf(darkRows, (a) => cr(a.b, DARK));
   row('dark tint vs the dark page (the group shows)', dt.v.toFixed(2), '>= 1.2', `${dt.p.k} ${dt.p.t}`, dt.v >= 1.2);
   row('bold vs the dark page (edge, band, icon)', db.v.toFixed(2), '>= 3', db.p.k, db.v >= 3);
+
+  // 12. light mode: every group is visibly coloured on the warm stone page (owner 2026-10-23). A WCAG ratio is not enough
+  //     (the tints sit within 1.0-1.06 : 1 of the page), so CIEDE2000 >= 3. The tints stay as they are (the owner's choice);
+  //     a tint that is under 3 from the stone page sits on a white surface frame (.group / .lesson-list in app.css), so
+  //     the pass needs >= 3 from the WHITE surface for those, and the gate prints both.
+  const tintRows = all.map(a => ({ k: a.k, t: a.r.tint, page: de00(a.r.tint, STONE), white: de00(a.r.tint, WHITE) }));
+  const onFrame = fs.existsSync(path.join(path.dirname(CSS_FILE), 'app.css')) && /group-frame[\s\S]*?\.group[^{]*\{[^}]*border:[^;]*var\(--surface\)/.test(fs.readFileSync(path.join(path.dirname(CSS_FILE), 'app.css'), 'utf8'));
+  const tWorst = minOf(tintRows, (a) => onFrame ? Math.max(a.page, a.white) : a.page);
+  const tPage = minOf(tintRows, (a) => a.page), tWhite = minOf(tintRows, (a) => a.white);
+  row(`tint vs stone page / white frame (CIEDE2000)`, `${r1(tPage.v)} ${tPage.p.k} / ${r1(tWhite.v)} ${tWhite.p.k}`, '>= 3', onFrame ? 'groups framed in white' : 'no frame', tWorst.v >= 3);
+
+  // 13. the GRADE badge (owner 2026-10-23): grade is told apart by a numbered ink circle, never by a second colour code.
+  //     Every app.css rule whose selector names .gbadge may use neutral tokens only (no area tint / soft / bold / deep /
+  //     on, no --a-*), and its text colour on its background is >= 4.5 : 1 in light and dark.
+  const badgeBad = []; let badgeCr = null;
+  {
+    const ap = path.join(path.dirname(CSS_FILE), 'app.css');
+    const css = fs.existsSync(ap) ? fs.readFileSync(ap, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '') : '';
+    const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].filter(m => /\.gbadge\b/.test(m[1]));
+    if (!rules.length) badgeBad.push('no .gbadge rule in app.css');
+    let fg = null, bg = null;
+    for (const m of rules) {
+      for (const v of m[2].matchAll(/var\((--[\w-]+)\)/g)) if (/^--(a|cc|oa|nbt|nf|meas|data|g|rpns|slate)-/.test(v[1])) badgeBad.push(`${m[1].trim()} uses ${v[1]}`);
+      if (/^\s*\.gbadge\s*$/.test(m[1])) { const c = m[2].match(/(?:^|;)\s*color:\s*var\(--([\w-]+)\)/), b = m[2].match(/background:\s*var\(--([\w-]+)\)/); if (c) fg = c[1]; if (b) bg = b[1]; }
+    }
+    if (!fg || !bg || !NEUTRALS[fg] || !NEUTRALS[bg]) badgeBad.push(`.gbadge colour ${fg} on ${bg} is not a neutral token pair`);
+    else { badgeCr = Math.min(cr(NEUTRALS[fg][0], NEUTRALS[bg][0]), cr(NEUTRALS[fg][1], NEUTRALS[bg][1])); if (badgeCr < 4.5) badgeBad.push(`contrast ${badgeCr.toFixed(2)}`); }
+  }
+  row('grade badge: neutral tokens only, text >= 4.5 light + dark', badgeBad.length ? badgeBad.length + ' found' : `${badgeCr.toFixed(2)} : 1`, 'neutral', badgeBad.slice(0, 3).join('; '), !badgeBad.length);
 
   // 7. tokens.css
   let tokBad = [];
