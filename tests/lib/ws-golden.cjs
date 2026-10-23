@@ -36,12 +36,36 @@ const RULE_SET_FILES = Object.freeze([
 
 const sha = (s) => crypto.createHash('sha256').update(s).digest('hex');
 
+/**
+ * The rule text of a rule-set file: the file with its dated STATUS NOTES removed (critic r1 N9). A status note is a
+ * Markdown blockquote whose first line opens with `> **YYYY-MM-DD:**` or `> **Build status ...:**` - a pointer to what
+ * is built or planned, not a rule a critic grades against - together with the one blank line that follows it. Plan
+ * pointers are added to these files on most planning days; hashing them made every recorded score stale the day it
+ * was written. Any other blockquote (an owner scope ruling such as RUBRIC's `> **Scope (owner ruling ...):**`) and every
+ * other line still counts, byte for byte, so a file without status notes hashes exactly as before.
+ */
+const STATUS_NOTE = /^>\s*\*\*(?:\d{4}-\d{2}-\d{2}|Build status\b[^*]*):\*\*/;
+function ruleText(buf) {
+    const lines = String(buf).split('\n');
+    const out = [];
+    for (let i = 0; i < lines.length; i++) {
+        if (STATUS_NOTE.test(lines[i])) {
+            while (i < lines.length && /^>/.test(lines[i])) i++;
+            if (i < lines.length && lines[i] === '') continue;   // the blank line after the note
+            i--;
+            continue;
+        }
+        out.push(lines[i]);
+    }
+    return out.join('\n');
+}
+
 /** {version, files: {path: sha256-16}} for the rule-set files in `root` (default this checkout). */
 function ruleSetVersion(root = REPO) {
     const files = {};
     for (const f of RULE_SET_FILES) {
         const p = path.join(root, f);
-        files[f] = fs.existsSync(p) ? sha(fs.readFileSync(p)).slice(0, 16) : 'missing';
+        files[f] = fs.existsSync(p) ? sha(ruleText(fs.readFileSync(p, 'utf8'))).slice(0, 16) : 'missing';
     }
     return { version: sha(RULE_SET_FILES.map((f) => `${f}:${files[f]}`).join('\n')).slice(0, 16), files };
 }
