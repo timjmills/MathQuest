@@ -98,6 +98,9 @@ const ROLE_SAMPLE = path.join(ROOT, 'tests', 'fixtures', 'precritic', 'role-samp
 const PRINT_BASE = path.resolve(ROOT, arg('print-lint-baseline', 'design/audit/baselines/print-lint.json'));
 const sizeBase = (sz) => PRINT_BASE.replace(/\.json$/, `.${sz}.json`);
 const pinnedIds = (file) => { try { return new Set(JSON.parse(fs.readFileSync(file, 'utf8')).documents.map((d) => d.id)); } catch (e) { return new Set(); } };
+// ws-options-verify's per-skill deadline (its default 60 s times out on add_facts, sub_facts and f_to_d in a cloud container,
+// 210 s together; lead 2026-10-23): 10 min a skill, overridable with MQ_OV_DEADLINE (ms).
+const OV_DEADLINE = String(process.env.MQ_OV_DEADLINE || 600000);
 const OV_BASE = path.resolve(ROOT, arg('options-verify-baseline', 'design/audit/baselines/options-verify.json'));
 const SLOTS_BASE = path.resolve(ROOT, arg('screen-slots-baseline', 'design/audit/baselines/screen-slots.json'));
 const MATRIX_BASE = path.resolve(ROOT, arg('matrix-baseline', 'design/audit/matrix/baseline.json'));
@@ -522,7 +525,7 @@ function buildPlan(ctx) {
         add(gate('providers', 'ws-providers-unit --skill', scope, 'node', 'ws-providers-unit', ['--skill', keys.join(',')], { parse: PARSE.providers, needFlags: ['skill'], expect: { skills: keys.length } }));
         add(gate('content-audit', 'ws-content-audit --skill', scope, 'browser', 'ws-content-audit', ['--skill', ids.join(','), ...catArg], { parse: PARSE.contentAudit, note: extraNote, expect: { skills: keys.length } }));
         const ovJson = path.join(ctx.logs, 'options-verify.json');
-        add(gate('options-verify', 'ws-options-verify --skill', scope, 'browser', 'ws-options-verify', ['--skill', ids.join(','), ...catArg, '--json', ovJson], { parse: PARSE.optionsVerify, jsonOut: ovJson, keys }));
+        add(gate('options-verify', 'ws-options-verify --skill', scope, 'browser', 'ws-options-verify', ['--skill', ids.join(','), ...catArg, '--deadline', OV_DEADLINE, '--json', ovJson], { parse: PARSE.optionsVerify, jsonOut: ovJson, keys }));
         const presetTouch = skills.filter((s) => s.preset || s.hosts);
         if (presetTouch.length) add(gate('presets', 'ws-presets-unit', `${presetTouch.length} preset / host skill(s)`, 'browser', 'ws-presets-unit', []));
         // The matrix takes its own browser slots (--slots: each print-lint process through /tmp/mq-browser-run.sh), so it

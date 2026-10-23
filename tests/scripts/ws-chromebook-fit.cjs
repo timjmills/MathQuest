@@ -39,12 +39,24 @@
 //                        the same fit verdicts as the default run
 //   --bigboard           SWEEP: the teacher's Board display (body.teacher-mode.tv-bigboard: css/teacher.css:96,
 //                        css/play-teacher.css), host card (the board shows the practice card only), sizes
-//                        1366x768 and 1920x1080. FAILS when the question does not fit the board: the board card
-//                        or frame scrolls sideways or down, or the teacher's board controls are off screen
+//                        1280x720, 1366x768 and 1920x1080. FAILS when the question does not fit the board: the board
+//                        card or frame scrolls sideways or down, a box nested in #questionPaper clips its content
+//                        by > 12 px (number-line pan strips excluded, as fitBoard does), or the teacher's board
+//                        controls are off screen (measured after the board's entrance animations finish)
 //   --sample <file>      the sweep sample; --skills overrides it; --roles student,teacher the sweep roles
 //   --baseline <file>    fail only on a per-skill failure the file does not pin (see findingId below); the
 //                        sweeps' standing failures are pinned in tests/fixtures/precritic/sweep-sample.json
 // The sweeps skip the checks that are not per skill (they have no mode of their own).
+//
+// Page errors (critic r1 D6) belong to the skill, size and host whose render raised them: a pageerror / console.error
+// is recorded as "<cat:skill> <WxH> <host>: page error: [type] <message>" (host "load" for one raised while the page
+// reloaded for that skill), and pinned in the baseline like any per-skill failure, as
+// "<host>:<WxH>:pageerror:<message, first 100 characters>". A page error outside the per-skill loop (the header,
+// dots and touch checks) cannot be pinned. No message is ever waived globally.
+//
+// An empty run is a FAIL, never OK (critic r1 D3): an unknown --skills key, a retired skill, an unknown --category,
+// a sweep sample naming a skill that is not live, a list of 0 skills, or 0 measured renders each FAIL and say why.
+//   node tests/scripts/ws-chromebook-fit.cjs --self-test     # the selection and page-error id rules (no browser)
 //
 // Prints one line per skill, size and host, then `ws-chromebook-fit: OK` or `FAIL` (exit 1).
 const fs = require('fs');
@@ -72,7 +84,7 @@ const SHARD = (() => {
 // the checks that are not per skill run once: not in a sweep, and in shard 1 only
 const GLOBALS = !SWEEP && (!SHARD || SHARD.i === 1);
 const SAMPLE_FILE = arg('sample', path.join(__dirname, '..', 'fixtures', 'precritic', 'sweep-sample.json'));
-const SIZES = (arg('sizes', BIGBOARD ? '1366x768,1920x1080' : DARK ? '1366x650' : '1366x650,1280x600')).split(',').map(s => { const [w, h] = s.split('x').map(Number); return { w, h }; });
+const SIZES = (arg('sizes', BIGBOARD ? '1280x720,1366x768,1920x1080' : DARK ? '1366x650' : '1366x650,1280x600')).split(',').map(s => { const [w, h] = s.split('x').map(Number); return { w, h }; });
 const HOSTS = (arg('hosts', BIGBOARD ? 'card' : DARK ? 'card,worksheet,quiz' : 'card,boss,race,worksheet,quiz')).split(',');
 // boss and race are the card plus an arena / a track: in a full run they are sampled on these
 const ARENA_SAMPLE = ['addition:add_facts', 'addition:add', 'addition:add_column_multi', 'counting:count_objects', 'addition:add_wp_10', 'graphs:bar_graph', 'division:long_div_2digit'];
@@ -146,11 +158,72 @@ function findingId(line) {
     const m = /^([a-z0-9_]+:[a-z0-9_]+) (\d+x\d+) (\S+): (.*)$/.exec(line);
     if (!m) return null;
     const why = m[4];
+    // a page error is pinned with its own message, per skill, size and host (critic r1 D6)
+    const pe = /^page error: \[[^\]]+\] (.*)$/.exec(why);
+    if (pe) return { key: m[1], id: `${m[3]}:${m[2]}:pageerror:${pe[1].replace(/\s+/g, ' ').trim().slice(0, 100)}` };
     const kind = /scrolls down/.test(why) ? 'scroll-y' : /scrolls sideways/.test(why) ? 'scroll-x' : /board controls/.test(why) ? 'controls'
         : /no Check \/ Next/.test(why) ? 'no-go' : /Check \/ Next off screen/.test(why) ? 'go' : /answer box bottom/.test(why) ? 'box'
             : /not brought into view/.test(why) ? 'tall-load' : /does not have the focus/.test(why) ? 'focus' : /did not move/.test(why) ? 'next'
                 : /arena|track/.test(why) ? 'arena' : 'error';
     return { key: m[1], id: `${m[3]}:${m[2]}:${kind}` };
+}
+
+/**
+ * Check a run's skill list (critic r1 D3). all: every SKILLS entry [{key, live}]; explicit: --skills given;
+ * sample: the list came from the sweep sample. Returns {list, errors}.
+ */
+function selectFit(all, { list = [], explicit = false, sample = false, categories = [], shard = null } = {}) {
+    const errors = [];
+    const known = new Map(all.map((s) => [s.key, s]));
+    for (const k of list) {
+        const s = known.get(k);
+        if (explicit || sample) {
+            if (!s) errors.push(sample ? `the sweep sample names ${k}, which is not a skill (regenerate the sample)` : `--skills ${k}: no such skill (want category:skill as in data.js SKILLS)`);
+            else if (!s.live) errors.push(sample ? `the sweep sample names ${k}, a retired skill` : `--skills ${k}: a retired skill (tombstone), not a live one`);
+        }
+    }
+    let out = list.filter((k) => known.has(k) && known.get(k).live);
+    const cats = new Set(all.filter((s) => s.live).map((s) => s.key.split(':')[0]));
+    for (const c of categories) if (!cats.has(c)) errors.push(`--category ${c}: no such category with a live skill`);
+    if (categories.length) out = out.filter((s) => categories.includes(s.split(':')[0]));
+    if (shard) out = out.filter((_, i) => i % shard.n === shard.i - 1);
+    if (!errors.length && !out.length) errors.push('the skill list has 0 skills (--category, --shard or the sample left nothing to measure)');
+    return { list: out, errors };
+}
+
+if (has('self-test')) {
+    const all = [{ key: 'addition:add_facts', live: true }, { key: 'addition:add', live: true }, { key: 'measurement:time_hour', live: true }, { key: 'addition:old', live: false }];
+    const cases = [
+        ['--skills nosuch:skill', { list: ['nosuch:skill'], explicit: true }, /--skills nosuch:skill: no such skill/],
+        ['--skills of a retired skill', { list: ['addition:old'], explicit: true }, /retired/],
+        ['--category measurment (a typo)', { list: ['addition:add_facts'], categories: ['measurment'] }, /--category measurment: no such category/],
+        ['a sample naming a gone skill', { list: ['addition:add_facts', 'addition:gone'], sample: true }, /sweep sample names addition:gone/],
+        ['--category with no sampled skill', { list: ['addition:add_facts'], categories: ['measurement'] }, /0 skills/],
+        ['--shard 3/3 of 2 skills', { list: ['addition:add_facts', 'addition:add'], shard: { i: 3, n: 3 } }, /0 skills/],
+        ['--skills addition:add (valid)', { list: ['addition:add'], explicit: true }, null],
+    ];
+    let bad = 0;
+    for (const [name, o, want] of cases) {
+        const r = selectFit(all, o);
+        const ok = want ? r.errors.some((e) => want.test(e)) : (!r.errors.length && r.list.length > 0);
+        if (!ok) bad++;
+        console.log(`  ${ok ? 'ok  ' : 'FAIL'} ${name}: ${r.errors.length ? r.errors.join('; ') : `${r.list.length} skill(s)`}`);
+    }
+    // page errors are pinned per skill, size and host, with their message (critic r1 D6)
+    const msg = "Cannot read properties of null (reading 'numberFamilyData')";
+    const idA = findingId(`addition:add_sub_fact_family 1366x650 dark-student:worksheet: page error: [pageerror] ${msg}`);
+    const idB = findingId(`addition:add_facts 1366x650 dark-student:worksheet: page error: [pageerror] ${msg}`);
+    const pinned = { 'addition:add_sub_fact_family': [`dark-student:worksheet:1366x650:pageerror:${msg}`] };
+    const hit = (id) => !!id && (pinned[id.key] || []).includes(id.id);
+    const ids = [['the pinned skill and host', idA, true], ['the same message from another skill', idB, false],
+        ['the same skill on another host', findingId(`addition:add_sub_fact_family 1366x650 dark-student:quiz: page error: [pageerror] ${msg}`), false]];
+    for (const [name, id, want] of ids) {
+        const ok = hit(id) === want;
+        if (!ok) bad++;
+        console.log(`  ${ok ? 'ok  ' : 'FAIL'} page error, ${name}: ${hit(id) ? 'pinned' : 'NEW'} (${id ? id.id : 'no id'})`);
+    }
+    console.log(bad ? 'ws-chromebook-fit --self-test: FAIL' : 'ws-chromebook-fit --self-test: OK');
+    process.exit(bad ? 1 : 0);
 }
 
 // In the page (--bigboard): does the question fit the teacher's Board display?
@@ -164,6 +237,18 @@ function BOARD() {
     const vis = el => { if (!el) return false; const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none'; };
     const pR = paper.getBoundingClientRect();
     const ctl = document.getElementById('tvBoardCtl');
+    // a box nested in the paper that clips its own content by > 12 px (launch-chrome.js nestedClip;
+    // the number lines' pan strips [data-mq-scroll] and 1-px screen-reader boxes excluded)
+    const nested = [];
+    for (const el of paper.querySelectorAll('*')) {
+        const ch = el.clientHeight, cw = el.clientWidth;
+        if (ch <= 2 || cw <= 2) continue;
+        const oy = el.scrollHeight - ch, ox = el.scrollWidth - cw;
+        if (oy <= 12 && ox <= 12) continue;
+        if (el.closest('[data-mq-scroll]')) continue;
+        const cs = getComputedStyle(el);
+        if ((oy > 12 && cs.overflowY !== 'visible') || (ox > 12 && cs.overflowX !== 'visible')) nested.push(`${el.tagName.toLowerCase()}${el.id ? '#' + el.id : ''}${el.classList[0] ? '.' + el.classList[0] : ''} +${Math.max(oy, ox)}`);
+    }
     const cR = ctl && vis(ctl) ? ctl.getBoundingClientRect() : null;
     return {
         H, W,
@@ -171,6 +256,7 @@ function BOARD() {
         overX: Math.max(card.scrollWidth - card.clientWidth, gv.scrollWidth - gv.clientWidth),
         overY: Math.max(card.scrollHeight - card.clientHeight, gv.scrollHeight - gv.clientHeight),
         ctl: cR ? { bottom: Math.round(cR.bottom), right: Math.round(cR.right) } : null,
+        nested,
     };
 }
 
@@ -222,11 +308,18 @@ async function startHost(page, host, c, k, seed) {
     const fails = [];
     const tall = [];
     const rows = [];
+    // page errors: those raised in the per-skill loop are blamed on the skill, size and host that raised them
+    let mark = 0;
+    const unattributed = [];
+    const take = () => { const p = app.problems.slice(mark); mark = app.problems.length; return p; };
+    const blame = (s, size, host) => { for (const p of take()) fails.push(`${s} ${size.w}x${size.h} ${host}: page error: [${p.type}] ${String(p.text).split('\n')[0]}`); };
 
     // ---- the sample ----
     let LIST = (arg('skills', '') || '').split(',').map(s => s.trim()).filter(Boolean);
+    const EXPLICIT = LIST.length > 0;
     // a sweep runs on the pinned sample: one skill per kit template
-    if (!LIST.length && SWEEP) LIST = (JSON.parse(fs.readFileSync(SAMPLE_FILE, 'utf8')).skills || []).map(r => r.key);
+    const FROM_SAMPLE = !LIST.length && SWEEP;
+    if (FROM_SAMPLE) LIST = (JSON.parse(fs.readFileSync(SAMPLE_FILE, 'utf8')).skills || []).map(r => r.key);
     if (!LIST.length) {
         const per = await page.evaluate(() => {
             const out = [];
@@ -241,8 +334,13 @@ async function startHost(page, host, c, k, seed) {
         const known = await page.evaluate(() => { const s = new Set(); for (const [c, a] of Object.entries(window.SKILLS)) if (Array.isArray(a)) a.forEach(x => x && s.add(`${c}:${x.v}`)); return Array.from(s); });
         LIST = LIST.filter(s => known.includes(s));
     }
-    if (CATEGORIES.length) LIST = LIST.filter(s => CATEGORIES.includes(s.split(':')[0]));
-    if (SHARD) LIST = LIST.filter((_, i) => i % SHARD.n === SHARD.i - 1);
+    {
+        // every SKILLS entry, live or not (tombstones and "(retired)" labels are not live)
+        const all = await page.evaluate(() => { const o = []; for (const [c, a] of Object.entries(window.SKILLS)) if (Array.isArray(a)) a.forEach(x => x && x.v && o.push({ key: `${c}:${x.v}`, live: !x.retired && !/^_?tomb|retired/i.test(x.v) && !/retired|tombstone/i.test(x.l || '') })); return o; });
+        const sel = selectFit(all, { list: LIST, explicit: EXPLICIT, sample: FROM_SAMPLE, categories: CATEGORIES, shard: SHARD });
+        if (sel.errors.length) { await app.close(); sel.errors.forEach(e => console.log(e)); console.log(`ws-chromebook-fit: ${sel.errors.length} selection error(s); nothing measured`); console.log('ws-chromebook-fit: FAIL'); process.exit(2); }
+        LIST = sel.list;
+    }
     if (DARK) await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'dark' }]);
     if (SWEEP || SHARD || CATEGORIES.length) console.log(`${MODE ? `${MODE} sweep (${ROLES.join(', ')}), ` : ''}${SHARD ? `shard ${SHARD.i}/${SHARD.n}, ` : ''}${LIST.length} skill(s)${GLOBALS ? '' : '; header, dots and touch checks not in this run'}`);
 
@@ -275,6 +373,7 @@ async function startHost(page, host, c, k, seed) {
         fails.push(...dotFails);
     }
 
+    unattributed.push(...take());   // the header and dots checks: not one skill's
     for (const role of ROLES) for (const size of SIZES) {
         await page.setViewport({ width: size.w, height: size.h, deviceScaleFactor: 1 });
         for (const s of LIST) {
@@ -282,16 +381,22 @@ async function startHost(page, host, c, k, seed) {
             await page.reload({ waitUntil: 'networkidle2' });
             await page.waitForFunction(() => typeof window.generateQuestion === 'function' && !!window.SKILLS, { timeout: 30000 });
             if (role) await page.evaluate((role) => window.setUserRole && window.setUserRole(role, { persist: false }), role);
+            blame(s, size, MODE ? `${MODE}${role ? '-' + role : ''}:load` : 'load');
             const line = [];
             for (const host of HOSTS) {
                 if ((host === 'boss' || host === 'race') && !arg('skills', '') && !ARENA_SAMPLE.includes(s)) continue;
                 const hostTag = MODE ? `${MODE}${role ? '-' + role : ''}:${host}` : host;
+                // every page error raised while this host rendered is this skill's, size's and host's (critic r1 D6)
+                try {
                 if (BIGBOARD) {
                     // the Board display: the whole question on the board, no scrolling, the controls on screen
                     const tag = `${s} ${size.w}x${size.h} ${hostTag}`;
                     let b;
                     try {
                         await startHost(page, host, c, k, hash(`${s}:${host}`));
+                        // the controls enter with a fadeSlide (translateY 24 px): measure only once every
+                        // animation on the board frame has finished, or it reads "bottom 772 of 768"
+                        try { await page.waitForFunction(() => { const g = document.getElementById('gameView'); if (!g || !g.getAnimations) return true; const t = getComputedStyle(g).transform; return (t === 'none' || /^matrix\(1, 0, 0, 1, 0, 0\)$/.test(t)) && g.getAnimations({ subtree: true }).every(a => !a.pending && (a.playState === 'finished' || a.playState === 'idle' || (a.effect && a.effect.getComputedTiming().iterations === Infinity))); }, { timeout: 5000 }); } catch (e) { /* measured anyway */ }
                         b = await page.evaluate(BOARD);
                         if (b.error) throw new Error(b.error);
                     } catch (e) { line.push(`${hostTag} ERR ${e.message}`); fails.push(`${tag}: ${e.message}`); continue; }
@@ -299,6 +404,7 @@ async function startHost(page, host, c, k, seed) {
                     const why = [];
                     if (b.overX > 1) why.push(`the board scrolls sideways by ${b.overX} px (paper ${b.paper.w} px wide, right ${b.paper.right} of ${b.W})`);
                     if (b.overY > 1) why.push(`the board scrolls down by ${b.overY} px (paper ${b.paper.h} px tall, bottom ${b.paper.bottom} of ${b.H})`);
+                    if (b.nested.length) why.push(`a box inside the paper clips its content (${b.nested.slice(0, 3).join(', ')})`);
                     if (!b.ctl) why.push('the board controls are not shown');
                     else if (b.ctl.bottom > b.H + 0.5 || b.ctl.right > b.W + 0.5) why.push(`the board controls are off screen (bottom ${b.ctl.bottom}, right ${b.ctl.right})`);
                     why.forEach(w => fails.push(`${tag}: ${w}`));
@@ -363,6 +469,7 @@ async function startHost(page, host, c, k, seed) {
                 }
                 rows.push({ skill: s, size: `${size.w}x${size.h}`, host: hostTag, ...m, load: undefined, verdict });
                 line.push(`${hostTag} ${verdict} box ${m.box ?? '-'}${m.boxKind === 'none' || m.boxKind === 'paper' ? `(${m.boxKind})` : ''}/${m.fold} go ${m.go ?? '-'}${host === 'worksheet' ? ` cards ${m.cardsFull}` : ''}`);
+                } finally { await sleep(50); blame(s, size, hostTag); }
             }
             console.log(`${(s + ' ' + size.w + 'x' + size.h).padEnd(44)} ${line.join(' | ')}`);
         }
@@ -406,19 +513,21 @@ async function startHost(page, host, c, k, seed) {
     }
     if (arg('json', null)) fs.writeFileSync(arg('json'), JSON.stringify(rows, null, 1));
     if (tall.length) console.log(`\nGenuinely tall items (may scroll; active-box brings the box into view):\n  ${tall.join('\n  ')}`);
-    if (app.problems.length) fails.push(...app.problems.slice(0, 8).map(p => `[${p.type}] ${p.text}`));
+    unattributed.push(...take());
+    if (unattributed.length) fails.push(...unattributed.slice(0, 8).map(p => `[${p.type}] ${p.text}`));
     await app.close();
+    // nothing measured is never OK (critic r1 D3)
+    if (!rows.length) { console.log(`\n0 renders measured (${LIST.length} skill(s) on hosts ${HOSTS.join(', ')}): nothing was checked`); if (fails.length) console.log(fails.join('\n')); console.log('ws-chromebook-fit: FAIL'); process.exit(1); }
     if (arg('baseline', null)) {
         // a pinned per-skill failure ("cat:skill WxH host: why") is reported, not failed; anything else fails
         const base = JSON.parse(fs.readFileSync(arg('baseline'), 'utf8'));
         const pinned = (base.chromebookFit || base).skills || {};
-        // a known app error the run triggers (pinned by its message), e.g. one a host switch raises
-        const problems = (base.chromebookFit || base).problems || [];
+        // page errors are pinned per skill, size and host (findingId); a global message list is no longer read
+        if (((base.chromebookFit || base).problems || []).length) console.log(`baseline ${arg('baseline')}: its global "problems" list is ignored (critic r1 D6): pin a page error per skill as "<host>:<WxH>:pageerror:<message>"`);
         const seen = [];
         const left = fails.filter(f => {
             const id = findingId(f);
             if (id && (pinned[id.key] || []).includes(id.id)) { seen.push(`${id.key} ${id.id}`); return false; }
-            if (/^\[(pageerror|console\.error)\] /.test(f) && problems.some(p => f.includes(p))) { seen.push(f); return false; }
             return true;
         });
         console.log(`\nbaseline ${arg('baseline')}: ${seen.length} pinned failure(s) seen (${seen.join('; ') || 'none'}), ${left.length} NEW`);

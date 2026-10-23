@@ -1,0 +1,19 @@
+{
+ "tool": "ws-options-pin",
+ "kind": "options-pin",
+ "commit": "fixture",
+ "dirty": false,
+ "mode": "check",
+ "batching": "hash-v1",
+ "subset": false,
+ "complete": true,
+ "finished": "2026-10-21T02:05:00Z",
+ "shard": null,
+ "slice": null,
+ "failing": {
+  "composing:number_word_form": [
+   "zeroPlace=\"never\""
+  ],
+  "subtraction:sub_50_no_regroup": []
+ }
+}

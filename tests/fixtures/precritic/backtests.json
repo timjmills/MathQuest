@@ -52,6 +52,37 @@
    "expect": { "fail": "FAIL", "pass": "OK" }
   },
   {
+   "id": "node-lint-keys",
+   "check": "ws-node-lint baseline pins finding KEYS, not counts (critic r1 D5): a fixed finding replaced by a new one in the same skill and rule fails",
+   "kind": "fixture",
+   "rule": "ws-node-lint keyed baseline (rule|kind|#item|signature)",
+   "fail": { "fixture": "tests/fixtures/precritic/node-lint-keys.swap.mjs", "state": "the pinned \"3 x 4\" on item 2 fixed, a new \"6 x 7\" on item 5: the count per (skill, rule) is still 1" },
+   "pass": { "fixture": "tests/fixtures/precritic/node-lint-keys.pin.mjs", "state": "the pinned finding, unchanged" },
+   "command": "node tests/scripts/ws-node-lint.mjs --fixture {fixture} --baseline tests/fixtures/precritic/node-lint-keys.baseline.json",
+   "expect": { "fail": "FAIL", "pass": "OK" }
+  },
+  {
+   "id": "mc-production",
+   "check": "H8: a production item (written on paper) is never offered as buttons on screen, every family (P-29, RM-P-01)",
+   "kind": "fixture",
+   "rule": "ws-content-audit MC-ALL mc-production",
+   "fail": { "fixture": "tests/fixtures/precritic/mc-production.fail.cjs", "state": "seeded \"what fraction is shaded?\" items: the paper cell has a fraction slot and no choices, the screen deals four fraction options (buttons)" },
+   "pass": { "fixture": "tests/fixtures/precritic/mc-production.pass.cjs", "state": "the same items typed (no option row); and a circle-one variant whose paper cell prints the same four choices" },
+   "command": "node tests/scripts/ws-content-audit.cjs --mc-fixture {fixture}",
+   "expect": { "fail": "FAIL", "pass": "OK" }
+  },
+  {
+   "id": "baseline-night-keeps-red",
+   "check": "A pinned row that regresses stays RED through a baseline night (ws-coverage-matrix BASELINE INVARIANTS I1-I5, critic r3 D1)",
+   "kind": "commit-pair",
+   "rule": "ws-coverage-matrix --write-baseline pin-new-only (I1), never a --red-from row (I2), verdict before the pin (I3); the fold (I5)",
+   "browser": false,
+   "fail": { "commit": "53f46e10", "state": "graded by critic r3: a slice night re-pins a regressed pilot row and reports it OK; a later slice file pins a re-selected red row and the re-run lists it OK" },
+   "pass": { "commit": "a5297660", "state": "fix round 3: both keep the row RED in the run file and the fold" },
+   "command": "node tests/fixtures/precritic/baseline-night.cjs --root {root}",
+   "expect": { "fail": "FAIL", "pass": "OK" }
+  },
+  {
    "id": "lone-item",
    "check": "Lone item / lone state on a page",
    "kind": "commit-pair",
