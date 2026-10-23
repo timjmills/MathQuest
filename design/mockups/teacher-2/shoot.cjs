@@ -30,7 +30,7 @@ const SIZES = { 1366: { width: 1366, height: 768 }, 1280: { width: 1280, height:
 // Every screen is CHECKED at all five widths (§2.9: no sideways scroll at 1366 / 1280 / 1024 / 820 / 390, nothing clipped
 // inside a panel, nothing hidden in a sideways strip). PNGs: the full set at 1366 and 390, light and dark; the middle
 // widths in light for the screens whose layout changes there (MID_SHOTS).
-const MID_SHOTS = new Set(['skills-tray', 'skills-tray6', 'lessons', 'lesson-panel', 'print-mixed', 'quiz', 'classes-progress', 'classes-quizzes', 'chip']);
+const MID_SHOTS = new Set(['skills-grade', 'tray-pop-open', 'print-grade', 'skills-tray', 'skills-tray6', 'lessons', 'lesson-panel', 'print-mixed', 'quiz', 'classes-progress', 'classes-quizzes', 'chip']);
 
 // name, label, url (relative to teacher-2/), primary at 1366?, full page too?, only these widths/themes?
 const SCREENS = [
@@ -68,6 +68,20 @@ const SCREENS = [
   ['classes-map', 'Classes: MAP tests', 'app.html?ctab=map#classes', true, false],
   ['classes-progress', 'Classes: Progress', 'app.html?ctab=progress#classes', false, false],
   ['profile', 'Profile menu', 'app.html#profile', false, false],
+  // fix round 3: big trays (owner 2026-10-23: 40–100+ skills, a whole grade)
+  ['skills-tray10', 'Skills, 10 skills: the summary bar', 'app.html?tray=demo10#skills', true, false],
+  ['skills-grade', 'Skills, a whole grade in the tray (Grade 3, 110 skills)', 'app.html?tray=grade3&grade=3#skills', true, false],
+  ['skills-grades', 'Skills, two whole grades in the tray (200 skills)', 'app.html?tray=grades2-3#skills', true, false],
+  ['tray-pop', 'The tray popup: by area, then grade (areas closed)', 'app.html?tray=grades2-3#tray', true, false],
+  ['tray-pop-open', 'The tray popup, every area open', 'app.html?tray=grades2-3&open=all#tray', true, false],
+  ['tray-pop-sel', 'The tray popup: a selection and the bulk bar', 'app.html?tray=grade3&open=NF&sel=g:NF|3#tray', true, false],
+  ['tray-pop-detailed', 'The tray popup, Detailed weights: Fractions held at 40 %', 'app.html?tray=grade3&open=NF&detailed=1&lockp=a:NF:40#tray', true, false],
+  ['tray-pop-50', 'Detailed: one skill held at 50 %, the rest split evenly', 'app.html?tray=demo64&pages=5&detailed=1&tq=within%201,000)&lockp=k:addition:add_wp_1k:50#tray', true, false],
+  ['print-grade', 'Print a whole grade: Mixed, every skill at least once', 'app.html?tray=grade3#print', true, false],
+  ['print-grade-single', 'Print a whole grade on Single skill: the warning', 'app.html?tray=grade3&kind=single#print', true, false],
+  ['print-grade-sections', 'Print a whole grade on Sections: one section per area', 'app.html?tray=grade3&kind=sections#print', true, false],
+  ['quiz-grade', 'Quiz from a whole grade: 20 questions, a sample', 'app.html?tray=grade3#quiz', true, false],
+  ['share-grade', 'Share a whole grade: the short grade code', 'app.html?tray=grade3#share', true, false],
 ];
 
 async function screenReport(page, w) {
@@ -211,16 +225,17 @@ async function runFlow(browser, base, f, w) {
     if (!state.found) { error = `no visible ${sel}`; break; }
     if (!state.inView) { scrolls++; actions++; await page.evaluate(() => document.querySelector('[data-flow-target]').scrollIntoView({ block: 'center' })); await page.waitForTimeout(50); }
     const loc = page.locator('[data-flow-target]');
-    if (a.type) await loc.fill(a.text); else await loc.click();
+    if (a.type) { await loc.fill(a.text); if (a.enter) await loc.press('Enter'); } else await loc.click();
     actions++;
     await page.waitForTimeout(60);
   }
-  const fin = await page.evaluate(() => ({ last: window.MQ.S.last, sheet: window.MQ.S.sheet, kind: window.MQ.plan().k }));
+  const fin = await page.evaluate((chk) => ({ last: window.MQ.S.last, sheet: window.MQ.S.sheet, kind: window.MQ.plan().k, check: chk ? !!eval(chk) : true }), f.check || null);
   const steps = Math.max(...acts.map(a => a.step));
   const maxPlan = Math.max(...String(w < 820 && f.narrowPlan ? f.narrowPlan : f.plan.actions).match(/\d+/g).map(Number));
   if (!error && f.done && fin.last !== f.done) error = `ended with ${fin.last}, wanted ${f.done}`;
   if (!error && f.doneSheet && fin.sheet !== f.doneSheet) error = `ended on ${fin.sheet}, wanted ${f.doneSheet}`;
   if (!error && f.expectKind && fin.kind !== f.expectKind) error = `kind ${fin.kind}, wanted ${f.expectKind}`;
+  if (!error && !fin.check) error = `end state wrong (${f.check.slice(0, 60)})`;
   if (!error && actions > maxPlan) error = `${actions} actions > plan ${f.plan.actions}`;
   if (!error && steps > 4) error = `${steps} steps > 4`;
   if (!error && errors.length) error = errors.join('; ');
@@ -286,7 +301,7 @@ async function runFlow(browser, base, f, w) {
           const t = document.querySelector('.tray'); const tr = t.getBoundingClientRect();
           const chips = [...t.querySelectorAll('.chip')].filter(c => c.getBoundingClientRect().width && getComputedStyle(c).visibility !== 'hidden');
           const rows = new Set(chips.map(c => Math.round(c.getBoundingClientRect().top))).size;
-          const summary = !!t.querySelector('.tray-summary') && t.querySelector('.tray-summary').getBoundingClientRect().width > 0;
+          const summary = [...t.querySelectorAll('.tray-summary')].some(x => x.getBoundingClientRect().width > 0);
           return { h: Math.round(tr.height), rows, chips: chips.length, summary };
         }, n);
         const lim = Math.min(w >= 1100 ? 96 : 120, SIZES[w].height * 0.15); const bad = [];
@@ -303,23 +318,34 @@ async function runFlow(browser, base, f, w) {
     // counts, and no item repeats on a page — for Print and Quiz, Mixed / Single / Sections, at several weight settings.
     if (!ONLY || ONLY.includes('preview')) {
       const page = await browser.newPage({ viewport: SIZES[1366] });
+      // weights are numbers (Less · Equal · More = 1 · 2 · 3, Detailed 0–10); locks are target %s on a skill, grade or area
+      const AF = 'addition:add_facts', TH = 'measurement:time_hour', SF = 'fractions:shade_fraction';
       const cases = [
         ['print equal', 'app.html?tray=demo3x#print', {}],
-        ['print add=More', 'app.html?tray=demo3x#print', { 'addition:add_facts': 'more' }],
-        ['print time=Less, shade=More', 'app.html?tray=demo3x#print', { 'measurement:time_hour': 'less', 'fractions:shade_fraction': 'more' }],
-        ['print 2 pages', 'app.html?tray=demo3x&pages=2#print', { 'addition:add_facts': 'more' }],
+        ['print add=More', 'app.html?tray=demo3x#print', { w: { [AF]: 3 } }],
+        ['print time=Less, shade=More', 'app.html?tray=demo3x#print', { w: { [TH]: 1, [SF]: 3 } }],
+        ['print 2 pages', 'app.html?tray=demo3x&pages=2#print', { w: { [AF]: 3 } }],
         ['print single, 3 skills', 'app.html?tray=demo3x&kind=single#print', {}],
-        ['print sections', 'app.html?tray=demo3x&kind=sections#print', { 'measurement:time_hour': 'more' }],
+        ['print sections', 'app.html?tray=demo3x&kind=sections#print', { w: { [TH]: 3 } }],
         ['quiz equal', 'app.html?tray=demo3#quiz', {}],
-        ['quiz add=More', 'app.html?tray=demo3#quiz', { 'addition:add_word_problems': 'more' }],
+        ['quiz add=More', 'app.html?tray=demo3#quiz', { w: { 'addition:add_word_problems': 3 } }],
         ['print 10 skills', 'app.html?tray=demo10#print', {}],
         ['print a whole grade', 'app.html?tray=grade3#print', {}],
+        ['quiz a whole grade', 'app.html?tray=grade3#quiz', {}],
+        ['detailed: a weight 0', 'app.html?tray=demo3x#print', { w: { [TH]: 0, [AF]: 7 } }],
+        ['detailed: shade held at 50 %', 'app.html?tray=demo3x&pages=2#print', { lock: { ['k:' + SF]: 50 } }],
+        ['detailed: Fractions 40 % of grade 3', 'app.html?tray=grade3#print', { lock: { 'a:NF': 40 }, w: { 'measurement:time_hour': 0 } }],
+        ['detailed: a grade held + a skill', 'app.html?tray=grades2-3#print', { lock: { 'g:OA|2': 30, 'k:FIRST': 10, 'k:LAST': 5 } }],
       ];
-      for (const [label, url, weights] of cases) {
+      for (const [label, url, set] of cases) {
         await page.goto(`${base}/design/mockups/teacher-2/${url}`, { waitUntil: 'networkidle' });
-        const r = await page.evaluate((weights) => {
-          const M = window.MQ; Object.assign(M.S.weights, weights); M.render();
-          const p = M.plan(); const bad = [];
+        const r = await page.evaluate((set) => {
+          const M = window.MQ; const fix = (o) => Object.fromEntries(Object.entries(o || {}).map(([k, v]) => [k.replace('FIRST', M.S.tray[0]).replace('LAST', M.S.tray[M.S.tray.length - 1]), v]));
+          set = { w: fix(set.w), lock: fix(set.lock) }; Object.assign(M.S.w, set.w); Object.assign(M.S.lock, set.lock); M.render();
+          const p = M.plan(M.S.sheet === 'quiz'); const bad = [];
+          if (p.errs && p.errs.length) bad.push('locks refused: ' + p.errs[0]);
+          for (const [k, w] of Object.entries(set.w || {})) if (w === 0 && p.byKey[k]) bad.push(`${k} has weight 0 but ${p.byKey[k]} problems`);
+          for (const [sc, v] of Object.entries(set.lock || {})) { const ks = M.S.tray.filter(k => sc.startsWith('k:') ? k === sc.slice(2) : sc.startsWith('a:') ? MQ_DATA.skills.find(s => s.c + ':' + s.v === k).a === sc.slice(2) : (s => s.a + '|' + s.g)(MQ_DATA.skills.find(s => s.c + ':' + s.v === k)) === sc.slice(2)); const got = ks.reduce((t, k) => t + (p.byKey[k] || 0), 0); if (Math.abs(got - p.total * v / 100) > 1) bad.push(`${sc} held at ${v} % gets ${got} of ${p.total}`); }
           if (!p.perPage) return { bad: ['plan() has no perPage'] };
           const tot = {}; p.perPage.forEach(pg => Object.entries(pg).forEach(([k, n]) => { tot[k] = (tot[k] || 0) + n; }));
           M.S.tray.forEach((k, i) => { if ((tot[k] || 0) !== p.counts[i]) bad.push(`pages add up to ${tot[k] || 0} of ${k}, summary says ${p.counts[i]}`); });
@@ -332,10 +358,26 @@ async function runFlow(browser, base, f, w) {
             const seen = new Set(); for (const c of cells) { const h = c.innerHTML; if (seen.has(h)) { bad.push(`page ${i + 1}: the same item twice`); break; } seen.add(h); }
           });
           const line = document.querySelector('[data-summary]'); const txt = line ? line.textContent : '';
+          if (!txt.includes(`${p.total} ${M.S.sheet === 'quiz' ? 'questions' : 'problems'}`)) bad.push(`summary “${txt.slice(0, 60)}” does not say ${p.total}`);
           return { bad, txt: txt.slice(0, 140) };
-        }, weights);
+        }, set);
         if (r.bad.length) failed++;
-        console.log(`${r.bad.length ? 'FAIL' : 'ok  '} preview = summary: ${label.padEnd(28)} ${r.bad.slice(0, 3).join('; ')}${r.bad.length > 3 ? ` (+${r.bad.length - 3})` : ''}`);
+        console.log(`${r.bad.length ? 'FAIL' : 'ok  '} preview = summary: ${label.padEnd(36)} ${r.bad.slice(0, 3).join('; ')}${r.bad.length > 3 ? ` (+${r.bad.length - 3})` : ''}`);
+      }
+      // the owner's case (2026-10-23): "I choose 1 problem type to be 50 % and the rest are evenly split with the remaining".
+      // 64 skills, one held at 50 % on a 40-problem page set → 20, the other 20 as even as rounding allows (each 0 or 1);
+      // 5 skills, one at 50 % → 20, then 5 · 5 · 5 · 5.
+      for (const [n, want] of [[64, 'one 20, the rest 0 or 1'], [5, '20 · 5 · 5 · 5 · 5']]) {
+        await page.goto(`${base}/design/mockups/teacher-2/app.html?tray=demo${n}&pages=5&kind=mixed#print`, { waitUntil: 'networkidle' });
+        const r = await page.evaluate(() => {
+          const M = window.MQ; const k0 = M.S.tray[0]; M.S.opts.pages = 5; M.setLock('k:' + k0, 50); M.render(); const p = M.plan();
+          const rest = M.S.tray.slice(1).map(k => p.byKey[k] || 0);
+          const cells = [...document.querySelectorAll('.previews .page-cell')].length;
+          return { n: M.S.tray.length, total: p.total, first: p.byKey[k0], max: Math.max(...rest), min: Math.min(...rest), sum: rest.reduce((a, b) => a + b, 0), cells, line: document.querySelector('[data-summary]').textContent };
+        });
+        const ok = r.total === 40 && r.first === 20 && r.sum === 20 && r.max - r.min <= 1 && (n !== 5 || (r.min === 5 && r.max === 5));
+        if (!ok) failed++;
+        console.log(`${ok ? 'ok  ' : 'FAIL'} 50 % case, ${r.n} skills on ${r.total}: held skill ${r.first}, the rest ${r.min}–${r.max} (sum ${r.sum})   want ${want}`);
       }
       await page.close();
     }

@@ -39,10 +39,29 @@
       actions: [{ click: '[data-act="browse"][data-arg="sets"]', step: 1, say: 'Browse by My sets' }, { click: '[data-act="openset"][data-arg="0"]', step: 2, say: 'Open the set' }, { click: '[data-act="tray-print"]', step: 3, say: 'Print' }, { click: '[data-act="sheet-print"]', step: 3, say: 'Print' }] },
     { id: 'chip-options', task: 'Change one skill’s options', plan: { steps: 1, actions: '1', today: 'buried per screen' }, start: 'tray=demo3', doneSheet: 'chip',
       actions: [{ click: '.tray-chips [data-act="chip"], .tray-count', step: 1, say: 'Tap its chip in the tray' }] },
+    // fix round 3 (owner 2026-10-23): a whole grade, a big tray, and its weights
+    { id: 'grade-paper', task: 'Practise a whole grade on paper', plan: { steps: 3, actions: '≤ 4', today: 'not possible' }, start: 'grade=3', done: 'print', expectKind: 'mixed',
+      check: 'MQ.S.tray.length > 60',
+      actions: [{ click: '[data-act="addgrade"]', step: 1, say: 'Add whole grade (Grade 3: one of each skill)' }, { click: '[data-act="tray-print"]', step: 2, say: 'Print in the tray (Mixed practice, every skill at least once)' }, { click: '[data-act="sheet-print"]', step: 3, say: 'Print' }] },
+    { id: 'grade-share', task: 'Share a whole grade', plan: { steps: 3, actions: '≤ 4', today: 'not possible' }, start: 'grade=3', done: 'copy',
+      check: '/G3-ALL/.test(document.body.innerText) || MQ.S.last === "copy"',
+      actions: [{ click: '[data-act="addgrade"]', step: 1, say: 'Add whole grade' }, { click: '[data-act="tray-share"]', step: 2, say: 'Share: the short grade code' }, { click: '[data-act="copy"]', step: 3, say: 'Copy the link' }] },
+    { id: 'grade-remove', task: 'Remove one grade from a big tray', plan: { steps: 2, actions: '≤ 3', today: 'one by one' }, start: 'tray=grades2-3',
+      check: 'MQ.S.tray.length > 0 && MQ.S.tray.every(k => MQ_DATA.skills.find(s => s.c + ":" + s.v === k).g !== "2")',
+      actions: [{ click: '.tray-label-btn, .tray-count', step: 1, say: 'Open the tray' }, { click: '[data-act="tpremove"][data-arg="r:2"]', step: 2, say: 'Remove Grade 2' }] },
+    { id: 'grade-more', task: 'Make one grade come up more often in a big tray', plan: { steps: 2, actions: '≤ 3', today: 'not possible' }, start: 'tray=grades2-3',
+      check: 'MQ.S.tray.filter(k => { const s = MQ_DATA.skills.find(x => x.c + ":" + x.v === k); return s.a === "OA" && s.g === "2"; }).every(k => MQ.S.w[k] === 3)',
+      actions: [{ click: '.tray-label-btn, .tray-count', step: 1, say: 'Open the tray' }, { click: '[data-act="tpcol"][data-arg="OA"]', step: 1, say: 'Open Operations' }, { click: '[data-act="hw"][data-arg="g:OA|2|3"]', step: 2, say: 'Grade 2 · How often: More' }] },
+    { id: 'area-40', task: 'Give Fractions 40 % of a whole-grade worksheet', plan: { steps: 3, actions: '≤ 4', today: 'not possible' }, start: 'tray=grade3', doneSheet: 'print',
+      check: 'Math.abs(MQ.S.tray.filter(k => MQ_DATA.skills.find(s => s.c + ":" + s.v === k).a === "NF").reduce((t, k) => t + (MQ.plan().byKey[k] || 0), 0) - 0.4 * MQ.plan().total) <= 1',
+      actions: [{ click: '.tray-label-btn, .tray-count', step: 1, say: 'Open the tray' }, { click: '[data-act="detailed"]', step: 1, say: 'Detailed weights' }, { type: 'input.pct[data-scope="a:NF"]', text: '40', enter: true, step: 2, say: 'Fractions: 40 % (the other areas share the rest)' }, { click: '.traypop [data-act="tray-print"]', step: 3, say: 'Print: the summary and the preview follow it' }] },
+    { id: 'skill-50', task: 'One skill 50 %, the rest split evenly', plan: { steps: 2, actions: '≤ 4', today: 'not possible' }, start: 'tray=demo64&pages=5',
+      check: '(() => { const p = MQ.plan(); const k = "addition:add_wp_1k"; const r = MQ.S.tray.filter(x => x !== k).map(x => p.byKey[x] || 0); return MQ.S.lock["k:" + k] === 50 && p.byKey[k] === Math.round(p.total / 2) && Math.max(...r) - Math.min(...r) <= 1; })()',
+      actions: [{ click: '.tray-label-btn, .tray-count', step: 1, say: 'Open the tray' }, { click: '[data-act="detailed"]', step: 1, say: 'Detailed weights' }, { type: '#tsearch', text: 'within 1,000)', step: 2, say: 'Find the skill' }, { type: 'input.pct[data-scope="k:addition:add_wp_1k"]', text: '50', enter: true, step: 2, say: '50 %: it is held, the rest share 50 % evenly' }] },
   ];
   // the narrow (390) chip flow opens the collapsed tray first: the count bar is one tap, then the chip
   Object.assign(FLOWS.find(f => f.id === 'chip-options'), { narrowPlan: '2', narrowNote: 'On a phone the tray is collapsed to “3 skills ▸” (§2.3), so a chip is two taps away' });
-  FLOWS.find(f => f.id === 'chip-options').narrow = [{ click: '.tray-count', step: 1, say: 'Tap “3 skills ▸”' }, { click: '.tray-sheet [data-act="chip"]', step: 1, say: 'Tap the chip' }];
+  FLOWS.find(f => f.id === 'chip-options').narrow = [{ click: '.tray-count', step: 1, say: 'Tap “3 skills ▸”' }, { click: '.traypop [data-act="chip"]', step: 1, say: 'Tap the skill' }];
   root.MQ_FLOWS = FLOWS;
   if (typeof module !== 'undefined' && module.exports) module.exports = FLOWS;
 })(typeof window !== 'undefined' ? window : globalThis);
