@@ -51,7 +51,7 @@
 
   /* board C: eight maths areas x four strengths (+ the text colour on bold) */
   --cc-tint: #F6EEEB; --cc-soft: #EDDCE2; --cc-bold: #CD9CC3; --cc-on: #1A1614; --cc-deep: #644C60;
-  --oa-tint: #EBE1E8; --oa-soft: #CBB6DB; --oa-bold: #5B1FAB; --oa-on: #FBF7EF; --oa-deep: #441780;
+  --oa-tint: #E6E3E2; --oa-soft: #BDBAC9; --oa-bold: #2E2B71; --oa-on: #FBF7EF; --oa-deep: #222055;
   --nbt-tint: #F9F3E2; --nbt-soft: #F5EBC7; --nbt-bold: #E7CF69; --nbt-on: #1A1614; --nbt-deep: #5C532A;
   --nf-tint: #EFE4E1; --nf-soft: #D6C0C5; --nf-bold: #7F3E63; --nf-on: #FBF7EF; --nf-deep: #5F2E4A;
   --meas-tint: #F3F3E8; --meas-soft: #E2EBDA; --meas-bold: #A9CFAA; --meas-on: #1A1614; --meas-deep: #475747;
@@ -79,7 +79,7 @@
   --scrim: rgba(0, 0, 0, 0.70);
 
   --cc-tint: #31282D; --cc-soft: #5B4755; --cc-deep: #E4CAD9;
-  --oa-tint: #1D1129; --oa-soft: #2D154C; --oa-deep: #B396D0;
+  --oa-tint: #15131E; --oa-soft: #1B1A34; --oa-deep: #A19DB8;
   --nbt-tint: #36311D; --nbt-soft: #655B31; --nbt-deep: #F1E3AC;
   --nf-tint: #23171C; --nf-soft: #3C212F; --nf-deep: #BE9CAA;
   --meas-tint: #2B3128; --meas-soft: #4D5B4B; --meas-deep: #D2E3CC;

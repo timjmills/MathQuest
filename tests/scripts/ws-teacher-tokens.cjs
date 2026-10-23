@@ -93,7 +93,7 @@ function ramp(b) { const dTint = mix(b, DARK, 0.18); return { tint: mix(b, CREAM
 // (design/mockups/teacher-2/palette/board-c-search.py). [key, css prefix, name, tint, soft, bold, deep, dark light version]
 const PLAN = [
   ['CC', 'cc', 'Counting & cardinality (mauve)', '#F6EEEB', '#EDDCE2', '#CD9CC3', '#644C60', '#E4CAD9'],
-  ['OA', 'oa', 'Operations & algebraic thinking (deep violet)', '#EBE1E8', '#CBB6DB', '#5B1FAB', '#441780', '#B396D0'],
+  ['OA', 'oa', 'Operations & algebraic thinking (dusty ink-indigo; fix round 1 muted it from violet #5B1FAB)', '#E6E3E2', '#BDBAC9', '#2E2B71', '#222055', '#A19DB8'],
   ['NBT', 'nbt', 'Number & operations in base ten (gold)', '#F9F3E2', '#F5EBC7', '#E7CF69', '#5C532A', '#F1E3AC'],
   ['NF', 'nf', 'Fractions & decimals (plum)', '#EFE4E1', '#D6C0C5', '#7F3E63', '#5F2E4A', '#BE9CAA'],
   ['MEAS', 'meas', 'Measurement (sage)', '#F3F3E8', '#E2EBDA', '#A9CFAA', '#475747', '#D2E3CC'],

@@ -61,3 +61,4 @@ img.board { max-width: 100%; border: var(--line-1) solid var(--line); border-rad
 th { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; }
 .tile b, .shot b { font-family: var(--font-display); font-weight: var(--fw-500); font-synthesis: none; }
 .tile, .shot { border-radius: 0; background: var(--surface); }
+.doc-wide { max-width: 1400px; }

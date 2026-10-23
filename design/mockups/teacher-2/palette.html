@@ -46,7 +46,7 @@
 <script>
 (function () {
   const C = window.MQColour;
-  const A = [['CC', 'Counting & cardinality', '#CD9CC3'], ['OA', 'Operations & algebra', '#5B1FAB'], ['NBT', 'Place value & base ten', '#E7CF69'], ['NF', 'Fractions & decimals', '#7F3E63'],
+  const A = [['CC', 'Counting & cardinality', '#CD9CC3'], ['OA', 'Operations & algebra', '#2E2B71'], ['NBT', 'Place value & base ten', '#E7CF69'], ['NF', 'Fractions & decimals', '#7F3E63'],
     ['MEAS', 'Measurement', '#A9CFAA'], ['DATA', 'Data', '#486E9C'], ['G', 'Geometry', '#278E8D'], ['RPNS', 'Ratio & number system', '#D8A480']];
   const SLATE = ['SLATE', 'Stone: Mixed · Words · No standard', '#57534E'];
   const FROM = { CC: ['mauve', '#C291B8'], OA: ['deep violet', '#6A1B9A'], NBT: ['gold', '#F6C96A'], NF: ['plum', '#8E5480'], MEAS: ['sage', '#9AB88B'], DATA: ['blue', '#3D6491'], G: ['teal', '#00838F'], RPNS: ['peach', '#F2C8A0'] };
@@ -73,7 +73,7 @@
   let ch = '';
   for (const dark of [false, true]) {
     ch += `<div style="background:${dark ? C.DARK : C.CREAM};padding:16px;border-radius:16px;display:flex;flex-wrap:wrap;gap:12px;margin-bottom:8px;border:1px solid #CFC5B8">`;
-    for (const [k, n, b] of A.slice(0, 4).concat([['MEAS', 'Measurement', '#6EE7B7'], SLATE])) { const r = C.ramp(b); const nm = k === 'SLATE' ? 'Mixed' : n.split(' ')[0]; ch += chip(r, nm, 'soft', dark) + chip(r, nm, 'bold', dark) + chip(r, nm, 'selected', dark); }
+    for (const [k, n, b] of A.slice(0, 4).concat([['MEAS', 'Measurement', '#A9CFAA'], SLATE])) { const r = C.ramp(b); const nm = k === 'SLATE' ? 'Mixed' : n.split(' ')[0]; ch += chip(r, nm, 'soft', dark) + chip(r, nm, 'bold', dark) + chip(r, nm, 'selected', dark); }
     ch += '</div>';
   }
   document.getElementById('chips').innerHTML = ch + '<p class="note">Each area: at rest (soft) · in the tray (bold) · selected (bold + ✓ + ring).</p>';
