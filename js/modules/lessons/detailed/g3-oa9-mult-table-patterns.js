@@ -281,7 +281,7 @@ export default {
         { n: 10, name: 'Plenary and exit slip', min: 5, page: 'P6',
             rows: [
                 { say: 'If one number is even, the product is even.', note: 'The Remember line. Say it twice.' },
-                { do: 'Hand out the exit slip. No help. Sort by the boxes ticked.', note: 'a. [[{exit.0.shaded}]] · b. [[{exit.1.shaded}]] · c. [[{exit.2.shaded}]].' },
+                { do: 'Hand out the exit slip. No help. Sort by the boxes ticked.', note: '1. [[{exit.0.shaded}]] · 2. [[{exit.1.shaded}]] · 3. [[{exit.2.shaded}]].' },
                 { say: 'Tomorrow we use rules to make number patterns.' },
             ] },
     ],

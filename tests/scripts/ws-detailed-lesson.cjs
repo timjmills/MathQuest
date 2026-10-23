@@ -632,7 +632,7 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
             const m = all.match(new RegExp(`Section ${num} ·([\\s\\S]*?)(?=Section \\d|Prerequisite routing:|$)`)); return m ? m[1] : ''; };
         const claims = (text, id) => {
             const cs = cellsOf(id);
-            for (const m of text.matchAll(/(?:^|[\s:·;])([a-h])\. ([0-9][0-9 +|,a-z]*?)(?= ·|\.(?:\s|$)|;)/g)) {
+            for (const m of text.matchAll(/(?:^|[\s:·;])([a-h]|[1-9][0-9]?)\. ([0-9][0-9 +|,a-z]*?)(?= ·|\.(?:\s|$)|;)/g)) {
                 n++;
                 const c = cs.find((x) => x.letter === m[1]);
                 if (!c) probs.push(`${id} has no item ${m[1]}`);
@@ -649,6 +649,11 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
             n++;
             const lo = m[1].charCodeAt(0), hi = (m[2] || m[1]).charCodeAt(0);
             for (let k = lo; k <= hi; k++) if (!p0.includes(String.fromCharCode(k))) probs.push(`routing names ${String.fromCharCode(k)}, P0 has no such item`);
+        }
+        // CL-11a (owner, 2026-10-23): items are number tabs - "1–4." ranges are checked the same way.
+        for (const m of rt.matchAll(/(?:^|[\s:·;(])([1-9][0-9]?)(?:–([1-9][0-9]?))?\. /g)) {
+            n++;
+            for (let k = Number(m[1]); k <= Number(m[2] || m[1]); k++) if (!p0.includes(String(k))) probs.push(`routing names ${k}, P0 has no such item`);
         }
         // (lesson 5 r4, critic r2 D7: T6's P5 glance row - every number it prints is a key mark of the P5 key)
         { const gl = (t6.match(/P5 Word problem\s+([^★]*)★/) || [])[1] || '';

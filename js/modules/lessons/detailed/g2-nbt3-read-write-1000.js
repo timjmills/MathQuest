@@ -329,7 +329,7 @@ export default {
         { n: 10, name: 'Plenary and exit slip', min: 4, page: 'P6',
             rows: [
                 { say: 'Every place gets a part.', note: 'Say the chant together twice.' },
-                { do: 'Hand out the exit slip. No help. Then sort the slips by the boxes ticked.', note: 'a. [[{exit.0.ans}]] · b. [[{exit.1.ans}]] · c. [[{exit.2.ans}]] · d. [[{exit.3.ans}]].' },
+                { do: 'Hand out the exit slip. No help. Then sort the slips by the boxes ticked.', note: '1. [[{exit.0.ans}]] · 2. [[{exit.1.ans}]] · 3. [[{exit.2.ans}]] · 4. [[{exit.3.ans}]].' },
             ] },
     ],
     transitionsMin: 4,
