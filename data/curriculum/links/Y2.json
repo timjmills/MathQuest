@@ -1820,6 +1820,11 @@
     {
      "key": "addition:number_line_add",
      "missing": "within 20 only, not ones added to a 2-digit number"
+    },
+    {
+     "key": "subtraction:sub_2d_1d",
+     "missing": "the subtracting half only (34 − 3); adding ones (34 + 3) is not dealt",
+     "opts": {}
     }
    ],
    "verdict": "partial",
@@ -2507,6 +2512,11 @@
      "key": "number_sense:between_tens",
      "why": "which two tens a number sits between",
      "opts": {}
+    },
+    {
+     "key": "subtraction:sub_2d_1d",
+     "why": "the same 2-digit − 1-digit subtraction without crossing a ten (Y2.B2.S5)",
+     "opts": {}
     }
    ],
    "note": ""
@@ -2886,6 +2896,11 @@
    "missing": "",
    "build": [],
    "pre": [
+    {
+     "key": "subtraction:sub_2d_1d",
+     "why": "Y2.B2.S5 Add and subtract 1s (the step before): a 1-digit number taken from a 2-digit one in columns, no ten crossed",
+     "opts": {}
+    },
     {
      "key": "subtraction:sub_50_no_regroup",
      "why": "subtracting within 50 without an exchange, the smaller band first",

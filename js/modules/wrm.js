@@ -277,6 +277,8 @@ export const SKILL_WRM = {
         { step: 'Y3.B2.S8', partial: 'subtracting ones across a ten mentally (43 − 5)' },
     ],
     'subtraction:sub_100_no_regroup': ['Y2.B2.S17'],
+    // SU-C pilot preset (2-digit − 1-digit, no ten crossed): the subtracting half of "Add and subtract 1s"
+    'subtraction:sub_2d_1d': [{ step: 'Y2.B2.S5', partial: 'the subtracting half only (34 − 3); adding ones is not dealt' }],
     'subtraction:sub_100_regroup': ['Y2.B2.S12', 'Y2.B2.S18'],
     'subtraction:sub_1k_no_regroup': ['Y3.B2.S12'],
     'subtraction:sub_1k_regroup': ['Y3.B2.S15', 'Y3.B2.S16'],
