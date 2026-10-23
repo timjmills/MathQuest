@@ -657,7 +657,7 @@ table.t th { color: var(--text-2); font-size: var(--fs-12); }
 .tray-label { display: grid; gap: 0; align-content: center; min-width: 0; flex: none; max-width: 200px; }
 .tray-label b { font-size: var(--fs-16); }
 .tray-label > span { font-size: var(--fs-14); }
-.tray-key { display: flex; flex-wrap: wrap; gap: 0 var(--sp-8); font-size: var(--fs-12); text-transform: none; letter-spacing: 0; }
+.tray-key { display: flex; flex-wrap: nowrap; gap: 0 var(--sp-8); font-size: var(--fs-12); text-transform: none; letter-spacing: 0; }
 .tray-key > span, .chip-legend > span { display: inline-flex; align-items: center; gap: var(--sp-4); color: var(--a-deep); font-family: var(--font-mono); font-weight: var(--fw-700); font-size: var(--fs-12); text-transform: uppercase; }
 .tray-key .icon, .chip-legend .icon { width: var(--fs-14); height: var(--fs-14); }
 .tray-chips { flex: 1 1 0; flex-wrap: nowrap; overflow: hidden; align-items: center; padding: var(--sp-4); min-width: 0; }
@@ -786,3 +786,18 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; a
 .card[data-domain="MIXED"], .card[data-domain="WORDS"], .card[data-domain="NOSTD"] { border-style: dashed; }
 /* critic r3 A4: in dark mode the lesson panel header is the dark tint with a bold edge, so it never outshines the primary */
 :root[data-theme="dark"] .panel-band { background: var(--a-tint); color: var(--text); border-left: var(--sp-8) solid var(--a-bold); border-bottom: var(--line-2) solid var(--a-bold); }
+.opt-stack { display: grid; gap: var(--sp-8); justify-items: start; min-width: 0; } .opt-stack .area-weights { justify-self: stretch; }
+/* the popup's header on a phone: search, Detailed weights and "View and more" (the view, expand, clear tray, the rest rule
+   and the grades row open under it), so the areas start high on the screen; a closed area keeps only its name and % */
+.tp-more-btn { display: none; }
+.tp-extra { display: contents; }
+.tp-rest.tp-extra, .tp-grades.tp-extra { display: flex; }
+@media (max-width: 819px) {
+  .tp-more-btn { display: inline-flex; }
+  .tp-extra, .tp-rest.tp-extra, .tp-grades.tp-extra { display: none; }
+  .tp-extra.open { display: flex; flex-wrap: wrap; gap: var(--sp-8); flex-basis: 100%; }
+  .tp-area.collapsed .tp-ctl .seg, .tp-area.collapsed .tp-ctl .tag, .tp-area.collapsed .tp-ctl .btn-text { display: none; }
+  .tp-ahead .tp-toggle { flex-basis: 160px; }
+}
+@media (max-width: 819px) { .block-row { flex-wrap: nowrap; margin: var(--sp-8) 0 var(--sp-4); } .block-row .btn-add { flex: none; padding: 0 var(--sp-8); } }
+@media (max-width: 819px) { .traypop .tp-foot { margin-top: auto; } }

@@ -241,7 +241,7 @@
       return { line: `${pg} · ${p.total} ${isQuiz ? 'questions' : 'problems'} · ${plural(areas.length, 'area')} · ${cover}${left}${pts}${ver}`,
         more: areas.map(x => `${AREAS[x.a].short} ${x.ks.reduce((t, k) => t + (p.byKey[k] || 0), 0)}`).join(', ') + ' · answer key at the end' };
     }
-    const names = S.tray.map((s, i) => `${short(SK[s].l)} ${wOf(s) ? '≈ ' + p.counts[i] : '(left out)'}`).join(', ');
+    const names = S.tray.map((s, i) => `${short(SK[s].l)} ${wOf(s) ? (anyLock() || S.detailed ? '≈ ' : '') + p.counts[i] : '(left out)'}`).join(', ');
     return {
       line: `${pg} · ${p.total} ${isQuiz ? 'questions' : 'problems'}${pts} · answer key at the end${left}${ver}`,
       more: (S.tray.length > 1 ? names : short(SK[S.tray[0]].l)) + (p.added ? ` · pages added so every skill comes up at least twice` : ''),
@@ -279,6 +279,7 @@
     for (const [box, chips] of stacks) {
       if (!chips.some(c => c.dataset.cut)) continue;
       chips.forEach(c => c.classList.add('compact'));
+      if (chips.length < 2) continue;   // one chip (a table cell): its row names the skill; no legend needed
       const as = [...new Set(chips.map(c => c.dataset.domain))];
       const lg = document.createElement('span'); lg.className = 'chip-legend';
       lg.innerHTML = as.map(a => `<span data-domain="${a}">${icon(AREAS[a].icon)}${AREAS[a].short}</span>`).join('');
@@ -398,7 +399,7 @@
     const n = S.tray.length; const dis = n ? '' : 'disabled aria-disabled="true"';
     const label = n ? plural(n, 'skill') : 'Empty';
     const areas = areasOf(S.tray);
-    const legend = `<span class="tray-key">${areas.map(x => `<span data-domain="${x.a}">${icon(AREAS[x.a].icon)}${AREAS[x.a].short}</span>`).join('')}</span>`;
+    const legend = `<span class="tray-key" title="${esc(areas.map(x => AREAS[x.a].name).join(' · '))}">${areas.map(x => `<span data-domain="${x.a}">${icon(AREAS[x.a].icon)}${areas.length > 1 ? ABBR[x.a] : AREAS[x.a].short}</span>`).join('')}</span>`;
     let mid;
     if (!n) mid = `<div class="tray-empty">Tick skills to put them here. Quiz can also start from a standard, a White Rose step or a lesson.</div>`;
     // the bar follows the tray's view (owner 2026-10-23): List = one line of names, Chips = chips, Thumbnails = mini pictures
@@ -409,7 +410,7 @@
     const gs = gradesOf(S.tray).map(x => x.g);
     return `<div class="tray ${big() ? 'tray-big' : ''}" role="region" aria-label="Tray">` +
       (big() ? `<button class="tray-label tray-label-btn" data-act="trayopen"><b>Tray</b><span>${esc(gs.length === 1 ? gradeName(gs[0]) : gs.length === 2 ? `Grades ${gs[0]}–${gs[1]}` : plural(gs.length, 'grade'))}</span><span>${label} · ${plural(areas.length, 'area')} ▸</span></button>`
-        : `<div class="tray-label"><b>Tray</b><span>${label}</span>${n ? legend : ''}</div>`) + mid +
+        : `<div class="tray-label"><b>Tray</b><span>${label}</span>${n && areas.length <= 3 ? legend : ''}</div>`) + mid +
       `<button class="btn tray-count ${big() ? 'tray-summary' : ''}" data-act="trayopen">${n ? `${label} ▸` : 'Tray empty'}</button>` +
       `<div class="tray-actions">${n ? '' : '<span class="tray-hint">Tick skills first</span>'}` +
       `<button class="btn" data-act="tray-quiz">${icon('quiz')}Quiz</button>` +
@@ -465,14 +466,14 @@
       const tags = `<span class="tp-tags">${changed ? '<span class="tag">changed</span>' : ''}${w !== 2 || locked ? `<span class="tag tag-w">${locked ? Math.round(S.lock['k:' + k]) + ' %' : wWord(w)}</span>` : ''}</span>`;
       const detail = det ? `<span class="tp-det"><span class="stepper stepper-sm"><button data-act="wstep" data-arg="${esc(k)}|-1" aria-label="Less weight" ${w <= 0 ? 'disabled' : ''}>−</button><output>${w}</output><button data-act="wstep" data-arg="${esc(k)}|1" aria-label="More weight" ${w >= 10 ? 'disabled' : ''}>+</button></span>${pctCtl('k:' + k, p.pct[k] || 0)}<span class="tp-share">≈ ${p.byKey[k] || 0} of ${p.total}</span></span>` : '';
       const x = `<button class="btn icon-btn" data-act="tpremove" data-arg="k:${esc(k)}" aria-label="Take ${esc(short(s.l))} out of the tray">${icon('close')}</button>`;
-      if (S.tview === 'chips') return `<div class="tp-item tp-chipitem ${w === 0 ? 'out' : ''}">${selBox('k:' + k, s.l)}${chipHTML(k)}${tags}${detail}${x}</div>`;
+      if (S.tview === 'chips') return `<div class="tp-item tp-chipitem ${w === 0 ? 'out' : ''}">${selBox('k:' + k, s.l)}${chipHTML(k, { legend: true, dot: true })}${tags}${detail}${x}</div>`;
       if (S.tview === 'thumbs') return `<div class="tp-item tp-thumb ${w === 0 ? 'out' : ''}" data-domain="${s.a}"><div class="tp-thumb-top" data-grade-host>${gbadge(s.g)}<button class="tp-name" data-act="chip" data-arg="${esc(k)}">${esc(short(s.l))}</button></div><div class="thumb">${T.draw(s, 1, S.skillOpts[k])}</div><div class="tp-thumb-foot">${selBox('k:' + k, s.l)}${tags}${x}</div>${detail}</div>`;
       return `<div class="tp-row ${w === 0 ? 'out' : ''}" data-domain="${s.a}" data-grade-host>${gbadge(s.g)}${selBox('k:' + k, s.l)}<span class="tp-icon">${icon(AREAS[s.a].icon)}</span><button class="tp-name" data-act="chip" data-arg="${esc(k)}">${esc(s.l)}</button>${tags}${detail}${x}</div>`;
     };
     const body = areas.map(({ a, ks }) => {
       const vis = ks.filter(match); if (!vis.length) return '';
       const col = isCollapsed(a); const gs = gradesOf(ks);
-      return `<section class="tp-area" data-domain="${a}" id="tp-${a}"><div class="tp-ahead">${selBox('a:' + a, AREAS[a].name)}` +
+      return `<section class="tp-area ${col ? 'collapsed' : ''}" data-domain="${a}" id="tp-${a}"><div class="tp-ahead">${selBox('a:' + a, AREAS[a].name)}` +
         `<button class="tp-toggle" data-act="tpcol" data-arg="${a}" aria-expanded="${!col}">${icon(AREAS[a].icon)}<b>${AREAS[a].name}</b><span class="count">${plural(ks.length, 'skill')}${col && gs.length > 1 ? ' · ' + gs.map(g => `${g.g} ${g.ks.length}`).join(' · ') : ''}</span><span class="chev">${col ? '▸' : '▾'}</span></button>` +
         `<span class="tp-ctl">${howOften('a:' + a)}${det ? pctCtl('a:' + a, sumOf(ks)) + `<button class="btn btn-text" data-act="reseteq" data-arg="a:${a}">Reset to equal</button>` : `<span class="tp-p">${Math.round(sumOf(ks))} %</span>`}<button class="btn btn-text" data-act="tpremove" data-arg="a:${a}">Remove area</button></span></div>` +
         (col ? '' : gs.map(({ g, ks: gk }) => { const gv = gk.filter(match); if (!gv.length) return ''; const sc = 'g:' + a + '|' + g;
@@ -488,11 +489,12 @@
     const sm = summaryText(false);
     const head = `<div class="tp-tools"><label class="search search-small">${icon('search')}<span class="sr">Find a skill in the tray</span><input id="tsearch" type="search" placeholder="Find a skill in the tray" value="${esc(S.tq)}" data-act="tsearch"></label>` +
       `<button class="toggle" data-act="detailed" ${pressed(det)}><i></i>Detailed weights</button>` +
+      `<button class="btn tp-more-btn" data-act="tpmore" aria-expanded="${!!S.tpMore}">View and more ${S.tpMore ? '▴' : '▾'}</button><div class="tp-extra ${S.tpMore ? 'open' : ''}">` +
       `<div class="seg wrap tp-view" role="group" aria-label="View">${[['list', 'List'], ['chips', 'Chips'], ['thumbs', 'Thumbnails']].map(([v, l]) => `<button data-act="tview" data-arg="${v}" ${pressed(S.tview === v)}>${l}</button>`).join('')}</div>` +
       `<button class="btn btn-text" data-act="tpall" data-arg="${areas.some(x => isCollapsed(x.a)) ? 'open' : 'close'}">${areas.some(x => isCollapsed(x.a)) ? 'Expand all' : 'Collapse all'}</button>` +
-      `<button class="btn btn-text" data-act="trayclear">Clear tray</button></div>` +
-      (det ? `<div class="tp-rest"><span class="row-label">When you set a %, the rest</span>${seg('The rest', [['even', 'Split evenly'], ['prop', 'Keep proportions']], S.rest, 'rest')}<button class="btn btn-text" data-act="reseteq" data-arg="all">Reset all to equal</button><span class="note">Weight 0 leaves a skill out for now; Less · Equal · More = 1 · 2 · 3.</span></div>` : '') +
-      (grades.length > 1 ? `<div class="tp-grades"><span class="row-label">Grades</span>${grades.map(x => `<span class="tp-gchip" data-grade-host>${gbadge(x.g)}<span>${esc(gradeShort(x.g))} · ${x.ks.length}</span><button class="btn btn-text" data-act="tpremove" data-arg="r:${x.g}">Remove</button></span>`).join('')}</div>` : '') +
+      `<button class="btn btn-text" data-act="trayclear">Clear tray</button></div></div>` +
+      (det ? `<div class="tp-rest tp-extra ${S.tpMore ? 'open' : ''}"><span class="row-label">When you set a %, the rest</span>${seg('The rest', [['even', 'Split evenly'], ['prop', 'Keep proportions']], S.rest, 'rest')}<button class="btn btn-text" data-act="reseteq" data-arg="all">Reset all to equal</button><span class="note">Weight 0 leaves a skill out for now; Less · Equal · More = 1 · 2 · 3.</span></div>` : '') +
+      (grades.length > 1 ? `<div class="tp-grades tp-extra ${S.tpMore ? 'open' : ''}"><span class="row-label">Grades</span>${grades.map(x => `<span class="tp-gchip" data-grade-host>${gbadge(x.g)}<span>${esc(gradeShort(x.g))} · ${x.ks.length}</span><button class="btn btn-text" data-act="tpremove" data-arg="r:${x.g}">Remove</button></span>`).join('')}</div>` : '') +
       (S.lockErr ? `<p class="warn" role="alert">⚠ ${esc(S.lockErr)}</p>` : '') + bulk;
     return `<div class="scrim" data-act="close"></div><div class="sheet traypop" role="dialog" aria-modal="true" aria-label="Tray"><div class="sheet-head"><div class="head-text"><p class="eyebrow">Tray · ${esc(trayTitle())}</p><h2>Your tray</h2></div><button class="btn close" data-act="close" aria-label="Close">${icon('close')}</button></div>` +
       `<div class="tp-head">${head}</div><div class="tp-body">${body || `<p class="note">No skill in the tray matches “${esc(S.tq)}”.</p>`}</div>` +
@@ -518,11 +520,11 @@
 
   // ---------------- the worksheet sheet (Print) and the Quiz sheet ----------------
   // Less · Equal · More for one skill (a number weight 0–10 shows as its number)
-  function wSeg(k) { const w = wOf(k); return seg('How often', [['1', 'Less'], ['2', 'Equal'], ['3', 'More']], String(w), 'wset:' + k); }
+  function wSeg(k) { const w = wOf(k); return seg('How often', [['less', 'Less'], ['equal', 'Equal'], ['more', 'More']], ({ 1: 'less', 2: 'equal', 3: 'more' })[w] || '', 'weight:' + k); }
   // the worksheet sheet's read-only list for a big tray: area, then grade, each with its How often and share
   function areaWeightList() {
-    const p = plan(); return areasOf(S.tray).map(x => `<div class="aw-row" data-domain="${x.a}"><span class="aw-name">${icon(AREAS[x.a].icon)}${AREAS[x.a].short}</span><span class="aw-n">${plural(x.ks.length, 'skill')}</span><b class="aw-w">${groupWord(x.ks)}</b><span class="aw-p">${Math.round(x.ks.reduce((t, k) => t + (p.pct[k] || 0), 0))} %</span></div>` +
-      gradesOf(x.ks).map(g => `<div class="aw-row aw-g" data-domain="${x.a}"><span class="aw-name">${gbadge(g.g)}${esc(gradeShort(g.g))}</span><span class="aw-n">${plural(g.ks.length, 'skill')}</span><b class="aw-w">${groupWord(g.ks)}</b><span class="aw-p">${Math.round(g.ks.reduce((t, k) => t + (p.pct[k] || 0), 0))} %</span></div>`).join('')).join('');
+    const p = plan(); const many = gradesOf(S.tray).length > 1; return areasOf(S.tray).map(x => `<div class="aw-row" data-domain="${x.a}"><span class="aw-name">${icon(AREAS[x.a].icon)}${AREAS[x.a].short}</span><span class="aw-n">${plural(x.ks.length, 'skill')}</span><b class="aw-w">${groupWord(x.ks)}</b><span class="aw-p">${Math.round(x.ks.reduce((t, k) => t + (p.pct[k] || 0), 0))} %</span></div>` +
+      (many ? gradesOf(x.ks) : []).map(g => `<div class="aw-row aw-g" data-domain="${x.a}"><span class="aw-name">${gbadge(g.g)}${esc(gradeShort(g.g))}</span><span class="aw-n">${plural(g.ks.length, 'skill')}</span><b class="aw-w">${groupWord(g.ks)}</b><span class="aw-p">${Math.round(g.ks.reduce((t, k) => t + (p.pct[k] || 0), 0))} %</span></div>`).join('')).join('');
   }
   function groupWord(ks) { const ws = new Set(ks.map(wOf)); return ws.size === 1 ? wWord([...ws][0]) : 'Mixed'; }
   function seg(name, choices, cur, act) { return `<div class="seg wrap" role="group" aria-label="${esc(name)}">${choices.map(([k, l]) => `<button data-act="${act}" data-arg="${k}" ${pressed(cur === k)}>${l}</button>`).join('')}</div>`; }
@@ -536,7 +538,7 @@
     if (isQuiz && big()) h += opt('How many questions?', `The quiz takes a sample of the ${n} skills; New numbers re-deals it`, stepper('qn', S.quiz.n || 20, 5, 60));
     else h += opt('How many pages?', k === 'single' && n > 1 ? 'Shared by how often each skill comes up; starts at one page per skill' : big() ? `${plan(isQuiz).total} problems; fewer pages take a sample of the skills` : 'Every page has new numbers; the key follows', stepper('pages', o.pages, 1, 30));
     if (n > 1 && !big()) h += opt('How often does each skill come up?', 'Less · Equal · More = 1 : 2 : 3', `<div class="weights">${S.tray.map(s => `<div class="weight-row w">${chipHTML(s)}${wSeg(s)}</div>`).join('')}</div>`);
-    if (big()) h += opt('How often does each area come up?', 'Set in the tray: one place for every skill’s How often', `<div class="area-weights">${areaWeightList()}</div><button class="btn" data-act="trayopen">Fine-tune in the tray ▸</button>`);
+    if (big()) h += opt('How often does each area come up?', 'Set in the tray: one place for every skill’s How often', `<div class="opt-stack"><div class="area-weights">${areaWeightList()}</div><button class="btn" data-act="trayopen">Fine-tune in the tray ▸</button></div>`);
     const ex = k === 'single'
       ? [['none', 'None'], ['top', 'An example at the top of each page'], ['group', 'An example to start each group'], ['each', 'An example with each problem (where it fits)']]
       : k === 'sections'
@@ -782,7 +784,7 @@
       const toMake = []; cur.blocks.forEach(b => b.steps.forEach(st => st.m.forEach(m => { if (!toMake.includes(m)) toMake.push(m); })));
       list = `<div class="lesson-list" data-domain="${cur.a}"><h2 class="band">${icon(AREAS[cur.a].icon)}${AREAS[cur.a].name} · ${gradeName(L.grade)}<span class="count">${plural(cur.blocks.reduce((n, b) => n + b.steps.length, 0), 'lesson')}</span></h2>` +
         `<details class="more area-tomake"><summary>Skills to be made in ${AREAS[cur.a].name} (${toMake.length})</summary>${toMake.length ? `<ul class="note">${toMake.map(m => `<li>${esc(m)}</li>`).join('')}</ul>` : '<p class="note">None: every lesson here has its skills.</p>'}</details>` +
-        cur.blocks.map(b => { const nk = new Set(b.steps.flatMap(st => st.k.filter(k => SK[k]))).size; return `<div class="block-row"><p class="block-name">${esc(b.term)} block ${b.n}: ${esc(b.name)}</p>${nk ? `<button class="btn btn-add" data-act="addunit" data-arg="${esc(b.id)}">+ Add this unit (${nk})</button>` : ''}</div>${b.steps.map(s => lessonRow(s, b, y, next, true)).join('')}`; }).join('') + '</div>';
+        cur.blocks.map(b => { const nk = new Set(b.steps.flatMap(st => st.k.filter(k => SK[k]))).size; return `<div class="block-row"><p class="block-name">${esc(b.term)} block ${b.n}: ${esc(b.name)}</p>${nk ? `<button class="btn btn-add" data-act="addunit" data-arg="${esc(b.id)}" aria-label="Add this unit (${nk} skills) to the tray"><span class="wide-only">+ Add this unit (${nk})</span><span class="narrow-only">+ Unit (${nk})</span></button>` : ''}</div>${b.steps.map(s => lessonRow(s, b, y, next, true)).join('')}`; }).join('') + '</div>';
     }
     const grades = GRADES.filter(g => g[0] !== 'M' && g[0] !== '6');
     return `<div class="head"><div class="head-text"><p class="eyebrow">White Rose · ${esc(y.name)} · ${esc(gradeName(L.grade))}</p><h1 class="title">Lessons</h1></div><label class="search">${icon('search')}<span class="sr">Find a lesson</span><input id="lsearch" type="search" placeholder="Find a lesson by name or code, e.g. “Hundreds” or “Y3.B1.S4”" value="${esc(L.q)}" data-act="lsearch"></label></div>` +
@@ -875,16 +877,17 @@
     toast(add.length ? `${plural(add.length, 'skill')} from ${what} added to the tray (${plural(S.tray.length, 'skill')} now).` : `Every skill from ${what} is already in the tray.`, add.length ? { tray: before } : null);
   }
   function takeOut(keys, what) { const before = S.tray.slice(); S.tray = S.tray.filter(k => !keys.includes(k)); S.sel = S.sel.filter(k => S.tray.includes(k)); keys.forEach(k => { delete S.lock['k:' + k]; }); toast(`${what} taken out of the tray (${plural(S.tray.length, 'skill')} left).`, { tray: before }); }
-  function openSheet(name) { S.sheet = name; S.copied = false; S.profile = false; S.trayOpen = false; if (name === 'print' || name === 'quiz') { S.kind = null; S.opts = kindDefaults(Object.assign(defaultOpts(), { size: S.opts.size })); S.quiz.n = big() ? 20 : 0; } }
+  function openSheet(name) { S.sheet = name; S.copied = false; S.toast = ''; S.undo = null; S.profile = false; S.trayOpen = false; if (name === 'print' || name === 'quiz') { S.kind = null; S.opts = kindDefaults(Object.assign(defaultOpts(), { size: S.opts.size })); S.quiz.n = big() ? 20 : 0; } }
 
   // ---------------- events ----------------
   document.addEventListener('click', (e) => {
+    if (S.pendingPct) applyPct(false);
     const el = e.target.closest('[data-act]'); if (!el || el.disabled) return;
     const act = el.dataset.act, arg = el.dataset.arg; const L = S.lessons;
     if (act === 'search' || act === 'lsearch' || act === 'tsearch') return;
     if (el.tagName === 'SUMMARY') return;
     e.preventDefault();
-    if (act.startsWith('wset:')) { S.w[act.slice(5)] = Number(arg); return render(); }
+    if (act.startsWith('weight:')) { const k = act.slice(7); S.w[k] = WEIGHT[arg] || 2; delete S.lock['k:' + k]; return render(); }
     if (act.startsWith('bopt:')) {   // the shared options sheet: one change, made in every selected skill
       const id = act.slice(5); for (const k of S.sel) { const o = (D.opts[SK[k].o] || []).find(x => x.id === id); if (!o) continue; const m = S.skillOpts[k] = S.skillOpts[k] || {}; const v = optVal(k, o);
         if (o.t === 'bool') m[id] = !v; else if (o.t === 'int') m[id] = Math.max(o.min ?? 0, Math.min(o.max ?? 20, Number(v ?? 0) + Number(arg))); else if (o.t === 'enum') m[id] = o.v[Number(arg)][0];
@@ -920,6 +923,7 @@
       case 'tpall': areasOf(S.tray).forEach(x => { S.collapsed[x.a] = arg !== 'open'; }); break;
       case 'detailed': S.detailed = !S.detailed; try { localStorage.setItem('mq_t2_detailed', S.detailed ? '1' : '0'); } catch (e2) { /* not kept */ } break;
       case 'rest': S.rest = arg; break;
+      case 'tpmore': S.tpMore = !S.tpMore; break;
       case 'tview': S.tview = arg; try { localStorage.setItem('mq_t2_tview', arg); } catch (e2) { /* not kept */ } break;
       case 'sel': { const ks = scopeKeys(arg); const all = ks.every(k => S.sel.includes(k)); S.sel = all ? S.sel.filter(k => !ks.includes(k)) : [...new Set(S.sel.concat(ks))]; break; }
       case 'selnone': S.sel = []; break;
@@ -984,8 +988,12 @@
     render();
   });
   // a target % is set when the box is left or Enter is pressed (typing "40" never sets 4 % on the way)
-  document.addEventListener('change', (e) => { if (e.target.matches && e.target.matches('input.pct')) { setLock(e.target.dataset.scope, Number(e.target.value)); render(); } });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches && e.target.matches('input.pct')) { e.preventDefault(); setLock(e.target.dataset.scope, Number(e.target.value)); render(); } });
+  // a target % is applied when typing pauses (0.6 s), on Enter, or before the next click is handled — never on the way
+  // ("40" never sets 4 %), and a click right after typing still lands (no re-render between mousedown and click)
+  function applyPct(rerender) { const p = S.pendingPct; if (!p) return; S.pendingPct = null; clearTimeout(applyPct.t); setLock(p.scope, p.v); if (rerender) { render(); const i = document.querySelector(`input.pct[data-scope="${CSS.escape(p.scope)}"]`); if (i && p.focus) { i.focus(); } } }
+  document.addEventListener('input', (e) => { if (e.target.matches && e.target.matches('input.pct') && e.target.value !== '') { S.pendingPct = { scope: e.target.dataset.scope, v: Number(e.target.value), focus: true }; clearTimeout(applyPct.t); applyPct.t = setTimeout(() => applyPct(true), 600); } });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches && e.target.matches('input.pct')) { e.preventDefault(); S.pendingPct = { scope: e.target.dataset.scope, v: Number(e.target.value), focus: true }; applyPct(true); } });
+  document.addEventListener('mousedown', (e) => { if (S.pendingPct && !(e.target.matches && e.target.matches('input.pct'))) { S.pendingPct.focus = false; applyPct(false); } }, true);
   document.addEventListener('input', (e) => {
     if (e.target.id === 'tsearch') { S.tq = e.target.value; const pos = e.target.selectionStart; render(); const i = document.getElementById('tsearch'); if (i) { i.focus(); i.setSelectionRange(pos, pos); } return; }
     // a search re-renders the whole screen, so the grade pill is not pressed while all grades are searched (critic r3 A4)

@@ -23,7 +23,8 @@ const DIR = __dirname; const SHOTS = path.join(DIR, 'shots');
 const args = process.argv.slice(2); const NO_SHOTS = args.includes('--no-shots');
 // quick runs while fixing: --only a,b (screen names) --widths 820,1024 --themes light --no-flows (no PNGs, no index then)
 const argv = (k) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1].split(',') : null; };
-const ONLY = argv('--only'), WIDTHS = (argv('--widths') || ['1366', '1280', '1024', '820', '390']).map(Number), THEMES = argv('--themes') || ['light', 'dark'];
+const FLOWS_ONLY = args.includes('--flows-only');   // quick: only click the flows (no screens, no files written)
+const ONLY = FLOWS_ONLY ? ['none'] : argv('--only'), WIDTHS = (argv('--widths') || ['1366', '1280', '1024', '820', '390']).map(Number), THEMES = argv('--themes') || ['light', 'dark'];
 const QUICK = !!(ONLY || argv('--widths') || argv('--themes') || args.includes('--no-flows'));
 const EXE = fs.existsSync('/opt/pw-browsers/chromium') ? '/opt/pw-browsers/chromium' : undefined;
 const SIZES = { 1366: { width: 1366, height: 768 }, 1280: { width: 1280, height: 800 }, 1024: { width: 1024, height: 768 }, 820: { width: 820, height: 1180 }, 390: { width: 390, height: 844 } };
@@ -281,7 +282,7 @@ async function runFlow(browser, base, f, w) {
         if (errors.length) rep.problems.push('console: ' + errors.join('; '));
         if (w === 1366 && primary && (rep.primaries !== 1 || rep.primaryBottom > 768)) rep.problems.push(`primary action not above the fold at 1366x768 (${rep.primaries} visible, bottom ${rep.primaryBottom})`);
         const file = `${name}-${w}-${theme}.png`;
-        const keep = !QUICK && (w === 1366 || w === 390 || (MID_SHOTS.has(name) && theme === 'light'));
+        const keep = (!QUICK || args.includes('--write')) && (w === 1366 || w === 390 || (MID_SHOTS.has(name) && theme === 'light'));
         if (!NO_SHOTS && keep) await page.screenshot({ path: path.join(SHOTS, file) });
         let fullFile = null;
         if (full && keep && (w === 1366 || w === 390) && rep.height > SIZES[w].height + 40 && !NO_SHOTS) { fullFile = `${name}-${w}-${theme}-full.png`; await page.screenshot({ path: path.join(SHOTS, fullFile), fullPage: true }); }
@@ -300,24 +301,26 @@ async function runFlow(browser, base, f, w) {
     if (!ONLY || ONLY.includes('tray-height')) for (const w of WIDTHS) {
       const page = await browser.newPage({ viewport: SIZES[w] });
       await page.goto(`${base}/design/mockups/teacher-2/app.html?theme=light#skills`, { waitUntil: 'networkidle' }); await page.evaluate(() => document.fonts.ready);
-      for (const n of [1, 3, 6, 8, 10, 40, 100]) {
-        const r = await page.evaluate((n) => {
+      for (const view of ['list', 'chips', 'thumbs']) for (const n of [1, 3, 6, 8, 10, 40, 100]) {
+        const r = await page.evaluate(([n, view]) => {
           const S = window.MQ.S; const pool = MQ_DATA.skills.filter(s => !s.p && s.a !== 'WORDS');
           // a realistic tray: the first n skills of grades 2 and 3 (several areas), then any others
-          const pick = pool.filter(s => s.g === '3').concat(pool.filter(s => s.g === '2'), pool.filter(s => s.g !== '2' && s.g !== '3'));
-          S.tray = pick.slice(0, n).map(s => s.c + ':' + s.v); S.sheet = null; window.MQ.render();
+          // the worst case for one row: every next skill from another maths area (most legends, longest names)
+          const byA = {}; pool.forEach(s => (byA[s.a] = byA[s.a] || []).push(s)); const lists = Object.values(byA); const pick = [];
+          for (let i = 0; pick.length < pool.length; i++) for (const l of lists) if (l[i]) pick.push(l[i]);
+          S.tray = pick.slice(0, n).map(s => s.c + ':' + s.v); S.sheet = null; S.tview = view; window.MQ.render();
           const t = document.querySelector('.tray'); const tr = t.getBoundingClientRect();
-          const chips = [...t.querySelectorAll('.chip')].filter(c => c.getBoundingClientRect().width && getComputedStyle(c).visibility !== 'hidden');
+          const chips = [...t.querySelectorAll('.tray-chips > *')].filter(c => c.getBoundingClientRect().width && getComputedStyle(c).visibility !== 'hidden');
           const rows = new Set(chips.map(c => Math.round(c.getBoundingClientRect().top))).size;
           const summary = [...t.querySelectorAll('.tray-summary')].some(x => x.getBoundingClientRect().width > 0);
           return { h: Math.round(tr.height), rows, chips: chips.length, summary };
-        }, n);
+        }, [n, view]);
         const lim = Math.min(w >= 1100 ? 96 : 120, SIZES[w].height * 0.15); const bad = [];
         if (r.h > lim) bad.push(`tray ${r.h}px > ${Math.round(lim)}px`);
         if (n <= 8 && w >= 820 && r.rows > 1) bad.push(`${r.rows} rows of chips (one row only)`);
         if (n > 8 && !r.summary) bad.push('no summary bar past 8 skills');
         if (bad.length) failed++;
-        console.log(`${bad.length ? 'FAIL' : 'ok  '} tray-height @${w} ${String(n).padStart(3)} skills: ${r.h}px, ${r.chips} chips in ${r.rows} row(s)${r.summary ? ', summary bar' : ''}${bad.length ? '  ' + bad.join('; ') : ''}`);
+        console.log(`${bad.length ? 'FAIL' : 'ok  '} tray-height @${w} ${view.padEnd(6)} ${String(n).padStart(3)} skills: ${r.h}px, ${r.chips} chips in ${r.rows} row(s)${r.summary ? ', summary bar' : ''}${bad.length ? '  ' + bad.join('; ') : ''}`);
       }
       await page.close();
     }
@@ -392,7 +395,7 @@ async function runFlow(browser, base, f, w) {
     // the flows
     const results = {};
     console.log('\nflows (actions incl. needed scrolls / steps):');
-    if (!QUICK) for (const f of FLOWS) for (const w of [1366, 390]) {
+    if (!QUICK || FLOWS_ONLY) for (const f of FLOWS) for (const w of [1366, 390]) {
       const r = await runFlow(browser, base, f, w); results[`${f.id}@${w}`] = r;
       if (!r.ok) failed++;
       console.log(`${r.ok ? 'ok  ' : 'FAIL'} ${f.id.padEnd(16)} @${w}  ${r.actions} actions${r.scrolls ? ` (${r.scrolls} scroll)` : ''}, ${r.steps} steps   plan ${f.plan.actions} · today ${f.plan.today}${r.error ? '  ' + r.error : ''}`);

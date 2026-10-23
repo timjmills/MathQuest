@@ -59,6 +59,8 @@
       check: '(() => { const p = MQ.plan(); const k = "addition:add_wp_1k"; const r = MQ.S.tray.filter(x => x !== k).map(x => p.byKey[x] || 0); return MQ.S.lock["k:" + k] === 50 && p.byKey[k] === Math.round(p.total / 2) && Math.max(...r) - Math.min(...r) <= 1; })()',
       actions: [{ click: '.tray-label-btn, .tray-count', step: 1, say: 'Open the tray' }, { click: '[data-act="detailed"]', step: 1, say: 'Detailed weights' }, { type: '#tsearch', text: 'within 1,000)', step: 2, say: 'Find the skill' }, { type: 'input.pct[data-scope="k:addition:add_wp_1k"]', text: '50', enter: true, step: 2, say: '50 %: it is held, the rest share 50 % evenly' }] },
   ];
+  // on a phone the grades row of the tray popup is under "View and more"
+  FLOWS.find(f => f.id === 'grade-remove').narrow = [{ click: '.tray-count', step: 1, say: 'Open the tray' }, { click: '[data-act="tpmore"]', step: 1, say: 'View and more' }, { click: '[data-act="tpremove"][data-arg="r:2"]', step: 2, say: 'Remove Grade 2' }];
   // the narrow (390) chip flow opens the collapsed tray first: the count bar is one tap, then the chip
   Object.assign(FLOWS.find(f => f.id === 'chip-options'), { narrowPlan: '2', narrowNote: 'On a phone the tray is collapsed to “3 skills ▸” (§2.3), so a chip is two taps away' });
   FLOWS.find(f => f.id === 'chip-options').narrow = [{ click: '.tray-count', step: 1, say: 'Tap “3 skills ▸”' }, { click: '.traypop [data-act="chip"]', step: 1, say: 'Tap the skill' }];
