@@ -324,4 +324,74 @@ export function interleave(items, weights = null, seed = 1, opts = {}) {
     };
 }
 
-export default { interleave, dealCounts, turnsOf, runsOf, capsOf };
+/* ================================================================ the page's repeats (M1 r4) */
+
+const OP_KEYS = { '+': '+', '-': '-', '−': '-', '*': '*', x: '*', '×': '*', '/': '/', '÷': '/' };
+const numOf = (v) => (v === undefined || v === null || v === '' ? NaN : Number(String(v).replace(/,/g, '')));
+
+/**
+ * One two-number + - x / fact, normalised: {op: '+'|'-'|'*'|'/', a, b}, or null when the item is
+ * not such a fact. Takes a plain {op, a, b}, a kit cell {template, payload}, a question {cell} or
+ * a host item {q: {cell}}.
+ */
+export function factOf(x) {
+    if (!x) return null;
+    const q = x.q || x;
+    const p = (q.cell && q.cell.payload) || (q.payload) || q;
+    const op = OP_KEYS[String(p.op || q.op || '')];
+    const ops = Array.isArray(p.operands) ? p.operands : [p.a, p.b];
+    const a = numOf(ops[0]);
+    const b = numOf(ops[1]);
+    if (!op || !Number.isFinite(a) || !Number.isFinite(b)) return null;
+    return { op, a, b };
+}
+
+/**
+ * The fact family of a fact, the same for every fact of it (6 + 7, 7 + 6, 13 - 6, 13 - 7 ->
+ * "+:13:6,7"; 8 x 10, 80 / 8 -> "x:8,10"), or '' (a quotient with a remainder has none).
+ */
+export function factFamily(f) {
+    if (!f) return '';
+    const pair = (x, y) => [x, y].sort((m, n) => m - n).join(',');
+    if (f.op === '+') return `+:${f.a + f.b}:${pair(f.a, f.b)}`;
+    if (f.op === '-') return `+:${f.a}:${pair(f.b, f.a - f.b)}`;
+    if (f.op === '*') return `x:${pair(f.a, f.b)}`;
+    if (f.op === '/' && f.b !== 0 && f.a % f.b === 0) return `x:${pair(f.b, f.a / f.b)}`;
+    return '';
+}
+
+/**
+ * THE PAGE'S REPEATS (critic M1 r3 D1; the machine check of a Mixed practice page). Over the
+ * items of ONE page, in print order:
+ *   exact        the same fact twice (7 + 3 and 7 + 3)
+ *   turnarounds  a + or x fact and the same fact turned round (7 + 3 and 3 + 7)
+ *   families     two facts of one fact family that are neither of those (6 + 7 and 13 - 6,
+ *                13 - 6 and 13 - 7, 8 x 10 and 80 / 10)
+ * Each entry is {i, j, key}: j the later item, i the first item it repeats. Items that are not
+ * two-number facts are skipped. -> {exact, turnarounds, families, bad}; `bad` = exact +
+ * turnarounds, the count a page may never print.
+ */
+export function pageRepeats(items) {
+    const exact = [];
+    const turnarounds = [];
+    const families = [];
+    const firstEx = new Map();
+    const firstTurn = new Map();
+    const firstFam = new Map();
+    (items || []).forEach((x, j) => {
+        const f = factOf(x);
+        if (!f) return;
+        const ex = `${f.op}:${f.a},${f.b}`;
+        const turn = f.op === '+' || f.op === '*' ? `${f.op}:${[f.a, f.b].sort((m, n) => m - n).join(',')}` : '';
+        const fam = factFamily(f);
+        if (firstEx.has(ex)) exact.push({ i: firstEx.get(ex), j, key: ex });
+        else if (turn && firstTurn.has(turn)) turnarounds.push({ i: firstTurn.get(turn), j, key: turn });
+        else if (fam && firstFam.has(fam)) families.push({ i: firstFam.get(fam), j, key: fam });
+        if (!firstEx.has(ex)) firstEx.set(ex, j);
+        if (turn && !firstTurn.has(turn)) firstTurn.set(turn, j);
+        if (fam && !firstFam.has(fam)) firstFam.set(fam, j);
+    });
+    return { exact, turnarounds, families, bad: exact.length + turnarounds.length };
+}
+
+export default { interleave, dealCounts, turnsOf, runsOf, capsOf, factOf, factFamily, pageRepeats };

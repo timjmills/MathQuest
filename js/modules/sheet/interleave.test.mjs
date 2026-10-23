@@ -9,7 +9,7 @@
 
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { interleave, dealCounts, runsOf, turnsOf } from './interleave.js';
+import { interleave, dealCounts, runsOf, turnsOf, pageRepeats, factFamily, factOf } from './interleave.js';
 
 const results = [];
 const check = (name, fn) => {
@@ -204,6 +204,21 @@ check('no Math.random in sheet/interleave.js', () => {
 // 13. Pending (M4): the 3-skill case at M with "the first time" - one example cell right before
 // each skill's first problem on each page, outside the runs and the shares, inside the capacity sum.
 pending('3 skills at M with "the first time": one example cell before each skill\'s first problem', 'M4');
+
+// 14. pageRepeats (critic M1 r3 D1): exact repeats, turnarounds and fact families on one page.
+check('pageRepeats: exact, turnaround and family found; other facts clean', () => {
+    const f = (op, a, b) => ({ op, a, b });
+    const r = pageRepeats([f('+', 7, 3), f('-', 13, 6), f('+', 3, 7), f('+', 7, 3), f('\u2212', 13, 7), f('\u00d7', 8, 10), f('\u00f7', 80, 10), f('/', 17, 5), f('/', 17, 5), { op: '+' }]);
+    if (r.exact.length !== 2 || r.exact[0].j !== 3 || r.exact[1].j !== 8) return `exact ${JSON.stringify(r.exact)}`;
+    if (r.turnarounds.length !== 1 || r.turnarounds[0].j !== 2) return `turn ${JSON.stringify(r.turnarounds)}`;
+    if (r.families.length !== 2 || r.families[0].j !== 4 || r.families[1].j !== 6) return `fam ${JSON.stringify(r.families)}`;
+    if (r.bad !== 3) return `bad ${r.bad}`;
+    const clean = pageRepeats([f('+', 2, 3), f('-', 9, 4), f('*', 6, 7), f('/', 20, 4)]);
+    if (clean.bad || clean.families.length) return 'clean page flagged';
+    if (factFamily(factOf({ q: { cell: { payload: { a: 12, b: 3, op: '/' } } } })) !== 'x:3,4') return 'host item not read';
+    if (factFamily(factOf({ op: '-', operands: [13, 6] })) !== '+:13:6,7') return 'operands not read';
+    return '';
+});
 
 let failed = 0;
 for (const r of results) {

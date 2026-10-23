@@ -43,7 +43,7 @@ import { tagLine as lessonTagLine, CASE_TESTS as LESSON_CASE_TESTS } from './she
 import { lessonFor, skillRef } from './lessons/prereqs.js';
 import { detailedLessonFor, validateDescription, fillPlaceholders } from './lessons/detailed/index.js';
 import { teacherBands, paginateTeacher, renderTeacherPage, measureShell, wordProblemPlan, exitSlipPlan, numberSensePlan, DETAILED_PUPIL_CSS, LIFT_MAX_CHARS, TEACHER_BODY_MM } from './sheet/roles/detailed-lesson.js';
-import { TEACHER_CSS, RCDWS_CSS, teacherParts, numberWords } from './sheet/index.js';
+import { TEACHER_CSS, RCDWS_CSS, teacherParts, numberWords, pageRepeats } from './sheet/index.js';
 const { tBand } = teacherParts;
 import { planItem as composePlanItem, operandsOf as composeOperandsOf, opOf as composeOpOf, opGlyphOf as composeGlyphOf, oralFrameOf as composeOralFrameOf, answerOf as composeAnswerOf, instructionKeyOf as composeInstrKeyOf, instructionText as composeInstrText } from './sheet/roles/compose.js';
 import {
@@ -253,6 +253,21 @@ function repeatKeys(q) {
     // critic M1 r2: the related facts of - and / (13 - 6 / 13 - 7, 12 / 3 / 12 / 4) in one share
     const fam = familyKey(q);
     if (fam && (op === '-' || op === '/')) keys.push(`rel:${fam}`);
+    return keys;
+}
+
+/**
+ * What a Mixed practice PAGE may never print twice (critic M1 r3 D1): the same fact, and for + and
+ * x the same fact turned round (3 + 7 after 7 + 3). Kept page-wide, never relaxed.
+ */
+function exactKeys(q) {
+    if (!q) return [];
+    const p = (q.cell && q.cell.payload) || {};
+    const op = opKeyOf(p.op || q.op);
+    const ops = refOperands(q);
+    if (ops.length !== 2 || !op) return [`text:${String(q.text || '')}`];
+    const keys = [`ex:${op}:${ops.join(',')}`];
+    if (op === '+' || op === '*') keys.push(`turn:${op}:${ops.slice().sort((a, b) => a - b).join(',')}`);
     return keys;
 }
 
@@ -2690,6 +2705,18 @@ async function buildRoleSheet(n, metaOf) {
     let keepPrompts = false;
     let mixDigits = 0;
     let mixedCheck = null;
+    let mixedRepeats = null;
+    const dealNotes = [];
+    /** The digit tracks a mixed page's facts print at: the widest number dealt (critic M1 r3 D4). */
+    const widestTracks = (its) => Math.max(0, ...its.map((it) => {
+        const c = it.q && it.q.cell;
+        if (!c || c.template !== 'fact' || !c.payload) return 0;
+        const p = c.payload;
+        const ans = p.ans !== undefined ? p.ans : it.q.ans;
+        return Math.max(2, String(p.a ?? '').length, String(p.b ?? '').length, String(ans ?? '').length);
+    }));
+    /** The across count the role picks for these (probe) items, or 0 (roles/mixed-practice.js). */
+    const mixedPickK = (pp) => { const c = typeof mod.mixedClass === 'function' ? mod.mixedClass(pp, input) : null; return c && c.ok && c.pick ? c.pick.k : 0; };
     const arrangementNotes = (n.arrangementNotes || []).slice();
 
     /**
@@ -2706,12 +2733,19 @@ async function buildRoleSheet(n, metaOf) {
         const flags = flagsFor(want);
         const out = [];
         let next = 0;
-        // A Mixed practice page (critic M1 r1 D3, L10): within one skill's share no answer comes
-        // twice and no fact comes with its turnaround (7 + 3 / 3 + 7), while the passes allow; the
-        // last pass takes what is left. Grouped pages keep their four passes and no such rule.
+        // A Mixed practice page (critic M1 r1 D3 / r3 D1, L10) deals on a RELAXATION LADDER, four
+        // passes a rung (eight on the last): rung 0 keeps every rule - in the share no answer twice (ans:), no related
+        // fact (rel:), and on the page no fact family twice; rung 1 lets an answer come again;
+        // rung 2 a related fact; rung 3 a fact family. NO rung lets the same fact or its
+        // turnaround (7 + 3 / 3 + 7) come twice on the page: a share the pool cannot fill without
+        // one is printed short, and `out.short` says how short. Grouped pages keep their four
+        // passes and no such rule.
         const noRepeat = keepPrompts;
         const shareSeen = new Set();
-        const passes = noRepeat ? 8 : 4;
+        const pageSeen = pageFam || new Set();
+        const passes = noRepeat ? 20 : 4;
+        const rungOf = (pass) => Math.min(3, Math.floor(pass / 4));
+        let rungMax = 0;
         for (let pass = 0; pass < passes && out.length < want; pass++) {
             const need = want - out.length;
             const batch = pass === 0 ? need : need * 2 + 2;
@@ -2722,8 +2756,10 @@ async function buildRoleSheet(n, metaOf) {
                 // A Mixed practice page of fact cells (critic M1 r1 D2): every fact on the page takes
                 // the page's widest answer zone, so the rules and the ones columns line up across a shelf.
                 // (A + fact keeps its fact drawing: a 3-track + band would otherwise draw the carry stack.)
+                // (critic M1 r3 D4: the page's count, up OR down - a band's 3-track answer zone on a
+                // page whose numbers are all 1- and 2-digit prints 2 tracks)
                 const pl = mixDigits && g0.q && g0.q.cell && g0.q.cell.template === 'fact' && g0.q.cell.payload;
-                const g = pl && Number(pl.digits) < mixDigits
+                const g = pl && Number(pl.digits) !== mixDigits
                     ? Object.assign({}, g0, { q: Object.assign({}, g0.q, { cell: Object.assign({}, g0.q.cell, { payload: Object.assign({}, pl, { digits: mixDigits }, pl.regroup === undefined ? { regroup: false } : {}) }) }) })
                     : g0;
                 const it = settlePrompts([hostItem(g, 0, n.size, { mix: { key: pi, count: pools.length, sheet: n.mix } })], metaOf(g.skill).instructionKey)[0];
@@ -2732,10 +2768,13 @@ async function buildRoleSheet(n, metaOf) {
                 // must sit in the cell's own slot, or the pupil sees two answer places (C1).
                 if (needsShow && (pass < 3 || strictShow) && !it.canShow()) continue;
                 const rk = noRepeat ? repeatKeys(g.q) : null;
-                if (rk && pass < passes - 1 && rk.some((x) => shareSeen.has(x))) continue;
+                const xk = noRepeat ? exactKeys(g.q) : null;
+                const rung = rungOf(pass);
+                if (xk && xk.some((x) => pageSeen.has(x) || shareSeen.has(x))) continue;
+                if (rk && rk.some((x) => shareSeen.has(x) && !(rung >= 1 && x.startsWith('ans:')) && !(rung >= 2 && x.startsWith('rel:')))) continue;
                 // critic M1 r2: a fact family another skill already put on the page (8 x 10 / 80 / 10)
                 const fk = pageFam ? familyKey(g.q) : '';
-                if (fk && pass < passes - 1 && pageFam.has(fk)) continue;
+                if (fk && rung < 3 && pageFam.has(fk)) continue;
                 const k = out.length;
                 const prepared = typeof mod.prepare === 'function'
                     ? mod.prepare(it, { index: k, seed: n.seed, wrong: !!flags[k], size: n.size, look: n.look })
@@ -2755,10 +2794,13 @@ async function buildRoleSheet(n, metaOf) {
                 if (mod.TIGHT_ROWS && prepared.template === 'count-row') prepared.tightRows = true;
                 prepared.section = 0;
                 if (rk) for (const x of rk) shareSeen.add(x);
+                if (xk) for (const x of xk) { shareSeen.add(x); pageSeen.add(x); }
                 if (fk) pageFam.add(fk);
+                if (noRepeat) rungMax = Math.max(rungMax, rung);
                 out.push(prepared);
             }
         }
+        if (noRepeat) { out.rung = rungMax; out.short = Math.max(0, want - out.length); }
         return out;
     };
     const measure = (items) => measureItems(items, { size: n.size, look: n.look, colsList });
@@ -2786,10 +2828,7 @@ async function buildRoleSheet(n, metaOf) {
         let why = first.why;
         if (ok) {
             keepPrompts = true;
-            mixDigits = Math.max(0, ...pools.flatMap((p) => probe[p.id].map((it) => {
-                const c = it.q && it.q.cell;
-                return c && c.template === 'fact' && c.payload ? Number(c.payload.digits) || 0 : 0;
-            })));
+            mixDigits = widestTracks(pools.flatMap((p) => probe[p.id]));
             const kept = {};
             pools.forEach((p, pi) => { kept[p.id] = dealPool(p, pi, PROBE); measureMixed(kept[p.id]); });
             const again = mod.mixedClass(kept, input);
@@ -2829,7 +2868,7 @@ async function buildRoleSheet(n, metaOf) {
     }
 
     // 2. How many items the page needs, from the measured probe.
-    const want = mod.counts(probe, input) || {};
+    let want = mod.counts(probe, input) || {};
 
     // 3. The final items: the probe again when it already holds them (same seeds, same items),
     //    else a fresh deal for the final count (the role's wrong/right pattern depends on it).
@@ -2864,12 +2903,40 @@ async function buildRoleSheet(n, metaOf) {
         return out;
     };
     if (input.arrangement === 'mixed') {
+        // critic M1 r3 D4: the track count follows the DEALT numbers. When the dealt page is wider
+        // or narrower than the probe's count, the probe is dealt and measured again at the dealt
+        // count, the across count and the counts re-picked, and the page dealt again (seeded, so
+        // deterministic). At most two re-picks; should the last deal still differ, the page keeps
+        // the wider count (an empty track, never a number wider than its tracks).
+        const repick = (tracks) => {
+            mixDigits = tracks;
+            pools.forEach((p, pi) => { probe[p.id] = dealPool(p, pi, PROBE); measureMixed(probe[p.id]); input.floors[p.id] = floorOf(probe[p.id]); });
+            want = mod.counts(probe, input) || {};
+            input.mixK = mixedPickK(probe);
+        };
+        input.mixK = mixedPickK(probe);
         items = dealMixed();
-        const widest = Math.max(0, ...items.map((it) => {
-            const c = it.q && it.q.cell;
-            return c && c.template === 'fact' && c.payload ? Number(c.payload.digits) || 0 : 0;
-        }));
-        if (widest > mixDigits) { mixDigits = widest; items = dealMixed(); }
+        for (let round = 0; round < 3; round++) {
+            const w = widestTracks(items);
+            if (!w || w === mixDigits) break;
+            if (round === 2 && w < mixDigits) break;
+            repick(w);
+            items = dealMixed();
+        }
+        // The page's machine check (critic M1 r3 D1, sheet/interleave.js pageRepeats): a mixed page
+        // never prints the same fact twice or a fact and its turnaround. The deal already keeps
+        // them apart; should one slip through, the later one is dropped and the notes say so.
+        const rep = pageRepeats(items);
+        if (rep.bad) {
+            const drop = new Set([...rep.exact, ...rep.turnarounds].map((x) => x.j));
+            items = items.filter((_, i) => !drop.has(i));
+            dealNotes.push(`Mixed practice: ${drop.size} repeated fact${drop.size > 1 ? 's were' : ' was'} left off the page.`);
+        }
+        const fams = pageRepeats(items).families.length;
+        const short = pools.map((p, pi) => ({ p, its: items.filter((it) => it.pool === p.id), w: Math.floor(Number(want[p.id]) || 0) })).filter((x) => x.its.length < x.w);
+        for (const x of short) dealNotes.push(`Mixed practice: ${metaOf(x.p.skills[0]).label} has only ${x.its.length} different facts for this page, so it prints ${x.its.length} of the ${x.w} it had room for.`);
+        if (fams) dealNotes.push(`Mixed practice: the skills have too few different facts for ${items.length} problems, so ${fams} fact${fams > 1 ? 's share a fact family' : ' shares a fact family'} with another fact on the page (such as 6 + 7 and 13 \u2212 6).`);
+        mixedRepeats = { exact: pageRepeats(items).exact.length, turnarounds: pageRepeats(items).turnarounds.length, families: fams };
     } else pools.forEach((p, pi) => {
         const w = Math.max(0, Math.min(MAX_ITEMS, Math.floor(Number(want[p.id]) || 0)));
         let its = w <= probe[p.id].length && !mod.wrongFlags && !(pageLr6 && pi > 0) ? coverSlice(p, probe[p.id], w) : null;
@@ -2917,7 +2984,7 @@ async function buildRoleSheet(n, metaOf) {
     const out = renderPlan(plan, { key: n.key });
     const fitsList = (plan.meta && plan.meta.fits) || [];
     const f0 = fitsList[0] || {};
-    const notes = [...new Set((plan.meta && plan.meta.notes) || []), ...anchorNotes, ...arrangementNotes.filter((t) => !((plan.meta && plan.meta.notes) || []).includes(t))];
+    const notes = [...new Set((plan.meta && plan.meta.notes) || []), ...anchorNotes, ...arrangementNotes.filter((t) => !((plan.meta && plan.meta.notes) || []).includes(t)), ...dealNotes];
     if (numberLine && numberLine.warn) notes.push(numberLine.warn);
     // SF-34: touch numerals never print under 24 pt, so on an S / M page the stacked touch cells
     // are raised to L; the fit line says so instead of the page's own digit size alone.
@@ -2947,6 +3014,8 @@ async function buildRoleSheet(n, metaOf) {
         arrangement: (plan.meta && plan.meta.arrangement) || n.arrangement,
         interleave: (plan.meta && plan.meta.interleave) || null,
         mixedCheck,
+        // (a mixed page's own repeat check, sheet/interleave.js pageRepeats: exact / turnarounds always 0)
+        mixedRepeats,
         plan,
         extras: input.extras || [],
     };

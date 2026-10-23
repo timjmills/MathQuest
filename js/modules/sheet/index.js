@@ -56,7 +56,7 @@ export {
 export { rng, int, pick, shuffle, deriveSeed } from './rng.js';
 
 /* ---------------------------------------------------------------------- the mixed order */
-export { interleave, dealCounts, turnsOf, runsOf, capsOf } from './interleave.js';
+export { interleave, dealCounts, turnsOf, runsOf, capsOf, factOf, factFamily, pageRepeats } from './interleave.js';
 
 /* ------------------------------------------------------------------------ contract */
 // The Skill Cell Contract: the provider registry, the controlled instruction library and the
