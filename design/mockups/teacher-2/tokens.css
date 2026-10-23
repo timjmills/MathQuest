@@ -1,0 +1,79 @@
+/* Teacher site 2.0 — design tokens (IMPROVEMENT_PLAN §2.7 board B, §2.8). The ONLY place raw values live.
+   tests/scripts/ws-teacher-tokens.cjs parses this file and checks every colour against the palette rules.
+   Area ramps: tint = 10 % of bold over white, soft = 30 %, deep = bold darkened to >= 7 : 1 on white;
+   dark mode: tint = 18 % of bold over #111318, soft = 40 %, the fourth strength = a light version >= 7 : 1 on the dark tint.
+   Slate (Mixed / Words / No standard) uses the same ramp rules; it always carries a dashed outline and its label. */
+
+:root {
+  /* type: chrome only (Andika is for pupil content) */
+  --font-ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-pupil: "Andika", "Andika New Basic", sans-serif;
+  --fs-12: 12px; --fs-14: 14px; --fs-16: 16px; --fs-20: 20px; --fs-28: 28px; --fs-36: 36px;
+  --fw-500: 500; --fw-700: 700;
+  --lh-tight: 1.2; --lh-body: 1.5;
+
+  /* spacing, radii, shadows, control size */
+  --sp-4: 4px; --sp-8: 8px; --sp-16: 16px; --sp-24: 24px; --sp-32: 32px; --sp-48: 48px;
+  --r-8: 8px; --r-16: 16px;
+  --shadow-1: 0 1px 3px rgba(17, 24, 39, 0.12);
+  --shadow-2: 0 12px 32px rgba(17, 24, 39, 0.24);
+  --control: 44px;
+  --line-1: 1px; --line-2: 2px;
+
+  /* neutrals, light */
+  --page: #FFFFFF;
+  --surface: #FFFFFF;
+  --surface-2: #F9FAFB;
+  --text: #111827;
+  --text-2: #374151;
+  --text-3: #4B5563;
+  --line: #D1D5DB;
+  --chip-edge-dark: #E5E7EB;
+  --ring: #111827;
+  --primary-bg: #111827;
+  --primary-fg: #FFFFFF;
+  --scrim: rgba(17, 24, 39, 0.48);
+  --error: #B91C1C;
+  --key: #C2410C;
+  --paper: #FFFFFF;
+  --paper-ink: #000000;
+  --paper-grey: #949494;
+
+  /* board B: eight maths areas x four strengths (+ the text colour on bold) */
+  --cc-tint: #F9E9FB;   --cc-soft: #ECBEF2;   --cc-bold: #C026D3;   --cc-on: #FFFFFF;   --cc-deep: #901C9E;
+  --oa-tint: #EBEAF6;   --oa-soft: #C3C1E3;   --oa-bold: #3730A3;   --oa-on: #FFFFFF;   --oa-deep: #29247A;
+  --nbt-tint: #FDF7E6;  --nbt-soft: #F9E8B5;  --nbt-bold: #EAB308;  --nbt-on: #111827;  --nbt-deep: #6E5404;
+  --nf-tint: #FEF1F8;   --nf-soft: #FCD5E9;   --nf-bold: #F472B6;   --nf-on: #111827;   --nf-deep: #894066;
+  --meas-tint: #F0FDF8; --meas-soft: #D3F8E9; --meas-bold: #6EE7B7; --meas-on: #111827; --meas-deep: #2E614D;
+  --data-tint: #F4F9FF; --data-soft: #DFEEFE; --data-bold: #93C5FD; --data-on: #111827; --data-deep: #445B74;
+  --g-tint: #E7F1F0;    --g-soft: #B7D6D3;    --g-bold: #0F766E;    --g-on: #FFFFFF;    --g-deep: #0B5852;
+  --rpns-tint: #F8FEF0; --rpns-soft: #EBFBD0; --rpns-bold: #BEF264; --rpns-on: #111827; --rpns-deep: #4A5E27;
+  --slate-tint: #EDEEF0; --slate-soft: #C8CCD2; --slate-bold: #475569; --slate-on: #FFFFFF; --slate-deep: #35404F;
+}
+
+/* dark mode: explicit choice, or the system setting unless light was chosen */
+:root[data-theme="dark"] {
+  --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.48);
+  --shadow-2: 0 12px 32px rgba(0, 0, 0, 0.64);
+  --page: #111318;
+  --surface: #111318;
+  --surface-2: #1A1D23;
+  --text: #F3F4F6;
+  --text-2: #D1D5DB;
+  --text-3: #9CA3AF;
+  --line: #374151;
+  --ring: #F3F4F6;
+  --primary-bg: #F3F4F6;
+  --primary-fg: #111827;
+  --scrim: rgba(0, 0, 0, 0.64);
+
+  --cc-tint: #30163A;   --cc-soft: #571B63;   --cc-deep: #E092E9;
+  --oa-tint: #181831;   --oa-soft: #201F50;   --oa-deep: #A3A0D5;
+  --nbt-tint: #383015;  --nbt-soft: #685312;  --nbt-deep: #F4D984;
+  --nf-tint: #3A2434;   --nf-soft: #6C3957;   --nf-deep: #FAB8DB;
+  --meas-tint: #223935; --meas-soft: #366858; --meas-deep: #B6F3DB;
+  --data-tint: #283341; --data-soft: #455A74; --data-deep: #C9E2FE;
+  --g-tint: #112527;    --g-soft: #103B3A;    --g-deep: #87BBB6;
+  --rpns-tint: #303B26; --rpns-soft: #566C36; --rpns-deep: #DEF8B2;
+  --slate-tint: #1B1F27; --slate-soft: #272D38; --slate-deep: #A3AAB4;
+}

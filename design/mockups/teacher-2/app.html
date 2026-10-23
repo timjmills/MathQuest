@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teacher Site Mock-up</title>
+<script>
+  // theme before first paint: ?theme=dark|light, else the system setting
+  (function () { var t = new URLSearchParams(location.search).get('theme'); if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; document.documentElement.setAttribute('data-theme', t); })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../../css/fonts/andika.css">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div id="app"></div>
+<div id="layer"></div>
+<div id="toast" class="toast" role="status" hidden></div>
+<script src="data.js"></script>
+<script src="thumbs.js"></script>
+<script src="app.js"></script>
+<script src="flows.js"></script>
+<script src="walk.js"></script>
+</body>
+</html>
