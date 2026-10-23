@@ -82,3 +82,14 @@ the newest run (a red row that the next night does not re-select vanishes; a fir
 seventh) and is skipped when the deploy is within budget (a deploy reaching no row passes with no nightly). Critic recommends
 ruling D8 for the bounded critic sample (85 pages). Nits N1–N10 (matrix baseline per-count at row grain, L3 blind on common
 data keys, mc-production backtest skips the in-page sampler, N9 the timed runs still to do).
+
+## Pilot support (lead requests 2026-10-23)
+- Merged `claude/sweet-newton-c8wrv1` (gates, ws-precritic, the nl* options-verify fix) into the lane.
+- **First per-row matrix baseline for the six pilot skills** (`subtraction:sub_50/100/1k/10k/100k/1m_no_regroup`): 201 rows,
+  93 run and pinned, 0 RED, 0 ERROR, 84 PENDING (M2/M4/T3 fields), 24 N/A; 279 documents in 2993 s (most of it slot waits
+  behind critic r2). `design/audit/matrix/baseline.json` now 127 rows; run file `design/audit/matrix/pilot-baseline-2026-10-23.json`.
+- `ws-precritic` passes `ws-options-verify --deadline 600000` (`MQ_OV_DEADLINE`).
+- **For the mixed-pages lane (engine findings, not fixed in Wave 0):** every pilot skill's `sections/defaults` row has the same
+  10 / 10 / 17 findings at S / M / L — L-OVERFLOW PG-12 ×8 at every size, L-DENSITY PG-23 ×2 at S and M, L-INK ILLEGIBLE ×8 and
+  L-DENSITY PAGEFILL ×1 at L. They come from the Sections composer with the fixed partner `algebra:tape_diagram` (its legacy
+  story cell overhangs its 46 mm cell by ≈ 19.9 mm), so they are composer / partner findings, identical across the six skills.
