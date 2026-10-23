@@ -735,7 +735,7 @@ teacher does this for 5–6 lessons). **Print** then offers, all as options (own
 customizable"): **one worksheet per lesson** (pages per lesson, e.g. 2, each with its own key), **one worksheet for all**
 (laid out as **Mixed practice** or **one section per lesson**, 1–2 pages or more), or **both**; every Single skill /
 Sections / Mixed practice option of §2.5 still applies per worksheet. **Print all** gives one PDF in lesson order, each part
-with its key. **Save as set** keeps the groups (reprint later with new numbers); **Share** gives one short code for the whole
+with its key — only the lessons the teacher added, and only the skills ticked in each (owner: "for only selected lessons"). **Save as set** keeps the groups (reprint later with new numbers); **Share** gives one short code for the whole
 set. Engine: a batch of `buildSheet` requests (one per lesson group, plus the combined one), concatenated into one document;
 the set code extends the compact set code (§2.4). Built with the owner's next batch of design changes (process rule 0).
 
