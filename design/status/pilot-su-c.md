@@ -3,13 +3,13 @@ Title: Pilot — SU-C column subtraction without regrouping, six skills onto `st
 Session: session_01G5ktGS4kteYMuLFxnxGEgU
 Branch: claude/sweet-newton-c8wrv1-wip-pilot-su-c
 Owner of files: subtraction no-regroup generator branch (gen-operations.js ranged sub), subtraction provider, skill-options / skill-presets / standards / wrm / search-terms entries for the six + `sub_2d_1d`
-State: paused
+State: fix
 Updated: 2026-10-23
 Builder profile: mq-opus-low
 Critic rounds: 2, FAIL
 
 ## Now
-- PILOT RESULT: FAIL against the §4.4 bar (2 critic rounds, both FAIL; 1 builder run + 1 fix run; 5 h 37 m wall). Waiting for the lead: fix round 2 (N1-N8) or stop here.
+- PILOT RESULT: FAIL against the §4.4 bar (2 critic rounds, both FAIL; 1 builder run + 1 fix run; 5 h 37 m wall). Lead 22:21: carry on to 8/10 — fix r2 (N1-N8), precritic clean, critic r3; hard stop if r3 fails on a defect that survived two medium rounds.
 - Step 2: one builder run (mq-opus-low) for all six skills from the signed card.
 
 ## Owner go
@@ -18,6 +18,7 @@ Critic rounds: 2, FAIL
 - none
 
 ## Times
+Times: fix round 2 (N1-N8), start 2026-10-23T22:24Z, end —, profile mq-opus-medium
 Times: critic round 2, start 2026-10-23T21:48Z, end 2026-10-23T22:20Z, profile mq-opus-medium, tokens 361k — FAIL (min C1 4, C2 7, C3 6, C4 7)
 Times: precritic pass 4 (after the 38-row re-pin), start 2026-10-23T21:26Z, end 2026-10-23T21:47Z, profile — — OK: 13 PASS (coverage-matrix PASS on the baseline, 0 RED), 1 N/A; rule 0b met
 Times: re-pin 38 rows (--repin, lead ruling), start 2026-10-23T21:20Z, end 2026-10-23T21:26Z, profile —
@@ -105,3 +106,4 @@ Measured 21:20Z with `ws-print-lint --json` (findings of the rule) and `buildShe
 - 2026-10-23 20:01: lead: new process rules 0a (uncertified pair builds run on mq-opus-medium) and 0b (before the critic: precritic green against the pins AND every red matrix row at or below the approved siblings; re-run sibling-compare). 0b applies before critic r2.
 - 2026-10-23 20:56: FIX R1 merged (ff471fd). D1-D12 fixed except D8's Mixed-practice heading: off-limits `sheet/roles/mixed-practice.js:225`, proposed patch `.find((s) => first && first.q && s.skillId === (first.q.presetId || first.q.skillId)) || ... ` (lead / mixed-pages lane). ORCHESTRATOR ERROR CORRECTED: sibling-compare.cjs read the sibling LOG, which prints at most 6 count lines a row, so unseen classes counted as 0; the true pre-fix figure was 124 ABOVE, not 236 (sibling-compare2.cjs reads absolute counts from the matrix --out JSON). After fix r1: 84 above the paired sibling, 38 above ANY named approved stack skill (above-any-after-fix1.txt): TY-11 anchors.js (16), H13 forced 2 cols / side anchors at M (17, every cell flagged on both, we fit 4 rows to their 3), fact-rows (2; proposed fact-rows.js patch), sections PAGEFILL (1), sections ex-each L H13 (3). Lead asked to rule (per-cell equivalence, or land the anchors.js / fact-rows.js fixes first). Proposed machine checks from fix r1: print-lint L-OVERLAP (neighbouring .ws-stack .head boxes), L-ANSAREA (answer segment < 4.4 mm). Also seen: addition:add_three stacked has the same 0.72 em answer-box defect (not changed); fact-probe.js ~136 chunks 9/9/2 instead of 7/7/6 (sub_1m_regroup too).
 - 2026-10-23 22:20: CRITIC R2 FAIL (critic-r2.md). D1-D11 fixed; D12 fixed on sub_1m but the class recurs on sub_50 / sub_100k (N5). New: N1 2-digit dealer skew + fixed zero position (C2 7); N2 lesson Warm-up fact cell 43-59 % empty (H13, C3 6); N3 option-panel help false (C1/C2 7); N4 Across option breaks the page (H2, C1 4); N5 side anchors at L (H13); N6-N8 minor. Engine rulings: (a) confirmed at S, REJECTED at L (my pin at L was wrong, = N5); (b), (c) (same rate per full-length item), (d), fact-probe confirmed. Default Practice pages and every screen host pass from 3 digits up (9/8/8/9).
+- 2026-10-23 22:24: matrix run file renamed pilot-su-c-20261023T2126Z.json (lead). Note: the matrix fold (RUN_RE) reads only date-named run files, so this file's REPINNED records are not folded; the pins themselves live in baseline.json, which precritic reads.
