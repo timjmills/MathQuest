@@ -215,3 +215,12 @@ Index sha: `ed32bdf58a41e14cceffd96fefef3a0bc6156109` · 1566 rules · 9 cross-f
 | VA5 | VA-5 (WORKSHEET_DESIGN_STANDARD.md); VA-05 (design/PROBLEM_TYPES.md) |
 | VA6 | VA-6 (WORKSHEET_DESIGN_STANDARD.md); VA-06 (design/PROBLEM_TYPES.md) |
 | VA7 | VA-7 (WORKSHEET_DESIGN_STANDARD.md); VA-07 (design/PROBLEM_TYPES.md) |
+
+## Ids cited outside this index
+
+The card-coverage test reads the ids critics cite (`design/status/defect-findings.csv`). These are not in the index:
+
+| Id | Status | Where |
+|---|---|---|
+| `LR-n` | external (NOTE, not a warning) | design/LESSON_RULES.md (lesson rules LR-1..LR-18; on origin/claude/sweet-newton-c8wrv1-wip-lessons, not on this branch) |
+| `H0` | known typo in the tally (stays a WARNING) | not a rule: the tally read "H0.32" / "H0.37" (a measured empty-band ratio in guided-r1 grade-run summaries) as a rule id |

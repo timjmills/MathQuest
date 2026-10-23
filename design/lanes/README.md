@@ -132,8 +132,18 @@ or `--cut <code>` with `--group pins` for one manifest per share-code pin sectio
 
 ```bash
 node tests/scripts/ws-integrate.mjs --self-test       # seeded fixtures in a temp dir (26 checks)
-node tests/scripts/ws-integrate.mjs --dry-run         # rebuild today's tree from manifests (see DRY_RUN.md)
+node tests/scripts/ws-integrate.mjs --dry-run         # rebuild the 150 appended skills from manifests (see DRY_RUN.md)
 ```
+
+**What the dry run covers:** it is the E5 gate as built, not a rebuild of the whole tree. It rebuilds the **150 skills
+appended since the share codes were frozen** (114 presets + 36 real skills, codes `T6` on), not the 572 frozen
+skills: their entries sit in packed, non-uniform lines (two to four codes per line in `FROZEN_SKILL_CODES`, with no
+pin-section headers; `SKILL_TIME_CATEGORY` / `SKILL_PRINT_SIZE` in `data.js` and some `search-terms.js` lines pack
+several skills per line), which a manifest
+cannot carry and a peel would cut in half. Peeling them would take a layout-only reflow of those tables to one entry
+per line plus a pin header per category (owner approval first), then `--cut AA`. As built, `--cut <code>` moves the
+start of the cut (a later code narrows it; `T6` is already the earliest pin section), and `--extract --skills
+cat:id,...` writes manifests for any skills, frozen ones included. Details in `DRY_RUN.md`.
 
 The dry run makes a temporary `git worktree` of HEAD (the main working tree is never touched), extracts a manifest
 per share-code pin section for every skill pinned from `T6` (the P4 appends, 2026-09-20) on, peels those entries

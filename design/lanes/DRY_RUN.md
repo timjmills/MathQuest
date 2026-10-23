@@ -4,6 +4,34 @@
 of HEAD and requires no diff and the four gates green. The main working tree is never modified (the worktree is
 removed afterwards). Re-run it after any change to the integrator or to the registry files' shape.
 
+## What it rebuilds (and what it does not)
+
+**This is the E5 gate as built, not a rebuild of the whole tree.** It peels out and re-applies the **150 skills
+appended since the share codes were frozen** (2026-09-19): every skill pinned from share code `T6` on — 36 real
+skills and 114 presets — out of the 722 skills the share codes cover today. The other **572 skills are not
+peeled**: they are the frozen base the manifests apply onto.
+
+Why: those 572 entries sit in packed, non-uniform lines. `FROZEN_SKILL_CODES` in `skill-codes-frozen.js` holds two to
+four entries per line, grouped under a `// <category>` comment, with no `// ---- … ----` pin-section headers (the
+extractor's unit is a pin section, and the first header is the P4 append at `T6`); `SKILL_TIME_CATEGORY` and
+`SKILL_PRINT_SIZE` in `data.js` pack three to six skills per line, keyed by bare skill id, and `search-terms.js`
+has packed lines too (`SKILLS`, `SKILL_STANDARDS` and `SKILL_WRM` are already one entry per line). The extractor leaves a packed line whole (as it does for `number_chart_fill`, which shares its lines
+with the base skill `hundreds_chart_fill`), so a manifest could not carry those skills' layout and peeling them would
+cut lines in half. Those skills are history no lane will add again: a new lane only ever appends.
+
+What it would take to peel them too: reflow `FROZEN_SKILL_CODES` and the packed `data.js` / `search-terms.js` lines to one entry per line and
+add a pin-section header per category to `FROZEN_SKILL_CODES` (layout only: no code, position or value changes, so
+`ws-code-snapshot` stays green, but a diff of several hundred lines in the frozen tables that the owner should approve
+first), then run the dry run with a cut at the first code (`--cut AA`).
+
+How to widen or narrow it as built:
+
+- `--dry-run --cut <code>` starts the cut at the pin section holding `<code>`. `T6` (the default) is the earliest
+  section there is, so a later code narrows the run; a code before `T6` (`AA`) gives the same 150 skills until the
+  reflow above is done.
+- `--extract --skills cat:id,...` (or `--since <commit>`) writes manifests for any named skills, frozen ones
+  included, to inspect or hand to a lane; the dry run itself peels only pin sections.
+
 ## Run of 2026-10-23
 
 | | |

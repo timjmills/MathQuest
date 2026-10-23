@@ -42,7 +42,7 @@ The owner's go for a family to go live (§1.6.3 step 6) is one line in the lane'
 Owner go: <family>, <YYYY-MM-DD>
 ```
 
-`<family>` is the category / family id in lowercase (e.g. `addition`, `place_value`). Only go lines, blank lines and
+`<family>` is the category / family id in lowercase (e.g. `addition`, `placevalue`; it must be a SKILLS category, a spec-card id or a line of `families.txt`). Only go lines, blank lines and
 HTML comments may stand in that section; anything else, an impossible date, or an `Owner go:` line elsewhere in the
 file fails `ws-status-index`, so the S5 deploy runner can trust `--owner-go --json`.
 

@@ -14,10 +14,6 @@
  "findingsMatch": {
   "templates": [
    "stack"
-  ],
-  "families": [
-   "addition",
-   "subtraction"
   ]
  },
  "skills": {
@@ -79,6 +75,7 @@
  "ruleGroups": [
   {
    "title": "The stack (WORKSHEET_DESIGN_STANDARD §10.1-10.3, quoted in full)",
+   "core": true,
    "full": true,
    "rules": [
     "VA-1",
@@ -93,6 +90,16 @@
     "VA-20",
     "VA-22",
     "VA-23"
+   ]
+  },
+  {
+   "title": "Key, tracks and screen regroup boxes (quoted in full)",
+   "core": true,
+   "full": true,
+   "rules": [
+    "AK-2",
+    "TY-21",
+    "SP-23"
    ]
   },
   {
@@ -167,7 +174,9 @@
     "Q-10",
     "P-10",
     "P-35",
-    "P-31"
+    "P-31",
+    "BD-4",
+    "PT-SCR-1"
    ]
   },
   {
@@ -183,7 +192,16 @@
     "DN-1a",
     "PT-GDP-2",
     "SL-3",
-    "SP-20"
+    "SP-20",
+    "PT-REV-3"
+   ]
+  },
+  {
+   "title": "Owner exceptions cited on the multiplication family (count rows only; they do not apply to the stack)",
+   "chars": 90,
+   "rules": [
+    "TY-10a",
+    "SL-3a"
    ]
   },
   {

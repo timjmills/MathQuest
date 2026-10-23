@@ -12,6 +12,8 @@
 //                                                          every line of <ref>:design/STATUS.md appears, in order, now
 //   node tests/scripts/ws-status-index.mjs --owner-go [--json]
 //                                                          every `Owner go: <family>, <YYYY-MM-DD>` line; malformed = exit 1
+//                                                          (family: a SKILLS category, a spec-card id or a line of
+//                                                          design/status/families.txt; date: real and not after today)
 //   node tests/scripts/ws-status-index.mjs --conflicts --since <YYYY-MM-DD|commit>
 //                                                          re-run every merge since then; count STATUS / stamp conflicts
 //   node tests/scripts/ws-status-index.mjs --self-test     inline fixtures in a temp dir
@@ -42,6 +44,49 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 const defaultRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
+// ---------------------------------------------------------------- known families
+//
+// A go line's <family> must be a known id: a category of SKILLS (js/modules/data.js, read as text: the module needs a
+// browser), a spec-card id (design/cards/<id>/), or a line of design/status/families.txt (the plan's template-family
+// ids, which are not categories). Its date must not be after today.
+const FAMILIES_REL = 'design/status/families.txt';
+const CARDS_REL = 'design/cards';
+
+export function skillsCategories(dataJsText) {
+  const at = dataJsText.search(/^export const SKILLS = \{/m);
+  if (at < 0) return [];
+  const body = dataJsText.slice(at);
+  const end = body.search(/^\};/m);
+  const out = [];
+  for (const m of body.slice(0, end < 0 ? undefined : end).matchAll(/^ {4}([a-z][a-z0-9_]*): \[/gm)) out.push(m[1]);
+  return out;
+}
+
+export function knownFamilies(root) {
+  const fams = new Set();
+  const sources = [];
+  const data = path.join(root, 'js/modules/data.js');
+  if (fs.existsSync(data)) { const c = skillsCategories(fs.readFileSync(data, 'utf8')); c.forEach((x) => fams.add(x)); sources.push(`${c.length} SKILLS categories`); }
+  const fl = path.join(root, FAMILIES_REL);
+  if (fs.existsSync(fl)) {
+    let n = 0;
+    for (const line of fs.readFileSync(fl, 'utf8').split('\n')) { const t = line.replace(/#.*/, '').trim(); if (t) { fams.add(t); n++; } }
+    sources.push(`${n} in ${FAMILIES_REL}`);
+  }
+  const cd = path.join(root, CARDS_REL);
+  if (fs.existsSync(cd)) {
+    const ids = fs.readdirSync(cd, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
+    ids.forEach((x) => fams.add(x));
+    sources.push(`${ids.length} spec cards`);
+  }
+  return { set: fams, sources };
+}
+
+function localToday() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 function validDate(s) {
   if (!DATE_RE.test(s)) return false;
   const d = new Date(s + 'T00:00:00Z');
@@ -69,7 +114,8 @@ export function isLaneText(text) {
   return i < lines.length && /^Lane:\s*\S/.test(lines[i]);
 }
 
-export function parseLane(text, rel) {
+// opts: {families: Set (null = do not check), today: 'YYYY-MM-DD'}
+export function parseLane(text, rel, { families = null, today = localToday() } = {}) {
   const errors = [];
   const lines = text.replace(/\r$/gm, '').split('\n');
   let i = headerStart(lines);
@@ -106,6 +152,8 @@ export function parseLane(text, rel) {
       const m = GO_RE.exec(line);
       if (!m) { errors.push(`${rel}:${j + 1}: malformed go line (want "Owner go: <family>, <YYYY-MM-DD>"): ${line}`); continue; }
       if (!validDate(m[2])) { errors.push(`${rel}:${j + 1}: go line date "${m[2]}" is not a real date`); continue; }
+      if (m[2] > today) { errors.push(`${rel}:${j + 1}: go line date "${m[2]}" is in the future (today is ${today})`); continue; }
+      if (families && !families.has(m[1])) { errors.push(`${rel}:${j + 1}: go line family "${m[1]}" is not a known family (a SKILLS category in js/modules/data.js, a spec card in ${CARDS_REL}/, or a line of ${FAMILIES_REL})`); continue; }
       go.push({ family: m[1], date: m[2], lane: header.Lane || path.basename(rel, '.md'), file: rel, line: j + 1 });
     } else if (/^\s*Owner go:/.test(line)) {
       errors.push(`${rel}:${j + 1}: "Owner go:" line outside the "## Owner go" section (it would not count)`);
@@ -118,7 +166,10 @@ export function parseLane(text, rel) {
   return { rel, header, go, errors };
 }
 
-export function readLanes(root) {
+// opts: {families: Set | null (default: knownFamilies(root)), today}
+export function readLanes(root, opts = {}) {
+  const families = opts.families !== undefined ? opts.families : knownFamilies(root).set;
+  const today = opts.today || localToday();
   const dir = path.join(root, LANES_REL);
   const lanes = [];
   const ignored = [];
@@ -129,7 +180,7 @@ export function readLanes(root) {
     if (!fs.statSync(full).isFile() || !name.endsWith('.md') || name.startsWith('_')) { ignored.push(rel); continue; }
     const text = fs.readFileSync(full, 'utf8');
     if (!isLaneText(text)) { ignored.push(rel); continue; }
-    lanes.push(parseLane(text, rel));
+    lanes.push(parseLane(text, rel, { families, today }));
   }
   const errors = lanes.flatMap((l) => l.errors);
   const seen = new Map();
@@ -311,6 +362,10 @@ function selfTest() {
       '## Now', '- building', '', '## Owner go', '<!-- go lines only -->', ...goLines, '', '## Open questions', '- none', '',
       '## Log', '- 2026-10-23: started', ''].join('\n');
     const w = (name, text) => fs.writeFileSync(path.join(root, LANES_REL, name), text);
+    // the known families of the fixture: SKILLS categories (data.js read as text), families.txt, spec-card ids
+    fs.mkdirSync(path.join(root, 'js/modules'), { recursive: true });
+    fs.writeFileSync(path.join(root, 'js/modules/data.js'), "export const DOMAINS = {\n    number: { cats: ['addition'] },\n};\nexport const SKILLS = {\n    addition: [\n        { v: 'add', l: 'Add' },\n    ],\n    subtraction: [],\n    fractions: [\n    ],\n};\nexport const OTHER = {\n    notafamily: [],\n};\n");
+    const RL = (r) => readLanes(r, { today: '2026-10-24' });
     w('alpha.md', lane('alpha', 'building', ['Owner go: addition, 2026-10-22']));
     w('beta.md', lane('beta', 'planned'));
     // Non-lane files that must be ignored.
@@ -321,7 +376,7 @@ function selfTest() {
     w('metrics.md', '# Metrics\n\nLane notes are not lanes.\n');
 
     // 1. ignore rule
-    const r1 = readLanes(root);
+    const r1 = RL(root);
     check(r1.errors.length === 0, `fixture lanes parse with no errors (${r1.errors.join('; ') || 'none'})`);
     check(r1.lanes.map((l) => l.header.Lane).join(',') === 'alpha,beta', 'only alpha.md and beta.md are lanes');
     check(['_TEMPLATE.md', 'defect-classes.md', 'README.md', 'defect-tally.csv', 'metrics.md'].every((n) => r1.ignored.includes(`${LANES_REL}/${n}`)), 'non-lane files in design/status are ignored');
@@ -338,13 +393,13 @@ function selfTest() {
 
     // 3. idempotent regeneration
     const g1 = regenerate(inited, r1.lanes);
-    const g2 = regenerate(g1, readLanes(root).lanes);
+    const g2 = regenerate(g1, RL(root).lanes);
     check(g1 === inited && g2 === g1, 'regeneration is idempotent (byte-identical on a second run)');
 
     // 4. region-only edits
     const edited = g1.replace(ARCHIVE_HEADING, `${ARCHIVE_HEADING}\n\nLead note added by hand.`) + '- appended by the lead\n';
     w('beta.md', lane('beta', 'critic', ['Owner go: fractions, 2026-10-24']));
-    const r2 = readLanes(root);
+    const r2 = RL(root);
     const stale = regenerate(edited, r2.lanes) !== edited;
     check(stale, 'a lane change makes the region stale (--check would fail)');
     const g3 = regenerate(edited, r2.lanes);
@@ -355,16 +410,27 @@ function selfTest() {
 
     // 5. malformed go lines fail
     w('gamma.md', lane('gamma', 'building', ['Owner go: subtraction 2026-10-23']));
-    const r3 = readLanes(root);
+    const r3 = RL(root);
     check(r3.errors.some((e) => e.includes('gamma.md:') && e.includes('malformed go line')), 'a malformed go line is an error with file:line');
     w('gamma.md', lane('gamma', 'building', ['Owner go: subtraction, 2026-02-30']));
-    check(readLanes(root).errors.some((e) => e.includes('not a real date')), 'an impossible go date is an error');
+    check(RL(root).errors.some((e) => e.includes('not a real date')), 'an impossible go date is an error');
     w('gamma.md', lane('gamma', 'building').replace('## Log\n', '## Log\nOwner go: subtraction, 2026-10-23\n'));
-    check(readLanes(root).errors.some((e) => e.includes('outside the "## Owner go" section')), 'a go line outside its section is an error');
+    check(RL(root).errors.some((e) => e.includes('outside the "## Owner go" section')), 'a go line outside its section is an error');
+    w('gamma.md', lane('gamma', 'building', ['Owner go: subtraction, 2026-10-25']));
+    check(RL(root).errors.some((e) => e.includes('gamma.md:') && e.includes('in the future')), 'N1: a go date after today is an error');
+    w('gamma.md', lane('gamma', 'building', ['Owner go: notafamily, 2026-10-23']));
+    check(RL(root).errors.some((e) => e.includes('"notafamily" is not a known family')), 'N1: an unknown family is an error (an object other than SKILLS does not count)');
+    check(JSON.stringify(skillsCategories(fs.readFileSync(path.join(root, 'js/modules/data.js'), 'utf8'))) === '["addition","subtraction","fractions"]', 'N1: SKILLS categories are read from data.js as text');
+    w('gamma.md', lane('gamma', 'building', ['Owner go: stack, 2026-10-23', 'Owner go: long-division, 2026-10-23']));
+    const e5 = RL(root).errors;
+    check(e5.some((e) => e.includes('"stack" is not a known family')) && e5.some((e) => e.includes('"long-division" is not a known family')), 'N1: template-family ids need families.txt or a card');
+    fs.writeFileSync(path.join(root, 'design/status/families.txt'), '# template families\nstack   # the column template\n');
+    fs.mkdirSync(path.join(root, 'design/cards/long-division'), { recursive: true });
+    check(RL(root).errors.length === 0, 'N1: a family listed in design/status/families.txt or a spec-card id is accepted');
     w('gamma.md', lane('gamma', 'sleeping'));
-    check(readLanes(root).errors.some((e) => e.includes('State "sleeping"')), 'an unknown State is an error');
+    check(RL(root).errors.some((e) => e.includes('State "sleeping"')), 'an unknown State is an error');
     fs.rmSync(path.join(root, LANES_REL, 'gamma.md'));
-    const goLines = readLanes(root).lanes.flatMap((l) => l.go);
+    const goLines = RL(root).lanes.flatMap((l) => l.go);
     check(goLines.length === 2 && goLines.every((g) => /^design\/status\/(alpha|beta)\.md$/.test(g.file) && g.line > 0), 'go lines carry lane, file and line');
 
     // 6. the conflicts measurement on a tiny repo
