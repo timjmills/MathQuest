@@ -370,7 +370,7 @@
   }
  ],
  "options": [
-  "Declared today per skill (below). The ladder in O-rubric terms: O2 number size by digits / within N (answer-bounded) and regroup never / some / every; O3 support = heads, regroup boxes, touch dots, start arrow (hints fade, the grid stays); O6 stacked / across.",
+  "Declared today per skill: §7b, after the Signed line (informational, not signed). The ladder in O-rubric terms: O2 number size by digits / within N (answer-bounded) and regroup never / some / every; O3 support = heads, regroup boxes, touch dots, start arrow (hints fade, the grid stays); O6 stacked / across.",
   "Pending options from owner rulings: `carry: top | bottom` (vis_carry_below), regroup boxes marked / unmarked / optional on screen (REGROUP-BOXES-SPEC), decimal-point track `dp` and the expanded form (vis_stack_layouts). Each is a plain option, not a preset skill, unless it teaches a new size class (CLAUDE.md distinct-option rule)."
  ],
  "gates": [

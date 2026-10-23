@@ -1,5 +1,5 @@
 <!-- spec-card
-{"card":"stack","kind":"template","template":"stack","families":["addition","subtraction"],"match":{"templates":["stack"]},"config":"design/cards/stack/card.json","generated":"2026-10-23","indexSha":"ed32bdf58a41e14cceffd96fefef3a0bc6156109","bodySha":"bfb31c823932834b"}
+{"card":"stack","kind":"template","template":"stack","families":["addition","subtraction"],"match":{"templates":["stack"]},"config":"design/cards/stack/card.json","generated":"2026-10-23","indexSha":"ed32bdf58a41e14cceffd96fefef3a0bc6156109","bodySha":"4f333c0e347ccaff","format":2,"configSha":"072278fc26ca"}
 {"cited":"AK-2 AX-4 AX-9 BD-4 BD-7 BD-11 C1 CL-9 DN-1a H1 H2 H3 H4 H5 H6 H7 H8 H9 H10 H11 H12 H13 L1 L6 LR-4 LR-6 OC4 P-1 PG-12 PT-FRM-6 PT-GDP-1 PT-GDP-2 PT-REV-3 PT-SCR-1 RP-1 RP-20 SL-1 SL-2 SL-3 SL-3a SP-20 TY-10a VA-10","rules":"VA-1 12d322 2 26885a 4 b05d12 7 13eea3 VA-10@WDS 9d9099 VA-11@WDS a5ab88 VA-12@WDS 60049e VA-13@WDS 05d8bb VA-13a c2dfad 20 ef38e6 22 045140 23 04bd6f AK-2 d4709f TY-21 53ed7d SP-23 fe1461 H2@RUBRIC f5bba0 H4@RUBRIC 9ce1f3 H5@RUBRIC b3892d H6 0722fd 8 44c23b 13 36f579 L1 799b66 VA-3 770d75 5 1337f5 6 45cb76 21 8802ac 30 5b42ae 31 2f0077 32 898868 LS-8 59531d SL-12 3cbafa TY-20 8964d2 23 e741c0 24 e73e2c 26 cc6cf2 VA-40 914c3a 41 1325cb 42 1b3a08 50 905c89 51 ca8fb1 52 992853 SL-1 e3b064 2 f404d5 11 183e7a CL-6 102a92 9 accb97 PG-12 8e75fd 14 64a88e PT-CGR-5 3f7489 PT-EQD-2 ed82db DN-34 d5b0e7 AK-1 a0cc12 4 8d027b INK-31 d7ece8 BD-7 81d3da PT-GDP-1 a0e2cc P-SC-7 65e105 SF-34@WDS.1 00e2f6 SP-1 87c2cc 2 1f2df0 3 7b7bfb 4 51a802 10 6ffb0a 12 1309f9 SCC-T3 359377 4 e83741 10 084029 14 b8671c 15 fc9373 17 c36547 SCC-P5 6387d4 6 d362fd BD-10 8d473f 11 29d891 12 36b79c PT-FRM-6 daac17 P-1 5a3076 29 89eb8e Q-10 50b907 P-10 256ad3 35 4b32c0 31 28b15c BD-4 b3947b PT-SCR-1 25f6f5 CL-1 277ec4 AX-4 2eb6c1 INK-5 631a6d TY-7 e3e1e1 RP-1 d529bd AX-9 74e9a4 DN-1a 4fcc05 PT-GDP-2 386bb5 SL-3 468d78 SP-20 cfb11a PT-REV-3 d5e0d9 TY-10a 5e59f3 SL-3a d38939 RP-20 8888b0 21 ad2ba4 C1 66f8a9 2 32e3b2 3 3d5192 4 e59efd H1@RUBRIC bf4b29 H3@RUBRIC d7f21f H7 3d3d38 9 fd82d1 10 fbd802 11 bef034 12 2de4f7 OC3 bb8551 4 00a5e1 7 81bde7 8 089b5e 10 ad6428 11 c55e70 14 18b2a5 L2 fecb99 3 901e56 4 6538d6 5 4d48a8 6 6e19d8 9 f4b4c0 10 d2ca35 11 9ebe19 CL-31 383ae0 INK-3 b9f1f1 4 fe5b27 P-LC-9 bc47bd SCC-01 8aa70b SF-10 f1a0d9 SL-10 9fe607 TY-2 510243 13 3d0f88 22 7e9b75 25 b0a223"}
 -->
 # Spec card: Stacked arithmetic (the `stack` template)
@@ -349,28 +349,10 @@ For answer keys, `wrongAnswer`, error analysis, True or False? and Reason It (P-
 
 ## 7. Options and presets
 
-- Declared today per skill (below). The ladder in O-rubric terms: O2 number size by digits / within N (answer-bounded) and regroup never / some / every; O3 support = heads, regroup boxes, touch dots, start arrow (hints fade, the grid stays); O6 stacked / across.
+- Declared today per skill: §7b, after the Signed line (informational, not signed). The ladder in O-rubric terms: O2 number size by digits / within N (answer-bounded) and regroup never / some / every; O3 support = heads, regroup boxes, touch dots, start arrow (hints fade, the grid stays); O6 stacked / across.
 - Pending options from owner rulings: `carry: top | bottom` (vis_carry_below), regroup boxes marked / unmarked / optional on screen (REGROUP-BOXES-SPEC), decimal-point track `dp` and the expanded form (vis_stack_layouts). Each is a plain option, not a preset skill, unless it teaches a new size class (CLAUDE.md distinct-option rule).
 
-**Options declared today** (`js/modules/skill-options.js`; id, label, values, skills that declare it):
-
-- `band` Numbers to: 10 / 20 (42)
-- `level` Support level: 3 — worked example, traced (3) / 2 — hints shown (2) / 1 — structure only (1) (38)
-- `notation` How it is written: Stacked (8 above + 7, with a rule under it) (stacked) / Across (8 + 7 = __) (across) (19)
-- `cover` Which problems get it: Every problem (whole) / Only the problems that need it (needed) / Fade down the page (all, then less, then none) (fade) (13)
-- `mix` Supports that clash: Section by section (section) / Problem by problem (problem) (13)
-- `support` Support: Touch dots: count on (on the smaller number) (touch) / Touch dots: count all (touchall) / Start arrow over the ones column (startarrow) / The sign in a box, named (boxsign) (13)
-- `regroup` Regrouping (carrying): Never (none) / Some items (mixed) / Every item (always) (8)
-- `regroup` Regrouping (borrowing): Never (none) / Some items (mixed) / Every item (always) (8)
-- `zeroPlace` Across zeros (5,003 − 2,847): Now and then (some) / Every item (always) (8)
-- `unknown` What is missing: The answer (8 + 7 = __) (answer) / The first number (__ + 7 = 15) (first) / The second number (8 + __ = 15) (second) / Mixed (mixed) (2)
-- `band` Start numbers to: 500 (304 − 126) (500) / 1,000 (905 − 367) (1000) / 10,000 (5,003 − 2,847) (10000) (1)
-- `task` Operation: Adding (0) / Subtracting (1) (1)
-- `tiles` Numbers to add: (Dealt across the page (3 and 4)) / 3 numbers (3) / 4 numbers (4) (1)
-- `tiles` Top number: 2 digits (47 × 6) (21) / 3 digits (215 × 6) (31) (1)
-- `tiles` Digits × digits: (Tables facts to 12 × 12 (follows Max Number)) / 1-digit × 1-digit (7 × 8) (11) / 2-digit × 1-digit (34 × 6) (21) / 3-digit × 1-digit (215 × 4) (31) / 2-digit × 2-digit (34 × 26) (22) (1)
-
-**Preset skills on these hosts** (`js/modules/skill-presets.js`): `multiplication:mult_2by1_column` → `multiplication:multiply` {"tiles":21}; `multiplication:mult_2by2_standard` → `multiplication:multiply` {"tiles":22}; `multiplication:mult_3by1_column` → `multiplication:multiply` {"tiles":31}
+The options and preset skills declared in the repo today are listed after the Signed line (§7b, informational, not signed).
 
 ## 8. Gates
 
@@ -400,3 +382,29 @@ Each runs as `node tests/scripts/<script> …`.
 6. **MW4K / IXL research is pending logins (Q-H4). Sign now?** Recommended: Yes, sign now; add the research to section 2 when the logins work, and re-sign only if the problem types or progression change.
 
 Signed: (not yet signed)
+
+<!-- informational: not signed. Not hashed, not compared, never read by any check. -->
+## 7b. Current options in the repo (informational, not signed)
+
+Listed from the repo at generation, so a build that adds the options the card asks for does not break the signature. Not part of the signed card: the owner signs section 7 above.
+
+**Options declared today** (`js/modules/skill-options.js`; id, label, values, skills that declare it):
+
+- `band` Numbers to: 10 / 20 (42)
+- `level` Support level: 3 — worked example, traced (3) / 2 — hints shown (2) / 1 — structure only (1) (38)
+- `notation` How it is written: Stacked (8 above + 7, with a rule under it) (stacked) / Across (8 + 7 = __) (across) (19)
+- `cover` Which problems get it: Every problem (whole) / Only the problems that need it (needed) / Fade down the page (all, then less, then none) (fade) (13)
+- `mix` Supports that clash: Section by section (section) / Problem by problem (problem) (13)
+- `support` Support: Touch dots: count on (on the smaller number) (touch) / Touch dots: count all (touchall) / Start arrow over the ones column (startarrow) / The sign in a box, named (boxsign) (13)
+- `regroup` Regrouping (carrying): Never (none) / Some items (mixed) / Every item (always) (8)
+- `regroup` Regrouping (borrowing): Never (none) / Some items (mixed) / Every item (always) (8)
+- `zeroPlace` Across zeros (5,003 − 2,847): Now and then (some) / Every item (always) (8)
+- `unknown` What is missing: The answer (8 + 7 = __) (answer) / The first number (__ + 7 = 15) (first) / The second number (8 + __ = 15) (second) / Mixed (mixed) (2)
+- `band` Start numbers to: 500 (304 − 126) (500) / 1,000 (905 − 367) (1000) / 10,000 (5,003 − 2,847) (10000) (1)
+- `task` Operation: Adding (0) / Subtracting (1) (1)
+- `tiles` Numbers to add: (Dealt across the page (3 and 4)) / 3 numbers (3) / 4 numbers (4) (1)
+- `tiles` Top number: 2 digits (47 × 6) (21) / 3 digits (215 × 6) (31) (1)
+- `tiles` Digits × digits: (Tables facts to 12 × 12 (follows Max Number)) / 1-digit × 1-digit (7 × 8) (11) / 2-digit × 1-digit (34 × 6) (21) / 3-digit × 1-digit (215 × 4) (31) / 2-digit × 2-digit (34 × 26) (22) (1)
+
+**Preset skills on these hosts** (`js/modules/skill-presets.js`): `multiplication:mult_2by1_column` → `multiplication:multiply` {"tiles":21}; `multiplication:mult_2by2_standard` → `multiplication:multiply` {"tiles":22}; `multiplication:mult_3by1_column` → `multiplication:multiply` {"tiles":31}
+<!-- /informational -->
