@@ -253,4 +253,4 @@ Each runs as `node tests/scripts/<script> …`.
 7. **SU-M1 (smaller from larger) is invisible on a no-regroup page. Seed regroup non-examples here (P-10)?** Recommended: No: the skill's name promises no regrouping and `ws-content-audit` holds it to that. The non-examples and the decide page live on the `_mixed` skills (SU-R R2). Here the key's `wrongAnswer` is built from SU-M7 (adds), M-ALIGN (left-lined) and M-ZERO, which do show on these items.
 8. **MW4K / IXL research is pending logins (Q-H4). Sign now?** Recommended: Yes, sign now; add the research to section 2 when the logins work, and re-sign only if the problem types or progression change.
 
-Signed: (not yet signed)
+Signed: owner, 2026-10-23
