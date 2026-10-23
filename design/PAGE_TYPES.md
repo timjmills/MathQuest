@@ -1432,12 +1432,16 @@ Slot map (positions never move; the binding changes by Level band; any slot can 
 
 ### 5.2 Mixed Skill Practice
 
-> **Build status 2026-10-23:** only GROUPED packing is built (`sheet/roles/mixed-practice.js`); SHUFFLED (PT-MIX-5…7) is not.
+> **Build status 2026-10-23:** GROUPED packing is built (`sheet/roles/mixed-practice.js`). Phase M1 builds a mixed order for
+> skills of one size class: the skills are interleaved (`sheet/interleave.js`: counts within 1 of the weights with two of each,
+> no run over 2, every skill in the first third, order from the seed) into shelves of the same k cells under one "Solve." strip,
+> each cell keeping its own instruction; skills of different size classes still print GROUPED, with the reason in the notes.
+> The 2 × 2 block packer of SHUFFLED (PT-MIX-5…7) is not built yet (M2).
 > The plan that builds it — interleaving, unit footprints, the 2 × 2 block packer, in-cell cues, key legend, screen parity — is
 > `design/IMPROVEMENT_PLAN.md` §3. Its teacher name is "Mixed practice", one of the three kinds of worksheet (Single skill · Sections · Mixed practice, owner 2026-10-23; §2.5 there).
 
 **Purpose.** Any set of skills, in any proportions, on one ruled rectangle where every vertical rule lands on a shared unit lattice.
-**Look.** Daily by default (I Can available). Default arrangement GROUPED.
+**Look.** Daily by default (I Can available). Default arrangement SHUFFLED for 2+ skills, GROUPED from a lesson.
 
 ```
 GROUPED (default): one shelf per skill             SHUFFLED: strips two units high, built from 2 x 2 blocks
