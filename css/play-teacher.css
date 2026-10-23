@@ -136,6 +136,9 @@ body.teacher-mode.tv-bigboard #gameView #answerOptions { pointer-events: none; }
     body.teacher-mode.tv-bigboard #gameView.active { padding: 12px; gap: 12px; }
     body.teacher-mode.tv-bigboard #gameView #questionPaper { zoom: 1; }
 }
+/* Board fit (launch-chrome.js fitBoard): when the capped zoom above would scroll the card, the
+   largest zoom that fits, measured per question; never below 1. */
+body.teacher-mode.tv-bigboard #gameView #questionPaper.tvb-fitted { zoom: var(--tvb-fit, 1); }
 
 #tvBoardBar, #tvBoardCtl { display: none; }
 body.teacher-mode.tv-bigboard #gameView #tvBoardBar { display: flex; }
