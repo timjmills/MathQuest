@@ -17,7 +17,7 @@ the archive below is this file as it stood before Wave 0, kept byte for byte.
 | mixed-pages | Truly mixed practice pages (M1–M5) | planned | 2026-10-23 | mq-opus-medium | 0, none | [mixed-pages.md](status/mixed-pages.md) |
 | teacher-site | Teacher site 2.0 (T1–T6, mock-up first) | planned | 2026-10-23 | mq-opus-medium | 0, none | [teacher-site.md](status/teacher-site.md) |
 | wave0-a | Wave 0 — precritic and checks (S1, S2, S4, S5, S9) | planned | 2026-10-23 | mq-opus-medium | 0, none | [wave0-a.md](status/wave0-a.md) |
-| wave0-b | Wave 0 — process (S3, S6, S7, S8, E5) | building | 2026-10-23 | mq-opus-medium | 0, none | [wave0-b.md](status/wave0-b.md) |
+| wave0-b | Wave 0 — process (S3, S6, S7, S8, E5) | fix | 2026-10-23 | mq-opus-medium | 1, FAIL | [wave0-b.md](status/wave0-b.md) |
 
 ### Owner go
 
