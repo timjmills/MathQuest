@@ -2,7 +2,12 @@
 # The ONE deploy-gate list (IMPROVEMENT_PLAN §1.4 S5; closes STATUS §7 "One deploy-gate list"), in three sessions
 # that can run in three cloud sessions at once, or one after another here.
 #
-#   bash tests/scripts/ws-deploy-gates.sh --list            # print the gate list (session, kind, command, present?)
+#   bash tests/scripts/ws-deploy-gates.sh --list            # print the gate list (session, kind, command, present?),
+#                                                           # then the time budget check (A8; exits with it)
+#   bash tests/scripts/ws-deploy-gates.sh --budget [--session N] [--timings f.jsonl]
+#                                                           # A8: each session's predicted wall clock from the gates'
+#                                                           # last measured seconds; FAIL over MQ_SESSION_BUDGET_MIN
+#                                                           # (default 30); UNTIMED gates are a WARNING
 #   bash tests/scripts/ws-deploy-gates.sh --session 1       # node gates + the browser gates that are not screen sweeps
 #   bash tests/scripts/ws-deploy-gates.sh --session 2       # ws-screen-slots + ws-chromebook-fit, sharded over the two
 #                                                           # browser slots, + viewport, S9 and the board / dark sweeps
@@ -112,7 +117,7 @@ PRINT_LINT_LIMIT=${MQ_PRINT_LINT_LIMIT:-461/33}
 COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo unknown)
 [ -n "$(git status --porcelain 2>/dev/null | grep -v '^??' | head -n 1)" ] && COMMIT="$COMMIT+dirty"
 
-usage() { sed -n '2,32p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,37p' "$0" | sed 's/^# \{0,1\}//'; }
 MATRIX_DIR=${MQ_MATRIX_DIR:-design/audit/matrix}
 MATRIX_BUDGET=${MQ_MATRIX_BUDGET:-500}
 ACCEPT_NOTYET=()
@@ -179,6 +184,9 @@ EOF
 #   - (N4) over the budget before the full baseline, the WARNING names how many affected rows HAVE a baseline entry
 #     (unchecked at this deploy) and how many have none, from the matrix's <inline>.over-budget.json.
 #   - (critic r4 D2) every run file is folded in the order it FINISHED (`finished`), whatever its name, ties by name;
+#   - (A10, ws-coverage-matrix foldRuns) a run file whose `finished` is more than 10 min after now (MQ_NOW) is a WARNING:
+#     its rows clear nothing, and it is never "the newest nightly" for the age / cover rules; (A11) a run file with no
+#     `baseline` field that finished after the N2 cut-off (2026-10-23T19:46Z) clears nothing (before it: the WARNING);
 #   - (critic r4 N2 / N3 / N9, ws-coverage-matrix foldRuns) an OK judged against another directory's baseline or a stale
 #     entry, an OK from a dirty run, and PENDING(step) / N/A never clear a red row; each such OK is a WARNING, as is a
 #     run file written before N2 that cleared a row unchecked, and a row with a baseline entry that turned N/A.
@@ -219,7 +227,7 @@ for (const l of foldSkipNote(fold)) console.log(`nightly:${l.replace(/^ +/, ' ')
 for (const w of foldWarnings(fold)) warn(w);
 // the AGE and the COVER of the newest nightly are judged on the nightly's own names only (a lane's run under another
 // name is folded for its rows, but it is not "the newest nightly")
-const nightFiles = fold.files.filter((f) => !f.extra && f.named !== false);
+const nightFiles = fold.files.filter((f) => !f.extra && f.named !== false && !f.future);   // A10: never a future-dated file
 const run = (f) => {   // when one run file finished: `finished`, else its git commit time, else its date at 00:00 UTC
   let when = f.j.finished ? Date.parse(f.j.finished) : NaN, src = 'finished';
   if (!Number.isFinite(when)) { try { const c = git('log', '-1', '--format=%cI', '--', f.file); if (c) { when = Date.parse(c); src = 'git commit time'; } } catch (e) { /* not committed */ } }
@@ -507,7 +515,7 @@ self_test() {
   local nx=$fx/nightly
   ncase() {   # name, nightly dir, want rc (0 OK, 1 FAIL, 2 NOTHING RUN, 3 NEEDS-SHARDED-RUN, 4 WARNING), stub exit
     local name=$1 d=$2 want=$3 got
-    MQ_GATES_LOGDIR=$tmp/lg MQ_NOW=2026-10-23T12:00:00Z MQ_MATRIX_DIR=$d MQ_MATRIX_CMD="bash $fx/matrix-stub.sh ${4:-3}" MQ_COVERAGE_ARGS="--all --affected X..HEAD" MQ_NIGHTLY_DIRTY_CHECK=0 \
+    MQ_GATES_LOGDIR=$tmp/lg MQ_NOW=${NC_NOW:-2026-10-23T12:00:00Z} MQ_MATRIX_DIR=$d MQ_MATRIX_CMD="bash $fx/matrix-stub.sh ${4:-3}" MQ_COVERAGE_ARGS="--all --affected X..HEAD" MQ_NIGHTLY_DIRTY_CHECK=0 \
       bash -c 'source "$0" --source-only; matrix_gate tests/scripts/ws-coverage-matrix.cjs' "$0" > "$tmp/m.log" 2>&1; got=$?
     if [ "$got" = "$want" ]; then echo "  ok   $name: exit $got ($(grep -E '^nightly: (REFUSED|WARNING|NEEDS|run )|^nightly: no RED|^ws-coverage-matrix: (FAIL)' "$tmp/m.log" | head -n 1 | cut -c1-160))"
     else echo "  FAIL $name: exit $got, want $want"; sed 's/^/       /' "$tmp/m.log" | tail -n 14; bad=1; fi
@@ -522,6 +530,13 @@ self_test() {
   ncase "within, stale nightly (31 h) before the full baseline: WARNING, passes" "$nx/stale" 4 0
   ncase "within, stale nightly (31 h) after the full baseline: refused" "$nx/stale-complete" 1 0
   ncase "within, a row with no baseline entry (PENDING(no-baseline)) is not red: OK" "$nx/no-baseline" 0 0
+  ncase "within, A10: a lane re-check dated 20 h in the future lists the red row OK: refused (it clears nothing)" "$nx/future" 1 0
+  if grep -q 'nightly: WARNING - lane-recheck.json finished 2026-10-24T08:00:00Z, 20.0 h after now' "$tmp/m.log"; then echo "  ok   A10: the future-dated file is named in a WARNING"; else echo "  FAIL A10: no WARNING names the future-dated file"; bad=1; fi
+  ncase "within, A10: the only nightly file is dated in the future: not the newest nightly (no nightly: WARNING)" "$nx/future-only" 4 0
+  if grep -q 'no nightly run file' "$tmp/m.log" && grep -q '2026-10-23T0900.json finished 2026-10-25T09:00:00Z' "$tmp/m.log"; then echo "  ok   A10: a future-dated nightly is never the newest nightly (age / cover)"; else echo "  FAIL A10: the future-dated nightly counted as the newest"; sed 's/^/       /' "$tmp/m.log" | tail -n 6; bad=1; fi
+  NC_NOW=2026-10-23T21:00:00Z ncase "within, A11: a run file with no baseline field, finished 19:58 (after the 19:46 cut-off), lists the red row OK: refused" "$nx/legacy-after" 1 0
+  if grep -q 'after the N2 cut-off 2026-10-23T19:46:00Z.*(A11)' "$tmp/m.log"; then echo "  ok   A11: the refusal's WARNING says why the file clears nothing"; else echo "  FAIL A11: no A11 reason"; sed 's/^/       /' "$tmp/m.log" | tail -n 6; bad=1; fi
+  NC_NOW=2026-10-23T21:00:00Z ncase "within, A11: the same file finished 06:30 (before the cut-off): it clears, with the pre-N2 WARNING" "$nx/legacy-before" 4 0
   ncase "within, every row PENDING (matrix exit 2): passed through as 2" "$nx/fresh" 2 2
   echo "   over the budget"
   ncase "over, no nightly before the full baseline: WARNING (owner: not held)" "$nx/none" 4
@@ -622,6 +637,33 @@ self_test() {
      && ! printf '%s\n' "${G_CMD[@]}" | grep -q 'ws-options-pin.cjs --check'; then echo "  ok   session 1 lists the read-only options gate (nfn, --gate) and never ws-options-pin --check"
   else echo "  FAIL session 1's options gate is not the read-only --gate"; bad=1; fi
   G_SES=(); G_KIND=(); G_NAME=(); G_CMD=(); G_KEY=()
+  # A8: the deploy-list time budget, on the timings of the 2026-10-23 timed runs (tests/fixtures/precritic/deploy/budget)
+  echo "-- A8: the deploy-list time budget (timings of the 2026-10-23 timed runs, 30-min budget)"
+  local bx=$fx/budget
+  bcase() {   # name, want rc (0 OK, 1 FAIL, 4 WARNING), timings file, pattern the output must hold, then env assignments
+    local name=$1 want=$2 tf=$3 pat=$4 got; shift 4
+    ( for a in "$@"; do export "$a"; done; G_SES=(); G_KIND=(); G_NAME=(); G_CMD=(); G_KEY=(); build_list; [ -n "${BCASE_ADD:-}" ] && add 1 node "ws-options-pin --check" "node tests/scripts/ws-options-pin.cjs --check"; budget_check "$tf" all ) > "$tmp/bu.log" 2>&1; got=$?
+    if [ "$got" = "$want" ] && grep -qE -- "$pat" "$tmp/bu.log"; then echo "  ok   $name: exit $got ($(grep -oE -- "$pat" "$tmp/bu.log" | head -n 1 | cut -c1-150))"
+    else echo "  FAIL $name: exit $got, want $want, pattern /$pat/"; grep '^budget' "$tmp/bu.log" | sed 's/^/       /' | head -n 12; bad=1; fi
+  }
+  bcase "the old list (ws-viewport-check in session 2): FAIL" 1 "$bx/timings-2026-10-23.jsonl" 'FAIL - session 2 is predicted at 3[3-4]\.[0-9] min' MQ_VIEWPORT_SESSION=2
+  bcase "today's list (viewport in session 3): passes (the options gate is UNTIMED: WARNING)" 4 "$bx/timings-2026-10-23.jsonl" 'session 2: predicted 2[0-9]\.[0-9] min'
+  grep -E '^budget: session [123]: predicted' "$tmp/bu.log" | sed 's/^/       /'
+  if grep -q 'UNTIMED ws-options-pin --gate' "$tmp/bu.log" && ! grep -q 'budget: FAIL' "$tmp/bu.log"; then echo "  ok   today's list: no session over 30 min; the gate with no measure is listed UNTIMED"; else echo "  FAIL today's list: $(grep -E '^budget: (FAIL|WARNING)' "$tmp/bu.log" | head -n 3)"; bad=1; fi
+  cat "$bx/timings-2026-10-23.jsonl" "$bx/timings-pin-check.jsonl" > "$tmp/pin.jsonl"
+  bcase "critic r4 D1: ws-options-pin --check added to session 1: FAIL" 1 "$tmp/pin.jsonl" 'FAIL - session 1 is predicted at [0-9]+\.[0-9] min, over the 30-min budget \(the longest: ws-options-pin --check 13440 s' BCASE_ADD=1
+  bcase "a gate with no measure (no timings file at all) is UNTIMED, never a FAIL" 4 "$tmp/none.jsonl" 'WARNING - UNTIMED ws-content-audit'
+  bcase "the matrix budget is modelled from MQ_MATRIX_BUDGET (900 documents x 5.26 slot-s): session 3 over 30 min" 1 "$bx/timings-2026-10-23.jsonl" 'FAIL - session 3 is predicted' MATRIX_BUDGET=900
+  # the budget is the first result row of every session run
+  G_SES=(T); G_KIND=(node); G_NAME=("ws-content-audit"); G_CMD=("true"); G_KEY=("")
+  BUDGET_AT_START=1 TIMINGS_READ="$bx/timings-2026-10-23.jsonl"; : > "$RES"; run_session T 2>/dev/null; BUDGET_AT_START=0
+  if [ "$(head -n 1 "$RES" | cut -f2,3)" = "$(printf 'deploy-list time budget\tOK')" ] && [ "$(wc -l < "$RES")" = 2 ]; then echo "  ok   a session run starts with the budget row (deploy-list time budget OK, then the gate)"
+  else echo "  FAIL the budget row: $(cut -f2,3 "$RES" | tr '\n\t' '; ')"; bad=1; fi
+  G_SES=(T); G_KIND=(node); G_NAME=("ws-options-pin --check"); G_CMD=("true"); G_KEY=("")
+  BUDGET_AT_START=1 TIMINGS_READ="$tmp/pin.jsonl"; : > "$RES"; run_session T 2>/dev/null; BUDGET_AT_START=0
+  if [ "$(head -n 1 "$RES" | cut -f3)" = FAIL ] && [ "$(verdict "$RES" | tail -n 1 | cut -c1-21)" = 'ws-deploy-gates: FAIL' ]; then echo "  ok   a session over its budget FAILs the deploy (the budget row is FAIL; it is not re-run as a flake)"
+  else echo "  FAIL over-budget session row: $(cut -f2,3 "$RES" | tr '\n\t' '; ')"; bad=1; fi
+  G_SES=(); G_KIND=(); G_NAME=(); G_CMD=(); G_KEY=()
   # a tree whose matrix has no --max-docs: the budget is measured with --list (32766 documents > 500)
   MQ_GATES_LOGDIR=$tmp/lg MQ_NOW=2026-10-23T12:00:00Z MQ_MATRIX_DIR=$nx/stale-complete MQ_COVERAGE_ARGS="--all" MQ_NIGHTLY_DIRTY_CHECK=0 \
     bash -c 'source "$0" --source-only; matrix_gate "$1"' "$0" "$fx/matrix-stub-old.cjs" > "$tmp/m.log" 2>&1; got=$?
@@ -637,6 +679,106 @@ self_test() {
   rm -rf "$tmp"
   [ $bad = 0 ] && echo 'ws-deploy-gates --self-test: OK' || echo 'ws-deploy-gates --self-test: FAIL'
   return $bad
+}
+
+# ---------------------------------------------------------------------------------------------- the time budget (A8)
+# Critic r4 (A8): the gate list is held to its time budget BEFORE anyone runs it. For every session it sums each gate's
+# LAST MEASURED seconds from the timings file (design/audit/baselines/deploy-gate-timings.jsonl, or --timings <file>:
+# one JSON line per session run, {date, session, gates: [{gate, result, seconds, slotWait}]}), schedules them, and
+# FAILS when a session's predicted wall clock is over MQ_SESSION_BUDGET_MIN (default 30) minutes.
+#   - a gate's time is its newest measure by `date` (results SKIPPED / NOT YET / ACCEPTED and 0 s are not measures),
+#     minus its slot wait (the wait is other sessions' work, not the gate's); names match after dropping a trailing
+#     "(...)" and a trailing " --baseline" (the same documents are checked; only the verdict differs);
+#   - browser and fn gates are scheduled onto the MQ_BROWSER_WORKERS (2) browser slots IN LIST ORDER, each to the first
+#     free slot (what run_session's workers do), node / nfn gates onto the MQ_NODE_WORKERS (2) node workers, each gate
+#     plus the worker's 3 s pause; the session's prediction is the longer of the two (the longest-first order is printed
+#     beside it: when it is shorter, reordering the list helps);
+#   - a gate that drives the slots itself is divisible work spread over the slots after the fixed gates (water-filling):
+#     the coverage matrix = MQ_MATRIX_BUDGET documents x MQ_MATRIX_DOC_SLOT_S (default 5.26 slot-s a document, the
+#     measured 0.38 documents/s on two slots), whatever its last run took; ws-options-pin --check / --write = its
+#     measured seconds x its `slots` (default 2);
+#   - a gate with no measure is UNTIMED: counted as 0 s and listed as a WARNING (time it once, then the list is judged);
+#     SKIPPED and NOT YET gates do not run and count 0 s.
+# Prints one block per session; the last line is `ws-deploy-gates --budget: OK`, `WARNING` (UNTIMED gates; exit 0)
+# or `FAIL` (exit 1). `--list` prints the same check under the list and exits with it; every session run starts with it
+# (a result row "deploy-list time budget", so an over-budget list FAILs the deploy before an hour is spent finding out).
+budget_check() {   # budget_check <timings file> <sessions, space-separated, or "all">
+  local tf=$1 ses=$2 gl rc
+  gl=$(mktemp)
+  for i in "${!G_SES[@]}"; do printf '%s\t%s\t%s\n' "${G_SES[$i]}" "${G_KIND[$i]}" "${G_NAME[$i]}" >> "$gl"; done
+  node - "$tf" "$gl" "$ses" "${MQ_SESSION_BUDGET_MIN:-30}" "$BROWSER_WORKERS" "$NODE_WORKERS" "$MATRIX_BUDGET" "${MQ_MATRIX_DOC_SLOT_S:-5.26}" <<'EOF'
+const fs = require('fs');
+const [tf, gl, sesArg, budgetMin, bw, nw, matrixDocs, docSlotS] = process.argv.slice(2);
+const PAUSE = 3;   // run_session's worker sleeps 3 s after each gate
+const norm = (n) => String(n).replace(/\s*\([^)]*\)\s*$/, '').replace(/\s+--baseline$/, '').trim();
+// the newest measure of every gate
+const meas = new Map();
+let lines = [];
+try { lines = fs.readFileSync(tf, 'utf8').split('\n').filter(Boolean); } catch (e) { console.log(`budget: no timings file ${tf} (${e.code || e.message}): every gate is UNTIMED`); }
+const runs = [];
+lines.forEach((l, k) => { try { const j = JSON.parse(l); runs.push({ j, t: Date.parse(j.date), k }); } catch (e) { console.log(`budget: ${tf} line ${k + 1} is not JSON (ignored)`); } });
+runs.sort((a, b) => ((Number.isFinite(a.t) ? a.t : 0) - (Number.isFinite(b.t) ? b.t : 0)) || a.k - b.k);
+for (const { j } of runs) for (const g of j.gates || []) {
+  if (!g || !g.gate || ['SKIPPED', 'NOT YET', 'ACCEPTED'].includes(g.result) || !(Number(g.seconds) > 0)) continue;
+  meas.set(norm(g.gate), { s: Math.max(0, Number(g.seconds) - (Number(g.slotWait) || 0)), slots: Number(g.slots) || null, from: `${String(j.date).slice(0, 16)} ${String(j.commit || '?').slice(0, 14)}` });
+}
+const gates = fs.readFileSync(gl, 'utf8').split('\n').filter(Boolean).map((l) => { const [s, kind, name] = l.split('\t'); return { s, kind, name }; });
+const want = sesArg === 'all' ? [...new Set(gates.map((g) => g.s))] : sesArg.split(/[ ,]+/).filter(Boolean);
+// list scheduling: each job to the slot that frees first; in list order (the runner), or longest first (for comparison)
+const sched = (jobs, k, longestFirst) => { const load = Array(k).fill(0); for (const x of longestFirst ? [...jobs].sort((a, b) => b - a) : jobs) { let m = 0; for (let i = 1; i < k; i++) if (load[i] < load[m]) m = i; load[m] += x; } return load; };
+const fill = (load, d) => {   // water-filling: divisible work d over the slots; returns the makespan
+  const max = Math.max(0, ...load);
+  const sorted = [...load].sort((a, b) => a - b);
+  let rest = d;
+  for (let i = 0; i < sorted.length; i++) {
+    const next = i + 1 < sorted.length ? sorted[i + 1] : Infinity, w = i + 1, need = (next - sorted[i]) * w;
+    if (rest <= need || next === Infinity) return Math.max(max, sorted[i] + rest / w);
+    rest -= need;
+    for (let q = 0; q <= i; q++) sorted[q] = next;
+  }
+  return max;
+};
+const fmt = (s) => `${(s / 60).toFixed(1)} min`;
+let fail = 0, untimedAll = 0;
+for (const s of want) {
+  const mine = gates.filter((g) => g.s === s);
+  const rigidB = [], rigidN = [], rows = [], untimed = [];
+  let div = 0;
+  for (const g of mine) {
+    const key = norm(g.name), m = meas.get(key);
+    if (g.kind === 'skip' || g.kind === 'notyet') { rows.push([g.name, g.kind, '0', g.kind === 'skip' ? 'SKIPPED: does not run' : 'NOT YET: does not run']); continue; }
+    if (/^ws-coverage-matrix\b/.test(key)) {
+      const w = Number(matrixDocs) * Number(docSlotS);
+      div += w; rows.push([g.name, `${g.kind}, slots`, w.toFixed(0), `budget model: ${matrixDocs} documents x ${docSlotS} slot-s, spread over the ${bw} slots`]); continue;
+    }
+    if (!m) { untimed.push(g.name); rows.push([g.name, g.kind, '?', 'UNTIMED: no measure in the timings file (counted 0 s)']); continue; }
+    if (/^ws-options-pin --(check|write)\b/.test(key)) {
+      const w = m.s * (m.slots || 2);
+      div += w; rows.push([g.name, `${g.kind}, slots`, w.toFixed(0), `${m.s.toFixed(1)} s x ${m.slots || 2} slots it drives itself (${m.from}), spread over the ${bw} slots`]); continue;
+    }
+    ((g.kind === 'browser' || g.kind === 'fn') ? rigidB : rigidN).push(m.s + PAUSE);
+    rows.push([g.name, g.kind, m.s.toFixed(1), m.from]);
+  }
+  const loadB = sched(rigidB, Number(bw), false), loadN = sched(rigidN, Number(nw), false);
+  const spanB = fill(loadB, div), spanN = Math.max(0, ...loadN), spanLpt = fill(sched(rigidB, Number(bw), true), div);
+  const pred = Math.max(spanB, spanN);
+  const over = pred > Number(budgetMin) * 60;
+  const workB = rigidB.reduce((a, x) => a + x, 0) + div;
+  console.log(`budget: session ${s}: predicted ${fmt(pred)} (${pred.toFixed(0)} s) - browser ${bw} slots ${fmt(spanB)} (${workB.toFixed(0)} slot-s of work incl. ${PAUSE} s pauses; floor ${fmt(workB / Number(bw))}; longest-first order ${fmt(spanLpt)}), node ${nw} workers ${fmt(spanN)}; budget ${budgetMin} min: ${over ? 'OVER' : 'within'}${untimed.length ? `; ${untimed.length} UNTIMED` : ''}`);
+  for (const r of rows.sort((a, b) => (Number(b[2]) || 0) - (Number(a[2]) || 0))) console.log(`  ${r[0].padEnd(52)} ${r[1].padEnd(13)} ${String(r[2]).padStart(7)} s  ${r[3]}`);
+  if (over) {
+    fail++;
+    const big = rows.filter((r) => Number(r[2]) > 0).sort((a, b) => Number(b[2]) - Number(a[2])).slice(0, 3).map((r) => `${r[0]} ${Number(r[2]).toFixed(0)} s`).join(', ');
+    console.log(`budget: FAIL - session ${s} is predicted at ${fmt(pred)}, over the ${budgetMin}-min budget (the longest: ${big}); move a gate to another session (MQ_VIEWPORT_SESSION is one), shard it, or take a whole-run tool off the deploy list`);
+  }
+  for (const u of untimed) console.log(`budget: WARNING - UNTIMED ${u} (session ${s}): no measured time in ${tf}; it counts 0 s until a session run times it`);
+  untimedAll += untimed.length;
+}
+const v = fail ? 'FAIL' : untimedAll ? 'WARNING' : 'OK';
+console.log(`ws-deploy-gates --budget: ${v}${fail ? ` (${fail} session(s) over ${budgetMin} min)` : ''}${untimedAll ? ` (${untimedAll} UNTIMED gate(s))` : ''}`);
+process.exit(fail ? 1 : untimedAll ? 4 : 0);
+EOF
+  rc=$?; rm -f "$gl"; return $rc
 }
 
 # ---------------------------------------------------------------------------------------------- the gate list
@@ -802,6 +944,15 @@ run_session() {
   done
   echo "== session $s ($(wc -l < "$qb") browser / fn, $(wc -l < "$qn") node / other; logs $LOGDIR)" >&2
   t0=$(now_ms)
+  # A8: every session run starts with its time budget (a row of its own: FAIL over budget, WARNING for UNTIMED gates)
+  if [ "${BUDGET_AT_START:-0}" = 1 ]; then
+    local blog="$LOGDIR/s$s-deploy-list-time-budget.log" brc bres bt0
+    bt0=$(now_ms)
+    budget_check "${TIMINGS_READ:-$TIMINGS}" "$s" > "$blog" 2>&1; brc=$?
+    case $brc in 0) bres=OK ;; 4) bres=WARNING ;; *) bres=FAIL ;; esac
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$s" "deploy-list time budget" "$bres" "$(awk -v a="$bt0" -v b="$(now_ms)" 'BEGIN{printf "%.1f", (b-a)/1000}')" 0 "$blog" budget >> "$RES"
+    echo "  [s$s] $bres  deploy-list time budget ($(grep -E '^budget: session' "$blog" | head -n 1 | sed 's/^budget: //'))" >&2
+  fi
   for w in $(seq 1 "$BROWSER_WORKERS"); do worker "$qb" & pids+=($!); done
   for w in $(seq 1 "$NODE_WORKERS"); do worker "$qn" & pids+=($!); done
   for w in "${pids[@]}"; do wait "$w"; done
@@ -809,6 +960,7 @@ run_session() {
   local line ses name res secs wt log idx item rres
   while IFS=$'\t' read -r ses name res secs wt log idx; do
     [ "$ses" = "$s" ] && [ "$res" = FAIL ] || continue
+    [ "$idx" = budget ] && continue   # the time budget is arithmetic on the list: re-running it cannot pass
     echo "  [s$s] re-running $name alone (flake check)" >&2
     : > "$RES.retry"
     run_gate "$idx" ".retry"
@@ -889,6 +1041,8 @@ while [ $# -gt 0 ]; do
     --accept-notyet) IFS=', ' read -r -a _acc <<< "$2"; ACCEPT_NOTYET+=("${_acc[@]}"); shift ;;
     --all) SESSIONS=(1 2 3) ;;
     --list) MODE=list ;;
+    --budget) MODE=budget ;;
+    --timings) TIMINGS_READ=$2; shift ;;
     --deploy-check) MODE=deploy ;;
     --lanes-dir) LANES_DIR=$2; shift ;;
     --status-dir) STATUS_DIR=$2; shift ;;
@@ -916,7 +1070,13 @@ if [ "$MODE" = list ]; then
     printf '%-8s %-8s %-50s %s\n' "${G_SES[$i]}" "$k" "${G_NAME[$i]}" "$c"
   done
   echo "(matrix: budget $MATRIX_BUDGET documents; base MQ_DEPLOY_BASE, else merge-base origin/master: $(deploy_base 2>&1 | tail -n 1))"
-  exit 0
+  echo
+  budget_check "${TIMINGS_READ:-$TIMINGS}" "${SESSIONS[*]:-all}"; rc=$?
+  [ $rc = 1 ] && exit 1; exit 0
+fi
+if [ "$MODE" = budget ]; then
+  budget_check "${TIMINGS_READ:-$TIMINGS}" "${SESSIONS[*]:-all}"; rc=$?
+  [ $rc = 1 ] && exit 1; exit 0
 fi
 [ ${#SESSIONS[@]} -gt 0 ] || { usage; exit 64; }
 if [ ! -x "$RUNNER" ]; then
@@ -932,6 +1092,7 @@ node -e 'require("puppeteer")' >/dev/null 2>&1 || { echo 'ws-deploy-gates: prere
 command -v flock >/dev/null 2>&1 || { echo 'ws-deploy-gates: prerequisite missing: flock (util-linux), needed by the browser runner'; prereq_bad=1; }
 [ $prereq_bad = 0 ] || { echo 'ws-deploy-gates: FAIL'; exit 1; }
 export BW=$BROWSER_WORKERS NW=$NODE_WORKERS
+BUDGET_AT_START=1
 for s in "${SESSIONS[@]}"; do run_session "$s"; done
 print_table
 echo

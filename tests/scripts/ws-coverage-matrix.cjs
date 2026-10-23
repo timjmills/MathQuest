@@ -894,6 +894,12 @@ function selectRows(all, { kinds, names, shard, seventh, slice, affectedIds, ext
 /** A run file: <date>[T<HHMM>][.shard-i-of-n].json; one run = one stamp (<date>, or <date>T<HHMM> for a fired run). */
 const RUN_RE = /^(\d{4}-\d{2}-\d{2}(?:T\d{4})?)(?:\.shard-(\d+)-of-(\d+))?\.json$/;
 const RED_STATES = new Set(['RED', 'ERROR']);
+/** A10: a run file whose `finished` is more than this after now is dated in the future (clock skew beyond 10 min). */
+const FUTURE_SKEW_MS = 10 * 60 * 1000;
+/** A11: the fix-r4 (N2) cut-off. A run file with no `baseline` field that finished after it clears no red row. */
+const N2_CUTOFF = '2026-10-23T19:46:00Z';
+/** The fold's clock: opts.now, else MQ_NOW (ISO, fixtures), else the real clock. */
+const foldNow = (opts) => (opts && Number.isFinite(opts.now) ? opts.now : process.env.MQ_NOW && Number.isFinite(Date.parse(process.env.MQ_NOW)) ? Date.parse(process.env.MQ_NOW) : Date.now());
 
 /** When a file name's stamp says the run happened: <date> = 00:00 UTC, <date>T<HHMM> = that time (the START, autoOut). */
 const stampTime = (stamp) => { const m = /^(\d{4}-\d{2}-\d{2})(?:T(\d{2})(\d{2}))?$/.exec(String(stamp)); return m ? Date.parse(`${m[1]}T${m[2] || '00'}:${m[3] || '00'}:00Z`) : NaN; };
@@ -914,16 +920,28 @@ const stampTime = (stamp) => { const m = /^(\d{4}-\d{2}-\d{2})(?:T(\d{2})(\d{2})
  *     CURRENT entry in this dir's merged baseline (`opts.base`, default loadBaseline(<dir>/baseline.json)); an OK row
  *     whose key differs still clears when its recorded findings, re-judged against the current entry, do not rise.
  *     `baseline: null` (a run with no --baseline: any finding was red, so OK = no findings at all) clears. A run file
- *     with no `baseline` field at all was written before N2: it clears as before, and the fold lists it (`legacyClears`);
+ *     with no `baseline` field at all that finished before the N2 cut-off (N2_CUTOFF, 2026-10-23T19:46Z; its `finished`,
+ *     else its name's stamp) was written before N2: it clears as before, and the fold lists it (`legacyClears`); one
+ *     that finished after the cut-off clears nothing (A11: every run file written since records its baseline);
+ *   - A10: the run file's `finished` is not more than 10 min after now (opts.now, else MQ_NOW, else the clock). A file
+ *     dated further ahead (a wrong clock) is listed in `future`, clears nothing (its RED rows still count), is ordered
+ *     by its `started` when that is not in the future (else its name's stamp, else its `finished`), and is never "the
+ *     newest nightly" for the age / cover rules (ws-deploy-gates nightly_check);
  *   - RETIRED (--retire) clears;
  *   - PENDING(no-baseline), PENDING(step) and N/A never clear (N9): the row stays red with `lastSeenAs` ("not re-run
  *     (now N/A)") until a run lists it OK, or the lead retires it (--retire takes a red row last seen N/A / PENDING).
  * An OK / REPINNED that does not clear is listed in `ignored` with why (a warning at deploy).
  * Returns { files: [{file, stamp, order, shard, named, j}], bad, skipped, rows: Map(id -> {status, stamp, file, commit,
  *           valid?, ...}), red: [ids RED / ERROR in the fold], ignored: [{id, file, status, why}], legacyClears:
- *           [{id, file}], pinnedNA: [ids with a baseline entry whose newest state is N/A] }.
+ *           [{id, file}], pinnedNA: [ids with a baseline entry whose newest state is N/A], future: [{file, finished,
+ *           aheadH}] }.
  */
 function foldRuns(dir, extra = [], opts = {}) {
+    const now = foldNow(opts);
+    /** A10: {finished, aheadH} when the file's `finished` is beyond the clock skew, else null */
+    const futureOf = (j, fin) => (Number.isFinite(fin) && fin > now + FUTURE_SKEW_MS ? { finished: j.finished, aheadH: (fin - now) / 3600000 } : null);
+    /** A10: a future file's order: its `started` when sane, else `fallback` (its name's stamp, or its finished) */
+    const orderOfFuture = (j, fallback) => { const st = Date.parse(j.started); return Number.isFinite(st) && st <= now + FUTURE_SKEW_MS ? st : fallback; };
     const all = (dir && fs.existsSync(dir) ? fs.readdirSync(dir) : []).filter((f) => /\.json$/i.test(f)).sort();
     const files = [], bad = [], skipped = [];
     const list = [];
@@ -935,15 +953,19 @@ function foldRuns(dir, extra = [], opts = {}) {
         const fin = j && Date.parse(j.finished);
         if (m) {   // the nightly's own names: always folded (an unreadable one is reported, never skipped)
             if (err) { bad.push({ file, error: err }); continue; }
-            list.push({ file, stamp: m[1], order: Number.isFinite(fin) ? fin : stampTime(m[1]), shard: m[2] ? { i: +m[2], n: +m[3] } : null, named: true, j });
+            const future = futureOf(j, fin);
+            const st0 = stampTime(m[1]);
+            list.push({ file, stamp: m[1], order: future ? orderOfFuture(j, Number.isFinite(st0) && st0 <= now + FUTURE_SKEW_MS ? st0 : fin) : Number.isFinite(fin) ? fin : st0, shard: m[2] ? { i: +m[2], n: +m[3] } : null, named: true, future, j });
             continue;
         }
         // N5: any other .json that IS a run (commit + finished + rows) is folded whatever its name; the rest is listed
         if (err) { skipped.push({ file, why: `not JSON (${err.slice(0, 60)})` }); continue; }
         const run = j && j.commit && j.finished && Array.isArray(j.rows);
         if (run && Number.isFinite(fin)) {
-            const iso = new Date(fin).toISOString();
-            list.push({ file, stamp: `${iso.slice(0, 10)}T${iso.slice(11, 13)}${iso.slice(14, 16)}`, order: fin, shard: null, named: false, j });
+            const future = futureOf(j, fin);
+            const order = future ? orderOfFuture(j, fin) : fin;
+            const iso = new Date(order).toISOString();
+            list.push({ file, stamp: `${iso.slice(0, 10)}T${iso.slice(11, 13)}${iso.slice(14, 16)}`, order, shard: null, named: false, future, j });
             continue;
         }
         const known = /^baseline(\.|$)/.test(f) ? 'a baseline file' : /^cache/.test(f) ? 'the cache' : /^options-pin-/.test(f) ? 'an options-pin report' : null;
@@ -953,19 +975,26 @@ function foldRuns(dir, extra = [], opts = {}) {
     // D2: by finish time, whatever the name; ties by file name
     list.sort((a, b) => ((a.order - b.order) || (path.basename(a.file) < path.basename(b.file) ? -1 : path.basename(a.file) > path.basename(b.file) ? 1 : 0)));
     for (const f of extra.filter((x) => x && fs.existsSync(x))) {
-        try { list.push({ file: f, stamp: 'inline', order: Infinity, shard: null, extra: true, j: JSON.parse(fs.readFileSync(f, 'utf8')) }); } catch (e) { bad.push({ file: f, error: e.message }); }
+        try { const j = JSON.parse(fs.readFileSync(f, 'utf8')); list.push({ file: f, stamp: 'inline', order: Infinity, shard: null, extra: true, future: null, j }); } catch (e) { bad.push({ file: f, error: e.message }); }
     }
     // N2: the baseline every clearing OK must have been judged against: this directory's merged baseline
     let base = opts.base;
     if (base === undefined) { try { base = dir && fs.existsSync(dir) ? loadBaseline(path.join(dir, 'baseline.json')) : null; } catch (e) { base = null; } }
     const here = dir ? path.resolve(dir) : null;
     const ignored = [], legacyClears = [];
+    const cutoff = Date.parse(N2_CUTOFF);
     /** Would this run's non-red record clear a red row? {ok, why?, legacy?} */
     const clears = (e, r, id, status) => {
         const j = e.j;
         if (j.dirty) return { ok: false, why: 'the run was on a tree with local edits (dirty: true); a dirty run never clears a red row (N3)' };
+        if (e.future) return { ok: false, why: `the run file finished ${e.future.finished}, ${e.future.aheadH.toFixed(1)} h after now (beyond the 10-min clock skew); a future-dated run never clears a red row (A10)` };
         if (status === 'RETIRED') return { ok: true };
-        if (!('baseline' in j)) return { ok: true, legacy: true };
+        if (!('baseline' in j)) {
+            // A11: no `baseline` field is a run file written before N2 only when it finished before the cut-off
+            const fin = Date.parse(j.finished), when = Number.isFinite(fin) ? fin : e.order;
+            if (!(when <= cutoff)) return { ok: false, why: `the run file records no baseline and finished ${Number.isFinite(when) ? new Date(when).toISOString() : '(unknown)'}, after the N2 cut-off ${N2_CUTOFF}: every run file written since records the baseline it was judged against, so this one clears nothing (A11)` };
+            return { ok: true, legacy: true };
+        }
         const rec = j.baseline;
         if (rec === null) return status === 'OK' ? { ok: true } : { ok: false, why: 'REPINNED by a run that records no baseline' };
         if (!rec || typeof rec !== 'object' || rec.dir == null || path.resolve(ROOT, rec.dir) !== here) return { ok: false, why: `judged against ${rec && (rec.file || rec.dir) || 'an unnamed baseline'}, not this directory's baseline (N2)` };
@@ -992,9 +1021,9 @@ function foldRuns(dir, extra = [], opts = {}) {
                 rec.valid = c.ok;
                 if (!c.ok && wasRed) { ignored.push({ id, file: e.file, status: rec.status, why: c.why }); rows.set(id, { ...prev, lastSeen: e.stamp, lastSeenAs: `${rec.status} (ignored: ${c.why})`, lastFile: e.file, seq }); return; }
                 if (c.ok && c.legacy && wasRed) legacyClears.push({ id, file: e.file });
-            } else if (rec.status === 'RETIRED' && wasRed && j.dirty) {
-                ignored.push({ id, file: e.file, status: rec.status, why: 'retired by a run on a dirty tree (N3)' });
-                rows.set(id, { ...prev, lastSeen: e.stamp, lastSeenAs: 'RETIRED (ignored: dirty)', lastFile: e.file, seq }); return;
+            } else if (rec.status === 'RETIRED' && wasRed && (j.dirty || e.future)) {
+                ignored.push({ id, file: e.file, status: rec.status, why: j.dirty ? 'retired by a run on a dirty tree (N3)' : `retired by a run file dated ${e.future.finished}, in the future (A10)` });
+                rows.set(id, { ...prev, lastSeen: e.stamp, lastSeenAs: `RETIRED (ignored: ${j.dirty ? 'dirty' : 'future'})`, lastFile: e.file, seq }); return;
             }
             // I5 / N9: printed with no entry, PENDING(step) and N/A never clear a red row: it was not judged OK
             if (wasRed && rec.status === 'PENDING' && rec.step === 'no-baseline') { rows.set(id, { ...prev, lastSeen: e.stamp, lastSeenAs: 'PENDING(no-baseline)', lastFile: e.file, seq }); return; }
@@ -1015,7 +1044,8 @@ function foldRuns(dir, extra = [], opts = {}) {
     const red = [...rows.entries()].filter(([, v]) => RED_STATES.has(v.status)).map(([id]) => id).sort();
     // N9: a row pinned as printable whose newest state is N/A (or red, last seen N/A): its entry checks nothing now
     const pinnedNA = [...rows.entries()].filter(([id, v]) => (v.status === 'N/A' || v.lastSeenAs === 'N/A') && base && base.rows && base.rows[id]).map(([id]) => id).sort();
-    return { files, bad, skipped, rows, red, ignored, legacyClears, pinnedNA };
+    const future = list.filter((e) => e.future).map((e) => ({ file: e.file, finished: e.future.finished, aheadH: e.future.aheadH }));
+    return { files, bad, skipped, rows, red, ignored, legacyClears, pinnedNA, future };
 }
 
 /** The fold's warnings (critic r4 N2 / N3 / N9), one line each: printed by --red-from and WARNINGs at deploy. */
@@ -1027,6 +1057,8 @@ function foldWarnings(fold) {
     const legacy = new Map();
     for (const x of fold.legacyClears || []) { if (!legacy.has(x.file)) legacy.set(x.file, []); legacy.get(x.file).push(x.id); }
     for (const [f, ids] of legacy) out.push(`${path.basename(f)} records no baseline (written before N2): its OK cleared ${ids.length} red row(s) unchecked (${ids.slice(0, 4).join(', ')}${ids.length > 4 ? ' ...' : ''})`);
+    // A10: every future-dated run file, whether or not it touched a red row
+    for (const f of fold.future || []) out.push(`${path.basename(f.file)} finished ${f.finished}, ${f.aheadH.toFixed(1)} h after now (beyond the 10-min clock skew): its rows clear nothing and it is not the newest run (A10); fix the clock that wrote it, or the file`);
     if ((fold.pinnedNA || []).length) out.push(`${fold.pinnedNA.length} row(s) with a baseline entry are N/A now, so their entry checks nothing (N9): ${fold.pinnedNA.slice(0, 5).join(', ')}${fold.pinnedNA.length > 5 ? ' ...' : ''}; if the row is gone for good, --retire it`);
     return out;
 }
@@ -1078,6 +1110,10 @@ async function rowIndexFor(keys) {
 function selfTest() {
     const bad = []; let n = 0;
     const ok = (c, m) => { n++; if (!c) bad.push(m); };
+    // the synthetic run files below are dated 2026-10 .. 2026-11: the fold's clock (A10) is set after all of them, so
+    // only the cases that write a future-dated file on purpose meet the A10 rule
+    const savedNow = process.env.MQ_NOW;
+    process.env.MQ_NOW = '2030-01-01T00:00:00Z';
     // 1. the More rows with the defaults row cover every pair of two-valued factors
     for (const k of [3, 4]) {
         const factors = Array.from({ length: k }, (_, i) => ({ tag: 'f' + i }));
@@ -1240,7 +1276,8 @@ function selfTest() {
     // 16. BASELINE INVARIANTS as properties over generated sequences of nights (runs / pins / regressions / re-pins)
     const prop = propertyTest({ sequences: 300, nights: 12, seed: 20261023 });
     n += prop.n; bad.push(...prop.bad);
-    console.log(`  property test: ${prop.sequences} sequences, ${prop.nights} nights, ${prop.rowChecks} row-night checks (${prop.modes}); I1 ${prop.c.I1} / I2 ${prop.c.I2} / I3 ${prop.c.I3} / I4 ${prop.c.I4} / I5 ${prop.c.I5} / truth ${prop.c.truth} / D2 ${prop.c.D2} (a run under another name, then a nightly-named run the same date) / N2 ${prop.c.N2} / N3 ${prop.c.N3} cases checked, ${prop.violations} violation(s)`);
+    console.log(`  property test: ${prop.sequences} sequences, ${prop.nights} nights, ${prop.rowChecks} row-night checks (${prop.modes}); I1 ${prop.c.I1} / I2 ${prop.c.I2} / I3 ${prop.c.I3} / I4 ${prop.c.I4} / I5 ${prop.c.I5} / truth ${prop.c.truth} / D2 ${prop.c.D2} (a run under another name, then a nightly-named run the same date) / N2 ${prop.c.N2} / N3 ${prop.c.N3} / A10 ${prop.c.A10} (a future-dated run file over a red row) / A11 ${prop.c.A11} (a run file with no baseline field after the cut-off over a red row) cases checked, ${prop.violations} violation(s)`);
+    if (savedNow === undefined) delete process.env.MQ_NOW; else process.env.MQ_NOW = savedNow;
     if (bad.length) { console.error(`${TOOL}: FAIL - ${bad.length} self-test(s)`); bad.forEach((b) => console.error('  - ' + b)); process.exit(1); }
     console.log(`${TOOL}: OK (self-test, ${n} assertions)`);
 }
@@ -1263,7 +1300,7 @@ const deep = (o) => JSON.parse(JSON.stringify(o));
  * `finished` = `finished` or the stamp's time), the run file BEFORE the pins (N5). `dirty` marks the run file dirty (N3);
  * `foreignBf` judges a plain run against another directory's baseline (N2). Returns what the properties need.
  */
-function simNight(dir, { ids, truth, mode, slice, repinIds = null, stamp, rowsOnly = null, file = null, finished = null, dirty = false, foreignBf = null }) {
+function simNight(dir, { ids, truth, mode, slice, repinIds = null, stamp, rowsOnly = null, file = null, finished = null, dirty = false, foreignBf = null, futureFinished = null, noBaselineField = false }) {
     const bf = path.join(dir, 'baseline.json');
     const all = ids.map(simRow);
     const fold = foldRuns(dir);
@@ -1281,7 +1318,12 @@ function simNight(dir, { ids, truth, mode, slice, repinIds = null, stamp, rowsOn
     const pinRes = judgeAndPin(sel, base, pinMode ? { rows: sel, mode: pinMode, bf, slice: mode === 'write-baseline' ? slice : null, redIds, repinIds, reason, commit: 'sim' } : null);
     const now = finished ? new Date(finished) : new Date(`${stamp.slice(0, 10)}T${stamp.length > 10 ? `${stamp.slice(11, 13)}:${stamp.slice(13, 15)}` : '01:13'}:00Z`);
     const rf = runFile(sel, { started: now.toISOString(), commit: 'sim', dirty, P: { source: 'sim' }, printHash: 'sim', ONLY: ['sim'], aff: null, slice: mode === 'write-baseline' || mode === 'pin-new' ? slice : null, shard: null, kinds: null, names: null, timing: null, live: [], refused: pinRes ? pinRes.refused : [], redFrom: redIds ? dir : null, redIds, affReached: null, pinMode, pinRes, reason, now, base, baseRecord: baselineRecord(judgeBf, base) });
-    writeAtomic(path.join(dir, file || `${stamp}.json`), JSON.stringify(rf));
+    // A10: a run file whose clock was wrong (its `finished` far ahead; `started` true); A11: a run file with no `baseline`
+    // field (the shape written before N2), here after the cut-off
+    const out = { ...rf };
+    if (futureFinished) out.finished = futureFinished;
+    if (noBaselineField) delete out.baseline;
+    writeAtomic(path.join(dir, file || `${stamp}.json`), JSON.stringify(out));
     if (pinRes) pinRes.flush();   // N5: the pins after the run file
     return { sel, redIds, rf };
 }
@@ -1426,9 +1468,46 @@ function invariantCases() {
     fs.writeFileSync(path.join(d, '2026-10-30.json'), JSON.stringify({ commit: 'c', finished: '2026-10-30T02:00:00Z', baseline: recHere, red: [], rows: [{ id: R, status: 'RED', repinned: { date: '2026-10-30', reason: 'x', key: 'notthecurrent00' } }] }));
     fo = foldRuns(d);
     ok(fo.red.includes(R) && fo.ignored.some((x) => x.status === 'REPINNED'), 'N2: a REPINNED record whose entry is not the current one does not clear (scenario C)');
+    // A11: a run file with no baseline field that finished AFTER the N2 cut-off (2026-10-23T19:46Z) clears nothing
     fs.writeFileSync(path.join(d, '2026-10-31.json'), JSON.stringify({ commit: 'c', finished: '2026-10-31T02:00:00Z', red: [], rows: [{ id: R, status: 'OK' }] }));
     fo = foldRuns(d);
-    ok(!fo.red.includes(R) && fo.legacyClears.some((x) => x.id === R) && foldWarnings(fo).some((l) => /records no baseline \(written before N2\)/.test(l)), 'N2: a run file written before N2 (no baseline field) clears as before, and the fold lists it');
+    ok(fo.red.includes(R) && !fo.legacyClears.length && fo.ignored.some((x) => x.id === R && /records no baseline and finished 2026-10-31T02:00:00\.000Z, after the N2 cut-off .*\(A11\)/.test(x.why)) && foldWarnings(fo).some((l) => /2026-10-31\.json lists 1 red row\(s\) OK that it may not clear/.test(l)), `A11: a run file with no baseline field, finished after the cut-off, does not clear the red row (${fo.red.includes(R)}; ${foldWarnings(fo).join(' | ').slice(0, 300)})`);
+    fs.rmSync(path.join(d, '2026-10-31.json'));
+    // ... before the cut-off: the pre-N2 shape, which clears as before with a WARNING (a fresh dir: red on 10-22, then
+    // a legacy OK at 10-23 19:40 and one at 19:52)
+    {
+        const dl = mk();
+        fs.writeFileSync(path.join(dl, '2026-10-22.json'), JSON.stringify({ commit: 'c', finished: '2026-10-22T02:00:00Z', baseline: null, red: [R], rows: [{ id: R, status: 'RED' }] }));
+        fs.writeFileSync(path.join(dl, '2026-10-23T1940.json'), JSON.stringify({ commit: 'c', finished: '2026-10-23T19:40:00Z', red: [], rows: [{ id: R, status: 'OK' }] }));
+        let fl = foldRuns(dl);
+        ok(!fl.red.includes(R) && fl.legacyClears.some((x) => x.id === R) && foldWarnings(fl).some((l) => /records no baseline \(written before N2\)/.test(l)), 'A11: a run file written before N2 (no baseline field, finished 19:40, before the 19:46 cut-off) clears as before, and the fold lists it (WARNING)');
+        fs.writeFileSync(path.join(dl, '2026-10-23T1940.json'), JSON.stringify({ commit: 'c', finished: '2026-10-23T19:52:00Z', red: [], rows: [{ id: R, status: 'OK' }] }));
+        fl = foldRuns(dl);
+        ok(fl.red.includes(R) && fl.ignored.some((x) => /\(A11\)/.test(x.why)), 'A11: the same file finished at 19:52 (after the cut-off) clears nothing');
+        fs.rmSync(path.join(dl, '2026-10-23T1940.json'));
+        fs.writeFileSync(path.join(dl, '2026-10-23.json'), JSON.stringify({ commit: 'c', red: [], rows: [{ id: R, status: 'OK' }] }));
+        fl = foldRuns(dl);
+        ok(!fl.red.includes(R) && fl.legacyClears.length === 1, 'A11: a nightly-named legacy file with no finished is timed by its name (10-23 00:00, before the cut-off): it clears, with the WARNING');
+        fs.rmSync(dl, { recursive: true, force: true });
+    }
+    // A10: a run file whose `finished` is more than 10 min after now clears nothing, is listed, and is ordered by started
+    {
+        const df = mk();
+        const at = { now: Date.parse('2026-10-23T12:00:00Z') };
+        fs.writeFileSync(path.join(df, '2026-10-22.json'), JSON.stringify({ commit: 'c', finished: '2026-10-22T02:00:00Z', baseline: null, red: [R], rows: [{ id: R, status: 'RED' }] }));
+        fs.writeFileSync(path.join(df, 'lane-check.json'), JSON.stringify({ commit: 'c', started: '2026-10-23T09:00:00Z', finished: '2026-10-24T09:00:00Z', baseline: null, red: [], rows: [{ id: R, status: 'OK' }, { id: 'a:x|single/defaults', status: 'RED' }] }));
+        let ff = foldRuns(df, [], at);
+        ok(ff.red.includes(R) && ff.future.length === 1 && ff.ignored.some((x) => x.id === R && /21\.0 h after now .*\(A10\)/.test(x.why)) && foldWarnings(ff).some((l) => /lane-check\.json finished 2026-10-24T09:00:00Z, 21\.0 h after now .*\(A10\)/.test(l)), `A10: a run file finished 21 h in the future does not clear the red row, and is listed (${foldWarnings(ff).join(' | ').slice(0, 300)})`);
+        ok(ff.red.includes('a:x|single/defaults') && ff.files.find((f) => /lane-check/.test(f.file)).order === Date.parse('2026-10-23T09:00:00Z'), 'A10: its RED rows still count, and it is ordered by its started (09:00), not its finished');
+        fs.writeFileSync(path.join(df, '2026-10-23T1000.json'), JSON.stringify({ commit: 'c', finished: '2026-10-23T10:00:00Z', baseline: null, red: [], rows: [{ id: 'a:x|single/defaults', status: 'OK' }] }));
+        ff = foldRuns(df, [], at);
+        ok(!ff.red.includes('a:x|single/defaults'), 'A10: a later real run (10:00) clears the future file\'s red row (it is ordered by started 09:00, not at 2026-10-24)');
+        ok(foldRuns(df, [], { now: Date.parse('2026-10-24T09:05:00Z') }).future.length === 0 && !foldRuns(df, [], { now: Date.parse('2026-10-24T08:55:00Z') }).red.includes(R), 'A10: within the 10-min skew (5 min ahead) the file is trusted and its OK clears');
+        fs.writeFileSync(path.join(df, '2026-10-25.json'), JSON.stringify({ commit: 'c', finished: '2026-10-25T02:00:00Z', baseline: null, red: [], rows: [{ id: R, status: 'RETIRED' }] }));
+        ff = foldRuns(df, [], at);
+        ok(ff.red.includes(R) && ff.ignored.some((x) => x.status === 'RETIRED' && /in the future \(A10\)/.test(x.why)), 'A10: a future-dated nightly-named file cannot retire a red row either');
+        fs.rmSync(df, { recursive: true, force: true });
+    }
     fs.rmSync(other, { recursive: true, force: true });
     // critic r4 N3: a dirty run file never clears a red row (it can still make one red)
     truth[R] = { n: 3, k: 'dense', err: false };
@@ -1481,7 +1560,7 @@ function rng32(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >
  */
 function propertyTest({ sequences, nights, seed }) {
     const bad = []; let n = 0;
-    const c = { I1: 0, I2: 0, I3: 0, I4: 0, I5: 0, truth: 0, D2: 0, N2: 0, N3: 0 };
+    const c = { I1: 0, I2: 0, I3: 0, I4: 0, I5: 0, truth: 0, D2: 0, N2: 0, N3: 0, A10: 0, A11: 0 };
     const modes = {};
     let rowChecks = 0, totalNights = 0, violations = 0;
     const fail = (m) => { violations++; if (bad.length < 12) bad.push(m); };
@@ -1547,8 +1626,12 @@ function propertyTest({ sequences, nights, seed }) {
             // N3 / N2: some plain runs are on a dirty tree, some judged against the other directory's baseline
             const r2 = mode === 'plain' ? rnd() : 1;
             const dirty = r2 < 0.3, foreign = r2 >= 0.3 && r2 < 0.6;
+            // A10 / A11: some run files of any mode are written by a wrong clock (finished years ahead of the fold's
+            // clock, started true) or in the pre-N2 shape (no baseline field) after the cut-off: neither may clear
+            const r3 = rnd();
+            const future = r3 < 0.07, noBase = r3 >= 0.07 && r3 < 0.14;
             let res;
-            try { res = simNight(d, { ids, truth, mode, slice, repinIds, stamp, file, finished: fin, dirty, foreignBf: foreign ? path.join(fd, 'baseline.json') : null }); } catch (e) { fail(`seq ${q} night ${t} (${mode}): threw ${e.message}`); break; }
+            try { res = simNight(d, { ids, truth, mode, slice, repinIds, stamp, file, finished: fin, dirty, foreignBf: foreign ? path.join(fd, 'baseline.json') : null, futureFinished: future ? new Date(Date.parse(fin) + 1500 * 86400000).toISOString() : null, noBaselineField: noBase }); } catch (e) { fail(`seq ${q} night ${t} (${mode}): threw ${e.message}`); break; }
             totalNights++;
             const after = loadBaseline(bf);
             const foldAfter = foldRuns(d);
@@ -1585,6 +1668,8 @@ function propertyTest({ sequences, nights, seed }) {
                     if (!rr && !nowRed) fail(`I5 seq ${q} night ${t} (${mode}): ${id} was red, did not run, and is no longer red`);
                     if (rr && !nowRed && !(rr.repinned || (probe.status === 'OK' && (was || !truth[id].n)))) fail(`I5 seq ${q} night ${t} (${mode}${foreign ? ', judged against another baseline' : ''}): ${id} left the red set as ${rr.status} (OK against this directory's entry: ${probe.status})`);
                     if (dirty) { c.N3++; if (!nowRed) fail(`N3 seq ${q} night ${t}: ${id} was red and a DIRTY run cleared it`); }
+                    if (future && rr) { c.A10++; if (!nowRed) fail(`A10 seq ${q} night ${t} (${mode}): ${id} was red and a run file dated in the future cleared it`); }
+                    if (noBase && rr) { c.A11++; if (!nowRed) fail(`A11 seq ${q} night ${t} (${mode}): ${id} was red and a run file with no baseline field, after the cut-off, cleared it`); }
                     if (foreign && rr) c.N2++;
                 }
                 // ground truth: a row that ran tonight, printed, and has more findings (or another finding) than the
