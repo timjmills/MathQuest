@@ -8433,3 +8433,9 @@ html.dark .student-def strong {
 .landing-skill-list > summary::-webkit-details-marker { display: none; }
 .landing-skill-list > summary::before { content: '\25B8'; }
 .landing-skill-list[open] > summary::before { content: '\25BE'; }
+
+/* W0 dark sweep (2026-10-23): in dark mode --mq-purple-soft turns night purple (#3A3258) but the pill's text
+   stayed --mq-purple (#7C5CE6), 2.55:1. The light accent reads 5.43:1 on that tint. Additive override. */
+html.dark .mq-skill-pill {
+    color: var(--brand-purple-l, #B5A5F4);
+}

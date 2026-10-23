@@ -197,6 +197,11 @@ A cap sets the **maximum** for the criterion named, whatever else is right.
 
 ## How a page counts as graded (owner Q-S4, 2026-10-23)
 
+**Every size (owner, 2026-10-23).** Every grade covers the print sizes: an independent critic grades sizes **S and L in
+full** and **spot-checks M** on every page type it grades; the machine checks (print-lint, the coverage matrix) cover
+S, M and L on every page. A grade given at one size only is not a grade of the page (it hides L1, "Size S ignored").
+Every critic brief names the sizes.
+
 The bar does not change: 8 or more on all four criteria, on every page and every screen host. One 7 is a fail.
 What changes is how a page reaches that bar (`design/IMPROVEMENT_PLAN.md` §1.3, §1.6.3, §1.6.4). A page counts as
 graded in one of two ways:
