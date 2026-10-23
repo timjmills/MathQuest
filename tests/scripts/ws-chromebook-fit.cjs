@@ -39,8 +39,10 @@
 //                        the same fit verdicts as the default run
 //   --bigboard           SWEEP: the teacher's Board display (body.teacher-mode.tv-bigboard: css/teacher.css:96,
 //                        css/play-teacher.css), host card (the board shows the practice card only), sizes
-//                        1366x768 and 1920x1080. FAILS when the question does not fit the board: the board card
-//                        or frame scrolls sideways or down, or the teacher's board controls are off screen
+//                        1280x720, 1366x768 and 1920x1080. FAILS when the question does not fit the board: the board
+//                        card or frame scrolls sideways or down, a box nested in #questionPaper clips its content
+//                        by > 12 px (number-line pan strips excluded, as fitBoard does), or the teacher's board
+//                        controls are off screen (measured after the board's entrance animations finish)
 //   --sample <file>      the sweep sample; --skills overrides it; --roles student,teacher the sweep roles
 //   --baseline <file>    fail only on a per-skill failure the file does not pin (see findingId below); the
 //                        sweeps' standing failures are pinned in tests/fixtures/precritic/sweep-sample.json
@@ -82,7 +84,7 @@ const SHARD = (() => {
 // the checks that are not per skill run once: not in a sweep, and in shard 1 only
 const GLOBALS = !SWEEP && (!SHARD || SHARD.i === 1);
 const SAMPLE_FILE = arg('sample', path.join(__dirname, '..', 'fixtures', 'precritic', 'sweep-sample.json'));
-const SIZES = (arg('sizes', BIGBOARD ? '1366x768,1920x1080' : DARK ? '1366x650' : '1366x650,1280x600')).split(',').map(s => { const [w, h] = s.split('x').map(Number); return { w, h }; });
+const SIZES = (arg('sizes', BIGBOARD ? '1280x720,1366x768,1920x1080' : DARK ? '1366x650' : '1366x650,1280x600')).split(',').map(s => { const [w, h] = s.split('x').map(Number); return { w, h }; });
 const HOSTS = (arg('hosts', BIGBOARD ? 'card' : DARK ? 'card,worksheet,quiz' : 'card,boss,race,worksheet,quiz')).split(',');
 // boss and race are the card plus an arena / a track: in a full run they are sampled on these
 const ARENA_SAMPLE = ['addition:add_facts', 'addition:add', 'addition:add_column_multi', 'counting:count_objects', 'addition:add_wp_10', 'graphs:bar_graph', 'division:long_div_2digit'];
@@ -235,6 +237,18 @@ function BOARD() {
     const vis = el => { if (!el) return false; const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none'; };
     const pR = paper.getBoundingClientRect();
     const ctl = document.getElementById('tvBoardCtl');
+    // a box nested in the paper that clips its own content by > 12 px (launch-chrome.js nestedClip;
+    // the number lines' pan strips [data-mq-scroll] and 1-px screen-reader boxes excluded)
+    const nested = [];
+    for (const el of paper.querySelectorAll('*')) {
+        const ch = el.clientHeight, cw = el.clientWidth;
+        if (ch <= 2 || cw <= 2) continue;
+        const oy = el.scrollHeight - ch, ox = el.scrollWidth - cw;
+        if (oy <= 12 && ox <= 12) continue;
+        if (el.closest('[data-mq-scroll]')) continue;
+        const cs = getComputedStyle(el);
+        if ((oy > 12 && cs.overflowY !== 'visible') || (ox > 12 && cs.overflowX !== 'visible')) nested.push(`${el.tagName.toLowerCase()}${el.id ? '#' + el.id : ''}${el.classList[0] ? '.' + el.classList[0] : ''} +${Math.max(oy, ox)}`);
+    }
     const cR = ctl && vis(ctl) ? ctl.getBoundingClientRect() : null;
     return {
         H, W,
@@ -242,6 +256,7 @@ function BOARD() {
         overX: Math.max(card.scrollWidth - card.clientWidth, gv.scrollWidth - gv.clientWidth),
         overY: Math.max(card.scrollHeight - card.clientHeight, gv.scrollHeight - gv.clientHeight),
         ctl: cR ? { bottom: Math.round(cR.bottom), right: Math.round(cR.right) } : null,
+        nested,
     };
 }
 
@@ -379,6 +394,9 @@ async function startHost(page, host, c, k, seed) {
                     let b;
                     try {
                         await startHost(page, host, c, k, hash(`${s}:${host}`));
+                        // the controls enter with a fadeSlide (translateY 24 px): measure only once every
+                        // animation on the board frame has finished, or it reads "bottom 772 of 768"
+                        try { await page.waitForFunction(() => { const g = document.getElementById('gameView'); if (!g || !g.getAnimations) return true; const t = getComputedStyle(g).transform; return (t === 'none' || /^matrix\(1, 0, 0, 1, 0, 0\)$/.test(t)) && g.getAnimations({ subtree: true }).every(a => !a.pending && (a.playState === 'finished' || a.playState === 'idle' || (a.effect && a.effect.getComputedTiming().iterations === Infinity))); }, { timeout: 5000 }); } catch (e) { /* measured anyway */ }
                         b = await page.evaluate(BOARD);
                         if (b.error) throw new Error(b.error);
                     } catch (e) { line.push(`${hostTag} ERR ${e.message}`); fails.push(`${tag}: ${e.message}`); continue; }
@@ -386,6 +404,7 @@ async function startHost(page, host, c, k, seed) {
                     const why = [];
                     if (b.overX > 1) why.push(`the board scrolls sideways by ${b.overX} px (paper ${b.paper.w} px wide, right ${b.paper.right} of ${b.W})`);
                     if (b.overY > 1) why.push(`the board scrolls down by ${b.overY} px (paper ${b.paper.h} px tall, bottom ${b.paper.bottom} of ${b.H})`);
+                    if (b.nested.length) why.push(`a box inside the paper clips its content (${b.nested.slice(0, 3).join(', ')})`);
                     if (!b.ctl) why.push('the board controls are not shown');
                     else if (b.ctl.bottom > b.H + 0.5 || b.ctl.right > b.W + 0.5) why.push(`the board controls are off screen (bottom ${b.ctl.bottom}, right ${b.ctl.right})`);
                     why.forEach(w => fails.push(`${tag}: ${w}`));
