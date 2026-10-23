@@ -5,7 +5,7 @@
 > change them; §2.8 lists the changes for the owner to confirm (Q-T1 replaces the six-tile home). **Owner 2026-10-23 (decided):**
 > the lettered A / B / C pages go — the worksheet choices are How many pages? (for section, single-skill and mixed pages alike) ·
 > How often each skill comes up · How the problems are arranged · Examples · Size, plus a New numbers button (§2.3a).
-> **Owner 2026-10-23 (decided):** no full page preview on the website — a one-line summary; the PDF made by Print is the preview.
+> **Owner 2026-10-23 (decided):** no full page preview on the website — a one-line summary plus a SMALL preview (the first page when every page has the same kind of problems; the first 2–3 pages when they differ); the PDF made by Print is the full view.
 
 
 The teacher side is organised around **three kinds of paper** (see `design/LESSON_LIBRARY_PLAN.md` §8e): **Practice**,
