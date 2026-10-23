@@ -891,8 +891,39 @@ export function generateEnhancedSkillCode() {
         else if (hm === 'none') tokens.push('H0');
     }
 
+    // Worksheet arrangement (IMPROVEMENT_PLAN 3.3, appended 2026-10-23): Wm Mixed practice, Wp one
+    // skill per page. Sections is what every older code means, so it writes nothing and an old
+    // code decodes exactly as before. Set by updateShareSettings('arrangement', ...).
+    const arrTok = ARRANGEMENT_TOKENS[ss.arrangement];
+    if (arrTok) tokens.push('W' + arrTok);
+    // Mixed practice repeats (owner ruling 2026-10-23, appended): F0 = do not fill the page past
+    // its unique facts (filling is the absent default); X1 = related facts allowed (off is the
+    // absent default). Older codes carry neither, so they decode exactly as before.
+    if (ss.fill === false || ss.fill === 'off') tokens.push('F0');
+    if (ss.families === 'allow') tokens.push('X1');
+
     if (tokens.length === 0) return skillsPart;
     return skillsPart + '|' + tokens.join('-');
+}
+
+/** The appended `W` settings token: arrangement -> letter (sections is the absent default). */
+const ARRANGEMENT_TOKENS = Object.freeze({ mixed: 'm', 'per-page': 'p' });
+const ARRANGEMENT_OF_TOKEN = Object.freeze({ m: 'mixed', s: 'sections', p: 'per-page' });
+
+/** A decoded code's worksheet arrangement: 'mixed' | 'sections' | 'per-page' (no W token: sections). */
+export function arrangementOfSettings(settings) {
+    const a = settings && settings.arrangement;
+    return a === 'mixed' || a === 'per-page' ? a : 'sections';
+}
+
+/** A decoded code's Mixed practice fill: false only with an F0 token (no token: the page is filled). */
+export function fillOfSettings(settings) {
+    return !(settings && settings.fill === false);
+}
+
+/** A decoded code's related-facts setting: 'allow' only with an X1 token (no token: 'off'). */
+export function familiesOfSettings(settings) {
+    return settings && settings.families === 'allow' ? 'allow' : 'off';
 }
 
 export function parseEnhancedSkillCode(code) {
@@ -940,6 +971,18 @@ export function parseEnhancedSkillCode(code) {
                 case 'H':
                     // help after a wrong answer (support-ladder.js)
                     result.settings.help = val === '1' ? 'worked' : val === '0' ? 'none' : 'ladder';
+                    break;
+                case 'W':
+                    // worksheet arrangement (IMPROVEMENT_PLAN 3.3); an unknown letter reads as sections
+                    result.settings.arrangement = ARRANGEMENT_OF_TOKEN[val] || 'sections';
+                    break;
+                case 'F':
+                    // Mixed practice: F0 stops at the unique facts; anything else fills the page
+                    result.settings.fill = val !== '0';
+                    break;
+                case 'X':
+                    // Mixed practice: X1 allows related facts on one page
+                    result.settings.families = val === '1' ? 'allow' : 'off';
                     break;
             }
         }

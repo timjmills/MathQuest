@@ -53,7 +53,7 @@ cannot read are all FAIL.
 | File | Scope |
 |---|---|
 | `print-lint.json` (W0-A) | every live skill, size L, independent (721 documents) |
-| `print-lint.S.json`, `print-lint.M.json` | the 20 role-sample skills + the six pilot skills (26 documents) |
+| `print-lint.S.json`, `print-lint.M.json` | every live skill (715 documents each; full sweep 2026-10-23: S 7746 findings in 399 documents, M 6975 in 382) |
 | `options-verify.json` | the 20 role-sample skills + the six pilot skills |
 | `screen-slots.json` | S5's pin from the full sweep (723 skills) and the dark / big-board sweeps |
 | `design/audit/matrix/baseline.json` | 34 addition rows (E1) + 93 rows for the six pilot skills |
@@ -69,7 +69,7 @@ prints the command that pins it, and a pin needs a STATUS note.
 - 23 input-validation probes all exit 2.
 
 ### Open items
-- Full S/M print-lint and options-verify sweeps (nightly), so skills outside the pins don't start red.
+- A full options-verify sweep (nightly), so skills outside its pin don't start red. (Full S/M print-lint: done.)
 - The role pages (`cat:skill#role`) are not pinned, so a `--role` run is red on any pre-existing role-page finding.
 - Critic r2 low items not fixed:
   - D2: screen-answer and chromebook-fit rows only check that each skill is named. S5 could print "checked N of M".
@@ -103,3 +103,4 @@ Times: precritic --skill <six pilot skills> with the matrix on --slots 1: wall 1
 Times: coverage-matrix pin for the six on --slots 2: 757 s (93 rows × S/M/L).
 Times: critic r2 11 min, PASS (fidelity 8, honesty 8, usability 8). precritic --skill sub_100_no_regroup with the matrix on --slots 2: wall 256 s (target 5–6 min: met).
 Times: after D1/D5/D6, precritic --skill sub_100_no_regroup: wall 256 s, exit 0 (OK: 12 PASS (2 on the baseline), 1 N/A, 0 SKIPPED-NOT-BUILT of 13).
+Times: full S / M print-lint sweep, 715 skills per size, 4 shards each, one slot per size: 17:21–18:41 (80 min; S 80 min, M 76 min). The owner kept all three sizes: "if we keep them then we should test them at some point ... 8/10 or above" (the matrix nightly and the rubric's sizes are with the lead).
