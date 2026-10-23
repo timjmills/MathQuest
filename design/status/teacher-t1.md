@@ -25,3 +25,6 @@ Owns: `design/mockups/teacher-2/`, `tests/scripts/ws-teacher-tokens.cjs`, this f
 | 2026-10-23 | Critic r3: A 7 · B 9 · C 7 · D 8 — FAIL (`critic-r3.md`): tray has no height cap; decoy thumbnail pictures (r2 #6 again → stop rule: picture-vs-text check first); preview ≠ summary counts | mq-opus-medium | FAIL |
 | 2026-10-23 | Owner: side menu in deep purple #592B88 shown (ΔE 15.6 from OA, 18.9 from NF); choice pending | lead | pending |
 | 2026-10-23 | Fix round 3: r3 defects + 40–100 skill tray, checks first | mq-opus-medium (fresh) | running |
+| 2026-10-23 | Owner: purple rail tried then kept as ink ("keep it as it is for now"); big-tray popup area → grade; select + weight there; detailed weights with % lock (one skill 50 %, rest even); tray views List (default) · Chips · Thumbnails | lead | — |
+| 2026-10-23 | Fix round 3: checks first (a5c99e4b failing), tray capped (≤ 81 px) with summary bar + popup, bulk add, detailed weights, pictures from the problem, preview = summary; all gates OK | mq-opus-medium | done |
+| 2026-10-23 | Critic round 4 (fresh critic) | mq-opus-medium | running |
