@@ -40,6 +40,7 @@ New owner design ideas are recorded here and NOT folded into a running fix round
 | 2026-10-23 | "we might want multiple pages of the same set of problems as well" | already in fix round 4 (sent before the batch rule): "Each page: New problems · Same problems, new numbers · Same page again" |
 | 2026-10-23 | side menu "deep purple like in this screenshot" → "actually let's keep it as it is for now … if it's a problem I will change later" | parked; purple #592B88 shown as a reference on palette.html |
 | 2026-10-23 | "I also want these to be in the general skills not just lessons (when they are built). Everything in a lesson should have a corresponding skill engine." | recorded in the plan as Q-L2 (lead); already reflected in the mock-up, no change needed |
+| 2026-10-23 | (via lead; full text IMPROVEMENT_PLAN §2.4 on claude/sweet-newton-c8wrv1) Multi-lesson practice sets, highly customizable: tick skills per lesson → "Add to tray" as a group named after the lesson, "Next lesson" arrow, 5–6 lessons; Print = one worksheet per lesson (own pages and key) / one for all (Mixed or a section per lesson) / both; Print all = one PDF in lesson order; Save as set + Share one short code | queued for the next batch; show as a mock-up flow at the approval sitting |
 
 | Date | Step | Who (profile) | Result |
 |---|---|---|---|
