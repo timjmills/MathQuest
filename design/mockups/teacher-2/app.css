@@ -176,7 +176,7 @@ button { cursor: pointer; }
   background: var(--paper); color: var(--paper-ink); border: var(--line-1) solid var(--paper-ink); border-radius: var(--r-8);
   font-family: var(--font-pupil); display: grid; place-items: center; overflow: hidden; padding: var(--sp-8);
 }
-.thumb svg { width: 100%; height: 100%; max-width: 100%; max-height: 100%; }
+.thumb > svg { width: 100%; height: 100%; max-width: 100%; max-height: 100%; }
 
 /* ---- the tray ---- */
 .tray {
@@ -295,7 +295,9 @@ details.more[open] > summary::before { content: "▾"; }
 .page-cell { border: var(--line-2) solid var(--paper-ink); height: 132px; display: grid; place-items: center; font-size: var(--fs-28); overflow: hidden; padding: var(--sp-8); }
 .page-cell.s { height: 96px; }
 .page-cell.l { height: 180px; }
-.page-cell svg { max-width: 100%; max-height: 112px; }
+.page-cell > svg { width: 100%; height: 100%; }
+.page-cell.page-more { border-style: dashed; color: var(--paper-ink); }
+.page-cell.page-more span { font-family: var(--font-ui); font-size: var(--fs-12); text-align: center; }
 .page-key { font-size: var(--fs-16); color: var(--paper-grey); text-align: right; margin-top: auto; }
 
 /* share */
@@ -389,7 +391,7 @@ table.t th { color: var(--text-2); font-size: var(--fs-12); }
 /* board */
 .board { position: fixed; inset: 0; z-index: 70; background: var(--page); display: grid; grid-template-rows: auto 1fr auto; }
 .board-top, .board-foot { display: flex; align-items: center; gap: var(--sp-16); padding: var(--sp-16) var(--sp-32); }
-.board-card svg { width: 70%; height: 70%; }
+.board-card > svg { width: 70%; height: 70%; }
 .board-card { margin: auto; width: min(880px, 92vw); aspect-ratio: 16 / 9; background: var(--paper); color: var(--paper-ink); border: var(--line-2) solid var(--paper-ink); border-radius: var(--r-16); display: grid; place-items: center; font-family: var(--font-pupil); }
 
 /* toast and walk-through banner */
@@ -781,7 +783,7 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; a
 .tray-li .icon { width: var(--fs-16); height: var(--fs-16); color: var(--a-deep); }
 .tray-mini { flex: none; display: inline-flex; align-items: center; gap: var(--sp-4); min-height: var(--control); height: var(--control); padding: 0 var(--sp-4); border: var(--line-2) solid var(--a-deep); border-radius: var(--r-8); background: var(--surface); cursor: pointer; }
 .tray-mini-pic { display: grid; place-items: center; width: 72px; height: 36px; background: var(--paper); border-radius: var(--r-8); overflow: hidden; }
-.tray-mini-pic svg { width: 100%; height: 100%; }
+.tray-mini-pic > svg { width: 100%; height: 100%; }
 /* critic r3 D2: a slate card (Mixed / Words / No standard) is dashed too, not only its band and chips */
 .card[data-domain="MIXED"], .card[data-domain="WORDS"], .card[data-domain="NOSTD"] { border-style: dashed; }
 /* critic r3 A4: in dark mode the lesson panel header is the dark tint with a bold edge, so it never outshines the primary */
@@ -801,3 +803,89 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; a
 }
 @media (max-width: 819px) { .block-row { flex-wrap: nowrap; margin: var(--sp-8) 0 var(--sp-4); } .block-row .btn-add { flex: none; padding: 0 var(--sp-8); } }
 @media (max-width: 819px) { .traypop .tp-foot { margin-top: auto; } }
+/* ---- fix round 4 (critic r4 A1, A5, B1): the tray popup ----
+   Less · Equal · More line up row to row (fixed slots); whole-grade rows across all areas; on a phone each area and grade
+   header is one compact line (name, count and its How often state) with a 44 px "⋯" that opens its controls under it,
+   and each skill row keeps its ✕ on the name's line, so a whole grade scans at about eight rows a screen. */
+.tp-ctl .tag-slot { display: inline-flex; width: 5.5rem; }
+.tp-ctl .tp-p { display: inline-block; min-width: 3.5rem; text-align: right; }
+.tp-ctl .tp-rm { width: 9.5rem; justify-content: flex-start; }
+.tp-ahead { padding-right: var(--sp-16); }
+.tag-held { display: inline-flex; align-items: center; gap: var(--sp-4); }
+.tag-held .icon { width: var(--fs-12); height: var(--fs-12); }
+.tp-hname { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--sp-8); min-width: 0; }
+.tp-ghead .tp-hname { flex: 1 1 auto; }
+.tp-state, .short-name, .tp-dots { display: none; }
+.tp-bygrade { display: grid; border: var(--line-2) solid var(--text); border-radius: var(--r-8); background: var(--surface); padding: 0 var(--sp-8) var(--sp-4); }
+.tp-bygrade .row-label { padding: var(--sp-8) 0 0; }
+.tp-rgrade { border-bottom: var(--line-1) solid var(--line); }
+.tp-rgrade:last-child { border-bottom: 0; }
+.tp-row { display: grid; grid-template-columns: auto auto auto minmax(0, 1fr) auto auto; column-gap: var(--sp-8); }
+.tp-row:not([data-grade-host]) { grid-template-columns: auto auto minmax(0, 1fr) auto auto; }
+.tp-row .tp-name { line-height: var(--lh-tight); }
+.tp-row .tp-det { grid-column: 1 / -1; padding: 0 0 var(--sp-4) var(--sp-48, 48px); }
+.tp-item.tp-chipitem { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; column-gap: var(--sp-4); }
+.tp-item.tp-chipitem .tp-tags, .tp-item.tp-chipitem .tp-det { grid-column: 2 / -1; }
+.tp-item.tp-chipitem .tp-tags:empty { display: none; }
+@media (max-width: 819px) {
+  .tp-dots { display: inline-flex; flex: none; font-size: var(--fs-20); font-weight: var(--fw-700); }
+  .tp-state { display: inline; }
+  .wide-name { display: none; }
+  .short-name { display: inline; }
+  .tp-ahead, .tp-ghead { flex-wrap: wrap; padding: 0 var(--sp-4); gap: 0 var(--sp-4); }
+  .tp-ahead .tp-toggle { flex: 1 1 0; min-width: 0; }
+  .tp-toggle .tp-hname, .tp-ghead .tp-hname { display: grid; gap: 0; line-height: var(--lh-tight); }
+  .tp-ghead .tp-hname { flex: 1 1 0; }
+  .tp-ahead > .tp-ctl, .tp-ghead > .tp-ctl { display: none; }
+  .tp-ahead.ctl-open > .tp-ctl, .tp-ghead.ctl-open > .tp-ctl { display: flex; flex-wrap: wrap; flex-basis: 100%; padding: 0 0 var(--sp-8); }
+  .tp-ctl .tp-rm { width: auto; }
+  .tp-ahead { padding-right: var(--sp-4); }
+  .tp-row { padding: 0; column-gap: var(--sp-4); }
+  .tp-row .tp-name { min-height: var(--control); padding: var(--sp-4) 0; }
+  .tp-row .tp-det { padding-left: 0; }
+  .tp-grade { padding: 0 var(--sp-4) var(--sp-4); }
+  .traypop .sheet-head { padding-top: var(--sp-8); padding-bottom: var(--sp-8); }
+  .traypop .tp-foot .summary { font-size: var(--fs-12); }
+  .traypop .tp-foot .btn { flex: 1 1 0; min-width: 0; padding: 0 var(--sp-8); }
+}
+@media (max-width: 819px) {
+  .tp-n { display: none; }
+  /* a whole grade's How often stays in sight on a phone (one tap); its Remove is under the ⋯ */
+  .tp-rgrade > .tp-ctl { display: flex; flex-wrap: wrap; flex-basis: 100%; padding: 0 0 var(--sp-8); }
+  .tp-rgrade:not(.ctl-open) > .tp-ctl .tp-rm { display: none; }
+}
+/* the % part of a header has one width per mode, so Less · Equal · More line up on every header (whole grade, area, grade) */
+.tp-ctl .tp-pp { display: inline-flex; align-items: center; justify-content: flex-end; gap: var(--sp-8); width: 4rem; }
+.traypop.det .tp-ctl .tp-pp { width: 17rem; }
+@media (max-width: 819px) { .tp-ctl .tp-pp, .traypop.det .tp-ctl .tp-pp { width: auto; } }
+/* fix round 4 (critic r4 A2–A4, D2): the tray bar */
+.tray-li-a { font-family: var(--font-mono); font-size: var(--fs-12); font-weight: var(--fw-700); color: var(--a-deep); margin-left: var(--sp-4); }
+.tray-mini { padding-right: var(--sp-8); }
+.tray-mini-pic { width: 56px; height: 32px; flex: none; }
+.tray-mini-name { font-size: var(--fs-14); font-weight: var(--fw-700); color: var(--text); white-space: nowrap; }
+.tray-chips > .fit-wrap { flex: 1 1 auto; min-width: 0; white-space: normal; text-align: left; line-height: var(--lh-tight); height: auto; }
+.tray-chips > .fit-wrap .tray-mini-name { white-space: normal; }
+.tray-chips > .fit-wrap .tray-mini-pic { display: none; }
+@media (max-width: 1099px) { .tray-actions .tb-ic { width: var(--control); padding: 0; justify-content: center; } .tray-actions .tb-ic .tb-l { display: none; } }
+/* every close button is a full 44 × 44 target, whatever its title does (critic r4 A4) */
+.btn.close { flex: none; min-width: var(--control); width: var(--control); }
+.aw-w { display: inline-flex; align-items: center; gap: var(--sp-4); }
+.aw-w .icon { width: var(--fs-12); height: var(--fs-12); }
+.seg button { min-width: var(--control); }
+@media (max-width: 819px) {
+  /* a whole grade on a phone is one line: badge, name, Less · Equal · More, ⋯ (select, % and Remove open under the ⋯) */
+  .tp-rgrade:not(.ctl-open) { flex-wrap: nowrap; }
+  .tp-rgrade:not(.ctl-open) > .selbox { display: none; }
+  .tp-rgrade:not(.ctl-open) > .tp-ctl { flex-basis: auto; flex-wrap: nowrap; padding: 0; margin-left: auto; }
+  .tp-rgrade:not(.ctl-open) > .tp-ctl .tp-pp, .tp-rgrade:not(.ctl-open) > .tp-ctl .tag-slot:empty { display: none; }
+  .tp-rgrade > .tp-dots { order: 9; }
+  .tp-bygrade .row-label { padding: var(--sp-4) 0 0; }
+}
+@media (max-width: 819px) {
+  /* Detailed weights on a phone: every header shows its controls (the % boxes are what the teacher came for) */
+  .traypop.det .tp-ahead > .tp-ctl, .traypop.det .tp-ghead > .tp-ctl { display: flex; flex-wrap: wrap; flex-basis: 100%; padding: 0 0 var(--sp-8); }
+}
+/* the one name that stays when nothing else fits: it wraps (never an ellipsis) and the row keeps one top line */
+.tray-chips:has(> .fit-wrap) { align-items: flex-start; }
+.tray-chips > .chip.fit-wrap { min-width: 9rem; height: auto; }
+.tray-chips > .chip.fit-wrap .name { white-space: normal; overflow: visible; text-overflow: clip; }

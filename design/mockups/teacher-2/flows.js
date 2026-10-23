@@ -50,17 +50,19 @@
       check: 'MQ.S.tray.length > 0 && MQ.S.tray.every(k => MQ_DATA.skills.find(s => s.c + ":" + s.v === k).g !== "2")',
       actions: [{ click: '.tray-label-btn, .tray-count', step: 1, say: 'Open the tray' }, { click: '[data-act="tpremove"][data-arg="r:2"]', step: 2, say: 'Remove Grade 2' }] },
     { id: 'grade-more', task: 'Make one grade come up more often in a big tray', plan: { steps: 2, actions: '≤ 3', today: 'not possible' }, start: 'tray=grades2-3',
-      check: 'MQ.S.tray.filter(k => { const s = MQ_DATA.skills.find(x => x.c + ":" + x.v === k); return s.a === "OA" && s.g === "2"; }).every(k => MQ.S.w[k] === 3)',
-      actions: [{ click: '.tray-label-btn, .tray-count', step: 1, say: 'Open the tray' }, { click: '[data-act="tpcol"][data-arg="OA"]', step: 1, say: 'Open Operations' }, { click: '[data-act="hw"][data-arg="g:OA|2|3"]', step: 2, say: 'Grade 2 · How often: More' }] },
+      // fix round 4 (critic r4 B1): the WHOLE grade, across every area; the check holds every grade-2 skill, and no other
+      check: '(() => { const g = (k) => MQ_DATA.skills.find(x => x.c + ":" + x.v === k).g; const two = MQ.S.tray.filter(k => g(k) === "2"); return two.length > 50 && two.every(k => MQ.S.w[k] === 3) && MQ.S.tray.filter(k => g(k) !== "2").every(k => (MQ.S.w[k] ?? 2) === 2); })()',
+      actions: [{ click: '.tray-label-btn, .tray-count', step: 1, say: 'Open the tray' }, { click: '[data-act="hw"][data-arg="r:2|3"]', step: 2, say: 'Grade 2 (all areas) · How often: More' }] },
     { id: 'area-40', task: 'Give Fractions 40 % of a whole-grade worksheet', plan: { steps: 3, actions: '≤ 4', today: 'not possible' }, start: 'tray=grade3', doneSheet: 'print',
       check: 'Math.abs(MQ.S.tray.filter(k => MQ_DATA.skills.find(s => s.c + ":" + s.v === k).a === "NF").reduce((t, k) => t + (MQ.plan().byKey[k] || 0), 0) - 0.4 * MQ.plan().total) <= 1',
       actions: [{ click: '.tray-label-btn, .tray-count', step: 1, say: 'Open the tray' }, { click: '[data-act="detailed"]', step: 1, say: 'Detailed weights' }, { type: 'input.pct[data-scope="a:NF"]', text: '40', enter: true, step: 2, say: 'Fractions: 40 % (the other areas share the rest)' }, { click: '.traypop [data-act="tray-print"]', step: 3, say: 'Print: the summary and the preview follow it' }] },
     { id: 'skill-50', task: 'One skill 50 %, the rest split evenly', plan: { steps: 2, actions: '≤ 4', today: 'not possible' }, start: 'tray=demo64&pages=5',
       check: '(() => { const p = MQ.plan(); const k = "addition:add_wp_1k"; const r = MQ.S.tray.filter(x => x !== k).map(x => p.byKey[x] || 0); return MQ.S.lock["k:" + k] === 50 && p.byKey[k] === Math.round(p.total / 2) && Math.max(...r) - Math.min(...r) <= 1; })()',
-      actions: [{ click: '.tray-label-btn, .tray-count', step: 1, say: 'Open the tray' }, { click: '[data-act="detailed"]', step: 1, say: 'Detailed weights' }, { type: '#tsearch', text: 'within 1,000)', step: 2, say: 'Find the skill' }, { type: 'input.pct[data-scope="k:addition:add_wp_1k"]', text: '50', enter: true, step: 2, say: '50 %: it is held, the rest share 50 % evenly' }] },
+      actions: [{ click: '.tray-label-btn, .tray-count', step: 1, say: 'Open the tray' }, { click: '[data-act="detailed"]', step: 1, say: 'Detailed weights' }, { type: '#tsearch', text: 'add 1000 story', step: 2, say: 'Find the skill (the app’s own search)' }, { type: 'input.pct[data-scope="k:addition:add_wp_1k"]', text: '50', enter: true, step: 2, say: '50 %: it is held, the rest share 50 % evenly' }] },
   ];
   // on a phone the grades row of the tray popup is under "View and more"
-  FLOWS.find(f => f.id === 'grade-remove').narrow = [{ click: '.tray-count', step: 1, say: 'Open the tray' }, { click: '[data-act="tpmore"]', step: 1, say: 'View and more' }, { click: '[data-act="tpremove"][data-arg="r:2"]', step: 2, say: 'Remove Grade 2' }];
+  // on a phone a whole grade's Remove is under its "⋯" (its How often stays in sight)
+  FLOWS.find(f => f.id === 'grade-remove').narrow = [{ click: '.tray-count', step: 1, say: 'Open the tray' }, { click: '[data-act="tpdots"][data-arg="r:2"]', step: 1, say: 'Grade 2 · ⋯' }, { click: '[data-act="tpremove"][data-arg="r:2"]', step: 2, say: 'Remove Grade 2' }];
   // the narrow (390) chip flow opens the collapsed tray first: the count bar is one tap, then the chip
   Object.assign(FLOWS.find(f => f.id === 'chip-options'), { narrowPlan: '2', narrowNote: 'On a phone the tray is collapsed to “3 skills ▸” (§2.3), so a chip is two taps away' });
   FLOWS.find(f => f.id === 'chip-options').narrow = [{ click: '.tray-count', step: 1, say: 'Tap “3 skills ▸”' }, { click: '.traypop [data-act="chip"]', step: 1, say: 'Tap the skill' }];

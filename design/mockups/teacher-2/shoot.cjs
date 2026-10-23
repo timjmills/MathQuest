@@ -12,6 +12,12 @@
 // a thumbnail's drawing; Skills from 820 px up with a search box >= 320 px, medium cards >= 200 px, first card by y 420;
 // every skill card / chip / lesson row / lesson panel / chip-options header has exactly one grade badge, first in its
 // content box, whole, >= 12 px, >= 4.5 : 1 (owner 2026-10-23).
+// Fix round 4 (critic r4) adds: every control >= 44 px WIDE too (close buttons squeezed by long titles); a quiz sheet's
+// How many questions equals its summary; preview cells are real captured items of their own skill; the phone tray popup
+// shows >= 6 skill rows on its first 390 × 844 screen (rows <= 56 px, ✕ on the name's line, headers <= 64 px); the print
+// sheet keeps 3 pages and Examples after close → tick a skill → Print; Grade 2 (all areas) · More reaches every grade-2
+// skill; and the two search boxes answer "2.NBT.5", "2.NBT.B.5", "within 1000", "time", "clocks", "add within 20",
+// "fractoins" and (tray) "3.NF.1" through the app's own finder.
 const fs = require('fs');
 const path = require('path');
 let chromium;
@@ -77,7 +83,7 @@ const SCREENS = [
   ['tray-pop-open', 'The tray popup, every area open', 'app.html?tray=grades2-3&open=all#tray', true, false],
   ['tray-pop-sel', 'The tray popup: a selection and the bulk bar', 'app.html?tray=grade3&open=NF&sel=g:NF|3#tray', true, false],
   ['tray-pop-detailed', 'The tray popup, Detailed weights: Fractions held at 40 %', 'app.html?tray=grade3&open=NF&detailed=1&lockp=a:NF:40#tray', true, false],
-  ['tray-pop-50', 'Detailed: one skill held at 50 %, the rest split evenly', 'app.html?tray=demo64&pages=5&detailed=1&tq=within%201,000)&lockp=k:addition:add_wp_1k:50#tray', true, false],
+  ['tray-pop-50', 'Detailed: one skill held at 50 %, the rest split evenly', 'app.html?tray=demo64&pages=5&detailed=1&tq=add%201000%20story&lockp=k:addition:add_wp_1k:50#tray', true, false],
   ['print-grade', 'Print a whole grade: Mixed, every skill at least once', 'app.html?tray=grade3#print', true, false],
   ['print-grade-single', 'Print a whole grade on Single skill: the warning', 'app.html?tray=grade3&kind=single#print', true, false],
   ['print-grade-sections', 'Print a whole grade on Sections: one section per area', 'app.html?tray=grade3&kind=sections#print', true, false],
@@ -165,11 +171,17 @@ async function screenReport(page, w) {
       while (!bad && (n = w.nextNode())) { const re = /[^\s\-‐‑/]{2,}/g; let m; while ((m = re.exec(n.data))) { const rg = document.createRange(); rg.setStart(n, m.index); rg.setEnd(n, m.index + m[0].length); const tops = new Set([...rg.getClientRects()].filter(x => x.width > 0).map(x => Math.round(x.top))); if (tops.size > 1) { bad = m[0]; break; } } }
       if (bad) say('word broken across lines', `“${bad}” in “${txt(el)}”`);
     }
-    // (5) controls >= 44 px tall (§2.8)
+    // (5) controls >= 44 px tall (§2.8); fix round 4 (critic r4 A4): and >= 44 px WIDE, so a long title can never squeeze a
+    //     close button, an icon button or a stepper key below the target (measured at every width, light and dark)
     for (const el of document.querySelectorAll('button, a.btn, input:not([type=hidden]), select, summary, [role=tab]')) {
       if (!shown(el)) continue; const r = el.getBoundingClientRect();
       if (r.height < 43.5) say('control under 44px', `“${txt(el)}” ${Math.round(r.height)}px`);
+      else if (r.width < 43.5 && !el.matches('input[type=checkbox], input[type=radio]')) say('control under 44px wide', `“${txt(el) || el.className}” ${Math.round(r.width)}px`);
     }
+    // (9) fix round 4 (critic r4 C3): a quiz sheet's How many questions equals the questions its summary line counts
+    const qn = document.querySelector('[data-act="qn"]');
+    if (qn && shown(qn)) { const n = Number(qn.closest('.stepper').querySelector('output').textContent); const line = (document.querySelector('[data-summary]') || {}).textContent || '';
+      const m = line.match(/(\d+) questions/); if (!m || Number(m[1]) !== n) say('quiz count', `stepper ${n}, summary “${line.slice(0, 50)}”`); }
     // (6) the tick box never sits on the thumbnail's drawing
     for (const c of document.querySelectorAll('.card')) {
       const t = c.querySelector('.tick span'), th = c.querySelector('.thumb'); if (!t || !th || !th.getBoundingClientRect().width) continue; const tr = t.getBoundingClientRect();
@@ -366,7 +378,9 @@ async function runFlow(browser, base, f, w) {
             const cells = [...pg.querySelectorAll('.page-cell')]; const got = {};
             for (const c of cells) { const k = c.getAttribute('data-skill'); if (!k) { bad.push('a preview cell without data-skill'); break; } got[k] = (got[k] || 0) + 1; }
             const want = p.perPage[i] || {}; for (const k of new Set([...Object.keys(want), ...Object.keys(got)])) if ((want[k] || 0) !== (got[k] || 0)) bad.push(`page ${i + 1}: preview ${got[k] || 0} × ${k}, plan ${want[k] || 0}`);
-            const seen = new Set(); for (const c of cells) { const h = c.innerHTML; if (seen.has(h)) { bad.push(`page ${i + 1}: the same item twice`); break; } seen.add(h); }
+            const seen = new Set(); for (const c of cells) { if (c.classList.contains('page-more')) continue; const h = c.innerHTML; if (seen.has(h)) { bad.push(`page ${i + 1}: the same item twice`); break; } seen.add(h); }
+            // every drawn cell is a REAL captured item of its own skill (fix round 4, critic r4 C1)
+            for (const c of cells) { if (c.classList.contains('page-more')) continue; const sv = c.querySelector('svg'); if (!sv || (sv.getAttribute('data-smp') !== c.getAttribute('data-skill') && !sv.hasAttribute('data-fallback'))) { bad.push(`page ${i + 1}: a cell of ${c.getAttribute('data-skill')} shows ${sv ? sv.getAttribute('data-smp') : 'nothing'}`); break; } }
           });
           const line = document.querySelector('[data-summary]'); const txt = line ? line.textContent : '';
           if (!txt.includes(`${p.total} ${M.S.sheet === 'quiz' ? 'questions' : 'problems'}`)) bad.push(`summary “${txt.slice(0, 60)}” does not say ${p.total}`);
@@ -390,6 +404,77 @@ async function runFlow(browser, base, f, w) {
         if (!ok) failed++;
         console.log(`${ok ? 'ok  ' : 'FAIL'} 50 % case, ${r.n} skills on ${r.total}: held skill ${r.first}, the rest ${r.min}–${r.max} (sum ${r.sum})   want ${want}`);
       }
+      await page.close();
+    }
+    // ---- fix round 4 (critic r4 A1): the big-tray popup on a phone scans. With a whole grade open at 390 × 844, at least
+    //      6 skill rows are in the first screen (each row's middle not covered by the header or the sticky foot), every
+    //      row is <= 56 px tall with its ✕ on the name's line, and the area and grade headers are <= 64 px.
+    if (!ONLY || ONLY.includes('phone-pop')) for (const theme of THEMES) {
+      const page = await browser.newPage({ viewport: SIZES[390] });
+      for (const [label, url] of [['a whole grade, every area open', 'app.html?tray=grade3&open=all#tray'], ['two grades, Operations open', 'app.html?tray=grades2-3&open=OA#tray']]) {
+        await page.goto(`${base}/design/mockups/teacher-2/${url.replace('?', `?theme=${theme}&`)}`, { waitUntil: 'networkidle' }); await page.evaluate(() => document.fonts.ready);
+        const r = await page.evaluate(() => {
+          const rows = [...document.querySelectorAll('.tp-row')]; const vis = rows.filter(row => { const b = row.getBoundingClientRect(); if (b.bottom > innerHeight || b.top < 0) return false; const t = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2); return !!t && row.contains(t); });
+          const tall = rows.filter(row => row.getBoundingClientRect().height > 56.5).length;
+          const xOff = rows.filter(row => { const x = row.querySelector('[data-act="tpremove"]'), n = row.querySelector('.tp-name'); if (!x || !n) return true; const a = x.getBoundingClientRect(), b = n.getBoundingClientRect(); return a.top > b.bottom - 4; }).length;
+          const heads = [...document.querySelectorAll('.tp-ahead, .tp-ghead:not(.tp-rgrade)')].filter(h => h.getBoundingClientRect().height > 64.5).map(h => Math.round(h.getBoundingClientRect().height));
+          return { vis: vis.length, rows: rows.length, tall, xOff, heads };
+        });
+        const bad = []; if (r.vis < 6) bad.push(`${r.vis} skill rows in the first screen (want >= 6)`); if (r.tall) bad.push(`${r.tall} rows taller than 56 px`); if (r.xOff) bad.push(`${r.xOff} rows with the ✕ off the name's line`); if (r.heads.length) bad.push(`headers over 64 px: ${r.heads.slice(0, 4).join(', ')}`);
+        if (bad.length) failed++;
+        console.log(`${bad.length ? 'FAIL' : 'ok  '} phone popup @390 ${theme}, ${label}: ${r.vis} rows on the first screen of ${r.rows}${bad.length ? '  ' + bad.join('; ') : ''}`);
+      }
+      await page.close();
+    }
+    // ---- fix round 4 (critic r4 B3): the worksheet sheet keeps what the teacher set. Set 3 pages and Examples at the top,
+    //      close, tick one more skill, press Print again: still 3 pages and Examples at the top (the kind recomputed only
+    //      if it no longer fits); and a grade's How often across ALL areas reaches every skill of that grade (r4 B1)
+    if (!ONLY || ONLY.includes('keep')) {
+      const page = await browser.newPage({ viewport: SIZES[1366] });
+      await page.goto(`${base}/design/mockups/teacher-2/app.html?tray=demo3#skills`, { waitUntil: 'networkidle' });
+      const clickAll = async (sels) => { for (const sel of sels) { await page.locator(sel).first().click(); await page.waitForTimeout(40); } };
+      await clickAll(['[data-act="tray-print"]', '[data-act="pages"][data-arg="1"]', '[data-act="pages"][data-arg="1"]', '[data-act="examples"][data-arg="top"]', '.sheet [data-act="close"].close']);
+      const before = await page.evaluate(() => window.MQ.S.opts.pages);
+      await clickAll(['#skill-list .card[aria-pressed="false"]', '[data-act="tray-print"]']);
+      const r = await page.evaluate(() => ({ pages: window.MQ.S.opts.pages, ex: window.MQ.S.opts.examples, n: window.MQ.S.tray.length, shown: (document.querySelector('.stepper output') || {}).textContent }));
+      const ok = before === 3 && r.pages === 3 && r.ex === 'top' && r.n === 4;
+      if (!ok) failed++;
+      console.log(`${ok ? 'ok  ' : 'FAIL'} print sheet keeps its settings: 3 pages + Examples at the top → close → tick a 4th skill → Print: ${r.pages} pages, examples ${r.ex}, ${r.n} skills`);
+      await page.goto(`${base}/design/mockups/teacher-2/app.html?tray=grades2-3#tray`, { waitUntil: 'networkidle' });
+      await clickAll(['[data-act="hw"][data-arg="r:2|3"]']);
+      const g = await page.evaluate(() => { const S = window.MQ.S; const two = S.tray.filter(k => MQ_DATA.skills.find(s => s.c + ':' + s.v === k).g === '2'); const areas = new Set(two.map(k => MQ_DATA.skills.find(s => s.c + ':' + s.v === k).a)); return { n: two.length, more: two.filter(k => S.w[k] === 3).length, areas: areas.size, others: S.tray.filter(k => !two.includes(k) && (k in S.w) && S.w[k] !== 2).length }; });
+      const gok = g.n > 0 && g.more === g.n && g.others === 0 && g.areas > 1;
+      if (!gok) failed++;
+      console.log(`${gok ? 'ok  ' : 'FAIL'} Grade 2 (all areas) · More: ${g.more} of ${g.n} grade-2 skills across ${g.areas} areas, ${g.others} other skills changed`);
+      await page.close();
+    }
+    // ---- fix round 4 (critic r4 B2): both search boxes go through the app's own finder (js/modules/skill-finder.js), never
+    //      label matching (CLAUDE.md). Each query's first card and hit count are held to what a teacher means by it.
+    if (!ONLY || ONLY.includes('search')) {
+      const page = await browser.newPage({ viewport: SIZES[1366] });
+      const cases = [
+        ['2.NBT.5', (r) => r.n >= 5 && r.n === r.alt, 'the standard without its cluster letter finds what 2.NBT.B.5 finds'],
+        ['2.NBT.B.5', (r) => r.n >= 5, 'the full code'],
+        ['within 1000', (r) => r.n >= 5 && /1,000/.test(r.top[0]), 'numbers written with or without the comma'],
+        ['time', (r) => /time|clock/i.test(r.top[0]) && !/times/i.test(r.top[0]) && r.top.slice(0, 3).every(t => /time|clock/i.test(t) && !/times as/i.test(t)), 'clock skills first, not Times as Many'],
+        ['clocks', (r) => /clock/i.test(r.top[0]), 'a clock skill first'],
+        ['add within 20', (r) => /within 20/i.test(r.top[0]) && /add/i.test(r.top[0]), 'Add within 20 first'],
+        ['fractoins', (r) => r.n >= 5 && /fraction/i.test(r.top[0]), 'a misspelling still finds fractions'],
+      ];
+      await page.goto(`${base}/design/mockups/teacher-2/app.html#skills`, { waitUntil: 'networkidle' });
+      await page.waitForFunction(() => window.MQ_FINDER_READY, null, { timeout: 30000 });
+      for (const [q, ok, why] of cases) {
+        const r = await page.evaluate((q) => { const S = window.MQ.S; const run = (x) => { S.q = x; window.MQ.render(); return [...document.querySelectorAll('#skill-list .card[data-skill]')].map(c => c.querySelector('.card-name').textContent); }; const top = run(q); const alt = q === '2.NBT.5' ? run('2.NBT.B.5').length : 0; run(q); const note = (document.querySelector('#skill-list .note') || {}).textContent || ''; const m = note.match(/(\d+) skills? match/); return { top, n: m ? Number(m[1]) : top.length, alt: q === '2.NBT.5' ? (alt && Number(((document.querySelector('#skill-list .note') || {}).textContent || '').match(/(\d+)/)[1])) : 0 }; }, q);
+        if (q === '2.NBT.5') { r.alt = await page.evaluate(() => { const S = window.MQ.S; S.q = '2.NBT.B.5'; window.MQ.render(); const m = ((document.querySelector('#skill-list .note') || {}).textContent || '').match(/(\d+) skills? match/); S.q = ''; return m ? Number(m[1]) : 0; }); }
+        const good = ok(r); if (!good) failed++;
+        console.log(`${good ? 'ok  ' : 'FAIL'} search “${q}”: ${r.n} skills, first ${r.top.slice(0, 3).join(' · ')}   (${why})`);
+      }
+      // the tray's own search: a standard code finds the tray's skills of that standard
+      await page.goto(`${base}/design/mockups/teacher-2/app.html?tray=grade3&tq=3.NF.1#tray`, { waitUntil: 'networkidle' });
+      await page.waitForFunction(() => window.MQ_FINDER_READY, null, { timeout: 30000 }); await page.evaluate(() => window.MQ.render());
+      const tr = await page.evaluate(() => [...document.querySelectorAll('.tp-row .tp-name')].map(x => x.textContent));
+      const tok = tr.length >= 2 && tr.every(t => /fraction|whole|equal|part|shade|unit/i.test(t)); if (!tok) failed++;
+      console.log(`${tok ? 'ok  ' : 'FAIL'} tray search “3.NF.1”: ${tr.length} rows (${tr.slice(0, 3).join(' · ')})`);
       await page.close();
     }
     // the flows
@@ -425,7 +510,7 @@ function writeIndex(shots, results) {
   <a class="tile" href="app.html"><b>The mock-up</b><span>Skills (opens here) with the tray, the worksheet sheet, Quiz, Share, Lessons, Classes and the profile menu. Works at any width; Theme is in the profile menu, or add ?theme=dark.</span></a>
   <a class="tile" href="flows.html"><b>The flows</b><span>Each job with its steps and clicks, today’s count beside it, and a “Walk it” button that shows each click in the mock-up.</span></a>
   <a class="tile" href="palette.html"><b>Colour: board C</b><span>Eight maths areas in four strengths, light and dark, the colour-blind check, where each colour moved from the site, and boards B and A as reference pictures.</span></a>
-  <a class="tile" href="thumbs.html"><b>Every skill’s thumbnail</b><span>All 715 live skills with the drawing their card shows, picked by category and skill id; <code>thumbs-check.cjs</code> holds each to its name.</span></a>
+  <a class="tile" href="thumbs.html"><b>Every skill’s thumbnail</b><span>All 715 live skills, each showing a REAL item captured from the app (<code>capture-samples.cjs</code>); <code>thumbs-check.cjs</code> holds each thumbnail to its own skill’s item.</span></a>
   <a class="tile" href="files.html"><b>Teacher files: live and branches</b><span>Which teacher files are live, which are only on a branch, and what T2–T6 does with each (STATUS §7).</span></a>
 </div>
 <h2>The flows at a glance</h2>
