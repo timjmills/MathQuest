@@ -1,4 +1,4 @@
-# Improvement plan — faster building, a simple teacher site, truly mixed pages (v17, 2026-10-23)
+# Improvement plan — faster building, a simple teacher site, truly mixed pages (v18, 2026-10-23)
 
 ## In short (for the owner)
 
@@ -42,7 +42,7 @@ no full preview on the website, but a small preview of the first page (or the fi
 Built from three audits on 2026-10-23 (the build history and gate timings; the teacher site driven in a browser at 1366
 and 390 px; the print engine with a test render) and graded by an independent critic: rounds 1–4 FAIL; round 5
 PASS on v5 (A 8 · B 9 · C 9 · D 8 · E 8 · F 9 · G 9), confirmed on v5.1. The owner's further requests then added §1.6
-and the three kinds of worksheet (v6–v16; rounds 6–16 FAIL); this v17 answers round 16. The current review state is in
+and the three kinds of worksheet (v6–v17; rounds 6–17 FAIL); this v18 answers round 17. The current review state is in
 `design/STATUS.md`.
 
 ---
@@ -337,39 +337,43 @@ flags E1 adds: `--kind single|sections|mixed`, `--pages N` and `--bring-back`.
 - the Fade values map to the support engine: Faded page = `--supports all --cover fade` (supports fade by position down
   the page); E1 names the engine fields for Faded problems and Faded packet (the packet also needs `--pages`) and adds a
   flag where none exists;
-- **Which rows a change reaches is found by output, not by file.** At M4 the row-2 lane exports one **pre-draw
-  function** from `print-sheet.js` (`preDraw(req, counts)`, new). `buildSheet` measures a probe of items before it
-  decides how many to deal (`buildSheetCore` probes 16, `probeRun`, `print-sheet.js:2073-2079`, then deals the final
-  count from the measured layout; `buildRoleSheet` probes 8, or 20 on the fact probe, l.2672-2680). Probe items that
-  are never printed still set the page's geometry — the cell floor is measured over the probe and the final items
-  together (`floorWith(si, probe.items.concat(items))`, l.2205), the role floors over the probe alone (l.2678), the
-  supports split measures both arrangements' probes (l.2174-2182), and the example band keeps one of four examples
-  taken by measured height (l.2740). So `preDraw` does not decide counts, and it deals and hashes **every item
-  `buildSheet` deals, not only those printed**: every probe (both arrangements of a supports split, each More Practice
-  letter's probe), the final deal up to the highest count any pass of the count loop reached, and every example taken
-  before the height filter. It takes those **deal counts** as input — the nightly's full render stores them beside
-  the row — and deals exactly them, as `buildSheet` would. It returns all the dealt items (`generateRun`, with its de-duplication and retries, including the final deal by
-  weight across sections), the example items, the role's `prepare` output (for example the error-analysis wrong
-  flags), the settled instruction text (`settlePrompts`, `instructionKeyFor`, `libraryKeyOf`, the providers), the
-  provider outputs (`strings`, `workedSteps`, `wrongAnswer`), the option values and presets in force, and each cell's
-  declared footprint — and stops before any cell is measured or drawn. Its output, hashed, is the row's **input
-  digest**. This is exact: a row's deal counts and geometry can change only if a dealt item changes (which changes its
-  digest) or the measuring and layout code or the stylesheets change — `floorOf` / `floorWith`, the count loop and the
-  layout in `print-sheet.js` are among its browser-side parts, and `layout.js` / `paginate.js` are engine modules, all
-  of which touch every print row (below); a row with no stored deal counts counts as changed. Measured sizes are
-  not in it: they come from the browser and are handled by file (next list). `ws-coverage-matrix --digest` (new, E1)
-  computes the digests of all rows in one fresh browser profile (no cookies, no localStorage; seeds are always given,
-  so `Math.random` is never reached — `print-sheet.js:89`), at ≈ 0.7 ms an item for raw generation (measured 2026-10-23:
-  1,200 items in 0.84 s), ≈ 650,000 printed items ≈ 8 minutes, more with the unprinted probe items (up to 16 a section
-  besides); `preDraw` also runs retries and the providers, so E1 measures its real cost and the budget below is
-  restated from that. The nightly stores its digests with its commit, so `--affected <commit
-  range>` computes only the tip's digests and lists every row whose digest differs from the stored one. A change to a
-  generator module, a provider, `skill-presets.js`, `sheet/instructions.js`, the dispatcher or any other file
-  therefore reaches exactly the rows whose pages it changes, wherever the code lives; a new addition skill reaches its
-  own rows, not the ≈ 200 skills that share `gen-operations.js`, unless it changed theirs. If a digest cannot be
-  computed at either end (an error; a skill that does not exist at the base, such as a new one), that row and every row
+- **Which rows a change reaches is found by output, not by file — by replaying the real code.** `buildSheet` makes
+  its dealing decisions from measurements: it measures a probe before it sets counts (`buildSheetCore` probes 16,
+  `probeRun`, `print-sheet.js:2073-2079`; `buildRoleSheet` probes 8, or 20 on the fact probe, l.2672-2680); probe
+  items that are never printed set the cell floor (`floorWith`, l.2205; the role floors, l.2678); a section of several
+  skills is dealt afresh on every pass of the count loop at that pass's own count (l.2088, `dealSkills` l.196); the
+  supports split measures both arrangements (l.2174-2182); a More Practice letter over capacity is re-dealt (l.2255-2256);
+  and the example band keeps one of four examples by measured height (l.2741). Copying those steps into a separate
+  function would miss the next one, so the digest **runs the real code**:
+  - at M4 the row-2 lane gives `buildSheet` two modes (`print-sheet.js`): **record** — the nightly's full render saves,
+    for every row, each measurement it made, keyed by a hash of the item's content and the measuring context (size,
+    look, columns, template) — and **replay** — `buildSheet` runs its whole code path (every probe, every pass of the
+    count loop at its own count, every re-deal, the examples, the role's `prepare`) but answers each measurement from
+    that record instead of drawing, and stops before any page is drawn;
+  - in replay it records **every item it deals, printed or not**, with the settled instruction text (`settlePrompts`,
+    `instructionKeyFor`, `libraryKeyOf`, the providers), the provider outputs (`strings`, `workedSteps`,
+    `wrongAnswer`), the role's `prepare` output (for example the error-analysis wrong flags), the option values and
+    presets in force and each cell's declared footprint. That record, hashed, is the row's **input digest**;
+  - if replay asks for a measurement the record does not hold — an item whose content changed, or a path the night did
+    not take — the row counts as changed; so does a row the night did not record;
+  - this is **exact by construction**: the same code with the same measured sizes makes the same decisions. Anything
+    that changes a decision either changes a dealt item (a new digest, or a missing measurement) or changes the
+    measuring and layout code or the stylesheets — `measureItems`, `floorOf` / `floorWith`, the count loop and the
+    layout in `print-sheet.js` are among its browser-side parts, and `layout.js` / `paginate.js` are engine modules,
+    all of which touch every print row (below).
+
+  `ws-coverage-matrix --digest` (new, E1) runs replay for every row in one fresh browser profile (no cookies, no
+  localStorage; seeds are always given, so `Math.random` is never reached — `print-sheet.js:89`). Generation costs
+  ≈ 0.7 ms an item (measured 2026-10-23: 1,200 items in 0.84 s), ≈ 650,000 printed items ≈ 8 minutes, more with the
+  unprinted probe items and the extra passes of several-skill sections; replay draws nothing, so E1 measures its real
+  cost and the budget below is restated from that. The nightly stores its digests and measurements with its commit,
+  so `--affected <commit range>` replays only the tip and lists every row whose digest differs from the stored one. A
+  change to a generator module, a provider, `skill-presets.js`, `sheet/instructions.js`, the dispatcher or any other
+  file therefore reaches exactly the rows whose pages it changes, wherever the code lives; a new addition skill
+  reaches its own rows, not the ≈ 200 skills that share `gen-operations.js`, unless it changed theirs. If replay
+  fails at either end (an error; a skill that does not exist at the base, such as a new one), that row and every row
   of the same category count as changed.
-- **Changes after the pre-draw** — the code and styles that measure and draw in the browser — are found by file:
+- **Changes to measuring and drawing** — the code and styles that measure and draw in the browser — are found by file:
   - an engine module touches every row of the pairs that use it (the fingerprint);
   - every **print row** is touched by: the browser-side parts of `print-sheet.js` (`measureItems`, the key path
     including `legacyKeyFill`, the document wrapper `sheetDocument`), `print-generate.js` (it draws every legacy-cell
@@ -400,7 +404,7 @@ flags E1 adds: `--kind single|sections|mixed`, `--pages N` and `--bring-back`.
   the counts), extending S9's per-skill baseline to the new rows; a **red row** is any finding beyond that baseline, or
   any other gate failure on the row;
 - **at deploy** (S5 session 3) the tip's digests are computed (≈ 8 min) and only the affected rows run, within a budget
-  of 500 documents (≈ 15 min on two slots): ≈ 23 minutes, beside the gate sessions. **Before M4** there is no `preDraw`,
+  of 500 documents (≈ 15 min on two slots): ≈ 23 minutes, beside the gate sessions. **Before M4** there is no replay,
   so every row counts as changed and every deploy that changes any file feeding a row takes the sharded run (≈ 3.5 h);
   the speed-up of this list starts when M4 is merged. Above the budget — any change to an
   engine module or a browser-side render file — the deploy triggers the sharded full run (≈ 3.5 h) and waits for it. Rows
@@ -561,7 +565,7 @@ flags E1 adds: `--kind single|sections|mixed`, `--pages N` and `--bring-back`.
 
 | Step | Work | Files | Done when |
 |---|---|---|---|
-| E1 | Envelopes, all-pairs sampling, structural fingerprint (binding-level engine modules), certificates, the coverage matrix with option rows, `--affected`, the dependency cache, the nightly job and the first per-row baseline, the packer proof and its print-time asserts (tools built in Wave 0; the first certificate after M4) | `tests/scripts/ws-envelope.mjs` (new), `tests/scripts/ws-coverage-matrix.cjs` (new), `tests/scripts/ws-packer-proof.mjs` (new), `tests/scripts/ws-print-lint.cjs` (`--kind`, `--pages`, `--bring-back`); the print-time asserts in `sheet/roles/mixed-practice.js` and the move of `print-sheet.js`'s measuring and key path into a module of its own are done by the row-2 lane at M4, which owns those files, `ws-grade-render.cjs` (`--envelope <template>--<kind>`, new flag), `design/audit/certified/`, `design/audit/matrix/` | `stack` × Single skill certified by running its all-pairs sample after M4; its certificate lists every page and score source; `ws-envelope --engine` prints the engine lists of §1.6.2; a deliberate change to `layout.js` voids `stack` × Single skill in a dry run, while a change to one provider, to a template the pair does not reach, or (after M3) to one preset or one instruction string voids nothing; a one-line change to `print-generate.js` makes `--affected` list every print row, while one new skill's commit in the project's usual shape — its SKILLS row, a new branch in `gen-operations.js` and its dispatcher entry, provider, `SKILL_STANDARDS` / `SKILL_WRM` entries, search terms and its pinned share code in `skill-codes-frozen.js` — plus the `index.html` stamp lists only that skill's rows; changing one instruction string lists exactly the rows whose items print it (checked against a full render); the digests of every row compute through `preDraw` from the stored deal counts (every item `buildSheet` deals), with their measured time recorded (target ≤ 10 minutes); a change that alters only an item past the probe (or only the final mixed deal), and a change that alters only a probe item that is not printed, each lists its row; measuring in the stylesheet frame matches the app document on the role sample; `ws-envelope --self-test` fails on a declared data leaf that exports a function; the nightly matrix runs and its first run writes the per-row baseline (STATUS note); a seeded new finding beyond that baseline turns its row red and blocks a test deploy; `--affected` on a one-generator change lists only that generator's skills |
+| E1 | Envelopes, all-pairs sampling, structural fingerprint (binding-level engine modules), certificates, the coverage matrix with option rows, `--affected`, the dependency cache, the nightly job and the first per-row baseline, the packer proof and its print-time asserts (tools built in Wave 0; the first certificate after M4) | `tests/scripts/ws-envelope.mjs` (new), `tests/scripts/ws-coverage-matrix.cjs` (new), `tests/scripts/ws-packer-proof.mjs` (new), `tests/scripts/ws-print-lint.cjs` (`--kind`, `--pages`, `--bring-back`); the print-time asserts in `sheet/roles/mixed-practice.js` and the move of `print-sheet.js`'s measuring and key path into a module of its own are done by the row-2 lane at M4, which owns those files, `ws-grade-render.cjs` (`--envelope <template>--<kind>`, new flag), `design/audit/certified/`, `design/audit/matrix/` | `stack` × Single skill certified by running its all-pairs sample after M4; its certificate lists every page and score source; `ws-envelope --engine` prints the engine lists of §1.6.2; a deliberate change to `layout.js` voids `stack` × Single skill in a dry run, while a change to one provider, to a template the pair does not reach, or (after M3) to one preset or one instruction string voids nothing; a one-line change to `print-generate.js` makes `--affected` list every print row, while one new skill's commit in the project's usual shape — its SKILLS row, a new branch in `gen-operations.js` and its dispatcher entry, provider, `SKILL_STANDARDS` / `SKILL_WRM` entries, search terms and its pinned share code in `skill-codes-frozen.js` — plus the `index.html` stamp lists only that skill's rows; changing one instruction string lists exactly the rows whose items print it (checked against a full render); replaying the nightly's own commit reproduces every stored digest exactly, with its measured time recorded (target ≤ 10 minutes); a change that alters only an item past the probe, only a probe item that is not printed, or only one pass of a several-skill section whose count loop shrank, each lists its row; measuring in the stylesheet frame matches the app document on the role sample; `ws-envelope --self-test` fails on a declared data leaf that exports a function; the nightly matrix runs and its first run writes the per-row baseline (STATUS note); a seeded new finding beyond that baseline turns its row red and blocks a test deploy; `--affected` on a one-generator change lists only that generator's skills |
 | E2 | Certify Single skill and Sections for the live skills' templates (after M4 is merged); the mixed packer and Mixed practice at M5; the Quiz layer with T3 | the files each lane owns (§1.6.5) | every pair the live skills use certified, or listed as outside with the reason |
 | E3 | Provider pass by family, largest first | `js/modules/sheet/providers/*`, the cards, `tests/scripts/ws-catalogue.cjs` (template column), `tests/scripts/ws-content-audit.cjs` (each family's name rules) | `real` providers 715 / 715 (pools through their members; legacy-cell skills listed); `ws-providers-unit` green; `ws-coverage-matrix` green (§1.6.5 item 3) |
 | E4 (later lesson wave, if needed) | Lesson-packet pages certified; shapes file; compiler; lesson precritic; recompile 1–5 + hold-out lesson 6 | `js/modules/lessons/compile.js`, `design/lessons/SHAPES.md`, `js/modules/lessons/shapes/*.js` (new), `tests/scripts/ws-detailed-lesson.cjs` | §1.6.5 Lessons items 1–6 done |
@@ -983,7 +987,7 @@ reproduced.
 | M1 | `interleave()` + self-test (with the weights-win case); the `arrangement` field and code flag; Mixed practice for skills of the same size class inside today's packer; the Q-M1 edits to PAGE_TYPES 5.2, DN-34 and `anchors.js` | `sheet/interleave.js` (new), `print-sheet.js`, `skill-codes.js`, `sheet/anchors.js`, `design/PAGE_TYPES.md`, `WORKSHEET_DESIGN_STANDARD.md` | self-test green; `ws-code-snapshot` green; a 4-skill same-size page renders mixed with no run > 2 |
 | M2 | Size classes (incl. measured legacy cells) + the 2 × 2 block packer (small boxes of different skills share blocks; runs counted in turns) + numbering + rebalanced last page + page units, the capacity sum, two-of-each and rotation across pages | `sheet/roles/mixed-practice.js`, `sheet/layout.js`, `sheet/paginate.js` | print-lint mixed rules green on the critic set at S / M / L |
 | M3 | `strings.cue` (fallback rule first, then real cues family by family) + the in-cell cue + lint | `sheet/contract.js` (also: `INSTRUCTION_LIBRARY` moved to `sheet/instructions.js` (new), the preset lookup registered by `js/modules/kit-setup.js` (new), imported by `print-sheet.js`, `screen-cell.js` and the node test harness — §1.6.2), `sheet/providers/*`, `sheet/cell.js` | every skill has a cue or is listed on the fallback; lint green |
-| M4 | Frame subtitle, readable footer, key legend by skill, the measured examples bands with their greyed fallback, the arrangement and examples choices in the worksheet sheet, the summary line (replacing PT-MIX-8) | `sheet/frame.js`, `sheet/roles/answer-key.js`, `print-sheet.js` (its measuring and key path moved into a module of its own; measuring in a frame with only `SHEET_STYLESHEETS` and `SHEET_ENGINE_CSS`, with its self-test; the `preDraw(req, counts)` export — all for E1), `sheet/anchors.js` (compact bands on Mixed practice pages); the worksheet-sheet choices themselves are added by the T3 lane in `teacher-print.js` | screens and keys match §3.3 |
+| M4 | Frame subtitle, readable footer, key legend by skill, the measured examples bands with their greyed fallback, the arrangement and examples choices in the worksheet sheet, the summary line (replacing PT-MIX-8) | `sheet/frame.js`, `sheet/roles/answer-key.js`, `print-sheet.js` (its measuring and key path moved into a module of its own; measuring in a frame with only `SHEET_STYLESHEETS` and `SHEET_ENGINE_CSS`, with its self-test; `buildSheet`'s record and replay modes — all for E1), `sheet/anchors.js` (compact bands on Mixed practice pages); the worksheet-sheet choices themselves are added by the T3 lane in `teacher-print.js` | screens and keys match §3.3 |
 | M5 | Online worksheet and quiz parity; independent critic; certify the mixed packer and Mixed practice (E2) | `worksheet.js`, `quiz-take.js` | critic ≥ 8 on every page, size and host; the packer's certificate written and `ws-packer-proof` green; Mixed practice certified for the live skills' templates |
 
 ---
