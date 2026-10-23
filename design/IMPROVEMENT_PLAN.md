@@ -1,12 +1,16 @@
-# Improvement plan — faster building, a simple teacher site, truly mixed pages (v5.1, 2026-10-23)
+# Improvement plan — faster building, a simple teacher site, truly mixed pages (v6, 2026-10-23)
 
 ## In short (for the owner)
 
 1. **Faster building, same quality.** Most of the time goes on critic rounds (median about 5 per lane), and most of
    what critics find could be found by a machine first. So we build those checks, make every builder pass them before a
    critic sees the work, build the shared drawings (templates) first so new skills become quick to add, and run the
-   deploy checks in parallel. The bar does not move: every page still needs 8 or better from an independent critic, and
-   every check still runs before the site is updated.
+   deploy checks in parallel. The biggest step (§1.6) covers **every product — skills, worksheet types, the three
+   papers and lessons**: each shared engine (a drawing, a page type, a paper, a lesson shape) is approved once across all
+   its sizes and options, and then new skills and lessons on it are made as data, drafted automatically from the
+   skills, checked by machine on every page and read by an independent reviewer as a batch. Up to six work lanes run at
+   once. The bar does not move: every page still scores 8 or better, every check still runs before the site is updated,
+   and a spot-audit each wave withdraws an approval if any page falls below 8.
 2. **A simple teacher site.** Four places instead of eleven: **Skills**, **Lessons**, **Classes** and your profile. Tick
    skills and they drop into a tray at the bottom with three buttons — **Print · Quiz · Share**. Printing, sending a code
    or making a quiz takes 3–4 steps. Options appear only when you ask for them.
@@ -97,7 +101,7 @@ critic, and the full gates before every deploy.**
 | S4 | **Golden renders + contact sheets** (with the §1.3 safeguards) | `ws-grade-render.cjs` (manifest + diff + contact sheet), `design/audit/golden/<template>/manifest.json` | a critic brief lists changed pages + the 20 % sample; unchanged pages carry their recorded score and its source |
 | S5 | **Parallel, sharded deploy gates** — node gates in parallel; browser gates two at a time; screen-slots and chromebook-fit split by category across both slots; one documented deploy-gate list (closes STATUS §7 "one deploy-gate list") | `tests/scripts/ws-deploy-gates.sh` (new), CLAUDE.md "Checks to run" | full run ≤ 30 min, same gates, nothing skipped |
 | S6 | **Merge hygiene** — per-lane status files + a generated STATUS.md index; lanes never run `ws-stamp-assets` | `design/status/<lane>.md`, `tests/scripts/ws-status-index.mjs` | a week of lanes with no STATUS or stamp conflict |
-| S7 | **Process rules** (after the owner approves Q-S1–Q-S3): template-first order; one model per template per role; batch critic with the §1.3 safeguards; near-miss re-check (minimum-based trigger); flakes logged; signed spec card; first build of a new template, and any failed copy, at Opus medium; builder report = precritic output | `CLAUDE.md`, `design/audit/LESSONS_LEARNED.md`, `design/audit/RUBRIC.md` | recorded; the next lane briefs use them |
+| S7 | **Process rules** (after the owner approves Q-S1–Q-S6): template-first order; one model per template per role; batch critic with the §1.3 safeguards; near-miss re-check (minimum-based trigger); flakes logged; signed spec card; first build of a new template, and any failed copy, at Opus medium; builder report = precritic output | `CLAUDE.md`, `design/audit/LESSONS_LEARNED.md`, `design/audit/RUBRIC.md` | recorded; the next lane briefs use them |
 | S8 | **Metrics** — first the defect tally of every past critic report (class × report); then rounds to PASS, hours, findings per class and the agent profile used (the profile name is recorded, since an agent cannot see its own effort setting) per lane; reviewed after every template; a rising class becomes the next check | `design/status/defect-tally.csv`, `design/status/metrics.md` | tally committed; filled from Wave 0 on |
 | S9 | **Clear the red gates** — fix `reading_ruler_hard`'s doubled answer area; pin the print-lint baseline (458/33) per skill | the skill's generator / cell | screen-slots green; baseline file committed |
 
@@ -151,6 +155,153 @@ Expected effect, measured by S8: median rounds to PASS 5 → 2; deploy gates 80 
    `ROADMAP.md` §3 (P9 onward); the BACKLOG items with no wave owner (STATUS §7: div_remainders counters, nl_sub,
    add_5_pictures, money_compare panels, mixed_placevalue, round_nl_hundred_thousands, support ladder on worksheet/quiz,
    expand double edge) join the family they belong to.
+
+### 1.6 Vastly faster for every product: certify the engine once, make every instance as data (owner 2026-10-23)
+
+Owner: "make sure the plan also covers increasing the speed of generating lessons, worksheet types, etc. … do this for
+all paper, lesson, worksheet types … figure out how to vastly improve the speed while keeping quality the same."
+
+§1.1–§1.5 cut the number of critic rounds. This section changes **what** is graded, which is the bigger lever: today
+every skill, every page type and every lesson is graded page by page, so the work grows with the number of products.
+After this section it grows with the number of **engines**, and products made on a certified engine are data.
+
+#### 1.6.1 What each product costs today
+
+| Product | How it is made today | What it costs |
+|---|---|---|
+| **Skills** (715 live) | built and graded one by one (§1.1) | median ≈ 5 critic rounds; when the drawing already existed, 114 preset skills took two builder runs |
+| **Worksheet types** — the 23 page roles in `js/modules/sheet/roles/` (Independent, More Practice, Guided, Scripted Model, Opener, Pre-skill check, Review, Test, Mixed, Word problems, Today's Number, fact rows and probe, answer key, Error analysis, True or False?, Reason It, Stretch …) | PT-CMP-1: any skill on any role, every role with a key (PT-CMP-5); a role is graded only with the skills the current lane happened to touch | every new skill silently owes 23 roles × S / M / L × key. Only **261 of 715** live skills have a real provider (`workedSteps`, `wrongAnswer`, `strings`, `misconceptions`; count from `getProvider().real`), so for the other 454 the Model, Guided, Opener, anchor-chart, Error-analysis, True-or-False and Reason-It roles print default-adapter output |
+| **Papers** — Practice, Quiz, Lesson (LESSON_LIBRARY_PLAN §8e) | Practice and Lesson on the sheet kit; Quiz in the separate legacy quiz builder (§2.1) | two engines to grade for one kind of paper |
+| **Detailed lessons** (owner list: 67) | each lesson a hand-written description of 307–350 lines (`js/modules/lessons/detailed/<id>.js`) plus `RESEARCH.md`; the critic re-grades the whole 21–31-page pack every round | 5 passed (lessons 1, 2, 3a, 4, 5) between 21:20 on 10-16 and 03:25 on 10-17 (commit log), in 3–4 rounds each (`data/curriculum/detailed-lessons.json`); 3 of the 5 builders escalated (STATUS §9); lesson 6 failed round 1, lesson 7 is ungraded; 62 still to make |
+| **Intervention library** — a lesson for every WRM small step (872, MASTER_PLAN Wave 8) | the standard lesson maker (`buildSheet({role: 'lesson'})`) from `prereqs.js` lesson data | not started at scale; page-by-page grading would mean thousands of pages |
+
+**What the 17 lesson critic reports found** (`design/lesson-planner/lessons/*/critic-r*.md`; lesson 1 = `g2-nbt3-read-write-1000`, 2 = `g1-oa1-bar-model-wp-20`, 3a = `g3-oa5-mult-properties`, 4 = `g3-oa9-mult-table-patterns`, 5 = `g3-oa9-input-output-rule`; D numbers are round 1 unless marked), by class:
+
+| Defect class | Examples | Machine check |
+|---|---|---|
+| Repeats: an exit or Practice item that is a modelled or Practice item again, turned round or near-twin | lesson 2 r3 D1 / D3; 3a D6; 4 D3, D5; 5 D1; 6 D2 | E24 (LR-5 pool) exists; extend to turned facts and near-twins |
+| A task practised that no page models; two new things at once | lesson 2 D3 (add-to); 1 D1 (one of three forms); 3a D2; 5 D3 | **new**: every task kind dealt on a Practice or exit page appears on a modelled panel or script row before it (task kinds from the generator) |
+| Teacher text that does not match the pupil pages (wrong panel, page, letter, answer; raw placeholder) | lesson 2 D4–D6, r3 D2; 1 D3, D7; 3a D7; 5 D5, r2 D7, D8; 4 D8 | E29 / E38 exist; extend: every page, panel, step and item a teacher page names resolves to the real one |
+| Answer given away or coached (Say band, hint, exit help) | lesson 4 D1, D2; Guided = Independent (4 D6) | **new**: no Say, hint or Steps text holds the item's key value; Guided carries a hint Independent does not |
+| Layout: slot below minimum, page under-filled, broken grid, empty quadrant | lesson 2 D1; 1 D5; 3a r2 D1; 4 D4 | `ws-print-lint`, E9 |
+| Numbers off the band; edge cases missing; an owner ruling broken (1,000 "board only") | lesson 2 D2; 1 D2, r3 S1; 3a D1 | **new**: the lesson card declares ranges, edge cases and rulings; the check reads them against the dealt items |
+| Assessment validity: the exit cannot measure the skill; a distractor is not the misconception it names; word problem off-skill | lesson 2 D8; 3a D4, D5; 5 D4; 4 D7 | partly: each distractor must carry a misconception id from the provider; the rest stays with the critic |
+
+Six of the seven classes are measurable; the critic's time should go on the seventh.
+
+#### 1.6.2 The method: certified engines, data instances
+
+| Engine (certified once) | Its instances (made as data) |
+|---|---|
+| a **cell template** (`stack`, `shape-grid`, `bar-model` …) | every skill, option and preset drawn by it |
+| a **page role** (Independent, Guided, Scripted Model, Review, Test …) | that role for every skill whose template is certified |
+| a **paper** (Practice; Quiz = Practice + scoring, once T3 retires the separate builder; Lesson) | every worksheet request from the §2.5 choices |
+| a **lesson shape** — the five passed lessons are the first members of five shapes: read / write a number in its forms (lesson 1); a bar-model word problem (2); a property of an operation (3a); a pattern on a table (4); a rule table (5) | every lesson of that shape = shape + its skill(s) + WRM step + the owner's choices on its card |
+
+**Certifying an engine** means an independent critic grades it across its **envelope** — every size S / M / L, both
+looks, every option value, every role it serves, the number ranges, the three screen hosts — with:
+- **every point of the envelope checked by machine** (the kit is pure, so `ws-print-lint`, `coverage()` (PT-CMP-4) and
+  the precritic rules run in node, in seconds, over all of it);
+- **a critic sample that covers every pair of option values at least once** (all-pairs sampling keeps it to tens of
+  pages, not thousands), plus a random 20 % at full scale and every page whose drawing fingerprint has never been graded;
+- the result written to `design/audit/certified/<engine>.json`: the envelope, the drawing fingerprint, the rule-set
+  version (RUBRIC, standards, LESSONS_LEARNED), the pages graded and their scores.
+
+**Making an instance** on a certified engine:
+- the builder writes data (a skill entry, option values, a preset, a lesson card), not drawing code;
+- the precritic checks it by machine, including "inside the envelope" — a new option value, size, number range or role
+  is **outside** and sends that page to a full grade;
+- an independent critic reads **every instance** on a contact sheet (one page and its key each, plus the screen card)
+  for the two criteria that depend on content — C1 ease of use and C2 educational value (RUBRIC §2) — and grades a
+  random 20 % of the instance pages at full scale on all four criteria; C3 spacing and C4 standard fidelity come from
+  the certified engine, because the drawing and layout are the engine's (same fingerprint);
+- the owner has already signed its card (the pedagogy choices), so the critic is not the first to see a design question.
+
+#### 1.6.3 By product
+
+- **Skills** — §1.5 as written, with the envelope: a template is certified once, then its ≈ 111 build-list entries,
+  options and presets are data (the presets showed the pace).
+- **Worksheet types** —
+  1. **Certify each live role** on the role sample (`tests/fixtures/precritic/role-sample.json`, 20 families) × S / M / L
+     × both looks × its key: Independent, More Practice, Guided, Scripted Model, Opener, Pre-skill check, Review, Test,
+     Mixed (with §3), Word problems, Today's Number, fact rows, fact probe, answer key. A skill on a certified template
+     then gets every certified role without a per-role grade (machine `coverage()` for every skill × role × size, keys
+     included, plus the contact sheet).
+  2. **Provider pass, family by family:** the 454 skills on default adapters get real providers as data — `workedSteps`
+     from the template's step grammar, `wrongAnswer` and `misconceptions` from the signed card's Misconceptions section
+     (S3 card item 6), `strings` from the instruction library. `ws-providers-unit` checks each: the steps reach the key,
+     the wrong answer is a tagged misconception, no hint holds the answer. This makes the Model, Guided, Opener and
+     anchor-chart roles fully useful for every skill and is what the lesson compiler needs.
+  3. The thinking roles (Error analysis, True or False?, Reason It, Stretch) **stay paused until Wave 8 is done**
+     (owner 2026-10-09, MASTER_PLAN Wave 9). When they start, they follow step 1 and are cheap, because step 2 has
+     already given every skill its misconceptions and wrong answers.
+- **Papers** — the paper composer is certified once on an all-pairs sample of the §2.5 choices (pages 1 / 3,
+  weights equal / unequal, the three arrangements, the examples choices, S / M / L) with the certified roles inside it.
+  Quiz becomes Practice + a scoring layer (T3), so it is certified by certifying the scoring layer, not a second engine.
+- **Lessons** —
+  1. **Lesson shapes.** Classify the owner's 67 lessons (and, later, the intervention steps) into shapes; the first two
+     lessons of a new shape get a full critic on every page (this certifies the shape).
+  2. **The lesson compiler** (`compileLesson(card)`, `js/modules/lessons/compile.js`, new): from the signed lesson card
+     (WRM step, CCSS / EE, shape, skill(s) with option values per chunk, ranges, edge cases, rulings) it writes the
+     description: atoms and the pre-skill check from the skill's prerequisites; chunks from the option ladder (one new
+     thing per step, PEDAGOGY P-1); the anchor chart, scripts and Steps from `workedSteps` and `strings`; the Guided fade
+     from the Guided role; Practice and exit from the generators with the LR-5 pool; the mistakes table and Check
+     Question distractors from `misconceptions` / `wrongAnswer`; vocabulary from the skill. The builder writes only what
+     the compiler cannot — the story and hook, shape-specific teaching notes — and edits. Target, measured by S8: the
+     hand-written part of a description falls from ≈ 330 lines to under 100.
+  3. **Lesson precritic:** `ws-detailed-lesson --check` plus the three new checks in §1.6.1 (modelled-before-practised,
+     nothing given away, rulings and ranges), each with a backtest on a failed lesson commit, and the extended E24 / E29.
+  4. **Grading a lesson of a certified shape:** teacher pages (unique text) graded in full; pupil pages made by
+     certified roles on the contact sheet + 20 % at full scale; any page with a new fingerprint in full.
+  5. **Proof first:** recompile the five passed lessons from cards; the compiled packs must pass `--check` and keep
+     ≥ 8 on a full critic before the compiler is used for lesson 6 onward.
+  6. **Intervention library:** the standard lesson maker is the "standard lesson" shape; once the provider pass covers a
+     family, that family's WRM steps are compiled and graded by family on contact sheets with the 20 % sample.
+- **Lessons of the White Rose page and the site** keep their existing gates (`ws-teacher-wrm`, `ws-site-lessons`); a
+  compiled lesson is placed on its WRM step by its card, as today.
+
+#### 1.6.4 More lanes without collisions
+
+- **No lane edits a shared file.** Each lane writes a manifest (`design/lanes/<lane>/manifest.json`: new skills with
+  their SKILLS entry, `SKILL_STANDARDS`, `SKILL_WRM`, search terms, presets, lesson cards); an integrator
+  (`tests/scripts/ws-integrate.mjs`, new) applies manifests in merge order — appending skill ids (share codes stay
+  append-only), regenerating the catalogue, coverage reports, the lesson registry (`lessons/detailed/index.js`,
+  `detailed-lessons.json`) and STATUS (S6), and stamping index.html once. This removes the conflict class behind 152
+  merge commits and 10 conflict fixes (§1.1).
+- **One lane per cloud session.** A container has 4 cores and two browser slots; ≈ 14 agents in one container starved
+  them (STATUS:91). Each lane in its own session has its own slots; with most checks in node, a lane needs the browser
+  only for its final renders.
+- **Up to 6 lanes at once** after Wave 0 (one per template family or lesson shape), instead of 3 (Q-S6). The limits are
+  then critic capacity and the owner's signing time, not machines.
+- **The owner signs cards in batches** — a template family's cards, or a lesson shape's next five lessons, in one
+  sitting, each question with a recommended answer — so no lane waits mid-build.
+
+#### 1.6.5 Why quality stays the same
+
+| Risk | Safeguard |
+|---|---|
+| A certified engine hides a weak instance | every instance is still read by an independent critic for C1 and C2 on the contact sheet; 20 % get a full four-criterion grade; content checks (content-audit, text ≠ generator, LR-5, nothing given away, misconceptions tagged) run on every item |
+| An instance outside what was certified | the precritic's envelope check sends it to a full grade |
+| The engine changes after certification | a new drawing fingerprint voids the inherited scores of every page it touches (golden diff, S4); those pages are re-graded |
+| Inherited scores drift from reality | **an inheritance audit each wave**: a fresh critic grades a random 5 % of inherited pages at full scale; any page below 8 withdraws the engine's certificate, and its family is re-graded in full |
+| Compiled lessons are bland or wrong | the five passed lessons must recompile and pass first; teacher pages are always graded in full; the owner signs every lesson card |
+| The rule "8 or better, everywhere" | unchanged in substance: every page of every product is ≥ 8, either graded directly or inherited from a certified engine with its source listed in the final PASS; the change in how a page counts as graded is the owner's call (Q-S4) and is written into CLAUDE.md and RUBRIC only after he agrees |
+
+#### 1.6.6 Phases (added to Wave 0, §4.1)
+
+| Step | Work | Files | Done when |
+|---|---|---|---|
+| E1 | Envelopes, all-pairs sampling, certificates | `tests/scripts/ws-envelope.mjs` (new), `ws-grade-render.cjs` (`--envelope <engine>`, new flag), `design/audit/certified/` | the `stack` template and the Independent role certified from their existing passed renders; the certificate lists every page and score source |
+| E2 | Certify the live roles on the role sample | `sheet/roles/*` (fixes only), `role-sample.json` | each listed role certified; `coverage()` green for every skill × role × size |
+| E3 | Provider pass by family (454 skills) | `js/modules/sheet/providers/*`, the cards | `real` providers 715 / 715; `ws-providers-unit` green |
+| E4 | Lesson shapes, compiler, lesson precritic, generated lesson registry; recompile lessons 1–5 | `js/modules/lessons/compile.js` (new), `js/modules/lessons/shapes/*.js` (new), `tests/scripts/ws-detailed-lesson.cjs` | lessons 1–5 recompiled, `--check` green, full critic ≥ 8; then lesson 6 onward from cards |
+| E5 | Lane manifests + integrator; one lane per session | `design/lanes/`, `tests/scripts/ws-integrate.mjs` (new) | a week of six lanes with no shared-file conflict |
+| E6 | Inheritance audit each wave | `design/audit/certified/audit-<wave>.md` | the first audit run and recorded |
+
+**Expected effect** (targets; S8 measures them): skills on a certified template made like the presets — a family per
+builder run; a new skill gets all certified roles with no per-role grading; lessons of a certified shape in one critic
+round instead of 3–4, with under a third of today's hand-written text; six lanes instead of three. Together this aims at
+several times today's throughput (≥ 5× on the backlog of skills and lessons); if S8 shows less, the next audit says why.
 
 ---
 
@@ -533,13 +684,14 @@ reproduced.
 
 | Order | Work | Lane owns | Runs beside |
 |---|---|---|---|
-| 1 | **Wave 0** (§1.4 S1–S9) + review of the open PRs #11 (needs a critic on its round-3 fixes f0d4a489), #13 (re-pin codes VA–VD; becomes the shape-grid / solid-kit starting point), #14 (quiz "Click ALL"; it lands in the same deploy as #13, merged right after it, because #13's new Click-ALL skills need #14's answer tiles — HANDOVER-2026-10-17) | `tests/scripts/*`, `design/status/`, `design/cards/` | mixed-page engine M1–M3 (different files) |
-| 2 | **Mixed pages M1–M5** | `print-sheet.js`, `sheet/*` | Wave 0 |
+| 1 | **Wave 0** (§1.4 S1–S9, then §1.6 E1, E2 and E5) + review of the open PRs #11 (needs a critic on its round-3 fixes f0d4a489), #13 (re-pin codes VA–VD; becomes the shape-grid / solid-kit starting point), #14 (quiz "Click ALL"; it lands in the same deploy as #13, merged right after it, because #13's new Click-ALL skills need #14's answer tiles — HANDOVER-2026-10-17) | `tests/scripts/*`, `design/status/`, `design/cards/` | mixed-page engine M1–M3 (different files) |
+| 2 | **Mixed pages M1–M5**, then the provider pass (§1.6 E3) family by family | `print-sheet.js`, `sheet/*` | Wave 0 |
 | 3 | **Teacher site 2.0 T1–T6** (T1 needs the owner) | `teacher-*.js`, `css/teacher*.css`, `index.html` teacher markup | templates (step 4) |
 | 4 | **Templates by leverage** (§1.5); the paused lanes restart with precritic: Lane D print backlog, the fraction key (keys show 2/8 = 1/4, owner 2026-10-17; both touch `print-sheet.js`, so one after the other and after M2), Lane B answer + regroup boxes, place-value write-value, the decimals key fault (AK-4 on `add_decimal`, same fix pattern as `mult_properties`), the skip-count owner answers still to build (wide rows wrap and keep size; phone card opens at the first box), the number line 5.2 later steps (1) a time line in hours and minutes for `measurement:elapsed_*`, (2) D9 band tightness, (4)/(8) a unit-fraction line for `fraction_operations` when the teacher fixes one denominator, (9) the owner question on mixed pools losing a row, the `order_fdp` page that prints "Order from greatest to least" with no numbers (STATUS §7 item 7, conversions family) | `sheet/cells/<template>.js`, the generators | Teacher site 2.0 |
-| 5 | **Lessons 6–10 and the rest of the owner's list** (Wave 8) — resume `claude/sweet-newton-c8wrv1-wip-detailed-lessons-2` (patches in `design/lesson-planner/wip-2026-10-17/`) | `js/modules/lessons/detailed/`, `data/curriculum/detailed-lessons.json` | any lane |
+| 5 | **Lessons 6–10 and the rest of the owner's list** (Wave 8) — first the lesson compiler and shapes (§1.6 E4: lessons 1–5 recompiled and passed), then lessons 6 onward from signed cards, one lane per shape; resume `claude/sweet-newton-c8wrv1-wip-detailed-lessons-2` (patches in `design/lesson-planner/wip-2026-10-17/`) | `js/modules/lessons/detailed/`, `data/curriculum/detailed-lessons.json` | any lane |
 
-At most three lanes at once, each owning its files; deploys use the S5 runner.
+At most three lanes at once until §1.6 E5 (manifests + integrator) lands; then up to six, one cloud session each
+(Q-S6). Each lane owns its files; deploys use the S5 runner. The inheritance audit (E6) runs once per wave.
 
 ### 4.2 Coverage — every planning document and open item
 
@@ -557,8 +709,11 @@ At most three lanes at once, each owning its files; deploys use the S5 runner.
 | Wave 5 (redo existing skills), 5.2 number line (built), 5.3 same skill with different supports | §1.5; 5.3 needs a share-code decision (Q-H3) |
 | Wave 6 (new skills incl. MAP 6.2–6.4) | §1.5 template order |
 | Wave 7 (Seesaw / Classroom trial, game modes) | unchanged, after Waves 5–6 |
-| Wave 8 (lessons, owner list of 67) | §4.1 step 5 |
-| Wave 9 (stretch / thinking pages) | unchanged, after Wave 8 |
+| Wave 8 (lessons, owner list of 67) | §4.1 step 5; built with the lesson compiler and lesson shapes (§1.6.3, E4) |
+| Wave 8 intervention library (a lesson for every WRM small step) | §1.6.3 Lessons item 6 (compiled by family after the provider pass) |
+| Wave 9 (stretch / thinking pages) | unchanged, after Wave 8; then certified as roles (§1.6.3 Worksheet types item 3), cheap because E3 gives every skill its misconceptions |
+| PAGE_TYPES §10 PT-CMP-1…5 (any skill on any role, every role with a key, `coverage()`) | §1.6.3 Worksheet types (roles certified; `coverage()` over every skill × role × size) and E3 (454 skills off default adapters) |
+| LESSON_LIBRARY_PLAN §8e three papers | §1.6.3 Papers (one composer certified; Quiz = Practice + scoring) |
 | ROADMAP P7 one renderer, P8/P9 families, O options, T teacher track | P7 largely live; P8/P9 → §1.5; O live (options + 114 presets); T → §2. ROADMAP §4 definition of done per family is unchanged |
 | TEACHER_SCREENS: home six tiles | replaced by §2.3 (Q-T1) |
 | TEACHER_SCREENS: make quiz by CCSS / EE / WRM / lesson, tags, scores | §2.4 Quiz |
@@ -594,6 +749,9 @@ At most three lanes at once, each owning its files; deploys use the S5 runner.
 | Q-S1 | Use the stronger, slower builder for the first skill of each new kind of drawing, and again for any copy that fails a review; keep the quicker builder for the other copies? (This changes the builder rule in CLAUDE.md.) | Yes |
 | Q-S2 | When a review fails only by a whisker (every failing mark is a 7, nothing lower), re-check just the failed pages, every changed page and a fresh 1 in 5 of the rest, instead of re-grading everything? Every page must still reach 8. | Yes |
 | Q-S3 | Let each work lane keep its own progress notes (joined into one status page automatically), so lanes stop clashing when their work is merged? | Yes |
+| Q-S4 | Once a kind of drawing, page type, paper or lesson pattern has passed review across all its sizes and options, may new skills and lessons that use it be checked this way: the machine checks on every page, a reviewer reading every new skill or lesson on a sheet of small pages, and 1 in 5 pages graded at full size (any new kind of page always in full)? A spot-audit each wave grades more pages at full size and withdraws the approval if any falls below 8. (This changes how CLAUDE.md says a page counts as graded.) | Yes |
+| Q-S5 | Let lessons be drafted automatically from their skills — steps, examples, the mistakes table, practice and the exit slip — with the builder writing only the story, the hook and the teaching notes? You still sign each lesson's card first, and the five lessons already passed are rebuilt this way and re-checked before any new one. | Yes |
+| Q-S6 | Run up to six work lanes at once, each in its own cloud session, once the merge tool is in place? | Yes |
 | Q-M1 | When a worksheet has 2 or more skills, mix the problems together by default? Practice printed from a lesson stays in sections, because the lesson's skills are new. | Yes |
 | Q-M2 | If the skills you chose cannot all fit on one page at least twice each, should Print add pages (it tells you) rather than print some skills only once? | Yes, add pages |
 | Q-T1 | Replace today's home screen with: the site opens on Skills, ticked skills go to a tray with Print · Quiz · Share? | Yes |
@@ -624,3 +782,10 @@ At most three lanes at once, each owning its files; deploys use the S5 runner.
 - **Deuteranopia / protanopia** — the two common kinds of red–green colour blindness, simulated with the Machado 2009 matrices.
 - **Ramp** — one colour in four strengths (tint, soft, bold, deep).
 - **Weights win** — when a skill is most of a mixed page, its run cap rises instead of the teacher's weights being cut.
+- **Engine / instance** — an engine is shared code that draws many products (a cell template, a page role, a paper, a
+  lesson shape); an instance is one product made on it (a skill, a role for a skill, a worksheet, a lesson).
+- **Envelope / certificate** — everything an engine is approved for (sizes, looks, option values, roles, ranges,
+  screens) and the record of that approval (`design/audit/certified/<engine>.json`).
+- **All-pairs sample** — a set of test pages in which every pair of option values appears at least once.
+- **Lesson shape / lesson compiler** — a pattern shared by several lessons, and the code that drafts a lesson's
+  description from its card and its skills.

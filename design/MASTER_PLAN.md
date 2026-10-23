@@ -1,6 +1,6 @@
 # MathQuest master plan — waves (owner, 2026-10-02)
 
-> **2026-10-23 — read `design/IMPROVEMENT_PLAN.md` first (v5.1; independent critic round 5 PASS).** It adds **Wave 0 (faster building at the
+> **2026-10-23 — read `design/IMPROVEMENT_PLAN.md` first (v6: adds §1.6, faster building for every product — skills, worksheet types, papers and lessons).** It adds **Wave 0 (faster building at the
 > same quality: precritic checks proved by backtests, signed spec cards, golden renders + batch critics under quality
 > safeguards, sharded deploy gates, per-lane status files)**, rebuilds Wave 3 as **Teacher site 2.0** (four places —
 > Skills, Lessons, Classes, profile; a tray with Print · Quiz · Share; ≤ 4 steps per job; bold maths-area colours used on
