@@ -227,3 +227,12 @@ own comparison did). Fix r6 at Opus medium.
 | Round | Result | (1) Automatic checks the findings point to | (2) Speed-ups |
 |---|---|---|---|
 | r6 | FAIL 6 / 8 / 7 | **A13** every rule-0b tool must judge unpinned rows too (a "status filter" test: a fixture with only PENDING(no-baseline) rows must still be compared); **A14** every new screen probe is run on the approved siblings before it gates (a "siblings clean" self-check: an approved skill failing a new probe means the probe is wrong, not the skill); **A15** partial-scope = INCOMPLETE for any scoped check. | Run a new check on approved siblings in the builder's own loop (would have caught D2 before the critic); slot-clip costs ≈ 19 min of a precritic — batch its print-lint jobs with the matrix's own render (one render, two lints). |
+
+Queue items A8, A10–A12 merged (d9cd5f4a): `ws-deploy-gates.sh --budget` (and the first row of every session run) predicts
+each session's wall clock from the newest measured gate times (list-order scheduling on the 2 browser slots + 2 node
+workers; the matrix as 500 docs × 5.26 slot-s) and FAILs a session over 30 min (`MQ_SESSION_BUDGET_MIN`); prediction vs
+measured: session 2 old list 2058 s vs 2057.8 s. Old list (viewport in session 2) FAIL 34.3 min; options-pin --check in
+session 1 FAIL 139 min; today's list 27.3 / 28.1 / 27.8 min. The 2026-10-23 timed runs' lines (sessions 1 and 2, transcribed
+from the child sessions' reports — they were never committed there) are now in `design/audit/baselines/deploy-gate-timings.jsonl`.
+A10 future-dated run files clear nothing; A11 run files without `baseline` after 2026-10-23T19:46Z clear nothing; A12
+options-pin `--resume` keyed by commit. Self-tests: deploy 91, matrix 171 (A10/A11 mutations each fail it), options-pin 67.
