@@ -55,8 +55,130 @@ for (const s of D.skills) {
 // the same skill must draw the same kind with every seed, and a different item with a different seed
 for (const s of D.skills.slice(0, 120)) if (T.draw(s, 1) === T.draw(s, 2) && T.draw(s, 2) === T.draw(s, 3) && !/words|shape|solid|compose|lines|symmetry|net|pie|box-plot|stat|spinner|attributes|classify|area-|positions|balance|jug|thermo|ruler|frac-|story-frac|story-convert|convert-|fdp|am-pm|digital|money-words|clock-parts|clock-fives|clock-order|length|nonstandard|oop-compare|div-sort|double-nl|inequality|transform|coord-polygon|volume|partition|pv-words|stat-question/.test(T.kindOf(s))) fails.push(`${s.c}:${s.v} draws the same item for every seed (New numbers would not change it)`);
 
+// fix round 3 (critic r3 C1, stop rule §1.7: the decoy picture survived r2 #6 and r3 #2). A picture ADDED to a problem
+// (draw() differs from the bare drawing, base()) must be drawn FROM that problem: every added picture is a
+// <g data-pic="type" data-vals="…"> group; every value it declares and every number written inside it is a number of the
+// problem's own text; the counters, crossed-out counters, parts and shaded parts it draws are the counts it declares; and
+// the type's own sum holds (a + b counters for an addition story, a counters with b crossed out for a take-away, n of d
+// parts shaded for n/d …). A picture without data, or with a number the problem does not have, is a decoy and fails.
+const SEEDS = [1, 2, 3, 'a', 'b'];
+const numsOf = (str) => (str.replace(/(\d),(?=\d{3})/g, '$1').match(/\d+(?:\.\d+)?/g) || []).map(String);
+const countIn = (g, re) => (g.match(re) || []).length;
+let picN = 0; const picTypes = {};
+function checkPic(s, seed, out) {
+  const groups = []; const re = /<g data-pic="([^"]+)"([^>]*)>/g; let m;
+  while ((m = re.exec(out))) {
+    // the group's own markup: from its open tag to its matching </g>
+    let depth = 0, i = m.index, end = -1; const tag = /<g\b|<\/g>/g; tag.lastIndex = i;
+    for (let t; (t = tag.exec(out));) { if (t[0] === '</g>') { depth--; if (!depth) { end = tag.lastIndex; break; } } else depth++; }
+    groups.push({ type: m[1], attrs: m[2], body: out.slice(m.index, end), start: m.index, end });
+  }
+  const where = `${s.c}:${s.v} (“${s.l}”) seed ${seed}`;
+  if (!groups.length) { fails.push(`${where}: an added picture without data-pic (a decoy: not drawn from the problem)`); return; }
+  let text = out; for (const g of groups.slice().reverse()) text = text.slice(0, g.start) + text.slice(g.end);
+  const problem = numsOf(text.replace(/<[^>]+>/g, ' '));
+  for (const g of groups) {
+    picN++; picTypes[g.type] = (picTypes[g.type] || 0) + 1;
+    const at = (k) => { const x = g.attrs.match(new RegExp(` data-${k}="([^"]*)"`)); return x ? x[1] : null; };
+    const vals = (at('vals') || '').split(',').filter(Boolean);
+    const bad = (why) => fails.push(`${where}: picture ${g.type} ${why} (problem numbers: ${problem.join(' ') || 'none'})`);
+    if (!vals.length) bad('declares no values');
+    for (const v of vals) if (!problem.includes(v)) bad(`shows ${v}, which is not in the problem`);
+    for (const v of numsOf(g.body.replace(/<[^>]+>/g, ' '))) if (!problem.includes(v)) bad(`writes ${v}, which is not in the problem`);
+    const V = vals.map(Number);
+    const counters = countIn(g.body, /<circle\b[^>]*class="ctr"/g), crossed = countIn(g.body, /class="x"/g);
+    const cells = countIn(g.body, /class="pp"/g), shaded = countIn(g.body, /class="pp"[^>]*fill="#949494"|fill="#949494"[^>]*class="pp"/g);
+    const want = { count: at('count'), x: at('x'), cells: at('cells'), shaded: at('shaded') };
+    if (want.count !== null && Number(want.count) !== counters) bad(`declares ${want.count} counters, draws ${counters}`);
+    if (want.x !== null && Number(want.x) !== crossed) bad(`declares ${want.x} crossed out, draws ${crossed}`);
+    if (want.cells !== null && Number(want.cells) !== cells) bad(`declares ${want.cells} parts, draws ${cells}`);
+    if (want.shaded !== null && Number(want.shaded) !== shaded) bad(`declares ${want.shaded} shaded, draws ${shaded}`);
+    const rule = {
+      'counters-add': () => counters === V[0] + V[1],                 // a and b, in two groups
+      'counters-take': () => counters === V[0] && crossed === V[1],     // a, with b crossed out
+      'counters-compare': () => counters === V[0] + V[1],             // two rows to compare
+      'groups': () => counters === V[0] * V[1],                       // a groups of b
+      'array': () => cells === V[0] * V[1],                           // rows × columns
+      'rows-of': () => counters === V[0],                             // N counters in rows of b
+      'frac': () => cells === V[1] && shaded === V[0],                // n of d
+      'frac-improper': () => cells === Math.ceil(V[0] / V[1]) * V[1] && shaded === V[0],
+      'frac-mixed': () => cells === (V[0] + 1) * V[2] && shaded === V[0] * V[2] + V[1],
+      'frac-copies': () => cells === V[0] * V[2] && shaded === V[0] * V[1],   // k copies of n/d
+      'wholes': () => cells === V[0] * V[1] && shaded === 0,           // a wholes cut into b parts
+      'frac-area': () => cells === V[1] * V[3] && shaded === V[0] * V[2],
+      'frac-of-amount': () => cells === V[1] && shaded === V[0],      // n/d of a whole labelled with the amount
+      'pairs': () => countIn(g.body, /class="rod"/g) * 10 + counters === V[0],
+      'units': () => cells === V[0],                                  // a length of a units
+      'boxes': () => cells === V[1],                                  // b boxes of a, then c away
+      'bar': () => cells >= 2,                                        // a bar model, labelled from the problem
+      'track': () => cells >= vals.length,
+      'numline': () => { const at0 = Number(at('at')); return problem.includes(at('at')) && Math.floor(at0 * 10 + 1e-9) / 10 === Number(at('from')) && Number(at('to')) === Math.round((Number(at('from')) + 0.1) * 10) / 10; },
+      'shape': () => true,
+    }[g.type];
+    if (!rule) bad('is not a known picture type');
+    else if (!rule()) bad(`does not draw its own numbers (${g.attrs.trim()}; ${counters} counters, ${crossed} crossed, ${cells} parts, ${shaded} shaded)`);
+  }
+}
+for (const s of D.skills) for (const seed of SEEDS) {
+  const out = T.draw(s, seed); const bare = T.base ? T.base(s, seed) : out;
+  if (out !== bare || /data-pic=/.test(out)) checkPic(s, seed, out);
+}
+// critic r3 C2: the MAP "Circle the Even or Odd Numbers" (select_even_odd) drew a number bond and base-ten blocks
+for (const s of D.skills) if (/even_odd|odd_even/.test(s.v) && !/odd-even/.test(T.kindOf(s))) fail(s, T.kindOf(s), 'an odd / even skill must draw odd and even numbers');
+
 for (const [c, kinds] of Object.entries(byCat)) console.log(`${c.padEnd(20)} ${Object.entries(kinds).map(([k, n]) => `${k}${n > 1 ? ' ×' + n : ''}`).join(', ')}`);
 const kinds = new Set(D.skills.map(s => T.kindOf(s)));
 console.log(`\n${D.skills.length} live skills · ${kinds.size} different drawings · ${Object.keys(svgs).length} Maths words cards, all different`);
-if (fails.length) { console.log('\nthumbs-check: FAIL'); fails.slice(0, 60).forEach(f => console.log('  ' + f)); if (fails.length > 60) console.log(`  … ${fails.length - 60} more`); process.exit(1); }
-console.log('thumbs-check: OK');
+console.log(`${picN} added pictures checked against their problems (${SEEDS.length} seeds): ${Object.entries(picTypes).map(([k, n]) => `${k} ${n}`).join(', ') || 'none'}`);
+
+// fix round 3 (critic r3 C2): in a browser, every thumbnail of every live skill (5 seeds) keeps all of its drawing inside
+// its own picture (nothing past the edge of the paper), and no text sits partly under an answer box or a part
+// (text wholly inside its box is fine: T / F pills, labels in a bar). Measured on the rendered SVG, transforms included.
+(async () => {
+  let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chromium } = require('/opt/node-tools/node_modules/playwright')); }
+  const fs = require('fs');
+  const { startServer } = require('../../../tests/lib/ws-harness.cjs');
+  const { server, base } = await startServer();
+  const browser = await chromium.launch({ executablePath: fs.existsSync('/opt/pw-browsers/chromium') ? '/opt/pw-browsers/chromium' : undefined });
+  let geo = [];
+  try {
+    const page = await browser.newPage({ viewport: { width: 1200, height: 900 } });
+    await page.goto(`${base}/design/mockups/teacher-2/thumbs.html?q=zzzz`, { waitUntil: 'networkidle' });
+    await page.evaluate(() => document.fonts.ready);
+    geo = await page.evaluate((SEEDS) => {
+      const out = []; const host = document.createElement('div'); host.style.cssText = 'position:absolute;left:0;top:0'; document.body.appendChild(host);
+      for (const s of MQ_DATA.skills) for (const seed of SEEDS) {
+        host.innerHTML = MQThumbs.draw(s, seed); const svg = host.querySelector('svg'); if (!svg) continue;
+        const R = svg.getBoundingClientRect(); const probs = [];
+        const leaves = [...svg.querySelectorAll('text, rect, circle, ellipse, line, path, polygon, polyline')];
+        for (const el of leaves) {
+          const b = el.getBoundingClientRect(); if (!b.width && !b.height) continue;
+          const sw = el.tagName === 'text' ? 0 : 1.5;   // half a stroke may touch the edge
+          if (b.left < R.left - sw - 1 || b.top < R.top - sw - 1 || b.right > R.right + sw + 1 || b.bottom > R.bottom + sw + 1) { probs.push(`${el.tagName}${el.tagName === 'text' ? ' “' + el.textContent.slice(0, 12) + '”' : ''} past the edge by ${Math.round(Math.max(R.left - b.left, R.top - b.top, b.right - R.right, b.bottom - R.bottom))}px`); break; }
+        }
+        // text partly under a box: answer boxes and parts are rects (or rounded pills) smaller than 90 × 70
+        const texts = [...svg.querySelectorAll('text')].map(t => ({ t: t.textContent, b: t.getBoundingClientRect() }));
+        const boxes = [...svg.querySelectorAll('rect')].map(r => r.getBoundingClientRect()).filter(b => b.width < 90 && b.height < 70 && b.width > 6 && b.height > 6);
+        outer: for (const { t, b } of texts) {
+          // the glyph box of SVG text includes the line's ascent/descent; use the inner 70 % height (the ink)
+          const tb = { left: b.left + 1, right: b.right - 1, top: b.top + b.height * 0.18, bottom: b.bottom - b.height * 0.12 };
+          for (const r of boxes) {
+            const ox = Math.min(tb.right, r.right) - Math.max(tb.left, r.left), oy = Math.min(tb.bottom, r.bottom) - Math.max(tb.top, r.top);
+            const inside = tb.left >= r.left - 1 && tb.right <= r.right + 1 && tb.top >= r.top - 2 && tb.bottom <= r.bottom + 2;
+            if (ox > 2 && oy > 2 && !inside) { probs.push(`text “${t.slice(0, 14)}” partly under a box (${Math.round(ox)}×${Math.round(oy)}px)`); break outer; }
+          }
+        }
+        if (probs.length) { out.push(`${s.c}:${s.v} (“${s.l}”) seed ${seed}: ${probs.join('; ')}`); }
+      }
+      host.remove(); return out;
+    }, SEEDS);
+  } finally { await browser.close(); server.close(); }
+  const geoSkills = new Set(geo.map(x => x.split(' ')[0]));
+  console.log(`bounds and overlap: ${D.skills.length} skills × ${SEEDS.length} seeds drawn in a browser, ${geoSkills.size} skills with a problem`);
+  geo.forEach(x => fails.push(x));
+  // one line per skill and defect (the seeds it showed in are counted, not repeated)
+  const once = new Map(); for (const f of fails) { const k = f.replace(/ seed \S+:/, ':'); once.set(k, (once.get(k) || 0) + 1); }
+  const lines = [...once].map(([k, n]) => k + (n > 1 ? `  [${n} seeds]` : ''));
+  if (lines.length) { console.log(`\nthumbs-check: FAIL (${new Set(lines.map(l => l.split(' ')[0])).size} skills)`); lines.slice(0, 150).forEach(f => console.log('  ' + f)); if (lines.length > 150) console.log(`  … ${lines.length - 150} more`); process.exit(1); }
+  console.log('thumbs-check: OK');
+})();

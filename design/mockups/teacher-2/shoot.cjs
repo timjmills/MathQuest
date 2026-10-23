@@ -270,6 +270,75 @@ async function runFlow(browser, base, f, w) {
         await page.close();
       }
     }
+    // ---- fix round 3 (critic r3 A1 + owner 2026-10-23 "40–100 skills", stop rule §1.7: tray height was flagged before) ----
+    // The tray never grows with the skills in it: ≤ 8 skills = one row of chips (+N more past what fits), more = one summary
+    // bar. Height ≤ 96 px from 1100 px up, ≤ 120 px at 1024 and below, and never more than 15 % of the screen; measured
+    // with 1, 3, 6, 8, 10, 40 and 100 skills at all five widths.
+    if (!ONLY || ONLY.includes('tray-height')) for (const w of WIDTHS) {
+      const page = await browser.newPage({ viewport: SIZES[w] });
+      await page.goto(`${base}/design/mockups/teacher-2/app.html?theme=light#skills`, { waitUntil: 'networkidle' }); await page.evaluate(() => document.fonts.ready);
+      for (const n of [1, 3, 6, 8, 10, 40, 100]) {
+        const r = await page.evaluate((n) => {
+          const S = window.MQ.S; const pool = MQ_DATA.skills.filter(s => !s.p && s.a !== 'WORDS');
+          // a realistic tray: the first n skills of grades 2 and 3 (several areas), then any others
+          const pick = pool.filter(s => s.g === '3').concat(pool.filter(s => s.g === '2'), pool.filter(s => s.g !== '2' && s.g !== '3'));
+          S.tray = pick.slice(0, n).map(s => s.c + ':' + s.v); S.sheet = null; window.MQ.render();
+          const t = document.querySelector('.tray'); const tr = t.getBoundingClientRect();
+          const chips = [...t.querySelectorAll('.chip')].filter(c => c.getBoundingClientRect().width && getComputedStyle(c).visibility !== 'hidden');
+          const rows = new Set(chips.map(c => Math.round(c.getBoundingClientRect().top))).size;
+          const summary = !!t.querySelector('.tray-summary') && t.querySelector('.tray-summary').getBoundingClientRect().width > 0;
+          return { h: Math.round(tr.height), rows, chips: chips.length, summary };
+        }, n);
+        const lim = Math.min(w >= 1100 ? 96 : 120, SIZES[w].height * 0.15); const bad = [];
+        if (r.h > lim) bad.push(`tray ${r.h}px > ${Math.round(lim)}px`);
+        if (n <= 8 && w >= 820 && r.rows > 1) bad.push(`${r.rows} rows of chips (one row only)`);
+        if (n > 8 && !r.summary) bad.push('no summary bar past 8 skills');
+        if (bad.length) failed++;
+        console.log(`${bad.length ? 'FAIL' : 'ok  '} tray-height @${w} ${String(n).padStart(3)} skills: ${r.h}px, ${r.chips} chips in ${r.rows} row(s)${r.summary ? ', summary bar' : ''}${bad.length ? '  ' + bad.join('; ') : ''}`);
+      }
+      await page.close();
+    }
+    // critic r3 C3: the preview deals from the same plan as the summary line. Each preview cell names its skill
+    // (data-skill); the cells of each shown page equal plan().perPage for that page, the pages add up to the summary's
+    // counts, and no item repeats on a page — for Print and Quiz, Mixed / Single / Sections, at several weight settings.
+    if (!ONLY || ONLY.includes('preview')) {
+      const page = await browser.newPage({ viewport: SIZES[1366] });
+      const cases = [
+        ['print equal', 'app.html?tray=demo3x#print', {}],
+        ['print add=More', 'app.html?tray=demo3x#print', { 'addition:add_facts': 'more' }],
+        ['print time=Less, shade=More', 'app.html?tray=demo3x#print', { 'measurement:time_hour': 'less', 'fractions:shade_fraction': 'more' }],
+        ['print 2 pages', 'app.html?tray=demo3x&pages=2#print', { 'addition:add_facts': 'more' }],
+        ['print single, 3 skills', 'app.html?tray=demo3x&kind=single#print', {}],
+        ['print sections', 'app.html?tray=demo3x&kind=sections#print', { 'measurement:time_hour': 'more' }],
+        ['quiz equal', 'app.html?tray=demo3#quiz', {}],
+        ['quiz add=More', 'app.html?tray=demo3#quiz', { 'addition:add_word_problems': 'more' }],
+        ['print 10 skills', 'app.html?tray=demo10#print', {}],
+        ['print a whole grade', 'app.html?tray=grade3#print', {}],
+      ];
+      for (const [label, url, weights] of cases) {
+        await page.goto(`${base}/design/mockups/teacher-2/${url}`, { waitUntil: 'networkidle' });
+        const r = await page.evaluate((weights) => {
+          const M = window.MQ; Object.assign(M.S.weights, weights); M.render();
+          const p = M.plan(); const bad = [];
+          if (!p.perPage) return { bad: ['plan() has no perPage'] };
+          const tot = {}; p.perPage.forEach(pg => Object.entries(pg).forEach(([k, n]) => { tot[k] = (tot[k] || 0) + n; }));
+          M.S.tray.forEach((k, i) => { if ((tot[k] || 0) !== p.counts[i]) bad.push(`pages add up to ${tot[k] || 0} of ${k}, summary says ${p.counts[i]}`); });
+          const pages = [...document.querySelectorAll('.previews .page')];
+          if (!pages.length) bad.push('no preview');
+          pages.forEach((pg, i) => {
+            const cells = [...pg.querySelectorAll('.page-cell')]; const got = {};
+            for (const c of cells) { const k = c.getAttribute('data-skill'); if (!k) { bad.push('a preview cell without data-skill'); break; } got[k] = (got[k] || 0) + 1; }
+            const want = p.perPage[i] || {}; for (const k of new Set([...Object.keys(want), ...Object.keys(got)])) if ((want[k] || 0) !== (got[k] || 0)) bad.push(`page ${i + 1}: preview ${got[k] || 0} × ${k}, plan ${want[k] || 0}`);
+            const seen = new Set(); for (const c of cells) { const h = c.innerHTML; if (seen.has(h)) { bad.push(`page ${i + 1}: the same item twice`); break; } seen.add(h); }
+          });
+          const line = document.querySelector('[data-summary]'); const txt = line ? line.textContent : '';
+          return { bad, txt: txt.slice(0, 140) };
+        }, weights);
+        if (r.bad.length) failed++;
+        console.log(`${r.bad.length ? 'FAIL' : 'ok  '} preview = summary: ${label.padEnd(28)} ${r.bad.slice(0, 3).join('; ')}${r.bad.length > 3 ? ` (+${r.bad.length - 3})` : ''}`);
+      }
+      await page.close();
+    }
     // the flows
     const results = {};
     console.log('\nflows (actions incl. needed scrolls / steps):');

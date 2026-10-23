@@ -803,5 +803,7 @@
     if (wantsPic && (picCount(out) === 0 || /^story-|^tape$/.test(kind))) out = withPicture(out, s, kind);
     return out;
   }
-  root.MQThumbs = { draw, kindOf, rng, int, picCount, KINDS: Object.keys(D), POOLS: Object.keys(POOL) };
+  // the bare drawing, before any picture is added (thumbs-check compares the two: an added picture must carry its data)
+  function base(s, seed) { const kind = kindOf(s); const r = rng(s.c + ':' + s.v + ':' + (seed === undefined ? '' : seed)); if (kind.startsWith('pool-')) return poolDraw(kind, s, r); const f = D[kind]; return f ? f(r, s) : ''; }
+  root.MQThumbs = { draw, base, kindOf, rng, int, picCount, KINDS: Object.keys(D), POOLS: Object.keys(POOL) };
 })(typeof window !== 'undefined' ? window : globalThis);
