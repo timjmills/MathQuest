@@ -454,7 +454,9 @@ const renderError = (s) => !!(s && !s.na && !s.pending && (s.error || Object.key
 const countsOf = (doc) => { const m = {}; for (const f of doc.findings || []) if (!f.waived) { const k = `${f.lint} ${f.rule}`; m[k] = (m[k] || 0) + 1; } return m; };
 /**
  * N1 (critic r2): the finding-level key of one print-lint finding, `<lint> <rule>|p<page>|<key>` with every digit
- * run of print-lint's own short key (`f.key`, else the message) normalised to `#`. A new finding that replaces a
+ * run of print-lint's short key (`f.key`; its --json drops that field today, so in practice the MESSAGE) normalised
+ * to `#`, cut to 120 characters. The message names what is wrong (the colour, the shape, the cell), so a new finding
+ * that replaces a
  * fixed one of the same rule on the same row is a different key, so it is caught even when the count stays the
  * same (the D5 class of ws-node-lint, at the matrix's grain). Numbers are normalised so a measurement that moves
  * by a millimetre is not a new finding; the page is kept, so the same defect moving to another page is new.
