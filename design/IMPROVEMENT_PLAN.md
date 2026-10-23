@@ -1,4 +1,4 @@
-# Improvement plan — faster building, a simple teacher site, truly mixed pages (v3, 2026-10-23)
+# Improvement plan — faster building, a simple teacher site, truly mixed pages (v4, 2026-10-23)
 
 ## In short (for the owner)
 
@@ -10,8 +10,9 @@
 2. **A simple teacher site.** Four places instead of eleven: **Skills**, **Lessons**, **Classes** and your profile. Tick
    skills and they drop into a tray at the bottom with three buttons — **Print · Quiz · Share**. Printing, sending a code
    or making a quiz takes 3–4 steps. Options appear only when you ask for them.
-3. **Bold colour on purpose.** Each maths area has its own strong colour (eight of them, each in four strengths, chosen
-   so colour-blind teachers can tell them apart too), used everywhere that area appears; the one button you should press
+3. **Bold colour on purpose.** Each maths area has its own strong colour (eight of them, each in four strengths), used
+   everywhere that area appears; areas taught in the same grade stay easy to tell apart for colour-blind teachers too, and
+   every colour also carries the area's name and icon; the one button you should press
    is bold black; everything else is calm. Pupil pages stay black and white. You pick between two colour boards first.
 4. **Worksheet choices in plain words** — no A / B pages: How many pages? · How often each skill comes up · Mixed
    together / In sections / One skill per page · Examples · Size. A small preview, and the PDF is the full view.
@@ -29,7 +30,7 @@ organisation; no lettered A/B pages — plain options, with "how many pages" for
 no full preview on the website, but a small preview of the first page (or the first 2–3 pages when they differ).
 
 Built from three audits on 2026-10-23 (the build history and gate timings; the teacher site driven in a browser at 1366
-and 390 px; the print engine with a test render) and graded by an independent critic (rounds 1 and 2 FAIL → this v3).
+and 390 px; the print engine with a test render) and graded by an independent critic (rounds 1–3 FAIL → this v4).
 
 ---
 
@@ -44,7 +45,7 @@ and 390 px; the print engine with a test render) and graded by an independent cr
 | Defects a machine could measure | most defect mentions in the reports read for this audit were measurable (viewport/scroll, untrue text, slot shape, clipping, lone item, plain words, repeats, overlap, ink, paper ≠ screen, size S, wrong key); judgment defects (pedagogy, clarity) were few. This is a reading, not a count: S8's first job commits the tally (`design/status/defect-tally.csv`, defect class × critic report) | critics spend their rounds finding measurable faults |
 | Classes no gate covered until a critic found them | false FULL verdicts (4 rounds running in WRM tagging, until the TITLEREP / RANGECHECK checks were added at round 14); the number line's sticky-header scroll (rounds 2–7); WRM "How it looks" lines (3 rounds); skip-count lone Model states (found only in round 4) | |
 | `LESSONS_LEARNED.md` checks never built | L1 sizes, L3 key-in-drawing, L6 instruction-follows-item, L10 answer cycles; L9 and L11 by eye only | |
-| Builder escalations (STATUS §9) | 14 recorded: 13 to Opus medium, 1 from Sonnet to Opus low (Lane C); each after 2–5 failed rounds at the lower setting (Y2–Y3 tagging, Y1 site lessons, skip-count and detailed lessons 1 and 2 after 2) | the cheap first pass on new, hard work costs 2–5 extra rounds |
+| Builder escalations (STATUS §9) | 14 recorded: 13 to Opus medium, 1 from Sonnet to Opus low (Lane C); each after the same defect survived 2–5 rounds at the lower setting (Y2–Y3 tagging escalated at round 12, after its last defect survived rounds 10 and 11; Y1 site lessons, skip-count and detailed lessons 1 and 2 also after 2) | the cheap first pass on new, hard work costs 2–5 extra rounds |
 | Deploy gates, run one after another | ≈ 80 min; screen-slots 22, chromebook-fit 17.4, teacher-wrm 12 + 12 = 80 % of it | |
 | Red at deploy | `ws-print-lint --source kit` FAILs at a standing 458 findings / 33 documents (accepted baseline ≤ 461/33); `ws-screen-slots` FAILs intermittently on `reading_ruler_hard` | a "green" precritic must compare against a pinned baseline |
 | Documents an agent reads | ≈ 740 KB (≈ 185 k tokens) — WORKSHEET_DESIGN_STANDARD 151 KB, PAGE_TYPES 186 KB, PEDAGOGY 131 KB, SKILL_CELL_CONTRACT 129 KB, STATUS 89 KB | |
@@ -76,7 +77,7 @@ and 390 px; the print engine with a test render) and graded by an independent cr
 |---|---|---|
 | Batch (contact-sheet) critic for copies of an approved template | misses a page type, size or screen | allowed only when precritic passes for **every page role × S / M / L × the three screen hosts** (practice card, online worksheet, quiz); the critic also opens a random **20 %** of (role, size, host) pages at full scale; any role whose code path differs from the approved model gets a full grade |
 | Unchanged pages keep their score (near-miss re-check, golden renders) | a stale score | the golden manifest stores **page + screen-host renders** (1366 / 1280 / 390) and a **fingerprint of the drawing** (hash of the cell DOM/SVG, not pixels), the **rule-set version** (RUBRIC, standards, LESSONS_LEARNED) and the per-criterion scores; a rule change, or a score older than 2 rounds, forces a re-grade; the final PASS lists every page with where its score came from |
-| Spec cards instead of the full standards | the card leaves out a rule | builders use cards; **critics keep reading the full standards and RUBRIC**; a card-coverage test fails if any rule id that a critic cited for that family in past reports is missing from the card |
+| Spec cards instead of the full standards | the card leaves out a rule | builders use cards; **critics keep reading the full standards and RUBRIC**; a card-coverage test fails if any rule id that a critic cited for that family in past reports is missing from the card; it runs again against the current rule-id index when each build starts, so a rule added after the card was signed is caught |
 | Opus low for copies | weaker work | precritic must pass before the critic; any copy that fails a critic round is rebuilt at Opus medium (part of Q-S1) |
 | Parallel deploy gates | flaky results under load | the same gates, two browser slots (owner rule). A FAIL that passes when re-run alone is still **logged as a defect** with an owner and counted in S8; the same item flaking twice **blocks the deploy** until it is fixed (`reading_ruler_hard` is one such intermittent real defect, S9) |
 | Near-miss re-check (Q-S2) | a weak page rides on an old score | allowed only when **every failed score in the round is a 7 and no score in the sample is below 7** (the bar is the minimum, not the average); the re-check grades the failed items, every changed page and a fresh 20 % sample |
@@ -105,7 +106,7 @@ critic, and the full gates before every deploy.**
 |---|---|
 | `--skill <cat:skill>` (repeatable) | `ws-node-lint` (*new*), `ws-providers-unit --skill` (*new flag*), `ws-content-audit --skill`, `ws-options-verify --skill`, `ws-presets-unit` (when presets touch it), `ws-print-lint --source kit --skills --baseline` (S / M / L, every role), `ws-screen-slots --skills --baseline` (*new flag*), `ws-screen-answer --skills`, `ws-chromebook-fit --skills`, `ws-code-snapshot`, `ws-boot-smoke` |
 | `--template <id>` | the above for every skill using the template + `ws-panes-unit` / the template's fixture test + `ws-grade-render --template` (*new flag*) contact sheet |
-| `--role <role>` | `ws-grade-render --roles <role> --skills <20 skills across families>` + `ws-print-lint --roles <role>` |
+| `--role <role>` | `ws-grade-render --roles <role> --skills <the role sample>` + `ws-print-lint --roles <role>` on the same skills. The role sample is `tests/fixtures/precritic/role-sample.json` (new in S1): the first live skill of each of the 20 largest families in `design/SKILL_CATALOGUE.md` order, pinned in the file and changed only with a STATUS note |
 | `--teacher` | `ws-teacher-shell`, `-library`, `-preview`, `-quiz`, `-wrm --grade --lesson` (*new flags*), `ws-teacher-flows` (*new*, §2.9), `ws-teacher-tokens` (*new*, §2.8), `ws-plain-words --check` |
 
 At deploy, S5 shards `ws-screen-slots --category` (exists) and `ws-chromebook-fit --category` (*new flag*) across the two
@@ -116,7 +117,7 @@ browser slots.
 | Check | Backtest |
 |---|---|
 | Lone item / lone state on a page | skip-count 359802c5 (critic r4 D12) fails; b19172b4 passes |
-| Text ≠ generator (claims of counts, kinds, ranges vs 300 seeded items) | WRM page 848d7d3f (critic r8 M12) fails; d515aa05 passes; WRM tagging Y2–Y3 round-13 state (false FULL) fails |
+| Text ≠ generator (claims of counts, kinds, ranges vs 300 seeded items) | WRM page 848d7d3f (critic r8 M12) fails; d515aa05 passes; WRM tagging Y2–Y3 c3d08a69 (graded by critic r13 in 5aa0ffce, N13: Y3.B6.S10 marked full on circles) fails; 89f30a64 (the TITLEREP gate, round 14) passes |
 | Chromebook viewport (answer box + Check reachable at 1366 × 768, nothing under a sticky header) | number line e189119f (graded by critic r7, R7-D1: timed band under the sticky bar at 1280) fails; 789f23f7 passes |
 | L1 sizes (S fits more than L; drawings scale) | seeded fixture from options critic R3 (fixed grid at S) |
 | L3 key value inside the question drawing | seeded fixture (a "combine shapes" item drawing its result) |
@@ -191,11 +192,15 @@ Expected effect, measured by S8: median rounds to PASS 5 → 2; deploy gates 80 
 
 **Below 820 px** (tablet portrait, phone): the left nav becomes a **labelled bottom bar** with the four places (icon +
 word, ≥ 44 px), replacing today's unlabelled 72 px icon rail; the tray collapses to one bar, **"3 skills ▸"**, with the
-three buttons beside it; tapping the count opens the chips. One column; the preview never comes first.
+three buttons beside it; tapping the count opens the chips. The tray bar sits directly above the bottom bar (56 + 64 px)
+and the page is padded by both, so nothing scrolls under them; sheets (worksheet, Quiz, Share, a chip's options) open
+full screen above both. One column; the preview never comes first.
 
 ### 2.4 The tray
 
-- Fixed at the bottom of Skills; shows the ticked skills as chips in their maths-area colours; drag to reorder.
+- Fixed at the bottom of Skills and **always visible, even when empty**: then Quiz opens "Build from" (a standard, a White
+  Rose unit or step, a lesson), and Print and Share are greyed with "Tick skills first". With skills, it shows them as
+  chips in their maths-area colours; drag to reorder.
 - **Tap a chip** → that skill's own options sheet (range, supports, skip, calculator, preset values, its weight) — options
   live on the skill (CLAUDE.md).
 - **Three buttons: Print · Quiz · Share.** Print opens the worksheet sheet (§2.5); Quiz opens the same sheet with scoring
@@ -217,7 +222,7 @@ key, no letters — Q-W3); Share shows the code and link at once with **Copy**
 | **How many pages?** | 1 · 2 · 3 · 4 · 5 …, for every arrangement (owner: section pages, single-skill pages and mixed pages alike); every page has new numbers; the key follows. Mixed together: each page is a full mixed page with the weights kept. In sections: the sections flow across the pages by weight; a section never splits mid-row. One skill per page: pages shared out by weight (6 pages, 3 equal skills → 2 each); never fewer pages than skills | 1 (One skill per page: one per skill) |
 | **How often does each skill come up?** | per skill: Less · Equal · More (1 : 2 : 3; a number in the chip's options) | Equal |
 | **How are the problems arranged?** (2+ skills) | **Mixed together** · **In sections** · **One skill per page** | Mixed together; In sections when the paper comes from a lesson's "Print practice" |
-| **Examples?** | None · One example at the top (of the page, or of each section) · An example with each problem (Q-W2; not on Mixed together pages) · on Mixed together pages: None or One example of each skill, in a strip at the top (§3.3) | One at the top on single-skill pages; None on mixed pages |
+| **Examples?** | None · **An example to start each group** (a worked example, then 3–4 problems like it, repeated down the page — today's block layout, the owner's 2026-09-26 ruling "one example on top of each block", LESSON_LIBRARY_PLAN §8f) · **An example with each problem** (Q-W2) · on Mixed together pages only: None or **One example of each skill, in a strip at the top** (§3.3) | None; practice printed from a lesson: An example to start each group (its skills are new) |
 | **Size** | S · M · L | M |
 
 - Under the choices: a **one-line summary** ("2 pages · 16 problems · Addition 6, Time 5, Fractions 5 · answer key at the
@@ -230,9 +235,11 @@ key, no letters — Q-W3); Share shows the code and link at once with **Copy**
   tests are the Quiz button, lessons are in Lessons, thinking pages stay paused (MASTER_PLAN 4.5, Wave 9).
 - Engine mapping (no new renderer): pages → the Practice role's page count; weights → the per-skill `weight` option;
   Mixed together → `arrangement: 'mixed'` (§3); In sections → today's sections; One skill per page → one section per
-  skill with page breaks; "One example at the top" → `anchors: 'sections'` (an example band before each block; the
-mixed-practice default today, `sheet/anchors.js:16`); "An example with each problem" → `anchors: 'side'`; None →
-`anchors: 'off'` (`ANCHOR_MODES`, `anchors.js:25`); the strip on mixed-together pages is new (M4). Old share codes and saved
+  skill with page breaks; "An example to start each group" → `anchors: 'sections'` (an example band, then the block's
+3–4 problems, `blockPlan` in `sheet/anchors.js`; the mixed-practice default today, `anchors.js:16`); "An example with
+each problem" → `anchors: 'side'`; None → `anchors: 'off'` (`ANCHOR_MODES`, `anchors.js:25`); the strip on
+mixed-together pages is new (M4). A single example at the very top of a page is not offered: the owner's ruling puts one
+on each block. Old share codes and saved
   sets with letters A–J decode to the same number of pages (`ws-code-snapshot`).
 
 ### 2.6 The flows
@@ -270,60 +277,74 @@ every row and asserts its action count, including the 6-action case for Lessons.
 | — **Status** | error / warning / success only | error red #B91C1C + ✕; warning = ink + ⚠ (no yellow fill, so it never reads as Counting); success = ink + ✓ |
 
 **Eight maths-area colours, four strengths each.** Splitting Measurement from Data (as the app's DOMAINS and the White
-Rose Statistics blocks already do) and grade 6 Ratio / Number system from Fractions gives eight areas. Each has a ramp,
-so strength shows rank inside the area: **tint** (10 %, a group's background) → **soft** (30 %, a filter chip at rest)
-→ **bold** (card edge, section header band, tray chip) → **deep** (the selected state, with ✓).
+Rose Statistics blocks already do) and grade 6 Ratio / Number system from Fractions gives eight areas. Each has four
+strengths, so strength shows rank inside the area: **tint** (10 %, a group's background) → **soft** (30 %, a filter chip
+at rest) → **bold** (card edge, section header band, tray chip, selected chip) → **deep** (the area's own text and
+outline colour; in dark mode a light version does the same job).
 
-| Maths area (code) | Tint | Soft | **Bold** (text on it) | Deep (white text) | Hue · L* |
+| Maths area (code) | Tint | Soft | **Bold** (text on it) | Deep (on white / on tint) | Hue · L* |
 |---|---|---|---|---|---|
-| Counting & cardinality (CC) | #FEFAE8 | #FEF0B9 | **#FACC15** gold (ink 11.6) | #695609 (7.2) | 48° · 84 |
-| Operations & algebraic thinking (OA; grade 6 EE) | #EBF2FE | #C4DAFC | **#3B82F6** blue (ink 4.8) | #2857A5 (7.0) | 217° · 56 |
-| Number & operations in base ten (NBT) | #ECEBFA | #C7C3EF | **#4338CA** indigo (white 7.9) | #322A98 (10.9) | 245° · 35 |
-| Fractions & decimals (NF) | #F3E8F4 | #DBBADD | **#86198F** plum (white 8.2) | #64136B (11.4) | 295° · 33 |
-| Measurement — length, mass, time, money, area, volume, angles (every MD cluster except data) | #E6F2EE | #B4D6CD | **#047857** emerald (white 5.5) | #035A41 (8.3) | 163° · 44 |
-| Data — the MD "represent and interpret data" clusters (K.MD.B, 1.MD.C, 2.MD.D, 3.MD.B, 4.MD.B, 5.MD.B); grade 6 SP | #E6F8FB | #B4E9F2 | **#06B6D4** cyan (ink 7.3) | #036272 (7.0) | 189° · 68 |
-| Geometry (G) | #EDFCF2 | #C9F5D9 | **#4ADE80** green (ink 10.2) | #21643A (7.1) | 142° · 79 |
-| Ratio & number system (grade 6 RP, NS) | #FDEDF5 | #F9C8E0 | **#EC4899** pink (ink 5.0) | #992F63 (7.1) | 330° · 57 |
+| Counting & cardinality (CC) | #F9E9FB | #ECBEF2 | **#C026D3** fuchsia (white 4.7) | #901C9E (7.4 / 6.4) | 293° · 49 |
+| Operations & algebraic thinking (OA; grade 6 EE) | #EBEAF6 | #C3C1E3 | **#3730A3** indigo (white 9.9) | #29247A (12.9 / 10.8) | 244° · 28 |
+| Number & operations in base ten (NBT) | #FDF7E6 | #F9E8B5 | **#EAB308** gold (ink 9.3) | #6E5404 (7.2 / 6.7) | 45° · 76 |
+| Fractions & decimals (NF) | #FEF1F8 | #FCD5E9 | **#F472B6** pink (ink 6.7) | #894066 (7.0 / 6.4) | 329° · 65 |
+| Measurement — length, mass, time, money, area, volume, angles (every MD cluster except data) | #F0FDF8 | #D3F8E9 | **#6EE7B7** mint (ink 11.6) | #2E614D (7.2 / 6.9) | 156° · 84 |
+| Data — the MD "represent and interpret data" clusters (K.MD.B, 1.MD.C, 2.MD.D, 3.MD.B, 4.MD.B, 5.MD.B); grade 6 SP | #F4F9FF | #DFEEFE | **#93C5FD** sky (ink 9.8) | #445B74 (7.0 / 6.6) | 212° · 78 |
+| Geometry (G) | #E7F1F0 | #B7D6D3 | **#0F766E** teal (white 5.5) | #0B5852 (8.3 / 7.2) | 175° · 44 |
+| Ratio & number system (grade 6 RP, NS) | #F8FEF0 | #EBFBD0 | **#BEF264** lime (ink 13.6) | #4A5E27 (7.2 / 7.0) | 82° · 90 |
 | No standard / Extra lessons | — | — | **#475569** slate (white 7.6), **dashed outline** | — | — |
 
-Ink = #111827. Tint and soft always take ink text (≥ 10 : 1). Contrast figures are WCAG ratios on the bold and deep fills.
+Ink = #111827. Tint and soft always take ink text (≥ 10 : 1). Contrast figures are WCAG ratios. **Dark mode** (page
+#111318): tint = 18 % and soft = 40 % of the bold over the page, with #F3F4F6 text (≥ 5.3 : 1); the fourth strength is a
+light version, ≥ 7 : 1 on the dark tint (CC #E092E9, OA #A3A0D5, NBT #F4D984, NF #FAB8DB, Measurement #B6F3DB, Data
+#C9E2FE, G #87BBB6, Ratio #DEF8B2).
 
-- **Checked for colour-blind teachers** (CIELAB ΔE76; deuteranopia and protanopia simulated with the Machado 2009
-  matrices at full severity): every pair of bold colours is ≥ 35 apart with normal vision and ≥ 20 apart under both
-  simulations (closest: Measurement–Ratio 20.1 deuteranopia, Data–Ratio 22.5 protanopia); OA and NBT now differ in
-  lightness (L* 56 vs 35), the clash critic r2 found in v2. Every bold is ≥ 20 from error red and from the answer-key
-  orange #C2410C in all three views. `python3 design/audit/palette-2026-10-23/ramps.py` reproduces every number here;
-  `search3.py 8 20 20` is the search that chose the set.
-- **Slate** ("No standard") is 16 from the nearest area under simulation, so it also carries a **dashed outline** and its
-  label; it never reads as an inactive control, because inactive controls are grey outlines with no fill.
-- **Dark mode:** neutral page #111318; tints become 18 % of the bold over the page and soft 40 %, with #F3F4F6 text
-  (≥ 5.9 : 1); bold chips keep their fill and text.
-- **Chip edges:** a bold fill under 3 : 1 against its page gets a 1 px outline so the chip's shape is always visible —
-  in light mode Counting (1.5), Data (2.4) and Geometry (1.7) take their own deep colour as the outline; in dark mode NBT
-  (2.4) and Fractions (2.3) take #E5E7EB, and slate's dashed outline is #E5E7EB.
+- **Checked for colour-blind teachers** with CIEDE2000 (the colour-difference measure closest to what people see;
+  deuteranopia and protanopia simulated with the Machado 2009 matrices at full severity):
+  - **Normal vision:** every pair of bold colours ≥ 20.4 apart (closest: Measurement–Ratio, which never share a grade).
+  - **Colour-blind, areas that share a grade** — K: CC OA NBT Measurement Data G · 1–2: OA NBT Measurement Data G ·
+    3–5: OA NBT NF Measurement Data G · 6: Ratio OA Data G — ≥ 12.2 apart under both simulations (closest: CC–OA).
+    Place value and Fractions, the pair critic r3 found at 8.0 in v3, are now gold and pink: 35.7 / 47.9.
+  - **Colour-blind, areas from different grades:** ≥ 8.7 (Place value–Ratio). They never share a grade-filtered list (the
+    default view); in a list across grades (a search, a tray with two grades) the grade pill, the area name and the area
+    icon tell them apart, so the plan does not claim the colours alone do.
+  - Every bold is ≥ 22.0 from error red and from the answer-key orange #C2410C in all three views. Slate is ≥ 14.6 from
+    every area with normal vision and ≥ 8.7 under simulation, so it also always has its **dashed outline** and label; it
+    never reads as an inactive control, because inactive controls are grey outlines with no fill.
+  - `python3 design/audit/palette-2026-10-23/ramps.py` reproduces every number in this section, for board A too;
+    `search5.py` (with `colour.py`) is the search that chose the set.
+- **Chips — one rule for every state:** every chip has a 1 px outline, the area's deep in light mode and #E5E7EB in dark
+  mode (≥ 7 : 1 against the page), because most soft fills and several bold fills are under 3 : 1 against the page
+  (`ramps.py` lists them). **Selected = the bold fill + ✓ + a 2 px ring** (ink; #F3F4F6 in dark mode) — never a change of
+  shade alone, so two selected chips differ by their bold colours, which the gate checks.
+- **Tint and soft never name an area alone:** anything on a tint or soft fill also shows the area's name and its bold
+  (an edge, a header band or a dot). So only the bold colours need to differ, and the gate checks that rule too.
 - **One meaning per colour:** a hue is a maths area or error, never both; actions, places and grades are ink and neutrals.
 - **Where the area comes from:** the skill's primary CCSS code in `SKILL_STANDARDS` (first code; MD split by cluster as in the
   table); a lesson's own CCSS; no code → slate. The 6 app DOMAINS and 35 categories are not used for colour.
 - **Organise by colour:** skill and lesson lists are grouped by maths area, each group on its tint under its bold header
   band, so a one-area list still shows four strengths of its colour, not one hue on black and white.
-- **Never colour alone:** every colour comes with its label and icon (black-and-white printers, colour-blind teachers).
+- **Never colour alone:** every colour comes with its area name and an area icon (black-and-white printers, colour-blind
+  teachers).
 - **Neutral backgrounds** (white; #111318 dark), no pastel washes outside the group tints. Grades are numbered neutral
   pills.
 
-**At T1 the owner picks between two rendered boards** (Q-T6): **A** six areas (Measurement and Data share emerald;
-Ratio / Number system shares plum) and **B** eight areas with the ramps above. Both are subsets of the set checked above,
-so both pass the gate.
+**At T1 the owner picks between two rendered boards** (Q-T6): **A** six areas (Measurement and Data share mint; Ratio /
+Number system shares pink) and **B** eight areas with the strengths above. Board A uses six of the same colours and passes
+the same checks (closest colour-blind pair CC–OA 12.2).
 
 ### 2.8 Type, spacing and the token gate
 
 - Type (chrome; Andika is for pupil content): 5 sizes (12 · 14 · 16 · 20 · 28, + 36 for the page title), 2 weights (500 ·
   700); body 16. Spacing 4 · 8 · 16 · 24 · 32 · 48. Radii 8 (controls), 16 (cards, sheets). Shadows: 2. Controls ≥ 44 px.
 - **`ws-teacher-tokens`** (new): only token values are used (sizes, spacing, radii, shadows, colours); at most one rank-1
-  ink fill per screen; area colours only on elements carrying a `data-domain`; **every pair of bold area colours ΔE76 ≥ 30
-  with normal vision and ≥ 20 under deuteranopia and protanopia simulation** (Machado 2009, severity 1.0); every bold ≥ 20
-  from error red and key orange in all three views; text contrast ≥ 4.5 : 1 on every ramp step in light and dark; chips
-  ≥ 3 : 1 against the page or outlined; slate always with its dashed outline. A hue-only check cannot catch a
-  colour-blind clash, so the gate measures ΔE.
+  ink fill per screen; area colours only on elements carrying a `data-domain`; **CIEDE2000 between bold area colours ≥ 20
+  for every pair with normal vision, ≥ 12 under deuteranopia and protanopia (Machado 2009, severity 1.0) for every pair
+  of areas that share a grade, ≥ 8 for any other pair**; every bold ≥ 20 from error red and key orange in all three
+  views; text contrast ≥ 4.5 : 1 on every strength in light and dark; every chip outlined (deep / #E5E7EB) and every
+  selected chip ringed with ✓; every tint or soft fill accompanied by the area name and its bold; slate always with its
+  dashed outline. A hue-only or ΔE76 check flatters saturated blues and purples, so the gate uses CIEDE2000 (the palette
+  check is `design/audit/palette-2026-10-23/colour.py`, ported to the gate in T1).
 
 ### 2.9 Merge, retire, migrate
 
@@ -348,9 +369,9 @@ so both pass the gate.
 | T1 | Clickable mock-up + the two palette boards (A six areas, B eight areas with ramps, each with its colour-blind simulation): Skills, tray, worksheet sheet, Quiz, Share, Lessons, Classes at 1366 and 390, light and dark; a live-vs-branch table of teacher files (STATUS §7) | `design/mockups/teacher-2/*.html`, `tests/scripts/ws-teacher-tokens.cjs` (palette part) | the owner approves the flows and picks board A or B (this is the signed spec card) |
 | T2 | Shell + tokens: four places, profile menu, the bottom bar below 820 px, tokens | `teacher-shell.js`, `teacher-ui.js`, `css/teacher-brand.css`, `css/teacher.css`, `index.html` teacher markup | `ws-teacher-tokens` green; old screens reachable |
 | T3 | Skills gallery + Browse by + tray + chip options + worksheet sheet + Quiz + Share | `teacher-library.js`, `teacher-skillpick.js`, `teacher-sets.js`, `teacher-print.js`, `teacher-preview.js`, `teacher-quiz-ui.js`, `quiz-builder.js` (save path only), `quiz-storage.js`, `teacher-map-tasks.js`, `print-sheet.js` (request normalising only), `css/teacher-library.css`, `css/teacher-quiz.css` | `ws-teacher-flows` green for every Skills flow |
-| T4 | Lessons: the 2026-10-17 layout restyled; Print lesson / Print practice / Share practice / Practise pre-skills | `teacher-wrm.js`, `lesson-tomake.js`, `css/teacher-wrm.css` | Lessons flows green |
+| T4 | Lessons: the 2026-10-17 layout restyled, opening where the teacher was last; Print lesson / Print practice / Share practice / Practise pre-skills; "Skills to be made" folded into each lesson and area | `teacher-wrm.js`, `lesson-tomake.js`, `teacher-todo.js` (its content moves onto lessons; the screen leaves the menu in T6), `css/teacher-wrm.css` | Lessons flows green |
 | T5 | Classes: board, results, MAP tests, progress | `teacher-map.js`, `dashboard.js` (wrapping only), board routing | each reachable in ≤ 2 actions |
-| T6 | Redirects and aliases, retire old entry points, rewrite the teacher gates; independent critic at 1366 / 1280 / 820 / 390, every action clicked through to a printed PDF or a working code | as above | critic ≥ 8 on every screen; full gates; deploy |
+| T6 | Redirects and aliases (incl. `#todo/…` → the lesson or area), retire old entry points (the separate Skills to be made screen, `teacher-todo.js` entry), rewrite the teacher gates; independent critic at 1366 / 1280 / 820 / 390, every action clicked through to a printed PDF or a working code | as above | critic ≥ 8 on every screen; full gates; deploy |
 
 ### 2.11 Teacher-site questions — see §4.3 (Q-T1 … Q-T6, Q-W2, Q-W3)
 
@@ -403,11 +424,23 @@ reproduced.
   the run rule and the first-third rule and swaps with the next fitting item if either breaks; a final row of height-1
   cells; word problems as a closing band. Rows take their tallest cell; content never shrinks; every cell keeps ≥ 40 %
   free; a strip never splits; the last page is rebalanced.
+- **Runs are counted in turns when small boxes share a block.** A 2 × 2 block may hold four 1 × 1 boxes or two 1 × 1 and a
+  2 × 1. Small boxes of different skills share a block wherever both are left (a fact and a short stack side by side).
+  When only one small skill can fill a block (1 × 1 facts mixed 1 : 1 with 2 × 2 clocks), that block is **one turn**,
+  however many boxes it holds, and the next block must be another skill while one is left. A turn is one box of
+  2 × 1 or larger, or one block of small boxes; the run rule counts turns, not numbers (facts block, clock, facts block,
+  clock passes; two facts blocks in a row fail).
+- **Page units:** a page holds N × rows units — N columns (PT-MIX-2) times the SHUFFLED rows at the size (PAGE_TYPES 5.2:
+  S 9, M 7, L 5) — minus the rows the examples strip and the word-problem band take (each at least one row).
 - **How many skills fit a page is a capacity sum, not a count:** Σ over the page's skills of 2 × (span area in units)
-  ≤ the page's units at the chosen size and look (each skill at least 2 problems on any page it appears on; the
-  word-problem band is outside the sum and exempt from the 2-problem rule, as in the PAGE_TYPES 5.2 worked example of 4
-  skills at L with one word problem). Example: the Daily L page (N = 4) has 4 blocks = 16 units, so three 2 × 2 clock
-  skills (2 × 4 × 3 = 24 units) do not fit on one page. When the skills do not fit, they rotate across the pages the
+  ≤ the page units (each skill at least 2 problems on any page it appears on; the word-problem band is outside the sum
+  and exempt from the 2-problem rule, as in the PAGE_TYPES 5.2 worked example of 4 skills at L with one word problem:
+  6 × 5 = 30 units, 6 for the word row, 24 left; clocks 8 + sums 4 + fractions 4 = 16 ≤ 24). Example: the Daily L page
+  (N = 4) has 4 × 5 = 20 units, 16 with a word-problem row, so three 2 × 2 clock skills (2 × 4 × 3 = 24 units) do not
+  fit on one page.
+- **Two of each skill beats the exact weights on a page.** A skill that appears on a page gets at least 2 problems there
+  (one alone is a lone item, a defect class the precritic checks); the weights are met as closely as that allows, and
+  the summary line says where they differ ("Less : More on a 4-problem page gives 2 and 2, not 1 and 3"). When the skills do not fit, they rotate across the pages the
   teacher asked for (each page a full mixed page, the totals across the pages keeping the weights, PT-MIX-9); if even the
   chosen number of pages cannot hold every skill twice, the summary line says "needs 2 pages" and Print offers it.
 - **A short instruction in each cell** (already required by PT-MIX-5): skills gain `strings.cue` — 1–4 words from the
@@ -435,12 +468,13 @@ reproduced.
 
 ### 3.4 Gates that prove it
 
-- `ws-print-lint` mixed rules: no run of one skill longer than 2; each skill's count within 1 of its weight; every
+- `ws-print-lint` mixed rules: no run of one skill longer than 2 turns (a block of small boxes is one turn); each skill's count within 1 of its weight; every
   non-computation cell has a cue; no cell below its minimum size; ≥ 40 % free; vertical rules on the unit grid; no page
   under-filled while items remain; the capacity sum holds on every page; any run over 2 matches the weights fallback and
   appears in the summary line.
 - `interleave()` self-test (node, deterministic), including the 1 : 3 on 12 items case (runs of 3, counts 3 and 9, the
-  summary note) and a 1 : 1 : 1 case (no run over 2); `ws-code-snapshot` (old codes decode as sections).
+  summary note), a 1 : 1 : 1 case (no run over 2), the facts-with-clocks case (blocks alternate, runs counted in turns)
+  and a Less : More case on a 4-problem page (2 and 2, the summary note); `ws-code-snapshot` (old codes decode as sections).
 - Critic case: `ws-grade-render --set` with four skills from four families at S / M / L + keys + the online worksheet and
   quiz, ≥ 8 on every criterion.
 
@@ -449,7 +483,7 @@ reproduced.
 | Phase | Work | Files | Done when |
 |---|---|---|---|
 | M1 | `interleave()` + self-test (with the weights-win case); the `arrangement` field and code flag; Mixed together for skills of the same size class inside today's packer; the Q-M1 edits to PAGE_TYPES 5.2, DN-34 and `anchors.js` | `sheet/interleave.js` (new), `print-sheet.js`, `skill-codes.js`, `sheet/anchors.js`, `design/PAGE_TYPES.md`, `WORKSHEET_DESIGN_STANDARD.md` | self-test green; `ws-code-snapshot` green; a 4-skill same-size page renders mixed with no run > 2 |
-| M2 | Size classes (incl. measured legacy cells) + the 2 × 2 block packer + numbering + rebalanced last page + the capacity sum and rotation across pages | `sheet/roles/mixed-practice.js`, `sheet/layout.js`, `sheet/paginate.js` | print-lint mixed rules green on the critic set at S / M / L |
+| M2 | Size classes (incl. measured legacy cells) + the 2 × 2 block packer (small boxes of different skills share blocks; runs counted in turns) + numbering + rebalanced last page + page units, the capacity sum, two-of-each and rotation across pages | `sheet/roles/mixed-practice.js`, `sheet/layout.js`, `sheet/paginate.js` | print-lint mixed rules green on the critic set at S / M / L |
 | M3 | `strings.cue` (fallback rule first, then real cues family by family) + the in-cell cue + lint | `sheet/contract.js`, `sheet/providers/*`, `sheet/cell.js` | every skill has a cue or is listed on the fallback; lint green |
 | M4 | Frame subtitle, readable footer, key legend by skill, the examples strip, the arrangement and examples choices in the worksheet sheet, the summary line (replacing PT-MIX-8) | `sheet/frame.js`, `sheet/roles/answer-key.js`, `teacher-print.js` (with T3) | screens and keys match §3.3 |
 | M5 | Online worksheet and quiz parity; independent critic | `worksheet.js`, `quiz-take.js` | critic ≥ 8 on every page, size and host |
@@ -462,10 +496,10 @@ reproduced.
 
 | Order | Work | Lane owns | Runs beside |
 |---|---|---|---|
-| 1 | **Wave 0** (§1.4 S1–S9) + review of the open PRs #11 (needs a critic on its round-3 fixes f0d4a489), #13 (re-pin codes VA–VD; becomes the shape-grid / solid-kit starting point), #14 (quiz "Click ALL") | `tests/scripts/*`, `design/status/`, `design/cards/` | mixed-page engine M1–M3 (different files) |
+| 1 | **Wave 0** (§1.4 S1–S9) + review of the open PRs #11 (needs a critic on its round-3 fixes f0d4a489), #13 (re-pin codes VA–VD; becomes the shape-grid / solid-kit starting point), #14 (quiz "Click ALL"; it lands in the same deploy as #13, merged right after it, because #13's new Click-ALL skills need #14's answer tiles — HANDOVER-2026-10-17) | `tests/scripts/*`, `design/status/`, `design/cards/` | mixed-page engine M1–M3 (different files) |
 | 2 | **Mixed pages M1–M5** | `print-sheet.js`, `sheet/*` | Wave 0 |
 | 3 | **Teacher site 2.0 T1–T6** (T1 needs the owner) | `teacher-*.js`, `css/teacher*.css`, `index.html` teacher markup | templates (step 4) |
-| 4 | **Templates by leverage** (§1.5); the paused lanes restart with precritic: Lane D print backlog, the fraction key (keys show 2/8 = 1/4, owner 2026-10-17; both touch `print-sheet.js`, so one after the other and after M2), Lane B answer + regroup boxes, place-value write-value, the decimals key fault (AK-4 on `add_decimal`, same fix pattern as `mult_properties`), the skip-count owner answers still to build (wide rows wrap and keep size; phone card opens at the first box), the number line 5.2 later steps (a time line in hours and minutes for `measurement:elapsed_*`; D9 band tightness) | `sheet/cells/<template>.js`, the generators | Teacher site 2.0 |
+| 4 | **Templates by leverage** (§1.5); the paused lanes restart with precritic: Lane D print backlog, the fraction key (keys show 2/8 = 1/4, owner 2026-10-17; both touch `print-sheet.js`, so one after the other and after M2), Lane B answer + regroup boxes, place-value write-value, the decimals key fault (AK-4 on `add_decimal`, same fix pattern as `mult_properties`), the skip-count owner answers still to build (wide rows wrap and keep size; phone card opens at the first box), the number line 5.2 later steps (1) a time line in hours and minutes for `measurement:elapsed_*`, (2) D9 band tightness, (4)/(8) a unit-fraction line for `fraction_operations` when the teacher fixes one denominator, (9) the owner question on mixed pools losing a row, the `order_fdp` page that prints "Order from greatest to least" with no numbers (STATUS §7 item 7, conversions family) | `sheet/cells/<template>.js`, the generators | Teacher site 2.0 |
 | 5 | **Lessons 6–10 and the rest of the owner's list** (Wave 8) — resume `claude/sweet-newton-c8wrv1-wip-detailed-lessons-2` (patches in `design/lesson-planner/wip-2026-10-17/`) | `js/modules/lessons/detailed/`, `data/curriculum/detailed-lessons.json` | any lane |
 
 At most three lanes at once, each owning its files; deploys use the S5 runner.
@@ -493,7 +527,7 @@ At most three lanes at once, each owning its files; deploys use the S5 runner.
 | TEACHER_SCREENS: make quiz by CCSS / EE / WRM / lesson, tags, scores | §2.4 Quiz |
 | TEACHER_SCREENS: gallery by default, Big 3 / 4 / 5, saved sets, pick many | §2.3 Skills + §2.4 tray |
 | LESSON_LIBRARY_PLAN §8e three papers | Practice = Print, Quiz = Quiz, Lesson = Lessons |
-| LESSON_LIBRARY_PLAN §8f one worked example on top | kept as "One example at the top"; "with each problem" is Q-W2 (reuses `anchors: 'side'`) |
+| LESSON_LIBRARY_PLAN §8f one worked example on top of each block | kept as "An example to start each group" (`anchors: 'sections'`); "with each problem" is Q-W2 (reuses `anchors: 'side'`) |
 | PAGE_TYPES 5.2 PT-MIX (shuffled); PT-MIX-8 | §3; PT-MIX-8 → the summary line (§3.3); the default-arrangement edits under Q-M1 |
 | LESSONS_LEARNED L1, L3, L6, L10 ("NEW"), L9, L11 | §1.4 S2 (+ L11 steps-beside-drawing as a print-lint rule) |
 | RUBRIC | bar unchanged; near-miss re-check rule added under §1.3 safeguards |
@@ -506,7 +540,9 @@ At most three lanes at once, each owning its files; deploys use the S5 runner.
 | STATUS §7: research logins missing | Q-H4 |
 | STATUS §7: 5.3 share-code decision | Q-H3 |
 | STATUS §7: decimals AK-4 key fault | §4.1 step 4 |
-| STATUS §7: number line 5.2 later steps (time line in hours and minutes for elapsed-time skills; D9 band tightness) | §4.1 step 4, with the number line's own family |
+| STATUS §7: number line 5.2 later steps (1) time line in hours and minutes, (2) D9 band tightness, (4)/(8) unit-fraction line for `fraction_operations`, (9) owner question on mixed pools losing a row | §4.1 step 4, with the number line's own family; the (9) question goes on that family's spec card |
+| STATUS §7: number line (3) the lesson packet places the line only through the roles it calls, (10) the band adds a page on Scripted Model / Guided (critic nl-r6 R6-D2) | §4.1 step 5 (lessons wave), before any lesson page offers the line |
+| STATUS §7: `order_fdp` prints "Order from greatest to least" with no numbers (seen by critic nl-r3) | §4.1 step 4 / §1.5 item 4, conversions family |
 | STATUS §7: an agent cannot see its own effort setting | Q-S1 relies on the profile (`mq-opus-low` / `mq-opus-medium`), not on the agent; the orchestrator records the profile per lane (S8) and states it in each brief, as CLAUDE.md "Agents" already asks |
 | STATUS: `reading_ruler_hard` doubled answer area; print-lint baseline 458/33 | §1.4 S9 |
 | STATUS: skip-count lane (merged and deployed 2026-10-17); owner answers on wide rows and the phone first view still to build | §4.1 step 4 |
@@ -526,8 +562,8 @@ At most three lanes at once, each owning its files; deploys use the S5 runner.
 | Q-T2 | Make quizzes from the same tray (Quiz button) and retire the separate quiz builder? Pupils take quizzes exactly as today, and old quiz links keep working. | Yes |
 | Q-T3 | Keep "Skills to be made" on each lesson and maths area (folded away), and take its separate screen out of the menu? | Yes |
 | Q-T4 | Show grades as plain numbered labels, so colour only ever means the maths area? | Yes |
-| Q-T5 | One share link for pupils, with the other kind of link under More options? | Yes |
-| Q-T6 | Colour board A (six maths-area colours) or board B (eight colours, each in four strengths)? Either way the main button is bold black, and both are safe for colour-blind teachers. | B |
+| Q-T5 | Share gives one link: it **opens the practice straight away** (today's "Direct link"). The other kind — a link that **puts the skills as buttons on the pupil's start screen to choose from**, which you can lock (today's "Quick Start link") — moves under More options. Agree? | Yes |
+| Q-T6 | Colour board A (six maths-area colours) or board B (eight colours, each in four strengths)? Either way the main button is bold black. On both, areas taught in the same grade stay easy to tell apart for colour-blind teachers, and every colour also shows the area's name and icon. | B |
 | Q-W1 | No lettered A–J pages; "How many pages?" for section, single-skill and mixed pages | **Decided by the owner, 2026-10-23** |
 | Q-W2 | Offer "An example with each problem" again? It was dropped on 2026-09-26 because it made pages with only one problem. | Yes, but only when at least 2 example-and-problem pairs fit the page at the chosen size (otherwise the choice is greyed out with the reason), and never on mixed pages |
 | Q-W3 | For quizzes, "How many versions? 1–6" — each version with its own order and answer key, no letters? | Yes |
@@ -545,7 +581,8 @@ At most three lanes at once, each owning its files; deploys use the S5 runner.
 - **Spec card** — the short, signed brief for one template or skill.
 - **Size class / unit grid** — how many grid units a problem's box takes on a mixed page (1 × 1, 2 × 1, 2 × 2 …).
 - **DN-34, BD-10, PT-MIX-n, L1–L11, Q-…** — rule ids in WORKSHEET_DESIGN_STANDARD, PAGE_TYPES, LESSONS_LEARNED and this file.
-- **ΔE (CIELAB ΔE76)** — how different two colours look; about 2 is barely visible, 20+ is clearly different.
+- **CIEDE2000** — a measure of how different two colours look to people; about 1–2 is barely visible, 10+ is easy to see,
+  20+ is clearly different colours. (The older ΔE76 overstates differences between saturated blues and purples.)
 - **Deuteranopia / protanopia** — the two common kinds of red–green colour blindness, simulated with the Machado 2009 matrices.
 - **Ramp** — one colour in four strengths (tint, soft, bold, deep).
 - **Weights win** — when a skill is most of a mixed page, its run cap rises instead of the teacher's weights being cut.

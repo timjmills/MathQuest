@@ -1,36 +1,55 @@
-# Teacher site 2.0 maths-area palette check (IMPROVEMENT_PLAN.md §2.7). Run: python3 ramps.py
-import itertools
-import os
-src=open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'search.py')).read().split("cands=[]")[0]; ns={}; exec(src,ns)
-cr=ns['cr']; hue=ns['hue']; dE=ns['dE']; lab=ns['lab']
-INK='#111827'; W='#FFFFFF'; DK='#111318'
-A=[('CC','Counting','#FACC15'),('OA','Operations & algebra','#3B82F6'),('NBT','Place value (base ten)','#4338CA'),('NF','Fractions','#86198F'),
-   ('MD-M','Measurement','#047857'),('MD-D','Data','#06B6D4'),('G','Geometry','#4ADE80'),('RP-NS','Ratio & number system (Gr 6)','#EC4899')]
-SL='#475569'
-def h2r(h): return [int(h[i:i+2],16) for i in (1,3,5)]
-def r2h(r): return '#'+''.join(f'{max(0,min(255,round(x))):02X}' for x in r)
-def mix(a,b,t): ra,rb=h2r(a),h2r(b); return r2h([ra[i]*t+rb[i]*(1-t) for i in range(3)])
-def best(h): 
-    w,i=cr(h,W),cr(h,INK); return ('white',w) if w>=i else ('ink',i)
-print('| Area | tint 10% | soft 30% | bold | deep |')
-for code,name,b in A:
-    tint=mix(b,W,.10); soft=mix(b,W,.30); t=.75
-    while cr(mix(b,'#000000',t),W)<7: t-=.01
-    deep=mix(b,'#000000',t)
-    row=[]
-    for h in (tint,soft,b,deep):
-        t,c=best(h); row.append(f'{h} {t} {c:.1f}')
-    print(code,' | '.join(row))
-    # dark mode: tint/soft over dark page
-    dt=mix(b,DK,.18); ds=mix(b,DK,.40)
-    print('   dark tint',dt,'text #F3F4F6',round(cr(dt,'#F3F4F6'),1),' dark soft',ds,round(cr(ds,'#F3F4F6'),1),' bold on dark page',round(cr(b,DK),1))
-print('min pairwise bold dE:')
-for m in ('normal','deut','prot'):
-    print(m, round(min(dE(a[2],b[2],m) for a,b in itertools.combinations(A,2)),1), min(((round(dE(a[2],b[2],m),1),a[0],b[0]) for a,b in itertools.combinations(A,2))))
-print('slate vs areas min', min((round(min(dE(SL,a[2],m) for m in ('normal','deut','prot')),1),a[0]) for a in A))
-print('ink vs areas min', min((round(min(dE(INK,a[2],m) for m in ('normal','deut','prot')),1),a[0]) for a in A))
-for code,name,b in A: print(code, 'hue',round(hue(b)), 'L*',round(lab(b,'normal')[0]))
-print('chip vs page (light white / dark #111318):')
-for code,name,b in A+[('slate','',SL)]: print(' ',code,round(cr(b,W),2),round(cr(b,DK),2))
-print('bold vs error red #B91C1C and key orange #C2410C, min over normal/deut/prot:')
-for code,name,b in A: print(' ',code,round(min(dE(b,'#B91C1C',m) for m in ('normal','deut','prot')),1),round(min(dE(b,'#C2410C',m) for m in ('normal','deut','prot')),1))
+# Teacher site 2.0 maths-area palette check (IMPROVEMENT_PLAN.md §2.7, v4 after critic r3). Run: python3 ramps.py
+# Prints the four strengths of each area in light and dark mode, their contrasts, the CIEDE2000 separation of the
+# bold colours (normal vision, deuteranopia, protanopia; same-grade pairs and any pair), and chip-edge contrasts.
+import itertools, os
+exec(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'colour.py')).read())
+A = [('CC', 'Counting & cardinality', '#C026D3'), ('OA', 'Operations & algebraic thinking', '#3730A3'),
+     ('NBT', 'Number & operations in base ten', '#EAB308'), ('NF', 'Fractions & decimals', '#F472B6'),
+     ('MEAS', 'Measurement', '#6EE7B7'), ('DATA', 'Data', '#93C5FD'), ('G', 'Geometry', '#0F766E'),
+     ('RPNS', 'Ratio & number system (grade 6)', '#BEF264')]
+SLATE = '#475569'
+GRADES = {'K': ['CC', 'OA', 'NBT', 'MEAS', 'DATA', 'G'], '1-2': ['OA', 'NBT', 'MEAS', 'DATA', 'G'],
+          '3-5': ['OA', 'NBT', 'NF', 'MEAS', 'DATA', 'G'], '6': ['RPNS', 'OA', 'DATA', 'G']}
+CO = {frozenset(p) for g in GRADES.values() for p in itertools.combinations(g, 2)}
+def deep(b):          # light mode: text and outline colour of the area, >= 7 : 1 on white and >= 25 % darker than bold
+    t = .75
+    while cr(mix(b, '#000000', t), WHITE) < 7: t -= .01
+    return mix(b, '#000000', t)
+def light(b, under):  # dark mode: the same job, >= 7 : 1 on the dark tint
+    t = .5
+    while cr(mix(b, WHITE, t), under) < 7: t -= .01
+    return mix(b, WHITE, t)
+print('LIGHT MODE  | tint 10% | soft 30% | bold (text) | deep (on white / on tint)')
+for k, n, b in A:
+    ti, so, de = mix(b, WHITE, .10), mix(b, WHITE, .30), deep(b)
+    t = text_for(b)
+    print(f'  {k:5} {ti} ink {cr(ti, INK):4.1f} | {so} ink {cr(so, INK):4.1f} | {b} {t} {cr(b, WHITE if t == "white" else INK):4.1f}'
+          f' | {de} {cr(de, WHITE):4.1f} / {cr(de, ti):4.1f}   hue {hue(b):3.0f} L* {lab(b)[0]:3.0f}')
+print('DARK MODE (page #111318)  | tint 18% | soft 40% | bold on page | light (on tint)')
+for k, n, b in A:
+    ti, so = mix(b, DARK, .18), mix(b, DARK, .40); li = light(b, ti)
+    print(f'  {k:5} {ti} #F3F4F6 {cr(ti, "#F3F4F6"):4.1f} | {so} #F3F4F6 {cr(so, "#F3F4F6"):4.1f} | {cr(b, DARK):4.1f} | {li} {cr(li, ti):4.1f}')
+def sim(a, b): return min(de00(a, b, 'deut'), de00(a, b, 'prot'))
+pairs = list(itertools.combinations(A, 2))
+same = [p for p in pairs if frozenset((p[0][0], p[1][0])) in CO]
+lo = lambda ps, f: min((round(f(a[2], b[2]), 1), a[0], b[0]) for a, b in ps)
+print('CIEDE2000 bold vs bold: normal, any pair', lo(pairs, de00), '| simulated, same grade', lo(same, sim),
+      '| simulated, any pair', lo(pairs, sim))
+print('CIEDE2000 vs error red #B91C1C / key orange #C2410C, min over the three views:')
+print('  ' + ' '.join(f'{k} {min(de00(b, ERR, m) for m in MODES):.1f}/{min(de00(b, KEY, m) for m in MODES):.1f}' for k, n, b in A))
+print('slate vs areas, simulated min', min((round(sim(SLATE, b), 1), k) for k, n, b in A),
+      'normal min', min((round(de00(SLATE, b), 1), k) for k, n, b in A))
+print('bold chip vs page: light (white) / dark (#111318)')
+print('  ' + ' '.join(f'{k} {cr(b, WHITE):.2f}/{cr(b, DARK):.2f}' for k, n, b in A + [('slate', '', SLATE)]))
+print('soft chip vs page: light / dark', ' '.join(f'{k} {cr(mix(b, WHITE, .3), WHITE):.2f}/{cr(mix(b, DARK, .4), DARK):.2f}' for k, n, b in A))
+print('outlines: deep vs white min', round(min(cr(deep(b), WHITE) for k, n, b in A), 1), '| #E5E7EB vs dark page', round(cr('#E5E7EB', DARK), 1),
+      '| ink ring vs white', round(cr(INK, WHITE), 1), '| #F3F4F6 ring vs dark page', round(cr('#F3F4F6', DARK), 1))
+# Board A (six areas): Measurement and Data share the Measurement colour; Ratio / number system shares Fractions'.
+BA = {'CC': '#C026D3', 'OA': '#3730A3', 'NBT': '#EAB308', 'NF': '#F472B6', 'MD': '#6EE7B7', 'G': '#0F766E'}
+GA = {'K': ['CC', 'OA', 'NBT', 'MD', 'G'], '1-2': ['OA', 'NBT', 'MD', 'G'], '3-5': ['OA', 'NBT', 'NF', 'MD', 'G'],
+      '6': ['NF', 'OA', 'MD', 'G']}
+COA = {frozenset(p) for g in GA.values() for p in itertools.combinations(g, 2)}
+pa = list(itertools.combinations(BA, 2))
+print('Board A: normal, any pair', min((round(de00(BA[x], BA[y]), 1), x, y) for x, y in pa),
+      '| simulated, same grade', min((round(sim(BA[x], BA[y]), 1), x, y) for x, y in pa if frozenset((x, y)) in COA),
+      '| simulated, any pair', min((round(sim(BA[x], BA[y]), 1), x, y) for x, y in pa))
