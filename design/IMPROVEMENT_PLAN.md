@@ -1,4 +1,4 @@
-# Improvement plan — faster building, a simple teacher site, truly mixed pages (v14, 2026-10-23)
+# Improvement plan — faster building, a simple teacher site, truly mixed pages (v15, 2026-10-23)
 
 ## In short (for the owner)
 
@@ -42,7 +42,7 @@ no full preview on the website, but a small preview of the first page (or the fi
 Built from three audits on 2026-10-23 (the build history and gate timings; the teacher site driven in a browser at 1366
 and 390 px; the print engine with a test render) and graded by an independent critic: rounds 1–4 FAIL; round 5
 PASS on v5 (A 8 · B 9 · C 9 · D 8 · E 8 · F 9 · G 9), confirmed on v5.1. The owner's further requests then added §1.6
-and the three kinds of worksheet (v6–v13; rounds 6–13 FAIL); this v14 answers round 13. The current review state is in
+and the three kinds of worksheet (v6–v14; rounds 6–14 FAIL); this v15 answers round 14. The current review state is in
 `design/STATUS.md`.
 
 ---
@@ -109,7 +109,7 @@ Q-S4, when it is inherited from a certified (template, kind) pair and its instan
 | S2 | **The missing checks**, each proved by a **backtest** (it FAILS on the state a critic failed and PASSES on the fix) — on a real commit where one exists, otherwise on a seeded fixture kept in `tests/fixtures/precritic/` | `ws-print-lint.cjs` rules, `ws-providers-unit.mjs`, `ws-node-lint.mjs` (new, no browser), `tests/fixtures/precritic/` | backtest table green (below) |
 | S3 | **Spec cards** — `ws-spec-card` writes `design/cards/<template or family>/<id>.md` from `build-specs.js` / `build-list.js` + the exact rule excerpts (by rule id) + owner rulings + capacity rows + gates; the card ends with **open questions** and a **"Signed: owner, date"** line; the build starts only after it is signed | `tests/scripts/ws-spec-card.mjs`, `design/cards/`, a rule-id index of the four standards | card format below; card-coverage test green |
 | S4 | **Golden renders + contact sheets** (with the §1.3 safeguards) | `ws-grade-render.cjs` (manifest + diff + contact sheet), `design/audit/golden/<template>/manifest.json` | a critic brief lists changed pages + the 20 % sample; unchanged pages carry their recorded score and its source |
-| S5 | **Parallel, sharded deploy gates in three sessions** (the browser gates alone take ≈ 63 min — screen-slots 22, chromebook-fit 17.4, teacher-wrm 12 + 12 — so two slots cannot meet 30 min): session 1 runs the node gates and the teacher browser gates; session 2 runs `ws-screen-slots` and `ws-chromebook-fit` split by category across its two slots, now also in the big-board view and in dark mode (new sweep modes, because `index.html` loads every teacher stylesheet beside the screen hosts); session 3 runs the coverage matrix's affected rows (§1.6.2, ≤ 500 documents). One documented deploy-gate list (closes STATUS §7 "one deploy-gate list") | `tests/scripts/ws-deploy-gates.sh` (new), CLAUDE.md "Checks to run" | the runner times each session and the whole; three timed runs at ≤ 30 min wall clock, same gates, nothing skipped |
+| S5 | **Parallel, sharded deploy gates in three sessions** (the browser gates alone take ≈ 63 min — screen-slots 22, chromebook-fit 17.4, teacher-wrm 12 + 12 — so two slots cannot meet 30 min): session 1 runs the node gates and the teacher browser gates; session 2 runs `ws-screen-slots` and `ws-chromebook-fit` split by category across its two slots (≈ 20 min), plus the new big-board and dark-mode sweep modes on a fixed sample — every screen host × one skill per template (because `index.html` loads every teacher stylesheet beside the screen hosts); session 3 computes the tip's digests (≈ 8 min) and runs the coverage matrix's affected rows (§1.6.2, ≤ 500 documents, ≈ 15 min). One documented deploy-gate list (closes STATUS §7 "one deploy-gate list") | `tests/scripts/ws-deploy-gates.sh` (new), `tests/scripts/ws-screen-slots.cjs` and `ws-chromebook-fit.cjs` (the two sweep modes; row 1 owns them while Wave 0 is open), CLAUDE.md "Checks to run" | the runner times each session and the whole; three timed runs at ≤ 30 min wall clock, same gates, nothing skipped |
 | S6 | **Merge hygiene** — per-lane status files + a generated STATUS.md index; lanes never run `ws-stamp-assets` | `design/status/<lane>.md`, `tests/scripts/ws-status-index.mjs` | a week of lanes with no STATUS or stamp conflict |
 | S7 | **Process rules** (after the owner approves Q-S1–Q-S6): template-first order; one model per (template, kind) pair; batch critic with the §1.3 safeguards; near-miss re-check (minimum-based trigger); flakes logged; signed spec card; first build of a new template, and any failed copy, at Opus medium; builder report = precritic output | `CLAUDE.md`, `design/audit/LESSONS_LEARNED.md`, `design/audit/RUBRIC.md` | recorded; the next lane briefs use them |
 | S8 | **Metrics** — first the defect tally of every past critic report (class × report); then rounds to PASS, hours, findings per class and the agent profile used (the profile name is recorded, since an agent cannot see its own effort setting) per lane; reviewed after every template; a rising class becomes the next check | `design/status/defect-tally.csv`, `design/status/metrics.md` | tally committed; filled from Wave 0 on |
@@ -337,30 +337,43 @@ flags E1 adds: `--kind single|sections|mixed`, `--pages N` and `--bring-back`.
 - the Fade values map to the support engine: Faded page = `--supports all --cover fade` (supports fade by position down
   the page); E1 names the engine fields for Faded problems and Faded packet (the packet also needs `--pages`) and adds a
   flag where none exists;
-- **Which rows a change reaches is found by output, not by file.** For every row, `ws-coverage-matrix --digest`
-  (new, E1) computes the row's **input digest** in one browser page load — everything the page is built from before
-  it is drawn: the row's seeded items (`generateQuestionFor` with the row's seeds and options), the provider outputs
-  for those items (`strings`, `workedSteps`, `wrongAnswer`, the instruction text each item actually receives through
-  `instructionKeyFor` / `libraryKeyOf` / the providers), the option values and presets in force, and the pure kit plan
-  the composer makes from them. `ws-coverage-matrix --affected <commit range>` computes the digests at both ends and
-  lists every row whose digest changed (all 715 skills' rows in a few minutes, as `ws-content-audit` does 310 skills ×
-  240 items in ≈ 45 s). So a change to a generator module, a provider, `skill-presets.js`, `sheet/instructions.js`,
-  the dispatcher or any other file reaches exactly the rows whose pages it changes, wherever the code lives; a new
-  addition skill reaches its own rows, not the ≈ 200 skills that share `gen-operations.js`, unless it changed theirs.
-  If a digest cannot be computed (an error, a skill that cannot be generated), that row and every row of the same
-  category count as changed.
-- **Changes after the digest** — the code that draws and measures in the browser — are found by file: an engine module
-  touches every row of the pairs that use it (the fingerprint); the browser-side parts of `print-sheet.js` (measuring,
-  keys, the document wrapper), `print-generate.js` (it draws every legacy-cell skill) and the stylesheet the printed
-  document carries touch every print row. Stylesheets in `css/` and the screen hosts (`screen-cell.js`,
-  `worksheet.js`, `quiz-take.js`, and `teacher-ui.js` / `teacher-quiz-ui.js`, which `quiz-monitor.js` reaches) touch
-  the screen checks, which already run in full at every deploy (S5 session 2: `ws-screen-slots`,
-  `ws-chromebook-fit`); `index.html` loads every teacher stylesheet beside the hosts, so S5 adds to those sweeps the
-  big-board view (`teacher.css:96` zooms `#gameView`) and dark mode (`teacher.css:850-851` restyles the online
-  worksheet). Files that feed neither — the `index.html` stamp, `search-terms.js`, generated documents, tests and
-  planning files — touch no row;
+- **Which rows a change reaches is found by output, not by file.** At M4 the row-2 lane exports one **pre-draw
+  function** from `print-sheet.js` (`preDraw(req)`, new): it runs the request exactly as `buildSheet` does up to the
+  drawing — the dealt items (`generateRun`, with its de-duplication and retries), the settled instruction text
+  (`settlePrompts`, `instructionKeyFor`, `libraryKeyOf`, the providers), the provider outputs (`strings`,
+  `workedSteps`, `wrongAnswer`), the option values and presets in force, and each cell's declared footprint — and
+  stops before any cell is measured or drawn. Its output, hashed, is the row's **input digest**. Measured sizes are
+  not in it: they come from the browser and are handled by file (next list). `ws-coverage-matrix --digest` (new, E1)
+  computes the digests of all rows in one fresh browser profile (no cookies, no localStorage; seeds are always given,
+  so `Math.random` is never reached — `print-sheet.js:89`), at ≈ 0.7 ms an item (measured 2026-10-23: 1,200 items in
+  0.84 s), ≈ 650,000 items ≈ 8 minutes. The nightly stores its digests with its commit, so `--affected <commit
+  range>` computes only the tip's digests and lists every row whose digest differs from the stored one. A change to a
+  generator module, a provider, `skill-presets.js`, `sheet/instructions.js`, the dispatcher or any other file
+  therefore reaches exactly the rows whose pages it changes, wherever the code lives; a new addition skill reaches its
+  own rows, not the ≈ 200 skills that share `gen-operations.js`, unless it changed theirs. If a digest cannot be
+  computed at either end (an error; a skill that does not exist at the base, such as a new one), that row and every row
+  of the same category count as changed.
+- **Changes after the pre-draw** — the code and styles that measure and draw in the browser — are found by file:
+  - an engine module touches every row of the pairs that use it (the fingerprint);
+  - every **print row** is touched by: the browser-side parts of `print-sheet.js` (`measureItems`, the key path
+    including `legacyKeyFill`, the document wrapper `sheetDocument`), `print-generate.js` (it draws every legacy-cell
+    skill), the printed document's eight stylesheets `SHEET_STYLESHEETS` (`print-sheet.js:69-72`: `css/brand.css`,
+    `css/variables.css`, `css/base.css`, `css/ui-components.css`, `css/word-problem-visuals.css`,
+    `css/print-worksheet.css`, `css/fonts/andika.css`, `css/sheet-kit.css`) and `SHEET_ENGINE_CSS`
+    (`sheet/roles/practice.js`). Cells are measured today in the app document, under every stylesheet `index.html`
+    loads, so E1 moves measuring into a frame that loads only `SHEET_STYLESHEETS` and `SHEET_ENGINE_CSS`, with a
+    self-test that the measurements match the app document's on the role sample; until then every `css/` file touches
+    every print row;
+  - every other `css/` file and the screen hosts (`screen-cell.js`, `worksheet.js`, `quiz-take.js`, and
+    `teacher-ui.js` / `teacher-quiz-ui.js`, which `quiz-monitor.js` reaches) touch the screen checks, which run in full
+    at every deploy (S5 session 2: `ws-screen-slots`, `ws-chromebook-fit`). `index.html` loads every teacher stylesheet
+    beside the hosts, so two new sweep modes check the big-board view (`teacher.css:96` zooms `#gameView`) and dark
+    mode (`teacher.css:850-851` restyles the online worksheet) on a fixed sample — every screen host × one skill per
+    template — inside session 2's time;
+  - files that feed neither — the `index.html` stamp, `search-terms.js`, generated documents, tests and planning
+    files — touch no row;
 - a row's **dependency hash** = its input digest + the structural fingerprints of its pairs + a hash of the
-  browser-side render files above. A row is re-run when its dependency hash changes; a row already green for the same
+  print render files above. A row is re-run when its dependency hash changes; a row already green for the same
   hash is not run again;
 - the **nightly job** runs in its own cloud session (a scheduled task) on the tip of the integration branch
   (`claude/sweet-newton-c8wrv1`), records the commit and writes `design/audit/matrix/<date>.json`. It re-runs the
@@ -370,8 +383,8 @@ flags E1 adds: `--kind single|sections|mixed`, `--pages N` and `--bring-back`.
 - the **first nightly writes the per-row baseline** (every finding on every row at that commit, with a STATUS note of
   the counts), extending S9's per-skill baseline to the new rows; a **red row** is any finding beyond that baseline, or
   any other gate failure on the row;
-- **at deploy** (S5) only the affected rows since the nightly's commit run, within a budget of 500 documents (≈ 15 min
-  on two slots) in a deploy session of its own, beside the gate sessions (S5). Above the budget — any change to an
+- **at deploy** (S5 session 3) the tip's digests are computed (≈ 8 min) and only the affected rows run, within a budget
+  of 500 documents (≈ 15 min on two slots): ≈ 23 minutes, beside the gate sessions. Above the budget — any change to an
   engine module or a browser-side render file — the deploy triggers the sharded full run (≈ 3.5 h) and waits for it. Rows
   already green in the cache for the same dependency hash are not run again: a lane's precritic runs its skills' rows
   on its own session, so a 20-skill E3 family (≈ 1,500 documents) reaches the deploy already cached, and the deploy
@@ -530,7 +543,7 @@ flags E1 adds: `--kind single|sections|mixed`, `--pages N` and `--bring-back`.
 
 | Step | Work | Files | Done when |
 |---|---|---|---|
-| E1 | Envelopes, all-pairs sampling, structural fingerprint (binding-level engine modules), certificates, the coverage matrix with option rows, `--affected`, the dependency cache, the nightly job and the first per-row baseline, the packer proof and its print-time asserts (tools built in Wave 0; the first certificate after M4) | `tests/scripts/ws-envelope.mjs` (new), `tests/scripts/ws-coverage-matrix.cjs` (new), `tests/scripts/ws-packer-proof.mjs` (new), `tests/scripts/ws-print-lint.cjs` (`--kind`, `--pages`, `--bring-back`); the print-time asserts in `sheet/roles/mixed-practice.js` and the move of `print-sheet.js`'s measuring and key path into a module of its own are done by the row-2 lane at M4, which owns those files, `ws-grade-render.cjs` (`--envelope <template>--<kind>`, new flag), `design/audit/certified/`, `design/audit/matrix/` | `stack` × Single skill certified by running its all-pairs sample after M4; its certificate lists every page and score source; `ws-envelope --engine` prints the engine lists of §1.6.2; a deliberate change to `layout.js` voids `stack` × Single skill in a dry run, while a change to one provider, to a template the pair does not reach, or (after M3) to one preset or one instruction string voids nothing; a one-line change to `print-generate.js` makes `--affected` list every print row, while one new skill's commit in the project's usual shape — its SKILLS row, a new branch in `gen-operations.js` and its dispatcher entry, provider, `SKILL_STANDARDS` / `SKILL_WRM` entries, search terms and its pinned share code in `skill-codes-frozen.js` — plus the `index.html` stamp lists only that skill's rows; changing one instruction string lists exactly the rows whose items print it (checked against a full render); the digests of all 715 skills compute in ≤ 10 minutes; `ws-envelope --self-test` fails on a declared data leaf that exports a function; the nightly matrix runs and its first run writes the per-row baseline (STATUS note); a seeded new finding beyond that baseline turns its row red and blocks a test deploy; `--affected` on a one-generator change lists only that generator's skills |
+| E1 | Envelopes, all-pairs sampling, structural fingerprint (binding-level engine modules), certificates, the coverage matrix with option rows, `--affected`, the dependency cache, the nightly job and the first per-row baseline, the packer proof and its print-time asserts (tools built in Wave 0; the first certificate after M4) | `tests/scripts/ws-envelope.mjs` (new), `tests/scripts/ws-coverage-matrix.cjs` (new), `tests/scripts/ws-packer-proof.mjs` (new), `tests/scripts/ws-print-lint.cjs` (`--kind`, `--pages`, `--bring-back`); the print-time asserts in `sheet/roles/mixed-practice.js` and the move of `print-sheet.js`'s measuring and key path into a module of its own are done by the row-2 lane at M4, which owns those files, `ws-grade-render.cjs` (`--envelope <template>--<kind>`, new flag), `design/audit/certified/`, `design/audit/matrix/` | `stack` × Single skill certified by running its all-pairs sample after M4; its certificate lists every page and score source; `ws-envelope --engine` prints the engine lists of §1.6.2; a deliberate change to `layout.js` voids `stack` × Single skill in a dry run, while a change to one provider, to a template the pair does not reach, or (after M3) to one preset or one instruction string voids nothing; a one-line change to `print-generate.js` makes `--affected` list every print row, while one new skill's commit in the project's usual shape — its SKILLS row, a new branch in `gen-operations.js` and its dispatcher entry, provider, `SKILL_STANDARDS` / `SKILL_WRM` entries, search terms and its pinned share code in `skill-codes-frozen.js` — plus the `index.html` stamp lists only that skill's rows; changing one instruction string lists exactly the rows whose items print it (checked against a full render); the digests of every row compute in ≤ 10 minutes (≈ 650,000 items at ≈ 0.7 ms) through `preDraw`; measuring in the stylesheet frame matches the app document on the role sample; `ws-envelope --self-test` fails on a declared data leaf that exports a function; the nightly matrix runs and its first run writes the per-row baseline (STATUS note); a seeded new finding beyond that baseline turns its row red and blocks a test deploy; `--affected` on a one-generator change lists only that generator's skills |
 | E2 | Certify Single skill and Sections for the live skills' templates (after M4 is merged); the mixed packer and Mixed practice at M5; the Quiz layer with T3 | the files each lane owns (§1.6.5) | every pair the live skills use certified, or listed as outside with the reason |
 | E3 | Provider pass by family, largest first | `js/modules/sheet/providers/*`, the cards, `tests/scripts/ws-catalogue.cjs` (template column), `tests/scripts/ws-content-audit.cjs` (each family's name rules) | `real` providers 715 / 715 (pools through their members; legacy-cell skills listed); `ws-providers-unit` green; `ws-coverage-matrix` green (§1.6.5 item 3) |
 | E4 (later lesson wave, if needed) | Lesson-packet pages certified; shapes file; compiler; lesson precritic; recompile 1–5 + hold-out lesson 6 | `js/modules/lessons/compile.js`, `design/lessons/SHAPES.md`, `js/modules/lessons/shapes/*.js` (new), `tests/scripts/ws-detailed-lesson.cjs` | §1.6.5 Lessons items 1–6 done |
@@ -952,7 +965,7 @@ reproduced.
 | M1 | `interleave()` + self-test (with the weights-win case); the `arrangement` field and code flag; Mixed practice for skills of the same size class inside today's packer; the Q-M1 edits to PAGE_TYPES 5.2, DN-34 and `anchors.js` | `sheet/interleave.js` (new), `print-sheet.js`, `skill-codes.js`, `sheet/anchors.js`, `design/PAGE_TYPES.md`, `WORKSHEET_DESIGN_STANDARD.md` | self-test green; `ws-code-snapshot` green; a 4-skill same-size page renders mixed with no run > 2 |
 | M2 | Size classes (incl. measured legacy cells) + the 2 × 2 block packer (small boxes of different skills share blocks; runs counted in turns) + numbering + rebalanced last page + page units, the capacity sum, two-of-each and rotation across pages | `sheet/roles/mixed-practice.js`, `sheet/layout.js`, `sheet/paginate.js` | print-lint mixed rules green on the critic set at S / M / L |
 | M3 | `strings.cue` (fallback rule first, then real cues family by family) + the in-cell cue + lint | `sheet/contract.js` (also: `INSTRUCTION_LIBRARY` moved to `sheet/instructions.js` (new), the preset lookup registered by `js/modules/kit-setup.js` (new), imported by `print-sheet.js`, `screen-cell.js` and the node test harness — §1.6.2), `sheet/providers/*`, `sheet/cell.js` | every skill has a cue or is listed on the fallback; lint green |
-| M4 | Frame subtitle, readable footer, key legend by skill, the measured examples bands with their greyed fallback, the arrangement and examples choices in the worksheet sheet, the summary line (replacing PT-MIX-8) | `sheet/frame.js`, `sheet/roles/answer-key.js`, `print-sheet.js` (its measuring and key path moved into a module of its own, E1), `sheet/anchors.js` (compact bands on Mixed practice pages); the worksheet-sheet choices themselves are added by the T3 lane in `teacher-print.js` | screens and keys match §3.3 |
+| M4 | Frame subtitle, readable footer, key legend by skill, the measured examples bands with their greyed fallback, the arrangement and examples choices in the worksheet sheet, the summary line (replacing PT-MIX-8) | `sheet/frame.js`, `sheet/roles/answer-key.js`, `print-sheet.js` (its measuring and key path moved into a module of its own, and the `preDraw` export, E1), `sheet/anchors.js` (compact bands on Mixed practice pages); the worksheet-sheet choices themselves are added by the T3 lane in `teacher-print.js` | screens and keys match §3.3 |
 | M5 | Online worksheet and quiz parity; independent critic; certify the mixed packer and Mixed practice (E2) | `worksheet.js`, `quiz-take.js` | critic ≥ 8 on every page, size and host; the packer's certificate written and `ws-packer-proof` green; Mixed practice certified for the live skills' templates |
 
 ---
