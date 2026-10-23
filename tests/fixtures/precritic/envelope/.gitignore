@@ -1,0 +1,2 @@
+# ws-envelope --envelope writes here by default; the envelope is regenerated, never committed
+out/
