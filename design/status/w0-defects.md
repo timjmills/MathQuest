@@ -22,6 +22,7 @@ Base: `claude/sweet-newton-c8wrv1-wip-wave0-gates` @ bfdbd90.
 | Critic r2 (defect 3 rebuild + quiz dot) | mq-opus-medium | 15:28 | 15:52 | 24 |
 | Builder E: board 1280×720 nested clip + dark answered dot (critic r2) | mq-opus-medium | 15:54 | 16:22 | 28 |
 | Critic r3 | mq-opus-medium | 16:25 | — | — |
+| Builder F: light quiz dots (owner ruling) | mq-opus-low | 16:41 | 16:45 | 4 |
 
 ## Defect 3 rebuild (after the critic, mq-opus-medium)
 - Critic: the Board display still scrolled at 1366x768 for `add_sub_fact_family` (+81 px measured, really +162: the centred card also cut the instruction line above its top) and `add_word_problems` (+33, really +65). C3 = 7.
@@ -32,6 +33,6 @@ Base: `claude/sweet-newton-c8wrv1-wip-wave0-gates` @ bfdbd90.
 - `ws-harness.cjs` looks for `chrome-linux/chrome`; this container has `/opt/pw-browsers/chromium-1243/chrome-linux64/chrome`. Set `PUPPETEER_EXECUTABLE_PATH` to it (tests file not changed by this lane).
 - Critic r1: identical on base bfdbd90 (pre-existing, not this lane). `support-numberline --quick` exits FAIL on 18 "X does not fit but offers nlOn…" lines (count_by_*, add/sub_negative, compare_to_half, …) from the option schema, outside this lane's change.
 - Critic r1 follow-ups for the tests owner (W0-A): (a) the dark sweep's legibility scan covers only `.qt-question-card`, so it missed the quiz dot; widen it to the whole host view; (b) `ws-chromebook-fit --bigboard` can read the board controls mid `fadeSlide` entrance (translateY 24 px → "bottom 772 of 768", 1 run in 6): wait for `#gameView.getAnimations()` or emulate reduced motion; (c) `ws-harness.cjs` looks for `chrome-linux/` but the container has `chrome-linux64/`.
-- Light-mode quiz dot palette is below 4.5:1 on plain (2.89), answered (2.80), flagged (2.34), current+flagged (1.65) — older code, needs an owner/palette decision (not changed here).
+- Light-mode quiz dots: owner ruling "use darker dots" (via the lead, 16:40). 6d79970 appends `html:not(.dark) .qt-q-dot…` rules to css/quiz-mode.css: every state ≥ 6.72:1 (was 1.65–4.64), told apart by fill / solid vs dashed border / purple fill or ring, not colour alone; dark unchanged.
 - `ws-stamp-assets --check` reports index.html stale; stamping is the deploy step's job, not this lane's.
 - Gate gap (tests owner): `ws-chromebook-fit --bigboard` does not cover 1280×720 nor count clipping inside nested scroll boxes; the critic's probe (scratchpad r3/probe-fit.cjs) did.
