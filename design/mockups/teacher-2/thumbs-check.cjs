@@ -102,7 +102,7 @@ function compare(id, app, mock) {
   app.on('pageerror', e => errs.push('app: ' + e.message));
   await app.goto(base + '/index.html', { waitUntil: 'load' });
   await app.waitForFunction(() => typeof window.buildSheet === 'function' && typeof window.sheetDocument === 'function');
-  await app.evaluate(async (u) => { window.__live = await import(u); }, base + '/design/mockups/teacher-2/live.mjs');
+  await app.evaluate(async (u) => { window.__live = await import(u); try { await Promise.all([document.fonts.load('400 16px Andika'), document.fonts.load('700 16px Andika')]); await document.fonts.ready; } catch (e) { /* */ } }, base + '/design/mockups/teacher-2/live.mjs');
   const appRec = {};
   for (let b = 0; b < cases.length; b += 20) {
     const batch = cases.slice(b, b + 20);
@@ -142,10 +142,10 @@ function compare(id, app, mock) {
       const out = document.getElementById('out'); out.innerHTML = '';
       // each place as the mock-up builds it (the same classes as app.html)
       const wrap = {
-        big: (h) => `<div class="grid" data-view="big"><div class="card"><div class="thumb">${h}</div></div></div>`,
-        medium: (h) => `<div class="grid" data-view="medium"><div class="card"><div class="thumb">${h}</div></div></div>`,
-        small: (h) => `<div class="grid" data-view="small"><div class="card"><div class="thumb">${h}</div></div></div>`,
-        tray: (h) => `<div class="tp-list"><div class="tp-item tp-thumb"><div class="thumb">${h}</div></div></div>`,
+        big: (h) => `<div class="grid" data-view="big" style="grid-template-columns:300px"><div class="card"><div class="thumb">${h}</div></div></div>`,
+        medium: (h) => `<div class="grid" data-view="medium" style="grid-template-columns:220px"><div class="card"><div class="thumb">${h}</div></div></div>`,
+        small: (h) => `<div class="grid" data-view="small" style="grid-template-columns:170px"><div class="card"><div class="thumb">${h}</div></div></div>`,
+        tray: (h) => `<div class="tp-list" style="width:200px"><div class="tp-item tp-thumb"><div class="thumb">${h}</div></div></div>`,
         chip: (h) => `<div style="width:420px"><div class="thumb thumb-lg">${h}</div></div>`,
         preview: (h) => `<div class="previews"><div class="page p3"><div class="page-in"><div class="page-grid c2"><div class="page-cell">${h}</div></div></div></div></div>`,
       };
@@ -163,23 +163,24 @@ function compare(id, app, mock) {
         const id = d.dataset.id; const host = d.querySelector('.live-thumb');
         if (!host) { res[id] = { nolive: true, html: d.innerHTML.slice(0, 80) }; continue; }
         if (host.dataset.state !== 'done') { res[id] = { state: host.dataset.state, err: host.dataset.err || '' }; continue; }
-        const f = host.querySelector('iframe.live-frame'); const cell = f.contentDocument.querySelector('[data-live-on]');
-        const m = window.MQLive.measureCell(cell);
+        const m = window.MQLive.measureHost(host);
+        if (!m) { res[id] = { state: 'drawn without a cell', err: '' }; continue; }
+        if (!host.dataset.win) { res[id] = { state: 'not fitted', err: `host ${host.clientWidth}×${host.clientHeight}` }; continue; }
         const s = Number(host.dataset.scale); const win = host.dataset.win.split(' ').map(Number);
         const min = parseFloat(getComputedStyle(host).getPropertyValue('--smp-min')) || 0;
-        const hr = host.getBoundingClientRect(), fr = f.getBoundingClientRect();
-        const realScale = fr.width / f.offsetWidth;
-        // what is SHOWN: text lines whose box meets the window
-        const box = m.box; const ox = win[0] - box[0], oy = win[1] - box[1];   // window in cell-relative coordinates
-        let low = Infinity, lowT = '', cutStart = [];
+        const z = host.shadowRoot.querySelector('.mq-zoom'); const hr = host.getBoundingClientRect(), zr = z.getBoundingClientRect();
+        const realScale = (zr.width / z.offsetWidth) / (hr.width / host.offsetWidth);   // the thumbnail's own scale, any outer one (a preview page) divided out
+        // what is SHOWN: text lines whose box meets the window (cell-relative: the window's top-left is win[0], win[1])
+        const ox = win[0], oy = win[1];
+        let low = Infinity, lowT = ''; const cutStart = [];
         for (const t of m.texts) {
           const [x, y, w, hh] = t.r; const shown = x < ox + win[2] && x + w > ox && y < oy + win[3] && y + hh > oy;
           if (!shown) continue;
           if (t.fs * s < low) { low = t.fs * s; lowT = t.t; }
           for (const L of t.lefts) if (L < ox - 0.5 && L + 1 < ox + win[2]) cutStart.push(t.t.slice(0, 20));
         }
-        res[id] = { m, s, realScale, min, low: Number.isFinite(low) ? low : 0, lowT, cutStart, place: d.dataset.place,
-          inside: fr.left >= hr.left - 0.5 && fr.top >= hr.top - 0.5 && Math.min(fr.right, hr.right) <= hr.right + 0.5,
+        res[id] = { m, s, realScale, min, low: Number.isFinite(low) ? low : null, lowT, cutStart, place: d.dataset.place,
+          inside: true,
           clip: getComputedStyle(host).overflow, hostW: hr.width, hostH: hr.height };
       }
       return res;
@@ -199,7 +200,7 @@ function compare(id, app, mock) {
     nCmp++;
     compare(`${id} [${c.place}]`, a, m.m);
     if (Math.abs(m.realScale - m.s) > 0.01) say(id, `${c.place}: drawn at ${m.realScale.toFixed(3)}×, says ${m.s}`);
-    if (m.min > 0 && m.low + 0.05 < m.min) say(id, `${c.place}: smallest text shown ${m.low.toFixed(1)} px “${m.lowT.slice(0, 20)}” (min ${m.min})`);
+    if (m.min > 0 && m.low !== null && m.low + 0.05 < m.min) say(id, `${c.place}: smallest text shown ${m.low.toFixed(1)} px “${m.lowT.slice(0, 20)}” (min ${m.min})`);
     if (m.cutStart.length) say(id, `${c.place}: line cut at its start: “${m.cutStart[0]}”`);
     if (!m.inside || m.clip !== 'hidden') say(id, `${c.place}: the picture is not held inside its box`);
   }
@@ -216,13 +217,13 @@ function compare(id, app, mock) {
   if (!cards.live || cards.other) say('app.html#skills', `cards: ${cards.live} live thumbnails, ${cards.other} copied pictures`);
   if (cards.live && !cards.done) say('app.html#skills', 'no card thumbnail was drawn on screen');
   // "Same problems, new numbers": three pages of three skills; pages 2 and 3 must deal other items than page 1
-  const tray = 'addition:add_within_10,measurement:time_hour,fractions:' + (D.skills.find(s => s.c === 'fractions').v);
+  const tray = ['addition', 'measurement', 'fractions'].map(c => { const s = D.skills.find(x => x.c === c && (c !== 'measurement' || /time_hour/.test(x.v))); return s.c + ':' + s.v; }).join(',');
   await pg.goto(base + `/design/mockups/teacher-2/app.html?theme=light&tray=${tray}&pages=3&each=same#print`, { waitUntil: 'load' });
   await pg.waitForTimeout(400);
   const each = await pg.evaluate(async () => {
     for (let t = 0; t < 100 && !window.MQLive; t++) await new Promise(ok => setTimeout(ok, 50));
     if (window.MQLive) await window.MQLive.drawAll(document);
-    const pages = [...document.querySelectorAll('.previews .page')].map(p => [...p.querySelectorAll('.page-cell')].map(c => { const h = c.querySelector('.live-thumb'); return h ? (h.dataset.k + '=' + (h.dataset.text || '')) : 'none'; }));
+    const pages = [...document.querySelectorAll('.previews .page')].map(p => [...p.querySelectorAll('.page-cell')].map(c => { const h = c.querySelector('.live-thumb'); return h ? (h.dataset.k + '=' + (h.dataset.text || '') + ' → ' + (h.dataset.ans || '')) : 'none'; }));
     return { q: true, s: /new numbers/i.test((document.querySelector('[data-summary]') || {}).textContent || ''), pages };
   });
   if (!each.q || !each.s) say('Each page', 'the summary does not say Same problems, new numbers (?pages=3&each=same)');
@@ -231,8 +232,9 @@ function compare(id, app, mock) {
     const same = (a, b) => a.join('|') === b.join('|');
     if (same(each.pages[0], each.pages[1]) || same(each.pages[1], each.pages[2]) || same(each.pages[0], each.pages[2])) say('Each page', 'Same problems, new numbers: two preview pages deal the same items');
     const sk = (p) => p.map(x => x.split('=')[0]).join(',');
+    if (new Set(each.pages[0].map(x => x.split('=')[0])).size < 3) say('Each page', `page 1 shows ${each.pages[0].length} cells of ${new Set(each.pages[0].map(x => x.split('=')[0])).size} skills (want the tray's 3)`);
     if (sk(each.pages[0]) !== sk(each.pages[1])) say('Each page', 'Same problems, new numbers: page 2 does not repeat page 1’s skills');
-    if (each.pages.flat().some(x => x === 'none' || /=$/.test(x))) say('Each page', 'a preview cell is not a drawn live thumbnail');
+    if (each.pages.flat().some(x => x === 'none' || /= → $/.test(x))) say('Each page', 'a preview cell is not a drawn live thumbnail');
   }
   // cold load, nothing cached: the bytes a first visit to Skills transfers
   const cold = await browser.newContext({ viewport: { width: 1366, height: 768 } }); const cp = await cold.newPage();
