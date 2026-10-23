@@ -146,6 +146,16 @@ and delete the entry. Lanes in `FROZEN_LANES` keep their order: new entries for 
 design); run it with `--report-only` meanwhile, and do not add it to an all-gates-must-pass list yet. A
 new skill that teaches a WRM step gets a `SKILL_WRM` entry, and its step comes off `WRM_PROPOSALS`.
 
+**Every new skill is linked in the same change (owner rule, 2026-10-23, "make sure and continue to tag all new skills"):**
+1. **White Rose lessons** — its `SKILL_WRM` tag(s) (`{step, partial}` when it covers part), and the curated year record in
+   `data/curriculum/links/<YEAR>.json` lists it as `direct` for that step (and for any school-site lesson it teaches);
+2. **Prerequisite skills** — it appears in the `pre` list of the steps / lessons it prepares for, and its own step's
+   `pre` names the skills a pupil needs first;
+3. **Related skills** — it appears in the `related` list of steps that share its CCSS code or sit next to it in the unit.
+A preset skill (an option recorded as a skill) is linked the same way. `node tests/scripts/ws-wrm-page-unit.mjs` and
+`ws-wrm.cjs --report-only` must stay green; a new skill with no WRM, prerequisite or related link is a defect the lane fixes
+before its critic.
+
 ## Researching Skills Before Implementation
 
 **The design contract above outranks every reference site.** Research tells you *what to teach and
