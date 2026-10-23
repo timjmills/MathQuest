@@ -178,6 +178,30 @@ body.teacher-mode.tv-bigboard #gameView #tvBoardCtl { display: flex; }
     .tvb-row .tvb-grow { display: none; }
     .tvb-row .tvb-btn { flex: 1 1 auto; }
 }
+/* Board fit, short boards (W0-defects, 1366x768): the space comes from the frame, never the
+   question. A centred card that overflows is scrolled from its top (safe), not cut above it. */
+body.teacher-mode.tv-bigboard #gameView #questionCard { justify-content: safe center; align-items: safe center; }
+@media (max-height: 800px) and (min-width: 601px) {
+    body.teacher-mode.tv-bigboard #gameView.active { padding: 12px 16px; gap: 8px; }
+    body.teacher-mode.tv-bigboard #gameView #questionCard { padding: 12px 16px; }
+}
+/* The side rail (launch-chrome.js fitBoard adds .tvb-rail only when a question does not fit at its
+   normal size with the bar above and the controls below): the card takes the board's whole height,
+   the chips sit at the top of a rail on the right and the controls (and the answer) at its foot. */
+body.teacher-mode.tv-bigboard #gameView.active.tvb-rail {
+    display: grid; grid-template-columns: minmax(0, 1fr) 216px; grid-template-rows: auto minmax(0, 1fr) auto;
+    column-gap: 16px; row-gap: 12px;
+}
+body.teacher-mode.tv-bigboard #gameView.tvb-rail #questionCard { grid-column: 1; grid-row: 1 / 4; }
+body.teacher-mode.tv-bigboard #gameView.tvb-rail #tvBoardBar {
+    grid-column: 2; grid-row: 1; flex-direction: column; align-items: flex-start; gap: 8px;
+}
+body.teacher-mode.tv-bigboard #gameView.tvb-rail #tvBoardCtl { grid-column: 2; grid-row: 3; }
+body.teacher-mode.tv-bigboard #gameView.tvb-rail .tvb-title { flex: none; max-width: 100%; white-space: normal; }
+body.teacher-mode.tv-bigboard #gameView.tvb-rail .tvb-row { flex-direction: column; align-items: stretch; gap: 8px; }
+body.teacher-mode.tv-bigboard #gameView.tvb-rail .tvb-row .tvb-grow { display: none; }
+body.teacher-mode.tv-bigboard #gameView.tvb-rail .tvb-answer { flex-direction: column; gap: 4px; padding: 12px 16px; }
+body.teacher-mode.tv-bigboard #gameView.tvb-rail .tvb-answer-v { overflow-wrap: anywhere; }
 
 /* ---------------------------------------------------------------- the worked example ("Show me how") */
 .mq-worked-preview-overlay.mq-how-teacher {

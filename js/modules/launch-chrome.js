@@ -211,21 +211,36 @@ function quietGameClocks() {
 /* Board fit: the question is drawn as BIG as the board allows without scrolling. The CSS zoom
    (1.6, 1.25 under 1024px, 1 under 600px; css/play-teacher.css) is the cap; when the paper at that
    zoom would scroll the white card, the zoom comes down to the largest that fits, never below 1
-   (content never shrinks below its normal size; at 1 the card's own scroll is the fallback).
+   (content never shrinks below its normal size).
+   When even zoom 1 does not fit with the chip bar above the card and the controls below it (a tall
+   question on a short board, e.g. 1366x768), the bar and the controls move to a side rail
+   (#gameView.tvb-rail, css/play-teacher.css) so the card gets the board's whole height, and the
+   zoom is fitted again; only then is the card's own scroll the fallback.
    Recomputed on every question render, on reveal, on resize and when the board starts. */
 function fitBoard() {
     const paper = document.getElementById('questionPaper');
     const card = document.getElementById('questionCard');
     if (!paper || !card) return;
+    const gv = document.getElementById('gameView');
+    if (gv) gv.classList.remove('tvb-rail');
     paper.classList.remove('tvb-fitted');
     paper.style.removeProperty('--tvb-fit');
     if (!isBoard()) return;
     const cap = parseFloat(getComputedStyle(paper).zoom) || 1;
     if (cap <= 1) return;
-    const gv = document.getElementById('gameView');
-    const fits = () => card.scrollHeight <= card.clientHeight + 1 && card.scrollWidth <= card.clientWidth + 1
-        && (!gv || (gv.scrollHeight <= gv.clientHeight + 1 && gv.scrollWidth <= gv.clientWidth + 1));
-    if (fits()) return;
+    if (fitZoom(paper, card, gv, cap) || !gv) return;
+    gv.classList.add('tvb-rail');
+    paper.classList.remove('tvb-fitted');
+    paper.style.removeProperty('--tvb-fit');
+    fitZoom(paper, card, gv, cap);
+}
+
+/* The largest zoom in [1, cap] at which the board does not scroll; returns whether it fits. */
+function fitZoom(paper, card, gv, cap) {
+    // No tolerance: 1 px of overflow still draws a scroll bar on a board with classic scroll bars.
+    const fits = () => card.scrollHeight <= card.clientHeight && card.scrollWidth <= card.clientWidth
+        && (!gv || (gv.scrollHeight <= gv.clientHeight && gv.scrollWidth <= gv.clientWidth));
+    if (fits()) return true;
     // First guess from the overflow ratio, then step down until it fits.
     const cs = getComputedStyle(card);
     const availH = card.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
@@ -239,6 +254,7 @@ function fitBoard() {
         if (z <= 1 || fits()) break;
         z = Math.max(1, Math.round((z - 0.05) * 100) / 100);
     }
+    return fits();
 }
 
 let fitObs = null;
