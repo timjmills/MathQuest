@@ -6,8 +6,10 @@ task has been created.** The lane lead creates it (one task, or eight with `SHAR
 
 ## What a night runs
 
-- **First run** (no `baseline.json` here): every row of every live skill, writing the per-row baseline
-  `baseline.json` (with shards, `baseline.shard-i-of-n.json`; every reader merges them). Add a STATUS note with the
+- **First run** (no nightly run file `<date>.json` here yet): every row of every live skill, writing the per-row
+  baseline into `baseline.json` (with shards, `baseline.shard-i-of-n.json`; every reader merges them). The rows
+  already in `baseline.json` (the E1 builder check pinned `addition:add_100_regroup` and `addition:add_20_regroup`
+  on 2026-10-23) are re-pinned at the nightly's commit. Add a STATUS note with the
   counts (the lane lead writes it; the session does not edit `design/STATUS.md`).
 - **Every later night**: the rows the commits since the last nightly reach (`--affected <last>..HEAD`) plus the
   rotating seventh of all rows (`--seventh <UTC weekday mod 7>`), so every row runs at least weekly. Rows already OK
@@ -15,10 +17,10 @@ task has been created.** The lane lead creates it (one task, or eight with `SHAR
   or a render error.
 - **Before M4** (no record / replay) a change to any print input reaches every print row, so such a night is the
   full matrix: 10,922 printable rows = 32,766 documents on 2026-10-23 (`ws-coverage-matrix --all --list`), about
-  15 h on two slots at the 0.6 documents/s measured with batching (`README` below) - more than one night, so it is
-  sharded over eight sessions (`SHARD=1/8` ... `SHARD=8/8`, about 2 h each). A night whose commits touch only
+  29 h on two slots at the 0.31 documents/s measured on a real mixed run (below) - more than one night, so it is
+  sharded over eight sessions (`SHARD=1/8` ... `SHARD=8/8`, about 3.7 h each). A night whose commits touch only
   planning files, tests, generated documents, `search-terms.js` or the `index.html` stamp runs only its seventh
-  (about 4,700 documents, about 2 h).
+  (about 1,560 rows = 4,700 documents, about 4.2 h on two slots).
 - Output: `design/audit/matrix/<UTC date>.json` (`<date>.shard-i-of-n.json` per shard): the commit, the selection,
   every row with its per-size counts, status (OK / CACHED / RED / PENDING(step) / N/A) and dependency hash, and the
   timing. The deploy gate (S5 session 3) refuses a deploy when the newest nightly is older than 24 hours or a row of
@@ -47,5 +49,14 @@ deploy gate reads all `<date>.shard-*.json` of the newest date.
 
 ## Measured cost (2026-10-23, this container, two shared browser slots)
 
-See the timings recorded in `design/audit/matrix/2026-10-23.json` (`timing`) and the E1 report: documents/s at
-`--slots 1` and `--slots 2`, with one document per browser start and with nine.
+| Run | Documents | Wall | Documents/s |
+|---|---|---|---|
+| 4 Single skill rows of `addition:add_20_regroup`, `--slots 1 --batch 1` (a browser start per document) | 12 | 85.1 s | 0.141 |
+| the same, `--slots 1 --batch 12` (one browser start) | 12 | 52.9 s | 0.227 |
+| the same, `--slots 2 --batch 1` | 12 | 48.1 s | 0.249 |
+| the same, `--slots 2 --batch 6` | 12 | 31.4 s | 0.382 |
+| every printable row of `addition:add_100_regroup` and `addition:add_20_regroup` (34 rows, Sections pages up to 10 + 5 key pages), `--slots 2 --batch 9` | 102 | 326.7 s | 0.312 |
+
+Batching saves about 2.9 s a document (one browser start and app boot); two slots add about 1.7x. No time in these
+four comparison runs was spent waiting for a slot another session held (the runner's wait log); the 102-document run
+predates the wait accounting, and one of its batches took 97.9 s against about 50 s for the others.

@@ -8,7 +8,7 @@
 #
 # What it does, on the checked-out tip of the integration branch (claude/sweet-newton-c8wrv1):
 #   1. refuses unless HEAD is the fetched tip of origin/claude/sweet-newton-c8wrv1 (the matrix records that commit);
-#   2. FIRST RUN (no design/audit/matrix/baseline.json and no baseline.shard-*.json): every row of every live skill
+#   2. FIRST RUN (no nightly run file <date>.json in design/audit/matrix/ yet): every row of every live skill
 #      (--all), and writes the per-row baseline (with SHARD: baseline.shard-i-of-n.json, merged by every reader);
 #   3. otherwise: the rows the commits since the last nightly reach (--affected <last nightly's commit>..HEAD; before
 #      M4 that is every print row whenever a print input changed, and none when only planning files, tests, generated
@@ -52,12 +52,11 @@ for (const f of runs.reverse()) { try { const j = JSON.parse(fs.readFileSync(d +
 ' "$DIR")
 
 ARGS=(--all --slots "$SLOTS" --out "$DIR/$DATE$SUFFIX.json" --cache "$DIR/cache$SUFFIX.json" --report-only "${SHARD_ARGS[@]}")
-if [ ! -f "$DIR/baseline.json" ] && ! ls "$DIR"/baseline.shard-*.json >/dev/null 2>&1; then
+if [ -z "$LAST" ]; then
+  # no nightly has run yet: every row, and its counts become the per-row baseline (merged with the rows a
+  # builder's own check pinned before, e.g. the E1 check of two skills)
   MODE="first run: every row, writes the per-row baseline"
   ARGS+=(--baseline "$DIR/baseline.json" --write-baseline)
-elif [ -z "$LAST" ]; then
-  MODE="no earlier nightly run file: every row against the baseline"
-  ARGS+=(--baseline "$DIR/baseline.json")
 else
   MODE="affected ${LAST:0:8}..${HEAD:0:8} + seventh $DOW"
   ARGS+=(--affected "$LAST..$HEAD" --seventh "$DOW" --baseline "$DIR/baseline.json")

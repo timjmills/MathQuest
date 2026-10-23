@@ -54,7 +54,7 @@
 //   Quiz layer     quiz-single / quiz-sections / quiz-mixed: PENDING(T3) - 3
 //   Fade rows are N/A for a skill that offers no supports (no `support` option with supportsModel).
 //
-// DEPENDENCY HASH (before M4). A row's hash = the print-input files (the whole-file import closure of
+// DEPENDENCY HASH (before M4). A row's hash = ws-print-lint.cjs + ws-harness.cjs (the checker) + the print-input files (the whole-file import closure of
 // print-sheet.js, print-generate.js and generate-question.js, every css/ file, index.html with its ?v= stamps
 // removed) + the structural fingerprints of the row's (template, kind) pairs (ws-envelope --engine) + the
 // row itself (skills, flags). Before M4 there is no replay, so the print inputs are hashed whole: a change to
@@ -616,7 +616,8 @@ function sizeCell(s) {
     // dependency hash (before M4: the print inputs whole + pair fingerprints + the row)
     const tree = fsTree();
     const inputs = printInputs(tree);
-    const printHash = printInputsHash(tree, inputs);
+    // the checker is an input too: a new lint rule must re-run the rows it was green for
+    const printHash = sha(printInputsHash(tree, inputs) + [PRINT_LINT, path.join(__dirname, '..', 'lib', 'ws-harness.cjs')].map((f) => sha(fs.readFileSync(f))).join(''));
     const fps = engineFingerprints();
     for (const r of rows) r.depHash = depHash(r, printHash, fps);
 

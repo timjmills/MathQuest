@@ -1001,6 +1001,7 @@ td{padding:3px 0;word-break:break-word}`;
         const errorsBefore = problems.length;
         const meta = { skill: `${s.categoryId}:${s.skillId}`, category: s.categoryId, skillId: s.skillId, label: s.label, grade: s.grade, dir: path.relative(OUT, dir) };
         if (unit.opts) meta.opts = unit.opts;
+        if (unit.req) meta.req = unit.req;     // an envelope row's kind options (examples, pages, fade, key)
         try {
             if (!NO_PRINT && LEGACY_PRINT && !s.set) meta.print = await renderPrinted(page, s, dir);
         } catch (e) { meta.print = { error: e.message }; }
@@ -1018,7 +1019,6 @@ td{padding:3px 0;word-break:break-word}`;
             meta.screen = {};
             await storeSupports(page, s, unit.opts);
             const wants = (h) => !unit.hosts || unit.hosts.includes(h);   // an envelope screen row: its host only
-            if (unit.req) meta.req = unit.req;
             if (wants('practice-card')) for (const [w, h, fit] of HOSTS) {
                 const k = fit ? `card-${w}x${h}` : `card-${w}`;
                 try { meta.screen[k] = await renderCard(page, s, w, h, path.join(dir, `${k}.png`), !!fit); } catch (e) { meta.screen[k] = { error: e.message }; }
