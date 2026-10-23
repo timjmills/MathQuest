@@ -47,3 +47,11 @@ Open, for other lanes or the owner:
 - CL-4: the fact cell's problem ends at 61–63 % of the cell height (owner ruling).
 - CL-32: tab width varies with the label's digits within a section (pre-existing, every page).
 - `per-page` arrangement is stored and encoded but not acted on; the teacher controls for arrangement / fill / families are T3's.
+
+## Engine defects from the pilot (lead, 2026-10-23) — fix after M1 passes, before M4; each with a backtest that fails today and passes after
+
+| # | Defect | Where | State |
+|---|---|---|---|
+| E1 | TY-11: step numbers print at 7.0 pt (minimum 8 pt); also on `addition:add_10k_regroup` | `sheet/anchors.js` `lineHtml` | queued |
+| E2 | The anchor cell reserves no height for its step text, so longer worked steps overflow instead of growing the cell (content never overflows or shrinks); needs a machine check | `sheet/anchors.js` | queued |
+| E3 | L-DENSITY H13: columns forced to 2 with side anchors pin a narrow stack to one side of a 92 mm cell; also `addition:add_1k_regroup`, `subtraction:sub_1k_regroup` | anchors side layout | queued |
