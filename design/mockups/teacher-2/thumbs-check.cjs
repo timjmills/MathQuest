@@ -84,7 +84,9 @@ function checkPic(s, seed, out) {
     const bad = (why) => fails.push(`${where}: picture ${g.type} ${why} (problem numbers: ${problem.join(' ') || 'none'})`);
     if (!vals.length) bad('declares no values');
     for (const v of vals) if (!problem.includes(v)) bad(`shows ${v}, which is not in the problem`);
-    for (const v of numsOf(g.body.replace(/<[^>]+>/g, ' '))) if (!problem.includes(v)) bad(`writes ${v}, which is not in the problem`);
+    // a number line may also write the two tenths either side of the problem's number (the rule below checks they are)
+    const ends = g.type === 'numline' ? [at('from'), at('to')] : [];
+    for (const v of numsOf(g.body.replace(/<[^>]+>/g, ' '))) if (!problem.includes(v) && !ends.includes(v)) bad(`writes ${v}, which is not in the problem`);
     const V = vals.map(Number);
     const counters = countIn(g.body, /<circle\b[^>]*class="ctr"/g), crossed = countIn(g.body, /class="x"/g);
     const cells = countIn(g.body, /class="pp"/g), shaded = countIn(g.body, /class="pp"[^>]*fill="#949494"|fill="#949494"[^>]*class="pp"/g);

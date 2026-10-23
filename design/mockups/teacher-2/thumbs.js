@@ -28,7 +28,7 @@
       if (p === null) { body += box(x, 6, size + 10, size + 10); x += size + 18; continue; }
       body += txt(x, size + 6, p, size); x += tw(p, size) + 8;
     }
-    return svg(Math.max(120, Math.ceil(x + 4)), h, body);
+    return svg(Math.max(120, Math.ceil(x + 10)), h, body);
   }
   function lines(rows, size = 22) {      // several rows, each a parts list
     let body = '', w = 120; const lh = size + 20;
@@ -211,7 +211,7 @@
     else if (pic === 'angle') p = ln(px, 62, px + 60, 62, 2.5) + ln(px, 62, px, 12, 2.5) + rect(px, 50, 12, 12, 'none', 1.5);
     else if (pic === 'cube') p = cube(px, 8, 44, 34, 16) + circ(px + 16, 8, 4, '#000');
     else if (pic === 'tally') p = tallyMarks(6, px, 20).s;
-    else if (pic === 'bars') p = `<g transform="translate(${px - 14} -14) scale(0.55)">${bars(rng(word))}</g>`;
+    else if (pic === 'bars') p = `<g transform="translate(${px - 14} -4) scale(0.55)">${bars(rng(word))}</g>`;
     else if (pic === 'plot') p = ln(px, 56, px + 70, 56) + txt(px + 14, 46, '×', 16, 'middle') + txt(px + 14, 34, '×', 16, 'middle') + txt(px + 40, 46, '×', 16, 'middle');
     else if (pic === 'pt') p = grid(5, 4, px, 12, 12) + circ(px + 36, 36, 4, '#000');
     else if (pic === 'list') p = txt(px, 46, '2 5 7 8 9', 16) + `<circle cx="${px + 30}" cy="41" r="10" fill="none" stroke="#000" stroke-width="2"/>`;
@@ -591,21 +591,21 @@
     'int-opposite': (r) => line([`the opposite of ${int(r, 2, 19)} is`, null], 20),
     'int-add': (r) => line([`−${int(r, 2, 9)} + ${int(r, 2, 9)} =`, null]),
     'int-sub': (r) => line([`${int(r, 2, 9)} − ${int(r, 10, 15)} =`, null]),
-    'frac-bar': (r) => { const d = int(r, 3, 6), n = int(r, 1, d - 1); let s = ''; for (let i = 0; i < d; i++) s += rect(10 + i * (150 / d), 10, 150 / d, 34, i < n ? GREY : '#fff'); return svg(220, 100, s + txt(14, 76, 'shaded', 18) + fracBox(140, 74)); },
-    'frac-shade': (r) => { const d = int(r, 3, 6), n = int(r, 1, d - 1); let s = ''; for (let i = 0; i < d; i++) s += rect(10 + i * (150 / d), 10, 150 / d, 34); return svg(220, 100, s + txt(14, 80, 'Shade', 18) + frac(110, 74, n, d)); },
+    'frac-bar': (r) => { const d = int(r, 3, 6), n = int(r, 1, d - 1); let s = ''; for (let i = 0; i < d; i++) s += rect(10 + i * (150 / d), 10, 150 / d, 34, i < n ? GREY : '#fff'); return svg(220, 112, s + txt(14, 76, 'shaded', 18) + fracBox(140, 74)); },
+    'frac-shade': (r) => { const d = int(r, 3, 6), n = int(r, 1, d - 1); let s = ''; for (let i = 0; i < d; i++) s += rect(10 + i * (150 / d), 10, 150 / d, 34); return svg(220, 110, s + txt(14, 80, 'Shade', 18) + frac(110, 74, n, d)); },
     'frac-equiv': (r) => { const d = int(r, 2, 4), n = int(r, 1, d - 1); let s = ''; for (let i = 0; i < d; i++) s += rect(10 + i * (120 / d), 8, 120 / d, 24, i < n ? GREY : '#fff'); for (let i = 0; i < 2 * d; i++) s += rect(10 + i * (60 / d), 40, 60 / d, 24, i < 2 * n ? GREY : '#fff'); return svg(240, 110, s + frac(160, 50, n, d) + txt(184, 58, '=', 22) + fracBox(214, 50)); },
-    'frac-set': (r) => { const d = int(r, 4, 6), n = int(r, 1, d - 1); let s = ''; for (let i = 0; i < d; i++) s += circ(16 + i * 24, 24, 9, i < n ? GREY : '#fff'); return svg(220, 100, s + txt(10, 78, 'part grey', 18) + fracBox(150, 70)); },
+    'frac-set': (r) => { const d = int(r, 4, 6), n = int(r, 1, d - 1); let s = ''; for (let i = 0; i < d; i++) s += circ(16 + i * 24, 24, 9, i < n ? GREY : '#fff'); return svg(220, 108, s + txt(10, 78, 'part grey', 18) + fracBox(150, 70)); },
     'frac-compare': (r) => { const d1 = int(r, 3, 8), d2 = int(r, 3, 8); return svg(200, 80, frac(40, 40, int(r, 1, d1 - 1), d1) + box(80, 20, 36, 36) + frac(160, 40, int(r, 1, d2 - 1), d2)); },
     'frac-order': (r) => svg(240, 84, frac(30, 40, 1, 2) + txt(56, 46, ',', 22) + frac(84, 40, 1, 4) + txt(110, 46, ',', 22) + frac(138, 40, 3, 4) + txt(166, 46, '→', 22) + box(196, 20, 34, 34)),
     'frac-simplify': (r) => { const d = int(r, 3, 6), n = int(r, 1, d - 1), k = int(r, 2, 4); return svg(160, 84, frac(36, 40, n * k, d * k) + txt(70, 48, '=', 24) + fracBox(116, 40)); },
     'frac-mixed-number': (r) => { const d = int(r, 3, 6), w = int(r, 1, 3), n = int(r, 1, d - 1); return svg(200, 84, frac(36, 40, w * d + n, d) + txt(70, 48, '=', 24) + box(96, 22, 30, 34) + fracBox(160, 40)); },
     'frac-round': () => svg(220, 84, txt(8, 48, '2', 28) + frac(44, 40, 7, 8) + txt(70, 48, '≈', 24) + box(100, 22, 36, 36)),
-    'frac-nl': (r) => { const d = int(r, 3, 4); return svg(240, 110, nline(0, 1, { ticks: d * 2, arrowAt: int(r, 1, d * 2 - 1) }).replace(/<svg[^>]*>|<\/svg>/g, '') + fracBox(120, 92)); },
+    'frac-nl': (r) => { const d = int(r, 3, 4); return svg(240, 128, nline(0, 1, { ticks: d * 2, arrowAt: int(r, 1, d * 2 - 1) }).replace(/<svg[^>]*>|<\/svg>/g, '') + fracBox(120, 92)); },
     'frac-whole': (r) => { const d = int(r, 2, 4); let s = ''; for (let i = 0; i < d; i++) s += rect(10 + i * (120 / d), 10, 120 / d, 30, GREY); return svg(220, 90, s + txt(150, 34, '1 =', 22) + fracBox(196, 34)); },
-    'frac-bar-add': (r) => { const d = int(r, 4, 6); let s = ''; for (let i = 0; i < d; i++) s += rect(10 + i * (150 / d), 10, 150 / d, 30, i < 2 ? GREY : '#fff'); return svg(220, 96, s + frac(40, 74, 1, d) + txt(64, 82, '+', 22) + frac(90, 74, 1, d) + txt(114, 82, '=', 22) + fracBox(150, 74)); },
+    'frac-bar-add': (r) => { const d = int(r, 4, 6); let s = ''; for (let i = 0; i < d; i++) s += rect(10 + i * (150 / d), 10, 150 / d, 30, i < 2 ? GREY : '#fff'); return svg(220, 112, s + frac(40, 74, 1, d) + txt(64, 82, '+', 22) + frac(90, 74, 1, d) + txt(114, 82, '=', 22) + fracBox(150, 74)); },
     'frac-add': (r) => { const d = int(r, 4, 9); return svg(220, 84, frac(30, 40, int(r, 1, 3), d) + txt(56, 48, '+', 24) + frac(84, 40, int(r, 1, 3), d) + txt(110, 48, '=', 24) + fracBox(150, 40)); },
     'frac-sub': (r) => { const d = int(r, 5, 9); return svg(220, 84, frac(30, 40, int(r, 4, d - 1), d) + txt(56, 48, '−', 24) + frac(84, 40, int(r, 1, 3), d) + txt(110, 48, '=', 24) + fracBox(150, 40)); },
-    'frac-add-bars': (r) => { const d = int(r, 4, 6); let s = ''; for (let i = 0; i < d; i++) s += rect(10 + i * (120 / d), 4, 120 / d, 22, i < 1 ? GREY : '#fff') + rect(10 + i * (120 / d), 30, 120 / d, 22, i < 2 ? GREY : '#fff'); return svg(220, 110, s + frac(30, 84, 1, d) + txt(56, 92, '+', 22) + frac(84, 84, 2, d) + txt(110, 92, '=', 22) + fracBox(150, 84)); },
+    'frac-add-bars': (r) => { const d = int(r, 4, 6); let s = ''; for (let i = 0; i < d; i++) s += rect(10 + i * (120 / d), 4, 120 / d, 22, i < 1 ? GREY : '#fff') + rect(10 + i * (120 / d), 30, 120 / d, 22, i < 2 ? GREY : '#fff'); return svg(220, 122, s + frac(30, 84, 1, d) + txt(56, 92, '+', 22) + frac(84, 84, 2, d) + txt(110, 92, '=', 22) + fracBox(150, 84)); },
     'frac-sub-bars': (r) => { const d = int(r, 4, 6); let s = ''; for (let i = 0; i < d; i++) { s += rect(10 + i * (150 / d), 8, 150 / d, 30, i < 3 ? GREY : '#fff'); if (i === 2) s += ln(10 + i * (150 / d), 38, 10 + (i + 1) * (150 / d), 8, 2); } return svg(220, 110, s + frac(30, 74, 3, d) + txt(56, 82, '−', 22) + frac(84, 74, 1, d) + txt(110, 82, '=', 22) + fracBox(150, 74)); },
     'frac-add-mixed': () => svg(240, 84, txt(8, 48, '1', 26) + frac(40, 40, 1, 4) + txt(64, 48, '+', 24) + txt(84, 48, '2', 26) + frac(116, 40, 2, 4) + txt(140, 48, '=', 24) + box(162, 22, 26, 34) + fracBox(214, 40)),
     'frac-sub-mixed': () => svg(240, 84, txt(8, 48, '3', 26) + frac(40, 40, 3, 5) + txt(64, 48, '−', 24) + txt(84, 48, '1', 26) + frac(116, 40, 1, 5) + txt(140, 48, '=', 24) + box(162, 22, 26, 34) + fracBox(214, 40)),
@@ -658,7 +658,7 @@
     'area-rect': (r) => { const w = int(r, 3, 9), h = int(r, 2, 6); return svg(220, 90, rect(10, 10, 120, 64) + txt(70, 88, `${w} cm`, 14, 'middle') + txt(136, 46, `${h} cm`, 14) + txt(178, 30, 'A =', 15) + box(176, 38, 36, 30)); },
     'perimeter': (r) => { const w = int(r, 3, 9), h = int(r, 2, 6); return svg(220, 90, rect(10, 10, 120, 64) + txt(70, 88, `${w} m`, 14, 'middle') + txt(136, 46, `${h} m`, 14) + txt(178, 30, 'P =', 15) + box(176, 38, 36, 30)); },
     'area-grid': (r) => { const w = int(r, 3, 6), h = int(r, 2, 4); return svg(220, 80, grid(w, h, 10, 10, 15) + `<rect x="10" y="10" width="${w * 15}" height="${h * 15}" fill="none" stroke="#000" stroke-width="2.5"/>` + txt(120, 40, 'squares', 15) + box(136, 46, 34, 28)); },
-    'area-triangle': () => svg(220, 90, `<polygon points="10,76 120,76 70,10" fill="none" stroke="#000" stroke-width="2.5"/>` + ln(70, 10, 70, 76, 1.5, '4 3') + txt(74, 50, '6', 14) + txt(64, 90, '10', 14) + txt(140, 40, 'A =', 15) + box(140, 48, 36, 30)),
+    'area-triangle': () => svg(220, 98, `<polygon points="10,76 120,76 70,10" fill="none" stroke="#000" stroke-width="2.5"/>` + ln(70, 10, 70, 76, 1.5, '4 3') + txt(74, 50, '6', 14) + txt(64, 92, '10', 14) + txt(140, 40, 'A =', 15) + box(140, 48, 36, 30)),
     'area-composite': () => svg(220, 90, `<polygon points="10,10 70,10 70,44 120,44 120,80 10,80" fill="none" stroke="#000" stroke-width="2.5"/>` + txt(140, 40, 'A =', 15) + box(140, 48, 36, 30)),
     'volume': (r) => svg(220, 96, cube(10, 8, 70, 50, 26) + txt(36, 94, int(r, 2, 6) + ' cm', 13) + txt(130, 40, 'V =', 15) + box(130, 48, 40, 30)),
     'angle-name': () => svg(200, 80, ln(20, 66, 110, 66, 2.5) + ln(20, 66, 70, 14, 2.5) + `<path d="M44 66 A24 24 0 0 0 36 50" fill="none" stroke="#000" stroke-width="1.5"/>` + txt(120, 50, 'acute?', 15) + box(130, 54, 50, 24)),
@@ -670,7 +670,7 @@
     'coord-polygon': () => svg(200, 124, coordGrid([[1, 1], [5, 1], [5, 4], [1, 4]], true) + txt(160, 40, 'side', 14) + box(166, 48, 28, 26)),
     'transform-reflect': () => svg(200, 124, coordGrid([[1, 1], [3, 1], [1, 4]], true) + ln(84, 6, 84, 102, 2.5, '6 4') + txt(160, 56, 'reflect', 14)),
     'transform-rotate': () => svg(200, 124, coordGrid([[4, 2], [7, 2], [4, 5]], true) + circ(84, 70, 4, '#000') + txt(160, 56, 'turn ¼', 14)),
-    'transform-translate': () => svg(200, 124, coordGrid([[1, 1], [3, 1], [1, 3]], true) + `<path d="M60 70 L110 40" stroke="#000" stroke-width="2" marker-end=""/>` + txt(160, 56, '→ 3, ↑ 2', 14)),
+    'transform-translate': () => svg(232, 124, coordGrid([[1, 1], [3, 1], [1, 3]], true) + `<path d="M60 70 L110 40" stroke="#000" stroke-width="2" marker-end=""/>` + txt(160, 56, '→ 3, ↑ 2', 14)),
     'clock': (r, s) => { const m = minutesFor(s.v, r); return svg(180, 100, analogClock(int(r, 1, 12), m) + box(108, 30, 64, 36)); },
     'clock-fives': () => svg(180, 100, analogClock(2, 25) + txt(108, 30, 'minutes', 14) + box(108, 38, 56, 34)),
     'clock-parts': () => svg(200, 100, analogClock(4, 0) + ln(76, 40, 120, 30, 1.5) + box(124, 14, 70, 28) + txt(124, 72, 'hour hand?', 13)),
@@ -804,7 +804,7 @@
     // N counters in columns of b (equal groups, the last one short)
     columnsOf(n, b) { let o = ''; for (let i = 0; i < n; i++) o += ctr(Math.floor(i / b) * 12 + 6, (i % b) * 12 + 6, '#fff', 4.6); return pic('rows-of', [n, b], { count: n }, Math.ceil(n / b) * 12 + 2, b * 12 + 2, o); },
     // a bar model: parts [{label, w, dashed}], the whole's label above
-    bar(type, vals, parts, whole) { const W = 150; const tot = parts.reduce((t, x) => t + x.w, 0); let x = 1, o = ''; for (const q of parts) { const w = W * q.w / tot; o += q.dashed ? `<rect x="${x}" y="22" width="${w}" height="26" fill="none" stroke="#000" stroke-width="1.6" stroke-dasharray="4 3"/>` : pp(x, 22, w, 26, q.on); o += txt(x + w / 2, 41, q.label, 14, 'middle'); x += w; } o += `<path d="M1 18 v-5 h${W} v5" fill="none" stroke="#000" stroke-width="1.5"/>` + txt(W / 2 + 1, 11, whole, 13, 'middle'); return pic(type, vals, { cells: parts.filter(q => !q.dashed).length }, W + 3, 52, o); },
+    bar(type, vals, parts, whole) { const tot = parts.reduce((t, x) => t + x.w, 0); const ws = parts.map(q => Math.max(150 * q.w / tot, tw(q.label, 14) + 10)); const W = ws.reduce((a, b) => a + b, 0); let x = 1, o = ''; parts.forEach((q, k) => { const w = ws[k]; o += q.dashed ? `<rect x="${x}" y="22" width="${w}" height="26" fill="none" stroke="#000" stroke-width="1.6" stroke-dasharray="4 3"/>` : pp(x, 22, w, 26, q.on); o += txt(x + w / 2, 41, q.label, 14, 'middle'); x += w; }); o += `<path d="M1 18 v-5 h${W} v5" fill="none" stroke="#000" stroke-width="1.5"/>` + txt(W / 2 + 1, 11, whole, 13, 'middle'); return pic(type, vals, { cells: parts.filter(q => !q.dashed).length }, W + 3, 52, o); },
     // fraction bars: rows of d parts, the first `shade` parts grey across the bars
     bars(type, vals, nBars, d, shade, extra = {}, label, W = 100) { const h = 12, per = nBars > 4 ? Math.ceil(nBars / 2) : nBars, top = label ? 16 : 0; let o = '', left = shade; for (let k = 0; k < nBars; k++) { const bx = Math.floor(k / per) * (W + 10), by = top + (k % per) * (h + 4); for (let i = 0; i < d; i++) o += pp(bx + 1 + i * W / d, by + 1, W / d, h, left-- > 0); } if (label) o += `<path d="M1 13 v-4 h${W} v4" fill="none" stroke="#000" stroke-width="1.5"/>` + txt(W / 2, 8, label, 12, 'middle'); return pic(type, vals, Object.assign({ cells: nBars * d, shaded: Math.max(0, shade) }, extra), nBars > 4 ? 2 * W + 13 : W + 3, top + per * (h + 4), o); },
     // pizzas: circles of d slices, `shade` slices grey across them
@@ -846,7 +846,7 @@
     'convert': ([a], s, out) => { const u = (out.replace(/<[^>]+>/g, ' ').match(/\d+ ([a-zA-Z]+) =/) || [])[1] || ''; let o = ''; for (let i = 0; i < a; i++) o += pp(1 + i * 24, 4, 24, 22, false) + txt(13 + i * 24, 20, u, 11, 'middle'); return pic('units', [a], { cells: a }, a * 24 + 3, 30, o); },
   };
   function mixedPair(v) { const groups = []; for (let i = 0; i + 2 < v.length && groups.length < 2; i += 3) groups.push(v.slice(i, i + 3)); let o = '', x = 0, H = 0; for (const [w, n, d] of groups) { const g = P.bars('frac-mixed', [w, n, d], w + 1, d, w * d + n, {}, null, 56); o += `<g transform="translate(${x} 0)">${g.b}</g>`; x += g.w + 8; H = Math.max(H, g.h); } return { w: x, h: H, b: o }; }
-  function copies(k, n, d) { const W = 72, h = 11, per = k > 4 ? Math.ceil(k / 2) : k; let o = ''; for (let b = 0; b < k; b++) { const bx = Math.floor(b / per) * (W + 8), by = (b % per) * (h + 4); for (let i = 0; i < d; i++) o += pp(bx + 1 + i * W / d, by + 1, W / d, h, i < n); } return pic('frac-copies', [k, n, d], { cells: k * d, shaded: k * n }, (k > 4 ? 2 * W + 10 : W + 3), per * (h + 4)); }
+  function copies(k, n, d) { const W = 72, h = 11, per = k > 4 ? Math.ceil(k / 2) : k; let o = ''; for (let b = 0; b < k; b++) { const bx = Math.floor(b / per) * (W + 8), by = (b % per) * (h + 4); for (let i = 0; i < d; i++) o += pp(bx + 1 + i * W / d, by + 1, W / d, h, i < n); } return pic('frac-copies', [k, n, d], { cells: k * d, shaded: k * n }, (k > 4 ? 2 * W + 10 : W + 3), per * (h + 4), o); }
   function withPicture(out, s, kind) {
     const m = out.match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/); const make = PICS[kind]; if (!m || !make) return out;
     const p = make(numsIn(out), s, out); if (!p) return out;
@@ -854,6 +854,7 @@
     return svg(Math.ceil(W + 16 + p.w), Math.ceil(h), `<g transform="translate(0 ${(h - H) / 2})">${body}</g><g transform="translate(${W + 16} ${(h - p.h) / 2})">${p.b}</g>`);
   }
   const PLAIN_DRAW = {
+    'tape': (r) => { const a = int(r, 3, 9), b = int(r, 3, 9); return lines([[`${a} + `, null, ` = ${a + b}`], ['? =', null]]); },
     'frac-bar': (r) => { const d = int(r, 3, 8), n = int(r, 1, d - 1); return svg(250, 84, txt(6, 30, `${n} of ${d} equal parts`, 18) + txt(6, 58, 'are shaded:', 18) + fracBox(222, 44)); },
     'frac-set': (r) => { const d = int(r, 4, 9), n = int(r, 1, d - 1); return svg(260, 84, txt(6, 30, `${n} of ${d} cats are black.`, 18) + txt(6, 60, 'What fraction?', 18) + fracBox(200, 44)); },
     'frac-equiv': (r) => { const a = int(r, 1, 3), b = a + int(r, 1, 3), k = int(r, 2, 4); return svg(200, 84, frac(30, 40, a, b) + txt(60, 48, '=', 24) + box(84, 6, 34, 28) + ln(80, 40, 122, 40) + txt(101, 70, b * k, 22, 'middle')); },
