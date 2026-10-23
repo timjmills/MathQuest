@@ -23,3 +23,4 @@ Times: merge W0-A wave0-gates (coverage-matrix baseline), start 2026-10-23T16:44
 
 ## Log
 - 2026-10-23: pilot started 16:43Z; card gate OK; merged origin/claude/sweet-newton-c8wrv1-wip-wave0-gates (bda2b0c), matrix baseline has rows for the six.
+- 2026-10-23 17:08: lead — owner decision (RUBRIC): every grade covers S and L in full and spot-checks M; critic brief must say so. Merge RUBRIC from claude/sweet-newton-c8wrv1 before the critic.
