@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Board B Palette</title>
+<script>(function(){var t=new URLSearchParams(location.search).get('theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="docs.css">
+</head>
+<body>
+<div class="doc">
+  <div class="top"><a class="btn" href="index.html">← Overview</a><a class="btn" href="app.html">Open the mock-up</a></div>
+  <h1>Colour: board B</h1>
+  <p class="lead">Eight maths areas, each in four strengths. Colour only ever means the maths area; the one main action is solid ink; everything else is calm neutrals (IMPROVEMENT_PLAN §2.7, the owner chose board B on 2026-10-23).</p>
+  <p class="note">Every swatch below is computed in this page from the bold colour with the plan’s ramp rules (<code>colour.js</code>, a port of <code>colour.py</code>), and <code>node tests/scripts/ws-teacher-tokens.cjs</code> checks the same numbers and the mock-up’s <code>tokens.css</code>. Contrast figures are WCAG ratios; ΔE is CIEDE2000.</p>
+
+  <h2>Light mode</h2>
+  <p class="note">Tint (10 %) is a group’s background · soft (30 %) a filter chip at rest · <b>bold</b> the card edge, header band, tray chip and selected chip · deep the area’s own text and outline. Tint and soft always take ink text.</p>
+  <div id="light"></div>
+
+  <h2>Dark mode</h2>
+  <p class="note">Page #111318. Tint = 18 % and soft = 40 % of the bold over the page with #F3F4F6 text; the fourth strength is a light version, ≥ 7 : 1 on the dark tint. Chip outlines are #E5E7EB.</p>
+  <div id="dark" class="dark-panel"></div>
+
+  <h2>Chips: one rule for every state</h2>
+  <p class="note">Every chip has a 1 px outline (deep in light mode, #E5E7EB in dark). Selected = the bold fill + ✓ + a 2 px ring. Slate (Mixed, Words, No standard) always has a dashed outline and its label.</p>
+  <div id="chips"></div>
+
+  <h2>Colour-blind check</h2>
+  <p class="note">The bold colours as seen with normal vision, deuteranopia and protanopia (Machado 2009 matrices, severity 1.0), and the closest pairs. Areas that share a single-grade list must be ≥ 12 apart under both simulations; any other pair ≥ 8 (in lists across grades the grade pill, the area name and the icon tell them apart).</p>
+  <div id="cvd"></div>
+  <h3>Areas that share a grade, as seen by each view</h3>
+  <div id="grades"></div>
+  <div id="numbers"></div>
+
+  <h2>Board A (not chosen; reference only)</h2>
+  <p class="note">Six areas: Measurement and Data share mint, Ratio / number system shares pink. Kept as a static picture so the choice can be revisited; the mock-up uses board B only.</p>
+  <img class="board" src="board-a.png" alt="Board A: six maths-area colours (Counting fuchsia, Operations indigo, Place value gold, Fractions pink, Measurement and data mint, Geometry teal), for reference">
+</div>
+<script src="colour.js"></script>
+<script>
+(function () {
+  const C = window.MQColour;
+  const A = [['CC', 'Counting & cardinality', '#C026D3'], ['OA', 'Operations & algebra', '#3730A3'], ['NBT', 'Place value & base ten', '#EAB308'], ['NF', 'Fractions & decimals', '#F472B6'],
+    ['MEAS', 'Measurement', '#6EE7B7'], ['DATA', 'Data', '#93C5FD'], ['G', 'Geometry', '#0F766E'], ['RPNS', 'Ratio & number system', '#BEF264']];
+  const SLATE = ['SLATE', 'Slate: Mixed · Words · No standard', '#475569'];
+  const GR = { K: ['CC', 'OA', 'NBT', 'MEAS', 'DATA', 'G'], 'Grades 1–2': ['OA', 'NBT', 'MEAS', 'DATA', 'G'], 'Grades 3–5': ['OA', 'NBT', 'NF', 'MEAS', 'DATA', 'G'], 'Grade 6': ['RPNS', 'OA', 'DATA', 'G'] };
+  const f = (x) => x.toFixed(1);
+  const sw = (bg, fg, top, bottom, extra = '') => `<div class="sw ${extra}" style="background:${bg};color:${fg}"><b>${top}</b><span>${bottom}</span></div>`;
+  let L = '<div class="sw-grid"><span></span><span class="sw-head">Tint</span><span class="sw-head">Soft</span><span class="sw-head">Bold</span><span class="sw-head">Deep</span>';
+  let Dk = '<div class="sw-grid"><span></span><span class="sw-head" style="color:#D1D5DB">Tint 18 %</span><span class="sw-head" style="color:#D1D5DB">Soft 40 %</span><span class="sw-head" style="color:#D1D5DB">Bold</span><span class="sw-head" style="color:#D1D5DB">Light version</span>';
+  for (const [k, n, b] of A.concat([SLATE])) {
+    const r = C.ramp(b); const dash = k === 'SLATE' ? 'dashed' : '';
+    L += `<div class="sw-name">${n}</div>` + sw(r.tint, C.INK, r.tint, 'ink ' + f(C.cr(r.tint, C.INK))) + sw(r.soft, C.INK, r.soft, 'ink ' + f(C.cr(r.soft, C.INK))) +
+      sw(r.bold, r.on, r.bold, (r.on === '#FFFFFF' ? 'white ' : 'ink ') + f(C.cr(r.bold, r.on)), dash) + sw('#FFFFFF', r.deep, r.deep, `on white ${f(C.cr(r.deep, '#FFFFFF'))} · on tint ${f(C.cr(r.deep, r.tint))}`);
+    Dk += `<div class="sw-name" style="color:#F3F4F6">${n}</div>` + sw(r.dTint, '#F3F4F6', r.dTint, '#F3F4F6 ' + f(C.cr(r.dTint, '#F3F4F6'))) + sw(r.dSoft, '#F3F4F6', r.dSoft, '#F3F4F6 ' + f(C.cr(r.dSoft, '#F3F4F6'))) +
+      sw(r.bold, r.on, r.bold, 'on page ' + f(C.cr(r.bold, C.DARK)), dash) + sw(r.dTint, r.dLight, r.dLight, 'on dark tint ' + f(C.cr(r.dLight, r.dTint)));
+  }
+  document.getElementById('light').innerHTML = L + '</div>';
+  const dk = document.getElementById('dark'); dk.style.background = C.DARK; dk.style.color = '#F3F4F6'; dk.innerHTML = Dk + '</div>';
+  // chips
+  const chip = (r, label, state, dark) => {
+    const edge = dark ? '#E5E7EB' : r.deep; const ring = dark ? '#F3F4F6' : '#111827';
+    const bg = state === 'soft' ? (dark ? r.dSoft : r.soft) : r.bold; const fg = state === 'soft' ? (dark ? '#F3F4F6' : '#111827') : r.on;
+    return `<span style="display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:8px;border:${label === 'Mixed' ? '2px dashed' : '1px solid'} ${edge};background:${bg};color:${fg};font-weight:700;font-size:14px;${state === 'selected' ? `box-shadow:0 0 0 2px ${ring};` : ''}">${state === 'selected' ? '✓ ' : ''}${label}</span>`;
+  };
+  let ch = '';
+  for (const dark of [false, true]) {
+    ch += `<div style="background:${dark ? C.DARK : '#FFFFFF'};padding:16px;border-radius:16px;display:flex;flex-wrap:wrap;gap:12px;margin-bottom:8px;border:1px solid #D1D5DB">`;
+    for (const [k, n, b] of A.slice(0, 4).concat([['MEAS', 'Measurement', '#6EE7B7'], SLATE])) { const r = C.ramp(b); const nm = k === 'SLATE' ? 'Mixed' : n.split(' ')[0]; ch += chip(r, nm, 'soft', dark) + chip(r, nm, 'bold', dark) + chip(r, nm, 'selected', dark); }
+    ch += '</div>';
+  }
+  document.getElementById('chips').innerHTML = ch + '<p class="note">Each area: at rest (soft) · in the tray (bold) · selected (bold + ✓ + ring).</p>';
+  // colour-blind
+  let cv = '<div class="cvd"><span></span><span class="sw-head">Normal vision</span><span class="sw-head">Deuteranopia</span><span class="sw-head">Protanopia</span>';
+  for (const [k, n, b] of A.concat([SLATE])) {
+    cv += `<div class="sw-name">${n}</div>` + ['normal', 'deut', 'prot'].map(m => { const h = m === 'normal' ? b : C.simulate(b, m); return sw(h, C.cr(h, '#FFFFFF') >= C.cr(h, C.INK) ? '#FFFFFF' : C.INK, h, '', k === 'SLATE' ? 'dashed' : ''); }).join('');
+  }
+  document.getElementById('cvd').innerHTML = cv + '</div>';
+  let gr = '';
+  const byK = Object.fromEntries(A.map(a => [a[0], a]));
+  for (const [g, ks] of Object.entries(GR)) {
+    gr += `<h3>${g}</h3>` + ['normal', 'deut', 'prot'].map(m => `<div class="note">${m === 'normal' ? 'Normal vision' : m === 'deut' ? 'Deuteranopia' : 'Protanopia'}</div><div class="grade-row">${ks.map(k => { const b = byK[k][2]; const h = m === 'normal' ? b : C.simulate(b, m); return sw(h, C.cr(h, '#FFFFFF') >= C.cr(h, C.INK) ? '#FFFFFF' : C.INK, k, ''); }).join('')}</div>`).join('');
+  }
+  document.getElementById('grades').innerHTML = gr;
+  // the closest pairs
+  const pairs = []; for (let i = 0; i < A.length; i++) for (let j = i + 1; j < A.length; j++) pairs.push([A[i], A[j]]);
+  const shared = new Set(); Object.values(GR).forEach(l => l.forEach((x, i) => l.slice(i + 1).forEach(y => shared.add([x, y].sort().join('|')))));
+  const sim = (a, b) => Math.min(C.de00(a, b, 'deut'), C.de00(a, b, 'prot'));
+  const lo = (ps, fn) => ps.map(([a, b]) => [fn(a[2], b[2]), a[0] + '–' + b[0]]).sort((x, y) => x[0] - y[0])[0];
+  const n1 = lo(pairs, (a, b) => C.de00(a, b)), n2 = lo(pairs.filter(([a, b]) => shared.has([a[0], b[0]].sort().join('|'))), sim), n3 = lo(pairs, sim);
+  const sl = A.map(a => [Math.min(C.de00(SLATE[2], a[2], 'deut'), C.de00(SLATE[2], a[2], 'prot'), C.de00(SLATE[2], a[2])), a[0]]).sort((x, y) => x[0] - y[0])[0];
+  const st = A.flatMap(a => ['normal', 'deut', 'prot'].flatMap(m => [[C.de00(a[2], C.ERR, m), a[0] + '–error red'], [C.de00(a[2], C.KEY, m), a[0] + '–key orange']])).sort((x, y) => x[0] - y[0])[0];
+  document.getElementById('numbers').innerHTML = `<h3>The closest pairs (ΔE CIEDE2000)</h3><div class="scroll"><table><thead><tr><th>Check</th><th>Closest</th><th>Pair</th><th>Needs</th></tr></thead><tbody>` +
+    [['Bold vs bold, normal vision', n1, '≥ 20'], ['Colour-blind, areas sharing a grade', n2, '≥ 12'], ['Colour-blind, any pair', n3, '≥ 8'], ['Slate vs every area, all views', sl, '≥ 8'], ['Bold vs error red / key orange, all views', st, '≥ 20']]
+      .map(([l, [v, p], need]) => `<tr><td>${l}</td><td class="ok">${f(v)}</td><td>${p}</td><td>${need}</td></tr>`).join('') + '</tbody></table></div>';
+})();
+</script>
+</body>
+</html>

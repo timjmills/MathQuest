@@ -172,6 +172,7 @@ button { cursor: pointer; }
 }
 .tray-label { display: grid; font-size: var(--fs-14); color: var(--text-2); white-space: nowrap; }
 .tray-label b { font-size: var(--fs-20); color: var(--text); }
+.tray-chips .chip { max-width: 200px; }
 .tray-chips { flex: 1; display: flex; gap: var(--sp-8); overflow-x: auto; min-width: 0; padding: var(--sp-4); scrollbar-width: thin; }
 .tray-empty { flex: 1; color: var(--text-2); font-size: var(--fs-16); }
 .tray-actions { display: flex; align-items: center; gap: var(--sp-8); }
@@ -284,7 +285,9 @@ details.more[open] > summary::before { content: "▾"; }
 .link { font-size: var(--fs-16); color: var(--text-2); overflow-wrap: anywhere; }
 .share-actions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-8); margin-top: var(--sp-16); }
 .share-actions .btn-primary { grid-column: 1 / -1; }
-.share-pad { padding: var(--sp-24); display: grid; gap: var(--sp-16); overflow-y: auto; }
+.share-pad { padding: var(--sp-24); display: grid; gap: var(--sp-16); overflow-y: auto; min-height: 0; flex: 1; align-content: start; }
+.narrow-foot { display: flex; gap: var(--sp-8); padding: var(--sp-16) var(--sp-24); border-top: var(--line-1) solid var(--line); flex-wrap: wrap; }
+.narrow-foot .btn-primary { flex: 1; }
 
 /* lessons */
 .lessons { display: grid; grid-template-columns: 220px minmax(0, 1fr) 400px; gap: var(--sp-24); align-items: start; }
@@ -398,7 +401,11 @@ table.t th { color: var(--text-2); font-size: var(--fs-12); }
   .opt-name { padding-top: 0; }
   .lessons { grid-template-columns: 1fr; }
   .lessons .panel { display: none; }
-  .area-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lessons > div:first-child .pills { flex-wrap: nowrap !important; overflow-x: auto; margin-bottom: var(--sp-8) !important; }
+  .area-list { display: flex; overflow-x: auto; }
+  .area-row { width: auto; white-space: nowrap; flex: none; }
+  .last-note { margin-bottom: var(--sp-8); }
+  .seg-big { flex-wrap: wrap; overflow: visible; }
   .board-top, .board-foot { padding: var(--sp-8) var(--sp-16); }
   .toast { bottom: 136px; }
   .walk { left: var(--sp-8); right: var(--sp-8); max-width: none; top: auto; bottom: 128px; }

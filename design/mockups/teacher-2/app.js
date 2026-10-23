@@ -402,7 +402,7 @@
       opt('Supports', 'Shown on each problem', `<button class="toggle" ${pressed(true)}><i></i>Number line</button><button class="toggle" ${pressed(false)}><i></i>Ten frame</button>`) +
       opt('Calculator', '', seg('Calculator', [['off', 'Not allowed'], ['on', 'Allowed']], 'off', 'noop')) +
       opt('How often it comes up', 'On pages with other skills', seg('How often', [['less', 'Less'], ['equal', 'Equal'], ['more', 'More']], w, 'weight:' + S.chip)) +
-      `<div class="share-actions"><button class="btn btn-primary" data-act="close">Done</button><button class="btn" data-act="remove" data-arg="${esc(S.chip)}">Take out of the tray</button></div></div>`;
+      `</div><div class="narrow-foot"><button class="btn" data-act="remove" data-arg="${esc(S.chip)}">Take out of the tray</button><button class="btn btn-primary" data-act="close">Done</button></div>`;
     return `<div class="scrim" data-act="close"></div><div class="sheet narrow" role="dialog" aria-modal="true" aria-label="Skill options"><div class="sheet-head"><h2>${esc(s.l)}</h2><button class="btn close" data-act="close" aria-label="Close">${icon('close')}</button></div>${body}</div>`;
   }
   function boardView() {
@@ -471,13 +471,13 @@
       body = `<div class="cards2">${S.sets.map((st, i) => `<div class="box"><h3>${esc(st.name)}</h3><div class="panel-chips">${st.skills.map(k => chipHTML(k, { act: 'noop' })).join('')}</div>${i === 0 ? `<button class="btn btn-primary" data-act="runboard" data-arg="${i}">${icon('board')}Start on the board</button>` : `<button class="btn" data-act="runboard" data-arg="${i}">${icon('board')}Start on the board</button>`}</div>`).join('')}</div>`;
     } else if (S.classes === 'results') {
       body = `<p class="warn" style="margin-bottom: var(--sp-16)">⚠ These are the quizzes taken on this device (the board, a shared Chromebook). Results stay on each pupil’s device.</p>` +
-        `<table class="t"><thead><tr><th>Quiz</th><th>Pupil</th><th>Score</th><th>Taken</th></tr></thead><tbody>` +
-        [['Place value check', 'Amira', '9 / 10', 'Today 10:42'], ['Place value check', 'Ben', '7 / 10', 'Today 10:40'], ['Time to the hour', 'Chloe', '12 / 12', 'Yesterday'], ['Add within 20', 'Dev', '15 / 20', 'Monday']].map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td><b>${r[2]}</b></td><td>${r[3]}</td></tr>`).join('') + '</tbody></table>';
+        `<div class="scroll-x"><table class="t"><thead><tr><th>Quiz</th><th>Pupil</th><th>Score</th><th>Taken</th></tr></thead><tbody>` +
+        [['Place value check', 'Amira', '9 / 10', 'Today 10:42'], ['Place value check', 'Ben', '7 / 10', 'Today 10:40'], ['Time to the hour', 'Chloe', '12 / 12', 'Yesterday'], ['Add within 20', 'Dev', '15 / 20', 'Monday']].map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td><b>${r[2]}</b></td><td>${r[3]}</td></tr>`).join('') + '</tbody></table></div>';
     } else if (S.classes === 'map') {
       body = `<div class="cards2"><div class="box"><h3>Start a MAP test</h3><p class="note">Pick the level and the strands, then start here or share the link.</p>${seg('Level', [['k2', 'Grades K–2'], ['35', 'Grades 3–5']], 'k2', 'noop')}<button class="btn btn-primary" data-act="noop">Start the MAP test</button></div><div class="box"><h3>Last results</h3><p class="note">Grade 2 · 12 pupils · on this device</p><div class="bar"><i style="width: 64%"></i></div><p class="note">Number & place value 64 % correct</p><div class="bar"><i style="width: 48%"></i></div><p class="note">Measurement 48 % correct</p></div></div>`;
     } else {
-      body = `<table class="t"><thead><tr><th>Skill</th><th>Practised</th><th>Correct</th></tr></thead><tbody>` +
-        ['addition:add_facts', 'measurement:time_hour', 'composing:base10_build', 'subtraction:sub_word_problems'].map((k, i) => `<tr><td>${chipHTML(k, { act: 'noop' })}</td><td>${[42, 18, 25, 9][i]} times</td><td><div class="bar" style="width: 160px"><i style="width:${[88, 61, 74, 40][i]}%"></i></div></td></tr>`).join('') + '</tbody></table>';
+      body = `<div class="scroll-x"><table class="t"><thead><tr><th>Skill</th><th>Practised</th><th>Correct</th></tr></thead><tbody>` +
+        ['addition:add_facts', 'measurement:time_hour', 'composing:base10_build', 'subtraction:sub_word_problems'].map((k, i) => `<tr><td>${chipHTML(k, { act: 'noop' })}</td><td>${[42, 18, 25, 9][i]} times</td><td><div class="bar" style="width: 120px"><i style="width:${[88, 61, 74, 40][i]}%"></i></div></td></tr>`).join('') + '</tbody></table></div>';
     }
     return `<div class="head"><h1 class="title">Classes</h1></div><div class="tabs scroll-x" role="group" aria-label="Classes">${tabs.map(([k, l]) => `<button data-act="ctab" data-arg="${k}" ${pressed(S.classes === k)}>${l}</button>`).join('')}</div>${body}`;
   }

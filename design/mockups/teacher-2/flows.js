@@ -35,6 +35,7 @@
       actions: [{ click: '.tray-chips [data-act="chip"], .tray-count', step: 1, say: 'Tap its chip in the tray' }] },
   ];
   // the narrow (390) chip flow opens the collapsed tray first: the count bar is one tap, then the chip
+  Object.assign(FLOWS.find(f => f.id === 'chip-options'), { narrowPlan: '2', narrowNote: 'On a phone the tray is collapsed to “3 skills ▸” (§2.3), so a chip is two taps away' });
   FLOWS.find(f => f.id === 'chip-options').narrow = [{ click: '.tray-count', step: 1, say: 'Tap “3 skills ▸”' }, { click: '.tray-sheet [data-act="chip"]', step: 1, say: 'Tap the chip' }];
   root.MQ_FLOWS = FLOWS;
   if (typeof module !== 'undefined' && module.exports) module.exports = FLOWS;
