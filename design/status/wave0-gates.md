@@ -41,7 +41,7 @@ Builders run in their own git worktrees and the lead merges them here.
 | Fix r1 C: node-lint per-finding baseline, H8 multiple choice for every family (D5, D7, N2, N9, N12) | mq-opus-medium (rebuild after a failed round) | 15:04 | 15:47 | — |
 | Critic r2 (fresh critic): FAIL 7 / 8 / 8, one blocking defect | mq-opus-medium | 15:47 | 17:07 | — |
 | Fix r2: nightly red-row rule (critic r2 D1) + nits + owner decisions (Repeated check in 28 slices; no-baseline rows PENDING) — merged dea73ab7 | mq-opus-medium (rebuild after a failed round) | 17:05 | 17:37 | — |
-| Sweep gaps from the W0-defects lane (board 1280×720 + nested clip, dark scan whole host, board animation, chrome-linux64) | mq-opus-low (change to built tools) | 17:09 | — | — |
+| Sweep gaps from the W0-defects lane (board 1280×720 + nested clip, dark scan whole host, board animation, chrome-linux64) | mq-opus-low (change to built tools) | 17:09 | 18:08 | — |
 | Pilot six-skill matrix baseline (lead run) | — | 16:17 | 17:12 | 55 |
 | S1 `ws-precritic` build (brought forward by the lead, 11:02; stopped: moved to the lead's session) | mq-opus-medium | 11:03 | 12:51 | 108 |
 
@@ -104,3 +104,11 @@ baseline over 28 nights into `baseline.slice-i-of-28.json`, then affected + red 
 PENDING(no-baseline), never RED; before the full baseline a stale or missing nightly is a WARNING (deploy still OK, shown).
 Envelope samples drop impossible option rows (strict critic set 543 → 297 pages; bounded 57 rows). L3 no longer blind on
 common data keys; MC-ALL prints PINNED for pinned skills; matrix pins carry finding keys.
+
+Sweep gaps (merged 85ff9293): `--bigboard` covers 1280×720 / 1366×768 / 1920×1080 and fails on nested clipping > 12 px inside
+`#questionPaper` (today 117/117 OK; on `0bb50b2~1` 1280×720 FAILs 7 skills); the dark scan covers the whole host view incl.
+quiz-dot states, WCAG AA, blended translucent fills, transitions off for the light re-check (today OK 234 renders; on
+`07bc08d1~1` catches the 2.18:1 current dot). Limitation, left as designed: the dark scan reports only what dark mode made
+worse, so the 3.10:1 answered dot on `0bb50b2~1` (low in light mode too then) is not flagged — a light-mode contrast scan
+would be a separate gate. The board waits for animations before measuring (6/6 repeats clean); `chromePath()` finds
+`chrome-linux64/` or `chrome-linux/`.
