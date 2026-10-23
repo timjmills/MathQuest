@@ -1,5 +1,13 @@
 # Teacher screens — owner rulings (2026-09-26)
 
+> **2026-10-23:** the teacher side is being redesigned as **Teacher site 2.0** — `design/IMPROVEMENT_PLAN.md` §2 (four places, the
+> tray + Make sheet, ≤ 4 steps per job, the bold colour system and its rules). The rulings below stay in force where §2 does not
+> change them; §2.8 lists the changes for the owner to confirm (Q-T1 replaces the six-tile home). **Owner 2026-10-23 (decided):**
+> the lettered A / B / C pages go — the worksheet choices are How many pages? (for section, single-skill and mixed pages alike) ·
+> How often each skill comes up · How the problems are arranged · Examples · Size, plus a New numbers button (§2.3a).
+> **Owner 2026-10-23 (decided):** no full page preview on the website — a one-line summary; the PDF made by Print is the preview.
+
+
 The teacher side is organised around **three kinds of paper** (see `design/LESSON_LIBRARY_PLAN.md` §8e): **Practice**,
 **Quiz** and **Lesson**. These rulings simplify the screens to match.
 

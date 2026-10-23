@@ -1,5 +1,9 @@
 # MathQuest skill revamp: the roadmap
 
+> **2026-10-23:** the order of work and the build process now live in `design/IMPROVEMENT_PLAN.md` (§1 process, §1.4 template
+> order for the remaining families, §4.1 order of work). This file keeps the definition of done per family (§4), which is unchanged.
+
+
 **The one place the plan lives.** Before this file the plan was spread across commit messages,
 `design/PROBLEM_TYPES.md` §5, `design/SKILL_CELL_CONTRACT.md` §10 and two research files, and
 they did not agree on the next family. When they disagree with this file, this file wins on

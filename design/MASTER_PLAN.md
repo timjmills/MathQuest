@@ -1,5 +1,14 @@
 # MathQuest master plan — waves (owner, 2026-10-02)
 
+> **2026-10-23 — read `design/IMPROVEMENT_PLAN.md` first.** It adds **Wave 0 (faster building at the same quality: precritic
+> checks with backtests, spec cards, golden renders + contact-sheet critics, sharded deploy gates, per-lane status files)**,
+> rebuilds Wave 3 as **Teacher site 2.0** (four places — Skills, Lessons, Classes, profile; the tray + Make sheet; ≤ 4 steps
+> to print or share; a bold, meaningful colour system), builds **truly mixed pages** for Wave 4.2 (PT-MIX SHUFFLED, never
+> built until now), replaces the lettered A–J practice pages with plain choices (How many pages? · How often each skill comes
+> up · Arrangement: mixed together / in sections / one skill per page · Examples · Size), and re-orders Waves 5–6 by
+> template leverage (9 templates unlock 45 % of the build list). Its §4.1 is the order of work; its §4.3 the owner questions.
+
+
 The owner's order of importance:
 
 1. correct the program;

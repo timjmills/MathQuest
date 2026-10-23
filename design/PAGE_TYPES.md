@@ -1432,6 +1432,10 @@ Slot map (positions never move; the binding changes by Level band; any slot can 
 
 ### 5.2 Mixed Skill Practice
 
+> **Build status 2026-10-23:** only GROUPED packing is built (`sheet/roles/mixed-practice.js`); SHUFFLED (PT-MIX-5…7) is not.
+> The plan that builds it — interleaving, unit footprints, the 2 × 2 block packer, in-cell cues, key legend, screen parity — is
+> `design/IMPROVEMENT_PLAN.md` §3. Its teacher name is "Mixed together" (§2.3a there).
+
 **Purpose.** Any set of skills, in any proportions, on one ruled rectangle where every vertical rule lands on a shared unit lattice.
 **Look.** Daily by default (I Can available). Default arrangement GROUPED.
 

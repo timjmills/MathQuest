@@ -233,6 +233,10 @@ This supersedes the 17-card page-type menu (and the stand-alone mapping in §8c,
   mixed builders when the engine lane extracts them (§8c); until then they route to today's roles with these options;
   (3) the Lesson paper gains the "parts" option.
 
+> **2026-10-23:** the Practice paper's options are now the five plain choices of `design/IMPROVEMENT_PLAN.md` §2.3a (owner: no
+> lettered A / B pages; How many pages? for section, single-skill and mixed pages). Mixed pages gain a true "Mixed together"
+> arrangement (§3 there).
+
 ## 8f. Owner ruling: worked examples on Practice papers — one example on top only (2026-09-26)
 
 Practice keeps a **"Worked example"** option in ONE form only: a single worked example at the **top of each skill's
@@ -241,6 +245,9 @@ failures). The example uses **different numbers from every problem on the page**
 answers), is **easy-first but shows the skill's real move** (no trivial single-coin or 1:03 examples), is drawn **the same
 way as the problems**, prints its steps at ≥ 11 pt at every size, and the block fills with problems under it. Critic
 anchor-r1 defects (commit 7146df5 on `critic-anchor-r1`) are the fix list.
+
+> **2026-10-23:** the owner asked for "an example problem with each problem" as a choice again — open question Q-W2 in
+> `design/IMPROVEMENT_PLAN.md` §2.8 (recommended: allowed only where ≥ 2 pairs fit a page at the chosen size).
 
 ## 9. Risks
 
