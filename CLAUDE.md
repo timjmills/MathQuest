@@ -68,6 +68,8 @@ outrank any general design advice or skill:
   "How a page counts as graded". Lanes write `design/status/<lane>.md`, never `design/STATUS.md`.
 - **8 or better, everywhere.** A redone skill is done only when it scores ≥ 8 on all four criteria
   of `design/audit/RUBRIC.md` on every page type and every screen host, graded by an independent critic.
+  The same bar holds for EVERYTHING that passes (owner, 2026-10-23): tools, engines, screens and mock-ups, lessons,
+  cards and plans each pass only at ≥ 8 on every criterion of their critic brief, graded by an independent critic.
 - Use `generateQuestionFor({category, skill, range, decimals, opts, seed})` for any generation
   outside live play. It carries the skill's options, restores state in `finally`, and its seed makes
   a page reproducible.
