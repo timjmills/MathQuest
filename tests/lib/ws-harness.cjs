@@ -88,7 +88,7 @@ function listSkills(page) {
     const out = [];
     for (const [categoryId, skills] of Object.entries(window.SKILLS)) {
       if (!Array.isArray(skills)) continue;
-      for (const s of skills) out.push({ categoryId, skillId: s.v, label: s.l, grade: window.getSkillGrade ? String(window.getSkillGrade(s.v, categoryId)) : '' });
+      for (const s of skills) out.push({ categoryId, skillId: s.v, label: s.l, retired: !!s.retired, grade: window.getSkillGrade ? String(window.getSkillGrade(s.v, categoryId)) : '' });
     }
     return out;
   });

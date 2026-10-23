@@ -13,6 +13,8 @@
 //   node tests/scripts/ws-coverage-matrix.cjs --skills cat:skill --write-baseline     # pin today's findings
 //   node tests/scripts/ws-coverage-matrix.cjs --all --affected <commitA>..<commitB> --list
 //   node tests/scripts/ws-coverage-matrix.cjs --all --affected A..B --seventh 3 --out auto   # the nightly (ws-matrix-nightly.sh)
+//   node tests/scripts/ws-coverage-matrix.cjs --all --affected A..B --max-docs 500 --baseline design/audit/matrix/baseline.json --slots 2
+//                                                                                     # the deploy (S5 session 3)
 //   node tests/scripts/ws-coverage-matrix.cjs --self-test                             # node only, no browser
 //
 // SELECTING ROWS
@@ -21,7 +23,12 @@
 //   --shard i/n              every n-th row from the i-th (1-based), rows sorted by id
 //   --seventh d              the rotating seventh (d = 0..6): rows whose id hashes to d mod 7 (added to --affected's rows)
 //   --affected A..B          the rows a commit range reaches (below); with --list, prints the reach and stops
-//   --list                   print the rows (RUN / PENDING(step) / N/A) without running anything
+//   --list                   print the rows (RUN / PENDING(step) / N/A) without running anything; ends with
+//                            `ws-coverage-matrix: LIST (...)`, never with a verdict
+//   A --kind or --rows value that names no row, a --skills key that is not a live skill, a malformed --shard /
+//   --seventh, or a selection of 0 rows (without --affected / --seventh, whose reach may be empty) is a FAIL that
+//   names it. LIVE = a SKILLS entry with a value and no `retired: true` (data.js keeps retired entries in place
+//   for the share codes): 715 on 2026-10-23, the same definition as ws-node-lint.
 // RUNNING
 //   --slots N                print-lint processes at once (default 1), each through /tmp/mq-browser-run.sh
 //   --batch N                documents per print-lint process (default 9 = 3 rows x S/M/L): one browser start
@@ -32,9 +39,34 @@
 //   --write-baseline         write this run's counts as the per-row baseline (into --baseline, default
 //                            design/audit/matrix/baseline.json; merged with the rows already there; with --shard,
 //                            baseline.shard-i-of-n.json)
-//   --cache f.json           skip a row already OK for the same dependency hash; record OK rows after the run
+//   --cache f.json           skip a row already OK for the same dependency hash AND the same baseline entry
+//                            (the row's pinned counts under --baseline, or "none": a row cached OK under one
+//                            baseline is re-run under another); record OK rows after the run
+//   --max-docs N             the deploy's budget (§1.6.2: 500): count the documents the selected, non-cached
+//                            rows would print (3 a row); above N run nothing, print
+//                            `ws-coverage-matrix: OVER-BUDGET <n> documents (budget N)` and exit 3 (whatever
+//                            --report-only says). The caller (ws-deploy-gates.sh) then reads the newest nightly
 //   --out f.json|auto        write the run (auto = design/audit/matrix/<UTC date>.json)
 //   --report-only            exit 0 even with red rows (never prints OK when a row is red)
+//
+// VERDICTS AND EXIT CODES (last line)
+//   OK (...)                      exit 0: every checked row OK or CACHED (rows PENDING / N/A beside them are listed)
+//   FAIL - ...                    exit 1: a RED or ERROR row, or a bad argument / selection (always named)
+//   INCOMPLETE (all n rows ...)   exit 2: rows were selected but none could be checked (every one PENDING or N/A)
+//   OVER-BUDGET <n> documents     exit 3: --max-docs exceeded, nothing run
+//   LIST (...)                    exit 0: --list, nothing run
+//   A row is RED when a lint count is above its per-row baseline; it is ERROR when it could not print: a size
+//   whose document did not render (`L-SPLIT RENDER`: a buildSheet throw, a crashed batch) or a row whose flags
+//   print-lint refuses. ERROR ignores the baseline, and --write-baseline never pins it (D4: a row that cannot
+//   print stays red until it prints); a size that needs a later step makes the row PENDING, never pinned.
+//
+// THE RUN FILE (--out; the nightly's design/audit/matrix/<YYYY-MM-DD>[.shard-i-of-n].json, read by the deploy):
+//   { tool, date, started, finished (ISO times), commit (full sha), dirty (bool), partners, printInputsHash,
+//     selection {skills, affected {from, to, files}, seventh, shard, kinds, rows}, replay, timing {...},
+//     totals {OK, CACHED, RED, PENDING, N/A, ERROR}, red: [ids of RED and ERROR rows], liveSkills,
+//     rows: [{ id, skill, kind, row, skills, args, pairs, depHash, status, cached?, step?, reason?, rises?,
+//              errors?, sizes {S, M, L: {pages, keyPages, counts, error} | {pending, reason} | {na}} }] }
+//   A row's `status` is one of OK / RED / PENDING / N/A / ERROR (a cached row is OK with `cached: <date>`).
 //   --verbose                every row and every finding group
 //
 // THE ROWS (§1.6.2 table; flag mapping §1.6.2 bullets; what each flag needs from buildSheet is decided by
@@ -113,7 +145,11 @@ async function loadApp() {
     } finally { [console.log, console.warn, console.error] = quiet; }
 }
 
-/** Live skills, as ws-print-lint selects them (tombstones and retired labels out). */
+/**
+ * Live skills: a SKILLS entry with a value and no `retired: true` (N11). data.js keeps retired entries IN
+ * PLACE for the positional share codes (CLAUDE.md), so counting array entries gives 723 on 2026-10-23 and the
+ * live count is 715 - the same definition as ws-node-lint. The id / label patterns are a belt for older trees.
+ */
 function liveSkills(app) {
     const out = [];
     for (const [cat, list] of Object.entries(app.data.SKILLS)) {
@@ -389,6 +425,9 @@ function affected(range) {
 
 /* ============================================================================ baseline and verdicts */
 
+/** Lint keys that mean the document did not print: never pinned, never forgiven by a baseline (D4). */
+const RENDER_KEYS = new Set(['L-SPLIT RENDER']);
+const renderError = (s) => !!(s && !s.na && !s.pending && (s.error || Object.keys(s.counts || {}).some((k) => RENDER_KEYS.has(k))));
 const countsOf = (doc) => { const m = {}; for (const f of doc.findings || []) if (!f.waived) { const k = `${f.lint} ${f.rule}`; m[k] = (m[k] || 0) + 1; } return m; };
 
 function loadBaseline(file) {
@@ -408,7 +447,10 @@ function risesOf(row, base) {
     for (const sz of SIZES) {
         const s = row.sizes[sz];
         if (!s || s.na || s.pending) continue;
-        for (const [k, n] of Object.entries(s.counts || {})) if (n > ((b[sz] || {})[k] || 0)) out.push(`${sz} ${k}: ${(b[sz] || {})[k] || 0} -> ${n}`);
+        for (const [k, n] of Object.entries(s.counts || {})) {
+            const pinned = RENDER_KEYS.has(k) ? 0 : ((b[sz] || {})[k] || 0);
+            if (n > pinned) out.push(`${sz} ${k}: ${pinned} -> ${n}`);
+        }
     }
     return out;
 }
@@ -484,9 +526,36 @@ function verdict(row, base) {
     if (s.every((x) => x.na)) { row.status = 'N/A'; row.reason = s[0].na; return; }
     if (s.some((x) => x.pending)) { row.status = 'PENDING'; row.step = s.find((x) => x.pending).pending; row.reason = s.find((x) => x.pending).reason; return; }
     row.rises = risesOf(row, base);
+    const bad = SIZES.filter((sz) => renderError(row.sizes[sz]));
+    if (bad.length) {
+        // it did not print: ERROR whatever the baseline holds (D4)
+        row.status = 'ERROR';
+        row.errors = bad.map((sz) => `${sz}: ${row.sizes[sz].error || 'L-SPLIT RENDER (the sheet did not render)'}`);
+        row.reason = `could not print at ${bad.join(', ')}`;
+        return;
+    }
     row.status = row.rises.length ? 'RED' : 'OK';
-    if (s.some((x) => x.error)) row.errors = s.filter((x) => x.error).map((x) => x.error);
 }
+
+/**
+ * --write-baseline (D4): pin the lint counts of the rows that PRINTED (status OK or RED after verdict()).
+ * A row that could not print (ERROR: a render error at any size), a PENDING or N/A row is never pinned; render
+ * keys are stripped even from a pinned row. Returns the ids refused, with why.
+ */
+function pinRows(cur, rows) {
+    const refused = [];
+    let pinned = 0;
+    for (const r of rows) {
+        if (!r.sizes) continue;
+        if (r.status !== 'OK' && r.status !== 'RED') { refused.push({ id: r.id, why: r.status === 'ERROR' ? (r.errors || []).join('; ') : r.status }); continue; }
+        cur.rows[r.id] = Object.fromEntries(SIZES.map((sz) => [sz, Object.fromEntries(Object.entries((r.sizes[sz] && r.sizes[sz].counts) || {}).filter(([k]) => !RENDER_KEYS.has(k)))]));
+        pinned++;
+    }
+    return { pinned, refused };
+}
+
+/** The cache key's baseline part (N10): the row's own merged baseline entry, or 'none' without --baseline. */
+const baselineKey = (base, id) => (base ? sha(JSON.stringify((base.rows && base.rows[id]) || {})).slice(0, 16) : 'none');
 
 /* ============================================================================ selection */
 
@@ -556,11 +625,86 @@ function selfTest() {
     let total = 0;
     for (let d = 0; d < 7; d++) total += selectRows(many, { seventh: d }).length;
     ok(total === 50, 'sevenths: every row in exactly one seventh');
+    // 8. D4: a row that could not print is ERROR whatever the baseline says, and --write-baseline never pins it
+    const printed = { id: 'p', sizes: { S: { counts: { 'L-KEY AK-2': 1 } }, M: { counts: {} }, L: { counts: {} } } };
+    const split = { id: 'e', sizes: { S: { counts: { 'L-SPLIT RENDER': 1 }, error: 'buildSheet threw' }, M: { counts: {} }, L: { counts: {} } } };
+    const crashed = { id: 'c', sizes: { S: { error: 'print-lint exit 1: crash', counts: { 'L-SPLIT RENDER': 1 } }, M: { counts: {} }, L: { counts: {} } } };
+    const pend = { id: 'q', sizes: { S: { pending: 'M4', reason: 'needs M4' }, M: { counts: {} }, L: { counts: {} } } };
+    const forgiving = { rows: { e: { S: { 'L-SPLIT RENDER': 1 } }, c: { S: { 'L-SPLIT RENDER': 1 } } } };
+    for (const r of [printed, split, crashed, pend]) verdict(r, forgiving);
+    ok(printed.status === 'RED', 'D4: a lint finding on a row that printed is RED before pinning');
+    ok(split.status === 'ERROR' && crashed.status === 'ERROR', `D4: a render error is ERROR even when a baseline pins L-SPLIT RENDER (${split.status}, ${crashed.status})`);
+    ok(pend.status === 'PENDING', 'D4: a size that needs a later step makes the row PENDING');
+    const cur = { rows: {} };
+    const pinRes = pinRows(cur, [printed, split, crashed, pend]);
+    ok(pinRes.pinned === 1 && Object.keys(cur.rows).join() === 'p', `D4: only the row that printed is pinned (${Object.keys(cur.rows).join()})`);
+    ok(pinRes.refused.map((x) => x.id).sort().join() === 'c,e,q', `D4: the rows that cannot print are listed as not pinned (${pinRes.refused.map((x) => x.id).join()})`);
+    for (const r of [printed, split, crashed]) verdict(r, cur);
+    ok(printed.status === 'OK' && split.status === 'ERROR' && crashed.status === 'ERROR', 'D4: after pinning the printed row is OK and the render errors stay ERROR');
+    const pinned2 = { rows: {} };
+    pinRows(pinned2, [{ id: 'm', status: 'RED', sizes: { S: { counts: { 'L-SPLIT RENDER': 1, 'L-INK INK-1': 2 } }, M: { counts: {} }, L: { counts: {} } } }]);
+    ok(!('L-SPLIT RENDER' in pinned2.rows.m.S) && pinned2.rows.m.S['L-INK INK-1'] === 2, 'D4: render keys are stripped even from a pinned row');
+    // 9. D3: names that name nothing, empty selections, all-pending runs
+    const allRows = rowsFor(info, ['c:d', 'e:f', 'g:h']);
+    ok(/unknown --rows single\/defualts/.test(selectionError({ all: allRows, names: ['single/defualts'], rows: [], reach: false }) || ''), 'D3: an unknown --rows name is an error naming it');
+    ok(/unknown --kind quizz/.test(selectionError({ all: allRows, kinds: ['quizz'], rows: [], reach: false }) || ''), 'D3: an unknown --kind is an error naming it');
+    ok(/0 rows/.test(selectionError({ all: allRows, kinds: ['mixed'], names: ['single/defaults'], rows: [], reach: false }) || ''), 'D3: a selection of 0 rows is an error');
+    ok(selectionError({ all: allRows, rows: [], reach: true }) === null, 'D3: an --affected / --seventh reach of 0 rows is not an error');
+    ok(selectionError({ all: allRows, names: ['single/defaults', 'a:b|sections/pages-2'], rows: allRows.slice(0, 2), reach: false }) === null, 'D3: row names and full ids are accepted');
+    const quizOnly = allRows.filter((r) => r.kind === 'quiz').map((r) => ({ ...r, status: 'PENDING', step: 'T3' }));
+    const fv = finalVerdict(quizOnly, { summary: 's' });
+    ok(fv.code === 2 && /^ws-coverage-matrix: INCOMPLETE \(all 3 rows pending: PENDING\(T3\) x3/.test(fv.line), `D3: all rows pending is INCOMPLETE, exit 2 (${fv.line})`);
+    ok(finalVerdict([{ status: 'N/A' }, { status: 'PENDING', step: 'M4' }], {}).code === 2, 'D3: all rows pending or n/a is INCOMPLETE');
+    ok(finalVerdict([{ status: 'OK' }, { status: 'PENDING', step: 'M4' }], {}).code === 0, 'D3: one checked row and pending rows is OK');
+    ok(finalVerdict([{ status: 'CACHED' }], {}).code === 0, 'D3: a cached row counts as checked');
+    ok(finalVerdict([{ id: 'x', status: 'ERROR' }, { status: 'OK' }], {}).code === 1, 'an ERROR row fails');
+    ok(finalVerdict([{ id: 'x', status: 'RED' }], { reportOnly: true }).code === 0 && /WOULD FAIL/.test(finalVerdict([{ id: 'x', status: 'RED' }], { reportOnly: true }).line), '--report-only: a red row exits 0 and never prints OK');
+    ok(finalVerdict([], { reach: true }).code === 0, 'an --affected reach of 0 rows is OK (nothing reached)');
+    // 10. N10: the cache key changes with the row's baseline entry
+    ok(baselineKey(null, 'r') === 'none' && baselineKey({ rows: {} }, 'r') !== 'none' && baselineKey({ rows: { r: { S: { a: 1 } } } }, 'r') !== baselineKey({ rows: {} }, 'r'), 'N10: the cache key differs with and without --baseline and with the row\'s pinned counts');
     if (bad.length) { console.error(`${TOOL}: FAIL - ${bad.length} self-test(s)`); bad.forEach((b) => console.error('  - ' + b)); process.exit(1); }
     console.log(`${TOOL}: OK (self-test, ${n} assertions)`);
 }
 
 /* ============================================================================ main */
+
+const KINDS = ['single', 'sections', 'mixed', 'quiz'];
+/**
+ * D3: every name the caller gave must name something. Returns the error text, or null.
+ * `all` = every row of the selected skills; `rows` = the rows selected; `reach` = --affected / --seventh given.
+ */
+function selectionError({ all, kinds, names, rows, reach }) {
+    const badKinds = (kinds || []).filter((k) => !KINDS.includes(k));
+    if (badKinds.length) return `unknown --kind ${badKinds.join(', ')} (${KINDS.join(', ')})`;
+    const badNames = (names || []).filter((n) => !all.some((r) => r.id === n || `${r.kind}/${r.name}` === n));
+    if (badNames.length) {
+        const known = [...new Set(all.map((r) => `${r.kind}/${r.name}`))];
+        return `unknown --rows ${badNames.join(', ')}: no row of the selected skill(s) has that name (rows: ${known.join(', ')})`;
+    }
+    if (!rows.length && !reach) return `the selection matched 0 rows (${[kinds && `--kind ${kinds.join(',')}`, names && `--rows ${names.join(',')}`].filter(Boolean).join(' ') || 'no filter'}): nothing would be checked`;
+    return null;
+}
+/**
+ * The last line (D3, N3): {line, code}. OK only when at least one row was checked (run or cached) and none is
+ * RED / ERROR; rows selected but none checkable is INCOMPLETE (exit 2), never OK.
+ */
+function finalVerdict(rows, { reportOnly = false, summary = '', reach = false } = {}) {
+    const st = (s) => rows.filter((r) => r.status === s);
+    const red = st('RED').length + st('ERROR').length;
+    if (red) {
+        const ids = [...st('ERROR'), ...st('RED')].slice(0, 5).map((r) => `${r.id} ${r.status}`).join('; ');
+        return reportOnly ? { line: `${TOOL}: WOULD FAIL - ${red} red row(s) (${ids}) [report-only, exit 0]; ${summary}`, code: 0 } : { line: `${TOOL}: FAIL - ${red} red row(s) (${ids}); ${summary}`, code: 1 };
+    }
+    if (!rows.length) return { line: `${TOOL}: OK (nothing reached: ${reach ? 'the --affected / --seventh selection reaches no row' : 'no rows'}; ${summary})`, code: 0 };
+    const checked = st('OK').length + st('CACHED').length;
+    if (!checked) {
+        const why = {};
+        for (const r of rows) { const k = r.status === 'PENDING' ? `PENDING(${r.step})` : r.status; why[k] = (why[k] || 0) + 1; }
+        const what = Object.keys(why).every((k) => k.startsWith('PENDING')) ? 'pending' : 'pending or n/a';
+        return { line: `${TOOL}: INCOMPLETE (all ${rows.length} rows ${what}: ${Object.entries(why).map(([k, n]) => `${k} x${n}`).join(', ')}; nothing checked)`, code: 2 };
+    }
+    return { line: `${TOOL}: OK (${summary})`, code: 0 };
+}
 
 const pad = (s, w) => String(s).padEnd(w);
 function sizeCell(s) {
@@ -571,18 +715,35 @@ function sizeCell(s) {
     const f = Object.values(s.counts || {}).reduce((a, b) => a + b, 0);
     return `${s.pages ?? '?'}+${s.keyPages ?? '?'}k ${f || '.'}`;
 }
+class UsageError extends Error {}
 
 (async () => {
     if (has('self-test')) return selfTest();
     const t0 = Date.now();
+    const started = new Date().toISOString();
     let commit = '?', dirty = false;
     try { commit = git('rev-parse', 'HEAD').trim(); dirty = git('status', '--porcelain', '--untracked-files=no').trim().length > 0; } catch (e) { /* not a git tree */ }
+    // arguments first: a malformed one fails before anything loads (D3)
+    const seventhArg = arg('seventh', null);
+    if (seventhArg !== null && !/^\d+$/.test(seventhArg)) throw new UsageError(`--seventh ${seventhArg}: a whole number 0-6`);
+    const seventh = seventhArg === null ? null : Number(seventhArg) % 7;
+    const shardArg = arg('shard', null);
+    const shardM = shardArg === null ? null : /^(\d+)\/(\d+)$/.exec(shardArg);
+    if (shardArg !== null && !shardM) throw new UsageError(`--shard ${shardArg}: i/n, e.g. 3/8`);
+    const shard = shardM ? { i: Number(shardM[1]), n: Number(shardM[2]) } : null;
+    if (shard && !(shard.i >= 1 && shard.i <= shard.n)) throw new UsageError('--shard i/n with 1 <= i <= n');
+    const maxDocsArg = arg('max-docs', null);
+    if (maxDocsArg !== null && !/^\d+$/.test(maxDocsArg)) throw new UsageError(`--max-docs ${maxDocsArg}: a whole number of documents`);
+    const maxDocs = maxDocsArg === null ? null : Number(maxDocsArg);
+    const kinds = arg('kind', null) ? arg('kind', null).split(',') : null;
+    const names = arg('rows', null) ? arg('rows', null).split(',') : null;
+
     const app = await loadApp();
     const live = liveSkills(app);
     const ONLY = (arg('skills', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
-    if (!ONLY.length && !has('all')) throw new Error('give --skills cat:skill,... or --all');
+    if (!ONLY.length && !has('all')) throw new UsageError('give --skills cat:skill,... or --all');
     const missing = ONLY.filter((k) => !live.some((s) => s.key === k));
-    if (missing.length) throw new Error(`no such live skill: ${missing.join(', ')}`);
+    if (missing.length) throw new UsageError(`no such live skill: ${missing.join(', ')} (retired and unknown skills have no rows)`);
     const universe = ONLY.length ? ONLY.map((k) => live.find((s) => s.key === k)) : live;
     const P = loadPartners();
     const infoByKey = new Map();
@@ -604,13 +765,10 @@ function sizeCell(s) {
         console.log(`  rows reached: ${affectedIds.size} of ${all.filter((r) => r.kind !== 'quiz').length} print rows (${universe.length} skill(s))`);
         console.log('  M4 replay: not built (instance-data files reach every row until buildSheet record / replay narrows them by output)');
     }
-    const seventh = arg('seventh', null) === null ? null : Number(arg('seventh', null)) % 7;
-    const shardM = /^(\d+)\/(\d+)$/.exec(arg('shard', '') || '');
-    const shard = shardM ? { i: Number(shardM[1]), n: Number(shardM[2]) } : null;
-    if (shard && !(shard.i >= 1 && shard.i <= shard.n)) throw new Error('--shard i/n with 1 <= i <= n');
-    const kinds = arg('kind', null) ? arg('kind', null).split(',') : null;
-    const names = arg('rows', null) ? arg('rows', null).split(',') : null;
+    const reach = affectedIds !== null || seventh !== null;
     const rows = selectRows(all, { kinds, names, shard, seventh, affectedIds });
+    const selErr = selectionError({ all, kinds, names, rows, reach });
+    if (selErr) throw new UsageError(selErr);
     settleStatic(rows);
 
     // dependency hash (before M4: the print inputs whole + pair fingerprints + the row)
@@ -622,51 +780,68 @@ function sizeCell(s) {
     for (const r of rows) r.depHash = depHash(r, printHash, fps);
 
     const byStatus = (st) => rows.filter((r) => r.status === st);
-    const kindLine = (list) => ['single', 'sections', 'mixed', 'quiz'].map((k) => `${k} ${list.filter((r) => r.kind === k).length}`).join(', ');
-    console.log(`${TOOL}: ${rows.length} row(s) (${kindLine(rows)}) for ${universe.length} skill(s); partners from ${P.source}; ${inputs.files.length} print-input files hashed (${printHash.slice(0, 12)})`);
+    const kindLine = (list) => KINDS.map((k) => `${k} ${list.filter((r) => r.kind === k).length}`).join(', ');
+    console.log(`${TOOL}: ${rows.length} row(s) (${kindLine(rows)}) for ${universe.length} skill(s) of ${live.length} live; partners from ${P.source}; ${inputs.files.length} print-input files hashed (${printHash.slice(0, 12)})`);
     console.log(`  RUN ${byStatus('RUN').length} · PENDING ${byStatus('PENDING').length} · N/A ${byStatus('N/A').length}${byStatus('ERROR').length ? ` · ERROR ${byStatus('ERROR').length}` : ''} · documents to run ${byStatus('RUN').length * 3}`);
-    if (has('list')) {
-        const show = rows.length > 200 && !has('verbose') ? rows.slice(0, 200) : rows;
-        for (const r of show) console.log(`  ${pad(r.status === "PENDING" ? `PENDING(${r.step})` : r.status, 31)} ${pad(r.id, 62)} ${r.args.join(' ')}${r.reason && r.status !== 'RUN' ? `  - ${r.reason.slice(0, 140)}` : ''}`);
-        if (show.length < rows.length) console.log(`  ... ${rows.length - show.length} more (--verbose)`);
-        console.log(`${TOOL}: OK (list, nothing run)`);
-        return;
-    }
 
-    // cache: rows already OK for the same dependency hash are skipped
+    // cache (N10): rows already OK for the same dependency hash AND the same baseline entry are skipped
+    const BASE = arg('baseline', null);
+    const base = loadBaseline(BASE);
     const CACHE = arg('cache', null);
     const cache = CACHE && fs.existsSync(CACHE) ? JSON.parse(fs.readFileSync(CACHE, 'utf8')) : { rows: {} };
     const toRun = [];
     for (const r of byStatus('RUN')) {
         const c = cache.rows[r.id];
-        if (CACHE && c && c.status === 'OK' && c.depHash === r.depHash) { r.status = 'CACHED'; r.cachedAt = c.date; } else toRun.push(r);
+        if (CACHE && c && c.status === 'OK' && c.depHash === r.depHash && c.baseline === baselineKey(base, r.id)) { r.status = 'CACHED'; r.cachedAt = c.date; } else toRun.push(r);
     }
+    if (CACHE) console.log(`  cache ${path.relative(process.cwd(), path.resolve(CACHE))}: ${byStatus('CACHED').length} row(s) already OK for this dependency hash and baseline entry`);
+
+    if (has('list')) {
+        const show = rows.length > 200 && !has('verbose') ? rows.slice(0, 200) : rows;
+        for (const r of show) console.log(`  ${pad(r.status === 'PENDING' ? `PENDING(${r.step})` : r.status, 31)} ${pad(r.id, 62)} ${r.args.join(' ')}${r.reason && r.status !== 'RUN' ? `  - ${r.reason.slice(0, 140)}` : ''}`);
+        if (show.length < rows.length) console.log(`  ... ${rows.length - show.length} more (--verbose)`);
+        if (maxDocs !== null) console.log(`  budget: ${toRun.length * 3} document(s) to run against --max-docs ${maxDocs}: ${toRun.length * 3 > maxDocs ? 'OVER (a real run would exit 3)' : 'within'}`);
+        console.log(`${TOOL}: LIST (${rows.length} row(s), ${toRun.length * 3} document(s) to run; nothing run)`);
+        return;
+    }
+    // D1: the deploy's budget - above it nothing runs; the caller reads the nightly instead
+    if (maxDocs !== null && toRun.length * 3 > maxDocs) {
+        console.log(`  ${toRun.length} affected, non-cached row(s) x 3 sizes = ${toRun.length * 3} document(s); budget ${maxDocs}; nothing run`);
+        console.log(`${TOOL}: OVER-BUDGET ${toRun.length * 3} documents (budget ${maxDocs})`);
+        process.exitCode = 3;
+        return;
+    }
+
     const slots = Math.max(1, parseInt(arg('slots', '1'), 10) || 1);
     const batch = Math.max(1, parseInt(arg('batch', '9'), 10) || 9);
     let timing = null;
+    let refused = [];
     if (toRun.length) {
         console.log(`${TOOL}: running ${toRun.length} row(s) = ${toRun.length * 3} document(s) on ${slots} slot(s), ${batch} document(s) a browser start`);
         timing = await runRows(toRun, { slots, batch, verbose: has('verbose') });
-        const BASE = arg('baseline', null);
-        const base = loadBaseline(BASE);
         for (const r of toRun) verdict(r, base);
         console.log(`  ${timing.linted} document(s) linted in ${(timing.wallMs / 1000).toFixed(1)} s: ${timing.docsPerSec.toFixed(3)} documents/s (${(timing.wallMs / 1000 / Math.max(1, timing.linted)).toFixed(2)} s a document, browser starts included; ${(timing.waitMs / 1000).toFixed(0)} s of batch time spent waiting for a slot another session held)`);
-        // --write-baseline: pin this run's counts, then judge the rows against what was pinned
+        // --write-baseline: pin the counts of the rows that printed (D4), then judge every row against it
         if (has('write-baseline')) {
-            const bf = arg('baseline', null) || path.join(MATRIX_DIR, 'baseline.json');
+            const bf = BASE || path.join(MATRIX_DIR, 'baseline.json');
             const target = shard ? path.join(path.dirname(bf), `baseline.shard-${shard.i}-of-${shard.n}.json`) : bf;
             let cur = { rows: {} };
             try { cur = JSON.parse(fs.readFileSync(target, 'utf8')); } catch (e) { /* new */ }
-            for (const r of toRun) if (r.sizes && (r.status === 'OK' || r.status === 'RED')) cur.rows[r.id] = Object.fromEntries(SIZES.map((s) => [s, r.sizes[s].counts || {}]));
-            cur.tool = TOOL; cur.note = 'Per-row baseline (IMPROVEMENT_PLAN §1.6.2): every finding count per (row, size, lint rule) at the commit below. A red row is any count above it. Changed only with a STATUS note.';
+            const res = pinRows(cur, toRun);
+            refused = res.refused;
+            cur.tool = TOOL; cur.note = 'Per-row baseline (IMPROVEMENT_PLAN §1.6.2): every finding count per (row, size, lint rule) at the commit below, for rows that printed. A red row is any count above it; a row that cannot print (L-SPLIT RENDER) is never pinned. Changed only with a STATUS note.';
             cur.commit = commit + (dirty ? ' (dirty)' : ''); cur.date = new Date().toISOString().slice(0, 10);
             cur.rows = Object.fromEntries(Object.entries(cur.rows).sort(([a], [b]) => a.localeCompare(b)));
             fs.mkdirSync(path.dirname(target), { recursive: true });
             fs.writeFileSync(target, JSON.stringify(cur, null, 1) + '\n');
-            console.log(`wrote the per-row baseline ${path.relative(process.cwd(), target)} (${Object.keys(cur.rows).length} row(s))`);
-            const pinned = toRun.filter((r) => r.status === 'RED').length;
-            for (const r of toRun) if (r.sizes && (r.status === 'OK' || r.status === 'RED')) verdict(r, loadBaseline(target));
-            console.log(`  ${pinned} row(s) with findings pinned; red now: ${toRun.filter((r) => r.status === 'RED').length}`);
+            console.log(`wrote the per-row baseline ${path.relative(process.cwd(), target)} (${Object.keys(cur.rows).length} row(s); ${res.pinned} pinned by this run)`);
+            const after = loadBaseline(target);
+            for (const r of toRun) if (r.status === 'OK' || r.status === 'RED') verdict(r, after);
+            if (refused.length) {
+                console.log(`  NOT pinned (cannot print or not checked; they stay red): ${refused.length} row(s)`);
+                for (const x of refused.slice(0, 40)) console.log(`    ${x.id}: ${String(x.why).slice(0, 160)}`);
+            }
+            console.log(`  red now: ${toRun.filter((r) => r.status === 'RED').length} RED, ${toRun.filter((r) => r.status === 'ERROR').length} ERROR`);
         }
     }
 
@@ -681,30 +856,49 @@ function sizeCell(s) {
             if (has('verbose')) for (const sz of SIZES) for (const g of (r.sizes && r.sizes[sz] && r.sizes[sz].groups) || []) console.log(`      ${sz} ${g.slice(0, 180)}`);
         }
     }
-    const tally = ['OK', 'CACHED', 'RED', 'PENDING', 'N/A', 'ERROR'].map((s) => `${s} ${byStatus(s).length}`).join(' · ');
-    console.log(`\n${TOOL}: ${tally}`);
+    for (const r of byStatus('ERROR').filter((x) => !x.sizes)) console.log(`  ERROR ${r.id}: ${String(r.reason).slice(0, 200)}`);
+    const TALLY = ['OK', 'CACHED', 'RED', 'PENDING', 'N/A', 'ERROR'];
+    // the tally line keeps its old shape (`<tool>: OK <n> · CACHED ...`): ws-matrix-nightly.sh reads it for the commit message;
+    // it is never the last line, which is always the verdict (finalVerdict)
+    console.log(`\n${TOOL}: ${TALLY.map((s) => `${s} ${byStatus(s).length}`).join(" · ")}`);
 
     // write: cache, run file
     if (CACHE) {
-        for (const r of toRun) if (r.status === 'OK') cache.rows[r.id] = { depHash: r.depHash, status: 'OK', date: new Date().toISOString().slice(0, 10) };
+        const baseNow = has('write-baseline') ? loadBaseline(BASE || path.join(MATRIX_DIR, 'baseline.json')) : base;
+        for (const r of toRun) if (r.status === 'OK') cache.rows[r.id] = { depHash: r.depHash, baseline: baselineKey(baseNow, r.id), status: 'OK', date: new Date().toISOString().slice(0, 10) };
         fs.writeFileSync(CACHE, JSON.stringify(cache, null, 1) + '\n');
     }
     const OUT = arg('out', null);
     if (OUT) {
         const file = OUT === 'auto' ? path.join(MATRIX_DIR, `${new Date().toISOString().slice(0, 10)}${shard ? `.shard-${shard.i}-of-${shard.n}` : ''}.json`) : path.resolve(OUT);
         fs.mkdirSync(path.dirname(file), { recursive: true });
-        fs.writeFileSync(file, JSON.stringify({
-            tool: TOOL, date: new Date().toISOString().slice(0, 10), commit, dirty, partners: P.source, printInputsHash: printHash,
-            selection: { skills: ONLY.length ? ONLY : 'all', affected: aff ? { from: aff.A, to: aff.B, files: aff.files } : null, seventh, shard: shard ? `${shard.i}/${shard.n}` : null, kinds, rows: names },
-            replay: 'M4 replay: not built',
-            timing: timing ? { slots, batch, documents: timing.linted, seconds: +(timing.wallMs / 1000).toFixed(1), slotWaitSeconds: +(timing.waitMs / 1000).toFixed(0), docsPerSec: +timing.docsPerSec.toFixed(4), batches: timing.chunkTimes } : null,
-            totals: Object.fromEntries(['OK', 'CACHED', 'RED', 'PENDING', 'N/A', 'ERROR', 'RUN'].map((s) => [s, byStatus(s).length])),
-            rows: rows.map((r) => ({ id: r.id, kind: r.kind, row: r.name, skills: r.skills, args: r.args, pairs: r.pairs, depHash: r.depHash, status: r.status, step: r.step || undefined, reason: r.status === 'RUN' ? undefined : r.reason, rises: r.rises && r.rises.length ? r.rises : undefined, sizes: r.sizes ? Object.fromEntries(SIZES.map((s) => [s, { ...r.sizes[s], groups: undefined }])) : undefined })),
-        }, null, 1) + '\n');
+        fs.writeFileSync(file, JSON.stringify(runFile(rows, { started, commit, dirty, P, printHash, ONLY, aff, seventh, shard, kinds, names, timing, slots, batch, live, refused }), null, 1) + '\n');
         console.log(`wrote ${path.relative(process.cwd(), file)}`);
     }
-    const red = byStatus('RED').length + byStatus('ERROR').length;
-    const summary = `${rows.length} row(s), ${toRun.length} run, ${(((Date.now() - t0) / 1000)).toFixed(0)} s`;
-    if (red && !has('report-only')) { console.error(`${TOOL}: FAIL - ${red} red row(s); ${summary}`); process.exit(1); }
-    console.log(red ? `${TOOL}: WOULD FAIL - ${red} red row(s) [report-only, exit 0]; ${summary}` : `${TOOL}: OK (${summary})`);
+    const summary = `${rows.length} row(s), ${toRun.length} run, ${byStatus('CACHED').length} cached, ${(((Date.now() - t0) / 1000)).toFixed(0)} s`;
+    const v = finalVerdict(rows, { reportOnly: has('report-only'), summary, reach });
+    (v.code ? console.error : console.log)(v.line);
+    process.exitCode = v.code;
 })().catch((e) => { console.error(`${TOOL}: FAIL - ${has('verbose') ? (e && e.stack) || e : (e && e.message) || e}`); process.exit(1); });
+
+/** The run file (header "THE RUN FILE"): per-row status OK / RED / PENDING / N/A / ERROR; cached rows are OK + cached. */
+function runFile(rows, { started, commit, dirty, P, printHash, ONLY, aff, seventh, shard, kinds, names, timing, slots, batch, live, refused }) {
+    const st = (s) => rows.filter((r) => r.status === s).length;
+    return {
+        tool: TOOL, date: new Date().toISOString().slice(0, 10), started, finished: new Date().toISOString(), commit, dirty, partners: P.source, printInputsHash: printHash,
+        selection: { skills: ONLY.length ? ONLY : 'all', affected: aff ? { from: aff.A, to: aff.B, files: aff.files } : null, seventh, shard: shard ? `${shard.i}/${shard.n}` : null, kinds, rows: names },
+        replay: 'M4 replay: not built',
+        liveSkills: live.length,
+        timing: timing ? { slots, batch, documents: timing.linted, seconds: +(timing.wallMs / 1000).toFixed(1), slotWaitSeconds: +(timing.waitMs / 1000).toFixed(0), docsPerSec: +timing.docsPerSec.toFixed(4), batches: timing.chunkTimes } : null,
+        totals: Object.fromEntries(['OK', 'CACHED', 'RED', 'PENDING', 'N/A', 'ERROR'].map((s) => [s, st(s)])),
+        red: rows.filter((r) => r.status === 'RED' || r.status === 'ERROR').map((r) => r.id),
+        notPinned: refused && refused.length ? refused : undefined,
+        rows: rows.map((r) => ({
+            id: r.id, skill: r.skill, kind: r.kind, row: r.name, skills: r.skills, args: r.args, pairs: r.pairs, depHash: r.depHash,
+            status: r.status === 'CACHED' ? 'OK' : r.status, cached: r.status === 'CACHED' ? (r.cachedAt || true) : undefined,
+            step: r.step || undefined, reason: r.status === 'OK' || r.status === 'CACHED' ? undefined : r.reason,
+            rises: r.rises && r.rises.length ? r.rises : undefined, errors: r.errors || undefined,
+            sizes: r.sizes ? Object.fromEntries(SIZES.map((s) => [s, { ...r.sizes[s], groups: undefined }])) : undefined,
+        })),
+    };
+}

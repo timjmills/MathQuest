@@ -8,15 +8,21 @@
 #
 # What it does, on the checked-out tip of the integration branch (claude/sweet-newton-c8wrv1):
 #   1. refuses unless HEAD is the fetched tip of origin/claude/sweet-newton-c8wrv1 (the matrix records that commit);
-#   2. FIRST RUN (no nightly run file <date>.json in design/audit/matrix/ yet): every row of every live skill
-#      (--all), and writes the per-row baseline (with SHARD: baseline.shard-i-of-n.json, merged by every reader);
+#   2. FIRST RUN (no run file of THIS shard, <date>[T<HHMM>][.shard-i-of-n].json, in design/audit/matrix/ yet): every row of every live skill
+#      (--all), and writes the per-row baseline (with SHARD: baseline.shard-i-of-n.json, merged by every reader).
+#      Only rows that PRINTED are pinned: a row that cannot print (a render error, L-SPLIT RENDER) stays ERROR and
+#      is listed as "NOT pinned" (ws-coverage-matrix D4), so it is red until it prints;
 #   3. otherwise: the rows the commits since the last nightly reach (--affected <last nightly's commit>..HEAD; before
 #      M4 that is every print row whenever a print input changed, and none when only planning files, tests, generated
 #      documents, search-terms.js or the index.html stamp changed) PLUS the rotating seventh of all rows (--seventh
 #      <UTC day of week mod 7>), so every row runs at least weekly; rows already OK in design/audit/matrix/cache.json
-#      for the same dependency hash are skipped; red = above the per-row baseline;
+#      for the same dependency hash and baseline entry are skipped; RED = above the per-row baseline, ERROR = did
+#      not print;
 #   4. writes design/audit/matrix/<UTC date>.json (with SHARD: <date>.shard-i-of-n.json) and the cache, and prints
-#      the commit message for the session to commit with (the session adds its own attribution lines).
+#      the commit message for the session to commit with (the session adds its own attribution lines). A run fired
+#      outside the schedule (the deploy firing the 8 shard tasks when its affected rows are over budget) on a date
+#      that already has a run file writes <date>T<HHMM>[.shard-i-of-n].json beside it: no run file is overwritten.
+#      Every run file carries `commit`, `finished` and each row's `status` (ws-coverage-matrix header, THE RUN FILE).
 # It never edits anything outside design/audit/matrix/. Exit 0 with red rows (--report-only): the deploy gate reads
 # the red rows from the JSON; a crash exits non-zero.
 set -euo pipefail
@@ -44,14 +50,19 @@ if [ -n "${SHARD:-}" ]; then
   SUFFIX=".shard-${SHARD%/*}-of-${SHARD#*/}"
 fi
 
-# the last nightly: the newest dated run file's recorded commit (shards of one night share it)
+# the last run OF THIS SHARD (or of the unsharded job): the newest dated run file's recorded commit. Per shard, so
+# shard 5 starting after shard 1 of the first night has pushed still sees its own first run (and pins its baseline)
 LAST=$(node -e '
-const fs = require("fs"), d = process.argv[1];
-const runs = (fs.existsSync(d) ? fs.readdirSync(d) : []).filter((f) => /^\d{4}-\d{2}-\d{2}(\.shard-\d+-of-\d+)?\.json$/.test(f)).sort();
+const fs = require("fs"), d = process.argv[1], suffix = process.argv[2] || "";
+const mine = (f) => (suffix ? f.endsWith(suffix + ".json") : !/\.shard-/.test(f));
+const runs = (fs.existsSync(d) ? fs.readdirSync(d) : []).filter((f) => /^\d{4}-\d{2}-\d{2}(T\d{4})?(\.shard-\d+-of-\d+)?\.json$/.test(f) && mine(f)).sort();
 for (const f of runs.reverse()) { try { const j = JSON.parse(fs.readFileSync(d + "/" + f, "utf8")); if (j.commit && !j.dirty) { console.log(j.commit); break; } } catch (e) {} }
-' "$DIR")
+' "$DIR" "$SUFFIX")
 
-ARGS=(--all --slots "$SLOTS" --out "$DIR/$DATE$SUFFIX.json" --cache "$DIR/cache$SUFFIX.json" --report-only "${SHARD_ARGS[@]}")
+# a second run on one date (a fired run) gets the time in its name, so the night's file is kept
+RUNFILE="$DIR/$DATE$SUFFIX.json"
+[ -e "$RUNFILE" ] && RUNFILE="$DIR/${DATE}T$(date -u +%H%M)$SUFFIX.json"
+ARGS=(--all --slots "$SLOTS" --out "$RUNFILE" --cache "$DIR/cache$SUFFIX.json" --report-only "${SHARD_ARGS[@]}")
 if [ -z "$LAST" ]; then
   # no nightly has run yet: every row, and its counts become the per-row baseline (merged with the rows a
   # builder's own check pinned before, e.g. the E1 check of two skills)
