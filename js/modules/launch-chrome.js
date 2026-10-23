@@ -184,6 +184,7 @@ function reveal(on) {
         box.innerHTML = revealed ? `<span class="tvb-answer-l">Answer</span> <span class="tvb-answer-v">${esc(answerText(state.currentQ))}</span>` : '';
     }
     if (btn) { btn.textContent = revealed ? 'Hide answer' : 'Show answer'; btn.setAttribute('aria-expanded', String(revealed)); }
+    if (boardOn) fitBoard();
 }
 
 function boardNext() {
@@ -205,6 +206,50 @@ function quietGameClocks() {
     // No countdown, no "off task" nudge on the board: the class answers aloud.
     if (state.timerInterval) { clearInterval(state.timerInterval); state.timerInterval = null; }
     if (typeof window.clearQuestionTimer === 'function') { try { window.clearQuestionTimer(); } catch (e) { /* ignore */ } }
+}
+
+/* Board fit: the question is drawn as BIG as the board allows without scrolling. The CSS zoom
+   (1.6, 1.25 under 1024px, 1 under 600px; css/play-teacher.css) is the cap; when the paper at that
+   zoom would scroll the white card, the zoom comes down to the largest that fits, never below 1
+   (content never shrinks below its normal size; at 1 the card's own scroll is the fallback).
+   Recomputed on every question render, on reveal, on resize and when the board starts. */
+function fitBoard() {
+    const paper = document.getElementById('questionPaper');
+    const card = document.getElementById('questionCard');
+    if (!paper || !card) return;
+    paper.classList.remove('tvb-fitted');
+    paper.style.removeProperty('--tvb-fit');
+    if (!isBoard()) return;
+    const cap = parseFloat(getComputedStyle(paper).zoom) || 1;
+    if (cap <= 1) return;
+    const gv = document.getElementById('gameView');
+    const fits = () => card.scrollHeight <= card.clientHeight + 1 && card.scrollWidth <= card.clientWidth + 1
+        && (!gv || (gv.scrollHeight <= gv.clientHeight + 1 && gv.scrollWidth <= gv.clientWidth + 1));
+    if (fits()) return;
+    // First guess from the overflow ratio, then step down until it fits.
+    const cs = getComputedStyle(card);
+    const availH = card.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    const availW = card.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    const r = paper.getBoundingClientRect();
+    let z = Math.min(cap, r.height > 0 ? cap * availH / r.height : cap, r.width > 0 ? cap * availW / r.width : cap);
+    z = Math.max(1, Math.floor(z * 100) / 100);
+    paper.classList.add('tvb-fitted');
+    for (;;) {
+        paper.style.setProperty('--tvb-fit', String(z));
+        if (z <= 1 || fits()) break;
+        z = Math.max(1, Math.round((z - 0.05) * 100) / 100);
+    }
+}
+
+let fitObs = null;
+function watchFit() {
+    if (fitObs || typeof MutationObserver === 'undefined') return;
+    const paper = document.getElementById('questionPaper');
+    if (!paper) return;
+    fitObs = new MutationObserver(() => { if (boardOn) fitBoard(); });
+    fitObs.observe(paper, { childList: true, subtree: true, characterData: true });
+    window.addEventListener('resize', () => { if (boardOn) fitBoard(); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (boardOn) fitBoard(); });
 }
 
 /** Redraw the board stage for the current question (called after every question renders). */
@@ -233,11 +278,14 @@ export function syncBoard() {
     };
     unfocus();
     setTimeout(unfocus, 120);
+    watchFit();
+    fitBoard();
 }
 
 function leaveBoard() {
     boardOn = false;
     revealed = false;
+    fitBoard();
     document.getElementById('tvBoardBar')?.remove();
     document.getElementById('tvBoardCtl')?.remove();
 }
