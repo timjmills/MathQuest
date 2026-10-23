@@ -45,6 +45,13 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
    4. **Record** — the result, causes and fixes go into `design/status/speed-audit.md` (one dated section per
       reflection) and the numbers into `design/status/metrics.md`, so the trend (rounds, hours, skills per lane-week)
       is visible over time. The owner gets a short plain-words summary.
+   **After EVERY critic round, pass or fail (owner, 2026-10-23),** the lane also writes two lists into its status file
+   and appends them to `design/status/speed-audit.md` under "Per-round findings":
+   - **Automatic checks** — each critic finding a machine could have measured (class, the rule, the proposed check and
+     its backtest), and whether a check already exists that should have caught it;
+   - **Speed-ups** — anything that cost time in that round (waits, reruns, wrong builder strength, card gaps, tool
+     slowness) and the smallest change that would save it.
+   The orchestrator assigns each item an owner (a lane, the checks owner, or a card/rule edit) before the next round.
    A lane is not closed until its reflection is written. *Why:* the 2026-10-23 pilot reflection found the wrong builder
    strength and five missing machine checks within the hour; each is now a rule or a check.
 0a. **Low effort only on a certified pair (pilot, 2026-10-23).** Opus low builds only copies on a (template, kind) pair that
