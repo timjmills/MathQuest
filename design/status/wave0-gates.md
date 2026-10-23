@@ -49,7 +49,7 @@ Builders run in their own git worktrees and the lead merges them here.
 | Critic r4: FAIL 7 / 8 / 8 (D1 deploy session 1 ran the whole options pin; D2 fold order by name) | mq-opus-medium | 19:05 | 19:19 | — |
 | Fix r4: read-only options gate at deploy, fold every run file by finish time + nits — merged b261abf0 | mq-opus-medium (rebuild after a failed round) | 19:19 | — | — |
 | Critic r5: **PASS 9 / 9 / 8**, no blocking defects | mq-opus-medium | 20:00 | 19:56 | — |
-| Precritic additions from the pilot's critic r1 (sibling compare, SLOT/CLIP on every matrix row, 390 px card, card rulings, not-offered options), lead request 20:00 | mq-opus-medium (first build) | 20:01 | — | — |
+| Precritic additions from the pilot's critic r1 (sibling compare, SLOT/CLIP on every matrix row, 390 px card, card rulings, not-offered options), lead request 20:00 | mq-opus-medium (first build) | 20:01 | 21:07 | — |
 | S1 `ws-precritic` build (brought forward by the lead, 11:02; stopped: moved to the lead's session) | mq-opus-medium | 11:03 | 12:51 | 108 |
 
 ## Critic r1 (2026-10-23, `design/audit/runs/wave0-gates/critic-r1.md`): FAIL — plan 6, backtests 8, usable 6
@@ -183,3 +183,19 @@ d4771778: the steady-phase slice is the one after the last COMPLETED slice (newe
 date's; the affected range already diffs from the last successful run. `ws-matrix-nightly.sh --self-test` (10 cases: one and
 two missed nights resume at the next slice and cover both nights' changes; dirty / unfinished runs don't count; 28 wraps to 1).
 Known behaviour: a forced `--slice k/28` re-run that completes resets the rotation to k+1 (use it only for the missed slice).
+
+## Precritic additions from the pilot's critic r1 (merged 27e67da4)
+Five checks in ws-precritic, each backtested: BAD = the pilot tree critic r1 graded (b3948d88), GOOD = b3948d88 + a seeded
+minimal fix patch (`tests/fixtures/precritic/pilot-su-c/good.patch`, never committed as app code; the pilot had no fix
+commit yet). `ws-backtest --row …-pilot`: 5/5 PASS (283 s).
+1. `ws-sibling-compare.cjs` — a red matrix row above the approved siblings' max (same row, size, rule) is FAIL; at or
+   below is engine red (rule 0b). Siblings in `tests/fixtures/precritic/siblings.json` (8 stack skills — to confirm).
+2. `ws-slot-clip.cjs` — L-ANSAREA / L-OVERFLOW on every matrix row × S/M/L + a probe for answer-box segment width ≥ 4.4 mm
+   (TY-21) and overlapping place-value heads (H2); the pilot's 4.06 mm segments at S are caught.
+3. `ws-phone-card.cjs` — the practice card at 390×844 / 390×664: no sideways clip, focus on the first (ones) box, in view.
+4. `ws-card-rulings.mjs --check rulings` — a card's `<!-- rulings {json} -->` block asserted over 300 seeded items a skill
+   (pilot: zero cases 55 % on sub_50 vs the 10 % bound).
+5. `--check offered` — the option panel offers nothing the card's `notOffered` lists (pilot: `band` on all 7 skills).
+Precritic on HEAD for subtraction:sub_100_no_regroup: OK, 15 PASS (2 baseline), 1 N/A, 2 SKIPPED (no rulings block on the
+card — the card owners need to add one; `--strict` makes that INCOMPLETE), 1581 s wall (1048 s of it a needless sibling
+measurement, since removed). The SLOT-W / HEADS probe lives in ws-slot-clip, not ws-print-lint yet.
