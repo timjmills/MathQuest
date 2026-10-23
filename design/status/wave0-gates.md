@@ -295,3 +295,7 @@ patch). Lead-side integration fix: the cards README's example block was read as 
 **Precritic on HEAD now FAILs `subtraction:sub_100_no_regroup`** on 3 counts above its paired siblings (mixed/defaults S
 PG-12 2 vs 0; sections/ex-each L H13 6 vs 4; single/ex-group S TY-11 16 vs 8) and on card rulings (band 118/300, same
 length 40/300, zero case 44.3 %, band offered) — real, the pilot's to fix (rule 0b), not a tool defect.
+12 (lead 23:07, owner ruling CL-4b, WORKSHEET_DESIGN_STANDARD 12ed112f): print-lint reads each cell's first printed row —
+top-default cells FAIL when the problem starts > 3 mm below the top pad; write-above cells (regrouping items, long-division
+brackets, judged from content) FAIL when not centred within 2 mm. REPORTING-ONLY until the mixed lane's kit change lands
+(the kit centres every stack today), then a gate. Backtest: today's tip FAILs on any no-regroup stack page; fact pages pass.
