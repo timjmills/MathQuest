@@ -200,3 +200,37 @@ measurements are real when they come:
 5. **Start the SU-C pilot the moment `ws-precritic` lands (medium).** It gives the §4.4 number weeks before E3.
 6. **Record times in the lane files (low).** Lane files have no start/end times for builder runs and critic rounds; add a
    `Times:` line per run (start, end, profile) so the next audit reads them instead of inferring them from commits.
+
+## Round 1b — check-ins, 11:56 → 14:00 UTC
+
+| Item | Then | Now |
+|---|---|---|
+| Rounds baseline (intervention 1) | plan said median ≈ 5 | done: `metrics.md` reports per lane median 4 / mean 4.8, per run 3 / 4.4 |
+| `ws-precritic` (intervention 3) | queued in W0-A | done: brought forward, then queued 1 h 48 min for a browser slot (three builders sharing two slots); the lead moved it to its own branch `-wip-wave0-precritic` (5ebe5d24, 13:34) |
+| Times in lane files (intervention 6) | none | done: W0-A and W0-B lane files carry a Times table |
+| W0-B | building | critic r2 PASS (2 rounds; tool work, not a skill measurement) |
+| W0-A build times (its Times table) | — | E1 envelope 19 min, S4 golden 29, S2 part 1 31, **S5 deploy runner 185**, **S2 part 2 145** (one S5 shard starved 90 min by the slot queue, fixed in bfdbd901), S9 fix 13 (low effort) |
+
+**Measured on a scratch merge of main + `-wip-wave0-gates` 88d27e72 + `-wip-wave0-precritic` 5ebe5d24 (one container, two
+browser slots):**
+
+| Tool | Target | Measured |
+|---|---|---|
+| `ws-precritic --skill`, one skill (sub_100_no_regroup) | ≈ 5–6 min a skill | **208 s**, green on 12 of 13 gates (coverage matrix SKIPPED-NOT-BUILT) |
+| `ws-precritic --skill`, the six SU-C skills | ≈ 30–36 min | **604 s (≈ 1.7 min a skill)**; chromebook-fit 376 s of it |
+| `ws-backtest` (all S2 checks) | backtests green | **10 PASS, 0 PENDING**, 387 s |
+| `ws-node-lint` | seconds | 0.4 s a skill, 46 s for every live skill |
+
+**Pilot readiness (§3) at 14:00:** 1 partial · 2 yes · 3 yes (signed f0df0a00) · 4 **no** · 5 yes.
+- **Blocker A (condition 4):** `-wip-wave0-gates` and `-wip-wave0-precritic` both add `design/audit/baselines/screen-slots.json`
+  in two different formats (S5: `standing` / `dark-student:card:contrast`; S1: `<host>:doubled`). One format, read by both tools,
+  then merge both into the main line.
+- **Blocker B (condition 1):** `ws-options-verify` FAILS on 5 of the 6 pilot skills (72 NEW: the inert number-line options
+  `nlOn` / `nlFrom` / `nlTo` / `nlStep` … "change nothing" in generation — pre-existing on main). It reads as NEW because
+  `design/audit/baselines/options-verify.json` pins only 21 skills (the role sample + sub_100_no_regroup). **Any lane touching
+  an unpinned skill starts red for a reason outside its scope**, which buys back the round the precritic is meant to save.
+  Fix: pin options-verify for every live skill (per-skill batches; the full sweep hangs), as print-lint is pinned for 721
+  documents — or fix the inert nl* options.
+
+**Verdict change:** the tools already timed are fast enough. `ws-precritic` comes in at about a third of its time budget per
+skill. Skill making is still **not yet measurable**; the pilot starts once A and B are fixed.
