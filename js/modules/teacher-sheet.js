@@ -240,7 +240,7 @@ async function probeLayouts(it) {
 /* ================================================================= building */
 
 function sigOf(p, list, quiz) {
-    return JSON.stringify({ g: trayGroups(), l: trayLocks(), k: p.kind, pi: p.pageItems, pb: p.pagesBy, o: S.opts, seed: S.seed, quiz: quiz ? { v: S.quiz.versions, q: S.quiz, name: S.quiz.name } : null, cnt: list.map((x) => [x.count || 0, x.lockPct === undefined ? -1 : x.lockPct, x.weight]),
+    return JSON.stringify({ t: S.batchTitle || '', g: trayGroups(), l: trayLocks(), k: p.kind, pi: p.pageItems, pb: p.pagesBy, o: S.opts, seed: S.seed, quiz: quiz ? { v: S.quiz.versions, q: S.quiz, name: S.quiz.name } : null, cnt: list.map((x) => [x.count || 0, x.lockPct === undefined ? -1 : x.lockPct, x.weight]),
         skills: list.map((x) => [keyOf(x), x.opts || null, x.leftOut ? 0 : 1]) });
 }
 
@@ -259,7 +259,7 @@ function versionFooter(html, label) {
 async function buildAll(p, list, quiz, onProgress) {
     const versions = versionsOf(quiz);
     const keysAtEnd = versions > 1 && S.opts.keyVersions === 'end';
-    const out = { pupil: [], key: [], doc: '', pages: 0, pagesAll: 0, keyPages: 0, byKey: {}, total: 0, errors: [], perVersion: [] };
+    const out = { pupil: [], key: [], doc: '', pages: 0, pagesAll: 0, keyPages: 0, byKey: {}, total: 0, printed: 0, errors: [], perVersion: [] };
     let tailKeys = '', done = 0;
     const parts0 = requests(p, list, quiz, 0).length;
     for (let v = 0; v < versions; v++) {
@@ -286,6 +286,7 @@ async function buildAll(p, list, quiz, onProgress) {
             vv.pages += (res.pageCount || 0) * copies;
             out.keyPages += res.keyPageCount || 0;
             vv.total += countParts(res, part, copies, vv.byKey);
+            out.printed += (res.items || []).filter(Boolean).length * copies;   // every printed problem (T4 batch summary)
         }
         out.perVersion.push(vv);
         out.pupil.push(vp); out.key.push(vk);
@@ -322,6 +323,7 @@ function scheduleBuild(delay = 250) {
  */
 async function runPreview() {
     if (!S.sheet || S.sheet === 'share' || S.sheet === 'quizshare') return;
+    if (batchActive()) { ensureBatch(); return; }   // lesson groups: the side shows what Print all makes
     const list = items();
     if (!list.length) { S.preview = null; renderSide(); return; }
     const my = ++token;
@@ -446,6 +448,7 @@ function open(kind, ctx = {}) {
     S.sheet = kind;
     S.fromLesson = !!ctx.fromLesson;
     if (S.fromLesson && !touched('kind')) S.kind = null;
+    S.batchTitle = typeof ctx.title === 'string' ? ctx.title : '';   // T4: a lesson's practice carries the lesson's name
     S.quizLink = '';
     if (kind === 'share') S.shareRes = undefined;
     S.popup = null;
@@ -463,6 +466,8 @@ function open(kind, ctx = {}) {
 }
 function close() {
     S.sheet = null;
+    S.batchTitle = '';
+    B.tok++; B.sig = ''; B.res = null; B.busy = null;
     S.popup = null;
     token++;
     persist();
@@ -646,6 +651,8 @@ function autoQuizName(list) {
 function renderSide() {
     const side = root && root.querySelector('#tvsSide');
     if (!side) return;
+    if (batchActive()) { renderBatchSide(side); return; }
+    if (side.dataset.batch) { delete side.dataset.batch; side.innerHTML = ''; }
     const sm = summary();
     const quiz = S.sheet === 'quiz';
     const has = items().length > 0;
@@ -953,7 +960,7 @@ function onClick(e) {
     const v = b.dataset.v;
     const more = root.querySelector('.tvs-more');
     S.moreOpen = !!(more && more.open);
-    if (EXTRA && EXTRA.click && /^x-/.test(b.dataset.act)) { if (EXTRA.click(b)) changed(false); return; }
+    if (EXTRA && EXTRA.click && /^x-/.test(b.dataset.act)) { if (EXTRA.click(b)) { changed(false); renderSide(); } return; }
     switch (b.dataset.act) {
         case 'close': close(); return;
         case 'kind': S.kind = v; touch('kind'); if (v !== 'single') S.opts.layout = 'standard'; changed(); return;
@@ -1071,7 +1078,13 @@ export function redrawSheet() { if (root && S.sheet) changed(false); }
  *                                                                 skills together, as many problems as its own sheet)
  * Returns { doc, pages, keyPages, parts: [{ title, pages, total, error? }] }.
  */
-export async function buildBatch(parts, onProgress) {
+export function buildBatch(parts, onProgress) {
+    // one batch at a time: a batch sets the sheet's kind and title while it builds
+    const run = B.chain.then(() => buildBatchNow(parts, onProgress));
+    B.chain = run.catch(() => null);
+    return run;
+}
+async function buildBatchNow(parts, onProgress) {
     const all = items();
     const pick = (keys) => keys.map((k) => all.find((x) => keyOf(x) === k)).filter((x) => x && !x.leftOut);
     const keepKind = S.kind, keepTitle = S.batchTitle;
@@ -1097,7 +1110,7 @@ export async function buildBatch(parts, onProgress) {
                 try { res = await buildSheet(req); } catch (e) { out.parts.push({ title: part.title, pages: 0, total: 0, error: (e && e.message) || 'Could not be built' }); continue; }
                 out.doc += (res.keyOptions && res.keyOptions.placement === 'after-page' ? res.docHtml || res.pupilHtml : `${res.pupilHtml}\n${res.keyHtml || ''}`) + '\n';
                 out.pages += res.pageCount || 0; out.keyPages += res.keyPageCount || 0;
-                out.parts.push({ title: part.title, pages: res.pageCount || 0, total: (res.items || []).filter(Boolean).length });
+                out.parts.push({ title: part.title, pages: res.pageCount || 0, keyPages: res.keyPageCount || 0, total: (res.items || []).filter(Boolean).length, first: (res.pupilPages && res.pupilPages[0]) || res.pupilHtml });
                 continue;
             }
             const list = pick(part.keys || []);
@@ -1108,14 +1121,67 @@ export async function buildBatch(parts, onProgress) {
             const b = await buildAll(p, list, false);
             out.doc += b.doc + '\n';
             out.pages += b.pages; out.keyPages += b.keyPages;
-            out.parts.push({ title: part.title, pages: b.pages, total: b.total });
+            out.parts.push({ title: part.title, pages: b.pages, keyPages: b.keyPages, total: b.printed, first: (b.perVersion[0] || {}).first || '' });
         }
     } finally { S.kind = keepKind; S.batchTitle = keepTitle; }
     return out;
 }
+/* The lesson-group summary: built from the SAME batch Print all prints, so its numbers are the PDF's. */
+const B = { sig: '', res: null, busy: null, tok: 0, prog: '', chain: Promise.resolve() };
+function batchActive() { try { return S.sheet === 'print' && !!EXTRA && typeof EXTRA.parts === 'function' && (EXTRA.parts() || []).length > 0; } catch (e) { return false; } }
+function batchSig(parts) {
+    return JSON.stringify({ parts, seed: S.seed, o: S.opts, k: S.kind, l: trayLocks(), g: trayGroups(), it: items().map((x) => [keyOf(x), x.opts || null, x.weight, x.count || 0, x.lockPct === undefined ? -1 : x.lockPct, x.leftOut ? 0 : 1]) });
+}
+function ensureBatch(onProgress) {
+    const parts = EXTRA.parts();
+    const sig = batchSig(parts);
+    if (B.sig === sig && B.res) return Promise.resolve(B.res);
+    if (B.sig === sig && B.busy) { if (onProgress) B.onProg = onProgress; return B.busy; }
+    B.sig = sig; B.res = null; B.onProg = onProgress || null;
+    const my = ++B.tok;
+    B.busy = buildBatch(parts, (i, n) => {
+        if (my !== B.tok) return;
+        B.prog = `Making worksheet ${i} of ${n}…`;
+        if (B.onProg) B.onProg(i, n);
+        if (root) renderSide();
+    }).then((r) => { if (my === B.tok) { B.res = r; B.busy = null; B.prog = ''; if (root) renderSide(); } return r; });
+    return B.busy;
+}
+const pl = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+/** The words of a built batch: "4 worksheets · 9 pages + 4 key pages · 38 problems", and a line per worksheet. */
+export function batchSummary(r) {
+    if (!r) return null;
+    const ok = r.parts.filter((x) => !x.error);
+    const problems = ok.reduce((t, x) => t + x.total, 0);
+    return {
+        line: `${pl(ok.length, 'worksheet')} · ${pl(r.pages, 'page')} + ${pl(r.keyPages, 'key page')} · ${pl(problems, 'problem')}`,
+        rows: r.parts.map((x) => (x.error ? `${x.title}: ${x.error}` : `${x.title}: ${pl(x.pages, 'page')} · ${pl(x.total, 'problem')} · key ${pl(x.keyPages, 'page')}`)),
+        pages: r.pages, keyPages: r.keyPages, problems, worksheets: ok.length,
+    };
+}
+function renderBatchSide(side) {
+    if (!side.dataset.batch) {
+        side.dataset.batch = '1';
+        side.innerHTML = `<div class="tvs-sum" id="tvsSumBox" aria-live="polite"></div><div class="tvs-prev" id="tvsPrevBox"><iframe class="tvs-prev-frame" id="tvsPrevFrame" title="Page 1 preview" tabindex="-1"></iframe></div>
+  <p class="tvs-muted tvs-prev-cap" id="tvsPrevCap"></p><div class="tvs-actions" id="tvsActBox"></div>`;
+    }
+    const parts = EXTRA.parts();
+    const fresh = B.res && B.sig === batchSig(parts);
+    if (!fresh && !B.busy) setTimeout(() => ensureBatch(), 0);
+    const sm = fresh ? batchSummary(B.res) : null;
+    side.querySelector('#tvsSumBox').innerHTML = sm
+        ? `<p class="tvs-sum-line" data-tvs-summary data-tvs-batch="${sm.worksheets}|${sm.pages}|${sm.keyPages}|${sm.problems}">${esc(sm.line)}</p><ul class="tvs-sum-more tvs-batch-rows">${sm.rows.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>`
+        : `<p class="tvs-sum-line" data-tvs-summary>${esc(`${pl(parts.length, 'worksheet')} · counting the pages…`)}</p><p class="tvs-sum-more" data-tvs-progress>${esc(B.prog || 'Making the worksheets…')}</p>`;
+    side.querySelector('#tvsPrevCap').textContent = fresh ? `First page of “${(B.res.parts[0] || {}).title || 'the first worksheet'}” · Print all makes every page` : 'Drawing the first page…';
+    side.querySelector('#tvsActBox').innerHTML = `<button type="button" class="tvs-btn tvs-primary" data-act="x-lpprint">${icon('print', 20)}<span>Print all</span></button>
+    <button type="button" class="tvs-btn" data-act="renew">${icon('shuffle', 18)}<span>New numbers</span></button>`;
+    if (fresh && B.res.parts[0] && B.res.parts[0].first) showPreview(B.res.parts[0].first);
+}
+
 /** buildBatch, then the print dialog (the document is kept as the sheet's last document). */
 export async function printBatch(parts, title, onProgress) {
-    const b = await buildBatch(parts, onProgress);
+    // the same build the summary counted (built once, for the summary and the print), else a fresh one
+    const b = batchActive() && batchSig(parts) === B.sig ? await ensureBatch(onProgress) : await buildBatch(parts, onProgress);
     if (!b.doc) { toast('These pages could not be built'); return b; }
     S.lastDoc = sheetDocument(b.doc, title, { paper: S.opts.paper || 'A4' });
     try { await printHtml(b.doc, title, S.opts.paper || 'A4'); } catch (e) { console.warn('[teacher-sheet] print failed', e); toast('Could not open the print dialog'); }
@@ -1128,5 +1194,5 @@ if (typeof window !== 'undefined') {
     window.tvCloseSheet = closeSheet;
     window.tvSheetState = sheetState;
     window.tvSheetBuildNow = buildNow;
-    window.tvSheetHooks = { setPrintExtra, onSheetClose, redrawSheet, buildBatch, printBatch };
+    window.tvSheetHooks = { setPrintExtra, onSheetClose, redrawSheet, buildBatch, printBatch, batchSummary, batchNow: () => (batchActive() ? ensureBatch() : Promise.resolve(null)) };
 }
