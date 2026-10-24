@@ -44,7 +44,7 @@ function loadStandards() {
     stdLoading = import('./standards.js').then((m) => {
         STD = m;
         if (root && root.isConnected) {
-            renderResults();
+            refreshResults();
             renderDetail();
             if (lib.mode === 'standards') renderStandardsView();
         }
@@ -186,10 +186,25 @@ function stdBannerHTML(count) {
       <p class="tvl-std-banner-text">${esc(r.text)}</p>${count ? '' : '<p class="tv-cap">No skill covers this yet. It is on the gap list in Standards coverage.</p>'}</div>`;
 }
 
+/** What renderResults last drew: the view, the selection and the skills in order. */
+let resultsSig = '';
+function resultsSignature(list) {
+    return [lib.view, lib.sel, lib.stdHits ? 'std' : '', list.map(keyOf).join(',')].join('|');
+}
+
+/** A late load (search terms, standards) re-draws the results only when they changed: re-drawing the same
+ *  list would blank its drawn thumbnails while they are drawn again. */
+function refreshResults() {
+    stdSearch();
+    if (resultsSig && resultsSignature(shown()) === resultsSig) return;
+    renderResults();
+}
+
 function renderResults() {
     const box = root.querySelector('#tvlResults');
     stdSearch();
     const list = shown();
+    resultsSig = resultsSignature(list);
     if (lib.stdHits) {
         const banner = stdBannerHTML(list.length);
         root.querySelector('#tvlCount').textContent = `${list.length} skill${list.length === 1 ? '' : 's'}`;
@@ -632,4 +647,4 @@ function wire() {
 }
 
 // The standards / WRM terms load after boot: re-run a search that is on screen (critic r1 N2).
-onSkillSearchReady(() => { try { if (root && root.isConnected && lib.query.trim()) renderResults(); } catch (e) { /* screen gone */ } });
+onSkillSearchReady(() => { try { if (root && root.isConnected && lib.query.trim()) refreshResults(); } catch (e) { /* screen gone */ } });

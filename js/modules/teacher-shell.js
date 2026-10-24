@@ -169,6 +169,7 @@ function showScreen(key) {
     if (key !== 'wrm') clearWrmHash(key);
     if (key !== 'map') clearMapHash();
     if (key !== 'todo') clearTodoHash();
+    placeScreens(key);
     document.querySelectorAll('#teacherMain .tv-screen').forEach((s) => s.classList.toggle('is-active', s.dataset.screen === key));
     setNavCurrent(key);
     const el = document.querySelector(`#teacherMain .tv-screen[data-screen="${key}"]`);
@@ -180,6 +181,65 @@ function showScreen(key) {
     }
     syncInert();
     window.scrollTo(0, 0);
+}
+
+/* ================================================================= parked screens
+   Only the screen on show is in the document. Every other screen that has been drawn is PARKED: its section
+   (with its DOM, listeners and state — ticks, view, preview) is swapped out for an empty placeholder and kept
+   here, and swapped back in before it is shown again. So a hidden screen never leaves a second live copy of a
+   shared control (List | Thumbnails, Options …) in the page, and coming back is exactly where the teacher
+   left it. A renderer keeps its own section as `root`, so late async work still lands in the parked section. */
+
+const parked = new Map();   // screen key -> its real (detached) section
+
+// A frame (the print preview, a sample) that is still loading is never detached: that would cancel its stylesheet
+// and font requests mid-load. Its screen is parked as soon as the frame has loaded. A frame is "loading" from the
+// moment it is added, given a src / srcdoc, or put back in the page, until its load event.
+let framesWatched = false;
+function watchFrames() {
+    if (framesWatched) return;
+    const main = document.getElementById('teacherMain');
+    if (!main) return;
+    framesWatched = true;
+    const mark = (f) => { f.dataset.tvLoading = '1'; };
+    new MutationObserver((records) => {
+        for (const r of records) {
+            if (r.type === 'attributes' && r.target.tagName === 'IFRAME') mark(r.target);
+            for (const n of r.addedNodes || []) {
+                if (n.nodeType !== 1) continue;
+                if (n.tagName === 'IFRAME') mark(n);
+                else n.querySelectorAll?.('iframe').forEach(mark);
+            }
+        }
+    }).observe(main, { subtree: true, childList: true, attributes: true, attributeFilter: ['src', 'srcdoc'] });
+    main.addEventListener('load', (e) => {
+        if (e.target.tagName !== 'IFRAME') return;
+        delete e.target.dataset.tvLoading;
+        if (document.body.classList.contains('tv-on-screen')) placeScreens(current);
+    }, true);
+}
+
+function placeScreens(key) {
+    watchFrames();
+    document.querySelectorAll('#teacherMain .tv-screen').forEach((sec) => {
+        if (sec.dataset.screen === key || sec.dataset.tvParked || !sec.firstChild) return;
+        if (sec.querySelector('iframe[data-tv-loading]')) return;   // parked once its frame has loaded
+        const ph = document.createElement('section');
+        ph.className = 'tv-screen';
+        ph.dataset.screen = sec.dataset.screen;
+        ph.dataset.tvParked = '1';
+        if (sec.hasAttribute('aria-label')) ph.setAttribute('aria-label', sec.getAttribute('aria-label'));
+        sec.classList.remove('is-active');
+        if (sec.contains(document.activeElement)) document.getElementById('teacherMain')?.focus({ preventScroll: true });
+        sec.replaceWith(ph);
+        parked.set(sec.dataset.screen, sec);
+    });
+    const real = parked.get(key);
+    if (!real) return;
+    const ph = document.querySelector(`#teacherMain .tv-screen[data-screen="${key}"]`);
+    real.querySelectorAll('iframe').forEach((f) => { f.dataset.tvLoading = '1'; });   // a frame put back reloads
+    if (ph) ph.replaceWith(real);
+    parked.delete(key);
 }
 
 /* ================================================================= legacy overlays + focus
