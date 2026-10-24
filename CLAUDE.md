@@ -86,7 +86,7 @@ node tests/scripts/ws-search-terms.cjs       # GATE: every skill is findable (>=
 node tests/scripts/ws-precritic.cjs --skill cat:skill --strict   # GATE before any critic (rule 0b): every machine check of what a lane touched
 node tests/scripts/ws-precritic.cjs --role lesson --strict       #   ... and per page role (H13 on lesson Warm-up cells)
 node tests/scripts/ws-spec-card.mjs --check-signed design/cards/<family>/<family>.md   # GATE at build start: card signed, every hosts-and-roles line decided
-node tests/scripts/ws-backtest.mjs           # every check FAILS on the state a critic failed and PASSES on its fix
+node tests/scripts/ws-backtest.mjs           # every check FAILS on the state a critic failed and PASSES on its fix, and is on precritic's path (ws-precritic-plan)
 bash tests/scripts/ws-deploy-gates.sh        # BEFORE EVERY DEPLOY: the deploy gate sessions (--list for the plan)
 ```
 

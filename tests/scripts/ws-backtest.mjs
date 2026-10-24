@@ -1,7 +1,7 @@
 // ws-backtest — proves each new check (IMPROVEMENT_PLAN §1.4 S2, "Backtests for the new checks"): it must FAIL on the
 // state a critic failed and PASS on the fix. The table is data: tests/fixtures/precritic/backtests.json.
 //
-//   node tests/scripts/ws-backtest.mjs                     # every row
+//   node tests/scripts/ws-backtest.mjs                     # every row, then ws-precritic-plan (each check on the lane's path)
 //   node tests/scripts/ws-backtest.mjs --row notation      # one row (repeatable or comma list)
 //   node tests/scripts/ws-backtest.mjs --kind fixture      # only the fixture rows (or commit-pair)
 //   node tests/scripts/ws-backtest.mjs --list              # the table, with pending rows marked
@@ -145,5 +145,14 @@ for (const x of bad.filter((b) => b.verdict === 'FAIL')) {
 }
 const pending = results.filter((x) => x.verdict === 'PENDING').length;
 console.log(`\n${results.length - bad.length} PASS, ${bad.length - pending} FAIL, ${pending} PENDING; ${((Date.now() - T0) / 1000).toFixed(1)} s`);
-console.log(bad.length ? `ws-backtest: FAIL (${bad.length}${pending ? `, ${pending} pending` : ''})` : 'ws-backtest: OK');
-process.exit(bad.length ? 1 : 0);
+// A backtested check must also be ON THE LANE'S PATH (S1 critic r1 D2): with the default table and no --row / --kind,
+// ws-precritic-plan asserts that ws-precritic --skill <the row's skills> plans each row's tool (and role). --no-plan skips.
+let planBad = 0;
+if (!has('--no-plan') && !arg('--table', null) && !argAll('--row').length && !arg('--kind', null)) {
+    const pr = spawnSync(process.execPath, [join(ROOT, 'tests/scripts/ws-precritic-plan.mjs')], { cwd: ROOT, encoding: 'utf8', maxBuffer: 32 << 20 });
+    const last = String(pr.stdout || '').trim().split('\n').filter((l) => /^ {2}(FAIL|\S+: )|^ws-precritic-plan:/.test(l));
+    console.log(`\n${last.join('\n')}`);
+    if (pr.status !== 0) planBad = 1;
+}
+console.log(bad.length || planBad ? `ws-backtest: FAIL (${bad.length}${pending ? `, ${pending} pending` : ''}${planBad ? ', plan: a check not on the lane\'s path' : ''})` : 'ws-backtest: OK');
+process.exit(bad.length || planBad ? 1 : 0);

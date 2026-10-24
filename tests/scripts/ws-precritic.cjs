@@ -655,6 +655,20 @@ function buildPlan(ctx) {
             const unp = keys.filter((k) => !pinned.has(k));
             add(gate(`print-lint-kit-${sz}`, `ws-print-lint --source kit --size ${sz} (${dup})`, scope, 'browser', 'ws-print-lint', a, { parse: PARSE.printLint, expect: { ids: keys }, note: all ? '' : `not pinned at ${sz}: ${listShort(unp)} (${rel(file)})` }));
         }
+        // The lane skill's OWN lesson page at L and S (S1 critic r1 D2: H13 on the Warm-up and WRAP-OP sat on the pilot's own
+        // lesson pages, N2 / N6 / N7, and the role sample never held them). Against the lesson pins (ids cat:skill#lesson); a
+        // lesson page the pin does not hold must be clean. With --role lesson the keys join that role's sample instead.
+        if (ctx.role !== 'lesson') {
+            for (const sz of ['L', 'S']) {
+                const file = sz === 'L' ? PRINT_BASE : sizeBase('S');
+                const ids = keys.map((k) => `${k}#lesson`);
+                const pinnedL = pinnedIds(file);
+                const a = ['--source', 'kit', '--roles', 'lesson', ...(sz === 'S' ? ['--size', 'S'] : []), '--skills', keys.join(',')];
+                if (fs.existsSync(file)) a.push('--baseline', rel(file));
+                const unp = keys.filter((k) => !pinnedL.has(`${k}#lesson`));
+                add(gate(`print-lint-lesson-${sz}`, `ws-print-lint --source kit --roles lesson --size ${sz} (the lane skills' own lesson pages: H13, WRAP-OP, ...)`, scope, 'browser', 'ws-print-lint', a, { parse: PARSE.printLint, expect: { ids }, note: unp.length ? `lesson page not pinned at ${sz}: ${listShort(unp)} (must be clean)` : '' }));
+            }
+        }
         const ssFile = scriptPath('ws-screen-slots');
         const ss = ['--skills', keys.join(',')];
         if (ssFile && srcHas(ssFile, 'baseline') && fs.existsSync(SLOTS_BASE)) ss.push('--baseline', rel(SLOTS_BASE));
@@ -727,7 +741,8 @@ function buildPlan(ctx) {
         add(gate('grade-render-template', 'ws-grade-render --template --contact-sheet', `template ${t}`, 'browser', 'ws-grade-render', ['--template', t, '--contact-sheet', '--out', path.join(ctx.logs, 'grade-render-template')], { needFlags: ['template', 'contact-sheet'], parse: PARSE.gradeRender }));
     }
     if (ctx.role) {
-        const sample = ctx.roleSample;
+        // --role R --skill X: the lane skills join the role's pinned sample (S1 critic r1 D2), so X's own R page is linted
+        const sample = [...new Set([...ctx.roleSample, ...ctx.skills.map((s) => s.key)])];
         const sc = `role ${ctx.role} × ${sample.length} sample skills`;
         add(gate(`grade-render-role-${ctx.role}`, `ws-grade-render --roles ${ctx.role}`, sc, 'browser', 'ws-grade-render', ['--roles', ctx.role, '--skills', sample.join(','), '--out', path.join(ctx.logs, `grade-render-${ctx.role}`)], { needFlags: ['roles'], parse: PARSE.gradeRender, expectUnits: sample.length }));
         const pl = ['--source', 'kit', '--roles', ctx.role, '--skills', sample.join(',')];
