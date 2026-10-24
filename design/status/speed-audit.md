@@ -519,3 +519,73 @@ stop: F1, F2 (11 checks), F3–F5, F7, the routing rule above, and W0-A r7's D1/
     skill + lock drops a skill; phone headers are tall. The T1 lane lists each with its check. **Owner: T1, when work resumes.**
 - **Lesson.** The lane met none of the targets, and nothing about its speed can be judged yet. Every lost round has a named cause
   and a recorded check, and the lane wrote its own per-round findings as the owner rule asks.
+
+### Mixed pages — pilot patches and anchors round 2
+
+- **Measure.** The pilot's engine patches (fact rows drop columns for 5–6 digit facts; preset band heading on Mixed practice):
+  **critic PASS, but held**, because they break `ws-layout-unit` VA-2 on main. Anchors round 2 (no-example pages plan as off,
+  tall pairs fall back, four-column side layout, twins match their problem): **critic FAIL**, with 28 anchor fails open. Stopped
+  per the owner. Lane total since 10:27 yesterday: M1 PASS in 6 rounds, then two follow-on pieces, one passed-and-held and one failed.
+- **Cause.** A patch passed its critic while a unit gate on main was red against it. The critic graded pages, and nobody ran the
+  unit gates on the merged result before the critic. That is rule 0b's intent, but the rule names precritic and the matrix, not
+  the unit gates.
+- **Fix (recorded).** Rule 0b's "clean" includes the unit gates on the branch **merged with main**. **Owner: lead, LESSONS_LEARNED,
+  when work resumes.**
+
+---
+
+## 2026-10-24 · FINAL SUMMARY (for the owner)
+
+**Numbers (2026-10-23 10:04 → 2026-10-24 03:15 UTC):**
+
+| Lane | Hours | Critic rounds | Result |
+|---|--:|--:|---|
+| W0-B process tools | 1 | 2 | **PASS**, on target |
+| ws-precritic | ≈ 4 | 2 | **PASS**, on target |
+| W0-defects | 3.6 | 3 | **PASS**, one over |
+| W0-A checks and gates | ≈ 10 + 3.5 | 5 + 2 | gates **PASS** at r5; the pilot-lesson checks FAIL at r7, stopped |
+| Mixed pages M1 | 8 | 6 | **PASS**; follow-ons: one PASS but held, one FAIL |
+| T1 teacher mock-up | ≈ 16 | 6 | FAIL, stopped |
+| SU-C pilot (6 skills + preset, the real speed test) | 8.2 | 2 (no r3) | FAIL; stopped by the stop rule; not merged; ≈ 1.81 M tokens |
+
+Rounds to PASS across the lanes that passed: 2, 2, 3, 5, 6, a median of 3. That is the same as before Wave 0 (median 3 a run,
+4 a lane). The target of 2 is not met yet.
+
+**What is really faster (measured):**
+- **Checking a skill.** `ws-precritic` checks one skill in 4–6 min, inside its target, and `ws-node-lint` a skill in 0.4 s. It
+  caught every regression before the pilot's second round and correctly blocked a third.
+- **Builder briefs.** A signed spec card is ≈ 10 k tokens, against ≈ 185 k of standards.
+- **Small tool lanes** split into parallel builders with self-tests passed in 2 rounds (W0-B in 1 h).
+- **Worksheets for teachers were never slow:** 0.3–2.8 s a sheet.
+
+**What is not faster yet:**
+- **Making skills.** The pilot took ≈ 1.2 h a skill with no PASS, against ≈ 1.3 h a skill and 3–4 rounds before. The ≥ 5× claim
+  is not shown.
+- **Rounds to PASS** are unchanged (median 3).
+- **Deploy gates** are not proven to fit 30 min: session 1 takes 26–28 min, and session 2 has no clean timed run.
+
+**Why** (the same three causes in every lane that lost rounds):
+1. **The spec card did not decide what the critic graded:** inherited options, lesson data, appearances, help text.
+2. **One defect survived several rounds** before anyone made it a machine check or sent it to the lane that owns the file
+   (W0-A baselines, M1 repeats, T1 thumbnails, the pilot's side anchors).
+3. **Work went to the critic before the merged result was clean** (the pilot's r1; the mixed patch that breaks a unit gate on main).
+
+**Top 3 changes before the next family:**
+1. **Generate the card's "hosts and roles" section from the code.** It lists every option the panel offers (inherited ones
+   too), every page type with its data source, and every screen. `--check-signed` fails while any line is undecided (F1).
+2. **Route cross-lane defects at first sight, and certify `stack` × Single skill first.** A finding whose fix is in another lane's
+   files goes to that lane in the same round, with the patch. The side-anchor sizing and the lesson Warm-up cell are fixed in the
+   engine and the pair certified before another family builds on it (F7 and the routing rule).
+3. **Build the 11 generic checks, with "clean" meaning merged-with-main.** Zero-case and digit-skew predicates, answer box ≥ 4.4 mm,
+   head overlap, lesson-data presence, option-help truth, an options render check, H13 on lesson roles, the presets item check,
+   wrongAnswer fits its slot, and operator at a line end. Precritic, the matrix and the unit gates must all be green on the branch
+   merged with main before any critic.
+
+**The loop (owner rule):** today's per-round lists named about 30 automatic checks and speed-ups. Seven are built and in use: rules
+0, 0a and 0b, the per-round findings rule, the fair browser-slot queue, the gate-sweep gaps, and baseline invariants with a self-test.
+W0-A's five pilot-lesson checks are built and backtested 8 / 8 but have not passed their critic. Everything else has an owner and
+is held by the stop.
+
+**One deviation to note:** tonight's lead-side changes (HD-5a strand tab removed, CL-11a number tabs only, CL-4b top-of-box with
+an L-TOPSTART lint) were made by in-session builders **without a critic**. Under the owner's rule that everything passes at ≥ 8
+by an independent critic, they need a critic round when work resumes, before any deploy.
