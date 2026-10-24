@@ -36,11 +36,7 @@ import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practic
 import { normKeyOptions, shortKeyRows, renderShortKey, tagKeyAnswers, answerText } from './sheet/roles/key-short.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH, splitPairH } from './sheet/roles/practice.js';
 import { onePageRows, setOnePagePaper, ONE_PAGE_ITEMS } from './count-rows.js';
-<<<<<<< HEAD
-import { resolveSectionLayout, resolveBandedLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS } from './sheet/layout.js';
-=======
-import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS, groupByHeight, packByHeight } from './sheet/layout.js';
->>>>>>> origin/claude/sweet-newton-c8wrv1
+import { resolveSectionLayout, resolveBandedLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS, groupByHeight, packByHeight } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
 import { tagLine as lessonTagLine, CASE_TESTS as LESSON_CASE_TESTS } from './sheet/roles/lesson.js';
@@ -2053,11 +2049,8 @@ function heightClassOf(sec, items, gridMm) {
 function layoutOf(role, section, items, n, ctx) {
     const base = { role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense, maxCols: section.maxCols, noCap: section.noCap };
     const opts = { size: n.size, look: n.look, header: ctx.header };
-<<<<<<< HEAD
     // (S6 sections: the columns are also tried on the grid net of the anchor band - layout.js resolveBandedLayout)
     const whole = resolveBandedLayout(base, section.anchorMm || 0, items, ctx.paper, LIVE_W_MM, opts);
-=======
-    const whole = resolveSectionLayout(base, items, ctx.paper, LIVE_W_MM, opts);
     // HEIGHT CLASSES (critic 2026-10-24 D2): a one-skill legacy pool whose problems differ a lot in
     // height (mixed_coordinates: 95 mm read-only grids beside 217 mm transform choices) is paged by
     // each problem's OWN measured height (heightClassOf), as the CL-41 split pages full-width
@@ -2076,7 +2069,6 @@ function layoutOf(role, section, items, n, ctx) {
         if (cap > whole.perPage) return Object.assign({}, whole, { perPage: cap, heightClass: true });
         return whole;
     }
->>>>>>> origin/claude/sweet-newton-c8wrv1
     if (!(role === 'independent' || role === 'more-practice') || (n.anchors && n.anchors !== 'off') || section.gridH || items.length < 2) return whole;
     const wide = items.filter((it) => oneColumnOnly(it, n));
     const narrow = items.filter((it) => !oneColumnOnly(it, n));
