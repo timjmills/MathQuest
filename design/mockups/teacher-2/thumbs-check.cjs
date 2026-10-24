@@ -18,6 +18,12 @@
 //      - the smallest text SHOWN is >= the place's minimum (Big 12, Medium 11, Small 9 px; previews and the bar 0);
 //      - no text line is cut at its START (the window is anchored at the left / top of what the cell draws);
 //      - the thumbnail is drawn (not waiting, not an error) and its picture stays inside its box;
+//   E. (fix round 6, critic r6 A1 / C3) the window SHOWS the drawing: >= 60 % of the item's drawn (non-text) area lies
+//      inside each visible window; the thumbnail's non-white pixel share is >= half the app cell's (screenshots of both);
+//      (a page preview shows the whole cell as a miniature, its anti-aliased hairlines are not ink, so it is exempt);
+//      two DIFFERENT skills whose app items differ never produce byte-identical thumbnails at the same place;
+//      prose (HTML text) shown is >= the place's minimum; drawn labels inside an SVG are part of the picture and may
+//      shrink with it to the place's drawing floor (--smp-min-draw: Big 8, Medium 7, Small 6 px), never below;
 //   D. the pages: app.html loads no samples.js; "Same problems, new numbers" pages 2 and 3 deal different items; a cold
 //      load of app.html#skills is measured and reported.
 'use strict';
@@ -45,6 +51,10 @@ const NAMED = [
   'vocabulary:vocab_grade_1', 'vocabulary:vocab_grade_3_geometry', 'vocabulary:vocab_grade_K_counting', 'order_of_operations:cube_numbers',
   'multiplication:count_by_9s', 'angles_lines:angles_on_straight_line', 'angles_lines:angles_around_point', 'algebra:solve_eq_twostep',
   'number_theory:factor_links_hard', 'fraction_operations:frac_word_mixed', 'addition:add_sub_fact_family',
+  // critic r6 A1: drawings the left / top crop hid
+  'conversions:double_num_line', 'composing:fraction_number_line', 'patterns:count_by_powers_of_10', 'shapes_early:shape_name_match_3d',
+  'shapes_classify:classify_quads', 'measurement:make_change_least_coins', 'algebra:write_expression', 'algebra:build_expr_addsub',
+  'measurement:elapsed_30min', 'measurement:elapsed_hour', 'measurement:elapsed_15min',
 ];
 const live = D.skills.map(s => s.c + ':' + s.v);
 let keys;
@@ -71,6 +81,15 @@ if (!ONLY) {
   for (const c of allCats) if (!cats.has(c)) say('sample', `category ${c} not sampled`);
 }
 
+// the share of a screenshot's pixels that are not white (any channel < 200), decoded in the page
+async function inkShare(page, buf) {
+  return page.evaluate(async (b64) => {
+    const img = await createImageBitmap(await (await fetch('data:image/png;base64,' + b64)).blob());
+    const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; const g = c.getContext('2d'); g.drawImage(img, 0, 0);
+    const d = g.getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 0; i < d.length; i += 4) if (d[i] < 200 || d[i + 1] < 200 || d[i + 2] < 200) n++;
+    return n / (c.width * c.height);
+  }, buf.toString('base64'));
+}
 const near = (a, b, tol) => Math.abs(a - b) <= tol;
 function compare(id, app, mock) {
   const bad = [];
@@ -104,8 +123,8 @@ function compare(id, app, mock) {
   await app.waitForFunction(() => typeof window.buildSheet === 'function' && typeof window.sheetDocument === 'function');
   await app.evaluate(async (u) => { window.__live = await import(u); try { await Promise.all([document.fonts.load('400 16px Andika'), document.fonts.load('700 16px Andika')]); await document.fonts.ready; } catch (e) { /* */ } }, base + '/design/mockups/teacher-2/live.mjs');
   const appRec = {};
-  for (let b = 0; b < cases.length; b += 20) {
-    const batch = cases.slice(b, b + 20);
+  for (let b = 0; b < cases.length; b += 1) {
+    const batch = cases.slice(b, b + 1);
     const got = await app.evaluate(async (batch) => {
       const L = window.__live; const out = {};
       for (const c of batch) {
@@ -120,13 +139,19 @@ function compare(id, app, mock) {
           await d.fonts.ready;
           const cells = [...d.querySelectorAll('.ws-page .ws-cell:not(.blankrun)')].filter(x => x.getBoundingClientRect().width > 4);
           out[id] = cells[c.n] ? L.measureCell(cells[c.n]) : { none: true };
-          f.remove();
+          if (cells[c.n]) { const fr = f.getBoundingClientRect(); out[id].shot = [out[id].box[0] + fr.left, out[id].box[1] + fr.top, out[id].box[2], out[id].box[3]]; f.style.visibility = 'visible'; f.id = 'chkf'; }
+          else f.remove();
         } catch (e) { out[id] = { err: String(e.message || e).slice(0, 160) }; }
       }
       return out;
     }, batch);
     Object.assign(appRec, got);
-    process.stderr.write(`  app ${Math.min(b + 20, cases.length)}/${cases.length} ${Math.round((Date.now() - t0) / 1000)} s\n`);
+    for (const [id, r] of Object.entries(got)) if (r.shot) {
+      const [x, y, w, h] = r.shot;
+      try { if (w >= 1 && h >= 1) r.ink = await inkShare(app, await app.screenshot({ clip: { x, y, width: Math.min(w, 900), height: Math.min(h, 1400) } })); } catch (e) { r.ink = null; }
+      await app.evaluate(() => { const f = document.getElementById('chkf'); if (f) f.remove(); });
+    }
+    if (b % 20 === 19 || b === cases.length - 1) process.stderr.write(`  app ${Math.min(b + 20, cases.length)}/${cases.length} ${Math.round((Date.now() - t0) / 1000)} s\n`);
   }
   // ---------------------------------------------------------------- B. the mock-up
   const mk = await ctx.newPage(); mk.setDefaultTimeout(180000);
@@ -172,24 +197,34 @@ function compare(id, app, mock) {
         const realScale = (zr.width / z.offsetWidth) / (hr.width / host.offsetWidth);   // the thumbnail's own scale, any outer one (a preview page) divided out
         // what is SHOWN: text lines whose box meets the window (cell-relative: the window's top-left is win[0], win[1])
         const ox = win[0], oy = win[1];
-        let low = Infinity, lowT = ''; const cutStart = [];
+        let low = Infinity, lowT = '', lowD = Infinity, lowDT = ''; const cutStart = [];
+        const minD = parseFloat(getComputedStyle(host).getPropertyValue('--smp-min-draw')) || 0;
         for (const t of m.texts) {
           const [x, y, w, hh] = t.r; const shown = x < ox + win[2] && x + w > ox && y < oy + win[3] && y + hh > oy;
           if (!shown) continue;
-          if (t.fs * s < low) { low = t.fs * s; lowT = t.t; }
+          if (t.svg) { if (t.fs * s < lowD) { lowD = t.fs * s; lowDT = t.t; } }
+          else if (t.fs * s < low) { low = t.fs * s; lowT = t.t; }
           for (const L of t.lefts) if (L < ox - 0.5 && L + 1 < ox + win[2]) cutStart.push(t.t.slice(0, 20));
         }
-        res[id] = { m, s, realScale, min, low: Number.isFinite(low) ? low : null, lowT, cutStart, place: d.dataset.place,
+        // drawn (non-text) area inside the window; a drawing nested in another drawing counts once (the outer one)
+        const dr = m.draws.filter((a, i) => !m.draws.some((b, j) => j !== i && b.r[0] <= a.r[0] + 0.5 && b.r[1] <= a.r[1] + 0.5 && b.r[0] + b.r[2] >= a.r[0] + a.r[2] - 0.5 && b.r[1] + b.r[3] >= a.r[1] + a.r[3] - 0.5 && (b.r[2] * b.r[3] > a.r[2] * a.r[3] || j < i)));
+        let dAll = 0, dIn = 0;
+        for (const a of dr) { const [x, y, w, hh] = a.r; dAll += w * hh; const iw = Math.max(0, Math.min(x + w, ox + win[2]) - Math.max(x, ox)), ih = Math.max(0, Math.min(y + hh, oy + win[3]) - Math.max(y, oy)); dIn += iw * ih; }
+        res[id] = { m, s, realScale, min, minD, lowD: Number.isFinite(lowD) ? lowD : null, lowDT, cover: dAll > 0 ? dIn / dAll : 1, low: Number.isFinite(low) ? low : null, lowT, cutStart, place: d.dataset.place,
           inside: true,
           clip: getComputedStyle(host).overflow, hostW: hr.width, hostH: hr.height };
       }
       return res;
     }, batch);
+    for (const [id, r] of Object.entries(got)) if (r.m) {
+      const el = await mk.$(`.chk[data-id="${id.replace(/"/g, '\\"')}"] .live-thumb`);
+      if (el) { try { const buf = await el.screenshot(); r.ink = await inkShare(mk, buf); r.hash = require('crypto').createHash('md5').update(buf).digest('hex'); } catch (e) { r.ink = null; } }
+    }
     Object.assign(mockRec, got);
     process.stderr.write(`  mock-up ${Math.min(b + 24, cases.length)}/${cases.length} ${Math.round((Date.now() - t0) / 1000)} s\n`);
   }
   // ---------------------------------------------------------------- C. compare
-  let nCmp = 0;
+  let nCmp = 0; const seenHash = {};
   for (const c of cases) {
     const id = c.k + '|' + c.seed + '|' + c.n; const a = appRec[id], m = mockRec[id];
     if (!a || a.err) { say(id, 'the app could not print it: ' + (a ? a.err : 'no record')); continue; }
@@ -201,6 +236,10 @@ function compare(id, app, mock) {
     compare(`${id} [${c.place}]`, a, m.m);
     if (Math.abs(m.realScale - m.s) > 0.01) say(id, `${c.place}: drawn at ${m.realScale.toFixed(3)}×, says ${m.s}`);
     if (m.min > 0 && m.low !== null && m.low + 0.05 < m.min) say(id, `${c.place}: smallest text shown ${m.low.toFixed(1)} px “${m.lowT.slice(0, 20)}” (min ${m.min})`);
+    if (m.minD > 0 && m.lowD !== null && m.lowD + 0.05 < m.minD) say(id, `${c.place}: smallest drawn label shown ${m.lowD.toFixed(1)} px “${m.lowDT.slice(0, 20)}” (floor ${m.minD})`);
+    if (m.cover < 0.6) say(id, `${c.place}: the window shows ${Math.round(m.cover * 100)} % of the drawn area (need >= 60 %)`);
+    if (c.place !== 'preview' && a.ink != null && m.ink != null && m.ink < 0.5 * a.ink) say(id, `${c.place}: ink ${(m.ink * 100).toFixed(1)} % vs the app cell's ${(a.ink * 100).toFixed(1)} % (need >= half)`);
+    if (m.hash) { const pk = c.place + '|' + m.hash; const prev = seenHash[pk]; if (prev && prev.k !== c.k && prev.text !== a.text) say(id, `${c.place}: the same picture as ${prev.k} (a different item)`); else if (!prev) seenHash[pk] = { k: c.k, text: a.text }; }
     if (m.cutStart.length) say(id, `${c.place}: line cut at its start: “${m.cutStart[0]}”`);
     if (!m.inside || m.clip !== 'hidden') say(id, `${c.place}: the picture is not held inside its box`);
   }
