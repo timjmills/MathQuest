@@ -306,12 +306,15 @@ function nrColumns(a, b) {
 /** Worked steps: ones first, then each place to the left (5 places at most, then grouped). */
 export function columnSubNoRegroup(a, b) {
     const cols = nrColumns(a, b);
+    // Each equation is held together with no-break spaces, so a step line never breaks inside
+    // "4 − 3 = 1" (critic SU-C r2 N7); the line still wraps between equations.
+    const eq = (...parts) => parts.join('\u00a0');
     const line = (c) => {
         const mark = [{ slot: `ring:${NR_PLACES[c.k]}`, value: '' }];
         if (!c.lead) mark.push({ slot: NR_PLACES[c.k], value: String(c.res) });
         if (c.bot === null) return { text: `${NR_TITLE(c.k)}: nothing to take away. Write ${c.top}.`, mark };
-        if (c.lead) return { text: `${NR_TITLE(c.k)}: ${c.top} − ${c.bot} = 0. Leave the box empty.`, mark };
-        return { text: `${NR_TITLE(c.k)}: ${c.top} − ${c.bot} = ${c.res}. Write ${c.res}.`, mark };
+        if (c.lead) return { text: `${NR_TITLE(c.k)}: ${eq(c.top, '−', c.bot, '=', 0)}. Leave the box empty.`, mark };
+        return { text: `${NR_TITLE(c.k)}: ${eq(c.top, '−', c.bot, '=', c.res)}. Write ${c.res}.`, mark };
     };
     // Four steps at every size: a worked-example anchor holds four lines beside the stack, and a
     // fifth overflowed the anchor cell at 4 digits and up (SU-C pilot precritic). From 4 digits
@@ -323,7 +326,7 @@ export function columnSubNoRegroup(a, b) {
         // From 4 digits the places left of the tens are one step (the anchor holds four lines),
         // but the step still states every column's sum and rings those columns (critic r1 D10).
         const rest = cols.slice(2);
-        const sums = rest.map((c) => (c.bot === null ? `${c.top}` : `${c.top} − ${c.bot} = ${c.res}`)).join(', ');
+        const sums = rest.map((c) => (c.bot === null ? `${c.top}` : eq(c.top, '−', c.bot, '=', c.res))).join(', ');
         const lead = rest.some((c) => c.lead) ? ' Leave a 0 at the front out.' : '';
         out.push(step(`${NR_TITLE(2)} to ${NR_PLACES[rest[rest.length - 1].k]}: ${sums}.${lead}`,
             rest.flatMap((c) => [{ slot: `ring:${NR_PLACES[c.k]}`, value: '' }, ...(c.lead ? [] : [{ slot: NR_PLACES[c.k], value: String(c.res) }])])));
@@ -331,7 +334,7 @@ export function columnSubNoRegroup(a, b) {
     } else {
         // Two digits: ones, tens, the answer, the check - four steps like every other size.
         if (cols.length === 2) out.push(step(`The answer is ${fmt(a - b)}.`, [{ slot: 'answer', value: String(a - b) }]));
-        out.push(step(`Check: ${fmt(a - b)} + ${fmt(b)} = ${fmt(a)}.`));
+        out.push(step(`Check: ${eq(fmt(a - b), '+', fmt(b), '=', fmt(a))}.`));
     }
     return clampSteps(out);
 }

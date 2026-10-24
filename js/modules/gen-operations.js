@@ -952,6 +952,71 @@ export function subNoRegroupDigits(maxVal) {
     const b = _SUB_NR_BAND[maxVal];
     return b ? String(b[1]).length : String(Math.max(1, maxVal - 1)).length;
 }
+// The two-digit valid sets, enumerated once per (band, length, zero case): every pair [a, b] with
+// a in [lo, hi], b of lenB digits, each digit of b at most the digit above it. `zero` false: no
+// column leaves 0 and no digit is 0 (the plain items); `zero` true: the ones are 0 over 0 (40 − 20).
+const _NR2_SETS = new Map();
+function _nr2Set(lo, hi, lenB, zero) {
+    const key = `${lo}:${hi}:${lenB}:${zero ? 1 : 0}`;
+    if (_NR2_SETS.has(key)) return _NR2_SETS.get(key);
+    const out = [];
+    for (let a = lo; a <= hi; a++) {
+        const t = Math.floor(a / 10), o = a % 10;
+        if (t < 1 || t > 9) continue;
+        if (zero) {
+            if (o !== 0 || lenB !== 2) continue;
+            for (let bt = 1; bt < t; bt++) out.push([a, bt * 10]);
+        } else {
+            if (o < 2) continue;
+            for (let bo = 1; bo < o; bo++) {
+                if (lenB === 1) out.push([a, bo]);
+                else for (let bt = 1; bt < t; bt++) out.push([a, bt * 10 + bo]);
+            }
+        }
+    }
+    _NR2_SETS.set(key, out);
+    return out;
+}
+// What this page has dealt so far, per band and length: item index -> [minuend, answer]. A page
+// opens at item 0 (generateQuestionFor), so the memory starts again there; a redrawn item
+// overwrites its own index, so a discarded duplicate is not counted.
+const _NR2_PAGE = new Map();
+const _NR2_WINDOW = 20, _NR2_MAX_MINUEND = 2, _NR2_MAX_ANSWER = 3;
+function _nr2Pair(lo, hi, lenB, rng) {
+    const plain = _nr2Set(lo, hi, lenB, false);
+    const zeroSet = _nr2Set(lo, hi, lenB, true);
+    const at = Number.isFinite(state.itemIndex) ? state.itemIndex : null;
+    const pkey = `${lo}:${hi}:${lenB}`;
+    if (at === 0) _NR2_PAGE.delete(pkey);
+    const seen = at === null ? null : (_NR2_PAGE.get(pkey) || new Map());
+    let mins = null, anss = null;
+    if (seen) {
+        mins = new Map(); anss = new Map();
+        for (const [k, [m, d]] of seen) {
+            if (k >= at || k < at - (_NR2_WINDOW - 1)) continue;
+            mins.set(m, (mins.get(m) || 0) + 1);
+            anss.set(d, (anss.get(d) || 0) + 1);
+        }
+    }
+    // about 1 item in 10 is the zero case, chosen by the seeded rng (never by position: L10)
+    const useZero = zeroSet.length > 0 && rng(0, 9) === 0;
+    const pool = useZero ? zeroSet : plain;
+    let pair = null;
+    for (let t = 0; t < 40; t++) {
+        let p = pool[rng(0, pool.length - 1)];
+        // 2d − 1d: b = 1 is the trivial take-away, so half of the 1s are drawn again
+        if (lenB === 1 && p[1] === 1 && rng(0, 1)) p = pool[rng(0, pool.length - 1)];
+        pair = p;
+        if (!mins) break;
+        if ((mins.get(p[0]) || 0) < _NR2_MAX_MINUEND && (anss.get(p[0] - p[1]) || 0) < _NR2_MAX_ANSWER) break;
+    }
+    if (!pair) pair = [hi, 1];
+    if (seen) {
+        seen.set(at, [pair[0], pair[0] - pair[1]]);
+        _NR2_PAGE.set(pkey, seen);
+    }
+    return [pair[0], pair[1]];
+}
 /**
  * One no-regrouping pair [a, b]: every digit of b is at most the digit above it (aligned right).
  *   lengths 'same'     b has as many digits as a;  'shorter'  b has one digit fewer (ragged).
@@ -961,9 +1026,13 @@ export function subNoRegroupDigits(maxVal) {
  *                      (card §9.4; critic SU-C r1 D1).
  *           'on'       from 3 digits up every item is ONE zero case, dealt by the rng: a 0 in the
  *                      top number (0 − 0), n − 0, a column leaving 0, or an answer with fewer digits.
- * Two digits deal the BOTTOM digit first (1-8, uniform) and the top digit over it, so no bottom
- * digit dominates (2d − 1d: b = 1 on 1 item in 8, not 1 in 3; critic r1 D8). The 2d − 1d preset
- * (within 100, lengths 'shorter') runs its minuend over every 2-digit number from 21 (D8).
+ * Two digits (critic SU-C r2 N1) draw the PAIR uniformly from the valid set (_nr2Pair): every
+ * digit of b at most the digit above it, no column leaving 0, the minuend in the size's band. The
+ * one zero case (a top 0 over a 0, 40 − 20) is about 1 item in 10 and is placed by the seeded rng,
+ * never by the item's position (L10). On a page no minuend prints more than twice and no answer
+ * more than three times in any 20 items. 2d − 1d deals b = 1 again half the time (about 1 item in
+ * 9; critic r1 D8). The 2d − 1d preset (within 100, lengths 'shorter') runs its minuend over every
+ * 2-digit number from 21 (D8).
  */
 function _subNoRegroupPair(maxVal, rng, { lengths = 'same', zeros = 'off' } = {}) {
     const [lo0, hi] = _SUB_NR_BAND[maxVal];
@@ -972,31 +1041,19 @@ function _subNoRegroupPair(maxVal, rng, { lengths = 'same', zeros = 'off' } = {}
     const lenB = lengths === 'shorter' ? Math.max(1, d - 1) : d;
     const big = d >= 3;
     const zeroCase = big && zeros === 'on';
+    if (!big) return _nr2Pair(lo, hi, lenB, rng);
     for (let t = 0; t < 400; t++) {
         const a = rng(lo, hi);
         const A = String(a).split('').map(Number);          // most significant first
         const at = (k) => A[d - 1 - k];                      // k = place, 0 = ones
         let B = new Array(lenB).fill(0);                     // B[k] = b's digit at place k
         let ok = true;
-        if (big) {
-            // the zero-free base item: every top digit 1-9, every b digit 1 .. a-1 (so no column
-            // leaves 0), a leading top digit with nothing under it may be 1.
-            for (let k = 0; k < d; k++) {
-                const v = at(k);
-                if (v === 0) { ok = false; break; }
-                if (k < lenB) { if (v < 2) { ok = false; break; } B[k] = rng(1, v - 1); }
-            }
-        } else {
-            // Two digits: build the pair column by column, the bottom digit first.
-            const tlo = Math.floor(lo / 10), thi = Math.floor(hi / 10);
-            // 1 item in 10 at most: a top 0 over a 0 (40 − 20). On a page (itemIndex set) it is
-            // item 8 of every ten, so no page clusters them; outside a page the rng decides.
-            const zeroOnes = Number.isFinite(state.itemIndex) ? state.itemIndex % 10 === 7 && t === 0 : rng(0, 9) === 0;
-            // (a bottom 1 is the trivial take-away: half of the 1s are dealt again, so b = 1 on about 1 item in 14)
-            if (zeroOnes) { A[1] = 0; B[0] = 0; } else { B[0] = rng(1, 8); if (B[0] === 1 && rng(0, 1)) B[0] = rng(1, 8); A[1] = rng(B[0] + 1, 9); }
-            if (lenB === 2) { A[0] = rng(Math.max(2, tlo), thi); B[1] = rng(1, A[0] - 1); }
-            else A[0] = rng(Math.max(1, tlo), thi);
-            if (zeroOnes && lenB === 1) ok = false;          // 2d − 1d: a 1-digit 0 is no item
+        // the zero-free base item: every top digit 1-9, every b digit 1 .. a-1 (so no column
+        // leaves 0), a leading top digit with nothing under it may be 1.
+        for (let k = 0; k < d; k++) {
+            const v = at(k);
+            if (v === 0) { ok = false; break; }
+            if (k < lenB) { if (v < 2) { ok = false; break; } B[k] = rng(1, v - 1); }
         }
         if (!ok) continue;
         if (zeroCase) {

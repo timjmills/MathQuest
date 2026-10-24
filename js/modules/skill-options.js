@@ -1016,9 +1016,12 @@ const _subZeros = () => ({
 // The no-regrouping column ladder's support level (critic SU-C r1 D2): the place heads are a
 // structural scaffold (WDS VA-30 / VA-32), so they print at the default level 1 and leave only on
 // their own fade step, level 0. Level 2 would print what level 1 prints, so it is not offered.
-const _subNrLevel = () => levelSubset([3, 1, 0], 1,
-    'Level 3 writes each answer in grey to trace (a worked example), level 1 prints the place-value '
-    + 'heads over the columns and the answer boxes, level 0 takes the heads away (the boxes stay).');
+const _subNrLevel = () => ({
+    ...levelSubset([3, 1, 0], 1,
+        'Level 3 writes each answer in grey to trace (a worked example), level 1 prints the place-value '
+        + 'heads over the columns and the answer boxes, level 0 takes the heads away (the boxes stay).'),
+    helpShort: '3 traces the answer, 1 prints the place heads, 0 takes them away; the answer boxes stay at every level.',
+});
 
 const P11_OPS_OPTIONS = {
     // --- fact drills: the band and a fading picture cue sit beside the fact set -----------------
@@ -3329,7 +3332,8 @@ const WORD_WORK_OPTIONS = (bar) => [
 //                          regrouping (2.NBT.5: tens and ones, mentally). A regrouping item, and
 //                          every item from within 1,000 up, stays stacked — the regroup box sits
 //                          over the next column, and past two digits the columns line the places
-//                          up. So the control is declared on the four 50 / 100 no-regrouping ids;
+//                          up. So the control is declared on the two addition 50 / 100 no-regrouping
+//                          ids (the subtraction ones are kit column skills: card subtraction.md §7);
 //                          on every other id the Support level's help line says "always stacked"
 //                          and why.
 //   mult_zeros             across (default) / stacked: 70 above × 8 is the column the algorithm
@@ -3391,6 +3395,11 @@ for (const op of ['add', 'sub']) {
         if (max < 50) continue;
         for (const rg of ['no_regroup', 'regroup', 'mixed']) {
             const key = `${cat}:${op}_${code}_${rg}`;
+            // The six no-regrouping column subtractions (spec card subtraction.md §7, pilot SU-C fix
+            // r2, critic r2 N3 / N4): no Across here (the card puts across on the sub-setup page,
+            // and across drew a broken page), and the Support level keeps its own help line
+            // (_subNrLevel), which names the levels it really offers.
+            if (op === 'sub' && rg === 'no_regroup' && max >= 50) continue;
             const oneLine = _ap4OneLine(max, rg);
             // Declared only where the id's OWN rung is one-line work (within 50 / 100, no
             // regrouping): a control whose value is overruled at the skill's default would be a

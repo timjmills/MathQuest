@@ -38,11 +38,13 @@ export const STEP_ICONS = Object.freeze(['look', 'start', 'count', 'write', 'reg
 const NR_VOCAB_2 = [
     { word: 'ones', meaning: 'the right-hand place', picture: { kind: 'blocks', tens: 0, ones: 4 } },
     { word: 'tens', meaning: 'groups of ten', picture: { kind: 'blocks', tens: 3, ones: 0 } },
-    { word: 'line up', meaning: 'ones under ones', picture: { kind: 'text', text: '47 − 23' } },
+    { word: 'line up', meaning: 'ones under ones', picture: { kind: 'stack', top: '47', bottom: '23' } },
 ];
-const NR_VOCAB_BIG = (n) => [
-    { word: 'place', meaning: 'ones, tens, hundreds ...', picture: { kind: 'text', text: 'H T O' } },
-    { word: 'line up', meaning: 'ones under ones', picture: { kind: 'text', text: n } },
+// (critic SU-C r2 N6: "line up" is pictured as a small column, ones under ones, never as an across
+// sentence that can wrap; "place" names the lesson's own place heads)
+const NR_VOCAB_BIG = (top, bottom, heads) => [
+    { word: 'place', meaning: 'ones, tens, hundreds ...', picture: { kind: 'text', text: heads } },
+    { word: 'line up', meaning: 'ones under ones', picture: { kind: 'stack', top, bottom } },
     { word: 'take away', meaning: 'subtract: the − sign', picture: { kind: 'glyph', text: '−' } },
 ];
 const NR_CONCEPTS = [
@@ -79,13 +81,17 @@ function subNoRegroupLessons() {
         words: [{ from: '^Check:\\s*', to: '' }],
         distinctFirst: true, distinctAnswer: true,
     }, o);
-    // (across: a one-line fact fills its Warm-up cell; a vertical 9 − 3 sat in a third of it, H13)
-    const facts10 = { key: 'subtraction:subtract', opts: { band: 10, notation: ['across'] }, why: 'Each column is a take-away fact within 10.' };
+    // (stacked, as the sub_100_regroup Warm-up draws its facts: an across fact sat in a row sized
+    // for the stacks beside it and left 43-59 % of its cell empty; critic SU-C r2 N2. Where the
+    // other prerequisite is wide - the place-value word bank, a 5-digit column - `warmRows` gives
+    // the facts a row of their own, four across, on the S and M lesson sheets: in a half-page cell a
+    // one-digit column left 34 % of the width empty. At L the extra row does not fit the sheet.)
+    const facts10 = { key: 'subtraction:subtract', opts: { band: 10, notation: ['stacked'] }, why: 'Each column is a take-away fact within 10.' };
     const pv = { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] }, why: 'Name the tens digit and the ones digit.' };
     const rung = (key, why) => ({ key, why });
     return {
         'subtraction:sub_50_no_regroup': base({
-            skills: [facts10, pv], vocab: NR_VOCAB_2, steps: NR_STEPS_2(), checkRow: true, maxSmall: 1,
+            skills: [facts10, pv], warmRows: ['S', 'M'], vocab: NR_VOCAB_2, steps: NR_STEPS_2(), checkRow: true, maxSmall: 1,
             mixWith: [{ key: 'addition:add_50_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }],
         }),
         'subtraction:sub_100_no_regroup': base({
@@ -96,27 +102,27 @@ function subNoRegroupLessons() {
         // The preset (host sub_100_no_regroup, lengths: shorter): every bottom number is one digit,
         // so `maxSmall` (one one-place take-away a page) does not apply; its tens step writes the tens.
         'subtraction:sub_2d_1d': base({
-            skills: [facts10, pv], vocab: NR_VOCAB_2, steps: NR_STEPS_2('Write the tens.'), checkRow: true,
+            skills: [facts10, pv], warmRows: ['S', 'M'], vocab: NR_VOCAB_2, steps: NR_STEPS_2('Write the tens.'), checkRow: true,
             mixWith: [{ key: 'addition:add_100_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }],
         }),
         'subtraction:sub_1k_no_regroup': base({
             skills: [rung('subtraction:sub_100_no_regroup', 'The same column steps with two places.'), facts10],
-            vocab: NR_VOCAB_BIG('486 − 52'), steps: NR_STEPS_3, checkRow: true, maxSmall: 1,
+            vocab: NR_VOCAB_BIG('486', '52', 'H T O'), steps: NR_STEPS_3, checkRow: true, maxSmall: 1,
             mixWith: [{ key: 'addition:add_1k_no_regroup' }],
         }),
         'subtraction:sub_10k_no_regroup': base({
             skills: [rung('subtraction:sub_1k_no_regroup', 'The same column steps with three places.'), facts10],
-            vocab: NR_VOCAB_BIG('4,867 − 352'), steps: NR_STEPS_BIG, maxSmall: 1,
+            vocab: NR_VOCAB_BIG('4,867', '352', 'Th H T O'), steps: NR_STEPS_BIG, maxSmall: 1,
             mixWith: [{ key: 'addition:add_10k_no_regroup' }],
         }),
         'subtraction:sub_100k_no_regroup': base({
             skills: [rung('subtraction:sub_10k_no_regroup', 'The same column steps with four places.'), facts10],
-            vocab: NR_VOCAB_BIG('48,675 − 3,524'), steps: NR_STEPS_BIG, maxSmall: 1,
+            vocab: NR_VOCAB_BIG('48,675', '3,524', 'TTh Th H T O'), steps: NR_STEPS_BIG, maxSmall: 1,
             mixWith: [{ key: 'addition:add_100k_no_regroup' }],
         }),
         'subtraction:sub_1m_no_regroup': base({
-            skills: [rung('subtraction:sub_100k_no_regroup', 'The same column steps with five places.'), facts10],
-            vocab: NR_VOCAB_BIG('486,759 − 35,247'), steps: NR_STEPS_BIG, maxSmall: 1,
+            skills: [rung('subtraction:sub_100k_no_regroup', 'The same column steps with five places.'), facts10], warmRows: ['S', 'M'],
+            vocab: NR_VOCAB_BIG('486,759', '35,247', 'HTh TTh Th H T O'), steps: NR_STEPS_BIG, maxSmall: 1,
             mixWith: [{ key: 'addition:add_1m_no_regroup' }],
         }),
     };

@@ -39,7 +39,7 @@ const PLACE_NAMES = ['O', 'T', 'H', 'Th', 'TTh', 'HTh'];
  * @param {'trace'|'solid'|null} [opts.boxInk]  with `answer: 'boxes'` and `ans`, the digits are
  *        drawn INSIDE the boxes, so a key laid over a Guided page lines up exactly (SCC-T10).
  */
-export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'open', grey = false, ans = null, unknown = null, slots = null, unknownSlot = null, regroupSlots = null, boxInk = null, ansTracks = 0, trackInk = null, touch = null, strikes = null, rings = null, seps = null, wide = false, trackEm = 0 } = {}) {
+export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'open', grey = false, ans = null, unknown = null, slots = null, unknownSlot = null, regroupSlots = null, boxInk = null, ansTracks = 0, trackInk = null, touch = null, strikes = null, rings = null, seps = null, wide = false, trackEm = 0, headEms = null } = {}) {
     // `a` may be an ARRAY of the rows above the operator row (three or four addends, CM-5/CM-6):
     // every one of them sits on the digit tracks with an empty operator track (VA-2).
     const tops = (Array.isArray(a) ? a : [a]).map(String);
@@ -160,7 +160,9 @@ export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'o
     // TY-21: any regroup scaffold forces 0.95 em tracks in both looks (the 'wide' class).
     // TY-2: a box is drawn with <i>, which the browser italicises; nothing in a stack is italic.
     html = html.replace(/(<i\b[^>]*?style=")/g, '$1font-style:normal;').replace(/<i(?=[ >])(?![^>]*style=)/g, '<i style="font-style:normal"');
-    const cols = sepSet ? `;grid-template-columns:${Array.from({ length: t }, (_, i) => `var(--ws-track)${sepSet.has(i) ? ` ${SEPARATOR_EM}em` : ''}`).join(' ')}` : '';
+    // N8: `headEms` {track index: em} widens the tracks under a 3-letter head (HTh, TTh) on their own.
+    const trackOf = (i) => (headEms && headEms[i] ? `${headEms[i]}em` : 'var(--ws-track)');
+    const cols = sepSet || headEms ? `;grid-template-columns:${Array.from({ length: t }, (_, i) => `${trackOf(i)}${sepSet && sepSet.has(i) ? ` ${SEPARATOR_EM}em` : ''}`).join(' ')}` : '';
     return `<div class="ws-stack${regroup || wide ? ' wide' : ''}" style="--t:${t}${trackEm ? `;--ws-track:${trackEm}em` : ''}${cols}" data-ws-slot="answer" data-ws-shape="open">${html}</div>`;
 }
 
@@ -289,12 +291,28 @@ const wideOf = (p) => !!(p && p.wideTracks === true);
  * VA-30 / D7: a wide-track stack whose heads name 5 or 6 places prints "HTh TTh Th" in bold zone
  * type, and a 3-letter head is wider than a 0.95 em digit track at S and M (Andika 700: HTh 17.6 pt
  * at 9 pt beside a 15.2 pt track). Those tracks grow until the heads stand apart - HTh to TTh
- * 0.7 mm at S (1.2 em: 1.25 em pushed the S side anchor out of its cell), 1.4 mm at M and L - the
- * letters keep their size and the digits theirs (SCC-T4). Paper only: the screen sets its own
- * track (screen-cell.css). 0 = the class track.
+ * 1 mm or more at every size (critic SU-C r2 N8: 1.2 em left 0.74 mm at S, and HTh TTh read as one
+ * run) - the letters keep their size and the digits theirs (SCC-T4). Paper only: the screen sets
+ * its own track (screen-cell.css). 0 = the class track.
  */
 const HEAD_TRACK_EM = Object.freeze({ S: 1.2, M: 1.05, L: 0.95 });
 const headTrackEm = (p, ctx, heads, t) => (wideOf(p) && heads && t - 1 >= 5 && ctx && ctx.mode !== 'screen' ? (HEAD_TRACK_EM[ctx.size] || 0) : 0);
+/**
+ * N8 (critic SU-C r2): at S a 6-place stack's HTh and TTh heads stood 0.74 mm apart at 1.2 em, so
+ * the two tracks under those 3-letter heads are 1.3 em at S (the heads stand 1.3 mm apart) and
+ * the operator track, which holds only the "−" and no head or box, gives back the same width
+ * (1.0 em). The stack keeps its width to the 0.01 mm: any wider (1.25 em on every track, or
+ * these two tracks alone) and the S side anchor no longer stands beside its problem.
+ * {track index: em}, or null.
+ */
+const HEAD3_TRACK_EM = Object.freeze({ S: 1.3 });
+const headEmsOf = (p, ctx, heads, t) => {
+    const em = HEAD3_TRACK_EM[ctx && ctx.size];
+    const base = headTrackEm(p, ctx, heads, t);
+    if (!em || !base || t - 1 < 6 || em <= base) return null;
+    const opEm = +(base - 2 * (em - base)).toFixed(3);
+    return { 0: opEm, [t - 5]: em, [t - 6]: em };     // the operator, TTh, HTh
+};
 
 export function stackSeps(p, t) {
     if (!p || !p.commas) return null;
@@ -396,7 +414,7 @@ register('stack', {
         const tm = touchMode(p);
         const rowsTd = tm ? touchColumns([...(Array.isArray(a) ? a : [a]), b], t, p.op, tm) : null;
         const drawn = stack(a, b, p.op, {
-            T: t, heads, regroup, answer, slots, regroupSlots, unknownSlot, boxInk, ansTracks: nAns, strikes, seps: stackSeps(p, t), wide: wideOf(p), trackEm: headTrackEm(p, ctx, heads, t),
+            T: t, heads, regroup, answer, slots, regroupSlots, unknownSlot, boxInk, ansTracks: nAns, strikes, seps: stackSeps(p, t), wide: wideOf(p), trackEm: headTrackEm(p, ctx, heads, t), headEms: headEmsOf(p, ctx, heads, t),
             touch: rowsTd ? { rows: rowsTd, o: touchOpts(ctx.metrics ? ctx.metrics.digitPt : 28, ctx.mode === 'screen' ? 'px' : 'pt', 'solid', ctx.photocopySafe) } : null,
             grey: level === 2 && ctx.state === 'blank',
             ans: shown === undefined ? null : shown,
@@ -443,7 +461,10 @@ register('stack', {
         const s = SIZES[ctx.size];
         const regroup = p.regroup !== undefined ? !!p.regroup : ctx.scaffoldLevel >= 1;
         const hEm = headTrackEm(p, ctx, scaffoldOf(p, ctx).heads, t);
-        const track = Math.max(trackMm(ctx.metrics.digitPt, ctx.size, ctx.look, regroup || wideOf(p)), hEm * (EM_MM[ctx.metrics.digitPt] || (ctx.metrics.digitPt / 72) * 25.4));
+        const emMm = EM_MM[ctx.metrics.digitPt] || (ctx.metrics.digitPt / 72) * 25.4;
+        const track = Math.max(trackMm(ctx.metrics.digitPt, ctx.size, ctx.look, regroup || wideOf(p)), hEm * emMm);
+        const hx = headEmsOf(p, ctx, scaffoldOf(p, ctx).heads, t);
+        const headExtraMm = hx ? Object.values(hx).reduce((acc, em) => acc + Math.max(0, em * emMm - track), 0) : 0;
         const digitH = (ctx.metrics.digitPt / 72) * 25.4 * 1.15;   // TY-13 digit line-height 1.15
         const hMm = (p.heads || ctx.scaffoldLevel >= 2 ? s.headsMm : 0)
             + (regroup ? (p.op === '-' ? s.headroomMm : s.regroupMm) : 0)
@@ -454,7 +475,7 @@ register('stack', {
         const sepMm = nSep * SEPARATOR_EM * (ctx.metrics.digitPt / 72) * 25.4;
         return {
             // A Check line is text and slots: the host measures it (lessons r1).
-            wMm: Math.ceil(t * track + sepMm + 6), hMm: Math.ceil(hMm), measure: !!(p.check && isSub(p)),
+            wMm: Math.ceil(t * track + sepMm + headExtraMm + 6), hMm: Math.ceil(hMm), measure: !!(p.check && isSub(p)),
             factLike: false, maxCols: 3, tracks: t, ...(nSep ? { separators: nSep } : {}), ...(wideOf(p) ? { wide: true } : {}),
         };
     },
@@ -521,7 +542,7 @@ register('stack', {
         return stack(a, b, p.op, {
             // A Guided cell (level 2) greys its boxes like every other Guided cell (SF-10, VA-10).
             grey: level === 2 && (!ctx || !ctx.state || ctx.state === 'blank'),
-            T: t, heads, regroup, answer, trackInk, ansTracks: nAns, strikes: strikes.length ? strikes : null, rings: rings.length ? rings : null, seps: stackSeps(p, t), wide: wideOf(p), trackEm: headTrackEm(p, ctx, heads, t),
+            T: t, heads, regroup, answer, trackInk, ansTracks: nAns, strikes: strikes.length ? strikes : null, rings: rings.length ? rings : null, seps: stackSeps(p, t), wide: wideOf(p), trackEm: headTrackEm(p, ctx, heads, t), headEms: headEmsOf(p, ctx, heads, t),
             regroupSlots: regroup ? Array.from({ length: t }, (_, i) => regroupSlots[i] || '<i></i>') : null,
             unknown: p.unknown || null,
         });
