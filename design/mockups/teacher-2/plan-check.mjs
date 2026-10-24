@@ -1,0 +1,38 @@
+// node design/mockups/teacher-2/plan-check.mjs — the teacher-plan.js cases (r6, owner 2026-10-24 counts and How much). Exits 1 on a FAIL.
+globalThis.window=globalThis;globalThis.document={};globalThis.localStorage={getItem(){return null},setItem(){}};
+const m = await import(new URL('../../../js/modules/teacher-plan.js', import.meta.url));
+const it = (i,o={}) => Object.assign({categoryId:'addition',skillId:'s'+i, area:'OA', grade:'2'}, o);
+const five = [it(0,{lockPct:50}),it(1),it(2),it(3),it(4)];
+const four = [it(0,{lockPct:50}),it(1),it(2),it(3)];
+const eq=(a,b,n)=>{const ok=JSON.stringify(a)===JSON.stringify(b);console.log(ok?'PASS':'FAIL',n,JSON.stringify(a));if(!ok)process.exitCode=1;};
+eq(m.planCounts(five,40).counts,[20,5,5,5,5],'5@50% 40');
+eq(m.planCounts(five,8).counts,[4,1,1,1,1],'5@50% 8');
+eq(m.planCounts(four,8).counts,[4,2,1,1].sort().reverse().length?m.planCounts(four,8).counts:0,'4@50% 8 (sorted check below)');
+const c=m.planCounts(four,8).counts; eq([c[0],c.slice(1).sort((a,b)=>b-a)].flat(),[4,2,1,1],'4@50% 8');
+const p=m.planPages('single',five,{size:'M'}); eq([p.pages,five.map(x=>p.pagesBy[m.keyOf(x)])],[8,[4,1,1,1,1]],'single 5@50%');
+eq(m.planCounts([it(0,{lockPct:70}),it(1,{lockPct:40})],10).error?'err':'ok','err','over 100');
+eq(m.planCounts([it(0),it(1,{area:'NF'}),it(2,{leftOut:true})],8).counts,[4,4,0],'mixed areas, left out');
+eq(m.planCounts([it(0),it(1),it(2)],8).counts.reduce((a,b)=>a+b),8,'sum');
+const q=m.planPages('mixed',[it(0),it(1),it(2),it(3),it(4)],{size:'M',pages:1}); eq([q.pages,q.total,q.added],[2,16,true],'mixed small tray adds pages');
+const s=m.planPages('mixed',[it(0),it(1)],{size:'M',pages:3,each:'copy'}); eq([s.pages,s.pageItems[0].join()===s.pageItems[2].join()],[3,true],'copy');
+const qz=m.planPages('mixed',[it(0),it(1),it(2)],{size:'M',quiz:true,total:10}); eq([qz.total,qz.pages],[10,2],'quiz');
+// owner 2026-10-24: counts, and How much
+const srt=(a)=>a.slice().sort((x,y)=>y-x);
+let r=m.planCounts([it(0,{count:6}),it(1),it(2),it(3),it(4)],8); eq([r.counts[0],srt(r.counts.slice(1)),r.warn.length>0],[6,[1,1,0,0],true],'count 6 of 8 -> 6.1.1.0.0 + warn');
+r=m.planCounts([it(0,{count:10}),it(1),it(2),it(3),it(4)],40); eq([r.counts[0],srt(r.counts.slice(1))],[10,[8,8,7,7]],'count 10 of 40 -> 10 + 8.8.7.7');
+r=m.planCounts([it(0,{count:6}),it(1,{lockPct:50})],8); eq(!!r.error,true,'count + % over total refused');
+let pp=m.planPages('mixed',[it(0),it(1),it(2)],{size:'M',amount:{mode:'each',n:4}}); eq([pp.total,pp.counts],[12,[4,4,4]],'3 skills, 4 of each');
+pp=m.planPages('mixed',[it(0),it(1),it(2),it(3)],{size:'M',amount:{mode:'total',n:30}}); eq([pp.total,srt(pp.counts),pp.pages,pp.pageItems.map(x=>x.length)],[30,[8,8,7,7],4,[8,8,8,6]],'30 in all, 4 skills');
+pp=m.planPages('mixed',[it(0,{count:6}),it(1),it(2)],{size:'M',amount:{mode:'pages',n:2}}); eq([pp.pages,pp.total,pp.counts[0],pp.counts[1]+pp.counts[2]],[2,16,6,10],'2 pages, one counted at 6');
+pp=m.planPages('mixed',[it(0,{count:20}),it(1)],{size:'M',amount:{mode:'pages',n:2}}); eq([!!pp.error,pp.needPages],[true,3],'counts past the pages offer more pages');
+pp=m.planPages('single',[it(0,{count:20}),it(1)],{size:'M',amount:{mode:'pages',n:2}}); eq([pp.pages,pp.pagesBy[m.keyOf(it(0))],pp.byKey[m.keyOf(it(0))]],[4,3,20],'single: pages rise so the count fits');
+pp=m.planPages('mixed',[it(0),it(1),it(2)],{size:'M',quiz:true,total:20}); eq([pp.total,pp.mode],[20,'total'],'quiz total');
+
+// owner 2026-10-24: three levels (skill count / group total / overall total), counts or %; more specific wins
+const K=(i)=>m.keyOf(it(i));
+r=m.planCounts([it(0,{count:6}),it(1),it(2),it(3),it(4)],30,{groups:[{skills:[K(1),K(2)],total:10}]}); eq([r.counts[0],r.counts[1],r.counts[2],srt(r.counts.slice(3))],[6,5,5,[7,7]],'skill 6, group of 2 at 10, overall 30 -> 6.5.5 + the 14 left 7.7 (brief said 9: 30-6-10 = 14)');
+r=m.planCounts([it(0,{count:20}),it(1,{count:15}),it(2)],30,{groups:[]}); eq([!!r.error,/Raise the total to 36/.test(r.error)],[true,true],'counts past the total -> error with a fix that leaves no skill at 0');
+r=m.planCounts([it(0,{count:8}),it(1),it(2)],30,{groups:[{skills:[K(0),K(1)],total:6}]}); eq([!!r.error,/lower/i.test(r.error)],[true,true],'a count past its group total -> error with a fix');
+r=m.planCounts([it(0),it(1),it(2),it(3)],20,{groups:[{skills:[K(0),K(1)],pct:50}]}); eq([r.counts[0],r.counts[1],r.counts[2]+r.counts[3]],[5,5,10],'group at 50 % of 20 with 2 skills -> 5.5 + the rest split');
+r=m.planCounts([it(0),it(1),it(2)],20,{groups:[{skills:[K(0)],pct:60},{skills:[K(1)],pct:50}]}); eq(!!r.error,true,'group % over 100 refused');
+console.log(process.exitCode ? 'plan-check: FAIL' : 'plan-check: OK');

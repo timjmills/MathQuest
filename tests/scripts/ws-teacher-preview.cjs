@@ -64,7 +64,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   // The (i) buttons follow the pointer in use (html.tvp-touch): a mouse move means a desktop, a
   // touch tap means a touch screen. Headless Chrome cannot emulate the hover media feature.
   const setPointer = async (hover) => {
-    if (hover) { await page.mouse.move(3, 3); await page.mouse.move(4, 4); } else await page.touchscreen.tap(700, 12);
+    // a tap on nothing switches the page to touch; it must land INSIDE the viewport (x 700 is off a 390 px screen) and on
+    // no control (on a phone the place tabs fill the row at y 12, so the tap goes in the workspace's top gutter)
+    if (hover) { await page.mouse.move(3, 3); await page.mouse.move(4, 4); } else { const vw = page.viewport().width; if (vw > 700) await page.touchscreen.tap(700, 12); else await page.touchscreen.tap(vw - 4, 2); }
     await sleep(60);
   };
 

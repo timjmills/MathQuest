@@ -1,0 +1,75 @@
+// Teacher site 2.0 mock-up: the flows of IMPROVEMENT_PLAN §2.6, as click lists. Used three ways: flows.html (the table),
+// walk.js (?walk=<id> highlights each click in the mock-up) and shoot.cjs (Playwright clicks every flow at 1366 and
+// 390 and asserts the counts). An action = a click, a typed search or a needed scroll; step = the screen / decision.
+(function (root) {
+  const OA3 = ['addition:add_word_problems', 'subtraction:sub_wp_start_unknown', 'number_ops_mixed:number_families_mixed'];
+  const tick = (k, step, say) => ({ click: `[data-skill="${k}"]`, step, say: say || 'Tick the skill' });
+  const FLOWS = [
+    { id: 'one-skill', task: 'One skill on paper with its key', plan: { steps: 3, actions: '4', today: '6' }, done: 'print',
+      actions: [{ type: '#search', text: 'addition facts', step: 1, say: 'Type in the search box' }, tick('addition:add_facts', 1), { click: '[data-act="tray-print"]', step: 2, say: 'Print in the tray' }, { click: '[data-act="sheet-print"]', step: 3, say: 'Print (Single skill is chosen for you)' }] },
+    { id: 'mixed-3', task: 'A mixed page of 3 skills', plan: { steps: 3, actions: '5–8', today: '13' }, done: 'print', expectKind: 'mixed',
+      actions: [tick(OA3[0], 1, 'Tick 3 skills from one maths-area list'), tick(OA3[1], 1, 'Tick the second skill'), tick(OA3[2], 1, 'Tick the third skill'), { click: '[data-act="tray-print"]', step: 2, say: 'Print in the tray (Mixed practice by default)' }, { click: '[data-act="sheet-print"]', step: 3, say: 'Print' }] },
+    { id: 'code-one', task: 'A code for one skill', plan: { steps: 3, actions: '4', today: '5' }, done: 'copy',
+      actions: [{ type: '#search', text: 'addition facts', step: 1, say: 'Type in the search box' }, tick('addition:add_facts', 1), { click: '[data-act="tray-share"]', step: 2, say: 'Share in the tray' }, { click: '[data-act="copy"]', step: 3, say: 'Copy the link' }] },
+    { id: 'set-3', task: 'A set of 3 skills to pupils', plan: { steps: 3, actions: '5–8', today: '≈ 11' }, done: 'copy',
+      actions: [tick(OA3[0], 1, 'Tick 3 skills'), tick(OA3[1], 1, 'Tick the second skill'), tick(OA3[2], 1, 'Tick the third skill'), { click: '[data-act="tray-share"]', step: 2, say: 'Share' }, { click: '[data-act="copy"]', step: 3, say: 'Copy the link' }] },
+    { id: 'mixed-3-search', task: 'A mixed page of 3 skills from three areas, each by search', plan: { steps: 3, actions: '5–8', today: '13' }, done: 'print', expectKind: 'mixed',
+      actions: [{ type: '#search', text: 'time to the hour', step: 1, say: 'Search the first skill' }, tick('measurement:time_hour', 1), { type: '#search', text: 'addition facts', step: 1, say: 'Search the second' }, tick('addition:add_facts', 1), { type: '#search', text: 'shade the fraction', step: 1, say: 'Search the third' }, tick('fractions:shade_fraction', 1), { click: '[data-act="tray-print"]', step: 2, say: 'Print (Mixed practice by default)' }, { click: '[data-act="sheet-print"]', step: 3, say: 'Print' }] },
+    { id: 'board', task: 'Practice on the board', plan: { steps: 3, actions: '3–4', today: '≈ 5' }, done: 'board',
+      actions: [tick(OA3[0], 1), { click: '[data-act="tray-share"]', step: 2, say: 'Share' }, { click: '[data-act="board"]', step: 3, say: 'Show on the board' }] },
+    { id: 'quiz-paper', task: 'A quiz on paper', plan: { steps: 3, actions: '3–5', today: '≈ 8+' }, done: 'quiz-print',
+      actions: [tick(OA3[0], 1), { click: '[data-act="tray-quiz"]', step: 2, say: 'Quiz in the tray' }, { click: '[data-act="quiz-print"]', step: 3, say: 'Print' }] },
+    { id: 'quiz-standard', task: 'A quiz on paper, built from a standard', plan: { steps: 3, actions: '3–5', today: '≈ 8+' }, done: 'quiz-print',
+      actions: [{ click: '[data-act="tray-quiz"]', step: 1, say: 'Quiz in the empty tray: Build from opens' }, { click: '[data-act="pickstd"][data-arg="2.NBT.B.5"]', step: 2, say: 'Pick the standard' }, { click: '[data-act="quiz-print"]', step: 3, say: 'Print' }] },
+    { id: 'quiz-online', task: 'A quiz for pupils online', plan: { steps: 4, actions: '4–6', today: 'not possible in one place' }, done: 'quiz-copy',
+      actions: [tick(OA3[0], 1), { click: '[data-act="tray-quiz"]', step: 2, say: 'Quiz' }, { click: '[data-act="quiz-share"]', step: 3, say: 'Share with pupils' }, { click: '[data-act="copy"]', step: 4, say: 'Copy the link' }] },
+    { id: 'lesson-practice', task: 'A White Rose lesson’s practice', plan: { steps: 4, actions: '4', today: '5–6' }, done: 'print', expectKind: 'sections',
+      actions: [{ click: '[data-act="go"][data-arg="lessons"]', step: 1, say: 'Lessons (opens where you were last)' }, { click: '[data-lesson="Y3.B1.S4"]', step: 2, say: 'The lesson marked Next' }, { click: '[data-act="lesson-practice"]', step: 3, say: 'Print practice' }, { click: '[data-act="sheet-print"]', step: 4, say: 'Print (Sections, examples the first time)' }] },
+    { id: 'lesson-other', task: 'A lesson’s practice from another grade and area', plan: { steps: 4, actions: '6', today: '5–6' }, done: 'print', expectKind: 'sections',
+      actions: [{ click: '[data-act="go"][data-arg="lessons"]', step: 1, say: 'Lessons' }, { click: '[data-act="lgrade"][data-arg="4"]', step: 1, say: 'Grade 4' }, { click: '[data-act="larea"][data-arg="NF"]', step: 1, say: 'Fractions & decimals' }, { click: '.lesson[data-act="lesson"]', step: 2, say: 'The first lesson' }, { click: '[data-act="lesson-practice"]', step: 3, say: 'Print practice' }, { click: '[data-act="sheet-print"]', step: 4, say: 'Print' }] },
+    { id: 'my-quizzes', task: 'Print a saved quiz again', plan: { steps: 3, actions: '3–4', today: 'quizzes list' }, done: 'quiz-print',
+      actions: [{ click: '[data-act="go"][data-arg="classes"]', step: 1, say: 'Classes' }, { click: '[data-act="ctab"][data-arg="quizzes"]', step: 1, say: 'Quizzes: your saved quizzes' }, { click: '[data-act="quizopen"][data-arg="0"]', step: 2, say: 'Print on the quiz' }, { click: '[data-act="quiz-print"]', step: 3, say: 'Print' }] },
+    { id: 'lesson-pre', task: 'A lesson’s pre-skills', plan: { steps: 4, actions: '4', today: 'not offered' }, done: 'print',
+      actions: [{ click: '[data-act="go"][data-arg="lessons"]', step: 1, say: 'Lessons' }, { click: '[data-lesson="Y3.B1.S4"]', step: 2, say: 'The lesson' }, { click: '[data-act="lesson-pre"]', step: 3, say: 'Practise pre-skills' }, { click: '[data-act="sheet-print"]', step: 4, say: 'Print' }] },
+    { id: 'lesson-print', task: 'A detailed lesson', plan: { steps: 4, actions: '4', today: '7' }, done: 'print',
+      actions: [{ click: '[data-act="go"][data-arg="lessons"]', step: 1, say: 'Lessons' }, { click: '[data-lesson="Y3.B1.S4"]', step: 2, say: 'The lesson' }, { click: '[data-act="lesson-print"]', step: 3, say: 'Print lesson' }, { click: '[data-act="sheet-print"]', step: 4, say: 'Print' }] },
+    { id: 'map-task', task: 'MAP practice by task', plan: { steps: 4, actions: '4', today: '4–5' }, done: 'print',
+      actions: [{ click: '[data-act="browse"][data-arg="map"]', step: 1, say: 'Browse by MAP strand' }, { click: '[data-act="maptask"]', step: 2, say: 'Pick a task: its skills go in the tray' }, { click: '[data-act="tray-print"]', step: 3, say: 'Print' }, { click: '[data-act="sheet-print"]', step: 4, say: 'Print' }] },
+    { id: 'saved-set', task: 'A saved set', plan: { steps: 3, actions: '3–4', today: '3–4' }, done: 'print',
+      actions: [{ click: '[data-act="browse"][data-arg="sets"]', step: 1, say: 'Browse by My sets' }, { click: '[data-act="openset"][data-arg="0"]', step: 2, say: 'Open the set' }, { click: '[data-act="tray-print"]', step: 3, say: 'Print' }, { click: '[data-act="sheet-print"]', step: 3, say: 'Print' }] },
+    { id: 'chip-options', task: 'Change one skill’s options', plan: { steps: 1, actions: '1', today: 'buried per screen' }, start: 'tray=demo3', doneSheet: 'chip',
+      actions: [{ click: '.tray-chips [data-act="chip"], .tray-count', step: 1, say: 'Tap its chip in the tray' }] },
+    // fix round 3 (owner 2026-10-23): a whole grade, a big tray, and its weights
+    { id: 'grade-paper', task: 'Practise a whole grade on paper', plan: { steps: 3, actions: '≤ 4', today: 'not possible' }, start: 'grade=3', done: 'print', expectKind: 'mixed',
+      check: 'MQ.S.tray.length > 60',
+      actions: [{ click: '[data-act="addgrade"]', step: 1, say: 'Add whole grade (Grade 3: one of each skill)' }, { click: '[data-act="tray-print"]', step: 2, say: 'Print in the tray (Mixed practice, every skill at least once)' }, { click: '[data-act="sheet-print"]', step: 3, say: 'Print' }] },
+    { id: 'grade-share', task: 'Share a whole grade', plan: { steps: 3, actions: '≤ 4', today: 'not possible' }, start: 'grade=3', done: 'copy',
+      check: '/G3-ALL/.test(document.body.innerText) || MQ.S.last === "copy"',
+      actions: [{ click: '[data-act="addgrade"]', step: 1, say: 'Add whole grade' }, { click: '[data-act="tray-share"]', step: 2, say: 'Share: the short grade code' }, { click: '[data-act="copy"]', step: 3, say: 'Copy the link' }] },
+    { id: 'grade-remove', task: 'Remove one grade from a big tray', plan: { steps: 2, actions: '≤ 3', today: 'one by one' }, start: 'tray=grades2-3',
+      check: 'MQ.S.tray.length > 0 && MQ.S.tray.every(k => MQ_DATA.skills.find(s => s.c + ":" + s.v === k).g !== "2")',
+      actions: [{ click: '.tray-label-btn, .tray-count', step: 1, say: 'Open the tray' }, { click: '[data-act="tpremove"][data-arg="r:2"]', step: 2, say: 'Remove Grade 2' }] },
+    { id: 'grade-more', task: 'Make one grade come up more often in a big tray', plan: { steps: 2, actions: '≤ 3', today: 'not possible' }, start: 'tray=grades2-3',
+      // fix round 4 (critic r4 B1): the WHOLE grade, across every area; the check holds every grade-2 skill, and no other
+      check: '(() => { const g = (k) => MQ_DATA.skills.find(x => x.c + ":" + x.v === k).g; const two = MQ.S.tray.filter(k => g(k) === "2"); return two.length > 50 && two.every(k => MQ.S.w[k] === 3) && MQ.S.tray.filter(k => g(k) !== "2").every(k => (MQ.S.w[k] ?? 2) === 2); })()',
+      actions: [{ click: '.tray-label-btn, .tray-count', step: 1, say: 'Open the tray' }, { click: '[data-act="hw"][data-arg="r:2|3"]', step: 2, say: 'Grade 2 (all areas) · How often: More' }] },
+    { id: 'area-40', task: 'Give Fractions 40 % of a whole-grade worksheet', plan: { steps: 3, actions: '≤ 4', today: 'not possible' }, start: 'tray=grade3', doneSheet: 'print',
+      check: 'Math.abs(MQ.S.tray.filter(k => MQ_DATA.skills.find(s => s.c + ":" + s.v === k).a === "NF").reduce((t, k) => t + (MQ.plan().byKey[k] || 0), 0) - 0.4 * MQ.plan().total) <= 1',
+      actions: [{ click: '.tray-label-btn, .tray-count', step: 1, say: 'Open the tray' }, { click: '[data-act="detailed"]', step: 1, say: 'Detailed weights' }, { type: 'input.pct[data-scope="a:NF"]', text: '40', enter: true, step: 2, say: 'Fractions: 40 % (the other areas share the rest)' }, { click: '.traypop [data-act="tray-print"]', step: 3, say: 'Print: the summary and the preview follow it' }] },
+    { id: 'skill-50', task: 'One skill 50 %, the rest split evenly', plan: { steps: 2, actions: '≤ 4', today: 'not possible' }, start: 'tray=demo64&pages=5',
+      check: '(() => { const p = MQ.plan(); const k = "addition:add_wp_1k"; const r = MQ.S.tray.filter(x => x !== k).map(x => p.byKey[x] || 0); return MQ.S.lock["k:" + k] === 50 && p.byKey[k] === Math.round(p.total / 2) && Math.max(...r) - Math.min(...r) <= 1; })()',
+      actions: [{ click: '.tray-label-btn, .tray-count', step: 1, say: 'Open the tray' }, { click: '[data-act="detailed"]', step: 1, say: 'Detailed weights' }, { type: '#tsearch', text: 'add 1000 story', step: 2, say: 'Find the skill (the app’s own search)' }, { type: 'input.pct[data-scope="k:addition:add_wp_1k"]', text: '50', enter: true, step: 2, say: '50 %: it is held, the rest share 50 % evenly' }] },
+    // owner 2026-10-23: "multiple pages of the same set of problems"
+    { id: 'copies-3', task: 'Three copies of the same mixed page', plan: { steps: 3, actions: '≤ 4', today: 'print the page 3 times' }, start: 'tray=' + OA3.join(','), done: 'print', expectKind: 'mixed',
+      check: 'MQ.S.opts.pages === 3 && MQ.S.opts.each === "copy"',
+      actions: [{ click: '[data-act="tray-print"]', step: 1, say: 'Print in the tray (a Mixed page of the 3 skills)' }, { click: '[data-act="pagesto"][data-arg="3"]', step: 2, say: 'How many pages: 3' }, { click: '[data-act="each"][data-arg="copy"]', step: 2, say: 'Each page: Same page again' }, { click: '[data-act="sheet-print"]', step: 3, say: 'Print (one key, “Key for all 3 copies”)' }] },
+  ];
+  // on a phone the grades row of the tray popup is under "View and more"
+  // on a phone a whole grade's Remove is under its "⋯" (its How often stays in sight)
+  FLOWS.find(f => f.id === 'grade-remove').narrow = [{ click: '.tray-count', step: 1, say: 'Open the tray' }, { click: '[data-act="tpdots"][data-arg="r:2"]', step: 1, say: 'Grade 2 · ⋯' }, { click: '[data-act="tpremove"][data-arg="r:2"]', step: 2, say: 'Remove Grade 2' }];
+  // the narrow (390) chip flow opens the collapsed tray first: the count bar is one tap, then the chip
+  Object.assign(FLOWS.find(f => f.id === 'chip-options'), { narrowPlan: '2', narrowNote: 'On a phone the tray is collapsed to “3 skills ▸” (§2.3), so a chip is two taps away' });
+  FLOWS.find(f => f.id === 'chip-options').narrow = [{ click: '.tray-count', step: 1, say: 'Tap “3 skills ▸”' }, { click: '.traypop [data-act="chip"]', step: 1, say: 'Tap the skill' }];
+  root.MQ_FLOWS = FLOWS;
+  if (typeof module !== 'undefined' && module.exports) module.exports = FLOWS;
+})(typeof window !== 'undefined' ? window : globalThis);

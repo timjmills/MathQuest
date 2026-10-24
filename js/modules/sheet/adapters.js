@@ -67,6 +67,8 @@ for (const k of DEP_KEYS) DEPS[k] = null;
  * @returns {string[]} the keys that are now installed
  */
 const READ_FIG_TYPES = new Set(['number', 'text', 'multiple-choice', 'multi-select-check', 'coord-input']);
+/** A legacy coordinates item whose grid is only READ (its cell carries `ws-legacy--readfig`, CL-4b top start). */
+export const legacyReadFig = (q) => !!q && q.categoryId === 'coordinates' && READ_FIG_TYPES.has(q.answerType);
 
 export function installLegacyAdapters(fns = {}) {
     for (const k of DEP_KEYS) if (fns[k] !== undefined && fns[k] !== null) DEPS[k] = fns[k];
@@ -222,7 +224,7 @@ const LEGACY_TEMPLATE = register('legacy', {
         // its grid as the workspace. A mixed_coordinates page shares one cell height with its
         // tallest item (a 2 x 2 transform choice), so a centred short item left a blank band
         // above its question (teacher-site T1 r6).
-        const readFig = p && p.categoryId === 'coordinates' && READ_FIG_TYPES.has(p.answerType) ? ' ws-legacy--readfig' : '';
+        const readFig = legacyReadFig(p) ? ' ws-legacy--readfig' : '';
         return `<div class="ws-legacy print-edition${readFig}">${stripLegacyHead(html)}${stamp(key, ctx)}</div>`;
     },
 

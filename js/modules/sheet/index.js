@@ -75,7 +75,7 @@ export {
 export {
     installLegacyAdapters, installedLegacy, resetLegacyAdapters, legacyDeps,
     defaultRenderCell, defaultWorkedSteps, defaultWrongAnswer,
-    defaultStrings, defaultFootprint, defaultOptions, ownOptionCount,
+    defaultStrings, defaultFootprint, defaultOptions, ownOptionCount, legacyReadFig,
 } from './adapters.js';
 
 /* ------------------------------------------------- cell templates (register on load) */

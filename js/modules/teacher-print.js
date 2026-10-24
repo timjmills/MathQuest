@@ -1095,7 +1095,7 @@ function fitPreview() {
 
 /* ================================================================= print */
 
-async function printHtml(html, title, paper) {
+export async function printHtml(html, title, paper) {
     const doc = sheetDocument(html, title, { paper });
     let frame = document.getElementById('tvPrintFrame');
     if (!frame) {

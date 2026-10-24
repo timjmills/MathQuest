@@ -1,0 +1,328 @@
+/* ==========================================================================
+   teacher-tray.css — Teacher site 2.0 (T3a): the tray bar, the tray popup and a chip's options sheet
+   ========================================================================== */
+/* The signed mock-up design/mockups/teacher-2/app.css "the tray", "the tray popup" and the sheets, on the board C
+   tokens of css/teacher-tokens.css only. ADDITIVE: new class names (.tt-*, .tc-*), scoped to #teacherApp. */
+
+/* ---------------------------------------------------------------- the bar: only on Skills, always there */
+#teacherApp #tvTray { display: none; }
+body.teacher-mode.tv-on-screen:not(.tv-play):not(.tv-board):has(#teacherMain > .tv-screen.is-active[data-screen="skills"]) #teacherApp #tvTray { display: flex; }
+#teacherApp .tt-bar {
+  position: fixed; left: var(--tv-side-w, 224px); right: 0; bottom: 0; z-index: 40;
+  align-items: center; gap: var(--sp-8); padding: var(--sp-8) var(--sp-16); min-height: 0;
+  background: var(--surface); color: var(--text); border-top: var(--line-2) solid var(--text); box-shadow: var(--shadow-2);
+  font-family: var(--font-ui); font-size: var(--fs-16); line-height: var(--lh-body);
+}
+#teacherApp .tt-bar *, #teacherApp .tt-layer *, #teacherApp .tt-toast * { box-sizing: border-box; }
+#teacherApp .tt-label { display: grid; gap: 0; align-content: center; min-width: 0; flex: none; max-width: 200px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: var(--ls-mono); font-size: var(--fs-12); color: var(--text-2); white-space: nowrap; }
+#teacherApp .tt-label b { font-family: var(--font-ui); text-transform: none; letter-spacing: 0; font-size: var(--fs-16); color: var(--text); }
+#teacherApp .tt-label-btn { min-height: var(--control); background: none; border: 0; text-align: left; cursor: pointer; padding: 0; }
+#teacherApp .tt-key { display: flex; flex-wrap: nowrap; gap: 0 var(--sp-8); }
+#teacherApp .tt-key > span { display: inline-flex; align-items: center; gap: var(--sp-4); color: var(--a-deep); font-weight: var(--fw-700); }
+#teacherApp .tt-empty { flex: 1; min-width: 0; color: var(--text-2); font-size: var(--fs-16); }
+#teacherApp .tt-items, #teacherApp .tt-segs { flex: 1 1 0; min-width: 0; display: flex; flex-wrap: nowrap; gap: var(--sp-8); overflow: hidden; align-items: center; padding: var(--sp-4); }
+#teacherApp .tt-segs { gap: var(--sp-4); }
+#teacherApp .tt-items:has(> .fit-wrap) { align-items: flex-start; }
+#teacherApp .tt-actions { flex: none; margin-left: auto; display: flex; align-items: center; gap: var(--sp-8); }
+#teacherApp .tt-hint { font-size: var(--fs-12); color: var(--text-3); text-align: right; }
+#teacherApp .tt-btn.tt-count { display: none; }
+
+/* buttons: rank 1 ink, rank 4 outline */
+#teacherApp .tt-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-8); min-height: var(--control); min-width: var(--control); padding: 0 var(--sp-16);
+  border-radius: var(--r-8); border: var(--line-1) solid var(--line); background: var(--surface); color: var(--text);
+  font-family: var(--font-ui); font-size: var(--fs-16); font-weight: var(--fw-700); white-space: nowrap; cursor: pointer; line-height: var(--lh-tight);
+}
+#teacherApp .tt-btn:hover { border-color: var(--action); }
+#teacherApp .tt-btn.tt-primary { background: var(--action); color: var(--action-on); border-color: var(--action); min-height: var(--sp-48); padding: 0 var(--sp-24); font-size: var(--fs-20); }
+#teacherApp .tt-btn[aria-disabled="true"], #teacherApp .tt-btn[disabled] { color: var(--text-3); border-color: var(--line); background: var(--surface); cursor: not-allowed; }
+#teacherApp .tt-btn.tt-text { border-color: transparent; background: transparent; }
+#teacherApp .tt-btn.tt-text:hover { border-color: var(--line); }
+#teacherApp .tt-btn.tt-icon { padding: 0; width: var(--control); }
+#teacherApp .tt-more { flex: none; white-space: nowrap; }
+#teacherApp .tt-more.tight { padding: 0 var(--sp-4); }
+
+/* the bar's items: List (a name over an area line) · Chips · Thumbnails */
+#teacherApp .tt-li { display: inline-flex; align-items: center; gap: var(--sp-4); flex: none; min-height: var(--control); padding: 0 var(--sp-8); border: 0; border-bottom: var(--line-2) solid var(--a-bold); background: none; color: var(--text); font-family: var(--font-ui); font-size: var(--fs-14); font-weight: var(--fw-700); white-space: nowrap; cursor: pointer; }
+#teacherApp .tt-li svg { color: var(--a-deep); }
+#teacherApp .tt-li-a { font-family: var(--font-ui); font-size: var(--fs-12); font-weight: var(--fw-700); color: var(--a-deep); margin-left: var(--sp-4); flex: none; }
+#teacherApp .tt-chip {
+  display: inline-flex; align-items: center; gap: var(--sp-8); flex: none; min-height: var(--control); padding: 0 var(--sp-16) 0 var(--sp-8); max-width: 100%; min-width: 0;
+  border-radius: var(--r-8); border: var(--line-1) solid var(--a-deep); background: var(--a-bold); color: var(--a-on);
+  font-family: var(--font-ui); font-size: var(--fs-14); font-weight: var(--fw-700); white-space: nowrap; cursor: pointer; text-align: left;
+}
+#teacherApp .tt-chip[data-domain="MIXED"], #teacherApp .tt-chip[data-domain="WORDS"], #teacherApp .tt-chip[data-domain="NOSTD"] { border-style: dashed; border-width: var(--line-2); }
+#teacherApp .tt-chip .tt-li-a { color: inherit; }
+#teacherApp .tt-chip-dot { width: var(--sp-24); height: var(--sp-24); display: grid; place-items: center; background: var(--surface); color: var(--text); flex: none; border: var(--line-1) solid var(--a-deep); }
+#teacherApp .tt-name { line-height: var(--lh-tight); padding: var(--sp-4) 0; }
+#teacherApp .tt-items > .fit-wrap { flex: 1 1 auto; min-width: 0; white-space: normal; height: auto; text-align: left; }
+#teacherApp .tt-items > .fit-wrap .tt-name, #teacherApp .tt-items > .fit-wrap .tt-mini-name { white-space: normal; }
+#teacherApp .tt-items > .fit-wrap .tt-mini-pic { display: none; }
+#teacherApp .tt-mini { flex: none; display: inline-flex; align-items: center; gap: var(--sp-4); min-height: var(--control); padding: 0 var(--sp-8) 0 var(--sp-4); border: var(--line-2) solid var(--a-deep); border-radius: var(--r-8); background: var(--surface); color: var(--text); cursor: pointer; font-family: var(--font-ui); }
+#teacherApp .tt-mini-pic { display: block; width: 56px; height: 32px; flex: none; background: var(--paper); overflow: hidden; border-radius: var(--r-8); position: relative; }
+#teacherApp .tt-mini-frame { position: absolute; inset: 0; border: 0; border-radius: 0; }
+#teacherApp .tt-mini-name { font-size: var(--fs-14); font-weight: var(--fw-700); white-space: nowrap; }
+#teacherApp .tt-seg {
+  flex: none; display: inline-flex; align-items: center; gap: var(--sp-4); min-height: var(--control); padding: 0 var(--sp-8);
+  border: var(--line-2) solid var(--a-deep); border-radius: var(--r-8); background: var(--a-tint); color: var(--text);
+  font-family: var(--font-ui); font-size: var(--fs-14); font-weight: var(--fw-700); white-space: nowrap; cursor: pointer;
+}
+#teacherApp .tt-seg svg { color: var(--a-deep); }
+#teacherApp .tt-seg b { font-family: var(--font-mono); font-size: var(--fs-14); }
+#teacherApp .tt-seg[data-domain="MIXED"], #teacherApp .tt-seg[data-domain="WORDS"], #teacherApp .tt-seg[data-domain="NOSTD"] { border-style: dashed; }
+#teacherApp .tt-seg-abbr { display: none; }
+#teacherApp .tt-segs.abbr .tt-seg-abbr { display: inline; }
+#teacherApp .tt-segs.abbr .tt-seg-long { display: none; }
+#teacherApp .tt-seg.bare svg { display: none; }
+#teacherApp .tt-seg.bare { padding: 0 var(--sp-4); }
+@media (max-width: 1099px) {
+  #teacherApp .tt-actions .tt-ic { width: var(--control); padding: 0; }
+  #teacherApp .tt-actions .tt-ic .tt-l { display: none; }
+  #teacherApp .tt-label .tt-key { display: none; }
+}
+
+/* below 820 px: "3 skills ▸" and the three buttons, directly above the bottom bar */
+@media (max-width: 819px) {
+  #teacherApp .tt-bar { left: 0; bottom: var(--tv2-bar); padding: var(--sp-4) var(--sp-16); border-top-width: var(--line-1); }
+  #teacherApp .tt-label, #teacherApp .tt-items, #teacherApp .tt-segs, #teacherApp .tt-empty, #teacherApp .tt-hint { display: none; }
+  #teacherApp .tt-btn.tt-count { display: inline-flex; flex: 1 1 0; justify-content: flex-start; min-width: 0; padding: 0 var(--sp-8); }
+  #teacherApp .tt-actions { gap: var(--sp-4); }
+  #teacherApp .tt-actions .tt-btn.tt-primary { padding: 0 var(--sp-16); font-size: var(--fs-16); }
+}
+
+/* ---------------------------------------------------------------- the Undo note */
+#teacherApp .tt-toast {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: 112px; z-index: 90; display: flex; align-items: center; gap: var(--sp-16);
+  max-width: calc(100vw - var(--sp-32)); padding: var(--sp-8) var(--sp-8) var(--sp-8) var(--sp-24); border-radius: var(--r-16);
+  background: var(--primary-bg); color: var(--primary-fg); box-shadow: var(--shadow-2); font-family: var(--font-ui); font-size: var(--fs-16); font-weight: var(--fw-700);
+}
+#teacherApp .tt-toast > span { flex: 1 1 auto; min-width: 0; }
+#teacherApp .tt-undo { flex: none; min-height: var(--control); min-width: var(--control); padding: 0 var(--sp-16); border: 0; border-radius: var(--r-8); background: var(--primary-fg); color: var(--primary-bg); font-family: var(--font-ui); font-size: var(--fs-16); font-weight: var(--fw-700); cursor: pointer; }
+@media (max-width: 819px) { #teacherApp .tt-toast { bottom: calc(var(--tv2-bar) + 56px + var(--sp-16)); left: var(--sp-16); right: var(--sp-16); transform: none; } }
+
+/* ---------------------------------------------------------------- sheets (the tray popup, a chip's options) */
+body.teacher-mode.tt-locked { overflow: hidden; }
+#teacherApp .tt-layer { position: fixed; inset: 0; z-index: 70; font-family: var(--font-ui); color: var(--text); font-size: var(--fs-16); line-height: var(--lh-body); }
+#teacherApp .tc-layer { z-index: 75; }
+#teacherApp .tt-scrim { position: absolute; inset: 0; background: var(--scrim); }
+#teacherApp .tt-sheet {
+  position: absolute; left: 50%; top: var(--sp-24); transform: translateX(-50%);
+  width: min(1160px, calc(100vw - var(--sp-48))); max-height: calc(100vh - var(--sp-48)); display: flex; flex-direction: column;
+  background: var(--surface); color: var(--text); border-radius: var(--r-16); box-shadow: var(--shadow-2); border: var(--line-1) solid var(--line);
+}
+#teacherApp .tc-sheet { width: min(640px, calc(100vw - var(--sp-48))); }
+#teacherApp .tt-sheet-head { display: flex; align-items: center; gap: var(--sp-16); padding: var(--sp-16) var(--sp-24); border-bottom: var(--line-1) solid var(--line); }
+#teacherApp .tt-head-text { display: grid; gap: var(--sp-4); min-width: 0; }
+#teacherApp .tt-sheet-head h2 { margin: 0; font-family: var(--font-display); font-weight: var(--fw-500); font-synthesis: none; font-size: var(--fs-28); line-height: var(--lh-tight); overflow-wrap: break-word; }
+#teacherApp .tt-eyebrow { margin: 0; font-family: var(--font-mono); font-size: var(--fs-12); text-transform: uppercase; letter-spacing: var(--ls-mono); color: var(--text-2); }
+#teacherApp .tt-close { margin-left: auto; flex: none; }
+#teacherApp .tt-sheet-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: var(--sp-8); padding: var(--sp-8) var(--sp-24); border-top: var(--line-1) solid var(--line); }
+#teacherApp .tt-summary { flex: 1 1 260px; font-size: var(--fs-14); font-weight: var(--fw-700); line-height: var(--lh-tight); }
+#teacherApp .tt-note { margin: 0; font-size: var(--fs-14); color: var(--text-2); }
+#teacherApp .tt-warn { margin: 0; font-size: var(--fs-14); font-weight: var(--fw-700); color: var(--text); }
+#teacherApp .tt-row-label { margin: 0; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: var(--ls-mono); font-size: var(--fs-12); font-weight: var(--fw-700); color: var(--text-2); }
+
+/* segmented Less · Equal · More (selected = fill + ✓ + ring), the switch, the stepper, % */
+#teacherApp .tt-seg-ctl { display: inline-flex; flex-wrap: wrap; gap: var(--sp-4); }
+#teacherApp .tt-seg-ctl button { min-height: var(--control); min-width: var(--control); padding: 0 var(--sp-8); border: var(--line-1) solid var(--line); border-radius: var(--r-8); background: var(--surface); color: var(--text-2); font-family: var(--font-ui); font-size: var(--fs-14); font-weight: var(--fw-700); white-space: nowrap; cursor: pointer; }
+#teacherApp .tt-seg-ctl button:hover { border-color: var(--text); }
+#teacherApp .tt-seg-ctl button[aria-pressed="true"] { background: var(--action-soft); color: var(--action); border-color: var(--action); }
+#teacherApp .tt-tag-slot { display: inline-flex; width: 5.5rem; }
+#teacherApp .tt-tag { font-family: var(--font-mono); font-size: var(--fs-12); text-transform: uppercase; border: var(--line-1) solid var(--text-2); border-radius: var(--r-8); padding: 0 var(--sp-4); color: var(--text); background: var(--surface); white-space: nowrap; }
+#teacherApp .tt-tags { display: inline-flex; gap: var(--sp-4); }
+#teacherApp .tt-held { gap: var(--sp-4); }
+#teacherApp .tt-release { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8); font-size: var(--fs-14); font-weight: var(--fw-700); }
+#teacherApp .tt-toggle-sw { display: inline-flex; align-items: center; gap: var(--sp-8); min-height: var(--control); background: transparent; border: 0; padding: 0; color: var(--text); font-family: var(--font-ui); font-size: var(--fs-14); font-weight: var(--fw-700); cursor: pointer; }
+#teacherApp .tt-toggle-sw i { width: var(--sp-48); height: 28px; border-radius: var(--r-16); border: var(--line-2) solid var(--text-3); position: relative; flex: none; }
+#teacherApp .tt-toggle-sw i::after { content: ""; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: var(--r-8); background: var(--text-3); }
+#teacherApp .tt-toggle-sw[aria-pressed="true"] i { border-color: var(--action); background: var(--action-soft); }
+#teacherApp .tt-toggle-sw[aria-pressed="true"] i::after { left: 22px; background: var(--action); }
+#teacherApp .tt-stepper { display: inline-flex; align-items: center; border: var(--line-1) solid var(--line); border-radius: var(--r-8); }
+#teacherApp .tt-stepper button { width: var(--control); height: var(--control); border: 0; background: transparent; color: var(--text); font-size: var(--fs-20); font-weight: var(--fw-700); cursor: pointer; }
+#teacherApp .tt-stepper button[disabled] { color: var(--text-3); cursor: not-allowed; }
+#teacherApp .tt-stepper output { min-width: var(--sp-32); text-align: center; font-size: var(--fs-16); font-weight: var(--fw-700); }
+#teacherApp .tt-pct-ctl { display: inline-flex; align-items: center; gap: var(--sp-4); }
+#teacherApp .tt-pct-in { display: inline-flex; align-items: center; gap: var(--sp-4); font-family: var(--font-mono); font-size: var(--fs-14); }
+#teacherApp .tt-pct-in input { width: 64px; min-height: var(--control); font-family: var(--font-ui); font-size: var(--fs-16); text-align: right; border: var(--line-1) solid var(--text-2); border-radius: var(--r-8); background: var(--surface); color: var(--text); padding: 0 var(--sp-4); }
+#teacherApp .tt-lock[aria-pressed="true"] { background: var(--action-soft); color: var(--action); border-color: var(--action); }
+#teacherApp .tt-selbox { width: var(--control); height: var(--control); flex: none; display: grid; place-items: center; background: none; border: 0; cursor: pointer; color: var(--text); padding: 0; }
+#teacherApp .tt-selbox i { width: var(--sp-24); height: var(--sp-24); display: grid; place-items: center; border: var(--line-2) solid var(--text); background: var(--surface); font-style: normal; font-weight: var(--fw-700); font-size: var(--fs-16); }
+#teacherApp .tt-selbox i { border-color: var(--action); }
+#teacherApp .tt-selbox[aria-checked="true"] i, #teacherApp .tt-selbox[aria-checked="mixed"] i { background: var(--action); color: var(--action-on); }
+
+/* ---------------------------------------------------------------- the tray popup: area → grade → skill */
+#teacherApp .tt-pop-head { padding: var(--sp-8) var(--sp-24); display: grid; gap: var(--sp-8); border-bottom: var(--line-1) solid var(--line); }
+#teacherApp .tt-tools, #teacherApp .tt-rest, #teacherApp .tt-bulk { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8); }
+#teacherApp .tt-search { position: relative; flex: 1 1 260px; display: block; min-width: 0; }
+#teacherApp .tt-search input { width: 100%; height: var(--control); padding: 0 var(--sp-8) 0 var(--sp-48); border-radius: var(--r-8); border: var(--line-2) solid var(--text); background: var(--surface); color: var(--text); font-family: var(--font-ui); font-size: var(--fs-16); }
+#teacherApp .tt-search > svg { position: absolute; left: var(--sp-16); top: 12px; pointer-events: none; }
+#teacherApp .tt-more-btn { display: none; }
+#teacherApp .tt-extra { display: contents; }
+#teacherApp .tt-rest.tt-extra { display: flex; }
+#teacherApp .tt-view { margin-left: auto; }
+#teacherApp .tt-bulk { padding: var(--sp-8); border: var(--line-2) solid var(--text); border-radius: var(--r-8); background: var(--surface-2); }
+#teacherApp .tt-pop-body { flex: 1 1 auto; overflow-y: auto; padding: var(--sp-8) var(--sp-24) var(--sp-16); display: grid; gap: var(--sp-8); align-content: start; min-height: 0; }
+#teacherApp .tt-area { border: var(--line-2) solid var(--a-deep); border-radius: var(--r-8); background: var(--a-tint); min-width: 0; }
+#teacherApp .tt-area[data-domain="MIXED"], #teacherApp .tt-area[data-domain="WORDS"], #teacherApp .tt-area[data-domain="NOSTD"] { border-style: dashed; }
+#teacherApp .tt-ahead, #teacherApp .tt-ghead { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8); padding: var(--sp-4) var(--sp-8); min-width: 0; }
+#teacherApp .tt-ahead { background: var(--surface); border-bottom: var(--line-1) solid var(--a-deep); padding-right: var(--sp-16); border-radius: var(--r-8) var(--r-8) 0 0; }
+#teacherApp .tt-area.collapsed .tt-ahead { border-bottom: 0; border-radius: var(--r-8); }
+#teacherApp .tt-toggle { display: inline-flex; align-items: center; gap: var(--sp-8); min-height: var(--control); background: none; border: 0; color: var(--text); font-family: var(--font-ui); font-size: var(--fs-16); cursor: pointer; text-align: left; flex: 1 1 220px; min-width: 0; padding: 0; }
+#teacherApp .tt-toggle > svg { color: var(--a-deep); }
+#teacherApp .tt-chev { margin-left: auto; }
+#teacherApp .tt-hname { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--sp-8); min-width: 0; }
+#teacherApp .tt-ghead .tt-hname { flex: 1 1 auto; }
+#teacherApp .tt-count-t { font-family: var(--font-mono); font-size: var(--fs-12); color: var(--text-2); }
+#teacherApp .tt-ghead b { font-size: var(--fs-14); }
+#teacherApp .tt-ctl { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8); margin-left: auto; }
+#teacherApp .tt-pp { display: inline-flex; align-items: center; justify-content: flex-end; gap: var(--sp-8); width: 4rem; }
+#teacherApp .tt-pop.det .tt-pp { width: auto; }
+#teacherApp .tt-p, #teacherApp .tt-share { font-family: var(--font-mono); font-size: var(--fs-12); color: var(--text-2); white-space: nowrap; }
+#teacherApp .tt-rm { width: 9.5rem; justify-content: flex-start; }
+#teacherApp .tt-state, #teacherApp .tt-short, #teacherApp .tt-dots { display: none; }
+#teacherApp .tt-grade { padding: 0 var(--sp-8) var(--sp-8); }
+#teacherApp .tt-ghead { border-bottom: var(--line-1) solid var(--line); padding-left: 0; }
+#teacherApp .tt-bygrade { display: grid; border: var(--line-2) solid var(--text); border-radius: var(--r-8); background: var(--surface); padding: 0 var(--sp-8) var(--sp-4); }
+#teacherApp .tt-bygrade .tt-row-label { padding: var(--sp-8) 0 0; }
+#teacherApp .tt-rgrade:last-child { border-bottom: 0; }
+#teacherApp .tt-items-p { display: grid; }
+#teacherApp .tt-row { display: grid; grid-template-columns: auto auto auto minmax(0, 1fr) auto auto; column-gap: var(--sp-8); align-items: center; padding: var(--sp-4) 0 var(--sp-4) var(--sp-24); border-bottom: var(--line-1) solid var(--line); background: var(--surface); }
+#teacherApp .tt-row:not([data-grade-host]) { grid-template-columns: auto auto minmax(0, 1fr) auto auto; }
+#teacherApp .tt-row .tt-det { grid-column: 1 / -1; display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8); padding: 0 0 var(--sp-4) var(--sp-48); }
+#teacherApp .tt-row.out .tt-name-btn { color: var(--text-3); text-decoration: line-through; }
+#teacherApp .tt-ricon { display: inline-grid; place-items: center; color: var(--a-deep); }
+#teacherApp .tt-name-btn { min-width: 0; min-height: var(--control); text-align: left; background: none; border: 0; color: var(--text); font-family: var(--font-ui); font-size: var(--fs-14); font-weight: var(--fw-700); cursor: pointer; line-height: var(--lh-tight); padding: var(--sp-4) 0; overflow-wrap: break-word; }
+#teacherApp .tt-name-btn:hover { text-decoration: underline; }
+#teacherApp .tt-pv-chips { display: flex; flex-wrap: wrap; gap: var(--sp-8); padding: var(--sp-8) 0; }
+#teacherApp .tt-chipitem { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; column-gap: var(--sp-4); align-items: center; max-width: 100%; padding: var(--sp-4); border-radius: var(--r-8); background: var(--surface); }
+#teacherApp .tt-chipitem .tt-chip { white-space: normal; }
+#teacherApp .tt-chipitem .tt-tags { grid-column: 2 / -1; }
+#teacherApp .tt-chipitem .tt-tags:empty { display: none; }
+#teacherApp .tt-item.out .tt-chip, #teacherApp .tt-pthumb.out .tt-pthumb-pic { opacity: 0.5; }
+#teacherApp .tt-pv-thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: var(--sp-8); padding: var(--sp-8) 0; }
+#teacherApp .tt-pthumb { display: grid; gap: var(--sp-4); padding: var(--sp-8); background: var(--surface); border: var(--line-1) solid var(--a-deep); border-left: var(--sp-4) solid var(--a-bold); border-radius: var(--r-8); min-width: 0; }
+#teacherApp .tt-pthumb-top { display: flex; align-items: center; gap: var(--sp-4); min-width: 0; }
+#teacherApp .tt-pthumb-top .tt-name-btn { flex: 1 1 auto; }
+#teacherApp .tt-pthumb-pic { display: block; height: 80px; border: var(--line-1) solid var(--paper-ink); border-radius: var(--r-8); background: var(--paper); overflow: hidden; }
+#teacherApp .tt-pthumb .tt-tags:empty { display: none; }
+
+@media (max-width: 1099px) {
+  #teacherApp .tt-more-btn { display: inline-flex; }
+  #teacherApp .tt-extra, #teacherApp .tt-rest.tt-extra { display: none; }
+  #teacherApp .tt-extra.open, #teacherApp .tt-rest.tt-extra.open { display: flex; flex-wrap: wrap; gap: var(--sp-8); flex-basis: 100%; align-items: center; }
+  #teacherApp .tt-view { margin-left: 0; }
+  #teacherApp .tt-area.collapsed .tt-ctl .tt-seg-ctl, #teacherApp .tt-area.collapsed .tt-ctl .tt-tag-slot, #teacherApp .tt-area.collapsed .tt-ctl .tt-rm { display: none; }
+  #teacherApp .tt-pop.det .tt-ahead > .tt-ctl, #teacherApp .tt-pop.det .tt-ghead:not(.tt-rgrade) > .tt-ctl { display: none; }
+  #teacherApp .tt-pop.det .tt-ahead > .tt-dots, #teacherApp .tt-pop.det .tt-ghead > .tt-dots { display: inline-flex; margin-left: auto; }
+  #teacherApp .tt-pop.det .tt-ahead.ctl-open > .tt-ctl, #teacherApp .tt-pop.det .tt-ghead.ctl-open > .tt-ctl { display: flex; flex-wrap: wrap; flex-basis: 100%; margin-left: 0; padding: 0 0 var(--sp-8); }
+  #teacherApp .tt-pop.det .tt-state { display: inline; }
+}
+@media (min-width: 820px) {
+  #teacherApp .tt-pop.det .tt-row { grid-template-columns: auto auto minmax(0, 1fr) auto auto auto; }
+  #teacherApp .tt-pop.det .tt-row[data-grade-host] { grid-template-columns: auto auto auto minmax(0, 1fr) auto auto auto; }
+  #teacherApp .tt-pop.det .tt-row > .tt-det { grid-column: auto; order: 1; padding: 0; flex-wrap: nowrap; }
+  #teacherApp .tt-pop.det .tt-row > .tt-icon { order: 2; }
+  #teacherApp .tt-pop.det .tt-row .tt-share { display: inline-block; min-width: 6.5rem; }
+  #teacherApp .tt-pop.det .tt-rest .tt-note { display: none; }
+}
+@media (min-width: 820px) and (max-width: 1099px) {
+  #teacherApp .tt-pop.det .tt-row .tt-share { min-width: 2.5rem; }
+  #teacherApp .tt-pop.det .tt-row .tt-of { display: none; }
+}
+
+/* ---------------------------------------------------------------- a chip's options sheet */
+#teacherApp .tc-sheet .tt-sheet-head > .gbadge { height: var(--sp-32); font-size: var(--fs-14); align-self: flex-start; margin-top: var(--sp-4); }
+#teacherApp .tc-area { display: inline-flex; align-items: center; gap: var(--sp-4); vertical-align: middle; font-weight: var(--fw-700); color: var(--a-deep); }
+#teacherApp .tc-body { flex: 1 1 auto; overflow-y: auto; min-height: 0; padding: var(--sp-16) var(--sp-24); display: grid; gap: var(--sp-16); align-content: start; }
+#teacherApp .tc-preview { display: grid; gap: var(--sp-8); }
+#teacherApp .tc-preview-head { display: flex; align-items: center; gap: var(--sp-8); justify-content: space-between; }
+#teacherApp .tc-k { font-family: var(--font-mono); font-size: var(--fs-12); font-weight: var(--fw-700); text-transform: uppercase; letter-spacing: var(--ls-mono); color: var(--text-2); }
+#teacherApp .tc-frame { height: 200px; border: var(--line-1) solid var(--paper-ink); border-radius: var(--r-8); background: var(--paper); }
+#teacherApp .tc-note { margin: 0; font-size: var(--fs-14); color: var(--text-2); }
+#teacherApp .tc-often { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8) var(--sp-16); padding-top: var(--sp-16); border-top: var(--line-1) solid var(--line); }
+#teacherApp .tc-held { display: inline-flex; align-items: center; gap: var(--sp-4); font-weight: var(--fw-700); }
+#teacherApp .tc-opts { display: grid; gap: 0; min-width: 0; }
+#teacherApp .tc-opts .sko-group-head { margin: var(--sp-16) 0 0; font-family: var(--font-mono); font-size: var(--fs-12); font-weight: var(--fw-700); text-transform: uppercase; letter-spacing: var(--ls-mono); color: var(--text-2); }
+#teacherApp .tc-row { position: relative; padding: var(--sp-8) calc(var(--control) + var(--sp-8)) var(--sp-8) 0; border-bottom: var(--line-1) solid var(--line); min-width: 0; }
+#teacherApp .tc-help { margin: var(--sp-4) 0 0; font-size: var(--fs-12); color: var(--text-2); }
+#teacherApp .tc-row button, #teacherApp .tc-row input, #teacherApp .tc-row select, #teacherApp .tc-opts summary { min-height: var(--control); }
+#teacherApp .tc-row .tv-select { width: 100%; }
+#teacherApp .tc-foot .tt-primary { min-width: 160px; }
+
+/* ---------------------------------------------------------------- below 820 px: sheets full screen above both bars */
+@media (max-width: 819px) {
+  #teacherApp .tt-sheet, #teacherApp .tc-sheet { inset: 0; left: 0; top: 0; transform: none; width: 100vw; max-height: none; height: 100%; border-radius: 0; border: 0; }
+  #teacherApp .tt-sheet-head { padding: var(--sp-8) var(--sp-16); }
+  #teacherApp .tt-sheet-head h2 { font-size: var(--fs-20); }
+  #teacherApp .tt-pop-head, #teacherApp .tt-pop-body { padding-left: var(--sp-16); padding-right: var(--sp-16); }
+  #teacherApp .tt-sheet-foot { padding: var(--sp-8) var(--sp-16); }
+  #teacherApp .tt-summary { flex-basis: 100%; font-size: var(--fs-12); }
+  #teacherApp .tt-sheet-foot .tt-btn { flex: 1 1 0; min-width: 0; padding: 0 var(--sp-8); white-space: normal; text-align: center; }
+  #teacherApp .tc-foot .tt-primary { flex-basis: 100%; }
+  #teacherApp .tc-body { padding: var(--sp-16); }
+  #teacherApp .tc-frame { height: 180px; }
+  #teacherApp .tt-dots { display: inline-flex; flex: none; font-size: var(--fs-20); }
+  #teacherApp .tt-state { display: inline; }
+  #teacherApp .tt-wide { display: none; }
+  #teacherApp .tt-short { display: inline; }
+  #teacherApp .tt-ahead, #teacherApp .tt-ghead { padding: 0 var(--sp-4); gap: 0 var(--sp-4); }
+  #teacherApp .tt-ahead .tt-toggle { flex: 1 1 0; }
+  #teacherApp .tt-toggle .tt-hname, #teacherApp .tt-ghead .tt-hname { display: grid; gap: 0; line-height: var(--lh-tight); }
+  #teacherApp .tt-ghead .tt-hname { flex: 1 1 0; }
+  #teacherApp .tt-ahead > .tt-ctl, #teacherApp .tt-ghead > .tt-ctl { display: none; }
+  #teacherApp .tt-ahead.ctl-open > .tt-ctl, #teacherApp .tt-ghead.ctl-open > .tt-ctl { display: flex; flex-wrap: wrap; flex-basis: 100%; margin-left: 0; padding: 0 0 var(--sp-8); }
+  #teacherApp .tt-rm { width: auto; }
+  #teacherApp .tt-pp { width: auto; }
+  #teacherApp .tt-n { display: none; }
+  #teacherApp .tt-row { padding: 0; column-gap: var(--sp-4); }
+  #teacherApp .tt-row .tt-det { padding-left: 0; }
+  #teacherApp .tt-grade { padding: 0 var(--sp-4) var(--sp-4); }
+  #teacherApp .tt-rgrade > .tt-ctl { display: flex; flex-wrap: wrap; flex-basis: 100%; margin-left: 0; padding: 0 0 var(--sp-8); }
+  #teacherApp .tt-rgrade:not(.ctl-open) > .tt-ctl .tt-rm, #teacherApp .tt-rgrade:not(.ctl-open) > .tt-ctl .tt-pp { display: none; }
+  #teacherApp .tt-pop.det .tt-row { display: flex; flex-wrap: wrap; align-items: center; column-gap: var(--sp-4); padding: var(--sp-4) 0 0; }
+  #teacherApp .tt-pop.det .tt-row > .tt-selbox, #teacherApp .tt-pop.det .tt-row > .tt-tags { display: none; }
+  #teacherApp .tt-pop.det .tt-row > .tt-name-btn { flex: 1 1 calc(100% - var(--sp-48) * 2); }
+  #teacherApp .tt-pop.det .tt-row > .tt-det { flex: 1 1 100%; order: 3; flex-wrap: nowrap; padding: 0 0 var(--sp-4); }
+  #teacherApp .tt-pop.det .tt-row .tt-of { display: none; }
+  #teacherApp .tt-pv-thumbs { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  #teacherApp .tt-pthumb-pic { height: 64px; }
+}
+/* the shared option controls (skill-options-ui.js) carry the pupil app's inline look: teacher sizes here, every target 44 px */
+#teacherApp .tc-opts label { min-height: var(--control); font-size: var(--fs-14) !important; }
+#teacherApp .tc-opts select, #teacherApp .tc-opts input[type="number"] { min-height: var(--control); font-size: var(--fs-14) !important; border-color: var(--text-2) !important; border-radius: var(--r-8) !important; }
+#teacherApp .tc-opts button { min-height: var(--control); min-width: var(--control); font-size: var(--fs-14) !important; font-weight: var(--fw-700); color: var(--text) !important; border-radius: var(--r-8) !important; }
+#teacherApp .tc-opts input[type="checkbox"] { width: 18px !important; height: 18px !important; }
+#teacherApp .tc-opts .sko-tip-text { background: var(--surface-2); color: var(--text); }
+#teacherApp .tc-opts .sko-tip { color: var(--text-2) !important; border-color: var(--text-2); }
+#teacherApp .tc-opts select.tv-select { width: 100%; }
+#teacherApp .tc-opts .sko-row-line select.tv-select { width: auto; flex: 0 1 auto; min-width: 0; max-width: 100%; }
+#teacherApp .tc-opts summary { display: flex; align-items: center; }
+/* the exact count (owner 2026-10-24: "an exact count for the how often … OR a %") */
+#teacherApp .tt-cnt-in input { width: 64px; }
+#teacherApp .tt-cnt-l { font-family: var(--font-ui); font-size: var(--fs-12); color: var(--text-2); }
+#teacherApp .tt-tag-held { display: inline-flex; align-items: center; gap: var(--sp-4); }
+#teacherApp .tc-or { font-size: var(--fs-14); color: var(--text-2); }
+@media (min-width: 820px) and (max-width: 1099px) { #teacherApp .tt-pop.det .tt-row .tt-cnt-l { display: none; } }
+@media (max-width: 819px) { #teacherApp .tt-pop.det .tt-row .tt-cnt-l { display: none; } #teacherApp .tt-pop.det .tt-row .tt-det { flex-wrap: wrap; } }
+
+/* owner 2026-10-24 (skills-hierarchy.webp): "Tray / 3 skills selected", "Review 3 skills", indigo Print; grade colours */
+#teacherApp .tt-label > span { text-transform: none; letter-spacing: 0; font-family: var(--font-ui); font-size: var(--fs-14); }
+#teacherApp .tt-label b { font-size: var(--fs-20); }
+#teacherApp .tt-review { white-space: nowrap; }
+@media (max-width: 1279px) { #teacherApp .tt-review { display: none; } }
+#teacherApp .tt-held { color: var(--action); border-color: var(--action); background: var(--action-soft); }
+#teacherApp .tt-ghead .tt-hname .gbadge-long { margin-right: var(--sp-8); }
+#teacherApp .tt-bulk-group { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8); }
+#teacherApp .tt-bulk-group input { width: 72px; }
+#teacherApp .tt-groups { display: flex; flex-wrap: wrap; gap: var(--sp-8); }
+#teacherApp .tt-group { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8); padding: 0 0 0 var(--sp-16); border: var(--line-1) solid var(--action); border-radius: var(--r-8); background: var(--action-soft); font-size: var(--fs-14); }
+#teacherApp .tt-chip .gbadge, #teacherApp .tt-mini .gbadge { border-color: var(--text); }
+#teacherApp .tt-hname .gbadge-long { justify-self: start; }
+#teacherApp .tc-opts .sko-tip { width: var(--control) !important; height: var(--control) !important; min-width: var(--control) !important; min-height: var(--control) !important; }
+/* the Total control in the popup foot (shared with the worksheet sheet's How much) */
+#teacherApp .tt-total { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8); }
+#teacherApp .tt-total .tt-stepper input { width: 64px; min-height: var(--control); border: 0; text-align: center; font-family: var(--font-ui); font-size: var(--fs-16); font-weight: var(--fw-700); background: transparent; color: var(--text); }
+#teacherApp .tt-warn .tt-btn { margin-left: var(--sp-8); }
+/* the scroll container keeps rows clear of the tray bar (and the bottom bar below 820 px) */
+html:has(body.teacher-mode) { scroll-padding-bottom: 96px; }
+@media (max-width: 819px) { html:has(body.teacher-mode) { scroll-padding-bottom: calc(var(--tv2-bar, 64px) + 64px); } }

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teacher Flows</title>
+<script>document.documentElement.setAttribute('data-theme','light');/* dark mode parked: owner 2026-10-23 */</script>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Fraunces:ital,opsz,wght@1,9..144,500&family=Inter:wght@500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="docs.css">
+</head>
+<body>
+<div class="doc">
+  <div class="top"><a class="btn" href="index.html">← Overview</a><a class="btn" href="app.html">Open the mock-up</a></div>
+  <p class="eyebrow">IMPROVEMENT_PLAN §2.6 · the flows</p>
+  <h1>The flows: 3–4 steps</h1>
+  <p class="serif">Find, tick, then Print, Quiz or Share.</p>
+  <p class="lead">Every job starts the same way: find skills, tick them into the tray, then Print, Quiz or Share. Each row below walks itself in the mock-up: press “Walk it” and follow the dashed outline.</p>
+  <p class="note"><b>Steps</b> = the screens or decisions (the owner’s “3–4 steps”). <b>Actions</b> = every click, typed search and needed scroll, from where the teacher starts (Skills, or Lessons opened where she was last). “Clicked” is what the shoot script counted when it ran each flow in the mock-up at 1366 × 768 and 390 × 844, including any scroll it needed. The plan figures are IMPROVEMENT_PLAN §2.6.</p>
+  <div class="scroll"><table id="t"><thead><tr><th>Task</th><th>The clicks</th><th>Steps</th><th>Actions: plan new / today</th><th>Clicked 1366</th><th>Clicked 390</th><th></th></tr></thead><tbody></tbody></table></div>
+  <p class="note" id="when"></p>
+</div>
+<script src="flows.js"></script>
+<script src="flows-check.js"></script>
+<script>
+(function () {
+  const chk = window.MQ_FLOW_CHECK || { results: {} };
+  const tb = document.querySelector('#t tbody');
+  const cell = (r) => r ? `<span class="${r.ok ? 'ok' : 'bad'}">${r.actions}${r.scrolls ? ` (incl. ${r.scrolls} scroll)` : ''} · ${r.steps} steps${r.ok ? ' ✓' : ' ✕ ' + (r.error || '')}</span>` : '<span class="note">not run</span>';
+  for (const f of window.MQ_FLOWS) {
+    const steps = Math.max(...f.actions.map(a => a.step));
+    const words = f.actions.map(a => a.type ? `type “${a.text}”` : a.say).join(' → ');
+    const href = `app.html?walk=${f.id}${f.start ? '&' + f.start : ''}`;
+    tb.insertAdjacentHTML('beforeend', `<tr><td><b>${f.task}</b></td><td>${words}</td><td class="n">${steps}</td><td class="n">${f.plan.actions} / ${f.plan.today}</td><td>${cell(chk.results[f.id + '@1366'])}</td><td>${cell(chk.results[f.id + '@390'])}</td><td><a class="btn" href="${href}">Walk it</a></td></tr>`);
+  }
+  if (chk.when) document.getElementById('when').textContent = `Clicked by shoot.cjs on ${chk.when}.`;
+})();
+</script>
+</body>
+</html>
