@@ -1,0 +1,11 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-options-verify.cjs --render --skill subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_100k_no_regroup,subtraction:sub_1m_no_regroup,subtraction:sub_2d_1d
+
+mq-browser-run: slot 2 after 186s
+subtraction:sub_50_no_regroup: 2 appearance value(s) to render: level=3, level=0; not rendered: calculator (play control), skipAfter (play control)
+subtraction:sub_100_no_regroup: 3 appearance value(s) to render: level=3, level=0, lengths="shorter"; not rendered: calculator (play control), skipAfter (play control)
+subtraction:sub_1k_no_regroup: 4 appearance value(s) to render: level=3, level=0, lengths="shorter", zeros="on"; not rendered: calculator (play control), skipAfter (play control)
+subtraction:sub_10k_no_regroup: 4 appearance value(s) to render: level=3, level=0, lengths="shorter", zeros="on"; not rendered: calculator (play control), skipAfter (play control)
+subtraction:sub_100k_no_regroup: 4 appearance value(s) to render: level=3, level=0, lengths="shorter", zeros="on"; not rendered: calculator (play control), skipAfter (play control)
+subtraction:sub_1m_no_regroup: 4 appearance value(s) to render: level=3, level=0, lengths="shorter", zeros="on"; not rendered: calculator (play control), skipAfter (play control)
+subtraction:sub_2d_1d: 3 appearance value(s) to render: level=3, level=0, lengths="same"; not rendered: calculator (play control), skipAfter (play control)
+ws-options-verify --render: OK (48 value page(s) (7 skill(s) x S/L) against 14 default page(s) through ws-print-lint --source kit in 687 s; 0 n/a)

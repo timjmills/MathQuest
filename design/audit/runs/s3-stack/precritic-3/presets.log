@@ -1,0 +1,8 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-presets-unit.mjs
+
+mq-browser-run: slot 1 after 157s
+(node:10502) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/user/MathQuest/js/modules/data.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/user/MathQuest/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ws-presets-unit: OK (115 presets: host live, values legal, defaults = preset, explicit wins, seeded items = host items, items obey the preset values: 48 item×value predicate checks (tiles / lengths / band), 666 value(s) with no predicate, 115 presets checked against the host default page; D8: 115 instruction keys = the host's, 7 spreads checked (108 with no single-length named number), tags + terms + print size + pinned code, options round-trip)

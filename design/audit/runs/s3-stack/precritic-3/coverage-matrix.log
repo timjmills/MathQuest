@@ -1,0 +1,184 @@
+$ node tests/scripts/ws-coverage-matrix.cjs --skills subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_100k_no_regroup,subtraction:sub_1m_no_regroup,subtraction:sub_2d_1d --baseline design/audit/matrix/baseline.json --slots 2 --out /tmp/claude-0/-home-user-MathQuest/777ba8d1-efd2-5fc4-929a-183f87207bfc/scratchpad/pc3/logs/coverage-matrix.json
+
+ws-coverage-matrix: 231 row(s) (single 105, sections 70, mixed 35, quiz 21) for 7 skill(s) of 716 live; partners from tests/fixtures/precritic/matrix-partners.json; 197 print-input files hashed (0c6320fa45e2)
+  RUN 105 · PENDING 98 · N/A 28 · documents to run 315
+ws-coverage-matrix: running 105 row(s) = 315 document(s) on 2 slot(s), 9 document(s) a browser start
+  batch 1/35: 9 document(s) in 167.6 s (12 s of it waiting for a slot)
+  batch 2/35: 9 document(s) in 262.0 s (108 s of it waiting for a slot)
+  batch 3/35: 9 document(s) in 200.6 s (94 s of it waiting for a slot)
+  batch 4/35: 9 document(s) in 199.4 s (107 s of it waiting for a slot)
+  batch 5/35: 9 document(s) in 201.8 s (93 s of it waiting for a slot)
+  batch 6/35: 9 document(s) in 354.6 s (207 s of it waiting for a slot)
+  batch 7/35: 9 document(s) in 377.4 s (226 s of it waiting for a slot)
+  batch 8/35: 9 document(s) in 224.9 s (125 s of it waiting for a slot)
+  batch 9/35: 9 document(s) in 195.3 s (100 s of it waiting for a slot)
+  batch 10/35: 9 document(s) in 209.7 s (103 s of it waiting for a slot)
+  batch 11/35: 9 document(s) in 295.1 s (148 s of it waiting for a slot)
+  batch 12/35: 9 document(s) in 327.2 s (188 s of it waiting for a slot)
+  batch 13/35: 9 document(s) in 239.9 s (140 s of it waiting for a slot)
+  batch 14/35: 9 document(s) in 188.1 s (101 s of it waiting for a slot)
+  batch 15/35: 9 document(s) in 200.9 s (89 s of it waiting for a slot)
+  batch 16/35: 9 document(s) in 253.5 s (113 s of it waiting for a slot)
+  batch 17/35: 9 document(s) in 292.5 s (141 s of it waiting for a slot)
+  batch 18/35: 9 document(s) in 89.1 s
+  batch 19/35: 9 document(s) in 247.5 s (144 s of it waiting for a slot)
+  batch 20/35: 9 document(s) in 109.5 s
+  batch 21/35: 9 document(s) in 143.2 s
+  batch 22/35: 9 document(s) in 89.7 s
+  batch 23/35: 9 document(s) in 155.0 s
+  batch 24/35: 9 document(s) in 95.0 s
+  batch 25/35: 9 document(s) in 103.6 s
+  batch 26/35: 9 document(s) in 144.3 s
+  batch 27/35: 9 document(s) in 147.5 s
+  batch 28/35: 9 document(s) in 105.5 s
+  batch 29/35: 9 document(s) in 86.2 s
+  batch 30/35: 9 document(s) in 108.5 s
+  batch 31/35: 9 document(s) in 143.8 s
+  batch 32/35: 9 document(s) in 145.4 s
+  batch 33/35: 9 document(s) in 101.1 s
+  batch 34/35: 9 document(s) in 83.8 s
+  batch 35/35: 9 document(s) in 107.8 s
+  315 document(s) linted in 3214.5 s: 0.098 documents/s (10.20 s a document, browser starts included; 2239 s of batch time spent waiting for a slot another session held)
+
+row                                                             S          M          L          status
+subtraction:sub_100_no_regroup|mixed/defaults                   4+2k .     4+2k .     4+2k 4     OK
+subtraction:sub_100_no_regroup|sections/defaults                4+2k 10    4+2k 10    4+2k 17    OK
+subtraction:sub_100_no_regroup|sections/ex-each                 4+2k 12    4+2k 10    4+2k 18    RED
+      + S L-WRAP WRAP-OP: 0 -> 2
+      + L L-INK ILLEGIBLE: 0 -> 8
+      + L L-WRAP WRAP-OP: 0 -> 2
+      + L L-OVERFLOW PG-12: new finding "p4 sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)" (0 -> 4; the rule's count did not rise: it replaced a fixed one)
+subtraction:sub_100_no_regroup|sections/ex-group                6+3k 12    6+3k 11    6+3k 11    RED
+      + L L-DENSITY PG-23: 0 -> 2
+subtraction:sub_100_no_regroup|sections/pages-2                 10+5k 29   10+5k 28   10+5k 30   OK
+subtraction:sub_100_no_regroup|single/defaults                  2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_100_no_regroup|single/ex-each                   2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_100_no_regroup|single/ex-group                  2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_100_no_regroup|single/layout-fact-rows          2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_100_no_regroup|single/layout-timed              2+1k .     2+1k .     6+3k .     OK
+subtraction:sub_100_no_regroup|single/layout-todays-number      2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_100_no_regroup|single/more-cols2+afterpage      2+1k 16    2+1k 16    2+1k 12    PENDING(no-baseline)
+subtraction:sub_100_no_regroup|single/more-cols2+short          2+1k 8     2+1k 8     2+1k 6     PENDING(no-baseline)
+subtraction:sub_100_no_regroup|single/more-short+afterpage      2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_100_no_regroup|single/pages-3                   6+3k .     6+3k .     6+3k .     OK
+subtraction:sub_100k_no_regroup|mixed/defaults                  4+2k .     4+2k .     4+2k .     OK
+subtraction:sub_100k_no_regroup|sections/defaults               4+2k 12    4+2k 10    4+2k 17    RED
+      + S L-DENSITY H13: 0 -> 2
+subtraction:sub_100k_no_regroup|sections/ex-each                4+2k 8     6+3k 13    4+2k 16    RED
+      + M L-DENSITY H13: 2 -> 4
+      + M L-OVERFLOW PG-12: new finding "p5 sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)" (0 -> 4; the rule's count did not rise: it replaced a fixed one)
+      + M L-DENSITY PAGEFILL: new finding "p2 page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row" (0 -> 1; the rule's count did not rise: it replaced a fixed one)
+      + L L-INK ILLEGIBLE: 0 -> 8
+      + L L-OVERFLOW PG-12: new finding "p4 sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)" (0 -> 4; the rule's count did not rise: it replaced a fixed one)
+subtraction:sub_100k_no_regroup|sections/ex-group               6+3k 9     6+3k 13    6+3k 9     OK
+subtraction:sub_100k_no_regroup|sections/pages-2                10+5k 35   10+5k 30   10+5k 30   OK
+subtraction:sub_100k_no_regroup|single/defaults                 2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_100k_no_regroup|single/ex-each                  2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_100k_no_regroup|single/ex-group                 2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_100k_no_regroup|single/layout-fact-rows         2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_100k_no_regroup|single/layout-timed             4+2k .     4+2k .     8+4k .     OK
+subtraction:sub_100k_no_regroup|single/layout-todays-number     2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_100k_no_regroup|single/more-cols2+afterpage     2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_100k_no_regroup|single/more-cols2+short         2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_100k_no_regroup|single/more-short+afterpage     2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_100k_no_regroup|single/pages-3                  6+3k .     6+3k .     6+3k .     OK
+subtraction:sub_10k_no_regroup|mixed/defaults                   4+2k 2     4+2k .     4+2k .     RED
+      + S L-DENSITY H13: 0 -> 2
+subtraction:sub_10k_no_regroup|sections/defaults                4+2k 10    4+2k 10    4+2k 17    OK
+subtraction:sub_10k_no_regroup|sections/ex-each                 4+2k 8     4+2k 8     4+2k 18    RED
+      + L L-INK ILLEGIBLE: 0 -> 8
+      + L L-WRAP WRAP-OP: 0 -> 2
+      + L L-OVERFLOW PG-12: new finding "p4 sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)" (0 -> 4; the rule's count did not rise: it replaced a fixed one)
+subtraction:sub_10k_no_regroup|sections/ex-group                6+3k 12    6+3k 13    6+3k 11    RED
+      + S L-DENSITY PAGEFILL: 1 -> 2
+      + S L-DENSITY PG-23: 0 -> 2
+      + L L-DENSITY PG-23: 0 -> 2
+subtraction:sub_10k_no_regroup|sections/pages-2                 10+5k 31   10+5k 30   10+5k 30   OK
+subtraction:sub_10k_no_regroup|single/defaults                  2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_10k_no_regroup|single/ex-each                   2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_10k_no_regroup|single/ex-group                  2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_10k_no_regroup|single/layout-fact-rows          2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_10k_no_regroup|single/layout-timed              2+1k .     4+2k .     6+3k .     OK
+subtraction:sub_10k_no_regroup|single/layout-todays-number      2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_10k_no_regroup|single/more-cols2+afterpage      2+1k 16    2+1k .     2+1k .     OK
+subtraction:sub_10k_no_regroup|single/more-cols2+short          2+1k 8     2+1k .     2+1k .     OK
+subtraction:sub_10k_no_regroup|single/more-short+afterpage      2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_10k_no_regroup|single/pages-3                   6+3k .     6+3k .     6+3k .     OK
+subtraction:sub_1k_no_regroup|mixed/defaults                    4+2k 4     4+2k .     4+2k .     RED
+      + S L-OVERFLOW PG-12: 0 -> 4
+subtraction:sub_1k_no_regroup|sections/defaults                 4+2k 10    4+2k 10    4+2k 17    OK
+subtraction:sub_1k_no_regroup|sections/ex-each                  4+2k 10    4+2k 8     4+2k 16    RED
+      + L L-INK ILLEGIBLE: 0 -> 8
+      + L L-OVERFLOW PG-12: new finding "p4 sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)" (0 -> 4; the rule's count did not rise: it replaced a fixed one)
+subtraction:sub_1k_no_regroup|sections/ex-group                 6+3k 11    6+3k 13    6+3k 11    RED
+      + S L-DENSITY PG-23: 0 -> 2
+      + L L-DENSITY PG-23: 0 -> 2
+subtraction:sub_1k_no_regroup|sections/pages-2                  10+5k 29   10+5k 28   10+5k 30   OK
+subtraction:sub_1k_no_regroup|single/defaults                   2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_1k_no_regroup|single/ex-each                    2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_1k_no_regroup|single/ex-group                   2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_1k_no_regroup|single/layout-fact-rows           2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_1k_no_regroup|single/layout-timed               2+1k .     4+2k .     6+3k .     OK
+subtraction:sub_1k_no_regroup|single/layout-todays-number       2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_1k_no_regroup|single/more-cols2+afterpage       2+1k 16    2+1k 16    2+1k .     PENDING(no-baseline)
+subtraction:sub_1k_no_regroup|single/more-cols2+short           2+1k 8     2+1k 8     2+1k .     PENDING(no-baseline)
+subtraction:sub_1k_no_regroup|single/more-short+afterpage       2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_1k_no_regroup|single/pages-3                    6+3k .     6+3k .     6+3k .     OK
+subtraction:sub_1m_no_regroup|mixed/defaults                    4+2k .     4+2k .     4+2k .     OK
+subtraction:sub_1m_no_regroup|sections/defaults                 4+2k 10    4+2k 10    4+2k 17    OK
+subtraction:sub_1m_no_regroup|sections/ex-each                  4+2k 12    4+2k 12    4+2k 16    RED
+      + S L-DENSITY PG-23: 0 -> 2
+      + S L-WRAP WRAP-OP: 0 -> 2
+      + S L-OVERFLOW PG-12: new finding "p1 sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)" (0 -> 4; the rule's count did not rise: it replaced a fixed one)
+      + M L-INK ILLEGIBLE: 0 -> 2
+      + M L-WRAP WRAP-OP: 0 -> 2
+      + M L-OVERFLOW PG-12: new finding "p4 sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)" (0 -> 4; the rule's count did not rise: it replaced a fixed one)
+subtraction:sub_1m_no_regroup|sections/ex-group                 6+3k 10    6+3k 9     6+3k 9     OK
+subtraction:sub_1m_no_regroup|sections/pages-2                  10+5k 31   10+5k 30   10+5k 30   OK
+subtraction:sub_1m_no_regroup|single/defaults                   2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_1m_no_regroup|single/ex-each                    2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_1m_no_regroup|single/ex-group                   2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_1m_no_regroup|single/layout-fact-rows           2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_1m_no_regroup|single/layout-timed               4+2k .     6+3k .     8+4k .     OK
+subtraction:sub_1m_no_regroup|single/layout-todays-number       2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_1m_no_regroup|single/more-cols2+afterpage       2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_1m_no_regroup|single/more-cols2+short           2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_1m_no_regroup|single/more-short+afterpage       2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_1m_no_regroup|single/pages-3                    6+3k .     6+3k .     6+3k .     OK
+subtraction:sub_2d_1d|mixed/defaults                            4+2k .     4+2k .     4+2k 4     PENDING(no-baseline)
+subtraction:sub_2d_1d|sections/defaults                         4+2k 10    4+2k 10    4+2k 17    PENDING(no-baseline)
+subtraction:sub_2d_1d|sections/ex-each                          4+2k 8     4+2k 10    4+2k 18    PENDING(no-baseline)
+subtraction:sub_2d_1d|sections/ex-group                         6+3k 12    6+3k 11    6+3k 11    PENDING(no-baseline)
+subtraction:sub_2d_1d|sections/pages-2                          10+5k 29   10+5k 28   10+5k 30   PENDING(no-baseline)
+subtraction:sub_2d_1d|single/defaults                           2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_2d_1d|single/ex-each                            2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_2d_1d|single/ex-group                           2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_2d_1d|single/layout-fact-rows                   2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_2d_1d|single/layout-timed                       2+1k .     2+1k .     6+3k .     OK
+subtraction:sub_2d_1d|single/layout-todays-number               2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_2d_1d|single/more-cols2+afterpage               2+1k 16    2+1k 16    2+1k 12    PENDING(no-baseline)
+subtraction:sub_2d_1d|single/more-cols2+short                   2+1k 8     2+1k 8     2+1k 6     PENDING(no-baseline)
+subtraction:sub_2d_1d|single/more-short+afterpage               2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_2d_1d|single/pages-3                            6+3k .     6+3k .     6+3k .     OK
+subtraction:sub_50_no_regroup|mixed/defaults                    4+2k .     4+2k .     4+2k 4     OK
+subtraction:sub_50_no_regroup|sections/defaults                 4+2k 10    4+2k 10    4+2k 17    OK
+subtraction:sub_50_no_regroup|sections/ex-each                  4+2k 10    4+2k 10    4+2k 16    RED
+      + L L-INK ILLEGIBLE: 0 -> 8
+      + L L-OVERFLOW PG-12: new finding "p4 sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)" (0 -> 4; the rule's count did not rise: it replaced a fixed one)
+subtraction:sub_50_no_regroup|sections/ex-group                 6+3k 12    6+3k 11    6+3k 11    RED
+      + L L-DENSITY PG-23: 0 -> 2
+subtraction:sub_50_no_regroup|sections/pages-2                  10+5k 29   10+5k 28   10+5k 30   OK
+subtraction:sub_50_no_regroup|single/defaults                   2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_50_no_regroup|single/ex-each                    2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_50_no_regroup|single/ex-group                   2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_50_no_regroup|single/layout-fact-rows           2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_50_no_regroup|single/layout-timed               2+1k .     2+1k .     6+3k .     OK
+subtraction:sub_50_no_regroup|single/layout-todays-number       2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_50_no_regroup|single/more-cols2+afterpage       2+1k 16    2+1k 16    2+1k 12    PENDING(no-baseline)
+subtraction:sub_50_no_regroup|single/more-cols2+short           2+1k 8     2+1k 8     2+1k 6     PENDING(no-baseline)
+subtraction:sub_50_no_regroup|single/more-short+afterpage       2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_50_no_regroup|single/pages-3                    6+3k .     6+3k .     6+3k .     OK
+
+ws-coverage-matrix: OK 79 · CACHED 0 · RED 13 · PENDING 111 · N/A 28 · ERROR 0
+wrote ../../../tmp/claude-0/-home-user-MathQuest/777ba8d1-efd2-5fc4-929a-183f87207bfc/scratchpad/pc3/logs/coverage-matrix.json
+ws-coverage-matrix: FAIL - 13 red row(s) (subtraction:sub_100_no_regroup|sections/ex-each RED; subtraction:sub_100_no_regroup|sections/ex-group RED; subtraction:sub_100k_no_regroup|sections/defaults RED; subtraction:sub_100k_no_regroup|sections/ex-each RED; subtraction:sub_10k_no_regroup|mixed/defaults RED); 231 row(s), 105 run, 0 cached, 3219 s

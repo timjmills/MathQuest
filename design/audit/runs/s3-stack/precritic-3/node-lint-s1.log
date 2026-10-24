@@ -1,0 +1,14 @@
+$ node tests/scripts/ws-node-lint.mjs --skill subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_100k_no_regroup,subtraction:sub_1m_no_regroup,subtraction:sub_2d_1d --rules LESSON-DATA,OPTION-HELP,WRONG-FITS --baseline tests/fixtures/precritic/node-lint-s1.baseline.json --json /tmp/claude-0/-home-user-MathQuest/777ba8d1-efd2-5fc4-929a-183f87207bfc/scratchpad/pc3/logs/node-lint-s1.json
+
+ws-node-lint: 7 skill(s), 30 items each, page 12, root /home/user/MathQuest
+
+rule        skills   items  findings  skills hit  skipped
+LESSON-DATA       7       7         0           0  -
+OPTION-HELP       7      24         0           0  -
+WRONG-FITS       7     210         0           0  -
+
+baseline: tests/fixtures/precritic/node-lint-s1.baseline.json (7 finding keys pinned at n=30, page=12)
+no finding beyond the baseline
+json: /tmp/claude-0/-home-user-MathQuest/777ba8d1-efd2-5fc4-929a-183f87207bfc/scratchpad/pc3/logs/node-lint-s1.json
+time: load 0.4 s, lint 0.6 s, total 1.0 s
+ws-node-lint: OK

@@ -1,0 +1,37 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --size S --skills subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_100k_no_regroup,subtraction:sub_1m_no_regroup,subtraction:sub_2d_1d --baseline design/audit/baselines/print-lint.S.json
+
+mq-browser-run: slot 1 after 135s
+ws-print-lint: source kit, 7 skill(s)
+  subtraction:sub_50_no_regroup#lesson: 6+3 pages, 0 finding(s)
+  subtraction:sub_100_no_regroup#lesson: 6+3 pages, 0 finding(s)
+  subtraction:sub_1k_no_regroup#lesson: 6+3 pages, 0 finding(s)
+  subtraction:sub_10k_no_regroup#lesson: 6+3 pages, 0 finding(s)
+  subtraction:sub_100k_no_regroup#lesson: 6+3 pages, 0 finding(s)
+  subtraction:sub_1m_no_regroup#lesson: 6+3 pages, 0 finding(s)
+  subtraction:sub_2d_1d#lesson: 6+3 pages, 0 finding(s)
+
+document                                  pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+subtraction:sub_50_no_regroup#lesson        6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_100_no_regroup#lesson       6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_1k_no_regroup#lesson        6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_10k_no_regroup#lesson       6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_100k_no_regroup#lesson      6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_1m_no_regroup#lesson        6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_2d_1d#lesson                6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+TOTAL                                               .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .
+
+subtraction:sub_50_no_regroup#lesson (Subtract within 50 (No Regrouping) (lesson))
+
+subtraction:sub_100_no_regroup#lesson (Subtract within 100 (No Regrouping) (lesson))
+
+subtraction:sub_1k_no_regroup#lesson (Subtract within 1,000 (No Regrouping) (lesson))
+
+subtraction:sub_10k_no_regroup#lesson (Subtract within 10,000 (No Regrouping) (lesson))
+
+subtraction:sub_100k_no_regroup#lesson (Subtract within 100,000 (No Regrouping) (lesson))
+
+subtraction:sub_1m_no_regroup#lesson (Subtract within 1,000,000 (No Regrouping) (lesson))
+
+subtraction:sub_2d_1d#lesson (Subtract a 1-Digit Number from a 2-Digit Number (No Regrouping) (lesson))
+
+ws-print-lint: OK (ratchet against design/audit/baselines/print-lint.S.json: nothing rose; 7 document(s), source kit; 0 finding(s) in 0 document(s))
