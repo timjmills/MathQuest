@@ -17,11 +17,10 @@ const THREE=[['addition','add_facts'],['subtraction','sub_facts'],['multiplicati
   await clickV(`[data-act="mode"][data-v="${mode}"]`);
   // set Versions to 3 with the stepper (the sheet keeps its settings between opens)
   for (let g=0; g<25; g++) { const n=await page.evaluate(()=>Number(document.querySelector('[data-act="wversions"]').closest('.tvs-stepper').querySelector('output').textContent)); if(n===3) break; await clickV(`[data-act="wversions"][aria-label="${n>3?'Fewer':'More'}"]`); }
-  await page.waitForFunction(()=>{const s=tvSheetState(); return s.built && !s.building && s.built.versions===3;},{timeout:120000}).catch(async()=>{console.log('STATE',JSON.stringify(await page.evaluate(()=>{const s=tvSheetState();return {b:s.built&&s.built.versions,building:s.building,sum:s.summary,v:document.querySelector('[data-act=wversions]')?.closest('.tvs-row')?.innerText}})))});
-  const st=await page.evaluate(()=>tvSheetState());
+  const st=await page.evaluate(async()=>{const b=await tvSheetBuildNow(); return {built:b, summary:tvSheetState().summary};});
   const pv=st.built.perVersion; const firsts=new Set(pv.map(x=>x.firstHash));
   const counts=pv.map(x=>JSON.stringify(Object.entries(x.byKey).sort()));
-  const ok = pv.length===3 && firsts.size===3 && new Set(counts).size===1;
+  const ok = pv.length===3 && firsts.size===3 && new Set(counts).size===1 && st.built.matchesPlan && !st.built.formA;
   if(!ok) bad++;
   console.log(`${ok?'PASS':'FAIL'} ${kind}/${mode}: ${pv.length} versions, ${firsts.size} different first pages, counts ${[...new Set(counts)].join(' | ')} :: ${st.summary.line}`);
  }

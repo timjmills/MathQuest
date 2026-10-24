@@ -31,7 +31,7 @@ pp=m.planPages('mixed',[it(0),it(1),it(2)],{size:'M',quiz:true,total:20}); eq([p
 // owner 2026-10-24: three levels (skill count / group total / overall total), counts or %; more specific wins
 const K=(i)=>m.keyOf(it(i));
 r=m.planCounts([it(0,{count:6}),it(1),it(2),it(3),it(4)],30,{groups:[{skills:[K(1),K(2)],total:10}]}); eq([r.counts[0],r.counts[1],r.counts[2],srt(r.counts.slice(3))],[6,5,5,[7,7]],'skill 6, group of 2 at 10, overall 30 -> 6.5.5 + the 14 left 7.7 (brief said 9: 30-6-10 = 14)');
-r=m.planCounts([it(0,{count:20}),it(1,{count:15}),it(2)],30,{groups:[]}); eq([!!r.error,/Raise the total to 35/.test(r.error)],[true,true],'counts past the total -> error with a fix');
+r=m.planCounts([it(0,{count:20}),it(1,{count:15}),it(2)],30,{groups:[]}); eq([!!r.error,/Raise the total to 36/.test(r.error)],[true,true],'counts past the total -> error with a fix that leaves no skill at 0');
 r=m.planCounts([it(0,{count:8}),it(1),it(2)],30,{groups:[{skills:[K(0),K(1)],total:6}]}); eq([!!r.error,/lower/i.test(r.error)],[true,true],'a count past its group total -> error with a fix');
 r=m.planCounts([it(0),it(1),it(2),it(3)],20,{groups:[{skills:[K(0),K(1)],pct:50}]}); eq([r.counts[0],r.counts[1],r.counts[2]+r.counts[3]],[5,5,10],'group at 50 % of 20 with 2 skills -> 5.5 + the rest split');
 r=m.planCounts([it(0),it(1),it(2)],20,{groups:[{skills:[K(0)],pct:60},{skills:[K(1)],pct:50}]}); eq(!!r.error,true,'group % over 100 refused');

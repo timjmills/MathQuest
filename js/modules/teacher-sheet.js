@@ -34,6 +34,7 @@ import { areaOf, AREAS, AREA_ORDER, areaIcon } from './teacher-areas.js';
 import { planPages, planCounts, PER_PAGE, keyOf } from './teacher-plan.js';
 import { trayGroups, trayLocks } from './teacher-tray.js';
 import { printHtml } from './teacher-print.js';
+import { isFact as isFactItem } from './sheet/roles/fact-rows.js';
 import { makeShareLink, showBoardCodeFor } from './teacher-sets.js';
 import { mountSample } from './teacher-preview.js';
 import { generateQuestionFor } from './generate-question.js';
@@ -227,16 +228,13 @@ function layoutOk(it, role = S.opts.layout) {
     return layoutCache.get(keyOf(it) + '|' + role) === true;
 }
 async function probeLayouts(it) {
-    const tasks = ['fact-rows', 'fact-probe'].map(async (role) => {
-        const k = keyOf(it) + '|' + role;
-        if (layoutCache.has(k)) return layoutCache.get(k);
-        const pr = buildSheet({ role, sections: [{ skills: [skillRef(it)], pages: 1 }], size: 'M', seed: 11, key: false })
-            .then(() => true, () => false)
-            .then((ok) => { layoutCache.set(k, ok); return ok; });
-        layoutCache.set(k, pr);
-        return pr;
-    });
-    await Promise.all(tasks);
+    // cheap: one generated item read by the fact-rows role's own test (no page build, so no long frame)
+    let ok = false;
+    try {
+        const q = generateQuestionFor({ category: it.categoryId, skill: it.skillId, opts: it.opts, seed: 11 });
+        ok = !!q && isFactItem({ q: Object.assign({ skillId: it.skillId, categoryId: it.categoryId }, q), template: q.cell && q.cell.template });
+    } catch (e) { ok = false; }
+    for (const role of ['fact-rows', 'fact-probe']) layoutCache.set(keyOf(it) + '|' + role, ok);
 }
 
 /* ================================================================= building */
@@ -461,7 +459,7 @@ function open(kind, ctx = {}) {
     if (kind === 'share') setTimeout(() => requestAnimationFrame(() => setTimeout(() => { if (S.sheet === 'share') makeLink(); }, 0)), 0);
     else scheduleBuild(0);
     const one = items();
-    if (one.length === 1 && kind === 'print') setTimeout(() => { if (S.sheet === 'print') probeLayouts(one[0]).then(() => { if (S.sheet === 'print') renderMain(); }); }, 1500);
+    if (one.length === 1 && kind === 'print') setTimeout(() => { if (S.sheet === 'print') probeLayouts(one[0]).then(() => { if (S.sheet === 'print') renderMain(); }); }, 300);
 }
 function close() {
     S.sheet = null;

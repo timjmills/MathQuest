@@ -197,7 +197,8 @@ export function planCounts(items, total, opts = {}) {
     const room = T - fixedSum;
     const heldN = T * held / 100;
     if (fixedSum + heldN > T + 1e-6) {
-        const need = held < 100 ? Math.ceil(fixedSum / (1 - held / 100) - 1e-9) : Infinity;
+        // the fix leaves no skill at 0: room for one of each uncounted skill too
+        const need = held < 100 ? Math.ceil((fixedSum + free.length) / (1 - held / 100) - 1e-9) : Infinity;
         // never rescaled silently: say so and offer the fix
         const fix = isFinite(need) ? ` Raise the total to ${need}.` : ' Lower the held %.';
         return { error: (fixedSum && held ? `The counts (${fixedSum}) and the held ${Math.round(held)} % come to more than the ${T} problems there are.`

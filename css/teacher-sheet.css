@@ -61,7 +61,8 @@ body.teacher-mode.tvs-open { overflow: hidden; }
 }
 #teacherApp .tvs-body { display: grid; grid-template-columns: minmax(0, 1fr) 336px; min-height: 0; }
 #teacherApp .tvs-body-one { display: block; overflow: auto; padding: var(--sp-24); }
-#teacherApp .tvs-main { overflow: auto; padding: var(--sp-16) var(--sp-24) var(--sp-32); min-width: 0; }
+/* (display: block — teacher-library.css has an older .tvs-main flex column that shrank the skills list to 0 px) */
+#teacherApp .tvs-main { display: block; overflow: auto; padding: var(--sp-16) var(--sp-24) var(--sp-32); min-width: 0; }
 #teacherApp .tvs-side {
   overflow: auto; padding: var(--sp-24);
   display: flex; flex-direction: column; gap: var(--sp-16);
@@ -112,7 +113,7 @@ body.teacher-mode.tvs-open { overflow: hidden; }
   font-size: var(--fs-12); font-weight: var(--fw-700); line-height: 1;
 }
 #teacherApp .tvs-trayline { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-16); margin: var(--sp-8) 0; }
-#teacherApp .tvs-glist { display: grid; gap: var(--sp-8); margin: var(--sp-8) 0 var(--sp-16); max-height: 360px; overflow: auto; }
+#teacherApp .tvs-glist { flex: none; display: grid; gap: var(--sp-8); margin: var(--sp-8) 0 var(--sp-16); max-height: 360px; overflow: auto; }
 #teacherApp .tvs-garea { border-left: var(--sp-4) solid var(--a-bold); padding-left: var(--sp-8); }
 #teacherApp .tvs-garea-name {
   display: flex; align-items: center; gap: var(--sp-8); margin: 0; min-height: var(--control);

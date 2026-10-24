@@ -24,7 +24,7 @@ const FLOWS=[
  for (const [name, sk, pre, sheet, clicks, target] of FLOWS) {
    await page.evaluate((sk)=>{ window.tvCloseSheet&&tvCloseSheet(); document.getElementById('tvBoardOverlay')?.remove(); UnifiedSkills.clear(); for(const [c,s] of sk){ const hit=SKILLS[c].find(x=>x.v===s); UnifiedSkills.add({categoryId:c,skillId:s,skillLabel:hit.l}); } window.skillQueue=[...UnifiedSkills.skills];},sk);
    await page.evaluate((k)=>tvOpenSheet(k),sheet);
-   await page.waitForFunction(()=>{const s=tvSheetState(); return s.sheet==='share' || (s.built && !s.building);},{timeout:120000});
+   await page.waitForFunction(()=>{const s=tvSheetState(); return s.sheet==='share' ? !!s.share : (s.preview && !s.building);},{timeout:120000});
    let ok=true, n=0;
    for (const sel of clicks) {
      const el=await page.waitForSelector('#tvSheet '+sel+', '+sel,{timeout:30000}).catch(()=>null);
