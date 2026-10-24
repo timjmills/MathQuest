@@ -42,7 +42,26 @@
    "keyPages": 1,
    "error": null,
    "counts": {},
-   "findings": []
+   "findings": [
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 22.3 mm tall under the item in a 42.8 mm cell, 21.7 mm (51%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mqt--seqstrip[data-ws-cell=\"seqstrip\"]> \"4 20 40 50 60\"",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 22.3 mm tall under the item in a 42.8 mm cell, 21.7 mm (51%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mqt--seqstrip[data-ws-cell=\"seqstrip\"]> \"4 20 30 40 50 60\"",
+     "page": 2,
+     "cell": 4
+    }
+   ]
   },
   {
    "id": "comparing:compare_groups",
@@ -1135,6 +1154,78 @@
      "sev": "critical",
      "page": 2,
      "msg": "key page 2 has 8 answer slots, pupil page 1 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"3,5,7,or9.=\" / \"[\"opt0\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"3,5,7,or9.=\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"2,4,6,or8.=\" / \"[\"opt2\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"2,4,6,or8.=\"",
+     "cell": 2
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"2,4,6,or8.=\" / \"[\"opt2\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"2,4,6,or8.=\"",
+     "cell": 3
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"3,5,7,or9.=\" / \"[\"opt0\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"3,5,7,or9.=\"",
+     "cell": 4
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"2,4,6,or8.=\" / \"[\"opt2\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"2,4,6,or8.=\"",
+     "cell": 5
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"3,5,7,or9.=\" / \"[\"opt0\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"3,5,7,or9.=\"",
+     "cell": 6
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"2,4,6,or8.=\" / \"[\"opt0\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"2,4,6,or8.=\"",
+     "cell": 7
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"3,5,7,or9.=\" / \"[\"opt0\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"3,5,7,or9.=\"",
+     "cell": 8
     }
    ]
   },
@@ -3817,7 +3908,26 @@
    "keyPages": 1,
    "error": null,
    "counts": {},
-   "findings": []
+   "findings": [
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 23.5 mm tall under the item in a 69.7 mm cell, 23 mm (33%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mqt--arrays[data-ws-cell=\"arrays\"]> \"1 rows of in all.\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 23.5 mm tall under the item in a 69.7 mm cell, 23 mm (33%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mqt--arrays[data-ws-cell=\"arrays\"]> \"1 2 rows of 2 4 in all.\"",
+     "page": 2,
+     "cell": 1
+    }
+   ]
   },
   {
    "id": "multiplication:mult_equal_groups",
@@ -8166,6 +8276,15 @@
      "sev": "major",
      "page": 2,
      "msg": "screen verb \"Click\" on paper: \"2/2 of 8 = 8. Click 8 🐱. = [\"opt0\",\"opt1\",\"opt2\",\"opt3\",\"op\" (BD-11, BD-12, BD-17)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \".Click8🐱.=\" / \"[\"opt0\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \".Click8🐱.=\"",
+     "cell": 1
     }
    ]
   },
@@ -8428,6 +8547,15 @@
      "sev": "major",
      "page": 2,
      "msg": "screen verb \"Click\" on paper: \"5/6 of 12 = 10. Click 10 ⭐. = [\"opt0\",\"opt1\",\"opt2\",\"opt3\",\"\" (BD-11, BD-12, BD-17)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \".Click10⭐.=\" / \"[\"opt0\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \".Click10⭐.=\"",
+     "cell": 1
     }
    ]
   },
@@ -12843,6 +12971,24 @@
      "sev": "major",
      "page": 2,
      "msg": "screen verb \"Drag\" on paper: \"Drag the fractions from greatest to least. (greatest to leas\" (BD-11, BD-12, BD-17)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 38.4 mm tall under the item in a 65.2 mm cell, 24.4 mm (37%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"2 Order these fractions from...\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 38.4 mm tall under the item in a 65.2 mm cell, 24.4 mm (37%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"2 Order these fractions from...\"",
+     "page": 2,
+     "cell": 2
     }
    ]
   },
@@ -15785,6 +15931,42 @@
      "sev": "critical",
      "page": 2,
      "msg": "key page 2 has 2 answer slots, pupil page 1 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \"1/6+1/6+\" / \"1/6...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \"1/6+1/6+\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \"1/6+1/6+\" / \"1/6+1/6...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \"1/6+1/6+\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \"1/6+1/6+\" / \"1/6...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"1/6+1/6+\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \"1/6+1/6+\" / \"1/6+1/6...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"1/6+1/6+\"",
+     "cell": 1
     }
    ]
   },
@@ -16814,6 +16996,15 @@
      "sev": "critical",
      "page": 2,
      "msg": "key page 2 has 2 answer slots, pupil page 1 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"ourresult.=\" / \"{\"t0\":\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"ourresult.=\"",
+     "cell": 1
     }
    ]
   },
@@ -17688,6 +17879,42 @@
      "sev": "critical",
      "page": 2,
      "msg": "key page 2 has 7 answer slots, pupil page 1 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \"1/6+1/6+\" / \"1/6...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \"1/6+1/6+\"",
+     "cell": 4
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"sumsto2/8.=\" / \"[\"opt0\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"sumsto2/8.=\"",
+     "cell": 2
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \"1/6+1/6+\" / \"1/6...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"1/6+1/6+\"",
+     "cell": 4
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"sumsto3/6.=\" / \"[\"opt1\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"sumsto3/6.=\"",
+     "cell": 4
     }
    ]
   },
@@ -18137,6 +18364,15 @@
      "sev": "critical",
      "page": 2,
      "msg": "key page 2 has 8 answer slots, pupil page 1 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"/5=5×5=25.=\" / \"[\"opt0\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"/5=5×5=25.=\"",
+     "cell": 5
     }
    ]
   },
@@ -18619,6 +18855,15 @@
      "sev": "critical",
      "page": 2,
      "msg": "key page 2 has 9 answer slots, pupil page 1 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"r:2÷3=2/3.=\" / \"[\"opt0\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"r:2÷3=2/3.=\"",
+     "cell": 9
     }
    ]
   },
@@ -23366,6 +23611,42 @@
      "sev": "critical",
      "page": 2,
      "msg": "key page 2 has 3 answer slots, pupil page 1 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 31.5 mm tall under the item in a 59.8 mm cell, 21.9 mm (37%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"3 Circle ALL expressions equ...\"",
+     "page": 1,
+     "cell": 3
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 31.5 mm tall under the item in a 59.8 mm cell, 21.9 mm (37%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"6 Circle ALL expressions equ...\"",
+     "page": 1,
+     "cell": 6
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 31.5 mm tall under the item in a 59.8 mm cell, 22.2 mm (37%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"3 Circle ALL expressions equ...\"",
+     "page": 2,
+     "cell": 3
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 31.5 mm tall under the item in a 59.8 mm cell, 22.2 mm (37%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"6 Circle ALL expressions equ...\"",
+     "page": 2,
+     "cell": 6
     }
    ]
   },
@@ -23399,6 +23680,42 @@
      "sev": "critical",
      "page": 2,
      "msg": "key page 2 has 2 answer slots, pupil page 1 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 37.9 mm tall under the item in a 71.4 mm cell, 23 mm (32%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"7 Circle ALL values that sat...\"",
+     "page": 1,
+     "cell": 7
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 37.9 mm tall under the item in a 71.4 mm cell, 23 mm (32%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"8 Circle ALL values that sat...\"",
+     "page": 1,
+     "cell": 8
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 37.9 mm tall under the item in a 71.4 mm cell, 23.3 mm (33%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"7 Circle ALL values that sat...\"",
+     "page": 2,
+     "cell": 7
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 37.9 mm tall under the item in a 71.4 mm cell, 23.3 mm (33%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"8 Circle ALL values that sat...\"",
+     "page": 2,
+     "cell": 8
     }
    ]
   },
@@ -26529,6 +26846,114 @@
      "sev": "critical",
      "page": 2,
      "msg": "key page 2 has 6 answer slots, pupil page 1 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"sides|Area=\" / \"length×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \"sides|Area=\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"sides|Area=\" / \"length×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \"sides|Area=\"",
+     "cell": 2
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"sides|Area=\" / \"length×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \"sides|Area=\"",
+     "cell": 3
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"sides|Area=\" / \"length×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \"sides|Area=\"",
+     "cell": 4
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"sides|Area=\" / \"length×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \"sides|Area=\"",
+     "cell": 5
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"sides|Area=\" / \"length×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \"sides|Area=\"",
+     "cell": 6
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"sides|Area=\" / \"length×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"sides|Area=\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"sides|Area=\" / \"length×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"sides|Area=\"",
+     "cell": 2
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"sides|Area=\" / \"length×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"sides|Area=\"",
+     "cell": 3
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"sides|Area=\" / \"length×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"sides|Area=\"",
+     "cell": 4
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"sides|Area=\" / \"length×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"sides|Area=\"",
+     "cell": 5
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"sides|Area=\" / \"length×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"sides|Area=\"",
+     "cell": 6
     }
    ]
   },
@@ -34987,6 +35412,24 @@
      "sev": "critical",
      "page": 2,
      "msg": "key page 2 has 2 answer slots, pupil page 1 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 48.1 mm tall under the item in a 76.5 mm cell, 41 mm (54%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"2 Circle ALL measurements eq...\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 37.7 mm tall under the item in a 76.5 mm cell, 30.5 mm (40%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"5 Circle ALL measurements eq...\"",
+     "page": 2,
+     "cell": 5
     }
    ]
   },
@@ -35272,7 +35715,26 @@
    "keyPages": 1,
    "error": null,
    "counts": {},
-   "findings": []
+   "findings": [
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 20.2 mm tall under the item in a 63 mm cell, 19.6 mm (31%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mqt--coins[data-ws-cell=\"coins\"]> \"5 A 5 5 B 10 1 More money: A...\"",
+     "page": 1,
+     "cell": 5
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 20.2 mm tall under the item in a 63 mm cell, 19.6 mm (31%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mqt--coins[data-ws-cell=\"coins\"]> \"5 A 5 5 B 10 1 More money: A...\"",
+     "page": 2,
+     "cell": 5
+    }
+   ]
   },
   {
    "id": "measurement:count_notes",
@@ -40164,6 +40626,15 @@
      "sev": "major",
      "page": 2,
      "msg": "screen verb \"Drag\" on paper: \"Drag the numbers in counting order. (counting up by 2s)\" (BD-11, BD-12, BD-17)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"ubtracts2.=\" / \"[\"t3\",\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"ubtracts2.=\"",
+     "cell": 1
     }
    ]
   },
@@ -40254,6 +40725,15 @@
      "sev": "major",
      "page": 2,
      "msg": "screen verb \"Drag\" on paper: \"Drag the numbers in counting order. (counting up by 5s)\" (BD-11, BD-12, BD-17)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"ubtracts5.=\" / \"[\"t3\",\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"ubtracts5.=\"",
+     "cell": 1
     }
    ]
   },
@@ -40868,6 +41348,60 @@
      "sev": "major",
      "page": 2,
      "msg": "screen verb \"Drag\" on paper: \"Pattern A is 1, 2, 3, 4. Drag Pattern B values in the matchi\" (BD-11, BD-12, BD-17)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 58.5 mm tall under the item in a 114.8 mm cell, 49 mm (43%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"2 Pattern A is 4, 5, 6, 7. D...\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 58.5 mm tall under the item in a 114.9 mm cell, 49 mm (43%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"4 Pattern A is 1, 2, 3, 4. D...\"",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 58.5 mm tall under the item in a 114.8 mm cell, 49 mm (43%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"2 Pattern A is 4, 5, 6, 7. D...\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 58.5 mm tall under the item in a 114.9 mm cell, 49 mm (43%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"4 Pattern A is 1, 2, 3, 4. D...\"",
+     "page": 2,
+     "cell": 4
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"nAvalue×2.=\" / \"[\"t0\",\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"nAvalue×2.=\"",
+     "cell": 2
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"nAvalue×2.=\" / \"[\"t0\",\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"nAvalue×2.=\"",
+     "cell": 4
     }
    ]
   },
@@ -40952,6 +41486,15 @@
      "sev": "major",
      "page": 2,
      "msg": "screen verb \"Drag\" on paper: \"Pattern A is 3, 4, 5, 6. Drag Pattern B values in the matchi\" (BD-11, BD-12, BD-17)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"nAvalue×4.=\" / \"[\"t0\",\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"nAvalue×4.=\"",
+     "cell": 1
     }
    ]
   },
@@ -41474,6 +42017,78 @@
      "sev": "critical",
      "page": 2,
      "msg": "key page 2 has 6 answer slots, pupil page 1 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"×\": \",−undoes+,×\" / \"undoes÷...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \",−undoes+,×\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"×\": \",−undoes+,×\" / \"undoes÷...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \",−undoes+,×\"",
+     "cell": 2
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"×\": \",−undoes+,×\" / \"undoes÷...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \",−undoes+,×\"",
+     "cell": 4
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"×\": \",−undoes+,×\" / \"undoes÷...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \",−undoes+,×\"",
+     "cell": 5
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"×\": \",−undoes+,×\" / \"undoes÷...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \",−undoes+,×\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"×\": \",−undoes+,×\" / \"undoes÷...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \",−undoes+,×\"",
+     "cell": 2
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"×\": \",−undoes+,×\" / \"undoes÷...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \",−undoes+,×\"",
+     "cell": 4
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"×\": \",−undoes+,×\" / \"undoes÷...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \",−undoes+,×\"",
+     "cell": 5
     }
    ]
   },
@@ -41941,6 +42556,24 @@
      "sev": "critical",
      "page": 2,
      "msg": "key page 2 has 1 answer slots, pupil page 1 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"−\": \":+undoes−,−\" / \"undoes+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \":+undoes−,−\"",
+     "cell": 2
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"−\": \":+undoes−,−\" / \"undoes+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \":+undoes−,−\"",
+     "cell": 2
     }
    ]
   },
@@ -41950,7 +42583,44 @@
    "keyPages": 1,
    "error": null,
    "counts": {},
-   "findings": []
+   "findings": [
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"÷\": \":×undoes÷,÷\" / \"undoes×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \":×undoes÷,÷\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"÷\": \":×undoes÷,÷\" / \"undoes×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \":×undoes÷,÷\"",
+     "cell": 2
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"÷\": \":×undoes÷,÷\" / \"undoes×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \":×undoes÷,÷\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"÷\": \":×undoes÷,÷\" / \"undoes×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \":×undoes÷,÷\"",
+     "cell": 2
+    }
+   ]
   },
   {
    "id": "algebra:solve_eq_twostep",
@@ -42340,7 +43010,62 @@
    "keyPages": 1,
    "error": null,
    "counts": {},
-   "findings": []
+   "findings": [
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"−\": \":+undoes−,−\" / \"undoes+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \":+undoes−,−\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"−\": \":+undoes−,−\" / \"undoes+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \":+undoes−,−\"",
+     "cell": 2
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"−\": \":+undoes−,−\" / \"undoes+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \":+undoes−,−\"",
+     "cell": 3
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"−\": \":+undoes−,−\" / \"undoes+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \":+undoes−,−\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"−\": \":+undoes−,−\" / \"undoes+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \":+undoes−,−\"",
+     "cell": 2
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"−\": \":+undoes−,−\" / \"undoes+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \":+undoes−,−\"",
+     "cell": 3
+    }
+   ]
   },
   {
    "id": "algebra:solve_x_minus_a",
@@ -42348,7 +43073,62 @@
    "keyPages": 1,
    "error": null,
    "counts": {},
-   "findings": []
+   "findings": [
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"−\": \":+undoes−,−\" / \"undoes+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \":+undoes−,−\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"−\": \":+undoes−,−\" / \"undoes+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \":+undoes−,−\"",
+     "cell": 2
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"−\": \":+undoes−,−\" / \"undoes+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \":+undoes−,−\"",
+     "cell": 3
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"−\": \":+undoes−,−\" / \"undoes+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \":+undoes−,−\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"−\": \":+undoes−,−\" / \"undoes+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \":+undoes−,−\"",
+     "cell": 2
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"−\": \":+undoes−,−\" / \"undoes+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \":+undoes−,−\"",
+     "cell": 3
+    }
+   ]
   },
   {
    "id": "algebra:solve_ax_eq_b",
@@ -42356,7 +43136,62 @@
    "keyPages": 1,
    "error": null,
    "counts": {},
-   "findings": []
+   "findings": [
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"÷\": \":×undoes÷,÷\" / \"undoes×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \":×undoes÷,÷\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"÷\": \":×undoes÷,÷\" / \"undoes×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \":×undoes÷,÷\"",
+     "cell": 2
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"÷\": \":×undoes÷,÷\" / \"undoes×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \":×undoes÷,÷\"",
+     "cell": 3
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"÷\": \":×undoes÷,÷\" / \"undoes×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \":×undoes÷,÷\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"÷\": \":×undoes÷,÷\" / \"undoes×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \":×undoes÷,÷\"",
+     "cell": 2
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"÷\": \":×undoes÷,÷\" / \"undoes×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \":×undoes÷,÷\"",
+     "cell": 3
+    }
+   ]
   },
   {
    "id": "algebra:solve_x_div_a",
@@ -42364,7 +43199,62 @@
    "keyPages": 1,
    "error": null,
    "counts": {},
-   "findings": []
+   "findings": [
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"÷\": \":×undoes÷,÷\" / \"undoes×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \":×undoes÷,÷\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"÷\": \":×undoes÷,÷\" / \"undoes×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \":×undoes÷,÷\"",
+     "cell": 2
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"÷\": \":×undoes÷,÷\" / \"undoes×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \":×undoes÷,÷\"",
+     "cell": 3
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"÷\": \":×undoes÷,÷\" / \"undoes×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \":×undoes÷,÷\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"÷\": \":×undoes÷,÷\" / \"undoes×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \":×undoes÷,÷\"",
+     "cell": 2
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"÷\": \":×undoes÷,÷\" / \"undoes×...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \":×undoes÷,÷\"",
+     "cell": 3
+    }
+   ]
   },
   {
    "id": "algebra:solve_ax_plus_b",
@@ -43351,6 +44241,24 @@
      "sev": "critical",
      "page": 2,
      "msg": "key page 2 has 4 answer slots, pupil page 1 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \"10×2÷4+\" / \"1...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \"10×2÷4+\"",
+     "cell": 2
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \"10×2÷4+\" / \"1...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"10×2÷4+\"",
+     "cell": 2
     }
    ]
   },
@@ -44586,6 +45494,24 @@
      "sev": "critical",
      "page": 2,
      "msg": "key page 2 has 3 answer slots, pupil page 1 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \"3+(3×4)]÷5+\" / \"3...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \"3+(3×4)]÷5+\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \"3+(3×4)]÷5+\" / \"3...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"3+(3×4)]÷5+\"",
+     "cell": 1
     }
    ]
   },
@@ -44830,6 +45756,15 @@
      "sev": "major",
      "page": 2,
      "msg": "screen verb \"drag\" on paper: \"Evaluate each side and drag each statement into the correct \" (BD-11, BD-12, BD-17)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"encompare.=\" / \"{\"t0\":\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"encompare.=\"",
+     "cell": 2
     }
    ]
   },
@@ -45265,7 +46200,188 @@
    "keyPages": 1,
    "error": null,
    "counts": {},
-   "findings": []
+   "findings": [
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \",000+8,000+\" / \"500+20+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<pv> \",000+8,000+\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \",000+7,000+\" / \"600+40+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<pv> \",000+7,000+\"",
+     "cell": 3
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \",000+2,000+\" / \"600+40...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<pv> \",000+2,000+\"",
+     "cell": 4
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \",000+6,000+\" / \"300+20+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<pv> \",000+6,000+\"",
+     "cell": 5
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \",000+4,000+\" / \"900+7...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<pv> \",000+4,000+\"",
+     "cell": 6
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \",000+5,000+\" / \"700+50+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<pv> \",000+5,000+\"",
+     "cell": 7
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \",000+5,000+\" / \"50+9...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<pv> \",000+5,000+\"",
+     "cell": 8
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \",000+6,000+\" / \"500+90+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<pv> \",000+6,000+\"",
+     "cell": 9
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \",000+5,000+\" / \"200+70+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<pv> \",000+5,000+\"",
+     "cell": 11
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \",000+5,000+\" / \"200+9...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<pv> \",000+5,000+\"",
+     "cell": 12
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \",000+8,000+\" / \"500+20+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<pv> \",000+8,000+\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \",000+7,000+\" / \"600+40+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<pv> \",000+7,000+\"",
+     "cell": 3
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \",000+2,000+\" / \"600+40...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<pv> \",000+2,000+\"",
+     "cell": 4
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \",000+6,000+\" / \"300+20+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<pv> \",000+6,000+\"",
+     "cell": 5
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \",000+4,000+\" / \"900+7...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<pv> \",000+4,000+\"",
+     "cell": 6
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \",000+5,000+\" / \"700+50+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<pv> \",000+5,000+\"",
+     "cell": 7
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \",000+5,000+\" / \"50+9...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<pv> \",000+5,000+\"",
+     "cell": 8
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \",000+6,000+\" / \"500+90+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<pv> \",000+6,000+\"",
+     "cell": 9
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \",000+5,000+\" / \"200+70+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<pv> \",000+5,000+\"",
+     "cell": 11
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \",000+5,000+\" / \"200+9...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<pv> \",000+5,000+\"",
+     "cell": 12
+    }
+   ]
   },
   {
    "id": "placevalue:number_word_names",
@@ -45345,7 +46461,26 @@
    "keyPages": 1,
    "error": null,
    "counts": {},
-   "findings": []
+   "findings": [
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 29.9 mm tall under the item in a 58.4 mm cell, 29.5 mm (50%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mqt--pv[data-ws-cell=\"pv\"]> \"4 553394 , ,\"",
+     "page": 1,
+     "cell": 4
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 29.9 mm tall under the item in a 58.4 mm cell, 29.5 mm (50%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mqt--pv[data-ws-cell=\"pv\"]> \"4 553394 33 , 55 , 94\"",
+     "page": 2,
+     "cell": 4
+    }
+   ]
   },
   {
    "id": "placevalue:unit_form",
@@ -45767,6 +46902,15 @@
      "sev": "critical",
      "page": 2,
      "msg": "key page 2 has 4 answer slots, pupil page 1 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"hemselves.=\" / \"[\"opt1\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"hemselves.=\"",
+     "cell": 4
     }
    ]
   },
@@ -47752,6 +48896,24 @@
      "sev": "major",
      "page": 2,
      "msg": "blank drawn with underscore characters \"____\": blanks are ruled lines or boxes (SL-6)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 49.7 mm tall under the item in a 114.8 mm cell, 43.2 mm (38%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"1 GCF of 30 and 45 1) Find a...\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 49.7 mm tall under the item in a 114.8 mm cell, 43.2 mm (38%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)",
+     "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"1 GCF of 30 and 45 1) Find a...\"",
+     "page": 2,
+     "cell": 1
     }
    ]
   },
@@ -48022,6 +49184,24 @@
      "sev": "critical",
      "page": 2,
      "msg": "key page 2 has 1 answer slots, pupil page 1 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"−\": \":+undoes−,−\" / \"undoes+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \":+undoes−,−\"",
+     "cell": 2
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"−\": \":+undoes−,−\" / \"undoes+...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \":+undoes−,−\"",
+     "cell": 2
     }
    ]
   },
@@ -48166,6 +49346,24 @@
      "sev": "major",
      "page": 2,
      "msg": "one empty band 15 mm tall in a 44.8 mm cell (33%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \"000+100+50+\" / \"4...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<pv> \"000+100+50+\"",
+     "cell": 3
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \"000+100+50+\" / \"4...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<pv> \"000+100+50+\"",
+     "cell": 3
     }
    ]
   },
@@ -50217,6 +51415,42 @@
      "sev": "major",
      "page": 2,
      "msg": "\"grade 6\" printed for the pupil: grade, CCSS codes and skill ids appear only in the teacher footer (SC-5, HD-6, HD-30)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"1/4=\" / \"0.25=25...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \"1/4=\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"atsto5dogs=\" / \"3:5...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \"atsto5dogs=\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"1/4=\" / \"0.25=25...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"1/4=\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"atsto5dogs=\" / \"3:5...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"atsto5dogs=\"",
+     "cell": 1
     }
    ]
   },
@@ -51775,6 +53009,42 @@
      "sev": "major",
      "page": 2,
      "msg": "\"grade 1\" printed for the pupil: grade, CCSS codes and skill ids appear only in the teacher footer (SC-5, HD-6, HD-30)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"4+3=\" / \"7.Theto...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \"4+3=\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"4+4=\" / \"8.Thati...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \"4+4=\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"4+3=\" / \"7.Theto...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"4+3=\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"4+4=\" / \"8.Thati...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"4+4=\"",
+     "cell": 1
     }
    ]
   },
@@ -53060,6 +54330,42 @@
      "sev": "major",
      "page": 2,
      "msg": "\"grade 2\" printed for the pupil: grade, CCSS codes and skill ids appear only in the teacher footer (SC-5, HD-6, HD-30)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \"(2+3)+4=2+\" / \"(3+4)=9...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \"(2+3)+4=2+\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"12+?=\" / \"20.Theu...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \"12+?=\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \"(2+3)+4=2+\" / \"(3+4)=9...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"(2+3)+4=2+\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"12+?=\" / \"20.Theu...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"12+?=\"",
+     "cell": 1
     }
    ]
   },
@@ -53471,6 +54777,42 @@
      "sev": "major",
      "page": 2,
      "msg": "\"grade 3\" printed for the pupil: grade, CCSS codes and skill ids appear only in the teacher footer (SC-5, HD-6, HD-30)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"×\": \"mes3means5×\" / \"3....\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \"mes3means5×\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"4×3=\" / \"12(4gro...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \"4×3=\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"×\": \"mes3means5×\" / \"3....\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"mes3means5×\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"4×3=\" / \"12(4gro...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"4×3=\"",
+     "cell": 1
     }
    ]
   },
@@ -54995,6 +56337,60 @@
      "sev": "major",
      "page": 2,
      "msg": "\"grade 6\" printed for the pupil: grade, CCSS codes and skill ids appear only in the teacher footer (SC-5, HD-6, HD-30)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"0with8%tax=\" / \"$20+$1....\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \"0with8%tax=\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"1/4=\" / \"0.25=25...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \"1/4=\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"25%=\" / \"25/100=...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \"25%=\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"0with8%tax=\" / \"$20+$1....\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"0with8%tax=\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"1/4=\" / \"0.25=25...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"1/4=\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"25%=\" / \"25/100=...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"25%=\"",
+     "cell": 1
     }
    ]
   },
@@ -55762,6 +57158,42 @@
      "sev": "major",
      "page": 2,
      "msg": "\"grade 6\" printed for the pupil: grade, CCSS codes and skill ids appear only in the teacher footer (SC-5, HD-6, HD-30)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \"In4x+\" / \"9,9isth...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \"In4x+\"",
+     "cell": 2
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"2x+3=\" / \"11→x=4...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<legacy> \"2x+3=\"",
+     "cell": 2
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \"In4x+\" / \"9,9isth...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"In4x+\"",
+     "cell": 2
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"=\": \"2x+3=\" / \"11→x=4...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 2,
+     "el": "<legacy> \"2x+3=\"",
+     "cell": 2
     }
    ]
   },

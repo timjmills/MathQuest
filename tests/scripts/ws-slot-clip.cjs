@@ -27,10 +27,13 @@
 //          Both are judged as ws-sibling-compare judges a row: a count above every sibling's count on the same row and
 //          size is FAIL; at or below is engine debt (listed, non-blocking); no sibling measured is FAIL. The siblings
 //          are the PAIRED ones (siblings.json `pairs`) by default, every approved sibling with --all-siblings (N1).
-//   SLOT-W (new, TY-21, critic r1 D3) every answer-box segment of a digit strip (`.ab[data-ws-seg]`) on the pupil and
-//          key pages is at least 4.4 mm wide as printed (A4, print media). Zero tolerance: a WDS minimum.
-//   HEADS  (new, H2, critic r1 D7) no two place-value heads (`.head`) of one stack overlap: the ink boxes of their text
-//          intersect by more than 0.2 mm. Zero tolerance (an illegible run is never engine debt).
+//   SLOT-W (TY-21, critic r1 D3) every digit-strip segment (`[data-ws-seg]`) and stand-alone answer box on the pupil
+//          and key pages is at least 4.4 mm wide as printed (A4, print media). Zero tolerance: a WDS minimum.
+//   HEADS  (H2, critic r1 D7, r2 N8) neighbouring head labels (a stack's `.head`s, a pv mat's place letters) sit at
+//          least 1 mm apart (overlap included). Zero tolerance (an illegible run is never engine debt).
+//          SLOT-W and HEADS are tests/lib/ws-geom-probe.cjs, the definition print-lint's L-ANSAREA TY-21 and L-OVERLAP
+//          read (one rule, two readers). D1 (W0-A critic r7): on a multi-skill row an item, or a SLOT / CLIP count,
+//          on a partner skill's cell is listed as "partner skill (non-blocking)", never a lane FAIL.
 //   Each line names what the two probes measured per template (N5): SLOT-W reads only digit strips (the stack's answer
 //   boxes) and HEADS only stack heads, so a document without them says "SLOT-W N/A (equation ×6: no box segment(s))"
 //   and the JSON row carries slotW / headsProbe "measured" or "N/A": never a silent 0.
@@ -60,48 +63,25 @@ const RUNNER = '/tmp/mq-browser-run.sh';
 const PRINT_LINT = path.join(__dirname, 'ws-print-lint.cjs');
 const MATRIX = path.join(__dirname, 'ws-coverage-matrix.cjs');
 const SLOT_LINTS = ['L-ANSAREA', 'L-OVERFLOW'];
-const MIN_SEG_MM = 4.4;
-const HEAD_OVERLAP_MM = 0.2;
+// TY-21 is print-lint's copy of SLOT-W (the shared probe): judged at zero tolerance below, never as a sibling count
+const slotCounted = (f) => SLOT_LINTS.includes(f.lint) && !f.waived && !(f.lint === 'L-ANSAREA' && f.rule === 'TY-21');
+// SLOT-W and HEADS read the ONE definition ws-print-lint's L-ANSAREA TY-21 and L-OVERLAP H2 read (S1 builder B):
+// tests/lib/ws-geom-probe.cjs. HEADS is now the 1 mm minimum gap (critic r2 N8: 0.74 mm apart reads as one run),
+// overlap included. Each item carries the skill of its cell (D1).
+const { GEOM_PROBE, MIN_SEG_MM, HEAD_GAP_MM } = require('../lib/ws-geom-probe.cjs');
+const PROBE_CFG = { minSeg: MIN_SEG_MM, minGap: HEAD_GAP_MM, wraps: false };
+const PROBE = GEOM_PROBE;
 
-/* ------------------------------------------------------------- the geometry probe (in the printed document) */
-function PROBE(minSeg, headTol) {
-    const mm = (px) => px * 25.4 / 96;
-    const out = { segs: 0, narrow: [], heads: 0, overlaps: [], tpl: {} };
-    const pageOf = (el) => { const p = el.closest('[data-ws-page], .ws-page'); const all = Array.from(document.querySelectorAll('[data-ws-page], .ws-page')); return p ? all.indexOf(p) + 1 : 0; };
-    // N5 (critic r6): which templates the document draws, and on which of them the probes found anything to measure
-    const tplOf = (el) => { const c = el.closest('[data-ws-cell]'); return c ? c.getAttribute('data-ws-cell') || '?' : '(no cell)'; };
-    const T = (t) => (out.tpl[t] = out.tpl[t] || { cells: 0, segs: 0, heads: 0 });
-    for (const c of document.querySelectorAll('[data-ws-cell]')) T(c.getAttribute('data-ws-cell') || '?').cells++;
-    for (const el of document.querySelectorAll('.ab[data-ws-seg]')) {
-        const r = el.getBoundingClientRect();
-        if (r.width <= 0 || r.height <= 0) continue;
-        out.segs++;
-        T(tplOf(el)).segs++;
-        const w = mm(r.width);
-        if (w < minSeg - 0.005) out.narrow.push({ page: pageOf(el), w: +w.toFixed(2) });
-    }
-    const inkBox = (el) => {
-        const range = document.createRange();
-        let box = null;
-        for (const n of el.childNodes) {
-            if (n.nodeType !== 3 || !n.textContent.trim()) continue;
-            range.selectNodeContents(n);
-            for (const r of range.getClientRects()) if (r.width > 0) box = box ? { l: Math.min(box.l, r.left), r: Math.max(box.r, r.right), t: Math.min(box.t, r.top), b: Math.max(box.b, r.bottom) } : { l: r.left, r: r.right, t: r.top, b: r.bottom };
-        }
-        return box;
-    };
-    for (const stk of document.querySelectorAll('.ws-stack')) {
-        const heads = Array.from(stk.querySelectorAll('.head')).map((h) => ({ h, box: inkBox(h), txt: h.textContent.trim() })).filter((x) => x.box);
-        out.heads += heads.length;
-        if (heads.length) T(tplOf(stk)).heads += heads.length;
-        for (let i = 1; i < heads.length; i++) {
-            const a = heads[i - 1], b = heads[i];
-            const ox = Math.min(a.box.r, b.box.r) - Math.max(a.box.l, b.box.l);
-            const oy = Math.min(a.box.b, b.box.b) - Math.max(a.box.t, b.box.t);
-            if (mm(ox) > headTol && oy > 0) out.overlaps.push({ page: pageOf(stk), a: a.txt, b: b.txt, mm: +mm(ox).toFixed(2) });
-        }
-    }
-    return out;
+/**
+ * D1 (W0-A critic r7): split a probe's items by skill. On a multi-skill row (the lane skill plus the matrix's
+ * partners) an item on a partner's cell never blocks the lane: it is listed as partner (non-blocking); an item no
+ * cell names stays with the lane.
+ */
+function splitBySkill(p, laneSkill, multi) {
+    const mine = (x) => !multi || !x.skill || x.skill === laneSkill;
+    const own = Object.assign({}, p, { narrow: (p.narrow || []).filter(mine), overlaps: (p.overlaps || []).filter(mine) });
+    const partner = Object.assign({}, p, { narrow: (p.narrow || []).filter((x) => !mine(x)), overlaps: (p.overlaps || []).filter((x) => !mine(x)) });
+    return { own, partner };
 }
 const summariseProbe = (p) => {
     const f = [];
@@ -109,7 +89,7 @@ const summariseProbe = (p) => {
         const ws = p.narrow.map((x) => x.w);
         f.push({ rule: 'SLOT-W', n: p.narrow.length, msg: `${p.narrow.length} of ${p.segs} answer-box segment(s) under ${MIN_SEG_MM} mm (narrowest ${Math.min(...ws)} mm; pages ${[...new Set(p.narrow.map((x) => x.page))].slice(0, 6).join(', ')}) (TY-21)` });
     }
-    if (p.overlaps.length) f.push({ rule: 'HEADS', n: p.overlaps.length, msg: `${p.overlaps.length} pair(s) of place heads overlap, e.g. "${p.overlaps[0].a}" / "${p.overlaps[0].b}" by ${p.overlaps[0].mm} mm on page ${p.overlaps[0].page} (H2)` });
+    if (p.overlaps.length) { const o = p.overlaps[0]; f.push({ rule: 'HEADS', n: p.overlaps.length, msg: `${p.overlaps.length} pair(s) of place heads overlap or sit under ${HEAD_GAP_MM} mm apart, e.g. "${o.a}" / "${o.b}" ${o.gap < 0 ? `overlap by ${-o.gap} mm` : `${o.gap} mm apart`} on page ${o.page} (H2)` }); }
     return f;
 };
 
@@ -155,7 +135,7 @@ async function probePhase(manifestFile) {
                     await page.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 });
                     if (failed.length) throw new Error(`${f}: stylesheet / font requests failed: ${failed.slice(0, 3).join(', ')}`);
                     try { await page.waitForFunction(() => document.fonts.status === 'loaded', { timeout: 8000 }); } catch (e) { /* measured anyway */ }
-                    const p = await page.evaluate(PROBE, MIN_SEG_MM, HEAD_OVERLAP_MM);
+                    const p = await page.evaluate(PROBE, PROBE_CFG);
                     agg.segs += p.segs; agg.heads += p.heads; agg.narrow.push(...p.narrow); agg.overlaps.push(...p.overlaps);
                     for (const [t, v] of Object.entries(p.tpl || {})) { const a = (agg.tpl[t] = agg.tpl[t] || { cells: 0, segs: 0, heads: 0 }); a.cells += v.cells; a.segs += v.segs; a.heads += v.heads; }
                 } finally { await page.close(); }
@@ -281,24 +261,44 @@ async function selfTest() {
     try {
         const p = await browser.newPage();
         await p.setViewport({ width: 794, height: 1100 });
-        const run = async (seg, gap) => { await p.setContent(page(seg, gap)); return summariseProbe(await p.evaluate(PROBE, MIN_SEG_MM, HEAD_OVERLAP_MM)); };
-        const good = await run(6, '0');
-        if (good.length) fails.push(`6 mm segments, short heads: ${JSON.stringify(good)}`);
+        const run = async (seg, gap) => { await p.setContent(page(seg, gap)); return summariseProbe(await p.evaluate(PROBE, PROBE_CFG)); };
+        const good = await run(8, '0');
+        if (good.length) fails.push(`8 mm segments, short heads: ${JSON.stringify(good)}`);
+        // critic r2 N8: heads that do not touch but sit 0.5 mm apart still read as one run (the shared 1 mm minimum)
+        await p.setContent(page(8, '0'));
+        await p.evaluate(() => {
+            const hs = [...document.querySelectorAll('.head')];
+            const stk = hs[0].parentElement; stk.style.position = 'relative'; stk.style.height = '20mm';
+            let x = 0;
+            for (const h of hs) { h.style.position = 'absolute'; h.style.top = '0'; h.style.left = `${x}px`; const r = document.createRange(); r.selectNodeContents(h.firstChild); x += r.getBoundingClientRect().width + 0.5 * 96 / 25.4; }
+        });
+        const tight = summariseProbe(await p.evaluate(PROBE, PROBE_CFG));
+        if (!tight.some((f) => f.rule === 'HEADS' && /0\.5 mm apart/.test(f.msg))) fails.push(`heads 0.5 mm apart: no HEADS finding (${JSON.stringify(tight)})`);
+        // D1 (W0-A critic r7): on a multi-skill page only the lane skill's cells block; a partner's narrow boxes are reported
+        const twoSkill = (laneSeg, partnerSeg) => `<!doctype html><meta charset="utf-8"><style>body{margin:0;font:12pt sans-serif}.ab{display:inline-block;height:8mm}</style><div data-ws-page="1">`
+            + `<div data-ws-cell="stack" data-ws-skill="a:lane"><span class="ab" data-ws-seg="l" style="width:${laneSeg}mm"></span><span class="ab" data-ws-seg="r" style="width:${laneSeg}mm"></span></div>`
+            + `<div data-ws-cell="stack" data-ws-skill="b:partner"><span class="ab" data-ws-seg="l" style="width:${partnerSeg}mm"></span><span class="ab" data-ws-seg="r" style="width:${partnerSeg}mm"></span></div></div>`;
+        await p.setContent(twoSkill(6, 4.06));
+        const po = splitBySkill(await p.evaluate(PROBE, PROBE_CFG), 'a:lane', true);
+        if (summariseProbe(po.own).length || !summariseProbe(po.partner).some((f) => f.rule === 'SLOT-W')) fails.push(`D1: narrow boxes on the partner's cells only must not block the lane (own ${JSON.stringify(summariseProbe(po.own))})`);
+        await p.setContent(twoSkill(4.06, 6));
+        const lo = splitBySkill(await p.evaluate(PROBE, PROBE_CFG), 'a:lane', true);
+        if (!summariseProbe(lo.own).some((f) => f.rule === 'SLOT-W') || summariseProbe(lo.partner).length) fails.push('D1: narrow boxes on the lane skill\'s cells must block');
         const narrow = await run(4.06, '0');
         if (!narrow.some((f) => f.rule === 'SLOT-W')) fails.push('4.06 mm segments: no SLOT-W finding');
         const clash = await run(4.06, '2pt');
         if (!clash.some((f) => f.rule === 'HEADS')) fails.push('heads wider than their 4 mm tracks: no HEADS finding');
         // N5 (critic r6): a document without digit strips says SLOT-W N/A per template, never a silent 0
-        await p.setContent(page(6, '0'));
-        const onStack = measuredLine(await p.evaluate(PROBE, MIN_SEG_MM, HEAD_OVERLAP_MM));
+        await p.setContent(page(8, '0'));
+        const onStack = measuredLine(await p.evaluate(PROBE, PROBE_CFG));
         if (!/^SLOT-W measured stack 3 box segment\(s\); HEADS measured stack 3 place head\(s\)$/.test(onStack)) fails.push(`stack page: SLOT-W and HEADS measured on stack (${onStack})`);
         await p.setContent(eqPage);
-        const eq = await p.evaluate(PROBE, MIN_SEG_MM, HEAD_OVERLAP_MM);
+        const eq = await p.evaluate(PROBE, PROBE_CFG);
         const eqLine = measuredLine(eq);
         if (eq.segs !== 0 || !/^SLOT-W N\/A \(equation ×2: no box segment\(s\)\); HEADS N\/A \(equation ×2/.test(eqLine)) fails.push(`equation page: SLOT-W N/A named (${eqLine})`);
     } finally { await browser.close(); }
     for (const f of fails) say(`  self-test FAIL: ${f}`);
-    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 4 fixture pages)`);
+    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 7 fixture pages)`);
     process.exit(fails.length ? 1 : 0);
 }
 
@@ -362,9 +362,9 @@ async function main() {
         for (const sz of sizes) {
             const d = docs.get(`${r.id}@${sz}`);
             if (!d) continue;
-            const counts = {};
-            for (const f of d.findings || []) if (SLOT_LINTS.includes(f.lint) && !f.waived) counts[`${f.lint} ${f.rule}`] = (counts[`${f.lint} ${f.rule}`] || 0) + 1;
-            s[sz] = { counts };
+            const counts = {}, bySkill = {};
+            for (const f of d.findings || []) if (slotCounted(f)) { const k = `${f.lint} ${f.rule}`; counts[k] = (counts[k] || 0) + 1; const m = (bySkill[f.skill || ''] = bySkill[f.skill || ''] || {}); m[k] = (m[k] || 0) + 1; }
+            s[sz] = { counts, bySkill: (r.skills || []).length > 1 ? bySkill : undefined };
         }
         return Object.assign({}, r, { status: 'OK', sizes: s });
     });
@@ -392,7 +392,7 @@ async function main() {
                 const d = sr.docs.get(j.id);
                 if (!d || d.error) continue;
                 const counts = {};
-                for (const f of d.findings || []) if (SLOT_LINTS.includes(f.lint) && !f.waived) counts[`${f.lint} ${f.rule}`] = (counts[`${f.lint} ${f.rule}`] || 0) + 1;
+                for (const f of d.findings || []) if (slotCounted(f)) counts[`${f.lint} ${f.rule}`] = (counts[`${f.lint} ${f.rule}`] || 0) + 1;
                 (srcRows[j.row.id] = srcRows[j.row.id] || {})[j.size] = { counts };
             }
             S.sources.push({ name: `the siblings' extra documents (printed now, ${Object.keys(srcRows).length} row(s))`, rows: srcRows });
@@ -408,20 +408,23 @@ async function main() {
         const d = docs.get(j.id);
         if (!d) { fails.push(`${tag}: no result (print-lint crashed)`); say(`${tag}: ERROR no result`); perRow.push({ id: j.row.id, size: j.size, status: 'ERROR' }); continue; }
         if (d.error) { fails.push(`${tag}: did not render: ${d.error}`); say(`${tag}: ERROR ${String(d.error).slice(0, 120)}`); perRow.push({ id: j.row.id, size: j.size, status: 'ERROR' }); continue; }
-        const lintF = (d.findings || []).filter((f) => SLOT_LINTS.includes(f.lint) && !f.waived);
+        const lintF = (d.findings || []).filter(slotCounted);
         const slot = lintF.filter((f) => f.lint === 'L-ANSAREA').length, clip = lintF.filter((f) => f.lint === 'L-OVERFLOW').length;
         const above = cmp.above.filter((x) => x.id === j.row.id && x.size === j.size), noSib = cmp.noSibling.filter((x) => x.id === j.row.id && x.size === j.size);
-        const geo = summariseProbe(probe[j.id] || { segs: 0, narrow: [], heads: 0, overlaps: [] });
+        const split = splitBySkill(probe[j.id] || { segs: 0, narrow: [], heads: 0, overlaps: [] }, j.row.skill, (j.row.skills || []).length > 1);
+        const geo = summariseProbe(split.own);
+        const geoPartner = summariseProbe(split.partner);
         const msgs = [];
         for (const x of above) msgs.push(`${x.rule} ${x.n} above the siblings' ${x.max}`);
         for (const x of noSib) msgs.push(`${x.rule} ${x.n}: no sibling measured this row`);
         for (const g of geo) msgs.push(g.msg);
+        const notes = geoPartner.map((g) => `partner skill (non-blocking, D1): ${g.msg}`).concat(cmp.partner.filter((x) => x.id === j.row.id && x.size === j.size).map((x) => `partner skill (non-blocking, D1): ${x.rule} ${x.n}`));
         const p = probe[j.id] || {};
         const status = msgs.length ? 'FAIL' : 'ok';
         const measured = measuredLine(p);
-        perRow.push({ id: j.row.id, size: j.size, status, slot, clip, segs: p.segs || 0, heads: p.heads || 0, slotW: p.segs ? 'measured' : 'N/A', headsProbe: p.heads ? 'measured' : 'N/A', templates: p.tpl || {}, measured, extra: j.row.kind === 'extra' ? (j.row.what || j.row.row) : undefined, findings: msgs });
+        perRow.push({ id: j.row.id, size: j.size, status, partner: notes.length ? notes : undefined, slot, clip, segs: p.segs || 0, heads: p.heads || 0, slotW: p.segs ? 'measured' : 'N/A', headsProbe: p.heads ? 'measured' : 'N/A', templates: p.tpl || {}, measured, extra: j.row.kind === 'extra' ? (j.row.what || j.row.row) : undefined, findings: msgs });
         for (const m of msgs) fails.push(`${tag}: ${m}`);
-        say(`${tag}${j.row.what ? ` (${j.row.what})` : ''}: ${status} (SLOT ${slot}, CLIP ${clip}${slot + clip && !above.length && !noSib.length ? ' at or below the siblings' : ''}; ${measured})${msgs.length ? '\n    ' + msgs.join('\n    ') : ''}`);
+        say(`${tag}${j.row.what ? ` (${j.row.what})` : ''}: ${status} (SLOT ${slot}, CLIP ${clip}${slot + clip && !above.length && !noSib.length ? ' at or below the siblings' : ''}; ${measured})${msgs.length ? '\n    ' + msgs.join('\n    ') : ''}${notes.length ? '\n    ' + notes.join('\n    ') : ''}`);
     }
     const printed = perRow.filter((r) => !['PENDING', 'N/A'].includes(r.status)).length;
     if (!printed) fails.push('no document printed: nothing was checked');

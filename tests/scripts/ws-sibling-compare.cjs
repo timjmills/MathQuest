@@ -81,8 +81,24 @@ const printed = (r) => r.status === 'RED' || r.status === 'OK' || r.status === '
 /** --rules H13,TY-11 (or the full key "L-DENSITY H13"): compare only these rules. */
 const ruleOn = (rules, key) => !rules || rules.some((x) => key === x || key.endsWith(` ${x}`) || key.startsWith(`${x} `));
 const hasFindings = (r, sizes, rules) => Object.entries(r.sizes || {}).some(([z, v]) => (!sizes || sizes.includes(z)) && v && ruleKeys(v.counts).some(([k, n]) => n > 0 && ruleOn(rules, k)));
+/**
+ * D1 (W0-A critic r7): on a multi-skill row (sections / mixed: the lane skill plus the matrix's partners) the counts
+ * that judge the lane are its OWN share: the findings its cells carry (`bySkill[skill]`, from print-lint's `skill`)
+ * plus those no cell names (`bySkill['']`, page-level, kept with the lane: conservative). A partner skill's findings
+ * never block the lane: they are listed as PARTNER (non-blocking). A row without `bySkill` (a run or pin written
+ * before D1) is judged on its totals, as before.
+ */
+function shareOf(v, skill, multi) {
+    if (!multi || !v || !v.bySkill) return { own: v && v.counts ? v.counts : v || {}, partner: {} };
+    const own = {}, partner = {};
+    for (const [sk, m] of Object.entries(v.bySkill)) {
+        const into = sk === skill || sk === '' ? own : partner;
+        for (const [k, n] of Object.entries(m)) into[k] = (into[k] || 0) + n;
+    }
+    return { own, partner };
+}
 function compare(oursRows, sibsOf, table, { redOnly = false, sizes = null, rules = null } = {}) {
-    const out = { above: [], engine: [], noSibling: [], errors: [], rowsCompared: 0, rowsAbove: new Set(), byStatus: {} };
+    const out = { above: [], engine: [], noSibling: [], errors: [], partner: [], rowsCompared: 0, rowsAbove: new Set(), byStatus: {} };
     for (const r of oursRows) {
         if (r.status === 'ERROR') { out.errors.push({ id: r.id, msg: (r.errors || []).join('; ') || 'did not print' }); continue; }
         if (!r.sizes || !(redOnly ? r.status === 'RED' : printed(r)) || !hasFindings(r, sizes, rules)) continue;
@@ -91,15 +107,18 @@ function compare(oursRows, sibsOf, table, { redOnly = false, sizes = null, rules
         out.byStatus[st] = (out.byStatus[st] || 0) + 1;
         const suf = `${r.kind}/${r.row}`;
         const sibs = sibsOf(r.skill);
+        const multi = (r.skills || []).length > 1;
         for (const [size, v] of Object.entries(r.sizes)) {
             if (!v || !v.counts || (sizes && !sizes.includes(size))) continue;
-            for (const [rule, n] of ruleKeys(v.counts)) {
+            const sh = shareOf(v, r.skill, multi);
+            for (const [rule, n] of ruleKeys(sh.partner)) if (n > 0 && ruleOn(rules, rule)) out.partner.push({ id: r.id, size, rule, n, skills: Object.keys(v.bySkill || {}).filter((k) => k && k !== r.skill) });
+            for (const [rule, n] of ruleKeys(sh.own)) {
                 if (!(n > 0) || !ruleOn(rules, rule)) continue;
                 const seen = [];
                 for (const s of sibs) {
                     const e = table.get(`${s}|${suf}`);
                     if (!e || !e.sizes || !e.sizes[size] || e.sizes[size].na || e.sizes[size].pending) continue;
-                    const c = e.sizes[size].counts ? e.sizes[size].counts : e.sizes[size];
+                    const c = shareOf(e.sizes[size], s, multi).own;
                     seen.push({ s, n: +(c[rule] || 0), src: e.src });
                 }
                 const rec = { id: r.id, size, rule, n, sibs: seen };
@@ -148,8 +167,20 @@ function selfTest() {
     const t2 = sibTable([{ name: 'pin', rows: { 'a:b|single/ex-group': { S: { 'L-DENSITY H13': 20 } } } }, { name: 'run', rows: { 'a:b|single/ex-group': { S: { counts: { 'L-DENSITY H13': 0 } } } } }]);
     t(compare([ours[0]], () => ['a:b'], t2).above.length === 2, 'a fresher sibling run replaces its pin');
     t(suffixOf('a:b|sections/ex-each') === 'sections/ex-each', 'suffix');
+    // D1 (W0-A critic r7): a multi-skill row judges the lane skill's own share; a partner's findings never block
+    const sibT = sibTable([{ name: 'pin', rows: { 'a:sib|sections/ex-each': { S: { counts: { 'L-SIZE TY-11': 0 } } } } }]);
+    const partnerOnly = { id: 'a:lane|sections/ex-each', skill: 'a:lane', skills: ['a:lane', 'b:partner'], kind: 'sections', row: 'ex-each', status: 'RED', sizes: { S: { counts: { 'L-SIZE TY-11': 6 }, bySkill: { 'b:partner': { 'L-SIZE TY-11': 6 } } } } };
+    const cp = compare([partnerOnly], () => ['a:sib'], sibT);
+    t(cp.above.length === 0 && cp.noSibling.length === 0 && cp.partner.length === 1 && cp.partner[0].n === 6, `D1: findings only on the partner's cells do not block (${JSON.stringify({ above: cp.above.length, partner: cp.partner.length })})`);
+    const laneOwn = { ...partnerOnly, sizes: { S: { counts: { 'L-SIZE TY-11': 9 }, bySkill: { 'a:lane': { 'L-SIZE TY-11': 3 }, 'b:partner': { 'L-SIZE TY-11': 6 } } } } };
+    const cl = compare([laneOwn], () => ['a:sib'], sibT);
+    t(cl.above.length === 1 && cl.above[0].n === 3 && cl.partner.length === 1, `D1: the lane skill's own 3 block, the partner's 6 are reported (${JSON.stringify(cl.above)})`);
+    const pageLevel = { ...partnerOnly, sizes: { S: { counts: { 'L-DENSITY PAGEFILL': 1 }, bySkill: { '': { 'L-DENSITY PAGEFILL': 1 } } } } };
+    t(compare([pageLevel], () => ['a:sib'], sibT).above.length === 1, 'D1: a page-level finding (no cell names a skill) stays with the lane');
+    const oldRow = { ...partnerOnly, sizes: { S: { counts: { 'L-SIZE TY-11': 6 } } } };
+    t(compare([oldRow], () => ['a:sib'], sibT).above.length === 1, 'D1: a row written before D1 (no bySkill) is judged on its totals');
     for (const f of fails) say(`  self-test FAIL: ${f}`);
-    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 13 cases)`);
+    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 17 cases)`);
     process.exit(fails.length ? 1 : 0);
 }
 
@@ -314,13 +345,14 @@ function main() {
     for (const x of c.above) say(`ABOVE      ${x.id} ${x.size} ${x.rule}: ours ${x.n}, siblings max ${x.max} (${fmtSibs(x)})`);
     for (const x of c.noSibling) say(`NO-SIBLING ${x.id} ${x.size} ${x.rule}: ours ${x.n}, no approved sibling measured ${suffixOf(x.id)} at ${x.size}`);
     if (has('verbose')) for (const x of c.engine) say(`engine     ${x.id} ${x.size} ${x.rule}: ours ${x.n} <= siblings max ${x.max} (${fmtSibs(x)})`);
+    for (const x of c.partner) say(`partner    ${x.id} ${x.size} ${x.rule}: ${x.n} on the partner skill(s)' cells (${x.skills.join(', ') || '?'}): reported, never blocks the lane (D1)`);
     const secs = ((Date.now() - T0) / 1000).toFixed(1);
-    const summary = `${c.rowsCompared} row(s) with findings compared (${Object.entries(c.byStatus).map(([k, v]) => `${k} ${v}`).join(', ') || 'none'}); ${c.engine.length} count(s) at or below the siblings (engine red, non-blocking), ${c.above.length} above, ${c.noSibling.length} with no sibling measured, ${c.errors.length} ERROR row(s); ${secs} s (lane matrix ${oursSecs} s, sibling matrix ${sibSecs} s)`;
-    if (has('json')) fs.writeFileSync(path.resolve(arg('json')), JSON.stringify({ tool: TOOL, root: ROOT, skills: keys, siblings: sibOf, templates: tpl, sources: sources.map((s) => s.name), rowsCompared: c.rowsCompared, byStatus: c.byStatus, red, noBaseline: noBase, above: c.above, noSibling: c.noSibling, engine: c.engine, errors: c.errors, rowsAboveSiblings: [...c.rowsAbove], seconds: +secs }, null, 1) + '\n');
+    const summary = `${c.rowsCompared} row(s) with findings compared (${Object.entries(c.byStatus).map(([k, v]) => `${k} ${v}`).join(', ') || 'none'}); ${c.engine.length} count(s) at or below the siblings (engine red, non-blocking), ${c.above.length} above, ${c.noSibling.length} with no sibling measured, ${c.errors.length} ERROR row(s), ${c.partner.length} partner-skill count(s) (non-blocking); ${secs} s (lane matrix ${oursSecs} s, sibling matrix ${sibSecs} s)`;
+    if (has('json')) fs.writeFileSync(path.resolve(arg('json')), JSON.stringify({ tool: TOOL, root: ROOT, skills: keys, siblings: sibOf, templates: tpl, sources: sources.map((s) => s.name), rowsCompared: c.rowsCompared, byStatus: c.byStatus, red, noBaseline: noBase, above: c.above, noSibling: c.noSibling, engine: c.engine, errors: c.errors, partner: c.partner, rowsAboveSiblings: [...c.rowsAbove], seconds: +secs }, null, 1) + '\n');
     const bad = c.above.length + c.noSibling.length + c.errors.length;
     if (noTpl.length && c.rowsCompared) say(`  no approved siblings for ${noTpl.join(', ')}: every red count of theirs is unproven`);
     say(bad ? `${TOOL}: FAIL - worse than siblings: ${c.above.length} count(s) above the approved siblings in ${new Set(c.above.map((x) => x.id)).size} row(s), ${c.noSibling.length} unproven (no sibling), ${c.errors.length} ERROR (${summary})` : `${TOOL}: OK (${summary})`);
     process.exit(bad && !has('report-only') ? 1 : 0);
 }
-module.exports = { compare, printed, sibTable, suffixOf, siblingsOf, loadSiblings, runMatrix, runRows, readPins };
+module.exports = { compare, shareOf, printed, sibTable, suffixOf, siblingsOf, loadSiblings, runMatrix, runRows, readPins };
 if (require.main === module) { try { main(); } catch (e) { say(`${TOOL}: ${e && e.stack || e}`); say(`${TOOL}: FAIL - error`); process.exit(2); } }

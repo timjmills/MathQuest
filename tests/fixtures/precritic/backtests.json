@@ -405,6 +405,125 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "ansarea-ty21-pilot",
+   "check": "Answer box width (TY-21: a box the pupil writes one digit in is >= 4.4 mm as printed; pilot-su-c critic r1 D3: answer boxes 4.06 mm at S)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-ANSAREA TY-21 (tests/lib/ws-geom-probe.cjs, the definition ws-slot-clip SLOT-W reads)",
+   "browser": true,
+   "fail": {
+    "commit": "27577cf",
+    "state": "pilot-su-c critic r1 FAIL commit: at support level 3 (the answer-strip-only level), 80 answer-strip segments 4.06 mm at S; its default level 1 page draws none narrower"
+   },
+   "pass": {
+    "commit": "ff471fd",
+    "state": "SU-C fix round 1 (D3: 0.95 em answer tracks)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills subtraction:sub_100_no_regroup --size S --opts '{\"level\":[3]}' --lints L-ANSAREA",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "overlap-d7-pilot",
+   "check": "Head labels collide (H2: neighbouring heads >= 1 mm apart; critic r1 D7: HTh / TTh overlap 1.97 mm at 5-6 digits, heads on at support level 3)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-OVERLAP H2 (the shared probe; ws-slot-clip HEADS reads it)",
+   "browser": true,
+   "fail": {
+    "commit": "27577cf",
+    "state": "critic r1 FAIL commit: sub_1m_no_regroup level 3 at S, 64 head pairs overlapping by 1.97 mm"
+   },
+   "pass": {
+    "commit": "a930c43",
+    "state": "fix r2 (N8: HTh / TTh tracks 1.3 em at S, heads 1.3 mm apart). NOT ff471fd: fix r1 cured the overlap but left the heads 0.74 mm apart (critic r2 N8), which the 1 mm minimum fails, as it must"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills subtraction:sub_1m_no_regroup --size S --opts '{\"level\":[3]}' --lints L-OVERLAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "overlap-n8-pilot",
+   "check": "Head labels too close (H2 1 mm minimum gap; critic r2 N8: HTh / TTh 0.74 mm apart at S read as one run)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-OVERLAP H2",
+   "browser": true,
+   "fail": {
+    "commit": "03eda45",
+    "state": "critic r2 FAIL commit: 24 head pairs 0.74 mm apart at S"
+   },
+   "pass": {
+    "commit": "a930c43",
+    "state": "fix r2 N8"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills subtraction:sub_1m_no_regroup --size S --opts '{\"level\":[3]}' --lints L-OVERLAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "wrap-op-pilot",
+   "check": "No wrapped line ends in an operator (critic r2 N6: \"486,759 −\" / \"35,247\" in the vocabulary picture; N7: \"4 −\" / \"3 = 1.\" in step 3)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-WRAP WRAP-OP",
+   "browser": true,
+   "fail": {
+    "commit": "03eda45",
+    "state": "critic r2 FAIL commit: lesson at L, 4 wrapped blocks (vocab picture p2, step 3 p1, and their key pages)"
+   },
+   "pass": {
+    "commit": "a930c43",
+    "state": "fix r2 N6 (line up drawn as a stack) + N7 (equations joined with U+00A0)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills subtraction:sub_1m_no_regroup --roles lesson --size L --lints L-WRAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "h13-lesson-warmup-pilot",
+   "check": "H13 reaches lesson Warm-up cells (critic r2 N2: the Warm-up fact cell 43-59 % empty beside a place-value cell)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY H13 (VA-70's across-fact hold is room, not content) and H13-ROW (a top cell's band below vs its row's)",
+   "browser": true,
+   "fail": {
+    "commit": "03eda45",
+    "state": "critic r2 FAIL commit: sub_50 lesson at S, the fact cell's band 31.5 mm of 54.2 mm (58 %)"
+   },
+   "pass": {
+    "commit": "a930c43",
+    "state": "fix r2 N2 at S (facts stacked, own row of four). At L N2 still fails there (the pilot's own status), so the row runs at S"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills subtraction:sub_50_no_regroup --roles lesson --size S --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "d1-partner-attribution",
+   "check": "D1 (W0-A critic r7): on a multi-skill matrix row only the LANE skill's cells (plus page-level findings) are judged; a partner skill's findings are reported and never block",
+   "kind": "fixture",
+   "rule": "ws-sibling-compare shareOf (bySkill from ws-coverage-matrix, print-lint's per-finding `skill`); ws-slot-clip splitBySkill (self-test)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/d1/lane-own.run.json",
+    "state": "3 of 9 findings on the lane skill's cells, sibling 0: ABOVE"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/d1/partner-only.run.json",
+    "state": "all 6 findings on the partner's cells: reported as partner, OK (before D1: ABOVE 6 > 0, FAIL)"
+   },
+   "command": "node tests/scripts/ws-sibling-compare.cjs --run {fixture} --siblings addition:d1_sibling --sibling-run tests/fixtures/precritic/d1/siblings.run.json",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
