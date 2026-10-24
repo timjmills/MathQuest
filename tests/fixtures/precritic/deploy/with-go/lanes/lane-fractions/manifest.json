@@ -1,0 +1,10 @@
+{
+  "lane": "lane-fractions",
+  "note": "FIXTURE for ws-deploy-gates.sh --self-test / --deploy-check (§1.6.3 step 6). Not a real lane.",
+  "makesLive": true,
+  "families": ["fractions"],
+  "skills": [
+    { "category": "fractions", "skill": "fixture_unit_fractions", "family": "fractions" },
+    { "category": "measurement", "skill": "fixture_length_compare" }
+  ]
+}

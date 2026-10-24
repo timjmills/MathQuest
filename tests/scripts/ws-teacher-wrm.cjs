@@ -4,6 +4,11 @@
 //     --curated  serves the link files in <dir> (R.json … Y6.json, MAP.json) as data/curriculum/links/,
 //                so the curated path (verdicts, "To be built", MAP.json tasks) is tested before the
 //                tagging lanes' files are merged. Without it the computed fallbacks are tested.
+//   node tests/scripts/ws-teacher-wrm.cjs --grade 3                 # the every-lesson sweeps cover grade 3 only
+//   node tests/scripts/ws-teacher-wrm.cjs --lesson 3:D4:2            # ... only this lesson (its key, site id or WRM step id)
+//     --grade / --lesson (ws-precritic --teacher, IMPROVEMENT_PLAN §1.4 S1) narrow the two every-lesson sweeps (the
+//     rendered-text sweep and the detailed lessons) to the lessons a lane touched; every scenario check still runs.
+//     Grade ids: PK, K, 1-6 ("Grade 3" and "G3" are read as 3). A filter that matches no lesson FAILS.
 //
 // Also: the "Skills to be made" screen (filters, expand, White Rose step link, print, CSV) and the MAP
 // page's "Practise by task" and "By representation" views (tick, Practice link, Print).
@@ -32,6 +37,11 @@ const CUR_MAP = !DATA_DIR ? false : SHIP_IDX ? !!SHIP_IDX.map : fs.existsSync(pa
 const { jargonHit } = require('../lib/wrm-jargon.cjs');
 const OUT = path.join(ROOT, 'design', 'audit', 'runs', 'wrm-page');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const argOf = (f) => { const i = process.argv.indexOf(f); return i > 0 && i + 1 < process.argv.length ? String(process.argv[i + 1]) : ''; };
+const ONLY_GRADE = argOf('--grade').replace(/^(grade|g)\s*/i, '').replace(/^pre-?k$/i, 'PK').toUpperCase();
+const ONLY_LESSON = argOf('--lesson');
+const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() === ONLY_GRADE)
+  && (!ONLY_LESSON || [l.key, l.site, l.step].some((v) => v != null && String(v) === ONLY_LESSON));
 
 (async () => {
   await require('../lib/wrm-jargon.cjs').ready();
@@ -1061,14 +1071,16 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       // fix round 6: EVERY lesson of the sequence (curated and rules), the whole White Rose screen, line by line
       const bad = [];
       let nLines = 0;
-      for (const l of all) {
+      const sweep = all.filter(sweepHas);
+      check(sweep.length > 0, `--grade ${ONLY_GRADE || '-'} --lesson ${ONLY_LESSON || '-'}: no lesson matches`);
+      for (const l of sweep) {
         const h = `${links.lessonHash(l)}`;
         await page.evaluate((x) => { location.hash = x; }, h);
         await waitFor(page, `location.hash === ${JSON.stringify(h)} && (document.querySelector('[data-screen="wrm"].is-active #tvwDetail .tvw-title') || {}).textContent?.includes(${JSON.stringify(l.title.slice(0, 12))})`, 8000, l.key);
         nLines += await plainSweep('[data-screen="wrm"].is-active', l.key, bad);
       }
       check(!bad.length, `plain English: ${bad.length} White Rose lines not plain: ${bad.slice(0, 5).join(' || ')} — forms: ${summ(bad)}`);
-      console.log(`rendered-text sweep: ${all.length} lessons (${curLessons.length} curated), ${nLines} lines, ${bad.length} not plain`);
+      console.log(`rendered-text sweep: ${sweep.length}${sweep.length !== all.length ? ` of ${all.length}` : ''} lessons (${curLessons.length} curated), ${nLines} lines, ${bad.length} not plain`);
     });
 
     /* ==================================================== round 7: the school site's own lessons (1366) */
@@ -1178,6 +1190,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
             const l = links.lessonBySite(r.site);
             check(!!l, `detailed ${r.id}: site lesson ${r.site} not listed`);
             if (!l) continue;
+            if ((ONLY_GRADE || ONLY_LESSON) && !sweepHas(l) && r.id !== ONLY_LESSON) continue;
             await freshLoad(links.lessonHash(l), '[data-screen="wrm"].is-active .tvw-head');
             const card = `[data-screen="wrm"].is-active [data-w-dl="${r.id}"]`;
             await waitFor(page, `!!document.querySelector(${JSON.stringify(card)})`, 20000, `detailed card ${r.id}`);

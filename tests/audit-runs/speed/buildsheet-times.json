@@ -1,0 +1,725 @@
+{
+ "date": "2026-10-23T10:36:26.384Z",
+ "rows": [
+  {
+   "skill": "addition:add_20_regroup",
+   "role": "independent",
+   "size": "S",
+   "meanMs": 1904,
+   "firstMs": 2393,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "addition:add_20_regroup",
+   "role": "independent",
+   "size": "M",
+   "meanMs": 1290,
+   "firstMs": 1374,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "addition:add_20_regroup",
+   "role": "independent",
+   "size": "L",
+   "meanMs": 1146,
+   "firstMs": 1136,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "addition:add_20_regroup",
+   "role": "guided",
+   "size": "S",
+   "meanMs": 1865,
+   "firstMs": 1820,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "addition:add_20_regroup",
+   "role": "guided",
+   "size": "M",
+   "meanMs": 1999,
+   "firstMs": 1947,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "addition:add_20_regroup",
+   "role": "guided",
+   "size": "L",
+   "meanMs": 1892,
+   "firstMs": 1789,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "addition:add_20_regroup",
+   "role": "review",
+   "size": "S",
+   "meanMs": 2060,
+   "firstMs": 1908,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "addition:add_20_regroup",
+   "role": "review",
+   "size": "M",
+   "meanMs": 1842,
+   "firstMs": 2014,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "addition:add_20_regroup",
+   "role": "review",
+   "size": "L",
+   "meanMs": 1888,
+   "firstMs": 1796,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "addition:add_20_regroup",
+   "role": "test",
+   "size": "S",
+   "meanMs": 967,
+   "firstMs": 1025,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "addition:add_20_regroup",
+   "role": "test",
+   "size": "M",
+   "meanMs": 907,
+   "firstMs": 846,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "addition:add_20_regroup",
+   "role": "test",
+   "size": "L",
+   "meanMs": 770,
+   "firstMs": 833,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "multiplication:multiply",
+   "role": "independent",
+   "size": "S",
+   "meanMs": 1704,
+   "firstMs": 1663,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "multiplication:multiply",
+   "role": "independent",
+   "size": "M",
+   "meanMs": 1172,
+   "firstMs": 1335,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "multiplication:multiply",
+   "role": "independent",
+   "size": "L",
+   "meanMs": 1243,
+   "firstMs": 1203,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "multiplication:multiply",
+   "role": "guided",
+   "size": "S",
+   "meanMs": 1841,
+   "firstMs": 1882,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "multiplication:multiply",
+   "role": "guided",
+   "size": "M",
+   "meanMs": 2040,
+   "firstMs": 1971,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "multiplication:multiply",
+   "role": "guided",
+   "size": "L",
+   "meanMs": 1864,
+   "firstMs": 1873,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "multiplication:multiply",
+   "role": "review",
+   "size": "S",
+   "meanMs": 1845,
+   "firstMs": 1802,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "multiplication:multiply",
+   "role": "review",
+   "size": "M",
+   "meanMs": 2025,
+   "firstMs": 2145,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "multiplication:multiply",
+   "role": "review",
+   "size": "L",
+   "meanMs": 1992,
+   "firstMs": 2086,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "multiplication:multiply",
+   "role": "test",
+   "size": "S",
+   "meanMs": 1130,
+   "firstMs": 1126,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "multiplication:multiply",
+   "role": "test",
+   "size": "M",
+   "meanMs": 973,
+   "firstMs": 993,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "multiplication:multiply",
+   "role": "test",
+   "size": "L",
+   "meanMs": 845,
+   "firstMs": 816,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "fractions:equiv_frac_visual",
+   "role": "independent",
+   "size": "S",
+   "meanMs": 1946,
+   "firstMs": 1958,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "fractions:equiv_frac_visual",
+   "role": "independent",
+   "size": "M",
+   "meanMs": 1414,
+   "firstMs": 1502,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "fractions:equiv_frac_visual",
+   "role": "independent",
+   "size": "L",
+   "meanMs": 1364,
+   "firstMs": 1315,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "fractions:equiv_frac_visual",
+   "role": "guided",
+   "size": "S",
+   "meanMs": 1905,
+   "firstMs": 1745,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "fractions:equiv_frac_visual",
+   "role": "guided",
+   "size": "M",
+   "meanMs": 2097,
+   "firstMs": 2069,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "fractions:equiv_frac_visual",
+   "role": "guided",
+   "size": "L",
+   "meanMs": 1997,
+   "firstMs": 2069,
+   "pages": [
+    2,
+    2
+   ],
+   "err": null
+  },
+  {
+   "skill": "fractions:equiv_frac_visual",
+   "role": "review",
+   "size": "S",
+   "meanMs": 1896,
+   "firstMs": 1814,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "fractions:equiv_frac_visual",
+   "role": "review",
+   "size": "M",
+   "meanMs": 2174,
+   "firstMs": 2390,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "fractions:equiv_frac_visual",
+   "role": "review",
+   "size": "L",
+   "meanMs": 2004,
+   "firstMs": 2043,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "fractions:equiv_frac_visual",
+   "role": "test",
+   "size": "S",
+   "meanMs": 345,
+   "firstMs": 325,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "fractions:equiv_frac_visual",
+   "role": "test",
+   "size": "M",
+   "meanMs": 290,
+   "firstMs": 283,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "fractions:equiv_frac_visual",
+   "role": "test",
+   "size": "L",
+   "meanMs": 332,
+   "firstMs": 278,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "placevalue:identify",
+   "role": "independent",
+   "size": "S",
+   "meanMs": 1697,
+   "firstMs": 1601,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "placevalue:identify",
+   "role": "independent",
+   "size": "M",
+   "meanMs": 1224,
+   "firstMs": 1149,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "placevalue:identify",
+   "role": "independent",
+   "size": "L",
+   "meanMs": 1217,
+   "firstMs": 1323,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "placevalue:identify",
+   "role": "guided",
+   "size": "S",
+   "meanMs": 2054,
+   "firstMs": 1752,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "placevalue:identify",
+   "role": "guided",
+   "size": "M",
+   "meanMs": 1783,
+   "firstMs": 1974,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "placevalue:identify",
+   "role": "guided",
+   "size": "L",
+   "meanMs": 1900,
+   "firstMs": 1673,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "placevalue:identify",
+   "role": "review",
+   "size": "S",
+   "meanMs": 2160,
+   "firstMs": 2400,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "placevalue:identify",
+   "role": "review",
+   "size": "M",
+   "meanMs": 2075,
+   "firstMs": 2147,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "placevalue:identify",
+   "role": "review",
+   "size": "L",
+   "meanMs": 1949,
+   "firstMs": 1937,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "placevalue:identify",
+   "role": "test",
+   "size": "S",
+   "meanMs": 1058,
+   "firstMs": 981,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "placevalue:identify",
+   "role": "test",
+   "size": "M",
+   "meanMs": 732,
+   "firstMs": 712,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "placevalue:identify",
+   "role": "test",
+   "size": "L",
+   "meanMs": 688,
+   "firstMs": 668,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "multiplication:count_by_tables",
+   "role": "independent",
+   "size": "S",
+   "meanMs": 2333,
+   "firstMs": 2345,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "multiplication:count_by_tables",
+   "role": "independent",
+   "size": "M",
+   "meanMs": 1858,
+   "firstMs": 1756,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "multiplication:count_by_tables",
+   "role": "independent",
+   "size": "L",
+   "meanMs": 1869,
+   "firstMs": 1765,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "multiplication:count_by_tables",
+   "role": "guided",
+   "size": "S",
+   "meanMs": 2787,
+   "firstMs": 2681,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "multiplication:count_by_tables",
+   "role": "guided",
+   "size": "M",
+   "meanMs": 2803,
+   "firstMs": 2737,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "multiplication:count_by_tables",
+   "role": "guided",
+   "size": "L",
+   "meanMs": 2846,
+   "firstMs": 2753,
+   "pages": [
+    2,
+    2
+   ],
+   "err": null
+  },
+  {
+   "skill": "multiplication:count_by_tables",
+   "role": "review",
+   "size": "S",
+   "meanMs": 2451,
+   "firstMs": 2427,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "multiplication:count_by_tables",
+   "role": "review",
+   "size": "M",
+   "meanMs": 2780,
+   "firstMs": 2736,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "multiplication:count_by_tables",
+   "role": "review",
+   "size": "L",
+   "meanMs": 2418,
+   "firstMs": 2365,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "multiplication:count_by_tables",
+   "role": "test",
+   "size": "S",
+   "meanMs": 498,
+   "firstMs": 510,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "multiplication:count_by_tables",
+   "role": "test",
+   "size": "M",
+   "meanMs": 488,
+   "firstMs": 533,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  },
+  {
+   "skill": "multiplication:count_by_tables",
+   "role": "test",
+   "size": "L",
+   "meanMs": 450,
+   "firstMs": 439,
+   "pages": [
+    1,
+    1
+   ],
+   "err": null
+  }
+ ]
+}

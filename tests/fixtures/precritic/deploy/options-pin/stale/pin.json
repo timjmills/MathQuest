@@ -1,0 +1,10 @@
+{
+ "note": "fixture pin (ws-deploy-gates --self-test, options gate)",
+ "pinned": "2026-10-20",
+ "skills": {
+  "composing:number_word_form": [
+   "zeroPlace=\"never\""
+  ],
+  "subtraction:sub_50_no_regroup": []
+ }
+}

@@ -10,6 +10,7 @@
 import { opGlyph, trackMm, SIZES, factTab, stripPos } from '../tokens.js';
 import { blank, esc } from '../cell.js';
 import { register } from '../registry.js';
+import { markWriteAbove } from '../cell.js';
 import { stepMarks, placeDigits, regroupMarks, PLACE_OFFSET } from '../steps.js';
 import { touchMode, touchColumns, touchOpts, touchDigit } from '../support-draw.js';
 
@@ -193,6 +194,24 @@ function regroupTracks(kind, t, topDigits) {
 }
 
 /**
+ * CL-4b: does this item's written working put marks ABOVE the columns (a carry, an exchange)?
+ * Read from the operands, never the skill name.
+ */
+export function needsRegroup(p, t) {
+    if (p.op === '+' || p.op === '-' || p.op === '−') return regroupWorking(p, t).vals.some((v) => v);
+    if (p.op === 'x' || p.op === '×' || p.op === '*') {
+        const A = String(p.a ?? '').replace(/\D/g, ''), B = String(p.b ?? '').replace(/\D/g, '');
+        if (A.length < 2 && B.length < 2) return false;
+        for (const d of B) {
+            let c = 0;
+            for (let i = A.length - 1; i >= 0; i--) { const v = Number(A[i]) * Number(d) + c; c = Math.floor(v / 10); if (c && i > 0) return true; }
+        }
+        return false;
+    }
+    return false;
+}
+
+/**
  * AK-2 (owner ruling 2026-09-25: keys FILL the regroup / carry boxes): the full written working of
  * a column sum or difference, one entry per track. Addition: the carry written over each column
  * that receives one. Subtraction: the new value of every top digit a regroup changed (the 5 over
@@ -347,7 +366,10 @@ register('stack', {
             ans: shown === undefined ? null : shown,
             unknown: p.unknown || null,
         });
-        return withCheck ? drawn + checkRowHtml(p, ctx, key) : drawn;
+        // CL-4b: a stack whose working regroups is written ABOVE the columns, so its cell is
+        // centred down the box (data-ws-writeabove on the stack, lifted onto the cell by cell()).
+        const top = needsRegroup(p, t) ? markWriteAbove(drawn) : drawn;
+        return withCheck ? top + checkRowHtml(p, ctx, key) : top;
     },
     answerKey(p) {
         const value = p.ans !== undefined ? p.ans : compute(p);

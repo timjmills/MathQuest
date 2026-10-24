@@ -1,0 +1,10 @@
+{
+  "$schema": "../manifest.schema.json",
+  "version": 1,
+  "lane": "teacher-site",
+  "mergeOrder": 40,
+  "description": "Starter manifest (E5). Add this lane's new skills, providers and lessons here; never edit the shared registry files.",
+  "skills": [],
+  "providers": [],
+  "lessons": []
+}

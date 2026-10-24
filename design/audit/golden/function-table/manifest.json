@@ -1,0 +1,912 @@
+{
+ "tool": "tests/scripts/ws-grade-render.cjs",
+ "version": 1,
+ "name": "function-table",
+ "template": "function-table",
+ "envelope": null,
+ "args": "--template function-table --golden write --contact-sheet",
+ "ruleSet": "ba0d584c7e6b96fc",
+ "ruleSetFiles": {
+  "design/audit/RUBRIC.md": "b6c3e3ada82a51a1",
+  "design/audit/LESSONS_LEARNED.md": "0747088d760f8ebf",
+  "WORKSHEET_DESIGN_STANDARD.md": "df43eb6f86b7cb46",
+  "PEDAGOGY_STANDARD.md": "937c13edacb1858f",
+  "design/PAGE_TYPES.md": "d367e7d8a0cdf9dc",
+  "design/PROBLEM_TYPES.md": "9c55bc9516696b78"
+ },
+ "round": 0,
+ "written": "2026-10-23",
+ "renders": "design/audit/golden/function-table/renders",
+ "skills": [
+  "algebra:function_table_easy",
+  "algebra:function_table_hard",
+  "algebra:function_table_find_rule",
+  "algebra:function_table_find_inputs"
+ ],
+ "pages": [
+  {
+   "id": "algebra:function_table_easy|independent|M|key|p1",
+   "kind": "print",
+   "skill": "algebra:function_table_easy",
+   "label": "Function Tables - Easy (Visual)",
+   "role": "independent",
+   "size": "M",
+   "part": "key",
+   "page": 1,
+   "opts": null,
+   "optsKey": null,
+   "seed": 784661,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_easy/independent-M-key-p1.png",
+   "contentHash": "a107aac6c2799734",
+   "measured": {
+    "cells": 6,
+    "digitPt": {
+     "max": 22,
+     "median": 22,
+     "min": 13
+    },
+    "slots": {
+     "n": 24,
+     "minMm": [
+      14,
+      9
+     ],
+     "sizes": [
+      "14x9 mm ×24"
+     ]
+    },
+    "band": {
+     "hPct": 4.7,
+     "wPct": 22.3,
+     "cell": 6
+    },
+    "footPct": 0.2,
+    "fits": "2x3",
+    "problems": 0
+   }
+  },
+  {
+   "id": "algebra:function_table_easy|independent|M|pupil|p1",
+   "kind": "print",
+   "skill": "algebra:function_table_easy",
+   "label": "Function Tables - Easy (Visual)",
+   "role": "independent",
+   "size": "M",
+   "part": "pupil",
+   "page": 1,
+   "opts": null,
+   "optsKey": null,
+   "seed": 784661,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_easy/independent-M-p1.png",
+   "contentHash": "7a306f7c4e435bc6",
+   "measured": {
+    "cells": 6,
+    "digitPt": {
+     "max": 22,
+     "median": 22,
+     "min": 13
+    },
+    "slots": {
+     "n": 24,
+     "minMm": [
+      14,
+      9
+     ],
+     "sizes": [
+      "14x9 mm ×24"
+     ]
+    },
+    "band": {
+     "hPct": 4.7,
+     "wPct": 22.3,
+     "cell": 6
+    },
+    "footPct": 0.2,
+    "fits": "2x3",
+    "problems": 0
+   }
+  },
+  {
+   "id": "algebra:function_table_easy|screen|card|1280",
+   "kind": "screen",
+   "skill": "algebra:function_table_easy",
+   "label": "Function Tables - Easy (Visual)",
+   "host": "card",
+   "width": 1280,
+   "height": null,
+   "opts": null,
+   "optsKey": null,
+   "seed": 2169832703,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_easy/card-1280.png",
+   "contentHash": "577559e0076723e9",
+   "measured": {
+    "hScroll": 0,
+    "smallTargets": 0,
+    "colours": 12,
+    "fonts": [
+     "Andika",
+     "Nunito"
+    ]
+   }
+  },
+  {
+   "id": "algebra:function_table_easy|screen|card|1366x768",
+   "kind": "screen",
+   "skill": "algebra:function_table_easy",
+   "label": "Function Tables - Easy (Visual)",
+   "host": "card",
+   "width": 1366,
+   "height": 768,
+   "opts": null,
+   "optsKey": null,
+   "seed": 2169832703,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_easy/card-1366x768.png",
+   "contentHash": "bd0295b1eb30c308",
+   "measured": {
+    "hScroll": 0,
+    "smallTargets": 0,
+    "colours": 12,
+    "fonts": [
+     "Andika",
+     "Nunito"
+    ]
+   }
+  },
+  {
+   "id": "algebra:function_table_easy|screen|card|390",
+   "kind": "screen",
+   "skill": "algebra:function_table_easy",
+   "label": "Function Tables - Easy (Visual)",
+   "host": "card",
+   "width": 390,
+   "height": null,
+   "opts": null,
+   "optsKey": null,
+   "seed": 2169832703,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_easy/card-390.png",
+   "contentHash": "577559e0076723e9",
+   "measured": {
+    "hScroll": 0,
+    "smallTargets": 4,
+    "colours": 12,
+    "fonts": [
+     "Andika",
+     "Nunito"
+    ]
+   }
+  },
+  {
+   "id": "algebra:function_table_easy|screen|card|820",
+   "kind": "screen",
+   "skill": "algebra:function_table_easy",
+   "label": "Function Tables - Easy (Visual)",
+   "host": "card",
+   "width": 820,
+   "height": null,
+   "opts": null,
+   "optsKey": null,
+   "seed": 2169832703,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_easy/card-820.png",
+   "contentHash": "bd0295b1eb30c308",
+   "measured": {
+    "hScroll": 0,
+    "smallTargets": 0,
+    "colours": 12,
+    "fonts": [
+     "Andika",
+     "Nunito"
+    ]
+   }
+  },
+  {
+   "id": "algebra:function_table_easy|screen|quiz|1280",
+   "kind": "screen",
+   "skill": "algebra:function_table_easy",
+   "label": "Function Tables - Easy (Visual)",
+   "host": "quiz",
+   "width": 1280,
+   "height": null,
+   "opts": null,
+   "optsKey": null,
+   "seed": 1253289876,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_easy/quiz-1280.png",
+   "contentHash": "b99f42d0262cdbe4",
+   "measured": {
+    "hScroll": 0,
+    "smallTargets": 0,
+    "colours": 12,
+    "fonts": [
+     "Andika",
+     "Nunito"
+    ]
+   }
+  },
+  {
+   "id": "algebra:function_table_easy|screen|worksheet|1280",
+   "kind": "screen",
+   "skill": "algebra:function_table_easy",
+   "label": "Function Tables - Easy (Visual)",
+   "host": "worksheet",
+   "width": 1280,
+   "height": null,
+   "opts": null,
+   "optsKey": null,
+   "seed": 1261475171,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_easy/worksheet-1280.png",
+   "contentHash": "65b4b6bb1020c26f",
+   "measured": {
+    "hScroll": 0,
+    "smallTargets": 24,
+    "colours": 9,
+    "fonts": [
+     "Andika",
+     "Nunito"
+    ]
+   }
+  },
+  {
+   "id": "algebra:function_table_find_inputs|independent|M|key|p1",
+   "kind": "print",
+   "skill": "algebra:function_table_find_inputs",
+   "label": "Function Tables: Find the Missing In Numbers",
+   "role": "independent",
+   "size": "M",
+   "part": "key",
+   "page": 1,
+   "opts": null,
+   "optsKey": null,
+   "seed": 823548,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_find_inputs/independent-M-key-p1.png",
+   "contentHash": "4aa6e01dad2962eb",
+   "measured": {
+    "cells": 6,
+    "digitPt": {
+     "max": 22,
+     "median": 22,
+     "min": 13
+    },
+    "slots": {
+     "n": 24,
+     "minMm": [
+      14,
+      9
+     ],
+     "sizes": [
+      "14x9 mm ×24"
+     ]
+    },
+    "band": {
+     "hPct": 4.7,
+     "wPct": 22.3,
+     "cell": 6
+    },
+    "footPct": 0.2,
+    "fits": "2x3",
+    "problems": 0
+   }
+  },
+  {
+   "id": "algebra:function_table_find_inputs|independent|M|pupil|p1",
+   "kind": "print",
+   "skill": "algebra:function_table_find_inputs",
+   "label": "Function Tables: Find the Missing In Numbers",
+   "role": "independent",
+   "size": "M",
+   "part": "pupil",
+   "page": 1,
+   "opts": null,
+   "optsKey": null,
+   "seed": 823548,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_find_inputs/independent-M-p1.png",
+   "contentHash": "52ef7054815f5393",
+   "measured": {
+    "cells": 6,
+    "digitPt": {
+     "max": 22,
+     "median": 22,
+     "min": 13
+    },
+    "slots": {
+     "n": 24,
+     "minMm": [
+      14,
+      9
+     ],
+     "sizes": [
+      "14x9 mm ×24"
+     ]
+    },
+    "band": {
+     "hPct": 4.7,
+     "wPct": 22.3,
+     "cell": 6
+    },
+    "footPct": 0.2,
+    "fits": "2x3",
+    "problems": 0
+   }
+  },
+  {
+   "id": "algebra:function_table_find_inputs|screen|card|1280",
+   "kind": "screen",
+   "skill": "algebra:function_table_find_inputs",
+   "label": "Function Tables: Find the Missing In Numbers",
+   "host": "card",
+   "width": 1280,
+   "height": null,
+   "opts": null,
+   "optsKey": null,
+   "seed": 543365364,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_find_inputs/card-1280.png",
+   "contentHash": "3b8c61543ee5a3a6",
+   "measured": {
+    "hScroll": 0,
+    "smallTargets": 0,
+    "colours": 12,
+    "fonts": [
+     "Andika",
+     "Nunito"
+    ]
+   }
+  },
+  {
+   "id": "algebra:function_table_find_inputs|screen|card|1366x768",
+   "kind": "screen",
+   "skill": "algebra:function_table_find_inputs",
+   "label": "Function Tables: Find the Missing In Numbers",
+   "host": "card",
+   "width": 1366,
+   "height": 768,
+   "opts": null,
+   "optsKey": null,
+   "seed": 543365364,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_find_inputs/card-1366x768.png",
+   "contentHash": "7ccd99d04e0bd072",
+   "measured": {
+    "hScroll": 0,
+    "smallTargets": 0,
+    "colours": 12,
+    "fonts": [
+     "Andika",
+     "Nunito"
+    ]
+   }
+  },
+  {
+   "id": "algebra:function_table_find_inputs|screen|card|390",
+   "kind": "screen",
+   "skill": "algebra:function_table_find_inputs",
+   "label": "Function Tables: Find the Missing In Numbers",
+   "host": "card",
+   "width": 390,
+   "height": null,
+   "opts": null,
+   "optsKey": null,
+   "seed": 543365364,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_find_inputs/card-390.png",
+   "contentHash": "3b8c61543ee5a3a6",
+   "measured": {
+    "hScroll": 0,
+    "smallTargets": 4,
+    "colours": 12,
+    "fonts": [
+     "Andika",
+     "Nunito"
+    ]
+   }
+  },
+  {
+   "id": "algebra:function_table_find_inputs|screen|card|820",
+   "kind": "screen",
+   "skill": "algebra:function_table_find_inputs",
+   "label": "Function Tables: Find the Missing In Numbers",
+   "host": "card",
+   "width": 820,
+   "height": null,
+   "opts": null,
+   "optsKey": null,
+   "seed": 543365364,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_find_inputs/card-820.png",
+   "contentHash": "7ccd99d04e0bd072",
+   "measured": {
+    "hScroll": 0,
+    "smallTargets": 0,
+    "colours": 12,
+    "fonts": [
+     "Andika",
+     "Nunito"
+    ]
+   }
+  },
+  {
+   "id": "algebra:function_table_find_inputs|screen|quiz|1280",
+   "kind": "screen",
+   "skill": "algebra:function_table_find_inputs",
+   "label": "Function Tables: Find the Missing In Numbers",
+   "host": "quiz",
+   "width": 1280,
+   "height": null,
+   "opts": null,
+   "optsKey": null,
+   "seed": 3593237891,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_find_inputs/quiz-1280.png",
+   "contentHash": "f108b23a9342376b",
+   "measured": {
+    "hScroll": 0,
+    "smallTargets": 0,
+    "colours": 12,
+    "fonts": [
+     "Andika",
+     "Nunito"
+    ]
+   }
+  },
+  {
+   "id": "algebra:function_table_find_inputs|screen|worksheet|1280",
+   "kind": "screen",
+   "skill": "algebra:function_table_find_inputs",
+   "label": "Function Tables: Find the Missing In Numbers",
+   "host": "worksheet",
+   "width": 1280,
+   "height": null,
+   "opts": null,
+   "optsKey": null,
+   "seed": 974733646,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_find_inputs/worksheet-1280.png",
+   "contentHash": "0f67baba9f98ce94",
+   "measured": {
+    "hScroll": 0,
+    "smallTargets": 24,
+    "colours": 9,
+    "fonts": [
+     "Andika",
+     "Nunito"
+    ]
+   }
+  },
+  {
+   "id": "algebra:function_table_find_rule|independent|M|key|p1",
+   "kind": "print",
+   "skill": "algebra:function_table_find_rule",
+   "label": "Function Tables: Find the Rule",
+   "role": "independent",
+   "size": "M",
+   "part": "key",
+   "page": 1,
+   "opts": null,
+   "optsKey": null,
+   "seed": 643675,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_find_rule/independent-M-key-p1.png",
+   "contentHash": "e3153fc3261ac877",
+   "measured": {
+    "cells": 6,
+    "digitPt": {
+     "max": 22,
+     "median": 22,
+     "min": 22
+    },
+    "slots": {
+     "n": 12,
+     "minMm": [
+      9,
+      9
+     ],
+     "sizes": [
+      "9x9 mm ×6",
+      "14x9 mm ×6"
+     ]
+    },
+    "band": {
+     "hPct": 14.4,
+     "wPct": 8.3,
+     "cell": 1
+    },
+    "footPct": 0.2,
+    "fits": "3x2",
+    "problems": 0
+   }
+  },
+  {
+   "id": "algebra:function_table_find_rule|independent|M|pupil|p1",
+   "kind": "print",
+   "skill": "algebra:function_table_find_rule",
+   "label": "Function Tables: Find the Rule",
+   "role": "independent",
+   "size": "M",
+   "part": "pupil",
+   "page": 1,
+   "opts": null,
+   "optsKey": null,
+   "seed": 643675,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_find_rule/independent-M-p1.png",
+   "contentHash": "7ae9368f291d579d",
+   "measured": {
+    "cells": 6,
+    "digitPt": {
+     "max": 22,
+     "median": 22,
+     "min": 22
+    },
+    "slots": {
+     "n": 12,
+     "minMm": [
+      9,
+      9
+     ],
+     "sizes": [
+      "9x9 mm ×6",
+      "14x9 mm ×6"
+     ]
+    },
+    "band": {
+     "hPct": 14.4,
+     "wPct": 8.3,
+     "cell": 1
+    },
+    "footPct": 0.2,
+    "fits": "3x2",
+    "problems": 0
+   }
+  },
+  {
+   "id": "algebra:function_table_find_rule|screen|card|1280",
+   "kind": "screen",
+   "skill": "algebra:function_table_find_rule",
+   "label": "Function Tables: Find the Rule",
+   "host": "card",
+   "width": 1280,
+   "height": null,
+   "opts": null,
+   "optsKey": null,
+   "seed": 1079680061,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_find_rule/card-1280.png",
+   "contentHash": "acbb0361cef20973",
+   "measured": {
+    "hScroll": 0,
+    "smallTargets": 0,
+    "colours": 12,
+    "fonts": [
+     "Andika",
+     "Nunito"
+    ]
+   }
+  },
+  {
+   "id": "algebra:function_table_find_rule|screen|card|1366x768",
+   "kind": "screen",
+   "skill": "algebra:function_table_find_rule",
+   "label": "Function Tables: Find the Rule",
+   "host": "card",
+   "width": 1366,
+   "height": 768,
+   "opts": null,
+   "optsKey": null,
+   "seed": 1079680061,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_find_rule/card-1366x768.png",
+   "contentHash": "1218bcaa1f58d1d0",
+   "measured": {
+    "hScroll": 0,
+    "smallTargets": 0,
+    "colours": 12,
+    "fonts": [
+     "Andika",
+     "Nunito"
+    ]
+   }
+  },
+  {
+   "id": "algebra:function_table_find_rule|screen|card|390",
+   "kind": "screen",
+   "skill": "algebra:function_table_find_rule",
+   "label": "Function Tables: Find the Rule",
+   "host": "card",
+   "width": 390,
+   "height": null,
+   "opts": null,
+   "optsKey": null,
+   "seed": 1079680061,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_find_rule/card-390.png",
+   "contentHash": "acbb0361cef20973",
+   "measured": {
+    "hScroll": 0,
+    "smallTargets": 2,
+    "colours": 12,
+    "fonts": [
+     "Andika",
+     "Nunito"
+    ]
+   }
+  },
+  {
+   "id": "algebra:function_table_find_rule|screen|card|820",
+   "kind": "screen",
+   "skill": "algebra:function_table_find_rule",
+   "label": "Function Tables: Find the Rule",
+   "host": "card",
+   "width": 820,
+   "height": null,
+   "opts": null,
+   "optsKey": null,
+   "seed": 1079680061,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_find_rule/card-820.png",
+   "contentHash": "1218bcaa1f58d1d0",
+   "measured": {
+    "hScroll": 0,
+    "smallTargets": 0,
+    "colours": 12,
+    "fonts": [
+     "Andika",
+     "Nunito"
+    ]
+   }
+  },
+  {
+   "id": "algebra:function_table_find_rule|screen|quiz|1280",
+   "kind": "screen",
+   "skill": "algebra:function_table_find_rule",
+   "label": "Function Tables: Find the Rule",
+   "host": "quiz",
+   "width": 1280,
+   "height": null,
+   "opts": null,
+   "optsKey": null,
+   "seed": 2878568134,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_find_rule/quiz-1280.png",
+   "contentHash": "d09deaee2b284378",
+   "measured": {
+    "hScroll": 0,
+    "smallTargets": 0,
+    "colours": 12,
+    "fonts": [
+     "Andika",
+     "Nunito"
+    ]
+   }
+  },
+  {
+   "id": "algebra:function_table_find_rule|screen|worksheet|1280",
+   "kind": "screen",
+   "skill": "algebra:function_table_find_rule",
+   "label": "Function Tables: Find the Rule",
+   "host": "worksheet",
+   "width": 1280,
+   "height": null,
+   "opts": null,
+   "optsKey": null,
+   "seed": 476227057,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_find_rule/worksheet-1280.png",
+   "contentHash": "8bfb8af9c41e37e7",
+   "measured": {
+    "hScroll": 0,
+    "smallTargets": 12,
+    "colours": 9,
+    "fonts": [
+     "Andika",
+     "Nunito"
+    ]
+   }
+  },
+  {
+   "id": "algebra:function_table_hard|independent|M|key|p1",
+   "kind": "print",
+   "skill": "algebra:function_table_hard",
+   "label": "Function Tables - Hard (Visual)",
+   "role": "independent",
+   "size": "M",
+   "part": "key",
+   "page": 1,
+   "opts": null,
+   "optsKey": null,
+   "seed": 783386,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_hard/independent-M-key-p1.png",
+   "contentHash": "074fd273d3de1360",
+   "measured": {
+    "cells": 6,
+    "digitPt": {
+     "max": 22,
+     "median": 22,
+     "min": 22
+    },
+    "slots": {
+     "n": 24,
+     "minMm": [
+      9,
+      9
+     ],
+     "sizes": [
+      "14x9 mm ×15",
+      "9x9 mm ×9"
+     ]
+    },
+    "band": {
+     "hPct": 15.3,
+     "wPct": 8.3,
+     "cell": 5
+    },
+    "footPct": 0.2,
+    "fits": "3x2",
+    "problems": 0
+   }
+  },
+  {
+   "id": "algebra:function_table_hard|independent|M|pupil|p1",
+   "kind": "print",
+   "skill": "algebra:function_table_hard",
+   "label": "Function Tables - Hard (Visual)",
+   "role": "independent",
+   "size": "M",
+   "part": "pupil",
+   "page": 1,
+   "opts": null,
+   "optsKey": null,
+   "seed": 783386,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_hard/independent-M-p1.png",
+   "contentHash": "ebe2652550e298e6",
+   "measured": {
+    "cells": 6,
+    "digitPt": {
+     "max": 22,
+     "median": 22,
+     "min": 22
+    },
+    "slots": {
+     "n": 24,
+     "minMm": [
+      9,
+      9
+     ],
+     "sizes": [
+      "14x9 mm ×15",
+      "9x9 mm ×9"
+     ]
+    },
+    "band": {
+     "hPct": 15.3,
+     "wPct": 8.3,
+     "cell": 5
+    },
+    "footPct": 0.2,
+    "fits": "3x2",
+    "problems": 0
+   }
+  },
+  {
+   "id": "algebra:function_table_hard|screen|card|1280",
+   "kind": "screen",
+   "skill": "algebra:function_table_hard",
+   "label": "Function Tables - Hard (Visual)",
+   "host": "card",
+   "width": 1280,
+   "height": null,
+   "opts": null,
+   "optsKey": null,
+   "seed": 1511329906,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_hard/card-1280.png",
+   "contentHash": "a11cfcc3266cc058",
+   "measured": {
+    "hScroll": 0,
+    "smallTargets": 0,
+    "colours": 12,
+    "fonts": [
+     "Andika",
+     "Nunito"
+    ]
+   }
+  },
+  {
+   "id": "algebra:function_table_hard|screen|card|1366x768",
+   "kind": "screen",
+   "skill": "algebra:function_table_hard",
+   "label": "Function Tables - Hard (Visual)",
+   "host": "card",
+   "width": 1366,
+   "height": 768,
+   "opts": null,
+   "optsKey": null,
+   "seed": 1511329906,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_hard/card-1366x768.png",
+   "contentHash": "1edd3f77af8e3ecf",
+   "measured": {
+    "hScroll": 0,
+    "smallTargets": 0,
+    "colours": 12,
+    "fonts": [
+     "Andika",
+     "Nunito"
+    ]
+   }
+  },
+  {
+   "id": "algebra:function_table_hard|screen|card|390",
+   "kind": "screen",
+   "skill": "algebra:function_table_hard",
+   "label": "Function Tables - Hard (Visual)",
+   "host": "card",
+   "width": 390,
+   "height": null,
+   "opts": null,
+   "optsKey": null,
+   "seed": 1511329906,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_hard/card-390.png",
+   "contentHash": "a11cfcc3266cc058",
+   "measured": {
+    "hScroll": 0,
+    "smallTargets": 4,
+    "colours": 12,
+    "fonts": [
+     "Andika",
+     "Nunito"
+    ]
+   }
+  },
+  {
+   "id": "algebra:function_table_hard|screen|card|820",
+   "kind": "screen",
+   "skill": "algebra:function_table_hard",
+   "label": "Function Tables - Hard (Visual)",
+   "host": "card",
+   "width": 820,
+   "height": null,
+   "opts": null,
+   "optsKey": null,
+   "seed": 1511329906,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_hard/card-820.png",
+   "contentHash": "1edd3f77af8e3ecf",
+   "measured": {
+    "hScroll": 0,
+    "smallTargets": 0,
+    "colours": 12,
+    "fonts": [
+     "Andika",
+     "Nunito"
+    ]
+   }
+  },
+  {
+   "id": "algebra:function_table_hard|screen|quiz|1280",
+   "kind": "screen",
+   "skill": "algebra:function_table_hard",
+   "label": "Function Tables - Hard (Visual)",
+   "host": "quiz",
+   "width": 1280,
+   "height": null,
+   "opts": null,
+   "optsKey": null,
+   "seed": 2748234181,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_hard/quiz-1280.png",
+   "contentHash": "8dc7dd1434d52d25",
+   "measured": {
+    "hScroll": 0,
+    "smallTargets": 0,
+    "colours": 12,
+    "fonts": [
+     "Andika",
+     "Nunito"
+    ]
+   }
+  },
+  {
+   "id": "algebra:function_table_hard|screen|worksheet|1280",
+   "kind": "screen",
+   "skill": "algebra:function_table_hard",
+   "label": "Function Tables - Hard (Visual)",
+   "host": "worksheet",
+   "width": 1280,
+   "height": null,
+   "opts": null,
+   "optsKey": null,
+   "seed": 504881772,
+   "render": "design/audit/golden/function-table/renders/algebra__function_table_hard/worksheet-1280.png",
+   "contentHash": "ac770daeb87b9e49",
+   "measured": {
+    "hScroll": 0,
+    "smallTargets": 24,
+    "colours": 9,
+    "fonts": [
+     "Andika",
+     "Nunito"
+    ]
+   }
+  }
+ ]
+}

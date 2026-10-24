@@ -31,8 +31,9 @@ export function headerFields(h = {}) {
  * Grade. Lines 1-2 are weight 700, line 3 is 400 (section 3.2).
  * @param {string[]|false} lines
  */
-export const strandTab = (lines) =>
-    (lines ? `<div class="ws-tabbox">${lines.map((t) => `<span>${esc(t)}</span>`).join('')}</div>` : '');
+// Owner ruling 2026-10-23: no strand tab on any page; kept as an export that prints nothing.
+// eslint-disable-next-line no-unused-vars
+export const strandTab = (lines) => '';
 
 /**
  * The "I Can" title (HD-10, HD-15): plain bold Andika, one line, no banner, no icon.
@@ -76,11 +77,13 @@ export const copyrightLine = (year) => `© ${year || new Date().getFullYear()} $
 export function page({ look = DEFAULT_LOOK, size = DEFAULT_SIZE, tab = 6, header = {}, footer = {}, body, cls = '', note = '' }) {
     const h = { name: true, date: true, score: false, tab: false, title: '', ...header };
     const fields = headerFields(h);
-    const tabBox = strandTab(h.tab);
+    // Owner ruling 2026-10-23: no strand-tab box on any page (the "I Can" title names the skill).
+    // The tab lines survive only as unprinted metadata, data-ws-tab, for the lints that read the role.
+    const tabMeta = Array.isArray(h.tab) && h.tab.length ? ` data-ws-tab="${esc(h.tab.join('|'))}"` : '';
     const title = pageTitle(h.title, h.titleNote);
     return `${note ? `<div class="ws-note">${note}</div>` : ''}
-<section class="ws-page ws-${size} ws-${look} ws-tab${tab} ${cls}" data-ws-look="${look}" data-ws-size="${size}">
-  <header class="ws-head"><div class="ws-rowA${h.tab ? '' : ' notab'}">${fields}${tabBox}</div>${title}<div class="ws-headrule"></div></header>${h.refBand ? `
+<section class="ws-page ws-${size} ws-${look} ws-tab${tab} ${cls}" data-ws-look="${look}" data-ws-size="${size}"${tabMeta}>
+  <header class="ws-head"><div class="ws-rowA notab">${fields}</div>${title}<div class="ws-headrule"></div></header>${h.refBand ? `
   ${h.refBand}` : ''}
   <main class="ws-body">${body}</main>
   ${pageFooter(footer)}

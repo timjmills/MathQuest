@@ -382,3 +382,17 @@
 /* owner 2026-10-09: the blank back of a key-on-a-new-sheet run carries one very small line in the
    footer band's centre cell (6 mm band, 7 pt, regular, black), level with the facing pages' footers. Additive. */
 .ws-page.ws-blank-back .ws-blank-foot > .ws-blank-note { font-weight: 400; color: var(--ws-ink); text-align: center; white-space: nowrap; }
+
+/* ---------- CL-4b (owner ruling 2026-10-23): top of the box is the default ----------
+   Additive over the round-3 "safe center" rule above (old saved HTML keeps rendering). Every print
+   cell starts at its top pad with the writing room below, facts included ("centred up, not in the
+   centre"). Exceptions: a cell whose pupil writes ABOVE the problem (data-ws-writeabove: a regroup
+   stack, a division bracket) stays centred down the box, and a cell whose visual IS the workspace
+   (draw the hands, shade the model, plot / place on a line: CL-4) keeps its placement. */
+.ws-page .ws-grid > .ws-cell[data-ws-cell]:not(.blankrun):not([data-ws-writeabove]):not(:has([data-ws-writeabove], .ws-stack-legacy i[data-ws-seg])):not(:is([data-ws-cell="clock"], [data-ws-cell="frac-model"], [data-ws-cell="nl-place"], [data-ws-cell="number-line"], [data-ws-cell="hop-line"], [data-ws-cell="chartwindow"], [data-ws-cell="mult-chart"], [data-ws-cell="tenframe"], [data-ws-legacy]:has(svg))) { justify-content: flex-start; }
+.ws-page .ws-grid > .ws-cell:is([data-ws-writeabove], :has([data-ws-writeabove], .ws-stack-legacy i[data-ws-seg])):not(.blankrun) { justify-content: safe center; }
+/* A legacy stack that draws a carry box only draws it when the item regroups: it is write-above too.
+   A centred stack keeps its tab clearance (CL-41) on both sides so it sits on the cell's true centre. */
+.ws-page .ws-grid > .ws-cell > .ws-stack[data-ws-writeabove] { margin-bottom: calc(var(--ws-tab, 5mm) - 1mm); }
+/* CL-4b: a legacy stack with no carry box keeps no empty carry headroom, so its digits start at the top. */
+.ws-page .ws-cell .ws-stack-legacy:not(:has(i[data-ws-seg])) > span[style*="height:7mm"]:empty { display: none !important; }

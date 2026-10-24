@@ -1,0 +1,10 @@
+{
+ "note": "Pinned ws-screen-slots findings per skill (IMPROVEMENT_PLAN §1.3 / §1.4 S1, S5): `ws-screen-slots --baseline design/audit/baselines/screen-slots.json` fails only on a finding (skill + \"host:kind\") not listed here. Pinned 2026-10-23 on commit 60c4fa53 from a full default run (723 skills, 2892 host renders, 1398 s) and the --dark and --bigboard sweeps on tests/fixtures/precritic/sweep-sample.json. Remove a line when its defect is fixed; never add one to make a NEW finding pass without a STATUS note.",
+ "knownIntermittent": {},
+ "standing": {},
+ "pinned": {
+  "date": "2026-10-23",
+  "commit": "60c4fa53"
+ },
+ "skills": {}
+}

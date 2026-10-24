@@ -274,7 +274,6 @@ calls it with the default, so a lane touching those skills gets a false FAIL. Fo
 precritic.
 
 ## Per-round findings
-
 ### Mixed practice M1 — rounds r1–r6 (lane `mixed-m1`, 2026-10-23)
 
 Result: PASS at r6 (16 pages, all ≥ 8). Target was ≤ 2 rounds; it took 6 (r1–r3 FAIL, r4 14/16, r5 and r6 PASS on the changed pages).

@@ -404,7 +404,7 @@ export function exitSlipPlan({ items, instr, say, tab, title, cellH, cols = 2, g
         // an empty instr = the strip above still applies)
         ...(groups || groupsOf(items, instr).map((g) => Object.assign(g, { cols, cellH }))).flatMap((g) => [
             ...(g.instr ? [{ kind: 'instruction', text: g.instr }] : []),
-            { kind: 'grid', cols: g.cols, rows: Math.ceil(g.items.length / g.cols), labels: 'letter', start: g.start, cls: `fixed dl-exitgrid${copy ? ' dl-copy' : ''}`, height: `${(Math.ceil(g.items.length / g.cols) * g.cellH).toFixed(2)}mm`, items: copy ? g.items.map((it) => Object.assign({}, it, { copy: true })) : g.items },
+            { kind: 'grid', cols: g.cols, rows: Math.ceil(g.items.length / g.cols), labels: 'tab', start: g.start, cls: `fixed dl-exitgrid${copy ? ' dl-copy' : ''}`, height: `${(Math.ceil(g.items.length / g.cols) * g.cellH).toFixed(2)}mm`, items: copy ? g.items.map((it) => Object.assign({}, it, { copy: true })) : g.items },
         ]),
         ...(say ? [{ kind: 'say', frame: say, digits: 3 }] : []),
         { kind: 'html', html: self },

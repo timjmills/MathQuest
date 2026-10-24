@@ -1,0 +1,25 @@
+{
+ "tool": "ws-coverage-matrix",
+ "date": "2026-10-20",
+ "commit": "60c4fa538f0b6abbb2a9eef55a506f4b2c81464a",
+ "dirty": false,
+ "note": "Self-test fixture for ws-deploy-gates.sh --self-test (read with MQ_NOW=2026-10-23T12:00:00Z). \"HEAD\" as the commit resolves to the tree under test.",
+ "finished": "2026-10-20T05:00:00Z",
+ "totals": {
+  "RED": 1
+ },
+ "rows": [
+  {
+   "id": "addition:add_100_regroup|single/defaults",
+   "kind": "single",
+   "skills": [
+    "addition:add_100_regroup"
+   ],
+   "status": "RED"
+  }
+ ],
+ "red": [
+  "addition:add_100_regroup|single/defaults"
+ ],
+ "baseline": null
+}

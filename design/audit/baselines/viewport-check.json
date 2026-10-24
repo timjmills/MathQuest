@@ -1,0 +1,15 @@
+{
+ "tool": "ws-viewport-check",
+ "root": "this tree",
+ "sizes": [
+  "1366x768",
+  "1366x650",
+  "1280x600",
+  "1280x720"
+ ],
+ "modes": [
+  "T0",
+  "T300"
+ ],
+ "findings": []
+}

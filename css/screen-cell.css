@@ -1800,3 +1800,13 @@ html body .mq-scell [data-mq-swiperow][data-mq-wrapfit] .k2-swipe-cues > .k2-swi
 .mq-scell .k2-countrow-frame[data-mq-tabtop] [data-mq-tabfor]:not([data-mq-tabfor="0"]) { display: none !important; }
 .mq-scell .k2-countrow-frame[data-mq-tabtop] [data-mq-tabfor="0"] { height: auto !important; margin: 0 0 4px 0 !important; }
 .mq-scell [data-mq-swiperow][data-mq-wrapfit] .k2-jumpcell[data-mq-leadin] > .k2-jump { visibility: hidden; }
+
+/* W0 dark sweep (2026-10-23): the current problem's card keeps its light cream (#fffbe0) in dark mode, but its
+   number took the dark-mode --mq-ink-2 (#CBC6E0), 1.59:1. On the cream it uses the light ink (7.89:1). */
+html.dark body .online-edition .problem-card.mq-wscard.mq-active-problem .mq-wsbar .mq-wsnum {
+    color: #4F4B6B;
+}
+
+/* CL-4b (owner ruling 2026-10-23), additive: the online worksheet's fitted cell starts at the top of
+   the box; a write-above cell (regroup stack, division bracket) stays centred. */
+.online-edition .problems-grid.mq-wsgrid.mq-wsfit > .problem-card.mq-wscard > .mq-wspaper > .ws-cell.mq-scell:not(:has([data-ws-writeabove])) { justify-content: flex-start; }

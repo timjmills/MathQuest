@@ -44,7 +44,7 @@
 // same wrong answer - an answer key and the page it belongs to can never disagree.
 
 import { register } from './registry.js';
-import { esc, blank, cell } from './cell.js';
+import { esc, blank, cell, tabText } from './cell.js';
 import { resolveCtx, PAPER, DEFAULT_PAPER, SIZES } from './tokens.js';
 import { rng, int, deriveSeed } from './rng.js';
 import { installDefaultAdapters, instructionFor } from './contract.js';
@@ -273,7 +273,7 @@ export function defaultRenderCell(q, ctx = {}) {
     payload.__factLike = fp.factLike;
     const inner = LEGACY_TEMPLATE.render(payload, c);
     const lab = c.label && c.label.style && c.label.style !== 'none'
-        ? `<span class="ws-${c.label.style === 'tab' ? 'tab' : 'letter'}" data-ws-label="${c.label.style}">${esc(c.label.text || '')}</span>`
+        ? `<span class="ws-tab" data-ws-label="tab">${esc(tabText(c.label.text))}</span>`   // CL-11a
         : '';
     return cell(inner, {
         label: lab,

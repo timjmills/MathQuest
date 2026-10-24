@@ -1,0 +1,141 @@
+{
+ "about": "The backtest table of IMPROVEMENT_PLAN §1.4 S2 as data. Each new check must FAIL on the state a critic failed and PASS on the fix. kind 'fixture': {fixture} is replaced by the variant's file. kind 'commit-pair': the runner checks out each commit in a temporary git worktree, {root} is replaced by its path (and MQ_ROOT is set to it), and the check script is always the CURRENT tree's. browser: true rows run through /tmp/mq-browser-run.sh. pending: true rows have no command yet and report PENDING, never OK. Run: node tests/scripts/ws-backtest.mjs",
+ "rows": [
+  {
+   "id": "notation",
+   "check": "Notation (C4: × not x, ÷ not /, stacked fractions, the instruction library's wording)",
+   "kind": "fixture",
+   "rule": "ws-node-lint NOTATION",
+   "fail": { "fixture": "tests/fixtures/precritic/notation.fail.mjs", "state": "an item printing \"3 x 4 =\" and an inline \"1/2\", and an instruction not in the library" },
+   "pass": { "fixture": "tests/fixtures/precritic/notation.pass.mjs", "state": "× sign, stacked fraction, library instruction" },
+   "command": "node tests/scripts/ws-node-lint.mjs --fixture {fixture}",
+   "expect": { "fail": "FAIL", "pass": "OK" }
+  },
+  {
+   "id": "l1-sizes",
+   "check": "L1 sizes (S fits more than L; drawings scale)",
+   "kind": "fixture",
+   "rule": "ws-node-lint L1",
+   "fail": { "fixture": "tests/fixtures/precritic/l1-sizes.fail.mjs", "state": "options critic R3 OC14: fixed grid and fixed drawing at S (2 x 3 at S as at L)" },
+   "pass": { "fixture": "tests/fixtures/precritic/l1-sizes.pass.mjs", "state": "track drawn from ctx.metrics: S fits more" },
+   "command": "node tests/scripts/ws-node-lint.mjs --fixture {fixture}",
+   "expect": { "fail": "FAIL", "pass": "OK" }
+  },
+  {
+   "id": "l3-key",
+   "check": "L3 key value inside the question drawing",
+   "kind": "fixture",
+   "rule": "ws-node-lint L3",
+   "fail": { "fixture": "tests/fixtures/precritic/l3-key.fail.mjs", "state": "a combine-shapes item drawing (and naming) its result" },
+   "pass": { "fixture": "tests/fixtures/precritic/l3-key.pass.mjs", "state": "the result is a ? box" },
+   "command": "node tests/scripts/ws-node-lint.mjs --fixture {fixture}",
+   "expect": { "fail": "FAIL", "pass": "OK" }
+  },
+  {
+   "id": "l6-steps",
+   "check": "L6 instruction / steps / Say line mention only the item's own numbers and task",
+   "kind": "fixture",
+   "rule": "ws-node-lint L6",
+   "fail": { "fixture": "tests/fixtures/precritic/l6-steps.fail.mjs", "state": "guided steps for other numbers (26 + 15 on every item)" },
+   "pass": { "fixture": "tests/fixtures/precritic/l6-steps.pass.mjs", "state": "steps derived from the item" },
+   "command": "node tests/scripts/ws-node-lint.mjs --fixture {fixture}",
+   "expect": { "fail": "FAIL", "pass": "OK" }
+  },
+  {
+   "id": "l10-cycle",
+   "check": "L10 answer position / value cycle over 30 items",
+   "kind": "fixture",
+   "rule": "ws-node-lint L10",
+   "fail": { "fixture": "tests/fixtures/precritic/l10-cycle.fail.mjs", "state": "A/B alternation from itemIndex % 2" },
+   "pass": { "fixture": "tests/fixtures/precritic/l10-cycle.pass.mjs", "state": "position dealt from the seeded rng" },
+   "command": "node tests/scripts/ws-node-lint.mjs --fixture {fixture}",
+   "expect": { "fail": "FAIL", "pass": "OK" }
+  },
+  {
+   "id": "node-lint-keys",
+   "check": "ws-node-lint baseline pins finding KEYS, not counts (critic r1 D5): a fixed finding replaced by a new one in the same skill and rule fails",
+   "kind": "fixture",
+   "rule": "ws-node-lint keyed baseline (rule|kind|#item|signature)",
+   "fail": { "fixture": "tests/fixtures/precritic/node-lint-keys.swap.mjs", "state": "the pinned \"3 x 4\" on item 2 fixed, a new \"6 x 7\" on item 5: the count per (skill, rule) is still 1" },
+   "pass": { "fixture": "tests/fixtures/precritic/node-lint-keys.pin.mjs", "state": "the pinned finding, unchanged" },
+   "command": "node tests/scripts/ws-node-lint.mjs --fixture {fixture} --baseline tests/fixtures/precritic/node-lint-keys.baseline.json",
+   "expect": { "fail": "FAIL", "pass": "OK" }
+  },
+  {
+   "id": "mc-production",
+   "check": "H8: a production item (written on paper) is never offered as buttons on screen, every family (P-29, RM-P-01)",
+   "kind": "fixture",
+   "rule": "ws-content-audit MC-ALL mc-production",
+   "fail": { "fixture": "tests/fixtures/precritic/mc-production.fail.cjs", "state": "seeded \"what fraction is shaded?\" items: the paper cell has a fraction slot and no choices, the screen deals four fraction options (buttons)" },
+   "pass": { "fixture": "tests/fixtures/precritic/mc-production.pass.cjs", "state": "the same items typed (no option row); and a circle-one variant whose paper cell prints the same four choices" },
+   "command": "node tests/scripts/ws-content-audit.cjs --mc-fixture {fixture}",
+   "expect": { "fail": "FAIL", "pass": "OK" }
+  },
+  {
+   "id": "baseline-night-keeps-red",
+   "check": "A pinned row that regresses stays RED through a baseline night (ws-coverage-matrix BASELINE INVARIANTS I1-I5, critic r3 D1)",
+   "kind": "commit-pair",
+   "rule": "ws-coverage-matrix --write-baseline pin-new-only (I1), never a --red-from row (I2), verdict before the pin (I3); the fold (I5)",
+   "browser": false,
+   "fail": { "commit": "53f46e10", "state": "graded by critic r3: a slice night re-pins a regressed pilot row and reports it OK; a later slice file pins a re-selected red row and the re-run lists it OK" },
+   "pass": { "commit": "a5297660", "state": "fix round 3: both keep the row RED in the run file and the fold" },
+   "command": "node tests/fixtures/precritic/baseline-night.cjs --root {root}",
+   "expect": { "fail": "FAIL", "pass": "OK" }
+  },
+  {
+   "id": "lone-item",
+   "check": "Lone item / lone state on a page",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY LONE (L-LONE)",
+   "browser": true,
+   "fail": { "commit": "359802c5", "state": "skip-count, critic r4 D12" },
+   "pass": { "commit": "b19172b4", "state": "fixed" },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills multiplication:count_by_tables --roles scripted-model --opts '{\"rows\":[{\"step\":25000}],\"onePage\":true}' --lints L-DENSITY",
+   "expect": { "fail": "FAIL", "pass": "OK" }
+  },
+  {
+   "id": "text-generator-wrm-page",
+   "check": "Text ≠ generator (claims of counts, kinds, ranges vs 300 seeded items): WRM page",
+   "kind": "commit-pair",
+   "rule": "ws-text-vs-gen --looks (RESPONSE, DRAWING)",
+   "browser": false,
+   "fail": { "commit": "848d7d3f", "state": "WRM page, critic r8 M12" },
+   "pass": { "commit": "d515aa05", "state": "fixed" },
+   "command": "node tests/scripts/ws-text-vs-gen.mjs --looks --root {root}",
+   "expect": { "fail": "FAIL", "pass": "OK" }
+  },
+  {
+   "id": "text-generator-wrm-tagging",
+   "check": "Text ≠ generator: WRM tagging Y2–Y3",
+   "kind": "commit-pair",
+   "rule": "ws-text-vs-gen --wrm (REP, RANGE)",
+   "browser": false,
+   "fail": { "commit": "c3d08a69", "state": "graded by critic r13 in 5aa0ffce, N13: Y3.B6.S10 marked full on circles" },
+   "pass": { "commit": "89f30a64", "state": "the TITLEREP gate, round 14" },
+   "command": "node tests/scripts/ws-text-vs-gen.mjs --wrm --root {root}",
+   "expect": { "fail": "FAIL", "pass": "OK" }
+  },
+  {
+   "id": "chromebook-viewport",
+   "check": "Chromebook viewport (answer box + Check reachable at 1366 × 768, nothing under a sticky header)",
+   "kind": "commit-pair",
+   "rule": "ws-viewport-check UNDER-HEADER / BOX-OUT / CHECK-OUT",
+   "browser": true,
+   "fail": { "commit": "e189119f", "state": "number line, critic r7 R7-D1: timed band under the sticky bar at 1280" },
+   "pass": { "commit": "789f23f7", "state": "fixed" },
+   "command": "node tests/scripts/ws-viewport-check.cjs --skills subtraction:sub_100_regroup,multiplication:nl_mult --opts '{\"nlOn\":true}' --sizes 1280x600,1366x650",
+   "expect": { "fail": "FAIL", "pass": "OK" }
+  },
+  {
+   "id": "repeats-lesson",
+   "check": "Repeats (a problem or a line twice on a page or packet; chart example returning on the exit slip)",
+   "kind": "commit-pair",
+   "rule": "ws-detailed-lesson --repeats (R-ANSWER, R-TURN, R-CELL)",
+   "browser": true,
+   "fail": { "commit": "c2a6d8b4", "state": "detailed lesson 6, graded by its critic r1 in 712592e2, D2: Guided 1 returns on the exit slip" },
+   "pass": { "commit": "f0990693", "state": "fixed" },
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g4-nbt1-ten-times-value --repeats",
+   "expect": { "fail": "FAIL", "pass": "OK" }
+  }
+ ]
+}
