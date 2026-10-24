@@ -172,7 +172,7 @@ function common(seed, quiz, version) {
     return {
         size: o.size, look: 'auto', paper: o.paper || 'A4',
         anchors: o.examples === 'sections' || o.examples === 'side' ? o.examples : 'off',
-        header: { name: h.name !== false, date: h.date !== false, score: quiz ? true : !!h.score, title: quiz ? ((S.quiz.name || '').trim() || autoQuizName(items())) : true },
+        header: { name: h.name !== false, date: h.date !== false, score: quiz ? true : !!h.score, title: quiz ? ((S.quiz.name || '').trim() || autoQuizName(items())) : (S.batchTitle || true) },
         key: { on: true, placement: o.keyPlace === 'after-page' ? 'after-page' : 'end', style: o.keyStyle === 'short' ? 'short' : 'copy' },
         seed: (seed + version * 104729) >>> 0,
         version: V > 1 ? `Version ${version + 1} of ${V}` : '',
@@ -472,6 +472,7 @@ function close() {
     document.querySelectorAll('#teacherApp .tv2-nav').forEach((el) => el.removeAttribute('inert'));
     document.body.classList.remove('tvs-open');
     document.removeEventListener('keydown', onKey, true);
+    for (const fn of [...closeFns]) { try { fn(); } catch (e) { console.warn('[teacher-sheet] close hook', e); } }
     if (lastFocus && lastFocus.isConnected) { try { lastFocus.focus({ preventScroll: true }); } catch (e) { /* */ } }
 }
 function mount() {
@@ -561,6 +562,7 @@ function optionsHTML() {
     }
     if (quiz) h += `<div class="tvs-field"><label class="tvs-label" for="tvsQuizName">Quiz name</label><input id="tvsQuizName" class="tvs-input" data-in="quizname" value="${esc(S.quiz.name || autoQuizName(list))}"></div>`;
     h += skillsHTML(list);
+    if (!quiz && EXTRA && EXTRA.html) { try { h += EXTRA.html(list) || ''; } catch (e) { console.warn('[teacher-sheet] extra', e); } }
     const p = plan(list);
     const k = p.kind;
     h += `<div class="tvs-kinds" role="radiogroup" aria-label="Kind of worksheet">${[['single', 'Single skill', 'One skill on a page'], ['sections', 'Sections', 'Each skill in its own part'], ['mixed', 'Mixed practice', 'Skills mixed together']].map(([v, l, s]) => `<button type="button" class="tvs-kind" role="radio" data-act="kind" data-v="${v}" aria-checked="${k === v}">${k === v ? icon('check', 18) : ''}<span class="tvs-kind-name">${l}</span><span class="tvs-kind-sub">${s}</span></button>`).join('')}</div>`;
@@ -902,6 +904,7 @@ function quizShareHTML() {
 /* ================================================================= print */
 
 async function doPrint() {
+    if (S.sheet === 'print' && EXTRA && EXTRA.print) { const r = EXTRA.print(); if (r) { await r; return; } }
     const list = items();
     if (!list.length) { toast('Tick skills first'); return; }
     const p = plan(list);
@@ -950,6 +953,7 @@ function onClick(e) {
     const v = b.dataset.v;
     const more = root.querySelector('.tvs-more');
     S.moreOpen = !!(more && more.open);
+    if (EXTRA && EXTRA.click && /^x-/.test(b.dataset.act)) { if (EXTRA.click(b)) changed(false); return; }
     switch (b.dataset.act) {
         case 'close': close(); return;
         case 'kind': S.kind = v; touch('kind'); if (v !== 'single') S.opts.layout = 'standard'; changed(); return;
@@ -1047,10 +1051,82 @@ export function setSheetAmount(mode, n) {
     persist();
 }
 
+/* ================================================================= hooks (lane S2 T4: lesson sets)
+ * The Lessons place adds lesson groups to the tray. When the tray holds them, the Print sheet shows a block that
+ * asks "one worksheet per lesson / one for all / both" (EXTRA.html), and Print makes ONE document from a batch of
+ * buildSheet requests (buildBatch): each lesson its own pages and key, then the combined paper. */
+let EXTRA = null;
+const closeFns = new Set();
+/** { html(list) → string, click(button) → true to redraw, print() → Promise | null (null = the sheet prints as usual) }.
+ *  Its buttons use data-act="x-…". */
+export function setPrintExtra(x) { EXTRA = x && typeof x === 'object' ? x : null; }
+/** fn runs each time the sheet closes. Returns the remover. */
+export function onSheetClose(fn) { closeFns.add(fn); return () => closeFns.delete(fn); }
+/** The open sheet redraws (an EXTRA choice changed from outside). */
+export function redrawSheet() { if (root && S.sheet) changed(false); }
+/**
+ * Several worksheets in ONE document, in the order given, each with its own pages and key:
+ *   { keys, kind?: 'sections' | 'mixed' | 'single', title? }   a worksheet of those skills, planned as the sheet plans
+ *   { lessons: [{ title, keys }], title? }                        one worksheet, a section per lesson (each lesson's
+ *                                                                 skills together, as many problems as its own sheet)
+ * Returns { doc, pages, keyPages, parts: [{ title, pages, total, error? }] }.
+ */
+export async function buildBatch(parts, onProgress) {
+    const all = items();
+    const pick = (keys) => keys.map((k) => all.find((x) => keyOf(x) === k)).filter((x) => x && !x.leftOut);
+    const keepKind = S.kind, keepTitle = S.batchTitle;
+    const out = { doc: '', pages: 0, keyPages: 0, parts: [] };
+    let i = 0;
+    try {
+        for (const part of parts) {
+            if (onProgress) onProgress(++i, parts.length);
+            await yieldNow();
+            S.batchTitle = part.title || '';
+            if (part.lessons) {
+                const secs = [];
+                for (const l of part.lessons) {
+                    const list = pick(l.keys || []);
+                    if (!list.length) continue;
+                    S.kind = 'mixed';
+                    const p = plan(list);
+                    secs.push({ skills: list.map((it) => skillRef(it)), count: Math.max(1, p.error ? list.length * 2 : p.total) });
+                }
+                if (!secs.length) continue;
+                const req = Object.assign(common(S.seed + 7919 * (i + 50), false, 0), { role: 'independent', sections: secs });
+                let res;
+                try { res = await buildSheet(req); } catch (e) { out.parts.push({ title: part.title, pages: 0, total: 0, error: (e && e.message) || 'Could not be built' }); continue; }
+                out.doc += (res.keyOptions && res.keyOptions.placement === 'after-page' ? res.docHtml || res.pupilHtml : `${res.pupilHtml}\n${res.keyHtml || ''}`) + '\n';
+                out.pages += res.pageCount || 0; out.keyPages += res.keyPageCount || 0;
+                out.parts.push({ title: part.title, pages: res.pageCount || 0, total: (res.items || []).filter(Boolean).length });
+                continue;
+            }
+            const list = pick(part.keys || []);
+            if (!list.length) continue;
+            S.kind = part.kind || keepKind;
+            const p = plan(list);
+            if (p.error) { out.parts.push({ title: part.title, pages: 0, total: 0, error: p.error }); continue; }
+            const b = await buildAll(p, list, false);
+            out.doc += b.doc + '\n';
+            out.pages += b.pages; out.keyPages += b.keyPages;
+            out.parts.push({ title: part.title, pages: b.pages, total: b.total });
+        }
+    } finally { S.kind = keepKind; S.batchTitle = keepTitle; }
+    return out;
+}
+/** buildBatch, then the print dialog (the document is kept as the sheet's last document). */
+export async function printBatch(parts, title, onProgress) {
+    const b = await buildBatch(parts, onProgress);
+    if (!b.doc) { toast('These pages could not be built'); return b; }
+    S.lastDoc = sheetDocument(b.doc, title, { paper: S.opts.paper || 'A4' });
+    try { await printHtml(b.doc, title, S.opts.paper || 'A4'); } catch (e) { console.warn('[teacher-sheet] print failed', e); toast('Could not open the print dialog'); }
+    return b;
+}
+
 if (typeof window !== 'undefined') {
     window.tvOpenSheet = openSheet;
     window.tvSheetAmount = { get: sheetAmount, set: setSheetAmount };
     window.tvCloseSheet = closeSheet;
     window.tvSheetState = sheetState;
     window.tvSheetBuildNow = buildNow;
+    window.tvSheetHooks = { setPrintExtra, onSheetClose, redrawSheet, buildBatch, printBatch };
 }
