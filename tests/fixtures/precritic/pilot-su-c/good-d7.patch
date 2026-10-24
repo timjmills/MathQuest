@@ -1,0 +1,23 @@
+diff -ruN a/css/sheet-kit.css b/css/sheet-kit.css
+--- a/css/sheet-kit.css	2026-10-23 22:30:18.432843363 +0000
++++ b/css/sheet-kit.css	2026-10-23 22:30:26.926727644 +0000
+@@ -198,6 +198,7 @@
+ :is(.ws-page, .ws-sheet) .ws-stack .prow.plus { display: flex; align-items: center; font-weight: 700; padding-left: calc(var(--ws-track) * .3); }
+ :is(.ws-page, .ws-sheet) .ws-stack .sep { width: .3em; }
+ :is(.ws-page, .ws-sheet) .ws-stack.wide { --ws-track: 0.95em; }                   /* TY-21: any regroup scaffold forces 0.95 em */
++:is(.ws-page, .ws-sheet) .ws-stack.heads-wide { --ws-track: 1.3em; }            /* seeded D7 stand-in: 5-6 digit heads never overlap */
+ :is(.ws-page, .ws-sheet) .ws-grey, :is(.ws-page, .ws-sheet) .ws-grey i { color: var(--ws-grey); border-color: var(--ws-grey) !important; border-width: 1pt !important; }
+ :is(.ws-page, .ws-sheet) .ws-trace { color: var(--ws-grey); }
+ :is(.ws-page, .ws-sheet).ws-photocopy .ws-trace,
+diff -ruN a/js/modules/sheet/cells/stack.js b/js/modules/sheet/cells/stack.js
+--- a/js/modules/sheet/cells/stack.js	2026-10-23 22:30:18.430659507 +0000
++++ b/js/modules/sheet/cells/stack.js	2026-10-23 22:30:26.926470670 +0000
+@@ -154,7 +154,7 @@
+     // TY-2: a box is drawn with <i>, which the browser italicises; nothing in a stack is italic.
+     html = html.replace(/(<i\b[^>]*?style=")/g, '$1font-style:normal;').replace(/<i(?=[ >])(?![^>]*style=)/g, '<i style="font-style:normal"');
+     const cols = sepSet ? `;grid-template-columns:${Array.from({ length: t }, (_, i) => `var(--ws-track)${sepSet.has(i) ? ` ${SEPARATOR_EM}em` : ''}`).join(' ')}` : '';
+-    return `<div class="ws-stack${regroup || answer === 'boxes' ? ' wide' : ''}" style="--t:${t}${cols}" data-ws-slot="answer" data-ws-shape="open">${html}</div>`;
++    return `<div class="ws-stack${regroup || answer === 'boxes' ? ' wide' : ''}${heads && t >= 6 ? ' heads-wide' : ''}" style="--t:${t}${cols}" data-ws-slot="answer" data-ws-shape="open">${html}</div>`;
+ }
+ 
+ /* ------------------------------------------------------------------ registry template */

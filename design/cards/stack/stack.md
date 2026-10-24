@@ -1,6 +1,32 @@
 <!-- spec-card
-{"card":"stack","kind":"template","template":"stack","families":["addition","subtraction"],"match":{"templates":["stack"]},"config":"design/cards/stack/card.json","indexSha":"ed32bdf58a41e14cceffd96fefef3a0bc6156109","bodySha":"adf4cf889914b858"}
-{"cited":"AK-2 AX-4 AX-9 BD-4 BD-7 BD-11 C1 CL-9 DN-1a H1 H2 H3 H4 H5 H6 H7 H8 H9 H10 H11 H12 H13 L1 L6 LR-4 LR-6 OC4 P-1 PG-12 PT-FRM-6 PT-GDP-1 PT-GDP-2 PT-REV-3 PT-SCR-1 RP-1 RP-20 SL-1 SL-2 SL-3 SL-3a SP-20 TY-10a VA-10","rules":"VA-1 12d322 2 26885a 4 b05d12 7 13eea3 VA-10@WDS 9d9099 VA-11@WDS a5ab88 VA-12@WDS 60049e VA-13@WDS 05d8bb VA-13a c2dfad 20 ef38e6 22 045140 23 04bd6f AK-2 d4709f TY-21 53ed7d SP-23 fe1461 VA-3 770d75 5 1337f5 6 45cb76 21 8802ac 30 5b42ae 31 2f0077 32 898868 LS-8 59531d SL-12 3cbafa TY-20 8964d2 23 e741c0 24 e73e2c 26 cc6cf2 VA-40 914c3a 41 1325cb 42 1b3a08 50 905c89 51 ca8fb1 52 992853 SL-1 e3b064 2 f404d5 11 183e7a CL-6 102a92 9 accb97 PG-12 8e75fd 14 64a88e PT-CGR-5 3f7489 PT-EQD-2 ed82db DN-34 d5b0e7 AK-1 a0cc12 4 8d027b INK-31 d7ece8 BD-7 81d3da PT-GDP-1 a0e2cc P-SC-7 65e105 SF-34@WDS.1 00e2f6 SP-1 87c2cc 2 1f2df0 3 7b7bfb 4 51a802 10 6ffb0a 12 1309f9 SCC-T3 359377 4 e83741 10 084029 14 b8671c 15 fc9373 17 c36547 SCC-P5 6387d4 6 d362fd BD-10 8d473f 11 29d891 12 36b79c PT-FRM-6 daac17 P-1 5a3076 29 89eb8e Q-10 50b907 P-10 256ad3 35 4b32c0 31 28b15c BD-4 b3947b PT-SCR-1 25f6f5 CL-1 277ec4 AX-4 2eb6c1 INK-5 631a6d TY-7 e3e1e1 RP-1 d529bd AX-9 74e9a4 DN-1a 4fcc05 PT-GDP-2 386bb5 SL-3 468d78 SP-20 cfb11a PT-REV-3 d5e0d9 TY-10a 5e59f3 SL-3a d38939 RP-20 8888b0 21 ad2ba4 C1 66f8a9 2 32e3b2 3 3d5192 4 e59efd H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H4@RUBRIC 9ce1f3 H5@RUBRIC b3892d H6 0722fd 7 3d3d38 8 44c23b 9 fd82d1 10 fbd802 11 bef034 12 2de4f7 13 36f579 OC3 bb8551 4 00a5e1 7 81bde7 8 089b5e 10 ad6428 11 c55e70 14 18b2a5 L1 799b66 2 fecb99 3 901e56 4 6538d6 5 4d48a8 6 6e19d8 9 f4b4c0 10 d2ca35 11 9ebe19 CL-31 383ae0 INK-3 b9f1f1 4 fe5b27 P-LC-9 bc47bd SCC-01 8aa70b SF-10 f1a0d9 SL-10 9fe607 TY-2 510243 13 3d0f88 22 7e9b75 25 b0a223"}
+{"card":"stack","kind":"template","template":"stack","families":["addition","subtraction"],"match":{"templates":["stack"]},"config":"design/cards/stack/card.json","indexSha":"8f0ffc97e613ef0c1d90ce01931730199f9c93a0","bodySha":"a23ab875fc30545e"}
+{"cited":"AK-2 AX-4 AX-9 BD-4 BD-7 BD-11 C1 CL-9 DN-1a H1 H2 H3 H4 H5 H6 H7 H8 H9 H10 H11 H12 H13 L1 L6 LR-4 LR-6 OC4 P-1 PG-12 PT-FRM-6 PT-GDP-1 PT-GDP-2 PT-REV-3 PT-SCR-1 RP-1 RP-20 SL-1 SL-2 SL-3 SL-3a SP-20 TY-10a VA-10","rules":"VA-1 12d322 2 26885a 4 b05d12 7 13eea3 VA-10@WDS 9d9099 VA-11@WDS a5ab88 VA-12@WDS 60049e VA-13@WDS 05d8bb VA-13a c2dfad 20 ef38e6 22 045140 23 04bd6f AK-2 d4709f TY-21 53ed7d SP-23 fe1461 VA-3 770d75 5 1337f5 6 45cb76 21 8802ac 30 5b42ae 31 2f0077 32 898868 LS-8 59531d SL-12 3cbafa TY-20 8964d2 23 e741c0 24 e73e2c 26 cc6cf2 VA-40 914c3a 41 1325cb 42 1b3a08 50 905c89 51 ca8fb1 52 992853 SL-1 e3b064 2 f404d5 11 183e7a CL-6 102a92 9 accb97 PG-12 8e75fd 14 64a88e PT-CGR-5 3f7489 PT-EQD-2 ed82db DN-34 90af7b AK-1 a0cc12 4 8d027b INK-31 d7ece8 BD-7 81d3da PT-GDP-1 a0e2cc P-SC-7 65e105 SF-34@WDS.1 00e2f6 SP-1 87c2cc 2 1f2df0 3 7b7bfb 4 51a802 10 6ffb0a 12 1309f9 SCC-T3 359377 4 e83741 10 084029 14 b8671c 15 fc9373 17 c36547 SCC-P5 6387d4 6 d362fd BD-10 8d473f 11 29d891 12 36b79c PT-FRM-6 daac17 P-1 5a3076 29 89eb8e Q-10 50b907 P-10 256ad3 35 4b32c0 31 28b15c BD-4 b3947b PT-SCR-1 25f6f5 CL-1 277ec4 AX-4 2eb6c1 INK-5 631a6d TY-7 e3e1e1 RP-1 d529bd AX-9 74e9a4 DN-1a 4fcc05 PT-GDP-2 386bb5 SL-3 468d78 SP-20 cfb11a PT-REV-3 d5e0d9 TY-10a 5e59f3 SL-3a d38939 RP-20 8888b0 21 ad2ba4 C1 66f8a9 2 32e3b2 3 3d5192 4 e59efd H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H4@RUBRIC 9ce1f3 H5@RUBRIC b3892d H6 0722fd 7 3d3d38 8 44c23b 9 fd82d1 10 fbd802 11 bef034 12 2de4f7 13 36f579 OC3 bb8551 4 00a5e1 7 81bde7 8 089b5e 10 ad6428 11 c55e70 14 18b2a5 L1 799b66 2 fecb99 3 901e56 4 6538d6 5 4d48a8 6 6e19d8 9 f4b4c0 10 d2ca35 11 9ebe19 CL-31 383ae0 INK-3 b9f1f1 4 fe5b27 P-LC-9 bc47bd SCC-01 8aa70b SF-10 f1a0d9 SL-10 9fe607 TY-2 510243 13 3d0f88 22 7e9b75 25 b0a223"}
+-->
+<!-- rulings
+{"v": 1, "card": "stack",
+"skills": ["addition:add","addition:add_100_mixed","addition:add_100_no_regroup","addition:add_100_regroup","addition:add_100k_mixed","addition:add_100k_no_regroup","addition:add_100k_regroup","addition:add_10_mixed","addition:add_10_no_regroup","addition:add_10_regroup","addition:add_10k_mixed","addition:add_10k_no_regroup","addition:add_10k_regroup","addition:add_1k_mixed","addition:add_1k_no_regroup","addition:add_1k_regroup","addition:add_1m_mixed","addition:add_1m_no_regroup","addition:add_1m_regroup","addition:add_20_mixed","addition:add_20_no_regroup","addition:add_20_regroup","addition:add_50_mixed","addition:add_50_no_regroup","addition:add_50_regroup","addition:add_column_multi","addition:add_missing_digit","addition:equal_sign","addition:mixed_addition","multiplication:mixed_multiplication","multiplication:mult_2by1_column","multiplication:mult_2by2_standard","multiplication:mult_3by1_column","multiplication:mult_missing_digit","multiplication:multiply","subtraction:mixed_add_sub","subtraction:mixed_subtraction","subtraction:sub_100_mixed","subtraction:sub_100_no_regroup","subtraction:sub_100_regroup","subtraction:sub_100k_mixed","subtraction:sub_100k_no_regroup","subtraction:sub_100k_regroup","subtraction:sub_10_mixed","subtraction:sub_10_no_regroup","subtraction:sub_10_regroup","subtraction:sub_10k_mixed","subtraction:sub_10k_no_regroup","subtraction:sub_10k_regroup","subtraction:sub_1k_mixed","subtraction:sub_1k_no_regroup","subtraction:sub_1k_regroup","subtraction:sub_1m_mixed","subtraction:sub_1m_no_regroup","subtraction:sub_1m_regroup","subtraction:sub_20_mixed","subtraction:sub_20_no_regroup","subtraction:sub_20_regroup","subtraction:sub_50_mixed","subtraction:sub_50_no_regroup","subtraction:sub_50_regroup","subtraction:sub_across_zeros","subtraction:sub_missing_digit","subtraction:subtract"],
+"rulings": [
+],
+"notOffered": [
+],
+"todo": [
+ {"id":"T-5.1","source":"§5.1","text":"\"Within N\" bounds the ANSWER (the sum, the minuend), never the operands."},
+ {"id":"T-5.2","source":"§5.2","text":"Dashed box = the unknown digit in a missing-digit stack; regroup boxes stay solid (LS-8)."},
+ {"id":"T-5.3","source":"§5.3","text":"General regrouping is secure before any zero is regrouped across; L-5Z changes only the..."},
+ {"id":"T-5.4","source":"§5.4","text":"Writing boxes are slightly rounded (SL-11); a row of digit boxes is ONE outline with di..."},
+ {"id":"T-5.5","source":"§5.5","text":"Every key (practice, mixed, independent) fills the regroup / carry boxes with the full ..."},
+ {"id":"T-5.6","source":"§5.6","text":"Key answers print reddish orange, keys only (INK-31)."},
+ {"id":"T-5.7","source":"§5.7","text":"Touch-dot column stacks keep the greys of earlier columns; \"Touched N\" stays on × stacks."},
+ {"id":"T-5.8","source":"§5.8","text":"SPEC, NOT BUILT (held for Lane B): on screen the regroup boxes an item needs are requir..."},
+ {"id":"T-5.9","source":"§5.9","text":"SPEC, NOT BUILT: option `carry: top | bottom` — carries UNDER the answer line, one colu..."},
+ {"id":"T-9.1","source":"§9.1","text":"Does this card also cover × 1-digit (`multiply`, `mult_missing_digit`) and the column-m..."},
+ {"id":"T-9.2","source":"§9.2","text":"Under-the-line carry box size (CARRY-BELOW-SPEC: about two-thirds of a digit box): what..."},
+ {"id":"T-9.3","source":"§9.3","text":"When the screen regroup boxes become required (REGROUP-BOXES-SPEC), VA-13, SCC-T17 and ..."},
+ {"id":"T-9.4","source":"§9.4","text":"Are regroup boxes a structural scaffold (stay at every level) or a hint (fade)?"},
+ {"id":"T-9.5","source":"§9.5","text":"Decimal column add / subtract (`add_decimal`, `sub_decimal`, legacy `decimal-column-*`)..."},
+ {"id":"T-9.6","source":"§9.6","text":"MW4K / IXL research is pending logins (Q-H4). Sign now?"}
+]
+}
 -->
 # Spec card: Stacked arithmetic (the `stack` template)
 
@@ -108,7 +134,7 @@ Multiply by 2-digit at 3 columns: 12 / 9 / 9. Regroup scaffolds on at 3 columns:
 
 ## 4. Rules that apply
 
-From the rule-id index (`design/cards/rule-index.json`, sha `ed32bdf58a41`). An id written `ID@SRC` is defined in more than one standard.
+From the rule-id index (`design/cards/rule-index.json`, sha `8f0ffc97e613`). An id written `ID@SRC` is defined in more than one standard.
 
 ### 4a. Core rules — apply every one (15 rules; ✱ = quoted in full, the rest cut at a sentence)
 
@@ -241,7 +267,7 @@ For answer keys, `wrongAnswer`, error analysis, True or False? and Reason It (P-
 
 Each runs as `node tests/scripts/<script> …`.
 
-- `ws-precritic.cjs --template stack` — PLANNED (not in the repo yet) — the one table every builder report pastes (IMPROVEMENT_PLAN §1.4 S1, being built by another lane)
+- `ws-precritic.cjs --template stack` — the one table every builder report pastes (IMPROVEMENT_PLAN §1.4 S1, being built by another lane)
 - `ws-spec-card.mjs --check-signed design/cards/stack/stack.md` — build-start gate
 - `ws-spec-card.mjs --check-coverage design/cards/stack/stack.md` — card-coverage test; runs again at build start
 - `ws-content-audit.cjs --category addition (and --category subtraction)`

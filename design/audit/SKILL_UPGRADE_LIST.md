@@ -258,6 +258,62 @@ The rest (`bar-graph` 6, `factor-tchart` 6, `perimeter-shape` 5, `count-row` 5, 
 | `all_mixed:grade_5_mixed` All Grade 5 Skills | null | word-work + pv + frac-model + stack (+ legacy 7/12) | default adapter | NEEDS-UPGRADE | part-migrated: 7/12 seeded items still legacy | print-lint L/S/M: SPACE 3/3/3, TAGLINE 2/2/2, SIZE 0/4/0; node-lint: NOTATION 9; options-verify: 4 option values fail; MC on screen: fraction-estimate/multiple-choice | **keep** (catalogue/algebra-patterns-number-theory.md:200): grade pool | pool: follows its members + the Mixed practice composer (M1-M5) |
 | `all_mixed:grade_6_mixed` All Grade 6 Skills | null | number-line (+ legacy 11/12) | default adapter | NEEDS-UPGRADE | part-migrated: 11/12 seeded items still legacy | print-lint L/S/M: FONT 8/8/8, TAGLINE 2/2/2, SPACE 0/2/2, KEY 1/1/1; node-lint: NOTATION 15; options-verify: 1 option values fail | **keep** (catalogue/algebra-patterns-number-theory.md:201): grade pool; catalogue host `long-division` is an artefact | pool: follows its members + the Mixed practice composer (M1-M5) |
 
+#### Wave 0 pinned defects (2026-10-23)
+
+- `algebra:algebra_word_mixed` — option values fail ws-options-verify: poolSize (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `algebra:build_expr_addsub` — ws-node-lint findings NOTATION 13, L3 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `algebra:evaluate_expression_hard` — ws-node-lint findings NOTATION 5, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `algebra:factor_out_gcf` — option values fail ws-options-verify: band (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `algebra:function_table_easy` — option values fail ws-options-verify: ftFactors (2 values), support (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `algebra:function_table_find_inputs` — option values fail ws-options-verify: ftFactors (2 values), support (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `algebra:function_table_find_rule` — option values fail ws-options-verify: ftFactors (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `algebra:inequalities` — ws-node-lint findings NOTATION 9, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `algebra:mixed_algebra` — ws-node-lint findings NOTATION 3, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `algebra:multi_step_word` — option values fail ws-options-verify: wpBar (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `algebra:multi_step_word_plain` — option values fail ws-options-verify: wpBar (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `algebra:solve_ax_minus_b` — option values fail ws-options-verify: band (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `algebra_mixed:algebra_all` — option values fail ws-options-verify: skipAfter (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `algebra_mixed:algebraic_all` — option values fail ws-options-verify: calculator (1 value), skipAfter (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `algebra_mixed:number_sense_all` — production item offered as buttons on screen while the paper prints no choices (make-a-ten/multiple-choice), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `algebra_mixed:number_sense_all` — option values fail ws-options-verify: skipAfter (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `algebra_mixed:number_sense_all` — ws-node-lint findings NOTATION 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `algebra_mixed:number_theory_all` — option values fail ws-options-verify: poolSize (1 value), skipAfter (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `algebra_mixed:order_ops_all` — ws-node-lint findings NOTATION 4, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `all_mixed:all_domains_mixed` — production item offered as buttons on screen while the paper prints no choices (legacy/text), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `all_mixed:all_domains_mixed` — option values fail ws-options-verify: poolSupport (3 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `all_mixed:all_domains_mixed` — ws-node-lint findings NOTATION 5, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `all_mixed:custom_mixed` — ws-node-lint findings NOTATION 8, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `all_mixed:grade_1_mixed` — production item offered as buttons on screen while the paper prints no choices (geometry-partitions/text, make-a-ten/multiple-choice), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `all_mixed:grade_1_mixed` — option values fail ws-options-verify: poolSize (1 value), poolSupport (3 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `all_mixed:grade_2_mixed` — option values fail ws-options-verify: poolSupport (2 values), skipAfter (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `all_mixed:grade_2_mixed` — ws-node-lint findings NOTATION 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `all_mixed:grade_3_mixed` — option values fail ws-options-verify: poolSize (1 value), poolSupport (3 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `all_mixed:grade_3_mixed` — ws-node-lint findings NOTATION 4, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `all_mixed:grade_4_mixed` — option values fail ws-options-verify: poolSupport (3 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `all_mixed:grade_4_mixed` — ws-node-lint findings NOTATION 16, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `all_mixed:grade_5_mixed` — production item offered as buttons on screen while the paper prints no choices (fraction-estimate/multiple-choice), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `all_mixed:grade_5_mixed` — option values fail ws-options-verify: poolSupport (3 values), skipAfter (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `all_mixed:grade_5_mixed` — ws-node-lint findings NOTATION 9, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `all_mixed:grade_6_mixed` — option values fail ws-options-verify: poolSize (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `all_mixed:grade_6_mixed` — ws-node-lint findings NOTATION 15, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `all_mixed:grade_k_mixed` — option values fail ws-options-verify: calculator (1 value), skipAfter (3 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `number_theory:divisibility_sort` — ws-node-lint findings L6 16, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `number_theory:factor_links_easy` — option values fail ws-options-verify: skipAfter (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `number_theory:factor_links_easy` — ws-node-lint findings REPEATS 3, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `number_theory:factor_links_hard` — option values fail ws-options-verify: skipAfter (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `number_theory:factor_links_medium` — option values fail ws-options-verify: skipAfter (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `number_theory:factor_links_medium` — ws-node-lint findings REPEATS 3, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `number_theory:factor_tchart_easy` — ws-node-lint findings REPEATS 2, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `number_theory:factor_tchart_medium` — ws-node-lint findings REPEATS 3, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `number_theory:mixed_number_theory` — option values fail ws-options-verify: poolSize (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `order_of_operations:cube_numbers` — option values fail ws-options-verify: step (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `order_of_operations:mixed_order_ops` — ws-node-lint findings NOTATION 5, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `order_of_operations:paren_multi` — ws-node-lint findings NOTATION 4, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `order_of_operations:paren_simple` — ws-node-lint findings NOTATION 13, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `order_of_operations:three_ops_no_paren` — ws-node-lint findings NOTATION 16, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `order_of_operations:two_ops_no_paren` — ws-node-lint findings NOTATION 15, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `patterns:number_patterns_rule` — option values fail ws-options-verify: missing (2 values), nlOn (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+
 ### Measurement and data (87 skills, 87 need an upgrade)
 
 | Skill | Gr | Template | Provider | Status | Evidence | Machine findings (pinned) | Catalogue verdict and defects | Effort |
@@ -349,6 +405,45 @@ The rest (`bar-graph` 6, `factor-tchart` 6, `perimeter-shape` 5, `count-row` 5, 
 | `probability:probability_basic` Basic Probability | 6 | legacy | default adapter | NEEDS-UPGRADE | legacy cell: no `q.cell` in 12 seeded items (code read at 07523be2) | print-lint L/S/M: NOTATION 2/2/2, SPACE 2/2/2, KEY 1/1/1; node-lint: NOTATION 9 | **redo** (catalogue/measurement-data.md:157): outcomes are named by colour words and drawn in colour (:1541-1562), breaking playbook rule PR-R1 and the black-and-white ruling; the marble picture is **not printed** — paper shows the sentence plus an orange scaffold box that gives the … | redo (new template `data-table`) |
 | `probability:mixed_probability` Mixed Probability | M | legacy | default adapter | NEEDS-UPGRADE | legacy cell: no `q.cell` in 12 seeded items (code read at 07523be2) | print-lint L/S/M: SPACE 4/4/4; node-lint: NOTATION 7 | **merge -> `probability:probability_basic`** (catalogue/measurement-data.md:158): routes to the same generator with the same pool; it is a mixed pool over a category with one real skill | merge into its target (alias), no own build |
 | `data_mixed:data_stats_all` All Data & Stats Skills | M | bar-graph + tally-chart + pictograph (+ legacy 7/12) | default adapter | NEEDS-UPGRADE | part-migrated: 7/12 seeded items still legacy | print-lint L/S/M: SIZE 14/14/14, FONT 2/2/2, KEY 1/1/1; node-lint: NOTATION 9; options-verify: 1 option values fail | **keep** (catalogue/measurement-data.md:159): inherits; catalogue host `chart-table` wrong for a pool of graph and statistics cells | pool: follows its members + the Mixed practice composer (M1-M5) |
+
+#### Wave 0 pinned defects (2026-10-23)
+
+- `data_analysis:statistical_question` — ws-node-lint findings REPEATS 5, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `data_mixed:data_stats_all` — option values fail ws-options-verify: poolSize (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `data_mixed:data_stats_all` — ws-node-lint findings NOTATION 9, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `graphs:build_bar_graph` — ws-node-lint findings L10 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `graphs:build_pictograph` — ws-node-lint findings L10 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `graphs:line_plot` — ws-node-lint findings NOTATION 106, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `graphs:line_plot_fractions` — ws-node-lint findings NOTATION 82, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `graphs:mixed_graphs` — option values fail ws-options-verify: poolSize (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `graphs:mixed_graphs` — ws-node-lint findings NOTATION 9, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `measurement:capacity` — ws-node-lint findings L6 6, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `measurement:convert_cm_to_mm` — ws-node-lint findings REPEATS 2, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `measurement:convert_feet_to_inches` — ws-node-lint findings REPEATS 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `measurement:convert_km_to_m` — ws-node-lint findings REPEATS 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `measurement:convert_m_to_cm` — ws-node-lint findings REPEATS 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `measurement:convert_m_to_mm` — ws-node-lint findings REPEATS 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `measurement:convert_miles_to_feet` — ws-node-lint findings REPEATS 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `measurement:convert_yards_to_feet` — ws-node-lint findings REPEATS 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `measurement:convert_yards_to_inches` — ws-node-lint findings REPEATS 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `measurement:count_notes` — option values fail ws-options-verify: values (4 values), order (3 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `measurement:count_notes_and_coins` — option values fail ws-options-verify: order (3 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `measurement:estimate_length` — production item offered as buttons on screen while the paper prints no choices (measurement-estimate/multiple-choice), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `measurement:heavier_lighter_visual` — ws-node-lint findings REPEATS 2, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `measurement:make_change_least_coins` — ws-node-lint findings REPEATS 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `measurement:minutes_by_fives_all` — ws-node-lint findings REPEATS 11, L10 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `measurement:mixed_measurement` — option values fail ws-options-verify: poolSize (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `measurement:money_amount_in_words` — option values fail ws-options-verify: order (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `measurement:money_amount_in_words` — ws-node-lint findings REPEATS 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `measurement:money_count` — ws-node-lint findings REPEATS 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `measurement:money_notation` — ws-node-lint findings REPEATS 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `measurement:reading_ruler` — ws-node-lint findings REPEATS 6, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `measurement:time_fives_ring` — ws-node-lint findings L6 10, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `measurement:time_half_hour` — ws-node-lint findings REPEATS 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `measurement:time_hour` — ws-node-lint findings REPEATS 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `measurement:unit_conversions` — ws-node-lint findings L3 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `probability:mixed_probability` — ws-node-lint findings NOTATION 7, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `probability:probability_basic` — ws-node-lint findings NOTATION 9, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
 
 ### Multiplication, division, integers (95 skills, 82 need an upgrade)
 
@@ -450,6 +545,62 @@ The rest (`bar-graph` 6, `factor-tchart` 6, `perimeter-shape` 5, `count-row` 5, 
 | `number_ops_mixed:which_sign` Which Sign Makes It True? (+ − × ÷) | M | equation | default adapter | NEEDS-UPGRADE | on kit template `equation`; no recorded critic PASS | print-lint L/S/M: SPACE 1/0/1 | (not in a family catalogue) | copy on existing template `equation` (fix + provider) |
 | `number_ops_mixed:missing_factor_or_addend` Missing Addend or Missing Factor? | 3 | equation | default adapter | NEEDS-UPGRADE | on kit template `equation`; no recorded critic PASS | print-lint L/S/M: SPACE 1/1/1 | (not in a family catalogue) | copy on existing template `equation` (fix + provider) |
 
+#### Wave 0 pinned defects (2026-10-23)
+
+- `division:div_2by1_long` — option values fail ws-options-verify: notation (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `division:div_3by1_long` — option values fail ws-options-verify: notation (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `division:div_3by2_long` — option values fail ws-options-verify: notation (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `division:div_4by1_long` — option values fail ws-options-verify: notation (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `division:share_into_groups` — ws-node-lint findings REPEATS 2, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `integers:abs_value` — ws-node-lint findings NOTATION 6, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `integers:add_int` — ws-node-lint findings NOTATION 31, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `integers:add_negative` — option values fail ws-options-verify: nlOn (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `integers:add_negative` — ws-node-lint findings NOTATION 30, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `integers:compare_int` — ws-node-lint findings NOTATION 22, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `integers:mixed_integers` — production item offered as buttons on screen while the paper prints no choices (wide/multiple-choice), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `integers:mixed_integers` — option values fail ws-options-verify: poolSize (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `integers:mixed_integers` — ws-node-lint findings NOTATION 17, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `integers:number_line_int` — ws-node-lint findings NOTATION 30, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `integers:opposite_numbers` — ws-node-lint findings NOTATION 14, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `integers:ordering_rationals` — production item offered as buttons on screen while the paper prints no choices (wide/multiple-choice), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `integers:ordering_rationals` — ws-node-lint findings NOTATION 78, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `integers:sub_int` — ws-node-lint findings NOTATION 30, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `integers:sub_negative` — option values fail ws-options-verify: nlOn (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `integers:sub_negative` — ws-node-lint findings NOTATION 30, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:arrays_groups` — option values fail ws-options-verify: range (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:count_by_10s` — option values fail ws-options-verify: onePage (1 value), order (1 value), nlOn (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:count_by_11s` — option values fail ws-options-verify: onePage (1 value), order (1 value), nlOn (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:count_by_12s` — option values fail ws-options-verify: onePage (1 value), order (1 value), nlOn (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:count_by_2s` — option values fail ws-options-verify: onePage (1 value), order (1 value), nlOn (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:count_by_3s` — option values fail ws-options-verify: onePage (1 value), order (1 value), nlOn (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:count_by_4s` — option values fail ws-options-verify: onePage (1 value), order (1 value), nlOn (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:count_by_5s` — option values fail ws-options-verify: onePage (1 value), order (1 value), nlOn (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:count_by_6s` — option values fail ws-options-verify: onePage (1 value), order (1 value), nlOn (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:count_by_7s` — option values fail ws-options-verify: rows (1 value), onePage (1 value), order (1 value), nlOn (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:count_by_8s` — option values fail ws-options-verify: onePage (1 value), order (1 value), nlOn (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:count_by_9s` — option values fail ws-options-verify: onePage (1 value), order (1 value), nlOn (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:mixed_multiplication` — option values fail ws-options-verify: poolSupport (3 values), skipAfter (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:mult_2by1_column` — option values fail ws-options-verify: notation (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:mult_2by2_standard` — option values fail ws-options-verify: notation (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:mult_3by1_column` — option values fail ws-options-verify: notation (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:mult_arrays` — option values fail ws-options-verify: range (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:mult_break_apart` — option values fail ws-options-verify: pictures (1 value), task (3 values), band (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:mult_by_hundred` — ws-node-lint findings REPEATS 4, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:mult_by_ten` — ws-node-lint findings REPEATS 4, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:mult_chart_headers` — option values fail ws-options-verify: missing (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:mult_chart_pattern` — option values fail ws-options-verify: missing (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:mult_chart_shade` — option values fail ws-options-verify: missing (6 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:mult_equal_groups` — option values fail ws-options-verify: range (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:mult_placeholder_zero` — ws-node-lint findings L10 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:mult_properties` — option values fail ws-options-verify: band (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:mult_properties` — ws-node-lint findings NOTATION 15, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `multiplication:number_families_mult` — option values fail ws-options-verify: skipAfter (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `number_ops_mixed:number_families_mixed` — option values fail ws-options-verify: skipAfter (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `number_ops_mixed:operations_all` — production item offered as buttons on screen while the paper prints no choices (wide/multiple-choice), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `number_ops_mixed:operations_all` — option values fail ws-options-verify: poolSize (1 value), poolSupport (2 values), skipAfter (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `number_ops_mixed:word_problems_mixed` — option values fail ws-options-verify: poolSupport (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `number_ops_mixed:word_problems_mixed_plain` — option values fail ws-options-verify: poolSupport (3 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+
 ### K-2, number sense, place value (80 skills, 78 need an upgrade)
 
 | Skill | Gr | Template | Provider | Status | Evidence | Machine findings (pinned) | Catalogue verdict and defects | Effort |
@@ -535,6 +686,34 @@ The rest (`bar-graph` 6, `factor-tchart` 6, `perimeter-shape` 5, `count-row` 5, 
 | `number_sense:near_doubles` Near Doubles (Doubles Plus One, Doubles Minus One) (preset of `doubles_near_doubles`) | 1 | legacy | default adapter | NEEDS-UPGRADE | legacy cell: no `q.cell` in 12 seeded items (code read at 07523be2) | none pinned | (not in a family catalogue) | data: preset of doubles_near_doubles, follows its host |
 | `number_sense:reasonable_quotients` Is the Quotient Reasonable? (preset of `estimate_quotient`) | 4 | pv | real (3/3 core) | NEEDS-UPGRADE | on kit template `pv`; no recorded critic PASS | print-lint L/S/M: KEY 2/2/2; node-lint: PATTERN 2 | (not in a family catalogue) | data: preset of estimate_quotient, follows its host |
 
+#### Wave 0 pinned defects (2026-10-23)
+
+- `comparing:compare_groups` — option values fail ws-options-verify: calculator (1 value), skipAfter (3 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `comparing:mixed_comparing` — option values fail ws-options-verify: calculator (1 value), skipAfter (3 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `composing:compose_whole` — ws-node-lint findings NOTATION 69, REPEATS 6, L10 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `composing:fraction_number_line` — ws-node-lint findings NOTATION 16, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `composing:make_ten` — ws-node-lint findings REPEATS 3, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `composing:mixed_composing` — option values fail ws-options-verify: calculator (1 value), skipAfter (3 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `composing:mixed_composing` — ws-node-lint findings NOTATION 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `composing:number_bonds` — option values fail ws-options-verify: calculator (1 value), skipAfter (3 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `composing:number_word_form` — option values fail ws-options-verify: zeroPlace (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `composing:ten_frame_build` — ws-node-lint findings REPEATS 2, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `composing:ten_frame_build_teen` — ws-node-lint findings REPEATS 3, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `composing:tens_foundation_visual` — ws-node-lint findings REPEATS 3, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `composing:write_numbers_in_words` — option values fail ws-options-verify: zeroPlace (2 values), answerSlot (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `counting:mixed_counting` — option values fail ws-options-verify: nlOn (1 value), nlFrom (2 values), nlTo (2 values), nlStep (19 values), nlLabels (6 values), nlMinor (5 values), nlHops (1 value), calculator (1 value), skipAfter (3 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `counting:number_seq_fill` — option values fail ws-options-verify: nlFrom (2 values), nlTo (2 values), nlStep (19 values), nlLabels (6 values), nlMinor (5 values), nlHops (1 value), calculator (1 value), skipAfter (3 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `counting_mixed:counting_all` — option values fail ws-options-verify: calculator (1 value), skipAfter (3 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `counting_mixed:counting_all` — ws-node-lint findings NOTATION 3, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `number_sense:compensation` — ws-node-lint findings NOTATION 15, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `number_sense:make_a_ten` — production item offered as buttons on screen while the paper prints no choices (make-a-ten/multiple-choice), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `number_sense:mixed_number_sense` — option values fail ws-options-verify: poolSize (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `number_sense:reasonable_quotients` — ws-node-lint findings L10 2, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `placevalue:digit_value_notation` — ws-node-lint findings L6 27, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `placevalue:digit_value_unit_form` — ws-node-lint findings L6 27, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `placevalue:place_value_10x` — option values fail ws-options-verify: band (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `placevalue:value` — ws-node-lint findings L6 25, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+
 ### Geometry (76 skills, 76 need an upgrade)
 
 | Skill | Gr | Template | Provider | Status | Evidence | Machine findings (pinned) | Catalogue verdict and defects | Effort |
@@ -616,6 +795,45 @@ The rest (`bar-graph` 6, `factor-tchart` 6, `perimeter-shape` 5, `count-row` 5, 
 | `geo_mixed:measurement_all` All Measurement Skills | M | timeline + clock + coins (+ legacy 2/12) | default adapter | NEEDS-UPGRADE | part-migrated: 2/12 seeded items still legacy | print-lint L/S/M: SPACE 1/2/1, KEY 0/1/0; MC on screen: measurement-estimate/multiple-choice | **keep** (catalogue/geometry.md:203): inherits emoji from the measurement family; catalogue host `computation-grid` wrong | pool: follows its members + the Mixed practice composer (M1-M5) |
 | `geo_mixed:geo_meas_all` All Geometry & Measurement | M | clock + timeline + coins + ruler (+ legacy 5/12) | default adapter | NEEDS-UPGRADE | part-migrated: 5/12 seeded items still legacy | print-lint L/S/M: SPACE 1/1/1; options-verify: 3 option values fail; MC on screen: geometry-partitions/text | **keep** (catalogue/geometry.md:204): same | pool: follows its members + the Mixed practice composer (M1-M5) |
 
+#### Wave 0 pinned defects (2026-10-23)
+
+- `angles_lines:measure_angles` — production item offered as buttons on screen while the paper prints no choices (geometry-measure-angle/choice), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `angles_lines:measure_angles` — ws-node-lint findings REPEATS 4, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `angles_lines:mixed_angles_lines` — production item offered as buttons on screen while the paper prints no choices (geometry-measure-angle/choice), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `coordinates:coordinate_all` — ws-node-lint findings NOTATION 51, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `coordinates:coordinate_graph` — ws-node-lint findings NOTATION 27, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `coordinates:coordinates_plot_all` — ws-node-lint findings NOTATION 78, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `coordinates:coordinates_plot_q1` — option values fail ws-options-verify: band (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `coordinates:coordinates_read_all` — ws-node-lint findings NOTATION 30, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `coordinates:coordinates_read_q1` — option values fail ws-options-verify: band (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `coordinates:geo_reflect` — ws-node-lint findings REPEATS 4, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `coordinates:geo_rotate` — ws-node-lint findings REPEATS 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `coordinates:mixed_coordinates` — option values fail ws-options-verify: poolSize (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `coordinates:mixed_coordinates` — ws-node-lint findings NOTATION 2, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `coordinates:net_surface_area` — ws-node-lint findings REPEATS 4, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `coordinates:reflect_x_axis` — ws-node-lint findings REPEATS 8, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `coordinates:reflect_y_axis` — ws-node-lint findings REPEATS 8, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `coordinates:rotate_half_turn` — ws-node-lint findings REPEATS 8, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `coordinates:rotate_quarter_turn` — ws-node-lint findings REPEATS 8, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `coordinates:rotate_three_quarter_turn` — ws-node-lint findings REPEATS 8, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `geo_mixed:geo_meas_all` — production item offered as buttons on screen while the paper prints no choices (geometry-partitions/text), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `geo_mixed:geo_meas_all` — option values fail ws-options-verify: poolSize (1 value), skipAfter (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `geo_mixed:geometry_all` — production item offered as buttons on screen while the paper prints no choices (geometry-measure-angle/choice), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `geo_mixed:geometry_all` — option values fail ws-options-verify: poolSize (1 value), skipAfter (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `geo_mixed:geometry_all` — ws-node-lint findings NOTATION 4, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `geo_mixed:measurement_all` — production item offered as buttons on screen while the paper prints no choices (measurement-estimate/multiple-choice), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `shapes_classify:cross_section_3d` — ws-node-lint findings REPEATS 2, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `shapes_classify:hotspot_quads` — ws-node-lint findings REPEATS 6, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `shapes_early:compose_hexagon` — ws-node-lint findings REPEATS 9, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `shapes_early:compose_rect_from_squares` — ws-node-lint findings REPEATS 11, L10 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `shapes_early:compose_shapes` — ws-node-lint findings REPEATS 8, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `shapes_early:mixed_shapes_early` — option values fail ws-options-verify: poolSize (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `shapes_early:partition_shapes` — production item offered as buttons on screen while the paper prints no choices (geometry-partitions/text), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `shapes_early:partition_shapes` — ws-node-lint findings REPEATS 3, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `shapes_early:shape_corners_count` — ws-node-lint findings REPEATS 6, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `shapes_early:shape_name_match_2d` — ws-node-lint findings REPEATS 11, L10 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `shapes_early:shape_name_match_3d` — ws-node-lint findings REPEATS 11, L10 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+
 ### Fractions, decimals, conversions (71 skills, 71 need an upgrade)
 
 | Skill | Gr | Template | Provider | Status | Evidence | Machine findings (pinned) | Catalogue verdict and defects | Effort |
@@ -692,6 +910,75 @@ The rest (`bar-graph` 6, `factor-tchart` 6, `perimeter-shape` 5, `count-row` 5, 
 | `frac_dec_mixed:conversions_all` All Conversion Skills | M | legacy | default adapter | NEEDS-UPGRADE | legacy cell: no `q.cell` in 12 seeded items (code read at 07523be2) | print-lint L/S/M: SPACE 4/4/4, NOTATION 3/3/3, SIZE 2/2/2, KEY 1/1/1; node-lint: NOTATION 13; options-verify: 2 option values fail; MC on screen: legacy/text | **keep** (catalogue/fractions-decimals-conversions.md:251): review pool; same measurement leak as `mixed_conversions` | pool: follows its members + the Mixed practice composer (M1-M5) |
 | `frac_dec_mixed:fdp_all` All FDP Skills | M | frac-model (+ legacy 11/12) | default adapter | NEEDS-UPGRADE | part-migrated: 11/12 seeded items still legacy | print-lint L/S/M: NOTATION 3/3/3; node-lint: NOTATION 58; options-verify: 7 option values fail; MC on screen: legacy/text | **keep** (catalogue/fractions-decimals-conversions.md:252): review pool; draws from `fraction_operations` too, so a 37-word item can appear (`maxWords` 37) | pool: follows its members + the Mixed practice composer (M1-M5) |
 
+#### Wave 0 pinned defects (2026-10-23)
+
+- `conversions:d_to_f` — production item offered as buttons on screen while the paper prints no choices (legacy/text), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `conversions:d_to_f` — ws-node-lint findings NOTATION 97, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `conversions:equiv_ratios` — option values fail ws-options-verify: band (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `conversions:f_to_d` — ws-node-lint findings NOTATION 91, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `conversions:f_to_p` — production item offered as buttons on screen while the paper prints no choices (legacy/text), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `conversions:f_to_p` — ws-node-lint findings NOTATION 72, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `conversions:mixed_conversions` — production item offered as buttons on screen while the paper prints no choices (legacy/text), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `conversions:mixed_conversions` — option values fail ws-options-verify: poolSize (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `conversions:mixed_conversions` — ws-node-lint findings NOTATION 8, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `conversions:p_to_f` — production item offered as buttons on screen while the paper prints no choices (legacy/text), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `conversions:p_to_f` — ws-node-lint findings NOTATION 127, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `conversions:percent_of_number` — ws-node-lint findings NOTATION 14, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `conversions:ratio_equivalent_or_not` — option values fail ws-options-verify: band (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `conversions:ratio_part_to_part` — option values fail ws-options-verify: band (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `conversions:ratio_simplest_form` — option values fail ws-options-verify: band (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `conversions:ratio_tables` — ws-node-lint findings L3 3, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `decimals:div_by_decimal` — option values fail ws-options-verify: range (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `decimals:mixed_decimals` — ws-node-lint findings NOTATION 3, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `decimals:sub_decimal` — ws-node-lint findings NOTATION 30, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `frac_dec_mixed:conversions_all` — production item offered as buttons on screen while the paper prints no choices (legacy/text), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `frac_dec_mixed:conversions_all` — option values fail ws-options-verify: poolSize (1 value), skipAfter (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `frac_dec_mixed:conversions_all` — ws-node-lint findings NOTATION 13, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `frac_dec_mixed:decimals_all` — option values fail ws-options-verify: skipAfter (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `frac_dec_mixed:decimals_all` — ws-node-lint findings NOTATION 3, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `frac_dec_mixed:fdp_all` — production item offered as buttons on screen while the paper prints no choices (legacy/text), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `frac_dec_mixed:fdp_all` — option values fail ws-options-verify: poolSize (2 values), poolSupport (3 values), skipAfter (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `frac_dec_mixed:fdp_all` — ws-node-lint findings NOTATION 58, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `frac_dec_mixed:fractions_all` — production item offered as buttons on screen while the paper prints no choices (mixed-to-improper/text), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `frac_dec_mixed:fractions_all` — option values fail ws-options-verify: poolSize (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `frac_dec_mixed:fractions_all` — ws-node-lint findings NOTATION 48, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:benchmark_fractions` — ws-node-lint findings NOTATION 157, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:compare` — ws-node-lint findings NOTATION 59, REPEATS 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:compare_frac_lcd` — ws-node-lint findings NOTATION 70, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:compare_fractions_nl` — option values fail ws-options-verify: nlOn (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:compare_fractions_nl` — ws-node-lint findings NOTATION 57, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:compare_to_half` — option values fail ws-options-verify: denoms (1 value), model (4 values), nlOn (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:compare_to_half` — ws-node-lint findings NOTATION 60, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:compose_target_frac` — ws-node-lint findings NOTATION 194, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:equiv_frac_nv` — ws-node-lint findings NOTATION 113, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:equiv_frac_visual` — ws-node-lint findings NOTATION 21, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:equivalent` — ws-node-lint findings NOTATION 85, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:equivalent_or_not` — option values fail ws-options-verify: nlOn (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:equivalent_or_not` — ws-node-lint findings NOTATION 60, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:fraction_bar_ops` — ws-node-lint findings NOTATION 52, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:fraction_nl_drag` — ws-node-lint findings NOTATION 19, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:fraction_of_set` — option values fail ws-options-verify: calculator (1 value), skipAfter (3 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:fraction_of_set` — ws-node-lint findings NOTATION 23, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:fraction_of_set_hard` — option values fail ws-options-verify: calculator (1 value), skipAfter (3 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:fraction_of_set_hard` — ws-node-lint findings NOTATION 23, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:fraction_of_set_hard_nv` — ws-node-lint findings NOTATION 46, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:fraction_of_set_nv` — ws-node-lint findings NOTATION 51, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:graph_fractions` — ws-node-lint findings NOTATION 30, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:identify` — ws-node-lint findings NOTATION 20, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:improper_mixed` — production item offered as buttons on screen while the paper prints no choices (improper-to-mixed/text, mixed-improper-visual/text, mixed-to-improper/text), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:improper_mixed` — ws-node-lint findings NOTATION 47, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:mixed_fractions` — production item offered as buttons on screen while the paper prints no choices (improper-to-mixed/text, mixed-improper-visual/text), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:mixed_fractions` — option values fail ws-options-verify: calculator (1 value), skipAfter (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:mixed_fractions` — ws-node-lint findings NOTATION 48, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:order_frac_numline` — ws-node-lint findings NOTATION 56, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:order_fractions` — ws-node-lint findings NOTATION 32, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:round_fractions` — ws-node-lint findings NOTATION 30, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:select_equiv_frac` — ws-node-lint findings NOTATION 196, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:shade_fraction` — ws-node-lint findings NOTATION 30, REPEATS 4, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:simplify` — production item offered as buttons on screen while the paper prints no choices (fraction-simplify/text), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:simplify` — ws-node-lint findings NOTATION 52, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fractions:simplify_with_gcf` — ws-node-lint findings NOTATION 30, REPEATS 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+
 ### Addition (59 skills, 59 need an upgrade)
 
 | Skill | Gr | Template | Provider | Status | Evidence | Machine findings (pinned) | Catalogue verdict and defects | Effort |
@@ -756,6 +1043,16 @@ The rest (`bar-graph` 6, `factor-tchart` 6, `perimeter-shape` 5, `count-row` 5, 
 | `addition:add_missing_digit` Find the Missing Digit (Addition) | 3 | stack | default adapter | NEEDS-UPGRADE | on kit template `stack`; no recorded critic PASS | print-lint L/S/M: KEY 0/1/1 | (not in a family catalogue) | copy on existing template `stack` (fix + provider) |
 | `addition:fact_family_sort` Is It a Fact Family? (+/−) | 1 | legacy | default adapter | NEEDS-UPGRADE | legacy cell: no `q.cell` in 12 seeded items (code read at 07523be2) | none pinned | (not in a family catalogue) | copy on existing template `fact-family` (migrate from legacy) |
 
+#### Wave 0 pinned defects (2026-10-23)
+
+- `addition:add_5_pictures` — ws-node-lint findings REPEATS 5, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `addition:add_word_problems` — option values fail ws-options-verify: pictures (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `addition:add_wp_100` — option values fail ws-options-verify: pictures (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `addition:add_wp_20` — option values fail ws-options-verify: pictures (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `addition:add_wp_50` — option values fail ws-options-verify: pictures (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `addition:mixed_addition` — option values fail ws-options-verify: nlOn (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `addition:number_families_add` — option values fail ws-options-verify: skipAfter (2 values), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+
 ### Subtraction (56 skills, 50 need an upgrade)
 
 | Skill | Gr | Template | Provider | Status | Evidence | Machine findings (pinned) | Catalogue verdict and defects | Effort |
@@ -817,6 +1114,18 @@ The rest (`bar-graph` 6, `factor-tchart` 6, `perimeter-shape` 5, `count-row` 5, 
 | `subtraction:sub_wp_compare` Subtraction Word Problems: How Many More? (preset of `sub_word_problems`) | 1 | word-work | real (3/3 core) | NEEDS-UPGRADE | on kit template `word-work`; no recorded critic PASS | options-verify: 1 option values fail; number-line support: 1 values fail | (not in a family catalogue) | data: preset of sub_word_problems, follows its host |
 | `subtraction:sub_wp_start_unknown` Subtraction Word Problems: Find the Start (preset of `sub_word_problems`) | 2 | word-work | real (3/3 core) | NEEDS-UPGRADE | on kit template `word-work`; no recorded critic PASS | options-verify: 2 option values fail; number-line support: 1 values fail | (not in a family catalogue) | data: preset of sub_word_problems, follows its host |
 
+#### Wave 0 pinned defects (2026-10-23)
+
+- `subtraction:mixed_subtraction` — option values fail ws-options-verify: poolSize (1 value), poolSupport (2 values), nlOn (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `subtraction:sub_5_pictures` — ws-node-lint findings REPEATS 3, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `subtraction:sub_word_problems` — option values fail ws-options-verify: pictures (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `subtraction:sub_wp_10` — option values fail ws-options-verify: pictures (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `subtraction:sub_wp_100` — option values fail ws-options-verify: pictures (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `subtraction:sub_wp_20` — option values fail ws-options-verify: pictures (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `subtraction:sub_wp_50` — option values fail ws-options-verify: pictures (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `subtraction:sub_wp_compare` — option values fail ws-options-verify: pictures (1 value), nlOn (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `subtraction:sub_wp_start_unknown` — option values fail ws-options-verify: pictures (1 value), wpCues (1 value), nlOn (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+
 ### Vocabulary (50 skills, 50 need an upgrade)
 
 | Skill | Gr | Template | Provider | Status | Evidence | Machine findings (pinned) | Catalogue verdict and defects | Effort |
@@ -872,6 +1181,28 @@ The rest (`bar-graph` 6, `factor-tchart` 6, `perimeter-shape` 5, `count-row` 5, 
 | `vocabulary:vocab_grade_6_algebra` Math Vocabulary – Grade 6: Algebra (Match) | 6 | legacy | default adapter | NEEDS-UPGRADE | legacy cell: no `q.cell` in 12 seeded items (code read at 07523be2) | print-lint L/S/M: FONT 46/46/46, TAGLINE 2/2/2, SPACE 0/2/2, KEY 1/1/1; node-lint: SIZE 1, NOTATION 4 | **fix** (catalogue/vocabulary.md:115): pool 21, pic 0; no long definitions, the cleanest text in the family, but no model anywhere | copy on existing template `words` (migrate from legacy) |
 | `vocabulary:vocab_grade_6_measurement` Math Vocabulary – Grade 6: Measurement (Match) | 6 | legacy | default adapter | NEEDS-UPGRADE | legacy cell: no `q.cell` in 12 seeded items (code read at 07523be2) | print-lint L/S/M: FONT 46/46/46, TAGLINE 2/2/2, KEY 1/1/1 | **redo** (catalogue/vocabulary.md:116): pool 10, pic 0 — the only grade-6 pool below the 12-card floor; 7 of 12 distinct | redo (`words`) |
 
+#### Wave 0 pinned defects (2026-10-23)
+
+- `vocabulary:vocab_grade_1` — ws-node-lint findings NOTATION 3, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `vocabulary:vocab_grade_1_operations` — ws-node-lint findings NOTATION 13, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `vocabulary:vocab_grade_2` — ws-node-lint findings NOTATION 2, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `vocabulary:vocab_grade_2_algebra` — ws-node-lint findings NOTATION 2, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `vocabulary:vocab_grade_2_operations` — ws-node-lint findings NOTATION 3, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `vocabulary:vocab_grade_3` — ws-node-lint findings NOTATION 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `vocabulary:vocab_grade_3_fractions` — ws-node-lint findings NOTATION 29, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `vocabulary:vocab_grade_4` — ws-node-lint findings NOTATION 13, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `vocabulary:vocab_grade_4_data` — ws-node-lint findings NOTATION 4, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `vocabulary:vocab_grade_4_fractions` — ws-node-lint findings NOTATION 83, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `vocabulary:vocab_grade_5` — ws-node-lint findings NOTATION 10, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `vocabulary:vocab_grade_5_data` — ws-node-lint findings NOTATION 1, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `vocabulary:vocab_grade_5_fractions` — ws-node-lint findings NOTATION 47, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `vocabulary:vocab_grade_6` — ws-node-lint findings NOTATION 11, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `vocabulary:vocab_grade_6_algebra` — ws-node-lint findings NOTATION 4, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `vocabulary:vocab_grade_6_fractions` — ws-node-lint findings NOTATION 29, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `vocabulary:vocab_grade_6_geometry` — ws-node-lint findings NOTATION 6, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `vocabulary:vocab_grade_6_operations` — ws-node-lint findings NOTATION 44, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `vocabulary:vocab_grade_K_operations` — ws-node-lint findings NOTATION 15, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+
 ### Fraction operations (41 skills, 41 need an upgrade)
 
 | Skill | Gr | Template | Provider | Status | Evidence | Machine findings (pinned) | Catalogue verdict and defects | Effort |
@@ -917,3 +1248,48 @@ The rest (`bar-graph` 6, `factor-tchart` 6, `perimeter-shape` 5, `count-row` 5, 
 | `fraction_operations:estimate_frac_ops` Estimate Fraction Sums/Differences | 5 | legacy | default adapter | NEEDS-UPGRADE | legacy cell: no `q.cell` in 12 seeded items (code read at 07523be2) | print-lint L/S/M: FONT 96/96/96, NOTATION 36/36/36, KEY 1/1/1; node-lint: NOTATION 109; MC on screen: fraction-estimate/multiple-choice | **redo** (catalogue/fraction-operations.md:172): negative differences and a value that does not match the printed fraction L4991-4995; keys "1.5" / "-0.5" L5010 while "1 1/2" is a wrong option; 1/4 and 3/4 rounded by an arbitrary rule L4998-5002; print is a production item, screen is … | redo (`frac-model`) |
 | `fraction_operations:unit_frac_div_whole` Divide a Unit Fraction by a Whole Number (preset of `div_unit_frac_nv`) | 5 | legacy | default adapter | NEEDS-UPGRADE | legacy cell: no `q.cell` in 12 seeded items (code read at 07523be2) | print-lint L/S/M: NOTATION 3/4/4, KEY 1/1/1; node-lint: NOTATION 45 | (not in a family catalogue) | data: preset of div_unit_frac_nv, follows its host |
 | `fraction_operations:whole_div_unit_frac` Divide a Whole Number by a Unit Fraction (preset of `div_unit_frac_nv`) | 5 | legacy | default adapter | NEEDS-UPGRADE | legacy cell: no `q.cell` in 12 seeded items (code read at 07523be2) | print-lint L/S/M: NOTATION 5/5/5, KEY 1/1/1; node-lint: NOTATION 34 | (not in a family catalogue) | data: preset of div_unit_frac_nv, follows its host |
+
+#### Wave 0 pinned defects (2026-10-23)
+
+- `fraction_operations:add_frac_like_nv` — ws-node-lint findings NOTATION 75, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:add_frac_unlike` — ws-node-lint findings NOTATION 89, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:add_frac_unlike_nv` — ws-node-lint findings NOTATION 121, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:add_fractions_like` — ws-node-lint findings NOTATION 73, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:add_mixed_like` — ws-node-lint findings NOTATION 59, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:add_mixed_like_nv` — ws-node-lint findings NOTATION 46, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:add_mixed_unlike` — ws-node-lint findings NOTATION 127, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:add_mixed_unlike_nv` — ws-node-lint findings NOTATION 59, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:decompose_frac_nv` — ws-node-lint findings NOTATION 63, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:decompose_fractions` — ws-node-lint findings NOTATION 86, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:div_unit_frac_nv` — ws-node-lint findings NOTATION 38, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:div_unit_fraction` — ws-node-lint findings NOTATION 34, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:estimate_frac_ops` — production item offered as buttons on screen while the paper prints no choices (fraction-estimate/multiple-choice), pinned in `design/audit/baselines/content-audit-mc.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:estimate_frac_ops` — ws-node-lint findings NOTATION 109, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:frac_10_100` — ws-node-lint findings NOTATION 135, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:frac_10_100_nv` — ws-node-lint findings NOTATION 99, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:frac_as_div_nv` — ws-node-lint findings NOTATION 37, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:frac_as_division` — ws-node-lint findings NOTATION 25, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:frac_mult_word` — ws-node-lint findings NOTATION 34, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:frac_mult_word_plain` — ws-node-lint findings NOTATION 37, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:frac_word_mixed` — ws-node-lint findings NOTATION 46, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:frac_word_mixed_plain` — ws-node-lint findings NOTATION 43, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:frac_word_problems` — ws-node-lint findings NOTATION 49, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:frac_word_problems_plain` — ws-node-lint findings NOTATION 54, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:mixed_fraction_ops` — option values fail ws-options-verify: poolSupport (1 value), pinned in `design/audit/baselines/options-verify.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:mixed_fraction_ops` — ws-node-lint findings NOTATION 64, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:mult_frac_frac` — ws-node-lint findings NOTATION 118, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:mult_frac_frac_nv` — ws-node-lint findings NOTATION 79, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:mult_frac_whole` — ws-node-lint findings NOTATION 51, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:mult_frac_whole_nv` — ws-node-lint findings NOTATION 42, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:mult_scaling` — ws-node-lint findings NOTATION 87, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:mult_scaling_nv` — ws-node-lint findings NOTATION 95, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:sub_frac_like_nv` — ws-node-lint findings NOTATION 78, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:sub_frac_unlike` — ws-node-lint findings NOTATION 152, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:sub_frac_unlike_nv` — ws-node-lint findings NOTATION 117, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:sub_fractions_like` — ws-node-lint findings NOTATION 112, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:sub_mixed_like` — ws-node-lint findings NOTATION 61, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:sub_mixed_like_nv` — ws-node-lint findings NOTATION 46, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:sub_mixed_unlike` — ws-node-lint findings NOTATION 117, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:sub_mixed_unlike_nv` — ws-node-lint findings NOTATION 60, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:unit_frac_div_whole` — ws-node-lint findings NOTATION 45, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
+- `fraction_operations:whole_div_unit_frac` — ws-node-lint findings NOTATION 34, pinned in `design/audit/baselines/node-lint.json` (Wave 0 gates, 2026-10-23); clears when the pin is removed.
