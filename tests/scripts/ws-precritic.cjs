@@ -650,6 +650,29 @@ function buildPlan(ctx) {
         const sk = keys.flatMap((k) => ['--skill', k]);
         add(gate('card-rulings', 'ws-card-rulings --check rulings (spec card numeric rulings, 300 items)', scope, 'node', 'ws-card-rulings', [...sk, '--check', 'rulings'], { parse: PARSE.cardRulings }));
         add(gate('card-not-offered', 'ws-card-rulings --check offered (panel offers nothing the card bans)', scope, 'node', 'ws-card-rulings', [...sk, '--check', 'offered'], { parse: PARSE.cardRulings }));
+        // W0-B2 (lane S1): the spec card that covers these skills is signed, its rulings / notOffered / decisions are as
+        // signed, and it decides every option value, role and screen host the repo offers today (ws-spec-card
+        // --check-signed --skill). No card covers them (exit 4): N/A. An UNSIGNED card (exit 5, "needs owner signature";
+        // a draft's other problems are listed) is INCOMPLETE, never PASS: the lane may run and the critic may grade, a
+        // --strict run fails. A SIGNED card that fails (an undecided line, a weakened ruling, a hand edit, a stale rule): FAIL.
+        add(gate('spec-card-signed', 'ws-spec-card --check-signed --skill (card signed; every host, role and option value decided)', scope, 'node', 'ws-spec-card', ['--check-signed', '--skill', keys.join(',')], { parse: (g, out, code) => {
+            const m = /^ws-spec-card: (OK|FAIL|NO-CARD) — (.*)$/m.exec(out);
+            if (!m) return unparsed('no "ws-spec-card: OK|FAIL|NO-CARD" line', out);
+            const det = out.split('\n').filter((l) => /^(FAIL|UNSIGNED) /.test(l)).slice(0, 10);
+            if (m[1] === 'NO-CARD' && code === 4) return { result: 'N/A', findings: m[2], detail: [], explainsExit: true };
+            if (m[1] === 'FAIL' && code === 5) return { result: 'INCOMPLETE (unsigned card)', findings: m[2], detail: det, explainsExit: true };
+            if (m[1] === 'OK' && code === 0) return { result: 'PASS', findings: m[2].slice(0, 200), detail: [], explainsExit: false };
+            return { result: 'FAIL', findings: m[2].slice(0, 200), detail: det, explainsExit: code === 1 };
+        } }));
+        // B7: every offered APPEARANCE value of the touched skills printed at S and L through ws-print-lint, against the
+        // skill's default page (pilot-su-c critic r2 N4: "Across" kept its promise and broke the page). A browser gate:
+        // print-lint runs inside the slot this row holds.
+        add(gate('options-render', 'ws-options-verify --render (each offered appearance value at S / L vs the default page)', `${scope} × S/L`, 'browser', 'ws-options-verify', ['--render', '--skill', keys.join(',')], { needFlags: ['render'], parse: (g, out, code) => {
+            const m = /^ws-options-verify --render: (OK|FAIL) \((.*)\)\s*$/m.exec(out);
+            if (!m) return unparsed('no "ws-options-verify --render: OK|FAIL" line', out);
+            if (m[1] === 'OK') return { result: /^nothing to render/.test(m[2]) ? 'N/A' : 'PASS', findings: m[2].slice(0, 220), detail: [], explainsExit: false };
+            return { result: 'FAIL', findings: m[2].slice(0, 220), detail: out.split('\n').filter((l) => /^ {2}FAIL /.test(l)).slice(0, 10).map((l) => l.trim()), explainsExit: code === 1 };
+        } }));
     }
     if (ctx.template) {
         const t = ctx.template;
