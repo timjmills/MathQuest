@@ -1,0 +1,172 @@
+/* ==========================================================================
+   teacher-shell.css — Teacher site 2.0 shell, board C, light only (T2)
+
+   The signed mock-up's shell (design/mockups/teacher-2/app.css "the shell"):
+     - >= 820 px: a 224 px INK side menu — brand, the three places (Skills,
+       Lessons, Classes) and the profile button "Me" at the foot, whose menu
+       holds Settings · Switch to pupil view · Teacher help;
+     - <  820 px: the same nav becomes a labelled bottom bar (icon + word,
+       64 px tall, every target >= 44 px) and the page is padded by it so
+       nothing scrolls under it;
+     - each place shows its screens as tabs (.tv2-tabs) at the top of the
+       workspace; until T3–T5 those are today's screens.
+   Values come from css/teacher-tokens.css only (no raw colours, sizes, radii
+   or shadows here).
+
+   ADDITIVE: loaded after every teacher sheet; earlier rules are overridden by
+   order or by a higher selector, never edited. Scoped to body.teacher-mode /
+   #teacherApp, so the pupil side and saved quiz HTML are never reached.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------- old screens on the board C neutrals
+   Today's screens keep their layout; their neutrals move to the warm stone page, white cards and warm ink.
+   (Their primary button keeps --tv-primary until T3 rebuilds those screens: ws-teacher-shell asserts it.) */
+body.teacher-mode {
+  --tv-page: var(--page);
+  --tv-surface: var(--surface);
+  --tv-subtle: var(--page);
+  --tv-subtle-2: var(--surface);
+  --tv-border: var(--line);
+  --tv-rule: var(--surface-2);
+  --tv-rule-soft: var(--page);
+  --tv-text: var(--text);
+  --tv-text-2: var(--text-2);
+  --tv-caption: var(--text-3);
+  --tv-selected: var(--text);
+  --tv-font: var(--font-ui);
+  --tv-display: var(--font-ui);
+  --tv-mono: var(--font-mono);
+  --tv-side-w: 224px;
+  background: var(--page);
+}
+#teacherApp .tv-h1 { font-family: var(--font-display); font-weight: var(--fw-500); font-synthesis: none; letter-spacing: -0.01em; }
+
+.tv2-icon { flex: none; }
+
+/* ---------------------------------------------------------------- the side menu (>= 820 px) */
+#teacherApp .tv2-nav {
+  width: var(--tv-side-w);
+  display: flex; flex-direction: column; gap: var(--sp-8);
+  padding: var(--sp-24) var(--sp-16);
+  background: var(--rail); color: var(--rail-text);
+  border-right: var(--line-1) solid var(--line);
+  font-family: var(--font-ui); font-size: var(--fs-16); font-weight: var(--fw-500); line-height: var(--lh-body);
+  overflow: visible;
+}
+#teacherApp .tv2-nav a { text-decoration: none; }
+#teacherApp .tv2-brand {
+  display: flex; align-items: center; gap: var(--sp-8); min-height: var(--control);
+  padding: 0 var(--sp-8); margin-bottom: var(--sp-16); border-radius: var(--r-8);
+  color: var(--rail-text); white-space: nowrap;
+  font-family: var(--font-display); font-weight: var(--fw-500); font-synthesis: none; font-size: var(--fs-16); letter-spacing: -0.01em;
+}
+#teacherApp .tv2-brand-mark {
+  width: var(--sp-32); height: var(--sp-32); flex: none; display: grid; place-items: center;
+  background: var(--rail-text); color: var(--rail); font-size: var(--fs-16); border-radius: 0;
+}
+#teacherApp .tv2-place {
+  display: flex; align-items: center; gap: var(--sp-16); width: 100%;
+  min-height: var(--sp-48); padding: 0 var(--sp-16);
+  border: var(--line-1) solid transparent; border-radius: var(--r-8); background: transparent;
+  color: var(--rail-text-2); font: inherit; font-size: var(--fs-16); font-weight: var(--fw-700); text-align: left; cursor: pointer;
+}
+#teacherApp .tv2-place:hover { border-color: var(--rail-text-2); }
+#teacherApp .tv2-place[aria-current="page"] { color: var(--rail-text); border-color: var(--rail-active); box-shadow: inset var(--sp-4) 0 0 var(--rail-active); }
+/* owner 2026-10-24 (owner-2026-10-24/skills-hierarchy.webp): the active place is an indigo fill */
+#teacherApp .tv2-nav .tv2-place[aria-current="page"] { background: var(--action); color: var(--action-on); border-color: var(--action); box-shadow: none; }
+#teacherApp .tv2-nav :focus-visible { outline: var(--line-2) solid var(--rail-text); outline-offset: var(--line-2); }
+#teacherApp .tv2-foot { margin-top: auto; position: relative; }
+#teacherApp .tv2-me { border-color: var(--rail-text-2); }
+#teacherApp .tv2-me[aria-expanded="true"] { color: var(--rail-text); border-color: var(--rail-text); }
+
+/* the profile menu: a white card above the profile button (a sheet above the bottom bar below 820 px) */
+#teacherApp .tv2-menu {
+  position: absolute; left: 0; bottom: calc(100% + var(--sp-8)); z-index: 60; min-width: 240px;
+  display: grid; gap: var(--sp-4); padding: var(--sp-8);
+  background: var(--surface); color: var(--text);
+  border: var(--line-1) solid var(--line); border-radius: var(--r-16); box-shadow: var(--shadow-2);
+}
+#teacherApp .tv2-menu[hidden] { display: none; }
+#teacherApp .tv2-menu-label {
+  margin: 0; padding: var(--sp-4) var(--sp-16) 0;
+  font-family: var(--font-mono); font-size: var(--fs-12); font-weight: var(--fw-500);
+  text-transform: uppercase; letter-spacing: var(--ls-mono); color: var(--text-3);
+}
+#teacherApp .tv2-menu-item {
+  display: flex; align-items: center; gap: var(--sp-8); min-height: var(--control); padding: 0 var(--sp-16);
+  border: var(--line-1) solid transparent; border-radius: var(--r-8); background: transparent;
+  color: var(--text); font: inherit; font-size: var(--fs-16); font-weight: var(--fw-500); text-align: left; cursor: pointer;
+}
+#teacherApp .tv2-menu-item:hover { border-color: var(--line); }
+#teacherApp .tv2-menu-item[aria-current="page"] { font-weight: var(--fw-700); border-color: var(--text); }
+#teacherApp .tv2-menu :focus-visible { outline: var(--line-2) solid var(--ring); outline-offset: var(--line-2); }
+
+/* ---------------------------------------------------------------- the place tabs (top of the workspace) */
+#teacherApp .tv2-tabs {
+  display: flex; flex-wrap: wrap; gap: var(--sp-8); max-width: 1600px;
+  margin: 0 0 var(--sp-16);
+  border-bottom: var(--line-1) solid var(--line);
+  font-family: var(--font-ui);
+}
+#teacherApp .tv2-tabs:empty { display: none; }
+/* the tabs sit in the workspace's top padding, so a screen's own header moves down by as little as possible */
+body.teacher-mode .tv-main:has(> .tv2-tabs:not(:empty)) { padding-top: var(--sp-8); }
+#teacherApp .tv2-tab {
+  display: inline-flex; align-items: center; gap: var(--sp-4); min-height: var(--control); padding: 0 var(--sp-16);
+  border: 0; border-bottom: var(--sp-4) solid transparent; background: transparent; border-radius: 0;
+  color: var(--text-2); font-size: var(--fs-16); font-weight: var(--fw-700); white-space: nowrap; text-decoration: none;
+}
+#teacherApp .tv2-tab:hover { color: var(--text); }
+#teacherApp .tv2-tab[aria-current="page"] { color: var(--text); border-bottom-color: var(--text); }
+#teacherApp .tv2-tab:focus-visible { outline: var(--line-2) solid var(--ring); outline-offset: calc(-1 * var(--line-2)); }
+
+/* ---------------------------------------------------------------- 820–1023 px: keep the labelled side menu
+   (teacher.css used to shrink it to a 72 px icon rail here) */
+@media (min-width: 820px) {
+  body.teacher-mode { --tv-side-w: 224px; }
+  #teacherApp .tv2-nav { padding: var(--sp-24) var(--sp-16); }
+}
+
+/* ---------------------------------------------------------------- below 820 px: the labelled bottom bar */
+@media (max-width: 819px) {
+  body.teacher-mode { --tv-side-w: 0px; padding-left: 0; }
+  body.teacher-mode.tv-on-screen { padding-bottom: var(--tv2-bar); }
+  body.teacher-mode .tv-main { padding: var(--sp-16) var(--sp-16) calc(var(--tv2-bar) + var(--sp-24)); }
+  body.teacher-mode .tv-main:has(> .tv2-tabs:not(:empty)) { padding-top: var(--sp-8); }
+  #teacherApp .tv2-nav {
+    top: auto; right: 0; bottom: 0; left: 0; width: auto; height: var(--tv2-bar);
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; padding: 0;
+    background: var(--surface); color: var(--text-2);
+    border-right: 0; border-top: var(--line-1) solid var(--line);
+    overflow: visible;
+  }
+  #teacherApp .tv2-brand { display: none; }
+  #teacherApp .tv2-foot { display: contents; }
+  #teacherApp .tv2-place {
+    display: grid; justify-items: center; align-content: center; gap: var(--sp-4);
+    min-height: var(--control); height: 100%; padding: 0 var(--sp-4);
+    border: 0; border-radius: 0; background: transparent;
+    color: var(--text-2); font-size: var(--fs-12); font-weight: var(--fw-700); text-align: center;
+  }
+  #teacherApp .tv2-place:hover { border-color: transparent; color: var(--text); }
+  #teacherApp .tv2-place[aria-current="page"],
+  #teacherApp .tv2-me[aria-expanded="true"] { color: var(--text); box-shadow: inset 0 var(--sp-4) 0 var(--text); }
+  #teacherApp .tv2-nav :focus-visible { outline: var(--line-2) solid var(--ring); outline-offset: calc(-1 * var(--line-2)); }
+  #teacherApp .tv2-menu {
+    position: fixed; left: var(--sp-8); right: var(--sp-8); bottom: calc(var(--tv2-bar) + var(--sp-8)); min-width: 0;
+  }
+  #teacherApp .tv2-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-4); margin-top: 0; }
+  #teacherApp .tv2-tab { justify-content: center; white-space: normal; text-align: center; padding: 0 var(--sp-8); }
+  body.teacher-mode .tv-toast { bottom: calc(var(--tv2-bar) + var(--sp-24)); }
+  /* bars that bleed to the workspace edges follow its 16 px gutter; the Send bar sits on the bottom bar */
+  #teacherApp .tvl-bar { margin-left: calc(-1 * var(--sp-16)); margin-right: calc(-1 * var(--sp-16)); padding-left: var(--sp-16); padding-right: var(--sp-16); }
+  #teacherApp .tv-actionbar { bottom: var(--tv2-bar); }
+  body.teacher-mode:has(#teacherMain .tv-screen.is-active .tvw-bar) .tv-toast { bottom: calc(var(--tv-bar-h, 88px) + var(--tv2-bar) + var(--sp-8)); }
+  #teacherApp .tv-actionbar:not(.tvw-bar) { margin: 0 calc(-1 * var(--sp-16)) calc(-1 * var(--sp-24)); padding-left: var(--sp-16); padding-right: var(--sp-16); }
+}
+
+/* play views and the board window: no menu, no bar (as before) */
+body.teacher-mode.tv-play #teacherApp .tv2-nav,
+body.teacher-mode.tv-board #teacherApp .tv2-nav { display: none; }
+body.teacher-mode.tv-play,
+body.teacher-mode.tv-board { padding-bottom: 0; }

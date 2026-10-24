@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Board C Palette</title>
+<script>document.documentElement.setAttribute('data-theme','light');/* dark mode parked: owner 2026-10-23 */</script>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Fraunces:ital,opsz,wght@1,9..144,500&family=Inter:wght@500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="docs.css">
+</head>
+<body>
+<div class="doc">
+  <div class="top"><a class="btn" href="index.html">← Overview</a><a class="btn" href="app.html">Open the mock-up</a></div>
+  <p class="eyebrow">Teacher site 2.0 · T1 · colour</p>
+  <h1>Colour: board C</h1>
+  <p class="serif">Muted, painted colours from the school’s maths site.</p>
+  <p class="lead">Eight maths areas, each in four strengths. Colour only ever means the maths area; the one main action is solid warm ink; everything else is a calm warm stone page, white surfaces and ink. The rules are IMPROVEMENT_PLAN §2.7; the colours are board C, taken from the school’s Awsaj maths site (owner, 2026-10-23: “I like these colors style more”) and moved only as far as the colour-blind and contrast rules need.</p>
+  <p class="note">Every swatch below is computed in this page from the bold colour with the plan’s ramp rules (tints and soft fills mixed over cream, deep ≥ 7 : 1 on the warm stone page; <code>colour.js</code>, a port of <code>colour.py</code>), and <code>node tests/scripts/ws-teacher-tokens.cjs</code> checks the same numbers and the mock-up’s <code>tokens.css</code>. Contrast figures are WCAG ratios; ΔE is CIEDE2000.</p>
+
+  <h2>Board C, light mode (warm stone page #EFECE8)</h2>
+  <p class="note">Owner, 2026-10-23: the light page is <b>warm stone</b> #EFECE8 with white #FFFFFF surfaces (cards, sheets, the tray) and #E5E1DB / #D6D0C8 for the second surface and lines. Cream #FBF7EF stays only as text on dark fills (the primary button, the rail, cream on a bold). The tints are kept as they are; because a few sit within 3 CIEDE2000 of the stone page (slate 1.6, Counting 2.1, Operations 2.9), every area group is a white card with its tint inside (every tint is ≥ 4.4 from white). Reference only:
+    <span class="ref-sw" style="background:#FBF7EF">cream #FBF7EF (the old page)</span> <span class="ref-sw" style="background:#C9C8DB">soft-tint group background (the “more colour” version, not chosen)</span></p>
+  <p class="note">Tint (10 %) is a group’s background · soft (30 %) a filter chip at rest · <b>bold</b> the card edge, header band, tray chip and selected chip · deep the area’s own text and outline. Tint and soft always take warm ink text (#1A1614).</p>
+  <div id="light"></div>
+
+  <h2>Board C, dark mode (parked)</h2>
+  <p class="note"><b>Parked by the owner, 2026-10-23:</b> “I don’t like the dark mode so for now do not make a dark mode.” The mock-up is light only (it ignores <code>?theme=dark</code>); the dark tokens below are kept untouched but unused, and <code>ws-teacher-tokens</code> skips its dark-mode checks.</p>
+  <p class="note">Page #0F0E0C. Tint = 18 % of the bold over the page (raised 1 % at a time until it is ≥ 1.25 : 1 from the page, so every group shows; the gate's floor is 1.2) and soft = 40 % with cream text; the fourth strength is a light version (bold mixed with cream), ≥ 7 : 1 on the dark tint. Chip outlines are #E8DFD2.</p>
+  <div id="dark" class="dark-panel"></div>
+
+  <h2>Chips: one rule for every state</h2>
+  <p class="note">Every chip has a 1 px outline (deep in light mode, #E8DFD2 in dark). Selected = the bold fill + ✓ + a 2 px ring. Slate (Mixed, Words, No standard) always has a dashed outline and its label.</p>
+  <div id="chips"></div>
+
+  <h2>Grade: a badge, not a colour</h2>
+  <p class="note">Owner, 2026-10-23: colour means the maths area only. The <b>grade</b> is a numbered circle in ink on white (dark mode: cream on the dark surface), never an area colour, always the <b>first thing</b> in its skill card, chip, lesson row, lesson panel and chip-options header, so a teacher reads the grade in the same place everywhere. Its rules use neutral tokens only (ws-teacher-tokens check 13; text 16.8 : 1 light and dark); shoot.cjs checks one badge per card, chip or row, in the start slot, whole, ≥ 12 px, ≥ 4.5 : 1. In a search across grades and under Mixed levels each area’s skills are also grouped by grade.</p>
+  <div class="badge-legend" aria-label="Grade badges"><span class="gb" title="Kindergarten">K</span><span class="gb" title="Grade 1">1</span><span class="gb" title="Grade 2">2</span><span class="gb" title="Grade 3">3</span><span class="gb" title="Grade 4">4</span><span class="gb" title="Grade 5">5</span><span class="gb" title="Grade 6">6</span><span class="note">K, then grades 1 to 6</span></div>
+
+  <h2>Colour-blind check</h2>
+  <p class="note">The bold colours as seen with normal vision, deuteranopia and protanopia (Machado 2009 matrices, severity 1.0), and the closest pairs. Areas that share a single-grade list must be ≥ 12 apart under both simulations; any other pair ≥ 8 (in lists across grades the grade pill, the area name and the icon tell them apart).</p>
+  <div id="cvd"></div>
+  <h3>Areas that share a grade, as seen by each view</h3>
+  <div id="grades"></div>
+  <div id="numbers"></div>
+
+  <h2>Where board C moved from the site’s colours</h2>
+  <div id="moved"></div>
+  <h3>Fix round 2 (2026-10-23): Operations lifted off the ink</h3>
+  <p class="note">Critic round 2 found the round-1 Operations #2E2B71 only 1.45 : 1 from the warm ink of the primary button, so a tray of Operations chips read as four black buttons, and in dark mode its tint (1.05 : 1) and bold (1.56 : 1) vanished on the page. The gate now holds every bold to <b>≥ 20 ΔE from ink and from the dark-mode cream primary, ≥ 2.0 : 1 against ink, ≥ 3 : 1 against the dark page</b>, and every dark tint to <b>≥ 1.2 : 1</b> against the page. No mid-value indigo passes beside the round-1 Data blue (they fall within 12 of each other under deuteranopia), so the search moved five colours together, by the least total ΔE: Operations <b>#2E2B71 → #555BAE</b> (mid indigo, L* 42, ΔE 16.3, now 2.99 : 1 from ink and 3.21 : 1 on the dark page; it moved back toward the site’s own violet #8579B6), Data #486E9C → <b>#4B8FCC</b> (ΔE 13.1, toward the site’s dusty blue #7A9AC2), Fractions #7F3E63 → <b>#865273</b> (5.9), Geometry #278E8D → <b>#399993</b> (4.3), Counting #CD9CC3 → <b>#CEA4C5</b> (2.6), and the stone #57534E → <b>#706C6A</b> (9.4). Gold, sage and peach did not move. Every margin widened except bold vs bold (20.7 → 20.6, OA–NF): the closest colour-blind pair sharing a grade is now 12.9 (CC–DATA, protanopia; was OA–NF 12.3), and ink on Geometry is 5.3 : 1 (was 4.57).</p>
+  <h3>Fix round 3 (2026-10-23): margins widened</h3>
+  <p class="note">Critic round 3 found three checks on the line. <b>Operations</b> #555BAE → <b>#5155BC</b> (moved 3.1 ΔE): Operations–Fractions 20.6 → 21.9. <b>Stone</b> (Mixed, Words, No standard) #706C6A → <b>#736E64</b>, a warmer stone (moved 4.4 ΔE): stone–Fractions under deuteranopia 8.8 → 13.0, and stone is ≥ 13 from every area in all three views. Dark tints are now built to <b>≥ 1.25 : 1</b> on the dark page (the gate's floor stays 1.2): Operations, Fractions, Data, Geometry and stone tints moved one step. Slate <b>cards</b> are now dashed too, like their bands and chips.</p>
+  <h3>Margins to watch</h3>
+  <p class="note">The closest pairs are in the table above (Place value–Ratio 20.7 with normal vision; Measurement–Ratio 8.9 under deuteranopia, a pair that never shares a grade). Any change to these shades must be re-checked with <code>node tests/scripts/ws-teacher-tokens.cjs</code> before it is shown.</p>
+  <p class="note"><b>Watched pairs (critic r4 D1):</b> two pairs that DO share grades sit within 1 of the colour-blind floor of 12. <b>Counting–Data 12.9 under protanopia</b> and <b>Fractions–Geometry 13.0 under deuteranopia</b> (both share grades 3–5 in single-grade lists). Neither is ever told apart by colour alone (each chip, card, band and tray item carries its area icon and its name or a legend), but neither may move closer: any change to Counting, Data, Fractions or Geometry must keep both pairs at 12.5 or more, and the gate's table prints them on every run.</p>
+  <h2>Side menu options (owner choice pending; the ink rail stays)</h2>
+  <p class="note">The side menu's colours are one set of tokens in <code>tokens.css</code>: <code>--rail</code>, <code>--rail-text</code>, <code>--rail-text-2</code> and <code>--rail-active</code> (the outline and bar of the current place), so changing the rail is one edit. The mock-up keeps the warm ink rail. Each option below shows its text colours and its CIEDE2000 distance from every area bold (normal vision); <b>bold</b> numbers are under 20, where the rail could be mistaken for an area.</p>
+  <div id="rails"></div>
+  <h2>Boards B and A (reference pictures only)</h2>
+  <p class="note">Board B (saturated, on white) was chosen on 2026-10-23 and replaced the same day by board C; board A (six areas) was not chosen. Both are kept as static pictures so the choice can be revisited; the mock-up uses board C only.</p>
+  <img class="board" src="board-b.png" alt="Board B: eight saturated maths-area colours in four strengths, for reference">
+  <img class="board" src="board-a.png" alt="Board A: six maths-area colours (Counting fuchsia, Operations indigo, Place value gold, Fractions pink, Measurement and data mint, Geometry teal), for reference">
+</div>
+<script src="colour.js"></script>
+<script>
+(function () {
+  const C = window.MQColour;
+  const A = [['CC', 'Counting & cardinality', '#CEA4C5'], ['OA', 'Operations & algebra', '#5155BC'], ['NBT', 'Place value & base ten', '#E7CF69'], ['NF', 'Fractions & decimals', '#865273'],
+    ['MEAS', 'Measurement', '#A9CFAA'], ['DATA', 'Data', '#4B8FCC'], ['G', 'Geometry', '#399993'], ['RPNS', 'Ratio & number system', '#D8A480']];
+  const SLATE = ['SLATE', 'Stone: Mixed · Words · No standard', '#736E64'];
+  const FROM = { CC: ['mauve', '#C291B8'], OA: ['violet', '#8579B6'], NBT: ['gold', '#F6C96A'], NF: ['plum', '#8E5480'], MEAS: ['sage', '#9AB88B'], DATA: ['dusty blue', '#7A9AC2'], G: ['teal', '#00838F'], RPNS: ['peach', '#F2C8A0'] };
+  const GR = { K: ['CC', 'OA', 'NBT', 'MEAS', 'DATA', 'G'], 'Grades 1–2': ['OA', 'NBT', 'MEAS', 'DATA', 'G'], 'Grades 3–5': ['OA', 'NBT', 'NF', 'MEAS', 'DATA', 'G'], 'Grade 6': ['RPNS', 'OA', 'DATA', 'G'] };
+  const f = (x) => x.toFixed(1);
+  const sw = (bg, fg, top, bottom, extra = '') => `<div class="sw ${extra}" style="background:${bg};color:${fg}"><b>${top}</b><span>${bottom}</span></div>`;
+  let L = '<div class="sw-grid"><span></span><span class="sw-head">Tint</span><span class="sw-head">Soft</span><span class="sw-head">Bold</span><span class="sw-head">Deep</span>';
+  let Dk = '<div class="sw-grid"><span></span><span class="sw-head" style="color:#CFC5B8">Tint 18 %</span><span class="sw-head" style="color:#CFC5B8">Soft 40 %</span><span class="sw-head" style="color:#CFC5B8">Bold</span><span class="sw-head" style="color:#CFC5B8">Light version</span>';
+  for (const [k, n, b] of A.concat([SLATE])) {
+    const r = C.ramp(b); const dash = k === 'SLATE' ? 'dashed' : '';
+    L += `<div class="sw-name">${n}</div>` + sw(r.tint, C.INK, r.tint, 'ink ' + f(C.cr(r.tint, C.INK))) + sw(r.soft, C.INK, r.soft, 'ink ' + f(C.cr(r.soft, C.INK))) +
+      sw(r.bold, r.on, r.bold, (r.on === C.CREAM ? 'cream ' : 'ink ') + f(C.cr(r.bold, r.on)), dash) + sw(C.STONE, r.deep, r.deep, `on stone ${f(C.cr(r.deep, C.STONE))} · on tint ${f(C.cr(r.deep, r.tint))}`);
+    Dk += `<div class="sw-name" style="color:#FBF7EF">${n}</div>` + sw(r.dTint, C.CREAM, r.dTint, 'cream ' + f(C.cr(r.dTint, C.CREAM))) + sw(r.dSoft, C.CREAM, r.dSoft, 'cream ' + f(C.cr(r.dSoft, C.CREAM))) +
+      sw(r.bold, r.on, r.bold, 'on page ' + f(C.cr(r.bold, C.DARK)), dash) + sw(r.dTint, r.dLight, r.dLight, 'on dark tint ' + f(C.cr(r.dLight, r.dTint)));
+  }
+  document.getElementById('light').innerHTML = L + '</div>';
+  const dk = document.getElementById('dark'); dk.style.background = C.DARK; dk.style.color = C.CREAM; dk.innerHTML = Dk + '</div>';
+  // chips
+  const chip = (r, label, state, dark) => {
+    const edge = dark ? '#E8DFD2' : r.deep; const ring = dark ? C.CREAM : C.INK;
+    const bg = state === 'soft' ? (dark ? r.dSoft : r.soft) : r.bold; const fg = state === 'soft' ? (dark ? C.CREAM : C.INK) : r.on;
+    return `<span style="display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:8px;border:${label === 'Mixed' ? '2px dashed' : '1px solid'} ${edge};background:${bg};color:${fg};font-weight:700;font-size:14px;${state === 'selected' ? `box-shadow:0 0 0 2px ${ring};` : ''}">${state === 'selected' ? '✓ ' : ''}${label}</span>`;
+  };
+  let ch = '';
+  for (const dark of [false, true]) {
+    ch += `<div style="background:${dark ? C.DARK : C.STONE};padding:16px;border-radius:16px;display:flex;flex-wrap:wrap;gap:12px;margin-bottom:8px;border:1px solid #CFC5B8">`;
+    for (const [k, n, b] of A.slice(0, 4).concat([['MEAS', 'Measurement', '#A9CFAA'], SLATE])) { const r = C.ramp(b); const nm = k === 'SLATE' ? 'Mixed' : n.split(' ')[0]; ch += chip(r, nm, 'soft', dark) + chip(r, nm, 'bold', dark) + chip(r, nm, 'selected', dark); }
+    ch += '</div>';
+  }
+  document.getElementById('chips').innerHTML = ch + '<p class="note">Each area: at rest (soft) · in the tray (bold) · selected (bold + ✓ + ring).</p>';
+  // colour-blind
+  let cv = '<div class="cvd"><span></span><span class="sw-head">Normal vision</span><span class="sw-head">Deuteranopia</span><span class="sw-head">Protanopia</span>';
+  for (const [k, n, b] of A.concat([SLATE])) {
+    cv += `<div class="sw-name">${n}</div>` + ['normal', 'deut', 'prot'].map(m => { const h = m === 'normal' ? b : C.simulate(b, m); return sw(h, C.cr(h, '#FFFFFF') >= C.cr(h, C.INK) ? '#FFFFFF' : C.INK, h, '', k === 'SLATE' ? 'dashed' : ''); }).join('');
+  }
+  document.getElementById('cvd').innerHTML = cv + '</div>';
+  let gr = '';
+  const byK = Object.fromEntries(A.map(a => [a[0], a]));
+  for (const [g, ks] of Object.entries(GR)) {
+    gr += `<h3>${g}</h3>` + ['normal', 'deut', 'prot'].map(m => `<div class="note">${m === 'normal' ? 'Normal vision' : m === 'deut' ? 'Deuteranopia' : 'Protanopia'}</div><div class="grade-row">${ks.map(k => { const b = byK[k][2]; const h = m === 'normal' ? b : C.simulate(b, m); return sw(h, C.cr(h, '#FFFFFF') >= C.cr(h, C.INK) ? '#FFFFFF' : C.INK, k, ''); }).join('')}</div>`).join('');
+  }
+  document.getElementById('grades').innerHTML = gr;
+  // the closest pairs
+  const pairs = []; for (let i = 0; i < A.length; i++) for (let j = i + 1; j < A.length; j++) pairs.push([A[i], A[j]]);
+  const shared = new Set(); Object.values(GR).forEach(l => l.forEach((x, i) => l.slice(i + 1).forEach(y => shared.add([x, y].sort().join('|')))));
+  const sim = (a, b) => Math.min(C.de00(a, b, 'deut'), C.de00(a, b, 'prot'));
+  const lo = (ps, fn) => ps.map(([a, b]) => [fn(a[2], b[2]), a[0] + '–' + b[0]]).sort((x, y) => x[0] - y[0])[0];
+  const n1 = lo(pairs, (a, b) => C.de00(a, b)), n2 = lo(pairs.filter(([a, b]) => shared.has([a[0], b[0]].sort().join('|'))), sim), n3 = lo(pairs, sim);
+  const sl = A.map(a => [Math.min(C.de00(SLATE[2], a[2], 'deut'), C.de00(SLATE[2], a[2], 'prot'), C.de00(SLATE[2], a[2])), a[0]]).sort((x, y) => x[0] - y[0])[0];
+  const st = A.flatMap(a => ['normal', 'deut', 'prot'].flatMap(m => [[C.de00(a[2], C.ERR, m), a[0] + '–error red'], [C.de00(a[2], C.KEY, m), a[0] + '–key orange']])).sort((x, y) => x[0] - y[0])[0];
+  document.getElementById('moved').innerHTML = '<div class="scroll"><table><thead><tr><th>Area</th><th>From the site</th><th>Board C</th><th>Moved (ΔE)</th></tr></thead><tbody>' + A.map(([k, n, b]) => `<tr><td>${n}</td><td><span style="display:inline-block;width:24px;height:24px;vertical-align:middle;background:${FROM[k][1]}"></span> ${FROM[k][0]} ${FROM[k][1]}</td><td><span style="display:inline-block;width:24px;height:24px;vertical-align:middle;background:${b}"></span> ${b}</td><td>${f(C.de00(FROM[k][1], b))}</td></tr>`).join('') + '</tbody></table></div><p class="note">Coral (#E86A5C) could not be an area colour: it is only 18.7 from error red and 14.1 from the answer-key orange (both need ≥ 20), so error and key keep their meaning and coral is left out. The search is <code>palette/board-c-search.py</code>.</p>';
+  // side menu options: ink (now), stone, white, taupe, deep purple (the school site)
+  const RAILS = [['Warm ink (now, chosen)', '#1A1614', '#FBF7EF', '#CFC5B8'], ['Stone', '#E5E1DB', '#1A1614', '#4A423B'], ['White', '#FFFFFF', '#1A1614', '#4A423B'], ['Taupe', '#8B7D70', '#FBF7EF', '#F1EAE0'], ['Deep purple #592B88 (school site)', '#592B88', '#FBF7EF', '#D9C9EC']];
+  document.getElementById('rails').innerHTML = '<div class="scroll"><table><thead><tr><th>Side menu</th><th>Text / second text</th>' + A.concat([SLATE]).map(a => `<th>${a[0] === 'SLATE' ? 'Stone' : a[0]}</th>`).join('') + '</tr></thead><tbody>' +
+    RAILS.map(([n, bg, t1, t2]) => `<tr><td><span class="rail-sw" style="background:${bg};color:${t1}"><b>Skills</b><span style="color:${t2}">Lessons</span></span> ${n}</td><td>${f(C.cr(bg, t1))} : 1 / ${f(C.cr(bg, t2))} : 1</td>` +
+      A.concat([SLATE]).map(a => { const d = C.de00(bg, a[2]); return `<td class="n">${d < 20 ? `<b>${f(d)}</b>` : f(d)}</td>`; }).join('') + '</tr>').join('') + '</tbody></table></div>';
+  document.getElementById('numbers').innerHTML = `<h3>The closest pairs (ΔE CIEDE2000)</h3><div class="scroll"><table><thead><tr><th>Check</th><th>Closest</th><th>Pair</th><th>Needs</th></tr></thead><tbody>` +
+    [['Bold vs bold, normal vision', n1, '≥ 20'], ['Colour-blind, areas sharing a grade', n2, '≥ 12'], ['Colour-blind, any pair', n3, '≥ 8'], ['Slate vs every area, all views', sl, '≥ 8'], ['Bold vs error red / key orange, all views', st, '≥ 20']]
+      .map(([l, [v, p], need]) => `<tr><td>${l}</td><td class="ok">${f(v)}</td><td>${p}</td><td>${need}</td></tr>`).join('') + '</tbody></table></div>';
+})();
+</script>
+</body>
+</html>

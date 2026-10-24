@@ -327,3 +327,11 @@ function wire(el) {
 
 /** For the gate: the current task list and the chosen task. */
 export function mapTasksState() { return { strand: k.strand, band: k.band, task: k.task, view: k.view, tasks: TASKS ? TASKS.length : 0, source: MAPD ? 'map.json' : 'engine' }; }
+
+/** Teacher site 2.0 (T3a): every MAP task (strand, RIT band, skills) for the Skills gallery's Browse by › MAP strand. */
+export async function mapTaskList() {
+    await load();
+    return (TASKS || []).map((t) => ({ id: t.id, task: t.task, strand: t.strand, ritBand: t.ritBand, lo: t.lo, status: t.status, skills: t.skills.slice() }));
+}
+/** The MAP practice strands in their order (after mapTaskList has loaded them). */
+export function mapStrandNames() { return W ? strands() : []; }
