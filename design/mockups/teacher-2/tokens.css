@@ -1,0 +1,95 @@
+/* Teacher site 2.0 — design tokens, BOARD C (owner 2026-10-23: "I like these colors style more" — the look of the
+   school's Awsaj maths site: warm cream page, warm ink, heavy grotesque headings, one italic serif line, small uppercase
+   mono labels, muted "painted" area colours). The ONLY place raw values live.
+   tests/scripts/ws-teacher-tokens.cjs parses this file and checks every colour against the palette rules (§2.7 rules,
+   board C values). Area ramps: tint = 10 % of bold over cream #FBF7EF, soft = 30 %, deep = bold darkened to >= 7 : 1 on
+   the warm stone page #EFECE8 (fix round 2); dark mode: tint = 18 % of bold over #0F0E0C (raised 1 % at a time until >= 1.25 : 1 from the page; 1.2 in fix round 2, 1.25 in fix round 3 for a margin), soft = 40 %, the fourth strength = a light version (bold mixed
+   with cream) >= 7 : 1 on the dark tint. Slate (warm stone: Mixed / Words / No standard) uses the same rules and always
+   carries a dashed outline and its label. Board C was found by palette/board-c-search.py. */
+
+:root {
+  /* type: chrome only (Andika is for pupil content) */
+  --font-ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Archivo Black", "Inter", system-ui, sans-serif;
+  --font-serif: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, monospace;
+  --font-pupil: "Andika", "Andika New Basic", sans-serif;
+  --fs-12: 12px; --fs-14: 14px; --fs-16: 16px; --fs-20: 20px; --fs-28: 28px; --fs-36: 36px;
+  --fw-500: 500; --fw-700: 700;
+  --lh-tight: 1.15; --lh-body: 1.5;
+  --ls-mono: 0.15em;
+
+  /* spacing, radii, shadows, control size */
+  --sp-4: 4px; --sp-8: 8px; --sp-16: 16px; --sp-24: 24px; --sp-32: 32px; --sp-48: 48px;
+  --r-8: 8px; --r-16: 16px;
+  --shadow-1: 0 1px 2px rgba(26, 22, 20, 0.10);
+  --shadow-2: 0 16px 40px rgba(26, 22, 20, 0.22);
+  --control: 44px;
+  --line-1: 1px; --line-2: 2px;
+  /* the ✕ of a search box, as a mask (drawn in the text colour) */
+  --x-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M4 4l12 12M16 4L4 16' stroke='black' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E");
+
+  /* neutrals, light: warm stone page and white surfaces (owner 2026-10-23, fix round 2), warm ink; cream #FBF7EF stays only
+     as text on dark fills (primary, rail, cream-on-bold) */
+  --page: #EFECE8;
+  --surface: #FFFFFF;
+  --surface-2: #E5E1DB;
+  --text: #1A1614;
+  --text-2: #4A423B;
+  --text-3: #6B6158;
+  --line: #D6D0C8;
+  --chip-edge-dark: #E8DFD2;
+  --ring: #1A1614;
+  --primary-bg: #1A1614;
+  --primary-fg: #FBF7EF;
+  --rail: #1A1614;
+  --rail-text: #FBF7EF;
+  --rail-text-2: #CFC5B8;
+  --rail-active: #FBF7EF;   /* the current place: outline and bar (the side menu is these four tokens; owner choice pending) */
+  --scrim: rgba(15, 14, 12, 0.56);
+  --error: #B91C1C;
+  --key: #C2410C;
+  --paper: #FFFFFF;
+  --paper-ink: #000000;
+  --paper-grey: #949494;
+
+  /* board C: eight maths areas x four strengths (+ the text colour on bold) */
+  --cc-tint: #F6EFEB; --cc-soft: #EDDEE2; --cc-bold: #CEA4C5; --cc-on: #1A1614; --cc-deep: #5B4857;
+  --oa-tint: #EAE7EA; --oa-soft: #C8C6E0; --oa-bold: #5155BC; --oa-on: #FBF7EF; --oa-deep: #3D408D;
+  --nbt-tint: #F9F3E2; --nbt-soft: #F5EBC7; --nbt-bold: #E7CF69; --nbt-on: #1A1614; --nbt-deep: #554D27;
+  --nf-tint: #EFE6E3; --nf-soft: #D8C5CA; --nf-bold: #865273; --nf-on: #FBF7EF; --nf-deep: #653E56;
+  --meas-tint: #F3F3E8; --meas-soft: #E2EBDA; --meas-bold: #A9CFAA; --meas-on: #1A1614; --meas-deep: #425142;
+  --data-tint: #E9EDEC; --data-soft: #C6D8E4; --data-bold: #4B8FCC; --data-on: #1A1614; --data-deep: #2A5072;
+  --g-tint: #E8EEE6; --g-soft: #C1DBD3; --g-bold: #399993; --g-on: #1A1614; --g-deep: #205652;
+  --rpns-tint: #F8EFE4; --rpns-soft: #F0DECE; --rpns-bold: #D8A480; --rpns-on: #1A1614; --rpns-deep: #5F4838;
+  --slate-tint: #EDE9E1; --slate-soft: #D2CEC5; --slate-bold: #736E64; --slate-on: #FBF7EF; --slate-deep: #524E47;
+}
+
+/* parked: owner 2026-10-23 ("for now do not make a dark mode"). These dark tokens are kept untouched but UNUSED: every
+   page sets data-theme="light" and ignores ?theme=. Do not tune them until the owner un-parks dark mode. */
+:root[data-theme="dark"] {
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.50);
+  --shadow-2: 0 16px 40px rgba(0, 0, 0, 0.70);
+  --page: #0F0E0C;
+  --surface: #1A1614;
+  --surface-2: #221D1A;
+  --text: #FBF7EF;
+  --text-2: #D9CFC2;
+  --text-3: #A89D90;
+  --line: #3A332D;
+  --ring: #FBF7EF;
+  --primary-bg: #FBF7EF;
+  --primary-fg: #1A1614;
+  --rail: #1A1614;
+  --scrim: rgba(0, 0, 0, 0.70);
+
+  --cc-tint: #31292D; --cc-soft: #5B4A56; --cc-deep: #E4CEDA;
+  --oa-tint: #21223D; --oa-soft: #292A52; --oa-deep: #ABABD7;
+  --nbt-tint: #36311D; --nbt-soft: #655B31; --nbt-deep: #F1E3AC;
+  --nf-tint: #302129; --nf-soft: #3F2935; --nf-deep: #C4A9B5;
+  --meas-tint: #2B3128; --meas-soft: #4D5B4B; --meas-deep: #D2E3CC;
+  --data-tint: #1A2730; --data-soft: #274259; --data-deep: #A3C3DE;
+  --g-tint: #172826; --g-soft: #204642; --g-deep: #9AC8C1;
+  --rpns-tint: #332921; --rpns-soft: #5F4A3A; --rpns-deep: #EACEB8;
+  --slate-tint: #272521; --slate-soft: #37342F; --slate-deep: #B7B2AA;
+}
