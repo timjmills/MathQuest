@@ -1180,6 +1180,15 @@ function vocabPicture(pic, c) {
         case 'glyph': return `<span class="mq-lvpic-glyph" style="font-size:${Math.round(m.digitPt * 1.3)}pt">${esc(pic.text)}</span>`;
         // A longer text picture ("10, 20, 30") at four fifths, so it never crowds its neighbour.
         case 'text': return `<span class="mq-lvpic-text" style="font-size:${String(pic.text || '').length > 7 ? Math.round(m.digitPt * 0.8) : m.digitPt}pt">${esc(pic.text)}</span>`;
+        // The place heads as the stack draws them (critic s3-stack r1 N6b: "HTh TTh Th H T O" as
+        // a text picture wrapped at L): {heads: 'HTh TTh Th H T O'}, each head in its own grid
+        // column, bold at the size's text type (a label, as the heads are), over a rule. Never
+        // wraps (one column per head).
+        case 'heads': {
+            const hs = String(pic.heads || pic.text || '').split(/\s+/).filter(Boolean);
+            return `<span class="mq-lvpic-heads" style="display:inline-grid;grid-auto-flow:column;column-gap:0.55em;font-size:${m.textPt || 11}pt;font-weight:700;line-height:1.1;white-space:nowrap;padding-bottom:0.8mm;border-bottom:${(1 * PT_MM).toFixed(3)}mm solid #000">`
+                + hs.map((h) => `<span style="text-align:center">${esc(h)}</span>`).join('') + '</span>';
+        }
         // A small two-row column (pilot SU-C fix r2, critic r2 N6): {top, bottom, op}. Each
         // character has its own grid column, so ones sit under ones (and commas under commas)
         // whatever the font's digit widths; the operator stands left of the bottom row and a rule

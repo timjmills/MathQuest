@@ -43,7 +43,8 @@ const NR_VOCAB_2 = [
 // (critic SU-C r2 N6: "line up" is pictured as a small column, ones under ones, never as an across
 // sentence that can wrap; "place" names the lesson's own place heads)
 const NR_VOCAB_BIG = (top, bottom, heads) => [
-    { word: 'place', meaning: 'ones, tens, hundreds ...', picture: { kind: 'text', text: heads } },
+    // (the heads as the stack's head row: a 'text' picture of six heads wrapped at L, critic s3-stack r1 N6b)
+    { word: 'place', meaning: 'ones, tens, hundreds ...', picture: { kind: 'heads', heads } },
     { word: 'line up', meaning: 'ones under ones', picture: { kind: 'stack', top, bottom } },
     { word: 'take away', meaning: 'subtract: the − sign', picture: { kind: 'glyph', text: '−' } },
 ];
