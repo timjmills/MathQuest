@@ -148,3 +148,10 @@ Lead, 2026-10-23 23:40: owner ruling CL-11a (9e614e21): item labels are only the
 supersedes M1's "numbered tabs past 26 on I Can" switch — merge in favour of CL-11a). CL-4b (including facts) is now done
 kit-wide by a builder on the lead's branch and is OUT of this lane entirely: the anchor rebuild drops its top-alignment
 work. HD-5a (6e94116f, strand-tab box removed), 9e614e21 and the CL-4b commit are merged here before the anchor critic.
+
+Logged for the next round (lead, 2026-10-24 00:57, information only — not widened into the current round): the pilot stopped
+on side-anchor pages at L. Side mode lays the twin and the pupil problem out 50 / 50 (`anchors.js` ~260: footprint wMm 88 /
+maxCols 2; `print-sheet.js` ~2150–2153: colsList [1, 2]), so a narrow stack leaves an empty band ≥ 30 % and a 5–6-digit twin
+pushes the pupil problem to full width; reproduces on sub_100_regroup and add_50_no_regroup. Proposed: size the pair's
+columns from content (pupil column = widest stack + 2 × 3 mm + label box; twin takes the rest). Whether the current rebuild
+(content-sized `auto auto` columns, the four-column layout) already fixes it: to be recorded when it reports.
