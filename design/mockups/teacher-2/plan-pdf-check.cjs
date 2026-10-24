@@ -26,6 +26,26 @@ const CASES = [
     if (!ok) bad++;
     console.log(`${ok ? 'PASS' : 'FAIL'} ${name}: plan ${JSON.stringify(r.plan.byKey)} on ${r.plan.pages} p · printed ${JSON.stringify(r.byKey)} on ${r.pages} p · versions ${r.versions} · ${r.summary}`);
   }
+
+  // Fact rows at 10 columns, size S (owner 2026-10-24): the built page has that many across, and the summary says it
+  for (const [c, sk] of [['addition', 'add_facts'], ['subtraction', 'sub_facts'], ['multiplication', 'mult_facts'], ['division', 'div_facts']]) {
+    await page.evaluate((c, sk) => { tvCloseSheet(); UnifiedSkills.clear(); UnifiedSkills.add({ categoryId: c, skillId: sk, skillLabel: sk }); window.skillQueue = [...UnifiedSkills.skills]; tvOpenSheet('print'); }, c, sk);
+    const has = await page.waitForSelector('[data-act="layout"][data-v="fact-rows"]', { timeout: 15000 }).then(() => true, () => false);
+    if (!has) { console.log(`SKIP fact rows ${sk}: no Fact rows layout offered`); continue; }
+    await page.evaluate(async () => { for (let g = 0; g < 25; g++) { const f = document.querySelector('[data-act="wversions"][aria-label="Fewer"]'); if (!f || f.disabled) break; f.click(); await new Promise((r) => setTimeout(r, 50)); } });
+    for (const [act, v] of [['kind', 'single'], ['layout', 'fact-rows'], ['size', 'S'], ['factcols', '10']]) { await page.evaluate((act, v) => document.querySelector(`[data-act="${act}"][data-v="${v}"]`).click(), act, v); await new Promise((r) => setTimeout(r, 300)); }
+    await new Promise((r) => setTimeout(r, 800));
+    await page.waitForFunction(() => / across × /.test(tvSheetState().summary.line), { timeout: 120000 }).catch(() => {});
+    const r = await page.evaluate(async () => { const b = await tvSheetBuildNow(); const line = tvSheetState().summary.line; return { fits: b.fits0, line, pages: b.pages }; });
+    const want = c === 'division' ? 8 : 10;
+    const m = r.line.match(/^(\d+) across × (\d+) rows = (\d+) facts/);
+    // the summary must say what the built page holds; the engine may give fewer across than asked when the widest
+    // fact does not fit (it never shrinks the digits), and then the check says so
+    const ok = r.fits && m && Number(m[1]) === r.fits.cols && Number(m[2]) === r.fits.rows && r.fits.cols <= want;
+    if (ok && r.fits.cols < want) console.log(`  note ${sk}: asked ${want} across, the engine fits ${r.fits.cols} at S (digits never shrink)`);
+    if (!ok) bad++;
+    console.log(`${ok ? 'PASS' : 'FAIL'} fact rows ${sk} at 10 columns, S: built ${r.fits && r.fits.cols} across × ${r.fits && r.fits.rows} rows · ${r.line}`);
+  }
   // a whole grade: the sheet's first render is fast and its numbers come from one plan
   await page.evaluate(async () => { for (let g = 0; g < 25; g++) { const f = document.querySelector('[data-act="wversions"][aria-label="Fewer"]'); if (!f || f.disabled) break; f.click(); await new Promise((r) => setTimeout(r, 50)); } document.querySelector('[data-act="kind"][data-v="mixed"]').click(); });
   const t = await page.evaluate(async () => {

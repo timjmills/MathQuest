@@ -192,7 +192,7 @@ function requests(p, list, quiz, version = 0) {
     if (p.kind === 'single' && S.opts.layout !== 'standard') {
         for (const it of list) {
             const pg = p.pagesBy ? p.pagesBy[keyOf(it)] || 0 : 0;
-            if (pg && layoutOk(it)) out.push({ req: Object.assign(base(), { role: S.opts.layout, look: 'auto', sections: [{ skills: [skillRef(it)], pages: pg }] }), copies: 1, keys: [keyOf(it)], pages: pg });
+            if (pg && layoutOk(it)) out.push({ req: Object.assign(base(), { role: S.opts.layout, look: 'auto', sections: [{ skills: [skillRef(it)], pages: pg, columns: factColsFor(it) }] }), copies: 1, keys: [keyOf(it)], pages: pg, fact: true });
         }
         if (out.length) return out;
     }
@@ -218,11 +218,24 @@ function countParts(res, part, copies, into) {
     }
     return n;
 }
+/** The problems the built page 1 holds (fact rows: its own count, from the built page). */
+function countOnPage1(res) {
+    const items = res.items || [];
+    const per = res.fits && res.fits.perPage;
+    return per ? Math.min(per, items.length) : items.length;
+}
 const yieldNow = () => new Promise((r) => setTimeout(r, 0));
 
 /* ================================================================= Layout (fact rows / timed check), probed per skill */
 
 const layoutCache = new Map();   // 'cat:skill|role' -> true | false | Promise
+/** Fact rows: how many across ('auto' = the engine's 10 / 6 / 5 at S / M / L; bracket division at most 8). */
+const isDivision = (it) => it.categoryId === 'division';
+function factColsFor(it) {
+    const c = S.opts.factCols;
+    if (S.opts.layout !== 'fact-rows' || !c || c === 'auto') return undefined;
+    return isDivision(it) ? Math.min(8, Number(c)) : Number(c);
+}
 function layoutOk(it, role = S.opts.layout) {
     if (role === 'standard') return true;
     return layoutCache.get(keyOf(it) + '|' + role) === true;
@@ -275,6 +288,7 @@ async function buildAll(p, list, quiz, onProgress) {
                 out.errors.push((e && e.message) || 'This page could not be built.');
                 continue;
             }
+            if (!out.fits0) out.fits0 = res.fits ? { cols: res.fits.cols, rows: res.fits.rows, perPage: res.fits.perPage } : null;
             const copies = Math.max(1, part.copies || 1);
             const pupil1 = versionFooter(res.pupilHtml, label);
             if (!vv.first) vv.first = (res.pupilPages && res.pupilPages[0]) || pupil1;
@@ -354,7 +368,7 @@ async function runPreview() {
             perLearned.set(perBase(list), Math.max(1, Math.floor(onPage / got)));
             continue;
         }
-        S.preview = { sig, html: (res.pupilPages && res.pupilPages[0]) || res.pupilHtml };
+        S.preview = { sig, html: (res.pupilPages && res.pupilPages[0]) || res.pupilHtml, fact: part.fact ? { cols: (res.fits && res.fits.cols) || 0, rows: (res.fits && res.fits.rows) || 0, onPage1: countOnPage1(res), pages: res.pageCount || 1 } : null };
         renderMain(); renderSide();
         return;
     }
@@ -384,8 +398,14 @@ function summary() {
     const names = isBig(list) ? byArea(active).map((a) => `${AREAS[a.area].short} ${a.list.reduce((t, x) => t + (by[keyOf(x)] || 0), 0)}`).join(', ')
         : list.map((x) => `${x.label} ${x.leftOut ? '(left out)' : (by[keyOf(x)] || 0) + (x.count > 0 ? ' (count)' : x.lockPct !== undefined ? ' (held)' : '')}`).join(', ');
     const pr = S.printed && S.printed.sig === sigOf(p, list, quiz) ? S.printed : null;
-    const drift = pr && (pr.pages !== pages || !pr.matchesPlan) ? ` · printed on ${pr.pages} page${pr.pages === 1 ? '' : 's'}${pr.matchesPlan ? '' : ', the engine changed some counts'}` : '';
+    const factLayout = p.kind === 'single' && S.opts.layout !== 'standard';
+    const drift = pr && !factLayout && (pr.pages !== pages || !pr.matchesPlan) ? ` · printed on ${pr.pages} page${pr.pages === 1 ? '' : 's'}${pr.matchesPlan ? '' : ', the engine changed some counts'}` : '';
     const V = versionsOf(quiz);
+    const fx = S.preview && S.preview.fact && S.preview.sig === sigOf(p, list, quiz) + '|' + perPageFor(list) && S.opts.layout === 'fact-rows' && p.kind === 'single' ? S.preview.fact : null;
+    if (fx && fx.cols && fx.rows) {
+        // counted from the built page: "10 across × 7 rows = 70 facts"
+        return { line: `${fx.cols} across × ${fx.rows} rows = ${fx.cols * fx.rows} facts${fx.pages > 1 ? ` a page · ${fx.pages} pages` : ''} · answer key at the end${drift}`, more: names.replace(/ \d+( \((count|held)\))?/g, '') + ' · fact rows' };
+    }
     if (V > 1) {
         return { line: `${V} versions · ${total} ${noun} each${ofEach}${pts} · ${pages * V} pages + keys${S.opts.keyVersions === 'end' ? ' (keys at the end)' : ' (a key after each version)'}${left}${drift}`,
             more: names + ' · every version has its own problems, the same mix and counts' };
@@ -462,7 +482,7 @@ function open(kind, ctx = {}) {
     if (kind === 'share') setTimeout(() => requestAnimationFrame(() => setTimeout(() => { if (S.sheet === 'share') makeLink(); }, 0)), 0);
     else scheduleBuild(0);
     const one = items();
-    if (one.length === 1 && kind === 'print') setTimeout(() => { if (S.sheet === 'print') probeLayouts(one[0]).then(() => { if (S.sheet === 'print') renderMain(); }); }, 300);
+    if (one.length === 1 && kind === 'print') setTimeout(() => { if (S.sheet === 'print') probeLayouts(one[0]).then(() => { if (S.sheet === 'print') { renderMain(); if (S.opts.layout !== 'standard') { S.preview = null; scheduleBuild(0); } } }); }, 300);
 }
 function close() {
     S.sheet = null;
@@ -612,6 +632,13 @@ function optionsHTML() {
         if (list.some((x) => layoutOk(x, 'fact-rows'))) opts.push(['fact-rows', 'Fact rows (5–10 across)']);
         if (list.some((x) => layoutOk(x, 'fact-probe'))) opts.push(['fact-probe', 'Timed check']);
         h += row('Layout', 'Only for skills that have one', seg('layout', S.opts.layout, opts, 'Layout'));
+        if (S.opts.layout === 'fact-rows') {
+            const div = list.some(isDivision);
+            const cur = String(S.opts.factCols || 'auto');
+            const cols = `<div class="tvs-seg" role="group" aria-label="Columns">${[['auto', 'Auto'], ['5', '5'], ['6', '6'], ['8', '8'], ['10', '10']].map(([v, l]) => { const off = div && v === '10'; return `<button type="button" class="tvs-btn" data-act="factcols" data-v="${v}" aria-pressed="${cur === v}"${off ? ' disabled title="8 is the most for ÷"' : ''}>${cur === v ? icon('check', 16) : ''}<span>${l}</span></button>`; }).join('')}</div>`;
+            // Size S stays one tap away beside the columns (more across needs the smaller digits)
+            h += row('Columns', div ? 'Facts across each row · 8 is the most for ÷' : 'Facts across each row', cols + seg('size', S.opts.size, [['S', 'S'], ['M', 'M'], ['L', 'L']], 'Size'));
+        }
     }
     h += row('Size', 'Bigger digits, fewer problems', seg('size', S.opts.size, [['S', 'S'], ['M', 'M'], ['L', 'L']], 'Size'));
     if (quiz) {
@@ -942,7 +969,7 @@ export async function buildNow() {
     const b = await buildAll(p, list, quiz);
     b.sig = sigOf(p, list, quiz); S.built = b; S.printed = { sig: b.sig, pages: b.pages, matchesPlan: b.matchesPlan };
     return { plan: { byKey: p.byKey, pages: p.pagesBy ? Object.values(p.pagesBy).reduce((a, c) => a + c, 0) : p.pages, total: p.total }, byKey: b.byKey, pages: b.pages, matchesPlan: b.matchesPlan, sameCounts: b.sameCounts, versions: b.versions,
-        perVersion: b.perVersion.map((x) => ({ byKey: x.byKey, total: x.total, pages: x.pages, firstHash: hashStr(x.first) })), formA: /Form A\b/.test(b.doc), doc: sheetDocument(b.doc, 'Worksheet', { paper: S.opts.paper || 'A4' }) };
+        perVersion: b.perVersion.map((x) => ({ byKey: x.byKey, total: x.total, pages: x.pages, firstHash: hashStr(x.first) })), formA: /Form A\b/.test(b.doc), fits0: b.fits0, firstPage: (b.pupil[0] || '').split(/<section\b[^>]*class="ws-page/)[1] || '', doc: sheetDocument(b.doc, 'Worksheet', { paper: S.opts.paper || 'A4' }) };
 }
 
 /* ================================================================= events */
@@ -981,6 +1008,7 @@ function onClick(e) {
         case 'examples': S.opts.examples = v; changed(); return;
         case 'each': S.opts.each = v; changed(); return;
         case 'layout': S.opts.layout = v; changed(); return;
+        case 'factcols': S.opts.factCols = v; changed(); return;
         case 'size': S.opts.size = v; changed(); return;
         case 'keyplace': S.opts.keyPlace = v; changed(); return;
         case 'keystyle': S.opts.keyStyle = v; changed(); return;
