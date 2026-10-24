@@ -90,7 +90,7 @@ skills such as arrays, count_by; no fractions backtest row), N-r2-5 (shape compa
 candidate list) stay open as recorded follow-ups.
 
 ## Totals
-- Wall time 05:15 → 12:15 UTC, **≈ 7.0 h** (builders 05:21–08:47, the longest B at 3 h 26 m; fix round 11:04–11:35; critics 16 + 21 min).
+- Wall time 05:15 → 11:50 UTC, **≈ 6.6 h** (builders 05:21–08:47, the longest B at 3 h 26 m; fix round 11:04–11:35; critics 16 + 21 min).
 - Agent tokens ≈ **1.71 M**: builder A 498 k (build + fix r1), B 431 k (build + D1 real-data fix), C 408 k, critic r1 197 k, r2 175 k.
 - Critic rounds: **2** (target ≤ 2: met). Builder runs: 3 first builds + 2 resumed fixes (A, B), all medium.
 
@@ -114,7 +114,7 @@ candidate list) stay open as recorded follow-ups.
 | — | Every backtested check is on precritic's path | ws-precritic-plan (run by ws-backtest) | mutation test |
 
 ## Speed reflection (process rule 00)
-- **Measure.** 2 critic rounds (target met), ≈ 7 h, ≈ 1.71 M tokens. r1 lost one round (7 / 8 / 7) to three defects.
+- **Measure.** 2 critic rounds (target met), ≈ 6.6 h, ≈ 1.71 M tokens. r1 lost one round (7 / 8 / 7) to three defects.
 - **Causes of the lost round and the lost hours.**
   1. *A check off the lane's path* (r1 D2): the lesson checks were backtested by calling print-lint directly, so green
      backtests hid that precritic never ran them on the lane skill. → **ws-precritic-plan** (built; ws-backtest runs it).
