@@ -648,3 +648,10 @@ function wire() {
 
 // The standards / WRM terms load after boot: re-run a search that is on screen (critic r1 N2).
 onSkillSearchReady(() => { try { if (root && root.isConnected && lib.query.trim()) refreshResults(); } catch (e) { /* screen gone */ } });
+
+/* ================================================================= Teacher site 2.0: the Skills gallery (T3a) */
+
+/** The Skills place (IMPROVEMENT_PLAN §2.3): search, Browse by, grade, thumbnails, tick → tray. */
+export function renderSkillsScreen(el) {
+    if (!el.dataset.built) { el.innerHTML = '<header class="tv-header"><div><h1 class="tv-h1">Skills</h1></div></header>'; el.dataset.built = '1'; }
+}

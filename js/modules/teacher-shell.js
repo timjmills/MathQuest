@@ -31,14 +31,14 @@ import {
 } from './teacher-ui.js';
 import { renderSetsScreen, openSavedSet, startNewSet, currentSetName } from './teacher-sets.js';
 import { renderPrintScreen, recentPrintouts, reprint, printoutMeta, openPrintWith } from './teacher-print.js';
-import { renderLibraryScreen } from './teacher-library.js';
+import { renderLibraryScreen, renderSkillsScreen } from './teacher-library.js';
 import { renderMapScreen } from './teacher-map.js';
 import { renderWrmScreen, wrmHashActive, wrmOnHashChange, clearWrmHash } from './teacher-wrm.js';
 import { renderTodoScreen, openTodo, todoHashActive, clearTodoHash } from './teacher-todo.js';
 import { mapHashActive, clearMapHash } from './teacher-map-tasks.js';
 import { installPreview, tvpAttrs, infoButtonHTML, modeAttrs, mountSample } from './teacher-preview.js';
 
-const SCREENS = ['home', 'sets', 'print', 'run', 'library', 'wrm', 'todo', 'quizzes', 'map', 'settings', 'progress'];
+const SCREENS = ['skills', 'home', 'sets', 'print', 'run', 'library', 'wrm', 'todo', 'quizzes', 'map', 'settings', 'progress'];
 // Legacy views a teacher is routed away from, to the teacher screen that replaces them
 // (the legacy views stay for their old entry points; pupils never reach the navigator).
 const REPLACED_VIEWS = { skillsOrganizerView: 'library', mapSelectorView: 'map' };
@@ -52,14 +52,14 @@ const SCREEN_KEY = 'mq_teacher_screen';
 // Teacher site 2.0 (T2, IMPROVEMENT_PLAN §2.3): four places. Until T3–T5 build their new content, each place
 // shows today's screens as tabs, so every old screen (and every tvGo(key)) stays reachable. Skills opens here.
 const PLACES = {
-    skills: { label: 'Skills', tabs: [['library', 'Skills library'], ['print', 'Print worksheets'], ['sets', 'Send a skill set'], ['home', 'Home']] },
+    skills: { label: 'Skills', tabs: [['skills', 'Skills'], ['library', 'Skills library'], ['print', 'Print worksheets'], ['sets', 'Send a skill set'], ['home', 'Home']] },
     lessons: { label: 'Lessons', tabs: [['wrm', 'White Rose lessons'], ['todo', 'Skills to be made']] },
     classes: { label: 'Classes', tabs: [['run', 'Run on the board'], ['quizzes', 'Quizzes'], ['map', 'MAP tests'], ['progress', 'Progress']] },
     me: { label: 'Me', tabs: [] },
 };
 const PLACE_OF = { settings: 'me' };
 for (const [place, p] of Object.entries(PLACES)) for (const [key] of p.tabs) PLACE_OF[key] = place;
-const DEFAULT_SCREEN = 'library';
+const DEFAULT_SCREEN = 'skills';
 
 const BOARD_WINDOW = (() => { try { return new URLSearchParams(location.search).get('board') === '1'; } catch (e) { return false; } })();
 
@@ -1153,6 +1153,7 @@ const RENDER = {
     sets: renderSetsScreen,
     print: renderPrintScreen,
     run: renderRun,
+    skills: renderSkillsScreen,
     library: renderLibraryScreen,
     wrm: renderWrmScreen,
     todo: renderTodoScreen,
