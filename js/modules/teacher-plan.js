@@ -5,8 +5,10 @@
 // the printed page carry. A port of plan() / alloc() / roundTree() in the signed mock-up
 // design/mockups/teacher-2/app.js (fix round r6), on the app's own items:
 //
-//   item = { categoryId, skillId, weight?, lockPct? }       (the UnifiedSkills entries carry these)
-//     weight   0 = left out for now (still in the set), otherwise a positive number; missing = 1
+//   item = { categoryId, skillId, weight?, lockPct?, leftOut? }   (the UnifiedSkills entries carry these)
+//     weight   a positive number; missing, 0 or 1 = the default 1 (share codes write 0 for "no weight given",
+//              skill-codes.js, so 0 is NEVER "left out")
+//     leftOut  true = left out for now (still in the set, gets no problem)
 //     lockPct  a held percentage for that skill (0–100); the unheld skills share what is left by weight
 //
 // Area and grade locks ('a:OA', 'g:OA|3') can be passed as opts.locks; skill locks may also be passed
@@ -29,8 +31,9 @@ const MAX_PAGES = 30;
 
 export const keyOf = (it) => `${it.categoryId}:${it.skillId}`;
 export const weightOf = (it) => {
-    const w = it && it.weight;
-    return w === 0 ? 0 : (typeof w === 'number' && w > 0 ? w : 1);
+    if (!it || it.leftOut === true) return 0;
+    const w = Number(it.weight);
+    return w > 0 ? w : 1;
 };
 function areaKey(it) {
     if (it.area) return it.area;
