@@ -26,7 +26,7 @@
 import { icon, esc, hideToast, toast, copyText, findSkill } from './teacher-ui.js';
 import { skillView, viewToggleHTML } from './teacher-preview.js';
 import { createPicker, liveKey, skillLabelOf, makePracticeLink, k2p } from './teacher-skillpick.js';
-import { restoreTray, syncTray, trayAddLesson, trayLessons, trayBorrow, trayReturn } from './teacher-tray.js';
+import { restoreTray, syncTray, trayAddLesson, trayLessons, trayBorrow, trayReturn, trayKeys } from './teacher-tray.js';
 import { setPrintExtra, onSheetClose, printBatch } from './teacher-sheet.js';
 import { buildSheet } from './print-sheet.js';
 import { printHtml } from './teacher-print.js';
@@ -384,7 +384,7 @@ function secHTML(s) {
             : rows(s.lessons);
     return `<section class="tvw-sec${s.extra ? ' is-extra' : ''}" id="tvwSec-${esc(s.key)}" data-w-secbox="${esc(s.key)}" aria-labelledby="tvwSecH-${esc(s.key)}">
         <h2 class="tvw-sec-h" id="tvwSecH-${esc(s.key)}" tabindex="-1"><span class="tvw-sec-t">${esc(s.name)}</span> <span class="tvw-sec-n">${n} lesson${n === 1 ? '' : 's'}</span></h2>
-        ${s.extra ? '<p class="tvw-sec-cap">Support lessons, projects, enrichment and assessments from the school site that are not part of a domain.</p>' : ''}
+        ${s.extra ? '<p class="tvw-sec-cap">Support lessons, projects, enrichment and assessments from the school site that are not part of a maths area.</p>' : ''}
         ${tmuWrapHTML(s)}
         ${body}
       </section>`;
@@ -486,7 +486,7 @@ function tmuWrapHTML(s) {
     const g = gradeRec();
     if (!g) return '';
     const sk = esc(s.key);
-    if (!TM || !queue) return `<div class="tvw-tmu-wrap" data-w-tmu-wrap="${sk}"><p class="tvw-sec-cap tvw-tmu-wait">Skills to be made for this ${s.extra ? 'section' : 'domain'}: loading…</p></div>`;
+    if (!TM || !queue) return `<div class="tvw-tmu-wrap" data-w-tmu-wrap="${sk}"><p class="tvw-sec-cap tvw-tmu-wait">Skills to be made for this ${s.extra ? 'section' : 'area'}: loading…</p></div>`;
     const key = `${v.grade}|${s.key}`;
     if (!unitCache.has(key)) {
         unitCache.set(key, TM.unitToMake(s.lessons.map((l) => ({ lesson: l, links: L.linksFor(l, { live }), detailed: detailedOf(detailed, l) })), { queue }));
@@ -496,13 +496,13 @@ function tmuWrapHTML(s) {
     const open = tmuOpen.has(key);
     const all = tmuAll.has(key);
     const shown = all ? rows : rows.slice(0, UNIT_ROWS);
-    const what = s.extra ? 'these extra lessons' : 'this domain';
+    const what = s.extra ? 'these extra lessons' : 'this area';
     const title = `Skills to be made for ${g.label} · ${s.name}`;
     return `<div class="tvw-tmu-wrap" data-w-tmu-wrap="${sk}">
         <button type="button" class="tv-btn tv-btn-sm tvw-tmu-fold" data-w-tmu-toggle="${sk}" aria-expanded="${open}" aria-controls="tvwTmu-${sk}">${icon(open ? 'chevD' : 'chevR', 16)}<span>Skills to be made for ${what} (${n}) — ${open ? 'hide' : 'show'}</span></button>
         <section class="tv-card tvw-tmu" id="tvwTmu-${sk}" data-w-tomake-unit="${n}" data-w-tmu-sec="${sk}" aria-labelledby="tvwTmuH-${sk}"${open ? '' : ' hidden'}>
           <div class="tvw-tm-head"><h3 class="tv-h3 tvw-tmu-h" id="tvwTmuH-${sk}">${esc(title)}</h3><span class="tvw-tm-count" aria-label="${n} to be made">${n}</span></div>
-          ${!open ? '' : !n ? `<p class="tvw-tm-empty" data-w-tm-empty="unit">${esc(TM.EMPTY_UNIT)}</p>` : `
+          ${!open ? '' : !n ? `<p class="tvw-tm-empty" data-w-tm-empty="unit">${esc(TM.EMPTY_UNIT.replace(/\bdomain\b/, 'area'))}</p>` : `
           <p class="tvw-tm-lead">To cover every lesson of ${what} and its standards, these will be made. Each names the lessons it is for.</p>
           <ul class="tvw-tm-list" data-w-tm-list="unit">${shown.map((x) => toMakeRowHTML(x, { lessons: x.lessons })).join('')}</ul>
           ${n > UNIT_ROWS ? `<button type="button" class="tv-btn tv-btn-sm tvw-tmu-all" data-w-tmu-all="${sk}" aria-expanded="${all}">${all ? `Show the first ${UNIT_ROWS}` : `Show all ${n}`}</button>` : ''}`}
@@ -633,11 +633,12 @@ function actsHTML(l) {
 }
 
 /** Open a sheet on ONLY these skills; the tray comes back when it closes. */
-function sheetWith(kind, items) {
+function sheetWith(kind, items, title = '') {
     if (typeof window.tvOpenSheet !== 'function') { toast('Not ready yet'); return; }
+    hideToast();
     trayBorrow(items);
     const off = onSheetClose(() => { off(); trayReturn(); });
-    window.tvOpenSheet(kind, { fromLesson: true });
+    window.tvOpenSheet(kind, { fromLesson: true, title });
 }
 
 async function shareLink() {
@@ -668,12 +669,11 @@ function addToTray() {
 }
 
 function practisePre() {
+    // share only: the do-first skills are borrowed for the Share sheet and the tray comes back as it was
     const l = L.lessonByKey(v.lesson);
     const items = preItems();
     if (!l || !items.length) return;
-    const opts = Object.fromEntries(items.filter((x) => x.opts).map((x) => [`${x.categoryId}:${x.skillId}`, x.opts]));
-    trayAddLesson({ id: `${l.key}#pre`, name: `Before ${lessonName(l)}`, ord: ordOf(l) - 0.5, keys: items.map((x) => `${x.categoryId}:${x.skillId}`), opts });
-    sheetWith('share', items);
+    sheetWith('share', items, `Before ${lessonName(l)}`);
 }
 
 let lessonBusy = false;
@@ -682,15 +682,28 @@ async function printLesson() {
     const made = madeLesson(l);
     if (!made) return;
     hideToast();
-    if (made.kind === 'detailed') { if (printDetailedLesson(made.id)) window.tvGo?.('print'); else toast('That lesson cannot be made here yet'); return; }
     if (lessonBusy) return;
     lessonBusy = true;
     toast('Making the lesson…');
     try {
-        const [c, sk] = made.item.key.split(':');
-        const res = await buildSheet({ role: 'lesson', sections: [{ skills: [{ categoryId: c, skillId: sk, opts: made.item.opts || {} }] }], practicePages: 1, mixed: false,
-            size: 'M', look: 'auto', paper: 'A4', header: { name: true, date: true, score: true, title: true }, key: { on: true, placement: 'end', style: 'copy' }, seed: 4242 });
-        await printHtml(res.docHtml || res.pupilHtml, lessonName(l), 'A4');
+        let req;
+        if (made.kind === 'detailed') {
+            // the detailed lesson prints from here (the seed every ready-made pack was built and checked with)
+            const r = detailed.all.find((x) => x.id === made.id);
+            const sk = (r && r.used.find((x) => liveKey(x.key))) || null;
+            const [c, id] = sk ? sk.key.split(':') : ['', ''];
+            req = { role: 'detailed-lesson', lessonId: made.id, paper: 'A4', seed: 4242, key: { on: true }, sections: [{ skills: sk ? [{ categoryId: c, skillId: id, opts: sk.opts || {} }] : [] }] };
+        } else {
+            const [c, sk] = made.item.key.split(':');
+            req = { role: 'lesson', sections: [{ skills: [{ categoryId: c, skillId: sk, opts: made.item.opts || {} }] }], practicePages: 1, mixed: false,
+                size: 'M', look: 'auto', paper: 'A4', header: { name: true, date: true, score: true, title: true }, key: { on: true, placement: 'end', style: 'copy' }, seed: 4242 };
+        }
+        const res = await buildSheet(req);
+        // a lesson is not a test form: no "Form A" in its footer
+        const html = String(res.docHtml || res.pupilHtml || '').replace(/Form [AB]\b\s*(·\s*)?/g, '');
+        if (!html) throw new Error('empty');
+        hideToast();
+        await printHtml(html, lessonName(l), 'A4');
     } catch (e) { console.warn('[teacher-wrm] lesson', e); toast('Could not make this lesson'); } finally { lessonBusy = false; }
 }
 
@@ -698,12 +711,23 @@ async function printLesson() {
  * When the tray holds lesson groups: one worksheet per lesson (each its own pages and key) · one for all (Mixed, or a
  * section per lesson) · both. Print all makes ONE document in lesson order from only the added lessons and their skills. */
 const LP = { mode: 'each', all: 'mixed' };
-function lpParts() {
+function lpUnits() {
     const ls = trayLessons();
-    const each = ls.map((g) => ({ keys: g.skills, title: g.name }));
-    const keys = [...new Set(ls.flatMap((g) => g.skills))];
-    const title = `${ls.length} lessons together`;
-    const all = LP.all === 'lessons' ? [{ lessons: ls.map((g) => ({ title: g.name, keys: g.skills })), title }] : [{ keys, kind: 'mixed', title }];
+    if (!ls.length) return [];
+    const inLesson = new Set(ls.flatMap((g) => g.skills));
+    // never dropped: the tray's skills that are in no lesson print too, as "Other skills"
+    const loose = trayKeys().filter((k) => !inLesson.has(k));
+    return [...ls.map((g) => ({ title: g.name, keys: g.skills })), ...(loose.length ? [{ title: 'Other skills', keys: loose }] : [])];
+}
+function lpParts() {
+    const units = lpUnits();
+    if (!units.length) return [];
+    const each = units.map((u) => ({ keys: u.keys, title: u.title }));
+    if (units.length < 2) return each;
+    const keys = [...new Set(units.flatMap((u) => u.keys))];
+    const nl = units.filter((u) => u.title !== 'Other skills').length;
+    const title = nl < units.length ? `${nl} lesson${nl === 1 ? '' : 's'} and other skills together` : `${nl} lessons together`;
+    const all = LP.all === 'lessons' ? [{ lessons: units.map((u) => ({ title: u.title, keys: u.keys })), title }] : [{ keys, kind: 'mixed', title }];
     return LP.mode === 'each' ? each : LP.mode === 'all' ? all : [...each, ...all];
 }
 let lpBusy = false;
@@ -712,7 +736,7 @@ function printAll() {
     if (!ls.length) return null;
     if (lpBusy) return Promise.resolve();
     lpBusy = true;
-    return printBatch(lpParts(), ls.length === 1 ? ls[0].name : `${ls.length} lessons`, (i, n) => { if (n > 1) toast(`Making the worksheets… ${i} of ${n}`); })
+    return printBatch(lpParts(), ls.length === 1 ? ls[0].name : `${ls.length} lessons`, (i, n) => { if (n > 1) toast(`Making worksheet ${i} of ${n}…`); })
         .catch((e) => { console.warn('[teacher-wrm] print all', e); toast('Could not make these worksheets'); })
         .finally(() => { lpBusy = false; });
 }
@@ -723,13 +747,17 @@ setPrintExtra({
     html() {
         const ls = trayLessons();
         if (!ls.length) return '';
+        const units = lpUnits();
         const parts = lpParts();
+        const loose = units.length > ls.length ? units[units.length - 1].keys.length : 0;
+        const choose = units.length > 1
+            ? `${lpRadio('x-lpmode', LP.mode, [['each', 'One worksheet per lesson (each with its own pages and key)'], ['all', 'One for all the lessons'], ['both', 'Both']], 'Worksheets')}
+            ${LP.mode === 'each' ? '' : `<p class="tvs-row-sub">The one for all:</p>${lpRadio('x-lpall', LP.all, [['mixed', 'Mixed practice'], ['lessons', 'A section per lesson']], 'The one for all')}`}` : '';
         return `<section class="tvs-row tvw-lp" data-w-lp="${ls.length}"><div class="tvs-row-head"><h3 class="tvs-row-title">${ls.length} lesson${ls.length === 1 ? '' : 's'} in the tray</h3>
-            <p class="tvs-row-sub">${esc(ls.map((g) => g.name).join(' · '))}</p></div>
-          <div class="tvs-row-body">${lpRadio('x-lpmode', LP.mode, [['each', 'One worksheet per lesson (each with its own pages and key)'], ['all', 'One for all the lessons'], ['both', 'Both']], 'Worksheets')}
-            ${LP.mode === 'each' ? '' : `<p class="tvs-row-sub">The one for all:</p>${lpRadio('x-lpall', LP.all, [['mixed', 'Mixed practice'], ['lessons', 'A section per lesson']], 'The one for all')}`}
-            <p class="tvs-muted">Print all makes one PDF in lesson order: ${parts.length} worksheet${parts.length === 1 ? '' : 's'}, each with its key.</p>
-            <button type="button" class="tvs-btn tvs-primary" data-act="x-lpprint">${icon('print', 20)}<span>Print all</span></button></div></section>`;
+            <p class="tvs-row-sub">${esc(units.map((u) => u.title).join(' · '))}</p></div>
+          <div class="tvs-row-body">${choose}
+            ${loose ? `<p class="tvs-muted" data-w-lp-loose="${loose}">${loose} skill${loose === 1 ? '' : 's'} in no lesson print as “Other skills”.</p>` : ''}
+            <p class="tvs-muted">Print all makes one PDF in lesson order: ${parts.length} worksheet${parts.length === 1 ? '' : 's'}, each with its key. The numbers are on the right.</p></div></section>`;
     },
     click(b) {
         const act = b.dataset.act, val = b.dataset.v;
@@ -739,6 +767,7 @@ setPrintExtra({
         return false;
     },
     print: () => printAll(),
+    parts: () => lpParts(),
 });
 
 function emptyText(g, l, notTagged, hasDl) {
@@ -896,7 +925,7 @@ function wire(el) {
         if (d.wBack) { closeLesson(); return; }
         if (d.wNextl) { openLesson(d.wNextl, 'title'); return; }
         if (t.getAttribute('aria-disabled') === 'true' && d.wAct) { toast(d.why || 'Tick skills first'); return; }
-        if (d.wAct === 'print') { const items = tickedItems(); if (items.length) sheetWith('print', items); else toast('Tick skills first'); return; }
+        if (d.wAct === 'print') { const items = tickedItems(); const l = L.lessonByKey(v.lesson); if (items.length) sheetWith('print', items, l ? lessonName(l) : ''); else toast('Tick skills first'); return; }
         if (d.wAct === 'link') { shareLink(); return; }
         if (d.wAct === 'copy') { copyText(pick.link).then((ok) => toast(ok ? 'Practice link copied' : 'Select the link and copy it')); return; }
         if (d.wAct === 'tray') { addToTray(); return; }

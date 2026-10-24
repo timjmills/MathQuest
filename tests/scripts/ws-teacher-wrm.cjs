@@ -686,7 +686,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
           await page.evaluate(() => { navigator.clipboard.writeText = (t) => { window.__copied = t; return Promise.resolve(); }; });
           await sleep(150);
           const fold = await page.$eval(`[data-screen="wrm"].is-active [data-w-tmu-toggle="${u}"]`, (b) => ({ text: b.textContent.trim(), exp: b.getAttribute('aria-expanded'), hidden: document.querySelector(`#tvwTmu-${b.dataset.wTmuToggle}`).hidden }));
-          check(fold.exp === 'false' && fold.hidden && fold.text === `Skills to be made for this domain (${rows.length}) — show`, `unit ${g} ${u} @${w}: folded button ${JSON.stringify(fold)}`);
+          check(fold.exp === 'false' && fold.hidden && fold.text === `Skills to be made for this area (${rows.length}) — show`, `unit ${g} ${u} @${w}: folded button ${JSON.stringify(fold)}`);
           await tap(`[data-screen="wrm"].is-active [data-w-tmu-toggle="${u}"]`);
           await sleep(150);
           const uf = await page.evaluate((sel) => {
@@ -700,7 +700,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
           const wantTitle = `Skills to be made for Grade ${g} · ${links.domainName(dom)}`;
           check(!uf.hidden && uf.title === wantTitle && uf.atTop, `unit ${g} ${u} @${w}: title "${uf.title}" (want "${wantTitle}"), open ${!uf.hidden}, at the top of its section ${uf.atTop}`);
           check(uf.count === rows.length && uf.shown === Math.min(6, rows.length), `unit ${g} ${u} @${w}: badge ${uf.count} rows ${uf.shown}, want ${rows.length} (first 6 shown)`);
-          check(rows.length ? uf.forOk : uf.empty === TMK.EMPTY_UNIT, `unit ${g} ${u} @${w}: a row lacks its parts or lessons`);
+          check(rows.length ? uf.forOk : uf.empty === TMK.EMPTY_UNIT.replace(/\bdomain\b/, 'area'), `unit ${g} ${u} @${w}: a row lacks its parts or lessons`);
           if (rows.length > 6) check(uf.all === `Show all ${rows.length}`, `unit ${g} ${u}: "Show all" button "${uf.all}"`);
           await fit(`unit ${g} ${u} @${w}`);
           { const ov = await page.$$eval(`#tvwToMake button, ${CARD} button, [data-w-tmu-toggle]`, (bs) => bs.filter((x) => x.getClientRects().length && x.scrollWidth > x.clientWidth + 1).map((x) => x.textContent.trim()));

@@ -500,3 +500,11 @@ body.teacher-mode:has(#teacherMain .tv-screen.is-active[data-screen="wrm"]) .tv-
 @media (max-width: 819px) {
   body.teacher-mode:has(#teacherMain .tv-screen.is-active[data-screen="wrm"]) .tv-toast { bottom: calc(var(--tvw-tray-h, 56px) + var(--tv2-bar) + var(--sp-8)); }
 }
+/* T4 check: lesson chips in the tray bar are capped, so three fit at 1366 (the full name is the chip's title) */
+#teacherApp .tt-items.tt-lessons .tt-li { max-width: 150px; }
+#teacherApp .tt-items.tt-lessons .tt-li .tt-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+/* T4 check: the Share sheet's code and link wrap at 390 (never cut off) */
+#teacherApp .tvs-codebox { grid-template-columns: minmax(0, 1fr); }
+#teacherApp .tvs-codebox > * { min-width: 0; max-width: 100%; }
+#teacherApp .tvs-codebox .tvs-code, #teacherApp .tvs-codebox .tvs-link-line code { word-break: break-all; white-space: normal; }
+#teacherApp .tvs-batch-rows { margin: var(--sp-8) 0 0; padding-left: var(--sp-16); display: grid; gap: var(--sp-4); }
