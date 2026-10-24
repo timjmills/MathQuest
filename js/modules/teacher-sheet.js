@@ -363,7 +363,7 @@ function summary() {
     const names0 = () => (isBig(list) ? byArea(active).map((a) => `${AREAS[a.area].short} ${a.list.reduce((t, x) => t + (b.byKey[keyOf(x)] || 0), 0)}`).join(', ') : list.map((x) => `${x.label} ${x.leftOut ? '(left out)' : b.byKey[keyOf(x)] || 0}`).join(', '));
     // the summary always gives all three numbers: pages · problems · (about) n of each (owner 2026-10-24)
     const vals = active.map((x) => b.byKey[keyOf(x)] || 0).filter((c) => c > 0);
-    const eachN = vals.length ? (vals.every((c) => c === vals[0]) ? `${vals[0]} of each` : `about ${Math.round(b.total / vals.length)} of each`) : '';
+    const eachN = vals.length ? (vals.every((c) => c === vals[0]) ? `${vals[0]} of each` : (Math.max(...vals) - Math.min(...vals) <= 1 ? `about ${Math.round(b.total / vals.length)} of each` : '')) : '';
     const ofEach = eachN && active.length > 1 ? ` · ${eachN}` : '';
     const err = b.errors.length ? ` · ${b.errors.length} part${b.errors.length > 1 ? 's' : ''} could not be built` : '';
     if (b.versions > 1) {
