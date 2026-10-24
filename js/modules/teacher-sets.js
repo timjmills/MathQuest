@@ -609,25 +609,41 @@ function renderSendPanel() {
   </div>` : ''}`;
 }
 
-function createLink() {
-    if (!currentSet().length) { toast('Add at least one skill first'); return; }
-    const s = ui.send;
+/**
+ * The share code and link for the CURRENT set (UnifiedSkills) with these rules: the one place every teacher screen
+ * makes them (the Send screen here, and the Share sheet of teacher-sheet.js), so ?code= / ?c= decode exactly as
+ * before. `send` = {gameMode, problemCount, timer, range, decimals} ('?' = pupil's choice), `type` 'direct' | 'qs'.
+ * @returns {{link:string, code:string}|null}
+ */
+export function makeShareLink(send, type = 'direct', lock = false) {
+    if (!currentSet().length) return null;
+    const s = Object.assign({}, ui.send, send || {});
     state.shareSettings = {
         timer: s.timer === '?' ? '?' : Number(s.timer),
         problemCount: s.problemCount === '?' ? '?' : Number(s.problemCount),
         gameMode: s.gameMode,
         range: s.range === '?' ? '?' : Number(s.range),
         decimals: s.decimals === '?' ? '?' : Number(s.decimals),
-        quickStartLocked: ui.lock ? 'locked' : '?',
+        quickStartLocked: lock ? 'locked' : '?',
     };
-    state.shareLinkType = ui.type === 'qs' ? 'quickstart' : 'direct';
+    state.shareLinkType = type === 'qs' ? 'quickstart' : 'direct';
     let link = '';
     try { link = window.generateShareableLink ? window.generateShareableLink() : ''; } catch (e) { link = ''; }
-    if (!link) { toast('Could not make a link for this set'); return; }
+    if (!link) return null;
     const m = /[?&](?:c|qs)=([^&]*)/.exec(link);
     const code = m ? decodeURIComponent(m[1]) : '';
-    ui.result = { link, code };
-    upsertSet({ link, code });
+    return { link, code };
+}
+
+/** The Send screen's own rules (mode, problems, timer ...), for the Share sheet's More options. */
+export const SHARE_FIELDS = () => SEND_FIELDS;
+
+function createLink() {
+    if (!currentSet().length) { toast('Add at least one skill first'); return; }
+    const r = makeShareLink(ui.send, ui.type, ui.lock);
+    if (!r) { toast('Could not make a link for this set'); return; }
+    ui.result = r;
+    upsertSet(r);
     renderSend();
 }
 
@@ -682,13 +698,21 @@ async function copyOut(which) {
  */
 function showBoardCode() {
     if (!ui.result) return;
+    showBoardCodeFor({ link: ui.result.link, code: ui.result.code, name: (ui.name || '').trim() || autoName(snapshotCurrentSet()) });
+}
+
+/**
+ * Show a code on the classroom board (the Send screen and the Share sheet): {link, code, name}.
+ */
+export function showBoardCodeFor(r) {
+    if (!r || !r.code) return;
     const opener = document.activeElement;
     let ov = document.getElementById('tvBoardOverlay');
     const close = () => {
         const el = document.getElementById('tvBoardOverlay');
         if (el) el.remove();
         document.removeEventListener('keydown', onKey, true);
-        const back = root && root.querySelector('[data-act="board-code"]');
+        const back = root && root.isConnected && root.querySelector('[data-act="board-code"]');
         const target = opener && opener.isConnected ? opener : back;
         if (target) { try { target.focus({ preventScroll: true }); } catch (e) { /* */ } }
     };
@@ -709,11 +733,11 @@ function showBoardCode() {
     ov.setAttribute('role', 'dialog');
     ov.setAttribute('aria-modal', 'true');
     ov.setAttribute('aria-labelledby', 'tvBoardName');
-    const code = pupilCode(ui.result.code);
+    const code = pupilCode(r.code);
     const parts = code.split('-').filter(Boolean);
-    const name = (ui.name || '').trim() || autoName(snapshotCurrentSet());
+    const name = r.name || autoName(snapshotCurrentSet());
     let host = 'the Math Quest Pro start screen';
-    try { host = new URL(ui.result.link).host || host; } catch (e) { /* keep the words */ }
+    try { host = new URL(r.link).host || host; } catch (e) { /* keep the words */ }
     ov.innerHTML = `<div class="tv-boardcode-card">
   <p class="tv-boardcode-kicker">Math Quest Pro</p>
   <h2 class="tv-boardcode-name" id="tvBoardName">${esc(name)}</h2>

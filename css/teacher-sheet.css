@@ -1,0 +1,259 @@
+/* ==========================================================================
+   teacher-sheet.css — the Worksheet, Quiz and Share sheets (Teacher site 2.0, T3b)
+
+   The signed mock-up design/mockups/teacher-2/ (#print, #quiz, #share, #quizshare):
+     - >= 820 px: a white dialog over the scrim, options on the left, the summary,
+       the page-1 preview and the actions on the right (stone panel); one ink
+       primary (Print, or Copy link on Share);
+     - <  820 px: full screen, one column; the preview follows the options (never
+       first) and the summary + Print stay in a bar at the foot.
+   Values from css/teacher-tokens.css only (no raw colours, sizes, radii or shadows).
+   Light only. ADDITIVE and scoped to #teacherApp (.tvs-*): nothing else is touched.
+   ========================================================================== */
+
+body.teacher-mode.tvs-open { overflow: hidden; }
+
+#teacherApp .tvs-overlay {
+  position: fixed; inset: 0; z-index: 80;
+  display: grid; place-items: center; padding: var(--sp-24);
+  background: var(--scrim);
+  font-family: var(--font-ui); color: var(--text); line-height: var(--lh-body);
+}
+#teacherApp .tvs-sheet {
+  position: relative;
+  width: min(1160px, 100%); height: min(100%, 1000px);
+  display: grid; grid-template-rows: auto minmax(0, 1fr);
+  background: var(--surface); border-radius: var(--r-16); box-shadow: var(--shadow-2);
+  overflow: hidden;
+}
+#teacherApp .tvs-sheet.tvs-narrow { width: min(640px, 100%); height: auto; max-height: 100%; }
+#teacherApp .tvs-head {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: var(--sp-16);
+  padding: var(--sp-16) var(--sp-24);
+  border-bottom: var(--line-1) solid var(--line);
+}
+#teacherApp .tvs-kicker {
+  margin: 0; font-family: var(--font-mono); font-size: var(--fs-12); font-weight: var(--fw-500);
+  letter-spacing: var(--ls-mono); text-transform: uppercase; color: var(--text-2);
+}
+#teacherApp .tvs-title {
+  margin: 0; font-family: var(--font-display); font-weight: var(--fw-500); font-synthesis: none;
+  font-size: var(--fs-28); line-height: var(--lh-tight); color: var(--text);
+}
+#teacherApp .tvs-body { display: grid; grid-template-columns: minmax(0, 1fr) 336px; min-height: 0; }
+#teacherApp .tvs-body-one { display: block; overflow: auto; padding: var(--sp-24); }
+#teacherApp .tvs-main { overflow: auto; padding: var(--sp-16) var(--sp-24) var(--sp-32); min-width: 0; }
+#teacherApp .tvs-side {
+  overflow: auto; padding: var(--sp-24);
+  display: flex; flex-direction: column; gap: var(--sp-16);
+  background: var(--page); border-left: var(--line-1) solid var(--line);
+}
+
+/* ---------------------------------------------------------------- buttons */
+#teacherApp .tvs-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-8);
+  min-height: var(--control); min-width: var(--control); padding: 0 var(--sp-16);
+  border: var(--line-1) solid var(--line); border-radius: var(--r-8);
+  background: var(--surface); color: var(--text);
+  font: inherit; font-size: var(--fs-16); font-weight: var(--fw-700); cursor: pointer; text-align: center;
+}
+#teacherApp .tvs-btn:hover { border-color: var(--text); }
+#teacherApp .tvs-btn[disabled] { color: var(--text-3); cursor: default; border-color: var(--line); }
+#teacherApp .tvs-btn[aria-disabled="true"] { color: var(--text-3); }
+#teacherApp .tvs-btn[aria-pressed="true"] { background: var(--surface-2); border: var(--line-2) solid var(--text); }
+#teacherApp .tvs-primary {
+  width: 100%; min-height: var(--sp-48);
+  background: var(--primary-bg); color: var(--primary-fg); border-color: var(--primary-bg); font-size: var(--fs-20);
+}
+#teacherApp .tvs-primary:hover { border-color: var(--primary-bg); }
+#teacherApp .tvs-primary[aria-disabled="true"] { background: var(--surface-2); color: var(--text-2); border-color: var(--line); }
+#teacherApp .tvs-close { padding: 0; }
+#teacherApp .tvs-link {
+  min-height: var(--control); padding: 0; border: 0; background: none; color: var(--text);
+  font: inherit; font-weight: var(--fw-700); text-decoration: underline; cursor: pointer;
+}
+#teacherApp .tvs-overlay :focus-visible { outline: var(--line-2) solid var(--ring); outline-offset: var(--line-2); }
+
+/* ---------------------------------------------------------------- chips and the grouped list */
+#teacherApp .tvs-chips { display: flex; flex-wrap: wrap; gap: var(--sp-8); margin: var(--sp-8) 0 var(--sp-16); }
+#teacherApp .tvs-chip {
+  display: inline-flex; align-items: center; gap: var(--sp-8); min-height: var(--control); max-width: 100%;
+  padding: 0 var(--sp-16) 0 var(--sp-8); border-radius: var(--r-8);
+  background: var(--a-bold); color: var(--a-on); border: var(--line-1) solid var(--a-deep);
+  font-size: var(--fs-16); font-weight: var(--fw-700);
+}
+#teacherApp .tvs-chip-name { overflow-wrap: anywhere; }
+#teacherApp .tvs-chip-area {
+  padding-left: var(--sp-8); border-left: var(--line-1) solid currentColor;
+  font-family: var(--font-mono); font-size: var(--fs-12); font-weight: var(--fw-500); letter-spacing: var(--ls-mono); text-transform: uppercase;
+}
+#teacherApp .tvs-grade {
+  flex: none; display: inline-grid; place-items: center; width: var(--sp-24); height: var(--sp-24);
+  border-radius: 50%; background: var(--surface); color: var(--text); border: var(--line-2) solid var(--text);
+  font-size: var(--fs-12); font-weight: var(--fw-700); line-height: 1;
+}
+#teacherApp .tvs-trayline { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-16); margin: var(--sp-8) 0; }
+#teacherApp .tvs-glist { display: grid; gap: var(--sp-8); margin: var(--sp-8) 0 var(--sp-16); max-height: 360px; overflow: auto; }
+#teacherApp .tvs-garea { border-left: var(--sp-4) solid var(--a-bold); padding-left: var(--sp-8); }
+#teacherApp .tvs-garea-name {
+  display: flex; align-items: center; gap: var(--sp-8); margin: 0; min-height: var(--control);
+  color: var(--a-deep); font-weight: var(--fw-700);
+}
+#teacherApp .tvs-gg { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-4); }
+#teacherApp .tvs-grow {
+  display: flex; align-items: center; gap: var(--sp-8); width: 100%; min-height: var(--control); padding: 0 var(--sp-8);
+  border: var(--line-1) solid var(--line); border-radius: var(--r-8); background: var(--surface);
+  color: var(--text); font: inherit; font-size: var(--fs-16); text-align: left; cursor: pointer;
+}
+#teacherApp .tvs-grow:hover { border-color: var(--text); }
+#teacherApp .tvs-grow-name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+
+/* ---------------------------------------------------------------- the three kinds */
+#teacherApp .tvs-kinds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-8); }
+#teacherApp .tvs-kind {
+  display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: var(--sp-8);
+  min-height: var(--sp-48); padding: var(--sp-8) var(--sp-16);
+  border: var(--line-1) solid var(--line); border-radius: var(--r-8); background: var(--surface);
+  color: var(--text); font: inherit; text-align: left; cursor: pointer;
+}
+#teacherApp .tvs-kind > svg { grid-row: 1; }
+#teacherApp .tvs-kind-name { font-size: var(--fs-16); font-weight: var(--fw-700); }
+#teacherApp .tvs-kind-sub { grid-column: 1 / -1; font-size: var(--fs-14); color: var(--text-2); }
+#teacherApp .tvs-kind[aria-checked="true"] { border: var(--line-2) solid var(--text); box-shadow: 0 0 0 var(--line-2) var(--surface), 0 0 0 var(--sp-4) var(--line); }
+#teacherApp .tvs-kind:not([aria-checked="true"]) .tvs-kind-name { grid-column: 1 / -1; }
+#teacherApp .tvs-chosen { margin: var(--sp-8) 0 0; }
+
+/* ---------------------------------------------------------------- option rows */
+#teacherApp .tvs-row {
+  display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: var(--sp-16);
+  padding: var(--sp-16) 0; border-top: var(--line-1) solid var(--line);
+}
+#teacherApp .tvs-row:first-of-type { margin-top: var(--sp-16); }
+#teacherApp .tvs-row-title { margin: 0; font-size: var(--fs-16); font-weight: var(--fw-700); line-height: var(--lh-tight); }
+#teacherApp .tvs-row-sub { margin: var(--sp-4) 0 0; font-size: var(--fs-14); color: var(--text-2); }
+#teacherApp .tvs-row-body { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-8); min-width: 0; }
+#teacherApp .tvs-seg { display: flex; flex-wrap: wrap; gap: var(--sp-8); }
+#teacherApp .tvs-seg .tvs-btn { font-weight: var(--fw-500); }
+#teacherApp .tvs-seg .tvs-btn[aria-pressed="true"] { font-weight: var(--fw-700); }
+#teacherApp .tvs-pages { display: flex; flex-wrap: wrap; gap: var(--sp-8); align-items: center; }
+#teacherApp .tvs-stepper {
+  display: inline-flex; align-items: center; border: var(--line-1) solid var(--line); border-radius: var(--r-8); background: var(--surface);
+}
+#teacherApp .tvs-stepper .tvs-btn { border: 0; }
+#teacherApp .tvs-step-n { min-width: var(--sp-48); text-align: center; font-size: var(--fs-20); font-weight: var(--fw-700); }
+#teacherApp .tvs-radios { display: grid; gap: var(--sp-8); width: 100%; max-width: 520px; }
+#teacherApp .tvs-radio {
+  display: flex; align-items: center; gap: var(--sp-8); min-height: var(--control); padding: 0 var(--sp-16);
+  border: var(--line-1) solid var(--line); border-radius: var(--r-8); background: var(--surface);
+  color: var(--text); font: inherit; font-size: var(--fs-16); text-align: left; cursor: pointer;
+}
+#teacherApp .tvs-radio[aria-checked="true"] { border: var(--line-2) solid var(--text); font-weight: var(--fw-700); }
+#teacherApp .tvs-radio-dot { flex: none; width: var(--sp-16); height: var(--sp-16); border-radius: 50%; border: var(--line-2) solid var(--text-2); }
+#teacherApp .tvs-radio[aria-checked="true"] .tvs-radio-dot { border-color: var(--text); background: radial-gradient(circle, var(--text) 45%, transparent 50%); }
+#teacherApp .tvs-often { display: grid; gap: var(--sp-8); width: 100%; }
+#teacherApp .tvs-often-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-8); }
+#teacherApp .tvs-often-name {
+  display: inline-flex; align-items: center; gap: var(--sp-8); min-height: var(--control); padding: 0 var(--sp-16) 0 var(--sp-8);
+  border-radius: var(--r-8); background: var(--a-tint); border-left: var(--sp-4) solid var(--a-bold); font-weight: var(--fw-700);
+}
+#teacherApp .tvs-held { display: inline-flex; align-items: center; gap: var(--sp-4); min-height: var(--control); font-weight: var(--fw-700); }
+#teacherApp .tvs-areas { border-collapse: collapse; font-size: var(--fs-14); }
+#teacherApp .tvs-areas th, #teacherApp .tvs-areas td { padding: var(--sp-8); text-align: left; border-bottom: var(--line-1) solid var(--line); }
+#teacherApp .tvs-areas th { display: flex; align-items: center; gap: var(--sp-8); border-left: var(--sp-4) solid var(--a-bold); font-weight: var(--fw-700); }
+#teacherApp .tvs-checks { display: flex; flex-wrap: wrap; gap: var(--sp-16); }
+#teacherApp .tvs-check { display: inline-flex; align-items: center; gap: var(--sp-8); min-height: var(--control); font-size: var(--fs-16); cursor: pointer; }
+#teacherApp .tvs-check input { width: var(--sp-24); height: var(--sp-24); accent-color: var(--text); }
+#teacherApp .tvs-more { margin-top: var(--sp-16); border-top: var(--line-1) solid var(--line); }
+#teacherApp .tvs-more-sum { display: flex; align-items: center; min-height: var(--control); font-weight: var(--fw-700); cursor: pointer; }
+#teacherApp .tvs-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-16); padding-bottom: var(--sp-16); }
+#teacherApp .tvs-field { display: grid; gap: var(--sp-4); margin: var(--sp-8) 0; }
+#teacherApp .tvs-label { font-size: var(--fs-14); font-weight: var(--fw-700); color: var(--text-2); }
+#teacherApp .tvs-input {
+  min-height: var(--control); padding: 0 var(--sp-16); width: 100%; box-sizing: border-box;
+  border: var(--line-1) solid var(--line); border-radius: var(--r-8); background: var(--surface);
+  color: var(--text); font: inherit; font-size: var(--fs-16);
+}
+#teacherApp .tvs-muted { margin: 0; font-size: var(--fs-14); color: var(--text-2); }
+#teacherApp .tvs-strong { margin: 0; font-size: var(--fs-16); font-weight: var(--fw-700); }
+#teacherApp .tvs-warn {
+  display: flex; align-items: flex-start; gap: var(--sp-8); margin: var(--sp-8) 0 0; padding: var(--sp-8) var(--sp-16);
+  border: var(--line-1) solid var(--error); border-radius: var(--r-8); color: var(--error); font-size: var(--fs-14); font-weight: var(--fw-700);
+}
+#teacherApp .tvs-empty { display: grid; gap: var(--sp-8); padding: var(--sp-32) 0; }
+
+/* ---------------------------------------------------------------- Build from */
+#teacherApp .tvs-from { display: grid; gap: var(--sp-8); margin-bottom: var(--sp-16); }
+#teacherApp .tvs-from-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-4); max-height: 320px; overflow: auto; }
+#teacherApp .tvs-from-row {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--sp-16);
+  width: 100%; min-height: var(--control); padding: var(--sp-8) var(--sp-16);
+  border: var(--line-1) solid var(--line); border-radius: var(--r-8); background: var(--surface);
+  color: var(--text); font: inherit; font-size: var(--fs-14); text-align: left; cursor: pointer;
+}
+#teacherApp .tvs-from-row:hover { border-color: var(--text); }
+#teacherApp .tvs-from-code { font-family: var(--font-mono); font-weight: var(--fw-700); white-space: nowrap; }
+#teacherApp .tvs-from-text { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+
+/* ---------------------------------------------------------------- summary, preview, actions */
+#teacherApp .tvs-sum-line { margin: 0; font-size: var(--fs-16); font-weight: var(--fw-700); line-height: var(--lh-tight); }
+#teacherApp .tvs-sum-line.is-error { color: var(--error); }
+#teacherApp .tvs-sum-more { margin: var(--sp-4) 0 0; font-size: var(--fs-14); color: var(--text-2); overflow-wrap: anywhere; }
+/* page 1 at 0.26 (A4 794 x 1123 px): the frame is laid out in a box of the scaled size, so nothing overflows */
+#teacherApp .tvs-prev {
+  --tvs-scale: 0.26;
+  position: relative; overflow: hidden; margin: 0 auto; flex: none;
+  width: calc(794px * var(--tvs-scale)); height: calc(1123px * var(--tvs-scale));
+  background: var(--paper); box-shadow: var(--shadow-1); outline: var(--line-1) solid var(--line);
+}
+#teacherApp .tvs-prev:empty { display: none; }
+#teacherApp .tvs-prev-frame {
+  position: absolute; top: 0; left: 0; width: 794px; height: 1123px; border: 0; background: var(--paper);
+  transform: scale(var(--tvs-scale)); transform-origin: 0 0; pointer-events: none;
+}
+#teacherApp .tvs-prev-cap { text-align: center; }
+#teacherApp .tvs-actions { display: grid; gap: var(--sp-8); }
+#teacherApp .tvs-codebox {
+  display: grid; gap: var(--sp-8); justify-items: center; margin: var(--sp-16) 0 var(--sp-8); padding: var(--sp-24) var(--sp-16);
+  border: var(--line-2) solid var(--text); border-radius: var(--r-16); text-align: center;
+}
+#teacherApp .tvs-code { margin: 0; font-family: var(--font-display); font-weight: var(--fw-500); font-synthesis: none; font-size: var(--fs-36); letter-spacing: 0.05em; overflow-wrap: anywhere; }
+#teacherApp .tvs-link-line { margin: 0; max-width: 100%; font-size: var(--fs-14); overflow-wrap: anywhere; }
+#teacherApp .tvs-link-line code { font-family: var(--font-mono); font-size: var(--fs-14); max-height: 96px; overflow: auto; display: block; overflow-wrap: anywhere; }
+#teacherApp .tvs-share-actions { display: grid; gap: var(--sp-8); margin-top: var(--sp-16); }
+#teacherApp .tvs-two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-8); }
+
+/* ---------------------------------------------------------------- popup preview */
+#teacherApp .tvs-popup { position: absolute; inset: 0; z-index: 2; display: grid; place-items: center; background: var(--scrim); padding: var(--sp-16); }
+#teacherApp .tvs-popup[hidden] { display: none; }
+#teacherApp .tvs-pop {
+  width: min(520px, 100%); max-height: 100%; overflow: auto; display: grid; gap: var(--sp-16); padding: var(--sp-16) var(--sp-24) var(--sp-24);
+  background: var(--surface); border-radius: var(--r-16); box-shadow: var(--shadow-2); border-top: var(--sp-8) solid var(--a-bold);
+}
+#teacherApp .tvs-pop-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-8); }
+#teacherApp .tvs-pop-title { display: flex; align-items: center; gap: var(--sp-8); margin: 0; font-size: var(--fs-20); font-weight: var(--fw-700); }
+#teacherApp .tvs-pop-frame { min-height: 200px; background: var(--paper); border: var(--line-1) solid var(--line); border-radius: var(--r-8); overflow: hidden; }
+
+/* ---------------------------------------------------------------- below 820 px: full screen, one column */
+@media (max-width: 819px) {
+  #teacherApp .tvs-overlay { padding: 0; place-items: stretch; }
+  #teacherApp .tvs-sheet, #teacherApp .tvs-sheet.tvs-narrow { width: 100%; height: 100%; max-height: none; border-radius: 0; }
+  #teacherApp .tvs-head { padding: var(--sp-8) var(--sp-16); }
+  #teacherApp .tvs-title { font-size: var(--fs-20); }
+  #teacherApp .tvs-body { display: block; overflow: auto; }
+  #teacherApp .tvs-body-one { padding: var(--sp-16); }
+  #teacherApp .tvs-main { overflow: visible; padding: var(--sp-8) var(--sp-16) var(--sp-16); }
+  #teacherApp .tvs-side { overflow: visible; border-left: 0; border-top: var(--line-1) solid var(--line); padding: var(--sp-16) var(--sp-16) 0; }
+  #teacherApp .tvs-kinds { grid-template-columns: 1fr; }
+  #teacherApp .tvs-row { grid-template-columns: 1fr; gap: var(--sp-8); }
+  #teacherApp .tvs-fields { grid-template-columns: 1fr; }
+  #teacherApp .tvs-prev { --tvs-scale: 0.36; }
+  /* the summary and the actions stay at the foot of the screen */
+  #teacherApp .tvs-actions {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 3;
+    grid-template-columns: repeat(2, minmax(0, 1fr)); padding: var(--sp-8) var(--sp-16);
+    background: var(--surface); border-top: var(--line-1) solid var(--line); box-shadow: var(--shadow-1);
+  }
+  #teacherApp .tvs-actions .tvs-primary { order: 2; font-size: var(--fs-16); min-height: var(--control); }
+  #teacherApp .tvs-side { padding-bottom: calc(2 * var(--sp-48) + var(--sp-32)); }
+  #teacherApp .tvs-code { font-size: var(--fs-28); }
+}
