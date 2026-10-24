@@ -1,0 +1,49 @@
+{
+ "about": "D1 (W0-A critic r7): a multi-skill matrix row (sections/ex-each: the lane skill + one partner). Counts per size and, per skill, the findings each skill's cells carry (bySkill, from print-lint's `skill`). Hand-made, in the shape ws-coverage-matrix --out writes. PASS state: all 6 findings are on the PARTNER's cells (reported, never blocks the lane).",
+ "rows": [
+  {
+   "id": "addition:d1_lane|sections/ex-each",
+   "skill": "addition:d1_lane",
+   "skills": [
+    "addition:d1_lane",
+    "subtraction:d1_partner"
+   ],
+   "kind": "sections",
+   "row": "ex-each",
+   "status": "RED",
+   "args": [
+    "--kind",
+    "sections"
+   ],
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 6
+     },
+     "keys": {},
+     "bySkill": {
+      "subtraction:d1_partner": {
+       "L-SIZE TY-11": 6
+      }
+     }
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "keys": {},
+     "bySkill": {}
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "keys": {},
+     "bySkill": {}
+    }
+   }
+  }
+ ]
+}

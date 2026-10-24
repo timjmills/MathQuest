@@ -529,6 +529,12 @@ const countsOf = (doc) => { const m = {}; for (const f of doc.findings || []) if
  * by a millimetre is not a new finding; the page is kept, so the same defect moving to another page is new.
  */
 const findingKey = (f) => `${f.lint} ${f.rule}|p${f.page != null ? f.page : ''}|${String(f.key || f.msg || '').replace(/\d+(?:\.\d+)?/g, '#').slice(0, 120)}`;
+/**
+ * D1 (W0-A critic r7): per skill, the counts of the findings its cells carry (print-lint's `skill`, from the cell's
+ * data-ws-skill); '' holds the findings no cell names (page-level). Only multi-skill rows store it: ws-sibling-compare
+ * and ws-slot-clip judge the lane skill's own share there, and report a partner skill's as non-blocking.
+ */
+const bySkillOf = (doc) => { const m = {}; for (const f of doc.findings || []) if (!f.waived && !RENDER_KEYS.has(`${f.lint} ${f.rule}`)) { const s = f.skill || ''; const k = `${f.lint} ${f.rule}`; (m[s] = m[s] || {})[k] = (m[s][k] || 0) + 1; } return m; };
 const keysOf = (doc) => { const m = {}; for (const f of doc.findings || []) if (!f.waived && !RENDER_KEYS.has(`${f.lint} ${f.rule}`)) { const k = findingKey(f); m[k] = (m[k] || 0) + 1; } return m; };
 
 /**
@@ -690,7 +696,7 @@ async function runRows(rows, { slots, batch, verbose }) {
         for (const sz of SIZES) {
             const id = `${r.id}@${sz}`;
             const d = docs.get(id);
-            if (d) r.sizes[sz] = { pages: d.pages, keyPages: d.keyPages, counts: countsOf(d), keys: keysOf(d), error: d.error || null, groups: verbose ? [...new Set((d.findings || []).map((f) => `${f.lint} ${f.rule}: ${f.msg}`))].slice(0, 12) : undefined };
+            if (d) r.sizes[sz] = { pages: d.pages, keyPages: d.keyPages, counts: countsOf(d), keys: keysOf(d), bySkill: (r.skills || []).length > 1 ? bySkillOf(d) : undefined, error: d.error || null, groups: verbose ? [...new Set((d.findings || []).map((f) => `${f.lint} ${f.rule}: ${f.msg}`))].slice(0, 12) : undefined };
             else if (pend.has(id)) r.sizes[sz] = { pending: pend.get(id).step, reason: pend.get(id).reason };
             else if (na.has(id)) r.sizes[sz] = { na: na.get(id).reason };
             else r.sizes[sz] = { error: crashed.get(id) || 'no result', counts: { 'L-SPLIT RENDER': 1 } };

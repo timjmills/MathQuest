@@ -103,6 +103,15 @@
 //              above the cells; BD-1 no "Part NN" section headings.
 //   L-ANSAREA  SL-1 answer lines >= 14 mm; SL-6 no underscore blanks; H12 an item that says draw / build /
 //              show has a drawing zone >= 30 mm tall with >= 60 % of it empty (measured and reported).
+//              TY-21 (kit / pack; S1 builder B) every digit-strip segment ([data-ws-seg]) and stand-alone answer box
+//              ([data-ws-slot] box / box-unknown) is >= 4.4 mm wide as printed (pilot critic r1 D3: 4.06 mm at S).
+//   L-OVERLAP  H2 (kit / pack) neighbouring head labels of one drawing (stack `.head`s, the place letters over a pv
+//              mat's zones) sit >= 1 mm apart (critic r1 D7 overlap, r2 N8 0.74 mm apart).
+//   L-WRAP     WRAP-OP (kit / pack) no wrapped line of text ends in − + × ÷ = with its expression continued on the
+//              next line (critic r2 N6 vocabulary picture, N7 worked step). TY-21, H2 and WRAP-OP are measured by
+//              tests/lib/ws-geom-probe.cjs, the one definition ws-slot-clip's SLOT-W / HEADS read too.
+//   (L-DENSITY H13-ROW: a top cell whose band below exceeds its row's smallest by >= 30 % of its height: the row is
+//              sized for a taller item, critic r2 N2. Findings carry `skill` (data-ws-skill) for D1 attribution.)
 //   L-INPUT    no <input>, <button>, <select>, <textarea> or contenteditable on a printed sheet.
 //   L-CCSS     SC-5 / HD-6 no CCSS code, "Grade N" or snake_case skill id outside the teacher footer.
 //   L-ANCHOR   S6 / PT-LBL-6 (kit, with --anchors side|sections): every step-by-step anchor cell carries
@@ -128,6 +137,7 @@ const { execFileSync } = require('child_process');
 const { pathToFileURL } = require('url');
 const puppeteer = require('puppeteer');
 const { ROOT, chromePath, startServer, open, waitFor, listSkills, renderPrint, hideOverlays } = require('../lib/ws-harness.cjs');
+const { GEOM_PROBE, MIN_SEG_MM, HEAD_GAP_MM } = require('../lib/ws-geom-probe.cjs');
 
 const argv = process.argv.slice(2);
 // --jobs: while one job of a jobs file runs, its flags are read in place of the command line's
@@ -267,7 +277,7 @@ function kitRequestFlags() {
 const TOOL = 'ws-print-lint';
 // INK-31: the answer-key ink (WORKSHEET_DESIGN_STANDARD.md INK-31).
 const KEY_INK = '#c2410c';
-const LINTS = ['L-INK', 'L-EMOJI', 'L-FONT', 'L-SIZE', 'L-OVERFLOW', 'L-SPLIT', 'L-DENSITY', 'L-KEY', 'L-VERBS', 'L-ANSAREA', 'L-INPUT', 'L-CCSS', 'L-ANCHOR', 'L-SUPPORT', 'L-TOPSTART'];
+const LINTS = ['L-INK', 'L-EMOJI', 'L-FONT', 'L-SIZE', 'L-OVERFLOW', 'L-SPLIT', 'L-DENSITY', 'L-KEY', 'L-VERBS', 'L-ANSAREA', 'L-INPUT', 'L-CCSS', 'L-ANCHOR', 'L-SUPPORT', 'L-TOPSTART', 'L-OVERLAP', 'L-WRAP'];
 
 /**
  * L-SUPPORT (S2): runs IN the rendered sheet document (the page lintHtmlInSheetPage prints from).
@@ -520,6 +530,10 @@ function wsLintPage(cfg) {
         if (ri) { if (isLegacy) out.part = ri.key ? 'key' : 'pupil'; else out.page = ri.idx + 1; }
         const c = cellNo(el);
         if (c) out.cell = c;
+        // D1 (W0-A critic r7): the skill whose cell carries the finding, so a multi-skill sheet's partner skill can
+        // neither fail nor hide a lane defect (ws-coverage-matrix bySkill, ws-sibling-compare, ws-slot-clip)
+        const sk = el.closest && el.closest('[data-ws-skill]');
+        if (sk && sk.getAttribute('data-ws-skill')) out.skill = sk.getAttribute('data-ws-skill');
         if (isLegacy) out.tag = tagOf(el);
         return out;
     };
@@ -872,6 +886,7 @@ function wsLintPage(cfg) {
            holds. The content box is every visible in-flow descendant (absolutely placed labels, tabs
            and the key's answer stamp excluded); the band is measured inside the cell's padding. */
         if (!isLegacy) {
+            const topRows = [];   // H13-ROW: the top cells of this page, judged against their row after the loop
             for (const c of ri.cells) {
                 if (c.classList.contains('blankrun') || c.closest('.mq-anchorgrid') || c.querySelector('[data-ws-anchor]')) continue;
                 const cr = c.getBoundingClientRect();
@@ -883,6 +898,9 @@ function wsLintPage(cfg) {
                     if (!visible(d)) continue;
                     if (d.closest('[data-ws-label], .ws-letter, .ws-tab, .ws-modeltab, .ws-legacy-answer')) continue;
                     if (getComputedStyle(d).position === 'absolute') continue;
+                    // VA-70's hold (an across fact kept at the vertical fact's height) is room, not content: the
+                    // sentence inside it is what the band is measured from (pilot-su-c critic r2 N2)
+                    if (d.classList && d.classList.contains('ws-eq-hold')) continue;
                     const r = d.getBoundingClientRect();
                     if (!r.width || !r.height) continue;
                     if (d.children.length && !(d instanceof SVGElement) && !d.textContent.trim() && !/^(svg|img|canvas)$/i.test(d.tagName)) {
@@ -933,6 +951,20 @@ function wsLintPage(cfg) {
                 const hBand = Math.max(box.l - inner.l, inner.r - box.r, 0);
                 if (vBand >= 0.3 * H) F('L-DENSITY', 'H13', 'major', c, `one empty band ${mm(vBand)} mm tall in a ${mm(H)} mm cell (${Math.round((vBand / H) * 100)}%): the row is sized for a taller item than it holds (RUBRIC H13)`, 'empty band in cell');
                 else if (hBand >= 0.3 * W) F('L-DENSITY', 'H13', 'major', c, `one empty band ${mm(hBand)} mm wide in a ${mm(W)} mm cell (${Math.round((hBand / W) * 100)}%): the content is pinned to one side (RUBRIC H13)`, 'empty band in cell');
+                else if (topCell) topRows.push({ c, top: cr.top, H, below: Math.max(inner.b - box.b, 0) });
+            }
+            /* H13-ROW (RUBRIC H13 "a row ... sized for a taller item than it holds"; pilot-su-c critic r2 N2: a lesson
+               Warm-up fact cell 43-59 % empty beside a place-value cell). Under a top cell the band below is writing
+               room (CL-4b), but only as much of it as the row's other cells keep: a cell whose band below exceeds
+               the smallest band below of its row (cells of the same page with the same top and height, within
+               1 mm) by 30 % of its height holds a shorter item than the row was sized for. A uniform grid never
+               fires (equal items keep equal bands). */
+            for (const a of topRows) {
+                const row = topRows.filter(b => b !== a && Math.abs(b.top - a.top) <= PX && Math.abs(b.H - a.H) <= PX);
+                if (!row.length) continue;
+                const keep = Math.min(...row.map(b => b.below));
+                const excess = a.below - keep;
+                if (excess >= 0.3 * a.H) F('L-DENSITY', 'H13', 'major', a.c, `one empty band ${mm(a.below)} mm tall under the item in a ${mm(a.H)} mm cell, ${mm(excess)} mm (${Math.round((excess / a.H) * 100)}%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)`, 'row sized for a taller item');
             }
         }
         if (!isLegacy) {
@@ -1536,6 +1568,14 @@ async function lintDocument(page, { id, mode, printBackground = false, notes = [
         }
     });
 
+    // ---- L-ANSAREA TY-21, L-OVERLAP H2, L-WRAP WRAP-OP: the shared geometry probe (tests/lib/ws-geom-probe.cjs,
+    //      the same definitions ws-slot-clip's SLOT-W and HEADS read)
+    if (mode !== 'legacy') {
+        const geo = await page.evaluate(GEOM_PROBE, { minSeg: MIN_SEG_MM, minGap: HEAD_GAP_MM });
+        info.geom = { segs: geo.segs, heads: geo.heads, tpl: geo.tpl };
+        geomFindings(geo, F);
+    }
+
     // ---- pages, parts, split, density, key
     if (mode !== 'legacy') lintKitGeometry(dom, pdf, info, F);
     else lintLegacyGeometry(dom, pdf, info, F, contentH);
@@ -1543,6 +1583,17 @@ async function lintDocument(page, { id, mode, printBackground = false, notes = [
     // location & de-duplication
     for (const f of findings) { delete f.tag; }
     return { info, findings, dom, pdf };
+}
+
+/**
+ * The shared geometry probe's items as findings (one per box, head pair or wrapped block), each located by page, cell
+ * and skill (D1). TY-21 and H2 are WDS minimums: never engine debt in ws-slot-clip, which reads the same probe.
+ */
+function geomFindings(geo, F) {
+    const at = (x) => { const o = { page: x.page, el: `<${x.tpl === '?' ? 'cell' : x.tpl}>${x.before ? ` "${x.before}"` : x.a ? ` "${x.a} ${x.b}"` : ''}` }; if (x.cell) o.cell = x.cell; if (x.skill) o.skill = x.skill; return o; };
+    for (const x of geo.narrow) F('L-ANSAREA', 'TY-21', 'major', at(x), `answer ${x.kind} ${x.w} mm wide as printed${x.key ? ' (key page)' : ''}: under ${MIN_SEG_MM} mm a pupil cannot write a digit in it (TY-21, VA-12)`, `narrow answer ${x.kind}`);
+    for (const x of geo.overlaps) F('L-OVERLAP', 'H2', 'major', at(x), `head labels "${x.a}" / "${x.b}" ${x.gap < 0 ? `overlap by ${-x.gap} mm` : `sit ${x.gap} mm apart`}: neighbouring heads need ${HEAD_GAP_MM} mm between them or they read as one run (H2)`, 'heads too close');
+    for (const x of geo.wraps) F('L-WRAP', 'WRAP-OP', 'major', at(x), `a wrapped line ends in "${x.op}": "${x.before}" / "${x.after}..." - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)`, `wrap after ${x.op}`);
 }
 
 // ---- kit / pack pages: every [data-ws-page] / .ws-page is one printed A4 sheet
@@ -2208,6 +2259,35 @@ const SELF_TESTS = [
         c.style.justifyContent = 'flex-start';
         c.closest('.ws-grid').style.gridTemplateRows = `${80 * 96 / 25.4}px repeat(20, auto)`;
     } },
+    // H13-ROW (pilot-su-c critic r2 N2): a short top cell in a row sized for its taller neighbour; the control is a
+    // uniform row (both cells hold the tall item), which keeps equal bands and never fires.
+    { name: 'short cell in a row sized for a taller item (H13-ROW)', expect: ['L-DENSITY', 'H13'], msg: /H13-ROW/, fn: () => {
+        const [a, b] = document.querySelectorAll('.ws-page [data-ws-cell]');
+        const g = a.closest('.ws-grid');
+        g.style.gridTemplateColumns = '1fr 1fr'; g.style.gridTemplateRows = `${80 * 96 / 25.4}px repeat(20, auto)`;
+        for (const c of [a, b]) { c.setAttribute('data-ws-cell', 'stack'); c.style.justifyContent = 'flex-start'; }
+        b.insertAdjacentHTML('beforeend', '<div style="height:52mm;width:30mm;border:0.75pt solid #000"></div>');
+    } },
+    { name: 'uniform row of tall items (H13-ROW control)', expect: [], absentMsg: [['L-DENSITY', 'H13'], /H13-ROW/], fn: () => {
+        const [a, b] = document.querySelectorAll('.ws-page [data-ws-cell]');
+        const g = a.closest('.ws-grid');
+        g.style.gridTemplateColumns = '1fr 1fr'; g.style.gridTemplateRows = `${80 * 96 / 25.4}px repeat(20, auto)`;
+        for (const c of [a, b]) { c.setAttribute('data-ws-cell', 'stack'); c.style.justifyContent = 'flex-start'; c.insertAdjacentHTML('beforeend', '<div style="height:52mm;width:30mm;border:0.75pt solid #000"></div>'); }
+    } },
+    // TY-21 (pilot-su-c critic r1 D3: answer boxes 4.06 mm at S): a 4 mm answer-strip segment and a 4 mm stand-alone
+    // answer box; the control is a 5 mm segment.
+    { name: 'answer-strip segment 4 mm wide (TY-21)', expect: ['L-ANSAREA', 'TY-21'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<span class="ab" data-ws-seg="first" style="display:inline-block;width:4mm;height:8mm;border:0.75pt solid #000"></span>'); } },
+    { name: 'stand-alone answer box 4 mm wide (TY-21)', expect: ['L-ANSAREA', 'TY-21'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<span data-ws-slot="x" data-ws-shape="box" style="display:inline-block;width:4mm;height:8mm;border:0.75pt solid #000"></span>'); } },
+    { name: 'answer-strip segment 5 mm wide (TY-21 control)', expect: [], absent: ['L-ANSAREA', 'TY-21'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<span class="ab" data-ws-seg="first" style="display:inline-block;width:5mm;height:8mm;border:0.75pt solid #000"></span>'); } },
+    // L-OVERLAP (critic r1 D7 heads collide; r2 N8 heads 0.74 mm apart): stack heads on 4 mm tracks, place letters
+    // over 3 mm pv zones; the control is the same heads on 12 mm tracks.
+    { name: 'stack heads overlapping (L-OVERLAP)', expect: ['L-OVERLAP', 'H2'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div class="ws-stack" style="display:grid;grid-template-columns:repeat(3,4mm);font-size:11pt"><span class="head" style="white-space:nowrap;text-align:center">HTh</span><span class="head" style="white-space:nowrap;text-align:center">TTh</span><span class="head" style="white-space:nowrap;text-align:center">Th</span></div>'); } },
+    { name: 'place letters crowding over a pv mat (L-OVERLAP)', expect: ['L-OVERLAP', 'H2'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<svg width="30mm" height="20mm" viewBox="0 0 30 20"><text x="5" y="4" text-anchor="middle" font-size="4" font-weight="700" fill="#000">Th</text><text x="8" y="4" text-anchor="middle" font-size="4" font-weight="700" fill="#000">H</text><rect x="2" y="6" width="3" height="12" fill="none" stroke="#000" stroke-width="0.2" data-pv-zone="1000"/><rect x="5" y="6" width="3" height="12" fill="none" stroke="#000" stroke-width="0.2" data-pv-zone="100"/></svg>'); } },
+    { name: 'stack heads on wide tracks (L-OVERLAP control)', expect: [], absent: ['L-OVERLAP', 'H2'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div class="ws-stack" style="display:grid;grid-template-columns:repeat(3,12mm);font-size:11pt"><span class="head" style="white-space:nowrap;text-align:center">HTh</span><span class="head" style="white-space:nowrap;text-align:center">TTh</span><span class="head" style="white-space:nowrap;text-align:center">Th</span></div>'); } },
+    // L-WRAP (critic r2 N6 / N7): a line that wraps after its operator; the control is the same kind of text joined
+    // with no-break spaces in a box wide enough for it.
+    { name: 'a line wrapped after its operator (L-WRAP)', expect: ['L-WRAP', 'WRAP-OP'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div style="width:24mm;font-size:16pt">12 + 345678</div>'); } },
+    { name: 'an expression joined with no-break spaces (L-WRAP control)', expect: [], absent: ['L-WRAP', 'WRAP-OP'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div style="width:60mm;font-size:16pt">Then 12&nbsp;+&nbsp;3&nbsp;=&nbsp;15 and 4&nbsp;&#8722;&nbsp;1&nbsp;=&nbsp;3.</div>'); } },
     { name: 'eight items on an Independent page', expect: ['L-DENSITY', 'DN-1'], fn: () => {
         const p1 = document.querySelector('.ws-page');
         p1.setAttribute('data-ws-role', 'independent');
@@ -2304,11 +2384,19 @@ async function selfTest() {
                 if (fired(r, t.absent)) bad.push(`${t.name}: ${t.absent.join(' ')} fired but must not`);
                 else console.log(`  ok   ${t.name}: ${t.absent.join(' ')} not fired`);
             }
+            if (t.absentMsg) {
+                asserts++;
+                const [[lint, rule], re] = t.absentMsg;
+                const hit = r.findings.find(f => f.lint === lint && f.rule === rule && re.test(f.msg));
+                if (hit) bad.push(`${t.name}: ${lint} ${rule} ${re} fired but must not: ${hit.msg.slice(0, 110)}`);
+                else console.log(`  ok   ${t.name}: ${lint} ${rule} ${re} not fired`);
+            }
             const exp = !t.expect.length ? [] : Array.isArray(t.expect[0]) ? t.expect : [t.expect];
             for (const e of exp) {
                 asserts++;
-                if (fired(r, e)) console.log(`  ok   ${t.name}: ${e.join(' ')} fired - ${r.findings.find(f => f.lint === e[0] && f.rule === e[1]).msg.slice(0, 110)}`);
-                else bad.push(`${t.name}: expected ${e.join(' ')}, got ${groupFindings(r.findings).map(g => `${g.lint} ${g.rule}`).join(', ') || 'nothing'}`);
+                const hit = r.findings.find(f => f.lint === e[0] && f.rule === e[1] && (!t.msg || t.msg.test(f.msg)));
+                if (hit) console.log(`  ok   ${t.name}: ${e.join(' ')} fired - ${hit.msg.slice(0, 110)}`);
+                else bad.push(`${t.name}: expected ${e.join(' ')}${t.msg ? ' ' + t.msg : ''}, got ${groupFindings(r.findings).map(g => `${g.lint} ${g.rule}`).join(', ') || 'nothing'}`);
             }
         }
         for (const t of LEGACY_SELF_TESTS) {
