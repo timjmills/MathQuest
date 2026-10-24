@@ -643,6 +643,26 @@
     "why": "the inherited AP4 control is removed; these six are always stacked, across belongs to the `sub-setup` rewrite page"
    },
    {
+    "option": "lengths",
+    "values": [
+     "same",
+     "shorter"
+    ],
+    "d": "offered",
+    "source": "owner-signed answer 3 (D3/D4)",
+    "why": "default same; shorter is its own section, never mixed at random"
+   },
+   {
+    "option": "zeros",
+    "values": [
+     "off",
+     "on"
+    ],
+    "d": "offered",
+    "source": "owner-signed answer 4",
+    "why": "default off; the zero case is its own section from 3 digits up"
+   },
+   {
     "option": "band",
     "values": [
      "10",

@@ -1,0 +1,7 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-screen-slots.cjs --skills subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_100k_no_regroup,subtraction:sub_1m_no_regroup,subtraction:sub_2d_1d --baseline design/audit/baselines/screen-slots.json --json /tmp/claude-0/-home-user-MathQuest/777ba8d1-efd2-5fc4-929a-183f87207bfc/scratchpad/pc2/logs/screen-slots.json
+
+mq-browser-run: slot 2 after 102s
+
+7 skills, 28 host renders, 0 doubled answer area(s), 0 paper verb(s) on screen
+baseline design/audit/baselines/screen-slots.json: 0 pinned finding(s) seen, 0 NEW
+ws-screen-slots: OK

@@ -77,10 +77,14 @@ export function binaryParts(q) {
     if (!q || typeof q !== 'object') return null;
     if (Array.isArray(q.options) && q.options.length > 0) return null;       // a choice item stays a choice (SP-3)
     if (q.answerType && q.answerType !== 'number') return null;
+    // Thousands commas ("4,367 − 2,244 = ?", toLocaleString) are read as the number they write
+    // (critic SU-C r1 D5: comma text fell through to the generic twin, which restated the sum in
+    // place of the instruction, focused the leftmost box and clipped a 6-digit stack at 390 px).
     const t = plainText(q.text);
-    const m = t.match(/^(\d{1,7})\s*([+\-−–×xX*÷/])\s*(\d{1,7})\s*=\s*(?:\?|_+)?\s*$/);
+    const N = '(\\d{1,3}(?:,\\d{3})+|\\d{1,7})';
+    const m = t.match(new RegExp(`^${N}\\s*([+\\-−–×xX*÷/])\\s*${N}\\s*=\\s*(?:\\?|_+)?\\s*$`));
     if (!m) return null;
-    const a = Number(m[1]), b = Number(m[3]), op = OP_NORM[m[2]];
+    const a = Number(m[1].replace(/,/g, '')), b = Number(m[3].replace(/,/g, '')), op = OP_NORM[m[2]];
     if (!op || !Number.isFinite(a) || !Number.isFinite(b)) return null;
     const ans = Number(String(q.ans).replace(/,/g, ''));
     if (!Number.isInteger(ans) || ans < 0) return null;
@@ -122,7 +126,11 @@ export function cellKindFor(q) {
         const T = Math.max(A.length, B.length) + 1;
         if (ANS.length <= T) {
             const noRegroup = q.regroup === false || pay.regroup === false || pay.regroup === 'none';
-            return { kind: 'stack', T, ...p, ...(noRegroup ? { regroup: false } : {}) };
+            const strip = Number(pay.ansDigits) > 0 && pay.regroup === false && p.op === '-' ? Math.max(Number(pay.ansDigits), ANS.length) : 0;
+            // The no-regrouping ladder prints its place heads at the default level (critic SU-C r1 D2):
+            // the screen draws them too (SP parity). Scoped by the payload's `wideTracks` opt-in.
+            const heads = pay.wideTracks === true && pay.heads === true;
+            return { kind: 'stack', T, ...p, ...(noRegroup ? { regroup: false } : {}), ...(pay.commas ? { commas: true } : {}), ...(strip ? { strip } : {}), ...(heads ? { heads: true } : {}) };
         }
     }
     // div_facts' Long-division form (divForm 'long'): the kit bracket on every screen host, so it
@@ -350,9 +358,20 @@ export function stackHTML(k, { idPrefix = '', regroup = true, answerClass = 'col
     const T = Math.max(k.T || 0, strip + 1, d + 1);
     const seg = (i, n) => (n <= 1 ? 'only' : i === 0 ? 'first' : i === n - 1 ? 'last' : 'mid');
     const tracks = (str) => [...String(str).padStart(T, ' ')];
+    // TY-24: thousands commas (k.commas, from 5 digits) in their own 0.3 em track, as on paper
+    // (sheet/cells/stack.js stackSeps): one separator cell in every track row, the answer strip
+    // broken there into two outlines.
+    const seps = k.commas ? Array.from({ length: T }, (_, i) => i).filter((i) => i >= 1 && [3, 6].includes(T - 1 - i)) : [];
+    const sepAfter = (i) => seps.includes(i);
+    const segAt = (i, first) => {
+        if (!seps.length) return seg(i - first, T - first);
+        let gs = first, ge = T - 1;
+        for (const sp of seps) { if (sp < i && sp + 1 > gs) gs = sp + 1; if (sp >= i && sp < ge) ge = sp; }
+        return seg(i - gs, ge - gs + 1);
+    };
     const cells = [];
     if (heads && T >= 3) {
-        for (let i = 0; i < T; i++) cells.push(`<span class="head">${i === 0 ? '' : ['O', 'T', 'H', 'Th', 'TTh', 'HTh'][T - 1 - i] || ''}</span>`);
+        for (let i = 0; i < T; i++) { cells.push(`<span class="head">${i === 0 ? '' : ['O', 'T', 'H', 'Th', 'TTh', 'HTh'][T - 1 - i] || ''}</span>`); if (sepAfter(i)) cells.push('<span class="head"></span>'); }
         cells.push('<span class="headcap"></span>');
     }
     // Regroup strip (VA-10): above every column except the ones for an addition (and never the
@@ -384,21 +403,25 @@ export function stackHTML(k, { idPrefix = '', regroup = true, answerClass = 'col
         tracks(num).forEach((ch, i) => {
             if (i === 0 && last) cells.push(`<span class="op">${opGlyph(k.op)}</span>`);
             else cells.push((tdRows && tdRows[r][i] && touchDigit(ch, true, to)) || `<span>${ch === ' ' ? '' : ch}</span>`);
+            if (sepAfter(i)) cells.push(`<span class="sep">${/[0-9]/.test(ch) ? ',' : ''}</span>`);
         });
         if (!last) cells.push('<span class="gap"></span>');
     });
     cells.push('<span class="rule"></span>');
     for (let i = 0; i < T; i++) {
         const at = i - (T - strip);
-        if (at < 0) { cells.push('<span class="ab mq-ab-empty"></span>'); continue; }
+        if (at < 0) { cells.push('<span class="ab mq-ab-empty"></span>'); if (sepAfter(i)) cells.push('<span class="ab sep"></span>'); continue; }
         const place = PLACES[T - 1 - i] || `place ${T - i}`;
-        cells.push(`<span class="ab" data-ws-seg="${seg(at, strip)}"><input type="text" class="${answerClass} mq-digit" data-slot="ans-${T - 1 - i}" data-ws-slot="ans-${T - 1 - i}" data-ws-shape="box"`
+        cells.push(`<span class="ab" data-ws-seg="${seps.length ? segAt(i, T - strip) : seg(at, strip)}"><input type="text" class="${answerClass} mq-digit" data-slot="ans-${T - 1 - i}" data-ws-slot="ans-${T - 1 - i}" data-ws-shape="box"`
             + ` inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" spellcheck="false"`
             + ` aria-label="answer, ${place} digit" data-_col-adv-attached="1"${idPrefix ? ` data-mq-stack="${attr(idPrefix)}"` : ''}></span>`);
+        if (sepAfter(i)) cells.push('<span class="ab sep"></span>');
     }
     const label = operands.join(` ${spokenOp(k.op)} `);
+    // (critic s3-stack r1 S1: the operator track, which holds only the sign, is its own variable,
+    // so a 6-digit stack can narrow it on a phone - screen-cell.css, max-width 480px)
     return `<div class="ws-sheet mq-kit" role="group" aria-label="${attr(label)}">`
-        + `<div class="ws-stack${rg ? ' wide' : ''}${operands.length > 2 ? ' mq-multi' : ''}" style="--t:${T}" data-ws-slot="answer" data-ws-shape="open">${cells.join('')}</div></div>`;
+        + `<div class="ws-stack${rg ? ' wide' : ''}${operands.length > 2 ? ' mq-multi' : ''}" style="--t:${T}${seps.length || T >= 7 ? `;grid-template-columns:${Array.from({ length: T }, (_, i) => `${i === 0 ? 'var(--mq-optrack, var(--ws-track))' : 'var(--ws-track)'}${sepAfter(i) ? ' 0.3em' : ''}`).join(' ')}` : ''}" data-ws-slot="answer" data-ws-shape="open">${cells.join('')}</div></div>`;
 }
 
 /**
@@ -428,7 +451,7 @@ export function kindHTML(k, { slotHtml = '', idPrefix = '', regroup = true, answ
     if (kk.kind === 'eq') html = equationHTML(kk, slotHtml);
     else if (kk.kind === 'fact') html = factHTML(kk, slotHtml);
     else if (kk.kind === 'division') html = divisionHTML(kk, slotHtml);
-    else if (kk.kind === 'stack') html = stackHTML(kk, { idPrefix, regroup, answerClass });
+    else if (kk.kind === 'stack') html = stackHTML(kk, { idPrefix, regroup, answerClass, heads: kk.heads === true });
     if (!html || kk === k) return html;
     const p = { a: k.a, b: k.b, op: k.op, operands: k.operands, supports: { ...supports, reserve: [] } };
     return withSupports(html, p, SCREEN_TEMPLATE[k.kind] || 'fact', { mode: 'screen', size: 'L', metrics: { digitPt: 28 } }, { problemWMm: 60, problemHMm: 40 });

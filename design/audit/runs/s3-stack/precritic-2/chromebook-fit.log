@@ -1,0 +1,48 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-chromebook-fit.cjs --skills subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_100k_no_regroup,subtraction:sub_1m_no_regroup,subtraction:sub_2d_1d
+
+mq-browser-run: slot 2 after 69s
+home screen 1366x650 (full header)           ok (nav flex, controls flex, menu button hidden)
+play at 1366x960 (tall screen, full header)  ok (nav flex, controls flex, menu button hidden)
+R6-D1 queue N10 line 1366x650: ok dots 1059-1241 x 151-183 band 70-123 card top 145
+R6-D1 queue N10 no line 1366x650: ok dots 1059-1241 x 82-114 band - card top 76
+R6-D1 queue N20 line 1366x650: ok dots 879-1241 x 151-183 band 70-123 card top 145
+R6-D1 queue N20 no line 1366x650: ok dots 879-1241 x 82-114 band - card top 76
+R6-D1 link N10 line 1366x650: ok dots 1059-1241 x 151-183 band 70-123 card top 145
+R6-D1 link N10 no line 1366x650: ok dots 1059-1241 x 82-114 band - card top 76
+R6-D1 link N20 line 1366x650: ok dots 879-1241 x 151-183 band 70-123 card top 145
+R6-D1 link N20 no line 1366x650: ok dots 879-1241 x 82-114 band - card top 76
+R6-D1 queue N10 line 1280x600: ok dots 1016-1198 x 151-183 band 70-123 card top 145
+R6-D1 queue N10 no line 1280x600: ok dots 1016-1198 x 82-114 band - card top 76
+R6-D1 queue N20 line 1280x600: ok dots 836-1198 x 151-183 band 70-123 card top 145
+R6-D1 queue N20 no line 1280x600: ok dots 836-1198 x 82-114 band - card top 76
+R6-D1 link N10 line 1280x600: ok dots 1016-1198 x 151-183 band 70-123 card top 145
+R6-D1 link N10 no line 1280x600: ok dots 1016-1198 x 82-114 band - card top 76
+R6-D1 link N20 line 1280x600: ok dots 836-1198 x 151-183 band 70-123 card top 145
+R6-D1 link N20 no line 1280x600: ok dots 836-1198 x 82-114 band - card top 76
+subtraction:sub_50_no_regroup 1366x650       card ok box 431/650 go 518 | boss ok box 431/650 go 518 | race ok box 431/650 go 518 | worksheet ok box 368/650 go 54 cards 3 | quiz ok box 400/650 go 504
+subtraction:sub_100_no_regroup 1366x650      card ok box 431/650 go 518 | boss ok box 431/650 go 518 | race ok box 431/650 go 518 | worksheet ok box 368/650 go 54 cards 3 | quiz ok box 400/650 go 504
+subtraction:sub_1k_no_regroup 1366x650       card ok box 431/650 go 518 | boss ok box 431/650 go 518 | race ok box 431/650 go 518 | worksheet ok box 368/650 go 54 cards 3 | quiz ok box 400/650 go 504
+subtraction:sub_10k_no_regroup 1366x650      card ok box 431/650 go 518 | boss ok box 431/650 go 518 | race ok box 431/650 go 518 | worksheet ok box 368/650 go 54 cards 3 | quiz ok box 400/650 go 504
+subtraction:sub_100k_no_regroup 1366x650     card ok box 431/650 go 518 | boss ok box 431/650 go 518 | race ok box 431/650 go 518 | worksheet ok box 368/650 go 54 cards 3 | quiz ok box 400/650 go 504
+subtraction:sub_1m_no_regroup 1366x650       card ok box 431/650 go 518 | boss ok box 431/650 go 518 | race ok box 431/650 go 518 | worksheet ok box 368/650 go 54 cards 2 | quiz ok box 400/650 go 504
+subtraction:sub_2d_1d 1366x650               card ok box 431/650 go 518 | boss ok box 431/650 go 518 | race ok box 431/650 go 518 | worksheet ok box 368/650 go 54 cards 3 | quiz ok box 400/650 go 504
+subtraction:sub_50_no_regroup 1280x600       card ok box 431/600 go 518 | boss ok box 431/600 go 518 | race ok box 431/600 go 518 | worksheet ok box 368/600 go 54 cards 3 | quiz ok box 400/600 go 504
+subtraction:sub_100_no_regroup 1280x600      card ok box 431/600 go 518 | boss ok box 431/600 go 518 | race ok box 431/600 go 518 | worksheet ok box 368/600 go 54 cards 3 | quiz ok box 400/600 go 504
+subtraction:sub_1k_no_regroup 1280x600       card ok box 431/600 go 518 | boss ok box 431/600 go 518 | race ok box 431/600 go 518 | worksheet ok box 368/600 go 54 cards 3 | quiz ok box 400/600 go 504
+subtraction:sub_10k_no_regroup 1280x600      card ok box 431/600 go 518 | boss ok box 431/600 go 518 | race ok box 431/600 go 518 | worksheet ok box 368/600 go 54 cards 3 | quiz ok box 400/600 go 504
+subtraction:sub_100k_no_regroup 1280x600     card ok box 431/600 go 518 | boss ok box 431/600 go 518 | race ok box 431/600 go 518 | worksheet ok box 368/600 go 54 cards 3 | quiz ok box 400/600 go 504
+subtraction:sub_1m_no_regroup 1280x600       card ok box 431/600 go 518 | boss ok box 431/600 go 518 | race ok box 431/600 go 518 | worksheet ok box 368/600 go 54 cards 2 | quiz ok box 400/600 go 504
+subtraction:sub_2d_1d 1280x600               card ok box 431/600 go 518 | boss ok box 431/600 go 518 | race ok box 431/600 go 518 | worksheet ok box 368/600 go 54 cards 3 | quiz ok box 400/600 go 504
+addition:add_facts 1366x650 quiz touch wrong touch Next ok
+addition:add_facts 1366x650 quiz touch right touch Next ok
+subtraction:subtract 1366x650 quiz touch wrong touch Next ok
+subtraction:subtract 1366x650 quiz touch right touch Next ok
+multiplication:mult_facts 1366x650 quiz touch wrong touch Next ok
+multiplication:mult_facts 1366x650 quiz touch right touch Next ok
+addition:add_facts 1280x600 quiz touch wrong touch Next ok
+addition:add_facts 1280x600 quiz touch right touch Next ok
+subtraction:subtract 1280x600 quiz touch wrong touch Next ok
+subtraction:subtract 1280x600 quiz touch right touch Next ok
+multiplication:mult_facts 1280x600 quiz touch wrong touch Next ok
+multiplication:mult_facts 1280x600 quiz touch right touch Next ok
+ws-chromebook-fit: OK

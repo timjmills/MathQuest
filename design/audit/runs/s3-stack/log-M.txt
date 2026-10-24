@@ -1,0 +1,9 @@
+ws-grade-render: 7 skills -> design/audit/runs/s3-stack/render-r1-M
+  [1/7] subtraction:sub_50_no_regroup  independent 1p+1k 4x4  lesson 3p+3k 1x1  mixed-practice 1p+1k 6x4  test 1p+1k 4x4  error-analysis 1p+1k 1x4  55s
+  [2/7] subtraction:sub_100_no_regroup  independent 1p+1k 4x4  lesson 3p+3k 1x1  mixed-practice 1p+1k 6x4  test 1p+1k 4x4  error-analysis 1p+1k 1x4  113s
+  [3/7] subtraction:sub_1k_no_regroup  independent 1p+1k 4x4  lesson 3p+3k 1x1  mixed-practice 1p+1k 6x4  test 1p+1k 4x4  error-analysis 1p+1k 1x4  172s
+  [4/7] subtraction:sub_10k_no_regroup  independent 1p+1k 3x4  lesson 3p+3k 1x1  mixed-practice 1p+1k 6x4  test 1p+1k 3x4  error-analysis 1p+1k 2x2  228s
+  [5/7] subtraction:sub_100k_no_regroup  independent 1p+1k 2x4  lesson 3p+3k 1x1  mixed-practice 1p+1k 6x4  test 1p+1k 2x4  error-analysis 1p+1k 1x4  285s
+  [6/7] subtraction:sub_1m_no_regroup  independent 1p+1k 2x4  lesson 3p+3k 1x1  mixed-practice 1p+1k 6x4  test 1p+1k 2x4  error-analysis 1p+1k 1x4  342s
+  [7/7] subtraction:sub_2d_1d  independent 1p+1k 4x4  lesson 3p+3k 1x1  mixed-practice 1p+1k 6x4  test 1p+1k 4x4  error-analysis 1p+1k 1x4  399s
+ws-grade-render: done, 7 units, 98 pages, 399s

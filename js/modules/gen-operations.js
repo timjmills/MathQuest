@@ -941,6 +941,168 @@ function generateSubPair(maxVal, regroupType, rng, opts) {
 }
 
 // ========================================
+// COLUMN SUBTRACTION WITHOUT REGROUPING, within 50 to within 1,000,000 (spec card
+// design/cards/subtraction/subtraction.md, section 9, owner-signed 2026-10-23)
+// ========================================
+// The minuend runs over the size's OWN digit count up to N ("within N" bounds the minuend), so
+// each rung adds one thing: a longer top number. Within 100 stops at 99 (100 − n always regroups).
+const _SUB_NR_BAND = { 50: [21, 50], 100: [51, 99], 1000: [100, 999], 10000: [1000, 9999], 100000: [10000, 99999], 1000000: [100000, 999999] };
+/** Digits of the largest minuend of a no-regrouping band: the answer strip's box count (SL-12). */
+export function subNoRegroupDigits(maxVal) {
+    const b = _SUB_NR_BAND[maxVal];
+    return b ? String(b[1]).length : String(Math.max(1, maxVal - 1)).length;
+}
+// The two-digit valid sets, enumerated once per (band, length, zero case): every pair [a, b] with
+// a in [lo, hi], b of lenB digits, each digit of b at most the digit above it. `zero` false: no
+// column leaves 0 and no digit is 0 (the plain items); `zero` true: the ones are 0 over 0 (40 − 20).
+const _NR2_SETS = new Map();
+function _nr2Set(lo, hi, lenB, zero) {
+    const key = `${lo}:${hi}:${lenB}:${zero ? 1 : 0}`;
+    if (_NR2_SETS.has(key)) return _NR2_SETS.get(key);
+    const out = [];
+    for (let a = lo; a <= hi; a++) {
+        const t = Math.floor(a / 10), o = a % 10;
+        if (t < 1 || t > 9) continue;
+        if (zero) {
+            if (o !== 0 || lenB !== 2) continue;
+            for (let bt = 1; bt < t; bt++) out.push([a, bt * 10]);
+        } else {
+            if (o < 2) continue;
+            for (let bo = 1; bo < o; bo++) {
+                if (lenB === 1) out.push([a, bo]);
+                else for (let bt = 1; bt < t; bt++) out.push([a, bt * 10 + bo]);
+            }
+        }
+    }
+    _NR2_SETS.set(key, out);
+    return out;
+}
+// What this page has dealt so far, per band and length: item index -> [minuend, answer]. A page
+// opens at item 0 (generateQuestionFor), so the memory starts again there; a redrawn item
+// overwrites its own index, so a discarded duplicate is not counted.
+const _NR2_PAGE = new Map();
+const _NR2_WINDOW = 20, _NR2_MAX_MINUEND = 2, _NR2_MAX_ANSWER = 3, _NR2_MAX_ONE = 2, _NR2_MAX_ZERO = 2;
+function _nr2Pair(lo, hi, lenB, rng) {
+    const plain = _nr2Set(lo, hi, lenB, false);
+    const zeroSet = _nr2Set(lo, hi, lenB, true);
+    const at = Number.isFinite(state.itemIndex) ? state.itemIndex : null;
+    const pkey = `${lo}:${hi}:${lenB}`;
+    if (at === 0) _NR2_PAGE.delete(pkey);
+    const seen = at === null ? null : (_NR2_PAGE.get(pkey) || new Map());
+    let mins = null, anss = null;
+    if (seen) {
+        mins = new Map(); anss = new Map();
+        for (const [k, [m, d]] of seen) {
+            if (k >= at || k < at - (_NR2_WINDOW - 1)) continue;
+            mins.set(m, (mins.get(m) || 0) + 1);
+            anss.set(d, (anss.get(d) || 0) + 1);
+        }
+    }
+    // about 1 item in 10 is the zero case (1 in 8 drawn, then capped), chosen by the seeded rng
+    // (never by position: L10), and
+    // never more than _NR2_MAX_ZERO in a page's 20, so no run of the page reads above 1 in 10
+    // (card §9.4; precritic-2 R-ZERO-NOT-SEEDED: 13 of 120 with the rng alone).
+    let zeros = 0;
+    if (seen) for (const [k, v] of seen) if (k < at && k >= at - (_NR2_WINDOW - 1) && v[2]) zeros++;
+    const useZero = zeroSet.length > 0 && rng(0, 7) === 0 && zeros < _NR2_MAX_ZERO;
+    const pool = useZero ? zeroSet : plain;
+    // 2d − 1d (critic s3 r1 N1b): b = 1 is the trivial take-away. The uniform draw alone gives
+    // it 8 pairs in 36 (22 %), so a drawn 1 is kept only 1 time in 2 (about 11 %), never more than
+    // _NR2_MAX_ONE in a page's 20, and an item never repeats the previous item's minuend tens with
+    // a subtrahend within 1 of the previous one (76 − 5, 75 − 3 …).
+    let ones = 0, prev = null;
+    if (seen && lenB === 1) {
+        for (const [k, [m, d]] of seen) {
+            if (k >= at || k < at - (_NR2_WINDOW - 1)) continue;
+            if (m - d === 1) ones++;
+        }
+        const pv = seen.get(at - 1);
+        if (pv) prev = [pv[0], pv[0] - pv[1]];
+    }
+    let pair = null;
+    for (let t = 0; t < 60; t++) {
+        const p = pool[rng(0, pool.length - 1)];
+        if (lenB === 1 && p[1] === 1 && t < 50 && (ones >= _NR2_MAX_ONE || rng(0, 1))) continue;
+        if (prev && t < 50 && Math.floor(p[0] / 10) === Math.floor(prev[0] / 10)
+            && Math.abs(p[1] - prev[1]) <= 1) continue;
+        pair = p;
+        if (!mins) break;
+        if ((mins.get(p[0]) || 0) < _NR2_MAX_MINUEND && (anss.get(p[0] - p[1]) || 0) < _NR2_MAX_ANSWER) break;
+    }
+    if (!pair) pair = [hi, 1];
+    if (seen) {
+        seen.set(at, [pair[0], pair[0] - pair[1], pair[0] % 10 === 0 && pair[1] % 10 === 0]);
+        _NR2_PAGE.set(pkey, seen);
+    }
+    return [pair[0], pair[1]];
+}
+/**
+ * One no-regrouping pair [a, b]: every digit of b is at most the digit above it (aligned right).
+ *   lengths 'same'     b has as many digits as a;  'shorter'  b has one digit fewer (ragged).
+ *   zeros   'off'      the plain page seeds no zero case: no n − 0, no column leaving 0, no
+ *                      shorter answer, and from 3 digits up no 0 digit in a.  Within 50 / 100 a
+ *                      0 ones digit comes only under a top 0 (40 − 20), in about 1 item in 10
+ *                      (card §9.4; critic SU-C r1 D1).
+ *           'on'       from 3 digits up every item is ONE zero case, dealt by the rng: a 0 in the
+ *                      top number (0 − 0), n − 0, a column leaving 0, or an answer with fewer digits.
+ * Two digits (critic SU-C r2 N1) draw the PAIR uniformly from the valid set (_nr2Pair): every
+ * digit of b at most the digit above it, no column leaving 0, the minuend in the size's band. The
+ * one zero case (a top 0 over a 0, 40 − 20) is about 1 item in 10 and is placed by the seeded rng,
+ * never by the item's position (L10). On a page no minuend prints more than twice and no answer
+ * more than three times in any 20 items. 2d − 1d keeps a drawn b = 1 half the time (about 1 item in
+ * 9, at most 2 in 20; critic r1 D8, s3 r1 N1b). The 2d − 1d preset (within 100, lengths 'shorter') runs its minuend over every
+ * 2-digit number from 21 (D8).
+ */
+function _subNoRegroupPair(maxVal, rng, { lengths = 'same', zeros = 'off' } = {}) {
+    const [lo0, hi] = _SUB_NR_BAND[maxVal];
+    const d = String(hi).length;
+    const lo = d === 2 && lengths === 'shorter' ? Math.min(lo0, 21) : lo0;
+    const lenB = lengths === 'shorter' ? Math.max(1, d - 1) : d;
+    const big = d >= 3;
+    const zeroCase = big && zeros === 'on';
+    if (!big) return _nr2Pair(lo, hi, lenB, rng);
+    for (let t = 0; t < 400; t++) {
+        const a = rng(lo, hi);
+        const A = String(a).split('').map(Number);          // most significant first
+        const at = (k) => A[d - 1 - k];                      // k = place, 0 = ones
+        let B = new Array(lenB).fill(0);                     // B[k] = b's digit at place k
+        let ok = true;
+        // the zero-free base item: every top digit 1-9, every b digit 1 .. a-1 (so no column
+        // leaves 0), a leading top digit with nothing under it may be 1.
+        for (let k = 0; k < d; k++) {
+            const v = at(k);
+            if (v === 0) { ok = false; break; }
+            if (k < lenB) { if (v < 2) { ok = false; break; } B[k] = rng(1, v - 1); }
+        }
+        if (!ok) continue;
+        if (zeroCase) {
+            const kinds = [];
+            if (lenB >= 2) kinds.push('n0');                 // a b digit of 0 under a top digit: n − 0
+            if (d >= 3) kinds.push('top0');                  // a 0 inside the top number (0 − 0)
+            kinds.push('nn');                                // a column that leaves 0
+            if (lenB === d) kinds.push('short');             // the answer has fewer digits
+            const kind = kinds[rng(0, kinds.length - 1)];
+            if (kind === 'n0') B[rng(0, lenB - 2)] = 0;
+            else if (kind === 'top0') {
+                const k = rng(0, d - 2);
+                A[d - 1 - k] = 0;
+                if (k < lenB) B[k] = 0;
+            } else if (kind === 'nn') {
+                const k = rng(0, Math.min(lenB, d - 1) - 1);
+                B[k] = at(k);
+            } else B[d - 1] = at(d - 1);
+        }
+        const aa = Number(A.join(''));
+        let b = 0;
+        for (let k = lenB - 1; k >= 0; k--) b = b * 10 + B[k];
+        if (String(b).length !== lenB || b < 1 || b >= aa || aa < lo || aa > hi) continue;
+        if (hasBorrow(aa, b)) continue;
+        return [aa, b];
+    }
+    return [hi, Number(String(hi).slice(-lenB).replace(/[0-9]/g, '1'))];
+}
+
+// ========================================
 // BRIDGING TEN  (owner ruling 2, P4)
 // ========================================
 // "Add within 10 (With Regrouping)" cannot exist. Two single-digit addends whose sum is at most
@@ -2452,7 +2614,7 @@ function _applyOptionPost(q, selected, routed) {
         return;
     }
     // --- the column support level (ranged ids from 50 up) ------------------------------------
-    if (rm && RANGE_MAP[rm[2]] >= 50 && Number.isInteger(q.a) && Number.isInteger(q.b) && (isAdd || isSubOp) && _optDef('level')) {
+    if (rm && RANGE_MAP[rm[2]] >= 50 && !q.subNoRegroupKit && Number.isInteger(q.a) && Number.isInteger(q.b) && (isAdd || isSubOp) && _optDef('level')) {
         const lvl = supportLevelFor(1);
         const maxVal = RANGE_MAP[rm[2]];
         const payload = { operands: [q.a, q.b], op: isAdd ? '+' : '-', ansDigits: String(isAdd ? maxVal : maxVal - 1).length };
@@ -2827,9 +2989,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     [a, b] = isAdd ? _bridgingTenAddPair(rng) : _bridgingTenSubPair(rng);
                 } else if (isAdd) {
                     [a, b] = generateAddPair(maxVal, regroupType, rng);
+                } else if (regroupType === 'no_regroup' && _SUB_NR_BAND[maxVal]) {
+                    [a, b] = _subNoRegroupPair(maxVal, rng, { lengths: _opt('lengths'), zeros: _opt('zeros') });
                 } else {
                     [a, b] = generateSubPair(maxVal, regroupType, rng);
                 }
+                const subNoRegroupKit = !isAdd && regroupType === 'no_regroup' && !!_SUB_NR_BAND[maxVal];
 
                 const ans = isAdd ? a + b : a - b;
                 const opSymbol = isAdd ? '+' : '−';
@@ -2853,6 +3018,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                           + `${a} + ${bridgeP1} = 10, and 10 + ${bridgeP2} = ${a + b}.`
                         : `Take away to ten first. Split ${b} into ${bridgeP1} and ${bridgeP2}. `
                           + `${a} − ${bridgeP1} = 10, and 10 − ${bridgeP2} = ${a - b}.`;
+                } else if (subNoRegroupKit) {
+                    // P-32: "regroup", never "borrow"; no caption on the cell.
+                    q.hint = 'Line up the places: ones under ones. Subtract the ones first, then each place to the left. '
+                        + 'No place needs regrouping.';
                 } else {
                     q.hint = isAdd
                         ? `Line up digits by place value. Add each column from the ones.${regroupType === 'regroup' ? ' Carry when a column sums to 10 or more!' : ''}`
@@ -2877,6 +3046,27 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 if (bandNotation === 'across') {
                     q.visual = '';
                     q.printFormat = isAdd ? 'add-facts-horizontal' : 'sub-facts-horizontal';
+                } else if (subNoRegroupKit) {
+                    // The kit `stack` (spec card §9.1): no regroup row, no headroom, answer boxes
+                    // as many as the band's largest minuend has digits (never this answer's length),
+                    // place heads from the support level, commas from 5 digits (TY-24).
+                    // Heads are structural (WDS VA-30 / VA-32): ON at the default level 1, gone
+                    // only at level 0, their own fade step (card §2 step 3; critic r1 D2).
+                    // `wideTracks`: 0.95 em tracks, so every answer box is 4.4 mm or more (TY-21)
+                    // and 5-6 place heads have room (critic r1 D3, D7).
+                    const lvl = supportLevelFor(1);
+                    const digits = subNoRegroupDigits(maxVal);
+                    const payload = { operands: [a, b], op: '-', ans, regroup: false, answer: 'boxes', heads: lvl >= 1, ansDigits: digits, wideTracks: true };
+                    if (digits >= 5) payload.commas = true;
+                    if (lvl >= 3) payload.traceAns = true;
+                    q.cell = { template: 'stack', v: 1, payload };
+                    q.visual = _kitStackTwin(payload);
+                    q.selfAnswering = true;
+                    q.supportLevel = lvl;
+                    q.regroup = false;
+                    q.subNoRegroupKit = true;
+                    q.printText = 'Subtract.';
+                    q.printFormat = 'column-sub';
                 } else {
                     q.visual = buildColumnVisual(a, b, isAdd, uniqueId);
                     q.printFormat = isAdd ? 'column-add' : 'column-sub';
@@ -2958,6 +3148,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         window.tagDistractor(q, String(a + b - 10), "Check your place-value alignment — make sure ones go under ones, tens under tens, and remember to carry when a column sums to 10 or more.");
                     } else {
                         window.tagDistractor(q, String(a + b), "Looks like you added instead of subtracting. Re-read the operation and try again.");
+                    }
+                    if (subNoRegroupKit) {
+                        // M-ALIGN: the shorter number lined up on the left.
+                        const shift = 10 ** (String(a).length - String(b).length);
+                        if (shift > 1 && a - b * shift >= 0) window.tagDistractor(q, String(a - b * shift), "Line the numbers up on the right: ones under ones, tens under tens.");
+                    } else if (!isAdd) {
                         // "Subtracted smaller from larger digit in each column" classic
                         // borrow-error often produces (a - b) shifted; surface a generic
                         // borrow-reminder for any near-miss.

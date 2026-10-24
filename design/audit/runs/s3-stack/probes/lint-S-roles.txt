@@ -1,0 +1,199 @@
+ws-print-lint: source kit, 7 skill(s)
+  subtraction:sub_50_no_regroup: 2+1 pages, 0 finding(s)
+  subtraction:sub_50_no_regroup#more-practice: 2+1 pages, 0 finding(s)
+  subtraction:sub_50_no_regroup#lesson: 6+3 pages, 6 finding(s)
+  subtraction:sub_50_no_regroup#mixed-practice: 2+1 pages, 0 finding(s)
+  subtraction:sub_50_no_regroup#test: 2+1 pages, 0 finding(s)
+  subtraction:sub_50_no_regroup#error-analysis: 2+1 pages, 0 finding(s)
+  subtraction:sub_50_no_regroup#guided: 2+1 pages, 0 finding(s)
+  subtraction:sub_50_no_regroup#review: 2+1 pages, 0 finding(s)
+  subtraction:sub_50_no_regroup#true-false: 2+1 pages, 0 finding(s)
+  subtraction:sub_50_no_regroup#reason-it: 2+1 pages, 0 finding(s)
+  subtraction:sub_50_no_regroup#stretch: 2+1 pages, 0 finding(s)
+  subtraction:sub_100_no_regroup: 2+1 pages, 0 finding(s)
+  subtraction:sub_100_no_regroup#more-practice: 2+1 pages, 0 finding(s)
+  subtraction:sub_100_no_regroup#lesson: 6+3 pages, 6 finding(s)
+  subtraction:sub_100_no_regroup#mixed-practice: 2+1 pages, 0 finding(s)
+  subtraction:sub_100_no_regroup#test: 2+1 pages, 0 finding(s)
+  subtraction:sub_100_no_regroup#error-analysis: 2+1 pages, 0 finding(s)
+  subtraction:sub_100_no_regroup#guided: 2+1 pages, 0 finding(s)
+  subtraction:sub_100_no_regroup#review: 2+1 pages, 0 finding(s)
+  subtraction:sub_100_no_regroup#true-false: 2+1 pages, 0 finding(s)
+  subtraction:sub_100_no_regroup#reason-it: 2+1 pages, 0 finding(s)
+  subtraction:sub_100_no_regroup#stretch: 2+1 pages, 0 finding(s)
+  subtraction:sub_1k_no_regroup: 2+1 pages, 0 finding(s)
+  subtraction:sub_1k_no_regroup#more-practice: 2+1 pages, 0 finding(s)
+  subtraction:sub_1k_no_regroup#lesson: 6+3 pages, 6 finding(s)
+  subtraction:sub_1k_no_regroup#mixed-practice: 2+1 pages, 0 finding(s)
+  subtraction:sub_1k_no_regroup#test: 2+1 pages, 0 finding(s)
+  subtraction:sub_1k_no_regroup#error-analysis: 2+1 pages, 0 finding(s)
+  subtraction:sub_1k_no_regroup#guided: 2+1 pages, 0 finding(s)
+  subtraction:sub_1k_no_regroup#review: 2+1 pages, 0 finding(s)
+  subtraction:sub_1k_no_regroup#true-false: 2+1 pages, 0 finding(s)
+  subtraction:sub_1k_no_regroup#reason-it: 2+1 pages, 0 finding(s)
+  subtraction:sub_1k_no_regroup#stretch: 2+1 pages, 0 finding(s)
+  subtraction:sub_10k_no_regroup: 2+1 pages, 0 finding(s)
+  subtraction:sub_10k_no_regroup#more-practice: 2+1 pages, 0 finding(s)
+  subtraction:sub_10k_no_regroup#lesson: 6+3 pages, 4 finding(s)
+  subtraction:sub_10k_no_regroup#mixed-practice: 2+1 pages, 0 finding(s)
+  subtraction:sub_10k_no_regroup#test: 2+1 pages, 0 finding(s)
+  subtraction:sub_10k_no_regroup#error-analysis: 2+1 pages, 0 finding(s)
+  subtraction:sub_10k_no_regroup#guided: 2+1 pages, 0 finding(s)
+  subtraction:sub_10k_no_regroup#review: 2+1 pages, 0 finding(s)
+  subtraction:sub_10k_no_regroup#true-false: 2+1 pages, 0 finding(s)
+  subtraction:sub_10k_no_regroup#reason-it: 2+1 pages, 0 finding(s)
+  subtraction:sub_10k_no_regroup#stretch: n/a (No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.)
+  subtraction:sub_100k_no_regroup: 2+1 pages, 0 finding(s)
+  subtraction:sub_100k_no_regroup#more-practice: 2+1 pages, 0 finding(s)
+  subtraction:sub_100k_no_regroup#lesson: 6+3 pages, 4 finding(s)
+  subtraction:sub_100k_no_regroup#mixed-practice: 2+1 pages, 0 finding(s)
+  subtraction:sub_100k_no_regroup#test: 2+1 pages, 0 finding(s)
+  subtraction:sub_100k_no_regroup#error-analysis: 2+1 pages, 0 finding(s)
+  subtraction:sub_100k_no_regroup#guided: 2+1 pages, 0 finding(s)
+  subtraction:sub_100k_no_regroup#review: 2+1 pages, 0 finding(s)
+  subtraction:sub_100k_no_regroup#true-false: 2+1 pages, 0 finding(s)
+  subtraction:sub_100k_no_regroup#reason-it: 2+1 pages, 0 finding(s)
+  subtraction:sub_100k_no_regroup#stretch: n/a (No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.)
+  subtraction:sub_1m_no_regroup: 2+1 pages, 0 finding(s)
+  subtraction:sub_1m_no_regroup#more-practice: 2+1 pages, 0 finding(s)
+  subtraction:sub_1m_no_regroup#lesson: 6+3 pages, 2 finding(s)
+  subtraction:sub_1m_no_regroup#mixed-practice: 2+1 pages, 0 finding(s)
+  subtraction:sub_1m_no_regroup#test: 2+1 pages, 0 finding(s)
+  subtraction:sub_1m_no_regroup#error-analysis: 2+1 pages, 0 finding(s)
+  subtraction:sub_1m_no_regroup#guided: 2+1 pages, 0 finding(s)
+  subtraction:sub_1m_no_regroup#review: 2+1 pages, 0 finding(s)
+  subtraction:sub_1m_no_regroup#true-false: 2+1 pages, 0 finding(s)
+  subtraction:sub_1m_no_regroup#reason-it: 2+1 pages, 0 finding(s)
+  subtraction:sub_1m_no_regroup#stretch: n/a (No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.)
+  subtraction:sub_2d_1d: 2+1 pages, 0 finding(s)
+  subtraction:sub_2d_1d#more-practice: 2+1 pages, 0 finding(s)
+  subtraction:sub_2d_1d#lesson: 6+3 pages, 6 finding(s)
+  subtraction:sub_2d_1d#mixed-practice: 2+1 pages, 0 finding(s)
+  subtraction:sub_2d_1d#test: 2+1 pages, 0 finding(s)
+  subtraction:sub_2d_1d#error-analysis: 2+1 pages, 0 finding(s)
+  subtraction:sub_2d_1d#guided: 2+1 pages, 0 finding(s)
+  subtraction:sub_2d_1d#review: 2+1 pages, 0 finding(s)
+  subtraction:sub_2d_1d#true-false: 2+1 pages, 0 finding(s)
+  subtraction:sub_2d_1d#reason-it: 2+1 pages, 0 finding(s)
+  subtraction:sub_2d_1d#stretch: 2+1 pages, 0 finding(s)
+
+document                                          pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART  result
+subtraction:sub_50_no_regroup                       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_50_no_regroup#more-practice         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_50_no_regroup#lesson                6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        6  FAIL
+subtraction:sub_50_no_regroup#mixed-practice        2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_50_no_regroup#test                  2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_50_no_regroup#error-analysis        2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_50_no_regroup#guided                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_50_no_regroup#review                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_50_no_regroup#true-false            2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_50_no_regroup#reason-it             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_50_no_regroup#stretch               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_100_no_regroup                      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_100_no_regroup#more-practice        2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_100_no_regroup#lesson               6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        6  FAIL
+subtraction:sub_100_no_regroup#mixed-practice       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_100_no_regroup#test                 2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_100_no_regroup#error-analysis       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_100_no_regroup#guided               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_100_no_regroup#review               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_100_no_regroup#true-false           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_100_no_regroup#reason-it            2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_100_no_regroup#stretch              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_1k_no_regroup                       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_1k_no_regroup#more-practice         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_1k_no_regroup#lesson                6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        6  FAIL
+subtraction:sub_1k_no_regroup#mixed-practice        2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_1k_no_regroup#test                  2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_1k_no_regroup#error-analysis        2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_1k_no_regroup#guided                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_1k_no_regroup#review                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_1k_no_regroup#true-false            2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_1k_no_regroup#reason-it             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_1k_no_regroup#stretch               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_10k_no_regroup                      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_10k_no_regroup#more-practice        2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_10k_no_regroup#lesson               6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        4  FAIL
+subtraction:sub_10k_no_regroup#mixed-practice       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_10k_no_regroup#test                 2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_10k_no_regroup#error-analysis       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_10k_no_regroup#guided               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_10k_no_regroup#review               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_10k_no_regroup#true-false           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_10k_no_regroup#reason-it            2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_100k_no_regroup                     2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_100k_no_regroup#more-practice       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_100k_no_regroup#lesson              6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        4  FAIL
+subtraction:sub_100k_no_regroup#mixed-practice      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_100k_no_regroup#test                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_100k_no_regroup#error-analysis      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_100k_no_regroup#guided              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_100k_no_regroup#review              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_100k_no_regroup#true-false          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_100k_no_regroup#reason-it           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_1m_no_regroup                       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_1m_no_regroup#more-practice         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_1m_no_regroup#lesson                6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        2  FAIL
+subtraction:sub_1m_no_regroup#mixed-practice        2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_1m_no_regroup#test                  2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_1m_no_regroup#error-analysis        2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_1m_no_regroup#guided                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_1m_no_regroup#review                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_1m_no_regroup#true-false            2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_1m_no_regroup#reason-it             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_2d_1d                               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_2d_1d#more-practice                 2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_2d_1d#lesson                        6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        6  FAIL
+subtraction:sub_2d_1d#mixed-practice                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_2d_1d#test                          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_2d_1d#error-analysis                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_2d_1d#guided                        2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_2d_1d#review                        2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_2d_1d#true-false                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_2d_1d#reason-it                     2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_2d_1d#stretch                       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+TOTAL                                                       .     .    .    .        .     .       .    .     .       .     .    .      .       .       34
+
+subtraction:sub_50_no_regroup#lesson (Subtract within 50 (No Regrouping) (lesson))
+  [L-TOPSTART CL-4b major] x6 (p2,5 cells 8,9,10,8,9,10) first printed row starts 4 mm below the top pad: top of the box is the default (CL-4b, owner ruling 2026-10-23)
+      e.g. <div.ws-cell.mq-lvcenter[data-ws-cell="stack"]> "T O 4 5 − 1 2 3" | <div.ws-cell.mq-lvcenter[data-ws-cell="stack"]> "T O 4 8 − 2 6"
+
+subtraction:sub_50_no_regroup#mixed-practice (Subtract within 50 (No Regrouping) (mixed-practice))
+
+subtraction:sub_100_no_regroup#lesson (Subtract within 100 (No Regrouping) (lesson))
+  [L-TOPSTART CL-4b major] x6 (p2,5 cells 6,7,8,6,7,8) first printed row starts 4 mm below the top pad: top of the box is the default (CL-4b, owner ruling 2026-10-23)
+      e.g. <div.ws-cell.mq-lvcenter[data-ws-cell="stack"]> "T O 5 6 − 3 3 3" | <div.ws-cell.mq-lvcenter[data-ws-cell="stack"]> "T O 8 8 − 3 5"
+
+subtraction:sub_100_no_regroup#mixed-practice (Subtract within 100 (No Regrouping) (mixed-practice))
+
+subtraction:sub_1k_no_regroup#lesson (Subtract within 1,000 (No Regrouping) (lesson))
+  [L-TOPSTART CL-4b major] x6 (p2,5 cells 6,7,8,6,7,8) first printed row starts 4 mm below the top pad: top of the box is the default (CL-4b, owner ruling 2026-10-23)
+      e.g. <div.ws-cell.mq-lvcenter[data-ws-cell="stack"]> "H T O 2 7 7 − 1 5 3 4" | <div.ws-cell.mq-lvcenter[data-ws-cell="stack"]> "H T O 4 5 9 − 2 1 2"
+
+subtraction:sub_1k_no_regroup#mixed-practice (Subtract within 1,000 (No Regrouping) (mixed-practice))
+
+subtraction:sub_10k_no_regroup#lesson (Subtract within 10,000 (No Regrouping) (lesson))
+  [L-TOPSTART CL-4b major] x4 (p2,5 cells 6,7,6,7) first printed row starts 4 mm below the top pad: top of the box is the default (CL-4b, owner ruling 2026-10-23)
+      e.g. <div.ws-cell.mq-lvcenter[data-ws-cell="stack"]> "Th H T O 3 5 8 6 − 1 3 1 3 3" | <div.ws-cell.mq-lvcenter[data-ws-cell="stack"]> "Th H T O 4 6 6 2 − 3 3 1 1"
+
+subtraction:sub_10k_no_regroup#mixed-practice (Subtract within 10,000 (No Regrouping) (mixed-practice))
+
+subtraction:sub_100k_no_regroup#lesson (Subtract within 100,000 (No Regrouping) (lesson))
+  [L-TOPSTART CL-4b major] x4 (p2,5 cells 6,7,6,7) first printed row starts 4 mm below the top pad: top of the box is the default (CL-4b, owner ruling 2026-10-23)
+      e.g. <div.ws-cell.mq-lvcenter[data-ws-cell="stack"]> "TTh Th H T O 6 9 , 4 5 6 − 4..." | <div.ws-cell.mq-lvcenter[data-ws-cell="stack"]> "TTh Th H T O 5 6 , 2 4 2 − 2..."
+
+subtraction:sub_100k_no_regroup#mixed-practice (Subtract within 100,000 (No Regrouping) (mixed-practice))
+
+subtraction:sub_1m_no_regroup#lesson (Subtract within 1,000,000 (No Regrouping) (lesson))
+  [L-TOPSTART CL-4b major] x2 (p2,5 cells 8,8) first printed row starts 4 mm below the top pad: top of the box is the default (CL-4b, owner ruling 2026-10-23)
+      e.g. <div.ws-cell.mq-lvcenter[data-ws-cell="stack"]> "HTh TTh Th H T O 8 2 6 , 3 3..."
+
+subtraction:sub_1m_no_regroup#mixed-practice (Subtract within 1,000,000 (No Regrouping) (mixed-practice))
+
+subtraction:sub_2d_1d#lesson (Subtract a 1-Digit Number from a 2-Digit Number (No Regrouping) (lesson))
+  [L-TOPSTART CL-4b major] x6 (p2,5 cells 8,9,10,8,9,10) first printed row starts 4 mm below the top pad: top of the box is the default (CL-4b, owner ruling 2026-10-23)
+      e.g. <div.ws-cell.mq-lvcenter[data-ws-cell="stack"]> "T O 8 9 − 3 6" | <div.ws-cell.mq-lvcenter[data-ws-cell="stack"]> "T O 9 7 − 1"
+
+subtraction:sub_2d_1d#mixed-practice (Subtract a 1-Digit Number from a 2-Digit Number (No Regrouping) (mixed-practice))
+
+ws-print-lint: FAIL - 74 document(s), source kit; 34 finding(s) in 7 document(s)

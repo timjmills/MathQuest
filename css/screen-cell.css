@@ -1810,3 +1810,10 @@ html.dark body .online-edition .problem-card.mq-wscard.mq-active-problem .mq-wsb
 /* CL-4b (owner ruling 2026-10-23), additive: the online worksheet's fitted cell starts at the top of
    the box; a write-above cell (regroup stack, division bracket) stays centred. */
 .online-edition .problems-grid.mq-wsgrid.mq-wsfit > .problem-card.mq-wscard > .mq-wspaper > .ws-cell.mq-scell:not(:has([data-ws-writeabove])) { justify-content: flex-start; }
+
+/* Critic s3-stack r1 S1: a 6-digit stack (7 tracks, its comma track) is 348 px of 48 px tracks and ran
+   past a 346 px card at 390. On a phone the tracks of a 7+-track stack are 46 px (the boxes keep
+   44 px, SP 15.2) and the operator track, which holds only the sign, 32 px: 320 px, 12 px clear each side. */
+@media (max-width: 480px) {
+    .mq-scell .mq-kit .ws-stack:is([style*="--t:7"], [style*="--t:8"]) { --ws-track: 46px; --mq-optrack: 32px; }
+}

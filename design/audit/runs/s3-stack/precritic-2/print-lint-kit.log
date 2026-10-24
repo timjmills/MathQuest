@@ -1,0 +1,23 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-print-lint.cjs --source kit --skills subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_100k_no_regroup,subtraction:sub_1m_no_regroup,subtraction:sub_2d_1d --baseline design/audit/baselines/print-lint.json
+
+mq-browser-run: slot 2 after 119s
+ws-print-lint: source kit, 7 skill(s)
+  subtraction:sub_50_no_regroup: 2+1 pages, 0 finding(s)
+  subtraction:sub_100_no_regroup: 2+1 pages, 0 finding(s)
+  subtraction:sub_1k_no_regroup: 2+1 pages, 0 finding(s)
+  subtraction:sub_10k_no_regroup: 2+1 pages, 0 finding(s)
+  subtraction:sub_100k_no_regroup: 2+1 pages, 0 finding(s)
+  subtraction:sub_1m_no_regroup: 2+1 pages, 0 finding(s)
+  subtraction:sub_2d_1d: 2+1 pages, 0 finding(s)
+
+document                           pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+subtraction:sub_50_no_regroup        2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_100_no_regroup       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_1k_no_regroup        2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_10k_no_regroup       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_100k_no_regroup      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_1m_no_regroup        2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_2d_1d                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+TOTAL                                        .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .
+
+ws-print-lint: OK (ratchet against design/audit/baselines/print-lint.json: nothing rose; 7 document(s), source kit; 0 finding(s) in 0 document(s))

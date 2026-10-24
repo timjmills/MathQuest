@@ -1,0 +1,14 @@
+ws-grade-render: 12 skills -> design/audit/runs/s3-stack/render-r1-M/anchors-side
+  [1/12] addition:add_50_no_regroup  independent 1p+1k 4x4  11s
+  [2/12] addition:add_100_regroup  independent 1p+1k 4x2  21s
+  [3/12] addition:add_10k_regroup  independent 1p+1k 2x3  32s
+  [4/12] subtraction:sub_50_no_regroup  independent 1p+1k 4x4  43s
+  [5/12] subtraction:sub_100_no_regroup  independent 1p+1k 4x4  54s
+  [6/12] subtraction:sub_100_regroup  independent 1p+1k 4x3  64s
+  [7/12] subtraction:sub_1k_no_regroup  independent 1p+1k 2x4  73s
+  [8/12] subtraction:sub_10k_no_regroup  independent 1p+1k 2x4  84s
+  [9/12] subtraction:sub_100k_no_regroup  independent 1p+1k 2x4  95s
+  [10/12] subtraction:sub_1m_no_regroup  independent 1p+1k 2x3  105s
+  [11/12] subtraction:sub_1m_regroup  independent 1p+1k 2x3  115s
+  [12/12] subtraction:sub_2d_1d  independent 1p+1k 4x4  125s
+ws-grade-render: done, 12 units, 24 pages, 125s

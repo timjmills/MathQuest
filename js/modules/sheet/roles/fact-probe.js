@@ -125,18 +125,25 @@ export function plan(input = {}) {
         // digits never shrink to fit (PG-20), so the probe takes the widest column count every
         // fact fits (measured, DN-10), as many rows as their height allows, and runs on to a
         // second page when 20 facts need it - the probe stays 20 facts in the chosen form.
-        const cols = bestCols(items, [4, 3, 2], ctx);
+        // The widest count the host's measurement AND the layout's digit clamp (12.3, with the
+        // thousands separators) both accept: a measured fit the clamp refuses gives hMinAt no
+        // layout (Infinity), which printed one row a page (SU-C pilot, 6-digit stacks at S).
+        const cols = [4, 3, 2].find((c) => fitsAt(items, c, ctx) && Number.isFinite(hMinAt(items, c, ctx))) || bestCols(items, [4, 3, 2], ctx);
         const h = hMinAt(items, cols, ctx);
         const rowsFit = Math.max(1, Math.floor(G / (Number.isFinite(h) ? h : G)));
         // the pages share the facts evenly (a rebalanced last page, PG-21), never a short tail
-        const nPages = Math.ceil(items.length / (cols * Math.min(rowsFit, Math.ceil(items.length / cols))));
-        const rows = Math.ceil(Math.ceil(items.length / nPages) / cols);
-        const per = cols * rows;
+        // The ROWS are shared (s3 precritic-2, PG-23): 20 facts in 3 columns, 3 rows a page, are
+        // 7 rows on 3 pages = 3 + 2 + 2 rows (9, 6, 5 facts), not 9, 9 and a 2-fact last page.
+        const totalRows = Math.ceil(items.length / cols);
+        const nPages = Math.ceil(totalRows / Math.min(rowsFit, totalRows));
+        const rowsOn = Array.from({ length: nPages }, (_, k) => Math.floor(totalRows / nPages) + (k < totalRows % nPages ? 1 : 0));
+        const rows = Math.max(...rowsOn);
         vRows = rows;
         vH = Math.min(Number.isFinite(h) ? 1.3 * h : G / rows, G / rows);
         const chunks = [];
-        for (let i = 0; i < items.length; i += per) chunks.push(items.slice(i, i + per));
-        const grids = chunks.map((ch, k) => gridPart(ch.map((it) => planItem(it, { cols })), { cols, rows: Math.ceil(ch.length / cols), cellH: vH, labels, start: 1 + k * per, cls: 'facts' }));
+        const starts = [];
+        for (let k = 0, i = 0; k < nPages && i < items.length; i += rowsOn[k] * cols, k++) { starts.push(i); chunks.push(items.slice(i, i + rowsOn[k] * cols)); }
+        const grids = chunks.map((ch, k) => gridPart(ch.map((it) => planItem(it, { cols })), { cols, rows: Math.ceil(ch.length / cols), cellH: vH, labels, start: 1 + starts[k], cls: 'facts' }));
         body = grids[0];
         if (grids.length > 1) extraPages = grids.slice(1).map((g) => ({ sections: [g] }));
         probeCols = cols;
