@@ -72,6 +72,15 @@ export const tabSideMm = (digitPt) => TAB_LADDER[factTab(digitPt)].sideMm;
  * @param {string} [opts.scope]     q.responseScope
  * @param {boolean} [opts.legacy]   marks a legacy-adapter cell (SCC-A5)
  */
+/**
+ * CL-4b: the pupil writes ABOVE this problem (a carry or exchange, a quotient over a bracket), so its
+ * cell is centred down the box instead of starting at the top. A template marks its own root element
+ * with `markWriteAbove(html)`; cell() then sets the same attribute on the cell, and the screen hosts
+ * read it with :has().
+ */
+export const WRITE_ABOVE = 'data-ws-writeabove="1"';
+export const markWriteAbove = (html) => String(html).replace(/^(\s*<[a-z][^>]*?)(\/?>)/i, `$1 ${WRITE_ABOVE}$2`);
+
 export function cell(inner, opts = {}) {
     const { label: lab = '', cls = '', style = '' } = opts;
     let a = opts.template ? ` data-ws-cell="${attr(opts.template)}"` : ' data-ws-cell';
@@ -84,7 +93,9 @@ export function cell(inner, opts = {}) {
     const body = opts.template ? `<div class="ws-cell-body">${inner}</div>` : inner;
     // `keyAttr` (key pages only): a data-ws-key-* hook after the style, so the page decorator's
     // `data-ws-cell style="` match is untouched
-    const extra = /^data-ws-key-[a-z-]+$/.test(opts.keyAttr || '') ? ` ${opts.keyAttr}` : '';
+    let extra = /^data-ws-key-[a-z-]+$/.test(opts.keyAttr || '') ? ` ${opts.keyAttr}` : '';
+    // CL-4b: after the style too, for the same reason
+    if (opts.writeAbove || String(inner).includes(WRITE_ABOVE)) extra += ` ${WRITE_ABOVE}`;
     return `<div class="ws-cell ${cls}"${a} style="${style}"${extra}>${lab}${body}</div>`;
 }
 

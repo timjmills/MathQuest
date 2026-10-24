@@ -9,7 +9,7 @@
 // Pure module (SCC-01).
 
 import { opGlyph, DEFAULT_SIZE, blankWidth, STRETCH_CAP } from '../tokens.js';
-import { esc, line, box, circle, blank } from '../cell.js';
+import { esc, line, box, circle, blank, WRITE_ABOVE } from '../cell.js';
 import { register } from '../registry.js';
 import { stepMarks, singleSlotState } from '../steps.js';
 import { touchNumbers, touchNumberHTML, touchOpts } from '../support-draw.js';
@@ -134,7 +134,7 @@ register('equation', {
                 ? `<span class="ws-divfrac" style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;">`
                     + `<span style="border-bottom:1.5pt solid #000;padding:0 0.2em;">${A}</span><span style="padding:0 0.2em;">${B}</span></span>`
                 : `${B}<span style="border-top:0.75pt solid #000;border-left:0.75pt solid #000;border-top-left-radius:0.4em;padding:0.05em 0.3em 0 0.3em;margin-left:0.15em;">${A}</span>`;
-            return `<div class="ws-eq" data-ws-notation="${p.notation}"${p.notation === 'fraction' ? ' style="align-items:center"' : ''}>${body}<span class="o">=</span>${R}</div>`;
+            return `<div class="ws-eq"${p.notation === 'bracket' ? ` ${WRITE_ABOVE}` : ''} data-ws-notation="${p.notation}"${p.notation === 'fraction' ? ' style="align-items:center"' : ''}>${body}<span class="o">=</span>${R}</div>`;
         }
         if (p.fact && u === 'result') {
             // A division FACT across (div_facts Standard, alone or in Mix, critic R2 R-2): ONE across

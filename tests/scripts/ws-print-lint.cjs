@@ -267,7 +267,7 @@ function kitRequestFlags() {
 const TOOL = 'ws-print-lint';
 // INK-31: the answer-key ink (WORKSHEET_DESIGN_STANDARD.md INK-31).
 const KEY_INK = '#c2410c';
-const LINTS = ['L-INK', 'L-EMOJI', 'L-FONT', 'L-SIZE', 'L-OVERFLOW', 'L-SPLIT', 'L-DENSITY', 'L-KEY', 'L-VERBS', 'L-ANSAREA', 'L-INPUT', 'L-CCSS', 'L-ANCHOR', 'L-SUPPORT'];
+const LINTS = ['L-INK', 'L-EMOJI', 'L-FONT', 'L-SIZE', 'L-OVERFLOW', 'L-SPLIT', 'L-DENSITY', 'L-KEY', 'L-VERBS', 'L-ANSAREA', 'L-INPUT', 'L-CCSS', 'L-ANCHOR', 'L-SUPPORT', 'L-TOPSTART'];
 
 /**
  * L-SUPPORT (S2): runs IN the rendered sheet document (the page lintHtmlInSheetPage prints from).
@@ -893,7 +893,43 @@ function wsLintPage(cfg) {
                 }
                 if (!box) continue;
                 const H = cr.height, W = cr.width;
-                const vBand = Math.max(box.t - inner.t, inner.b - box.b, 0);
+                /* L-TOPSTART (CL-4b, owner ruling 2026-10-23): top of the box is the default. A top
+                   cell's first printed row starts within 3 mm of the top pad (or just below the label keep-out,
+                   CL-40 / CL-41); a write-above cell (data-ws-writeabove:
+                   a regroup stack, a division bracket) is centred down the cell within 2 mm. Cells whose
+                   visual is the workspace (CL-4) and legacy pictures are not judged. */
+                const tmpl = c.getAttribute('data-ws-cell') || '';
+                const wa = c.hasAttribute('data-ws-writeabove') || !!c.querySelector('[data-ws-writeabove], .ws-stack-legacy i[data-ws-seg]');
+                const workspace = ['clock', 'frac-model', 'nl-place', 'number-line', 'hop-line', 'chartwindow', 'mult-chart', 'tenframe'].includes(tmpl) || (c.hasAttribute('data-ws-legacy') && !!c.querySelector('svg'));
+                const judged = (cfg.mode === 'pack' ? !!tmpl : c.hasAttribute('data-ws-cell')) && !workspace && !c.closest('[data-ws-topstart="off"]');
+                const fits = (box.b - box.t) < (inner.b - inner.t) - 4 * PX;
+                // the first PRINTED row: ink (text, a drawing, a stroked box), never an empty spacer
+                let inkTop = Infinity, inkBot = -Infinity;
+                for (const d of c.querySelectorAll('*')) {
+                    if (!visible(d) || d.closest('[data-ws-label], .ws-letter, .ws-tab, .ws-modeltab, .ws-legacy-answer')) continue;
+                    const ds = getComputedStyle(d);
+                    if (ds.position === 'absolute') continue;
+                    const ink = [...d.childNodes].some(n => n.nodeType === 3 && n.textContent.trim()) || /^(svg|img|canvas)$/i.test(d.tagName)
+                        || ['Top', 'Bottom', 'Left', 'Right'].some(k => parseFloat(ds[`border${k}Width`]) > 0 && ds[`border${k}Style`] !== 'none');
+                    if (!ink) continue;
+                    const r = d.getBoundingClientRect();
+                    if (!r.width && !r.height) continue;
+                    inkTop = Math.min(inkTop, r.top); inkBot = Math.max(inkBot, r.bottom);
+                }
+                if (inkTop === Infinity) { inkTop = box.t; inkBot = box.b; }
+                if (judged && fits && wa) {
+                    const off = ((box.t + box.b) / 2) - ((inner.t + inner.b) / 2);   // the laid-out problem, answer zone included
+                    if (Math.abs(off) > 2 * PX) F('L-TOPSTART', 'CL-4b', 'major', c, `write-above cell is ${mm(Math.abs(off))} mm ${off < 0 ? 'above' : 'below'} the cell's centre: the pupil writes above this problem, so it is centred down the box (CL-4b)`, 'write-above not centred');
+                } else if (judged && fits) {
+                    let top = inner.t;
+                    const lab = c.querySelector(':scope > .ws-tab, :scope > .ws-letter, :scope > .ws-modeltab, :scope > [data-ws-label]');
+                    if (lab) top = Math.max(top, lab.getBoundingClientRect().bottom + 1 * PX);   // CL-40 / CL-41: just below the tab
+                    const gap = inkTop - top;
+                    if (gap > 3 * PX) F('L-TOPSTART', 'CL-4b', 'major', c, `first printed row starts ${mm(gap)} mm below the top pad: top of the box is the default (CL-4b, owner ruling 2026-10-23)`, 'not at top of box');
+                }
+                // CL-4b: under a top cell the band below the problem is writing room, not a sizing error.
+                const topCell = judged && !wa && getComputedStyle(c).justifyContent === 'flex-start';
+                const vBand = topCell ? Math.max(box.t - inner.t, 0) : Math.max(box.t - inner.t, inner.b - box.b, 0);
                 const hBand = Math.max(box.l - inner.l, inner.r - box.r, 0);
                 if (vBand >= 0.3 * H) F('L-DENSITY', 'H13', 'major', c, `one empty band ${mm(vBand)} mm tall in a ${mm(H)} mm cell (${Math.round((vBand / H) * 100)}%): the row is sized for a taller item than it holds (RUBRIC H13)`, 'empty band in cell');
                 else if (hBand >= 0.3 * W) F('L-DENSITY', 'H13', 'major', c, `one empty band ${mm(hBand)} mm wide in a ${mm(W)} mm cell (${Math.round((hBand / W) * 100)}%): the content is pinned to one side (RUBRIC H13)`, 'empty band in cell');
@@ -2157,6 +2193,20 @@ const SELF_TESTS = [
         c.insertAdjacentHTML('afterbegin', '<div style="height:1mm"></div>');
         const g = c.closest('.ws-grid');
         if (g) g.style.gridTemplateRows = `${Math.max(3 * c.getBoundingClientRect().height, 60 * 96 / 25.4)}px repeat(20, auto)`;
+    } },
+    // L-TOPSTART (CL-4b, owner 2026-10-23): a top cell centred down a tall row, and a write-above cell pinned to the top.
+    { name: 'stack centred down a tall cell (L-TOPSTART)', expect: ['L-TOPSTART', 'CL-4b'], fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.setAttribute('data-ws-cell', 'stack');
+        c.style.justifyContent = 'center';
+        c.closest('.ws-grid').style.gridTemplateRows = `${80 * 96 / 25.4}px repeat(20, auto)`;
+    } },
+    { name: 'regroup stack pinned to the top (L-TOPSTART)', expect: ['L-TOPSTART', 'CL-4b'], fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.setAttribute('data-ws-cell', 'stack');
+        c.setAttribute('data-ws-writeabove', '1');
+        c.style.justifyContent = 'flex-start';
+        c.closest('.ws-grid').style.gridTemplateRows = `${80 * 96 / 25.4}px repeat(20, auto)`;
     } },
     { name: 'eight items on an Independent page', expect: ['L-DENSITY', 'DN-1'], fn: () => {
         const p1 = document.querySelector('.ws-page');
