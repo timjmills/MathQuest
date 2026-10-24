@@ -44,7 +44,8 @@
 //             a = b) with at least 4 items, its positions on the page (i mod page) and in the run (i mod m, m = 2..page)
 //             may not crowd one residue (binomial tail, Bonferroni over the residues and periods, below 0.001).
 //
-// Exit 0 OK, 1 FAIL, 2 usage (an unknown flag, an unknown --skill), 3 INCOMPLETE (a skill whose valid set is unknown, or
+// Exit 0 OK, 1 FAIL, 2 usage (an unknown flag, an unknown --skill: FAIL), 4 N/A (every skill deals no operands: fractions,
+// clocks, shapes - `ws-dealer-uniform: N/A - no operand-dealt items: ...`), 3 INCOMPLETE (a skill whose valid set is unknown, or
 // with unreadable items); 0 items read for a skill FAILS it. Prints `ws-dealer-uniform: OK|FAIL|INCOMPLETE (...)` last.
 // --json <file> writes the per-skill results; --report-only exits 0 (the last line still says what it found).
 // BASELINE: tests/fixtures/precritic/dealer-uniform.baseline.json {skills: {"cat:skill": [finding key, ...]}} pins real
@@ -376,8 +377,15 @@ function selfTest() {
     let fpp = 0;
     for (let s = 1; s <= 20; s++) { const r = mulberry(100 + s); const free = nz.map((x) => (r() < 0.1 ? zero : x)); if (judgePeriod(free, 20).length) fpp++; }
     t(fpp <= 1, `PERIOD: seeded positions fail on at most 1 of 20 seeds (${fpp})`);
+    // D1 (S1 critic r1): a skill that deals no numbers is N/A, never FAIL; a numeric skill that read 0 items is FAIL
+    const R = (key, status, findings = []) => ({ key, status, findings });
+    t(finalVerdict([R('fractions:identify', 'N/A'), R('measurement:time_hour', 'N/A')]).code === 4 && /^ws-dealer-uniform: N\/A - no operand-dealt items: fractions:identify, measurement:time_hour /.test(finalVerdict([R('fractions:identify', 'N/A'), R('measurement:time_hour', 'N/A')]).line), 'D1: only non-numeric skills -> N/A, exit 4');
+    const mix = finalVerdict([R('fractions:identify', 'N/A'), R('subtraction:sub_100_regroup', 'OK')]);
+    t(mix.code === 0 && /N\/A, no operand-dealt items: fractions:identify/.test(mix.line), 'D1: an N/A skill beside an OK one: OK, the N/A named');
+    t(finalVerdict([R('fractions:identify', 'N/A'), R('subtraction:x', 'FAIL', ['0 of 120 items read (120 threw, 0 without operands): nothing checked'])]).code === 1, 'D1: a numeric skill whose items all threw still FAILS (A1)');
+    t(finalVerdict([]).code === 0 ? false : true, 'D1: an empty scope is never OK');
     for (const f of fails) say(`  self-test FAIL: ${f}`);
-    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 15 cases)`);
+    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 19 cases)`);
     process.exit(fails.length ? 1 : 0);
 }
 
@@ -453,6 +461,7 @@ async function main() {
         const read = items.filter(Boolean);
         const r = { key, n: N, read: read.length, errors, unread: items.length - read.length - errors, findings: [], notes: [], status: 'OK' };
         results.push(r);
+        if (!read.length && !errors && r.unread === N) { r.status = 'N/A'; r.notes.push(`all ${N} items generated, none deals operands (no "a op b" to read): nothing to deal evenly`); continue; }
         if (!read.length) { r.status = 'FAIL'; r.findings.push(`0 of ${N} items read (${errors} threw, ${r.unread} without operands): nothing checked`); continue; }
         if (read.length < N) { r.status = 'INCOMPLETE'; r.notes.push(`${N - read.length} of ${N} item(s) not read (${errors} threw)`); }
         // ---- the valid set
@@ -552,13 +561,27 @@ async function main() {
         for (const k of r.stale || []) say(`      fixed? pinned "${k}" no longer found (re-pin ${BASE_FILE ? relative(HERE, BASE_FILE) : 'the baseline'})`);
         for (const n of r.notes) say(`      note ${n}`);
     }
-    const bad = results.filter((r) => r.status === 'FAIL'), inc = results.filter((r) => r.status === 'INCOMPLETE');
     const secs = ((Date.now() - T0) / 1000).toFixed(1);
     if (has('--json')) writeFileSync(resolve(arg('--json')), JSON.stringify({ tool: TOOL, root: ROOT, n: N, page: PAGE, opts: opts || null, results }, null, 1) + '\n');
-    const tail = `${keys.length - bad.length - inc.length} OK, ${bad.length} FAIL, ${inc.length} INCOMPLETE of ${keys.length} skill(s); ${secs} s`;
-    const line = bad.length ? `${TOOL}: FAIL - ${bad.map((r) => `${r.key.split(':')[1]} (${r.findings.length})`).join(', ')} (${tail})`
-        : inc.length ? `${TOOL}: INCOMPLETE - not fully checked: ${inc.map((r) => r.key).join(', ')} (${tail})` : `${TOOL}: OK (${tail})`;
-    say(line);
-    process.exit(has('--report-only') ? 0 : bad.length ? 1 : inc.length ? 3 : 0);
+    const v = finalVerdict(results, secs);
+    say(v.line);
+    process.exit(has('--report-only') ? 0 : v.code);
+}
+
+/**
+ * The last line and exit code (pure; self-tested). FAIL (1) beats INCOMPLETE (3) beats OK (0). A skill whose items
+ * carry no dealable numbers (every item generated, none with operands: fractions, clocks, shapes) is N/A: nothing to
+ * deal evenly. A scope of N/A skills only prints `N/A - no operand-dealt items: <skills>` and exits 4 (ws-precritic:
+ * N/A); N/A skills beside judged ones are named in the tail. A skill with 0 items read because items THREW is FAIL.
+ */
+export function finalVerdict(results, secs = '0.0') {
+    const bad = results.filter((r) => r.status === 'FAIL'), inc = results.filter((r) => r.status === 'INCOMPLETE'), na = results.filter((r) => r.status === 'N/A');
+    const ok = results.length - bad.length - inc.length - na.length;
+    const tail = `${ok} OK, ${bad.length} FAIL, ${inc.length} INCOMPLETE, ${na.length} N/A of ${results.length} skill(s)${na.length && na.length < results.length ? ` (N/A, no operand-dealt items: ${na.map((r) => r.key).join(', ')})` : ''}; ${secs} s`;
+    if (!results.length) return { code: 1, line: `${TOOL}: FAIL - 0 skills checked` };
+    if (bad.length) return { code: 1, line: `${TOOL}: FAIL - ${bad.map((r) => `${r.key.split(':')[1]} (${r.findings.length})`).join(', ')} (${tail})` };
+    if (inc.length) return { code: 3, line: `${TOOL}: INCOMPLETE - not fully checked: ${inc.map((r) => r.key).join(', ')} (${tail})` };
+    if (results.length && na.length === results.length) return { code: 4, line: `${TOOL}: N/A - no operand-dealt items: ${na.map((r) => r.key).join(', ')} (${tail})` };
+    return { code: 0, line: `${TOOL}: OK (${tail})` };
 }
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main().catch((e) => { say(`${TOOL}: ${e && e.stack || e}`); say(`${TOOL}: FAIL - error`); process.exit(2); });
