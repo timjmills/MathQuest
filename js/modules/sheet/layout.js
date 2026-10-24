@@ -477,6 +477,23 @@ export function sectionClass(infos) {
  * would drop rows and the band-less grid's rows still fit the shorter grid at their minimum height
  * (hMin: the content never shrinks), the page keeps that grid with each row giving up its share.
  */
+/**
+ * A section under an anchor band (worked examples as SECTIONS, S6; s3 precritic-2 ex-group H13):
+ * the band comes off the section's share, so the grid's column choice is also tried on the
+ * height NET of the band - else a short problem is planned as 2 rows x 2 columns, the band takes
+ * the second row back, and 2 problems print in two half-page cells. Of the two layouts the one
+ * with MORE columns wins (a tie keeps the full-height one, as before): more problems a row,
+ * never more pages. bandMm 0 / no gridH: resolveSectionLayout as it is.
+ */
+export function resolveBandedLayout(section = {}, bandMm = 0, items = [], paper = DEFAULT_PAPER, availableWidthMm = LIVE_W_MM, ctx = {}) {
+    const full = resolveSectionLayout(section, items, paper, availableWidthMm, ctx);
+    if (!(section.gridH > 0) || !(Number(bandMm) > 0)) return full;
+    const netH = Math.floor((section.gridH - Number(bandMm)) * 1000) / 1000;
+    if (!(netH > 0)) return full;
+    const net = resolveSectionLayout(Object.assign({}, section, { gridH: netH }), items, paper, availableWidthMm, ctx);
+    return net.cols > full.cols && !net.clamped ? resolveSectionLayout(Object.assign({}, section, { columns: net.cols }), items, paper, availableWidthMm, ctx) : full;
+}
+
 export function resolveSectionLayout(section = {}, items = [], paper = DEFAULT_PAPER, availableWidthMm = LIVE_W_MM, ctx = {}) {
     const L1 = resolveSectionLayoutCore(section, items, paper, availableWidthMm, ctx);
     const band = Number(ctx.header && ctx.header.refBandMm) || 0;

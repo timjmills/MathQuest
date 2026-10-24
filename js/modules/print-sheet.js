@@ -36,7 +36,7 @@ import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practic
 import { normKeyOptions, shortKeyRows, renderShortKey, tagKeyAnswers, answerText } from './sheet/roles/key-short.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH, splitPairH } from './sheet/roles/practice.js';
 import { onePageRows, setOnePagePaper, ONE_PAGE_ITEMS } from './count-rows.js';
-import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS } from './sheet/layout.js';
+import { resolveSectionLayout, resolveBandedLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
 import { tagLine as lessonTagLine, CASE_TESTS as LESSON_CASE_TESTS } from './sheet/roles/lesson.js';
@@ -2006,17 +2006,11 @@ function oneColumnOnly(it, n) {
  * columns, the full-width ones under them, one row each (2026-09-25, AP4: Mixed Time printed three
  * clocks a page in one column because two of its nine skills are full width).
  */
-/**
- * The grid height a section's COLUMN choice sees: with an anchor band (worked examples as
- * sections, S6) the band comes off the section's share first, so a short problem is not given
- * two rows (and two wide columns) the band then takes back (s3 precritic-2, ex-group H13).
- */
-export const gridNetOfAnchor = (sec) => (sec.gridH && Number(sec.anchorMm) > 0 ? Math.max(1, Math.floor((sec.gridH - Number(sec.anchorMm)) * 1000) / 1000) : sec.gridH);
-
 function layoutOf(role, section, items, n, ctx) {
-    const base = { role, columns: section.columns, count: items.length, floor: section.floor, gridH: gridNetOfAnchor(section), dense: section.dense, maxCols: section.maxCols, noCap: section.noCap };
+    const base = { role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense, maxCols: section.maxCols, noCap: section.noCap };
     const opts = { size: n.size, look: n.look, header: ctx.header };
-    const whole = resolveSectionLayout(base, items, ctx.paper, LIVE_W_MM, opts);
+    // (S6 sections: the columns are also tried on the grid net of the anchor band - layout.js resolveBandedLayout)
+    const whole = resolveBandedLayout(base, section.anchorMm || 0, items, ctx.paper, LIVE_W_MM, opts);
     if (!(role === 'independent' || role === 'more-practice') || (n.anchors && n.anchors !== 'off') || section.gridH || items.length < 2) return whole;
     const wide = items.filter((it) => oneColumnOnly(it, n));
     const narrow = items.filter((it) => !oneColumnOnly(it, n));
@@ -2567,7 +2561,7 @@ async function buildSheetCore(req = {}) {
             members.forEach((si, k) => {
                 const sec = n.sections[si];
                 sec.gridH = Math.max(need[k], Math.floor(h[k] * 1000) / 1000);
-                const L = resolveSectionLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: gridNetOfAnchor(sec), dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap },
+                const L = resolveBandedLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap }, sec.anchorMm || 0,
                     withTwins(si, probesOf(si)), paper, LIVE_W_MM, { size: n.size, look: n.look, header: layoutHeader });
                 out[si] = capFromL(sec, si, L);
             });
