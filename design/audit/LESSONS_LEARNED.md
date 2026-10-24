@@ -58,9 +58,10 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
    has its certificate (`design/audit/certified/`). Every build on an uncertified pair — including redos and "copies" — runs
    on Opus medium. *Why:* the SU-C pilot built at low on `stack` × Single skill before certification; critic r1 scored a
    minimum of 4 and the family needed a second builder run.
-0b. **Clean before the critic.** The critic starts only when precritic is green against the pinned baselines AND every red
-   matrix row is at or below the approved siblings' counts (the sibling comparison). A critic round started earlier counts
-   only if that comparison later confirms it.
+0b. **Clean before the critic.** The critic starts only when `ws-precritic --strict` is green against the pinned baselines
+   (under `--strict` a SKIPPED-NOT-BUILT, SKIPPED (no rulings) or INCOMPLETE row is not green) AND every red matrix row is at
+   or below the approved siblings' counts (the sibling comparison), on the lane branch MERGED WITH the current main branch,
+   with the unit gates green there too. A critic round started earlier counts only if that comparison later confirms it.
 0. **Batch design decisions (owner, 2026-10-23).** A new design idea from the owner while a build or fix round is running
    goes on the lane's "Owner design list" (status file, date + the owner's words) and the owner is told it is queued; it
    is not folded into the running round. When the round passes its critic, the owner sees the whole thing once and

@@ -83,7 +83,14 @@ node tests/scripts/ws-catalogue.cjs         # regenerate design/SKILL_CATALOGUE.
 node tests/scripts/ws-content-audit.cjs     # GATE: do + - x / skills match their own names?
 node tests/scripts/ws-stamp-assets.cjs      # BEFORE EVERY DEPLOY: cache-bust index.html (--check to verify)
 node tests/scripts/ws-search-terms.cjs       # GATE: every skill is findable (>= 5 search terms, 230+ real queries hit their top 5)
+node tests/scripts/ws-precritic.cjs --skill cat:skill --strict   # GATE before any critic (rule 0b): every machine check of what a lane touched
+node tests/scripts/ws-precritic.cjs --role lesson --strict       #   ... and per page role (H13 on lesson Warm-up cells)
+node tests/scripts/ws-spec-card.mjs --check-signed design/cards/<family>/<family>.md   # GATE at build start: card signed, every hosts-and-roles line decided
+node tests/scripts/ws-backtest.mjs           # every check FAILS on the state a critic failed and PASSES on its fix, and is on precritic's path (ws-precritic-plan)
+bash tests/scripts/ws-deploy-gates.sh        # BEFORE EVERY DEPLOY: the deploy gate sessions (--list for the plan)
 ```
+
+"Clean before critic" means precritic `--strict` plus the unit gates green on the lane branch MERGED WITH the current main branch.
 
 **A new skill must get search terms (`js/modules/search-terms.js`: a `CONCEPT_RULES` hit, plus `SKILL_TERMS` when its
 label is vague) in the same change; `ws-search-terms` is the gate.** Every skill search box calls `js/modules/skill-finder.js`
@@ -535,6 +542,10 @@ Extensive SVG generation functions across 5 modules:
 - Do not skip steps or leave TODOs
 - Never say "done" unless you have confirmed it works end to end
 - When creating or updating skills, ALWAYS research reference sites first (see "Researching Skills" section above)
+
+## Usage budget (owner rule, 2026-10-24)
+
+Use at most **80 % of the weekly usage limit** (window resets Thursday 22:00 UTC). Working figure: **1 % ≈ $28 of session `cost_usd`**, so 80 % ≈ $2,240 a week. Before starting lanes, sum `cost_usd` of the sessions since the reset and check the remaining budget; stop new work at 80 %. Benchmarks and the week's running total: `design/IMPROVEMENT_PLAN.md` "Usage budget".
 
 ## Agents — model and effort (owner rule, 2026-10-02, latest revision)
 

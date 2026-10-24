@@ -592,66 +592,25 @@ by an independent critic, they need a critic round when work resumes, before any
 
 ---
 
-# Speed audit
-
 ## Per-round findings
 
-### Teacher site 2.0 T1 (mock-up), rounds r1–r5 (lane lead session_016hL18AgyxsUYPBST63Xeki, 2026-10-23)
+### Wave 0 part A (gates lane) — critic rounds r1–r5 (2026-10-23)
 
-**(1) Automatic checks — critic findings a machine could have measured**
-
-| Round | Finding | Check that measures it | Existing check should have caught it? |
+| Round | Result | (1) Automatic checks the findings point to | (2) Speed-ups |
 |---|---|---|---|
-| r1 | Lessons squeezed / sideways scroll at 1024 and 820; panel buttons clipped 16 px | page sideways scroll + child-past-parent overflow at 1366/1280/1024/820/390 (now in `shoot.cjs`) | yes in spirit: §2.9 already named those widths, but the first shoot script only ran 1366 and 390 |
-| r1 | Thumbnails contradict skill names | thumbnail ↔ skill content check (now `thumbs-check.cjs`) | no check existed |
-| r1 | Strips hiding options sideways at 390 | element scrollWidth > clientWidth on any strip | no |
-| r1 | Raw sizes in `app.js` inline styles | token gate scans JS inline `style=` (now check 9) | no: the gate only read CSS |
-| r1/r2 | Chip and tray names truncated ("Addi…"), area word spilling past chip | text clipped in own box / ellipsis / name narrower than ~8 ch (now in `shoot.cjs`) | no: overflow checks were page-level only |
-| r2 | Skills at 820: 110 px search, 113 px cards, mid-word title breaks | min search width, min card width, mid-word break detector | no |
-| r2 | Operations #2E2B71 reads as ink; dark tint 1.05 : 1 | bold vs ink ΔE ≥ 20 and ≥ 2 : 1; dark tint ≥ 1.2 : 1 vs page (now checks 10–11) | no: the gate compared areas with each other, never with ink or the page |
-| r2 | Controls 36 px | every control ≥ 44 × 44 (height AND width) | partly: §2.8 rule existed, no check |
-| r2 | Tick box covering the drawing | overlap of tick box and thumbnail content box | no |
-| r3 | Tray grows to 45 % of screen at 10 skills | tray height ≤ 96 px / ≤ 15 % viewport at 1–200 skills (now in `shoot.cjs`) | no |
-| r3 | Decoy pictures (generic counters, fixed ¾ bar) | picture data-* values vs the problem's numbers | no: the r2 fix added a check that pictures *exist*, not that they *match* |
-| r3/r4 | Preview counts ≠ summary line | per-skill counts in preview == `plan().counts` for several weightings | no |
-| r4 | ~35 base drawings contradict names (unlike denominators, rounding place, Mode) | content checks per name class; ROOT: draw from the real generator | no: check only covered the added pictures, not the base drawing |
-| r4 | Search placeholder "2.NBT.5" finds 0 | placeholder examples must each return ≥ 1 hit via the real finder | the CLAUDE.md rule (use `skill-finder.js`) should have been in the brief; no check |
-| r4 | "+N more" alone at 1024/820; close buttons 22–39 px wide | ≥ 1 named item before "+N"; 44 px width rule | partly (height-only 44 px check) |
-| r5 | ~120 captured thumbnails garbled (SVG font-size overridden by capture reset) | compare each thumbnail's text sizes/boxes (or pixels) with the app's own `buildSheet` cell | no: `thumbs-check` checked min size and bounds, not fidelity to the app |
-| r5 | Crop cuts line starts | no text line starts left of its crop window | no |
-| r5 | 820 big-tray bar "+6 areas" only | same rule as r4 "+N" generalised to area segments | the r4 check was too narrow (chips only) |
+| r1 | FAIL 6 / 8 / 6 (D1–D8) | **A1 "checked nothing" self-check in every gate**: unknown `--skills` / `--category` / `--rows` and 0 checked items must FAIL (D3, four gates printed OK on nothing) — a shared helper in `tests/lib` so new tools get it free. **A2 verdict lint for runners**: SKIPPED / NOT YET never ends a run OK (D2). **A3 baseline-grain check**: a baseline pins findings by key, never a count (D5); a test that a swapped finding fails, for every tool with a baseline. **A4 per-skill pins only** (D6). **A5 plan-flag coverage**: grep the plan's named flags (§1.4, §1.6.7) against each tool's usage text (D7 missed: H8 multiple choice). | Brief every new tool with the cross-cutting contract up front (exit codes 0/1/2/3, INCOMPLETE, unknown-id FAIL, key-based baselines, run-file fields): r1–r4 found the same contract gaps tool by tool. Give interface contracts between tools in the brief (matrix ↔ deploy runner) — done from r1 on, it removed merge rework. |
+| r2 | FAIL 7 / 8 / 8 (D1) | **A6 state-fold property test** for any tool that reads run history (newest-only reads let red rows vanish). | A defect in shared state logic needs the invariants written first; fixing symptoms took r2→r4 (three rounds, one area). Rule: on the 2nd defect in the same area, brief the root cause and a property test (done at r3). |
+| r3 | FAIL 7 / 8 / 8 (D1) | **A7 baseline invariants I1–I5 as a reusable property test** (pin-new-only, verdict before pin, no re-pin by a nightly) — applies to node-lint, options-pin and matrix baselines alike. | Same as r2: escalate to "root cause + invariants" one round earlier. |
+| r4 | FAIL 7 / 8 / 8 (D1, D2) | **A8 deploy-list time budget**: `ws-deploy-gates --list` sums each gate's last measured seconds per session and FAILS when a session exceeds 30 min (would have caught the options pin auto-joining session 1, and session 2's 33.6-min floor). **A9 fold-order mutation in the property test** (sort by name vs `finished`). | Lead integration rule: a "switch on when the tool exists" line must be reviewed at merge (D1 was the lead's merge). Time each gate once and keep the table in the runner so rebalancing is arithmetic, not a 90-min timed run. |
+| r5 | **PASS 9 / 9 / 8** | Nits → checks: **A10** reject run files with a future `finished` (clock skew); **A11** legacy run files (no `baseline` field) clear nothing after a cut-off; **A12** options-pin `--resume` keyed by commit. | Run critics on the narrowest scope (r5 scoped to "r4 defects + regressions" took 10 min vs 29 min for r1). Timed deploy runs in parallel child sessions: three sessions × 3 runs in ≈ 1.5 h wall instead of ≈ 4.5 h serial. |
+| r6 | FAIL 6 / 8 / 7 | **A13** every rule-0b tool must judge unpinned rows too (a "status filter" test: a fixture with only PENDING(no-baseline) rows must still be compared); **A14** every new screen probe is run on the approved siblings before it gates (a "siblings clean" self-check: an approved skill failing a new probe means the probe is wrong, not the skill); **A15** partial-scope = INCOMPLETE for any scoped check. | Run a new check on approved siblings in the builder's own loop (would have caught D2 before the critic); slot-clip costs ≈ 19 min of a precritic — batch its print-lint jobs with the matrix's own render (one render, two lints). |
+| r7 | FAIL 7 / 9 / 7 (D1, D2) | **A16** multi-skill rows: a finding is attributed to the skill whose cell carries it (`data-ws-cell` + page/cell), partner findings never block a lane; **A17** a signed card's rulings are hashed under its signature (weakening a ruling or emptying `notOffered` voids the signature), checked by precritic. | Brief rule 0b tools with the multi-skill case up front (partners seeded per row differ by skill); have precritic run `ws-spec-card --check-signed` on the lane's cards. |
 
-**(2) Speed-ups — what cost time, and the smallest change that saves it**
+### Lane S1 (card gate + 11 generic checks) — critic rounds r1–r2 (2026-10-24)
 
-| Round | Cost | Smallest change |
-|---|---|---|
-| r1 | Builder checked only 1366/390; critic found 1024/820 breaks → a full round | Mock-up briefs name all five §2.9 widths and require page + in-panel overflow checks from the first build |
-| r1–r5 | Thumbnails cost four rounds (hand drawings → pictures → captured DOM → live) | For a mock-up, use real app rendering from the start or neutral placeholders; never hand-drawn stand-ins of real content (lead time-box now in place) |
-| r2 | Same chip truncation fixed twice because the check didn't exist | Stop rule applied at the first repeat, not the second: when a critic finding is measurable, the fix commit must include its check |
-| r2–r4 | Owner design changes arriving mid-round (palette, grade badge, stone, tray scale, popup, weights, views, Each page) re-opened screens the critic had graded | Batch rule (now owner rule): queue ideas, one approval sitting, one build + one critic round |
-| r3 | Tray had no height budget, so the 40–100 skill requirement came late and forced a redesign | Every fixed bar/panel gets a size budget (px and % of viewport) in the brief, tested at extreme content counts (1, 10, 100) |
-| r4 | Search built label-only despite the CLAUDE.md rule | Lane briefs quote the CLAUDE.md rules that touch the screen (search → `skill-finder.js`; generation → `generateQuestionFor`) |
-| r5 | 6 MB captured samples slow every critic page load and shoot run | Live lazy rendering (in progress) or placeholders; budget page weight in the brief |
-| all | Builders ran 1-2 h per round; critics re-wrote their own probes each time | Keep the critic's probe scripts in the lane folder (`design/mockups/teacher-2/critic-tools/`) so each builder runs them before reporting |
+| Round | Result | (1) Automatic checks the findings point to | (2) Speed-ups |
+|---|---|---|---|
+| r1 | FAIL 7 / 8 / 7 (D1–D3) | **ws-precritic-plan** (built): every backtested check must be planned by `ws-precritic --skill <its skills>` (D2); run each new per-skill gate on one skill of every kit family before the critic (D1); a fixture backtest only where no real commit pair exists (D3) | three parallel builders on disjoint files; union backtests.json by row id at merge |
+| r2 | **PASS 9 / 9 / 8** | stale-pin report for pinned findings (N-r2-3); precritic-plan coverage for gates whose rows name no skill (N-r2-1) | narrow r2 scope (fixes + regressions) in 21 min; one real precritic run of an approved sibling and `--role lesson` on the merged tree before the critic caught 4 of the lane's 5 setup traps |
 
-### Teacher site 2.0 T1, round r6 (2026-10-24)
-
-**(1) Automatic checks**
-
-| Finding | Check that measures it | Existing check should have caught it? |
-|---|---|---|
-| ~1 in 5 live thumbnails crop away the drawing (Line Plots blank, elapsed-time cards alike) | the crop window must contain ≥ X % of the cell's drawn-content box (SVG/IMG/canvas union), and distinct skills' crops must differ | no: `thumbs-check` compared text size and position, not drawing visibility |
-| Held % shows "✓ Equal" in the Print sheet; More silently releases the lock | every weight display of a locked item shows its % and lock; any change to a locked item needs a confirm | no |
-| Single skill + lock gives 16·8·8·8·0 (40 %, one skill dropped) | every non-zero-weight skill gets ≥ 1 problem, or a visible ⚠; the locked share is honoured within rounding | partly: the % check covered Mixed only |
-| Phone detailed headers inline → 1 row visible; Chips/Thumbnails rows 102/322 px | rows-in-first-viewport check in EVERY view, not only List | partly: the r5 check covered List only |
-| Tray Chips with ≥ 4 areas: no area word and no legend | the area name is visible for every chip (own label or a stack legend) | the r4 rule existed per stack; not run on this state |
-| Pill ✓ overlaps text on phone; 820 bar hides "+N" | text-overlap probe on selected pills; "+N" present when areas are hidden | partly |
-| Quiz "6 areas" while one area gets 0 | the summary's area count = areas with ≥ 1 item | no |
-
-**(2) Speed-ups**
-
-| Cost | Smallest change |
-|---|---|
-| Each fixed check was scoped to the state that failed (List only, Mixed only, chips only), so the same class reappeared in a sibling state | Write each check over ALL views × kinds × widths from the start (a state matrix in shoot.cjs) |
-| The live-thumbnail fix judged success by text metrics, so a crop hiding the picture still passed | Fidelity checks compare what is VISIBLE in the final crop, not only the source |
-| Six critic rounds for one mock-up | For T2+, the critic's probe scripts run inside the builder's verify step (kept in the lane folder), and every brief carries the full state matrix |
+Details and the reflection: design/status/s1-checks.md.

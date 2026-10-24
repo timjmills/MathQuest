@@ -64,12 +64,12 @@ async function open({ seed = null, viewport = { width: 1280, height: 900, device
   const problems = [];
   page.on('pageerror', e => problems.push({ type: 'pageerror', text: e.message }));
   page.on('console', m => { if (m.type() === 'error') problems.push({ type: 'console.error', text: m.text() }); });
-  // A font load the browser cancels (net::ERR_ABORTED: the document reloaded or was replaced mid-load) is not a missing
+  // A font load (a .woff/.woff2 file or its css/fonts/ stylesheet) the browser cancels (net::ERR_ABORTED: the document reloaded or was replaced mid-load) is not a missing
   // file; ws-teacher-shell failed 4 of 6 timed deploy runs on aborted Andika loads (2026-10-23). Any other failure counts.
   page.on('requestfailed', r => {
     if (!r.url().startsWith(base)) return;
     const err = (r.failure() && r.failure().errorText) || '';
-    if (err === 'net::ERR_ABORTED' && /\.woff2?(\?|$)/.test(r.url())) return;
+    if (err === 'net::ERR_ABORTED' && (/\.woff2?(\?|$)/.test(r.url()) || /\/css\/fonts\//.test(r.url()))) return;   // the font files and their css/fonts/*.css
     problems.push({ type: 'requestfailed', text: `${r.url()} <${err}>` });
   });
   if (seed !== null) await page.evaluateOnNewDocument(seedScript(seed));

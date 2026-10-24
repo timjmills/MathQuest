@@ -1,0 +1,5 @@
+{
+ "about": "Lane S1 check 9 PASS state: the pilot fix-r1 tree ff471fd (D8 fixed, so check 7 is clean) as committed (the multiply sizer honours tiles).",
+ "commit": "ff471fd",
+ "patches": []
+}

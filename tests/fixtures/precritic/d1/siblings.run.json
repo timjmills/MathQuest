@@ -1,0 +1,43 @@
+{
+ "about": "D1 fixture: the approved sibling's same row, clean (0 findings): before D1 the partner-only row read ABOVE (6 > 0) and failed the lane.",
+ "rows": [
+  {
+   "id": "addition:d1_sibling|sections/ex-each",
+   "skill": "addition:d1_sibling",
+   "skills": [
+    "addition:d1_sibling",
+    "subtraction:d1_partner"
+   ],
+   "kind": "sections",
+   "row": "ex-each",
+   "status": "OK",
+   "args": [
+    "--kind",
+    "sections"
+   ],
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "keys": {},
+     "bySkill": {}
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "keys": {},
+     "bySkill": {}
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "keys": {},
+     "bySkill": {}
+    }
+   }
+  }
+ ]
+}

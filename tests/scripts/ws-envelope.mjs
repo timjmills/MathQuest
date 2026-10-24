@@ -16,7 +16,7 @@
 //        [--skills cat:skill,...] [--items N]
 //        the envelope (sizes, the kind's options, the template's skills and their option values,
 //        keys, screen hosts), the machine all-pairs sample (sample.print / .screen) and the CRITIC
-//        sample (sample.critic: all pairs of option values deduped across skills + a random 20 % capped at 40 pages)
+//        sample (sample.critic, D8: the bounded all-pairs set + a random 20 %, total capped at 40 pages; sample.criticStrict for reference)
 //   node tests/scripts/ws-envelope.mjs --self-test [--declare-leaf <file>]
 //        the walker on fixture module graphs, the leaf rule on fixture leaves, and every declared
 //        data leaf of the tree; --declare-leaf adds a file to the declared leaves for that run
@@ -938,10 +938,12 @@ export function coversAllPairs(dims, rows) {
 // The lower bound of any such set is its largest pair group (dimension A x dimension B): each row covers
 // one pair of a group at most. When the strict set exceeds CRITIC_PAGE_BUDGET pages the run says so,
 // names the dominant groups, and computes the bounded set the plan could rule for instead
-// (`sample.criticBounded`: the smallest of the measured bounds - boundary classes, size-only pairing, representative skills).
+// (the smallest of the measured bounds - boundary classes, size-only pairing, representative skills); by the D8
+// ruling that bounded set + the random 20 %, capped at CRITIC_TOTAL_CAP_PAGES in all, IS `sample.critic` (strict: `sample.criticStrict`).
 export const CRITIC_PAGE_BUDGET = 60;
 export const CRITIC_RANDOM_SHARE = 0.2;
 export const CRITIC_RANDOM_CAP_PAGES = 40;
+export const CRITIC_TOTAL_CAP_PAGES = 40;   // D8 ruling: the whole critic sample of a pair, all-pairs + random
 const rowPages = (r) => Math.max(1, Number(r.pages) || 1);
 /** The rows the kit cannot print: Faded packet on one page (ws-print-lint: --fade packet needs --pages >= 2). */
 export const criticValid = (r) => !(r.fade === 'packet' && r.pages !== undefined && Number(r.pages) < 2);
@@ -1192,19 +1194,62 @@ export function criticSample(kdims, skills, { pair = '', hosts = [], envelopeSiz
         ].map((v, i) => {
             const b = criticAllPairs(kdims, v.skills, seedOf(':bounded' + i), criticValidFor(v.skills), v.optionKinds);
             const d = criticDominance(b.need, v.skills);
-            return { ...v, skills: undefined, rows: b.rows.length, pages: b.rows.reduce((n, r) => n + rowPages(r), 0), lowerBound: d.lowerBound, groupBound: d.groupBound, exclusiveBound: d.exclusiveBound, dominant: d.groups.slice(0, 3), sample: b.rows };
+            return { ...v, skills: undefined, rows: b.rows.length, pages: b.rows.reduce((n, r) => n + rowPages(r), 0), lowerBound: d.lowerBound, groupBound: d.groupBound, exclusiveBound: d.exclusiveBound, dominant: d.groups.slice(0, 3), sample: b.rows, need: b.need };
         });
         const pick = variants.slice().sort((a, b) => a.pages - b.pages)[0];
         out.proposal = {
             why: `the strict set is ${pairsPages} pages: at least ${dom.lowerBound} rows, because ${dom.exclusiveBound >= dom.groupBound ? `${dom.exclusiveSkills} skills offer values no other skill offers, so each needs rows of its own (${dom.exclusiveBound} rows between them)` : `the largest pair group ${dom.groups[0].group} has ${dom.groupBound} pairs`}; the options with many values: ${many.map((o) => `${o} ${new Set(skills.flatMap((sk) => (sk.options[o] || []).map((x) => JSON.stringify(x)))).size}`).join(', ')}`,
             options: many,
-            variants: variants.map(({ sample, ...v }) => v),
+            variants: variants.map(({ sample, need, ...v }) => v),
             chosen: pick.id,
         };
         out.bounded = pick.sample.map((r) => ({ ...r, part: 'pairs-bounded' }));
         out.boundedRule = pick.rule;
+        out.boundedNeed = pick.need;
     }
-    return out;
+    return capCritic(out, kdims, skills, { seed: seedOf(':random-capped'), envelopeSize, valid });
+}
+
+/**
+ * D8 ruling (lead, 2026-10-23): "follow the plan's cap, all-pairs plus 20 %, capped at 40 pages a pair. Use
+ * the bounded set, not the strict one." The returned object IS sample.critic: the all-pairs part (the
+ * bounded set when the strict set is over budget, else the strict set) plus the seeded random 20 %, the
+ * TOTAL capped at CRITIC_TOTAL_CAP_PAGES. Random rows go first; only when the all-pairs part alone is over
+ * the cap are its last rows cut, and the pairs left uncovered are reported (`cut`). The strict set
+ * rides along as `strict` (sample.criticStrict).
+ */
+function capCritic(out, kdims, skills, { seed, envelopeSize, valid }) {
+    const strict = { rule: out.rule, print: out.print, screen: out.screen, pages: out.pages, rows: out.rows, requiredPairs: out.requiredPairs };
+    const bounded = !!out.bounded;
+    let base = bounded ? out.bounded : out.print.filter((r) => r.part === 'pairs');
+    const need = bounded ? out.boundedNeed : null;
+    const basePagesAll = base.reduce((n, r) => n + rowPages(r), 0);
+    const rnd = criticRandom(kdims, skills, { seed, envelopeSize, taken: base, valid, capPages: Math.max(0, CRITIC_TOTAL_CAP_PAGES - basePagesAll) });
+    const wanted = criticRandom(kdims, skills, { seed, envelopeSize, taken: base, valid, capPages: CRITIC_RANDOM_CAP_PAGES });
+    const cutRows = [];
+    if (basePagesAll > CRITIC_TOTAL_CAP_PAGES) {
+        let pages = 0; const keep = [];
+        for (const r of base) { if (pages + rowPages(r) <= CRITIC_TOTAL_CAP_PAGES) { keep.push(r); pages += rowPages(r); } else cutRows.push(r); }
+        base = keep;
+    }
+    const basePages = base.reduce((n, r) => n + rowPages(r), 0);
+    const reqKeys = need ? [...need.keys()] : [...criticPairs(kdims, skills, valid).keys()];
+    const got = new Set(base.flatMap(rowPairKeys));
+    const covered = reqKeys.filter((k) => got.has(k)).length;
+    const print = [...base, ...rnd.rows.map((r) => ({ ...r, part: 'random' }))];
+    const { bounded: _b, boundedNeed: _n, ...rest } = out;
+    return {
+        ...rest,
+        rule: `D8 ruling: the ${bounded ? `bounded all-pairs set (${out.proposal.chosen}: ${out.boundedRule})` : 'strict all-pairs set (within budget)'} plus a seeded random 20 % of the rest of the envelope, the total capped at ${CRITIC_TOTAL_CAP_PAGES} pages a pair (random rows dropped first)`,
+        variant: bounded ? out.proposal.chosen : 'strict',
+        print,
+        pages: { pairs: basePages, random: rnd.pages, total: basePages + rnd.pages, budget: CRITIC_PAGE_BUDGET, randomCap: CRITIC_RANDOM_CAP_PAGES, totalCap: CRITIC_TOTAL_CAP_PAGES },
+        rows: { pairs: base.length, random: rnd.rows.length, randomWanted: Number.isFinite(rnd.want) ? rnd.want : null, screen: out.screen.length },
+        // honest coverage: the pairs of the set actually used (the bounded set's pairs when bounded), not the strict set's
+        coverage: { of: bounded ? `bounded set (${out.proposal.chosen})` : 'strict set', requiredPairs: reqKeys.length, coveredPairs: covered, strictRequiredPairs: out.requiredPairs },
+        cut: { randomRows: wanted.rows.length - rnd.rows.length, randomPages: wanted.pages - rnd.pages, pairsRows: cutRows.length, pairsPages: cutRows.reduce((n, r) => n + rowPages(r), 0), uncoveredPairs: reqKeys.length - covered },
+        strict,
+    };
 }
 
 /** The anchors modes the tree has today (ANCHOR_MODES in sheet/anchors.js). */
@@ -1376,16 +1421,18 @@ export async function buildEnvelope(pairId, reader, { only = null, items = 6 } =
         sample: {
             // print / screen: the MACHINE sample (every skill, each with its own pairs) for the instance gates;
             // critic: what an independent critic grades (ws-grade-render --envelope reads it by default)
-            critic: critic ? { ...critic, bounded: undefined } : null,
-            ...(critic && critic.bounded ? { criticBounded: { rule: critic.boundedRule, variant: critic.proposal.chosen, print: critic.bounded, screen: critic.screen } } : {}),
+            // (D8 ruling: the bounded all-pairs set + the random 20 %, total capped at 40 pages); criticStrict: the strict set, for reference
+            critic: critic ? { ...critic, strict: undefined } : null,
+            ...(critic ? { criticStrict: critic.strict } : {}),
             print: printRows, screen: screenRows,
             checks: {
                 printBaseCoversAllPairs: skills.length ? coversAllPairs(printDims, base) === null : null,
                 screenCoversAllPairs: skills.length ? coversAllPairs(screenDims, screenRows) === null : null,
                 perSkillCoversAllPairs: perSkillGap === null,
                 ...(perSkillGap ? { perSkillFirstGap: perSkillGap } : {}),
-                criticCoversAllPairs: critic ? criticCovers(dims, criticSkills, critic.print.filter((r) => r.part === 'pairs'), criticValidFor(criticSkills)) === null : null,
+                criticStrictCoversAllPairs: critic ? criticCovers(dims, criticSkills, critic.strict.print.filter((r) => r.part === 'pairs'), criticValidFor(criticSkills)) === null : null,
                 criticRandomWithinCap: critic ? critic.pages.random <= CRITIC_RANDOM_CAP_PAGES : null,
+                criticWithinTotalCap: critic ? critic.pages.total <= CRITIC_TOTAL_CAP_PAGES : null,
             },
         },
     };
@@ -1528,14 +1575,13 @@ async function main() {
         console.log(`  machine sample     print ${env.sample.print.length} rows (kind options x skill ${env.sample.print.length - optRows} + each skill's own options x size ${optRows}), screen ${env.sample.screen.length} rows (sample.print / sample.screen: the instance gates)`);
         const c = env.sample.critic;
         if (c) {
-            console.log(`  CRITIC sample      sample.critic: all-pairs ${c.rows.pairs} rows = ${c.pages.pairs} pages (${c.requiredPairs} pairs of values, deduped across skills; lower bound ${c.lowerBound} rows: largest pair group ${c.groupBound}, skill-exclusive values ${c.exclusiveBound} over ${c.exclusiveSkills} skills) + random ${c.rows.random} rows = ${c.pages.random} pages (20 % of the rest of the envelope = ${c.rows.randomWanted === null ? '?' : c.rows.randomWanted.toLocaleString('en-US')} rows, capped at ${c.pages.randomCap} pages) + screen ${c.rows.screen} rows: ${c.pages.total} print pages`);
+            const st = env.sample.criticStrict;
+            console.log(`  CRITIC sample      sample.critic (${c.variant}): all-pairs ${c.rows.pairs} rows = ${c.pages.pairs} pages + random ${c.rows.random} rows = ${c.pages.random} pages (20 % of the rest = ${c.rows.randomWanted === null ? '?' : c.rows.randomWanted.toLocaleString('en-US')} rows) + screen ${c.rows.screen} rows: ${c.pages.total} print pages (cap ${c.pages.totalCap})`);
+            console.log(`  critic coverage    ${c.coverage.coveredPairs} of ${c.coverage.requiredPairs} pairs of the ${c.coverage.of} (the strict set needs ${c.coverage.strictRequiredPairs})`);
+            console.log(`  cap cut            random ${c.cut.randomRows} rows / ${c.cut.randomPages} pages; all-pairs ${c.cut.pairsRows} rows / ${c.cut.pairsPages} pages (${c.cut.uncoveredPairs} pairs uncovered)`);
+            if (st) console.log(`  strict (reference) sample.criticStrict: ${st.rows.pairs} rows = ${st.pages.pairs} pages, ${st.requiredPairs} pairs`);
             console.log(`  dominant pairs     ${c.dominant.map((g) => `${g.group} ${g.pairs}`).join(' · ')}`);
-            if (c.overBudget) {
-                const p = c.proposal;
-                console.log(`  OVER BUDGET        above the plan's "tens of pages a pair" (budget ${c.pages.budget}): ${p.why}`);
-                for (const v of p.variants) console.log(`  bound ${pad(v.id, 16)} ${v.rows} rows = ${v.pages} pages (lower bound ${v.lowerBound}: group ${v.groupBound}, exclusive ${v.exclusiveBound})${v.id === p.chosen ? '  <- sample.criticBounded' : ''}: ${v.rule}`);
-                console.log('  ruling needed      sample.critic stays the strict set the plan names; the plan (§1.6.2) has to rule for a bound before sample.criticBounded replaces it');
-            }
+            if (c.overBudget) for (const v of c.proposal.variants) console.log(`  bound ${pad(v.id, 16)} ${v.rows} rows = ${v.pages} pages (lower bound ${v.lowerBound})${v.id === c.proposal.chosen ? '  <- used by sample.critic' : ''}`);
         }
         console.log(`  pairwise checks    ${JSON.stringify(env.sample.checks)}`);
         console.log(`  written            ${relative(ROOT, file)}`);
@@ -1658,7 +1704,14 @@ async function selfTest() {
     const wide = { skill: 'w:1', options: { step: Array.from({ length: 20 }, (_, i) => i + 1), labels: ['a', 'b', 'c', 'd', 'e', 'f', 'g'] }, defaults: { step: 5 } };
     const cs = criticSample(kd, [wide, A], { pair: 'fx--single', hosts: ['card'], envelopeSize: 1e9 });
     ok(cs.overBudget && cs.lowerBound >= 140 && cs.dominant[0].group === 'opt:labels x opt:step', `a 20 x 7 option pair is over budget and named (lower bound ${cs.lowerBound}, ${cs.dominant[0].group})`);
-    ok(cs.proposal && cs.proposal.variants.length === 3 && cs.bounded.length < cs.rows.pairs, 'over budget: the bounds are measured and the smallest is written');
+    ok(cs.proposal && cs.proposal.variants.length === 3 && cs.rows.pairs < cs.strict.rows.pairs && cs.variant === cs.proposal.chosen, 'over budget: the bounds are measured and the smallest is sample.critic');
+    ok(cs.pages.total <= CRITIC_TOTAL_CAP_PAGES, `D8: the critic total is capped at ${CRITIC_TOTAL_CAP_PAGES} pages (${cs.pages.total})`);
+    ok(cs.cut.pairsRows === 0 || cs.rows.random === 0, 'D8: random rows are dropped before any all-pairs row');
+    ok(cs.coverage.of.startsWith('bounded') && cs.coverage.requiredPairs < cs.coverage.strictRequiredPairs && cs.coverage.coveredPairs + cs.cut.uncoveredPairs === cs.coverage.requiredPairs, `D8: coverage is claimed for the bounded set only (${cs.coverage.coveredPairs}/${cs.coverage.requiredPairs}, strict ${cs.coverage.strictRequiredPairs})`);
+    const capped = capCritic({ rule: '', print: [], screen: [], pages: {}, rows: {}, requiredPairs: 0, bounded: Array.from({ length: 30 }, (_, i) => ({ skill: 'a:1', size: 'S', pages: 2, n: i, part: 'pairs-bounded' })), boundedNeed: new Map(), proposal: { chosen: 'x' } }, kd, [A], { seed: 1, envelopeSize: 1e9, valid: criticValid });
+    ok(capped.pages.total <= CRITIC_TOTAL_CAP_PAGES && capped.rows.random === 0 && capped.cut.pairsRows === 10 && capped.cut.pairsPages === 20, `D8: an all-pairs part over the cap drops every random row, then cuts and reports all-pairs rows (${capped.cut.pairsRows} rows / ${capped.cut.pairsPages} pages)`);
+    const small = criticSample(kd, [A], { pair: 'fx--small', hosts: [], envelopeSize: 1e9 });
+    ok(small.variant === 'strict' && small.pages.total <= CRITIC_TOTAL_CAP_PAGES, `D8: a within-budget pair keeps the strict set, total ${small.pages.total} <= ${CRITIC_TOTAL_CAP_PAGES}`);
     ok(boundOptions([wide])[0].options.step.join() === '1,5,20', 'boundary classes: first, default, last');
     // N5 (critic r2): impossible option rows are never required or dealt
     const nlSk = { skill: 'n:1', options: { nlOn: [false, true], nlStep: ['auto', 5, 10], nlFrom: [-1000000, 1000000], nlTo: [-1000000, 1000000] },

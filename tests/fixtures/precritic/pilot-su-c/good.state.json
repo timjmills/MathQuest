@@ -1,0 +1,5 @@
+{
+ "about": "A SEEDED minimal fix of the pilot-su-c r1 tree, never committed anywhere (the pilot branch has no fix commit yet, 2026-10-23 20:10): b3948d88 + good.patch. The patch makes four of critic r1's fixes as the critic wrote them, and nothing else: D1 (gen-operations.js _subNoRegroupPair, 2-digit branch: each bottom digit 1 .. v-1, a top 0 only 1 time in 10), D3 (sheet/cells/stack.js: 0.95 em tracks when the answer is boxes, in render and footprint), D5 (screen-cell.js binaryParts: strip thousands commas so 4-6 digit items reach the stack drawing on screen) and D6 (skill-options.js P11 loop: no band control on the no-regroup subtraction ladder from within 50). It is the PASS state of the backtest rows sibling-compare-pilot, slot-clip-pilot, phone-card-pilot, card-rulings-pilot and card-not-offered-pilot.",
+ "commit": "b3948d88",
+ "patches": ["tests/fixtures/precritic/pilot-su-c/good.patch"]
+}

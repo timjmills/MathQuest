@@ -1295,3 +1295,28 @@ passed per lane-week against the rate before Wave 0.
   part, ranges, edge cases, rulings).
 - **Lesson shape / lesson compiler** — a pattern shared by several lessons, and the code that drafts a lesson's
   description from its card and its skills.
+
+## Usage budget (owner, 2026-10-24) — read before starting any lane
+
+The owner's rule: **use at most 80 % of the weekly usage limit.** Plan every set of lanes against it.
+
+| Item | Value | How it was measured |
+|---|---|---|
+| Weekly window | resets **Thursday 22:00 UTC** (next: 2026-10-29 22:00) | `rate_limit_info.resetsAt` (seven_day) on any session |
+| 1 % of weekly usage | **≈ $28** of session cost | 2026-10-23: all sessions ≈ $1,400 = ~50 % (owner's figure) |
+| 80 % cap | **≈ $2,240 a week** | 80 × $28 |
+| Week of 2026-10-22: used by 2026-10-24 10:30 | ≈ 61 % (~$1,700) | 50 % on 10-23 + ~$300 on 10-24 |
+
+**How to measure:** `cost_usd` in each session's `usage` (get_session / list_sessions), summed over the lead session's share and every lane since the reset. Session cost is a stand-in for usage; recalibrate whenever the owner gives a real percentage. Check the remaining budget before starting lanes, and stop new work at 80 %.
+
+**Benchmarks (2026-10-23/24, for estimating):**
+
+| Work | Cost | Time |
+|---|---|---|
+| One critic round | $15–25 | ~35 min |
+| A skill family of 6–7 skills (pilot, 2 rounds, not passed) | ~$100 (≈ $25–30 a skill with the lead's share) | 8 h |
+| Small tool lane (2 rounds) | ~$40–90 | 1–2 h |
+| Checks lane, Wave 0 gates (5 rounds) | ~$316 | ~10 h |
+| Teacher mock-up (6 rounds) | ~$260 | ~16 h |
+| Lead session | ~$250 a busy day | — |
+| Expected steady state, certified template | ~$15–20 a skill → ~70–90 skills a week at 80 % | — |

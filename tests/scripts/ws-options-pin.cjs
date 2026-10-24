@@ -16,9 +16,12 @@
 //
 //   --batch N        skills per ws-options-verify process (default 25; one browser start per batch)
 //   --slots N        batches at once (default 2), each through /tmp/mq-browser-run.sh (it queues behind other sessions)
-//   --tmp DIR        where the per-batch JSON goes (default /tmp/mq-options-pin/<UTC date>[.shard-i-of-n]); --resume
-//                    reuses it, so a crashed nightly continues where it stopped; a batch's file name carries a hash
-//                    of its skills, so a changed selection never reuses a stale file
+//   --tmp DIR        where the per-batch JSON goes (default /tmp/mq-options-pin/<UTC date>.<commit 12>[-dirty-<diff
+//                    hash>][.shard-i-of-n], A12: keyed by the commit, so a --resume after a commit or an edit never
+//                    reuses another tree's results); --resume reuses it, so a crashed nightly continues where it
+//                    stopped; a batch's file name carries a hash of its skills, so a changed selection never reuses a
+//                    stale file. The dir holds run-key.json (date, commit, diff hash, shard); --resume into a dir whose
+//                    key differs (a --tmp DIR given by hand, reused on another tree) is refused (exit 2)
 //   --n N            items per check, passed to ws-options-verify (default: its own, 12 - the precritic's value)
 //   --deadline MS    ws-options-verify's per-skill deadline (default 600000: its own 60 s default times out on
 //                    add_facts, sub_facts, f_to_d and the mixed pools in a cloud container with shared slots)
@@ -59,7 +62,9 @@
 // slots). Node only: no browser slot, a few seconds. It folds every <dir>/options-pin-*.json, ordered by `finished`
 // (ISO time; a file without one by the date in its name at 00:00 UTC), ties broken by file name, into each skill's
 // NEWEST result (the last file whose `failing` lists the skill; a crashed batch's skills are not listed, so they keep
-// their older result). A file with `dirty: true` can add a failure but never clears one. Then:
+// their older result). A file with `dirty: true` can add a failure but never clears one. A10: a file whose `finished`
+// is more than 10 min after now (clock skew) is a WARNING: like a dirty file it can add a failure but never clears
+// one, it is not the newest file (age) and it checks no slice; it is ordered by its `started` (else its name). Then:
 //   FAIL     a live skill (data.js SKILLS, retired and custom_mixed out) whose newest result has a failing pair the
 //            CURRENT pin (--baseline) does not list: a NEW pair that no later check fixed (a skill missing from the
 //            pin counts every pair); or an unreadable options-pin file; or, ONCE ALL 28 SLICES HAVE BEEN CHECKED, the
@@ -114,6 +119,24 @@ function planBatches(skills, { batch, shard = null }) {
     return out.map((list, i) => ({ i, skills: list, keys: list.map((s) => s.key), ids: [...new Set(list.map((s) => s.skillId))] }));
 }
 
+/* ============================================================================ the --resume tmp dir (A12), pure */
+
+/**
+ * The run's key: what a --resume may continue. `commit` = full HEAD sha (null outside git), `diffHash` = a hash of
+ * `git diff HEAD` when the tree has local edits (null when clean), `shard` = {i, n} | null.
+ */
+const runKeyOf = ({ date, commit, diffHash = null, shard = null }) => ({ date, commit: commit || 'nogit', diff: diffHash || null, shard: shard ? `${shard.i}/${shard.n}` : null });
+/** The default tmp dir for a key: /tmp/mq-options-pin/<date>.<commit 12>[-dirty-<diff 8>][.shard-i-of-n] (A12). */
+const tmpDirFor = (key, base = '/tmp/mq-options-pin') => path.join(base, `${key.date}.${String(key.commit).slice(0, 12)}${key.diff ? `-dirty-${String(key.diff).slice(0, 8)}` : ''}${key.shard ? `.shard-${key.shard.replace('/', '-of-')}` : ''}`);
+/** --resume into `dir`: null when it may continue, else why not (a run-key.json from another tree, date or shard). */
+function resumeRefusal(dir, key) {
+    const f = path.join(dir, 'run-key.json');
+    if (!fs.existsSync(f)) return null;   // a fresh dir
+    let k; try { k = JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { return `${f} is unreadable (${e.message.slice(0, 60)})`; }
+    const diff = ['date', 'commit', 'diff', 'shard'].filter((x) => (k[x] || null) !== (key[x] || null));
+    return diff.length ? `${dir} holds the batches of another run (${diff.map((x) => `${x} ${k[x] || 'none'} there, ${key[x] || 'none'} now`).join('; ')}); a --resume would mix two trees' results. Run without --resume, or with another --tmp` : null;
+}
+
 /* ============================================================================ the deploy gate (D1), node only */
 
 const OPIN_RE = /^options-pin-.*\.json$/;
@@ -125,7 +148,8 @@ const nameTime = (f) => { const m = /(\d{4}-\d{2}-\d{2})(?:T(\d{2})(\d{2}))?/.ex
  *           slices: Set(i of 28 checked), full: bool (all 28, or a complete clean full run), newest: ms | null,
  *           dirtyIgnored: [{key, file}] }.
  */
-function foldOptionPins(dir, pin) {
+const SKEW_MS = 10 * 60 * 1000;   // A10: a `finished` up to 10 min ahead of the clock is clock skew, not a future file
+function foldOptionPins(dir, pin, now = Date.now()) {
     const names = (fs.existsSync(dir) ? fs.readdirSync(dir) : []).filter((f) => OPIN_RE.test(f));
     const files = [], bad = [];
     for (const f of names) {
@@ -134,23 +158,35 @@ function foldOptionPins(dir, pin) {
         try { j = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { bad.push({ file, error: e.message.slice(0, 120) }); continue; }
         if (!j || typeof j !== 'object' || !j.failing || typeof j.failing !== 'object') { bad.push({ file, error: 'no "failing" map (not an options-pin run file)' }); continue; }
         const fin = Date.parse(j.finished);
+        // A10: a `finished` beyond the clock skew is not trusted: ordered by `started` (else the name), never clears
+        if (Number.isFinite(fin) && fin > now + SKEW_MS) {
+            const st = Date.parse(j.started);
+            const sane = Number.isFinite(st) && st <= now + SKEW_MS;
+            files.push({ file, name: f, when: sane ? st : nameTime(f), src: sane ? 'started (finished is in the future)' : 'name (finished is in the future)', future: { finished: j.finished, aheadH: (fin - now) / 3600000 }, j });
+            continue;
+        }
         files.push({ file, name: f, when: Number.isFinite(fin) ? fin : nameTime(f), src: Number.isFinite(fin) ? 'finished' : 'name', j });
     }
     files.sort((a, b) => (a.when - b.when) || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
     const pinned = (pin && pin.skills) || {};
-    const skills = new Map(), slices = new Set(), dirtyIgnored = [];
+    const skills = new Map(), slices = new Set(), dirtyIgnored = [], future = [];
     let full = false, newest = null;
     for (const e of files) {
         const j = e.j;
+        const untrusted = j.dirty || e.future;
+        if (e.future) future.push({ file: e.file, finished: e.future.finished, aheadH: e.future.aheadH, cleared: [] });
         for (const [key, pairs] of Object.entries(j.failing)) {
             const list = Array.isArray(pairs) ? pairs.map(String) : [];
             const p = pinned[key];
             const newPairs = list.filter((x) => !p || !p.includes(x));
-            // N3 analogue: a run on a dirty tree can add a failure, never clear one
-            if (j.dirty && !newPairs.length) { if (skills.has(key) && skills.get(key).newPairs.length) dirtyIgnored.push({ key, file: e.file }); continue; }
+            // N3 analogue: a run on a dirty tree can add a failure, never clear one; A10: nor can a future-dated file
+            if (untrusted && !newPairs.length) {
+                if (skills.has(key) && skills.get(key).newPairs.length) { if (j.dirty) dirtyIgnored.push({ key, file: e.file }); else future[future.length - 1].cleared.push(key); }
+                continue;
+            }
             skills.set(key, { pairs: list, newPairs, file: e.file, when: e.when });
         }
-        if (j.dirty) continue;
+        if (untrusted) continue;
         if (Number.isFinite(e.when) && (newest === null || e.when > newest)) newest = e.when;
         const complete = j.complete === true;
         if (!complete || j.batching !== 'hash-v1' || j.subset) continue;
@@ -159,7 +195,7 @@ function foldOptionPins(dir, pin) {
         else if (sl.n === 28) slices.add(sl.i);
     }
     if (slices.size === 28) full = true;
-    return { files, bad, skills, slices, full, newest, dirtyIgnored };
+    return { files, bad, skills, slices, full, newest, dirtyIgnored, future };
 }
 
 /** Live skills from data.js in node (as the in-browser listing: SKILLS minus `retired` and custom_mixed). */
@@ -180,7 +216,7 @@ function gateVerdict({ dir, pinFile, live, now }) {
     const say = (l) => lines.push(`options gate: ${l}`);
     let pin = null;
     try { pin = JSON.parse(fs.readFileSync(pinFile, 'utf8')); } catch (e) { refusals.push(`the pin ${rel(pinFile)} is unreadable (${e.message.slice(0, 80)})`); }
-    const fo = foldOptionPins(dir, pin);
+    const fo = foldOptionPins(dir, pin, now);
     say(`${fo.files.length} options-pin run file(s) in ${rel(dir)}, folded by finished time; ${fo.skills.size} skill(s) with a result; pin ${rel(pinFile)}${pin && pin.pinned ? ` (pinned ${pin.pinned})` : ''}`);
     for (const b of fo.bad) refusals.push(`unreadable options-pin file ${rel(b.file)}: ${b.error}`);
     say(fo.full ? 'every slice checked (all 28 slices, or a complete full run)' : `${fo.slices.size} of 28 slices checked${fo.slices.size ? ` (${[...fo.slices].sort((a, b) => a - b).join(', ')})` : ''}`);
@@ -191,6 +227,8 @@ function gateVerdict({ dir, pinFile, live, now }) {
         if (!live.has(key)) { say(`${key} has NEW pair(s) in ${path.basename(r.file)}, but it is not a live skill (ignored)`); continue; }
         news.push(`${key}: ${r.newPairs.slice(0, 3).join(', ')}${r.newPairs.length > 3 ? ` and ${r.newPairs.length - 3} more` : ''} (newest result: ${path.basename(r.file)}${pin && pin.skills && !pin.skills[key] ? '; the skill is not in the pin' : ''})`);
     }
+    // A10: a file dated in the future (beyond 10 min of clock skew) clears nothing and is not the newest result
+    for (const f of fo.future) warnings.push(`${path.basename(f.file)} finished ${f.finished}, ${f.aheadH.toFixed(1)} h after now (beyond the 10-min clock skew): it can add a failure but clears none${f.cleared.length ? ` (it would have cleared ${f.cleared.join(', ')})` : ''}, checks no slice and is not the newest file; fix the clock that wrote it, or the file`);
     for (const d of fo.dirtyIgnored) say(`${d.key}: ${path.basename(d.file)} ran on a dirty tree and lists no new pair; it does not clear the earlier NEW pair (N3)`);
     if (news.length) refusals.push(`${news.length} live skill(s) have a failing pair the pin does not list, and no later check fixed it: ${news.slice(0, 10).join('; ')}${news.length > 10 ? ' ...' : ''}. Fix the option (a later nightly, or ws-options-pin --check --skills <cat:skill> --out ${rel(dir)}/options-pin-<date>T<HHMM>.json on a clean tree, that no longer fails clears it), or re-pin it on purpose with a STATUS note: node tests/scripts/ws-options-pin.cjs --write --skills <cat:skill>`);
     // age and coverage (the matrix's rule: a warning until the whole set has been checked once)
@@ -298,11 +336,37 @@ function selfTest() {
     v = run(d);
     ok(v.code === 0 && v.lines.some((l) => /gone:skill .* not a live skill \(ignored\)/.test(l)), `D1: a skill that is not live is ignored (${v.code})`);
     fs.rmSync(d, { recursive: true, force: true });
+    // A10: a file whose `finished` is beyond 10 min of clock skew clears nothing, is not the newest, checks no slice
+    d = dir();
+    put(d, 'options-pin-2026-10-22.json', { finished: '2026-10-22T02:00:00Z', shard: '3/28', slice: { i: 3, n: 28 }, failing: { 'a:x': ['o="1"', 'o="2"'] } });
+    put(d, 'options-pin-2026-10-23T0200.json', { started: '2026-10-23T02:00:00Z', finished: '2026-10-24T09:00:00Z', shard: '4/28', slice: { i: 4, n: 28 }, failing: { 'a:x': ['o="1"'] } });
+    v = run(d);
+    ok(v.code === 1 && v.fold.future.length === 1 && v.fold.future[0].cleared.join() === 'a:x' && v.lines.some((l) => /WARNING - options-pin-2026-10-23T0200\.json finished 2026-10-24T09:00:00Z, 21\.0 h after now .* clears none \(it would have cleared a:x\)/.test(l)) && !v.fold.slices.has(4), `A10: a future-dated file (21 h ahead) does not clear the NEW pair, warns, checks no slice (${v.code}; ${v.lines.filter((l) => /WARNING|REFUSED/.test(l)).join(' | ').slice(0, 300)})`);
+    ok(v.lines.some((l) => /newest options-pin file finished 34\.0 h ago/.test(l)), 'A10: the future-dated file is not the newest file (the age is the 10-22 file\'s 34.0 h)');
+    put(d, 'options-pin-2026-10-23T0300.json', { finished: '2026-10-23T12:09:00Z', shard: '5/28', slice: { i: 5, n: 28 }, failing: { 'a:x': ['o="1"'] } });
+    v = run(d);
+    ok(v.code === 4 && v.fold.slices.has(5) && v.fold.future.length === 1, `A10: a file 9 min ahead (within the skew) is trusted: it clears the pair and counts its slice (${v.code})`);
+    put(d, 'options-pin-2026-10-23T1209.json', { started: '2026-10-23T12:09:30Z', finished: '2027-01-01T00:00:00Z', shard: null, failing: { 'a:x': ['o="1"', 'o="7"'] } });
+    v = run(d);
+    ok(v.code === 1 && v.lines.some((l) => /a:x: o="7"/.test(l)), `A10: a future-dated file (ordered by its started, 12:09:30, after the file that finished 12:09) can still ADD a failing pair (${v.code})`);
+    fs.rmSync(d, { recursive: true, force: true });
+    // A12: the --resume tmp dir is keyed by the commit and the local diff; a dir of another run refuses a --resume
+    const k1 = runKeyOf({ date: '2026-10-23', commit: 'a'.repeat(40) }), k2 = runKeyOf({ date: '2026-10-23', commit: 'b'.repeat(40) });
+    const k1d = runKeyOf({ date: '2026-10-23', commit: 'a'.repeat(40), diffHash: 'f00dfeed00000000' }), k1s = runKeyOf({ date: '2026-10-23', commit: 'a'.repeat(40), shard: { i: 3, n: 28 } });
+    ok(tmpDirFor(k1) === '/tmp/mq-options-pin/2026-10-23.aaaaaaaaaaaa' && tmpDirFor(k1d) === '/tmp/mq-options-pin/2026-10-23.aaaaaaaaaaaa-dirty-f00dfeed' && tmpDirFor(k1s) === '/tmp/mq-options-pin/2026-10-23.aaaaaaaaaaaa.shard-3-of-28', `A12: the default tmp dir names the commit, the diff and the shard (${tmpDirFor(k1)}, ${tmpDirFor(k1d)}, ${tmpDirFor(k1s)})`);
+    ok(new Set([k1, k2, k1d, k1s].map((k) => tmpDirFor(k))).size === 4, 'A12: two commits, a dirty tree and a shard of the same date get four different dirs');
+    d = dir();
+    ok(resumeRefusal(d, k1) === null, 'A12: --resume into a fresh dir continues');
+    fs.writeFileSync(path.join(d, 'run-key.json'), JSON.stringify(k1));
+    ok(resumeRefusal(d, k1) === null, 'A12: --resume on the same commit continues');
+    ok(/commit a+ there, b+ now/.test(resumeRefusal(d, k2) || ''), `A12: --resume of a dir written on another commit is refused (${(resumeRefusal(d, k2) || 'null').slice(0, 160)})`);
+    ok(/diff none there, f00dfeed00000000 now/.test(resumeRefusal(d, k1d) || ''), 'A12: --resume after a local edit (another diff hash) is refused');
+    fs.rmSync(d, { recursive: true, force: true });
     if (bad.length) { console.log(`ws-options-pin --self-test: FAIL - ${bad.length} of ${n}`); bad.forEach((b) => console.log('  - ' + b)); process.exit(1); }
     console.log(`ws-options-pin --self-test: OK (${n} assertions)`);
 }
 
-module.exports = { planBatches, sliceOf, foldOptionPins, gateVerdict };
+module.exports = { planBatches, sliceOf, foldOptionPins, gateVerdict, runKeyOf, tmpDirFor, resumeRefusal };
 
 if (require.main === module && has('self-test')) { selfTest(); return; }
 if (require.main === module && has('gate')) {
@@ -387,8 +451,17 @@ const fmtS = (ms) => `${(ms / 1000).toFixed(1)} s`;
         if (!m || +m[1] < 1 || +m[1] > +m[2]) { console.error('ws-options-pin: --shard takes i/n (1 <= i <= n)'); process.exit(2); }
         shard = { i: +m[1], n: +m[2] };
     }
-    const TMP = path.resolve(arg('tmp', path.join('/tmp/mq-options-pin', date + (shard ? `.shard-${shard.i}-of-${shard.n}` : ''))));
+    // A12: the tmp dir is keyed by the commit (and the local diff), so a --resume never reuses another tree's batches
+    const RUN_KEY = runKeyOf({ date, commit: gitHead(), diffHash: gitDiffHash(), shard });
+    const TMP = path.resolve(arg('tmp', tmpDirFor(RUN_KEY)));
+    if (has('resume')) { const why = resumeRefusal(TMP, RUN_KEY); if (why) { console.log(`ws-options-pin: --resume refused (A12): ${why}`); console.log('ws-options-pin: FAIL'); process.exit(2); } }
+    else if (resumeRefusal(TMP, RUN_KEY)) {
+        // a fresh run into a dir of another run (a --tmp given by hand): start it clean, so a later --resume of THIS run
+        // reads only its own batches
+        for (const f of fs.readdirSync(TMP)) fs.rmSync(path.join(TMP, f), { recursive: true, force: true });
+    }
     fs.mkdirSync(TMP, { recursive: true });
+    fs.writeFileSync(path.join(TMP, 'run-key.json'), JSON.stringify(RUN_KEY) + '\n');
     ensureRunner();
     const T0 = Date.now();
 
@@ -605,6 +678,13 @@ const fmtS = (ms) => `${(ms / 1000).toFixed(1)} s`;
 
 function gitHead() {
     try { return require('child_process').execFileSync('git', ['-C', ROOT, 'rev-parse', 'HEAD'], { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch (e) { return null; }
+}
+/** A hash of `git diff HEAD` (tracked files outside design/audit/matrix and baselines), or null on a clean tree (A12). */
+function gitDiffHash() {
+    try {
+        const out = require('child_process').execFileSync('git', ['-C', ROOT, 'diff', 'HEAD', '--', '.', ':(exclude)design/audit/matrix', ':(exclude)design/audit/baselines'], { stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 256 * 1024 * 1024 });
+        return out.length ? crypto.createHash('sha256').update(out).digest('hex').slice(0, 16) : null;
+    } catch (e) { return null; }
 }
 /** Tracked files with local edits outside design/audit/ (the run file and the matrix files themselves do not count). */
 function gitDirty() {
