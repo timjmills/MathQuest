@@ -132,7 +132,7 @@ export function renderTodoScreen(el) {
     writeTodoHash();
     if (!el.dataset.built) {
         el.dataset.built = '1';
-        el.innerHTML = `<header class="tv-header"><div><h1 class="tv-h1">Skills to be made</h1>
+        el.innerHTML = `<header class="tv-header"><div><h1 class="tv-h1">All skills to be made</h1>
           <p class="tv-sub">Every skill or option still to build so pupils can practise all of CCSS, the Essential Elements, White Rose and MAP. Open one to see what it will do.</p></div>
           <div class="tv-header-actions">
             <button type="button" class="tv-btn" data-t-act="print">${icon('print', 18)}<span>Print list</span></button>

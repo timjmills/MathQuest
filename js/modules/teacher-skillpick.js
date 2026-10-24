@@ -48,7 +48,7 @@ export function makePracticeLink(items) {
 /** A build-list name in a teacher's words: "… (option)" → "… (new option on an existing skill)". */
 export const teacherName = (n) => String(n || '').replace(/\s*\(option\)\s*$/i, ' (new option on an existing skill)');
 
-/** "To be built: <name>" — each name a button to the Skills to be made screen at that entry. */
+/** "To be built: <name>" — each name a button to the All skills to be made list at that entry. */
 export function toBeBuiltHTML(ids, nameOf, lead = 'To be built') {
     if (!ids || !ids.length) return '';
     return `<p class="tvw-tbb">${esc(lead)}: ${ids.map((id) => `<button type="button" class="tvw-tbb-link" data-todo-open="${esc(id)}">${esc(teacherName(nameOf(id)))}</button>`).join('')}</p>`;

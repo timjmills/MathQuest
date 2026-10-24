@@ -199,7 +199,7 @@ function render() {
         root.innerHTML = `
 <header class="tv-header">
   <div><h1 class="tv-h1">MAP tests</h1><p class="tv-sub">${m.tab === 'reps' ? 'The picture-to-number changes MAP asks for, strand by strand, and the skills that practise each.' : 'The MAP task types by strand and RIT band, with the skills that practise each. Tick skills, then make a practice link or print.'}</p></div>
-  <div class="tv-header-actions"><button type="button" class="tv-btn tv-btn-ghost" data-map-act="todo">${icon('list', 18)}<span>Skills to be made</span></button></div>
+  <div class="tv-header-actions"><button type="button" class="tv-btn tv-btn-ghost" data-map-act="todo">${icon('list', 18)}<span>All skills to be made</span></button></div>
 </header>
 ${tabsHTML()}
 <div id="tvmPanel" class="tvm-panel" role="tabpanel" aria-labelledby="tvmTab-${m.tab}"></div>`;

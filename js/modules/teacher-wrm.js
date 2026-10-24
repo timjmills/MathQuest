@@ -447,7 +447,7 @@ const UNIT_ROWS = 6;
 
 function toMakeRowHTML(x, { lessons = null } = {}) {
     const link = x.todo
-        ? `<button type="button" class="tv-btn tv-btn-sm tvw-tm-link" data-todo-open="${esc(x.todo)}">${icon('list', 16)}<span>See it on Skills to be made</span></button>`
+        ? `<button type="button" class="tv-btn tv-btn-sm tvw-tm-link" data-todo-open="${esc(x.todo)}">${icon('list', 16)}<span>See it in All skills to be made</span></button>`
         : x.detailed ? `<button type="button" class="tv-btn tv-btn-sm tvw-tm-link" data-w-dl-goto="${esc(x.detailed)}">${icon('sheet', 16)}<span>See it in the detailed lesson</span></button>` : '';
     const num = (l) => { const p = placeOf(l); return p ? String(p.n) : ''; };
     const forL = lessons && lessons.length

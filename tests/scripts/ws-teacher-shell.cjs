@@ -427,8 +427,11 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
   }));
   // a FULL load (a hash-only goto is a same-document navigation); the teacher role is set again after the load
   const visit = async (url, ms = 1500, teacher = true) => {
+    // leave the old page only once it has fully loaded (an early about:blank aborts its stylesheets)
+    await page.waitForFunction(() => document.readyState === 'complete', { timeout: 60000 }).catch(() => {});
+    await page.waitForNetworkIdle({ idleTime: 300, timeout: 30000 }).catch(() => {});
     await page.goto('about:blank');
-    await page.goto(app.base + url, { waitUntil: 'networkidle2', timeout: 60000 });
+    await page.goto(app.base + url, { waitUntil: 'networkidle0', timeout: 60000 });
     for (let i = 0; i < 60 && !(await page.evaluate(() => typeof window.tvGo === 'function' && typeof window.setUserRole === 'function')); i++) await sleep(250);
     if (teacher) await page.evaluate(() => window.setUserRole('teacher'));
     await sleep(ms);
@@ -487,7 +490,7 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
     r = await visit(`/index.html#todo/${encodeURIComponent(ref.todo)}`, 4000);
     row(w, `#todo/${ref.todo}`, r.screen === 'wrm' && r.place === 'lessons' && /^#wrm\//.test(r.hash) && !r.sideways, r);
     r = await visit('/index.html#todo/no-such-entry', 3000);
-    row(w, '#todo/<unknown> → the list', r.screen === 'todo' && r.place === 'lessons' && /Skills to be made/.test(r.text), r);
+    row(w, '#todo/<unknown> → the list', r.screen === 'todo' && r.place === 'lessons' && /All skills to be made/.test(r.text), r);
     // mq_teacher_screen old values
     for (const [old, screen, place] of [['home', 'skills', 'skills'], ['library', 'skills', 'skills'], ['print', 'skills', 'skills'], ['sets', 'skills', 'skills'], ['todo', 'wrm', 'lessons'], ['map', 'map', 'classes'], ['quizzes', 'quizzes', 'classes']]) {
       await page.evaluate((v) => sessionStorage.setItem('mq_teacher_screen', v), old);

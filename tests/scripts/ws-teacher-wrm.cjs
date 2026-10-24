@@ -617,7 +617,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
         if (want.pre.length) check(/^Earlier skills to be made first/.test(f.preHead), `${tag}: no "Earlier skills to be made first" list`);
         for (const x of [...f.items, ...f.pre]) {
           check(x.name && /^(New skill|New option|Fix|New picture|Follow-on lesson)$/.test(x.kind) && x.covers && /^(Planned|Being built)$/.test(x.status), `${tag}: row lacks name/kind/covers/status ${JSON.stringify(x)}`);
-          check(x.todo ? x.link === 'See it on Skills to be made' : x.dl, `${tag}: row has no link ${JSON.stringify(x)}`);
+          check(x.todo ? x.link === 'See it in All skills to be made' : x.dl, `${tag}: row has no link ${JSON.stringify(x)}`);
           for (const t of [x.name, x.covers]) { const h = jargonHit(t); check(!h, `${tag}: not plain (${h && h.name}) ${h && h.snippet}`); }
         }
         if (want.items.length) check(f.lead === TMK.leadLine(want.codes, want.items.length), `${tag}: lead "${f.lead}"`);

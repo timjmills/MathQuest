@@ -638,7 +638,7 @@ function moreHTML() {
   ${row('Header', 'On every pupil page', `<div class="tvs-checks">${ck('name', 'Name')}${ck('date', 'Date')}${S.sheet === 'quiz' ? '' : `<label class="tvs-check"><input type="checkbox" data-in="hdr" data-v="score"${hd.score ? ' checked' : ''}><span>Score</span></label>`}</div>`)}
   ${row('Answer key', 'Where it prints and how it looks', `${seg('keyplace', o.keyPlace === 'after-page' ? 'after-page' : 'end', [['end', 'At the end'], ['after-page', 'After each page']], 'Key placement')}${seg('keystyle', o.keyStyle === 'short' ? 'short' : 'copy', [['copy', 'Copy of the page'], ['short', 'Answers only']], 'Key style')}`)}
   ${row('Paper', '', seg('paper', o.paper === 'Letter' ? 'Letter' : 'A4', [['A4', 'A4'], ['Letter', 'Letter']], 'Paper'))}
-  <p class="tvs-muted">The old Print worksheets screen (every page type) is still under Skills › <button type="button" class="tvs-link" data-act="oldprint">Print worksheets</button>.</p>
+  <p class="tvs-muted">Need another page type? Open the <button type="button" class="tvs-link" data-act="oldprint">Old print screen (all page types)</button>.</p>
 </details>`;
 }
 function autoQuizName(list) {

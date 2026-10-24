@@ -528,7 +528,7 @@ function renderHome(el) {
     el.innerHTML = `
 <header class="tv-header">
   <div><h1 class="tv-h1">${greeting()}</h1><p class="tv-sub">${esc(today)}</p></div>
-  <div class="tv-header-actions"><button type="button" class="tv-btn tv-btn-ghost" data-home-go="todo">${icon('list', 20)}<span>Skills to be made</span></button><a class="tv-btn tv-btn-ghost" href="help/teacher-online.html" target="_blank" rel="noopener">${icon('book', 20)}<span>Teacher help</span></a></div>
+  <div class="tv-header-actions"><button type="button" class="tv-btn tv-btn-ghost" data-home-go="todo">${icon('list', 20)}<span>All skills to be made</span></button><a class="tv-btn tv-btn-ghost" href="help/teacher-online.html" target="_blank" rel="noopener">${icon('book', 20)}<span>Teacher help</span></a></div>
 </header>
 <section class="tv-grid-3" aria-label="Start a job">
   ${job('sets', 'send', 'Send a skill set', 'Pick the skills and the rules, then give pupils a link or a code to open on their own device.', 'New skill set', true)}
