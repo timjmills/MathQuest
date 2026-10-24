@@ -88,3 +88,20 @@ its decisions, not re-decide them. The README there lists each round's decisions
 | 2026-10-24 | Owner clarification (via lead): counts at three levels that combine — one skill (count or %), a chosen group of selected skills (one total split by How often; bulk bar "Problems for these: N"), all skills (overall total); specific wins; summary shows per-skill result; impossible sums are said plainly with a fix offered, never silently rescaled | lane lead → T3a, T3b | in T3 |
 | 2026-10-24 | Owner addition (via lead): "OR the same with percentage options": every level (skill, group, all) takes a count OR a % of the whole set; >100 % or over-total warned with a fix; % rounded to whole problems; summary shows per-skill counts | lane lead → T3a, T3b | in T3 |
 | 2026-10-24 | Owner (direct): indigo primary clashed with OA #5155BC (ΔE 8.5) → "Move Operations colour"; then chose **olive green #729C00** (tint #EDEED7, soft #D2DCA7, deep #3F5600, ink text). No colour clears every rule once indigo is the primary: owner accepted the olive's colour-blind closeness to key orange (8.3) and error red as a recorded exception in ws-teacher-tokens (still measured, floor 8); all other checks unchanged and green | lane lead | done |
+| 2026-10-24 | T3 built: T3a (3fc8d5a, 2ceebe6, 64a9571) Skills gallery, tray bar/popup, chip options; T3b (c3961f0 … dd2f89c) teacher-plan + Worksheet/Quiz/Share sheets, Versions. Flows in plan at 1366/390 | mq-opus-medium ×2 | built |
+| 2026-10-24 | T3 independent check (f3ee1c7): clear bugs — whole grade Print freezes ~188 s and numbers disagree; >5-skill list 0 px at 1366; tray checks counts vs a fixed 8; PDF counts ≠ plan; preset key mismatch; word-problem quiz link > 8000 (Copy disabled); Share/Print open jank 6–11 s; versions footer "Form A"; chip badge spill. Clean: layout, colours, links, codes, dark mode, no console errors. Gates OK except preview (the gate's own tap) and tokens (since fixed, 76af7ba) | mq-opus-medium | fixes running (same builders) |
+
+### Per-round lists (rule 00), T3 check
+
+| Finding | Check that would have caught it |
+|---|---|
+| Whole-grade Print freezes 188 s | a time budget: tray of 89 skills → sheet first paint < 2 s, in sheet-flows.cjs |
+| Stepper / summary / PDF disagree; printed counts ≠ plan | PDF per-skill item counts == planCounts for several settings (incl. groups, 6 Equal, whole grade) |
+| >5 list 0 px at 1366 | every visible list container has height > 0 at every width (views-check style matrix over the sheets) |
+| Tray refuses counts > 8 | popup validation uses the same total the sheet will use (one source) |
+| Word-problem quiz link > 8000 | quiz-online flow run for a word-problem skill as well as a fact skill |
+
+| Cost | Smallest change |
+|---|---|
+| Two builders split one feature at the plan/tray boundary; field names drifted (groups, locks, total) | define the shared state module + its API in the brief before splitting |
+| Owner changes arrived mid-build (6 in one session) | fold them in at once but re-run the number checks after each, not only at the end |
