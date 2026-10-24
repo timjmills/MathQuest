@@ -55,9 +55,9 @@ function defaults() {
     const d = printDefaults();
     return {
         kind: null, touched: [],
-        opts: { pages: 1, each: 'new', examples: 'off', layout: 'standard', size: 'M', paper: d.paper,
+        opts: { pages: 1, mode: 'pages', nTotal: 24, nEach: 4, each: 'new', examples: 'off', layout: 'standard', size: 'M', paper: d.paper,
             keyPlace: d.keyPlace, keyStyle: d.keyStyle, header: { name: true, date: true, score: false } },
-        quiz: { n: 10, versions: 1, points: 1, name: '', from: 'skills', fromQuery: '' },
+        quiz: { mode: 'total', n: 20, nEach: 4, pages: 1, versions: 1, points: 1, name: '', from: 'skills', fromQuery: '' },
         share: { gameMode: 'practice', problemCount: '20', timer: '0', lock: false },
     };
 }
@@ -82,7 +82,7 @@ const S = (() => {
     return base;
 })();
 function persist() {
-    writeStore(STORE_KEY, { opts: S.opts, quiz: { n: S.quiz.n, versions: S.quiz.versions, points: S.quiz.points }, share: S.share, touched: S.touched, kind: S.kind });
+    writeStore(STORE_KEY, { opts: S.opts, quiz: { mode: S.quiz.mode, n: S.quiz.n, nEach: S.quiz.nEach, pages: S.quiz.pages, versions: S.quiz.versions, points: S.quiz.points }, share: S.share, touched: S.touched, kind: S.kind });
 }
 function freshSeed() { return Math.floor(Math.random() * 900000) + 100000; }
 const touched = (k) => S.touched.includes(k);
@@ -97,6 +97,7 @@ function items() {
             categoryId: s.categoryId, skillId: s.skillId,
             weight: Number(s.weight) > 0 ? Number(s.weight) : 0,
             lockPct: typeof s.lockPct === 'number' ? s.lockPct : undefined,
+            count: Number(s.count) > 0 ? Math.round(Number(s.count)) : undefined,
             leftOut: s.leftOut === true,
             opts: s.opts && typeof s.opts === 'object' ? s.opts : undefined,
             area: areaOf(s.categoryId, s.skillId) || 'NOSTD',
@@ -133,15 +134,23 @@ function plan(list = items()) {
     const per = PER_PAGE[o.size] || PER_PAGE.M;
     let pages = o.pages;
     if (!touched('pages')) pages = k === 'single' ? Math.max(1, list.filter((x) => !x.leftOut).length) : isBig(list) ? Math.min(30, Math.ceil(list.length / per)) : 1;
-    if (quiz) pages = Math.max(1, Math.ceil(S.quiz.n / per));
-    return planPages(k, list, { pages, size: o.size, each: quiz ? 'new' : o.each, seed: S.seed, quiz, total: quiz ? S.quiz.n : undefined, labelOf: (key) => (list.find((x) => keyOf(x) === key) || {}).label || key });
+    return planPages(k, list, { amount: amountOf(pages), size: o.size, each: quiz ? 'new' : o.each, seed: S.seed, quiz, labelOf: (key) => (list.find((x) => keyOf(x) === key) || {}).label || key });
+}
+/** How much? Pages · Problems in all · Problems of each skill (owner 2026-10-24). */
+function amountOf(defaultPages) {
+    if (S.sheet === 'quiz') {
+        const m = S.quiz.mode;
+        return { mode: m, n: m === 'pages' ? S.quiz.pages : m === 'each' ? S.quiz.nEach : S.quiz.n };
+    }
+    const m = S.opts.mode || 'pages';
+    return { mode: m, n: m === 'pages' ? defaultPages : m === 'each' ? S.opts.nEach : S.opts.nTotal };
 }
 
 /* ================================================================= requests (the engine mapping) */
 
-function skillRef(it, weight) {
+function skillRef(it, weight, force = false) {
     const o = { categoryId: it.categoryId, skillId: it.skillId, opts: it.opts || {} };
-    if (weight > 1) o.weight = weight;
+    if (weight > 1 || (force && weight > 0)) o.weight = weight;
     return o;
 }
 function common(seed, quiz, version) {
@@ -150,7 +159,7 @@ function common(seed, quiz, version) {
     return {
         size: o.size, look: 'auto', paper: o.paper || 'A4',
         anchors: o.examples === 'sections' || o.examples === 'side' ? o.examples : 'off',
-        header: { name: h.name !== false, date: h.date !== false, score: quiz ? true : !!h.score, title: quiz && S.quiz.name ? S.quiz.name : true },
+        header: { name: h.name !== false, date: h.date !== false, score: quiz ? true : !!h.score, title: quiz ? ((S.quiz.name || '').trim() || autoQuizName(items())) : true },
         key: { on: true, placement: o.keyPlace === 'after-page' ? 'after-page' : 'end', style: o.keyStyle === 'short' ? 'short' : 'copy' },
         seed: (seed + version * 104729) >>> 0,
     };
@@ -165,6 +174,26 @@ function requests(p, list, quiz, version = 0) {
     const each = p.each || 'new';
     let n = 0;
     const base = () => common(S.seed + 7919 * (n++), quiz, version);
+    // Exact numbers (How much = problems in all / of each, a skill's own count, every quiz): every part holds the
+    // plan's counts. Single skill: each skill its own part with its count; Mixed practice: each page one part of
+    // its skills dealt by those counts (the Mixed practice role takes no item count yet, so these pages print the
+    // skills in groups); Sections already carry counts.
+    const exact = p.mode !== 'pages' || list.some((x) => x.count > 0);
+    if (exact && p.kind !== 'sections') {
+        if (p.kind === 'single') {
+            for (const it of list) {
+                const c = p.byKey[keyOf(it)] || 0;
+                if (c > 0) out.push({ req: Object.assign(base(), { role: 'independent', sections: [{ skills: [skillRef(it)], count: c }] }), copies: 1, keys: [keyOf(it)] });
+            }
+        } else {
+            for (const pg of p.pageItems) {
+                const c = {}; const order = [];
+                (pg || []).forEach((k) => { if (!c[k]) order.push(k); c[k] = (c[k] || 0) + 1; });
+                if (order.length) out.push({ req: Object.assign(base(), { role: 'independent', sections: [{ skills: order.map((k) => skillRef(byKey[k], c[k], true)), count: pg.length }] }), copies: 1, keys: order });
+            }
+        }
+        return out;
+    }
     if (p.kind === 'single') {
         const layout = S.opts.layout;
         for (const it of list) {
@@ -228,7 +257,7 @@ async function probeLayouts(it) {
 /* ================================================================= building */
 
 function sigOf(p, list, quiz) {
-    return JSON.stringify({ k: p.kind, pi: p.pageItems, pb: p.pagesBy, o: S.opts, seed: S.seed, quiz: quiz ? { v: S.quiz.versions, n: S.quiz.n, name: S.quiz.name } : null,
+    return JSON.stringify({ k: p.kind, pi: p.pageItems, pb: p.pagesBy, o: S.opts, seed: S.seed, quiz: quiz ? { v: S.quiz.versions, q: S.quiz, name: S.quiz.name } : null, cnt: list.map((x) => [x.count || 0, x.lockPct === undefined ? -1 : x.lockPct, x.weight]),
         skills: list.map((x) => [keyOf(x), x.opts || null, x.leftOut ? 0 : 1]) });
 }
 
@@ -319,20 +348,24 @@ function summary() {
     const active = list.filter((x) => !x.leftOut);
     const left = list.length - active.length ? ` · ${list.length - active.length} left out` : '';
     const shown = active.filter((x) => (b.byKey[keyOf(x)] || 0) > 0).length;
+    // the summary always gives all three numbers: pages · problems · (about) n of each (owner 2026-10-24)
+    const vals = active.map((x) => b.byKey[keyOf(x)] || 0).filter((c) => c > 0);
+    const eachN = vals.length ? (vals.every((c) => c === vals[0]) ? `${vals[0]} of each` : `about ${Math.round(b.total / vals.length)} of each`) : '';
+    const ofEach = eachN && active.length > 1 ? ` · ${eachN}` : '';
     const err = b.errors.length ? ` · ${b.errors.length} part${b.errors.length > 1 ? 's' : ''} could not be built` : '';
     if (isBig(list)) {
         const areas = byArea(active);
         const hit = areas.filter((a) => a.list.some((x) => b.byKey[keyOf(x)] > 0)).length;
         const cover = shown >= active.length ? 'every skill at least once' : `a sample of ${shown} of ${active.length} skills, New numbers re-deals the sample`;
-        return { line: `${pg} · ${b.total} ${noun} · ${hit === areas.length ? `${areas.length} area${areas.length > 1 ? 's' : ''}` : `${hit} of ${areas.length} areas`} · ${cover}${left}${pts}${ver}${err}`,
+        return { line: `${pg} · ${b.total} ${noun}${ofEach} · ${hit === areas.length ? `${areas.length} area${areas.length > 1 ? 's' : ''}` : `${hit} of ${areas.length} areas`} · ${cover}${left}${pts}${ver}${err}`,
             more: areas.map((a) => `${AREAS[a.area].short} ${a.list.reduce((t, x) => t + (b.byKey[keyOf(x)] || 0), 0)}`).join(', ') + ' · answer key at the end' };
     }
-    const names = list.map((x) => `${x.label} ${x.leftOut ? '(left out)' : b.byKey[keyOf(x)] || 0}`).join(', ');
+    const names = list.map((x) => `${x.label} ${x.leftOut ? '(left out)' : (b.byKey[keyOf(x)] || 0) + (x.count > 0 ? ' (count)' : x.lockPct !== undefined ? ' (held)' : '')}`).join(', ');
     const warn = p.warn.length ? ' · ' + p.warn.join(' ') : '';
     const each = quiz ? 'new' : p.each;
-    if (each === 'copy') return { line: `${b.pages} copies of the same page · ${b.total / Math.max(1, b.pages) | 0} ${noun} on each · ${b.total} in all · one key: “Key for all ${b.pages} copies”${left}`, more: names + ' · New numbers re-deals the page' };
-    if (each === 'same') return { line: `${pg} · the same ${noun} on each, new numbers · ${b.total} in all · answer key at the end${left}`, more: names + ' · New numbers re-deals every page' };
-    return { line: `${pg} · ${b.total} ${noun}${pts} · answer key at the end${left}${ver}${err}`,
+    if (each === 'copy') return { line: `${b.pages} copies of the same page · ${b.total / Math.max(1, b.pages) | 0} ${noun} on each · ${b.total} in all${ofEach} · one key: “Key for all ${b.pages} copies”${left}`, more: names + ' · New numbers re-deals the page' };
+    if (each === 'same') return { line: `${pg} · the same ${noun} on each, new numbers · ${b.total} in all${ofEach} · answer key at the end${left}`, more: names + ' · New numbers re-deals every page' };
+    return { line: `${pg} · ${b.total} ${noun}${ofEach}${pts} · answer key at the end${left}${ver}${err}`,
         more: names + (p.added === 'single' ? ` · pages raised to ${p.pages} so every skill keeps a page and the held % is met` : p.added ? ' · pages added so every skill comes up at least twice' : '') + warn };
 }
 function byArea(list) {
@@ -349,7 +382,7 @@ function byGrade(list) {
 /* ================================================================= markup helpers */
 
 const gradeName = (g) => (g === 'K' ? 'Kindergarten' : g === 'M' ? 'Mixed levels' : `Grade ${g}`);
-const gradeBadge = (g) => `<span class="tvs-grade" aria-label="${esc(gradeName(g))}">${esc(g === 'M' ? 'M' : g)}</span>`;
+const gradeBadge = (g) => `<span class="tvs-grade" data-grade="${esc(g)}" aria-label="${esc(gradeName(g))}">${esc(g === 'M' ? 'M' : g)}</span>`;
 function chip(it) {
     const a = AREAS[it.area] || AREAS.NOSTD;
     return `<span class="tvs-chip" data-domain="${esc(it.area)}">${gradeBadge(it.grade)}${areaIcon(it.area, 18)}<span class="tvs-chip-name">${esc(it.label)}</span><span class="tvs-chip-area">${esc(a.short)}</span></span>`;
@@ -479,14 +512,14 @@ function skillsHTML(list) {
 }
 /** Queued item 2: above 5 skills a list grouped area → grade (no chips); each row opens a popup preview. */
 function groupedListHTML(list) {
-    return `<div class="tvs-glist">${byArea(list).map((a) => `<div class="tvs-garea" data-domain="${esc(a.area)}"><p class="tvs-garea-name">${areaIcon(a.area, 18)}<span>${esc(AREAS[a.area].name)}</span><span class="tvs-muted">${a.list.length} skill${a.list.length > 1 ? 's' : ''}</span></p>${byGrade(a.list).map((g) => `<ul class="tvs-gg" aria-label="${esc(AREAS[a.area].short + ', ' + gradeName(g.grade))}">${g.list.map((x) => `<li><button type="button" class="tvs-grow" data-act="popup" data-v="${esc(keyOf(x))}">${gradeBadge(x.grade)}<span class="tvs-grow-name">${esc(x.label)}</span>${x.leftOut ? '<span class="tvs-muted">left out</span>' : ''}${icon('eye', 18)}</button></li>`).join('')}</ul>`).join('')}</div>`).join('')}</div>`;
+    return `<div class="tvs-glist">${byArea(list).map((a) => `<div class="tvs-garea" data-domain="${esc(a.area)}"><p class="tvs-garea-name">${areaIcon(a.area, 18)}<span>${esc(AREAS[a.area].name)}</span><span class="tvs-muted">${a.list.length} skill${a.list.length > 1 ? 's' : ''}</span></p>${byGrade(a.list).map((g) => `<p class="tvs-ghead">${gradeBadge(g.grade)}<span>${esc(gradeName(g.grade))}</span></p><ul class="tvs-gg" aria-label="${esc(AREAS[a.area].short + ', ' + gradeName(g.grade))}">${g.list.map((x) => `<li><button type="button" class="tvs-grow" data-act="popup" data-v="${esc(keyOf(x))}">${gradeBadge(x.grade)}<span class="tvs-grow-name">${esc(x.label)}</span>${x.leftOut ? '<span class="tvs-muted">left out</span>' : ''}${icon('eye', 18)}</button></li>`).join('')}</ul>`).join('')}</div>`).join('')}</div>`;
 }
 
 function optionsHTML() {
     const list = items();
     const quiz = S.sheet === 'quiz';
     let h = '';
-    if (quiz && (S.quiz.from !== 'skills' || !list.length)) h += buildFromHTML(list);
+    if (quiz) h += buildFromHTML(list);
     if (!list.length) {
         return h + (quiz ? '' : `<div class="tvs-empty"><p class="tvs-strong">Tick skills first</p><p class="tvs-muted">Tick one or more skills on Skills, then press Print.</p></div>`);
     }
@@ -499,17 +532,24 @@ function optionsHTML() {
     if (p.error) h += `<p class="tvs-warn" role="alert">${icon('info', 18)}<span>${esc(p.error)} Change the held amounts in the tray.</span></p>`;
     else if (p.warn.length) h += p.warn.map((w) => `<p class="tvs-warn">${icon('info', 18)}<span>${esc(w)}</span></p>`).join('');
 
-    // How many pages? / questions?
-    if (quiz) {
-        h += row('How many questions?', 'Shared by how often each skill comes up', `<div class="tvs-pages">${stepper('qn', S.quiz.n, 1, 60, 'Questions')}${seg('qn', S.quiz.n, [['5', '5'], ['10', '10'], ['20', '20']], 'Questions')}</div>`);
-    } else {
+    // How much? Pages · Problems in all · Problems of each skill
+    {
+        const q = quiz ? S.quiz : null;
+        const mode = quiz ? q.mode : (S.opts.mode || 'pages');
         const pg = p.pagesBy ? Math.max(1, Object.values(p.pagesBy).reduce((a, b) => a + b, 0)) : p.pages;
-        const sub = k === 'single' && list.length > 1 ? 'Shared by how often each skill comes up; starts at one page per skill' : isBig(list) ? `${p.total} problems; fewer pages take a sample of the skills` : 'The key follows';
-        h += row('How many pages?', sub, `<div class="tvs-pages">${stepper('pages', pg, 1, 30, 'Pages')}${seg('pages', pg, [['2', '2'], ['3', '3'], ['5', '5']], 'Pages')}</div>`);
+        const noun = quiz ? 'questions' : 'problems';
+        let ctl;
+        if (mode === 'pages') ctl = `${stepper('pages', quiz ? q.pages : pg, 1, 30, 'Pages')}${seg('pages', quiz ? q.pages : pg, [['2', '2'], ['3', '3'], ['5', '5']], 'Pages')}`;
+        else if (mode === 'total') ctl = `${stepper('ntotal', quiz ? q.n : S.opts.nTotal, 1, 300, noun + ' in all')}${seg('ntotal', quiz ? q.n : S.opts.nTotal, [['10', '10'], ['20', '20'], ['30', '30']], noun + ' in all')}`;
+        else ctl = `${stepper('neach', quiz ? q.nEach : S.opts.nEach, 1, 50, noun + ' of each skill')}${seg('neach', quiz ? q.nEach : S.opts.nEach, [['2', '2'], ['4', '4'], ['6', '6']], noun + ' of each skill')}`;
+        const sub = mode === 'pages' ? (k === 'single' && list.length > 1 ? 'Shared by how often each skill comes up; starts at one page per skill' : isBig(list) ? `${p.total} ${noun}; fewer pages take a sample of the skills` : 'The key follows')
+            : mode === 'total' ? `Pages = ${noun} ÷ ${p.perPage} a page; the last page holds the rest` : 'A skill with its own count keeps it';
+        h += row('How much?', sub, `${seg('mode', mode, [['pages', 'Pages'], ['total', quiz ? 'Questions in all' : 'Problems in all'], ['each', quiz ? 'Questions of each skill' : 'Problems of each skill']], 'How much')}<div class="tvs-pages">${ctl}</div>`);
     }
+    if (p.error && (p.needPages || p.needTotal)) h += `<div class="tvs-raise"><button type="button" class="tvs-btn" data-act="raise" data-v="${p.needPages ? 'p' + p.needPages : 't' + p.needTotal}">${p.needPages ? `Raise to ${p.needPages} pages` : `Raise to ${p.needTotal} problems`}</button></div>`;
     // How often
     if (list.length > 1 && !isBig(list)) {
-        h += row('How often does each skill come up?', 'Less · Equal · More = 1 : 2 : 3', `<div class="tvs-often">${list.map((x) => `<div class="tvs-often-row"><span class="tvs-often-name" data-domain="${esc(x.area)}">${gradeBadge(x.grade)}<span>${esc(x.label)}</span></span>${x.lockPct !== undefined ? `<span class="tvs-held">${Math.round(x.lockPct)} % ${icon('lock', 16)}</span>` : seg('often', levelOf(x, list), [['1', 'Less'], ['2', 'Equal'], ['3', 'More']], 'How often: ' + x.label, ` data-key="${esc(keyOf(x))}"`)}</div>`).join('')}</div>`);
+        h += row('How often does each skill come up?', 'Less · Equal · More = 1 : 2 : 3', `<div class="tvs-often">${list.map((x) => `<div class="tvs-often-row"><span class="tvs-often-name" data-domain="${esc(x.area)}">${gradeBadge(x.grade)}<span>${esc(x.label)}</span></span>${x.count > 0 || x.lockPct !== undefined ? heldHTML(x) : seg('often', levelOf(x, list), [['1', 'Less'], ['2', 'Equal'], ['3', 'More']], 'How often: ' + x.label, ` data-key="${esc(keyOf(x))}"`)}</div>`).join('')}</div>`);
     } else if (isBig(list)) {
         const pct = p.pct || {};
         h += row('How often does each area come up?', 'Set in the tray: one place for every skill’s How often', `<table class="tvs-areas"><tbody>${byArea(list.filter((x) => !x.leftOut)).map((a) => `<tr data-domain="${esc(a.area)}"><th scope="row">${areaIcon(a.area, 18)}<span>${esc(AREAS[a.area].short)}</span></th><td>${a.list.length} skill${a.list.length > 1 ? 's' : ''}</td><td>${Math.round(a.list.reduce((t, x) => t + (pct[keyOf(x)] || 0), 0))} %</td></tr>`).join('')}</tbody></table>${typeof window.tvOpenTray === 'function' ? '<button type="button" class="tvs-btn" data-act="tray">Fine-tune in the tray ▸</button>' : ''}`);
@@ -534,6 +574,13 @@ function optionsHTML() {
     }
     h += moreHTML();
     return h;
+}
+/** A skill held at an exact count ("6 🔒") or a % ("40 % 🔒"): changing it first asks "Release the 6?". */
+function heldHTML(x) {
+    const what = x.count > 0 ? String(x.count) : `${Math.round(x.lockPct)} %`;
+    const k = keyOf(x);
+    if (S.release === k) return `<span class="tvs-held" role="group" aria-label="Release ${esc(what)}?"><span>Release the ${esc(what)}?</span><button type="button" class="tvs-btn" data-act="release" data-v="${esc(k)}">Release</button><button type="button" class="tvs-btn" data-act="keep">Keep</button></span>`;
+    return `<button type="button" class="tvs-btn tvs-held-btn" data-act="askrelease" data-v="${esc(k)}" aria-label="${esc(what)}, held. Change it">${esc(what)} ${icon('lock', 16)}</button>`;
 }
 function moreHTML() {
     const o = S.opts, hd = o.header || {};
@@ -721,8 +768,9 @@ function shareHTML() {
 async function quizTest() {
     const list = items().filter((x) => !x.leftOut);
     const k = kindOf(list);
-    const pc = planCounts(list, S.quiz.n, { seed: S.seed });
-    if (pc.error) throw new Error(pc.error);
+    const pp = plan(items());
+    if (pp.error) throw new Error(pp.error);
+    const pc = { counts: list.map((x) => pp.byKey[keyOf(x)] || 0) };
     const bySkill = [];
     list.forEach((it, i) => {
         const qs = [], seen = new Set();
@@ -815,8 +863,14 @@ function onClick(e) {
     switch (b.dataset.act) {
         case 'close': close(); return;
         case 'kind': S.kind = v; touch('kind'); if (v !== 'single') S.opts.layout = 'standard'; changed(); return;
-        case 'pages': S.opts.pages = Math.max(1, Math.min(30, Number(v) || 1)); touch('pages'); changed(); return;
-        case 'qn': S.quiz.n = Math.max(1, Math.min(60, Number(v) || 10)); changed(); return;
+        case 'pages': { const n = Math.max(1, Math.min(30, Number(v) || 1)); if (S.sheet === 'quiz') S.quiz.pages = n; else { S.opts.pages = n; touch('pages'); } changed(); return; }
+        case 'ntotal': { const n = Math.max(1, Math.min(300, Number(v) || 1)); if (S.sheet === 'quiz') S.quiz.n = n; else S.opts.nTotal = n; changed(); return; }
+        case 'neach': { const n = Math.max(1, Math.min(50, Number(v) || 1)); if (S.sheet === 'quiz') S.quiz.nEach = n; else S.opts.nEach = n; changed(); return; }
+        case 'mode': if (S.sheet === 'quiz') S.quiz.mode = v; else S.opts.mode = v; changed(); return;
+        case 'raise': { const n = Number(v.slice(1)); if (v[0] === 'p') { if (S.sheet === 'quiz') { S.quiz.mode = 'pages'; S.quiz.pages = n; } else { S.opts.mode = 'pages'; S.opts.pages = n; touch('pages'); } } else if (S.sheet === 'quiz') S.quiz.n = n; else S.opts.nTotal = n; changed(); return; }
+        case 'askrelease': S.release = v; renderMain(); return;
+        case 'keep': S.release = null; renderMain(); return;
+        case 'release': { const it = currentSet().find((x) => `${x.categoryId}:${x.skillId}` === v); if (it) { delete it.count; delete it.lockPct; } S.release = null; window.skillQueue = [...currentSet()]; changed(); return; }
         case 'versions': S.quiz.versions = Math.max(1, Math.min(6, Number(v) || 1)); changed(); return;
         case 'points': S.quiz.points = Number(v) === 2 ? 2 : 1; changed(false); renderSide(); return;
         case 'often': { const key = b.closest('[data-key]').dataset.key; setLevel(key, Number(v)); changed(); return; }
