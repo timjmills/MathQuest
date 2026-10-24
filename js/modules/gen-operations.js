@@ -981,7 +981,7 @@ function _nr2Set(lo, hi, lenB, zero) {
 // opens at item 0 (generateQuestionFor), so the memory starts again there; a redrawn item
 // overwrites its own index, so a discarded duplicate is not counted.
 const _NR2_PAGE = new Map();
-const _NR2_WINDOW = 20, _NR2_MAX_MINUEND = 2, _NR2_MAX_ANSWER = 3;
+const _NR2_WINDOW = 20, _NR2_MAX_MINUEND = 2, _NR2_MAX_ANSWER = 3, _NR2_MAX_ONE = 2;
 function _nr2Pair(lo, hi, lenB, rng) {
     const plain = _nr2Set(lo, hi, lenB, false);
     const zeroSet = _nr2Set(lo, hi, lenB, true);
@@ -1001,11 +1001,25 @@ function _nr2Pair(lo, hi, lenB, rng) {
     // about 1 item in 10 is the zero case, chosen by the seeded rng (never by position: L10)
     const useZero = zeroSet.length > 0 && rng(0, 9) === 0;
     const pool = useZero ? zeroSet : plain;
+    // 2d − 1d (critic s3 r1 N1b): b = 1 is the trivial take-away. The uniform draw alone gives
+    // it 8 pairs in 36 (22 %), so a drawn 1 is kept only 1 time in 2 (about 11 %), never more than
+    // _NR2_MAX_ONE in a page's 20, and an item never repeats the previous item's minuend tens with
+    // a subtrahend within 1 of the previous one (76 − 5, 75 − 3 …).
+    let ones = 0, prev = null;
+    if (seen && lenB === 1) {
+        for (const [k, [m, d]] of seen) {
+            if (k >= at || k < at - (_NR2_WINDOW - 1)) continue;
+            if (m - d === 1) ones++;
+        }
+        const pv = seen.get(at - 1);
+        if (pv) prev = [pv[0], pv[0] - pv[1]];
+    }
     let pair = null;
-    for (let t = 0; t < 40; t++) {
-        let p = pool[rng(0, pool.length - 1)];
-        // 2d − 1d: b = 1 is the trivial take-away, so half of the 1s are drawn again
-        if (lenB === 1 && p[1] === 1 && rng(0, 1)) p = pool[rng(0, pool.length - 1)];
+    for (let t = 0; t < 60; t++) {
+        const p = pool[rng(0, pool.length - 1)];
+        if (lenB === 1 && p[1] === 1 && t < 50 && (ones >= _NR2_MAX_ONE || rng(0, 1))) continue;
+        if (prev && t < 50 && Math.floor(p[0] / 10) === Math.floor(prev[0] / 10)
+            && Math.abs(p[1] - prev[1]) <= 1) continue;
         pair = p;
         if (!mins) break;
         if ((mins.get(p[0]) || 0) < _NR2_MAX_MINUEND && (anss.get(p[0] - p[1]) || 0) < _NR2_MAX_ANSWER) break;
@@ -1030,8 +1044,8 @@ function _nr2Pair(lo, hi, lenB, rng) {
  * digit of b at most the digit above it, no column leaving 0, the minuend in the size's band. The
  * one zero case (a top 0 over a 0, 40 − 20) is about 1 item in 10 and is placed by the seeded rng,
  * never by the item's position (L10). On a page no minuend prints more than twice and no answer
- * more than three times in any 20 items. 2d − 1d deals b = 1 again half the time (about 1 item in
- * 9; critic r1 D8). The 2d − 1d preset (within 100, lengths 'shorter') runs its minuend over every
+ * more than three times in any 20 items. 2d − 1d keeps a drawn b = 1 half the time (about 1 item in
+ * 9, at most 2 in 20; critic r1 D8, s3 r1 N1b). The 2d − 1d preset (within 100, lengths 'shorter') runs its minuend over every
  * 2-digit number from 21 (D8).
  */
 function _subNoRegroupPair(maxVal, rng, { lengths = 'same', zeros = 'off' } = {}) {
