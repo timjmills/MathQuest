@@ -350,8 +350,21 @@ export function factRowsLayout(items, input) {
         : (bigFact && verticalFitPt(cols, n, ctx.look, (SIZES[ctx.size] || SIZES.L).digitPt, ctx.size)) || verticalPt(cols, n, ctx.look);
     if (pt < factDigitPt(cols)) note = [note, `Digits ${pt} pt so ${n}-digit facts fit ${cols} columns.`].filter(Boolean).join(' ');
     const cap = factRowsCapacity(cols, ctx.size, ctx.paper, header);
-    const rows = cap.rows;
-    return { across: false, cols, rows, perPage: cols * rows, cellH: Math.min(G / rows, cap.cellH * 1.3), hMin: cap.cellH, digitPt: pt, tracks: n, gridH: G, labels, note };
+    // The row height holds the WHOLE fact (critic s3-stack r1, lead item 6: VA-70's S heights left
+    // the answer row out, so at S 10 x 9 the last row had no writing room and the key's answers
+    // printed under the grid): the number tab's keep-out (tab + 1 mm, CL-40), the two operand rows
+    // (1.15 em each), the rule (1 mm gap + 1 mm), the answer row - 1.15 em, at least the size's
+    // writing height - and the 2 mm bottom pad, as the page measures them (S 28.5, M 39.2, L 45.1
+    // mm content). The row count is chosen from that height.
+    const dMm = EM_MM[pt] || (pt / 72) * 25.4;
+    const sz = SIZES[ctx.size] || SIZES.L;
+    const padTop = Math.max(factPadTop(labels, cols), sz.tabMm + 1);
+    // (L keeps PT 4.1's 5 x 5: its 45.2 mm need fits 5 rows of 45.4 mm; the 0.4 mm grid rule leaves
+    // a 45.0 mm box, so a 2-digit key answer reaches 0.1-0.2 mm into the 2 mm bottom pad there)
+    const need = padTop + 2.3 * dMm + 2.1 + Math.max(1.15 * dMm, sz.writeMm) + 2;
+    const hMin = Math.max(cap.cellH, Math.ceil(need * 10) / 10);
+    const rows = Math.max(1, Math.floor((G - SAFETY_H_MM) / hMin));
+    return { across: false, cols, rows, perPage: cols * rows, cellH: Math.min(G / rows, hMin * 1.3), hMin, digitPt: pt, tracks: n, gridH: G, labels, note };
 }
 
 
