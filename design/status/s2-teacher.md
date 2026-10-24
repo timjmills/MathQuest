@@ -12,3 +12,72 @@ Owner pre-approved the build (STATUS 2026-10-23 22:15). Light only on the teache
 |---|---|---|---|
 | 2026-10-24 | Lane opened; merged T1 mock-up (e4b8da2d) | lane lead | — |
 | 2026-10-24 | Step 1: fix round r6 (critic-r6 items 1–6) | mq-opus-low | running |
+| 2026-10-24 | Owner ruling via lead: no 8/10 gate and no critic loop for the teacher site. Step 1 = r6 fixes then the build brief (no further mock-up critic). Each build stage = ONE independent check (mq-opus-medium; findings, not scores: bugs, broken flows, step counts over plan, layout at 1366/390, regressions); clear bugs fixed in the stage; automatic gates must pass; push + report each stage | lead | — |
+
+## Build brief (Teacher site 2.0, T2–T6)
+
+The mock-up `design/mockups/teacher-2/` is the signed spec: its screens, words, counts and checks are SETTLED. Builders copy
+its decisions, not re-decide them. The README there lists each round's decisions; the summary:
+
+**Settled**
+- Four places: **Skills** (opens here) · **Lessons** · **Classes** · profile menu (Settings, Switch to pupil view, Teacher
+  help). Below 820 px a labelled bottom bar (icon + word, ≥ 44 px) with the tray bar directly above it; sheets open full
+  screen; one column, the preview never first.
+- Board C (Awsaj style): warm stone page `#EFECE8`, white cards, ink side menu; bold colour = maths area ONLY (eight areas
+  + dashed slate for No standard / Mixed / Words); the action is bold ink, one rank-1 fill per screen; grade = a neutral
+  numbered ink circle in a fixed first slot (never colour), said once on a one-grade header; area word + icon on every
+  chip and card (or a stack legend); selected = fill + ✓ + ring with a gap token. **Light only** on the teacher site
+  (no dark tokens used; the pupil app keeps dark mode). Tokens from `tokens.css` (type 12·14·16·20·28·36, weights
+  500·700, spacing 4·8·16·24·32·48, radii 8/16, 2 shadows, controls ≥ 44 px); `ws-teacher-tokens` is the gate.
+- Skills: one big search through `skill-finder.js` (never label-only); Browse by Maths area · White Rose step · Standard
+  (covered / not yet) · MAP strand · My sets; Grade chips; Big 3 / Medium 4 / Small 5 thumbnails or List, 60 per page,
+  filtered by grade; tick → tray; Add whole grade / Add whole area / Add all N (standard) with Undo.
+- Thumbnails show the skill's REAL item, drawn by the app (`buildSheet` at the card seed), cropped to the drawn content
+  box, scaled no lower than Big 12 / Medium 11 / Small 9 px; no strand-tab box (HD-5a); number tabs only (CL-11a). Cache
+  drawn cells per skill + seed (page weight noted by r6: first screen 7.4 s).
+- Tray: fixed at the bottom of Skills, always visible (empty → Quiz opens "Build from", Print/Share greyed "Tick skills
+  first"); ≤ 8 skills one row of chips (never "+N more" alone), > 8 one summary bar "Grade 3 · 64 skills · 6 areas ▸" with
+  one segment per area (+N beside the named one); height ≤ 96 px ≥ 1100 px, ≤ 120 px below, ≤ 15 % of the screen at
+  1–563 skills. Popup `#tray` = area → grade → skill, List (default) · Chips · Thumbnails; search; select + bulk bar (How
+  often, Set weight, Options…, Remove); How often per area / grade / whole grade; Detailed weights (0–10, share, ≈ n, %
+  lock, split evenly / keep proportions, > 100 % refused; a held item shows "40 % 🔒", never "Equal", and asks before
+  release); counts by largest remainder area → grade → skill; Clear tray with Undo. Three buttons **Print · Quiz ·
+  Share**. The tray saves itself (`mq_teacher_sets`) and appears under My sets.
+- Worksheet sheet: three kinds **Single skill · Sections · Mixed practice**, each showing only its options (§2.5 table);
+  defaults per §2.5; Each page: New problems · Same problems, new numbers · Same page again (one key "Key for all N
+  copies"); one-line summary = preview counts (`plan().perPage`); small preview of page 1 (or 1–3 when they differ);
+  Print = the PDF via `buildSheet` + `sheetDocument`; New numbers re-deals; More options (prerequisites, header fields,
+  key placement, number line, columns); a big tray samples and says so; Single skill + lock raises pages or warns; kept
+  settings across close/open.
+- Quiz: the same sheet with scoring, Build from (skills / CCSS / EE / WRM unit or step / lesson), How many questions,
+  versions 1–6 (own order and key, no letters), Save (`saveTest`) and Share with pupils (`compressTestForURL` → `?quiz=`).
+- Share: code + link at once, **Copy** primary, **Show on the board** secondary; mode, timer, count, lock in More options;
+  whole-grade code is a PROPOSAL until `skill-codes.js` decodes it (append-only; `ws-code-snapshot` count may only rise).
+- Lessons: the 2026-10-17 layout (Grade → area → lessons in order → side panel), opens where the teacher was last with
+  "Next"; search by name or code; Print lesson (primary) · Print practice · Share practice · Practise pre-skills; Skills
+  to be made folded into lessons and areas, collapsed.
+- Classes: tabs Board · Quizzes (results on this device, said so) · MAP tests · Progress; each in ≤ 2 actions.
+
+**Queued design list (owner, folded into this build)**
+1. Multi-lesson practice sets (§2.4): tick skills per lesson → **Add to tray** as a group named after the lesson, **Next
+   lesson** arrow; Print offers one worksheet per lesson (own pages + key) / one for all (Mixed or a section per lesson) /
+   both; **Print all** = one PDF in lesson order, only the added lessons and ticked skills; Save as set keeps groups;
+   Share = one short code.
+2. Print and Share sheets: above 5 skills a **list** grouped area → grade (no chips), each row opening a popup preview.
+3. A chip tap opens that skill's **options sheet, led by a live preview** that updates as options change; hover on desktop
+   shows a quick preview.
+4. Light only (done by the mock-up; keep).
+
+**Stages** (each its own commit, one independent check, gates green on the branch merged with
+`origin/claude/sweet-newton-c8wrv1`; builders on mq-opus-medium for each new screen):
+- **T2** Shell + tokens: four places, profile menu, bottom bar < 820 px, light tokens, `areaOf()` (`teacher-areas.js`),
+  `css/teacher-*.css`; old screens reachable.
+- **T3** Skills gallery + Browse by + tray + popup + chip options sheet + worksheet sheet + Quiz + Share (+ queued 2, 3).
+- **T4** Lessons (+ queued 1: multi-lesson sets).
+- **T5** Classes.
+- **T6** Redirects / aliases (`?code=`, `?c=`, `?quiz=`, `#wrm/…`, `#map/…`, `#todo/…`, `mq_teacher_screen`,
+  `mq_teacher_sets`, `tvGo`, `tvOpenPrintWith`, `?board=1`), retire old entry points; teacher gates.
+- Acceptance: the §2.6 flows, counted in actions, at 1366 and 390 (the mock-up's `flows.js` rows are the list).
+- Not owned (report to the lead if needed): `sheet/*` (e.g. `roles/test.js` Quiz layer, new anchors modes `top`/`first`),
+  `print-sheet.js`, generators, `tests/scripts/*` (so new teacher gates such as `ws-teacher-flows` are proposed to the
+  lead; lane checks live in `design/mockups/teacher-2/` meanwhile).
