@@ -356,17 +356,13 @@ Signed: (not yet signed)
 
 Listed from the repo at generation. The decisions are signed in §7a; `--check-signed` re-derives this listing from the repo and FAILS on any line without a decision (`[UNDECIDED]`). Not part of the signed card.
 
-**Option values (offeredOptionsFor)** (55 lines; 0 undecided)
+**Option values (offeredOptionsFor)** (49 lines; 4 undecided)
 
-- `notation=stacked` How it is written, default (sub_100_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `notation=across` How it is written (sub_100_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `band=10` Numbers to (all 6) [hidden, PROPOSED]
-- `band=20` Numbers to (all 6) [hidden, PROPOSED]
-- `band=50` Numbers to, default on sub_50_no_regroup (all 6) [hidden, PROPOSED]
-- `band=100` Numbers to, default on sub_100_no_regroup (sub_100_no_regroup, sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) [hidden, PROPOSED]
 - `level=3` Support level (all 6) [offered, PROPOSED]
-- `level=2` Support level (all 6) [hidden, PROPOSED]
 - `level=1` Support level, default (all 6) [offered, PROPOSED]
+- `level=0` Support level (all 6) [offered, PROPOSED]
+- `lengths=same` Number lengths [difficulty], default (sub_100_no_regroup, sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) [UNDECIDED]
+- `lengths=shorter` Number lengths [difficulty] (sub_100_no_regroup, sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) [UNDECIDED]
 - `nlOn=true` Show the number line [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
 - `nlOn=false` Show the number line [nline], default (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
 - `nlFrom=*` Starts at [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
@@ -409,30 +405,28 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 - `calculator=true` Calculator [play] (all 6) [out of scope, PROPOSED]
 - `calculator=false` Calculator [play], default (all 6) [out of scope, PROPOSED]
 - `skipAfter=*` Skip appears after [play] (all 6) [out of scope, PROPOSED]
-- `band=1000` Numbers to, default on sub_1k_no_regroup (sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) [hidden, PROPOSED]
-- `band=10000` Numbers to, default on sub_10k_no_regroup (sub_100k_no_regroup, sub_10k_no_regroup, sub_1m_no_regroup) [hidden, PROPOSED]
-- `band=100000` Numbers to, default on sub_100k_no_regroup (sub_100k_no_regroup, sub_1m_no_regroup) [hidden, PROPOSED]
-- `band=1000000` Numbers to, default (sub_1m_no_regroup) [hidden, PROPOSED]
+- `zeros=off` Zeros [difficulty], default (sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) [UNDECIDED]
+- `zeros=on` Zeros [difficulty] (sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) [UNDECIDED]
 
 **Page roles (buildSheet)** (17 lines; 0 undecided)
 
 - `role:independent` — the skill's own items (all 6) [offered, PROPOSED]
 - `role:more-practice` — the skill's own items (all 6) [offered, PROPOSED]
 - `role:opener` (also lesson-opener) — the skill's own items (all 6) [offered, PROPOSED]
-- `role:scripted-model` (also model) — provider workedSteps: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) (all 6) [offered, PROPOSED]
-- `role:guided` — provider workedSteps: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) (all 6) [offered, PROPOSED]
-- `role:error-analysis` (also check-it) — provider wrongAnswer: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup); provider misconceptions: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) (all 6) [offered, PROPOSED]
+- `role:scripted-model` (also model) — provider workedSteps: real 6/6 (all 6) [offered, PROPOSED]
+- `role:guided` — provider workedSteps: real 6/6 (all 6) [offered, PROPOSED]
+- `role:error-analysis` (also check-it) — provider wrongAnswer: real 6/6; provider misconceptions: real 6/6 (all 6) [offered, PROPOSED]
 - `role:review` — earlier skills: data.js order (print-sheet.js earlierSkills) (all 6) [offered, PROPOSED]
 - `role:test` (also test-a, test-b) — the skill's own items (all 6) [offered, PROPOSED]
 - `role:pre-skill-check` (also pre-skill) — earlier skills: data.js order (print-sheet.js earlierSkills) (all 6) [offered, PROPOSED]
-- `role:word-problems` — provider stories: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) (all 6) [offered, PROPOSED]
-- `role:fact-rows` — provider stories: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) (all 6) [offered, PROPOSED]
+- `role:word-problems` — provider stories: real 6/6 (all 6) [offered, PROPOSED]
+- `role:fact-rows` — provider stories: real 6/6 (all 6) [offered, PROPOSED]
 - `role:fact-probe` — the skill's own items (all 6) [offered, PROPOSED]
-- `role:mixed-practice` (also mixed) — provider stories: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) (all 6) [offered, PROPOSED]
-- `role:true-false` — provider wrongAnswer: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) (all 6) [offered, PROPOSED]
-- `role:reason-it` (also reason) — provider workedSteps: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup); provider wrongAnswer: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) (all 6) [offered, PROPOSED]
+- `role:mixed-practice` (also mixed) — provider stories: real 6/6 (all 6) [offered, PROPOSED]
+- `role:true-false` — provider wrongAnswer: real 6/6 (all 6) [offered, PROPOSED]
+- `role:reason-it` (also reason) — provider workedSteps: real 6/6; provider wrongAnswer: real 6/6 (all 6) [offered, PROPOSED]
 - `role:stretch` — the skill's own items (all 6) [offered, PROPOSED]
-- `role:lesson` — lesson data: prereqs.js 0/6 (FALLBACK, warm-up from the earlier skills in data.js order, on sub_100_no_regroup, sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup, sub_50_no_regroup) (all 6) [offered, PROPOSED]
+- `role:lesson` — lesson data: prereqs.js 6/6 (all 6) [offered, PROPOSED]
 
 **Screen hosts** (8 lines; 0 undecided)
 
@@ -447,9 +441,9 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 
 **Options declared today** (`js/modules/skill-options.js`; id, label, values, skills that declare it):
 
-- `band` Numbers to: 10 / 20 / 50 / 100 (6)
-- `level` Support level: 3 / 2 / 1 (6)
-- `notation` How it is written: stacked / across (2)
+- `level` Support level: 3 / 1 / 0 (6)
+- `lengths` Number lengths: same / shorter (5)
+- `zeros` Zeros: off / on (4)
 
-**Preset skills on these hosts** (`js/modules/skill-presets.js`): (none)
+**Preset skills on these hosts** (`js/modules/skill-presets.js`): `subtraction:sub_2d_1d` → `subtraction:sub_100_no_regroup` {"lengths":"shorter"}
 <!-- /informational -->
