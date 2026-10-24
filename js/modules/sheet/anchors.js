@@ -24,6 +24,7 @@
 // Pure module (SCC-01): no window, no DOM, no Math.random, no app import.
 
 import { esc, getProvider, hasCell, getCell, resolveCtx, SIZES } from './index.js';
+import { FRAME_MM, cellBorderMm } from './layout.js';
 
 export const ANCHOR_MODES = Object.freeze(['off', 'side', 'sections']);
 
@@ -253,12 +254,16 @@ export function anchorHtml(it, c, { variant = 'band', twinCols = 2, level = 3, g
         }
         // (the whole-trace fallback, S5: its answer traced grey - a template that ignores the
         // trace ink keeps its answer slot, and the slot takes the grey: INK-3's trace rule)
-        if (greyNewest && whole && !/data-ws-ink="trace"/.test(one)) one = one.replace(/ data-ws-aslot="answer"(?![^>]*data-ws-ink)/g, ' data-ws-aslot="answer" data-ws-ink="trace"');
+        // (S3 task 6, E10: every writing place the example fills - a sort's bins, a table's cells -
+        // not only one named "answer": the pupil writes all of them, so all are the newest marks)
+        if (greyNewest && whole && !/data-ws-ink="trace"/.test(one)) one = one.replace(/ data-ws-aslot="([^"]*)"(?![^>]*data-ws-ink)/g, ' data-ws-aslot="$1" data-ws-ink="trace"');
         const st = `<div class="mq-anchor-cell ws-${size}">${one}</div>`;
         // The steps keep a readable column (BESIDE_MIN_MM): beside a state too wide to leave it,
         // they wrap UNDER the state and the cell grows (DN-10; lead pilot E2: a list squeezed to
         // no width beside a wide bar graph ran its lines out of the cell).
-        const list = stepsList(steps, steps.map((_, i) => i), ` style="flex:1 1 ${BESIDE_MIN_MM}mm"`);
+        // (the min-width as well: a shrink-to-fit twin sums its items' max-content widths, and a list
+        // whose lines are narrower than its basis wrapped under the state 0.6 mm short - S3 rebuild)
+        const list = stepsList(steps, steps.map((_, i) => i), ` style="flex:1 1 ${BESIDE_MIN_MM}mm;min-width:${BESIDE_MIN_MM}mm"`);
         // The state and its numbered steps side by side (the twin keeps its height close to the
         // pupil's problem beside it); the Say line closes it.
         const body = `<div class="mq-anchor-one mq-anchor-beside" style="flex-wrap:wrap">${st}${list}</div>`;
@@ -270,7 +275,7 @@ export function anchorHtml(it, c, { variant = 'band', twinCols = 2, level = 3, g
     const n = groups.length;
     const size = stateSize(c.size, n);
     const states = groups.map((g, k) => `<div class="mq-anchor-state">`
-        + `<div class="mq-anchor-cell ws-${size}">${stateHtml(it, merged, k, c, twinCols, false, size)}</div>`
+        + `<div class="mq-anchor-cell ws-${size}">${stateHtml(it, merged, k, c, twinCols, false, size, level)}</div>`
         + `${stepsList(steps, g.steps)}</div>`).join('');
     return `<div class="mq-anchor mq-anchor-band" data-ws-anchor="band" data-ws-states="${n}">`
         + `<div class="mq-anchor-states" style="grid-template-columns:repeat(${n},minmax(0,1fr))">${states}</div>${sayHtml}</div>`;
@@ -294,7 +299,9 @@ export function anchorItem(it, { variant = 'band', twinCols = 2, level = 3, grey
         // A twin clears the Model tab with the Guided model cell's top pad; a band keeps its
         // height for the problems and moves its first state right of the tab instead.
         cellCls: `mq-anchorcell mq-anchor-${variant}cell${variant === 'side' ? ' mq-modelcell' : ''}`,
-        footprint: { wMm: variant === 'side' ? 88 : 180, hMm: null, measure: true, maxCols: variant === 'side' ? 2 : 1 },
+        // (a side twin's width is not an equal half column: print-sheet measureSide2 sizes the pupil's
+        // column to its problem and gives the twin the rest - S3 task 1)
+        footprint: { wMm: variant === 'side' ? null : 180, hMm: null, measure: true, maxCols: variant === 'side' ? 2 : 1 },
         fclass: variant === 'side' ? 'standard' : 'wide',
         measureLevel: 3,
         section: it.section,
@@ -350,6 +357,11 @@ export function anchorHeightMm(a, cols = 1) {
  */
 export function sideFit(L, items) {
     const twins = (items || []).filter((it) => it && it.anchor);
+    // The rows of `need` mm a grid of G mm holds: its outer frame and the rules between its rows
+    // take their share (S3: a row planned at G / rows was its pitch, not its height - a twin's Say
+    // line ran 0.3-0.6 mm into the 2 mm pad, E11).
+    const RULE = Math.max(cellBorderMm('daily'), cellBorderMm('ican'));
+    const fitRows = (g, need) => Math.max(1, Math.floor((g - 2 * FRAME_MM + RULE) / (need + RULE)));
     if (!L || (L.cols !== 1 && L.cols !== 2) || !twins.length) return L;
     const G = Number(L.gridH) > 0 ? Number(L.gridH) : L.rows * L.cellH;
     const tw = Math.max(0, ...twins.map((a) => anchorHeightMm(a, L.cols)));
@@ -361,21 +373,30 @@ export function sideFit(L, items) {
         // least as many pairs as two columns would. Each cell is still drawn at the two-column
         // width (`drawCols`), so nothing shrinks (DN-10).
         const need4 = Math.max(...twins.map((a) => a.pair4Mm));
-        const need2 = Math.max(...twins.map((a) => Number(a.pair2Mm) || 0), hs.length ? pr : 0, tw);
-        const rows = Math.max(1, Math.floor((G + 0.3) / need4));
-        if (2 * rows >= Math.max(1, Math.floor(G / need2))) {
+        // (two columns as they would print: the content-sized pair, `pairMm`, when it is measured)
+        const need2 = Math.max(...twins.map((a) => Number(a.cols2 ? a.pairMm : a.pair2Mm) || 0), hs.length ? pr : 0, tw);
+        // (no tolerance: a row shorter than its pair ran the twin's Say line into the 2 mm pad, E11)
+        const rows = fitRows(G, need4);
+        if (2 * rows >= fitRows(G, need2)) {
             return Object.assign({}, L, { cols: 4, drawCols: 2, side4: true, colsTpl4: twins[0].cols4, rows, perPage: rows * 4, cellW: Math.round((L.cellW || 93) / 2 * 10) / 10, cellH: Math.floor((G / rows) * 1000) / 1000 });
         }
     }
     if (L.cols === 2) {
+        // S3 task 1: the pair's columns are sized to their content (print-sheet measureSide2: the
+        // pupil's column is its widest problem + its pads + the label box, the twin takes the
+        // rest), and the rows to the pairs' heights MEASURED in those columns (`pairMm`).
+        const tpl2 = twins.every((a) => a.cols2) ? twins[0].cols2 : '';
+        const T = tpl2 ? { colsTpl2: tpl2 } : {};
         // (L.hMin holds the twins at an equal half column; with the problems known, they decide)
         const need = Math.max(hs.length ? pr : Number(L.hMin) || 0, tw);
         // The densest rows that hold every pair: fewer when a twin is taller than its row, more
         // when the practice ceiling left rows a third empty (E4, L-class wasted space).
-        const fit = Math.max(1, Math.floor(G / need));
-        const rows = need > L.cellH + 0.05 ? Math.min(L.rows, fit) : twins.every((a) => Number.isFinite(a.pairMm)) && hs.length ? fit : L.rows;
-        if (rows === L.rows) return L;
-        return Object.assign({}, L, { rows, perPage: rows * 2, cellH: Math.floor((G / rows) * 1000) / 1000 });
+        const fit = fitRows(G, need);
+        // (pairs measured as they print - `pairMm` holds the problem beside the twin too - decide the
+        // rows before the problems are dealt as well: the page's capacity on Auto, S3)
+        const rows = need > L.cellH + 0.05 ? Math.min(L.rows, fit) : twins.every((a) => Number.isFinite(a.pairMm) && a.pairMm > 0) ? fit : L.rows;
+        if (rows === L.rows) return Object.assign({}, L, T);
+        return Object.assign({}, L, T, { rows, perPage: rows * 2, cellH: Math.floor((G / rows) * 1000) / 1000 });
     }
     // (A one-row layout made a PAIR of rows keeps a cell too tall for two: rows x cellH ran past
     // the page - critic anchors-r1, a 456 mm grid. Those rows are re-planned from the grid.)
@@ -399,6 +420,11 @@ export const side4Cols = (problemMm) => `auto minmax(${problemMm}mm,auto) auto m
 /** A two-column side pair with an empty band this wide (H13's 30 %) beside a cell's content fills
  *  under about half of its row: it is a candidate for the four-column grid (print-sheet measureSide4). */
 export const SIDE4_BAND = 0.30;
+
+/** Owner ruling (2026-10-24): these skills' worked examples print in a band ABOVE the problems on
+ *  a side-anchor page, never beside them (print-sheet buildSheetCore; anchors.check E14). Any other
+ *  skill whose pair fills under half its row and does not stand four abreast does the same. */
+export const SIDE_BAND_ONLY = Object.freeze(['fractions:shade_fraction', 'measurement:money_count', 'placevalue:place_value_10x']);
 
 /* ============================================================ easy numbers first */
 
@@ -455,9 +481,10 @@ export const pupilCount = (items) => items.filter((it) => !it.anchor).length;
  * @param {number} o.bodyMm      the height the section may use on a page, instruction included
  * @param {number} o.instrMm     the instruction line (PG-22: repeated on every page)
  * @param {number} o.anchorMm    the anchor band's measured height
+ * @param {number} [o.count]     the section's problem count (default 6): a lone block takes them all
  * @returns {{blockRows, perBlock, blocksPerPage, cellH, perPage, blockMm}}
  */
-export function blockPlan({ cols, hMin, cellH, bodyMm, instrMm, anchorMm }) {
+export function blockPlan({ cols, hMin, cellH, bodyMm, instrMm, anchorMm, count = 6 }) {
     const c = Math.max(1, cols || 1);
     const want = c >= 3 ? 1 : c === 2 ? 2 : 3;          // 3-4 problems a block (PT: owner ruling S6)
     const avail = Math.max(1, bodyMm - instrMm - 1);
@@ -466,10 +493,13 @@ export function blockPlan({ cols, hMin, cellH, bodyMm, instrMm, anchorMm }) {
     while (blockRows > 1 && anchorMm + blockRows * h > avail) blockRows--;
     const blocksPerPage = Math.max(1, Math.floor(avail / (anchorMm + blockRows * h)));
     // A page that holds ONE block and a lot of empty paper (tall problems) gives the block the
-    // rows that fit, up to 6 problems, rather than printing a half-empty page (PT-ENG-3).
+    // rows that fit, rather than printing a half-empty page (PT-ENG-3). S6 one-block rule (S3
+    // task 2): rows = min(what fits, ceil(n / cols)) - the lone block holds the section's n
+    // problems when they fit (critic anchors-r2: 1 row of 4 at S, and 2 of 6 spilled overleaf).
     if (blocksPerPage === 1) {
         const more = Math.floor((avail - anchorMm) / h);
-        while (blockRows < more && (blockRows + 1) * c <= Math.max(6, want * c)) blockRows++;
+        const n = Math.max(1, Math.floor(Number(count) || 6), want * c);
+        blockRows = Math.max(blockRows, Math.min(more, Math.ceil(n / c)));
     }
     const fill = (avail - blocksPerPage * anchorMm) / (blocksPerPage * blockRows);
     const ch = Math.max(h, Math.min(fill, Math.max(cellH || h, h)));
@@ -532,6 +562,7 @@ export const ANCHOR_CSS = `
 :is(.ws-page,.ws-sheet) .mq-anchor{width:100%;display:flex;flex-direction:column;gap:1mm;text-align:left}
 :is(.ws-page,.ws-sheet) .mq-anchor-band .mq-anchor-state:first-child .mq-anchor-cell{padding-left:13mm}
 :is(.ws-page,.ws-sheet) .ws-cell:is(.mq-anchor-bandcell,.mq-anchor-compactcell){padding-top:2mm;padding-bottom:2mm}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-anchor-sidecell{padding-bottom:2mm}
 :is(.ws-page,.ws-sheet) .mq-anchor-compact .mq-anchor-cell{padding-left:13mm}
 :is(.ws-page,.ws-sheet) .mq-anchor-states{display:grid;column-gap:0;width:100%}
 :is(.ws-page,.ws-sheet) .mq-anchor-state{display:flex;flex-direction:column;align-items:stretch;gap:1.5mm;padding:0 2.5mm;min-width:0}
@@ -553,5 +584,5 @@ export const ANCHOR_CSS = `
 export default {
     ANCHOR_MODES, ANCHOR_ROLES, normaliseAnchors, wordCount, workedStepsOf, anchorEligible, ineligibleNote,
     stepLines, anchorGroups, sayLineOf, stepTemplateOf, unslot, stateSize, anchorHtml, anchorItem,
-    anchorPlanItem, anchorHeightMm, sideFit, SIDE_COLS, side4Cols, SIDE4_BAND, ANCHOR_PAGE_CSS, easeScore, pickDistinct, sideItems, pupilCount, blockPlan, blockPages, ANCHOR_CSS,
+    anchorPlanItem, anchorHeightMm, sideFit, SIDE_COLS, side4Cols, SIDE4_BAND, SIDE_BAND_ONLY, ANCHOR_PAGE_CSS, easeScore, pickDistinct, sideItems, pupilCount, blockPlan, blockPages, ANCHOR_CSS,
 };

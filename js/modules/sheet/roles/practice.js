@@ -664,7 +664,7 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
             if (itemsBySection[si].some((it) => it.anchor)) return sideFit(L, itemsBySection[si]);
         }
         if (!aMm) return L;
-        const bp = blockPlan({ cols: L.cols, hMin: L.hMin, cellH: L.cellH, bodyMm: sec.gridH ? sec.gridH + instr : body, instrMm: instr, anchorMm: aMm });
+        const bp = blockPlan({ cols: L.cols, hMin: L.hMin, cellH: L.cellH, bodyMm: sec.gridH ? sec.gridH + instr : body, instrMm: instr, anchorMm: aMm, count: itemsBySection[si].length });
         return Object.assign({}, L, { cellH: bp.cellH, perPage: bp.perPage, rows: bp.blocksPerPage * bp.blockRows, blocks: bp, anchorMm: aMm });
     });
     // Wave 5.2 (critic nl-r4 D1 / D2): with the number-line band, a split section's two parts
@@ -958,7 +958,8 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 rowsTpl: shape ? shape.rowsTpl : L.pairMm && L.pairs ? Array.from({ length: part.chunk.rows }, (_, r) => `${L.pairMm[r % 2]}fr`).join(' ') : '',
                 // SIDE BY SIDE (two columns): each column as wide as what it holds, the spare
                 // width shared, so a narrow stack is not an island in a half-page cell (H13).
-                ...(L.cols === 2 && its.some((it) => it.anchor) ? { colsTpl: SIDE_COLS } : {}),
+                // (S3 task 1: the content-sized pair columns, anchors.js sideFit `colsTpl2`)
+                ...(L.cols === 2 && its.some((it) => it.anchor) ? { colsTpl: L.colsTpl2 || SIDE_COLS } : {}),
                 // (owner ruling A: the four-column side grid, [twin | problem | twin | problem])
                 ...(L.side4 && its.some((it) => it.anchor) ? { colsTpl: L.colsTpl4 } : {}),
                 rowGap: gap.gap || 0,
