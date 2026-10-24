@@ -60,7 +60,7 @@ body.teacher-mode {
 
   /* board C: eight maths areas x four strengths (+ the text colour on bold), and slate */
   --cc-tint: #F6EFEB; --cc-soft: #EDDEE2; --cc-bold: #CEA4C5; --cc-on: #1A1614; --cc-deep: #5B4857;
-  --oa-tint: #EAE7EA; --oa-soft: #C8C6E0; --oa-bold: #5155BC; --oa-on: #FBF7EF; --oa-deep: #3D408D;
+  --oa-tint: #EDEED7; --oa-soft: #D2DCA7; --oa-bold: #729C00; --oa-on: #1A1614; --oa-deep: #3F5600; /* owner 2026-10-24: olive green, clear of the indigo primary */
   --nbt-tint: #F9F3E2; --nbt-soft: #F5EBC7; --nbt-bold: #E7CF69; --nbt-on: #1A1614; --nbt-deep: #554D27;
   --nf-tint: #EFE6E3; --nf-soft: #D8C5CA; --nf-bold: #865273; --nf-on: #FBF7EF; --nf-deep: #653E56;
   --meas-tint: #F3F3E8; --meas-soft: #E2EBDA; --meas-bold: #A9CFAA; --meas-on: #1A1614; --meas-deep: #425142;

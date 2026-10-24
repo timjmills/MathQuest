@@ -116,7 +116,7 @@ function ramp(b) { const dTint = darkTint(b); return { tint: mix(b, CREAM, 0.10)
 // (design/mockups/teacher-2/palette/board-c-search.py). [key, css prefix, name, tint, soft, bold, deep, dark light version, dark tint]
 const PLAN = [
   ['CC', 'cc', 'Counting & cardinality (mauve)', '#F6EFEB', '#EDDEE2', '#CEA4C5', '#5B4857', '#E4CEDA', '#31292D'],
-  ['OA', 'oa', 'Operations & algebraic thinking (mid indigo; fix round 2 lifted it from ink-indigo #2E2B71, which read as ink; fix round 3 moved #555BAE 3.1 to widen OA–NF from 20.6)', '#EAE7EA', '#C8C6E0', '#5155BC', '#3D408D', '#ABABD7', '#21223D'],
+  ['OA', 'oa', 'Operations & algebraic thinking (olive green; owner 2026-10-24 moved it from indigo #5155BC, 8.5 from the new indigo primary)', '#EDEED7', '#D2DCA7', '#729C00', '#3F5600', '#B6CA78', '#21280A'],
   ['NBT', 'nbt', 'Number & operations in base ten (gold)', '#F9F3E2', '#F5EBC7', '#E7CF69', '#554D27', '#F1E3AC', '#36311D'],
   ['NF', 'nf', 'Fractions & decimals (plum)', '#EFE6E3', '#D8C5CA', '#865273', '#653E56', '#C4A9B5', '#302129'],
   ['MEAS', 'meas', 'Measurement (sage)', '#F3F3E8', '#E2EBDA', '#A9CFAA', '#425142', '#D2E3CC', '#2B3128'],
@@ -235,7 +235,13 @@ function parseBlocks(css) {
     row(`slate vs every area, ${mode}`, r1(s.v), '>= 8', `slate–${s.p.k}`, s.v >= 8);
   }
   // 5. status colours
-  const st = minOf(A.flatMap(a => MODES.flatMap(m => [[a, ERR, m, 'error red'], [a, KEY, m, 'key orange']])), ([a, c, m]) => de00(a.r.bold, c, m));
+  // Owner exception (2026-10-24): OA olive #729C00 vs key orange (and error red) under colour-blind simulation is accepted (no colour
+  // clears every rule once indigo is the primary; key orange only marks answers on keys, and OA always carries its name and
+  // icon). The pair is still measured and shown; it must stay >= 8, every other pair >= 20.
+  const KEY_EXCEPT = (a, c, m) => a.k === 'OA' && (c === KEY || c === ERR) && m !== 'normal';   // error red shows with its ✕ / ⚠ icon
+  const ex = minOf(A.flatMap(a => MODES.flatMap(m => [[a, KEY, m], [a, ERR, m]])).filter(([a, c, m]) => KEY_EXCEPT(a, c, m)), ([a, c, m]) => de00(a.r.bold, c, m));
+  if (ex) row('owner exception: OA vs key orange / error red, colour-blind', r1(ex.v), '>= 8', `OA–${ex.p[1] === KEY ? 'key orange' : 'error red'} (${ex.p[2]})`, ex.v >= 8);
+  const st = minOf(A.flatMap(a => MODES.flatMap(m => [[a, ERR, m, 'error red'], [a, KEY, m, 'key orange']])).filter(([a, c, m]) => !KEY_EXCEPT(a, c, m)), ([a, c, m]) => de00(a.r.bold, c, m));
   row('bold vs error red / key orange, all views', r1(st.v), '>= 20', `${st.p[0].k}–${st.p[3]} (${st.p[2]})`, st.v >= 20);
 
   // 6. contrast (light only while dark mode is parked: the dark pairs are kept below, skipped)
