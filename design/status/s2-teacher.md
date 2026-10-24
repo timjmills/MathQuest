@@ -145,3 +145,10 @@ check 0.18 M · T6 0.14 M + check 0.18 M ≈ **3.1 M** (limit 20 M). Wall time �
 | Six owner design changes mid-T3 | owner saw screenshots and refined | worth it (owner wanted them); fold in at once, re-run the number checks after each |
 | Colour clash (indigo primary vs OA) found only by the token gate after the build | owner's new primary not run through the palette check when given | run `colour.py`-style check the moment an owner gives a new colour, before briefing builders |
 | Check-then-fix by resuming the same builder (SendMessage) | — | kept context, cheapest fix rounds of the lane; keep doing it |
+| 2026-10-24 | T6 fixed (bb7e217): shell gate waits for load (3/3 OK); no text names a removed tab. Owner (via lead): fact-rows Columns Auto·5·6·8·10 with Size S beside it, summary from the built page (54f4511); engine gives × 8 across and ÷ 3 across at S (never shrinks digits) — engine note for the lead | mq-opus-low / mq-opus-medium | done |
+| 2026-10-24 | FINAL: merged with base (781a8870), all 8 gates OK (boot-smoke, code-snapshot 722, shell, library, preview, quiz, tokens, wrm). Lane done: T2, T3, T4, T6 built and checked; T5 skipped by owner. Not deployed | lane lead | DONE |
+
+**Open for the owner / other lanes** (not this lane's files): whole-grade print is slow (Grade 1: ~26 s sheet, ~118 s document,
+engine); mixed-practice takes no per-skill count; the test role has forms A/B only; anchors `top`/`first` and fade supports
+are not built; unticking "The start" still deals start-unknown problems (generator); ÷ fact rows fit 3 across at S; teacher
+hash links open the pupil home unless Settings › "Open the site in" = Last view (owner decision).
