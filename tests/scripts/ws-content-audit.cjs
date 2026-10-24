@@ -18,6 +18,8 @@
 //   node tests/scripts/ws-content-audit.cjs --mc-write-baseline    # re-pin design/audit/baselines/content-audit-mc.json
 //   node tests/scripts/ws-content-audit.cjs --mc-fixture tests/fixtures/precritic/mc-production.fail.json   # no browser
 //   node tests/scripts/ws-content-audit.cjs --no-mc                # the family sections only (the gate before H8)
+//   node tests/scripts/ws-content-audit.cjs --skill sub_50_no_regroup --rulings <file>   # card rulings from a file (backtest)
+//   node tests/scripts/ws-content-audit.cjs --no-card-rulings      # leave CARD RULINGS out (--card-n N: items, default 120)
 //
 // MC-ALL (IMPROVEMENT_PLAN §1.6.3 H8): the default run ends with a section that samples EVERY live
 // skill (--mc-n items, default 60, same seeds) and fails a written answer offered as buttons on
@@ -2631,12 +2633,65 @@ function selfTest() {
     eq('mc judge: a sign strip', mcJudge({ answerType: 'symbol', labels: ['<', '>', '='], printText: '4 ○ 7' }).verdict, 'ok');
     eq('mc judge: a widget', mcJudge({ answerType: 'multi-select-check', labels: ['1', '2'], printText: '' }).verdict, 'ok');
     eq('mc judge: a word bank not drawn on paper', mcJudge({ answerType: 'multiple-choice', labels: ['acute', 'obtuse'], printText: 'Name the angle. ____' }).verdict, 'note');
+    // card rulings (S1 check 1): a broken ruling of the child's JSON is a card-ruling FAIL on its skill; a held one a note
+    const crOut = [{ categoryId: 'subtraction', skillId: 'sub_50_no_regroup', fails: [], notes: [] }, { categoryId: 'addition', skillId: 'add_10', fails: [], notes: [] }];
+    foldRulings(crOut, { n: 120, blocks: ['design/cards/subtraction/subtraction.md'], results: [
+        { key: 'subtraction:sub_50_no_regroup', ok: false, id: 'R-ZERO-NOT-SEEDED', source: '§9.4', msg: 'zeroCase on 71 of 120 items (59.2%; at most 10%)' },
+        { key: 'subtraction:sub_50_no_regroup', ok: true, id: 'R-BAND-50', msg: 'a in 21..50: all 120 items' }] });
+    eq('card rulings: a broken ruling fails its skill', crOut[0].fails.map(f => `${f.cls} ${f.msg.split(':')[0]}`).join(), 'card-ruling R-ZERO-NOT-SEEDED (card §9.4)');
+    eq('card rulings: a held ruling is a note, not a fail', crOut[0].notes.length, 1);
+    eq('card rulings: a skill no card rules on is untouched', crOut[1].fails.length + crOut[1].notes.length, 0);
 
     if (bad.length) { console.error(`ws-content-audit: FAIL - ${bad.length} self-test(s)`); bad.forEach(b => console.error('  - ' + b)); process.exit(1); }
     console.log(`ws-content-audit: OK (self-test, ${TESTS} name-reading assertions)`);
 }
 
 // ---------------------------------------------------------------------------
+// CARD RULINGS (lane S1 check 1; pilot-su-c critic r1 D1: zero cases on 66 of 120 items of sub_50_no_regroup broke the
+// spec card's §9.4, and no gate read the card). Every numeric ruling a spec card's rulings block makes on an audited
+// skill (design/cards/<family>/*.md, `<!-- rulings {json} -->`) is a predicate of this gate: the skill FAILS with class
+// `card-ruling` when a ruling breaks. The parser, the predicates (range, digits, noRegroup, boxes, maxShare / minShare
+// of zeroCase, ...) and the sampling are ws-card-rulings.mjs's own - it runs as a child (node, no browser) over the
+// audited skills with `--check rulings --n <--card-n, default 120>`, so nothing is duplicated here. A skill no card
+// rules on gets nothing from this section (the name checks above still judge it). `--rulings <file>` (repeatable) uses
+// a rulings file instead of the cards (a backtest fixture), `--no-card-rulings` leaves the section out. A run of the
+// child that writes no result FAILS every audited skill (the rulings could not be checked), never passes them.
+function cardRulingsInto(out) {
+    const keys = [...new Set(out.filter(s => s.categoryId && s.skillId).map(s => `${s.categoryId}:${s.skillId}`))];
+    if (!keys.length) return;
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ws-audit-rulings-'));
+    const json = path.join(tmp, 'rulings.json');
+    const files = process.argv.flatMap((a, i) => (a === '--rulings' && process.argv[i + 1] ? ['--rulings', process.argv[i + 1]] : []));
+    const argv = [path.join(__dirname, 'ws-card-rulings.mjs'), '--root', ROOT, '--check', 'rulings', '--n', String(parseInt(arg('card-n', '120'), 10)), '--json', json, ...files, '--skill', keys.join(',')];
+    const r = require('child_process').spawnSync(process.execPath, argv, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+    let j = null;
+    try { j = JSON.parse(fs.readFileSync(json, 'utf8')); } catch (e) { j = null; }
+    fs.rmSync(tmp, { recursive: true, force: true });
+    if (r.status === 4) return;                       // NO-RULINGS: no card rules on any audited skill
+    if (!j) {
+        const why = String((r.stdout || '') + (r.stderr || '')).trim().split('\n').slice(-1)[0] || `exit ${r.status}`;
+        for (const s of out) if (s.fails) s.fails.push({ cls: 'card-ruling', msg: `the spec card rulings could not be checked (ws-card-rulings: ${why})` });
+        return;
+    }
+    foldRulings(out, j);
+}
+/** ws-card-rulings' --json results folded into the audit rows (pure; self-tested). */
+function foldRulings(out, j) {
+    const byKey = new Map(out.map(s => [`${s.categoryId}:${s.skillId}`, s]));
+    const ruled = new Set((j.results || []).map(x => x.key));
+    for (const x of j.results || []) {
+        const s = byKey.get(x.key);
+        if (!s || !s.fails) continue;
+        if (!x.ok) s.fails.push({ cls: 'card-ruling', msg: `${x.id}${x.source ? ` (card ${x.source})` : ''}${x.opts && Object.keys(x.opts).length ? ` ${JSON.stringify(x.opts)}` : ''}: ${x.msg}` });
+    }
+    for (const k of ruled) {
+        const s = byKey.get(k);
+        if (!s || !s.notes) continue;
+        const mine = j.results.filter(x => x.key === k);
+        s.notes.push({ cls: 'card-rulings', msg: `${mine.filter(x => x.ok).length} of ${mine.length} spec-card ruling(s) hold over ${j.n} items (${[...new Set(j.blocks || [])].join(', ')})` });
+    }
+}
+
 (async () => {
     if (has('self-test')) return selfTest();
     if (arg('mc-fixture', null)) return mcFixture(arg('mc-fixture', null));
@@ -2861,6 +2916,7 @@ function selfTest() {
     }
     const mcRows = RUN_MC ? await mcSweep() : null;
     await app.close();
+    if (!has('no-card-rulings')) cardRulingsInto(out);
 
     for (const s of out) {
         const tag = s.fails.length ? 'FAIL' : s.notes.length ? 'note' : ' ok ';

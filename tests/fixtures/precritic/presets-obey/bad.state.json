@@ -1,0 +1,5 @@
+{
+ "about": "Lane S1 check 9 (ws-presets-unit: items obey the preset values) FAIL state: the S1 base 4fbc80c + bad.patch, a SEEDED defect never committed anywhere: the multiply sizer (gen-operations.js _generateSizedMultDiv) reads tiles 21 as 22, so the preset multiplication:mult_2by1_column deals 2-digit x 2-digit items. The host given the preset values deals the same items, so the old check 3 (preset = host with its values) passes; only check 9 sees that the items break tiles=21.",
+ "commit": "4fbc80c",
+ "patches": ["tests/fixtures/precritic/presets-obey/bad.patch"]
+}

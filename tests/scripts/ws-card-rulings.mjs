@@ -96,7 +96,7 @@ export function proseTodoLines(blocks) {
 }
 
 /** Every rulings block under design/cards of the tree. */
-function cardBlocks(root) {
+export function cardBlocks(root) {
     const dir = join(root, 'design', 'cards');
     const out = [];
     if (!existsSync(dir)) return out;
@@ -201,7 +201,7 @@ function selfTest() {
 }
 
 /* ------------------------------------------------------------------ the app in node */
-async function loadApp(root) {
+export async function loadApp(root) {
     const M = (p) => pathToFileURL(join(root, 'js', 'modules', p)).href;
     const stub = () => new Proxy(function () {}, { get: (t, k) => (k === Symbol.toPrimitive ? () => '' : k === 'length' ? 0 : k === Symbol.iterator ? undefined : stub()), apply: () => stub(), construct: () => stub(), set: () => true });
     const store = {};
@@ -217,7 +217,7 @@ async function loadApp(root) {
         return { gq, data, so };
     } finally { for (const k of Object.keys(quiet)) console[k] = quiet[k]; }
 }
-const fnv = (s) => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+export const fnv = (s) => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 
 async function main() {
     if (has('--self-test')) return selfTest();
@@ -338,4 +338,5 @@ export function finalVerdict({ results, keys, unruled = [], check = 'all', secs 
     if (unchecked.length) return { code: 2, unchecked, line: `${TOOL}: INCOMPLETE - not checked: ${unchecked.join(', ')} (${tail})` };
     return { code: 0, unchecked, line: `${TOOL}: OK (${tail})` };
 }
-main().catch((e) => { say(`${TOOL}: ${e && e.stack || e}`); say(`${TOOL}: FAIL - error`); process.exit(2); });
+// (imported by ws-content-audit / ws-dealer-uniform for its parser, predicates and app loader: main runs only as a script)
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main().catch((e) => { say(`${TOOL}: ${e && e.stack || e}`); say(`${TOOL}: FAIL - error`); process.exit(2); });
