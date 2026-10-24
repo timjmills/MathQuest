@@ -491,3 +491,31 @@ skill) is next.
 0a, 0b, the per-round findings rule, and W0-A's five pilot-lesson checks (sibling comparison, SLOT/CLIP on matrix rows, 390 card,
 card rulings, not-offered options), backtested 8/8 but not yet passed by their critic (r7 FAIL). Assigned and held by the owner's
 stop: F1, F2 (11 checks), F3–F5, F7, the routing rule above, and W0-A r7's D1/D2. Dropped: 0.
+
+### T1 teacher mock-up — stopped at critic r6 FAIL (A 7 · B 9 · C 7 · D 8)
+
+- **Measure** (`design/status/teacher-t1.md`). 10:04 → 02:08: **about 16 h, 6 critic rounds, all FAIL**, 6 fix rounds on
+  mq-opus-medium, fresh builders from r2 under the stop rule. Lowest scores per round: r1 7, r2 6, r3 7, r4 6, r5 6, r6 7. The
+  owner pre-approved the build ("I have seen enough"), so a PASS would have gone straight to a build brief; it stops here instead.
+- **Causes, by cost.**
+  1. **Thumbnails cost four rounds (r2–r5).** They went from hand-drawn stand-ins, to pictures, to captured DOM, to live
+     rendering. Each step fixed the last round's defect and introduced a new one: decoys, drawings that contradicted their names,
+     garbled SVG fonts, then crops that hide the drawing on about 1 in 5. The root was copying the app's drawing into a mock-up
+     format instead of rendering it with the app's own modules from the start.
+  2. **Owner design changes arrived mid-round in r2–r4** (palette, grade badge, page colour, a 40–100-skill tray, popups, weights,
+     views, "Each page") and reopened screens the critic had already graded. This led to the batch rule (process rule 0), applied
+     from r4.
+  3. **r1 lost a round to widths.** The builder checked 1366 and 390; the critic found breaks at 1024 and 820.
+  4. **The stop rule was applied at the second repeat, not the first** (chip truncation, r1 → r2).
+- **Fixes (recorded; held by the owner's stop).**
+  - Mock-up briefs name all five §2.9 widths and require page and in-panel overflow checks from the first build. **Owner: lead,
+    brief template.**
+  - Mock-ups render real content with the app's own modules (read-only import), or use neutral placeholders. Never hand-drawn
+    stand-ins of real content. **Owner: lead, LESSONS_LEARNED.**
+  - When a critic finding is measurable, the fix commit includes its check: the stop rule acts at the first repeat. **Owner: lead.**
+  - Keep the critics' probe scripts in the lane folder (`design/mockups/teacher-2/critic-tools/`), and builders run them before
+    reporting. **Owner: the T1 lane, done for r6.**
+  - The r6 defects stay open: about 1 in 5 crops hide the drawing; the held % shows as "Equal" and is released silently; Single
+    skill + lock drops a skill; phone headers are tall. The T1 lane lists each with its check. **Owner: T1, when work resumes.**
+- **Lesson.** The lane met none of the targets, and nothing about its speed can be judged yet. Every lost round has a named cause
+  and a recorded check, and the lane wrote its own per-round findings as the owner rule asks.

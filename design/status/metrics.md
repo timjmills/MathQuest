@@ -410,6 +410,7 @@ against this row.
 | 2026-10-23 | Mixed pages M1 | engine (interleave, arrangement) | mq-opus-medium (r6 mq-opus-low) | 6 | PASS 16/16 pages | 6 | 8.0 | REPEATS, SIZE ladder (machine-measurable, checked from r4), CL-13 | — | 0.2 |
 | 2026-10-24 | SU-C pilot | `stack` × Single skill, 6 skills + 1 preset | mq-opus-low, then mq-opus-medium ×2 | 2 | FAIL ×2, stopped before r3 (stop rule) | — (not passed) | 8.25 | r1: CONTENT, SCAFFOLD, SIZE, LESSON, SCREEN, OPTIONS, INK; r2: PATTERN, SPACE ×2, UNTRUE_TEXT, CLIP_OVERLAP ×2, VISUAL_DESIGN, STEPS_LAYOUT | 0 | 0.2 |
 | 2026-10-24 | W0-A second phase | pilot-lesson checks | mq-opus-medium | 2 | FAIL ×2 (r6, r7), stopped | — | ≈ 3.5 | COMPARE_SCOPE (multi-skill rows), signed-card hash | — | 0.1 |
+| 2026-10-24 | T1 teacher mock-up | screen (mock-up) | mq-opus-medium (fresh builders from r2) | 6 | FAIL ×6, stopped | — (not passed) | ≈ 16 | thumbnails ×4 rounds (CONTENT / VISUAL fidelity), VIEWPORT (1024/820), CLIP (chip text), weights logic | — | 0.4 |
 
 - **Builder profile** is the profile **name** (`mq-opus-low` / `mq-opus-medium`): an agent cannot see its own effort.
 - **Findings by class** come from the critic's class tags (`design/audit/RUBRIC.md` §6): one count per class, e.g.
