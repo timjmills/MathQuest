@@ -32,6 +32,7 @@ import {
 } from './teacher-ui.js';
 import { areaOf, AREAS, AREA_ORDER, areaIcon } from './teacher-areas.js';
 import { planPages, planCounts, PER_PAGE, keyOf } from './teacher-plan.js';
+import { trayGroups, trayLocks } from './teacher-tray.js';
 import { printHtml } from './teacher-print.js';
 import { makeShareLink, showBoardCodeFor } from './teacher-sets.js';
 import { mountSample } from './teacher-preview.js';
@@ -135,7 +136,7 @@ function plan(list = items()) {
     const per = PER_PAGE[o.size] || PER_PAGE.M;
     let pages = o.pages;
     if (!touched('pages')) pages = k === 'single' ? Math.max(1, list.filter((x) => !x.leftOut).length) : isBig(list) ? Math.min(30, Math.ceil(list.length / per)) : 1;
-    return planPages(k, list, { amount: amountOf(pages), size: o.size, each: quiz ? 'new' : o.each, seed: S.seed, quiz, labelOf: (key) => (list.find((x) => keyOf(x) === key) || {}).label || key });
+    return planPages(k, list, { groups: trayGroups(), locks: trayLocks(), amount: amountOf(pages), size: o.size, each: quiz ? 'new' : o.each, seed: S.seed, quiz, labelOf: (key) => (list.find((x) => keyOf(x) === key) || {}).label || key });
 }
 /** How much? Pages · Problems in all · Problems of each skill (owner 2026-10-24). */
 function amountOf(defaultPages) {
@@ -256,7 +257,7 @@ async function probeLayouts(it) {
 /* ================================================================= building */
 
 function sigOf(p, list, quiz) {
-    return JSON.stringify({ k: p.kind, pi: p.pageItems, pb: p.pagesBy, o: S.opts, seed: S.seed, quiz: quiz ? { v: S.quiz.versions, q: S.quiz, name: S.quiz.name } : null, cnt: list.map((x) => [x.count || 0, x.lockPct === undefined ? -1 : x.lockPct, x.weight]),
+    return JSON.stringify({ g: trayGroups(), l: trayLocks(), k: p.kind, pi: p.pageItems, pb: p.pagesBy, o: S.opts, seed: S.seed, quiz: quiz ? { v: S.quiz.versions, q: S.quiz, name: S.quiz.name } : null, cnt: list.map((x) => [x.count || 0, x.lockPct === undefined ? -1 : x.lockPct, x.weight]),
         skills: list.map((x) => [keyOf(x), x.opts || null, x.leftOut ? 0 : 1]) });
 }
 
