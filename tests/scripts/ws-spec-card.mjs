@@ -1912,6 +1912,17 @@ async function main(argv) {
         const target = val('--check-signed');
         const keys = argv.flatMap((a, i) => (a === '--skill' && argv[i + 1] ? argv[i + 1].split(',') : [])).map((x) => x.trim()).filter(Boolean);
         if (!target && !keys.length) return { ok: false, msg: '--check-signed needs a card path, or --skill cat:skill[,...] (the cards that cover those skills)' };
+        // S1 critic r1 N2: an unknown skill id is a usage FAIL, never NO-CARD (a typo must not read green)
+        if (keys.length) {
+            let live = null;
+            try {
+                if (!globalThis.localStorage) globalThis.localStorage = { getItem: () => null, setItem() {}, removeItem() {} };
+                const d = await import(pathToFileURL(path.join(REPO, 'js', 'modules', 'data.js')).href);
+                live = new Set(Object.entries(d.SKILLS || {}).flatMap(([c, l]) => (l || []).filter((s) => s && s.v && !s.retired).map((s) => `${c}:${s.v}`)));
+            } catch (e) { return { ok: false, msg: `cannot read the live skills (js/modules/data.js): ${e.message}` }; }
+            const unknown = keys.filter((k) => !live.has(k));
+            if (unknown.length) return { ok: false, msg: `unknown skill(s) ${unknown.join(', ')}: not a live category:skill` };
+        }
         const files = target ? [path.resolve(REPO, target)] : cardsCovering(REPO, keys);
         if (!files.length) return { ok: true, verdict: 'NO-CARD', code: 4, msg: `no spec card under ${CARDS_REL} covers ${keys.join(', ')} (section 1 or the rulings block): nothing to check` };
         const res = [];

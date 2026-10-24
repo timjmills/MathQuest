@@ -113,6 +113,21 @@ function makeObey() {
         lengths: (q, v) => { const o = rd(q); if (!o) return null; return v === 'shorter' ? nd(o[1]) < nd(o[0]) : v === 'same' ? nd(o[1]) === nd(o[0]) : null; },
         // "within N" bounds the answer: the sum / product, the minuend / dividend
         band: (q, v, host, cat) => { const o = rd(q); if (!o || !Number.isFinite(+v)) return null; const named = cat === 'addition' || cat === 'multiplication' ? Number(String(q.ans).replace(/,/g, '')) : o[0]; return Number.isFinite(named) ? named <= +v : null; },
+        // D8 spread (not an option id): the named number over a deep sample reaches the first and the last fifth of
+        // its digit class (10-99 for 2 digits; 2-9 for 1). null: no item read, or the named number has more than one
+        // length (a product of 2 x 1 digits), so there is no single class to span.
+        _spread: (items, cat) => {
+            const named = items.map((q) => { const o = rd(q); return !o ? NaN : cat === 'addition' || cat === 'multiplication' ? Number(String(q.ans).replace(/,/g, '')) : o[0]; }).filter(Number.isFinite);
+            if (named.length < 10) return null;
+            const lens = new Set(named.map(nd));
+            if (lens.size !== 1) return null;
+            const d = [...lens][0];
+            if (d < 2) return null;
+            const lo = 10 ** (d - 1), hi = 10 ** d - 1, w = hi - lo;
+            const min = Math.min(...named), max = Math.max(...named);
+            const needLo = Math.floor(lo + w / 5), needHi = Math.ceil(hi - w / 5);
+            return { ok: min <= needLo && max >= needHi, min, max, lo, hi, needLo, needHi, what: cat === 'addition' || cat === 'multiplication' ? 'answer' : 'first number' };
+        },
     };
 }
 if (process.argv.includes('--self-test')) {
@@ -125,8 +140,13 @@ if (process.argv.includes('--self-test')) {
     t(O.lengths({ cell: { payload: { operands: [57, 3] } } }, 'shorter') === true && O.lengths({ a: 57, b: 23 }, 'shorter') === false, 'lengths shorter');
     t(O.band({ a: 7, b: 5, ans: 12 }, 10, 'add', 'addition') === false && O.band({ a: 9, b: 4, ans: 5 }, 10, 'sub', 'subtraction') === true, 'band bounds the sum / the minuend');
     t(O.band({ text: 'no numbers' }, 10, 'x', 'addition') === null, 'band: unreadable is null');
+    // D8 spread: minuends 51-99 (pilot r1) are narrow; 21-99 (fix r1) reach the first fifth (10-27) and the last (81-99)
+    const subs = (lo, hi) => Array.from({ length: 30 }, (_, i) => ({ a: lo + Math.round((hi - lo) * i / 29), b: 1 }));
+    t(O._spread(subs(51, 99), 'subtraction').ok === false, 'spread: minuends 51-99 are a narrow set');
+    t(O._spread(subs(21, 99), 'subtraction').ok === true, 'spread: minuends 21-99 span the class');
+    t(O._spread([{ a: 12, b: 3, ans: 36 }, { a: 98, b: 7, ans: 686 }].concat(subs(10, 99).map((x) => ({ a: x.a, b: 2, ans: x.a * 2 }))), 'multiplication') === null, 'spread: a product of several lengths is not judged');
     for (const b of bad) console.error('  - ' + b);
-    console.log(bad.length ? `ws-presets-unit: FAIL - self-test (${bad.length})` : 'ws-presets-unit: OK (self-test, 7 predicate cases)');
+    console.log(bad.length ? `ws-presets-unit: FAIL - self-test (${bad.length})` : 'ws-presets-unit: OK (self-test, 10 predicate cases)');
     process.exit(bad.length ? 1 : 0);
 }
 
@@ -136,8 +156,13 @@ const { open } = require('../lib/ws-harness.cjs');
 const app = await open({ seed: 1 });
 try {
     // (the page function and makeObey go in as source: makeObey is a function, which evaluate() cannot pass as an argument)
-    const pageCheck = (list, makeObey) => {
+    const pageCheck = async (list, makeObey) => {
         const out = [];
+        // the composer's own instruction reader (the module the app loaded: same URL, same registry)
+        let instrKeyOf = null;
+        try { instrKeyOf = (await import(new URL('js/modules/sheet/roles/compose.js', location.href).href)).instructionKeyOf || null; } catch (e) { instrKeyOf = null; }
+        if (!instrKeyOf) out.push('check 7: sheet/roles/compose.js instructionKeyOf could not be loaded: the instruction key was not checked');
+        let instrChecked = 0, spreadChecked = 0, spreadSkipped = 0;
         // the area model's input ids open with Date.now() (a per-call DOM id, not content): drop the clock part
         const strip = (q) => q && J2({ t: q.text, a: q.ans, v: q.visual, c: q.cell }).replace(/(data-area-idx=\\?")\d+/g, '$1');
         function J2(x) { return JSON.stringify(x); }
@@ -172,6 +197,22 @@ try {
                     if (!r) out.push(`${key} item ${i}: does not obey its preset ${ok}=${J2(v)} (${String(a.text || '').slice(0, 40)} = ${a.ans})`);
                 }
             }
+            // 7. pilot critic r1 D8 (lane S1 fix r1). (a) The INSTRUCTION: the sheet's instruction key for the preset's
+            // items, read the way the page composer reads it (compose.js instructionKeyOf, with the preset as the
+            // section's listed skill), is the host's key for the host's items with the preset values (D8: sub_2d_1d
+            // matched no listed skill and printed "Solve. Write the answer." where the host says "Subtract.").
+            if (instrKeyOf) {
+                const kp = instrKeyOf(pa.filter(Boolean).map((q) => ({ q })), [{ categoryId: cat, skillId: id, opts: p.opts }]);
+                const kh = instrKeyOf(pb.filter(Boolean).map((q) => ({ q })), [{ categoryId: cat, skillId: p.skill, opts: p.opts }]);
+                instrChecked++;
+                if (kp !== kh) out.push(`${key}: instruction key "${kp}" on its own page, but its host ${p.skill} says "${kh}" (pilot D8)`);
+            }
+            // (b) The SPREAD: over 60 items the number "within N" bounds (minuend / dividend; sum / product) reaches
+            // the first and the last fifth of its digit class (D8: minuends 51-99 only, for a 2-digit class 10-99).
+            const deep = Array.from({ length: 60 }, (_, i) => window.generateQuestionFor({ category: cat, skill: id, seed: 5000 + 13 * i, itemIndex: i, itemCount: 60 }));
+            const sv = ['addition', 'subtraction', 'multiplication', 'division'].includes(cat) ? OBEY._spread(deep.filter(Boolean), cat) : null;   // (the + − × ÷ ladder rungs: D8's class)
+            if (sv === null) spreadSkipped++;
+            else { spreadChecked++; if (!sv.ok) out.push(`${key}: narrow set: its ${sv.what} runs ${sv.min}-${sv.max} over 60 items, inside the ${sv.lo}-${sv.hi} class it must reach ${sv.needLo} or below and ${sv.needHi} or above (pilot D8)`); }
             const pd = page(p.skill, undefined);
             genericChecked++;
             if (pa.every((a, i) => a && pd[i] && strip(a) === strip(pd[i]))) out.push(`${key}: its 6 items equal ${p.skill}'s DEFAULT items: the preset values ${J2(p.opts)} change nothing`);
@@ -182,11 +223,12 @@ try {
             // state restored
             if (window.state.skill === p.skill) out.push(`${key}: state.skill left on the host`);
         }
-        return { out, obeyChecked, obeySkipped, genericChecked };
+        return { out, obeyChecked, obeySkipped, genericChecked, instrChecked, spreadChecked, spreadSkipped };
     };
     const res = await app.page.evaluate(`(${pageCheck.toString()})(${JSON.stringify(entries)}, ${makeObey.toString()})`);
     failures.push(...res.out);
-    obeyNote = `${res.obeyChecked} item×value predicate checks (tiles / lengths / band), ${res.obeySkipped} value(s) with no predicate, ${res.genericChecked} presets checked against the host default page`;
+    obeyNote = `${res.obeyChecked} item×value predicate checks (tiles / lengths / band), ${res.obeySkipped} value(s) with no predicate, ${res.genericChecked} presets checked against the host default page; D8: ${res.instrChecked} instruction keys = the host's, ${res.spreadChecked} spreads checked (${res.spreadSkipped} with no single-length named number)`;
+    if (!res.instrChecked) failures.push('check 7: no preset instruction key was checked');
     if (!res.genericChecked) failures.push('check 9: no preset was checked against its host default (0 items checked)');
     // the 2-char share code opens the preset
     const codeRes = await app.page.evaluate(() => {

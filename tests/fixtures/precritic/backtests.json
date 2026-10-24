@@ -504,7 +504,27 @@
   },
   {
    "id": "s1-presets-obey",
-   "check": "S1 check 9: every preset skill's items obey its preset option values",
+   "check": "S1 check 9, pilot D8: a preset's items carry the host's instruction key and span the band's digit class",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-presets-unit check 7 (instruction key = the host's; the named number reaches the first and last fifth of its digit class)",
+   "fail": {
+    "commit": "27577cf",
+    "state": "pilot-su-c critic r1 D8: sub_2d_1d prints \"Solve. Write the answer.\" (compose.js matched no listed skill for a preset item) and deals minuends 51-99 only"
+   },
+   "pass": {
+    "commit": "ff471fd",
+    "state": "fix r1: compose.js / practice.js match the preset by presetId (the \"subtract\" key); the 2d - 1d minuend runs from 21. (D8's Mixed-practice heading part went to the mixed-pages lane; not checked here.)"
+   },
+   "command": "node tests/scripts/ws-presets-unit.mjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "s1-presets-obey-seeded",
+   "check": "S1 check 9, option obedience: every preset skill's items obey its preset option values (tiles / lengths / band)",
    "kind": "fixture",
    "browser": false,
    "rule": "ws-presets-unit check 6 (items obey the preset values)",
@@ -520,7 +540,8 @@
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
-   }
+   },
+   "realPair": "none for option obedience (no pilot commit breaks a preset value the host also ignores); the D8 half of check 9 has its real pair in s1-presets-obey"
   },
   {
    "id": "options-render-pilot",

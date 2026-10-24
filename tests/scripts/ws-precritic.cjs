@@ -567,6 +567,9 @@ const PARSE = {
     dealerUniform(g, out, code) {
         const inc = /^ws-dealer-uniform: INCOMPLETE - not fully checked: (.*?) \((.*)\)\s*$/m.exec(out);
         if (inc && code === 3) return { result: 'INCOMPLETE (valid set unknown)', findings: `not fully checked: ${listShort(inc[1].split(', '), 4)}; ${inc[2]}`, detail: out.split('\n').filter((l) => /^ {6}note /.test(l)).slice(0, 6).map((l) => l.trim()), explainsExit: true };
+        // S1 critic r1 D1: skills that deal no operands (fractions, clocks, shapes) have nothing to deal evenly: N/A, exit 4
+        const na = /^ws-dealer-uniform: N\/A - no operand-dealt items: (.*?) \((.*)\)\s*$/m.exec(out);
+        if (na && code === 4) return { result: 'N/A', findings: `no operand-dealt items (nothing to deal evenly): ${listShort(na[1].split(', '), 4)}`, detail: [], explainsExit: true };
         const r = generic(g, out, code);
         const m = /^ws-dealer-uniform: (?:OK|FAIL - [^(]*)\((.*)\)\s*$/m.exec(out);
         const missing = (g.keys || []).filter((k) => !new RegExp(`^ {2}\\S+ +${reEsc(k)} `, 'm').test(out));
@@ -712,7 +715,10 @@ function buildPlan(ctx) {
             const m = /^ws-spec-card: (OK|FAIL|NO-CARD) — (.*)$/m.exec(out);
             if (!m) return unparsed('no "ws-spec-card: OK|FAIL|NO-CARD" line', out);
             const det = out.split('\n').filter((l) => /^(FAIL|UNSIGNED) /.test(l)).slice(0, 10);
-            if (m[1] === 'NO-CARD' && code === 4) return { result: 'N/A', findings: m[2], detail: [], explainsExit: true };
+            // S1 critic r1 N4: design/cards/README.md says "a build starts only after the owner has signed its card" - a
+            // rule for NEW builds; families approved before cards existed have none, so NO-CARD stays N/A (--strict
+            // accepts it) and the row says so in words, so a lane building a new family sees it has no card.
+            if (m[1] === 'NO-CARD' && code === 4) return { result: 'N/A', findings: `no spec card covers ${listShort(keys, 4)} (${m[2].slice(0, 120)}); a NEW family's build needs a signed card first (design/cards/README.md), an approved pre-card family has none`, detail: [], explainsExit: true };
             if (m[1] === 'FAIL' && code === 5) return { result: 'INCOMPLETE (unsigned card)', findings: m[2], detail: det, explainsExit: true };
             if (m[1] === 'OK' && code === 0) return { result: 'PASS', findings: m[2].slice(0, 200), detail: [], explainsExit: false };
             return { result: 'FAIL', findings: m[2].slice(0, 200), detail: det, explainsExit: code === 1 };
