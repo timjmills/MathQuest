@@ -150,7 +150,8 @@ function compare(oursRows, sibsOf, table, { redOnly = false, sizes = null, rules
 
 function selfTest() {
     const fails = [];
-    const t = (c, m) => { if (!c) fails.push(m); };
+    let n = 0;
+    const t = (c, m) => { n++; if (!c) fails.push(m); };
     const table = sibTable([{ name: 'pin', rows: { 'addition:add_100_regroup|single/ex-group': { S: { 'L-SIZE TY-11': 8, 'L-SIZE TY-11|p1|x': 8 }, M: {}, L: {} } } }]);
     const ours = [
         { id: 'subtraction:s|single/ex-group', skill: 'subtraction:s', kind: 'single', row: 'ex-group', status: 'RED', sizes: { S: { counts: { 'L-SIZE TY-11': 8, 'L-DENSITY H13': 16 } }, M: { counts: {} } } },
@@ -179,6 +180,19 @@ function selfTest() {
     const so = siblingsOf(cfg, { 's:x': 'stack', 's:y': 'stack' }, ['s:x', 's:y'], {});
     t(so['s:x'].join() === 'a:p,a:q' && so['s:y'].join() === 'a:p,a:q,a:far', `paired by default, all approved without a pair (${JSON.stringify(so)})`);
     t(siblingsOf(cfg, { 's:x': 'stack' }, ['s:x'], { allSiblings: true })['s:x'].length === 3, '--all-siblings: every approved sibling');
+    // SAME SHAPE (lead 2026-10-24): a 3-track sibling is never a 2-track skill's; with none of its shape, the peers
+    const shp = { 's:x': { tracks: 2 }, 's:y': { tracks: 2 }, 'a:p': { tracks: 3 }, 'a:q': { tracks: 2 }, 'a:far': { tracks: 5 }, 'n:2': { tracks: 2 }, 'n:3': { tracks: 3 } };
+    const ss = siblingsOf(cfg, { 's:x': 'stack', 's:y': 'stack' }, ['s:x', 's:y'], { shape: shp });
+    t(ss['s:x'].join() === 'a:q' && ss['s:y'].join() === 'a:q', `same shape only: the 3- and 5-track siblings dropped (${JSON.stringify(ss)})`);
+    const cfgP = { templates: { stack: { approved: ['a:p', 'a:far'], peers: ['n:2', 'n:3'] } } };
+    const sp = siblingsOf(cfgP, { 's:x': 'stack' }, ['s:x'], { shape: shp });
+    t(sp['s:x'].length === 0 && sp._peers['s:x'].join() === 'n:2', `no same-shape approved sibling: the same-shape peer only (${JSON.stringify(sp._peers)})`);
+    // the real case of the ruling: add_100_regroup (answers reach 100) is never sub_100_regroup's sibling
+    const real = shapesOf(['subtraction:sub_100_regroup', 'addition:add_100_regroup', 'subtraction:sub_100_no_regroup']);
+    t(real['subtraction:sub_100_regroup'].tracks === 2 && real['addition:add_100_regroup'].tracks === 3 && real['subtraction:sub_100_no_regroup'].tracks === 2, `real shapes: sub_100_regroup 2, add_100_regroup 3, sub_100_no_regroup 2 tracks (${JSON.stringify(real)})`);
+    const realCfg = JSON.parse(fs.readFileSync(path.join(HERE, 'tests/fixtures/precritic/siblings.json'), 'utf8'));
+    const rs = siblingsOf(realCfg, { 'subtraction:sub_100_regroup': 'stack' }, ['subtraction:sub_100_regroup'], { shape: Object.assign(shapesOf([...new Set([...realCfg.templates.stack.approved, ...realCfg.templates.stack.peers])]), real) });
+    t(!rs['subtraction:sub_100_regroup'].includes('addition:add_100_regroup') && rs._peers['subtraction:sub_100_regroup'].includes('subtraction:sub_100_no_regroup'), `sub_100_regroup: add_100_regroup is not its sibling; same-shape peers ${JSON.stringify(rs._peers['subtraction:sub_100_regroup'])}, siblings ${JSON.stringify(rs['subtraction:sub_100_regroup'])}`);
     const cr = compare([ours[0]], () => ['addition:add_100_regroup'], table, { rules: ['H13'] });
     t(cr.above.length === 1 && cr.engine.length === 0 && cr.above[0].rule === 'L-DENSITY H13', '--rules H13 compares H13 only');
     const t2 = sibTable([{ name: 'pin', rows: { 'a:b|single/ex-group': { S: { 'L-DENSITY H13': 20 } } } }, { name: 'run', rows: { 'a:b|single/ex-group': { S: { counts: { 'L-DENSITY H13': 0 } } } } }]);
@@ -204,7 +218,7 @@ function selfTest() {
     const oldRow = { ...partnerOnly, sizes: { S: { counts: { 'L-SIZE TY-11': 6 } } } };
     t(compare([oldRow], () => ['a:sib'], sibT).above.length === 1, 'D1: a row written before D1 (no bySkill) is judged on its totals');
     for (const f of fails) say(`  self-test FAIL: ${f}`);
-    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 20 cases)`);
+    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, ${n} cases)`);
     process.exit(fails.length ? 1 : 0);
 }
 
@@ -246,7 +260,10 @@ function runMatrix(keys, { rows, baseline, out, label }) {
     return j;
 }
 /** The kit template each skill draws most (8 seeded items), in node. */
-function templatesOf(keys) {
+/** {key: {template, tracks}}: the kit template a skill draws most over 8 seeded items, and its SHAPE (lead ruling
+ *  2026-10-24, rule 0b): the most digit tracks any operand or answer needs over 24 seeded items (0 when the cell has no
+ *  numeric operands). */
+function shapesOf(keys) {
     const code = `
 import { pathToFileURL } from 'node:url'; import { join } from 'node:path';
 const ROOT = process.env.SC_ROOT; const M = (p) => pathToFileURL(join(ROOT, 'js', 'modules', p)).href;
@@ -257,11 +274,16 @@ const out = process.stdout.write.bind(process.stdout); console.log = console.war
 const gq = await import(M('generate-question.js')); const pg = await import(M('print-generate.js'));
 const res = {};
 for (const key of JSON.parse(process.env.SC_KEYS)) { const [cat, id] = key.split(':'); const seen = {};
-  for (let i = 0; i < 8; i++) { let t = 'error'; try { const q = gq.generateQuestionFor({ category: cat, skill: id, seed: 1000 + i, itemIndex: i }); const r = q && pg.kitCellSpec(Object.assign({ skillId: id, categoryId: cat }, q)); t = r ? r.template : 'legacy'; } catch (e) {} seen[t] = (seen[t] || 0) + 1; }
-  res[key] = Object.entries(seen).sort((a, b) => b[1] - a[1])[0][0]; }
+  let tracks = 0;
+  for (let i = 0; i < 24; i++) { let t = 'error'; try { const q = gq.generateQuestionFor({ category: cat, skill: id, seed: 1000 + i, itemIndex: i }); const r = q && pg.kitCellSpec(Object.assign({ skillId: id, categoryId: cat }, q)); t = r ? r.template : 'legacy';
+      const pl = (r && r.payload) || (q && q.cell && q.cell.payload) || {};
+      const nums = (Array.isArray(pl.operands) ? pl.operands : []).filter((n) => typeof n === 'number' && isFinite(n));
+      if (nums.length) tracks = Math.max(tracks, pl.ansDigits || 0, ...nums.map((n) => String(Math.trunc(Math.abs(n))).length)); } catch (e) {}
+    if (i < 8) seen[t] = (seen[t] || 0) + 1; }
+  res[key] = { template: Object.entries(seen).sort((a, b) => b[1] - a[1])[0][0], tracks }; }
 out('\\n' + JSON.stringify(res) + '\\n'); process.exit(0);`;
     const r = spawnSync(process.execPath, ['--input-type=module', '-e', code], { cwd: HERE, env: Object.assign({}, process.env, { SC_ROOT: ROOT, SC_KEYS: JSON.stringify(keys) }), encoding: 'utf8', maxBuffer: 64 << 20 });
-    try { return JSON.parse(String(r.stdout || '').trim().split('\n').pop()); } catch (e) { throw new Error(`cannot read the skills' templates in node: ${String(r.stderr || '').slice(0, 400)}`); }
+    try { return JSON.parse(String(r.stdout || '').trim().split('\n').pop()); } catch (e) { throw new Error(`cannot read the skills' templates and shapes in node: ${String(r.stderr || '').slice(0, 400)}`); }
 }
 
 /**
@@ -274,13 +296,22 @@ out('\\n' + JSON.stringify(res) + '\\n'); process.exit(0);`;
  * gets every approved sibling of its template; allSiblings (--all-siblings) takes every approved sibling (the lenient
  * max over all of them).
  */
-function siblingsOf(cfg, tpl, keys, { allSiblings = false } = {}) {
-    const sibOf = {};
+function siblingsOf(cfg, tpl, keys, { allSiblings = false, shape = null } = {}) {
+    // SAME SHAPE (lead ruling 2026-10-24): a sibling counts only when its shape (template, digit tracks) is the skill's own:
+    // a 3-track add_100_regroup stack has narrower empty bands than a 2-track sub_100_regroup one, so it is never its
+    // sibling. With no same-shape approved sibling, the template's lead-named `peers` of the same shape are used (measured
+    // like siblings: see loadSiblings); a skill whose shape is unknown (no numeric operands) keeps the old choice.
+    const same = (k, s) => !shape || !shape[k] || !shape[s] || !shape[k].tracks || shape[s].tracks === shape[k].tracks;
+    const sibOf = {}, peerOf = {};
     for (const k of keys) {
         const t = cfg.templates && cfg.templates[tpl[k]];
         const pairs = !allSiblings && t && t.pairs && t.pairs[k];
-        sibOf[k] = (pairs || (t && t.approved) || []).filter((s) => s !== k && !keys.includes(s));
+        const cand = (pairs || (t && t.approved) || []).filter((s) => s !== k && !keys.includes(s));
+        sibOf[k] = cand.filter((s) => same(k, s));
+        peerOf[k] = [];
+        if (!sibOf[k].length && cand.length && shape) peerOf[k] = ((t && t.peers) || []).filter((s) => s !== k && !keys.includes(s) && same(k, s));
     }
+    Object.defineProperty(sibOf, '_peers', { value: peerOf, enumerable: false });
     return sibOf;
 }
 function loadSiblings({ keys, onlyRows = [], pinFile, tmp, explicit = [], allSiblings = false, runSiblings = false, siblingRuns = [], siblingsFile }) {
@@ -288,12 +319,21 @@ function loadSiblings({ keys, onlyRows = [], pinFile, tmp, explicit = [], allSib
     const cfg = fs.existsSync(sf) ? JSON.parse(fs.readFileSync(sf, 'utf8')) : { templates: {} };
     let tpl = {};
     let sibOf = {};
+    let shapes = {};
+    const peerOnly = new Set();   // skills compared with same-shape PEERS (no approved sibling of their shape)
     if (explicit.length) for (const k of keys) sibOf[k] = explicit.filter((s) => s !== k);
     else {
-        tpl = templatesOf(keys);
-        sibOf = siblingsOf(cfg, tpl, keys, { allSiblings });
+        const cands = [...new Set(keys.flatMap((k) => Object.values(cfg.templates || {}).flatMap((t) => [...(t.approved || []), ...(t.peers || []), ...Object.values(t.pairs || {}).flat()])))];
+        const shape = shapesOf([...new Set([...keys, ...cands])]);
+        for (const k of Object.keys(shape)) tpl[k] = shape[k].template;
+        sibOf = siblingsOf(cfg, tpl, keys, { allSiblings, shape });
+        const peers = sibOf._peers;
+        for (const k of keys) if (!sibOf[k].length && peers[k].length) { sibOf[k] = peers[k]; peerOnly.add(k); }
+        shapes = shape;
     }
     const noTpl = keys.filter((k) => !sibOf[k].length);
+    // same-shape peers are measured like siblings (a fresh / cached sibling run when asked): their pins predate the newer
+    // print-lint rules (L-WRAP, H13-ROW, TY-21), so a pin-only peer would read 0 for those and make every new finding ABOVE
     const allSibs = [...new Set(Object.values(sibOf).flat())];
     const sources = [readPins(pinFile)];
     let sibSecs = 0, sibCache = '', sibRunFile = null;
@@ -316,7 +356,7 @@ function loadSiblings({ keys, onlyRows = [], pinFile, tmp, explicit = [], allSib
         sources.push(runFileAsSource(j, `sibling run (${sibCache})`));
     }
     for (const f of siblingRuns) sources.push(runFileAsSource(runRows(path.resolve(f)), `sibling run ${path.basename(f)}`));
-    return { sibOf, tpl, sources, allSibs, noTpl, sf, sibSecs, sibRunFile };
+    return { sibOf, tpl, sources, allSibs, noTpl, sf, sibSecs, sibRunFile, shapes, peerOnly };
 }
 
 /* ---------------------------------------------------------------- main */
@@ -363,7 +403,7 @@ function main() {
     const noBase = oursRows.filter((r) => r.status === 'PENDING' && printed(r)).length;
     const fmtSibs = (x) => x.sibs.map((s) => `${s.s.split(':')[1]} ${s.n}`).join(', ');
     say(`${TOOL}: ${keys.length} lane skill(s) on ${ROOT === HERE ? 'this tree' : ROOT}; ${oursRows.length} row(s), ${red} RED, ${noBase} PENDING(no-baseline), ${c.errors.length} ERROR; comparing ${has('red-only') ? 'RED rows only (--red-only)' : 'every printed row with findings (RED, OK, PENDING(no-baseline))'} with ${argAll('siblings').length ? 'the given siblings' : has('all-siblings') ? 'every approved sibling (--all-siblings)' : 'the paired siblings (all approved where the skill has no pair)'}`);
-    for (const k of keys) say(`  ${k}: template ${tpl[k] || '(given)'}; siblings ${sibOf[k].length ? sibOf[k].join(', ') : 'NONE (no approved sibling on this template in ' + path.relative(HERE, sf) + ')'}`);
+    for (const k of keys) say(`  ${k}: template ${tpl[k] || '(given)'}${S.shapes && S.shapes[k] && S.shapes[k].tracks ? `, ${S.shapes[k].tracks} track(s)` : ''}; ${S.peerOnly && S.peerOnly.has(k) ? 'same-shape PEERS (no approved sibling of its shape)' : 'siblings'} ${sibOf[k].length ? sibOf[k].join(', ') : 'NONE (no approved sibling of this template and shape in ' + path.relative(HERE, sf) + ')'}`);
     say(`  sibling counts from: ${sources.map((s) => `${s.name}: ${Object.keys(s.rows).filter((id) => allSibs.includes(id.split('|')[0])).length} sibling row(s)`).join('; ')}`);
     for (const e of c.errors) say(`ERROR      ${e.id}: ${e.msg}${/attribution missing/.test(e.msg) ? '' : ' (a row that cannot print is never engine debt)'}`);
     for (const x of c.above) say(`ABOVE      ${x.id} ${x.size} ${x.rule}: ours ${x.n}, siblings max ${x.max} (${fmtSibs(x)})`);
