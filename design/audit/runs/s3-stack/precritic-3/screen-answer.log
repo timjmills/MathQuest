@@ -1,0 +1,12 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-screen-answer.cjs --skills subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_100k_no_regroup,subtraction:sub_1m_no_regroup,subtraction:sub_2d_1d
+
+mq-browser-run: slot 2 after 45s
+subtraction:sub_50_no_regroup      card ok | worksheet ok (3/3) | quiz ok (3/3)
+subtraction:sub_100_no_regroup     card ok | worksheet ok (3/3) | quiz ok (3/3)
+subtraction:sub_1k_no_regroup      card ok | worksheet ok (3/3) | quiz ok (3/3)
+subtraction:sub_10k_no_regroup     card ok | worksheet ok (3/3) | quiz ok (3/3)
+subtraction:sub_100k_no_regroup    card ok | worksheet ok (3/3) | quiz ok (3/3)
+subtraction:sub_1m_no_regroup      card ok | worksheet ok (3/3) | quiz ok (3/3)
+subtraction:sub_2d_1d              card ok | worksheet ok (3/3) | quiz ok (3/3)
+live green (card, quiz)            ok
+ws-screen-answer: OK

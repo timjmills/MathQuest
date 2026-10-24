@@ -1,0 +1,41 @@
+$ node tests/scripts/ws-card-rulings.mjs --skill subtraction:sub_50_no_regroup --skill subtraction:sub_100_no_regroup --skill subtraction:sub_1k_no_regroup --skill subtraction:sub_10k_no_regroup --skill subtraction:sub_100k_no_regroup --skill subtraction:sub_1m_no_regroup --skill subtraction:sub_2d_1d --check rulings
+
+ws-card-rulings: design/cards/stack/stack.md, design/cards/subtraction/subtraction.md on this tree; 7 skill(s), 300 items per ruling
+  ok   subtraction:sub_50_no_regroup        R-BAND-50          (§9.2; §5.1 (within N bounds the minuend)) a in 21..50: all 300 items
+  ok   subtraction:sub_100_no_regroup       R-BAND-100         (§9.2; §5.1 (within N bounds the minuend)) a in 51..99: all 300 items
+  ok   subtraction:sub_1k_no_regroup        R-BAND-1K          (§9.2; §5.1 (within N bounds the minuend)) a in 100..999: all 300 items
+  ok   subtraction:sub_10k_no_regroup       R-BAND-10K         (§9.2; §5.1 (within N bounds the minuend)) a in 1000..9999: all 300 items
+  ok   subtraction:sub_100k_no_regroup      R-BAND-100K        (§9.2; §5.1 (within N bounds the minuend)) a in 10000..99999: all 300 items
+  ok   subtraction:sub_1m_no_regroup        R-BAND-1M          (§9.2; §5.1 (within N bounds the minuend)) a in 100000..999999: all 300 items
+  ok   subtraction:sub_2d_1d                R-BAND-2D1D        (§9.3 (2d − 1d is the sub_2d_1d preset)) a has 2 digit(s): all 300 items
+  ok   subtraction:sub_100_no_regroup       R-NO-REGROUP       (§1 (the name: no regrouping)) no regrouping (-): all 300 items
+  ok   subtraction:sub_100k_no_regroup      R-NO-REGROUP       (§1 (the name: no regrouping)) no regrouping (-): all 300 items
+  ok   subtraction:sub_10k_no_regroup       R-NO-REGROUP       (§1 (the name: no regrouping)) no regrouping (-): all 300 items
+  ok   subtraction:sub_1k_no_regroup        R-NO-REGROUP       (§1 (the name: no regrouping)) no regrouping (-): all 300 items
+  ok   subtraction:sub_1m_no_regroup        R-NO-REGROUP       (§1 (the name: no regrouping)) no regrouping (-): all 300 items
+  ok   subtraction:sub_2d_1d                R-NO-REGROUP       (§1 (the name: no regrouping)) no regrouping (-): all 300 items
+  ok   subtraction:sub_50_no_regroup        R-NO-REGROUP       (§1 (the name: no regrouping)) no regrouping (-): all 300 items
+  ok   subtraction:sub_50_no_regroup        R-SAME-LENGTH      (§9.3 (lengths: same by default)) b has a digit(s): all 300 items
+  ok   subtraction:sub_100_no_regroup       R-SAME-LENGTH      (§9.3 (lengths: same by default)) b has a digit(s): all 300 items
+  ok   subtraction:sub_1k_no_regroup        R-SAME-LENGTH      (§9.3 (lengths: same by default)) b has a digit(s): all 300 items
+  ok   subtraction:sub_10k_no_regroup       R-SAME-LENGTH      (§9.3 (lengths: same by default)) b has a digit(s): all 300 items
+  ok   subtraction:sub_100k_no_regroup      R-SAME-LENGTH      (§9.3 (lengths: same by default)) b has a digit(s): all 300 items
+  ok   subtraction:sub_1m_no_regroup        R-SAME-LENGTH      (§9.3 (lengths: same by default)) b has a digit(s): all 300 items
+  ok   subtraction:sub_2d_1d                R-SHORTER-2D1D     (§9.3 (2d − 1d)) b has 1 digit(s): all 300 items
+  ok   subtraction:sub_100_no_regroup       R-ZERO-NOT-SEEDED  (§9.4 (zeros off: never seeded; critic r1 D1 bound 10%)) zeroCase on 26 of 300 items (8.7%; at most 10%); e.g. 70 - 10 = 60 [2 boxes], 60 - 30 = 30 [2 boxes], 70 - 30 = 40 [2 boxes], 60 - 50 = 10 [2 boxes]
+  ok   subtraction:sub_100k_no_regroup      R-ZERO-NOT-SEEDED  (§9.4 (zeros off: never seeded; critic r1 D1 bound 10%)) zeroCase on 0 of 300 items (0.0%; at most 10%)
+  ok   subtraction:sub_10k_no_regroup       R-ZERO-NOT-SEEDED  (§9.4 (zeros off: never seeded; critic r1 D1 bound 10%)) zeroCase on 0 of 300 items (0.0%; at most 10%)
+  ok   subtraction:sub_1k_no_regroup        R-ZERO-NOT-SEEDED  (§9.4 (zeros off: never seeded; critic r1 D1 bound 10%)) zeroCase on 0 of 300 items (0.0%; at most 10%)
+  ok   subtraction:sub_1m_no_regroup        R-ZERO-NOT-SEEDED  (§9.4 (zeros off: never seeded; critic r1 D1 bound 10%)) zeroCase on 0 of 300 items (0.0%; at most 10%)
+  ok   subtraction:sub_2d_1d                R-ZERO-NOT-SEEDED  (§9.4 (zeros off: never seeded; critic r1 D1 bound 10%)) zeroCase on 0 of 300 items (0.0%; at most 10%)
+  ok   subtraction:sub_50_no_regroup        R-ZERO-NOT-SEEDED  (§9.4 (zeros off: never seeded; critic r1 D1 bound 10%)) zeroCase on 26 of 300 items (8.7%; at most 10%); e.g. 40 - 30 = 10 [2 boxes], 40 - 30 = 10 [2 boxes], 50 - 20 = 30 [2 boxes], 40 - 20 = 20 [2 boxes]
+  ok   subtraction:sub_50_no_regroup        R-BOXES-2          (§9.5 (boxes = digits of the band largest minuend, same on every item)) 2 answer box(es): all 300 items
+  ok   subtraction:sub_100_no_regroup       R-BOXES-2          (§9.5 (boxes = digits of the band largest minuend, same on every item)) 2 answer box(es): all 300 items
+  ok   subtraction:sub_2d_1d                R-BOXES-2          (§9.5 (boxes = digits of the band largest minuend, same on every item)) 2 answer box(es): all 300 items
+  ok   subtraction:sub_1k_no_regroup        R-BOXES-3          (§9.5 (boxes = digits of the band largest minuend, same on every item)) 3 answer box(es): all 300 items
+  ok   subtraction:sub_10k_no_regroup       R-BOXES-4          (§9.5 (boxes = digits of the band largest minuend, same on every item)) 4 answer box(es): all 300 items
+  ok   subtraction:sub_100k_no_regroup      R-BOXES-5          (§9.5 (boxes = digits of the band largest minuend, same on every item)) 5 answer box(es): all 300 items
+  ok   subtraction:sub_1m_no_regroup        R-BOXES-6          (§9.5 (boxes = digits of the band largest minuend, same on every item)) 6 answer box(es): all 300 items
+  design/cards/stack/stack.md: rulings block present, 15 prose ruling(s) not machine-checked (§5.1, §5.2, §5.3, §5.4, §5.5, §5.6, §5.7, §5.8, §5.9, §9.1, §9.2, §9.3, §9.4, §9.5, §9.6)
+  design/cards/subtraction/subtraction.md: rulings block present, 10 prose ruling(s) not machine-checked (§5.2, §5.3, §5.4, §5.5, §5.6, §5.7, §9.1, §9.6, §9.7, §9.8)
+ws-card-rulings: OK (35 ruling check(s), 0 not-offered check(s), 7 of 7 skill(s) checked; 11.0 s)

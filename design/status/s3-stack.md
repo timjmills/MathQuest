@@ -1,0 +1,77 @@
+Lane: s3-stack
+Title: S3 — stack × Single engine debt (side/sections anchors, lesson Warm-up, E10) and the SU-C pilot to 8/10
+Session: session_01CJ9HShunXfJxu24RbqcRjV (lead session_01HVwpAE3g6EZH8idgErP6LP)
+Branch: claude/sweet-newton-c8wrv1-wip-s3-stack
+Owner of files: sheet/anchors.js, layout.js, paginate.js, cells/stack.js, roles/practice.js, roles/lesson.js (+ lesson composer), roles/fact-rows.js, roles/mixed-practice.js, the anchor and section parts of print-sheet.js, the SU-C subtraction generators and providers
+State: stopped (brief path used: fix round + critic r2 FAIL on one 7; F1 fixed after, not yet re-graded)
+Updated: 2026-10-24
+Builder profile: mq-opus-medium (failed-round rebuild, rule 0a)
+
+## Now
+- RESULT: critic r2 FAIL on ONE 7 (F1, sub_10k fact rows at S, C3 7); every other pilot skill, page type, host and anchor sibling >= 8 on all four criteria. F1 fixed after the critic (60c1d5a: 6 x 6, digits clear; VA-2 holds) but not re-graded: the brief's one fix round + one more critic is used. Lead to decide on a focused re-check of fact rows S.
+- Out of the owner's bar, scored not counted (critic r2): EA1 error-analysis wrong answers shifted one place with a comma in a box (4-6 digits; error-analysis.js ~111 passes the comma-formatted value into stack()); W1 worked-example steps 1-3 show empty boxes (scripted-model.js); ST1 Stretch at L ~40 % empty. Nit L2: sub_50 lesson re-deals its model 35 − 21 as p3 item 5.
+- Merged mixed-m1 (anchors r2) and pilot-su-c (fix r2). c2160715's fact-rows column drop reverted on this branch (it breaks ws-layout-unit VA-2 on main; the lead lands a narrowed version); its D8 preset band heading stays.
+- Builder A (anchors: 50/50 sizing + measured pair heights, lone sections block, 2 mm bottom pad, twin = problem in the sections band, band-above for shade_fraction / money_count / place_value_10x, E10 grey) and builder B (lesson Warm-up rows per item kind, worktree) running.
+
+## Times
+
+## Per-round findings
+
+## Log
+Times: builder B (lesson Warm-up rows per kind, N2), start 2026-10-24T05:21Z, end 2026-10-24T06:15Z, profile mq-opus-medium, tokens 192k, 80 tool uses. Warm-up band ≤ 29 % on all seven + siblings (was ≤ 41 % on the critic-state fixture); ws-print-lint lesson role unchanged; open: horizontal H13 in a half-width place-value Warm-up cell at L on 4 skills (width band).
+Times: builder B round 2 (Warm-up width band), start 2026-10-24T06:16Z, end 2026-10-24T06:42Z, profile mq-opus-medium. Width band at L ≤ 28 % (was 34 %), height ≤ 29 %; lesson lint L 164 → 156 (the 8 H13 width findings gone).
+Times: builder A (anchors rebuild, tasks 1-6 + E11-E14 backtests + Andika-origin fix in anchors.check), start 2026-10-24T05:21Z, end 2026-10-24T07:42Z, profile mq-opus-medium, tokens 399k, 170 tool uses. anchors.check 46 skills 0 FAIL; print-lint side/sections S/M/L 0 findings (HEAD had 9/9/2 H13 + 1 OVERFLOW).
+Times: precritic pass 1 (--strict, merged with main ffc1351), start 2026-10-24T07:43Z, end 2026-10-24T08:17Z, profile — — FAIL: 12 PASS, 1 N/A, coverage-matrix 7 RED (all sections/ex-each + sub_10k ex-group: ILLEGIBLE, PG-12, H13, PAGEFILL); builder A resumed on it. Tool note: ws-precritic looks for chrome-linux/, the container has chrome-linux64/ (worked around with PUPPETEER_EXECUTABLE_PATH; reported to the lead for S1).
+Times: builder A round 2 (precritic REDs; side sections share pages by measured pair rows; variable-height side rows), start 2026-10-24T07:50Z, end 2026-10-24T09:38Z, profile mq-opus-medium, tokens 482k (both rounds). 7 RED rows remain; cause is the partner algebra:tape_diagram's Answer line overflowing its cell (pinned PG-12, also anchors-off); reproduces with the anchor files reverted. mixed-page.check --seeds 3 OK (108 pages). add_10k side L worst twin gap 29 %.
+- 09:39 lead ruling: the 7 RED sections rows are partner-owned (algebra:tape_diagram cell overflow; W0-A D1 partner attribution), non-blocking, not re-pinned; critic told the same. Start the critic if the sibling comparison matches.
+Times: sibling comparison (rule 0b; sections ex-each/ex-group on add_100_regroup, add_1k_regroup, sub_100_regroup, sub_100k_regroup, sub_1m_regroup), start 2026-10-24T09:39Z, end 2026-10-24T09:42Z — add_100_regroup RED too (PAGEFILL 1→2 as on sub_10k ex-group; new L-TOPSTART CL-4b 0→4 from main's CL-4b, lead-owned), others no baseline; sibling L totals 13–17 vs pilot 16–21 with the partner overflow. Rule 0b met under the lead's ruling.
+Times: critic r1 (mq-opus-medium), start 2026-10-24T09:45Z
+- 10:35 lead: owner rule — all work pauses at 80 % weekly usage (now ~61 %); commit+push every step; on PAUSE NOW finish step, commit, push, status, report, stop; no extra agents.
+- 11:18 merged main 7bf5f587 (CL-4b equal-margin centring of write-above stacks; 5–6-digit regroup facts centred on fact rows) mid-critic; critic told to re-render regroup/fact-row pages. Lead open items: sub_100_regroup ex-each/sections H13 bands (check after the critic); fact-rows S 10×9 cells 1 mm short for 2-digit facts with the 4.5 mm tab (capacity decision: report only).
+Times: critic r1 (mq-opus-medium), start 2026-10-24T09:42Z, end 2026-10-24T12:13Z, tokens 415k, 205 tool uses — FAIL on 7ca4631 (re-rendered on 2be17d6, findings hold). Min: sub_50/100/1k/10k/100k 8/8/8/8; sub_1m 7/8/7/8; sub_2d_1d 8/7/8/8; anchor siblings 8/8/8/8; band-above skills C1 7. Defects: A1 Model tab over the band's first line (anchors.js); S1 sub_1m 6-digit stack touches the frame on the 390 practice card (regression, stack.js / screen-cell.js); N1b sub_2d_1d "− 1" on 17.5 % of items (_nr2Pair); N6b "place" vocab picture wraps at L on sub_1m (prereqs.js). r2 N1–N5, N7, N8 and all anchors r2 items fixed. Fact rows S 10×9 (lead capacity item) still present.
+Times: fix round r1 (A1, S1, N1b, N6b, nits M1/N9, lead item 6 fact-rows S), start 2026-10-24T12:14Z, end 2026-10-24T13:08Z, profile mq-opus-medium, tokens 239k, 119 tool uses. Open: add_20_regroup fact rows L 25×0.2 mm (fixing drops L to 5×4, breaks ws-layout-unit PT 4.1 — lead decision); band skills' own pre-existing lint (TY-7 slash, TY-11 7 pt in place_value_10x pupil cells, H13 31 % money_count).
+Times: precritic pass 2 (--strict, merged with main 02ce513; S1's widened gate set, 25 gates), start 2026-10-24T13:09Z, end ~14:39Z — FAIL: 16 PASS, 7 FAIL (content-audit R-ZERO 10.8 % on sub_50; coverage-matrix 9 RED; lesson lint S/L L-TOPSTART mq-lvcenter; sibling-compare 31 counts above (PG-23, H13 more-cols2 M, PAGEFILL); slot-clip SIGTERM; card-not-offered nl* ×28), 1 INCOMPLETE (card unsigned — lead). Logs: design/audit/runs/s3-stack/precritic-2/.
+- 14:42 lead rulings: (1) add_20_regroup fact rows L stay 5×5 (PT 4.1); 0.2 mm findings pre-existing, addition family, non-blocking; (2) card's 4 undecided values (lengths, zeros) go to the owner; card stays unsigned until then; (3) slot-clip run alone; 90-min precritic noted for the tools backlog.
+Times: precritic-2 cleanup builder, start 2026-10-24T14:41Z, end 2026-10-24T16:14Z, profile mq-opus-medium, tokens 261k, 135 tool uses. Fixed: lesson Guided CL-4b (lesson-css.js), zero-case cap (≤ 2 in 20; sub_50 10/120), nl* options not offered (card-rulings offered OK), fact-probe rows shared across pages (layout-timed PG-23 2→0); slot-clip alone OK (58 min). Partner-driven (perimeter_intro / tape_diagram): ex-each/ex-group PG-23 + PAGEFILL at S/M, WRAP-OP, sub_100k sections H13, sub_10k mixed H13. Same as sibling: more-cols2 H13 at M. Engine (ours, being fixed): ex-group column choice counts the anchor band in gridH (H13 at L, 4 vs 0).
+- 16:36 owner ruling via lead: CL-4b decided PER SECTION (any regrouping stack in a section → every stack drawing a regroup row is write-above/centred; VA-10, AX-4). Move from cells/stack.js:371 to section assembly; add row-consistency check (first inked row within 1.5 mm across a grid row), backtest add_100_mixed M items 3/6/11/12. Folded into the current builder round before critic r2.
+Times: builder round (ex-group column choice resolveBandedLayout + E16; CL-4b per section markSectionWriteAbove + E17 row check), start 2026-10-24T16:15Z, end 2026-10-24T17:35Z, profile mq-opus-medium, tokens 341k (both rounds of this builder). Own-skill ex-group H13 0 at S/M/L, no page-count change; E17 add_100_mixed M 3 bad rows → 0. Remaining rises: partner-tagged; PG-23 on ex-group last page = perimeter_intro's 2-problem section (partner); add_100_regroup/add_100_mixed lesson H13 ×12 at S identical on main (pre-existing).
+Times: precritic pass 3 (--strict, 3caaf5d), start 2026-10-24T17:46Z — at 19:34Z: 20 PASS, card INCOMPLETE (unsigned), coverage-matrix + sibling-compare FAIL (13 counts above siblings in 8 rows, all page-level PG-23/PAGEFILL on sections ex-each/ex-group traced to the partner perimeter_intro's last-page section; lead ruling asked), slot-clip + options-render still running.
+Times: critic r2 (mq-opus-medium), start 2026-10-24T19:36Z (started under rule 0b's later-confirmation clause).
+- 19:35 lead ruling: the sections ex-each/ex-group PG-23/PAGEFILL (perimeter_intro's last-page section) are partner-driven, non-blocking for precritic; critic r2 counts; critic told to grade the pilot's cells and page fill where the pilot's section ends. Tool gap for S1: page-level findings (PG-23, PAGEFILL) need partner attribution by which section ends the page.
+
+## Per-round findings (LESSONS_LEARNED rule 00)
+
+### s3-stack · critic r1 (2026-10-24, FAIL: four 7s)
+| Finding | Automatic check that would have caught it | Existed? |
+|---|---|---|
+| A1 Model tab over the band's first line (band-above skills) | anchors.check E15: content top ≥ tab bottom + 1 mm (added, fails 32 before) | No |
+| S1 sub_1m 6-digit stack touches the frame at 390 | ws-phone-card / chromebook-fit: ≥ 8 px clear each side (now in precritic) | Partly (fit only, no clearance) |
+| N1b sub_2d_1d "− 1" on 17.5 % | ws-dealer-uniform: value share caps per page (now in precritic) | No (added by S1) |
+| N6b vocab picture wraps at L | probes/vocab-wrap.cjs: no picture wraps / overruns | No |
+| Fact rows S capacity (lead item) | row height includes the answer row; key answers inside cells | No |
+
+### s3-stack · precritic 2 (S1's widened gates)
+| Finding | Check | Existed? |
+|---|---|---|
+| Lesson Guided stacks 4 mm low | print-lint --roles lesson L-TOPSTART | Yes (new gate) |
+| sub_50 zero share 10.8 % | content-audit card ruling R-ZERO | Yes (new gate) |
+| nl* options offered against the card | ws-card-rulings --check offered | Yes (new gate) |
+| ex-group column choice ignores the anchor band | anchors.check E16 (added) | No |
+
+### s3-stack · critic r2 (2026-10-24, FAIL: one 7)
+| Finding | Automatic check | Existed? |
+|---|---|---|
+| F1 4-digit facts in 8 columns, ink on both frames (fact rows S) | print-lint: ink-to-frame clearance ≥ 1 mm in fact cells (the role's own slackMm < 0 must FAIL, not print) — for S1 | No: ws-print-lint finds nothing on this page |
+| L2 lesson re-deals its model problem | node-lint: lesson practice items ≠ model items | No |
+| EA1 comma in a digit box on error analysis | screen/print lint: no non-digit glyph in a digit track | No |
+
+## Speed reflection (rule 00)
+- Wall: 05:20Z → 22:00Z (~16.7 h) for 2 critic rounds; target ≤ 2 rounds: met on count, but the result is one 7 short.
+- Agent tokens: builder A 482k, builder B 217k, fix round 239k, cleanup builder 601k (two rounds), critic r1 415k, critic r2 ~317k ≈ 2.27 M.
+- Lost time, causes → fixes:
+  1. Precritic took > 90 min, then > 2 h, on 7 skills (slot-clip ~58–75 min alone): two runs killed by the harness cap. → S1: shard precritic, or run slot-clip from the matrix's own renders; the 2 h background cap must be a design limit.
+  2. S1's widened gate set arrived mid-lane, so precritic 2 found four new classes after critic r1. → Run the CURRENT precritic (merged with main) before each critic, as rule 0b says; I did, but the gate set changed between runs.
+  3. Page-level findings (PG-23 / PAGEFILL) on partner sections cost one triage and one lead ruling. → S1: attribute page-level findings to the section that ends the page.
+  4. F1 slipped through two critics because fact rows were treated as out of scope in r1, and no lint measures fact-cell clearance. → The role's own fit measure (slackMm < 0) must fail loud; add a print-lint fact-cell clearance check.
+  5. A merge committed with `git commit -a` swept conflict markers into print-sheet.js (fixed 3 min later). → Never `commit -a` during a merge; check `git diff --name-only --diff-filter=U` first (added to my own routine).
+  6. ws-precritic looks for chrome-linux/, the container has chrome-linux64/ → S1 (reported).

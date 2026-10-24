@@ -36,18 +36,18 @@ import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practic
 import { normKeyOptions, shortKeyRows, renderShortKey, tagKeyAnswers, answerText } from './sheet/roles/key-short.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH, splitPairH } from './sheet/roles/practice.js';
 import { onePageRows, setOnePagePaper, ONE_PAGE_ITEMS } from './count-rows.js';
-import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS, groupByHeight, packByHeight } from './sheet/layout.js';
+import { resolveSectionLayout, resolveBandedLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS, groupByHeight, packByHeight } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
 import { tagLine as lessonTagLine, CASE_TESTS as LESSON_CASE_TESTS } from './sheet/roles/lesson.js';
 import { lessonFor, skillRef } from './lessons/prereqs.js';
 import { detailedLessonFor, validateDescription, fillPlaceholders } from './lessons/detailed/index.js';
 import { teacherBands, paginateTeacher, renderTeacherPage, measureShell, wordProblemPlan, exitSlipPlan, numberSensePlan, DETAILED_PUPIL_CSS, LIFT_MAX_CHARS, TEACHER_BODY_MM } from './sheet/roles/detailed-lesson.js';
-import { TEACHER_CSS, RCDWS_CSS, teacherParts, numberWords, pageRepeats, factOf } from './sheet/index.js';
+import { TEACHER_CSS, RCDWS_CSS, teacherParts, numberWords, pageRepeats, factOf, stackRegroups } from './sheet/index.js';
 const { tBand } = teacherParts;
 import { planItem as composePlanItem, operandsOf as composeOperandsOf, opOf as composeOpOf, opGlyphOf as composeGlyphOf, oralFrameOf as composeOralFrameOf, answerOf as composeAnswerOf, instructionKeyOf as composeInstrKeyOf, instructionText as composeInstrText } from './sheet/roles/compose.js';
 import {
-    normaliseAnchors, ANCHOR_ROLES, anchorEligible, anchorItem, anchorHeightMm, easeScore, ineligibleNote,
+    normaliseAnchors, ANCHOR_ROLES, anchorEligible, anchorItem, anchorHeightMm, sideFit, SIDE_COLS, side4Cols, SIDE4_BAND, SIDE_BAND_ONLY, easeScore, ineligibleNote,
     blockPlan, sideItems, pickDistinct,
 } from './sheet/anchors.js';
 import {
@@ -1228,6 +1228,19 @@ function allocateHostSupports(items, n) {
  * function (the SAME one for the pupil page, the key and the measurement), the key, and the
  * class tokens the role writes onto the cell.
  */
+/**
+ * CL-4b per SECTION (owner ruling 2026-10-24; VA-10, AX-4): when any stack of a section regroups,
+ * every stack of the section is told so (`sectionWriteAbove`), and each one that draws a regroup
+ * row is centred like the regrouping ones - the cells of a row start together, and where an item
+ * sits never gives away whether it regroups. Called once a section's items are dealt.
+ */
+export function markSectionWriteAbove(items) {
+    const stacks = (items || []).filter((it) => it && it.q && it.q.cell && it.q.cell.template === 'stack' && it.q.cell.payload);
+    const any = stacks.some((it) => stackRegroups(it.q.cell.payload));
+    for (const it of stacks) it.q.cell.payload = Object.assign({}, it.q.cell.payload, { sectionWriteAbove: any || undefined });
+    return items;
+}
+
 function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = null } = {}) {
     const q0 = g.q;
     // S2: a legacy-drawn fact (sub_facts' vertical fact) that carries supports is drawn by the kit's
@@ -1467,6 +1480,191 @@ function ensureEngineStyle(doc) {
 function why(it, c, reason) {
     it.measureWhy = it.measureWhy || {};
     if (!it.measureWhy[c]) it.measureWhy[c] = String(reason).slice(0, 80);
+}
+
+/**
+ * The ink and the height a cell's content needs, read in the page (S3 rebuild). `need` runs from
+ * the cell's TOP to its lowest in-flow box (a twin's Say line closes its box under its last ink)
+ * plus the cell's bottom padding: the space above the first ink (the Model tab's clearance, a
+ * stack's headroom) is part of the height - an ink-top measure planned a twin 3 mm short, and its
+ * Say line ran into the 2 mm bottom pad (critic anchors-r2, the grid's bottom frame).
+ */
+function cellInk(cell, PX_PER_MM) {
+    const getComputedStyle = (el) => el.ownerDocument.defaultView.getComputedStyle(el);
+    const r = cell.getBoundingClientRect();
+    const cs = getComputedStyle(cell);
+    let lo = Infinity, hi = -Infinity, bot = -Infinity, inside = true, labelR = r.left;
+    for (const el of cell.querySelectorAll('*')) {
+        if (el.closest('.ws-letter,.ws-tab,.ws-label,.ws-modeltab')) { if (el.matches('.ws-letter,.ws-tab,.ws-label,.ws-modeltab')) labelR = Math.max(labelR, el.getBoundingClientRect().right); continue; }
+        if (el.parentElement && el.parentElement.closest('svg')) continue;
+        if (getComputedStyle(el).position === 'absolute') continue;
+        const er = el.getBoundingClientRect();
+        if (!er.height) continue;
+        bot = Math.max(bot, er.bottom);
+        if (el.children.length && el.tagName.toLowerCase() !== 'svg') continue;
+        if (!er.width) continue;
+        lo = Math.min(lo, er.left); hi = Math.max(hi, er.right);
+        // (inside the cell's border with a 1 mm margin: a subtraction's wide ones box overhangs its
+        // stack on purpose, into the padding)
+        if (er.right > r.right - PX_PER_MM || er.left < r.left + PX_PER_MM) inside = false;
+    }
+    // (a box wider than the cell - a chart's frame - runs past it even when its text does not)
+    if (cell.scrollWidth > cell.clientWidth + PX_PER_MM) inside = false;
+    const need = bot > r.top ? bot - r.top + (parseFloat(cs.paddingBottom) || 0) : 0;
+    return { w: hi > lo ? hi - lo : 0, inside, need, label: labelR - r.left, padX: (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0) };
+}
+
+/**
+ * "Print-media measurement" (S3 task 1; critic anchors-r2, E4 "drift"): the side pairs are measured
+ * only once the sheet's font is loaded - Andika at 400 and 700, for the glyphs the steps use. A
+ * pair measured while the font was still loading (the first sheet of a session) was planned
+ * 3-4 mm off what it prints, a row too many or too few. Resolves to the document to measure in.
+ */
+async function printMeasureDoc() {
+    if (typeof document === 'undefined' || !document.body) return null;
+    try {
+        if (document.fonts) {
+            const sample = '0123456789 +\u2212\u00d7\u00f7= ,.:? Say Ones Tens Write Regroup';
+            await Promise.all(['12pt Andika', 'bold 12pt Andika'].map((f) => document.fonts.load(f, sample).catch(() => null)));
+            await document.fonts.ready;
+        }
+    } catch (e) { /* measure as is */ }
+    return document;
+}
+
+/** A hidden sheet root to measure in: the print-measure document when given, else the app page. */
+function measureHost(size, look, mdoc) {
+    const doc = mdoc && mdoc.body ? mdoc : document;
+    if (doc === document) ensureEngineStyle(document);
+    const s = SIZES[size] || SIZES.L;
+    const host = doc.createElement('div');
+    host.setAttribute('aria-hidden', 'true');
+    host.style.cssText = 'position:absolute;left:-10000px;top:0;width:220mm;visibility:hidden;pointer-events:none;contain:layout;';
+    host.innerHTML = `<div class="ws-sheet ws-${size} ws-${look} ws-tab${s.tabMm}" style="display:block;max-width:none;width:${LIVE_W_MM}mm;overflow:visible"></div>`;
+    doc.body.appendChild(host);
+    return { root: host.firstChild, done: () => host.remove() };
+}
+
+/**
+ * SIDE BY SIDE, two columns (S3 task 1; critic anchors-r2: the 50/50 pair put a 5-digit problem
+ * in a 92 mm column and the twin under its own steps - one pair a page at L). The pair's columns
+ * are sized from content: the PUPIL's column is the widest problem's ink + its two 3 mm pads + the
+ * label box; the twin takes the rest (`minmax(0,1fr) <pupil>mm`), so its steps stand beside its
+ * state where they can. Each [twin | problem] pair is then drawn in those columns and measured as
+ * it prints. Writes on each twin: `cols2` (the template), `pairMm` (its tallest pair, mm, read by
+ * anchors.js anchorHeightMm(a, 2) and sideFit), and `measured[2]` (its own height there and
+ * whether it fits its column), so the layout neither estimates nor rejects two columns from an
+ * equal half. `tpl` reuses a section's template (the probe's) when given.
+ */
+function measureSide2(pairs, { size, look, tpl = '', mdoc = null }) {
+    if (typeof document === 'undefined' || !document.body || !pairs.length) return '';
+    const { root, done } = measureHost(size, look, mdoc);
+    const PX_PER_MM = 96 / 25.4;
+    const ctx = (lvl) => resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: lvl || 1, state: 'blank' });
+    const cellHtml = (x) => { let b = ''; try { b = x.render(ctx(x.measureLevel), { cols: 2 }); } catch (e) { b = ''; } return `<div class="ws-cell ${x.cellCls || ''}" style="height:auto;min-height:0;"><span class="ws-letter">m.</span>${b}</div>`; };
+    try {
+        if (!tpl) {
+            // the pupil's column: the widest problem at its own width (a max-content column)
+            let col = 0;
+            for (const it of new Set(pairs.map((p) => p[1]))) {
+                root.innerHTML = `<div class="ws-grid fixed" style="grid-template-columns:minmax(0,1fr) max-content;grid-template-rows:auto;height:auto;align-items:start"><div class="ws-cell"></div>${cellHtml(it)}</div>`;
+                const ink = cellInk(root.firstChild.children[1], PX_PER_MM);
+                col = Math.max(col, ink.w + ink.padX + ink.label);
+            }
+            tpl = `minmax(0,1fr) ${Math.ceil(col / PX_PER_MM)}mm`;
+        }
+        for (const [twin] of pairs) { twin.pairMm = 0; twin.measured = Object.assign({}, twin.measured, { 2: { hMm: 0, fits: true } }); }
+        for (const [twin, it] of pairs) {
+            root.innerHTML = `<div class="ws-grid fixed" style="grid-template-columns:${tpl};grid-template-rows:auto;height:auto;align-items:start">${cellHtml(twin)}${cellHtml(it)}</div>`;
+            const g = root.firstChild;
+            const a = cellInk(g.children[0], PX_PER_MM), b = cellInk(g.children[1], PX_PER_MM);
+            const fits = a.inside && b.inside && g.scrollWidth <= g.clientWidth + PX_PER_MM;
+            twin.pairMm = Math.max(twin.pairMm, Math.ceil(Math.max(a.need, b.need) / PX_PER_MM * 10) / 10);
+            const m2 = twin.measured[2];
+            twin.measured[2] = { hMm: Math.max(m2.hMm, Math.ceil(a.need / PX_PER_MM * 10) / 10), fits: m2.fits && fits };
+            twin.cols2 = tpl;
+        }
+        return tpl;
+    } finally { done(); }
+}
+
+/**
+ * Owner ruling A (critic anchors-r1): a side page whose [twin | problem] pairs fill under about
+ * half of the two-column row prints FOUR columns, [twin | problem | twin | problem] (H13: no cell
+ * an island in a wide cell). Chosen by rule, never by skill:
+ *   1. each pair is drawn in the two-column side grid; it is LOW FILL when a cell's empty band
+ *      left or right of its content is SIDE4_BAND (H13's 30 %) or more - the pair fills under
+ *      half of the row however the width is shared;
+ *   2. the pairs are then drawn two to a row in the four-column grid at the cells' own drawing
+ *      width; that layout is taken only if every cell's content stays inside its cell.
+ * Returns {ok, hMm (the tallest four-column row), h2Mm (the tallest two-column row), fill}.
+ * anchors.js sideFit takes it only when a page holds at least as many pairs as in two columns.
+ */
+function measureSide4(pairs, { size, look, mdoc = null }) {
+    const out = { ok: false, hMm: 0, h2Mm: 0, fill: 1, band: 0 };
+    if (typeof document === 'undefined' || !document.body || !pairs.length) return out;
+    const { root, done } = measureHost(size, look, mdoc);
+    const getComputedStyle = (el) => el.ownerDocument.defaultView.getComputedStyle(el);
+    const PX_PER_MM = 96 / 25.4;
+    const ctx = (lvl) => resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: lvl || 1, state: 'blank' });
+    const cellHtml = (x) => { let b = ''; try { b = x.render(ctx(x.measureLevel), { cols: 2 }); } catch (e) { b = ''; } return `<div class="ws-cell ${x.cellCls || ''}" style="height:auto;min-height:0;"><span class="ws-letter">m.</span>${b}</div>`; };
+    // the content's ink extent in a cell, and whether it stays inside the cell's padding box
+    const ink = (cell) => {
+        const r = cell.getBoundingClientRect();
+        const cs = getComputedStyle(cell);
+        let lo = Infinity, hi = -Infinity, top = Infinity, bot = -Infinity, inside = true;
+        for (const el of cell.querySelectorAll('*')) {
+            if (el.closest('.ws-letter,.ws-tab,.ws-label') || (el.parentElement && el.parentElement.closest('svg'))) continue;
+            if (getComputedStyle(el).position === 'absolute') continue;
+            if (el.children.length && el.tagName.toLowerCase() !== 'svg') continue;
+            const er = el.getBoundingClientRect();
+            if (!er.width || !er.height) continue;
+            lo = Math.min(lo, er.left); hi = Math.max(hi, er.right);
+            top = Math.min(top, er.top); bot = Math.max(bot, er.bottom);
+            // (inside the cell's border with a 1 mm margin: a subtraction's wide ones box overhangs its
+            // stack on purpose, into the padding)
+            if (er.right > r.right - PX_PER_MM || er.left < r.left + PX_PER_MM) inside = false;
+        }
+        // the height the content needs: from the cell's top to its lowest box, and the bottom pad
+        // (cellInk; an ink-top measure planned a twin 3 mm short - S3 rebuild); and a box wider
+        // than its cell (a hundreds chart's frame in a 45 mm twin column) is not inside
+        const ci = cellInk(cell, PX_PER_MM);
+        const need = ci.need;
+        if (!ci.inside && cell.scrollWidth > cell.clientWidth + PX_PER_MM) inside = false;
+        return { w: hi > lo ? hi - lo : 0, inside, band: hi > lo ? Math.max(lo - r.left, r.right - hi) / r.width : 1, need };
+    };
+    try {
+        let fill = 0, band = 0, h2 = 0, wP = 0;
+        for (const [twin, it] of pairs) {
+            root.innerHTML = `<div class="ws-grid fixed" style="grid-template-columns:${SIDE_COLS};grid-template-rows:auto;height:auto;align-items:start">${cellHtml(twin)}${cellHtml(it)}</div>`;
+            const g = root.firstChild;
+            const [a, b] = g.children;
+            const ia = ink(a), ib = ink(b);
+            fill = Math.max(fill, (ia.w + ib.w) / g.getBoundingClientRect().width);
+            band = Math.max(band, ia.band, ib.band);
+            wP = Math.max(wP, ib.w / PX_PER_MM);
+            h2 = Math.max(h2, g.getBoundingClientRect().height / PX_PER_MM);
+        }
+        out.fill = Math.round(fill * 1000) / 1000;
+        out.band = Math.round(band * 1000) / 1000;
+        out.h2Mm = Math.ceil(h2 * 10) / 10;
+        if (!(band >= SIDE4_BAND)) return out;
+        // The problem columns as wide as the widest problem's ink + 4 mm a side (a subtraction's
+        // wide ones box overhangs its stack); the twins share the rest.
+        const tpl = side4Cols(Math.ceil(wP + 8));
+        let h = 0;
+        for (let i = 0; i < pairs.length; i += 2) {
+            const two = [pairs[i], pairs[i + 1] || pairs[0]];
+            root.innerHTML = `<div class="ws-grid fixed" style="grid-template-columns:${tpl};grid-template-rows:auto;height:auto;align-items:start">${two.map(([t, it]) => cellHtml(t) + cellHtml(it)).join('')}</div>`;
+            const g = root.firstChild;
+            if ([...g.children].some((c) => !ink(c).inside) || g.scrollWidth > g.clientWidth + PX_PER_MM) return out;
+            h = Math.max(h, ...[...g.children].map((c) => ink(c).need / PX_PER_MM));
+        }
+        out.ok = true;
+        out.tpl = tpl;
+        out.hMm = Math.ceil(h * 10) / 10;
+        return out;
+    } finally { done(); }
 }
 
 function measureItems(items, { size, look, colsList }) {
@@ -1851,7 +2049,8 @@ function heightClassOf(sec, items, gridMm) {
 function layoutOf(role, section, items, n, ctx) {
     const base = { role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense, maxCols: section.maxCols, noCap: section.noCap };
     const opts = { size: n.size, look: n.look, header: ctx.header };
-    const whole = resolveSectionLayout(base, items, ctx.paper, LIVE_W_MM, opts);
+    // (S6 sections: the columns are also tried on the grid net of the anchor band - layout.js resolveBandedLayout)
+    const whole = resolveBandedLayout(base, section.anchorMm || 0, items, ctx.paper, LIVE_W_MM, opts);
     // HEIGHT CLASSES (critic 2026-10-24 D2): a one-skill legacy pool whose problems differ a lot in
     // height (mixed_coordinates: 95 mm read-only grids beside 217 mm transform choices) is paged by
     // each problem's OWN measured height (heightClassOf), as the CL-41 split pages full-width
@@ -1952,11 +2151,12 @@ const ANCHOR_MAX = 48;            // candidates per skill at most (side by side 
  * `take(pupilItems, count)` then picks examples that are none of the pupil's problems (review
  * note 5: an anchor is a sibling item, never the same item).
  */
-function anchorSet(sk, si, n, { variant, colsList, twinCols }) {
+function anchorSet(sk, si, n, { variant, colsList, twinCols, level }) {
     const cands = [];
     const seen = new Set();
     let next = 0;
     let eligible = null;
+    let post = null;            // (side by side: measures fresh twins in their pairs, measureSide2)
     const base = ((n.seed ^ 0x2545F491) + si * 65537) >>> 0;
     const grow = (want) => {
         const fresh = [];
@@ -1970,11 +2170,12 @@ function anchorSet(sk, si, n, { variant, colsList, twinCols }) {
             const it = hostItem({ q, skill: sk }, si, n.size, { supports: false });
             if (eligible === null) eligible = anchorEligible(it);
             if (!eligible) return;
-            const a = anchorItem(it, { variant, twinCols });
+            const a = anchorItem(it, level === undefined ? { variant, twinCols } : { variant, twinCols, level, greyNewest: true });
             cands.push(a);
             fresh.push(a);
         }
         if (fresh.length) measureItems(fresh, { size: n.size, look: n.look, colsList });
+        if (fresh.length && post) post(fresh);
         // Easy numbers first; a stable order, so the same seed reprints the same examples.
         cands.sort((x, y) => easeScore(x.source.q) - easeScore(y.source.q) || signature(x.source.q).localeCompare(signature(y.source.q)));
     };
@@ -1983,6 +2184,8 @@ function anchorSet(sk, si, n, { variant, colsList, twinCols }) {
         get eligible() { return !!eligible; },
         get items() { return cands; },
         grow,
+        /** A measure run on every candidate generated from now on (and on those already there). */
+        set post(fn) { post = fn; if (fn && cands.length) fn(cands.slice()); },
         /** The band height every candidate fits in (mm). */
         // The easiest few are the ones a page uses; a later, taller one is never picked into a
         // band that cannot hold it (see `take` callers).
@@ -1993,7 +2196,7 @@ function anchorSet(sk, si, n, { variant, colsList, twinCols }) {
             const sigOf = (a) => signature(a.source.q);
             const free = () => cands.filter((a) => !sigs.has(sigOf(a))).length;
             if (free() < count) grow(cands.length + count - free() + 2);
-            return pickDistinct(cands, sigs, count, sigOf);
+            return pickDistinct(cands, sigs, count, sigOf, (a) => String((a.source.q && a.source.q.text) || '').replace(/[^0-9]/g, ''));
         },
     };
 }
@@ -2005,7 +2208,7 @@ function anchorSummary(mode, list, notes) {
     for (const a of list) {
         if (!a || !a.source || seen.has(a)) continue;
         seen.add(a);
-        examples.push({ section: a.section, pool: a.pool, variant: a.anchor, skill: a.skill, text: String(a.source.q.text || ''), ans: a.source.q.ans, sig: signature(a.source.q), measured: a.measured });
+        examples.push({ section: a.section, pool: a.pool, variant: a.anchor, skill: a.skill, text: String(a.source.q.text || ''), ans: a.source.q.ans, sig: signature(a.source.q), measured: a.measured, pairMm: a.pairMm, pair4Mm: a.pair4Mm, pair2Mm: a.pair2Mm, side4: a.side4 });
     }
     return { mode, examples, notes: notes.slice() };
 }
@@ -2188,12 +2391,21 @@ async function buildSheetCore(req = {}) {
     // page capacity is decided, so the capacity reserves their band (sections) or their half of
     // every row (side by side). A skill with no real worked steps gets none, and the dialog says so.
     const anchorMode = n.anchors;
+    // Owner ruling B (critic anchors-r1): a side twin is drawn at the pupil's own scaffold level
+    // (practice.js composeSheet: level 1 on Independent and More Practice), so it has exactly the
+    // heads row and answer row the problem beside it has - same drawing, same scaffolds; and
+    // (ruling C, S5) its newest marks are grey (anchors.js anchorHtml greyNewest).
+    // (owner ruling, 2026-10-24: the sections band too - every worked example on every page type)
+    const PUPIL_LEVEL = 1;
     const anchorNotes = [];
     const instrMm = instructionMm(n.size);
+    const askedCols = n.sections.map((sec) => ({ columns: sec.columns, maxCols: sec.maxCols }));
+    // (side by side: the pairs are measured in a print-like document - printMeasureDoc)
+    const mdoc = anchorMode === 'side' ? await printMeasureDoc() : null;
     const anchorSets = anchorMode === 'off' ? [] : n.sections.map((sec, si) => {
         const sk = sec.skills[0];
         const set = anchorSet(sk, si, n, anchorMode === 'side'
-            ? { variant: 'side', colsList: [1, 2], twinCols: 2 } : { variant: 'band', colsList: [1], twinCols: 4 });
+            ? { variant: 'side', colsList: [1, 2], twinCols: 2, level: PUPIL_LEVEL } : { variant: 'band', colsList: [1], twinCols: 4, level: PUPIL_LEVEL });
         if (!set.eligible) { anchorNotes.push(ineligibleNote(metaOf(sk).label)); return null; }
         if (anchorMode === 'side') sec.columns = 2;
         else { sec.maxCols = 4; sec.anchorMm = set.heightMm(1); }
@@ -2209,9 +2421,9 @@ async function buildSheetCore(req = {}) {
     const capFromL = (sec, si, L) => {
         if (anchorMode === 'sections' && anchorSets[si]) {
             const body = sec.gridH ? sec.gridH + instrMm : bodyHeightMm(paper, layoutHeader);
-            return blockPlan({ cols: L.cols, hMin: L.hMin, cellH: L.cellH, bodyMm: body, instrMm, anchorMm: sec.anchorMm }).perPage;
+            return blockPlan({ cols: L.cols, hMin: L.hMin, cellH: L.cellH, bodyMm: body, instrMm, anchorMm: sec.anchorMm, count: sec.count || undefined }).perPage;
         }
-        if (anchorMode === 'side' && anchorSets[si] && anchorSets[si].items.length) return Math.max(1, Math.floor((L.cols === 1 ? Math.max(2, L.rows - (L.rows % 2)) : L.perPage) / 2));
+        if (anchorMode === 'side' && anchorSets[si] && anchorSets[si].items.length) return Math.max(1, Math.floor((L.cols === 1 ? sideFit(Object.assign({}, L, { rows: Math.max(2, L.rows - (L.rows % 2)) }), anchorSets[si].items).rows : sideFit(L, anchorSets[si].items).perPage) / 2));
         return L.perPage;
     };
     const floorWith = (si, items) => floorOf(anchorMode === 'side' && anchorSets[si] ? items.concat(anchorSets[si].items) : items, n);
@@ -2222,6 +2434,72 @@ async function buildSheetCore(req = {}) {
         return gen.map((g) => settlePrompts([hostItem(g, sectionIdx, n.size, { mix })], sec.instructionKey || metaOf(g.skill).instructionKey)[0]);
     };
 
+    // Critic anchors-r1 (3): an example and one of its problems must share a page (PG-21). Side by
+    // side falls back to the twin above its problem (one column, practice.js layoutSheet), and a
+    // band to the compact band; a pair taller than the page even so (a whole multiplication chart
+    // above a chart) gets no example, and the dialog says so.
+    const bandInstead = [];
+    anchorSets.forEach((set, si) => {
+        if (!set || !set.items.length) return;
+        const sec = n.sections[si];
+        const G = (sec.gridH ? sec.gridH : bodyHeightMm(paper, layoutHeader) - instrMm) - 1;
+        const probe = build(si, sec, 4, (n.seed + si * 100003) >>> 0);
+        measureItems(probe, { size: n.size, look: n.look, colsList: [1] });
+        const pr = Math.max(0, ...probe.map((it) => (it.measured && it.measured[1] && Number.isFinite(it.measured[1].hMm) ? it.measured[1].hMm + 1 : 0)));
+        if (!(pr > 0)) return;
+        const twinMm = (s) => (anchorMode === 'side' ? Math.min(...s.items.map((a) => anchorHeightMm(a, 1))) : s.heightMm(1));
+        if (twinMm(set) + pr <= G) {
+            // Owner ruling A: pairs that fill under half of the two-column row print four columns
+            // (anchors.js sideFit reads `side4` / `pair4Mm` on the twins).
+            if (anchorMode === 'side') {
+                // S3 task 1: every twin measured in its content-sized pair, now and as the set grows
+                const tpl2 = measureSide2(probe.map((it) => [set.items[0], it]), { size: n.size, look: n.look, mdoc }) || '';
+                const s4 = measureSide4(probe.map((it, i) => [set.items[i % set.items.length], it]), { size: n.size, look: n.look, mdoc });
+                // (and every twin the set grows later carries the same two- and four-column plan, so
+                // the page's capacity is never read from a twin with no measure - S3)
+                set.post = (fresh) => {
+                    measureSide2(fresh.map((a, i) => [a, probe[i % probe.length]]), { size: n.size, look: n.look, tpl: tpl2, mdoc });
+                    for (const a of fresh) { a.side4 = s4.ok; a.pair4Mm = s4.ok ? s4.hMm : 0; a.pair2Mm = s4.h2Mm; a.cols4 = s4.tpl || ''; }
+                };
+                // Owner ruling (2026-10-24; S3 task 5): a pair that fills under half of its row
+                // (H13's band) and does not stand four abreast either - a wide picture, a coin
+                // row, a place-value chart (shade_fraction, money_count, place_value_10x) - takes
+                // its worked example in a band ABOVE its problems, never beside them. The three the
+                // owner named do so at every size (at L their pairs fill just over half a row).
+                const key = `${sec.skills[0].categoryId}:${sec.skills[0].skillId}`;
+                if ((!s4.ok && s4.band >= SIDE4_BAND) || SIDE_BAND_ONLY.includes(key)) bandInstead.push(metaOf(sec.skills[0]).label);
+            }
+            return;
+        }
+        if (anchorMode === 'sections') {
+            const compact = anchorSet(sec.skills[0], si, n, { variant: 'compact', colsList: [1], twinCols: 4, level: PUPIL_LEVEL });
+            if (compact.eligible && compact.items.length && compact.heightMm(1) + pr <= G) {
+                anchorSets[si] = compact;
+                sec.anchorMm = compact.heightMm(1);
+                return;
+            }
+        }
+        anchorSets[si] = null;
+        if (anchorMode === 'side') sec.columns = askedCols[si].columns;
+        else { sec.maxCols = askedCols[si].maxCols; delete sec.anchorMm; }
+        anchorNotes.push(`${metaOf(sec.skills[0]).label}: a worked example and its problem are too tall to share a page at size ${n.size}, so this page prints without examples.`);
+    });
+    if (anchorMode === 'side' && bandInstead.length) {
+        const res = await buildSheetCore(Object.assign({}, req, { anchors: 'sections' }));
+        const note = `${bandInstead.join(', ')}: the worked example is too wide to stand beside its problem, so it prints in a band above the problems.`;
+        res.anchors = Object.assign({}, res.anchors, { mode: 'sections', asked: 'side', notes: ((res.anchors && res.anchors.notes) || []).concat(note) });
+        res.notes = [...new Set((res.notes || []).concat(anchorNotes, note))];
+        return res;
+    }
+    // Critic anchors-r1 (2): a sheet none of whose skills has worked steps prints no example, so
+    // it is planned EXACTLY as anchors 'off' (same columns, packing and splits); the dialog keeps
+    // the mode asked for and its notes.
+    if (anchorMode !== 'off' && anchorSets.every((s) => !s)) {
+        const res = await buildSheetCore(Object.assign({}, req, { anchors: 'off' }));
+        res.anchors = { mode: anchorMode, examples: [], notes: anchorNotes.slice() };
+        res.notes = [...new Set((res.notes || []).concat(anchorNotes))];
+        return res;
+    }
     const notes = [];
     let hostItems = [];
     const measure = (items, sec) => { measureItems(items, { size: n.size, look: n.look, colsList: candidateCols(sec.columns, n.size) }); heightClassOf(sec, items, bodyHeightMm(paper, layoutHeader) - instrMm); };
@@ -2263,20 +2541,49 @@ async function buildSheetCore(req = {}) {
      * sum to one body, so nothing splits and nothing shrinks (PG-20, PG-21). Returns the item
      * count of each sub-section per page, or null for a section that is not grouped.
      */
+    // (S3: a side section's least is one ROW OF PAIRS as it prints - the twin's own measured
+    // pair, two- or four-column, whichever is shorter - not the layout's hMin; a shared page
+    // gave a 4-column side row 60 mm for a 100 mm pair, and its steps ran out of the cell)
+    const sideRowOf = (si, layouts) => {
+        if (anchorMode !== 'side' || !anchorSets[si] || !anchorSets[si].items.length || layouts[si].cols === 1) return 0;
+        const tw = anchorSets[si].items;
+        const two = Math.max(...tw.map((a) => anchorHeightMm(a, 2)));
+        const four = tw.every((a) => a.side4 && a.pair4Mm > 0) ? Math.max(...tw.map((a) => a.pair4Mm)) : Infinity;
+        return Math.min(two, four);
+    };
     const shareRows = (layouts) => {
         const out = n.sections.map(() => null);
         const groups = new Map();
         n.sections.forEach((sec, si) => { if (sec.group && !sec.count) { if (!groups.has(sec.group.id)) groups.set(sec.group.id, []); groups.get(sec.group.id).push(si); } });
         const body = bodyHeightMm(paper, layoutHeader) - 1;
         const instr = instructionMm(n.size);
-        for (const members of groups.values()) {
+        // S3: side by side, the members whose least rows do not all fit one page are packed onto
+        // pages in order, and each page's body is shared among the members it holds - not one
+        // page's share for all (the side pairs' measured rows overran it, the last members went
+        // overleaf and page 1 kept 2 problems over a 45 % empty strip: DN-2, PAGEFILL).
+        const pageGroups = [];
+        for (const all of groups.values()) {
+            if (anchorMode !== 'side') { pageGroups.push({ members: all, body }); continue; }
+            const bodyCont = bodyHeightMm(paper, layoutHeader, { cont: true }) - 1;
+            const least = (si) => Math.max(layouts[si].hMin * (anchorSets[si] && anchorSets[si].items.length && layouts[si].cols === 1 ? 2 : 1), sideRowOf(si, layouts)) + 1 + instr;
+            let cur = [], used = 0, pageBody = body;
+            for (const si of all) {
+                const nd = least(si);
+                if (cur.length && used + nd > pageBody) { pageGroups.push({ members: cur, body: pageBody }); cur = []; used = 0; pageBody = bodyCont; }
+                cur.push(si);
+                used += nd;
+            }
+            if (cur.length) pageGroups.push({ members: cur, body: pageBody });
+        }
+        for (const { members, body } of pageGroups) {
             // S6 sections: every member keeps room for its anchor band too.
             const band = (si) => (anchorMode === 'sections' && anchorSets[si] ? n.sections[si].anchorMm || 0 : 0);
             const avail = body - members.length * instr;
             // S6 side by side in ONE column: a twin sits above its problem, so a member's least is a
             // PAIR of rows (practice.js layoutSheet pages whole pairs), not one row.
             const pairOf = (si) => (anchorMode === 'side' && anchorSets[si] && anchorSets[si].items.length && layouts[si].cols === 1 ? 2 : 1);
-            const needOf = (si) => layouts[si].hMin * pairOf(si) + 1 + band(si);
+            // (sideRowOf, S3: a side section's least is one row of pairs as it prints)
+            const needOf = (si) => Math.max(layouts[si].hMin * pairOf(si), sideRowOf(si, layouts)) + 1 + band(si);
             let need = members.map(needOf);
             // S6 sections: when the members' bands and one row each do not fit one page, every
             // member takes the COMPACT band (one state, steps beside; Mixed practice's), so a page of
@@ -2284,7 +2591,7 @@ async function buildSheetCore(req = {}) {
             if (anchorMode === 'sections' && need.reduce((a, v) => a + v, 0) > avail) {
                 for (const si of members) {
                     if (!anchorSets[si]) continue;
-                    const compact = anchorSet(n.sections[si].skills[0], si, n, { variant: 'compact', colsList: [1], twinCols: 4 });
+                    const compact = anchorSet(n.sections[si].skills[0], si, n, { variant: 'compact', colsList: [1], twinCols: 4, level: PUPIL_LEVEL });
                     if (!compact.eligible || !compact.items.length) continue;
                     anchorSets[si] = compact;
                     n.sections[si].anchorMm = compact.heightMm(1);
@@ -2312,7 +2619,7 @@ async function buildSheetCore(req = {}) {
             members.forEach((si, k) => {
                 const sec = n.sections[si];
                 sec.gridH = Math.max(need[k], Math.floor(h[k] * 1000) / 1000);
-                const L = resolveSectionLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap },
+                const L = resolveBandedLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap }, sec.anchorMm || 0,
                     withTwins(si, probesOf(si)), paper, LIVE_W_MM, { size: n.size, look: n.look, header: layoutHeader });
                 out[si] = capFromL(sec, si, L);
             });
@@ -2373,7 +2680,7 @@ async function buildSheetCore(req = {}) {
                 if (again >= want) break;
                 want = again;
             }
-            hostItems = hostItems.concat(items);
+            hostItems = hostItems.concat(markSectionWriteAbove(items));
         });
     } else {
         // MORE PRACTICE: each letter under its own seed (PT-MPR-2). The first letter's probe fixes
@@ -2421,6 +2728,8 @@ async function buildSheetCore(req = {}) {
                 byLetter = letters.map((L, k) => (perLetter[k] > cap ? finalRun(sec, si, letterBase(L), cap, probeOf(L)) : byLetter[k]));
             }
             byLetter.forEach((items, k) => items.forEach((it) => { it.letter = letters[k]; }));
+            // (CL-4b per section: the letters of a section are one section)
+            markSectionWriteAbove(byLetter.flat());
             for (const items of byLetter) hostItems = hostItems.concat(items);
         });
     }
@@ -2437,6 +2746,14 @@ async function buildSheetCore(req = {}) {
             if (anchorMode === 'side') {
                 const tw = set.take(hostItems, mine.length);
                 mine.forEach((it, i) => { it.twin = tw[i] || null; });
+                // (the section's REAL pairs, in the columns their own problems need - S3 task 1)
+                measureSide2(mine.filter((it) => it.twin).map((it) => [it.twin, it]), { size: n.size, look: n.look, mdoc });
+                // Owner ruling A: the four-column side layout, held to the section's REAL pairs
+                const pairs = mine.filter((it) => it.twin).map((it) => [it.twin, it]);
+                if (pairs.some(([t]) => t.side4)) {
+                    const s4 = measureSide4(pairs, { size: n.size, look: n.look, mdoc });
+                    for (const [t] of pairs) { t.side4 = s4.ok; t.pair4Mm = s4.ok ? s4.hMm : 0; t.pair2Mm = s4.h2Mm; t.cols4 = s4.tpl || ''; }
+                }
             } else {
                 // One example per block: enough for a sheet's blocks (a block holds 1-4 problems).
                 const perLetter = new Map();
@@ -3011,11 +3328,13 @@ async function buildRoleSheet(n, metaOf) {
         pools.forEach((p, pi) => {
             const sk = p.skills[0];
             // The compact band (one state, steps beside): a skill's shelf band stays short.
-            const band = anchorSet(sk, pi, n, { variant: 'compact', colsList: [1], twinCols: 4 });
+            // (owner ruling, 2026-10-24: a worked example matches the pupil's problem on EVERY page
+            // type - drawn at the practice pupil's own scaffold level, 1, like a side twin)
+            const band = anchorSet(sk, pi, n, { variant: 'compact', colsList: [1], twinCols: 4, level: 1 });
             if (!band.eligible) { anchorNotes.push(ineligibleNote(metaOf(sk).label)); return; }
             const entry = { band: band.items.slice(), bandSet: band };
             if (n.anchors === 'side') {
-                const side = anchorSet(sk, pi + 4099, n, { variant: 'side', colsList, twinCols: 2 });
+                const side = anchorSet(sk, pi + 4099, n, { variant: 'side', colsList, twinCols: 2, level: 1 });
                 entry.side = side.items.slice();
                 entry.sideSet = side;
             }
@@ -3177,6 +3496,12 @@ async function buildRoleSheet(n, metaOf) {
         input.extras = ex;
     }
 
+    // CL-4b per section (owner ruling 2026-10-24): each section of the role's items decides once.
+    {
+        const bySec = new Map();
+        for (const it of items) { const k = it && it.section !== undefined ? it.section : 0; if (!bySec.has(k)) bySec.set(k, []); bySec.get(k).push(it); }
+        for (const list of bySec.values()) markSectionWriteAbove(list);
+    }
     const numberLine = nline ? drawNumberLine(nline, items.some((it) => nline.keys.has(String(it.skill))) ? items.filter((it) => nline.keys.has(String(it.skill))) : items, n.size, header) : null;
     const plan = mod.plan(input);
     const out = renderPlan(plan, { key: n.key });

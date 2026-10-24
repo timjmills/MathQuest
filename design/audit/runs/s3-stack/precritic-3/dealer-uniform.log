@@ -1,0 +1,18 @@
+$ node tests/scripts/ws-dealer-uniform.mjs --skill subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_100k_no_regroup,subtraction:sub_1m_no_regroup,subtraction:sub_2d_1d
+
+ws-dealer-uniform: 7 skill(s) on this tree; 120 items a skill, pages of 20
+  OK         subtraction:sub_50_no_regroup  (120/120 read; valid set: [2d - 2d, 100 % of the deal, 115 judged] card R-BAND-50, R-NO-REGROUP, R-SAME-LENGTH (R-ZERO-NOT-SEEDED cases left out) + learned from 1324 items: a ≥ b, no regrouping (−), b as long as a, a 22..49, b 11..38, answer 11..38; digits a@0 {23456789} a@1 {234} b@0 {12345678} b@1 {123} …; 4000 uniform draws)
+      note UNIFORM: fair under the pairs / kinds / named reading
+  OK         subtraction:sub_100_no_regroup  (120/120 read; valid set: [2d - 2d, 100 % of the deal, 113 judged] card R-BAND-100, R-NO-REGROUP, R-SAME-LENGTH (R-ZERO-NOT-SEEDED cases left out) + learned from 1324 items: a ≥ b, no regrouping (−), b as long as a, a 52..99, b 11..88, answer 11..88; digits a@0 {23456789} a@1 {56789} b@0 {12345678} b@1 {12345678} …; 4000 uniform draws)
+      note UNIFORM: fair under the pairs / kinds reading
+  OK         subtraction:sub_1k_no_regroup  (120/120 read; valid set: [3d - 3d, 100 % of the deal, 120 judged] card R-BAND-1K, R-NO-REGROUP, R-SAME-LENGTH (R-ZERO-NOT-SEEDED cases left out) + learned from 1440 items: a ≥ b, no regrouping (−), b as long as a, a 222..999, b 111..861, answer 111..861; digits a@0 {23456789} a@1 {23456789} a@2 {23456789} b@0 {12345678} …; 4000 uniform draws)
+      note UNIFORM: fair under the named reading
+  OK         subtraction:sub_10k_no_regroup  (120/120 read; valid set: [4d - 4d, 100 % of the deal, 120 judged] card R-BAND-10K, R-NO-REGROUP, R-SAME-LENGTH (R-ZERO-NOT-SEEDED cases left out) + learned from 1440 items: a ≥ b, no regrouping (−), b as long as a, a 2223..9998, b 1111..8714, answer 1111..8441; digits a@0 {23456789} a@1 {23456789} a@2 {23456789} a@3 {23456789} …; 4000 uniform draws)
+      note UNIFORM: fair under the named reading
+  OK         subtraction:sub_100k_no_regroup  (120/120 read; valid set: [5d - 5d, 100 % of the deal, 120 judged] card R-BAND-100K, R-NO-REGROUP, R-SAME-LENGTH (R-ZERO-NOT-SEEDED cases left out) + learned from 1440 items: a ≥ b, no regrouping (−), b as long as a, a 22255..99998, b 11111..86422, answer 11111..87211; digits a@0 {23456789} a@1 {23456789} a@2 {23456789} a@3 {23456789} …; 4000 uniform draws)
+      note UNIFORM: fair under the named reading
+  OK         subtraction:sub_1m_no_regroup  (120/120 read; valid set: [6d - 6d, 100 % of the deal, 120 judged] card R-BAND-1M, R-NO-REGROUP, R-SAME-LENGTH (R-ZERO-NOT-SEEDED cases left out) + learned from 1440 items: a ≥ b, no regrouping (−), b as long as a, a 222489..999992, b 111111..871353, answer 111111..872321; digits a@0 {23456789} a@1 {23456789} a@2 {23456789} a@3 {23456789} …; 4000 uniform draws)
+      note UNIFORM: fair under the named reading
+  OK         subtraction:sub_2d_1d  (120/120 read; valid set: [2d - 1d, 100 % of the deal, 120 judged] card R-BAND-2D1D, R-NO-REGROUP, R-SHORTER-2D1D (R-ZERO-NOT-SEEDED cases left out) + learned from 1440 items: a ≥ b, no regrouping (−), b shorter than a, a 22..99, b 1..8, answer 21..98; digits a@0 {23456789} a@1 {23456789} b@0 {12345678} ans@0 {12345678} …; 4000 uniform draws)
+      note UNIFORM: fair under the pairs / kinds reading
+ws-dealer-uniform: OK (7 OK, 0 FAIL, 0 INCOMPLETE, 0 N/A of 7 skill(s); 27.3 s)

@@ -30,10 +30,13 @@ export const blankRun = (fromColumn) => `<div class="ws-cell blankrun" style="--
  * @param {string} [opts.cls]               'facts' (hairline interiors), 'open' (tests), 'fixed'
  * @param {string} [opts.height]            an explicit grid height, e.g. '99mm'
  * @param {number[]} [opts.unlabelled]      indexes that carry no label (Model / Guided cells, CL-14)
+ * @param {string} [opts.colsTpl]           a grid-template-columns value other than equal columns (a
+ *                                          side-by-side anchor page: [twin | problem] sized to what
+ *                                          each holds, RUBRIC H13)
  * @param {string} [opts.rowsTpl]           a grid-template-rows value other than equal rows (the
  *                                          Guided page's model row, which carries its worked trace)
  */
-export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', height = '', unlabelled = [], rowsTpl = '', spanFirst = false, rowGap = 0 } = {}) {
+export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', height = '', unlabelled = [], rowsTpl = '', colsTpl = '', spanFirst = false, rowGap = 0 } = {}) {
     const n = cols * (rows || Math.ceil(cells.length / cols));
     let k = start;
     const out = cells.map((c, i) => {
@@ -60,11 +63,11 @@ export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', 
             const from = spanFirst ? (i === 0 ? 0 : 1 + (i - 1) * cols) : i * cols;
             const to = spanFirst ? (i === 0 ? 1 : 1 + i * cols) : (i + 1) * cols;
             const part = out.slice(from, to).join('') + (i === r - 1 ? out.slice(to).join('') : '');
-            rowsHtml.push(`<div class="ws-grid ${cls} ws-gridrow" style="grid-template-columns:repeat(${cols},1fr);grid-template-rows:1fr;height:${h}mm;${i ? `margin-top:${rowGap}mm;` : ''}">${part}</div>`);
+            rowsHtml.push(`<div class="ws-grid ${cls} ws-gridrow" style="grid-template-columns:${colsTpl || `repeat(${cols},1fr)`};grid-template-rows:1fr;height:${h}mm;${i ? `margin-top:${rowGap}mm;` : ''}">${part}</div>`);
         }
         return `<div class="ws-gridrows" data-ws-rowgap="${rowGap}" style="flex:none;">${rowsHtml.join('')}</div>`;
     }
-    return `<div class="ws-grid ${cls}" style="grid-template-columns:repeat(${cols},1fr);grid-template-rows:${rowsTpl || `repeat(${r},1fr)`};${height ? `height:${height};` : ''}">${out.join('')}</div>`;
+    return `<div class="ws-grid ${cls}" style="grid-template-columns:${colsTpl || `repeat(${cols},1fr)`};grid-template-rows:${rowsTpl || `repeat(${r},1fr)`};${height ? `height:${height};` : ''}">${out.join('')}</div>`;
 }
 
 /**

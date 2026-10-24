@@ -1,0 +1,70 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-options-verify.cjs --skill sub_50_no_regroup,sub_100_no_regroup,sub_1k_no_regroup,sub_10k_no_regroup,sub_100k_no_regroup,sub_1m_no_regroup,sub_2d_1d --category subtraction --deadline 600000 --json /tmp/claude-0/-home-user-MathQuest/777ba8d1-efd2-5fc4-929a-183f87207bfc/scratchpad/pc3/logs/options-verify.json
+
+subtraction:sub_50_no_regroup  (7 values)
+   ok   level=[3]  warn print: 6/6 answer(s) not found in the key text (e.g. "12")
+   ok   level=[0]  warn print: 1/6 answer(s) not found in the key text (e.g. "13")
+   ok   level=[3,1,0]  warn print: 2/6 answer(s) not found in the key text (e.g. "12")
+   ok   calculator=true  
+   ok   skipAfter=0  
+   ok   skipAfter=2  
+   ok   skipAfter=20  
+subtraction:sub_100_no_regroup  (8 values)
+   ok   level=[3]  warn print: 6/6 answer(s) not found in the key text (e.g. "51")
+   ok   level=[0]  
+   ok   level=[3,1,0]  warn print: 2/6 answer(s) not found in the key text (e.g. "51")
+   ok   lengths="shorter"  
+   ok   calculator=true  
+   ok   skipAfter=0  
+   ok   skipAfter=2  
+   ok   skipAfter=20  
+subtraction:sub_1k_no_regroup  (9 values)
+   ok   level=[3]  warn print: 6/6 answer(s) not found in the key text (e.g. "113")
+   ok   level=[0]  
+   ok   level=[3,1,0]  warn print: 2/6 answer(s) not found in the key text (e.g. "113")
+   ok   lengths="shorter"  
+   ok   zeros="on"  
+   ok   calculator=true  
+   ok   skipAfter=0  
+   ok   skipAfter=2  
+   ok   skipAfter=20  
+subtraction:sub_10k_no_regroup  (9 values)
+   ok   level=[3]  warn print: 6/6 answer(s) not found in the key text (e.g. "2115")
+   ok   level=[0]  
+   ok   level=[3,1,0]  warn print: 2/6 answer(s) not found in the key text (e.g. "2115")
+   ok   lengths="shorter"  
+   ok   zeros="on"  
+   ok   calculator=true  
+   ok   skipAfter=0  
+   ok   skipAfter=2  
+   ok   skipAfter=20  
+subtraction:sub_100k_no_regroup  (9 values)
+   ok   level=[3]  warn print: 6/6 answer(s) not found in the key text (e.g. "21123")
+   ok   level=[0]  warn print: 6/6 answer(s) not found in the key text (e.g. "21123")
+   ok   level=[3,1,0]  warn print: 6/6 answer(s) not found in the key text (e.g. "21123")
+   ok   lengths="shorter"  warn print: 6/6 answer(s) not found in the key text (e.g. "41123")
+   ok   zeros="on"  warn print: 6/6 answer(s) not found in the key text (e.g. "20123")
+   ok   calculator=true  
+   ok   skipAfter=0  
+   ok   skipAfter=2  
+   ok   skipAfter=20  
+subtraction:sub_1m_no_regroup  (9 values)
+   ok   level=[3]  warn print: 6/6 answer(s) not found in the key text (e.g. "311611")
+   ok   level=[0]  warn print: 6/6 answer(s) not found in the key text (e.g. "311611")
+   ok   level=[3,1,0]  warn print: 6/6 answer(s) not found in the key text (e.g. "311611")
+   ok   lengths="shorter"  warn print: 6/6 answer(s) not found in the key text (e.g. "611611")
+   ok   zeros="on"  warn print: 6/6 answer(s) not found in the key text (e.g. "311711")
+   ok   calculator=true  
+   ok   skipAfter=0  
+   ok   skipAfter=2  
+   ok   skipAfter=20  
+subtraction:sub_2d_1d  (8 values)
+   ok   level=[3]  warn print: 6/6 answer(s) not found in the key text (e.g. "31")
+   ok   level=[0]  
+   ok   level=[3,1,0]  warn print: 2/6 answer(s) not found in the key text (e.g. "31")
+   ok   lengths="same"  
+   ok   calculator=true  
+   ok   skipAfter=0  
+   ok   skipAfter=2  
+   ok   skipAfter=20  
+skills: 7 with options (0 with none) · values 59: 59 pass, 0 fail (0 gated) · skills passing 7/7
+ws-options-verify: OK

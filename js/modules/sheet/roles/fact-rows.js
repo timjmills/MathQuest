@@ -119,6 +119,8 @@ export function factTitle(items) {
 
 const OP_SIGN = { add: '+', subtract: '-', multiply: 'x', divide: '/' };
 const LADDER_PTS = [28, 24, 20, 18, 16];
+/** The real-fit clearance of the column gate: 1 mm of white either side of the fact's ink (R1). */
+export const FIT_CLEAR_MM = 2;
 const ACROSS_ROW = { S: 18, M: 21, L: 24 };      // PT-FPR's horizontal row, 16 / 20 / 24 + the tab clearance
 /**
  * A bracket's digit track on a fact-rows page, in em of the rung's digit: 1 em leaves 0.44 em
@@ -269,12 +271,12 @@ function verticalPt(cols, n, look) {
  * Below 5 columns the rung is the size's Auto one (16 / 24 / 28 pt at S / M / L): the cell's
  * height (FACT_CELL_H_MM) is the Auto page's, so a bigger digit would stand out of it.
  */
-function verticalFitPt(cols, n, look, floor, size) {
+function verticalFitPt(cols, n, look, floor, size, clearMm = 5) {
     const { inner } = cellWidthMm(cols, LIVE_W_MM, look);
     const top = cols >= 5 ? factDigitPt(cols) : Math.min(factDigitPt(5), factDigitPt(AUTO[size] || 5));
     const pts = [...new Set([top, ...LADDER_PTS, floor])].filter((p) => p <= top && p >= Math.min(floor, top)).sort((a, b) => b - a);
     for (const pt of pts) {
-        if ((FACT_OP_TRACK_EM + n * FACT_TRACK_EM) * (EM_MM[pt] || (pt / 72) * 25.4) + 5 <= inner) return pt;
+        if ((FACT_OP_TRACK_EM + n * FACT_TRACK_EM) * (EM_MM[pt] || (pt / 72) * 25.4) + clearMm <= inner) return pt;
     }
     return 0;
 }
@@ -346,12 +348,37 @@ export function factRowsLayout(items, input) {
         while (cols > 2 && verticalFitPt(cols, n, ctx.look, floor, ctx.size) === 0) cols--;
         if (cols < before) note = [note, `${n}-digit facts: ${cols} columns so the digits keep the ${ctx.size} size.`].filter(Boolean).join(' ');
     }
+    // A shorter fact steps its digits down the ladder first (VA-2); when even the ladder's last rung
+    // does not fit the cell (critic s3-stack r2 F1: 4-digit sub_10k facts in 8 columns at S, ink on
+    // both frames), it drops columns too, instead of printing past its cell. This gate tests REAL
+    // fit - the fact's drawn width plus 1 mm of clearance each side (critic r3 R1: the 5 mm rung
+    // budget used as a column gate cost add_facts / sub_facts their Auto 10 at S, and overrode an
+    // explicit teacher choice, though the facts fit with 1.7-4.4 mm to spare).
+    const lastRung = LADDER_PTS[LADDER_PTS.length - 1];
+    if (!divide && !bigFact) {
+        const before = cols;
+        while (cols > 2 && verticalFitPt(cols, n, ctx.look, lastRung, ctx.size, FIT_CLEAR_MM) === 0) cols--;
+        if (cols < before) note = [note, `${n}-digit facts: ${cols} columns so every fact fits its cell.`].filter(Boolean).join(' ');
+    }
     const pt = tightDiv && fitsAt(cols) ? factDigitPt(cols)
         : (bigFact && verticalFitPt(cols, n, ctx.look, (SIZES[ctx.size] || SIZES.L).digitPt, ctx.size)) || verticalPt(cols, n, ctx.look);
     if (pt < factDigitPt(cols)) note = [note, `Digits ${pt} pt so ${n}-digit facts fit ${cols} columns.`].filter(Boolean).join(' ');
     const cap = factRowsCapacity(cols, ctx.size, ctx.paper, header);
-    const rows = cap.rows;
-    return { across: false, cols, rows, perPage: cols * rows, cellH: Math.min(G / rows, cap.cellH * 1.3), hMin: cap.cellH, digitPt: pt, tracks: n, gridH: G, labels, note };
+    // The row height holds the WHOLE fact (critic s3-stack r1, lead item 6: VA-70's S heights left
+    // the answer row out, so at S 10 x 9 the last row had no writing room and the key's answers
+    // printed under the grid): the number tab's keep-out (tab + 1 mm, CL-40), the two operand rows
+    // (1.15 em each), the rule (1 mm gap + 1 mm), the answer row - 1.15 em, at least the size's
+    // writing height - and the 2 mm bottom pad, as the page measures them (S 28.5, M 39.2, L 45.1
+    // mm content). The row count is chosen from that height.
+    const dMm = EM_MM[pt] || (pt / 72) * 25.4;
+    const sz = SIZES[ctx.size] || SIZES.L;
+    const padTop = Math.max(factPadTop(labels, cols), sz.tabMm + 1);
+    // (L keeps PT 4.1's 5 x 5: its 45.2 mm need fits 5 rows of 45.4 mm; the 0.4 mm grid rule leaves
+    // a 45.0 mm box, so a 2-digit key answer reaches 0.1-0.2 mm into the 2 mm bottom pad there)
+    const need = padTop + 2.3 * dMm + 2.1 + Math.max(1.15 * dMm, sz.writeMm) + 2;
+    const hMin = Math.max(cap.cellH, Math.ceil(need * 10) / 10);
+    const rows = Math.max(1, Math.floor((G - SAFETY_H_MM) / hMin));
+    return { across: false, cols, rows, perPage: cols * rows, cellH: Math.min(G / rows, hMin * 1.3), hMin, digitPt: pt, tracks: n, gridH: G, labels, note };
 }
 
 

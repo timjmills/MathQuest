@@ -293,6 +293,7 @@ export const SKILL_GRADES = {
     'count_by_8s': 3, 'count_by_9s': 3, 'count_by_10s': 2, 'count_by_11s': 3, 'count_by_12s': 3,
     'div_sharing_word_problems': 3, 'div_grouping_word_problems': 3, 
     'sub_wp_compare': 1, 'sub_wp_start_unknown': 2, 'add_negative': 6, 'sub_negative': 6,
+    'sub_2d_1d': 2,                                                       // 2.NBT.B.5 (2026-10-23 preset, SU-C C3)
     'identify_fraction_nl': 3, 'write_fraction_nl': 3, 'compare_fractions_nl': 3, 'equivalent_or_not': 4, 'simplify_with_gcf': 6,
     'unit_frac_div_whole': 5, 'whole_div_unit_frac': 5, 'div_decimal_by_whole': 5, 'div_by_decimal': 6, 'round_to_tenth': 5,
     'round_to_hundredth': 5, 'ratio_part_to_part': 6, 'ratio_simplest_form': 6, 'ratio_equivalent_or_not': 6,
@@ -754,6 +755,8 @@ export const SKILLS = {
         // APPENDED 2026-10-17 — PRESET skills, batch 2 (skill-presets.js; owner: every "ask owner" row is a preset).
         { v: "sub_wp_compare", l: "Subtraction Word Problems: How Many More?", presetOf: "sub_word_problems" },
         { v: "sub_wp_start_unknown", l: "Subtraction Word Problems: Find the Start", presetOf: "sub_word_problems" },
+        // APPENDED 2026-10-23 — PRESET (SU-C pilot, catalogue C3): 2-digit − 1-digit, no regrouping.
+        { v: "sub_2d_1d", l: "Subtract a 1-Digit Number from a 2-Digit Number (No Regrouping)", presetOf: "sub_100_no_regroup" },
     ],
     multiplication: [
         { v: "mult_facts", l: "Multiplication Facts (1-12)" },
@@ -2095,6 +2098,7 @@ export const SKILL_PRINT_SIZE = {
     sub_50_no_regroup: "standard", sub_50_regroup: "standard", sub_50_mixed: "standard",
     add_100_no_regroup: "standard", add_100_regroup: "standard", add_100_mixed: "standard",
     sub_100_no_regroup: "standard", sub_100_regroup: "standard", sub_100_mixed: "standard",
+    sub_2d_1d: "standard",
     add_1k_no_regroup: "standard", add_1k_regroup: "standard", add_1k_mixed: "standard",
     sub_1k_no_regroup: "standard", sub_1k_regroup: "standard", sub_1k_mixed: "standard",
     add_10k_no_regroup: "standard", add_10k_regroup: "standard", add_10k_mixed: "standard",

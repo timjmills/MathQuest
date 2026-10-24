@@ -127,6 +127,21 @@ function warmShape(pools, input) {
         const pick = opts.find(([, c]) => fitsWidth(its, c)) || opts[opts.length - 1];
         out[id] = { k: pick[0], cols: pick[1] };
     }
+    // `warmRows` (lesson data; pilot SU-C fix r2, critic r2 N2): two prerequisites whose cells
+    // differ in width - one-digit column facts fit a quarter of the page, a place-value word bank
+    // or a 5-digit column only a half - each take a full-width row of their own, the narrow one
+    // four cells across, so neither is drawn in a cell sized for the other (H13, CL-3 per row).
+    // Opt-in: every other lesson keeps its shared band.
+    // `warmRows: true` (every size) or a list of sizes (['S']).
+    const ldata = input && input.lesson && input.lesson.data;
+    const rowsAsked = ldata && (ldata.warmRows === true || (Array.isArray(ldata.warmRows) && ldata.warmRows.includes(ctx.size)));
+    if (ids.length > 1 && rowsAsked) {
+        const w4 = ids.map((id) => fitsWidth(pools[id].slice(0, 3), 4));
+        if (w4.some(Boolean) && !w4.every(Boolean)) {
+            ids.forEach((id, i) => { out[id] = w4[i] ? { k: 4, cols: 4, stack: true } : fitsWidth(pools[id].slice(0, 3), 2) ? { k: 2, cols: 2, stack: true } : { k: 1, cols: 1, stack: true }; });
+            return out;
+        }
+    }
     // The halves hold the same number of cells, so the Warm-up's cells are one size (CL-3).
     if (ids.length > 1 && ids.some((id) => !fitsWidth(pools[id].slice(0, 3), 2))) {
         // A cell too wide for half the page (a sentence with two boxes, a number line) never
@@ -143,8 +158,67 @@ function warmShape(pools, input) {
         const hOf1 = (id) => hAt(pools[id].slice(0, 3), out[id].cols);
         const hMax = Math.max(...ids.map(hOf1));
         for (const id of ids) out[id].rows = hOf1(id) > 0 && hOf1(id) * 2 <= hMax * 1.1 ? 2 : 1;
+        // Rows sized per item kind (critic SU-C r2 N2, H13; every lesson): a half whose cells would
+        // still leave more than WARM_BAND of the shared row empty - an across fact "7 − 3 = ___"
+        // beside a column stack or a place-value item - does not share the row. Each skill then
+        // takes a full-width row of its own, as tall as its own items (CL-3 holds per row), as many
+        // cells across as its measurement allows. `plan` keeps the shared row when the split rows
+        // would add a page (input._warmShared).
+        const hRow = Math.max(...ids.map((id) => Math.max(20, hOf1(id)) * out[id].rows));
+        const loose = ids.some((id) => hOf1(id) > 0 && 1 - (Math.max(20, hOf1(id)) * out[id].rows) / hRow > WARM_BAND);
+        if (loose && !(input && input._warmShared)) {
+            // (the cells of one row hold items of one height too: a skill whose items differ - a
+            // fraction sentence and a picture - takes fewer cells across rather than mix them)
+            const alike = (its, c) => { const hs = its.map((it) => Math.max(20, hOf(it, c))); return Math.min(...hs) >= Math.max(...hs) * (1 - WARM_BAND); };
+            for (const id of ids) {
+                const k = [4, 2].find((c) => pools[id].length >= c && fitsWidth(pools[id].slice(0, c), c) && alike(pools[id].slice(0, c), c)) || 1;
+                out[id] = { k, cols: k, stack: true, split: true };
+            }
+        }
     }
     return out;
+}
+
+/** H13 for the Warm-up: the most of a cell's height its own item may leave empty (RUBRIC: < 30 %). */
+const WARM_BAND = 0.25;
+
+/** The width (mm) the page's content gives a row of cells (A4: 186 mm less the band borders). */
+const ROW_W_MM = 183;
+
+/**
+ * The Warm-up row's track widths (mm), each half as wide as its cells draw, when equal halves
+ * would leave a cell more than WARM_BAND of its width empty (H13 width); null to keep halves.
+ * A cell's drawn width is read from its measurement at the half's column count: the cell's
+ * width less twice its least side slack (`slackMm`, CL-8).
+ */
+function warmTracks(halves, wPools, shape, rowsOf) {
+    if (halves.length !== 2) return null;
+    const info = halves.map((id) => {
+        const c = shape[id].cols;
+        const its = wPools[id].slice(0, shape[id].k * rowsOf(id));
+        const cw = ROW_W_MM / c;
+        const sl = its.map((it) => it.measured && it.measured[c] && it.measured[c].slackMm);
+        if (!its.length || sl.some((v) => !Number.isFinite(v))) return null;
+        const ink = Math.max(...sl.map((v) => cw - 2 * v));
+        // the narrowest cell its items are measured to fit (a 4-column cell, a 3-column one ...)
+        const fitC = [4, 3].find((n) => n > c && its.every((it) => it.measured && it.measured[n] && it.measured[n].fits !== false && Number.isFinite(it.measured[n].slackMm) && it.measured[n].slackMm >= CL8_MM));
+        const minCell = fitC ? ROW_W_MM / fitC : cw;
+        return { k: shape[id].k, ink, minCell };
+    });
+    if (info.some((x) => !x || !(x.ink > 0))) return null;
+    const band = (x, w) => (w / x.k - x.ink) / 2 / (w / x.k);
+    const even = info.map((x) => band(x, ROW_W_MM / 2));
+    if (Math.max(...even) <= WARM_BAND) return null;
+    const need = info.map((x) => x.k * x.ink);
+    let w = need.map((n) => ROW_W_MM * n / need.reduce((a, b) => a + b, 0));
+    // never narrower than the half's items fit; the other half takes the rest
+    for (let i = 0; i < 2; i++) {
+        const lo = info[i].minCell * info[i].k;
+        if (w[i] < lo) { w[i] = lo; w[1 - i] = ROW_W_MM - lo; }
+    }
+    if (w.some((x, i) => x < info[i].minCell * info[i].k - 0.1)) return null;
+    const after = info.map((x, i) => band(x, w[i]));
+    return Math.max(...after) < Math.max(...even) - 0.02 ? w : null;
 }
 
 export function counts(pools, input) {
@@ -155,6 +229,8 @@ export function counts(pools, input) {
     const divFacts = mainPool.length > 0 && mainPool.every((it) => it.q && it.q.divForm);
     const out = { main: divFacts ? PROBE + 12 : PROBE };
     for (const [id, s] of Object.entries(shape)) out[id] = s.k * (s.rows || 1);
+    // (split rows per kind may fall back to the shared row in `plan`: deal enough for either)
+    if (Object.values(shape).some((s) => s.split)) for (const [id, s] of Object.entries(warmShape(pools, Object.assign({}, input, { _warmShared: true })))) out[id] = Math.max(out[id] || 0, s.k * (s.rows || 1));
     for (const id of Object.keys(pools)) if (/^x/.test(id)) out[id] = 3;
     return out;
 }
@@ -195,6 +271,16 @@ export const CASE_TESTS = Object.freeze({
     endsFive: (it) => roundRest(it) === 5,
     // Lessons r3: a one-place take-away from a number with 0 ones (70 - 8), and the 90s -> 100.
     takeAwayZero: (it) => { const o = operandsOf((it && it.q) || {}); return o.length >= 2 && Number(o[0]) % 10 === 0 && Number(o[1]) < 10; },
+    // SU-C (critic r1 D4): a no-regrouping column subtraction that is NOT a zero case - no 0 in the
+    // top number, no n − 0, no column that leaves 0, an answer as long as the top number.
+    subNoZero: (it) => {
+        const o = operandsOf((it && it.q) || {}).map(Number);
+        if (o.length < 2 || !(o[0] > o[1]) || o[1] < 1) return false;
+        const A = String(o[0]), B = String(o[1]).padStart(A.length, 'x');
+        if (/0/.test(A) || String(o[0] - o[1]).length !== A.length) return false;
+        for (let i = 0; i < A.length; i++) if (B[i] !== 'x' && (B[i] === '0' || Number(B[i]) >= Number(A[i]))) return false;
+        return true;
+    },
     toHundred: (it) => {
         const c = it && it.q && it.q.cell;
         const n = c && c.payload ? Number(c.payload.n) : NaN;
@@ -1094,6 +1180,30 @@ function vocabPicture(pic, c) {
         case 'glyph': return `<span class="mq-lvpic-glyph" style="font-size:${Math.round(m.digitPt * 1.3)}pt">${esc(pic.text)}</span>`;
         // A longer text picture ("10, 20, 30") at four fifths, so it never crowds its neighbour.
         case 'text': return `<span class="mq-lvpic-text" style="font-size:${String(pic.text || '').length > 7 ? Math.round(m.digitPt * 0.8) : m.digitPt}pt">${esc(pic.text)}</span>`;
+        // The place heads as the stack draws them (critic s3-stack r1 N6b: "HTh TTh Th H T O" as
+        // a text picture wrapped at L): {heads: 'HTh TTh Th H T O'}, each head in its own grid
+        // column, bold at the size's text type (a label, as the heads are), over a rule. Never
+        // wraps (one column per head).
+        case 'heads': {
+            const hs = String(pic.heads || pic.text || '').split(/\s+/).filter(Boolean);
+            return `<span class="mq-lvpic-heads" style="display:inline-grid;grid-auto-flow:column;column-gap:0.55em;font-size:${m.textPt || 11}pt;font-weight:700;line-height:1.1;white-space:nowrap;padding-bottom:0.8mm;border-bottom:${(1 * PT_MM).toFixed(3)}mm solid #000">`
+                + hs.map((h) => `<span style="text-align:center">${esc(h)}</span>`).join('') + '</span>';
+        }
+        // A small two-row column (pilot SU-C fix r2, critic r2 N6): {top, bottom, op}. Each
+        // character has its own grid column, so ones sit under ones (and commas under commas)
+        // whatever the font's digit widths; the operator stands left of the bottom row and a rule
+        // closes the column. Never wraps (one column per character).
+        case 'stack': {
+            const top = String(pic.top || ''), bot = String(pic.bottom || '');
+            const n = Math.max(top.length, bot.length);
+            const pt = n > 5 ? Math.round(m.digitPt * 0.8) : m.digitPt;
+            const cellsOf = (t, row) => t.padStart(n, ' ').split('').map((ch, i) => `<span style="grid-row:${row};grid-column:${i + 2};text-align:center">${ch === ' ' ? '' : esc(ch)}</span>`).join('');
+            return `<span class="mq-lvpic-stack" style="display:inline-grid;grid-auto-columns:auto;column-gap:0.15em;row-gap:0.6mm;font-size:${pt}pt;line-height:1;white-space:nowrap;align-items:end">`
+                + cellsOf(top, 1)
+                + `<span style="grid-row:2;grid-column:1;padding-right:0.15em">${esc(pic.op || '−')}</span>` + cellsOf(bot, 2)
+                + `<span style="grid-row:3;grid-column:1 / ${n + 2};border-top:${(1.5 * PT_MM).toFixed(3)}mm solid #000;height:0;margin-top:0.4mm"></span>`
+                + '</span>';
+        }
         case 'blocks': {
             // RP: a ten is a rod of ten unit squares, a one is one square (outlined, 0.75 pt).
             const u = { S: 2.8, M: 3.1, L: 3.4 }[c.size] || 3.4;     // lessons r1: 2.6 mm cubes were too small
@@ -1436,6 +1546,15 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
 }
 
 export function plan(input = {}) {
+    // Warm-up rows per item kind (critic SU-C r2 N2): when split rows would push the sheet onto
+    // another page, the shared row is kept (the page count never grows for the split).
+    const p1 = planOnce(input);
+    if (!p1._warmSplit || input._warmShared) return p1;
+    const p0 = planOnce(Object.assign({}, input, { _warmShared: true }));
+    return (p1.pages || []).length > (p0.pages || []).length ? p0 : p1;
+}
+
+function planOnce(input = {}) {
     const ctx = ctxOf(input);
     const lesson = input.lesson || {};
     const data = lesson.data || null;
@@ -1527,11 +1646,31 @@ export function plan(input = {}) {
             const sameInstr = parts.length > 1 && t0 && parts.every((p) => String((p.parts[0] && p.parts[0].text) || '') === t0);
             if (sameInstr) for (const p of parts) p.parts = p.parts.slice(1);
             const charMm = 0.5 * m.textPt * (25.4 / 72);
-            const twoLines = !sameInstr && parts.length > 1 && parts.some((p) => String(p.parts[0].text || '').length * charMm > 93 - 8);
+            // Tracks as wide as their content (critic SU-C r2 N2 follow-up, H13 width): a narrow
+            // one-place column in half the page left a third of its cell's width empty on each
+            // side. When either half would leave more than WARM_BAND of its cell's width empty,
+            // the row's width is shared in proportion to what each half's cells draw (measured:
+            // the cell width less twice the item's side slack), never below the narrowest column
+            // the half's items are measured to fit, and only when that leaves every cell fuller.
+            const trackMm = warmTracks(halves, wPools, shape, rowsOf);
+            const instrFits = (p, w) => sameInstr || String((p.parts[0] && p.parts[0].text) || '').length * charMm <= 2 * (w - 8);
+            const tracks = trackMm && parts.every((p, i) => instrFits(p, trackMm[i])) ? trackMm : null;
+            const halfW = (i) => (tracks ? tracks[i] : 93);
+            const twoLines = !sameInstr && parts.length > 1 && parts.some((p, i) => String(p.parts[0].text || '').length * charMm > halfW(i) - 8);
             if (twoLines) for (const p of parts) p.cls += ' mq-lwarm2';
             const instrH = sameInstr ? 0 : twoLines ? m.instr * 1.75 : m.instr;
-            const content = parts.length > 1 ? { kind: 'row', cls: 'mq-lwarmrow', widths: parts.map(() => '1fr'), parts } : parts[0];
-            groups.push(band(m.strip + instrH + hW, { kind: 'band', label: 'Warm-up:', instr: sameInstr ? t0 : '', content }, { h: hW, grid: parts.map((p) => p.parts[p.parts.length - 1]), cap: 0, capIfEmpty: 0.45 }));
+            const content = parts.length > 1 ? { kind: 'row', cls: 'mq-lwarmrow', widths: parts.map((p, i) => (tracks ? `minmax(0, ${tracks[i].toFixed(2)}fr)` : '1fr')), parts } : parts[0];
+            // The page's spare height may grow these cells only while each one's own item still
+            // fills all but WARM_BAND of it (critic SU-C r2 N2: at L the grown row left a short
+            // fact 39-40 % of a 65 mm cell empty); what it cannot take passes to the bands after it.
+            const room = halves.map((id) => {
+                const its = wPools[id].slice(0, shape[id].k * rowsOf(id));
+                const hs = its.map((it) => hOf(it, shape[id].cols));
+                if (!hs.length || hs.some((h) => !(h > 0))) return Infinity;
+                return rowsOf(id) * Math.max(20, Math.min(...hs)) / (1 - WARM_BAND) - hW;
+            });
+            const maxAdd = Math.max(0, Math.min(...room));
+            groups.push(band(m.strip + instrH + hW, { kind: 'band', label: 'Warm-up:', instr: sameInstr ? t0 : '', content }, Object.assign({ h: hW, grid: parts.map((p) => p.parts[p.parts.length - 1]), cap: 0, capIfEmpty: 0.45 }, Number.isFinite(maxAdd) ? { maxAdd } : {})));
         }
     }
 
@@ -1726,10 +1865,14 @@ export function plan(input = {}) {
         // Independent rows, and a band that reaches its cap passes the rest of its share to the bands after it, so the
         // sheet does not end on a blank band; absent, as before)
         let left = spare;
+        let carry = 0;   // (what a band's `maxAdd` refused, passed to the bands after it)
         for (const [gi, g] of grows.entries()) {
             const cap0 = wide && g.capIfEmpty !== undefined ? g.capIfEmpty : (g.cap !== undefined ? g.cap : 0.35);
             const cap = data && data.growAll ? Math.max(cap0, 0.5) : cap0;
-            const add = data && data.growAll ? Math.min(left / (grows.length - gi), g.h * cap) : Math.min(spare / grows.length, g.h * cap);
+            const share = data && data.growAll ? left / (grows.length - gi) : spare / grows.length + carry;
+            const add0 = Math.min(share, g.h * cap);
+            const add = g.maxAdd !== undefined ? Math.min(add0, g.maxAdd) : add0;
+            carry = data && data.growAll ? 0 : add0 - add;
             left -= add;
             for (const part of g.grid) part.height = `${Math.round(((parseFloat(part.height) || g.h) + add) * 100) / 100}mm`;
             if (g.box) g.box.html = g.box.html.replace(/height:[\d.]+mm/, `height:${(g.h + add).toFixed(2)}mm`);
@@ -1771,6 +1914,7 @@ export function plan(input = {}) {
     // header, the pages after it the continuation header (HD-20).
     plan0.pages = plan0.pages.map((pg, i) => (i > 0 && !out[i].header && pg.header === frame.header ? Object.assign({}, pg, { header: frame.contHeader }) : pg));
     plan0.cls = [plan0.cls || '', 'mq-lesson'].filter(Boolean).join(' ');
+    if (halves.some((id) => shape[id].split)) Object.defineProperty(plan0, '_warmSplit', { value: true, enumerable: false });
     return plan0;
 }
 

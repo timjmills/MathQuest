@@ -1,6 +1,6 @@
 <!-- spec-card
-{"card":"subtraction","kind":"family","template":"stack","families":[],"match":{"templates":["stack"]},"config":"design/cards/subtraction/card.json","indexSha":"e4855a641fe40d4e19914154f1da96fe97901b51","bodySha":"1d92fab41f9647c6","format":2,"configSha":"7a817a9ac3df"}
-{"cited":"AX-9 C1 CL-9 DN-1a H2 H4 H5 H6 H7 H8 H9 H10 H11 H13 L1 L6 LR-4 LR-6 P-1 PT-FRM-6 PT-GDP-1 RP-1 SP-20 VA-10","rules":"VA-1 12d322 2 26885a 4 b05d12 7 13eea3 VA-10@WDS 9d9099 VA-11@WDS a5ab88 VA-12@WDS 60049e VA-13@WDS 05d8bb VA-13a c2dfad 20 ef38e6 22 045140 23 04bd6f AK-2 d4709f TY-21 53ed7d SP-23 fe1461 VA-3 770d75 5 1337f5 6 45cb76 21 8802ac 30 5b42ae 31 2f0077 32 898868 LS-8 59531d SL-12 3cbafa TY-20 8964d2 23 e741c0 24 e73e2c 26 cc6cf2 VA-40 914c3a 41 1325cb 42 1b3a08 50 905c89 51 ca8fb1 52 992853 SL-1 e3b064 2 f404d5 11 183e7a CL-6 102a92 9 accb97 PG-12 8e75fd 14 64a88e PT-CGR-5 3f7489 PT-EQD-2 ed82db DN-34 90af7b AK-1 a0cc12 4 8d027b INK-31 d7ece8 BD-7 81d3da PT-GDP-1 a0e2cc P-SC-7 65e105 SF-34@WDS.1 00e2f6 SP-1 87c2cc 2 1f2df0 3 7b7bfb 4 51a802 10 6ffb0a 12 1309f9 SCC-T3 359377 4 e83741 10 084029 14 b8671c 15 fc9373 17 c36547 SCC-P5 6387d4 6 d362fd BD-10 8d473f 11 29d891 12 36b79c PT-FRM-6 daac17 P-1 5a3076 29 89eb8e Q-10 50b907 P-10 256ad3 35 4b32c0 31 28b15c BD-4 b3947b PT-SCR-1 25f6f5 CL-1 277ec4 AX-4 2eb6c1 INK-5 631a6d TY-7 e3e1e1 RP-1 d529bd AX-9 74e9a4 DN-1a 4fcc05 PT-GDP-2 386bb5 SL-3 468d78 SP-20 cfb11a PT-REV-3 d5e0d9 C1 66f8a9 2 32e3b2 3 3d5192 4 e59efd H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H4@RUBRIC 9ce1f3 H5@RUBRIC b3892d H6 0722fd 7 3d3d38 8 44c23b 9 fd82d1 10 fbd802 11 bef034 12 2de4f7 13 36f579 OC3 bb8551 4 00a5e1 7 81bde7 8 089b5e 10 ad6428 11 c55e70 14 18b2a5 L1 799b66 2 fecb99 3 901e56 4 6538d6 5 4d48a8 6 6e19d8 9 f4b4c0 10 d2ca35 11 9ebe19 CL-4b 12a353 31 383ae0 INK-3 b9f1f1 4 fe5b27 P-LC-9 bc47bd SCC-01 8aa70b SF-10 f1a0d9 SL-10 9fe607 TY-2 510243 13 3d0f88 22 7e9b75 25 b0a223","entries":"R%3AR-BAND-50 18e69e R%3AR-BAND-100 fc263d R%3AR-BAND-1K 435a7c R%3AR-BAND-10K 619074 R%3AR-BAND-100K 5d5b6b R%3AR-BAND-1M c0857e R%3AR-BAND-2D1D 18fb90 R%3AR-NO-REGROUP 71d085 R%3AR-SAME-LENGTH 6e75e9 R%3AR-SHORTER-2D1D d43a78 R%3AR-ZERO-NOT-SEEDED e7ee95 R%3AR-BOXES-2 ace42a R%3AR-BOXES-3 b32a2d R%3AR-BOXES-4 0b0482 R%3AR-BOXES-5 34e155 R%3AR-BOXES-6 37d9fb N%3AN-BAND c6154e D%3Anotation%3Dstacked d55128 D%3Anotation%3Dacross d55128 D%3Aband%3D10 d55128 D%3Aband%3D20 d55128 D%3Aband%3D50 d55128 D%3Aband%3D100 d55128 D%3Aband%3D1000 d55128 D%3Aband%3D10000 d55128 D%3Aband%3D100000 d55128 D%3Aband%3D1000000 d55128 D%3Alevel%3D3 972948 D%3Alevel%3D1 972948 D%3Alevel%3D0 972948 D%3Alevel%3D2 d55128 D%3AnlOn%3Dtrue d55128 D%3AnlOn%3Dfalse d55128 D%3AnlFrom%3D* d55128 D%3AnlTo%3D* d55128 D%3AnlStep%3D1 d55128 D%3AnlStep%3D2 d55128 D%3AnlStep%3D5 d55128 D%3AnlStep%3D10 d55128 D%3AnlStep%3D20 d55128 D%3AnlStep%3D25 d55128 D%3AnlStep%3D50 d55128 D%3AnlStep%3D100 d55128 D%3AnlStep%3D1000 d55128 D%3AnlStep%3Dauto d55128 D%3AnlStep%3D1%2F2 d55128 D%3AnlStep%3D1%2F3 d55128 D%3AnlStep%3D1%2F4 d55128 D%3AnlStep%3D1%2F5 d55128 D%3AnlStep%3D1%2F6 d55128 D%3AnlStep%3D1%2F8 d55128 D%3AnlStep%3D1%2F10 d55128 D%3AnlStep%3D1%2F12 d55128 D%3AnlStep%3D0.1 d55128 D%3AnlStep%3D0.01 d55128 D%3AnlLabels%3Dauto d55128 D%3AnlLabels%3Dall d55128 D%3AnlLabels%3D2 d55128 D%3AnlLabels%3D5 d55128 D%3AnlLabels%3D10 d55128 D%3AnlLabels%3Dends d55128 D%3AnlLabels%3Dnone d55128 D%3AnlMinor%3Dauto d55128 D%3AnlMinor%3D0 d55128 D%3AnlMinor%3D2 d55128 D%3AnlMinor%3D4 d55128 D%3AnlMinor%3D5 d55128 D%3AnlMinor%3D10 d55128 D%3AnlHops%3Dtrue d55128 D%3AnlHops%3Dfalse d55128 D%3Acalculator%3Dtrue 11baa8 D%3Acalculator%3Dfalse 11baa8 D%3AskipAfter%3D* 11baa8 D%3Arole%3Aindependent 972948 D%3Arole%3Amore-practice 972948 D%3Arole%3Aopener 972948 D%3Arole%3Ascripted-model 972948 D%3Arole%3Aguided 972948 D%3Arole%3Aerror-analysis 972948 D%3Arole%3Areview 972948 D%3Arole%3Atest 972948 D%3Arole%3Apre-skill-check 972948 D%3Arole%3Aword-problems 972948 D%3Arole%3Afact-rows 972948 D%3Arole%3Afact-probe 972948 D%3Arole%3Amixed-practice 972948 D%3Arole%3Atrue-false 972948 D%3Arole%3Areason-it 972948 D%3Arole%3Astretch 972948 D%3Arole%3Alesson 972948 D%3Ahost%3Apractice-card 972948 D%3Ahost%3Aonline-worksheet 972948 D%3Ahost%3Aquiz 972948 D%3Ahost%3Aboss 11baa8 D%3Ahost%3Arace 11baa8 D%3Ahost%3Amap 11baa8 D%3Ahost%3Amode-dark 11baa8 D%3Ahost%3Amode-bigboard 11baa8"}
+{"card":"subtraction","kind":"family","template":"stack","families":[],"match":{"templates":["stack"]},"config":"design/cards/subtraction/card.json","indexSha":"e4855a641fe40d4e19914154f1da96fe97901b51","bodySha":"db01c9eed06d4c60","format":2,"configSha":"673ffdc76741"}
+{"cited":"AX-9 C1 CL-9 DN-1a H2 H4 H5 H6 H7 H8 H9 H10 H11 H13 L1 L6 LR-4 LR-6 P-1 PT-FRM-6 PT-GDP-1 RP-1 SP-20 VA-10","rules":"VA-1 12d322 2 26885a 4 b05d12 7 13eea3 VA-10@WDS 9d9099 VA-11@WDS a5ab88 VA-12@WDS 60049e VA-13@WDS 05d8bb VA-13a c2dfad 20 ef38e6 22 045140 23 04bd6f AK-2 d4709f TY-21 53ed7d SP-23 fe1461 VA-3 770d75 5 1337f5 6 45cb76 21 8802ac 30 5b42ae 31 2f0077 32 898868 LS-8 59531d SL-12 3cbafa TY-20 8964d2 23 e741c0 24 e73e2c 26 cc6cf2 VA-40 914c3a 41 1325cb 42 1b3a08 50 905c89 51 ca8fb1 52 992853 SL-1 e3b064 2 f404d5 11 183e7a CL-6 102a92 9 accb97 PG-12 8e75fd 14 64a88e PT-CGR-5 3f7489 PT-EQD-2 ed82db DN-34 90af7b AK-1 a0cc12 4 8d027b INK-31 d7ece8 BD-7 81d3da PT-GDP-1 a0e2cc P-SC-7 65e105 SF-34@WDS.1 00e2f6 SP-1 87c2cc 2 1f2df0 3 7b7bfb 4 51a802 10 6ffb0a 12 1309f9 SCC-T3 359377 4 e83741 10 084029 14 b8671c 15 fc9373 17 c36547 SCC-P5 6387d4 6 d362fd BD-10 8d473f 11 29d891 12 36b79c PT-FRM-6 daac17 P-1 5a3076 29 89eb8e Q-10 50b907 P-10 256ad3 35 4b32c0 31 28b15c BD-4 b3947b PT-SCR-1 25f6f5 CL-1 277ec4 AX-4 2eb6c1 INK-5 631a6d TY-7 e3e1e1 RP-1 d529bd AX-9 74e9a4 DN-1a 4fcc05 PT-GDP-2 386bb5 SL-3 468d78 SP-20 cfb11a PT-REV-3 d5e0d9 C1 66f8a9 2 32e3b2 3 3d5192 4 e59efd H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H4@RUBRIC 9ce1f3 H5@RUBRIC b3892d H6 0722fd 7 3d3d38 8 44c23b 9 fd82d1 10 fbd802 11 bef034 12 2de4f7 13 36f579 OC3 bb8551 4 00a5e1 7 81bde7 8 089b5e 10 ad6428 11 c55e70 14 18b2a5 L1 799b66 2 fecb99 3 901e56 4 6538d6 5 4d48a8 6 6e19d8 9 f4b4c0 10 d2ca35 11 9ebe19 CL-4b 12a353 31 383ae0 INK-3 b9f1f1 4 fe5b27 P-LC-9 bc47bd SCC-01 8aa70b SF-10 f1a0d9 SL-10 9fe607 TY-2 510243 13 3d0f88 22 7e9b75 25 b0a223","entries":"R%3AR-BAND-50 18e69e R%3AR-BAND-100 fc263d R%3AR-BAND-1K 435a7c R%3AR-BAND-10K 619074 R%3AR-BAND-100K 5d5b6b R%3AR-BAND-1M c0857e R%3AR-BAND-2D1D 18fb90 R%3AR-NO-REGROUP 71d085 R%3AR-SAME-LENGTH 6e75e9 R%3AR-SHORTER-2D1D d43a78 R%3AR-ZERO-NOT-SEEDED e7ee95 R%3AR-BOXES-2 ace42a R%3AR-BOXES-3 b32a2d R%3AR-BOXES-4 0b0482 R%3AR-BOXES-5 34e155 R%3AR-BOXES-6 37d9fb N%3AN-BAND c6154e D%3Anotation%3Dstacked d55128 D%3Anotation%3Dacross d55128 D%3Alengths%3Dsame bcefeb D%3Alengths%3Dshorter bcefeb D%3Azeros%3Doff bcefeb D%3Azeros%3Don bcefeb D%3Aband%3D10 d55128 D%3Aband%3D20 d55128 D%3Aband%3D50 d55128 D%3Aband%3D100 d55128 D%3Aband%3D1000 d55128 D%3Aband%3D10000 d55128 D%3Aband%3D100000 d55128 D%3Aband%3D1000000 d55128 D%3Alevel%3D3 972948 D%3Alevel%3D1 972948 D%3Alevel%3D0 972948 D%3Alevel%3D2 d55128 D%3AnlOn%3Dtrue d55128 D%3AnlOn%3Dfalse d55128 D%3AnlFrom%3D* d55128 D%3AnlTo%3D* d55128 D%3AnlStep%3D1 d55128 D%3AnlStep%3D2 d55128 D%3AnlStep%3D5 d55128 D%3AnlStep%3D10 d55128 D%3AnlStep%3D20 d55128 D%3AnlStep%3D25 d55128 D%3AnlStep%3D50 d55128 D%3AnlStep%3D100 d55128 D%3AnlStep%3D1000 d55128 D%3AnlStep%3Dauto d55128 D%3AnlStep%3D1%2F2 d55128 D%3AnlStep%3D1%2F3 d55128 D%3AnlStep%3D1%2F4 d55128 D%3AnlStep%3D1%2F5 d55128 D%3AnlStep%3D1%2F6 d55128 D%3AnlStep%3D1%2F8 d55128 D%3AnlStep%3D1%2F10 d55128 D%3AnlStep%3D1%2F12 d55128 D%3AnlStep%3D0.1 d55128 D%3AnlStep%3D0.01 d55128 D%3AnlLabels%3Dauto d55128 D%3AnlLabels%3Dall d55128 D%3AnlLabels%3D2 d55128 D%3AnlLabels%3D5 d55128 D%3AnlLabels%3D10 d55128 D%3AnlLabels%3Dends d55128 D%3AnlLabels%3Dnone d55128 D%3AnlMinor%3Dauto d55128 D%3AnlMinor%3D0 d55128 D%3AnlMinor%3D2 d55128 D%3AnlMinor%3D4 d55128 D%3AnlMinor%3D5 d55128 D%3AnlMinor%3D10 d55128 D%3AnlHops%3Dtrue d55128 D%3AnlHops%3Dfalse d55128 D%3Acalculator%3Dtrue 11baa8 D%3Acalculator%3Dfalse 11baa8 D%3AskipAfter%3D* 11baa8 D%3Arole%3Aindependent 972948 D%3Arole%3Amore-practice 972948 D%3Arole%3Aopener 972948 D%3Arole%3Ascripted-model 972948 D%3Arole%3Aguided 972948 D%3Arole%3Aerror-analysis 972948 D%3Arole%3Areview 972948 D%3Arole%3Atest 972948 D%3Arole%3Apre-skill-check 972948 D%3Arole%3Aword-problems 972948 D%3Arole%3Afact-rows 972948 D%3Arole%3Afact-probe 972948 D%3Arole%3Amixed-practice 972948 D%3Arole%3Atrue-false 972948 D%3Arole%3Areason-it 972948 D%3Arole%3Astretch 972948 D%3Arole%3Alesson 972948 D%3Ahost%3Apractice-card 972948 D%3Ahost%3Aonline-worksheet 972948 D%3Ahost%3Aquiz 972948 D%3Ahost%3Aboss 11baa8 D%3Ahost%3Arace 11baa8 D%3Ahost%3Amap 11baa8 D%3Ahost%3Amode-dark 11baa8 D%3Ahost%3Amode-bigboard 11baa8"}
 -->
 <!-- rulings
 {"v": 1, "card": "subtraction",
@@ -274,6 +274,8 @@ What the critic grades and the panel may show. Each live line in §7b needs one 
 **Option values (offeredOptionsFor)**
 
 - `notation=stacked | across` — **hidden** (PROPOSED) — the inherited AP4 control is removed; these six are always stacked, across belongs to the `sub-setup` rewrite page (§5.8; critic SU-C r2 N4)
+- `lengths=same | shorter` — **offered** — default same; shorter is its own section, never mixed at random (owner-signed answer 3 (D3/D4))
+- `zeros=off | on` — **offered** — default off; the zero case is its own section from 3 digits up (owner-signed answer 4)
 - `band=10 | 20 | 50 | 100 | 1000 | 10000 | 100000 | 1000000` — **hidden** (PROPOSED) — O2 number size IS the six skills; the legacy band control would deal another skill's numbers (§7; critic SU-C r1 D6 (N-BAND))
 - `level=3 | 1 | 0` — **offered** (PROPOSED) — 3 traces the answer, 1 prints the place heads, 0 takes them away; the answer boxes stay at every level (§5.9, §5.10)
 - `level=2` — **hidden** (PROPOSED) — levels offered are 3, 1, 0 (the derived table's [3, 2, 1] is stale; a re-derive measures [3, 1, 0]) (§5.9, §5.10)
@@ -356,83 +358,38 @@ Signed: (not yet signed)
 
 Listed from the repo at generation. The decisions are signed in §7a; `--check-signed` re-derives this listing from the repo and FAILS on any line without a decision (`[UNDECIDED]`). Not part of the signed card.
 
-**Option values (offeredOptionsFor)** (55 lines; 0 undecided)
+**Option values (offeredOptionsFor)** (10 lines; 0 undecided)
 
-- `notation=stacked` How it is written, default (sub_100_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `notation=across` How it is written (sub_100_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `band=10` Numbers to (all 6) [hidden, PROPOSED]
-- `band=20` Numbers to (all 6) [hidden, PROPOSED]
-- `band=50` Numbers to, default on sub_50_no_regroup (all 6) [hidden, PROPOSED]
-- `band=100` Numbers to, default on sub_100_no_regroup (sub_100_no_regroup, sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) [hidden, PROPOSED]
 - `level=3` Support level (all 6) [offered, PROPOSED]
-- `level=2` Support level (all 6) [hidden, PROPOSED]
 - `level=1` Support level, default (all 6) [offered, PROPOSED]
-- `nlOn=true` Show the number line [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlOn=false` Show the number line [nline], default (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlFrom=*` Starts at [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlTo=*` Ends at [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlStep=1` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlStep=2` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlStep=5` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlStep=10` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlStep=20` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlStep=25` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlStep=50` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlStep=100` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlStep=1000` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlStep=auto` Step between ticks [nline], default (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlStep=1/2` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlStep=1/3` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlStep=1/4` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlStep=1/5` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlStep=1/6` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlStep=1/8` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlStep=1/10` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlStep=1/12` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlStep=0.1` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlStep=0.01` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlLabels=auto` Numbers under the ticks [nline], default (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlLabels=all` Numbers under the ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlLabels=2` Numbers under the ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlLabels=5` Numbers under the ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlLabels=10` Numbers under the ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlLabels=ends` Numbers under the ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlLabels=none` Numbers under the ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlMinor=auto` Small ticks between [nline], default (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlMinor=0` Small ticks between [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlMinor=2` Small ticks between [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlMinor=4` Small ticks between [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlMinor=5` Small ticks between [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlMinor=10` Small ticks between [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlHops=true` Hop arrows over each step [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
-- `nlHops=false` Hop arrows over each step [nline], default (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `level=0` Support level (all 6) [offered, PROPOSED]
+- `lengths=same` Number lengths [difficulty], default (sub_100_no_regroup, sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) [offered]
+- `lengths=shorter` Number lengths [difficulty] (sub_100_no_regroup, sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) [offered]
 - `calculator=true` Calculator [play] (all 6) [out of scope, PROPOSED]
 - `calculator=false` Calculator [play], default (all 6) [out of scope, PROPOSED]
 - `skipAfter=*` Skip appears after [play] (all 6) [out of scope, PROPOSED]
-- `band=1000` Numbers to, default on sub_1k_no_regroup (sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) [hidden, PROPOSED]
-- `band=10000` Numbers to, default on sub_10k_no_regroup (sub_100k_no_regroup, sub_10k_no_regroup, sub_1m_no_regroup) [hidden, PROPOSED]
-- `band=100000` Numbers to, default on sub_100k_no_regroup (sub_100k_no_regroup, sub_1m_no_regroup) [hidden, PROPOSED]
-- `band=1000000` Numbers to, default (sub_1m_no_regroup) [hidden, PROPOSED]
+- `zeros=off` Zeros [difficulty], default (sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) [offered]
+- `zeros=on` Zeros [difficulty] (sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) [offered]
 
 **Page roles (buildSheet)** (17 lines; 0 undecided)
 
 - `role:independent` — the skill's own items (all 6) [offered, PROPOSED]
 - `role:more-practice` — the skill's own items (all 6) [offered, PROPOSED]
 - `role:opener` (also lesson-opener) — the skill's own items (all 6) [offered, PROPOSED]
-- `role:scripted-model` (also model) — provider workedSteps: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) (all 6) [offered, PROPOSED]
-- `role:guided` — provider workedSteps: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) (all 6) [offered, PROPOSED]
-- `role:error-analysis` (also check-it) — provider wrongAnswer: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup); provider misconceptions: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) (all 6) [offered, PROPOSED]
+- `role:scripted-model` (also model) — provider workedSteps: real 6/6 (all 6) [offered, PROPOSED]
+- `role:guided` — provider workedSteps: real 6/6 (all 6) [offered, PROPOSED]
+- `role:error-analysis` (also check-it) — provider wrongAnswer: real 6/6; provider misconceptions: real 6/6 (all 6) [offered, PROPOSED]
 - `role:review` — earlier skills: data.js order (print-sheet.js earlierSkills) (all 6) [offered, PROPOSED]
 - `role:test` (also test-a, test-b) — the skill's own items (all 6) [offered, PROPOSED]
 - `role:pre-skill-check` (also pre-skill) — earlier skills: data.js order (print-sheet.js earlierSkills) (all 6) [offered, PROPOSED]
-- `role:word-problems` — provider stories: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) (all 6) [offered, PROPOSED]
-- `role:fact-rows` — provider stories: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) (all 6) [offered, PROPOSED]
+- `role:word-problems` — provider stories: real 6/6 (all 6) [offered, PROPOSED]
+- `role:fact-rows` — provider stories: real 6/6 (all 6) [offered, PROPOSED]
 - `role:fact-probe` — the skill's own items (all 6) [offered, PROPOSED]
-- `role:mixed-practice` (also mixed) — provider stories: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) (all 6) [offered, PROPOSED]
-- `role:true-false` — provider wrongAnswer: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) (all 6) [offered, PROPOSED]
-- `role:reason-it` (also reason) — provider workedSteps: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup); provider wrongAnswer: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) (all 6) [offered, PROPOSED]
+- `role:mixed-practice` (also mixed) — provider stories: real 6/6 (all 6) [offered, PROPOSED]
+- `role:true-false` — provider wrongAnswer: real 6/6 (all 6) [offered, PROPOSED]
+- `role:reason-it` (also reason) — provider workedSteps: real 6/6; provider wrongAnswer: real 6/6 (all 6) [offered, PROPOSED]
 - `role:stretch` — the skill's own items (all 6) [offered, PROPOSED]
-- `role:lesson` — lesson data: prereqs.js 0/6 (FALLBACK, warm-up from the earlier skills in data.js order, on sub_100_no_regroup, sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup, sub_50_no_regroup) (all 6) [offered, PROPOSED]
+- `role:lesson` — lesson data: prereqs.js 6/6 (all 6) [offered, PROPOSED]
 
 **Screen hosts** (8 lines; 0 undecided)
 
@@ -447,9 +404,9 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 
 **Options declared today** (`js/modules/skill-options.js`; id, label, values, skills that declare it):
 
-- `band` Numbers to: 10 / 20 / 50 / 100 (6)
-- `level` Support level: 3 / 2 / 1 (6)
-- `notation` How it is written: stacked / across (2)
+- `level` Support level: 3 / 1 / 0 (6)
+- `lengths` Number lengths: same / shorter (5)
+- `zeros` Zeros: off / on (4)
 
-**Preset skills on these hosts** (`js/modules/skill-presets.js`): (none)
+**Preset skills on these hosts** (`js/modules/skill-presets.js`): `subtraction:sub_2d_1d` → `subtraction:sub_100_no_regroup` {"lengths":"shorter"}
 <!-- /informational -->

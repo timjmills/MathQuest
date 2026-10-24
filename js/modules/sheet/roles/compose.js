@@ -254,7 +254,9 @@ export function instructionKeyOf(items, skills) {
     const keys = items.map((it) => {
         if (it.instructionKey) return it.instructionKey;
         const q = it.q || {};
-        const s = (skills || []).find((k) => k.skillId === q.skillId && (!q.categoryId || k.categoryId === q.categoryId));
+        // (a preset's item names its host as skillId and itself as presetId: match the preset first)
+        const own = (id) => (skills || []).find((k) => k.skillId === id && (!q.categoryId || k.categoryId === q.categoryId));
+        const s = (q.presetId && own(q.presetId)) || own(q.skillId);
         return s ? (s.instructionKey || skillWords(s).instructionKey) : '';
     });
     return sectionInstructionKey(keys);

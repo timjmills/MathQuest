@@ -1,0 +1,4 @@
+ws-grade-render: 2 skills -> design/audit/runs/s3-stack/render-r2-M/fr10k
+  [1/2] subtraction:sub_10k_no_regroup  fact-rows 1p+1k 6x6  16s
+  [2/2] subtraction:sub_100k_no_regroup  fact-rows 1p+1k 4x5  29s
+ws-grade-render: done, 2 units, 4 pages, 30s

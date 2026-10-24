@@ -1,0 +1,8 @@
+$ node tests/scripts/ws-providers-unit.mjs --skill subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_100k_no_regroup,subtraction:sub_1m_no_regroup,subtraction:sub_2d_1d
+
+  --skill: 0 of 7 skill(s) checked; not covered (no item maker in this test): subtraction:sub_50_no_regroup, subtraction:sub_100_no_regroup, subtraction:sub_1k_no_regroup, subtraction:sub_10k_no_regroup, subtraction:sub_100k_no_regroup, subtraction:sub_1m_no_regroup, subtraction:sub_2d_1d
+ws-providers-unit: OK (408 checks, 32 time and money + 24 re-graded skills + 9 siblings + 41 place-value / rounding / estimation + 4 count-by)
+(node:8382) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/user/MathQuest/js/modules/sheet/index.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/user/MathQuest/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)

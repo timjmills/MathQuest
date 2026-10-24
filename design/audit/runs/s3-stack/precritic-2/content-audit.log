@@ -1,0 +1,49 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-content-audit.cjs --skill sub_50_no_regroup,sub_100_no_regroup,sub_1k_no_regroup,sub_10k_no_regroup,sub_100k_no_regroup,sub_1m_no_regroup,sub_2d_1d --category subtraction
+
+FAIL subtraction/sub_50_no_regroup  "Subtract within 50 (No Regrouping)"
+       - [card-ruling] R-ZERO-NOT-SEEDED (card §9.4 (zeros off: never seeded; critic r1 D1 bound 10%)): zeroCase on 13 of 120 items (10.8%; at most 10%); e.g. 40 - 30 = 10 [2 boxes], 40 - 30 = 10 [2 boxes], 50 - 20 = 30 [2 boxes], 40 - 20 = 20 [2 boxes]
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+       . [card-rulings] 4 of 5 spec-card ruling(s) hold over 120 items (design/cards/stack/stack.md, design/cards/subtraction/subtraction.md)
+note subtraction/sub_100_no_regroup  "Subtract within 100 (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+       . [ragged] operands are always the same length in 240 items (no 4-digit + 2-digit)
+       . [card-rulings] 5 of 5 spec-card ruling(s) hold over 120 items (design/cards/stack/stack.md, design/cards/subtraction/subtraction.md)
+note subtraction/sub_1k_no_regroup  "Subtract within 1,000 (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+       . [ragged] operands are always the same length in 240 items (no 4-digit + 2-digit)
+       . [card-rulings] 5 of 5 spec-card ruling(s) hold over 120 items (design/cards/stack/stack.md, design/cards/subtraction/subtraction.md)
+note subtraction/sub_10k_no_regroup  "Subtract within 10,000 (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+       . [ragged] operands are always the same length in 240 items (no 4-digit + 2-digit)
+       . [card-rulings] 5 of 5 spec-card ruling(s) hold over 120 items (design/cards/stack/stack.md, design/cards/subtraction/subtraction.md)
+note subtraction/sub_100k_no_regroup  "Subtract within 100,000 (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+       . [ragged] operands are always the same length in 240 items (no 4-digit + 2-digit)
+       . [card-rulings] 5 of 5 spec-card ruling(s) hold over 120 items (design/cards/stack/stack.md, design/cards/subtraction/subtraction.md)
+note subtraction/sub_1m_no_regroup  "Subtract within 1,000,000 (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+       . [ragged] operands are always the same length in 240 items (no 4-digit + 2-digit)
+       . [card-rulings] 5 of 5 spec-card ruling(s) hold over 120 items (design/cards/stack/stack.md, design/cards/subtraction/subtraction.md)
+note subtraction/sub_2d_1d  "Subtract a 1-Digit Number from a 2-Digit Number (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+       . [card-rulings] 5 of 5 spec-card ruling(s) hold over 120 items (design/cards/stack/stack.md, design/cards/subtraction/subtraction.md)
+
+Failures by class:
+     1  card-ruling
+
+Notes by class:
+     7  zero-facts
+     7  card-rulings
+     5  ragged
+
+By family:
+  operations    7 skills, 1 failing: sub_50_no_regroup
+           1  card-ruling
+
+Coverage: 0 skills where NOTHING could be checked against the name; 0 more with at least one check that could not be applied.
+
+MC-ALL (P-29 / RM-P-01, every live skill): 7 skills, 60 items each
+baseline: design/audit/baselines/content-audit-mc.json (30 pinned (skill, kind) pairs)
+ws-content-audit --mc-all: OK (7 skills, 60 items each: 0 with production items as buttons (0 pinned), 0 new, 0 label-bank notes)
+
+ws-content-audit: FAIL - 1 of 7 subtraction/sub_50_no_regroup,sub_100_no_regroup,sub_1k_no_regroup,sub_10k_no_regroup,sub_100k_no_regroup,sub_1m_no_regroup,sub_2d_1d skills, 240 items each, Max Number 100 (1 contradict their own name, 0 of 0 mixed pools deal outside their pool; 19 notes)

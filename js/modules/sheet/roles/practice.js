@@ -26,12 +26,12 @@ import {
     SIZES, DEFAULT_SIZE, LOOKS, DEFAULT_LOOK,
 } from '../index.js';
 import {
-    resolveSectionLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap, groupByHeight, rowShape, packByHeight, rowGapFor, DENSE_ROOM,
+    resolveSectionLayout, resolveBandedLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap, groupByHeight, rowShape, packByHeight, rowGapFor, DENSE_ROOM,
 } from '../layout.js';
 import { paginate, labelStarts, scoreDenominator, placeSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
 import { deriveSeed } from '../rng.js';
-import { ANCHOR_CSS, anchorPlanItem, sideItems, pupilCount, blockPlan, blockPages } from '../anchors.js';
+import { ANCHOR_CSS, ANCHOR_PAGE_CSS, anchorPlanItem, sideItems, pupilCount, blockPlan, blockPages, sideFit, SIDE_COLS } from '../anchors.js';
 import { LESSON_CSS } from '../lesson-css.js';
 
 /* ======================================================================= engine stylesheet */
@@ -63,6 +63,10 @@ export const SHEET_ENGINE_CSS = `
    clipped silently. The key's answer stamp costs no layout, so the problem sits where it sits on
    the pupil page (AK-1). */
 :is(.ws-page,.ws-sheet) .ws-cell.mq-legacy{align-items:stretch;padding-top:calc(var(--ws-tab,6mm) + 1mm)}
+/* R1: a legacy-sourced item a fact page redraws with the fact template (sub_facts on Fact rows)
+   keeps the fact cell's own top pad (--fp, set clear of the tab by factPadTop), as add_facts does;
+   the legacy 7 mm pushed the L key's answers 0.2 mm out of the 45 mm row (PG-12). */
+:is(.ws-page,.ws-sheet) .ws-cell.fact.mq-legacy{padding-top:var(--fp,2mm)}
 :is(.ws-page,.ws-sheet) .ws-cell.mq-legacy>.ws-legacy{width:100%;min-width:0}
 :is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .worksheet-problem{border:0!important;border-radius:0!important;padding:0!important;margin:0!important;overflow:visible!important;background:transparent!important;box-shadow:none!important}
 :is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .problem-content,:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .problem-content>div{overflow:visible}
@@ -642,8 +646,11 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
     const body = bodyHeightMm(paper, headerFirst);
     const split = new Set(sectionsIn.map((s) => s.splitOf).filter((x) => x !== undefined && x !== null));
     const layouts = sectionsIn.map((sec, si) => {
-        const L0 = resolveSectionLayout(
-            { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap },
+        // S6 sections: the column choice sees the grid net of the anchor band (blockPlan below
+        // takes the band off the page; s3 precritic-2 ex-group H13).
+        const aMm0 = anchorBandOf(anchors, si);
+        const L0 = resolveBandedLayout(
+            { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap }, aMm0,
             itemsBySection[si], paper, availableWidthMm, { size, look, header: headerFirst },
         );
         // A split section's two parts share the page: their rows are sized to what they hold.
@@ -657,10 +664,14 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
         // at the foot of a page with its problem overleaf).
         if (anchors && anchors.mode === 'side' && L.cols === 1 && itemsBySection[si].some((it) => it.anchor)) {
             const rows = Math.max(2, L.rows - (L.rows % 2));
-            return Object.assign({}, L, { rows, perPage: rows, pairs: true });
+            return sideFit(Object.assign({}, L, { rows, perPage: rows, pairs: true }), itemsBySection[si]);
+        }
+        // SIDE BY SIDE in two columns: rows as tall as the tallest twin (its steps included).
+        if (anchors && anchors.mode === 'side' && L.cols === 2) {
+            if (itemsBySection[si].some((it) => it.anchor)) return sideFit(L, itemsBySection[si]);
         }
         if (!aMm) return L;
-        const bp = blockPlan({ cols: L.cols, hMin: L.hMin, cellH: L.cellH, bodyMm: sec.gridH ? sec.gridH + instr : body, instrMm: instr, anchorMm: aMm });
+        const bp = blockPlan({ cols: L.cols, hMin: L.hMin, cellH: L.cellH, bodyMm: sec.gridH ? sec.gridH + instr : body, instrMm: instr, anchorMm: aMm, count: itemsBySection[si].length });
         return Object.assign({}, L, { cellH: bp.cellH, perPage: bp.perPage, rows: bp.blocksPerPage * bp.blockRows, blocks: bp, anchorMm: aMm });
     });
     // Wave 5.2 (critic nl-r4 D1 / D2): with the number-line band, a split section's two parts
@@ -683,6 +694,8 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
     }
     const chunksBySection = layouts.map((L, si) => (L.blocks
         ? blockPages(itemsBySection[si].length, L.blocks, L.cols, L.anchorMm)
+        : anchors && anchors.mode === 'side' && L.cols === 2 && !L.side4 && sidePairPages(itemsBySection[si], L)
+            ? sidePairPages(itemsBySection[si], L)
         : L.pairs
             // Paginate PAIRS, then count them back as rows: a page break never falls inside one.
             ? paginate(Math.ceil(itemsBySection[si].length / 2), { cols: 1, rows: L.rows / 2 })
@@ -700,6 +713,40 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
         { bodyFirstMm: body, bodyContMm: bodyHeightMm(paper, headerFirst, { cont: true }) },
     );
     return { layouts, chunksBySection, pages };
+}
+
+/**
+ * SIDE BY SIDE in two columns, pairs of different heights (S3; critic anchors-r2, add_10k side L:
+ * one tall worked twin set every row of the sheet, so a page held two pairs and the shorter twins
+ * stood in rows 40 % empty): the pairs go onto a page while their OWN measured heights (`pairMm`,
+ * the problem's own height when taller) fit the grid, frame and row rules included, and each row
+ * is as tall as its pair in proportion (`rowsTpl`). Null when the pairs are one height (the
+ * uniform rows of sideFit apply) or are not all measured.
+ */
+function sidePairPages(items, L) {
+    const hs = [];
+    for (let i = 0; i < items.length; i += 2) {
+        const tw = items[i], pr = items[i + 1];
+        if (!tw || !tw.anchor || !(Number(tw.pairMm) > 0)) return null;
+        const p = pr && pr.measured && pr.measured[2] && Number.isFinite(pr.measured[2].hMm) ? pr.measured[2].hMm + 1 : 0;
+        hs.push(Math.max(Number(tw.pairMm), p));
+    }
+    if (!hs.length || Math.max(...hs) < Math.min(...hs) * 1.1) return null;
+    const RULE = 0.6;   // the widest row rule of the looks, and the frame (layout.js cellBorderMm / FRAME_MM)
+    const out = [];
+    let r = 0;
+    while (r < hs.length) {
+        const G = (out.length ? Number(L.gridHCont) || Number(L.gridH) : Number(L.gridH)) || L.rows * L.cellH;
+        let n = 0, sum = 2 * RULE;
+        while (r + n < hs.length && (n === 0 || sum + RULE + hs[r + n] <= G)) { sum += (n ? RULE : 0) + hs[r + n]; n++; }
+        const rows = hs.slice(r, r + n);
+        const from = r * 2;
+        // (the last page stretches its rows no more than a third past what they hold - H13)
+        const gridMm = r + n >= hs.length ? Math.min(G, sum * 1.3) : G;
+        out.push({ index: out.length, from, count: Math.min(n * 2, items.length - from), rows: n, rebalanced: false, gridMm: Math.round(gridMm * 100) / 100, rowsTpl: rows.map((h) => `${Math.round(h * 10) / 10}fr`).join(' ') });
+        r += n;
+    }
+    return out;
 }
 
 /** The anchor band height (mm) of section `si` in SECTIONS mode, else 0. */
@@ -856,7 +903,11 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
         const pupil = sheetItems[si].filter((it) => !it.anchor);
         const hostKeys = pupil.map((it) => {
             const q = it.q || {};
-            const s = skills.find((k) => k.skillId === q.skillId && (!q.categoryId || k.categoryId === q.categoryId));
+            // A preset skill's items carry their HOST's id as skillId and the preset's as presetId
+            // (generate-question.js), so the preset is matched by presetId first (critic SU-C r1 D8:
+            // sub_2d_1d matched no listed skill and printed "Solve. Write the answer.").
+            const own = (id) => skills.find((k) => k.skillId === id && (!q.categoryId || k.categoryId === q.categoryId));
+            const s = (q.presetId && own(q.presetId)) || own(q.skillId);
             return (it.instructionKey) || (s ? skillWords(s).instructionKey : '');
         });
         // Critic guided-r1: a mixed pool's items are stamped with the pool's one line ("Solve.
@@ -885,6 +936,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
     const planPages = pages.map((pg, pi) => {
         const sections = [];
         if (pi === 0) sections.push({ kind: 'html', html: styleBlock() });
+        if (pi === 0 && anchors) sections.push({ kind: 'html', html: ANCHOR_PAGE_CSS });
         if (pg.cont) sections.push({ kind: 'html', html: CONT_MARK });
         // A lesson's step reminder strip (roles/lesson.js stripHtml) above the grid of every page;
         // the host took its height off the section's gridH.
@@ -944,9 +996,18 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 start,
                 cls: fillByFlex && !shape ? '' : 'fixed',
                 height: gap.gap ? `${gap.heightMm}mm` : shape ? `${shape.heightMm}mm` : fillByFlex ? '' : `${Math.round(part.chunk.rows * L.cellH * 1000) / 1000}mm`,
-                rowsTpl: shape ? shape.rowsTpl : '',
+                // SIDE BY SIDE in one column: each pair's twin row and problem row as tall as each
+                // needs (anchors.js sideFit), so a tall twin never runs out of its row.
+                rowsTpl: shape ? shape.rowsTpl : L.pairMm && L.pairs ? Array.from({ length: part.chunk.rows }, (_, r) => `${L.pairMm[r % 2]}fr`).join(' ') : '',
+                // SIDE BY SIDE (two columns): each column as wide as what it holds, the spare
+                // width shared, so a narrow stack is not an island in a half-page cell (H13).
+                // (S3 task 1: the content-sized pair columns, anchors.js sideFit `colsTpl2`)
+                ...(L.cols === 2 && its.some((it) => it.anchor) ? { colsTpl: L.colsTpl2 || SIDE_COLS } : {}),
+                // (owner ruling A: the four-column side grid, [twin | problem | twin | problem])
+                ...(L.side4 && its.some((it) => it.anchor) ? { colsTpl: L.colsTpl4 } : {}),
                 rowGap: gap.gap || 0,
-                items: its.map((it) => planItem(it, level, L.cols)),
+                // (owner ruling A: a four-column side page draws each cell at its two-column width)
+                items: its.map((it) => planItem(it, level, L.side4 ? L.drawCols : L.cols)),
             });
         }
         // Wave 5.2: a page none of whose sections asked for the number line prints without it

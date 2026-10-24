@@ -24,7 +24,7 @@ Sources:
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
 - Covered 513 (59%), partial only 149 (17%), gap 210 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 392 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
+- 393 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
@@ -1566,6 +1566,7 @@ whatever happens to the WRM gaps.
   Vocabulary: ten, hundred, bond to 100  
 - **Y2.B2.S5** Add and subtract 1s — covered. _1.OA.C.5, 1.OA.C.6, M.EE.1.OA.5_  
   Skills: Number Line Addition (B&W) (`addition:number_line_add`); Number Line Subtraction (B&W) (`subtraction:number_line_sub`)  
+  Partial: Subtract a 1-Digit Number from a 2-Digit Number (No Regrouping) (`subtraction:sub_2d_1d`), missing adding ones (34 + 3): it deals only the subtracting half (34 − 3)  
   Vocabulary: ones, tens, 1 more, 1 less  
 - **Y2.B2.S6** Add by making 10 — covered. _1.OA.B.3, 1.OA.C.6_  
   Skills: Add — Bridging Ten (sums 11–18) (`addition:add_10_regroup`); Make a Ten Strategy (`number_sense:make_a_ten`)  

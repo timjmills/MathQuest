@@ -1,0 +1,83 @@
+$ node tests/scripts/ws-card-rulings.mjs --skill subtraction:sub_50_no_regroup --skill subtraction:sub_100_no_regroup --skill subtraction:sub_1k_no_regroup --skill subtraction:sub_10k_no_regroup --skill subtraction:sub_100k_no_regroup --skill subtraction:sub_1m_no_regroup --skill subtraction:sub_2d_1d --check offered
+
+ws-card-rulings: design/cards/stack/stack.md, design/cards/subtraction/subtraction.md on this tree; 7 skill(s), 300 items per ruling
+  ok   subtraction:sub_100_no_regroup       N-BAND             (§7 (O2 number size = the six skills themselves; critic r1 D6)) band not offered
+  ok   subtraction:sub_100k_no_regroup      N-BAND             (§7 (O2 number size = the six skills themselves; critic r1 D6)) band not offered
+  ok   subtraction:sub_10k_no_regroup       N-BAND             (§7 (O2 number size = the six skills themselves; critic r1 D6)) band not offered
+  ok   subtraction:sub_1k_no_regroup        N-BAND             (§7 (O2 number size = the six skills themselves; critic r1 D6)) band not offered
+  ok   subtraction:sub_1m_no_regroup        N-BAND             (§7 (O2 number size = the six skills themselves; critic r1 D6)) band not offered
+  ok   subtraction:sub_2d_1d                N-BAND             (§7 (O2 number size = the six skills themselves; critic r1 D6)) band not offered
+  ok   subtraction:sub_50_no_regroup        N-BAND             (§7 (O2 number size = the six skills themselves; critic r1 D6)) band not offered
+  ok   subtraction:sub_100_no_regroup       N-D-notation       (§7a (decision, PROPOSED: §5.8; critic SU-C r2 N4)) notation not offered
+  ok   subtraction:sub_100k_no_regroup      N-D-notation       (§7a (decision, PROPOSED: §5.8; critic SU-C r2 N4)) notation not offered
+  ok   subtraction:sub_10k_no_regroup       N-D-notation       (§7a (decision, PROPOSED: §5.8; critic SU-C r2 N4)) notation not offered
+  ok   subtraction:sub_1k_no_regroup        N-D-notation       (§7a (decision, PROPOSED: §5.8; critic SU-C r2 N4)) notation not offered
+  ok   subtraction:sub_1m_no_regroup        N-D-notation       (§7a (decision, PROPOSED: §5.8; critic SU-C r2 N4)) notation not offered
+  ok   subtraction:sub_2d_1d                N-D-notation       (§7a (decision, PROPOSED: §5.8; critic SU-C r2 N4)) notation not offered
+  ok   subtraction:sub_50_no_regroup        N-D-notation       (§7a (decision, PROPOSED: §5.8; critic SU-C r2 N4)) notation not offered
+  ok   subtraction:sub_100_no_regroup       N-D-band           (§7a (decision, PROPOSED: §7; critic SU-C r1 D6 (N-BAND))) band not offered
+  ok   subtraction:sub_100k_no_regroup      N-D-band           (§7a (decision, PROPOSED: §7; critic SU-C r1 D6 (N-BAND))) band not offered
+  ok   subtraction:sub_10k_no_regroup       N-D-band           (§7a (decision, PROPOSED: §7; critic SU-C r1 D6 (N-BAND))) band not offered
+  ok   subtraction:sub_1k_no_regroup        N-D-band           (§7a (decision, PROPOSED: §7; critic SU-C r1 D6 (N-BAND))) band not offered
+  ok   subtraction:sub_1m_no_regroup        N-D-band           (§7a (decision, PROPOSED: §7; critic SU-C r1 D6 (N-BAND))) band not offered
+  ok   subtraction:sub_2d_1d                N-D-band           (§7a (decision, PROPOSED: §7; critic SU-C r1 D6 (N-BAND))) band not offered
+  ok   subtraction:sub_50_no_regroup        N-D-band           (§7a (decision, PROPOSED: §7; critic SU-C r1 D6 (N-BAND))) band not offered
+  ok   subtraction:sub_100_no_regroup       N-D-level          (§7a (decision, PROPOSED: §5.9, §5.10)) level offered without 2
+  ok   subtraction:sub_100k_no_regroup      N-D-level          (§7a (decision, PROPOSED: §5.9, §5.10)) level offered without 2
+  ok   subtraction:sub_10k_no_regroup       N-D-level          (§7a (decision, PROPOSED: §5.9, §5.10)) level offered without 2
+  ok   subtraction:sub_1k_no_regroup        N-D-level          (§7a (decision, PROPOSED: §5.9, §5.10)) level offered without 2
+  ok   subtraction:sub_1m_no_regroup        N-D-level          (§7a (decision, PROPOSED: §5.9, §5.10)) level offered without 2
+  ok   subtraction:sub_2d_1d                N-D-level          (§7a (decision, PROPOSED: §5.9, §5.10)) level offered without 2
+  ok   subtraction:sub_50_no_regroup        N-D-level          (§7a (decision, PROPOSED: §5.9, §5.10)) level offered without 2
+  ok   subtraction:sub_100_no_regroup       N-D-nlOn           (§7a (decision, PROPOSED: §7 (support ladder))) nlOn not offered
+  ok   subtraction:sub_100k_no_regroup      N-D-nlOn           (§7a (decision, PROPOSED: §7 (support ladder))) nlOn not offered
+  ok   subtraction:sub_10k_no_regroup       N-D-nlOn           (§7a (decision, PROPOSED: §7 (support ladder))) nlOn not offered
+  ok   subtraction:sub_1k_no_regroup        N-D-nlOn           (§7a (decision, PROPOSED: §7 (support ladder))) nlOn not offered
+  ok   subtraction:sub_1m_no_regroup        N-D-nlOn           (§7a (decision, PROPOSED: §7 (support ladder))) nlOn not offered
+  ok   subtraction:sub_2d_1d                N-D-nlOn           (§7a (decision, PROPOSED: §7 (support ladder))) nlOn not offered
+  ok   subtraction:sub_50_no_regroup        N-D-nlOn           (§7a (decision, PROPOSED: §7 (support ladder))) nlOn not offered
+  ok   subtraction:sub_100_no_regroup       N-D-nlFrom         (§7a (decision, PROPOSED: §7 (support ladder))) nlFrom not offered
+  ok   subtraction:sub_100k_no_regroup      N-D-nlFrom         (§7a (decision, PROPOSED: §7 (support ladder))) nlFrom not offered
+  ok   subtraction:sub_10k_no_regroup       N-D-nlFrom         (§7a (decision, PROPOSED: §7 (support ladder))) nlFrom not offered
+  ok   subtraction:sub_1k_no_regroup        N-D-nlFrom         (§7a (decision, PROPOSED: §7 (support ladder))) nlFrom not offered
+  ok   subtraction:sub_1m_no_regroup        N-D-nlFrom         (§7a (decision, PROPOSED: §7 (support ladder))) nlFrom not offered
+  ok   subtraction:sub_2d_1d                N-D-nlFrom         (§7a (decision, PROPOSED: §7 (support ladder))) nlFrom not offered
+  ok   subtraction:sub_50_no_regroup        N-D-nlFrom         (§7a (decision, PROPOSED: §7 (support ladder))) nlFrom not offered
+  ok   subtraction:sub_100_no_regroup       N-D-nlTo           (§7a (decision, PROPOSED: §7 (support ladder))) nlTo not offered
+  ok   subtraction:sub_100k_no_regroup      N-D-nlTo           (§7a (decision, PROPOSED: §7 (support ladder))) nlTo not offered
+  ok   subtraction:sub_10k_no_regroup       N-D-nlTo           (§7a (decision, PROPOSED: §7 (support ladder))) nlTo not offered
+  ok   subtraction:sub_1k_no_regroup        N-D-nlTo           (§7a (decision, PROPOSED: §7 (support ladder))) nlTo not offered
+  ok   subtraction:sub_1m_no_regroup        N-D-nlTo           (§7a (decision, PROPOSED: §7 (support ladder))) nlTo not offered
+  ok   subtraction:sub_2d_1d                N-D-nlTo           (§7a (decision, PROPOSED: §7 (support ladder))) nlTo not offered
+  ok   subtraction:sub_50_no_regroup        N-D-nlTo           (§7a (decision, PROPOSED: §7 (support ladder))) nlTo not offered
+  ok   subtraction:sub_100_no_regroup       N-D-nlStep         (§7a (decision, PROPOSED: §7 (support ladder))) nlStep not offered
+  ok   subtraction:sub_100k_no_regroup      N-D-nlStep         (§7a (decision, PROPOSED: §7 (support ladder))) nlStep not offered
+  ok   subtraction:sub_10k_no_regroup       N-D-nlStep         (§7a (decision, PROPOSED: §7 (support ladder))) nlStep not offered
+  ok   subtraction:sub_1k_no_regroup        N-D-nlStep         (§7a (decision, PROPOSED: §7 (support ladder))) nlStep not offered
+  ok   subtraction:sub_1m_no_regroup        N-D-nlStep         (§7a (decision, PROPOSED: §7 (support ladder))) nlStep not offered
+  ok   subtraction:sub_2d_1d                N-D-nlStep         (§7a (decision, PROPOSED: §7 (support ladder))) nlStep not offered
+  ok   subtraction:sub_50_no_regroup        N-D-nlStep         (§7a (decision, PROPOSED: §7 (support ladder))) nlStep not offered
+  ok   subtraction:sub_100_no_regroup       N-D-nlLabels       (§7a (decision, PROPOSED: §7 (support ladder))) nlLabels not offered
+  ok   subtraction:sub_100k_no_regroup      N-D-nlLabels       (§7a (decision, PROPOSED: §7 (support ladder))) nlLabels not offered
+  ok   subtraction:sub_10k_no_regroup       N-D-nlLabels       (§7a (decision, PROPOSED: §7 (support ladder))) nlLabels not offered
+  ok   subtraction:sub_1k_no_regroup        N-D-nlLabels       (§7a (decision, PROPOSED: §7 (support ladder))) nlLabels not offered
+  ok   subtraction:sub_1m_no_regroup        N-D-nlLabels       (§7a (decision, PROPOSED: §7 (support ladder))) nlLabels not offered
+  ok   subtraction:sub_2d_1d                N-D-nlLabels       (§7a (decision, PROPOSED: §7 (support ladder))) nlLabels not offered
+  ok   subtraction:sub_50_no_regroup        N-D-nlLabels       (§7a (decision, PROPOSED: §7 (support ladder))) nlLabels not offered
+  ok   subtraction:sub_100_no_regroup       N-D-nlMinor        (§7a (decision, PROPOSED: §7 (support ladder))) nlMinor not offered
+  ok   subtraction:sub_100k_no_regroup      N-D-nlMinor        (§7a (decision, PROPOSED: §7 (support ladder))) nlMinor not offered
+  ok   subtraction:sub_10k_no_regroup       N-D-nlMinor        (§7a (decision, PROPOSED: §7 (support ladder))) nlMinor not offered
+  ok   subtraction:sub_1k_no_regroup        N-D-nlMinor        (§7a (decision, PROPOSED: §7 (support ladder))) nlMinor not offered
+  ok   subtraction:sub_1m_no_regroup        N-D-nlMinor        (§7a (decision, PROPOSED: §7 (support ladder))) nlMinor not offered
+  ok   subtraction:sub_2d_1d                N-D-nlMinor        (§7a (decision, PROPOSED: §7 (support ladder))) nlMinor not offered
+  ok   subtraction:sub_50_no_regroup        N-D-nlMinor        (§7a (decision, PROPOSED: §7 (support ladder))) nlMinor not offered
+  ok   subtraction:sub_100_no_regroup       N-D-nlHops         (§7a (decision, PROPOSED: §7 (support ladder))) nlHops not offered
+  ok   subtraction:sub_100k_no_regroup      N-D-nlHops         (§7a (decision, PROPOSED: §7 (support ladder))) nlHops not offered
+  ok   subtraction:sub_10k_no_regroup       N-D-nlHops         (§7a (decision, PROPOSED: §7 (support ladder))) nlHops not offered
+  ok   subtraction:sub_1k_no_regroup        N-D-nlHops         (§7a (decision, PROPOSED: §7 (support ladder))) nlHops not offered
+  ok   subtraction:sub_1m_no_regroup        N-D-nlHops         (§7a (decision, PROPOSED: §7 (support ladder))) nlHops not offered
+  ok   subtraction:sub_2d_1d                N-D-nlHops         (§7a (decision, PROPOSED: §7 (support ladder))) nlHops not offered
+  ok   subtraction:sub_50_no_regroup        N-D-nlHops         (§7a (decision, PROPOSED: §7 (support ladder))) nlHops not offered
+  design/cards/stack/stack.md: rulings block present, 15 prose ruling(s) not machine-checked (§5.1, §5.2, §5.3, §5.4, §5.5, §5.6, §5.7, §5.8, §5.9, §9.1, §9.2, §9.3, §9.4, §9.5, §9.6)
+  design/cards/subtraction/subtraction.md: rulings block present, 10 prose ruling(s) not machine-checked (§5.2, §5.3, §5.4, §5.5, §5.6, §5.7, §9.1, §9.6, §9.7, §9.8)
+ws-card-rulings: OK (0 ruling check(s), 77 not-offered check(s), 7 of 7 skill(s) checked; 0.6 s)
