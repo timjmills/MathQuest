@@ -72,6 +72,8 @@ body.teacher-mode {
 }
 #teacherApp .tv2-place:hover { border-color: var(--rail-text-2); }
 #teacherApp .tv2-place[aria-current="page"] { color: var(--rail-text); border-color: var(--rail-active); box-shadow: inset var(--sp-4) 0 0 var(--rail-active); }
+/* owner 2026-10-24 (owner-2026-10-24/skills-hierarchy.webp): the active place is an indigo fill */
+#teacherApp .tv2-nav .tv2-place[aria-current="page"] { background: var(--action); color: var(--action-on); border-color: var(--action); box-shadow: none; }
 #teacherApp .tv2-nav :focus-visible { outline: var(--line-2) solid var(--rail-text); outline-offset: var(--line-2); }
 #teacherApp .tv2-foot { margin-top: auto; position: relative; }
 #teacherApp .tv2-me { border-color: var(--rail-text-2); }

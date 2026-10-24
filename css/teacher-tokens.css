@@ -69,6 +69,16 @@ body.teacher-mode {
   --rpns-tint: #F8EFE4; --rpns-soft: #F0DECE; --rpns-bold: #D8A480; --rpns-on: #1A1614; --rpns-deep: #5F4838;
   --slate-tint: #EDE9E1; --slate-soft: #D2CEC5; --slate-bold: #736E64; --slate-on: #FBF7EF; --slate-deep: #524E47;
 
+  /* owner 2026-10-24 (design/mockups/teacher-2/owner-2026-10-24/skills-hierarchy.webp): the primary action and the
+     selected state are INDIGO (white text 8.3 : 1); the soft selected fill carries ink (15.2 : 1) */
+  --action: #3438C6; --action-on: #FFFFFF; --action-soft: #E9EBFC;
+
+  /* owner 2026-10-24 (owner-2026-10-24/grade-colours.png): each grade its own colour. The badge always keeps its
+     label (K, G1 … or "Grade 2"), so grade is never told by colour alone. Ink text on every fill (4.6–10.2 : 1;
+     white fails on all of them); G6 teal confirmed by the owner via the lead. */
+  --grade-pk: #E2BD96; --grade-k: #E6BD5E; --grade-1: #D56455; --grade-2: #96AE82; --grade-3: #7E9AC4;
+  --grade-4: #B589AF; --grade-5: #8579B8; --grade-6: #5E9E9A; --grade-m: #FFFFFF; --grade-on: #1A1614;
+
   /* the bottom bar (below 820 px) */
   --tv2-bar: 64px;
 }
@@ -86,3 +96,14 @@ body.teacher-mode {
 #teacherApp [data-domain="MIXED"], #teacherApp [data-domain="WORDS"], #teacherApp [data-domain="NOSTD"] {
   --a-tint: var(--slate-tint); --a-soft: var(--slate-soft); --a-bold: var(--slate-bold); --a-on: var(--slate-on); --a-deep: var(--slate-deep);
 }
+
+/* a grade badge / pill / swatch carrying data-grade gets its grade colour as --gr (ink text on it) */
+#teacherApp [data-grade="PK"] { --gr: var(--grade-pk); }
+#teacherApp [data-grade="K"] { --gr: var(--grade-k); }
+#teacherApp [data-grade="1"] { --gr: var(--grade-1); }
+#teacherApp [data-grade="2"] { --gr: var(--grade-2); }
+#teacherApp [data-grade="3"] { --gr: var(--grade-3); }
+#teacherApp [data-grade="4"] { --gr: var(--grade-4); }
+#teacherApp [data-grade="5"] { --gr: var(--grade-5); }
+#teacherApp [data-grade="6"] { --gr: var(--grade-6); }
+#teacherApp [data-grade="M"] { --gr: var(--grade-m); }

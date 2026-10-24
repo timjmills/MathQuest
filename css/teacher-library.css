@@ -275,3 +275,214 @@ html:has(#teacherMain .tv-screen.is-active[data-screen="library"] .tvl-bar:not([
 @media (max-width: 600px) {
     .tvl-bar { gap: 8px; margin: -8px -24px; padding: 8px 24px; }
 }
+
+/* =====================================================================================================================
+   Teacher site 2.0 (T3a): THE SKILLS GALLERY (#teacherApp .ts-*), light only. The signed mock-up (design/mockups/
+   teacher-2/) as changed by the owner on 2026-10-24 (owner-2026-10-24/skills-hierarchy.webp, grade-colours.png): title,
+   subtitle and meta line with the search top right; ONE white filter card (Grade row · divider · Browse by + Size);
+   area bands with Thumbnail · List · Chip; cards with a grade pill and a tick; indigo primary and selected states;
+   each grade its own colour, always with its label. Values from css/teacher-tokens.css only.
+   ADDITIVE: new class names only. Pupil content (the thumbnails) stays black-and-white Andika on paper.
+   ===================================================================================================================== */
+#teacherApp .tv-screen[data-screen="skills"] { gap: 0; padding-bottom: calc(96px + var(--sp-32)); }
+#teacherApp .ts-top { display: flex; align-items: flex-start; gap: var(--sp-24); margin-bottom: calc(var(--sp-8) + var(--sp-4)); }
+#teacherApp .ts-head-text { display: grid; gap: var(--sp-4); flex: 1 1 auto; min-width: 0; }
+#teacherApp .ts-title { font-size: var(--fs-36); line-height: var(--lh-tight); }
+#teacherApp .ts-sub { margin: 0; font-size: var(--fs-20); font-weight: var(--fw-500); color: var(--text-2); line-height: var(--lh-tight); }
+#teacherApp .ts-meta { margin: var(--sp-4) 0 0; font-size: var(--fs-14); font-weight: var(--fw-500); color: var(--text-2); }
+#teacherApp .ts-search { position: relative; flex: 0 1 520px; display: block; min-width: 0; }
+#teacherApp .ts-search input {
+  width: 100%; height: 56px; padding: 0 var(--sp-16) 0 var(--sp-48); border-radius: var(--r-8);
+  border: var(--line-1) solid var(--text-3); background: var(--surface); color: var(--text); font-size: var(--fs-16); font-family: var(--font-ui);
+}
+#teacherApp .ts-search input:focus { border-color: var(--action); outline: var(--line-2) solid var(--action); outline-offset: 0; }
+#teacherApp .ts-search input::placeholder { color: var(--text-3); }
+#teacherApp .ts-search > svg { position: absolute; left: var(--sp-16); top: calc(var(--sp-16) + var(--line-2)); color: var(--text); pointer-events: none; }
+#teacherApp .ts-row { display: flex; align-items: center; gap: var(--sp-16); flex-wrap: wrap; margin-bottom: var(--sp-16); min-width: 0; }
+#teacherApp .ts-note { margin: 0; font-size: var(--fs-14); color: var(--text-2); line-height: var(--lh-body); }
+#teacherApp .ts-mb { margin-bottom: var(--sp-16); }
+#teacherApp .ts-muted { color: var(--text-3); font-weight: var(--fw-500); }
+
+/* the ONE filter card: Grade · divider · Browse by + Size */
+#teacherApp .ts-filters { background: var(--surface); border: var(--line-1) solid var(--line); border-radius: var(--r-16); box-shadow: var(--shadow-1); padding: calc(var(--sp-8) + var(--sp-4)) var(--sp-24); margin-bottom: var(--sp-8); min-width: 0; }
+#teacherApp .ts-frow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8) var(--sp-16); min-width: 0; }
+#teacherApp .ts-flabel { flex: none; min-width: 5rem; font-size: var(--fs-16); font-weight: var(--fw-700); color: var(--text-2); }
+#teacherApp .ts-fdiv { height: var(--line-1); background: var(--line); margin: calc(var(--sp-8) + var(--sp-4)) 0; }
+#teacherApp .ts-searching .ts-filters { display: none; }
+#teacherApp .ts-fsep { width: var(--line-1); align-self: stretch; background: var(--line); margin: 0 var(--sp-8); }
+
+/* choices: rest = white outline; selected = the soft indigo fill with an indigo edge (segments) or the indigo fill (grade) */
+#teacherApp .ts-seg { display: inline-flex; flex-wrap: wrap; gap: var(--sp-8); }
+#teacherApp .ts-seg button, #teacherApp .ts-pill {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-8); min-height: var(--control); min-width: var(--control);
+  padding: 0 var(--sp-16); border: var(--line-1) solid var(--line); border-radius: var(--r-8); background: var(--surface);
+  color: var(--text); font-size: var(--fs-16); font-weight: var(--fw-500); white-space: nowrap; cursor: pointer; font-family: var(--font-ui);
+}
+#teacherApp .ts-seg button:hover, #teacherApp .ts-pill:hover { border-color: var(--action); }
+#teacherApp .ts-seg button[aria-pressed="true"] { background: var(--action-soft); color: var(--action); border-color: var(--action); font-weight: var(--fw-700); }
+#teacherApp .ts-pills { display: flex; flex-wrap: wrap; gap: var(--sp-8); min-width: 0; }
+#teacherApp .ts-pill { min-width: 56px; font-weight: var(--fw-700); position: relative; }
+#teacherApp .ts-pill .ts-gsw { width: 12px; height: 12px; border-radius: var(--r-8); background: var(--gr); border: var(--line-1) solid var(--text); flex: none; }
+#teacherApp .ts-pill[aria-pressed="true"] { background: var(--action); color: var(--action-on); border-color: var(--action); box-shadow: inset 0 calc(-1 * var(--sp-4)) 0 var(--gr); }
+#teacherApp .ts-pill[aria-pressed="true"] .ts-gsw { border-color: var(--action-on); }
+#teacherApp .ts-layout button { font-size: var(--fs-14); padding: 0 calc(var(--sp-8) + var(--sp-4)); }
+#teacherApp .ts-filters .ts-seg button { padding: 0 calc(var(--sp-8) + var(--sp-4)); }
+#teacherApp .ts-fsep + .ts-flabel { min-width: 0; }
+
+/* buttons */
+#teacherApp .ts-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-8); min-height: var(--control); padding: 0 var(--sp-16);
+  border-radius: var(--r-8); border: var(--line-1) solid var(--text-3); background: var(--surface); color: var(--text);
+  font-size: var(--fs-16); font-weight: var(--fw-700); white-space: nowrap; cursor: pointer; font-family: var(--font-ui);
+}
+#teacherApp .ts-btn:hover { border-color: var(--action); }
+#teacherApp .ts-add { white-space: normal; text-align: left; }
+#teacherApp .ts-add-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8) var(--sp-16); margin-bottom: var(--sp-8); }
+#teacherApp .ts-add-row .ts-btn { min-height: var(--sp-48); }
+#teacherApp .ts-more-row { display: flex; justify-content: center; padding: var(--sp-8) 0 var(--sp-24); }
+#teacherApp .ts-more-btn { margin-top: var(--sp-8); }
+
+/* maths-area groups: a white frame, the area's tint inside; the band = icon tile, title over its count, tools right */
+#teacherApp .ts-group { background: var(--a-tint); border: var(--sp-8) solid var(--surface); box-shadow: var(--shadow-1); border-radius: var(--r-16); padding: var(--sp-8) var(--sp-16) var(--sp-16); margin-bottom: var(--sp-24); min-width: 0; }
+#teacherApp .ts-band-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8) var(--sp-16); margin-bottom: calc(var(--sp-8) + var(--sp-4)); }
+#teacherApp .ts-band { flex: 1 1 280px; display: flex; align-items: center; gap: var(--sp-16); min-width: 0; }
+#teacherApp .ts-band > svg:first-child { width: var(--sp-48); height: var(--sp-48); padding: calc(var(--sp-8) + var(--sp-4)); background: var(--a-bold); color: var(--a-on); flex: none; border-radius: var(--r-8); }
+#teacherApp .ts-group[data-domain="MIXED"] .ts-band > svg:first-child, #teacherApp .ts-group[data-domain="WORDS"] .ts-band > svg:first-child, #teacherApp .ts-group[data-domain="NOSTD"] .ts-band > svg:first-child { outline: var(--line-2) dashed var(--a-on); outline-offset: calc(-1 * var(--sp-4)); }
+#teacherApp .ts-band-t { display: grid; gap: 0; min-width: 0; }
+#teacherApp .ts-band-t h2 { margin: 0; font-family: var(--font-ui); font-weight: var(--fw-700); font-size: var(--fs-20); line-height: var(--lh-tight); color: var(--text); overflow-wrap: break-word; }
+#teacherApp .ts-band-t .ts-count { font-family: var(--font-ui); font-size: var(--fs-16); font-weight: var(--fw-500); color: var(--text-2); text-transform: none; letter-spacing: 0; margin: 0; }
+#teacherApp .ts-band-tools { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8) var(--sp-16); margin-left: auto; }
+#teacherApp .ts-count { font-size: var(--fs-14); font-weight: var(--fw-500); color: var(--text-2); white-space: nowrap; }
+#teacherApp .ts-grade-head { display: flex; align-items: center; gap: var(--sp-8); margin: var(--sp-8) 0; font-size: var(--fs-16); font-weight: var(--fw-700); }
+#teacherApp .ts-step { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8); margin-bottom: var(--sp-8); }
+#teacherApp .ts-step > b { font-size: var(--fs-16); }
+#teacherApp .ts-std { margin-bottom: var(--sp-16); }
+#teacherApp .ts-gpill { display: inline-flex; align-items: center; padding: 0 var(--sp-8); border: var(--line-1) solid var(--text-3); font-family: var(--font-mono); font-size: var(--fs-12); font-weight: var(--fw-500); text-transform: uppercase; color: var(--text-2); white-space: nowrap; line-height: 20px; }
+#teacherApp .ts-badge { font-size: var(--fs-12); font-weight: var(--fw-700); text-transform: uppercase; border: var(--line-2) solid var(--text); padding: 0 var(--sp-8); white-space: nowrap; font-family: var(--font-mono); }
+#teacherApp .ts-badge.quiet { border-width: var(--line-1); border-color: var(--line); color: var(--text-2); font-weight: var(--fw-500); }
+
+/* the grid: Big 3 · Medium 4 · Small 5 thumbnails, List, Chip */
+#teacherApp .ts-grid { display: grid; gap: var(--sp-16); }
+#teacherApp .ts-grid[data-view="big"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+#teacherApp .ts-grid[data-view="medium"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+#teacherApp .ts-grid[data-view="small"] { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+#teacherApp .ts-grid[data-view="list"] { grid-template-columns: minmax(0, 1fr); gap: var(--sp-8); }
+#teacherApp .ts-grid[data-view="chip"] { display: flex; flex-wrap: wrap; gap: var(--sp-8); }
+
+/* a skill card: grade pill top-left, tick top-right, the bold name, the preview box; the area edge stays */
+#teacherApp .ts-card {
+  position: relative; display: flex; flex-direction: column; gap: var(--sp-8); text-align: left; padding: calc(var(--sp-8) + var(--sp-4));
+  background: var(--surface); color: var(--text); border: var(--line-1) solid var(--line); border-left: var(--sp-8) solid var(--a-bold); border-radius: var(--r-8);
+  box-shadow: var(--shadow-1); min-width: 0; width: 100%; cursor: pointer; font-family: var(--font-ui);
+}
+#teacherApp .ts-card:hover { border-color: var(--action); border-left-color: var(--a-bold); }
+#teacherApp .ts-card[aria-pressed="true"] { border-color: var(--action); border-left-color: var(--a-bold); box-shadow: inset 0 0 0 var(--line-1) var(--action), var(--shadow-1); }
+#teacherApp .ts-card[data-domain="MIXED"], #teacherApp .ts-card[data-domain="WORDS"], #teacherApp .ts-card[data-domain="NOSTD"] { border-style: dashed; }
+#teacherApp .ts-card-top { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-4) var(--sp-8); min-height: var(--sp-24); padding-right: var(--sp-32); font-size: var(--fs-12); min-width: 0; }
+#teacherApp .ts-card-name { font-size: var(--fs-20); font-weight: var(--fw-700); line-height: var(--lh-tight); overflow-wrap: break-word; min-width: 0; padding-right: var(--sp-8); }
+#teacherApp .ts-grid[data-view="medium"] .ts-card-name { font-size: var(--fs-16); }
+#teacherApp .ts-grid[data-view="small"] .ts-card-name { font-size: var(--fs-14); }
+#teacherApp .ts-card-meta { display: flex; align-items: center; gap: var(--sp-8); font-size: var(--fs-12); color: var(--text-2); flex-wrap: wrap; min-width: 0; }
+#teacherApp .ts-area-tag { display: inline-flex; align-items: center; gap: var(--sp-4); font-weight: var(--fw-700); color: var(--a-deep); min-width: 0; }
+#teacherApp .ts-mixed { font-size: var(--fs-12); border: var(--line-1) dashed var(--a-deep); border-radius: var(--r-8); padding: 0 var(--sp-4); color: var(--a-deep); }
+#teacherApp .ts-tick { position: absolute; top: var(--sp-4); right: var(--sp-4); width: var(--control); height: var(--control); display: grid; place-items: center; }
+#teacherApp .ts-tick span {
+  width: 28px; height: 28px; border-radius: var(--r-8); border: var(--line-2) solid var(--action); background: var(--surface);
+  display: grid; place-items: center; color: var(--action-on); font-weight: var(--fw-700); font-size: var(--fs-16);
+}
+#teacherApp .ts-card[aria-pressed="true"] .ts-tick span { background: var(--action); border-color: var(--action); }
+#teacherApp .ts-grid[data-view="list"] .ts-card { flex-direction: row; align-items: center; padding: var(--sp-8) var(--sp-8) var(--sp-8) var(--sp-16); min-height: 56px; }
+#teacherApp .ts-grid[data-view="list"] .ts-card-top { padding-right: 0; flex: none; flex-wrap: nowrap; order: 2; margin-left: auto; padding-right: var(--sp-48); }
+#teacherApp .ts-grid[data-view="list"] .ts-card-top .gbadge { order: -1; }
+#teacherApp .ts-grid[data-view="list"] .ts-card-name { flex: 1 1 auto; font-size: var(--fs-16); }
+#teacherApp .ts-grid[data-view="list"] .ts-card-meta { margin-left: auto; padding-right: var(--sp-48); flex-wrap: nowrap; }
+#teacherApp .ts-grid[data-view="list"] .ts-tick { top: 50%; transform: translateY(-50%); }
+#teacherApp .ts-chipcard { flex-direction: row; align-items: center; width: auto; max-width: 100%; padding: var(--sp-4) var(--sp-48) var(--sp-4) var(--sp-8); min-height: 52px; gap: var(--sp-8); }
+#teacherApp .ts-chipcard .ts-card-name { font-size: var(--fs-14); padding-right: 0; }
+#teacherApp .ts-chipcard .ts-tick { top: 50%; transform: translateY(-50%); }
+#teacherApp .ts-chip-ic { color: var(--a-deep); display: inline-grid; flex: none; }
+
+/* the GRADE badge (owner 2026-10-24): the grade's own colour, always with its label (G2, K … or "Grade 2"); ink text */
+#teacherApp .gbadge {
+  flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: var(--sp-32); height: var(--sp-24); padding: 0 var(--sp-8);
+  border-radius: var(--r-8); border: var(--line-1) solid var(--text); background: var(--gr, var(--surface)); color: var(--grade-on);
+  font-family: var(--font-ui); font-size: var(--fs-12); font-weight: var(--fw-700); line-height: var(--lh-tight); white-space: nowrap;
+}
+#teacherApp .gbadge-long { height: 28px; font-size: var(--fs-14); padding: 0 calc(var(--sp-8) + var(--sp-4)); }
+
+/* the thumbnail: the app's own paper cell, cropped to what it draws (teacher-chip.js mountCropped) */
+#teacherApp .ts-thumb { display: block; height: 96px; flex: 1 0 auto; min-width: 0; border: var(--line-1) solid var(--line); border-radius: var(--r-8); background: var(--paper); overflow: hidden; }
+#teacherApp .ts-grid[data-view="big"] .ts-thumb { height: 136px; }
+#teacherApp .ts-grid[data-view="small"] .ts-thumb { height: 80px; }
+#teacherApp .ts-frame { display: block; width: 100%; height: 100%; border: 0; border-radius: 0; background: var(--paper); }
+#teacherApp .ts-frame .tvp-stage { padding: 0; max-width: none; }
+#teacherApp .ts-frame.ts-cut-r { -webkit-mask-image: linear-gradient(to right, var(--paper-ink) 84%, transparent); mask-image: linear-gradient(to right, var(--paper-ink) 84%, transparent); }
+#teacherApp .ts-frame.ts-cut-b { -webkit-mask-image: linear-gradient(to bottom, var(--paper-ink) 80%, transparent); mask-image: linear-gradient(to bottom, var(--paper-ink) 80%, transparent); }
+#teacherApp .ts-frame.ts-cut-r.ts-cut-b {
+  -webkit-mask-image: linear-gradient(to right, var(--paper-ink) 84%, transparent), linear-gradient(to bottom, var(--paper-ink) 80%, transparent); -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, var(--paper-ink) 84%, transparent), linear-gradient(to bottom, var(--paper-ink) 80%, transparent); mask-composite: intersect;
+}
+
+/* MAP tasks and saved sets */
+#teacherApp .ts-tasks { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--sp-8); }
+#teacherApp .ts-task {
+  display: grid; gap: var(--sp-8); text-align: left; padding: var(--sp-8) var(--sp-16); min-height: var(--control); background: var(--surface); color: var(--text);
+  border: var(--line-1) solid var(--line); border-left: var(--sp-8) solid var(--a-bold); border-radius: var(--r-8); cursor: pointer; font-family: var(--font-ui); min-width: 0;
+}
+#teacherApp .ts-task .ts-card-name { font-size: var(--fs-16); }
+#teacherApp .ts-task:hover { border-color: var(--action); border-left-color: var(--a-bold); }
+#teacherApp .ts-task[aria-pressed="true"] { border-color: var(--action); border-left-color: var(--a-bold); box-shadow: inset 0 0 0 var(--line-1) var(--action); }
+#teacherApp .ts-task-act { display: inline-flex; align-items: center; gap: var(--sp-4); font-size: var(--fs-14); font-weight: var(--fw-700); color: var(--action); }
+#teacherApp .ts-sets { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--sp-16); }
+#teacherApp .ts-set {
+  display: grid; gap: var(--sp-8); align-content: start; text-align: left; padding: var(--sp-16) var(--sp-24); background: var(--surface); color: var(--text);
+  border: var(--line-1) solid var(--line); border-radius: var(--r-16); cursor: pointer; font-family: var(--font-ui); min-width: 0;
+}
+#teacherApp .ts-set:hover { border-color: var(--action); }
+#teacherApp .ts-set-name { font-weight: var(--fw-700); font-size: var(--fs-20); line-height: var(--lh-tight); }
+#teacherApp .ts-set-chips { display: flex; flex-wrap: wrap; gap: var(--sp-4); align-items: center; min-width: 0; }
+#teacherApp .ts-mini-chip { display: inline-flex; align-items: center; gap: var(--sp-4); padding: var(--sp-4) var(--sp-8) var(--sp-4) var(--sp-4); border: var(--line-1) solid var(--a-deep); border-left: var(--sp-4) solid var(--a-bold); border-radius: var(--r-8); font-size: var(--fs-12); font-weight: var(--fw-700); max-width: 100%; min-width: 0; }
+#teacherApp .ts-mini-chip > span:last-child { overflow-wrap: anywhere; }
+#teacherApp .ts-mini-chip svg { color: var(--a-deep); flex: none; }
+
+@media (max-width: 1099px) {
+  #teacherApp .ts-top { flex-wrap: wrap; gap: var(--sp-8); }
+  #teacherApp .ts-search { flex: 1 1 100%; }
+  #teacherApp .ts-grid[data-view="medium"] { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+  #teacherApp .ts-grid[data-view="big"] { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+  #teacherApp .ts-grid[data-view="small"] { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  #teacherApp .ts-fsep { display: none; }
+  #teacherApp .ts-band-tools { margin-left: 0; }
+}
+@media (max-width: 819px) {
+  #teacherApp .tv-screen[data-screen="skills"] { padding-bottom: calc(56px + var(--sp-24)); }
+  #teacherApp .ts-title { font-size: var(--fs-28); }
+  #teacherApp .ts-sub { font-size: var(--fs-16); }
+  #teacherApp .ts-search input { height: var(--sp-48); padding-right: var(--sp-8); }
+  #teacherApp .ts-search > svg { top: calc(var(--sp-16) - var(--line-2)); }
+  #teacherApp .ts-filters { padding: var(--sp-8) var(--sp-16); margin-left: calc(-1 * var(--sp-8)); margin-right: calc(-1 * var(--sp-8)); }
+  #teacherApp .ts-frow { gap: var(--sp-4) var(--sp-8); }
+  #teacherApp .ts-flabel { min-width: 0; font-size: var(--fs-14); }
+  #teacherApp .ts-searching .ts-filters { display: none; }
+  #teacherApp .ts-fdiv { margin: var(--sp-8) 0; }
+  #teacherApp .ts-pill { min-width: var(--control); padding: 0 var(--sp-8); }
+  #teacherApp .ts-seg { gap: var(--sp-4); }
+  #teacherApp .ts-seg button { padding: 0 calc(var(--sp-4) + var(--line-2)); font-size: var(--fs-14); }
+  #teacherApp .ts-list > .ts-note.ts-mb { display: none; }
+  #teacherApp .ts-group { padding: var(--sp-8); margin-left: calc(-1 * var(--sp-8)); margin-right: calc(-1 * var(--sp-8)); }
+  #teacherApp .ts-band > svg:first-child { width: 40px; height: 40px; padding: calc(var(--sp-8) + var(--line-2)); }
+  #teacherApp .ts-band { gap: var(--sp-8); flex-basis: 100%; }
+  #teacherApp .ts-band-t h2 { font-size: var(--fs-20); }
+  #teacherApp .ts-band-t .ts-count { font-size: var(--fs-14); }
+  #teacherApp .ts-layout button span { display: none; }
+  #teacherApp .ts-layout button { padding: 0; }
+  #teacherApp .ts-grid[data-view="big"] { grid-template-columns: minmax(0, 1fr); }
+  #teacherApp .ts-grid[data-view="medium"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #teacherApp .ts-grid[data-view="small"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #teacherApp .ts-card { padding: var(--sp-8); }
+  #teacherApp .ts-tick { top: 0; right: 0; }
+  #teacherApp .ts-card-name { padding-right: 0; }
+  #teacherApp .ts-grid[data-view="list"] .ts-card-name { padding-right: var(--sp-48); }
+  #teacherApp .ts-grid[data-view="list"] .ts-card-top { padding-right: var(--sp-48); }
+  #teacherApp .ts-grid[data-view="small"] .ts-area-tag { display: none; }
+}
