@@ -9,7 +9,15 @@
 //     weight   a positive number; missing, 0 or 1 = the default 1 (share codes write 0 for "no weight given",
 //              skill-codes.js, so 0 is NEVER "left out")
 //     leftOut  true = left out for now (still in the set, gets no problem)
-//     lockPct  a held percentage for that skill (0–100); the unheld skills share what is left by weight
+//     lockPct  a held percentage for that skill (0–100) of the TOTAL
+//     count    an exact number of problems for that skill ("6 problems"; owner 2026-10-24)
+//
+// Order (owner 2026-10-24): fixed counts come off the total first; then the % locks take their share of the
+// total; the rest is shared by weight. Counts plus % over the total are refused ({error}, with `needTotal`).
+//
+// How much (owner 2026-10-24): planPages takes opts.amount = {mode, n}:
+//   'pages' N pages (the default, N = opts.pages) · 'total' N problems in all (pages = ceil(N / perPage), the last
+//   page holds the rest) · 'each' N of each skill (total = N × the skills without a count + their counts).
 //
 // Area and grade locks ('a:OA', 'g:OA|3') can be passed as opts.locks; skill locks may also be passed
 // there as 'k:<categoryId>:<skillId>'. Locks over 100 % are refused ({error}).
@@ -102,13 +110,17 @@ function roundTree(exact, total, seed, info) {
     return out;
 }
 
+const countOf = (it) => { const c = Math.round(Number(it && it.count)); return c > 0 && !(it && it.leftOut) ? c : 0; };
+
 function prepare(items, opts) {
     const list = (items || []).filter((it) => it && it.categoryId && it.skillId);
     const info = {};
-    list.forEach((it) => { info[keyOf(it)] = { a: areaKey(it), g: gradeKey(it), w: weightOf(it) }; });
+    list.forEach((it) => { info[keyOf(it)] = { a: areaKey(it), g: gradeKey(it), w: weightOf(it), c: countOf(it) }; });
     const act = list.filter((it) => weightOf(it) > 0).map(keyOf);
-    const locks = collectLocks(list, opts);
-    return { list, info, act, locks };
+    const locks = collectLocks(list.filter((it) => !countOf(it)), opts);
+    const fixed = {}; act.forEach((k) => { if (info[k].c) fixed[k] = info[k].c; });
+    const fixedSum = Object.values(fixed).reduce((a, b) => a + b, 0);
+    return { list, info, act, locks, fixed, fixedSum };
 }
 
 function lockError(errs) {
@@ -116,82 +128,128 @@ function lockError(errs) {
     const names = e.keys.map((k) => k.replace(/^[akg]:/, '')).join(' + ');
     return `The held amounts (${names}) come to ${e.used} %, more than the ${e.room} % there is.`;
 }
+const pctSum = (locks) => Object.values(locks).reduce((a, b) => a + b, 0);
 
 /**
- * Counts per item for `total` problems.
- * @returns {{counts:number[], byKey:Object<string,number>, pct:Object<string,number>, total:number, locked:boolean} | {error:string}}
+ * Counts per item for `total` problems: the fixed counts first, then the held % of the total, then the rest by
+ * weight (largest remainder, area → grade → skill).
+ * @returns {{counts:number[], byKey, pct, total, locked:boolean, warn:string[]} | {error:string, needTotal?:number}}
  */
 export function planCounts(items, total, opts = {}) {
-    const { list, info, act, locks } = prepare(items, opts);
-    const sh = shares(act, info, locks);
-    if (sh.errs.length) return { error: lockError(sh.errs) };
+    const { list, info, act, locks, fixed, fixedSum } = prepare(items, opts);
     const T = Math.max(0, Math.round(total || 0));
+    const free = act.filter((k) => !fixed[k]);
+    const held = pctSum(locks);
+    // the % locks are shares of the TOTAL; what the fixed counts leave is the room they come out of
+    const room = T - fixedSum;
+    const heldN = T * held / 100;
+    if (fixedSum + heldN > T + 1e-6) {
+        const need = held < 100 ? Math.ceil(fixedSum / (1 - held / 100) - 1e-9) : Infinity;
+        return { error: fixedSum && held ? `The counts (${fixedSum}) and the held ${Math.round(held)} % come to more than the ${T} problems there are.`
+            : fixedSum ? `The counts come to ${fixedSum}, more than the ${T} problems there are.` : lockError([{ keys: Object.keys(locks), used: Math.round(held), room: 100 }]), needTotal: need };
+    }
+    // rescale the % locks to the room the counts leave
+    const scale = room > 0 ? T / room : 0;
+    const rl = {}; for (const [k, v] of Object.entries(locks)) rl[k] = v * scale;
+    const sh = shares(free, info, rl);
+    if (sh.errs.length && room > 0) return { error: lockError(sh.errs) };
     const seed = 's' + (opts.seed === undefined ? 0 : opts.seed);
-    const byKey = act.length ? roundTree(Object.fromEntries(act.map((k) => [k, T * (sh.pct[k] || 0) / 100])), T, seed, info) : {};
-    const anyLock = Object.keys(locks).length > 0;
+    const byKey = free.length && room > 0 ? roundTree(Object.fromEntries(free.map((k) => [k, room * (sh.pct[k] || 0) / 100])), room, seed, info) : {};
+    Object.assign(byKey, fixed);
+    const anyLock = Object.keys(locks).length > 0 || fixedSum > 0;
     const floor = opts.minEach !== undefined ? opts.minEach : (!anyLock && act.length <= 8 && T >= act.length * 2 ? 2 : 1);
-    // every active item at least `floor` when the total allows; donors are the largest unheld counts
-    if (T >= act.length * floor) {
-        const held = (k) => locks['k:' + k] !== undefined;
-        for (const k of act) {
+    // every active item at least `floor` when the total allows; donors are the largest unheld, uncounted counts
+    if (room >= free.length * floor) {
+        const isHeld = (k) => locks['k:' + k] !== undefined;
+        for (const k of free) {
             while ((byKey[k] || 0) < floor) {
-                const donor = act.filter((y) => byKey[y] > floor && !held(y)).sort((a, b) => byKey[b] - byKey[a])[0]
-                    || act.filter((y) => byKey[y] > floor).sort((a, b) => byKey[b] - byKey[a])[0];
+                const donor = free.filter((y) => byKey[y] > floor && !isHeld(y)).sort((a, b) => byKey[b] - byKey[a])[0]
+                    || free.filter((y) => byKey[y] > floor).sort((a, b) => byKey[b] - byKey[a])[0];
                 if (!donor) break;
                 byKey[donor]--; byKey[k] = (byKey[k] || 0) + 1;
             }
         }
     }
     list.forEach((it) => { const k = keyOf(it); if (!(k in byKey)) byKey[k] = 0; });
-    return { counts: list.map((it) => byKey[keyOf(it)] || 0), byKey, pct: sh.pct, total: T, locked: anyLock };
+    const pct = {}; act.forEach((k) => { pct[k] = T ? 100 * byKey[k] / T : 0; });
+    const label = (k) => (opts.labelOf ? opts.labelOf(k) : k);
+    const warn = act.filter((k) => !(byKey[k] > 0)).map((k) => `${label(k)} gets no problem: add problems${anyLock ? ' or lower the counts / held %' : ''}.`);
+    return { counts: list.map((it) => byKey[keyOf(it)] || 0), byKey, pct, total: T, locked: anyLock, warn };
 }
 
 /**
  * The page plan for one of the three kinds.
  * @param {'single'|'sections'|'mixed'} kind
  * @param {object[]} items
- * @param {{pages?:number, size?:'S'|'M'|'L', perPage?:number, total?:number, quiz?:boolean, seed?:any,
- *          each?:'new'|'same'|'copy', locks?:object}} opts
- * @returns {{kind, pages, perPage:number, total, counts:number[], byKey, pagesBy:Object<string,number>|null,
- *            pageItems:string[][], added:false|'single'|true, warn:string[], big:boolean, shown:number,
- *            active:number, left:number, pct, error?:string}}
+ * @param {{pages?:number, amount?:{mode:'pages'|'total'|'each', n:number}, size?:'S'|'M'|'L', perPage?:number,
+ *          quiz?:boolean, total?:number, seed?:any, each?:'new'|'same'|'copy', locks?:object, labelOf?:Function}} opts
+ *   (`quiz` + `total` = the old spelling of amount {mode:'total', n: total})
+ * @returns {{kind, mode, pages, perPage, total, about, counts:number[], byKey, pagesBy:Object|null, pageItems:string[][],
+ *            added:false|'single'|true, warn:string[], big, shown, active, left, pct, each, needPages?:number, error?:string}}
  */
 export function planPages(kind, items, opts = {}) {
-    const { list, info, act, locks } = prepare(items, opts);
+    const { list, info, act, locks, fixed, fixedSum } = prepare(items, opts);
     const per = Math.max(1, opts.perPage || PER_PAGE[opts.size] || PER_PAGE.M);
-    const n = list.length, big = n > 8, anyLock = Object.keys(locks).length > 0;
+    const n = list.length, big = n > 8, anyLock = Object.keys(locks).length > 0 || fixedSum > 0;
     const seed = opts.seed === undefined ? 0 : opts.seed;
     const label = (k) => (opts.labelOf ? opts.labelOf(k) : k);
-    const sh = shares(act, info, locks);
-    if (sh.errs.length) return { kind, error: lockError(sh.errs), pages: 0, perPage: per, total: 0, counts: list.map(() => 0), byKey: {}, pagesBy: null, pageItems: [], added: false, warn: [], big, shown: 0, active: act.length, left: n - act.length, pct: sh.pct };
-    let pages = Math.max(1, Math.min(MAX_PAGES, Math.round(opts.pages || (kind === 'single' ? Math.max(1, act.length) : 1))));
-    let added = false, total, byKey = {}, warn = [], pagesBy = null;
-    const lockMet = (pg, P) => Object.keys(locks).every((sc) => {
-        const ks = act.filter((k) => (sc === 'k:' + k) || (sc === 'a:' + info[k].a) || (sc === 'g:' + info[k].a + '|' + info[k].g));
-        if (!ks.length) return true;
-        return Math.abs(ks.reduce((t, x) => t + pg[x], 0) / P * 100 - locks[sc]) <= 2;
-    });
-    if (kind === 'single') {
-        // each skill its own pages, shared by weight; with a held %, pages rise until every skill keeps a page
-        // AND each held % is met (5 skills, one at 50 % → 8 pages: 4 · 1 · 1 · 1 · 1)
-        const deal = (P) => roundLR(Object.fromEntries(act.map((x) => [x, P * (sh.pct[x] || 0) / 100])), P, 'p' + seed);
-        let pg = deal(pages);
-        if (anyLock && (act.some((x) => pg[x] < 1) || !lockMet(pg, pages))) {
-            for (let P = pages + 1; P <= MAX_PAGES; P++) { const t = deal(P); if (act.every((x) => t[x] >= 1) && lockMet(t, P)) { pg = t; pages = P; added = 'single'; break; } }
-        }
-        // no lock: a skill left without a page borrows one from the skill with the most
-        if (!anyLock && pages >= act.length) for (const x of act) while (pg[x] < 1) { const d = act.slice().sort((a, b) => pg[b] - pg[a])[0]; if (!d || pg[d] <= 1) break; pg[d]--; pg[x]++; }
-        pagesBy = pg;
-        act.forEach((x) => { byKey[x] = pg[x] * per; }); total = pages * per;
-        warn = act.filter((x) => pg[x] < 1).map((x) => `${label(x)} gets no page: add pages${anyLock ? ' or lower the held %' : ''}.`);
-    } else {
-        total = opts.quiz && opts.total ? Math.round(opts.total) : per * pages;
-        if (!opts.quiz && !big && !anyLock && kind === 'mixed' && act.length * 2 > total) { pages = Math.ceil(act.length * 2 / per); total = per * pages; added = true; }
-        if (!opts.quiz && !big && kind === 'sections' && act.length > total / 2) { pages = Math.ceil(act.length * 2 / per); total = per * pages; added = true; }
-        const pc = planCounts(list, total, { locks: opts.locks, seed, minEach: (!big && !anyLock && total >= act.length * 2) ? 2 : 1 });
+    const amount = opts.amount && ['pages', 'total', 'each'].includes(opts.amount.mode) ? opts.amount
+        : opts.quiz && opts.total ? { mode: 'total', n: opts.total } : { mode: 'pages', n: opts.pages };
+    const mode = amount.mode;
+    const free = act.filter((k) => !fixed[k]);
+    const fail = (error, extra = {}) => Object.assign({ kind, mode, error, pages: 0, perPage: per, total: 0, about: 0, counts: list.map(() => 0), byKey: {}, pagesBy: null, pageItems: [], added: false, warn: [], big, shown: 0, active: act.length, left: n - act.length, pct: {}, each: 'new' }, extra);
+    let pages, total, added = false, byKey = {}, warn = [], pagesBy = null, needPages;
+
+    if (mode === 'total' || mode === 'each') {
+        const N = Math.max(1, Math.round(amount.n || 1));
+        total = mode === 'total' ? N : N * free.length + fixedSum;
+        const pc = planCounts(list, total, { locks: opts.locks, seed, labelOf: opts.labelOf });
+        if (pc.error) return fail(pc.error, { needTotal: pc.needTotal });
         byKey = pc.byKey;
-        if (opts.quiz) pages = Math.max(1, Math.ceil(total / per));
-        if (!big) warn = act.filter((x) => !(byKey[x] > 0)).map((x) => `${label(x)} gets no problem: add pages${anyLock ? ' or lower the held %' : ''}.`);
+        if (mode === 'each') free.forEach((k) => { if (!Object.keys(locks).length) byKey[k] = N; });
+        total = act.reduce((t, k) => t + (byKey[k] || 0), 0);
+        warn = pc.warn;
+        if (kind === 'single') { pagesBy = {}; act.forEach((k) => { pagesBy[k] = byKey[k] > 0 ? Math.ceil(byKey[k] / per) : 0; }); pages = Object.values(pagesBy).reduce((a, b) => a + b, 0); }
+        else pages = Math.max(1, Math.ceil(total / per));
+    } else {
+        pages = Math.max(1, Math.min(MAX_PAGES, Math.round(amount.n || (kind === 'single' ? Math.max(1, act.length) : 1))));
+        const lockMet = (pg, P, keys) => Object.keys(locks).every((sc) => {
+            const ks = keys.filter((k) => (sc === 'k:' + k) || (sc === 'a:' + info[k].a) || (sc === 'g:' + info[k].a + '|' + info[k].g));
+            if (!ks.length) return true;
+            return Math.abs(ks.reduce((t, x) => t + pg[x], 0) / P * 100 - locks[sc]) <= 2;
+        });
+        if (kind === 'single') {
+            // a counted skill takes the pages its count needs; the others share the rest by weight. With a held %,
+            // pages rise until every skill keeps a page AND each held % is met (5 skills, one at 50 % → 8: 4·1·1·1·1)
+            const fixedPages = {}; Object.entries(fixed).forEach(([k, c]) => { fixedPages[k] = Math.ceil(c / per); });
+            const fp = Object.values(fixedPages).reduce((a, b) => a + b, 0);
+            const sh = shares(free, info, locks);
+            if (sh.errs.length) return fail(lockError(sh.errs));
+            const deal = (P) => Object.assign(roundLR(Object.fromEntries(free.map((x) => [x, Math.max(0, P - fp) * (sh.pct[x] || 0) / 100])), Math.max(0, P - fp), 'p' + seed), fixedPages);
+            let pg = deal(pages);
+            const ok = (t, P) => P >= fp && free.every((x) => t[x] >= 1) && lockMet(t, P - fp, free);
+            if (anyLock && !ok(pg, pages)) {
+                for (let P = pages + 1; P <= MAX_PAGES; P++) { const t = deal(P); if (ok(t, P)) { pg = t; pages = P; added = 'single'; break; } }
+            }
+            if (!anyLock && pages - fp >= free.length) for (const x of free) while (pg[x] < 1) { const d = free.slice().sort((a, b) => pg[b] - pg[a])[0]; if (!d || pg[d] <= 1) break; pg[d]--; pg[x]++; }
+            if (fp > pages) { pages = fp; added = 'single'; }
+            pagesBy = pg;
+            act.forEach((x) => { byKey[x] = fixed[x] || pg[x] * per; });
+            total = act.reduce((t, k) => t + byKey[k], 0);
+            warn = act.filter((x) => !(pg[x] >= 1)).map((x) => `${label(x)} gets no page: add pages${anyLock ? ' or lower the counts / held %' : ''}.`);
+        } else {
+            total = per * pages;
+            if (!big && !anyLock && kind === 'mixed' && act.length * 2 > total) { pages = Math.ceil(act.length * 2 / per); total = per * pages; added = true; }
+            if (!big && kind === 'sections' && act.length > total / 2 && !fixedSum) { pages = Math.ceil(act.length * 2 / per); total = per * pages; added = true; }
+            const pc = planCounts(list, total, { locks: opts.locks, seed, labelOf: opts.labelOf, minEach: (!big && !anyLock && total >= act.length * 2) ? 2 : 1 });
+            if (pc.error) {
+                // the counts (and held %) do not fit these pages: say how many would
+                needPages = isFinite(pc.needTotal) ? Math.ceil(pc.needTotal / per) : undefined;
+                return fail(`${pc.error}${needPages ? ` Raise to ${needPages} page${needPages > 1 ? 's' : ''}?` : ''}`, { needPages });
+            }
+            byKey = pc.byKey;
+            if (!big) warn = pc.warn;
+        }
     }
     // deal onto pages: Mixed shuffles (seeded); Sections and Single keep each skill together (Sections by area → grade)
     let order = list.map(keyOf);
@@ -199,24 +257,33 @@ export function planPages(kind, items, opts = {}) {
         const ai = (k) => AREA_ORDER.indexOf(info[k].a), gi = (k) => GRADE_ORDER.indexOf(info[k].g);
         order = order.slice().sort((x, y) => ai(x) - ai(y) || gi(x) - gi(y));
     }
-    const flat = []; order.forEach((k) => { for (let i = 0; i < (byKey[k] || 0); i++) flat.push(k); });
-    if (kind === 'mixed') { const r = rng('deal' + seed); for (let i = flat.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [flat[i], flat[j]] = [flat[j], flat[i]]; } }
-    let pageItems = []; for (let i = 0; i < flat.length; i += per) pageItems.push(flat.slice(i, i + per));
-    // Each page: "same" (same problems, new numbers) / "copy" (same page again) repeat page 1's plan on every page;
-    // Single skill repeats each skill's first page through its pages. A quiz never prints identical copies.
-    let each = opts.each || 'new'; if (pages <= 1) each = 'new'; if (opts.quiz && each === 'copy') each = 'same';
+    let pageItems = [];
+    if (kind === 'single') {
+        // each skill on its own pages: a page holds `per`, the skill's last page the rest
+        for (const k of order) { let c = byKey[k] || 0; while (c > 0) { const t = Math.min(per, c); pageItems.push(Array(t).fill(k)); c -= t; } }
+    } else {
+        const flat = []; order.forEach((k) => { for (let i = 0; i < (byKey[k] || 0); i++) flat.push(k); });
+        if (kind === 'mixed') { const r = rng('deal' + seed); for (let i = flat.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [flat[i], flat[j]] = [flat[j], flat[i]]; } }
+        for (let i = 0; i < flat.length; i += per) pageItems.push(flat.slice(i, i + per));
+    }
+    // Each page: "same" (same problems, new numbers) / "copy" (same page again) repeat page 1's plan on every page
+    // (Pages mode only); Single skill repeats each skill's first page through its pages. A quiz never prints copies.
+    let each = opts.each || 'new'; if (pages <= 1 || mode !== 'pages') each = 'new'; if (opts.quiz && each === 'copy') each = 'same';
     if (each !== 'new' && pages > 1 && !(opts.quiz && big)) {
         if (kind === 'single') pageItems = pageItems.map((pg) => pageItems.find((q) => q[0] === pg[0]).slice());
         else {
-            const unit = planPages(kind, items, Object.assign({}, opts, { pages: 1, each: 'new' })).pageItems;
+            const unit = planPages(kind, items, Object.assign({}, opts, { pages: 1, amount: undefined, each: 'new' })).pageItems;
             pageItems = []; for (let i = 0; i < pages; i++) pageItems.push((unit[i % unit.length] || []).slice());
         }
         byKey = {}; pageItems.flat().forEach((x) => { byKey[x] = (byKey[x] || 0) + 1; }); total = pageItems.flat().length;
     }
     list.forEach((it) => { const k = keyOf(it); if (!(k in byKey)) byKey[k] = 0; });
+    const shown = act.filter((x) => byKey[x] > 0).length;
+    const pct = {}; act.forEach((k) => { pct[k] = total ? 100 * byKey[k] / total : 0; });
     return {
-        kind, pages: Math.max(pages, pageItems.length), perPage: per, total, each,
+        kind, mode, pages: Math.max(pages, kind === 'single' ? 0 : pageItems.length), perPage: per, total, each,
+        about: shown ? Math.round(total / shown) : 0,
         counts: list.map((it) => byKey[keyOf(it)] || 0), byKey, pagesBy, pageItems, added, warn, big,
-        shown: act.filter((x) => byKey[x] > 0).length, active: act.length, left: n - act.length, pct: sh.pct,
+        shown, active: act.length, left: n - act.length, pct,
     };
 }
