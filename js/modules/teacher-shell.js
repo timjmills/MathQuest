@@ -70,10 +70,14 @@ let started = false;
 
 function isTeacher() { return document.body.classList.contains('teacher-mode'); }
 
+// Each place reopens on the tab the teacher used last (T2 check: Classes always opened Run on the board).
+const LAST_TAB = {};
+
 function setNavCurrent(key) {
     const place = PLACE_OF[key] || '';
+    if (place && place !== 'me') LAST_TAB[place] = key;
     document.querySelectorAll('#teacherApp [data-tv-place]').forEach((a) => {
-        if (a.dataset.tvPlace === place && place !== 'me') a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+        if (a.dataset.tvPlace === place) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
     });
     document.querySelectorAll('#tv2Profile [data-tv-go]').forEach((a) => {
         if (a.dataset.tvGo === key) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
@@ -399,9 +403,15 @@ function start() {
         if (!a) { if (!e.target.closest('#tv2Profile') || e.target.closest('.tv2-menu-item')) setProfileOpen(false); return; }
         e.preventDefault();
         setProfileOpen(false);
-        tvGo(a.dataset.tvGo);
+        tvGo((a.dataset.tvPlace && LAST_TAB[a.dataset.tvPlace]) || a.dataset.tvGo);
     });
     // The profile menu closes on Esc (focus back on "Me"), on a click outside it, and when focus leaves it.
+    // The menu sits before "Me" in the page, so Tab from an open "Me" moves into the menu (T2 check).
+    document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Tab' || e.shiftKey || profileMenu()?.hidden !== false || document.activeElement !== profileButton()) return;
+        const first = profileMenu().querySelector('a, button');
+        if (first) { e.preventDefault(); first.focus(); }
+    });
     document.addEventListener('keydown', (e) => {
         if (e.key !== 'Escape' || profileMenu()?.hidden !== false) return;
         setProfileOpen(false);
