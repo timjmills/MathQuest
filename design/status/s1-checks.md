@@ -49,3 +49,21 @@ Base: origin/claude/sweet-newton-c8wrv1 (e371ec9) + merge of `-wip-wave0-gates` 
   **App-hook suggestion for the lead:** pass `skill` from practice.js planItem (and the mixed composer) into cell(), so the
   page carries the attribution itself and print-lint's matching becomes a cross-check.
 - 10:47 Critic r1 started (mq-opus-medium), at 956bc20a.
+
+## Critic rounds
+
+| Round | Start | End | Result | Tokens |
+|---|---|---|---|---|
+| r1 (mq-opus-medium) | 10:47 | 11:03 | **FAIL 7 / 8 / 7**: D1 dealer-uniform fails every no-number skill; D2 checks 8 and 11 never reach the lane skill's own lesson page through precritic; D3 presets check passes the pilot's real D8 and its backtest is seeded; nits N1–N5 | 197 k |
+
+Report: design/audit/runs/s1-checks/critic-r1.md.
+
+### Fix round 1 (11:05 –)
+- D2 (lead, 11:05–11:35): precritic --skill adds `print-lint-lesson-L` / `-S` on the lane skills' own lesson pages (lesson pins;
+  an unpinned lesson page must be clean); `--role R --skill X` adds X to the role sample. New **ws-precritic-plan**: every
+  backtest row's tool (and role) on the row's skills must be planned by `ws-precritic --skill <them>` (or `--role R` for a
+  non-lesson role; a tool precritic never plans may pass on the deploy path). Mutation test: with the lesson gate disabled,
+  wrap-op-pilot and h13-lesson-warmup-pilot FAIL; restored, 20 rows OK, 18 n/a. ws-backtest runs it after a full table.
+- D1, D3, N2, N4: builder A (resumed, medium).
+- N3: the app hook (pass `skill` from practice.js planItem into cell()) is with the lead (10:46 note).
+- N1 (spec-card §7b data source read from comments): left for the card tool's next change; recorded here.
