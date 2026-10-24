@@ -552,7 +552,7 @@
       if (S.tview === 'chips' && !det) return `<div class="tp-item tp-chipitem ${w === 0 ? 'out' : ''}">${selBox('k:' + k, s.l)}${chipHTML(k, { legend: true, dot: true, noBadge: oneGrade })}${x}${tags}${detail}</div>`;
       if (S.tview === 'thumbs' && !det) return `<div class="tp-item tp-thumb ${w === 0 ? 'out' : ''}" data-domain="${s.a}" data-skill="${esc(k)}"><div class="tp-thumb-top"${oneGrade ? '' : ' data-grade-host'}>${selBox('k:' + k, s.l)}${oneGrade ? '' : gbadge(s.g)}<button class="tp-name" data-act="chip" data-arg="${esc(k)}">${esc(short(s.l))}</button>${x}</div><div class="thumb">${T.draw(s, 1, S.skillOpts[k])}</div><div class="tp-thumb-foot">${tags}</div>${detail}</div>`;
       // one grade in the tray: the grade is said once, in the grade header, not on every row (critic r4 A5)
-      return `<div class="tp-row ${w === 0 ? 'out' : ''}" data-domain="${s.a}"${oneGrade ? '' : ' data-grade-host'}>${oneGrade ? '' : gbadge(s.g)}${selBox('k:' + k, s.l)}<span class="tp-icon">${icon(AREAS[s.a].icon)}</span><button class="tp-name" data-act="chip" data-arg="${esc(k)}">${esc(s.l)}</button>${tags}${x}${detail}</div>`;
+      return `<div class="tp-row ${w === 0 ? 'out' : ''}" data-domain="${s.a}"${oneGrade ? '' : ' data-grade-host'}>${oneGrade ? '' : gbadge(s.g)}${selBox('k:' + k, s.l)}<span class="tp-icon">${icon(AREAS[s.a].icon)}</span><button class="tp-name" data-act="chip" data-arg="${esc(k)}">${esc(s.l)}</button>${det ? `<span class="tp-name-t">${esc(s.l)}</span>` : ''}${tags}${x}${detail}</div>`;
     };
     const body = areas.map(({ a, ks }) => {
       const vis = ks.filter(match); if (!vis.length) return '';

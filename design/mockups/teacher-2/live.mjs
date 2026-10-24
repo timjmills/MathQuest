@@ -150,7 +150,7 @@ const FRAME_CSS = `:host{all:initial;display:block!important;position:relative}
 .mq-zoom{position:absolute;left:0;top:0;transform-origin:0 0}
 .mq-chain{background:transparent!important;outline:0!important;box-shadow:none!important;border-color:transparent!important}
 .mq-chain::before,.mq-chain::after{visibility:hidden!important}
-[data-live-off]{visibility:hidden!important}
+[data-live-off],[data-live-off] *,.ws-tabbox,.ws-tabbox *,[data-ws-label="tab"],[data-ws-label="tab"] *{visibility:hidden!important}
 :host(.no-label) [data-live-on] [data-ws-label]{visibility:hidden!important}
 [data-live-on]{border-color:transparent!important;outline:0!important;box-shadow:none!important;background:transparent!important}`;
 function appCss() {
@@ -260,8 +260,9 @@ export function fitHost(host) {
       for (const r of (m.prims || [])) ink += 4 * ov(r, x, y);
       let sc = ink, cut = false;
       m.texts.forEach((t, i) => {
+        // a line on the window's rows that starts left of it is cut at its start, even when the window has skipped it whole
+        if (t.r[1] < y + wh && t.r[1] + t.r[3] > y && t.lefts.some(L => L < x - 0.5 && L + 1 < x + ww)) { sc -= 2 * t.r[2] * t.r[3] + 400; cut = true; }
         const a = ov(t.r, x, y); if (!a) return;
-        if (t.lefts.some(L => L < x - 0.5 && L + 1 < x + ww)) { sc -= 2 * t.r[2] * t.r[3] + 400; cut = true; }   // a line cut at its start
         if (t.r[1] < y - 0.5 || t.r[1] + t.r[3] > y + wh + 0.5) { sc -= 1.5 * a; return; }   // a line sliced through its height
         sc += (i === 0 ? 1 : 0.6) * a;                                       // words tell items apart; the first line most
       });

@@ -963,7 +963,8 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; a
 @media (max-width: 819px) {
   .traypop.det .tp-row { display: flex; flex-wrap: wrap; align-items: center; column-gap: var(--sp-4); padding: var(--sp-4) 0 0; }
   .traypop.det .tp-row > .selbox, .traypop.det .tp-row > .tp-tags { display: none; }
-  .traypop.det .tp-row > .tp-name { flex: 1 1 calc(100% - var(--sp-32)); min-height: 0; padding: 0; font-size: var(--fs-14); text-align: left; }
+  .traypop.det .tp-row > .tp-name { display: none; }   /* a phone's detailed row names the skill as text; its options open from the plain view */
+  .traypop.det .tp-row > .tp-name-t { flex: 1 1 calc(100% - var(--sp-32)); font-size: var(--fs-14); font-weight: var(--fw-700); line-height: var(--lh-tight); }
   .traypop.det .tp-row > .tp-det { flex: 1 1 calc(100% - var(--control) - var(--sp-8)); min-width: 0; order: 3; display: flex; flex-wrap: nowrap; align-items: center; padding: 0; }
   .traypop.det .tp-row > .icon-btn { order: 4; }
   .traypop.det .tp-row .l-of { display: none; }
@@ -973,3 +974,5 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; a
 .tp-thumb-foot:not(:has(.tag)) { display: none; }
 @media (max-width: 819px) { .tp-thumb .thumb { height: 64px; } }
 .tray-seg.bare { padding: 0 var(--sp-4); }
+.tp-name-t { display: none; }
+@media (max-width: 819px) { .traypop.det .tp-row > .tp-name-t { display: block; } }

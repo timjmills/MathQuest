@@ -199,6 +199,7 @@ async function screenReport(page, w) {
     // (10) lead 2026-10-23: a real item in a thumbnail is readable. The smallest text each shown thumbnail SHOWS is at least
     //      its place's minimum (--smp-min: Big 12 px, Medium and the tray's Thumbnails 11, Small 9); page previews and
     //      the bar's mini picture (0) are miniatures of a printed page and are not held to it
+    // fix round 6: an SVG's own labels are held to the drawing floor (--smp-min-draw) by thumbs-check, prose to --smp-min here
     // fix round 5: thumbnails are drawn live by the app (live.mjs); each drawn one carries its measures (__mq), scale and
     // window, so what it SHOWS is read exactly as thumbs-check.cjs reads it
     for (const t of document.querySelectorAll('.live-thumb')) {
@@ -209,8 +210,8 @@ async function screenReport(page, w) {
       if (t.shadowRoot && [...t.shadowRoot.querySelectorAll('.ws-tabbox, [data-ws-label="tab"]')].some(e => getComputedStyle(e).visibility !== 'hidden' && e.getBoundingClientRect().width > 0)) say('strand tab shown', t.dataset.k);
       if (!min || t.dataset.state !== 'done' || !t.__mq) continue;
       const sc = Number(t.dataset.scale), win = t.dataset.win.split(' ').map(Number); let low = 1e9, lowT = '';
-      for (const x of t.__mq.texts) { const [X, Y, W, H] = x.r; if (X < win[0] + win[2] && X + W > win[0] && Y < win[1] + win[3] && Y + H > win[1] && x.fs * sc < low) { low = x.fs * sc; lowT = x.t.slice(0, 14); }
-        if (x.lefts.some(L => L < win[0] - 0.5 && L + 1 < win[0] + win[2]) && Y < win[1] + win[3]) say('thumbnail line cut at its start', `${t.dataset.k}: “${x.t.slice(0, 16)}”`); }
+      for (const x of t.__mq.texts) { const [X, Y, W, H] = x.r; if (X < win[0] + win[2] && X + W > win[0] && Y < win[1] + win[3] && Y + H > win[1] && !x.svg && x.fs * sc < low) { low = x.fs * sc; lowT = x.t.slice(0, 14); }
+        if (x.lefts.some(L => L < win[0] - 0.5 && L + 1 < win[0] + win[2]) && Y < win[1] + win[3] && Y + H > win[1]) say('thumbnail line cut at its start', `${t.dataset.k}: “${x.t.slice(0, 16)}”`); }
       if (low < min - 0.05) say('thumbnail text too small', `${t.dataset.k}: ${low.toFixed(1)}px “${lowT}” (min ${min})`);
     }
     // fix round 5 (critic r5 D2, §2.7 "selected = fill + ✓ + ring"): every selected segmented option and pill shows a ✓ and
