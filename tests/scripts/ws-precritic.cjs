@@ -216,12 +216,13 @@ function prerequisites() {
     if (!chrome) {
         try {
             for (const d of fs.readdirSync('/opt/pw-browsers').filter((n) => /^chromium-\d+$/.test(n)).sort().reverse()) {
-                const exe = path.join('/opt/pw-browsers', d, 'chrome-linux', 'chrome');
-                if (fs.existsSync(exe)) { chrome = exe; break; }
+                // the same two layouts as tests/lib/ws-harness.cjs (Playwright 1.5x writes chrome-linux64)
+                const exe = ['chrome-linux64', 'chrome-linux'].map((sub) => path.join('/opt/pw-browsers', d, sub, 'chrome')).find((p) => fs.existsSync(p));
+                if (exe) { chrome = exe; break; }
             }
         } catch (e) { /* none */ }
     }
-    if (!chrome || !fs.existsSync(chrome)) bad.push('Chromium: no /opt/pw-browsers/chromium-*/chrome-linux/chrome and no PUPPETEER_EXECUTABLE_PATH. Fix: PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npx playwright install chromium (or set PUPPETEER_EXECUTABLE_PATH)');
+    if (!chrome || !fs.existsSync(chrome)) bad.push('Chromium: no /opt/pw-browsers/chromium-*/chrome-linux{64,}/chrome and no PUPPETEER_EXECUTABLE_PATH. Fix: PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npx playwright install chromium (or set PUPPETEER_EXECUTABLE_PATH)');
     try { require.resolve('puppeteer', { paths: [ROOT] }); } catch (e) { bad.push('puppeteer: not resolvable from the repo. Fix: npm install (in the repo root)'); }
     // the proxy CA in Chromium's NSS store (STATUS §8)
     if (fs.existsSync('/root/.ccr/ca-bundle.crt')) {
