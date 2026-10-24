@@ -362,8 +362,8 @@ async function main() {
         for (const sz of sizes) {
             const d = docs.get(`${r.id}@${sz}`);
             if (!d) continue;
-            const counts = {}, bySkill = {};
-            for (const f of d.findings || []) if (slotCounted(f)) { const k = `${f.lint} ${f.rule}`; counts[k] = (counts[k] || 0) + 1; const m = (bySkill[f.skill || ''] = bySkill[f.skill || ''] || {}); m[k] = (m[k] || 0) + 1; }
+            const counts = {}, bySkill = { '?': {} };
+            for (const f of d.findings || []) if (slotCounted(f)) { const k = `${f.lint} ${f.rule}`; counts[k] = (counts[k] || 0) + 1; const who = f.skill || (f.cell ? '?' : ''); const m = (bySkill[who] = bySkill[who] || {}); m[k] = (m[k] || 0) + 1; }
             s[sz] = { counts, bySkill: (r.skills || []).length > 1 ? bySkill : undefined };
         }
         return Object.assign({}, r, { status: 'OK', sizes: s });
@@ -414,10 +414,16 @@ async function main() {
         const split = splitBySkill(probe[j.id] || { segs: 0, narrow: [], heads: 0, overlaps: [] }, j.row.skill, (j.row.skills || []).length > 1);
         const geo = summariseProbe(split.own);
         const geoPartner = summariseProbe(split.partner);
+        // D1 fix r1: on a multi-skill row, probe items on cells that name no skill must not pass silently
+        const pItems = [...((probe[j.id] || {}).narrow || []), ...((probe[j.id] || {}).overlaps || [])].filter((x) => x.cell);
+        const pUnnamed = pItems.filter((x) => !x.skill).length;
+        const attrGap = (j.row.skills || []).length > 1 && pItems.length && pUnnamed * 2 > pItems.length ? `attribution missing: ${pUnnamed} of ${pItems.length} probe item(s) on cells that name no skill (D1)` : null;
         const msgs = [];
         for (const x of above) msgs.push(`${x.rule} ${x.n} above the siblings' ${x.max}`);
         for (const x of noSib) msgs.push(`${x.rule} ${x.n}: no sibling measured this row`);
         for (const g of geo) msgs.push(g.msg);
+        if (attrGap) msgs.push(attrGap);
+        for (const e of cmp.errors.filter((x) => x.id === j.row.id && String(x.msg).startsWith(`${j.size}:`))) msgs.push(e.msg);
         const notes = geoPartner.map((g) => `partner skill (non-blocking, D1): ${g.msg}`).concat(cmp.partner.filter((x) => x.id === j.row.id && x.size === j.size).map((x) => `partner skill (non-blocking, D1): ${x.rule} ${x.n}`));
         const p = probe[j.id] || {};
         const status = msgs.length ? 'FAIL' : 'ok';

@@ -1914,9 +1914,90 @@ async function legacyDocumentHtml(page) {
     });
 }
 
-async function lintHtmlInSheetPage(app, html, id, mode) {
+/**
+ * D1 fix r1 (runs IN the printed document): the sections and mixed-practice composers draw their cells without
+ * data-ws-skill (sheet/cell.js emits it only when a composer passes `skill`, and practice.js planItem does not), so
+ * every finding on a multi-skill sheet read as page-level. buildSheet's `items` (plan order, each with its skill)
+ * are matched to the dealt cells of each part (pupil pages, then the key's facsimile pages) in document order:
+ * the top-level cells carrying a number / letter tab (anchors, Model cells and untabbed cells excluded). A tab
+ * text equal to the item's letter is used when every item has one; otherwise the order is used, and only when the
+ * counts agree and the items' numbers appear in their cells (>= 80 %). Nothing is attributed when the match fails:
+ * the findings stay unattributed and ws-sibling-compare's attribution check fails the row (never silent).
+ */
+function attributeCells({ items, anchors }) {
+    let pages = [...document.querySelectorAll('[data-ws-page]')];
+    if (!pages.length) pages = [...document.querySelectorAll('.ws-page')];
+    const CELL = '[data-ws-cell], .ws-cell:not(.blankrun)';
+    const isKey = (p) => !!(p.closest('[data-ws-mode="key"]') || p.matches('[data-ws-mode="key"]'));
+    const res = { items: items.length, parts: [] };
+    for (const key of [false, true]) {
+        const cells = pages.filter((p) => isKey(p) === key).flatMap((p) => [...p.querySelectorAll(CELL)].filter((c) => !c.parentElement.closest(CELL)))
+            .filter((c) => !c.closest('.mq-anchorgrid') && !c.querySelector('[data-ws-anchor], .ws-modeltab') && c.querySelector(':scope > .ws-tab, :scope > .ws-letter, :scope > [data-ws-label]'));
+        const part = { key, cells: cells.length, attributed: 0, how: '' };
+        res.parts.push(part);
+        if (!cells.length) continue;
+        const lab = (c) => (c.querySelector(':scope > .ws-tab, :scope > .ws-letter, :scope > [data-ws-label]').textContent || '').replace(/[.)\s]/g, '');
+        let pairs = null;
+        if (items.every((it) => it.letter)) {
+            const byLab = new Map();
+            for (const c of cells) { const l = lab(c); if (!byLab.has(l)) byLab.set(l, []); byLab.get(l).push(c); }
+            const used = new Map();
+            pairs = [];
+            for (const it of items) { const l = it.letter.replace(/[.)\s]/g, ''); const list = byLab.get(l) || []; const k = used.get(l) || 0; if (list[k]) { pairs.push([list[k], it]); used.set(l, k + 1); } }
+            part.how = 'letter';
+            if (pairs.length !== items.length) pairs = null;
+        }
+        if (!pairs && cells.length === items.length) {
+            const nums = (s) => (String(s).match(/\d[\d,]*/g) || []).map((x) => x.replace(/,/g, ''));
+            const txt = (c) => (c.textContent || '').replace(/[\s, ]/g, '');
+            let judged = 0, hit = 0;
+            cells.forEach((c, i) => { const n = nums(items[i].text); if (!n.length) return; judged++; if (n.every((x) => txt(c).includes(x))) hit++; });
+            if (!judged || hit / judged >= 0.8) { pairs = cells.map((c, i) => [c, items[i]]); part.how = `order (${hit}/${judged} items' numbers in their cells)`; }
+            else part.how = `order refused: ${hit}/${judged} items' numbers in their cells`;
+        } else if (!pairs) part.how = `no match: ${cells.length} tabbed cells, ${items.length} items`;
+        for (const [c, it] of pairs || []) if (it.skill && !c.getAttribute('data-ws-skill')) { c.setAttribute('data-ws-skill', it.skill); part.attributed++; }
+    }
+    // anchor (worked example) cells: the example whose numbers ALL appear in the cell; attributed when the matching
+    // examples name one skill (a side anchor repeats on a section's later pages, so order cannot be used)
+    const nums = (t) => (String(t).match(/\d[\d,]*/g) || []).map((x) => x.replace(/,/g, ''));
+    const aCells = pages.flatMap((p) => [...p.querySelectorAll(CELL)].filter((c) => !c.parentElement.closest(CELL))).filter((c) => !c.getAttribute('data-ws-skill') && (c.classList.contains('mq-anchorcell') || c.querySelector('[data-ws-anchor]')));
+    res.anchors = { cells: aCells.length, examples: (anchors || []).length, attributed: 0 };
+    // score: the example's expression written out ("12−11") found in the cell beats its numbers found one by one;
+    // among number matches, the most digits matched wins; a tie between two skills attributes nothing
+    const core = (t) => (String(t).replace(/[\s,\u00a0]/g, '').match(/[\d\u2212+\u00d7\u00f7]{3,}/g) || []).filter((x) => /\d[\u2212+\u00d7\u00f7]\d/.test(x));
+    res.anchors.texts = (anchors || []).map((a) => `${a.skill}: ${a.text.slice(0, 40)}`);
+    for (const c of aCells) {
+        const txt = (c.textContent || '').replace(/[\s,\u00a0]/g, '');
+        const scored = (anchors || []).filter((a) => a.skill).map((a) => {
+            const e = core(a.text).filter((x) => txt.includes(x));
+            if (e.length) return { a, score: 1000 + e.join('').length };
+            const n = nums(a.text);
+            return { a, score: n.length && n.every((x) => txt.includes(x)) ? n.join('').length : 0 };
+        }).filter((x) => x.score > 0).sort((x, y) => y.score - x.score);
+        if (!scored.length) continue;
+        const top = new Set(scored.filter((x) => x.score === scored[0].score).map((x) => x.a.skill));
+        if (top.size === 1) { c.setAttribute('data-ws-skill', [...top][0]); res.anchors.attributed++; }
+    }
+    // an anchor whose example draws no numbers ("What is the perimeter?"): the skill of the problems it sits beside,
+    // the attributed item cells of the smallest enclosing block that holds any (a side anchor shares its section's
+    // band), when they name one skill
+    for (const c of aCells) {
+        if (c.getAttribute('data-ws-skill')) continue;
+        for (let up = c.parentElement; up && !up.matches('[data-ws-page], .ws-page'); up = up.parentElement) {
+            const near = [...up.querySelectorAll('[data-ws-skill]')].filter((x) => x !== c && !aCells.includes(x)).map((x) => x.getAttribute('data-ws-skill'));
+            if (!near.length) continue;
+            const one = new Set(near);
+            if (one.size === 1) { c.setAttribute('data-ws-skill', near[0]); res.anchors.attributed++; res.anchors.byPlace = (res.anchors.byPlace || 0) + 1; }
+            break;
+        }
+    }
+    return res;
+}
+
+async function lintHtmlInSheetPage(app, html, id, mode, items = null) {   // items: {items, anchors} (D1 fix r1)
     const SAVE = arg('save-html', null);
-    if (SAVE) { fs.mkdirSync(path.resolve(process.cwd(), SAVE), { recursive: true }); fs.writeFileSync(path.resolve(process.cwd(), SAVE, id.replace(/[^\w.-]+/g, '_') + '.html'), html); }
+    const saveTo = SAVE ? path.resolve(process.cwd(), SAVE, id.replace(/[^\w.-]+/g, '_') + '.html') : null;
+    if (SAVE) { fs.mkdirSync(path.resolve(process.cwd(), SAVE), { recursive: true }); fs.writeFileSync(saveTo, html); }
     const sheet = await app.page.browser().newPage();
     const failed = [];
     sheet.on('requestfailed', r => { if (/stylesheet|font/.test(r.resourceType()) && !/fonts\.(googleapis|gstatic)\.com/.test(r.url())) failed.push(r.url()); });
@@ -1928,7 +2009,15 @@ async function lintHtmlInSheetPage(app, html, id, mode) {
         await sheet.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 });
         // a sheet linted without its own stylesheets or fonts measures nothing real
         if (failed.length) throw new Error(`the document's stylesheet / font requests failed: ${failed.slice(0, 3).join(', ')}`);
+        // D1 fix r1: a multi-skill sheet's cells get the skill of the item they draw (and the saved document
+        // keeps it, so ws-slot-clip's probe reads the same attribution)
+        let attribution = null;
+        if (items && items.items.length && new Set(items.items.map((i) => i.skill)).size > 1) {
+            attribution = await sheet.evaluate(attributeCells, items);
+            if (saveTo) fs.writeFileSync(saveTo, '<!doctype html>\n' + await sheet.evaluate(() => document.documentElement.outerHTML));
+        }
         const res = await lintDocument(sheet, { id, mode });
+        if (attribution) res.info.attribution = attribution;
         if (mode === 'kit' && arg('supports', null)) {
             const sr = await sheet.evaluate(supportCheckInPage);
             res.findings.push(...sr.findings);
@@ -1998,7 +2087,13 @@ async function runAppDocs(app, source, skills, flags, results, jobId) {
                         let out;
                         try { out = await window.buildSheet(req); } catch (e) { if (e && e.unsupported) return { unsupported: e.message }; throw e; }
                         const body = out.docHtml || [out.pupilHtml, out.keyHtml].filter(Boolean).join('\n');
-                        return { doc: window.sheetDocument(body, LABEL), pupilHtml: out.pupilHtml, keyHtml: out.keyHtml };
+                        // D1 fix r1: the skill of every dealt item, in plan order (the composers of sections / mixed
+                        // pages do not put data-ws-skill on their cells; buildSheet's own items list carries it)
+                        const sk = (x) => (x && typeof x === 'object' ? `${x.categoryId || ''}:${x.skillId || ''}` : String(x || ''));
+                        const items = (out.items || []).filter((it) => !it.part || it.part === 'practice' || it.part === 'mixed').map((it) => ({ skill: sk(it.skill), letter: it.letter == null ? '' : String(it.letter), text: String(it.text || '') }));
+                        // ... and of every anchor (worked example) cell: matched by the numbers it draws
+                        items.anchors = ((out.anchors && out.anchors.examples) || []).map((a) => ({ skill: sk(a.skill), text: String(a.text || '') }));
+                        return { doc: window.sheetDocument(body, LABEL), pupilHtml: out.pupilHtml, keyHtml: out.keyHtml, items, anchorItems: items.anchors };
                     }, { S: d.skills.map(k => ({ categoryId: k.categoryId, skillId: k.skillId })), seed, COUNT: arg('count', 'auto') === 'auto' ? undefined : parseInt(arg('count', '6'), 10), role, ANCHORS: flags.anchors, SUPPORTS: flags.supports, COVER: flags.coverage, MIX: arg('mix', null), OPTS: arg('opts', null) ? JSON.parse(arg('opts', '{}')) : null, KIT_SIZE: kitSize(), KEY_OPTS: arg('key-place', null) || arg('key-style', null) ? { on: true, placement: arg('key-place', 'end'), style: arg('key-style', 'copy') } : null, PAGES: flags.pages, COLUMNS: flags.columns, SECTIONS: flags.sectionsMode, LABEL: d.skills.length === 1 ? s.label : d.label });
                     if (html && html.doc) { kitHalves = html; html = html.doc; }
                 }
@@ -2007,7 +2102,7 @@ async function runAppDocs(app, source, skills, flags, results, jobId) {
                     if (jobId) NA_DOCS.push({ id, reason: html.unsupported });
                     continue;
                 }
-                r = await lintHtmlInSheetPage(app, html, id, source === 'legacy' ? 'legacy' : 'kit');
+                r = await lintHtmlInSheetPage(app, html, id, source === 'legacy' ? 'legacy' : 'kit', kitHalves && d.skills.length > 1 ? { items: kitHalves.items, anchors: kitHalves.anchorItems || [] } : null);
                 if (kitHalves) r.findings.push(...anchorFindings(kitHalves.pupilHtml, kitHalves.keyHtml));
             } catch (e) {
                 r = { info: { id, mode: source, error: e.message }, findings: [{ lint: 'L-SPLIT', rule: 'RENDER', sev: 'critical', msg: `the sheet did not render: ${e.message}`, key: 'render error' }] };
@@ -2148,7 +2243,7 @@ function writeJson(results, source, file) {
         tool: TOOL, source, lints: LINTS,
         documents: results.map(r => ({
             id: r.info.id, label: r.info.label || '', mode: r.info.mode, pages: r.info.pages ?? null, keyPages: r.info.keyPages ?? null,
-            printedPages: r.info.printedPages ?? null, itemsPerPage: r.info.itemsPerPage || null, parts: r.info.parts || null, error: r.info.error || null,
+            printedPages: r.info.printedPages ?? null, itemsPerPage: r.info.itemsPerPage || null, parts: r.info.parts || null, error: r.info.error || null, attribution: r.info.attribution || undefined,
             counts: Object.fromEntries(LINTS.map(l => [l, r.findings.filter(f => f.lint === l && !f.waived).length])),
             findings: sortFindings(r.findings.map(f => { const { key, ...rest } = f; return rest; })),
             notes: r.info.notes || [],

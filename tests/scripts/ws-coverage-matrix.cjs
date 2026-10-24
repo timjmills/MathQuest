@@ -531,10 +531,13 @@ const countsOf = (doc) => { const m = {}; for (const f of doc.findings || []) if
 const findingKey = (f) => `${f.lint} ${f.rule}|p${f.page != null ? f.page : ''}|${String(f.key || f.msg || '').replace(/\d+(?:\.\d+)?/g, '#').slice(0, 120)}`;
 /**
  * D1 (W0-A critic r7): per skill, the counts of the findings its cells carry (print-lint's `skill`, from the cell's
- * data-ws-skill); '' holds the findings no cell names (page-level). Only multi-skill rows store it: ws-sibling-compare
- * and ws-slot-clip judge the lane skill's own share there, and report a partner skill's as non-blocking.
+ * data-ws-skill, which print-lint sets from buildSheet's items on multi-skill sheets); '' holds the page-level findings
+ * (no cell), '?' the findings ON a cell that names no skill (attribution missing; always present, so a reader can tell
+ * this format from the one before D1 fix r1, where every unnamed finding was ''). Only multi-skill rows store it:
+ * ws-sibling-compare and ws-slot-clip judge the lane skill's own share there, report a partner skill's as
+ * non-blocking, and fail a row whose cell findings are mostly unattributed.
  */
-const bySkillOf = (doc) => { const m = {}; for (const f of doc.findings || []) if (!f.waived && !RENDER_KEYS.has(`${f.lint} ${f.rule}`)) { const s = f.skill || ''; const k = `${f.lint} ${f.rule}`; (m[s] = m[s] || {})[k] = (m[s][k] || 0) + 1; } return m; };
+const bySkillOf = (doc) => { const m = { '?': {} }; for (const f of doc.findings || []) if (!f.waived && !RENDER_KEYS.has(`${f.lint} ${f.rule}`)) { const s = f.skill || (f.cell ? '?' : ''); const k = `${f.lint} ${f.rule}`; (m[s] = m[s] || {})[k] = (m[s][k] || 0) + 1; } return m; };
 const keysOf = (doc) => { const m = {}; for (const f of doc.findings || []) if (!f.waived && !RENDER_KEYS.has(`${f.lint} ${f.rule}`)) { const k = findingKey(f); m[k] = (m[k] || 0) + 1; } return m; };
 
 /**

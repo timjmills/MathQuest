@@ -92,10 +92,25 @@ function shareOf(v, skill, multi) {
     if (!multi || !v || !v.bySkill) return { own: v && v.counts ? v.counts : v || {}, partner: {} };
     const own = {}, partner = {};
     for (const [sk, m] of Object.entries(v.bySkill)) {
-        const into = sk === skill || sk === '' ? own : partner;
+        const into = sk === skill || sk === '' || sk === '?' ? own : partner;
         for (const [k, n] of Object.entries(m)) into[k] = (into[k] || 0) + n;
     }
     return { own, partner };
+}
+/**
+ * D1 fix r1: attribution missing must never pass silently. On a multi-skill row, the findings that carry no skill:
+ * `bySkill['?']` (on a cell that names none) of the cell findings, in the format that has the '?' key; in the format
+ * before it (every unnamed finding under ''), every '' finding. More than half of them unnamed: FAIL.
+ */
+function attributionGap(v, multi) {
+    if (!multi || !v || !v.bySkill) return null;
+    const sum = (m) => Object.values(m || {}).reduce((a, b) => a + b, 0);
+    const total = sum(v.counts);
+    if (!total) return null;
+    const fresh = Object.prototype.hasOwnProperty.call(v.bySkill, '?');
+    const unnamed = fresh ? sum(v.bySkill['?']) : sum(v.bySkill['']);
+    const base = fresh ? total - sum(v.bySkill['']) : total;
+    return base > 0 && unnamed * 2 > base ? { unnamed, of: base, fresh } : null;
 }
 function compare(oursRows, sibsOf, table, { redOnly = false, sizes = null, rules = null } = {}) {
     const out = { above: [], engine: [], noSibling: [], errors: [], partner: [], rowsCompared: 0, rowsAbove: new Set(), byStatus: {} };
@@ -110,8 +125,10 @@ function compare(oursRows, sibsOf, table, { redOnly = false, sizes = null, rules
         const multi = (r.skills || []).length > 1;
         for (const [size, v] of Object.entries(r.sizes)) {
             if (!v || !v.counts || (sizes && !sizes.includes(size))) continue;
+            const gap = attributionGap(v, multi);
+            if (gap) out.errors.push({ id: r.id, msg: `${size}: attribution missing - ${gap.unnamed} of ${gap.of} ${gap.fresh ? 'cell ' : ''}finding(s) name no skill on a multi-skill row (D1: print-lint could not tell the lane's cells from the partners')` });
             const sh = shareOf(v, r.skill, multi);
-            for (const [rule, n] of ruleKeys(sh.partner)) if (n > 0 && ruleOn(rules, rule)) out.partner.push({ id: r.id, size, rule, n, skills: Object.keys(v.bySkill || {}).filter((k) => k && k !== r.skill) });
+            for (const [rule, n] of ruleKeys(sh.partner)) if (n > 0 && ruleOn(rules, rule)) out.partner.push({ id: r.id, size, rule, n, skills: Object.keys(v.bySkill || {}).filter((k) => k && k !== '?' && k !== r.skill && Object.keys(v.bySkill[k]).includes(rule)) });
             for (const [rule, n] of ruleKeys(sh.own)) {
                 if (!(n > 0) || !ruleOn(rules, rule)) continue;
                 const seen = [];
@@ -177,10 +194,17 @@ function selfTest() {
     t(cl.above.length === 1 && cl.above[0].n === 3 && cl.partner.length === 1, `D1: the lane skill's own 3 block, the partner's 6 are reported (${JSON.stringify(cl.above)})`);
     const pageLevel = { ...partnerOnly, sizes: { S: { counts: { 'L-DENSITY PAGEFILL': 1 }, bySkill: { '': { 'L-DENSITY PAGEFILL': 1 } } } } };
     t(compare([pageLevel], () => ['a:sib'], sibT).above.length === 1, 'D1: a page-level finding (no cell names a skill) stays with the lane');
+    // D1 fix r1: a multi-skill row whose findings mostly name no skill is an ERROR, never a pass
+    const unnamedOld = { ...partnerOnly, sizes: { S: { counts: { 'L-OVERFLOW PG-12': 8, 'L-DENSITY PG-23': 2 }, bySkill: { '': { 'L-OVERFLOW PG-12': 8, 'L-DENSITY PG-23': 2 } } } } };
+    t(compare([unnamedOld], () => ['a:sib'], sibT).errors.length === 1, 'D1 r1: every finding unnamed (the format before fix r1) -> attribution missing');
+    const unnamedNew = { ...partnerOnly, sizes: { S: { counts: { 'L-OVERFLOW PG-12': 8, 'L-DENSITY PG-23': 2 }, bySkill: { '?': { 'L-OVERFLOW PG-12': 5 }, 'b:partner': { 'L-OVERFLOW PG-12': 3 }, '': { 'L-DENSITY PG-23': 2 } } } } };
+    t(compare([unnamedNew], () => ['a:sib'], sibT).errors.length === 1, 'D1 r1: 5 of 8 cell findings on unnamed cells -> attribution missing');
+    const pageOnly = { ...partnerOnly, sizes: { S: { counts: { 'L-DENSITY PG-23': 2 }, bySkill: { '?': {}, '': { 'L-DENSITY PG-23': 2 } } } } };
+    t(compare([pageOnly], () => ['a:sib'], sibT).errors.length === 0, 'D1 r1: page-level findings only (fresh format) are not an attribution gap');
     const oldRow = { ...partnerOnly, sizes: { S: { counts: { 'L-SIZE TY-11': 6 } } } };
     t(compare([oldRow], () => ['a:sib'], sibT).above.length === 1, 'D1: a row written before D1 (no bySkill) is judged on its totals');
     for (const f of fails) say(`  self-test FAIL: ${f}`);
-    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 17 cases)`);
+    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 20 cases)`);
     process.exit(fails.length ? 1 : 0);
 }
 
@@ -341,7 +365,7 @@ function main() {
     say(`${TOOL}: ${keys.length} lane skill(s) on ${ROOT === HERE ? 'this tree' : ROOT}; ${oursRows.length} row(s), ${red} RED, ${noBase} PENDING(no-baseline), ${c.errors.length} ERROR; comparing ${has('red-only') ? 'RED rows only (--red-only)' : 'every printed row with findings (RED, OK, PENDING(no-baseline))'} with ${argAll('siblings').length ? 'the given siblings' : has('all-siblings') ? 'every approved sibling (--all-siblings)' : 'the paired siblings (all approved where the skill has no pair)'}`);
     for (const k of keys) say(`  ${k}: template ${tpl[k] || '(given)'}; siblings ${sibOf[k].length ? sibOf[k].join(', ') : 'NONE (no approved sibling on this template in ' + path.relative(HERE, sf) + ')'}`);
     say(`  sibling counts from: ${sources.map((s) => `${s.name}: ${Object.keys(s.rows).filter((id) => allSibs.includes(id.split('|')[0])).length} sibling row(s)`).join('; ')}`);
-    for (const e of c.errors) say(`ERROR      ${e.id}: ${e.msg} (a row that cannot print is never engine debt)`);
+    for (const e of c.errors) say(`ERROR      ${e.id}: ${e.msg}${/attribution missing/.test(e.msg) ? '' : ' (a row that cannot print is never engine debt)'}`);
     for (const x of c.above) say(`ABOVE      ${x.id} ${x.size} ${x.rule}: ours ${x.n}, siblings max ${x.max} (${fmtSibs(x)})`);
     for (const x of c.noSibling) say(`NO-SIBLING ${x.id} ${x.size} ${x.rule}: ours ${x.n}, no approved sibling measured ${suffixOf(x.id)} at ${x.size}`);
     if (has('verbose')) for (const x of c.engine) say(`engine     ${x.id} ${x.size} ${x.rule}: ours ${x.n} <= siblings max ${x.max} (${fmtSibs(x)})`);
@@ -354,5 +378,5 @@ function main() {
     say(bad ? `${TOOL}: FAIL - worse than siblings: ${c.above.length} count(s) above the approved siblings in ${new Set(c.above.map((x) => x.id)).size} row(s), ${c.noSibling.length} unproven (no sibling), ${c.errors.length} ERROR (${summary})` : `${TOOL}: OK (${summary})`);
     process.exit(bad && !has('report-only') ? 1 : 0);
 }
-module.exports = { compare, shareOf, printed, sibTable, suffixOf, siblingsOf, loadSiblings, runMatrix, runRows, readPins };
+module.exports = { compare, shareOf, attributionGap, printed, sibTable, suffixOf, siblingsOf, loadSiblings, runMatrix, runRows, readPins };
 if (require.main === module) { try { main(); } catch (e) { say(`${TOOL}: ${e && e.stack || e}`); say(`${TOOL}: FAIL - error`); process.exit(2); } }
