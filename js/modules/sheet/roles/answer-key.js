@@ -380,6 +380,7 @@ function gridPart(part, ctx, report) {
         height: part.height || '',
         unlabelled: part.unlabelled || [],
         rowsTpl: part.rowsTpl || '',
+        colsTpl: part.colsTpl || '',
         spanFirst: !!part.spanFirst,
         rowGap: Number(part.rowGap) || 0,
     });

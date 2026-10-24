@@ -589,3 +589,99 @@ is held by the stop.
 **One deviation to note:** tonight's lead-side changes (HD-5a strand tab removed, CL-11a number tabs only, CL-4b top-of-box with
 an L-TOPSTART lint) were made by in-session builders **without a critic**. Under the owner's rule that everything passes at ≥ 8
 by an independent critic, they need a critic round when work resumes, before any deploy.
+## Per-round findings
+### Mixed practice M1 — rounds r1–r6 (lane `mixed-m1`, 2026-10-23)
+
+Result: PASS at r6 (16 pages, all ≥ 8). Target was ≤ 2 rounds; it took 6 (r1–r3 FAIL, r4 14/16, r5 and r6 PASS on the changed pages).
+
+**Automatic checks** (finding → proposed check; did an existing check exist that should have caught it?)
+
+| Round | Finding | Proposed check (backtest) | Existing check? |
+|---|---|---|---|
+| r1 | Size S printed the L page (20 problems, the same as L, fewer than M) — LESSONS L1 | Problems S > M > L per look, on every multi-size render — **built**: `sheet/mixed-page.check.cjs` (size ladder) | No. L1 is known but has no general machine check; `ws-print-lint` does not compare sizes. Should become a print-lint rule for every role |
+| r1 | Two templates (legacy `sub_facts` and kit `fact`) in one band; rule 3.7 mm lower, ones off by 2.4 mm | One template per mixed band; rule y and right digit edge equal within 0.3 mm across a shelf — **built** (mixed-page check; `mixedClass` refuses legacy) | No |
+| r1 | Repeated answers and turnarounds in one skill's share (L10) | `pageRepeats(items)` (exact / turnaround / related) — **built** (pure, in `sheet/interleave.js`, used by the mixed-page check) | No; L10 has no machine check outside this lane — should be a print-lint rule for every page |
+| r2 | Doubled quiet letters `aa.`…`pp.` past 26 items (CL-13) | Label regex `/^([a-z])\1+\.$/` fails — **built** (mixed-page check). Belongs in `ws-print-lint` for every role | No |
+| r2 | Related facts give each other away (13−6 / 13−7; 8×10 / 80÷10) | Family keys in `pageRepeats` — **built** | No |
+| r3 | Exact repeats on the 2-skill S page: the deal's last pass dropped every uniqueness rule silently | `pageRepeats` on every mixed render + per-rung counts (`dealtAs`) — **built** | No — the r2 fix was checked on 20 seeds of the *critic set* only, not on a small-supply page; the check scenarios now include a small pool |
+| r3 | I Can M printed the S page (k chosen with no digit floor) | Digit pt ≥ the size's working digits (TY-30 floor) — **built** | No |
+| r3 | I Can L 3 across, fill 0.46 (TY-31) | Fill within 55–75 % or a note — **built** | No |
+| r3 | Track count from the probe, not the dealt items | Tracks = widest number on the page — **built** | No |
+| r3 | Tabs 4 mm / 8 pt at 20 pt digits (CL-31) | Tab size from the ladder digit size — **built** | No |
+| r4 | Fill-on repeats clustered (one fact 4 times, twins on one shelf) | Per-skill fact-pair counts differ by ≤ 1; no identical fact twice on a shelf — **built** | No |
+| r4 | Empty bordered cell on a short page (PG-15) | Every bordered cell holds a problem; trailing area unruled, inside a rectangular frame — **built**. L-CELL (PG-15) exists in `ws-print-lint` but did not flag it: **it should have** — check why L-CELL missed a bordered empty `ws-cell` | Yes (L-CELL / PG-15), missed it |
+| r4 | Daily M 5 across vs I Can M 6 across (least-overfill rule) | Same k across looks when the lattice allows; rule gap ≥ 6 mm — **built** (gap) | No |
+| r5 | Note wording / fill figure disagreed between meta, table and drawing | Note figures equal the drawn measurement within 0.5 % — **built** (`drawnFill`) | No |
+| r5 | A page moved by a rule change (weighted 1:3 M) after it had passed | Re-render every page whose plan hash changed since the last critic; the critic sees only fresh renders — **process**: hash plans per page, list "changed since last grade" | No |
+| r6 | CL-32: tab width varies with the label's digits within a section (pre-existing, every page) | Equal tab widths per section — proposed for `ws-print-lint` (checks owner) | No |
+
+**Speed-ups** (what cost time → smallest change)
+
+| Round | Cost | Smallest change |
+|---|---|---|
+| r1 | Critic could not run `ws-grade-render` (auto-mode denied it: the script deletes temp PDFs; no `--help`, so `--help` ran a real render) | Give `ws-grade-render` a `--help` that exits, and keep temp files in the scratchpad; critics grade builder renders by default (done from r2) |
+| r1–r3 | Three rounds on the same defect classes (repeats, size ladder) because each fix was verified on the critic set only | Brief every first build with the scenario matrix up front (small supply, both looks, all sizes); the lane now has `mixed-page.check.cjs` — it should exist *before* the first critic, written from §3.4 |
+| r1 | The critic set was not available (only the four operations share a size class; one was legacy) — found by the builder measuring ~180 skills | The plan's critic case assumed four families share a class; record per-template size classes in the catalogue so a lane can pick a critic set in one lookup |
+| r3→r4 | The §1.7 stop came one round late (repeats survived r1→r3) | Count defect *classes* per round in the status file as they come in; stop at the second survival automatically |
+| r4 | `mixed-page.check.cjs` takes ≈ 1 h serially | Run it in 3 parallel parts (done); give it `--quick` (5 seeds, one look) for fix rounds and the full run before the critic |
+| r4–r5 | Owner rulings arrived mid-round (fill, families, PG-15) and were applied mid-round | Process rule 0 (batch design decisions) — now in force |
+| r5 | One page changed after its pass and was not re-rendered, costing a follow-up spot-check | Plan-hash diff before each critic (above) |
+| r6 | Fixer edited note wording after its last full check; the lead re-ran the fill scenarios (≈ 50 min) | A fixer's last commit must be followed by the quick check; the report states the commit the check ran on |
+
+### Anchor engine fixes (pilot E1–E3) — critic round 1, 2026-10-23: FAIL
+
+Side pages of add_10k / add_1k 8 on every criterion (E1, E2, E3 fixed there); 6 of 16 pages ≤ 7, all defects pre-existing
+on anchor-mode pages. Rebuild at Opus medium (failed round).
+
+**Automatic checks**
+
+| Finding | Proposed check (backtest) | Existing check? |
+|---|---|---|
+| Sections-anchor problems centred down the cell (CL-4) | E5 top start and E3 bands in sections mode too | E5 existed but ran on side only — scoping gap |
+| A skill with no workedSteps changes the page in anchor mode (sub_1k: forced 2 columns, 4 columns for 6 items) | plan(anchors, no examples) == plan(off) | No — `anchors.check` skipped these pages (`if (!r.n) continue`) |
+| mult_chart_easy side pair overflows the page by 80–90 mm | Any overflow > 0.5 mm FAILS; no `KNOWN_E2_SIDE` allow-list | E2 existed but its allow-list downgraded it to WARN — allow-lists must not hold overflows |
+| The key's bold leaks onto the anchor (not a facsimile) | Computed weight / colour of `.mq-anchor` glyphs equal on pupil and key | No (L-ANCHOR checks markup, not computed style) |
+| Step lines wrap before "=" | No rendered step line starts with "=" (Range line boxes) | No |
+| Empty grid area in a section with fewer items than columns × rows | Grid-hole check | No |
+| Kit-wide: stack cells centre content vertically on every page type (CL-4, owner ruling) | A kit-wide top-start rule in `ws-print-lint` | No — raised with the lead (not this lane's to change) |
+
+**Speed-ups**
+
+| Cost | Smallest change |
+|---|---|
+| Only M rendered; S and L could not be graded (rubric grades S and L in full) | Render S, M and L in the same run, every time (now in the r2 brief) |
+| Scope proof by eye | Hand the critic a before/after pixel-diff box per page and the per-cell band numbers (`bands.py`) |
+| No anchors-off baseline to compare a no-example skill against | Render an anchors='off' baseline per skill |
+| The round-1 fixer built at low on an uncertified pair (anchors side layout) | Rule 0a: first builds on an uncertified pair run at medium |
+
+### Anchor engine fixes + pilot patches — critic round 2 (on the merged tree, 6640347), 2026-10-24: FAIL — lane stopped (owner)
+
+Pilot patches PASS: fact-rows sub_100k / sub_1m at S and L (5 × 6 at 18 / 16 pt, 3 × 5 at 28 pt, all keys correct) and the
+preset band heading ("Multiplying"). Anchor spec items hold (step numbers ≥ 8 pt, no "=" line starts, key does not bold the
+anchor, twins match the problem, grey newest marks, no-example and over-tall fallbacks pixel-identical to anchors-off, the
+four-column layout on add_50). Failing pages: add_10k side L (C3 4: 6 pages, one pair a page), add_10k sections S (C3 5: the
+lone block takes 1 row of 4, 2 problems spill), add_50 side M (C3 5: E4 real — a second page), add_50 side S and add_10k
+sections L (C3/C4 7: the grid's bottom frame does not print). Open low items: "Thousands: 3 = 3." bring-down wording, Say-line
+orphan at L, sections band shows headings the problems lack (owner: does ruling B cover the band?), restating band state,
+Mixed key leaves × carry boxes empty, a carry box on add_50_no_regroup (pre-existing), exchange-mark room on 5–6-digit fact rows
+under CL-4b (owner), band instruction for presets.
+
+**Automatic checks**
+
+| Finding | Proposed check (backtest) | Existing check? |
+|---|---|---|
+| add_50 M: a second page from the pair-height estimate | E4 caught it — keep it a FAIL, never waive as drift; plan from the print-media measurement | Yes (E4), reported as "drift" by the builder — should have blocked |
+| add_10k side L: one pair a page, 46 % empty twin | Items per page vs what the measured pair heights allow; H13 on side twins at L | No |
+| add_10k sections S: lone block not filling the page | blockPlan assertion: one block fits → rows = min(fit, ceil(6 / cols)); warn when pages > anchors-off pages + 1 or a page < 50 % used | No |
+| Bottom frame not printed (4 page pairs) | Raster check on the PDF: the outer frame closes at its lowest point (~20 lines of Python) | No — L-OVERFLOW and the DOM say the border exists |
+| Anchor content 0.1 mm past its cell | Content bottom ≤ cell bottom − 2 mm pad | Partly (E2 at 0.5 mm) — tighten to the pad |
+| "N = N." step lines; orphaned last word on the Say line | String / line-box checks in the anchors check | No |
+| E5 (CL-4b) noisy on add_50 S | Fix E5's write-above classifier | E5 exists (WARN), misclassifies |
+
+**Speed-ups**
+
+| Cost | Smallest change |
+|---|---|
+| The critic measured by hand what a driver could table | One driver: render + measure (bands, overflow, page fill, frame closed) + anchors-off diff, writing a table |
+| Page-count regressions found only by the critic | Page-count table (anchors vs off) in every render run; > 2× off is an instant flag |
+| A builder labelled a real E4 failure as "drift" | A FAIL line in a gate is never re-labelled in a report; the report lists every FAIL verbatim |

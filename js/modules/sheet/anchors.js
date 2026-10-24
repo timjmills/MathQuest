@@ -149,11 +149,11 @@ export const unslot = (html) => String(html)
  * One step state of the example: the template's own `stepState`, else (the fallback) the whole
  * cell with its answer traced grey.
  */
-function stateHtml(it, merged, k, c, twinCols, whole, size) {
+function stateHtml(it, merged, k, c, twinCols, whole, size, level = 3) {
     const t = stepTemplateOf(it);
     // The state is drawn at the anchor's own (smaller) preset: the templates read ctx.metrics and
     // the kit's size custom properties, which the wrapper's `ws-<size>` class sets (anchorHtml).
-    const ctx = resolveCtx(Object.assign({}, c, { size, metrics: undefined, state: 'blank', scaffoldLevel: 3, options: Object.assign({}, c.options || {}, { factColumns: twinCols }) }));
+    const ctx = resolveCtx(Object.assign({}, c, { size, metrics: undefined, state: 'blank', scaffoldLevel: level, options: Object.assign({}, c.options || {}, { factColumns: twinCols }) }));
     if (t && !whole) {
         const payload = Object.assign({}, it.q.cell.payload || {});
         // A fact's digit size follows the fact ladder, not the preset: pin it to the anchor's size.
@@ -180,11 +180,24 @@ export function stateSize(pageSize, n) {
     return 'S';
 }
 
+/** The narrowest column a step list keeps beside its state (mm): about five words at the zone size. */
+const BESIDE_MIN_MM = 30;
+
 /** The inner width of a full-width anchor cell at one column (mm). */
 const BAND_W_MM = 178;
 
-const lineHtml = (text, n) => `<li${n ? '' : ' class="mq-anchor-cont"'}>${n ? `<em>${n}</em>` : '<em></em>'}<span>${esc(text)}</span></li>`;
-const stepsList = (steps, idx) => `<ol class="mq-anchor-steps">${idx.map((i) => stepLines(steps[i].text).map((t, j) => lineHtml(t, j === 0 ? i + 1 : 0)).join('')).join('')}</ol>`;
+/**
+ * TY-11: a step number is pupil-facing type, never under the minimum (the quiet letter at S, the
+ * size table's smallest pupil type). The list's 0.85 em ran 7.0 pt at S and 7.8 pt at M (lead
+ * pilot E1); the floor rides on the number itself, so pages without anchors are untouched.
+ */
+const TY11_MIN_PT = Math.min(...Object.values(SIZES).map((s) => s.letterPt));
+const NUM_STYLE = ` style="font-size:max(0.85em,${TY11_MIN_PT}pt)"`;
+// Critic anchors-r1 (5): a line never wraps before its "=": the word before it, "=" and the value
+// after it are held together (no-break spaces), so "regrouped = 13." stays on one line.
+const keepEquals = (html) => html.replace(/ +(=) +/g, '&nbsp;$1&nbsp;');
+const lineHtml = (text, n) => `<li${n ? '' : ' class="mq-anchor-cont"'}>${n ? `<em${NUM_STYLE}>${n}</em>` : '<em></em>'}<span>${keepEquals(esc(text))}</span></li>`;
+const stepsList = (steps, idx, style = '') => `<ol class="mq-anchor-steps"${style}>${idx.map((i) => stepLines(steps[i].text).map((t, j) => lineHtml(t, j === 0 ? i + 1 : 0)).join('')).join('')}</ol>`;
 
 /**
  * The anchor's drawing.
@@ -195,8 +208,13 @@ const stepsList = (steps, idx) => `<ol class="mq-anchor-steps">${idx.map((i) => 
  *        twin (one state); or the compact full-width band of Mixed practice (one state, its steps
  *        beside it), which keeps a skill's shelf band short enough for two skills a page
  * @param {number} o.twinCols   the column count the pupil's cells are drawn at (fact ladder, stacks)
+ * @param {number} [o.level]   the scaffold level the example is drawn at (3, a Model cell's; a
+ *        practice page's side twin passes the pupil's own level, so the twin is the same drawing
+ *        with the same scaffolds as the problem beside it - owner ruling B, critic anchors-r1)
+ * @param {boolean} [o.greyNewest]  the one state's newest marks are grey even when the last step
+ *        only restates the answer (S5 side twin, owner ruling C)
  */
-export function anchorHtml(it, c, { variant = 'band', twinCols = 2 } = {}) {
+export function anchorHtml(it, c, { variant = 'band', twinCols = 2, level = 3, greyNewest = false } = {}) {
     const steps = workedStepsOf(it);
     const say = sayLineOf(it);
     let whole = !stepTemplateOf(it);
@@ -221,14 +239,33 @@ export function anchorHtml(it, c, { variant = 'band', twinCols = 2 } = {}) {
     if (variant === 'side' || variant === 'compact' || whole) {
         // One state: the worked example whole (the newest step grey), its steps under it
         // (side) or beside it (a band whose template draws no step states).
-        const k = merged.length - 1;
         const size = stateSize(c.size, variant === 'band' ? 2 : 1);
-        const st = `<div class="mq-anchor-cell ws-${size}">${stateHtml(it, merged, k, c, twinCols, whole, size)}</div>`;
-        const list = stepsList(steps, steps.map((_, i) => i));
+        let m = merged;
+        let one = stateHtml(it, m, m.length - 1, c, twinCols, whole, size, level);
+        // S5 / P-LC-9 (owner ruling C): the twin's LAST marks are grey. A last step that only
+        // restates what is written ("The sum is 224.") turns nothing grey, so it shares its state
+        // with the step before it until the newest marks show grey.
+        if (greyNewest && !whole) {
+            while (m.length > 1 && !/data-ws-ink="trace"/.test(one)) {
+                m = m.slice(0, -2).concat([{ marks: m[m.length - 2].marks.concat(m[m.length - 1].marks) }]);
+                one = stateHtml(it, m, m.length - 1, c, twinCols, whole, size, level);
+            }
+        }
+        // (the whole-trace fallback, S5: its answer traced grey - a template that ignores the
+        // trace ink keeps its answer slot, and the slot takes the grey: INK-3's trace rule)
+        if (greyNewest && whole && !/data-ws-ink="trace"/.test(one)) one = one.replace(/ data-ws-aslot="answer"(?![^>]*data-ws-ink)/g, ' data-ws-aslot="answer" data-ws-ink="trace"');
+        const st = `<div class="mq-anchor-cell ws-${size}">${one}</div>`;
+        // The steps keep a readable column (BESIDE_MIN_MM): beside a state too wide to leave it,
+        // they wrap UNDER the state and the cell grows (DN-10; lead pilot E2: a list squeezed to
+        // no width beside a wide bar graph ran its lines out of the cell).
+        const list = stepsList(steps, steps.map((_, i) => i), ` style="flex:1 1 ${BESIDE_MIN_MM}mm"`);
         // The state and its numbered steps side by side (the twin keeps its height close to the
         // pupil's problem beside it); the Say line closes it.
-        const body = `<div class="mq-anchor-one mq-anchor-beside">${st}${list}</div>`;
-        return `<div class="mq-anchor mq-anchor-${variant}" data-ws-anchor="${variant}" data-ws-states="1">${body}${sayHtml}</div>`;
+        const body = `<div class="mq-anchor-one mq-anchor-beside" style="flex-wrap:wrap">${st}${list}</div>`;
+        // A side twin is centred in its cell at its own width (lead pilot E3, H13: never pinned to
+        // one side of the pair's cell with an empty band beside it); a band keeps the full width.
+        const centre = variant === 'side' ? ' style="width:auto;max-width:100%;align-self:center"' : '';
+        return `<div class="mq-anchor mq-anchor-${variant}" data-ws-anchor="${variant}" data-ws-states="1"${centre}>${body}${sayHtml}</div>`;
     }
     const n = groups.length;
     const size = stateSize(c.size, n);
@@ -244,13 +281,13 @@ export function anchorHtml(it, c, { variant = 'band', twinCols = 2 } = {}) {
  * the same in every state, so the key shows it exactly as the pupil page (AK-1), and it carries no
  * key and no graded slot (unscored, PT-LBL-6).
  */
-export function anchorItem(it, { variant = 'band', twinCols = 2 } = {}) {
+export function anchorItem(it, { variant = 'band', twinCols = 2, level = 3, greyNewest = false } = {}) {
     return {
         q: null,
         anchor: variant,
         source: it,
         skill: it.skill || '',
-        render: (c) => anchorHtml(it, c, { variant, twinCols }),
+        render: (c) => anchorHtml(it, c, { variant, twinCols, level, greyNewest }),
         key: { value: '', display: '', slots: {} },
         drawsAnswer: true,
         visual: false,
@@ -286,11 +323,82 @@ export function anchorPlanItem(a, cols = 1) {
 
 /** The measured height of an anchor item (mm) at `cols`, with a floor. */
 export function anchorHeightMm(a, cols = 1) {
+    // A side twin measured in its printed pair (print-sheet measurePairs: the real grid at its
+    // real column width, so no wrap margin is needed; anchors.check.cjs E2 holds it to the print).
+    if (cols === 2 && a && Number.isFinite(a.pairMm) && a.pairMm > 0) return a.pairMm;
     const m = a && a.measured && a.measured[cols];
     // + 6 mm: the anchor's step text wraps in narrow state columns, and a wrap measured in the
     // app page can fall one line short of the printed document's (a line is ~5 mm at L).
     return m && Number.isFinite(m.hMm) ? m.hMm + 6 : 0;
 }
+
+/**
+ * SIDE BY SIDE: the rows a page holds so every cell is at least as tall as what it holds (lead
+ * pilot E2). A twin's step text is part of its measured height; a layout that kept the practice
+ * ceiling's rows printed cells shorter than the twin, and its steps ran out of the cell (DN-10:
+ * content never overflows; the cell grows, and a page holds fewer pairs). A twin carries the same
+ * +6 mm print margin as a band (anchorHeightMm).
+ *
+ * Two columns ([twin | problem] rows): the most rows that hold the tallest pair (once the pairs
+ * are measured as they print, print-sheet measurePairs). One column (a twin above
+ * its problem): whole pairs, each pair's twin row and problem row as tall as each needs
+ * (`pairMm`, the grid's row template), so a twin taller than half a pair still fits.
+ *
+ * @param {Object} L       the section layout (cols, rows, cellH, hMin, gridH)
+ * @param {Object[]} items the section's items: twins (`anchor`) and, when known, the problems
+ * @returns {Object} L, or a copy with fewer rows (and `pairMm: [twin, problem]` at one column)
+ */
+export function sideFit(L, items) {
+    const twins = (items || []).filter((it) => it && it.anchor);
+    if (!L || (L.cols !== 1 && L.cols !== 2) || !twins.length) return L;
+    const G = Number(L.gridH) > 0 ? Number(L.gridH) : L.rows * L.cellH;
+    const tw = Math.max(0, ...twins.map((a) => anchorHeightMm(a, L.cols)));
+    const hs = (items || []).filter((it) => it && !it.anchor && it.measured && it.measured[L.cols] && Number.isFinite(it.measured[L.cols].hMm)).map((it) => it.measured[L.cols].hMm + 1);
+    const pr = hs.length ? Math.max(...hs) : Number(L.hMin) || 0;
+    if (L.cols === 2 && twins.every((a) => a.side4 && a.cols4 && Number.isFinite(a.pair4Mm) && a.pair4Mm > 0)) {
+        // Owner ruling A: [twin | problem | twin | problem] rows, the most that hold the tallest
+        // row of two pairs as it prints (print-sheet measureSide4), taken when a page holds at
+        // least as many pairs as two columns would. Each cell is still drawn at the two-column
+        // width (`drawCols`), so nothing shrinks (DN-10).
+        const need4 = Math.max(...twins.map((a) => a.pair4Mm));
+        const need2 = Math.max(...twins.map((a) => Number(a.pair2Mm) || 0), hs.length ? pr : 0, tw);
+        const rows = Math.max(1, Math.floor((G + 0.3) / need4));
+        if (2 * rows >= Math.max(1, Math.floor(G / need2))) {
+            return Object.assign({}, L, { cols: 4, drawCols: 2, side4: true, colsTpl4: twins[0].cols4, rows, perPage: rows * 4, cellW: Math.round((L.cellW || 93) / 2 * 10) / 10, cellH: Math.floor((G / rows) * 1000) / 1000 });
+        }
+    }
+    if (L.cols === 2) {
+        // (L.hMin holds the twins at an equal half column; with the problems known, they decide)
+        const need = Math.max(hs.length ? pr : Number(L.hMin) || 0, tw);
+        // The densest rows that hold every pair: fewer when a twin is taller than its row, more
+        // when the practice ceiling left rows a third empty (E4, L-class wasted space).
+        const fit = Math.max(1, Math.floor(G / need));
+        const rows = need > L.cellH + 0.05 ? Math.min(L.rows, fit) : twins.every((a) => Number.isFinite(a.pairMm)) && hs.length ? fit : L.rows;
+        if (rows === L.rows) return L;
+        return Object.assign({}, L, { rows, perPage: rows * 2, cellH: Math.floor((G / rows) * 1000) / 1000 });
+    }
+    // (A one-row layout made a PAIR of rows keeps a cell too tall for two: rows x cellH ran past
+    // the page - critic anchors-r1, a 456 mm grid. Those rows are re-planned from the grid.)
+    if (!(tw > L.cellH + 0.05) && !(L.rows * L.cellH > G + 0.05)) return L;
+    const pairs = Math.max(1, Math.min(L.rows / 2, Math.floor(G / (tw + pr))));
+    const rows = pairs * 2;
+    // The spare height shared by the pair's two rows in proportion (never under what each holds).
+    const k = G / pairs / (tw + pr);
+    const pairMm = [Math.round(tw * k * 10) / 10, Math.round(pr * k * 10) / 10];
+    return Object.assign({}, L, { rows, perPage: rows, cellH: Math.floor((G / rows) * 1000) / 1000, pairMm });
+}
+
+/** The columns of a two-column side-by-side grid (lead pilot E3, H13): sized to their content. */
+export const SIDE_COLS = 'auto auto';
+
+/** The four-column side grid, [twin | problem | twin | problem] (owner ruling A): each problem
+ *  column at least `problemMm` wide (print-sheet measureSide4: the widest problem's ink + its
+ *  margins); the spare width shared by all four (a twin's steps wrap under its state when they must). */
+export const side4Cols = (problemMm) => `auto minmax(${problemMm}mm,auto) auto minmax(${problemMm}mm,auto)`;
+
+/** A two-column side pair with an empty band this wide (H13's 30 %) beside a cell's content fills
+ *  under about half of its row: it is a candidate for the four-column grid (print-sheet measureSide4). */
+export const SIDE4_BAND = 0.30;
 
 /* ============================================================ easy numbers first */
 
@@ -410,6 +518,14 @@ export function blockPages(count, bp, cols, anchorMm) {
 
 /* ====================================================================== the CSS */
 
+/**
+ * Printed on anchor pages only (practice.js composeSheet), so every other page keeps its bytes.
+ * Critic anchors-r1 (4), S5 / L-ANCHOR: the key's answer weight (700 on solid ink) does not reach
+ * a worked example - the example is a facsimile of the pupil page's. Additive: a later, more
+ * specific rule; the key's own rule is untouched.
+ */
+export const ANCHOR_PAGE_CSS = '<style data-mq-anchor-page>.ws-page.ws-key .mq-anchor [data-ws-ink="solid"]:not(.mq-pupil){font-weight:inherit}</style>';
+
 /** Drawn by the engine stylesheet (practice.js SHEET_ENGINE_CSS). Black and white, calm. */
 export const ANCHOR_CSS = `
 :is(.ws-page,.ws-sheet) .ws-cell.mq-anchorcell{justify-content:flex-start;align-items:stretch}
@@ -437,5 +553,5 @@ export const ANCHOR_CSS = `
 export default {
     ANCHOR_MODES, ANCHOR_ROLES, normaliseAnchors, wordCount, workedStepsOf, anchorEligible, ineligibleNote,
     stepLines, anchorGroups, sayLineOf, stepTemplateOf, unslot, stateSize, anchorHtml, anchorItem,
-    anchorPlanItem, anchorHeightMm, easeScore, pickDistinct, sideItems, pupilCount, blockPlan, blockPages, ANCHOR_CSS,
+    anchorPlanItem, anchorHeightMm, sideFit, SIDE_COLS, side4Cols, SIDE4_BAND, ANCHOR_PAGE_CSS, easeScore, pickDistinct, sideItems, pupilCount, blockPlan, blockPages, ANCHOR_CSS,
 };

@@ -263,6 +263,22 @@ function verticalPt(cols, n, look) {
     return LADDER_PTS[LADDER_PTS.length - 1];
 }
 
+/**
+ * The largest point size from the column's ladder rung down to `floor` (the size's working digits)
+ * at which the widest vertical fact fits its cell (verticalPt's width formula); 0 when none does.
+ * Below 5 columns the rung is the size's Auto one (16 / 24 / 28 pt at S / M / L): the cell's
+ * height (FACT_CELL_H_MM) is the Auto page's, so a bigger digit would stand out of it.
+ */
+function verticalFitPt(cols, n, look, floor, size) {
+    const { inner } = cellWidthMm(cols, LIVE_W_MM, look);
+    const top = cols >= 5 ? factDigitPt(cols) : Math.min(factDigitPt(5), factDigitPt(AUTO[size] || 5));
+    const pts = [...new Set([top, ...LADDER_PTS, floor])].filter((p) => p <= top && p >= Math.min(floor, top)).sort((a, b) => b - a);
+    for (const pt of pts) {
+        if ((FACT_OP_TRACK_EM + n * FACT_TRACK_EM) * (EM_MM[pt] || (pt / 72) * 25.4) + 5 <= inner) return pt;
+    }
+    return 0;
+}
+
 /** The width of an across fact "144 ÷ 12 = ___" at `pt` (Andika digits 0.55 em, signs 0.6 em). */
 function acrossWidthMm(items, pt, size) {
     const em = EM_MM[pt] || (pt / 72) * 25.4;
@@ -318,7 +334,17 @@ export function factRowsLayout(items, input) {
     const fitsAt = (c) => { const pt = factDigitPt(c); return (n + 1) * FACT_TRACK_EM * (EM_MM[pt] || (pt / 72) * 25.4) <= cellWidthMm(c, LIVE_W_MM, ctx.look).inner - 4.5; };
     while (tightDiv && cols > 5 && !fitsAt(cols)) cols--;
     if (cols < askedCols) note = [note, `${n}-digit numbers: ${cols} columns so the digits keep their size.`].filter(Boolean).join(' ');
-    const pt = tightDiv && fitsAt(cols) ? factDigitPt(cols) : verticalPt(cols, n, ctx.look);
+    // A long + - x fact (5-6 digits: sub_100k_regroup, sub_1m_regroup) that does not fit its cell
+    // at the size's working digits drops columns until it does (PG-20: content never shrinks to
+    // fit; print-lint ILLEGIBLE / PG-12 at 16 pt in 8 columns). Division keeps its own path above.
+    if (!divide) {
+        const floor = (SIZES[ctx.size] || SIZES.L).digitPt;
+        const before = cols;
+        while (cols > 2 && verticalFitPt(cols, n, ctx.look, floor, ctx.size) === 0) cols--;
+        if (cols < before) note = [note, `${n}-digit facts: ${cols} columns so the digits keep the ${ctx.size} size.`].filter(Boolean).join(' ');
+    }
+    const pt = tightDiv && fitsAt(cols) ? factDigitPt(cols)
+        : (!divide && verticalFitPt(cols, n, ctx.look, (SIZES[ctx.size] || SIZES.L).digitPt, ctx.size)) || verticalPt(cols, n, ctx.look);
     if (pt < factDigitPt(cols)) note = [note, `Digits ${pt} pt so ${n}-digit facts fit ${cols} columns.`].filter(Boolean).join(' ');
     const cap = factRowsCapacity(cols, ctx.size, ctx.paper, header);
     const rows = cap.rows;
@@ -395,7 +421,10 @@ function factCell(it, L) {
         });
     }
     const payload = { a: o[0], b: o[1], op, ans: Number.isFinite(Number(ans)) && ans !== '' ? Number(ans) : undefined, columns: L.cols, pt: L.digitPt, digits: L.tracks,
-        padTop: factPadTop(L.labels, L.cols) };
+        padTop: factPadTop(L.labels, L.cols),
+        // a fact-rows page is a fact drill: a 3+-track sum stays a fact in 4 columns or fewer too
+        // (cells/fact.js drawsStack turns it into the regroup stack on a practice page)
+        ...(op === '+' ? { regroup: false } : {}) };
     const q2 = Object.assign({}, q, { cell: { template: 'fact', payload, v: 1 } });
     return Object.assign({}, it, {
         q: q2,
